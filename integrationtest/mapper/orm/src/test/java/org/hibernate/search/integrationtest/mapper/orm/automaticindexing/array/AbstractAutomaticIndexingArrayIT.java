@@ -6,50 +6,51 @@
  */
 package org.hibernate.search.integrationtest.mapper.orm.automaticindexing.array;
 
-import org.hibernate.search.util.impl.integrationtest.mapper.orm.BackendMockTestRule;
-import org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmSetupHelper;
-import org.hibernate.search.util.impl.integrationtest.mapper.orm.ReusableOrmSetupHolder;
+import static org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmUtils.with;
 
-import org.junit.ClassRule;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.MethodRule;
+import org.hibernate.SessionFactory;
+import org.hibernate.search.util.impl.integrationtest.common.extension.BackendMock;
+import org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmSetupHelper;
+
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestInstance;
+import org.junit.jupiter.api.extension.RegisterExtension;
 
 /**
  * An abstract base for tests dealing with automatic indexing based on Hibernate ORM entity events
  * and involving an array.
  */
-public abstract class AbstractAutomaticIndexingArrayIT<TIndexed, TArray, TIndexField> {
+@TestInstance(TestInstance.Lifecycle.PER_CLASS)
+abstract class AbstractAutomaticIndexingArrayIT<TIndexed, TArray, TIndexField> {
 
-	@ClassRule
-	public static BackendMockTestRule backendMock = BackendMockTestRule.createGlobal();
+	@RegisterExtension
+	public static BackendMock backendMock = BackendMock.create();
 
-	@ClassRule
-	public static ReusableOrmSetupHolder setupHolder = ReusableOrmSetupHolder.withBackendMock( backendMock );
-
-	@Rule
-	public MethodRule setupHolderMethodRule = setupHolder.methodRule();
+	@RegisterExtension
+	public static OrmSetupHelper ormSetupHelper = OrmSetupHelper.withBackendMock( backendMock );
 
 	private final ArrayModelPrimitives<TIndexed, TArray, TIndexField> primitives;
+	private SessionFactory sessionFactory;
 
 	AbstractAutomaticIndexingArrayIT(ArrayModelPrimitives<TIndexed, TArray, TIndexField> primitives) {
 		this.primitives = primitives;
 	}
 
-	@ReusableOrmSetupHolder.Setup
-	public void setup(OrmSetupHelper.SetupContext setupContext) {
+	@BeforeAll
+	void setup() {
 		backendMock.expectSchema( primitives.getIndexName(), b -> b
 				.field( "serializedArray", primitives.getExpectedIndexFieldType(),
 						b2 -> b2.multiValued( true ) )
 				.field( "elementCollectionArray", primitives.getExpectedIndexFieldType(),
 						b2 -> b2.multiValued( true ) ) );
 
-		setupContext.withAnnotatedTypes( primitives.getIndexedClass() );
+		sessionFactory = ormSetupHelper.start().withAnnotatedTypes( primitives.getIndexedClass() ).setup();
 	}
 
 	@Test
-	public void serializedArray_replaceArray() {
-		setupHolder.runInTransaction( session -> {
+	void serializedArray_replaceArray() {
+		with( sessionFactory ).runInTransaction( session -> {
 			TIndexed entity1 = primitives.newIndexed( 1 );
 
 			TArray array1 = primitives.newArray( 2 );
@@ -67,7 +68,7 @@ public abstract class AbstractAutomaticIndexingArrayIT<TIndexed, TArray, TIndexF
 		backendMock.verifyExpectationsMet();
 
 		// Test replacing the array
-		setupHolder.runInTransaction( session -> {
+		with( sessionFactory ).runInTransaction( session -> {
 			TIndexed entity1 = session.get( primitives.getIndexedClass(), 1 );
 
 			TArray array2 = primitives.newArray( 3 );
@@ -86,8 +87,8 @@ public abstract class AbstractAutomaticIndexingArrayIT<TIndexed, TArray, TIndexF
 	}
 
 	@Test
-	public void serializedArray_replaceElement() {
-		setupHolder.runInTransaction( session -> {
+	void serializedArray_replaceElement() {
+		with( sessionFactory ).runInTransaction( session -> {
 			TIndexed entity1 = primitives.newIndexed( 1 );
 
 			TArray array = primitives.newArray( 2 );
@@ -105,7 +106,7 @@ public abstract class AbstractAutomaticIndexingArrayIT<TIndexed, TArray, TIndexF
 		backendMock.verifyExpectationsMet();
 
 		// Test replacing an element in the array
-		setupHolder.runInTransaction( session -> {
+		with( sessionFactory ).runInTransaction( session -> {
 			TIndexed entity1 = session.get( primitives.getIndexedClass(), 1 );
 
 			TArray array = primitives.getSerializedArray( entity1 );
@@ -120,8 +121,8 @@ public abstract class AbstractAutomaticIndexingArrayIT<TIndexed, TArray, TIndexF
 	}
 
 	@Test
-	public void elementCollectionArray_replaceArray() {
-		setupHolder.runInTransaction( session -> {
+	void elementCollectionArray_replaceArray() {
+		with( sessionFactory ).runInTransaction( session -> {
 			TIndexed entity1 = primitives.newIndexed( 1 );
 
 			TArray array1 = primitives.newArray( 2 );
@@ -139,7 +140,7 @@ public abstract class AbstractAutomaticIndexingArrayIT<TIndexed, TArray, TIndexF
 		backendMock.verifyExpectationsMet();
 
 		// Test replacing the array
-		setupHolder.runInTransaction( session -> {
+		with( sessionFactory ).runInTransaction( session -> {
 			TIndexed entity1 = session.get( primitives.getIndexedClass(), 1 );
 
 			TArray array2 = primitives.newArray( 3 );
@@ -158,8 +159,8 @@ public abstract class AbstractAutomaticIndexingArrayIT<TIndexed, TArray, TIndexF
 	}
 
 	@Test
-	public void elementCollectionArray_replaceElement() {
-		setupHolder.runInTransaction( session -> {
+	void elementCollectionArray_replaceElement() {
+		with( sessionFactory ).runInTransaction( session -> {
 			TIndexed entity1 = primitives.newIndexed( 1 );
 
 			TArray array = primitives.newArray( 2 );
@@ -177,7 +178,7 @@ public abstract class AbstractAutomaticIndexingArrayIT<TIndexed, TArray, TIndexF
 		backendMock.verifyExpectationsMet();
 
 		// Test replacing an element in the array
-		setupHolder.runInTransaction( session -> {
+		with( sessionFactory ).runInTransaction( session -> {
 			TIndexed entity1 = session.get( primitives.getIndexedClass(), 1 );
 
 			TArray array = primitives.getElementCollectionArray( entity1 );

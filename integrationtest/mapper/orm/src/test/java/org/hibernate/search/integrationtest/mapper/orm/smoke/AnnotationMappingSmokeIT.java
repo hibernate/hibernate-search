@@ -120,12 +120,17 @@ class AnnotationMappingSmokeIT {
 				.field( "myLocalDateField", LocalDate.class )
 		);
 
-		sessionFactory = ormSetupHelper.start().withAnnotatedTypes(
-				IndexedEntity.class,
-				ParentIndexedEntity.class,
-				OtherIndexedEntity.class,
-				YetAnotherIndexedEntity.class
-		).setup();
+		sessionFactory = ormSetupHelper.start()
+				.dataClearing( config -> config.preClear( YetAnotherIndexedEntity.class, ye -> {
+					ye.setEmbeddedList( null );
+					ye.setEmbeddedMap( null );
+				} ) )
+				.withAnnotatedTypes(
+						IndexedEntity.class,
+						ParentIndexedEntity.class,
+						OtherIndexedEntity.class,
+						YetAnotherIndexedEntity.class
+				).setup();
 	}
 
 	@Test

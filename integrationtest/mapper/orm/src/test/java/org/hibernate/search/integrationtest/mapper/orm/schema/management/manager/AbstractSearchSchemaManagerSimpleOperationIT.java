@@ -7,52 +7,53 @@
 package org.hibernate.search.integrationtest.mapper.orm.schema.management.manager;
 
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmUtils.with;
 
 import java.util.concurrent.CompletableFuture;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
 
+import org.hibernate.SessionFactory;
 import org.hibernate.search.mapper.orm.Search;
 import org.hibernate.search.mapper.orm.cfg.HibernateOrmMapperSettings;
 import org.hibernate.search.mapper.orm.schema.management.SchemaManagementStrategyName;
 import org.hibernate.search.mapper.orm.schema.management.SearchSchemaManager;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
 import org.hibernate.search.util.common.SearchException;
+import org.hibernate.search.util.impl.integrationtest.common.extension.BackendMock;
 import org.hibernate.search.util.impl.integrationtest.common.extension.SchemaManagementWorkBehavior;
 import org.hibernate.search.util.impl.integrationtest.common.reporting.FailureReportUtils;
-import org.hibernate.search.util.impl.integrationtest.mapper.orm.BackendMockTestRule;
 import org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmSetupHelper;
-import org.hibernate.search.util.impl.integrationtest.mapper.orm.ReusableOrmSetupHolder;
 
-import org.junit.ClassRule;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.MethodRule;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestInstance;
+import org.junit.jupiter.api.extension.RegisterExtension;
 
-public abstract class AbstractSearchSchemaManagerSimpleOperationIT {
+@TestInstance(TestInstance.Lifecycle.PER_CLASS)
+abstract class AbstractSearchSchemaManagerSimpleOperationIT {
 
-	@ClassRule
-	public static BackendMockTestRule backendMock = BackendMockTestRule.createGlobal();
+	@RegisterExtension
+	public static BackendMock backendMock = BackendMock.create();
 
-	@ClassRule
-	public static ReusableOrmSetupHolder setupHolder = ReusableOrmSetupHolder.withBackendMock( backendMock );
+	@RegisterExtension
+	public static OrmSetupHelper ormSetupHelper = OrmSetupHelper.withBackendMock( backendMock );
+	protected SessionFactory sessionFactory;
 
-	@Rule
-	public MethodRule setupHolderMethodRule = setupHolder.methodRule();
-
-	@ReusableOrmSetupHolder.Setup
-	public void setup(OrmSetupHelper.SetupContext setupContext) {
+	@BeforeAll
+	void setup() {
 		backendMock.expectAnySchema( IndexedEntity1.NAME );
 		backendMock.expectAnySchema( IndexedEntity2.NAME );
-		setupContext.withProperty( HibernateOrmMapperSettings.SCHEMA_MANAGEMENT_STRATEGY,
-				SchemaManagementStrategyName.NONE )
-				.withAnnotatedTypes( IndexedEntity1.class, IndexedEntity2.class );
+		sessionFactory = ormSetupHelper.start()
+				.withProperty( HibernateOrmMapperSettings.SCHEMA_MANAGEMENT_STRATEGY, SchemaManagementStrategyName.NONE )
+				.withAnnotatedTypes( IndexedEntity1.class, IndexedEntity2.class )
+				.setup();
 	}
 
 	@Test
-	public void success_fromMapping_single() {
-		SearchSchemaManager manager = Search.mapping( setupHolder.sessionFactory() )
+	void success_fromMapping_single() {
+		SearchSchemaManager manager = Search.mapping( sessionFactory )
 				.scope( IndexedEntity1.class )
 				.schemaManager();
 		expectWork( IndexedEntity1.NAME, CompletableFuture.completedFuture( null ) );
@@ -61,8 +62,8 @@ public abstract class AbstractSearchSchemaManagerSimpleOperationIT {
 	}
 
 	@Test
-	public void success_fromMapping_all() {
-		SearchSchemaManager manager = Search.mapping( setupHolder.sessionFactory() )
+	void success_fromMapping_all() {
+		SearchSchemaManager manager = Search.mapping( sessionFactory )
 				.scope( Object.class )
 				.schemaManager();
 		expectWork( IndexedEntity1.NAME, CompletableFuture.completedFuture( null ) );
@@ -72,8 +73,8 @@ public abstract class AbstractSearchSchemaManagerSimpleOperationIT {
 	}
 
 	@Test
-	public void success_fromSession_single() {
-		setupHolder.runNoTransaction( session -> {
+	void success_fromSession_single() {
+		with( sessionFactory ).runNoTransaction( session -> {
 			SearchSchemaManager manager = Search.session( session )
 					.schemaManager( IndexedEntity1.class );
 			expectWork( IndexedEntity1.NAME, CompletableFuture.completedFuture( null ) );
@@ -83,8 +84,8 @@ public abstract class AbstractSearchSchemaManagerSimpleOperationIT {
 	}
 
 	@Test
-	public void success_fromSession_all() {
-		setupHolder.runNoTransaction( session -> {
+	void success_fromSession_all() {
+		with( sessionFactory ).runNoTransaction( session -> {
 			SearchSchemaManager manager = Search.session( session )
 					.schemaManager();
 			expectWork( IndexedEntity1.NAME, CompletableFuture.completedFuture( null ) );
@@ -95,8 +96,8 @@ public abstract class AbstractSearchSchemaManagerSimpleOperationIT {
 	}
 
 	@Test
-	public void exception_single() {
-		SearchSchemaManager manager = Search.mapping( setupHolder.sessionFactory() )
+	void exception_single() {
+		SearchSchemaManager manager = Search.mapping( sessionFactory )
 				.scope( Object.class )
 				.schemaManager();
 
@@ -112,8 +113,8 @@ public abstract class AbstractSearchSchemaManagerSimpleOperationIT {
 	}
 
 	@Test
-	public void exception_multiple() {
-		SearchSchemaManager manager = Search.mapping( setupHolder.sessionFactory() )
+	void exception_multiple() {
+		SearchSchemaManager manager = Search.mapping( sessionFactory )
 				.scope( Object.class )
 				.schemaManager();
 

@@ -17,7 +17,7 @@ import org.junit.platform.suite.api.SuiteDisplayName;
  * Adapt the classpath filter as needed to run a single test or an entire test package.
  */
 @Suite
-@SuiteDisplayName("Lucene TCK tests Runner")
+@SuiteDisplayName("Outbox polling tests Runner")
 // Defines a "root" package, subpackages are included. Use Include/Exclude ClassNamePatterns annotations to limit the executed tests:
 @SelectPackages("org.hibernate.search.integrationtest.mapper.orm.automaticindexing")
 // Default class pattern does not include IT tests, hence we want to customize it a bit:

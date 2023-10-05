@@ -40,8 +40,8 @@ import org.hibernate.search.mapper.orm.session.SearchSession;
 import org.hibernate.search.mapper.pojo.extractor.builtin.BuiltinContainerExtractors;
 import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.ProgrammaticMappingConfigurationContext;
 import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.TypeMappingStep;
+import org.hibernate.search.util.impl.integrationtest.common.extension.BackendMock;
 import org.hibernate.search.util.impl.integrationtest.common.extension.StubSearchWorkBehavior;
-import org.hibernate.search.util.impl.integrationtest.mapper.orm.BackendMockTestRule;
 import org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmSetupHelper;
 
 import org.junit.jupiter.api.BeforeAll;
@@ -53,7 +53,7 @@ import org.junit.jupiter.api.extension.RegisterExtension;
 class ProgrammaticMappingSmokeIT {
 
 	@RegisterExtension
-	public static BackendMockTestRule backendMock = BackendMockTestRule.createGlobal();
+	public static BackendMock backendMock = BackendMock.create();
 
 	@RegisterExtension
 	public static OrmSetupHelper ormSetupHelper = OrmSetupHelper.withBackendMock( backendMock );
@@ -126,6 +126,7 @@ class ProgrammaticMappingSmokeIT {
 						OtherIndexedEntity.class,
 						YetAnotherIndexedEntity.class
 				)
+				.dataClearing( config -> config.clearDatabaseData( false ) )
 				.setup();
 	}
 
@@ -287,7 +288,7 @@ class ProgrammaticMappingSmokeIT {
 	}
 
 	@Test
-	public void search() {
+	void search() {
 		backendMock.inLenientMode( () -> with( sessionFactory ).runInTransaction( session -> {
 			IndexedEntity entity0 = new IndexedEntity();
 			entity0.setId( 0 );

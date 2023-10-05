@@ -13,15 +13,9 @@ import org.hibernate.search.engine.backend.common.DocumentReference;
 import org.hibernate.search.engine.search.query.SearchQuery;
 import org.hibernate.search.engine.search.query.SearchScroll;
 import org.hibernate.search.engine.search.query.SearchScrollResult;
-import org.hibernate.search.integrationtest.mapper.orm.search.loading.model.singletype.SingleTypeLoadingMapping;
-import org.hibernate.search.integrationtest.mapper.orm.search.loading.model.singletype.SingleTypeLoadingModel;
 import org.hibernate.search.util.impl.integrationtest.common.extension.StubNextScrollWorkBehavior;
 
-public class SearchQueryEntityLoadingScrollingIT<T> extends SearchQueryEntityLoadingBaseIT<T> {
-
-	public SearchQueryEntityLoadingScrollingIT(SingleTypeLoadingModel<T> model, SingleTypeLoadingMapping mapping) {
-		super( model, mapping );
-	}
+class SearchQueryEntityLoadingScrollingIT<T> extends SearchQueryEntityLoadingBaseIT<T> {
 
 	@Override
 	protected <T2> List<T2> getHits(List<String> targetIndexes, SearchQuery<T2> query,

@@ -45,16 +45,22 @@ import org.jboss.logging.Logger;
 class OrmSetupHelperCleaner {
 	private static final Logger log = Logger.getLogger( OrmSetupHelperCleaner.class.getName() );
 
-	private DataClearConfigImpl config;
+	private final DataClearConfigImpl config;
 
-	OrmSetupHelperCleaner() {
+	static OrmSetupHelperCleaner create(boolean oncePerClass) {
+		if ( oncePerClass ) {
+			return new OrmSetupHelperCleaner().appendConfiguration(
+					config -> config.clearDatabaseData( true ).clearIndexData( false ) );
+		}
+		return new OrmSetupHelperCleaner();
+	}
+
+	private OrmSetupHelperCleaner() {
 		this.config = new DataClearConfigImpl();
 	}
 
-
 	void cleanupData(SessionFactoryImplementor sessionFactory) {
-		if ( sessionFactory == null ) {
-			log.error( "session == null" );
+		if ( !( config.clearDatabaseData || config.clearIndexData ) ) {
 			return;
 		}
 		log.info( "Clearing data and reusing the same session factory." );
@@ -222,11 +228,9 @@ class OrmSetupHelperCleaner {
 		return createSelectOrDeleteAllOfSpecificTypeQuery( entityType, session, QueryType.DELETE );
 	}
 
-	public void configure(boolean reset, Consumer<DataClearConfig> configurer) {
-		if ( reset ) {
-			this.config = new DataClearConfigImpl();
-		}
+	public OrmSetupHelperCleaner appendConfiguration(Consumer<DataClearConfig> configurer) {
 		configurer.accept( this.config );
+		return this;
 	}
 
 	enum QueryType {
@@ -299,7 +303,7 @@ class OrmSetupHelperCleaner {
 		private final List<ThrowingConsumer<Session, RuntimeException>> preClear = new ArrayList<>();
 
 		private boolean clearIndexData = false;
-		private boolean clearDatabaseData = true;
+		private boolean clearDatabaseData = false;
 
 		@Override
 		public DataClearConfig clearDatabaseData(boolean clear) {

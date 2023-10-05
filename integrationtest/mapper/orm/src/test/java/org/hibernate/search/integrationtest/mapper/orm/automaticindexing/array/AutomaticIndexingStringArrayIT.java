@@ -19,7 +19,7 @@ import org.hibernate.annotations.JdbcTypeCode;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.GenericField;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
 
-public class AutomaticIndexingStringArrayIT
+class AutomaticIndexingStringArrayIT
 		extends AbstractAutomaticIndexingArrayIT<
 				AutomaticIndexingStringArrayIT.IndexedEntity,
 				String[],

@@ -8,9 +8,9 @@ package org.hibernate.search.integrationtest.jakarta.batch.massindexing;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.entry;
+import static org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmUtils.with;
 import static org.junit.Assume.assumeTrue;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -41,19 +41,19 @@ import org.hibernate.search.mapper.orm.session.SearchSession;
 import org.hibernate.search.mapper.orm.work.SearchIndexingPlan;
 import org.hibernate.search.util.common.AssertionFailure;
 import org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmSetupHelper;
-import org.hibernate.search.util.impl.integrationtest.mapper.orm.ReusableOrmSetupHolder;
 import org.hibernate.search.util.impl.test.annotation.TestForIssue;
 
-import org.junit.Before;
-import org.junit.ClassRule;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.MethodRule;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestInstance;
+import org.junit.jupiter.api.extension.RegisterExtension;
 
 /**
  * @author Mincong Huang
  */
-public class MassIndexingJobIT {
+@TestInstance(TestInstance.Lifecycle.PER_CLASS)
+class MassIndexingJobIT {
 
 	protected static final int INSTANCES_PER_DATA_TEMPLATE = 100;
 
@@ -68,25 +68,23 @@ public class MassIndexingJobIT {
 
 	private static final String MAIN_STEP_NAME = "produceLuceneDoc";
 
-	@ClassRule
-	public static ReusableOrmSetupHolder setupHolder =
-			ReusableOrmSetupHolder.withSingleBackend( BackendConfigurations.simple() );
-	@Rule
-	public MethodRule setupHolderMethodRule = setupHolder.methodRule();
+	@RegisterExtension
+	public static OrmSetupHelper ormSetupHelper = OrmSetupHelper.withSingleBackend( BackendConfigurations.simple() );
 
 	private EntityManagerFactory emf;
 
-	@ReusableOrmSetupHolder.Setup
-	public void setup(OrmSetupHelper.SetupContext setupContext, ReusableOrmSetupHolder.DataClearConfig dataClearConfig) {
-		setupContext.withAnnotatedTypes( Company.class, Person.class, WhoAmI.class, CompanyGroup.class )
-				.withProperty( HibernateOrmMapperSettings.INDEXING_LISTENERS_ENABLED, false );
-
-		dataClearConfig.clearOrder( CompanyGroup.class, Company.class );
+	@BeforeAll
+	void setup() {
+		emf = ormSetupHelper.start().withAnnotatedTypes(
+				Company.class, Person.class, WhoAmI.class, CompanyGroup.class )
+				.withProperty( HibernateOrmMapperSettings.INDEXING_LISTENERS_ENABLED, false )
+				.dataClearing( config -> config.clearOrder( CompanyGroup.class, Company.class )
+						.clearIndexData( true ) )
+				.setup();
 	}
 
-	@Before
-	public void initData() {
-		emf = setupHolder.entityManagerFactory();
+	@BeforeEach
+	void initData() {
 		List<Company> companies = new ArrayList<>();
 		List<Person> people = new ArrayList<>();
 		List<WhoAmI> whos = new ArrayList<>();
@@ -105,13 +103,13 @@ public class MassIndexingJobIT {
 			whos.add( new WhoAmI( "cid03 " + index3, "id03 " + index3, "uid03 " + index3 ) );
 		}
 
-		setupHolder.runInTransaction( session -> {
+		with( emf ).runInTransaction( session -> {
 			companies.forEach( session::persist );
 			people.forEach( session::persist );
 			whos.forEach( session::persist );
 		} );
 
-		setupHolder.runInTransaction( em -> {
+		with( emf ).runInTransaction( em -> {
 			List<CompanyGroup> groups = new ArrayList<>();
 			for ( int i = 0; i < INSTANCE_PER_ENTITY_TYPE; i += 3 ) {
 				int index1 = i;
@@ -126,9 +124,7 @@ public class MassIndexingJobIT {
 	}
 
 	@Test
-	public void simple()
-			throws InterruptedException,
-			IOException {
+	void simple() throws InterruptedException {
 		List<Company> companies = JobTestUtil.findIndexedResults( emf, Company.class, "name", "Google" );
 		List<Person> people = JobTestUtil.findIndexedResults( emf, Person.class, "firstName", "Linus" );
 		List<WhoAmI> whos = JobTestUtil.findIndexedResults( emf, WhoAmI.class, "id", "id01" );
@@ -155,9 +151,7 @@ public class MassIndexingJobIT {
 	}
 
 	@Test
-	public void simple_defaultCheckpointInterval()
-			throws InterruptedException,
-			IOException {
+	void simple_defaultCheckpointInterval() throws InterruptedException {
 		List<Company> companies = JobTestUtil.findIndexedResults( emf, Company.class, "name", "Google" );
 		List<Person> people = JobTestUtil.findIndexedResults( emf, Person.class, "firstName", "Linus" );
 		List<WhoAmI> whos = JobTestUtil.findIndexedResults( emf, WhoAmI.class, "id", "id01" );
@@ -184,7 +178,7 @@ public class MassIndexingJobIT {
 
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-2637")
-	public void indexedEmbeddedCollection() throws InterruptedException {
+	void indexedEmbeddedCollection() throws InterruptedException {
 		List<CompanyGroup> groupsContainingGoogle =
 				JobTestUtil.findIndexedResults( emf, CompanyGroup.class, "companies.name", "Google" );
 		List<CompanyGroup> groupsContainingRedHat =
@@ -213,7 +207,7 @@ public class MassIndexingJobIT {
 
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-4487")
-	public void indexedEmbeddedCollection_idFetchSize_entityFetchSize_mysql() throws InterruptedException {
+	void indexedEmbeddedCollection_idFetchSize_entityFetchSize_mysql() throws InterruptedException {
 		Dialect dialect = emf.unwrap( SessionFactoryImplementor.class ).getJdbcServices()
 				.getJdbcEnvironment().getDialect();
 		assumeTrue( "This test only makes sense on MySQL,"
@@ -250,7 +244,7 @@ public class MassIndexingJobIT {
 	}
 
 	@Test
-	public void purge() throws InterruptedException, IOException {
+	void purge() throws InterruptedException {
 		int expectedCount = 10;
 
 		assertThat( JobTestUtil.nbDocumentsInIndex( emf, Company.class ) ).isZero();
@@ -273,7 +267,7 @@ public class MassIndexingJobIT {
 	}
 
 	@Test
-	public void noPurge() throws InterruptedException, IOException {
+	void noPurge() throws InterruptedException {
 		int expectedCount = 10;
 
 		assertThat( JobTestUtil.nbDocumentsInIndex( emf, Company.class ) ).isZero();
@@ -296,9 +290,7 @@ public class MassIndexingJobIT {
 	}
 
 	@Test
-	public void reindexOnly()
-			throws InterruptedException,
-			IOException {
+	void reindexOnly() throws InterruptedException {
 		// searches before mass index,
 		// expected no results for each search
 		assertThat( JobTestUtil.findIndexedResults( emf, Company.class, "name", "Google" ) ).isEmpty();
@@ -321,9 +313,7 @@ public class MassIndexingJobIT {
 	}
 
 	@Test
-	public void reindexOnly_maxResults()
-			throws InterruptedException,
-			IOException {
+	void reindexOnly_maxResults() throws InterruptedException {
 		// searches before mass index,
 		// expected no results for each search
 		assertThat( JobTestUtil.nbDocumentsInIndex( emf, Company.class ) ).isZero();
@@ -343,9 +333,7 @@ public class MassIndexingJobIT {
 	}
 
 	@Test
-	public void partitioned()
-			throws InterruptedException,
-			IOException {
+	void partitioned() throws InterruptedException {
 		List<Company> companies = JobTestUtil.findIndexedResults( emf, Company.class, "name", "Google" );
 		List<Person> people = JobTestUtil.findIndexedResults( emf, Person.class, "firstName", "Linus" );
 		List<WhoAmI> whos = JobTestUtil.findIndexedResults( emf, WhoAmI.class, "id", "id01" );
@@ -419,7 +407,7 @@ public class MassIndexingJobIT {
 	}
 
 	protected final void indexSomeCompanies(int count) {
-		setupHolder.runInTransaction( em -> {
+		with( emf ).runInTransaction( em -> {
 			CriteriaBuilder criteriaBuilder = em.getCriteriaBuilder();
 			CriteriaQuery<Company> criteria = criteriaBuilder.createQuery( Company.class );
 			Root<Company> root = criteria.from( Company.class );

@@ -160,7 +160,7 @@ public class OrmSetupHelper
 	private final SchemaManagementStrategyName schemaManagementStrategyName;
 	private final OrmAssertionHelper assertionHelper;
 	private final BiConsumer<Boolean, String> assumptionTrueCheck;
-	private final OrmSetupHelperCleaner ormSetupHelperCleaner;
+	private OrmSetupHelperCleaner ormSetupHelperCleaner;
 	private CoordinationStrategyExpectations coordinationStrategyExpectations = DEFAULT_COORDINATION_STRATEGY_EXPECTATIONS;
 	private SessionFactoryImplementor sessionFactory;
 
@@ -172,7 +172,6 @@ public class OrmSetupHelper
 		this.schemaManagementStrategyName = schemaManagementStrategyName;
 		this.assertionHelper = new OrmAssertionHelper( backendSetupStrategy );
 		this.assumptionTrueCheck = assumptionTrueCheck;
-		this.ormSetupHelperCleaner = new OrmSetupHelperCleaner();
 	}
 
 	public OrmSetupHelper coordinationStrategy(CoordinationStrategyExpectations coordinationStrategyExpectations) {
@@ -219,7 +218,11 @@ public class OrmSetupHelper
 			super.afterTestExecution( context );
 		}
 		finally {
-			this.ormSetupHelperCleaner.cleanupData( sessionFactory );
+			// if test was aborted then we don't want to clean the data since the test wasn't executed.
+			if ( !context.getExecutionException().map( Object::getClass )
+					.map( org.opentest4j.TestAbortedException.class::equals ).orElse( Boolean.FALSE ) ) {
+				this.ormSetupHelperCleaner.cleanupData( sessionFactory );
+			}
 		}
 	}
 
@@ -246,6 +249,7 @@ public class OrmSetupHelper
 		private final Map<String, Object> overriddenProperties = new LinkedHashMap<>();
 
 		SetupContext(SchemaManagementStrategyName schemaManagementStrategyName) {
+			ormSetupHelperCleaner = OrmSetupHelperCleaner.create( callOncePerClass );
 			// Set the default properties according to OrmSetupHelperConfig
 			withProperties( DEFAULT_PROPERTIES );
 			// Override the schema management strategy according to our needs for testing
@@ -305,8 +309,15 @@ public class OrmSetupHelper
 		}
 
 		public SetupContext dataClearing(boolean reset, Consumer<DataClearConfig> configurer) {
-			ormSetupHelperCleaner.configure( reset, configurer );
+			if ( reset ) {
+				ormSetupHelperCleaner = OrmSetupHelperCleaner.create( callOncePerClass );
+			}
+			ormSetupHelperCleaner.appendConfiguration( configurer );
 			return thisAsC();
+		}
+
+		public SetupContext disableDataClearing() {
+			return dataClearing( true, config -> config.clearDatabaseData( false ) );
 		}
 
 		public SessionFactory setup(Class<?>... annotatedTypes) {

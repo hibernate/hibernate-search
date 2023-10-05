@@ -57,7 +57,9 @@ class HibernateSearchPartitionMapperComponentIT {
 	@BeforeAll
 	public void init() {
 		emf = ormSetupHelper.start().withAnnotatedTypes( Company.class, Person.class, CompanyGroup.class )
-				.withProperty( HibernateOrmMapperSettings.INDEXING_LISTENERS_ENABLED, false ).setup();
+				.withProperty( HibernateOrmMapperSettings.INDEXING_LISTENERS_ENABLED, false )
+				.dataClearing( config -> config.clearDatabaseData( false ).clearIndexData( true ) )
+				.setup();
 
 		with( emf ).runInTransaction( session -> {
 			for ( int i = 1; i <= COMP_ROWS; i++ ) {
@@ -124,7 +126,7 @@ class HibernateSearchPartitionMapperComponentIT {
 	}
 
 	@Test
-	public void noData() throws Exception {
+	void noData() throws Exception {
 		JobContextData jobData = new JobContextData();
 		jobData.setEntityManagerFactory( emf );
 		var companyGroupType = JobTestUtil.createEntityTypeDescriptor( emf, CompanyGroup.class );

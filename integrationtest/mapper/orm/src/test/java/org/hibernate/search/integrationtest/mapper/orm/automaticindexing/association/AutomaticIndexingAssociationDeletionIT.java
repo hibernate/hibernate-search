@@ -6,6 +6,8 @@
  */
 package org.hibernate.search.integrationtest.mapper.orm.automaticindexing.association;
 
+import static org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmUtils.with;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -24,18 +26,18 @@ import jakarta.persistence.OneToOne;
 import jakarta.persistence.OrderBy;
 import jakarta.persistence.OrderColumn;
 
+import org.hibernate.SessionFactory;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.GenericField;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.IndexedEmbedded;
-import org.hibernate.search.util.impl.integrationtest.mapper.orm.BackendMockTestRule;
+import org.hibernate.search.util.impl.integrationtest.common.extension.BackendMock;
 import org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmSetupHelper;
-import org.hibernate.search.util.impl.integrationtest.mapper.orm.ReusableOrmSetupHolder;
 import org.hibernate.search.util.impl.test.annotation.TestForIssue;
 
-import org.junit.ClassRule;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.MethodRule;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestInstance;
+import org.junit.jupiter.api.extension.RegisterExtension;
 
 /**
  * Test that Hibernate Search does not throw a {@link org.hibernate.LazyInitializationException}
@@ -51,23 +53,30 @@ import org.junit.rules.MethodRule;
  * Thus, we take extra care to catch {@link org.hibernate.LazyInitializationException} and ignore it.
  */
 @TestForIssue(jiraKey = "HSEARCH-3999")
+@TestInstance(TestInstance.Lifecycle.PER_CLASS)
 public class AutomaticIndexingAssociationDeletionIT {
 
-	@ClassRule
-	public static BackendMockTestRule backendMock = BackendMockTestRule.createGlobal();
+	@RegisterExtension
+	public static BackendMock backendMock = BackendMock.create();
 
-	@ClassRule
-	public static ReusableOrmSetupHolder setupHolder = ReusableOrmSetupHolder.withBackendMock( backendMock );
+	@RegisterExtension
+	public static OrmSetupHelper ormSetupHelper = OrmSetupHelper.withBackendMock( backendMock );
 
-	@Rule
-	public MethodRule setupHolderMethodRule = setupHolder.methodRule();
+	protected SessionFactory sessionFactory;
 
-	@ReusableOrmSetupHolder.Setup
-	public void setup(OrmSetupHelper.SetupContext setupContext, ReusableOrmSetupHolder.DataClearConfig dataClearConfig) {
+	@BeforeAll
+	void setup() {
 		backendMock.expectAnySchema( AssociationOwner.NAME );
 		backendMock.expectAnySchema( AssociationNonOwner.NAME );
-		setupContext.withAnnotatedTypes( AssociationOwner.class, AssociationNonOwner.class );
-		dataClearConfig.clearOrder( AssociationOwner.class, AssociationNonOwner.class );
+		OrmSetupHelper.SetupContext setupContext = ormSetupHelper.start().withAnnotatedTypes(
+				AssociationOwner.class, AssociationNonOwner.class )
+				.dataClearing( config -> config.clearOrder( AssociationOwner.class, AssociationNonOwner.class ) );
+
+		sessionFactory = additionalSetup( setupContext ).setup();
+	}
+
+	protected OrmSetupHelper.SetupContext additionalSetup(OrmSetupHelper.SetupContext setupContext) {
+		return setupContext;
 	}
 
 	protected OrmSetupHelper.SetupContext configure(OrmSetupHelper.SetupContext ctx) {
@@ -75,10 +84,10 @@ public class AutomaticIndexingAssociationDeletionIT {
 	}
 
 	@Test
-	public void optionalOneToOne_deleteOwner() {
+	void optionalOneToOne_deleteOwner() {
 		initOptionalOneToOne();
 
-		setupHolder.runInTransaction( session -> {
+		with( sessionFactory ).runInTransaction( session -> {
 			AssociationOwner owner1 = session.getReference( AssociationOwner.class, 1 );
 
 			session.remove( owner1 );
@@ -94,10 +103,10 @@ public class AutomaticIndexingAssociationDeletionIT {
 	}
 
 	@Test
-	public void optionalOneToOne_deleteNonOwner() {
+	void optionalOneToOne_deleteNonOwner() {
 		initOptionalOneToOne();
 
-		setupHolder.runInTransaction( session -> {
+		with( sessionFactory ).runInTransaction( session -> {
 			AssociationOwner owner1 = session.getReference( AssociationOwner.class, 1 );
 			AssociationNonOwner nonOwner2 = session.getReference( AssociationNonOwner.class, 2 );
 
@@ -119,10 +128,10 @@ public class AutomaticIndexingAssociationDeletionIT {
 	}
 
 	@Test
-	public void optionalOneToOne_deleteBoth() {
+	void optionalOneToOne_deleteBoth() {
 		initOptionalOneToOne();
 
-		setupHolder.runInTransaction( session -> {
+		with( sessionFactory ).runInTransaction( session -> {
 			AssociationOwner owner1 = session.getReference( AssociationOwner.class, 1 );
 			AssociationNonOwner nonOwner2 = session.getReference( AssociationNonOwner.class, 2 );
 
@@ -139,7 +148,7 @@ public class AutomaticIndexingAssociationDeletionIT {
 	}
 
 	private void initOptionalOneToOne() {
-		setupHolder.runInTransaction( session -> {
+		with( sessionFactory ).runInTransaction( session -> {
 			AssociationOwner owner1 = new AssociationOwner( 1 );
 			AssociationNonOwner nonOwner2 = new AssociationNonOwner( 2 );
 
@@ -166,10 +175,10 @@ public class AutomaticIndexingAssociationDeletionIT {
 	}
 
 	@Test
-	public void manyToOne_deleteOwner() {
+	void manyToOne_deleteOwner() {
 		initManyToOne();
 
-		setupHolder.runInTransaction( session -> {
+		with( sessionFactory ).runInTransaction( session -> {
 			AssociationOwner owner1 = session.getReference( AssociationOwner.class, 1 );
 
 			session.remove( owner1 );
@@ -188,10 +197,10 @@ public class AutomaticIndexingAssociationDeletionIT {
 	}
 
 	@Test
-	public void manyToOne_deleteNonOwner() {
+	void manyToOne_deleteNonOwner() {
 		initManyToOne();
 
-		setupHolder.runInTransaction( session -> {
+		with( sessionFactory ).runInTransaction( session -> {
 			AssociationOwner owner1 = session.getReference( AssociationOwner.class, 1 );
 			AssociationOwner owner3 = session.getReference( AssociationOwner.class, 3 );
 			AssociationNonOwner nonOwner2 = session.getReference( AssociationNonOwner.class, 2 );
@@ -219,10 +228,10 @@ public class AutomaticIndexingAssociationDeletionIT {
 	}
 
 	@Test
-	public void manyToOne_deleteBoth() {
+	void manyToOne_deleteBoth() {
 		initManyToOne();
 
-		setupHolder.runInTransaction( session -> {
+		with( sessionFactory ).runInTransaction( session -> {
 			AssociationOwner owner3 = session.getReference( AssociationOwner.class, 3 );
 			AssociationOwner owner1 = session.getReference( AssociationOwner.class, 1 );
 			AssociationNonOwner nonOwner2 = session.getReference( AssociationNonOwner.class, 2 );
@@ -247,7 +256,7 @@ public class AutomaticIndexingAssociationDeletionIT {
 	}
 
 	private void initManyToOne() {
-		setupHolder.runInTransaction( session -> {
+		with( sessionFactory ).runInTransaction( session -> {
 			AssociationOwner owner1 = new AssociationOwner( 1 );
 			AssociationNonOwner nonOwner2 = new AssociationNonOwner( 2 );
 			AssociationOwner owner3 = new AssociationOwner( 3 );
@@ -286,10 +295,10 @@ public class AutomaticIndexingAssociationDeletionIT {
 	}
 
 	@Test
-	public void manyToMany_deleteOwner() {
+	void manyToMany_deleteOwner() {
 		initManyToMany();
 
-		setupHolder.runInTransaction( session -> {
+		with( sessionFactory ).runInTransaction( session -> {
 			AssociationOwner owner1 = session.getReference( AssociationOwner.class, 1 );
 
 			session.remove( owner1 );
@@ -305,10 +314,10 @@ public class AutomaticIndexingAssociationDeletionIT {
 	}
 
 	@Test
-	public void manyToMany_deleteNonOwner() {
+	void manyToMany_deleteNonOwner() {
 		initManyToMany();
 
-		setupHolder.runInTransaction( session -> {
+		with( sessionFactory ).runInTransaction( session -> {
 			AssociationOwner owner1 = session.getReference( AssociationOwner.class, 1 );
 			AssociationOwner owner3 = session.getReference( AssociationOwner.class, 3 );
 			AssociationNonOwner nonOwner2 = session.getReference( AssociationNonOwner.class, 2 );
@@ -342,10 +351,10 @@ public class AutomaticIndexingAssociationDeletionIT {
 	}
 
 	@Test
-	public void manyToMany_deleteBoth() {
+	void manyToMany_deleteBoth() {
 		initManyToMany();
 
-		setupHolder.runInTransaction( session -> {
+		with( sessionFactory ).runInTransaction( session -> {
 			AssociationOwner owner3 = session.getReference( AssociationOwner.class, 3 );
 			AssociationOwner owner1 = session.getReference( AssociationOwner.class, 1 );
 			AssociationNonOwner nonOwner2 = session.getReference( AssociationNonOwner.class, 2 );
@@ -376,7 +385,7 @@ public class AutomaticIndexingAssociationDeletionIT {
 	}
 
 	private void initManyToMany() {
-		setupHolder.runInTransaction( session -> {
+		with( sessionFactory ).runInTransaction( session -> {
 			AssociationOwner owner1 = new AssociationOwner( 1 );
 			AssociationNonOwner nonOwner2 = new AssociationNonOwner( 2 );
 			AssociationOwner owner3 = new AssociationOwner( 3 );

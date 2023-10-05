@@ -7,6 +7,7 @@
 package org.hibernate.search.integrationtest.mapper.orm.outboxpolling.automaticindexing;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmUtils.with;
 
 import java.util.Collections;
 import java.util.List;
@@ -17,6 +18,7 @@ import jakarta.persistence.Id;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.OneToOne;
 
+import org.hibernate.SessionFactory;
 import org.hibernate.search.integrationtest.mapper.orm.outboxpolling.testsupport.util.OutboxEventFilter;
 import org.hibernate.search.integrationtest.mapper.orm.outboxpolling.testsupport.util.TestingOutboxPollingInternalConfigurer;
 import org.hibernate.search.mapper.orm.outboxpolling.cfg.impl.HibernateOrmMapperOutboxPollingImplSettings;
@@ -24,36 +26,33 @@ import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.IndexedEmbedded;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.KeywordField;
 import org.hibernate.search.util.impl.integrationtest.common.extension.BackendMock;
-import org.hibernate.search.util.impl.integrationtest.mapper.orm.BackendMockTestRule;
 import org.hibernate.search.util.impl.integrationtest.mapper.orm.CoordinationStrategyExpectations;
 import org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmSetupHelper;
-import org.hibernate.search.util.impl.integrationtest.mapper.orm.ReusableOrmSetupHolder;
 
-import org.junit.Before;
-import org.junit.ClassRule;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.MethodRule;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestInstance;
+import org.junit.jupiter.api.extension.RegisterExtension;
 
 /**
  * Extensive tests with edge cases for automatic indexing with the outbox-polling strategy.
  */
-public class OutboxPollingAutomaticIndexingEdgeCasesIT {
+@TestInstance(TestInstance.Lifecycle.PER_CLASS)
+class OutboxPollingAutomaticIndexingEdgeCasesIT {
 
 	private static final OutboxEventFilter eventFilter = new OutboxEventFilter();
 
-	@ClassRule
-	public static BackendMockTestRule backendMock = BackendMockTestRule.createGlobal();
+	@RegisterExtension
+	public static BackendMock backendMock = BackendMock.create();
 
-	@ClassRule
-	public static ReusableOrmSetupHolder setupHolder = ReusableOrmSetupHolder.withBackendMock( backendMock )
+	@RegisterExtension
+	public static OrmSetupHelper ormSetupHelper = OrmSetupHelper.withBackendMock( backendMock )
 			.coordinationStrategy( CoordinationStrategyExpectations.outboxPolling() );
+	private SessionFactory sessionFactory;
 
-	@Rule
-	public MethodRule setupHolderMethodRule = setupHolder.methodRule();
-
-	@ReusableOrmSetupHolder.Setup
-	public void setup(OrmSetupHelper.SetupContext setupContext) {
+	@BeforeAll
+	void setup() {
 		backendMock.expectSchema( IndexedEntity.NAME, b -> b
 				.field( "text", String.class )
 				.objectField( "contained", b2 -> b2
@@ -61,22 +60,27 @@ public class OutboxPollingAutomaticIndexingEdgeCasesIT {
 						.field( "text", String.class ) ) );
 		backendMock.expectSchema( IndexedAndContainedEntity.NAME, b -> b
 				.field( "text", String.class ) );
-		setupContext
-				.withProperty( HibernateOrmMapperOutboxPollingImplSettings.COORDINATION_INTERNAL_CONFIGURER,
-						new TestingOutboxPollingInternalConfigurer().outboxEventFilter( eventFilter ) )
-				.withAnnotatedTypes( IndexedEntity.class, IndexedAndContainedEntity.class );
+
+		sessionFactory = ormSetupHelper.start()
+				.withProperty(
+						HibernateOrmMapperOutboxPollingImplSettings.COORDINATION_INTERNAL_CONFIGURER,
+						new TestingOutboxPollingInternalConfigurer().outboxEventFilter( eventFilter )
+				)
+				.withAnnotatedTypes( IndexedEntity.class, IndexedAndContainedEntity.class )
+				.dataClearing( config -> config.clearOrder( IndexedAndContainedEntity.class, IndexedEntity.class ) )
+				.setup();
 	}
 
-	@Before
-	public void resetFilter() {
+	@BeforeEach
+	void resetFilter() {
 		eventFilter.reset();
 		// Disable the filter by default: only some of the tests actually need it.
 		eventFilter.showAllEvents();
 	}
 
 	@Test
-	public void multipleChangesSameTransaction() {
-		setupHolder.runInTransaction( session -> {
+	void multipleChangesSameTransaction() {
+		with( sessionFactory ).runInTransaction( session -> {
 			IndexedEntity entity1 = new IndexedEntity( 1, "initialValue I" );
 			session.persist( entity1 );
 
@@ -111,10 +115,10 @@ public class OutboxPollingAutomaticIndexingEdgeCasesIT {
 	}
 
 	@Test
-	public void massiveInsert() {
+	void massiveInsert() {
 		for ( int i = 0; i < 5; i++ ) {
 			int finalI = i;
-			setupHolder.runInTransaction( session -> {
+			with( sessionFactory ).runInTransaction( session -> {
 				BackendMock.DocumentWorkCallListContext context = backendMock.expectWorks( IndexedEntity.NAME );
 
 				for ( int j = 0; j < 500; j++ ) {
@@ -136,8 +140,8 @@ public class OutboxPollingAutomaticIndexingEdgeCasesIT {
 	}
 
 	@Test
-	public void addIndexedAndContained_addAndUpdateEventsProcessedInDifferentBatches() {
-		setupHolder.runInTransaction( session -> {
+	void addIndexedAndContained_addAndUpdateEventsProcessedInDifferentBatches() {
+		with( sessionFactory ).runInTransaction( session -> {
 			IndexedEntity containing = new IndexedEntity( 1, "initialValue" );
 			session.persist( containing );
 			backendMock.expectWorks( IndexedEntity.NAME )
@@ -148,7 +152,7 @@ public class OutboxPollingAutomaticIndexingEdgeCasesIT {
 
 		eventFilter.hideAllEvents();
 
-		setupHolder.runInTransaction( session -> {
+		with( sessionFactory ).runInTransaction( session -> {
 			IndexedEntity containing = session.getReference( IndexedEntity.class, 1 );
 			IndexedAndContainedEntity contained = new IndexedAndContainedEntity( 2, "initialValue" );
 			containing.getContained().add( contained );
@@ -166,11 +170,11 @@ public class OutboxPollingAutomaticIndexingEdgeCasesIT {
 		} );
 
 		// Make events visible one by one, so that they are processed in separate batches.
-		List<UUID> eventIds = setupHolder.applyInTransaction( eventFilter::findOutboxEventIdsNoFilter );
+		List<UUID> eventIds = with( sessionFactory ).applyInTransaction( eventFilter::findOutboxEventIdsNoFilter );
 		assertThat( eventIds ).hasSize( 2 );
 		for ( UUID eventId : eventIds ) {
 			eventFilter.showOnlyEvents( Collections.singletonList( eventId ) );
-			eventFilter.awaitUntilNoMoreVisibleEvents( setupHolder.sessionFactory() );
+			eventFilter.awaitUntilNoMoreVisibleEvents( sessionFactory );
 		}
 
 		// If everything goes well, the above will have executed exactly one add work for "contained"

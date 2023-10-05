@@ -7,6 +7,7 @@
 package org.hibernate.search.integrationtest.mapper.orm.automaticindexing.proxy;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmUtils.with;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -20,19 +21,19 @@ import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.OneToOne;
 
+import org.hibernate.SessionFactory;
 import org.hibernate.proxy.HibernateProxy;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.GenericField;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.IndexedEmbedded;
-import org.hibernate.search.util.impl.integrationtest.mapper.orm.BackendMockTestRule;
+import org.hibernate.search.util.impl.integrationtest.common.extension.BackendMock;
 import org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmSetupHelper;
-import org.hibernate.search.util.impl.integrationtest.mapper.orm.ReusableOrmSetupHolder;
 import org.hibernate.search.util.impl.test.annotation.TestForIssue;
 
-import org.junit.ClassRule;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.MethodRule;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestInstance;
+import org.junit.jupiter.api.extension.RegisterExtension;
 
 /**
  * Test that Hibernate Search correctly unproxies entities before accessing entity fields to populate document,
@@ -40,32 +41,33 @@ import org.junit.rules.MethodRule;
  * which would never work correctly as those private fields are always null on proxies.
  */
 @TestForIssue(jiraKey = "HSEARCH-3643")
+@TestInstance(TestInstance.Lifecycle.PER_CLASS)
 public class IndexingProcessorProxiedAssociatedEntityIT {
 
-	@ClassRule
-	public static BackendMockTestRule backendMock = BackendMockTestRule.createGlobal();
+	@RegisterExtension
+	public static BackendMock backendMock = BackendMock.create();
 
-	@ClassRule
-	public static ReusableOrmSetupHolder setupHolder = ReusableOrmSetupHolder.withBackendMock( backendMock );
+	@RegisterExtension
+	public static OrmSetupHelper ormSetupHelper = OrmSetupHelper.withBackendMock( backendMock );
+	private SessionFactory sessionFactory;
 
-	@Rule
-	public MethodRule setupHolderMethodRule = setupHolder.methodRule();
-
-	@ReusableOrmSetupHolder.Setup
-	public void setup(OrmSetupHelper.SetupContext setupContext, ReusableOrmSetupHolder.DataClearConfig dataClearConfig) {
+	@BeforeAll
+	void setup() {
 		backendMock.expectAnySchema( IndexedEntity.NAME );
 
-		setupContext.withAnnotatedTypes(
-				IndexedEntity.class,
-				ContainedEntity.class
-		);
-
-		dataClearConfig.clearOrder( ContainedEntity.class, IndexedEntity.class );
+		sessionFactory = ormSetupHelper.start()
+				.withAnnotatedTypes( IndexedEntity.class, ContainedEntity.class )
+				.dataClearing( config -> config.clearOrder( ContainedEntity.class, IndexedEntity.class )
+						.preClear( IndexedEntity.class, entity -> {
+							entity.containedSingle = null;
+							entity.containedList = new ArrayList<>();
+						} ) )
+				.setup();
 	}
 
 	@Test
-	public void toOne() {
-		setupHolder.runInTransaction( session -> {
+	void toOne() {
+		with( sessionFactory ).runInTransaction( session -> {
 			IndexedEntity indexed1 = new IndexedEntity( 1, "initialValue" );
 
 			ContainedEntity contained1 = new ContainedEntity( 2, "initialValue" );
@@ -85,7 +87,7 @@ public class IndexingProcessorProxiedAssociatedEntityIT {
 		} );
 		backendMock.verifyExpectationsMet();
 
-		setupHolder.runInTransaction( session -> {
+		with( sessionFactory ).runInTransaction( session -> {
 			IndexedEntity indexed1 = session.getReference( IndexedEntity.class, 1 );
 
 			// The contained entity should be a proxy, otherwise the test doesn't make sense
@@ -105,8 +107,8 @@ public class IndexingProcessorProxiedAssociatedEntityIT {
 	}
 
 	@Test
-	public void toMany() {
-		setupHolder.runInTransaction( session -> {
+	void toMany() {
+		with( sessionFactory ).runInTransaction( session -> {
 			IndexedEntity indexed1 = new IndexedEntity( 1, "initialValue" );
 
 			ContainedEntity contained1 = new ContainedEntity( 2, "initialValue1" );
@@ -126,7 +128,7 @@ public class IndexingProcessorProxiedAssociatedEntityIT {
 		} );
 		backendMock.verifyExpectationsMet();
 
-		setupHolder.runInTransaction( session -> {
+		with( sessionFactory ).runInTransaction( session -> {
 			// Create a proxy for contained1, so that the "containedList" list in indexed1 is populated with that proxy.
 			// The proxy will be initialized, but that's irrelevant to our test.
 			@SuppressWarnings("unused") // Keep a reference to the proxy so that it's not garbage collected, which would prevent the above from happening.

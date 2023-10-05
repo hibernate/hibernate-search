@@ -9,7 +9,6 @@ package org.hibernate.search.integrationtest.mapper.orm.search.loading;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicReference;
@@ -19,47 +18,41 @@ import org.hibernate.search.integrationtest.mapper.orm.search.loading.model.sing
 import org.hibernate.search.integrationtest.mapper.orm.search.loading.model.singletype.SingleTypeLoadingModel;
 import org.hibernate.search.util.common.SearchTimeoutException;
 import org.hibernate.search.util.impl.integrationtest.common.extension.BackendMock;
-import org.hibernate.search.util.impl.integrationtest.mapper.orm.BackendMockTestRule;
 import org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmSetupHelper;
-import org.hibernate.search.util.impl.integrationtest.mapper.orm.ReusableOrmSetupHolder;
 import org.hibernate.search.util.impl.integrationtest.mapper.orm.TimeoutLoadingListener;
 import org.hibernate.search.util.impl.test.annotation.TestForIssue;
+import org.hibernate.search.util.impl.test.extension.parameterized.ParameterizedPerClass;
+import org.hibernate.search.util.impl.test.extension.parameterized.ParameterizedSetup;
 
-import org.junit.ClassRule;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.MethodRule;
-import org.junit.runner.RunWith;
-import org.junit.runners.Parameterized;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 
 /**
  * Basic tests of entity loading when executing a search query
  * when only a single type is involved.
  */
-@RunWith(Parameterized.class)
+@ParameterizedPerClass
 public class SearchQueryEntityLoadingBaseIT<T> extends AbstractSearchQueryEntityLoadingSingleTypeIT<T> {
 
-	@Parameterized.Parameters(name = "{0}, {1}")
-	public static List<Object[]> params() {
-		List<Object[]> result = new ArrayList<>();
+	public static List<? extends Arguments> params() {
+		List<Arguments> result = new ArrayList<>();
 		forAllModelMappingCombinations( (model, mapping) -> {
-			result.add( new Object[] { model, mapping } );
+			result.add( Arguments.of( model, mapping ) );
 		} );
 		return result;
 	}
 
-	@ClassRule
-	public static BackendMockTestRule backendMock = BackendMockTestRule.createGlobal();
+	@RegisterExtension
+	public static BackendMock backendMock = BackendMock.create();
 
-	@ClassRule
-	public static ReusableOrmSetupHolder setupHolder = ReusableOrmSetupHolder.withBackendMock( backendMock );
+	@RegisterExtension
+	public static OrmSetupHelper ormSetupHelper = OrmSetupHelper.withBackendMock( backendMock );
 
-	@Rule
-	public MethodRule setupHolderMethodRule = setupHolder.methodRule();
-
-	public SearchQueryEntityLoadingBaseIT(SingleTypeLoadingModel<T> model, SingleTypeLoadingMapping mapping) {
-		super( model, mapping );
-	}
+	private SessionFactory sessionFactory;
+	private SingleTypeLoadingModel<T> model;
+	private SingleTypeLoadingMapping mapping;
 
 	@Override
 	protected BackendMock backendMock() {
@@ -68,25 +61,34 @@ public class SearchQueryEntityLoadingBaseIT<T> extends AbstractSearchQueryEntity
 
 	@Override
 	protected SessionFactory sessionFactory() {
-		return setupHolder.sessionFactory();
+		return sessionFactory;
 	}
 
-	@ReusableOrmSetupHolder.SetupParams
-	public List<?> setupParams() {
-		return Arrays.asList( mapping, model );
+	@Override
+	protected SingleTypeLoadingModel<T> model() {
+		return model;
 	}
 
-	@ReusableOrmSetupHolder.Setup
-	public void setup(OrmSetupHelper.SetupContext setupContext) {
+	@Override
+	protected SingleTypeLoadingMapping mapping() {
+		return mapping;
+	}
+
+	@ParameterizedSetup
+	@MethodSource("params")
+	public void setup(SingleTypeLoadingModel<T> model, SingleTypeLoadingMapping mapping) {
+		this.model = model;
+		this.mapping = mapping;
+
 		backendMock.expectAnySchema( model.getIndexName() );
-		setupContext.withConfiguration( c -> mapping.configure( c, model ) );
+		sessionFactory = ormSetupHelper.start().withConfiguration( c -> mapping.configure( c, model ) ).setup();
 	}
 
 	/**
 	 * Test loading without any specific configuration.
 	 */
 	@Test
-	public void simple() {
+	void simple() {
 		final int entityCount = 3;
 
 		persistThatManyEntities( entityCount );
@@ -101,7 +103,7 @@ public class SearchQueryEntityLoadingBaseIT<T> extends AbstractSearchQueryEntity
 	}
 
 	@Test
-	public void simple_withVeryLargeTimeout() {
+	void simple_withVeryLargeTimeout() {
 		final int entityCount = 3;
 
 		persistThatManyEntities( entityCount );
@@ -117,7 +119,7 @@ public class SearchQueryEntityLoadingBaseIT<T> extends AbstractSearchQueryEntity
 	}
 
 	@Test
-	public void simple_entityLoadingTimeout() {
+	void simple_entityLoadingTimeout() {
 		final int entityCount = 3;
 
 		persistThatManyEntities( entityCount );
@@ -142,7 +144,7 @@ public class SearchQueryEntityLoadingBaseIT<T> extends AbstractSearchQueryEntity
 	 */
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-3349")
-	public void notFound() {
+	void notFound() {
 		persistThatManyEntities( 2 );
 
 		testLoading(
@@ -164,7 +166,7 @@ public class SearchQueryEntityLoadingBaseIT<T> extends AbstractSearchQueryEntity
 	 * Test that returned results are initialized even if a proxy was present in the persistence context.
 	 */
 	@Test
-	public void initializeProxyFromPersistenceContext() {
+	void initializeProxyFromPersistenceContext() {
 		final int entityCount = 10;
 
 		persistThatManyEntities( entityCount );

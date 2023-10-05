@@ -45,7 +45,7 @@ import org.hibernate.search.mapper.pojo.mapping.definition.annotation.IndexedEmb
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.IndexingDependency;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.ObjectPath;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.PropertyValue;
-import org.hibernate.search.util.impl.integrationtest.mapper.orm.ReusableOrmSetupHolder;
+import org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmSetupHelper;
 
 /**
  * Test automatic indexing caused by multi-valued association updates
@@ -80,9 +80,9 @@ public class AutomaticIndexingManyToManyOwnedByContainingMapKeysBaseIT
 		return false;
 	}
 
-	@ReusableOrmSetupHolder.Setup
-	public void setup(ReusableOrmSetupHolder.DataClearConfig dataClearConfig) {
-		dataClearConfig.preClear( ContainedEntity.class, contained -> {
+	@Override
+	protected OrmSetupHelper.SetupContext additionalSetup(OrmSetupHelper.SetupContext setupContext) {
+		setupContext.dataClearing( config -> config.preClear( ContainedEntity.class, contained -> {
 			contained.getContainingAsIndexedEmbedded().clear();
 			contained.getContainingAsNonIndexedEmbedded().clear();
 			contained.getContainingAsIndexedEmbeddedShallowReindexOnUpdate().clear();
@@ -94,7 +94,8 @@ public class AutomaticIndexingManyToManyOwnedByContainingMapKeysBaseIT
 				embeddedAssociations.getContainingAsIndexedEmbedded().clear();
 				embeddedAssociations.getContainingAsNonIndexedEmbedded().clear();
 			}
-		} );
+		} ) );
+		return setupContext;
 	}
 
 	@Entity(name = "containing")

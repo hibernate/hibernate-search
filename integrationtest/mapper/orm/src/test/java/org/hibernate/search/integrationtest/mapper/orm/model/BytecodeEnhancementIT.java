@@ -102,7 +102,7 @@ class BytecodeEnhancementIT {
 	}
 
 	@Test
-	public void testBytecodeEnhancementWorked() {
+	void testBytecodeEnhancementWorked() {
 		assertThat( IndexedEntity.class.getDeclaredMethods() )
 				.extracting( Method::getName )
 				.anyMatch( name -> name.startsWith( "$$_hibernate_" ) );
@@ -110,7 +110,7 @@ class BytecodeEnhancementIT {
 
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-3581")
-	public void test() {
+	void test() {
 		with( sessionFactory ).runInTransaction( session -> {
 			IndexedEntity entity1 = new IndexedEntity();
 			// This cast is necessary to work around https://hibernate.atlassian.net/browse/HHH-14006

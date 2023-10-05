@@ -19,9 +19,11 @@ import org.hibernate.search.mapper.orm.cfg.HibernateOrmMapperSettings;
 import org.hibernate.search.util.impl.integrationtest.common.extension.BackendMock;
 import org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmSetupHelper;
 import org.hibernate.search.util.impl.test.annotation.TestForIssue;
+import org.hibernate.search.util.impl.test.extension.parameterized.ParameterizedPerClass;
+import org.hibernate.search.util.impl.test.extension.parameterized.ParameterizedSetup;
 
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
-import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 
@@ -29,11 +31,8 @@ import org.junit.jupiter.params.provider.MethodSource;
  * Test fetch size of entity loading when executing a search query
  * when only a single type is involved.
  */
+@ParameterizedPerClass
 class SearchQueryEntityLoadingFetchSizeIT<T> extends AbstractSearchQueryEntityLoadingSingleTypeIT<T> {
-
-	SearchQueryEntityLoadingFetchSizeIT() {
-		super( null, null );
-	}
 
 	public static List<? extends Arguments> params() {
 		List<Arguments> result = new ArrayList<>();
@@ -44,12 +43,14 @@ class SearchQueryEntityLoadingFetchSizeIT<T> extends AbstractSearchQueryEntityLo
 	}
 
 	@RegisterExtension
-	public BackendMock backendMock = BackendMock.create();
+	public static BackendMock backendMock = BackendMock.create();
 
 	@RegisterExtension
-	public OrmSetupHelper ormSetupHelper = OrmSetupHelper.withBackendMock( backendMock );
+	public static OrmSetupHelper ormSetupHelper = OrmSetupHelper.withBackendMock( backendMock );
 
 	private SessionFactory sessionFactory;
+	private SingleTypeLoadingModel<T> model;
+	private SingleTypeLoadingMapping mapping;
 
 	@Override
 	protected BackendMock backendMock() {
@@ -61,11 +62,26 @@ class SearchQueryEntityLoadingFetchSizeIT<T> extends AbstractSearchQueryEntityLo
 		return sessionFactory;
 	}
 
-	@ParameterizedTest(name = "{0}, {1}")
+	@Override
+	protected SingleTypeLoadingModel<T> model() {
+		return model;
+	}
+
+	@Override
+	protected SingleTypeLoadingMapping mapping() {
+		return mapping;
+	}
+
+	@ParameterizedSetup
 	@MethodSource("params")
+	void setUp(SingleTypeLoadingModel<T> model, SingleTypeLoadingMapping mapping) {
+		this.model = model;
+		this.mapping = mapping;
+	}
+
+	@Test
 	@TestForIssue(jiraKey = "HSEARCH-3349")
-	void defaults(SingleTypeLoadingModel<T> model, SingleTypeLoadingMapping mapping) {
-		init( model, mapping );
+	void defaults() {
 		testLoadingFetchSize(
 				// Do not configure search.loading.fetch_size
 				null,
@@ -78,11 +94,9 @@ class SearchQueryEntityLoadingFetchSizeIT<T> extends AbstractSearchQueryEntityLo
 		);
 	}
 
-	@ParameterizedTest(name = "{0}, {1}")
-	@MethodSource("params")
+	@Test
 	@TestForIssue(jiraKey = "HSEARCH-3349")
-	void configurationProperty(SingleTypeLoadingModel<T> model, SingleTypeLoadingMapping mapping) {
-		init( model, mapping );
+	void configurationProperty() {
 		testLoadingFetchSize(
 				// Configure search.loading.fetch_size with this value
 				50,
@@ -96,11 +110,9 @@ class SearchQueryEntityLoadingFetchSizeIT<T> extends AbstractSearchQueryEntityLo
 	}
 
 
-	@ParameterizedTest(name = "{0}, {1}")
-	@MethodSource("params")
+	@Test
 	@TestForIssue(jiraKey = "HSEARCH-3349")
-	void override_valid(SingleTypeLoadingModel<T> model, SingleTypeLoadingMapping mapping) {
-		init( model, mapping );
+	void override_valid() {
 		testLoadingFetchSize(
 				// Configure search.loading.fetch_size with this value (will be ignored)
 				100,
@@ -113,11 +125,9 @@ class SearchQueryEntityLoadingFetchSizeIT<T> extends AbstractSearchQueryEntityLo
 		);
 	}
 
-	@ParameterizedTest(name = "{0}, {1}")
-	@MethodSource("params")
+	@Test
 	@TestForIssue(jiraKey = "HSEARCH-3349")
-	void override_invalid_0(SingleTypeLoadingModel<T> model, SingleTypeLoadingMapping mapping) {
-		init( model, mapping );
+	void override_invalid_0() {
 		assertThatThrownBy( () -> testLoadingFetchSize(
 				// Do not configure search.loading.fetch_size
 				null,
@@ -132,11 +142,9 @@ class SearchQueryEntityLoadingFetchSizeIT<T> extends AbstractSearchQueryEntityLo
 				.hasMessageContaining( "'fetchSize' must be strictly positive" );
 	}
 
-	@ParameterizedTest(name = "{0}, {1}")
-	@MethodSource("params")
+	@Test
 	@TestForIssue(jiraKey = "HSEARCH-3349")
-	void override_invalid_negative(SingleTypeLoadingModel<T> model, SingleTypeLoadingMapping mapping) {
-		init( model, mapping );
+	void override_invalid_negative() {
 		assertThatThrownBy( () -> testLoadingFetchSize(
 				// Do not configure search.loading.fetch_size
 				null,
@@ -156,12 +164,9 @@ class SearchQueryEntityLoadingFetchSizeIT<T> extends AbstractSearchQueryEntityLo
 	 * when the collection associations are loaded eagerly.
 	 * This used to fail with FetchMode.SUBSELECT.
 	 */
-	@ParameterizedTest(name = "{0}, {1}")
-	@MethodSource("params")
+	@Test
 	@TestForIssue(jiraKey = "HSEARCH-4150")
-	void multipleStatements_lastWithFewerIds_eagerAssociations(SingleTypeLoadingModel<T> model,
-			SingleTypeLoadingMapping mapping) {
-		init( model, mapping );
+	void multipleStatements_lastWithFewerIds_eagerAssociations() {
 		testLoadingFetchSize(
 				// Set a fetch size lower than the number of entities
 				null, 100,

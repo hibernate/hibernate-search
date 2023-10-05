@@ -9,16 +9,20 @@ package org.hibernate.search.integrationtest.mapper.orm.massindexing;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.assertj.core.api.Fail.fail;
 import static org.hibernate.search.util.common.impl.CollectionHelper.asSet;
+import static org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmUtils.with;
 
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 
 import org.hibernate.Session;
+import org.hibernate.SessionFactory;
 import org.hibernate.search.engine.backend.work.execution.DocumentCommitStrategy;
 import org.hibernate.search.engine.backend.work.execution.DocumentRefreshStrategy;
 import org.hibernate.search.engine.tenancy.spi.TenancyMode;
@@ -30,28 +34,28 @@ import org.hibernate.search.mapper.orm.session.SearchSession;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.GenericField;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
 import org.hibernate.search.util.common.SearchException;
+import org.hibernate.search.util.impl.integrationtest.common.extension.BackendMock;
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.index.StubSchemaManagementWork;
-import org.hibernate.search.util.impl.integrationtest.mapper.orm.BackendMockTestRule;
 import org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmSetupHelper;
-import org.hibernate.search.util.impl.integrationtest.mapper.orm.ReusableOrmSetupHolder;
+import org.hibernate.search.util.impl.test.extension.parameterized.ParameterizedPerClass;
+import org.hibernate.search.util.impl.test.extension.parameterized.ParameterizedSetup;
+import org.hibernate.search.util.impl.test.extension.parameterized.ParameterizedSetupBeforeTest;
 
-import org.junit.Before;
-import org.junit.ClassRule;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.MethodRule;
-import org.junit.runner.RunWith;
-import org.junit.runners.Parameterized;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 
 /**
  * Very basic test to probe an use of {@link MassIndexer} api.
  */
-@RunWith(Parameterized.class)
-public class MassIndexingBaseIT {
+@ParameterizedPerClass
+class MassIndexingBaseIT {
 
-	@Parameterized.Parameters(name = "{0}")
-	public static TenancyMode[] params() {
-		return TenancyMode.values();
+	private SessionFactory sessionFactory;
+
+	public static List<? extends Arguments> params() {
+		return Arrays.stream( TenancyMode.values() ).map( Arguments::of ).collect( Collectors.toList() );
 	}
 
 	private static final String TENANT_1_ID = "tenant1";
@@ -66,41 +70,41 @@ public class MassIndexingBaseIT {
 	public static final String TITLE_4 = "The Fellowship Of The Ring";
 	public static final String AUTHOR_4 = "J. R. R. Tolkien";
 
-	@ClassRule
-	public static BackendMockTestRule backendMock = BackendMockTestRule.createGlobal();
+	@RegisterExtension
+	public static BackendMock backendMock = BackendMock.create();
 
-	@ClassRule
-	public static ReusableOrmSetupHolder setupHolder = ReusableOrmSetupHolder.withBackendMock( backendMock );
+	@RegisterExtension
+	public static OrmSetupHelper ormSetupHelper = OrmSetupHelper.withBackendMock( backendMock );
 
-	@Rule
-	public MethodRule setupHolderMethodRule = setupHolder.methodRule();
-
-	@Parameterized.Parameter
 	public TenancyMode tenancyMode;
 
-	@ReusableOrmSetupHolder.SetupParams
-	public List<?> setupParams() {
-		return Collections.singletonList( tenancyMode );
-	}
+	@ParameterizedSetup
+	@MethodSource("params")
+	void setup(TenancyMode tenancyMode) {
+		this.tenancyMode = tenancyMode;
 
-	@ReusableOrmSetupHolder.Setup
-	public void setup(OrmSetupHelper.SetupContext setupContext, ReusableOrmSetupHolder.DataClearConfig dataClearConfig) {
-		backendMock.expectAnySchema( Book.INDEX );
-
-		setupContext.withPropertyRadical( HibernateOrmMapperSettings.Radicals.INDEXING_LISTENERS_ENABLED, false )
+		backendMock.resetExpectations();
+		OrmSetupHelper.SetupContext setupContext = ormSetupHelper.start().withPropertyRadical(
+				HibernateOrmMapperSettings.Radicals.INDEXING_LISTENERS_ENABLED, false )
 				.withAnnotatedTypes( Book.class );
 
 		if ( TenancyMode.MULTI_TENANCY.equals( tenancyMode ) ) {
 			setupContext.tenants( TENANT_1_ID, TENANT_2_ID );
-			setupContext.withProperty( HibernateOrmMapperSettings.MULTI_TENANCY_TENANT_IDS,
-					String.join( ",", TENANT_1_ID, TENANT_2_ID ) );
-			dataClearConfig.tenants( TENANT_1_ID, TENANT_2_ID );
+			setupContext.withProperty(
+					HibernateOrmMapperSettings.MULTI_TENANCY_TENANT_IDS,
+					String.join( ",", TENANT_1_ID, TENANT_2_ID )
+			);
 		}
+
+		// We add the schema expectation as a part of a configuration, and as a last configuration.
+		// this way we will only set the expectation only when the entire config was a success:
+		setupContext.withConfiguration( ignored -> backendMock.expectAnySchema( Book.INDEX ) );
+		sessionFactory = setupContext.setup();
 	}
 
-	@Before
-	public void initData() {
-		setupHolder.with( targetTenantId() ).runInTransaction( session -> {
+	@ParameterizedSetupBeforeTest
+	public void init() {
+		with( sessionFactory, targetTenantId() ).runInTransaction( session -> {
 			session.persist( new Book( 1, TITLE_1, AUTHOR_1 ) );
 			session.persist( new Book( 2, TITLE_2, AUTHOR_2 ) );
 			session.persist( new Book( 3, TITLE_3, AUTHOR_3 ) );
@@ -110,7 +114,7 @@ public class MassIndexingBaseIT {
 			// Also add data to the other tenant,
 			// in order to trigger failures if the mass indexer does not correctly limit itself
 			// to just the target tenant.
-			setupHolder.with( TENANT_2_ID ).runInTransaction( session -> {
+			with( sessionFactory, TENANT_2_ID ).runInTransaction( session -> {
 				session.persist( new Book( 1, TITLE_1, AUTHOR_1 ) );
 				session.persist( new Book( 2, TITLE_2, AUTHOR_2 ) );
 				session.persist( new Book( 3, TITLE_3, AUTHOR_3 ) );
@@ -128,8 +132,8 @@ public class MassIndexingBaseIT {
 	}
 
 	@Test
-	public void defaultMassIndexerStartAndWait() throws Exception {
-		setupHolder.with( targetTenantId() ).runNoTransaction( session -> {
+	void defaultMassIndexerStartAndWait() throws Exception {
+		with( sessionFactory, targetTenantId() ).runNoTransaction( session -> {
 			SearchSession searchSession = Search.session( session );
 			MassIndexer indexer = searchSession.massIndexer();
 
@@ -172,8 +176,8 @@ public class MassIndexingBaseIT {
 	}
 
 	@Test
-	public void dropAndCreateSchemaOnStart() {
-		setupHolder.with( targetTenantId() ).runNoTransaction( session -> {
+	void dropAndCreateSchemaOnStart() {
+		with( sessionFactory, targetTenantId() ).runNoTransaction( session -> {
 			SearchSession searchSession = Search.session( session );
 			MassIndexer indexer = searchSession.massIndexer().dropAndCreateSchemaOnStart( true );
 
@@ -217,8 +221,8 @@ public class MassIndexingBaseIT {
 	}
 
 	@Test
-	public void mergeSegmentsOnFinish() {
-		setupHolder.with( targetTenantId() ).runNoTransaction( session -> {
+	void mergeSegmentsOnFinish() {
+		with( sessionFactory, targetTenantId() ).runNoTransaction( session -> {
 			SearchSession searchSession = Search.session( session );
 			MassIndexer indexer = searchSession.massIndexer().mergeSegmentsOnFinish( true );
 
@@ -263,8 +267,8 @@ public class MassIndexingBaseIT {
 	}
 
 	@Test
-	public void fromMappingWithoutSession_explicitSingleTenant() {
-		SearchMapping searchMapping = Search.mapping( setupHolder.sessionFactory() );
+	void fromMappingWithoutSession_explicitSingleTenant() {
+		SearchMapping searchMapping = Search.mapping( sessionFactory );
 		MassIndexer indexer = searchMapping.scope( Object.class ).massIndexer( targetTenantId() );
 
 		// add operations on indexes can follow any random order,
@@ -304,8 +308,8 @@ public class MassIndexingBaseIT {
 	}
 
 	@Test
-	public void fromMappingWithoutSession_explicitAllTenants() {
-		SearchMapping searchMapping = Search.mapping( setupHolder.sessionFactory() );
+	void fromMappingWithoutSession_explicitAllTenants() {
+		SearchMapping searchMapping = Search.mapping( sessionFactory );
 		MassIndexer indexer = searchMapping.scope( Object.class ).massIndexer( allTenantIds() );
 
 		// add operations on indexes can follow any random order,
@@ -378,8 +382,8 @@ public class MassIndexingBaseIT {
 	}
 
 	@Test
-	public void fromMappingWithoutSession_implicitTenant() {
-		SearchMapping searchMapping = Search.mapping( setupHolder.sessionFactory() );
+	void fromMappingWithoutSession_implicitTenant() {
+		SearchMapping searchMapping = Search.mapping( sessionFactory );
 		// We don't pass a tenant ID, it's implicit:
 		// in single-tenancy mode the tenant ID is set to `null`,
 		// and in multi-tenancy mode the tenant IDs are extracted from the configuration properties.
@@ -455,8 +459,8 @@ public class MassIndexingBaseIT {
 	}
 
 	@Test
-	public void dropAndCreateSchemaOnStartAndPurgeBothEnabled() {
-		setupHolder.with( targetTenantId() ).runNoTransaction( session -> {
+	void dropAndCreateSchemaOnStartAndPurgeBothEnabled() {
+		with( sessionFactory, targetTenantId() ).runNoTransaction( session -> {
 			SearchSession searchSession = Search.session( session );
 			MassIndexer indexer = searchSession.massIndexer()
 					.dropAndCreateSchemaOnStart( true )
@@ -504,8 +508,8 @@ public class MassIndexingBaseIT {
 	}
 
 	@Test
-	public void reuseSearchSessionAfterOrmSessionIsClosed_createMassIndexer() {
-		Session session = setupHolder.sessionFactory().withOptions()
+	void reuseSearchSessionAfterOrmSessionIsClosed_createMassIndexer() {
+		Session session = sessionFactory.withOptions()
 				.tenantIdentifier( targetTenantId() )
 				.openSession();
 		SearchSession searchSession = Search.session( session );
@@ -522,8 +526,8 @@ public class MassIndexingBaseIT {
 	}
 
 	@Test
-	public void lazyCreateSearchSessionAfterOrmSessionIsClosed_createMassIndexer() {
-		Session session = setupHolder.sessionFactory().withOptions()
+	void lazyCreateSearchSessionAfterOrmSessionIsClosed_createMassIndexer() {
+		Session session = sessionFactory.withOptions()
 				.tenantIdentifier( targetTenantId() )
 				.openSession();
 		// Search session is not created, since we don't use it

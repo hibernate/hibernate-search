@@ -8,6 +8,7 @@ package org.hibernate.search.integrationtest.mapper.orm.outboxpolling.automatici
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.SoftAssertions.assertSoftly;
+import static org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmUtils.with;
 
 import java.util.Arrays;
 import java.util.Collection;
@@ -19,6 +20,7 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
 import jakarta.persistence.OneToOne;
 
+import org.hibernate.SessionFactory;
 import org.hibernate.search.engine.backend.analysis.AnalyzerNames;
 import org.hibernate.search.integrationtest.mapper.orm.outboxpolling.testsupport.util.OutboxEventFilter;
 import org.hibernate.search.integrationtest.mapper.orm.outboxpolling.testsupport.util.TestingOutboxPollingInternalConfigurer;
@@ -31,34 +33,32 @@ import org.hibernate.search.mapper.pojo.mapping.definition.annotation.IndexedEmb
 import org.hibernate.search.mapper.pojo.route.DocumentRouteDescriptor;
 import org.hibernate.search.mapper.pojo.route.DocumentRoutesDescriptor;
 import org.hibernate.search.mapper.pojo.work.spi.PojoIndexingQueueEventPayload;
-import org.hibernate.search.util.impl.integrationtest.mapper.orm.BackendMockTestRule;
+import org.hibernate.search.util.impl.integrationtest.common.extension.BackendMock;
 import org.hibernate.search.util.impl.integrationtest.mapper.orm.CoordinationStrategyExpectations;
 import org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmSetupHelper;
-import org.hibernate.search.util.impl.integrationtest.mapper.orm.ReusableOrmSetupHolder;
 import org.hibernate.search.util.impl.test.annotation.TestForIssue;
 
-import org.junit.Before;
-import org.junit.ClassRule;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.MethodRule;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestInstance;
+import org.junit.jupiter.api.extension.RegisterExtension;
 
-public class OutboxPollingAutomaticIndexingEventSendingIT {
+@TestInstance(TestInstance.Lifecycle.PER_CLASS)
+class OutboxPollingAutomaticIndexingEventSendingIT {
 
 	private static final OutboxEventFilter eventFilter = new OutboxEventFilter();
 
-	@ClassRule
-	public static BackendMockTestRule backendMock = BackendMockTestRule.createGlobal();
+	@RegisterExtension
+	public static BackendMock backendMock = BackendMock.create();
 
-	@ClassRule
-	public static ReusableOrmSetupHolder setupHolder = ReusableOrmSetupHolder.withBackendMock( backendMock )
+	@RegisterExtension
+	public static OrmSetupHelper ormSetupHelper = OrmSetupHelper.withBackendMock( backendMock )
 			.coordinationStrategy( CoordinationStrategyExpectations.outboxPolling() );
+	private SessionFactory sessionFactory;
 
-	@Rule
-	public MethodRule setupHolderMethodRule = setupHolder.methodRule();
-
-	@ReusableOrmSetupHolder.Setup
-	public void setup(OrmSetupHelper.SetupContext setupContext, ReusableOrmSetupHolder.DataClearConfig dataClearConfig) {
+	@BeforeAll
+	void setup() {
 		backendMock.expectSchema( IndexedEntity.NAME, b -> b
 				.field( "text", String.class, f -> f.analyzerName( AnalyzerNames.DEFAULT ) )
 		);
@@ -80,55 +80,58 @@ public class OutboxPollingAutomaticIndexingEventSendingIT {
 				.field( "nonIndexedEmbeddedText", String.class, f -> f.analyzerName( AnalyzerNames.DEFAULT ) )
 		);
 
-		setupContext
-				.withProperty( HibernateOrmMapperOutboxPollingImplSettings.COORDINATION_INTERNAL_CONFIGURER,
-						new TestingOutboxPollingInternalConfigurer().outboxEventFilter( eventFilter ) )
+		sessionFactory = ormSetupHelper.start()
+				.withProperty(
+						HibernateOrmMapperOutboxPollingImplSettings.COORDINATION_INTERNAL_CONFIGURER,
+						new TestingOutboxPollingInternalConfigurer().outboxEventFilter( eventFilter )
+				)
 				// use timebase uuids to get predictable sorting order
 				.withProperty( "hibernate.search.coordination.entity.mapping.outboxevent.uuid_gen_strategy", "time" )
 				.withAnnotatedTypes( IndexedEntity.class, AnotherIndexedEntity.class, RoutedIndexedEntity.class,
-						IndexedAndContainingEntity.class, ContainedEntity.class, IndexedAndContainedEntity.class );
-
-		dataClearConfig.clearOrder( ContainedEntity.class, IndexedAndContainedEntity.class,
-				IndexedAndContainingEntity.class );
+						IndexedAndContainingEntity.class, ContainedEntity.class, IndexedAndContainedEntity.class
+				)
+				.dataClearing( config -> config.clearOrder( ContainedEntity.class, IndexedAndContainedEntity.class,
+						IndexedAndContainingEntity.class ) )
+				.setup();
 	}
 
-	@Before
-	public void resetFilter() {
+	@BeforeEach
+	void resetFilter() {
 		eventFilter.reset();
 	}
 
 	@Test
-	public void insertUpdateDelete_indexed() {
-		setupHolder.runInTransaction( session -> {
+	void insertUpdateDelete_indexed() {
+		with( sessionFactory ).runInTransaction( session -> {
 			IndexedEntity indexedPojo = new IndexedEntity( 1, "Using some text here" );
 			session.persist( indexedPojo );
 		} );
 
-		setupHolder.runInTransaction( session -> {
+		with( sessionFactory ).runInTransaction( session -> {
 			List<OutboxEvent> outboxEntries = eventFilter.findOutboxEventsNoFilter( session );
 
 			assertThat( outboxEntries ).hasSize( 1 );
 			verifyOutboxEntry( outboxEntries.get( 0 ), IndexedEntity.NAME, "1", null );
 		} );
 
-		setupHolder.runInTransaction( session -> {
+		with( sessionFactory ).runInTransaction( session -> {
 			IndexedEntity entity = session.getReference( IndexedEntity.class, 1 );
 			entity.setText( "Change the test of this entity!" );
 		} );
 
-		setupHolder.runInTransaction( session -> {
+		with( sessionFactory ).runInTransaction( session -> {
 			List<OutboxEvent> outboxEntries = eventFilter.findOutboxEventsNoFilter( session );
 
 			assertThat( outboxEntries ).hasSize( 2 );
 			verifyOutboxEntry( outboxEntries.get( 1 ), IndexedEntity.NAME, "1", null );
 		} );
 
-		setupHolder.runInTransaction( session -> {
+		with( sessionFactory ).runInTransaction( session -> {
 			IndexedEntity entity = session.getReference( IndexedEntity.class, 1 );
 			session.remove( entity );
 		} );
 
-		setupHolder.runInTransaction( session -> {
+		with( sessionFactory ).runInTransaction( session -> {
 			List<OutboxEvent> outboxEntries = eventFilter.findOutboxEventsNoFilter( session );
 
 			assertThat( outboxEntries ).hasSize( 3 );
@@ -138,8 +141,8 @@ public class OutboxPollingAutomaticIndexingEventSendingIT {
 
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-4141")
-	public void insertUpdateDelete_contained() {
-		setupHolder.runInTransaction( session -> {
+	void insertUpdateDelete_contained() {
+		with( sessionFactory ).runInTransaction( session -> {
 			IndexedAndContainingEntity containing = new IndexedAndContainingEntity( 1, "initial" );
 			ContainedEntity contained = new ContainedEntity( 2, "initial" );
 			containing.setContained( contained );
@@ -148,7 +151,7 @@ public class OutboxPollingAutomaticIndexingEventSendingIT {
 			session.persist( contained );
 		} );
 
-		setupHolder.runInTransaction( session -> {
+		with( sessionFactory ).runInTransaction( session -> {
 			List<OutboxEvent> outboxEntries = eventFilter.findOutboxEventsNoFilter( session );
 
 			// There *is* an event when a contained entity is created,
@@ -158,24 +161,24 @@ public class OutboxPollingAutomaticIndexingEventSendingIT {
 			verifyOutboxEntry( outboxEntries.get( 1 ), IndexedAndContainingEntity.NAME, "1", null );
 		} );
 
-		setupHolder.runInTransaction( session -> {
+		with( sessionFactory ).runInTransaction( session -> {
 			ContainedEntity entity = session.getReference( ContainedEntity.class, 2 );
 			entity.setText( "updated" );
 		} );
 
-		setupHolder.runInTransaction( session -> {
+		with( sessionFactory ).runInTransaction( session -> {
 			List<OutboxEvent> outboxEntries = eventFilter.findOutboxEventsNoFilter( session );
 
 			assertThat( outboxEntries ).hasSize( 3 );
 			verifyOutboxEntry( outboxEntries.get( 2 ), ContainedEntity.NAME, "2", null );
 		} );
 
-		setupHolder.runInTransaction( session -> {
+		with( sessionFactory ).runInTransaction( session -> {
 			ContainedEntity entity = session.getReference( ContainedEntity.class, 2 );
 			session.remove( entity );
 		} );
 
-		setupHolder.runInTransaction( session -> {
+		with( sessionFactory ).runInTransaction( session -> {
 			List<OutboxEvent> outboxEntries = eventFilter.findOutboxEventsNoFilter( session );
 
 			// When a contained entity is deleted,
@@ -188,8 +191,8 @@ public class OutboxPollingAutomaticIndexingEventSendingIT {
 
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-4141")
-	public void insertUpdateDelete_indexedAndContained() {
-		setupHolder.runInTransaction( session -> {
+	void insertUpdateDelete_indexedAndContained() {
+		with( sessionFactory ).runInTransaction( session -> {
 			IndexedAndContainingEntity containing = new IndexedAndContainingEntity( 1, "initial" );
 			IndexedAndContainedEntity indexedAndContained = new IndexedAndContainedEntity( 2, "initial" );
 			containing.setIndexedAndContained( indexedAndContained );
@@ -198,7 +201,7 @@ public class OutboxPollingAutomaticIndexingEventSendingIT {
 			session.persist( indexedAndContained );
 		} );
 
-		setupHolder.runInTransaction( session -> {
+		with( sessionFactory ).runInTransaction( session -> {
 			List<OutboxEvent> outboxEntries = eventFilter.findOutboxEventsNoFilter( session );
 
 			assertThat( outboxEntries ).hasSize( 2 );
@@ -206,24 +209,24 @@ public class OutboxPollingAutomaticIndexingEventSendingIT {
 			verifyOutboxEntry( outboxEntries.get( 1 ), IndexedAndContainedEntity.NAME, "2", null );
 		} );
 
-		setupHolder.runInTransaction( session -> {
+		with( sessionFactory ).runInTransaction( session -> {
 			IndexedAndContainedEntity entity = session.getReference( IndexedAndContainedEntity.class, 2 );
 			entity.setText( "updated" );
 		} );
 
-		setupHolder.runInTransaction( session -> {
+		with( sessionFactory ).runInTransaction( session -> {
 			List<OutboxEvent> outboxEntries = eventFilter.findOutboxEventsNoFilter( session );
 
 			assertThat( outboxEntries ).hasSize( 3 );
 			verifyOutboxEntry( outboxEntries.get( 2 ), IndexedAndContainedEntity.NAME, "2", null );
 		} );
 
-		setupHolder.runInTransaction( session -> {
+		with( sessionFactory ).runInTransaction( session -> {
 			IndexedAndContainedEntity entity = session.getReference( IndexedAndContainedEntity.class, 2 );
 			session.remove( entity );
 		} );
 
-		setupHolder.runInTransaction( session -> {
+		with( sessionFactory ).runInTransaction( session -> {
 			List<OutboxEvent> outboxEntries = eventFilter.findOutboxEventsNoFilter( session );
 
 			assertThat( outboxEntries ).hasSize( 5 );
@@ -237,8 +240,8 @@ public class OutboxPollingAutomaticIndexingEventSendingIT {
 
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-4141")
-	public void updateIndexedEmbeddedField_contained() {
-		setupHolder.runInTransaction( session -> {
+	void updateIndexedEmbeddedField_contained() {
+		with( sessionFactory ).runInTransaction( session -> {
 			IndexedAndContainingEntity containing = new IndexedAndContainingEntity( 1, "initial" );
 			ContainedEntity contained = new ContainedEntity( 2, "initial" );
 			containing.setContained( contained );
@@ -253,25 +256,25 @@ public class OutboxPollingAutomaticIndexingEventSendingIT {
 						.field( "text", "initial" )
 						.objectField( "contained", b2 -> b2
 								.field( "text", "initial" ) ) );
-		eventFilter.showAllEventsUpToNow( setupHolder.sessionFactory() );
+		eventFilter.showAllEventsUpToNow( sessionFactory );
 		backendMock.verifyExpectationsMet();
 		// Processing the insert events shouldn't yield more events
 		backendMock.indexingWorkExpectations().awaitIndexingAssertions( () -> {
-			setupHolder.runInTransaction( session -> {
+			with( sessionFactory ).runInTransaction( session -> {
 				List<OutboxEvent> outboxEntries = eventFilter.findOutboxEventsNoFilter( session );
 				assertThat( outboxEntries ).isEmpty();
 			} );
 		} );
 
-		setupHolder.runInTransaction( session -> {
+		with( sessionFactory ).runInTransaction( session -> {
 			ContainedEntity entity = session.getReference( ContainedEntity.class, 2 );
 			entity.setText( "updated" );
 		} );
 
 		// Processing the update event should yield more events for containing entities
-		eventFilter.showAllEventsUpToNow( setupHolder.sessionFactory() );
+		eventFilter.showAllEventsUpToNow( sessionFactory );
 		backendMock.indexingWorkExpectations().awaitIndexingAssertions( () -> {
-			setupHolder.runInTransaction( session -> {
+			with( sessionFactory ).runInTransaction( session -> {
 				List<OutboxEvent> outboxEntries = eventFilter.findOutboxEventsNoFilter( session );
 				assertThat( outboxEntries ).hasSize( 1 );
 				verifyOutboxEntry( outboxEntries.get( 0 ), IndexedAndContainingEntity.NAME, "1", null );
@@ -281,8 +284,8 @@ public class OutboxPollingAutomaticIndexingEventSendingIT {
 
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-4141")
-	public void updateIndexedEmbeddedField_indexedAndContained() {
-		setupHolder.runInTransaction( session -> {
+	void updateIndexedEmbeddedField_indexedAndContained() {
+		with( sessionFactory ).runInTransaction( session -> {
 			IndexedAndContainingEntity containing = new IndexedAndContainingEntity( 1, "initial" );
 			IndexedAndContainedEntity contained = new IndexedAndContainedEntity( 2, "initial" );
 			containing.setIndexedAndContained( contained );
@@ -301,17 +304,17 @@ public class OutboxPollingAutomaticIndexingEventSendingIT {
 				.add( "2", b -> b
 						.field( "text", "initial" )
 						.field( "nonIndexedEmbeddedText", "initial" ) );
-		eventFilter.showAllEventsUpToNow( setupHolder.sessionFactory() );
+		eventFilter.showAllEventsUpToNow( sessionFactory );
 		backendMock.verifyExpectationsMet();
 		// Processing the insert events shouldn't yield more events
 		backendMock.indexingWorkExpectations().awaitIndexingAssertions( () -> {
-			setupHolder.runInTransaction( session -> {
+			with( sessionFactory ).runInTransaction( session -> {
 				List<OutboxEvent> outboxEntries = eventFilter.findOutboxEventsNoFilter( session );
 				assertThat( outboxEntries ).isEmpty();
 			} );
 		} );
 
-		setupHolder.runInTransaction( session -> {
+		with( sessionFactory ).runInTransaction( session -> {
 			IndexedAndContainedEntity entity = session.getReference( IndexedAndContainedEntity.class, 2 );
 			entity.setText( "updated" );
 		} );
@@ -320,11 +323,11 @@ public class OutboxPollingAutomaticIndexingEventSendingIT {
 				.addOrUpdate( "2", b -> b
 						.field( "text", "updated" )
 						.field( "nonIndexedEmbeddedText", "initial" ) );
-		eventFilter.showAllEventsUpToNow( setupHolder.sessionFactory() );
+		eventFilter.showAllEventsUpToNow( sessionFactory );
 		backendMock.verifyExpectationsMet();
 		// Processing the update event should yield more events for containing entities
 		backendMock.indexingWorkExpectations().awaitIndexingAssertions( () -> {
-			setupHolder.runInTransaction( session -> {
+			with( sessionFactory ).runInTransaction( session -> {
 				List<OutboxEvent> outboxEntries = eventFilter.findOutboxEventsNoFilter( session );
 				assertThat( outboxEntries ).hasSize( 1 );
 				verifyOutboxEntry( outboxEntries.get( 0 ), IndexedAndContainingEntity.NAME, "1", null );
@@ -334,8 +337,8 @@ public class OutboxPollingAutomaticIndexingEventSendingIT {
 
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-4141")
-	public void updateNonIndexedEmbeddedField_contained() {
-		setupHolder.runInTransaction( session -> {
+	void updateNonIndexedEmbeddedField_contained() {
+		with( sessionFactory ).runInTransaction( session -> {
 			IndexedAndContainingEntity containing = new IndexedAndContainingEntity( 1, "initial" );
 			ContainedEntity contained = new ContainedEntity( 2, "initial" );
 			containing.setContained( contained );
@@ -350,26 +353,26 @@ public class OutboxPollingAutomaticIndexingEventSendingIT {
 						.field( "text", "initial" )
 						.objectField( "contained", b2 -> b2
 								.field( "text", "initial" ) ) );
-		eventFilter.showAllEventsUpToNow( setupHolder.sessionFactory() );
+		eventFilter.showAllEventsUpToNow( sessionFactory );
 		backendMock.verifyExpectationsMet();
 		// Processing the insert events shouldn't yield more events
 		backendMock.indexingWorkExpectations().awaitIndexingAssertions( () -> {
-			setupHolder.runInTransaction( session -> {
+			with( sessionFactory ).runInTransaction( session -> {
 				List<OutboxEvent> outboxEntries = eventFilter.findOutboxEventsNoFilter( session );
 				assertThat( outboxEntries ).isEmpty();
 			} );
 		} );
 
-		setupHolder.runInTransaction( session -> {
+		with( sessionFactory ).runInTransaction( session -> {
 			ContainedEntity entity = session.getReference( ContainedEntity.class, 2 );
 			entity.setNonIndexedEmbeddedText( "updated" );
 		} );
 
 		// Processing this update event shouldn't yield more events,
 		// because the changed field is not indexed-embedded.
-		eventFilter.showAllEventsUpToNow( setupHolder.sessionFactory() );
+		eventFilter.showAllEventsUpToNow( sessionFactory );
 		backendMock.indexingWorkExpectations().awaitIndexingAssertions( () -> {
-			setupHolder.runInTransaction( session -> {
+			with( sessionFactory ).runInTransaction( session -> {
 				List<OutboxEvent> outboxEntries = eventFilter.findOutboxEventsNoFilter( session );
 				assertThat( outboxEntries ).isEmpty();
 			} );
@@ -378,8 +381,8 @@ public class OutboxPollingAutomaticIndexingEventSendingIT {
 
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-4141")
-	public void updateNonIndexedEmbeddedField_indexedAndContained() {
-		setupHolder.runInTransaction( session -> {
+	void updateNonIndexedEmbeddedField_indexedAndContained() {
+		with( sessionFactory ).runInTransaction( session -> {
 			IndexedAndContainingEntity containing = new IndexedAndContainingEntity( 1, "initial" );
 			IndexedAndContainedEntity contained = new IndexedAndContainedEntity( 2, "initial" );
 			containing.setIndexedAndContained( contained );
@@ -398,17 +401,17 @@ public class OutboxPollingAutomaticIndexingEventSendingIT {
 				.add( "2", b -> b
 						.field( "text", "initial" )
 						.field( "nonIndexedEmbeddedText", "initial" ) );
-		eventFilter.showAllEventsUpToNow( setupHolder.sessionFactory() );
+		eventFilter.showAllEventsUpToNow( sessionFactory );
 		backendMock.verifyExpectationsMet();
 		// Processing the insert events shouldn't yield more events
 		backendMock.indexingWorkExpectations().awaitIndexingAssertions( () -> {
-			setupHolder.runInTransaction( session -> {
+			with( sessionFactory ).runInTransaction( session -> {
 				List<OutboxEvent> outboxEntries = eventFilter.findOutboxEventsNoFilter( session );
 				assertThat( outboxEntries ).isEmpty();
 			} );
 		} );
 
-		setupHolder.runInTransaction( session -> {
+		with( sessionFactory ).runInTransaction( session -> {
 			IndexedAndContainedEntity entity = session.getReference( IndexedAndContainedEntity.class, 2 );
 			entity.setNonIndexedEmbeddedText( "updated" );
 		} );
@@ -417,12 +420,12 @@ public class OutboxPollingAutomaticIndexingEventSendingIT {
 				.addOrUpdate( "2", b -> b
 						.field( "text", "initial" )
 						.field( "nonIndexedEmbeddedText", "updated" ) );
-		eventFilter.showAllEventsUpToNow( setupHolder.sessionFactory() );
+		eventFilter.showAllEventsUpToNow( sessionFactory );
 		backendMock.verifyExpectationsMet();
 		// Processing this update event shouldn't yield more events,
 		// because the changed field is not indexed-embedded.
 		backendMock.indexingWorkExpectations().awaitIndexingAssertions( () -> {
-			setupHolder.runInTransaction( session -> {
+			with( sessionFactory ).runInTransaction( session -> {
 				List<OutboxEvent> outboxEntries = eventFilter.findOutboxEventsNoFilter( session );
 				assertThat( outboxEntries ).isEmpty();
 			} );
@@ -430,15 +433,15 @@ public class OutboxPollingAutomaticIndexingEventSendingIT {
 	}
 
 	@Test
-	public void multipleInstances() {
+	void multipleInstances() {
 		for ( int i = 1; i <= 7; i++ ) {
 			IndexedEntity indexedPojo = new IndexedEntity( i, "Using some text here" );
-			setupHolder.runInTransaction( session -> {
+			with( sessionFactory ).runInTransaction( session -> {
 				session.persist( indexedPojo );
 			} );
 		}
 
-		setupHolder.runInTransaction( session -> {
+		with( sessionFactory ).runInTransaction( session -> {
 			List<OutboxEvent> outboxEntries = eventFilter.findOutboxEventsNoFilter( session );
 
 			assertThat( outboxEntries ).hasSize( 7 );
@@ -449,18 +452,18 @@ public class OutboxPollingAutomaticIndexingEventSendingIT {
 	}
 
 	@Test
-	public void multipleTypes() {
-		setupHolder.runInTransaction( session -> {
+	void multipleTypes() {
+		with( sessionFactory ).runInTransaction( session -> {
 			IndexedEntity indexedPojo = new IndexedEntity( 1, "Using some text here" );
 			session.persist( indexedPojo );
 		} );
 
-		setupHolder.runInTransaction( session -> {
+		with( sessionFactory ).runInTransaction( session -> {
 			AnotherIndexedEntity indexedPojo = new AnotherIndexedEntity( 1, "Using some text here" );
 			session.persist( indexedPojo );
 		} );
 
-		setupHolder.runInTransaction( session -> {
+		with( sessionFactory ).runInTransaction( session -> {
 			List<OutboxEvent> outboxEntries = eventFilter.findOutboxEventsNoFilter( session );
 
 			assertThat( outboxEntries ).hasSize( 2 );
@@ -470,14 +473,14 @@ public class OutboxPollingAutomaticIndexingEventSendingIT {
 	}
 
 	@Test
-	public void routingKeys() {
-		setupHolder.runInTransaction( session -> {
+	void routingKeys() {
+		with( sessionFactory ).runInTransaction( session -> {
 			RoutedIndexedEntity indexedPojo = new RoutedIndexedEntity( 1, "Using some text here",
 					RoutedIndexedEntity.Status.FIRST );
 			session.persist( indexedPojo );
 		} );
 
-		setupHolder.runInTransaction( session -> {
+		with( sessionFactory ).runInTransaction( session -> {
 			List<OutboxEvent> outboxEntries = eventFilter.findOutboxEventsNoFilter( session );
 
 			assertThat( outboxEntries ).hasSize( 1 );
@@ -486,13 +489,13 @@ public class OutboxPollingAutomaticIndexingEventSendingIT {
 					"FIRST" );
 		} );
 
-		setupHolder.runInTransaction( session -> {
+		with( sessionFactory ).runInTransaction( session -> {
 			RoutedIndexedEntity entity = session.getReference( RoutedIndexedEntity.class, 1 );
 			entity.setText( "Change the test of this entity!" );
 			entity.setStatus( RoutedIndexedEntity.Status.SECOND );
 		} );
 
-		setupHolder.runInTransaction( session -> {
+		with( sessionFactory ).runInTransaction( session -> {
 			List<OutboxEvent> outboxEntries = eventFilter.findOutboxEventsNoFilter( session );
 
 			assertThat( outboxEntries ).hasSize( 2 );
