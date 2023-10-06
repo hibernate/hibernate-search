@@ -37,7 +37,6 @@ import org.hibernate.search.util.common.logging.impl.Log;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 import org.hibernate.search.util.impl.integrationtest.common.TestConfigurationProvider;
 import org.hibernate.search.util.impl.integrationtest.common.bean.ForbiddenBeanProvider;
-import org.hibernate.search.util.impl.integrationtest.common.extension.ComposedExtension;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappedIndex;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMapping;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappingImpl;
@@ -47,23 +46,18 @@ import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappingSch
 
 import org.junit.jupiter.api.extension.AfterAllCallback;
 import org.junit.jupiter.api.extension.AfterEachCallback;
-import org.junit.jupiter.api.extension.AfterTestExecutionCallback;
 import org.junit.jupiter.api.extension.BeforeAllCallback;
 import org.junit.jupiter.api.extension.BeforeEachCallback;
-import org.junit.jupiter.api.extension.BeforeTestExecutionCallback;
 import org.junit.jupiter.api.extension.ExtensionContext;
 import org.junit.jupiter.api.extension.TestExecutionExceptionHandler;
 
 public class SearchSetupHelper
-		implements AfterAllCallback, AfterEachCallback, AfterTestExecutionCallback,
-		BeforeAllCallback, BeforeEachCallback, BeforeTestExecutionCallback, TestExecutionExceptionHandler {
+		implements AfterAllCallback, AfterEachCallback, BeforeAllCallback, BeforeEachCallback, TestExecutionExceptionHandler {
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	private final TestConfigurationProvider configurationProvider = new TestConfigurationProvider();
 	private TckBackendSetupStrategy<?> setupStrategy;
-	private ComposedExtension delegate;
-
 	private final List<SearchIntegrationEnvironment> environments = new ArrayList<>();
 	private final List<SearchIntegrationPartialBuildState> integrationPartialBuildStates = new ArrayList<>();
 	private final List<StubMappingImpl> mappings = new ArrayList<>();
@@ -75,36 +69,6 @@ public class SearchSetupHelper
 	}
 
 	private SearchSetupHelper() {
-		ComposedExtension.FullExtension ownActions = new ComposedExtension.FullExtension.Builder()
-				.withBeforeAll( beforeAllContext -> {
-					// BeforeAll callback can be called if an extension
-					// is added in a static context, i.e. @RegisterExtension static MyExtension = ....;
-					// Or when the test class is annotated with @TestInstance(TestInstance.Lifecycle.PER_CLASS)
-					// which also implies that we'd want to have only a BeforeAll, AfterAll callbacks:
-					callOncePerClass = true;
-				} )
-				.withAfterAll( afterAllContext -> {
-					if ( callOncePerClass ) {
-						cleanUp();
-					}
-				} ).withAfterEach( afterEachContext -> {
-					if ( !callOncePerClass ) {
-						cleanUp();
-					}
-				} ).withTestExecutionExceptionHandler( (testExecutionExceptionContext, throwable) -> {
-					// When used as a "ClassExtension", exceptions are not properly reported by JUnit.
-					// Log them so that we have something in the logs, at least.
-					log.warn(
-							"Exception thrown by test and caught by SearchSetupHelper rule: " + throwable.getMessage(),
-							throwable
-					);
-					throw throwable;
-				} ).build();
-
-		this.delegate = new ComposedExtension(
-				ownActions,
-				configurationProvider
-		);
 	}
 
 	public SetupContext start() {
@@ -151,41 +115,46 @@ public class SearchSetupHelper
 
 	@Override
 	public void afterAll(ExtensionContext context) throws Exception {
-		if ( !runningInNestedContext( context ) ) {
-			delegate.afterAll( context );
+		configurationProvider.afterAll( context );
+		if ( !runningInNestedContext( context ) && callOncePerClass ) {
+			cleanUp();
 		}
 	}
 
 	@Override
 	public void afterEach(ExtensionContext context) throws Exception {
-		delegate.afterEach( context );
-	}
-
-	@Override
-	public void afterTestExecution(ExtensionContext context) throws Exception {
-		delegate.afterTestExecution( context );
+		configurationProvider.afterEach( context );
+		if ( !callOncePerClass ) {
+			cleanUp();
+		}
 	}
 
 	@Override
 	public void beforeAll(ExtensionContext context) throws Exception {
 		if ( !runningInNestedContext( context ) ) {
-			delegate.beforeAll( context );
+			// BeforeAll callback can be called if an extension
+			// is added in a static context, i.e. @RegisterExtension static MyExtension = ....;
+			// Or when the test class is annotated with @TestInstance(TestInstance.Lifecycle.PER_CLASS)
+			// which also implies that we'd want to have only a BeforeAll, AfterAll callbacks:
+			callOncePerClass = true;
+			configurationProvider.beforeAll( context );
 		}
 	}
 
 	@Override
 	public void beforeEach(ExtensionContext context) throws Exception {
-		delegate.beforeEach( context );
-	}
-
-	@Override
-	public void beforeTestExecution(ExtensionContext context) throws Exception {
-		delegate.beforeTestExecution( context );
+		configurationProvider.beforeEach( context );
 	}
 
 	@Override
 	public void handleTestExecutionException(ExtensionContext context, Throwable throwable) throws Throwable {
-		delegate.handleTestExecutionException( context, throwable );
+		// When used as a "ClassExtension", exceptions are not properly reported by JUnit.
+		// Log them so that we have something in the logs, at least.
+		log.warn(
+				"Exception thrown by test and caught by SearchSetupHelper rule: " + throwable.getMessage(),
+				throwable
+		);
+		throw throwable;
 	}
 
 	public void cleanUp() throws IOException {

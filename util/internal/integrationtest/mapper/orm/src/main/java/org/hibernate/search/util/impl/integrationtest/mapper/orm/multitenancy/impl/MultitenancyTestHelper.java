@@ -6,7 +6,7 @@
  */
 package org.hibernate.search.util.impl.integrationtest.mapper.orm.multitenancy.impl;
 
-import java.util.function.BiConsumer;
+import static org.junit.jupiter.api.Assumptions.assumeTrue;
 
 import org.hibernate.cfg.AvailableSettings;
 import org.hibernate.dialect.H2Dialect;
@@ -23,26 +23,19 @@ import org.hibernate.testing.orm.junit.DialectContext;
  */
 public class MultitenancyTestHelper {
 
-	public static void enable(SimpleSessionFactoryBuilder builder, BiConsumer<Boolean, String> assumptionTrueCheck,
-			String... tenantIds) {
-		MultitenancyTestHelper helper = new MultitenancyTestHelper( assumptionTrueCheck, tenantIds );
+	public static void enable(SimpleSessionFactoryBuilder builder, String... tenantIds) {
+		MultitenancyTestHelper helper = new MultitenancyTestHelper( tenantIds );
 		helper.attachTo( builder );
 	}
 
-	public static void enable(SimpleSessionFactoryBuilder builder, String... tenantIds) {
-		enable( builder, org.junit.jupiter.api.Assumptions::assumeTrue, tenantIds );
-	}
-
 	private final String[] tenantIds;
-	private final BiConsumer<Boolean, String> assumptionTrueCheck;
 
-	private MultitenancyTestHelper(BiConsumer<Boolean, String> assumptionTrueCheck, String[] tenantIds) {
-		this.assumptionTrueCheck = assumptionTrueCheck;
+	private MultitenancyTestHelper(String[] tenantIds) {
 		this.tenantIds = tenantIds;
 	}
 
 	private void attachTo(SimpleSessionFactoryBuilder builder) {
-		assumptionTrueCheck.accept(
+		assumeTrue(
 				DialectContext.getDialect() instanceof H2Dialect,
 				"This test relies on multi-tenancy, which can currently only be set up with H2"
 		);

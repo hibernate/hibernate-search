@@ -8,14 +8,11 @@ package org.hibernate.search.util.impl.integrationtest.common.extension;
 
 import java.lang.invoke.MethodHandles;
 import java.util.Map;
-import java.util.Optional;
 
 import org.hibernate.search.engine.cfg.BackendSettings;
 import org.hibernate.search.util.common.logging.impl.Log;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 import org.hibernate.search.util.impl.integrationtest.common.TestConfigurationProvider;
-
-import org.junit.jupiter.api.extension.Extension;
 
 public abstract class BackendConfiguration {
 
@@ -53,10 +50,6 @@ public abstract class BackendConfiguration {
 
 	public static boolean isLucene() {
 		return "lucene".equals( BACKEND_TYPE );
-	}
-
-	public Optional<Extension> extension() {
-		return Optional.empty();
 	}
 
 	public <C extends MappingSetupHelper<C, ?, ?, ?, ?>.AbstractSetupContext> C setup(C setupContext,

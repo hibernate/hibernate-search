@@ -678,8 +678,6 @@
 
             <!-- Test -->
             <!-- JUnit 4 is only used for legacy v5 tests that we won't be changing-->
-            <!-- Also used on some tests that we cannot migrate for now.-->
-            <!-- These tests will run with junit-vintage in the modules that have mixed jupiter/vintage tests -->
             <dependency>
                 <groupId>junit</groupId>
                 <artifactId>junit</artifactId>

@@ -10,13 +10,10 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-import java.util.Optional;
 import java.util.concurrent.CompletionStage;
 
 import org.hibernate.search.util.impl.integrationtest.common.TestConfigurationProvider;
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.BackendMappingHandle;
-
-import org.junit.jupiter.api.extension.Extension;
 
 class ActualBackendSetupStrategy implements BackendSetupStrategy {
 	private final BackendConfiguration defaultBackendConfiguration;
@@ -39,25 +36,6 @@ class ActualBackendSetupStrategy implements BackendSetupStrategy {
 		return namedBackendConfigurations.isEmpty()
 				? defaultBackendConfiguration.toString()
 				: allConfigurations.toString();
-	}
-
-	@Override
-	public Optional<Extension> getTestRule() {
-		Extension finalExtension = null;
-		for ( BackendConfiguration configuration : allConfigurations ) {
-			Optional<Extension> extension = configuration.extension();
-			if ( !extension.isPresent() ) {
-				continue;
-			}
-			if ( finalExtension == null ) {
-				finalExtension = extension.get();
-			}
-			else {
-				// TODO: fix me
-				finalExtension = new ComposedExtension( extension.get(), finalExtension );
-			}
-		}
-		return Optional.ofNullable( finalExtension );
 	}
 
 	@Override
