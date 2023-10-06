@@ -6,7 +6,6 @@
  */
 package org.hibernate.search.util.impl.integrationtest.mapper.orm;
 
-import static org.junit.Assume.assumeTrue;
 import static org.junit.jupiter.api.Assumptions.assumeFalse;
 
 import java.util.ArrayList;
@@ -18,7 +17,6 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.ServiceLoader;
-import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 
 import org.hibernate.SessionFactory;
@@ -34,6 +32,7 @@ import org.hibernate.search.util.impl.integrationtest.common.extension.MappingSe
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.BackendMappingHandle;
 import org.hibernate.search.util.impl.integrationtest.mapper.orm.multitenancy.impl.MultitenancyTestHelper;
 
+import org.junit.jupiter.api.extension.AfterTestExecutionCallback;
 import org.junit.jupiter.api.extension.ExtensionContext;
 
 public class OrmSetupHelper
@@ -42,10 +41,9 @@ public class OrmSetupHelper
 				SimpleSessionFactoryBuilder,
 				SimpleSessionFactoryBuilder,
 				SessionFactory,
-				OrmSetupHelper.SetupVariant> {
+				OrmSetupHelper.SetupVariant>
+		implements AfterTestExecutionCallback {
 
-	protected static final BiConsumer<Boolean, String> JUPITER_ASSUMPTION_CHECK = org.junit.jupiter.api.Assumptions::assumeTrue;
-	private static final BiConsumer<Boolean, String> VINTAGE_ASSUMPTION_CHECK = (b, s) -> assumeTrue( s, b );
 	private static final CoordinationStrategyExpectations DEFAULT_COORDINATION_STRATEGY_EXPECTATIONS;
 	private static final Map<String, Object> DEFAULT_PROPERTIES;
 
@@ -68,58 +66,15 @@ public class OrmSetupHelper
 	}
 
 	public static OrmSetupHelper withBackendMock(BackendMock backendMock) {
-		return withBackendMock( backendMock, JUPITER_ASSUMPTION_CHECK );
-	}
-
-	public static OrmSetupHelper withBackendMocks(BackendMock defaultBackendMock,
-			Map<String, BackendMock> namedBackendMocks) {
-		return withBackendMocks( defaultBackendMock, namedBackendMocks, JUPITER_ASSUMPTION_CHECK );
-	}
-
-	public static OrmSetupHelper withSingleBackend(BackendConfiguration backendConfiguration) {
-		return withSingleBackend( backendConfiguration, JUPITER_ASSUMPTION_CHECK );
-	}
-
-	public static OrmSetupHelper withMultipleBackends(BackendConfiguration defaultBackendConfiguration,
-			Map<String, BackendConfiguration> namedBackendConfigurations) {
-		return withMultipleBackends(
-				defaultBackendConfiguration, namedBackendConfigurations,
-				JUPITER_ASSUMPTION_CHECK );
-	}
-
-	public static OrmSetupHelper withBackendMockLegacy(BackendMock backendMock) {
-		return withBackendMock( backendMock, VINTAGE_ASSUMPTION_CHECK );
-	}
-
-	public static OrmSetupHelper withBackendMocksLegacy(BackendMock defaultBackendMock,
-			Map<String, BackendMock> namedBackendMocks) {
-		return withBackendMocks( defaultBackendMock, namedBackendMocks, VINTAGE_ASSUMPTION_CHECK );
-	}
-
-	public static OrmSetupHelper withSingleBackendLegacy(BackendConfiguration backendConfiguration) {
-		return withSingleBackend( backendConfiguration, VINTAGE_ASSUMPTION_CHECK );
-	}
-
-	public static OrmSetupHelper withMultipleBackendsGlobal(BackendConfiguration defaultBackendConfiguration,
-			Map<String, BackendConfiguration> namedBackendConfigurations) {
-		return withMultipleBackends(
-				defaultBackendConfiguration, namedBackendConfigurations,
-				VINTAGE_ASSUMPTION_CHECK );
-	}
-
-	private static OrmSetupHelper withBackendMock(BackendMock backendMock,
-			BiConsumer<Boolean, String> assumptionTrueCheck) {
 		return new OrmSetupHelper(
 				BackendSetupStrategy.withSingleBackendMock( backendMock ),
 				Collections.singleton( backendMock ),
 				// Mock backend => avoid schema management unless we want to test it
-				SchemaManagementStrategyName.NONE,
-				assumptionTrueCheck
+				SchemaManagementStrategyName.NONE
 		);
 	}
 
-	private static OrmSetupHelper withBackendMocks(BackendMock defaultBackendMock,
-			Map<String, BackendMock> namedBackendMocks, BiConsumer<Boolean, String> assumptionTrueCheck) {
+	public static OrmSetupHelper withBackendMocks(BackendMock defaultBackendMock, Map<String, BackendMock> namedBackendMocks) {
 		List<BackendMock> backendMocks = new ArrayList<>();
 		if ( defaultBackendMock != null ) {
 			backendMocks.add( defaultBackendMock );
@@ -129,49 +84,42 @@ public class OrmSetupHelper
 				BackendSetupStrategy.withMultipleBackendMocks( defaultBackendMock, namedBackendMocks ),
 				backendMocks,
 				// Mock backend => avoid schema management unless we want to test it
-				SchemaManagementStrategyName.NONE,
-				assumptionTrueCheck
+				SchemaManagementStrategyName.NONE
 		);
 	}
 
-	private static OrmSetupHelper withSingleBackend(BackendConfiguration backendConfiguration,
-			BiConsumer<Boolean, String> assumptionTrueCheck) {
+	public static OrmSetupHelper withSingleBackend(BackendConfiguration backendConfiguration) {
 		return new OrmSetupHelper(
 				BackendSetupStrategy.withSingleBackend( backendConfiguration ),
 				Collections.emptyList(),
 				// Real backend => ensure we clean up everything before and after the tests
-				SchemaManagementStrategyName.DROP_AND_CREATE_AND_DROP,
-				assumptionTrueCheck
+				SchemaManagementStrategyName.DROP_AND_CREATE_AND_DROP
 		);
 	}
 
-	private static OrmSetupHelper withMultipleBackends(BackendConfiguration defaultBackendConfiguration,
-			Map<String, BackendConfiguration> namedBackendConfigurations, BiConsumer<Boolean, String> assumptionTrueCheck) {
+	public static OrmSetupHelper withMultipleBackends(BackendConfiguration defaultBackendConfiguration,
+			Map<String, BackendConfiguration> namedBackendConfigurations) {
 		return new OrmSetupHelper(
 				BackendSetupStrategy.withMultipleBackends( defaultBackendConfiguration, namedBackendConfigurations ),
 				Collections.emptyList(),
 				// Real backend => ensure to clean up everything
-				SchemaManagementStrategyName.DROP_AND_CREATE_AND_DROP,
-				assumptionTrueCheck
+				SchemaManagementStrategyName.DROP_AND_CREATE_AND_DROP
 		);
 	}
 
 	private final Collection<BackendMock> backendMocks;
 	private final SchemaManagementStrategyName schemaManagementStrategyName;
 	private final OrmAssertionHelper assertionHelper;
-	private final BiConsumer<Boolean, String> assumptionTrueCheck;
 	private OrmSetupHelperCleaner ormSetupHelperCleaner;
 	private CoordinationStrategyExpectations coordinationStrategyExpectations = DEFAULT_COORDINATION_STRATEGY_EXPECTATIONS;
 	private SessionFactoryImplementor sessionFactory;
 
 	protected OrmSetupHelper(BackendSetupStrategy backendSetupStrategy, Collection<BackendMock> backendMocks,
-			SchemaManagementStrategyName schemaManagementStrategyName,
-			BiConsumer<Boolean, String> assumptionTrueCheck) {
+			SchemaManagementStrategyName schemaManagementStrategyName) {
 		super( backendSetupStrategy );
 		this.backendMocks = backendMocks;
 		this.schemaManagementStrategyName = schemaManagementStrategyName;
 		this.assertionHelper = new OrmAssertionHelper( backendSetupStrategy );
-		this.assumptionTrueCheck = assumptionTrueCheck;
 	}
 
 	public OrmSetupHelper coordinationStrategy(CoordinationStrategyExpectations coordinationStrategyExpectations) {
@@ -213,16 +161,11 @@ public class OrmSetupHelper
 	}
 
 	@Override
-	public void afterTestExecution(ExtensionContext context) throws Exception {
-		try {
-			super.afterTestExecution( context );
-		}
-		finally {
-			// if test was aborted then we don't want to clean the data since the test wasn't executed.
-			if ( !context.getExecutionException().map( Object::getClass )
-					.map( org.opentest4j.TestAbortedException.class::equals ).orElse( Boolean.FALSE ) ) {
-				this.ormSetupHelperCleaner.cleanupData( sessionFactory );
-			}
+	public void afterTestExecution(ExtensionContext context) {
+		// if test was aborted then we don't want to clean the data since the test wasn't executed.
+		if ( !context.getExecutionException().map( Object::getClass )
+				.map( org.opentest4j.TestAbortedException.class::equals ).orElse( Boolean.FALSE ) ) {
+			this.ormSetupHelperCleaner.cleanupData( sessionFactory );
 		}
 	}
 
@@ -280,7 +223,7 @@ public class OrmSetupHelper
 
 		public SetupContext tenants(boolean enableMultitenancyHelper, String... tenants) {
 			if ( enableMultitenancyHelper ) {
-				withConfiguration( b -> MultitenancyTestHelper.enable( b, assumptionTrueCheck, tenants ) );
+				withConfiguration( b -> MultitenancyTestHelper.enable( b, tenants ) );
 			}
 			if ( coordinationStrategyExpectations.requiresTenantIds ) {
 				withProperty( HibernateOrmMapperSettings.MULTI_TENANCY_TENANT_IDS, String.join( ",", tenants ) );

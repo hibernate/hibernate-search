@@ -8,19 +8,12 @@ package org.hibernate.search.util.impl.integrationtest.common.extension;
 
 import java.util.Collections;
 import java.util.Map;
-import java.util.Optional;
 import java.util.concurrent.CompletionStage;
 
 import org.hibernate.search.util.impl.integrationtest.common.TestConfigurationProvider;
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.BackendMappingHandle;
 
-import org.junit.jupiter.api.extension.Extension;
-
 public interface BackendSetupStrategy {
-
-	default Optional<Extension> getTestRule() {
-		return Optional.empty();
-	}
 
 	<C extends MappingSetupHelper<C, ?, ?, ?, ?>.AbstractSetupContext> C start(C setupContext,
 			TestConfigurationProvider configurationProvider,

@@ -10,7 +10,6 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 import java.util.function.Consumer;
 import java.util.function.UnaryOperator;
@@ -24,22 +23,15 @@ import org.hibernate.search.util.impl.integrationtest.common.stub.backend.Backen
 
 import org.junit.jupiter.api.extension.AfterAllCallback;
 import org.junit.jupiter.api.extension.AfterEachCallback;
-import org.junit.jupiter.api.extension.AfterTestExecutionCallback;
 import org.junit.jupiter.api.extension.BeforeAllCallback;
 import org.junit.jupiter.api.extension.BeforeEachCallback;
-import org.junit.jupiter.api.extension.BeforeTestExecutionCallback;
-import org.junit.jupiter.api.extension.Extension;
 import org.junit.jupiter.api.extension.ExtensionContext;
-import org.junit.jupiter.api.extension.TestExecutionExceptionHandler;
 
 public abstract class MappingSetupHelper<C extends MappingSetupHelper<C, B, BC, R, SV>.AbstractSetupContext, B, BC, R, SV>
-		implements
-		AfterAllCallback, AfterEachCallback, AfterTestExecutionCallback,
-		BeforeAllCallback, BeforeEachCallback, BeforeTestExecutionCallback, TestExecutionExceptionHandler {
+		implements AfterAllCallback, AfterEachCallback, BeforeAllCallback, BeforeEachCallback {
 
 	private final TestConfigurationProvider configurationProvider;
 	private final BackendSetupStrategy backendSetupStrategy;
-	private final ComposedExtension delegate;
 	protected boolean callOncePerClass = false;
 
 	private final List<R> toClose = new ArrayList<>();
@@ -47,33 +39,6 @@ public abstract class MappingSetupHelper<C extends MappingSetupHelper<C, B, BC, 
 	protected MappingSetupHelper(BackendSetupStrategy backendSetupStrategy) {
 		this.configurationProvider = new TestConfigurationProvider();
 		this.backendSetupStrategy = backendSetupStrategy;
-		Optional<Extension> setupStrategyTestExtension = backendSetupStrategy.getTestRule();
-		ComposedExtension.FullExtension ownActions = new ComposedExtension.FullExtension.Builder()
-				.withAfterAll( afterAllContext -> {
-					if ( callOncePerClass ) {
-						cleanUp();
-					}
-				} ).withAfterEach( afterEachContext -> {
-					if ( !callOncePerClass ) {
-						cleanUp();
-					}
-				} ).withBeforeAll( beforeAllContext -> {
-					callOncePerClass = true;
-					if ( callOncePerClass ) {
-						init();
-					}
-				} ).withBeforeEach( beforeEachContext -> {
-					if ( !callOncePerClass ) {
-						init();
-					}
-				} ).build();
-
-		this.delegate = new ComposedExtension(
-				ownActions,
-				setupStrategyTestExtension
-						.<Extension>map( extension -> new ComposedExtension( extension, configurationProvider ) )
-						.orElse( configurationProvider )
-		);
 	}
 
 	@Override
@@ -96,37 +61,35 @@ public abstract class MappingSetupHelper<C extends MappingSetupHelper<C, B, BC, 
 
 	@Override
 	public void afterAll(ExtensionContext context) throws Exception {
-		delegate.afterAll( context );
+		configurationProvider.afterAll( context );
+		if ( callOncePerClass ) {
+			cleanUp();
+		}
 	}
 
 	@Override
 	public void afterEach(ExtensionContext context) throws Exception {
-		delegate.afterEach( context );
-	}
-
-	@Override
-	public void afterTestExecution(ExtensionContext context) throws Exception {
-		delegate.afterTestExecution( context );
+		configurationProvider.afterEach( context );
+		if ( !callOncePerClass ) {
+			cleanUp();
+		}
 	}
 
 	@Override
 	public void beforeAll(ExtensionContext context) throws Exception {
-		delegate.beforeAll( context );
+		configurationProvider.beforeAll( context );
+		callOncePerClass = true;
+		if ( callOncePerClass ) {
+			init();
+		}
 	}
 
 	@Override
 	public void beforeEach(ExtensionContext context) throws Exception {
-		delegate.beforeEach( context );
-	}
-
-	@Override
-	public void beforeTestExecution(ExtensionContext context) throws Exception {
-		delegate.beforeTestExecution( context );
-	}
-
-	@Override
-	public void handleTestExecutionException(ExtensionContext context, Throwable throwable) throws Throwable {
-		delegate.handleTestExecutionException( context, throwable );
+		configurationProvider.beforeEach( context );
+		if ( !callOncePerClass ) {
+			init();
+		}
 	}
 
 	private void cleanUp() throws Exception {
