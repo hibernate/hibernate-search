@@ -217,7 +217,6 @@
         <!-- IMPORTANT: For Java 8, this must be the path to the JDK, not to the JRE -->
         <java-version.test.launcher.java_home>${java-version.test.compiler.java_home}</java-version.test.launcher.java_home>
         <java-version.test.launcher>${java-version.test.launcher.java_home}/bin/java</java-version.test.launcher>
-
         <!--
              The absolute path to the root project directory.
              This property is set by the build-helper plugin.
