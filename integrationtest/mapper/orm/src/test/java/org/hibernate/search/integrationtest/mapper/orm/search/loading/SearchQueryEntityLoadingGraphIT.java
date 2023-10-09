@@ -83,7 +83,8 @@ public class SearchQueryEntityLoadingGraphIT<T> extends AbstractSearchQueryEntit
 		this.mapping = mapping;
 		backendMock.expectAnySchema( model.getIndexName() );
 		sessionFactory = ormSetupHelper.start().withConfiguration( c -> mapping.configure( c, model ) )
-				.dataClearing( true, config -> config.preClear( model.getIndexedClass(), model::clearContainedEager )
+				.dataClearing( true, config -> config
+						.preClear( model.getIndexedClass(), model::clearContainedEager )
 						.clearOrder( model.getContainedClass(), model.getIndexedClass() ) )
 				.setup();
 	}

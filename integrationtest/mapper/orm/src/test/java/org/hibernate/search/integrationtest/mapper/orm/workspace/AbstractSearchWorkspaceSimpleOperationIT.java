@@ -51,7 +51,8 @@ abstract class AbstractSearchWorkspaceSimpleOperationIT {
 		defaultBackendMock.expectAnySchema( IndexedEntity1.INDEX_NAME );
 		backend2Mock.expectAnySchema( IndexedEntity2.INDEX_NAME );
 		sessionFactory = ormSetupHelper.start()
-				.withAnnotatedTypes( IndexedEntity1.class, IndexedEntity2.class ).setup();
+				.withAnnotatedTypes( IndexedEntity1.class, IndexedEntity2.class )
+				.setup();
 	}
 
 	@Test

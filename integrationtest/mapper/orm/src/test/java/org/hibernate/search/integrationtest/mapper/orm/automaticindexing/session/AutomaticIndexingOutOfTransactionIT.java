@@ -40,8 +40,8 @@ class AutomaticIndexingOutOfTransactionIT {
 	@BeforeAll
 	void setup() {
 		backendMock.expectAnySchema( IndexedEntity.INDEX_NAME );
-		sessionFactory = ormSetupHelper.start().withProperty(
-				AvailableSettings.ALLOW_UPDATE_OUTSIDE_TRANSACTION, true )
+		sessionFactory = ormSetupHelper.start()
+				.withProperty( AvailableSettings.ALLOW_UPDATE_OUTSIDE_TRANSACTION, true )
 				.withAnnotatedTypes( IndexedEntity.class )
 				.setup();
 	}

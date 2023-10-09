@@ -59,8 +59,8 @@ class SearchIndexingPlanBaseIT {
 		defaultBackendMock.expectAnySchema( IndexedEntity1.INDEX_NAME );
 		backend2Mock.expectAnySchema( IndexedEntity2.INDEX_NAME );
 
-		sessionFactory = ormSetupHelper.start().withAnnotatedTypes(
-				IndexedEntity1.class, IndexedEntity2.class, ContainedEntity.class )
+		sessionFactory = ormSetupHelper.start()
+				.withAnnotatedTypes( IndexedEntity1.class, IndexedEntity2.class, ContainedEntity.class )
 				.setup();
 	}
 

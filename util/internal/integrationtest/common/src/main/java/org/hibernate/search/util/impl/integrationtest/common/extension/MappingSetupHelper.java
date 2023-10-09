@@ -31,7 +31,7 @@ public abstract class MappingSetupHelper<C extends MappingSetupHelper<C, B, BC, 
 		implements AfterAllCallback, AfterEachCallback, BeforeAllCallback, BeforeEachCallback {
 
 	private final TestConfigurationProvider configurationProvider;
-	private final BackendSetupStrategy backendSetupStrategy;
+	protected final BackendSetupStrategy backendSetupStrategy;
 	protected boolean callOncePerClass = false;
 
 	private final List<R> toClose = new ArrayList<>();

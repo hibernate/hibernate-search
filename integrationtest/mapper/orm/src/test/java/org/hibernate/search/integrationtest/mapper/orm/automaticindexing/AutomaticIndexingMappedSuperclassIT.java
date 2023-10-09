@@ -56,7 +56,7 @@ class AutomaticIndexingMappedSuperclassIT {
 				IndexedEntityMappedSuperclass.class,
 				IndexedEntity.class,
 				ContainedEntity.class
-		).dataClearing( config -> config.clearDatabaseData( false ) ).setup();
+		).setup();
 	}
 
 	@Test

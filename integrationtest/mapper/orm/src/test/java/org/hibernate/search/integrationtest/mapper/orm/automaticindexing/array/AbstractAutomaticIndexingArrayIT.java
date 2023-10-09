@@ -45,7 +45,8 @@ abstract class AbstractAutomaticIndexingArrayIT<TIndexed, TArray, TIndexField> {
 				.field( "elementCollectionArray", primitives.getExpectedIndexFieldType(),
 						b2 -> b2.multiValued( true ) ) );
 
-		sessionFactory = ormSetupHelper.start().withAnnotatedTypes( primitives.getIndexedClass() ).setup();
+		sessionFactory =
+				ormSetupHelper.start().withAnnotatedTypes( primitives.getIndexedClass() ).setup();
 	}
 
 	@Test

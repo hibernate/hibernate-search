@@ -192,7 +192,7 @@ public class OrmSetupHelper
 		private final Map<String, Object> overriddenProperties = new LinkedHashMap<>();
 
 		SetupContext(SchemaManagementStrategyName schemaManagementStrategyName) {
-			ormSetupHelperCleaner = OrmSetupHelperCleaner.create( callOncePerClass );
+			ormSetupHelperCleaner = OrmSetupHelperCleaner.create( callOncePerClass, backendSetupStrategy.isMockBackend() );
 			// Set the default properties according to OrmSetupHelperConfig
 			withProperties( DEFAULT_PROPERTIES );
 			// Override the schema management strategy according to our needs for testing
@@ -253,14 +253,16 @@ public class OrmSetupHelper
 
 		public SetupContext dataClearing(boolean reset, Consumer<DataClearConfig> configurer) {
 			if ( reset ) {
-				ormSetupHelperCleaner = OrmSetupHelperCleaner.create( callOncePerClass );
+				ormSetupHelperCleaner = OrmSetupHelperCleaner.create( callOncePerClass,
+						backendSetupStrategy.isMockBackend()
+				);
 			}
 			ormSetupHelperCleaner.appendConfiguration( configurer );
 			return thisAsC();
 		}
 
-		public SetupContext disableDataClearing() {
-			return dataClearing( true, config -> config.clearDatabaseData( false ) );
+		public SetupContext dataClearingIndexOnly() {
+			return dataClearing( false, config -> config.clearDatabaseData( false ).clearIndexData( true ) );
 		}
 
 		public SessionFactory setup(Class<?>... annotatedTypes) {

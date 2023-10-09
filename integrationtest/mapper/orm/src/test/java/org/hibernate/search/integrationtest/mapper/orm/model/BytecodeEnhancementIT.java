@@ -61,7 +61,7 @@ class BytecodeEnhancementIT {
 	private SessionFactory sessionFactory;
 
 	@ParameterizedSetup
-	public void setup() {
+	void setup() {
 		backendMock.expectSchema( IndexedEntity.INDEX, b -> b
 				.field( "mappedSuperClassText", String.class )
 				.field( "entitySuperClassText", String.class )
