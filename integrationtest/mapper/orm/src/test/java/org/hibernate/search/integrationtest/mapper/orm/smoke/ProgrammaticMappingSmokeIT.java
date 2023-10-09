@@ -126,7 +126,6 @@ class ProgrammaticMappingSmokeIT {
 						OtherIndexedEntity.class,
 						YetAnotherIndexedEntity.class
 				)
-				.dataClearing( config -> config.clearDatabaseData( false ) )
 				.setup();
 	}
 

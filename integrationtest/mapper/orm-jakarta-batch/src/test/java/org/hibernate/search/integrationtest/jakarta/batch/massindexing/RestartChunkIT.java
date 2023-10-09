@@ -60,7 +60,6 @@ class RestartChunkIT {
 	void setup() {
 		emf = ormSetupHelper.start().withAnnotatedTypes( SimulatedFailureCompany.class )
 				.withProperty( HibernateOrmMapperSettings.INDEXING_LISTENERS_ENABLED, false )
-				.dataClearing( config -> config.clearIndexData( true ) )
 				.setup();
 	}
 

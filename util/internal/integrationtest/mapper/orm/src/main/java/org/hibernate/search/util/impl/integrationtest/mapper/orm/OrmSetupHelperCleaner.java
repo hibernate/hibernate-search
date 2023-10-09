@@ -47,10 +47,10 @@ class OrmSetupHelperCleaner {
 
 	private final DataClearConfigImpl config;
 
-	static OrmSetupHelperCleaner create(boolean oncePerClass) {
+	static OrmSetupHelperCleaner create(boolean oncePerClass, boolean mockBackend) {
 		if ( oncePerClass ) {
 			return new OrmSetupHelperCleaner().appendConfiguration(
-					config -> config.clearDatabaseData( true ).clearIndexData( false ) );
+					config -> config.clearDatabaseData( true ).clearIndexData( !mockBackend ) );
 		}
 		return new OrmSetupHelperCleaner();
 	}

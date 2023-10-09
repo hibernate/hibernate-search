@@ -70,7 +70,8 @@ public class AutomaticIndexingAssociationDeletionIT {
 		backendMock.expectAnySchema( AssociationNonOwner.NAME );
 		OrmSetupHelper.SetupContext setupContext = ormSetupHelper.start().withAnnotatedTypes(
 				AssociationOwner.class, AssociationNonOwner.class )
-				.dataClearing( config -> config.clearOrder( AssociationOwner.class, AssociationNonOwner.class ) );
+				.dataClearing( config -> config.clearOrder( AssociationOwner.class,
+						AssociationNonOwner.class ) );
 
 		sessionFactory = additionalSetup( setupContext ).setup();
 	}

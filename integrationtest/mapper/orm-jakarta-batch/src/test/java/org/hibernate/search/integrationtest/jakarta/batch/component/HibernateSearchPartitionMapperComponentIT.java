@@ -58,7 +58,7 @@ class HibernateSearchPartitionMapperComponentIT {
 	public void init() {
 		emf = ormSetupHelper.start().withAnnotatedTypes( Company.class, Person.class, CompanyGroup.class )
 				.withProperty( HibernateOrmMapperSettings.INDEXING_LISTENERS_ENABLED, false )
-				.dataClearing( config -> config.clearDatabaseData( false ).clearIndexData( true ) )
+				.dataClearingIndexOnly()
 				.setup();
 
 		with( emf ).runInTransaction( session -> {

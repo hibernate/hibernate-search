@@ -78,8 +78,7 @@ class MassIndexingJobIT {
 		emf = ormSetupHelper.start().withAnnotatedTypes(
 				Company.class, Person.class, WhoAmI.class, CompanyGroup.class )
 				.withProperty( HibernateOrmMapperSettings.INDEXING_LISTENERS_ENABLED, false )
-				.dataClearing( config -> config.clearOrder( CompanyGroup.class, Company.class )
-						.clearIndexData( true ) )
+				.dataClearing( config -> config.clearOrder( CompanyGroup.class, Company.class ) )
 				.setup();
 	}
 

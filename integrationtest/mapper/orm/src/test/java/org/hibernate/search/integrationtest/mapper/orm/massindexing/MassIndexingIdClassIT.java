@@ -51,8 +51,8 @@ class MassIndexingIdClassIT {
 	void setup() {
 		backendMock.expectAnySchema( IdClassEntity.INDEX );
 
-		sessionFactory = ormSetupHelper.start().withPropertyRadical(
-				HibernateOrmMapperSettings.Radicals.INDEXING_LISTENERS_ENABLED, false )
+		sessionFactory = ormSetupHelper.start()
+				.withPropertyRadical( HibernateOrmMapperSettings.Radicals.INDEXING_LISTENERS_ENABLED, false )
 				.withAnnotatedTypes( IdClassEntity.class )
 				.setup();
 	}

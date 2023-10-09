@@ -98,11 +98,9 @@ class AutomaticIndexingOverReindexingIT {
 				)
 		);
 
-		sessionFactory = ormSetupHelper.start().withAnnotatedTypes(
-				Level1Entity.class,
-				Level2Entity.class,
-				Level3Entity.class
-		).setup();
+		sessionFactory = ormSetupHelper.start()
+				.withAnnotatedTypes( Level1Entity.class, Level2Entity.class, Level3Entity.class )
+				.setup();
 	}
 
 	@Test

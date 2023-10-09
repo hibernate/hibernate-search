@@ -51,8 +51,6 @@ class MassIndexingJobWithMultiTenancyIT {
 				.withProperty( HibernateOrmMapperSettings.INDEXING_LISTENERS_ENABLED, false )
 				.withBackendProperty( "multi_tenancy.strategy", "discriminator" )
 				.tenants( TARGET_TENANT_ID, UNUSED_TENANT_ID )
-				// since it's a single test, we can leave the index and data
-				// .dataClearing( config -> config.clearDatabaseData( true ).clearIndexData( true ) )
 				.setup();
 		with( sessionFactory, TARGET_TENANT_ID )
 				.runInTransaction( session -> companies.forEach( session::persist ) );

@@ -63,13 +63,14 @@ class AutomaticIndexingGenericPolymorphicAssociationIT {
 				UnrelatedContainingEntity.class,
 				ContainedEntity.class
 		).dataClearing(
-				config -> config.clearOrder( IndexedEntity.class, ContainingEntity.class, MiddleContainingEntity.class,
-						UnrelatedContainingEntity.class, ContainedEntity.class
-				).preClear( session -> session.createQuery( "select e from indexed e ", IndexedEntity.class )
-						.getResultList().forEach( e -> {
-							e.getChild().setParent( null );
-							e.setChild( null );
-						} ) ) )
+				config -> config
+						.clearOrder( IndexedEntity.class, ContainingEntity.class, MiddleContainingEntity.class,
+								UnrelatedContainingEntity.class, ContainedEntity.class )
+						.preClear( session -> session.createQuery( "select e from indexed e ", IndexedEntity.class )
+								.getResultList().forEach( e -> {
+									e.getChild().setParent( null );
+									e.setChild( null );
+								} ) ) )
 				.setup();
 	}
 

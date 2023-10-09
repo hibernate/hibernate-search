@@ -63,7 +63,7 @@ class AutomaticIndexingPolymorphicOriginalSideAssociationIT {
 				FirstMiddleContainingEntity.class,
 				SecondMiddleContainingEntity.class,
 				ContainedEntity.class
-		).dataClearing( config -> config.clearDatabaseData( false ) ).setup();
+		).setup();
 	}
 
 	/**
