@@ -6,7 +6,7 @@
  */
 package org.hibernate.search.test.event.update;
 
-import static org.junit.Assert.assertEquals;
+import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.List;
 
@@ -18,7 +18,7 @@ import org.hibernate.search.query.dsl.QueryBuilder;
 import org.hibernate.search.test.SearchTestBase;
 import org.hibernate.search.testsupport.TestForIssue;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import org.apache.lucene.search.Query;
 
@@ -27,10 +27,10 @@ import org.apache.lucene.search.Query;
  * @author Sanne Grinovero
  */
 @TestForIssue(jiraKey = "HSEARCH-1999")
-public class DirtyCheckingTest extends SearchTestBase {
+class DirtyCheckingTest extends SearchTestBase {
 
 	@Test
-	public void testName() throws Exception {
+	void testName() {
 		try ( FullTextSession s = Search.getFullTextSession( openSession() ) ) {
 			Transaction tx = s.beginTransaction();
 			{
@@ -64,8 +64,8 @@ public class DirtyCheckingTest extends SearchTestBase {
 
 		FullTextQuery fullTextQuery = s.createFullTextQuery( q, CheeseRollingCompetitor.class ).setProjection( "Nickname" );
 		List list = fullTextQuery.list();
-		assertEquals( 1, list.size() );
-		assertEquals( expectedProjection, ( (Object[]) list.get( 0 ) )[0] );
+		assertThat( list ).hasSize( 1 );
+		assertThat( ( (Object[]) list.get( 0 ) )[0] ).isEqualTo( expectedProjection );
 
 		s.clear();
 	}

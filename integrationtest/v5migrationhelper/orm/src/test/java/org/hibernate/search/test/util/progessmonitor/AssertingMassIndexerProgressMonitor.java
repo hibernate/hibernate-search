@@ -7,7 +7,7 @@
 
 package org.hibernate.search.test.util.progessmonitor;
 
-import static org.junit.Assert.assertEquals;
+import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.concurrent.atomic.LongAdder;
 
@@ -61,9 +61,10 @@ public class AssertingMassIndexerProgressMonitor implements MassIndexerProgressM
 	}
 
 	public void assertExpectedProgressMade() {
-		assertEquals( "Unexpected number of added documents", expectedAddedDocuments, addedDocuments.longValue() );
-		assertEquals( "Unexpected total count", expectedTotalCount, totalCount.longValue() );
-		assertEquals( "Finished called more than once", 1, finishedCount.longValue() );
+		assertThat( addedDocuments.longValue() ).as( "Unexpected number of added documents" )
+				.isEqualTo( expectedAddedDocuments );
+		assertThat( totalCount.longValue() ).as( "Unexpected total count" ).isEqualTo( expectedTotalCount );
+		assertThat( finishedCount.longValue() ).as( "Finished called more than once" ).isEqualTo( 1 );
 	}
 
 }

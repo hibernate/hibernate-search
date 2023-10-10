@@ -15,8 +15,9 @@ import java.util.Set;
 
 import org.hibernate.search.util.impl.test.extension.log4j.Log4j2ConfigurationAccessor;
 
-import org.junit.rules.TestRule;
-import org.junit.runners.model.Statement;
+import org.junit.jupiter.api.extension.AfterEachCallback;
+import org.junit.jupiter.api.extension.BeforeEachCallback;
+import org.junit.jupiter.api.extension.ExtensionContext;
 
 import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.core.LogEvent;
@@ -29,12 +30,12 @@ import org.hamcrest.TypeSafeMatcher;
 /**
  * @author Yoann Rodiere
  */
-public class ExpectedLog4jLog implements TestRule {
+public class ExpectedLog4jLog implements BeforeEachCallback, AfterEachCallback {
 
 	private static final String DEFAULT_LOGGER_NAME = "org.hibernate.search";
 
 	/**
-	 * @return a {@linkplain TestRule rule} targeting the logger named '{@value DEFAULT_LOGGER_NAME}',
+	 * @return a {@linkplain org.junit.jupiter.api.extension.Extension rule} targeting the logger named '{@value DEFAULT_LOGGER_NAME}',
 	 * that originally does not mandate any particular log to be produced (identical to behavior without this rule).
 	 */
 	public static ExpectedLog4jLog create() {
@@ -42,7 +43,7 @@ public class ExpectedLog4jLog implements TestRule {
 	}
 
 	/**
-	 * @return a {@linkplain TestRule rule} targeting the logger whose name is given by {@code loggerName},
+	 * @return a {@linkplain org.junit.jupiter.api.extension.Extension rule} targeting the logger whose name is given by {@code loggerName},
 	 * that originally does not mandate any particular log to be produced (identical to behavior without this rule).
 	 */
 	public static ExpectedLog4jLog create(String loggerName) {
@@ -55,13 +56,11 @@ public class ExpectedLog4jLog implements TestRule {
 
 	protected List<Matcher<?>> absenceExpectations = new ArrayList<>();
 
+	private Log4j2ConfigurationAccessor programmaticConfig;
+	private TestAppender currentAppender;
+
 	private ExpectedLog4jLog(String loggerName) {
 		this.loggerName = loggerName;
-	}
-
-	@Override
-	public Statement apply(Statement base, org.junit.runner.Description description) {
-		return new ExpectedLogStatement( base );
 	}
 
 	/**
@@ -162,30 +161,23 @@ public class ExpectedLog4jLog implements TestRule {
 		};
 	}
 
-	private class ExpectedLogStatement extends Statement {
+	@Override
+	public void beforeEach(ExtensionContext context) {
+		ExpectedLog4jLog.this.expectations.clear();
+		ExpectedLog4jLog.this.absenceExpectations.clear();
+		programmaticConfig = new Log4j2ConfigurationAccessor( loggerName );
+		TestAppender appender = new TestAppender( "TestAppender", ExpectedLog4jLog.this );
+		programmaticConfig.addAppender( appender );
+		ExpectedLog4jLog.this.currentAppender = appender;
+	}
 
-		private final Statement next;
-
-		public ExpectedLogStatement(Statement base) {
-			next = base;
-		}
-
-		@Override
-		public void evaluate() throws Throwable {
-			Log4j2ConfigurationAccessor programmaticConfig = new Log4j2ConfigurationAccessor( loggerName );
-			TestAppender appender = new TestAppender( "TestAppender", ExpectedLog4jLog.this );
-			programmaticConfig.addAppender( appender );
-			try {
-				next.evaluate();
-			}
-			finally {
-				programmaticConfig.removeAppender();
-			}
-			Set<Matcher<?>> expectationsNotMet = appender.getExpectationsNotMet();
-			Set<LogEvent> unexpectedEvents = appender.getUnexpectedEvents();
-			if ( !expectationsNotMet.isEmpty() || !unexpectedEvents.isEmpty() ) {
-				fail( buildFailureMessage( expectationsNotMet, unexpectedEvents ) );
-			}
+	@Override
+	public void afterEach(ExtensionContext context) {
+		programmaticConfig.removeAppender();
+		Set<Matcher<?>> expectationsNotMet = currentAppender.getExpectationsNotMet();
+		Set<LogEvent> unexpectedEvents = currentAppender.getUnexpectedEvents();
+		if ( !expectationsNotMet.isEmpty() || !unexpectedEvents.isEmpty() ) {
+			fail( buildFailureMessage( expectationsNotMet, unexpectedEvents ) );
 		}
 	}
 

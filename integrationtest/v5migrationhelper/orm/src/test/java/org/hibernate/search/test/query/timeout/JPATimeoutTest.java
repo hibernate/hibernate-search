@@ -6,10 +6,8 @@
  */
 package org.hibernate.search.test.query.timeout;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.fail;
 
 import java.util.List;
 import java.util.Map;
@@ -25,20 +23,20 @@ import org.hibernate.search.query.dsl.QueryBuilder;
 import org.hibernate.search.test.jpa.JPATestCase;
 import org.hibernate.search.util.impl.integrationtest.backend.lucene.query.SlowQuery;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import org.apache.lucene.search.Query;
 
 /**
  * @author Emmanuel Bernard
  */
-public class JPATimeoutTest extends JPATestCase {
+class JPATimeoutTest extends JPATestCase {
 
 	private Query slowQuery;
 
 	@Override
-	@Before
+	@BeforeEach
 	public void setUp() {
 		super.setUp();
 		FullTextEntityManager em = Search.getFullTextEntityManager( factory.createEntityManager() );
@@ -52,7 +50,7 @@ public class JPATimeoutTest extends JPATestCase {
 	}
 
 	@Test
-	public void testQueryTimeoutException() throws Exception {
+	void testQueryTimeoutException() throws Exception {
 		FullTextEntityManager em = Search.getFullTextEntityManager( factory.createEntityManager() );
 
 		em.getTransaction().begin();
@@ -74,7 +72,7 @@ public class JPATimeoutTest extends JPATestCase {
 		em.clear();
 
 		em.getTransaction().begin();
-		assertEquals( 100, em.createQuery( "delete from " + Clock.class.getName() ).executeUpdate() );
+		assertThat( em.createQuery( "delete from " + Clock.class.getName() ).executeUpdate() ).isEqualTo( 100 );
 		em.getTransaction().commit();
 
 		em.close();
@@ -82,13 +80,13 @@ public class JPATimeoutTest extends JPATestCase {
 	}
 
 	@Test
-	public void testLimitFetchingTime() {
+	void testLimitFetchingTime() {
 		FullTextEntityManager em = Search.getFullTextEntityManager( factory.createEntityManager() );
 
 		em.getTransaction().begin();
 		FullTextQuery hibernateQuery = em.createFullTextQuery( slowQuery, Clock.class );
 		List results = hibernateQuery.getResultList();
-		assertEquals( 50, results.size() );
+		assertThat( results ).hasSize( 50 );
 
 		em.clear();
 
@@ -96,10 +94,10 @@ public class JPATimeoutTest extends JPATestCase {
 		hibernateQuery.limitExecutionTimeTo( 1, TimeUnit.NANOSECONDS );
 		List result = hibernateQuery.getResultList();
 		System.out.println( "Result size early: " + result.size() );
-		assertEquals( "Test early failure, before the number of results are even fetched", 0, result.size() );
+		assertThat( result ).as( "Test early failure, before the number of results are even fetched" ).isEmpty();
 		if ( result.size() == 0 ) {
 			//sometimes, this
-			assertTrue( hibernateQuery.hasPartialResults() );
+			assertThat( hibernateQuery.hasPartialResults() ).isTrue();
 		}
 
 		em.clear();
@@ -118,15 +116,15 @@ public class JPATimeoutTest extends JPATestCase {
 		hibernateQuery = em.createFullTextQuery( slowQuery, Clock.class );
 		hibernateQuery.limitExecutionTimeTo( 30, TimeUnit.SECONDS );
 		results = hibernateQuery.getResultList();
-		assertEquals( "Test below limit termination", 50, results.size() );
-		assertFalse( hibernateQuery.hasPartialResults() );
+		assertThat( results ).as( "Test below limit termination" ).hasSize( 50 );
+		assertThat( hibernateQuery.hasPartialResults() ).isFalse();
 
 		em.getTransaction().commit();
 
 		em.clear();
 
 		em.getTransaction().begin();
-		assertEquals( 100, em.createQuery( "delete from " + Clock.class.getName() ).executeUpdate() );
+		assertThat( em.createQuery( "delete from " + Clock.class.getName() ).executeUpdate() ).isEqualTo( 100 );
 		em.getTransaction().commit();
 
 		em.close();

@@ -20,31 +20,31 @@ import org.hibernate.search.query.facet.FacetingRequest;
 import org.hibernate.search.testsupport.junit.SearchFactoryHolder;
 import org.hibernate.search.testsupport.junit.SearchITHelper;
 
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 
 /**
  * Test that the HSQuery result cache gets cleared as necessary.
  *
  * @author Yoann Rodiere
  */
-public class HSQueryResultCacheClearingTest {
+class HSQueryResultCacheClearingTest {
 
-	@Rule
+	@RegisterExtension
 	public final SearchFactoryHolder sfHolder = new SearchFactoryHolder( IndexedEntity.class );
 
 	private final SearchITHelper helper = new SearchITHelper( sfHolder );
 
-	@Before
-	public void setUp() throws Exception {
+	@BeforeEach
+	void setUp() {
 		helper.add( new IndexedEntity( 0, "zero" ) );
 		helper.add( new IndexedEntity( 1, "one" ) );
 		helper.add( new IndexedEntity( 2, "two" ) );
 	}
 
 	@Test
-	public void clear_firstResult() throws Exception {
+	void clear_firstResult() {
 		HSQuery hsQuery = queryAll();
 		helper.assertThatQuery( hsQuery ).matchesExactlyIds( 0, 1, 2 );
 
@@ -56,7 +56,7 @@ public class HSQueryResultCacheClearingTest {
 	}
 
 	@Test
-	public void clear_maxResult() throws Exception {
+	void clear_maxResult() {
 		HSQuery hsQuery = queryAll();
 		helper.assertThatQuery( hsQuery ).matchesExactlyIds( 0, 1, 2 );
 
@@ -68,7 +68,7 @@ public class HSQueryResultCacheClearingTest {
 	}
 
 	@Test
-	public void clear_projection() throws Exception {
+	void clear_projection() {
 		HSQuery hsQuery = queryAll();
 		hsQuery.projection( ProjectionConstants.ID );
 		helper.assertThatQuery( hsQuery ).matchesExactlySingleProjections( 0, 1, 2 );
@@ -83,7 +83,7 @@ public class HSQueryResultCacheClearingTest {
 	}
 
 	@Test
-	public void clear_sort() throws Exception {
+	void clear_sort() {
 		QueryBuilder qb = helper.queryBuilder( IndexedEntity.class );
 		HSQuery hsQuery = queryAll();
 		helper.assertThatQuery( hsQuery ).matchesExactlyIds( 0, 1, 2 );
@@ -93,7 +93,7 @@ public class HSQueryResultCacheClearingTest {
 	}
 
 	@Test
-	public void clear_faceting() throws Exception {
+	void clear_faceting() {
 		QueryBuilder qb = helper.queryBuilder( IndexedEntity.class );
 		HSQuery hsQuery = queryAll();
 		helper.assertThatQuery( hsQuery ).matchesExactlyIds( 0, 1, 2 );

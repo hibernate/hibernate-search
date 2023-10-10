@@ -6,8 +6,8 @@
  */
 package org.hibernate.search.test.query;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmUtils.listAll;
-import static org.junit.Assert.assertEquals;
 
 import java.util.List;
 
@@ -19,7 +19,7 @@ import org.hibernate.search.Search;
 import org.hibernate.search.test.SearchTestBase;
 import org.hibernate.search.testsupport.TestConstants;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import org.apache.lucene.queryparser.classic.QueryParser;
 import org.apache.lucene.search.Query;
@@ -27,10 +27,10 @@ import org.apache.lucene.search.Query;
 /**
  * @author Emmanuel Bernard
  */
-public class QueryLoaderTest extends SearchTestBase {
+class QueryLoaderTest extends SearchTestBase {
 
 	@Test
-	public void testWithEagerCollectionLoad() throws Exception {
+	void testWithEagerCollectionLoad() throws Exception {
 		Session sess = openSession();
 		Transaction tx = sess.beginTransaction();
 		Music music = new Music();
@@ -81,11 +81,11 @@ public class QueryLoaderTest extends SearchTestBase {
 		Query query = parser.parse( "title:moo" );
 		FullTextQuery hibQuery = s.createFullTextQuery( query, Music.class );
 		List result = hibQuery.list();
-		assertEquals( "Should have returned 2 Books", 2, result.size() );
+		assertThat( result ).as( "Should have returned 2 Books" ).hasSize( 2 );
 		music = (Music) result.get( 0 );
-		assertEquals( "Book 1 should have four authors", 4, music.getAuthors().size() );
+		assertThat( music.getAuthors() ).as( "Book 1 should have four authors" ).hasSize( 4 );
 		music2 = (Music) result.get( 1 );
-		assertEquals( "Book 2 should have four authors", 4, music2.getAuthors().size() );
+		assertThat( music2.getAuthors() ).as( "Book 2 should have four authors" ).hasSize( 4 );
 
 		//cleanup
 		music.getAuthors().clear();

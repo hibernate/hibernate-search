@@ -18,9 +18,9 @@ import org.hibernate.search.query.dsl.QueryBuilder;
 import org.hibernate.search.test.SearchTestBase;
 import org.hibernate.search.testsupport.TestForIssue;
 
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import org.apache.lucene.search.Query;
 
@@ -30,12 +30,12 @@ import org.apache.lucene.search.Query;
  *
  * @author Gunnar Morling
  */
-public class ObjectLoadingCrossHierarchyTest extends SearchTestBase {
+class ObjectLoadingCrossHierarchyTest extends SearchTestBase {
 
 	private FullTextSession fullTextSession;
 
 	@Override
-	@Before
+	@BeforeEach
 	public void setUp() throws Exception {
 		super.setUp();
 		Session session = openSession();
@@ -44,14 +44,14 @@ public class ObjectLoadingCrossHierarchyTest extends SearchTestBase {
 	}
 
 	@Override
-	@After
+	@AfterEach
 	public void tearDown() throws Exception {
 		super.tearDown();
 	}
 
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-1793")
-	public void testQueryingForEntitiesFromDifferentIdSpaces() throws Exception {
+	void testQueryingForEntitiesFromDifferentIdSpaces() {
 		QueryBuilder queryBuilder = fullTextSession.getSearchFactory()
 				.buildQueryBuilder().forEntity( EducationalInstitution.class ).get();
 

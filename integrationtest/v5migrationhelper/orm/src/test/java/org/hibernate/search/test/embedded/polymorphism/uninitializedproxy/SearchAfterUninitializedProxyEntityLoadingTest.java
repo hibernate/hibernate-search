@@ -6,8 +6,7 @@
  */
 package org.hibernate.search.test.embedded.polymorphism.uninitializedproxy;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.List;
 
@@ -21,38 +20,38 @@ import org.hibernate.search.query.dsl.QueryBuilder;
 import org.hibernate.search.test.SearchTestBase;
 import org.hibernate.search.testsupport.TestForIssue;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 @TestForIssue(jiraKey = "HSEARCH-1448")
-public class SearchAfterUninitializedProxyEntityLoadingTest extends SearchTestBase {
+class SearchAfterUninitializedProxyEntityLoadingTest extends SearchTestBase {
 	private Integer entityId;
 	private Integer entityReferenceId;
 
 	@Override
-	@Before
+	@BeforeEach
 	public void setUp() throws Exception {
 		super.setUp();
 		populateDatabase();
 	}
 
 	@Test
-	public void testSearchConcreteEntityWithoutPreLoadedProxy() {
+	void testSearchConcreteEntityWithoutPreLoadedProxy() {
 		executeTest( ConcreteEntity.class, false );
 	}
 
 	@Test
-	public void testSearchAbstractEntityWithoutPreLoadedProxy() {
+	void testSearchAbstractEntityWithoutPreLoadedProxy() {
 		executeTest( AbstractEntity.class, false );
 	}
 
 	@Test
-	public void testSearchConcreteEntityWithPreLoadedProxy() {
+	void testSearchConcreteEntityWithPreLoadedProxy() {
 		executeTest( ConcreteEntity.class, true );
 	}
 
 	@Test
-	public void testSearchAbstractEntityWithPreLoadedProxy() {
+	void testSearchAbstractEntityWithPreLoadedProxy() {
 		executeTest( AbstractEntity.class, true );
 	}
 
@@ -62,28 +61,21 @@ public class SearchAfterUninitializedProxyEntityLoadingTest extends SearchTestBa
 	}
 
 	private void executeTest(Class<? extends AbstractEntity> clazz, boolean loadAbstractProxyBeforeSearch) {
-		Session session = openSession();
-
-		try {
+		try ( Session session = openSession() ) {
 			if ( loadAbstractProxyBeforeSearch ) {
 				// Load a proxified version of the entity into the session
 				LazyAbstractEntityReference reference = (LazyAbstractEntityReference) session.get(
 						LazyAbstractEntityReference.class, entityReferenceId );
-				assertTrue( reference != null && !Hibernate.isInitialized( reference.getEntity() ) );
+				assertThat( reference != null && !Hibernate.isInitialized( reference.getEntity() ) ).isTrue();
 			}
 
 			// Search for the created entity
-			assertEquals( 1, doSearch( session, clazz, entityId ).size() );
-		}
-		finally {
-			session.close();
+			assertThat( doSearch( session, clazz, entityId ) ).hasSize( 1 );
 		}
 	}
 
 	private void populateDatabase() {
-		Session session = openSession();
-
-		try {
+		try ( Session session = openSession(); ) {
 			Transaction t = session.beginTransaction();
 
 			ConcreteEntity entity = new ConcreteEntity();
@@ -96,9 +88,6 @@ public class SearchAfterUninitializedProxyEntityLoadingTest extends SearchTestBa
 
 			session.flush();
 			t.commit();
-		}
-		finally {
-			session.close();
 		}
 	}
 

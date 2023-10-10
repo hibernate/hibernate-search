@@ -7,6 +7,7 @@
 package org.hibernate.search.test.embedded.sorting;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import java.util.List;
 
@@ -18,14 +19,12 @@ import org.hibernate.search.Search;
 import org.hibernate.search.query.dsl.QueryBuilder;
 import org.hibernate.search.test.SearchTestBase;
 import org.hibernate.search.testsupport.TestForIssue;
-import org.hibernate.search.testsupport.junit.ElasticsearchSupportInProgress;
+import org.hibernate.search.testsupport.junit.Tags;
 import org.hibernate.search.util.common.SearchException;
 
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.experimental.categories.Category;
-import org.junit.rules.ExpectedException;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Tag;
+import org.junit.jupiter.api.Test;
 
 import org.apache.lucene.search.Query;
 import org.apache.lucene.search.Sort;
@@ -34,17 +33,14 @@ import org.apache.lucene.search.Sort;
  * @author Davide D'Alto
  */
 @TestForIssue(jiraKey = "HSEARCH-2069")
-public class EmbeddedSortableIdFieldTest extends SearchTestBase {
+class EmbeddedSortableIdFieldTest extends SearchTestBase {
 
 	private static final String LEX = "Lex Luthor";
 	private static final String DARKSEID = "Darkseid";
 	private static final String CLARK = "Clark Kent";
 
-	@Rule
-	public final ExpectedException thrown = ExpectedException.none();
-
-	@Before
-	public void before() throws Exception {
+	@BeforeEach
+	void before() {
 		try ( Session session = openSession() ) {
 			Transaction transaction = session.beginTransaction();
 
@@ -66,7 +62,7 @@ public class EmbeddedSortableIdFieldTest extends SearchTestBase {
 	}
 
 	@Test
-	public void testSortingOnSortableFieldIncludedByIndexEmbedded() {
+	void testSortingOnSortableFieldIncludedByIndexEmbedded() {
 		try ( Session session = openSession() ) {
 			FullTextSession fullTextSession = Search.getFullTextSession( session );
 			QueryBuilder qb = fullTextSession.getSearchFactory().buildQueryBuilder().forEntity( Hero.class ).get();
@@ -89,25 +85,26 @@ public class EmbeddedSortableIdFieldTest extends SearchTestBase {
 	}
 
 	@Test
-	@Category(ElasticsearchSupportInProgress.class) // HSEARCH-2398 Improve field name/type validation when querying the Elasticsearch backend
-	public void testSortingOnSortableFieldNotIncludedByIndexEmbeddedException() {
-		thrown.expect( SearchException.class );
-		thrown.expectMessage( "Unknown field 'villain.id_sort'" );
+	@Tag(Tags.ELASTICSEARCH_SUPPORT_IN_PROGRESS) // HSEARCH-2398 Improve field name/type validation when querying the Elasticsearch backend
+	void testSortingOnSortableFieldNotIncludedByIndexEmbeddedException() {
+		assertThatThrownBy( () -> {
+			try ( Session session = openSession() ) {
+				FullTextSession fullTextSession = Search.getFullTextSession( session );
+				QueryBuilder qb = fullTextSession.getSearchFactory().buildQueryBuilder().forEntity( Hero.class ).get();
+				Transaction transaction = fullTextSession.beginTransaction();
 
-		try ( Session session = openSession() ) {
-			FullTextSession fullTextSession = Search.getFullTextSession( session );
-			QueryBuilder qb = fullTextSession.getSearchFactory().buildQueryBuilder().forEntity( Hero.class ).get();
-			Transaction transaction = fullTextSession.beginTransaction();
+				Sort sort = qb.sort().byField( "villain.id_sort" ).createSort();
 
-			Sort sort = qb.sort().byField( "villain.id_sort" ).createSort();
-
-			QueryBuilder queryBuilder = fullTextSession.getSearchFactory().buildQueryBuilder().forEntity( Hero.class ).get();
-			Query q = queryBuilder.keyword().onField( "villain.name" ).matching( LEX ).createQuery();
-			FullTextQuery fullTextQuery = fullTextSession.createFullTextQuery( q, Hero.class );
-			fullTextQuery.setSort( sort );
-			fullTextQuery.list();
-			transaction.commit();
-		}
+				QueryBuilder queryBuilder = fullTextSession.getSearchFactory().buildQueryBuilder().forEntity(
+						Hero.class ).get();
+				Query q = queryBuilder.keyword().onField( "villain.name" ).matching( LEX ).createQuery();
+				FullTextQuery fullTextQuery = fullTextSession.createFullTextQuery( q, Hero.class );
+				fullTextQuery.setSort( sort );
+				fullTextQuery.list();
+				transaction.commit();
+			}
+		} ).isInstanceOf( SearchException.class )
+				.hasMessageContainingAll( "Unknown field 'villain.id_sort'" );
 	}
 
 	@Override

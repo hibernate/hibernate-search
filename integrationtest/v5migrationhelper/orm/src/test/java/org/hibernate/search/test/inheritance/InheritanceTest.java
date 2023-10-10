@@ -6,10 +6,8 @@
  */
 package org.hibernate.search.test.inheritance;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.fail;
 
 import java.io.Serializable;
 import java.lang.invoke.MethodHandles;
@@ -24,7 +22,7 @@ import org.hibernate.search.util.common.SearchException;
 import org.hibernate.search.util.logging.impl.Log;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import org.apache.lucene.document.IntPoint;
 import org.apache.lucene.queryparser.classic.QueryParser;
@@ -33,12 +31,12 @@ import org.apache.lucene.search.Query;
 /**
  * @author Emmanuel Bernard
  */
-public class InheritanceTest extends SearchTestBase {
+class InheritanceTest extends SearchTestBase {
 
 	private static final Log log = LoggerFactory.make( MethodHandles.lookup() );
 
 	@Test
-	public void testSearchUnindexClass() throws Exception {
+	void testSearchUnindexClass() throws Exception {
 		createTestData();
 
 		QueryParser parser = new QueryParser( "name", TestConstants.stopAnalyzer );
@@ -66,7 +64,7 @@ public class InheritanceTest extends SearchTestBase {
 	}
 
 	@Test
-	public void testInheritance() throws Exception {
+	void testInheritance() throws Exception {
 		createTestData();
 
 		FullTextSession s = Search.getFullTextSession( openSession() );
@@ -88,8 +86,8 @@ public class InheritanceTest extends SearchTestBase {
 		query = parser.parse( "Elephant OR White Pointer" );
 		hibQuery = s.createFullTextQuery( query, Being.class );
 		List result = hibQuery.list();
-		assertNotNull( result );
-		assertEquals( "Query filtering on superclass return mapped subclasses", 2, result.size() );
+		assertThat( result ).isNotNull();
+		assertThat( result ).as( "Query filtering on superclass return mapped subclasses" ).hasSize( 2 );
 
 		query = IntPoint.newRangeQuery( "weight", 4000, 5000 );
 		hibQuery = s.createFullTextQuery( query, Animal.class );
@@ -105,7 +103,7 @@ public class InheritanceTest extends SearchTestBase {
 
 
 	@Test
-	public void testPolymorphicQueries() throws Exception {
+	void testPolymorphicQueries() throws Exception {
 		createTestData();
 
 		FullTextSession s = Search.getFullTextSession( openSession() );
@@ -138,7 +136,7 @@ public class InheritanceTest extends SearchTestBase {
 	}
 
 	@Test
-	public void testSubclassInclusion() throws Exception {
+	void testSubclassInclusion() {
 		createTestData();
 
 		FullTextSession s = Search.getFullTextSession( openSession() );
@@ -147,19 +145,19 @@ public class InheritanceTest extends SearchTestBase {
 		Query query = IntPoint.newExactQuery( "numberOfEggs", 2 );
 		org.hibernate.query.Query hibQuery = s.createFullTextQuery( query, Eagle.class );
 		List result = hibQuery.list();
-		assertNotNull( result );
-		assertEquals( "Wrong number of hits. There should be two birds.", 1, result.size() );
+		assertThat( result ).isNotNull();
+		assertThat( result ).as( "Wrong number of hits. There should be two birds." ).hasSize( 1 );
 
 		query = IntPoint.newExactQuery( "numberOfEggs", 2 );
 		hibQuery = s.createFullTextQuery( query, Bird.class );
 		result = hibQuery.list();
-		assertNotNull( result );
-		assertEquals( "Wrong number of hits. There should be two birds.", 2, result.size() );
+		assertThat( result ).isNotNull();
+		assertThat( result ).as( "Wrong number of hits. There should be two birds." ).hasSize( 2 );
 
 		hibQuery = s.createFullTextQuery( query, Mammal.class );
 		result = hibQuery.list();
-		assertNotNull( result );
-		assertEquals( "Wrong number of hits. There should be two birds.", 0, result.size() );
+		assertThat( result ).isNotNull();
+		assertThat( result ).as( "Wrong number of hits. There should be two birds." ).isEmpty();
 
 		try {
 			hibQuery = s.createFullTextQuery( query, String.class );
@@ -180,7 +178,7 @@ public class InheritanceTest extends SearchTestBase {
 	 * @throws Exception in case the test fails.
 	 */
 	@Test
-	public void testPurgeIndex() throws Exception {
+	void testPurgeIndex() throws Exception {
 		createTestData();
 		FullTextSession s = Search.getFullTextSession( openSession() );
 
@@ -221,7 +219,7 @@ public class InheritanceTest extends SearchTestBase {
 	 * @throws Exception in case the test fails.
 	 */
 	@Test
-	public void testPurgeUnIndexClass() throws Exception {
+	void testPurgeUnIndexClass() throws Exception {
 		createTestData();
 		FullTextSession s = Search.getFullTextSession( openSession() );
 
@@ -245,8 +243,8 @@ public class InheritanceTest extends SearchTestBase {
 		QueryParser parser = new QueryParser( "name", TestConstants.stopAnalyzer );
 		Query query = parser.parse( "Elephant OR White Pointer OR Chimpanzee OR Dove or Eagle" );
 		List result = s.createFullTextQuery( query, Animal.class ).list();
-		assertNotNull( result );
-		assertEquals( "Wrong number of hits. There should be one elephant and one shark.", count, result.size() );
+		assertThat( result ).isNotNull();
+		assertThat( result ).as( "Wrong number of hits. There should be one elephant and one shark." ).hasSize( count );
 	}
 
 	private void createTestData() {
@@ -287,11 +285,11 @@ public class InheritanceTest extends SearchTestBase {
 	}
 
 	private void assertItsTheElephant(List result) {
-		assertNotNull( result );
-		assertEquals( "Wrong number of results", 1, result.size() );
-		assertTrue( "Wrong result type", result.get( 0 ) instanceof Mammal );
+		assertThat( result ).isNotNull();
+		assertThat( result ).as( "Wrong number of results" ).hasSize( 1 );
+		assertThat( result.get( 0 ) ).as( "Wrong result type" ).isInstanceOf( Mammal.class );
 		Mammal mammal = (Mammal) result.get( 0 );
-		assertEquals( "Wrong animal name", "Elephant", mammal.getName() );
+		assertThat( mammal.getName() ).as( "Wrong animal name" ).isEqualTo( "Elephant" );
 	}
 
 	@Override

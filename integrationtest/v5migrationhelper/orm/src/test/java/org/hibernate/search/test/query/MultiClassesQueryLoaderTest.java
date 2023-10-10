@@ -6,7 +6,7 @@
  */
 package org.hibernate.search.test.query;
 
-import static org.junit.Assert.assertEquals;
+import static org.assertj.core.api.Assertions.assertThat;
 
 import java.sql.Connection;
 import java.sql.SQLException;
@@ -22,8 +22,8 @@ import org.hibernate.search.Search;
 import org.hibernate.search.test.SearchTestBase;
 import org.hibernate.search.testsupport.TestConstants;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import org.apache.lucene.queryparser.classic.QueryParser;
 import org.apache.lucene.search.Query;
@@ -32,11 +32,11 @@ import org.apache.lucene.search.Query;
  * @author Emmanuel Bernard
  * @author Sanne Grinovero
  */
-public class MultiClassesQueryLoaderTest extends SearchTestBase {
+class MultiClassesQueryLoaderTest extends SearchTestBase {
 
 	private Query luceneQuery;
 
-	@Before
+	@BeforeEach
 	@Override
 	public void setUp() throws Exception {
 		super.setUp();
@@ -69,7 +69,7 @@ public class MultiClassesQueryLoaderTest extends SearchTestBase {
 	}
 
 	@Test
-	public void testObjectNotFound() throws Exception {
+	void testObjectNotFound() throws Exception {
 		Session session = openSession();
 		Transaction tx = session.beginTransaction();
 
@@ -89,41 +89,41 @@ public class MultiClassesQueryLoaderTest extends SearchTestBase {
 		Query query = parser.parse( "name:charles" );
 		FullTextQuery hibQuery = s.createFullTextQuery( query, Author.class, Music.class );
 		List result = hibQuery.list();
-		assertEquals( "Should have returned no author", 0, result.size() );
+		assertThat( result ).as( "Should have returned no author" ).isEmpty();
 
 		tx.commit();
 		s.close();
 	}
 
 	@Test
-	public void testObjectTypeFilteringSingleClass() throws Exception {
+	void testObjectTypeFilteringSingleClass() {
 		Session session = openSession();
 		Transaction tx = session.beginTransaction();
 
 		FullTextSession fullTextSession = Search.getFullTextSession( session );
 		FullTextQuery fullTextQuery = fullTextSession.createFullTextQuery( luceneQuery, Music.class );
 		List result = fullTextQuery.list();
-		assertEquals( "Should match the music only", 1, result.size() );
+		assertThat( result ).as( "Should match the music only" ).hasSize( 1 );
 		tx.commit();
 		fullTextSession.close();
 	}
 
 	@Test
-	public void testObjectTypeFilteringTwoClasses() throws Exception {
+	void testObjectTypeFilteringTwoClasses() {
 		Session session = openSession();
 		Transaction tx = session.beginTransaction();
 
 		FullTextSession fullTextSession = Search.getFullTextSession( session );
 		FullTextQuery fullTextQuery = fullTextSession.createFullTextQuery( luceneQuery, Author.class, Music.class );
 		List result = fullTextQuery.list();
-		assertEquals( "Should match the author and music only", 2, result.size() );
+		assertThat( result ).as( "Should match the author and music only" ).hasSize( 2 );
 
 		tx.commit();
 		fullTextSession.close();
 	}
 
 	@Test
-	public void testObjectTypeFilteringThreeClasses() throws Exception {
+	void testObjectTypeFilteringThreeClasses() {
 		Session session = openSession();
 		Transaction tx = session.beginTransaction();
 
@@ -136,24 +136,24 @@ public class MultiClassesQueryLoaderTest extends SearchTestBase {
 		);
 		List result = fullTextQuery.list();
 
-		assertEquals( "Should match the author, music and book", 3, result.size() );
+		assertThat( result ).as( "Should match the author, music and book" ).hasSize( 3 );
 		fullTextQuery = fullTextSession.createFullTextQuery( luceneQuery );
 		result = fullTextQuery.list();
-		assertEquals( "Should match all types", 3, result.size() );
+		assertThat( result ).as( "Should match all types" ).hasSize( 3 );
 
 		tx.commit();
 		fullTextSession.close();
 	}
 
 	@Test
-	public void testImplicitObjectTypeFiltering() throws Exception {
+	void testImplicitObjectTypeFiltering() {
 		Session session = openSession();
 		Transaction tx = session.beginTransaction();
 
 		FullTextSession fullTextSession = Search.getFullTextSession( session );
 		FullTextQuery fullTextQuery = fullTextSession.createFullTextQuery( luceneQuery );
 		List result = fullTextQuery.list();
-		assertEquals( "Should match all types", 3, result.size() );
+		assertThat( result ).as( "Should match all types" ).hasSize( 3 );
 
 		tx.commit();
 		fullTextSession.close();

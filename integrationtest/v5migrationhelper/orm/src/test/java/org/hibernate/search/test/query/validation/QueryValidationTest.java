@@ -21,9 +21,9 @@ import org.hibernate.search.annotations.Indexed;
 import org.hibernate.search.test.SearchTestBase;
 import org.hibernate.search.util.common.SearchException;
 
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import org.apache.lucene.index.Term;
 import org.apache.lucene.search.TermQuery;
@@ -31,10 +31,10 @@ import org.apache.lucene.search.TermQuery;
 /**
  * @author Hardy Ferentschik
  */
-public class QueryValidationTest extends SearchTestBase {
+class QueryValidationTest extends SearchTestBase {
 	private FullTextSession fullTextSession;
 
-	@Before
+	@BeforeEach
 	@Override
 	public void setUp() throws Exception {
 		super.setUp();
@@ -47,7 +47,7 @@ public class QueryValidationTest extends SearchTestBase {
 		this.fullTextSession = Search.getFullTextSession( openSession() );
 	}
 
-	@After
+	@AfterEach
 	@Override
 	public void tearDown() throws Exception {
 		fullTextSession.close();
@@ -55,7 +55,7 @@ public class QueryValidationTest extends SearchTestBase {
 	}
 
 	@Test
-	public void testTargetingNonIndexedEntityThrowsException() {
+	void testTargetingNonIndexedEntityThrowsException() {
 		TermQuery query = new TermQuery( new Term( "foo", "bar" ) );
 		assertThatThrownBy( () -> fullTextSession.createFullTextQuery( query, C.class ) )
 				.isInstanceOf( SearchException.class )
@@ -64,7 +64,7 @@ public class QueryValidationTest extends SearchTestBase {
 	}
 
 	@Test
-	public void testTargetingNonConfiguredEntityThrowsException() {
+	void testTargetingNonConfiguredEntityThrowsException() {
 		TermQuery query = new TermQuery( new Term( "foo", "bar" ) );
 		assertThatThrownBy( () -> fullTextSession.createFullTextQuery( query, D.class ) )
 				.isInstanceOf( SearchException.class )

@@ -16,9 +16,9 @@ import org.hibernate.search.testsupport.junit.SearchFactoryHolder;
 import org.hibernate.search.testsupport.junit.SearchITHelper;
 import org.hibernate.search.testsupport.junit.SearchITHelper.AssertBuildingHSQueryContext;
 
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 
 import org.apache.lucene.search.Query;
 
@@ -28,22 +28,22 @@ import org.apache.lucene.search.Query;
  * @author Sanne Grinovero (C) 2015 Red Hat Inc.
  */
 @TestForIssue(jiraKey = "HSEARCH-1973")
-public class NumericTypeWithNullEncodingTest {
+class NumericTypeWithNullEncodingTest {
 
-	@Rule
+	@RegisterExtension
 	public final SearchFactoryHolder sfHolder = new SearchFactoryHolder( SomeEntity.class );
 
 	private final SearchITHelper helper = new SearchITHelper( sfHolder );
 
-	@Before
-	public void prepareTestData() {
+	@BeforeEach
+	void prepareTestData() {
 		storeData( "title-one", 1 );
 		storeData( "title-two", null );
 		storeData( "title-three", 3 );
 	}
 
 	@Test
-	public void verifyExplicitRangeQuery() {
+	void verifyExplicitRangeQuery() {
 		Query query = getQueryBuilder()
 				.range()
 				.onField( "nullableAge" )
@@ -55,7 +55,7 @@ public class NumericTypeWithNullEncodingTest {
 	}
 
 	@Test
-	public void verifyExplicitKeywordQuery() {
+	void verifyExplicitKeywordQuery() {
 		Query query = getQueryBuilder()
 				.keyword()
 				.onField( "nullableAge" )

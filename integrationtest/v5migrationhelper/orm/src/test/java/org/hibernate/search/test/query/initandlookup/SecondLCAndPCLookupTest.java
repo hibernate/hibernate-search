@@ -27,8 +27,8 @@ import org.hibernate.stat.Statistics;
 
 import org.hibernate.testing.cache.CachingRegionFactory;
 
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 
 import org.apache.lucene.search.MatchAllDocsQuery;
 import org.apache.lucene.search.Query;
@@ -38,13 +38,13 @@ import org.apache.lucene.search.Query;
  *
  * @author Emmanuel Bernard
  */
-public class SecondLCAndPCLookupTest extends SearchTestBase {
+class SecondLCAndPCLookupTest extends SearchTestBase {
 
-	@Rule
+	@RegisterExtension
 	public StaticIndexingSwitch indexingSwitch = new StaticIndexingSwitch();
 
 	@Test
-	public void testQueryWoLookup() throws Exception {
+	void testQueryWoLookup() {
 		Session session = openSession();
 		final Statistics statistics = session.getSessionFactory().getStatistics();
 		statistics.clear();
@@ -74,7 +74,7 @@ public class SecondLCAndPCLookupTest extends SearchTestBase {
 	}
 
 	@Test
-	public void testQueryWith2LCLookup() throws Exception {
+	void testQueryWith2LCLookup() {
 		Session session = openSession();
 		final Statistics statistics = session.getSessionFactory().getStatistics();
 		statistics.clear();
@@ -105,7 +105,7 @@ public class SecondLCAndPCLookupTest extends SearchTestBase {
 	}
 
 	@Test
-	public void testQueryWithPCLookup() throws Exception {
+	void testQueryWithPCLookup() {
 		Session session = openSession();
 		final Statistics statistics = session.getSessionFactory().getStatistics();
 		statistics.clear();
@@ -142,7 +142,7 @@ public class SecondLCAndPCLookupTest extends SearchTestBase {
 	}
 
 	@Test
-	public void testQueryWithPCAndCacheLookup() throws Exception {
+	void testQueryWithPCAndCacheLookup() {
 		Session session = openSession();
 		final Statistics statistics = session.getSessionFactory().getStatistics();
 		statistics.clear();
@@ -181,7 +181,7 @@ public class SecondLCAndPCLookupTest extends SearchTestBase {
 	}
 
 	@Test
-	public void testStaleCacheWithAsyncIndexer() {
+	void testStaleCacheWithAsyncIndexer() {
 		Session session = openSession();
 		final Statistics statistics = session.getSessionFactory().getStatistics();
 		statistics.clear();

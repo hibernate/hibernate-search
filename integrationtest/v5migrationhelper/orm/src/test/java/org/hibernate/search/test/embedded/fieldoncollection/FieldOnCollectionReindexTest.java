@@ -7,7 +7,7 @@
 
 package org.hibernate.search.test.embedded.fieldoncollection;
 
-import static org.junit.Assert.assertEquals;
+import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.List;
 
@@ -20,13 +20,13 @@ import org.hibernate.search.query.dsl.QueryBuilder;
 import org.hibernate.search.test.SearchTestBase;
 import org.hibernate.search.testsupport.TestForIssue;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
-public class FieldOnCollectionReindexTest extends SearchTestBase {
+class FieldOnCollectionReindexTest extends SearchTestBase {
 
 	@TestForIssue(jiraKey = "HSEARCH-1004")
 	@Test
-	public void testUpdatingElementCollectionWithFieldAnnotationReindexesEntity() {
+	void testUpdatingElementCollectionWithFieldAnnotationReindexesEntity() {
 		Session hibernateSession = openSession();
 
 		IndexedEntity indexedEntity = new IndexedEntity( "child" );
@@ -44,15 +44,15 @@ public class FieldOnCollectionReindexTest extends SearchTestBase {
 		tx = hibernateSession.beginTransaction();
 
 		searchResult = searchIndexedEntity( hibernateSession, "keywords", "test1" );
-		assertEquals( 1, searchResult.size() );
-		assertEquals( searchResult.iterator().next().getId(), indexedEntity.getId() );
+		assertThat( searchResult ).hasSize( 1 );
+		assertThat( searchResult.iterator().next().getId() ).isEqualTo( indexedEntity.getId() );
 
 		searchResult = searchIndexedEntity( hibernateSession, "keywords", "test2" );
-		assertEquals( 0, searchResult.size() );
+		assertThat( searchResult ).isEmpty();
 
 		searchResult = searchIndexedEntity( hibernateSession, "keywords", "test3" );
-		assertEquals( 1, searchResult.size() );
-		assertEquals( searchResult.iterator().next().getId(), indexedEntity.getId() );
+		assertThat( searchResult ).hasSize( 1 );
+		assertThat( searchResult.iterator().next().getId() ).isEqualTo( indexedEntity.getId() );
 
 		tx.commit();
 
@@ -66,8 +66,8 @@ public class FieldOnCollectionReindexTest extends SearchTestBase {
 
 		// Everything is OK: the index is correctly updated
 		searchResult = searchIndexedEntity( hibernateSession, "keywords", "test4" );
-		assertEquals( 1, searchResult.size() );
-		assertEquals( searchResult.iterator().next().getId(), indexedEntity.getId() );
+		assertThat( searchResult ).hasSize( 1 );
+		assertThat( searchResult.iterator().next().getId() ).isEqualTo( indexedEntity.getId() );
 
 		// Now, let's update only the collection
 		indexedEntity.addKeyword( "test5" );
@@ -80,8 +80,8 @@ public class FieldOnCollectionReindexTest extends SearchTestBase {
 		// The collection hasn't been indexed correctly
 		// The following tests fail
 		searchResult = searchIndexedEntity( hibernateSession, "keywords", "test5" );
-		assertEquals( 1, searchResult.size() );
-		assertEquals( searchResult.iterator().next().getId(), indexedEntity.getId() );
+		assertThat( searchResult ).hasSize( 1 );
+		assertThat( searchResult.iterator().next().getId() ).isEqualTo( indexedEntity.getId() );
 		tx.commit();
 
 		hibernateSession.close();

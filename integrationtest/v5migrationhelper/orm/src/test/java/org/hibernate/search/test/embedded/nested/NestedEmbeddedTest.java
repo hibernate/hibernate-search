@@ -6,7 +6,7 @@
  */
 package org.hibernate.search.test.embedded.nested;
 
-import static org.junit.Assert.assertEquals;
+import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.List;
 
@@ -17,7 +17,7 @@ import org.hibernate.search.Search;
 import org.hibernate.search.test.SearchTestBase;
 import org.hibernate.search.testsupport.TestConstants;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import org.apache.lucene.queryparser.classic.QueryParser;
 import org.apache.lucene.search.Query;
@@ -26,7 +26,7 @@ import org.apache.lucene.search.Query;
  * @author Emmanuel Bernard
  * @author Hardy Ferentschik
  */
-public class NestedEmbeddedTest extends SearchTestBase {
+class NestedEmbeddedTest extends SearchTestBase {
 
 	/**
 	 * HSEARCH-391
@@ -34,7 +34,7 @@ public class NestedEmbeddedTest extends SearchTestBase {
 	 * @throws Exception in case the tests fails
 	 */
 	@Test
-	public void testNestedEmbeddedIndexing() throws Exception {
+	void testNestedEmbeddedIndexing() throws Exception {
 		Product product = new Product();
 		Attribute attribute = new Attribute( product );
 		product.setAttribute( attribute );
@@ -54,7 +54,7 @@ public class NestedEmbeddedTest extends SearchTestBase {
 
 		query = parser.parse( "foo" );
 		result = session.createFullTextQuery( query ).list();
-		assertEquals( "unable to find property in attribute value", 1, result.size() );
+		assertThat( result ).as( "unable to find property in attribute value" ).hasSize( 1 );
 
 
 		s.clear();
@@ -71,11 +71,11 @@ public class NestedEmbeddedTest extends SearchTestBase {
 
 		query = parser.parse( "foo" );
 		result = session.createFullTextQuery( query, Product.class ).list();
-		assertEquals( "change in embedded not reflected in root index", 0, result.size() );
+		assertThat( result ).as( "change in embedded not reflected in root index" ).isEmpty();
 
 		query = parser.parse( "bar" );
 		result = session.createFullTextQuery( query, Product.class ).list();
-		assertEquals( "change in embedded not reflected in root index", 1, result.size() );
+		assertThat( result ).as( "change in embedded not reflected in root index" ).hasSize( 1 );
 
 		tx.commit();
 		s.close();
@@ -88,7 +88,7 @@ public class NestedEmbeddedTest extends SearchTestBase {
 	 * @throws Exception in case the tests fails
 	 */
 	@Test
-	public void testNestedEmbeddedIndexingWithContainedInOnCollection() throws Exception {
+	void testNestedEmbeddedIndexingWithContainedInOnCollection() throws Exception {
 		Person john = new Person( "John Doe" );
 		Place eiffelTower = new Place( "Eiffel Tower" );
 		Address addressEiffel = new Address( "Avenue Gustave Eiffel", "London" );
@@ -111,7 +111,7 @@ public class NestedEmbeddedTest extends SearchTestBase {
 
 		query = parser.parse( "London" );
 		result = session.createFullTextQuery( query ).list();
-		assertEquals( "unable to find nested indexed value", 1, result.size() );
+		assertThat( result ).as( "unable to find nested indexed value" ).hasSize( 1 );
 
 
 		s.clear();
@@ -130,11 +130,11 @@ public class NestedEmbeddedTest extends SearchTestBase {
 
 		query = parser.parse( "London" );
 		result = session.createFullTextQuery( query, Person.class ).list();
-		assertEquals( "change in embedded not reflected in root index", 0, result.size() );
+		assertThat( result ).as( "change in embedded not reflected in root index" ).isEmpty();
 
 		query = parser.parse( "Paris" );
 		result = session.createFullTextQuery( query, Person.class ).list();
-		assertEquals( "change in embedded not reflected in root index", 1, result.size() );
+		assertThat( result ).as( "change in embedded not reflected in root index" ).hasSize( 1 );
 
 		tx.commit();
 		session.close();

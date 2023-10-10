@@ -6,6 +6,8 @@
  */
 package org.hibernate.search.test.dsl;
 
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+
 import org.hibernate.search.annotations.DocumentId;
 import org.hibernate.search.annotations.Field;
 import org.hibernate.search.annotations.Indexed;
@@ -15,16 +17,15 @@ import org.hibernate.search.testsupport.junit.SearchFactoryHolder;
 import org.hibernate.search.testsupport.junit.SearchITHelper;
 import org.hibernate.search.util.common.SearchException;
 
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.ExpectedException;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 
 /**
  * Test backported from Search 6, was BoolSearchPredicateIT.
  * Should not be ported when merging the Search 6 code, but simply removed.
  */
-public class BoolDSLTest {
+class BoolDSLTest {
 
 	private static final String DOCUMENT_1 = "1";
 	private static final String DOCUMENT_2 = "2";
@@ -54,21 +55,18 @@ public class BoolDSLTest {
 	private static final Integer FIELD4_VALUE3 = 42_000; // Different from document 1
 	private static final Integer FIELD5_VALUE3 = 142_000; // Different from document 1
 
-	@Rule
+	@RegisterExtension
 	public final SearchFactoryHolder sfHolder = new SearchFactoryHolder( IndexedEntity.class );
 
 	private final SearchITHelper helper = new SearchITHelper( sfHolder );
 
-	@Rule
-	public final ExpectedException thrown = ExpectedException.none();
-
-	@Before
-	public void setup() {
+	@BeforeEach
+	void setup() {
 		initData();
 	}
 
 	@Test
-	public void must() {
+	void must() {
 		QueryBuilder queryBuilder = helper.queryBuilder( IndexedEntity.class );
 
 		HSQuery query = helper.hsQuery(
@@ -101,7 +99,7 @@ public class BoolDSLTest {
 	}
 
 	@Test
-	public void should() {
+	void should() {
 		QueryBuilder queryBuilder = helper.queryBuilder( IndexedEntity.class );
 
 		HSQuery query = helper.hsQuery(
@@ -125,7 +123,7 @@ public class BoolDSLTest {
 	}
 
 	@Test
-	public void mustNot() {
+	void mustNot() {
 		QueryBuilder queryBuilder = helper.queryBuilder( IndexedEntity.class );
 
 		HSQuery query = helper.hsQuery(
@@ -149,7 +147,7 @@ public class BoolDSLTest {
 	}
 
 	@Test
-	public void should_mustNot() {
+	void should_mustNot() {
 		QueryBuilder queryBuilder = helper.queryBuilder( IndexedEntity.class );
 
 		HSQuery query = helper.hsQuery(
@@ -165,7 +163,7 @@ public class BoolDSLTest {
 	}
 
 	@Test
-	public void must_mustNot() {
+	void must_mustNot() {
 		QueryBuilder queryBuilder = helper.queryBuilder( IndexedEntity.class );
 
 		HSQuery query = helper.hsQuery(
@@ -189,7 +187,7 @@ public class BoolDSLTest {
 	}
 
 	@Test
-	public void must_should() {
+	void must_should() {
 		QueryBuilder queryBuilder = helper.queryBuilder( IndexedEntity.class );
 
 		// A boolean predicate with must + should clauses:
@@ -221,7 +219,7 @@ public class BoolDSLTest {
 	}
 
 	@Test
-	public void filter_should() {
+	void filter_should() {
 		QueryBuilder queryBuilder = helper.queryBuilder( IndexedEntity.class );
 
 		// A boolean predicate with filter + should clauses:
@@ -255,7 +253,7 @@ public class BoolDSLTest {
 	}
 
 	@Test
-	public void mustNot_should() {
+	void mustNot_should() {
 		QueryBuilder queryBuilder = helper.queryBuilder( IndexedEntity.class );
 
 		// A boolean predicate with mustNot + should clauses:
@@ -289,7 +287,7 @@ public class BoolDSLTest {
 	}
 
 	@Test
-	public void minimumShouldMatchNumber_positive() {
+	void minimumShouldMatchNumber_positive() {
 		QueryBuilder queryBuilder = helper.queryBuilder( IndexedEntity.class );
 
 		// Expect default behavior (1 "should" clause has to match)
@@ -344,7 +342,7 @@ public class BoolDSLTest {
 	}
 
 	@Test
-	public void minimumShouldMatchNumber_negative() {
+	void minimumShouldMatchNumber_negative() {
 		QueryBuilder queryBuilder = helper.queryBuilder( IndexedEntity.class );
 
 		// Expect default behavior (1 "should" clause has to match)
@@ -387,7 +385,7 @@ public class BoolDSLTest {
 	}
 
 	@Test
-	public void minimumShouldMatchPercent_positive() {
+	void minimumShouldMatchPercent_positive() {
 		QueryBuilder queryBuilder = helper.queryBuilder( IndexedEntity.class );
 
 		// Expect default behavior (1 "should" clause has to match)
@@ -442,7 +440,7 @@ public class BoolDSLTest {
 	}
 
 	@Test
-	public void minimumShouldMatchPercent_negative() {
+	void minimumShouldMatchPercent_negative() {
 		QueryBuilder queryBuilder = helper.queryBuilder( IndexedEntity.class );
 
 		// Expect default behavior (1 "should" clause has to match)
@@ -485,13 +483,13 @@ public class BoolDSLTest {
 	}
 
 	@Test
-	public void minimumShouldMatch_error_multipleConflictingConstraints() {
-		QueryBuilder queryBuilder = helper.queryBuilder( IndexedEntity.class );
-
-		thrown.expect( SearchException.class );
-		thrown.expectMessage( "Multiple conflicting minimumShouldMatch constraints" );
-
-		queryBuilder.bool().minimumShouldMatchNumber( -1 ).minimumShouldMatchPercent( 100 );
+	void minimumShouldMatch_error_multipleConflictingConstraints() {
+		assertThatThrownBy(
+				() -> {
+					QueryBuilder queryBuilder = helper.queryBuilder( IndexedEntity.class );
+					queryBuilder.bool().minimumShouldMatchNumber( -1 ).minimumShouldMatchPercent( 100 );
+				} ).isInstanceOf( SearchException.class )
+				.hasMessageContainingAll( "Multiple conflicting minimumShouldMatch constraints" );
 	}
 
 	private void initData() {

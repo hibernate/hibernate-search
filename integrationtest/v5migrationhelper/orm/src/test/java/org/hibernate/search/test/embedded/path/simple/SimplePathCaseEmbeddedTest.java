@@ -7,9 +7,9 @@
 
 package org.hibernate.search.test.embedded.path.simple;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmUtils.listAll;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.fail;
 
 import java.util.List;
 
@@ -21,22 +21,22 @@ import org.hibernate.search.query.dsl.QueryBuilder;
 import org.hibernate.search.test.SearchTestBase;
 import org.hibernate.search.util.common.SearchException;
 
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import org.apache.lucene.search.Query;
 
 /**
  * @author Davide D'Alto
  */
-public class SimplePathCaseEmbeddedTest extends SearchTestBase {
+class SimplePathCaseEmbeddedTest extends SearchTestBase {
 
 	private Session s = null;
 	private EntityA entityA = null;
 
 	@Override
-	@Before
+	@BeforeEach
 	public void setUp() throws Exception {
 		super.setUp();
 		EntityC indexedC = new EntityC( "indexed" );
@@ -50,7 +50,7 @@ public class SimplePathCaseEmbeddedTest extends SearchTestBase {
 	}
 
 	@Override
-	@After
+	@AfterEach
 	public void tearDown() throws Exception {
 		s.clear();
 
@@ -60,31 +60,23 @@ public class SimplePathCaseEmbeddedTest extends SearchTestBase {
 	}
 
 	@Test
-	public void testFieldIsIndexedIfInPath() throws Exception {
+	void testFieldIsIndexedIfInPath() {
 		List<EntityA> result = search( s, "b.indexed.field", "indexed" );
 
-		assertEquals( 1, result.size() );
-		assertEquals( entityA.id, result.get( 0 ).id );
+		assertThat( result ).hasSize( 1 );
+		assertThat( result.get( 0 ).id ).isEqualTo( entityA.id );
 	}
 
 	@Test
-	public void testEmbeddedNotIndexedIfNotInPath() throws Exception {
-		try {
-			search( s, "b.skipped.indexed", "indexed" );
-			fail( "Should not index embedded property if not in path and not in depth limit" );
-		}
-		catch (SearchException e) {
-		}
+	void testEmbeddedNotIndexedIfNotInPath() {
+		assertThatThrownBy( () -> search( s, "b.skipped.indexed", "indexed" ) )
+				.isInstanceOf( SearchException.class );
 	}
 
 	@Test
-	public void testFieldNotIndexedIfNotInPath() throws Exception {
-		try {
-			search( s, "b.indexed.skipped", "skipped" );
-			fail( "Should not index embedded property if not in path and not in depth limit" );
-		}
-		catch (SearchException e) {
-		}
+	void testFieldNotIndexedIfNotInPath() {
+		assertThatThrownBy( () -> search( s, "b.indexed.skipped", "skipped" ) )
+				.isInstanceOf( SearchException.class );
 	}
 
 	private List<EntityA> search(Session s, String field, String value) {

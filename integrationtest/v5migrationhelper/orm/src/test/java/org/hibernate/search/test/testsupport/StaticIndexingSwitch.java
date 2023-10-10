@@ -12,37 +12,19 @@ import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.RoutingBinde
 import org.hibernate.search.mapper.pojo.bridge.runtime.RoutingBridgeRouteContext;
 import org.hibernate.search.mapper.pojo.route.DocumentRoutes;
 
-import org.junit.rules.TestRule;
-import org.junit.runner.Description;
-import org.junit.runners.model.Statement;
+import org.junit.jupiter.api.extension.AfterAllCallback;
+import org.junit.jupiter.api.extension.AfterEachCallback;
+import org.junit.jupiter.api.extension.BeforeAllCallback;
+import org.junit.jupiter.api.extension.BeforeEachCallback;
+import org.junit.jupiter.api.extension.ExtensionContext;
 
-public class StaticIndexingSwitch implements TestRule {
+public class StaticIndexingSwitch
+		implements BeforeEachCallback, AfterEachCallback, BeforeAllCallback, AfterAllCallback {
 
 	private static StaticIndexingSwitch activeInstance = null;
 
 	private boolean enabled = true;
-
-	@Override
-	public Statement apply(Statement base, Description description) {
-		return new Statement() {
-			@Override
-			public void evaluate() throws Throwable {
-				if ( activeInstance != null ) {
-					throw new IllegalStateException( "Using StaticCounters twice in a single test is forbidden."
-							+ " Make sure you added one (and only one)"
-							+ " '@Rule public StaticIndexingSwitch indexingSwitch = new StaticIndexingSwitch()' to your test." );
-				}
-				activeInstance = StaticIndexingSwitch.this;
-				try {
-					base.evaluate();
-				}
-				finally {
-					activeInstance = null;
-					reset();
-				}
-			}
-		};
-	}
+	private boolean callOncePerClass = false;
 
 	public void enable(boolean enabled) {
 		this.enabled = enabled;
@@ -58,11 +40,49 @@ public class StaticIndexingSwitch implements TestRule {
 
 	public static StaticIndexingSwitch activeSwitch() {
 		if ( activeInstance == null ) {
-			throw new IllegalStateException( "Using StaticCounters without an appropriate @Rule is forbidden."
+			throw new IllegalStateException( "Using StaticCounters without an appropriate @RegisterExtension is forbidden."
+					+ " Make sure you added one (and only one)"
+					+ " '@RegisterExtension public StaticIndexingSwitch indexingSwitch = new StaticIndexingSwitch()' to your test." );
+		}
+		return activeInstance;
+	}
+
+	@Override
+	public void afterAll(ExtensionContext extensionContext) throws Exception {
+		if ( callOncePerClass ) {
+			activeInstance = null;
+			reset();
+		}
+	}
+
+	@Override
+	public void afterEach(ExtensionContext extensionContext) throws Exception {
+		if ( !callOncePerClass ) {
+			activeInstance = null;
+			reset();
+		}
+	}
+
+	@Override
+	public void beforeAll(ExtensionContext extensionContext) throws Exception {
+		callOncePerClass = true;
+		doBefore();
+	}
+
+	@Override
+	public void beforeEach(ExtensionContext extensionContext) throws Exception {
+		if ( !callOncePerClass ) {
+			doBefore();
+		}
+	}
+
+	private void doBefore() {
+		if ( activeInstance != null ) {
+			throw new IllegalStateException( "Using StaticCounters twice in a single test is forbidden."
 					+ " Make sure you added one (and only one)"
 					+ " '@Rule public StaticIndexingSwitch indexingSwitch = new StaticIndexingSwitch()' to your test." );
 		}
-		return activeInstance;
+		activeInstance = StaticIndexingSwitch.this;
 	}
 
 	public static class Binder implements RoutingBinder {

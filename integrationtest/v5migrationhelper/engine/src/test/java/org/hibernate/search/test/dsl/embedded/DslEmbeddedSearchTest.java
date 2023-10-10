@@ -16,16 +16,16 @@ import org.hibernate.search.testsupport.junit.SearchFactoryHolder;
 import org.hibernate.search.testsupport.junit.SearchITHelper;
 import org.hibernate.search.testsupport.junit.SearchITHelper.AssertBuildingHSQueryContext;
 
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 
 import org.apache.lucene.search.Query;
 
 /**
  * @author Davide D'Alto
  */
-public class DslEmbeddedSearchTest {
+class DslEmbeddedSearchTest {
 
 	private static Calendar initCalendar(int year, int month, int day) {
 		Calendar instance = createCalendar();
@@ -38,13 +38,13 @@ public class DslEmbeddedSearchTest {
 		return Calendar.getInstance( TimeZone.getTimeZone( "Europe/Rome" ), Locale.ITALY );
 	}
 
-	@Rule
+	@RegisterExtension
 	public final SearchFactoryHolder sfHolder = new SearchFactoryHolder( ContainerEntity.class );
 
 	private final SearchITHelper helper = new SearchITHelper( sfHolder );
 
-	@Before
-	public void setUp() throws Exception {
+	@BeforeEach
+	void setUp() {
 		EmbeddedEntity ee = new EmbeddedEntity();
 		ee.setEmbeddedField( "embedded" );
 		ee.setDate( initCalendar( 2007, Calendar.JANUARY, 14 ).getTime() );
@@ -69,7 +69,7 @@ public class DslEmbeddedSearchTest {
 	}
 
 	@Test
-	public void testSearchString() throws Exception {
+	void testSearchString() {
 		QueryBuilder qb = helper.queryBuilder( ContainerEntity.class );
 		Query q = qb.keyword().onField( "emb.embeddedField" ).matching( "embedded" ).createQuery();
 
@@ -78,7 +78,7 @@ public class DslEmbeddedSearchTest {
 
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-2070")
-	public void testSearchDateWithoutFieldBridge() throws Exception {
+	void testSearchDateWithoutFieldBridge() {
 		QueryBuilder qb = helper.queryBuilder( ContainerEntity.class );
 		Query q = qb.range().onField( "emb.date" )
 				.above( initCalendar( 2007, Calendar.JANUARY, 14 ).getTime() )

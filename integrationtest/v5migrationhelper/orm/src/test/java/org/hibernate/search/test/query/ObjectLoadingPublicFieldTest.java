@@ -6,8 +6,7 @@
  */
 package org.hibernate.search.test.query;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
+import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.List;
 
@@ -27,8 +26,8 @@ import org.hibernate.search.test.SearchTestBase;
 import org.hibernate.search.testsupport.TestForIssue;
 import org.hibernate.search.util.common.AssertionFailure;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import org.apache.lucene.index.Term;
 import org.apache.lucene.search.MatchAllDocsQuery;
@@ -48,12 +47,12 @@ import org.apache.lucene.search.TermQuery;
  * @author Yoann Rodiere
  */
 @TestForIssue(jiraKey = "HSEARCH-2541")
-public class ObjectLoadingPublicFieldTest extends SearchTestBase {
+class ObjectLoadingPublicFieldTest extends SearchTestBase {
 
 	private Query fieldFooQuery;
 	private Query fieldBarQuery;
 
-	@Before
+	@BeforeEach
 	@Override
 	public void setUp() throws Exception {
 		super.setUp();
@@ -88,14 +87,14 @@ public class ObjectLoadingPublicFieldTest extends SearchTestBase {
 	}
 
 	@Test
-	public void singleClass_singleResult() throws Exception {
+	void singleClass_singleResult() {
 		Session session = openSession();
 		Transaction tx = session.beginTransaction();
 
 		FullTextSession fullTextSession = Search.getFullTextSession( session );
 		FullTextQuery fullTextQuery = fullTextSession.createFullTextQuery( fieldFooQuery, A.class );
 		List<?> result = fullTextQuery.list();
-		assertEquals( "Should match B only", 1, result.size() );
+		assertThat( result ).as( "Should match B only" ).hasSize( 1 );
 		assertPopulated( result );
 
 		fullTextSession.clear();
@@ -109,7 +108,7 @@ public class ObjectLoadingPublicFieldTest extends SearchTestBase {
 	}
 
 	@Test
-	public void singleClass_multipleResults() throws Exception {
+	void singleClass_multipleResults() {
 		Session session = openSession();
 		Transaction tx = session.beginTransaction();
 
@@ -117,7 +116,7 @@ public class ObjectLoadingPublicFieldTest extends SearchTestBase {
 		FullTextSession fullTextSession = Search.getFullTextSession( session );
 		FullTextQuery fullTextQuery = fullTextSession.createFullTextQuery( luceneQuery, A.class );
 		List<?> result = fullTextQuery.list();
-		assertEquals( "Should match A only", 2, result.size() );
+		assertThat( result ).as( "Should match A only" ).hasSize( 2 );
 		assertPopulated( result );
 
 		fullTextSession.clear();
@@ -131,14 +130,14 @@ public class ObjectLoadingPublicFieldTest extends SearchTestBase {
 	}
 
 	@Test
-	public void twoClasses_singleResult() throws Exception {
+	void twoClasses_singleResult() {
 		Session session = openSession();
 		Transaction tx = session.beginTransaction();
 
 		FullTextSession fullTextSession = Search.getFullTextSession( session );
 		FullTextQuery fullTextQuery = fullTextSession.createFullTextQuery( fieldBarQuery, A.class, B.class );
 		List<?> result = fullTextQuery.list();
-		assertEquals( "Should match a single A only", 1, result.size() );
+		assertThat( result ).as( "Should match a single A only" ).hasSize( 1 );
 		assertPopulated( result );
 
 		fullTextSession.clear();
@@ -152,14 +151,14 @@ public class ObjectLoadingPublicFieldTest extends SearchTestBase {
 	}
 
 	@Test
-	public void twoClasses_multipleResults() throws Exception {
+	void twoClasses_multipleResults() {
 		Session session = openSession();
 		Transaction tx = session.beginTransaction();
 
 		FullTextSession fullTextSession = Search.getFullTextSession( session );
 		FullTextQuery fullTextQuery = fullTextSession.createFullTextQuery( fieldFooQuery, A.class, B.class );
 		List<?> result = fullTextQuery.list();
-		assertEquals( "Should match A and B only", 2, result.size() );
+		assertThat( result ).as( "Should match A and B only" ).hasSize( 2 );
 		assertPopulated( result );
 
 		fullTextSession.clear();
@@ -173,7 +172,7 @@ public class ObjectLoadingPublicFieldTest extends SearchTestBase {
 	}
 
 	@Test
-	public void threeClasses() throws Exception {
+	void threeClasses() {
 		Session session = openSession();
 		Transaction tx = session.beginTransaction();
 
@@ -182,7 +181,7 @@ public class ObjectLoadingPublicFieldTest extends SearchTestBase {
 				fieldFooQuery, A.class, B.class, C.class
 		);
 		List<?> result = fullTextQuery.list();
-		assertEquals( "Should match all types", 3, result.size() );
+		assertThat( result ).as( "Should match all types" ).hasSize( 3 );
 		assertPopulated( result );
 
 		fullTextSession.clear();
@@ -198,14 +197,14 @@ public class ObjectLoadingPublicFieldTest extends SearchTestBase {
 	}
 
 	@Test
-	public void implicitAllClasses() throws Exception {
+	void implicitAllClasses() {
 		Session session = openSession();
 		Transaction tx = session.beginTransaction();
 
 		FullTextSession fullTextSession = Search.getFullTextSession( session );
 		FullTextQuery fullTextQuery = fullTextSession.createFullTextQuery( fieldFooQuery );
 		List<?> result = fullTextQuery.list();
-		assertEquals( "Should match all types", 3, result.size() );
+		assertThat( result ).as( "Should match all types" ).hasSize( 3 );
 		assertPopulated( result );
 
 		fullTextSession.clear();
@@ -233,13 +232,13 @@ public class ObjectLoadingPublicFieldTest extends SearchTestBase {
 			result = tuple[0];
 		}
 		if ( result instanceof A ) {
-			assertNotNull( ( (A) result ).id );
+			assertThat( ( (A) result ).id ).isNotNull();
 		}
 		else if ( result instanceof B ) {
-			assertNotNull( ( (B) result ).id );
+			assertThat( ( (B) result ).id ).isNotNull();
 		}
 		else if ( result instanceof C ) {
-			assertNotNull( ( (C) result ).id );
+			assertThat( ( (C) result ).id ).isNotNull();
 		}
 		else {
 			throw new AssertionFailure( "Unexpected type for result " + result );

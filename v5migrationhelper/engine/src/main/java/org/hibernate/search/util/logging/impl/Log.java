@@ -59,7 +59,7 @@ public interface Log extends BaseHibernateSearchLogger {
 			value = "'%1$s' is not a supported type for a range faceting request parameter. Supported types are: '%2$s'")
 	SearchException unsupportedParameterTypeForRangeFaceting(String facetRangeParameterType, String supportedTypes);
 
-	@Message(id = 270, value = "At least of of the facets ranges in facet request '%1$s' contains neither start nor end value")
+	@Message(id = 270, value = "At least one of the facets ranges in facet request '%1$s' contains neither start nor end value")
 	SearchException noStartOrEndSpecifiedForRangeQuery(String facetRequestName);
 
 	@Message(id = 271, value = "RANGE_DEFINITION_ORDER is not a valid sort order for a discrete faceting request.")

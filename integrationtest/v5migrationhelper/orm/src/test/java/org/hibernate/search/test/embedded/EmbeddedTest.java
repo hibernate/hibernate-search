@@ -6,7 +6,7 @@
  */
 package org.hibernate.search.test.embedded;
 
-import static org.junit.Assert.assertEquals;
+import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -18,7 +18,7 @@ import org.hibernate.search.Search;
 import org.hibernate.search.test.SearchTestBase;
 import org.hibernate.search.testsupport.TestConstants;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import org.apache.lucene.document.LongPoint;
 import org.apache.lucene.index.Term;
@@ -32,10 +32,10 @@ import org.apache.lucene.search.TermQuery;
  * @author Emmanuel Bernard
  * @author Hardy Ferentschik
  */
-public class EmbeddedTest extends SearchTestBase {
+class EmbeddedTest extends SearchTestBase {
 
 	@Test
-	public void testEmbeddedIndexing() throws Exception {
+	void testEmbeddedIndexing() throws Exception {
 		Tower tower = new Tower();
 		tower.setName( "JBoss tower" );
 		Address a = new Address();
@@ -62,19 +62,19 @@ public class EmbeddedTest extends SearchTestBase {
 
 		query = parser.parse( "address.street:place" );
 		result = session.createFullTextQuery( query ).list();
-		assertEquals( "unable to find property in embedded", 1, result.size() );
+		assertThat( result ).as( "unable to find property in embedded" ).hasSize( 1 );
 
 		query = parser.parse( "address.ownedBy_name:renting" );
 		result = session.createFullTextQuery( query, Tower.class ).list();
-		assertEquals( "unable to find property in embedded", 1, result.size() );
+		assertThat( result ).as( "unable to find property in embedded" ).hasSize( 1 );
 
 		query = LongPoint.newExactQuery( "address.id", a.getId() );
 		result = session.createFullTextQuery( query, Tower.class ).list();
-		assertEquals( "unable to find property by id of embedded", 1, result.size() );
+		assertThat( result ).as( "unable to find property by id of embedded" ).hasSize( 1 );
 
 		query = parser.parse( "address.country.name:" + a.getCountry().getName() );
 		result = session.createFullTextQuery( query, Tower.class ).list();
-		assertEquals( "unable to find property with 2 levels of embedded", 1, result.size() );
+		assertThat( result ).as( "unable to find property with 2 levels of embeddedembedded" ).hasSize( 1 );
 
 		s.clear();
 
@@ -89,7 +89,7 @@ public class EmbeddedTest extends SearchTestBase {
 
 		query = parser.parse( "address.ownedBy_name:buckhead" );
 		result = session.createFullTextQuery( query, Tower.class ).list();
-		assertEquals( "change in embedded not reflected in root index", 1, result.size() );
+		assertThat( result ).as( "change in embedded not reflected in root index" ).hasSize( 1 );
 
 		s.clear();
 
@@ -102,7 +102,7 @@ public class EmbeddedTest extends SearchTestBase {
 	}
 
 	@Test
-	public void testEmbeddedIndexingOneToMany() throws Exception {
+	void testEmbeddedIndexingOneToMany() throws Exception {
 		Country country = new Country();
 		country.setName( "Germany" );
 		List<State> states = new ArrayList<State>();
@@ -129,12 +129,12 @@ public class EmbeddedTest extends SearchTestBase {
 
 		query = parser.parse( "states.name:Hessen" );
 		result = session.createFullTextQuery( query ).list();
-		assertEquals( "unable to find property in embedded", 1, result.size() );
+		assertThat( result ).as( "unable to find property in embedded" ).hasSize( 1 );
 		s.close();
 	}
 
 	@Test
-	public void testEmbeddedIndexingElementCollection() throws Exception {
+	void testEmbeddedIndexingElementCollection() throws Exception {
 		Tower tower = new Tower();
 		tower.setName( "JBoss tower" );
 		Address a = new Address();
@@ -166,12 +166,12 @@ public class EmbeddedTest extends SearchTestBase {
 
 		query = parser.parse( "address.inhabitants.name:Smith" );
 		result = session.createFullTextQuery( query ).list();
-		assertEquals( "unable to find property in embedded @ElementCollection", 1, result.size() );
+		assertThat( result ).as( "unable to find property in embedded @ElementCollection" ).hasSize( 1 );
 		s.close();
 	}
 
 	@Test
-	public void testContainedIn() throws Exception {
+	void testContainedIn() throws Exception {
 		Tower tower = new Tower();
 		tower.setName( "JBoss tower" );
 		Address a = new Address();
@@ -204,7 +204,7 @@ public class EmbeddedTest extends SearchTestBase {
 
 		query = parser.parse( "address.street:peachtree" );
 		result = session.createFullTextQuery( query, Tower.class ).list();
-		assertEquals( "change in embedded not reflected in root index", 1, result.size() );
+		assertThat( result ).as( "change in embedded not reflected in root index" ).hasSize( 1 );
 
 		s.clear();
 
@@ -221,7 +221,7 @@ public class EmbeddedTest extends SearchTestBase {
 
 		query = parser.parse( "address.street:peachtree" );
 		result = session.createFullTextQuery( query, Tower.class ).list();
-		assertEquals( "breaking link fails", 0, result.size() );
+		assertThat( result ).as( "breaking link fails" ).isEmpty();
 
 		tx = s.beginTransaction();
 		s.delete( s.get( Tower.class, tower.getId() ) );
@@ -232,7 +232,7 @@ public class EmbeddedTest extends SearchTestBase {
 	}
 
 	@Test
-	public void testIndexedEmbeddedAndCollections() throws Exception {
+	void testIndexedEmbeddedAndCollections() throws Exception {
 		Author a = new Author();
 		a.setName( "Voltaire" );
 		Author a2 = new Author();
@@ -285,7 +285,7 @@ public class EmbeddedTest extends SearchTestBase {
 
 		query = parser.parse( "Hugo" );
 		result = session.createFullTextQuery( query, Product.class ).list();
-		assertEquals( "collection of embedded ignored", 1, result.size() );
+		assertThat( result ).as( "collection of embedded ignored" ).hasSize( 1 );
 
 		// update the collection
 		Product p = (Product) result.get( 0 );
@@ -294,10 +294,10 @@ public class EmbeddedTest extends SearchTestBase {
 		// PhraseQuery
 		query = new TermQuery( new Term( "orders.orderNumber", "ZERTYD" ) );
 		result = session.createFullTextQuery( query, Product.class ).list();
-		assertEquals( "collection of untokenized ignored", 1, result.size() );
+		assertThat( result ).as( "collection of untokenized ignored" ).hasSize( 1 );
 		query = new TermQuery( new Term( "orders.orderNumber", "ACVBNM" ) );
 		result = session.createFullTextQuery( query, Product.class ).list();
-		assertEquals( "collection of untokenized ignored", 1, result.size() );
+		assertThat( result ).as( "collection of untokenized ignored" ).hasSize( 1 );
 
 		tx.commit();
 
@@ -308,7 +308,7 @@ public class EmbeddedTest extends SearchTestBase {
 		query = parser.parse( "Proust" );
 		result = session.createFullTextQuery( query, Product.class ).list();
 		// HSEARCH-56
-		assertEquals( "update of collection of embedded ignored", 1, result.size() );
+		assertThat( result ).as( "update of collection of embedded ignored" ).hasSize( 1 );
 
 		s.delete( s.get( Product.class, p1.getId() ) );
 		s.delete( s.get( Product.class, p2.getId() ) );
@@ -322,8 +322,7 @@ public class EmbeddedTest extends SearchTestBase {
 	 * @throws Exception in case the test fails
 	 */
 	@Test
-	public void testEmbeddedObjectUpdate() throws Exception {
-
+	void testEmbeddedObjectUpdate() throws Exception {
 		State state = new State();
 		state.setName( "Bavaria" );
 		StateCandidate candiate = new StateCandidate();
@@ -349,7 +348,7 @@ public class EmbeddedTest extends SearchTestBase {
 
 		query = parser.parse( "Bavaria" );
 		result = session.createFullTextQuery( query, StateCandidate.class ).list();
-		assertEquals( "IndexEmbedded ignored.", 1, result.size() );
+		assertThat( result ).as( "IndexEmbedded ignored." ).hasSize( 1 );
 		tx.commit();
 		s.clear();
 
@@ -363,14 +362,14 @@ public class EmbeddedTest extends SearchTestBase {
 		session = Search.getFullTextSession( s );
 		query = parser.parse( "Hessen" );
 		result = session.createFullTextQuery( query, StateCandidate.class ).list();
-		assertEquals( "IndexEmbedded ignored.", 1, result.size() );
+		assertThat( result ).as( "IndexEmbedded ignored." ).hasSize( 1 );
 		tx.commit();
 		s.clear();
 		s.close();
 	}
 
 	@Test
-	public void testEmbeddedToManyInSuperclass() throws ParseException {
+	void testEmbeddedToManyInSuperclass() throws ParseException {
 		ProductFeature featureA = new ProductFeature();
 		featureA.setName( "featureA" );
 		ProductFeature featureB = new ProductFeature();
@@ -397,7 +396,7 @@ public class EmbeddedTest extends SearchTestBase {
 
 		query = parser.parse( "features.name:featureA" );
 		result = session.createFullTextQuery( query, AbstractProduct.class ).list();
-		assertEquals( "Feature A should be indexed", 1, result.size() );
+		assertThat( result ).as( "Feature A should be indexed" ).hasSize( 1 );
 
 		// Add product features - product should be re-indexed
 		book = (AbstractProduct) result.get( 0 );
@@ -413,7 +412,7 @@ public class EmbeddedTest extends SearchTestBase {
 		tx = s.beginTransaction();
 		query = parser.parse( "features.name:featureB" );
 		result = session.createFullTextQuery( query, AbstractProduct.class ).list();
-		assertEquals( "Feature B should be indexed now as well", 1, result.size() );
+		assertThat( result ).as( "Feature B should be indexed now as well" ).hasSize( 1 );
 		tx.commit();
 
 		s.close();

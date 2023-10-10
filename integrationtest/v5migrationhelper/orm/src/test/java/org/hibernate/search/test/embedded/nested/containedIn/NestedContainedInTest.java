@@ -7,8 +7,7 @@
 
 package org.hibernate.search.test.embedded.nested.containedIn;
 
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
+import static org.assertj.core.api.Assertions.assertThat;
 
 import org.hibernate.Transaction;
 import org.hibernate.search.FullTextQuery;
@@ -16,7 +15,7 @@ import org.hibernate.search.FullTextSession;
 import org.hibernate.search.Search;
 import org.hibernate.search.test.SearchTestBase;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import org.apache.lucene.index.Term;
 import org.apache.lucene.search.Query;
@@ -25,10 +24,10 @@ import org.apache.lucene.search.TermQuery;
 /**
  * @author Emmanuel Bernard
  */
-public class NestedContainedInTest extends SearchTestBase {
+class NestedContainedInTest extends SearchTestBase {
 
 	@Test
-	public void testAddHelpItem() {
+	void testAddHelpItem() {
 		openSession();
 		String tagName = "animal";
 		createHelpItem( tagName );
@@ -37,7 +36,7 @@ public class NestedContainedInTest extends SearchTestBase {
 	}
 
 	@Test
-	public void testChangeTagName() {
+	void testChangeTagName() {
 		openSession();
 		String tagName = "animal";
 		createHelpItem( tagName );
@@ -85,8 +84,8 @@ public class NestedContainedInTest extends SearchTestBase {
 		FullTextQuery fullTextQuery =
 				fullTextSession.createFullTextQuery( termQuery, HelpItem.class );
 		HelpItem check = (HelpItem) fullTextQuery.uniqueResult();
-		assertNotNull( "No HelpItem with Tag '" + tagName + "' found in Lucene index.", check );
-		assertTrue( check.getTags().get( 0 ).getTag().getName().equals( tagName ) );
+		assertThat( check ).as( "No HelpItem with Tag '" + tagName + "' found in Lucene index." ).isNotNull();
+		assertThat( check.getTags().get( 0 ).getTag().getName() ).isEqualTo( tagName );
 		tx.commit();
 		return check;
 	}

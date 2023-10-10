@@ -6,7 +6,7 @@
  */
 package org.hibernate.search.test.query.facet;
 
-import static org.junit.Assert.assertEquals;
+import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.List;
 
@@ -17,7 +17,7 @@ import org.hibernate.search.query.facet.Facet;
 import org.hibernate.search.query.facet.FacetingRequest;
 import org.hibernate.search.testsupport.TestForIssue;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import org.apache.lucene.search.MatchAllDocsQuery;
 import org.apache.lucene.search.Query;
@@ -25,11 +25,11 @@ import org.apache.lucene.search.Query;
 /**
  * @author Hardy Ferentschik
  */
-public class StringFacetingTest extends AbstractFacetTest {
+class StringFacetingTest extends AbstractFacetTest {
 
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-809")
-	public void testStringFaceting() throws Exception {
+	void testStringFaceting() {
 		FacetingRequest request = queryBuilder( Car.class ).facet()
 				.name( "manufacturer" )
 				.onField( "make" )
@@ -39,7 +39,7 @@ public class StringFacetingTest extends AbstractFacetTest {
 		FullTextQuery query = matchAll( request );
 
 		List<Facet> facetList = query.getFacetManager().getFacets( "manufacturer" );
-		assertEquals( "Wrong number of facets", 5, facetList.size() );
+		assertThat( facetList ).as( "Wrong number of facets" ).hasSize( 5 );
 
 		assertFacet( facetList.get( 0 ), "Honda", 13 );
 		assertFacet( facetList.get( 1 ), "BMW", 12 );
@@ -49,15 +49,15 @@ public class StringFacetingTest extends AbstractFacetTest {
 	}
 
 	private void assertFacet(Facet facet, String expectedMake, int expectedCount) {
-		assertEquals( "Wrong facet value", expectedMake, facet.getValue() );
-		assertEquals( "Wrong facet count", expectedCount, facet.getCount() );
+		assertThat( facet.getValue() ).as( "Wrong facet value" ).isEqualTo( expectedMake );
+		assertThat( facet.getCount() ).as( "Wrong facet count" ).isEqualTo( expectedCount );
 	}
 
 	private FullTextQuery matchAll(FacetingRequest request) {
 		Query luceneQuery = new MatchAllDocsQuery();
 		FullTextQuery query = fullTextSession.createFullTextQuery( luceneQuery, Car.class );
 		query.getFacetManager().enableFaceting( request );
-		assertEquals( "Wrong number of indexed cars", 50, query.getResultSize() );
+		assertThat( query.getResultSize() ).as( "Wrong number of indexed cars" ).isEqualTo( 50 );
 		return query;
 	}
 

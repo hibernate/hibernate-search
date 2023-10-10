@@ -6,7 +6,7 @@
  */
 package org.hibernate.search.test.engine.indexapi;
 
-import static org.junit.Assert.assertEquals;
+import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.Arrays;
 import java.util.List;
@@ -18,8 +18,8 @@ import org.hibernate.search.Search;
 import org.hibernate.search.test.SearchTestBase;
 import org.hibernate.search.testsupport.TestForIssue;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import org.apache.lucene.search.MatchAllDocsQuery;
 
@@ -29,9 +29,9 @@ import org.apache.lucene.search.MatchAllDocsQuery;
  * @author John Griffin
  * @author Hardy Ferentschik
  */
-public class PurgeTest extends SearchTestBase {
+class PurgeTest extends SearchTestBase {
 
-	@Before
+	@BeforeEach
 	@Override
 	public void setUp() throws Exception {
 		super.setUp();
@@ -39,7 +39,7 @@ public class PurgeTest extends SearchTestBase {
 	}
 
 	@Test
-	public void testPurgeById() throws Exception {
+	void testPurgeById() {
 		assertNumberOfIndexedEntitiesForTypes( 2, Clock.class );
 		assertNumberOfIndexedEntitiesForTypes( 2, Book.class );
 
@@ -58,7 +58,7 @@ public class PurgeTest extends SearchTestBase {
 	}
 
 	@Test
-	public void testPurgeAll() throws Exception {
+	void testPurgeAll() {
 		assertNumberOfIndexedEntitiesForTypes( 2, Clock.class );
 		assertNumberOfIndexedEntitiesForTypes( 2, Book.class );
 
@@ -89,7 +89,7 @@ public class PurgeTest extends SearchTestBase {
 
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-1271")
-	public void testPurgeEntityWithContainedIn() throws Exception {
+	void testPurgeEntityWithContainedIn() {
 		assertNumberOfIndexedEntitiesForTypes( 1, Tree.class );
 		assertNumberOfIndexedEntitiesForTypes( 4, Leaf.class );
 
@@ -109,7 +109,7 @@ public class PurgeTest extends SearchTestBase {
 
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-1271")
-	public void testPurgeAllWithContainedIn() throws Exception {
+	void testPurgeAllWithContainedIn() {
 		assertNumberOfIndexedEntitiesForTypes( 1, Tree.class );
 		assertNumberOfIndexedEntitiesForTypes( 4, Leaf.class );
 
@@ -128,7 +128,7 @@ public class PurgeTest extends SearchTestBase {
 
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-1271")
-	public void testPurgeWithNullAsIdDeletesAllIndexedDocuments() throws Exception {
+	void testPurgeWithNullAsIdDeletesAllIndexedDocuments() {
 		assertNumberOfIndexedEntitiesForTypes( 1, Tree.class );
 		assertNumberOfIndexedEntitiesForTypes( 4, Leaf.class );
 
@@ -168,7 +168,8 @@ public class PurgeTest extends SearchTestBase {
 			org.hibernate.query.Query query = fullTextSession.createFullTextQuery( new MatchAllDocsQuery(), types );
 			@SuppressWarnings("unchecked")
 			List<Object> results = (List<Object>) query.list();
-			assertEquals( "Incorrect document count for type: " + Arrays.toString( types ), expectedCount, results.size() );
+			assertThat( results ).as( "Incorrect document count for type: " + Arrays.toString( types ) )
+					.hasSize( expectedCount );
 
 			tx.commit();
 		}

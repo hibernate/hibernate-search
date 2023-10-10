@@ -18,8 +18,8 @@ import org.hibernate.search.testsupport.TestForIssue;
 import org.hibernate.search.testsupport.junit.SearchFactoryHolder;
 import org.hibernate.search.testsupport.junit.SearchITHelper;
 
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 
 /**
  * Test the behavior when an {@literal @IndexedEmbedded} with default paths (i.e. "include everything")
@@ -28,15 +28,15 @@ import org.junit.Test;
  * @author Yoann Rodiere
  */
 @TestForIssue(jiraKey = "HSEARCH-2547")
-public class DefaultPathsWithNestedIndexedEmbeddedTest {
+class DefaultPathsWithNestedIndexedEmbeddedTest {
 
-	@Rule
+	@RegisterExtension
 	public final SearchFactoryHolder sfHolder = new SearchFactoryHolder( A.class, B.class, C.class );
 
 	private final SearchITHelper helper = new SearchITHelper( sfHolder );
 
 	@Test
-	public void testIndexAndSearch() {
+	void testIndexAndSearch() {
 		A a = new A();
 		a.id = 0L;
 		a.foo = "someValue";

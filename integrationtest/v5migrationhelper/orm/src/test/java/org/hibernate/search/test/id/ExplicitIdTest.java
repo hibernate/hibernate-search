@@ -7,8 +7,7 @@
 package org.hibernate.search.test.id;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.fail;
+import static org.junit.jupiter.api.Assertions.fail;
 
 import java.util.List;
 
@@ -19,7 +18,7 @@ import org.hibernate.search.test.SearchTestBase;
 import org.hibernate.search.testsupport.TestForIssue;
 import org.hibernate.search.util.common.SearchException;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import org.apache.lucene.document.LongPoint;
 import org.apache.lucene.index.Term;
@@ -28,7 +27,7 @@ import org.apache.lucene.search.TermQuery;
 /**
  * @author Hardy Ferentschik
  */
-public class ExplicitIdTest extends SearchTestBase {
+class ExplicitIdTest extends SearchTestBase {
 
 	/**
 	 * Tests that @DocumentId can be specified on a field other than the @Id annotated one. See HSEARCH-574.
@@ -36,7 +35,7 @@ public class ExplicitIdTest extends SearchTestBase {
 	 * @throws Exception in case the test fails.
 	 */
 	@Test
-	public void testExplicitDocumentIdSingleResult() throws Exception {
+	void testExplicitDocumentIdSingleResult() {
 		Article hello = new Article();
 		hello.setDocumentId( 1 );
 		hello.setText( "Hello World" );
@@ -51,7 +50,7 @@ public class ExplicitIdTest extends SearchTestBase {
 		List results = Search.getFullTextSession( s ).createFullTextQuery(
 				new TermQuery( new Term( "text", "world" ) )
 		).list();
-		assertEquals( 1, results.size() );
+		assertThat( results ).hasSize( 1 );
 		tx.commit();
 		s.close();
 	}
@@ -62,7 +61,7 @@ public class ExplicitIdTest extends SearchTestBase {
 	 * @throws Exception in case the test fails.
 	 */
 	@Test
-	public void testExplicitDocumentIdMultipleResults() throws Exception {
+	void testExplicitDocumentIdMultipleResults() {
 		Article hello = new Article();
 		hello.setDocumentId( 1 );
 		hello.setText( "Hello World" );
@@ -82,7 +81,7 @@ public class ExplicitIdTest extends SearchTestBase {
 		List results = Search.getFullTextSession( s ).createFullTextQuery(
 				new TermQuery( new Term( "text", "world" ) )
 		).list();
-		assertEquals( 2, results.size() );
+		assertThat( results ).hasSize( 2 );
 		tx.commit();
 		s.close();
 	}
@@ -93,7 +92,7 @@ public class ExplicitIdTest extends SearchTestBase {
 	 * @throws Exception in case the test fails.
 	 */
 	@Test
-	public void testDocumentIdMustBeUnique() throws Exception {
+	void testDocumentIdMustBeUnique() {
 		Article hello = new Article();
 		hello.setDocumentId( 1 );
 		hello.setText( "Hello World" );
@@ -133,7 +132,7 @@ public class ExplicitIdTest extends SearchTestBase {
 	 */
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-2056")
-	public void testQueryOnIdPropertyWithExplicitDocumentIdPresent() throws Exception {
+	void testQueryOnIdPropertyWithExplicitDocumentIdPresent() {
 		Article hello = new Article();
 		hello.setDocumentId( 1 );
 		hello.setText( "Hello World" );
@@ -148,7 +147,7 @@ public class ExplicitIdTest extends SearchTestBase {
 		List results = Search.getFullTextSession( s ).createFullTextQuery(
 				LongPoint.newExactQuery( "articleId", hello.getArticleId() )
 		).list();
-		assertEquals( 1, results.size() );
+		assertThat( results ).hasSize( 1 );
 		tx.commit();
 		s.close();
 	}

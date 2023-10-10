@@ -6,7 +6,7 @@
  */
 package org.hibernate.search.test.configuration.indexingStrategy;
 
-import static org.junit.Assert.assertEquals;
+import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.Map;
 
@@ -20,22 +20,20 @@ import org.hibernate.search.annotations.Indexed;
 import org.hibernate.search.mapper.orm.cfg.HibernateOrmMapperSettings;
 import org.hibernate.search.test.SearchTestBase;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 /**
  * @author Emmanuel Bernard
  * @author Hardy Ferentschik
  */
-public class ManualIndexingStrategyTest extends SearchTestBase {
+class ManualIndexingStrategyTest extends SearchTestBase {
 
 	@Test
-	public void testMultipleEntitiesPerIndex() throws Exception {
+	void testMultipleEntitiesPerIndex() {
 		indexTestEntity();
-		assertEquals(
-				"Due to manual indexing being enabled no listener-triggered indexing should have occurred",
-				0,
-				getNumberOfDocumentsInIndex( "TestEntity" )
-		);
+		assertThat( getNumberOfDocumentsInIndex( "TestEntity" ) )
+				.as( "Due to manual indexing being enabled no listener-triggered indexing should have occurred" )
+				.isZero();
 	}
 
 	@Override

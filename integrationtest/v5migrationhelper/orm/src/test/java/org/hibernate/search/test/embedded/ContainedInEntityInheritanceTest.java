@@ -6,7 +6,7 @@
  */
 package org.hibernate.search.test.embedded;
 
-import static org.junit.Assert.assertEquals;
+import static org.assertj.core.api.Assertions.assertThat;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -26,7 +26,7 @@ import org.hibernate.search.query.dsl.QueryBuilder;
 import org.hibernate.search.test.SearchTestBase;
 import org.hibernate.search.testsupport.TestForIssue;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import org.apache.lucene.search.Query;
 
@@ -34,10 +34,10 @@ import org.apache.lucene.search.Query;
  * @author Yoann Rodiere
  */
 @TestForIssue(jiraKey = "HSEARCH-2486")
-public class ContainedInEntityInheritanceTest extends SearchTestBase {
+class ContainedInEntityInheritanceTest extends SearchTestBase {
 
 	@Test
-	public void testContainedInIsInherited() {
+	void testContainedInIsInherited() {
 		// Initialize
 		Containing containing;
 		try ( Session session = openSession() ) {
@@ -54,7 +54,7 @@ public class ContainedInEntityInheritanceTest extends SearchTestBase {
 
 			transaction.commit();
 		}
-		assertEquals( 1, queryResultSize( 0 ) );
+		assertThat( queryResultSize( 0 ) ).isEqualTo( 1 );
 
 		// Update and test the containedIn
 		try ( Session session = openSession() ) {
@@ -66,8 +66,8 @@ public class ContainedInEntityInheritanceTest extends SearchTestBase {
 
 			transaction.commit();
 		}
-		assertEquals( 1, queryResultSize( 1 ) );
-		assertEquals( 0, queryResultSize( 0 ) );
+		assertThat( queryResultSize( 1 ) ).isEqualTo( 1 );
+		assertThat( queryResultSize( 0 ) ).isZero();
 	}
 
 	private int queryResultSize(int fieldValue) {

@@ -14,8 +14,8 @@ import org.hibernate.search.test.util.BackendTestHelper;
 import org.hibernate.search.test.util.ImmutableTestConfiguration;
 import org.hibernate.search.test.util.TestConfiguration;
 
-import org.junit.After;
-import org.junit.Rule;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.extension.RegisterExtension;
 
 /**
  * A base class for tests of the initialization process.
@@ -30,7 +30,7 @@ import org.junit.Rule;
  */
 public abstract class SearchInitializationTestBase {
 
-	@Rule
+	@RegisterExtension
 	public final V5MigrationHelperOrmSetupHelper setupHelper = V5MigrationHelperOrmSetupHelper.create();
 
 	private DefaultTestResourceManager testResourceManager;
@@ -73,7 +73,7 @@ public abstract class SearchInitializationTestBase {
 		return backendTestHelper;
 	}
 
-	@After
+	@AfterEach
 	public void tearDown() throws Exception {
 		try {
 			if ( testResourceManager != null ) {

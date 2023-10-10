@@ -6,7 +6,7 @@
  */
 package org.hibernate.search.test.query.facet;
 
-import static org.junit.Assert.assertEquals;
+import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.List;
 
@@ -14,10 +14,10 @@ import org.hibernate.Session;
 import org.hibernate.search.FullTextQuery;
 import org.hibernate.search.query.facet.Facet;
 import org.hibernate.search.query.facet.FacetingRequest;
-import org.hibernate.search.testsupport.junit.PortedToSearch6;
+import org.hibernate.search.testsupport.junit.Tags;
 
-import org.junit.Test;
-import org.junit.experimental.categories.Category;
+import org.junit.jupiter.api.Tag;
+import org.junit.jupiter.api.Test;
 
 import org.apache.lucene.search.Query;
 
@@ -25,12 +25,12 @@ import org.apache.lucene.search.Query;
  * @author Hardy Ferentschik
  * @author Emmanuel Bernard
  */
-@Category(PortedToSearch6.class)
-public class EdgeCaseFacetTest extends AbstractFacetTest {
+@Tag(Tags.PORTED_TO_SEARCH_6)
+class EdgeCaseFacetTest extends AbstractFacetTest {
 	private final String facetName = "ccs";
 
 	@Test
-	public void testFacetingOnEmptyIndex() throws Exception {
+	void testFacetingOnEmptyIndex() {
 		FacetingRequest request = queryBuilder( Car.class ).facet()
 				.name( facetName )
 				.onField( Car.CUBIC_CAPACITY_STRING_FACET_STRING_ENCODING )
@@ -39,14 +39,14 @@ public class EdgeCaseFacetTest extends AbstractFacetTest {
 		FullTextQuery query = queryHondaWithFacet( request );
 
 		List<Facet> facetList = query.getFacetManager().getFacets( facetName );
-		assertEquals( "Wrong number of facets", 0, facetList.size() );
+		assertThat( facetList ).as( "Wrong number of facets" ).isEmpty();
 	}
 
 	private FullTextQuery queryHondaWithFacet(FacetingRequest request) {
 		Query luceneQuery = queryBuilder( Car.class ).keyword().onField( "make" ).matching( "Honda" ).createQuery();
 		FullTextQuery query = fullTextSession.createFullTextQuery( luceneQuery, Car.class );
 		query.getFacetManager().enableFaceting( request );
-		assertEquals( "Wrong number of query matches", 0, query.getResultSize() );
+		assertThat( query.getResultSize() ).as( "Wrong number of query matches" ).isEqualTo( 0 );
 		return query;
 	}
 

@@ -13,19 +13,19 @@ import org.hibernate.search.Search;
 import org.hibernate.search.test.SearchTestBase;
 import org.hibernate.search.test.util.progessmonitor.AssertingMassIndexerProgressMonitor;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import org.apache.lucene.search.MatchAllDocsQuery;
 
 /**
  * @author Hardy Ferentschik
  */
-public class ProgressMonitorTest extends SearchTestBase {
+class ProgressMonitorTest extends SearchTestBase {
 	FullTextSession fullTextSession;
 
 	@Override
-	@Before
+	@BeforeEach
 	public void setUp() throws Exception {
 		super.setUp();
 		fullTextSession = Search.getFullTextSession( openSession() );
@@ -33,7 +33,7 @@ public class ProgressMonitorTest extends SearchTestBase {
 	}
 
 	@Test
-	public void testAllRelevantProgressMonitoringOperationsCalled() throws InterruptedException {
+	void testAllRelevantProgressMonitoringOperationsCalled() throws InterruptedException {
 		// let mass indexer re-index the data in the db (created in initializeData())
 		AssertingMassIndexerProgressMonitor monitor = new AssertingMassIndexerProgressMonitor( 10, 10 );
 		fullTextSession.createIndexer( LegacyCar.class )

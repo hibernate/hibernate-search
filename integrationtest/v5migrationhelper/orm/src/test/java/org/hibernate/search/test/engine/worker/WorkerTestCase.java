@@ -6,7 +6,7 @@
  */
 package org.hibernate.search.test.engine.worker;
 
-import static org.junit.Assert.assertTrue;
+import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.concurrent.TimeUnit;
 
@@ -19,10 +19,8 @@ import org.hibernate.search.test.SearchTestBase;
 import org.hibernate.search.test.util.impl.ExpectedLog4jLog;
 import org.hibernate.search.testsupport.concurrency.ConcurrentRunner;
 
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.junit.runners.JUnit4;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 
 import org.apache.logging.log4j.Level;
 import org.apache.lucene.index.Term;
@@ -33,14 +31,13 @@ import org.apache.lucene.search.TermQuery;
  * @author Emmanuel Bernard
  * @author Sanne Grinovero
  */
-@RunWith(JUnit4.class) // CustomRunner messes with @Rule
-public abstract class WorkerTestCase extends SearchTestBase {
+abstract class WorkerTestCase extends SearchTestBase {
 
-	@Rule
+	@RegisterExtension
 	public ExpectedLog4jLog logged = ExpectedLog4jLog.create();
 
 	@Test
-	public void testConcurrency() throws Exception {
+	void testConcurrency() throws Exception {
 		int numberOfThreads = 15;
 		int iteration = 100;
 
@@ -113,7 +110,7 @@ public abstract class WorkerTestCase extends SearchTestBase {
 				// don't test because in case of async, it query happens before
 				// actual saving
 				if ( isWorkerSync ) {
-					assertTrue( results );
+					assertThat( results ).isTrue();
 				}
 				tx.commit();
 				s.close();

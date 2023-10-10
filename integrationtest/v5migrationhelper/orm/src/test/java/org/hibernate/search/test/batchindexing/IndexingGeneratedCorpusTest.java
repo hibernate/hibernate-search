@@ -6,11 +6,8 @@
  */
 package org.hibernate.search.test.batchindexing;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmUtils.countAll;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
 
 import java.io.IOException;
 import java.lang.invoke.MethodHandles;
@@ -30,9 +27,9 @@ import org.hibernate.search.testsupport.textbuilder.SentenceInventor;
 import org.hibernate.search.util.logging.impl.Log;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
 
-import org.junit.BeforeClass;
-import org.junit.ClassRule;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 
 import org.apache.lucene.search.MatchAllDocsQuery;
 import org.apache.lucene.search.Query;
@@ -42,7 +39,7 @@ import org.apache.lucene.search.Query;
  *
  * @author Sanne Grinovero
  */
-public class IndexingGeneratedCorpusTest {
+class IndexingGeneratedCorpusTest {
 
 	private static final Log log = LoggerFactory.make( MethodHandles.lookup() );
 
@@ -53,7 +50,7 @@ public class IndexingGeneratedCorpusTest {
 
 	private static final SentenceInventor sentenceInventor = new SentenceInventor( 7L, 4000 );
 
-	@ClassRule
+	@RegisterExtension
 	public static FullTextSessionBuilder builder = new FullTextSessionBuilder()
 			.addAnnotatedClass( Book.class )
 			.addAnnotatedClass( Dvd.class )
@@ -62,7 +59,7 @@ public class IndexingGeneratedCorpusTest {
 			.addAnnotatedClass( SecretBook.class )
 			.setProperty( BackendSettings.backendKey( LuceneBackendSettings.THREAD_POOL_SIZE ), "4" );
 
-	@BeforeClass
+	@BeforeAll
 	public static void setUp() throws Exception {
 		createMany( Book.class, BOOK_NUM );
 		createMany( Dvd.class, DVD_NUM );
@@ -122,7 +119,7 @@ public class IndexingGeneratedCorpusTest {
 	}
 
 	@Test
-	public void testBatchIndexing() throws InterruptedException, IOException {
+	void testBatchIndexing() throws InterruptedException, IOException {
 		verifyResultNumbers(); //initial count of entities should match expectations
 		purgeAll(); // empty indexes
 		verifyIsEmpty();
@@ -133,16 +130,16 @@ public class IndexingGeneratedCorpusTest {
 	}
 
 	@Test
-	public void testCreationOfTheDefaultMassIndexer() throws Exception {
+	void testCreationOfTheDefaultMassIndexer() throws Exception {
 		FullTextSession fullTextSession = builder.openFullTextSession();
 		MassIndexer indexer = fullTextSession.createIndexer( Object.class );
-		assertNotNull( indexer );
+		assertThat( indexer ).isNotNull();
 	}
 
 	private void reindexAll() throws InterruptedException {
 		FullTextSession fullTextSession = builder.openFullTextSession();
 		SilentProgressMonitor progressMonitor = new SilentProgressMonitor();
-		assertFalse( progressMonitor.finished );
+		assertThat( progressMonitor.finished ).isFalse();
 		try {
 			fullTextSession.createIndexer( Object.class )
 					.threadsForSubsequentFetching( 8 )
@@ -154,7 +151,7 @@ public class IndexingGeneratedCorpusTest {
 		finally {
 			fullTextSession.close();
 		}
-		assertTrue( progressMonitor.finished );
+		assertThat( progressMonitor.finished ).isTrue();
 	}
 
 	private void purgeAll() {
@@ -171,42 +168,21 @@ public class IndexingGeneratedCorpusTest {
 
 	@SuppressWarnings("unchecked")
 	private void verifyResultNumbers() {
-		assertEquals(
-				DVD_NUM,
-				countByFT( Dvd.class )
-		);
-		assertEquals(
-				ANCIENTBOOK_NUM + BOOK_NUM,
-				countByFT( Book.class )
-		);
-		assertEquals(
-				ANCIENTBOOK_NUM + BOOK_NUM + SECRETBOOK_NUM,
-				countByDatabaseCriteria( Book.class )
-		);
-		assertEquals(
-				SECRETBOOK_NUM,
-				countByDatabaseCriteria( SecretBook.class )
-		);
-		assertEquals(
-				ANCIENTBOOK_NUM,
-				countByFT( AncientBook.class )
-		);
-		assertEquals(
-				DVD_NUM + ANCIENTBOOK_NUM + BOOK_NUM,
-				countByFT( AncientBook.class, Book.class, Dvd.class )
-		);
-		assertEquals(
-				DVD_NUM + ANCIENTBOOK_NUM,
-				countByFT( AncientBook.class, Dvd.class )
-		);
+		assertThat( countByFT( Dvd.class ) ).isEqualTo( DVD_NUM );
+		assertThat( countByFT( Book.class ) ).isEqualTo( ANCIENTBOOK_NUM + BOOK_NUM );
+		assertThat( countByDatabaseCriteria( Book.class ) ).isEqualTo( ANCIENTBOOK_NUM + BOOK_NUM + SECRETBOOK_NUM );
+		assertThat( countByDatabaseCriteria( SecretBook.class ) ).isEqualTo( SECRETBOOK_NUM );
+		assertThat( countByFT( AncientBook.class ) ).isEqualTo( ANCIENTBOOK_NUM );
+		assertThat( countByFT( AncientBook.class, Book.class, Dvd.class ) ).isEqualTo( DVD_NUM + ANCIENTBOOK_NUM + BOOK_NUM );
+		assertThat( countByFT( AncientBook.class, Dvd.class ) ).isEqualTo( DVD_NUM + ANCIENTBOOK_NUM );
 	}
 
 	@SuppressWarnings("unchecked")
 	private void verifyIsEmpty() {
-		assertEquals( 0, countByFT( Dvd.class ) );
-		assertEquals( 0, countByFT( Book.class ) );
-		assertEquals( 0, countByFT( AncientBook.class ) );
-		assertEquals( 0, countByFT( AncientBook.class, Book.class, Dvd.class ) );
+		assertThat( countByFT( Dvd.class ) ).isZero();
+		assertThat( countByFT( Book.class ) ).isZero();
+		assertThat( countByFT( AncientBook.class ) ).isZero();
+		assertThat( countByFT( AncientBook.class, Book.class, Dvd.class ) ).isZero();
 	}
 
 	private int countByFT(Class<? extends TitleAble>... types) {
@@ -224,7 +200,7 @@ public class IndexingGeneratedCorpusTest {
 		finally {
 			fullTextSession.close();
 		}
-		assertEquals( bySize, byResultSize );
+		assertThat( byResultSize ).isEqualTo( bySize );
 		return bySize;
 	}
 

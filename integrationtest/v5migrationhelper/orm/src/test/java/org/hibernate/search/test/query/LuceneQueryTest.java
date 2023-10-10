@@ -6,12 +6,8 @@
  */
 package org.hibernate.search.test.query;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
 
 import java.util.List;
 
@@ -28,8 +24,8 @@ import org.hibernate.search.testsupport.TestConstants;
 import org.hibernate.search.util.common.SearchException;
 import org.hibernate.stat.Statistics;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import org.apache.lucene.queryparser.classic.QueryParser;
 import org.apache.lucene.search.Query;
@@ -39,17 +35,17 @@ import org.apache.lucene.search.Query;
  * @author John Griffin
  * @author Hardy Ferentschik
  */
-public class LuceneQueryTest extends SearchTestBase {
+class LuceneQueryTest extends SearchTestBase {
 
 	@Override
-	@Before
+	@BeforeEach
 	public void setUp() throws Exception {
 		super.setUp();
 		indexTestData();
 	}
 
 	@Test
-	public void testList() throws Exception {
+	void testList() throws Exception {
 		FullTextSession fullTextSession = Search.getFullTextSession( openSession() );
 		Transaction tx = fullTextSession.beginTransaction();
 		QueryParser parser = new QueryParser( "title", TestConstants.stopAnalyzer );
@@ -57,43 +53,43 @@ public class LuceneQueryTest extends SearchTestBase {
 		Query query = parser.parse( "summary:noword" );
 		org.hibernate.query.Query hibQuery = fullTextSession.createFullTextQuery( query, Clock.class, Book.class );
 		List result = hibQuery.list();
-		assertNotNull( result );
-		assertEquals( 0, result.size() );
+		assertThat( result ).isNotNull();
+		assertThat( result ).isEmpty();
 
 		query = parser.parse( "summary:Festina Or brand:Seiko" );
 		hibQuery = fullTextSession.createFullTextQuery( query, Clock.class, Book.class );
 		result = hibQuery.list();
-		assertNotNull( result );
-		assertEquals( "Query with explicit class filter", 2, result.size() );
+		assertThat( result ).isNotNull();
+		assertThat( result ).as( "Query with explicit class filter" ).hasSize( 2 );
 
 		query = parser.parse( "summary:Festina Or brand:Seiko" );
 		hibQuery = fullTextSession.createFullTextQuery( query, Clock.class );
 		result = hibQuery.list();
-		assertNotNull( result );
-		assertEquals( "Query with one class filter", 1, result.size() );
+		assertThat( result ).isNotNull();
+		assertThat( result ).as( "Query with one class filter" ).hasSize( 1 );
 
 		query = parser.parse( "summary:Festina Or brand:Seiko" );
 		hibQuery = fullTextSession.createFullTextQuery( query );
 		result = hibQuery.list();
-		assertNotNull( result );
-		assertEquals( "Query with no class filter", 2, result.size() );
+		assertThat( result ).isNotNull();
+		assertThat( result ).as( "Query with no class filter" ).hasSize( 2 );
 		for ( Object element : result ) {
-			assertTrue( Hibernate.isInitialized( element ) );
+			assertThat( Hibernate.isInitialized( element ) ).isTrue();
 			fullTextSession.delete( element );
 		}
 		fullTextSession.flush();
 		query = parser.parse( "summary:Festina Or brand:Seiko" );
 		hibQuery = fullTextSession.createFullTextQuery( query );
 		result = hibQuery.list();
-		assertNotNull( result );
-		assertEquals( "Query with delete objects", 0, result.size() );
+		assertThat( result ).isNotNull();
+		assertThat( result ).as( "Query with delete objects" ).isEmpty();
 
 		tx.commit();
 		fullTextSession.close();
 	}
 
 	@Test
-	public void testResultSize() throws Exception {
+	void testResultSize() throws Exception {
 		FullTextSession fullTextSession = Search.getFullTextSession( openSession() );
 		Transaction tx = fullTextSession.beginTransaction();
 		QueryParser parser = new QueryParser( "title", TestConstants.stopAnalyzer );
@@ -106,14 +102,14 @@ public class LuceneQueryTest extends SearchTestBase {
 			stats.setStatisticsEnabled( true );
 		}
 		FullTextQuery hibQuery = fullTextSession.createFullTextQuery( query, Clock.class, Book.class );
-		assertEquals( "Exection of getResultSize without actual results", 2, hibQuery.getResultSize() );
-		assertEquals( "No entity should be loaded", 0, stats.getEntityLoadCount() );
+		assertThat( hibQuery.getResultSize() ).as( "Exection of getResultSize without actual results" ).isEqualTo( 2 );
+		assertThat( stats.getEntityLoadCount() ).as( "No entity should be loaded" ).isEqualTo( 0 );
 
 		query = parser.parse( "summary:Festina Or brand:Seiko" );
 		hibQuery = fullTextSession.createFullTextQuery( query );
 		List result = hibQuery.list();
-		assertNotNull( result );
-		assertEquals( "2 entities should be loaded", 2, stats.getEntityLoadCount() );
+		assertThat( result ).isNotNull();
+		assertThat( stats.getEntityLoadCount() ).as( "2 entities should be loaded" ).isEqualTo( 2 );
 		if ( !enabled ) {
 			stats.setStatisticsEnabled( false );
 		}
@@ -123,7 +119,7 @@ public class LuceneQueryTest extends SearchTestBase {
 	}
 
 	@Test
-	public void testResultSizeWithOffset() throws Exception {
+	void testResultSizeWithOffset() throws Exception {
 		FullTextSession fullTextSession = Search.getFullTextSession( openSession() );
 		Transaction tx = fullTextSession.beginTransaction();
 		QueryParser parser = new QueryParser( "title", TestConstants.stopAnalyzer );
@@ -132,15 +128,15 @@ public class LuceneQueryTest extends SearchTestBase {
 		org.hibernate.query.Query hibQuery = fullTextSession.createFullTextQuery( query, Clock.class, Book.class );
 		hibQuery.setFirstResult( 1 );
 		List result = hibQuery.list();
-		assertNotNull( result );
-		assertEquals( "first result no max result", 1, result.size() );
+		assertThat( result ).isNotNull();
+		assertThat( result ).as( "first result no max result" ).hasSize( 1 );
 
 		tx.commit();
 		fullTextSession.close();
 	}
 
 	@Test
-	public void testMaxResultLessThanTotalNumberOfHits() throws Exception {
+	void testMaxResultLessThanTotalNumberOfHits() throws Exception {
 		FullTextSession fullTextSession = Search.getFullTextSession( openSession() );
 		Transaction tx = fullTextSession.beginTransaction();
 		QueryParser parser = new QueryParser( "title", TestConstants.stopAnalyzer );
@@ -150,15 +146,15 @@ public class LuceneQueryTest extends SearchTestBase {
 		hibQuery.setFirstResult( 0 );
 		hibQuery.setMaxResults( 1 );
 		List result = hibQuery.list();
-		assertNotNull( result );
-		assertEquals( "max result set", 1, result.size() );
+		assertThat( result ).isNotNull()
+				.hasSize( 1 );
 
 		tx.commit();
 		fullTextSession.close();
 	}
 
 	@Test
-	public void testMaxResultMoreThanTotalNumberOfHits() throws Exception {
+	void testMaxResultMoreThanTotalNumberOfHits() throws Exception {
 		FullTextSession fullTextSession = Search.getFullTextSession( openSession() );
 		Transaction tx = fullTextSession.beginTransaction();
 		QueryParser parser = new QueryParser( "title", TestConstants.stopAnalyzer );
@@ -168,15 +164,15 @@ public class LuceneQueryTest extends SearchTestBase {
 		hibQuery.setFirstResult( 0 );
 		hibQuery.setMaxResults( 3 );
 		List result = hibQuery.list();
-		assertNotNull( result );
-		assertEquals( "max result out of limit", 2, result.size() );
+		assertThat( result ).isNotNull();
+		assertThat( result ).as( "max result out of limit" ).hasSize( 2 );
 
 		tx.commit();
 		fullTextSession.close();
 	}
 
 	@Test
-	public void testMaxResultWithOffset() throws Exception {
+	void testMaxResultWithOffset() throws Exception {
 		FullTextSession fullTextSession = Search.getFullTextSession( openSession() );
 		Transaction tx = fullTextSession.beginTransaction();
 		QueryParser parser = new QueryParser( "title", TestConstants.stopAnalyzer );
@@ -187,15 +183,15 @@ public class LuceneQueryTest extends SearchTestBase {
 		hibQuery.setFirstResult( 2 );
 		hibQuery.setMaxResults( 3 );
 		List result = hibQuery.list();
-		assertNotNull( result );
-		assertEquals( "first result out of limit", 0, result.size() );
+		assertThat( result ).isNotNull();
+		assertThat( result ).as( "first result out of limit" ).isEmpty();
 
 		tx.commit();
 		fullTextSession.close();
 	}
 
 	@Test
-	public void testScrollableResultSet() throws Exception {
+	void testScrollableResultSet() throws Exception {
 		FullTextSession fullTextSession = Search.getFullTextSession( openSession() );
 		Transaction tx = fullTextSession.beginTransaction();
 		QueryParser parser = new QueryParser( "title", TestConstants.stopAnalyzer );
@@ -203,21 +199,21 @@ public class LuceneQueryTest extends SearchTestBase {
 		Query query = parser.parse( "summary:noword" );
 		org.hibernate.query.Query hibQuery = fullTextSession.createFullTextQuery( query, Clock.class, Book.class );
 		ScrollableResults result = hibQuery.scroll();
-		assertNotNull( result );
-		assertEquals( -1, result.getRowNumber() );
-		assertEquals( false, result.next() );
+		assertThat( result ).isNotNull();
+		assertThat( result.getRowNumber() ).isEqualTo( -1 );
+		assertThat( result.next() ).isFalse();
 		result.close();
 
 		query = parser.parse( "summary:Festina Or brand:Seiko" );
 		hibQuery = fullTextSession.createFullTextQuery( query, Clock.class, Book.class );
 		result = hibQuery.scroll();
-		assertEquals( -1, result.getRowNumber() );
+		assertThat( result.getRowNumber() ).isEqualTo( -1 );
 		result.beforeFirst();
-		assertEquals( true, result.next() );
-		assertTrue( result.isFirst() );
-		assertTrue( result.scroll( 1 ) );
-		assertTrue( result.isLast() );
-		assertFalse( result.scroll( 1 ) );
+		assertThat( result.next() ).isTrue();
+		assertThat( result.isFirst() ).isTrue();
+		assertThat( result.scroll( 1 ) ).isTrue();
+		assertThat( result.isLast() ).isTrue();
+		assertThat( result.scroll( 1 ) ).isFalse();
 
 		tx.commit();
 		fullTextSession.close();
@@ -226,7 +222,7 @@ public class LuceneQueryTest extends SearchTestBase {
 	// Technically this is checked by other tests but let's do it anyway. J.G.
 
 	@Test
-	public void testDefaultFetchSize() throws Exception {
+	void testDefaultFetchSize() throws Exception {
 		FullTextSession fullTextSession = Search.getFullTextSession( openSession() );
 		Transaction tx = fullTextSession.beginTransaction();
 		QueryParser parser = new QueryParser( "dept", TestConstants.standardAnalyzer );
@@ -238,17 +234,17 @@ public class LuceneQueryTest extends SearchTestBase {
 		ScrollableResults projections = hibQuery.scroll();
 		projections.beforeFirst();
 		Object[] projection = (Object[]) projections.get();
-		assertNull( projection );
+		assertThat( projection ).isNull();
 
 		projections.next();
-		assertTrue( projections.isFirst() );
+		assertThat( projections.isFirst() ).isTrue();
 
 		tx.commit();
 		fullTextSession.close();
 	}
 
 	@Test
-	public void testFetchSizeLargerThanHits() throws Exception {
+	void testFetchSizeLargerThanHits() throws Exception {
 		FullTextSession fullTextSession = Search.getFullTextSession( openSession() );
 		Transaction tx = fullTextSession.beginTransaction();
 		QueryParser parser = new QueryParser( "dept", TestConstants.standardAnalyzer );
@@ -264,14 +260,14 @@ public class LuceneQueryTest extends SearchTestBase {
 		results.beforeFirst();
 		results.next();
 		Object[] result = (Object[]) results.get();
-		assertEquals( "incorrect entityInfo returned", 1000, result[0] );
+		assertThat( result[0] ).as( "incorrect entityInfo returned" ).isEqualTo( 1000 );
 
 		tx.commit();
 		fullTextSession.close();
 	}
 
 	@Test
-	public void testFetchSizeDefaultMax() throws Exception {
+	void testFetchSizeDefaultMax() throws Exception {
 		FullTextSession fullTextSession = Search.getFullTextSession( openSession() );
 		Transaction tx = fullTextSession.beginTransaction();
 		QueryParser parser = new QueryParser( "dept", TestConstants.standardAnalyzer );
@@ -287,21 +283,21 @@ public class LuceneQueryTest extends SearchTestBase {
 		results.beforeFirst();
 		results.next();
 		Object[] result = (Object[]) results.get();
-		assertEquals( "incorrect entityInfo returned", 1000, result[0] );
+		assertThat( result[0] ).as( "incorrect entityInfo returned" ).isEqualTo( 1000 );
 		results.scroll( 2 );
 		result = (Object[]) results.get();
-		assertEquals( "incorrect entityInfo returned", 1003, result[0] );
+		assertThat( result[0] ).as( "incorrect entityInfo returned" ).isEqualTo( 1003 );
 		// check cache addition
 		results.next();
 		result = (Object[]) results.get();
-		assertEquals( "incorrect entityInfo returned", 1004, result[0] );
+		assertThat( result[0] ).as( "incorrect entityInfo returned" ).isEqualTo( 1004 );
 
 		tx.commit();
 		fullTextSession.close();
 	}
 
 	@Test
-	public void testFetchSizeNonDefaultMax() throws Exception {
+	void testFetchSizeNonDefaultMax() throws Exception {
 		FullTextSession fullTextSession = Search.getFullTextSession( openSession() );
 		Transaction tx = fullTextSession.beginTransaction();
 		QueryParser parser = new QueryParser( "dept", TestConstants.standardAnalyzer );
@@ -318,19 +314,19 @@ public class LuceneQueryTest extends SearchTestBase {
 		results.beforeFirst();
 		results.next();
 		Object[] result = (Object[]) results.get();
-		assertEquals( "incorrect entityInfo returned", 1000, result[0] );
+		assertThat( result[0] ).as( "incorrect entityInfo returned" ).isEqualTo( 1000 );
 
 		results.next();
 		result = (Object[]) results.get();
-		assertEquals( "incorrect entityInfo returned", 1002, result[0] );
+		assertThat( result[0] ).as( "incorrect entityInfo returned" ).isEqualTo( 1002 );
 
 		results.scroll( 2 );
 		result = (Object[]) results.get();
-		assertEquals( "incorrect entityInfo returned", 1004, result[0] );
+		assertThat( result[0] ).as( "incorrect entityInfo returned" ).isEqualTo( 1004 );
 
 		results.next();
 		result = (Object[]) results.get();
-		assertNull( result );
+		assertThat( result ).isNull();
 
 		results.close();
 
@@ -339,19 +335,19 @@ public class LuceneQueryTest extends SearchTestBase {
 		results.beforeFirst();
 		results.next();
 		result = (Object[]) results.get();
-		assertEquals( "incorrect entityInfo returned", 1000, result[0] );
+		assertThat( result[0] ).as( "incorrect entityInfo returned" ).isEqualTo( 1000 );
 
 		// And test a bad forward scroll.
 		results.scroll( 10 );
 		result = (Object[]) results.get();
-		assertNull( result );
+		assertThat( result ).isNull();
 
 		tx.commit();
 		fullTextSession.close();
 	}
 
 	@Test
-	public void testFetchSizeNonDefaultMaxNoHits() throws Exception {
+	void testFetchSizeNonDefaultMaxNoHits() throws Exception {
 		FullTextSession fullTextSession = Search.getFullTextSession( openSession() );
 		Transaction tx = fullTextSession.beginTransaction();
 		QueryParser parser = new QueryParser( "dept", TestConstants.standardAnalyzer );
@@ -365,7 +361,7 @@ public class LuceneQueryTest extends SearchTestBase {
 		ScrollableResults results = hibQuery.scroll();
 		results.beforeFirst();
 		Object[] result = (Object[]) results.get();
-		assertNull( "non-null entity infos returned", result );
+		assertThat( result ).as( "non-null entity infos returned" ).isNull();
 
 		tx.commit();
 		fullTextSession.close();
@@ -377,7 +373,7 @@ public class LuceneQueryTest extends SearchTestBase {
 	 * @throws Exception in case the test fails.
 	 */
 	@Test
-	public void testMaxResultZero() throws Exception {
+	void testMaxResultZero() throws Exception {
 		FullTextSession fullTextSession = Search.getFullTextSession( openSession() );
 		Transaction tx = fullTextSession.beginTransaction();
 		QueryParser parser = new QueryParser( "dept", TestConstants.standardAnalyzer );
@@ -387,20 +383,20 @@ public class LuceneQueryTest extends SearchTestBase {
 		hibQuery.setMaxResults( 0 );
 
 		List result = hibQuery.list();
-		assertTrue( "We should get the empty result list", result.isEmpty() );
+		assertThat( result ).as( "We should get the empty result list" ).isEmpty();
 
 		hibQuery.setFirstResult( 1 );
 		hibQuery.setMaxResults( 0 );
 
 		result = hibQuery.list();
-		assertTrue( "We should get the empty result list", result.isEmpty() );
+		assertThat( result ).as( "We should get the empty result list" ).isEmpty();
 
 		tx.commit();
 		fullTextSession.close();
 	}
 
 	@Test
-	public void testCurrent() throws Exception {
+	void testCurrent() throws Exception {
 		FullTextSession fullTextSession = Search.getFullTextSession( openSession() );
 		Transaction tx = fullTextSession.beginTransaction();
 		QueryParser parser = new QueryParser( "dept", TestConstants.standardAnalyzer );
@@ -414,13 +410,13 @@ public class LuceneQueryTest extends SearchTestBase {
 		ScrollableResults results = hibQuery.scroll();
 		results.beforeFirst();
 		results.next();
-		assertTrue( "beforeFirst() pointer incorrect", results.isFirst() );
+		assertThat( results.isFirst() ).as( "beforeFirst() pointer incorrect" ).isTrue();
 
 		results.last();
-		assertTrue( "last() pointer incorrect", results.isLast() );
+		assertThat( results.isLast() ).as( "last() pointer incorrect" ).isTrue();
 
 		results.afterLast();
-		assertEquals( "afterLast() pointer incorrect", -1, results.getRowNumber() );
+		assertThat( results.getRowNumber() ).as( "afterLast() pointer incorrect" ).isEqualTo( -1 );
 
 		// Let's test a REAL screwup.
 		hibQuery.setMaxResults( 4 );
@@ -428,18 +424,18 @@ public class LuceneQueryTest extends SearchTestBase {
 		results = hibQuery.scroll();
 		results.scroll( 4 );
 		Object[] result = (Object[]) results.get();
-		assertEquals( 1004, result[0] );
+		assertThat( result[0] ).isEqualTo( 1004 );
 
 		results.last();
 		result = (Object[]) results.get();
-		assertEquals( 1004, result[0] );
+		assertThat( result[0] ).isEqualTo( 1004 );
 
 		tx.commit();
 		fullTextSession.close();
 	}
 
 	@Test
-	public void testScrollFirstResult() throws Exception {
+	void testScrollFirstResult() throws Exception {
 		FullTextSession fullTextSession = Search.getFullTextSession( openSession() );
 		Transaction tx = fullTextSession.beginTransaction();
 		QueryParser parser = new QueryParser( "dept", TestConstants.standardAnalyzer );
@@ -462,7 +458,7 @@ public class LuceneQueryTest extends SearchTestBase {
 	}
 
 	@Test
-	public void testNoGraph() throws Exception {
+	void testNoGraph() throws Exception {
 		FullTextSession fullTextSession = Search.getFullTextSession( openSession() );
 		Transaction tx = fullTextSession.beginTransaction();
 		QueryParser parser = new QueryParser( "title", TestConstants.stopAnalyzer );
@@ -470,17 +466,17 @@ public class LuceneQueryTest extends SearchTestBase {
 		Query query = parser.parse( "summary:Festina" );
 		org.hibernate.query.Query hibQuery = fullTextSession.createFullTextQuery( query, Book.class );
 		List result = hibQuery.list();
-		assertNotNull( result );
-		assertEquals( "Query with no explicit entity graph", 1, result.size() );
+		assertThat( result ).isNotNull();
+		assertThat( result ).as( "Query with no explicit entity graph" ).hasSize( 1 );
 		Book book = (Book) result.get( 0 );
-		assertFalse( "Association should not be initialized", Hibernate.isInitialized( book.getAuthors() ) );
+		assertThat( Hibernate.isInitialized( book.getAuthors() ) ).as( "Association should not be initialized" ).isFalse();
 
 		tx.commit();
 		fullTextSession.close();
 	}
 
 	@Test
-	public void testLoadGraph() throws Exception {
+	void testLoadGraph() throws Exception {
 		FullTextSession fullTextSession = Search.getFullTextSession( openSession() );
 		Transaction tx = fullTextSession.beginTransaction();
 		QueryParser parser = new QueryParser( "title", TestConstants.stopAnalyzer );
@@ -493,18 +489,18 @@ public class LuceneQueryTest extends SearchTestBase {
 		List result = fullTextSession.createFullTextQuery( query, Book.class )
 				.applyLoadGraph( graph )
 				.list();
-		assertNotNull( result );
-		assertEquals( "Query with explicit entity graph", 1, result.size() );
+		assertThat( result ).isNotNull();
+		assertThat( result ).as( "Query with no explicit entity graph" ).hasSize( 1 );
 		Book book = (Book) result.get( 0 );
-		assertTrue( "Association should be initialized", Hibernate.isInitialized( book.getAuthors() ) );
-		assertEquals( 1, book.getAuthors().size() );
+		assertThat( Hibernate.isInitialized( book.getAuthors() ) ).as( "Association should be initialized" ).isTrue();
+		assertThat( book.getAuthors() ).hasSize( 1 );
 
 		tx.commit();
 		fullTextSession.close();
 	}
 
 	@Test
-	public void testFetchGraph() throws Exception {
+	void testFetchGraph() throws Exception {
 		FullTextSession fullTextSession = Search.getFullTextSession( openSession() );
 		Transaction tx = fullTextSession.beginTransaction();
 		QueryParser parser = new QueryParser( "title", TestConstants.stopAnalyzer );
@@ -517,18 +513,18 @@ public class LuceneQueryTest extends SearchTestBase {
 		List result = fullTextSession.createFullTextQuery( query, Book.class )
 				.applyFetchGraph( graph )
 				.list();
-		assertNotNull( result );
-		assertEquals( "Query with explicit entity graph", 1, result.size() );
+		assertThat( result ).isNotNull();
+		assertThat( result ).as( "Query with no explicit entity graph" ).hasSize( 1 );
 		Book book = (Book) result.get( 0 );
-		assertTrue( "Association should be initialized", Hibernate.isInitialized( book.getAuthors() ) );
-		assertEquals( 1, book.getAuthors().size() );
+		assertThat( Hibernate.isInitialized( book.getAuthors() ) ).as( "Association should be initialized" ).isTrue();
+		assertThat( book.getAuthors() ).hasSize( 1 );
 
 		tx.commit();
 		fullTextSession.close();
 	}
 
 	@Test
-	public void testLoadGraphHint() throws Exception {
+	void testLoadGraphHint() throws Exception {
 		FullTextSession fullTextSession = Search.getFullTextSession( openSession() );
 		Transaction tx = fullTextSession.beginTransaction();
 		QueryParser parser = new QueryParser( "title", TestConstants.stopAnalyzer );
@@ -541,18 +537,18 @@ public class LuceneQueryTest extends SearchTestBase {
 		List result = fullTextSession.createFullTextQuery( query, Book.class )
 				.setHint( "jakarta.persistence.loadgraph", graph )
 				.list();
-		assertNotNull( result );
-		assertEquals( "Query with explicit entity graph", 1, result.size() );
+		assertThat( result ).isNotNull();
+		assertThat( result ).as( "Query with no explicit entity graph" ).hasSize( 1 );
 		Book book = (Book) result.get( 0 );
-		assertTrue( "Association should be initialized", Hibernate.isInitialized( book.getAuthors() ) );
-		assertEquals( 1, book.getAuthors().size() );
+		assertThat( Hibernate.isInitialized( book.getAuthors() ) ).as( "Association should be initialized" ).isTrue();
+		assertThat( book.getAuthors() ).hasSize( 1 );
 
 		tx.commit();
 		fullTextSession.close();
 	}
 
 	@Test
-	public void testFetchGraphHint() throws Exception {
+	void testFetchGraphHint() throws Exception {
 		FullTextSession fullTextSession = Search.getFullTextSession( openSession() );
 		Transaction tx = fullTextSession.beginTransaction();
 		QueryParser parser = new QueryParser( "title", TestConstants.stopAnalyzer );
@@ -565,18 +561,18 @@ public class LuceneQueryTest extends SearchTestBase {
 		List result = fullTextSession.createFullTextQuery( query, Book.class )
 				.setHint( "jakarta.persistence.fetchgraph", graph )
 				.list();
-		assertNotNull( result );
-		assertEquals( "Query with explicit entity graph", 1, result.size() );
+		assertThat( result ).isNotNull();
+		assertThat( result ).as( "Query with no explicit entity graph" ).hasSize( 1 );
 		Book book = (Book) result.get( 0 );
-		assertTrue( "Association should be initialized", Hibernate.isInitialized( book.getAuthors() ) );
-		assertEquals( 1, book.getAuthors().size() );
+		assertThat( Hibernate.isInitialized( book.getAuthors() ) ).as( "Association should be initialized" ).isTrue();
+		assertThat( book.getAuthors() ).hasSize( 1 );
 
 		tx.commit();
 		fullTextSession.close();
 	}
 
 	@Test
-	public void testScrollEmptyHits() throws Exception {
+	void testScrollEmptyHits() throws Exception {
 		FullTextSession fullTextSession = Search.getFullTextSession( openSession() );
 		Transaction tx = fullTextSession.beginTransaction();
 		QueryParser parser = new QueryParser( "dept", TestConstants.standardAnalyzer );
@@ -588,7 +584,7 @@ public class LuceneQueryTest extends SearchTestBase {
 		projections.beforeFirst();
 		projections.next();
 		Object[] projection = (Object[]) projections.get();
-		assertNull( projection );
+		assertThat( projection ).isNull();
 
 		hibQuery = fullTextSession.createFullTextQuery( query, Employee.class ).setMaxResults( 20 );
 
@@ -596,14 +592,14 @@ public class LuceneQueryTest extends SearchTestBase {
 		projections.beforeFirst();
 		projections.next();
 		projection = (Object[]) projections.get();
-		assertNull( projection );
+		assertThat( projection ).isNull();
 
 		tx.commit();
 		fullTextSession.close();
 	}
 
 	@Test
-	public void testListEmptyHits() throws Exception {
+	void testListEmptyHits() throws Exception {
 		FullTextSession fullTextSession = Search.getFullTextSession( openSession() );
 		Transaction tx = fullTextSession.beginTransaction();
 		QueryParser parser = new QueryParser( "dept", TestConstants.standardAnalyzer );
@@ -611,11 +607,11 @@ public class LuceneQueryTest extends SearchTestBase {
 		Query query = parser.parse( "dept:XXX" );
 		org.hibernate.search.FullTextQuery hibQuery = fullTextSession.createFullTextQuery( query, Employee.class );
 		List result = hibQuery.list();
-		assertEquals( 0, result.size() );
+		assertThat( result ).isEmpty();
 
 		hibQuery = fullTextSession.createFullTextQuery( query, Employee.class ).setFirstResult( 10 ).setMaxResults( 20 );
 		result = hibQuery.list();
-		assertEquals( 0, result.size() );
+		assertThat( result ).isEmpty();
 
 		tx.commit();
 		fullTextSession.close();

@@ -6,8 +6,7 @@
  */
 package org.hibernate.search.test.embedded.update;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNull;
+import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.HashSet;
 import java.util.List;
@@ -33,7 +32,7 @@ import org.hibernate.search.mapper.pojo.mapping.definition.annotation.IndexingDe
 import org.hibernate.search.test.SearchTestBase;
 import org.hibernate.search.testsupport.TestForIssue;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import org.apache.lucene.index.Term;
 import org.apache.lucene.search.TermQuery;
@@ -43,11 +42,11 @@ import org.apache.lucene.search.TermQuery;
  *
  * @author Davide Di Somma <davide.disomma@gmail.com>
  */
-public class UpdateIndexedEmbeddedCollectionTest extends SearchTestBase {
+class UpdateIndexedEmbeddedCollectionTest extends SearchTestBase {
 
 	@TestForIssue(jiraKey = "HSEARCH-734")
 	@Test
-	public void testUpdateIndexedEmbeddedCollectionWithNull() throws Exception {
+	void testUpdateIndexedEmbeddedCollectionWithNull() {
 
 		// load the truck with number plate "LVN 746 XD" guided by driver Mark Smith
 		Driver driverSmith = new Driver( "Mark", "Smith" );
@@ -85,8 +84,8 @@ public class UpdateIndexedEmbeddedCollectionTest extends SearchTestBase {
 		final Long truckMLN666DJId = truckMLN666DJ.getId();
 		session = Search.getFullTextSession( openSession() );
 		tx = session.beginTransaction();
-		assertEquals( truckMLN666DJId, findTruckIdFromIndex( session, "armchair" ) );
-		assertEquals( truckLVN746XDId, findTruckIdFromIndex( session, "table" ) );
+		assertThat( findTruckIdFromIndex( session, "armchair" ) ).isEqualTo( truckMLN666DJId );
+		assertThat( findTruckIdFromIndex( session, "table" ) ).isEqualTo( truckLVN746XDId );
 		tx.commit();
 		session.close();
 
@@ -104,7 +103,7 @@ public class UpdateIndexedEmbeddedCollectionTest extends SearchTestBase {
 		// let's assert that indexes got updated correctly
 		session = Search.getFullTextSession( openSession() );
 		tx = session.beginTransaction();
-		assertNull( findTruckIdFromIndex( session, "table" ) );
+		assertThat( findTruckIdFromIndex( session, "table" ) ).isNull();
 		tx.commit();
 		session.close();
 

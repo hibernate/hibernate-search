@@ -7,8 +7,7 @@
 
 package org.hibernate.search.test.batchindexing;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.List;
 
@@ -21,7 +20,7 @@ import org.hibernate.search.Search;
 import org.hibernate.search.test.SearchTestBase;
 import org.hibernate.search.testsupport.TestForIssue;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import org.apache.lucene.index.Term;
 import org.apache.lucene.search.MatchAllDocsQuery;
@@ -29,12 +28,12 @@ import org.apache.lucene.search.Query;
 import org.apache.lucene.search.TermQuery;
 
 @TestForIssue(jiraKey = "HSEARCH-1240")
-public class MassIndexerIndexedEmbeddedProxyTest extends SearchTestBase {
+class MassIndexerIndexedEmbeddedProxyTest extends SearchTestBase {
 
 	private static final String TEST_NAME_CONTENT = "name";
 
 	@Test
-	public void testMassIndexerWithProxyTest() throws InterruptedException {
+	void testMassIndexerWithProxyTest() throws InterruptedException {
 		prepareEntities();
 
 		verifyMatchExistsWithName( "lazyEntity.name", TEST_NAME_CONTENT );
@@ -50,7 +49,7 @@ public class MassIndexerIndexedEmbeddedProxyTest extends SearchTestBase {
 	}
 
 	@Test
-	public void testMassIndexerRepeatedInvocation() throws InterruptedException {
+	void testMassIndexerRepeatedInvocation() throws InterruptedException {
 		//Test that the MassIndexer can be started multiple times
 		prepareEntities();
 
@@ -81,8 +80,8 @@ public class MassIndexerIndexedEmbeddedProxyTest extends SearchTestBase {
 			FullTextQuery fullTextQuery = fullTextSession.createFullTextQuery( q );
 			int resultSize = fullTextQuery.getResultSize();
 			List list = fullTextQuery.list();
-			assertEquals( 0, resultSize );
-			assertTrue( list.isEmpty() );
+			assertThat( resultSize ).isZero();
+			assertThat( list ).isEmpty();
 		}
 		finally {
 			fullTextSession.close();
@@ -117,11 +116,11 @@ public class MassIndexerIndexedEmbeddedProxyTest extends SearchTestBase {
 			Query q = new TermQuery( new Term( fieldName, fieldValue ) );
 			FullTextQuery fullTextQuery = fullTextSession.createFullTextQuery( q );
 			int resultSize = fullTextQuery.getResultSize();
-			assertEquals( 1, resultSize );
+			assertThat( resultSize ).isEqualTo( 1 );
 
 			@SuppressWarnings("unchecked")
 			List<IndexedEmbeddedProxyRootEntity> list = fullTextQuery.list();
-			assertEquals( 1, list.size() );
+			assertThat( list ).hasSize( 1 );
 			transaction.commit();
 		}
 		finally {

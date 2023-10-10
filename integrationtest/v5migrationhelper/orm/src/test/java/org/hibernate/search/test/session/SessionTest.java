@@ -6,8 +6,8 @@
  */
 package org.hibernate.search.test.session;
 
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.fail;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.fail;
 
 import java.lang.reflect.Proxy;
 import java.util.Map;
@@ -21,16 +21,16 @@ import org.hibernate.event.spi.EventSource;
 import org.hibernate.search.FullTextSession;
 import org.hibernate.search.Search;
 import org.hibernate.search.test.SearchTestBase;
-import org.hibernate.search.testsupport.junit.PortedToSearch6;
+import org.hibernate.search.testsupport.junit.Tags;
 
-import org.junit.Test;
-import org.junit.experimental.categories.Category;
+import org.junit.jupiter.api.Tag;
+import org.junit.jupiter.api.Test;
 
 /**
  * @author Emmanuel Bernard
  */
-@Category(PortedToSearch6.class)
-public class SessionTest extends SearchTestBase {
+@Tag(Tags.PORTED_TO_SEARCH_6)
+class SessionTest extends SearchTestBase {
 
 	//EventSource, org.hibernate.Session, LobCreationContext
 	private static final Class<?>[] SESS_PROXY_INTERFACES = new Class[] {
@@ -42,7 +42,7 @@ public class SessionTest extends SearchTestBase {
 	};
 
 	@Test
-	public void testSessionWrapper() throws Exception {
+	void testSessionWrapper() {
 		Session s = openSession();
 		DelegationWrapper wrapper = new DelegationWrapper( s );
 		Session wrapped = (Session) Proxy.newProxyInstance(
@@ -61,11 +61,11 @@ public class SessionTest extends SearchTestBase {
 	}
 
 	@Test
-	public void testThreadBoundSessionWrappingOutOfTransaction() throws Exception {
+	void testThreadBoundSessionWrappingOutOfTransaction() {
 		final Session session = getSessionFactory().getCurrentSession();
 		try {
 			FullTextSession fts = Search.getFullTextSession( session );
-			assertNotNull( fts );
+			assertThat( fts ).isNotNull();
 			//success
 		}
 		finally {

@@ -677,13 +677,6 @@
             </dependency>
 
             <!-- Test -->
-            <!-- JUnit 4 is only used for legacy v5 tests that we won't be changing-->
-            <dependency>
-                <groupId>junit</groupId>
-                <artifactId>junit</artifactId>
-                <version>${version.junit}</version>
-            </dependency>
-
             <dependency>
                 <groupId>org.junit</groupId>
                 <artifactId>junit-bom</artifactId>

@@ -22,9 +22,9 @@ import org.hibernate.search.testsupport.junit.SearchFactoryHolder;
 import org.hibernate.search.testsupport.junit.SearchITHelper;
 import org.hibernate.search.testsupport.junit.SearchITHelper.AssertBuildingHSQueryContext;
 
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 
 import org.apache.lucene.search.Query;
 import org.apache.lucene.search.Sort;
@@ -34,14 +34,14 @@ import org.apache.lucene.search.Sort;
  * @author Yoann Rodiere
  */
 @TestForIssue(jiraKey = "HSEARCH-1872")
-public class SortDSLTest {
-	@Rule
+class SortDSLTest {
+	@RegisterExtension
 	public final SearchFactoryHolder sfHolder = new SearchFactoryHolder( IndexedEntry.class );
 
 	private final SearchITHelper helper = new SearchITHelper( sfHolder );
 
-	@Before
-	public void prepareTestData() {
+	@BeforeEach
+	void prepareTestData() {
 		IndexedEntry entry0 = new IndexedEntry( 0 )
 				.setTextField(
 						"infrequent1 infrequent2 infrequent1"
@@ -111,7 +111,7 @@ public class SortDSLTest {
 	}
 
 	@Test
-	public void score() throws Exception {
+	void score() {
 		Query query = builder().keyword()
 				.onField( "textField" )
 				.matching( "infrequent1" )
@@ -139,7 +139,7 @@ public class SortDSLTest {
 	}
 
 	@Test
-	public void docID() throws Exception {
+	void docID() {
 		Sort sort = builder().sort()
 				.byIndexOrder()
 				.createSort();
@@ -162,7 +162,7 @@ public class SortDSLTest {
 	}
 
 	@Test
-	public void singleField() throws Exception {
+	void singleField() {
 		// Missing value is not provided; the missing values should be considered as 0
 
 		Sort sort = builder().sort()
@@ -184,7 +184,7 @@ public class SortDSLTest {
 	}
 
 	@Test
-	public void singleField_double_missingValue_use() throws Exception {
+	void singleField_double_missingValue_use() {
 		Sort sort = builder().sort()
 				.byField( "uniqueDoubleField" )
 				.onMissingValue().use( 1.5d )
@@ -207,7 +207,7 @@ public class SortDSLTest {
 	}
 
 	@Test
-	public void singleField_integer_missingValue_use() throws Exception {
+	void singleField_integer_missingValue_use() {
 		Sort sort = builder().sort()
 				.byField( "uniqueIntegerField" )
 				.onMissingValue().use( 2 )
@@ -230,7 +230,7 @@ public class SortDSLTest {
 	}
 
 	@Test
-	public void singleField_double_missingValue_sortFirst() throws Exception {
+	void singleField_double_missingValue_sortFirst() {
 		Sort sort = builder().sort()
 				.byField( "uniqueDoubleField" )
 				.onMissingValue().sortFirst()
@@ -253,7 +253,7 @@ public class SortDSLTest {
 	}
 
 	@Test
-	public void singleField_integer_missingValue_sortFirst() throws Exception {
+	void singleField_integer_missingValue_sortFirst() {
 		Sort sort = builder().sort()
 				.byField( "uniqueIntegerField" )
 				.onMissingValue().sortFirst()
@@ -276,7 +276,7 @@ public class SortDSLTest {
 	}
 
 	@Test
-	public void singleField_missingValue_sortLast() throws Exception {
+	void singleField_missingValue_sortLast() {
 		Sort sort = builder().sort()
 				.byField( "uniqueDoubleField" )
 				.onMissingValue().sortLast()
@@ -299,7 +299,7 @@ public class SortDSLTest {
 	}
 
 	@Test
-	public void multipleFields() throws Exception {
+	void multipleFields() {
 		Sort sort = builder().sort()
 				.byField( "nonUniqueIntegerField" )
 				.andByField( "uniqueDoubleField" )
@@ -322,7 +322,7 @@ public class SortDSLTest {
 	}
 
 	@Test
-	public void distance() throws Exception {
+	void distance() {
 		Sort sort = builder().sort()
 				.byDistance()
 				.onField( "location" )
@@ -348,7 +348,7 @@ public class SortDSLTest {
 	}
 
 	@Test
-	public void fieldThenScore() throws Exception {
+	void fieldThenScore() {
 		Query query = builder().keyword()
 				.onField( "textField" )
 				.matching( "inMultipleDocsWithUniqueScores" )
@@ -376,7 +376,7 @@ public class SortDSLTest {
 	}
 
 	@Test
-	public void scoreThenField() throws Exception {
+	void scoreThenField() {
 		Query query = builder().keyword()
 				.onField( "textField" )
 				.matching( "inMultipleDocsWithVariousScores" )
@@ -405,7 +405,7 @@ public class SortDSLTest {
 
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-2587")
-	public void embeddedField() throws Exception {
+	void embeddedField() {
 		// Missing value is not provided; the missing values should be considered as 0
 
 		Sort sort = builder().sort()

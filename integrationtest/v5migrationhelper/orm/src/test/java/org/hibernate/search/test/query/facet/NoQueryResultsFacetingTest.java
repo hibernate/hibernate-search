@@ -6,8 +6,7 @@
  */
 package org.hibernate.search.test.query.facet;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.List;
 
@@ -18,10 +17,10 @@ import org.hibernate.search.query.engine.spi.FacetManager;
 import org.hibernate.search.query.facet.Facet;
 import org.hibernate.search.query.facet.FacetSortOrder;
 import org.hibernate.search.query.facet.FacetingRequest;
-import org.hibernate.search.testsupport.junit.PortedToSearch6;
+import org.hibernate.search.testsupport.junit.Tags;
 
-import org.junit.Test;
-import org.junit.experimental.categories.Category;
+import org.junit.jupiter.api.Tag;
+import org.junit.jupiter.api.Test;
 
 import org.apache.lucene.index.Term;
 import org.apache.lucene.search.Query;
@@ -30,12 +29,12 @@ import org.apache.lucene.search.TermQuery;
 /**
  * @author Hardy Ferentschik
  */
-@Category(PortedToSearch6.class)
-public class NoQueryResultsFacetingTest extends AbstractFacetTest {
+@Tag(Tags.PORTED_TO_SEARCH_6)
+class NoQueryResultsFacetingTest extends AbstractFacetTest {
 	private final String facetName = "ccs";
 
 	@Test
-	public void testSimpleDiscretFacetingWithNoResultsQuery() throws Exception {
+	void testSimpleDiscretFacetingWithNoResultsQuery() {
 		FacetingRequest request = queryBuilder( Car.class ).facet()
 				.name( facetName )
 				.onField( Car.CUBIC_CAPACITY_STRING_FACET_STRING_ENCODING )
@@ -44,11 +43,11 @@ public class NoQueryResultsFacetingTest extends AbstractFacetTest {
 		FullTextQuery query = queryHondaNoResultsWithFacet( request );
 
 		List<Facet> facetList = query.getFacetManager().getFacets( facetName );
-		assertEquals( "Wrong number of facets", 0, facetList.size() );
+		assertThat( facetList ).as( "Wrong number of facets" ).isEmpty();
 	}
 
 	@Test
-	public void testMultipleFacetsWithNoResultsQuery() {
+	void testMultipleFacetsWithNoResultsQuery() {
 		final String descendingOrderedFacet = "desc";
 		FacetingRequest requestDesc = queryBuilder( Car.class ).facet()
 				.name( descendingOrderedFacet )
@@ -76,22 +75,21 @@ public class NoQueryResultsFacetingTest extends AbstractFacetTest {
 		assertFacetCounts( facetManager.getFacets( ascendingOrderedFacet ), new int[] { 0, 0, 0, 0 } );
 
 		facetManager.disableFaceting( descendingOrderedFacet );
-		assertTrue(
-				"descendingOrderedFacet should be disabled", query.getFacetManager().getFacets(
+		assertThat(
+				query.getFacetManager().getFacets(
 						descendingOrderedFacet
-				).isEmpty()
-		);
+				)
+		).as( "descendingOrderedFacet should be disabled" )
+				.isEmpty();
 		assertFacetCounts( facetManager.getFacets( ascendingOrderedFacet ), new int[] { 0, 0, 0, 0 } );
 
 		facetManager.disableFaceting( ascendingOrderedFacet );
-		assertTrue(
-				"descendingOrderedFacet should be disabled",
-				facetManager.getFacets( descendingOrderedFacet ).isEmpty()
-		);
-		assertTrue(
-				"ascendingOrderedFacet should be disabled",
-				facetManager.getFacets( ascendingOrderedFacet ).isEmpty()
-		);
+		assertThat(
+				facetManager.getFacets( descendingOrderedFacet )
+		).as( "descendingOrderedFacet should be disabled" ).isEmpty();
+		assertThat(
+				facetManager.getFacets( ascendingOrderedFacet )
+		).as( "ascendingOrderedFacet should be disabled" ).isEmpty();
 	}
 
 	private FullTextQuery queryHondaNoResultsWithFacet(FacetingRequest request) {
@@ -102,12 +100,12 @@ public class NoQueryResultsFacetingTest extends AbstractFacetTest {
 				.createQuery();
 		FullTextQuery query = fullTextSession.createFullTextQuery( luceneQuery, Car.class );
 		query.getFacetManager().enableFaceting( request );
-		assertEquals( "Wrong number of query matches", 0, query.getResultSize() );
+		assertThat( query.getResultSize() ).as( "Wrong number of query matches" ).isEqualTo( 0 );
 		return query;
 	}
 
 	@Test
-	public void testSimpleDiscretFacetingQuery() throws Exception {
+	void testSimpleDiscretFacetingQuery() {
 		FacetingRequest request = queryBuilder( Car.class ).facet()
 				.name( facetName )
 				.onField( Car.CUBIC_CAPACITY_STRING_FACET_STRING_ENCODING )
@@ -116,11 +114,11 @@ public class NoQueryResultsFacetingTest extends AbstractFacetTest {
 		FullTextQuery query = queryHondaWithFacet( request );
 
 		List<Facet> facetList = query.getFacetManager().getFacets( facetName );
-		assertEquals( "Wrong number of facets", 3, facetList.size() );
+		assertThat( facetList ).as( "Wrong number of facets" ).hasSize( 3 );
 	}
 
 	@Test
-	public void testMultipleFacetsQuery() {
+	void testMultipleFacetsQuery() {
 		final String descendingOrderedFacet = "desc";
 		FacetingRequest requestDesc = queryBuilder( Car.class ).facet()
 				.name( descendingOrderedFacet )
@@ -148,22 +146,20 @@ public class NoQueryResultsFacetingTest extends AbstractFacetTest {
 		assertFacetCounts( facetManager.getFacets( ascendingOrderedFacet ), new int[] { 0, 4, 4, 5 } );
 
 		facetManager.disableFaceting( descendingOrderedFacet );
-		assertTrue(
-				"descendingOrderedFacet should be disabled", query.getFacetManager().getFacets(
+		assertThat(
+				query.getFacetManager().getFacets(
 						descendingOrderedFacet
-				).isEmpty()
-		);
+				)
+		).as( "descendingOrderedFacet should be disabled" ).isEmpty();
 		assertFacetCounts( facetManager.getFacets( ascendingOrderedFacet ), new int[] { 0, 4, 4, 5 } );
 
 		facetManager.disableFaceting( ascendingOrderedFacet );
-		assertTrue(
-				"descendingOrderedFacet should be disabled",
-				facetManager.getFacets( descendingOrderedFacet ).isEmpty()
-		);
-		assertTrue(
-				"ascendingOrderedFacet should be disabled",
-				facetManager.getFacets( ascendingOrderedFacet ).isEmpty()
-		);
+		assertThat(
+				facetManager.getFacets( descendingOrderedFacet )
+		).as( "descendingOrderedFacet should be disabled" ).isEmpty();
+		assertThat(
+				facetManager.getFacets( ascendingOrderedFacet )
+		).as( "ascendingOrderedFacet should be disabled" ).isEmpty();
 	}
 
 	private FullTextQuery queryHondaWithFacet(FacetingRequest request) {
@@ -174,7 +170,7 @@ public class NoQueryResultsFacetingTest extends AbstractFacetTest {
 				.createQuery();
 		FullTextQuery query = fullTextSession.createFullTextQuery( luceneQuery, Car.class );
 		query.getFacetManager().enableFaceting( request );
-		assertEquals( "Wrong number of query matches", 13, query.getResultSize() );
+		assertThat( query.getResultSize() ).as( "Wrong number of query matches" ).isEqualTo( 13 );
 		return query;
 	}
 

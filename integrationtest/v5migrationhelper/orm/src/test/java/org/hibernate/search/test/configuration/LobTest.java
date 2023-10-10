@@ -6,7 +6,7 @@
  */
 package org.hibernate.search.test.configuration;
 
-import static org.junit.Assert.assertEquals;
+import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.List;
 
@@ -27,9 +27,9 @@ import org.hibernate.search.query.dsl.QueryBuilder;
 import org.hibernate.search.test.SearchTestBase;
 import org.hibernate.search.testsupport.TestForIssue;
 
-import org.hibernate.testing.SkipForDialect;
+import org.hibernate.testing.orm.junit.SkipForDialect;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import org.apache.lucene.search.Query;
 
@@ -39,12 +39,11 @@ import org.apache.lucene.search.Query;
  * @author Hardy Ferentschik
  */
 @TestForIssue(jiraKey = "HSEARCH-993")
-public class LobTest extends SearchTestBase {
+class LobTest extends SearchTestBase {
 
 	@Test
-	@SkipForDialect(value = SybaseDialect.class,
-			comment = "Sybase does not support @Lob")
-	public void testCreateIndexSearchEntityWithLobField() {
+	@SkipForDialect(dialectClass = SybaseDialect.class, reason = "Sybase does not support @Lob")
+	void testCreateIndexSearchEntityWithLobField() {
 		// create and index
 		Session session = openSession();
 		Transaction tx = session.beginTransaction();
@@ -66,7 +65,7 @@ public class LobTest extends SearchTestBase {
 
 		FullTextQuery hibernateQuery = fullTextSession.createFullTextQuery( query );
 		List<LobHolder> result = hibernateQuery.list();
-		assertEquals( "We should have a match for the single LobHolder", 1, result.size() );
+		assertThat( result ).as( "We should have a match for the single LobHolder" ).hasSize( 1 );
 
 		tx.commit();
 		session.close();

@@ -22,8 +22,8 @@ import org.hibernate.cfg.Environment;
 import org.hibernate.search.test.testsupport.V5MigrationHelperJPASetupHelper;
 import org.hibernate.search.testsupport.TestConstants;
 
-import org.junit.Before;
-import org.junit.Rule;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.extension.RegisterExtension;
 
 import org.apache.lucene.util.Version;
 
@@ -32,12 +32,12 @@ import org.apache.lucene.util.Version;
  */
 public abstract class JPATestCase {
 
-	@Rule
+	@RegisterExtension
 	public final V5MigrationHelperJPASetupHelper setupHelper = V5MigrationHelperJPASetupHelper.create();
 
 	protected EntityManagerFactory factory;
 
-	@Before
+	@BeforeEach
 	public void setUp() {
 		factory = setupHelper.start().withProperties( getConfig() ).setup( getPersistenceUnitName() );
 	}

@@ -7,9 +7,7 @@
 
 package org.hibernate.search.test.query.facet;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import static org.assertj.core.api.Assertions.assertThat;
 
 import java.lang.invoke.MethodHandles;
 import java.util.ArrayList;
@@ -31,7 +29,7 @@ import org.hibernate.search.query.facet.RangeFacet;
 import org.hibernate.search.util.logging.impl.Log;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import org.apache.lucene.search.Query;
 
@@ -40,59 +38,59 @@ import org.apache.lucene.search.Query;
  *
  * @author Hardy Ferentschik
  */
-public class WebShopTest extends AbstractFacetTest {
+class WebShopTest extends AbstractFacetTest {
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	@Test
-	public void testSimulateClient() {
+	void testSimulateClient() {
 		// get hold of the search service
 		SearchService searchService = new SearchService( getSessionFactory() );
 
 		// execute the search and display main query results
 		List<Car> cars = searchService.searchCar( "BMW" );
-		assertEquals( "We should have matching cars", 12, cars.size() );
+		assertThat( cars ).as( "We should have matching cars" ).hasSize( 12 );
 
 		// get the menu items for faceting
 		Map<String, List<FacetMenuItem>> facetMenuItems = searchService.getMenuItems();
 
 		List<FacetMenuItem> colorMenuItems = facetMenuItems.get( SearchService.colorFacetName );
-		assertEquals( "Wrong number of menu entries", 4, colorMenuItems.size() );
+		assertThat( colorMenuItems ).as( "Wrong number of menu entries" ).hasSize( 4 );
 		for ( FacetMenuItem item : colorMenuItems ) {
-			assertFalse( item.isSelected() );
+			assertThat( item.isSelected() ).isFalse();
 		}
 
 		List<FacetMenuItem> ccsMenuItems = facetMenuItems.get( SearchService.cubicCapacityFacetName );
-		assertEquals( "Wrong number of menu entries", 3, ccsMenuItems.size() );
+		assertThat( ccsMenuItems ).as( "Wrong number of menu entries" ).hasSize( 3 );
 		for ( FacetMenuItem item : ccsMenuItems ) {
-			assertFalse( item.isSelected() );
+			assertThat( item.isSelected() ).isFalse();
 		}
 
 		// let the user select a facet menu
 		FacetMenuItem selectedItem = facetMenuItems.get( SearchService.colorFacetName ).get( 0 );
-		assertEquals( "Wrong facet count", 3, selectedItem.getCount() );
+		assertThat( selectedItem.getCount() ).as( "Wrong facet count" ).isEqualTo( 3 );
 
 		cars = searchService.selectMenuItem( selectedItem );
-		assertEquals( "We should have matching cars", 3, cars.size() );
+		assertThat( cars ).as( "We should have matching cars" ).hasSize( 3 );
 
 		// get the new menu items
 		facetMenuItems = searchService.getMenuItems();
 
 		colorMenuItems = facetMenuItems.get( SearchService.colorFacetName );
-		assertEquals( "Wrong number of menu entries", 1, colorMenuItems.size() );
+		assertThat( colorMenuItems ).as( "Wrong number of menu entries" ).hasSize( 1 );
 		FacetMenuItem menuItem = colorMenuItems.get( 0 );
-		assertEquals( "Wrong facet count", 3, menuItem.getCount() );
-		assertTrue( menuItem.isSelected() );
+		assertThat( menuItem.getCount() ).as( "Wrong facet count" ).isEqualTo( 3 );
+		assertThat( menuItem.isSelected() ).isTrue();
 
 		ccsMenuItems = facetMenuItems.get( SearchService.cubicCapacityFacetName );
-		assertEquals( "Wrong number of menu entries", 3, ccsMenuItems.size() );
+		assertThat( ccsMenuItems ).as( "Wrong number of menu entries" ).hasSize( 3 );
 		for ( FacetMenuItem item : ccsMenuItems ) {
-			assertFalse( item.isSelected() );
+			assertThat( item.isSelected() ).isFalse();
 		}
 
 		// deselect the menuitem again
 		cars = searchService.deSelectMenuItem( menuItem );
-		assertEquals( "We should have matching cars", 12, cars.size() );
+		assertThat( cars ).as( "We should have matching cars" ).hasSize( 12 );
 	}
 
 

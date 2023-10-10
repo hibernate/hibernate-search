@@ -23,27 +23,27 @@ import org.hibernate.search.testsupport.junit.SearchFactoryHolder;
 import org.hibernate.search.testsupport.junit.SearchITHelper;
 import org.hibernate.search.testsupport.junit.SearchITHelper.AssertBuildingHSQueryContext;
 
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 
 import org.apache.lucene.search.Query;
 
-public class NumericFieldTest {
+class NumericFieldTest {
 
-	@Rule
+	@RegisterExtension
 	public final SearchFactoryHolder sfHolder = new SearchFactoryHolder( Location.class, Coordinate.class,
 			PointOfInterest.class, Position.class, TouristAttraction.class, ScoreBoard.class );
 
 	private final SearchITHelper helper = new SearchITHelper( sfHolder );
 
-	@Before
-	public void setUp() throws Exception {
+	@BeforeEach
+	public void setUp() {
 		prepareData();
 	}
 
 	@Test
-	public void testIndexAndSearchNumericField() {
+	void testIndexAndSearchNumericField() {
 		// Range Queries including lower and upper bounds
 		assertRangeQuery( "overriddenFieldName", 1, 3 ).as( "Query id " ).hasResultSize( 3 );
 		assertRangeQuery( "latitude", -10d, 10d ).as( "Query by double range" ).hasResultSize( 3 );
@@ -90,7 +90,7 @@ public class NumericFieldTest {
 
 	@TestForIssue(jiraKey = "HSEARCH-1193")
 	@Test
-	public void testNumericFieldProjections() {
+	void testNumericFieldProjections() {
 		Query latitudeQuery = helper.queryBuilder( Location.class ).range().onField( "latitude" )
 				.from( -20d ).to( -20d ).createQuery();
 		helper.assertThatQuery( latitudeQuery ).from( Location.class )

@@ -6,7 +6,7 @@
  */
 package org.hibernate.search.test.embedded.update;
 
-import static org.junit.Assert.assertEquals;
+import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.List;
 import java.util.Locale;
@@ -18,7 +18,7 @@ import org.hibernate.search.Search;
 import org.hibernate.search.test.SearchTestBase;
 import org.hibernate.search.testsupport.TestForIssue;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import org.apache.lucene.index.Term;
 import org.apache.lucene.search.TermQuery;
@@ -28,10 +28,10 @@ import org.apache.lucene.search.WildcardQuery;
  * @author Guillaume Smet
  */
 @TestForIssue(jiraKey = "HSEARCH-1573")
-public class ContainedInWithoutIndexedEmbeddedReindexPropagationTest extends SearchTestBase {
+class ContainedInWithoutIndexedEmbeddedReindexPropagationTest extends SearchTestBase {
 
 	@Test
-	public void testUpdatingContainedInEntityPropagatesToAllEntitiesSimpleCase() throws Exception {
+	void testUpdatingContainedInEntityPropagatesToAllEntitiesSimpleCase() {
 		// first operation -> save
 		FullTextSession session = Search.getFullTextSession( openSession() );
 		Transaction tx = session.beginTransaction();
@@ -51,7 +51,7 @@ public class ContainedInWithoutIndexedEmbeddedReindexPropagationTest extends Sea
 		// assert that everything got saved correctly
 		session = Search.getFullTextSession( openSession() );
 		tx = session.beginTransaction();
-		assertEquals( 1, getSimpleChildEntitiesFromIndex( session, parent.getName() ).size() );
+		assertThat( getSimpleChildEntitiesFromIndex( session, parent.getName() ) ).hasSize( 1 );
 		tx.commit();
 		session.close();
 
@@ -66,13 +66,13 @@ public class ContainedInWithoutIndexedEmbeddedReindexPropagationTest extends Sea
 		// check that the SimpleChildEntity has been reindexed correctly
 		session = Search.getFullTextSession( openSession() );
 		tx = session.beginTransaction();
-		assertEquals( 1, getSimpleChildEntitiesFromIndex( session, parent.getName() ).size() );
+		assertThat( getSimpleChildEntitiesFromIndex( session, parent.getName() ) ).hasSize( 1 );
 		tx.commit();
 		session.close();
 	}
 
 	@Test
-	public void testUpdatingContainedInEntityPropagatesToAllEntitiesBusinessCase() throws Exception {
+	void testUpdatingContainedInEntityPropagatesToAllEntitiesBusinessCase() throws Exception {
 		ProductModel model = new ProductModel( "042024N" );
 
 		ProductArticle article1 = new ProductArticle( model, "02" );
@@ -101,7 +101,7 @@ public class ContainedInWithoutIndexedEmbeddedReindexPropagationTest extends Sea
 		// assert that everything got saved correctly
 		session = Search.getFullTextSession( openSession() );
 		tx = session.beginTransaction();
-		assertEquals( 2, getShootingBriefsFromIndex( session, model.getMainReferenceCode().getRawValue() ).size() );
+		assertThat( getShootingBriefsFromIndex( session, model.getMainReferenceCode().getRawValue() ) ).hasSize( 2 );
 		tx.commit();
 		session.close();
 
@@ -117,7 +117,7 @@ public class ContainedInWithoutIndexedEmbeddedReindexPropagationTest extends Sea
 		// check that the ProductShootingBrief has been reindexed correctly.
 		session = Search.getFullTextSession( openSession() );
 		tx = session.beginTransaction();
-		assertEquals( 1, getShootingBriefsFromIndex( session, "NEWREF" ).size() );
+		assertThat( getShootingBriefsFromIndex( session, "NEWREF" ) ).hasSize( 1 );
 		tx.commit();
 		session.close();
 	}

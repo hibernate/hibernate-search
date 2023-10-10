@@ -12,15 +12,15 @@ import static org.junit.Assert.fail;
 import org.hibernate.cfg.Configuration;
 import org.hibernate.search.util.common.SearchException;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 /**
  * @author Emmanuel Bernard
  */
-public class UnresolvedBridgeTest {
+class UnresolvedBridgeTest {
 
 	@Test
-	public void testSerializableType() throws Exception {
+	void testSerializableType() {
 		Configuration cfg = new Configuration();
 
 		for ( int i = 0; i < getAnnotatedClasses().length; i++ ) {

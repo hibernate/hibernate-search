@@ -6,7 +6,7 @@
  */
 package org.hibernate.search.test.bridge;
 
-import static org.junit.Assert.assertEquals;
+import static org.assertj.core.api.Assertions.assertThat;
 
 import java.net.URI;
 import java.net.URL;
@@ -23,7 +23,7 @@ import org.hibernate.search.Search;
 import org.hibernate.search.test.SearchTestBase;
 import org.hibernate.search.testsupport.TestConstants;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import org.apache.lucene.document.DateTools;
 import org.apache.lucene.document.DoublePoint;
@@ -40,9 +40,9 @@ import org.apache.lucene.search.TermQuery;
 /**
  * @author Emmanuel Bernard
  */
-public class BridgeTest extends SearchTestBase {
+class BridgeTest extends SearchTestBase {
 	@Test
-	public void testDefaultAndNullBridges() throws Exception {
+	void testDefaultAndNullBridges() throws Exception {
 		Cloud cloud = new Cloud();
 		cloud.setMyDate( null );
 		cloud.setDouble1( null );
@@ -83,7 +83,7 @@ public class BridgeTest extends SearchTestBase {
 				.build();
 
 		result = session.createFullTextQuery( booleanQuery ).list();
-		assertEquals( "find primitives and do not fail on null", 1, result.size() );
+		assertThat( result ).as( "find primitives and do not fail on null" ).hasSize( 1 );
 
 		booleanQuery = new BooleanQuery.Builder()
 				.add( DoublePoint.newRangeQuery( "double1", 2.1, 2.1 ), BooleanClause.Occur.MUST )
@@ -93,33 +93,33 @@ public class BridgeTest extends SearchTestBase {
 				.build();
 
 		result = session.createFullTextQuery( booleanQuery ).list();
-		assertEquals( "null elements should not be stored", 0, result.size() ); //the query is dumb because restrictive
+		assertThat( result ).as( "null elements should not be stored" ).isEmpty(); //the query is dumb because restrictive
 
 		query = parser.parse( "type:dog" );
 		result = session.createFullTextQuery( query ).setProjection( "type" ).list();
-		assertEquals( "Enum projection works", 1, result.size() ); //the query is dumb because restrictive
+		assertThat( result ).as( "Enum projection works" ).hasSize( 1 ); //the query is dumb because restrictive
 
 		query = new TermQuery( new Term( "uri", "http://www.hibernate.org" ) ); //the query is dumb because restrictive
 		result = session.createFullTextQuery( query ).setProjection( "uri" ).list();
-		assertEquals( "URI works", 1, result.size() );
+		assertThat( result ).as( "URI works" ).hasSize( 1 );
 
 		query = new TermQuery( new Term( "url", "http://www.hibernate.org" ) ); //the query is dumb because restrictive
 		result = session.createFullTextQuery( query ).setProjection( "url" ).list();
-		assertEquals( "URL works", 1, result.size() );
+		assertThat( result ).as( "URL works" ).hasSize( 1 );
 
 		query = new TermQuery( new Term( "uuid", "f49c6ba8-8d7f-417a-a255-d594dddf729f" ) );
 		result = session.createFullTextQuery( query ).setProjection( "uuid" ).list();
-		assertEquals( "UUID works", 1, result.size() );
+		assertThat( result ).as( "UUID works" ).hasSize( 1 );
 
 		query = parser.parse(
 				"char1:[" + String.valueOf( Character.MIN_VALUE ) + " TO " + String.valueOf( Character.MAX_VALUE - 2 ) + "]" );
 		result = session.createFullTextQuery( query ).setProjection( "char1" ).list();
-		assertEquals( "Null elements should not be stored, CharacterBridge is not working", 0, result.size() );
+		assertThat( result ).as( "Null elements should not be stored, CharacterBridge is not working" ).isEmpty();
 
 		query = parser.parse( "char2:P" );
 		result = session.createFullTextQuery( query ).setProjection( "char2" ).list();
-		assertEquals( "Wrong results number, CharacterBridge is not working", 1, result.size() );
-		assertEquals( "Wrong result, CharacterBridge is not working", 'P', ( (Object[]) result.get( 0 ) )[0] );
+		assertThat( result ).as( "Wrong results number, CharacterBridge is not working" ).hasSize( 1 );
+		assertThat( ( (Object[]) result.get( 0 ) )[0] ).as( "Wrong result, CharacterBridge is not working" ).isEqualTo( 'P' );
 
 		tx.commit();
 		s.close();
@@ -127,7 +127,7 @@ public class BridgeTest extends SearchTestBase {
 	}
 
 	@Test
-	public void testDateBridge() throws Exception {
+	void testDateBridge() {
 		Calendar c = Calendar.getInstance( TimeZone.getTimeZone( "Europe/Rome" ), Locale.ROOT ); //for the sake of tests
 		c.set( 2000, Calendar.DECEMBER, 15, 3, 43, 2 );
 		c.set( Calendar.MILLISECOND, 5 );
@@ -205,14 +205,14 @@ public class BridgeTest extends SearchTestBase {
 
 		BooleanQuery booleanQuery = booleanQueryBuilder.build();
 		List result = session.createFullTextQuery( booleanQuery ).list();
-		assertEquals( "Date not found or not properly truncated", 1, result.size() );
+		assertThat( result ).as( "Date not found or not properly truncated" ).hasSize( 1 );
 
 		tx.commit();
 		s.close();
 	}
 
 	@Test
-	public void testCalendarBridge() throws Exception {
+	void testCalendarBridge() {
 		Cloud cloud = new Cloud();
 		Calendar calendar = Calendar.getInstance( TimeZone.getTimeZone( "Europe/Rome" ), Locale.ROOT ); //for the sake of tests
 		calendar.set( 2000, 11, 15, 3, 43, 2 );
@@ -288,7 +288,7 @@ public class BridgeTest extends SearchTestBase {
 
 		BooleanQuery booleanQuery = booleanQueryBuilder.build();
 		List result = session.createFullTextQuery( booleanQuery ).list();
-		assertEquals( "Calendar not found or not properly truncated", 1, result.size() );
+		assertThat( result ).as( "Calendar not found or not properly truncated" ).hasSize( 1 );
 
 		tx.commit();
 		s.close();

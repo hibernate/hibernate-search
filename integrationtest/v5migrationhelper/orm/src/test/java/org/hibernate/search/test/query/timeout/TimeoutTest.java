@@ -6,10 +6,8 @@
  */
 package org.hibernate.search.test.query.timeout;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.fail;
 
 import java.util.List;
 import java.util.Map;
@@ -28,22 +26,22 @@ import org.hibernate.search.query.dsl.QueryBuilder;
 import org.hibernate.search.test.SearchTestBase;
 import org.hibernate.search.util.impl.integrationtest.backend.lucene.query.SlowQuery;
 
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import org.apache.lucene.search.Query;
 
 /**
  * @author Emmanuel Bernard
  */
-public class TimeoutTest extends SearchTestBase {
+class TimeoutTest extends SearchTestBase {
 
 	private FullTextSession fts;
 	private Query slowQuery;
 
 	@Override
-	@Before
+	@BeforeEach
 	public void setUp() throws Exception {
 		super.setUp();
 		fts = Search.getFullTextSession( openSession() );
@@ -56,14 +54,14 @@ public class TimeoutTest extends SearchTestBase {
 	}
 
 	@Override
-	@After
+	@AfterEach
 	public void tearDown() throws Exception {
 		try {
 			Transaction tx = fts.getTransaction();
 			if ( tx.getStatus() != TransactionStatus.ACTIVE ) {
 				tx = fts.beginTransaction();
 			}
-			assertEquals( 100, fts.createQuery( "delete from " + Clock.class.getName() ).executeUpdate() );
+			assertThat( fts.createQuery( "delete from " + Clock.class.getName() ).executeUpdate() ).isEqualTo( 100 );
 			fts.purgeAll( Clock.class );
 			tx.commit();
 			fts.close();
@@ -74,7 +72,7 @@ public class TimeoutTest extends SearchTestBase {
 	}
 
 	@Test
-	public void testTimeout() {
+	void testTimeout() {
 		Transaction tx = fts.beginTransaction();
 
 		assertCorrectNumberOfClocksNoTimeout();
@@ -85,7 +83,7 @@ public class TimeoutTest extends SearchTestBase {
 	}
 
 	@Test
-	public void testLimitFetchingTime() {
+	void testLimitFetchingTime() {
 		Transaction tx = fts.beginTransaction();
 
 		assertCorrectNumberOfClocksNoTimeout();
@@ -107,14 +105,14 @@ public class TimeoutTest extends SearchTestBase {
 	}
 
 	@Test
-	public void testEnoughTime() {
+	void testEnoughTime() {
 		Transaction tx = fts.beginTransaction();
 
 		FullTextQuery hibernateQuery = fts.createFullTextQuery( slowQuery, Clock.class );
 		hibernateQuery.setTimeout( 5, TimeUnit.MINUTES );
 		List results = hibernateQuery.list();
-		assertFalse( hibernateQuery.hasPartialResults() );
-		assertEquals( 50, results.size() );
+		assertThat( hibernateQuery.hasPartialResults() ).isFalse();
+		assertThat( results ).hasSize( 50 );
 
 		tx.commit();
 	}
@@ -156,7 +154,7 @@ public class TimeoutTest extends SearchTestBase {
 	private void assertCorrectNumberOfClocksNoTimeout() {
 		FullTextQuery hibernateQuery = fts.createFullTextQuery( slowQuery, Clock.class );
 		final List results = hibernateQuery.list();
-		assertEquals( 50, results.size() );
+		assertThat( results ).hasSize( 50 );
 		fts.clear();
 	}
 
@@ -184,8 +182,8 @@ public class TimeoutTest extends SearchTestBase {
 		FullTextQuery hibernateQuery = fts.createFullTextQuery( slowQuery, Clock.class );
 		hibernateQuery.limitExecutionTimeTo( 30, TimeUnit.SECONDS );
 		List results = hibernateQuery.list();
-		assertEquals( "Test below limit termination", 50, results.size() );
-		assertFalse( hibernateQuery.hasPartialResults() );
+		assertThat( results ).hasSize( 50 ).as( "Test below limit termination" );
+		assertThat( hibernateQuery.hasPartialResults() ).isFalse();
 		fts.clear();
 	}
 
@@ -194,10 +192,10 @@ public class TimeoutTest extends SearchTestBase {
 		hibernateQuery.limitExecutionTimeTo( 1, TimeUnit.NANOSECONDS );
 		List result = hibernateQuery.list();
 		System.out.println( "Result size early: " + result.size() );
-		assertEquals( "Test early failure, before the number of results are even fetched", 0, result.size() );
+		assertThat( result ).as( "Test early failure, before the number of results are even fetched" ).isEmpty();
 		if ( result.size() == 0 ) {
 			//sometimes, this
-			assertTrue( hibernateQuery.hasPartialResults() );
+			assertThat( hibernateQuery.hasPartialResults() ).isTrue();
 		}
 		fts.clear();
 	}

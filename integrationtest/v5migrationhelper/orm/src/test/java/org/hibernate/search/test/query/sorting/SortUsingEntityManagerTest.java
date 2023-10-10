@@ -21,20 +21,22 @@ import org.hibernate.search.query.dsl.QueryBuilder;
 import org.hibernate.search.test.jpa.JPATestCase;
 import org.hibernate.search.test.query.ProductArticle;
 
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import org.apache.lucene.search.Sort;
 
 /**
  * @author Davide D'Alto
  */
-public class SortUsingEntityManagerTest extends JPATestCase {
+class SortUsingEntityManagerTest extends JPATestCase {
 
 	private static final TimeZone ENCODING_TIME_ZONE = TimeZone.getTimeZone( "UTC" );
 
 	private FullTextEntityManager em;
 
 	@Override
+	@BeforeEach
 	public void setUp() {
 		super.setUp();
 		em = org.hibernate.search.jpa.Search.getFullTextEntityManager( factory.createEntityManager() );
@@ -60,7 +62,7 @@ public class SortUsingEntityManagerTest extends JPATestCase {
 
 	@Test
 	@SuppressWarnings("unchecked")
-	public void testResultOrderedByDateDescending() throws Exception {
+	void testResultOrderedByDateDescending() throws Exception {
 		EntityTransaction tx = em.getTransaction();
 		tx.begin();
 

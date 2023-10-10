@@ -7,44 +7,33 @@
 
 package org.hibernate.search.test.engine;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.fail;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import org.hibernate.search.Search;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 /**
  * @author Emmanuel Bernard
  */
-public class FullTextSessionAndEntityManagerCreationTest {
+class FullTextSessionAndEntityManagerCreationTest {
 
 	@Test
-	public void testCreatingFullTextSessionByPassingNullFails() throws Exception {
-		try {
-			Search.getFullTextSession( null );
-			fail( "A valid session must be passed" );
-		}
-		catch (IllegalArgumentException e) {
-			assertEquals(
-					"Unexpected error code: " + e.getMessage(),
-					"HSEARCH000178: Unable to create a FullTextSession from a null Session",
-					e.getMessage() );
-		}
+	void testCreatingFullTextSessionByPassingNullFails() {
+		assertThatThrownBy( () -> Search.getFullTextSession( null ) )
+				.isInstanceOf( IllegalArgumentException.class )
+				.hasMessageContainingAll(
+						"HSEARCH000178: Unable to create a FullTextSession from a null Session"
+				);
 	}
 
 	@Test
-	public void testCreatingFullEntityManagerByPassingNullFails() throws Exception {
-		try {
-			org.hibernate.search.jpa.Search.getFullTextEntityManager( null );
-			fail( "A valid session must be passed" );
-		}
-		catch (IllegalArgumentException e) {
-			assertEquals(
-					"Unexpected error code: " + e.getMessage(),
-					"HSEARCH000179: Unable to create a FullTextEntityManager from a null EntityManager",
-					e.getMessage() );
-		}
+	void testCreatingFullEntityManagerByPassingNullFails() {
+		assertThatThrownBy( () -> org.hibernate.search.jpa.Search.getFullTextEntityManager( null ) )
+				.isInstanceOf( IllegalArgumentException.class )
+				.hasMessageContainingAll(
+						"HSEARCH000179: Unable to create a FullTextEntityManager from a null EntityManager"
+				);
 	}
 
 }

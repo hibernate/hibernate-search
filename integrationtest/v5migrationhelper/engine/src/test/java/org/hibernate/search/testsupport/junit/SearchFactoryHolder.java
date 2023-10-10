@@ -6,8 +6,7 @@
  */
 package org.hibernate.search.testsupport.junit;
 
-import static org.hibernate.search.test.util.impl.JunitJupiterContextHelper.extensionContext;
-import static org.junit.Assert.assertNull;
+import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -16,10 +15,11 @@ import org.hibernate.search.mapper.pojo.standalone.mapping.SearchMapping;
 import org.hibernate.search.spi.SearchIntegrator;
 import org.hibernate.search.testsupport.migration.V5MigrationStandalonePojoSearchIntegratorAdapter;
 
+import org.junit.jupiter.api.extension.AfterAllCallback;
+import org.junit.jupiter.api.extension.AfterEachCallback;
+import org.junit.jupiter.api.extension.BeforeAllCallback;
+import org.junit.jupiter.api.extension.BeforeEachCallback;
 import org.junit.jupiter.api.extension.ExtensionContext;
-import org.junit.rules.TestRule;
-import org.junit.runner.Description;
-import org.junit.runners.model.Statement;
 
 /**
  * Testing SearchFactoryHolder.
@@ -29,7 +29,7 @@ import org.junit.runners.model.Statement;
  * @author Sanne Grinovero
  * @since 4.1
  */
-public class SearchFactoryHolder implements TestRule {
+public class SearchFactoryHolder implements AfterAllCallback, BeforeAllCallback, BeforeEachCallback, AfterEachCallback {
 
 	private final V5MigrationHelperEngineSetupHelper setupHelper = V5MigrationHelperEngineSetupHelper.create();
 
@@ -38,6 +38,7 @@ public class SearchFactoryHolder implements TestRule {
 
 	private SearchMapping mapping;
 	private SearchIntegrator searchIntegrator;
+	private boolean callOncePerClass = false;
 
 	public SearchFactoryHolder(Class<?>... entities) {
 		this.entities = entities;
@@ -52,34 +53,51 @@ public class SearchFactoryHolder implements TestRule {
 		return mapping;
 	}
 
-	@Override
-	public Statement apply(Statement base, Description description) {
-		Statement statement = new Statement() {
-
-			@Override
-			public void evaluate() throws Throwable {
-				ExtensionContext context = extensionContext( description );
-				setupHelper.beforeAll( context );
-				try {
-					mapping = setupHelper.start()
-							.withProperties( configuration )
-							.setup( entities );
-					searchIntegrator = new V5MigrationStandalonePojoSearchIntegratorAdapter( mapping );
-					base.evaluate();
-				}
-				finally {
-					mapping = null;
-					searchIntegrator = null;
-					setupHelper.afterAll( context );
-				}
-			}
-		};
-		return statement;
-	}
-
 	public SearchFactoryHolder withProperty(String key, Object value) {
-		assertNull( "Mapping already initialized", mapping );
+		assertThat( mapping ).as( "Mapping already initialized" ).isNotNull();
 		configuration.put( key, value );
 		return this;
+	}
+
+	@Override
+	public void afterAll(ExtensionContext extensionContext) throws Exception {
+		if ( callOncePerClass ) {
+			doAfter( extensionContext );
+		}
+	}
+
+	@Override
+	public void afterEach(ExtensionContext extensionContext) throws Exception {
+		if ( !callOncePerClass ) {
+			doAfter( extensionContext );
+		}
+	}
+
+	private void doAfter(ExtensionContext extensionContext) throws Exception {
+		mapping = null;
+		searchIntegrator = null;
+		setupHelper.afterAll( extensionContext );
+	}
+
+	@Override
+	public void beforeAll(ExtensionContext extensionContext) throws Exception {
+		callOncePerClass = true;
+		doBefore( extensionContext );
+	}
+
+	@Override
+	public void beforeEach(ExtensionContext extensionContext) throws Exception {
+		if ( !callOncePerClass ) {
+			doBefore( extensionContext );
+		}
+	}
+
+	private void doBefore(ExtensionContext extensionContext) throws Exception {
+		setupHelper.beforeAll( extensionContext );
+
+		mapping = setupHelper.start()
+				.withProperties( configuration )
+				.setup( entities );
+		searchIntegrator = new V5MigrationStandalonePojoSearchIntegratorAdapter( mapping );
 	}
 }

@@ -7,8 +7,8 @@
 
 package org.hibernate.search.test.batchindexing;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmUtils.listAll;
-import static org.junit.Assert.assertEquals;
 
 import java.util.List;
 
@@ -17,26 +17,26 @@ import org.hibernate.search.FullTextSession;
 import org.hibernate.search.Search;
 import org.hibernate.search.test.SearchTestBase;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import org.apache.lucene.search.MatchAllDocsQuery;
 
 /**
  * @author Sanne Grinovero (C) 2011 Red Hat Inc.
  */
-public class CollectionInitializeTest extends SearchTestBase {
+class CollectionInitializeTest extends SearchTestBase {
 
 	@Test
-	public void testMassIndexing() throws InterruptedException {
+	void testMassIndexing() throws InterruptedException {
 		FullTextSession fullTextSession = Search.getFullTextSession( openSession() );
 		initializeData( fullTextSession );
 		try {
 			List list = listAll( fullTextSession, LegacyCarPlant.class );
-			assertEquals( 1, list.size() );
+			assertThat( list ).hasSize( 1 );
 			fullTextSession.createIndexer( LegacyCarPlant.class ).startAndWait();
 			int resultSize =
 					fullTextSession.createFullTextQuery( new MatchAllDocsQuery(), LegacyCarPlant.class ).getResultSize();
-			assertEquals( 1, resultSize );
+			assertThat( resultSize ).isEqualTo( 1 );
 		}
 		finally {
 			clearData( fullTextSession );

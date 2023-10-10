@@ -6,7 +6,7 @@
  */
 package org.hibernate.search.test.engine;
 
-import static org.junit.Assert.assertEquals;
+import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.List;
 
@@ -30,7 +30,7 @@ import org.hibernate.search.query.dsl.QueryBuilder;
 import org.hibernate.search.test.SearchTestBase;
 import org.hibernate.search.testsupport.TestForIssue;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import org.apache.lucene.search.Query;
 
@@ -40,11 +40,11 @@ import org.apache.lucene.search.Query;
  *
  * @author Sanne Grinovero (C) 2012 Red Hat Inc.
  */
-public class TransientFieldsDirtyTest extends SearchTestBase {
+class TransientFieldsDirtyTest extends SearchTestBase {
 
 	@TestForIssue(jiraKey = "HSEARCH-1096")
 	@Test
-	public void testTransientFieldsAreAlwaysDirty() {
+	void testTransientFieldsAreAlwaysDirty() {
 		Session session = openSession();
 		try {
 			FormulaAdd f = new FormulaAdd();
@@ -83,9 +83,9 @@ public class TransientFieldsDirtyTest extends SearchTestBase {
 		FullTextQuery query = fullTextSession.createFullTextQuery( luceneQuery, FormulaAdd.class );
 		List resultsList = query.list();
 		transaction.commit();
-		assertEquals( 1, resultsList.size() );
+		assertThat( resultsList ).hasSize( 1 );
 		FormulaAdd result = (FormulaAdd) resultsList.get( 0 );
-		assertEquals( value, result.getAplusB() );
+		assertThat( result.getAplusB() ).isEqualTo( value );
 	}
 
 	@Override

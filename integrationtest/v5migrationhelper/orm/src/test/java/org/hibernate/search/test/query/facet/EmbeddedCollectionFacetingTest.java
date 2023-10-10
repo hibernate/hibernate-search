@@ -6,7 +6,7 @@
  */
 package org.hibernate.search.test.query.facet;
 
-import static org.junit.Assert.assertEquals;
+import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.List;
 
@@ -21,11 +21,11 @@ import org.hibernate.search.query.facet.FacetSortOrder;
 import org.hibernate.search.query.facet.FacetingRequest;
 import org.hibernate.search.test.SearchTestBase;
 import org.hibernate.search.testsupport.TestForIssue;
-import org.hibernate.search.testsupport.junit.PortedToSearch6;
+import org.hibernate.search.testsupport.junit.Tags;
 
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.experimental.categories.Category;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Tag;
+import org.junit.jupiter.api.Test;
 
 import org.apache.lucene.search.MatchAllDocsQuery;
 
@@ -33,15 +33,15 @@ import org.apache.lucene.search.MatchAllDocsQuery;
  * @author Elmer van Chastelet
  */
 @TestForIssue(jiraKey = "HSEARCH-726")
-@Category(PortedToSearch6.class)
-public class EmbeddedCollectionFacetingTest extends SearchTestBase {
+@Tag(Tags.PORTED_TO_SEARCH_6)
+class EmbeddedCollectionFacetingTest extends SearchTestBase {
 	Author voltaire;
 	Author hugo;
 	Author moliere;
 	Author proust;
 
-	@Before
-	public void createTestData() {
+	@BeforeEach
+	void createTestData() {
 		voltaire = new Author();
 		voltaire.setName( "Voltaire" );
 
@@ -84,7 +84,7 @@ public class EmbeddedCollectionFacetingTest extends SearchTestBase {
 	}
 
 	@Test
-	public void testFacetEmbeddedAndCollections() throws Exception {
+	void testFacetEmbeddedAndCollections() {
 		FullTextSession fullTextSession = Search.getFullTextSession( openSession() );
 
 		FullTextQuery fullTextQuery = fullTextSession.createFullTextQuery( new MatchAllDocsQuery(), Book.class );
@@ -100,7 +100,7 @@ public class EmbeddedCollectionFacetingTest extends SearchTestBase {
 				.createFacetingRequest();
 
 		List<Facet> facets = fullTextQuery.getFacetManager().enableFaceting( facetReq ).getFacets( "someFacet" );
-		assertEquals( "There should be three facets", 3, facets.size() );
+		assertThat( facets ).as( "There should be three facets" ).hasSize( 3 );
 		assertFacet( facets.get( 0 ), hugo, 3 );
 		assertFacet( facets.get( 1 ), moliere, 2 );
 		assertFacet( facets.get( 2 ), voltaire, 1 );
@@ -117,7 +117,7 @@ public class EmbeddedCollectionFacetingTest extends SearchTestBase {
 	}
 
 	private void assertFacet(Facet facet, Author expectedAuthor, int expectedCount) {
-		assertEquals( "Wrong facet value", expectedAuthor.getName(), facet.getValue() );
-		assertEquals( "Wrong facet count", expectedCount, facet.getCount() );
+		assertThat( facet.getValue() ).as( "Wrong facet value" ).isEqualTo( expectedAuthor.getName() );
+		assertThat( facet.getCount() ).as( "Wrong facet count" ).isEqualTo( expectedCount );
 	}
 }

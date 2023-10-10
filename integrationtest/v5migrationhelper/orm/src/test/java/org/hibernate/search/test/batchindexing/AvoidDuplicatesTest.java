@@ -6,7 +6,7 @@
  */
 package org.hibernate.search.test.batchindexing;
 
-import static org.junit.Assert.assertEquals;
+import static org.assertj.core.api.Assertions.assertThat;
 
 import org.hibernate.Session;
 import org.hibernate.Transaction;
@@ -16,15 +16,15 @@ import org.hibernate.search.MassIndexer;
 import org.hibernate.search.Search;
 import org.hibernate.search.test.SearchTestBase;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import org.apache.lucene.search.MatchAllDocsQuery;
 
-public class AvoidDuplicatesTest extends SearchTestBase {
+class AvoidDuplicatesTest extends SearchTestBase {
 
 	@Override
-	@Before
+	@BeforeEach
 	public void setUp() throws Exception {
 		super.setUp();
 		Session session = openSession();
@@ -52,14 +52,14 @@ public class AvoidDuplicatesTest extends SearchTestBase {
 	}
 
 	@Test
-	public void testReindexedOnce() throws InterruptedException {
-		assertEquals( 2, countBooksInIndex() );
+	void testReindexedOnce() throws InterruptedException {
+		assertThat( countBooksInIndex() ).isEqualTo( 2 );
 		Session session = openSession();
 		FullTextSession fullTextSession = Search.getFullTextSession( session );
 		MassIndexer massIndexer = fullTextSession.createIndexer();
 		massIndexer.startAndWait();
 		session.close();
-		assertEquals( 2, countBooksInIndex() );
+		assertThat( countBooksInIndex() ).isEqualTo( 2 );
 	}
 
 	private int countBooksInIndex() {

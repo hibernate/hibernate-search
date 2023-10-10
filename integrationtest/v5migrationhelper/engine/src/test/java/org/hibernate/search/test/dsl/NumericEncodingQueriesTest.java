@@ -21,9 +21,9 @@ import org.hibernate.search.query.dsl.QueryBuilder;
 import org.hibernate.search.testsupport.junit.SearchFactoryHolder;
 import org.hibernate.search.testsupport.junit.SearchITHelper;
 
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 
 import org.apache.lucene.document.DateTools;
 import org.apache.lucene.search.Query;
@@ -31,7 +31,7 @@ import org.apache.lucene.search.Query;
 /**
  * @author Davide D'Alto
  */
-public class NumericEncodingQueriesTest {
+class NumericEncodingQueriesTest {
 
 	private static final Calendar ANNOUNCED = initCalendar( 1950, 1, 1 );
 	private static final Date UPDATED = initCalendar( 2000, 1, 1 ).getTime();
@@ -51,19 +51,19 @@ public class NumericEncodingQueriesTest {
 		return calendar;
 	}
 
-	@Rule
+	@RegisterExtension
 	public final SearchFactoryHolder sfHolder = new SearchFactoryHolder( Fair.class );
 
 	private final SearchITHelper helper = new SearchITHelper( sfHolder );
 
-	@Before
-	public void createEvent() throws Exception {
+	@BeforeEach
+	void createEvent() {
 		Fair lucca = new Fair( LUCCA_ID, "Lucca comics and games", NEXT_EVENT.getTime(), FIRST_EDITION, UPDATED, ANNOUNCED );
 		helper.add( lucca );
 	}
 
 	@Test
-	public void testDslWithDate() throws Exception {
+	void testDslWithDate() {
 		Date nextEventDate = DateTools.round( NEXT_EVENT.getTime(), DateTools.Resolution.DAY );
 		Query query = queryBuilder().keyword().onField( "startDate" ).matching( nextEventDate ).createQuery();
 
@@ -71,7 +71,7 @@ public class NumericEncodingQueriesTest {
 	}
 
 	@Test
-	public void testDslWithCalendar() throws Exception {
+	void testDslWithCalendar() {
 		Calendar year = createCalendar();
 		year.setTime( DateTools.round( FIRST_EDITION.getTime(), DateTools.Resolution.YEAR ) );
 
@@ -81,14 +81,14 @@ public class NumericEncodingQueriesTest {
 	}
 
 	@Test
-	public void testDslWithDefaultDateBridge() throws Exception {
+	void testDslWithDefaultDateBridge() {
 		Query query = queryBuilder().keyword().onField( "updated" ).matching( UPDATED ).createQuery();
 
 		helper.assertThatQuery( query ).from( Fair.class ).matchesExactlyIds( LUCCA_ID );
 	}
 
 	@Test
-	public void testDslWithDefaultCalendarBridge() throws Exception {
+	void testDslWithDefaultCalendarBridge() {
 		Query query = queryBuilder().keyword().onField( "announced" ).matching( ANNOUNCED ).createQuery();
 
 		helper.assertThatQuery( query ).from( Fair.class ).matchesExactlyIds( LUCCA_ID );

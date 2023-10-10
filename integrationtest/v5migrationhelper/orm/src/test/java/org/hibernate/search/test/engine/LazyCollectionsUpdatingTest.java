@@ -6,9 +6,8 @@
  */
 package org.hibernate.search.test.engine;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmUtils.listAll;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
 
 import java.util.List;
 import java.util.Map;
@@ -19,8 +18,8 @@ import org.hibernate.search.FullTextSession;
 import org.hibernate.search.Search;
 import org.hibernate.search.test.SearchTestBase;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import org.apache.lucene.index.Term;
 import org.apache.lucene.search.TermQuery;
@@ -32,17 +31,17 @@ import org.apache.lucene.search.TermQuery;
  *
  * @author Sanne Grinovero
  */
-public class LazyCollectionsUpdatingTest extends SearchTestBase {
+class LazyCollectionsUpdatingTest extends SearchTestBase {
 
 	@Test
-	public void testUpdatingInTransaction() {
+	void testUpdatingInTransaction() {
 		assertFindsByRoadName( "buonarroti" );
 		FullTextSession fullTextSession = Search.getFullTextSession( openSession() );
 		try {
 			Transaction tx = fullTextSession.beginTransaction();
 			List list = listAll( fullTextSession, BusStop.class );
-			assertNotNull( list );
-			assertEquals( 4, list.size() );
+			assertThat( list ).isNotNull()
+					.hasSize( 4 );
 			BusStop busStop = (BusStop) list.get( 1 );
 			busStop.setRoadName( "new road" );
 			tx.commit();
@@ -54,13 +53,13 @@ public class LazyCollectionsUpdatingTest extends SearchTestBase {
 	}
 
 	@Test
-	public void testUpdatingOutOfTransaction() {
+	void testUpdatingOutOfTransaction() {
 		assertFindsByRoadName( "buonarroti" );
 		FullTextSession fullTextSession = Search.getFullTextSession( openSession() );
 		try {
 			List list = listAll( fullTextSession, BusStop.class );
-			assertNotNull( list );
-			assertEquals( 4, list.size() );
+			assertThat( list ).isNotNull()
+					.hasSize( 4 );
 			BusStop busStop = (BusStop) list.get( 1 );
 			busStop.setRoadName( "new road" );
 			fullTextSession.flush();
@@ -77,16 +76,16 @@ public class LazyCollectionsUpdatingTest extends SearchTestBase {
 		TermQuery ftQuery = new TermQuery( new Term( "stops.roadName", analyzedRoadname ) );
 		FullTextQuery query = fullTextSession.createFullTextQuery( ftQuery, BusLine.class );
 		query.setProjection( "busLineName" );
-		assertEquals( 1, query.list().size() );
+		assertThat( query.list() ).hasSize( 1 );
 		List results = query.list();
 		String resultName = (String) ( (Object[]) results.get( 0 ) )[0];
-		assertEquals( "Linea 64", resultName );
+		assertThat( resultName ).isEqualTo( "Linea 64" );
 		tx.commit();
 		fullTextSession.close();
 	}
 
 	@Override
-	@Before
+	@BeforeEach
 	public void setUp() throws Exception {
 		super.setUp();
 		openSession();
