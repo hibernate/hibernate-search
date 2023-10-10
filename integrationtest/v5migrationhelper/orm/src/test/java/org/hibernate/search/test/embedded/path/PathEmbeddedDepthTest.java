@@ -7,9 +7,9 @@
 
 package org.hibernate.search.test.embedded.path;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmUtils.listAll;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.fail;
 
 import java.util.List;
 
@@ -21,9 +21,9 @@ import org.hibernate.search.query.dsl.QueryBuilder;
 import org.hibernate.search.test.SearchTestBase;
 import org.hibernate.search.util.common.SearchException;
 
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import org.apache.lucene.search.Query;
 
@@ -47,51 +47,48 @@ import org.apache.lucene.search.Query;
  *
  * @author Davide D'Alto
  */
-public class PathEmbeddedDepthTest extends SearchTestBase {
+class PathEmbeddedDepthTest extends SearchTestBase {
 
 	private Session session = null;
 
 	@Test
-	public void testShouldIndexFieldInPath() throws Exception {
+	void testShouldIndexFieldInPath() {
 		List<Human> result = search( session, "parents.parents.parents.name", "Philippa" );
 
-		assertEquals( 1, result.size() );
-		assertEquals(
-				"Should be able to index a field in path regarding the depth",
-				"John of England", result.get( 0 ).getFullname() );
+		assertThat( result ).hasSize( 1 );
+		assertThat( result.get( 0 ).getFullname() )
+				.as( "Should be able to index a field in path regarding the depth" )
+				.isEqualTo( "John of England" );
 	}
 
 	@Test
-	public void testIndexFieldIfInsideDepth() throws Exception {
+	void testIndexFieldIfInsideDepth() {
 		List<Human> result = search( session, "parents.parents.name", "Empress" );
 
-		assertEquals( 1, result.size() );
-		assertEquals(
-				"Should be able to index field inside depth and in path",
-				"John of England", result.get( 0 ).getFullname() );
+		assertThat( result ).hasSize( 1 );
+		assertThat( result.get( 0 ).getFullname() )
+				.as( "Should be able to index field inside depth and in path" )
+				.isEqualTo( "John of England" );
 	}
 
 	@Test
-	public void testShouldNotIndexFieldOutsidePathAndOverDepth() throws Exception {
-		try {
-			search( session, "parents.parents.parents.surname", "de Montfort" );
-			fail( "Shoudl not index a field if not in path and over the depth threshold" );
-		}
-		catch (SearchException e) {
-		}
+	void testShouldNotIndexFieldOutsidePathAndOverDepth() {
+		assertThatThrownBy( () -> search( session, "parents.parents.parents.surname", "de Montfort" ) )
+				.isInstanceOf( SearchException.class );
 	}
 
 	@Test
-	public void testShouldIndexFieldNotInPathButInsideDepthThreshold() throws Exception {
+	void testShouldIndexFieldNotInPathButInsideDepthThreshold() {
 		List<Human> result = search( session, "parents.parents.surname", "de Châtellerault" );
 
-		assertEquals( 1, result.size() );
-		assertEquals( "Should be able to index a field if is inside the depth threshold even if not in path",
-				"John of England", result.get( 0 ).getFullname() );
+		assertThat( result ).hasSize( 1 );
+		assertThat( result.get( 0 ).getFullname() )
+				.as( "Should be able to index a field if is inside the depth threshold even if not in path" )
+				.isEqualTo( "John of England" );
 	}
 
 	@Override
-	@Before
+	@BeforeEach
 	public void setUp() throws Exception {
 		super.setUp();
 		session = openSession();
@@ -134,7 +131,7 @@ public class PathEmbeddedDepthTest extends SearchTestBase {
 	}
 
 	@Override
-	@After
+	@AfterEach
 	public void tearDown() throws Exception {
 		session.clear();
 

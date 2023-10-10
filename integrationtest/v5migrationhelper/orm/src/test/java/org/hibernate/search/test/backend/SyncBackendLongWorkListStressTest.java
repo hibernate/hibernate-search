@@ -6,8 +6,8 @@
  */
 package org.hibernate.search.test.backend;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmUtils.countAll;
-import static org.junit.Assert.assertEquals;
 
 import java.util.Map;
 
@@ -21,17 +21,17 @@ import org.hibernate.search.mapper.orm.cfg.HibernateOrmMapperSettings;
 import org.hibernate.search.mapper.orm.schema.management.SchemaManagementStrategyName;
 import org.hibernate.search.test.SearchTestBase;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import org.apache.lucene.search.MatchAllDocsQuery;
 
-public class SyncBackendLongWorkListStressTest extends SearchTestBase {
+class SyncBackendLongWorkListStressTest extends SearchTestBase {
 
 	/* needs to be sensibly higher than org.hibernate.search.batchindexing.Executors.QUEUE_MAX_LENGTH */
 	private static final int NUM_SAVED_ENTITIES = 40;
 
 	@Test
-	public void testWorkLongerThanMaxQueueSize() throws Exception {
+	void testWorkLongerThanMaxQueueSize() {
 		FullTextSession s = Search.getFullTextSession( openSession() );
 
 		for ( int i = 0; i < NUM_SAVED_ENTITIES; i++ ) {
@@ -45,7 +45,7 @@ public class SyncBackendLongWorkListStressTest extends SearchTestBase {
 		Transaction tx = s.beginTransaction();
 		// count of entities in database needs to be checked before SF is closed (HSQLDB will forget the entities)
 		Number count = countAll( s, Clock.class );
-		assertEquals( NUM_SAVED_ENTITIES, count.intValue() );
+		assertThat( count.intValue() ).isEqualTo( NUM_SAVED_ENTITIES );
 		tx.commit();
 		s.close();
 
@@ -57,7 +57,7 @@ public class SyncBackendLongWorkListStressTest extends SearchTestBase {
 		s = Search.getFullTextSession( openSession() );
 		tx = s.beginTransaction();
 		int fullTextCount = s.createFullTextQuery( new MatchAllDocsQuery(), Clock.class ).getResultSize();
-		assertEquals( NUM_SAVED_ENTITIES, fullTextCount );
+		assertThat( fullTextCount ).isEqualTo( NUM_SAVED_ENTITIES );
 		s.purgeAll( Clock.class );
 		tx.commit();
 		s.close();

@@ -6,7 +6,7 @@
  */
 package org.hibernate.search.test.id;
 
-import static org.junit.Assert.assertEquals;
+import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.List;
 
@@ -15,7 +15,7 @@ import org.hibernate.Transaction;
 import org.hibernate.search.Search;
 import org.hibernate.search.test.SearchTestBase;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import org.apache.lucene.index.Term;
 import org.apache.lucene.search.TermQuery;
@@ -23,7 +23,7 @@ import org.apache.lucene.search.TermQuery;
 /**
  * @author Hardy Ferentschik
  */
-public class ImplicitIdTest extends SearchTestBase {
+class ImplicitIdTest extends SearchTestBase {
 
 	/**
 	 * Tests that @DocumentId is optional. See HSEARCH-104.
@@ -31,7 +31,7 @@ public class ImplicitIdTest extends SearchTestBase {
 	 * @throws Exception in case the test fails.
 	 */
 	@Test
-	public void testImplicitDocumentId() throws Exception {
+	void testImplicitDocumentId() {
 		Animal dog = new Animal();
 		dog.setName( "Dog" );
 
@@ -45,7 +45,7 @@ public class ImplicitIdTest extends SearchTestBase {
 		List results = Search.getFullTextSession( s ).createFullTextQuery(
 				new TermQuery( new Term( "name", "dog" ) )
 		).list();
-		assertEquals( 1, results.size() );
+		assertThat( results ).hasSize( 1 );
 		tx.commit();
 		s.close();
 	}

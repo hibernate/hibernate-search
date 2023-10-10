@@ -6,7 +6,7 @@
  */
 package org.hibernate.search.test.query.facet;
 
-import static org.junit.Assert.assertEquals;
+import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.Iterator;
 import java.util.List;
@@ -16,20 +16,20 @@ import org.hibernate.Transaction;
 import org.hibernate.search.FullTextQuery;
 import org.hibernate.search.query.facet.Facet;
 import org.hibernate.search.query.facet.FacetingRequest;
-import org.hibernate.search.testsupport.junit.PortedToSearch6;
+import org.hibernate.search.testsupport.junit.Tags;
 
-import org.junit.Test;
-import org.junit.experimental.categories.Category;
+import org.junit.jupiter.api.Tag;
+import org.junit.jupiter.api.Test;
 
 import org.apache.lucene.search.MatchAllDocsQuery;
 
-@Category(PortedToSearch6.class)
-public class ManyToOneFacetingTest extends AbstractFacetTest {
+@Tag(Tags.PORTED_TO_SEARCH_6)
+class ManyToOneFacetingTest extends AbstractFacetTest {
 	private final String indexFieldName = "companyFacilities.country";
 	private final String facetName = "countryFacility";
 
 	@Test
-	public void testAllIndexedManyToOneValuesGetCounted() throws Exception {
+	void testAllIndexedManyToOneValuesGetCounted() {
 		FacetingRequest request = queryBuilder( Company.class ).facet()
 				.name( facetName )
 				.onField( indexFieldName )
@@ -39,13 +39,13 @@ public class ManyToOneFacetingTest extends AbstractFacetTest {
 		FullTextQuery query = queryCompanyWithFacet( request );
 
 		List<Facet> facetList = query.getFacetManager().getFacets( facetName );
-		assertEquals( "Wrong number of facets", 2, facetList.size() );
+		assertThat( facetList ).as( "Wrong number of facets" ).hasSize( 2 );
 
 		// check count in facet
 		Iterator<Facet> itr = facetList.iterator();
 		while ( itr.hasNext() ) {
 			Facet item = itr.next();
-			assertEquals( "Wrong count of facet", 1, item.getCount() );
+			assertThat( item.getCount() ).as( "Wrong count of facet" ).isEqualTo( 1 );
 		}
 
 	}
@@ -53,7 +53,7 @@ public class ManyToOneFacetingTest extends AbstractFacetTest {
 	private FullTextQuery queryCompanyWithFacet(FacetingRequest request) {
 		FullTextQuery query = fullTextSession.createFullTextQuery( new MatchAllDocsQuery() );
 		query.getFacetManager().enableFaceting( request );
-		assertEquals( "Wrong number of query matches", 1, query.getResultSize() );
+		assertThat( query.getResultSize() ).as( "Wrong number of query matches" ).isEqualTo( 1 );
 		return query;
 	}
 

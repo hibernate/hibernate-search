@@ -32,8 +32,8 @@ import org.hibernate.search.testsupport.TestForIssue;
 import org.hibernate.search.testsupport.junit.SearchFactoryHolder;
 import org.hibernate.search.testsupport.junit.SearchITHelper;
 
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 
 import org.apache.lucene.search.Query;
 
@@ -41,15 +41,15 @@ import org.apache.lucene.search.Query;
  * @author Davide D'Alto
  */
 @TestForIssue(jiraKey = "HSEARCH-1947")
-public class JavaTimeTest {
+class JavaTimeTest {
 
-	@Rule
+	@RegisterExtension
 	public final SearchFactoryHolder sfHolder = new SearchFactoryHolder( Sample.class );
 
 	private final SearchITHelper helper = new SearchITHelper( sfHolder );
 
 	@Test
-	public void testLocalDate() throws Exception {
+	void testLocalDate() {
 		LocalDate date = LocalDate.of( 2012, Month.DECEMBER, 30 );
 		Sample sample = new Sample( 1L, "LocalDate example" );
 		sample.localDate = date;

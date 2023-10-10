@@ -6,8 +6,8 @@
  */
 package org.hibernate.search.test.session;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmUtils.queryAll;
-import static org.junit.Assert.assertEquals;
 
 import java.sql.Connection;
 import java.sql.SQLException;
@@ -23,16 +23,16 @@ import org.hibernate.search.Search;
 import org.hibernate.search.test.SearchTestBase;
 import org.hibernate.search.testsupport.TestConstants;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import org.apache.lucene.queryparser.classic.QueryParser;
 
 /**
  * @author Emmanuel Bernard
  */
-public class MassIndexUsingManualFlushTest extends SearchTestBase {
+class MassIndexUsingManualFlushTest extends SearchTestBase {
 	@Test
-	public void testManualIndexFlush() throws Exception {
+	void testManualIndexFlush() throws Exception {
 		FullTextSession s = Search.getFullTextSession( openSession() );
 		Transaction tx = s.beginTransaction();
 		final int loop = 14;
@@ -73,7 +73,7 @@ public class MassIndexUsingManualFlushTest extends SearchTestBase {
 		tx = s.beginTransaction();
 		QueryParser parser = new QueryParser( "noDefaultField", TestConstants.stopAnalyzer );
 		List result = s.createFullTextQuery( parser.parse( "body:create" ) ).list();
-		assertEquals( 14, result.size() );
+		assertThat( result ).hasSize( 14 );
 		for ( Object object : result ) {
 			s.delete( object );
 		}

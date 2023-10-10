@@ -6,20 +6,20 @@
  */
 package org.hibernate.search.test.embedded.graph;
 
-import static org.junit.Assert.assertEquals;
+import static org.assertj.core.api.Assertions.assertThat;
 
 import org.hibernate.Session;
 import org.hibernate.search.test.SearchTestBase;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 /**
  * TestCase to verify proper management of saving of complex relations and collections. See HSEARCH-476
  */
-public class RecursiveGraphTest extends SearchTestBase {
+class RecursiveGraphTest extends SearchTestBase {
 
 	@Test
-	public void testCreateParentAndChild() throws Exception {
+	void testCreateParentAndChild() {
 		Person[] people = new Person[2];
 		Person parent = new Person();
 		parent.setName( "parent" );
@@ -29,7 +29,7 @@ public class RecursiveGraphTest extends SearchTestBase {
 		people[0] = parent;
 		people[1] = child;
 		savePeople( people );
-		assertEquals( 2, getNumberOfDocumentsInIndex( "Person" ) );
+		assertThat( getNumberOfDocumentsInIndex( "Person" ) ).isEqualTo( 2 );
 	}
 
 	private void connectChildToParent(Person child, Person parent) {

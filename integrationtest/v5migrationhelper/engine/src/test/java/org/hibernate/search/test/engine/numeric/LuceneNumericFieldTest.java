@@ -7,7 +7,6 @@
 package org.hibernate.search.test.engine.numeric;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.Assert.assertEquals;
 
 import java.util.HashSet;
 import java.util.List;
@@ -23,37 +22,37 @@ import org.hibernate.search.engine.ProjectionConstants;
 import org.hibernate.search.testsupport.TestForIssue;
 import org.hibernate.search.testsupport.junit.SearchFactoryHolder;
 import org.hibernate.search.testsupport.junit.SearchITHelper;
-import org.hibernate.search.testsupport.junit.SkipOnElasticsearch;
+import org.hibernate.search.testsupport.junit.Tags;
 
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.experimental.categories.Category;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Tag;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 
 import org.apache.lucene.document.Document;
 import org.apache.lucene.index.IndexableField;
 
-@Category(SkipOnElasticsearch.class) // This test is Lucene-specific. The generic equivalent is NumericFieldTest.
-public class LuceneNumericFieldTest {
+@Tag(Tags.SKIP_ON_ELASTICSEARCH) // This test is Lucene-specific. The generic equivalent is NumericFieldTest.
+class LuceneNumericFieldTest {
 
-	@Rule
+	@RegisterExtension
 	public final SearchFactoryHolder sfHolder = new SearchFactoryHolder( TouristAttraction.class, ScoreBoard.class );
 
 	private final SearchITHelper helper = new SearchITHelper( sfHolder );
 
-	@Before
-	public void setUp() throws Exception {
+	@BeforeEach
+	void setUp() {
 		prepareData();
 	}
 
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-1987")
-	public void testDocumentFieldIsNumeric() {
+	void testDocumentFieldIsNumeric() {
 		List<Object[]> list = (List<Object[]>) helper.hsQuery( TouristAttraction.class )
 				.projection( ProjectionConstants.DOCUMENT )
 				.fetch();
 
-		assertEquals( 1, list.size() );
+		assertThat( list ).hasSize( 1 );
 		Document document = (Document) list.iterator().next()[0];
 
 		IndexableField scoreNumeric = document.getField( "scoreNumeric" );
@@ -62,12 +61,12 @@ public class LuceneNumericFieldTest {
 
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-1987")
-	public void testNumericMappingOfEmbeddedFields() {
+	void testNumericMappingOfEmbeddedFields() {
 		List<Object[]> list = (List<Object[]>) helper.hsQuery( ScoreBoard.class )
 				.projection( ProjectionConstants.DOCUMENT )
 				.fetch();
 
-		assertEquals( 1, list.size() );
+		assertThat( list ).hasSize( 1 );
 		Document document = (Document) list.iterator().next()[0];
 
 		IndexableField scoreNumeric = document.getField( "score_id" );

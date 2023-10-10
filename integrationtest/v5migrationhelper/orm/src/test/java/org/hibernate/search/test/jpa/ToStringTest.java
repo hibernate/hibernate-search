@@ -6,7 +6,7 @@
  */
 package org.hibernate.search.test.jpa;
 
-import static org.junit.Assert.assertThat;
+import static org.assertj.core.api.Assertions.assertThat;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -21,23 +21,22 @@ import org.hibernate.search.jpa.Search;
 import org.hibernate.search.query.dsl.QueryBuilder;
 import org.hibernate.search.testsupport.TestForIssue;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import org.apache.lucene.search.Query;
-import org.hamcrest.CoreMatchers;
 
 /**
  * @author Hardy Ferentschik
  */
-public class ToStringTest extends JPATestCase {
+class ToStringTest extends JPATestCase {
 	FullTextEntityManager entityManager;
 	FullTextSession fullTextSession;
 	Query luceneQuery;
 
 
-	@Before
-	public void setup() {
+	@BeforeEach
+	void setup() {
 		entityManager = Search.getFullTextEntityManager( factory.createEntityManager() );
 		Session session = entityManager.unwrap( Session.class );
 		fullTextSession = org.hibernate.search.Search.getFullTextSession( session );
@@ -51,7 +50,7 @@ public class ToStringTest extends JPATestCase {
 
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-1173")
-	public void testToStringContainsQueryInformationForSessionUseCase() throws Exception {
+	void testToStringContainsQueryInformationForSessionUseCase() {
 		org.hibernate.search.FullTextQuery fullTextQuery = fullTextSession.createFullTextQuery(
 				luceneQuery, Foo.class
 		);
@@ -60,7 +59,7 @@ public class ToStringTest extends JPATestCase {
 
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-1173")
-	public void testToStringContainsQueryInformationForJPAUseCase() throws Exception {
+	void testToStringContainsQueryInformationForJPAUseCase() {
 		org.hibernate.search.jpa.FullTextQuery fullTextQuery = entityManager.createFullTextQuery(
 				luceneQuery, Foo.class
 		);
@@ -74,8 +73,9 @@ public class ToStringTest extends JPATestCase {
 
 	private void assertToStringContainsLuceneQueryInformation(String fullTextQueryToString) {
 		assertThat(
-				"Unexpected toString implementation. The string should contain a string representation of the internal query.",
-				fullTextQueryToString, CoreMatchers.containsString( luceneQuery.toString() ) );
+				fullTextQueryToString )
+				.as( "Unexpected toString implementation. The string should contain a string representation of the internal query." )
+				.contains( luceneQuery.toString() );
 	}
 
 	@Entity

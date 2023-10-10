@@ -9,27 +9,27 @@ package org.hibernate.search.test.query.facet;
 import org.hibernate.Session;
 import org.hibernate.search.testsupport.TestForIssue;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
-public class NullValuesFacetingTest extends AbstractFacetTest {
+class NullValuesFacetingTest extends AbstractFacetTest {
 
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-1917")
-	public void testNullStringFaceting() throws Exception {
+	void testNullStringFaceting() {
 		Car car = new Car( null, "yellow", 2500 );
 		fullTextSession.save( car );
 	}
 
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-1917")
-	public void testEmptyStringFaceting() throws Exception {
+	void testEmptyStringFaceting() {
 		Car car = new Car( "", "red", 2500 );
 		fullTextSession.save( car );
 	}
 
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-1917")
-	public void testNullNumericFaceting() throws Exception {
+	void testNullNumericFaceting() {
 		Car car = new Car( "honda", "yellow", null );
 		fullTextSession.save( car );
 	}

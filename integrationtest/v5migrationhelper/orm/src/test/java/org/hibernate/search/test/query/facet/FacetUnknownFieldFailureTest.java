@@ -6,27 +6,27 @@
  */
 package org.hibernate.search.test.query.facet;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.junit.Assert.assertEquals;
 
 import org.hibernate.Session;
 import org.hibernate.Transaction;
 import org.hibernate.search.FullTextQuery;
 import org.hibernate.search.query.facet.FacetingRequest;
-import org.hibernate.search.testsupport.junit.PortedToSearch6;
+import org.hibernate.search.testsupport.junit.Tags;
 import org.hibernate.search.util.common.SearchException;
 
-import org.junit.Test;
-import org.junit.experimental.categories.Category;
+import org.junit.jupiter.api.Tag;
+import org.junit.jupiter.api.Test;
 
 import org.apache.lucene.search.MatchAllDocsQuery;
 import org.apache.lucene.search.Query;
 
-@Category(PortedToSearch6.class)
-public class FacetUnknownFieldFailureTest extends AbstractFacetTest {
+@Tag(Tags.PORTED_TO_SEARCH_6)
+class FacetUnknownFieldFailureTest extends AbstractFacetTest {
 
 	@Test
-	public void testUnknownFieldNameThrowsException() {
+	void testUnknownFieldNameThrowsException() {
 		FacetingRequest request = queryBuilder( Car.class ).facet()
 				.name( "foo" ) // faceting name is irrelevant
 				.onField( "foobar" ) // foobar is not a valid field name
@@ -38,7 +38,7 @@ public class FacetUnknownFieldFailureTest extends AbstractFacetTest {
 	}
 
 	@Test
-	public void testKnownFieldNameNotConfiguredForFacetingThrowsException() {
+	void testKnownFieldNameNotConfiguredForFacetingThrowsException() {
 		FacetingRequest request = queryBuilder( Fruit.class ).facet()
 				.name( "foo" ) // faceting name is irrelevant
 				.onField( "name" ) // name is a valid property of apple, but not configured for faceting
@@ -48,7 +48,7 @@ public class FacetUnknownFieldFailureTest extends AbstractFacetTest {
 		assertThatThrownBy( () -> {
 			FullTextQuery query = fullTextSession.createFullTextQuery( new MatchAllDocsQuery(), Fruit.class );
 			query.getFacetManager().enableFaceting( request );
-			assertEquals( "Wrong number of query matches", 1, query.getResultSize() );
+			assertThat( query.getResultSize() ).as( "Wrong number of query matches" ).isEqualTo( 1 );
 
 			query.getFacetManager().getFacets( "foo" );
 		} )
@@ -64,7 +64,7 @@ public class FacetUnknownFieldFailureTest extends AbstractFacetTest {
 				.createQuery();
 		FullTextQuery query = fullTextSession.createFullTextQuery( luceneQuery, Car.class );
 		query.getFacetManager().enableFaceting( request );
-		assertEquals( "Wrong number of query matches", 13, query.getResultSize() );
+		assertThat( query.getResultSize() ).as( "Wrong number of query matches" ).isEqualTo( 13 );
 		return query;
 	}
 

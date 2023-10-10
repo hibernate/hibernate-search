@@ -6,7 +6,7 @@
  */
 package org.hibernate.search.test.embedded.polymorphism;
 
-import static org.junit.Assert.assertEquals;
+import static org.assertj.core.api.Assertions.assertThat;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
@@ -25,21 +25,21 @@ import org.hibernate.search.annotations.IndexedEmbedded;
 import org.hibernate.search.test.SearchTestBase;
 import org.hibernate.search.testsupport.TestForIssue;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import org.apache.lucene.index.Term;
 import org.apache.lucene.search.Query;
 import org.apache.lucene.search.TermQuery;
 
 @TestForIssue(jiraKey = "HSEARCH-3156")
-public class PolymorphicAssociationContainedInTargetTest extends SearchTestBase {
+class PolymorphicAssociationContainedInTargetTest extends SearchTestBase {
 
 	private static final String INIT_NAME = "initname";
 	private static final String EDIT_NAME = "editname";
 
 	// Nominal case: the level3 refers to a level2 of a configured type (DerivedLevel2).
 	@Test
-	public void testPolymorphicAssociationConfiguredType() {
+	void testPolymorphicAssociationConfiguredType() {
 		try ( Session session = openSession() ) {
 			Transaction transaction = session.beginTransaction();
 
@@ -77,14 +77,14 @@ public class PolymorphicAssociationContainedInTargetTest extends SearchTestBase 
 				FullTextSession fullTextSession = Search.getFullTextSession( session ) ) {
 			Query q = new TermQuery( new Term( "derivedLevel2Child.level3Child.name", EDIT_NAME ) );
 			FullTextQuery fullTextQuery = fullTextSession.createFullTextQuery( q );
-			assertEquals( 1, fullTextQuery.getResultSize() );
+			assertThat( fullTextQuery.getResultSize() ).isEqualTo( 1 );
 		}
 	}
 
 	// Failing case: the level3 refers to a level2 of a non-configured type (Level2, the base type).
 	// This should not affect the index, but indexing used to fail with an exception before HSEARCH-3156 was solved.
 	@Test
-	public void testPolymorphicAssociationNonConfiguredType() {
+	void testPolymorphicAssociationNonConfiguredType() {
 		try ( Session session = openSession() ) {
 			Transaction transaction = session.beginTransaction();
 

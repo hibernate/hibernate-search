@@ -7,8 +7,8 @@
 
 package org.hibernate.search.test.embedded.nested.containedIn;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmUtils.listAll;
-import static org.junit.Assert.assertEquals;
 
 import java.util.Map;
 
@@ -21,7 +21,7 @@ import org.hibernate.search.testsupport.TestForIssue;
 
 import org.hibernate.testing.cache.CachingRegionFactory;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import org.apache.lucene.document.LongPoint;
 import org.apache.lucene.index.Term;
@@ -30,12 +30,12 @@ import org.apache.lucene.search.TermQuery;
 /**
  * @author Emmanuel Bernard
  */
-public class LazyM2OContainedInTest extends SearchTestBase {
+class LazyM2OContainedInTest extends SearchTestBase {
 
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-385")
 	@SuppressWarnings("unchecked")
-	public void testDocumentsAt0() {
+	void testDocumentsAt0() {
 		FullTextSession fts = Search.getFullTextSession( getSessionFactory().openSession() );
 		Transaction tx = fts.beginTransaction();
 		final Entity1ForDoc0 ent1 = new Entity1ForDoc0();
@@ -59,15 +59,13 @@ public class LazyM2OContainedInTest extends SearchTestBase {
 
 		tx = fts.beginTransaction();
 
-		assertEquals(
-				1,
+		assertThat(
 				fts.createFullTextQuery( LongPoint.newExactQuery( "uid", uid1 ), Entity1ForDoc0.class ).getResultSize()
-		);
-		assertEquals(
-				1,
+		).isEqualTo( 1 );
+		assertThat(
 				fts.createFullTextQuery( LongPoint.newExactQuery( "entities2.uid", uid2 ), Entity1ForDoc0.class )
 						.getResultSize()
-		);
+		).isEqualTo( 1 );
 
 		tx.commit();
 
@@ -84,7 +82,7 @@ public class LazyM2OContainedInTest extends SearchTestBase {
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-386")
 	@SuppressWarnings("unchecked")
-	public void testContainedInAndLazy() {
+	void testContainedInAndLazy() {
 		FullTextSession fts = Search.getFullTextSession( getSessionFactory().openSession() );
 		Entity1ForUnindexed ent1_0 = new Entity1ForUnindexed();
 		Entity1ForUnindexed ent1_1 = new Entity1ForUnindexed();
@@ -119,12 +117,12 @@ public class LazyM2OContainedInTest extends SearchTestBase {
 		//FIXME that's not guaranteed to happen before flush
 		long otherId = other.getUid();
 
-		assertEquals( 1, fts
+		assertThat( fts
 				.createFullTextQuery(
 						LongPoint.newExactQuery( "entity1.uid-numeric", ent1_0.getUid() ),
 						Entity2ForUnindexed.class
 				)
-				.getResultSize() );
+				.getResultSize() ).isEqualTo( 1 );
 		Entity1ForUnindexed toDelete = (Entity1ForUnindexed) fts.get( Entity1ForUnindexed.class, otherId );
 
 		fts.delete( toDelete );
@@ -133,9 +131,10 @@ public class LazyM2OContainedInTest extends SearchTestBase {
 		fts.getTransaction().commit();
 		fts.clear();
 
-		assertEquals( 0,
+		assertThat(
 				fts.createFullTextQuery( new TermQuery( new Term( "entity1.uid", String.valueOf( otherId ) ) ),
-						Entity2ForUnindexed.class ).getResultSize() );
+						Entity2ForUnindexed.class ).getResultSize() )
+				.isZero();
 
 		tx = fts.beginTransaction();
 		for ( Entity2ForUnindexed e : listAll( fts, Entity2ForUnindexed.class ) ) {

@@ -6,8 +6,8 @@
  */
 package org.hibernate.search.test.engine;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmUtils.listAll;
-import static org.junit.Assert.assertEquals;
 
 import org.hibernate.Transaction;
 import org.hibernate.search.FullTextQuery;
@@ -15,7 +15,7 @@ import org.hibernate.search.FullTextSession;
 import org.hibernate.search.Search;
 import org.hibernate.search.test.SearchTestBase;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import org.apache.lucene.search.MatchAllDocsQuery;
 
@@ -25,24 +25,24 @@ import org.apache.lucene.search.MatchAllDocsQuery;
  *
  * @author Sanne Grinovero
  */
-public class RollbackTransactionTest extends SearchTestBase {
+class RollbackTransactionTest extends SearchTestBase {
 
 	@Test
-	public void testTransactionBehaviour() {
-		assertEquals( 0, countBusLinesByFullText() );
-		assertEquals( 0, countBusLineByDatabaseCount() );
+	void testTransactionBehaviour() {
+		assertThat( countBusLinesByFullText() ).isZero();
+		assertThat( countBusLineByDatabaseCount() ).isZero();
 		createBusLines( 5, true );
-		assertEquals( 0, countBusLinesByFullText() );
-		assertEquals( 0, countBusLineByDatabaseCount() );
+		assertThat( countBusLinesByFullText() ).isZero();
+		assertThat( countBusLineByDatabaseCount() ).isZero();
 		createBusLines( 5, false );
-		assertEquals( 5, countBusLinesByFullText() );
-		assertEquals( 5, countBusLineByDatabaseCount() );
+		assertThat( countBusLinesByFullText() ).isEqualTo( 5 );
+		assertThat( countBusLineByDatabaseCount() ).isEqualTo( 5 );
 		createBusLines( 7, true );
-		assertEquals( 5, countBusLinesByFullText() );
-		assertEquals( 5, countBusLineByDatabaseCount() );
+		assertThat( countBusLinesByFullText() ).isEqualTo( 5 );
+		assertThat( countBusLineByDatabaseCount() ).isEqualTo( 5 );
 		createBusLines( 7, false );
-		assertEquals( 12, countBusLinesByFullText() );
-		assertEquals( 12, countBusLineByDatabaseCount() );
+		assertThat( countBusLinesByFullText() ).isEqualTo( 12 );
+		assertThat( countBusLineByDatabaseCount() ).isEqualTo( 12 );
 	}
 
 	private void createBusLines(int number, boolean rollback) {

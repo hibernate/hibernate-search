@@ -13,9 +13,9 @@ import org.hibernate.search.spatial.impl.Point;
 import org.hibernate.search.testsupport.junit.SearchFactoryHolder;
 import org.hibernate.search.testsupport.junit.SearchITHelper;
 
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 
 import org.apache.lucene.search.Query;
 
@@ -25,20 +25,20 @@ import org.apache.lucene.search.Query;
  */
 //DO NOT AUTO INDENT THIS FILE.
 //MY DSL IS BEAUTIFUL, DUMB INDENTATION IS SCREWING IT UP
-public class SpatialDSLTest {
+class SpatialDSLTest {
 
-	@Rule
+	@RegisterExtension
 	public final SearchFactoryHolder sfHolder = new SearchFactoryHolder( POI.class );
 
 	private final SearchITHelper helper = new SearchITHelper( sfHolder );
 
-	@Before
-	public void setUp() throws Exception {
+	@BeforeEach
+	void setUp() {
 		indexTestData();
 	}
 
 	@Test
-	public void testSpatialRangeQueries() {
+	void testSpatialRangeQueries() {
 		final QueryBuilder builder = helper.queryBuilder( POI.class );
 
 		Coordinates coordinates = Point.fromDegrees( 24d, 31.5d );

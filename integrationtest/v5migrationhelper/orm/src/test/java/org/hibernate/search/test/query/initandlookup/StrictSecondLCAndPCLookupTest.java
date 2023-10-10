@@ -26,8 +26,8 @@ import org.hibernate.stat.Statistics;
 
 import org.hibernate.testing.cache.CachingRegionFactory;
 
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 
 import org.apache.lucene.search.MatchAllDocsQuery;
 
@@ -36,13 +36,13 @@ import org.apache.lucene.search.MatchAllDocsQuery;
  *
  * @author Sanne Grinovero (C) 2011 Red Hat Inc.
  */
-public class StrictSecondLCAndPCLookupTest extends SearchTestBase {
+class StrictSecondLCAndPCLookupTest extends SearchTestBase {
 
-	@Rule
+	@RegisterExtension
 	public StaticIndexingSwitch indexingSwitch = new StaticIndexingSwitch();
 
 	@Test
-	public void testStaleCacheWithAsyncIndexer() {
+	void testStaleCacheWithAsyncIndexer() {
 		Session session = openSession();
 		final Statistics statistics = session.getSessionFactory().getStatistics();
 		statistics.clear();

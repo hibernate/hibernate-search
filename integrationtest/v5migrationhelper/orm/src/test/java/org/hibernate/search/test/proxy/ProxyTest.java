@@ -13,15 +13,15 @@ import org.hibernate.Session;
 import org.hibernate.Transaction;
 import org.hibernate.search.test.SearchTestBase;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 /**
  * @author Hardy Ferentschik
  */
-public class ProxyTest extends SearchTestBase {
+class ProxyTest extends SearchTestBase {
 
 	@Test
-	public void testProxy() throws Exception {
+	void testProxy() {
 		Session session = openSession();
 		Transaction tx = session.beginTransaction();
 		Book book = new Book(
@@ -49,7 +49,7 @@ public class ProxyTest extends SearchTestBase {
 	}
 
 	@Test
-	public void testDeleteProxy() throws Exception {
+	void testDeleteProxy() {
 		createTestData();
 
 		Session s = openSession();

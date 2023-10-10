@@ -6,8 +6,8 @@
  */
 package org.hibernate.search.test.session;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmUtils.listAll;
-import static org.junit.Assert.assertEquals;
 
 import java.sql.Connection;
 import java.sql.SQLException;
@@ -23,7 +23,7 @@ import org.hibernate.search.Search;
 import org.hibernate.search.test.SearchTestBase;
 import org.hibernate.search.testsupport.TestConstants;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import org.apache.lucene.index.Term;
 import org.apache.lucene.queryparser.classic.QueryParser;
@@ -33,10 +33,10 @@ import org.apache.lucene.search.TermQuery;
 /**
  * @author Emmanuel Bernard
  */
-public class MassIndexTest extends SearchTestBase {
+class MassIndexTest extends SearchTestBase {
 
 	@Test
-	public void testTransactional() throws Exception {
+	void testTransactional() throws Exception {
 		FullTextSession s = Search.getFullTextSession( openSession() );
 		Transaction tx = s.beginTransaction();
 		final int loop = 4;
@@ -55,7 +55,7 @@ public class MassIndexTest extends SearchTestBase {
 		tx = s.beginTransaction();
 		QueryParser parser = new QueryParser( "id", TestConstants.stopAnalyzer );
 		List result = s.createFullTextQuery( parser.parse( "body:create" ) ).list();
-		assertEquals( 0, result.size() );
+		assertThat( result ).isEmpty();
 		tx.commit();
 		s.close();
 
@@ -87,7 +87,7 @@ public class MassIndexTest extends SearchTestBase {
 		tx = s.beginTransaction();
 		parser = new QueryParser( "noDefaultField", TestConstants.stopAnalyzer );
 		result = s.createFullTextQuery( parser.parse( "body:write" ) ).list();
-		assertEquals( 0, result.size() );
+		assertThat( result ).isEmpty();
 		result = listAll( s, Email.class );
 		for ( int i = 0; i < loop / 2; i++ ) {
 			s.index( result.get( i ) );
@@ -113,7 +113,7 @@ public class MassIndexTest extends SearchTestBase {
 		s = Search.getFullTextSession( openSession() );
 		tx = s.beginTransaction();
 		result = s.createFullTextQuery( parser.parse( "body:create" ) ).list();
-		assertEquals( 1, result.size() );
+		assertThat( result ).hasSize( 1 );
 		tx.commit();
 		s.close();
 	}
@@ -133,7 +133,7 @@ public class MassIndexTest extends SearchTestBase {
 		FullTextSession session = Search.getFullTextSession( s );
 		Query luceneQuery = new TermQuery( new Term( "categorie.nom", "livre" ) );
 		List result = session.createFullTextQuery( luceneQuery, Entite.class ).list();
-		assertEquals( 1, result.size() );
+		assertThat( result ).hasSize( 1 );
 		s.close();
 
 		s = getSessionWithAutoCommit();
@@ -146,7 +146,7 @@ public class MassIndexTest extends SearchTestBase {
 		session = Search.getFullTextSession( s );
 		luceneQuery = new TermQuery( new Term( "categorie.nom", "livre" ) );
 		result = session.createFullTextQuery( luceneQuery, Entite.class ).list();
-		assertEquals( "test lazy loading and indexing", 1, result.size() );
+		assertThat( result ).as( "test lazy loading and indexing" ).hasSize( 1 );
 		s.close();
 
 		s = getSessionWithAutoCommit();
@@ -163,7 +163,7 @@ public class MassIndexTest extends SearchTestBase {
 		session = Search.getFullTextSession( s );
 		luceneQuery = new TermQuery( new Term( "categorie.nom", "livre" ) );
 		result = session.createFullTextQuery( luceneQuery, Entite.class ).list();
-		assertEquals( "test lazy loading and indexing", 1, result.size() );
+		assertThat( result ).as( "test lazy loading and indexing" ).hasSize( 1 );
 		s.close();
 	}
 

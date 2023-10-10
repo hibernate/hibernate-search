@@ -6,8 +6,7 @@
  */
 package org.hibernate.search.test.envers;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNull;
+import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.List;
 
@@ -21,12 +20,12 @@ import org.hibernate.search.Search;
 import org.hibernate.search.query.dsl.QueryBuilder;
 import org.hibernate.search.test.SearchTestBase;
 import org.hibernate.search.testsupport.TestForIssue;
-import org.hibernate.search.testsupport.junit.PortedToSearch6;
+import org.hibernate.search.testsupport.junit.Tags;
 
-import org.hibernate.testing.SkipForDialect;
+import org.hibernate.testing.orm.junit.SkipForDialect;
 
-import org.junit.Test;
-import org.junit.experimental.categories.Category;
+import org.junit.jupiter.api.Tag;
+import org.junit.jupiter.api.Test;
 
 import org.apache.lucene.index.Term;
 import org.apache.lucene.search.Query;
@@ -38,9 +37,9 @@ import org.apache.lucene.search.TermQuery;
  *
  * @author Davide Di Somma <davide.disomma@gmail.com>
  */
-@SkipForDialect(jiraKey = "HSEARCH-1943", value = PostgreSQLDialect.class)
-@Category(PortedToSearch6.class)
-public class SearchAndEnversIntegrationTest extends SearchTestBase {
+@SkipForDialect(reason = "HSEARCH-1943", dialectClass = PostgreSQLDialect.class)
+@Tag(Tags.PORTED_TO_SEARCH_6)
+class SearchAndEnversIntegrationTest extends SearchTestBase {
 
 	private Person harryPotter;
 	private Person hermioneGranger;
@@ -53,7 +52,7 @@ public class SearchAndEnversIntegrationTest extends SearchTestBase {
 	 */
 	@TestForIssue(jiraKey = "HSEARCH-1293")
 	@Test
-	public void testHibernateSearchAndEnversIntegration() {
+	void testHibernateSearchAndEnversIntegration() {
 		atRevision1();
 		atRevision2();
 		atRevision3();
@@ -93,19 +92,19 @@ public class SearchAndEnversIntegrationTest extends SearchTestBase {
 
 				//Let's assert that Hibernate Envers has audited correctly
 				AuditReader auditReader = AuditReaderFactory.get( session );
-				assertEquals( 1, findLastRevisionForEntity( auditReader, Person.class ) );
-				assertEquals( 1, findLastRevisionForEntity( auditReader, Address.class ) );
-				assertEquals( 2, howManyEntitiesChangedAtRevisionNumber( auditReader, Person.class, 1 ) );
-				assertEquals( 2, howManyEntitiesChangedAtRevisionNumber( auditReader, Address.class, 1 ) );
-				assertEquals( 2, howManyAuditedObjectsSoFar( auditReader, Person.class ) );
-				assertEquals( 2, howManyAuditedObjectsSoFar( auditReader, Address.class ) );
+				assertThat( findLastRevisionForEntity( auditReader, Person.class ) ).isEqualTo( 1 );
+				assertThat( findLastRevisionForEntity( auditReader, Address.class ) ).isEqualTo( 1 );
+				assertThat( howManyEntitiesChangedAtRevisionNumber( auditReader, Person.class, 1 ) ).isEqualTo( 2 );
+				assertThat( howManyEntitiesChangedAtRevisionNumber( auditReader, Address.class, 1 ) ).isEqualTo( 2 );
+				assertThat( howManyAuditedObjectsSoFar( auditReader, Person.class ) ).isEqualTo( 2 );
+				assertThat( howManyAuditedObjectsSoFar( auditReader, Address.class ) ).isEqualTo( 2 );
 				//Let's compares that entities from Hibernate Search and last revision entities from Hibernate Envers are equals
 				Person hermioneFromHibSearch = findPersonFromIndexBySurname( session, "Granger" );
 				Person hermioneAtRevision1 = findPersonFromAuditBySurname( auditReader, "Granger" );
-				assertEquals( hermioneFromHibSearch, hermioneAtRevision1 );
+				assertThat( hermioneAtRevision1 ).isEqualTo( hermioneFromHibSearch );
 				Person harryFromHibSearch = findPersonFromIndexBySurname( session, "Potter" );
 				Person harryAtRevision1 = findPersonFromAuditBySurname( auditReader, "Potter" );
-				assertEquals( harryFromHibSearch, harryAtRevision1 );
+				assertThat( harryAtRevision1 ).isEqualTo( harryFromHibSearch );
 
 				tx.commit();
 			}
@@ -143,27 +142,27 @@ public class SearchAndEnversIntegrationTest extends SearchTestBase {
 				AuditReader auditReader = AuditReaderFactory.get( session );
 
 				//Let's assert that Hibernate Envers has audited everything correctly
-				assertEquals( 1, findLastRevisionForEntity( auditReader, Person.class ) );
-				assertEquals( 2, findLastRevisionForEntity( auditReader, Address.class ) );
-				assertEquals( 0, howManyEntitiesChangedAtRevisionNumber( auditReader, Person.class, 2 ) );
-				assertEquals( 1, howManyEntitiesChangedAtRevisionNumber( auditReader, Address.class, 2 ) );
-				assertEquals( 2, howManyAuditedObjectsSoFar( auditReader, Person.class ) );
-				assertEquals( 3, howManyAuditedObjectsSoFar( auditReader, Address.class ) );
+				assertThat( findLastRevisionForEntity( auditReader, Person.class ) ).isEqualTo( 1 );
+				assertThat( findLastRevisionForEntity( auditReader, Address.class ) ).isEqualTo( 2 );
+				assertThat( howManyEntitiesChangedAtRevisionNumber( auditReader, Person.class, 2 ) ).isZero();
+				assertThat( howManyEntitiesChangedAtRevisionNumber( auditReader, Address.class, 2 ) ).isEqualTo( 1 );
+				assertThat( howManyAuditedObjectsSoFar( auditReader, Person.class ) ).isEqualTo( 2 );
+				assertThat( howManyAuditedObjectsSoFar( auditReader, Address.class ) ).isEqualTo( 3 );
 				@SuppressWarnings("unchecked")
 				List<Address> houseNumberAddressChangedAtRevision2 = auditReader.createQuery()
 						.forEntitiesModifiedAtRevision( Address.class, 2 )
 						.add( AuditEntity.property( "houseNumber" ).hasChanged() )
 						.add( AuditEntity.property( "flatNumber" ).hasChanged() )
 						.add( AuditEntity.property( "streetName" ).hasNotChanged() ).getResultList();
-				assertEquals( 1, houseNumberAddressChangedAtRevision2.size() );
+				assertThat( houseNumberAddressChangedAtRevision2 ).hasSize( 1 );
 
 				//Let's assert that Hibernate Search has indexed everything correctly
 				List<Person> peopleLivingInPrivetDriveFromHibSearch = findPeopleFromIndexByStreetName( session, "privet" );
-				assertEquals( 1, peopleLivingInPrivetDriveFromHibSearch.size() );
+				assertThat( peopleLivingInPrivetDriveFromHibSearch ).hasSize( 1 );
 				//Let's compare that entities from Hibernate Search and last revision entities from Hibernate Envers are equals
 				Person harryFromHibSearch = peopleLivingInPrivetDriveFromHibSearch.get( 0 );
 				Person harryAtRevision2 = findPersonFromAuditBySurname( auditReader, "Potter" );
-				assertEquals( harryFromHibSearch, harryAtRevision2 );
+				assertThat( harryAtRevision2 ).isEqualTo( harryFromHibSearch );
 
 				tx.commit();
 			}
@@ -204,16 +203,16 @@ public class SearchAndEnversIntegrationTest extends SearchTestBase {
 				List<Person> peopleWhoHasMovedHouseAtRevision3 = auditReader.createQuery()
 						.forEntitiesModifiedAtRevision( Person.class, 3 ).add( AuditEntity.property( "address" ).hasChanged() )
 						.getResultList();
-				assertEquals( 1, peopleWhoHasMovedHouseAtRevision3.size() );
-				assertEquals( 3, findLastRevisionForEntity( auditReader, Person.class ) );
-				assertEquals( 3, findLastRevisionForEntity( auditReader, Address.class ) );
-				assertEquals( 1, howManyEntitiesChangedAtRevisionNumber( auditReader, Person.class, 3 ) );
-				assertEquals( 2, howManyEntitiesChangedAtRevisionNumber( auditReader, Address.class, 3 ) );
-				assertEquals( 3, howManyAuditedObjectsSoFar( auditReader, Person.class ) );
-				assertEquals( 5, howManyAuditedObjectsSoFar( auditReader, Address.class ) );
+				assertThat( peopleWhoHasMovedHouseAtRevision3.size() ).isEqualTo( 1 );
+				assertThat( findLastRevisionForEntity( auditReader, Person.class ) ).isEqualTo( 3 );
+				assertThat( findLastRevisionForEntity( auditReader, Address.class ) ).isEqualTo( 3 );
+				assertThat( howManyEntitiesChangedAtRevisionNumber( auditReader, Person.class, 3 ) ).isEqualTo( 1 );
+				assertThat( howManyEntitiesChangedAtRevisionNumber( auditReader, Address.class, 3 ) ).isEqualTo( 2 );
+				assertThat( howManyAuditedObjectsSoFar( auditReader, Person.class ) ).isEqualTo( 3 );
+				assertThat( howManyAuditedObjectsSoFar( auditReader, Address.class ) ).isEqualTo( 5 );
 				//Let's assert that Hibernate Search has indexed everything correctly
 				List<Person> peopleLivingInPrivetDriveFromHibSearch = findPeopleFromIndexByStreetName( session, "privet" );
-				assertEquals( 2, peopleLivingInPrivetDriveFromHibSearch.size() );
+				assertThat( peopleLivingInPrivetDriveFromHibSearch ).hasSize( 2 );
 
 				tx.commit();
 			}
@@ -250,17 +249,17 @@ public class SearchAndEnversIntegrationTest extends SearchTestBase {
 				AuditReader auditReader = AuditReaderFactory.get( session );
 
 				//Let's assert that Hibernate Envers has audited everything correctly
-				assertEquals( 4, findLastRevisionForEntity( auditReader, Person.class ) );
-				assertEquals( 4, findLastRevisionForEntity( auditReader, Address.class ) );
-				assertEquals( 2, howManyEntitiesChangedAtRevisionNumber( auditReader, Person.class, 4 ) );
-				assertEquals( 2, howManyEntitiesChangedAtRevisionNumber( auditReader, Address.class, 4 ) );
-				assertEquals( 7, howManyAuditedObjectsSoFar( auditReader, Address.class ) );
-				assertEquals( 5, howManyAuditedObjectsSoFar( auditReader, Person.class ) );
+				assertThat( findLastRevisionForEntity( auditReader, Person.class ) ).isEqualTo( 4 );
+				assertThat( findLastRevisionForEntity( auditReader, Address.class ) ).isEqualTo( 4 );
+				assertThat( howManyEntitiesChangedAtRevisionNumber( auditReader, Person.class, 4 ) ).isEqualTo( 2 );
+				assertThat( howManyEntitiesChangedAtRevisionNumber( auditReader, Address.class, 4 ) ).isEqualTo( 2 );
+				assertThat( howManyAuditedObjectsSoFar( auditReader, Address.class ) ).isEqualTo( 7 );
+				assertThat( howManyAuditedObjectsSoFar( auditReader, Person.class ) ).isEqualTo( 5 );
 				//Let's assert that Hibernate Search has indexed everything correctly
-				assertNull( findPersonFromIndexBySurname( session, "Potter" ) );
-				assertNull( findPersonFromIndexBySurname( session, "Granger" ) );
-				assertEquals( 0, findPeopleFromIndexByStreetName( session, "privet" ).size() );
-				assertEquals( 0, findPeopleFromIndexByStreetName( session, "Guillaume" ).size() );
+				assertThat( findPersonFromIndexBySurname( session, "Potter" ) ).isNull();
+				assertThat( findPersonFromIndexBySurname( session, "Granger" ) ).isNull();
+				assertThat( findPeopleFromIndexByStreetName( session, "privet" ) ).isEmpty();
+				assertThat( findPeopleFromIndexByStreetName( session, "Guillaume" ) ).isEmpty();
 
 				tx.commit();
 			}

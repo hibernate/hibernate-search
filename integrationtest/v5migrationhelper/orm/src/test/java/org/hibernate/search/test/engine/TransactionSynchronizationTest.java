@@ -28,10 +28,10 @@ import org.hibernate.search.test.SearchTestBase;
 /**
  * @author Emmanuel Bernard
  */
-public class TransactionSynchronizationTest extends SearchTestBase {
+class TransactionSynchronizationTest extends SearchTestBase {
 
-	@org.junit.Test
-	public void testProperExceptionPropagation() throws Exception {
+	@org.junit.jupiter.api.Test
+	void testProperExceptionPropagation() {
 		/*
 		 * This test relies on the fact that Hibernate Search needs to call getFailing()
 		 * during indexing, and that this method will throw an exception.

@@ -6,18 +6,19 @@
  */
 package org.hibernate.search.test.dsl;
 
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+
 import org.hibernate.search.query.dsl.QueryBuilder;
 import org.hibernate.search.testsupport.AnalysisNames;
 import org.hibernate.search.testsupport.TestForIssue;
-import org.hibernate.search.testsupport.junit.PortedToSearch6;
 import org.hibernate.search.testsupport.junit.SearchFactoryHolder;
 import org.hibernate.search.testsupport.junit.SearchITHelper;
+import org.hibernate.search.testsupport.junit.Tags;
 
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.experimental.categories.Category;
-import org.junit.rules.ExpectedException;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Tag;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 
 import org.apache.lucene.search.Query;
 import org.apache.lucene.search.Sort;
@@ -26,24 +27,21 @@ import org.apache.lucene.search.SortField;
 /**
  * @author Guillaume Smet
  */
-public class SimpleQueryStringDSLTest {
-	@Rule
+class SimpleQueryStringDSLTest {
+	@RegisterExtension
 	public final SearchFactoryHolder sfHolder = new SearchFactoryHolder( Coffee.class, Book.class );
 
 	private final SearchITHelper helper = new SearchITHelper( sfHolder );
 
-	@Rule
-	public final ExpectedException thrown = ExpectedException.none();
-
-	@Before
-	public void setUp() throws Exception {
+	@BeforeEach
+	void setUp() {
 		indexTestData();
 	}
 
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-2678")
-	@Category(PortedToSearch6.class)
-	public void testSimpleQueryString() {
+	@Tag(Tags.PORTED_TO_SEARCH_6)
+	void testSimpleQueryString() {
 		QueryBuilder qb = getCoffeeQueryBuilder();
 
 		Query query = qb.simpleQueryString()
@@ -84,8 +82,8 @@ public class SimpleQueryStringDSLTest {
 
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-2678")
-	@Category(PortedToSearch6.class)
-	public void testBoost() {
+	@Tag(Tags.PORTED_TO_SEARCH_6)
+	void testBoost() {
 		QueryBuilder qb = getCoffeeQueryBuilder();
 
 		Query query = qb.simpleQueryString()
@@ -111,8 +109,8 @@ public class SimpleQueryStringDSLTest {
 
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-2678")
-	@Category(PortedToSearch6.class)
-	public void testFuzzy() {
+	@Tag(Tags.PORTED_TO_SEARCH_6)
+	void testFuzzy() {
 		QueryBuilder qb = getCoffeeQueryBuilder();
 
 		Query query = qb.simpleQueryString()
@@ -128,8 +126,8 @@ public class SimpleQueryStringDSLTest {
 
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-2678")
-	@Category(PortedToSearch6.class)
-	public void testAnalyzer() {
+	@Tag(Tags.PORTED_TO_SEARCH_6)
+	void testAnalyzer() {
 		QueryBuilder qb = getBookQueryBuilder();
 
 		Query query = qb.simpleQueryString()
@@ -170,24 +168,24 @@ public class SimpleQueryStringDSLTest {
 
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-2700")
-	@Category(PortedToSearch6.class)
-	public void testNullQueryString() {
-		QueryBuilder qb = getCoffeeQueryBuilder();
+	@Tag(Tags.PORTED_TO_SEARCH_6)
+	void testNullQueryString() {
+		assertThatThrownBy( () -> {
+			QueryBuilder qb = getCoffeeQueryBuilder();
+			qb.simpleQueryString()
+					.onFields( "name", "summary", "description" )
+					.withAndAsDefaultOperator()
+					.matching( null )
+					.createQuery();
+		} ).isInstanceOf( IllegalArgumentException.class )
+				.hasMessageContaining( "'simpleQueryString' must not be null" );
 
-		thrown.expect( IllegalArgumentException.class );
-		thrown.expectMessage( "'simpleQueryString' must not be null" );
-
-		qb.simpleQueryString()
-				.onFields( "name", "summary", "description" )
-				.withAndAsDefaultOperator()
-				.matching( null )
-				.createQuery();
 	}
 
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-2700")
-	@Category(PortedToSearch6.class)
-	public void testEmptyQueryString() {
+	@Tag(Tags.PORTED_TO_SEARCH_6)
+	void testEmptyQueryString() {
 		QueryBuilder qb = getCoffeeQueryBuilder();
 
 		Query query = qb.simpleQueryString()
@@ -203,8 +201,8 @@ public class SimpleQueryStringDSLTest {
 
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-2700")
-	@Category(PortedToSearch6.class)
-	public void testBlankQueryString() {
+	@Tag(Tags.PORTED_TO_SEARCH_6)
+	void testBlankQueryString() {
 		QueryBuilder qb = getCoffeeQueryBuilder();
 
 		Query query = qb.simpleQueryString()
@@ -230,7 +228,7 @@ public class SimpleQueryStringDSLTest {
 
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-3039")
-	public void testSearchOnEmbeddedObjectId() {
+	void testSearchOnEmbeddedObjectId() {
 		QueryBuilder qb = getCoffeeQueryBuilder();
 
 		Query query = qb.simpleQueryString()

@@ -6,13 +6,10 @@
  */
 package org.hibernate.search.test.jpa;
 
-import static org.hamcrest.CoreMatchers.is;
-import static org.hamcrest.CoreMatchers.not;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.within;
 import static org.hibernate.search.test.util.ResourceCleanupFunctions.withinEntityManager;
 import static org.hibernate.search.test.util.ResourceCleanupFunctions.withinTransaction;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertThat;
 
 import java.util.List;
 
@@ -24,8 +21,8 @@ import org.hibernate.search.test.spatial.DoubleIndexedPOI;
 import org.hibernate.search.test.spatial.POI;
 import org.hibernate.search.testsupport.TestForIssue;
 
-import org.junit.After;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.Test;
 
 import org.apache.lucene.search.Sort;
 
@@ -35,13 +32,13 @@ import org.apache.lucene.search.Sort;
  * @author Nicolas Helleringer
  * @author Davide Di Somma <davide.disomma@gmail.com>
  */
-public class SpatialQueryingJPATest extends JPATestCase {
+class SpatialQueryingJPATest extends JPATestCase {
 
 	// Use a large, but reasonable distance: Elasticsearch 5 can't handle Double.MAX_VALUE for instance
 	private static final double LARGE_DISTANCE_KM = 40_000;
 
-	@After
-	public void cleanup() {
+	@AfterEach
+	void cleanup() {
 		withinEntityManager( factory, em -> {
 			withinTransaction( em, () -> {
 				em.createQuery( "from " + POI.class.getName() ).getResultList().forEach( entity -> em.remove( entity ) );
@@ -52,7 +49,7 @@ public class SpatialQueryingJPATest extends JPATestCase {
 	}
 
 	@Test
-	public void testDistanceProjectionWithoutDistanceSort() throws Exception {
+	void testDistanceProjectionWithoutDistanceSort() {
 		POI poi = new POI( 1, "Distance to 24,32 : 0", 24.0d, 32.0d, "" );
 		POI poi2 = new POI( 2, "Distance to 24,32 : 10.16", 24.0d, 31.9d, "" );
 		POI poi3 = new POI( 3, "Distance to 24,32 : 11.12", 23.9d, 32.0d, "" );
@@ -88,26 +85,26 @@ public class SpatialQueryingJPATest extends JPATestCase {
 				hibQuery.setSpatialParameters( centerLatitude, centerLongitude, "location" );
 				hibQuery.setSort( builder.sort().byField( "idSort" ).createSort() );
 				List results = hibQuery.getResultList();
-				assertEquals( 6, results.size() );
+				assertThat( results ).hasSize( 6 );
 				Object[] firstResult = (Object[]) results.get( 0 );
 				Object[] secondResult = (Object[]) results.get( 1 );
 				Object[] thirdResult = (Object[]) results.get( 2 );
 				Object[] fourthResult = (Object[]) results.get( 3 );
 				Object[] fifthResult = (Object[]) results.get( 4 );
 				Object[] sixthResult = (Object[]) results.get( 5 );
-				assertEquals( 0.0, (Double) firstResult[1], 0.01 );
-				assertEquals( 10.1582, (Double) secondResult[1], 0.01 );
-				assertEquals( 11.1195, (Double) thirdResult[1], 0.01 );
-				assertEquals( 15.0636, (Double) fourthResult[1], 0.01 );
-				assertEquals( 22.239, (Double) fifthResult[1], 0.02 );
-				assertEquals( 24.446, (Double) sixthResult[1], 0.02 );
+				assertThat( (Double) firstResult[1] ).isEqualTo( 0.0, within( 0.01 ) );
+				assertThat( (Double) secondResult[1] ).isEqualTo( 10.1582, within( 0.01 ) );
+				assertThat( (Double) thirdResult[1] ).isEqualTo( 11.1195, within( 0.01 ) );
+				assertThat( (Double) fourthResult[1] ).isEqualTo( 15.0636, within( 0.01 ) );
+				assertThat( (Double) fifthResult[1] ).isEqualTo( 22.239, within( 0.02 ) );
+				assertThat( (Double) sixthResult[1] ).isEqualTo( 24.446, within( 0.02 ) );
 			} );
 		} );
 	}
 
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-2324")
-	public void testDistanceProjectionWithoutDistanceSortMissingCoordinates() throws Exception {
+	void testDistanceProjectionWithoutDistanceSortMissingCoordinates() {
 		POI poi1 = new POI( 1, "Distance to 24,32 : unknown (incomplete coordinates)", null, 32d, "" );
 		POI poi2 = new POI( 2, "Distance to 24,32 : unknown (incomplete coordinates)", 24d, null, "" );
 		POI poi3 = new POI( 3, "Distance to 23,32 : unknown (incomplete coordinates)", null, null, "" );
@@ -134,26 +131,26 @@ public class SpatialQueryingJPATest extends JPATestCase {
 				hibQuery.setSpatialParameters( centerLatitude, centerLongitude, "location" );
 				hibQuery.setSort( builder.sort().byField( "idSort" ).createSort() );
 				List results = hibQuery.getResultList();
-				assertEquals( "Missing coordinates should never appear in spatial query results", 0, results.size() );
+				assertThat( results ).as( "Missing coordinates should never appear in spatial query results" ).isEmpty();
 
 				hibQuery = em.createFullTextQuery( builder.all().createQuery(), POI.class );
 				hibQuery.setProjection( FullTextQuery.THIS, FullTextQuery.SPATIAL_DISTANCE );
 				hibQuery.setSpatialParameters( centerLatitude, centerLongitude, "location" );
 				hibQuery.setSort( builder.sort().byField( "idSort" ).createSort() );
 				results = hibQuery.getResultList();
-				assertEquals( 3, results.size() );
+				assertThat( results ).hasSize( 3 );
 				Object[] firstResult = (Object[]) results.get( 0 );
 				Object[] secondResult = (Object[]) results.get( 1 );
 				Object[] thirdResult = (Object[]) results.get( 2 );
-				assertNull( firstResult[1] );
-				assertNull( secondResult[1] );
-				assertNull( thirdResult[1] );
+				assertThat( firstResult[1] ).isNull();
+				assertThat( secondResult[1] ).isNull();
+				assertThat( thirdResult[1] ).isNull();
 			} );
 		} );
 	}
 
 	@Test
-	public void testDistanceSort() throws Exception {
+	void testDistanceSort() {
 		POI poi = new POI( 1, "Distance to 24,32 : 0", 24.0d, 32.0d, "" );
 		POI poi2 = new POI( 2, "Distance to 24,32 : 10.16", 24.0d, 31.9d, "" );
 		POI poi3 = new POI( 3, "Distance to 24,32 : 11.12", 23.9d, 32.0d, "" );
@@ -198,12 +195,12 @@ public class SpatialQueryingJPATest extends JPATestCase {
 				Object[] fourthResult = (Object[]) results.get( 3 );
 				Object[] fifthResult = (Object[]) results.get( 4 );
 				Object[] sixthResult = (Object[]) results.get( 5 );
-				assertEquals( 0.0, (Double) firstResult[1], 0.01 );
-				assertEquals( 10.1582, (Double) secondResult[1], 0.01 );
-				assertEquals( 11.1195, (Double) thirdResult[1], 0.01 );
-				assertEquals( 15.0636, (Double) fourthResult[1], 0.01 );
-				assertEquals( 22.239, (Double) fifthResult[1], 0.02 );
-				assertEquals( 24.446, (Double) sixthResult[1], 0.02 );
+				assertThat( (Double) firstResult[1] ).isEqualTo( 0.0, within( 0.01 ) );
+				assertThat( (Double) secondResult[1] ).isEqualTo( 10.1582, within( 0.01 ) );
+				assertThat( (Double) thirdResult[1] ).isEqualTo( 11.1195, within( 0.01 ) );
+				assertThat( (Double) fourthResult[1] ).isEqualTo( 15.0636, within( 0.01 ) );
+				assertThat( (Double) fifthResult[1] ).isEqualTo( 22.239, within( 0.02 ) );
+				assertThat( (Double) sixthResult[1] ).isEqualTo( 24.446, within( 0.02 ) );
 
 				distanceSort = builder.sort().byDistance().onField( "location" )
 						.fromLatitude( centerLatitude ).andLongitude( centerLongitude )
@@ -217,18 +214,18 @@ public class SpatialQueryingJPATest extends JPATestCase {
 				fourthResult = (Object[]) results.get( 3 );
 				fifthResult = (Object[]) results.get( 4 );
 				sixthResult = (Object[]) results.get( 5 );
-				assertEquals( 24.446, (Double) firstResult[1], 0.02 );
-				assertEquals( 22.239, (Double) secondResult[1], 0.02 );
-				assertEquals( 15.0636, (Double) thirdResult[1], 0.01 );
-				assertEquals( 11.1195, (Double) fourthResult[1], 0.01 );
-				assertEquals( 10.1582, (Double) fifthResult[1], 0.01 );
-				assertEquals( 0.0, (Double) sixthResult[1], 0.01 );
+				assertThat( (Double) firstResult[1] ).isEqualTo( 24.446, within( 0.02 ) );
+				assertThat( (Double) secondResult[1] ).isEqualTo( 22.239, within( 0.02 ) );
+				assertThat( (Double) thirdResult[1] ).isEqualTo( 15.0636, within( 0.01 ) );
+				assertThat( (Double) fourthResult[1] ).isEqualTo( 11.1195, within( 0.01 ) );
+				assertThat( (Double) fifthResult[1] ).isEqualTo( 10.1582, within( 0.01 ) );
+				assertThat( (Double) sixthResult[1] ).isEqualTo( 0.0, within( 0.01 ) );
 			} );
 		} );
 	}
 
 	@Test
-	public void testDistanceSort2() throws Exception {
+	void testDistanceSort2() {
 		withinEntityManager( factory, em -> {
 			withinTransaction( em, () -> {
 				int cnt = 0;
@@ -278,7 +275,7 @@ public class SpatialQueryingJPATest extends JPATestCase {
 					String message = poi.getName() + " (" + poi.getLatitude() + ", " + poi.getLongitude() + ") is not at "
 							+ centerLatitude + ", " + centerLongitude;
 
-					assertThat( message, ( (Double) result[1] ).doubleValue(), is( not( 0.0 ) ) );
+					assertThat( ( (Double) result[1] ).doubleValue() ).as( message ).isNotZero();
 				}
 			} );
 		} );
@@ -286,7 +283,7 @@ public class SpatialQueryingJPATest extends JPATestCase {
 
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-2324")
-	public void testDistanceSortMissingCoordinates() throws Exception {
+	void testDistanceSortMissingCoordinates() {
 		POI poi = new POI( 0, "Distance to 24,32 : 10.16km", 24.0d, 31.9d, "" );
 		POI poi2 = new POI( 1, "Distance to 24,32 : unknown, 4361.00km if interpreted as 0,0", null, null, "" );
 
@@ -313,8 +310,8 @@ public class SpatialQueryingJPATest extends JPATestCase {
 				List results = hibQuery.getResultList();
 				Object[] firstResult = (Object[]) results.get( 0 );
 				Object[] secondResult = (Object[]) results.get( 1 );
-				assertEquals( 10.1582, (Double) firstResult[1], 0.01 );
-				assertNull( secondResult[1] );
+				assertThat( (Double) firstResult[1] ).isEqualTo( 10.1582, within( 0.01 ) );
+				assertThat( secondResult[1] ).isNull();
 
 				distanceSort = builder.sort().byDistance().onField( "location" )
 						.fromLatitude( centerLatitude ).andLongitude( centerLongitude )
@@ -324,15 +321,15 @@ public class SpatialQueryingJPATest extends JPATestCase {
 				results = hibQuery.getResultList();
 				firstResult = (Object[]) results.get( 0 );
 				secondResult = (Object[]) results.get( 1 );
-				assertNull( firstResult[1] );
-				assertEquals( 10.1582, (Double) secondResult[1], 0.01 );
+				assertThat( firstResult[1] ).isNull();
+				assertThat( (Double) secondResult[1] ).isEqualTo( 10.1582, within( 0.01 ) );
 			} );
 		} );
 	}
 
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-2322")
-	public void testDistanceSortMissingCoordinatesWholeSegment() throws Exception {
+	void testDistanceSortMissingCoordinatesWholeSegment() {
 		POI poi = new POI( 0, "Distance to 24,32 : 10.16km", 24.0d, 31.9d, "" );
 		POI poi2 = new POI( 1, "Distance to 24,32 : unknown, 4361.00km if interpreted as 0,0", null, null, "" );
 
@@ -365,8 +362,8 @@ public class SpatialQueryingJPATest extends JPATestCase {
 				List results = hibQuery.getResultList();
 				Object[] firstResult = (Object[]) results.get( 0 );
 				Object[] secondResult = (Object[]) results.get( 1 );
-				assertEquals( 10.1582, (Double) firstResult[1], 0.01 );
-				assertNull( secondResult[1] );
+				assertThat( (Double) firstResult[1] ).isEqualTo( 10.1582, within( 0.01 ) );
+				assertThat( secondResult[1] ).isNull();
 
 				distanceSort = builder.sort().byDistance().onField( "location" )
 						.fromLatitude( centerLatitude ).andLongitude( centerLongitude )
@@ -376,14 +373,14 @@ public class SpatialQueryingJPATest extends JPATestCase {
 				results = hibQuery.getResultList();
 				firstResult = (Object[]) results.get( 0 );
 				secondResult = (Object[]) results.get( 1 );
-				assertNull( firstResult[1] );
-				assertEquals( 10.1582, (Double) secondResult[1], 0.01 );
+				assertThat( firstResult[1] ).isNull();
+				assertThat( (Double) secondResult[1] ).isEqualTo( 10.1582, within( 0.01 ) );
 			} );
 		} );
 	}
 
 	@Test
-	public void testDistanceSortWithMaxResult() throws Exception {
+	void testDistanceSortWithMaxResult() {
 		POI poi = new POI( 1, "Distance to 24,32 : 0", 24.0d, 32.0d, "" );
 		POI poi2 = new POI( 2, "Distance to 24,32 : 10.16", 24.0d, 31.9d, "" );
 		POI poi3 = new POI( 3, "Distance to 24,32 : 11.12", 23.9d, 32.0d, "" );
@@ -429,15 +426,15 @@ public class SpatialQueryingJPATest extends JPATestCase {
 				Object[] firstResult = (Object[]) results.get( 0 );
 				Object[] secondResult = (Object[]) results.get( 1 );
 				Object[] thirdResult = (Object[]) results.get( 2 );
-				assertEquals( 0.0, (Double) firstResult[1], 0.01 );
-				assertEquals( 10.1582, (Double) secondResult[1], 0.01 );
-				assertEquals( 11.1195, (Double) thirdResult[1], 0.01 );
+				assertThat( (Double) firstResult[1] ).isEqualTo( 0.0, within( 0.01 ) );
+				assertThat( (Double) secondResult[1] ).isEqualTo( 10.1582, within( 0.01 ) );
+				assertThat( (Double) thirdResult[1] ).isEqualTo( 11.1195, within( 0.01 ) );
 			} );
 		} );
 	}
 
 	@Test
-	public void testDoubleIndexedDistanceProjection() throws Exception {
+	void testDoubleIndexedDistanceProjection() throws Exception {
 		DoubleIndexedPOI poi1 = new DoubleIndexedPOI( 1, "Distance to 24,32 : 0", 24.0d, 32.0d, "" );
 		DoubleIndexedPOI poi2 = new DoubleIndexedPOI( 2, "Distance to 24,32 : 10.16", 24.0d, 31.9d, "" );
 		DoubleIndexedPOI poi3 = new DoubleIndexedPOI( 3, "Distance to 24,32 : 11.12", 23.9d, 32.0d, "" );
@@ -482,12 +479,12 @@ public class SpatialQueryingJPATest extends JPATestCase {
 				Object[] fourthResult = (Object[]) results.get( 3 );
 				Object[] fifthResult = (Object[]) results.get( 4 );
 				Object[] sixthResult = (Object[]) results.get( 5 );
-				assertEquals( 0.0, (Double) firstResult[1], 0.01 );
-				assertEquals( 10.1582, (Double) secondResult[1], 0.01 );
-				assertEquals( 11.1195, (Double) thirdResult[1], 0.01 );
-				assertEquals( 15.0636, (Double) fourthResult[1], 0.01 );
-				assertEquals( 22.239, (Double) fifthResult[1], 0.02 );
-				assertEquals( 24.446, (Double) sixthResult[1], 0.02 );
+				assertThat( (Double) firstResult[1] ).isEqualTo( 0.0, within( 0.01 ) );
+				assertThat( (Double) secondResult[1] ).isEqualTo( 10.1582, within( 0.01 ) );
+				assertThat( (Double) thirdResult[1] ).isEqualTo( 11.1195, within( 0.01 ) );
+				assertThat( (Double) fourthResult[1] ).isEqualTo( 15.0636, within( 0.01 ) );
+				assertThat( (Double) fifthResult[1] ).isEqualTo( 22.239, within( 0.02 ) );
+				assertThat( (Double) sixthResult[1] ).isEqualTo( 24.446, within( 0.02 ) );
 
 				//Tests with @Latitude+@Longitude
 				luceneQuery = builder.spatial()
@@ -504,12 +501,12 @@ public class SpatialQueryingJPATest extends JPATestCase {
 				fourthResult = (Object[]) results.get( 3 );
 				fifthResult = (Object[]) results.get( 4 );
 				sixthResult = (Object[]) results.get( 5 );
-				assertEquals( 0.0, (Double) firstResult[1], 0.0001 );
-				assertEquals( 10.1582, (Double) secondResult[1], 0.01 );
-				assertEquals( 11.1195, (Double) thirdResult[1], 0.01 );
-				assertEquals( 15.0636, (Double) fourthResult[1], 0.01 );
-				assertEquals( 22.239, (Double) fifthResult[1], 0.02 );
-				assertEquals( 24.446, (Double) sixthResult[1], 0.02 );
+				assertThat( (Double) firstResult[1] ).isEqualTo( 0.0, within( 0.0001 ) );
+				assertThat( (Double) secondResult[1] ).isEqualTo( 10.1582, within( 0.01 ) );
+				assertThat( (Double) thirdResult[1] ).isEqualTo( 11.1195, within( 0.01 ) );
+				assertThat( (Double) fourthResult[1] ).isEqualTo( 15.0636, within( 0.01 ) );
+				assertThat( (Double) fifthResult[1] ).isEqualTo( 22.239, within( 0.02 ) );
+				assertThat( (Double) sixthResult[1] ).isEqualTo( 24.446, within( 0.02 ) );
 			} );
 		} );
 	}

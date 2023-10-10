@@ -7,7 +7,7 @@
 
 package org.hibernate.search.test.query.nullValues;
 
-import static org.junit.Assert.assertEquals;
+import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.List;
 
@@ -19,7 +19,7 @@ import org.hibernate.search.query.dsl.QueryBuilder;
 import org.hibernate.search.test.SearchTestBase;
 import org.hibernate.search.testsupport.TestForIssue;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import org.apache.lucene.index.Term;
 import org.apache.lucene.search.Query;
@@ -31,10 +31,10 @@ import org.apache.lucene.search.TermQuery;
  * @author Hardy Ferentschik
  */
 @TestForIssue(jiraKey = "HSEARCH-115")
-public class IndexAndQueryNullTest extends SearchTestBase {
+class IndexAndQueryNullTest extends SearchTestBase {
 
 	@Test
-	public void testIndexAndSearchNull() throws Exception {
+	void testIndexAndSearchNull() {
 		Value fooValue = new Value( "foo" );
 		Value nullValue = new Value( null );
 
@@ -55,7 +55,7 @@ public class IndexAndQueryNullTest extends SearchTestBase {
 	}
 
 	@Test
-	public void testNullIndexingWithDSLQuery() throws Exception {
+	void testNullIndexingWithDSLQuery() {
 		Value fooValue = new Value( "foo" );
 		Value nullValue = new Value( null );
 
@@ -74,14 +74,14 @@ public class IndexAndQueryNullTest extends SearchTestBase {
 
 		@SuppressWarnings("unchecked")
 		List<Value> valueList = fullTextQuery.list();
-		assertEquals( "Wrong number of results", 1, valueList.size() );
+		assertThat( valueList ).as( "Wrong number of results" ).hasSize( 1 );
 
 		tx.commit();
 		fullTextSession.close();
 	}
 
 	@Test
-	public void testIndexAndSearchConfiguredDefaultNullToken() throws Exception {
+	void testIndexAndSearchConfiguredDefaultNullToken() {
 		Value fooValue = new Value( "foo" );
 		fooValue.setFallback( "foo" );
 		Value nullValue = new Value( "bar" );
@@ -104,13 +104,12 @@ public class IndexAndQueryNullTest extends SearchTestBase {
 	}
 
 	private void searchKeywordWithExpectedNumberOfResults(FullTextSession fullTextSession, String fieldName, String termValue,
-			int expectedNumberOfResults)
-			throws Exception {
+			int expectedNumberOfResults) {
 		TermQuery query = new TermQuery( new Term( fieldName, termValue ) );
 		FullTextQuery fullTextQuery = fullTextSession.createFullTextQuery( query, Value.class );
 		@SuppressWarnings("unchecked")
 		List<Value> valueList = fullTextQuery.list();
-		assertEquals( "Wrong number of results", expectedNumberOfResults, valueList.size() );
+		assertThat( valueList ).as( "Wrong number of results" ).hasSize( expectedNumberOfResults );
 	}
 
 	@Override

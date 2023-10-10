@@ -5,7 +5,7 @@
  * See the lgpl.txt file in the root directory or <http://www.gnu.org/licenses/lgpl-2.1.html>.
  */
 
-import static org.junit.Assert.assertEquals;
+import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.List;
 
@@ -14,7 +14,7 @@ import org.hibernate.search.Search;
 import org.hibernate.search.test.SearchTestBase;
 import org.hibernate.search.testsupport.TestForIssue;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import org.apache.lucene.index.Term;
 import org.apache.lucene.search.TermQuery;
@@ -25,10 +25,10 @@ import org.apache.lucene.search.TermQuery;
  * We had an embarrassing NPE in this case, so better test for this.
  */
 @TestForIssue(jiraKey = "HSEARCH-2319")
-public class NoPackageTest extends SearchTestBase {
+class NoPackageTest extends SearchTestBase {
 
 	@Test
-	public void testMultipleEntitiesPerIndex() throws Exception {
+	void testMultipleEntitiesPerIndex() {
 		try ( Session s = openSession() ) {
 			s.getTransaction().begin();
 			NotPackagedEntity box = new NotPackagedEntity();
@@ -41,7 +41,7 @@ public class NoPackageTest extends SearchTestBase {
 			s.getTransaction().begin();
 			TermQuery q = new TermQuery( new Term( "title", "dirty" ) );
 			List results = Search.getFullTextSession( s ).createFullTextQuery( q, NotPackagedEntity.class ).list();
-			assertEquals( 1, results.size() );
+			assertThat( results ).hasSize( 1 );
 		}
 	}
 

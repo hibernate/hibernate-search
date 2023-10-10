@@ -6,11 +6,10 @@
  */
 package org.hibernate.search.test.bridge;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.hibernate.search.test.bridge.MapBridgeTestEntity.Language.ENGLISH;
 import static org.hibernate.search.test.bridge.MapBridgeTestEntity.Language.ITALIAN;
 import static org.hibernate.search.test.bridge.MapBridgeTestEntity.Language.KLINGON;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
 
 import java.util.Date;
 import java.util.List;
@@ -23,8 +22,8 @@ import org.hibernate.search.query.dsl.QueryBuilder;
 import org.hibernate.search.query.dsl.TermMatchingContext;
 import org.hibernate.search.test.SearchTestBase;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import org.apache.lucene.document.DateTools;
 import org.apache.lucene.search.Query;
@@ -34,7 +33,7 @@ import org.apache.lucene.search.Query;
  *
  * @author Davide D'Alto
  */
-public class MapBridgeTest extends SearchTestBase {
+class MapBridgeTest extends SearchTestBase {
 
 	private FullTextSession fullTextSession;
 	private MapBridgeTestEntity withoutNull;
@@ -43,7 +42,7 @@ public class MapBridgeTest extends SearchTestBase {
 	private Date indexedDate;
 
 	@Override
-	@Before
+	@BeforeEach
 	public void setUp() throws Exception {
 		super.setUp();
 		Session session = openSession();
@@ -90,123 +89,123 @@ public class MapBridgeTest extends SearchTestBase {
 	}
 
 	@Test
-	public void testSearchNullEntry() throws Exception {
+	void testSearchNullEntry() {
 		List<MapBridgeTestEntity> results = findResults( "nullIndexed", MapBridgeTestEntity.NULL_LANGUAGE_TOKEN, true );
 
-		assertNotNull( "No result found for an indexed collection", results );
-		assertEquals( "Unexpected number of results in a collection", 1, results.size() );
-		assertEquals( "Wrong result returned looking for a null in a collection", withNullEntry.getName(),
-				results.get( 0 ).getName() );
+		assertThat( results ).as( "No result found for an indexed collection" ).isNotNull();
+		assertThat( results ).as( "Unexpected number of results in a collection" ).hasSize( 1 );
+		assertThat( results.get( 0 ).getName() ).as( "Wrong result returned looking for a null in a collection" )
+				.isEqualTo( withNullEntry.getName() );
 	}
 
 	@Test
-	public void testSearchNullNumericEntry() throws Exception {
+	void testSearchNullNumericEntry() {
 		List<MapBridgeTestEntity> results =
 				findResults( "numericNullIndexed", MapBridgeTestEntity.NULL_NUMERIC_TOKEN_INT, false );
 
-		assertNotNull( "No result found for an indexed collection", results );
-		assertEquals( "Unexpected number of results in a collection", 1, results.size() );
-		assertEquals( "Wrong result returned looking for a null in a collection of numeric", withNullEntry.getName(),
-				results.get( 0 ).getName() );
+		assertThat( results ).as( "No result found for an indexed collection" ).isNotNull();
+		assertThat( results ).as( "Unexpected number of results in a collection" ).hasSize( 1 );
+		assertThat( results.get( 0 ).getName() ).as( "Wrong result returned looking for a null in a collection of numeric" )
+				.isEqualTo( withNullEntry.getName() );
 	}
 
 	@Test
-	public void testSearchNotNullEntry() throws Exception {
+	void testSearchNotNullEntry() {
 		{
 			List<MapBridgeTestEntity> results = findResults( "nullIndexed", KLINGON, false );
 
-			assertNotNull( "No result found for an indexed collection", results );
-			assertEquals( "Wrong number of results returned for an indexed collection", 1, results.size() );
-			assertEquals( "Wrong result returned from an indexed collection", withNullEntry.getName(), results.get( 0 )
-					.getName() );
+			assertThat( results ).as( "No result found for an indexed collection" ).isNotNull();
+			assertThat( results ).as( "Wrong number of results returned for an indexed collection" ).hasSize( 1 );
+			assertThat( results.get( 0 ).getName() ).as( "Wrong result returned from an indexed collection" )
+					.isEqualTo( withNullEntry.getName() );
 		}
 		{
 			List<MapBridgeTestEntity> results = findResults( "nullIndexed", ITALIAN, false );
 
-			assertNotNull( "No result found for an indexed collection", results );
-			assertEquals( "Wrong number of results returned for an indexed collection", 1, results.size() );
-			assertEquals( "Wrong result returned from an indexed collection", withoutNull.getName(), results.get( 0 )
-					.getName() );
+			assertThat( results ).as( "No result found for an indexed collection" ).isNotNull();
+			assertThat( results ).as( "Wrong number of results returned for an indexed collection" ).hasSize( 1 );
+			assertThat( results.get( 0 ).getName() ).as( "Wrong result returned from an indexed collection" )
+					.isEqualTo( withoutNull.getName() );
 		}
 		{
 			List<MapBridgeTestEntity> results = findResults( "nullIndexed", ENGLISH, false );
 
-			assertNotNull( "No result found for an indexed collection", results );
-			assertEquals( "Wrong number of results returned for an indexed collection", 2, results.size() );
+			assertThat( results ).as( "No result found for an indexed collection" ).isNotNull();
+			assertThat( results ).as( "Wrong number of results returned for an indexed collection" ).hasSize( 2 );
 		}
 	}
 
 	@Test
-	public void testSearchEntryWhenNullEntryNotIndexed() throws Exception {
+	void testSearchEntryWhenNullEntryNotIndexed() {
 		{
 			List<MapBridgeTestEntity> results = findResults( "nullNotIndexed", "DaltoValue", false );
 
-			assertNotNull( "No result found for an indexed array", results );
-			assertEquals( "Wrong number of results returned for an indexed array", 1, results.size() );
-			assertEquals( "Wrong result returned from an indexed array", withoutNull.getName(), results.get( 0 )
-					.getName() );
+			assertThat( results ).as( "No result found for an indexed array" ).isNotNull();
+			assertThat( results ).as( "Wrong number of results returned for an indexed array" ).hasSize( 1 );
+			assertThat( results.get( 0 ).getName() ).as( "Wrong result returned from an indexed array" )
+					.isEqualTo( withoutNull.getName() );
 		}
 		{
 			List<MapBridgeTestEntity> results = findResults( "nullNotIndexed", "WorfValue", false );
 
-			assertNotNull( "No result found for an indexed array", results );
-			assertEquals( "Wrong number of results returned for an indexed array", 1, results.size() );
-			assertEquals( "Wrong result returned from an indexed array", withNullEntry.getName(), results.get( 0 )
-					.getName() );
+			assertThat( results ).as( "No result found for an indexed array" ).isNotNull();
+			assertThat( results ).as( "Wrong number of results returned for an indexed array" ).hasSize( 1 );
+			assertThat( results.get( 0 ).getName() ).as( "Wrong result returned from an indexed array" )
+					.isEqualTo( withNullEntry.getName() );
 		}
 	}
 
 	@Test
-	public void testSearchNotNullNumeric() throws Exception {
+	void testSearchNotNullNumeric() {
 		{
 			List<MapBridgeTestEntity> results = findNumericResults( "numericNullIndexed", 1 );
 
-			assertNotNull( "No result found for an indexed collection", results );
-			assertEquals( "Wrong number of results returned for an indexed collection", 1, results.size() );
-			assertEquals( "Wrong result returned from an indexed collection", withoutNull.getName(), results.get( 0 )
-					.getName() );
+			assertThat( results ).as( "No result found for an indexed collection" ).isNotNull();
+			assertThat( results ).as( "Wrong number of results returned for an indexed collection" ).hasSize( 1 );
+			assertThat( results.get( 0 ).getName() ).as( "Wrong result returned from an indexed collection" )
+					.isEqualTo( withoutNull.getName() );
 		}
 		{
 			List<MapBridgeTestEntity> results = findNumericResults( "numericNullIndexed", 11 );
 
-			assertNotNull( "No result found for an indexed collection", results );
-			assertEquals( "Wrong number of results returned for an indexed collection", 1, results.size() );
-			assertEquals( "Wrong result returned from an indexed collection", withNullEntry.getName(), results.get( 0 )
-					.getName() );
+			assertThat( results ).as( "No result found for an indexed collection" ).isNotNull();
+			assertThat( results ).as( "Wrong number of results returned for an indexed collection" ).hasSize( 1 );
+			assertThat( results.get( 0 ).getName() ).as( "Wrong result returned from an indexed collection" )
+					.isEqualTo( withNullEntry.getName() );
 		}
 	}
 
 	@Test
-	public void testSearchNotNullNumericEntryWhenNullEntryNotIndexed() throws Exception {
+	void testSearchNotNullNumericEntryWhenNullEntryNotIndexed() {
 		{
 			List<MapBridgeTestEntity> results = findNumericResults( "numericNullNotIndexed", 3L );
 
-			assertNotNull( "No result found for an indexed array", results );
-			assertEquals( "Wrong number of results returned for an indexed array", 1, results.size() );
-			assertEquals( "Wrong result returned from an indexed array", withoutNull.getName(), results.get( 0 )
-					.getName() );
+			assertThat( results ).as( "No result found for an indexed array" ).isNotNull();
+			assertThat( results ).as( "Wrong number of results returned for an indexed array" ).hasSize( 1 );
+			assertThat( results.get( 0 ).getName() ).as( "Wrong result returned from an indexed array" )
+					.isEqualTo( withoutNull.getName() );
 		}
 		{
 			List<MapBridgeTestEntity> results = findNumericResults( "numericNullNotIndexed", 33L );
 
-			assertNotNull( "No result found for an indexed array", results );
-			assertEquals( "Wrong number of results returned for an indexed array", 1, results.size() );
-			assertEquals( "Wrong result returned from an indexed array", withNullEntry.getName(), results.get( 0 )
-					.getName() );
+			assertThat( results ).as( "No result found for an indexed array" ).isNotNull();
+			assertThat( results ).as( "Wrong number of results returned for an indexed array" ).hasSize( 1 );
+			assertThat( results.get( 0 ).getName() ).as( "Wrong result returned from an indexed array" )
+					.isEqualTo( withNullEntry.getName() );
 		}
 	}
 
 	@Test
-	public void testDateIndexing() throws Exception {
+	void testDateIndexing() {
 		List<MapBridgeTestEntity> results = findResultsWithRangeQuery(
 				"dates",
 				DateTools.round( indexedDate, DateTools.Resolution.SECOND )
 		);
 
-		assertNotNull( "No result found for an indexed collection", results );
-		assertEquals( "Wrong number of results returned for an indexed collection", 1, results.size() );
-		assertEquals( "Wrong result returned from a collection of Date", withoutNull.getName(), results.get( 0 )
-				.getName() );
+		assertThat( results ).as( "No result found for an indexed collection" ).isNotNull();
+		assertThat( results ).as( "Wrong number of results returned for an indexed collection" ).hasSize( 1 );
+		assertThat( results.get( 0 ).getName() ).as( "Wrong result returned from a collection of Date" )
+				.isEqualTo( withoutNull.getName() );
 	}
 
 	@SuppressWarnings("unchecked")

@@ -8,7 +8,7 @@ package org.hibernate.search.testsupport.textbuilder;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 /**
  * Tests WordDictionary and WordInventor,
@@ -21,10 +21,10 @@ import org.junit.Test;
  *
  * @author Sanne Grinovero
  */
-public class TextProductionTest {
+class TextProductionTest {
 
 	@Test
-	public void testSomeWordsGetBuilt() {
+	void testSomeWordsGetBuilt() {
 		SentenceInventor wi = new SentenceInventor( 7L, 200 );
 		String randomPeriod = wi.nextPeriod();
 		// randomPeriod will be some random sentence like "Qoswo, orrmi ag ybwp bbtb kw qgtqaon lyhk nbv: qrqm flyui hyshm jmpqyb qmolml fjxw gnumocv Twwg."

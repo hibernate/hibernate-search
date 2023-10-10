@@ -6,7 +6,7 @@
  */
 package org.hibernate.search.test.query.facet;
 
-import static org.junit.Assert.assertEquals;
+import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.Arrays;
 import java.util.Collection;
@@ -25,21 +25,21 @@ import org.hibernate.search.query.facet.Facet;
 import org.hibernate.search.query.facet.FacetSortOrder;
 import org.hibernate.search.query.facet.FacetingRequest;
 import org.hibernate.search.testsupport.TestForIssue;
-import org.hibernate.search.testsupport.junit.PortedToSearch6;
 import org.hibernate.search.testsupport.junit.SearchFactoryHolder;
 import org.hibernate.search.testsupport.junit.SearchITHelper;
+import org.hibernate.search.testsupport.junit.Tags;
 
-import org.junit.Ignore;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.experimental.categories.Category;
+import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.Tag;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 
 import org.apache.lucene.search.MatchAllDocsQuery;
 
 @TestForIssue(jiraKey = "HSEARCH-2535")
-@Category(PortedToSearch6.class)
+@Tag(Tags.PORTED_TO_SEARCH_6)
 public class MultiValuedFacetingTest {
-	@Rule
+	@RegisterExtension
 	public final SearchFactoryHolder sfHolder = new SearchFactoryHolder(
 			StringArrayFacetEntity.class, StringCollectionFacetEntity.class, StringMapFacetEntity.class,
 			NumberArrayFacetEntity.class, NumberCollectionFacetEntity.class, NumberMapFacetEntity.class );
@@ -47,7 +47,7 @@ public class MultiValuedFacetingTest {
 	private final SearchITHelper helper = new SearchITHelper( sfHolder );
 
 	@Test
-	public void stringArray() throws Exception {
+	void stringArray() {
 		StringArrayFacetEntity entity = new StringArrayFacetEntity( 1L );
 		helper.add( entity );
 		entity = new StringArrayFacetEntity( 1L, "foo" );
@@ -68,13 +68,13 @@ public class MultiValuedFacetingTest {
 				.createFacetingRequest();
 
 		List<Facet> facets = hsQuery.getFacetManager().enableFaceting( facetReq ).getFacets( "someFacet" );
-		assertEquals( "There should be two facets", 2, facets.size() );
+		assertThat( facets ).as( "There should be two facets" ).hasSize( 2 );
 		assertFacet( facets.get( 0 ), "foo", 2 );
 		assertFacet( facets.get( 1 ), "bar", 1 );
 	}
 
 	@Test
-	public void stringCollection() throws Exception {
+	void stringCollection() {
 		StringCollectionFacetEntity entity = new StringCollectionFacetEntity( 1L );
 		helper.add( entity );
 		entity = new StringCollectionFacetEntity( 1L, "foo" );
@@ -96,13 +96,13 @@ public class MultiValuedFacetingTest {
 				.createFacetingRequest();
 
 		List<Facet> facets = hsQuery.getFacetManager().enableFaceting( facetReq ).getFacets( "someFacet" );
-		assertEquals( "There should be two facets", 2, facets.size() );
+		assertThat( facets ).as( "There should be two facets" ).hasSize( 2 );
 		assertFacet( facets.get( 0 ), "foo", 2 );
 		assertFacet( facets.get( 1 ), "bar", 1 );
 	}
 
 	@Test
-	public void stringMap() throws Exception {
+	void stringMap() {
 		StringMapFacetEntity entity = new StringMapFacetEntity( 1L );
 		helper.add( entity );
 		entity = new StringMapFacetEntity( 1L, "foo" );
@@ -123,14 +123,14 @@ public class MultiValuedFacetingTest {
 				.createFacetingRequest();
 
 		List<Facet> facets = hsQuery.getFacetManager().enableFaceting( facetReq ).getFacets( "someFacet" );
-		assertEquals( "There should be two facets", 2, facets.size() );
+		assertThat( facets ).as( "There should be two facets" ).hasSize( 2 );
 		assertFacet( facets.get( 0 ), "foo", 2 );
 		assertFacet( facets.get( 1 ), "bar", 1 );
 	}
 
 	@Test
-	@Ignore // HSEARCH-1927 : Range faceting on multiple numeric values does not work
-	public void numberArray() throws Exception {
+	@Disabled // HSEARCH-1927 : Range faceting on multiple numeric values does not work
+	void numberArray() {
 		NumberArrayFacetEntity entity = new NumberArrayFacetEntity( 1L );
 		helper.add( entity );
 		entity = new NumberArrayFacetEntity( 1L, 42 );
@@ -153,14 +153,14 @@ public class MultiValuedFacetingTest {
 				.createFacetingRequest();
 
 		List<Facet> facets = hsQuery.getFacetManager().enableFaceting( facetReq ).getFacets( "someFacet" );
-		assertEquals( "There should be two facets", 2, facets.size() );
+		assertThat( facets ).as( "There should be two facets" ).hasSize( 2 );
 		assertFacet( facets.get( 0 ), "[0.0, 100.0)", 2 );
 		assertFacet( facets.get( 1 ), "[100.0, 500.0)", 1 );
 	}
 
 	@Test
-	@Ignore // HSEARCH-1927 : Range faceting on multiple numeric values does not work
-	public void numberCollection() throws Exception {
+	@Disabled // HSEARCH-1927 : Range faceting on multiple numeric values does not work
+	void numberCollection() {
 		NumberCollectionFacetEntity entity = new NumberCollectionFacetEntity( 1L );
 		helper.add( entity );
 		entity = new NumberCollectionFacetEntity( 1L, 42.2f );
@@ -184,14 +184,14 @@ public class MultiValuedFacetingTest {
 				.createFacetingRequest();
 
 		List<Facet> facets = hsQuery.getFacetManager().enableFaceting( facetReq ).getFacets( "someFacet" );
-		assertEquals( "There should be two facets", 2, facets.size() );
+		assertThat( facets ).as( "There should be two facets" ).hasSize( 2 );
 		assertFacet( facets.get( 0 ), "[0.0, 100.0)", 2 );
 		assertFacet( facets.get( 1 ), "[100.0, 500.0)", 1 );
 	}
 
 	@Test
-	@Ignore // HSEARCH-1927 : Range faceting on multiple numeric values does not work
-	public void numberMap() throws Exception {
+	@Disabled // HSEARCH-1927 : Range faceting on multiple numeric values does not work
+	void numberMap() {
 		NumberMapFacetEntity entity = new NumberMapFacetEntity( 1L );
 		helper.add( entity );
 		entity = new NumberMapFacetEntity( 1L, 42.2f );
@@ -214,14 +214,14 @@ public class MultiValuedFacetingTest {
 				.createFacetingRequest();
 
 		List<Facet> facets = hsQuery.getFacetManager().enableFaceting( facetReq ).getFacets( "someFacet" );
-		assertEquals( "There should be two facets", 2, facets.size() );
+		assertThat( facets ).as( "There should be two facets" ).hasSize( 2 );
 		assertFacet( facets.get( 0 ), "[0.0, 100.0)", 2 );
 		assertFacet( facets.get( 1 ), "[100.0, 500.0)", 1 );
 	}
 
 	private void assertFacet(Facet facet, String expectedValue, int expectedCount) {
-		assertEquals( "Wrong facet value", expectedValue, facet.getValue() );
-		assertEquals( "Wrong facet count", expectedCount, facet.getCount() );
+		assertThat( facet.getValue() ).as( "Wrong facet value" ).isEqualTo( expectedValue );
+		assertThat( facet.getCount() ).as( "Wrong facet count" ).isEqualTo( expectedCount );
 	}
 
 	@Indexed

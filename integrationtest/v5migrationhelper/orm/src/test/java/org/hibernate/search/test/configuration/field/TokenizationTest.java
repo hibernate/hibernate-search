@@ -6,6 +6,8 @@
  */
 package org.hibernate.search.test.configuration.field;
 
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Id;
@@ -17,27 +19,23 @@ import org.hibernate.search.annotations.Indexed;
 import org.hibernate.search.annotations.Store;
 import org.hibernate.search.test.SearchInitializationTestBase;
 
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.ExpectedException;
+import org.junit.jupiter.api.Test;
 
 /**
  * Tests related to the {@code Field} annotation and its options
  *
  * @author Hardy Ferentschik
  */
-public class TokenizationTest extends SearchInitializationTestBase {
+class TokenizationTest extends SearchInitializationTestBase {
 	private static final String DEFAULT_FIELD_NAME = "default";
 
-	@Rule
-	public ExpectedException thrown = ExpectedException.none();
-
 	@Test
-	public void testWarningLoggedForInconsistentFieldConfiguration() throws Exception {
-		thrown.expectMessage( "Duplicate index field definition: '" + DEFAULT_FIELD_NAME + "'" );
-		thrown.expectMessage( Product.class.getName() );
-
-		init( Product.class );
+	void testWarningLoggedForInconsistentFieldConfiguration() {
+		assertThatThrownBy( () -> init( Product.class ) )
+				.hasMessageContainingAll(
+						"Duplicate index field definition: '" + DEFAULT_FIELD_NAME + "'",
+						Product.class.getName()
+				);
 	}
 
 	@Entity

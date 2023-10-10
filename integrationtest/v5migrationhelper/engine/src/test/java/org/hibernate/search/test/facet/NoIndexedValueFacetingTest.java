@@ -15,44 +15,44 @@ import org.hibernate.search.query.dsl.QueryBuilder;
 import org.hibernate.search.query.engine.spi.HSQuery;
 import org.hibernate.search.query.facet.FacetingRequest;
 import org.hibernate.search.testsupport.TestForIssue;
-import org.hibernate.search.testsupport.junit.PortedToSearch6;
 import org.hibernate.search.testsupport.junit.SearchFactoryHolder;
 import org.hibernate.search.testsupport.junit.SearchITHelper;
+import org.hibernate.search.testsupport.junit.Tags;
 
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.experimental.categories.Category;
+import org.junit.jupiter.api.Tag;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 
 /**
  * Test behavior when performing faceting requests on an index with no value for the targeted faceted field
  * (either because there is no document, or because no document has a value for this field).
  */
 @TestForIssue(jiraKey = "HSEARCH-2955")
-@Category(PortedToSearch6.class)
-public class NoIndexedValueFacetingTest {
+@Tag(Tags.PORTED_TO_SEARCH_6)
+class NoIndexedValueFacetingTest {
 
-	@Rule
+	@RegisterExtension
 	public final SearchFactoryHolder sfHolder = new SearchFactoryHolder( FacetedEntity.class );
 
 	private final SearchITHelper helper = new SearchITHelper( sfHolder );
 
 	@Test
-	public void discrete_emptyIndex() {
+	void discrete_emptyIndex() {
 		doDiscreteFacetingQuery();
 	}
 
 	@Test
-	public void integerRange_emptyIndex() {
+	void integerRange_emptyIndex() {
 		doIntegerRangeFacetingQuery();
 	}
 
 	@Test
-	public void floatRange_emptyIndex() {
+	void floatRange_emptyIndex() {
 		doFloatRangeFacetingQuery();
 	}
 
 	@Test
-	public void discrete_noIndexedValueForFacet() {
+	void discrete_noIndexedValueForFacet() {
 		helper.index(
 				new FacetedEntity( 0, null, 0, 0.01f ),
 				new FacetedEntity( 1, null, 1, 42.01f )
@@ -61,7 +61,7 @@ public class NoIndexedValueFacetingTest {
 	}
 
 	@Test
-	public void integerRange_noIndexedValueForFacet() {
+	void integerRange_noIndexedValueForFacet() {
 		helper.index(
 				new FacetedEntity( 0, "first", null, 0.01f ),
 				new FacetedEntity( 1, "second", null, 42.01f )
@@ -70,7 +70,7 @@ public class NoIndexedValueFacetingTest {
 	}
 
 	@Test
-	public void floatRange_noIndexedValueForFacet() {
+	void floatRange_noIndexedValueForFacet() {
 		helper.index(
 				new FacetedEntity( 0, "first", 0, null ),
 				new FacetedEntity( 1, "second", 1, null )

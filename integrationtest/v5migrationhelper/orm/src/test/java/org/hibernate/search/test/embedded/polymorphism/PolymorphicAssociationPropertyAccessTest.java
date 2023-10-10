@@ -6,7 +6,7 @@
  */
 package org.hibernate.search.test.embedded.polymorphism;
 
-import static org.junit.Assert.assertEquals;
+import static org.assertj.core.api.Assertions.assertThat;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
@@ -26,20 +26,20 @@ import org.hibernate.search.annotations.IndexedEmbedded;
 import org.hibernate.search.test.SearchTestBase;
 import org.hibernate.search.testsupport.TestForIssue;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import org.apache.lucene.index.Term;
 import org.apache.lucene.search.Query;
 import org.apache.lucene.search.TermQuery;
 
 @TestForIssue(jiraKey = "HSEARCH-1241")
-public class PolymorphicAssociationPropertyAccessTest extends SearchTestBase {
+class PolymorphicAssociationPropertyAccessTest extends SearchTestBase {
 
 	private static final String INIT_NAME = "initname";
 	private static final String EDIT_NAME = "editname";
 
 	@Test
-	public void testPolymorphicAssociation() {
+	void testPolymorphicAssociation() {
 		prepareEntities( INIT_NAME );
 
 		// Here the test can fail if the polymorphic association is not properly handled.
@@ -48,8 +48,7 @@ public class PolymorphicAssociationPropertyAccessTest extends SearchTestBase {
 	}
 
 	private void prepareEntities(String level3Name) {
-		Session session = openSession();
-		try {
+		try ( Session session = openSession() ) {
 			Transaction transaction = session.beginTransaction();
 
 			Level1 level1 = new Level1();
@@ -69,25 +68,18 @@ public class PolymorphicAssociationPropertyAccessTest extends SearchTestBase {
 
 			transaction.commit();
 		}
-		finally {
-			session.close();
-		}
 	}
 
 	private void changeLevel3Name(String currentName, String newName) {
-		FullTextSession fullTextSession = Search.getFullTextSession( openSession() );
-		try {
+		try ( FullTextSession fullTextSession = Search.getFullTextSession( openSession() ) ) {
 			Transaction transaction = fullTextSession.beginTransaction();
 			Query q = new TermQuery( new Term( "name", currentName ) );
 			FullTextQuery fullTextQuery = fullTextSession.createFullTextQuery( q );
-			assertEquals( 1, fullTextQuery.getResultSize() );
+			assertThat( fullTextQuery.getResultSize() ).isEqualTo( 1 );
 
 			Level3 level3 = (Level3) fullTextQuery.list().get( 0 );
 			level3.setName( newName );
 			transaction.commit();
-		}
-		finally {
-			fullTextSession.close();
 		}
 	}
 

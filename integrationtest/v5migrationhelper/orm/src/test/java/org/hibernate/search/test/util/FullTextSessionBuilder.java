@@ -6,8 +6,6 @@
  */
 package org.hibernate.search.test.util;
 
-import static org.hibernate.search.test.util.impl.JunitJupiterContextHelper.extensionContext;
-
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -28,10 +26,11 @@ import org.hibernate.search.impl.ImplementationFactory;
 import org.hibernate.search.test.testsupport.V5MigrationHelperOrmSetupHelper;
 import org.hibernate.service.spi.ServiceRegistryImplementor;
 
+import org.junit.jupiter.api.extension.AfterAllCallback;
+import org.junit.jupiter.api.extension.AfterEachCallback;
+import org.junit.jupiter.api.extension.BeforeAllCallback;
+import org.junit.jupiter.api.extension.BeforeEachCallback;
 import org.junit.jupiter.api.extension.ExtensionContext;
-import org.junit.rules.TestRule;
-import org.junit.runner.Description;
-import org.junit.runners.model.Statement;
 
 /**
  * Use the builder pattern to provide a SessionFactory.
@@ -41,7 +40,9 @@ import org.junit.runners.model.Statement;
  * @author Sanne Grinovero
  * @author Hardy Ferentschik
  */
-public class FullTextSessionBuilder implements TestRule {
+public class FullTextSessionBuilder
+		implements BeforeEachCallback, AfterEachCallback, BeforeAllCallback,
+		AfterAllCallback {
 
 	private final V5MigrationHelperOrmSetupHelper setupHelper = V5MigrationHelperOrmSetupHelper.create();
 
@@ -49,6 +50,7 @@ public class FullTextSessionBuilder implements TestRule {
 	private final Set<Class<?>> annotatedClasses = new HashSet<>();
 	private SessionFactoryImplementor sessionFactory;
 	private final List<LoadEventListener> additionalLoadEventListeners = new ArrayList<>();
+	private boolean callOncePerClass = false;
 
 	/**
 	 * Override before building any parameter, or add new ones.
@@ -124,24 +126,31 @@ public class FullTextSessionBuilder implements TestRule {
 	}
 
 	@Override
-	public Statement apply(final Statement base, Description description) {
-		ExtensionContext context = extensionContext( description );
-
-		Statement wrapped = new Statement() {
-			@Override
-			public void evaluate() throws Throwable {
-				setupHelper.beforeAll( context );
-				build();
-				try {
-					base.evaluate();
-				}
-				finally {
-					sessionFactory = null;
-					setupHelper.afterAll( context );
-				}
-			}
-		};
-		return wrapped;
+	public void afterEach(ExtensionContext extensionContext) throws Exception {
+		if ( !callOncePerClass ) {
+			sessionFactory = null;
+			setupHelper.afterEach( extensionContext );
+		}
 	}
 
+	@Override
+	public void beforeEach(ExtensionContext extensionContext) throws Exception {
+		if ( !callOncePerClass ) {
+			setupHelper.beforeEach( extensionContext );
+		}
+	}
+
+	@Override
+	public void afterAll(ExtensionContext extensionContext) throws Exception {
+		if ( callOncePerClass ) {
+			sessionFactory = null;
+			setupHelper.afterEach( extensionContext );
+		}
+	}
+
+	@Override
+	public void beforeAll(ExtensionContext extensionContext) throws Exception {
+		callOncePerClass = true;
+		setupHelper.beforeAll( extensionContext );
+	}
 }

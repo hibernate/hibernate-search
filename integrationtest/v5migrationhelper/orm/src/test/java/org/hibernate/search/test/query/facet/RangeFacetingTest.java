@@ -6,10 +6,9 @@
  */
 package org.hibernate.search.test.query.facet;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
+import static org.junit.jupiter.api.Assertions.fail;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
@@ -23,23 +22,23 @@ import org.hibernate.search.query.engine.spi.FacetManager;
 import org.hibernate.search.query.facet.Facet;
 import org.hibernate.search.query.facet.FacetSortOrder;
 import org.hibernate.search.query.facet.FacetingRequest;
-import org.hibernate.search.testsupport.junit.PortedToSearch6;
+import org.hibernate.search.testsupport.junit.Tags;
 import org.hibernate.search.util.common.SearchException;
 
-import org.junit.Test;
-import org.junit.experimental.categories.Category;
+import org.junit.jupiter.api.Tag;
+import org.junit.jupiter.api.Test;
 
 /**
  * @author Hardy Ferentschik
  */
-public class RangeFacetingTest extends AbstractFacetTest {
+class RangeFacetingTest extends AbstractFacetTest {
 
 	private static final String indexFieldName = "price";
 	private static final String priceRange = "priceRange";
 
 	@Test
-	@Category(PortedToSearch6.class)
-	public void testRangeQueryForInteger() {
+	@Tag(Tags.PORTED_TO_SEARCH_6)
+	void testRangeQueryForInteger() {
 		FacetingRequest rangeRequest = queryBuilder( Cd.class ).facet()
 				.name( priceRange )
 				.onField( indexFieldName )
@@ -59,8 +58,8 @@ public class RangeFacetingTest extends AbstractFacetTest {
 	}
 
 	@Test
-	@Category(PortedToSearch6.class)
-	public void testRangeBelow() {
+	@Tag(Tags.PORTED_TO_SEARCH_6)
+	void testRangeBelow() {
 		FacetingRequest rangeRequest = queryBuilder( Cd.class ).facet()
 				.name( priceRange )
 				.onField( indexFieldName )
@@ -76,8 +75,8 @@ public class RangeFacetingTest extends AbstractFacetTest {
 	}
 
 	@Test
-	@Category(PortedToSearch6.class)
-	public void testRangeBelowExcludeLimit() {
+	@Tag(Tags.PORTED_TO_SEARCH_6)
+	void testRangeBelowExcludeLimit() {
 		FacetingRequest rangeRequest = queryBuilder( Cd.class ).facet()
 				.name( priceRange )
 				.onField( indexFieldName )
@@ -93,8 +92,8 @@ public class RangeFacetingTest extends AbstractFacetTest {
 	}
 
 	@Test
-	@Category(PortedToSearch6.class)
-	public void testRangeAbove() {
+	@Tag(Tags.PORTED_TO_SEARCH_6)
+	void testRangeAbove() {
 		FacetingRequest rangeRequest = queryBuilder( Cd.class ).facet()
 				.name( priceRange )
 				.onField( indexFieldName )
@@ -110,8 +109,8 @@ public class RangeFacetingTest extends AbstractFacetTest {
 	}
 
 	@Test
-	@Category(PortedToSearch6.class)
-	public void testRangeAboveExcludeLimit() {
+	@Tag(Tags.PORTED_TO_SEARCH_6)
+	void testRangeAboveExcludeLimit() {
 		FacetingRequest rangeRequest = queryBuilder( Cd.class ).facet()
 				.name( priceRange )
 				.onField( indexFieldName )
@@ -127,8 +126,8 @@ public class RangeFacetingTest extends AbstractFacetTest {
 	}
 
 	@Test
-	@Category(PortedToSearch6.class)
-	public void testRangeAboveBelow() {
+	@Tag(Tags.PORTED_TO_SEARCH_6)
+	void testRangeAboveBelow() {
 		FacetingRequest rangeRequest = queryBuilder( Cd.class ).facet()
 				.name( priceRange )
 				.onField( indexFieldName )
@@ -145,8 +144,8 @@ public class RangeFacetingTest extends AbstractFacetTest {
 	}
 
 	@Test
-	@Category(PortedToSearch6.class)
-	public void testRangeBelowMiddleAbove() {
+	@Tag(Tags.PORTED_TO_SEARCH_6)
+	void testRangeBelowMiddleAbove() {
 		final String facetingName = "cdPriceFaceting";
 		FacetingRequest rangeRequest = queryBuilder( Cd.class ).facet()
 				.name( facetingName )
@@ -164,8 +163,8 @@ public class RangeFacetingTest extends AbstractFacetTest {
 	}
 
 	@Test
-	@Category(PortedToSearch6.class)
-	public void testRangeWithExcludeLimitsAtEachLevel() {
+	@Tag(Tags.PORTED_TO_SEARCH_6)
+	void testRangeWithExcludeLimitsAtEachLevel() {
 		final String facetingName = "cdPriceFaceting";
 		FacetingRequest rangeRequest = queryBuilder( Cd.class ).facet()
 				.name( facetingName )
@@ -203,8 +202,8 @@ public class RangeFacetingTest extends AbstractFacetTest {
 	}
 
 	@Test
-	@Category(PortedToSearch6.class)
-	public void testRangeQueryForDoubleWithZeroCount() {
+	@Tag(Tags.PORTED_TO_SEARCH_6)
+	void testRangeQueryForDoubleWithZeroCount() {
 		FacetingRequest rangeRequest = queryBuilder( Fruit.class ).facet()
 				.name( priceRange )
 				.onField( indexFieldName )
@@ -224,7 +223,7 @@ public class RangeFacetingTest extends AbstractFacetTest {
 	}
 
 	@Test
-	public void testRangeQueryForDoubleWithoutZeroCount() {
+	void testRangeQueryForDoubleWithoutZeroCount() {
 		FacetingRequest rangeRequest = queryBuilder( Fruit.class ).facet()
 				.name( priceRange )
 				.onField( indexFieldName )
@@ -243,13 +242,13 @@ public class RangeFacetingTest extends AbstractFacetTest {
 
 		List<Facet> facets = query.getFacetManager().getFacets( priceRange );
 		assertFacetCounts( facets, new int[] { 2, 3, 5 } );
-		assertEquals( "[0.0, 1.0]", facets.get( 0 ).getValue() );
-		assertEquals( "[1.01, 1.5]", facets.get( 1 ).getValue() );
-		assertEquals( "[1.51, 3.0]", facets.get( 2 ).getValue() );
+		assertThat( facets.get( 0 ).getValue() ).isEqualTo( "[0.0, 1.0]" );
+		assertThat( facets.get( 1 ).getValue() ).isEqualTo( "[1.01, 1.5]" );
+		assertThat( facets.get( 2 ).getValue() ).isEqualTo( "[1.51, 3.0]" );
 	}
 
 	@Test
-	public void testRangeQueryRangeDefOrderHigherMaxCount() {
+	void testRangeQueryRangeDefOrderHigherMaxCount() {
 		FacetingRequest rangeRequest = queryBuilder( Fruit.class ).facet()
 				.name( priceRange )
 				.onField( indexFieldName )
@@ -269,14 +268,14 @@ public class RangeFacetingTest extends AbstractFacetTest {
 
 		List<Facet> facets = query.getFacetManager().getFacets( priceRange );
 		assertFacetCounts( facets, new int[] { 2, 3, 5 } );
-		assertEquals( "[0.0, 1.0]", facets.get( 0 ).getValue() );
-		assertEquals( "[1.01, 1.5]", facets.get( 1 ).getValue() );
-		assertEquals( "[1.51, 3.0]", facets.get( 2 ).getValue() );
+		assertThat( facets.get( 0 ).getValue() ).isEqualTo( "[0.0, 1.0]" );
+		assertThat( facets.get( 1 ).getValue() ).isEqualTo( "[1.01, 1.5]" );
+		assertThat( facets.get( 2 ).getValue() ).isEqualTo( "[1.51, 3.0]" );
 	}
 
 	@Test
-	@Category(PortedToSearch6.class)
-	public void testDateRangeFaceting() throws Exception {
+	@Tag(Tags.PORTED_TO_SEARCH_6)
+	void testDateRangeFaceting() throws Exception {
 		final String facetingName = "albumYearFaceting";
 		final String fieldName = "releaseYear";
 		final DateFormat formatter = new SimpleDateFormat( "yyyy", Locale.ROOT );
@@ -300,9 +299,9 @@ public class RangeFacetingTest extends AbstractFacetTest {
 	}
 
 	@Test
-	@Category(PortedToSearch6.class)
-	public void testRangeQueryWithUnsupportedType() {
-		try {
+	@Tag(Tags.PORTED_TO_SEARCH_6)
+	void testRangeQueryWithUnsupportedType() {
+		assertThatThrownBy( () -> {
 			queryBuilder( Cd.class ).facet()
 					.name( priceRange )
 					.onField( indexFieldName )
@@ -311,15 +310,14 @@ public class RangeFacetingTest extends AbstractFacetTest {
 					.createFacetingRequest();
 			fail( "Unsupported range faceting type" );
 		}
-		catch (SearchException e) {
-			assertTrue( "Unexpected error message: " + e.getMessage(), e.getMessage().startsWith( "HSEARCH000269" ) );
-		}
+		).isInstanceOf( SearchException.class )
+				.hasMessageContainingAll( "HSEARCH000269", "is not a supported type for a range faceting request parameter" );
 	}
 
 	@Test
-	@Category(PortedToSearch6.class)
-	public void testRangeQueryWithNullToAndFrom() {
-		try {
+	@Tag(Tags.PORTED_TO_SEARCH_6)
+	void testRangeQueryWithNullToAndFrom() {
+		assertThatThrownBy( () -> {
 			queryBuilder( Cd.class ).facet()
 					.name( priceRange )
 					.onField( indexFieldName )
@@ -328,14 +326,14 @@ public class RangeFacetingTest extends AbstractFacetTest {
 					.createFacetingRequest();
 			fail( "Unsupported range faceting type" );
 		}
-		catch (SearchException e) {
-			assertTrue( "Unexpected error message: " + e.getMessage(), e.getMessage().startsWith( "HSEARCH000270" ) );
-		}
+		).isInstanceOf( SearchException.class )
+				.hasMessageContainingAll( "HSEARCH000270",
+						"At least one of the facets ranges in facet request 'priceRange' contains neither start nor end value" );
 	}
 
 	@Test
-	@Category(PortedToSearch6.class)
-	public void testUnsupportedRangeParameterTypeThrowsException() {
+	@Tag(Tags.PORTED_TO_SEARCH_6)
+	void testUnsupportedRangeParameterTypeThrowsException() {
 		FacetingRequest rangeRequest = queryBuilder( Fruit.class ).facet()
 				.name( priceRange )
 				.onField( indexFieldName )

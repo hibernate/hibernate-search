@@ -6,6 +6,8 @@
  */
 package org.hibernate.search.test.projection;
 
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+
 import org.hibernate.search.annotations.DocumentId;
 import org.hibernate.search.annotations.Field;
 import org.hibernate.search.annotations.Indexed;
@@ -18,16 +20,15 @@ import org.hibernate.search.mapper.pojo.mapping.definition.annotation.PropertyVa
 import org.hibernate.search.testsupport.TestForIssue;
 import org.hibernate.search.testsupport.concurrency.ConcurrentRunner;
 import org.hibernate.search.testsupport.concurrency.ConcurrentRunner.TaskFactory;
-import org.hibernate.search.testsupport.junit.ElasticsearchSupportInProgress;
 import org.hibernate.search.testsupport.junit.SearchFactoryHolder;
 import org.hibernate.search.testsupport.junit.SearchITHelper;
+import org.hibernate.search.testsupport.junit.Tags;
 import org.hibernate.search.util.common.SearchException;
 
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.experimental.categories.Category;
-import org.junit.rules.ExpectedException;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Tag;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 
 /**
  * This test verifies the correct projection rules (like which FieldBridge)
@@ -40,18 +41,16 @@ import org.junit.rules.ExpectedException;
  * @author Sanne Grinovero (C) 2015 Red Hat Inc.
  */
 @TestForIssue(jiraKey = "HSEARCH-1786")
-public class ProjectionConversionTest {
+class ProjectionConversionTest {
 
-	@Rule
-	public final ExpectedException thrown = ExpectedException.none();
 
-	@Rule
+	@RegisterExtension
 	public final SearchFactoryHolder sfHolder = new SearchFactoryHolder( ExampleEntity.class );
 
 	private final SearchITHelper helper = new SearchITHelper( sfHolder );
 
-	@Before
-	public void storeTestData() {
+	@BeforeEach
+	void storeTestData() {
 		ExampleEntity entity = new ExampleEntity();
 		entity.id = 1L;
 		entity.someInteger = 5;
@@ -75,48 +74,48 @@ public class ProjectionConversionTest {
 	}
 
 	@Test
-	public void projectingExplicitId() {
+	void projectingExplicitId() {
 		projectionTestHelper( ProjectionConstants.ID, Long.valueOf( 1L ) );
 	}
 
 	@Test
-	public void projectingIdOnOverloadedMapping() {
+	void projectingIdOnOverloadedMapping() {
 		projectionTestHelper( "stringTypedId", Long.valueOf( 1L ) );
 	}
 
 	@Test
-	public void projectingIntegerField() {
+	void projectingIntegerField() {
 		projectionTestHelper( "someInteger", Integer.valueOf( 5 ) );
 	}
 
 	@Test
-	@Category(ElasticsearchSupportInProgress.class) // HSEARCH-2423 Projecting an unstored field should raise an exception
-	public void projectingUnstoredField() {
-		thrown.expect( SearchException.class );
-		thrown.expectMessage( "Cannot use 'projection:field' on field 'unstoredField'" );
-		thrown.expectMessage(
-				"Make sure the field is marked as searchable/sortable/projectable/aggregable/highlightable (whichever is relevant)" );
-
-		projectionTestHelper( "unstoredField", null );
+	@Tag(Tags.ELASTICSEARCH_SUPPORT_IN_PROGRESS) // HSEARCH-2423 Projecting an unstored field should raise an exception
+	void projectingUnstoredField() {
+		assertThatThrownBy( () -> projectionTestHelper( "unstoredField", null ) )
+				.isInstanceOf( SearchException.class )
+				.hasMessageContainingAll(
+						"Cannot use 'projection:field' on field 'unstoredField'",
+						"Make sure the field is marked as searchable/sortable/projectable/aggregable/highlightable (whichever is relevant)"
+				);
 	}
 
 	@Test
-	public void projectingEmbeddedIdByPropertyName() {
+	void projectingEmbeddedIdByPropertyName() {
 		projectionTestHelper( "embedded.id", Long.valueOf( 2L ) );
 	}
 
 	@Test
-	public void projectingEmbeddedIdOnOverloadedMapping() {
+	void projectingEmbeddedIdOnOverloadedMapping() {
 		projectionTestHelper( "embedded.stringTypedId", Long.valueOf( 2L ) );
 	}
 
 	@Test
-	public void projectingOnConflictingMappedIdField() {
+	void projectingOnConflictingMappedIdField() {
 		projectionTestHelper( "second.id", "a string" );
 	}
 
 	@Test
-	public void concurrentMixedProjections() throws Exception {
+	void concurrentMixedProjections() throws Exception {
 		//The point of this test is to "simultaneously" project multiple different types
 		new ConcurrentRunner( 1000, 20,
 				new TaskFactory() {

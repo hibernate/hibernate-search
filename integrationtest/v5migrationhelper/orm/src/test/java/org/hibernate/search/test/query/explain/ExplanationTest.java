@@ -6,7 +6,7 @@
  */
 package org.hibernate.search.test.query.explain;
 
-import static org.junit.Assert.assertEquals;
+import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.HashMap;
 import java.util.List;
@@ -19,7 +19,7 @@ import org.hibernate.search.Search;
 import org.hibernate.search.test.SearchTestBase;
 import org.hibernate.search.testsupport.TestConstants;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import org.apache.lucene.queryparser.classic.MultiFieldQueryParser;
 import org.apache.lucene.search.Query;
@@ -27,9 +27,9 @@ import org.apache.lucene.search.Query;
 /**
  * @author Emmanuel Bernard
  */
-public class ExplanationTest extends SearchTestBase {
+class ExplanationTest extends SearchTestBase {
 	@Test
-	public void testExplanation() throws Exception {
+	void testExplanation() throws Exception {
 		FullTextSession s = Search.getFullTextSession( openSession() );
 		Transaction tx = s.beginTransaction();
 		Dvd dvd = new Dvd( "The dark knight",
@@ -51,9 +51,9 @@ public class ExplanationTest extends SearchTestBase {
 				.setProjection( FullTextQuery.ID, FullTextQuery.EXPLANATION, FullTextQuery.THIS );
 		@SuppressWarnings("unchecked")
 		List<Object[]> results = ftQuery.list();
-		assertEquals( 2, results.size() );
+		assertThat( results ).hasSize( 2 );
 		for ( Object[] result : results ) {
-			assertEquals( ftQuery.explain( result[0] ).toString(), result[1].toString() );
+			assertThat( result[1].toString() ).isEqualTo( ftQuery.explain( result[0] ).toString() );
 			s.delete( result[2] );
 		}
 		tx.commit();

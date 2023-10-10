@@ -6,7 +6,7 @@
  */
 package org.hibernate.search.test.engine;
 
-import static org.junit.Assert.assertEquals;
+import static org.assertj.core.api.Assertions.assertThat;
 
 import java.io.IOException;
 import java.sql.Connection;
@@ -18,15 +18,15 @@ import org.hibernate.jdbc.Work;
 import org.hibernate.search.test.Document;
 import org.hibernate.search.test.SearchTestBase;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 /**
  * @author Emmanuel Bernard
  */
-public class TransactionTest extends SearchTestBase {
+class TransactionTest extends SearchTestBase {
 
 	@Test
-	public void testTransactionCommit() throws Exception {
+	void testTransactionCommit() throws Exception {
 		Session s = getSessionFactory().openSession();
 		s.getTransaction().begin();
 		s.persist(
@@ -41,7 +41,7 @@ public class TransactionTest extends SearchTestBase {
 		s.getTransaction().commit();
 		s.close();
 
-		assertEquals( "transaction.commit() should index", 3, getDocumentNumber() );
+		assertThat( getDocumentNumber() ).as( "transaction.commit() should index" ).isEqualTo( 3 );
 
 		s = getSessionFactory().openSession();
 		s.getTransaction().begin();
@@ -54,7 +54,7 @@ public class TransactionTest extends SearchTestBase {
 		s.getTransaction().rollback();
 		s.close();
 
-		assertEquals( "rollback() should not index", 3, getDocumentNumber() );
+		assertThat( getDocumentNumber() ).as( "rollback() should not index" ).isEqualTo( 3 );
 
 		s = getSessionFactory().openSession();
 		s.doWork( new Work() {
@@ -71,7 +71,7 @@ public class TransactionTest extends SearchTestBase {
 		s.flush();
 		s.close();
 
-		assertEquals( "no transaction should index", 4, getDocumentNumber() );
+		assertThat( getDocumentNumber() ).as( "no transaction should index" ).isEqualTo( 4 );
 
 	}
 

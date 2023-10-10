@@ -6,7 +6,7 @@
  */
 package org.hibernate.search.test.query.facet;
 
-import static org.junit.Assert.assertEquals;
+import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.List;
 
@@ -19,8 +19,8 @@ import org.hibernate.search.query.dsl.QueryBuilder;
 import org.hibernate.search.query.facet.Facet;
 import org.hibernate.search.test.SearchTestBase;
 
-import org.junit.After;
-import org.junit.Before;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
 
 import org.apache.lucene.search.Query;
 
@@ -81,7 +81,7 @@ public abstract class AbstractFacetTest extends SearchTestBase {
 	protected Transaction tx;
 
 	@Override
-	@Before
+	@BeforeEach
 	public void setUp() throws Exception {
 		super.setUp();
 		fullTextSession = Search.getFullTextSession( openSession() );
@@ -90,7 +90,7 @@ public abstract class AbstractFacetTest extends SearchTestBase {
 	}
 
 	@Override
-	@After
+	@AfterEach
 	public void tearDown() throws Exception {
 		tx.commit();
 		fullTextSession.clear();
@@ -109,16 +109,16 @@ public abstract class AbstractFacetTest extends SearchTestBase {
 	}
 
 	public void assertFacetCounts(List<Facet> facetList, int[] counts) {
-		assertEquals( "Wrong number of facets", counts.length, facetList.size() );
+		assertThat( facetList ).as( "Wrong number of facets" ).hasSize( counts.length );
 		for ( int i = 0; i < facetList.size(); i++ ) {
-			assertEquals( "Wrong facet count for facet " + i, counts[i], facetList.get( i ).getCount() );
+			assertThat( facetList.get( i ).getCount() ).as( "Wrong facet count for facet " + i ).isEqualTo( counts[i] );
 		}
 	}
 
 	public void assertFacetValues(List<Facet> facetList, Object[] values) {
-		assertEquals( "Wrong number of facets", values.length, facetList.size() );
+		assertThat( facetList ).as( "Wrong number of facets" ).hasSize( values.length );
 		for ( int i = 0; i < facetList.size(); i++ ) {
-			assertEquals( "Wrong facet value for facet " + i, values[i], facetList.get( i ).getValue() );
+			assertThat( facetList.get( i ).getValue() ).as( "Wrong facet value for facet " + i ).isEqualTo( values[i] );
 		}
 	}
 

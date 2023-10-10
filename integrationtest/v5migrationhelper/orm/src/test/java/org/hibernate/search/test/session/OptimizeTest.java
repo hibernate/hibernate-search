@@ -6,7 +6,7 @@
  */
 package org.hibernate.search.test.session;
 
-import static org.junit.Assert.assertEquals;
+import static org.assertj.core.api.Assertions.assertThat;
 
 import org.hibernate.Transaction;
 import org.hibernate.search.FullTextSession;
@@ -14,17 +14,17 @@ import org.hibernate.search.Search;
 import org.hibernate.search.test.SearchTestBase;
 import org.hibernate.search.testsupport.TestConstants;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import org.apache.lucene.queryparser.classic.QueryParser;
 
 /**
  * @author Emmanuel Bernard
  */
-public class OptimizeTest extends SearchTestBase {
+class OptimizeTest extends SearchTestBase {
 
 	@Test
-	public void testOptimize() throws Exception {
+	void testOptimize() throws Exception {
 		FullTextSession s = Search.getFullTextSession( openSession() );
 		Transaction tx = s.beginTransaction();
 		int loop = 2000;
@@ -49,7 +49,7 @@ public class OptimizeTest extends SearchTestBase {
 		tx = s.beginTransaction();
 		QueryParser parser = new QueryParser( "noDefaultField", TestConstants.stopAnalyzer );
 		int result = s.createFullTextQuery( parser.parse( "body:wrote" ) ).getResultSize();
-		assertEquals( 2000, result );
+		assertThat( result ).isEqualTo( 2000 );
 		s.createQuery( "delete " + Email.class.getName() ).executeUpdate();
 		tx.commit();
 		s.close();

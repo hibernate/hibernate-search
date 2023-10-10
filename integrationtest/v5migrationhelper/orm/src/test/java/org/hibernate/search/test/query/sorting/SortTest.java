@@ -7,9 +7,6 @@
 package org.hibernate.search.test.query.sorting;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
 
 import java.io.IOException;
 import java.util.Calendar;
@@ -36,12 +33,12 @@ import org.hibernate.search.test.query.Author;
 import org.hibernate.search.test.query.Book;
 import org.hibernate.search.testsupport.TestConstants;
 import org.hibernate.search.testsupport.TestForIssue;
-import org.hibernate.search.testsupport.junit.SkipOnElasticsearch;
+import org.hibernate.search.testsupport.junit.Tags;
 
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.experimental.categories.Category;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Tag;
+import org.junit.jupiter.api.Test;
 
 import org.apache.lucene.index.LeafReader;
 import org.apache.lucene.index.LeafReaderContext;
@@ -58,13 +55,13 @@ import org.apache.lucene.search.SortField;
 /**
  * @author Hardy Ferentschik
  */
-public class SortTest extends SearchTestBase {
+class SortTest extends SearchTestBase {
 
 	private static FullTextSession fullTextSession;
 	private static QueryParser queryParser;
 
 	@Override
-	@Before
+	@BeforeEach
 	public void setUp() throws Exception {
 		super.setUp();
 		fullTextSession = Search.getFullTextSession( openSession() );
@@ -79,7 +76,7 @@ public class SortTest extends SearchTestBase {
 	}
 
 	@Override
-	@After
+	@AfterEach
 	public void tearDown() throws Exception {
 		// check for ongoing transaction which is an indicator that something went wrong
 		// don't call the cleanup methods in this case. Otherwise the original error get swallowed
@@ -94,7 +91,7 @@ public class SortTest extends SearchTestBase {
 
 	@SuppressWarnings("unchecked")
 	@Test
-	public void testResultOrderedByIdAsString() throws Exception {
+	void testResultOrderedByIdAsString() throws Exception {
 		Transaction tx = fullTextSession.beginTransaction();
 
 		QueryBuilder qb = fullTextSession.getSearchFactory().buildQueryBuilder().forEntity( Book.class ).get();
@@ -103,7 +100,7 @@ public class SortTest extends SearchTestBase {
 		Sort sort = qb.sort().byField( "id_forStringSort" ).asc().createSort();
 		hibQuery.setSort( sort );
 		List<Book> result = hibQuery.list();
-		assertNotNull( result );
+		assertThat( result ).isNotNull();
 		assertThat( result ).extracting( "id" ).containsExactly( 1, 10, 2, 3 );
 
 		tx.commit();
@@ -111,7 +108,7 @@ public class SortTest extends SearchTestBase {
 
 	@SuppressWarnings("unchecked")
 	@Test
-	public void testResultOrderedByIdAsLong() throws Exception {
+	void testResultOrderedByIdAsLong() throws Exception {
 		Transaction tx = fullTextSession.beginTransaction();
 
 		QueryBuilder qb = fullTextSession.getSearchFactory().buildQueryBuilder().forEntity( Book.class ).get();
@@ -120,7 +117,7 @@ public class SortTest extends SearchTestBase {
 		Sort sort = qb.sort().byField( "id_forIntegerSort" ).asc().createSort();
 		hibQuery.setSort( sort );
 		List<Book> result = hibQuery.list();
-		assertNotNull( result );
+		assertThat( result ).isNotNull();
 		assertThat( result ).extracting( "id" ).containsExactly( 1, 2, 3, 10 );
 
 		tx.commit();
@@ -128,8 +125,8 @@ public class SortTest extends SearchTestBase {
 
 	@SuppressWarnings("unchecked")
 	@Test
-	@Category(SkipOnElasticsearch.class)
-	public void testResultOrderedByIdAlteringSortStyle() throws Exception {
+	@Tag(Tags.SKIP_ON_ELASTICSEARCH)
+	void testResultOrderedByIdAlteringSortStyle() throws Exception {
 		Transaction tx = fullTextSession.beginTransaction();
 
 		QueryBuilder qb = fullTextSession.getSearchFactory().buildQueryBuilder().forEntity( Book.class ).get();
@@ -153,7 +150,7 @@ public class SortTest extends SearchTestBase {
 
 	@SuppressWarnings("unchecked")
 	@Test
-	public void testResultOrderedBySummaryStringAscending() throws Exception {
+	void testResultOrderedBySummaryStringAscending() throws Exception {
 		Transaction tx = fullTextSession.beginTransaction();
 
 		// order by summary
@@ -163,16 +160,16 @@ public class SortTest extends SearchTestBase {
 		Sort sort = qb.sort().byField( "summary_forSort" ).createSort(); //ASC
 		hibQuery.setSort( sort );
 		List<Book> result = hibQuery.list();
-		assertNotNull( result );
-		assertEquals( "Wrong number of test results.", 5, result.size() );
-		assertEquals( "Groovy in Action", result.get( 0 ).getSummary() );
+		assertThat( result ).isNotNull();
+		assertThat( result ).as( "Wrong number of test results." ).hasSize( 5 );
+		assertThat( result.get( 0 ).getSummary() ).isEqualTo( "Groovy in Action" );
 
 		tx.commit();
 	}
 
 	@SuppressWarnings("unchecked")
 	@Test
-	public void testResultOrderedBySummaryStringDescending() throws Exception {
+	void testResultOrderedBySummaryStringDescending() throws Exception {
 		Transaction tx = fullTextSession.beginTransaction();
 
 		// order by summary backwards
@@ -182,16 +179,16 @@ public class SortTest extends SearchTestBase {
 		Sort sort = qb.sort().byField( "summary_forSort" ).desc().createSort(); //DESC
 		hibQuery.setSort( sort );
 		List<Book> result = hibQuery.list();
-		assertNotNull( result );
-		assertEquals( "Wrong number of test results.", 5, result.size() );
-		assertEquals( "Hibernate & Lucene", result.get( 0 ).getSummary() );
+		assertThat( result ).isNotNull();
+		assertThat( result ).as( "Wrong number of test results." ).hasSize( 5 );
+		assertThat( result.get( 0 ).getSummary() ).isEqualTo( "Hibernate & Lucene" );
 
 		tx.commit();
 	}
 
 	@SuppressWarnings("unchecked")
 	@Test
-	public void testResultOrderedByDateDescending() throws Exception {
+	void testResultOrderedByDateDescending() throws Exception {
 		Transaction tx = fullTextSession.beginTransaction();
 
 		// order by date backwards
@@ -201,17 +198,17 @@ public class SortTest extends SearchTestBase {
 		Sort sort = qb.sort().byField( "publicationDate" ).desc().createSort(); //DESC
 		hibQuery.setSort( sort );
 		List<Book> result = hibQuery.list();
-		assertNotNull( result );
+		assertThat( result ).isNotNull();
 		assertThat( result ).extracting( "id" ).containsExactly( 4, 10, 3, 2, 1 );
-		assertEquals( "Groovy in Action", result.get( 0 ).getSummary() );
+		assertThat( result.get( 0 ).getSummary() ).isEqualTo( "Groovy in Action" );
 
 		tx.commit();
 	}
 
 	@SuppressWarnings("unchecked")
 	@Test
-	@Category(SkipOnElasticsearch.class)
-	public void testCustomFieldComparatorAscendingSort() {
+	@Tag(Tags.SKIP_ON_ELASTICSEARCH)
+	void testCustomFieldComparatorAscendingSort() {
 		Transaction tx = fullTextSession.beginTransaction();
 
 		Query query = new MatchAllDocsQuery();
@@ -219,12 +216,12 @@ public class SortTest extends SearchTestBase {
 		Sort sort = new Sort( new SortField( "sum", new SumFieldComparatorSource() ) );
 		hibQuery.setSort( sort );
 		List<NumberHolder> result = hibQuery.list();
-		assertNotNull( result );
-		assertEquals( "Wrong number of test results.", 4, result.size() );
+		assertThat( result ).isNotNull();
+		assertThat( result ).as( "Wrong number of test results." ).hasSize( 4 );
 
 		int previousSum = 0;
 		for ( NumberHolder n : result ) {
-			assertTrue( "Documents should be ordered by increasing sum", previousSum < n.getSum() );
+			assertThat( n.getSum() ).as( "Documents should be ordered by increasing sum" ).isGreaterThan( previousSum );
 			previousSum = n.getSum();
 		}
 
@@ -233,8 +230,8 @@ public class SortTest extends SearchTestBase {
 
 	@SuppressWarnings("unchecked")
 	@Test
-	@Category(SkipOnElasticsearch.class)
-	public void testCustomFieldComparatorDescendingSort() {
+	@Tag(Tags.SKIP_ON_ELASTICSEARCH)
+	void testCustomFieldComparatorDescendingSort() {
 		Transaction tx = fullTextSession.beginTransaction();
 
 		Query query = new MatchAllDocsQuery();
@@ -242,12 +239,12 @@ public class SortTest extends SearchTestBase {
 		Sort sort = new Sort( new SortField( "sum", new SumFieldComparatorSource(), true ) );
 		hibQuery.setSort( sort );
 		List<NumberHolder> result = hibQuery.list();
-		assertNotNull( result );
-		assertEquals( "Wrong number of test results.", 4, result.size() );
+		assertThat( result ).isNotNull();
+		assertThat( result ).as( "Wrong number of test results." ).hasSize( 4 );
 
 		int previousSum = 100;
 		for ( NumberHolder n : result ) {
-			assertTrue( "Documents should be ordered by decreasing sum", previousSum > n.getSum() );
+			assertThat( n.getSum() ).as( "Documents should be ordered by decreasing sum" ).isLessThan( previousSum );
 			previousSum = n.getSum();
 		}
 
@@ -256,7 +253,7 @@ public class SortTest extends SearchTestBase {
 
 	@SuppressWarnings("unchecked")
 	@Test
-	public void testResultOrderedByDocId() throws Exception {
+	void testResultOrderedByDocId() throws Exception {
 		Transaction tx = fullTextSession.beginTransaction();
 
 		Query query = queryParser.parse( "summary:lucene" );
@@ -265,7 +262,7 @@ public class SortTest extends SearchTestBase {
 		hibQuery.setSort( sort );
 		List<Book> result = hibQuery.list();
 
-		assertNotNull( result );
+		assertThat( result ).isNotNull();
 		assertThat( result ).extracting( "id" ).containsExactlyInAnyOrder( 1, 2, 3, 10 );
 
 		tx.commit();
@@ -273,7 +270,7 @@ public class SortTest extends SearchTestBase {
 
 	@Test
 	@SuppressWarnings("unchecked")
-	public void testResultOrderedByEmbeddedAuthorNameAscending() throws Exception {
+	void testResultOrderedByEmbeddedAuthorNameAscending() throws Exception {
 		Transaction tx = fullTextSession.beginTransaction();
 
 		// order by summary
@@ -283,14 +280,14 @@ public class SortTest extends SearchTestBase {
 		Sort sort = qb.sort().byField( "mainAuthor.name_sort" ).createSort(); //ASC
 		hibQuery.setSort( sort );
 		List<Book> result = hibQuery.list();
-		assertNotNull( result );
+		assertThat( result ).isNotNull();
 		assertThat( result ).extracting( "id" ).containsExactly( 2, 1, 3, 4, 10 );
 
 		tx.commit();
 	}
 
 	@Test
-	public void testSortingByMultipleFields() throws Exception {
+	void testSortingByMultipleFields() throws Exception {
 		Transaction tx = fullTextSession.beginTransaction();
 
 		QueryBuilder qb = fullTextSession.getSearchFactory().buildQueryBuilder().forEntity( BrickLayer.class ).get();
@@ -302,7 +299,7 @@ public class SortTest extends SearchTestBase {
 
 		@SuppressWarnings("unchecked")
 		List<Book> result = hibQuery.list();
-		assertNotNull( result );
+		assertThat( result ).isNotNull();
 		assertThat( result ).extracting( "lastName" )
 				.containsExactly( "Higgins", "Higgins", "Johnson", "Johnson" );
 
@@ -316,7 +313,7 @@ public class SortTest extends SearchTestBase {
 	@SuppressWarnings("unchecked")
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-2287")
-	public void testChangingSortOrder() throws Exception {
+	void testChangingSortOrder() throws Exception {
 		Transaction tx = fullTextSession.beginTransaction();
 
 		QueryBuilder qb = fullTextSession.getSearchFactory().buildQueryBuilder().forEntity( Book.class ).get();

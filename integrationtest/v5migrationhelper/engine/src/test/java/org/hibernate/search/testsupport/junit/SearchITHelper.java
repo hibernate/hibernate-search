@@ -7,7 +7,7 @@
 package org.hibernate.search.testsupport.junit;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.Assert.fail;
+import static org.junit.jupiter.api.Assertions.fail;
 
 import java.io.Serializable;
 import java.util.ArrayList;

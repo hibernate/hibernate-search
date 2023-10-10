@@ -21,11 +21,11 @@ import org.hibernate.search.query.dsl.QueryBuilder;
 import org.hibernate.search.test.SearchTestBase;
 import org.hibernate.search.util.common.impl.CollectionHelper;
 
-import org.hibernate.testing.RequiresDialect;
+import org.hibernate.testing.orm.junit.RequiresDialect;
 
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import org.apache.lucene.search.Query;
 
@@ -45,10 +45,9 @@ import org.apache.lucene.search.Query;
  */
 @RequiresDialect(
 		comment = "The connection provider for this test ignores configuration and requires H2",
-		strictMatching = true,
 		value = org.hibernate.dialect.H2Dialect.class
 )
-public class DatabaseMultitenancyTest extends SearchTestBase {
+class DatabaseMultitenancyTest extends SearchTestBase {
 
 	/**
 	 * Metamec tenant identifier
@@ -73,7 +72,7 @@ public class DatabaseMultitenancyTest extends SearchTestBase {
 	};
 
 	@Override
-	@Before
+	@BeforeEach
 	public void setUp() throws Exception {
 		super.setUp();
 
@@ -87,28 +86,28 @@ public class DatabaseMultitenancyTest extends SearchTestBase {
 	}
 
 	@Test
-	public void shouldOnlyFindMetamecModels() throws Exception {
+	void shouldOnlyFindMetamecModels() throws Exception {
 		List<Clock> list = searchAll( METAMEC_TID );
 		assertThat( list ).isNotEmpty();
 		assertThat( list ).containsExactlyInAnyOrder( METAMEC_MODELS );
 	}
 
 	@Test
-	public void shouldOnlyFindGeochronModels() throws Exception {
+	void shouldOnlyFindGeochronModels() throws Exception {
 		List<Clock> list = searchAll( GEOCHRON_TID );
 		assertThat( list ).isNotEmpty();
 		assertThat( list ).containsExactlyInAnyOrder( GEOCHRON_MODELS );
 	}
 
 	@Test
-	public void shouldMatchOnlyElementsFromOneTenant() throws Exception {
+	void shouldMatchOnlyElementsFromOneTenant() throws Exception {
 		List<Clock> list = searchModel( "model", GEOCHRON_TID );
 		assertThat( list ).isNotEmpty();
 		assertThat( list ).containsExactlyInAnyOrder( GEOCHRON_MODELS );
 	}
 
 	@Test
-	public void shouldBeAbleToPurgeTheIndex() throws Exception {
+	void shouldBeAbleToPurgeTheIndex() throws Exception {
 		purgeAll( Clock.class, GEOCHRON_TID );
 
 		List<Clock> listg = searchAll( GEOCHRON_TID );
@@ -119,7 +118,7 @@ public class DatabaseMultitenancyTest extends SearchTestBase {
 	}
 
 	@Test
-	public void shouldBeAbleToRebuildTheIndexForTheTenantId() throws Exception {
+	void shouldBeAbleToRebuildTheIndexForTheTenantId() throws Exception {
 		purgeAll( Clock.class, GEOCHRON_TID );
 		purgeAll( Clock.class, METAMEC_TID );
 		rebuildIndexWithMassIndexer( Clock.class, GEOCHRON_TID );
@@ -132,7 +131,7 @@ public class DatabaseMultitenancyTest extends SearchTestBase {
 	}
 
 	@Test
-	public void shouldOnlyPurgeTheEntitiesOfTheSelectedTenant() throws Exception {
+	void shouldOnlyPurgeTheEntitiesOfTheSelectedTenant() throws Exception {
 		purgeAll( Clock.class, GEOCHRON_TID );
 
 		List<Clock> list = searchAll( METAMEC_TID );
@@ -140,7 +139,7 @@ public class DatabaseMultitenancyTest extends SearchTestBase {
 	}
 
 	@Test
-	public void shouldPurgeOnStartOnlyTheSelectedTenant() throws Exception {
+	void shouldPurgeOnStartOnlyTheSelectedTenant() throws Exception {
 		// This will run a purgeOnStart
 		rebuildIndexWithMassIndexer( Clock.class, GEOCHRON_TID );
 
@@ -152,7 +151,7 @@ public class DatabaseMultitenancyTest extends SearchTestBase {
 	}
 
 	@Test
-	public void shouldOnlyReturnResultsOfTheSpecificTenant() throws Exception {
+	void shouldOnlyReturnResultsOfTheSpecificTenant() throws Exception {
 		purgeAll( Clock.class, GEOCHRON_TID );
 		purgeAll( Clock.class, METAMEC_TID );
 		rebuildIndexWithMassIndexer( Clock.class, GEOCHRON_TID );
@@ -162,7 +161,7 @@ public class DatabaseMultitenancyTest extends SearchTestBase {
 	}
 
 	@Test
-	public void shouldSearchOtherTenantsDocuments() throws Exception {
+	void shouldSearchOtherTenantsDocuments() throws Exception {
 		purgeAll( Clock.class, GEOCHRON_TID );
 		purgeAll( Clock.class, METAMEC_TID );
 		rebuildIndexWithMassIndexer( Clock.class, GEOCHRON_TID );
@@ -223,8 +222,8 @@ public class DatabaseMultitenancyTest extends SearchTestBase {
 		session.clear();
 	}
 
-	@After
-	public void deleteEntities() throws Exception {
+	@AfterEach
+	void deleteEntities() {
 		Session session = openSessionWithTenantId( METAMEC_TID );
 		deleteClocks( session );
 		session.close();

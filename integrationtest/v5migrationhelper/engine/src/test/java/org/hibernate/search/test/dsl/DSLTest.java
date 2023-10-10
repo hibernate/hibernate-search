@@ -6,10 +6,9 @@
  */
 package org.hibernate.search.test.dsl;
 
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertThat;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.junit.jupiter.api.Assertions.fail;
 
 import java.util.Calendar;
 import java.util.Date;
@@ -21,23 +20,20 @@ import org.hibernate.search.query.dsl.BooleanJunction;
 import org.hibernate.search.query.dsl.QueryBuilder;
 import org.hibernate.search.testsupport.AnalysisNames;
 import org.hibernate.search.testsupport.TestForIssue;
-import org.hibernate.search.testsupport.junit.PortedToSearch6;
 import org.hibernate.search.testsupport.junit.SearchFactoryHolder;
 import org.hibernate.search.testsupport.junit.SearchITHelper;
-import org.hibernate.search.testsupport.junit.SkipOnElasticsearch;
+import org.hibernate.search.testsupport.junit.Tags;
 import org.hibernate.search.util.common.SearchException;
 
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.experimental.categories.Category;
-import org.junit.rules.ExpectedException;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Tag;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 
 import org.apache.lucene.search.BooleanClause;
 import org.apache.lucene.search.BooleanQuery;
 import org.apache.lucene.search.BoostQuery;
 import org.apache.lucene.search.Query;
-import org.hamcrest.CoreMatchers;
 
 /**
  * @author Emmanuel Bernard
@@ -45,13 +41,10 @@ import org.hamcrest.CoreMatchers;
  */
 //DO NOT AUTO INDENT THIS FILE.
 //MY DSL IS BEAUTIFUL, DUMB INDENTATION IS SCREWING IT UP
-public class DSLTest {
+class DSLTest {
 	private final Calendar calendar = GregorianCalendar.getInstance( TimeZone.getTimeZone( "GMT" ), Locale.ROOT );
 
-	@Rule
-	public final ExpectedException thrown = ExpectedException.none();
-
-	@Rule
+	@RegisterExtension
 	public final SearchFactoryHolder sfHolder = new SearchFactoryHolder( Month.class, Car.class,
 			SportsCar.class, Animal.class, Day.class, Coffee.class );
 
@@ -59,13 +52,13 @@ public class DSLTest {
 
 	private Date february;
 
-	@Before
-	public void setUp() throws Exception {
+	@BeforeEach
+	void setUp() {
 		indexTestData();
 	}
 
 	@Test
-	public void testUseOfFieldBridge() throws Exception {
+	void testUseOfFieldBridge() {
 		final QueryBuilder monthQb = helper.queryBuilder( Month.class );
 
 		Query query = monthQb.keyword().onField( "monthValue" ).matching( 2 ).createQuery();
@@ -73,7 +66,7 @@ public class DSLTest {
 	}
 
 	@Test
-	public void testTermQueryOnAnalyzer() throws Exception {
+	void testTermQueryOnAnalyzer() {
 		final QueryBuilder monthQb = helper.queryBuilder( Month.class );
 
 		//regular term query
@@ -104,7 +97,7 @@ public class DSLTest {
 
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-2785")
-	public void testTermQueryOnNormalizer() throws Exception {
+	void testTermQueryOnNormalizer() {
 		final QueryBuilder monthQb = helper.queryBuilder( Month.class );
 
 		Query query = monthQb.keyword().onField( "name" ).matching( "February" ).createQuery();
@@ -127,8 +120,8 @@ public class DSLTest {
 	}
 
 	@Test
-	@Category(PortedToSearch6.class)
-	public void testFuzzyQuery() throws Exception {
+	@Tag(Tags.PORTED_TO_SEARCH_6)
+	void testFuzzyQuery() {
 		final QueryBuilder monthQb = helper.queryBuilder( Month.class );
 
 
@@ -146,8 +139,8 @@ public class DSLTest {
 	}
 
 	@Test
-	@Category(PortedToSearch6.class)
-	public void testFuzzyQueryOnMultipleFields() throws Exception {
+	@Tag(Tags.PORTED_TO_SEARCH_6)
+	void testFuzzyQueryOnMultipleFields() {
 		final QueryBuilder monthQb = helper.queryBuilder( Month.class );
 
 		Query query = monthQb
@@ -163,7 +156,7 @@ public class DSLTest {
 	}
 
 	@Test
-	public void testWildcardQuery() throws Exception {
+	void testWildcardQuery() {
 		final QueryBuilder monthQb = helper.queryBuilder( Month.class );
 
 		Query query = monthQb
@@ -178,7 +171,7 @@ public class DSLTest {
 
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-1811")
-	public void testWildcardQueryOnMultipleFields() throws Exception {
+	void testWildcardQueryOnMultipleFields() {
 		final QueryBuilder monthQb = helper.queryBuilder( Month.class );
 
 		Query query = monthQb
@@ -192,7 +185,7 @@ public class DSLTest {
 	}
 
 	@Test
-	public void testQueryCustomization() throws Exception {
+	void testQueryCustomization() {
 		final QueryBuilder monthQb = helper.queryBuilder( Month.class );
 
 
@@ -219,7 +212,7 @@ public class DSLTest {
 	}
 
 	@Test
-	public void testMultipleFields() throws Exception {
+	void testMultipleFields() {
 		final QueryBuilder monthQb = helper.queryBuilder( Month.class );
 
 		//combined query, January and February both contain whitening but February in a longer text
@@ -252,7 +245,7 @@ public class DSLTest {
 	}
 
 	@Test
-	public void testBoolean() throws Exception {
+	void testBoolean() {
 		final QueryBuilder monthQb = helper.queryBuilder( Month.class );
 
 		//must
@@ -293,7 +286,7 @@ public class DSLTest {
 
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-2034")
-	public void testBooleanWithoutScoring() throws Exception {
+	void testBooleanWithoutScoring() {
 		final QueryBuilder monthQb = helper.queryBuilder( Month.class );
 
 		//must + disable scoring
@@ -304,15 +297,15 @@ public class DSLTest {
 				.createQuery();
 
 		helper.assertThatQuery( query ).from( Month.class ).matchesExactlyIds( 1 );
-		assertTrue( query instanceof BooleanQuery );
+		assertThat( query instanceof BooleanQuery ).isTrue();
 		BooleanQuery bq = (BooleanQuery) query;
 		BooleanClause firstBooleanClause = bq.clauses().get( 0 );
-		assertFalse( firstBooleanClause.isScoring() );
+		assertThat( firstBooleanClause.isScoring() ).isFalse();
 	}
 
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-2037")
-	public void testBooleanWithOnlyNegationQueries() throws Exception {
+	void testBooleanWithOnlyNegationQueries() {
 		final QueryBuilder monthQb = helper.queryBuilder( Month.class );
 
 		//must + disable scoring
@@ -326,25 +319,27 @@ public class DSLTest {
 
 		helper.assertThatQuery( query ).from( Month.class ).matchesExactlyIds( 3 );
 
-		assertTrue( query instanceof BooleanQuery );
+		assertThat( query instanceof BooleanQuery ).isTrue();
 		BooleanQuery bq = (BooleanQuery) query;
 		BooleanClause firstBooleanClause = bq.clauses().get( 0 );
-		assertFalse( firstBooleanClause.isScoring() );
+		assertThat( firstBooleanClause.isScoring() ).isFalse();
 	}
 
-	@Test(expected = SearchException.class)
-	public void testIllegalBooleanJunction() {
-		final QueryBuilder monthQb = helper.queryBuilder( Month.class );
-		//forgetting to set any condition on the boolean, an exception shall be thrown:
-		BooleanJunction<?> booleanJunction = monthQb.bool();
-		assertTrue( booleanJunction.isEmpty() );
-		booleanJunction.createQuery();
-		fail( "should not reach this point" );
+	@Test
+	void testIllegalBooleanJunction() {
+		assertThatThrownBy( () -> {
+			final QueryBuilder monthQb = helper.queryBuilder( Month.class );
+			//forgetting to set any condition on the boolean, an exception shall be thrown:
+			BooleanJunction<?> booleanJunction = monthQb.bool();
+			assertThat( booleanJunction.isEmpty() ).isTrue();
+			booleanJunction.createQuery();
+			fail( "should not reach this point" );
+		} ).isInstanceOf( SearchException.class );
 	}
 
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-2565")
-	public void testBooleanWithNullClauses() throws Exception {
+	void testBooleanWithNullClauses() {
 		final QueryBuilder monthQb = helper.queryBuilder( Month.class );
 
 		// must/should with null clauses
@@ -355,7 +350,7 @@ public class DSLTest {
 				.should( null )
 				.createQuery();
 
-		assertThat( query, CoreMatchers.instanceOf( BoostQuery.class ) );
+		assertThat( query instanceof BoostQuery ).isTrue();
 
 		helper.assertThatQuery( query ).from( Month.class ).matchesExactlyIds( 1 );
 
@@ -367,13 +362,13 @@ public class DSLTest {
 				.must( monthQb.keyword().onField( "mythology" ).matching( "colder" ).createQuery() )
 				.createQuery();
 
-		assertThat( query, CoreMatchers.instanceOf( BoostQuery.class ) );
+		assertThat( query instanceof BoostQuery ).isTrue();
 
 		helper.assertThatQuery( query ).from( Month.class ).matchesExactlyIds( 1 );
 	}
 
 	@Test
-	public void testRangeQueryFromTo() throws Exception {
+	void testRangeQueryFromTo() {
 		final QueryBuilder monthQb = helper.queryBuilder( Month.class );
 
 		calendar.setTimeZone( TimeZone.getTimeZone( "UTC" ) );
@@ -394,8 +389,8 @@ public class DSLTest {
 	}
 
 	@Test
-	@Category(SkipOnElasticsearch.class) // This only works because of a Lucene-specific hack in org.hibernate.search.bridge.util.impl.NumericFieldUtils.createNumericRangeQuery
-	public void testRangeQueryFromToIgnoreFieldBridge() throws Exception {
+	@Tag(Tags.SKIP_ON_ELASTICSEARCH) // This only works because of a Lucene-specific hack in org.hibernate.search.bridge.util.impl.NumericFieldUtils.createNumericRangeQuery
+	void testRangeQueryFromToIgnoreFieldBridge() {
 		final QueryBuilder monthQb = helper.queryBuilder( Month.class );
 
 		calendar.setTimeZone( TimeZone.getTimeZone( "UTC" ) );
@@ -416,7 +411,7 @@ public class DSLTest {
 	}
 
 	@Test
-	public void testRangeQueryBelow() throws Exception {
+	void testRangeQueryBelow() {
 		final QueryBuilder monthQb = helper.queryBuilder( Month.class );
 
 		calendar.setTimeZone( TimeZone.getTimeZone( "UTC" ) );
@@ -440,8 +435,8 @@ public class DSLTest {
 	}
 
 	@Test
-	@Category(SkipOnElasticsearch.class) // This only works because of a Lucene-specific hack in org.hibernate.search.bridge.util.impl.NumericFieldUtils.createNumericRangeQuery
-	public void testRangeQueryBelowIgnoreFieldBridge() throws Exception {
+	@Tag(Tags.SKIP_ON_ELASTICSEARCH) // This only works because of a Lucene-specific hack in org.hibernate.search.bridge.util.impl.NumericFieldUtils.createNumericRangeQuery
+	void testRangeQueryBelowIgnoreFieldBridge() {
 		final QueryBuilder monthQb = helper.queryBuilder( Month.class );
 
 		calendar.setTimeZone( TimeZone.getTimeZone( "UTC" ) );
@@ -458,7 +453,7 @@ public class DSLTest {
 	}
 
 	@Test
-	public void testRangeQueryAbove() throws Exception {
+	void testRangeQueryAbove() {
 		final QueryBuilder monthQb = helper.queryBuilder( Month.class );
 
 		calendar.setTimeZone( TimeZone.getTimeZone( "UTC" ) );
@@ -474,8 +469,8 @@ public class DSLTest {
 	}
 
 	@Test
-	@Category(SkipOnElasticsearch.class) // This only works because of a Lucene-specific hack in org.hibernate.search.bridge.util.impl.NumericFieldUtils.createNumericRangeQuery
-	public void testRangeQueryAboveIgnoreFieldBridge() throws Exception {
+	@Tag(Tags.SKIP_ON_ELASTICSEARCH) // This only works because of a Lucene-specific hack in org.hibernate.search.bridge.util.impl.NumericFieldUtils.createNumericRangeQuery
+	void testRangeQueryAboveIgnoreFieldBridge() {
 		final QueryBuilder monthQb = helper.queryBuilder( Month.class );
 
 		calendar.setTimeZone( TimeZone.getTimeZone( "UTC" ) );
@@ -491,7 +486,7 @@ public class DSLTest {
 	}
 
 	@Test
-	public void testRangeQueryAboveInclusive() throws Exception {
+	void testRangeQueryAboveInclusive() {
 		final QueryBuilder monthQb = helper.queryBuilder( Month.class );
 
 		// test the limits, inclusive
@@ -504,7 +499,7 @@ public class DSLTest {
 	}
 
 	@Test
-	public void testRangeQueryAboveExclusive() throws Exception {
+	void testRangeQueryAboveExclusive() {
 		final QueryBuilder monthQb = helper.queryBuilder( Month.class );
 
 		// test the limits, exclusive
@@ -517,8 +512,8 @@ public class DSLTest {
 	}
 
 	@Test
-	@Category(PortedToSearch6.class)
-	public void testPhraseQuery() throws Exception {
+	@Tag(Tags.PORTED_TO_SEARCH_6)
+	void testPhraseQuery() {
 		final QueryBuilder monthQb = helper.queryBuilder( Month.class );
 
 		Query query = monthQb
@@ -561,7 +556,7 @@ public class DSLTest {
 
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-2785")
-	public void testPhraseQueryWithNormalizer() throws Exception {
+	void testPhraseQueryWithNormalizer() {
 		final QueryBuilder monthQb = helper.queryBuilder( Month.class );
 
 		// Phrase queries on a normalized (non-tokenized) field will only work with single-word queries
@@ -597,7 +592,7 @@ public class DSLTest {
 
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-2479")
-	public void testPhraseQueryTermCreation() throws Exception {
+	void testPhraseQueryTermCreation() {
 		String testCaseText = "Test the Test test of your test test to test test test of test and Test budgeting.";
 		final QueryBuilder monthQb = helper.queryBuilder( Month.class );
 
@@ -611,7 +606,7 @@ public class DSLTest {
 	}
 
 	@Test
-	public void testPhraseQueryWithStopWords() throws Exception {
+	void testPhraseQueryWithStopWords() {
 		final QueryBuilder monthQb = helper.queryBuilder( Month.class );
 
 		Query query = monthQb
@@ -625,7 +620,7 @@ public class DSLTest {
 
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-1074")
-	public void testPhraseQueryWithNoTermsAfterAnalyzerApplication() throws Exception {
+	void testPhraseQueryWithNoTermsAfterAnalyzerApplication() {
 		final QueryBuilder monthQb = helper.queryBuilder( Month.class );
 
 		// we use mythology_stem here as the default analyzer for Elasticsearch does not include a stopwords filter
@@ -640,7 +635,7 @@ public class DSLTest {
 	}
 
 	@Test
-	public void testNumericRangeQueries() {
+	void testNumericRangeQueries() {
 		final QueryBuilder monthQb = helper.queryBuilder( Month.class );
 
 		Query query = monthQb
@@ -655,7 +650,7 @@ public class DSLTest {
 
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-1378")
-	public void testNumericRangeQueryAbove() {
+	void testNumericRangeQueryAbove() {
 		final QueryBuilder monthQb = helper.queryBuilder( Month.class );
 
 		//inclusive
@@ -680,7 +675,7 @@ public class DSLTest {
 
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-1378")
-	public void testNumericRangeQueryBelow() {
+	void testNumericRangeQueryBelow() {
 		final QueryBuilder monthQb = helper.queryBuilder( Month.class );
 
 		//inclusive
@@ -704,7 +699,7 @@ public class DSLTest {
 	}
 
 	@Test
-	public void testNumericFieldsTermQuery() {
+	void testNumericFieldsTermQuery() {
 		final QueryBuilder monthQb = helper.queryBuilder( Month.class );
 
 		Query query = monthQb.keyword()
@@ -717,7 +712,7 @@ public class DSLTest {
 
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-703")
-	public void testPolymorphicQueryForUnindexedSuperTypeReturnsIndexedSubType() {
+	void testPolymorphicQueryForUnindexedSuperTypeReturnsIndexedSubType() {
 		final QueryBuilder builder = helper.queryBuilder( Object.class );
 
 		Query query = builder.all().createQuery();
@@ -728,7 +723,7 @@ public class DSLTest {
 
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-703")
-	public void testPolymorphicQueryWithKeywordTermForUnindexedSuperTypeReturnsIndexedSubType() {
+	void testPolymorphicQueryWithKeywordTermForUnindexedSuperTypeReturnsIndexedSubType() {
 		final QueryBuilder builder = helper.queryBuilder( Car.class );
 
 		Query query = builder.keyword().onField( "name" ).matching( "Morris" ).createQuery();
@@ -737,7 +732,7 @@ public class DSLTest {
 
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-703")
-	public void testObtainingBuilderForUnindexedTypeWithoutIndexedSubTypesCausesException() {
+	void testObtainingBuilderForUnindexedTypeWithoutIndexedSubTypesCausesException() {
 		try {
 			helper.queryBuilder( Animal.class );
 
@@ -750,7 +745,7 @@ public class DSLTest {
 
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-2199")
-	public void testCharFilters() throws Exception {
+	void testCharFilters() {
 		final QueryBuilder monthQb = helper.queryBuilder( Month.class );
 
 		//regular query
@@ -782,7 +777,7 @@ public class DSLTest {
 
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-3233")
-	public void testOverridesForField() {
+	void testOverridesForField() {
 		final QueryBuilder monthQb = sfHolder.getSearchFactory().buildQueryBuilder().forEntity( Month.class )
 				.overridesForField( "mythology_ngram", AnalysisNames.ANALYZER_STANDARD_STANDARD_LOWERCASE_STOP )
 				.get();
@@ -824,15 +819,15 @@ public class DSLTest {
 
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-3233")
-	public void testOverridesForFieldUnknownAnalyzer() {
-		thrown.expect( SearchException.class );
-		thrown.expectMessage( "Unknown analyzer: 'invalid_analyzer_name'" );
+	void testOverridesForFieldUnknownAnalyzer() {
+		assertThatThrownBy( () -> {
+			QueryBuilder monthQb = sfHolder.getSearchFactory().buildQueryBuilder().forEntity( Month.class )
+					.overridesForField( "mythology_ngram", "invalid_analyzer_name" )
+					.get();
 
-		QueryBuilder monthQb = sfHolder.getSearchFactory().buildQueryBuilder().forEntity( Month.class )
-				.overridesForField( "mythology_ngram", "invalid_analyzer_name" )
-				.get();
-
-		monthQb.keyword().onField( "mythology_ngram" ).matching( "sno" ).createQuery();
+			monthQb.keyword().onField( "mythology_ngram" ).matching( "sno" ).createQuery();
+		} ).isInstanceOf( SearchException.class )
+				.hasMessageContaining( "Unknown analyzer: 'invalid_analyzer_name'" );
 	}
 
 	private void indexTestData() {

@@ -72,17 +72,6 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-surefire-plugin</artifactId>
-                <dependencies>
-                    <!--
-                             Force tests to execute with JUnit 4
-                             See http://maven.apache.org/surefire/maven-failsafe-plugin/examples/junit.html
-                         -->
-                    <dependency>
-                        <groupId>org.apache.maven.surefire</groupId>
-                        <artifactId>surefire-junit47</artifactId>
-                        <version>${version.surefire.plugin}</version>
-                    </dependency>
-                </dependencies>
                 <configuration>
                     <!-- Tests are suffixed with *Test instead of *IT,
                             but they really are integration tests: don't execute them with surefire -->
@@ -92,17 +81,6 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-failsafe-plugin</artifactId>
-                <dependencies>
-                    <!--
-                             Force tests to execute with JUnit 4
-                             See http://maven.apache.org/surefire/maven-failsafe-plugin/examples/junit.html
-                         -->
-                    <dependency>
-                        <groupId>org.apache.maven.surefire</groupId>
-                        <artifactId>surefire-junit47</artifactId>
-                        <version>${version.surefire.plugin}</version>
-                    </dependency>
-                </dependencies>
                 <executions>
                     <execution>
                         <id>it</id>

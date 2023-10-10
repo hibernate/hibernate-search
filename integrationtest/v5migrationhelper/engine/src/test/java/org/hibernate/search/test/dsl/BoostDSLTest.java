@@ -11,9 +11,9 @@ import org.hibernate.search.testsupport.TestForIssue;
 import org.hibernate.search.testsupport.junit.SearchFactoryHolder;
 import org.hibernate.search.testsupport.junit.SearchITHelper;
 
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 
 import org.apache.lucene.search.Query;
 import org.apache.lucene.search.Sort;
@@ -23,20 +23,20 @@ import org.apache.lucene.search.SortField;
  * @author Guillaume Smet
  */
 @TestForIssue(jiraKey = "HSEARCH-2983")
-public class BoostDSLTest {
+class BoostDSLTest {
 
-	@Rule
+	@RegisterExtension
 	public final SearchFactoryHolder sfHolder = new SearchFactoryHolder( Coffee.class );
 
 	private final SearchITHelper helper = new SearchITHelper( sfHolder );
 
-	@Before
-	public void setUp() throws Exception {
+	@BeforeEach
+	void setUp() {
 		indexTestData();
 	}
 
 	@Test
-	public void testBoostOnTermQuery() {
+	void testBoostOnTermQuery() {
 		QueryBuilder qb = helper.queryBuilder( Coffee.class );
 
 		Query query = qb.bool()
@@ -59,7 +59,7 @@ public class BoostDSLTest {
 	}
 
 	@Test
-	public void testBoostOnNumericQuery() {
+	void testBoostOnNumericQuery() {
 		QueryBuilder qb = helper.queryBuilder( Coffee.class );
 
 		Query query = qb.bool()

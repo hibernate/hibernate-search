@@ -6,7 +6,7 @@
  */
 package org.hibernate.search.test.embedded.update;
 
-import static org.junit.Assert.assertEquals;
+import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.List;
 
@@ -16,7 +16,7 @@ import org.hibernate.search.FullTextSession;
 import org.hibernate.search.Search;
 import org.hibernate.search.test.SearchTestBase;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import org.apache.lucene.index.Term;
 import org.apache.lucene.search.TermQuery;
@@ -24,11 +24,11 @@ import org.apache.lucene.search.TermQuery;
 /**
  * @author Hardy Ferentschik
  */
-public class ContainedInReindexPropagationTest extends SearchTestBase {
+class ContainedInReindexPropagationTest extends SearchTestBase {
 
 	// see HSEARCH-662
 	@Test
-	public void testUpdatingContainedInEntityPropagatesToAllEntities() throws Exception {
+	void testUpdatingContainedInEntityPropagatesToAllEntities() {
 		// source to move dads from
 		Grandpa source = new Grandpa( "grandpaSource" );
 		// source to move dads to
@@ -66,8 +66,8 @@ public class ContainedInReindexPropagationTest extends SearchTestBase {
 		tx = session.beginTransaction();
 
 		// everything gets indexed correctly
-		assertEquals( getSonsGrandpaIdFromIndex( session, son1.getName() ), sourceGrandpaId );
-		assertEquals( getSonsGrandpaIdFromIndex( session, son2.getName() ), sourceGrandpaId );
+		assertThat( getSonsGrandpaIdFromIndex( session, son1.getName() ) ).isEqualTo( sourceGrandpaId );
+		assertThat( getSonsGrandpaIdFromIndex( session, son2.getName() ) ).isEqualTo( sourceGrandpaId );
 
 		tx.commit();
 		session.close();
@@ -90,9 +90,11 @@ public class ContainedInReindexPropagationTest extends SearchTestBase {
 		tx = session.beginTransaction();
 
 		//NOTE: it looks like the last item in session (i.e. dad2) does get updated correctly
-		assertEquals( "must now point target!", getSonsGrandpaIdFromIndex( session, son2.getName() ), targetGrandpaId );
+		assertThat( getSonsGrandpaIdFromIndex( session, son2.getName() ) ).as( "must now point target!" )
+				.isEqualTo( targetGrandpaId );
 		//this one will fail miserably
-		assertEquals( "must now point target!", getSonsGrandpaIdFromIndex( session, son1.getName() ), targetGrandpaId );
+		assertThat( getSonsGrandpaIdFromIndex( session, son1.getName() ) ).as( "must now point target!" )
+				.isEqualTo( targetGrandpaId );
 
 		tx.commit();
 		session.close();

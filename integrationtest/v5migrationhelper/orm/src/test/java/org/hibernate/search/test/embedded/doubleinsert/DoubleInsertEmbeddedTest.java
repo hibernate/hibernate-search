@@ -6,7 +6,7 @@
  */
 package org.hibernate.search.test.embedded.doubleinsert;
 
-import static org.junit.Assert.assertEquals;
+import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.Date;
 
@@ -15,7 +15,7 @@ import org.hibernate.search.FullTextSession;
 import org.hibernate.search.Search;
 import org.hibernate.search.test.SearchTestBase;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import org.apache.lucene.index.Term;
 import org.apache.lucene.search.TermQuery;
@@ -23,17 +23,17 @@ import org.apache.lucene.search.TermQuery;
 /**
  * @author Emmanuel Bernard
  */
-public class DoubleInsertEmbeddedTest extends SearchTestBase {
+class DoubleInsertEmbeddedTest extends SearchTestBase {
 
 	@Test
-	public void testDoubleInsert() throws Exception {
+	void testDoubleInsert() {
 		PersonalContact contact = createTestData();
 		FullTextSession s = Search.getFullTextSession( openSession() );
 		s.getTransaction().begin();
 		Term term = new Term( "county", "county" );
 		TermQuery termQuery = new TermQuery( term );
 		Query query = s.createFullTextQuery( termQuery );
-		assertEquals( 1, query.list().size() );
+		assertThat( query.list() ).hasSize( 1 );
 		contact = (PersonalContact) s.get( PersonalContact.class, contact.getId() );
 		contact.getPhoneNumbers().clear();
 		contact.getAddresses().clear();
@@ -47,7 +47,7 @@ public class DoubleInsertEmbeddedTest extends SearchTestBase {
 	}
 
 	@Test
-	public void testMultipleUpdatesTriggeredByContainedIn() {
+	void testMultipleUpdatesTriggeredByContainedIn() {
 		PersonalContact contact = createTestData();
 		FullTextSession s = Search.getFullTextSession( openSession() );
 		s.getTransaction().begin();

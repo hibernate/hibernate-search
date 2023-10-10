@@ -19,12 +19,9 @@ import org.hibernate.search.test.testsupport.V5MigrationHelperOrmSetupHelper;
 import org.hibernate.search.test.util.BackendTestHelper;
 import org.hibernate.search.test.util.TestConfiguration;
 
-import org.hibernate.testing.junit4.CustomRunner;
-
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.extension.RegisterExtension;
 
 import org.apache.lucene.store.Directory;
 
@@ -33,10 +30,9 @@ import org.apache.lucene.store.Directory;
  *
  * @author Hardy Ferentschik
  */
-@RunWith(CustomRunner.class)
 public abstract class SearchTestBase implements TestResourceManager, TestConfiguration {
 
-	@Rule
+	@RegisterExtension
 	public final V5MigrationHelperOrmSetupHelper setupHelper = V5MigrationHelperOrmSetupHelper.create();
 
 	// access only via getter, since instance gets lazily initialized
@@ -45,13 +41,13 @@ public abstract class SearchTestBase implements TestResourceManager, TestConfigu
 	// access only via getter, since instance gets lazily initialized
 	private BackendTestHelper backendTestHelper;
 
-	@Before
-	public void setUp() throws Exception {
+	@BeforeEach
+	protected void setUp() throws Exception {
 		getTestResourceManager().openSessionFactory();
 	}
 
-	@After
-	public void tearDown() throws Exception {
+	@AfterEach
+	protected void tearDown() throws Exception {
 		getTestResourceManager().defaultTearDown();
 	}
 

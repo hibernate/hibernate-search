@@ -7,7 +7,7 @@
 
 package org.hibernate.search.test.spatial;
 
-import static org.junit.Assert.assertEquals;
+import static org.assertj.core.api.Assertions.assertThat;
 
 import java.lang.invoke.MethodHandles;
 import java.util.ArrayList;
@@ -38,9 +38,10 @@ import org.hibernate.search.test.SearchTestBase;
 import org.hibernate.search.util.logging.impl.Log;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
 
-import org.hibernate.testing.TestForIssue;
+import org.hibernate.testing.orm.junit.JiraKey;
 
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import org.apache.lucene.search.Sort;
 
@@ -49,8 +50,8 @@ import org.apache.lucene.search.Sort;
  *
  * @author PB
  */
-@TestForIssue(jiraKey = "HSEARCH-1267")
-public class SpatialSearchSortByDistanceAndPagingTest extends SearchTestBase {
+@JiraKey("HSEARCH-1267")
+class SpatialSearchSortByDistanceAndPagingTest extends SearchTestBase {
 	private static final Log log = LoggerFactory.make( MethodHandles.lookup() );
 
 	private static final int EXPECTED_RESULTS_COUNT = 37;
@@ -61,37 +62,36 @@ public class SpatialSearchSortByDistanceAndPagingTest extends SearchTestBase {
 	private int idx;
 
 	@Test
-	public void testSortWithoutPaging_isOk() {
-		assertEquals( EXPECTED_RESULTS_COUNT, doSearch( SEARCH_DISTANCE, 50, true ) );
+	void testSortWithoutPaging_isOk() {
+		assertThat( doSearch( SEARCH_DISTANCE, 50, true ) ).isEqualTo( EXPECTED_RESULTS_COUNT );
 	}
 
 	@Test
-	public void testSortWithPageSize5_notOk() {
-		assertEquals(
-				"sorting by distance and paging error",
-				EXPECTED_RESULTS_COUNT, doSearch( SEARCH_DISTANCE, 5, true )
-		);
+	void testSortWithPageSize5_notOk() {
+		assertThat( doSearch( SEARCH_DISTANCE, 5, true ) )
+				.as( "sorting by distance and paging error" )
+				.isEqualTo( EXPECTED_RESULTS_COUNT );
 	}
 
 	@Test
-	public void testSortWithPageSize10_notOk() {
-		assertEquals(
-				"sorting by distance and paging error",
-				EXPECTED_RESULTS_COUNT, doSearch( SEARCH_DISTANCE, 10, true )
-		);
+	void testSortWithPageSize10_notOk() {
+		assertThat( doSearch( SEARCH_DISTANCE, 10, true ) )
+				.as( "sorting by distance and paging error" )
+				.isEqualTo( EXPECTED_RESULTS_COUNT );
 	}
 
 	@Test
-	public void testNoSortWithPageSize5_isOk() {
-		assertEquals( EXPECTED_RESULTS_COUNT, doSearch( SEARCH_DISTANCE, 5, false ) );
+	void testNoSortWithPageSize5_isOk() {
+		assertThat( doSearch( SEARCH_DISTANCE, 5, false ) ).isEqualTo( EXPECTED_RESULTS_COUNT );
 	}
 
 	@Test
-	public void testNoSortWithPageSize10_isOk() {
-		assertEquals( EXPECTED_RESULTS_COUNT, doSearch( SEARCH_DISTANCE, 10, false ) );
+	void testNoSortWithPageSize10_isOk() {
+		assertThat( doSearch( SEARCH_DISTANCE, 10, false ) ).isEqualTo( EXPECTED_RESULTS_COUNT );
 	}
 
 	@Override
+	@BeforeEach
 	public void setUp() throws Exception {
 		super.setUp();
 		prepareTestData();

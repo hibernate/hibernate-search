@@ -7,7 +7,7 @@
 package org.hibernate.search.test.query;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.Assert.fail;
+import static org.junit.jupiter.api.Assertions.fail;
 
 import org.hibernate.Transaction;
 import org.hibernate.search.FullTextSession;
@@ -16,7 +16,7 @@ import org.hibernate.search.test.SearchTestBase;
 import org.hibernate.search.testsupport.TestConstants;
 import org.hibernate.search.util.common.SearchException;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import org.apache.lucene.queryparser.classic.QueryParser;
 import org.apache.lucene.search.Query;
@@ -26,10 +26,10 @@ import org.apache.lucene.search.Query;
  *
  * @author Hardy Ferentschik
  */
-public class QueryUnindexedEntityTest extends SearchTestBase {
+class QueryUnindexedEntityTest extends SearchTestBase {
 
 	@Test
-	public void testQueryOnAllEntities() throws Exception {
+	void testQueryOnAllEntities() throws Exception {
 
 		FullTextSession s = Search.getFullTextSession( openSession() );
 

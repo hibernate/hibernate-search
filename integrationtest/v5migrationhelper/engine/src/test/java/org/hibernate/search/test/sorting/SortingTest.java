@@ -27,9 +27,8 @@ import org.hibernate.search.testsupport.TestForIssue;
 import org.hibernate.search.testsupport.junit.SearchFactoryHolder;
 import org.hibernate.search.testsupport.junit.SearchITHelper;
 
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.ExpectedException;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 
 import org.apache.lucene.search.Query;
 import org.apache.lucene.search.Sort;
@@ -39,20 +38,17 @@ import org.apache.lucene.search.Sort;
  *
  * @author Sanne Grinovero
  */
-public class SortingTest {
+class SortingTest {
 
 	private static final String SORT_TYPE_ERROR_CODE = "HSEARCH000307";
 
-	@Rule
-	public final ExpectedException thrown = ExpectedException.none();
-
-	@Rule
+	@RegisterExtension
 	public final SearchFactoryHolder factoryHolder = new SearchFactoryHolder( Person.class, UnsortableToy.class );
 
 	private final SearchITHelper helper = new SearchITHelper( factoryHolder );
 
 	@Test
-	public void testSortingOnNumericInt() {
+	void testSortingOnNumericInt() {
 		// Index all testData:
 		helper.index(
 				new Person( 0, 3, "Three" ),
@@ -77,7 +73,7 @@ public class SortingTest {
 	}
 
 	@Test
-	public void testSortingOnString() {
+	void testSortingOnString() {
 		// Index all testData:
 		helper.index(
 				new Person( 0, 3, "Three" ),
@@ -93,7 +89,7 @@ public class SortingTest {
 
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-2376")
-	public void testSortingOnCollatedString() {
+	void testSortingOnCollatedString() {
 		// Index all testData:
 		helper.index(
 				new Person( 0, 3, "Éléonore" ),
@@ -110,7 +106,7 @@ public class SortingTest {
 
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-2376")
-	public void testAnalyzedSortableStoredField() {
+	void testAnalyzedSortableStoredField() {
 		Person person = new Person( 0, 3, "Éléonore" );
 
 		// Index all testData:
@@ -129,7 +125,7 @@ public class SortingTest {
 	}
 
 	@Test
-	public void testSortingOnEmbeddedString() {
+	void testSortingOnEmbeddedString() {
 		// Index all testData:
 		helper.index(
 				new Person( 0, 3, "Three", new CuddlyToy( "Hippo" ) ),
@@ -148,7 +144,7 @@ public class SortingTest {
 	 */
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-2000")
-	public void testSortingForTypeWithSortableFieldWithinEmbeddedToManyAssociation() {
+	void testSortingForTypeWithSortableFieldWithinEmbeddedToManyAssociation() {
 		// Index all testData:
 		helper.index(
 				new Person(
@@ -176,7 +172,7 @@ public class SortingTest {
 	}
 
 	@Test
-	public void testSortOnNullableNumericFieldArray() throws Exception {
+	void testSortOnNullableNumericFieldArray() throws Exception {
 		helper.index(
 				new Person( 1, 25, "name1", 1, 2, 3 ),
 				new Person( 2, 22, "name2", 1, null, 3 ),

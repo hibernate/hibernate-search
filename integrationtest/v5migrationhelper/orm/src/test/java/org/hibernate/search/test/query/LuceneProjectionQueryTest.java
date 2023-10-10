@@ -6,9 +6,7 @@
  */
 package org.hibernate.search.test.query;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
+import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.Date;
 import java.util.List;
@@ -20,12 +18,12 @@ import org.hibernate.search.FullTextSession;
 import org.hibernate.search.Search;
 import org.hibernate.search.test.SearchTestBase;
 import org.hibernate.search.testsupport.TestConstants;
-import org.hibernate.search.testsupport.junit.SkipOnElasticsearch;
+import org.hibernate.search.testsupport.junit.Tags;
 
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.experimental.categories.Category;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Tag;
+import org.junit.jupiter.api.Test;
 
 import org.apache.lucene.document.Document;
 import org.apache.lucene.queryparser.classic.QueryParser;
@@ -38,10 +36,10 @@ import org.apache.lucene.search.Query;
  * @author John Griffin
  * @author Hardy Ferentschik
  */
-@Category(SkipOnElasticsearch.class) // This test is specific to the Lucene backend
-public class LuceneProjectionQueryTest extends SearchTestBase {
+@Tag(Tags.SKIP_ON_ELASTICSEARCH) // This test is specific to the Lucene backend
+class LuceneProjectionQueryTest extends SearchTestBase {
 
-	@Before
+	@BeforeEach
 	@Override
 	public void setUp() throws Exception {
 		super.setUp();
@@ -64,7 +62,7 @@ public class LuceneProjectionQueryTest extends SearchTestBase {
 		s.clear();
 	}
 
-	@After
+	@AfterEach
 	@Override
 	public void tearDown() throws Exception {
 		Session s = getSession(); // Opened during setup
@@ -82,7 +80,7 @@ public class LuceneProjectionQueryTest extends SearchTestBase {
 	}
 
 	@Test
-	public void testLuceneDocumentProjection() throws Exception {
+	void testLuceneDocumentProjection() throws Exception {
 		FullTextSession s = Search.getFullTextSession( getSession() );
 		Transaction tx = s.beginTransaction();
 
@@ -92,16 +90,16 @@ public class LuceneProjectionQueryTest extends SearchTestBase {
 		hibQuery.setProjection( FullTextQuery.DOCUMENT );
 
 		List<?> result = hibQuery.list();
-		assertNotNull( result );
+		assertThat( result ).isNotNull();
 		Object[] projection = (Object[]) result.get( 0 );
-		assertTrue( "DOCUMENT incorrect", projection[0] instanceof Document );
-		assertEquals( "DOCUMENT size incorrect", 4, ( (Document) projection[0] ).getFields().size() );
+		assertThat( projection[0] ).as( "DOCUMENT incorrect" ).isInstanceOf( Document.class );
+		assertThat( ( (Document) projection[0] ).getFields() ).as( "DOCUMENT size incorrect" ).hasSize( 4 );
 
 		tx.commit();
 	}
 
 	@Test
-	public void testLuceneDocumentProjectionNonLoadedFieldOptimization() throws Exception {
+	void testLuceneDocumentProjectionNonLoadedFieldOptimization() throws Exception {
 		FullTextSession s = Search.getFullTextSession( getSession() );
 		Transaction tx = s.beginTransaction();
 
@@ -111,16 +109,15 @@ public class LuceneProjectionQueryTest extends SearchTestBase {
 		hibQuery.setProjection( FullTextQuery.ID, FullTextQuery.DOCUMENT );
 
 		List<?> result = hibQuery.list();
-		assertNotNull( result );
+		assertThat( result ).isNotNull();
 
 		Object[] projection = (Object[]) result.get( 0 );
-		assertNotNull( projection );
-		assertEquals( "id field name not projected", 1001, projection[0] );
-		assertEquals(
-				"Document fields should not be lazy on DOCUMENT projection",
-				"Jackson", ( (Document) projection[1] ).getField( "lastname" ).stringValue()
-		);
-		assertEquals( "DOCUMENT size incorrect", 4, ( (Document) projection[1] ).getFields().size() );
+		assertThat( result ).isNotNull();
+		assertThat( projection[0] ).as( "id field name not projected" ).isEqualTo( 1001 );
+		assertThat(
+				( (Document) projection[1] ).getField( "lastname" ).stringValue()
+		).as( "Document fields should not be lazy on DOCUMENT projection" ).isEqualTo( "Jackson" );
+		assertThat( ( (Document) projection[1] ).getFields() ).as( "DOCUMENT size incorrect" ).hasSize( 4 );
 
 		tx.commit();
 	}

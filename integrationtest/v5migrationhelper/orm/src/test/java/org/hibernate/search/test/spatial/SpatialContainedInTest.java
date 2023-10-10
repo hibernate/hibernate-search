@@ -6,7 +6,7 @@
  */
 package org.hibernate.search.test.spatial;
 
-import static org.junit.Assert.assertEquals;
+import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.List;
 
@@ -30,18 +30,18 @@ import org.hibernate.search.query.dsl.Unit;
 import org.hibernate.search.test.SearchInitializationTestBase;
 import org.hibernate.search.testsupport.TestForIssue;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 /**
  * Test behavior when using {@code @ContainedIn} in a {@code @Spatial}-annotated entity.
  *
  * @author Yoann Rodiere
  */
-public class SpatialContainedInTest extends SearchInitializationTestBase {
+class SpatialContainedInTest extends SearchInitializationTestBase {
 
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-2858")
-	public void test() throws Exception {
+	void test() throws Exception {
 		// We mainly want to test that the initialization won't fail with an NPE
 		init( Actor.class, ActorLocation.class );
 
@@ -83,7 +83,7 @@ public class SpatialContainedInTest extends SearchInitializationTestBase {
 
 			FullTextQuery query = ftSession.createFullTextQuery( luceneQuery, Actor.class );
 			List<?> results = query.list();
-			assertEquals( 1, results.size() );
+			assertThat( results ).hasSize( 1 );
 		}
 
 		// Change the location so that it doesn't match the query anymore
@@ -113,7 +113,7 @@ public class SpatialContainedInTest extends SearchInitializationTestBase {
 
 			FullTextQuery query = ftSession.createFullTextQuery( luceneQuery, Actor.class );
 			List<?> results = query.list();
-			assertEquals( 0, results.size() );
+			assertThat( results ).isEmpty();
 		}
 	}
 

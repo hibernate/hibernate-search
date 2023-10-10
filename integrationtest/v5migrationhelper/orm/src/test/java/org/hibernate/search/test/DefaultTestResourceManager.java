@@ -207,11 +207,7 @@ public final class DefaultTestResourceManager implements TestResourceManager {
 	}
 
 	private static void deleteRecursive(Path path) throws IOException {
-		if ( path == null ) {
-			throw new IllegalArgumentException();
-		}
-
-		if ( Files.notExists( path ) ) {
+		if ( path == null || Files.notExists( path ) ) {
 			return;
 		}
 
