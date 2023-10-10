@@ -37,6 +37,14 @@ org.skyscreamer.jsonassert.JSONAssert @ Use JsonHelper.assertJsonEquals to avoid
 org.junit.experimental.runners.Enclosed @ Use NestedRunner instead of Enclosed and annotate inner classes with @Nested
 org.junit.Assert @ Use AssertJ assertions instead
 org.junit.jupiter.api.Assertions @ Use AssertJ assertions instead
+org.junit.Test @ Use JUnit 5 instead
+org.junit.Before @ Use JUnit 5 instead
+org.junit.After @ Use JUnit 5 instead
+org.junit.BeforeClass @ Use JUnit 5 instead
+org.junit.AfterClass @ Use JUnit 5 instead
+org.junit.Rule @ Use JUnit 5 instead
+org.junit.ClassRule @ Use JUnit 5 instead
+org.junit.Ignore @ Use JUnit 5 instead
 
 ################################################################################################################
 # Unsafe API/SPI from Hibernate ORM
