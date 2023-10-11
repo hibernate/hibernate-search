@@ -110,9 +110,8 @@ public class OrmSetupHelper
 	private final Collection<BackendMock> backendMocks;
 	private final SchemaManagementStrategyName schemaManagementStrategyName;
 	private final OrmAssertionHelper assertionHelper;
-	private OrmSetupHelperCleaner ormSetupHelperCleaner;
+	private final List<OrmSetupHelperCleaner> ormSetupHelperCleaners = new ArrayList<>();
 	private CoordinationStrategyExpectations coordinationStrategyExpectations = DEFAULT_COORDINATION_STRATEGY_EXPECTATIONS;
-	private SessionFactoryImplementor sessionFactory;
 
 	protected OrmSetupHelper(BackendSetupStrategy backendSetupStrategy, Collection<BackendMock> backendMocks,
 			SchemaManagementStrategyName schemaManagementStrategyName) {
@@ -157,6 +156,8 @@ public class OrmSetupHelper
 	protected void close(SessionFactory toClose) {
 		try ( Closer<RuntimeException> closer = new Closer<>() ) {
 			closer.push( SessionFactory::close, toClose );
+			// if we are closing the session factory, we don't want to keep its cleaner around, so we remove it from the list:
+			ormSetupHelperCleaners.removeIf( cleaner -> cleaner.usesExactly( toClose ) );
 		}
 	}
 
@@ -165,7 +166,10 @@ public class OrmSetupHelper
 		// if test was aborted then we don't want to clean the data since the test wasn't executed.
 		if ( !context.getExecutionException().map( Object::getClass )
 				.map( org.opentest4j.TestAbortedException.class::equals ).orElse( Boolean.FALSE ) ) {
-			this.ormSetupHelperCleaner.cleanupData( sessionFactory );
+
+			try ( Closer<RuntimeException> closer = new Closer<>() ) {
+				closer.pushAll( OrmSetupHelperCleaner::cleanupData, ormSetupHelperCleaners );
+			}
 		}
 	}
 
@@ -190,9 +194,9 @@ public class OrmSetupHelper
 
 		// Use a LinkedHashMap for deterministic iteration
 		private final Map<String, Object> overriddenProperties = new LinkedHashMap<>();
+		private final List<Consumer<DataClearConfig>> dataCleanerConfigurers = new ArrayList<>();
 
 		SetupContext(SchemaManagementStrategyName schemaManagementStrategyName) {
-			ormSetupHelperCleaner = OrmSetupHelperCleaner.create( callOncePerClass, backendSetupStrategy.isMockBackend() );
 			// Set the default properties according to OrmSetupHelperConfig
 			withProperties( DEFAULT_PROPERTIES );
 			// Override the schema management strategy according to our needs for testing
@@ -253,11 +257,10 @@ public class OrmSetupHelper
 
 		public SetupContext dataClearing(boolean reset, Consumer<DataClearConfig> configurer) {
 			if ( reset ) {
-				ormSetupHelperCleaner = OrmSetupHelperCleaner.create( callOncePerClass,
-						backendSetupStrategy.isMockBackend()
-				);
+				dataCleanerConfigurers.clear();
 			}
-			ormSetupHelperCleaner.appendConfiguration( configurer );
+			dataCleanerConfigurers.add( configurer );
+
 			return thisAsC();
 		}
 
@@ -283,7 +286,15 @@ public class OrmSetupHelper
 
 		@Override
 		protected SessionFactory build(SimpleSessionFactoryBuilder builder) {
-			sessionFactory = builder.build().unwrap( SessionFactoryImplementor.class );
+			SessionFactoryImplementor sessionFactory = builder.build().unwrap( SessionFactoryImplementor.class );
+
+			OrmSetupHelperCleaner cleaner = OrmSetupHelperCleaner.create(
+					sessionFactory, callOncePerClass, backendSetupStrategy.isMockBackend() );
+			for ( Consumer<DataClearConfig> configurer : dataCleanerConfigurers ) {
+				cleaner.appendConfiguration( configurer );
+			}
+			ormSetupHelperCleaners.add( cleaner );
+
 			return sessionFactory;
 		}
 
