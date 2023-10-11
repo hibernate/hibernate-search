@@ -46,20 +46,22 @@ class OrmSetupHelperCleaner {
 	private static final Logger log = Logger.getLogger( OrmSetupHelperCleaner.class.getName() );
 
 	private final DataClearConfigImpl config;
+	private final SessionFactoryImplementor sessionFactory;
 
-	static OrmSetupHelperCleaner create(boolean oncePerClass, boolean mockBackend) {
+	static OrmSetupHelperCleaner create(SessionFactoryImplementor sessionFactory, boolean oncePerClass, boolean mockBackend) {
 		if ( oncePerClass ) {
-			return new OrmSetupHelperCleaner().appendConfiguration(
+			return new OrmSetupHelperCleaner( sessionFactory ).appendConfiguration(
 					config -> config.clearDatabaseData( true ).clearIndexData( !mockBackend ) );
 		}
-		return new OrmSetupHelperCleaner();
+		return new OrmSetupHelperCleaner( sessionFactory );
 	}
 
-	private OrmSetupHelperCleaner() {
+	private OrmSetupHelperCleaner(SessionFactoryImplementor sessionFactory) {
+		this.sessionFactory = sessionFactory;
 		this.config = new DataClearConfigImpl();
 	}
 
-	void cleanupData(SessionFactoryImplementor sessionFactory) {
+	void cleanupData() {
 		if ( !( config.clearDatabaseData || config.clearIndexData ) ) {
 			return;
 		}
@@ -231,6 +233,11 @@ class OrmSetupHelperCleaner {
 	public OrmSetupHelperCleaner appendConfiguration(Consumer<DataClearConfig> configurer) {
 		configurer.accept( this.config );
 		return this;
+	}
+
+	public boolean usesExactly(SessionFactory sessionFactory) {
+		// exactly the same
+		return this.sessionFactory == sessionFactory;
 	}
 
 	enum QueryType {
