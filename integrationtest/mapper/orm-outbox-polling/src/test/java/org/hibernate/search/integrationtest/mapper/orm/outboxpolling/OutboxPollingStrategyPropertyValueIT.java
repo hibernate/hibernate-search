@@ -72,8 +72,9 @@ public class OutboxPollingStrategyPropertyValueIT {
 	public static BackendMock backendMock = BackendMock.create();
 
 	@RegisterExtension
-	public static OrmSetupHelper ormSetupHelper = OrmSetupHelper.withBackendMock( backendMock )
-			.coordinationStrategy( CoordinationStrategyExpectations.outboxPolling() );
+	public static OrmSetupHelper ormSetupHelper =
+			OrmSetupHelper.withCoordinationStrategy( CoordinationStrategyExpectations.outboxPolling() )
+					.withBackendMock( backendMock );
 
 	@ParameterizedSetup
 	@MethodSource("params")

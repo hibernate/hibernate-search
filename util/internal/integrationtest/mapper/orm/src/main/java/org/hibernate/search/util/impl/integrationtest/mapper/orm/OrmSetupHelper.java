@@ -31,7 +31,6 @@ import org.hibernate.search.util.impl.integrationtest.common.extension.BackendSe
 import org.hibernate.search.util.impl.integrationtest.common.extension.MappingSetupHelper;
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.BackendMappingHandle;
 import org.hibernate.search.util.impl.integrationtest.mapper.orm.multitenancy.impl.MultitenancyTestHelper;
-import org.hibernate.search.util.impl.test.extension.ExtensionScope;
 
 import org.junit.jupiter.api.extension.ExtensionContext;
 
@@ -65,15 +64,35 @@ public class OrmSetupHelper
 	}
 
 	public static OrmSetupHelper withBackendMock(BackendMock backendMock) {
+		return create( backendMock, DEFAULT_COORDINATION_STRATEGY_EXPECTATIONS );
+	}
+
+	public static OrmSetupHelper withBackendMocks(BackendMock defaultBackendMock, Map<String, BackendMock> namedBackendMocks) {
+		return create( defaultBackendMock, namedBackendMocks, DEFAULT_COORDINATION_STRATEGY_EXPECTATIONS );
+	}
+
+	public static OrmSetupHelper withSingleBackend(BackendConfiguration backendConfiguration) {
+		return create( backendConfiguration, DEFAULT_COORDINATION_STRATEGY_EXPECTATIONS );
+	}
+
+	public static OrmSetupHelper withMultipleBackends(BackendConfiguration defaultBackendConfiguration,
+			Map<String, BackendConfiguration> namedBackendConfigurations) {
+		return create( defaultBackendConfiguration, namedBackendConfigurations, DEFAULT_COORDINATION_STRATEGY_EXPECTATIONS );
+	}
+
+	private static OrmSetupHelper create(BackendMock backendMock,
+			CoordinationStrategyExpectations coordinationStrategyExpectations) {
 		return new OrmSetupHelper(
 				BackendSetupStrategy.withSingleBackendMock( backendMock ),
 				Collections.singleton( backendMock ),
 				// Mock backend => avoid schema management unless we want to test it
-				SchemaManagementStrategyName.NONE
+				SchemaManagementStrategyName.NONE,
+				coordinationStrategyExpectations
 		);
 	}
 
-	public static OrmSetupHelper withBackendMocks(BackendMock defaultBackendMock, Map<String, BackendMock> namedBackendMocks) {
+	private static OrmSetupHelper create(BackendMock defaultBackendMock, Map<String, BackendMock> namedBackendMocks,
+			CoordinationStrategyExpectations coordinationStrategyExpectations) {
 		List<BackendMock> backendMocks = new ArrayList<>();
 		if ( defaultBackendMock != null ) {
 			backendMocks.add( defaultBackendMock );
@@ -83,46 +102,54 @@ public class OrmSetupHelper
 				BackendSetupStrategy.withMultipleBackendMocks( defaultBackendMock, namedBackendMocks ),
 				backendMocks,
 				// Mock backend => avoid schema management unless we want to test it
-				SchemaManagementStrategyName.NONE
+				SchemaManagementStrategyName.NONE,
+				coordinationStrategyExpectations
 		);
 	}
 
-	public static OrmSetupHelper withSingleBackend(BackendConfiguration backendConfiguration) {
+	private static OrmSetupHelper create(BackendConfiguration backendConfiguration,
+			CoordinationStrategyExpectations coordinationStrategyExpectations) {
 		return new OrmSetupHelper(
 				BackendSetupStrategy.withSingleBackend( backendConfiguration ),
 				Collections.emptyList(),
 				// Real backend => ensure we clean up everything before and after the tests
-				SchemaManagementStrategyName.DROP_AND_CREATE_AND_DROP
+				SchemaManagementStrategyName.DROP_AND_CREATE_AND_DROP,
+				coordinationStrategyExpectations
 		);
 	}
 
-	public static OrmSetupHelper withMultipleBackends(BackendConfiguration defaultBackendConfiguration,
-			Map<String, BackendConfiguration> namedBackendConfigurations) {
+	private static OrmSetupHelper create(BackendConfiguration defaultBackendConfiguration,
+			Map<String, BackendConfiguration> namedBackendConfigurations,
+			CoordinationStrategyExpectations coordinationStrategyExpectations) {
 		return new OrmSetupHelper(
 				BackendSetupStrategy.withMultipleBackends( defaultBackendConfiguration, namedBackendConfigurations ),
 				Collections.emptyList(),
 				// Real backend => ensure to clean up everything
-				SchemaManagementStrategyName.DROP_AND_CREATE_AND_DROP
+				SchemaManagementStrategyName.DROP_AND_CREATE_AND_DROP,
+				coordinationStrategyExpectations
 		);
 	}
 
-	private final Collection<BackendMock> backendMocks;
 	private final SchemaManagementStrategyName schemaManagementStrategyName;
 	private final OrmAssertionHelper assertionHelper;
 	private final List<OrmSetupHelperCleaner> ormSetupHelperCleaners = new ArrayList<>();
-	private CoordinationStrategyExpectations coordinationStrategyExpectations = DEFAULT_COORDINATION_STRATEGY_EXPECTATIONS;
+	private final CoordinationStrategyExpectations coordinationStrategyExpectations;
 
-	protected OrmSetupHelper(BackendSetupStrategy backendSetupStrategy, Collection<BackendMock> backendMocks,
-			SchemaManagementStrategyName schemaManagementStrategyName) {
+	private OrmSetupHelper(BackendSetupStrategy backendSetupStrategy, Collection<BackendMock> backendMocks,
+			SchemaManagementStrategyName schemaManagementStrategyName,
+			CoordinationStrategyExpectations coordinationStrategyExpectations) {
 		super( backendSetupStrategy );
-		this.backendMocks = backendMocks;
 		this.schemaManagementStrategyName = schemaManagementStrategyName;
+		this.coordinationStrategyExpectations = coordinationStrategyExpectations;
 		this.assertionHelper = new OrmAssertionHelper( backendSetupStrategy );
+		for ( BackendMock backendMock : backendMocks ) {
+			backendMock.indexingWorkExpectations( coordinationStrategyExpectations.indexingWorkExpectations );
+		}
 	}
 
-	public OrmSetupHelper coordinationStrategy(CoordinationStrategyExpectations coordinationStrategyExpectations) {
-		this.coordinationStrategyExpectations = coordinationStrategyExpectations;
-		return this;
+	public static CoordinationStrategyHolder withCoordinationStrategy(
+			CoordinationStrategyExpectations coordinationStrategyExpectations) {
+		return new CoordinationStrategyHolder( coordinationStrategyExpectations );
 	}
 
 	@Override
@@ -142,13 +169,6 @@ public class OrmSetupHelper
 
 	public boolean areEntitiesProcessedInSession() {
 		return coordinationStrategyExpectations.sync;
-	}
-
-	@Override
-	protected void init(ExtensionScope scope) {
-		for ( BackendMock backendMock : backendMocks ) {
-			backendMock.indexingWorkExpectations( coordinationStrategyExpectations.indexingWorkExpectations );
-		}
 	}
 
 	@Override
@@ -308,6 +328,31 @@ public class OrmSetupHelper
 			return this;
 		}
 
+	}
+
+	public static final class CoordinationStrategyHolder {
+		private CoordinationStrategyHolder(CoordinationStrategyExpectations coordinationStrategyExpectations) {
+			this.coordinationStrategyExpectations = coordinationStrategyExpectations;
+		}
+
+		private final CoordinationStrategyExpectations coordinationStrategyExpectations;
+
+		public OrmSetupHelper withBackendMock(BackendMock backendMock) {
+			return create( backendMock, coordinationStrategyExpectations );
+		}
+
+		public OrmSetupHelper withBackendMocks(BackendMock defaultBackendMock, Map<String, BackendMock> namedBackendMocks) {
+			return create( defaultBackendMock, namedBackendMocks, coordinationStrategyExpectations );
+		}
+
+		public OrmSetupHelper withSingleBackend(BackendConfiguration backendConfiguration) {
+			return create( backendConfiguration, coordinationStrategyExpectations );
+		}
+
+		public OrmSetupHelper withMultipleBackends(BackendConfiguration defaultBackendConfiguration,
+				Map<String, BackendConfiguration> namedBackendConfigurations) {
+			return create( defaultBackendConfiguration, namedBackendConfigurations, coordinationStrategyExpectations );
+		}
 	}
 
 }

@@ -39,8 +39,9 @@ class OutboxPollingSearchMappingMultiTenancyIT {
 	public BackendMock backendMock = BackendMock.create();
 
 	@RegisterExtension
-	public OrmSetupHelper ormSetupHelper = OrmSetupHelper.withBackendMock( backendMock )
-			.coordinationStrategy( CoordinationStrategyExpectations.outboxPolling() );
+	public OrmSetupHelper ormSetupHelper =
+			OrmSetupHelper.withCoordinationStrategy( CoordinationStrategyExpectations.outboxPolling() )
+					.withBackendMock( backendMock );
 
 	public static List<? extends Arguments> params() {
 		return Arrays.asList(
