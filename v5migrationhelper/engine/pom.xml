@@ -25,7 +25,7 @@
         <java.module.name>org.hibernate.search.v5migrationhelper.engine</java.module.name>
 
         <!-- This is based on legacy code and there are plenty of problems that we don't care to fix -->
-        <jqassistant.skip>true</jqassistant.skip>
+        <jqassistant.maven.module.skip>true</jqassistant.maven.module.skip>
         <forbiddenapis.skip>true</forbiddenapis.skip>
         <sonar.skip>true</sonar.skip>
     </properties>
