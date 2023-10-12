@@ -7,10 +7,13 @@
 package org.hibernate.search.util.impl.test.extension.parameterized;
 
 import static org.hibernate.search.util.impl.test.extension.parameterized.ParameterizedClassUtils.isParameterizedSetup;
+import static org.junit.platform.commons.util.AnnotationUtils.findAnnotation;
 import static org.junit.platform.commons.util.AnnotationUtils.isAnnotated;
 
+import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
 
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.engine.descriptor.ClassTestDescriptor;
 import org.junit.jupiter.engine.descriptor.MethodBasedTestDescriptor;
 import org.junit.jupiter.engine.descriptor.NestedClassTestDescriptor;
@@ -25,13 +28,22 @@ import org.junit.platform.engine.TestDescriptor;
 public class ParameterizedClassPostDiscoveryFilter implements org.junit.platform.launcher.PostDiscoveryFilter {
 	@Override
 	public FilterResult apply(TestDescriptor testDescriptor) {
-		// class annotated with a ParameterizedSetup but no setup method with ParameterizedSetup -- we better fail :)
 		if ( testDescriptor instanceof ClassTestDescriptor ) {
 			Class<?> testClass = ( (ClassTestDescriptor) testDescriptor ).getTestClass();
-			if ( isParameterizedClass( testClass ) && !hasParameterizedSetup( testClass ) ) {
-				throw new IllegalStateException(
-						"Unable to find a @ParameterizedSetup method in " + testClass
-								+ ". @ParameterizedClass tests MUST have a @ParameterizedSetup method." );
+			if ( isParameterizedClass( testClass ) ) {
+				// class annotated with a ParameterizedSetup but no setup method with ParameterizedSetup -- we better fail :)
+				if ( !hasParameterizedSetup( testClass ) ) {
+					throw new IllegalStateException(
+							"Unable to find a @ParameterizedSetup method in " + testClass
+									+ ". @ParameterizedClass tests MUST have a @ParameterizedSetup method." );
+				}
+				// parameterized class has some @BeforeEach callbacks. These are not "supported by the @ParameterizedClass
+				if ( hasBeforeEach( testClass ) ) {
+					throw new IllegalStateException(
+							"@ParameterizedClass test " + testClass
+									+ " contains some methods annotated with @BeforeEach. " +
+									"Use @ParameterizedSetupBeforeTest instead." );
+				}
 			}
 		}
 		// nested class inside a parameterized test -- we are not handling this option for now, so.... failing:
@@ -69,23 +81,31 @@ public class ParameterizedClassPostDiscoveryFilter implements org.junit.platform
 									+ " Remove any JUnit @TestTemplate/@TestFactory annotations from "
 									+ methodTestDescriptor.getTestMethod() );
 				}
-
 			}
 		}
 		return FilterResult.included( "This filter does not care about this case." );
 	}
 
 	private boolean hasParameterizedSetup(Class<?> testClass) {
+		return hasMethodAnnotated( testClass, ParameterizedSetup.class );
+	}
+
+	private boolean hasBeforeEach(Class<?> testClass) {
+		return hasMethodAnnotated( testClass, BeforeEach.class );
+	}
+
+	private boolean hasMethodAnnotated(Class<?> testClass, Class<? extends Annotation> annotationType) {
 		if ( Object.class.equals( testClass ) ) {
 			return false;
 		}
 		for ( Method method : testClass.getDeclaredMethods() ) {
-			if ( isAnnotated( method, ParameterizedSetup.class ) ) {
+			if ( isAnnotated( method, annotationType ) ) {
+				findAnnotation( method, annotationType );
 				return true;
 			}
 		}
 
-		return hasParameterizedSetup( testClass.getSuperclass() );
+		return hasMethodAnnotated( testClass.getSuperclass(), annotationType );
 	}
 
 	private static boolean isParameterizedClass(Class<?> testClass) {

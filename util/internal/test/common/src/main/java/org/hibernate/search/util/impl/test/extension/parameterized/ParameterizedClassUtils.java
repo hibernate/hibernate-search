@@ -35,10 +35,6 @@ final class ParameterizedClassUtils {
 		return isAnnotated( candidate, ParameterizedSetup.class );
 	}
 
-	static boolean isTestMethod(Method candidate) {
-		return isAnnotated( candidate, Test.class ) || isAnnotated( candidate, ParameterizedTest.class );
-	}
-
 	static void findParameters(List<Object[]> arguments, ExtensionContext extensionContext, Method testMethod) {
 		for ( ArgumentsSource source : findRepeatableAnnotations( testMethod, ArgumentsSource.class ) ) {
 			ArgumentsProvider argumentsProvider =
