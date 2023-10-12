@@ -31,8 +31,8 @@ import org.hibernate.search.util.impl.integrationtest.common.extension.BackendSe
 import org.hibernate.search.util.impl.integrationtest.common.extension.MappingSetupHelper;
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.BackendMappingHandle;
 import org.hibernate.search.util.impl.integrationtest.mapper.orm.multitenancy.impl.MultitenancyTestHelper;
+import org.hibernate.search.util.impl.test.extension.ExtensionScope;
 
-import org.junit.jupiter.api.extension.AfterTestExecutionCallback;
 import org.junit.jupiter.api.extension.ExtensionContext;
 
 public class OrmSetupHelper
@@ -41,8 +41,7 @@ public class OrmSetupHelper
 				SimpleSessionFactoryBuilder,
 				SimpleSessionFactoryBuilder,
 				SessionFactory,
-				OrmSetupHelper.SetupVariant>
-		implements AfterTestExecutionCallback {
+				OrmSetupHelper.SetupVariant> {
 
 	private static final CoordinationStrategyExpectations DEFAULT_COORDINATION_STRATEGY_EXPECTATIONS;
 	private static final Map<String, Object> DEFAULT_PROPERTIES;
@@ -146,7 +145,7 @@ public class OrmSetupHelper
 	}
 
 	@Override
-	protected void init() {
+	protected void init(ExtensionScope scope) {
 		for ( BackendMock backendMock : backendMocks ) {
 			backendMock.indexingWorkExpectations( coordinationStrategyExpectations.indexingWorkExpectations );
 		}
@@ -162,7 +161,8 @@ public class OrmSetupHelper
 	}
 
 	@Override
-	public void afterTestExecution(ExtensionContext context) {
+	public void beforeEach(ExtensionContext context) {
+		super.beforeEach( context );
 		// if test was aborted then we don't want to clean the data since the test wasn't executed.
 		if ( !context.getExecutionException().map( Object::getClass )
 				.map( org.opentest4j.TestAbortedException.class::equals ).orElse( Boolean.FALSE ) ) {
@@ -289,7 +289,7 @@ public class OrmSetupHelper
 			SessionFactoryImplementor sessionFactory = builder.build().unwrap( SessionFactoryImplementor.class );
 
 			OrmSetupHelperCleaner cleaner = OrmSetupHelperCleaner.create(
-					sessionFactory, callOncePerClass, backendSetupStrategy.isMockBackend() );
+					sessionFactory, currentScope(), backendSetupStrategy.isMockBackend() );
 			for ( Consumer<DataClearConfig> configurer : dataCleanerConfigurers ) {
 				cleaner.appendConfiguration( configurer );
 			}

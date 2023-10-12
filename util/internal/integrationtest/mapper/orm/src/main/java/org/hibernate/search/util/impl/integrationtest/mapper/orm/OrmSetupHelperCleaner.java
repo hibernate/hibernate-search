@@ -34,6 +34,7 @@ import org.hibernate.search.mapper.orm.mapping.impl.HibernateOrmMapping;
 import org.hibernate.search.util.common.SearchException;
 import org.hibernate.search.util.common.impl.Closer;
 import org.hibernate.search.util.common.impl.SuppressingCloser;
+import org.hibernate.search.util.impl.test.extension.ExtensionScope;
 import org.hibernate.search.util.impl.test.function.ThrowingConsumer;
 
 import org.jboss.logging.Logger;
@@ -48,8 +49,9 @@ class OrmSetupHelperCleaner {
 	private final DataClearConfigImpl config;
 	private final SessionFactoryImplementor sessionFactory;
 
-	static OrmSetupHelperCleaner create(SessionFactoryImplementor sessionFactory, boolean oncePerClass, boolean mockBackend) {
-		if ( oncePerClass ) {
+	static OrmSetupHelperCleaner create(SessionFactoryImplementor sessionFactory, ExtensionScope scope, boolean mockBackend) {
+		// if we have a test scope cleaner we don't need to clean the data as the session factory will be closed anyway.
+		if ( !ExtensionScope.TEST.equals( scope ) ) {
 			return new OrmSetupHelperCleaner( sessionFactory ).appendConfiguration(
 					config -> config.clearDatabaseData( true ).clearIndexData( !mockBackend ) );
 		}
@@ -326,7 +328,7 @@ class OrmSetupHelperCleaner {
 
 		@Override
 		public DataClearConfig preClear(Consumer<Session> preClear) {
-			this.preClear.add( c -> preClear.accept( c ) );
+			this.preClear.add( preClear::accept );
 			return this;
 		}
 

@@ -18,7 +18,11 @@ import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Spliterator;
+import java.util.function.Consumer;
 import java.util.stream.Stream;
+
+import org.hibernate.search.util.impl.test.extension.ExtensionScope;
+import org.hibernate.search.util.impl.test.function.ThrowingConsumer;
 
 import org.junit.jupiter.api.TestInstance;
 import org.junit.jupiter.api.extension.Extension;
@@ -34,7 +38,7 @@ import org.junit.jupiter.api.extension.TestTemplateInvocationContextProvider;
 
 final class ParameterizedClassExtension
 		implements TestTemplateInvocationContextProvider, ParameterResolver,
-		TestExecutionExceptionHandler {
+		TestExecutionExceptionHandler, InvocationInterceptor {
 	private List<Object[]> envArguments;
 	private int envIndex = 0;
 	private boolean envInitialized = false;
@@ -79,6 +83,9 @@ final class ParameterizedClassExtension
 		envArguments = new ArrayList<>();
 		ParameterizedClassUtils.findParameters( envArguments, context, context.getRequiredTestMethod() );
 
+		Consumer<ExtensionScope> scopeModifier = ExtensionScope.currentScopeModifier( context );
+		ThrowingConsumer<ExtensionScope, Exception> cleanUp = ExtensionScope.scopeCleanUp( context );
+
 		return stream(
 				spliteratorUnknownSize(
 						new Iterator<>() {
@@ -110,7 +117,8 @@ final class ParameterizedClassExtension
 
 								return new ParameterizedClassTestTemplateInvocationContext(
 										testMethod.getName(),
-										new MethodInterceptor( !envInitialized || reinitOnEachTest )
+										new MethodInterceptor( scopeModifier, cleanUp, !envInitialized || reinitOnEachTest,
+												test.hasNext() )
 								);
 							}
 						}, Spliterator.NONNULL
@@ -173,10 +181,17 @@ final class ParameterizedClassExtension
 
 	private class MethodInterceptor implements InvocationInterceptor {
 
+		private final Consumer<ExtensionScope> scopeModifier;
+		private final ThrowingConsumer<ExtensionScope, Exception> cleanUp;
 		private final boolean invoke;
+		private final boolean hasMoreTests;
 
-		private MethodInterceptor(boolean invoke) {
+		private MethodInterceptor(Consumer<ExtensionScope> scopeModifier, ThrowingConsumer<ExtensionScope, Exception> cleanUp,
+				boolean invoke, boolean hasMoreTests) {
+			this.scopeModifier = scopeModifier;
+			this.cleanUp = cleanUp;
 			this.invoke = invoke;
+			this.hasMoreTests = hasMoreTests;
 		}
 
 		@Override
@@ -184,7 +199,9 @@ final class ParameterizedClassExtension
 				ReflectiveInvocationContext<Method> invocationContext, ExtensionContext extensionContext)
 				throws Throwable {
 			if ( invoke ) {
+				scopeModifier.accept( ExtensionScope.PARAMETERIZED_CLASS_SETUP );
 				invocation.proceed();
+				scopeModifier.accept( ExtensionScope.TEST );
 			}
 			else {
 				invocation.skip();
@@ -199,7 +216,10 @@ final class ParameterizedClassExtension
 					read( extensionContext, StoreKey.TEST_TO_RUN, ParameterizedTestMethodInvoker.class );
 			testMethod.invoke( extensionContext.getRequiredTestInstance() );
 			envInitialized = !envInitializationFailed;
+
+			if ( !hasMoreTests ) {
+				cleanUp.accept( ExtensionScope.PARAMETERIZED_CLASS_SETUP );
+			}
 		}
 	}
-
 }
