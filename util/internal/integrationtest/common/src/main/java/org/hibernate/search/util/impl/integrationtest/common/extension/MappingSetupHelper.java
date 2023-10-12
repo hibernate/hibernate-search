@@ -6,8 +6,10 @@
  */
 package org.hibernate.search.util.impl.integrationtest.common.extension;
 
+import java.lang.reflect.Constructor;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.EnumMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.CompletableFuture;
@@ -20,21 +22,23 @@ import org.hibernate.search.util.common.impl.Closer;
 import org.hibernate.search.util.impl.integrationtest.common.TestConfigurationProvider;
 import org.hibernate.search.util.impl.integrationtest.common.assertion.MappingAssertionHelper;
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.BackendMappingHandle;
+import org.hibernate.search.util.impl.test.extension.ExtensionScope;
 
 import org.junit.jupiter.api.extension.AfterAllCallback;
 import org.junit.jupiter.api.extension.AfterEachCallback;
 import org.junit.jupiter.api.extension.BeforeAllCallback;
 import org.junit.jupiter.api.extension.BeforeEachCallback;
 import org.junit.jupiter.api.extension.ExtensionContext;
+import org.junit.jupiter.api.extension.InvocationInterceptor;
+import org.junit.jupiter.api.extension.ReflectiveInvocationContext;
 
 public abstract class MappingSetupHelper<C extends MappingSetupHelper<C, B, BC, R, SV>.AbstractSetupContext, B, BC, R, SV>
-		implements AfterAllCallback, AfterEachCallback, BeforeAllCallback, BeforeEachCallback {
+		implements AfterAllCallback, AfterEachCallback, BeforeAllCallback, BeforeEachCallback, InvocationInterceptor {
 
 	private final TestConfigurationProvider configurationProvider;
 	protected final BackendSetupStrategy backendSetupStrategy;
-	protected boolean callOncePerClass = false;
-
-	private final List<R> toClose = new ArrayList<>();
+	private final Map<ExtensionScope, List<R>> toClose = new EnumMap<>( ExtensionScope.class );
+	private ExtensionScope scope = ExtensionScope.CLASS;
 
 	protected MappingSetupHelper(BackendSetupStrategy backendSetupStrategy) {
 		this.configurationProvider = new TestConfigurationProvider();
@@ -59,55 +63,69 @@ public abstract class MappingSetupHelper<C extends MappingSetupHelper<C, B, BC, 
 		return backendSetupStrategy.start( setupContext, configurationProvider, setupContext.backendMappingHandlePromise );
 	}
 
+	protected void updateScope(ExtensionScope scope) {
+		this.scope = scope;
+	}
+
+	protected ExtensionScope currentScope() {
+		return scope;
+	}
+
+	@Override
+	public <T> T interceptTestClassConstructor(Invocation<T> invocation,
+			ReflectiveInvocationContext<Constructor<T>> invocationContext, ExtensionContext extensionContext)
+			throws Throwable {
+		ExtensionScope.currentScopeModifier( extensionContext, this::updateScope );
+		ExtensionScope.scopeCleanUp( extensionContext, this::cleanUp );
+
+		return InvocationInterceptor.super.interceptTestClassConstructor( invocation, invocationContext, extensionContext );
+	}
+
 	@Override
 	public void afterAll(ExtensionContext context) throws Exception {
 		configurationProvider.afterAll( context );
-		if ( callOncePerClass ) {
-			cleanUp();
-		}
+		cleanUp( ExtensionScope.CLASS );
 	}
 
 	@Override
 	public void afterEach(ExtensionContext context) throws Exception {
 		configurationProvider.afterEach( context );
-		if ( !callOncePerClass ) {
-			cleanUp();
-		}
+		cleanUp( ExtensionScope.TEST );
 	}
 
 	@Override
-	public void beforeAll(ExtensionContext context) throws Exception {
+	public void beforeAll(ExtensionContext context) {
 		configurationProvider.beforeAll( context );
-		callOncePerClass = true;
-		if ( callOncePerClass ) {
-			init();
-		}
+		updateScope( ExtensionScope.CLASS );
+		init( ExtensionScope.CLASS );
 	}
 
 	@Override
-	public void beforeEach(ExtensionContext context) throws Exception {
+	public void beforeEach(ExtensionContext context) {
 		configurationProvider.beforeEach( context );
-		if ( !callOncePerClass ) {
-			init();
-		}
+		updateScope( ExtensionScope.TEST );
+		init( ExtensionScope.TEST );
 	}
 
-	private void cleanUp() throws Exception {
+	private void cleanUp(ExtensionScope scope) throws Exception {
 		try ( Closer<Exception> closer = new Closer<>() ) {
 			// Make sure to close the last-created resource first,
 			// to avoid problems e.g. if starting multiple ORM SessionFactories
 			// where only the first one creates/drops the schema:
 			// in that case the other SessionFactories must be closed before the first one,
 			// to avoid any SQL queries after the schema was dropped.
-			Collections.reverse( toClose );
-			closer.pushAll( MappingSetupHelper.this::close, toClose );
-			toClose.clear();
+			List<R> list = toClose.remove( scope );
+			if ( list == null ) {
+				list = List.of();
+			}
+			Collections.reverse( list );
+			closer.pushAll( MappingSetupHelper.this::close, list );
 		}
 	}
 
 	protected abstract C createSetupContext(SV setupVariant);
 
-	protected void init() {
+	protected void init(ExtensionScope scope) {
 	}
 
 	protected abstract void close(R toClose) throws Exception;
@@ -198,7 +216,7 @@ public abstract class MappingSetupHelper<C extends MappingSetupHelper<C, B, BC, 
 
 			try {
 				R result = build( builder );
-				toClose.add( result );
+				toClose.computeIfAbsent( currentScope(), key -> new ArrayList<>() ).add( result );
 				backendMappingHandlePromise.complete( toBackendMappingHandle( result ) );
 
 				configurations.forEach( c -> c.afterBuild( result ) );
