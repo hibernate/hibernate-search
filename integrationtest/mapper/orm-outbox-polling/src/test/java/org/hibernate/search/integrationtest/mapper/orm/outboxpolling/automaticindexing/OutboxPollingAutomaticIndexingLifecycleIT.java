@@ -41,8 +41,9 @@ class OutboxPollingAutomaticIndexingLifecycleIT {
 	public BackendMock backendMock = BackendMock.create();
 
 	@RegisterExtension
-	public OrmSetupHelper ormSetupHelper = OrmSetupHelper.withBackendMock( backendMock )
-			.coordinationStrategy( CoordinationStrategyExpectations.outboxPolling() );
+	public OrmSetupHelper ormSetupHelper =
+			OrmSetupHelper.withCoordinationStrategy( CoordinationStrategyExpectations.outboxPolling() )
+					.withBackendMock( backendMock );
 
 	private final OutboxEventFilter eventFilter = new OutboxEventFilter();
 

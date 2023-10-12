@@ -53,8 +53,9 @@ class OutboxPollingAutomaticIndexingEventSendingIT {
 	public static BackendMock backendMock = BackendMock.create();
 
 	@RegisterExtension
-	public static OrmSetupHelper ormSetupHelper = OrmSetupHelper.withBackendMock( backendMock )
-			.coordinationStrategy( CoordinationStrategyExpectations.outboxPolling() );
+	public static OrmSetupHelper ormSetupHelper =
+			OrmSetupHelper.withCoordinationStrategy( CoordinationStrategyExpectations.outboxPolling() )
+					.withBackendMock( backendMock );
 	private SessionFactory sessionFactory;
 
 	@BeforeAll

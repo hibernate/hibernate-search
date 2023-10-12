@@ -35,8 +35,9 @@ class OutboxPollingAutomaticIndexingWhileMassIndexingIT {
 	public BackendMock backendMock = BackendMock.create();
 
 	@RegisterExtension
-	public OrmSetupHelper setupHelper = OrmSetupHelper.withBackendMock( backendMock )
-			.coordinationStrategy( CoordinationStrategyExpectations.outboxPollingAndMassIndexing() );
+	public OrmSetupHelper setupHelper =
+			OrmSetupHelper.withCoordinationStrategy( CoordinationStrategyExpectations.outboxPollingAndMassIndexing() )
+					.withBackendMock( backendMock );
 
 	@Test
 	void singleTenant() throws InterruptedException {

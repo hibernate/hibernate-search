@@ -47,8 +47,9 @@ class OutboxPollingAutomaticIndexingMultiTenancyIT {
 	public BackendMock backendMock = BackendMock.create();
 
 	@RegisterExtension
-	public OrmSetupHelper setupHelper = OrmSetupHelper.withBackendMock( backendMock )
-			.coordinationStrategy( CoordinationStrategyExpectations.outboxPolling() );
+	public OrmSetupHelper setupHelper =
+			OrmSetupHelper.withCoordinationStrategy( CoordinationStrategyExpectations.outboxPolling() )
+					.withBackendMock( backendMock );
 
 	@RegisterExtension
 	public StaticCounters counters = StaticCounters.create();

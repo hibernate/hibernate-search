@@ -58,8 +58,9 @@ public class OutboxPollingDisabledIT {
 	public static BackendMock backendMock = BackendMock.create();
 
 	@RegisterExtension
-	public static OrmSetupHelper ormSetupHelper = OrmSetupHelper.withBackendMock( backendMock )
-			.coordinationStrategy( CoordinationStrategyExpectations.defaults() );
+	public static OrmSetupHelper ormSetupHelper =
+			OrmSetupHelper.withCoordinationStrategy( CoordinationStrategyExpectations.defaults() )
+					.withBackendMock( backendMock );
 
 
 	@ParameterizedSetup
