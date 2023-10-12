@@ -30,7 +30,7 @@
         <format.skip>true</format.skip>
 
         <deploy.skip>true</deploy.skip>
-        <jqassistant.skip>true</jqassistant.skip>
+        <jqassistant.maven.module.skip>true</jqassistant.maven.module.skip>
     </properties>
 
     <dependencies>

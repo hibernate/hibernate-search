@@ -19,7 +19,7 @@
     <description>Hibernate Search common build configuration files</description>
 
     <properties>
-        <jqassistant.skip>true</jqassistant.skip>
+        <jqassistant.maven.module.skip>true</jqassistant.maven.module.skip>
 
         <!--
             This module generates the rules used in the Checkstyle and ForbiddenAPIs plugins,

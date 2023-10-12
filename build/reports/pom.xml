@@ -22,12 +22,6 @@
 
     <properties>
         <!--
-             Do NOT skip jqassistant: we want to execute analysis here so as to fail the build if anything is wrong.
-             Reminder: jqassistant only executes analysis in the last module of the build,
-             so if we skip it in the last module, it just won't execute analysis... ever.
-         -->
-        <jqassistant.skip>false</jqassistant.skip>
-        <!--
         Disable the dependency convergence rule, because the dependencies of various integration tests do not converge
         -->
         <enforcer.dependencyconvergence.skip>true</enforcer.dependencyconvergence.skip>
