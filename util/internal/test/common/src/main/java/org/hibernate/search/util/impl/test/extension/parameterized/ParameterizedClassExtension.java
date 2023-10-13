@@ -22,7 +22,6 @@ import java.util.function.Consumer;
 import java.util.stream.Stream;
 
 import org.hibernate.search.util.impl.test.extension.ExtensionScope;
-import org.hibernate.search.util.impl.test.function.ThrowingConsumer;
 
 import org.junit.jupiter.api.TestInstance;
 import org.junit.jupiter.api.extension.Extension;
@@ -46,6 +45,10 @@ final class ParameterizedClassExtension
 	private boolean reinitOnEachTest = false;
 
 	private List<ParameterizedTestMethodInvoker> parameterizedSetupBeforeTestInvokers;
+
+	public static boolean areThereMoreTestsForCurrentConfigurations(ExtensionContext extensionContext) {
+		return read( extensionContext, StoreKey.MORE_TESTS_AVAILABLE, boolean.class );
+	}
 
 	@Override
 	public boolean supportsParameter(ParameterContext parameterContext, ExtensionContext extensionContext)
@@ -84,7 +87,6 @@ final class ParameterizedClassExtension
 		ParameterizedClassUtils.findParameters( envArguments, context, context.getRequiredTestMethod() );
 
 		Consumer<ExtensionScope> scopeModifier = ExtensionScope.currentScopeModifier( context );
-		ThrowingConsumer<ExtensionScope, Exception> cleanUp = ExtensionScope.scopeCleanUp( context );
 
 		return stream(
 				spliteratorUnknownSize(
@@ -114,11 +116,11 @@ final class ParameterizedClassExtension
 							public TestTemplateInvocationContext next() {
 								ParameterizedTestMethodInvoker testMethod = test.next();
 								write( context, StoreKey.TEST_TO_RUN, testMethod );
+								write( context, StoreKey.MORE_TESTS_AVAILABLE, !test.hasNext() );
 
 								return new ParameterizedClassTestTemplateInvocationContext(
 										testMethod.getName(),
-										new MethodInterceptor( scopeModifier, cleanUp, !envInitialized || reinitOnEachTest,
-												test.hasNext() )
+										List.of( new MethodInterceptor( scopeModifier, !envInitialized || reinitOnEachTest ) )
 								);
 							}
 						}, Spliterator.NONNULL
@@ -141,27 +143,22 @@ final class ParameterizedClassExtension
 
 	@Override
 	public void handleTestExecutionException(ExtensionContext extensionContext, Throwable throwable) throws Throwable {
-		if ( !envInitialized ) {
-			envInitializationFailed = true;
-		}
-		else {
-			envInitializationFailed = false;
-		}
-
+		envInitializationFailed = !envInitialized;
 		throw throwable;
 	}
 
 	private enum StoreKey {
-		TEST_TO_RUN
+		TEST_TO_RUN,
+		MORE_TESTS_AVAILABLE;
 	}
 
 	private class ParameterizedClassTestTemplateInvocationContext implements TestTemplateInvocationContext {
 		private final String name;
-		private final MethodInterceptor interceptor;
+		private final List<Extension> extensions;
 
-		private ParameterizedClassTestTemplateInvocationContext(String name, MethodInterceptor interceptor) {
+		private ParameterizedClassTestTemplateInvocationContext(String name, List<Extension> extension) {
 			this.name = name;
-			this.interceptor = interceptor;
+			this.extensions = extension;
 		}
 
 		@Override
@@ -175,23 +172,18 @@ final class ParameterizedClassExtension
 
 		@Override
 		public List<Extension> getAdditionalExtensions() {
-			return List.of( interceptor );
+			return extensions;
 		}
 	}
 
 	private class MethodInterceptor implements InvocationInterceptor {
 
 		private final Consumer<ExtensionScope> scopeModifier;
-		private final ThrowingConsumer<ExtensionScope, Exception> cleanUp;
 		private final boolean invoke;
-		private final boolean hasMoreTests;
 
-		private MethodInterceptor(Consumer<ExtensionScope> scopeModifier, ThrowingConsumer<ExtensionScope, Exception> cleanUp,
-				boolean invoke, boolean hasMoreTests) {
+		private MethodInterceptor(Consumer<ExtensionScope> scopeModifier, boolean invoke) {
 			this.scopeModifier = scopeModifier;
-			this.cleanUp = cleanUp;
 			this.invoke = invoke;
-			this.hasMoreTests = hasMoreTests;
 		}
 
 		@Override
@@ -216,10 +208,6 @@ final class ParameterizedClassExtension
 					read( extensionContext, StoreKey.TEST_TO_RUN, ParameterizedTestMethodInvoker.class );
 			testMethod.invoke( extensionContext.getRequiredTestInstance() );
 			envInitialized = !envInitializationFailed;
-
-			if ( !hasMoreTests ) {
-				cleanUp.accept( ExtensionScope.PARAMETERIZED_CLASS_SETUP );
-			}
 		}
 	}
 }
