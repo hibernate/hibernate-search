@@ -11,6 +11,7 @@ import java.lang.invoke.MethodHandles;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.EnumMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -43,26 +44,20 @@ import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappingImp
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappingInitiator;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappingKey;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappingSchemaManagementStrategy;
+import org.hibernate.search.util.impl.test.extension.AbstractScopeTrackingExtension;
+import org.hibernate.search.util.impl.test.extension.ExtensionScope;
 
-import org.junit.jupiter.api.extension.AfterAllCallback;
-import org.junit.jupiter.api.extension.AfterEachCallback;
-import org.junit.jupiter.api.extension.BeforeAllCallback;
-import org.junit.jupiter.api.extension.BeforeEachCallback;
 import org.junit.jupiter.api.extension.ExtensionContext;
 import org.junit.jupiter.api.extension.TestExecutionExceptionHandler;
 
-public class SearchSetupHelper
-		implements AfterAllCallback, AfterEachCallback, BeforeAllCallback, BeforeEachCallback, TestExecutionExceptionHandler {
+public class SearchSetupHelper extends AbstractScopeTrackingExtension implements TestExecutionExceptionHandler {
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	private final TestConfigurationProvider configurationProvider = new TestConfigurationProvider();
 	private TckBackendSetupStrategy<?> setupStrategy;
-	private final List<SearchIntegrationEnvironment> environments = new ArrayList<>();
-	private final List<SearchIntegrationPartialBuildState> integrationPartialBuildStates = new ArrayList<>();
-	private final List<StubMappingImpl> mappings = new ArrayList<>();
 	private TckBackendAccessor backendAccessor;
-	private boolean callOncePerClass = false;
+	private final Map<ExtensionScope, Context> scopeContexts = new EnumMap<>( ExtensionScope.class );
 
 	public static SearchSetupHelper create() {
 		return new SearchSetupHelper();
@@ -113,37 +108,36 @@ public class SearchSetupHelper
 		return backendAccessor;
 	}
 
+	private Context currentContext() {
+		return scopeContexts.get( currentScope() );
+	}
+
 	@Override
-	public void afterAll(ExtensionContext context) throws Exception {
+	protected void actualAfterAll(ExtensionContext context) throws Exception {
 		configurationProvider.afterAll( context );
-		if ( !runningInNestedContext( context ) && callOncePerClass ) {
-			cleanUp();
-		}
-	}
-
-	@Override
-	public void afterEach(ExtensionContext context) throws Exception {
-		configurationProvider.afterEach( context );
-		if ( !callOncePerClass ) {
-			cleanUp();
-		}
-	}
-
-	@Override
-	public void beforeAll(ExtensionContext context) throws Exception {
 		if ( !runningInNestedContext( context ) ) {
-			// BeforeAll callback can be called if an extension
-			// is added in a static context, i.e. @RegisterExtension static MyExtension = ....;
-			// Or when the test class is annotated with @TestInstance(TestInstance.Lifecycle.PER_CLASS)
-			// which also implies that we'd want to have only a BeforeAll, AfterAll callbacks:
-			callOncePerClass = true;
-			configurationProvider.beforeAll( context );
+			cleanUp();
 		}
 	}
 
 	@Override
-	public void beforeEach(ExtensionContext context) throws Exception {
+	protected void actualAfterEach(ExtensionContext context) throws Exception {
+		configurationProvider.afterEach( context );
+		cleanUp();
+	}
+
+	@Override
+	protected void actualBeforeAll(ExtensionContext context) {
+		if ( !runningInNestedContext( context ) ) {
+			configurationProvider.beforeAll( context );
+			scopeContexts.put( ExtensionScope.CLASS, new Context() );
+		}
+	}
+
+	@Override
+	protected void actualBeforeEach(ExtensionContext context) {
 		configurationProvider.beforeEach( context );
+		scopeContexts.put( ExtensionScope.TEST, new Context() );
 	}
 
 	@Override
@@ -164,12 +158,13 @@ public class SearchSetupHelper
 	}
 
 	private void cleanUp(Closer<IOException> closer) {
-		closer.pushAll( StubMappingImpl::close, mappings );
-		mappings.clear();
-		closer.pushAll( SearchIntegrationPartialBuildState::closeOnFailure, integrationPartialBuildStates );
-		integrationPartialBuildStates.clear();
-		closer.pushAll( SearchIntegrationEnvironment::close, environments );
-		environments.clear();
+		Context context = currentContext();
+		closer.pushAll( StubMappingImpl::close, context.mappings );
+		context.mappings.clear();
+		closer.pushAll( SearchIntegrationPartialBuildState::closeOnFailure, context.integrationPartialBuildStates );
+		context.integrationPartialBuildStates.clear();
+		closer.pushAll( SearchIntegrationEnvironment::close, context.environments );
+		context.environments.clear();
 		closer.push( TckBackendAccessor::close, backendAccessor );
 		backendAccessor = null;
 	}
@@ -263,11 +258,12 @@ public class SearchSetupHelper
 		}
 
 		public PartialSetup setupFirstPhaseOnly(Optional<StubMapping> previousMapping) {
+			Context context = currentContext();
 			SearchIntegrationEnvironment environment =
 					SearchIntegrationEnvironment.builder( propertySource, unusedPropertyChecker )
 							.beanProvider( beanProvider )
 							.build();
-			environments.add( environment );
+			context.environments.add( environment );
 
 			SearchIntegration.Builder integrationBuilder = ( previousMapping.isPresent() )
 					? previousMapping.get().integration().restartBuilder( environment )
@@ -280,7 +276,7 @@ public class SearchSetupHelper
 			integrationBuilder.addMappingInitiator( mappingKey, initiator );
 
 			SearchIntegrationPartialBuildState integrationPartialBuildState = integrationBuilder.prepareBuild();
-			integrationPartialBuildStates.add( integrationPartialBuildState );
+			context.integrationPartialBuildStates.add( integrationPartialBuildState );
 
 			return overrides -> {
 				SearchIntegrationFinalizer finalizer =
@@ -288,12 +284,12 @@ public class SearchSetupHelper
 								unusedPropertyChecker );
 				StubMappingImpl mapping = finalizer.finalizeMapping(
 						mappingKey,
-						(context, partialMapping) -> partialMapping.finalizeMapping( schemaManagementStrategy )
+						(ctx, partialMapping) -> partialMapping.finalizeMapping( schemaManagementStrategy )
 				);
-				mappings.add( mapping );
+				context.mappings.add( mapping );
 
 				finalizer.finalizeIntegration();
-				integrationPartialBuildStates.remove( integrationPartialBuildState );
+				context.integrationPartialBuildStates.remove( integrationPartialBuildState );
 
 				return mapping;
 			};
@@ -326,4 +322,9 @@ public class SearchSetupHelper
 		return context.getRequiredTestClass().isMemberClass();
 	}
 
+	private static class Context {
+		private final List<SearchIntegrationEnvironment> environments = new ArrayList<>();
+		private final List<SearchIntegrationPartialBuildState> integrationPartialBuildStates = new ArrayList<>();
+		private final List<StubMappingImpl> mappings = new ArrayList<>();
+	}
 }

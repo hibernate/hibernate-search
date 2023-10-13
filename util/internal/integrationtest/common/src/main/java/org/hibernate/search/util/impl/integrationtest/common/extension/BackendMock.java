@@ -36,23 +36,22 @@ import org.hibernate.search.util.impl.integrationtest.common.stub.backend.index.
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.index.impl.StubBackendFactory;
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.index.impl.StubIndexCreateContext;
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.search.query.impl.StubSearchWork;
+import org.hibernate.search.util.impl.test.extension.ExtensionScope;
 
-import org.junit.jupiter.api.extension.AfterAllCallback;
 import org.junit.jupiter.api.extension.AfterEachCallback;
 import org.junit.jupiter.api.extension.BeforeAllCallback;
 import org.junit.jupiter.api.extension.BeforeEachCallback;
+import org.junit.jupiter.api.extension.BeforeTestExecutionCallback;
 import org.junit.jupiter.api.extension.ExtensionContext;
 
 import org.opentest4j.TestAbortedException;
 
-public class BackendMock implements BeforeEachCallback, AfterEachCallback, BeforeAllCallback, AfterAllCallback {
+public class BackendMock implements BeforeTestExecutionCallback, AfterEachCallback, BeforeAllCallback, BeforeEachCallback {
 
 	private final VerifyingStubBackendBehavior backendBehavior =
 			new VerifyingStubBackendBehavior( this::indexingWorkExpectations );
-
 	private volatile boolean started = false;
-	private boolean callOncePerClass = false;
-
+	private ExtensionScope startingScope = ExtensionScope.TEST;
 	private volatile BackendIndexingWorkExpectations indexingWorkExpectations = BackendIndexingWorkExpectations.sync();
 
 	private final Map<String, StubTreeNodeDiffer<StubDocumentNode>> documentDiffers = new ConcurrentHashMap<>();
@@ -65,56 +64,44 @@ public class BackendMock implements BeforeEachCallback, AfterEachCallback, Befor
 	}
 
 	@Override
-	public void beforeAll(ExtensionContext context) {
-		callOncePerClass = true;
-		doBefore();
+	public void beforeAll(ExtensionContext extensionContext) {
+		started = true;
+		startingScope = ExtensionScope.CLASS;
 	}
 
 	@Override
-	public void afterAll(ExtensionContext context) {
-		if ( callOncePerClass ) {
-			doAfter( context );
-		}
+	public void beforeEach(ExtensionContext extensionContext) {
+		started = true;
 	}
 
 	@Override
-	public void beforeEach(ExtensionContext context) {
-		if ( !callOncePerClass ) {
-			doBefore();
-		}
+	public void beforeTestExecution(ExtensionContext extensionContext) throws Exception {
+		// this means we are done with any @Before setups
+		// and we want to make sure that anything we've expected there is OK.
+		// And if we don't do it here then any unmet expectations from @Before will only fail after the test is executed
+		// and it'll be harder to track the mismatch.
+		verifyAndReset();
 	}
 
 	@Override
 	public void afterEach(ExtensionContext context) {
-		if ( !callOncePerClass ) {
-			doAfter( context );
+		if ( context.getExecutionException().map( e -> e instanceof TestAbortedException ).orElse( Boolean.FALSE ) ) {
+			// test was aborted - hence let's not do verification. cleanups will happen in finally block.
+			return;
 		}
+		verifyAndReset();
+		if ( ExtensionScope.TEST.equals( startingScope ) ) {
+			backendBehavior().resetBackends();
+		}
+		started = false;
 	}
 
-	private void doBefore() {
-		started = true;
-	}
-
-	private void doAfter(ExtensionContext context) {
+	private void verifyAndReset() {
 		try {
-			if ( context.getExecutionException().map( e -> e instanceof TestAbortedException ).orElse( Boolean.FALSE ) ) {
-				// test was aborted - hence let's not do verification. cleanups will happen in finally block.
-				return;
-			}
-			// Workaround for a problem in Hibernate ORM's CustomRunner
-			// (used by BytecodeEnhancerRunner in particular)
-			// which applies class rules twices, resulting in "started" being false
-			// when we get here in the outermost statement...
-			if ( started ) {
-				verifyExpectationsMet();
-			}
+			backendBehavior().verifyExpectationsMet();
 		}
 		finally {
-			if ( started ) {
-				resetExpectations();
-				started = false;
-				backendBehavior.resetBackends();
-			}
+			backendBehavior().resetExpectations();
 		}
 	}
 

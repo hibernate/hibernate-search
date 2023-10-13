@@ -832,10 +832,10 @@
                         <jvm>${java-version.test.launcher}</jvm>
                         <argLine>${surefire.jvm.args}</argLine>
                         <!--
-                                                    Better test names in test reports.
-                                                    See https://maven.apache.org/surefire/maven-surefire-plugin/examples/junit-platform.html#Surefire_Extensions_and_Reports_Configuration_for_.40DisplayName
-                                                    Don't ask me why this isn't the default
-                                                -->
+                            Better test names in test reports.
+                            See https://maven.apache.org/surefire/maven-surefire-plugin/examples/junit-platform.html#Surefire_Extensions_and_Reports_Configuration_for_.40DisplayName
+                            Don't ask me why this isn't the default
+                        -->
                         <statelessTestsetReporter implementation="org.apache.maven.plugin.surefire.extensions.junit5.JUnit5Xml30StatelessReporter">
                             <usePhrasedFileName>true</usePhrasedFileName>
                             <usePhrasedTestSuiteClassName>true</usePhrasedTestSuiteClassName>

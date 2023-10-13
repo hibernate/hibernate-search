@@ -12,19 +12,16 @@ import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.RoutingBinde
 import org.hibernate.search.mapper.pojo.bridge.runtime.RoutingBridgeRouteContext;
 import org.hibernate.search.mapper.pojo.route.DocumentRoutes;
 
-import org.junit.jupiter.api.extension.AfterAllCallback;
 import org.junit.jupiter.api.extension.AfterEachCallback;
 import org.junit.jupiter.api.extension.BeforeAllCallback;
 import org.junit.jupiter.api.extension.BeforeEachCallback;
 import org.junit.jupiter.api.extension.ExtensionContext;
 
-public class StaticIndexingSwitch
-		implements BeforeEachCallback, AfterEachCallback, BeforeAllCallback, AfterAllCallback {
+public class StaticIndexingSwitch implements BeforeEachCallback, AfterEachCallback, BeforeAllCallback {
 
 	private static StaticIndexingSwitch activeInstance = null;
 
 	private boolean enabled = true;
-	private boolean callOncePerClass = false;
 
 	public void enable(boolean enabled) {
 		this.enabled = enabled;
@@ -48,35 +45,19 @@ public class StaticIndexingSwitch
 	}
 
 	@Override
-	public void afterAll(ExtensionContext extensionContext) throws Exception {
-		if ( callOncePerClass ) {
-			activeInstance = null;
-			reset();
-		}
+	public void afterEach(ExtensionContext extensionContext) {
+		activeInstance = null;
+		reset();
 	}
 
 	@Override
-	public void afterEach(ExtensionContext extensionContext) throws Exception {
-		if ( !callOncePerClass ) {
-			activeInstance = null;
-			reset();
-		}
+	public void beforeAll(ExtensionContext extensionContext) {
+		throw new IllegalStateException(
+				"StaticIndexingSwitch is only available as nonstatic extension, i.e. @RegisterExtension StaticIndexingSwitch staticIndexingSwitch = new StaticIndexingSwitch();" );
 	}
 
 	@Override
-	public void beforeAll(ExtensionContext extensionContext) throws Exception {
-		callOncePerClass = true;
-		doBefore();
-	}
-
-	@Override
-	public void beforeEach(ExtensionContext extensionContext) throws Exception {
-		if ( !callOncePerClass ) {
-			doBefore();
-		}
-	}
-
-	private void doBefore() {
+	public void beforeEach(ExtensionContext extensionContext) {
 		if ( activeInstance != null ) {
 			throw new IllegalStateException( "Using StaticCounters twice in a single test is forbidden."
 					+ " Make sure you added one (and only one)"

@@ -15,7 +15,6 @@ import org.hibernate.search.mapper.pojo.standalone.mapping.SearchMapping;
 import org.hibernate.search.spi.SearchIntegrator;
 import org.hibernate.search.testsupport.migration.V5MigrationStandalonePojoSearchIntegratorAdapter;
 
-import org.junit.jupiter.api.extension.AfterAllCallback;
 import org.junit.jupiter.api.extension.AfterEachCallback;
 import org.junit.jupiter.api.extension.BeforeAllCallback;
 import org.junit.jupiter.api.extension.BeforeEachCallback;
@@ -29,7 +28,7 @@ import org.junit.jupiter.api.extension.ExtensionContext;
  * @author Sanne Grinovero
  * @since 4.1
  */
-public class SearchFactoryHolder implements AfterAllCallback, BeforeAllCallback, BeforeEachCallback, AfterEachCallback {
+public class SearchFactoryHolder implements BeforeAllCallback, BeforeEachCallback, AfterEachCallback {
 
 	private final V5MigrationHelperEngineSetupHelper setupHelper = V5MigrationHelperEngineSetupHelper.create();
 
@@ -38,7 +37,6 @@ public class SearchFactoryHolder implements AfterAllCallback, BeforeAllCallback,
 
 	private SearchMapping mapping;
 	private SearchIntegrator searchIntegrator;
-	private boolean callOncePerClass = false;
 
 	public SearchFactoryHolder(Class<?>... entities) {
 		this.entities = entities;
@@ -60,40 +58,21 @@ public class SearchFactoryHolder implements AfterAllCallback, BeforeAllCallback,
 	}
 
 	@Override
-	public void afterAll(ExtensionContext extensionContext) throws Exception {
-		if ( callOncePerClass ) {
-			doAfter( extensionContext );
-		}
-	}
-
-	@Override
 	public void afterEach(ExtensionContext extensionContext) throws Exception {
-		if ( !callOncePerClass ) {
-			doAfter( extensionContext );
-		}
-	}
-
-	private void doAfter(ExtensionContext extensionContext) throws Exception {
 		mapping = null;
 		searchIntegrator = null;
 		setupHelper.afterAll( extensionContext );
 	}
 
 	@Override
-	public void beforeAll(ExtensionContext extensionContext) throws Exception {
-		callOncePerClass = true;
-		doBefore( extensionContext );
+	public void beforeAll(ExtensionContext extensionContext) {
+		throw new IllegalStateException(
+				"SearchFactoryHolder is only available as nonstatic extension, i.e. @RegisterExtension SearchFactoryHolder searchFactoryHolder = new SearchFactoryHolder();" );
 	}
 
 	@Override
 	public void beforeEach(ExtensionContext extensionContext) throws Exception {
-		if ( !callOncePerClass ) {
-			doBefore( extensionContext );
-		}
-	}
-
-	private void doBefore(ExtensionContext extensionContext) throws Exception {
-		setupHelper.beforeAll( extensionContext );
+		setupHelper.beforeEach( extensionContext );
 
 		mapping = setupHelper.start()
 				.withProperties( configuration )

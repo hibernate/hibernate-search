@@ -7,6 +7,7 @@
 package org.hibernate.search.test.util;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -24,12 +25,10 @@ import org.hibernate.search.SearchFactory;
 import org.hibernate.search.hcore.util.impl.ContextHelper;
 import org.hibernate.search.impl.ImplementationFactory;
 import org.hibernate.search.test.testsupport.V5MigrationHelperOrmSetupHelper;
+import org.hibernate.search.util.impl.test.extension.AbstractScopeTrackingExtension;
+import org.hibernate.search.util.impl.test.extension.ExtensionScope;
 import org.hibernate.service.spi.ServiceRegistryImplementor;
 
-import org.junit.jupiter.api.extension.AfterAllCallback;
-import org.junit.jupiter.api.extension.AfterEachCallback;
-import org.junit.jupiter.api.extension.BeforeAllCallback;
-import org.junit.jupiter.api.extension.BeforeEachCallback;
 import org.junit.jupiter.api.extension.ExtensionContext;
 
 /**
@@ -40,17 +39,14 @@ import org.junit.jupiter.api.extension.ExtensionContext;
  * @author Sanne Grinovero
  * @author Hardy Ferentschik
  */
-public class FullTextSessionBuilder
-		implements BeforeEachCallback, AfterEachCallback, BeforeAllCallback,
-		AfterAllCallback {
+public class FullTextSessionBuilder extends AbstractScopeTrackingExtension {
 
 	private final V5MigrationHelperOrmSetupHelper setupHelper = V5MigrationHelperOrmSetupHelper.create();
 
 	private final Map<String, Object> cfg = new HashMap<>();
 	private final Set<Class<?>> annotatedClasses = new HashSet<>();
-	private SessionFactoryImplementor sessionFactory;
+	private final Map<ExtensionScope, SessionFactoryImplementor> sessionFactory = new HashMap<>();
 	private final List<LoadEventListener> additionalLoadEventListeners = new ArrayList<>();
-	private boolean callOncePerClass = false;
 
 	/**
 	 * Override before building any parameter, or add new ones.
@@ -81,10 +77,10 @@ public class FullTextSessionBuilder
 	 * @return a new FullTextSession based upon the built configuration.
 	 */
 	public FullTextSession openFullTextSession() {
-		if ( sessionFactory == null ) {
+		if ( sessionFactory() == null ) {
 			build();
 		}
-		Session session = sessionFactory.openSession();
+		Session session = sessionFactory().openSession();
 		return Search.getFullTextSession( session );
 	}
 
@@ -98,9 +94,9 @@ public class FullTextSessionBuilder
 
 		setupContext = setupContext.withConfiguration( builder -> builder.addAnnotatedClasses( annotatedClasses ) );
 
-		sessionFactory = setupContext.setup().unwrap( SessionFactoryImplementor.class );
+		currentSessionFactory( setupContext.setup().unwrap( SessionFactoryImplementor.class ) );
 
-		ServiceRegistryImplementor serviceRegistryImplementor = sessionFactory.getServiceRegistry();
+		ServiceRegistryImplementor serviceRegistryImplementor = sessionFactory().getServiceRegistry();
 		EventListenerRegistry registry = serviceRegistryImplementor.getService( EventListenerRegistry.class );
 
 		for ( LoadEventListener listener : additionalLoadEventListeners ) {
@@ -114,10 +110,10 @@ public class FullTextSessionBuilder
 	 * @return the SearchFactory
 	 */
 	public SearchFactory getSearchFactory() {
-		if ( sessionFactory == null ) {
+		if ( sessionFactory() == null ) {
 			build();
 		}
-		return ImplementationFactory.createSearchFactory( ContextHelper.getSearchIntegratorBySFI( sessionFactory ) );
+		return ImplementationFactory.createSearchFactory( ContextHelper.getSearchIntegratorBySFI( sessionFactory() ) );
 	}
 
 	public FullTextSessionBuilder addLoadEventListener(LoadEventListener additionalLoadEventListener) {
@@ -126,31 +122,36 @@ public class FullTextSessionBuilder
 	}
 
 	@Override
-	public void afterEach(ExtensionContext extensionContext) throws Exception {
-		if ( !callOncePerClass ) {
-			sessionFactory = null;
-			setupHelper.afterEach( extensionContext );
-		}
+	protected void actualAfterEach(ExtensionContext extensionContext) throws Exception {
+		currentSessionFactory( null );
+		setupHelper.afterEach( extensionContext );
 	}
 
 	@Override
-	public void beforeEach(ExtensionContext extensionContext) throws Exception {
-		if ( !callOncePerClass ) {
-			setupHelper.beforeEach( extensionContext );
-		}
+	protected void actualBeforeEach(ExtensionContext extensionContext) throws Exception {
+		setupHelper.beforeEach( extensionContext );
 	}
 
 	@Override
-	public void afterAll(ExtensionContext extensionContext) throws Exception {
-		if ( callOncePerClass ) {
-			sessionFactory = null;
-			setupHelper.afterEach( extensionContext );
-		}
+	protected void actualAfterAll(ExtensionContext extensionContext) throws Exception {
+		currentSessionFactory( null );
+		setupHelper.afterAll( extensionContext );
 	}
 
 	@Override
-	public void beforeAll(ExtensionContext extensionContext) throws Exception {
-		callOncePerClass = true;
+	protected void actualBeforeAll(ExtensionContext extensionContext) throws Exception {
 		setupHelper.beforeAll( extensionContext );
+	}
+
+	private SessionFactoryImplementor sessionFactory() {
+		Collection<SessionFactoryImplementor> values = sessionFactory.values();
+		return values.isEmpty() ? null : values.iterator().next();
+	}
+
+	private void currentSessionFactory(SessionFactoryImplementor sessionFactory) {
+		SessionFactoryImplementor removed = this.sessionFactory.put( currentScope(), sessionFactory );
+		if ( removed != null ) {
+			removed.close();
+		}
 	}
 }
