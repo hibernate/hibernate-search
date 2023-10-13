@@ -22,23 +22,20 @@ import org.hibernate.search.util.common.impl.Closer;
 import org.hibernate.search.util.impl.integrationtest.common.TestConfigurationProvider;
 import org.hibernate.search.util.impl.integrationtest.common.assertion.MappingAssertionHelper;
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.BackendMappingHandle;
+import org.hibernate.search.util.impl.test.extension.AbstractScopeTrackingExtension;
 import org.hibernate.search.util.impl.test.extension.ExtensionScope;
 
-import org.junit.jupiter.api.extension.AfterAllCallback;
-import org.junit.jupiter.api.extension.AfterEachCallback;
-import org.junit.jupiter.api.extension.BeforeAllCallback;
-import org.junit.jupiter.api.extension.BeforeEachCallback;
 import org.junit.jupiter.api.extension.ExtensionContext;
 import org.junit.jupiter.api.extension.InvocationInterceptor;
 import org.junit.jupiter.api.extension.ReflectiveInvocationContext;
 
 public abstract class MappingSetupHelper<C extends MappingSetupHelper<C, B, BC, R, SV>.AbstractSetupContext, B, BC, R, SV>
-		implements AfterAllCallback, AfterEachCallback, BeforeAllCallback, BeforeEachCallback, InvocationInterceptor {
+		extends AbstractScopeTrackingExtension
+		implements InvocationInterceptor {
 
 	private final TestConfigurationProvider configurationProvider;
 	protected final BackendSetupStrategy backendSetupStrategy;
 	private final Map<ExtensionScope, List<R>> toClose = new EnumMap<>( ExtensionScope.class );
-	private ExtensionScope scope = ExtensionScope.CLASS;
 
 	protected MappingSetupHelper(BackendSetupStrategy backendSetupStrategy) {
 		this.configurationProvider = new TestConfigurationProvider();
@@ -63,14 +60,6 @@ public abstract class MappingSetupHelper<C extends MappingSetupHelper<C, B, BC, 
 		return backendSetupStrategy.start( setupContext, configurationProvider, setupContext.backendMappingHandlePromise );
 	}
 
-	protected void updateScope(ExtensionScope scope) {
-		this.scope = scope;
-	}
-
-	protected ExtensionScope currentScope() {
-		return scope;
-	}
-
 	@Override
 	public <T> T interceptTestClassConstructor(Invocation<T> invocation,
 			ReflectiveInvocationContext<Constructor<T>> invocationContext, ExtensionContext extensionContext)
@@ -82,29 +71,27 @@ public abstract class MappingSetupHelper<C extends MappingSetupHelper<C, B, BC, 
 	}
 
 	@Override
-	public void afterAll(ExtensionContext context) throws Exception {
+	protected void actualAfterAll(ExtensionContext context) throws Exception {
 		configurationProvider.afterAll( context );
 		cleanUp( ExtensionScope.CLASS );
 	}
 
 	@Override
-	public void afterEach(ExtensionContext context) throws Exception {
+	protected void actualAfterEach(ExtensionContext context) throws Exception {
 		configurationProvider.afterEach( context );
 		cleanUp( ExtensionScope.TEST );
 	}
 
 	@Override
-	public void beforeAll(ExtensionContext context) {
+	protected void actualBeforeAll(ExtensionContext context) {
 		configurationProvider.beforeAll( context );
-		updateScope( ExtensionScope.CLASS );
-		init( ExtensionScope.CLASS );
+		init( currentScope() );
 	}
 
 	@Override
-	public void beforeEach(ExtensionContext context) {
+	protected void actualBeforeEach(ExtensionContext context) {
 		configurationProvider.beforeEach( context );
-		updateScope( ExtensionScope.TEST );
-		init( ExtensionScope.TEST );
+		init( currentScope() );
 	}
 
 	private void cleanUp(ExtensionScope scope) throws Exception {

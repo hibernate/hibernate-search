@@ -181,8 +181,8 @@ public class OrmSetupHelper
 	}
 
 	@Override
-	public void beforeEach(ExtensionContext context) {
-		super.beforeEach( context );
+	public void actualBeforeEach(ExtensionContext context) {
+		super.actualBeforeEach( context );
 		// if test was aborted then we don't want to clean the data since the test wasn't executed.
 		if ( !context.getExecutionException().map( Object::getClass )
 				.map( org.opentest4j.TestAbortedException.class::equals ).orElse( Boolean.FALSE ) ) {
