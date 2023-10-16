@@ -7,44 +7,44 @@
 
 @Library('hibernate-jenkins-pipeline-helpers@1.5') _
 
-// NOTE: Remember to update the matrix axes below when adding/removing entries here.
+def configurations = [
+		'jandex3'          :
+				[
+						onlyRunTestDependingOn: ['hibernate-search-mapper-pojo-base'],
+						// Need to rebuild this module in order to insert the Jandex 3 dependency in tests
+						additionalMavenArgs   : '-pl :hibernate-search-util-internal-test-common'
+				],
+		'orm5.6'           :
+				[
+						updateProperties      : ['version.org.hibernate'],
+						onlyRunTestDependingOn: ['hibernate-search-mapper-orm', 'hibernate-search-mapper-orm-jakarta']
+				],
+		'orm6.2'           :
+				[
+						updateProperties      : ['version.org.hibernate.orm'],
+						onlyRunTestDependingOn: ['hibernate-search-mapper-orm-orm6'],
+						// we need to recompile this module since it has incompatible return type and will result in a build error.
+						// Note: we *must* rebuild the `-orm6` artifact (not the regular one), since that's where the orm6 upgrade is applied:
+						additionalMavenArgs   : '-pl :hibernate-search-util-internal-integrationtest-mapper-orm-orm6',
+						skipSourceModifiedCheck: true
+				],
+		'orm6.3'           :
+				[
+						updateProperties      : ['version.org.hibernate.orm'],
+						onlyRunTestDependingOn: ['hibernate-search-mapper-orm-orm6'],
+						// we need to recompile this module since it has incompatible return type and will result in a build error.
+						// Note: we *must* rebuild the `-orm6` artifact (not the regular one), since that's where the orm6 upgrade is applied:
+						additionalMavenArgs   : '-pl :hibernate-search-util-internal-integrationtest-mapper-orm-orm6'
+				],
+		'orm6-in-main-code':
+				[
+						updateProperties: ['version.org.hibernate.orm']
+						// In this case we'll rebuild and test everything.
+				]
+]
+
 Map settings() {
-	switch (env.DEPENDENCY_UPDATE_NAME) {
-		case 'jandex3':
-			return [
-					onlyRunTestDependingOn: ['hibernate-search-mapper-pojo-base'],
-					// Need to rebuild this module in order to insert the Jandex 3 dependency in tests
-					additionalMavenArgs: '-pl :hibernate-search-util-internal-test-common'
-			]
-		case 'orm5.6':
-			return [
-					updateProperties: ['version.org.hibernate'],
-					onlyRunTestDependingOn: ['hibernate-search-mapper-orm', 'hibernate-search-mapper-orm-jakarta']
-			]
-		case 'orm6.2':
-			return [
-					updateProperties: ['version.org.hibernate.orm'],
-					onlyRunTestDependingOn: ['hibernate-search-mapper-orm-orm6'],
-					// we need to recompile this module since it has incompatible return type and will result in a build error.
-					// Note: we *must* rebuild the `-orm6` artifact (not the regular one), since that's where the orm6 upgrade is applied:
-					additionalMavenArgs: '-pl :hibernate-search-util-internal-integrationtest-mapper-orm-orm6'
-			]
-		case 'orm6.3':
-			return [
-					updateProperties: ['version.org.hibernate.orm'],
-					onlyRunTestDependingOn: ['hibernate-search-mapper-orm-orm6'],
-					// we need to recompile this module since it has incompatible return type and will result in a build error.
-					// Note: we *must* rebuild the `-orm6` artifact (not the regular one), since that's where the orm6 upgrade is applied:
-					additionalMavenArgs: '-pl :hibernate-search-util-internal-integrationtest-mapper-orm-orm6'
-			]
-		case 'orm6-in-main-code':
-			return [
-					updateProperties: ['version.org.hibernate.orm']
-					// In this case we'll rebuild and test everything.
-			]
-		default:
-			return [:]
-	}
+	return configurations.getOrDefault(env.DEPENDENCY_UPDATE_NAME, [:])
 }
 
 // Perform authenticated pulls of container images, to avoid failure due to download throttling on dockerhub.
@@ -89,6 +89,11 @@ pipeline {
 	triggers {
 		// Run at least once per week, in case of snapshot updates.
 		cron '@weekly'
+	}
+	parameters {
+		choice(name: 'UPDATE_JOB', choices: ['all'] + configurations.keySet() as String[], defaultValue: 'all', description: 'Select which update jobs to run. `All` will include all configured update jobs.')
+		string(name: 'ORM_REPOSITORY', defaultValue: '', description: 'Git URL to Hibernate ORM repository. If provided, Hibernate ORM will be built locally. Works only in pair with ORM_BRANCH.')
+		string(name: 'ORM_BRANCH', defaultValue: '', description: 'Hibernate ORM branch to build from. If provided, Hibernate ORM will be built locally. Works only in pair with ORM_REPOSITORY.')
 	}
 	options {
 		buildDiscarder logRotator(daysToKeepStr: '10', numToKeepStr: '3')
@@ -138,8 +143,7 @@ pipeline {
 				axes {
 					axis {
 						name 'DEPENDENCY_UPDATE_NAME'
-						// NOTE: Remember to update the settings() method above when changing this.
-						values 'jandex3', 'orm5.6', 'orm6.2', 'orm6.3', 'orm6-in-main-code'
+						values params.UPDATE_JOB == 'all' ? configurations.keySet() as String[] : params.UPDATE_JOB
 					}
 				}
 				stages {
@@ -159,13 +163,31 @@ pipeline {
 							}
 						}
 					}
+					stage('Build Hibernate ORM') {
+						when {
+							expression {
+								return params.ORM_REPOSITORY?.trim() || params.ORM_BRANCH?.trim()
+							}
+						}
+						steps {
+							if (!params.ORM_REPOSITORY?.trim() || !params.ORM_BRANCH?.trim()) {
+								error "Both ORM_REPOSITORY and ORM_BRANCH must be not blank if a local build of Hibernate ORM is required. Repository: [${params.ORM_REPOSITORY}], branch: [${params.ORM_BRANCH}]."
+							}
+							script {
+								sh "git clone ${params.ORM_REPOSITORY} --depth 1 --branch ${params.ORM_BRANCH} --single-branch ${env.WORKSPACE_TMP}/hibernate-orm-local-copy"
+							}
+							script {
+								sh "${env.WORKSPACE_TMP}/hibernate-orm-local-copy/gradlew publishToMavenLocal -x test"
+							}
+						}
+					}
 					stage('Update dependency') {
 						steps {
 							withMavenWorkspace {
 								sh "ci/dependency-update/perform-update.sh ${env.DEPENDENCY_UPDATE_NAME} '${settings().updateProperties?.join(",") ?: ''}'"
 							}
 							script {
-								if (0 != sh(script: "git diff origin/${BRANCH_NAME} | grep -q '.'", returnStatus: true)) {
+								if (!settings().skipSourceModifiedCheck && 0 != sh(script: "git diff origin/${BRANCH_NAME} | grep -q '.'", returnStatus: true)) {
 									error "This job does not seem to update any dependency; perhaps it is misconfigured? The source code has not been updated, neither by merging a WIP branch nor by updating version properties."
 								}
 							}
