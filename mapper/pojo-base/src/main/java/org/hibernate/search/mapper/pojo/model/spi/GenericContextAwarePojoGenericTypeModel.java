@@ -9,6 +9,7 @@ package org.hibernate.search.mapper.pojo.model.spi;
 import java.lang.reflect.Type;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 
 import org.hibernate.search.util.common.reflect.impl.GenericTypeContext;
@@ -126,6 +127,23 @@ public final class GenericContextAwarePojoGenericTypeModel<T>
 	@Override
 	public String name() {
 		return genericTypeContext.name();
+	}
+
+	@Override
+	public boolean equals(Object o) {
+		if ( this == o ) {
+			return true;
+		}
+		if ( o == null || getClass() != o.getClass() ) {
+			return false;
+		}
+		GenericContextAwarePojoGenericTypeModel<?> that = (GenericContextAwarePojoGenericTypeModel<?>) o;
+		return Objects.equals( genericTypeContext, that.genericTypeContext );
+	}
+
+	@Override
+	public int hashCode() {
+		return Objects.hash( genericTypeContext );
 	}
 
 	@Override

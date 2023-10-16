@@ -890,4 +890,13 @@ public interface Log extends BasicLogger {
 			Set<String> nonMatchingExcludePaths, Set<String> encounteredFieldPaths,
 			@Param EventContext eventContext);
 
+	@Message(id = ID_OFFSET + 143, value = "Cyclic recursion when applying the default container extractors to type '%1$s'."
+			+ " Container extractors applied to that type and resulting in the same type: %2$s."
+			+ " To break the cycle, you should consider configuring container extraction explicitly,"
+			+ " possibly disabling it for this part of your mapping."
+			+ " See the reference documentation for more information.")
+	SearchException defaultContainerExtractorCyclicRecursion(
+			@FormatWith(PojoTypeModelFormatter.class) PojoTypeModel<?> typeModel,
+			List<String> extractorNames);
+
 }

@@ -12,6 +12,7 @@ import java.lang.invoke.MethodHandles;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.List;
 
 import org.hibernate.search.mapper.pojo.bridge.ValueBridge;
@@ -230,9 +231,9 @@ class FieldContainerExtractorBaseIT {
 				);
 	}
 
-	public static class MyPathBridge implements ValueBridge<Path, String> {
+	public static class MyObjectBridge implements ValueBridge<Object, String> {
 		@Override
-		public String toIndexedValue(Path value, ValueBridgeToIndexedValueContext context) {
+		public String toIndexedValue(Object value, ValueBridgeToIndexedValueContext context) {
 			return value.toString();
 		}
 	}
@@ -244,7 +245,7 @@ class FieldContainerExtractorBaseIT {
 		class IndexedEntity {
 			@DocumentId
 			Integer id;
-			@GenericField(valueBridge = @ValueBridgeRef(type = MyPathBridge.class),
+			@GenericField(valueBridge = @ValueBridgeRef(type = MyObjectBridge.class),
 					extraction = @ContainerExtraction(extract = ContainerExtract.NO))
 			Path path;
 		}
@@ -266,6 +267,96 @@ class FieldContainerExtractorBaseIT {
 
 			backendMock.expectWorks( INDEX_NAME )
 					.add( "1", b -> b.field( "path", "foo" ) );
+		}
+		backendMock.verifyExpectationsMet();
+	}
+
+	@Test
+	@TestForIssue(jiraKey = "HSEARCH-4988")
+	void cycle_extraction_path() {
+		@Indexed
+		class IndexedEntity {
+			@DocumentId
+			Integer id;
+			@GenericField(valueBridge = @ValueBridgeRef(type = MyObjectBridge.class))
+			Path path;
+		}
+		assertThatThrownBy(
+				() -> setupHelper.start()
+						.expectCustomBeans()
+						.setup( IndexedEntity.class )
+		)
+				.isInstanceOf( SearchException.class )
+				.satisfies( FailureReportUtils.hasFailureReport()
+						.typeContext( IndexedEntity.class.getName() )
+						.pathContext( ".path" )
+						.failure(
+								"Cyclic recursion when applying the default container extractors to type '"
+										+ Path.class.getName() + "'",
+								"Container extractors applied to that type and resulting in the same type: [iterable]",
+								"To break the cycle, you should consider configuring container extraction explicitly"
+						)
+				);
+
+	}
+
+	@Test
+	@TestForIssue(jiraKey = "HSEARCH-4988")
+	void cycle_extraction_generics() {
+		@Indexed
+		class IndexedEntity<T extends Collection<T>> {
+			@DocumentId
+			Integer id;
+			@GenericField(valueBridge = @ValueBridgeRef(type = MyObjectBridge.class))
+			T genericField;
+		}
+		assertThatThrownBy(
+				() -> setupHelper.start()
+						.expectCustomBeans()
+						.setup( IndexedEntity.class )
+		)
+				.isInstanceOf( SearchException.class )
+				.satisfies( FailureReportUtils.hasFailureReport()
+						.typeContext( IndexedEntity.class.getName() )
+						.pathContext( ".genericField" )
+						.failure(
+								"Cyclic recursion when applying the default container extractors to type '"
+										+ "T (java.util.Collection<T>)'",
+								"Container extractors applied to that type and resulting in the same type: [collection]",
+								"To break the cycle, you should consider configuring container extraction explicitly"
+						)
+				);
+
+	}
+
+	@Test
+	@TestForIssue(jiraKey = "HSEARCH-4988")
+	void cycle_noFalsePositive_objectArray() {
+		@Indexed(index = INDEX_NAME)
+		class IndexedEntity<T> {
+			@DocumentId
+			Integer id;
+			@GenericField(valueBridge = @ValueBridgeRef(type = MyObjectBridge.class))
+			T[][][] objectArray;
+		}
+
+		backendMock.expectSchema( INDEX_NAME, b -> b
+				.field( "objectArray", String.class, b2 -> b2.multiValued( true ) )
+		);
+
+		SearchMapping mapping = setupHelper.start()
+				.expectCustomBeans()
+				.setup( IndexedEntity.class );
+		backendMock.verifyExpectationsMet();
+
+		try ( SearchSession session = mapping.createSession() ) {
+			IndexedEntity<Object> entity = new IndexedEntity<>();
+			entity.id = 1;
+			entity.objectArray = new Object[][][] { { { "foo" } } };
+			session.indexingPlan().add( entity );
+
+			backendMock.expectWorks( INDEX_NAME )
+					.add( "1", b -> b.field( "objectArray", "foo" ) );
 		}
 		backendMock.verifyExpectationsMet();
 	}

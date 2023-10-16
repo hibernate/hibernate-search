@@ -70,4 +70,23 @@ public interface PojoTypeModel<T> {
 	 */
 	Optional<? extends PojoTypeModel<?>> arrayElementType();
 
+	/**
+	 * @return A human-readable description of this type.
+	 */
+	@Override
+	String toString();
+
+	/**
+	 * @return {@code true} if {@code obj} is a {@link PojoTypeModel} referencing the exact same type
+	 * with the exact same exposed metadata.
+	 */
+	@Override
+	boolean equals(Object obj);
+
+	/*
+	 * Note to implementors: you must override hashCode to be consistent with equals().
+	 */
+	@Override
+	int hashCode();
+
 }

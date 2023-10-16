@@ -14,6 +14,7 @@ import java.lang.reflect.TypeVariable;
 import java.lang.reflect.WildcardType;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 
 import org.hibernate.search.util.common.AssertionFailure;
@@ -91,6 +92,24 @@ public final class GenericTypeContext {
 	@Override
 	public String toString() {
 		return getClass().getName() + "[" + resolvedType.getTypeName() + ", " + declaringContext + "]";
+	}
+
+	@Override
+	public boolean equals(Object o) {
+		if ( this == o ) {
+			return true;
+		}
+		if ( o == null || getClass() != o.getClass() ) {
+			return false;
+		}
+		GenericTypeContext that = (GenericTypeContext) o;
+		return Objects.equals( resolvedType, that.resolvedType )
+				&& Objects.equals( declaringContext, that.declaringContext );
+	}
+
+	@Override
+	public int hashCode() {
+		return Objects.hash( resolvedType, declaringContext );
 	}
 
 	public Class<?> rawType() {
