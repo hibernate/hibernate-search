@@ -4,7 +4,7 @@
  * License: GNU Lesser General Public License (LGPL), version 2.1 or later
  * See the lgpl.txt file in the root directory or <http://www.gnu.org/licenses/lgpl-2.1.html>.
  */
-package org.hibernate.search.mapper.pojo.standalone.model.impl;
+package org.hibernate.search.mapper.pojo.model.hcann.spi;
 
 import java.lang.reflect.Member;
 import java.util.ArrayList;
@@ -15,33 +15,35 @@ import java.util.function.Function;
 import java.util.stream.Stream;
 
 import org.hibernate.annotations.common.reflection.XProperty;
-import org.hibernate.search.mapper.pojo.model.hcann.spi.AbstractPojoHCAnnRawTypeModel;
 import org.hibernate.search.mapper.pojo.model.spi.GenericContextAwarePojoGenericTypeModel.RawTypeDeclaringContext;
+import org.hibernate.search.mapper.pojo.model.spi.PojoPropertyModel;
 import org.hibernate.search.mapper.pojo.model.spi.PojoRawTypeIdentifier;
 
-class StandalonePojoRawTypeModel<T> extends AbstractPojoHCAnnRawTypeModel<T, StandalonePojoBootstrapIntrospector> {
+public final class PojoSimpleHCAnnRawTypeModel<T>
+		extends AbstractPojoHCAnnRawTypeModel<T, AbstractPojoHCAnnBootstrapIntrospector> {
 
-	StandalonePojoRawTypeModel(StandalonePojoBootstrapIntrospector introspector, PojoRawTypeIdentifier<T> typeIdentifier,
+	public PojoSimpleHCAnnRawTypeModel(AbstractPojoHCAnnBootstrapIntrospector introspector,
+			PojoRawTypeIdentifier<T> typeIdentifier,
 			RawTypeDeclaringContext<T> rawTypeDeclaringContext) {
 		super( introspector, typeIdentifier, rawTypeDeclaringContext );
 	}
 
 	@Override
 	@SuppressWarnings("unchecked") // xClass represents T, so its supertypes represent ? super T
-	public Stream<StandalonePojoRawTypeModel<? super T>> ascendingSuperTypes() {
+	public Stream<PojoSimpleHCAnnRawTypeModel<? super T>> ascendingSuperTypes() {
 		return introspector.ascendingSuperClasses( xClass )
-				.map( xc -> (StandalonePojoRawTypeModel<? super T>) introspector.typeModel( xc ) );
+				.map( xc -> (PojoSimpleHCAnnRawTypeModel<? super T>) introspector.typeModel( xc ) );
 	}
 
 	@Override
 	@SuppressWarnings("unchecked") // xClass represents T, so its supertypes represent ? super T
-	public Stream<StandalonePojoRawTypeModel<? super T>> descendingSuperTypes() {
+	public Stream<PojoSimpleHCAnnRawTypeModel<? super T>> descendingSuperTypes() {
 		return introspector.descendingSuperClasses( xClass )
-				.map( xc -> (StandalonePojoRawTypeModel<? super T>) introspector.typeModel( xc ) );
+				.map( xc -> (PojoSimpleHCAnnRawTypeModel<? super T>) introspector.typeModel( xc ) );
 	}
 
 	@Override
-	protected StandalonePojoPropertyModel<?> createPropertyModel(String propertyName) {
+	protected PojoPropertyModel<?> createPropertyModel(String propertyName) {
 		List<XProperty> declaredXProperties = new ArrayList<>( 2 );
 		List<XProperty> methodAccessXProperties = declaredMethodAccessXPropertiesByName().get( propertyName );
 		if ( methodAccessXProperties != null ) {
@@ -57,7 +59,7 @@ class StandalonePojoRawTypeModel<T> extends AbstractPojoHCAnnRawTypeModel<T, Sta
 			return null;
 		}
 
-		return new StandalonePojoPropertyModel<>( introspector, this, propertyName,
+		return new PojoSimpleHCAnnPropertyModel<>( introspector, this, propertyName,
 				declaredXProperties, members );
 	}
 
@@ -72,7 +74,7 @@ class StandalonePojoRawTypeModel<T> extends AbstractPojoHCAnnRawTypeModel<T, Sta
 		return field == null ? null : Collections.singletonList( field );
 	}
 
-	private <T2> T2 findInSelfOrParents(Function<StandalonePojoRawTypeModel<?>, T2> getter) {
+	private <T2> T2 findInSelfOrParents(Function<PojoSimpleHCAnnRawTypeModel<?>, T2> getter) {
 		return ascendingSuperTypes()
 				.map( getter )
 				.filter( Objects::nonNull )

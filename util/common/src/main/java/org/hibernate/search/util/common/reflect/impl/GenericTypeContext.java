@@ -118,20 +118,20 @@ public final class GenericTypeContext {
 
 	public String name() {
 		Class<?> rawType = rawType();
-		TypeVariable<? extends Class<?>>[] typeParameters = rawType.getTypeParameters();
-		if ( typeParameters.length == 0 ) {
-			return resolvedType.getTypeName();
-		}
 
 		StringBuilder builder = new StringBuilder( rawType.getTypeName() );
-		builder.append( '<' );
-		for ( int i = 0; i < typeParameters.length; i++ ) {
-			if ( i > 0 ) {
-				builder.append( ',' );
+
+		TypeVariable<? extends Class<?>>[] typeParameters = rawType.getTypeParameters();
+		if ( typeParameters.length > 0 ) {
+			builder.append( '<' );
+			for ( int i = 0; i < typeParameters.length; i++ ) {
+				if ( i > 0 ) {
+					builder.append( ',' );
+				}
+				builder.append( resolveTypeArgument( rawType, i ).orElse( typeParameters[i] ).getTypeName() );
 			}
-			builder.append( resolveTypeArgument( rawType, i ).orElse( typeParameters[i] ).getTypeName() );
+			builder.append( '>' );
 		}
-		builder.append( '>' );
 
 		if ( resolvedType.getTypeName().equals( builder.toString() ) ) {
 			return resolvedType.getTypeName();

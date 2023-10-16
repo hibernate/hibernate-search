@@ -113,30 +113,23 @@ public class HibernateOrmBootstrapIntrospector extends AbstractPojoHCAnnBootstra
 		return valueHandleFactory.createForConstructor( constructor );
 	}
 
+	@Override
+	protected ValueReadHandle<?> createValueReadHandle(Member member) throws IllegalAccessException {
+		setAccessible( member );
+		return super.createValueReadHandle( member );
+	}
+
 	ValueReadHandle<?> createValueReadHandle(Class<?> holderClass, Member member,
 			HibernateOrmBasicClassPropertyMetadata ormPropertyMetadata)
 			throws IllegalAccessException {
-		if ( member instanceof Method ) {
-			Method method = (Method) member;
-			setAccessible( method );
-			return valueHandleFactory.createForMethod( method );
-		}
-		else if ( member instanceof Field ) {
-			Field field = (Field) member;
-			if ( ormPropertyMetadata != null && !ormPropertyMetadata.isId() ) {
-				Method bytecodeEnhancerReaderMethod = getBytecodeEnhancerReaderMethod( holderClass, field );
-				if ( bytecodeEnhancerReaderMethod != null ) {
-					setAccessible( bytecodeEnhancerReaderMethod );
-					return valueHandleFactory.createForMethod( bytecodeEnhancerReaderMethod );
-				}
+		if ( member instanceof Field && ormPropertyMetadata != null && !ormPropertyMetadata.isId() ) {
+			Method bytecodeEnhancerReaderMethod = getBytecodeEnhancerReaderMethod( holderClass, (Field) member );
+			if ( bytecodeEnhancerReaderMethod != null ) {
+				return createValueReadHandle( bytecodeEnhancerReaderMethod );
 			}
+		}
 
-			setAccessible( field );
-			return valueHandleFactory.createForField( field );
-		}
-		else {
-			throw new AssertionFailure( "Unexpected type for a " + Member.class.getName() + ": " + member );
-		}
+		return createValueReadHandle( member );
 	}
 
 	@SuppressWarnings("rawtypes")
@@ -160,14 +153,15 @@ public class HibernateOrmBootstrapIntrospector extends AbstractPojoHCAnnBootstra
 		);
 	}
 
-	private static void setAccessible(AccessibleObject member) {
+	private static void setAccessible(Member member) {
 		try {
-			// always set accessible to true as it bypass the security model checks
-			// at execution time and is faster.
-			member.setAccessible( true );
+			// always try to set accessible to true regardless of visibility
+			// as it's faster even for public fields:
+			// it bypasses the security model checks at execution time.
+			( (AccessibleObject) member ).setAccessible( true );
 		}
 		catch (SecurityException se) {
-			if ( !Modifier.isPublic( ( (Member) member ).getModifiers() ) ) {
+			if ( !Modifier.isPublic( member.getModifiers() ) ) {
 				throw se;
 			}
 		}
