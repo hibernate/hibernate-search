@@ -8,6 +8,7 @@ package org.hibernate.search.mapper.pojo.model.spi;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 
 import org.hibernate.search.util.common.impl.CollectionHelper;
@@ -71,6 +72,25 @@ public final class SyntheticPojoGenericTypeModel<T> extends AbstractPojoGenericT
 		}
 		builder.append( '>' );
 		return builder.toString();
+	}
+
+	@Override
+	public boolean equals(Object o) {
+		if ( this == o ) {
+			return true;
+		}
+		if ( o == null || getClass() != o.getClass() ) {
+			return false;
+		}
+		SyntheticPojoGenericTypeModel<?> that = (SyntheticPojoGenericTypeModel<?>) o;
+		return Objects.equals( rawType(), that.rawType() )
+				&& Objects.equals( arrayElementType, that.arrayElementType )
+				&& Objects.equals( genericTypeArguments, that.genericTypeArguments );
+	}
+
+	@Override
+	public int hashCode() {
+		return Objects.hash( rawType(), arrayElementType, genericTypeArguments );
 	}
 
 	@Override

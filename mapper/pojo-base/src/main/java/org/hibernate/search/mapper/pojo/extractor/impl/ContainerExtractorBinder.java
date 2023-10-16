@@ -10,9 +10,11 @@ import java.lang.invoke.MethodHandles;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 
 import org.hibernate.search.engine.environment.bean.BeanHolder;
 import org.hibernate.search.engine.environment.bean.BeanResolver;
@@ -285,8 +287,18 @@ public class ContainerExtractorBinder {
 
 		@Override
 		public boolean tryAppend(ExtractorResolutionState<?> state) {
+			Set<PojoTypeModel<?>> encounteredTypes = new HashSet<>();
+			encounteredTypes.add( state.extractedType );
+			return tryAppend( state, state.extractedType, encounteredTypes );
+		}
+
+		private boolean tryAppend(ExtractorResolutionState<?> state, PojoTypeModel<?> initialType,
+				Set<PojoTypeModel<?>> encounteredTypes) {
 			for ( ExtractorContributor extractorContributor : candidates ) {
 				if ( extractorContributor.tryAppend( state ) ) {
+					if ( !encounteredTypes.add( state.extractedType ) ) {
+						throw log.defaultContainerExtractorCyclicRecursion( initialType, state.extractorNames );
+					}
 					// Recurse as much as possible
 					tryAppend( state );
 					return true;
