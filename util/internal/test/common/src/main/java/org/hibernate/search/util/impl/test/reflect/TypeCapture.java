@@ -17,6 +17,11 @@ public abstract class TypeCapture<T> {
 		this.type = capture();
 	}
 
+	@Override
+	public String toString() {
+		return type.toString();
+	}
+
 	Type capture() {
 		return captureTypeArgument( TypeCapture.class, this );
 	}

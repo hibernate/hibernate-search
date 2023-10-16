@@ -8,6 +8,9 @@ package org.hibernate.search.mapper.pojo.model.hcann.spi;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Constructor;
+import java.lang.reflect.Field;
+import java.lang.reflect.Member;
+import java.lang.reflect.Method;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
@@ -26,6 +29,7 @@ import org.hibernate.search.util.common.AssertionFailure;
 import org.hibernate.search.util.common.impl.StreamHelper;
 import org.hibernate.search.util.common.reflect.spi.ValueCreateHandle;
 import org.hibernate.search.util.common.reflect.spi.ValueHandleFactory;
+import org.hibernate.search.util.common.reflect.spi.ValueReadHandle;
 
 public abstract class AbstractPojoHCAnnBootstrapIntrospector implements PojoBootstrapIntrospector {
 
@@ -75,6 +79,20 @@ public abstract class AbstractPojoHCAnnBootstrapIntrospector implements PojoBoot
 			throws IllegalAccessException {
 		throw new AssertionFailure( this + " doesn't support constructor handles."
 				+ " '" + getClass().getName() + " should be updated to implement createValueCreateHandle(Constructor)." );
+	}
+
+	protected ValueReadHandle<?> createValueReadHandle(Member member) throws IllegalAccessException {
+		if ( member instanceof Method ) {
+			Method method = (Method) member;
+			return valueHandleFactory.createForMethod( method );
+		}
+		else if ( member instanceof Field ) {
+			Field field = (Field) member;
+			return valueHandleFactory.createForField( field );
+		}
+		else {
+			throw new AssertionFailure( "Unexpected type for a " + Member.class.getName() + ": " + member );
+		}
 	}
 
 	public Class<?> toClass(XClass xClass) {

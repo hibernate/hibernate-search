@@ -9,9 +9,7 @@ package org.hibernate.search.mapper.pojo.standalone.model.impl;
 import java.lang.invoke.MethodHandles;
 import java.lang.reflect.AccessibleObject;
 import java.lang.reflect.Constructor;
-import java.lang.reflect.Field;
 import java.lang.reflect.Member;
-import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.util.HashMap;
 import java.util.Map;
@@ -19,12 +17,12 @@ import java.util.Map;
 import org.hibernate.annotations.common.reflection.java.JavaReflectionManager;
 import org.hibernate.search.mapper.pojo.model.hcann.spi.AbstractPojoHCAnnBootstrapIntrospector;
 import org.hibernate.search.mapper.pojo.model.hcann.spi.PojoHCannOrmGenericContextHelper;
+import org.hibernate.search.mapper.pojo.model.hcann.spi.PojoSimpleHCAnnRawTypeModel;
 import org.hibernate.search.mapper.pojo.model.spi.GenericContextAwarePojoGenericTypeModel.RawTypeDeclaringContext;
 import org.hibernate.search.mapper.pojo.model.spi.PojoBootstrapIntrospector;
 import org.hibernate.search.mapper.pojo.model.spi.PojoRawTypeIdentifier;
 import org.hibernate.search.mapper.pojo.model.spi.PojoRawTypeModel;
 import org.hibernate.search.mapper.pojo.standalone.logging.impl.Log;
-import org.hibernate.search.util.common.AssertionFailure;
 import org.hibernate.search.util.common.impl.ReflectionHelper;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 import org.hibernate.search.util.common.reflect.spi.ValueCreateHandle;
@@ -55,7 +53,7 @@ public class StandalonePojoBootstrapIntrospector extends AbstractPojoHCAnnBootst
 
 	@Override
 	@SuppressWarnings("unchecked")
-	public <T> StandalonePojoRawTypeModel<T> typeModel(Class<T> clazz) {
+	public <T> PojoSimpleHCAnnRawTypeModel<T> typeModel(Class<T> clazz) {
 		if ( clazz.isPrimitive() ) {
 			/*
 			 * We'll never manipulate the primitive type, as we're using generics everywhere,
@@ -63,7 +61,7 @@ public class StandalonePojoBootstrapIntrospector extends AbstractPojoHCAnnBootst
 			 */
 			clazz = (Class<T>) ReflectionHelper.getPrimitiveWrapperType( clazz );
 		}
-		return (StandalonePojoRawTypeModel<T>) typeModelCache.computeIfAbsent( clazz, this::createTypeModel );
+		return (PojoSimpleHCAnnRawTypeModel<T>) typeModelCache.computeIfAbsent( clazz, this::createTypeModel );
 	}
 
 	@Override
@@ -72,31 +70,21 @@ public class StandalonePojoBootstrapIntrospector extends AbstractPojoHCAnnBootst
 	}
 
 	@Override
+	protected ValueReadHandle<?> createValueReadHandle(Member member) throws IllegalAccessException {
+		setAccessible( member );
+		return super.createValueReadHandle( member );
+	}
+
+	@Override
 	protected <T> ValueCreateHandle<T> createValueCreateHandle(Constructor<T> constructor) throws IllegalAccessException {
 		setAccessible( constructor );
 		return valueHandleFactory.createForConstructor( constructor );
 	}
 
-	ValueReadHandle<?> createValueReadHandle(Member member) throws IllegalAccessException {
-		if ( member instanceof Method ) {
-			Method method = (Method) member;
-			setAccessible( method );
-			return valueHandleFactory.createForMethod( method );
-		}
-		else if ( member instanceof Field ) {
-			Field field = (Field) member;
-			setAccessible( field );
-			return valueHandleFactory.createForField( field );
-		}
-		else {
-			throw new AssertionFailure( "Unexpected type for a " + Member.class.getName() + ": " + member );
-		}
-	}
-
 	private <T> PojoRawTypeModel<T> createTypeModel(Class<T> clazz) {
 		PojoRawTypeIdentifier<T> typeIdentifier = PojoRawTypeIdentifier.of( clazz );
 		try {
-			return new StandalonePojoRawTypeModel<>(
+			return new PojoSimpleHCAnnRawTypeModel<>(
 					this, typeIdentifier,
 					new RawTypeDeclaringContext<>( genericContextHelper, clazz )
 			);
@@ -106,14 +94,15 @@ public class StandalonePojoBootstrapIntrospector extends AbstractPojoHCAnnBootst
 		}
 	}
 
-	private static void setAccessible(AccessibleObject member) {
+	private static void setAccessible(Member member) {
 		try {
-			// always set accessible to true as it bypasses the security model checks
-			// at execution time and is faster.
-			member.setAccessible( true );
+			// always try to set accessible to true regardless of visibility
+			// as it's faster even for public fields:
+			// it bypasses the security model checks at execution time.
+			( (AccessibleObject) member ).setAccessible( true );
 		}
 		catch (SecurityException se) {
-			if ( !Modifier.isPublic( ( (Member) member ).getModifiers() ) ) {
+			if ( !Modifier.isPublic( member.getModifiers() ) ) {
 				throw se;
 			}
 		}

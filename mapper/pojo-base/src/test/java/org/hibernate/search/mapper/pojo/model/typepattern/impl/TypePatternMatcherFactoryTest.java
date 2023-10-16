@@ -8,72 +8,50 @@ package org.hibernate.search.mapper.pojo.model.typepattern.impl;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
 
 import java.io.Serializable;
+import java.lang.invoke.MethodHandles;
 import java.lang.reflect.Type;
+import java.util.Collection;
+import java.util.EnumSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 
-import org.hibernate.search.mapper.pojo.model.spi.PojoBootstrapIntrospector;
-import org.hibernate.search.mapper.pojo.model.spi.PojoRawTypeModel;
-import org.hibernate.search.mapper.pojo.model.spi.PojoTypeModel;
+import org.hibernate.search.mapper.pojo.testsupport.TestIntrospector;
+import org.hibernate.search.util.common.reflect.spi.ValueHandleFactory;
 import org.hibernate.search.util.impl.test.reflect.TypeCapture;
 import org.hibernate.search.util.impl.test.reflect.WildcardTypeCapture;
 import org.hibernate.search.util.impl.test.reflect.WildcardTypeCapture.Of;
 
 import org.junit.jupiter.api.Test;
 
-@SuppressWarnings({ "unchecked", "rawtypes" }) // Raw types are the only way to mock parameterized types
+import org.assertj.core.api.InstanceOfAssertFactories;
+
 class TypePatternMatcherFactoryTest {
 
-	private final PojoBootstrapIntrospector introspectorMock = mock( PojoBootstrapIntrospector.class );
-
-	private final TypePatternMatcherFactory factory = new TypePatternMatcherFactory( introspectorMock );
+	private final TestIntrospector introspector =
+			new TestIntrospector( ValueHandleFactory.usingMethodHandle( MethodHandles.lookup() ) );
+	private final TypePatternMatcherFactory factory = new TypePatternMatcherFactory( introspector );
 
 	@Test
 	void exactType() {
-		PojoRawTypeModel typeToMatchMock = mock( PojoRawTypeModel.class );
-		PojoTypeModel typeToInspectMock = mock( PojoTypeModel.class );
-		PojoRawTypeModel typeToInspectRawTypeMock = mock( PojoRawTypeModel.class );
-
-		when( introspectorMock.typeModel( String.class ) )
-				.thenReturn( typeToMatchMock );
-		TypePatternMatcher matcher = factory.createExactRawTypeMatcher( String.class );
+		TypePatternMatcher matcher = factory.createExactRawTypeMatcher( CharSequence.class );
 		assertThat( matcher ).isNotNull();
 
-		when( typeToMatchMock.name() )
-				.thenReturn( "THE_TYPE_TO_MATCH" );
-		assertThat( matcher.toString() )
-				.isEqualTo( "hasExactRawType(THE_TYPE_TO_MATCH)" );
+		assertThat( matcher )
+				.hasToString( "hasExactRawType(java.lang.CharSequence)" );
 
-		when( typeToInspectMock.rawType() )
-				.thenReturn( typeToInspectRawTypeMock );
-		when( typeToMatchMock.isSubTypeOf( typeToInspectRawTypeMock ) )
-				.thenReturn( true );
-		when( typeToInspectRawTypeMock.isSubTypeOf( typeToMatchMock ) )
-				.thenReturn( true );
-		assertThat( matcher.matches( typeToInspectMock ) ).isTrue();
+		// Exact type => match
+		assertThat( matcher.matches( introspector.typeModel( CharSequence.class ) ) ).isTrue();
 
-		when( typeToMatchMock.isSubTypeOf( typeToInspectRawTypeMock ) )
-				.thenReturn( false );
-		when( typeToInspectRawTypeMock.isSubTypeOf( typeToMatchMock ) )
-				.thenReturn( true );
-		assertThat( matcher.matches( typeToInspectMock ) ).isFalse();
+		// Supertype => no match
+		assertThat( matcher.matches( introspector.typeModel( Object.class ) ) ).isFalse();
 
-		when( typeToMatchMock.isSubTypeOf( typeToInspectRawTypeMock ) )
-				.thenReturn( true );
-		when( typeToInspectRawTypeMock.isSubTypeOf( typeToMatchMock ) )
-				.thenReturn( false );
-		assertThat( matcher.matches( typeToInspectMock ) ).isFalse();
+		// Subtype => no match
+		assertThat( matcher.matches( introspector.typeModel( String.class ) ) ).isFalse();
 
-		when( typeToMatchMock.isSubTypeOf( typeToInspectRawTypeMock ) )
-				.thenReturn( false );
-		when( typeToInspectRawTypeMock.isSubTypeOf( typeToMatchMock ) )
-				.thenReturn( false );
-		assertThat( matcher.matches( typeToInspectMock ) ).isFalse();
+		// Unrelated type => no match
+		assertThat( matcher.matches( introspector.typeModel( Number.class ) ) ).isFalse();
 	}
 
 	/**
@@ -82,45 +60,25 @@ class TypePatternMatcherFactoryTest {
 	 */
 	@Test
 	void concreteEnumType() {
-		PojoRawTypeModel enumTypeMock = mock( PojoRawTypeModel.class );
-		PojoTypeModel typeToInspectMock = mock( PojoTypeModel.class );
-		PojoRawTypeModel typeToInspectRawTypeMock = mock( PojoRawTypeModel.class );
-
-		when( introspectorMock.typeModel( Enum.class ) )
-				.thenReturn( enumTypeMock );
 		TypePatternMatcher matcher = factory.createRawSuperTypeMatcher( Enum.class )
 				.and( factory.createExactRawTypeMatcher( Enum.class ).negate() );
 		assertThat( matcher ).isNotNull();
 
 		// Strict Enum subtype => match
-		when( typeToInspectMock.rawType() )
-				.thenReturn( typeToInspectRawTypeMock );
-		when( enumTypeMock.isSubTypeOf( typeToInspectRawTypeMock ) )
-				.thenReturn( false );
-		when( typeToInspectRawTypeMock.isSubTypeOf( enumTypeMock ) )
-				.thenReturn( true );
-		assertThat( matcher.matches( typeToInspectMock ) ).isTrue();
+		assertThat( matcher.matches( introspector.typeModel( MyEnum.class ) ) ).isTrue();
 
 		// Enum class itself => no match
-		when( enumTypeMock.isSubTypeOf( typeToInspectRawTypeMock ) )
-				.thenReturn( true );
-		when( typeToInspectRawTypeMock.isSubTypeOf( enumTypeMock ) )
-				.thenReturn( true );
-		assertThat( matcher.matches( typeToInspectMock ) ).isFalse();
+		assertThat( matcher.matches( introspector.typeModel( Enum.class ) ) ).isFalse();
 
 		// Enum supertype => no match
-		when( enumTypeMock.isSubTypeOf( typeToInspectRawTypeMock ) )
-				.thenReturn( true );
-		when( typeToInspectRawTypeMock.isSubTypeOf( enumTypeMock ) )
-				.thenReturn( false );
-		assertThat( matcher.matches( typeToInspectMock ) ).isFalse();
+		assertThat( matcher.matches( introspector.typeModel( Object.class ) ) ).isFalse();
 
 		// Unrelated type => no match
-		when( enumTypeMock.isSubTypeOf( typeToInspectRawTypeMock ) )
-				.thenReturn( false );
-		when( typeToInspectRawTypeMock.isSubTypeOf( enumTypeMock ) )
-				.thenReturn( false );
-		assertThat( matcher.matches( typeToInspectMock ) ).isFalse();
+		assertThat( matcher.matches( introspector.typeModel( Number.class ) ) ).isFalse();
+	}
+
+	private enum MyEnum {
+		FOO, BAR;
 	}
 
 	@Test
@@ -145,41 +103,18 @@ class TypePatternMatcherFactoryTest {
 
 	@Test
 	void rawSuperType() {
-		PojoRawTypeModel<String> typeToMatchMock = mock( PojoRawTypeModel.class );
-		PojoRawTypeModel<Integer> resultTypeMock = mock( PojoRawTypeModel.class );
-		PojoTypeModel<?> typeToInspectMock = mock( PojoTypeModel.class );
-		PojoRawTypeModel typeToInspectRawTypeMock = mock( PojoRawTypeModel.class );
-
-		when( introspectorMock.typeModel( String.class ) )
-				.thenReturn( typeToMatchMock );
-		when( introspectorMock.typeModel( Integer.class ) )
-				.thenReturn( resultTypeMock );
-		ExtractingTypePatternMatcher matcher = factory.createExtractingMatcher( String.class, Integer.class );
+		ExtractingTypePatternMatcher matcher = factory.createExtractingMatcher( Collection.class, Integer.class );
 		assertThat( matcher ).isNotNull();
 
-		when( typeToMatchMock.name() )
-				.thenReturn( "THE_TYPE_TO_MATCH" );
-		when( resultTypeMock.name() )
-				.thenReturn( "THE_RESULT_TYPE" );
-		assertThat( matcher.toString() )
-				.isEqualTo( "hasRawSuperType(THE_TYPE_TO_MATCH) => THE_RESULT_TYPE" );
+		assertThat( matcher )
+				.hasToString( "hasRawSuperType(java.util.Collection) => java.lang.Integer" );
 
-		Optional<? extends PojoTypeModel<?>> actualReturn;
+		assertThat( matcher.extract( introspector.typeModel( EnumSet.class ) ) )
+				.asInstanceOf( InstanceOfAssertFactories.OPTIONAL )
+				.contains( introspector.typeModel( Integer.class ) );
 
-		when( typeToInspectMock.rawType() )
-				.thenReturn( typeToInspectRawTypeMock );
-		when( typeToInspectRawTypeMock.isSubTypeOf( typeToMatchMock ) )
-				.thenReturn( true );
-		actualReturn = matcher.extract( typeToInspectMock );
-		assertThat( actualReturn ).isNotNull();
-		assertThat( actualReturn.isPresent() ).isTrue();
-		assertThat( actualReturn.get() ).isSameAs( resultTypeMock );
-
-		when( typeToInspectRawTypeMock.isSubTypeOf( typeToMatchMock ) )
-				.thenReturn( false );
-		actualReturn = matcher.extract( typeToInspectMock );
-		assertThat( actualReturn ).isNotNull();
-		assertThat( actualReturn.isPresent() ).isFalse();
+		assertThat( matcher.extract( introspector.typeModel( Iterable.class ) ) )
+				.isEmpty();
 	}
 
 	@Test
@@ -192,7 +127,7 @@ class TypePatternMatcherFactoryTest {
 	}
 
 	@Test
-	<T> void rawSuperType_resultIsWildcard() {
+	void rawSuperType_resultIsWildcard() {
 		assertThatThrownBy( () -> factory.createExtractingMatcher(
 				String.class,
 				new WildcardTypeCapture<Of<?>>() {}.getType()
@@ -211,64 +146,33 @@ class TypePatternMatcherFactoryTest {
 
 	@Test
 	void nonGenericArrayElement() {
-		PojoRawTypeModel<String[]> typeToMatchMock = mock( PojoRawTypeModel.class );
-		PojoRawTypeModel<Integer> resultTypeMock = mock( PojoRawTypeModel.class );
-		PojoTypeModel<?> typeToInspectMock = mock( PojoTypeModel.class );
-		PojoRawTypeModel typeToInspectRawTypeMock = mock( PojoRawTypeModel.class );
-
-		when( introspectorMock.typeModel( String[].class ) )
-				.thenReturn( typeToMatchMock );
-		when( introspectorMock.typeModel( Integer.class ) )
-				.thenReturn( resultTypeMock );
 		ExtractingTypePatternMatcher matcher = factory.createExtractingMatcher( String[].class, Integer.class );
 		assertThat( matcher ).isNotNull();
 
-		when( typeToMatchMock.name() )
-				.thenReturn( "THE_TYPE_TO_MATCH" );
-		when( resultTypeMock.name() )
-				.thenReturn( "THE_RESULT_TYPE" );
-		assertThat( matcher.toString() )
-				.isEqualTo( "hasRawSuperType(THE_TYPE_TO_MATCH) => THE_RESULT_TYPE" );
+		assertThat( matcher )
+				.hasToString( "hasRawSuperType([Ljava.lang.String;) => java.lang.Integer" );
 
-		Optional<? extends PojoTypeModel<?>> actualReturn;
-
-		when( typeToInspectMock.rawType() )
-				.thenReturn( typeToInspectRawTypeMock );
-		when( typeToInspectRawTypeMock.isSubTypeOf( typeToMatchMock ) )
-				.thenReturn( true );
-		actualReturn = matcher.extract( typeToInspectMock );
-		assertThat( actualReturn ).isNotNull();
-		assertThat( actualReturn.isPresent() ).isTrue();
-		assertThat( actualReturn.get() ).isSameAs( resultTypeMock );
+		assertThat( matcher.extract( introspector.typeModel( String[].class ) ) )
+				.asInstanceOf( InstanceOfAssertFactories.OPTIONAL )
+				.contains( introspector.typeModel( Integer.class ) );
 	}
 
 	@Test
-	<T> void genericArrayElement() {
-		PojoTypeModel<?> typeToInspectMock = mock( PojoTypeModel.class );
-		PojoTypeModel<T> resultTypeMock = mock( PojoTypeModel.class );
-
+	<T, U> void genericArrayElement() {
 		ExtractingTypePatternMatcher matcher = factory.createExtractingMatcher(
 				new TypeCapture<T[]>() {}.getType(),
 				new TypeCapture<T>() {}.getType()
 		);
 		assertThat( matcher ).isInstanceOf( ArrayElementTypeMatcher.class );
-		assertThat( matcher.toString() )
-				.isEqualTo( "T[] => T" );
+		assertThat( matcher )
+				.hasToString( "T[] => T" );
 
-		Optional<? extends PojoTypeModel<?>> actualReturn;
+		assertThat( matcher.extract( introspector.typeModel( new TypeCapture<U[]>() {} ) ) )
+				.asInstanceOf( InstanceOfAssertFactories.OPTIONAL )
+				.contains( introspector.typeModel( new TypeCapture<U>() {} ) );
 
-		when( typeToInspectMock.arrayElementType() )
-				.thenReturn( (Optional) Optional.of( resultTypeMock ) );
-		actualReturn = matcher.extract( typeToInspectMock );
-		assertThat( actualReturn ).isNotNull();
-		assertThat( actualReturn.isPresent() ).isTrue();
-		assertThat( actualReturn.get() ).isSameAs( resultTypeMock );
-
-		when( typeToInspectMock.arrayElementType() )
-				.thenReturn( Optional.empty() );
-		actualReturn = matcher.extract( typeToInspectMock );
-		assertThat( actualReturn ).isNotNull();
-		assertThat( actualReturn.isPresent() ).isFalse();
+		assertThat( matcher.extract( introspector.typeModel( new TypeCapture<U>() {} ) ) )
+				.isEmpty();
 	}
 
 	@Test
@@ -308,32 +212,23 @@ class TypePatternMatcherFactoryTest {
 	}
 
 	@Test
-	<T> void parameterizedType() {
-		PojoTypeModel<?> typeToInspectMock = mock( PojoTypeModel.class );
-		PojoTypeModel<Integer> resultTypeMock = mock( PojoTypeModel.class );
-
+	<T, U> void parameterizedType() {
 		ExtractingTypePatternMatcher matcher = factory.createExtractingMatcher(
 				new TypeCapture<Map<?, T>>() {}.getType(),
 				new TypeCapture<T>() {}.getType()
 		);
 		assertThat( matcher ).isInstanceOf( ParameterizedTypeArgumentMatcher.class );
-		assertThat( matcher.toString() )
-				.isEqualTo( "java.util.Map<?, T> => T" );
+		assertThat( matcher )
+				.hasToString( "java.util.Map<?, T> => T" );
 
-		Optional<? extends PojoTypeModel<?>> actualReturn;
+		assertThat( matcher.extract( introspector.typeModel( new TypeCapture<Map<String, U>>() {} ) ) )
+				.asInstanceOf( InstanceOfAssertFactories.OPTIONAL )
+				.contains( introspector.typeModel( new TypeCapture<U>() {} ) );
 
-		when( typeToInspectMock.typeArgument( Map.class, 1 ) )
-				.thenReturn( (Optional) Optional.of( resultTypeMock ) );
-		actualReturn = matcher.extract( typeToInspectMock );
-		assertThat( actualReturn ).isNotNull();
-		assertThat( actualReturn.isPresent() ).isTrue();
-		assertThat( actualReturn.get() ).isSameAs( resultTypeMock );
-
-		when( typeToInspectMock.typeArgument( Map.class, 1 ) )
-				.thenReturn( Optional.empty() );
-		actualReturn = matcher.extract( typeToInspectMock );
-		assertThat( actualReturn ).isNotNull();
-		assertThat( actualReturn.isPresent() ).isFalse();
+		assertThat( matcher.extract( introspector.typeModel( new TypeCapture<Collection<U>>() {} ) ) )
+				.isEmpty();
+		assertThat( matcher.extract( introspector.typeModel( new TypeCapture<U>() {} ) ) )
+				.isEmpty();
 	}
 
 	@Test
@@ -400,7 +295,7 @@ class TypePatternMatcherFactoryTest {
 	}
 
 	@Test
-	<T, U> void parameterizedType_resultIsRawType() {
+	<T> void parameterizedType_resultIsRawType() {
 		assertThatThrownBy( () -> factory.createExtractingMatcher(
 				new TypeCapture<Map<?, T>>() {}.getType(),
 				Object.class
