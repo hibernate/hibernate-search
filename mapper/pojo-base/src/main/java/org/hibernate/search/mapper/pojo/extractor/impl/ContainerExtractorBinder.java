@@ -64,7 +64,7 @@ public class ContainerExtractorBinder {
 	private final BeanResolver beanResolver;
 	private final ContainerExtractorRegistry containerExtractorRegistry;
 	private final TypePatternMatcherFactory typePatternMatcherFactory;
-	private final FirstMatchingExtractorContributor firstMatchingExtractorContributor =
+	private final FirstMatchingExtractorContributor defaultExtractorContributor =
 			new FirstMatchingExtractorContributor();
 	private final Map<String, SingleExtractorContributor> extractorContributorCache = new HashMap<>();
 
@@ -94,7 +94,7 @@ public class ContainerExtractorBinder {
 			ContainerExtractorPath extractorPath) {
 		ExtractorResolutionState<C> state = new ExtractorResolutionState<>( sourceType );
 		if ( extractorPath.isDefault() ) {
-			firstMatchingExtractorContributor.tryAppend( state );
+			defaultExtractorContributor.tryAppend( state );
 		}
 		else {
 			for ( String extractorName : extractorPath.explicitExtractorNames() ) {
@@ -128,7 +128,7 @@ public class ContainerExtractorBinder {
 			ContainerExtractorPath extractorPath) {
 		ExtractorResolutionState<C> state = new ExtractorResolutionState<>( sourceType );
 		if ( extractorPath.isDefault() ) {
-			firstMatchingExtractorContributor.tryAppend( state );
+			defaultExtractorContributor.tryAppend( state );
 		}
 		else {
 			for ( String extractorName : extractorPath.explicitExtractorNames() ) {
@@ -189,21 +189,19 @@ public class ContainerExtractorBinder {
 		}
 	}
 
-	public boolean isDefaultExtractorPath(PojoTypeModel<?> sourceType, ContainerExtractorPath extractorPath) {
-		Optional<? extends BoundContainerExtractorPath<?, ?>> boundDefaultExtractorPathOptional =
-				tryBindPath(
-						sourceType,
-						ContainerExtractorPath.defaultExtractors()
-				);
-		return boundDefaultExtractorPathOptional.isPresent()
-				&& extractorPath.equals(
-						boundDefaultExtractorPathOptional.get().getExtractorPath()
-				);
+	public <C> boolean isDefaultExtractorPath(PojoTypeModel<C> sourceType, ContainerExtractorPath extractorPath) {
+		if ( extractorPath.isDefault() ) {
+			return true;
+		}
+		else {
+			ExtractorResolutionState<C> state = new ExtractorResolutionState<>( sourceType );
+			return defaultExtractorContributor.tryMatch( state, extractorPath.explicitExtractorNames() );
+		}
 	}
 
 	private void addDefaultExtractor(String extractorName) {
 		ExtractorContributor extractorContributor = getExtractorContributorForName( extractorName );
-		firstMatchingExtractorContributor.addCandidate( extractorContributor );
+		defaultExtractorContributor.addCandidate( extractorContributor );
 	}
 
 	private SingleExtractorContributor getExtractorContributorForName(String extractorName) {
@@ -254,6 +252,11 @@ public class ContainerExtractorBinder {
 		}
 
 		@Override
+		public String toString() {
+			return "SingleExtractorContributor[" + extractorName + " (" + typePatternMatcher + ")]";
+		}
+
+		@Override
 		public boolean tryAppend(ExtractorResolutionState<?> state) {
 			Optional<? extends PojoTypeModel<?>> resultTypeOptional =
 					typePatternMatcher.extract( state.extractedType );
@@ -290,6 +293,39 @@ public class ContainerExtractorBinder {
 				}
 			}
 			return false;
+		}
+
+		public boolean tryMatch(ExtractorResolutionState<?> state, List<String> toMatch) {
+			return tryMatch( state, toMatch, 0 );
+		}
+
+		private boolean tryMatch(ExtractorResolutionState<?> state, List<String> toMatch, int toMatchIndex) {
+			for ( ExtractorContributor extractorContributor : candidates ) {
+				if ( extractorContributor.tryAppend( state ) ) {
+					// There is a resolved path from this point.
+					if ( toMatchIndex >= toMatch.size() ) {
+						// The path to match is empty,
+						// so the resolved path is longer than the one to match:
+						// it doesn't match.
+						return false;
+					}
+					else if ( !toMatch.get( toMatchIndex )
+							.equals( state.extractorNames.get( state.extractorNames.size() - 1 ) ) ) {
+						// The resolved path has a different extractor
+						// than the path to match at this point:
+						// it doesn't match.
+						return false;
+					}
+					else {
+						// The resolved path matches at this point.
+						// Try to match the rest of the path to match.
+						return tryMatch( state, toMatch, toMatchIndex + 1 );
+					}
+				}
+			}
+
+			// No resolved path from this point: we'll only match if the path to match is empty.
+			return toMatchIndex >= toMatch.size();
 		}
 	}
 

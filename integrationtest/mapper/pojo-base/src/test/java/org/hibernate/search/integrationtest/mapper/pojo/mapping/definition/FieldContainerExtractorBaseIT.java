@@ -9,9 +9,14 @@ package org.hibernate.search.integrationtest.mapper.pojo.mapping.definition;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import java.lang.invoke.MethodHandles;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.List;
 
+import org.hibernate.search.mapper.pojo.bridge.ValueBridge;
+import org.hibernate.search.mapper.pojo.bridge.mapping.annotation.ValueBridgeRef;
+import org.hibernate.search.mapper.pojo.bridge.runtime.ValueBridgeToIndexedValueContext;
 import org.hibernate.search.mapper.pojo.extractor.ContainerExtractionContext;
 import org.hibernate.search.mapper.pojo.extractor.ContainerExtractor;
 import org.hibernate.search.mapper.pojo.extractor.ValueProcessor;
@@ -34,7 +39,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
 
 /**
- * Test error cases when applying container value extractors in the {@code @GenericField} annotation.
+ * Test applying container value extractors in the {@code @GenericField} annotation.
  * <p>
  * Does not test all container value extractor types, which are tested in {@link FieldContainerExtractorImplicitIT}
  * and {@link FieldContainerExtractorExplicitIT}.
@@ -223,5 +228,45 @@ class FieldContainerExtractorBaseIT {
 								"or leave the 'extractor' list to its default, empty value to disable extraction"
 						)
 				);
+	}
+
+	public static class MyPathBridge implements ValueBridge<Path, String> {
+		@Override
+		public String toIndexedValue(Path value, ValueBridgeToIndexedValueContext context) {
+			return value.toString();
+		}
+	}
+
+	@Test
+	@TestForIssue(jiraKey = "HSEARCH-4988")
+	void cycle_noExtraction() {
+		@Indexed(index = INDEX_NAME)
+		class IndexedEntity {
+			@DocumentId
+			Integer id;
+			@GenericField(valueBridge = @ValueBridgeRef(type = MyPathBridge.class),
+					extraction = @ContainerExtraction(extract = ContainerExtract.NO))
+			Path path;
+		}
+
+		backendMock.expectSchema( INDEX_NAME, b -> b
+				.field( "path", String.class )
+		);
+
+		SearchMapping mapping = setupHelper.start()
+				.expectCustomBeans()
+				.setup( IndexedEntity.class );
+		backendMock.verifyExpectationsMet();
+
+		try ( SearchSession session = mapping.createSession() ) {
+			IndexedEntity entity = new IndexedEntity();
+			entity.id = 1;
+			entity.path = Paths.get( "foo" );
+			session.indexingPlan().add( entity );
+
+			backendMock.expectWorks( INDEX_NAME )
+					.add( "1", b -> b.field( "path", "foo" ) );
+		}
+		backendMock.verifyExpectationsMet();
 	}
 }
