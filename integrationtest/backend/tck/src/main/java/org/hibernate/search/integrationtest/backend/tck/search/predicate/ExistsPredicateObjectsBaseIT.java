@@ -41,7 +41,6 @@ import org.junit.jupiter.params.provider.MethodSource;
 
 //CHECKSTYLE:OFF HideUtilityClassConstructor ignore the rule since it is a class with nested test classes.
 // cannot make a private constructor.
-
 class ExistsPredicateObjectsBaseIT {
 	//CHECKSTYLE:ON
 
@@ -54,23 +53,28 @@ class ExistsPredicateObjectsBaseIT {
 	static void setup() {
 		setupHelper.start()
 				.withIndexes(
-						InObjectFieldIT.mainIndex, InObjectFieldIT.missingFieldIndex,
-						ScoreIT.index
+						InObjectFieldConfigured.mainIndex, InObjectFieldConfigured.missingFieldIndex,
+						ScoreConfigured.index
 				)
 				.setup();
 
-		final BulkIndexer inObjectFieldMainIndexer = InObjectFieldIT.mainIndex.bulkIndexer();
-		final BulkIndexer inObjectFieldMissingFieldIndexer = InObjectFieldIT.missingFieldIndex.bulkIndexer();
-		InObjectFieldIT.dataSets.forEach( d -> d.contribute( inObjectFieldMainIndexer, inObjectFieldMissingFieldIndexer ) );
+		final BulkIndexer inObjectFieldMainIndexer = InObjectFieldConfigured.mainIndex.bulkIndexer();
+		final BulkIndexer inObjectFieldMissingFieldIndexer = InObjectFieldConfigured.missingFieldIndex.bulkIndexer();
+		InObjectFieldConfigured.dataSets
+				.forEach( d -> d.contribute( inObjectFieldMainIndexer, inObjectFieldMissingFieldIndexer ) );
 
-		final BulkIndexer scoreIndexer = ScoreIT.index.bulkIndexer();
-		ScoreIT.dataSets.forEach( d -> d.contribute( scoreIndexer ) );
+		final BulkIndexer scoreIndexer = ScoreConfigured.index.bulkIndexer();
+		ScoreConfigured.dataSets.forEach( d -> d.contribute( scoreIndexer ) );
 
 		inObjectFieldMainIndexer.join( inObjectFieldMissingFieldIndexer, scoreIndexer );
 	}
 
 	@Nested
-	class InObjectFieldIT extends AbstractPredicateInObjectFieldIT {
+	class InObjectFieldIT extends InObjectFieldConfigured {
+		// JDK 11 does not allow static fields in non-static inner class and JUnit does not allow running @Nested tests in static inner classes...
+	}
+
+	abstract static class InObjectFieldConfigured extends AbstractPredicateInObjectFieldIT {
 
 		private static final SimpleMappedIndex<IndexBinding> mainIndex =
 				SimpleMappedIndex.of( root -> new IndexBinding( root, Collections.singletonList( innerFieldType ) ) )
@@ -168,7 +172,11 @@ class ExistsPredicateObjectsBaseIT {
 	}
 
 	@Nested
-	class ScoreIT extends AbstractPredicateScoreIT {
+	class ScoreIT extends ScoreConfigured {
+		// JDK 11 does not allow static fields in non-static inner class and JUnit does not allow running @Nested tests in static inner classes...
+	}
+
+	abstract static class ScoreConfigured extends AbstractPredicateScoreIT {
 		private static final SimpleMappedIndex<IndexBinding> index = SimpleMappedIndex.of( IndexBinding::new )
 				.name( "score" );
 		private static final List<DataSet> dataSets = new ArrayList<>();

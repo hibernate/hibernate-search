@@ -27,7 +27,6 @@ import org.junit.jupiter.params.provider.Arguments;
 
 //CHECKSTYLE:OFF HideUtilityClassConstructor ignore the rule since it is a class with nested test classes.
 // cannot make a private constructor.
-
 class ExistsPredicateBaseIT {
 	//CHECKSTYLE:ON
 
@@ -40,44 +39,47 @@ class ExistsPredicateBaseIT {
 	static void setup() {
 		setupHelper.start()
 				.withIndexes(
-						SingleFieldIT.index,
-						InObjectFieldIT.mainIndex, InObjectFieldIT.missingFieldIndex,
-						ScoreIT.index,
-						InvalidFieldIT.index,
-						SearchableIT.searchableYesIndex, SearchableIT.searchableNoIndex,
-						TypeCheckingNoConversionIT.index, TypeCheckingNoConversionIT.compatibleIndex,
-						TypeCheckingNoConversionIT.rawFieldCompatibleIndex, TypeCheckingNoConversionIT.missingFieldIndex,
-						TypeCheckingNoConversionIT.incompatibleIndex,
-						ScaleCheckingIT.index, ScaleCheckingIT.compatibleIndex, ScaleCheckingIT.incompatibleIndex
+						SingleFieldConfigured.index,
+						InObjectFieldConfigured.mainIndex, InObjectFieldConfigured.missingFieldIndex,
+						ScoreConfigured.index,
+						InvalidFieldConfigured.index,
+						SearchableConfigured.searchableYesIndex, SearchableConfigured.searchableNoIndex,
+						TypeCheckingNoConversionConfigured.index, TypeCheckingNoConversionConfigured.compatibleIndex,
+						TypeCheckingNoConversionConfigured.rawFieldCompatibleIndex,
+						TypeCheckingNoConversionConfigured.missingFieldIndex,
+						TypeCheckingNoConversionConfigured.incompatibleIndex,
+						ScaleCheckingConfigured.index, ScaleCheckingConfigured.compatibleIndex,
+						ScaleCheckingConfigured.incompatibleIndex
 				)
 				.setup();
 
-		final BulkIndexer singleFieldIndexer = SingleFieldIT.index.bulkIndexer();
-		SingleFieldIT.dataSets.forEach( d -> d.contribute( SingleFieldIT.index, singleFieldIndexer ) );
+		final BulkIndexer singleFieldIndexer = SingleFieldConfigured.index.bulkIndexer();
+		SingleFieldConfigured.dataSets.forEach( d -> d.contribute( SingleFieldConfigured.index, singleFieldIndexer ) );
 
-		final BulkIndexer inObjectFieldMainIndexer = InObjectFieldIT.mainIndex.bulkIndexer();
-		final BulkIndexer inObjectFieldMissingFieldIndexer = InObjectFieldIT.missingFieldIndex.bulkIndexer();
-		InObjectFieldIT.dataSets.forEach( d -> d.contribute( InObjectFieldIT.mainIndex, inObjectFieldMainIndexer,
-				InObjectFieldIT.missingFieldIndex, inObjectFieldMissingFieldIndexer ) );
+		final BulkIndexer inObjectFieldMainIndexer = InObjectFieldConfigured.mainIndex.bulkIndexer();
+		final BulkIndexer inObjectFieldMissingFieldIndexer = InObjectFieldConfigured.missingFieldIndex.bulkIndexer();
+		InObjectFieldConfigured.dataSets
+				.forEach( d -> d.contribute( InObjectFieldConfigured.mainIndex, inObjectFieldMainIndexer,
+						InObjectFieldConfigured.missingFieldIndex, inObjectFieldMissingFieldIndexer ) );
 
-		final BulkIndexer scoreIndexer = ScoreIT.index.bulkIndexer();
-		ScoreIT.dataSets.forEach( d -> d.contribute( scoreIndexer ) );
+		final BulkIndexer scoreIndexer = ScoreConfigured.index.bulkIndexer();
+		ScoreConfigured.dataSets.forEach( d -> d.contribute( scoreIndexer ) );
 
-		final BulkIndexer typeCheckingMainIndexer = TypeCheckingNoConversionIT.index.bulkIndexer();
-		final BulkIndexer typeCheckingCompatibleIndexer = TypeCheckingNoConversionIT.compatibleIndex.bulkIndexer();
+		final BulkIndexer typeCheckingMainIndexer = TypeCheckingNoConversionConfigured.index.bulkIndexer();
+		final BulkIndexer typeCheckingCompatibleIndexer = TypeCheckingNoConversionConfigured.compatibleIndex.bulkIndexer();
 		final BulkIndexer typeCheckingRawFieldCompatibleIndexer =
-				TypeCheckingNoConversionIT.rawFieldCompatibleIndex.bulkIndexer();
-		final BulkIndexer typeCheckingMissingFieldIndexer = TypeCheckingNoConversionIT.missingFieldIndex.bulkIndexer();
-		TypeCheckingNoConversionIT.dataSets
-				.forEach( d -> d.contribute( TypeCheckingNoConversionIT.index, typeCheckingMainIndexer,
-						TypeCheckingNoConversionIT.compatibleIndex, typeCheckingCompatibleIndexer,
-						TypeCheckingNoConversionIT.rawFieldCompatibleIndex, typeCheckingRawFieldCompatibleIndexer,
-						TypeCheckingNoConversionIT.missingFieldIndex, typeCheckingMissingFieldIndexer ) );
+				TypeCheckingNoConversionConfigured.rawFieldCompatibleIndex.bulkIndexer();
+		final BulkIndexer typeCheckingMissingFieldIndexer = TypeCheckingNoConversionConfigured.missingFieldIndex.bulkIndexer();
+		TypeCheckingNoConversionConfigured.dataSets
+				.forEach( d -> d.contribute( TypeCheckingNoConversionConfigured.index, typeCheckingMainIndexer,
+						TypeCheckingNoConversionConfigured.compatibleIndex, typeCheckingCompatibleIndexer,
+						TypeCheckingNoConversionConfigured.rawFieldCompatibleIndex, typeCheckingRawFieldCompatibleIndexer,
+						TypeCheckingNoConversionConfigured.missingFieldIndex, typeCheckingMissingFieldIndexer ) );
 
-		final BulkIndexer scaleCheckingMainIndexer = ScaleCheckingIT.index.bulkIndexer();
-		final BulkIndexer scaleCheckingCompatibleIndexer = ScaleCheckingIT.compatibleIndex.bulkIndexer();
-		ScaleCheckingIT.dataSet.contribute( ScaleCheckingIT.index, scaleCheckingMainIndexer,
-				ScaleCheckingIT.compatibleIndex, scaleCheckingCompatibleIndexer );
+		final BulkIndexer scaleCheckingMainIndexer = ScaleCheckingConfigured.index.bulkIndexer();
+		final BulkIndexer scaleCheckingCompatibleIndexer = ScaleCheckingConfigured.compatibleIndex.bulkIndexer();
+		ScaleCheckingConfigured.dataSet.contribute( ScaleCheckingConfigured.index, scaleCheckingMainIndexer,
+				ScaleCheckingConfigured.compatibleIndex, scaleCheckingCompatibleIndexer );
 
 		singleFieldIndexer.join(
 				inObjectFieldMainIndexer, inObjectFieldMissingFieldIndexer, scoreIndexer,
@@ -92,7 +94,11 @@ class ExistsPredicateBaseIT {
 	}
 
 	@Nested
-	class SingleFieldIT<F> extends AbstractPredicateSingleFieldIT<ExistsPredicateTestValues<F>> {
+	class SingleFieldIT<F> extends SingleFieldConfigured<F> {
+		// JDK 11 does not allow static fields in non-static inner class and JUnit does not allow running @Nested tests in static inner classes...
+	}
+
+	abstract static class SingleFieldConfigured<F> extends AbstractPredicateSingleFieldIT<ExistsPredicateTestValues<F>> {
 
 		private static final SimpleMappedIndex<IndexBinding> index =
 				SimpleMappedIndex.of( root -> new IndexBinding( root, supportedFieldTypes ) )
@@ -119,7 +125,11 @@ class ExistsPredicateBaseIT {
 	}
 
 	@Nested
-	class ScoreIT<F> extends AbstractPredicateScoreIT {
+	class ScoreIT<F> extends ScoreConfigured<F> {
+		// JDK 11 does not allow static fields in non-static inner class and JUnit does not allow running @Nested tests in static inner classes...
+	}
+
+	abstract static class ScoreConfigured<F> extends AbstractPredicateScoreIT {
 
 		private static final SimpleMappedIndex<IndexBinding> index = SimpleMappedIndex.of( IndexBinding::new )
 				.name( "score" );
@@ -208,7 +218,12 @@ class ExistsPredicateBaseIT {
 	}
 
 	@Nested
-	class InObjectFieldIT<F> extends AbstractPredicateFieldInObjectFieldIT<ExistsPredicateTestValues<F>> {
+	class InObjectFieldIT<F> extends InObjectFieldConfigured<F> {
+		// JDK 11 does not allow static fields in non-static inner class and JUnit does not allow running @Nested tests in static inner classes...
+	}
+
+	abstract static class InObjectFieldConfigured<F>
+			extends AbstractPredicateFieldInObjectFieldIT<ExistsPredicateTestValues<F>> {
 		private static final SimpleMappedIndex<IndexBinding> mainIndex =
 				SimpleMappedIndex.of( root -> new IndexBinding( root, supportedFieldTypes ) )
 						.name( "nesting" );
@@ -242,11 +257,15 @@ class ExistsPredicateBaseIT {
 	}
 
 	@Nested
-	class InvalidFieldIT extends AbstractPredicateInvalidFieldIT {
+	class InvalidFieldIT extends InvalidFieldConfigured {
+		// JDK 11 does not allow static fields in non-static inner class and JUnit does not allow running @Nested tests in static inner classes...
+	}
+
+	abstract static class InvalidFieldConfigured extends AbstractPredicateInvalidFieldIT {
 		private static final SimpleMappedIndex<IndexBinding> index = SimpleMappedIndex.of( IndexBinding::new )
 				.name( "invalidField" );
 
-		public InvalidFieldIT() {
+		protected InvalidFieldConfigured() {
 			super( index );
 		}
 
@@ -272,7 +291,11 @@ class ExistsPredicateBaseIT {
 	}
 
 	@Nested
-	class SearchableIT extends AbstractPredicateSearchableIT {
+	class SearchableIT extends SearchableConfigured {
+		// JDK 11 does not allow static fields in non-static inner class and JUnit does not allow running @Nested tests in static inner classes...
+	}
+
+	abstract static class SearchableConfigured extends AbstractPredicateSearchableIT {
 
 		private static final SimpleMappedIndex<SearchableYesIndexBinding> searchableYesIndex =
 				SimpleMappedIndex.of( root -> new SearchableYesIndexBinding( root, supportedFieldTypes ) )
@@ -313,7 +336,11 @@ class ExistsPredicateBaseIT {
 	}
 
 	@Nested
-	class TypeCheckingNoConversionIT<F>
+	class TypeCheckingNoConversionIT<F> extends TypeCheckingNoConversionConfigured<F> {
+		// JDK 11 does not allow static fields in non-static inner class and JUnit does not allow running @Nested tests in static inner classes...
+	}
+
+	abstract static class TypeCheckingNoConversionConfigured<F>
 			extends AbstractPredicateTypeCheckingNoConversionIT<ExistsPredicateTestValues<F>> {
 		private static final SimpleMappedIndex<IndexBinding> index =
 				SimpleMappedIndex.of( root -> new IndexBinding( root, supportedFieldTypes ) )
@@ -384,7 +411,11 @@ class ExistsPredicateBaseIT {
 	}
 
 	@Nested
-	class ScaleCheckingIT extends AbstractPredicateScaleCheckingIT {
+	class ScaleCheckingIT extends ScaleCheckingConfigured {
+		// JDK 11 does not allow static fields in non-static inner class and JUnit does not allow running @Nested tests in static inner classes...
+	}
+
+	abstract static class ScaleCheckingConfigured extends AbstractPredicateScaleCheckingIT {
 		private static final DataSet dataSet = new DataSet();
 
 		private static final SimpleMappedIndex<IndexBinding> index = SimpleMappedIndex.of( IndexBinding::new )
@@ -395,7 +426,7 @@ class ExistsPredicateBaseIT {
 				SimpleMappedIndex.of( IncompatibleIndexBinding::new )
 						.name( "scaleChecking_incompatible" );
 
-		public ScaleCheckingIT() {
+		public ScaleCheckingConfigured() {
 			super( index, compatibleIndex, incompatibleIndex, dataSet );
 		}
 

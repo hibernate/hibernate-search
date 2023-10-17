@@ -29,7 +29,6 @@ import org.assertj.core.api.recursive.comparison.RecursiveComparisonConfiguratio
 
 //CHECKSTYLE:OFF HideUtilityClassConstructor ignore the rule since it is a class with nested test classes.
 // cannot make a private constructor.
-
 class FieldProjectionBaseIT {
 	//CHECKSTYLE:ON
 
@@ -43,24 +42,27 @@ class FieldProjectionBaseIT {
 	@BeforeAll
 	static void setup() {
 		setupHelper.start()
-				.withIndexes( InObjectProjectionIT.mainIndex, InObjectProjectionIT.missingLevel1Index,
-						InObjectProjectionIT.missingLevel1SingleValuedFieldIndex,
-						InObjectProjectionIT.missingLevel2Index, InObjectProjectionIT.missingLevel2SingleValuedFieldIndex )
+				.withIndexes( InObjectProjectionConfigured.mainIndex, InObjectProjectionConfigured.missingLevel1Index,
+						InObjectProjectionConfigured.missingLevel1SingleValuedFieldIndex,
+						InObjectProjectionConfigured.missingLevel2Index,
+						InObjectProjectionConfigured.missingLevel2SingleValuedFieldIndex )
 				.setup();
 
-		BulkIndexer compositeForEachMainIndexer = InObjectProjectionIT.mainIndex.bulkIndexer();
-		BulkIndexer compositeForEachMissingLevel1Indexer = InObjectProjectionIT.missingLevel1Index.bulkIndexer();
+		BulkIndexer compositeForEachMainIndexer = InObjectProjectionConfigured.mainIndex.bulkIndexer();
+		BulkIndexer compositeForEachMissingLevel1Indexer = InObjectProjectionConfigured.missingLevel1Index.bulkIndexer();
 		BulkIndexer compositeForEachMissingLevel1SingleValuedFieldIndexer =
-				InObjectProjectionIT.missingLevel1SingleValuedFieldIndex.bulkIndexer();
-		BulkIndexer compositeForEachMissingLevel2Indexer = InObjectProjectionIT.missingLevel2Index.bulkIndexer();
+				InObjectProjectionConfigured.missingLevel1SingleValuedFieldIndex.bulkIndexer();
+		BulkIndexer compositeForEachMissingLevel2Indexer = InObjectProjectionConfigured.missingLevel2Index.bulkIndexer();
 		BulkIndexer compositeForEachMissingLevel2SingleValuedFieldIndexer =
-				InObjectProjectionIT.missingLevel2SingleValuedFieldIndex.bulkIndexer();
-		InObjectProjectionIT.dataSets.forEach( d -> d.contribute( InObjectProjectionIT.mainIndex, compositeForEachMainIndexer,
-				InObjectProjectionIT.missingLevel1Index, compositeForEachMissingLevel1Indexer,
-				InObjectProjectionIT.missingLevel1SingleValuedFieldIndex, compositeForEachMissingLevel1SingleValuedFieldIndexer,
-				InObjectProjectionIT.missingLevel2Index, compositeForEachMissingLevel2Indexer,
-				InObjectProjectionIT.missingLevel2SingleValuedFieldIndex,
-				compositeForEachMissingLevel2SingleValuedFieldIndexer ) );
+				InObjectProjectionConfigured.missingLevel2SingleValuedFieldIndex.bulkIndexer();
+		InObjectProjectionConfigured.dataSets
+				.forEach( d -> d.contribute( InObjectProjectionConfigured.mainIndex, compositeForEachMainIndexer,
+						InObjectProjectionConfigured.missingLevel1Index, compositeForEachMissingLevel1Indexer,
+						InObjectProjectionConfigured.missingLevel1SingleValuedFieldIndex,
+						compositeForEachMissingLevel1SingleValuedFieldIndexer,
+						InObjectProjectionConfigured.missingLevel2Index, compositeForEachMissingLevel2Indexer,
+						InObjectProjectionConfigured.missingLevel2SingleValuedFieldIndex,
+						compositeForEachMissingLevel2SingleValuedFieldIndexer ) );
 
 		compositeForEachMainIndexer.join( compositeForEachMissingLevel1Indexer,
 				compositeForEachMissingLevel1SingleValuedFieldIndexer, compositeForEachMissingLevel2Indexer,
@@ -68,7 +70,11 @@ class FieldProjectionBaseIT {
 	}
 
 	@Nested
-	class InObjectProjectionIT<F>
+	class InObjectProjectionIT<F> extends InObjectProjectionConfigured<F> {
+		// JDK 11 does not allow static fields in non-static inner class and JUnit does not allow running @Nested tests in static inner classes...
+	}
+
+	abstract static class InObjectProjectionConfigured<F>
 			extends AbstractProjectionInObjectProjectionIT<F, F, FieldProjectionTestValues<F>> {
 		private static final List<FieldTypeDescriptor<?>> supportedFieldTypes = FieldTypeDescriptor.getAll();
 		private static final SimpleMappedIndex<IndexBinding> mainIndex =

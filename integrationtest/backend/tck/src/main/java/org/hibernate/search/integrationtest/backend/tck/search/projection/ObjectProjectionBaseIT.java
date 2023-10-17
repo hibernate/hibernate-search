@@ -28,7 +28,6 @@ import org.junit.jupiter.api.extension.RegisterExtension;
 
 //CHECKSTYLE:OFF HideUtilityClassConstructor ignore the rule since it is a class with nested test classes.
 // cannot make a private constructor.
-
 class ObjectProjectionBaseIT {
 	//CHECKSTYLE:ON
 
@@ -37,10 +36,10 @@ class ObjectProjectionBaseIT {
 
 	@BeforeAll
 	static void setup() {
-		setupHelper.start().withIndex( FromAsIT.index ).setup();
+		setupHelper.start().withIndex( FromAsConfigured.index ).setup();
 
-		BulkIndexer fromAsIndexer = FromAsIT.index.bulkIndexer();
-		FromAsIT.dataSet.contribute( FromAsIT.index, fromAsIndexer );
+		BulkIndexer fromAsIndexer = FromAsConfigured.index.bulkIndexer();
+		FromAsConfigured.dataSet.contribute( FromAsConfigured.index, fromAsIndexer );
 
 		fromAsIndexer.join();
 	}
@@ -53,14 +52,18 @@ class ObjectProjectionBaseIT {
 	}
 
 	@Nested
-	class FromAsIT extends AbstractCompositeProjectionFromAsIT<FromAsIT.IndexBinding> {
+	class FromAsIT extends FromAsConfigured {
+		// JDK 11 does not allow static fields in non-static inner class and JUnit does not allow running @Nested tests in static inner classes...
+	}
+
+	abstract static class FromAsConfigured extends AbstractCompositeProjectionFromAsIT<FromAsConfigured.IndexBinding> {
 
 		private static final SimpleMappedIndex<IndexBinding> index = SimpleMappedIndex.of( IndexBinding::new )
 				.name( "fromAs" );
 
 		private static final DataSet dataSet = new DataSet();
 
-		public FromAsIT() {
+		public FromAsConfigured() {
 			super( index, dataSet );
 		}
 

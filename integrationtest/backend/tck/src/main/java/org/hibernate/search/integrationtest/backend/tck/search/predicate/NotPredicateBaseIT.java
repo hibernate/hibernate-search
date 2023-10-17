@@ -24,7 +24,6 @@ import org.junit.jupiter.params.provider.Arguments;
 
 //CHECKSTYLE:OFF HideUtilityClassConstructor ignore the rule since it is a class with nested test classes.
 // cannot make a private constructor.
-
 class NotPredicateBaseIT {
 	//CHECKSTYLE:ON
 
@@ -35,18 +34,22 @@ class NotPredicateBaseIT {
 	static void setup() {
 		setupHelper.start()
 				.withIndexes(
-						ScoreIT.index
+						ScoreConfigured.index
 				)
 				.setup();
 
-		final BulkIndexer scoreIndexer = ScoreIT.index.bulkIndexer();
-		ScoreIT.dataSet.contribute( scoreIndexer );
+		final BulkIndexer scoreIndexer = ScoreConfigured.index.bulkIndexer();
+		ScoreConfigured.dataSet.contribute( scoreIndexer );
 
 		scoreIndexer.join();
 	}
 
 	@Nested
-	class ScoreIT extends AbstractPredicateScoreIT {
+	class ScoreIT extends ScoreConfigured {
+		// JDK 11 does not allow static fields in non-static inner class and JUnit does not allow running @Nested tests in static inner classes...
+	}
+
+	abstract static class ScoreConfigured extends AbstractPredicateScoreIT {
 		private static final DataSet dataSet = new DataSet();
 
 		private static final StubMappedIndex index = StubMappedIndex.withoutFields().name( "score" );
