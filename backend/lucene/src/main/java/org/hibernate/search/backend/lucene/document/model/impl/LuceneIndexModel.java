@@ -9,6 +9,7 @@ package org.hibernate.search.backend.lucene.document.model.impl;
 import java.util.List;
 import java.util.Map;
 
+import org.hibernate.search.backend.lucene.lowlevel.codec.impl.HibernateSearchLuceneCodec;
 import org.hibernate.search.backend.lucene.lowlevel.common.impl.AnalyzerConstants;
 import org.hibernate.search.engine.backend.document.model.spi.AbstractIndexModel;
 import org.hibernate.search.engine.backend.document.model.spi.IndexFieldFilter;
@@ -17,6 +18,7 @@ import org.hibernate.search.engine.backend.metamodel.IndexDescriptor;
 
 import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.analysis.DelegatingAnalyzerWrapper;
+import org.apache.lucene.codecs.Codec;
 
 public class LuceneIndexModel extends AbstractIndexModel<LuceneIndexModel, LuceneIndexRoot, LuceneIndexField>
 		implements AutoCloseable, IndexDescriptor {
@@ -25,6 +27,7 @@ public class LuceneIndexModel extends AbstractIndexModel<LuceneIndexModel, Lucen
 
 	private final IndexingScopedAnalyzer indexingAnalyzer;
 	private final SearchScopedAnalyzer searchAnalyzer;
+	private final Codec codec;
 
 	public LuceneIndexModel(String hibernateSearchName, String mappedTypeName,
 			IndexIdentifier identifier,
@@ -35,6 +38,7 @@ public class LuceneIndexModel extends AbstractIndexModel<LuceneIndexModel, Lucen
 		this.indexingAnalyzer = new IndexingScopedAnalyzer();
 		this.searchAnalyzer = new SearchScopedAnalyzer();
 		this.hasNestedDocuments = hasNestedDocuments;
+		this.codec = new HibernateSearchLuceneCodec( this );
 	}
 
 	@Override
@@ -57,6 +61,10 @@ public class LuceneIndexModel extends AbstractIndexModel<LuceneIndexModel, Lucen
 
 	public Analyzer getSearchAnalyzer() {
 		return searchAnalyzer;
+	}
+
+	public Codec codec() {
+		return codec;
 	}
 
 	/**

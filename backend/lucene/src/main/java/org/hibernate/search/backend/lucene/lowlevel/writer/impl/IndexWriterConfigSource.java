@@ -12,6 +12,7 @@ import org.hibernate.search.engine.cfg.ConfigurationPropertySource;
 import org.hibernate.search.util.common.reporting.EventContext;
 
 import org.apache.lucene.analysis.Analyzer;
+import org.apache.lucene.codecs.Codec;
 import org.apache.lucene.index.IndexWriterConfig;
 import org.apache.lucene.index.LogByteSizeMergePolicy;
 import org.apache.lucene.search.similarities.Similarity;
@@ -30,18 +31,21 @@ import org.apache.lucene.search.similarities.Similarity;
 public class IndexWriterConfigSource {
 
 	public static IndexWriterConfigSource create(Similarity similarity, Analyzer analyzer,
-			ConfigurationPropertySource propertySource, EventContext eventContext) {
+			Codec codec, ConfigurationPropertySource propertySource, EventContext eventContext) {
 		List<IndexWriterSettingValue<?>> values = IndexWriterSettings.extractAll( propertySource, eventContext );
-		return new IndexWriterConfigSource( similarity, analyzer, values );
+		return new IndexWriterConfigSource( similarity, analyzer, codec, values );
 	}
 
 	private final Similarity similarity;
 	private final Analyzer analyzer;
+	private final Codec codec;
 	private final List<IndexWriterSettingValue<?>> values;
 
-	private IndexWriterConfigSource(Similarity similarity, Analyzer analyzer, List<IndexWriterSettingValue<?>> values) {
+	private IndexWriterConfigSource(Similarity similarity, Analyzer analyzer, Codec codec,
+			List<IndexWriterSettingValue<?>> values) {
 		this.similarity = similarity;
 		this.analyzer = analyzer;
+		this.codec = codec;
 		this.values = values;
 	}
 
@@ -57,6 +61,7 @@ public class IndexWriterConfigSource {
 	public IndexWriterConfig createIndexWriterConfig() {
 		IndexWriterConfig writerConfig = new IndexWriterConfig( analyzer );
 		writerConfig.setSimilarity( similarity );
+		writerConfig.setCodec( codec );
 		for ( IndexWriterSettingValue<?> value : values ) {
 			value.applySetting( writerConfig );
 		}

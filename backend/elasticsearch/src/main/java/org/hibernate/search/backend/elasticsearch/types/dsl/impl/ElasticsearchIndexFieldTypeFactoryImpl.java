@@ -29,6 +29,7 @@ import org.hibernate.search.engine.backend.reporting.spi.BackendMappingHints;
 import org.hibernate.search.engine.backend.types.dsl.ScaledNumberIndexFieldTypeOptionsStep;
 import org.hibernate.search.engine.backend.types.dsl.StandardIndexFieldTypeOptionsStep;
 import org.hibernate.search.engine.backend.types.dsl.StringIndexFieldTypeOptionsStep;
+import org.hibernate.search.engine.backend.types.dsl.VectorFieldTypeOptionsStep;
 import org.hibernate.search.engine.mapper.mapping.building.spi.IndexFieldTypeDefaultsProvider;
 import org.hibernate.search.engine.spatial.GeoPoint;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
@@ -232,6 +233,16 @@ public class ElasticsearchIndexFieldTypeFactoryImpl
 	@Override
 	public ScaledNumberIndexFieldTypeOptionsStep<?, BigInteger> asBigInteger() {
 		return new ElasticsearchBigIntegerIndexFieldTypeOptionsStep( this, typeDefaultsProvider );
+	}
+
+	@Override
+	public VectorFieldTypeOptionsStep<?, byte[]> asByteVector(int dimension) {
+		throw new UnsupportedOperationException( "The Elasticsearch backend does not support vector field yet." );
+	}
+
+	@Override
+	public VectorFieldTypeOptionsStep<?, float[]> asFloatVector(int dimension) {
+		throw new UnsupportedOperationException( "The Elasticsearch backend does not support vector field yet." );
 	}
 
 	@Override

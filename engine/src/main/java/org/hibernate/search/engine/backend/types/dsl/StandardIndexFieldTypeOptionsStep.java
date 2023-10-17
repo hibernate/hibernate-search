@@ -7,8 +7,6 @@
 package org.hibernate.search.engine.backend.types.dsl;
 
 import org.hibernate.search.engine.backend.types.Aggregable;
-import org.hibernate.search.engine.backend.types.Projectable;
-import org.hibernate.search.engine.backend.types.Searchable;
 import org.hibernate.search.engine.backend.types.Sortable;
 
 /**
@@ -21,14 +19,7 @@ import org.hibernate.search.engine.backend.types.Sortable;
  * @param <F> The type of field values.
  */
 public interface StandardIndexFieldTypeOptionsStep<S extends StandardIndexFieldTypeOptionsStep<?, F>, F>
-		extends IndexFieldTypeOptionsStep<S, F> {
-
-	/**
-	 * @param projectable Whether projections are enabled for this field.
-	 * @return {@code this}, for method chaining.
-	 * @see Projectable
-	 */
-	S projectable(Projectable projectable);
+		extends SearchableProjectableIndexFieldTypeOptionsStep<S, F> {
 
 	/**
 	 * @param sortable Whether this field should be sortable.
@@ -36,19 +27,6 @@ public interface StandardIndexFieldTypeOptionsStep<S extends StandardIndexFieldT
 	 * @see Sortable
 	 */
 	S sortable(Sortable sortable);
-
-	/**
-	 * @param indexNullAs A value used instead of null values when indexing.
-	 * @return {@code this}, for method chaining.
-	 */
-	S indexNullAs(F indexNullAs);
-
-	/**
-	 * @param searchable Whether this field should be searchable.
-	 * @return {@code this}, for method chaining.
-	 * @see Searchable
-	 */
-	S searchable(Searchable searchable);
 
 	/**
 	 * @param aggregable Whether aggregations are enabled for this field.
