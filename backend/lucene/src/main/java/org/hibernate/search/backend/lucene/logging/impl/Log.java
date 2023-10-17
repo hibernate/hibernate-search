@@ -705,4 +705,12 @@ public interface Log extends BasicLogger {
 	@Message(id = ID_OFFSET + 173, value = "'%1$s' cannot be nested in an object projection. "
 			+ "%2$s")
 	SearchException cannotUseProjectionInNestedContext(String projection, String hint, @Param EventContext eventContext);
+
+	@Message(id = ID_OFFSET + 174,
+			value = "Vector '%1$s' cannot be equal to '%2$s'. It must be a positive integer value lesser than or equal to %3$s.")
+	SearchException vectorPropertyUnsupportedValue(String property, Integer value, int max);
+
+	@Message(id = ID_OFFSET + 175, value = "No built-in vector index field type for class: '%1$s'.")
+	SearchException cannotGuessVectorFieldType(@FormatWith(ClassFormatter.class) Class<?> inputType,
+			@Param EventContext context);
 }

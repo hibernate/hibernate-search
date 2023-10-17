@@ -30,6 +30,10 @@
 
         <!-- >>> Lucene -->
         <!-- When upgrading Lucene, make sure to align the dependency to com.carrotsearch.hppc (see below) -->
+        <!--
+            When upgrading Lucene, check HibernateSearchKnnVectorsFormat to see if its internals should be updated too.
+            In particular if a delegating Lucene95HnswVectorsFormat should be changed to a different version.
+        -->
         <version.org.apache.lucene>9.8.0</version.org.apache.lucene>
         <javadoc.org.apache.lucene.tag>${parsed-version.org.apache.lucene.majorVersion}_${parsed-version.org.apache.lucene.minorVersion}_${parsed-version.org.apache.lucene.incrementalVersion}</javadoc.org.apache.lucene.tag>
         <javadoc.org.apache.lucene.core.url>https://lucene.apache.org/core/${javadoc.org.apache.lucene.tag}/core/</javadoc.org.apache.lucene.core.url>

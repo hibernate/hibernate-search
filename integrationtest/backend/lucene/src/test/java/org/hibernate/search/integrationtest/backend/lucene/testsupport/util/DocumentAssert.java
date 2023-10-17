@@ -65,6 +65,16 @@ public class DocumentAssert {
 		return hasField( "byte[]", absoluteFieldPath, values );
 	}
 
+	public DocumentAssert hasVectorField(String absoluteFieldPath, byte[]... values) {
+		return hasField( "byte[]", absoluteFieldPath,
+				Arrays.stream( values ).map( Arrays::toString ).toArray( String[]::new ) );
+	}
+
+	public DocumentAssert hasVectorField(String absoluteFieldPath, float[]... values) {
+		return hasField( "float[]", absoluteFieldPath,
+				Arrays.stream( values ).map( Arrays::toString ).toArray( String[]::new ) );
+	}
+
 	@SafeVarargs
 	private final <T> DocumentAssert hasField(String type, String absoluteFieldPath, T... values) {
 		String fieldDescription = "field at path '" + absoluteFieldPath + "'"

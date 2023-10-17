@@ -24,6 +24,7 @@ import org.hibernate.search.engine.backend.types.dsl.IndexFieldTypeOptionsStep;
 import org.hibernate.search.engine.backend.types.dsl.ScaledNumberIndexFieldTypeOptionsStep;
 import org.hibernate.search.engine.backend.types.dsl.StandardIndexFieldTypeOptionsStep;
 import org.hibernate.search.engine.backend.types.dsl.StringIndexFieldTypeOptionsStep;
+import org.hibernate.search.engine.backend.types.dsl.VectorFieldTypeOptionsStep;
 import org.hibernate.search.engine.mapper.mapping.building.spi.IndexFieldTypeDefaultsProvider;
 import org.hibernate.search.engine.spatial.GeoPoint;
 
@@ -155,6 +156,16 @@ public class StubIndexFieldTypeFactory implements IndexFieldTypeFactory {
 	@Override
 	public ScaledNumberIndexFieldTypeOptionsStep<?, BigInteger> asBigInteger() {
 		return new StubScaledNumberIndexFieldTypeOptionsStep<>( BigInteger.class, defaultsProvider );
+	}
+
+	@Override
+	public VectorFieldTypeOptionsStep<?, byte[]> asByteVector(int dimension) {
+		throw new UnsupportedOperationException( "Implement me" );
+	}
+
+	@Override
+	public VectorFieldTypeOptionsStep<?, float[]> asFloatVector(int dimension) {
+		throw new UnsupportedOperationException( "Implement me" );
 	}
 
 	public <T> IndexFieldTypeOptionsStep<?, T> asNonStandard(Class<T> fieldValueType) {

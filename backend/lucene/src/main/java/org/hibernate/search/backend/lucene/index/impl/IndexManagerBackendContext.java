@@ -199,7 +199,7 @@ public class IndexManagerBackendContext implements WorkExecutionBackendContext, 
 			ConfigurationPropertySource propertySource) {
 		String indexName = model.hibernateSearchName();
 		IndexWriterConfigSource writerConfigSource = IndexWriterConfigSource.create(
-				similarity, model.getIndexingAnalyzer(), propertySource, shardEventContext
+				similarity, model.getIndexingAnalyzer(), model.codec(), propertySource, shardEventContext
 		);
 		return ioStrategy.createIndexAccessor(
 				indexName, shardEventContext, directoryHolder, writerConfigSource

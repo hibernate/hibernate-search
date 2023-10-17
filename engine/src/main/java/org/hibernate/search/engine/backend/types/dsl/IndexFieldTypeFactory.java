@@ -21,6 +21,7 @@ import java.time.ZonedDateTime;
 
 import org.hibernate.search.engine.spatial.GeoPoint;
 import org.hibernate.search.util.common.SearchException;
+import org.hibernate.search.util.common.annotation.Incubating;
 
 /**
  * A factory for types of index fields.
@@ -165,6 +166,23 @@ public interface IndexFieldTypeFactory {
 	 * @return A DSL step where the index field type can be defined in more details.
 	 */
 	ScaledNumberIndexFieldTypeOptionsStep<?, BigInteger> asBigInteger();
+
+
+	/**
+	 * Define a field type intended for use in vector search
+	 * and whose values are represented as a {@code byte[]} in Hibernate Search.
+	 * @return A DSL step where the index field type can be defined in more details.
+	 */
+	@Incubating
+	VectorFieldTypeOptionsStep<?, byte[]> asByteVector(int dimension);
+
+	/**
+	 * Define a field type intended for use in vector search
+	 * and whose values are represented as a {@code float[]} in Hibernate Search.
+	 * @return A DSL step where the index field type can be defined in more details.
+	 */
+	@Incubating
+	VectorFieldTypeOptionsStep<?, float[]> asFloatVector(int dimension);
 
 	/**
 	 * Extend the current factory with the given extension,

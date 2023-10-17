@@ -22,8 +22,10 @@ import org.hibernate.search.mapper.pojo.mapping.definition.annotation.IndexedEmb
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.KeywordField;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.NonStandardField;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.ScaledNumberField;
+import org.hibernate.search.mapper.pojo.mapping.definition.annotation.VectorField;
 import org.hibernate.search.mapper.pojo.model.path.PojoModelPath;
 import org.hibernate.search.mapper.pojo.model.path.PojoModelPathValueNode;
+import org.hibernate.search.util.common.annotation.Incubating;
 
 /**
  * The step in a mapping definition where a property can be mapped.
@@ -237,5 +239,33 @@ public interface PropertyMappingStep {
 	 * or where other elements can be mapped to the property.
 	 */
 	IndexingDependencyOptionsStep indexingDependency();
+
+	/**
+	 * Maps the property to a vector field in the index with the same name as this property.
+	 *
+	 * @param dimension The number of dimensions (array length) of vectors to be indexed.
+	 * @return A DSL step where the field mapping can be defined in more details,
+	 * or where other elements can be mapped to the property.
+	 *
+	 * @see VectorField
+	 * @see VectorField#dimension()
+	 */
+	@Incubating
+	PropertyMappingVectorFieldStep vectorField(int dimension);
+
+	/**
+	 * Maps the property to a vector field in the index with a custom name.
+	 *
+	 * @param dimension The number of dimensions (array length) of vectors to be indexed.
+	 * @param relativeFieldName The name of the index field.
+	 * @return A DSL step where the field mapping can be defined in more details,
+	 * or where other elements can be mapped to the property.
+	 *
+	 * @see VectorField
+	 * @see VectorField#dimension()
+	 * @see VectorField#name()
+	 */
+	@Incubating
+	PropertyMappingVectorFieldStep vectorField(int dimension, String relativeFieldName);
 
 }
