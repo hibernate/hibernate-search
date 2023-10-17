@@ -27,7 +27,6 @@ import org.junit.jupiter.params.provider.Arguments;
 
 //CHECKSTYLE:OFF HideUtilityClassConstructor ignore the rule since it is a class with nested test classes.
 // cannot make a private constructor.
-
 class MatchAllPredicateBaseIT {
 	//CHECKSTYLE:ON
 
@@ -38,23 +37,27 @@ class MatchAllPredicateBaseIT {
 	static void setup() {
 		setupHelper.start()
 				.withIndexes(
-						InObjectFieldIT.mainIndex, InObjectFieldIT.missingFieldIndex,
-						ScoreIT.index
+						InObjectFieldConfigured.mainIndex, InObjectFieldConfigured.missingFieldIndex,
+						ScoreConfigured.index
 				)
 				.setup();
 
-		final BulkIndexer inObjectFieldMainIndexer = InObjectFieldIT.mainIndex.bulkIndexer();
-		final BulkIndexer inObjectFieldMissingFieldIndexer = InObjectFieldIT.missingFieldIndex.bulkIndexer();
-		InObjectFieldIT.dataSet.contribute( inObjectFieldMainIndexer, inObjectFieldMissingFieldIndexer );
+		final BulkIndexer inObjectFieldMainIndexer = InObjectFieldConfigured.mainIndex.bulkIndexer();
+		final BulkIndexer inObjectFieldMissingFieldIndexer = InObjectFieldConfigured.missingFieldIndex.bulkIndexer();
+		InObjectFieldConfigured.dataSet.contribute( inObjectFieldMainIndexer, inObjectFieldMissingFieldIndexer );
 
-		final BulkIndexer scoreIndexer = ScoreIT.index.bulkIndexer();
-		ScoreIT.dataSet.contribute( scoreIndexer );
+		final BulkIndexer scoreIndexer = ScoreConfigured.index.bulkIndexer();
+		ScoreConfigured.dataSet.contribute( scoreIndexer );
 
 		inObjectFieldMainIndexer.join( inObjectFieldMissingFieldIndexer, scoreIndexer );
 	}
 
 	@Nested
-	class InObjectFieldIT extends AbstractPredicateInObjectFieldIT {
+	class InObjectFieldIT extends InObjectFieldConfigured {
+		// JDK 11 does not allow static fields in non-static inner class and JUnit does not allow running @Nested tests in static inner classes...
+	}
+
+	abstract static class InObjectFieldConfigured extends AbstractPredicateInObjectFieldIT {
 		private static final DataSet dataSet = new DataSet();
 
 		private static final SimpleMappedIndex<IndexBinding> mainIndex =
@@ -72,7 +75,8 @@ class MatchAllPredicateBaseIT {
 		@Override
 		protected PredicateFinalStep predicate(SearchPredicateFactory f, ObjectFieldBinding objectFieldBinding,
 				int matchingDocOrdinal, AbstractPredicateDataSet dataSet) {
-			return f.matchAll().except( f.id().matchingAny( InObjectFieldIT.dataSet.docIdsExcept( matchingDocOrdinal ) ) );
+			return f.matchAll()
+					.except( f.id().matchingAny( InObjectFieldConfigured.dataSet.docIdsExcept( matchingDocOrdinal ) ) );
 		}
 
 		private static class DataSet extends AbstractPredicateDataSet {
@@ -100,7 +104,11 @@ class MatchAllPredicateBaseIT {
 	}
 
 	@Nested
-	class ScoreIT extends AbstractPredicateScoreIT {
+	class ScoreIT extends ScoreConfigured {
+		// JDK 11 does not allow static fields in non-static inner class and JUnit does not allow running @Nested tests in static inner classes...
+	}
+
+	abstract static class ScoreConfigured extends AbstractPredicateScoreIT {
 		private static final DataSet dataSet = new DataSet();
 
 		private static final StubMappedIndex index = StubMappedIndex.withoutFields().name( "score" );
@@ -112,21 +120,21 @@ class MatchAllPredicateBaseIT {
 		@Override
 		protected PredicateFinalStep predicate(SearchPredicateFactory f, int matchingDocOrdinal,
 				AbstractPredicateDataSet dataSet, StubMappedIndex index) {
-			return f.matchAll().except( f.id().matchingAny( ScoreIT.dataSet.docIdsExcept( matchingDocOrdinal ) ) );
+			return f.matchAll().except( f.id().matchingAny( ScoreConfigured.dataSet.docIdsExcept( matchingDocOrdinal ) ) );
 		}
 
 		@Override
 		protected PredicateFinalStep predicateWithBoost(SearchPredicateFactory f, int matchingDocOrdinal,
 				float boost, AbstractPredicateDataSet dataSet,
 				StubMappedIndex index) {
-			return f.matchAll().except( f.id().matchingAny( ScoreIT.dataSet.docIdsExcept( matchingDocOrdinal ) ) )
+			return f.matchAll().except( f.id().matchingAny( ScoreConfigured.dataSet.docIdsExcept( matchingDocOrdinal ) ) )
 					.boost( boost );
 		}
 
 		@Override
 		protected PredicateFinalStep predicateWithConstantScore(SearchPredicateFactory f, int matchingDocOrdinal,
 				AbstractPredicateDataSet dataSet, StubMappedIndex index) {
-			return f.matchAll().except( f.id().matchingAny( ScoreIT.dataSet.docIdsExcept( matchingDocOrdinal ) ) )
+			return f.matchAll().except( f.id().matchingAny( ScoreConfigured.dataSet.docIdsExcept( matchingDocOrdinal ) ) )
 					.constantScore();
 		}
 
@@ -134,7 +142,7 @@ class MatchAllPredicateBaseIT {
 		protected PredicateFinalStep predicateWithConstantScoreAndBoost(SearchPredicateFactory f,
 				int matchingDocOrdinal, float boost, AbstractPredicateDataSet dataSet,
 				StubMappedIndex index) {
-			return f.matchAll().except( f.id().matchingAny( ScoreIT.dataSet.docIdsExcept( matchingDocOrdinal ) ) )
+			return f.matchAll().except( f.id().matchingAny( ScoreConfigured.dataSet.docIdsExcept( matchingDocOrdinal ) ) )
 					.constantScore().boost( boost );
 		}
 

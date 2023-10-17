@@ -22,7 +22,6 @@ import org.junit.jupiter.params.provider.Arguments;
 
 //CHECKSTYLE:OFF HideUtilityClassConstructor ignore the rule since it is a class with nested test classes.
 // cannot make a private constructor.
-
 class OrPredicateBaseIT {
 	//CHECKSTYLE:ON
 
@@ -33,23 +32,27 @@ class OrPredicateBaseIT {
 	static void setup() {
 		setupHelper.start()
 				.withIndexes(
-						ScoreIT.index,
-						AddScoreIT.index
+						ScoreConfigured.index,
+						AddScoreConfigured.index
 				)
 				.setup();
 
-		final BulkIndexer scoreIndexer = ScoreIT.index.bulkIndexer();
-		ScoreIT.dataSet.contribute( scoreIndexer );
+		final BulkIndexer scoreIndexer = ScoreConfigured.index.bulkIndexer();
+		ScoreConfigured.dataSet.contribute( scoreIndexer );
 
-		final BulkIndexer addScoreIndexer = AddScoreIT.index.bulkIndexer();
-		AddScoreIT.dataSet.contribute( addScoreIndexer );
+		final BulkIndexer addScoreIndexer = AddScoreConfigured.index.bulkIndexer();
+		AddScoreConfigured.dataSet.contribute( addScoreIndexer );
 
 		scoreIndexer.join();
 		addScoreIndexer.join();
 	}
 
 	@Nested
-	class ScoreIT extends AbstractPredicateScoreIT {
+	class ScoreIT extends ScoreConfigured {
+		// JDK 11 does not allow static fields in non-static inner class and JUnit does not allow running @Nested tests in static inner classes...
+	}
+
+	abstract static class ScoreConfigured extends AbstractPredicateScoreIT {
 		private static final DataSet dataSet = new DataSet();
 
 		private static final StubMappedIndex index = StubMappedIndex.withoutFields().name( "score" );
@@ -61,21 +64,21 @@ class OrPredicateBaseIT {
 		@Override
 		protected PredicateFinalStep predicate(SearchPredicateFactory f, int matchingDocOrdinal,
 				AbstractPredicateDataSet dataSet, StubMappedIndex index) {
-			return f.or( f.id().matching( ScoreIT.dataSet.docId( matchingDocOrdinal ) ) );
+			return f.or( f.id().matching( ScoreConfigured.dataSet.docId( matchingDocOrdinal ) ) );
 		}
 
 		@Override
 		protected PredicateFinalStep predicateWithBoost(SearchPredicateFactory f, int matchingDocOrdinal,
 				float boost, AbstractPredicateDataSet dataSet,
 				StubMappedIndex index) {
-			return f.or( f.id().matching( ScoreIT.dataSet.docId( matchingDocOrdinal ) ) )
+			return f.or( f.id().matching( ScoreConfigured.dataSet.docId( matchingDocOrdinal ) ) )
 					.boost( boost );
 		}
 
 		@Override
 		protected PredicateFinalStep predicateWithConstantScore(SearchPredicateFactory f, int matchingDocOrdinal,
 				AbstractPredicateDataSet dataSet, StubMappedIndex index) {
-			return f.or( f.id().matching( ScoreIT.dataSet.docId( matchingDocOrdinal ) ) )
+			return f.or( f.id().matching( ScoreConfigured.dataSet.docId( matchingDocOrdinal ) ) )
 					.constantScore();
 		}
 
@@ -83,7 +86,7 @@ class OrPredicateBaseIT {
 		protected PredicateFinalStep predicateWithConstantScoreAndBoost(SearchPredicateFactory f,
 				int matchingDocOrdinal, float boost, AbstractPredicateDataSet dataSet,
 				StubMappedIndex index) {
-			return f.or( f.id().matching( ScoreIT.dataSet.docId( matchingDocOrdinal ) ) )
+			return f.or( f.id().matching( ScoreConfigured.dataSet.docId( matchingDocOrdinal ) ) )
 					.constantScore()
 					.boost( boost );
 		}
@@ -102,7 +105,11 @@ class OrPredicateBaseIT {
 	}
 
 	@Nested
-	class AddScoreIT extends AbstractPredicateScoreIT {
+	class AddScoreIT extends AddScoreConfigured {
+		// JDK 11 does not allow static fields in non-static inner class and JUnit does not allow running @Nested tests in static inner classes...
+	}
+
+	abstract static class AddScoreConfigured extends AbstractPredicateScoreIT {
 		private static final DataSet dataSet = new DataSet();
 
 		private static final StubMappedIndex index = StubMappedIndex.withoutFields().name( "addscore" );
@@ -115,7 +122,7 @@ class OrPredicateBaseIT {
 		protected PredicateFinalStep predicate(SearchPredicateFactory f, int matchingDocOrdinal,
 				AbstractPredicateDataSet dataSet, StubMappedIndex index) {
 			return f.or()
-					.add( f.id().matching( AddScoreIT.dataSet.docId( matchingDocOrdinal ) ) );
+					.add( f.id().matching( AddScoreConfigured.dataSet.docId( matchingDocOrdinal ) ) );
 		}
 
 		@Override
@@ -123,7 +130,7 @@ class OrPredicateBaseIT {
 				float boost, AbstractPredicateDataSet dataSet,
 				StubMappedIndex index) {
 			return f.or()
-					.add( f.id().matching( AddScoreIT.dataSet.docId( matchingDocOrdinal ) ) )
+					.add( f.id().matching( AddScoreConfigured.dataSet.docId( matchingDocOrdinal ) ) )
 					.boost( boost );
 		}
 
@@ -131,7 +138,7 @@ class OrPredicateBaseIT {
 		protected PredicateFinalStep predicateWithConstantScore(SearchPredicateFactory f, int matchingDocOrdinal,
 				AbstractPredicateDataSet dataSet, StubMappedIndex index) {
 			return f.or()
-					.add( f.id().matching( AddScoreIT.dataSet.docId( matchingDocOrdinal ) ) )
+					.add( f.id().matching( AddScoreConfigured.dataSet.docId( matchingDocOrdinal ) ) )
 					.constantScore();
 		}
 
@@ -140,7 +147,7 @@ class OrPredicateBaseIT {
 				int matchingDocOrdinal, float boost, AbstractPredicateDataSet dataSet,
 				StubMappedIndex index) {
 			return f.or()
-					.add( f.id().matching( AddScoreIT.dataSet.docId( matchingDocOrdinal ) ) )
+					.add( f.id().matching( AddScoreConfigured.dataSet.docId( matchingDocOrdinal ) ) )
 					.constantScore()
 					.boost( boost );
 		}

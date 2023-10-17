@@ -26,7 +26,6 @@ import org.junit.jupiter.params.provider.Arguments;
 
 //CHECKSTYLE:OFF HideUtilityClassConstructor ignore the rule since it is a class with nested test classes.
 // cannot make a private constructor.
-
 class SpatialWithinBoundingBoxPredicateBaseIT {
 	//CHECKSTYLE:ON
 
@@ -50,41 +49,43 @@ class SpatialWithinBoundingBoxPredicateBaseIT {
 	static void setup() {
 		setupHelper.start()
 				.withIndexes(
-						SingleFieldIT.index, MultiFieldIT.index,
-						InObjectFieldIT.mainIndex, InObjectFieldIT.missingFieldIndex,
-						ScoreIT.index,
-						InvalidFieldIT.index, UnsupportedTypeIT.index,
-						SearchableIT.searchableYesIndex, SearchableIT.searchableNoIndex,
-						ArgumentCheckingIT.index,
-						TypeCheckingNoConversionIT.index, TypeCheckingNoConversionIT.compatibleIndex,
-						TypeCheckingNoConversionIT.rawFieldCompatibleIndex, TypeCheckingNoConversionIT.missingFieldIndex,
-						TypeCheckingNoConversionIT.incompatibleIndex
+						SingleFieldConfigured.index, MultiFieldConfigured.index,
+						InObjectFieldConfigured.mainIndex, InObjectFieldConfigured.missingFieldIndex,
+						ScoreConfigured.index,
+						InvalidFieldConfigured.index, UnsupportedTypeConfigured.index,
+						SearchableConfigured.searchableYesIndex, SearchableConfigured.searchableNoIndex,
+						ArgumentCheckingConfigured.index,
+						TypeCheckingNoConversionConfigured.index, TypeCheckingNoConversionConfigured.compatibleIndex,
+						TypeCheckingNoConversionConfigured.rawFieldCompatibleIndex,
+						TypeCheckingNoConversionConfigured.missingFieldIndex,
+						TypeCheckingNoConversionConfigured.incompatibleIndex
 				)
 				.setup();
 
-		final BulkIndexer singleFieldIndexer = SingleFieldIT.index.bulkIndexer();
-		SingleFieldIT.dataSet.contribute( SingleFieldIT.index, singleFieldIndexer );
+		final BulkIndexer singleFieldIndexer = SingleFieldConfigured.index.bulkIndexer();
+		SingleFieldConfigured.dataSet.contribute( SingleFieldConfigured.index, singleFieldIndexer );
 
-		final BulkIndexer multiFieldIndexer = MultiFieldIT.index.bulkIndexer();
-		MultiFieldIT.dataSet.contribute( MultiFieldIT.index, multiFieldIndexer );
+		final BulkIndexer multiFieldIndexer = MultiFieldConfigured.index.bulkIndexer();
+		MultiFieldConfigured.dataSet.contribute( MultiFieldConfigured.index, multiFieldIndexer );
 
-		final BulkIndexer inObjectFieldMainIndexer = InObjectFieldIT.mainIndex.bulkIndexer();
-		final BulkIndexer inObjectFieldMissingFieldIndexer = InObjectFieldIT.missingFieldIndex.bulkIndexer();
-		InObjectFieldIT.dataSet.contribute( InObjectFieldIT.mainIndex, inObjectFieldMainIndexer,
-				InObjectFieldIT.missingFieldIndex, inObjectFieldMissingFieldIndexer );
+		final BulkIndexer inObjectFieldMainIndexer = InObjectFieldConfigured.mainIndex.bulkIndexer();
+		final BulkIndexer inObjectFieldMissingFieldIndexer = InObjectFieldConfigured.missingFieldIndex.bulkIndexer();
+		InObjectFieldConfigured.dataSet.contribute( InObjectFieldConfigured.mainIndex, inObjectFieldMainIndexer,
+				InObjectFieldConfigured.missingFieldIndex, inObjectFieldMissingFieldIndexer );
 
-		final BulkIndexer scoreIndexer = ScoreIT.index.bulkIndexer();
-		ScoreIT.dataSet.contribute( ScoreIT.index, scoreIndexer );
+		final BulkIndexer scoreIndexer = ScoreConfigured.index.bulkIndexer();
+		ScoreConfigured.dataSet.contribute( ScoreConfigured.index, scoreIndexer );
 
-		final BulkIndexer typeCheckingMainIndexer = TypeCheckingNoConversionIT.index.bulkIndexer();
-		final BulkIndexer typeCheckingCompatibleIndexer = TypeCheckingNoConversionIT.compatibleIndex.bulkIndexer();
+		final BulkIndexer typeCheckingMainIndexer = TypeCheckingNoConversionConfigured.index.bulkIndexer();
+		final BulkIndexer typeCheckingCompatibleIndexer = TypeCheckingNoConversionConfigured.compatibleIndex.bulkIndexer();
 		final BulkIndexer typeCheckingRawFieldCompatibleIndexer =
-				TypeCheckingNoConversionIT.rawFieldCompatibleIndex.bulkIndexer();
-		final BulkIndexer typeCheckingMissingFieldIndexer = TypeCheckingNoConversionIT.missingFieldIndex.bulkIndexer();
-		TypeCheckingNoConversionIT.dataSet.contribute( TypeCheckingNoConversionIT.index, typeCheckingMainIndexer,
-				TypeCheckingNoConversionIT.compatibleIndex, typeCheckingCompatibleIndexer,
-				TypeCheckingNoConversionIT.rawFieldCompatibleIndex, typeCheckingRawFieldCompatibleIndexer,
-				TypeCheckingNoConversionIT.missingFieldIndex, typeCheckingMissingFieldIndexer );
+				TypeCheckingNoConversionConfigured.rawFieldCompatibleIndex.bulkIndexer();
+		final BulkIndexer typeCheckingMissingFieldIndexer = TypeCheckingNoConversionConfigured.missingFieldIndex.bulkIndexer();
+		TypeCheckingNoConversionConfigured.dataSet.contribute( TypeCheckingNoConversionConfigured.index,
+				typeCheckingMainIndexer,
+				TypeCheckingNoConversionConfigured.compatibleIndex, typeCheckingCompatibleIndexer,
+				TypeCheckingNoConversionConfigured.rawFieldCompatibleIndex, typeCheckingRawFieldCompatibleIndexer,
+				TypeCheckingNoConversionConfigured.missingFieldIndex, typeCheckingMissingFieldIndexer );
 
 		singleFieldIndexer.join(
 				multiFieldIndexer, inObjectFieldMainIndexer, inObjectFieldMissingFieldIndexer,
@@ -99,7 +100,12 @@ class SpatialWithinBoundingBoxPredicateBaseIT {
 	}
 
 	@Nested
-	class SingleFieldIT extends AbstractPredicateSingleFieldIT<SpatialWithinBoundingBoxPredicateTestValues> {
+	class SingleFieldIT extends SingleFieldConfigured {
+		// JDK 11 does not allow static fields in non-static inner class and JUnit does not allow running @Nested tests in static inner classes...
+	}
+
+	abstract static class SingleFieldConfigured
+			extends AbstractPredicateSingleFieldIT<SpatialWithinBoundingBoxPredicateTestValues> {
 		private static final DataSet<GeoPoint, SpatialWithinBoundingBoxPredicateTestValues> dataSet =
 				new DataSet<>( testValues() );
 
@@ -115,12 +121,17 @@ class SpatialWithinBoundingBoxPredicateBaseIT {
 		protected PredicateFinalStep predicate(SearchPredicateFactory f, String fieldPath, int matchingDocOrdinal,
 				DataSet<?, SpatialWithinBoundingBoxPredicateTestValues> dataSet) {
 			return f.spatial().within().field( fieldPath )
-					.boundingBox( SingleFieldIT.dataSet.values.matchingArg( matchingDocOrdinal ) );
+					.boundingBox( SingleFieldConfigured.dataSet.values.matchingArg( matchingDocOrdinal ) );
 		}
 	}
 
 	@Nested
-	class MultiFieldIT extends AbstractPredicateMultiFieldIT<SpatialWithinBoundingBoxPredicateTestValues> {
+	class MultiFieldIT extends MultiFieldConfigured {
+		// JDK 11 does not allow static fields in non-static inner class and JUnit does not allow running @Nested tests in static inner classes...
+	}
+
+	abstract static class MultiFieldConfigured
+			extends AbstractPredicateMultiFieldIT<SpatialWithinBoundingBoxPredicateTestValues> {
 		private static final DataSet<GeoPoint, SpatialWithinBoundingBoxPredicateTestValues> dataSet =
 				new DataSet<>( testValues() );
 
@@ -137,14 +148,14 @@ class SpatialWithinBoundingBoxPredicateBaseIT {
 				String otherFieldPath, int matchingDocOrdinal,
 				DataSet<?, SpatialWithinBoundingBoxPredicateTestValues> dataSet) {
 			return f.spatial().within().field( fieldPath ).field( otherFieldPath )
-					.boundingBox( MultiFieldIT.dataSet.values.matchingArg( matchingDocOrdinal ) );
+					.boundingBox( MultiFieldConfigured.dataSet.values.matchingArg( matchingDocOrdinal ) );
 		}
 
 		@Override
 		protected PredicateFinalStep predicateOnFields(SearchPredicateFactory f, String[] fieldPaths, int matchingDocOrdinal,
 				DataSet<?, SpatialWithinBoundingBoxPredicateTestValues> dataSet) {
 			return f.spatial().within().fields( fieldPaths )
-					.boundingBox( MultiFieldIT.dataSet.values.matchingArg( matchingDocOrdinal ) );
+					.boundingBox( MultiFieldConfigured.dataSet.values.matchingArg( matchingDocOrdinal ) );
 		}
 
 		@Override
@@ -152,12 +163,16 @@ class SpatialWithinBoundingBoxPredicateBaseIT {
 				String[] fieldPaths, int matchingDocOrdinal,
 				DataSet<?, SpatialWithinBoundingBoxPredicateTestValues> dataSet) {
 			return f.spatial().within().field( fieldPath ).fields( fieldPaths )
-					.boundingBox( MultiFieldIT.dataSet.values.matchingArg( matchingDocOrdinal ) );
+					.boundingBox( MultiFieldConfigured.dataSet.values.matchingArg( matchingDocOrdinal ) );
 		}
 	}
 
 	@Nested
-	class InObjectFieldIT
+	class InObjectFieldIT extends InObjectFieldConfigured {
+		// JDK 11 does not allow static fields in non-static inner class and JUnit does not allow running @Nested tests in static inner classes...
+	}
+
+	abstract static class InObjectFieldConfigured
 			extends AbstractPredicateFieldInObjectFieldIT<SpatialWithinBoundingBoxPredicateTestValues> {
 		private static final DataSet<GeoPoint, SpatialWithinBoundingBoxPredicateTestValues> dataSet =
 				new DataSet<>( testValues() );
@@ -180,12 +195,16 @@ class SpatialWithinBoundingBoxPredicateBaseIT {
 		protected PredicateFinalStep predicate(SearchPredicateFactory f, String fieldPath, int matchingDocOrdinal,
 				DataSet<?, SpatialWithinBoundingBoxPredicateTestValues> dataSet) {
 			return f.spatial().within().field( fieldPath )
-					.boundingBox( InObjectFieldIT.dataSet.values.matchingArg( matchingDocOrdinal ) );
+					.boundingBox( InObjectFieldConfigured.dataSet.values.matchingArg( matchingDocOrdinal ) );
 		}
 	}
 
 	@Nested
-	class ScoreIT extends AbstractPredicateFieldScoreIT<SpatialWithinBoundingBoxPredicateTestValues> {
+	class ScoreIT extends ScoreConfigured {
+		// JDK 11 does not allow static fields in non-static inner class and JUnit does not allow running @Nested tests in static inner classes...
+	}
+
+	abstract static class ScoreConfigured extends AbstractPredicateFieldScoreIT<SpatialWithinBoundingBoxPredicateTestValues> {
 		private static final DataSet<GeoPoint, SpatialWithinBoundingBoxPredicateTestValues> dataSet =
 				new DataSet<>( testValues() );
 
@@ -201,21 +220,21 @@ class SpatialWithinBoundingBoxPredicateBaseIT {
 		protected PredicateFinalStep predicate(SearchPredicateFactory f, String fieldPath, int matchingDocOrdinal,
 				DataSet<?, SpatialWithinBoundingBoxPredicateTestValues> dataSet) {
 			return f.spatial().within().field( fieldPath )
-					.boundingBox( ScoreIT.dataSet.values.matchingArg( matchingDocOrdinal ) );
+					.boundingBox( ScoreConfigured.dataSet.values.matchingArg( matchingDocOrdinal ) );
 		}
 
 		@Override
 		protected PredicateFinalStep predicateWithConstantScore(SearchPredicateFactory f, String[] fieldPaths,
 				int matchingDocOrdinal, DataSet<?, SpatialWithinBoundingBoxPredicateTestValues> dataSet) {
 			return f.spatial().within().fields( fieldPaths )
-					.boundingBox( ScoreIT.dataSet.values.matchingArg( matchingDocOrdinal ) ).constantScore();
+					.boundingBox( ScoreConfigured.dataSet.values.matchingArg( matchingDocOrdinal ) ).constantScore();
 		}
 
 		@Override
 		protected PredicateFinalStep predicateWithPredicateLevelBoost(SearchPredicateFactory f, String[] fieldPaths,
 				int matchingDocOrdinal, float predicateBoost, DataSet<?, SpatialWithinBoundingBoxPredicateTestValues> dataSet) {
 			return f.spatial().within().fields( fieldPaths )
-					.boundingBox( ScoreIT.dataSet.values.matchingArg( matchingDocOrdinal ) ).boost( predicateBoost );
+					.boundingBox( ScoreConfigured.dataSet.values.matchingArg( matchingDocOrdinal ) ).boost( predicateBoost );
 		}
 
 		@Override
@@ -223,14 +242,14 @@ class SpatialWithinBoundingBoxPredicateBaseIT {
 				String[] fieldPaths, int matchingDocOrdinal, float predicateBoost,
 				DataSet<?, SpatialWithinBoundingBoxPredicateTestValues> dataSet) {
 			return f.spatial().within().fields( fieldPaths )
-					.boundingBox( ScoreIT.dataSet.values.matchingArg( matchingDocOrdinal ) ).boost( predicateBoost );
+					.boundingBox( ScoreConfigured.dataSet.values.matchingArg( matchingDocOrdinal ) ).boost( predicateBoost );
 		}
 
 		@Override
 		protected PredicateFinalStep predicateWithFieldLevelBoost(SearchPredicateFactory f, String fieldPath,
 				float fieldBoost, int matchingDocOrdinal, DataSet<?, SpatialWithinBoundingBoxPredicateTestValues> dataSet) {
 			return f.spatial().within().field( fieldPath ).boost( fieldBoost )
-					.boundingBox( ScoreIT.dataSet.values.matchingArg( matchingDocOrdinal ) );
+					.boundingBox( ScoreConfigured.dataSet.values.matchingArg( matchingDocOrdinal ) );
 		}
 
 		@Override
@@ -238,7 +257,7 @@ class SpatialWithinBoundingBoxPredicateBaseIT {
 				String fieldPath, float fieldBoost, int matchingDocOrdinal,
 				DataSet<?, SpatialWithinBoundingBoxPredicateTestValues> dataSet) {
 			return f.spatial().within().field( fieldPath ).boost( fieldBoost )
-					.boundingBox( ScoreIT.dataSet.values.matchingArg( matchingDocOrdinal ) ).constantScore();
+					.boundingBox( ScoreConfigured.dataSet.values.matchingArg( matchingDocOrdinal ) ).constantScore();
 		}
 
 		@Override
@@ -246,16 +265,20 @@ class SpatialWithinBoundingBoxPredicateBaseIT {
 				String fieldPath, float fieldBoost, int matchingDocOrdinal, float predicateBoost,
 				DataSet<?, SpatialWithinBoundingBoxPredicateTestValues> dataSet) {
 			return f.spatial().within().field( fieldPath ).boost( fieldBoost )
-					.boundingBox( ScoreIT.dataSet.values.matchingArg( matchingDocOrdinal ) ).boost( predicateBoost );
+					.boundingBox( ScoreConfigured.dataSet.values.matchingArg( matchingDocOrdinal ) ).boost( predicateBoost );
 		}
 	}
 
 	@Nested
-	class InvalidFieldIT extends AbstractPredicateInvalidFieldIT {
+	class InvalidFieldIT extends InvalidFieldConfigured {
+		// JDK 11 does not allow static fields in non-static inner class and JUnit does not allow running @Nested tests in static inner classes...
+	}
+
+	abstract static class InvalidFieldConfigured extends AbstractPredicateInvalidFieldIT {
 		private static final SimpleMappedIndex<IndexBinding> index = SimpleMappedIndex.of( IndexBinding::new )
 				.name( "invalidField" );
 
-		public InvalidFieldIT() {
+		public InvalidFieldConfigured() {
 			super( index );
 		}
 
@@ -273,7 +296,11 @@ class SpatialWithinBoundingBoxPredicateBaseIT {
 	}
 
 	@Nested
-	class UnsupportedTypeIT extends AbstractPredicateUnsupportedTypeIT {
+	class UnsupportedTypeIT extends UnsupportedTypeConfigured {
+		// JDK 11 does not allow static fields in non-static inner class and JUnit does not allow running @Nested tests in static inner classes...
+	}
+
+	abstract static class UnsupportedTypeConfigured extends AbstractPredicateUnsupportedTypeIT {
 		private static final SimpleMappedIndex<IndexBinding> index =
 				SimpleMappedIndex.of( root -> new IndexBinding( root, unsupportedFieldTypes ) )
 						.name( "unsupportedType" );
@@ -303,7 +330,11 @@ class SpatialWithinBoundingBoxPredicateBaseIT {
 	}
 
 	@Nested
-	class SearchableIT extends AbstractPredicateSearchableIT {
+	class SearchableIT extends SearchableConfigured {
+		// JDK 11 does not allow static fields in non-static inner class and JUnit does not allow running @Nested tests in static inner classes...
+	}
+
+	abstract static class SearchableConfigured extends AbstractPredicateSearchableIT {
 		private static final SimpleMappedIndex<SearchableYesIndexBinding> searchableYesIndex =
 				SimpleMappedIndex.of( root -> new SearchableYesIndexBinding( root, supportedFieldTypes ) )
 						.name( "searchableYes" );
@@ -330,7 +361,11 @@ class SpatialWithinBoundingBoxPredicateBaseIT {
 	}
 
 	@Nested
-	class ArgumentCheckingIT extends AbstractPredicateArgumentCheckingIT {
+	class ArgumentCheckingIT extends ArgumentCheckingConfigured {
+		// JDK 11 does not allow static fields in non-static inner class and JUnit does not allow running @Nested tests in static inner classes...
+	}
+
+	abstract static class ArgumentCheckingConfigured extends AbstractPredicateArgumentCheckingIT {
 		private static final SimpleMappedIndex<IndexBinding> index =
 				SimpleMappedIndex.of( root -> new IndexBinding( root, supportedFieldTypes ) )
 						.name( "argumentChecking" );
@@ -346,7 +381,11 @@ class SpatialWithinBoundingBoxPredicateBaseIT {
 	}
 
 	@Nested
-	class TypeCheckingNoConversionIT
+	class TypeCheckingNoConversionIT extends TypeCheckingNoConversionConfigured {
+		// JDK 11 does not allow static fields in non-static inner class and JUnit does not allow running @Nested tests in static inner classes...
+	}
+
+	abstract static class TypeCheckingNoConversionConfigured
 			extends AbstractPredicateTypeCheckingNoConversionIT<SpatialWithinBoundingBoxPredicateTestValues> {
 		private static final DataSet<GeoPoint, SpatialWithinBoundingBoxPredicateTestValues> dataSet =
 				new DataSet<>( testValues() );
@@ -376,14 +415,14 @@ class SpatialWithinBoundingBoxPredicateBaseIT {
 		protected PredicateFinalStep predicate(SearchPredicateFactory f, String fieldPath, int matchingDocOrdinal,
 				DataSet<?, SpatialWithinBoundingBoxPredicateTestValues> dataSet) {
 			return f.spatial().within().field( fieldPath )
-					.boundingBox( TypeCheckingNoConversionIT.dataSet.values.matchingArg( matchingDocOrdinal ) );
+					.boundingBox( TypeCheckingNoConversionConfigured.dataSet.values.matchingArg( matchingDocOrdinal ) );
 		}
 
 		@Override
 		protected PredicateFinalStep predicate(SearchPredicateFactory f, String field0Path, String field1Path,
 				int matchingDocOrdinal, DataSet<?, SpatialWithinBoundingBoxPredicateTestValues> dataSet) {
 			return f.spatial().within().field( field0Path ).field( field1Path )
-					.boundingBox( TypeCheckingNoConversionIT.dataSet.values.matchingArg( matchingDocOrdinal ) );
+					.boundingBox( TypeCheckingNoConversionConfigured.dataSet.values.matchingArg( matchingDocOrdinal ) );
 		}
 
 		@Override
