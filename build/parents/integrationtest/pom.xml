@@ -151,9 +151,7 @@
             <properties>
                 <jdbc.driver.groupId>org.postgresql</jdbc.driver.groupId>
                 <jdbc.driver.artifactId>postgresql</jdbc.driver.artifactId>
-                <test.database.run.image.pull>true</test.database.run.image.pull>
-                <test.database.run.image.name>${test.database.run.postgres.image.name}</test.database.run.image.name>
-                <test.database.run.image.tag>${test.database.run.postgres.image.tag}</test.database.run.image.tag>
+                <test.database.run.kind>postgresql</test.database.run.kind>
             </properties>
         </profile>
 
@@ -164,9 +162,7 @@
             <properties>
                 <jdbc.driver.groupId>org.mariadb.jdbc</jdbc.driver.groupId>
                 <jdbc.driver.artifactId>mariadb-java-client</jdbc.driver.artifactId>
-                <test.database.run.image.pull>true</test.database.run.image.pull>
-                <test.database.run.image.name>${test.database.run.mariadb.image.name}</test.database.run.image.name>
-                <test.database.run.image.tag>${test.database.run.mariadb.image.tag}</test.database.run.image.tag>
+                <test.database.run.kind>mariadb</test.database.run.kind>
             </properties>
         </profile>
 
@@ -177,9 +173,7 @@
             <properties>
                 <jdbc.driver.groupId>com.mysql</jdbc.driver.groupId>
                 <jdbc.driver.artifactId>mysql-connector-j</jdbc.driver.artifactId>
-                <test.database.run.image.pull>true</test.database.run.image.pull>
-                <test.database.run.image.name>${test.database.run.mysql.image.name}</test.database.run.image.name>
-                <test.database.run.image.tag>${test.database.run.mysql.image.tag}</test.database.run.image.tag>
+                <test.database.run.kind>mysql</test.database.run.kind>
             </properties>
         </profile>
 
@@ -190,9 +184,7 @@
             <properties>
                 <jdbc.driver.groupId>com.ibm.db2</jdbc.driver.groupId>
                 <jdbc.driver.artifactId>jcc</jdbc.driver.artifactId>
-                <test.database.run.image.pull>true</test.database.run.image.pull>
-                <test.database.run.image.name>${test.database.run.db2.image.name}</test.database.run.image.name>
-                <test.database.run.image.tag>${test.database.run.db2.image.tag}</test.database.run.image.tag>
+                <test.database.run.kind>db2</test.database.run.kind>
             </properties>
         </profile>
 
@@ -203,9 +195,7 @@
             <properties>
                 <jdbc.driver.groupId>com.oracle.database.jdbc</jdbc.driver.groupId>
                 <jdbc.driver.artifactId>ojdbc11</jdbc.driver.artifactId>
-                <test.database.run.image.pull>true</test.database.run.image.pull>
-                <test.database.run.image.name>${test.database.run.oracle.image.name}</test.database.run.image.name>
-                <test.database.run.image.tag>${test.database.run.oracle.image.tag}</test.database.run.image.tag>
+                <test.database.run.kind>oracle</test.database.run.kind>
                 <!-- avoid `ORA-01882: timezone region not found` exception on CI -->
                 <failsafe.jvm.args.jdbc>-Doracle.jdbc.timezoneAsRegion=false</failsafe.jvm.args.jdbc>
             </properties>
@@ -218,9 +208,7 @@
             <properties>
                 <jdbc.driver.groupId>com.microsoft.sqlserver</jdbc.driver.groupId>
                 <jdbc.driver.artifactId>mssql-jdbc</jdbc.driver.artifactId>
-                <test.database.run.image.pull>true</test.database.run.image.pull>
-                <test.database.run.image.name>${test.database.run.mssql.image.name}</test.database.run.image.name>
-                <test.database.run.image.tag>${test.database.run.mssql.image.tag}</test.database.run.image.tag>
+                <test.database.run.kind>mssql</test.database.run.kind>
             </properties>
         </profile>
 
@@ -232,9 +220,7 @@
                 <!-- CockroachDB uses the same client protocol as PostgreSQL (pgwire), so the driver is the same. -->
                 <jdbc.driver.groupId>org.postgresql</jdbc.driver.groupId>
                 <jdbc.driver.artifactId>postgresql</jdbc.driver.artifactId>
-                <test.database.run.image.pull>true</test.database.run.image.pull>
-                <test.database.run.image.name>${test.database.run.cockroachdb.image.name}</test.database.run.image.name>
-                <test.database.run.image.tag>${test.database.run.cockroachdb.image.tag}</test.database.run.image.tag>
+                <test.database.run.kind>cockroachdb</test.database.run.kind>
             </properties>
         </profile>
     </profiles>

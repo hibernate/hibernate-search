@@ -1194,8 +1194,8 @@
                             <org.hibernate.search.integrationtest.backend.elasticsearch.distribution>${test.elasticsearch.distribution}</org.hibernate.search.integrationtest.backend.elasticsearch.distribution>
                             <org.hibernate.search.integrationtest.backend.elasticsearch.name>${test.searchengine.run.image.name}</org.hibernate.search.integrationtest.backend.elasticsearch.name>
                             <org.hibernate.search.integrationtest.backend.elasticsearch.tag>${test.searchengine.run.image.tag}</org.hibernate.search.integrationtest.backend.elasticsearch.tag>
-                            <org.hibernate.search.integrationtest.orm.database.image.name>${test.database.run.image.name}</org.hibernate.search.integrationtest.orm.database.image.name>
-                            <org.hibernate.search.integrationtest.orm.database.image.tag>${test.database.run.image.tag}</org.hibernate.search.integrationtest.orm.database.image.tag>
+                            <org.hibernate.search.integrationtest.orm.database.kind>${test.database.run.kind}</org.hibernate.search.integrationtest.orm.database.kind>
+                            <org.hibernate.search.integrationtest.orm.project.root.directory>${rootProject.directory}</org.hibernate.search.integrationtest.orm.project.root.directory>
                         </systemPropertyVariables>
                     </configuration>
                 </plugin>
