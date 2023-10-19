@@ -4,6 +4,13 @@
 # https://help.github.com/github/administering-a-repository/configuration-options-for-dependency-updates
 
 version: 2
+registries:
+  dockerhub:
+    type: docker-registry
+    url: https://registry.hub.docker.com
+    username: ${{secrets.DOCKERHUB_USERNAME}}
+    password: ${{secrets.DOCKERHUB_TOKEN}}
+    replaces-base: true
 updates:
   - package-ecosystem: "maven"
     directory: "/"
@@ -99,3 +106,11 @@ updates:
       # See https://github.com/dependabot/dependabot-core/issues/4028
       # And, additionally, it is only for performance testing.
       - dependency-name: "org.bsc.maven:maven-processor-plugin"
+  - package-ecosystem: "docker"
+    registries:
+      - dockerhub
+    # For dependabot to find Docker files they all should be in the same directory.
+    # Dependabot is picking any files that has `dockerfile` in them.
+    directory: "/build/container/"
+    schedule:
+      interval: "monthly"
