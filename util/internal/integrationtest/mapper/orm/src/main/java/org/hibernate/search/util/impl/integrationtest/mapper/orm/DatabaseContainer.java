@@ -6,19 +6,19 @@
  */
 package org.hibernate.search.util.impl.integrationtest.mapper.orm;
 
+import java.nio.file.Path;
 import java.time.Duration;
 import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
-import java.util.concurrent.Future;
 import java.util.function.Consumer;
 
 import com.github.dockerjava.api.model.HostConfig;
 import com.github.dockerjava.api.model.Ulimit;
 
 import org.testcontainers.containers.JdbcDatabaseContainer;
-import org.testcontainers.utility.DockerImageName;
+import org.testcontainers.images.builder.ImageFromDockerfile;
 
 /*
  * Suppress "Resource leak: '<unassigned Closeable value>' is never closed". Testcontainers take care of closing
@@ -40,13 +40,15 @@ public final class DatabaseContainer {
 
 
 	static {
-		String name = System.getProperty( "org.hibernate.search.integrationtest.orm.database.image.name", "" );
-		String tag = System.getProperty( "org.hibernate.search.integrationtest.orm.database.image.tag" );
+		String name = System.getProperty( "org.hibernate.search.integrationtest.orm.database.kind", "" );
+		Path root = Path.of( System.getProperty( "org.hibernate.search.integrationtest.orm.project.root.directory", "" ) );
 		DATABASE = SupportedDatabase.from( name );
 
-		DATABASE_CONTAINER = DATABASE.container( name, tag );
+		DATABASE_CONTAINER = DATABASE.container(
+				root.resolve( "build" ).resolve( "container" ).resolve( name + ".Dockerfile" ),
+				name
+		);
 	}
-
 
 	public static Configuration configuration() {
 		return configure( Configuration::addAsSystemProperties );
@@ -102,7 +104,7 @@ public final class DatabaseContainer {
 			}
 
 			@Override
-			HibernateSearchJdbcDatabaseContainer container(String name, String tag) {
+			HibernateSearchJdbcDatabaseContainer container(Path dockerfile, String name) {
 				return null;
 			}
 		},
@@ -113,9 +115,9 @@ public final class DatabaseContainer {
 			}
 
 			@Override
-			HibernateSearchJdbcDatabaseContainer container(String name, String tag) {
+			HibernateSearchJdbcDatabaseContainer container(Path dockerfile, String name) {
 				return new HibernateSearchJdbcDatabaseContainer(
-						DockerImageName.parse( name ).withTag( tag ),
+						dockerfile, name,
 						"org.postgresql.Driver",
 						"jdbc:postgresql://%s:%d/hibernate_orm_test",
 						5432,
@@ -134,9 +136,9 @@ public final class DatabaseContainer {
 			}
 
 			@Override
-			HibernateSearchJdbcDatabaseContainer container(String name, String tag) {
+			HibernateSearchJdbcDatabaseContainer container(Path dockerfile, String name) {
 				return new HibernateSearchJdbcDatabaseContainer(
-						DockerImageName.parse( name ).withTag( tag ),
+						dockerfile, name,
 						"org.mariadb.jdbc.Driver",
 						"jdbc:mariadb://%s:%d/hibernate_orm_test",
 						3306,
@@ -158,9 +160,9 @@ public final class DatabaseContainer {
 			}
 
 			@Override
-			HibernateSearchJdbcDatabaseContainer container(String name, String tag) {
+			HibernateSearchJdbcDatabaseContainer container(Path dockerfile, String name) {
 				return new HibernateSearchJdbcDatabaseContainer(
-						DockerImageName.parse( name ).withTag( tag ),
+						dockerfile, name,
 						"com.mysql.jdbc.Driver",
 						"jdbc:mysql://%s:%d/hibernate_orm_test",
 						3306,
@@ -182,9 +184,9 @@ public final class DatabaseContainer {
 			}
 
 			@Override
-			HibernateSearchJdbcDatabaseContainer container(String name, String tag) {
+			HibernateSearchJdbcDatabaseContainer container(Path dockerfile, String name) {
 				return new HibernateSearchJdbcDatabaseContainer(
-						DockerImageName.parse( name ).withTag( tag ),
+						dockerfile, name,
 						"com.ibm.db2.jcc.DB2Driver",
 						"jdbc:db2://%s:%d/hreact",
 						50000,
@@ -214,11 +216,11 @@ public final class DatabaseContainer {
 			}
 
 			@Override
-			HibernateSearchJdbcDatabaseContainer container(String name, String tag) {
+			HibernateSearchJdbcDatabaseContainer container(Path dockerfile, String name) {
 				return new HibernateSearchJdbcDatabaseContainer(
-						DockerImageName.parse( name ).withTag( tag ),
+						dockerfile, name,
 						"oracle.jdbc.OracleDriver",
-						"jdbc:oracle:thin:@%s:%d/XE",
+						"jdbc:oracle:thin:@%s:%d/FREEPDB1",
 						1521,
 						"SYSTEM",
 						"hibernate_orm_test",
@@ -234,9 +236,9 @@ public final class DatabaseContainer {
 			}
 
 			@Override
-			HibernateSearchJdbcDatabaseContainer container(String name, String tag) {
+			HibernateSearchJdbcDatabaseContainer container(Path dockerfile, String name) {
 				return new HibernateSearchJdbcDatabaseContainer(
-						DockerImageName.parse( name ).withTag( tag ),
+						dockerfile, name,
 						"com.microsoft.sqlserver.jdbc.SQLServerDriver",
 						"jdbc:sqlserver://%s:%d;databaseName=tempdb",
 						1433,
@@ -255,9 +257,9 @@ public final class DatabaseContainer {
 			}
 
 			@Override
-			HibernateSearchJdbcDatabaseContainer container(String name, String tag) {
+			HibernateSearchJdbcDatabaseContainer container(Path dockerfile, String name) {
 				return new HibernateSearchJdbcDatabaseContainer(
-						DockerImageName.parse( name ).withTag( tag ),
+						dockerfile, name,
 						"org.postgresql.Driver",
 						"jdbc:postgresql://%s:%d/defaultdb?sslmode=disable",
 						26257,
@@ -289,7 +291,7 @@ public final class DatabaseContainer {
 
 		abstract String dialect();
 
-		abstract HibernateSearchJdbcDatabaseContainer container(String name, String tag);
+		abstract HibernateSearchJdbcDatabaseContainer container(Path dockerfile, String name);
 
 		static SupportedDatabase from(String name) {
 			for ( SupportedDatabase database : values() ) {
@@ -311,31 +313,18 @@ public final class DatabaseContainer {
 		private final String password;
 		private final String testQueryString;
 
-		public HibernateSearchJdbcDatabaseContainer(Future<String> image, String driverClassName, String jdbcUrlPattern,
+		public HibernateSearchJdbcDatabaseContainer(Path dockerfile, String name, String driverClassName, String jdbcUrlPattern,
 				int port, String username, String password, String testQueryString) {
-			super( image );
+			// IMPORTANT: we do not want to delete the image on exit as then we cannot use container reuse.
+			// (these two options are somewhat mutually exclusive).
+			super( new ImageFromDockerfile( "hibernate-search-" + name, false ).withDockerfile( dockerfile ) );
 			this.driverClassName = driverClassName;
 			this.jdbcUrlPattern = jdbcUrlPattern;
 			this.port = port;
 			this.username = username;
 			this.password = password;
 			this.testQueryString = testQueryString;
-			posInit();
-		}
 
-		public HibernateSearchJdbcDatabaseContainer(DockerImageName dockerImageName, String driverClassName,
-				String jdbcUrlPattern, int port, String username, String password, String testQueryString) {
-			super( dockerImageName );
-			this.driverClassName = driverClassName;
-			this.jdbcUrlPattern = jdbcUrlPattern;
-			this.port = port;
-			this.username = username;
-			this.password = password;
-			this.testQueryString = testQueryString;
-			posInit();
-		}
-
-		private void posInit() {
 			withExposedPorts( port );
 			withReuse( true );
 			withStartupTimeout( REGULAR_TIMEOUT );
@@ -412,5 +401,4 @@ public final class DatabaseContainer {
 			System.setProperty( "JDBC_ISOLATION", this.isolation );
 		}
 	}
-
 }

@@ -387,51 +387,9 @@
         <test.elasticsearch.run.opensearch.image.name>docker.io/opensearchproject/opensearch</test.elasticsearch.run.opensearch.image.name>
         <test.elasticsearch.run.opensearch.image.tag>${test.elasticsearch.version}</test.elasticsearch.run.opensearch.image.tag>
 
-        <!-- Test containers ryuk image for container management-->
-        <test.testcontainers.run.image.name>testcontainers/ryuk</test.testcontainers.run.image.name>
-        <test.testcontainers.run.image.tag>0.5.1</test.testcontainers.run.image.tag>
-
-        <!-- PostgreSQL -->
-        <!-- See https://hub.docker.com/_/postgres -->
-        <test.database.run.postgres.skip>true</test.database.run.postgres.skip>
-        <test.database.run.postgres.image.name>docker.io/postgres</test.database.run.postgres.image.name>
-        <test.database.run.postgres.image.tag>15.1</test.database.run.postgres.image.tag>
-        <!-- MariaDB -->
-        <!-- See https://hub.docker.com/_/mariadb -->
-        <test.database.run.mariadb.skip>true</test.database.run.mariadb.skip>
-        <test.database.run.mariadb.image.name>docker.io/mariadb</test.database.run.mariadb.image.name>
-        <test.database.run.mariadb.image.tag>10.10.2</test.database.run.mariadb.image.tag>
-        <!-- MySQL -->
-        <!-- See https://hub.docker.com/_/mysql -->
-        <test.database.run.mysql.skip>true</test.database.run.mysql.skip>
-        <test.database.run.mysql.image.name>docker.io/mysql</test.database.run.mysql.image.name>
-        <test.database.run.mysql.image.tag>8.0.31</test.database.run.mysql.image.tag>
-        <!-- DB2 -->
-        <!-- See https://hub.docker.com/r/ibmcom/db2 -->
-        <test.database.run.db2.skip>true</test.database.run.db2.skip>
-        <test.database.run.db2.image.name>docker.io/ibmcom/db2</test.database.run.db2.image.name>
-        <test.database.run.db2.image.tag>11.5.8.0</test.database.run.db2.image.tag>
-        <!-- Oracle -->
-        <!-- See https://hub.docker.com/r/gvenzl/oracle-xe -->
-        <test.database.run.oracle.skip>true</test.database.run.oracle.skip>
-        <test.database.run.oracle.image.name>docker.io/gvenzl/oracle-xe</test.database.run.oracle.image.name>
-        <test.database.run.oracle.image.tag>21.3.0-slim-faststart</test.database.run.oracle.image.tag>
-        <!-- MS SQL Server -->
-        <!-- See https://hub.docker.com/_/microsoft-mssql-server -->
-        <test.database.run.mssql.skip>true</test.database.run.mssql.skip>
-        <test.database.run.mssql.image.name>mcr.microsoft.com/mssql/server</test.database.run.mssql.image.name>
-        <test.database.run.mssql.image.tag>2019-CU18-ubuntu-20.04</test.database.run.mssql.image.tag>
-        <!-- CockroachDB -->
-        <!-- See https://hub.docker.com/r/cockroachdb/cockroach/tags -->
-        <test.database.run.cockroachdb.skip>true</test.database.run.cockroachdb.skip>
-        <test.database.run.cockroachdb.image.name>docker.io/cockroachdb/cockroach</test.database.run.cockroachdb.image.name>
-        <test.database.run.cockroachdb.image.tag>v23.1.4</test.database.run.cockroachdb.image.tag>
-
         <!-- Docker images to be pulled. To be redefined in specific profiles of Elasticsearch/OpenSearch \
              or database specific ones. -->
-        <test.database.run.image.pull>false</test.database.run.image.pull>
-        <test.database.run.image.name>h2</test.database.run.image.name>
-        <test.database.run.image.tag></test.database.run.image.tag>
+        <test.database.run.kind>h2</test.database.run.kind>
 
         <test.elasticsearch.run.image.pull>true</test.elasticsearch.run.image.pull>
         <test.elasticsearch.run.image.name></test.elasticsearch.run.image.name>
@@ -996,9 +954,12 @@
                                     def isTrueString = { string -> string && Boolean.parseBoolean( string ) }
                                     def isNotBlankString = { string -> string?.trim() }
 
-                                    images += '${test.testcontainers.run.image.name}:${test.testcontainers.run.image.tag}'
-                                    if ( isTrueString( '${test.database.run.image.pull}' ) && isNotBlankString( '${test.database.run.image.name}' ) ) {
-                                        images += '${test.database.run.image.name}:${test.database.run.image.tag}'
+                                    if ( isNotBlankString( '${test.database.run.kind}' ) && '${test.database.run.kind}' != 'h2') {
+                                        def dockerFileContent = new File('./build/container/${test.database.run.kind}.Dockerfile').text
+                                        if ((match = dockerFileContent =~ /FROM (.+)/)) {
+                                            def image = match.group(1).trim()
+                                            images += image
+                                        }
                                     }
                                     if ( isTrueString( '${test.elasticsearch.run.image.pull}' ) && isNotBlankString( '${test.elasticsearch.run.image.name}' ) ) {
                                         images += '${test.elasticsearch.run.image.name}:${test.elasticsearch.run.image.tag}'
