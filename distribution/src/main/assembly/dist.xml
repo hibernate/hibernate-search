@@ -194,6 +194,7 @@
 
                 <!-- only needed for documentation and helper scripts, no need to include them -->
                 <exclude>hibernate-noorm-release-scripts/**</exclude>
+                <exclude>hibernate-release-scripts/**</exclude>
 
                 <!-- actual files which should be ignored -->
                 <exclude>.git</exclude>
