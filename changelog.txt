@@ -1,6 +1,56 @@
 Hibernate Search Changelog
 ==========================
 
+7.0.0.CR1 (2023-10-20)
+-------------------------
+
+** Bug
+    * HSEARCH-4988 Container extractor resolution leads to StackOverflowError on properties of type Path
+    * HSEARCH-4986 Mapping partitions fails in Jakarta Batch mass indexing job for some JDBC drivers (DB2, MSSQL, ...)
+    * HSEARCH-4983 Concurrency issues in Lucene IndexAccessor/IndexWriterProvider may lead to LockObtainFailedException: Lock held by this virtual machine
+    * HSEARCH-4980 Jakarta Batch job fails for entities with embedded ids
+    * HSEARCH-4969 IndexOutOfBoundsException in TextMultiValues
+    * HSEARCH-4947 CodeSource does not work in windows using jar files
+    * HSEARCH-4487 Jakarta Batch Mass Indexing job fails with @IndexedEmbedded entity and MySQL
+
+** Improvement
+    * HSEARCH-4994 Upgrade to Elasticsearch client 8.10.4 and test against Elasticsearch 8.10.4
+    * HSEARCH-4993 Add compatibility with OpenSearch 2.11.0
+    * HSEARCH-4992 Upgrade to AWS SDK 2.21.1
+    * HSEARCH-4990 Upgrade to Elasticsearch client 8.10.3 and test against Elasticsearch 8.10.3
+    * HSEARCH-4984 Upgrade to Avro 1.11.3
+    * HSEARCH-4982 Upgrade to Lucene 9.8
+    * HSEARCH-4978 Add compatibility with OpenSearch 2.10.0
+    * HSEARCH-4967 Upgrade to Elasticsearch client 8.10.2 and test against Elasticsearch 8.10.2
+    * HSEARCH-4959 Upgrade to Hibernate ORM 6.3.1.Final
+    * HSEARCH-4958 Upgrade to Elasticsearch client 8.10.1 and test against Elasticsearch 8.10.1
+    * HSEARCH-4957 Upgrade to Jackson 2.15.2
+    * HSEARCH-4946 Upgrade to Elasticsearch client 8.10.0 and test against Elasticsearch 8.10.0
+    * HSEARCH-4941 Upgrade to Elasticsearch client 8.9.2 and test against Elasticsearch 8.9.2
+    * HSEARCH-4940 Use "Jakarta Batch" instead of "JSR-352"/"Batch for Java" in POM and documentation of JSR-352 artifacts
+    * HSEARCH-4928 Rename hibernate-search-mapper-orm-coordination-outbox-polling to something shorter
+
+** New Feature
+    * HSEARCH-4403 Support ORM's discriminator-based multi-tenancy (esp. in the outbox-polling module)
+
+** Remove Feature
+    * HSEARCH-4938 Remove support for the complement operator (~) in regexp queries
+    * HSEARCH-4934 Drop compatibility with Elasticsearch 7.0-7.9, OpenSearch 1.0-1.2
+
+** Task
+    * HSEARCH-4991 Test against latest Elasticsearch 7.17.14
+    * HSEARCH-4989 Update JQAssistant rules for JUnit 5 upgrade
+    * HSEARCH-4985 Fix heading level of documentation section "Explicitly altering a whole index"
+    * HSEARCH-4968 Test against latest OpenSearch 1.3.13
+    * HSEARCH-4944 Adjust tests to address ORM changes introduced in a recent ORM 6.3 snapshot
+    * HSEARCH-4943 Document the differences in outbox polling tables when upgrading to Hiberate Search 6.2  with ORM 5 vs ORM 6
+    * HSEARCH-4942 Test against latest Elasticsearch 7.17.13
+    * HSEARCH-4939 Avoid uses of Lucene's NO_MORE_ORDS constant
+    * HSEARCH-4935 Re-enable Spring integration tests after next 6.3 ORM upgrade
+    * HSEARCH-4923 Tidy up documentation of listener-triggered indexing vs indexing plans
+    * HSEARCH-4920 Add CI jobs to test against the latest version of Lucene/Elasticsearch
+    * HSEARCH-3654 Upgrade to JUnit 5
+
 7.0.0.Beta1 (2023-09-05)
 -------------------------
 
