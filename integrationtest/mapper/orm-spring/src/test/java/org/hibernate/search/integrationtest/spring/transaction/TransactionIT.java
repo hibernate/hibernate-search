@@ -10,13 +10,13 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.Id;
 
+import org.hibernate.search.integrationtest.spring.testsupport.AbstractMapperOrmSpringIT;
 import org.hibernate.search.integrationtest.spring.testsupport.AbstractSpringITConfig;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
 import org.hibernate.search.util.impl.integrationtest.common.extension.BackendMock;
 import org.hibernate.search.util.impl.test.annotation.TestForIssue;
 
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.api.extension.RegisterExtension;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,16 +27,14 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 import org.springframework.test.annotation.DirtiesContext;
-import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
-@ExtendWith(SpringExtension.class)
 // Adding a property here is just a "workaround" to make sure that a different context is used for this test
 // otherwise there can be build errors when running all the tests via maven.
 @SpringBootTest(properties = "spring.jta.atomikos.datasource.bean-name=hsearch-datasource1")
 @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
-class TransactionIT {
+class TransactionIT extends AbstractMapperOrmSpringIT {
 
 	@Configuration
 	@EntityScan

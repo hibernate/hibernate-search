@@ -7,6 +7,7 @@
 package org.hibernate.search.test.configuration;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assumptions.assumeFalse;
 
 import java.util.List;
 
@@ -17,7 +18,6 @@ import jakarta.persistence.Lob;
 
 import org.hibernate.Session;
 import org.hibernate.Transaction;
-import org.hibernate.dialect.SybaseDialect;
 import org.hibernate.search.FullTextQuery;
 import org.hibernate.search.FullTextSession;
 import org.hibernate.search.Search;
@@ -26,8 +26,7 @@ import org.hibernate.search.annotations.Indexed;
 import org.hibernate.search.query.dsl.QueryBuilder;
 import org.hibernate.search.test.SearchTestBase;
 import org.hibernate.search.testsupport.TestForIssue;
-
-import org.hibernate.testing.orm.junit.SkipForDialect;
+import org.hibernate.search.util.impl.integrationtest.mapper.orm.DatabaseContainer;
 
 import org.junit.jupiter.api.Test;
 
@@ -42,8 +41,11 @@ import org.apache.lucene.search.Query;
 class LobTest extends SearchTestBase {
 
 	@Test
-	@SkipForDialect(dialectClass = SybaseDialect.class, reason = "Sybase does not support @Lob")
 	void testCreateIndexSearchEntityWithLobField() {
+		assumeFalse(
+				org.hibernate.dialect.SybaseDialect.class.getName().equals( DatabaseContainer.configuration().driver() ),
+				"Sybase does not support @Lob"
+		);
 		// create and index
 		Session session = openSession();
 		Transaction tx = session.beginTransaction();

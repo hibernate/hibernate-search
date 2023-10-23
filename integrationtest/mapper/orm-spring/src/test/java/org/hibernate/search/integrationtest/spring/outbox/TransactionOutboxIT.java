@@ -10,32 +10,28 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.Id;
 
+import org.hibernate.search.integrationtest.spring.testsupport.AbstractMapperOrmSpringIT;
 import org.hibernate.search.integrationtest.spring.testsupport.AbstractSpringITConfig;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
 import org.hibernate.search.util.impl.integrationtest.common.extension.BackendMock;
 import org.hibernate.search.util.impl.integrationtest.mapper.orm.CoordinationStrategyExpectations;
 
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.api.extension.RegisterExtension;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.domain.EntityScan;
-import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.stereotype.Service;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ActiveProfiles;
-import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
-@ExtendWith(SpringExtension.class)
-@SpringBootTest
 @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_CLASS)
 @ActiveProfiles(profiles = { "outbox" })
-class TransactionOutboxIT {
+class TransactionOutboxIT extends AbstractMapperOrmSpringIT {
 
 	@Configuration
 	@EntityScan

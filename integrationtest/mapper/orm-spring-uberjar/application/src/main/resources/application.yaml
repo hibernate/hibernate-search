@@ -7,7 +7,7 @@ spring.jpa:
         directory.root: ${LUCENE_ROOT_PATH:target/test-indexes}/${random.uuid}
 
 spring.datasource:
-  driver-class: org.h2.Driver
+  driver-class-name: org.h2.Driver
   url: jdbc:h2:mem:db1;DB_CLOSE_DELAY=-1
   username: sa
   password: sa

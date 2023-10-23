@@ -9,10 +9,8 @@ package org.hibernate.search.util.impl.integrationtest.mapper.orm.multitenancy.i
 import static org.junit.jupiter.api.Assumptions.assumeTrue;
 
 import org.hibernate.cfg.AvailableSettings;
-import org.hibernate.dialect.H2Dialect;
+import org.hibernate.search.util.impl.integrationtest.mapper.orm.DatabaseContainer;
 import org.hibernate.search.util.impl.integrationtest.mapper.orm.SimpleSessionFactoryBuilder;
-
-import org.hibernate.testing.orm.junit.DialectContext;
 
 /**
  * Utility to help setting up a test SessionFactory which uses multi-tenancy based
@@ -36,7 +34,9 @@ public class MultitenancyTestHelper {
 
 	private void attachTo(SimpleSessionFactoryBuilder builder) {
 		assumeTrue(
-				DialectContext.getDialect() instanceof H2Dialect,
+				// Until we adapt the dialect context ... (that is if we need to adapt it)
+				// DialectContext.getDialect() instanceof H2Dialect,
+				org.hibernate.dialect.H2Dialect.class.getName().equals( DatabaseContainer.configuration().driver() ),
 				"This test relies on multi-tenancy, which can currently only be set up with H2"
 		);
 

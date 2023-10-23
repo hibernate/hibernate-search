@@ -13,14 +13,13 @@ import jakarta.persistence.EntityManagerFactory;
 
 import org.hibernate.engine.spi.SessionFactoryImplementor;
 import org.hibernate.resource.transaction.spi.TransactionCoordinatorBuilder;
-import org.hibernate.search.integrationtest.spring.extension.HibernateSpringPropertiesSetterExtension;
 import org.hibernate.search.integrationtest.spring.jta.JtaAndSpringOutboxApplicationConfiguration;
 import org.hibernate.search.integrationtest.spring.jta.dao.SnertDAO;
 import org.hibernate.search.integrationtest.spring.jta.entity.Snert;
+import org.hibernate.search.integrationtest.spring.testsupport.AbstractMapperOrmSpringIT;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
 
 import com.atomikos.icatch.jta.TransactionManagerImp;
 
@@ -28,14 +27,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ActiveProfiles;
-import org.springframework.test.context.junit.jupiter.SpringExtension;
 
-@ExtendWith(HibernateSpringPropertiesSetterExtension.class)
-@ExtendWith(SpringExtension.class)
 @SpringBootTest(classes = JtaAndSpringOutboxApplicationConfiguration.class)
 @ActiveProfiles({ "jta", "outbox", "transaction-timeout" })
 @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_CLASS)
-class TransactionTimeoutJtaAndSpringOutboxIT {
+class TransactionTimeoutJtaAndSpringOutboxIT extends AbstractMapperOrmSpringIT {
 
 	@Autowired
 	private SnertDAO snertDAO;
@@ -58,7 +54,7 @@ class TransactionTimeoutJtaAndSpringOutboxIT {
 	}
 
 	@Test
-	void test() throws Exception {
+	void test() {
 		Snert snert = new Snert();
 		snert.setId( 1L );
 		snert.setName( "dave" );

@@ -18,6 +18,7 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.Id;
 
+import org.hibernate.search.integrationtest.spring.testsupport.AbstractMapperOrmSpringIT;
 import org.hibernate.search.integrationtest.spring.testsupport.AbstractSpringITConfig;
 import org.hibernate.search.mapper.orm.Search;
 import org.hibernate.search.mapper.orm.session.SearchSession;
@@ -29,17 +30,14 @@ import org.hibernate.search.util.impl.integrationtest.common.extension.StubSearc
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.api.extension.RegisterExtension;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.domain.EntityScan;
-import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.stereotype.Service;
 import org.springframework.test.annotation.DirtiesContext;
-import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.support.TransactionTemplate;
 
@@ -48,10 +46,8 @@ import org.springframework.transaction.support.TransactionTemplate;
  *  one can create a single SearchSession for all threads, and it will correctly use the correct EntityManager
  *  depending on the current thread.
  */
-@ExtendWith(SpringExtension.class)
-@SpringBootTest
 @DirtiesContext(classMode = DirtiesContext.ClassMode.BEFORE_CLASS)
-class SessionProxyIT {
+class SessionProxyIT extends AbstractMapperOrmSpringIT {
 
 	@Configuration
 	@EntityScan

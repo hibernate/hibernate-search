@@ -29,10 +29,9 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ActiveProfiles;
 
-@SpringBootTest
 @ActiveProfiles(resolver = TestActiveProfilesResolver.class)
 @DirtiesContext(classMode = DirtiesContext.ClassMode.BEFORE_CLASS)
-class Java17IT {
+class Java17IT extends AbstractLibraryShowcaseSearchIT{
 
 	private static boolean needsInit;
 

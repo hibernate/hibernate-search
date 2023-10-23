@@ -7,11 +7,11 @@
 package org.hibernate.search.test.envers;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assumptions.assumeFalse;
 
 import java.util.List;
 
 import org.hibernate.Transaction;
-import org.hibernate.dialect.PostgreSQLDialect;
 import org.hibernate.envers.AuditReader;
 import org.hibernate.envers.AuditReaderFactory;
 import org.hibernate.envers.query.AuditEntity;
@@ -21,8 +21,7 @@ import org.hibernate.search.query.dsl.QueryBuilder;
 import org.hibernate.search.test.SearchTestBase;
 import org.hibernate.search.testsupport.TestForIssue;
 import org.hibernate.search.testsupport.junit.Tags;
-
-import org.hibernate.testing.orm.junit.SkipForDialect;
+import org.hibernate.search.util.impl.integrationtest.mapper.orm.DatabaseContainer;
 
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
@@ -37,7 +36,6 @@ import org.apache.lucene.search.TermQuery;
  *
  * @author Davide Di Somma <davide.disomma@gmail.com>
  */
-@SkipForDialect(reason = "HSEARCH-1943", dialectClass = PostgreSQLDialect.class)
 @Tag(Tags.PORTED_TO_SEARCH_6)
 class SearchAndEnversIntegrationTest extends SearchTestBase {
 
@@ -53,6 +51,10 @@ class SearchAndEnversIntegrationTest extends SearchTestBase {
 	@TestForIssue(jiraKey = "HSEARCH-1293")
 	@Test
 	void testHibernateSearchAndEnversIntegration() {
+		assumeFalse(
+				org.hibernate.dialect.PostgreSQLDialect.class.getName().equals( DatabaseContainer.configuration().driver() ),
+				"HSEARCH-1943"
+		);
 		atRevision1();
 		atRevision2();
 		atRevision3();

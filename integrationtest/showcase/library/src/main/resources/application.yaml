@@ -1,10 +1,5 @@
-spring.jpa:
-  properties:
-    hibernate:
-      dialect: ${HIBERNATE_DIALECT} # From environment variable
-
 spring.datasource:
-  driver-class: ${JDBC_DRIVER} # From environment variable
+  driver-class-name: ${JDBC_DRIVER} # From environment variable
   url: ${JDBC_URL} # From environment variable
   username: ${JDBC_USERNAME} # From environment variable
   password: ${JDBC_PASSWORD} # From environment variable

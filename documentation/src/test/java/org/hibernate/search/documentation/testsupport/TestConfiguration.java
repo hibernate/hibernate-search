@@ -11,6 +11,7 @@ import java.util.Map;
 
 import org.hibernate.search.util.impl.integrationtest.common.TestConfigurationProvider;
 import org.hibernate.search.util.impl.integrationtest.common.extension.BackendConfiguration;
+import org.hibernate.search.util.impl.integrationtest.mapper.orm.DatabaseContainer;
 
 public final class TestConfiguration {
 
@@ -22,8 +23,8 @@ public final class TestConfiguration {
 	 *
 	 * @return Configuration properties to use when bootstrapping Hibernate ORM with JPA.
 	 */
-	public static Map<String, String> ormMapperProperties(TestConfigurationProvider configurationProvider) {
-		Map<String, String> properties = new HashMap<>();
+	public static Map<String, Object> ormMapperProperties(TestConfigurationProvider configurationProvider) {
+		Map<String, Object> properties = databaseConnectionProperties();
 
 		// Hack: override example properties set in persistence.xml
 		properties.put( "hibernate.search.backend.hosts", "" );
@@ -37,6 +38,12 @@ public final class TestConfiguration {
 		properties.put( "hibernate.search.schema_management.strategy", "drop-and-create-and-drop" );
 		properties.put( "hibernate.search.indexing.plan.synchronization.strategy", "sync" );
 
+		return properties;
+	}
+
+	public static Map<String, Object> databaseConnectionProperties() {
+		Map<String, Object> properties = new HashMap<>();
+		DatabaseContainer.configuration().add( properties );
 		return properties;
 	}
 
