@@ -8,6 +8,7 @@ package org.hibernate.search.test.batchindexing;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmUtils.listAll;
+import static org.junit.jupiter.api.Assumptions.assumeTrue;
 
 import java.io.IOException;
 import java.util.List;
@@ -20,8 +21,7 @@ import org.hibernate.search.Search;
 import org.hibernate.search.query.dsl.QueryBuilder;
 import org.hibernate.search.test.SearchTestBase;
 import org.hibernate.search.util.common.impl.CollectionHelper;
-
-import org.hibernate.testing.orm.junit.RequiresDialect;
+import org.hibernate.search.util.impl.integrationtest.mapper.orm.DatabaseContainer;
 
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -43,10 +43,6 @@ import org.apache.lucene.search.Query;
  * @author Sanne Grinovero
  * @since 5.2
  */
-@RequiresDialect(
-		comment = "The connection provider for this test ignores configuration and requires H2",
-		value = org.hibernate.dialect.H2Dialect.class
-)
 class DatabaseMultitenancyTest extends SearchTestBase {
 
 	/**
@@ -74,6 +70,7 @@ class DatabaseMultitenancyTest extends SearchTestBase {
 	@Override
 	@BeforeEach
 	public void setUp() throws Exception {
+		requiresDialectCheck();
 		super.setUp();
 
 		Session sessionMetamec = openSessionWithTenantId( METAMEC_TID );
@@ -224,6 +221,7 @@ class DatabaseMultitenancyTest extends SearchTestBase {
 
 	@AfterEach
 	void deleteEntities() {
+		requiresDialectCheck();
 		Session session = openSessionWithTenantId( METAMEC_TID );
 		deleteClocks( session );
 		session.close();
@@ -231,6 +229,13 @@ class DatabaseMultitenancyTest extends SearchTestBase {
 		session = openSessionWithTenantId( GEOCHRON_TID );
 		deleteClocks( session );
 		session.close();
+	}
+
+	private static void requiresDialectCheck() {
+		assumeTrue(
+				org.hibernate.dialect.H2Dialect.class.getName().equals( DatabaseContainer.configuration().driver() ),
+				"The connection provider for this test ignores configuration and requires H2"
+		);
 	}
 
 	private void deleteClocks(Session session) {

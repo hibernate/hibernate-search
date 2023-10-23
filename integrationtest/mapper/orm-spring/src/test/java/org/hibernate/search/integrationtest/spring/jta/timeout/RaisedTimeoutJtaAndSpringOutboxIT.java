@@ -12,15 +12,14 @@ import jakarta.persistence.EntityManagerFactory;
 
 import org.hibernate.engine.spi.SessionFactoryImplementor;
 import org.hibernate.resource.transaction.spi.TransactionCoordinatorBuilder;
-import org.hibernate.search.integrationtest.spring.extension.HibernateSpringPropertiesSetterExtension;
 import org.hibernate.search.integrationtest.spring.jta.JtaAndSpringOutboxApplicationConfiguration;
 import org.hibernate.search.integrationtest.spring.jta.dao.SnertDAO;
 import org.hibernate.search.integrationtest.spring.jta.entity.Snert;
+import org.hibernate.search.integrationtest.spring.testsupport.AbstractMapperOrmSpringIT;
 import org.hibernate.search.util.impl.integrationtest.common.extension.BackendMock;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.api.extension.RegisterExtension;
 
 import com.atomikos.icatch.jta.TransactionManagerImp;
@@ -29,14 +28,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ActiveProfiles;
-import org.springframework.test.context.junit.jupiter.SpringExtension;
 
-@ExtendWith(HibernateSpringPropertiesSetterExtension.class)
-@ExtendWith(SpringExtension.class)
 @SpringBootTest(classes = JtaAndSpringOutboxApplicationConfiguration.class)
 @ActiveProfiles({ "jta", "outbox", "transaction-timeout", "raised-timeout" })
 @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_CLASS)
-class RaisedTimeoutJtaAndSpringOutboxIT {
+class RaisedTimeoutJtaAndSpringOutboxIT extends AbstractMapperOrmSpringIT {
 
 	@Autowired
 	@RegisterExtension

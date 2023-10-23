@@ -13,6 +13,7 @@ import static org.mockito.Mockito.when;
 
 import java.lang.reflect.Field;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -44,6 +45,7 @@ import org.hibernate.search.util.common.reflect.spi.ValueReadHandle;
 import org.hibernate.search.util.impl.integrationtest.common.extension.BackendMock;
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.BackendMappingHandle;
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.index.StubSchemaManagementWork;
+import org.hibernate.search.util.impl.integrationtest.mapper.orm.DatabaseContainer;
 import org.hibernate.search.util.impl.integrationtest.mapper.orm.HibernateOrmMappingHandle;
 import org.hibernate.search.util.impl.integrationtest.mapper.orm.SimpleSessionFactoryBuilder;
 
@@ -116,6 +118,7 @@ class HibernateOrmIntegrationBooterIT {
 					}
 				} );
 
+		DatabaseContainer.configuration().add( booterGeneratedProperties );
 		for ( Map.Entry<String, Object> booterGeneratedProperty : booterGeneratedProperties.entrySet() ) {
 			builder.setProperty( booterGeneratedProperty.getKey(), booterGeneratedProperty.getValue() );
 		}
@@ -160,6 +163,9 @@ class HibernateOrmIntegrationBooterIT {
 				EngineSettings.BACKEND + "." + BackendSettings.TYPE,
 				backendMock.factory( mappingHandlePromise )
 		);
+		HashMap<String, Object> connectionProperties = new HashMap<>();
+		DatabaseContainer.configuration().add( connectionProperties );
+		registryBuilder.applySettings( connectionProperties );
 
 		StandardServiceRegistry serviceRegistry = registryBuilder.build();
 		toClose.add( serviceRegistry );

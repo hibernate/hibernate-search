@@ -12,11 +12,11 @@ import jakarta.persistence.EntityManagerFactory;
 
 import org.hibernate.engine.spi.SessionFactoryImplementor;
 import org.hibernate.resource.transaction.spi.TransactionCoordinatorBuilder;
-import org.hibernate.search.integrationtest.spring.extension.HibernateSpringPropertiesSetterExtension;
 import org.hibernate.search.integrationtest.spring.jta.dao.BoxDAO;
 import org.hibernate.search.integrationtest.spring.jta.entity.Box;
 import org.hibernate.search.integrationtest.spring.jta.entity.Doughnut;
 import org.hibernate.search.integrationtest.spring.jta.entity.Muffin;
+import org.hibernate.search.integrationtest.spring.testsupport.AbstractMapperOrmSpringIT;
 import org.hibernate.search.mapper.orm.session.impl.HibernateOrmSearchSessionHolder;
 import org.hibernate.search.util.impl.integrationtest.common.extension.BackendMock;
 import org.hibernate.search.util.impl.test.annotation.PortedFromSearch5;
@@ -24,22 +24,18 @@ import org.hibernate.search.util.impl.test.annotation.PortedFromSearch5;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.api.extension.RegisterExtension;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ActiveProfiles;
-import org.springframework.test.context.junit.jupiter.SpringExtension;
 
-@ExtendWith(HibernateSpringPropertiesSetterExtension.class)
-@ExtendWith(SpringExtension.class)
 @SpringBootTest(classes = JtaAndSpringApplicationConfiguration.class)
 @ActiveProfiles("jta")
 @PortedFromSearch5(original = "org.hibernate.search.test.integration.spring.jta.JtaAndSpringMoreComplexIT")
 @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_CLASS)
-class JtaAndSpringMoreComplexIT {
+class JtaAndSpringMoreComplexIT extends AbstractMapperOrmSpringIT {
 
 	@Autowired
 	@RegisterExtension

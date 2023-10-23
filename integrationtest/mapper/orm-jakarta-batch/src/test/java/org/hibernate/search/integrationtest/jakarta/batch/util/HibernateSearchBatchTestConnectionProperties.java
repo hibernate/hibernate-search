@@ -27,7 +27,7 @@ public final class HibernateSearchBatchTestConnectionProperties {
 					SearchBackendContainer.connectionUrl()
 			);
 		}
-		DatabaseContainer.configuration();
+		DatabaseContainer.configuration().add( properties );
 
 		return properties;
 	}

@@ -6,31 +6,27 @@
  */
 package org.hibernate.search.integrationtest.showcase.library;
 
-import org.hibernate.search.util.impl.integrationtest.backend.elasticsearch.SearchContainer;
-import org.hibernate.search.util.impl.integrationtest.mapper.orm.DatabaseContainer;
-
 import org.springframework.test.context.ActiveProfilesResolver;
 
 public class TestActiveProfilesResolver implements ActiveProfilesResolver {
 
+	/*
+	 * Default when running tests from within an IDE.
+	 * This is the main reason we're using an ActiveProfilesResolver:
+	 * there is apparently no way to set default profiles for tests,
+	 * as setting "spring.profiles.active" in a @TestPropertySource for example
+	 * will *override* any command-line arguments, environment properties or system properties.
+	 */
+	private static final String DEFAULT_BACKEND = "lucene";
+
 	@Override
 	public String[] resolve(Class<?> testClass) {
-		String testBackend = System.getProperty( "test.backend" );
-		if ( testBackend == null ) {
-			/*
-			 * Default when running tests from within an IDE.
-			 * This is the main reason we're using an ActiveProfilesResolver:
-			 * there is apparently no way to set default profiles for tests,
-			 * as setting "spring.profiles.active" in a @TestPropertySource for example
-			 * will *override* any command-line arguments, environment properties or system properties.
-			 */
-			testBackend = "lucene";
-		}
-		if ( "elasticsearch".equals( testBackend ) ) {
-			System.setProperty( "ES_HOSTS", SearchContainer.connectionUrl() );
-		}
-		DatabaseContainer.springConfiguration();
+		String testBackend = configuredBackend();
 		// The test profiles must be mentioned last, to allow them to override properties
 		return new String[] { testBackend, "test", "test-" + testBackend };
+	}
+
+	public static String configuredBackend() {
+		return System.getProperty( "test.backend", DEFAULT_BACKEND );
 	}
 }

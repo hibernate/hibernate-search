@@ -2,14 +2,12 @@ spring.jpa:
   hibernate:
     ddl-auto: create-drop
   properties:
-    hibernate:
-      dialect: ${HIBERNATE_DIALECT} # From environment variable
     hibernate.search:
       # The backend is a mock anyway.
       schema_management.strategy: none
 
 spring.datasource:
-  driver-class: ${JDBC_DRIVER} # From environment variable
+  driver-class-name: ${JDBC_DRIVER} # From environment variable
   url: ${JDBC_URL} # From environment variable
   username: ${JDBC_USERNAME} # From environment variable
   password: ${JDBC_PASSWORD} # From environment variable
@@ -21,10 +19,6 @@ logging.level:
   org.hibernate.search.query: DEBUG
   org.hibernate.search.elasticsearch.request: DEBUG
   org.hibernate.search.backend.lucene: DEBUG
-
-# Default environment variable values for IDEs that are unable to extract them from the maven-failsafe configuration
-# These values are overridden when running tests from Intellij IDEA or directly from Maven
-JDBC_URL: jdbc:h2:mem:db1;DB_CLOSE_DELAY=-1
 
 # since atomikos connection pool has a max size set to 1 ...
 # we will not be able to execute more than one transaction at a time, leading to errors in tests

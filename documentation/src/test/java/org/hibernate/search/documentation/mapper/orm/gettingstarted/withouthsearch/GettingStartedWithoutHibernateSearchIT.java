@@ -7,6 +7,7 @@
 package org.hibernate.search.documentation.mapper.orm.gettingstarted.withouthsearch;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.hibernate.search.documentation.testsupport.TestConfiguration.databaseConnectionProperties;
 import static org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmUtils.with;
 
 import java.util.List;
@@ -26,7 +27,8 @@ class GettingStartedWithoutHibernateSearchIT {
 
 	@BeforeEach
 	void setup() {
-		entityManagerFactory = Persistence.createEntityManagerFactory( "GettingStartedWithoutHibernateSearchIT" );
+		entityManagerFactory = Persistence.createEntityManagerFactory( "GettingStartedWithoutHibernateSearchIT",
+				databaseConnectionProperties() );
 	}
 
 	@AfterEach

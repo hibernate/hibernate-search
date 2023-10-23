@@ -3,4 +3,4 @@ spring.jpa:
     hibernate.search:
       backend:
         log.json_pretty_printing: true
-        hosts: ${ES_HOSTS}
+        uris: ${ELASTICSEARCH_URIS:localhost:9200}
