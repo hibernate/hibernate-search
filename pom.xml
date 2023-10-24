@@ -381,11 +381,11 @@
         <test.elasticsearch.version>${version.org.elasticsearch.latest}</test.elasticsearch.version>
 
         <test.elasticsearch.run.elastic.skip>true</test.elasticsearch.run.elastic.skip>
-        <test.elasticsearch.run.elastic.image.name>elastic/elasticsearch</test.elasticsearch.run.elastic.image.name>
+        <test.elasticsearch.run.elastic.image.name>docker.io/elastic/elasticsearch</test.elasticsearch.run.elastic.image.name>
         <test.elasticsearch.run.elastic.image.tag>${test.elasticsearch.version}</test.elasticsearch.run.elastic.image.tag>
 
         <test.elasticsearch.run.opensearch.skip>true</test.elasticsearch.run.opensearch.skip>
-        <test.elasticsearch.run.opensearch.image.name>opensearchproject/opensearch</test.elasticsearch.run.opensearch.image.name>
+        <test.elasticsearch.run.opensearch.image.name>docker.io/opensearchproject/opensearch</test.elasticsearch.run.opensearch.image.name>
         <test.elasticsearch.run.opensearch.image.tag>${test.elasticsearch.version}</test.elasticsearch.run.opensearch.image.tag>
 
         <!-- Run containers for additional ORM databases -->
@@ -393,27 +393,27 @@
         <!-- PostgreSQL -->
         <!-- See https://hub.docker.com/_/postgres -->
         <test.database.run.postgres.skip>true</test.database.run.postgres.skip>
-        <test.database.run.postgres.image.name>postgres</test.database.run.postgres.image.name>
+        <test.database.run.postgres.image.name>docker.io/postgres</test.database.run.postgres.image.name>
         <test.database.run.postgres.image.tag>15.1</test.database.run.postgres.image.tag>
         <!-- MariaDB -->
         <!-- See https://hub.docker.com/_/mariadb -->
         <test.database.run.mariadb.skip>true</test.database.run.mariadb.skip>
-        <test.database.run.mariadb.image.name>mariadb</test.database.run.mariadb.image.name>
+        <test.database.run.mariadb.image.name>docker.io/mariadb</test.database.run.mariadb.image.name>
         <test.database.run.mariadb.image.tag>10.10.2</test.database.run.mariadb.image.tag>
         <!-- MySQL -->
         <!-- See https://hub.docker.com/_/mysql -->
         <test.database.run.mysql.skip>true</test.database.run.mysql.skip>
-        <test.database.run.mysql.image.name>mysql</test.database.run.mysql.image.name>
+        <test.database.run.mysql.image.name>docker.io/mysql</test.database.run.mysql.image.name>
         <test.database.run.mysql.image.tag>8.0.31</test.database.run.mysql.image.tag>
         <!-- DB2 -->
         <!-- See https://hub.docker.com/r/ibmcom/db2 -->
         <test.database.run.db2.skip>true</test.database.run.db2.skip>
-        <test.database.run.db2.image.name>ibmcom/db2</test.database.run.db2.image.name>
+        <test.database.run.db2.image.name>docker.io/ibmcom/db2</test.database.run.db2.image.name>
         <test.database.run.db2.image.tag>11.5.8.0</test.database.run.db2.image.tag>
         <!-- Oracle -->
         <!-- See https://hub.docker.com/r/gvenzl/oracle-xe -->
         <test.database.run.oracle.skip>true</test.database.run.oracle.skip>
-        <test.database.run.oracle.image.name>gvenzl/oracle-xe</test.database.run.oracle.image.name>
+        <test.database.run.oracle.image.name>docker.io/gvenzl/oracle-xe</test.database.run.oracle.image.name>
         <test.database.run.oracle.image.tag>21.3.0-slim-faststart</test.database.run.oracle.image.tag>
         <!-- MS SQL Server -->
         <!-- See https://hub.docker.com/_/microsoft-mssql-server -->
@@ -423,7 +423,7 @@
         <!-- CockroachDB -->
         <!-- See https://hub.docker.com/r/cockroachdb/cockroach/tags -->
         <test.database.run.cockroachdb.skip>true</test.database.run.cockroachdb.skip>
-        <test.database.run.cockroachdb.image.name>cockroachdb/cockroach</test.database.run.cockroachdb.image.name>
+        <test.database.run.cockroachdb.image.name>docker.io/cockroachdb/cockroach</test.database.run.cockroachdb.image.name>
         <test.database.run.cockroachdb.image.tag>v23.1.4</test.database.run.cockroachdb.image.tag>
 
         <!-- Set empty default values to avoid Maven leaving property references (${...}) when it doesn't find a value -->
