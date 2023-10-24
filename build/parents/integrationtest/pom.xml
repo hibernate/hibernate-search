@@ -65,23 +65,9 @@
         <!--
              To run tests against a different version of Elasticsearch, see CONTRIBUTING.md.
           -->
-        <!-- Profile enabled when an Elasticsearch instance must be pulled -->
+        <!-- Profile enabled when an Elasticsearch/OpenSearch container must NOT be started as a test container, but when an URL to an "external" service is supplied! -->
         <profile>
-            <id>elasticsearch-run</id>
-            <activation>
-                <!-- Activate by default, i.e. if test.elasticsearch.connection.uris has not been defined explicitly -->
-                <property>
-                    <name>!test.elasticsearch.connection.uris</name>
-                </property>
-            </activation>
-            <properties>
-                <test.elasticsearch.run.image.name>${test.elasticsearch.run.elastic.image.name}</test.elasticsearch.run.image.name>
-                <test.elasticsearch.run.image.tag>${test.elasticsearch.run.elastic.image.tag}</test.elasticsearch.run.image.tag>
-            </properties>
-        </profile>
-        <!-- Profile enabled when an Elasticsearch instance must NOT be run by Maven -->
-        <profile>
-            <id>elasticsearch-do-not-run</id>
+            <id>search-container-do-not-start</id>
             <activation>
                 <!-- Activate if test.elasticsearch.connection.uris has been defined explicitly -->
                 <property>
@@ -89,6 +75,22 @@
                 </property>
             </activation>
             <properties>
+                <test.elasticsearch.run.image.pull>false</test.elasticsearch.run.image.pull>
+            </properties>
+        </profile>
+
+        <!-- Profile enabled when Elasticsearch tests are skipped -->
+        <profile>
+            <id>elasticsearch-test-skip</id>
+            <activation>
+                <!-- Activate if test.elasticsearch.connection.uris has been defined explicitly -->
+                <property>
+                    <name>test.elasticsearch.skip</name>
+                    <value>true</value>
+                </property>
+            </activation>
+            <properties>
+                <test.elasticsearch.run.skip.forRelevantModules>true</test.elasticsearch.run.skip.forRelevantModules>
                 <test.elasticsearch.run.image.pull>false</test.elasticsearch.run.image.pull>
             </properties>
         </profile>
@@ -109,20 +111,6 @@
                      so we also have retry steps in the Jenkinsfile.
                  -->
                 <failsafe.rerunFailingTestsCount>4</failsafe.rerunFailingTestsCount>
-            </properties>
-        </profile>
-
-        <profile>
-            <id>opensearch</id>
-            <activation>
-                <property>
-                    <name>test.elasticsearch.distribution</name>
-                    <value>opensearch</value>
-                </property>
-            </activation>
-            <properties>
-                <test.elasticsearch.run.image.name>${test.elasticsearch.run.opensearch.image.name}</test.elasticsearch.run.image.name>
-                <test.elasticsearch.run.image.tag>${test.elasticsearch.run.opensearch.image.tag}</test.elasticsearch.run.image.tag>
             </properties>
         </profile>
 

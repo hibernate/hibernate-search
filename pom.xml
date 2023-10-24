@@ -377,24 +377,14 @@
         <!-- Container images for various integration tests -->
         <!-- The latest version of Elasticsearch tested against by default -->
         <version.org.elasticsearch.latest>8.10.4</version.org.elasticsearch.latest>
-        <test.elasticsearch.version>${version.org.elasticsearch.latest}</test.elasticsearch.version>
-
-        <test.elasticsearch.run.elastic.skip>true</test.elasticsearch.run.elastic.skip>
-        <test.elasticsearch.run.elastic.image.name>docker.io/elastic/elasticsearch</test.elasticsearch.run.elastic.image.name>
-        <test.elasticsearch.run.elastic.image.tag>${test.elasticsearch.version}</test.elasticsearch.run.elastic.image.tag>
-
-        <test.elasticsearch.run.opensearch.skip>true</test.elasticsearch.run.opensearch.skip>
-        <test.elasticsearch.run.opensearch.image.name>docker.io/opensearchproject/opensearch</test.elasticsearch.run.opensearch.image.name>
-        <test.elasticsearch.run.opensearch.image.tag>${test.elasticsearch.version}</test.elasticsearch.run.opensearch.image.tag>
+        <test.elasticsearch.version></test.elasticsearch.version>
+        <test.elasticsearch.distribution>elastic</test.elasticsearch.distribution>
 
         <!-- Docker images to be pulled. To be redefined in specific profiles of Elasticsearch/OpenSearch \
              or database specific ones. -->
         <test.database.run.kind>h2</test.database.run.kind>
 
         <test.elasticsearch.run.image.pull>true</test.elasticsearch.run.image.pull>
-        <test.elasticsearch.run.image.name></test.elasticsearch.run.image.name>
-        <test.elasticsearch.run.image.tag></test.elasticsearch.run.image.tag>
-
 
         <!-- Set empty default values to avoid Maven leaving property references (${...}) when it doesn't find a value -->
 
@@ -965,10 +955,16 @@
 
                                     images += parseImage( './build/container/ryuk.Dockerfile' )
                                     if ( isNotBlankString( '${test.database.run.kind}' ) && '${test.database.run.kind}' != 'h2') {
-                                        images += parseImage( './build/container/${test.database.run.kind}.Dockerfile' )
+                                        images += parseImage( './build/container/database/${test.database.run.kind}.Dockerfile' )
                                     }
-                                    if ( isTrueString( '${test.elasticsearch.run.image.pull}' ) && isNotBlankString( '${test.elasticsearch.run.image.name}' ) ) {
-                                        images += '${test.elasticsearch.run.image.name}:${test.elasticsearch.run.image.tag}'
+                                    if ( isTrueString( '${test.elasticsearch.run.image.pull}' ) ) {
+                                        def fromFile = parseImage( './build/container/search-backend/${test.elasticsearch.distribution}.Dockerfile')
+                                        def suppliedVersion = '${test.elasticsearch.version}'
+                                        if (isNotBlankString(suppliedVersion)) {
+                                            images += fromFile.substring(0, fromFile.lastIndexOf(':')+1) + suppliedVersion
+                                        } else {
+                                            images += fromFile
+                                        }
                                     }
                                     // Exclude images from non-dockerhub repositories
                                     new File('${containerImagesListFile}').append( images.findAll{ref -> !(ref ==~ /^(?!((.*\.)?docker\.io))[\w\d\.]+\/[\w\d\.]+\/[\w\d\.]+(:.+)?$/)}.join('\n') + '\n' )

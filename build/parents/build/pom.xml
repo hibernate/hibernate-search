@@ -119,8 +119,8 @@
         <version.junit-jupiter>5.10.0</version.junit-jupiter>
         <version.junit-platform-suite-engine>1.10.0</version.junit-platform-suite-engine>
         <version.org.osgi.core>6.0.0</version.org.osgi.core>
+        <!-- Make sure to update Ryuk container version in `ryuk.Dockerfile` whenever updating testcontainers to align it with the lib. -->
         <version.testcontainers>1.19.1</version.testcontainers>
-
 
         <version.org.hamcrest>2.2</version.org.hamcrest>
         <version.org.mockito>5.7.0</version.org.mockito>
@@ -215,7 +215,6 @@
              because we will be able to change the configuration without re-compiling the configuration file
              (which is located in a dependency of the integration tests modules).
          -->
-        <test.elasticsearch.distribution>elastic</test.elasticsearch.distribution>
         <test.elasticsearch.connection.uris></test.elasticsearch.connection.uris>
         <test.elasticsearch.connection.username></test.elasticsearch.connection.username>
         <test.elasticsearch.connection.password></test.elasticsearch.connection.password>
@@ -1203,10 +1202,9 @@
                             <org.hibernate.search.version>${project.version}</org.hibernate.search.version>
                             <org.hibernate.search.enable_performance_tests>${test.performance.enable}</org.hibernate.search.enable_performance_tests>
                             <org.hibernate.search.integrationtest.backend.elasticsearch.distribution>${test.elasticsearch.distribution}</org.hibernate.search.integrationtest.backend.elasticsearch.distribution>
-                            <org.hibernate.search.integrationtest.backend.elasticsearch.name>${test.searchengine.run.image.name}</org.hibernate.search.integrationtest.backend.elasticsearch.name>
-                            <org.hibernate.search.integrationtest.backend.elasticsearch.tag>${test.searchengine.run.image.tag}</org.hibernate.search.integrationtest.backend.elasticsearch.tag>
+                            <org.hibernate.search.integrationtest.backend.elasticsearch.version>${test.elasticsearch.version}</org.hibernate.search.integrationtest.backend.elasticsearch.version>
                             <org.hibernate.search.integrationtest.orm.database.kind>${test.database.run.kind}</org.hibernate.search.integrationtest.orm.database.kind>
-                            <org.hibernate.search.integrationtest.orm.project.root.directory>${rootProject.directory}</org.hibernate.search.integrationtest.orm.project.root.directory>
+                            <org.hibernate.search.integrationtest.project.root.directory>${rootProject.directory}</org.hibernate.search.integrationtest.project.root.directory>
                         </systemPropertyVariables>
                     </configuration>
                 </plugin>
