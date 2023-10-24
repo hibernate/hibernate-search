@@ -953,13 +953,19 @@
                                     def images = []
                                     def isTrueString = { string -> string && Boolean.parseBoolean( string ) }
                                     def isNotBlankString = { string -> string?.trim() }
-
-                                    if ( isNotBlankString( '${test.database.run.kind}' ) && '${test.database.run.kind}' != 'h2') {
-                                        def dockerFileContent = new File('./build/container/${test.database.run.kind}.Dockerfile').text
-                                        if ((match = dockerFileContent =~ /FROM (.+)/)) {
-                                            def image = match.group(1).trim()
-                                            images += image
+                                    def parseImage = { file ->
+                                        {
+                                            def dockerFileContent = new File(file).text
+                                            if ((match = dockerFileContent =~ /FROM (.+)/)) {
+                                                return match.group(1).trim()
+                                            }
+                                            return ''
                                         }
+                                    }
+
+                                    images += parseImage( './build/container/ryuk.Dockerfile' )
+                                    if ( isNotBlankString( '${test.database.run.kind}' ) && '${test.database.run.kind}' != 'h2') {
+                                        images += parseImage( './build/container/${test.database.run.kind}.Dockerfile' )
                                     }
                                     if ( isTrueString( '${test.elasticsearch.run.image.pull}' ) && isNotBlankString( '${test.elasticsearch.run.image.name}' ) ) {
                                         images += '${test.elasticsearch.run.image.name}:${test.elasticsearch.run.image.tag}'

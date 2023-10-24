@@ -431,6 +431,7 @@ stage('Default build') {
 					${commonMavenArgs} \
 					-DskipSurefireTests \
 					-Pskip-checks \
+					-Pci-build \
 					-Pci-rebuild \
 					${incrementalBuild ? """ \
 							-Dincremental \
@@ -938,7 +939,7 @@ void mavenNonDefaultBuild(BuildEnvironment buildEnv, String args, List<String> a
 	def testSuffix = buildEnv.tag.replaceAll('[^a-zA-Z0-9_\\-+]+', '_')
 
 	sh """ \
-			mvn clean install -Dsurefire.environment=$testSuffix \
+			mvn clean install -Pci-build -Dsurefire.environment=$testSuffix \
 					${toTestJdkArg(buildEnv)} \
 					--fail-at-end \
 					$args \

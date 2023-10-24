@@ -260,7 +260,7 @@ pipeline {
 									withMavenWorkspace {
 										pullContainerImages()
 										sh """ \
-									mvn clean install -U -Pdependency-update -Pdist -Dsurefire.environment=${normalize(env.DEPENDENCY_UPDATE_NAME)} \
+									mvn clean install -U -Pdependency-update -Pdist -Pci-build -Dsurefire.environment=${normalize(env.DEPENDENCY_UPDATE_NAME)} \
 									--fail-at-end \
 									${env[qualify('ADDITIONAL_MAVEN_ARGS')]} \
 								"""
