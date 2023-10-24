@@ -529,6 +529,6 @@ feel free to ignore them, submit your PR and let the reviewer guide you.
 or the return type or parameter type of public or protected methods.
 * SPI types **must not** expose internal types, be it through inheritance, public or protected fields,
 or the return type or parameter type of public or protected methods.
-* Types from a given module A **must not** depend on a internal type defined in another module B.
+* Types from a given module A **must not** depend on an internal type defined in another module B.
 There are exceptions, for example if module B is purely internal (named `hibernate-search-*-internal-*`),
-like `hibernate-search-util-interal-common`.
+like `hibernate-search-util-internal-common`.
