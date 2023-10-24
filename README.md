@@ -127,8 +127,8 @@ See the `lgpl.txt` file in the root directory or <http://www.gnu.org/licenses/lg
 
 ## Getting started
 
-A getting started guide is available
-[in the reference documentation](https://docs.jboss.org/hibernate/stable/search/reference/en-US/html_single/#getting-started).
+Getting started guides are available
+[here](https://hibernate.org/search/documentation/getting-started/).
 
 Fore more information, refer to the Hibernate Search website:
 
