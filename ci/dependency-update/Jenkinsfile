@@ -18,6 +18,11 @@ Map settings() {
 					// we need to recompile this module since it has incompatible return type and will result in a build error:
 					additionalMavenArgs: '-pl :hibernate-search-util-internal-integrationtest-mapper-orm'
 			]
+		case 'orm6.4':
+			return [
+					updateProperties: ['version.org.hibernate.orm'],
+					onlyRunTestDependingOn: ['hibernate-search-mapper-orm'],
+			]
 		case 'lucene9.8':
 			return [
 					updateProperties: ['version.org.apache.lucene'],
