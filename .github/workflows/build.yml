@@ -60,7 +60,8 @@ jobs:
               version: 17
             },
             maven: {
-              args: ''
+              # Since we only start an Elasticsearch container on Linux we add the profile to enable container reuse here:
+              args: '-Pci-build'
             }
           }
           # We can't start Linux containers on GitHub Actions' Windows VMs,

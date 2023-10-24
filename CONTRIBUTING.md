@@ -397,6 +397,22 @@ Or more simply, if your AWS credentials are already stored in `~/.aws/credential
         -Dtest.elasticsearch.connection.aws.region=<Your AWS region ID>
 ```
 
+### Testcontainers
+
+Hibernate Search uses Testcontainers in its integration tests. 
+By default, testcontainers are not reusable, i.e. a container is started at the beginning of an executed test suite,
+and then stopped; each execution of failsafe plugin will start/stop their own containers as well as each test module.
+With [reusable testcontainers](https://java.testcontainers.org/features/reuse/) required containers will start as needed
+but will not be terminated, staying available between different failsafe executions and test modules
+and even after the maven build is finished.
+Reusable containers must be stopped manually, if needed (e.g. with `docker stop <container name>`
+or `docker kill <container name>`).
+
+There are a few ways to enable reusable testcontainers:
+
+1. Enable reusable testcontainers in `~/.testcontainers.properties`, by adding `testcontainers.reuse.enable=true`
+2. Build with `ci-build` Maven profile: `./mvnw clean install -Pci-build`
+
 ### JQAssistant
 
 You can request static analysis and sanity checks with the `jqassistant` profile.

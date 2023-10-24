@@ -1188,6 +1188,17 @@
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-failsafe-plugin</artifactId>
                     <configuration>
+                        <environmentVariables>
+                            <!-- Just to be sure that we are pulling/using the Ryuk from docker.io -->
+                            <TESTCONTAINERS_RYUK_CONTAINER_IMAGE>docker.io/testcontainers/ryuk:0.5.1</TESTCONTAINERS_RYUK_CONTAINER_IMAGE>
+                            <!--
+                                Startup checks might want to test whether the images can be pulled (e.g. see `tinyimage.container.image` config property).
+                                To prevent that and speedup the startup a bit the checks are disabled.
+                                In case there are any issues, the checks can be enabled.
+                                Also for debugging purposes consider enabling testcontainers debug logs (https://java.testcontainers.org/supported_docker_environment/logging_config/).
+                             -->
+                            <TESTCONTAINERS_CHECKS_DISABLE>true</TESTCONTAINERS_CHECKS_DISABLE>
+                        </environmentVariables>
                         <systemPropertyVariables>
                             <org.hibernate.search.version>${project.version}</org.hibernate.search.version>
                             <org.hibernate.search.enable_performance_tests>${test.performance.enable}</org.hibernate.search.enable_performance_tests>
@@ -1311,6 +1322,25 @@
     </build>
 
     <profiles>
+        <profile>
+            <id>ci-build</id>
+            <build>
+                <pluginManagement>
+                    <plugins>
+                        <plugin>
+                            <groupId>org.apache.maven.plugins</groupId>
+                            <artifactId>maven-failsafe-plugin</artifactId>
+                            <configuration>
+                                <environmentVariables>
+                                    <!-- To make Testcontainers reusable on CI, where ~/.testcontainers.properties is not necessarily defined -->
+                                    <TESTCONTAINERS_REUSE_ENABLE>true</TESTCONTAINERS_REUSE_ENABLE>
+                                </environmentVariables>
+                            </configuration>
+                        </plugin>
+                    </plugins>
+                </pluginManagement>
+            </build>
+        </profile>
         <!-- Profile used when testing dependency updates on CI -->
         <profile>
             <id>dependency-update</id>
