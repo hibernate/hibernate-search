@@ -41,11 +41,11 @@ public final class DatabaseContainer {
 
 	static {
 		String name = System.getProperty( "org.hibernate.search.integrationtest.orm.database.kind", "" );
-		Path root = Path.of( System.getProperty( "org.hibernate.search.integrationtest.orm.project.root.directory", "" ) );
+		Path root = Path.of( System.getProperty( "org.hibernate.search.integrationtest.project.root.directory", "" ) );
 		DATABASE = SupportedDatabase.from( name );
 
 		DATABASE_CONTAINER = DATABASE.container(
-				root.resolve( "build" ).resolve( "container" ).resolve( name + ".Dockerfile" ),
+				root.resolve( "build" ).resolve( "container" ).resolve( "database" ).resolve( name + ".Dockerfile" ),
 				name
 		);
 	}

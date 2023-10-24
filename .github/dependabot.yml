@@ -111,6 +111,44 @@ updates:
       - dockerhub
     # For dependabot to find Docker files they all should be in the same directory.
     # Dependabot is picking any files that has `dockerfile` in them.
+    #
+    # This includes only Ryuk container, hence we want it to be checked/updated at the same time when our regular java dependencies are updated
     directory: "/build/container/"
     schedule:
+      interval: "weekly"
+      day: "tuesday"
+    assignees: ["yrodiere"]
+  - package-ecosystem: "docker"
+    registries:
+      - dockerhub
+    # For dependabot to find Docker files they all should be in the same directory.
+    # Dependabot is picking any files that has `dockerfile` in them.
+    #
+    # This will only include database containers, hence we check for updates only once a month:
+    directory: "/build/container/database"
+    schedule:
       interval: "monthly"
+    assignees: ["yrodiere"]
+    groups:
+      # This group combines all database containers dependencies.
+      database-containers:
+        patterns:
+          # Include all:
+          - "*"
+  - package-ecosystem: "docker"
+    registries:
+      - dockerhub
+    # For dependabot to find Docker files they all should be in the same directory.
+    # Dependabot is picking any files that has `dockerfile` in them.
+    directory: "/build/container/search-backend"
+    schedule:
+      interval: "daily"
+    assignees: ["yrodiere"]
+    groups:
+      # This group combines all search backends containers dependencies.
+      # We will still need to create specific tickets to address these updates and do some code changes,
+      # so we just want to get a notification from the bot that the new versions are available.
+      search-backend-containers:
+        patterns:
+          # Include all:
+          - "*"

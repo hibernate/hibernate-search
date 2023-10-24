@@ -6,7 +6,12 @@
  */
 package org.hibernate.search.util.impl.integrationtest.backend.elasticsearch;
 
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.time.Duration;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import org.hibernate.search.backend.elasticsearch.ElasticsearchDistributionName;
 import org.hibernate.search.backend.elasticsearch.ElasticsearchVersion;
@@ -23,12 +28,30 @@ public final class SearchBackendContainer {
 	private static final GenericContainer<?> SEARCH_CONTAINER;
 
 	static {
-		String name = System.getProperty( "org.hibernate.search.integrationtest.backend.elasticsearch.name", "" );
-		String tag = System.getProperty( "org.hibernate.search.integrationtest.backend.elasticsearch.tag" );
+		ElasticsearchDistributionName distributionName = ElasticsearchDistributionName
+				.of( System.getProperty( "org.hibernate.search.integrationtest.backend.elasticsearch.distribution", "" ) );
+		String tag = System.getProperty( "org.hibernate.search.integrationtest.backend.elasticsearch.version" );
+		Path root = Path.of( System.getProperty( "org.hibernate.search.integrationtest.project.root.directory", "" ) );
 
-		SEARCH_CONTAINER = name.contains( "elastic" )
-				? elasticsearch( name, tag, ElasticsearchVersion.of( ElasticsearchDistributionName.ELASTIC, tag ) )
-				: opensearch( name, tag );
+		try {
+			DockerImageName dockerImageName = parseDockerImageName( root.resolve( "build" ).resolve( "container" )
+					.resolve( "search-backend" ).resolve( distributionName.externalRepresentation() + ".Dockerfile" ), tag );
+			switch ( distributionName ) {
+				case ELASTIC:
+					SEARCH_CONTAINER = elasticsearch( dockerImageName );
+					break;
+				case OPENSEARCH:
+				case AMAZON_OPENSEARCH_SERVERLESS:
+					SEARCH_CONTAINER = opensearch( dockerImageName );
+					break;
+				default:
+					throw new IllegalStateException( "Unknown distribution " + distributionName );
+			}
+		}
+		catch (IOException e) {
+			throw new IllegalStateException(
+					"Unable to initialize a Search Engine container [" + distributionName + ", " + tag + ", " + root + "]", e );
+		}
 	}
 
 	public static int mappedPort(int port) {
@@ -60,8 +83,8 @@ public final class SearchBackendContainer {
 		}
 	}
 
-	private static GenericContainer<?> elasticsearch(String name, String tag, ElasticsearchVersion version) {
-		GenericContainer<?> container = common( name, tag )
+	private static GenericContainer<?> elasticsearch(DockerImageName dockerImageName) {
+		GenericContainer<?> container = common( dockerImageName )
 				.withEnv( "logger.level", "WARN" )
 				.withEnv( "discovery.type", "single-node" )
 				// Older images require HTTP authentication for all requests;
@@ -78,6 +101,9 @@ public final class SearchBackendContainer {
 				// which will never happen since we only have one node.
 				// See https://www.elastic.co/guide/en/elasticsearch/reference/7.17/modules-cluster.html#disk-based-shard-allocation
 				.withEnv( "cluster.routing.allocation.disk.threshold_enabled", "false" );
+
+		ElasticsearchVersion version =
+				ElasticsearchVersion.of( ElasticsearchDistributionName.ELASTIC, dockerImageName.getVersionPart() );
 
 		// Disable a few features that we don't use and that just slow up container startup.
 		if ( version.majorOptional().orElse( Integer.MIN_VALUE ) == 8 ) {
@@ -109,8 +135,8 @@ public final class SearchBackendContainer {
 		return container;
 	}
 
-	private static GenericContainer<?> opensearch(String name, String tag) {
-		return common( name, tag )
+	private static GenericContainer<?> opensearch(DockerImageName dockerImageName) {
+		return common( dockerImageName )
 				.withEnv( "logger.level", "WARN" )
 				.withEnv( "discovery.type", "single-node" )
 				// Prevent swapping
@@ -134,11 +160,30 @@ public final class SearchBackendContainer {
 	 * this resource in the end.
 	 */
 	@SuppressWarnings("resource")
-	private static GenericContainer<?> common(String image, String tag) {
-		return new GenericContainer<>( DockerImageName.parse( image ).withTag( tag ) )
+	private static GenericContainer<?> common(DockerImageName dockerImageName) {
+		return new GenericContainer<>( dockerImageName )
 				.withExposedPorts( 9200, 9300 )
 				.waitingFor( new HttpWaitStrategy().forPort( 9200 ).forStatusCode( 200 ) )
 				.withStartupTimeout( Duration.ofMinutes( 5 ) )
 				.withReuse( true );
+	}
+
+
+	private static DockerImageName parseDockerImageName(Path dockerfile, String tag) throws IOException {
+		Pattern DOCKERFILE_FROM_LINE_PATTERN = Pattern.compile( "FROM (.+)" );
+
+		DockerImageName dockerImageName = Files.lines( dockerfile )
+				.map( DOCKERFILE_FROM_LINE_PATTERN::matcher )
+				.filter( Matcher::matches )
+				.map( m -> m.group( 1 ) )
+				.map( DockerImageName::parse )
+				.findAny().orElseThrow( () -> new IllegalStateException(
+						"Dockerfile " + dockerfile + " has unexpected structure. It *must* contain a single FROM line." ) );
+
+		if ( tag != null && !tag.trim().isEmpty() ) {
+			return dockerImageName.withTag( tag );
+		}
+
+		return dockerImageName;
 	}
 }
