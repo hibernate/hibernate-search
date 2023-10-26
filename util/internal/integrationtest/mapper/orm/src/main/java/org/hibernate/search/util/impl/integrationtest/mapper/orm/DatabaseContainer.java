@@ -8,10 +8,12 @@ package org.hibernate.search.util.impl.integrationtest.mapper.orm;
 
 import java.nio.file.Path;
 import java.time.Duration;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Optional;
 import java.util.function.BiConsumer;
 
 import org.hibernate.cfg.JdbcSettings;
@@ -20,6 +22,9 @@ import com.github.dockerjava.api.model.HostConfig;
 import com.github.dockerjava.api.model.Ulimit;
 
 import org.testcontainers.containers.JdbcDatabaseContainer;
+import org.testcontainers.containers.wait.strategy.HttpWaitStrategy;
+import org.testcontainers.containers.wait.strategy.LogMessageWaitStrategy;
+import org.testcontainers.containers.wait.strategy.WaitStrategy;
 import org.testcontainers.images.builder.ImageFromDockerfile;
 
 /*
@@ -51,20 +56,32 @@ public final class DatabaseContainer {
 	}
 
 	public static Configuration configuration() {
-		if ( !SupportedDatabase.H2.equals( DATABASE ) ) {
-			DATABASE_CONTAINER.start();
+		// Let's see if an external DB connection was provided:
+		String url = System.getProperty( "jdbc.url" );
+		if ( url != null && !url.trim().isEmpty() ) {
+			// -Dhibernate.dialect=${db.dialect}
+			// -Dhibernate.connection.driver_class=${jdbc.driver}
+			// -Dhibernate.connection.url=${jdbc.url}
+			// -Dhibernate.connection.username=${jdbc.user}
+			// -Dhibernate.connection.password=${jdbc.pass}
+			// -Dhibernate.connection.isolation=${jdbc.isolation}
+			return DATABASE.configuration( url, DATABASE_CONTAINER )
+					.withDialect( System.getProperty( "db.dialect" ) )
+					.withDriver( System.getProperty( "jdbc.driver" ) )
+					.withUser( System.getProperty( "jdbc.user" ) )
+					.withPass( System.getProperty( "jdbc.pass" ) )
+					.withIsolation( System.getProperty( "jdbc.isolation" ) );
 		}
-		Configuration configuration = DATABASE.configuration( DATABASE_CONTAINER );
-
-		if ( DATABASE_CONTAINER != null && !DATABASE_CONTAINER.isRunning() ) {
-			synchronized (DATABASE_CONTAINER) {
-				if ( !DATABASE_CONTAINER.isRunning() ) {
-					DATABASE_CONTAINER.start();
+		else {
+			if ( DATABASE_CONTAINER != null && !DATABASE_CONTAINER.isRunning() ) {
+				synchronized (DATABASE_CONTAINER) {
+					if ( !DATABASE_CONTAINER.isRunning() ) {
+						DATABASE_CONTAINER.start();
+					}
 				}
 			}
+			return DATABASE.configuration( DATABASE_CONTAINER );
 		}
-
-		return configuration;
 	}
 
 	private enum SupportedDatabase {
@@ -87,6 +104,11 @@ public final class DatabaseContainer {
 			}
 
 			@Override
+			Configuration configuration(String jdbcUrl, JdbcDatabaseContainer<?> container) {
+				return configuration( container ).withUrl( jdbcUrl );
+			}
+
+			@Override
 			HibernateSearchJdbcDatabaseContainer container(Path dockerfile, String name) {
 				return null;
 			}
@@ -106,7 +128,10 @@ public final class DatabaseContainer {
 						5432,
 						"hibernate_orm_test",
 						"hibernate_orm_test",
-						"select 1"
+						"select 1",
+						new LogMessageWaitStrategy()
+								.withRegEx( ".*database system is ready to accept connections.*\\s" )
+								.withTimes( 2 )
 				).withEnv( "POSTGRES_USER", "hibernate_orm_test" )
 						.withEnv( "POSTGRES_PASSWORD", "hibernate_orm_test" )
 						.withEnv( "POSTGRES_DB", "hibernate_orm_test" );
@@ -168,16 +193,19 @@ public final class DatabaseContainer {
 
 			@Override
 			HibernateSearchJdbcDatabaseContainer container(Path dockerfile, String name) {
+
 				return new HibernateSearchJdbcDatabaseContainer(
 						dockerfile, name,
 						"com.ibm.db2.jcc.DB2Driver",
-						"jdbc:db2://%s:%d/hreact",
+						"jdbc:db2://%s:%d/hreact:sslConnection=false;",
 						50000,
 						"hreact",
 						"hreact",
-						"SELECT 1 FROM SYSIBM.SYSDUMMY1"
-
-				).withNetworkMode( "bridge" )
+						"SELECT 1 FROM SYSIBM.SYSDUMMY1",
+						new LogMessageWaitStrategy()
+								.withRegEx( ".*Setup has completed\\..*" )
+				).withPrivilegedMode( true )
+						.withNetworkMode( "bridge" )
 						.withEnv( "DB2INSTANCE", "hreact" )
 						.withEnv( "DB2INST1_PASSWORD", "hreact" )
 						.withEnv( "DBNAME", "hreact" )
@@ -207,9 +235,11 @@ public final class DatabaseContainer {
 						1521,
 						"SYSTEM",
 						"hibernate_orm_test",
-						"select 1 from dual"
-				).withEnv( "ORACLE_PASSWORD", "hibernate_orm_test" )
-						.withStartupTimeout( EXTENDED_TIMEOUT );
+						"select 1 from dual",
+						new LogMessageWaitStrategy()
+								.withRegEx( ".*DATABASE IS READY TO USE!.*\\s" )
+								.withTimes( 1 )
+				).withEnv( "ORACLE_PASSWORD", "hibernate_orm_test" );
 			}
 		},
 		MSSQL {
@@ -223,13 +253,13 @@ public final class DatabaseContainer {
 				return new HibernateSearchJdbcDatabaseContainer(
 						dockerfile, name,
 						"com.microsoft.sqlserver.jdbc.SQLServerDriver",
-						"jdbc:sqlserver://%s:%d;databaseName=tempdb",
+						"jdbc:sqlserver://%s:%d;databaseName=tempdb;encrypt=true;trustServerCertificate=true;",
 						1433,
 						"SA",
 						"ActuallyRequired11Complexity",
 						"select 1"
 				).withEnv( "ACCEPT_EULA", "Y" )
-						.withEnv( "SA_PASSWORD", "ActuallyRequired11Complexity" )
+						.withEnv( "MSSQL_SA_PASSWORD", "ActuallyRequired11Complexity" )
 						.withStartupTimeout( EXTENDED_TIMEOUT );
 			}
 		},
@@ -248,7 +278,12 @@ public final class DatabaseContainer {
 						26257,
 						"root",
 						"",
-						"select 1"
+						"select 1",
+						new HttpWaitStrategy()
+								.forPath( "/health" )
+								.forPort( 8080 )
+								.forStatusCode( 200 ),
+						8080
 				).withCommand( "start-single-node --insecure" )
 						.withStartupTimeout( EXTENDED_TIMEOUT )
 						.withCreateContainerCmdModifier( cmd -> {
@@ -266,6 +301,17 @@ public final class DatabaseContainer {
 					dialect(),
 					container.getDriverClassName(),
 					container.getJdbcUrl(),
+					container.getUsername(),
+					container.getPassword(),
+					""
+			);
+		}
+
+		Configuration configuration(String jdbcUrl, JdbcDatabaseContainer<?> container) {
+			return new Configuration(
+					dialect(),
+					container.getDriverClassName(),
+					jdbcUrl,
 					container.getUsername(),
 					container.getPassword(),
 					""
@@ -295,9 +341,16 @@ public final class DatabaseContainer {
 		private final String username;
 		private final String password;
 		private final String testQueryString;
+		private final Optional<WaitStrategy> customWaitStrategy;
 
 		public HibernateSearchJdbcDatabaseContainer(Path dockerfile, String name, String driverClassName, String jdbcUrlPattern,
 				int port, String username, String password, String testQueryString) {
+			this( dockerfile, name, driverClassName, jdbcUrlPattern, port, username, password, testQueryString, null );
+		}
+
+		public HibernateSearchJdbcDatabaseContainer(Path dockerfile, String name, String driverClassName, String jdbcUrlPattern,
+				int port, String username, String password, String testQueryString, WaitStrategy waitStrategy,
+				Integer... additionalExposedPorts) {
 			// IMPORTANT: we do not want to delete the image on exit as then we cannot use container reuse.
 			// (these two options are somewhat mutually exclusive).
 			super( new ImageFromDockerfile( "hibernate-search-" + name, false ).withDockerfile( dockerfile ) );
@@ -307,10 +360,36 @@ public final class DatabaseContainer {
 			this.username = username;
 			this.password = password;
 			this.testQueryString = testQueryString;
+			this.customWaitStrategy = Optional.ofNullable( waitStrategy );
 
-			withExposedPorts( port );
+			if ( additionalExposedPorts.length == 0 ) {
+				withExposedPorts( port );
+			}
+			else {
+				Integer[] ports = Arrays.copyOf( additionalExposedPorts, additionalExposedPorts.length + 1 );
+				ports[additionalExposedPorts.length] = port;
+				withExposedPorts( ports );
+			}
 			withReuse( true );
 			withStartupTimeout( REGULAR_TIMEOUT );
+		}
+
+		@Override
+		protected void waitUntilContainerStarted() {
+			if ( customWaitStrategy.isPresent() ) {
+				customWaitStrategy.get().waitUntilReady( this );
+			}
+			else {
+				super.waitUntilContainerStarted();
+			}
+		}
+
+		@Override
+		public HibernateSearchJdbcDatabaseContainer withStartupTimeout(Duration startupTimeout) {
+			if ( customWaitStrategy.isPresent() ) {
+				customWaitStrategy.get().withStartupTimeout( startupTimeout );
+			}
+			return super.withStartupTimeout( startupTimeout );
 		}
 
 		@Override
@@ -348,7 +427,7 @@ public final class DatabaseContainer {
 		private final String pass;
 		private final String isolation;
 
-		public Configuration(String dialect, String driver, String url, String user, String pass, String isolation) {
+		private Configuration(String dialect, String driver, String url, String user, String pass, String isolation) {
 			this.dialect = dialect;
 			this.driver = driver;
 			this.url = url;
@@ -396,6 +475,48 @@ public final class DatabaseContainer {
 			consumer.accept( "spring.datasource.url", this.url );
 			consumer.accept( "spring.datasource.username", this.user );
 			consumer.accept( "spring.datasource.password", this.pass );
+		}
+
+		private Configuration withDialect(String dialect) {
+			if ( dialect == null ) {
+				return this;
+			}
+			return new Configuration( dialect, driver, url, user, pass, isolation );
+		}
+
+		private Configuration withDriver(String driver) {
+			if ( driver == null ) {
+				return this;
+			}
+			return new Configuration( dialect, driver, url, user, pass, isolation );
+		}
+
+		private Configuration withUrl(String url) {
+			if ( url == null ) {
+				return this;
+			}
+			return new Configuration( dialect, driver, url, user, pass, isolation );
+		}
+
+		private Configuration withUser(String user) {
+			if ( user == null ) {
+				return this;
+			}
+			return new Configuration( dialect, driver, url, user, pass, isolation );
+		}
+
+		private Configuration withPass(String pass) {
+			if ( pass == null ) {
+				return this;
+			}
+			return new Configuration( dialect, driver, url, user, pass, isolation );
+		}
+
+		private Configuration withIsolation(String isolation) {
+			if ( isolation == null ) {
+				return this;
+			}
+			return new Configuration( dialect, driver, url, user, pass, isolation );
 		}
 	}
 }
