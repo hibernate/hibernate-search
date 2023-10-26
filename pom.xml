@@ -195,7 +195,7 @@
              Version to be used as baseline for API/SPI change reports,
              and for the migration guide
           -->
-        <version.org.hibernate.search.previous-stable>6.2.0.CR1</version.org.hibernate.search.previous-stable>
+        <version.org.hibernate.search.previous-stable>6.2.2.Final</version.org.hibernate.search.previous-stable>
 
         <!-- Build settings -->
 
