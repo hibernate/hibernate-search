@@ -107,8 +107,7 @@ pipeline {
 	options {
 		buildDiscarder logRotator(daysToKeepStr: '10', numToKeepStr: '3')
 		disableConcurrentBuilds(abortPrevious: true)
-		// Run at most twice per week, to preserve CI workers for more urgent tasks.
-		rateLimitBuilds(throttle: [count: 2, durationName: 'week', userBoost: true])
+		overrideIndexTriggers(false)
 	}
 	stages {
 		// This allows testing the original (unpatched) artifacts,
@@ -142,7 +141,10 @@ pipeline {
 						}
 						script {
 							dir('hibernate-orm-local-copy') {
-								sh "git clone ${params.ORM_REPOSITORY} --depth 1 --branch ${params.ORM_BRANCH} --single-branch ."
+								// We may get either an http or an ssh repository URLs.
+								// Since this job can work correctly only with an http URL we will try to adapt the ssh url if we spot one:
+								def repositoryUrl = params.ORM_REPOSITORY ==~ /^git@github\.com:.+$/ ? params.ORM_REPOSITORY.replace("git@github.com:", "https://github.com/") : params.ORM_REPOSITORY
+								sh "git clone ${repositoryUrl} --depth 1 --branch ${params.ORM_BRANCH} --single-branch ."
 								sh "./gradlew publishToMavenLocal -x test -Dmaven.repo.local=${env.WORKSPACE_TMP}/.m2repository"
 							}
 							dir(env.WORKSPACE_TMP + '/.m2repository') {
