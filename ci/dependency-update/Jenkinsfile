@@ -97,7 +97,8 @@ pipeline {
 		// Make sure tp update axis and settings() when adding new choice parameter.
 		choice(name: 'UPDATE_JOB', choices: ['all', 'jandex3', 'orm5.6', 'orm6.2', 'orm6.3', 'orm6-in-main-code'], description: 'Select which update jobs to run. `All` will include all configured update jobs.')
 		string(name: 'ORM_REPOSITORY', defaultValue: '', description: 'Git URL to Hibernate ORM repository. If provided, Hibernate ORM will be built locally. Works only in pair with ORM_BRANCH. Provide an http repository URL rather than an ssh one.')
-		string(name: 'ORM_BRANCH', defaultValue: '', description: 'Hibernate ORM branch to build from. If provided, Hibernate ORM will be built locally. Works only in pair with ORM_REPOSITORY.')
+		string(name: 'ORM_BRANCH', defaultValue: '', description: 'Hibernate ORM branch to build from. If provided, Hibernate ORM will be built locally. Works only in pair with ORM_REPOSITORY. Either a pull request ID or a branch name should be provided, but not both at the same time. Use branch if you want to build from a fork repository.')
+		string(name: 'ORM_PULL_REQUEST_ID', defaultValue: '', description: 'Hibernate ORM pull request id to build from. If provided, Hibernate ORM will be built locally. Works only in pair with ORM_REPOSITORY. Either a pull request ID or a branch name should be provided, but not both at the same time.')
 	}
 	options {
 		buildDiscarder logRotator(daysToKeepStr: '10', numToKeepStr: '3')
@@ -125,13 +126,16 @@ pipeline {
 					when {
 						beforeAgent true
 						expression {
-							return params.ORM_REPOSITORY?.trim() || params.ORM_BRANCH?.trim()
+							return params.ORM_REPOSITORY?.trim() || params.ORM_BRANCH?.trim() || params.ORM_PULL_REQUEST_ID?.trim()
 						}
 					}
 					steps {
 						script {
-							if (!params.ORM_REPOSITORY?.trim() || !params.ORM_BRANCH?.trim()) {
-								error "Both ORM_REPOSITORY and ORM_BRANCH must be not blank if a local build of Hibernate ORM is required. Repository: [${params.ORM_REPOSITORY}], branch: [${params.ORM_BRANCH}]."
+							if (params.ORM_BRANCH?.trim() && params.ORM_PULL_REQUEST_ID?.trim()) {
+								error "Both ORM_BRANCH and ORM_PULL_REQUEST_ID are provided. Use only one of these parameters."
+							}
+							if (!params.ORM_REPOSITORY?.trim() || !(params.ORM_BRANCH?.trim() || params.ORM_PULL_REQUEST_ID?.trim())) {
+								error "Both ORM_REPOSITORY and either ORM_BRANCH or ORM_PULL_REQUEST_ID must be not blank if a local build of Hibernate ORM is required. Repository: [${params.ORM_REPOSITORY}], branch: [${params.ORM_BRANCH}, pull request: [${params.ORM_PULL_REQUEST_ID}]]."
 							}
 						}
 						script {
@@ -139,7 +143,14 @@ pipeline {
 								// We may get either an http or an ssh repository URLs.
 								// Since this job can work correctly only with an http URL we will try to adapt the ssh url if we spot one:
 								def repositoryUrl = params.ORM_REPOSITORY ==~ /^git@github\.com:.+$/ ? params.ORM_REPOSITORY.replace("git@github.com:", "https://github.com/") : params.ORM_REPOSITORY
-								sh "git clone ${repositoryUrl} --depth 1 --branch ${params.ORM_BRANCH} --single-branch ."
+								if (params.ORM_BRANCH?.trim()) {
+									sh "git clone ${repositoryUrl} --depth 1 --branch ${params.ORM_BRANCH} --single-branch ."
+								} else {
+									sh "git clone ${repositoryUrl} --depth 1 --single-branch ."
+									sh "git fetch origin pull/${params.ORM_PULL_REQUEST_ID}/head:orm-branch-to-build"
+									sh "git switch orm-branch-to-build"
+								}
+
 								sh "./gradlew publishToMavenLocal -x test -Dmaven.repo.local=${env.WORKSPACE_TMP}/.m2repository"
 							}
 							dir(env.WORKSPACE_TMP + '/.m2repository') {
