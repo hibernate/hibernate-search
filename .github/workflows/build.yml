@@ -6,7 +6,7 @@
 # See https://docs.github.com/en/actions
 # for more information about GitHub actions.
 
-name: Hibernate Search GitHub Actions Build
+name: GitHub Actions Build
 
 on:
   push:
