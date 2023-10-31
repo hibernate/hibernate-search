@@ -257,7 +257,7 @@
         <maven.compiler.testTarget>${maven.compiler.testRelease}</maven.compiler.testTarget>
 
         <!-- Plugin versions -->
-        <version.clean.plugin>3.3.1</version.clean.plugin>
+        <version.clean.plugin>3.3.2</version.clean.plugin>
         <version.install.plugin>3.1.1</version.install.plugin>
         <version.enforcer.plugin>3.4.0</version.enforcer.plugin>
         <version.project-info.plugin>3.4.5</version.project-info.plugin>
@@ -268,7 +268,7 @@
         <version.flatten-maven-plugin>1.5.0</version.flatten-maven-plugin>
         <version.assembly.plugin>3.6.0</version.assembly.plugin>
         <version.buildhelper.plugin>3.4.0</version.buildhelper.plugin>
-        <version.checkstyle.plugin>3.3.0</version.checkstyle.plugin>
+        <version.checkstyle.plugin>3.3.1</version.checkstyle.plugin>
         <version.bundle.plugin>5.1.9</version.bundle.plugin>
         <!-- Needing 3.6.2 at least because of MCOMPILER-294 -->
         <version.compiler.plugin>3.11.0</version.compiler.plugin>
