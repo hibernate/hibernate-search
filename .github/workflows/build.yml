@@ -11,26 +11,28 @@ name: Hibernate Search GitHub Actions Build
 on:
   push:
     branches:
+      # Pattern order matters: the last matching inclusion/exclusion wins
+      - '**'
       - '!3.*'
       - '!4.*'
       - '!5.*'
       - '!6.*'
       - '!dependabot/**'
-      - '**'
     tags:
       - '**'
   pull_request:
     types: [opened, synchronize, reopened, ready_for_review]
     branches:
+      # Pattern order matters: the last matching inclusion/exclusion wins
+      - '**'
       - '!3.*'
       - '!4.*'
       - '!5.*'
       - '!6.*'
       # Ignore dependabot PRs that are not just about build dependencies;
       # we'll reject such dependant PRs and send a PR ourselves.
-      - 'dependabot/maven/build-dependencies-**'
       - '!dependabot/**'
-      - '**'
+      - 'dependabot/maven/build-dependencies-**'
 
 concurrency:
   group: "workflow = ${{ github.workflow }}, ref = ${{ github.event.ref }}, pr = ${{ github.event.pull_request.id }}"
