@@ -11,6 +11,9 @@ registries:
     username: ${{secrets.DOCKERHUB_USERNAME}}
     password: ${{secrets.DOCKERHUB_TOKEN}}
     replaces-base: true
+  ibm:
+    type: docker-registry
+    url: https://icr.io
 updates:
   - package-ecosystem: "maven"
     directory: "/"
@@ -109,6 +112,7 @@ updates:
   - package-ecosystem: "docker"
     registries:
       - dockerhub
+      - ibm
     # For dependabot to find Docker files they all should be in the same directory.
     # Dependabot is picking any files that has `dockerfile` in them.
     #
