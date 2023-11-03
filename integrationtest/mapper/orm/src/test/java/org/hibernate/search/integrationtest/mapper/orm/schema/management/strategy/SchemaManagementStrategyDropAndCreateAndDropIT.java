@@ -10,6 +10,7 @@ import java.util.concurrent.CompletableFuture;
 
 import org.hibernate.SessionFactory;
 import org.hibernate.search.mapper.orm.schema.management.SchemaManagementStrategyName;
+import org.hibernate.search.util.common.SearchException;
 import org.hibernate.search.util.impl.integrationtest.common.extension.SchemaManagementWorkBehavior;
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.index.StubSchemaManagementWork;
 import org.hibernate.search.util.impl.test.ExceptionMatcherBuilder;
@@ -44,9 +45,12 @@ class SchemaManagementStrategyDropAndCreateAndDropIT extends AbstractSchemaManag
 
 		logged.expectEvent(
 				Level.ERROR,
-				ExceptionMatcherBuilder.isException( exception ).build(),
-				"Hibernate Search encountered a failure during shutdown",
-				IndexedEntity2.class.getName()
+				ExceptionMatcherBuilder.isException( SearchException.class )
+						.withMessage( "Hibernate Search encountered failures during shutdown" )
+						.withMessage( IndexedEntity2.class.getName() )
+						.withSuppressed( exception )
+						.build(),
+				"Unable to shut down Hibernate Search"
 		);
 		sessionFactory.close();
 		backendMock.verifyExpectationsMet();
@@ -67,15 +71,14 @@ class SchemaManagementStrategyDropAndCreateAndDropIT extends AbstractSchemaManag
 
 		logged.expectEvent(
 				Level.ERROR,
-				ExceptionMatcherBuilder.isException( exception1 ).build(),
-				"Hibernate Search encountered a failure during shutdown",
-				IndexedEntity1.class.getName()
-		);
-		logged.expectEvent(
-				Level.ERROR,
-				ExceptionMatcherBuilder.isException( exception2 ).build(),
-				"Hibernate Search encountered a failure during shutdown",
-				IndexedEntity2.class.getName()
+				ExceptionMatcherBuilder.isException( SearchException.class )
+						.withMessage( "Hibernate Search encountered failures during shutdown" )
+						.withMessage( IndexedEntity1.class.getName() )
+						.withMessage( IndexedEntity2.class.getName() )
+						.withSuppressed( exception1 )
+						.withSuppressed( exception2 )
+						.build(),
+				"Unable to shut down Hibernate Search"
 		);
 		sessionFactory.close();
 		backendMock.verifyExpectationsMet();

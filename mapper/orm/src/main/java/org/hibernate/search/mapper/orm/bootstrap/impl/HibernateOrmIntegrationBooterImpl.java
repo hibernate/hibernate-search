@@ -167,7 +167,7 @@ public class HibernateOrmIntegrationBooterImpl implements HibernateOrmIntegratio
 				// to skip further cleanup of other resources.
 				.whenComplete( Futures.handler( (ignored, throwable) -> {
 					if ( throwable != null ) {
-						log.shutdownFailed( throwable.getMessage(), throwable );
+						log.shutdownFailed( throwable );
 					}
 				} ) );
 
