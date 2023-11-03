@@ -29,10 +29,12 @@ import org.hibernate.search.util.common.SearchException;
 import org.hibernate.search.util.common.SearchTimeoutException;
 import org.hibernate.search.util.common.logging.impl.ClassFormatter;
 import org.hibernate.search.util.common.logging.impl.DurationInSecondsAndFractionsFormatter;
+import org.hibernate.search.util.common.logging.impl.EventContextFormatter;
 import org.hibernate.search.util.common.logging.impl.EventContextNoPrefixFormatter;
 import org.hibernate.search.util.common.logging.impl.MessageConstants;
 import org.hibernate.search.util.common.logging.impl.SimpleNameClassFormatter;
 import org.hibernate.search.util.common.reporting.EventContext;
+import org.hibernate.search.util.common.reporting.spi.EventContextProvider;
 
 import org.jboss.logging.BasicLogger;
 import org.jboss.logging.Logger;
@@ -141,10 +143,12 @@ public interface Log extends BasicLogger {
 			value = "Hibernate Search encountered a failure during %1$s;"
 					+ " continuing for now to list all problems,"
 					+ " but the process will ultimately be aborted.\n"
-					+ "Context: %2$s\n"
+					+ "%2$s\n" // Context
 					+ "Failure:" // The stack trace follows
 	)
-	void newCollectedFailure(String process, String context, @Cause Throwable failure);
+	void newCollectedFailure(String process,
+			@FormatWith(EventContextFormatter.class) EventContextProvider contextProvider,
+			@Cause Throwable failure);
 
 	@LogMessage(level = Logger.Level.WARN)
 	@Message(id = ID_OFFSET + 22, value = "Exception while collecting a failure"
