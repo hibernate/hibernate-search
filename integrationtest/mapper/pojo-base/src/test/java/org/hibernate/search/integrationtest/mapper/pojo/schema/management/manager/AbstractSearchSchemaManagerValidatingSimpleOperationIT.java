@@ -17,11 +17,19 @@ import org.hibernate.search.util.impl.integrationtest.common.reporting.FailureRe
 
 import org.junit.jupiter.api.Test;
 
+import org.apache.logging.log4j.Level;
+import org.hamcrest.Matchers;
+
 public abstract class AbstractSearchSchemaManagerValidatingSimpleOperationIT
 		extends AbstractSearchSchemaManagerSimpleOperationIT {
 
 	@Test
 	void failure_single() {
+		String failureMessage = "My failure";
+
+		// We must not log the failures, see https://hibernate.atlassian.net/browse/HSEARCH-4995
+		logged.expectEvent( Level.DEBUG /* or higher */, failureMessage ).never();
+
 		try ( SearchSession searchSession = mapping.createSession() ) {
 			SearchSchemaManager manager = searchSession
 					.scope( Object.class )
@@ -29,7 +37,7 @@ public abstract class AbstractSearchSchemaManagerValidatingSimpleOperationIT
 
 			expectWork( IndexedEntity1.NAME, CompletableFuture.completedFuture( null ) );
 			expectWork( IndexedEntity2.NAME, failureCollector -> {
-				failureCollector.add( "My failure" );
+				failureCollector.add( failureMessage );
 				return CompletableFuture.completedFuture( null );
 			} );
 
@@ -37,7 +45,7 @@ public abstract class AbstractSearchSchemaManagerValidatingSimpleOperationIT
 					.isInstanceOf( SearchException.class )
 					.satisfies( FailureReportUtils.hasFailureReport()
 							.typeContext( IndexedEntity2.class.getName() )
-							.failure( "My failure" ) );
+							.failure( failureMessage ) );
 		}
 	}
 
@@ -69,14 +77,23 @@ public abstract class AbstractSearchSchemaManagerValidatingSimpleOperationIT
 
 	@Test
 	void failure_exception() {
+		String failureMessage = "My failure";
+		String exceptionMessage = "My exception";
+
+		// We must not log the failures, see https://hibernate.atlassian.net/browse/HSEARCH-4995
+		logged.expectEvent( Level.DEBUG /* or higher */, failureMessage ).never();
+		logged.expectEvent( Level.DEBUG /* or higher */, Matchers.hasToString( Matchers.containsString( exceptionMessage ) ) )
+				.never();
+
 		try ( SearchSession searchSession = mapping.createSession() ) {
+
 			SearchSchemaManager manager = searchSession
 					.scope( Object.class )
 					.schemaManager();
 
-			RuntimeException exception = new RuntimeException( "My exception" );
+			RuntimeException exception = new RuntimeException( exceptionMessage );
 			expectWork( IndexedEntity1.NAME, failureCollector -> {
-				failureCollector.add( "My failure" );
+				failureCollector.add( failureMessage );
 				return exceptionFuture( exception );
 			} );
 			expectWork( IndexedEntity2.NAME, CompletableFuture.completedFuture( null ) );
@@ -85,8 +102,9 @@ public abstract class AbstractSearchSchemaManagerValidatingSimpleOperationIT
 					.isInstanceOf( SearchException.class )
 					.satisfies( FailureReportUtils.hasFailureReport()
 							.typeContext( IndexedEntity1.class.getName() )
-							.failure( "My failure" )
-							.failure( "My exception" ) );
+							.failure( failureMessage )
+							.failure( exceptionMessage ) )
+					.hasSuppressedException( exception );
 		}
 	}
 

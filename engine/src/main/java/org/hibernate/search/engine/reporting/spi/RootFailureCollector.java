@@ -7,6 +7,7 @@
 package org.hibernate.search.engine.reporting.spi;
 
 import java.lang.invoke.MethodHandles;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
@@ -49,28 +50,24 @@ public final class RootFailureCollector implements FailureCollector {
 
 	public void checkNoFailure() {
 		if ( failureCount.get() > 0 ) {
-			String renderedFailures = renderFailures();
-			throw log.collectedFailures( process, renderedFailures );
+			List<Throwable> failures = new ArrayList<>();
+			ToStringStyle style = ToStringStyle.multilineIndentStructure(
+					EngineEventContextMessages.INSTANCE.failureReportContextFailuresSeparator(),
+					EngineEventContextMessages.INSTANCE.failureReportContextIndent(),
+					EngineEventContextMessages.INSTANCE.failureReportFailuresBulletPoint(),
+					EngineEventContextMessages.INSTANCE.failureReportFailuresNoBulletPoint()
+			);
+			ToStringTreeBuilder builder = new ToStringTreeBuilder( style );
+			builder.startObject();
+			if ( failureCount.get() > FAILURE_LIMIT ) {
+				builder.value( log.collectedFailureLimitReached( process, FAILURE_LIMIT, failureCount.get() ) );
+			}
+			if ( delegate != null ) {
+				delegate.appendChildrenFailuresTo( failures, builder );
+			}
+			builder.endObject();
+			throw log.collectedFailures( process, builder.toString(), failures );
 		}
-	}
-
-	private String renderFailures() {
-		ToStringStyle style = ToStringStyle.multilineIndentStructure(
-				EngineEventContextMessages.INSTANCE.failureReportContextFailuresSeparator(),
-				EngineEventContextMessages.INSTANCE.failureReportContextIndent(),
-				EngineEventContextMessages.INSTANCE.failureReportFailuresBulletPoint(),
-				EngineEventContextMessages.INSTANCE.failureReportFailuresNoBulletPoint()
-		);
-		ToStringTreeBuilder builder = new ToStringTreeBuilder( style );
-		builder.startObject();
-		if ( failureCount.get() > FAILURE_LIMIT ) {
-			builder.value( log.collectedFailureLimitReached( process, FAILURE_LIMIT, failureCount.get() ) );
-		}
-		if ( delegate != null ) {
-			delegate.appendChildrenFailuresTo( builder );
-		}
-		builder.endObject();
-		return builder.toString();
 	}
 
 	@Override
@@ -142,12 +139,12 @@ public final class RootFailureCollector implements FailureCollector {
 			// Nothing to do
 		}
 
-		final void appendChildrenFailuresTo(ToStringTreeBuilder builder) {
+		final void appendChildrenFailuresTo(List<Throwable> failures, ToStringTreeBuilder builder) {
 			for ( ContextualFailureCollectorImpl child : children.values() ) {
 				// Some contexts may have been mentioned without any failure being ever reported.
 				// Only display contexts that had at least one failure reported.
 				if ( child.hasFailure() ) {
-					child.appendFailuresTo( builder );
+					child.appendFailuresTo( failures, builder );
 				}
 			}
 		}
@@ -162,6 +159,7 @@ public final class RootFailureCollector implements FailureCollector {
 		private final EventContextElement context;
 
 		// Avoiding blocking implementations because we access this from reactive event loops
+		private final Collection<Throwable> failures = new ConcurrentLinkedDeque<>();
 		private final Collection<String> failureMessages = new ConcurrentLinkedDeque<>();
 
 		private ContextualFailureCollectorImpl(NonRootFailureCollector parent, EventContextElement context) {
@@ -202,7 +200,7 @@ public final class RootFailureCollector implements FailureCollector {
 
 		@Override
 		public void add(String failureMessage) {
-			doAdd( failureMessage );
+			doAdd( null, failureMessage );
 		}
 
 		@Override
@@ -216,12 +214,13 @@ public final class RootFailureCollector implements FailureCollector {
 			joiner.add( context.render() );
 		}
 
-		void appendFailuresTo(ToStringTreeBuilder builder) {
+		void appendFailuresTo(List<Throwable> failures, ToStringTreeBuilder builder) {
 			builder.startObject( context.render() );
+			failures.addAll( this.failures );
 			if ( !failureMessages.isEmpty() ) {
 				builder.attribute( EngineEventContextMessages.INSTANCE.failureReportFailures(), failureMessages );
 			}
-			appendChildrenFailuresTo( builder );
+			appendChildrenFailuresTo( failures, builder );
 			builder.endObject();
 		}
 
@@ -230,12 +229,11 @@ public final class RootFailureCollector implements FailureCollector {
 			appendContextTo( contextJoiner );
 			log.newCollectedFailure( root.process, contextJoiner.toString(), failure );
 
-			doAdd( failureMessage );
-		}
-
-		private void doAdd(String failureMessage) {
 			if ( root.shouldAddFailure() ) {
 				failureMessages.add( failureMessage );
+				if ( failure != null ) {
+					failures.add( failure );
+				}
 			}
 		}
 	}

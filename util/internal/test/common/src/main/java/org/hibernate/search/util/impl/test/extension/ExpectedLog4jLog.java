@@ -109,6 +109,20 @@ public class ExpectedLog4jLog implements BeforeEachCallback, AfterEachCallback {
 
 	/**
 	 * Expect a logging event matching the given level or higher,
+	 * with a throwable matching the given matcher.
+	 * <p>
+	 * Defaults to expecting the event once or more.
+	 */
+	public LogExpectation expectEvent(Level level,
+			Matcher<? super Throwable> throwableMatcher) {
+		return expectEvent( CoreMatchers.allOf(
+				eventLevelMatcher( level ),
+				eventThrowableMatcher( throwableMatcher )
+		) );
+	}
+
+	/**
+	 * Expect a logging event matching the given level or higher,
 	 * with a throwable matching the given matcher,
 	 * and with a message containing the given strings.
 	 * <p>

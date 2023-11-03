@@ -15,8 +15,10 @@ import org.hibernate.search.mapper.pojo.bridge.mapping.annotation.ValueBridgeRef
 import org.hibernate.search.mapper.pojo.bridge.runtime.ValueBridgeToIndexedValueContext;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.GenericField;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
+import org.hibernate.search.util.common.SearchException;
 import org.hibernate.search.util.impl.integrationtest.common.extension.BackendMock;
 import org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmSetupHelper;
+import org.hibernate.search.util.impl.test.ExceptionMatcherBuilder;
 import org.hibernate.search.util.impl.test.extension.ExpectedLog4jLog;
 
 import org.junit.jupiter.api.Test;
@@ -44,7 +46,14 @@ class ShutdownFailureIT {
 		backendMock.expectAnySchema( FailingIndexedEntity.NAME );
 		SessionFactory sessionFactory = ormSetupHelper.start().setup( FailingIndexedEntity.class );
 
-		logged.expectEvent( Level.ERROR, "Simulated shutdown failure" );
+		logged.expectEvent( Level.ERROR,
+				ExceptionMatcherBuilder.isException( SearchException.class )
+						.withMessage( "Hibernate Search encountered failures during shutdown" )
+						.withSuppressed( ExceptionMatcherBuilder.isException( RuntimeException.class )
+								.withMessage( "Simulated shutdown failure" )
+								.build() )
+						.build(),
+				"Unable to shut down Hibernate Search" );
 		sessionFactory.close();
 	}
 
