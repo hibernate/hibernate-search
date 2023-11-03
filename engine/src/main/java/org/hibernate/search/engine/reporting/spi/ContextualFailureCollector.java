@@ -6,6 +6,8 @@
  */
 package org.hibernate.search.engine.reporting.spi;
 
+import org.hibernate.search.util.common.reporting.spi.EventContextProvider;
+
 /**
  * A failure collector with an implicit context.
  * <p>
@@ -13,7 +15,7 @@ package org.hibernate.search.engine.reporting.spi;
  *
  * @see FailureCollector
  */
-public interface ContextualFailureCollector extends FailureCollector {
+public interface ContextualFailureCollector extends FailureCollector, EventContextProvider {
 
 	boolean hasFailure();
 

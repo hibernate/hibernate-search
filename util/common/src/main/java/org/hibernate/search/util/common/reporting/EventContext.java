@@ -102,6 +102,10 @@ public final class EventContext {
 		return MESSAGES.contextPrefix() + render();
 	}
 
+	public EventContext append(EventContextElement other) {
+		return new EventContext( this, other );
+	}
+
 	public EventContext append(EventContext other) {
 		return other.appendTo( this );
 	}

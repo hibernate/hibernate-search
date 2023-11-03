@@ -37,4 +37,9 @@ public class StubUnusedContextualFailureCollector implements ContextualFailureCo
 	public ContextualFailureCollector withContext(EventContextElement contextElement) {
 		return fail( "Unexpected call to withContext(" + contextElement + ")" );
 	}
+
+	@Override
+	public EventContext eventContext() {
+		return fail( "Unexpected call to eventContext()" );
+	}
 }

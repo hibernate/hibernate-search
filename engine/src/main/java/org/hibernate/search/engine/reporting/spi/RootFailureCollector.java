@@ -11,7 +11,6 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
-import java.util.StringJoiner;
 import java.util.concurrent.ConcurrentLinkedDeque;
 import java.util.concurrent.ConcurrentSkipListMap;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -25,7 +24,6 @@ import org.hibernate.search.util.common.impl.ToStringTreeBuilder;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 import org.hibernate.search.util.common.reporting.EventContext;
 import org.hibernate.search.util.common.reporting.EventContextElement;
-import org.hibernate.search.util.common.reporting.impl.CommonEventContextMessages;
 
 public final class RootFailureCollector implements FailureCollector {
 
@@ -135,8 +133,8 @@ public final class RootFailureCollector implements FailureCollector {
 			return withContext( EventContexts.defaultContext() );
 		}
 
-		void appendContextTo(StringJoiner joiner) {
-			// Nothing to do
+		EventContext createEventContext(EventContextElement contextElement) {
+			return EventContext.create( contextElement );
 		}
 
 		final void appendChildrenFailuresTo(List<Throwable> failures, ToStringTreeBuilder builder) {
@@ -152,20 +150,21 @@ public final class RootFailureCollector implements FailureCollector {
 		final Collection<ContextualFailureCollectorImpl> children() {
 			return children.values();
 		}
+
 	}
 
 	private static class ContextualFailureCollectorImpl extends NonRootFailureCollector implements ContextualFailureCollector {
 		private final NonRootFailureCollector parent;
-		private final EventContextElement context;
+		private final EventContextElement contextElement;
 
 		// Avoiding blocking implementations because we access this from reactive event loops
 		private final Collection<Throwable> failures = new ConcurrentLinkedDeque<>();
 		private final Collection<String> failureMessages = new ConcurrentLinkedDeque<>();
 
-		private ContextualFailureCollectorImpl(NonRootFailureCollector parent, EventContextElement context) {
+		private ContextualFailureCollectorImpl(NonRootFailureCollector parent, EventContextElement contextElement) {
 			super( parent );
 			this.parent = parent;
-			this.context = context;
+			this.contextElement = contextElement;
 		}
 
 		@Override
@@ -209,13 +208,17 @@ public final class RootFailureCollector implements FailureCollector {
 		}
 
 		@Override
-		void appendContextTo(StringJoiner joiner) {
-			parent.appendContextTo( joiner );
-			joiner.add( context.render() );
+		public EventContext eventContext() {
+			return parent.createEventContext( contextElement );
+		}
+
+		@Override
+		EventContext createEventContext(EventContextElement contextElement) {
+			return eventContext().append( contextElement );
 		}
 
 		void appendFailuresTo(List<Throwable> failures, ToStringTreeBuilder builder) {
-			builder.startObject( context.render() );
+			builder.startObject( contextElement.render() );
 			failures.addAll( this.failures );
 			if ( !failureMessages.isEmpty() ) {
 				builder.attribute( EngineEventContextMessages.INSTANCE.failureReportFailures(), failureMessages );
@@ -225,9 +228,7 @@ public final class RootFailureCollector implements FailureCollector {
 		}
 
 		private void doAdd(Throwable failure, String failureMessage) {
-			StringJoiner contextJoiner = new StringJoiner( CommonEventContextMessages.INSTANCE.contextSeparator() );
-			appendContextTo( contextJoiner );
-			log.newCollectedFailure( root.process, contextJoiner.toString(), failure );
+			log.newCollectedFailure( root.process, this, failure );
 
 			if ( root.shouldAddFailure() ) {
 				failureMessages.add( failureMessage );
