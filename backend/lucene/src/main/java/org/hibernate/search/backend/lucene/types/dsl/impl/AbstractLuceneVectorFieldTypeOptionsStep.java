@@ -73,8 +73,8 @@ abstract class AbstractLuceneVectorFieldTypeOptionsStep<S extends AbstractLucene
 	}
 
 	@Override
-	public S beamWidth(Integer beamWidth) {
-		if ( beamWidth == null || beamWidth < 1 || beamWidth > MAX_BEAM_WIDTH ) {
+	public S beamWidth(int beamWidth) {
+		if ( beamWidth < 1 || beamWidth > MAX_BEAM_WIDTH ) {
 			throw log.vectorPropertyUnsupportedValue( "beamWidth", beamWidth, MAX_BEAM_WIDTH );
 		}
 		this.beamWidth = beamWidth;
@@ -82,8 +82,8 @@ abstract class AbstractLuceneVectorFieldTypeOptionsStep<S extends AbstractLucene
 	}
 
 	@Override
-	public S maxConnections(Integer maxConnections) {
-		if ( maxConnections == null || maxConnections < 1 || maxConnections > MAX_MAX_CONNECTIONS ) {
+	public S maxConnections(int maxConnections) {
+		if ( maxConnections < 1 || maxConnections > MAX_MAX_CONNECTIONS ) {
 			throw log.vectorPropertyUnsupportedValue( "maxConnections", maxConnections, MAX_MAX_CONNECTIONS );
 		}
 		this.maxConnections = maxConnections;

@@ -6,38 +6,27 @@
  */
 package org.hibernate.search.mapper.pojo.mapping.definition.programmatic.impl;
 
-import java.lang.invoke.MethodHandles;
-
 import org.hibernate.search.engine.backend.types.Projectable;
 import org.hibernate.search.engine.backend.types.Searchable;
 import org.hibernate.search.engine.backend.types.VectorSimilarity;
-import org.hibernate.search.mapper.pojo.logging.impl.Log;
+import org.hibernate.search.mapper.pojo.bridge.binding.spi.FieldModelContributorContext;
+import org.hibernate.search.mapper.pojo.extractor.mapping.programmatic.ContainerExtractorPath;
 import org.hibernate.search.mapper.pojo.mapping.building.spi.PojoPropertyMetadataContributor;
 import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.PropertyMappingStep;
 import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.PropertyMappingVectorFieldStep;
-import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
-class PropertyMappingVectorFieldStepImpl extends DelegatingPropertyMappingStep
+class PropertyMappingVectorFieldStepImpl extends AbstractPropertyMappingFieldOptionsStep<PropertyMappingVectorFieldStepImpl>
 		implements PropertyMappingVectorFieldStep, PojoPropertyMetadataContributor {
 
-	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
-
-	private final String relativeFieldName;
-	private Projectable projectable;
-	private VectorSimilarity vectorSimilarity;
-	private Integer beamWidth;
-	private Integer maxConnections;
-	private String indexNullAs;
-
-
 	PropertyMappingVectorFieldStepImpl(PropertyMappingStep parent, int dimension, String relativeFieldName) {
-		super( parent );
+		super( parent, relativeFieldName, FieldModelContributorContext::vectorTypeOptionsStep );
+		extractors( ContainerExtractorPath.noExtractors() );
 	}
 
 	@Override
 	public PropertyMappingVectorFieldStep projectable(Projectable projectable) {
-		this.projectable = projectable;
-		return this;
+		fieldModelContributor.add( c -> c.vectorTypeOptionsStep().projectable( projectable ) );
+		return thisAsS();
 	}
 
 	@Override
@@ -47,25 +36,30 @@ class PropertyMappingVectorFieldStepImpl extends DelegatingPropertyMappingStep
 
 	@Override
 	public PropertyMappingVectorFieldStep vectorSimilarity(VectorSimilarity vectorSimilarity) {
-		this.vectorSimilarity = vectorSimilarity;
-		return this;
+		fieldModelContributor.add( c -> c.vectorTypeOptionsStep().vectorSimilarity( vectorSimilarity ) );
+		return thisAsS();
 	}
 
 	@Override
 	public PropertyMappingVectorFieldStep beamWidth(int beamWidth) {
-		this.beamWidth = beamWidth;
-		return this;
+		fieldModelContributor.add( c -> c.vectorTypeOptionsStep().beamWidth( beamWidth ) );
+		return thisAsS();
 	}
 
 	@Override
 	public PropertyMappingVectorFieldStep maxConnections(int maxConnections) {
-		this.maxConnections = maxConnections;
-		return this;
+		fieldModelContributor.add( c -> c.vectorTypeOptionsStep().maxConnections( maxConnections ) );
+		return thisAsS();
 	}
 
 	@Override
 	public PropertyMappingVectorFieldStep indexNullAs(String indexNullAs) {
-		this.indexNullAs = indexNullAs;
+		fieldModelContributor.add( c -> c.indexNullAs( indexNullAs ) );
+		return thisAsS();
+	}
+
+	@Override
+	PropertyMappingVectorFieldStepImpl thisAsS() {
 		return this;
 	}
 }
