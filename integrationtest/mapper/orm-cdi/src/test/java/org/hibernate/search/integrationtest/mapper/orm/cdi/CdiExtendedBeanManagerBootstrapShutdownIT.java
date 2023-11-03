@@ -30,6 +30,7 @@ import org.hibernate.search.util.impl.integrationtest.common.extension.BackendMo
 import org.hibernate.search.util.impl.integrationtest.common.extension.StubSearchWorkBehavior;
 import org.hibernate.search.util.impl.integrationtest.common.reporting.FailureReportUtils;
 import org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmSetupHelper;
+import org.hibernate.search.util.impl.test.ExceptionMatcherBuilder;
 import org.hibernate.search.util.impl.test.annotation.TestForIssue;
 import org.hibernate.search.util.impl.test.extension.ExpectedLog4jLog;
 import org.hibernate.search.util.impl.test.extension.StaticCounters;
@@ -266,7 +267,12 @@ class CdiExtendedBeanManagerBootstrapShutdownIT {
 
 			// The bean manager shuts down.
 			// Hibernate Search should fail to shut down, and report the failure through the logs.
-			logged.expectEvent( Level.ERROR, "Simulated shutdown failure" );
+			logged.expectEvent( Level.ERROR,
+					ExceptionMatcherBuilder.isException( SearchException.class )
+							.withMessage( "Hibernate Search encountered failures during shutdown" )
+							.withSuppressed( bootFailedException )
+							.build(),
+					"Unable to shut down Hibernate Search" );
 			extendedBeanManager.simulateShutdown();
 
 			assertThat( StaticCounters.get().get( DependentBean.KEYS.preDestroy ) ).isEqualTo( 1 );

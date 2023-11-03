@@ -127,15 +127,16 @@ public interface Log extends BasicLogger {
 	@Message(id = ID_OFFSET + 19,
 			value = "Hibernate Search encountered %3$s failures during %1$s."
 					+ " Only the first %2$s failures are displayed here."
-					+ " See the logs for extra failures.")
+					+ " See the TRACE logs for extra failures.")
 	String collectedFailureLimitReached(String process, int failureLimit, int failureCount);
 
 	@Message(id = ID_OFFSET + 20,
 			value = "Hibernate Search encountered failures during %1$s."
 					+ " Failures:\n%2$s")
-	SearchException collectedFailures(String process, String renderedFailures);
+	SearchException collectedFailures(String process, String renderedFailures,
+			@Suppressed Collection<Throwable> failures);
 
-	@LogMessage(level = Logger.Level.ERROR)
+	@LogMessage(level = Logger.Level.TRACE)
 	@Message(id = ID_OFFSET + 21,
 			value = "Hibernate Search encountered a failure during %1$s;"
 					+ " continuing for now to list all problems,"

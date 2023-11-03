@@ -10,6 +10,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.awaitility.Awaitility.await;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ForkJoinPool;
 import java.util.concurrent.ForkJoinTask;
@@ -17,9 +18,51 @@ import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
+import org.hibernate.search.util.common.SearchException;
+
 import org.junit.jupiter.api.Test;
 
 class RootFailureCollectorTest {
+
+	@Test
+	void simple() {
+		RootFailureCollector rootFailureCollector = new RootFailureCollector( "RootName" );
+		List<String> messages = new ArrayList<>();
+		List<Throwable> exceptions = new ArrayList<>();
+		for ( int i = 0; i < 30; i++ ) {
+			ContextualFailureCollector failureCollector = rootFailureCollector.withContext(
+					EventContexts.fromType( "Type #" + i ) );
+			if ( i % 3 == 0 ) {
+				String message = "Failure with RuntimeException #" + i;
+				messages.add( message );
+				Throwable exception = new RuntimeException( message );
+				exceptions.add( exception );
+				failureCollector.add( exception );
+			}
+			else if ( i % 3 == 1 ) {
+				String message = "Failure with SearchException #" + i;
+				messages.add( message );
+				Throwable exception = new SearchException( message, EventContexts.fromIndexFieldAbsolutePath( "path" + i ) );
+				exceptions.add( exception );
+				failureCollector.add( exception );
+			}
+			else {
+				String message = "Failure without exception #" + i;
+				messages.add( message );
+				failureCollector.add( message );
+			}
+		}
+		for ( int i = 0; i < 10; i++ ) {
+			ContextualFailureCollector failureCollector = rootFailureCollector.withContext(
+					EventContexts.fromType( "Type #" + i ) );
+			failureCollector.add( "Error #" + i );
+		}
+		assertThatThrownBy( rootFailureCollector::checkNoFailure )
+				// Check that we mention that some failures are not being reported
+				.hasMessageContaining( "Hibernate Search encountered failures during RootName" )
+				.hasMessageContainingAll( messages.toArray( CharSequence[]::new ) )
+				.satisfies( e -> assertThat( e.getSuppressed() ).containsExactlyInAnyOrderElementsOf( exceptions ) );
+	}
 
 	/**
 	 * Triggers many more failures than the failure limit.
@@ -44,7 +87,7 @@ class RootFailureCollectorTest {
 				.hasMessageContainingAll( "Hibernate Search encountered " + ( RootFailureCollector.FAILURE_LIMIT + 10 )
 						+ " failures during RootName",
 						"Only the first " + RootFailureCollector.FAILURE_LIMIT + " failures are displayed here",
-						"See the logs for extra failures" )
+						"See the TRACE logs for extra failures" )
 				// Check that we didn't report failures after the limit was reached
 				.message().satisfies( message -> {
 					assertThat( countOccurrences( message, "Error #" ) )
@@ -89,7 +132,7 @@ class RootFailureCollectorTest {
 				.hasMessageContainingAll( "Hibernate Search encountered " + ( RootFailureCollector.FAILURE_LIMIT + 1000 )
 						+ " failures during RootName",
 						"Only the first " + RootFailureCollector.FAILURE_LIMIT + " failures are displayed here",
-						"See the logs for extra failures" )
+						"See the TRACE logs for extra failures" )
 				// Check that we didn't report failures after the limit was reached
 				.message().satisfies( message -> {
 					assertThat( countOccurrences( message, "Error #" ) )

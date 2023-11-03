@@ -25,11 +25,15 @@ import org.hibernate.search.util.impl.integrationtest.common.extension.BackendMo
 import org.hibernate.search.util.impl.integrationtest.common.extension.SchemaManagementWorkBehavior;
 import org.hibernate.search.util.impl.integrationtest.common.reporting.FailureReportUtils;
 import org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmSetupHelper;
+import org.hibernate.search.util.impl.test.extension.ExpectedLog4jLog;
 
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
 import org.junit.jupiter.api.extension.RegisterExtension;
+
+import org.apache.logging.log4j.Level;
+import org.hamcrest.Matchers;
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 abstract class AbstractSearchSchemaManagerSimpleOperationIT {
@@ -40,6 +44,9 @@ abstract class AbstractSearchSchemaManagerSimpleOperationIT {
 	@RegisterExtension
 	public static OrmSetupHelper ormSetupHelper = OrmSetupHelper.withBackendMock( backendMock );
 	protected SessionFactory sessionFactory;
+
+	@RegisterExtension
+	final ExpectedLog4jLog logged = ExpectedLog4jLog.create();
 
 	@BeforeAll
 	void setup() {
@@ -97,11 +104,18 @@ abstract class AbstractSearchSchemaManagerSimpleOperationIT {
 
 	@Test
 	void exception_single() {
+		String exceptionMessage = "My exception";
+
+		// We must not log the exceptions, see https://hibernate.atlassian.net/browse/HSEARCH-4995
+		logged.expectEvent( Level.DEBUG,
+				Matchers.hasToString( Matchers.containsString( exceptionMessage ) ) )
+				.never();
+
 		SearchSchemaManager manager = Search.mapping( sessionFactory )
 				.scope( Object.class )
 				.schemaManager();
 
-		RuntimeException exception = new RuntimeException( "My exception" );
+		RuntimeException exception = new RuntimeException( exceptionMessage );
 		expectWork( IndexedEntity1.NAME, CompletableFuture.completedFuture( null ) );
 		expectWork( IndexedEntity2.NAME, exceptionFuture( exception ) );
 
@@ -109,7 +123,8 @@ abstract class AbstractSearchSchemaManagerSimpleOperationIT {
 				.isInstanceOf( SearchException.class )
 				.satisfies( FailureReportUtils.hasFailureReport()
 						.typeContext( IndexedEntity2.class.getName() )
-						.failure( "My exception" ) );
+						.failure( exceptionMessage ) )
+				.hasSuppressedException( exception );
 	}
 
 	@Test
