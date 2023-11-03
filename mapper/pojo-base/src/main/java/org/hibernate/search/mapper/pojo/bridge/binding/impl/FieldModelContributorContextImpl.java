@@ -12,6 +12,7 @@ import org.hibernate.search.engine.backend.types.dsl.IndexFieldTypeOptionsStep;
 import org.hibernate.search.engine.backend.types.dsl.ScaledNumberIndexFieldTypeOptionsStep;
 import org.hibernate.search.engine.backend.types.dsl.StandardIndexFieldTypeOptionsStep;
 import org.hibernate.search.engine.backend.types.dsl.StringIndexFieldTypeOptionsStep;
+import org.hibernate.search.engine.backend.types.dsl.VectorFieldTypeOptionsStep;
 import org.hibernate.search.mapper.pojo.bridge.ValueBridge;
 import org.hibernate.search.mapper.pojo.bridge.binding.spi.FieldModelContributorContext;
 import org.hibernate.search.mapper.pojo.logging.impl.Log;
@@ -72,6 +73,18 @@ final class FieldModelContributorContextImpl<F> implements FieldModelContributor
 		else {
 			throw log.invalidFieldEncodingForScaledNumberFieldMapping(
 					fieldTypeOptionsStep, ScaledNumberIndexFieldTypeOptionsStep.class
+			);
+		}
+	}
+
+	@Override
+	public VectorFieldTypeOptionsStep<?, ?> vectorTypeOptionsStep() {
+		if ( fieldTypeOptionsStep instanceof VectorFieldTypeOptionsStep ) {
+			return (VectorFieldTypeOptionsStep<?, ?>) fieldTypeOptionsStep;
+		}
+		else {
+			throw log.invalidFieldEncodingForVectorFieldMapping(
+					fieldTypeOptionsStep, VectorFieldTypeOptionsStep.class
 			);
 		}
 	}

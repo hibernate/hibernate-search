@@ -9,6 +9,7 @@ package org.hibernate.search.mapper.pojo.bridge.binding.spi;
 import org.hibernate.search.engine.backend.types.dsl.ScaledNumberIndexFieldTypeOptionsStep;
 import org.hibernate.search.engine.backend.types.dsl.StandardIndexFieldTypeOptionsStep;
 import org.hibernate.search.engine.backend.types.dsl.StringIndexFieldTypeOptionsStep;
+import org.hibernate.search.engine.backend.types.dsl.VectorFieldTypeOptionsStep;
 
 public interface FieldModelContributorContext {
 
@@ -19,6 +20,8 @@ public interface FieldModelContributorContext {
 	StringIndexFieldTypeOptionsStep<?> stringTypeOptionsStep();
 
 	ScaledNumberIndexFieldTypeOptionsStep<?, ?> scaledNumberTypeOptionsStep();
+
+	VectorFieldTypeOptionsStep<?, ?> vectorTypeOptionsStep();
 
 	void checkNonStandardTypeOptionsStep();
 }

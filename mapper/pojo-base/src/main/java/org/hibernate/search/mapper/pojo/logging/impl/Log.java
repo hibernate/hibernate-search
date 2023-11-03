@@ -899,4 +899,15 @@ public interface Log extends BasicLogger {
 			@FormatWith(PojoTypeModelFormatter.class) PojoTypeModel<?> typeModel,
 			List<String> extractorNames);
 
+	@Message(id = ID_OFFSET + 144,
+			value = "Unable to apply property mapping:"
+					+ " this property mapping must target an index field of vector type,"
+					+ " but the resolved field type is non-vector."
+					+ " This generally means you need to use a different field annotation"
+					+ " or to convert property values using a custom ValueBridge or ValueBinder."
+					+ " If you are already using a custom ValueBridge or ValueBinder, check its field type."
+					+ " Details: encountered type DSL step '%1$s',"
+					+ " which does not extend the expected interface '%2$s'.")
+	SearchException invalidFieldEncodingForVectorFieldMapping(IndexFieldTypeOptionsStep<?, ?> step,
+			@FormatWith(ClassFormatter.class) Class<?> expectedContextType);
 }
