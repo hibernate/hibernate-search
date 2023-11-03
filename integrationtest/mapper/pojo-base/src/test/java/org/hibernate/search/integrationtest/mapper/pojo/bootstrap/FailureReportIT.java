@@ -6,6 +6,7 @@
  */
 package org.hibernate.search.integrationtest.mapper.pojo.bootstrap;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import java.lang.invoke.MethodHandles;
@@ -74,15 +75,17 @@ class FailureReportIT {
 				() -> new SearchException( field2FailureMessage )
 		);
 
+		// We want trace logs all along the process,
+		// just in case a critical failure prevents the failure report from being thrown.
 		logged.expectEvent(
-				Level.ERROR,
+				Level.TRACE,
 				ExceptionMatcherBuilder.isException( SearchException.class )
 						.withMessage( field1FailureMessage ).build(),
 				FAILURE_LOG_INTRODUCTION
 						+ "Standalone POJO mapping, type '" + IndexedEntity.class.getName() + "', path '.myProperty'\n"
 		);
 		logged.expectEvent(
-				Level.ERROR,
+				Level.TRACE,
 				ExceptionMatcherBuilder.isException( SearchException.class )
 						.withMessage( field2FailureMessage ).build(),
 				FAILURE_LOG_INTRODUCTION
@@ -100,7 +103,17 @@ class FailureReportIT {
 								+ "                failures: \n"
 								+ "                  - " + field1FailureMessage + "\n"
 								+ "                  - " + field2FailureMessage
-				);
+				)
+				// We also want the stack traces for debugging purposes
+				.satisfies( e -> assertThat( e.getSuppressed() )
+						.satisfiesExactlyInAnyOrder(
+								s -> assertThat( s )
+										.isInstanceOf( SearchException.class )
+										.hasMessage( field1FailureMessage ),
+								s -> assertThat( s )
+										.isInstanceOf( SearchException.class )
+										.hasMessage( field2FailureMessage )
+						) );
 	}
 
 	/**
@@ -131,15 +144,17 @@ class FailureReportIT {
 				() -> new SearchException( field2FailureMessage )
 		);
 
+		// We want trace logs all along the process,
+		// just in case a critical failure prevents the failure report from being thrown.
 		logged.expectEvent(
-				Level.ERROR,
+				Level.TRACE,
 				ExceptionMatcherBuilder.isException( SearchException.class )
 						.withMessage( field1FailureMessage ).build(),
 				FAILURE_LOG_INTRODUCTION
 						+ "Standalone POJO mapping, type '" + IndexedEntity.class.getName() + "', path '.myProperty1'\n"
 		);
 		logged.expectEvent(
-				Level.ERROR,
+				Level.TRACE,
 				ExceptionMatcherBuilder.isException( SearchException.class )
 						.withMessage( field2FailureMessage ).build(),
 				FAILURE_LOG_INTRODUCTION
@@ -159,7 +174,17 @@ class FailureReportIT {
 								+ "            path '.myProperty2': \n"
 								+ "                failures: \n"
 								+ "                  - " + field2FailureMessage
-				);
+				)
+				// We also want the stack traces for debugging purposes
+				.satisfies( e -> assertThat( e.getSuppressed() )
+						.satisfiesExactlyInAnyOrder(
+								s -> assertThat( s )
+										.isInstanceOf( SearchException.class )
+										.hasMessage( field1FailureMessage ),
+								s -> assertThat( s )
+										.isInstanceOf( SearchException.class )
+										.hasMessage( field2FailureMessage )
+						) );
 	}
 
 	/**
@@ -196,15 +221,17 @@ class FailureReportIT {
 				() -> new SearchException( field2FailureMessage )
 		);
 
+		// We want trace logs all along the process,
+		// just in case a critical failure prevents the failure report from being thrown.
 		logged.expectEvent(
-				Level.ERROR,
+				Level.TRACE,
 				ExceptionMatcherBuilder.isException( SearchException.class )
 						.withMessage( field1FailureMessage ).build(),
 				FAILURE_LOG_INTRODUCTION
 						+ "Standalone POJO mapping, type '" + IndexedEntity1.class.getName() + "', path '.myProperty1'\n"
 		);
 		logged.expectEvent(
-				Level.ERROR,
+				Level.TRACE,
 				ExceptionMatcherBuilder.isException( SearchException.class )
 						.withMessage( field2FailureMessage ).build(),
 				FAILURE_LOG_INTRODUCTION
@@ -225,7 +252,17 @@ class FailureReportIT {
 								+ "            path '.myProperty2': \n"
 								+ "                failures: \n"
 								+ "                  - " + field2FailureMessage
-				);
+				)
+				// We also want the stack traces for debugging purposes
+				.satisfies( e -> assertThat( e.getSuppressed() )
+						.satisfiesExactlyInAnyOrder(
+								s -> assertThat( s )
+										.isInstanceOf( SearchException.class )
+										.hasMessage( field1FailureMessage ),
+								s -> assertThat( s )
+										.isInstanceOf( SearchException.class )
+										.hasMessage( field2FailureMessage )
+						) );
 	}
 
 	@Test
@@ -258,8 +295,10 @@ class FailureReportIT {
 				)
 		);
 
+		// We want trace logs all along the process,
+		// just in case a critical failure prevents the failure report from being thrown.
 		logged.expectEvent(
-				Level.ERROR,
+				Level.TRACE,
 				ExceptionMatcherBuilder.isException( SearchException.class )
 						.withMessage( field1FailureMessage ).build(),
 				FAILURE_LOG_INTRODUCTION
@@ -267,7 +306,7 @@ class FailureReportIT {
 						+ " index '" + indexName + "', field 'failingField1'\n"
 		);
 		logged.expectEvent(
-				Level.ERROR,
+				Level.TRACE,
 				ExceptionMatcherBuilder.isException( SearchException.class )
 						.withMessage( field2FailureMessage ).build(),
 				FAILURE_LOG_INTRODUCTION
@@ -290,7 +329,19 @@ class FailureReportIT {
 								+ "                    field 'failingField2': \n"
 								+ "                        failures: \n"
 								+ "                          - " + field2FailureMessage
-				);
+				)
+				// We also want the stack traces for debugging purposes
+				.satisfies( e -> assertThat( e.getSuppressed() )
+						.satisfiesExactlyInAnyOrder(
+								s -> assertThat( s )
+										.isInstanceOf( SearchException.class )
+										.hasMessage(
+												field1FailureMessage + "\nContext: index 'indexName', field 'failingField1'" ),
+								s -> assertThat( s )
+										.isInstanceOf( SearchException.class )
+										.hasMessage(
+												field2FailureMessage + "\nContext: index 'indexName', field 'failingField2'" )
+						) );
 	}
 
 }

@@ -207,8 +207,8 @@ public interface Log extends BasicLogger {
 	SearchException unknownEntityNameForIndexedEntityType(String invalidName, Collection<String> validNames);
 
 	@LogMessage(level = Logger.Level.ERROR)
-	@Message(id = ID_OFFSET + 35, value = "Unable to shut down Hibernate Search: %1$s")
-	void shutdownFailed(String causeMessage, @Cause Throwable cause);
+	@Message(id = ID_OFFSET + 35, value = "Unable to shut down Hibernate Search:")
+	void shutdownFailed(@Cause Throwable cause);
 
 	@Message(id = ID_OFFSET + 36, value = "Cannot use scroll() with scroll mode '%1$s' with Hibernate Search queries:"
 			+ " only ScrollMode.FORWARDS_ONLY is supported.")

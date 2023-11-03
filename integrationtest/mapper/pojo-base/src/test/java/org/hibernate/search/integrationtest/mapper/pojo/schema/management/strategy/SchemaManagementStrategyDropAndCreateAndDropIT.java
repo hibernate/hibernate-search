@@ -56,7 +56,8 @@ class SchemaManagementStrategyDropAndCreateAndDropIT extends AbstractSchemaManag
 				.hasMessageContainingAll(
 						"Hibernate Search encountered failures during shutdown",
 						IndexedEntity2.class.getName()
-				);
+				)
+				.hasSuppressedException( exception );
 		backendMock.verifyExpectationsMet();
 	}
 
@@ -76,7 +77,9 @@ class SchemaManagementStrategyDropAndCreateAndDropIT extends AbstractSchemaManag
 						"Hibernate Search encountered failures during shutdown",
 						IndexedEntity1.class.getName(),
 						IndexedEntity2.class.getName()
-				);
+				)
+				.hasSuppressedException( exception1 )
+				.hasSuppressedException( exception2 );
 		mapping.close();
 		backendMock.verifyExpectationsMet();
 	}
