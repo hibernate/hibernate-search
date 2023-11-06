@@ -6,7 +6,6 @@
  */
 package org.hibernate.search.backend.lucene.types.codec.impl;
 
-import org.apache.lucene.codecs.KnnVectorsFormat;
 import org.apache.lucene.index.IndexableField;
 
 /**
@@ -55,11 +54,4 @@ public interface LuceneFieldCodec<F> {
 	 * in doubt.
 	 */
 	boolean isCompatibleWith(LuceneFieldCodec<?> other);
-
-	/**
-	 * TODO: vector : docs
-	 */
-	default KnnVectorsFormat knnVectorFormat() {
-		return null;
-	}
 }
