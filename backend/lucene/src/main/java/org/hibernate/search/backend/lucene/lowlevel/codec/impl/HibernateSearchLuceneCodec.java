@@ -8,6 +8,8 @@ package org.hibernate.search.backend.lucene.lowlevel.codec.impl;
 
 import org.hibernate.search.backend.lucene.document.model.impl.LuceneIndexField;
 import org.hibernate.search.backend.lucene.document.model.impl.LuceneIndexModel;
+import org.hibernate.search.backend.lucene.types.codec.impl.LuceneFieldCodec;
+import org.hibernate.search.backend.lucene.types.codec.impl.LuceneVectorFieldCodec;
 import org.hibernate.search.engine.backend.document.model.spi.IndexFieldFilter;
 
 import org.apache.lucene.codecs.Codec;
@@ -40,9 +42,12 @@ public class HibernateSearchLuceneCodec extends FilterCodec {
 		public KnnVectorsFormat getKnnVectorsFormatForField(String fieldName) {
 			LuceneIndexField field = model.fieldOrNull( fieldName, IndexFieldFilter.ALL );
 			if ( field != null ) {
-				KnnVectorsFormat knnVectorsFormat = field.toValueField().type().codec().knnVectorFormat();
-				if ( knnVectorsFormat != null ) {
-					return knnVectorsFormat;
+				LuceneFieldCodec<?> codec = field.toValueField().type().codec();
+				if ( codec instanceof LuceneVectorFieldCodec ) {
+					KnnVectorsFormat knnVectorsFormat = ( (LuceneVectorFieldCodec<?>) codec ).knnVectorFormat();
+					if ( knnVectorsFormat != null ) {
+						return knnVectorsFormat;
+					}
 				}
 			}
 			// we shouldn't really reach this point. Vector fields redefine their vector formats.
