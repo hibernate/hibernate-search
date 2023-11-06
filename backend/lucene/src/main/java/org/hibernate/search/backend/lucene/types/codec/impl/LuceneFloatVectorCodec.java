@@ -9,16 +9,14 @@ package org.hibernate.search.backend.lucene.types.codec.impl;
 import java.nio.ByteBuffer;
 
 import org.hibernate.search.backend.lucene.lowlevel.codec.impl.HibernateSearchKnnVectorsFormat;
-import org.hibernate.search.engine.backend.types.VectorSimilarity;
 
 import org.apache.lucene.document.KnnFloatVectorField;
-import org.apache.lucene.document.StoredField;
 import org.apache.lucene.index.IndexableField;
 import org.apache.lucene.index.VectorEncoding;
-import org.apache.lucene.util.BytesRef;
+import org.apache.lucene.index.VectorSimilarityFunction;
 
-public class LuceneFloatVectorCodec extends AbstractLuceneVectorFieldCodec<float[], float[]> {
-	public LuceneFloatVectorCodec(VectorSimilarity vectorSimilarity, int dimension, Storage storage, Indexing indexing,
+public class LuceneFloatVectorCodec extends AbstractLuceneVectorFieldCodec<float[]> {
+	public LuceneFloatVectorCodec(VectorSimilarityFunction vectorSimilarity, int dimension, Storage storage, Indexing indexing,
 			float[] indexNullAsValue, HibernateSearchKnnVectorsFormat knnVectorsFormat) {
 		super( vectorSimilarity, dimension, storage, indexing, indexNullAsValue, knnVectorsFormat );
 	}
@@ -37,8 +35,12 @@ public class LuceneFloatVectorCodec extends AbstractLuceneVectorFieldCodec<float
 	}
 
 	@Override
-	public float[] encode(float[] value) {
-		return value;
+	public byte[] encode(float[] value) {
+		ByteBuffer buffer = ByteBuffer.allocate( Float.BYTES * value.length );
+		for ( float element : value ) {
+			buffer.putFloat( element );
+		}
+		return buffer.array();
 	}
 
 	@Override
@@ -51,12 +53,4 @@ public class LuceneFloatVectorCodec extends AbstractLuceneVectorFieldCodec<float
 		return VectorEncoding.FLOAT32;
 	}
 
-	@Override
-	protected IndexableField toStoredField(String absoluteFieldPath, float[] encodedValue) {
-		ByteBuffer buffer = ByteBuffer.allocate( Float.BYTES * encodedValue.length );
-		for ( float element : encodedValue ) {
-			buffer.putFloat( element );
-		}
-		return new StoredField( absoluteFieldPath, new BytesRef( buffer.array() ) );
-	}
 }
