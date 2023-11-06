@@ -236,12 +236,17 @@ public class ElasticsearchIndexFieldTypeFactoryImpl
 	}
 
 	@Override
-	public VectorFieldTypeOptionsStep<?, byte[]> asByteVector(int dimension) {
+	public <F> VectorFieldTypeOptionsStep<?, F> asVector(Class<F> valueType) {
 		throw new UnsupportedOperationException( "The Elasticsearch backend does not support vector field yet." );
 	}
 
 	@Override
-	public VectorFieldTypeOptionsStep<?, float[]> asFloatVector(int dimension) {
+	public VectorFieldTypeOptionsStep<?, byte[]> asByteVector() {
+		throw new UnsupportedOperationException( "The Elasticsearch backend does not support vector field yet." );
+	}
+
+	@Override
+	public VectorFieldTypeOptionsStep<?, float[]> asFloatVector() {
 		throw new UnsupportedOperationException( "The Elasticsearch backend does not support vector field yet." );
 	}
 

@@ -97,12 +97,12 @@ class LuceneVectorFieldIT {
 			string = root.field( "string", f -> f.asString().projectable( Projectable.YES ) ).toReference();
 			byteVector = root
 					.field( "byteVector",
-							f -> f.asByteVector( 4 ).projectable( Projectable.YES ).maxConnections( 16 )
+							f -> f.asByteVector().dimension( 4 ).projectable( Projectable.YES ).maxConnections( 16 )
 									.vectorSimilarity( VectorSimilarity.L2 ) )
 					.toReference();
 			floatVector = root
 					.field( "floatVector",
-							f -> f.asFloatVector( 8 ).projectable( Projectable.YES ).maxConnections( 48 )
+							f -> f.asFloatVector().dimension( 8 ).projectable( Projectable.YES ).maxConnections( 48 )
 									.beamWidth( 256 ).vectorSimilarity( VectorSimilarity.INNER_PRODUCT ) )
 					.toReference();
 		}

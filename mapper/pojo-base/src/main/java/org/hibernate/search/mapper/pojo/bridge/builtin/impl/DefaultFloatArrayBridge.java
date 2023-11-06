@@ -9,10 +9,10 @@ package org.hibernate.search.mapper.pojo.bridge.builtin.impl;
 import java.util.Arrays;
 
 import org.hibernate.search.engine.cfg.spi.ParseUtils;
-import org.hibernate.search.mapper.pojo.bridge.runtime.ValueBridgeFromIndexedValueContext;
-import org.hibernate.search.mapper.pojo.bridge.runtime.ValueBridgeToIndexedValueContext;
+import org.hibernate.search.mapper.pojo.bridge.VectorBridge;
 
-public final class DefaultFloatArrayBridge extends AbstractSimpleDefaultBridge<Float[], float[]> {
+public final class DefaultFloatArrayBridge extends AbstractPassThroughDefaultBridge<float[]>
+		implements VectorBridge<float[], float[]> {
 
 	public static final DefaultFloatArrayBridge INSTANCE = new DefaultFloatArrayBridge();
 
@@ -20,41 +20,12 @@ public final class DefaultFloatArrayBridge extends AbstractSimpleDefaultBridge<F
 	}
 
 	@Override
-	protected String toString(Float[] value) {
+	protected String toString(float[] value) {
 		return Arrays.toString( value );
 	}
 
 	@Override
-	protected Float[] fromString(String value) {
-		return ParseUtils.parseFloatArray( value );
-	}
-
-	@Override
-	public float[] toIndexedValue(Float[] value, ValueBridgeToIndexedValueContext context) {
-		if ( value == null ) {
-			return null;
-		}
-		float[] result = new float[value.length];
-		for ( int i = 0; i < value.length; i++ ) {
-			result[i] = value[i];
-		}
-		return result;
-	}
-
-	@Override
-	public Float[] fromIndexedValue(float[] value, ValueBridgeFromIndexedValueContext context) {
-		if ( value == null ) {
-			return null;
-		}
-		Float[] result = new Float[value.length];
-		for ( int i = 0; i < value.length; i++ ) {
-			result[i] = Float.valueOf( value[i] );
-		}
-		return result;
-	}
-
-	@Override
-	public float[] parse(String value) {
+	protected float[] fromString(String value) {
 		return ParseUtils.parseFloatPrimitiveArray( value );
 	}
 

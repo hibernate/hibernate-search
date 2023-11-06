@@ -713,4 +713,7 @@ public interface Log extends BasicLogger {
 	@Message(id = ID_OFFSET + 175, value = "No built-in vector index field type for class: '%1$s'.")
 	SearchException cannotGuessVectorFieldType(@FormatWith(ClassFormatter.class) Class<?> inputType,
 			@Param EventContext context);
+
+	@Message(id = ID_OFFSET + 176, value = "Vector dimension is a mandatory property.")
+	SearchException vectorDimensionNotSpecified(@Param EventContext eventContext);
 }

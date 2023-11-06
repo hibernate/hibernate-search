@@ -128,12 +128,12 @@ public class LuceneIndexFieldTypeFactoryImpl
 	}
 
 	@SuppressWarnings("unchecked")
-	public <F> VectorFieldTypeOptionsStep<?, F> asVector(int dimension, Class<F> valueType) {
+	public <F> VectorFieldTypeOptionsStep<?, F> asVector(Class<F> valueType) {
 		if ( byte[].class.equals( valueType ) ) {
-			return (VectorFieldTypeOptionsStep<?, F>) asByteVector( dimension );
+			return (VectorFieldTypeOptionsStep<?, F>) asByteVector();
 		}
 		else if ( float[].class.equals( valueType ) ) {
-			return (VectorFieldTypeOptionsStep<?, F>) asFloatVector( dimension );
+			return (VectorFieldTypeOptionsStep<?, F>) asFloatVector();
 		}
 		else {
 			throw log.cannotGuessVectorFieldType( valueType, getEventContext() );
@@ -246,13 +246,13 @@ public class LuceneIndexFieldTypeFactoryImpl
 	}
 
 	@Override
-	public VectorFieldTypeOptionsStep<?, byte[]> asByteVector(int dimension) {
-		return new LuceneByteVectorFieldTypeOptionsStep( this, dimension );
+	public VectorFieldTypeOptionsStep<?, byte[]> asByteVector() {
+		return new LuceneByteVectorFieldTypeOptionsStep( this );
 	}
 
 	@Override
-	public VectorFieldTypeOptionsStep<?, float[]> asFloatVector(int dimension) {
-		return new LuceneFloatVectorFieldTypeOptionsStep( this, dimension );
+	public VectorFieldTypeOptionsStep<?, float[]> asFloatVector() {
+		return new LuceneFloatVectorFieldTypeOptionsStep( this );
 	}
 
 	@Override
