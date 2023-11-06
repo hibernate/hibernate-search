@@ -21,6 +21,7 @@ import org.hibernate.search.engine.environment.bean.BeanResolver;
 import org.hibernate.search.engine.mapper.mapping.building.spi.IndexBindingContext;
 import org.hibernate.search.engine.mapper.mapping.building.spi.IndexFieldTypeDefaultsProvider;
 import org.hibernate.search.mapper.pojo.bridge.ValueBridge;
+import org.hibernate.search.mapper.pojo.bridge.VectorBridge;
 import org.hibernate.search.mapper.pojo.bridge.binding.ValueBindingContext;
 import org.hibernate.search.mapper.pojo.bridge.binding.spi.FieldModelContributor;
 import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.ValueBinder;
@@ -189,7 +190,12 @@ public class ValueBindingContextImpl<V> extends AbstractBindingContext
 						+ bridge + "'." ) );
 		// TODO : vector : extend ValueBridge to ValueArrayBridge and then feed things to indexFieldTypeFactory.asVector in that case
 		if ( typeArgument instanceof Class ) {
-			return indexFieldTypeFactory.as( (Class<F>) typeArgument );
+			if ( bridge instanceof VectorBridge ) {
+				return indexFieldTypeFactory.asVector( (Class<F>) typeArgument );
+			}
+			else {
+				return indexFieldTypeFactory.as( (Class<F>) typeArgument );
+			}
 		}
 		else {
 			throw log.invalidGenericParameterToInferFieldType( bridge, typeArgument );

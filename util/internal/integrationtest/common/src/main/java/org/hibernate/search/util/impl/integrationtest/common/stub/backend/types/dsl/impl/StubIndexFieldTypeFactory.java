@@ -159,12 +159,17 @@ public class StubIndexFieldTypeFactory implements IndexFieldTypeFactory {
 	}
 
 	@Override
-	public VectorFieldTypeOptionsStep<?, byte[]> asByteVector(int dimension) {
+	public <F> VectorFieldTypeOptionsStep<?, F> asVector(Class<F> valueType) {
 		throw new UnsupportedOperationException( "Implement me" );
 	}
 
 	@Override
-	public VectorFieldTypeOptionsStep<?, float[]> asFloatVector(int dimension) {
+	public VectorFieldTypeOptionsStep<?, byte[]> asByteVector() {
+		throw new UnsupportedOperationException( "Implement me" );
+	}
+
+	@Override
+	public VectorFieldTypeOptionsStep<?, float[]> asFloatVector() {
 		throw new UnsupportedOperationException( "Implement me" );
 	}
 

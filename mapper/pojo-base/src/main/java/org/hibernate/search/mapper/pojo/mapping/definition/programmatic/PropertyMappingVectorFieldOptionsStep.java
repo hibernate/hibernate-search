@@ -15,18 +15,18 @@ import org.hibernate.search.util.common.annotation.Incubating;
  * TODO: vector : docs
  */
 @Incubating
-public interface PropertyMappingVectorFieldStep extends PropertyMappingStep {
+public interface PropertyMappingVectorFieldOptionsStep extends PropertyMappingStep {
 
-	PropertyMappingVectorFieldStep projectable(Projectable projectable);
+	PropertyMappingVectorFieldOptionsStep projectable(Projectable projectable);
 
-	PropertyMappingVectorFieldStep searchable(Searchable searchable);
+	PropertyMappingVectorFieldOptionsStep searchable(Searchable searchable);
 
-	PropertyMappingVectorFieldStep vectorSimilarity(VectorSimilarity vectorSimilarity);
+	PropertyMappingVectorFieldOptionsStep vectorSimilarity(VectorSimilarity vectorSimilarity);
 
-	PropertyMappingVectorFieldStep beamWidth(int beamWidth);
+	PropertyMappingVectorFieldOptionsStep beamWidth(int beamWidth);
 
-	PropertyMappingVectorFieldStep maxConnections(int maxConnections);
+	PropertyMappingVectorFieldOptionsStep maxConnections(int maxConnections);
 
-	PropertyMappingVectorFieldStep indexNullAs(String indexNullAs);
+	PropertyMappingVectorFieldOptionsStep indexNullAs(String indexNullAs);
 
 }

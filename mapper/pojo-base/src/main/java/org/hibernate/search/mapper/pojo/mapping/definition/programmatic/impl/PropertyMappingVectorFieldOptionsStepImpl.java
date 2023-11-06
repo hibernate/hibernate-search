@@ -9,57 +9,58 @@ package org.hibernate.search.mapper.pojo.mapping.definition.programmatic.impl;
 import org.hibernate.search.engine.backend.types.Projectable;
 import org.hibernate.search.engine.backend.types.Searchable;
 import org.hibernate.search.engine.backend.types.VectorSimilarity;
-import org.hibernate.search.mapper.pojo.bridge.binding.spi.FieldModelContributorContext;
 import org.hibernate.search.mapper.pojo.extractor.mapping.programmatic.ContainerExtractorPath;
 import org.hibernate.search.mapper.pojo.mapping.building.spi.PojoPropertyMetadataContributor;
 import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.PropertyMappingStep;
-import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.PropertyMappingVectorFieldStep;
+import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.PropertyMappingVectorFieldOptionsStep;
 
-class PropertyMappingVectorFieldStepImpl extends AbstractPropertyMappingFieldOptionsStep<PropertyMappingVectorFieldStepImpl>
-		implements PropertyMappingVectorFieldStep, PojoPropertyMetadataContributor {
+class PropertyMappingVectorFieldOptionsStepImpl
+		extends AbstractPropertyMappingFieldOptionsStep<PropertyMappingVectorFieldOptionsStepImpl>
+		implements PropertyMappingVectorFieldOptionsStep, PojoPropertyMetadataContributor {
 
-	PropertyMappingVectorFieldStepImpl(PropertyMappingStep parent, int dimension, String relativeFieldName) {
-		super( parent, relativeFieldName, FieldModelContributorContext::vectorTypeOptionsStep );
+	PropertyMappingVectorFieldOptionsStepImpl(PropertyMappingStep parent, int dimension, String relativeFieldName) {
+		super( parent, relativeFieldName, c -> c.vectorTypeOptionsStep().dimension( dimension ) );
 		extractors( ContainerExtractorPath.noExtractors() );
 	}
 
 	@Override
-	public PropertyMappingVectorFieldStep projectable(Projectable projectable) {
+	public PropertyMappingVectorFieldOptionsStep projectable(Projectable projectable) {
 		fieldModelContributor.add( c -> c.vectorTypeOptionsStep().projectable( projectable ) );
 		return thisAsS();
 	}
 
 	@Override
-	public PropertyMappingVectorFieldStep searchable(Searchable searchable) {
+	public PropertyMappingVectorFieldOptionsStep searchable(Searchable searchable) {
+		fieldModelContributor.add( c -> c.vectorTypeOptionsStep().searchable( searchable ) );
 		return this;
 	}
 
 	@Override
-	public PropertyMappingVectorFieldStep vectorSimilarity(VectorSimilarity vectorSimilarity) {
+	public PropertyMappingVectorFieldOptionsStep vectorSimilarity(VectorSimilarity vectorSimilarity) {
 		fieldModelContributor.add( c -> c.vectorTypeOptionsStep().vectorSimilarity( vectorSimilarity ) );
 		return thisAsS();
 	}
 
 	@Override
-	public PropertyMappingVectorFieldStep beamWidth(int beamWidth) {
+	public PropertyMappingVectorFieldOptionsStep beamWidth(int beamWidth) {
 		fieldModelContributor.add( c -> c.vectorTypeOptionsStep().beamWidth( beamWidth ) );
 		return thisAsS();
 	}
 
 	@Override
-	public PropertyMappingVectorFieldStep maxConnections(int maxConnections) {
+	public PropertyMappingVectorFieldOptionsStep maxConnections(int maxConnections) {
 		fieldModelContributor.add( c -> c.vectorTypeOptionsStep().maxConnections( maxConnections ) );
 		return thisAsS();
 	}
 
 	@Override
-	public PropertyMappingVectorFieldStep indexNullAs(String indexNullAs) {
+	public PropertyMappingVectorFieldOptionsStep indexNullAs(String indexNullAs) {
 		fieldModelContributor.add( c -> c.indexNullAs( indexNullAs ) );
 		return thisAsS();
 	}
 
 	@Override
-	PropertyMappingVectorFieldStepImpl thisAsS() {
+	PropertyMappingVectorFieldOptionsStepImpl thisAsS() {
 		return this;
 	}
 }

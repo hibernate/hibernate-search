@@ -9,10 +9,10 @@ package org.hibernate.search.mapper.pojo.bridge.builtin.impl;
 import java.util.Arrays;
 
 import org.hibernate.search.engine.cfg.spi.ParseUtils;
-import org.hibernate.search.mapper.pojo.bridge.runtime.ValueBridgeFromIndexedValueContext;
-import org.hibernate.search.mapper.pojo.bridge.runtime.ValueBridgeToIndexedValueContext;
+import org.hibernate.search.mapper.pojo.bridge.VectorBridge;
 
-public final class DefaultByteArrayBridge extends AbstractSimpleDefaultBridge<Byte[], byte[]> {
+public final class DefaultByteArrayBridge extends AbstractPassThroughDefaultBridge<byte[]>
+		implements VectorBridge<byte[], byte[]> {
 
 	public static final DefaultByteArrayBridge INSTANCE = new DefaultByteArrayBridge();
 
@@ -20,41 +20,12 @@ public final class DefaultByteArrayBridge extends AbstractSimpleDefaultBridge<By
 	}
 
 	@Override
-	protected String toString(Byte[] value) {
+	protected String toString(byte[] value) {
 		return Arrays.toString( value );
 	}
 
 	@Override
-	protected Byte[] fromString(String value) {
-		return ParseUtils.parseByteArray( value );
-	}
-
-	@Override
-	public byte[] toIndexedValue(Byte[] value, ValueBridgeToIndexedValueContext context) {
-		if ( value == null ) {
-			return null;
-		}
-		byte[] result = new byte[value.length];
-		for ( int i = 0; i < value.length; i++ ) {
-			result[i] = value[i];
-		}
-		return result;
-	}
-
-	@Override
-	public Byte[] fromIndexedValue(byte[] value, ValueBridgeFromIndexedValueContext context) {
-		if ( value == null ) {
-			return null;
-		}
-		Byte[] result = new Byte[value.length];
-		for ( int i = 0; i < value.length; i++ ) {
-			result[i] = Byte.valueOf( value[i] );
-		}
-		return result;
-	}
-
-	@Override
-	public byte[] parse(String value) {
+	protected byte[] fromString(String value) {
 		return ParseUtils.parseBytePrimitiveArray( value );
 	}
 }

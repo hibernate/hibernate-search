@@ -21,7 +21,7 @@ public abstract class AbstractLuceneVectorFieldCodec<F, E> implements LuceneStan
 
 	protected final FieldType fieldType;
 	protected final VectorSimilarity vectorSimilarity;
-	protected final int dimension;
+	private final int dimension;
 	private final Storage storage;
 	private final Indexing indexing;
 	private final F indexNullAsValue;

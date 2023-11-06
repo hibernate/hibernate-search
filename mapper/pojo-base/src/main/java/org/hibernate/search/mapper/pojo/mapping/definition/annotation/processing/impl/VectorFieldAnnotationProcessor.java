@@ -7,13 +7,14 @@
 package org.hibernate.search.mapper.pojo.mapping.definition.annotation.processing.impl;
 
 import org.hibernate.search.engine.backend.types.Projectable;
+import org.hibernate.search.engine.backend.types.Searchable;
 import org.hibernate.search.engine.backend.types.VectorSimilarity;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.AnnotationDefaultValues;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.VectorField;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.processing.PropertyMappingAnnotationProcessor;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.processing.PropertyMappingAnnotationProcessorContext;
 import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.PropertyMappingStep;
-import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.PropertyMappingVectorFieldStep;
+import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.PropertyMappingVectorFieldOptionsStep;
 
 public class VectorFieldAnnotationProcessor implements PropertyMappingAnnotationProcessor<VectorField> {
 
@@ -22,7 +23,7 @@ public class VectorFieldAnnotationProcessor implements PropertyMappingAnnotation
 			PropertyMappingAnnotationProcessorContext context) {
 		String cleanedUpRelativeFieldName = context.toNullIfDefault( annotation.name(), "" );
 
-		PropertyMappingVectorFieldStep fieldContext =
+		PropertyMappingVectorFieldOptionsStep fieldContext =
 				mappingContext.vectorField( annotation.dimension(), cleanedUpRelativeFieldName );
 
 		int maxConnections = annotation.maxConnections();
@@ -42,6 +43,10 @@ public class VectorFieldAnnotationProcessor implements PropertyMappingAnnotation
 		Projectable projectable = annotation.projectable();
 		if ( !Projectable.DEFAULT.equals( projectable ) ) {
 			fieldContext.projectable( projectable );
+		}
+		Searchable searchable = annotation.searchable();
+		if ( !Searchable.DEFAULT.equals( searchable ) ) {
+			fieldContext.searchable( searchable );
 		}
 	}
 }

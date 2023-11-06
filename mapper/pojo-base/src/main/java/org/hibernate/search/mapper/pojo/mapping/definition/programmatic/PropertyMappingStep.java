@@ -251,7 +251,7 @@ public interface PropertyMappingStep {
 	 * @see VectorField#dimension()
 	 */
 	@Incubating
-	PropertyMappingVectorFieldStep vectorField(int dimension);
+	PropertyMappingVectorFieldOptionsStep vectorField(int dimension);
 
 	/**
 	 * Maps the property to a vector field in the index with a custom name.
@@ -266,6 +266,6 @@ public interface PropertyMappingStep {
 	 * @see VectorField#name()
 	 */
 	@Incubating
-	PropertyMappingVectorFieldStep vectorField(int dimension, String relativeFieldName);
+	PropertyMappingVectorFieldOptionsStep vectorField(int dimension, String relativeFieldName);
 
 }

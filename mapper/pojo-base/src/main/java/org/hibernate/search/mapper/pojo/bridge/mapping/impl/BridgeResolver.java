@@ -45,14 +45,12 @@ import org.hibernate.search.mapper.pojo.bridge.builtin.impl.DefaultBigIntegerBri
 import org.hibernate.search.mapper.pojo.bridge.builtin.impl.DefaultBooleanBridge;
 import org.hibernate.search.mapper.pojo.bridge.builtin.impl.DefaultByteArrayBridge;
 import org.hibernate.search.mapper.pojo.bridge.builtin.impl.DefaultByteBridge;
-import org.hibernate.search.mapper.pojo.bridge.builtin.impl.DefaultBytePrimitiveArrayBridge;
 import org.hibernate.search.mapper.pojo.bridge.builtin.impl.DefaultCharacterBridge;
 import org.hibernate.search.mapper.pojo.bridge.builtin.impl.DefaultDoubleBridge;
 import org.hibernate.search.mapper.pojo.bridge.builtin.impl.DefaultDurationBridge;
 import org.hibernate.search.mapper.pojo.bridge.builtin.impl.DefaultEnumBridge;
 import org.hibernate.search.mapper.pojo.bridge.builtin.impl.DefaultFloatArrayBridge;
 import org.hibernate.search.mapper.pojo.bridge.builtin.impl.DefaultFloatBridge;
-import org.hibernate.search.mapper.pojo.bridge.builtin.impl.DefaultFloatPrimitiveArrayBridge;
 import org.hibernate.search.mapper.pojo.bridge.builtin.impl.DefaultGeoPointBridge;
 import org.hibernate.search.mapper.pojo.bridge.builtin.impl.DefaultInstantBridge;
 import org.hibernate.search.mapper.pojo.bridge.builtin.impl.DefaultIntegerBridge;
@@ -332,15 +330,9 @@ public final class BridgeResolver {
 
 			// arrays for vector fields:
 			exactType( byte[].class )
-					.valueBridge( DefaultBytePrimitiveArrayBridge.INSTANCE )
-					.identifierBridge( DefaultBytePrimitiveArrayBridge.INSTANCE );
-			exactType( float[].class )
-					.valueBridge( DefaultFloatPrimitiveArrayBridge.INSTANCE )
-					.identifierBridge( DefaultFloatPrimitiveArrayBridge.INSTANCE );
-			exactType( Byte[].class )
 					.valueBridge( DefaultByteArrayBridge.INSTANCE )
 					.identifierBridge( DefaultByteArrayBridge.INSTANCE );
-			exactType( Float[].class )
+			exactType( float[].class )
 					.valueBridge( DefaultFloatArrayBridge.INSTANCE )
 					.identifierBridge( DefaultFloatArrayBridge.INSTANCE );
 		}

@@ -18,6 +18,8 @@ import org.hibernate.search.util.common.annotation.Incubating;
 public interface VectorFieldTypeOptionsStep<S extends VectorFieldTypeOptionsStep<?, F>, F>
 		extends SearchableProjectableIndexFieldTypeOptionsStep<S, F> {
 
+	S dimension(int dimension);
+
 	S vectorSimilarity(VectorSimilarity vectorSimilarity);
 
 	S beamWidth(int beamWidth);

@@ -16,8 +16,8 @@ import org.hibernate.search.engine.backend.types.VectorSimilarity;
 class LuceneByteVectorFieldTypeOptionsStep
 		extends AbstractLuceneVectorFieldTypeOptionsStep<LuceneByteVectorFieldTypeOptionsStep, byte[]> {
 
-	LuceneByteVectorFieldTypeOptionsStep(LuceneIndexFieldTypeBuildContext buildContext, int dimension) {
-		super( buildContext, byte[].class, dimension );
+	LuceneByteVectorFieldTypeOptionsStep(LuceneIndexFieldTypeBuildContext buildContext) {
+		super( buildContext, byte[].class );
 	}
 
 	@Override
@@ -27,7 +27,7 @@ class LuceneByteVectorFieldTypeOptionsStep
 
 	@Override
 	protected AbstractLuceneVectorFieldCodec<byte[], ?> createCodec(VectorSimilarity vectorSimilarity, int dimension,
-			Indexing indexing, Storage storage, byte[] indexNullAsValue, HibernateSearchKnnVectorsFormat knnVectorsFormat) {
+			Storage storage, Indexing indexing, byte[] indexNullAsValue, HibernateSearchKnnVectorsFormat knnVectorsFormat) {
 		return new LuceneByteVectorCodec( vectorSimilarity, dimension, storage, indexing, indexNullAsValue, knnVectorsFormat );
 	}
 

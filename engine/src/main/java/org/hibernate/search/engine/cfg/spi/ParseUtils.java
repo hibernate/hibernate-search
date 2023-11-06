@@ -39,7 +39,6 @@ import java.util.Objects;
 import java.util.UUID;
 import java.util.function.BiFunction;
 import java.util.function.Function;
-import java.util.function.IntFunction;
 import java.util.stream.Collectors;
 
 import org.hibernate.search.engine.logging.impl.Log;
@@ -383,10 +382,6 @@ public final class ParseUtils {
 		}
 	}
 
-	public static Byte[] parseByteArray(String value) {
-		return parseArray( Byte[]::new, ParseUtils::parseByte, Byte[].class, value );
-	}
-
 	public static float[] parseFloatPrimitiveArray(String value) {
 		try {
 			String[] values = value.replaceAll( "(^\\s*\\[\\s*)|(\\s*\\]\\s*$)", "" ).split( "[,;\\s]+" );
@@ -398,25 +393,6 @@ public final class ParseUtils {
 		}
 		catch (SearchException ex) {
 			throw log.invalidStringForType( value, float[].class, ex.getMessage(), ex );
-		}
-	}
-
-	public static Float[] parseFloatArray(String value) {
-		return parseArray( Float[]::new, ParseUtils::parseFloat, Float[].class, value );
-	}
-
-	private static <F> F[] parseArray(IntFunction<F[]> arrayCreator, Function<String, F> parser, Class<F[]> arrayType,
-			String value) {
-		try {
-			String[] values = value.replaceAll( "[\\[\\]]", "" ).split( "\\s*,\\s*" );
-			F[] parsed = arrayCreator.apply( values.length );
-			for ( int i = 0; i < values.length; i++ ) {
-				parsed[i] = parser.apply( values[i] );
-			}
-			return parsed;
-		}
-		catch (RuntimeException ex) {
-			throw log.invalidStringForType( value, arrayType, ex.getMessage(), ex );
 		}
 	}
 }
