@@ -27,6 +27,8 @@ import org.hibernate.search.engine.search.projection.spi.ProjectionTypeKeys;
 import org.hibernate.search.util.common.AssertionFailure;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
+import org.apache.lucene.index.VectorSimilarityFunction;
+
 /**
  * @param <S> The "self" type (the actual exposed type of this step).
  * @param <F> The type of field values.
@@ -109,14 +111,14 @@ abstract class AbstractLuceneVectorFieldTypeOptionsStep<S extends AbstractLucene
 			throw log.vectorDimensionNotSpecified( buildContext.getEventContext() );
 		}
 
-		VectorSimilarity resolvedVectorSimilarity = resolveDefault( vectorSimilarity );
+		VectorSimilarityFunction resolvedVectorSimilarity = resolveDefault( vectorSimilarity );
 		boolean resolvedProjectable = resolveDefault( projectable );
 		boolean resolvedSearchable = resolveDefault( searchable );
 
 		Indexing indexing = resolvedSearchable ? Indexing.ENABLED : Indexing.DISABLED;
 		Storage storage = resolvedProjectable ? Storage.ENABLED : Storage.DISABLED;
 
-		AbstractLuceneVectorFieldCodec<F, ?> codec = createCodec( resolvedVectorSimilarity, dimension, storage, indexing,
+		AbstractLuceneVectorFieldCodec<F> codec = createCodec( resolvedVectorSimilarity, dimension, storage, indexing,
 				indexNullAsValue, new HibernateSearchKnnVectorsFormat( maxConnections, beamWidth )
 		);
 		builder.codec( codec );
@@ -133,18 +135,19 @@ abstract class AbstractLuceneVectorFieldTypeOptionsStep<S extends AbstractLucene
 		return builder.build();
 	}
 
-	protected abstract AbstractLuceneVectorFieldCodec<F, ?> createCodec(VectorSimilarity vectorSimilarity, int dimension,
+	protected abstract AbstractLuceneVectorFieldCodec<F> createCodec(VectorSimilarityFunction vectorSimilarity, int dimension,
 			Storage storage, Indexing indexing, F indexNullAsValue, HibernateSearchKnnVectorsFormat knnVectorsFormat);
 
-	protected static VectorSimilarity resolveDefault(VectorSimilarity vectorSimilarity) {
+
+	private static VectorSimilarityFunction resolveDefault(VectorSimilarity vectorSimilarity) {
 		switch ( vectorSimilarity ) {
 			case DEFAULT:
 			case L2:
-				return VectorSimilarity.L2;
+				return VectorSimilarityFunction.EUCLIDEAN;
 			case INNER_PRODUCT:
-				return VectorSimilarity.INNER_PRODUCT;
+				return VectorSimilarityFunction.DOT_PRODUCT;
 			case COSINE:
-				return VectorSimilarity.COSINE;
+				return VectorSimilarityFunction.COSINE;
 			default:
 				throw new AssertionFailure( "Unexpected value for Similarity: " + vectorSimilarity );
 		}

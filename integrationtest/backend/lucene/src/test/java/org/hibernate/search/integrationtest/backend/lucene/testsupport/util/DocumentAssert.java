@@ -8,6 +8,7 @@ package org.hibernate.search.integrationtest.backend.lucene.testsupport.util;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import java.nio.ByteBuffer;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
@@ -66,13 +67,18 @@ public class DocumentAssert {
 	}
 
 	public DocumentAssert hasVectorField(String absoluteFieldPath, byte[]... values) {
-		return hasField( "byte[]", absoluteFieldPath,
-				Arrays.stream( values ).map( Arrays::toString ).toArray( String[]::new ) );
+		return hasField( "byte[]", absoluteFieldPath, Arrays.stream( values ).toArray( byte[][]::new ) );
 	}
 
 	public DocumentAssert hasVectorField(String absoluteFieldPath, float[]... values) {
 		return hasField( "float[]", absoluteFieldPath,
-				Arrays.stream( values ).map( Arrays::toString ).toArray( String[]::new ) );
+				Arrays.stream( values ).map( floats -> {
+					ByteBuffer buffer = ByteBuffer.allocate( floats.length * Float.BYTES );
+					for ( float v : floats ) {
+						buffer.putFloat( v );
+					}
+					return buffer.array();
+				} ).toArray( byte[][]::new ) );
 	}
 
 	@SafeVarargs

@@ -9,25 +9,26 @@ package org.hibernate.search.backend.lucene.types.codec.impl;
 import java.util.Objects;
 
 import org.hibernate.search.backend.lucene.lowlevel.codec.impl.HibernateSearchKnnVectorsFormat;
-import org.hibernate.search.engine.backend.types.VectorSimilarity;
 
 import org.apache.lucene.codecs.KnnVectorsFormat;
 import org.apache.lucene.document.FieldType;
+import org.apache.lucene.document.StoredField;
 import org.apache.lucene.index.IndexableField;
 import org.apache.lucene.index.VectorEncoding;
 import org.apache.lucene.index.VectorSimilarityFunction;
+import org.apache.lucene.util.BytesRef;
 
-public abstract class AbstractLuceneVectorFieldCodec<F, E> implements LuceneStandardFieldCodec<F, E> {
+public abstract class AbstractLuceneVectorFieldCodec<F> implements LuceneVectorFieldCodec<F> {
 
 	protected final FieldType fieldType;
-	protected final VectorSimilarity vectorSimilarity;
+	protected final VectorSimilarityFunction vectorSimilarity;
 	private final int dimension;
 	private final Storage storage;
 	private final Indexing indexing;
 	private final F indexNullAsValue;
 	private final HibernateSearchKnnVectorsFormat knnVectorsFormat;
 
-	protected AbstractLuceneVectorFieldCodec(VectorSimilarity vectorSimilarity, int dimension, Storage storage,
+	protected AbstractLuceneVectorFieldCodec(VectorSimilarityFunction vectorSimilarity, int dimension, Storage storage,
 			Indexing indexing, F indexNullAsValue, HibernateSearchKnnVectorsFormat knnVectorsFormat) {
 		this.vectorSimilarity = vectorSimilarity;
 		this.dimension = dimension;
@@ -37,7 +38,7 @@ public abstract class AbstractLuceneVectorFieldCodec<F, E> implements LuceneStan
 		this.knnVectorsFormat = knnVectorsFormat;
 
 		this.fieldType = new FieldType();
-		this.fieldType.setVectorAttributes( dimension, vectorEncoding(), vectorSimilarityFunction( vectorSimilarity ) );
+		this.fieldType.setVectorAttributes( dimension, vectorEncoding(), vectorSimilarity );
 		this.fieldType.freeze();
 	}
 
@@ -51,7 +52,7 @@ public abstract class AbstractLuceneVectorFieldCodec<F, E> implements LuceneStan
 			return;
 		}
 
-		E encodedValue = encode( value );
+		byte[] encodedValue = encode( value );
 
 		if ( Indexing.ENABLED == indexing ) {
 			documentBuilder.addField( createIndexField( absoluteFieldPath, value ) );
@@ -61,7 +62,9 @@ public abstract class AbstractLuceneVectorFieldCodec<F, E> implements LuceneStan
 		}
 	}
 
-	protected abstract IndexableField toStoredField(String absoluteFieldPath, E encodedValue);
+	private IndexableField toStoredField(String absoluteFieldPath, byte[] encodedValue) {
+		return new StoredField( absoluteFieldPath, new BytesRef( encodedValue ) );
+	}
 
 	@Override
 	public boolean isCompatibleWith(LuceneFieldCodec<?> obj) {
@@ -72,7 +75,7 @@ public abstract class AbstractLuceneVectorFieldCodec<F, E> implements LuceneStan
 			return false;
 		}
 
-		AbstractLuceneVectorFieldCodec<?, ?> other = (AbstractLuceneVectorFieldCodec<?, ?>) obj;
+		AbstractLuceneVectorFieldCodec<?> other = (AbstractLuceneVectorFieldCodec<?>) obj;
 
 		return dimension == other.dimension
 				&& vectorSimilarity == other.vectorSimilarity
@@ -82,20 +85,6 @@ public abstract class AbstractLuceneVectorFieldCodec<F, E> implements LuceneStan
 	}
 
 	protected abstract IndexableField createIndexField(String absoluteFieldPath, F value);
-
-	private static VectorSimilarityFunction vectorSimilarityFunction(VectorSimilarity vectorSimilarity) {
-		switch ( vectorSimilarity ) {
-			case L2:
-				return VectorSimilarityFunction.EUCLIDEAN;
-			case INNER_PRODUCT:
-				return VectorSimilarityFunction.DOT_PRODUCT;
-			case COSINE:
-				return VectorSimilarityFunction.COSINE;
-			default:
-				throw new IllegalStateException( "unknown similarity function " + vectorSimilarity );
-		}
-
-	}
 
 	protected abstract VectorEncoding vectorEncoding();
 
