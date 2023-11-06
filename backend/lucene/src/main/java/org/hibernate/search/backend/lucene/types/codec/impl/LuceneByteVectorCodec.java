@@ -6,8 +6,6 @@
  */
 package org.hibernate.search.backend.lucene.types.codec.impl;
 
-import java.util.Arrays;
-
 import org.hibernate.search.backend.lucene.lowlevel.codec.impl.HibernateSearchKnnVectorsFormat;
 import org.hibernate.search.engine.backend.types.VectorSimilarity;
 
@@ -15,6 +13,7 @@ import org.apache.lucene.document.KnnByteVectorField;
 import org.apache.lucene.document.StoredField;
 import org.apache.lucene.index.IndexableField;
 import org.apache.lucene.index.VectorEncoding;
+import org.apache.lucene.util.BytesRef;
 
 public class LuceneByteVectorCodec extends AbstractLuceneVectorFieldCodec<byte[], byte[]> {
 	public LuceneByteVectorCodec(VectorSimilarity vectorSimilarity, int dimension, Storage storage, Indexing indexing,
@@ -24,8 +23,7 @@ public class LuceneByteVectorCodec extends AbstractLuceneVectorFieldCodec<byte[]
 
 	@Override
 	public byte[] decode(IndexableField field) {
-		KnnByteVectorField byteVectorField = (KnnByteVectorField) field;
-		return byteVectorField.vectorValue();
+		return field.binaryValue().bytes;
 	}
 
 	@Override
@@ -45,6 +43,6 @@ public class LuceneByteVectorCodec extends AbstractLuceneVectorFieldCodec<byte[]
 
 	@Override
 	protected IndexableField toStoredField(String absoluteFieldPath, byte[] encodedValue) {
-		return new StoredField( absoluteFieldPath, Arrays.toString( encodedValue ) );
+		return new StoredField( absoluteFieldPath, new BytesRef( encodedValue ) );
 	}
 }

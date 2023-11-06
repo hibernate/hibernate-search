@@ -6,7 +6,7 @@
  */
 package org.hibernate.search.backend.lucene.types.codec.impl;
 
-import java.util.Arrays;
+import java.nio.ByteBuffer;
 
 import org.hibernate.search.backend.lucene.lowlevel.codec.impl.HibernateSearchKnnVectorsFormat;
 import org.hibernate.search.engine.backend.types.VectorSimilarity;
@@ -15,6 +15,7 @@ import org.apache.lucene.document.KnnFloatVectorField;
 import org.apache.lucene.document.StoredField;
 import org.apache.lucene.index.IndexableField;
 import org.apache.lucene.index.VectorEncoding;
+import org.apache.lucene.util.BytesRef;
 
 public class LuceneFloatVectorCodec extends AbstractLuceneVectorFieldCodec<float[], float[]> {
 	public LuceneFloatVectorCodec(VectorSimilarity vectorSimilarity, int dimension, Storage storage, Indexing indexing,
@@ -24,8 +25,15 @@ public class LuceneFloatVectorCodec extends AbstractLuceneVectorFieldCodec<float
 
 	@Override
 	public float[] decode(IndexableField field) {
-		KnnFloatVectorField byteVectorField = (KnnFloatVectorField) field;
-		return byteVectorField.vectorValue();
+		float[] result = new float[field.binaryValue().bytes.length / Float.BYTES];
+
+		int index = 0;
+		ByteBuffer buffer = ByteBuffer.wrap( field.binaryValue().bytes );
+		while ( buffer.hasRemaining() ) {
+			result[index++] = buffer.getFloat();
+		}
+
+		return result;
 	}
 
 	@Override
@@ -45,6 +53,10 @@ public class LuceneFloatVectorCodec extends AbstractLuceneVectorFieldCodec<float
 
 	@Override
 	protected IndexableField toStoredField(String absoluteFieldPath, float[] encodedValue) {
-		return new StoredField( absoluteFieldPath, Arrays.toString( encodedValue ) );
+		ByteBuffer buffer = ByteBuffer.allocate( Float.BYTES * encodedValue.length );
+		for ( float element : encodedValue ) {
+			buffer.putFloat( element );
+		}
+		return new StoredField( absoluteFieldPath, new BytesRef( buffer.array() ) );
 	}
 }

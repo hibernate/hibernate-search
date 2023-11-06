@@ -73,6 +73,28 @@ class LuceneVectorFieldIT {
 				) );
 	}
 
+	@Test
+	void simpleVectorSavedAndRetrievedViaProjection() {
+		SearchQuery<Object[]> query = index.createScope().query()
+				.select(
+						f -> f.composite().from(
+								f.field( "string" ),
+								f.field( "byteVector" ),
+								f.field( "floatVector" )
+						).asArray()
+				)
+				.where( f -> f.matchAll() )
+				.toQuery();
+
+		List<Object[]> result = query.fetchAll().hits();
+		assertThat( result )
+				.hasSize( 2 )
+				.containsOnly(
+						new Object[] { "keyword1", BYTE_VECTOR_1, FLOAT_VECTOR_1 },
+						new Object[] { "keyword2", BYTE_VECTOR_2, FLOAT_VECTOR_2 }
+				);
+	}
+
 	private void initData() {
 		index.bulkIndexer()
 				.add( "ID:1", document -> {

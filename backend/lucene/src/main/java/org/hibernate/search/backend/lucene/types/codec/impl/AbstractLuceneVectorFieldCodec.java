@@ -61,8 +61,6 @@ public abstract class AbstractLuceneVectorFieldCodec<F, E> implements LuceneStan
 		}
 	}
 
-	// TODO : vector : use byte array to represent data of a stored field instead of a string.
-	//  for floats see Float#floatToIntBits or maybe ByteBuffer#putFloat
 	protected abstract IndexableField toStoredField(String absoluteFieldPath, E encodedValue);
 
 	@Override
