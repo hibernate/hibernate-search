@@ -30,7 +30,7 @@ import org.hibernate.search.util.common.annotation.Incubating;
  * Vector fields are to be used in k-NN search, when the distance between a queried and stored vectors is computed
  * and k nearest vectors are selected as the results.
  *
- * TODO : vector : add `see some predicate once search part is ready`
+ * @see org.hibernate.search.engine.search.predicate.dsl.KnnPredicateFieldStep
  */
 @Documented
 @Target({ ElementType.METHOD, ElementType.FIELD })

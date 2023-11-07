@@ -8,6 +8,7 @@ package org.hibernate.search.backend.lucene.search.common.impl;
 
 import java.util.List;
 
+import org.hibernate.search.backend.lucene.types.codec.impl.LuceneFieldCodec;
 import org.hibernate.search.engine.search.common.spi.AbstractMultiIndexSearchIndexValueFieldContext;
 import org.hibernate.search.engine.search.common.spi.SearchIndexSchemaElementContextHelper;
 
@@ -61,5 +62,10 @@ public class LuceneMultiIndexSearchIndexValueFieldContext<F>
 	public boolean hasTermVectorsConfigured() {
 		return fromTypeIfCompatible( LuceneSearchIndexValueFieldTypeContext::hasTermVectorsConfigured, Object::equals,
 				"hasTermVectorsConfigured" );
+	}
+
+	@Override
+	public LuceneFieldCodec<F> codec() {
+		return fromTypeIfCompatible( LuceneSearchIndexValueFieldTypeContext::codec, Object::equals, "codec" );
 	}
 }

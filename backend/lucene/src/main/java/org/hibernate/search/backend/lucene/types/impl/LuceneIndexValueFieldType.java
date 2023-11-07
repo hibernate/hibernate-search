@@ -35,6 +35,7 @@ public final class LuceneIndexValueFieldType<F>
 		this.hasTermVectorsConfigured = builder.hasTermVectorsConfigured;
 	}
 
+	@Override
 	public LuceneFieldCodec<F> codec() {
 		return codec;
 	}

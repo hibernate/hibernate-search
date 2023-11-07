@@ -19,7 +19,7 @@ public abstract class AbstractLuceneSearchPredicate implements LuceneSearchPredi
 
 	protected final Set<String> indexNames;
 	// NOTE: below modifiers (boost, constant score) are used to implement hasNoModifiers() that other predicates
-	// rely on and might build on to include additional predicate-specific modifiers ElasticsearchBooleanPredicate in particular.
+	// rely on and might build on to include additional predicate-specific modifiers LuceneBooleanPredicate in particular.
 	// IMPORTANT: Review where current modifiers are used and how the new modifier affects that logic, when adding a new modifier.
 	private final Float boost;
 	private final boolean constantScore;
