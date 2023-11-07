@@ -53,4 +53,8 @@ public class LuceneFloatVectorCodec extends AbstractLuceneVectorFieldCodec<float
 		return VectorEncoding.FLOAT32;
 	}
 
+	@Override
+	public Class<?> vectorElementsType() {
+		return float.class;
+	}
 }

@@ -12,6 +12,7 @@ import java.lang.invoke.MethodHandles;
 
 import org.hibernate.search.backend.lucene.logging.impl.Log;
 import org.hibernate.search.backend.lucene.lowlevel.codec.impl.HibernateSearchKnnVectorsFormat;
+import org.hibernate.search.backend.lucene.search.predicate.impl.LuceneKnnPredicate;
 import org.hibernate.search.backend.lucene.search.projection.impl.LuceneFieldProjection;
 import org.hibernate.search.backend.lucene.types.codec.impl.AbstractLuceneVectorFieldCodec;
 import org.hibernate.search.backend.lucene.types.codec.impl.Indexing;
@@ -123,8 +124,9 @@ abstract class AbstractLuceneVectorFieldTypeOptionsStep<S extends AbstractLucene
 		);
 		builder.codec( codec );
 		if ( resolvedSearchable ) {
-			builder.queryElementFactory( PredicateTypeKeys.EXISTS, new LuceneExistsPredicate.DocValuesOrNormsBasedFactory<>() );
 			builder.searchable( true );
+			builder.queryElementFactory( PredicateTypeKeys.EXISTS, new LuceneExistsPredicate.DocValuesOrNormsBasedFactory<>() );
+			builder.queryElementFactory( PredicateTypeKeys.KNN, new LuceneKnnPredicate.DefaultFactory<>() );
 		}
 
 		if ( resolvedProjectable ) {

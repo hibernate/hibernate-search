@@ -38,4 +38,9 @@ public class LuceneByteVectorCodec extends AbstractLuceneVectorFieldCodec<byte[]
 	protected VectorEncoding vectorEncoding() {
 		return VectorEncoding.BYTE;
 	}
+
+	@Override
+	public Class<?> vectorElementsType() {
+		return byte.class;
+	}
 }

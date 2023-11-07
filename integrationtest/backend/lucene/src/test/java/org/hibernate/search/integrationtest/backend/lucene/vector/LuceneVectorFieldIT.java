@@ -37,12 +37,15 @@ class LuceneVectorFieldIT {
 	@RegisterExtension
 	public final SearchSetupHelper setupHelper = SearchSetupHelper.create();
 
-	private final SimpleMappedIndex<IndexBinding> index = SimpleMappedIndex.of( IndexBinding::new );
+	private final SimpleMappedIndex<IndexBinding> index = SimpleMappedIndex.of( IndexBinding::new )
+			.name( "index" );
+	private final SimpleMappedIndex<PredicateIndexBinding> predicateIndex = SimpleMappedIndex.of( PredicateIndexBinding::new )
+			.name( "predicateIndex" );
 
 	@BeforeEach
 	void setup() {
 		setupHelper.start()
-				.withIndex( index )
+				.withIndexes( index, predicateIndex )
 				.setup();
 		initData();
 	}
@@ -95,6 +98,33 @@ class LuceneVectorFieldIT {
 				);
 	}
 
+	@Test
+	void simpleVectorPredicate() {
+		// took the sample data and query from this example https://opensearch.org/docs/latest/search-plugins/knn/filter-search-knn/#using-a-lucene-k-nn-filter
+		// to see if we'll get the same results... and looks like we do :smile:
+		int k = 3;
+		SearchQuery<float[]> query = predicateIndex.createScope().query()
+				.select(
+						f -> f.field( "location", float[].class )
+				)
+				.where( f -> f.knn( k )
+						.field( "location" )
+						.matching( 5f, 4f )
+						.filter( f.range().field( "rating" ).between( 8, 10 ) )
+						.filter( f.terms().field( "parking" ).matchingAny( true ) )
+				).toQuery();
+
+		List<float[]> result = query.fetchAll().hits();
+
+		assertThat( result )
+				.hasSize( k ) // since that is how many neighbors we were asking for in the predicate
+				.containsExactly(
+						new float[] { 4.9f, 3.4f },
+						new float[] { 6.4f, 3.4f },
+						new float[] { 3.3f, 4.5f }
+				);
+	}
+
 	private void initData() {
 		index.bulkIndexer()
 				.add( "ID:1", document -> {
@@ -106,6 +136,69 @@ class LuceneVectorFieldIT {
 					document.addValue( index.binding().string, "keyword2" );
 					document.addValue( index.binding().byteVector, BYTE_VECTOR_2 );
 					document.addValue( index.binding().floatVector, FLOAT_VECTOR_2 );
+				} )
+				.join();
+
+		predicateIndex.bulkIndexer()
+				.add( "ID:1", document -> {
+					document.addValue( predicateIndex.binding().location, new float[] { 5.2f, 4.4f } );
+					document.addValue( predicateIndex.binding().parking, true );
+					document.addValue( predicateIndex.binding().rating, 5 );
+				} )
+				.add( "ID:2", document -> {
+					document.addValue( predicateIndex.binding().location, new float[] { 5.2f, 3.9f } );
+					document.addValue( predicateIndex.binding().parking, false );
+					document.addValue( predicateIndex.binding().rating, 4 );
+				} )
+				.add( "ID:3", document -> {
+					document.addValue( predicateIndex.binding().location, new float[] { 4.9f, 3.4f } );
+					document.addValue( predicateIndex.binding().parking, true );
+					document.addValue( predicateIndex.binding().rating, 9 );
+				} )
+				.add( "ID:4", document -> {
+					document.addValue( predicateIndex.binding().location, new float[] { 4.2f, 4.6f } );
+					document.addValue( predicateIndex.binding().parking, false );
+					document.addValue( predicateIndex.binding().rating, 6 );
+				} )
+				.add( "ID:5", document -> {
+					document.addValue( predicateIndex.binding().location, new float[] { 3.3f, 4.5f } );
+					document.addValue( predicateIndex.binding().parking, true );
+					document.addValue( predicateIndex.binding().rating, 8 );
+				} )
+				.add( "ID:6", document -> {
+					document.addValue( predicateIndex.binding().location, new float[] { 6.4f, 3.4f } );
+					document.addValue( predicateIndex.binding().parking, true );
+					document.addValue( predicateIndex.binding().rating, 9 );
+				} )
+				.add( "ID:7", document -> {
+					document.addValue( predicateIndex.binding().location, new float[] { 4.2f, 6.2f } );
+					document.addValue( predicateIndex.binding().parking, true );
+					document.addValue( predicateIndex.binding().rating, 5 );
+				} )
+				.add( "ID:8", document -> {
+					document.addValue( predicateIndex.binding().location, new float[] { 2.4f, 4.0f } );
+					document.addValue( predicateIndex.binding().parking, true );
+					document.addValue( predicateIndex.binding().rating, 8 );
+				} )
+				.add( "ID:9", document -> {
+					document.addValue( predicateIndex.binding().location, new float[] { 1.4f, 3.2f } );
+					document.addValue( predicateIndex.binding().parking, false );
+					document.addValue( predicateIndex.binding().rating, 5 );
+				} )
+				.add( "ID:10", document -> {
+					document.addValue( predicateIndex.binding().location, new float[] { 7.0f, 9.9f } );
+					document.addValue( predicateIndex.binding().parking, true );
+					document.addValue( predicateIndex.binding().rating, 9 );
+				} )
+				.add( "ID:11", document -> {
+					document.addValue( predicateIndex.binding().location, new float[] { 3.0f, 2.3f } );
+					document.addValue( predicateIndex.binding().parking, false );
+					document.addValue( predicateIndex.binding().rating, 6 );
+				} )
+				.add( "ID:12", document -> {
+					document.addValue( predicateIndex.binding().location, new float[] { 5.0f, 1.0f } );
+					document.addValue( predicateIndex.binding().parking, true );
+					document.addValue( predicateIndex.binding().rating, 3 );
 				} )
 				.join();
 	}
@@ -127,6 +220,19 @@ class LuceneVectorFieldIT {
 							f -> f.asFloatVector().dimension( 8 ).projectable( Projectable.YES ).maxConnections( 48 )
 									.beamWidth( 256 ).vectorSimilarity( VectorSimilarity.INNER_PRODUCT ) )
 					.toReference();
+		}
+	}
+
+	private static class PredicateIndexBinding {
+		final IndexFieldReference<Boolean> parking;
+		final IndexFieldReference<Integer> rating;
+		final IndexFieldReference<float[]> location;
+
+		PredicateIndexBinding(IndexSchemaElement root) {
+			parking = root.field( "parking", f -> f.asBoolean().projectable( Projectable.YES ) ).toReference();
+			rating = root.field( "rating", f -> f.asInteger().projectable( Projectable.YES ) ).toReference();
+			location = root.field( "location", f -> f.asFloatVector().dimension( 2 ).projectable( Projectable.YES )
+					.maxConnections( 16 ).beamWidth( 100 ).vectorSimilarity( VectorSimilarity.L2 ) ).toReference();
 		}
 	}
 }

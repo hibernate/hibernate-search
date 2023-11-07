@@ -20,4 +20,9 @@ public interface LuceneVectorFieldCodec<F> extends LuceneStandardFieldCodec<F, b
 	 * and can for example define custom {@code beamWidth} or {@code maxConnections} or even provide a completely custom implementation (needs to be registered via ServiceLoader mechanism).
 	 */
 	KnnVectorsFormat knnVectorFormat();
+
+	/**
+	 * @return The type of vector elements expected to get either {@code float.class} or {@code byte.class}.
+	 */
+	Class<?> vectorElementsType();
 }

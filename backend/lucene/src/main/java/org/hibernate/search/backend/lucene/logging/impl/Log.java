@@ -716,4 +716,11 @@ public interface Log extends BasicLogger {
 
 	@Message(id = ID_OFFSET + 176, value = "Vector dimension is a mandatory property.")
 	SearchException vectorDimensionNotSpecified(@Param EventContext eventContext);
+
+	@Message(id = ID_OFFSET + 177, value = "Vector field '%1$s' is defined as a '%2$s' array."
+			+ " Matching against '%3$s' array is unsupported."
+			+ " Use the array of the same type as the vector field.")
+	SearchException vectorKnnMatchVectorTypeDiffersFromField(String absoluteFieldPath,
+			@FormatWith(ClassFormatter.class) Class<?> expected, @FormatWith(ClassFormatter.class) Class<?> actual);
+
 }

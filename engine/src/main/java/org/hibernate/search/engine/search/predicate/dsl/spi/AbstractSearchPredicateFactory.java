@@ -17,6 +17,7 @@ import org.hibernate.search.engine.search.predicate.SearchPredicate;
 import org.hibernate.search.engine.search.predicate.dsl.BooleanPredicateClausesStep;
 import org.hibernate.search.engine.search.predicate.dsl.ExistsPredicateFieldStep;
 import org.hibernate.search.engine.search.predicate.dsl.ExtendedSearchPredicateFactory;
+import org.hibernate.search.engine.search.predicate.dsl.KnnPredicateFieldStep;
 import org.hibernate.search.engine.search.predicate.dsl.MatchAllPredicateOptionsStep;
 import org.hibernate.search.engine.search.predicate.dsl.MatchIdPredicateMatchingStep;
 import org.hibernate.search.engine.search.predicate.dsl.MatchNonePredicateFinalStep;
@@ -38,6 +39,7 @@ import org.hibernate.search.engine.search.predicate.dsl.TermsPredicateFieldStep;
 import org.hibernate.search.engine.search.predicate.dsl.WildcardPredicateFieldStep;
 import org.hibernate.search.engine.search.predicate.dsl.impl.BooleanPredicateClausesStepImpl;
 import org.hibernate.search.engine.search.predicate.dsl.impl.ExistsPredicateFieldStepImpl;
+import org.hibernate.search.engine.search.predicate.dsl.impl.KnnPredicateFieldStepImpl;
 import org.hibernate.search.engine.search.predicate.dsl.impl.MatchAllPredicateOptionsStepImpl;
 import org.hibernate.search.engine.search.predicate.dsl.impl.MatchIdPredicateMatchingStepImpl;
 import org.hibernate.search.engine.search.predicate.dsl.impl.MatchNonePredicateFinalStepImpl;
@@ -212,6 +214,12 @@ public abstract class AbstractSearchPredicateFactory<
 			predicateName = path;
 		}
 		return new NamedPredicateOptionsStepImpl( this, dslContext, fieldPath, predicateName );
+	}
+
+	@Override
+	public KnnPredicateFieldStep knn(int k) {
+		Contracts.assertStrictlyPositive( k, "k" );
+		return new KnnPredicateFieldStepImpl( this, dslContext, k );
 	}
 
 	@Override
