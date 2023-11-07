@@ -14,7 +14,11 @@ import org.junit.platform.suite.api.SuiteDisplayName;
 /**
  * Helper for running specific Hibernate ORM integration tests with outbox-polling from the IDE.
  * <p>
- * Adapt the classpath filter as needed to run a single test or an entire test package.
+ * Adapt the {@code @IncludeClassNamePatterns}/{@code @SelectPackages} annotation as needed
+ * to run a single test or an entire test package.
+ * <p>
+ * If tests against a non-H2 database are requested (e.g. with the ci-postgressql Maven profile),
+ * the database will be started automatically using TestContainers.
  */
 @Suite
 @SuiteDisplayName("Outbox polling tests Runner")

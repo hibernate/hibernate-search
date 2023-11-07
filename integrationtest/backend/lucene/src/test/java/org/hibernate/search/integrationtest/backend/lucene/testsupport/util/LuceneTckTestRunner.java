@@ -13,8 +13,9 @@ import org.junit.platform.suite.api.SuiteDisplayName;
 
 /**
  * Helper for running specific TCK tests against the Lucene backend from the IDE.
- *
- * <p>Adapt the classpath filter as needed to run a single test or an entire test package.
+ * <p>
+ * Adapt the {@code @IncludeClassNamePatterns}/{@code @SelectPackages} annotation as needed
+ * to run a single test or an entire test package.
  *
  * @author Gunnar Morling
  */
