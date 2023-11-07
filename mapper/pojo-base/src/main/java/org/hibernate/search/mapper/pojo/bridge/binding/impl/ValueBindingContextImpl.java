@@ -188,7 +188,6 @@ public class ValueBindingContextImpl<V> extends AbstractBindingContext
 		Type typeArgument = bridgeTypeContext.resolveTypeArgument( ValueBridge.class, 1 )
 				.orElseThrow( () -> new AssertionFailure( "Could not auto-detect the return type for value bridge '"
 						+ bridge + "'." ) );
-		// TODO : vector : extend ValueBridge to ValueArrayBridge and then feed things to indexFieldTypeFactory.asVector in that case
 		if ( typeArgument instanceof Class ) {
 			if ( bridge instanceof VectorBridge ) {
 				return indexFieldTypeFactory.asVector( (Class<F>) typeArgument );
