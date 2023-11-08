@@ -98,8 +98,15 @@ class FullTextSharedSessionBuilderDelegator implements FullTextSharedSessionBuil
 		return Search.getFullTextSession( builder.openSession() );
 	}
 
+	@Deprecated(forRemoval = true)
 	@Override
 	public FullTextSharedSessionBuilder tenantIdentifier(String tenantIdentifier) {
+		builder.tenantIdentifier( tenantIdentifier );
+		return this;
+	}
+
+	@Override
+	public FullTextSharedSessionBuilder tenantIdentifier(Object tenantIdentifier) {
 		builder.tenantIdentifier( tenantIdentifier );
 		return this;
 	}

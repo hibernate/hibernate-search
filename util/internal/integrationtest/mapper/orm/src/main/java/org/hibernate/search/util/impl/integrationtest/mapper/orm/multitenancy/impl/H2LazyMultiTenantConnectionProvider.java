@@ -19,7 +19,7 @@ import org.hibernate.testing.env.ConnectionProviderBuilder;
 
 import org.jboss.logging.Logger;
 
-public class H2LazyMultiTenantConnectionProvider extends AbstractMultiTenantConnectionProvider
+public class H2LazyMultiTenantConnectionProvider extends AbstractMultiTenantConnectionProvider<String>
 		implements Stoppable {
 
 	private static final Logger log = Logger.getLogger( H2LazyMultiTenantConnectionProvider.class.getName() );

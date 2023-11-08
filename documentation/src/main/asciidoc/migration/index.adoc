@@ -43,7 +43,7 @@ Hibernate Search {hibernateSearchVersion} now requires:
 - JDK 11 or later;
 - Lucene 9 for its Lucene backend;
 - Elasticsearch 7.10+ or OpenSearch 1.3+ for its Elasticsearch backend;
-- Hibernate ORM 6.3.x for the Hibernate ORM integration.
+- Hibernate ORM 6.4.x for the Hibernate ORM integration.
 
 Regarding the Hibernate ORM requirements, when migrating from previous versions of Hibernate Search:
 
@@ -54,6 +54,9 @@ to artifacts ending with `-orm6` (e.g. `hibernate-search-mapper-orm-orm6`).
 Just remove the `-orm6` suffix from the dependency coordinates
 (e.g. use `hibernate-search-mapper-orm` instead)
 when you upgrade to this version of Hibernate Search.
++
+Then, https://github.com/hibernate/hibernate-orm/blob/6.4/migration-guide.adoc[migrate to Hibernate ORM 6.4]
+at the same time you upgrade to this version of Hibernate Search.
 If your application uses Hibernate ORM 6.2::
 You need to https://github.com/hibernate/hibernate-orm/blob/6.3/migration-guide.adoc[migrate to Hibernate ORM 6.3] first
 before upgrading to this version of Hibernate Search.
@@ -62,7 +65,7 @@ Then follow the instructions for "If your application uses Hibernate ORM 6.3" ab
 If your application uses Hibernate ORM 5.6::
 You need to migrate to Hibernate ORM 6.3 first
 before upgrading to this version of Hibernate Search;
-see https://github.com/hibernate/hibernate-orm/wiki/Migration-Guides/[Hibernate ORM migration guides]
+see https://hibernate.org/orm/documentation/migrate/[Hibernate ORM migration guides]
 and https://docs.jboss.org/hibernate/search/6.2/reference/en-US/html_single/#other-integrations-orm6[this guide for using Hibernate ORM 6.x with Hibernate Search 6.2].
 +
 Then follow the instructions for "If your application uses Hibernate ORM 6.3" above.
