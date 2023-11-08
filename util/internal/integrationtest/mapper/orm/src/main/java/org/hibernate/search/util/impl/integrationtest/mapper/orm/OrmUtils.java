@@ -32,7 +32,7 @@ public final class OrmUtils {
 		return with( sessionFactory, null );
 	}
 
-	public static PersistenceRunner<Session, Transaction> with(SessionFactory sessionFactory, String tenantId) {
+	public static PersistenceRunner<Session, Transaction> with(SessionFactory sessionFactory, Object tenantId) {
 		return new NativePersistenceRunner( sessionFactory, tenantId );
 	}
 

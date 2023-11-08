@@ -45,7 +45,7 @@ public final class PersistenceUtil {
 		@SuppressWarnings("rawtypes")
 		SessionBuilder builder = sessionFactory.withOptions();
 		if ( StringHelper.isNotEmpty( tenantId ) ) {
-			builder.tenantIdentifier( tenantId );
+			builder.tenantIdentifier( (Object) tenantId );
 		}
 		Session session = builder.openSession();
 		// We don't need to write to the database
@@ -69,7 +69,7 @@ public final class PersistenceUtil {
 		@SuppressWarnings("rawtypes")
 		StatelessSessionBuilder builder = sessionFactory.withStatelessOptions();
 		if ( StringHelper.isNotEmpty( tenantId ) ) {
-			builder.tenantIdentifier( tenantId );
+			builder.tenantIdentifier( (Object) tenantId );
 		}
 		return builder.openStatelessSession();
 	}

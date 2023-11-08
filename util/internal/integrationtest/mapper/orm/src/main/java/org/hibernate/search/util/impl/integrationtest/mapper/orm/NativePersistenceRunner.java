@@ -14,9 +14,9 @@ import org.hibernate.search.util.impl.test.function.ThrowingFunction;
 
 class NativePersistenceRunner implements PersistenceRunner<Session, Transaction> {
 	private final SessionFactory sessionFactory;
-	private final String tenantId;
+	private final Object tenantId;
 
-	NativePersistenceRunner(SessionFactory sessionFactory, String tenantId) {
+	NativePersistenceRunner(SessionFactory sessionFactory, Object tenantId) {
 		this.sessionFactory = sessionFactory;
 		this.tenantId = tenantId;
 	}

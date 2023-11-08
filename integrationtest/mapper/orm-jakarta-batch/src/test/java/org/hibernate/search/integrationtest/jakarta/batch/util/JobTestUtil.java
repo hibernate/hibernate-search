@@ -7,6 +7,7 @@
 package org.hibernate.search.integrationtest.jakarta.batch.util;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmUtils.with;
 
 import java.lang.invoke.MethodHandles;
 import java.util.List;
@@ -116,27 +117,25 @@ public final class JobTestUtil {
 	}
 
 	public static <T> int nbDocumentsInIndex(EntityManagerFactory emf, Class<T> clazz) {
-		try ( Session session = emf.unwrap( SessionFactory.class ).openSession() ) {
+		return with( emf ).applyNoTransaction( session -> {
 			SearchSession searchSession = Search.session( session );
 			searchSession.workspace().refresh();
 			long totalHitCount = searchSession.search( clazz ).where( f -> f.matchAll() ).fetchTotalHitCount();
 			return Math.toIntExact( totalHitCount );
-		}
+		} );
 	}
 
 	public static <T> List<T> findIndexedResults(EntityManagerFactory emf, Class<T> clazz, String key, String value) {
 		SessionFactory sessionFactory = emf.unwrap( SessionFactory.class );
-		try ( Session session = sessionFactory.openSession() ) {
-			return find( session, clazz, key, value );
-		}
+		return with( sessionFactory )
+				.applyNoTransaction( session -> find( session, clazz, key, value ) );
 	}
 
 	public static <T> List<T> findIndexedResultsInTenant(EntityManagerFactory emf, Class<T> clazz, String key, String value,
 			String tenantId) {
 		SessionFactory sessionFactory = emf.unwrap( SessionFactory.class );
-		try ( Session session = sessionFactory.withOptions().tenantIdentifier( tenantId ).openSession() ) {
-			return find( session, clazz, key, value );
-		}
+		return with( sessionFactory, tenantId )
+				.applyNoTransaction( session -> find( session, clazz, key, value ) );
 	}
 
 	private static <T> List<T> find(Session session, Class<T> clazz, String key, String value) {
