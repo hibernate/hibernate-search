@@ -122,6 +122,12 @@ updates:
       interval: "weekly"
       day: "tuesday"
     assignees: ["yrodiere"]
+    groups:
+      # This group combines all build containers dependencies.
+      build-containers:
+        patterns:
+          # Include all:
+          - "*"
   - package-ecosystem: "docker"
     registries:
       - dockerhub
