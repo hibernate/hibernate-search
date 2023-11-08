@@ -33,8 +33,8 @@ on:
       # we'll reject such dependant PRs and send a PR ourselves.
       - '!dependabot/**'
       - 'dependabot/maven/build-dependencies-**'
-      - 'dependabot/docker/build-containers-**'
-      - 'dependabot/docker/database-containers-**'
+      - 'dependabot/docker/**/build-containers-**'
+      - 'dependabot/docker/**/database-containers-**'
 
 concurrency:
   group: "workflow = ${{ github.workflow }}, ref = ${{ github.event.ref }}, pr = ${{ github.event.pull_request.id }}"
