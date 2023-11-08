@@ -175,7 +175,7 @@ public final class HibernateOrmMassIndexingContext
 			HibernateOrmQueryLoader<E, I> typeQueryLoader = createQueryLoader( typeContexts );
 			SharedSessionContractImplementor session = (SharedSessionContractImplementor) sessionFactory
 					.withStatelessOptions()
-					.tenantIdentifier( context.tenantIdentifier() )
+					.tenantIdentifier( (Object) context.tenantIdentifier() )
 					.openStatelessSession();
 			try {
 				PojoMassIdentifierSink<I> sink = context.createSink();
@@ -198,7 +198,7 @@ public final class HibernateOrmMassIndexingContext
 			HibernateOrmQueryLoader<E, ?> typeQueryLoader = createQueryLoader( typeContexts );
 			SessionImplementor session = (SessionImplementor) sessionFactory
 					.withOptions()
-					.tenantIdentifier( context.tenantIdentifier() )
+					.tenantIdentifier( (Object) context.tenantIdentifier() )
 					.openSession();
 			try {
 				session.setHibernateFlushMode( FlushMode.MANUAL );

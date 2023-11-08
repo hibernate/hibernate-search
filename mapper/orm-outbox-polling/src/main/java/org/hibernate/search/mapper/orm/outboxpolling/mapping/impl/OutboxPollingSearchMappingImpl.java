@@ -64,7 +64,7 @@ public class OutboxPollingSearchMappingImpl implements OutboxPollingSearchMappin
 	public long countAbortedEvents(String tenantId) {
 		checkTenant( tenantId );
 
-		try ( Session session = sessionFactory.withOptions().tenantIdentifier( tenantId ).openSession() ) {
+		try ( Session session = sessionFactory.withOptions().tenantIdentifier( (Object) tenantId ).openSession() ) {
 			return transactionHelper.inTransaction( (SharedSessionContractImplementor) session, () -> {
 				Query<Long> query = session.createQuery( COUNT_EVENTS_WITH_STATUS, Long.class );
 				query.setParameter( "status", OutboxEvent.Status.ABORTED );
@@ -91,7 +91,7 @@ public class OutboxPollingSearchMappingImpl implements OutboxPollingSearchMappin
 	public int reprocessAbortedEvents(String tenantId) {
 		checkTenant( tenantId );
 
-		try ( Session session = sessionFactory.withOptions().tenantIdentifier( tenantId ).openSession() ) {
+		try ( Session session = sessionFactory.withOptions().tenantIdentifier( (Object) tenantId ).openSession() ) {
 			return transactionHelper.inTransaction( (SharedSessionContractImplementor) session, () -> {
 				MutationQuery query = session.createMutationQuery( UPDATE_EVENTS_WITH_STATUS );
 				query.setParameter( "status", OutboxEvent.Status.ABORTED );
@@ -118,7 +118,7 @@ public class OutboxPollingSearchMappingImpl implements OutboxPollingSearchMappin
 	public int clearAllAbortedEvents(String tenantId) {
 		checkTenant( tenantId );
 
-		try ( Session session = sessionFactory.withOptions().tenantIdentifier( tenantId ).openSession() ) {
+		try ( Session session = sessionFactory.withOptions().tenantIdentifier( (Object) tenantId ).openSession() ) {
 			return transactionHelper.inTransaction( (SharedSessionContractImplementor) session, () -> {
 				MutationQuery query = session.createMutationQuery( DELETE_EVENTS_WITH_STATUS );
 				query.setParameter( "status", OutboxEvent.Status.ABORTED );

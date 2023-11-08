@@ -8,14 +8,13 @@ package org.hibernate.search.integrationtest.mapper.orm.realbackend.multitenant;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmUtils.with;
 
 import java.util.List;
-import java.util.function.Consumer;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
 
-import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.search.integrationtest.mapper.orm.realbackend.testsupport.BackendConfigurations;
 import org.hibernate.search.mapper.orm.Search;
@@ -79,20 +78,20 @@ class RealBackendDatabaseMultitenancyIT {
 	}
 
 	private void checkMultitenancy() {
-		withinTransaction( TENANT_ID_1, session -> {
+		with( sessionFactory, TENANT_ID_1 ).runInTransaction( session -> {
 			IndexedEntity entity = new IndexedEntity();
 			entity.id = 1;
 			entity.text = TENANT_TEXT_1;
 			session.persist( entity );
 		} );
-		withinTransaction( TENANT_ID_2, session -> {
+		with( sessionFactory, TENANT_ID_2 ).runInTransaction( session -> {
 			IndexedEntity entity = new IndexedEntity();
 			entity.id = 1;
 			entity.text = TENANT_TEXT_2;
 			session.persist( entity );
 		} );
 
-		withinSession( TENANT_ID_1, session -> {
+		with( sessionFactory, TENANT_ID_1 ).runInTransaction( session -> {
 			List<IndexedEntity> entities = Search.session( session )
 					.search( IndexedEntity.class )
 					.where( f -> f.matchAll() )
@@ -100,7 +99,7 @@ class RealBackendDatabaseMultitenancyIT {
 
 			assertThat( entities ).extracting( "text" ).containsExactly( TENANT_TEXT_1 );
 		} );
-		withinSession( TENANT_ID_2, session -> {
+		with( sessionFactory, TENANT_ID_2 ).runInTransaction( session -> {
 			List<IndexedEntity> entities = Search.session( session )
 					.search( IndexedEntity.class )
 					.where( f -> f.matchAll() )
@@ -108,21 +107,6 @@ class RealBackendDatabaseMultitenancyIT {
 
 			assertThat( entities ).extracting( "text" ).containsExactly( TENANT_TEXT_2 );
 		} );
-	}
-
-	private void withinTransaction(String tenantId, Consumer<Session> action) {
-		withinSession( tenantId, (session) -> {
-			session.beginTransaction();
-			action.accept( session );
-			session.getTransaction().commit();
-			session.clear();
-		} );
-	}
-
-	private void withinSession(String tenantId, Consumer<Session> action) {
-		try ( Session session = sessionFactory.withOptions().tenantIdentifier( tenantId ).openSession() ) {
-			action.accept( session );
-		}
 	}
 
 	@Entity(name = IndexedEntity.NAME)

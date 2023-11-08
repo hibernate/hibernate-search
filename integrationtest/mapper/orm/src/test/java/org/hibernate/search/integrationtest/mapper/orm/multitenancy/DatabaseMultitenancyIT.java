@@ -163,7 +163,7 @@ class DatabaseMultitenancyIT {
 		}
 	}
 
-	private Session openSessionWithTenantId(String tid) {
+	private Session openSessionWithTenantId(Object tid) {
 		return sessionFactory.withOptions().tenantIdentifier( tid ).openSession();
 	}
 

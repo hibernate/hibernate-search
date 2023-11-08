@@ -17,9 +17,9 @@ import org.hibernate.engine.spi.SessionImplementor;
 public final class SessionHelper {
 
 	private final SessionFactoryImplementor sessionFactory;
-	private final String tenantId;
+	private final Object tenantId;
 
-	public SessionHelper(SessionFactoryImplementor sessionFactory, String tenantId) {
+	public SessionHelper(SessionFactoryImplementor sessionFactory, Object tenantId) {
 		this.sessionFactory = sessionFactory;
 		this.tenantId = tenantId;
 	}

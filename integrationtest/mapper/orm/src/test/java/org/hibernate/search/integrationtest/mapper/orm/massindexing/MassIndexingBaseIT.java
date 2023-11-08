@@ -510,7 +510,7 @@ class MassIndexingBaseIT {
 	@Test
 	void reuseSearchSessionAfterOrmSessionIsClosed_createMassIndexer() {
 		Session session = sessionFactory.withOptions()
-				.tenantIdentifier( targetTenantId() )
+				.tenantIdentifier( (Object) targetTenantId() )
 				.openSession();
 		SearchSession searchSession = Search.session( session );
 		// a SearchSession instance is created lazily,
@@ -528,7 +528,7 @@ class MassIndexingBaseIT {
 	@Test
 	void lazyCreateSearchSessionAfterOrmSessionIsClosed_createMassIndexer() {
 		Session session = sessionFactory.withOptions()
-				.tenantIdentifier( targetTenantId() )
+				.tenantIdentifier( (Object) targetTenantId() )
 				.openSession();
 		// Search session is not created, since we don't use it
 		SearchSession searchSession = Search.session( session );

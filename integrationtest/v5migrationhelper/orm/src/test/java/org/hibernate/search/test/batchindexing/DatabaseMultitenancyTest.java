@@ -206,7 +206,7 @@ class DatabaseMultitenancyTest extends SearchTestBase {
 		session.close();
 	}
 
-	private Session openSessionWithTenantId(String tenantId) {
+	private Session openSessionWithTenantId(Object tenantId) {
 		return getSessionFactory().withOptions().tenantIdentifier( tenantId ).openSession();
 	}
 
