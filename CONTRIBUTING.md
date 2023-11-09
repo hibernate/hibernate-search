@@ -16,6 +16,12 @@ in the root directory of the repository.
 All contributions are subject to the [Developer Certificate of Origin (DCO)](https://developercertificate.org/).
 The DCO text is also included verbatim in the [dco.txt](dco.txt) file in the root directory of the repository.
 
+## Finding something to contribute
+
+Our [JIRA instance](https://hibernate.atlassian.net/browse/HSEARCH) is where all tasks are reported and tracked.
+
+In particular there is a [list of issues suitable for new contributors](https://hibernate.atlassian.net/issues/?filter=21120).
+
 ## Contributing a bug report
 
 If you want to see something fixed, but are not comfortable enough to dig into the codebase,
