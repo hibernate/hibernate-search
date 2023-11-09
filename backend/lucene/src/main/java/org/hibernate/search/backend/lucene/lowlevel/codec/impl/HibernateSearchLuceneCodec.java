@@ -15,14 +15,29 @@ import org.hibernate.search.engine.backend.document.model.spi.IndexFieldFilter;
 import org.apache.lucene.codecs.Codec;
 import org.apache.lucene.codecs.FilterCodec;
 import org.apache.lucene.codecs.KnnVectorsFormat;
+import org.apache.lucene.codecs.lucene95.Lucene95Codec;
 import org.apache.lucene.codecs.perfield.PerFieldKnnVectorsFormat;
 
 public class HibernateSearchLuceneCodec extends FilterCodec {
+
+	static final Codec DEFAULT_CODEC = new Lucene95Codec();
+
 	private final KnnVectorsFormat knnVectorsFormat;
 
 	public HibernateSearchLuceneCodec(LuceneIndexModel model) {
-		super( HibernateSearchLuceneCodec.class.getSimpleName(), Codec.getDefault() );
-		this.knnVectorsFormat = new IndexModelBasedPerFieldKnnVectorsFormat( model );
+		this( new IndexModelBasedPerFieldKnnVectorsFormat( model ) );
+	}
+
+	public HibernateSearchLuceneCodec(KnnVectorsFormat knnVectorsFormat) {
+		super( HibernateSearchLuceneCodec.class.getSimpleName(), DEFAULT_CODEC );
+		this.knnVectorsFormat = knnVectorsFormat;
+	}
+
+	public HibernateSearchLuceneCodec() {
+		this( (KnnVectorsFormat) null );
+		// NOTE: we are not providing access to a PerFieldKnnVectorsFormat based on a model,
+		// since max connections and beam width parameters configured by vector format are only used by an index writer;
+		// and we also are crating and passing the codec to the writer ourselves.
 	}
 
 	@Override
