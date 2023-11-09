@@ -159,18 +159,25 @@ public class StubIndexFieldTypeFactory implements IndexFieldTypeFactory {
 	}
 
 	@Override
+	@SuppressWarnings("unchecked")
 	public <F> VectorFieldTypeOptionsStep<?, F> asVector(Class<F> valueType) {
-		throw new UnsupportedOperationException( "Implement me" );
+		if ( byte[].class.equals( valueType ) ) {
+			return (VectorFieldTypeOptionsStep<?, F>) asByteVector();
+		}
+		if ( float[].class.equals( valueType ) ) {
+			return (VectorFieldTypeOptionsStep<?, F>) asFloatVector();
+		}
+		throw new IllegalStateException( "Unsupported vector type " + valueType );
 	}
 
 	@Override
 	public VectorFieldTypeOptionsStep<?, byte[]> asByteVector() {
-		throw new UnsupportedOperationException( "Implement me" );
+		return new StubVectorFieldTypeOptionsStep<>( byte[].class );
 	}
 
 	@Override
 	public VectorFieldTypeOptionsStep<?, float[]> asFloatVector() {
-		throw new UnsupportedOperationException( "Implement me" );
+		return new StubVectorFieldTypeOptionsStep<>( float[].class );
 	}
 
 	public <T> IndexFieldTypeOptionsStep<?, T> asNonStandard(Class<T> fieldValueType) {

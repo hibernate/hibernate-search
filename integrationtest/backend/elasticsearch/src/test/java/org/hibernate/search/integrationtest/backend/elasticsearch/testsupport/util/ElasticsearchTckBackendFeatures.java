@@ -245,4 +245,9 @@ public class ElasticsearchTckBackendFeatures extends TckBackendFeatures {
 				aoss -> false
 		);
 	}
+
+	@Override
+	public boolean supportsVectorSearch() {
+		return false;
+	}
 }
