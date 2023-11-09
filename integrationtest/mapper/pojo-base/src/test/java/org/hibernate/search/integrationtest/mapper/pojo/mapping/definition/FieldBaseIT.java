@@ -18,6 +18,7 @@ import org.hibernate.search.mapper.pojo.bridge.runtime.ValueBridgeToIndexedValue
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.DocumentId;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.GenericField;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
+import org.hibernate.search.mapper.pojo.mapping.definition.annotation.VectorField;
 import org.hibernate.search.mapper.pojo.standalone.mapping.SearchMapping;
 import org.hibernate.search.mapper.pojo.standalone.session.SearchSession;
 import org.hibernate.search.util.common.SearchException;
@@ -70,6 +71,26 @@ class FieldBaseIT {
 						.failure( "No default value bridge implementation for type '"
 								+ Object.class.getName() + "'",
 								"Use a custom bridge" ) );
+	}
+
+	@Test
+	void valueBridge_default_vector_noMatch() {
+		@Indexed
+		class IndexedEntity {
+			@DocumentId
+			Integer id;
+			@VectorField(dimension = 4)
+			Object myProperty;
+		}
+		assertThatThrownBy(
+				() -> setupHelper.start().setup( IndexedEntity.class )
+		)
+				.isInstanceOf( SearchException.class )
+				.satisfies( FailureReportUtils.hasFailureReport()
+						.typeContext( IndexedEntity.class.getName() )
+						.pathContext( ".myProperty" )
+						.failure(
+								"No default value bridge implementation for type '" + Object.class.getName() + "'" ) );
 	}
 
 	@Test

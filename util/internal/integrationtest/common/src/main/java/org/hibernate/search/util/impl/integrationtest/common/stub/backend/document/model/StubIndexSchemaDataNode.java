@@ -18,6 +18,7 @@ import org.hibernate.search.engine.backend.types.Projectable;
 import org.hibernate.search.engine.backend.types.Searchable;
 import org.hibernate.search.engine.backend.types.Sortable;
 import org.hibernate.search.engine.backend.types.TermVector;
+import org.hibernate.search.engine.backend.types.VectorSimilarity;
 import org.hibernate.search.engine.reporting.spi.EventContexts;
 import org.hibernate.search.engine.search.predicate.definition.PredicateDefinition;
 import org.hibernate.search.util.common.reporting.EventContext;
@@ -242,9 +243,30 @@ public final class StubIndexSchemaDataNode extends StubTreeNode<StubIndexSchemaD
 			return this;
 		}
 
+		public Builder dimension(int dimension) {
+			attribute( "dimension", dimension );
+			return this;
+		}
+
+		public Builder maxConnections(int maxConnections) {
+			attribute( "maxConnections", maxConnections );
+			return this;
+		}
+
+		public Builder beamWidth(int beamWidth) {
+			attribute( "beamWidth", beamWidth );
+			return this;
+		}
+
+		public Builder vectorSimilarity(VectorSimilarity vectorSimilarity) {
+			attribute( "vectorSimilarity", vectorSimilarity );
+			return this;
+		}
+
 		@Override
 		public StubIndexSchemaDataNode build() {
 			return new StubIndexSchemaDataNode( this );
 		}
+
 	}
 }
