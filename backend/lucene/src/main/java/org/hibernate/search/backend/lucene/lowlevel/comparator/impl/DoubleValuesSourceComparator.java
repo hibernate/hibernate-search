@@ -13,6 +13,7 @@ import org.hibernate.search.backend.lucene.lowlevel.docvalues.impl.DoubleMultiVa
 import org.apache.lucene.index.LeafReaderContext;
 import org.apache.lucene.index.NumericDocValues;
 import org.apache.lucene.search.LeafFieldComparator;
+import org.apache.lucene.search.Pruning;
 import org.apache.lucene.search.comparators.DoubleComparator;
 
 public class DoubleValuesSourceComparator extends DoubleComparator {
@@ -20,8 +21,8 @@ public class DoubleValuesSourceComparator extends DoubleComparator {
 	private final DoubleMultiValuesToSingleValuesSource source;
 
 	public DoubleValuesSourceComparator(int numHits, String field, Double missingValue, boolean reversed,
-			boolean enableSkipping, DoubleMultiValuesToSingleValuesSource source) {
-		super( numHits, field, missingValue, reversed, enableSkipping );
+			Pruning pruning, DoubleMultiValuesToSingleValuesSource source) {
+		super( numHits, field, missingValue, reversed, pruning );
 		this.source = source;
 	}
 
