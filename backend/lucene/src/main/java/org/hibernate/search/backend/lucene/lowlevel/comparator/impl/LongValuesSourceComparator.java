@@ -13,15 +13,16 @@ import org.hibernate.search.backend.lucene.lowlevel.docvalues.impl.LongMultiValu
 import org.apache.lucene.index.LeafReaderContext;
 import org.apache.lucene.index.NumericDocValues;
 import org.apache.lucene.search.LeafFieldComparator;
+import org.apache.lucene.search.Pruning;
 import org.apache.lucene.search.comparators.LongComparator;
 
 public class LongValuesSourceComparator extends LongComparator {
 
 	private final LongMultiValuesToSingleValuesSource source;
 
-	public LongValuesSourceComparator(int numHits, String field, Long missingValue, boolean reversed, boolean enableSkipping,
+	public LongValuesSourceComparator(int numHits, String field, Long missingValue, boolean reversed, Pruning pruning,
 			LongMultiValuesToSingleValuesSource source) {
-		super( numHits, field, missingValue, reversed, enableSkipping );
+		super( numHits, field, missingValue, reversed, pruning );
 		this.source = source;
 	}
 

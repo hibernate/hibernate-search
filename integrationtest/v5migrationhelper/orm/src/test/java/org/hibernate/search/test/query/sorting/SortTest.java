@@ -47,6 +47,7 @@ import org.apache.lucene.queryparser.classic.QueryParser;
 import org.apache.lucene.search.FieldComparator;
 import org.apache.lucene.search.FieldComparatorSource;
 import org.apache.lucene.search.MatchAllDocsQuery;
+import org.apache.lucene.search.Pruning;
 import org.apache.lucene.search.Query;
 import org.apache.lucene.search.SimpleFieldComparator;
 import org.apache.lucene.search.Sort;
@@ -485,7 +486,7 @@ class SortTest extends SearchTestBase {
 
 	public static class SumFieldComparatorSource extends FieldComparatorSource {
 		@Override
-		public FieldComparator<?> newComparator(String fieldName, int numHits, boolean enableSkipping, boolean reversed) {
+		public FieldComparator<?> newComparator(String fieldName, int numHits, Pruning pruning, boolean reversed) {
 			return new SumFieldComparator( numHits, "num1", "num2" );
 		}
 	}

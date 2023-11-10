@@ -10,6 +10,7 @@ import org.hibernate.search.backend.lucene.lowlevel.docvalues.impl.MultiValueMod
 import org.hibernate.search.backend.lucene.types.lowlevel.impl.LuceneNumericDomain;
 
 import org.apache.lucene.search.FieldComparator;
+import org.apache.lucene.search.Pruning;
 import org.apache.lucene.search.Query;
 
 public class LuceneNumericFieldComparatorSource<E extends Number> extends LuceneFieldComparatorSource {
@@ -27,8 +28,8 @@ public class LuceneNumericFieldComparatorSource<E extends Number> extends Lucene
 	}
 
 	@Override
-	public FieldComparator<?> newComparator(String fieldname, int numHits, boolean enableSkipping, boolean reversed) {
-		return numericDomain.createFieldComparator( fieldname, numHits, missingValue, reversed, enableSkipping,
+	public FieldComparator<?> newComparator(String fieldname, int numHits, Pruning pruning, boolean reversed) {
+		return numericDomain.createFieldComparator( fieldname, numHits, missingValue, reversed, pruning,
 				sortMode, nestedDocsProvider );
 	}
 }

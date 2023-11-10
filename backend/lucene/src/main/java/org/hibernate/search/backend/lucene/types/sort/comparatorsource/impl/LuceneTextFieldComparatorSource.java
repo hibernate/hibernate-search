@@ -16,6 +16,7 @@ import org.hibernate.search.backend.lucene.types.sort.impl.SortMissingValue;
 import org.apache.lucene.index.LeafReaderContext;
 import org.apache.lucene.index.SortedDocValues;
 import org.apache.lucene.search.FieldComparator;
+import org.apache.lucene.search.Pruning;
 import org.apache.lucene.search.Query;
 import org.apache.lucene.search.comparators.TermOrdValComparator;
 import org.apache.lucene.util.BytesRef;
@@ -33,7 +34,7 @@ public class LuceneTextFieldComparatorSource extends LuceneFieldComparatorSource
 	}
 
 	@Override
-	public FieldComparator<?> newComparator(String fieldname, int numHits, boolean enableSkipping, boolean reversed) {
+	public FieldComparator<?> newComparator(String fieldname, int numHits, Pruning pruning, boolean reversed) {
 		final boolean considerMissingHighest;
 		if ( SortMissingValue.MISSING_LOWEST.equals( missingValue ) ) {
 			considerMissingHighest = false;
@@ -53,7 +54,7 @@ public class LuceneTextFieldComparatorSource extends LuceneFieldComparatorSource
 				TextMultiValuesToSingleValuesSource.fromField( fieldname, multiValueMode, nestedDocsProvider );
 
 		// forcing to not skipping documents
-		return new TermOrdValComparator( numHits, fieldname, considerMissingHighest, reversed, false ) {
+		return new TermOrdValComparator( numHits, fieldname, considerMissingHighest, reversed, Pruning.NONE ) {
 			@Override
 			protected SortedDocValues getSortedDocValues(LeafReaderContext context, String field) throws IOException {
 				SortedDocValues sortedDocValues = source.getValues( context );
