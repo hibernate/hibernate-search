@@ -76,8 +76,8 @@ class TrackingDirectory extends BaseDirectory {
 	}
 
 	@Override
-	public ChecksumIndexInput openChecksumInput(String name, IOContext context) throws IOException {
-		return new TrackingChecksumIndexInput( delegate.openChecksumInput( name, context ), tracker );
+	public ChecksumIndexInput openChecksumInput(String name) throws IOException {
+		return new TrackingChecksumIndexInput( delegate.openChecksumInput( name ), tracker );
 	}
 
 	@Override
