@@ -12,6 +12,7 @@ import org.hibernate.search.backend.lucene.lowlevel.docvalues.impl.MultiValueMod
 import org.hibernate.search.engine.spatial.GeoPoint;
 
 import org.apache.lucene.search.FieldComparator;
+import org.apache.lucene.search.Pruning;
 import org.apache.lucene.search.Query;
 
 public class LuceneGeoPointDistanceComparatorSource extends LuceneFieldComparatorSource {
@@ -29,11 +30,11 @@ public class LuceneGeoPointDistanceComparatorSource extends LuceneFieldComparato
 	}
 
 	@Override
-	public FieldComparator<?> newComparator(String fieldname, int numHits, boolean enableSkipping, boolean reversed) {
+	public FieldComparator<?> newComparator(String fieldname, int numHits, Pruning pruning, boolean reversed) {
 		GeoPointDistanceMultiValuesToSingleValuesSource source = new GeoPointDistanceMultiValuesToSingleValuesSource(
 				fieldname, mode, nestedDocsProvider, center
 		);
 		// forcing to not skipping documents
-		return new DoubleValuesSourceComparator( numHits, fieldname, missingValue, reversed, false, source );
+		return new DoubleValuesSourceComparator( numHits, fieldname, missingValue, reversed, Pruning.NONE, source );
 	}
 }
