@@ -18,6 +18,7 @@ import org.apache.lucene.facet.Facets;
 import org.apache.lucene.facet.FacetsCollector;
 import org.apache.lucene.index.IndexableField;
 import org.apache.lucene.search.FieldComparator;
+import org.apache.lucene.search.Pruning;
 import org.apache.lucene.search.Query;
 
 public interface LuceneNumericDomain<E extends Number> {
@@ -54,6 +55,6 @@ public interface LuceneNumericDomain<E extends Number> {
 	IndexableField createSortedDocValuesField(String absoluteFieldPath, E numericValue);
 
 	FieldComparator<E> createFieldComparator(String absoluteFieldPath, int numHits,
-			E missingValue, boolean reversed, boolean enableSkipping, MultiValueMode multiValueMode,
+			E missingValue, boolean reversed, Pruning pruning, MultiValueMode multiValueMode,
 			NestedDocsProvider nestedDocsProvider);
 }

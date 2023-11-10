@@ -26,6 +26,7 @@ import org.apache.lucene.facet.Facets;
 import org.apache.lucene.facet.FacetsCollector;
 import org.apache.lucene.index.IndexableField;
 import org.apache.lucene.search.FieldComparator;
+import org.apache.lucene.search.Pruning;
 import org.apache.lucene.search.Query;
 
 public class LuceneIntegerDomain implements LuceneNumericDomain<Integer> {
@@ -122,10 +123,10 @@ public class LuceneIntegerDomain implements LuceneNumericDomain<Integer> {
 
 	@Override
 	public FieldComparator<Integer> createFieldComparator(String fieldName, int numHits,
-			Integer missingValue, boolean reversed, boolean enableSkipping, MultiValueMode multiValueMode,
+			Integer missingValue, boolean reversed, Pruning pruning, MultiValueMode multiValueMode,
 			NestedDocsProvider nestedDocsProvider) {
 		LongMultiValuesToSingleValuesSource source =
 				LongMultiValuesToSingleValuesSource.fromIntField( fieldName, multiValueMode, nestedDocsProvider );
-		return new IntValuesSourceComparator( numHits, fieldName, missingValue, reversed, enableSkipping, source );
+		return new IntValuesSourceComparator( numHits, fieldName, missingValue, reversed, pruning, source );
 	}
 }
