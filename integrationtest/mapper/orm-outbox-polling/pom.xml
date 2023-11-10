@@ -71,7 +71,7 @@
                             </dependenciesToScan>
                             <includes>
                                 <!-- Include all tests from this module -->
-                                <include>%regex[org[/\\]hibernate[/\\]search[/\\]integrationtest[/\\]mapper[/\\]orm[/\\]coordination[/\\]outboxpolling[/\\].*IT\.class]</include>
+                                <include>%regex[org[/\\]hibernate[/\\]search[/\\]integrationtest[/\\]mapper[/\\]orm[/\\]outboxpolling[/\\].*IT\.class]</include>
                                 <!-- Include tests from integrationtest-mapper-orm that are related to automatic indexing -->
                                 <include>%regex[org[/\\]hibernate[/\\]search[/\\]integrationtest[/\\]mapper[/\\]orm[/\\]automaticindexing[/\\].*IT\.class]</include>
                             </includes>
