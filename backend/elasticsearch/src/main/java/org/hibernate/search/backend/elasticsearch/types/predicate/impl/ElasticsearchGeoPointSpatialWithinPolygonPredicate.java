@@ -25,12 +25,15 @@ import com.google.gson.JsonObject;
 
 public class ElasticsearchGeoPointSpatialWithinPolygonPredicate extends AbstractElasticsearchSingleFieldPredicate {
 
-	private static final JsonObjectAccessor GEO_POLYGON_ACCESSOR =
-			JsonAccessor.root().property( "geo_polygon" ).asObject();
+	private static final JsonObjectAccessor GEO_SHAPE_ACCESSOR =
+			JsonAccessor.root().property( "geo_shape" ).asObject();
 	private static final JsonAccessor<Boolean> IGNORE_UNMAPPED_ACCESSOR =
 			JsonAccessor.root().property( "ignore_unmapped" ).asBoolean();
 
-	private static final String POINTS_PROPERTY_NAME = "points";
+	private static final String COORDINATES_PROPERTY_NAME = "coordinates";
+	private static final String TYPE_PROPERTY_NAME = "type";
+	private static final String TYPE_PROPERTY_VALUE = "Polygon";
+	private static final String SHAPE_PROPERTY_NAME = "shape";
 
 	private final double[] coordinates;
 
@@ -42,7 +45,7 @@ public class ElasticsearchGeoPointSpatialWithinPolygonPredicate extends Abstract
 	@Override
 	protected JsonObject doToJsonQuery(PredicateRequestContext context, JsonObject outerObject,
 			JsonObject innerObject) {
-		JsonObject pointsObject = new JsonObject();
+		JsonObject geometryObject = new JsonObject();
 		JsonArray pointsArray = new JsonArray();
 		for ( int i = 0; i < coordinates.length; i += 2 ) {
 			JsonArray point = new JsonArray();
@@ -50,9 +53,28 @@ public class ElasticsearchGeoPointSpatialWithinPolygonPredicate extends Abstract
 			point.add( coordinates[i + 1] );
 			pointsArray.add( point );
 		}
-		pointsObject.add( POINTS_PROPERTY_NAME, pointsArray );
+		// GeoJSON Polygon has an array around the array of actual coordinates:
+		// "geometry": {
+		//     "type": "Polygon",
+		//     "coordinates": [
+		//         [
+		//             [100.0, 0.0],
+		//             [101.0, 0.0],
+		//             [101.0, 1.0],
+		//             [100.0, 1.0],
+		//             [100.0, 0.0]
+		//         ]
+		//     ]
+		// },
+		JsonArray coordinatesArray = new JsonArray();
+		coordinatesArray.add( pointsArray );
+		geometryObject.add( COORDINATES_PROPERTY_NAME, coordinatesArray );
+		// A GeoJSON shape; in our case we'll always have a Polygon:
+		geometryObject.addProperty( TYPE_PROPERTY_NAME, TYPE_PROPERTY_VALUE );
 
-		innerObject.add( absoluteFieldPath, pointsObject );
+		JsonObject shapeObject = new JsonObject();
+		shapeObject.add( SHAPE_PROPERTY_NAME, geometryObject );
+		innerObject.add( absoluteFieldPath, shapeObject );
 
 		if ( indexNames().size() > 1 ) {
 			// There are multiple target indexes; some of them may not declare the field.
@@ -60,7 +82,7 @@ public class ElasticsearchGeoPointSpatialWithinPolygonPredicate extends Abstract
 			IGNORE_UNMAPPED_ACCESSOR.set( innerObject, true );
 		}
 
-		GEO_POLYGON_ACCESSOR.set( outerObject, innerObject );
+		GEO_SHAPE_ACCESSOR.set( outerObject, innerObject );
 		return outerObject;
 	}
 
