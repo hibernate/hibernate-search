@@ -37,8 +37,8 @@ import org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmSetupHelper;
 import org.hibernate.search.util.impl.test.annotation.TestForIssue;
 import org.hibernate.search.util.impl.test.extension.parameterized.ParameterizedPerClass;
 import org.hibernate.search.util.impl.test.extension.parameterized.ParameterizedSetup;
+import org.hibernate.search.util.impl.test.extension.parameterized.ParameterizedSetupBeforeTest;
 
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
 import org.junit.jupiter.params.provider.Arguments;
@@ -93,7 +93,7 @@ public class OutboxPollingStrategyPropertyValueIT {
 				.setup();
 	}
 
-	@BeforeEach
+	@ParameterizedSetupBeforeTest
 	void resetFilter() {
 		eventFilter.reset();
 	}
