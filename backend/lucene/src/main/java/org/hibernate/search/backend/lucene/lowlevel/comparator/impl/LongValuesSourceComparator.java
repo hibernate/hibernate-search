@@ -34,6 +34,7 @@ public class LongValuesSourceComparator extends LongComparator {
 	private class LongValuesSourceLeafComparator extends LongLeafComparator {
 		LongValuesSourceLeafComparator(LeafReaderContext context) throws IOException {
 			super( context );
+			disableSkipping();
 		}
 
 		@Override

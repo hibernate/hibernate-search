@@ -34,6 +34,7 @@ public class IntValuesSourceComparator extends IntComparator {
 	private class IntValuesSourceLeafComparator extends IntLeafComparator {
 		IntValuesSourceLeafComparator(LeafReaderContext context) throws IOException {
 			super( context );
+			disableSkipping();
 		}
 
 		@Override

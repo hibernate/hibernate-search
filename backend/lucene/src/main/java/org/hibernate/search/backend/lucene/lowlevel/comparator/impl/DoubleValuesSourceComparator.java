@@ -34,6 +34,7 @@ public class DoubleValuesSourceComparator extends DoubleComparator {
 	private class DoubleValuesSourceLeafComparator extends DoubleLeafComparator {
 		DoubleValuesSourceLeafComparator(LeafReaderContext context) throws IOException {
 			super( context );
+			disableSkipping();
 		}
 
 		@Override

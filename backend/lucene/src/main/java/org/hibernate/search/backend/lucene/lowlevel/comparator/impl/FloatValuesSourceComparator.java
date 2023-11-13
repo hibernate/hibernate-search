@@ -34,6 +34,7 @@ public class FloatValuesSourceComparator extends FloatComparator {
 	private class FloatValuesSourceLeafComparator extends FloatLeafComparator {
 		FloatValuesSourceLeafComparator(LeafReaderContext context) throws IOException {
 			super( context );
+			disableSkipping();
 		}
 
 		@Override
