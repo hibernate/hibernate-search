@@ -31,13 +31,13 @@ Map settings() {
 			return [
 					updateProperties: ['version.org.apache.lucene'],
 					onlyRunTestDependingOn: ['hibernate-search-backend-lucene'],
-					additionalMavenArgs: '-Dtest.elasticsearch.skip=true'
+					additionalMavenArgs: '-Dtest.elasticsearch.skip=true -pl :hibernate-search-backend-lucene,:hibernate-search-util-internal-integrationtest-backend-lucene'
 			]
 		case 'lucene10':
 			return [
 					updateProperties: ['version.org.apache.lucene'],
 					onlyRunTestDependingOn: ['hibernate-search-backend-lucene'],
-					additionalMavenArgs: '-Dtest.elasticsearch.skip=true'
+					additionalMavenArgs: '-Dtest.elasticsearch.skip=true -pl :hibernate-search-backend-lucene,:hibernate-search-util-internal-integrationtest-backend-lucene'
 			]
 		case 'elasticsearch-latest':
 			return [
