@@ -21,6 +21,7 @@ import org.hibernate.search.engine.search.query.SearchQuery;
 import org.hibernate.search.engine.search.sort.dsl.SearchSortFactory;
 import org.hibernate.search.engine.search.sort.dsl.SortFinalStep;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.FieldTypeDescriptor;
+import org.hibernate.search.integrationtest.backend.tck.testsupport.types.StandardFieldTypeDescriptor;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.TckConfiguration;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.extension.SearchSetupHelper;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.BulkIndexer;
@@ -36,11 +37,11 @@ import org.junit.jupiter.params.provider.MethodSource;
 
 class FieldSortDynamicFieldIT<F> {
 
-	private static final List<FieldTypeDescriptor<?>> supportedFieldTypes = new ArrayList<>();
+	private static final List<StandardFieldTypeDescriptor<?>> supportedFieldTypes = new ArrayList<>();
 	private static final List<Arguments> parameters = new ArrayList<>();
 
 	static {
-		for ( FieldTypeDescriptor<?> fieldType : FieldTypeDescriptor.getAll() ) {
+		for ( StandardFieldTypeDescriptor<?> fieldType : FieldTypeDescriptor.getAllStandard() ) {
 			if ( fieldType.isFieldSortSupported() ) {
 				supportedFieldTypes.add( fieldType );
 				parameters.add( Arguments.of( fieldType ) );
@@ -79,7 +80,7 @@ class FieldSortDynamicFieldIT<F> {
 
 	@ParameterizedTest(name = "{0}")
 	@MethodSource("params")
-	void simple(FieldTypeDescriptor<F> fieldTypeDescriptor) {
+	void simple(FieldTypeDescriptor<F, ?> fieldTypeDescriptor) {
 		String fieldPath = mainFieldPath( fieldTypeDescriptor );
 
 		assertThatQuery( matchNonEmptyQuery( f -> f.field( fieldPath ).asc() ) )
@@ -91,7 +92,7 @@ class FieldSortDynamicFieldIT<F> {
 	@ParameterizedTest(name = "{0}")
 	@MethodSource("params")
 	@TestForIssue(jiraKey = "HSEARCH-4531")
-	void neverPopulated(FieldTypeDescriptor<F> fieldTypeDescriptor) {
+	void neverPopulated(FieldTypeDescriptor<F, ?> fieldTypeDescriptor) {
 		assumeTrue(
 				TckConfiguration.get().getBackendFeatures()
 						.supportsFieldSortWhenFieldMissingInSomeTargetIndexes( fieldTypeDescriptor.getJavaType() ),
@@ -127,11 +128,11 @@ class FieldSortDynamicFieldIT<F> {
 				.toQuery();
 	}
 
-	private static String mainFieldPath(FieldTypeDescriptor<?> type) {
+	private static String mainFieldPath(FieldTypeDescriptor<?, ?> type) {
 		return IndexBinding.fieldPath( type, "main" );
 	}
 
-	private String neverPopulatedFieldPath(FieldTypeDescriptor<?> fieldTypeDescriptor) {
+	private String neverPopulatedFieldPath(FieldTypeDescriptor<?, ?> fieldTypeDescriptor) {
 		return IndexBinding.fieldPath( fieldTypeDescriptor, "neverPopulated" );
 	}
 
@@ -146,12 +147,12 @@ class FieldSortDynamicFieldIT<F> {
 	}
 
 	private static void initDocument(DocumentElement document, Integer ordinal) {
-		for ( FieldTypeDescriptor<?> type : supportedFieldTypes ) {
+		for ( StandardFieldTypeDescriptor<?> type : supportedFieldTypes ) {
 			addValue( type, document, ordinal );
 		}
 	}
 
-	private static void addValue(FieldTypeDescriptor<?> type, DocumentElement documentElement, Integer ordinal) {
+	private static void addValue(StandardFieldTypeDescriptor<?> type, DocumentElement documentElement, Integer ordinal) {
 		if ( ordinal == null ) {
 			return;
 		}
@@ -162,12 +163,12 @@ class FieldSortDynamicFieldIT<F> {
 	}
 
 	private static class IndexBinding {
-		public static String fieldPath(FieldTypeDescriptor<?> type, String suffix) {
+		public static String fieldPath(FieldTypeDescriptor<?, ?> type, String suffix) {
 			return type.getUniqueName() + "_" + suffix;
 		}
 
 		IndexBinding(IndexSchemaElement root) {
-			for ( FieldTypeDescriptor<?> type : supportedFieldTypes ) {
+			for ( StandardFieldTypeDescriptor<?> type : supportedFieldTypes ) {
 				root.fieldTemplate( "myTemplate" + type.getUniqueName(),
 						f -> type.configure( f ).sortable( Sortable.YES ) )
 						.matchingPathGlob( fieldPath( type, "*" ) );

@@ -14,6 +14,8 @@ import java.util.stream.Stream;
 
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaElement;
 import org.hibernate.search.engine.backend.types.Sortable;
+import org.hibernate.search.engine.backend.types.dsl.SearchableProjectableIndexFieldTypeOptionsStep;
+import org.hibernate.search.engine.backend.types.dsl.StandardIndexFieldTypeOptionsStep;
 import org.hibernate.search.engine.reporting.spi.EventContexts;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.FieldTypeDescriptor;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.SimpleFieldModelsByType;
@@ -37,7 +39,8 @@ import org.junit.jupiter.params.provider.MethodSource;
 
 class FieldSortUnsupportedTypesIT<F> {
 
-	private static Stream<FieldTypeDescriptor<?>> unsupportedTypeDescriptors() {
+	private static Stream<FieldTypeDescriptor<?,
+			? extends SearchableProjectableIndexFieldTypeOptionsStep<?, ?>>> unsupportedTypeDescriptors() {
 		return FieldTypeDescriptor.getAll().stream()
 				.filter( typeDescriptor -> !typeDescriptor.isFieldSortSupported() );
 	}
@@ -63,7 +66,7 @@ class FieldSortUnsupportedTypesIT<F> {
 	@ParameterizedTest(name = "{0}")
 	@MethodSource("params")
 	@TestForIssue(jiraKey = "HSEARCH-3798")
-	void error_notSupported(FieldTypeDescriptor<F> fieldTypeDescriptor) {
+	void error_notSupported(FieldTypeDescriptor<F, ?> fieldTypeDescriptor) {
 		StubMappingScope scope = index.createScope();
 		String absoluteFieldPath = getFieldPath( fieldTypeDescriptor );
 
@@ -80,7 +83,7 @@ class FieldSortUnsupportedTypesIT<F> {
 				) );
 	}
 
-	private String getFieldPath(FieldTypeDescriptor<F> fieldTypeDescriptor) {
+	private String getFieldPath(FieldTypeDescriptor<F, ?> fieldTypeDescriptor) {
 		return index.binding().fieldModels.get( fieldTypeDescriptor ).relativeFieldName;
 	}
 
@@ -89,7 +92,12 @@ class FieldSortUnsupportedTypesIT<F> {
 
 		IndexBinding(IndexSchemaElement root) {
 			fieldModels = SimpleFieldModelsByType.mapAll( unsupportedTypeDescriptors(), root, "",
-					c -> c.sortable( Sortable.NO ) );
+					c -> {
+						if ( c instanceof StandardIndexFieldTypeOptionsStep ) {
+							( (StandardIndexFieldTypeOptionsStep<?, ?>) c ).sortable( Sortable.NO );
+						}
+					}
+			);
 		}
 	}
 

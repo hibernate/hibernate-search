@@ -16,7 +16,7 @@ import org.hibernate.search.integrationtest.backend.tck.testsupport.util.TckConf
 public final class WildcardPredicateTestValues extends AbstractPredicateTestValues<String> {
 	private final List<String> values;
 
-	public WildcardPredicateTestValues(FieldTypeDescriptor<String> fieldType) {
+	public WildcardPredicateTestValues(FieldTypeDescriptor<String, ?> fieldType) {
 		super( fieldType );
 		this.values = fieldType.getAscendingUniqueTermValues().getSingle();
 	}

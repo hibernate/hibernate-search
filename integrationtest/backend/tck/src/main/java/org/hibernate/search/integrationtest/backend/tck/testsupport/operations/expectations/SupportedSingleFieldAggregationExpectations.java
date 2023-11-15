@@ -13,13 +13,13 @@ import org.hibernate.search.integrationtest.backend.tck.testsupport.util.TypeAss
 
 public abstract class SupportedSingleFieldAggregationExpectations<F> {
 
-	private final FieldTypeDescriptor<F> fieldType;
+	private final FieldTypeDescriptor<F, ?> fieldType;
 	private final String aggregationName;
 	private final List<F> mainIndexDocumentFieldValues;
 	private final List<F> compatibleIndexDocumentFieldValues;
 	private final List<List<F>> multiValuedIndexDocumentFieldValues;
 
-	protected SupportedSingleFieldAggregationExpectations(FieldTypeDescriptor<F> fieldType, String aggregationName,
+	protected SupportedSingleFieldAggregationExpectations(FieldTypeDescriptor<F, ?> fieldType, String aggregationName,
 			List<F> mainIndexDocumentFieldValues,
 			List<F> compatibleIndexDocumentFieldValues,
 			List<List<F>> multiValuedIndexDocumentFieldValues) {
@@ -35,7 +35,7 @@ public abstract class SupportedSingleFieldAggregationExpectations<F> {
 		return aggregationName + " on type " + fieldType.getUniqueName();
 	}
 
-	public FieldTypeDescriptor<F> fieldType() {
+	public FieldTypeDescriptor<F, ?> fieldType() {
 		return fieldType;
 	}
 

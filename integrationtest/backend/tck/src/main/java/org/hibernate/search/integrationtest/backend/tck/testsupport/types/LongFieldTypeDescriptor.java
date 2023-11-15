@@ -17,7 +17,7 @@ import org.hibernate.search.integrationtest.backend.tck.testsupport.types.values
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.values.IndexableValues;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.TckConfiguration;
 
-public class LongFieldTypeDescriptor extends FieldTypeDescriptor<Long> {
+public class LongFieldTypeDescriptor extends StandardFieldTypeDescriptor<Long> {
 
 	public static final LongFieldTypeDescriptor INSTANCE = new LongFieldTypeDescriptor();
 

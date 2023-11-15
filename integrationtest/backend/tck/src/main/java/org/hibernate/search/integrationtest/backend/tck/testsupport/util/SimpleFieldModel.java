@@ -11,37 +11,48 @@ import java.util.function.Function;
 
 import org.hibernate.search.engine.backend.document.IndexFieldReference;
 import org.hibernate.search.engine.backend.types.dsl.IndexFieldTypeFactory;
-import org.hibernate.search.engine.backend.types.dsl.StandardIndexFieldTypeOptionsStep;
+import org.hibernate.search.engine.backend.types.dsl.SearchableProjectableIndexFieldTypeOptionsStep;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.FieldTypeDescriptor;
 
 public class SimpleFieldModel<F> {
 
-	public static <F> StandardFieldMapper<F, SimpleFieldModel<F>> mapper(FieldTypeDescriptor<F> typeDescriptor) {
+	public static <
+			F,
+			S extends SearchableProjectableIndexFieldTypeOptionsStep<?, F>> SimpleFieldMapper<F, S, SimpleFieldModel<F>> mapper(
+					FieldTypeDescriptor<F, S> typeDescriptor) {
 		return mapper( typeDescriptor, ignored -> {} );
 	}
 
-	public static <F> StandardFieldMapper<F, SimpleFieldModel<F>> mapper(FieldTypeDescriptor<F> typeDescriptor,
-			Consumer<? super StandardIndexFieldTypeOptionsStep<?, F>> configurationAdjustment) {
-		return StandardFieldMapper.of(
+	public static <
+			F,
+			S extends SearchableProjectableIndexFieldTypeOptionsStep<?, F>> SimpleFieldMapper<F, S, SimpleFieldModel<F>> mapper(
+					FieldTypeDescriptor<F, ? extends S> typeDescriptor,
+					Consumer<S> configurationAdjustment) {
+		return SimpleFieldMapper.of(
 				typeDescriptor::configure,
 				configurationAdjustment,
 				(reference, relativeFieldName) -> new SimpleFieldModel<>( typeDescriptor, reference, relativeFieldName )
 		);
 	}
 
-	public static <F> StandardFieldMapper<F, SimpleFieldModel<F>> mapperWithOverride(FieldTypeDescriptor<F> typeDescriptor,
-			Function<IndexFieldTypeFactory, StandardIndexFieldTypeOptionsStep<?, F>> initialConfiguration) {
-		return StandardFieldMapper.of(
+	public static <
+			F,
+			S extends SearchableProjectableIndexFieldTypeOptionsStep<?, F>> SimpleFieldMapper<F,
+					S,
+					SimpleFieldModel<F>> mapperWithOverride(
+							FieldTypeDescriptor<F, S> typeDescriptor,
+							Function<IndexFieldTypeFactory, S> initialConfiguration) {
+		return SimpleFieldMapper.of(
 				initialConfiguration,
 				(reference, relativeFieldName) -> new SimpleFieldModel<>( typeDescriptor, reference, relativeFieldName )
 		);
 	}
 
-	public final FieldTypeDescriptor<F> typeDescriptor;
+	public final FieldTypeDescriptor<F, ?> typeDescriptor;
 	public final String relativeFieldName;
 	public final IndexFieldReference<F> reference;
 
-	private SimpleFieldModel(FieldTypeDescriptor<F> typeDescriptor, IndexFieldReference<F> reference,
+	private SimpleFieldModel(FieldTypeDescriptor<F, ?> typeDescriptor, IndexFieldReference<F> reference,
 			String relativeFieldName) {
 		this.typeDescriptor = typeDescriptor;
 		this.reference = reference;

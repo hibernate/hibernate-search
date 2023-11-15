@@ -11,7 +11,7 @@ import org.hibernate.search.integrationtest.backend.tck.testsupport.types.FieldT
 public abstract class AbstractPerFieldTypeProjectionDataSet<F, P, V extends AbstractProjectionTestValues<F, P>>
 		extends AbstractProjectionDataSet {
 
-	protected final FieldTypeDescriptor<F> fieldType;
+	protected final FieldTypeDescriptor<F, ?> fieldType;
 	protected final V values;
 
 	protected AbstractPerFieldTypeProjectionDataSet(String routingKey, V values) {

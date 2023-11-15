@@ -22,7 +22,7 @@ import org.hibernate.search.integrationtest.backend.tck.testsupport.types.expect
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.values.AscendingUniqueTermValues;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.values.IndexableValues;
 
-public class OffsetDateTimeFieldTypeDescriptor extends FieldTypeDescriptor<OffsetDateTime> {
+public class OffsetDateTimeFieldTypeDescriptor extends StandardFieldTypeDescriptor<OffsetDateTime> {
 
 	public static final OffsetDateTimeFieldTypeDescriptor INSTANCE = new OffsetDateTimeFieldTypeDescriptor();
 

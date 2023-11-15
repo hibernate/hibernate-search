@@ -32,6 +32,7 @@ import org.hibernate.search.engine.search.sort.dsl.FieldSortOptionsStep;
 import org.hibernate.search.engine.search.sort.dsl.SortOrder;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.model.singlefield.SingleFieldIndexBinding;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.FieldTypeDescriptor;
+import org.hibernate.search.integrationtest.backend.tck.testsupport.types.StandardFieldTypeDescriptor;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.TestedFieldStructure;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.extension.SearchSetupHelper;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.BulkIndexer;
@@ -59,13 +60,13 @@ import org.apache.lucene.search.TopFieldDocs;
 
 class LuceneSearchTopDocsMergeFieldSortIT<F> {
 
-	private static final Set<FieldTypeDescriptor<?>> supportedFieldTypes = new LinkedHashSet<>();
+	private static final Set<StandardFieldTypeDescriptor<?>> supportedFieldTypes = new LinkedHashSet<>();
 	private static final List<DataSet<?>> dataSets = new ArrayList<>();
 
 	private static final List<Arguments> parameters = new ArrayList<>();
 
 	static {
-		for ( FieldTypeDescriptor<?> fieldType : FieldTypeDescriptor.getAll() ) {
+		for ( StandardFieldTypeDescriptor<?> fieldType : FieldTypeDescriptor.getAllStandard() ) {
 			if ( fieldType.isFieldSortSupported() ) {
 				supportedFieldTypes.add( fieldType );
 				for ( TestedFieldStructure fieldStructure : TestedFieldStructure.all() ) {
@@ -122,7 +123,7 @@ class LuceneSearchTopDocsMergeFieldSortIT<F> {
 	@ParameterizedTest(name = "{0} - {2} - {1}")
 	@MethodSource("params")
 	void asc(TestedFieldStructure fieldStructure,
-			FieldTypeDescriptor<F> fieldType, SortMode sortMode,
+			FieldTypeDescriptor<F, ?> fieldType, SortMode sortMode,
 			DataSet<F> dataSetForAsc, DataSet<F> dataSetForDesc) {
 		assumeTestParametersWork( sortMode, fieldStructure, fieldType );
 
@@ -157,7 +158,7 @@ class LuceneSearchTopDocsMergeFieldSortIT<F> {
 	@ParameterizedTest(name = "{0} - {2} - {1}")
 	@MethodSource("params")
 	void desc(TestedFieldStructure fieldStructure,
-			FieldTypeDescriptor<F> fieldType, SortMode sortMode,
+			FieldTypeDescriptor<F, ?> fieldType, SortMode sortMode,
 			DataSet<F> dataSetForAsc, DataSet<F> dataSetForDesc) {
 		assumeTestParametersWork( sortMode, fieldStructure, fieldType );
 
@@ -191,7 +192,7 @@ class LuceneSearchTopDocsMergeFieldSortIT<F> {
 	}
 
 	private LuceneSearchQuery<DocumentReference> matchNonEmptySortedByFieldQuery(DataSet<F> dataSet, int segment,
-			SortOrder sortOrder, TestedFieldStructure fieldStructure, FieldTypeDescriptor<F> fieldType,
+			SortOrder sortOrder, TestedFieldStructure fieldStructure, FieldTypeDescriptor<F, ?> fieldType,
 			SortMode sortMode) {
 		StubMappingScope scope = index.createScope();
 		return scope.query().extension( LuceneExtension.get() )
@@ -237,7 +238,7 @@ class LuceneSearchTopDocsMergeFieldSortIT<F> {
 	}
 
 	private void assumeTestParametersWork(SortMode sortMode, TestedFieldStructure fieldStructure,
-			FieldTypeDescriptor<F> fieldType) {
+			FieldTypeDescriptor<F, ?> fieldType) {
 		assumeFalse(
 				isMedianWithNestedField( sortMode, fieldStructure )
 						||
@@ -247,12 +248,12 @@ class LuceneSearchTopDocsMergeFieldSortIT<F> {
 		);
 	}
 
-	private boolean isSumOrAvgOrMedianWithStringField(FieldTypeDescriptor<F> fieldType, SortMode sortMode) {
+	private boolean isSumOrAvgOrMedianWithStringField(FieldTypeDescriptor<F, ?> fieldType, SortMode sortMode) {
 		return EnumSet.of( SortMode.SUM, SortMode.AVG, SortMode.MEDIAN ).contains( sortMode )
 				&& String.class.equals( fieldType.getJavaType() );
 	}
 
-	private boolean isSumWithTemporalField(SortMode sortMode, FieldTypeDescriptor<F> fieldType) {
+	private boolean isSumWithTemporalField(SortMode sortMode, FieldTypeDescriptor<F, ?> fieldType) {
 		return SortMode.SUM.equals( sortMode )
 				&& ( Temporal.class.isAssignableFrom( fieldType.getJavaType() )
 						|| MonthDay.class.equals( fieldType.getJavaType() ) );
@@ -263,13 +264,13 @@ class LuceneSearchTopDocsMergeFieldSortIT<F> {
 				&& fieldStructure.isInNested();
 	}
 
-	private String getFieldPath(TestedFieldStructure fieldStructure, FieldTypeDescriptor<?> fieldType) {
+	private String getFieldPath(TestedFieldStructure fieldStructure, FieldTypeDescriptor<?, ?> fieldType) {
 		return index.binding().getFieldPath( fieldStructure, fieldType );
 	}
 
 	private static class DataSet<F> {
 		private final TestedFieldStructure fieldStructure;
-		private final FieldTypeDescriptor<F> fieldType;
+		private final FieldTypeDescriptor<F, ?> fieldType;
 		private final SortMode expectedSortMode;
 		private final String routingKeyForSegment0;
 		private final String routingKeyForSegment1;
@@ -281,7 +282,7 @@ class LuceneSearchTopDocsMergeFieldSortIT<F> {
 		private final String seg0EmptyDocId;
 		private final String seg1EmptyDocId;
 
-		private DataSet(TestedFieldStructure fieldStructure, FieldTypeDescriptor<F> fieldType, SortMode sortModeOrNull,
+		private DataSet(TestedFieldStructure fieldStructure, FieldTypeDescriptor<F, ?> fieldType, SortMode sortModeOrNull,
 				SortMode expectedSortMode) {
 			this.fieldStructure = fieldStructure;
 			this.fieldType = fieldType;

@@ -12,6 +12,7 @@ import java.util.Collection;
 
 import org.hibernate.search.engine.backend.document.DocumentElement;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaElement;
+import org.hibernate.search.engine.backend.types.dsl.SearchableProjectableIndexFieldTypeOptionsStep;
 import org.hibernate.search.engine.search.predicate.dsl.PredicateFinalStep;
 import org.hibernate.search.engine.search.predicate.dsl.SearchPredicateFactory;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.FieldTypeDescriptor;
@@ -115,7 +116,8 @@ public abstract class AbstractPredicateMultiFieldIT<V extends AbstractPredicateT
 		private final SimpleFieldModelsByType field1;
 		private final SimpleFieldModelsByType field2;
 
-		public IndexBinding(IndexSchemaElement root, Collection<? extends FieldTypeDescriptor<?>> fieldTypes) {
+		public IndexBinding(IndexSchemaElement root, Collection<
+				? extends FieldTypeDescriptor<?, ? extends SearchableProjectableIndexFieldTypeOptionsStep<?, ?>>> fieldTypes) {
 			field0 = SimpleFieldModelsByType.mapAll( fieldTypes, root, "field0_" );
 			field1 = SimpleFieldModelsByType.mapAll( fieldTypes, root, "field1_" );
 			field2 = SimpleFieldModelsByType.mapAll( fieldTypes, root, "field2_" );

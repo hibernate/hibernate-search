@@ -10,7 +10,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaElement;
-import org.hibernate.search.engine.backend.types.dsl.StandardIndexFieldTypeOptionsStep;
+import org.hibernate.search.engine.backend.types.dsl.SearchableProjectableIndexFieldTypeOptionsStep;
 import org.hibernate.search.engine.search.predicate.dsl.PredicateFinalStep;
 import org.hibernate.search.engine.search.predicate.dsl.SearchPredicateFactory;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.FieldTypeDescriptor;
@@ -30,7 +30,9 @@ import org.junit.jupiter.params.provider.Arguments;
 class ExistsPredicateBaseIT {
 	//CHECKSTYLE:ON
 
-	private static final List<FieldTypeDescriptor<?>> supportedFieldTypes = FieldTypeDescriptor.getAll();
+	private static final List<
+			FieldTypeDescriptor<?, ? extends SearchableProjectableIndexFieldTypeOptionsStep<?, ?>>> supportedFieldTypes =
+					FieldTypeDescriptor.getAll();
 
 	@RegisterExtension
 	public static SearchSetupHelper setupHelper = SearchSetupHelper.create();
@@ -89,7 +91,7 @@ class ExistsPredicateBaseIT {
 		);
 	}
 
-	private static <F> ExistsPredicateTestValues<F> testValues(FieldTypeDescriptor<F> fieldType) {
+	private static <F> ExistsPredicateTestValues<F> testValues(FieldTypeDescriptor<F, ?> fieldType) {
 		return new ExistsPredicateTestValues<>( fieldType );
 	}
 
@@ -106,7 +108,7 @@ class ExistsPredicateBaseIT {
 		private static final List<DataSet<?, ?>> dataSets = new ArrayList<>();
 		private static final List<Arguments> parameters = new ArrayList<>();
 		static {
-			for ( FieldTypeDescriptor<?> fieldType : supportedFieldTypes ) {
+			for ( FieldTypeDescriptor<?, ?> fieldType : supportedFieldTypes ) {
 				DataSet<?, ?> dataSet = new DataSet<>( testValues( fieldType ) );
 				dataSets.add( dataSet );
 				parameters.add( Arguments.of( index, dataSet ) );
@@ -136,7 +138,7 @@ class ExistsPredicateBaseIT {
 		private static final List<DataSet<?>> dataSets = new ArrayList<>();
 		private static final List<Arguments> parameters = new ArrayList<>();
 		static {
-			for ( FieldTypeDescriptor<?> fieldType : supportedFieldTypes ) {
+			for ( FieldTypeDescriptor<?, ?> fieldType : supportedFieldTypes ) {
 				DataSet<?> dataSet = new DataSet<>( fieldType );
 				dataSets.add( dataSet );
 				parameters.add( Arguments.of( index, dataSet ) );
@@ -200,7 +202,7 @@ class ExistsPredicateBaseIT {
 		}
 
 		private static class DataSet<F> extends AbstractPerFieldTypePredicateDataSet<F, ExistsPredicateTestValues<F>> {
-			protected DataSet(FieldTypeDescriptor<F> fieldType) {
+			protected DataSet(FieldTypeDescriptor<F, ?> fieldType) {
 				super( testValues( fieldType ) );
 			}
 
@@ -235,7 +237,7 @@ class ExistsPredicateBaseIT {
 		private static final List<DataSet<?, ?>> dataSets = new ArrayList<>();
 		private static final List<Arguments> parameters = new ArrayList<>();
 		static {
-			for ( FieldTypeDescriptor<?> fieldType : supportedFieldTypes ) {
+			for ( FieldTypeDescriptor<?, ?> fieldType : supportedFieldTypes ) {
 				DataSet<?, ?> dataSet = new DataSet<>( testValues( fieldType ) );
 				dataSets.add( dataSet );
 				parameters.add( Arguments.of( mainIndex, missingFieldIndex, dataSet ) );
@@ -307,7 +309,7 @@ class ExistsPredicateBaseIT {
 
 		private static final List<Arguments> parameters = new ArrayList<>();
 		static {
-			for ( FieldTypeDescriptor<?> fieldType : supportedFieldTypes ) {
+			for ( FieldTypeDescriptor<?, ?> fieldType : supportedFieldTypes ) {
 				parameters.add( Arguments.of( searchableYesIndex, searchableNoIndex, fieldType ) );
 			}
 		}
@@ -319,13 +321,13 @@ class ExistsPredicateBaseIT {
 		@Override
 		public void unsearchable(SimpleMappedIndex<SearchableYesIndexBinding> searchableYesIndex,
 				SimpleMappedIndex<SearchableNoIndexBinding> searchableNoIndex,
-				FieldTypeDescriptor<?> fieldType) {
+				FieldTypeDescriptor<?, ?> fieldType) {
 			throw new org.opentest4j.TestAbortedException(
 					"The 'exists' predicate actually can be used on unsearchable fields" );
 		}
 
 		@Override
-		protected void tryPredicate(SearchPredicateFactory f, String fieldPath) {
+		protected void tryPredicate(SearchPredicateFactory f, String fieldPath, FieldTypeDescriptor<?, ?> fieldType) {
 			f.exists().field( fieldPath );
 		}
 
@@ -348,8 +350,8 @@ class ExistsPredicateBaseIT {
 		private static final SimpleMappedIndex<CompatibleIndexBinding> compatibleIndex =
 				SimpleMappedIndex.<CompatibleIndexBinding>of( root -> new CompatibleIndexBinding( root, supportedFieldTypes ) {
 					@Override
-					protected void addIrrelevantOptions(FieldTypeDescriptor<?> fieldType,
-							StandardIndexFieldTypeOptionsStep<?, ?> c) {
+					protected void addIrrelevantOptions(FieldTypeDescriptor<?, ?> fieldType,
+							SearchableProjectableIndexFieldTypeOptionsStep<?, ?> c) {
 						// It's not as easy to find irrelevant options for the "exists" predicate,
 						// since "sortable" and "aggregable", and even "projectable" in some cases,
 						// may add doc values which may lead to a different implementation of the "exists" predicate.
@@ -369,7 +371,7 @@ class ExistsPredicateBaseIT {
 		private static final List<DataSet<?, ?>> dataSets = new ArrayList<>();
 		private static final List<Arguments> parameters = new ArrayList<>();
 		static {
-			for ( FieldTypeDescriptor<?> fieldType : supportedFieldTypes ) {
+			for ( FieldTypeDescriptor<?, ?> fieldType : supportedFieldTypes ) {
 				DataSet<?, ?> dataSet = new DataSet<>( testValues( fieldType ) );
 				dataSets.add( dataSet );
 				parameters.add( Arguments.of( index, compatibleIndex, rawFieldCompatibleIndex, missingFieldIndex,

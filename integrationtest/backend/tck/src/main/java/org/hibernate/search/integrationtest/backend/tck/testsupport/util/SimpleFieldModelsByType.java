@@ -14,80 +14,110 @@ import java.util.function.Consumer;
 import java.util.stream.Stream;
 
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaElement;
-import org.hibernate.search.engine.backend.types.dsl.StandardIndexFieldTypeOptionsStep;
+import org.hibernate.search.engine.backend.types.dsl.SearchableProjectableIndexFieldTypeOptionsStep;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.FieldTypeDescriptor;
 
 public class SimpleFieldModelsByType {
-	public static SimpleFieldModelsByType mapAll(Collection<? extends FieldTypeDescriptor<?>> typeDescriptors,
+	public static <S extends SearchableProjectableIndexFieldTypeOptionsStep<?, ?>> SimpleFieldModelsByType mapAll(
+			Collection<? extends FieldTypeDescriptor<?, ? extends S>> typeDescriptors,
 			IndexSchemaElement parent, String prefix) {
 		return mapAll( typeDescriptors.stream(), parent, prefix );
 	}
 
 	@SafeVarargs
-	public static SimpleFieldModelsByType mapAll(Collection<? extends FieldTypeDescriptor<?>> typeDescriptors,
+	public static <S extends SearchableProjectableIndexFieldTypeOptionsStep<?, ?>> SimpleFieldModelsByType mapAll(
+			Collection<? extends FieldTypeDescriptor<?, ? extends S>> typeDescriptors,
 			IndexSchemaElement parent, String prefix,
-			Consumer<StandardIndexFieldTypeOptionsStep<?, ?>>... additionalConfiguration) {
+			Consumer<? super S>... additionalConfiguration) {
 		return mapAll( typeDescriptors.stream(), parent, prefix, additionalConfiguration );
 	}
 
 	@SafeVarargs
-	public static SimpleFieldModelsByType mapAll(Stream<? extends FieldTypeDescriptor<?>> typeDescriptors,
+	public static <S extends SearchableProjectableIndexFieldTypeOptionsStep<?, ?>> SimpleFieldModelsByType mapAll(
+			Stream<? extends FieldTypeDescriptor<?, ? extends S>> typeDescriptors,
 			IndexSchemaElement parent, String prefix,
-			Consumer<StandardIndexFieldTypeOptionsStep<?, ?>>... additionalConfiguration) {
+			Consumer<? super S>... additionalConfiguration) {
 		SimpleFieldModelsByType result = new SimpleFieldModelsByType();
 		typeDescriptors.forEach( typeDescriptor -> {
 			result.content.put(
 					typeDescriptor,
-					SimpleFieldModel.mapper( typeDescriptor, ignored -> {} )
-							.map( parent, prefix + typeDescriptor.getUniqueName(), additionalConfiguration )
-			);
-		} );
-		return result;
-	}
-
-	@SafeVarargs
-	public static SimpleFieldModelsByType mapAll(Collection<? extends FieldTypeDescriptor<?>> typeDescriptors,
-			IndexSchemaElement parent, String prefix,
-			BiConsumer<FieldTypeDescriptor<?>, StandardIndexFieldTypeOptionsStep<?, ?>>... additionalConfiguration) {
-		SimpleFieldModelsByType result = new SimpleFieldModelsByType();
-		typeDescriptors.forEach( typeDescriptor -> {
-			result.content.put(
-					typeDescriptor,
-					SimpleFieldModel.mapper( typeDescriptor, c -> {
-						for ( BiConsumer<FieldTypeDescriptor<?>,
-								StandardIndexFieldTypeOptionsStep<?, ?>> config : additionalConfiguration ) {
-							config.accept( typeDescriptor, c );
+					map( typeDescriptor, parent, prefix, (S step) -> {
+						for ( Consumer<? super S> config : additionalConfiguration ) {
+							config.accept( step );
 						}
 					} )
-							.map( parent, prefix + typeDescriptor.getUniqueName() )
 			);
 		} );
 		return result;
 	}
 
 	@SafeVarargs
-	public static SimpleFieldModelsByType mapAllMultiValued(Collection<? extends FieldTypeDescriptor<?>> typeDescriptors,
+	public static <S extends SearchableProjectableIndexFieldTypeOptionsStep<?, ?>> SimpleFieldModelsByType mapAll(
+			Collection<? extends FieldTypeDescriptor<?, ? extends S>> typeDescriptors,
 			IndexSchemaElement parent, String prefix,
-			Consumer<StandardIndexFieldTypeOptionsStep<?, ?>>... additionalConfiguration) {
+			BiConsumer<FieldTypeDescriptor<?, ? extends S>, S>... additionalConfiguration) {
+		SimpleFieldModelsByType result = new SimpleFieldModelsByType();
+		typeDescriptors.forEach( typeDescriptor -> {
+			result.content.put(
+					typeDescriptor,
+					map( typeDescriptor, parent, prefix, (S step) -> {
+						for ( BiConsumer<FieldTypeDescriptor<?, ? extends S>, S> config : additionalConfiguration ) {
+							config.accept( typeDescriptor, step );
+						}
+					} )
+			);
+		} );
+		return result;
+	}
+
+	// We can't easily express "S2 extends S and SearchableProjectableIndexFieldTypeOptionsStep<?, F>" in java
+	// so we fall back to dirty, dirty casts...
+	@SuppressWarnings("unchecked")
+	private static <S extends SearchableProjectableIndexFieldTypeOptionsStep<?, ?>> SimpleFieldModel<?> map(
+			FieldTypeDescriptor<?, ? extends S> typeDescriptor, IndexSchemaElement parent, String prefix,
+			Consumer<S> additionalConfiguration) {
+		return SimpleFieldModel.mapper( (FieldTypeDescriptor<?, ?>) typeDescriptor )
+				.map( parent, prefix + typeDescriptor.getUniqueName(),
+						step -> additionalConfiguration.accept( (S) step ) );
+	}
+
+	@SafeVarargs
+	public static <S extends SearchableProjectableIndexFieldTypeOptionsStep<?, ?>> SimpleFieldModelsByType mapAllMultiValued(
+			Collection<? extends FieldTypeDescriptor<?, ? extends S>> typeDescriptors,
+			IndexSchemaElement parent, String prefix,
+			Consumer<? super S>... additionalConfiguration) {
 		return mapAllMultiValued( typeDescriptors.stream(), parent, prefix, additionalConfiguration );
 	}
 
 	@SafeVarargs
-	public static SimpleFieldModelsByType mapAllMultiValued(Stream<? extends FieldTypeDescriptor<?>> typeDescriptors,
+	public static <S extends SearchableProjectableIndexFieldTypeOptionsStep<?, ?>> SimpleFieldModelsByType mapAllMultiValued(
+			Stream<? extends FieldTypeDescriptor<?, ? extends S>> typeDescriptors,
 			IndexSchemaElement parent, String prefix,
-			Consumer<StandardIndexFieldTypeOptionsStep<?, ?>>... additionalConfiguration) {
+			Consumer<? super S>... additionalConfiguration) {
 		SimpleFieldModelsByType result = new SimpleFieldModelsByType();
 		typeDescriptors.forEach( typeDescriptor -> {
 			result.content.put(
 					typeDescriptor,
-					SimpleFieldModel.mapper( typeDescriptor, ignored -> {} )
-							.mapMultiValued( parent, prefix + typeDescriptor.getUniqueName(), additionalConfiguration )
+					mapMultiValued( typeDescriptor, parent, prefix, additionalConfiguration )
 			);
 		} );
 		return result;
 	}
 
-	private final Map<FieldTypeDescriptor<?>, SimpleFieldModel<?>> content = new LinkedHashMap<>();
+	@SuppressWarnings("unchecked")
+	private static <S extends SearchableProjectableIndexFieldTypeOptionsStep<?, ?>> SimpleFieldModel<?> mapMultiValued(
+			FieldTypeDescriptor<?, ? extends S> typeDescriptor, IndexSchemaElement parent, String prefix,
+			Consumer<? super S>[] additionalConfiguration) {
+		return SimpleFieldModel.mapper( (FieldTypeDescriptor<?, ?>) typeDescriptor )
+				.mapMultiValued( parent, prefix + typeDescriptor.getUniqueName(),
+						step -> {
+							for ( Consumer<? super S> config : additionalConfiguration ) {
+								config.accept( (S) step );
+							}
+						} );
+	}
+
+	private final Map<FieldTypeDescriptor<?, ?>, SimpleFieldModel<?>> content = new LinkedHashMap<>();
 
 	@Override
 	public String toString() {
@@ -95,7 +125,7 @@ public class SimpleFieldModelsByType {
 	}
 
 	@SuppressWarnings("unchecked")
-	public <F> SimpleFieldModel<F> get(FieldTypeDescriptor<F> typeDescriptor) {
+	public <F> SimpleFieldModel<F> get(FieldTypeDescriptor<F, ?> typeDescriptor) {
 		return (SimpleFieldModel<F>) content.get( typeDescriptor );
 	}
 

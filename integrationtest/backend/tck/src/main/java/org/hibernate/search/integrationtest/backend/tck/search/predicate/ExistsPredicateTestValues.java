@@ -11,7 +11,7 @@ import org.hibernate.search.integrationtest.backend.tck.testsupport.types.FieldT
 public final class ExistsPredicateTestValues<F> extends AbstractPredicateTestValues<F> {
 	private final F value;
 
-	public ExistsPredicateTestValues(FieldTypeDescriptor<F> fieldType) {
+	public ExistsPredicateTestValues(FieldTypeDescriptor<F, ?> fieldType) {
 		super( fieldType );
 		this.value = fieldType.getUniquelyMatchableValues().get( 0 );
 	}

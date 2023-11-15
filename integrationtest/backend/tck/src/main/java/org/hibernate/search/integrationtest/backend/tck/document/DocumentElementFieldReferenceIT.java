@@ -19,6 +19,7 @@ import org.hibernate.search.engine.backend.document.IndexObjectFieldReference;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaElement;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaObjectField;
 import org.hibernate.search.engine.backend.types.ObjectStructure;
+import org.hibernate.search.engine.backend.types.dsl.SearchableProjectableIndexFieldTypeOptionsStep;
 import org.hibernate.search.engine.common.tree.TreeFilterDefinition;
 import org.hibernate.search.engine.mapper.mapping.building.spi.IndexedEmbeddedBindingContext;
 import org.hibernate.search.engine.mapper.mapping.building.spi.IndexedEntityBindingContext;
@@ -42,7 +43,8 @@ import org.junit.jupiter.params.provider.MethodSource;
 
 class DocumentElementFieldReferenceIT<F> {
 
-	private static List<FieldTypeDescriptor<?>> supportedTypeDescriptors() {
+	private static List<
+			FieldTypeDescriptor<?, ? extends SearchableProjectableIndexFieldTypeOptionsStep<?, ?>>> supportedTypeDescriptors() {
 		return FieldTypeDescriptor.getAll();
 	}
 
@@ -67,7 +69,7 @@ class DocumentElementFieldReferenceIT<F> {
 	 */
 	@ParameterizedTest(name = "{0}")
 	@MethodSource("params")
-	void addValue_nonNull(FieldTypeDescriptor<F> fieldType) {
+	void addValue_nonNull(FieldTypeDescriptor<F, ?> fieldType) {
 		executeAdd( "1", document -> {
 			setNonNullValue( index.binding(), document, fieldType );
 		} );
@@ -78,7 +80,7 @@ class DocumentElementFieldReferenceIT<F> {
 	 */
 	@ParameterizedTest(name = "{0}")
 	@MethodSource("params")
-	void addValue_null(FieldTypeDescriptor<F> fieldType) {
+	void addValue_null(FieldTypeDescriptor<F, ?> fieldType) {
 		executeAdd( "1", document -> {
 			setNullValue( index.binding(), document, fieldType );
 		} );
@@ -90,7 +92,7 @@ class DocumentElementFieldReferenceIT<F> {
 	 */
 	@ParameterizedTest(name = "{0}")
 	@MethodSource("params")
-	void addObject(FieldTypeDescriptor<F> fieldType) {
+	void addObject(FieldTypeDescriptor<F, ?> fieldType) {
 		executeAdd( "1", document -> {
 			setNullValue( index.binding(), document, fieldType );
 
@@ -123,7 +125,7 @@ class DocumentElementFieldReferenceIT<F> {
 	 */
 	@ParameterizedTest(name = "{0}")
 	@MethodSource("params")
-	void addNullObject(FieldTypeDescriptor<F> fieldType) {
+	void addNullObject(FieldTypeDescriptor<F, ?> fieldType) {
 		executeAdd( "1", document -> {
 			setNullValue( index.binding(), document, fieldType );
 
@@ -150,7 +152,7 @@ class DocumentElementFieldReferenceIT<F> {
 	 */
 	@ParameterizedTest(name = "{0}")
 	@MethodSource("params")
-	void addValue_excludedFields(FieldTypeDescriptor<F> fieldType) {
+	void addValue_excludedFields(FieldTypeDescriptor<F, ?> fieldType) {
 		executeAdd( "1", document -> {
 			DocumentElement excludingObject = document.addObject( index.binding().excludingObject.self );
 			setNonNullValue( index.binding().excludingObject, excludingObject, fieldType );
@@ -173,7 +175,7 @@ class DocumentElementFieldReferenceIT<F> {
 
 	@ParameterizedTest(name = "{0}")
 	@MethodSource("params")
-	void invalidFieldForDocumentElement_flattenedObjectChild(FieldTypeDescriptor<F> fieldType) {
+	void invalidFieldForDocumentElement_flattenedObjectChild(FieldTypeDescriptor<F, ?> fieldType) {
 		IndexFieldReference<F> reference = index.binding().flattenedObject.fieldModels.get( fieldType ).reference;
 		assertThatThrownBy(
 				() -> executeAdd( "1", document -> {
@@ -189,7 +191,7 @@ class DocumentElementFieldReferenceIT<F> {
 
 	@ParameterizedTest(name = "{0}")
 	@MethodSource("params")
-	void invalidFieldForDocumentElement_nestedObjectChild(FieldTypeDescriptor<F> fieldType) {
+	void invalidFieldForDocumentElement_nestedObjectChild(FieldTypeDescriptor<F, ?> fieldType) {
 		IndexFieldReference<F> reference = index.binding().nestedObject.fieldModels.get( fieldType ).reference;
 		assertThatThrownBy(
 				() -> executeAdd( "1", document -> {
@@ -205,7 +207,7 @@ class DocumentElementFieldReferenceIT<F> {
 
 	@ParameterizedTest(name = "{0}")
 	@MethodSource("params")
-	void invalidFieldForDocumentElement_rootChild(FieldTypeDescriptor<F> fieldType) {
+	void invalidFieldForDocumentElement_rootChild(FieldTypeDescriptor<F, ?> fieldType) {
 		IndexFieldReference<F> reference = index.binding().fieldModels.get( fieldType ).reference;
 		assertThatThrownBy(
 				() -> executeAdd( "1", document -> {
@@ -221,13 +223,13 @@ class DocumentElementFieldReferenceIT<F> {
 	}
 
 	private void setNonNullValue(AbstractObjectBinding binding, DocumentElement document,
-			FieldTypeDescriptor<F> fieldType) {
+			FieldTypeDescriptor<F, ?> fieldType) {
 		document.addValue( binding.fieldModels.get( fieldType ).reference,
 				fieldType.getIndexableValues().getSingle().get( 0 ) );
 	}
 
 	private void setNullValue(AbstractObjectBinding binding, DocumentElement document,
-			FieldTypeDescriptor<F> fieldType) {
+			FieldTypeDescriptor<F, ?> fieldType) {
 		document.addValue( binding.fieldModels.get( fieldType ).reference, null );
 	}
 

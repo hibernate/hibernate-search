@@ -13,10 +13,9 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
-import java.util.function.Consumer;
 
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaElement;
-import org.hibernate.search.engine.backend.types.dsl.StandardIndexFieldTypeOptionsStep;
+import org.hibernate.search.engine.backend.types.dsl.SearchableProjectableIndexFieldTypeOptionsStep;
 import org.hibernate.search.engine.reporting.spi.EventContexts;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.operations.AggregationDescriptor;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.operations.expectations.UnsupportedSingleFieldAggregationExpectations;
@@ -43,12 +42,16 @@ import org.junit.jupiter.params.provider.MethodSource;
 
 class SingleFieldAggregationUnsupportedTypesIT<F> {
 
-	private static final Set<FieldTypeDescriptor<?>> unsupportedFieldTypes = new LinkedHashSet<>();
+	private static final Set<
+			FieldTypeDescriptor<?, ? extends SearchableProjectableIndexFieldTypeOptionsStep<?, ?>>> unsupportedFieldTypes =
+					new LinkedHashSet<>();
 	private static final List<Arguments> parameters = new ArrayList<>();
 
 	static {
 		for ( AggregationDescriptor aggregationDescriptor : AggregationDescriptor.getAll() ) {
-			for ( FieldTypeDescriptor<?> fieldTypeDescriptor : FieldTypeDescriptor.getAll() ) {
+			for ( FieldTypeDescriptor<?,
+					? extends SearchableProjectableIndexFieldTypeOptionsStep<?, ?>> fieldTypeDescriptor : FieldTypeDescriptor
+							.getAll() ) {
 				Optional<? extends UnsupportedSingleFieldAggregationExpectations> expectations =
 						aggregationDescriptor.getSingleFieldAggregationExpectations( fieldTypeDescriptor ).getUnsupported();
 				if ( expectations.isPresent() ) {
@@ -77,7 +80,7 @@ class SingleFieldAggregationUnsupportedTypesIT<F> {
 	@MethodSource("params")
 	@TestForIssue(jiraKey = "HSEARCH-1748")
 	@PortedFromSearch5(original = "org.hibernate.search.test.query.facet.RangeFacetingTest.testRangeQueryWithUnsupportedType")
-	void simple(FieldTypeDescriptor<F> fieldType, UnsupportedSingleFieldAggregationExpectations expectations) {
+	void simple(FieldTypeDescriptor<F, ?> fieldType, UnsupportedSingleFieldAggregationExpectations expectations) {
 		SimpleFieldModel<F> model = index.binding().fieldModels.get( fieldType );
 		String fieldPath = model.relativeFieldName;
 
@@ -93,12 +96,6 @@ class SingleFieldAggregationUnsupportedTypesIT<F> {
 				.satisfies( FailureReportUtils.hasContext(
 						EventContexts.fromIndexFieldAbsolutePath( fieldPath )
 				) );
-	}
-
-	private SimpleFieldModel<F> mapField(IndexSchemaElement parent, String prefix,
-			Consumer<StandardIndexFieldTypeOptionsStep<?, F>> additionalConfiguration, FieldTypeDescriptor<F> fieldType) {
-		return SimpleFieldModel.mapper( fieldType, additionalConfiguration )
-				.map( parent, prefix + fieldType.getUniqueName() );
 	}
 
 	private static class IndexBinding {

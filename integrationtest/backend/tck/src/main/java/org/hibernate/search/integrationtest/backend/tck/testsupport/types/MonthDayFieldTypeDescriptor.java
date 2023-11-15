@@ -20,7 +20,7 @@ import org.hibernate.search.integrationtest.backend.tck.testsupport.types.expect
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.values.AscendingUniqueTermValues;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.values.IndexableValues;
 
-public class MonthDayFieldTypeDescriptor extends FieldTypeDescriptor<MonthDay> {
+public class MonthDayFieldTypeDescriptor extends StandardFieldTypeDescriptor<MonthDay> {
 
 	public static final MonthDayFieldTypeDescriptor INSTANCE = new MonthDayFieldTypeDescriptor();
 

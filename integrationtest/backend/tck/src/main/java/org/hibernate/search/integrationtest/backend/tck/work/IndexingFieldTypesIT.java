@@ -10,12 +10,14 @@ import static org.hibernate.search.util.impl.integrationtest.common.assertion.Se
 import static org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMapperUtils.referenceProvider;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaElement;
 import org.hibernate.search.engine.backend.types.Projectable;
+import org.hibernate.search.engine.backend.types.dsl.SearchableProjectableIndexFieldTypeOptionsStep;
 import org.hibernate.search.engine.backend.work.execution.OperationSubmitter;
 import org.hibernate.search.engine.backend.work.execution.spi.IndexIndexingPlan;
 import org.hibernate.search.engine.search.query.SearchQuery;
@@ -39,7 +41,9 @@ import org.junit.jupiter.params.provider.MethodSource;
  */
 class IndexingFieldTypesIT<F> {
 
-	private static final List<FieldTypeDescriptor<?>> supportedTypeDescriptors = FieldTypeDescriptor.getAll();
+	private static final List<
+			FieldTypeDescriptor<?, ? extends SearchableProjectableIndexFieldTypeOptionsStep<?, ?>>> supportedTypeDescriptors =
+					FieldTypeDescriptor.getAll();
 
 	public static List<? extends Arguments> params() {
 		return supportedTypeDescriptors.stream()
@@ -52,7 +56,7 @@ class IndexingFieldTypesIT<F> {
 
 	private SimpleMappedIndex<IndexBinding> index;
 
-	public void init(FieldTypeDescriptor<F> typeDescriptor) {
+	public void init(FieldTypeDescriptor<F, ?> typeDescriptor) {
 		index = SimpleMappedIndex.of(
 				root -> new IndexBinding( root, typeDescriptor ) );
 		setupHelper.start().withIndex( index ).setup();
@@ -60,7 +64,7 @@ class IndexingFieldTypesIT<F> {
 
 	@ParameterizedTest(name = "{0}")
 	@MethodSource("params")
-	void withReference(FieldTypeDescriptor<F> typeDescriptor) {
+	void withReference(FieldTypeDescriptor<F, ?> typeDescriptor) {
 		init( typeDescriptor );
 		List<F> values = new ArrayList<>( typeDescriptor.getIndexableValues().getSingle() );
 		values.add( null ); // Also test null
@@ -99,7 +103,7 @@ class IndexingFieldTypesIT<F> {
 
 	@ParameterizedTest(name = "{0}")
 	@MethodSource("params")
-	void withPath(FieldTypeDescriptor<F> typeDescriptor) {
+	void withPath(FieldTypeDescriptor<F, ?> typeDescriptor) {
 		init( typeDescriptor );
 		List<F> values = new ArrayList<>( typeDescriptor.getIndexableValues().getSingle() );
 		values.add( null ); // Also test null
@@ -138,7 +142,7 @@ class IndexingFieldTypesIT<F> {
 
 	@ParameterizedTest(name = "{0}")
 	@MethodSource("params")
-	void dynamic_withPath(FieldTypeDescriptor<F> typeDescriptor) {
+	void dynamic_withPath(FieldTypeDescriptor<F, ?> typeDescriptor) {
 		init( typeDescriptor );
 		List<F> values = new ArrayList<>( typeDescriptor.getIndexableValues().getSingle() );
 		values.add( null ); // Also test null
@@ -179,7 +183,7 @@ class IndexingFieldTypesIT<F> {
 	private class IndexBinding {
 		final SimpleFieldModel<F> fieldModel;
 
-		IndexBinding(IndexSchemaElement root, FieldTypeDescriptor<F> typeDescriptor) {
+		IndexBinding(IndexSchemaElement root, FieldTypeDescriptor<F, ?> typeDescriptor) {
 			this.fieldModel = SimpleFieldModel.mapper( typeDescriptor, c -> c.projectable( Projectable.YES ) )
 					.map( root, "field" );
 			supportedTypeDescriptors.forEach( fieldType -> {
@@ -216,8 +220,29 @@ class IndexingFieldTypesIT<F> {
 				return false;
 			}
 			IdAndValue<?> that = (IdAndValue<?>) o;
+
+			boolean isArray = isArray( fieldValue ) || isArray( that.fieldValue );
+
 			return Objects.equals( documentId, that.documentId )
-					&& Objects.equals( fieldValue, that.fieldValue );
+					&& isArray ? arraysEquals( fieldValue, that.fieldValue ) : Objects.equals( fieldValue, that.fieldValue );
+		}
+
+		private <T> boolean isArray(T fieldValue) {
+			return fieldValue != null && fieldValue.getClass().isArray();
+		}
+
+		private <T> boolean arraysEquals(T a1, T a2) {
+			if ( a1 == null && a2 == null ) {
+				return true;
+			}
+			Class<?> componentType = a1 == null ? a2.getClass().getComponentType() : a1.getClass().getComponentType();
+			if ( byte.class.equals( componentType ) ) {
+				return Arrays.equals( (byte[]) a1, (byte[]) a2 );
+			}
+			if ( float.class.equals( componentType ) ) {
+				return Arrays.equals( (float[]) a1, (float[]) a2 );
+			}
+			throw new IllegalArgumentException( componentType + " is not supported for array equals check" );
 		}
 
 		@Override

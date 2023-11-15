@@ -21,8 +21,12 @@ import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaElement
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaObjectField;
 import org.hibernate.search.engine.backend.types.ObjectStructure;
 import org.hibernate.search.engine.backend.types.Sortable;
+import org.hibernate.search.engine.backend.types.dsl.SearchableProjectableIndexFieldTypeOptionsStep;
+import org.hibernate.search.engine.backend.types.dsl.StandardIndexFieldTypeOptionsStep;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.AnalyzedStringFieldTypeDescriptor;
+import org.hibernate.search.integrationtest.backend.tck.testsupport.types.ByteVectorFieldTypeDescriptor;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.FieldTypeDescriptor;
+import org.hibernate.search.integrationtest.backend.tck.testsupport.types.FloatVectorFieldTypeDescriptor;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.SimpleFieldModel;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.SimpleFieldModelsByType;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.TckConfiguration;
@@ -38,14 +42,24 @@ import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 
 class ExistsPredicateSpecificsIT<F> {
-	private static final List<FieldTypeDescriptor<?>> supportedFieldTypes = FieldTypeDescriptor.getAll();
-	private static final List<FieldTypeDescriptor<?>> supportedFieldTypesWithDocValues = new ArrayList<>();
+	private static final List<
+			FieldTypeDescriptor<?, ? extends SearchableProjectableIndexFieldTypeOptionsStep<?, ?>>> supportedFieldTypes =
+					FieldTypeDescriptor.getAll();
+	private static final List<FieldTypeDescriptor<?,
+			? extends SearchableProjectableIndexFieldTypeOptionsStep<?, ?>>> supportedFieldMultipleCanBeAddedToFlattenObject =
+					new ArrayList<>();
+	private static final List<FieldTypeDescriptor<?,
+			? extends SearchableProjectableIndexFieldTypeOptionsStep<?, ?>>> supportedFieldTypesWithDocValues =
+					new ArrayList<>();
 	private static final List<DataSet<?>> dataSets = new ArrayList<>();
 	private static final List<Arguments> parameters = new ArrayList<>();
 	static {
-		for ( FieldTypeDescriptor<?> fieldType : supportedFieldTypes ) {
+		for ( FieldTypeDescriptor<?, ?> fieldType : supportedFieldTypes ) {
 			if ( fieldType.isFieldSortSupported() ) {
 				supportedFieldTypesWithDocValues.add( fieldType );
+			}
+			if ( fieldType.isMultivaluable() ) {
+				supportedFieldMultipleCanBeAddedToFlattenObject.add( fieldType );
 			}
 			DataSet<?> dataSet = new DataSet<>( fieldType );
 			dataSets.add( dataSet );
@@ -161,8 +175,10 @@ class ExistsPredicateSpecificsIT<F> {
 	@MethodSource("params")
 	void multiIndex_differentFieldType(DataSet<F> dataSet) {
 		assumeFalse(
-				dataSet.fieldType.equals( AnalyzedStringFieldTypeDescriptor.INSTANCE ),
-				"This test is only relevant if the field type does not use norms"
+				dataSet.fieldType.equals( AnalyzedStringFieldTypeDescriptor.INSTANCE )
+						|| dataSet.fieldType.equals( ByteVectorFieldTypeDescriptor.INSTANCE )
+						|| dataSet.fieldType.equals( FloatVectorFieldTypeDescriptor.INSTANCE ),
+				"This test is only relevant if the field type does not use doc values or norms (do not use a DocValuesOrNormsBasedFactory)"
 		);
 
 		StubMappingScope scope = mainIndex.createScope( differentFieldTypeIndex );
@@ -219,7 +235,7 @@ class ExistsPredicateSpecificsIT<F> {
 		IndexBinding(IndexSchemaElement root) {
 			fieldWithDefaults = SimpleFieldModelsByType.mapAll( supportedFieldTypes, root, "fieldWithDefaults_" );
 			fieldWithDocValues = SimpleFieldModelsByType.mapAll( supportedFieldTypesWithDocValues, root, "fieldWithDocValues_",
-					c -> c.sortable( Sortable.YES ) );
+					c -> ( (StandardIndexFieldTypeOptionsStep<?, ?>) c ).sortable( Sortable.YES ) );
 			flattenedObject = new ObjectMapping( root, "flattenedObject", ObjectStructure.FLATTENED );
 			nestedObject = new ObjectMapping( root, "nestedObject", ObjectStructure.NESTED );
 		}
@@ -236,41 +252,47 @@ class ExistsPredicateSpecificsIT<F> {
 			IndexSchemaObjectField objectField = parent.objectField( relativeFieldName, structure )
 					.multiValued();
 			self = objectField.toReference();
-			fieldWithDefaults = SimpleFieldModelsByType.mapAll( supportedFieldTypes, objectField, "fieldWithDefaults_" );
+			fieldWithDefaults = SimpleFieldModelsByType.mapAll(
+					ObjectStructure.NESTED.equals( structure )
+							? supportedFieldTypes
+							: supportedFieldMultipleCanBeAddedToFlattenObject,
+					objectField, "fieldWithDefaults_" );
 			fieldWithDocValues =
 					SimpleFieldModelsByType.mapAll( supportedFieldTypesWithDocValues, objectField, "fieldWithDocValues_",
-							c -> c.sortable( Sortable.YES ) );
+							c -> ( (StandardIndexFieldTypeOptionsStep<?, ?>) c ).sortable( Sortable.YES ) );
 		}
 	}
 
 	private static class DifferentTypeIndexBinding {
-		private final Map<FieldTypeDescriptor<?>, SimpleFieldModel<?>> fieldWithDefaultsByOriginalType = new LinkedHashMap<>();
-		private final Map<FieldTypeDescriptor<?>, SimpleFieldModel<?>> fieldWithDocValuesByOriginalType = new LinkedHashMap<>();
+		private final Map<FieldTypeDescriptor<?, ?>, SimpleFieldModel<?>> fieldWithDefaultsByOriginalType =
+				new LinkedHashMap<>();
+		private final Map<FieldTypeDescriptor<?, ?>, SimpleFieldModel<?>> fieldWithDocValuesByOriginalType =
+				new LinkedHashMap<>();
 
 		DifferentTypeIndexBinding(IndexSchemaElement root) {
 			supportedFieldTypes.forEach( fieldType -> {
-				FieldTypeDescriptor<?> replacingType = FieldTypeDescriptor.getIncompatible( fieldType );
+				FieldTypeDescriptor<?, ?> replacingType = FieldTypeDescriptor.getIncompatible( fieldType );
 				fieldWithDefaultsByOriginalType.put( fieldType, SimpleFieldModel.mapper( replacingType )
 						.map( root, "fieldWithDefaults_" + fieldType.getUniqueName() ) );
 			} );
 			supportedFieldTypesWithDocValues.forEach( fieldType -> {
-				FieldTypeDescriptor<?> replacingType = null;
-				for ( FieldTypeDescriptor<?> candidate : supportedFieldTypesWithDocValues ) {
+				FieldTypeDescriptor<?, ?> replacingType = null;
+				for ( FieldTypeDescriptor<?, ?> candidate : supportedFieldTypesWithDocValues ) {
 					if ( !fieldType.equals( candidate ) ) {
 						replacingType = candidate;
 					}
 				}
 				fieldWithDocValuesByOriginalType.put( fieldType, SimpleFieldModel.mapper( replacingType,
-						c -> c.sortable( Sortable.YES ) )
+						c -> ( (StandardIndexFieldTypeOptionsStep<?, ?>) c ).sortable( Sortable.YES ) )
 						.map( root, "fieldWithDocValues_" + fieldType.getUniqueName() ) );
 			} );
 		}
 	}
 
 	private static final class DataSet<F> extends AbstractPredicateDataSet {
-		protected final FieldTypeDescriptor<F> fieldType;
+		protected final FieldTypeDescriptor<F, ?> fieldType;
 
-		public DataSet(FieldTypeDescriptor<F> fieldType) {
+		public DataSet(FieldTypeDescriptor<F, ?> fieldType) {
 			super( fieldType.getUniqueName() );
 			this.fieldType = fieldType;
 		}
@@ -289,20 +311,24 @@ class ExistsPredicateSpecificsIT<F> {
 							document.addValue( mainIndex.binding().fieldWithDocValues.get( fieldType ).reference, value1 );
 						}
 
-						// Add one object with value1, and another with value2
-						DocumentElement flattenedObject1 = document.addObject( mainIndex.binding().flattenedObject.self );
-						flattenedObject1.addValue(
-								mainIndex.binding().flattenedObject.fieldWithDefaults.get( fieldType ).reference, value1 );
-						if ( docValues ) {
+						if ( fieldType.isMultivaluable() ) {
+							// Add one object with value1, and another with value2
+							DocumentElement flattenedObject1 = document.addObject( mainIndex.binding().flattenedObject.self );
 							flattenedObject1.addValue(
-									mainIndex.binding().flattenedObject.fieldWithDocValues.get( fieldType ).reference, value1 );
-						}
-						DocumentElement flattenedObject2 = document.addObject( mainIndex.binding().flattenedObject.self );
-						flattenedObject2.addValue(
-								mainIndex.binding().flattenedObject.fieldWithDefaults.get( fieldType ).reference, value1 );
-						if ( docValues ) {
+									mainIndex.binding().flattenedObject.fieldWithDefaults.get( fieldType ).reference, value1 );
+							if ( docValues ) {
+								flattenedObject1.addValue(
+										mainIndex.binding().flattenedObject.fieldWithDocValues.get( fieldType ).reference,
+										value1 );
+							}
+							DocumentElement flattenedObject2 = document.addObject( mainIndex.binding().flattenedObject.self );
 							flattenedObject2.addValue(
-									mainIndex.binding().flattenedObject.fieldWithDocValues.get( fieldType ).reference, value1 );
+									mainIndex.binding().flattenedObject.fieldWithDefaults.get( fieldType ).reference, value1 );
+							if ( docValues ) {
+								flattenedObject2.addValue(
+										mainIndex.binding().flattenedObject.fieldWithDocValues.get( fieldType ).reference,
+										value1 );
+							}
 						}
 
 						// Same for the nested object
@@ -327,14 +353,21 @@ class ExistsPredicateSpecificsIT<F> {
 							document.addValue( mainIndex.binding().fieldWithDocValues.get( fieldType ).reference, value2 );
 						}
 
-						// Add one empty object, and another with value2
-						document.addObject( mainIndex.binding().flattenedObject.self );
-						DocumentElement flattenedObject2 = document.addObject( mainIndex.binding().flattenedObject.self );
-						flattenedObject2.addValue(
-								mainIndex.binding().flattenedObject.fieldWithDefaults.get( fieldType ).reference, value2 );
-						if ( docValues ) {
+						if ( fieldType.isMultivaluable() ) {
+							// Add one empty object, and another with value2
+							document.addObject( mainIndex.binding().flattenedObject.self );
+							DocumentElement flattenedObject2 = document.addObject(
+									mainIndex.binding().flattenedObject.self );
 							flattenedObject2.addValue(
-									mainIndex.binding().flattenedObject.fieldWithDocValues.get( fieldType ).reference, value2 );
+									mainIndex.binding().flattenedObject.fieldWithDefaults.get( fieldType ).reference,
+									value2
+							);
+							if ( docValues ) {
+								flattenedObject2.addValue(
+										mainIndex.binding().flattenedObject.fieldWithDocValues.get(
+												fieldType ).reference,
+										value2 );
+							}
 						}
 
 						// Same for the nested object

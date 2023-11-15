@@ -11,6 +11,7 @@ import java.util.Arrays;
 import java.util.List;
 
 import org.hibernate.search.engine.backend.types.ObjectStructure;
+import org.hibernate.search.engine.backend.types.dsl.SearchableProjectableIndexFieldTypeOptionsStep;
 import org.hibernate.search.engine.search.projection.dsl.ProjectionFinalStep;
 import org.hibernate.search.engine.search.projection.dsl.SearchProjectionFactory;
 import org.hibernate.search.engine.spatial.GeoPoint;
@@ -78,8 +79,9 @@ class DistanceProjectionBaseIT {
 
 	abstract static class InObjectProjectionConfigured
 			extends AbstractProjectionInObjectProjectionIT<GeoPoint, Double, DistanceProjectionTestValues> {
-		private static final List<FieldTypeDescriptor<?>> supportedFieldTypes =
-				Arrays.asList( GeoPointFieldTypeDescriptor.INSTANCE );
+		private static final List<
+				FieldTypeDescriptor<?, ? extends SearchableProjectableIndexFieldTypeOptionsStep<?, ?>>> supportedFieldTypes =
+						Arrays.asList( GeoPointFieldTypeDescriptor.INSTANCE );
 		private static final SimpleMappedIndex<IndexBinding> mainIndex =
 				SimpleMappedIndex.of( root -> new IndexBinding( root, supportedFieldTypes ) )
 						.name( "main" );

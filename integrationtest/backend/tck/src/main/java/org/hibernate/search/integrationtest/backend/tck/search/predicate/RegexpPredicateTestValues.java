@@ -16,7 +16,7 @@ import org.hibernate.search.integrationtest.backend.tck.testsupport.types.Normal
 public final class RegexpPredicateTestValues extends AbstractPredicateTestValues<String> {
 	private final List<String> values;
 
-	public RegexpPredicateTestValues(FieldTypeDescriptor<String> fieldType) {
+	public RegexpPredicateTestValues(FieldTypeDescriptor<String, ?> fieldType) {
 		super( fieldType );
 		this.values = fieldType.getAscendingUniqueTermValues().getSingle();
 	}

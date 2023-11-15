@@ -14,7 +14,7 @@ import org.hibernate.search.integrationtest.backend.tck.testsupport.types.expect
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.values.AscendingUniqueTermValues;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.values.IndexableValues;
 
-public class KeywordStringFieldTypeDescriptor extends FieldTypeDescriptor<String> {
+public class KeywordStringFieldTypeDescriptor extends StandardFieldTypeDescriptor<String> {
 
 	public static final KeywordStringFieldTypeDescriptor INSTANCE = new KeywordStringFieldTypeDescriptor();
 

@@ -25,6 +25,7 @@ import org.hibernate.search.integrationtest.backend.tck.testsupport.types.Analyz
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.FieldTypeDescriptor;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.GeoPointFieldTypeDescriptor;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.NormalizedStringFieldTypeDescriptor;
+import org.hibernate.search.integrationtest.backend.tck.testsupport.types.StandardFieldTypeDescriptor;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.SimpleFieldModel;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.SimpleFieldModelsByType;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.extension.SearchSetupHelper;
@@ -41,11 +42,12 @@ import org.junit.jupiter.api.extension.RegisterExtension;
 
 class MatchPredicateFuzzyIT {
 
-	private static final List<FieldTypeDescriptor<?>> unsupportedFieldTypes = FieldTypeDescriptor.getAll().stream()
-			.filter( fieldType -> !String.class.equals( fieldType.getJavaType() )
-					// GeoPoints don't support the match predicate to begin with, let alone fuzzy().
-					&& !GeoPointFieldTypeDescriptor.INSTANCE.equals( fieldType ) )
-			.collect( Collectors.toList() );
+	private static final List<StandardFieldTypeDescriptor<?>> unsupportedFieldTypes =
+			FieldTypeDescriptor.getAllStandard().stream()
+					.filter( fieldType -> !String.class.equals( fieldType.getJavaType() )
+							// GeoPoints don't support the match predicate to begin with, let alone fuzzy().
+							&& !GeoPointFieldTypeDescriptor.INSTANCE.equals( fieldType ) )
+					.collect( Collectors.toList() );
 
 	@RegisterExtension
 	public static final SearchSetupHelper setupHelper = SearchSetupHelper.create();
@@ -221,7 +223,7 @@ class MatchPredicateFuzzyIT {
 	void unsupportedFieldType() {
 		SearchPredicateFactory f = index.createScope().predicate();
 
-		for ( FieldTypeDescriptor<?> fieldType : unsupportedFieldTypes ) {
+		for ( FieldTypeDescriptor<?, ?> fieldType : unsupportedFieldTypes ) {
 			SimpleFieldModel<?> fieldModel = index.binding().unsupportedTypeFields.get( fieldType );
 			String absoluteFieldPath = fieldModel.relativeFieldName;
 			Object valueToMatch = fieldType.getUniquelyMatchableValues().get( 0 );

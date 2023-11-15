@@ -33,6 +33,7 @@ import org.hibernate.search.engine.search.query.dsl.SearchQueryOptionsStep;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.operations.AggregationDescriptor;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.operations.TermsAggregationDescriptor;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.FieldTypeDescriptor;
+import org.hibernate.search.integrationtest.backend.tck.testsupport.types.StandardFieldTypeDescriptor;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.SimpleFieldModelsByType;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.TckConfiguration;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.ValueWrapper;
@@ -58,13 +59,13 @@ class TermsAggregationSpecificsIT<F> {
 
 	private static final String AGGREGATION_NAME = "aggregationName";
 
-	private static final Set<FieldTypeDescriptor<?>> supportedFieldTypes = new LinkedHashSet<>();
+	private static final Set<StandardFieldTypeDescriptor<?>> supportedFieldTypes = new LinkedHashSet<>();
 	private static final List<DataSet<?>> dataSets = new ArrayList<>();
 	private static final List<Arguments> parameters = new ArrayList<>();
 
 	static {
 		AggregationDescriptor aggregationDescriptor = TermsAggregationDescriptor.INSTANCE;
-		for ( FieldTypeDescriptor<?> fieldType : FieldTypeDescriptor.getAll() ) {
+		for ( StandardFieldTypeDescriptor<?> fieldType : FieldTypeDescriptor.getAllStandard() ) {
 			if ( aggregationDescriptor.getSingleFieldAggregationExpectations( fieldType ).isSupported() ) {
 				supportedFieldTypes.add( fieldType );
 				DataSet<?> dataSet = new DataSet<>( fieldType );
@@ -94,13 +95,13 @@ class TermsAggregationSpecificsIT<F> {
 
 	@ParameterizedTest(name = "{0}")
 	@MethodSource("params")
-	void superClassFieldType(FieldTypeDescriptor<F> fieldType, DataSet<F> dataSet) {
+	void superClassFieldType(FieldTypeDescriptor<F, ?> fieldType, DataSet<F> dataSet) {
 		Class<? super F> superClass = fieldType.getJavaType().getSuperclass();
 
 		doTestSuperClassFieldType( superClass, fieldType, dataSet );
 	}
 
-	private <S> void doTestSuperClassFieldType(Class<S> superClass, FieldTypeDescriptor<F> fieldType, DataSet<F> dataSet) {
+	private <S> void doTestSuperClassFieldType(Class<S> superClass, FieldTypeDescriptor<F, ?> fieldType, DataSet<F> dataSet) {
 		String fieldPath = index.binding().fieldModels.get( fieldType ).relativeFieldName;
 
 		AggregationKey<Map<S, Long>> aggregationKey = AggregationKey.of( AGGREGATION_NAME );
@@ -125,7 +126,7 @@ class TermsAggregationSpecificsIT<F> {
 	 */
 	@ParameterizedTest(name = "{0}")
 	@MethodSource("params")
-	void predicate(FieldTypeDescriptor<F> fieldType, DataSet<F> dataSet) {
+	void predicate(FieldTypeDescriptor<F, ?> fieldType, DataSet<F> dataSet) {
 		String fieldPath = index.binding().fieldModels.get( fieldType ).relativeFieldName;
 
 		AggregationKey<Map<F, Long>> aggregationKey = AggregationKey.of( AGGREGATION_NAME );
@@ -156,7 +157,7 @@ class TermsAggregationSpecificsIT<F> {
 	 */
 	@ParameterizedTest(name = "{0}")
 	@MethodSource("params")
-	void limitAndOffset(FieldTypeDescriptor<F> fieldType, DataSet<F> dataSet) {
+	void limitAndOffset(FieldTypeDescriptor<F, ?> fieldType, DataSet<F> dataSet) {
 		String fieldPath = index.binding().fieldModels.get( fieldType ).relativeFieldName;
 
 		AggregationKey<Map<F, Long>> aggregationKey = AggregationKey.of( AGGREGATION_NAME );
@@ -178,7 +179,7 @@ class TermsAggregationSpecificsIT<F> {
 	@ParameterizedTest(name = "{0}")
 	@MethodSource("params")
 	@PortedFromSearch5(original = "org.hibernate.search.test.query.facet.SimpleFacetingTest.testDefaultSortOrderIsCount")
-	void order_default(FieldTypeDescriptor<F> fieldType, DataSet<F> dataSet) {
+	void order_default(FieldTypeDescriptor<F, ?> fieldType, DataSet<F> dataSet) {
 		String fieldPath = index.binding().fieldModels.get( fieldType ).relativeFieldName;
 
 		AggregationKey<Map<F, Long>> aggregationKey = AggregationKey.of( AGGREGATION_NAME );
@@ -203,7 +204,7 @@ class TermsAggregationSpecificsIT<F> {
 	@ParameterizedTest(name = "{0}")
 	@MethodSource("params")
 	@PortedFromSearch5(original = "org.hibernate.search.test.query.facet.SimpleFacetingTest.testCountSortOrderDesc")
-	void orderByCountDescending(FieldTypeDescriptor<F> fieldType, DataSet<F> dataSet) {
+	void orderByCountDescending(FieldTypeDescriptor<F, ?> fieldType, DataSet<F> dataSet) {
 		String fieldPath = index.binding().fieldModels.get( fieldType ).relativeFieldName;
 
 		AggregationKey<Map<F, Long>> aggregationKey = AggregationKey.of( AGGREGATION_NAME );
@@ -230,7 +231,7 @@ class TermsAggregationSpecificsIT<F> {
 	@ParameterizedTest(name = "{0}")
 	@MethodSource("params")
 	@PortedFromSearch5(original = "org.hibernate.search.test.query.facet.SimpleFacetingTest.testCountSortOrderAsc")
-	void orderByCountAscending(FieldTypeDescriptor<F> fieldType, DataSet<F> dataSet) {
+	void orderByCountAscending(FieldTypeDescriptor<F, ?> fieldType, DataSet<F> dataSet) {
 		assumeNonDefaultOrdersSupported();
 
 		String fieldPath = index.binding().fieldModels.get( fieldType ).relativeFieldName;
@@ -258,7 +259,7 @@ class TermsAggregationSpecificsIT<F> {
 
 	@ParameterizedTest(name = "{0}")
 	@MethodSource("params")
-	void orderByTermDescending(FieldTypeDescriptor<F> fieldType, DataSet<F> dataSet) {
+	void orderByTermDescending(FieldTypeDescriptor<F, ?> fieldType, DataSet<F> dataSet) {
 		assumeNonDefaultOrdersSupported();
 
 		String fieldPath = index.binding().fieldModels.get( fieldType ).relativeFieldName;
@@ -287,7 +288,7 @@ class TermsAggregationSpecificsIT<F> {
 	@ParameterizedTest(name = "{0}")
 	@MethodSource("params")
 	@PortedFromSearch5(original = "org.hibernate.search.test.query.facet.SimpleFacetingTest.testAlphabeticalSortOrder")
-	void orderByTermAscending(FieldTypeDescriptor<F> fieldType, DataSet<F> dataSet) {
+	void orderByTermAscending(FieldTypeDescriptor<F, ?> fieldType, DataSet<F> dataSet) {
 		assumeNonDefaultOrdersSupported();
 
 		String fieldPath = index.binding().fieldModels.get( fieldType ).relativeFieldName;
@@ -316,7 +317,7 @@ class TermsAggregationSpecificsIT<F> {
 	@ParameterizedTest(name = "{0}")
 	@MethodSource("params")
 	@PortedFromSearch5(original = "org.hibernate.search.test.query.facet.SimpleFacetingTest.testZeroCountsExcluded")
-	void minDocumentCount_positive(FieldTypeDescriptor<F> fieldType, DataSet<F> dataSet) {
+	void minDocumentCount_positive(FieldTypeDescriptor<F, ?> fieldType, DataSet<F> dataSet) {
 		String fieldPath = index.binding().fieldModels.get( fieldType ).relativeFieldName;
 
 		AggregationKey<Map<F, Long>> aggregationKey = AggregationKey.of( AGGREGATION_NAME );
@@ -346,7 +347,7 @@ class TermsAggregationSpecificsIT<F> {
 	@ParameterizedTest(name = "{0}")
 	@MethodSource("params")
 	@PortedFromSearch5(original = "org.hibernate.search.test.query.facet.SimpleFacetingTest.testZeroCountsIncluded")
-	void minDocumentCount_zero(FieldTypeDescriptor<F> fieldType, DataSet<F> dataSet) {
+	void minDocumentCount_zero(FieldTypeDescriptor<F, ?> fieldType, DataSet<F> dataSet) {
 		String fieldPath = index.binding().fieldModels.get( fieldType ).relativeFieldName;
 
 		AggregationKey<Map<F, Long>> aggregationKey = AggregationKey.of( AGGREGATION_NAME );
@@ -382,7 +383,7 @@ class TermsAggregationSpecificsIT<F> {
 
 	@ParameterizedTest(name = "{0}")
 	@MethodSource("params")
-	void minDocumentCount_zero_noMatch(FieldTypeDescriptor<F> fieldType, DataSet<F> dataSet) {
+	void minDocumentCount_zero_noMatch(FieldTypeDescriptor<F, ?> fieldType, DataSet<F> dataSet) {
 		String fieldPath = index.binding().fieldModels.get( fieldType ).relativeFieldName;
 
 		AggregationKey<Map<F, Long>> aggregationKey = AggregationKey.of( AGGREGATION_NAME );
@@ -412,7 +413,7 @@ class TermsAggregationSpecificsIT<F> {
 
 	@ParameterizedTest(name = "{0}")
 	@MethodSource("params")
-	void minDocumentCount_zero_noMatch_orderByTermDescending(FieldTypeDescriptor<F> fieldType, DataSet<F> dataSet) {
+	void minDocumentCount_zero_noMatch_orderByTermDescending(FieldTypeDescriptor<F, ?> fieldType, DataSet<F> dataSet) {
 		assumeNonDefaultOrdersSupported();
 
 		String fieldPath = index.binding().fieldModels.get( fieldType ).relativeFieldName;
@@ -445,7 +446,7 @@ class TermsAggregationSpecificsIT<F> {
 
 	@ParameterizedTest(name = "{0}")
 	@MethodSource("params")
-	void minDocumentCount_negative(FieldTypeDescriptor<F> fieldType, DataSet<F> dataSet) {
+	void minDocumentCount_negative(FieldTypeDescriptor<F, ?> fieldType, DataSet<F> dataSet) {
 		String fieldPath = index.binding().fieldModels.get( fieldType ).relativeFieldName;
 
 		assertThatThrownBy( () -> index.createScope().aggregation().terms().field( fieldPath, fieldType.getJavaType() )
@@ -459,7 +460,7 @@ class TermsAggregationSpecificsIT<F> {
 	@MethodSource("params")
 	@TestForIssue(jiraKey = "HSEARCH-776")
 	@PortedFromSearch5(original = "org.hibernate.search.test.query.facet.SimpleFacetingTest.testMaxFacetCounts")
-	void maxTermCount_positive(FieldTypeDescriptor<F> fieldType, DataSet<F> dataSet) {
+	void maxTermCount_positive(FieldTypeDescriptor<F, ?> fieldType, DataSet<F> dataSet) {
 		String fieldPath = index.binding().fieldModels.get( fieldType ).relativeFieldName;
 
 		AggregationKey<Map<F, Long>> aggregationKey = AggregationKey.of( AGGREGATION_NAME );
@@ -491,7 +492,7 @@ class TermsAggregationSpecificsIT<F> {
 	 */
 	@ParameterizedTest(name = "{0}")
 	@MethodSource("params")
-	void maxTermCount_positive_orderByTermAscending(FieldTypeDescriptor<F> fieldType, DataSet<F> dataSet) {
+	void maxTermCount_positive_orderByTermAscending(FieldTypeDescriptor<F, ?> fieldType, DataSet<F> dataSet) {
 		assumeNonDefaultOrdersSupported();
 
 		String fieldPath = index.binding().fieldModels.get( fieldType ).relativeFieldName;
@@ -521,7 +522,7 @@ class TermsAggregationSpecificsIT<F> {
 
 	@ParameterizedTest(name = "{0}")
 	@MethodSource("params")
-	void maxTermCount_positive_orderByCountAscending(FieldTypeDescriptor<F> fieldType, DataSet<F> dataSet) {
+	void maxTermCount_positive_orderByCountAscending(FieldTypeDescriptor<F, ?> fieldType, DataSet<F> dataSet) {
 		assumeNonDefaultOrdersSupported();
 
 		String fieldPath = index.binding().fieldModels.get( fieldType ).relativeFieldName;
@@ -552,7 +553,7 @@ class TermsAggregationSpecificsIT<F> {
 
 	@ParameterizedTest(name = "{0}")
 	@MethodSource("params")
-	void maxTermCount_zero(FieldTypeDescriptor<F> fieldType, DataSet<F> dataSet) {
+	void maxTermCount_zero(FieldTypeDescriptor<F, ?> fieldType, DataSet<F> dataSet) {
 		String fieldPath = index.binding().fieldModels.get( fieldType ).relativeFieldName;
 
 		assertThatThrownBy( () -> index.createScope().aggregation().terms().field( fieldPath, fieldType.getJavaType() )
@@ -564,7 +565,7 @@ class TermsAggregationSpecificsIT<F> {
 
 	@ParameterizedTest(name = "{0}")
 	@MethodSource("params")
-	void maxTermCount_negative(FieldTypeDescriptor<F> fieldType, DataSet<F> dataSet) {
+	void maxTermCount_negative(FieldTypeDescriptor<F, ?> fieldType, DataSet<F> dataSet) {
 		String fieldPath = index.binding().fieldModels.get( fieldType ).relativeFieldName;
 
 		assertThatThrownBy( () -> index.createScope().aggregation().terms().field( fieldPath, fieldType.getJavaType() )
@@ -577,7 +578,7 @@ class TermsAggregationSpecificsIT<F> {
 	@ParameterizedTest(name = "{0}")
 	@MethodSource("params")
 	@TestForIssue(jiraKey = "HSEARCH-4544")
-	void maxTermCount_integerMaxValue(FieldTypeDescriptor<F> fieldType, DataSet<F> dataSet) {
+	void maxTermCount_integerMaxValue(FieldTypeDescriptor<F, ?> fieldType, DataSet<F> dataSet) {
 		String fieldPath = index.binding().fieldModels.get( fieldType ).relativeFieldName;
 
 		AggregationKey<Map<F, Long>> aggregationKey = AggregationKey.of( AGGREGATION_NAME );
@@ -603,7 +604,7 @@ class TermsAggregationSpecificsIT<F> {
 	@ParameterizedTest(name = "{0}")
 	@MethodSource("params")
 	@TestForIssue(jiraKey = "HSEARCH-4544")
-	void maxTermCount_veryLarge(FieldTypeDescriptor<F> fieldType, DataSet<F> dataSet) {
+	void maxTermCount_veryLarge(FieldTypeDescriptor<F, ?> fieldType, DataSet<F> dataSet) {
 		String fieldPath = index.binding().fieldModels.get( fieldType ).relativeFieldName;
 
 		AggregationKey<Map<F, Long>> aggregationKey = AggregationKey.of( AGGREGATION_NAME );
@@ -636,7 +637,7 @@ class TermsAggregationSpecificsIT<F> {
 
 	@SuppressWarnings("unchecked")
 	private <K, V> Consumer<Map<F, V>> containsExactly(Consumer<BiConsumer<F, V>> expectationBuilder,
-			FieldTypeDescriptor<F> fieldType) {
+			FieldTypeDescriptor<F, ?> fieldType) {
 		List<Map.Entry<F, V>> expected = new ArrayList<>();
 		expectationBuilder.accept( (k, v) -> expected.add( entry( fieldType.toExpectedDocValue( k ), v ) ) );
 		return actual -> assertThat( normalize( actual ) )
@@ -645,7 +646,7 @@ class TermsAggregationSpecificsIT<F> {
 
 	@SuppressWarnings("unchecked")
 	private <K, V> Consumer<Map<K, V>> containsInAnyOrder(Consumer<BiConsumer<F, V>> expectationBuilder,
-			FieldTypeDescriptor<F> fieldType) {
+			FieldTypeDescriptor<F, ?> fieldType) {
 		List<Map.Entry<F, V>> expected = new ArrayList<>();
 		expectationBuilder.accept( (k, v) -> expected.add( entry( fieldType.toExpectedDocValue( k ), v ) ) );
 		return actual -> assertThat( normalize( actual ).entrySet() )
@@ -653,7 +654,7 @@ class TermsAggregationSpecificsIT<F> {
 	}
 
 	private static class DataSet<F> {
-		final FieldTypeDescriptor<F> fieldType;
+		final FieldTypeDescriptor<F, ?> fieldType;
 		final String name;
 		final Map<F, List<String>> documentIdPerTerm;
 		final List<F> valuesInAscendingOrder;
@@ -661,7 +662,7 @@ class TermsAggregationSpecificsIT<F> {
 		final List<F> valuesInAscendingDocumentCountOrder;
 		final List<F> valuesInDescendingDocumentCountOrder;
 
-		private DataSet(FieldTypeDescriptor<F> fieldType) {
+		private DataSet(FieldTypeDescriptor<F, ?> fieldType) {
 			this.fieldType = fieldType;
 			this.name = fieldType.getUniqueName();
 			this.documentIdPerTerm = new LinkedHashMap<>();

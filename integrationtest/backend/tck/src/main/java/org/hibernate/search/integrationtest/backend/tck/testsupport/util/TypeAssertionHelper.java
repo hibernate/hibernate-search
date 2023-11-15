@@ -17,7 +17,7 @@ public abstract class TypeAssertionHelper<F, T> {
 
 	public abstract T create(F fieldValue);
 
-	public static <F> TypeAssertionHelper<F, F> identity(FieldTypeDescriptor<F> typeDescriptor) {
+	public static <F> TypeAssertionHelper<F, F> identity(FieldTypeDescriptor<F, ?> typeDescriptor) {
 		return new TypeAssertionHelper<F, F>() {
 			@Override
 			public Class<F> getJavaClass() {
@@ -32,7 +32,7 @@ public abstract class TypeAssertionHelper<F, T> {
 	}
 
 	@SuppressWarnings("rawtypes")
-	public static <F> TypeAssertionHelper<F, ValueWrapper> wrapper(FieldTypeDescriptor<F> typeDescriptor) {
+	public static <F> TypeAssertionHelper<F, ValueWrapper> wrapper(FieldTypeDescriptor<F, ?> typeDescriptor) {
 		return new TypeAssertionHelper<F, ValueWrapper>() {
 			@Override
 			public Class<ValueWrapper> getJavaClass() {
@@ -60,7 +60,7 @@ public abstract class TypeAssertionHelper<F, T> {
 		};
 	}
 
-	public static <F, T> TypeAssertionHelper<F, T> wrongType(FieldTypeDescriptor<T> wrongTypeDescriptor) {
+	public static <F, T> TypeAssertionHelper<F, T> wrongType(FieldTypeDescriptor<T, ?> wrongTypeDescriptor) {
 		return new TypeAssertionHelper<F, T>() {
 			@Override
 			public Class<T> getJavaClass() {

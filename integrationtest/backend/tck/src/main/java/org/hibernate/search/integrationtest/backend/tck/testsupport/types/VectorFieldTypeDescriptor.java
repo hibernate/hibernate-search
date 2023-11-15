@@ -6,38 +6,15 @@
  */
 package org.hibernate.search.integrationtest.backend.tck.testsupport.types;
 
-import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 import org.hibernate.search.engine.backend.types.dsl.IndexFieldTypeFactory;
 import org.hibernate.search.engine.backend.types.dsl.VectorFieldTypeOptionsStep;
+import org.hibernate.search.integrationtest.backend.tck.testsupport.types.values.AscendingUniqueTermValues;
+import org.hibernate.search.integrationtest.backend.tck.testsupport.types.values.IndexableValues;
 
-public abstract class VectorFieldTypeDescriptor<F> extends AbstractFieldTypeDescriptor<F> {
-
-	private static List<VectorFieldTypeDescriptor<?>> all;
-
-	public static List<VectorFieldTypeDescriptor<?>> getAll() {
-		if ( all == null ) {
-			List<VectorFieldTypeDescriptor<?>> list = new ArrayList<>();
-			Collections.addAll(
-					list,
-					ByteVectorFieldTypeDescriptor.INSTANCE,
-					FloatVectorFieldTypeDescriptor.INSTANCE
-			);
-			all = Collections.unmodifiableList( list );
-		}
-		return all;
-	}
-
-	public static VectorFieldTypeDescriptor<?> getIncompatible(VectorFieldTypeDescriptor<?> typeDescriptor) {
-		if ( ByteVectorFieldTypeDescriptor.INSTANCE.equals( typeDescriptor ) ) {
-			return FloatVectorFieldTypeDescriptor.INSTANCE;
-		}
-		else {
-			return ByteVectorFieldTypeDescriptor.INSTANCE;
-		}
-	}
+public abstract class VectorFieldTypeDescriptor<F>
+		extends FieldTypeDescriptor<F, VectorFieldTypeOptionsStep<?, F>> {
 
 	protected VectorFieldTypeDescriptor(Class<F> javaType) {
 		super( javaType );
@@ -49,6 +26,36 @@ public abstract class VectorFieldTypeDescriptor<F> extends AbstractFieldTypeDesc
 
 	@Override
 	public abstract VectorFieldTypeOptionsStep<?, F> configure(IndexFieldTypeFactory fieldContext);
+
+	@Override
+	protected IndexableValues<F> createIndexableValues() {
+		return new IndexableValues<F>() {
+			@Override
+			protected List<F> createSingle() {
+				return createUniquelyMatchableValues();
+			}
+		};
+	}
+
+	@Override
+	protected AscendingUniqueTermValues<F> createAscendingUniqueTermValues() {
+		return null;
+	}
+
+	@Override
+	public boolean isFieldSortSupported() {
+		return false;
+	}
+
+	@Override
+	public boolean isFieldAggregationSupported() {
+		return false;
+	}
+
+	@Override
+	public boolean isMultivaluable() {
+		return false;
+	}
 
 	public abstract int vectorSize();
 }

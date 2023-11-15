@@ -9,20 +9,35 @@ package org.hibernate.search.integrationtest.backend.tck.testsupport.types;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 
 import org.hibernate.search.engine.backend.types.dsl.IndexFieldTypeFactory;
-import org.hibernate.search.engine.backend.types.dsl.StandardIndexFieldTypeOptionsStep;
+import org.hibernate.search.engine.backend.types.dsl.SearchableProjectableIndexFieldTypeOptionsStep;
+import org.hibernate.search.integrationtest.backend.tck.testsupport.types.expectations.IndexNullAsMatchPredicateExpectactions;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.values.AscendingUniqueTermValues;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.values.IndexableValues;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.TckConfiguration;
 
-public abstract class FieldTypeDescriptor<F> extends AbstractFieldTypeDescriptor<F> {
+public abstract class FieldTypeDescriptor<F, S extends SearchableProjectableIndexFieldTypeOptionsStep<?, F>> {
 
-	private static List<FieldTypeDescriptor<?>> all;
+	private static List<FieldTypeDescriptor<?, ? extends SearchableProjectableIndexFieldTypeOptionsStep<?, ?>>> all;
+	private static List<StandardFieldTypeDescriptor<?>> allStandard;
+	private static List<VectorFieldTypeDescriptor<?>> allVector;
+	private static List<FieldTypeDescriptor<?, ? extends SearchableProjectableIndexFieldTypeOptionsStep<?, ?>>> allNonStandard;
 
-	public static List<FieldTypeDescriptor<?>> getAll() {
+	public static List<FieldTypeDescriptor<?, ? extends SearchableProjectableIndexFieldTypeOptionsStep<?, ?>>> getAll() {
 		if ( all == null ) {
-			List<FieldTypeDescriptor<?>> list = new ArrayList<>();
+			List<FieldTypeDescriptor<?, ?>> list = new ArrayList<>();
+			list.addAll( StandardFieldTypeDescriptor.getAllStandard() );
+			list.addAll( VectorFieldTypeDescriptor.getAllVector() );
+			all = Collections.unmodifiableList( list );
+		}
+		return all;
+	}
+
+	public static List<StandardFieldTypeDescriptor<?>> getAllStandard() {
+		if ( allStandard == null ) {
+			List<StandardFieldTypeDescriptor<?>> list = new ArrayList<>();
 			Collections.addAll(
 					list,
 					KeywordStringFieldTypeDescriptor.INSTANCE,
@@ -48,15 +63,41 @@ public abstract class FieldTypeDescriptor<F> extends AbstractFieldTypeDescriptor
 					BigDecimalFieldTypeDescriptor.INSTANCE,
 					BigIntegerFieldTypeDescriptor.INSTANCE
 			);
+			Collections.addAll( VectorFieldTypeDescriptor.getAllVector() );
 			if ( TckConfiguration.get().getBackendFeatures().supportsYearType() ) {
 				list.add( YearFieldTypeDescriptor.INSTANCE );
 			}
-			all = Collections.unmodifiableList( list );
+			allStandard = Collections.unmodifiableList( list );
 		}
-		return all;
+		return allStandard;
 	}
 
-	public static FieldTypeDescriptor<?> getIncompatible(FieldTypeDescriptor<?> typeDescriptor) {
+	public static List<VectorFieldTypeDescriptor<?>> getAllVector() {
+		if ( allVector == null ) {
+			List<VectorFieldTypeDescriptor<?>> list = new ArrayList<>();
+			if ( TckConfiguration.get().getBackendFeatures().supportsVectorSearch() ) {
+				Collections.addAll(
+						list,
+						ByteVectorFieldTypeDescriptor.INSTANCE,
+						FloatVectorFieldTypeDescriptor.INSTANCE
+				);
+			}
+			allVector = Collections.unmodifiableList( list );
+		}
+		return allVector;
+	}
+
+	public static List<
+			FieldTypeDescriptor<?, ? extends SearchableProjectableIndexFieldTypeOptionsStep<?, ?>>> getAllNonStandard() {
+		if ( allNonStandard == null ) {
+			List<FieldTypeDescriptor<?, ?>> list = new ArrayList<>( getAll() );
+			list.removeAll( getAllStandard() );
+			allNonStandard = Collections.unmodifiableList( list );
+		}
+		return allNonStandard;
+	}
+
+	public static StandardFieldTypeDescriptor<?> getIncompatible(FieldTypeDescriptor<?, ?> typeDescriptor) {
 		if ( IntegerFieldTypeDescriptor.INSTANCE.equals( typeDescriptor ) ) {
 			return LongFieldTypeDescriptor.INSTANCE;
 		}
@@ -65,22 +106,49 @@ public abstract class FieldTypeDescriptor<F> extends AbstractFieldTypeDescriptor
 		}
 	}
 
+	protected final Class<F> javaType;
+	private final String uniqueName;
+
 	private final AscendingUniqueTermValues<F> ascendingUniqueTermValues = createAscendingUniqueTermValues();
 
 	private final IndexableValues<F> indexableValues = createIndexableValues();
 
+	private final List<F> uniquelyMatchableValues = Collections.unmodifiableList( createUniquelyMatchableValues() );
+
+	private final List<F> nonMatchingValues = Collections.unmodifiableList( createNonMatchingValues() );
 
 	protected FieldTypeDescriptor(Class<F> javaType) {
-		super( javaType );
+		this( javaType, javaType.getSimpleName() );
 	}
 
 	protected FieldTypeDescriptor(Class<F> javaType, String uniqueName) {
-		super( javaType, uniqueName );
+		this.javaType = javaType;
+		this.uniqueName = uniqueName;
 	}
 
 	@Override
-	public StandardIndexFieldTypeOptionsStep<?, F> configure(IndexFieldTypeFactory fieldContext) {
-		return fieldContext.as( javaType );
+	public String toString() {
+		return getUniqueName();
+	}
+
+	public final Class<F> getJavaType() {
+		return javaType;
+	}
+
+	public final String getUniqueName() {
+		return uniqueName;
+	}
+
+	public abstract S configure(IndexFieldTypeFactory fieldContext);
+
+	/**
+	 * @param indexed The value that was indexed.
+	 * @return The value that will returned by the backend,
+	 * which could be different due to normalization.
+	 * In particular, date/time types with an offset/zone will be normalized to UTC and lose the offset/zone information.
+	 */
+	public F toExpectedDocValue(F indexed) {
+		return indexed;
 	}
 
 	/**
@@ -107,4 +175,39 @@ public abstract class FieldTypeDescriptor<F> extends AbstractFieldTypeDescriptor
 
 	protected abstract IndexableValues<F> createIndexableValues();
 
+	/**
+	 * @return A set of values that can be uniquely matched using predicates.
+	 * This excludes empty strings in particular.
+	 * This also means distinct values for analyzed/normalized text cannot share the same token.
+	 */
+	public final List<F> getUniquelyMatchableValues() {
+		return uniquelyMatchableValues;
+	}
+
+	protected abstract List<F> createUniquelyMatchableValues();
+
+	public final List<F> getNonMatchingValues() {
+		return nonMatchingValues;
+	}
+
+	protected abstract List<F> createNonMatchingValues();
+
+	public abstract F valueFromInteger(int integer);
+
+	public boolean isFieldSortSupported() {
+		// Assume supported by default: this way, we'll get test failures if we forget to override this method.
+		return true;
+	}
+
+	public boolean isFieldAggregationSupported() {
+		// Assume supported by default: this way, we'll get test failures if we forget to override this method.
+		return true;
+	}
+
+	public boolean isMultivaluable() {
+		// Assume supported by default: this way, we'll get test failures if we forget to override this method.
+		return true;
+	}
+
+	public abstract Optional<IndexNullAsMatchPredicateExpectactions<F>> getIndexNullAsMatchPredicateExpectations();
 }

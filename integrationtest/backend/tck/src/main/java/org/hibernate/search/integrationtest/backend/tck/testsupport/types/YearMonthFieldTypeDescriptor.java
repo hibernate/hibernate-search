@@ -19,7 +19,7 @@ import org.hibernate.search.integrationtest.backend.tck.testsupport.types.expect
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.values.AscendingUniqueTermValues;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.values.IndexableValues;
 
-public class YearMonthFieldTypeDescriptor extends FieldTypeDescriptor<YearMonth> {
+public class YearMonthFieldTypeDescriptor extends StandardFieldTypeDescriptor<YearMonth> {
 
 	public static final YearMonthFieldTypeDescriptor INSTANCE = new YearMonthFieldTypeDescriptor();
 

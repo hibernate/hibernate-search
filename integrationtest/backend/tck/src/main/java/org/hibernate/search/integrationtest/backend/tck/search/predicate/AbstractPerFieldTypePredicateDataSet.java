@@ -11,7 +11,7 @@ import org.hibernate.search.integrationtest.backend.tck.testsupport.types.FieldT
 public abstract class AbstractPerFieldTypePredicateDataSet<F, V extends AbstractPredicateTestValues<F>>
 		extends AbstractPredicateDataSet {
 
-	protected final FieldTypeDescriptor<F> fieldType;
+	protected final FieldTypeDescriptor<F, ?> fieldType;
 	protected final V values;
 
 	protected AbstractPerFieldTypePredicateDataSet(V values) {

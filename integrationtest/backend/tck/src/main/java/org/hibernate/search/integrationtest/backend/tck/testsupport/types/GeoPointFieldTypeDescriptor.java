@@ -15,7 +15,7 @@ import org.hibernate.search.integrationtest.backend.tck.testsupport.types.expect
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.values.AscendingUniqueTermValues;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.values.IndexableValues;
 
-public class GeoPointFieldTypeDescriptor extends FieldTypeDescriptor<GeoPoint> {
+public class GeoPointFieldTypeDescriptor extends StandardFieldTypeDescriptor<GeoPoint> {
 
 	public static final GeoPointFieldTypeDescriptor INSTANCE = new GeoPointFieldTypeDescriptor();
 

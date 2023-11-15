@@ -21,7 +21,7 @@ import org.hibernate.search.integrationtest.backend.tck.testsupport.types.values
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.values.IndexableValues;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.TckConfiguration;
 
-public class BigDecimalFieldTypeDescriptor extends FieldTypeDescriptor<BigDecimal> {
+public class BigDecimalFieldTypeDescriptor extends StandardFieldTypeDescriptor<BigDecimal> {
 
 	public static final BigDecimalFieldTypeDescriptor INSTANCE = new BigDecimalFieldTypeDescriptor();
 

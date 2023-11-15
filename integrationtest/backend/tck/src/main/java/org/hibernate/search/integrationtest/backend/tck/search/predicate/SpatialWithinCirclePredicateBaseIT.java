@@ -12,6 +12,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import org.hibernate.search.engine.backend.types.dsl.SearchableProjectableIndexFieldTypeOptionsStep;
 import org.hibernate.search.engine.search.predicate.dsl.PredicateFinalStep;
 import org.hibernate.search.engine.search.predicate.dsl.SearchPredicateFactory;
 import org.hibernate.search.engine.spatial.GeoPoint;
@@ -34,12 +35,16 @@ class SpatialWithinCirclePredicateBaseIT {
 	//CHECKSTYLE:ON
 
 	private static final GeoPointFieldTypeDescriptor supportedFieldType;
-	private static final List<FieldTypeDescriptor<GeoPoint>> supportedFieldTypes = new ArrayList<>();
-	private static final List<FieldTypeDescriptor<?>> unsupportedFieldTypes = new ArrayList<>();
+	private static final List<
+			FieldTypeDescriptor<GeoPoint, ? extends SearchableProjectableIndexFieldTypeOptionsStep<?, ?>>> supportedFieldTypes =
+					new ArrayList<>();
+	private static final List<
+			FieldTypeDescriptor<?, ? extends SearchableProjectableIndexFieldTypeOptionsStep<?, ?>>> unsupportedFieldTypes =
+					new ArrayList<>();
 	static {
 		supportedFieldType = GeoPointFieldTypeDescriptor.INSTANCE;
 		supportedFieldTypes.add( supportedFieldType );
-		for ( FieldTypeDescriptor<?> fieldType : FieldTypeDescriptor.getAll() ) {
+		for ( FieldTypeDescriptor<?, ?> fieldType : FieldTypeDescriptor.getAll() ) {
 			if ( !supportedFieldType.equals( fieldType ) ) {
 				unsupportedFieldTypes.add( fieldType );
 			}
@@ -319,7 +324,7 @@ class SpatialWithinCirclePredicateBaseIT {
 
 		private static final List<Arguments> parameters = new ArrayList<>();
 		static {
-			for ( FieldTypeDescriptor<?> fieldType : unsupportedFieldTypes ) {
+			for ( FieldTypeDescriptor<?, ?> fieldType : unsupportedFieldTypes ) {
 				parameters.add( Arguments.of( index, fieldType ) );
 			}
 		}
@@ -360,7 +365,7 @@ class SpatialWithinCirclePredicateBaseIT {
 		}
 
 		@Override
-		protected void tryPredicate(SearchPredicateFactory f, String fieldPath) {
+		protected void tryPredicate(SearchPredicateFactory f, String fieldPath, FieldTypeDescriptor<?, ?> fieldType) {
 			f.spatial().within().field( fieldPath )
 					// We need this because the backend is not involved before the call to circle()
 					.circle( GeoPoint.of( 0, 0 ), 1 );
@@ -388,7 +393,7 @@ class SpatialWithinCirclePredicateBaseIT {
 
 		@ParameterizedTest(name = "{1}")
 		@MethodSource("params")
-		void nullUnit(SimpleMappedIndex<IndexBinding> index, FieldTypeDescriptor<?> fieldType) {
+		void nullUnit(SimpleMappedIndex<IndexBinding> index, FieldTypeDescriptor<?, ?> fieldType) {
 			SearchPredicateFactory f = index.createScope().predicate();
 
 			assertThatThrownBy(

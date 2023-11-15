@@ -18,13 +18,13 @@ import org.hibernate.search.integrationtest.backend.tck.testsupport.types.FieldT
  */
 public abstract class AbstractProjectionTestValues<F, P> {
 
-	protected final FieldTypeDescriptor<F> fieldType;
+	protected final FieldTypeDescriptor<F, ?> fieldType;
 
-	protected AbstractProjectionTestValues(FieldTypeDescriptor<F> fieldType) {
+	protected AbstractProjectionTestValues(FieldTypeDescriptor<F, ?> fieldType) {
 		this.fieldType = fieldType;
 	}
 
-	public FieldTypeDescriptor<F> fieldType() {
+	public FieldTypeDescriptor<F, ?> fieldType() {
 		return fieldType;
 	}
 

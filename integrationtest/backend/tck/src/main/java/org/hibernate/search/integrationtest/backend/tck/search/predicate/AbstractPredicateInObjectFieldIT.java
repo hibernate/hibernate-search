@@ -15,6 +15,7 @@ import org.hibernate.search.engine.backend.document.IndexObjectFieldReference;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaElement;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaObjectField;
 import org.hibernate.search.engine.backend.types.ObjectStructure;
+import org.hibernate.search.engine.backend.types.dsl.SearchableProjectableIndexFieldTypeOptionsStep;
 import org.hibernate.search.engine.search.predicate.SearchPredicate;
 import org.hibernate.search.engine.search.predicate.definition.PredicateDefinition;
 import org.hibernate.search.engine.search.predicate.definition.PredicateDefinitionContext;
@@ -189,17 +190,18 @@ public abstract class AbstractPredicateInObjectFieldIT {
 		final SimpleFieldModelsByType field;
 
 		AbstractObjectBinding(IndexSchemaElement self, String absolutePath,
-				Collection<? extends FieldTypeDescriptor<?>> fieldTypes) {
+				Collection<? extends FieldTypeDescriptor<?,
+						? extends SearchableProjectableIndexFieldTypeOptionsStep<?, ?>>> fieldTypes) {
 			this.absolutePath = absolutePath;
 			this.field = SimpleFieldModelsByType.mapAll( fieldTypes, self, "" );
 		}
 
-		String absoluteFieldPath(FieldTypeDescriptor<?> fieldType) {
+		String absoluteFieldPath(FieldTypeDescriptor<?, ?> fieldType) {
 			String prefix = absolutePath == null ? "" : absolutePath + ".";
 			return prefix + relativeFieldPath( fieldType );
 		}
 
-		String relativeFieldPath(FieldTypeDescriptor<?> fieldType) {
+		String relativeFieldPath(FieldTypeDescriptor<?, ?> fieldType) {
 			return field.get( fieldType ).relativeFieldName;
 		}
 	}
@@ -209,7 +211,8 @@ public abstract class AbstractPredicateInObjectFieldIT {
 		final ObjectFieldBinding nested;
 		final ObjectFieldBinding flattened;
 
-		IndexBinding(IndexSchemaElement root, Collection<? extends FieldTypeDescriptor<?>> fieldTypes) {
+		IndexBinding(IndexSchemaElement root, Collection<
+				? extends FieldTypeDescriptor<?, ? extends SearchableProjectableIndexFieldTypeOptionsStep<?, ?>>> fieldTypes) {
 			super( root, null, fieldTypes );
 			nested = ObjectFieldBinding.create( root, absolutePath, "nested", ObjectStructure.NESTED,
 					fieldTypes, 1 );
@@ -217,7 +220,7 @@ public abstract class AbstractPredicateInObjectFieldIT {
 					fieldTypes, 1 );
 		}
 
-		protected <F> void initDocument(DocumentElement document, FieldTypeDescriptor<F> fieldType, F fieldValue) {
+		protected <F> void initDocument(DocumentElement document, FieldTypeDescriptor<F, ?> fieldType, F fieldValue) {
 			DocumentElement flattenedDocument = document.addObject( flattened.reference );
 			addValue( flattenedDocument, flattened, fieldType, fieldValue );
 
@@ -270,14 +273,14 @@ public abstract class AbstractPredicateInObjectFieldIT {
 		}
 
 		protected <F> void addValue(DocumentElement object, AbstractObjectBinding binding,
-				FieldTypeDescriptor<F> fieldType, F fieldValue) {
+				FieldTypeDescriptor<F, ?> fieldType, F fieldValue) {
 			object.addValue( binding.field.get( fieldType ).reference, fieldValue );
 		}
 	}
 
 	static class MissingFieldIndexBinding {
 
-		MissingFieldIndexBinding(IndexSchemaElement root, Collection<? extends FieldTypeDescriptor<?>> fieldTypes) {
+		MissingFieldIndexBinding(IndexSchemaElement root, Collection<? extends FieldTypeDescriptor<?, ?>> fieldTypes) {
 		}
 
 		protected void initDocument() {
@@ -294,14 +297,14 @@ public abstract class AbstractPredicateInObjectFieldIT {
 		final ObjectFieldBinding flattened;
 
 		static ObjectFieldBinding create(IndexSchemaElement parent, String parentAbsolutePath, String relativeFieldName,
-				ObjectStructure structure, Collection<? extends FieldTypeDescriptor<?>> fieldTypes,
+				ObjectStructure structure, Collection<? extends FieldTypeDescriptor<?, ?>> fieldTypes,
 				int depth) {
 			IndexSchemaObjectField objectField = parent.objectField( relativeFieldName, structure );
 			return new ObjectFieldBinding( objectField, parentAbsolutePath, relativeFieldName, fieldTypes, depth );
 		}
 
 		ObjectFieldBinding(IndexSchemaObjectField objectField, String parentAbsolutePath, String relativeFieldName,
-				Collection<? extends FieldTypeDescriptor<?>> fieldTypes, int depth) {
+				Collection<? extends FieldTypeDescriptor<?, ?>> fieldTypes, int depth) {
 			super( objectField, parentAbsolutePath == null ? relativeFieldName : parentAbsolutePath + "." + relativeFieldName,
 					fieldTypes );
 			relativeName = relativeFieldName;

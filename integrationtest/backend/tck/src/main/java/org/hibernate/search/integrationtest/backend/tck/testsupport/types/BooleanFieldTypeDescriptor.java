@@ -15,7 +15,7 @@ import org.hibernate.search.integrationtest.backend.tck.testsupport.types.expect
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.values.AscendingUniqueTermValues;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.values.IndexableValues;
 
-public class BooleanFieldTypeDescriptor extends FieldTypeDescriptor<Boolean> {
+public class BooleanFieldTypeDescriptor extends StandardFieldTypeDescriptor<Boolean> {
 
 	public static final BooleanFieldTypeDescriptor INSTANCE = new BooleanFieldTypeDescriptor();
 

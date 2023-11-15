@@ -13,6 +13,7 @@ import java.util.List;
 import java.util.stream.Stream;
 
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaElement;
+import org.hibernate.search.engine.backend.types.dsl.SearchableProjectableIndexFieldTypeOptionsStep;
 import org.hibernate.search.engine.spatial.GeoPoint;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.FieldTypeDescriptor;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.SimpleFieldModelsByType;
@@ -34,7 +35,8 @@ import org.junit.jupiter.params.provider.MethodSource;
 
 class DistanceProjectionUnsupportedTypesIT<F> {
 
-	private static Stream<FieldTypeDescriptor<?>> unsupportedTypeDescriptors() {
+	private static Stream<FieldTypeDescriptor<?,
+			? extends SearchableProjectableIndexFieldTypeOptionsStep<?, ?>>> unsupportedTypeDescriptors() {
 		return FieldTypeDescriptor.getAll().stream()
 				.filter( typeDescriptor -> !GeoPoint.class.isAssignableFrom( typeDescriptor.getJavaType() ) );
 	}
@@ -59,7 +61,7 @@ class DistanceProjectionUnsupportedTypesIT<F> {
 
 	@ParameterizedTest(name = "{0}")
 	@MethodSource("params")
-	void notSupported(FieldTypeDescriptor<F> fieldTypeDescriptor) {
+	void notSupported(FieldTypeDescriptor<F, ?> fieldTypeDescriptor) {
 		StubMappingScope scope = index.createScope();
 		String absoluteFieldPath = getFieldPath( fieldTypeDescriptor );
 
@@ -73,7 +75,7 @@ class DistanceProjectionUnsupportedTypesIT<F> {
 				);
 	}
 
-	private String getFieldPath(FieldTypeDescriptor<F> fieldTypeDescriptor) {
+	private String getFieldPath(FieldTypeDescriptor<F, ?> fieldTypeDescriptor) {
 		return index.binding().fieldModels.get( fieldTypeDescriptor ).relativeFieldName;
 	}
 

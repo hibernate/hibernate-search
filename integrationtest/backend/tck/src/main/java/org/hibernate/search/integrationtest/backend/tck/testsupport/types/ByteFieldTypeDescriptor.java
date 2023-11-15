@@ -14,7 +14,7 @@ import org.hibernate.search.integrationtest.backend.tck.testsupport.types.expect
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.values.AscendingUniqueTermValues;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.values.IndexableValues;
 
-public class ByteFieldTypeDescriptor extends FieldTypeDescriptor<Byte> {
+public class ByteFieldTypeDescriptor extends StandardFieldTypeDescriptor<Byte> {
 
 	public static final ByteFieldTypeDescriptor INSTANCE = new ByteFieldTypeDescriptor();
 
