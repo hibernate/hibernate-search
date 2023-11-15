@@ -6,7 +6,6 @@
  */
 package org.hibernate.search.integrationtest.backend.tck.search.projection;
 
-import static org.hibernate.search.integrationtest.backend.tck.testsupport.model.singlefield.SingleFieldIndexBinding.NO_ADDITIONAL_CONFIGURATION;
 import static org.hibernate.search.integrationtest.backend.tck.testsupport.types.values.IndexableGeoPointWithDistanceFromCenterValues.CENTER_POINT_1;
 import static org.hibernate.search.integrationtest.backend.tck.testsupport.types.values.IndexableGeoPointWithDistanceFromCenterValues.CENTER_POINT_2;
 import static org.hibernate.search.util.impl.integrationtest.common.assertion.SearchResultAssert.assertThatQuery;
@@ -25,8 +24,8 @@ import org.hibernate.search.engine.search.common.SortMode;
 import org.hibernate.search.engine.spatial.DistanceUnit;
 import org.hibernate.search.engine.spatial.GeoPoint;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.model.singlefield.SingleFieldIndexBinding;
-import org.hibernate.search.integrationtest.backend.tck.testsupport.types.FieldTypeDescriptor;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.GeoPointFieldTypeDescriptor;
+import org.hibernate.search.integrationtest.backend.tck.testsupport.types.StandardFieldTypeDescriptor;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.values.AscendingUniqueDistanceFromCenterValues;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.values.IndexableGeoPointWithDistanceFromCenterValues;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.TckConfiguration;
@@ -56,7 +55,7 @@ import org.assertj.core.api.ListAssert;
 class DistanceProjectionMultiValuedBaseIT {
 
 	private static final GeoPointFieldTypeDescriptor fieldType = GeoPointFieldTypeDescriptor.INSTANCE;
-	private static final Set<FieldTypeDescriptor<GeoPoint>> supportedFieldTypes = Collections.singleton( fieldType );
+	private static final Set<StandardFieldTypeDescriptor<GeoPoint>> supportedFieldTypes = Collections.singleton( fieldType );
 	private static final List<DataSet> dataSets = new ArrayList<>();
 	private static final List<Arguments> parameters = new ArrayList<>();
 	private static final Comparator<Iterable<Double>> APPROX_M_COMPARATOR =
@@ -90,7 +89,7 @@ class DistanceProjectionMultiValuedBaseIT {
 							root,
 							supportedFieldTypes,
 							TckConfiguration.get().getBackendFeatures().fieldsProjectableByDefault()
-									? NO_ADDITIONAL_CONFIGURATION
+									? c -> {}
 									: c -> c.projectable( Projectable.YES )
 					)
 			)
@@ -101,7 +100,7 @@ class DistanceProjectionMultiValuedBaseIT {
 							root,
 							supportedFieldTypes,
 							TckConfiguration.get().getBackendFeatures().fieldsProjectableByDefault()
-									? NO_ADDITIONAL_CONFIGURATION
+									? c -> {}
 									: c -> c.projectable( Projectable.YES ).sortable( Sortable.YES )
 					)
 			)

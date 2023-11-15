@@ -17,7 +17,7 @@ import org.hibernate.search.util.common.data.Range;
 public final class RangePredicateTestValues<F> extends AbstractPredicateTestValues<F> {
 	private final List<F> values;
 
-	public RangePredicateTestValues(FieldTypeDescriptor<F> fieldType) {
+	public RangePredicateTestValues(FieldTypeDescriptor<F, ?> fieldType) {
 		super( fieldType );
 		this.values = fieldType.getAscendingUniqueTermValues().getSingle();
 	}

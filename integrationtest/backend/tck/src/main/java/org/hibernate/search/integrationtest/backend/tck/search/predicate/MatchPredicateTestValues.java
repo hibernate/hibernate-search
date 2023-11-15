@@ -13,7 +13,7 @@ import org.hibernate.search.integrationtest.backend.tck.testsupport.types.FieldT
 public final class MatchPredicateTestValues<F> extends AbstractPredicateTestValues<F> {
 	private final List<F> values;
 
-	public MatchPredicateTestValues(FieldTypeDescriptor<F> fieldType) {
+	public MatchPredicateTestValues(FieldTypeDescriptor<F, ?> fieldType) {
 		super( fieldType );
 		this.values = fieldType.getUniquelyMatchableValues();
 	}

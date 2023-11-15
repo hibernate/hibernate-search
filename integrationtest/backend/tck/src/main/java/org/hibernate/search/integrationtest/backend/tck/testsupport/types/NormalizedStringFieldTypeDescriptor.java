@@ -18,7 +18,7 @@ import org.hibernate.search.integrationtest.backend.tck.testsupport.types.expect
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.values.AscendingUniqueTermValues;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.values.IndexableValues;
 
-public class NormalizedStringFieldTypeDescriptor extends FieldTypeDescriptor<String> {
+public class NormalizedStringFieldTypeDescriptor extends StandardFieldTypeDescriptor<String> {
 
 	public static final NormalizedStringFieldTypeDescriptor INSTANCE = new NormalizedStringFieldTypeDescriptor();
 

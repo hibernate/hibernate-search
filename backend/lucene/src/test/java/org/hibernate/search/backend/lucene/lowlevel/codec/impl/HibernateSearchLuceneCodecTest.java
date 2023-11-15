@@ -11,7 +11,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 import org.junit.jupiter.api.Test;
 
 import org.apache.lucene.codecs.Codec;
-import org.apache.lucene.codecs.lucene95.Lucene95Codec;
 
 class HibernateSearchLuceneCodecTest {
 	@Test

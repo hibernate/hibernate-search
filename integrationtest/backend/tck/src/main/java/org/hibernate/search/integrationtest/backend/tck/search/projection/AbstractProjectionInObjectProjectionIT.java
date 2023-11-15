@@ -22,6 +22,7 @@ import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaElement
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaObjectField;
 import org.hibernate.search.engine.backend.types.ObjectStructure;
 import org.hibernate.search.engine.backend.types.Projectable;
+import org.hibernate.search.engine.backend.types.dsl.SearchableProjectableIndexFieldTypeOptionsStep;
 import org.hibernate.search.engine.search.projection.dsl.ProjectionFinalStep;
 import org.hibernate.search.engine.search.projection.dsl.SearchProjectionFactory;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.FieldTypeDescriptor;
@@ -1515,7 +1516,7 @@ public abstract class AbstractProjectionInObjectProjectionIT<F, P, V extends Abs
 		private final Level1ObjectFieldBinding singleValuedLevel1_nested;
 		private final Level1ObjectFieldBinding singleValuedLevel1_flattened;
 
-		IndexBinding(IndexSchemaElement root, Collection<? extends FieldTypeDescriptor<?>> fieldTypes) {
+		IndexBinding(IndexSchemaElement root, Collection<? extends FieldTypeDescriptor<?, ?>> fieldTypes) {
 			IndexSchemaObjectField level1NestedObjectField =
 					root.objectField( "level1_nested", ObjectStructure.NESTED ).multiValued();
 			level1_nested = new Level1ObjectFieldBinding( level1NestedObjectField, null,
@@ -1553,7 +1554,7 @@ public abstract class AbstractProjectionInObjectProjectionIT<F, P, V extends Abs
 		final Level1ObjectFieldBindingWithoutSingleValuedField level1_flattened;
 
 		MissingLevel1SingleValuedFieldIndexBinding(IndexSchemaElement root,
-				Collection<? extends FieldTypeDescriptor<?>> fieldTypes) {
+				Collection<? extends FieldTypeDescriptor<?, ?>> fieldTypes) {
 			IndexSchemaObjectField level1NestedObjectField =
 					root.objectField( "level1_nested", ObjectStructure.NESTED ).multiValued();
 			level1_nested = new Level1ObjectFieldBindingWithoutSingleValuedField( level1NestedObjectField, null,
@@ -1573,7 +1574,7 @@ public abstract class AbstractProjectionInObjectProjectionIT<F, P, V extends Abs
 		final ObjectFieldBinding level1_nested;
 		final ObjectFieldBinding level1_flattened;
 
-		MissingLevel2IndexBinding(IndexSchemaElement root, Collection<? extends FieldTypeDescriptor<?>> fieldTypes) {
+		MissingLevel2IndexBinding(IndexSchemaElement root, Collection<? extends FieldTypeDescriptor<?, ?>> fieldTypes) {
 			IndexSchemaObjectField level1NestedObjectField =
 					root.objectField( "level1_nested", ObjectStructure.NESTED ).multiValued();
 			level1_nested = new ObjectFieldBinding( level1NestedObjectField, null,
@@ -1594,15 +1595,19 @@ public abstract class AbstractProjectionInObjectProjectionIT<F, P, V extends Abs
 		final Level1ObjectFieldBindingWithoutLevel2SingleValuedField level1_flattened;
 
 		MissingLevel2SingleValuedFieldIndexBinding(IndexSchemaElement root,
-				Collection<? extends FieldTypeDescriptor<?>> fieldTypes) {
+				Collection<? extends FieldTypeDescriptor<?,
+						? extends SearchableProjectableIndexFieldTypeOptionsStep<?, ?>>> fieldTypes) {
 			IndexSchemaObjectField level1NestedObjectField =
 					root.objectField( "level1_nested", ObjectStructure.NESTED ).multiValued();
 			level1_nested = new Level1ObjectFieldBindingWithoutLevel2SingleValuedField( level1NestedObjectField, null,
-					"level1_nested", ObjectStructure.NESTED, fieldTypes );
+					"level1_nested", ObjectStructure.NESTED, fieldTypes
+			);
 			IndexSchemaObjectField level1FlattenedObjectField =
 					root.objectField( "level1_flattened", ObjectStructure.FLATTENED ).multiValued();
-			level1_flattened = new Level1ObjectFieldBindingWithoutLevel2SingleValuedField( level1FlattenedObjectField, null,
-					"level1_flattened", ObjectStructure.FLATTENED, fieldTypes );
+			level1_flattened = new Level1ObjectFieldBindingWithoutLevel2SingleValuedField( level1FlattenedObjectField,
+					null,
+					"level1_flattened", ObjectStructure.FLATTENED, fieldTypes
+			);
 		}
 
 		public Level1ObjectFieldBindingWithoutLevel2SingleValuedField level1(ObjectStructure structure) {
@@ -1617,7 +1622,8 @@ public abstract class AbstractProjectionInObjectProjectionIT<F, P, V extends Abs
 		final IndexObjectFieldReference reference;
 
 		ObjectFieldBinding(IndexSchemaObjectField objectField, String parentAbsolutePath, String relativeFieldName,
-				Collection<? extends FieldTypeDescriptor<?>> fieldTypes) {
+				Collection<? extends FieldTypeDescriptor<?,
+						? extends SearchableProjectableIndexFieldTypeOptionsStep<?, ?>>> fieldTypes) {
 			absolutePath = FieldPaths.compose( parentAbsolutePath, relativeFieldName );
 			singleValuedField = SimpleFieldModelsByType.mapAll( fieldTypes, objectField, "singleValuedField_",
 					b -> b.projectable( Projectable.YES ) );
@@ -1626,11 +1632,11 @@ public abstract class AbstractProjectionInObjectProjectionIT<F, P, V extends Abs
 			reference = objectField.toReference();
 		}
 
-		String singleValuedFieldAbsolutePath(FieldTypeDescriptor<?> fieldType) {
+		String singleValuedFieldAbsolutePath(FieldTypeDescriptor<?, ?> fieldType) {
 			return FieldPaths.compose( absolutePath, singleValuedField.get( fieldType ).relativeFieldName );
 		}
 
-		String multiValuedFieldAbsolutePath(FieldTypeDescriptor<?> fieldType) {
+		String multiValuedFieldAbsolutePath(FieldTypeDescriptor<?, ?> fieldType) {
 			return FieldPaths.compose( absolutePath, multiValuedField.get( fieldType ).relativeFieldName );
 		}
 	}
@@ -1639,7 +1645,7 @@ public abstract class AbstractProjectionInObjectProjectionIT<F, P, V extends Abs
 		final ObjectFieldBinding level2;
 
 		Level1ObjectFieldBinding(IndexSchemaObjectField objectField, String parentAbsolutePath, String relativeFieldName,
-				ObjectStructure structure, Collection<? extends FieldTypeDescriptor<?>> fieldTypes) {
+				ObjectStructure structure, Collection<? extends FieldTypeDescriptor<?, ?>> fieldTypes) {
 			super( objectField, parentAbsolutePath, relativeFieldName, fieldTypes );
 			IndexSchemaObjectField level2ObjectField = objectField.objectField( "level2", structure )
 					.multiValued();
@@ -1653,7 +1659,8 @@ public abstract class AbstractProjectionInObjectProjectionIT<F, P, V extends Abs
 		final IndexObjectFieldReference reference;
 
 		ObjectFieldBindingWithoutSingleValuedField(IndexSchemaObjectField objectField, String parentAbsolutePath,
-				String relativeFieldName, Collection<? extends FieldTypeDescriptor<?>> fieldTypes) {
+				String relativeFieldName, Collection<? extends FieldTypeDescriptor<?,
+						? extends SearchableProjectableIndexFieldTypeOptionsStep<?, ?>>> fieldTypes) {
 			absolutePath = FieldPaths.compose( parentAbsolutePath, relativeFieldName );
 			multiValuedField = SimpleFieldModelsByType.mapAllMultiValued( fieldTypes, objectField, "multiValuedField_",
 					b -> b.projectable( Projectable.YES ) );
@@ -1667,7 +1674,7 @@ public abstract class AbstractProjectionInObjectProjectionIT<F, P, V extends Abs
 
 		Level1ObjectFieldBindingWithoutSingleValuedField(IndexSchemaObjectField objectField, String parentAbsolutePath,
 				String relativeFieldName,
-				ObjectStructure structure, Collection<? extends FieldTypeDescriptor<?>> fieldTypes) {
+				ObjectStructure structure, Collection<? extends FieldTypeDescriptor<?, ?>> fieldTypes) {
 			super( objectField, parentAbsolutePath, relativeFieldName, fieldTypes );
 			IndexSchemaObjectField level2ObjectField = objectField.objectField( "level2", structure )
 					.multiValued();
@@ -1680,7 +1687,7 @@ public abstract class AbstractProjectionInObjectProjectionIT<F, P, V extends Abs
 
 		Level1ObjectFieldBindingWithoutLevel2SingleValuedField(IndexSchemaObjectField objectField, String parentAbsolutePath,
 				String relativeFieldName,
-				ObjectStructure structure, Collection<? extends FieldTypeDescriptor<?>> fieldTypes) {
+				ObjectStructure structure, Collection<? extends FieldTypeDescriptor<?, ?>> fieldTypes) {
 			super( objectField, parentAbsolutePath, relativeFieldName, fieldTypes );
 			IndexSchemaObjectField level2ObjectField = objectField.objectField( "level2", structure )
 					.multiValued();

@@ -18,6 +18,7 @@ import org.hibernate.search.engine.search.common.ValueConvert;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.BooleanFieldTypeDescriptor;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.FieldTypeDescriptor;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.GeoPointFieldTypeDescriptor;
+import org.hibernate.search.integrationtest.backend.tck.testsupport.types.StandardFieldTypeDescriptor;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.SimpleFieldModelsByType;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.ValueWrapper;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.extension.SearchSetupHelper;
@@ -33,18 +34,18 @@ import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 
 class RangePredicateSpecificsIT<F> {
-	private static final List<FieldTypeDescriptor<?>> supportedFieldTypes = new ArrayList<>();
+	private static final List<StandardFieldTypeDescriptor<?>> supportedFieldTypes = new ArrayList<>();
 	private static final List<DataSet<?>> dataSets = new ArrayList<>();
 	private static final List<Arguments> parameters = new ArrayList<>();
 	static {
-		for ( FieldTypeDescriptor<?> fieldType : FieldTypeDescriptor.getAll() ) {
+		for ( StandardFieldTypeDescriptor<?> fieldType : FieldTypeDescriptor.getAllStandard() ) {
 			if ( !GeoPointFieldTypeDescriptor.INSTANCE.equals( fieldType )
 					// Booleans don't have enough values to run this test. See BooleanSortAndRangePredicateIT.
 					&& !BooleanFieldTypeDescriptor.INSTANCE.equals( fieldType ) ) {
 				supportedFieldTypes.add( fieldType );
 			}
 		}
-		for ( FieldTypeDescriptor<?> fieldType : supportedFieldTypes ) {
+		for ( StandardFieldTypeDescriptor<?> fieldType : supportedFieldTypes ) {
 			DataSet<?> dataSet = new DataSet<>( new RangePredicateTestValues<>( fieldType ) );
 			dataSets.add( dataSet );
 			parameters.add( Arguments.of( dataSet ) );

@@ -27,10 +27,16 @@ public class SearchHitsAssert<H> {
 		return new SearchHitsAssert<>( actual );
 	}
 
+	private final boolean usingRecursiveFieldByFieldElementComparator;
 	private final List<? extends H> actual;
 	private String description = "<unknown>";
 
 	private SearchHitsAssert(List<? extends H> actual) {
+		this( false, actual );
+	}
+
+	public SearchHitsAssert(boolean usingRecursiveFieldByFieldElementComparator, List<? extends H> actual) {
+		this.usingRecursiveFieldByFieldElementComparator = usingRecursiveFieldByFieldElementComparator;
 		this.actual = actual;
 	}
 

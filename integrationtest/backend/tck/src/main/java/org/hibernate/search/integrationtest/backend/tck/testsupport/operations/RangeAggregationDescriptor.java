@@ -43,10 +43,12 @@ public class RangeAggregationDescriptor extends AggregationDescriptor {
 	public <F> ExpectationsAlternative<
 			SupportedSingleFieldAggregationExpectations<F>,
 			UnsupportedSingleFieldAggregationExpectations> getSingleFieldAggregationExpectations(
-					FieldTypeDescriptor<F> typeDescriptor) {
+					FieldTypeDescriptor<F, ?> typeDescriptor) {
 		if ( String.class.equals( typeDescriptor.getJavaType() )
 				|| GeoPoint.class.equals( typeDescriptor.getJavaType() )
-				|| Boolean.class.equals( typeDescriptor.getJavaType() ) ) {
+				|| Boolean.class.equals( typeDescriptor.getJavaType() )
+				|| byte[].class.equals( typeDescriptor.getJavaType() )
+				|| float[].class.equals( typeDescriptor.getJavaType() ) ) {
 			// Range aggregations are not supported on text, GeoPoint or boolean fields.
 			return ExpectationsAlternative.unsupported( unsupportedExpectations( typeDescriptor ) );
 		}
@@ -183,7 +185,8 @@ public class RangeAggregationDescriptor extends AggregationDescriptor {
 		} );
 	}
 
-	private <F> UnsupportedSingleFieldAggregationExpectations unsupportedExpectations(FieldTypeDescriptor<F> typeDescriptor) {
+	private <
+			F> UnsupportedSingleFieldAggregationExpectations unsupportedExpectations(FieldTypeDescriptor<F, ?> typeDescriptor) {
 		return new UnsupportedSingleFieldAggregationExpectations() {
 			@Override
 			public String aggregationName() {

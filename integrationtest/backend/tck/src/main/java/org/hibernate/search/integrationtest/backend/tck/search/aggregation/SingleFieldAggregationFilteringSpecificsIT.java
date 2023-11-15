@@ -24,6 +24,7 @@ import org.hibernate.search.integrationtest.backend.tck.testsupport.operations.A
 import org.hibernate.search.integrationtest.backend.tck.testsupport.operations.expectations.AggregationScenario;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.operations.expectations.SupportedSingleFieldAggregationExpectations;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.FieldTypeDescriptor;
+import org.hibernate.search.integrationtest.backend.tck.testsupport.types.StandardFieldTypeDescriptor;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.SimpleFieldModelsByType;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.extension.SearchSetupHelper;
 import org.hibernate.search.util.common.SearchException;
@@ -45,12 +46,12 @@ import org.junit.jupiter.params.provider.MethodSource;
 
 class SingleFieldAggregationFilteringSpecificsIT<F> {
 
-	private static final Set<FieldTypeDescriptor<?>> supportedFieldTypes = new LinkedHashSet<>();
+	private static final Set<StandardFieldTypeDescriptor<?>> supportedFieldTypes = new LinkedHashSet<>();
 	private static final List<Arguments> parameters = new ArrayList<>();
 
 	static {
 		for ( AggregationDescriptor aggregationDescriptor : AggregationDescriptor.getAll() ) {
-			for ( FieldTypeDescriptor<?> fieldType : FieldTypeDescriptor.getAll() ) {
+			for ( StandardFieldTypeDescriptor<?> fieldType : FieldTypeDescriptor.getAllStandard() ) {
 				Optional<? extends SupportedSingleFieldAggregationExpectations<?>> expectations =
 						aggregationDescriptor.getSingleFieldAggregationExpectations( fieldType ).getSupported();
 				if ( expectations.isPresent() ) {

@@ -27,6 +27,8 @@ import org.hibernate.search.integrationtest.backend.tck.testsupport.types.Analyz
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.FieldTypeDescriptor;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.GeoPointFieldTypeDescriptor;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.NormalizedStringFieldTypeDescriptor;
+import org.hibernate.search.integrationtest.backend.tck.testsupport.types.StandardFieldTypeDescriptor;
+import org.hibernate.search.integrationtest.backend.tck.testsupport.types.VectorFieldTypeDescriptor;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.TckConfiguration;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.ValueWrapper;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.extension.SearchSetupHelper;
@@ -56,7 +58,7 @@ class IndexValueFieldTypeDescriptorBaseIT {
 
 	private SimpleMappedIndex<IndexBinding> index;
 
-	public void init(FieldTypeDescriptor<?> fieldType) {
+	public void init(FieldTypeDescriptor<?, ?> fieldType) {
 		index = SimpleMappedIndex.of(
 				root -> new IndexBinding( root, fieldType ) );
 		setupHelper.start().withIndex( index )
@@ -66,7 +68,7 @@ class IndexValueFieldTypeDescriptorBaseIT {
 
 	@ParameterizedTest(name = "{0}")
 	@MethodSource("params")
-	void isSearchable(FieldTypeDescriptor<?> fieldType) {
+	void isSearchable(FieldTypeDescriptor<?, ?> fieldType) {
 		init( fieldType );
 		assertThat( getTypeDescriptor( "default" ) )
 				.returns( true, IndexValueFieldTypeDescriptor::searchable );
@@ -78,7 +80,7 @@ class IndexValueFieldTypeDescriptorBaseIT {
 
 	@ParameterizedTest(name = "{0}")
 	@MethodSource("params")
-	void isSortable(FieldTypeDescriptor<?> fieldType) {
+	void isSortable(FieldTypeDescriptor<?, ?> fieldType) {
 		init( fieldType );
 		boolean projectable = TckConfiguration.get().getBackendFeatures().fieldsProjectableByDefault();
 
@@ -96,7 +98,7 @@ class IndexValueFieldTypeDescriptorBaseIT {
 
 	@ParameterizedTest(name = "{0}")
 	@MethodSource("params")
-	void isProjectable(FieldTypeDescriptor<?> fieldType) {
+	void isProjectable(FieldTypeDescriptor<?, ?> fieldType) {
 		init( fieldType );
 		boolean projectable = TckConfiguration.get().getBackendFeatures().fieldsProjectableByDefault();
 		assertThat( getTypeDescriptor( "default" ) )
@@ -109,7 +111,7 @@ class IndexValueFieldTypeDescriptorBaseIT {
 
 	@ParameterizedTest(name = "{0}")
 	@MethodSource("params")
-	void isAggregable(FieldTypeDescriptor<?> fieldType) {
+	void isAggregable(FieldTypeDescriptor<?, ?> fieldType) {
 		init( fieldType );
 		assertThat( getTypeDescriptor( "default" ) )
 				.returns( false, IndexValueFieldTypeDescriptor::aggregable );
@@ -123,7 +125,7 @@ class IndexValueFieldTypeDescriptorBaseIT {
 
 	@ParameterizedTest(name = "{0}")
 	@MethodSource("params")
-	void dslArgumentClass(FieldTypeDescriptor<?> fieldType) {
+	void dslArgumentClass(FieldTypeDescriptor<?, ?> fieldType) {
 		init( fieldType );
 		assertThat( getTypeDescriptor( "default" ) )
 				.returns( fieldType.getJavaType(), IndexValueFieldTypeDescriptor::dslArgumentClass );
@@ -135,7 +137,7 @@ class IndexValueFieldTypeDescriptorBaseIT {
 
 	@ParameterizedTest(name = "{0}")
 	@MethodSource("params")
-	void projectedValueClass(FieldTypeDescriptor<?> fieldType) {
+	void projectedValueClass(FieldTypeDescriptor<?, ?> fieldType) {
 		init( fieldType );
 		assertThat( getTypeDescriptor( "default" ) )
 				.returns( fieldType.getJavaType(), IndexValueFieldTypeDescriptor::projectedValueClass );
@@ -147,7 +149,7 @@ class IndexValueFieldTypeDescriptorBaseIT {
 
 	@ParameterizedTest(name = "{0}")
 	@MethodSource("params")
-	void valueClass(FieldTypeDescriptor<?> fieldType) {
+	void valueClass(FieldTypeDescriptor<?, ?> fieldType) {
 		init( fieldType );
 		assertThat( getTypeDescriptor( "default" ) )
 				.returns( fieldType.getJavaType(), IndexValueFieldTypeDescriptor::valueClass );
@@ -159,7 +161,7 @@ class IndexValueFieldTypeDescriptorBaseIT {
 
 	@ParameterizedTest(name = "{0}")
 	@MethodSource("params")
-	void searchAnalyzerName(FieldTypeDescriptor<?> fieldType) {
+	void searchAnalyzerName(FieldTypeDescriptor<?, ?> fieldType) {
 		init( fieldType );
 		IndexValueFieldTypeDescriptor typeDescriptor = getTypeDescriptor( "default" );
 
@@ -175,7 +177,7 @@ class IndexValueFieldTypeDescriptorBaseIT {
 
 	@ParameterizedTest(name = "{0}")
 	@MethodSource("params")
-	void normalizerName(FieldTypeDescriptor<?> fieldType) {
+	void normalizerName(FieldTypeDescriptor<?, ?> fieldType) {
 		init( fieldType );
 		IndexValueFieldTypeDescriptor typeDescriptor = getTypeDescriptor( "default" );
 
@@ -195,16 +197,16 @@ class IndexValueFieldTypeDescriptorBaseIT {
 		return fieldDescriptor.type();
 	}
 
-	private boolean isSortSupported(FieldTypeDescriptor<?> fieldType) {
+	private boolean isSortSupported(FieldTypeDescriptor<?, ?> fieldType) {
 		return fieldType.isFieldSortSupported();
 	}
 
-	private boolean isAggregationSupported(FieldTypeDescriptor<?> fieldType) {
+	private boolean isAggregationSupported(FieldTypeDescriptor<?, ?> fieldType) {
 		return TermsAggregationDescriptor.INSTANCE.getSingleFieldAggregationExpectations( fieldType ).isSupported();
 	}
 
 	private class IndexBinding {
-		IndexBinding(IndexSchemaElement root, FieldTypeDescriptor<?> fieldType) {
+		IndexBinding(IndexSchemaElement root, FieldTypeDescriptor<?, ?> fieldType) {
 			mapper( fieldType, ignored -> {} ).map( root, "default" );
 
 			mapper( fieldType, c -> c.dslConverter( ValueWrapper.class, ValueWrapper.toDocumentValueConverter() ) )
@@ -212,18 +214,33 @@ class IndexValueFieldTypeDescriptorBaseIT {
 			mapper( fieldType, c -> c.projectionConverter( ValueWrapper.class, ValueWrapper.fromDocumentValueConverter() ) )
 					.map( root, "projectionConverter" );
 
-			mapper( fieldType, c -> c.searchable( Searchable.YES ) ).map( root, "searchable" );
-			mapper( fieldType, c -> c.searchable( Searchable.NO ) ).map( root, "nonSearchable" );
-			if ( isSortSupported( fieldType ) ) {
-				mapper( fieldType, c -> c.sortable( Sortable.YES ) ).map( root, "sortable" );
+			if ( fieldType instanceof StandardFieldTypeDescriptor<?> ) {
+				var standardFieldType = (StandardFieldTypeDescriptor<?>) fieldType;
+				mapper( standardFieldType, c -> c.searchable( Searchable.YES ) ).map( root, "searchable" );
+				mapper( standardFieldType, c -> c.searchable( Searchable.NO ) ).map( root, "nonSearchable" );
+				if ( isSortSupported( standardFieldType ) ) {
+					mapper( standardFieldType, c -> c.sortable( Sortable.YES ) ).map( root, "sortable" );
+				}
+				mapper( standardFieldType, c -> c.sortable( Sortable.NO ) ).map( root, "nonSortable" );
+				mapper( standardFieldType, c -> c.projectable( Projectable.YES ) ).map( root, "projectable" );
+				mapper( standardFieldType, c -> c.projectable( Projectable.NO ) ).map( root, "nonProjectable" );
+				if ( isAggregationSupported( standardFieldType ) ) {
+					mapper( standardFieldType, c -> c.aggregable( Aggregable.YES ) ).map( root, "aggregable" );
+				}
+				mapper( standardFieldType, c -> c.aggregable( Aggregable.NO ) ).map( root, "nonAggregable" );
 			}
-			mapper( fieldType, c -> c.sortable( Sortable.NO ) ).map( root, "nonSortable" );
-			mapper( fieldType, c -> c.projectable( Projectable.YES ) ).map( root, "projectable" );
-			mapper( fieldType, c -> c.projectable( Projectable.NO ) ).map( root, "nonProjectable" );
-			if ( isAggregationSupported( fieldType ) ) {
-				mapper( fieldType, c -> c.aggregable( Aggregable.YES ) ).map( root, "aggregable" );
+			else {
+				var vectorFieldType = (VectorFieldTypeDescriptor<?>) fieldType;
+				mapper( vectorFieldType, c -> c.searchable( Searchable.YES ) ).map( root, "searchable" );
+				mapper( vectorFieldType, c -> c.searchable( Searchable.NO ) ).map( root, "nonSearchable" );
+				mapper( vectorFieldType, c -> c.projectable( Projectable.YES ) ).map( root, "projectable" );
+				mapper( vectorFieldType, c -> c.projectable( Projectable.NO ) ).map( root, "nonProjectable" );
+
+				// use defaults, that should be NO to make use of the tests:
+				mapper( vectorFieldType ).map( root, "nonSortable" );
+				mapper( vectorFieldType ).map( root, "nonAggregable" );
+
 			}
-			mapper( fieldType, c -> c.aggregable( Aggregable.NO ) ).map( root, "nonAggregable" );
 		}
 	}
 }

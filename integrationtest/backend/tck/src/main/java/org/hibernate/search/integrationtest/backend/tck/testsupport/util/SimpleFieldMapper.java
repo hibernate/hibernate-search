@@ -14,38 +14,40 @@ import org.hibernate.search.engine.backend.document.IndexFieldReference;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaElement;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaFieldOptionsStep;
 import org.hibernate.search.engine.backend.types.dsl.IndexFieldTypeFactory;
-import org.hibernate.search.engine.backend.types.dsl.StandardIndexFieldTypeOptionsStep;
+import org.hibernate.search.engine.backend.types.dsl.SearchableProjectableIndexFieldTypeOptionsStep;
 
-public final class StandardFieldMapper<F, M> {
+public final class SimpleFieldMapper<F, S extends SearchableProjectableIndexFieldTypeOptionsStep<?, F>, M> {
 
-	public static <F, M> StandardFieldMapper<F, M> of(
-			Function<IndexFieldTypeFactory, StandardIndexFieldTypeOptionsStep<?, F>> initialConfiguration,
+	public static <F, S extends SearchableProjectableIndexFieldTypeOptionsStep<?, F>, M> SimpleFieldMapper<F, S, M> of(
+			Function<IndexFieldTypeFactory, S> initialConfiguration,
 			BiFunction<IndexFieldReference<F>, String, M> resultFunction) {
 		return of( initialConfiguration, ignored -> {}, resultFunction );
 	}
 
-	public static <F> StandardFieldMapper<F, IndexFieldReference<F>> of(
-			Function<IndexFieldTypeFactory, StandardIndexFieldTypeOptionsStep<?, F>> initialConfiguration,
-			Consumer<? super StandardIndexFieldTypeOptionsStep<?, F>> configurationAdjustment) {
+	public static <
+			F,
+			S extends SearchableProjectableIndexFieldTypeOptionsStep<?, F>> SimpleFieldMapper<F, S, IndexFieldReference<F>> of(
+					Function<IndexFieldTypeFactory, S> initialConfiguration,
+					Consumer<? super S> configurationAdjustment) {
 		return of( initialConfiguration, configurationAdjustment, (reference, ignored) -> reference );
 	}
 
-	public static <F, M> StandardFieldMapper<F, M> of(
-			Function<IndexFieldTypeFactory, StandardIndexFieldTypeOptionsStep<?, F>> initialConfiguration,
-			Consumer<? super StandardIndexFieldTypeOptionsStep<?, F>> configurationAdjustment,
+	public static <F, S extends SearchableProjectableIndexFieldTypeOptionsStep<?, F>, M> SimpleFieldMapper<F, S, M> of(
+			Function<IndexFieldTypeFactory, S> initialConfiguration,
+			Consumer<? super S> configurationAdjustment,
 			BiFunction<IndexFieldReference<F>, String, M> resultFunction) {
-		return new StandardFieldMapper<>(
+		return new SimpleFieldMapper<>(
 				initialConfiguration, configurationAdjustment, resultFunction
 		);
 	}
 
-	private final Function<IndexFieldTypeFactory, StandardIndexFieldTypeOptionsStep<?, F>> initialConfiguration;
-	private final Consumer<? super StandardIndexFieldTypeOptionsStep<?, F>> configurationAdjustment;
+	private final Function<IndexFieldTypeFactory, S> initialConfiguration;
+	private final Consumer<? super S> configurationAdjustment;
 	private final BiFunction<IndexFieldReference<F>, String, M> resultFunction;
 
-	private StandardFieldMapper(
-			Function<IndexFieldTypeFactory, StandardIndexFieldTypeOptionsStep<?, F>> initialConfiguration,
-			Consumer<? super StandardIndexFieldTypeOptionsStep<?, F>> configurationAdjustment,
+	private SimpleFieldMapper(
+			Function<IndexFieldTypeFactory, S> initialConfiguration,
+			Consumer<? super S> configurationAdjustment,
 			BiFunction<IndexFieldReference<F>, String, M> resultFunction) {
 		this.initialConfiguration = initialConfiguration;
 		this.configurationAdjustment = configurationAdjustment;
@@ -62,28 +64,27 @@ public final class StandardFieldMapper<F, M> {
 
 	@SafeVarargs
 	public final M map(IndexSchemaElement parent, String name,
-			Consumer<? super StandardIndexFieldTypeOptionsStep<?, F>>... additionalConfigurations) {
+			Consumer<? super S>... additionalConfigurations) {
 		return map( parent, name, false, additionalConfigurations );
 	}
 
 	@SafeVarargs
 	public final M mapMultiValued(IndexSchemaElement parent, String name,
-			Consumer<? super StandardIndexFieldTypeOptionsStep<?, F>>... additionalConfigurations) {
+			Consumer<? super S>... additionalConfigurations) {
 		return map( parent, name, true, additionalConfigurations );
 	}
 
 	// Note: this needs to be final even if it's private; otherwise javac will raise an error when using Java 8.
 	@SafeVarargs
 	private final M map(IndexSchemaElement parent, String name, boolean multiValued,
-			Consumer<? super StandardIndexFieldTypeOptionsStep<?, F>>... additionalConfigurations) {
+			Consumer<? super S>... additionalConfigurations) {
 		IndexSchemaFieldOptionsStep<?, IndexFieldReference<F>> fieldContext = parent
 				.field(
 						name,
 						f -> {
-							StandardIndexFieldTypeOptionsStep<?, F> typeContext = initialConfiguration.apply( f );
+							S typeContext = initialConfiguration.apply( f );
 							configurationAdjustment.accept( typeContext );
-							for ( Consumer<? super StandardIndexFieldTypeOptionsStep<?,
-									F>> additionalConfiguration : additionalConfigurations ) {
+							for ( Consumer<? super S> additionalConfiguration : additionalConfigurations ) {
 								additionalConfiguration.accept( typeContext );
 							}
 							return typeContext;

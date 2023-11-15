@@ -15,7 +15,7 @@ import org.hibernate.search.engine.backend.common.spi.FieldPaths;
 import org.hibernate.search.engine.backend.document.DocumentElement;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaElement;
 import org.hibernate.search.engine.backend.types.ObjectStructure;
-import org.hibernate.search.engine.backend.types.dsl.StandardIndexFieldTypeOptionsStep;
+import org.hibernate.search.engine.backend.types.dsl.SearchableProjectableIndexFieldTypeOptionsStep;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.FieldTypeDescriptor;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.IndexFieldLocation;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.IndexObjectFieldCardinality;
@@ -28,18 +28,22 @@ public class SingleFieldIndexBinding extends AbstractObjectBinding {
 	public static final String DISCRIMINATOR_VALUE_INCLUDED = "included";
 	public static final String DISCRIMINATOR_VALUE_EXCLUDED = "excluded";
 
-	public static final Consumer<StandardIndexFieldTypeOptionsStep<?, ?>> NO_ADDITIONAL_CONFIGURATION = c -> {};
+	public static final Consumer<SearchableProjectableIndexFieldTypeOptionsStep<?, ?>> NO_ADDITIONAL_CONFIGURATION = c -> {};
 
-	public static SingleFieldIndexBinding create(IndexSchemaElement root,
-			Collection<? extends FieldTypeDescriptor<?>> supportedFieldTypes,
-			Consumer<StandardIndexFieldTypeOptionsStep<?, ?>> additionalConfiguration) {
+	public static <S extends SearchableProjectableIndexFieldTypeOptionsStep<?, ?>> SingleFieldIndexBinding create(
+			IndexSchemaElement root,
+			Collection<? extends FieldTypeDescriptor<?, ? extends S>> supportedFieldTypes,
+			Consumer<S> additionalConfiguration) {
 		return new SingleFieldIndexBinding( root, supportedFieldTypes, additionalConfiguration,
 				IndexObjectFieldCardinality.MULTI_VALUED );
 	}
 
-	public static SingleFieldIndexBinding createWithSingleValuedNestedFields(IndexSchemaElement root,
-			Collection<? extends FieldTypeDescriptor<?>> supportedFieldTypes,
-			Consumer<StandardIndexFieldTypeOptionsStep<?, ?>> additionalConfiguration) {
+	public static <
+			S extends SearchableProjectableIndexFieldTypeOptionsStep<?,
+					?>> SingleFieldIndexBinding createWithSingleValuedNestedFields(
+							IndexSchemaElement root,
+							Collection<? extends FieldTypeDescriptor<?, ? extends S>> supportedFieldTypes,
+							Consumer<S> additionalConfiguration) {
 		return new SingleFieldIndexBinding( root, supportedFieldTypes, additionalConfiguration,
 				IndexObjectFieldCardinality.SINGLE_VALUED );
 	}
@@ -47,8 +51,9 @@ public class SingleFieldIndexBinding extends AbstractObjectBinding {
 	public final FirstLevelObjectBinding flattenedObject;
 	public final FirstLevelObjectBinding nestedObject;
 
-	private SingleFieldIndexBinding(IndexSchemaElement root, Collection<? extends FieldTypeDescriptor<?>> supportedFieldTypes,
-			Consumer<StandardIndexFieldTypeOptionsStep<?, ?>> additionalConfiguration,
+	private <S extends SearchableProjectableIndexFieldTypeOptionsStep<?, ?>> SingleFieldIndexBinding(
+			IndexSchemaElement root, Collection<? extends FieldTypeDescriptor<?, ? extends S>> supportedFieldTypes,
+			Consumer<? super S> additionalConfiguration,
 			IndexObjectFieldCardinality nestedFieldCardinality) {
 		super( null, null, root, supportedFieldTypes, additionalConfiguration );
 		flattenedObject = FirstLevelObjectBinding.create(
@@ -61,7 +66,7 @@ public class SingleFieldIndexBinding extends AbstractObjectBinding {
 		);
 	}
 
-	public final String getFieldPath(TestedFieldStructure fieldStructure, FieldTypeDescriptor<?> fieldType) {
+	public final String getFieldPath(TestedFieldStructure fieldStructure, FieldTypeDescriptor<?, ?> fieldType) {
 		return getParentObject( fieldStructure ).getAbsoluteFieldPath( fieldStructure, fieldType );
 	}
 
@@ -84,17 +89,17 @@ public class SingleFieldIndexBinding extends AbstractObjectBinding {
 		}
 	}
 
-	public <F> void initSingleValued(FieldTypeDescriptor<F> fieldType, IndexFieldLocation location,
+	public <F> void initSingleValued(FieldTypeDescriptor<F, ?> fieldType, IndexFieldLocation location,
 			DocumentElement document, F value) {
 		initSingleValued( fieldType, location, document, value, null, false );
 	}
 
-	public <F> void initSingleValued(FieldTypeDescriptor<F> fieldType, IndexFieldLocation location,
+	public <F> void initSingleValued(FieldTypeDescriptor<F, ?> fieldType, IndexFieldLocation location,
 			DocumentElement document, F value, F garbageValue) {
 		initSingleValued( fieldType, location, document, value, garbageValue, true );
 	}
 
-	public <F> void initSingleValued(FieldTypeDescriptor<F> fieldType, IndexFieldLocation location,
+	public <F> void initSingleValued(FieldTypeDescriptor<F, ?> fieldType, IndexFieldLocation location,
 			DocumentElement document, F value, F garbageValue, boolean includeGarbageValueInNested) {
 		switch ( location ) {
 			case ROOT:
@@ -144,12 +149,12 @@ public class SingleFieldIndexBinding extends AbstractObjectBinding {
 		}
 	}
 
-	public <F> void initMultiValued(FieldTypeDescriptor<F> fieldType, IndexFieldLocation location,
+	public <F> void initMultiValued(FieldTypeDescriptor<F, ?> fieldType, IndexFieldLocation location,
 			DocumentElement document, List<F> values) {
 		initMultiValued( fieldType, location, document, values, Collections.emptyList() );
 	}
 
-	public <F> void initMultiValued(FieldTypeDescriptor<F> fieldType, IndexFieldLocation location,
+	public <F> void initMultiValued(FieldTypeDescriptor<F, ?> fieldType, IndexFieldLocation location,
 			DocumentElement document, List<F> values, List<F> garbageValues) {
 		switch ( location ) {
 			case ROOT:

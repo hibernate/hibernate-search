@@ -15,6 +15,7 @@ import java.util.stream.Stream;
 
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaElement;
 import org.hibernate.search.engine.backend.types.Highlightable;
+import org.hibernate.search.engine.backend.types.dsl.SearchableProjectableIndexFieldTypeOptionsStep;
 import org.hibernate.search.engine.backend.types.dsl.StringIndexFieldTypeOptionsStep;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.AnalyzedStringFieldTypeDescriptor;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.FieldTypeDescriptor;
@@ -37,7 +38,8 @@ import org.junit.jupiter.params.provider.MethodSource;
 
 class HighlightProjectionUnsupportedTypesIT<F> {
 
-	private static Stream<FieldTypeDescriptor<?>> unsupportedTypeDescriptors() {
+	private static Stream<FieldTypeDescriptor<?,
+			? extends SearchableProjectableIndexFieldTypeOptionsStep<?, ?>>> unsupportedTypeDescriptors() {
 		return FieldTypeDescriptor.getAll().stream()
 				.filter( typeDescriptor -> !AnalyzedStringFieldTypeDescriptor.INSTANCE.equals( typeDescriptor ) );
 	}
@@ -61,7 +63,7 @@ class HighlightProjectionUnsupportedTypesIT<F> {
 
 	@ParameterizedTest(name = "{0}")
 	@MethodSource("params")
-	void notSupported(FieldTypeDescriptor<F> fieldTypeDescriptor) {
+	void notSupported(FieldTypeDescriptor<F, ?> fieldTypeDescriptor) {
 		StubMappingScope scope = index.createScope();
 		String absoluteFieldPath = getFieldPath( fieldTypeDescriptor );
 
@@ -75,7 +77,7 @@ class HighlightProjectionUnsupportedTypesIT<F> {
 				);
 	}
 
-	private String getFieldPath(FieldTypeDescriptor<F> fieldTypeDescriptor) {
+	private String getFieldPath(FieldTypeDescriptor<F, ?> fieldTypeDescriptor) {
 		return index.binding().fieldModels.get( fieldTypeDescriptor ).relativeFieldName;
 	}
 

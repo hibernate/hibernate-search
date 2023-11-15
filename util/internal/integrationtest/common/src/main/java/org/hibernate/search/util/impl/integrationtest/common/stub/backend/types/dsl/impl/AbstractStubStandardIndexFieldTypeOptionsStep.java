@@ -7,13 +7,11 @@
 package org.hibernate.search.util.impl.integrationtest.common.stub.backend.types.dsl.impl;
 
 import org.hibernate.search.engine.backend.types.Aggregable;
-import org.hibernate.search.engine.backend.types.Projectable;
-import org.hibernate.search.engine.backend.types.Searchable;
 import org.hibernate.search.engine.backend.types.Sortable;
 import org.hibernate.search.engine.backend.types.dsl.StandardIndexFieldTypeOptionsStep;
 
 abstract class AbstractStubStandardIndexFieldTypeOptionsStep<S extends AbstractStubStandardIndexFieldTypeOptionsStep<?, F>, F>
-		extends AbstractStubIndexFieldTypeOptionsStep<S, F>
+		extends AbstractStubSearchableProjectableIndexFieldTypeOptionsStep<S, F>
 		implements StandardIndexFieldTypeOptionsStep<S, F> {
 
 	AbstractStubStandardIndexFieldTypeOptionsStep(Class<F> inputType) {
@@ -21,26 +19,8 @@ abstract class AbstractStubStandardIndexFieldTypeOptionsStep<S extends AbstractS
 	}
 
 	@Override
-	public S projectable(Projectable projectable) {
-		builder.modifier( b -> b.projectable( projectable ) );
-		return thisAsS();
-	}
-
-	@Override
 	public S sortable(Sortable sortable) {
 		builder.modifier( b -> b.sortable( sortable ) );
-		return thisAsS();
-	}
-
-	@Override
-	public S indexNullAs(F indexNullAs) {
-		builder.modifier( b -> b.indexNullAs( indexNullAs ) );
-		return thisAsS();
-	}
-
-	@Override
-	public S searchable(Searchable searchable) {
-		builder.modifier( b -> b.searchable( searchable ) );
 		return thisAsS();
 	}
 

@@ -38,6 +38,7 @@ import org.hibernate.search.integrationtest.backend.tck.testsupport.model.single
 import org.hibernate.search.integrationtest.backend.tck.testsupport.model.singlefield.SingleFieldIndexBinding;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.FieldTypeDescriptor;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.NormalizedStringFieldTypeDescriptor;
+import org.hibernate.search.integrationtest.backend.tck.testsupport.types.StandardFieldTypeDescriptor;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.TckConfiguration;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.TestedFieldStructure;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.extension.SearchSetupHelper;
@@ -59,12 +60,12 @@ import org.junit.jupiter.params.provider.MethodSource;
 
 class FieldSortBaseIT<F> {
 
-	private static final Set<FieldTypeDescriptor<?>> supportedFieldTypes = new LinkedHashSet<>();
+	private static final Set<StandardFieldTypeDescriptor<?>> supportedFieldTypes = new LinkedHashSet<>();
 	private static final List<DataSet<?>> dataSets = new ArrayList<>();
 	private static final List<Arguments> parameters = new ArrayList<>();
 
 	static {
-		for ( FieldTypeDescriptor<?> fieldType : FieldTypeDescriptor.getAll() ) {
+		for ( StandardFieldTypeDescriptor<?> fieldType : StandardFieldTypeDescriptor.getAllStandard() ) {
 			if ( fieldType.isFieldSortSupported() ) {
 				supportedFieldTypes.add( fieldType );
 				for ( TestedFieldStructure fieldStructure : TestedFieldStructure.all() ) {
@@ -123,7 +124,7 @@ class FieldSortBaseIT<F> {
 	@MethodSource("params")
 	@TestForIssue(jiraKey = { "HSEARCH-3798", "HSEARCH-2252", "HSEARCH-2254", "HSEARCH-3103" })
 	void simple(TestedFieldStructure fieldStructure,
-			FieldTypeDescriptor<F> fieldType, SortMode sortMode,
+			FieldTypeDescriptor<F, ?> fieldType, SortMode sortMode,
 			DataSet<F> dataSetForAsc, DataSet<F> dataSetForDesc) {
 		assumeTestParametersWork( fieldStructure, fieldType, sortMode );
 
@@ -152,7 +153,7 @@ class FieldSortBaseIT<F> {
 	@MethodSource("params")
 	@TestForIssue(jiraKey = { "HSEARCH-3103" })
 	void medianWithNestedField(TestedFieldStructure fieldStructure,
-			FieldTypeDescriptor<F> fieldType, SortMode sortMode,
+			FieldTypeDescriptor<F, ?> fieldType, SortMode sortMode,
 			DataSet<F> dataSetForAsc, DataSet<F> dataSetForDesc) {
 		assumeTrue(
 				isMedianWithNestedField( sortMode, fieldStructure )
@@ -177,7 +178,7 @@ class FieldSortBaseIT<F> {
 	@MethodSource("params")
 	@TestForIssue(jiraKey = { "HSEARCH-3103" })
 	void sumOrAvgOrMedianWithStringField(TestedFieldStructure fieldStructure,
-			FieldTypeDescriptor<F> fieldType, SortMode sortMode,
+			FieldTypeDescriptor<F, ?> fieldType, SortMode sortMode,
 			DataSet<F> dataSetForAsc, DataSet<F> dataSetForDesc) {
 		assumeTrue(
 				isSumOrAvgOrMedianWithStringField( sortMode, fieldType ),
@@ -201,7 +202,7 @@ class FieldSortBaseIT<F> {
 	@MethodSource("params")
 	@TestForIssue(jiraKey = { "HSEARCH-3103" })
 	void sumWithTemporalField(TestedFieldStructure fieldStructure,
-			FieldTypeDescriptor<F> fieldType, SortMode sortMode,
+			FieldTypeDescriptor<F, ?> fieldType, SortMode sortMode,
 			DataSet<F> dataSetForAsc, DataSet<F> dataSetForDesc) {
 		assumeTrue(
 				isSumWithTemporalField( sortMode, fieldType ),
@@ -225,7 +226,7 @@ class FieldSortBaseIT<F> {
 	@MethodSource("params")
 	@TestForIssue(jiraKey = "HSEARCH-3886")
 	void missingValue_default(TestedFieldStructure fieldStructure,
-			FieldTypeDescriptor<F> fieldType, SortMode sortMode,
+			FieldTypeDescriptor<F, ?> fieldType, SortMode sortMode,
 			DataSet<F> dataSetForAsc, DataSet<F> dataSetForDesc) {
 		assumeTestParametersWork( fieldStructure, fieldType, sortMode );
 
@@ -258,7 +259,7 @@ class FieldSortBaseIT<F> {
 	@ParameterizedTest(name = "{0} - {2} - {1}")
 	@MethodSource("params")
 	void missingValue_explicit(TestedFieldStructure fieldStructure,
-			FieldTypeDescriptor<F> fieldType, SortMode sortMode,
+			FieldTypeDescriptor<F, ?> fieldType, SortMode sortMode,
 			DataSet<F> dataSetForAsc, DataSet<F> dataSetForDesc) {
 		assumeTestParametersWork( fieldStructure, fieldType, sortMode );
 
@@ -366,7 +367,7 @@ class FieldSortBaseIT<F> {
 	@MethodSource("params")
 	@TestForIssue(jiraKey = "HSEARCH-3254")
 	void missingValue_explicit_multipleEmpty(TestedFieldStructure fieldStructure,
-			FieldTypeDescriptor<F> fieldType, SortMode sortMode,
+			FieldTypeDescriptor<F, ?> fieldType, SortMode sortMode,
 			DataSet<F> dataSetForAsc, DataSet<F> dataSetForDesc) {
 		assumeTestParametersWork( fieldStructure, fieldType, sortMode );
 
@@ -430,7 +431,7 @@ class FieldSortBaseIT<F> {
 	@MethodSource("params")
 	@TestForIssue(jiraKey = "HSEARCH-3254")
 	void missingValue_multipleEmpty_useExistingDocumentValue(TestedFieldStructure fieldStructure,
-			FieldTypeDescriptor<F> fieldType, SortMode sortMode,
+			FieldTypeDescriptor<F, ?> fieldType, SortMode sortMode,
 			DataSet<F> dataSetForAsc, DataSet<F> dataSetForDesc) {
 		assumeTestParametersWork( fieldStructure, fieldType, sortMode );
 
@@ -477,7 +478,7 @@ class FieldSortBaseIT<F> {
 	@MethodSource("params")
 	@TestForIssue(jiraKey = "HSEARCH-4162")
 	void factoryWithRoot(TestedFieldStructure fieldStructure,
-			FieldTypeDescriptor<F> fieldType, SortMode sortMode,
+			FieldTypeDescriptor<F, ?> fieldType, SortMode sortMode,
 			DataSet<F> dataSetForAsc, DataSet<F> dataSetForDesc) {
 		assumeTestParametersWork( fieldStructure, fieldType, sortMode );
 
@@ -516,7 +517,7 @@ class FieldSortBaseIT<F> {
 	@MethodSource("params")
 	@TestForIssue(jiraKey = { "HSEARCH-4513" })
 	void concurrentQueriesUsingSameSort(TestedFieldStructure fieldStructure,
-			FieldTypeDescriptor<F> fieldType, SortMode sortMode,
+			FieldTypeDescriptor<F, ?> fieldType, SortMode sortMode,
 			DataSet<F> dataSetForAsc, DataSet<F> dataSetForDesc) {
 		assumeTestParametersWork( fieldStructure, fieldType, sortMode );
 
@@ -550,7 +551,7 @@ class FieldSortBaseIT<F> {
 	@MethodSource("params")
 	@TestForIssue(jiraKey = { "HSEARCH-4513" })
 	void missingValue_multipleOptionsSameTime(TestedFieldStructure fieldStructure,
-			FieldTypeDescriptor<F> fieldType, SortMode sortMode,
+			FieldTypeDescriptor<F, ?> fieldType, SortMode sortMode,
 			DataSet<F> dataSetForAsc, DataSet<F> dataSetForDesc) {
 		assumeTestParametersWork( fieldStructure, fieldType, sortMode );
 
@@ -674,7 +675,7 @@ class FieldSortBaseIT<F> {
 		}
 	}
 
-	private void assumeTestParametersWork(TestedFieldStructure fieldStructure, FieldTypeDescriptor<F> fieldType,
+	private void assumeTestParametersWork(TestedFieldStructure fieldStructure, FieldTypeDescriptor<F, ?> fieldType,
 			SortMode sortMode) {
 		assumeFalse(
 				isMedianWithNestedField( sortMode, fieldStructure )
@@ -684,12 +685,12 @@ class FieldSortBaseIT<F> {
 		);
 	}
 
-	private boolean isSumOrAvgOrMedianWithStringField(SortMode sortMode, FieldTypeDescriptor<F> fieldType) {
+	private boolean isSumOrAvgOrMedianWithStringField(SortMode sortMode, FieldTypeDescriptor<F, ?> fieldType) {
 		return EnumSet.of( SortMode.SUM, SortMode.AVG, SortMode.MEDIAN ).contains( sortMode )
 				&& String.class.equals( fieldType.getJavaType() );
 	}
 
-	private boolean isSumWithTemporalField(SortMode sortMode, FieldTypeDescriptor<F> fieldType) {
+	private boolean isSumWithTemporalField(SortMode sortMode, FieldTypeDescriptor<F, ?> fieldType) {
 		return SortMode.SUM.equals( sortMode )
 				&& ( Temporal.class.isAssignableFrom( fieldType.getJavaType() )
 						|| MonthDay.class.equals( fieldType.getJavaType() ) );
@@ -700,12 +701,12 @@ class FieldSortBaseIT<F> {
 				&& fieldStructure.isInNested();
 	}
 
-	private String getFieldPath(TestedFieldStructure fieldStructure, FieldTypeDescriptor<F> fieldType) {
+	private String getFieldPath(TestedFieldStructure fieldStructure, FieldTypeDescriptor<F, ?> fieldType) {
 		return index.binding().getFieldPath( fieldStructure, fieldType );
 	}
 
 	@SuppressWarnings("unchecked")
-	private F getSingleValueForMissingUse(int ordinal, FieldTypeDescriptor<F> fieldType) {
+	private F getSingleValueForMissingUse(int ordinal, FieldTypeDescriptor<F, ?> fieldType) {
 		F value = fieldType.getAscendingUniqueTermValues().getSingle().get( ordinal );
 
 		if ( fieldType instanceof NormalizedStringFieldTypeDescriptor
@@ -720,7 +721,7 @@ class FieldSortBaseIT<F> {
 
 	private static class DataSet<F> {
 		private final TestedFieldStructure fieldStructure;
-		private final FieldTypeDescriptor<F> fieldType;
+		private final FieldTypeDescriptor<F, ?> fieldType;
 		private final SortMode expectedSortMode;
 		private final String routingKey;
 
@@ -733,7 +734,7 @@ class FieldSortBaseIT<F> {
 		private final String emptyDoc3Id;
 		private final String emptyDoc4Id;
 
-		private DataSet(TestedFieldStructure fieldStructure, FieldTypeDescriptor<F> fieldType, SortMode sortModeOrNull,
+		private DataSet(TestedFieldStructure fieldStructure, FieldTypeDescriptor<F, ?> fieldType, SortMode sortModeOrNull,
 				SortMode expectedSortMode) {
 			this.fieldStructure = fieldStructure;
 			this.fieldType = fieldType;

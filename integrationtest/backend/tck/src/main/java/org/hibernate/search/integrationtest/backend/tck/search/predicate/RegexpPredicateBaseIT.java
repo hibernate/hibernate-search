@@ -9,6 +9,7 @@ package org.hibernate.search.integrationtest.backend.tck.search.predicate;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.hibernate.search.engine.backend.types.dsl.SearchableProjectableIndexFieldTypeOptionsStep;
 import org.hibernate.search.engine.search.predicate.dsl.PredicateFinalStep;
 import org.hibernate.search.engine.search.predicate.dsl.SearchPredicateFactory;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.FieldTypeDescriptor;
@@ -26,13 +27,17 @@ import org.junit.jupiter.params.provider.Arguments;
 class RegexpPredicateBaseIT {
 	//CHECKSTYLE:ON
 
-	private static final List<FieldTypeDescriptor<String>> supportedFieldTypes = new ArrayList<>();
-	private static final List<FieldTypeDescriptor<?>> unsupportedFieldTypes = new ArrayList<>();
+	private static final List<
+			FieldTypeDescriptor<String, ? extends SearchableProjectableIndexFieldTypeOptionsStep<?, ?>>> supportedFieldTypes =
+					new ArrayList<>();
+	private static final List<
+			FieldTypeDescriptor<?, ? extends SearchableProjectableIndexFieldTypeOptionsStep<?, ?>>> unsupportedFieldTypes =
+					new ArrayList<>();
 	static {
-		for ( FieldTypeDescriptor<?> fieldType : FieldTypeDescriptor.getAll() ) {
+		for ( FieldTypeDescriptor<?, ?> fieldType : FieldTypeDescriptor.getAll() ) {
 			if ( String.class.equals( fieldType.getJavaType() ) ) {
 				@SuppressWarnings("unchecked")
-				FieldTypeDescriptor<String> casted = (FieldTypeDescriptor<String>) fieldType;
+				FieldTypeDescriptor<String, ?> casted = (FieldTypeDescriptor<String, ?>) fieldType;
 				supportedFieldTypes.add( casted );
 			}
 			else {
@@ -95,7 +100,7 @@ class RegexpPredicateBaseIT {
 		);
 	}
 
-	private static RegexpPredicateTestValues testValues(FieldTypeDescriptor<String> fieldType) {
+	private static RegexpPredicateTestValues testValues(FieldTypeDescriptor<String, ?> fieldType) {
 		return new RegexpPredicateTestValues( fieldType );
 	}
 
@@ -112,7 +117,7 @@ class RegexpPredicateBaseIT {
 		private static final List<DataSet<String, RegexpPredicateTestValues>> dataSets = new ArrayList<>();
 		private static final List<Arguments> parameters = new ArrayList<>();
 		static {
-			for ( FieldTypeDescriptor<String> fieldType : supportedFieldTypes ) {
+			for ( FieldTypeDescriptor<String, ?> fieldType : supportedFieldTypes ) {
 				DataSet<String, RegexpPredicateTestValues> dataSet = new DataSet<>( testValues( fieldType ) );
 				dataSets.add( dataSet );
 				parameters.add( Arguments.of( index, dataSet ) );
@@ -143,7 +148,7 @@ class RegexpPredicateBaseIT {
 		private static final List<DataSet<String, RegexpPredicateTestValues>> dataSets = new ArrayList<>();
 		private static final List<Arguments> parameters = new ArrayList<>();
 		static {
-			for ( FieldTypeDescriptor<String> fieldType : supportedFieldTypes ) {
+			for ( FieldTypeDescriptor<String, ?> fieldType : supportedFieldTypes ) {
 				DataSet<String, RegexpPredicateTestValues> dataSet = new DataSet<>( testValues( fieldType ) );
 				dataSets.add( dataSet );
 				parameters.add( Arguments.of( index, dataSet ) );
@@ -192,7 +197,7 @@ class RegexpPredicateBaseIT {
 		private static final List<DataSet<?, ?>> dataSets = new ArrayList<>();
 		private static final List<Arguments> parameters = new ArrayList<>();
 		static {
-			for ( FieldTypeDescriptor<String> fieldType : supportedFieldTypes ) {
+			for ( FieldTypeDescriptor<String, ?> fieldType : supportedFieldTypes ) {
 				DataSet<?, ?> dataSet = new DataSet<>( testValues( fieldType ) );
 				dataSets.add( dataSet );
 				parameters.add( Arguments.of( mainIndex, missingFieldIndex, dataSet ) );
@@ -223,7 +228,7 @@ class RegexpPredicateBaseIT {
 		private static final List<DataSet<String, RegexpPredicateTestValues>> dataSets = new ArrayList<>();
 		private static final List<Arguments> parameters = new ArrayList<>();
 		static {
-			for ( FieldTypeDescriptor<String> fieldType : supportedFieldTypes ) {
+			for ( FieldTypeDescriptor<String, ?> fieldType : supportedFieldTypes ) {
 				DataSet<String, RegexpPredicateTestValues> dataSet = new DataSet<>( testValues( fieldType ) );
 				dataSets.add( dataSet );
 				parameters.add( Arguments.of( index, dataSet ) );
@@ -321,7 +326,7 @@ class RegexpPredicateBaseIT {
 
 		private static final List<Arguments> parameters = new ArrayList<>();
 		static {
-			for ( FieldTypeDescriptor<?> fieldType : unsupportedFieldTypes ) {
+			for ( FieldTypeDescriptor<?, ?> fieldType : unsupportedFieldTypes ) {
 				parameters.add( Arguments.of( index, fieldType ) );
 			}
 		}
@@ -357,7 +362,7 @@ class RegexpPredicateBaseIT {
 
 		private static final List<Arguments> parameters = new ArrayList<>();
 		static {
-			for ( FieldTypeDescriptor<?> fieldType : supportedFieldTypes ) {
+			for ( FieldTypeDescriptor<?, ?> fieldType : supportedFieldTypes ) {
 				parameters.add( Arguments.of( searchableYesIndex, searchableNoIndex, fieldType ) );
 			}
 		}
@@ -367,7 +372,7 @@ class RegexpPredicateBaseIT {
 		}
 
 		@Override
-		protected void tryPredicate(SearchPredicateFactory f, String fieldPath) {
+		protected void tryPredicate(SearchPredicateFactory f, String fieldPath, FieldTypeDescriptor<?, ?> fieldType) {
 			f.regexp().field( fieldPath );
 		}
 
@@ -389,7 +394,7 @@ class RegexpPredicateBaseIT {
 
 		private static final List<Arguments> parameters = new ArrayList<>();
 		static {
-			for ( FieldTypeDescriptor<?> fieldType : supportedFieldTypes ) {
+			for ( FieldTypeDescriptor<?, ?> fieldType : supportedFieldTypes ) {
 				parameters.add( Arguments.of( index, fieldType ) );
 			}
 		}
@@ -430,7 +435,7 @@ class RegexpPredicateBaseIT {
 		private static final List<DataSet<String, RegexpPredicateTestValues>> dataSets = new ArrayList<>();
 		private static final List<Arguments> parameters = new ArrayList<>();
 		static {
-			for ( FieldTypeDescriptor<String> fieldType : supportedFieldTypes ) {
+			for ( FieldTypeDescriptor<String, ?> fieldType : supportedFieldTypes ) {
 				DataSet<String, RegexpPredicateTestValues> dataSet = new DataSet<>( testValues( fieldType ) );
 				dataSets.add( dataSet );
 				parameters.add( Arguments.of( index, compatibleIndex, rawFieldCompatibleIndex, missingFieldIndex,

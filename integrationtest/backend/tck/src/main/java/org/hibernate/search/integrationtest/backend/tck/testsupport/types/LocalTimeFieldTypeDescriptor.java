@@ -16,7 +16,7 @@ import org.hibernate.search.integrationtest.backend.tck.testsupport.types.expect
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.values.AscendingUniqueTermValues;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.values.IndexableValues;
 
-public class LocalTimeFieldTypeDescriptor extends FieldTypeDescriptor<LocalTime> {
+public class LocalTimeFieldTypeDescriptor extends StandardFieldTypeDescriptor<LocalTime> {
 
 	public static final LocalTimeFieldTypeDescriptor INSTANCE = new LocalTimeFieldTypeDescriptor();
 

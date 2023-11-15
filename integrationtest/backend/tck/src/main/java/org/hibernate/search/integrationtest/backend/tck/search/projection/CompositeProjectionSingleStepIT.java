@@ -21,7 +21,7 @@ import org.hibernate.search.engine.backend.types.Projectable;
 import org.hibernate.search.engine.backend.types.dsl.IndexFieldTypeFactory;
 import org.hibernate.search.engine.backend.types.dsl.StandardIndexFieldTypeOptionsStep;
 import org.hibernate.search.engine.search.query.SearchQuery;
-import org.hibernate.search.integrationtest.backend.tck.testsupport.util.StandardFieldMapper;
+import org.hibernate.search.integrationtest.backend.tck.testsupport.util.SimpleFieldMapper;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.extension.SearchSetupHelper;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.SimpleMappedIndex;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappingScope;
@@ -385,7 +385,7 @@ class CompositeProjectionSingleStepIT {
 	}
 
 	private static class FieldModel<F> {
-		static <F> StandardFieldMapper<F, FieldModel<F>> mapper(Class<F> type,
+		static <F> SimpleFieldMapper<F, ?, FieldModel<F>> mapper(Class<F> type,
 				F document1Value, F document2Value, F document3Value) {
 			return mapper(
 					c -> (StandardIndexFieldTypeOptionsStep<?, F>) c.as( type ),
@@ -393,10 +393,10 @@ class CompositeProjectionSingleStepIT {
 			);
 		}
 
-		static <F> StandardFieldMapper<F, FieldModel<F>> mapper(
+		static <F> SimpleFieldMapper<F, ?, FieldModel<F>> mapper(
 				Function<IndexFieldTypeFactory, StandardIndexFieldTypeOptionsStep<?, F>> configuration,
 				F document1Value, F document2Value, F document3Value) {
-			return StandardFieldMapper.of(
+			return SimpleFieldMapper.of(
 					configuration,
 					c -> c.projectable( Projectable.YES ),
 					(reference, name) -> new FieldModel<>( reference, name, document1Value, document2Value, document3Value )

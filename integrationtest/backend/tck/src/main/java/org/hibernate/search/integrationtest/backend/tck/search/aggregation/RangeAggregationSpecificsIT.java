@@ -32,6 +32,7 @@ import org.hibernate.search.engine.search.query.dsl.SearchQueryOptionsStep;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.operations.AggregationDescriptor;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.operations.RangeAggregationDescriptor;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.FieldTypeDescriptor;
+import org.hibernate.search.integrationtest.backend.tck.testsupport.types.StandardFieldTypeDescriptor;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.SimpleFieldModelsByType;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.TckConfiguration;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.ValueWrapper;
@@ -59,13 +60,13 @@ class RangeAggregationSpecificsIT<F> {
 
 	private static final String AGGREGATION_NAME = "aggregationName";
 
-	private static final Set<FieldTypeDescriptor<?>> supportedFieldTypes = new LinkedHashSet<>();
+	private static final Set<StandardFieldTypeDescriptor<?>> supportedFieldTypes = new LinkedHashSet<>();
 	private static final List<DataSet<?>> dataSets = new ArrayList<>();
 	private static final List<Arguments> parameters = new ArrayList<>();
 
 	static {
 		AggregationDescriptor aggregationDescriptor = RangeAggregationDescriptor.INSTANCE;
-		for ( FieldTypeDescriptor<?> fieldType : FieldTypeDescriptor.getAll() ) {
+		for ( StandardFieldTypeDescriptor<?> fieldType : FieldTypeDescriptor.getAllStandard() ) {
 			if ( aggregationDescriptor.getSingleFieldAggregationExpectations( fieldType ).isSupported() ) {
 				supportedFieldTypes.add( fieldType );
 				DataSet<?> dataSet = new DataSet<>( fieldType );
@@ -96,7 +97,7 @@ class RangeAggregationSpecificsIT<F> {
 	@ParameterizedTest(name = "{0}")
 	@MethodSource("params")
 	@PortedFromSearch5(original = "org.hibernate.search.test.query.facet.RangeFacetingTest.testRangeBelow")
-	void rangeAtMost(FieldTypeDescriptor<F> fieldType, DataSet<F> dataSet) {
+	void rangeAtMost(FieldTypeDescriptor<F, ?> fieldType, DataSet<F> dataSet) {
 		assumeNonCanonicalRangesSupported();
 
 		String fieldPath = index.binding().fieldModels.get( fieldType ).relativeFieldName;
@@ -122,7 +123,7 @@ class RangeAggregationSpecificsIT<F> {
 	@ParameterizedTest(name = "{0}")
 	@MethodSource("params")
 	@PortedFromSearch5(original = "org.hibernate.search.test.query.facet.RangeFacetingTest.testRangeBelowExcludeLimit")
-	void rangeLessThan(FieldTypeDescriptor<F> fieldType, DataSet<F> dataSet) {
+	void rangeLessThan(FieldTypeDescriptor<F, ?> fieldType, DataSet<F> dataSet) {
 		String fieldPath = index.binding().fieldModels.get( fieldType ).relativeFieldName;
 
 		AggregationKey<Map<Range<F>, Long>> aggregationKey = AggregationKey.of( AGGREGATION_NAME );
@@ -146,7 +147,7 @@ class RangeAggregationSpecificsIT<F> {
 	@ParameterizedTest(name = "{0}")
 	@MethodSource("params")
 	@PortedFromSearch5(original = "org.hibernate.search.test.query.facet.RangeFacetingTest.testRangeAbove")
-	void rangeAtLeast(FieldTypeDescriptor<F> fieldType, DataSet<F> dataSet) {
+	void rangeAtLeast(FieldTypeDescriptor<F, ?> fieldType, DataSet<F> dataSet) {
 		String fieldPath = index.binding().fieldModels.get( fieldType ).relativeFieldName;
 
 		AggregationKey<Map<Range<F>, Long>> aggregationKey = AggregationKey.of( AGGREGATION_NAME );
@@ -170,7 +171,7 @@ class RangeAggregationSpecificsIT<F> {
 	@ParameterizedTest(name = "{0}")
 	@MethodSource("params")
 	@PortedFromSearch5(original = "org.hibernate.search.test.query.facet.RangeFacetingTest.testRangeAboveExcludeLimit")
-	void rangeGreaterThan(FieldTypeDescriptor<F> fieldType, DataSet<F> dataSet) {
+	void rangeGreaterThan(FieldTypeDescriptor<F, ?> fieldType, DataSet<F> dataSet) {
 		assumeNonCanonicalRangesSupported();
 
 		String fieldPath = index.binding().fieldModels.get( fieldType ).relativeFieldName;
@@ -197,7 +198,7 @@ class RangeAggregationSpecificsIT<F> {
 	@MethodSource("params")
 	@PortedFromSearch5(
 			original = "org.hibernate.search.test.query.facet.RangeFacetingTest.testRangeWithExcludeLimitsAtEachLevel")
-	void rangesCanonical(FieldTypeDescriptor<F> fieldType, DataSet<F> dataSet) {
+	void rangesCanonical(FieldTypeDescriptor<F, ?> fieldType, DataSet<F> dataSet) {
 		String fieldPath = index.binding().fieldModels.get( fieldType ).relativeFieldName;
 
 		AggregationKey<Map<Range<F>, Long>> aggregationKey = AggregationKey.of( AGGREGATION_NAME );
@@ -228,7 +229,7 @@ class RangeAggregationSpecificsIT<F> {
 	@ParameterizedTest(name = "{0}")
 	@MethodSource("params")
 	@PortedFromSearch5(original = "org.hibernate.search.test.query.facet.RangeFacetingTest.testRangeBelowMiddleAbove")
-	void rangesBetweenIncludingAllBounds(FieldTypeDescriptor<F> fieldType, DataSet<F> dataSet) {
+	void rangesBetweenIncludingAllBounds(FieldTypeDescriptor<F, ?> fieldType, DataSet<F> dataSet) {
 		assumeNonCanonicalRangesSupported();
 
 		String fieldPath = index.binding().fieldModels.get( fieldType ).relativeFieldName;
@@ -276,7 +277,7 @@ class RangeAggregationSpecificsIT<F> {
 
 	@ParameterizedTest(name = "{0}")
 	@MethodSource("params")
-	void rangesOverlap(FieldTypeDescriptor<F> fieldType, DataSet<F> dataSet) {
+	void rangesOverlap(FieldTypeDescriptor<F, ?> fieldType, DataSet<F> dataSet) {
 		String fieldPath = index.binding().fieldModels.get( fieldType ).relativeFieldName;
 
 		AggregationKey<Map<Range<F>, Long>> aggregationKey = AggregationKey.of( AGGREGATION_NAME );
@@ -307,7 +308,7 @@ class RangeAggregationSpecificsIT<F> {
 	@ParameterizedTest(name = "{0}")
 	@MethodSource("params")
 	@PortedFromSearch5(original = "org.hibernate.search.test.query.facet.RangeFacetingTest.testRangeQueryWithNullToAndFrom")
-	void rangeNull(FieldTypeDescriptor<F> fieldType, DataSet<F> dataSet) {
+	void rangeNull(FieldTypeDescriptor<F, ?> fieldType, DataSet<F> dataSet) {
 		String fieldPath = index.binding().fieldModels.get( fieldType ).relativeFieldName;
 
 		assertThatThrownBy( () -> index.createScope().aggregation().range()
@@ -321,7 +322,7 @@ class RangeAggregationSpecificsIT<F> {
 
 	@ParameterizedTest(name = "{0}")
 	@MethodSource("params")
-	void rangesNull(FieldTypeDescriptor<F> fieldType, DataSet<F> dataSet) {
+	void rangesNull(FieldTypeDescriptor<F, ?> fieldType, DataSet<F> dataSet) {
 		String fieldPath = index.binding().fieldModels.get( fieldType ).relativeFieldName;
 
 		assertThatThrownBy( () -> index.createScope().aggregation().range()
@@ -335,7 +336,7 @@ class RangeAggregationSpecificsIT<F> {
 
 	@ParameterizedTest(name = "{0}")
 	@MethodSource("params")
-	void rangesContainingNull(FieldTypeDescriptor<F> fieldType, DataSet<F> dataSet) {
+	void rangesContainingNull(FieldTypeDescriptor<F, ?> fieldType, DataSet<F> dataSet) {
 		String fieldPath = index.binding().fieldModels.get( fieldType ).relativeFieldName;
 
 		assertThatThrownBy( () -> index.createScope().aggregation().range()
@@ -354,7 +355,7 @@ class RangeAggregationSpecificsIT<F> {
 	@MethodSource("params")
 	@PortedFromSearch5(
 			original = "org.hibernate.search.test.query.facet.RangeFacetingTest.testUnsupportedRangeParameterTypeThrowsException")
-	void fieldTypeSuperClass(FieldTypeDescriptor<F> fieldType, DataSet<F> dataSet) {
+	void fieldTypeSuperClass(FieldTypeDescriptor<F, ?> fieldType, DataSet<F> dataSet) {
 		String fieldPath = index.binding().fieldModels.get( fieldType ).relativeFieldName;
 
 		Class<? super F> fieldTypeSuperClass = fieldType.getJavaType().getSuperclass();
@@ -376,7 +377,7 @@ class RangeAggregationSpecificsIT<F> {
 	@MethodSource("params")
 	@PortedFromSearch5(
 			original = "org.hibernate.search.test.query.facet.RangeFacetingTest.testRangeQueryForDoubleWithZeroCount")
-	void predicate(FieldTypeDescriptor<F> fieldType, DataSet<F> dataSet) {
+	void predicate(FieldTypeDescriptor<F, ?> fieldType, DataSet<F> dataSet) {
 		String fieldPath = index.binding().fieldModels.get( fieldType ).relativeFieldName;
 
 		AggregationKey<Map<Range<F>, Long>> aggregationKey = AggregationKey.of( AGGREGATION_NAME );
@@ -411,7 +412,7 @@ class RangeAggregationSpecificsIT<F> {
 	 */
 	@ParameterizedTest(name = "{0}")
 	@MethodSource("params")
-	void limitAndOffset(FieldTypeDescriptor<F> fieldType, DataSet<F> dataSet) {
+	void limitAndOffset(FieldTypeDescriptor<F, ?> fieldType, DataSet<F> dataSet) {
 		String fieldPath = index.binding().fieldModels.get( fieldType ).relativeFieldName;
 
 		AggregationKey<Map<Range<F>, Long>> aggregationKey = AggregationKey.of( AGGREGATION_NAME );
@@ -442,7 +443,7 @@ class RangeAggregationSpecificsIT<F> {
 	 */
 	@ParameterizedTest(name = "{0}")
 	@MethodSource("params")
-	void rangeOverlap(FieldTypeDescriptor<F> fieldType, DataSet<F> dataSet) {
+	void rangeOverlap(FieldTypeDescriptor<F, ?> fieldType, DataSet<F> dataSet) {
 		String fieldPath = index.binding().fieldModels.get( fieldType ).relativeFieldName;
 
 		AggregationKey<Map<Range<F>, Long>> aggregationKey = AggregationKey.of( AGGREGATION_NAME );
@@ -482,7 +483,7 @@ class RangeAggregationSpecificsIT<F> {
 	 */
 	@ParameterizedTest(name = "{0}")
 	@MethodSource("params")
-	void order_asDefined(FieldTypeDescriptor<F> fieldType, DataSet<F> dataSet) {
+	void order_asDefined(FieldTypeDescriptor<F, ?> fieldType, DataSet<F> dataSet) {
 		String fieldPath = index.binding().fieldModels.get( fieldType ).relativeFieldName;
 
 		AggregationKey<Map<Range<F>, Long>> aggregationKey = AggregationKey.of( AGGREGATION_NAME );
@@ -528,12 +529,12 @@ class RangeAggregationSpecificsIT<F> {
 	}
 
 	private static class DataSet<F> {
-		final FieldTypeDescriptor<F> fieldType;
+		final FieldTypeDescriptor<F, ?> fieldType;
 		final String name;
 		final List<F> ascendingValues;
 		final List<F> documentFieldValues;
 
-		private DataSet(FieldTypeDescriptor<F> fieldType) {
+		private DataSet(FieldTypeDescriptor<F, ?> fieldType) {
 			this.fieldType = fieldType;
 			this.name = fieldType.getUniqueName();
 			this.ascendingValues = fieldType.getAscendingUniqueTermValues().getSingle();

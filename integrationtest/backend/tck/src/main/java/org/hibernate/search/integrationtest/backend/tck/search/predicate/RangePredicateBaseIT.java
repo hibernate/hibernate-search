@@ -16,6 +16,7 @@ import org.hibernate.search.engine.search.predicate.dsl.PredicateFinalStep;
 import org.hibernate.search.engine.search.predicate.dsl.SearchPredicateFactory;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.FieldTypeDescriptor;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.GeoPointFieldTypeDescriptor;
+import org.hibernate.search.integrationtest.backend.tck.testsupport.types.StandardFieldTypeDescriptor;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.InvalidType;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.ValueWrapper;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.extension.SearchSetupHelper;
@@ -36,10 +37,10 @@ import org.junit.jupiter.params.provider.MethodSource;
 class RangePredicateBaseIT {
 	//CHECKSTYLE:ON
 
-	static final List<FieldTypeDescriptor<?>> supportedFieldTypes = new ArrayList<>();
-	static final List<FieldTypeDescriptor<?>> unsupportedFieldTypes = new ArrayList<>();
+	static final List<StandardFieldTypeDescriptor<?>> supportedFieldTypes = new ArrayList<>();
+	static final List<FieldTypeDescriptor<?, ?>> unsupportedFieldTypes = new ArrayList<>();
 	static {
-		for ( FieldTypeDescriptor<?> fieldType : FieldTypeDescriptor.getAll() ) {
+		for ( StandardFieldTypeDescriptor<?> fieldType : FieldTypeDescriptor.getAllStandard() ) {
 			if ( GeoPointFieldTypeDescriptor.INSTANCE.equals( fieldType ) ) {
 				unsupportedFieldTypes.add( fieldType );
 			}
@@ -47,6 +48,7 @@ class RangePredicateBaseIT {
 				supportedFieldTypes.add( fieldType );
 			}
 		}
+		unsupportedFieldTypes.addAll( FieldTypeDescriptor.getAllNonStandard() );
 	}
 
 	@RegisterExtension
@@ -120,7 +122,7 @@ class RangePredicateBaseIT {
 		);
 	}
 
-	private static <F> RangePredicateTestValues<F> testValues(FieldTypeDescriptor<F> fieldType) {
+	private static <F> RangePredicateTestValues<F> testValues(FieldTypeDescriptor<F, ?> fieldType) {
 		return new RangePredicateTestValues<>( fieldType );
 	}
 
@@ -137,7 +139,7 @@ class RangePredicateBaseIT {
 		private static final List<DataSet<?, ?>> dataSets = new ArrayList<>();
 		private static final List<Arguments> parameters = new ArrayList<>();
 		static {
-			for ( FieldTypeDescriptor<?> fieldType : supportedFieldTypes ) {
+			for ( FieldTypeDescriptor<?, ?> fieldType : supportedFieldTypes ) {
 				DataSet<?, ?> dataSet = new DataSet<>( testValues( fieldType ) );
 				dataSets.add( dataSet );
 				parameters.add( Arguments.of( index, dataSet ) );
@@ -168,7 +170,7 @@ class RangePredicateBaseIT {
 		private static final List<DataSet<?, ?>> dataSets = new ArrayList<>();
 		private static final List<Arguments> parameters = new ArrayList<>();
 		static {
-			for ( FieldTypeDescriptor<?> fieldType : supportedFieldTypes ) {
+			for ( FieldTypeDescriptor<?, ?> fieldType : supportedFieldTypes ) {
 				DataSet<?, ?> dataSet = new DataSet<>( testValues( fieldType ) );
 				dataSets.add( dataSet );
 				parameters.add( Arguments.of( index, dataSet ) );
@@ -218,7 +220,7 @@ class RangePredicateBaseIT {
 		private static final List<DataSet<?, ?>> dataSets = new ArrayList<>();
 		private static final List<Arguments> parameters = new ArrayList<>();
 		static {
-			for ( FieldTypeDescriptor<?> fieldType : supportedFieldTypes ) {
+			for ( FieldTypeDescriptor<?, ?> fieldType : supportedFieldTypes ) {
 				DataSet<?, ?> dataSet = new DataSet<>( testValues( fieldType ) );
 				dataSets.add( dataSet );
 				parameters.add( Arguments.of( mainIndex, missingFieldIndex, dataSet ) );
@@ -274,7 +276,7 @@ class RangePredicateBaseIT {
 		private static final List<DataSet<?, ?>> dataSets = new ArrayList<>();
 		private static final List<Arguments> parameters = new ArrayList<>();
 		static {
-			for ( FieldTypeDescriptor<?> fieldType : supportedFieldTypes ) {
+			for ( FieldTypeDescriptor<?, ?> fieldType : supportedFieldTypes ) {
 				DataSet<?, ?> dataSet = new DataSet<>( testValues( fieldType ) );
 				dataSets.add( dataSet );
 				parameters.add( Arguments.of( index, dataSet ) );
@@ -371,7 +373,7 @@ class RangePredicateBaseIT {
 
 		private static final List<Arguments> parameters = new ArrayList<>();
 		static {
-			for ( FieldTypeDescriptor<?> fieldType : unsupportedFieldTypes ) {
+			for ( FieldTypeDescriptor<?, ?> fieldType : unsupportedFieldTypes ) {
 				parameters.add( Arguments.of( index, fieldType ) );
 			}
 		}
@@ -407,7 +409,7 @@ class RangePredicateBaseIT {
 
 		private static final List<Arguments> parameters = new ArrayList<>();
 		static {
-			for ( FieldTypeDescriptor<?> fieldType : supportedFieldTypes ) {
+			for ( FieldTypeDescriptor<?, ?> fieldType : supportedFieldTypes ) {
 				parameters.add( Arguments.of( searchableYesIndex, searchableNoIndex, fieldType ) );
 			}
 		}
@@ -417,7 +419,7 @@ class RangePredicateBaseIT {
 		}
 
 		@Override
-		protected void tryPredicate(SearchPredicateFactory f, String fieldPath) {
+		protected void tryPredicate(SearchPredicateFactory f, String fieldPath, FieldTypeDescriptor<?, ?> fieldType) {
 			f.range().field( fieldPath );
 		}
 
@@ -439,7 +441,7 @@ class RangePredicateBaseIT {
 
 		private static final List<Arguments> parameters = new ArrayList<>();
 		static {
-			for ( FieldTypeDescriptor<?> fieldType : supportedFieldTypes ) {
+			for ( FieldTypeDescriptor<?, ?> fieldType : supportedFieldTypes ) {
 				parameters.add( Arguments.of( index, fieldType ) );
 			}
 		}
@@ -450,7 +452,7 @@ class RangePredicateBaseIT {
 
 		@ParameterizedTest(name = "{1}")
 		@MethodSource("params")
-		void nullBounds(SimpleMappedIndex<IndexBinding> index, FieldTypeDescriptor<?> fieldType) {
+		void nullBounds(SimpleMappedIndex<IndexBinding> index, FieldTypeDescriptor<?, ?> fieldType) {
 			SearchPredicateFactory f = index.createScope().predicate();
 
 			assertThatThrownBy( () -> f.range().field( fieldPath( index, fieldType ) )
@@ -495,7 +497,7 @@ class RangePredicateBaseIT {
 		private static final List<DataSet<?, ?>> dataSets = new ArrayList<>();
 		private static final List<Arguments> parameters = new ArrayList<>();
 		static {
-			for ( FieldTypeDescriptor<?> fieldType : supportedFieldTypes ) {
+			for ( FieldTypeDescriptor<?, ?> fieldType : supportedFieldTypes ) {
 				DataSet<?, ?> dataSet = new DataSet<>( testValues( fieldType ) );
 				dataSets.add( dataSet );
 				parameters.add( Arguments.of( index, compatibleIndex, rawFieldCompatibleIndex, missingFieldIndex,

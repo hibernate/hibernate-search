@@ -21,7 +21,7 @@ import org.hibernate.search.integrationtest.backend.tck.testsupport.types.expect
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.values.AscendingUniqueTermValues;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.values.IndexableValues;
 
-public class InstantFieldTypeDescriptor extends FieldTypeDescriptor<Instant> {
+public class InstantFieldTypeDescriptor extends StandardFieldTypeDescriptor<Instant> {
 
 	public static final InstantFieldTypeDescriptor INSTANCE = new InstantFieldTypeDescriptor();
 

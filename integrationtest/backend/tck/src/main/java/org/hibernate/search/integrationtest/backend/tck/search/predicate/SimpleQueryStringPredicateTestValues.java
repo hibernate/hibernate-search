@@ -13,7 +13,7 @@ import org.hibernate.search.integrationtest.backend.tck.testsupport.types.FieldT
 public final class SimpleQueryStringPredicateTestValues extends AbstractPredicateTestValues<String> {
 	private final List<String> values;
 
-	public SimpleQueryStringPredicateTestValues(FieldTypeDescriptor<String> fieldType) {
+	public SimpleQueryStringPredicateTestValues(FieldTypeDescriptor<String, ?> fieldType) {
 		super( fieldType );
 		this.values = fieldType.getUniquelyMatchableValues();
 	}

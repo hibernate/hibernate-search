@@ -21,7 +21,7 @@ import org.hibernate.search.engine.spatial.GeoPoint;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.configuration.DefaultAnalysisDefinitions;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.FieldTypeDescriptor;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.expectations.IndexNullAsMatchPredicateExpectactions;
-import org.hibernate.search.integrationtest.backend.tck.testsupport.util.StandardFieldMapper;
+import org.hibernate.search.integrationtest.backend.tck.testsupport.util.SimpleFieldMapper;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.extension.SearchSetupHelper;
 import org.hibernate.search.util.common.SearchException;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.SimpleMappedIndex;
@@ -137,7 +137,7 @@ class IndexNullAsValueIT {
 		final IndexFieldReference<GeoPoint> geoPointField;
 
 		IndexBinding(IndexSchemaElement root) {
-			matchFieldModels = FieldTypeDescriptor.getAll().stream()
+			matchFieldModels = FieldTypeDescriptor.getAllStandard().stream()
 					.filter( typeDescriptor -> typeDescriptor.getIndexNullAsMatchPredicateExpectations().isPresent() )
 					.map( typeDescriptor -> ByTypeFieldModel.mapper( root, typeDescriptor ) )
 					.collect( Collectors.toList() );
@@ -150,12 +150,12 @@ class IndexNullAsValueIT {
 	}
 
 	private static class ByTypeFieldModel<F> {
-		static <F> ByTypeFieldModel<F> mapper(IndexSchemaElement root, FieldTypeDescriptor<F> typeDescriptor) {
+		static <F> ByTypeFieldModel<F> mapper(IndexSchemaElement root, FieldTypeDescriptor<F, ?> typeDescriptor) {
 			IndexNullAsMatchPredicateExpectactions<F> expectations =
 					typeDescriptor.getIndexNullAsMatchPredicateExpectations().get();
 			F indexNullAsValue = expectations.getIndexNullAsValue();
 
-			return StandardFieldMapper.of(
+			return SimpleFieldMapper.of(
 					typeDescriptor::configure,
 					(reference, name) -> new ByTypeFieldModel<>( reference, name, expectations )
 			).map( root, "field_" + typeDescriptor.getUniqueName(), c -> c.indexNullAs( indexNullAsValue ) );

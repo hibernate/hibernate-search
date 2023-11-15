@@ -34,6 +34,7 @@ import org.hibernate.search.integrationtest.backend.tck.testsupport.operations.A
 import org.hibernate.search.integrationtest.backend.tck.testsupport.operations.expectations.AggregationScenario;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.operations.expectations.SupportedSingleFieldAggregationExpectations;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.FieldTypeDescriptor;
+import org.hibernate.search.integrationtest.backend.tck.testsupport.types.StandardFieldTypeDescriptor;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.TestedFieldStructure;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.extension.SearchSetupHelper;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.BulkIndexer;
@@ -57,13 +58,13 @@ class SingleFieldAggregationBaseIT<F> {
 
 	private static final String AGGREGATION_NAME = "aggregationName";
 
-	private static final Set<FieldTypeDescriptor<?>> supportedFieldTypes = new LinkedHashSet<>();
+	private static final Set<StandardFieldTypeDescriptor<?>> supportedFieldTypes = new LinkedHashSet<>();
 	private static final List<DataSet<?>> dataSets = new ArrayList<>();
 	private static final List<Arguments> parameters = new ArrayList<>();
 
 	static {
 		for ( AggregationDescriptor aggregationDescriptor : AggregationDescriptor.getAll() ) {
-			for ( FieldTypeDescriptor<?> fieldTypeDescriptor : FieldTypeDescriptor.getAll() ) {
+			for ( StandardFieldTypeDescriptor<?> fieldTypeDescriptor : FieldTypeDescriptor.getAllStandard() ) {
 				Optional<? extends SupportedSingleFieldAggregationExpectations<?>> expectations =
 						aggregationDescriptor.getSingleFieldAggregationExpectations( fieldTypeDescriptor ).getSupported();
 				if ( expectations.isPresent() ) {
@@ -154,7 +155,7 @@ class SingleFieldAggregationBaseIT<F> {
 	}
 
 	private <A> void doTest_aggregationObject(AggregationScenario<A> scenario, DataSet<F> dataSet,
-			TestedFieldStructure fieldStructure, FieldTypeDescriptor<?> fieldType) {
+			TestedFieldStructure fieldStructure, FieldTypeDescriptor<?, ?> fieldType) {
 		StubMappingScope scope = mainIndex.createScope();
 		String fieldPath = getFieldPath( mainIndex.binding(), fieldStructure, fieldType );
 		AggregationKey<A> aggregationKey = AggregationKey.of( AGGREGATION_NAME );
@@ -300,7 +301,7 @@ class SingleFieldAggregationBaseIT<F> {
 	}
 
 	private String getFieldPath(SingleFieldIndexBinding indexBinding, TestedFieldStructure fieldStructure,
-			FieldTypeDescriptor<?> fieldType) {
+			FieldTypeDescriptor<?, ?> fieldType) {
 		return indexBinding.getFieldPath( fieldStructure, fieldType );
 	}
 
@@ -323,7 +324,7 @@ class SingleFieldAggregationBaseIT<F> {
 
 	private static class DataSet<F> {
 		final SupportedSingleFieldAggregationExpectations<F> expectations;
-		final FieldTypeDescriptor<F> fieldType;
+		final FieldTypeDescriptor<F, ?> fieldType;
 		final String routingKey;
 		private final TestedFieldStructure fieldStructure;
 

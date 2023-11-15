@@ -16,6 +16,7 @@ import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaElement
 import org.hibernate.search.engine.backend.types.Aggregable;
 import org.hibernate.search.engine.backend.types.Projectable;
 import org.hibernate.search.engine.backend.types.Sortable;
+import org.hibernate.search.engine.backend.types.dsl.SearchableProjectableIndexFieldTypeOptionsStep;
 import org.hibernate.search.engine.backend.types.dsl.StandardIndexFieldTypeOptionsStep;
 import org.hibernate.search.engine.reporting.spi.EventContexts;
 import org.hibernate.search.engine.search.common.ValueConvert;
@@ -516,7 +517,8 @@ public abstract class AbstractPredicateTypeCheckingAndConversionIT<V extends Abs
 		private final SimpleFieldModelsByType customDslConverterField0;
 		private final SimpleFieldModelsByType customDslConverterField1;
 
-		public IndexBinding(IndexSchemaElement root, Collection<? extends FieldTypeDescriptor<?>> fieldTypes) {
+		public IndexBinding(IndexSchemaElement root, Collection<
+				? extends FieldTypeDescriptor<?, ? extends SearchableProjectableIndexFieldTypeOptionsStep<?, ?>>> fieldTypes) {
 			defaultDslConverterField0 = SimpleFieldModelsByType.mapAll( fieldTypes, root, "defaultDslConverterField0_" );
 			customDslConverterField0 = SimpleFieldModelsByType.mapAll( fieldTypes, root, "customDslConverterField0_",
 					c -> c.dslConverter( ValueWrapper.class, ValueWrapper.toDocumentValueConverter() ) );
@@ -530,7 +532,8 @@ public abstract class AbstractPredicateTypeCheckingAndConversionIT<V extends Abs
 		private final SimpleFieldModelsByType customDslConverterField0;
 		private final SimpleFieldModelsByType customDslConverterField1;
 
-		public CompatibleIndexBinding(IndexSchemaElement root, Collection<? extends FieldTypeDescriptor<?>> fieldTypes) {
+		public CompatibleIndexBinding(IndexSchemaElement root, Collection<
+				? extends FieldTypeDescriptor<?, ? extends SearchableProjectableIndexFieldTypeOptionsStep<?, ?>>> fieldTypes) {
 			defaultDslConverterField0 = SimpleFieldModelsByType.mapAll( fieldTypes, root, "defaultDslConverterField0_",
 					this::addIrrelevantOptions );
 			customDslConverterField0 = SimpleFieldModelsByType.mapAll( fieldTypes, root, "customDslConverterField0_",
@@ -546,11 +549,12 @@ public abstract class AbstractPredicateTypeCheckingAndConversionIT<V extends Abs
 		}
 
 		// See HSEARCH-3307: this checks that irrelevant options are ignored when checking cross-index field compatibility
-		protected void addIrrelevantOptions(FieldTypeDescriptor<?> fieldType, StandardIndexFieldTypeOptionsStep<?, ?> c) {
+		protected void addIrrelevantOptions(FieldTypeDescriptor<?, ?> fieldType,
+				SearchableProjectableIndexFieldTypeOptionsStep<?, ?> c) {
 			c.projectable( Projectable.YES );
-			if ( fieldType.isFieldSortSupported() ) {
-				c.sortable( Sortable.YES );
-				c.aggregable( Aggregable.YES );
+			if ( fieldType.isFieldSortSupported() && fieldType.isFieldAggregationSupported() ) {
+				( (StandardIndexFieldTypeOptionsStep<?, ?>) c ).sortable( Sortable.YES );
+				( (StandardIndexFieldTypeOptionsStep<?, ?>) c ).aggregable( Aggregable.YES );
 			}
 		}
 	}
@@ -561,7 +565,8 @@ public abstract class AbstractPredicateTypeCheckingAndConversionIT<V extends Abs
 		private final SimpleFieldModelsByType customDslConverterField1;
 
 		public RawFieldCompatibleIndexBinding(IndexSchemaElement root,
-				Collection<? extends FieldTypeDescriptor<?>> fieldTypes) {
+				Collection<? extends FieldTypeDescriptor<?,
+						? extends SearchableProjectableIndexFieldTypeOptionsStep<?, ?>>> fieldTypes) {
 			defaultDslConverterField0 = SimpleFieldModelsByType.mapAll( fieldTypes, root, "defaultDslConverterField0_",
 					c -> c.dslConverter( ValueWrapper.class, ValueWrapper.toDocumentValueConverter() ) );
 			customDslConverterField0 = SimpleFieldModelsByType.mapAll( fieldTypes, root, "customDslConverterField0_" );
@@ -570,7 +575,8 @@ public abstract class AbstractPredicateTypeCheckingAndConversionIT<V extends Abs
 	}
 
 	public static final class IncompatibleIndexBinding {
-		public IncompatibleIndexBinding(IndexSchemaElement root, Collection<? extends FieldTypeDescriptor<?>> fieldTypes) {
+		public IncompatibleIndexBinding(IndexSchemaElement root, Collection<
+				? extends FieldTypeDescriptor<?, ? extends SearchableProjectableIndexFieldTypeOptionsStep<?, ?>>> fieldTypes) {
 			fieldTypes.forEach( fieldType -> SimpleFieldModel.mapper( FieldTypeDescriptor.getIncompatible( fieldType ) )
 					.map( root, "defaultDslConverterField0_" + fieldType.getUniqueName() )
 			);
@@ -584,7 +590,7 @@ public abstract class AbstractPredicateTypeCheckingAndConversionIT<V extends Abs
 	}
 
 	public static class MissingFieldIndexBinding {
-		public MissingFieldIndexBinding(IndexSchemaElement root, Collection<? extends FieldTypeDescriptor<?>> fieldTypes) {
+		public MissingFieldIndexBinding(IndexSchemaElement root, Collection<? extends FieldTypeDescriptor<?, ?>> fieldTypes) {
 		}
 	}
 

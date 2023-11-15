@@ -9,7 +9,7 @@ package org.hibernate.search.integrationtest.backend.tck.search.projection;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.FieldTypeDescriptor;
 
 public class FieldProjectionTestValues<F> extends AbstractProjectionTestValues<F, F> {
-	protected FieldProjectionTestValues(FieldTypeDescriptor<F> fieldType) {
+	protected FieldProjectionTestValues(FieldTypeDescriptor<F, ?> fieldType) {
 		super( fieldType );
 	}
 

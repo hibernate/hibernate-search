@@ -10,7 +10,6 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
-import org.hibernate.search.engine.backend.types.Projectable;
 import org.hibernate.search.engine.backend.types.dsl.IndexFieldTypeFactory;
 import org.hibernate.search.engine.backend.types.dsl.VectorFieldTypeOptionsStep;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.expectations.IndexNullAsMatchPredicateExpectactions;
@@ -27,7 +26,7 @@ public class ByteVectorFieldTypeDescriptor extends VectorFieldTypeDescriptor<byt
 
 	@Override
 	public VectorFieldTypeOptionsStep<?, byte[]> configure(IndexFieldTypeFactory fieldContext) {
-		return fieldContext.asByteVector().dimension( size ).projectable( Projectable.YES );
+		return fieldContext.asByteVector().dimension( size );
 	}
 
 	@Override

@@ -17,7 +17,7 @@ import org.hibernate.search.integrationtest.backend.tck.testsupport.types.expect
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.values.AscendingUniqueTermValues;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.values.IndexableValues;
 
-public class BigIntegerFieldTypeDescriptor extends FieldTypeDescriptor<BigInteger> {
+public class BigIntegerFieldTypeDescriptor extends StandardFieldTypeDescriptor<BigInteger> {
 
 	public static final BigIntegerFieldTypeDescriptor INSTANCE = new BigIntegerFieldTypeDescriptor();
 

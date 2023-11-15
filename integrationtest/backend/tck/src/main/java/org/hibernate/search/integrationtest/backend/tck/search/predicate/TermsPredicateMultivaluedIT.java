@@ -15,9 +15,11 @@ import java.util.List;
 import org.hibernate.search.engine.backend.document.DocumentElement;
 import org.hibernate.search.engine.backend.document.IndexFieldReference;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaElement;
+import org.hibernate.search.engine.backend.types.dsl.SearchableProjectableIndexFieldTypeOptionsStep;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.BooleanFieldTypeDescriptor;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.FieldTypeDescriptor;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.GeoPointFieldTypeDescriptor;
+import org.hibernate.search.integrationtest.backend.tck.testsupport.types.StandardFieldTypeDescriptor;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.SimpleFieldModelsByType;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.extension.SearchSetupHelper;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.BulkIndexer;
@@ -31,14 +33,14 @@ import org.junit.jupiter.params.provider.MethodSource;
 
 class TermsPredicateMultivaluedIT<F> {
 
-	private static final List<FieldTypeDescriptor<?>> types = new ArrayList<>();
+	private static final List<StandardFieldTypeDescriptor<?>> types = new ArrayList<>();
 	private static final List<TypeValues<?>> typeValuesSet = new ArrayList<>();
 	private static final List<Arguments> parameters = new ArrayList<>();
 
 	private static final String DOC_ID = "my_only_document";
 
 	static {
-		for ( FieldTypeDescriptor<?> type : FieldTypeDescriptor.getAll() ) {
+		for ( StandardFieldTypeDescriptor<?> type : FieldTypeDescriptor.getAllStandard() ) {
 			if ( GeoPointFieldTypeDescriptor.INSTANCE.equals( type ) ) {
 				continue;
 			}
@@ -163,7 +165,8 @@ class TermsPredicateMultivaluedIT<F> {
 	public static final class IndexBinding {
 		private final SimpleFieldModelsByType field;
 
-		public IndexBinding(IndexSchemaElement root, Collection<? extends FieldTypeDescriptor<?>> fieldTypes) {
+		public IndexBinding(IndexSchemaElement root, Collection<
+				? extends FieldTypeDescriptor<?, ? extends SearchableProjectableIndexFieldTypeOptionsStep<?, ?>>> fieldTypes) {
 			field = SimpleFieldModelsByType.mapAllMultiValued( fieldTypes, root, "field0_" );
 		}
 	}
@@ -171,7 +174,7 @@ class TermsPredicateMultivaluedIT<F> {
 	public static final class TypeValues<T> {
 		private final TermsPredicateTestValues<T> values;
 
-		public TypeValues(FieldTypeDescriptor<T> type) {
+		public TypeValues(FieldTypeDescriptor<T, ?> type) {
 			this.values = new TermsPredicateTestValues<>( type );
 		}
 

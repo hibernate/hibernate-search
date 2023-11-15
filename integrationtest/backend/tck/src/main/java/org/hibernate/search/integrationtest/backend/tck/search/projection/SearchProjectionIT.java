@@ -40,7 +40,7 @@ import org.hibernate.search.engine.search.query.SearchQuery;
 import org.hibernate.search.engine.search.query.SearchResult;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.configuration.DefaultAnalysisDefinitions;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.stub.StubEntity;
-import org.hibernate.search.integrationtest.backend.tck.testsupport.util.StandardFieldMapper;
+import org.hibernate.search.integrationtest.backend.tck.testsupport.util.SimpleFieldMapper;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.extension.SearchSetupHelper;
 import org.hibernate.search.util.common.SearchException;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.GenericStubMappingScope;
@@ -723,7 +723,7 @@ class SearchProjectionIT {
 	}
 
 	private static class FieldModel<F> {
-		static <F> StandardFieldMapper<F, FieldModel<F>> mapper(Class<F> type,
+		static <F> SimpleFieldMapper<F, ?, FieldModel<F>> mapper(Class<F> type,
 				F document1Value, F document2Value, F document3Value) {
 			return mapper(
 					c -> (StandardIndexFieldTypeOptionsStep<?, F>) c.as( type ),
@@ -731,10 +731,10 @@ class SearchProjectionIT {
 			);
 		}
 
-		static <F> StandardFieldMapper<F, FieldModel<F>> mapper(
+		static <F> SimpleFieldMapper<F, ?, FieldModel<F>> mapper(
 				Function<IndexFieldTypeFactory, StandardIndexFieldTypeOptionsStep<?, F>> configuration,
 				F document1Value, F document2Value, F document3Value) {
-			return StandardFieldMapper.of(
+			return SimpleFieldMapper.of(
 					configuration,
 					c -> c.projectable( Projectable.YES ),
 					(reference, name) -> new FieldModel<>(

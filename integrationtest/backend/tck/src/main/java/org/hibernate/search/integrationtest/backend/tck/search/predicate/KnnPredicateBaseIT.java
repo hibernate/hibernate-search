@@ -29,7 +29,7 @@ import org.junit.jupiter.params.provider.Arguments;
 
 class KnnPredicateBaseIT {
 
-	private static final List<VectorFieldTypeDescriptor<?>> supportedFieldTypes = VectorFieldTypeDescriptor.getAll();
+	private static final List<VectorFieldTypeDescriptor<?>> supportedFieldTypes = VectorFieldTypeDescriptor.getAllVector();
 
 	@RegisterExtension
 	public SearchSetupHelper setupHelper = SearchSetupHelper.create();

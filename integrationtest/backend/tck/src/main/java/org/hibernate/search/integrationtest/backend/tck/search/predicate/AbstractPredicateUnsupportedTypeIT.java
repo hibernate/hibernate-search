@@ -11,6 +11,7 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import java.util.Collection;
 
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaElement;
+import org.hibernate.search.engine.backend.types.dsl.SearchableProjectableIndexFieldTypeOptionsStep;
 import org.hibernate.search.engine.reporting.spi.EventContexts;
 import org.hibernate.search.engine.search.predicate.dsl.SearchPredicateFactory;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.FieldTypeDescriptor;
@@ -26,7 +27,7 @@ public abstract class AbstractPredicateUnsupportedTypeIT {
 
 	@ParameterizedTest(name = "{1}")
 	@MethodSource("params")
-	void unsupported(SimpleMappedIndex<IndexBinding> index, FieldTypeDescriptor<?> fieldType) {
+	void unsupported(SimpleMappedIndex<IndexBinding> index, FieldTypeDescriptor<?, ?> fieldType) {
 		SearchPredicateFactory f = index.createScope().predicate();
 
 		String fieldPath = index.binding().field.get( fieldType ).relativeFieldName;
@@ -49,7 +50,8 @@ public abstract class AbstractPredicateUnsupportedTypeIT {
 	public static final class IndexBinding {
 		private final SimpleFieldModelsByType field;
 
-		public IndexBinding(IndexSchemaElement root, Collection<? extends FieldTypeDescriptor<?>> fieldTypes) {
+		public IndexBinding(IndexSchemaElement root, Collection<
+				? extends FieldTypeDescriptor<?, ? extends SearchableProjectableIndexFieldTypeOptionsStep<?, ?>>> fieldTypes) {
 			field = SimpleFieldModelsByType.mapAll( fieldTypes, root, "" );
 		}
 	}

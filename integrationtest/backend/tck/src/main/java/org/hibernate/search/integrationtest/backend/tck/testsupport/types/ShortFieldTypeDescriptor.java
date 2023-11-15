@@ -14,7 +14,7 @@ import org.hibernate.search.integrationtest.backend.tck.testsupport.types.expect
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.values.AscendingUniqueTermValues;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.values.IndexableValues;
 
-public class ShortFieldTypeDescriptor extends FieldTypeDescriptor<Short> {
+public class ShortFieldTypeDescriptor extends StandardFieldTypeDescriptor<Short> {
 
 	public static final ShortFieldTypeDescriptor INSTANCE = new ShortFieldTypeDescriptor();
 
