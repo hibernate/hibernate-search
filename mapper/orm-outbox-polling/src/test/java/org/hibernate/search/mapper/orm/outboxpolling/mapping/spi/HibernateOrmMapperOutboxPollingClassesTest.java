@@ -10,6 +10,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.hibernate.search.util.common.jar.impl.JandexUtils.readOrBuildIndex;
 import static org.hibernate.search.util.common.jar.impl.JarUtils.codeSourceLocation;
 
+import java.lang.reflect.Modifier;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
@@ -20,6 +21,7 @@ import org.hibernate.search.mapper.orm.outboxpolling.cluster.impl.Agent;
 import org.hibernate.search.mapper.orm.outboxpolling.event.impl.OutboxEvent;
 import org.hibernate.search.util.common.AssertionFailure;
 import org.hibernate.search.util.common.jar.impl.JandexUtils;
+import org.hibernate.search.util.impl.test.annotation.TestForIssue;
 
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
@@ -83,6 +85,16 @@ class HibernateOrmMapperOutboxPollingClassesTest {
 		assertThat( modelClassNames ).isNotEmpty();
 		assertThat( HibernateOrmMapperOutboxPollingClasses.hibernateOrmTypes() )
 				.containsExactlyInAnyOrderElementsOf( modelClassNames );
+	}
+
+	@Test
+	@TestForIssue(jiraKey = "HSEARCH-5015")
+	void testNoFinalJpaModelClass() {
+		assertThat( HibernateOrmMapperOutboxPollingClasses.hibernateOrmTypes() )
+				.map( outboxPollingIndex::getClassByName )
+				.filteredOn( c -> !c.isEnum() )
+				.allSatisfy( c -> assertThat( c.flags() )
+						.returns( false, Modifier::isFinal ) );
 	}
 
 	private static Set<DotName> collectModelClassesRecursively(Index index, Set<DotName> initialClasses) {

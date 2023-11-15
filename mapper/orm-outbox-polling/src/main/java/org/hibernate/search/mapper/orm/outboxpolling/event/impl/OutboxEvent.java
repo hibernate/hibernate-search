@@ -11,7 +11,7 @@ import java.util.UUID;
 
 import jakarta.persistence.Transient;
 
-public final class OutboxEvent {
+public class OutboxEvent {
 
 	public enum Status {
 		PENDING, ABORTED
