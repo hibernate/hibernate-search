@@ -16,6 +16,7 @@ import org.hibernate.search.engine.backend.common.DocumentReference;
 import org.hibernate.search.engine.backend.document.DocumentElement;
 import org.hibernate.search.engine.backend.document.IndexFieldReference;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaElement;
+import org.hibernate.search.engine.search.predicate.SearchPredicate;
 import org.hibernate.search.engine.search.query.SearchQuery;
 import org.hibernate.search.engine.spatial.GeoPoint;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.configuration.DefaultAnalysisDefinitions;
@@ -72,6 +73,33 @@ class IndexNullAsValueIT {
 	}
 
 	@Test
+	void indexNullAsValue_vector() {
+		setUp();
+		StubMappingScope scope = index.createScope();
+
+		for ( ByTypeFieldModel<?> fieldModel : index.binding().knnFieldModels ) {
+			String absoluteFieldPath = fieldModel.relativeFieldName;
+			Object valueToMatch = fieldModel.indexNullAsValue.indexedValue;
+			SearchPredicate predicate;
+			if ( valueToMatch instanceof byte[] ) {
+				predicate =
+						scope.predicate().knn( 2 ).field( absoluteFieldPath ).matching( (byte[]) valueToMatch ).toPredicate();
+			}
+			else {
+				predicate =
+						scope.predicate().knn( 2 ).field( absoluteFieldPath ).matching( (float[]) valueToMatch ).toPredicate();
+			}
+
+			SearchQuery<DocumentReference> query = scope.query()
+					.where( predicate )
+					.toQuery();
+
+			assertThatQuery( query )
+					.hasDocRefHitsAnyOrder( index.typeName(), DOCUMENT_WITH_INDEX_NULL_AS_VALUES, DOCUMENT_WITH_NULL_VALUES );
+		}
+	}
+
+	@Test
 	void indexNullAsValue_fullText() {
 		assertThatThrownBy( () -> setupHelper.start()
 				.withIndex( StubMappedIndex.ofNonRetrievable(
@@ -106,6 +134,7 @@ class IndexNullAsValueIT {
 						DOCUMENT_WITH_INDEX_NULL_AS_VALUES,
 						document -> {
 							index.binding().matchFieldModels.forEach( f -> f.indexNullAsValue.write( document ) );
+							index.binding().knnFieldModels.forEach( f -> f.indexNullAsValue.write( document ) );
 							if ( index.binding().geoPointField != null ) {
 								document.addValue( index.binding().geoPointField, GeoPoint.of( 0.0, 0.0 ) );
 							}
@@ -115,6 +144,7 @@ class IndexNullAsValueIT {
 						DOCUMENT_WITH_DIFFERENT_VALUES,
 						document -> {
 							index.binding().matchFieldModels.forEach( f -> f.differentValue.write( document ) );
+							index.binding().knnFieldModels.forEach( f -> f.differentValue.write( document ) );
 							if ( index.binding().geoPointField != null ) {
 								document.addValue( index.binding().geoPointField, GeoPoint.of( 40, 70 ) );
 							}
@@ -124,6 +154,7 @@ class IndexNullAsValueIT {
 						DOCUMENT_WITH_NULL_VALUES,
 						document -> {
 							index.binding().matchFieldModels.forEach( f -> f.nullValue.write( document ) );
+							index.binding().knnFieldModels.forEach( f -> f.nullValue.write( document ) );
 							if ( index.binding().geoPointField != null ) {
 								document.addValue( index.binding().geoPointField, null );
 							}
@@ -134,10 +165,15 @@ class IndexNullAsValueIT {
 
 	private static class IndexBinding {
 		final List<ByTypeFieldModel<?>> matchFieldModels;
+		final List<ByTypeFieldModel<?>> knnFieldModels;
 		final IndexFieldReference<GeoPoint> geoPointField;
 
 		IndexBinding(IndexSchemaElement root) {
 			matchFieldModels = FieldTypeDescriptor.getAllStandard().stream()
+					.filter( typeDescriptor -> typeDescriptor.getIndexNullAsMatchPredicateExpectations().isPresent() )
+					.map( typeDescriptor -> ByTypeFieldModel.mapper( root, typeDescriptor ) )
+					.collect( Collectors.toList() );
+			knnFieldModels = FieldTypeDescriptor.getAllVector().stream()
 					.filter( typeDescriptor -> typeDescriptor.getIndexNullAsMatchPredicateExpectations().isPresent() )
 					.map( typeDescriptor -> ByTypeFieldModel.mapper( root, typeDescriptor ) )
 					.collect( Collectors.toList() );
