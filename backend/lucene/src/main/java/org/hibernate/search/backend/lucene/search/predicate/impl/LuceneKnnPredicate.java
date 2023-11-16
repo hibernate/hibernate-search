@@ -103,16 +103,6 @@ public class LuceneKnnPredicate extends AbstractLuceneSingleFieldPredicate imple
 		}
 
 		@Override
-		public void boost(float boost) {
-			throw new UnsupportedOperationException( "This predicate does not support boost" );
-		}
-
-		@Override
-		public void constantScore() {
-			throw new UnsupportedOperationException( "This predicate does not support constant score" );
-		}
-
-		@Override
 		public SearchPredicate build() {
 			return new LuceneKnnPredicate( this );
 		}

@@ -7,8 +7,10 @@
 package org.hibernate.search.engine.search.predicate.spi;
 
 import org.hibernate.search.engine.search.predicate.SearchPredicate;
+import org.hibernate.search.util.common.annotation.Incubating;
 
-public interface KnnPredicateBuilder {
+@Incubating
+public interface KnnPredicateBuilder extends SearchPredicateBuilder {
 
 	void k(int k);
 
