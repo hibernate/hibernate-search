@@ -40,6 +40,7 @@ public abstract class AbstractIndexValueFieldType<
 	private final boolean sortable;
 	private final boolean projectable;
 	private final boolean aggregable;
+	private final boolean multivaluable;
 	private final Set<SearchHighlighterType> allowedHighlighterTypes;
 
 	private final Map<SearchQueryElementTypeKey<?>, SearchQueryElementFactory<?, ? super SC, ? super N>> queryElementFactories;
@@ -58,6 +59,7 @@ public abstract class AbstractIndexValueFieldType<
 		this.sortable = builder.sortable;
 		this.projectable = builder.projectable;
 		this.aggregable = builder.aggregable;
+		this.multivaluable = builder.multivaluable;
 		this.allowedHighlighterTypes = Collections.unmodifiableSet( builder.allowedHighlighterTypes );
 		this.queryElementFactories = builder.queryElementFactories;
 		this.analyzerName = builder.analyzerName;
@@ -99,6 +101,11 @@ public abstract class AbstractIndexValueFieldType<
 	@Override
 	public final boolean aggregable() {
 		return aggregable;
+	}
+
+	@Override
+	public boolean multivaluable() {
+		return multivaluable;
 	}
 
 	@Override
@@ -174,6 +181,7 @@ public abstract class AbstractIndexValueFieldType<
 		private boolean sortable;
 		private boolean projectable;
 		private boolean aggregable;
+		private boolean multivaluable = true;
 		private Set<SearchHighlighterType> allowedHighlighterTypes = Collections.emptySet();
 
 		private final Map<SearchQueryElementTypeKey<?>,
@@ -216,6 +224,10 @@ public abstract class AbstractIndexValueFieldType<
 
 		public final void aggregable(boolean aggregable) {
 			this.aggregable = aggregable;
+		}
+
+		public final void multivaluable(boolean multivaluable) {
+			this.multivaluable = multivaluable;
 		}
 
 		public final void allowedHighlighterTypes(Set<SearchHighlighterType> allowedHighlighterTypes) {

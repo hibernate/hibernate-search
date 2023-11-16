@@ -723,4 +723,6 @@ public interface Log extends BasicLogger {
 	SearchException vectorKnnMatchVectorTypeDiffersFromField(String absoluteFieldPath,
 			@FormatWith(ClassFormatter.class) Class<?> expected, @FormatWith(ClassFormatter.class) Class<?> actual);
 
+	@Message(id = ID_OFFSET + 178, value = "Fields of this type cannot be multivalued.")
+	SearchException multiValuedFieldNotAllowed(@Param EventContext context);
 }

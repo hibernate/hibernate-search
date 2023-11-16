@@ -8,6 +8,8 @@ package org.hibernate.search.engine.backend.metamodel;
 
 import java.util.Optional;
 
+import org.hibernate.search.util.common.annotation.Incubating;
+
 /**
  * The type of a "value" field in the index,
  * exposing its various capabilities and accepted Java types.
@@ -44,6 +46,12 @@ public interface IndexValueFieldTypeDescriptor {
 	 * (e.g. a range aggregation on an analyzed string field).
 	 */
 	boolean aggregable();
+
+	/**
+	 * @return {@code true} if the field type allows storing multiple values, {@code false} otherwise.
+	 */
+	@Incubating
+	boolean multivaluable();
 
 	/**
 	 * @return The expected raw Java type of arguments passed to the DSL for this field.

@@ -55,6 +55,9 @@ class LuceneIndexValueFieldBuilder<F>
 
 	@Override
 	public LuceneIndexValueFieldBuilder<F> multiValued() {
+		if ( !type.multivaluable() ) {
+			throw log.multiValuedFieldNotAllowed( eventContext() );
+		}
 		this.multiValued = true;
 		return this;
 	}

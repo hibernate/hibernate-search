@@ -7,6 +7,7 @@
 package org.hibernate.search.integrationtest.backend.lucene.vector;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.hibernate.search.integrationtest.backend.lucene.testsupport.util.DocumentAssert.containsDocument;
 import static org.hibernate.search.util.impl.integrationtest.common.assertion.SearchResultAssert.assertThatQuery;
 
@@ -24,6 +25,7 @@ import org.hibernate.search.engine.backend.types.Projectable;
 import org.hibernate.search.engine.backend.types.VectorSimilarity;
 import org.hibernate.search.engine.search.query.SearchQuery;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.extension.SearchSetupHelper;
+import org.hibernate.search.util.common.SearchException;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.BulkIndexer;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.SimpleMappedIndex;
 
@@ -283,6 +285,17 @@ class LuceneVectorFieldIT {
 				} );
 	}
 
+	@Test
+	void multivaluedFieldsNotAllowed() {
+		SimpleMappedIndex<MultiValuedIndexBinding> index = SimpleMappedIndex.of( MultiValuedIndexBinding::new ).name( "index" );
+		assertThatThrownBy( () -> setupHelper.start().withIndexes( index ).setup() )
+				.isInstanceOf( SearchException.class )
+				.hasMessageContaining(
+						"field 'vector'",
+						"Fields of this type cannot be multivalued"
+				);
+	}
+
 	private void initDataSimple(SimpleMappedIndex<IndexBinding> index) {
 		index.bulkIndexer()
 				.add( "ID:1", document -> {
@@ -450,6 +463,14 @@ class LuceneVectorFieldIT {
 							f -> f.asFloatVector().dimension( 8 ).vectorSimilarity( similarity )
 					)
 					.toReference();
+		}
+	}
+
+	private static class MultiValuedIndexBinding {
+		final IndexFieldReference<byte[]> vector;
+
+		private MultiValuedIndexBinding(IndexSchemaElement root) {
+			vector = root.field( "vector", f -> f.asByteVector().dimension( 2 ) ).multiValued().toReference();
 		}
 	}
 
