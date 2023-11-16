@@ -134,6 +134,8 @@ abstract class AbstractLuceneVectorFieldTypeOptionsStep<S extends AbstractLucene
 			builder.queryElementFactory( ProjectionTypeKeys.FIELD, new LuceneFieldProjection.Factory<>( codec ) );
 		}
 
+		builder.multivaluable( false );
+
 		return builder.build();
 	}
 
