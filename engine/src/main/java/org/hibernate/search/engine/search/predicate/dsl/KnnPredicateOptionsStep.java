@@ -13,7 +13,7 @@ import org.hibernate.search.engine.search.predicate.SearchPredicate;
 /**
  * The final step in a "knn" predicate definition, where optional parameters can be set.
  */
-public interface KnnPredicateOptionsStep extends PredicateFinalStep {
+public interface KnnPredicateOptionsStep extends PredicateScoreStep<KnnPredicateOptionsStep>, PredicateFinalStep {
 
 	KnnPredicateOptionsStep filter(SearchPredicate searchPredicate);
 

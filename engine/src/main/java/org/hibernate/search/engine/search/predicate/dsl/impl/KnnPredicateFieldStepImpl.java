@@ -74,6 +74,18 @@ public final class KnnPredicateFieldStepImpl extends AbstractPredicateFinalStep
 		return this;
 	}
 
+	@Override
+	public KnnPredicateOptionsStep boost(float boost) {
+		this.builder.boost( boost );
+		return this;
+	}
+
+	@Override
+	public KnnPredicateOptionsStep constantScore() {
+		this.builder.constantScore();
+		return this;
+	}
+
 	private BooleanPredicateBuilder booleanPredicateBuilder() {
 		if ( this.booleanBuilder == null ) {
 			this.booleanBuilder = dslContext.scope().predicateBuilders().bool();
