@@ -967,7 +967,7 @@
                                         }
                                     }
                                     // Exclude images from non-dockerhub repositories
-                                    new File('${containerImagesListFile}').append( images.findAll{ref -> !(ref ==~ /^(?!((.*\.)?docker\.io))[\w\d\.]+\/[\w\d\.]+\/[\w\d\.]+(:.+)?$/)}.join('\n') + '\n' )
+                                    new File('${containerImagesListFile}').append( images.join('\n') + '\n' )
                                 ]]></script>
                             </configuration>
                         </execution>
