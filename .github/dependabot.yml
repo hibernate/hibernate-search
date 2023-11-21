@@ -67,6 +67,7 @@ updates:
           - "com.github.tomakehurst:*"
           - "org.jsoup:*"
           - "org.ow2.asm:*" # for Surefire/Failsafe plugins to support builds on latest JDKs
+          - "org.testcontainers:testcontainers-bom"
     ignore:
       # These dependencies are updated manually
       - dependency-name: "org.hibernate:*"
