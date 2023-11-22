@@ -43,6 +43,8 @@ public class Book {
 	@FullTextField(analyzer = "english")
 	private String comment;
 
+	private float[] coverImageEmbeddings;
+
 	@ManyToMany
 	@IndexedEmbedded(structure = ObjectStructure.NESTED)
 	private List<Author> authors = new ArrayList<>();
@@ -96,6 +98,14 @@ public class Book {
 
 	public void setComment(String comment) {
 		this.comment = comment;
+	}
+
+	public float[] getCoverImageEmbeddings() {
+		return coverImageEmbeddings;
+	}
+
+	public void setCoverImageEmbeddings(float[] coverImageEmbeddings) {
+		this.coverImageEmbeddings = coverImageEmbeddings;
 	}
 
 	public List<Author> getAuthors() {
