@@ -28,7 +28,7 @@ public class HibernateSearchKnnVectorsFormat extends KnnVectorsFormat {
 	}
 
 	private final KnnVectorsFormat delegate;
-	private final int maxConn;
+	private final int maxConnection;
 
 	private final int beamWidth;
 
@@ -36,10 +36,10 @@ public class HibernateSearchKnnVectorsFormat extends KnnVectorsFormat {
 		this( DEFAULT_MAX_CONN, DEFAULT_BEAM_WIDTH );
 	}
 
-	public HibernateSearchKnnVectorsFormat(int maxConn, int beamWidth) {
+	public HibernateSearchKnnVectorsFormat(int maxConnection, int beamWidth) {
 		super( HibernateSearchKnnVectorsFormat.class.getSimpleName() );
-		this.delegate = new Lucene95HnswVectorsFormat( maxConn, beamWidth );
-		this.maxConn = maxConn;
+		this.delegate = new Lucene95HnswVectorsFormat( maxConnection, beamWidth );
+		this.maxConnection = maxConnection;
 		this.beamWidth = beamWidth;
 	}
 
@@ -68,11 +68,19 @@ public class HibernateSearchKnnVectorsFormat extends KnnVectorsFormat {
 			return false;
 		}
 		HibernateSearchKnnVectorsFormat that = (HibernateSearchKnnVectorsFormat) o;
-		return maxConn == that.maxConn && beamWidth == that.beamWidth;
+		return maxConnection == that.maxConnection && beamWidth == that.beamWidth;
 	}
 
 	@Override
 	public int hashCode() {
-		return Objects.hash( maxConn, beamWidth );
+		return Objects.hash( maxConnection, beamWidth );
+	}
+
+	@Override
+	public String toString() {
+		return "HibernateSearchKnnVectorsFormat{" +
+				"maxConnection=" + maxConnection +
+				", beamWidth=" + beamWidth +
+				'}';
 	}
 }

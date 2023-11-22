@@ -79,8 +79,7 @@ public abstract class AbstractLuceneVectorFieldCodec<F> implements LuceneVectorF
 
 		return dimension == other.dimension
 				&& vectorSimilarity == other.vectorSimilarity
-				// not sure about this one :
-				// TODO : vector : need to test with different formats to see if that'll work ...
+				// to check beam width and max connections:
 				&& Objects.equals( knnVectorsFormat, other.knnVectorsFormat );
 	}
 
@@ -91,5 +90,14 @@ public abstract class AbstractLuceneVectorFieldCodec<F> implements LuceneVectorF
 	@Override
 	public KnnVectorsFormat knnVectorFormat() {
 		return knnVectorsFormat;
+	}
+
+	@Override
+	public String toString() {
+		return getClass().getSimpleName() + "{" +
+				"vectorSimilarity=" + vectorSimilarity +
+				", dimension=" + dimension +
+				", knnVectorsFormat=" + knnVectorsFormat +
+				'}';
 	}
 }

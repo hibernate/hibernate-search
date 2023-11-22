@@ -58,4 +58,6 @@ public abstract class VectorFieldTypeDescriptor<F>
 	}
 
 	public abstract int vectorSize();
+
+	public abstract F sampleVector(int dimension);
 }
