@@ -8,8 +8,10 @@ package org.hibernate.search.documentation.search.predicate;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmUtils.with;
+import static org.junit.jupiter.api.Assumptions.assumeTrue;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.function.Consumer;
@@ -26,9 +28,12 @@ import org.hibernate.search.engine.spatial.GeoBoundingBox;
 import org.hibernate.search.engine.spatial.GeoPoint;
 import org.hibernate.search.engine.spatial.GeoPolygon;
 import org.hibernate.search.mapper.orm.Search;
+import org.hibernate.search.mapper.orm.cfg.HibernateOrmMapperSettings;
+import org.hibernate.search.mapper.orm.mapping.HibernateOrmSearchMappingConfigurer;
 import org.hibernate.search.mapper.orm.scope.SearchScope;
 import org.hibernate.search.mapper.orm.session.SearchSession;
 import org.hibernate.search.util.common.data.RangeBoundInclusion;
+import org.hibernate.search.util.impl.integrationtest.common.extension.BackendConfiguration;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -52,6 +57,19 @@ class PredicateDslIT {
 	@BeforeEach
 	void setup() {
 		entityManagerFactory = setupHelper.start().setup( Book.class, Author.class, EmbeddableGeoPoint.class );
+
+		DocumentationSetupHelper.SetupContext setupContext = setupHelper.start();
+		// TODO HSEARCH-4950 Remove this if and add @VectorField to the Book entity once we support KNN search using Elasticsearch/OpenSearch
+		if ( BackendConfiguration.isLucene() ) {
+			setupContext.withProperty(
+					HibernateOrmMapperSettings.MAPPING_CONFIGURER,
+					(HibernateOrmSearchMappingConfigurer) context -> context.programmaticMapping()
+							.type( Book.class )
+							.property( "coverImageEmbeddings" )
+							.vectorField( 128 )
+			);
+		}
+		entityManagerFactory = setupContext.setup( Book.class, Author.class, EmbeddableGeoPoint.class );
 		initData();
 	}
 
@@ -1086,6 +1104,45 @@ class PredicateDslIT {
 		} );
 	}
 
+	@Test
+	void knn() {
+		// TODO HSEARCH-4950 Remove this assumption when we support KNN search using Elasticsearch/OpenSearch
+		assumeTrue(
+				BackendConfiguration.isLucene(),
+				"This test only makes sense if the backend supports vectors"
+		);
+		withinSearchSession( searchSession -> {
+			// tag::knn[]
+			float[] coverImageEmbeddingsVector = /*...*/
+					// end::knn[]
+					new float[128];
+			// tag::knn[]
+			List<Book> hits = searchSession.search( Book.class )
+					.where( f -> f.knn( 5 ).field( "coverImageEmbeddings" ).matching( coverImageEmbeddingsVector ) )
+					.fetchHits( 20 );
+			// end::knn[]
+			assertThat( hits )
+					.extracting( Book::getId )
+					.containsExactlyInAnyOrder( BOOK1_ID, BOOK2_ID, BOOK3_ID, BOOK4_ID );
+		} );
+
+		withinSearchSession( searchSession -> {
+			// tag::knn-filter[]
+			float[] coverImageEmbeddingsVector = /*...*/
+					// end::knn-filter[]
+					new float[128];
+			// tag::knn-filter[]
+			List<Book> hits = searchSession.search( Book.class )
+					.where( f -> f.knn( 5 ).field( "coverImageEmbeddings" ).matching( coverImageEmbeddingsVector )
+							.filter( f.match().field( "authors.firstName" ).matching( "isaac" ) ) )
+					.fetchHits( 20 );
+			// end::knn-filter[]
+			assertThat( hits )
+					.extracting( Book::getId )
+					.containsExactlyInAnyOrder( BOOK1_ID, BOOK2_ID, BOOK3_ID );
+		} );
+	}
+
 	private MySearchParameters getSearchParameters() {
 		return new MySearchParameters() {
 			@Override
@@ -1148,6 +1205,7 @@ class PredicateDslIT {
 			book1.setPageCount( 250 );
 			book1.setGenre( Genre.SCIENCE_FICTION );
 			book1.getAuthors().add( isaacAsimov );
+			book1.setCoverImageEmbeddings( floats( 128, 1.0f ) );
 			isaacAsimov.getBooks().add( book1 );
 
 			Book book2 = new Book();
@@ -1158,6 +1216,7 @@ class PredicateDslIT {
 			book2.setGenre( Genre.SCIENCE_FICTION );
 			book2.setComment( "Really liked this one!" );
 			book2.getAuthors().add( isaacAsimov );
+			book2.setCoverImageEmbeddings( floats( 128, 2.0f ) );
 			isaacAsimov.getBooks().add( book2 );
 
 			Book book3 = new Book();
@@ -1167,6 +1226,7 @@ class PredicateDslIT {
 			book3.setPageCount( 435 );
 			book3.setGenre( Genre.SCIENCE_FICTION );
 			book3.getAuthors().add( isaacAsimov );
+			book3.setCoverImageEmbeddings( floats( 128, 3.0f ) );
 			isaacAsimov.getBooks().add( book3 );
 
 			Book book4 = new Book();
@@ -1176,6 +1236,7 @@ class PredicateDslIT {
 			book4.setPageCount( 222 );
 			book4.setGenre( Genre.CRIME_FICTION );
 			book4.getAuthors().add( aLeeMartinez );
+			book4.setCoverImageEmbeddings( floats( 128, 4.0f ) );
 			aLeeMartinez.getBooks().add( book3 );
 
 			entityManager.persist( isaacAsimov );
@@ -1196,5 +1257,11 @@ class PredicateDslIT {
 		Integer getPageCountMaxFilter();
 
 		List<String> getAuthorFilters();
+	}
+
+	private static float[] floats(int dimension, float value) {
+		float[] bytes = new float[dimension];
+		Arrays.fill( bytes, value );
+		return bytes;
 	}
 }

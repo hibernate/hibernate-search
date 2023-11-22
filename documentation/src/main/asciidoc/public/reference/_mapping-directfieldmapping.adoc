@@ -132,6 +132,25 @@ Fields mapped using this annotation have very limited configuration options from
 but the value binder will be able to pick a non-standard field type,
 which generally gives much more flexibility.
 
+[[mapping-directfieldmapping-annotations-vectorfield]]  `@VectorField`::
++
+include::../components/_incubating-warning.adoc[]
++
+WARNING: Vector fields are only supported by the <<backend-lucene, Lucene backend>> for now.
++
+Specific field type for vector fields to be used in a <<search-dsl-predicate-knn,vector search>>.
++
+Vector fields accept values of type `float[]` or `byte[]` and *require* that
+the <<mapping-directfieldmapping-dimension,dimension>> of stored vectors is specified upfront and that the indexed vectors
+size match this dimension.
++
+Besides that, vector fields allow optionally configuring
+the <<mapping-directfieldmapping-vectorSimilarity,similarity function>> used during search,
+the <<mapping-directfieldmapping-beamWidth,beam width>>
+and the <<mapping-directfieldmapping-maxConnections,maximum connections>> used during indexing.
++
+WARNING: It is not allowed to index multiple vectors within the same field, i.e. vector fields cannot be <<binding-index-field-dsl-multi-valued-fields,multivalued>>.
+
 [[mapping-directfieldmapping-annotation-attributes]]
 == [[mapper-orm-directfieldmapping-annotation-attributes]] Field annotation attributes
 
@@ -335,6 +354,71 @@ Additionally, if the <<mapping-directfieldmapping-term-vector,term vector storin
 or `WITH_POSITIONS_OFFSETS_PAYLOADS`, both backends would support the `FAST_VECTOR`
 highlighter, if they already support the other two (`[PLAIN, UNIFIED]`).
 |===============
+
+[[mapping-directfieldmapping-dimension]] `dimension`::
++
+include::../components/_incubating-warning.adoc[]
++
+The size of the stored vectors. This is a required field. This size should match the vector size of the vectors produced by
+the model used to convert the data into vector representation. It is expected to be a positive integer value in range `[1,1024]`.
++
+Only available on `@VectorField`.
+// TODO: HSEARCH-5020: to update the section once we make this configurable
+
+[[mapping-directfieldmapping-vectorSimilarity]] `vectorSimilarity`::
++
+include::../components/_incubating-warning.adoc[]
++
+Defines how vector similarity is calculated during a <<search-dsl-predicate-knn,vector search>>.
++
+Only available on `@VectorField`.
++
+[cols=",a",options="header"]
+|===============
+|Value|Definition
+|`VectorSimilarity.L2`|An L2 (Euclidean) norm, that is a sensible default for most scenarios.
+Distance between vectors `x` and `y` is calculated as latexmath:[d(x,y) = \sum_{i=1}^{n} (x_i - y_i)^2 ]
+and the score function is latexmath:[s = \frac{1}{1+d}]
+|`VectorSimilarity.INNER_PRODUCT`|Inner product (dot product in particular).
+Distance between vectors `x` and `y` is calculated as latexmath:[d(x,y) = \sum_{i=1}^{n} x_i \cdot y_i ]
+and the score function is latexmath:[s = \frac{1}{1+d}]
+
+[WARNING]
+====
+To use this similarity efficiently, both index and search vectors *must* be normalized;
+otherwise search may produce poor results.
+Floating point vectors must be https://en.wikipedia.org/wiki/Unit_vector[normalized to be of unit length],
+while byte vectors should simply all have the same norm.
+====
+
+|`VectorSimilarity.COSINE`|Cosine similarity.
+Distance between vectors `x` and `y` is calculated as latexmath:[d(x,y) = \frac{1 - \sum_{i=1} ^{n} x_i \cdot y_i }{ \sqrt{ \sum_{i=1} ^{n} x_i^2 } \sqrt{ \sum_{i=1} ^{n} y_i^2 }} ]
+and the score function is latexmath:[s = \frac{1}{1+d}]
+|`VectorSimilarity.DEFAULT`|Use the backend-specific default. For the <<backend-lucene, Lucene backend>> an `L2` similarity is used.
+|===============
+
+[[mapping-directfieldmapping-beamWidth]] `beamWidth`::
++
+include::../components/_incubating-warning.adoc[]
++
+Beam width is the size of the dynamic list used during k-NN graph creation. It affects how vectors are stored.
+Higher values lead to a more accurate graph but slower indexing speed.
++
+Default value is backend-specific.
++
+Only available on `@VectorField`.
+
+[[mapping-directfieldmapping-maxConnections]] `maxConnections`::
++
+include::../components/_incubating-warning.adoc[]
++
+The number of neighbors each node will be connected to in the https://en.wikipedia.org/wiki/Nearest_neighbor_search#cite_note-:0-10[HNSW (Hierarchical Navigable Small World graphs) graph].
+Modifying this value will have an impact on memory consumption.
+It is recommended to keep this value between 2 and 100.
++
+Default value is backend-specific.
++
+Only available on `@VectorField`.
 
 [[mapping-directfieldmapping-supported-types]]
 == [[mapper-orm-directfieldmapping-supported-types]] [[section-built-in-bridges]] Supported property types

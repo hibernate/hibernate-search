@@ -55,7 +55,7 @@ public class HibernateSearchKnnVectorsFormat extends KnnVectorsFormat {
 
 	@Override
 	public int getMaxDimensions(String fieldName) {
-		// TODO : vector : we can make this configurable, apparently there are models that produce larger vectors than this default allows.
+		// TODO: HSEARCH-5020: we can make this configurable, apparently there are models that produce larger vectors than this default allows.
 		return DEFAULT_MAX_DIMENSIONS;
 	}
 

@@ -1464,6 +1464,53 @@ either on a per-field basis with a call to `.boost(...)` just after `.field(...)
 or for the whole predicate with a call to `.boost(...)`
 after `.circle(...)`/`.boundingBox(...)`/`.polygon(...)`.
 
+[[search-dsl-predicate-knn]]
+== `knn`: K-Nearest Neighbors a.k.a. vector search
+
+include::../components/_incubating-warning.adoc[]
+
+The `knn` predicate, with `k` being a positive integer, matches the `k` documents for which a given vector field's value is "nearest" to a given vector.
+
+Distance is measured based on the vector similarity configured for the given <<mapping-directfieldmapping-annotations-vectorfield,vector field>>.
+
+.Simple K-Nearest Neighbors search
+====
+[source, JAVA, indent=0, subs="+callouts"]
+----
+include::{sourcedir}/org/hibernate/search/documentation/search/predicate/PredicateDslIT.java[tags=knn]
+----
+====
+
+[[search-dsl-predicate-knn-argument-type]]
+=== Expected type of arguments
+
+The `knn` predicate expects arguments to the `matching(...)` method
+to have the same type as the index type of a target field.
+
+For example, if an entity property is mapped in the index to a byte array type (`byte[]`) ,
+`.matching(...)` will expect its argument to be a byte array (`byte[]`) only.
+
+[[search-dsl-predicate-knn-filter]]
+=== Filtering the neighbors
+
+Optionally, the predicate can filter out some of the neighbors using the `.filter(..)` clause of the predicate.
+`.filter(...)` expects a predicate to be passed to it.
+
+.K-Nearest Neighbors search with a filter
+====
+[source, JAVA, indent=0, subs="+callouts"]
+----
+include::{sourcedir}/org/hibernate/search/documentation/search/predicate/PredicateDslIT.java[tags=knn-filter]
+----
+====
+
+[[search-dsl-predicate-knn-other]]
+=== Other options
+
+* The score of a `knn` predicate is variable by default (higher for "nearer" documents),
+but can be <<search-dsl-predicate-common-constantScore,made constant with `.constantScore()`>>.
+* The score of a `knn` predicate can be <<search-dsl-predicate-common-boost,boosted>>
+for the whole predicate with a call to `.boost(...)` after `.matching(...)`.
 
 [[search-dsl-predicate-named]]
 == [[query-filter-fulltext]] `named`: call a predicate defined in the mapping
