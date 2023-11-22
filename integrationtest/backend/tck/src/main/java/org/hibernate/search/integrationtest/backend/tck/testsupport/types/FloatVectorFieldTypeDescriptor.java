@@ -9,6 +9,7 @@ package org.hibernate.search.integrationtest.backend.tck.testsupport.types;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
+import java.util.Random;
 
 import org.hibernate.search.engine.backend.types.dsl.IndexFieldTypeFactory;
 import org.hibernate.search.engine.backend.types.dsl.VectorFieldTypeOptionsStep;
@@ -32,6 +33,11 @@ public class FloatVectorFieldTypeDescriptor extends VectorFieldTypeDescriptor<fl
 	@Override
 	public int vectorSize() {
 		return size;
+	}
+
+	@Override
+	public float[] sampleVector(int dimension) {
+		return arrayOf( dimension, new Random().nextFloat() );
 	}
 
 	@Override
