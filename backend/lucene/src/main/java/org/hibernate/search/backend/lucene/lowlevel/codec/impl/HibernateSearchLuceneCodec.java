@@ -20,7 +20,7 @@ import org.apache.lucene.codecs.perfield.PerFieldKnnVectorsFormat;
 
 public class HibernateSearchLuceneCodec extends FilterCodec {
 
-	static final Codec DEFAULT_CODEC = new Lucene95Codec();
+	public static final Codec DEFAULT_CODEC = new Lucene95Codec();
 
 	private final KnnVectorsFormat knnVectorsFormat;
 
@@ -29,15 +29,11 @@ public class HibernateSearchLuceneCodec extends FilterCodec {
 	}
 
 	public HibernateSearchLuceneCodec(KnnVectorsFormat knnVectorsFormat) {
-		super( HibernateSearchLuceneCodec.class.getSimpleName(), DEFAULT_CODEC );
+		// We are using the name of the default codec to trick Lucene into writing it as a codec into the segment info.
+		// This will make sure that if we read the segments we will not need to have this codec available,
+		// be it someone trying to read it with external tools, or if  we are accessing and index created with different "versions".
+		super( DEFAULT_CODEC.getName(), DEFAULT_CODEC );
 		this.knnVectorsFormat = knnVectorsFormat;
-	}
-
-	public HibernateSearchLuceneCodec() {
-		this( (KnnVectorsFormat) null );
-		// NOTE: we are not providing access to a PerFieldKnnVectorsFormat based on a model,
-		// since max connections and beam width parameters configured by vector format are only used by an index writer;
-		// and we also are crating and passing the codec to the writer ourselves.
 	}
 
 	@Override

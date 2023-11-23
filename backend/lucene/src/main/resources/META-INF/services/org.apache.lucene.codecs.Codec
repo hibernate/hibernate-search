@@ -1,1 +1,1 @@
-org.hibernate.search.backend.lucene.lowlevel.codec.impl.HibernateSearchLuceneCodec
+# Note we do not want to register our own custom HibernateSearchLuceneCodec here as we are reusing the name of a default codec for it!

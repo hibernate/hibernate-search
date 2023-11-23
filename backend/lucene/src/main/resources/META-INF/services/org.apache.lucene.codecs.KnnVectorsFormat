@@ -1,1 +1,1 @@
-org.hibernate.search.backend.lucene.lowlevel.codec.impl.HibernateSearchKnnVectorsFormat
+# Note we do not want to register our own custom HibernateSearchKnnVectorsFormat here as we are reusing the name of a default format for it!
