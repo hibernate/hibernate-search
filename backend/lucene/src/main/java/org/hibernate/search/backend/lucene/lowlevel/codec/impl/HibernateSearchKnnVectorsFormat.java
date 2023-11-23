@@ -37,8 +37,12 @@ public class HibernateSearchKnnVectorsFormat extends KnnVectorsFormat {
 	}
 
 	public HibernateSearchKnnVectorsFormat(int maxConnection, int beamWidth) {
-		super( HibernateSearchKnnVectorsFormat.class.getSimpleName() );
-		this.delegate = new Lucene95HnswVectorsFormat( maxConnection, beamWidth );
+		this( new Lucene95HnswVectorsFormat( maxConnection, beamWidth ), maxConnection, beamWidth );
+	}
+
+	public HibernateSearchKnnVectorsFormat(KnnVectorsFormat delegate, int maxConnection, int beamWidth) {
+		super( delegate.getName() );
+		this.delegate = delegate;
 		this.maxConnection = maxConnection;
 		this.beamWidth = beamWidth;
 	}
@@ -57,6 +61,10 @@ public class HibernateSearchKnnVectorsFormat extends KnnVectorsFormat {
 	public int getMaxDimensions(String fieldName) {
 		// TODO: HSEARCH-5020: we can make this configurable, apparently there are models that produce larger vectors than this default allows.
 		return DEFAULT_MAX_DIMENSIONS;
+	}
+
+	public KnnVectorsFormat delegate() {
+		return delegate;
 	}
 
 	@Override
