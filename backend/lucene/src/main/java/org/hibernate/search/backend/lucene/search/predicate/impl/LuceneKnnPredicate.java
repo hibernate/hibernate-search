@@ -7,6 +7,7 @@
 package org.hibernate.search.backend.lucene.search.predicate.impl;
 
 import java.lang.invoke.MethodHandles;
+import java.lang.reflect.Array;
 
 import org.hibernate.search.backend.lucene.logging.impl.Log;
 import org.hibernate.search.backend.lucene.search.common.impl.AbstractLuceneValueFieldSearchQueryElementFactory;
@@ -63,6 +64,7 @@ public class LuceneKnnPredicate extends AbstractLuceneSingleFieldPredicate imple
 
 	private static class Builder<F> extends AbstractBuilder implements KnnPredicateBuilder {
 		private final Class<?> vectorElementsType;
+		private final int indexedVectorsDimension;
 		private int k;
 		private Object vector;
 		private LuceneSearchPredicate filter;
@@ -72,7 +74,9 @@ public class LuceneKnnPredicate extends AbstractLuceneSingleFieldPredicate imple
 
 			LuceneFieldCodec<F> codec = field.type().codec();
 			if ( codec instanceof LuceneVectorFieldCodec ) {
-				vectorElementsType = ( (LuceneVectorFieldCodec<F>) codec ).vectorElementsType();
+				LuceneVectorFieldCodec<F> vectorCodec = (LuceneVectorFieldCodec<F>) codec;
+				vectorElementsType = vectorCodec.vectorElementsType();
+				indexedVectorsDimension = vectorCodec.getConfiguredDimensions();
 			}
 			else {
 				// shouldn't really happen as if someone tries this it should fail on `queryElementFactory` lookup.
@@ -93,6 +97,11 @@ public class LuceneKnnPredicate extends AbstractLuceneSingleFieldPredicate imple
 			if ( !vectorElementsType.equals( vector.getClass().getComponentType() ) ) {
 				throw log.vectorKnnMatchVectorTypeDiffersFromField( absoluteFieldPath, vectorElementsType,
 						vector.getClass().getComponentType() );
+			}
+			if ( Array.getLength( vector ) != indexedVectorsDimension ) {
+				throw log.vectorKnnMatchVectorDimensionDiffersFromField( absoluteFieldPath, indexedVectorsDimension,
+						Array.getLength( vector )
+				);
 			}
 			this.vector = vector;
 		}

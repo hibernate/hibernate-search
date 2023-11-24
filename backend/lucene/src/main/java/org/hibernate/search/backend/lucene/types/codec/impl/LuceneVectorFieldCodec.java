@@ -25,4 +25,9 @@ public interface LuceneVectorFieldCodec<F> extends LuceneStandardFieldCodec<F, b
 	 * @return The type of vector elements expected to get either {@code float.class} or {@code byte.class}.
 	 */
 	Class<?> vectorElementsType();
+
+	/**
+	 * @return The number of dimensions (array length) of vectors to be indexed that this codec can process.
+	 */
+	int getConfiguredDimensions();
 }

@@ -40,7 +40,6 @@ import org.hibernate.search.util.impl.integrationtest.mapper.stub.SimpleMappedIn
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappingScope;
 
 import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
@@ -169,8 +168,6 @@ class KnnPredicateSpecificsIT {
 
 		@ParameterizedTest(name = "{1}")
 		@MethodSource("params")
-		@Disabled
-		// TODO : vector : make sure that the vector size for matching matches the vector size of indexed vectors
 		void wrongVectorLength(SimpleMappedIndex<IndexBinding> index, VectorFieldTypeDescriptor<?> fieldType) {
 			String fieldPath = index.binding().field.get( fieldType ).relativeFieldName;
 
@@ -179,7 +176,9 @@ class KnnPredicateSpecificsIT {
 					.fetchAll() )
 					.isInstanceOf( SearchException.class )
 					.hasMessageContainingAll(
-							"Vector value passed to the knn predicate has incorrect dimension that does not match the dimension of the indexed vectors."
+							"Vector field '" + fieldPath + "' is defined as a vector with '4' dimensions (array length).",
+							"Matching against an array with length of '8' is unsupported",
+							"Use the array of the same size as the vector field"
 					);
 		}
 
