@@ -9,21 +9,29 @@ package org.hibernate.search.mapper.pojo.mapping.definition.programmatic.impl;
 import org.hibernate.search.engine.backend.types.Projectable;
 import org.hibernate.search.engine.backend.types.Searchable;
 import org.hibernate.search.engine.backend.types.VectorSimilarity;
+import org.hibernate.search.engine.backend.types.dsl.IndexFieldTypeFactory;
+import org.hibernate.search.engine.backend.types.dsl.IndexFieldTypeOptionsStep;
 import org.hibernate.search.mapper.pojo.bridge.binding.spi.FieldModelContributorContext;
 import org.hibernate.search.mapper.pojo.extractor.mapping.programmatic.ContainerExtractorPath;
 import org.hibernate.search.mapper.pojo.mapping.building.spi.PojoPropertyMetadataContributor;
 import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.PropertyMappingStep;
 import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.PropertyMappingVectorFieldOptionsStep;
+import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.impl.PojoCompositeFieldModelContributor.DefaultInitiator;
 
 class PropertyMappingVectorFieldOptionsStepImpl
 		extends AbstractPropertyMappingFieldOptionsStep<PropertyMappingVectorFieldOptionsStepImpl>
 		implements PropertyMappingVectorFieldOptionsStep, PojoPropertyMetadataContributor {
 
 	PropertyMappingVectorFieldOptionsStepImpl(PropertyMappingStep parent, int dimension, String relativeFieldName) {
-		super(
-				parent, relativeFieldName, FieldModelContributorContext::vectorTypeOptionsStep,
-				() -> new PojoCompositeVectorFieldModelContributor( dimension )
-		);
+		super( parent, relativeFieldName,
+				new DefaultInitiator() {
+					@Override
+					public <F> IndexFieldTypeOptionsStep<?, F> initiate(IndexFieldTypeFactory factory,
+							Class<F> clazz) {
+						return factory.asVector( dimension, clazz );
+					}
+				},
+				FieldModelContributorContext::vectorTypeOptionsStep );
 		extractors( ContainerExtractorPath.noExtractors() );
 	}
 

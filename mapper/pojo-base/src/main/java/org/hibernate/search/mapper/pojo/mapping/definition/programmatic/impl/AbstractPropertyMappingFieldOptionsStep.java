@@ -8,12 +8,10 @@ package org.hibernate.search.mapper.pojo.mapping.definition.programmatic.impl;
 
 import java.lang.invoke.MethodHandles;
 import java.util.Map;
-import java.util.function.Supplier;
 
 import org.hibernate.search.engine.backend.common.spi.FieldPaths;
 import org.hibernate.search.engine.environment.bean.BeanReference;
 import org.hibernate.search.mapper.pojo.bridge.ValueBridge;
-import org.hibernate.search.mapper.pojo.bridge.binding.spi.FieldModelContributor;
 import org.hibernate.search.mapper.pojo.bridge.mapping.impl.BeanBinder;
 import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.ValueBinder;
 import org.hibernate.search.mapper.pojo.extractor.mapping.programmatic.ContainerExtractorPath;
@@ -39,19 +37,15 @@ abstract class AbstractPropertyMappingFieldOptionsStep<S extends PropertyMapping
 	private ContainerExtractorPath extractorPath = ContainerExtractorPath.defaultExtractors();
 
 	AbstractPropertyMappingFieldOptionsStep(PropertyMappingStep delegate, String relativeFieldName,
-			FieldModelContributor fieldTypeChecker) {
-		this( delegate, relativeFieldName, fieldTypeChecker, PojoCompositeFieldModelContributor::new );
-	}
-
-	AbstractPropertyMappingFieldOptionsStep(PropertyMappingStep delegate, String relativeFieldName,
-			FieldModelContributor fieldTypeChecker, Supplier<PojoCompositeFieldModelContributor> fieldModelContributorCreator) {
+			PojoCompositeFieldModelContributor.DefaultInitiator fieldTypeDefaultInitiator,
+			PojoCompositeFieldModelContributor.Contributor fieldTypeChecker) {
 		super( delegate );
 		this.relativeFieldName = relativeFieldName;
 		if ( relativeFieldName != null && relativeFieldName.contains( FieldPaths.PATH_SEPARATOR_STRING ) ) {
 			throw log.invalidFieldNameDotNotAllowed( relativeFieldName );
 		}
-		this.fieldModelContributor = fieldModelContributorCreator.get();
-		// The very first field contributor will just check that the field type is appropriate.
+		this.fieldModelContributor = new PojoCompositeFieldModelContributor( fieldTypeDefaultInitiator );
+		// The very first field type contributor will just check that the field type is appropriate.
 		// It is only useful if no option is set, since setting an option will perform that check too.
 		this.fieldModelContributor.add( fieldTypeChecker );
 	}
