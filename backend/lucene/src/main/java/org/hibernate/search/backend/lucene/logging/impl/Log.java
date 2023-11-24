@@ -722,4 +722,9 @@ public interface Log extends BasicLogger {
 
 	@Message(id = ID_OFFSET + 177, value = "Fields of this type cannot be multivalued.")
 	SearchException multiValuedFieldNotAllowed(@Param EventContext context);
+
+	@Message(id = ID_OFFSET + 178, value = "Vector field '%1$s' is defined as a vector with '%2$s' dimensions (array length)."
+			+ " Matching against an array with length of '%3$s' is unsupported."
+			+ " Use the array of the same size as the vector field.")
+	SearchException vectorKnnMatchVectorDimensionDiffersFromField(String absoluteFieldPath, int expected, int actual);
 }
