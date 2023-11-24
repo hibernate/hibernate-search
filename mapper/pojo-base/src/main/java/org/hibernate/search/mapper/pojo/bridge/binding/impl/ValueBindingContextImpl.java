@@ -10,7 +10,6 @@ import java.lang.invoke.MethodHandles;
 import java.lang.reflect.Type;
 import java.util.Map;
 import java.util.Optional;
-import java.util.function.Function;
 
 import org.hibernate.search.engine.backend.document.IndexFieldReference;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaElement;
@@ -189,9 +188,7 @@ public class ValueBindingContextImpl<V> extends AbstractBindingContext
 				.orElseThrow( () -> new AssertionFailure( "Could not auto-detect the return type for value bridge '"
 						+ bridge + "'." ) );
 		if ( typeArgument instanceof Class ) {
-			Function<Class<F>, IndexFieldTypeOptionsStep<?, F>> initialStepCreator =
-					contributor.initialStepCreator( indexFieldTypeFactory );
-			return initialStepCreator.apply( (Class<F>) typeArgument );
+			return contributor.inferDefaultFieldType( indexFieldTypeFactory, (Class<F>) typeArgument );
 		}
 		else {
 			throw log.invalidGenericParameterToInferFieldType( bridge, typeArgument );
