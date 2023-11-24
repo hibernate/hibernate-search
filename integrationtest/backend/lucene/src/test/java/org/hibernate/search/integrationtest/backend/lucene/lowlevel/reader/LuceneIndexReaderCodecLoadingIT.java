@@ -89,7 +89,7 @@ class LuceneIndexReaderCodecLoadingIT {
 		final IndexFieldReference<byte[]> vectorField;
 
 		IndexBinding(IndexSchemaElement root) {
-			vectorField = root.field( "vector", c -> c.asByteVector().dimension( 2 ).maxConnections( 10 ) ).toReference();
+			vectorField = root.field( "vector", c -> c.asByteVector( 2 ).maxConnections( 10 ) ).toReference();
 		}
 	}
 }

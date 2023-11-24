@@ -109,13 +109,13 @@ public abstract class FieldTypeDescriptor<F, S extends SearchableProjectableInde
 	protected final Class<F> javaType;
 	private final String uniqueName;
 
-	private final AscendingUniqueTermValues<F> ascendingUniqueTermValues = createAscendingUniqueTermValues();
+	private AscendingUniqueTermValues<F> ascendingUniqueTermValues;
 
-	private final IndexableValues<F> indexableValues = createIndexableValues();
+	private IndexableValues<F> indexableValues;
 
-	private final List<F> uniquelyMatchableValues = Collections.unmodifiableList( createUniquelyMatchableValues() );
+	private List<F> uniquelyMatchableValues;
 
-	private final List<F> nonMatchingValues = Collections.unmodifiableList( createNonMatchingValues() );
+	private List<F> nonMatchingValues;
 
 	protected FieldTypeDescriptor(Class<F> javaType) {
 		this( javaType, javaType.getSimpleName() );
@@ -159,7 +159,10 @@ public abstract class FieldTypeDescriptor<F, S extends SearchableProjectableInde
 	 */
 	public final AscendingUniqueTermValues<F> getAscendingUniqueTermValues() {
 		if ( ascendingUniqueTermValues == null ) {
-			throw new UnsupportedOperationException( "Value lookup isn't supported for " + this + "." );
+			ascendingUniqueTermValues = createAscendingUniqueTermValues();
+			if ( ascendingUniqueTermValues == null ) {
+				throw new UnsupportedOperationException( "Value lookup isn't supported for " + this + "." );
+			}
 		}
 		return ascendingUniqueTermValues;
 	}
@@ -170,6 +173,9 @@ public abstract class FieldTypeDescriptor<F, S extends SearchableProjectableInde
 	 * @return A set of indexables values, not necessarily unique.
 	 */
 	public final IndexableValues<F> getIndexableValues() {
+		if ( indexableValues == null ) {
+			indexableValues = createIndexableValues();
+		}
 		return indexableValues;
 	}
 
@@ -181,12 +187,18 @@ public abstract class FieldTypeDescriptor<F, S extends SearchableProjectableInde
 	 * This also means distinct values for analyzed/normalized text cannot share the same token.
 	 */
 	public final List<F> getUniquelyMatchableValues() {
+		if ( uniquelyMatchableValues == null ) {
+			uniquelyMatchableValues = createUniquelyMatchableValues();
+		}
 		return uniquelyMatchableValues;
 	}
 
 	protected abstract List<F> createUniquelyMatchableValues();
 
 	public final List<F> getNonMatchingValues() {
+		if ( nonMatchingValues == null ) {
+			nonMatchingValues = createNonMatchingValues();
+		}
 		return nonMatchingValues;
 	}
 

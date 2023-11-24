@@ -10,6 +10,7 @@ import java.lang.invoke.MethodHandles;
 import java.lang.reflect.Type;
 import java.util.Map;
 import java.util.Optional;
+import java.util.function.Function;
 
 import org.hibernate.search.engine.backend.document.IndexFieldReference;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaElement;
@@ -21,7 +22,6 @@ import org.hibernate.search.engine.environment.bean.BeanResolver;
 import org.hibernate.search.engine.mapper.mapping.building.spi.IndexBindingContext;
 import org.hibernate.search.engine.mapper.mapping.building.spi.IndexFieldTypeDefaultsProvider;
 import org.hibernate.search.mapper.pojo.bridge.ValueBridge;
-import org.hibernate.search.mapper.pojo.bridge.VectorBridge;
 import org.hibernate.search.mapper.pojo.bridge.binding.ValueBindingContext;
 import org.hibernate.search.mapper.pojo.bridge.binding.spi.FieldModelContributor;
 import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.ValueBinder;
@@ -189,12 +189,9 @@ public class ValueBindingContextImpl<V> extends AbstractBindingContext
 				.orElseThrow( () -> new AssertionFailure( "Could not auto-detect the return type for value bridge '"
 						+ bridge + "'." ) );
 		if ( typeArgument instanceof Class ) {
-			if ( bridge instanceof VectorBridge ) {
-				return indexFieldTypeFactory.asVector( (Class<F>) typeArgument );
-			}
-			else {
-				return indexFieldTypeFactory.as( (Class<F>) typeArgument );
-			}
+			Function<Class<F>, IndexFieldTypeOptionsStep<?, F>> initialStepCreator =
+					contributor.initialStepCreator( indexFieldTypeFactory );
+			return initialStepCreator.apply( (Class<F>) typeArgument );
 		}
 		else {
 			throw log.invalidGenericParameterToInferFieldType( bridge, typeArgument );

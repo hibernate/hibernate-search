@@ -19,15 +19,22 @@ public class ByteVectorFieldTypeDescriptor extends VectorFieldTypeDescriptor<byt
 
 	public static final ByteVectorFieldTypeDescriptor INSTANCE = new ByteVectorFieldTypeDescriptor();
 
-	public static final int size = 4;
-
 	private ByteVectorFieldTypeDescriptor() {
-		super( byte[].class, "byte_vector" );
+		this( 4 );
+	}
+
+	private ByteVectorFieldTypeDescriptor(int dimension) {
+		super( byte[].class, "byte_vector", dimension );
+	}
+
+	@Override
+	public VectorFieldTypeDescriptor<byte[]> withDimension(int dimension) {
+		return new ByteVectorFieldTypeDescriptor( dimension );
 	}
 
 	@Override
 	public VectorFieldTypeOptionsStep<?, byte[]> configure(IndexFieldTypeFactory fieldContext) {
-		return fieldContext.asByteVector().dimension( size );
+		return fieldContext.asByteVector( size );
 	}
 
 	@Override
@@ -36,8 +43,8 @@ public class ByteVectorFieldTypeDescriptor extends VectorFieldTypeDescriptor<byt
 	}
 
 	@Override
-	public byte[] sampleVector(int dimension) {
-		return arrayOf( dimension, new Random().nextInt( Byte.MAX_VALUE - 1 ) + 1 );
+	public byte[] sampleVector() {
+		return arrayOf( size, new Random().nextInt( Byte.MAX_VALUE - 1 ) + 1 );
 	}
 
 	@Override

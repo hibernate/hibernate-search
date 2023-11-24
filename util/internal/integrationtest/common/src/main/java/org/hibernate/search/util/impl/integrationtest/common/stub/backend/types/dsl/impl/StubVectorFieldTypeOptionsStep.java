@@ -13,14 +13,9 @@ class StubVectorFieldTypeOptionsStep<F>
 		extends AbstractStubSearchableProjectableIndexFieldTypeOptionsStep<StubVectorFieldTypeOptionsStep<F>, F>
 		implements VectorFieldTypeOptionsStep<StubVectorFieldTypeOptionsStep<F>, F> {
 
-	StubVectorFieldTypeOptionsStep(Class<F> klass) {
+	StubVectorFieldTypeOptionsStep(int dimension, Class<F> klass) {
 		super( klass );
-	}
-
-	@Override
-	public StubVectorFieldTypeOptionsStep<F> dimension(int dimension) {
 		builder.modifier( b -> b.dimension( dimension ) );
-		return this;
 	}
 
 	@Override

@@ -25,4 +25,5 @@ class PojoCompositeFieldModelContributor implements FieldModelContributor {
 			delegate.contribute( context );
 		}
 	}
+
 }

@@ -20,12 +20,6 @@ public interface VectorFieldTypeOptionsStep<S extends VectorFieldTypeOptionsStep
 		extends SearchableProjectableIndexFieldTypeOptionsStep<S, F> {
 
 	/**
-	 * @param dimension Defines the size of the vector.
-	 * @return {@code this}, for method chaining.
-	 */
-	S dimension(int dimension);
-
-	/**
 	 * @param vectorSimilarity Defines how vector similarity is calculated.
 	 * @return {@code this}, for method chaining.
 	 */

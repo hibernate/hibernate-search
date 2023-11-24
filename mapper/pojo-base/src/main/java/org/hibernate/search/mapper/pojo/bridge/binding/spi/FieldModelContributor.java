@@ -6,7 +6,17 @@
  */
 package org.hibernate.search.mapper.pojo.bridge.binding.spi;
 
+import java.util.function.Function;
+
+import org.hibernate.search.engine.backend.types.dsl.IndexFieldTypeFactory;
+import org.hibernate.search.engine.backend.types.dsl.IndexFieldTypeOptionsStep;
+
 public interface FieldModelContributor {
+
+	default <F> Function<Class<F>, IndexFieldTypeOptionsStep<?, F>> initialStepCreator(
+			IndexFieldTypeFactory indexFieldTypeFactory) {
+		return indexFieldTypeFactory::as;
+	}
 
 	void contribute(FieldModelContributorContext context);
 

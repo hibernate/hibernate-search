@@ -9,10 +9,8 @@ package org.hibernate.search.mapper.pojo.bridge.builtin.impl;
 import java.util.Arrays;
 
 import org.hibernate.search.engine.cfg.spi.ParseUtils;
-import org.hibernate.search.mapper.pojo.bridge.VectorBridge;
 
-public final class DefaultFloatArrayBridge extends AbstractPassThroughDefaultBridge<float[]>
-		implements VectorBridge<float[], float[]> {
+public final class DefaultFloatArrayBridge extends AbstractPassThroughDefaultBridge<float[]> {
 
 	public static final DefaultFloatArrayBridge INSTANCE = new DefaultFloatArrayBridge();
 
