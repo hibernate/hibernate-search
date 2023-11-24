@@ -160,24 +160,24 @@ public class StubIndexFieldTypeFactory implements IndexFieldTypeFactory {
 
 	@Override
 	@SuppressWarnings("unchecked")
-	public <F> VectorFieldTypeOptionsStep<?, F> asVector(Class<F> valueType) {
+	public <F> VectorFieldTypeOptionsStep<?, F> asVector(int dimension, Class<F> valueType) {
 		if ( byte[].class.equals( valueType ) ) {
-			return (VectorFieldTypeOptionsStep<?, F>) asByteVector();
+			return (VectorFieldTypeOptionsStep<?, F>) asByteVector( dimension );
 		}
 		if ( float[].class.equals( valueType ) ) {
-			return (VectorFieldTypeOptionsStep<?, F>) asFloatVector();
+			return (VectorFieldTypeOptionsStep<?, F>) asFloatVector( dimension );
 		}
 		throw new IllegalStateException( "Unsupported vector type " + valueType );
 	}
 
 	@Override
-	public VectorFieldTypeOptionsStep<?, byte[]> asByteVector() {
-		return new StubVectorFieldTypeOptionsStep<>( byte[].class );
+	public VectorFieldTypeOptionsStep<?, byte[]> asByteVector(int dimension) {
+		return new StubVectorFieldTypeOptionsStep<>( dimension, byte[].class );
 	}
 
 	@Override
-	public VectorFieldTypeOptionsStep<?, float[]> asFloatVector() {
-		return new StubVectorFieldTypeOptionsStep<>( float[].class );
+	public VectorFieldTypeOptionsStep<?, float[]> asFloatVector(int dimension) {
+		return new StubVectorFieldTypeOptionsStep<>( dimension, float[].class );
 	}
 
 	public <T> IndexFieldTypeOptionsStep<?, T> asNonStandard(Class<T> fieldValueType) {

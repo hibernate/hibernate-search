@@ -19,25 +19,27 @@ public class FloatVectorFieldTypeDescriptor extends VectorFieldTypeDescriptor<fl
 
 	public static final FloatVectorFieldTypeDescriptor INSTANCE = new FloatVectorFieldTypeDescriptor();
 
-	public static final int size = 4;
-
 	private FloatVectorFieldTypeDescriptor() {
-		super( float[].class, "float_vector" );
+		this( 4 );
+	}
+
+	private FloatVectorFieldTypeDescriptor(int dimension) {
+		super( float[].class, "float_vector", dimension );
+	}
+
+	@Override
+	public VectorFieldTypeDescriptor<float[]> withDimension(int dimension) {
+		return new FloatVectorFieldTypeDescriptor( dimension );
 	}
 
 	@Override
 	public VectorFieldTypeOptionsStep<?, float[]> configure(IndexFieldTypeFactory fieldContext) {
-		return fieldContext.asFloatVector().dimension( size );
+		return fieldContext.asFloatVector( size );
 	}
 
 	@Override
-	public int vectorSize() {
-		return size;
-	}
-
-	@Override
-	public float[] sampleVector(int dimension) {
-		return arrayOf( dimension, new Random().nextFloat() );
+	public float[] sampleVector() {
+		return arrayOf( size, new Random().nextFloat() );
 	}
 
 	@Override

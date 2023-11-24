@@ -43,24 +43,19 @@ abstract class AbstractLuceneVectorFieldTypeOptionsStep<S extends AbstractLucene
 	private static final int MAX_MAX_CONNECTIONS = 512;
 
 	protected VectorSimilarity vectorSimilarity = VectorSimilarity.DEFAULT;
-	protected int dimension = -1;
+	protected final int dimension;
 	protected int beamWidth = MAX_MAX_CONNECTIONS;
 	protected int maxConnections = 16;
 	private Projectable projectable = Projectable.DEFAULT;
 	private Searchable searchable = Searchable.DEFAULT;
 	private F indexNullAsValue = null;
 
-	AbstractLuceneVectorFieldTypeOptionsStep(LuceneIndexFieldTypeBuildContext buildContext, Class<F> valueType) {
+	AbstractLuceneVectorFieldTypeOptionsStep(LuceneIndexFieldTypeBuildContext buildContext, Class<F> valueType, int dimension) {
 		super( buildContext, valueType );
-	}
-
-	@Override
-	public S dimension(int dimension) {
 		if ( dimension < 1 || dimension > DEFAULT_MAX_DIMENSIONS ) {
 			throw log.vectorPropertyUnsupportedValue( "dimension", dimension, DEFAULT_MAX_DIMENSIONS );
 		}
 		this.dimension = dimension;
-		return thisAsS();
 	}
 
 	@Override
@@ -107,11 +102,6 @@ abstract class AbstractLuceneVectorFieldTypeOptionsStep<S extends AbstractLucene
 
 	@Override
 	public LuceneIndexValueFieldType<F> toIndexFieldType() {
-		if ( dimension < 0 ) {
-			// means we never called dimension(..)
-			throw log.vectorDimensionNotSpecified( buildContext.getEventContext() );
-		}
-
 		VectorSimilarityFunction resolvedVectorSimilarity = resolveDefault( vectorSimilarity );
 		boolean resolvedProjectable = resolveDefault( projectable );
 		boolean resolvedSearchable = resolveDefault( searchable );

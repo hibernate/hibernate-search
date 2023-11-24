@@ -8,6 +8,7 @@ package org.hibernate.search.mapper.pojo.mapping.definition.programmatic.impl;
 
 import java.lang.invoke.MethodHandles;
 import java.util.Map;
+import java.util.function.Supplier;
 
 import org.hibernate.search.engine.backend.common.spi.FieldPaths;
 import org.hibernate.search.engine.environment.bean.BeanReference;
@@ -39,12 +40,17 @@ abstract class AbstractPropertyMappingFieldOptionsStep<S extends PropertyMapping
 
 	AbstractPropertyMappingFieldOptionsStep(PropertyMappingStep delegate, String relativeFieldName,
 			FieldModelContributor fieldTypeChecker) {
+		this( delegate, relativeFieldName, fieldTypeChecker, PojoCompositeFieldModelContributor::new );
+	}
+
+	AbstractPropertyMappingFieldOptionsStep(PropertyMappingStep delegate, String relativeFieldName,
+			FieldModelContributor fieldTypeChecker, Supplier<PojoCompositeFieldModelContributor> fieldModelContributorCreator) {
 		super( delegate );
 		this.relativeFieldName = relativeFieldName;
 		if ( relativeFieldName != null && relativeFieldName.contains( FieldPaths.PATH_SEPARATOR_STRING ) ) {
 			throw log.invalidFieldNameDotNotAllowed( relativeFieldName );
 		}
-		this.fieldModelContributor = new PojoCompositeFieldModelContributor();
+		this.fieldModelContributor = fieldModelContributorCreator.get();
 		// The very first field contributor will just check that the field type is appropriate.
 		// It is only useful if no option is set, since setting an option will perform that check too.
 		this.fieldModelContributor.add( fieldTypeChecker );

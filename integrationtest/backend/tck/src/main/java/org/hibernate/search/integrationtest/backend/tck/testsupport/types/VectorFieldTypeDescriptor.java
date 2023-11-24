@@ -16,13 +16,14 @@ import org.hibernate.search.integrationtest.backend.tck.testsupport.types.values
 public abstract class VectorFieldTypeDescriptor<F>
 		extends FieldTypeDescriptor<F, VectorFieldTypeOptionsStep<?, F>> {
 
-	protected VectorFieldTypeDescriptor(Class<F> javaType) {
-		super( javaType );
+	protected final int size;
+
+	protected VectorFieldTypeDescriptor(Class<F> javaType, String uniqueName, int size) {
+		super( javaType, uniqueName );
+		this.size = size;
 	}
 
-	protected VectorFieldTypeDescriptor(Class<F> javaType, String uniqueName) {
-		super( javaType, uniqueName );
-	}
+	public abstract VectorFieldTypeDescriptor<F> withDimension(int dimension);
 
 	@Override
 	public abstract VectorFieldTypeOptionsStep<?, F> configure(IndexFieldTypeFactory fieldContext);
@@ -57,7 +58,10 @@ public abstract class VectorFieldTypeDescriptor<F>
 		return false;
 	}
 
-	public abstract int vectorSize();
+	public int vectorSize() {
+		return size;
+	}
 
-	public abstract F sampleVector(int dimension);
+	public abstract F sampleVector();
+
 }

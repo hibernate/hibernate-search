@@ -714,15 +714,12 @@ public interface Log extends BasicLogger {
 	SearchException cannotGuessVectorFieldType(@FormatWith(ClassFormatter.class) Class<?> inputType,
 			@Param EventContext context);
 
-	@Message(id = ID_OFFSET + 176, value = "Vector dimension is a mandatory property.")
-	SearchException vectorDimensionNotSpecified(@Param EventContext eventContext);
-
-	@Message(id = ID_OFFSET + 177, value = "Vector field '%1$s' is defined as a '%2$s' array."
+	@Message(id = ID_OFFSET + 176, value = "Vector field '%1$s' is defined as a '%2$s' array."
 			+ " Matching against '%3$s' array is unsupported."
 			+ " Use the array of the same type as the vector field.")
 	SearchException vectorKnnMatchVectorTypeDiffersFromField(String absoluteFieldPath,
 			@FormatWith(ClassFormatter.class) Class<?> expected, @FormatWith(ClassFormatter.class) Class<?> actual);
 
-	@Message(id = ID_OFFSET + 178, value = "Fields of this type cannot be multivalued.")
+	@Message(id = ID_OFFSET + 177, value = "Fields of this type cannot be multivalued.")
 	SearchException multiValuedFieldNotAllowed(@Param EventContext context);
 }

@@ -44,14 +44,14 @@ class LuceneVectorFieldIT {
 				.withIndex( SimpleMappedIndex
 						.of( root -> root
 								.field( "vector",
-										f -> f.asByteVector().dimension( dimension ).beamWidth( beamWidth )
+										f -> f.asByteVector( dimension ).beamWidth( beamWidth )
 												.maxConnections( maxConnections ) )
 								.toReference() ) )
 				.setup()
 		).isInstanceOf( SearchException.class )
 				.hasMessageContainingAll(
 						"Vector '" + property + "' cannot be equal to '" + value + "'",
-						"It must be a positive integer value not greater than " + maxValue
+						"It must be a positive integer value lesser than or equal to " + maxValue
 				);
 	}
 }

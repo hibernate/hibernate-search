@@ -15,6 +15,7 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 import java.util.function.Consumer;
+import java.util.stream.Collectors;
 
 import org.hibernate.search.engine.backend.document.DocumentElement;
 import org.hibernate.search.engine.backend.document.IndexFieldReference;
@@ -82,7 +83,7 @@ class KnnPredicateSpecificsIT {
 		final BulkIndexer scopeIndexer = SearchScopeConfigured.index.bulkIndexer();
 		SearchScopeConfigured.dataSets.forEach( d -> d.contribute( SearchScopeConfigured.index, scopeIndexer ) );
 		final BulkIndexer scopeDifferentDimensionIndexer = SearchScopeConfigured.indexDifferentDimension.bulkIndexer();
-		SearchScopeConfigured.dataSets
+		SearchScopeConfigured.dataSetsDimension
 				.forEach( d -> d.contribute( SearchScopeConfigured.indexDifferentDimension, scopeDifferentDimensionIndexer ) );
 		final BulkIndexer scopeDifferentBeamWidthIndexer = SearchScopeConfigured.indexDifferentBeamWidth.bulkIndexer();
 		SearchScopeConfigured.dataSets
@@ -220,27 +221,33 @@ class KnnPredicateSpecificsIT {
 	}
 
 	abstract static class SearchScopeConfigured {
+		private static final List<VectorFieldTypeDescriptor<?>> supportedFieldTypesWithDifferentDimension =
+				supportedFieldTypes.stream()
+						.map( vd -> vd.withDimension( 2 ) ).collect( Collectors.toList() );
+
 		private static final SimpleMappedIndex<IndexBinding> index =
-				SimpleMappedIndex.of( root -> new IndexBinding( root, supportedFieldTypes, 2, 2, 2, VectorSimilarity.L2 ) )
+				SimpleMappedIndex.of( root -> new IndexBinding( root, supportedFieldTypes, 2, 2, VectorSimilarity.L2 ) )
 						.name( "scope" );
 
 		private static final SimpleMappedIndex<IndexBinding> indexDifferentDimension =
-				SimpleMappedIndex.of( root -> new IndexBinding( root, supportedFieldTypes, 4, 2, 2, VectorSimilarity.L2 ) )
-						.name( "scopeDifferentDimension" );
+				SimpleMappedIndex.of( root -> new IndexBinding( root, supportedFieldTypesWithDifferentDimension, 2, 2,
+						VectorSimilarity.L2
+				) ).name( "scopeDifferentDimension" );
 
 		private static final SimpleMappedIndex<IndexBinding> indexDifferentBeamWidth =
-				SimpleMappedIndex.of( root -> new IndexBinding( root, supportedFieldTypes, 2, 4, 2, VectorSimilarity.L2 ) )
+				SimpleMappedIndex.of( root -> new IndexBinding( root, supportedFieldTypes, 4, 2, VectorSimilarity.L2 ) )
 						.name( "scopeDifferentBeamWidth" );
 
 		private static final SimpleMappedIndex<IndexBinding> indexDifferentMaxConnection =
-				SimpleMappedIndex.of( root -> new IndexBinding( root, supportedFieldTypes, 2, 2, 4, VectorSimilarity.L2 ) )
+				SimpleMappedIndex.of( root -> new IndexBinding( root, supportedFieldTypes, 2, 4, VectorSimilarity.L2 ) )
 						.name( "scopeDifferentMaxConnection" );
 
 		private static final SimpleMappedIndex<IndexBinding> indexDifferentSimilarity =
-				SimpleMappedIndex.of( root -> new IndexBinding( root, supportedFieldTypes, 2, 2, 2, VectorSimilarity.COSINE ) )
+				SimpleMappedIndex.of( root -> new IndexBinding( root, supportedFieldTypes, 2, 2, VectorSimilarity.COSINE ) )
 						.name( "scopeDifferentSimilarity" );
 
 		private static final List<DataSet<?>> dataSets = new ArrayList<>();
+		private static final List<DataSet<?>> dataSetsDimension = new ArrayList<>();
 
 		private static final List<Arguments> parameters = new ArrayList<>();
 		static {
@@ -248,6 +255,9 @@ class KnnPredicateSpecificsIT {
 				parameters.add( Arguments.of( fieldType, index, indexDifferentDimension, indexDifferentBeamWidth,
 						indexDifferentMaxConnection, indexDifferentSimilarity ) );
 				dataSets.add( new DataSet<>( fieldType ) );
+			}
+			for ( VectorFieldTypeDescriptor<?> fieldType : supportedFieldTypesWithDifferentDimension ) {
+				dataSetsDimension.add( new DataSet<>( fieldType ) );
 			}
 		}
 
@@ -362,24 +372,16 @@ class KnnPredicateSpecificsIT {
 		private static class IndexBinding {
 			private final SimpleFieldModelsByType field;
 
-			private final int dimension;
-			private final int beamWidth;
-			private final int maxConnections;
-			private final VectorSimilarity vectorSimilarity;
 
 			public IndexBinding(IndexSchemaElement root, Collection<? extends VectorFieldTypeDescriptor<?>> fieldTypes,
-					int dimension, int beamWidth, int maxConnections, VectorSimilarity vectorSimilarity) {
-				this.dimension = dimension;
-				this.beamWidth = beamWidth;
-				this.maxConnections = maxConnections;
-				this.vectorSimilarity = vectorSimilarity;
+					int beamWidth, int maxConnections, VectorSimilarity vectorSimilarity) {
 
-				field = SimpleFieldModelsByType.mapAll( fieldTypes, root, "", c -> c.dimension( dimension )
-						.beamWidth( beamWidth ).maxConnections( maxConnections ).vectorSimilarity( vectorSimilarity ) );
+				field = SimpleFieldModelsByType.mapAll( fieldTypes, root, "", c -> c.beamWidth( beamWidth )
+						.maxConnections( maxConnections ).vectorSimilarity( vectorSimilarity ) );
 			}
 
 			public <F> F sampleVector(VectorFieldTypeDescriptor<F> vectorFieldTypeDescriptor) {
-				return vectorFieldTypeDescriptor.sampleVector( dimension );
+				return vectorFieldTypeDescriptor.sampleVector();
 			}
 		}
 
@@ -717,7 +719,7 @@ class KnnPredicateSpecificsIT {
 			PredicateIndexBinding(IndexSchemaElement root) {
 				parking = root.field( "parking", f -> f.asBoolean().projectable( Projectable.YES ) ).toReference();
 				rating = root.field( "rating", f -> f.asInteger().projectable( Projectable.YES ) ).toReference();
-				location = root.field( "location", f -> f.asFloatVector().dimension( 2 ).projectable( Projectable.YES )
+				location = root.field( "location", f -> f.asFloatVector( 2 ).projectable( Projectable.YES )
 						.maxConnections( 16 ).beamWidth( 100 ).vectorSimilarity( VectorSimilarity.L2 ) ).toReference();
 			}
 		}
@@ -726,7 +728,7 @@ class KnnPredicateSpecificsIT {
 			final IndexFieldReference<byte[]> vector;
 
 			private MultiValuedIndexBinding(IndexSchemaElement root) {
-				vector = root.field( "vector", f -> f.asByteVector().dimension( 2 ) ).multiValued().toReference();
+				vector = root.field( "vector", f -> f.asByteVector( 2 ) ).multiValued().toReference();
 			}
 		}
 
@@ -741,10 +743,10 @@ class KnnPredicateSpecificsIT {
 				nested = nestedField.toReference();
 
 				byteVector = nestedField.field(
-						"byteVector", f -> f.asByteVector().dimension( 2 ).projectable( Projectable.YES ) )
+						"byteVector", f -> f.asByteVector( 2 ).projectable( Projectable.YES ) )
 						.toReference();
 				floatVector = nestedField
-						.field( "floatVector", f -> f.asFloatVector().dimension( 2 ).projectable( Projectable.YES ) )
+						.field( "floatVector", f -> f.asFloatVector( 2 ).projectable( Projectable.YES ) )
 						.toReference();
 			}
 		}

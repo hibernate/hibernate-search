@@ -9,6 +9,7 @@ package org.hibernate.search.mapper.pojo.mapping.definition.programmatic.impl;
 import org.hibernate.search.engine.backend.types.Projectable;
 import org.hibernate.search.engine.backend.types.Searchable;
 import org.hibernate.search.engine.backend.types.VectorSimilarity;
+import org.hibernate.search.mapper.pojo.bridge.binding.spi.FieldModelContributorContext;
 import org.hibernate.search.mapper.pojo.extractor.mapping.programmatic.ContainerExtractorPath;
 import org.hibernate.search.mapper.pojo.mapping.building.spi.PojoPropertyMetadataContributor;
 import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.PropertyMappingStep;
@@ -19,7 +20,10 @@ class PropertyMappingVectorFieldOptionsStepImpl
 		implements PropertyMappingVectorFieldOptionsStep, PojoPropertyMetadataContributor {
 
 	PropertyMappingVectorFieldOptionsStepImpl(PropertyMappingStep parent, int dimension, String relativeFieldName) {
-		super( parent, relativeFieldName, c -> c.vectorTypeOptionsStep().dimension( dimension ) );
+		super(
+				parent, relativeFieldName, FieldModelContributorContext::vectorTypeOptionsStep,
+				() -> new PojoCompositeVectorFieldModelContributor( dimension )
+		);
 		extractors( ContainerExtractorPath.noExtractors() );
 	}
 

@@ -17,8 +17,8 @@ import org.apache.lucene.index.VectorSimilarityFunction;
 class LuceneFloatVectorFieldTypeOptionsStep
 		extends AbstractLuceneVectorFieldTypeOptionsStep<LuceneFloatVectorFieldTypeOptionsStep, float[]> {
 
-	LuceneFloatVectorFieldTypeOptionsStep(LuceneIndexFieldTypeBuildContext buildContext) {
-		super( buildContext, float[].class );
+	LuceneFloatVectorFieldTypeOptionsStep(LuceneIndexFieldTypeBuildContext buildContext, int dimension) {
+		super( buildContext, float[].class, dimension );
 	}
 
 	@Override
