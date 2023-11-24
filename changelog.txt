@@ -1,6 +1,27 @@
 Hibernate Search Changelog
 ==========================
 
+7.0.0.CR2 (2023-11-24)
+-------------------------
+
+** Improvement
+    * HSEARCH-5015 Make OutboxEvent non-final
+    * HSEARCH-5012 Add compatiblity with Elasticsearch 8.11.1 and upgrade to Elasticsearch client 8.11.1
+    * HSEARCH-5008 Upgrade to Hibernate ORM 6.4
+    * HSEARCH-5005 Add compatiblity with Elasticsearch 8.11.0 and upgrade to Elasticsearch client 8.11.0
+    * HSEARCH-4999 Use geo_shape instead of geo_polygon in Elasticsearch spatial predicates
+    * HSEARCH-4997 Compatibility with Hibernate ORM 6.4
+    * HSEARCH-4996 Upgrade JBeret to 2.1.3.Final
+    * HSEARCH-4995 Avoid logging exceptions when using SchemaManager explicitly
+
+** Task
+    * HSEARCH-5013 Test against latest Elasticsearch 7.17.15
+    * HSEARCH-5011 Fix some tests no longer being executed as part of the build
+    * HSEARCH-5002 Document dropped compatibility with older Elasticsearch/OpenSearch versions and Hibernate ORM 6.3 upgrade in migration guide
+    * HSEARCH-5000 Address test failure with ORM 6.4 in PolymorphicAssociationContainedInTargetTest
+    * HSEARCH-4998 Make the build compatible with podman
+    * HSEARCH-4674 Move to Testcontainers to start Elasticsearch/OpenSearch/databases/etc.
+
 7.0.0.CR1 (2023-10-20)
 -------------------------
 
