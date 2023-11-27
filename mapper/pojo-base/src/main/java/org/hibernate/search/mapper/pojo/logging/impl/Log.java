@@ -910,4 +910,9 @@ public interface Log extends BasicLogger {
 					+ " which does not extend the expected interface '%2$s'.")
 	SearchException invalidFieldEncodingForVectorFieldMapping(IndexFieldTypeOptionsStep<?, ?> step,
 			@FormatWith(ClassFormatter.class) Class<?> expectedContextType);
+
+	@Message(id = ID_OFFSET + 145, value = "Vector dimension is a required property. "
+			+ "Either specify it as an annotation property (@VectorField(dimension = somePositiveInteger)), "
+			+ "or define a value binder (@VectorField(valueBinder = @ValueBinderRef(..))) that explicitly declares a vector field specifying the dimension.")
+	SearchException vectorDimensionNotSpecified();
 }

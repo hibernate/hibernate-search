@@ -358,7 +358,7 @@ class VectorFieldIT {
 		class IndexedEntity {
 			@DocumentId
 			Integer id;
-			@VectorField(valueBridge = @ValueBridgeRef(type = InvalidTypeBridge.class))
+			@VectorField(dimension = 5, valueBridge = @ValueBridgeRef(type = InvalidTypeBridge.class))
 			List<Byte> bytes;
 		}
 
@@ -427,6 +427,27 @@ class VectorFieldIT {
 								+ " or set the type parameter F to a definite, raw type." ) );
 	}
 
+	@Test
+	void customBridge_vectorDimensionUnknown() {
+		@Indexed(index = INDEX_NAME)
+		class IndexedEntity {
+			@DocumentId
+			Integer id;
+			@VectorField(valueBinder = @ValueBinderRef(type = ValidImplicitTypeBridge.ValidImplicitTypeBinder.class))
+			Collection<Float> floats;
+		}
+
+		assertThatThrownBy( () -> setupHelper.start().expectCustomBeans().setup( IndexedEntity.class ) )
+				.isInstanceOf( SearchException.class )
+				.satisfies( FailureReportUtils.hasFailureReport()
+						.typeContext( IndexedEntity.class.getName() )
+						.pathContext( ".floats" )
+						.failure( "Vector dimension is a required property. "
+								+ "Either specify it as an annotation property (@VectorField(dimension = somePositiveInteger)),"
+								+ " or define a value binder (@VectorField(valueBinder = @ValueBinderRef(..))) that explicitly declares a vector field specifying the dimension." ) );
+	}
+
+	@SuppressWarnings("rawtypes")
 	public static class ValidTypeBridge implements ValueBridge<List, byte[]> {
 		@Override
 		public byte[] toIndexedValue(List value, ValueBridgeToIndexedValueContext context) {
@@ -449,6 +470,7 @@ class VectorFieldIT {
 		}
 	}
 
+	@SuppressWarnings("rawtypes")
 	public static class ParametricBridge implements ValueBridge<List, float[]> {
 
 		@Override
@@ -478,6 +500,7 @@ class VectorFieldIT {
 		}
 	}
 
+	@SuppressWarnings("rawtypes")
 	public static class ValidImplicitTypeBridge implements ValueBridge<Collection, float[]> {
 
 		public static class ValidImplicitTypeBinder implements ValueBinder {
@@ -514,6 +537,7 @@ class VectorFieldIT {
 		}
 	}
 
+	@SuppressWarnings("rawtypes")
 	public static class InvalidTypeBridge implements ValueBridge<List, Integer> {
 		@Override
 		public Integer toIndexedValue(List value, ValueBridgeToIndexedValueContext context) {
