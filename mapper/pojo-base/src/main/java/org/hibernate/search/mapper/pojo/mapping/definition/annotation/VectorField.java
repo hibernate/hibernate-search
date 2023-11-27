@@ -17,6 +17,8 @@ import org.hibernate.search.engine.backend.types.Projectable;
 import org.hibernate.search.engine.backend.types.Searchable;
 import org.hibernate.search.engine.backend.types.VectorSimilarity;
 import org.hibernate.search.engine.environment.bean.BeanRetrieval;
+import org.hibernate.search.mapper.pojo.bridge.mapping.annotation.ValueBinderRef;
+import org.hibernate.search.mapper.pojo.bridge.mapping.annotation.ValueBridgeRef;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.processing.PropertyMapping;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.processing.PropertyMappingAnnotationProcessorRef;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.processing.impl.VectorFieldAnnotationProcessor;
@@ -61,7 +63,7 @@ public @interface VectorField {
 	/**
 	 * @return The size of the vector.
 	 */
-	int dimension();
+	int dimension() default AnnotationDefaultValues.DEFAULT_DIMENSION;
 
 	/**
 	 * @return How vector similarity is calculated.
@@ -88,6 +90,22 @@ public @interface VectorField {
 	 * Default value is backend-specific.
 	 */
 	int maxConnections() default AnnotationDefaultValues.DEFAULT_MAX_CONNECTIONS;
+
+	/**
+	 * @return A reference to the value bridge to use for this field.
+	 * Must not be set if {@link #valueBinder()} is set.
+	 * @see GenericField#valueBridge()
+	 * @see ValueBridgeRef
+	 */
+	ValueBridgeRef valueBridge() default @ValueBridgeRef;
+
+	/**
+	 * @return A reference to the value binder to use for this field.
+	 * Must not be set if {@link #valueBridge()} is set.
+	 * @see GenericField#valueBinder()
+	 * @see ValueBinderRef
+	 */
+	ValueBinderRef valueBinder() default @ValueBinderRef;
 
 	@Documented
 	@Target({ ElementType.METHOD, ElementType.FIELD })

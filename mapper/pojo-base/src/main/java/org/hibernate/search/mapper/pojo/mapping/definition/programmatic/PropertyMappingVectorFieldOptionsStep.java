@@ -19,7 +19,8 @@ import org.hibernate.search.util.common.annotation.Incubating;
  * @see VectorField
  */
 @Incubating
-public interface PropertyMappingVectorFieldOptionsStep extends PropertyMappingStep {
+public interface PropertyMappingVectorFieldOptionsStep
+		extends PropertyMappingFieldOptionsStep<PropertyMappingVectorFieldOptionsStep> {
 
 	/**
 	 * @param projectable Whether this field should be projectable.

@@ -12,6 +12,7 @@ import java.util.Map;
 import org.hibernate.search.mapper.pojo.bridge.builtin.programmatic.GeoPointBinder;
 import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.MarkerBinder;
 import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.PropertyBinder;
+import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.ValueBinder;
 import org.hibernate.search.mapper.pojo.extractor.mapping.programmatic.ContainerExtractorPath;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.AssociationInverseSide;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.DocumentId;
@@ -267,5 +268,37 @@ public interface PropertyMappingStep {
 	 */
 	@Incubating
 	PropertyMappingVectorFieldOptionsStep vectorField(int dimension, String relativeFieldName);
+
+	/**
+	 * Maps the property to a vector field in the index with the same name as this property.
+	 * <p>
+	 * In this case the {@link VectorField#dimension() number of dimensions} (array length) of vectors to be indexed
+	 * is expected to be provided through other means, e.g. via a {@link PropertyMappingVectorFieldOptionsStep#valueBinder(ValueBinder) binder}.
+	 * @return A DSL step where the field mapping can be defined in more details,
+	 * or where other elements can be mapped to the property.
+	 *
+	 * @see VectorField
+	 * @see VectorField#dimension()
+	 * @see VectorField#valueBinder()
+	 */
+	@Incubating
+	PropertyMappingVectorFieldOptionsStep vectorField();
+
+	/**
+	 * Maps the property to a vector field in the index with a custom name.
+	 * <p>
+	 * In this case the {@link VectorField#dimension() number of dimensions} (array length) of vectors to be indexed
+	 * is expected to be provided through other means, e.g. via a {@link PropertyMappingVectorFieldOptionsStep#valueBinder(ValueBinder) binder}.
+	 * @param relativeFieldName The name of the index field.
+	 * @return A DSL step where the field mapping can be defined in more details,
+	 * or where other elements can be mapped to the property.
+	 *
+	 * @see VectorField
+	 * @see VectorField#dimension()
+	 * @see VectorField#name()
+	 * @see VectorField#valueBinder()
+	 */
+	@Incubating
+	PropertyMappingVectorFieldOptionsStep vectorField(String relativeFieldName);
 
 }

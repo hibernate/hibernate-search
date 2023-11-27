@@ -193,4 +193,20 @@ class InitialPropertyMappingStep
 		children.add( child );
 		return child;
 	}
+
+	@Override
+	public PropertyMappingVectorFieldOptionsStep vectorField() {
+		PropertyMappingVectorFieldOptionsStepImpl child =
+				new PropertyMappingVectorFieldOptionsStepImpl( this, null, null );
+		children.add( child );
+		return child;
+	}
+
+	@Override
+	public PropertyMappingVectorFieldOptionsStep vectorField(String relativeFieldName) {
+		PropertyMappingVectorFieldOptionsStepImpl child =
+				new PropertyMappingVectorFieldOptionsStepImpl( this, null, relativeFieldName );
+		children.add( child );
+		return child;
+	}
 }
