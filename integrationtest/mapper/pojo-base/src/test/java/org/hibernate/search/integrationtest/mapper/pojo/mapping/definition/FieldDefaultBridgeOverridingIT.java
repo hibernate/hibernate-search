@@ -11,6 +11,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import java.lang.invoke.MethodHandles;
 import java.util.List;
 import java.util.Objects;
+import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 import org.hibernate.search.engine.backend.types.converter.runtime.ToDocumentValueConvertContext;
@@ -47,6 +48,8 @@ class FieldDefaultBridgeOverridingIT<V, F> {
 
 	public static List<? extends Arguments> params() {
 		return PropertyTypeDescriptor.getAll().stream()
+				// these tests cannot work with vector fields.
+				.filter( Predicate.not( PropertyTypeDescriptor::isVectorType ) )
 				.map( type -> Arguments.of( type, type.getDefaultValueBridgeExpectations() ) )
 				.collect( Collectors.toList() );
 	}

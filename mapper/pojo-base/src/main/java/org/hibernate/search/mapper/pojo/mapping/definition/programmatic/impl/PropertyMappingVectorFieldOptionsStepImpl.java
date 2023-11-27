@@ -26,10 +26,16 @@ class PropertyMappingVectorFieldOptionsStepImpl
 		super( parent, relativeFieldName,
 				new DefaultInitiator() {
 					@Override
-					public <F> IndexFieldTypeOptionsStep<?, F> initiate(IndexFieldTypeFactory factory,
-							Class<F> clazz) {
-						//
-						return factory.asVector( dimension, clazz );
+					public <F> IndexFieldTypeOptionsStep<?, F> initiate(IndexFieldTypeFactory factory, Class<F> clazz) {
+						// we consider arrays (byte[] and float[] in particular to be vector types, anything else will be
+						// treated as a non-vector field and delegated to a regular as(..) call.
+						if ( clazz.isArray() ) {
+							//
+							return factory.asVector( dimension, clazz );
+						}
+						else {
+							return factory.as( clazz );
+						}
 					}
 				},
 				FieldModelContributorContext::vectorTypeOptionsStep );
