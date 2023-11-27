@@ -6,15 +6,37 @@
  */
 package org.hibernate.search.integrationtest.mapper.pojo.mapping.definition;
 
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+
 import java.lang.invoke.MethodHandles;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.List;
+import java.util.Objects;
 
 import org.hibernate.search.engine.backend.types.Projectable;
 import org.hibernate.search.engine.backend.types.Searchable;
 import org.hibernate.search.engine.backend.types.VectorSimilarity;
+import org.hibernate.search.engine.backend.types.dsl.VectorFieldTypeOptionsStep;
+import org.hibernate.search.mapper.pojo.bridge.ValueBridge;
+import org.hibernate.search.mapper.pojo.bridge.binding.ValueBindingContext;
+import org.hibernate.search.mapper.pojo.bridge.mapping.annotation.ValueBinderRef;
+import org.hibernate.search.mapper.pojo.bridge.mapping.annotation.ValueBridgeRef;
+import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.ValueBinder;
+import org.hibernate.search.mapper.pojo.bridge.runtime.ValueBridgeFromIndexedValueContext;
+import org.hibernate.search.mapper.pojo.bridge.runtime.ValueBridgeToIndexedValueContext;
+import org.hibernate.search.mapper.pojo.common.annotation.Param;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.DocumentId;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.VectorField;
+import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.TypeMappingStep;
+import org.hibernate.search.mapper.pojo.standalone.mapping.SearchMapping;
+import org.hibernate.search.mapper.pojo.standalone.session.SearchSession;
+import org.hibernate.search.util.common.SearchException;
 import org.hibernate.search.util.impl.integrationtest.common.extension.BackendMock;
+import org.hibernate.search.util.impl.integrationtest.common.reporting.FailureReportUtils;
 import org.hibernate.search.util.impl.integrationtest.mapper.pojo.standalone.StandalonePojoMappingSetupHelper;
 
 import org.junit.jupiter.api.Test;
@@ -182,5 +204,342 @@ class VectorFieldIT {
 		backendMock.verifyExpectationsMet();
 	}
 
+	@Test
+	void customBridge_explicitFieldType() {
+		@Indexed(index = INDEX_NAME)
+		class IndexedEntity {
+			@DocumentId
+			Integer id;
+			@VectorField(valueBinder = @ValueBinderRef(type = ValidTypeBridge.ExplicitFieldTypeBinder.class))
+			List<Byte> bytes;
+		}
+
+		backendMock.expectSchema( INDEX_NAME, b -> b
+				.field( "bytes", byte[].class, f -> f.dimension( 2 ) )
+		);
+		setupHelper.start().expectCustomBeans().setup( IndexedEntity.class );
+		backendMock.verifyExpectationsMet();
+	}
+
+	@Test
+	void customBridge_withParams_annotationMapping() {
+		@Indexed(index = INDEX_NAME)
+		class IndexedEntity {
+			@DocumentId
+			Integer id;
+			@VectorField(valueBinder = @ValueBinderRef(type = ParametricBridge.ParametricBinder.class,
+					params = @Param(name = "dimension", value = "2")))
+			List<Byte> bytes;
+
+			@VectorField(valueBinder = @ValueBinderRef(type = ParametricBridge.ParametricBinder.class,
+					params = @Param(name = "dimension", value = "5")))
+			List<Float> floats;
+
+			IndexedEntity() {
+			}
+
+			IndexedEntity(Integer id, List<Byte> bytes, List<Float> floats) {
+				this.id = id;
+				this.bytes = bytes;
+				this.floats = floats;
+			}
+		}
+
+		backendMock.expectSchema( INDEX_NAME, b -> b.field( "floats", float[].class, f -> f.dimension( 5 ) )
+				.field( "bytes", float[].class, f -> f.dimension( 2 ) ) );
+		SearchMapping mapping = setupHelper.start()
+				.expectCustomBeans().setup( IndexedEntity.class );
+		backendMock.verifyExpectationsMet();
+
+		try ( SearchSession session = mapping.createSession() ) {
+			IndexedEntity entity = new IndexedEntity(
+					1, Arrays.asList( (byte) 1, (byte) 2 ), Arrays.asList( 1.0f, 1.0f, 1.0f, 1.0f, 1.0f )
+			);
+			session.indexingPlan().add( entity );
+
+			backendMock.expectWorks( INDEX_NAME )
+					.add( "1", b -> b.field( "bytes", new float[] { 1, 2 } )
+							.field( "floats", new float[] { 1.0f, 1.0f, 1.0f, 1.0f, 1.0f } ) );
+
+		}
+		backendMock.verifyExpectationsMet();
+	}
+
+	@Test
+	void customBridge_implicitFieldType() {
+		@Indexed(index = INDEX_NAME)
+		class IndexedEntity {
+			@DocumentId
+			Integer id;
+			@VectorField(dimension = 2,
+					valueBinder = @ValueBinderRef(type = ValidImplicitTypeBridge.ValidImplicitTypeBinder.class))
+			Collection<Float> floats;
+		}
+
+		backendMock.expectSchema( INDEX_NAME, b -> b
+				.field( "floats", float[].class, f -> f.dimension( 2 ) )
+		);
+		setupHelper.start().expectCustomBeans().setup( IndexedEntity.class );
+		backendMock.verifyExpectationsMet();
+	}
+
+	@Test
+	void customBridge_withParams_programmaticMapping() {
+		class IndexedEntity {
+			Integer id;
+			Collection<Float> floats;
+
+			IndexedEntity() {
+			}
+
+			IndexedEntity(Integer id, Collection<Float> floats) {
+				this.id = id;
+				this.floats = floats;
+			}
+		}
+
+		backendMock.expectSchema( INDEX_NAME, b -> b.field( "floats", float[].class, f -> f.dimension( 2 ) ) );
+		SearchMapping mapping = setupHelper.start()
+				.withConfiguration( builder -> {
+					builder.addEntityType( IndexedEntity.class );
+
+					TypeMappingStep indexedEntity = builder.programmaticMapping().type( IndexedEntity.class );
+					indexedEntity.indexed().index( INDEX_NAME );
+					indexedEntity.property( "id" ).documentId();
+					indexedEntity.property( "floats" ).vectorField( 2 ).valueBinder(
+							new ValidImplicitTypeBridge.ValidImplicitTypeBinder(),
+							Collections.emptyMap()
+					);
+				} )
+				.expectCustomBeans().setup( IndexedEntity.class );
+		backendMock.verifyExpectationsMet();
+
+		try ( SearchSession session = mapping.createSession() ) {
+			IndexedEntity entity = new IndexedEntity( 1, Arrays.asList( 1.0f, 2.0f ) );
+			session.indexingPlan().add( entity );
+
+			backendMock.expectWorks( INDEX_NAME )
+					.add( "1", b -> b.field( "floats", new float[] { 1.0f, 2.0f } ) );
+		}
+		backendMock.verifyExpectationsMet();
+	}
+
+	@Test
+	void defaultBridge_invalidFieldType() {
+		@Indexed(index = INDEX_NAME)
+		class IndexedEntity {
+			@DocumentId
+			Integer id;
+			@VectorField(dimension = 5)
+			Integer notVector;
+		}
+
+		assertThatThrownBy(
+				() -> setupHelper.start().setup( IndexedEntity.class )
+		)
+				.isInstanceOf( SearchException.class )
+				.satisfies( FailureReportUtils.hasFailureReport()
+						.typeContext( IndexedEntity.class.getName() )
+						.pathContext( ".notVector" )
+						.failure(
+								"Unable to apply property mapping: this property mapping must target an index field of vector type",
+								"but the resolved field type is non-vector",
+								"This generally means you need to use a different field annotation"
+										+ " or to convert property values using a custom ValueBridge or ValueBinder",
+								"If you are already using a custom ValueBridge or ValueBinder, check its field type",
+								"encountered type DSL step '",
+								"expected interface '" + VectorFieldTypeOptionsStep.class.getName() + "'"
+						) );
+	}
+
+	@Test
+	void customBridge_implicitFieldType_invalid() {
+		@Indexed(index = INDEX_NAME)
+		class IndexedEntity {
+			@DocumentId
+			Integer id;
+			@VectorField(valueBridge = @ValueBridgeRef(type = InvalidTypeBridge.class))
+			List<Byte> bytes;
+		}
+
+		assertThatThrownBy( () -> setupHelper.start().expectCustomBeans().setup( IndexedEntity.class ) )
+				.isInstanceOf( SearchException.class )
+				.satisfies( FailureReportUtils.hasFailureReport()
+						.typeContext( IndexedEntity.class.getName() )
+						.pathContext( ".bytes" )
+						.failure(
+								"Unable to apply property mapping: this property mapping must target an index field of vector type, but the resolved field type is non-vector",
+								"This generally means you need to use a different field annotation"
+										+ " or to convert property values using a custom ValueBridge or ValueBinder",
+								"If you are already using a custom ValueBridge or ValueBinder, check its field type",
+								"encountered type DSL step '",
+								"expected interface '" + VectorFieldTypeOptionsStep.class.getName() + "'"
+						) );
+	}
+
+	@Test
+	void customBridge_explicitFieldType_invalid() {
+		@Indexed(index = INDEX_NAME)
+		class IndexedEntity {
+			@DocumentId
+			Integer id;
+			@VectorField(valueBinder = @ValueBinderRef(type = InvalidTypeBridge.ExplicitFieldTypeBinder.class))
+			List<Byte> bytes;
+		}
+
+		assertThatThrownBy( () -> setupHelper.start().expectCustomBeans().setup( IndexedEntity.class ) )
+				.isInstanceOf( SearchException.class )
+				.satisfies( FailureReportUtils.hasFailureReport()
+						.typeContext( IndexedEntity.class.getName() )
+						.pathContext( ".bytes" )
+						.failure(
+								"Unable to apply property mapping: this property mapping must target an index field of vector type, but the resolved field type is non-vector",
+								"This generally means you need to use a different field annotation"
+										+ " or to convert property values using a custom ValueBridge or ValueBinder",
+								"If you are already using a custom ValueBridge or ValueBinder, check its field type",
+								"encountered type DSL step '",
+								"expected interface '" + VectorFieldTypeOptionsStep.class.getName() + "'"
+						) );
+	}
+
+	@Test
+	void customBridge_implicitFieldType_generic() {
+		@Indexed(index = INDEX_NAME)
+		class IndexedEntity {
+			@DocumentId
+			Integer id;
+			@VectorField(valueBridge = @ValueBridgeRef(type = GenericTypeBridge.class))
+			String property;
+		}
+
+		assertThatThrownBy( () -> setupHelper.start().expectCustomBeans().setup( IndexedEntity.class ) )
+				.isInstanceOf( SearchException.class )
+				.satisfies( FailureReportUtils.hasFailureReport()
+						.typeContext( IndexedEntity.class.getName() )
+						.pathContext( ".property" )
+						.failure( "Unable to infer index field type for value bridge '"
+								+ GenericTypeBridge.TOSTRING + "':"
+								+ " this bridge implements ValueBridge<V, F>,"
+								+ " but sets the generic type parameter F to 'T'."
+								+ " The index field type can only be inferred automatically"
+								+ " when this type parameter is set to a raw class."
+								+ " Use a ValueBinder to set the index field type explicitly,"
+								+ " or set the type parameter F to a definite, raw type." ) );
+	}
+
+	public static class ValidTypeBridge implements ValueBridge<List, byte[]> {
+		@Override
+		public byte[] toIndexedValue(List value, ValueBridgeToIndexedValueContext context) {
+			if ( value == null ) {
+				return null;
+			}
+			byte[] bytes = new byte[value.size()];
+			int index = 0;
+			for ( Object o : value ) {
+				bytes[index++] = Byte.parseByte( Objects.toString( o, null ) );
+			}
+			return bytes;
+		}
+
+		public static class ExplicitFieldTypeBinder implements ValueBinder {
+			@Override
+			public void bind(ValueBindingContext<?> context) {
+				context.bridge( List.class, new ValidTypeBridge(), context.typeFactory().asByteVector( 2 ) );
+			}
+		}
+	}
+
+	public static class ParametricBridge implements ValueBridge<List, float[]> {
+
+		@Override
+		public float[] toIndexedValue(List value, ValueBridgeToIndexedValueContext context) {
+			if ( value == null ) {
+				return null;
+			}
+			float[] floats = new float[value.size()];
+			int index = 0;
+			for ( Object o : value ) {
+				floats[index++] = Float.parseFloat( Objects.toString( o, null ) );
+			}
+			return floats;
+		}
+
+		public static class ParametricBinder implements ValueBinder {
+			@Override
+			public void bind(ValueBindingContext<?> context) {
+				context.bridge( List.class, new ParametricBridge(),
+						context.typeFactory().asFloatVector( extractDimension( context ) )
+				);
+			}
+		}
+
+		private static int extractDimension(ValueBindingContext<?> context) {
+			return Integer.parseInt( context.param( "dimension", String.class ) );
+		}
+	}
+
+	public static class ValidImplicitTypeBridge implements ValueBridge<Collection, float[]> {
+
+		public static class ValidImplicitTypeBinder implements ValueBinder {
+
+			@Override
+			public void bind(ValueBindingContext<?> context) {
+				context.bridge( Collection.class, new ValidImplicitTypeBridge() );
+			}
+		}
+
+		@Override
+		public float[] toIndexedValue(Collection value, ValueBridgeToIndexedValueContext context) {
+			if ( value == null ) {
+				return null;
+			}
+			float[] result = new float[value.size()];
+			int index = 0;
+			for ( Object o : value ) {
+				result[index++] = Float.parseFloat( Objects.toString( o, null ) );
+			}
+			return result;
+		}
+
+		@Override
+		public Collection fromIndexedValue(float[] value, ValueBridgeFromIndexedValueContext context) {
+			if ( value == null ) {
+				return null;
+			}
+			List<Float> floats = new ArrayList<>( value.length );
+			for ( float v : value ) {
+				floats.add( v );
+			}
+			return floats;
+		}
+	}
+
+	public static class InvalidTypeBridge implements ValueBridge<List, Integer> {
+		@Override
+		public Integer toIndexedValue(List value, ValueBridgeToIndexedValueContext context) {
+			throw new UnsupportedOperationException( "Should not be called" );
+		}
+
+		public static class ExplicitFieldTypeBinder implements ValueBinder {
+			@Override
+			public void bind(ValueBindingContext<?> context) {
+				context.bridge( List.class, new InvalidTypeBridge(), context.typeFactory().asInteger() );
+			}
+		}
+	}
+
+	public static class GenericTypeBridge<T> implements ValueBridge<String, T> {
+		private static final String TOSTRING = "<GenericTypeBridge toString() result>";
+
+		@Override
+		public String toString() {
+			return TOSTRING;
+		}
+
+		@Override
+		public T toIndexedValue(String value, ValueBridgeToIndexedValueContext context) {
+			throw new UnsupportedOperationException( "Should not be called" );
+		}
+	}
 
 }
