@@ -131,6 +131,7 @@ class DocumentIdDefaultBridgeBaseIT<I> {
 						.toQuery();
 
 				assertThat( query.fetchAll().hits() )
+						.usingRecursiveFieldByFieldElementComparator()
 						.containsExactly( PojoEntityReference.withName(
 								expectations.getTypeWithIdentifierBridge1(),
 								DefaultIdentifierBridgeExpectations.TYPE_WITH_IDENTIFIER_BRIDGE_1_NAME,

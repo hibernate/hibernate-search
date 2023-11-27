@@ -69,22 +69,40 @@ class FieldDefaultBridgeBaseIT<V, F> {
 	public void setup(PropertyTypeDescriptor<V, F> typeDescriptor, DefaultValueBridgeExpectations<V, F> expectations) {
 		backendMock.expectSchema(
 				DefaultValueBridgeExpectations.TYPE_WITH_VALUE_BRIDGE_1_NAME, b -> {
-					b.field( FIELD_NAME, expectations.getIndexFieldJavaType() );
+					b.field( FIELD_NAME, expectations.getIndexFieldJavaType(), f -> {
+						if ( typeDescriptor.isVectorType() ) {
+							f.dimension( PropertyTypeDescriptor.VECTOR_DIMENSION );
+						}
+					} );
 
 					if ( typeDescriptor.isNullable() ) {
 						b.field( FIELD_INDEXNULLAS_NAME, expectations.getIndexFieldJavaType(),
-								f -> f.indexNullAs( expectations.getNullAsValueBridge1() ) );
+								f -> {
+									f.indexNullAs( expectations.getNullAsValueBridge1() );
+									if ( typeDescriptor.isVectorType() ) {
+										f.dimension( PropertyTypeDescriptor.VECTOR_DIMENSION );
+									}
+								} );
 					}
 				},
 				indexModel -> this.index1Field = indexModel.fieldOrNull( FIELD_NAME )
 		);
 		backendMock.expectSchema(
 				DefaultValueBridgeExpectations.TYPE_WITH_VALUE_BRIDGE_2_NAME, b -> {
-					b.field( FIELD_NAME, expectations.getIndexFieldJavaType() );
+					b.field( FIELD_NAME, expectations.getIndexFieldJavaType(), f -> {
+						if ( typeDescriptor.isVectorType() ) {
+							f.dimension( PropertyTypeDescriptor.VECTOR_DIMENSION );
+						}
+					} );
 
 					if ( typeDescriptor.isNullable() ) {
 						b.field( FIELD_INDEXNULLAS_NAME, expectations.getIndexFieldJavaType(),
-								f -> f.indexNullAs( expectations.getNullAsValueBridge2() ) );
+								f -> {
+									f.indexNullAs( expectations.getNullAsValueBridge2() );
+									if ( typeDescriptor.isVectorType() ) {
+										f.dimension( PropertyTypeDescriptor.VECTOR_DIMENSION );
+									}
+								} );
 					}
 				},
 				indexModel -> this.index2Field = indexModel.fieldOrNull( FIELD_NAME )

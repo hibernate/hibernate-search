@@ -64,11 +64,19 @@ class FieldDefaultBridgeOverridingIT<V, F> {
 	public void setup(PropertyTypeDescriptor<V, F> typeDescriptor, DefaultValueBridgeExpectations<V, F> expectations) {
 		backendMock.expectSchema(
 				DefaultValueBridgeExpectations.TYPE_WITH_VALUE_BRIDGE_1_NAME, b -> {
-					b.field( FIELD_NAME, FieldTypeForOverridingDefaultBridge.class );
-
+					b.field( FIELD_NAME, FieldTypeForOverridingDefaultBridge.class, f -> {
+						if ( typeDescriptor.isVectorType() ) {
+							f.dimension( PropertyTypeDescriptor.VECTOR_DIMENSION );
+						}
+					} );
 					if ( typeDescriptor.isNullable() ) {
 						b.field( FIELD_INDEXNULLAS_NAME, FieldTypeForOverridingDefaultBridge.class,
-								f -> f.indexNullAs( new FieldTypeForOverridingDefaultBridge( "NULL_AS" ) ) );
+								f -> {
+									f.indexNullAs( new FieldTypeForOverridingDefaultBridge( "NULL_AS" ) );
+									if ( typeDescriptor.isVectorType() ) {
+										f.dimension( PropertyTypeDescriptor.VECTOR_DIMENSION );
+									}
+								} );
 					}
 				},
 				indexModel -> this.indexField = indexModel.fieldOrNull( FIELD_NAME )
