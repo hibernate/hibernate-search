@@ -104,6 +104,10 @@ public abstract class PropertyTypeDescriptor<V, F> {
 		return false;
 	}
 
+	public boolean supportedAsIdentifier() {
+		return true;
+	}
+
 	public PropertyValues<V, F> values() {
 		return values;
 	}
