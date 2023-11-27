@@ -330,11 +330,9 @@ public final class BridgeResolver {
 
 			// arrays for vector fields:
 			exactType( byte[].class )
-					.valueBridge( DefaultByteArrayBridge.INSTANCE )
-					.identifierBridge( DefaultByteArrayBridge.INSTANCE );
+					.valueBridge( DefaultByteArrayBridge.INSTANCE );
 			exactType( float[].class )
-					.valueBridge( DefaultFloatArrayBridge.INSTANCE )
-					.identifierBridge( DefaultFloatArrayBridge.INSTANCE );
+					.valueBridge( DefaultFloatArrayBridge.INSTANCE );
 		}
 
 		private class TypePatternDefaultBinderDefinitionStep

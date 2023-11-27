@@ -51,6 +51,7 @@ class DocumentIdDefaultBridgeBaseIT<I> {
 
 	public static List<? extends Arguments> params() {
 		return PropertyTypeDescriptor.getAll().stream()
+				.filter( PropertyTypeDescriptor::supportedAsIdentifier )
 				.map( type -> Arguments.of( type, type.getDefaultIdentifierBridgeExpectations() ) )
 				.collect( Collectors.toList() );
 	}

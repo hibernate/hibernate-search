@@ -16,4 +16,9 @@ public abstract class AbstractVectorPropertyTypeDescriptor<V, F> extends Propert
 	public boolean isVectorType() {
 		return true;
 	}
+
+	@Override
+	public boolean supportedAsIdentifier() {
+		return false;
+	}
 }
