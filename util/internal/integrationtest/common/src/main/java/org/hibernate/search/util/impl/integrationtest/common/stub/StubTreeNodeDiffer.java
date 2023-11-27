@@ -6,7 +6,9 @@
  */
 package org.hibernate.search.util.impl.integrationtest.common.stub;
 
+import java.lang.reflect.Array;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
@@ -83,7 +85,7 @@ public final class StubTreeNodeDiffer<N extends StubTreeNode<N>> {
 		for ( String key : attributeKeys ) {
 			List<Object> expected = expectedNode.getAttributes().get( key );
 			List<Object> actual = actualNode.getAttributes().get( key );
-			if ( !Objects.equals( expected, actual ) ) {
+			if ( !equalLists( expected, actual ) ) {
 				StubTreeNodeMismatch mismatch = new StubTreeNodeMismatch( expected == null ? NO_VALUE : expected,
 						actual == null ? NO_VALUE : actual );
 				mismatchesByPath.put( attributePath( path, key ), mismatch );
@@ -96,6 +98,54 @@ public final class StubTreeNodeDiffer<N extends StubTreeNode<N>> {
 			List<N> actualChildren = actualNode.getChildren().get( key );
 			addChildrenMismatchesRecursively( mismatchesByPath, path, key, expectedChildren, actualChildren );
 		}
+	}
+
+	private boolean equalLists(List<Object> listA, List<Object> listB) {
+		if ( listA == null && listB == null ) {
+			return true;
+		}
+		if ( listA == null || listB == null ) {
+			return false;
+		}
+		if ( listA.size() != listB.size() ) {
+			return false;
+		}
+		Iterator<Object> ai = listA.iterator();
+		Iterator<Object> bi = listB.iterator();
+		while ( ai.hasNext() ) {
+			if ( !objectsEquals( ai.next(), bi.next() ) ) {
+				return false;
+			}
+		}
+		return true;
+	}
+
+	private boolean objectsEquals(Object a, Object b) {
+		if ( a == null && b == null ) {
+			return true;
+		}
+		if ( a == null || b == null ) {
+			return false;
+		}
+		if ( a.getClass().isArray() ) {
+			return arraysEquals( a, b );
+		}
+		return Objects.equals( a, b );
+	}
+
+	private boolean arraysEquals(Object a, Object b) {
+		assert a != null;
+		assert b != null;
+		int length = Array.getLength( a );
+		if ( length != Array.getLength( b ) ) {
+			return false;
+		}
+		for ( int i = 0; i < length; i++ ) {
+			if ( !Objects.equals( Array.get( a, i ), Array.get( b, i ) ) ) {
+				return false;
+			}
+		}
+		return true;
 	}
 
 	private void addChildrenMismatchesRecursively(Map<String, StubTreeNodeMismatch> mismatchesByPath,

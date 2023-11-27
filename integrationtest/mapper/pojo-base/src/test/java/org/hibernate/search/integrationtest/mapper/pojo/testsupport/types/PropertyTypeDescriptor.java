@@ -15,7 +15,7 @@ import org.hibernate.search.integrationtest.mapper.pojo.testsupport.types.expect
 import org.hibernate.search.integrationtest.mapper.pojo.testsupport.types.values.PropertyValues;
 
 public abstract class PropertyTypeDescriptor<V, F> {
-
+	public static final int VECTOR_DIMENSION = 2;
 	private static List<PropertyTypeDescriptor<?, ?>> all;
 
 	public static List<PropertyTypeDescriptor<?, ?>> getAll() {
@@ -63,7 +63,9 @@ public abstract class PropertyTypeDescriptor<V, F> {
 					JavaSqlDatePropertyTypeDescriptor.INSTANCE,
 					JavaSqlTimestampPropertyTypeDescriptor.INSTANCE,
 					JavaSqlTimePropertyTypeDescriptor.INSTANCE,
-					GeoPointPropertyTypeDescriptor.INSTANCE
+					GeoPointPropertyTypeDescriptor.INSTANCE,
+					PrimitiveByteArrayPropertyTypeDescriptor.INSTANCE,
+					PrimitiveFloatArrayPropertyTypeDescriptor.INSTANCE
 			) );
 		}
 		return all;
@@ -96,6 +98,10 @@ public abstract class PropertyTypeDescriptor<V, F> {
 
 	public boolean isNullable() {
 		return !javaType.isPrimitive();
+	}
+
+	public boolean isVectorType() {
+		return false;
 	}
 
 	public PropertyValues<V, F> values() {
