@@ -32,6 +32,12 @@ public final class AnnotationDefaultValues {
 	 */
 	public static final int DEFAULT_MAX_CONNECTIONS = Integer.MIN_VALUE;
 
+	/**
+	 * This extreme value is both invalid and very unlikely to be used.
+	 * So we use it to mark that the user has not set the value.
+	 */
+	public static final int DEFAULT_DIMENSION = Integer.MIN_VALUE;
+
 
 	private AnnotationDefaultValues() {
 	}

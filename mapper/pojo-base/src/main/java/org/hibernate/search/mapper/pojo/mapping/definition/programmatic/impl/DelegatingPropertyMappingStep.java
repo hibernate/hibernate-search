@@ -131,4 +131,14 @@ class DelegatingPropertyMappingStep implements PropertyMappingStep {
 	public PropertyMappingVectorFieldOptionsStep vectorField(int dimension, String relativeFieldName) {
 		return delegate.vectorField( dimension, relativeFieldName );
 	}
+
+	@Override
+	public PropertyMappingVectorFieldOptionsStep vectorField() {
+		return delegate.vectorField();
+	}
+
+	@Override
+	public PropertyMappingVectorFieldOptionsStep vectorField(String relativeFieldName) {
+		return delegate.vectorField( relativeFieldName );
+	}
 }

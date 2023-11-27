@@ -19,15 +19,16 @@ import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.Property
 import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.impl.PojoCompositeFieldModelContributor.DefaultInitiator;
 
 class PropertyMappingVectorFieldOptionsStepImpl
-		extends AbstractPropertyMappingFieldOptionsStep<PropertyMappingVectorFieldOptionsStepImpl>
+		extends AbstractPropertyMappingFieldOptionsStep<PropertyMappingVectorFieldOptionsStep>
 		implements PropertyMappingVectorFieldOptionsStep, PojoPropertyMetadataContributor {
 
-	PropertyMappingVectorFieldOptionsStepImpl(PropertyMappingStep parent, int dimension, String relativeFieldName) {
+	PropertyMappingVectorFieldOptionsStepImpl(PropertyMappingStep parent, Integer dimension, String relativeFieldName) {
 		super( parent, relativeFieldName,
 				new DefaultInitiator() {
 					@Override
 					public <F> IndexFieldTypeOptionsStep<?, F> initiate(IndexFieldTypeFactory factory,
 							Class<F> clazz) {
+						//
 						return factory.asVector( dimension, clazz );
 					}
 				},

@@ -10,6 +10,7 @@ import java.lang.invoke.MethodHandles;
 
 import org.hibernate.search.engine.backend.types.dsl.IndexFieldTypeOptionsStep;
 import org.hibernate.search.engine.backend.types.dsl.ScaledNumberIndexFieldTypeOptionsStep;
+import org.hibernate.search.engine.backend.types.dsl.SearchableProjectableIndexFieldTypeOptionsStep;
 import org.hibernate.search.engine.backend.types.dsl.StandardIndexFieldTypeOptionsStep;
 import org.hibernate.search.engine.backend.types.dsl.StringIndexFieldTypeOptionsStep;
 import org.hibernate.search.engine.backend.types.dsl.VectorFieldTypeOptionsStep;
@@ -32,7 +33,7 @@ final class FieldModelContributorContextImpl<F> implements FieldModelContributor
 
 	@Override
 	public void indexNullAs(String value) {
-		standardTypeOptionsStep().indexNullAs( bridge.parse( value ) );
+		searchableProjectableIndexFieldTypeOptionsStep().indexNullAs( bridge.parse( value ) );
 	}
 
 	/*
@@ -87,6 +88,15 @@ final class FieldModelContributorContextImpl<F> implements FieldModelContributor
 					fieldTypeOptionsStep, VectorFieldTypeOptionsStep.class
 			);
 		}
+	}
+
+	@SuppressWarnings("unchecked")
+	@Override
+	public SearchableProjectableIndexFieldTypeOptionsStep<?, ? super F> searchableProjectableIndexFieldTypeOptionsStep() {
+		if ( fieldTypeOptionsStep instanceof VectorFieldTypeOptionsStep ) {
+			return (VectorFieldTypeOptionsStep<?, F>) fieldTypeOptionsStep;
+		}
+		return standardTypeOptionsStep();
 	}
 
 	@Override

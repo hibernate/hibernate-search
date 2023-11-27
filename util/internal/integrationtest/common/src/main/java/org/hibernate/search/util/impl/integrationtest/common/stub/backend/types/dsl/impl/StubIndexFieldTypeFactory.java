@@ -167,7 +167,7 @@ public class StubIndexFieldTypeFactory implements IndexFieldTypeFactory {
 		if ( float[].class.equals( valueType ) ) {
 			return (VectorFieldTypeOptionsStep<?, F>) asFloatVector( dimension );
 		}
-		throw new IllegalStateException( "Unsupported vector type " + valueType );
+		return new StubVectorFieldTypeOptionsStep<>( dimension, valueType );
 	}
 
 	@Override
