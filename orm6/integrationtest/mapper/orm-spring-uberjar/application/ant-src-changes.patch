@@ -1,0 +1,53 @@
+diff --git a/test/java/org/hibernate/search/integrationtest/spring/repackaged/application/RepackagedApplicationIT.java b/integrationtest/mapper/orm-spring-uberjar/application/src/test/java/org/hibernate/search/integrationtest/spring/repackaged/application/RepackagedApplicationIT.java
+--- a/test/java/org/hibernate/search/integrationtest/spring/repackaged/application/RepackagedApplicationIT.java
++++ b/test/java/org/hibernate/search/integrationtest/spring/repackaged/application/RepackagedApplicationIT.java
+@@ -15,6 +15,7 @@
+ import java.nio.file.Path;
+ import java.nio.file.Paths;
+ import java.util.jar.JarEntry;
++import java.util.jar.JarFile;
+
+ import org.hibernate.search.mapper.pojo.mapping.definition.annotation.ProjectionConstructor;
+ import org.hibernate.search.util.common.SearchException;
+@@ -32,7 +33,8 @@
+
+ import acme.org.hibernate.search.integrationtest.spring.repackaged.model.MyEntity;
+ import acme.org.hibernate.search.integrationtest.spring.repackaged.model.MyProjection;
+-import org.springframework.boot.loader.jar.JarFile;
++import org.springframework.boot.loader.net.protocol.Handlers;
++import org.springframework.boot.loader.net.protocol.jar.JarUrl;
+
+ /**
+  * This test is NOT a @SpringBootTest:
+@@ -83,9 +85,9 @@
+ 	@Test
+ 	public void canReadJar() throws Exception {
+ 		try ( JarFile outerJar = new JarFile( repackedJarPath.toFile() ) ) {
+-			for ( JarEntry jarEntry : outerJar ) {
++			for ( JarEntry jarEntry : outerJar.stream().toList() ) {
+ 				if ( jarEntry.getName().contains( "hibernate-search-integrationtest-spring-repackaged-model" ) ) {
+-					URL innerJarURL = outerJar.getNestedJarFile( jarEntry ).getUrl();
++					URL innerJarURL = innerJarUrl( jarEntry );
+
+ 					try ( URLClassLoader isolatedClassLoader = new URLClassLoader( new URL[] { innerJarURL }, null ) ) {
+ 						Class<?> classInIsolatedClassLoader = isolatedClassLoader.loadClass( MyEntity.class.getName() );
+@@ -106,8 +106,7 @@
+ 							classInfo = index.getClassByName( DotName.createSimple( MyProjection.class.getName() ) );
+ 							assertThat( classInfo ).isNotNull();
+ 							assertThat(
+-									classInfo.annotations()
+-											.get( DotName.createSimple( ProjectionConstructor.class.getName() ) ) )
++									classInfo.annotations( DotName.createSimple( ProjectionConstructor.class.getName() ) ) )
+ 									.isNotNull();
+ 							name = classInfo.field( "name" );
+ 							assertThat( name ).isNotNull();
+@@ -130,4 +132,9 @@
+ 			}
+ 		}
+ 	}
++
++	URL innerJarUrl(JarEntry jarEntry) {
++		Handlers.register();
++		return JarUrl.create( repackedJarPath.toFile(), jarEntry );
++	}
+ }
