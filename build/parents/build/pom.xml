@@ -128,7 +128,7 @@
         <version.junit-platform-suite-engine>1.10.0</version.junit-platform-suite-engine>
         <version.org.osgi.core>6.0.0</version.org.osgi.core>
         <!-- Make sure to update Ryuk container version in `ryuk.Dockerfile` whenever updating testcontainers to align it with the lib. -->
-        <version.testcontainers>1.19.2</version.testcontainers>
+        <version.testcontainers>1.19.3</version.testcontainers>
 
         <version.org.hamcrest>2.2</version.org.hamcrest>
         <version.org.mockito>5.7.0</version.org.mockito>
@@ -167,7 +167,7 @@
         <version.org.google.guava>32.1.2-jre</version.org.google.guava>
 
         <!-- >>> Spring integration tests -->
-        <version.org.springframework.boot>3.1.1</version.org.springframework.boot>
+        <version.org.springframework.boot>3.2.0</version.org.springframework.boot>
         <!-- Spring Boot 3 Atomikos starter and related libs version: -->
         <version.com.atomikos>6.0.0</version.com.atomikos>
 
