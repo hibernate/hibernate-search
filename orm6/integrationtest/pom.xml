@@ -38,6 +38,18 @@
                 <module>java/modules/orm-coordination-outbox-polling-elasticsearch</module>
             </modules>
         </profile>
+        <profile>
+            <id>springITs</id>
+            <activation>
+                <property>
+                    <name>java-version.test.release</name>
+                    <value>!8</value>
+                </property>
+            </activation>
+            <modules>
+                <module>mapper/orm-spring-uberjar</module>
+            </modules>
+        </profile>
     </profiles>
 </project>
 

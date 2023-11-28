@@ -1,0 +1,55 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <parent>
+        <groupId>org.hibernate.search</groupId>
+        <artifactId>hibernate-search-integrationtest-orm6</artifactId>
+        <version>6.2.3-SNAPSHOT</version>
+        <relativePath>../..</relativePath>
+    </parent>
+    <artifactId>hibernate-search-integrationtest-spring-repackaged-orm6</artifactId>
+    <packaging>pom</packaging>
+
+    <name>Hibernate Search ITs - Spring Repackaged JAR</name>
+    <description>Testing if Hibernate Search will start correctly inside a Spring's repackaged jar</description>
+
+    <modules>
+        <module>model</module>
+        <module>application</module>
+    </modules>
+
+    <properties>
+        <!--
+            Remove Hibernate system properties from parent settings:
+            They are supposed to be handled by the spring.datasource subsystem
+            and not by the Hibernate internal pool!
+            See also the failsafe configuration.
+         -->
+        <failsafe.jvm.args.hibernate-orm></failsafe.jvm.args.hibernate-orm>
+        <version.org.springframework.boot>3.2.0</version.org.springframework.boot>
+    </properties>
+
+    <dependencyManagement>
+        <dependencies>
+            <dependency>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-dependencies</artifactId>
+                <version>${version.org.springframework.boot}</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+            <!-- The Spring BOM uses a version of bytebuddy that's too old for Mockito to work correctly -->
+            <dependency>
+                <groupId>net.bytebuddy</groupId>
+                <artifactId>byte-buddy</artifactId>
+                <version>${version.net.bytebuddy}</version>
+            </dependency>
+            <dependency>
+                <groupId>net.bytebuddy</groupId>
+                <artifactId>byte-buddy-agent</artifactId>
+                <version>${version.net.bytebuddy}</version>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
+</project>
+
