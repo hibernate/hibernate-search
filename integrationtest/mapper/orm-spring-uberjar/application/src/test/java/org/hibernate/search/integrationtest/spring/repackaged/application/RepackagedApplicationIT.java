@@ -14,6 +14,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.jar.JarEntry;
+import java.util.jar.JarFile;
 
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.ProjectionConstructor;
 import org.hibernate.search.util.common.jar.impl.JandexUtils;
@@ -29,7 +30,8 @@ import org.jboss.jandex.Index;
 
 import acme.org.hibernate.search.integrationtest.spring.repackaged.model.MyEntity;
 import acme.org.hibernate.search.integrationtest.spring.repackaged.model.MyProjection;
-import org.springframework.boot.loader.jar.JarFile;
+import org.springframework.boot.loader.net.protocol.Handlers;
+import org.springframework.boot.loader.net.protocol.jar.JarUrl;
 
 /**
  * This test is NOT a @SpringBootTest:
@@ -72,10 +74,11 @@ class RepackagedApplicationIT {
 	 */
 	@Test
 	void canReadJar() throws Exception {
+
 		try ( JarFile outerJar = new JarFile( repackedJarPath.toFile() ) ) {
-			for ( JarEntry jarEntry : outerJar ) {
+			for ( JarEntry jarEntry : outerJar.stream().toList() ) {
 				if ( jarEntry.getName().contains( "hibernate-search-integrationtest-spring-repackaged-model" ) ) {
-					URL innerJarURL = outerJar.getNestedJarFile( jarEntry ).getUrl();
+					URL innerJarURL = innerJarUrl( jarEntry );
 
 					try ( URLClassLoader isolatedClassLoader = new URLClassLoader( new URL[] { innerJarURL }, null ) ) {
 						Class<?> classInIsolatedClassLoader = isolatedClassLoader.loadClass( MyEntity.class.getName() );
@@ -101,5 +104,10 @@ class RepackagedApplicationIT {
 				}
 			}
 		}
+	}
+
+	URL innerJarUrl(JarEntry jarEntry) {
+		Handlers.register();
+		return JarUrl.create( repackedJarPath.toFile(), jarEntry );
 	}
 }
