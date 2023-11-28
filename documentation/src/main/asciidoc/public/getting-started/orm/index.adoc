@@ -36,7 +36,7 @@ ifdef::backend-pdf[:relfileprefix: {hibernateSearchDocUrl}../]
 == [[gettingstarted-architecture]] Assumptions
 
 This getting-started guide aims to be generic and does not tie itself to any framework in particular.
-If you use link:{springBootUrl}[Spring Boot] or link:{quarkusUrl}[Quarkus],
+If you use link:{quarkusUrl}[Quarkus], link:{wildflyUrl}[WildFly] or link:{springBootUrl}[Spring Boot],
 make sure to first have a look at xref:{reference-documentation-location}#compatibility-framework[framework support] for tips and to learn about quirks.
 
 For the sake of simplicity, this guide assumes you are building an application deployed as a single instance on a single node.

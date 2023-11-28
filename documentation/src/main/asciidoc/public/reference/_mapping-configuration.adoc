@@ -72,8 +72,10 @@ to look for types annotated with
 Hibernate Search's scanning may trigger the indexing of JARs through Jandex on application startup.
 This indexing should be reasonably short, but if it causes performance issues, you can:
 
-* Switch to the <<compatibility-framework-quarkus,Quarkus>> framework,
+* Migrate your application to the <<compatibility-framework-quarkus,Quarkus>> framework,
 which among other things executes this part of Hibernate Search's startup at build time.
+* OR migrate your application to the <<compatibility-framework-wildfly,WildFly>> application server,
+which among other things executes this part of Hibernate Search's startup in a more optimized way.
 * OR execute the https://github.com/wildfly/jandex-maven-plugin[Jandex Maven Plugin]
 during the build of your application, so that indexes are already built when the application starts.
 * OR instruct Hibernate Search to never build Jandex indexes on startup,

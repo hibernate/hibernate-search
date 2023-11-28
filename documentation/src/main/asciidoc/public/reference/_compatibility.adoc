@@ -68,13 +68,24 @@ is also relevant for the OpenSearch distribution.
 [[compatibility-framework-quarkus]]
 === [[gettingstarted-framework-quarkus]] [[_quarkus]] Quarkus
 
-link:{quarkusUrl}[Quarkus] has an official extension for Hibernate Search with Hibernate ORM and Elasticsearch,
+link:{quarkusUrl}[Quarkus] has an official extension for <<mapper-orm,Hibernate Search with Hibernate ORM>>
+using the <<backend-elasticsearch,Elasticsearch backend>>,
 which is a tight integration with additional features, different dependencies, and different configuration properties.
 
 As your first step to using Hibernate Search within Quarkus,
 we recommend you follow Quarkus's https://quarkus.io/guides/hibernate-search-orm-elasticsearch[Hibernate Search Guide]:
 it is a great hands-on introduction to Hibernate Search,
 _and_ it covers the specifics of Quarkus.
+
+[[compatibility-framework-wildfly]]
+=== WildFly
+
+link:{wildflyUrl}[WildFly] includes modules for <<mapper-orm,Hibernate Search with Hibernate ORM>>
+using either the <<backend-lucene,Lucene backend>> or the <<backend-elasticsearch,Elasticsearch backend>>.
+
+To start using Hibernate Search within WildFly,
+see the https://docs.wildfly.org/30/Developer_Guide.html#using-hibernate-search[Hibernate Search section in the WildFly Developer Guide]:
+it covers all the specifics of WildFly.
 
 [[compatibility-framework-spring-boot]]
 === [[gettingstarted-framework-spring-boot]] [[_spring_boot]] Spring Boot
