@@ -111,6 +111,10 @@
         <!-- This is used to generate a link to the Jakarta EE javadoc -->
         <javadoc.jakarta.batch.url>https://jakarta.ee/specifications/batch/${parsed-version.jakarta.batch.majorVersion}.${parsed-version.jakarta.batch.minorVersion}/apidocs/</javadoc.jakarta.batch.url>
 
+        <!-- >>> WildFly dependencies -->
+        <!-- This is used to generate a link to the WildFly documentation -->
+        <version.org.wildfly>30.0.0.Final</version.org.wildfly>
+
         <!-- Test dependencies -->
 
         <!-- >>> Common -->
@@ -857,6 +861,15 @@
                 <version>${version.jsoup}</version>
             </dependency>
 
+            <!-- The version is used to generate a link to the WildFly documentation -->
+            <!-- This simply makes sure dependabot will automatically bump the version -->
+            <dependency>
+                <groupId>org.wildfly.bom</groupId>
+                <artifactId>wildfly</artifactId>
+                <version>${version.org.wildfly}</version>
+                <type>pom</type>
+            </dependency>
+
             <!-- We only need these two libs here for testing utils -->
             <dependency>
                 <groupId>com.google.guava</groupId>
@@ -1304,6 +1317,16 @@
                         <configuration>
                             <propertyPrefix>parsed-version.jakarta.batch</propertyPrefix>
                             <versionString>${version.jakarta.batch}</versionString>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>parse-wildfly-version</id>
+                        <goals>
+                            <goal>parse-version</goal>
+                        </goals>
+                        <configuration>
+                            <propertyPrefix>parsed-version.org.wildfly</propertyPrefix>
+                            <versionString>${version.org.wildfly}</versionString>
                         </configuration>
                     </execution>
                 </executions>

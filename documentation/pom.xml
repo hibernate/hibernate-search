@@ -302,6 +302,7 @@
                         <amazonOpenSearchServiceUrl>https://docs.aws.amazon.com/opensearch-service/latest/developerguide</amazonOpenSearchServiceUrl>
                         <amazonOpenSearchServerlessUrl>https://docs.aws.amazon.com/opensearch-service/latest/developerguide/serverless-overview.html</amazonOpenSearchServerlessUrl>
                         <wildflyUrl>https://wildfly.org/</wildflyUrl>
+                        <wildflyDeveloperGuideUrl>https://docs.wildfly.org/${parsed-version.org.wildfly.majorVersion}/Developer_Guide.html</wildflyDeveloperGuideUrl>
                         <quarkusUrl>https://quarkus.io/</quarkusUrl>
                         <springUrl>https://spring.io/</springUrl>
                         <springBootUrl>https://spring.io/projects/spring-boot</springBootUrl>
