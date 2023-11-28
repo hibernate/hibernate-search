@@ -135,6 +135,23 @@ Then, try to recompile your application.
 Compilation errors should point you to the most significant API changes that require your immediate attention;
 most of the code that still compiles should work as it used to in Hibernate Search 5.
 
+[NOTE]
+====
+Using the migration helper in link:{wildflyUrl}[WildFly] will require a bit more work:
+
+* You will need to bundle both the migration helper engine (`org.hibernate.search:hibernate-search-v5migrationhelper-engine`)
+and Hibernate ORM integration (`org.hibernate.search:hibernate-search-v5migrationhelper-orm`)
+with your application, because they are not provided as modules in WildFly.
+* If you don't use Hibernate Search 6's `@Indexed` annotation, but stick to Hibernate Search 5's,
+WildFly will not be able to detect that you use Hibernate Search as
+https://docs.wildfly.org/30/Developer_Guide.html#using-hibernate-search[it usually does];
+you will then need to declare dependencies to Hibernate Search explicitly,
+for example using a manifest entry as explained https://docs.wildfly.org/30/Developer_Guide.html#using-hibernate-search[here].
+
+See https://github.com/wildfly/wildfly/blob/82bf2263d620bf54b2bb1f4d3ef794a3448685ab/testsuite/integration/basic/src/test/java/org/jboss/as/test/integration/hibernate/search/v5migrationhelper/simple/HibernateSearchV5MigrationHelperTestCase.java#L64-L73[this integration test in WildFly]
+for more hints about using the migration helper in WildFly.
+====
+
 [[migration-helper-limitations]]
 === Limitations of the migration helper
 
