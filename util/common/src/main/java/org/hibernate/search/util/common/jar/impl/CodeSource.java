@@ -38,6 +38,13 @@ class CodeSource implements Closeable {
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	private static final String JAR_URI_PATH_SEPARATOR = "!/";
+	// Starting with Spring Boot 3.2 the nested jars in a repackaged app will be using an url structure as:
+	//   * "jar:nested:/.../app-repackaged.jar/!BOOT-INF/classes/!/"
+	//   * jar:nested:/.../app-repackaged.jar/!BOOT-INF/lib/some-packaged-lib.jar!/
+	// that means that we will get the `nested:...` as a path when extracting the nested path.
+	// Spring should be able to handle loading the files for such jars using their own custom filesystem and handlers
+	// hence as soon as we discover such path we let it be handled by them.
+	private static final String NESTED_SPEC_PREFIX = "nested:";
 	private static final BiFunction<Path, URI, FileSystem> NESTED_JAR_FILESYSTEM_CREATOR;
 
 	static {
@@ -185,7 +192,7 @@ class CodeSource implements Closeable {
 
 	private Path extractedJarNestedPath(URI jarUri) {
 		String spec = jarUri.getSchemeSpecificPart();
-		if ( spec == null ) {
+		if ( spec == null || spec.startsWith( NESTED_SPEC_PREFIX ) ) {
 			return null;
 		}
 		int pathSeparatorIndex = spec.indexOf( JAR_URI_PATH_SEPARATOR );

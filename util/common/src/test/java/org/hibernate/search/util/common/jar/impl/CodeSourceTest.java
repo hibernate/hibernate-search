@@ -20,28 +20,56 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.ArrayList;
 import java.util.Collections;
+import java.util.List;
 import java.util.Map;
+import java.util.jar.JarFile;
 import java.util.stream.Stream;
 
+import org.hibernate.search.util.common.impl.Closer;
+import org.hibernate.search.util.impl.test.SystemHelper;
 import org.hibernate.search.util.impl.test.annotation.TestForIssue;
 import org.hibernate.search.util.impl.test.function.ThrowingConsumer;
 
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 
-import org.springframework.boot.loader.jar.JarFile;
+import org.springframework.boot.loader.net.protocol.Handlers;
+import org.springframework.boot.loader.net.protocol.jar.JarUrl;
 
 class CodeSourceTest {
-
+	private static final String PROTOCOL_HANDLER_PACKAGES = "java.protocol.handler.pkgs";
 	private static final String META_INF_FILE_RELATIVE_PATH = "META-INF/someFile.txt";
 	private static final byte[] META_INF_FILE_CONTENT = "This is some content".getBytes( StandardCharsets.UTF_8 );
 	private static final String NON_EXISTING_FILE_RELATIVE_PATH = "META-INF/nonExisting.txt";
 	private static final String SIMPLE_CLASS_RELATIVE_PATH = SimpleClass.class.getName().replaceAll(
 			"\\.", "/" ) + ".class";
-
 	@TempDir
 	public Path temporaryFolder;
+
+	private final List<SystemHelper.SystemPropertyRestorer> toClose = new ArrayList<>();
+
+	@BeforeEach
+	void setupHandlers() {
+		// Spring has some of their own handlers configured through this property.
+		// Handlers.register(); is required to get them registered.
+		// We want to have them available for tests that rely on Spring Boot.
+		// We don't want them to interfere with non-spring tests, so we reset the property before running a test.
+		// We will rely on their own registration mechanism, but we want to reset the property back to the system value once we are done with the tests.
+		// We just set the value to the current one, so it gets registered in the helper:
+		toClose.add( SystemHelper.setSystemProperty( PROTOCOL_HANDLER_PACKAGES,
+				System.getProperty( PROTOCOL_HANDLER_PACKAGES, "" ) ) );
+	}
+
+	@AfterEach
+	void restoreSystemProperties() {
+		try ( Closer<RuntimeException> closer = new Closer<>() ) {
+			closer.pushAll( SystemHelper.SystemPropertyRestorer::close, toClose );
+		}
+	}
 
 	@Test
 	void directory() throws Exception {
@@ -159,7 +187,8 @@ class CodeSourceTest {
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-4724")
 	void jar_jarScheme_springBoot_classesInSubDirectory() throws Exception {
-		String classesDirRelativeString = "BOOT-INF/classes";
+		Handlers.register();
+		String classesDirRelativeString = "BOOT-INF/classes/";
 		Path jarPath = createJar( root -> {
 			addMetaInfFile( root );
 			addSimpleClass( root.resolve( classesDirRelativeString ) );
@@ -167,10 +196,7 @@ class CodeSourceTest {
 
 		try ( JarFile outerJar = new JarFile( jarPath.toFile() ) ) {
 			@SuppressWarnings("deprecation") // For JDK 20+
-			// TODO: HSEARCH-4765 To be replaced with URL#of(URI, URLStreamHandler) when switching to JDK 20+
-			// see https://download.java.net/java/early_access/jdk20/docs/api/java.base/java/net/URL.html#of(java.net.URI,java.net.URLStreamHandler) for deprecation info
-			// cannot simply change to URI as boot specific Handler is required to make things work.
-			URL innerJarURL = new URL( outerJar.getUrl(), classesDirRelativeString + "!/" );
+			URL innerJarURL = JarUrl.create( jarPath.toFile(), classesDirRelativeString );
 			try ( URLClassLoader isolatedClassLoader = createIsolatedClassLoader( innerJarURL ) ) {
 				Class<?> classInIsolatedClassLoader = isolatedClassLoader.loadClass( SimpleClass.class.getName() );
 
@@ -208,6 +234,7 @@ class CodeSourceTest {
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-4724")
 	void jar_jarScheme_springBoot_classesInSubJarInSubDirectory() throws Exception {
+		Handlers.register();
 		String innerJarInOuterJarRelativePathString = "BOOT-INF/lib/inner.jar";
 		// For some reason inner JAR entries in the outer JAR must not be compressed, otherwise classloading will fail.
 		Path outerJarPath = createJar(
@@ -222,10 +249,9 @@ class CodeSourceTest {
 					Files.copy( innerJar, innerJarInOuterJarAbsolute );
 				}
 		);
-
 		try ( JarFile outerJar = new JarFile( outerJarPath.toFile() ) ) {
-			URL innerJarURL = outerJar.getNestedJarFile( outerJar.getJarEntry( innerJarInOuterJarRelativePathString ) )
-					.getUrl();
+			URL innerJarURL =
+					JarUrl.create( outerJarPath.toFile(), outerJar.getJarEntry( innerJarInOuterJarRelativePathString ) );
 			try ( URLClassLoader isolatedClassLoader = createIsolatedClassLoader( innerJarURL ) ) {
 				Class<?> classInIsolatedClassLoader = isolatedClassLoader.loadClass( SimpleClass.class.getName() );
 				// Check preconditions: this is the situation that we want to test.
