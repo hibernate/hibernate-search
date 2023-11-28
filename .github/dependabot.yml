@@ -52,9 +52,6 @@ updates:
           - "org.openjdk.jmh:*" # performance testing dependency
           - "com.google.guava:guava" # Guava is used in our test utils
           - "org.asciidoctor:*" # Asciidoctor is used for rendering the documentation
-          # Eclipse compiler
-          - "org.codehaus.plexus:*"
-          - "org.eclipse.jdt:*"
           - "org.jboss.marshalling:jboss-marshalling" # JBeret IT dependency
           - "org.wildfly.security:wildfly-security-manager" # JBeret IT dependency
           - "org.springframework.boot:*" # Spring is only for ITs
@@ -68,6 +65,11 @@ updates:
           - "org.jsoup:*"
           - "org.ow2.asm:*" # for Surefire/Failsafe plugins to support builds on latest JDKs
           - "org.testcontainers:testcontainers-bom"
+          # Eclipse compiler
+          - "org.codehaus.plexus:*"
+          - "org.eclipse.jdt:*"
+          # We only use the version of WildFly for a link in the documentation
+          - "org.wildfly.bom:wildfly"
     ignore:
       # These dependencies are updated manually
       - dependency-name: "org.hibernate:*"
@@ -107,6 +109,9 @@ updates:
       # See https://github.com/dependabot/dependabot-core/issues/4028
       # And, additionally, it is only for performance testing.
       - dependency-name: "org.bsc.maven:maven-processor-plugin"
+      # We only use the major version of WildFly, and only for a link in the documentation
+      - dependency-name: "org.wildfly.bom:wildfly"
+        update-types: [ "version-update:semver-minor", "version-update:semver-patch" ]
   - package-ecosystem: "docker"
     registries:
       - dockerhub

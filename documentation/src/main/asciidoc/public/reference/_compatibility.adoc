@@ -105,7 +105,7 @@ link:{wildflyUrl}[WildFly] includes modules for <<mapper-orm,Hibernate Search wi
 using either the <<backend-lucene,Lucene backend>> or the <<backend-elasticsearch,Elasticsearch backend>>.
 
 To start using Hibernate Search within WildFly,
-see the https://docs.wildfly.org/30/Developer_Guide.html#using-hibernate-search[Hibernate Search section in the WildFly Developer Guide]:
+see the link:{wildflyDeveloperGuideUrl}#using-hibernate-search[Hibernate Search section in the WildFly Developer Guide]:
 it covers all the specifics of WildFly.
 
 [[compatibility-framework-spring-boot]]
