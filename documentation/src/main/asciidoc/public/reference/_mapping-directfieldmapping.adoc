@@ -149,6 +149,10 @@ the <<mapping-directfieldmapping-vectorSimilarity,similarity function>> used dur
 the <<mapping-directfieldmapping-beamWidth,beam width>>
 and the <<mapping-directfieldmapping-maxConnections,maximum connections>> used during indexing.
 +
+WARNING: Vector fields, on the contrary to the other field types, disable the container extraction by default
+Manually setting the <<mapping-directfieldmapping-extraction,extraction>> to `DEFAULT` will result in an exception.
+Only explicitly <<mapping-containerextractor-explicit,configured extractors>> are allowed for vector fields.
++
 WARNING: It is not allowed to index multiple vectors within the same field, i.e. vector fields cannot be <<binding-index-field-dsl-multi-valued-fields,multivalued>>.
 
 [[mapping-directfieldmapping-annotation-attributes]]
@@ -225,13 +229,15 @@ The replacement is defined as a String. Thus, its value has to be parsed.
 Look up the column _Parsing method for 'indexNullAs'_ in <<mapping-directfieldmapping-supported-types>> to find out the format used when parsing.
 ====
 
-`extraction`::
+[[mapping-directfieldmapping-extraction]]  `extraction`::
 How elements to index should be extracted from the property in the case of container types
 (`List`, `Optional`, `Map`, ...).
 +
 By default, for properties that have a container type,
 the innermost elements will be indexed.
 For example for a property of type `List<String>`, elements of type `String` will be indexed.
++
+Vector fields disable the extraction by default.
 +
 This default behavior and ways to override it are described
 in the section <<mapping-containerextractor>>.
