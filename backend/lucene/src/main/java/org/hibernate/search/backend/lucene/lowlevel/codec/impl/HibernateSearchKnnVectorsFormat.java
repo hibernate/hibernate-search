@@ -15,7 +15,7 @@ import java.util.Objects;
 import org.apache.lucene.codecs.KnnVectorsFormat;
 import org.apache.lucene.codecs.KnnVectorsReader;
 import org.apache.lucene.codecs.KnnVectorsWriter;
-import org.apache.lucene.codecs.lucene95.Lucene95HnswVectorsFormat;
+import org.apache.lucene.codecs.lucene99.Lucene99HnswVectorsFormat;
 import org.apache.lucene.index.SegmentReadState;
 import org.apache.lucene.index.SegmentWriteState;
 
@@ -37,7 +37,7 @@ public class HibernateSearchKnnVectorsFormat extends KnnVectorsFormat {
 	}
 
 	public HibernateSearchKnnVectorsFormat(int maxConnection, int beamWidth) {
-		this( new Lucene95HnswVectorsFormat( maxConnection, beamWidth ), maxConnection, beamWidth );
+		this( new Lucene99HnswVectorsFormat( maxConnection, beamWidth ), maxConnection, beamWidth );
 	}
 
 	public HibernateSearchKnnVectorsFormat(KnnVectorsFormat delegate, int maxConnection, int beamWidth) {
