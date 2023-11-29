@@ -9,7 +9,7 @@
 
 Hibernate Search automatically extracts data from Hibernate ORM entities to push it to
 local [Apache Lucene](http://lucene.apache.org/) indexes
-or remote [Elasticsearch](https://www.elastic.co/products/elasticsearch) indexes.
+or remote [Elasticsearch](https://www.elastic.co/products/elasticsearch)/[OpenSearch](https://www.opensearch.org/) indexes.
 
 It features:
 
