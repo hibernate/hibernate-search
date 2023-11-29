@@ -19,6 +19,8 @@ import org.hibernate.search.engine.backend.types.VectorSimilarity;
 import org.hibernate.search.engine.environment.bean.BeanRetrieval;
 import org.hibernate.search.mapper.pojo.bridge.mapping.annotation.ValueBinderRef;
 import org.hibernate.search.mapper.pojo.bridge.mapping.annotation.ValueBridgeRef;
+import org.hibernate.search.mapper.pojo.extractor.mapping.annotation.ContainerExtract;
+import org.hibernate.search.mapper.pojo.extractor.mapping.annotation.ContainerExtraction;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.processing.PropertyMapping;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.processing.PropertyMappingAnnotationProcessorRef;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.processing.impl.VectorFieldAnnotationProcessor;
@@ -106,6 +108,16 @@ public @interface VectorField {
 	 * @see ValueBinderRef
 	 */
 	ValueBinderRef valueBinder() default @ValueBinderRef;
+
+	/**
+	 * @return A definition of container extractors to be applied to the property,
+	 * allowing the binding of a value bridge to container elements.
+	 * By default, Hibernate Search will <b>not</b> try to apply a set of extractors.
+	 * Vector fields require an explicit extraction path being specified,
+	 * i.e. extraction must be set to {@code DEFAULT} and a nonempty array of container value extractor names provided as a {@code value}: {@code @ContainerExtraction(extract = ContainerExtract.DEFAULT, value = { ... })}
+	 * @see GenericField#extraction()
+	 */
+	ContainerExtraction extraction() default @ContainerExtraction(extract = ContainerExtract.NO);
 
 	@Documented
 	@Target({ ElementType.METHOD, ElementType.FIELD })

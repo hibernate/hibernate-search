@@ -915,4 +915,9 @@ public interface Log extends BasicLogger {
 			+ "Either specify it as an annotation property (@VectorField(dimension = somePositiveInteger)), "
 			+ "or define a value binder (@VectorField(valueBinder = @ValueBinderRef(..))) that explicitly declares a vector field specifying the dimension.")
 	SearchException vectorDimensionNotSpecified();
+
+	@Message(id = ID_OFFSET + 146, value = "Vector fields require an explicit extraction path being specified, "
+			+ "i.e. extraction must be set to DEFAULT and a nonempty array of container value extractor names provided, "
+			+ "e.g. @ContainerExtraction(extract = ContainerExtract.DEFAULT, value = { ... }).")
+	SearchException vectorFieldMustUseExplicitExtractorPath();
 }

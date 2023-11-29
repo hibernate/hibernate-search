@@ -11,21 +11,20 @@ import org.hibernate.search.engine.backend.types.Searchable;
 import org.hibernate.search.engine.backend.types.VectorSimilarity;
 import org.hibernate.search.mapper.pojo.bridge.mapping.annotation.ValueBinderRef;
 import org.hibernate.search.mapper.pojo.bridge.mapping.annotation.ValueBridgeRef;
+import org.hibernate.search.mapper.pojo.extractor.mapping.annotation.ContainerExtraction;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.AnnotationDefaultValues;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.VectorField;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.processing.PropertyMappingAnnotationProcessor;
-import org.hibernate.search.mapper.pojo.mapping.definition.annotation.processing.PropertyMappingAnnotationProcessorContext;
 import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.PropertyMappingFieldOptionsStep;
 import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.PropertyMappingStep;
 import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.PropertyMappingVectorFieldOptionsStep;
 
-public class VectorFieldAnnotationProcessor extends AbstractBaseFieldAnnotationProcessor<VectorField>
+public class VectorFieldAnnotationProcessor extends AbstractFieldAnnotationProcessor<VectorField>
 		implements PropertyMappingAnnotationProcessor<VectorField> {
 
-
 	@Override
-	PropertyMappingFieldOptionsStep<?> initBaseFieldMappingContext(PropertyMappingAnnotationProcessorContext context,
-			PropertyMappingStep mappingContext, VectorField annotation, String fieldName) {
+	PropertyMappingFieldOptionsStep<?> initFieldMappingContext(PropertyMappingStep mappingContext, VectorField annotation,
+			String fieldName) {
 		int dimension = annotation.dimension();
 		PropertyMappingVectorFieldOptionsStep fieldContext = dimension == AnnotationDefaultValues.DEFAULT_DIMENSION
 				? mappingContext.vectorField( fieldName )
@@ -61,6 +60,11 @@ public class VectorFieldAnnotationProcessor extends AbstractBaseFieldAnnotationP
 		}
 
 		return fieldContext;
+	}
+
+	@Override
+	ContainerExtraction getExtraction(VectorField annotation) {
+		return annotation.extraction();
 	}
 
 	@Override

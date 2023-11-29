@@ -15,6 +15,8 @@ Most built-in annotations applied to properties will work transparently when app
 
 Same goes for other field annotations such as `@FullTextField`,
 as well as `@IndexedEmbedded` in particular.
+With `@VectorField` being an exception to this behaviour,
+requiring <<mapping-containerextractor-explicit,explicit instructions>> to extract values from a container.
 
 What happens behind the scenes is that Hibernate Search will inspect the property type
 and attempt to apply "container extractors", picking the first that works.

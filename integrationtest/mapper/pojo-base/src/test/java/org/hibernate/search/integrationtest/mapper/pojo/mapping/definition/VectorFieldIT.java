@@ -15,6 +15,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 
 import org.hibernate.search.engine.backend.types.Projectable;
 import org.hibernate.search.engine.backend.types.Searchable;
@@ -28,6 +29,9 @@ import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.ValueBinder;
 import org.hibernate.search.mapper.pojo.bridge.runtime.ValueBridgeFromIndexedValueContext;
 import org.hibernate.search.mapper.pojo.bridge.runtime.ValueBridgeToIndexedValueContext;
 import org.hibernate.search.mapper.pojo.common.annotation.Param;
+import org.hibernate.search.mapper.pojo.extractor.builtin.BuiltinContainerExtractors;
+import org.hibernate.search.mapper.pojo.extractor.mapping.annotation.ContainerExtract;
+import org.hibernate.search.mapper.pojo.extractor.mapping.annotation.ContainerExtraction;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.DocumentId;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.VectorField;
@@ -445,6 +449,76 @@ class VectorFieldIT {
 						.failure( "Vector dimension is a required property. "
 								+ "Either specify it as an annotation property (@VectorField(dimension = somePositiveInteger)),"
 								+ " or define a value binder (@VectorField(valueBinder = @ValueBinderRef(..))) that explicitly declares a vector field specifying the dimension." ) );
+	}
+
+	@Test
+	void valueExtractorsEnabled() {
+		@Indexed(index = INDEX_NAME)
+		class IndexedEntity {
+			@DocumentId
+			Integer id;
+			@VectorField(dimension = 2, extraction = @ContainerExtraction(extract = ContainerExtract.DEFAULT,
+					value = { BuiltinContainerExtractors.OPTIONAL }))
+			Optional<byte[]> bytes;
+
+
+			@VectorField(dimension = 5, extraction = @ContainerExtraction(extract = ContainerExtract.DEFAULT,
+					value = { BuiltinContainerExtractors.OPTIONAL }))
+			Optional<float[]> floats;
+
+			IndexedEntity() {
+			}
+
+			IndexedEntity(Integer id, byte[] bytes, float[] floats) {
+				this.id = id;
+				this.bytes = Optional.ofNullable( bytes );
+				this.floats = Optional.ofNullable( floats );
+			}
+		}
+
+		backendMock.expectSchema( INDEX_NAME, b -> b.field( "floats", float[].class, f -> f.dimension( 5 ) )
+				.field( "bytes", byte[].class, f -> f.dimension( 2 ) ) );
+		SearchMapping mapping = setupHelper.start()
+				.expectCustomBeans().setup( IndexedEntity.class );
+		backendMock.verifyExpectationsMet();
+
+		try ( SearchSession session = mapping.createSession() ) {
+			IndexedEntity entity1 = new IndexedEntity(
+					1, new byte[] { (byte) 1, (byte) 2 }, null
+			);
+			IndexedEntity entity2 = new IndexedEntity(
+					2, null, new float[] { 1.0f, 1.0f, 1.0f, 1.0f, 1.0f }
+			);
+			session.indexingPlan().add( entity1 );
+			session.indexingPlan().add( entity2 );
+
+			backendMock.expectWorks( INDEX_NAME )
+					.add( "1", b -> b.field( "bytes", new byte[] { 1, 2 } ) )
+					.add( "2", b -> b.field( "floats", new float[] { 1.0f, 1.0f, 1.0f, 1.0f, 1.0f } ) );
+
+		}
+		backendMock.verifyExpectationsMet();
+	}
+
+	@Test
+	void valueExtractorsEnabled_defaultExtractorPathNotSupported() {
+		@Indexed(index = INDEX_NAME)
+		class IndexedEntity {
+			@DocumentId
+			Integer id;
+			@VectorField(dimension = 5, extraction = @ContainerExtraction(extract = ContainerExtract.DEFAULT))
+			Optional<float[]> floats;
+		}
+
+		assertThatThrownBy( () -> setupHelper.start().expectCustomBeans().setup( IndexedEntity.class ) )
+				.isInstanceOf( SearchException.class )
+				.satisfies( FailureReportUtils.hasFailureReport()
+						.typeContext( IndexedEntity.class.getName() )
+						.pathContext( ".floats" )
+						.annotationContextAnyParameters( VectorField.class )
+						.failure( "Vector fields require an explicit extraction path being specified, "
+								+ "i.e. extraction must be set to DEFAULT and a nonempty array of container value extractor names provided, "
+								+ "e.g. @ContainerExtraction(extract = ContainerExtract.DEFAULT, value = { ... })." ) );
 	}
 
 	@SuppressWarnings("rawtypes")

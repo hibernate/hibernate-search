@@ -39,7 +39,6 @@ class PropertyMappingVectorFieldOptionsStepImpl
 						// we consider arrays (byte[] and float[] in particular to be vector types, anything else will be
 						// treated as a non-vector field and delegated to a regular as(..) call.
 						if ( clazz.isArray() ) {
-							//
 							return factory.asVector( dimension, clazz );
 						}
 						else {
@@ -85,6 +84,14 @@ class PropertyMappingVectorFieldOptionsStepImpl
 	public PropertyMappingVectorFieldOptionsStep indexNullAs(String indexNullAs) {
 		fieldModelContributor.add( c -> c.indexNullAs( indexNullAs ) );
 		return thisAsS();
+	}
+
+	@Override
+	public PropertyMappingVectorFieldOptionsStep extractors(ContainerExtractorPath extractorPath) {
+		if ( extractorPath.isDefault() ) {
+			throw log.vectorFieldMustUseExplicitExtractorPath();
+		}
+		return super.extractors( extractorPath );
 	}
 
 	@Override
