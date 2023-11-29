@@ -370,7 +370,7 @@ public final class ParseUtils {
 
 	public static byte[] parseBytePrimitiveArray(String value) {
 		try {
-			String[] values = value.replaceAll( "(^\\s*\\[\\s*)|(\\s*\\]\\s*$)", "" ).split( "[,;\\s]+" );
+			String[] values = arrayValues( value.trim() );
 			byte[] parsed = new byte[values.length];
 			for ( int i = 0; i < values.length; i++ ) {
 				parsed[i] = parseByte( values[i] );
@@ -384,7 +384,7 @@ public final class ParseUtils {
 
 	public static float[] parseFloatPrimitiveArray(String value) {
 		try {
-			String[] values = value.replaceAll( "(^\\s*\\[\\s*)|(\\s*\\]\\s*$)", "" ).split( "[,;\\s]+" );
+			String[] values = arrayValues( value.trim() );
 			float[] parsed = new float[values.length];
 			for ( int i = 0; i < values.length; i++ ) {
 				parsed[i] = parseFloat( values[i] );
@@ -394,5 +394,12 @@ public final class ParseUtils {
 		catch (SearchException ex) {
 			throw log.invalidStringForType( value, float[].class, ex.getMessage(), ex );
 		}
+	}
+
+	private static String[] arrayValues(String value) {
+		if ( value.startsWith( "[" ) && value.endsWith( "]" ) ) {
+			value = value.substring( 1, value.length() - 1 ).trim();
+		}
+		return value.split( "[,;\\s]+" );
 	}
 }

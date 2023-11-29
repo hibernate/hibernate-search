@@ -76,6 +76,10 @@ class ParseUtilsTest {
 				.hasMessageContainingAll( "Invalid string for type 'java.lang.Byte': '1a'. For input string: \"1a\"" );
 		assertThatThrownBy( () -> ParseUtils.parseBytePrimitiveArray( "[1,2[32],2]" ) )
 				.hasMessageContainingAll( "Invalid string for type 'java.lang.Byte': '2[32]'. For input string: \"2[32]\"" );
+		assertThatThrownBy( () -> ParseUtils.parseBytePrimitiveArray( "[ 1, 2, 3, 4, 5" ) )
+				.hasMessageContainingAll( "Invalid string for type 'java.lang.Byte': '['. For input string: \"[\"" );
+		assertThatThrownBy( () -> ParseUtils.parseBytePrimitiveArray( "1, 2, 3, 4, 5]" ) )
+				.hasMessageContainingAll( "Invalid string for type 'java.lang.Byte': '5]'. For input string: \"5]\"" );
 	}
 
 	@Test
@@ -102,5 +106,9 @@ class ParseUtilsTest {
 		assertThatThrownBy( () -> ParseUtils.parseFloatPrimitiveArray( "[1.0,2.0[32.0],2.0]" ) )
 				.hasMessageContainingAll(
 						"Invalid string for type 'java.lang.Float': '2.0[32.0]'. For input string: \"2.0[32.0]\"" );
+		assertThatThrownBy( () -> ParseUtils.parseFloatPrimitiveArray( "[ 1.0, 2.0, 3.0, 4.0, 5.0" ) )
+				.hasMessageContainingAll( "Invalid string for type 'java.lang.Float': '['. For input string: \"[\"" );
+		assertThatThrownBy( () -> ParseUtils.parseFloatPrimitiveArray( "1.0, 2.0, 3.0, 4.0, 5.0]" ) )
+				.hasMessageContainingAll( "Invalid string for type 'java.lang.Float': '5.0]'. For input string: \"5.0]\"" );
 	}
 }
