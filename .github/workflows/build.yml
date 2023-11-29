@@ -18,6 +18,7 @@ on:
       - '!5.*'
       - '!6.*'
       - '!dependabot/**'
+      - '!wip/**/dependency-update/**'
     tags:
       - '**'
   pull_request:
