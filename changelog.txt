@@ -1,6 +1,15 @@
 Hibernate Search Changelog
 ==========================
 
+7.1.0.Alpha1 (2023-11-30)
+-------------------------
+
+** Improvement
+    * HSEARCH-5024 Adjust Jandex index reading and building for nested JARs
+
+** New Feature
+    * HSEARCH-4948 Vector search using the Lucene backend
+
 7.0.0.CR2 (2023-11-24)
 -------------------------
 
