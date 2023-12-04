@@ -38,315 +38,61 @@ and only then to later versions (which will be significantly easier).
 [[requirements]]
 == Requirements
 
-Hibernate Search {hibernateSearchVersion} now requires:
+The requirements of Hibernate Search {hibernateSearchVersion}
+are the same as those of Hibernate Search {hibernateSearchPreviousStableVersionShort}:
 
 - JDK 11 or later;
 - Lucene 9 for its Lucene backend;
 - Elasticsearch 7.10+ or OpenSearch 1.3+ for its Elasticsearch backend;
 - Hibernate ORM 6.4.x for the Hibernate ORM integration.
 
-Regarding the Hibernate ORM requirements, when migrating from previous versions of Hibernate Search:
-
-If your application uses Hibernate ORM 6.3::
-Your Hibernate Search dependencies include references
-to artifacts ending with `-orm6` (e.g. `hibernate-search-mapper-orm-orm6`).
-+
-Just remove the `-orm6` suffix from the dependency coordinates
-(e.g. use `hibernate-search-mapper-orm` instead)
-when you upgrade to this version of Hibernate Search.
-+
-Then, https://github.com/hibernate/hibernate-orm/blob/6.4/migration-guide.adoc[migrate to Hibernate ORM 6.4]
-at the same time you upgrade to this version of Hibernate Search.
-If your application uses Hibernate ORM 6.2::
-You need to https://github.com/hibernate/hibernate-orm/blob/6.3/migration-guide.adoc[migrate to Hibernate ORM 6.3] first
-before upgrading to this version of Hibernate Search.
-+
-Then follow the instructions for "If your application uses Hibernate ORM 6.3" above.
-If your application uses Hibernate ORM 5.6::
-You need to migrate to Hibernate ORM 6.3 first
-before upgrading to this version of Hibernate Search;
-see https://hibernate.org/orm/documentation/migrate/[Hibernate ORM migration guides]
-and https://docs.jboss.org/hibernate/search/6.2/reference/en-US/html_single/#other-integrations-orm6[this guide for using Hibernate ORM 6.x with Hibernate Search 6.2].
-+
-Then follow the instructions for "If your application uses Hibernate ORM 6.3" above.
-
 [[artifact-changes]]
-== Artifact changes
+== Artifacts
 
-With the move to Jakarta EE Hibernate Search previous batch artifacts (`hibernate-search-mapper-orm-batch-jsr352-core`/`hibernate-search-mapper-orm-batch-jsr352-jberet`)
-will now relocate to the new ones (`hibernate-search-mapper-orm-jakarta-batch-core`/`hibernate-search-mapper-orm-jakarta-batch-jberet`) matching the naming of Jakarta EE specification.
-This also means that the corresponding Java module names and packages are also updated:
-
-* The core module is now named `org.hibernate.search.jakarta.batch.core` and the base package for this module is `org.hibernate.search.jakarta.batch.core`
-* The JBeret module is now named `org.hibernate.search.jakarta.batch.jberet` and the base package for this module is `org.hibernate.search.jakarta.batch.jberet`
-
-Outbox polling for Hibernate ORM artifact is getting a shorter name: `hibernate-search-mapper-orm-outbox-polling`.
-For most of the users this should only be the change in the dependencies, unless some setting keys from `HibernateOrmMapperOutboxPollingSettings`
-where referenced in the code, then an import update will be required as well.
-The corresponding Java module name and base package are updated to:
-
-* The module is now named `org.hibernate.search.mapper.orm.outboxpolling` and the base package for this module is `org.hibernate.search.mapper.orm.outboxpolling`
+The coordinates of Maven artifacts in Hibernate Search {hibernateSearchVersion}
+are the same as in Hibernate Search {hibernateSearchPreviousStableVersionShort}.
 
 [[data-format]]
-== Data format and schema changes
+== Data format and schema
 
 [[indexes]]
 === Indexes
 
-Elasticsearch indexes created with Hibernate Search {hibernateSearchPreviousStableVersionShort}
-can be read from and written to with Hibernate Search {hibernateSearchVersion}.
-
-Reading and writing to Lucene indexes created with Hibernate Search {hibernateSearchPreviousStableVersionShort}
-using Hibernate Search {hibernateSearchVersion} may lead to exceptions, since there were incompatible changes applied to internal fields.
-You must recreate your Lucene indexes and reindex your database. The easiest way to do so is to use link:{hibernateSearchDocUrl}#indexing-massindexer[the `MassIndexer`] with link:{hibernateSearchDocUrl}#indexing-massindexer-parameters-drop-and-create-schema[`dropAndCreateSchemaOnStart(true)`].
+The index format and schema in Hibernate Search {hibernateSearchVersion}
+is backward-compatible with Hibernate Search {hibernateSearchPreviousStableVersionShort}:
+older indexes can be read from and written to without reindexing.
 
 [[outboxpolling]]
-=== Outbox polling system tables
+=== Outbox polling database tables
 
-If you use the incubating link:{hibernateSearchDocUrl}#coordination-outbox-polling[`outbox-polling` coordination strategy],
-with the PostgreSQL database you will be impacted by the changes to entities that represents the outbox event and agent,
-requiring database schema changes.
-The `payload` column changes its type from `oid` to `bytea` for both outbox event and agent tables.
-You can find suggested migration scripts below:
-
-.Postgresql:
-[,sql]
-----
--- Change outbox event `payload` column type to bytea:
--- Note the way existing LOBs are retrieved using lo_get function.
-alter table hsearch_outbox_event
-    alter column payload type bytea using lo_get(payload);
-
--- Change agent `payload` column type to bytea:
--- Note: even though agent table should've not used payload column so far, we still need to have a type cast.
--- It can be done either with the same `lo_get()` function call, or with a pair of casts like `cast( cast( payload as text ) as bytea )`:
-alter table hsearch_agent
-    alter column payload type bytea using lo_get(payload);
-----
-Other databases:
-
-* CockroachDB: no migration required. Type of the `payload` is `bytes` in both cases.
-* MySQL: no migration required. Type of the `payload` is `longblob` in both cases.
-* MariaDB: no migration required. Type of the `payload` is `longblob` in both cases.
-* DB2: no migration required. Type of the `payload` is `blob` in both cases.
-* Oracle: no migration required. Type of the `payload` is `blob` in both cases.
-* MSSQL: no migration required. Type of the `payload` is `varbinary(max)` in both cases.
-* H2: no migration required. Type of the `payload` is `blob` in both cases.
-
-If you were using Hibernate Search 6.2 with Hibernate ORM 5, i.e. using regular Hibernate Search artifacts and not `-orm6`/`-jakarta` ones
-this upgrade will also mean the upgrade of Hibernate ORM to 6.3. Doing so will lead to a potential type mismatch when using Hibernate ORM's schema validation.
-To prevent that, `id` column types can be updated from `varchar` to `char` where applicable.
-You can find suggested migration scripts for the tested databases below:
-
-.Postgresql:
-[,sql]
-----
--- change outbox event `id` column type to char:
-alter table hsearch_outbox_event
-    alter column id TYPE char(36);
-
--- change agent `id` column type to char:
-alter table hsearch_agent
-    alter column id TYPE char(36);
-----
-
-.CockroachDB:
-[,sql]
-----
--- change outbox event `id` column type to char:
--- altering type directly is not supported: https://go.crdb.dev/issue-v/47636/v22.1
-alter table hsearch_outbox_event
-    add tmp char(36);
-update hsearch_outbox_event
-set tmp = id
-where 1 = 1;
-alter table hsearch_outbox_event
-    alter column tmp set not null;
-alter table hsearch_outbox_event
-    alter primary key using columns (tmp);
-alter table hsearch_outbox_event
-    drop column id;
-alter table hsearch_outbox_event
-    rename column tmp to id;
-
--- change agent `id` column type to char:
-alter table hsearch_agent
-    add tmp char(36);
-update hsearch_agent
-set tmp = id
-where 1 = 1;
-alter table hsearch_agent
-    alter column tmp set not null;
-alter table hsearch_agent
-    alter primary key using columns (tmp);
-alter table hsearch_agent
-    drop column id;
-alter table hsearch_agent
-    rename column tmp to id;
-----
-
-.MySQL:
-[,sql]
-----
--- change outbox event `id` column type to char:
-alter table hsearch_outbox_event
-    modify column id char(36);
-
--- change agent `id` column type to char:
-alter table hsearch_agent
-    modify column id char(36);
-----
-
-.MariaDB:
-[,sql]
-----
--- change outbox event `id` column type to char:
-alter table hsearch_outbox_event
-    modify column id char(36);
-
--- change agent `id` column type to char:
-alter table hsearch_agent
-    modify column id char(36);
-----
-
-.DB2:
-[,sql]
-----
--- change outbox event `id` column type to char:
-alter table hsearch_outbox_event
-    drop primary key;
-alter table hsearch_outbox_event
-    alter column id set data type char(36);
--- make this call if the adding constraint fails:
-call sysproc.admin_cmd('reorg table hsearch_outbox_event');
-alter table hsearch_outbox_event
-    add constraint hsearch_outbox_event_pkey primary key (id);
-
--- change agent `id` column type to char:
-alter table hsearch_agent
-    drop primary key;
-alter table hsearch_agent
-    alter column id set data type char(36);
--- make this call if the adding constraint fails:
-call sysproc.admin_cmd('reorg table hsearch_agent');
-alter table hsearch_agent
-    add constraint hsearch_agent_pkey primary key (id);
-----
-
-.Oracle:
-[,sql]
-----
--- change outbox event `id` column type to char:
-alter table hsearch_outbox_event
-    add tmp char(36);
-update hsearch_outbox_event
-set tmp = id
-where 1 = 1;
-alter table hsearch_outbox_event
-    modify tmp not null;
-alter table hsearch_outbox_event
-    drop column id;
-alter table hsearch_outbox_event
-    rename column tmp to id;
-alter table hsearch_outbox_event
-    add constraint hsearch_outbox_event_pkey primary key (id);
-
--- change agent `id` column type to char:
-alter table hsearch_agent
-alter table hsearch_agent
-    add tmp char(36);
-update hsearch_agent
-set tmp = id
-where 1 = 1;
-alter table hsearch_agent
-    modify tmp not null;
-alter table hsearch_agent
-    drop column id;
-alter table hsearch_agent
-    rename column tmp to id;
-alter table hsearch_agent
-    add constraint hsearch_agent_pkey primary key (id);
-----
-
-.MSSQL:
-[,sql]
-----
--- change publox event `id` column type to char:
-alter table hsearch_outbox_event
-    drop constraint if exists hsearch_outbox_event_pkey;
-alter table hsearch_outbox_event
-    alter column id binary(16) not null;
-alter table hsearch_outbox_event
-    add constraint hsearch_outbox_event_pkey primary key (id);
-
--- change agent `id` column type to char:
-alter table hsearch_agent
-    drop constraint if exists hsearch_agent_pkey;
-alter table hsearch_agent
-    alter column id binary(16) not null;
-alter table hsearch_agent
-    add constraint hsearch_agent_pkey primary key (id);
-----
-
-.H2:
-[,sql]
-----
--- change outbox event `id` column type to char:
-alter table hsearch_outbox_event
-    alter column id char(36) not null;
-
--- change agent `id` column type to char:
-alter table hsearch_agent
-    alter column id char(36) not null;
-----
+The event and agent database tables used for
+link:https://docs.jboss.org/hibernate/search/{hibernateSearchVersionShort}/reference/en-US/html_single/#coordination-database-polling[outbox-polling]
+in Hibernate Search {hibernateSearchVersion}
+are backward-compatible with Hibernate Search {hibernateSearchPreviousStableVersionShort}:
+no database schema update is necessary for these tables.
 
 [[configuration]]
-== Configuration changes
+== Configuration
 
-The configuration properties are backward-compatible with Hibernate Search {hibernateSearchPreviousStableVersionShort}.
-
-However, some configuration values are deprecated:
-
-* `hibernate.search.coordination.entity.mapping.outboxevent.uuid_type` and `hibernate.search.coordination.entity.mapping.agent.uuid_type`
-now accept names of SQL type codes from `org.hibernate.type.SqlTypes` or their corresponding int values.
-The value `default` is still valid. `uuid-binary` and `uuid-char` are accepted and converted to their corresponding `org.hibernate.type.SqlTypes` alternatives, but they are deprecated and will not be accepted in the future versions of Hibernate Search.
+The configuration properties in Hibernate Search {hibernateSearchVersion}
+are backward-compatible with Hibernate Search {hibernateSearchPreviousStableVersionShort}.
 
 [[api]]
-== API changes
+== API
 
 The https://hibernate.org/community/compatibility-policy/#code-categorization[API]
-is for the most part backward-compatible with Hibernate Search {hibernateSearchPreviousStableVersionShort}.
-
-However, some APIs changed:
-
-* The complement operator (`~`) used for link:{hibernateSearchDocUrl}#search-dsl-predicate-regexp-flags[matching regular expression patterns with flags]
-is now removed with no alternative to replace it.
-* The Hibernate Search job for Jakarta Batch no longer accepts a `customQueryHQL` / `.restrictedBy(String)` parameter.
-Use `.reindexOnly(String hql, Map parameters)` instead.
-* The Hibernate Search job for Jakarta Batch no longer accepts a `sessionClearInterval` / `.sessionClearInterval(int)` parameter.
-Use `entityFetchSize`/`.entityFetchSize(int)` instead.
+in Hibernate Search {hibernateSearchVersion}
+is backward-compatible with Hibernate Search {hibernateSearchPreviousStableVersionShort}.
 
 [[spi]]
-== SPI changes
+== SPI
 
 The https://hibernate.org/community/compatibility-policy/#code-categorization[SPI]
-are for the most part backward-compatible with Hibernate Search {hibernateSearchPreviousStableVersionShort}.
+in Hibernate Search {hibernateSearchVersion}
+is backward-compatible with Hibernate Search {hibernateSearchPreviousStableVersionShort}.
 
 [[behavior]]
-== Behavior changes
+== Behavior
 
 The behavior of Hibernate Search {hibernateSearchVersion}
-is for the most part backward-compatible with Hibernate Search {hibernateSearchPreviousStableVersionShort}.
-
-However, parts of Hibernate Search now behave differently:
-
-* The default value for `hibernate.search.backend.query.shard_failure.ignore` is changed from `true` to `false` which means
-that now Hibernate Search will throw an exception if at least one shard failed during a search operation.
-To get the previous behavior set this configuration property explicitly to `true`.
-Note, this setting must be set for each elasticsearch backend, if multiple are defined.
-* The Hibernate Search job for Jakarta Batch will now list identifiers in one session (with one DB connection),
-while loading entities in another (with another DB connection).
-This is to sidestep limitations of scrolling in some JDBC drivers.
-* For entities whose document ID is based on a different property than the entity ID,
-the Hibernate Search job for Jakarta Batch will now build the partition plan using that property
-instead of using the entity ID indiscriminately.
+is backward-compatible with Hibernate Search {hibernateSearchPreviousStableVersionShort}.
