@@ -110,6 +110,10 @@ In any case:
   * Check there are no resolved/closed issues in the current `*-backlog` "version";
     if there are, you might want to assign them to your release.
 
+**If it is a new major or minor release**:
+
+* Reset the migration guide to include only information relevant to the new major or minor.
+
 **If it's a `.CR` or `.Final` release**:
 
 * Check that the [migration guide](documentation/src/main/asciidoc/migration/index.adoc) is up to date.
@@ -204,9 +208,12 @@ In any case:
 
 **If it is a new major or minor release**:
 
+* Reset the migration guide on the `main` branch if you forgot about it when preparing the release.
 * Create a maintenance branch for the previous series, if not already done:
-  * `git branch <x.(y-1)>`
-  * `mvn versions:set -DnewVersion=<x.(y-1).z>-SNAPSHOT`
-  * `git add`, `commit`, `push upstream` the new branch.
+  * `git branch <x.(y-1)> <last relevant commit on main>`
+  * Update the version on the new branch if necessary:
+    * `mvn versions:set -DnewVersion=<x.(y-1).z>-SNAPSHOT`
+    * `git add -A`, `commit`
+  * `git push upstream` the new branch
   * Activate GitHub's "branch protection" features on the newly created maintenance branch:
     https://github.com/hibernate/hibernate-search/settings/branches/.
