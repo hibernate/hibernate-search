@@ -101,28 +101,34 @@ have not been kept up-to-date, and might need a refresh.
 
 ### Preparing the release
 
+In any case:
+
 * Check that everything has been pushed to the upstream repository.
 * Check that the CI job for the branch you want to release is green.
 * Check Jira:
   * Check there are no outstanding issues assigned to the release.
   * Check there are no resolved/closed issues in the current `*-backlog` "version";
     if there are, you might want to assign them to your release.
-* **If it's a `.CR` or `.Final` release**:
-  * Check that the [migration guide](documentation/src/main/asciidoc/migration/index.adoc) is up to date.
-    In particular, check the git history for API/SPI changes
-    and document them in the migration guide.
-* If you **added a new Maven module** that should be included in the distribution,
-  **check that it has been included in the distribution** (javadoc and ZIP distribution).
-  * `mvn clean install -Pdocumentation-pdf,dist -DskipTests`
-  * Check the distribution package as built by Maven (`distribution/target/hibernate-search-<version>-dist`).
-    In particular, check the jar files in the subdirectories:
-    * `lib/required`
-    * `lib/optional`
-    * `lib/provided`
 
-    They should contain the appropriate dependencies, without duplicates.
-    The creation of these directories is driven by the assembly plugin (`distribution/src/main/assembly/dist.xml`)
-    which is very specific and might break with the inclusion of new dependencies.
+**If it's a `.CR` or `.Final` release**:
+
+* Check that the [migration guide](documentation/src/main/asciidoc/migration/index.adoc) is up to date.
+  In particular, check the git history for API/SPI changes
+  and document them in the migration guide.
+
+If you **added a new Maven module** that should be included in the distribution,
+**check that it has been included in the distribution** (javadoc and ZIP distribution):
+
+* `mvn clean install -Pdocumentation-pdf,dist -DskipTests`
+* Check the distribution package as built by Maven (`distribution/target/hibernate-search-<version>-dist`).
+  In particular, check the jar files in the subdirectories:
+  * `lib/required`
+  * `lib/optional`
+  * `lib/provided`
+
+  They should contain the appropriate dependencies, without duplicates.
+  The creation of these directories is driven by the assembly plugin (`distribution/src/main/assembly/dist.xml`)
+  which is very specific and might break with the inclusion of new dependencies.
 
 ### Performing the release
 
@@ -188,14 +194,19 @@ If you just released the latest stable, you will need to update other projects:
 
 ### Updating Hibernate Search
 
-* **If it is a new major or minor release**, and if not already done, create a maintenance branch for the previous series:
-  * `git branch <x.(y-1)>`
-  * `mvn versions:set -DnewVersion=<x.(y-1).z>-SNAPSHOT`
-  * `git add`, `commit`, `push upstream` the new branch.
-  * Activate GitHub's "branch protection" features on the newly created maintenance branch:
-    https://github.com/hibernate/hibernate-search/settings/branches/.
+In any case:
+
 * Make sure to keep the `previous.stable` property in the POM up-to-date
   on all actively developed branches.
   The property must point to the latest micro of the previous minor.
   E.g. let's say you release 5.6.5 while actively working on 5.7,
   then the development branch for 5.7 must have its `previous.stable` property set to 5.6.5.
+
+**If it is a new major or minor release**:
+
+* Create a maintenance branch for the previous series, if not already done:
+  * `git branch <x.(y-1)>`
+  * `mvn versions:set -DnewVersion=<x.(y-1).z>-SNAPSHOT`
+  * `git add`, `commit`, `push upstream` the new branch.
+  * Activate GitHub's "branch protection" features on the newly created maintenance branch:
+    https://github.com/hibernate/hibernate-search/settings/branches/.
