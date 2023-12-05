@@ -44,7 +44,7 @@ public final class UuidDataTypeUtils {
 	 * Otherwise, when {@code value != "default" } a user passed value will be used.
 	 */
 	@SuppressWarnings("deprecation")
-	public static int uuidType(String value, ConfigurationPropertySource source,
+	public static Integer uuidType(String value, ConfigurationPropertySource source,
 			OptionalConfigurationProperty<String> property, Dialect dialect) {
 		if ( DEFAULT.equalsIgnoreCase( value ) ) {
 			return defaultUuidType( dialect );
@@ -61,12 +61,12 @@ public final class UuidDataTypeUtils {
 		return TypeCodeConverter.convert( value );
 	}
 
-	public static int defaultUuidType(Dialect dialect) {
+	public static Integer defaultUuidType(Dialect dialect) {
 		// See HSEARCH-4749 why MSSQL is treated differently
 		if ( dialect instanceof SQLServerDialect ) {
 			return SqlTypes.BINARY;
 		}
-		return SqlTypes.CHAR;
+		return null;
 	}
 
 	// Copied and adapted from ORM's ConfigurationHelper$TypeCodeConverter

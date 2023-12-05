@@ -124,7 +124,7 @@ public class OutboxPollingAgentAdditionalJaxbMappingProducer implements Hibernat
 			mappings = JaxbMappingHelper.unmarshall( mapping.get() );
 		}
 		else {
-			int resolvedUuidType = uuidType.orElseGet( () -> UuidDataTypeUtils.defaultUuidType( dialect ) );
+			Integer resolvedUuidType = uuidType.orElseGet( () -> UuidDataTypeUtils.defaultUuidType( dialect ) );
 			String resolvedUuidStrategy = uuidStrategy.orElse(
 					HibernateOrmMapperOutboxPollingSettings.Defaults.COORDINATION_ENTITY_MAPPING_AGENT_UUID_GEN_STRATEGY )
 					.strategy();
@@ -144,7 +144,7 @@ public class OutboxPollingAgentAdditionalJaxbMappingProducer implements Hibernat
 	}
 
 	private static JaxbEntityMappings createMappings(String schema, String catalog,
-			String table, int resolvedUuidType, String resolvedUuidStrategy,
+			String table, Integer resolvedUuidType, String resolvedUuidStrategy,
 			boolean tenantIdRequired) {
 		AdditionalMappingBuilder builder = new AdditionalMappingBuilder(
 				Agent.class, ENTITY_NAME )

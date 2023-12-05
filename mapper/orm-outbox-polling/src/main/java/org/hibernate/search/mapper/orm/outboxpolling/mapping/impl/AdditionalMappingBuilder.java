@@ -83,10 +83,12 @@ public class AdditionalMappingBuilder {
 		return this;
 	}
 
-	public AdditionalMappingBuilder id(int type, String strategy) {
+	public AdditionalMappingBuilder id(Integer type, String strategy) {
 		JaxbId id = new JaxbId();
 		id.setName( "id" );
-		id.setJdbcTypeCode( type );
+		if ( type != null ) {
+			id.setJdbcTypeCode( type );
+		}
 		id.setUuidGenerator( new JaxbUuidGenerator() );
 		id.getUuidGenerator().setStyle( UuidGenerator.Style.valueOf( strategy.toUpperCase( Locale.ROOT ) ) );
 		entity.getAttributes().getId().add( id );
