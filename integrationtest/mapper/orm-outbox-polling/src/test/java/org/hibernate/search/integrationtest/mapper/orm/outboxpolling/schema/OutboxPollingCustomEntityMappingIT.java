@@ -28,6 +28,8 @@ import org.hibernate.SessionFactory;
 import org.hibernate.dialect.Dialect;
 import org.hibernate.engine.jdbc.env.spi.NameQualifierSupport;
 import org.hibernate.engine.spi.SessionFactoryImplementor;
+import org.hibernate.metamodel.mapping.JdbcMapping;
+import org.hibernate.metamodel.model.domain.SimpleDomainType;
 import org.hibernate.resource.jdbc.spi.StatementInspector;
 import org.hibernate.search.integrationtest.mapper.orm.outboxpolling.testsupport.util.OutboxEventFilter;
 import org.hibernate.search.integrationtest.mapper.orm.outboxpolling.testsupport.util.TestingOutboxPollingInternalConfigurer;
@@ -44,13 +46,19 @@ import org.hibernate.search.mapper.pojo.work.spi.PojoIndexingQueueEventPayload;
 import org.hibernate.search.util.common.SearchException;
 import org.hibernate.search.util.impl.integrationtest.common.extension.BackendMock;
 import org.hibernate.search.util.impl.integrationtest.mapper.orm.CoordinationStrategyExpectations;
+import org.hibernate.search.util.impl.integrationtest.mapper.orm.DatabaseContainer;
 import org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmSetupHelper;
 import org.hibernate.search.util.impl.test.extension.ExpectedLog4jLog;
+import org.hibernate.type.SqlTypes;
+import org.hibernate.type.descriptor.jdbc.JdbcType;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
 
 class OutboxPollingCustomEntityMappingIT {
+
+	private static final String POSTGRESQL_DIALECT = "org.hibernate.dialect.PostgreSQLDialect";
+	private static final String MSSQL_DIALECT = "org.hibernate.dialect.SQLServerDialect";
 
 	private static final String CUSTOM_SCHEMA = "CUSTOM_SCHEMA";
 	private static final String ORIGINAL_OUTBOX_EVENT_TABLE_NAME =
@@ -392,6 +400,48 @@ class OutboxPollingCustomEntityMappingIT {
 						"something-incompatible",
 						"Valid names are: [auto, random, time]"
 				);
+	}
+
+	@Test
+	void defaultUuidDataType() {
+		backendMock.expectAnySchema( IndexedEntity.INDEX );
+		sessionFactory = ormSetupHelper.start()
+				.withProperty(
+						HibernateOrmMapperOutboxPollingImplSettings.COORDINATION_INTERNAL_CONFIGURER,
+						new TestingOutboxPollingInternalConfigurer().outboxEventFilter( eventFilter )
+				)
+				// Allow ORM to create schema as we want to use non-default for this testcase:
+				.withProperty( "jakarta.persistence.create-database-schemas", true )
+				.withProperty( "hibernate.show_sql", true )
+				.setup( IndexedEntity.class );
+		backendMock.verifyExpectationsMet();
+
+		JdbcType agent = idJdbcType( sessionFactory, Agent.class );
+		JdbcType event = idJdbcType( sessionFactory, OutboxEvent.class );
+
+		String dialect = DatabaseContainer.configuration().dialect();
+
+		switch ( dialect ) {
+			case POSTGRESQL_DIALECT:
+				assertThat( agent.getDdlTypeCode() ).isEqualTo( SqlTypes.UUID );
+				assertThat( event.getDdlTypeCode() ).isEqualTo( SqlTypes.UUID );
+				break;
+			case MSSQL_DIALECT:
+				assertThat( agent.getDdlTypeCode() ).isEqualTo( SqlTypes.BINARY );
+				assertThat( event.getDdlTypeCode() ).isEqualTo( SqlTypes.BINARY );
+				break;
+			default:
+				assertThat( agent.getDdlTypeCode() ).isIn( SqlTypes.UUID, SqlTypes.BINARY, SqlTypes.CHAR );
+				assertThat( event.getDdlTypeCode() ).isIn( SqlTypes.UUID, SqlTypes.BINARY, SqlTypes.CHAR );
+				break;
+		}
+	}
+
+	private static JdbcType idJdbcType(SessionFactory sessionFactory, Class<?> entity) {
+		SimpleDomainType<?> idType = sessionFactory.unwrap( SessionFactoryImplementor.class ).getJpaMetamodel().entity( entity )
+				.getIdType();
+
+		return ( (JdbcMapping) idType ).getJdbcType();
 	}
 
 	private void assertEventUUIDVersion(Session session, int expectedVersion) {
