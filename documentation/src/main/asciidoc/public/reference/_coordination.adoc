@@ -335,6 +335,8 @@ Defaults to `auto`.
 * `agent.uuid_type` defines link:{hibernateJavadocUrl}org/hibernate/type/SqlTypes.html[the name of the Hibernate `SqlType`]
 used for representing an UUID in the agent table. Hibernate Search provides a special `default` option that is going to
 be used by default and will result into one of `UUID`/`BINARY`/`CHAR` depending on the database in use.
+While currently Hibernate Search will use the dialect's default link:{hibernateDocUrl}#basic-uuid[representation of the UUID] in the database,
+it is not a guarantee. If a specific type is required, it is best to provide it explicitly via this property.
 Please refer to link:{hibernateJavadocUrl}org/hibernate/type/SqlTypes.html[SqlTypes] to see
 the list of available type codes supported by Hibernate ORM.
 The SQL type code can be passed as a name of a corresponding constant in `org.hibernate.type.SqlTypes` or as an integer value.
@@ -358,6 +360,8 @@ Defaults to `auto`.
 * `outboxevent.uuid_type` defines link:{hibernateJavadocUrl}org/hibernate/type/SqlTypes.html[the name of the Hibernate `SqlType`]
 used for representing an UUID in the outbox event table. Hibernate Search provides a special `default` option that is going to
 be used by default and will result into one of `UUID`/`BINARY`/`CHAR` depending on the database in use.
+While currently Hibernate Search will use the dialect's default link:{hibernateDocUrl}#basic-uuid[representation of the UUID] in the database,
+it is not a guarantee. If a specific type is required, it is best to provide it explicitly via this property.
 Please refer to link:{hibernateJavadocUrl}org/hibernate/type/SqlTypes.html[SqlTypes] to see
 the list of available type codes supported by Hibernate ORM.
 The SQL type code can be passed as a name of a corresponding constant in `org.hibernate.type.SqlTypes` or as an integer value.

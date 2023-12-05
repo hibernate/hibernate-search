@@ -423,12 +423,9 @@ class OutboxPollingCustomEntityMappingIT {
 
 		switch ( dialect ) {
 			case POSTGRESQL_DIALECT:
+			case MSSQL_DIALECT:
 				assertThat( agent.getDdlTypeCode() ).isEqualTo( SqlTypes.UUID );
 				assertThat( event.getDdlTypeCode() ).isEqualTo( SqlTypes.UUID );
-				break;
-			case MSSQL_DIALECT:
-				assertThat( agent.getDdlTypeCode() ).isEqualTo( SqlTypes.BINARY );
-				assertThat( event.getDdlTypeCode() ).isEqualTo( SqlTypes.BINARY );
 				break;
 			default:
 				assertThat( agent.getDdlTypeCode() ).isIn( SqlTypes.UUID, SqlTypes.BINARY, SqlTypes.CHAR );

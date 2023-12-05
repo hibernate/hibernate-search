@@ -9,8 +9,6 @@ package org.hibernate.search.mapper.orm.outboxpolling.cfg.impl;
 import java.lang.invoke.MethodHandles;
 import java.util.Locale;
 
-import org.hibernate.dialect.Dialect;
-import org.hibernate.dialect.SQLServerDialect;
 import org.hibernate.search.engine.cfg.ConfigurationPropertySource;
 import org.hibernate.search.engine.cfg.spi.OptionalConfigurationProperty;
 import org.hibernate.search.mapper.orm.outboxpolling.logging.impl.Log;
@@ -45,9 +43,9 @@ public final class UuidDataTypeUtils {
 	 */
 	@SuppressWarnings("deprecation")
 	public static Integer uuidType(String value, ConfigurationPropertySource source,
-			OptionalConfigurationProperty<String> property, Dialect dialect) {
+			OptionalConfigurationProperty<String> property) {
 		if ( DEFAULT.equalsIgnoreCase( value ) ) {
-			return defaultUuidType( dialect );
+			return null;
 		}
 		String propertyName = property.resolveOrRaw( source );
 		if ( UUID_CHAR.equalsIgnoreCase( value ) ) {
@@ -59,14 +57,6 @@ public final class UuidDataTypeUtils {
 			return SqlTypes.BINARY;
 		}
 		return TypeCodeConverter.convert( value );
-	}
-
-	public static Integer defaultUuidType(Dialect dialect) {
-		// See HSEARCH-4749 why MSSQL is treated differently
-		if ( dialect instanceof SQLServerDialect ) {
-			return SqlTypes.BINARY;
-		}
-		return null;
 	}
 
 	// Copied and adapted from ORM's ConfigurationHelper$TypeCodeConverter

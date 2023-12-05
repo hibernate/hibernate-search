@@ -69,8 +69,8 @@ If you use the incubating link:{hibernateSearchDocUrl}#coordination-outbox-polli
 you may be impacted by the changes to entity mapping for entities that represents the outbox event and agent,
 requiring database schema changes.
 
-Changes are only applicable if the `hibernate.search.coordination.entity.mapping.*.uuid_type` was set to `default` (implicitly or explicitly).
-In case when schema changes are not possible to apply at the moment, the configuration settings can be provided
+Changes are only necessary if configuration properties `hibernate.search.coordination.entity.mapping.*.uuid_type` are not set or are set to `default`.
+If schema changes are not possible to apply at the moment, the following settings can be provided
 to specify the type to represent UUIDs in the database:
 
 [source, properties]
@@ -79,12 +79,9 @@ hibernate.search.coordination.entity.mapping.outboxevent.uuid_type=CHAR
 hibernate.search.coordination.entity.mapping.agent.uuid_type=CHAR
 ----
 
-The `id` column changes its type from the current one to the one used by the corresponding Hibernate ORM Database dialect
-by default for representing the uuid type, except the following databases where no changes are expected:
-
-* MSSQL: no migration required. Type of the `id` remains `binary(16)` for both tables.
-
-For other databases see suggested migration scripts:
+The default type for UUIDs in outbox-polling tables now match
+link:{hibernateDocUrl}#basic-uuid[the default type for UUIDs in Hibernate ORM].
+See suggested migration scripts:
 
 .Postgresql:
 [,sql]
@@ -241,6 +238,26 @@ alter table hsearch_agent
     drop column id;
 alter table hsearch_agent
     rename column tmp to id;
+alter table hsearch_agent
+    add constraint hsearch_agent_pkey primary key (id);
+----
+
+.MSSQL:
+[,sql]
+----
+-- change outbox event `id` column type to uniqueidentifier:
+alter table hsearch_outbox_event
+    drop constraint if exists hsearch_outbox_event_pkey;
+alter table hsearch_outbox_event
+    alter column id uniqueidentifier not null;
+alter table hsearch_outbox_event
+    add constraint hsearch_outbox_event_pkey primary key (id);
+
+-- change agent `id` column type to uuid:
+alter table hsearch_agent
+    drop constraint if exists hsearch_agent_pkey;
+alter table hsearch_agent
+    alter column id uniqueidentifier not null;
 alter table hsearch_agent
     add constraint hsearch_agent_pkey primary key (id);
 ----

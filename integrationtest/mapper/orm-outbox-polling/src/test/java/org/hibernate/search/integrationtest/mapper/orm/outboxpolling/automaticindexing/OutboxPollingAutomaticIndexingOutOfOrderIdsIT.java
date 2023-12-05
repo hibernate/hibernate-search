@@ -182,7 +182,7 @@ class OutboxPollingAutomaticIndexingOutOfOrderIdsIT {
 	@Test
 	void processDeleteRecreate_outOfOrder() {
 		// An entity is deleted, then re-created in separate transactions,
-		// but the add event has ID 1, the and the delete event has ID 2.
+		// but the add event has ID 1, and the delete event has ID 2.
 
 		int id = 1;
 		with( sessionFactory ).runInTransaction( session -> {
