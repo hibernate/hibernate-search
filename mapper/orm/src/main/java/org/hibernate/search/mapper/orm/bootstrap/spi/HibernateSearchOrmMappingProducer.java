@@ -10,14 +10,12 @@ import java.util.Map;
 
 import org.hibernate.boot.jaxb.mapping.JaxbEntityMappings;
 import org.hibernate.boot.spi.MetadataBuildingContext;
-import org.hibernate.dialect.Dialect;
 import org.hibernate.search.engine.cfg.ConfigurationPropertySource;
 
 public interface HibernateSearchOrmMappingProducer {
 
 	Map<Class<?>, JaxbEntityMappings> produceMappings(
 			ConfigurationPropertySource propertySource,
-			Dialect dialect,
 			MetadataBuildingContext buildingContext
 	);
 

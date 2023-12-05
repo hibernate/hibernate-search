@@ -13,7 +13,6 @@ import java.util.Optional;
 import org.hibernate.Length;
 import org.hibernate.boot.jaxb.mapping.JaxbEntityMappings;
 import org.hibernate.boot.spi.MetadataBuildingContext;
-import org.hibernate.dialect.Dialect;
 import org.hibernate.search.engine.cfg.ConfigurationPropertySource;
 import org.hibernate.search.engine.cfg.spi.ConfigurationProperty;
 import org.hibernate.search.engine.cfg.spi.OptionalConfigurationProperty;
@@ -89,7 +88,7 @@ public final class OutboxPollingOutboxEventAdditionalJaxbMappingProducer
 
 
 	@Override
-	public Map<Class<?>, JaxbEntityMappings> produceMappings(ConfigurationPropertySource propertySource, Dialect dialect,
+	public Map<Class<?>, JaxbEntityMappings> produceMappings(ConfigurationPropertySource propertySource,
 			MetadataBuildingContext buildingContext) {
 		Optional<String> mapping = OUTBOXEVENT_ENTITY_MAPPING.get( propertySource );
 		Optional<String> schema = ENTITY_MAPPING_OUTBOXEVENT_SCHEMA.get( propertySource );
@@ -101,8 +100,7 @@ public final class OutboxPollingOutboxEventAdditionalJaxbMappingProducer
 				value -> UuidDataTypeUtils.uuidType(
 						value,
 						propertySource,
-						ENTITY_MAPPING_OUTBOXEVENT_UUID_TYPE,
-						dialect
+						ENTITY_MAPPING_OUTBOXEVENT_UUID_TYPE
 				) );
 
 		if ( mapping.isPresent()
@@ -126,7 +124,7 @@ public final class OutboxPollingOutboxEventAdditionalJaxbMappingProducer
 			mappings = JaxbMappingHelper.unmarshall( mapping.get() );
 		}
 		else {
-			Integer resolvedUuidType = uuidType.orElseGet( () -> UuidDataTypeUtils.defaultUuidType( dialect ) );
+			Integer resolvedUuidType = uuidType.orElse( null );
 			String resolvedUuidStrategy = uuidStrategy.orElse(
 					HibernateOrmMapperOutboxPollingSettings.Defaults.COORDINATION_ENTITY_MAPPING_OUTBOX_EVENT_UUID_GEN_STRATEGY )
 					.strategy();

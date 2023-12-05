@@ -13,7 +13,6 @@ import java.util.Optional;
 import org.hibernate.Length;
 import org.hibernate.boot.jaxb.mapping.JaxbEntityMappings;
 import org.hibernate.boot.spi.MetadataBuildingContext;
-import org.hibernate.dialect.Dialect;
 import org.hibernate.search.engine.cfg.ConfigurationPropertySource;
 import org.hibernate.search.engine.cfg.spi.ConfigurationProperty;
 import org.hibernate.search.engine.cfg.spi.OptionalConfigurationProperty;
@@ -87,7 +86,7 @@ public class OutboxPollingAgentAdditionalJaxbMappingProducer implements Hibernat
 					.build();
 
 	@Override
-	public Map<Class<?>, JaxbEntityMappings> produceMappings(ConfigurationPropertySource propertySource, Dialect dialect,
+	public Map<Class<?>, JaxbEntityMappings> produceMappings(ConfigurationPropertySource propertySource,
 			MetadataBuildingContext buildingContext) {
 		Optional<String> mapping = AGENT_ENTITY_MAPPING.get( propertySource );
 		Optional<String> schema = ENTITY_MAPPING_AGENT_SCHEMA.get( propertySource );
@@ -99,8 +98,7 @@ public class OutboxPollingAgentAdditionalJaxbMappingProducer implements Hibernat
 				value -> UuidDataTypeUtils.uuidType(
 						value,
 						propertySource,
-						ENTITY_MAPPING_AGENT_UUID_TYPE,
-						dialect
+						ENTITY_MAPPING_AGENT_UUID_TYPE
 				) );
 
 		// only allow configuring the entire mapping or table/catalog/schema/generator/datatype names
@@ -124,7 +122,7 @@ public class OutboxPollingAgentAdditionalJaxbMappingProducer implements Hibernat
 			mappings = JaxbMappingHelper.unmarshall( mapping.get() );
 		}
 		else {
-			Integer resolvedUuidType = uuidType.orElseGet( () -> UuidDataTypeUtils.defaultUuidType( dialect ) );
+			Integer resolvedUuidType = uuidType.orElse( null );
 			String resolvedUuidStrategy = uuidStrategy.orElse(
 					HibernateOrmMapperOutboxPollingSettings.Defaults.COORDINATION_ENTITY_MAPPING_AGENT_UUID_GEN_STRATEGY )
 					.strategy();

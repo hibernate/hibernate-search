@@ -45,7 +45,6 @@ public class HibernateSearchCompositeMappingProducer implements AdditionalMappin
 				.coordinationStrategyConfiguration().mappingProducers() ) {
 			for ( Map.Entry<Class<?>, JaxbEntityMappings> entry : mappingProducer.produceMappings(
 					propertySource,
-					metadata.getDatabase().getDialect(),
 					buildingContext
 			).entrySet() ) {
 				contributions.contributeEntity( entry.getKey() );
