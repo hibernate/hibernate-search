@@ -1,6 +1,16 @@
 Hibernate Search Changelog
 ==========================
 
+7.0.0.Final (2023-12-05)
+-------------------------
+
+** Improvement
+    * HSEARCH-5024 Adjust Jandex index reading and building for Spring Boot 3.2 nested JARs
+
+** Task
+    * HSEARCH-5026 Test against latest OpenSearch 2.11.1
+    * HSEARCH-5022 Mention WildFly in the documentation
+
 7.0.0.CR2 (2023-11-24)
 -------------------------
 
