@@ -253,7 +253,6 @@ alter table hsearch_outbox_event
 
 -- change agent `id` column type to char:
 alter table hsearch_agent
-alter table hsearch_agent
     add tmp char(36);
 update hsearch_agent
 set tmp = id
