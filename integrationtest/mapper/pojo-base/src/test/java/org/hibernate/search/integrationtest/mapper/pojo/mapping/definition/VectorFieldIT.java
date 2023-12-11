@@ -345,15 +345,9 @@ class VectorFieldIT {
 				.satisfies( FailureReportUtils.hasFailureReport()
 						.typeContext( IndexedEntity.class.getName() )
 						.pathContext( ".notVector" )
-						.failure(
-								"Unable to apply property mapping: this property mapping must target an index field of vector type",
-								"but the resolved field type is non-vector",
-								"This generally means you need to use a different field annotation"
-										+ " or to convert property values using a custom ValueBridge or ValueBinder",
-								"If you are already using a custom ValueBridge or ValueBinder, check its field type",
-								"encountered type DSL step '",
-								"expected interface '" + VectorFieldTypeOptionsStep.class.getName() + "'"
-						) );
+						// NOTE: this is an exception from the IndexFieldTypeFactory implementation, hence it is backend-specific and in this case
+						// it is from the stub-backend.
+						.failure( "No built-in vector index field type for class: 'java.lang.Integer'." ) );
 	}
 
 	@Test
@@ -371,14 +365,9 @@ class VectorFieldIT {
 				.satisfies( FailureReportUtils.hasFailureReport()
 						.typeContext( IndexedEntity.class.getName() )
 						.pathContext( ".bytes" )
-						.failure(
-								"Unable to apply property mapping: this property mapping must target an index field of vector type, but the resolved field type is non-vector",
-								"This generally means you need to use a different field annotation"
-										+ " or to convert property values using a custom ValueBridge or ValueBinder",
-								"If you are already using a custom ValueBridge or ValueBinder, check its field type",
-								"encountered type DSL step '",
-								"expected interface '" + VectorFieldTypeOptionsStep.class.getName() + "'"
-						) );
+						// NOTE: this is an exception from the IndexFieldTypeFactory implementation, hence it is backend-specific and in this case
+						// it is from the stub-backend.
+						.failure( "No built-in vector index field type for class: 'java.lang.Integer'." ) );
 	}
 
 	@Test

@@ -36,14 +36,7 @@ class PropertyMappingVectorFieldOptionsStepImpl
 						if ( dimension == null ) {
 							throw log.vectorDimensionNotSpecified();
 						}
-						// we consider arrays (byte[] and float[] in particular to be vector types, anything else will be
-						// treated as a non-vector field and delegated to a regular as(..) call.
-						if ( clazz.isArray() ) {
-							return factory.asVector( dimension, clazz );
-						}
-						else {
-							return factory.as( clazz );
-						}
+						return factory.asVector( dimension, clazz );
 					}
 				},
 				FieldModelContributorContext::vectorTypeOptionsStep );
