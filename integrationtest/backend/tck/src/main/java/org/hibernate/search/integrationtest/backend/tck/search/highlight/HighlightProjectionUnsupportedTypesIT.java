@@ -60,10 +60,9 @@ class HighlightProjectionUnsupportedTypesIT<F> {
 		setupHelper.start().withIndex( index ).setup();
 	}
 
-
 	@ParameterizedTest(name = "{0}")
 	@MethodSource("params")
-	void notSupported(FieldTypeDescriptor<F, ?> fieldTypeDescriptor) {
+	void use(FieldTypeDescriptor<F, ?> fieldTypeDescriptor) {
 		StubMappingScope scope = index.createScope();
 		String absoluteFieldPath = getFieldPath( fieldTypeDescriptor );
 

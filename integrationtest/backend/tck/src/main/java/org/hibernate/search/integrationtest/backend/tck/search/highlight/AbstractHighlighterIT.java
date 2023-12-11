@@ -861,7 +861,7 @@ abstract class AbstractHighlighterIT {
 	}
 
 	@Test
-	void highlightInNestedContextNotAllowed() {
+	void inObjectProjection() {
 		List<String> objects = Arrays.asList( "objectDefault", "objectFlattened" );
 		for ( String object : objects ) {
 			for ( String level2 : objects ) {

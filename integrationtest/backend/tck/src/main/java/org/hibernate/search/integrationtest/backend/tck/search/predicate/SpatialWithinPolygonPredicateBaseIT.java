@@ -59,7 +59,8 @@ class SpatialWithinPolygonPredicateBaseIT {
 						InObjectFieldConfigured.mainIndex, InObjectFieldConfigured.missingFieldIndex,
 						ScoreConfigured.index,
 						InvalidFieldConfigured.index, UnsupportedTypeConfigured.index,
-						SearchableConfigured.searchableYesIndex, SearchableConfigured.searchableNoIndex,
+						SearchableConfigured.searchableDefaultIndex, SearchableConfigured.searchableYesIndex,
+						SearchableConfigured.searchableNoIndex,
 						ArgumentCheckingConfigured.index,
 						TypeCheckingNoConversionConfigured.index, TypeCheckingNoConversionConfigured.compatibleIndex,
 						TypeCheckingNoConversionConfigured.rawFieldCompatibleIndex,
@@ -296,7 +297,7 @@ class SpatialWithinPolygonPredicateBaseIT {
 		}
 
 		@Override
-		protected String predicateNameInErrorMessage() {
+		protected String predicateTrait() {
 			return "predicate:spatial:within-polygon";
 		}
 	}
@@ -330,7 +331,7 @@ class SpatialWithinPolygonPredicateBaseIT {
 		}
 
 		@Override
-		protected String predicateNameInErrorMessage() {
+		protected String predicateTrait() {
 			return "predicate:spatial:within-polygon";
 		}
 	}
@@ -341,6 +342,9 @@ class SpatialWithinPolygonPredicateBaseIT {
 	}
 
 	abstract static class SearchableConfigured extends AbstractPredicateSearchableIT {
+		private static final SimpleMappedIndex<SearchableDefaultIndexBinding> searchableDefaultIndex =
+				SimpleMappedIndex.of( root -> new SearchableDefaultIndexBinding( root, supportedFieldTypes ) )
+						.name( "searchableDefault" );
 		private static final SimpleMappedIndex<SearchableYesIndexBinding> searchableYesIndex =
 				SimpleMappedIndex.of( root -> new SearchableYesIndexBinding( root, supportedFieldTypes ) )
 						.name( "searchableYes" );
@@ -349,8 +353,16 @@ class SpatialWithinPolygonPredicateBaseIT {
 				SimpleMappedIndex.of( root -> new SearchableNoIndexBinding( root, supportedFieldTypes ) )
 						.name( "searchableNo" );
 
+		private static final List<Arguments> parameters = new ArrayList<>();
+		static {
+			for ( FieldTypeDescriptor<?, ?> fieldType : supportedFieldTypes ) {
+				parameters.add( Arguments.of( searchableDefaultIndex, searchableYesIndex, searchableNoIndex, fieldType ) );
+			}
+		}
+
 		public static List<? extends Arguments> params() {
-			return Arrays.asList( Arguments.of( searchableYesIndex, searchableNoIndex, supportedFieldType ) );
+			return Arrays.asList(
+					Arguments.of( searchableDefaultIndex, searchableYesIndex, searchableNoIndex, supportedFieldType ) );
 		}
 
 		@Override
@@ -361,7 +373,7 @@ class SpatialWithinPolygonPredicateBaseIT {
 		}
 
 		@Override
-		protected String predicateNameInErrorMessage() {
+		protected String predicateTrait() {
 			return "predicate:spatial:within-polygon";
 		}
 	}
@@ -433,7 +445,7 @@ class SpatialWithinPolygonPredicateBaseIT {
 		}
 
 		@Override
-		protected String predicateNameInErrorMessage() {
+		protected String predicateTrait() {
 			return "predicate:spatial:within-polygon";
 		}
 	}

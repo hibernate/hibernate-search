@@ -9,7 +9,6 @@ package org.hibernate.search.integrationtest.backend.tck.search.sort;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.hibernate.search.integrationtest.backend.tck.testsupport.types.values.AscendingUniqueDistanceFromCenterValues.CENTER_POINT;
 import static org.hibernate.search.util.impl.integrationtest.common.assertion.SearchResultAssert.assertThatQuery;
-import static org.junit.jupiter.api.Assumptions.assumeFalse;
 import static org.junit.jupiter.api.Assumptions.assumeTrue;
 
 import java.util.function.Consumer;
@@ -94,25 +93,6 @@ class DistanceSortTypeCheckingAndConversionIT {
 				.setup();
 
 		initData();
-	}
-
-	@Test
-	void unsortable() {
-		assumeFalse(
-				TckConfiguration.get().getBackendFeatures().fieldsProjectableByDefault(),
-				"Skipping test for ES GeoPoint as those would become sortable by default in this case."
-		);
-		StubMappingScope scope = mainIndex.createScope();
-		String fieldPath = getNonSortableFieldPath();
-
-		assertThatThrownBy( () -> {
-			scope.sort().distance( fieldPath, CENTER_POINT );
-		} )
-				.isInstanceOf( SearchException.class )
-				.hasMessageContainingAll(
-						"Cannot use 'sort:distance' on field '" + fieldPath + "'",
-						"Make sure the field is marked as searchable/sortable/projectable/aggregable/highlightable (whichever is relevant)"
-				);
 	}
 
 	@Test
@@ -258,10 +238,6 @@ class DistanceSortTypeCheckingAndConversionIT {
 		return mainIndex.binding().fieldWithDslConverterModel.relativeFieldName;
 	}
 
-	private String getNonSortableFieldPath() {
-		return mainIndex.binding().nonSortableFieldModel.relativeFieldName;
-	}
-
 	private static void initDocument(IndexBinding indexBinding, DocumentElement document, Integer ordinal) {
 		addValue( indexBinding.fieldModel, document, ordinal );
 		addValue( indexBinding.fieldWithDslConverterModel, document, ordinal );
@@ -306,7 +282,6 @@ class DistanceSortTypeCheckingAndConversionIT {
 	private static class AbstractObjectMapping {
 		final SimpleFieldModel<GeoPoint> fieldModel;
 		final SimpleFieldModel<GeoPoint> fieldWithDslConverterModel;
-		final SimpleFieldModel<GeoPoint> nonSortableFieldModel;
 
 		AbstractObjectMapping(IndexSchemaElement root,
 				Consumer<StandardIndexFieldTypeOptionsStep<?, ?>> additionalConfiguration) {
@@ -317,11 +292,6 @@ class DistanceSortTypeCheckingAndConversionIT {
 							root, "converted", c -> c.sortable( Sortable.YES ),
 							additionalConfiguration.andThen(
 									c -> c.dslConverter( ValueWrapper.class, ValueWrapper.toDocumentValueConverter() ) )
-					);
-			nonSortableFieldModel = SimpleFieldModel.mapper( fieldType )
-					.map(
-							root, "nonSortable", c -> c.sortable( Sortable.YES ),
-							additionalConfiguration.andThen( c -> c.sortable( Sortable.NO ) )
 					);
 		}
 	}

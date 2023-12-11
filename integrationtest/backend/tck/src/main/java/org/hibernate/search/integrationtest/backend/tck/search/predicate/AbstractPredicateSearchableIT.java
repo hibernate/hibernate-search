@@ -24,9 +24,10 @@ import org.junit.jupiter.params.provider.MethodSource;
 
 public abstract class AbstractPredicateSearchableIT {
 
-	@ParameterizedTest(name = "{2}")
+	@ParameterizedTest(name = "{3}")
 	@MethodSource("params")
-	void unsearchable(SimpleMappedIndex<SearchableYesIndexBinding> searchableYesIndex,
+	void searchable_no_use(SimpleMappedIndex<SearchableDefaultIndexBinding> searchableDefaultIndex,
+			SimpleMappedIndex<SearchableYesIndexBinding> searchableYesIndex,
 			SimpleMappedIndex<SearchableNoIndexBinding> searchableNoIndex,
 			FieldTypeDescriptor<?, ?> fieldType) {
 		SearchPredicateFactory f = searchableNoIndex.createScope().predicate();
@@ -36,14 +37,15 @@ public abstract class AbstractPredicateSearchableIT {
 		assertThatThrownBy( () -> tryPredicate( f, fieldPath, fieldType ) )
 				.isInstanceOf( SearchException.class )
 				.hasMessageContainingAll(
-						"Cannot use '" + predicateNameInErrorMessage() + "' on field '" + fieldPath + "'",
+						"Cannot use '" + predicateTrait() + "' on field '" + fieldPath + "'",
 						"Make sure the field is marked as searchable/sortable/projectable/aggregable/highlightable (whichever is relevant)"
 				);
 	}
 
-	@ParameterizedTest(name = "{2}")
+	@ParameterizedTest(name = "{3}")
 	@MethodSource("params")
-	void multiIndex_incompatibleSearchable(SimpleMappedIndex<SearchableYesIndexBinding> searchableYesIndex,
+	void multiIndex_incompatibleSearchable(SimpleMappedIndex<SearchableDefaultIndexBinding> searchableDefaultIndex,
+			SimpleMappedIndex<SearchableYesIndexBinding> searchableYesIndex,
 			SimpleMappedIndex<SearchableNoIndexBinding> searchableNoIndex,
 			FieldTypeDescriptor<?, ?> fieldType) {
 		SearchPredicateFactory f = searchableYesIndex.createScope( searchableNoIndex ).predicate();
@@ -54,14 +56,23 @@ public abstract class AbstractPredicateSearchableIT {
 				.isInstanceOf( SearchException.class )
 				.hasMessageContainingAll(
 						"Inconsistent configuration for field '" + fieldPath + "' in a search query across multiple indexes",
-						"Inconsistent support for '" + predicateNameInErrorMessage() + "'"
+						"Inconsistent support for '" + predicateTrait() + "'"
 				);
 	}
 
 	protected abstract void tryPredicate(SearchPredicateFactory f, String fieldPath,
 			FieldTypeDescriptor<?, ?> fieldType);
 
-	protected abstract String predicateNameInErrorMessage();
+	protected abstract String predicateTrait();
+
+	public static final class SearchableDefaultIndexBinding {
+		private final SimpleFieldModelsByType field;
+
+		public SearchableDefaultIndexBinding(IndexSchemaElement root, Collection<
+				? extends FieldTypeDescriptor<?, ? extends SearchableProjectableIndexFieldTypeOptionsStep<?, ?>>> fieldTypes) {
+			field = SimpleFieldModelsByType.mapAll( fieldTypes, root, "" );
+		}
+	}
 
 	public static final class SearchableYesIndexBinding {
 		private final SimpleFieldModelsByType field;
@@ -73,7 +84,7 @@ public abstract class AbstractPredicateSearchableIT {
 	}
 
 	public static final class SearchableNoIndexBinding {
-		private final SimpleFieldModelsByType field;
+		final SimpleFieldModelsByType field;
 
 		public SearchableNoIndexBinding(IndexSchemaElement root, Collection<
 				? extends FieldTypeDescriptor<?, ? extends SearchableProjectableIndexFieldTypeOptionsStep<?, ?>>> fieldTypes) {
