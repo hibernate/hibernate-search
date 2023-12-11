@@ -31,16 +31,6 @@ diff --git a/test/java/org/hibernate/search/integrationtest/spring/repackaged/ap
 
  					try ( URLClassLoader isolatedClassLoader = new URLClassLoader( new URL[] { innerJarURL }, null ) ) {
  						Class<?> classInIsolatedClassLoader = isolatedClassLoader.loadClass( MyEntity.class.getName() );
-@@ -106,8 +106,7 @@
- 							classInfo = index.getClassByName( DotName.createSimple( MyProjection.class.getName() ) );
- 							assertThat( classInfo ).isNotNull();
- 							assertThat(
--									classInfo.annotations()
--											.get( DotName.createSimple( ProjectionConstructor.class.getName() ) ) )
-+									classInfo.annotations( DotName.createSimple( ProjectionConstructor.class.getName() ) ) )
- 									.isNotNull();
- 							name = classInfo.field( "name" );
- 							assertThat( name ).isNotNull();
 @@ -130,4 +132,9 @@
  			}
  		}
