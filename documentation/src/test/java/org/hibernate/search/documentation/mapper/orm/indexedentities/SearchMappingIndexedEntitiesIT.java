@@ -7,9 +7,11 @@
 package org.hibernate.search.documentation.mapper.orm.indexedentities;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.fail;
 
 import java.sql.Date;
 import java.util.Optional;
+import java.util.Set;
 
 import jakarta.persistence.EntityManagerFactory;
 
@@ -22,6 +24,7 @@ import org.hibernate.search.engine.backend.metamodel.IndexObjectFieldDescriptor;
 import org.hibernate.search.engine.backend.metamodel.IndexObjectFieldTypeDescriptor;
 import org.hibernate.search.engine.backend.metamodel.IndexValueFieldDescriptor;
 import org.hibernate.search.engine.backend.metamodel.IndexValueFieldTypeDescriptor;
+import org.hibernate.search.engine.backend.types.IndexFieldTraits;
 import org.hibernate.search.mapper.orm.Search;
 import org.hibernate.search.mapper.orm.entity.SearchIndexedEntity;
 import org.hibernate.search.mapper.orm.mapping.SearchMapping;
@@ -109,8 +112,26 @@ class SearchMappingIndexedEntitiesIT {
 				assertThat( searchAnalyzerName ).isEmpty();
 				assertThat( normalizerName ).isEmpty();
 				//tag::indexMetamodel[]
+				Set<String> traits = type.traits(); // <9>
+				if ( traits.contains( IndexFieldTraits.Aggregations.RANGE ) ) {
+					// ...
+					//end::indexMetamodel[]
+				}
+				else {
+					fail( "The field should be aggregable!" );
+					//tag::indexMetamodel[]
+				}
+				//end::indexMetamodel[]
+				assertThat( traits ).contains(
+						IndexFieldTraits.Predicates.EXISTS,
+						IndexFieldTraits.Predicates.MATCH,
+						IndexFieldTraits.Predicates.RANGE,
+						IndexFieldTraits.Aggregations.TERMS,
+						IndexFieldTraits.Aggregations.RANGE
+				);
+				//tag::indexMetamodel[]
 			}
-			else if ( field.isObjectField() ) { // <9>
+			else if ( field.isObjectField() ) { // <10>
 				IndexObjectFieldDescriptor objectField = field.toObjectField();
 
 				IndexObjectFieldTypeDescriptor type = objectField.type();

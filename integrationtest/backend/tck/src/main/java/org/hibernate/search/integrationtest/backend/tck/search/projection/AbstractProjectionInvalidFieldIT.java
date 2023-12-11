@@ -6,6 +6,7 @@
  */
 package org.hibernate.search.integrationtest.backend.tck.search.projection;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import org.hibernate.search.engine.backend.document.IndexObjectFieldReference;
@@ -34,6 +35,26 @@ public abstract class AbstractProjectionInvalidFieldIT {
 				.isInstanceOf( SearchException.class )
 				.hasMessageContaining( "Unknown field" )
 				.hasMessageContaining( "'unknown_field'" );
+	}
+
+	@Test
+	void trait_objectField_nested() {
+		String fieldPath = index.binding().nested.relativeFieldName;
+
+		assertThat( index.toApi().descriptor().field( fieldPath ) )
+				.hasValueSatisfying( fieldDescriptor -> assertThat( fieldDescriptor.type().traits() )
+						.as( "traits of field '" + fieldPath + "'" )
+						.doesNotContain( projectionTrait() ) );
+	}
+
+	@Test
+	void trait_objectField_flattened() {
+		String fieldPath = index.binding().flattened.relativeFieldName;
+
+		assertThat( index.toApi().descriptor().field( fieldPath ) )
+				.hasValueSatisfying( fieldDescriptor -> assertThat( fieldDescriptor.type().traits() )
+						.as( "traits of field '" + fieldPath + "'" )
+						.doesNotContain( projectionTrait() ) );
 	}
 
 	@Test

@@ -14,7 +14,7 @@ import org.hibernate.search.engine.search.predicate.dsl.SearchPredicateFactory;
  *
  * @see IndexObjectFieldDescriptor
  */
-public interface IndexObjectFieldTypeDescriptor {
+public interface IndexObjectFieldTypeDescriptor extends IndexFieldTypeDescriptor {
 
 	/**
 	 * @return {@code true} if this object field is represented internally as a nested document,

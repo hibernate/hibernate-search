@@ -16,7 +16,7 @@ import org.hibernate.search.util.common.annotation.Incubating;
  *
  * @see IndexValueFieldDescriptor
  */
-public interface IndexValueFieldTypeDescriptor {
+public interface IndexValueFieldTypeDescriptor extends IndexFieldTypeDescriptor {
 
 	/**
 	 * @return {@code true} if search predicates are supported on fields of this type.
@@ -24,7 +24,6 @@ public interface IndexValueFieldTypeDescriptor {
 	 * (e.g. a "within circle" predicate on a string field).
 	 */
 	boolean searchable();
-
 
 	/**
 	 * @return {@code true} if sorts are supported on fields of this type.

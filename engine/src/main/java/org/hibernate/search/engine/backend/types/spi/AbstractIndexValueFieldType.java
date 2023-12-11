@@ -7,8 +7,6 @@
 package org.hibernate.search.engine.backend.types.spi;
 
 import java.util.Collections;
-import java.util.HashMap;
-import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 
@@ -21,14 +19,13 @@ import org.hibernate.search.engine.backend.types.converter.spi.ProjectionConvert
 import org.hibernate.search.engine.search.common.spi.SearchIndexScope;
 import org.hibernate.search.engine.search.common.spi.SearchIndexValueFieldContext;
 import org.hibernate.search.engine.search.common.spi.SearchIndexValueFieldTypeContext;
-import org.hibernate.search.engine.search.common.spi.SearchQueryElementFactory;
-import org.hibernate.search.engine.search.common.spi.SearchQueryElementTypeKey;
 import org.hibernate.search.engine.search.highlighter.spi.SearchHighlighterType;
 
 public abstract class AbstractIndexValueFieldType<
 		SC extends SearchIndexScope<?>,
 		N extends SearchIndexValueFieldContext<SC>,
 		F>
+		extends AbstractIndexNodeType<SC, N>
 		implements IndexValueFieldTypeDescriptor, IndexFieldType<F>, SearchIndexValueFieldTypeContext<SC, N, F> {
 	private final Class<F> valueClass;
 	private final DslConverter<F, F> rawDslConverter;
@@ -43,13 +40,12 @@ public abstract class AbstractIndexValueFieldType<
 	private final boolean multivaluable;
 	private final Set<SearchHighlighterType> allowedHighlighterTypes;
 
-	private final Map<SearchQueryElementTypeKey<?>, SearchQueryElementFactory<?, ? super SC, ? super N>> queryElementFactories;
-
 	private final String analyzerName;
 	private final String searchAnalyzerName;
 	private final String normalizerName;
 
 	protected AbstractIndexValueFieldType(Builder<SC, N, F> builder) {
+		super( builder );
 		this.valueClass = builder.valueClass;
 		this.rawDslConverter = builder.rawDslConverter;
 		this.rawProjectionConverter = builder.rawProjectionConverter;
@@ -61,7 +57,6 @@ public abstract class AbstractIndexValueFieldType<
 		this.aggregable = builder.aggregable;
 		this.multivaluable = builder.multivaluable;
 		this.allowedHighlighterTypes = Collections.unmodifiableSet( builder.allowedHighlighterTypes );
-		this.queryElementFactories = builder.queryElementFactories;
 		this.analyzerName = builder.analyzerName;
 		this.searchAnalyzerName = builder.searchAnalyzerName != null ? builder.searchAnalyzerName : builder.analyzerName;
 		this.normalizerName = builder.normalizerName;
@@ -74,7 +69,7 @@ public abstract class AbstractIndexValueFieldType<
 				+ ", analyzerName=" + analyzerName
 				+ ", searchAnalyzerName=" + searchAnalyzerName
 				+ ", normalizerName=" + normalizerName
-				+ ", capabilities=" + queryElementFactories.keySet()
+				+ ", traits=" + traits()
 				+ "]";
 	}
 
@@ -153,13 +148,6 @@ public abstract class AbstractIndexValueFieldType<
 		return Optional.ofNullable( searchAnalyzerName );
 	}
 
-	@SuppressWarnings("unchecked") // The cast is safe by construction; see the builder.
-	@Override
-	public final <T> SearchQueryElementFactory<? extends T, ? super SC, ? super N> queryElementFactory(
-			SearchQueryElementTypeKey<T> key) {
-		return (SearchQueryElementFactory<? extends T, ? super SC, ? super N>) queryElementFactories.get( key );
-	}
-
 	@Override
 	public boolean highlighterTypeSupported(SearchHighlighterType type) {
 		return allowedHighlighterTypes.contains( type );
@@ -168,7 +156,8 @@ public abstract class AbstractIndexValueFieldType<
 	public abstract static class Builder<
 			SC extends SearchIndexScope<?>,
 			N extends SearchIndexValueFieldContext<SC>,
-			F> {
+			F>
+			extends AbstractIndexNodeType.Builder<SC, N> {
 
 		private final Class<F> valueClass;
 		private final DslConverter<F, F> rawDslConverter;
@@ -183,9 +172,6 @@ public abstract class AbstractIndexValueFieldType<
 		private boolean aggregable;
 		private boolean multivaluable = true;
 		private Set<SearchHighlighterType> allowedHighlighterTypes = Collections.emptySet();
-
-		private final Map<SearchQueryElementTypeKey<?>,
-				SearchQueryElementFactory<?, ? super SC, ? super N>> queryElementFactories = new HashMap<>();
 
 		private String analyzerName;
 		private String searchAnalyzerName;
@@ -232,11 +218,6 @@ public abstract class AbstractIndexValueFieldType<
 
 		public final void allowedHighlighterTypes(Set<SearchHighlighterType> allowedHighlighterTypes) {
 			this.allowedHighlighterTypes = allowedHighlighterTypes;
-		}
-
-		public final <T> void queryElementFactory(SearchQueryElementTypeKey<T> key,
-				SearchQueryElementFactory<? extends T, ? super SC, ? super N> factory) {
-			queryElementFactories.put( key, factory );
 		}
 
 		public final void analyzerName(String analyzerName) {

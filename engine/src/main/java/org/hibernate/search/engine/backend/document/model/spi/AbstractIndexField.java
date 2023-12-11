@@ -7,16 +7,16 @@
 package org.hibernate.search.engine.backend.document.model.spi;
 
 import org.hibernate.search.engine.backend.common.spi.FieldPaths;
+import org.hibernate.search.engine.backend.types.spi.AbstractIndexNodeType;
 import org.hibernate.search.engine.common.tree.spi.TreeNodeInclusion;
 import org.hibernate.search.engine.reporting.spi.EventContexts;
-import org.hibernate.search.engine.search.common.spi.SearchIndexNodeTypeContext;
 import org.hibernate.search.engine.search.common.spi.SearchIndexScope;
 import org.hibernate.search.util.common.reporting.EventContext;
 
 public abstract class AbstractIndexField<
 		S extends AbstractIndexField<S, SC, ?, C>,
 		SC extends SearchIndexScope<?>,
-		NT extends SearchIndexNodeTypeContext<SC, ? super S>,
+		NT extends AbstractIndexNodeType<SC, ? super S>,
 		C extends IndexCompositeNode<SC, ?, ?>>
 		extends AbstractIndexNode<S, SC, NT>
 		implements IndexField<SC, C> {

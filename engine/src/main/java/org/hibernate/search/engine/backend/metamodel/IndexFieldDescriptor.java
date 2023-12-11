@@ -39,6 +39,12 @@ public interface IndexFieldDescriptor {
 	IndexValueFieldDescriptor toValueField();
 
 	/**
+	 * @return The type of this field, exposing its various capabilities.
+	 * @see IndexFieldTypeDescriptor
+	 */
+	IndexFieldTypeDescriptor type();
+
+	/**
 	 * @return The parent of this field, either the {@link IndexCompositeElementDescriptor#isRoot() index root}
 	 * or an {@link IndexCompositeElementDescriptor#isObjectField() object field}.
 	 */

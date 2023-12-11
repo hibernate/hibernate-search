@@ -6,6 +6,7 @@
  */
 package org.hibernate.search.integrationtest.backend.tck.search.predicate;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import java.util.Collection;
@@ -24,6 +25,17 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 
 public abstract class AbstractPredicateUnsupportedTypeIT {
+
+	@ParameterizedTest(name = "{1}")
+	@MethodSource("params")
+	void trait(SimpleMappedIndex<IndexBinding> index, FieldTypeDescriptor<?, ?> fieldType) {
+		String fieldPath = index.binding().field.get( fieldType ).relativeFieldName;
+
+		assertThat( index.toApi().descriptor().field( fieldPath ) )
+				.hasValueSatisfying( fieldDescriptor -> assertThat( fieldDescriptor.type().traits() )
+						.as( "traits of field '" + fieldPath + "'" )
+						.doesNotContain( predicateTrait() ) );
+	}
 
 	@ParameterizedTest(name = "{1}")
 	@MethodSource("params")

@@ -340,6 +340,40 @@ class SingleFieldAggregationTypeCheckingAndConversionIT<F> {
 
 	@ParameterizedTest(name = "{0}")
 	@MethodSource("params")
+	void aggregable_yes_trait(SupportedSingleFieldAggregationExpectations<F> expectations, DataSet<F> dataSet) {
+		String fieldPath = mainIndex.binding().fieldModels.get( expectations.fieldType() ).relativeFieldName;
+
+		assertThat( mainIndex.toApi().descriptor().field( fieldPath ) )
+				.hasValueSatisfying( fieldDescriptor -> assertThat( fieldDescriptor.type().traits() )
+						.as( "traits of field '" + fieldPath + "'" )
+						.contains( "aggregation:" + expectations.aggregationName() ) );
+	}
+
+	@ParameterizedTest(name = "{0}")
+	@MethodSource("params")
+	void aggregable_default_trait(SupportedSingleFieldAggregationExpectations<F> expectations, DataSet<F> dataSet) {
+		String fieldPath =
+				mainIndex.binding().fieldWithAggregableDefaultModels.get( expectations.fieldType() ).relativeFieldName;
+
+		assertThat( mainIndex.toApi().descriptor().field( fieldPath ) )
+				.hasValueSatisfying( fieldDescriptor -> assertThat( fieldDescriptor.type().traits() )
+						.as( "traits of field '" + fieldPath + "'" )
+						.doesNotContain( "aggregation:" + expectations.aggregationName() ) );
+	}
+
+	@ParameterizedTest(name = "{0}")
+	@MethodSource("params")
+	void aggregable_no_trait(SupportedSingleFieldAggregationExpectations<F> expectations, DataSet<F> dataSet) {
+		String fieldPath = mainIndex.binding().fieldWithAggregableNoModels.get( expectations.fieldType() ).relativeFieldName;
+
+		assertThat( mainIndex.toApi().descriptor().field( fieldPath ) )
+				.hasValueSatisfying( fieldDescriptor -> assertThat( fieldDescriptor.type().traits() )
+						.as( "traits of field '" + fieldPath + "'" )
+						.doesNotContain( "aggregation:" + expectations.aggregationName() ) );
+	}
+
+	@ParameterizedTest(name = "{0}")
+	@MethodSource("params")
 	void aggregable_default_use(SupportedSingleFieldAggregationExpectations<F> expectations, DataSet<F> dataSet) {
 		String fieldPath =
 				mainIndex.binding().fieldWithAggregableDefaultModels.get( expectations.fieldType() ).relativeFieldName;

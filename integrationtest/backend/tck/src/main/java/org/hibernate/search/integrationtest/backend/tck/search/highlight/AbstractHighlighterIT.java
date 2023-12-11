@@ -6,6 +6,7 @@
  */
 package org.hibernate.search.integrationtest.backend.tck.search.highlight;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.hibernate.search.util.impl.integrationtest.common.assertion.SearchHitsAssert.assertThatHits;
 import static org.junit.jupiter.api.Assumptions.assumeFalse;
@@ -21,6 +22,7 @@ import org.hibernate.search.engine.backend.document.IndexObjectFieldReference;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaElement;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaObjectField;
 import org.hibernate.search.engine.backend.types.Highlightable;
+import org.hibernate.search.engine.backend.types.IndexFieldTraits;
 import org.hibernate.search.engine.backend.types.ObjectStructure;
 import org.hibernate.search.engine.backend.types.Projectable;
 import org.hibernate.search.engine.backend.types.TermVector;
@@ -126,6 +128,52 @@ abstract class AbstractHighlighterIT {
 	}
 
 	abstract HighlighterOptionsStep<?> highlighter(SearchHighlighterFactory factory);
+
+	@Test
+	void highlightable_enabled_trait() {
+		assertThat( Arrays.asList( "string", "objectFlattened.string" ) )
+				.allSatisfy( fieldPath -> assertThat( index.toApi().descriptor().field( fieldPath ) )
+						.hasValueSatisfying( fieldDescriptor -> assertThat( fieldDescriptor.type().traits() )
+								.as( "traits of field '" + fieldPath + "'" )
+								.contains( "projection:highlight" ) ) );
+	}
+
+	@Test
+	void projectable_no_trait() {
+		String fieldPath = "stringNotProjectable";
+		if ( TckConfiguration.get().getBackendFeatures().supportsHighlightableWithoutProjectable() ) {
+			assertThat( index.toApi().descriptor().field( fieldPath ) )
+					.hasValueSatisfying( fieldDescriptor -> assertThat( fieldDescriptor.type().traits() )
+							.as( "traits of field '" + fieldPath + "'" )
+							.contains( IndexFieldTraits.Projections.HIGHLIGHT ) );
+		}
+		else {
+			assertThat( index.toApi().descriptor().field( fieldPath ) )
+					.hasValueSatisfying( fieldDescriptor -> assertThat( fieldDescriptor.type().traits() )
+							.as( "traits of field '" + fieldPath + "'" )
+							.doesNotContain( IndexFieldTraits.Projections.HIGHLIGHT ) );
+		}
+	}
+
+	@Test
+	void highlightable_enabled_trait_nested() {
+		assertThat( Arrays.asList(
+				"objectNested.string",
+				"objectNested.level2objectDefault.string",
+				"objectNested.level2objectNested.string",
+				"objectNested.level2objectFlattened.string",
+				"objectDefault.level2objectNested.string",
+				"objectFlattened.level2objectNested.string"
+		) )
+				.allSatisfy( inObjectFieldPath -> assertThat( nestedIndex.toApi().descriptor().field( inObjectFieldPath ) )
+						.hasValueSatisfying( fieldDescriptor -> assertThat( fieldDescriptor.type().traits() )
+								.as( "traits of field '" + inObjectFieldPath + "'" )
+								// See HSEARCH-4841: highlighting is forbidden on nested fields...
+								// but here we're inspecting the field *type*, which unfortunately
+								// is independent of the field structure and thus doesn't know
+								// highlighting is not available.
+								.contains( IndexFieldTraits.Projections.HIGHLIGHT ) ) );
+	}
 
 	@Test
 	void highlighterNoConfigurationAtAll() {

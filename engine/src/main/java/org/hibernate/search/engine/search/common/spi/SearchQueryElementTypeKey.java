@@ -11,21 +11,19 @@ import java.util.Objects;
 @SuppressWarnings("unused")
 public final class SearchQueryElementTypeKey<T> {
 
-	public static <T> SearchQueryElementTypeKey<T> of(String namespace, String name) {
-		return new SearchQueryElementTypeKey<>( namespace, name );
+	public static <T> SearchQueryElementTypeKey<T> of(String name) {
+		return new SearchQueryElementTypeKey<>( name );
 	}
 
-	private final String namespace;
 	private final String name;
 
-	private SearchQueryElementTypeKey(String namespace, String name) {
-		this.namespace = namespace;
+	private SearchQueryElementTypeKey(String name) {
 		this.name = name;
 	}
 
 	@Override
 	public String toString() {
-		return namespace + ":" + name;
+		return name;
 	}
 
 	@Override
@@ -37,12 +35,15 @@ public final class SearchQueryElementTypeKey<T> {
 			return false;
 		}
 		SearchQueryElementTypeKey<?> that = (SearchQueryElementTypeKey<?>) o;
-		return Objects.equals( namespace, that.namespace ) && Objects.equals( name, that.name );
+		return Objects.equals( name, that.name );
 	}
 
 	@Override
 	public int hashCode() {
-		return Objects.hash( namespace, name );
+		return Objects.hash( name );
 	}
 
+	public String name() {
+		return name;
+	}
 }

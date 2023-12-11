@@ -7,6 +7,7 @@
 package org.hibernate.search.backend.elasticsearch.search.predicate.impl;
 
 import org.hibernate.search.backend.elasticsearch.types.predicate.impl.ElasticsearchSimpleQueryStringPredicateBuilderFieldState;
+import org.hibernate.search.engine.backend.types.IndexFieldTraits;
 import org.hibernate.search.engine.search.common.spi.SearchQueryElementTypeKey;
 
 public final class ElasticsearchPredicateTypeKeys {
@@ -14,12 +15,8 @@ public final class ElasticsearchPredicateTypeKeys {
 	private ElasticsearchPredicateTypeKeys() {
 	}
 
-	private static <T> SearchQueryElementTypeKey<T> key(String name) {
-		return SearchQueryElementTypeKey.of( "predicate", name );
-	}
-
 	public static final SearchQueryElementTypeKey<
 			ElasticsearchSimpleQueryStringPredicateBuilderFieldState> SIMPLE_QUERY_STRING =
-					key( "simple-query-string" );
+					SearchQueryElementTypeKey.of( IndexFieldTraits.Predicates.SIMPLE_QUERY_STRING );
 
 }

@@ -6,6 +6,7 @@
  */
 package org.hibernate.search.integrationtest.backend.tck.search.sort;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assumptions.assumeFalse;
 
 import java.util.ArrayList;
@@ -139,6 +140,42 @@ class DistanceSortBaseIT {
 
 		public static List<? extends Arguments> params() {
 			return parameters;
+		}
+
+		@Override
+		void sortable_default_trait(SimpleMappedIndex<SortableDefaultIndexBinding> sortableDefaultIndex,
+				SimpleMappedIndex<SortableYesIndexBinding> sortableYesIndex,
+				SimpleMappedIndex<SortableNoIndexBinding> sortableNoIndex, FieldTypeDescriptor<?, ?> fieldType) {
+			if ( TckConfiguration.get().getBackendFeatures().fieldsProjectableByDefault() ) {
+				// On Elasticsearch GeoPoint fields are always sortable by distance when projectable
+				String fieldPath = sortableDefaultIndex.binding().field.get( fieldType ).relativeFieldName;
+
+				assertThat( sortableDefaultIndex.toApi().descriptor().field( fieldPath ) )
+						.hasValueSatisfying( fieldDescriptor -> assertThat( fieldDescriptor.type().traits() )
+								.as( "traits of field '" + fieldPath + "'" )
+								.contains( sortTrait() ) );
+			}
+			else {
+				super.sortable_default_trait( sortableDefaultIndex, sortableYesIndex, sortableNoIndex, fieldType );
+			}
+		}
+
+		@Override
+		void sortable_no_trait(SimpleMappedIndex<SortableDefaultIndexBinding> sortableDefaultIndex,
+				SimpleMappedIndex<SortableYesIndexBinding> sortableYesIndex,
+				SimpleMappedIndex<SortableNoIndexBinding> sortableNoIndex, FieldTypeDescriptor<?, ?> fieldType) {
+			if ( TckConfiguration.get().getBackendFeatures().fieldsProjectableByDefault() ) {
+				// On Elasticsearch GeoPoint fields are always sortable by distance when projectable
+				String fieldPath = sortableNoIndex.binding().field.get( fieldType ).relativeFieldName;
+
+				assertThat( sortableNoIndex.toApi().descriptor().field( fieldPath ) )
+						.hasValueSatisfying( fieldDescriptor -> assertThat( fieldDescriptor.type().traits() )
+								.as( "traits of field '" + fieldPath + "'" )
+								.contains( sortTrait() ) );
+			}
+			else {
+				super.sortable_no_trait( sortableDefaultIndex, sortableYesIndex, sortableNoIndex, fieldType );
+			}
 		}
 
 		@Override

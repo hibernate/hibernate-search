@@ -6,6 +6,9 @@
  */
 package org.hibernate.search.engine.search.predicate.spi;
 
+import static org.hibernate.search.engine.search.common.spi.SearchQueryElementTypeKey.of;
+
+import org.hibernate.search.engine.backend.types.IndexFieldTraits;
 import org.hibernate.search.engine.search.common.spi.SearchQueryElementTypeKey;
 
 public final class PredicateTypeKeys {
@@ -14,27 +17,28 @@ public final class PredicateTypeKeys {
 	}
 
 	public static <T> SearchQueryElementTypeKey<T> key(String name) {
-		return SearchQueryElementTypeKey.of( "predicate", name );
+		return of( name );
 	}
 
 	public static SearchQueryElementTypeKey<NamedPredicateBuilder> named(String name) {
-		return key( "named:" + name );
+		return of( IndexFieldTraits.Predicates.named( name ) );
 	}
 
-	public static final SearchQueryElementTypeKey<NestedPredicateBuilder> NESTED = key( "nested" );
-	public static final SearchQueryElementTypeKey<MatchPredicateBuilder> MATCH = key( "match" );
-	public static final SearchQueryElementTypeKey<RangePredicateBuilder> RANGE = key( "range" );
-	public static final SearchQueryElementTypeKey<ExistsPredicateBuilder> EXISTS = key( "exists" );
-	public static final SearchQueryElementTypeKey<PhrasePredicateBuilder> PHRASE = key( "phrase" );
-	public static final SearchQueryElementTypeKey<WildcardPredicateBuilder> WILDCARD = key( "wildcard" );
-	public static final SearchQueryElementTypeKey<RegexpPredicateBuilder> REGEXP = key( "regexp" );
-	public static final SearchQueryElementTypeKey<TermsPredicateBuilder> TERMS = key( "terms" );
+	public static final SearchQueryElementTypeKey<NestedPredicateBuilder> NESTED = of( IndexFieldTraits.Predicates.NESTED );
+	public static final SearchQueryElementTypeKey<MatchPredicateBuilder> MATCH = of( IndexFieldTraits.Predicates.MATCH );
+	public static final SearchQueryElementTypeKey<RangePredicateBuilder> RANGE = of( IndexFieldTraits.Predicates.RANGE );
+	public static final SearchQueryElementTypeKey<ExistsPredicateBuilder> EXISTS = of( IndexFieldTraits.Predicates.EXISTS );
+	public static final SearchQueryElementTypeKey<PhrasePredicateBuilder> PHRASE = of( IndexFieldTraits.Predicates.PHRASE );
+	public static final SearchQueryElementTypeKey<WildcardPredicateBuilder> WILDCARD =
+			of( IndexFieldTraits.Predicates.WILDCARD );
+	public static final SearchQueryElementTypeKey<RegexpPredicateBuilder> REGEXP = of( IndexFieldTraits.Predicates.REGEXP );
+	public static final SearchQueryElementTypeKey<TermsPredicateBuilder> TERMS = of( IndexFieldTraits.Predicates.TERMS );
 	public static final SearchQueryElementTypeKey<SpatialWithinCirclePredicateBuilder> SPATIAL_WITHIN_CIRCLE =
-			key( "spatial:within-circle" );
+			of( IndexFieldTraits.Predicates.SPATIAL_WITHIN_CIRCLE );
 	public static final SearchQueryElementTypeKey<SpatialWithinPolygonPredicateBuilder> SPATIAL_WITHIN_POLYGON =
-			key( "spatial:within-polygon" );
+			of( IndexFieldTraits.Predicates.SPATIAL_WITHIN_POLYGON );
 	public static final SearchQueryElementTypeKey<SpatialWithinBoundingBoxPredicateBuilder> SPATIAL_WITHIN_BOUNDING_BOX =
-			key( "spatial:within-bounding-box" );
-	public static final SearchQueryElementTypeKey<KnnPredicateBuilder> KNN = key( "knn" );
+			of( IndexFieldTraits.Predicates.SPATIAL_WITHIN_BOUNDING_BOX );
+	public static final SearchQueryElementTypeKey<KnnPredicateBuilder> KNN = of( IndexFieldTraits.Predicates.KNN );
 
 }

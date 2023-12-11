@@ -41,6 +41,12 @@ class LuceneTckBackendFeatures extends TckBackendFeatures {
 	}
 
 	@Override
+	public boolean supportsHighlightableWithoutProjectable() {
+		// The Lucene backend relies on stored values for highlighting
+		return false;
+	}
+
+	@Override
 	public boolean supportsHighlighterUnifiedTypeNoMatchSize() {
 		// Lucene default unified highlighter does not support no-match-size setting.
 		// While in ES a custom highlighter is used that allows for such option.
