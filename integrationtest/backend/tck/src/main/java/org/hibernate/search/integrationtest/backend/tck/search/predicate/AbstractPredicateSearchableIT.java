@@ -6,6 +6,7 @@
  */
 package org.hibernate.search.integrationtest.backend.tck.search.predicate;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import java.util.Collection;
@@ -23,6 +24,48 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 
 public abstract class AbstractPredicateSearchableIT {
+
+	@ParameterizedTest(name = "{3}")
+	@MethodSource("params")
+	void searchable_default_trait(SimpleMappedIndex<SearchableDefaultIndexBinding> searchableDefaultIndex,
+			SimpleMappedIndex<SearchableYesIndexBinding> searchableYesIndex,
+			SimpleMappedIndex<SearchableNoIndexBinding> searchableNoIndex,
+			FieldTypeDescriptor<?, ?> fieldType) {
+		String fieldPath = searchableDefaultIndex.binding().field.get( fieldType ).relativeFieldName;
+
+		assertThat( searchableDefaultIndex.toApi().descriptor().field( fieldPath ) )
+				.hasValueSatisfying( fieldDescriptor -> assertThat( fieldDescriptor.type().traits() )
+						.as( "traits of field '" + fieldPath + "'" )
+						.contains( predicateTrait() ) );
+	}
+
+	@ParameterizedTest(name = "{3}")
+	@MethodSource("params")
+	void searchable_yes_trait(SimpleMappedIndex<SearchableDefaultIndexBinding> searchableDefaultIndex,
+			SimpleMappedIndex<SearchableYesIndexBinding> searchableYesIndex,
+			SimpleMappedIndex<SearchableNoIndexBinding> searchableNoIndex,
+			FieldTypeDescriptor<?, ?> fieldType) {
+		String fieldPath = searchableYesIndex.binding().field.get( fieldType ).relativeFieldName;
+
+		assertThat( searchableYesIndex.toApi().descriptor().field( fieldPath ) )
+				.hasValueSatisfying( fieldDescriptor -> assertThat( fieldDescriptor.type().traits() )
+						.as( "traits of field '" + fieldPath + "'" )
+						.contains( predicateTrait() ) );
+	}
+
+	@ParameterizedTest(name = "{3}")
+	@MethodSource("params")
+	void searchable_no_trait(SimpleMappedIndex<SearchableDefaultIndexBinding> searchableDefaultIndex,
+			SimpleMappedIndex<SearchableYesIndexBinding> searchableYesIndex,
+			SimpleMappedIndex<SearchableNoIndexBinding> searchableNoIndex,
+			FieldTypeDescriptor<?, ?> fieldType) {
+		String fieldPath = searchableNoIndex.binding().field.get( fieldType ).relativeFieldName;
+
+		assertThat( searchableNoIndex.toApi().descriptor().field( fieldPath ) )
+				.hasValueSatisfying( fieldDescriptor -> assertThat( fieldDescriptor.type().traits() )
+						.as( "traits of field '" + fieldPath + "'" )
+						.doesNotContain( predicateTrait() ) );
+	}
 
 	@ParameterizedTest(name = "{3}")
 	@MethodSource("params")

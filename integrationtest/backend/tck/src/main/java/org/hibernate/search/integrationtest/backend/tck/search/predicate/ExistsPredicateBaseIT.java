@@ -6,6 +6,8 @@
  */
 package org.hibernate.search.integrationtest.backend.tck.search.predicate;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -273,6 +275,16 @@ class ExistsPredicateBaseIT {
 		}
 
 		@Override
+		public void trait_objectField_flattened() {
+			throw new org.opentest4j.TestAbortedException( "The 'exists' predicate actually can be used on object fields" );
+		}
+
+		@Override
+		public void trait_objectField_nested() {
+			throw new org.opentest4j.TestAbortedException( "The 'exists' predicate actually can be used on object fields" );
+		}
+
+		@Override
 		public void use_objectField_flattened() {
 			throw new org.opentest4j.TestAbortedException( "The 'exists' predicate actually can be used on object fields" );
 		}
@@ -320,6 +332,20 @@ class ExistsPredicateBaseIT {
 
 		public static List<? extends Arguments> params() {
 			return parameters;
+		}
+
+		@Override
+		void searchable_no_trait(SimpleMappedIndex<SearchableDefaultIndexBinding> searchableDefaultIndex,
+				SimpleMappedIndex<SearchableYesIndexBinding> searchableYesIndex,
+				SimpleMappedIndex<SearchableNoIndexBinding> searchableNoIndex, FieldTypeDescriptor<?, ?> fieldType) {
+			// The 'exists' predicate actually can be used on unsearchable fields
+
+			String fieldPath = searchableNoIndex.binding().field.get( fieldType ).relativeFieldName;
+
+			assertThat( searchableNoIndex.toApi().descriptor().field( fieldPath ) )
+					.hasValueSatisfying( fieldDescriptor -> assertThat( fieldDescriptor.type().traits() )
+							.as( "traits of field '" + fieldPath + "'" )
+							.contains( predicateTrait() ) );
 		}
 
 		@Override

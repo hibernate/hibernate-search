@@ -6,8 +6,11 @@
  */
 package org.hibernate.search.integrationtest.backend.tck.search.projection;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.jupiter.api.Assumptions.assumeTrue;
+
+import java.util.Arrays;
 
 import org.hibernate.search.engine.backend.document.IndexFieldReference;
 import org.hibernate.search.engine.backend.document.IndexObjectFieldReference;
@@ -51,6 +54,24 @@ class ObjectProjectionSpecificsIT {
 		assertThatThrownBy( () -> index.createScope().projection().object( "unknownField" ) )
 				.isInstanceOf( SearchException.class )
 				.hasMessageContainingAll( "Unknown field 'unknownField'" );
+	}
+
+	@Test
+	void trait() {
+		assertThat( Arrays.asList( "level1", "flattenedLevel1", "level1.level2", "flattenedLevel1.level2" ) )
+				.allSatisfy( fieldPath -> assertThat( index.toApi().descriptor().field( fieldPath ) )
+						.hasValueSatisfying( fieldDescriptor -> assertThat( fieldDescriptor.type().traits() )
+								.as( "traits of field '" + fieldPath + "'" )
+								.contains( "projection:object" ) ) );
+	}
+
+	@Test
+	void trait_nonObjectFieldPath() {
+		String fieldPath = "level1.field1";
+		assertThat( index.toApi().descriptor().field( fieldPath ) )
+				.hasValueSatisfying( fieldDescriptor -> assertThat( fieldDescriptor.type().traits() )
+						.as( "traits of field '" + fieldPath + "'" )
+						.doesNotContain( "projection:object" ) );
 	}
 
 	@Test

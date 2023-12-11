@@ -48,7 +48,10 @@ is it searchable, sortable, projectable,
 what is the expected java class for arguments to the <<search-dsl,Search DSL>>,
 what are the analyzers/normalizer set on this field,
 ...
-<9> Object fields can also be inspected.
+<9> Inspect the "traits" of a field type:
+each trait represents a predicate/sort/projection/aggregation
+that can be used on fields of that type.
+<10> Object fields can also be inspected.
 ====
 
 [TIP]

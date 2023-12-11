@@ -6,9 +6,11 @@
  */
 package org.hibernate.search.backend.lucene.search.predicate.impl;
 
+import static org.hibernate.search.engine.search.common.spi.SearchQueryElementTypeKey.of;
+
 import org.hibernate.search.backend.lucene.types.predicate.impl.LuceneSimpleQueryStringPredicateBuilderFieldState;
+import org.hibernate.search.engine.backend.types.IndexFieldTraits;
 import org.hibernate.search.engine.search.common.spi.SearchQueryElementTypeKey;
-import org.hibernate.search.engine.search.predicate.spi.PredicateTypeKeys;
 
 public final class LucenePredicateTypeKeys {
 
@@ -16,6 +18,6 @@ public final class LucenePredicateTypeKeys {
 	}
 
 	public static final SearchQueryElementTypeKey<LuceneSimpleQueryStringPredicateBuilderFieldState> SIMPLE_QUERY_STRING =
-			PredicateTypeKeys.key( "simple-query-string" );
+			of( IndexFieldTraits.Predicates.SIMPLE_QUERY_STRING );
 
 }

@@ -6,6 +6,7 @@
  */
 package org.hibernate.search.integrationtest.backend.tck.search.highlight;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import java.util.ArrayList;
@@ -15,6 +16,7 @@ import java.util.stream.Stream;
 
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaElement;
 import org.hibernate.search.engine.backend.types.Highlightable;
+import org.hibernate.search.engine.backend.types.IndexFieldTraits;
 import org.hibernate.search.engine.backend.types.dsl.SearchableProjectableIndexFieldTypeOptionsStep;
 import org.hibernate.search.engine.backend.types.dsl.StringIndexFieldTypeOptionsStep;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.AnalyzedStringFieldTypeDescriptor;
@@ -58,6 +60,17 @@ class HighlightProjectionUnsupportedTypesIT<F> {
 	@BeforeAll
 	static void setup() {
 		setupHelper.start().withIndex( index ).setup();
+	}
+
+	@ParameterizedTest(name = "{0}")
+	@MethodSource("params")
+	void trait(FieldTypeDescriptor<F, ?> fieldTypeDescriptor) {
+		String fieldPath = getFieldPath( fieldTypeDescriptor );
+
+		assertThat( index.toApi().descriptor().field( fieldPath ) )
+				.hasValueSatisfying( fieldDescriptor -> assertThat( fieldDescriptor.type().traits() )
+						.as( "traits of field '" + fieldPath + "'" )
+						.doesNotContain( IndexFieldTraits.Projections.HIGHLIGHT ) );
 	}
 
 	@ParameterizedTest(name = "{0}")

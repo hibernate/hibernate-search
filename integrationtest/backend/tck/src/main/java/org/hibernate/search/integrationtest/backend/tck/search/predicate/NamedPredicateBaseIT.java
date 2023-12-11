@@ -6,8 +6,11 @@
  */
 package org.hibernate.search.integrationtest.backend.tck.search.predicate;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.hibernate.search.util.impl.integrationtest.common.assertion.SearchResultAssert.assertThatQuery;
+
+import java.util.Arrays;
 
 import org.hibernate.search.engine.backend.document.DocumentElement;
 import org.hibernate.search.engine.backend.document.IndexObjectFieldReference;
@@ -55,6 +58,15 @@ class NamedPredicateBaseIT {
 		BulkIndexer indexer = index.bulkIndexer();
 		dataSet.contribute( indexer );
 		indexer.join();
+	}
+
+	@Test
+	void trait() {
+		assertThat( Arrays.asList( "nested", "flattened" ) )
+				.allSatisfy( fieldPath -> assertThat( index.toApi().descriptor().field( fieldPath ) )
+						.hasValueSatisfying( fieldDescriptor -> assertThat( fieldDescriptor.type().traits() )
+								.as( "traits of field '" + fieldPath + "'" )
+								.contains( "predicate:named:match-both-fields" ) ) );
 	}
 
 	@Test

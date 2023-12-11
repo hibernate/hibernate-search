@@ -22,6 +22,8 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
 
+import org.assertj.core.api.InstanceOfAssertFactories;
+
 /**
  * Basic tests for object field type descriptor features.
  */
@@ -48,6 +50,19 @@ class IndexObjectFieldTypeDescriptorBaseIT {
 				.returns( false, IndexObjectFieldTypeDescriptor::nested );
 		assertThat( getTypeDescriptor( "nested" ) )
 				.returns( true, IndexObjectFieldTypeDescriptor::nested );
+	}
+
+	@Test
+	void nestedTraits() {
+		assertThat( getTypeDescriptor( "default" ) )
+				.extracting( IndexObjectFieldTypeDescriptor::traits, InstanceOfAssertFactories.collection( String.class ) )
+				.doesNotContain( "predicate:nested" );
+		assertThat( getTypeDescriptor( "flattened" ) )
+				.extracting( IndexObjectFieldTypeDescriptor::traits, InstanceOfAssertFactories.collection( String.class ) )
+				.doesNotContain( "predicate:nested" );
+		assertThat( getTypeDescriptor( "nested" ) )
+				.extracting( IndexObjectFieldTypeDescriptor::traits, InstanceOfAssertFactories.collection( String.class ) )
+				.contains( "predicate:nested" );
 	}
 
 	private IndexObjectFieldTypeDescriptor getTypeDescriptor(String fieldName) {

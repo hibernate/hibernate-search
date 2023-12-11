@@ -6,6 +6,7 @@
  */
 package org.hibernate.search.engine.search.sort.spi;
 
+import org.hibernate.search.engine.backend.types.IndexFieldTraits;
 import org.hibernate.search.engine.search.common.spi.SearchQueryElementTypeKey;
 
 public final class SortTypeKeys {
@@ -13,11 +14,9 @@ public final class SortTypeKeys {
 	private SortTypeKeys() {
 	}
 
-	public static <T> SearchQueryElementTypeKey<T> key(String name) {
-		return SearchQueryElementTypeKey.of( "sort", name );
-	}
-
-	public static final SearchQueryElementTypeKey<FieldSortBuilder> FIELD = key( "field" );
-	public static final SearchQueryElementTypeKey<DistanceSortBuilder> DISTANCE = key( "distance" );
+	public static final SearchQueryElementTypeKey<FieldSortBuilder> FIELD =
+			SearchQueryElementTypeKey.of( IndexFieldTraits.Sorts.FIELD );
+	public static final SearchQueryElementTypeKey<DistanceSortBuilder> DISTANCE =
+			SearchQueryElementTypeKey.of( IndexFieldTraits.Sorts.DISTANCE );
 
 }

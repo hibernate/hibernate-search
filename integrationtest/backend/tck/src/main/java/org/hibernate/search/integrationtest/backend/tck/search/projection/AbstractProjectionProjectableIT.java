@@ -6,6 +6,7 @@
  */
 package org.hibernate.search.integrationtest.backend.tck.search.projection;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.jupiter.api.Assumptions.assumeFalse;
 
@@ -25,6 +26,60 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 
 abstract class AbstractProjectionProjectableIT {
+
+	@ParameterizedTest(name = "{3}")
+	@MethodSource("params")
+	void projectable_default_trait(
+			SimpleMappedIndex<AbstractProjectionProjectableIT.ProjectableDefaultIndexBinding> projectableDefaultIndex,
+			SimpleMappedIndex<AbstractProjectionProjectableIT.ProjectableYesIndexBinding> projectableYesIndex,
+			SimpleMappedIndex<AbstractProjectionProjectableIT.ProjectableNoIndexBinding> projectableNoIndex,
+			FieldTypeDescriptor<?, ?> fieldType) {
+		String fieldPath = projectableDefaultIndex.binding().field.get( fieldType ).relativeFieldName;
+
+		assertThat( projectableDefaultIndex.toApi().descriptor().field( fieldPath ) )
+				.hasValueSatisfying( fieldDescriptor -> {
+					if ( TckConfiguration.get().getBackendFeatures().fieldsProjectableByDefault() ) {
+						assertThat( fieldDescriptor.type().traits() )
+								.as( "traits of field '" + fieldPath + "'" )
+								.contains( projectionTrait() );
+					}
+					else {
+						assertThat( fieldDescriptor.type().traits() )
+								.as( "traits of field '" + fieldPath + "'" )
+								.doesNotContain( projectionTrait() );
+					}
+				} );
+	}
+
+	@ParameterizedTest(name = "{3}")
+	@MethodSource("params")
+	void projectable_yes_trait(
+			SimpleMappedIndex<AbstractProjectionProjectableIT.ProjectableDefaultIndexBinding> projectableDefaultIndex,
+			SimpleMappedIndex<AbstractProjectionProjectableIT.ProjectableYesIndexBinding> projectableYesIndex,
+			SimpleMappedIndex<AbstractProjectionProjectableIT.ProjectableNoIndexBinding> projectableNoIndex,
+			FieldTypeDescriptor<?, ?> fieldType) {
+		String fieldPath = projectableYesIndex.binding().field.get( fieldType ).relativeFieldName;
+
+		assertThat( projectableYesIndex.toApi().descriptor().field( fieldPath ) )
+				.hasValueSatisfying( fieldDescriptor -> assertThat( fieldDescriptor.type().traits() )
+						.as( "traits of field '" + fieldPath + "'" )
+						.contains( projectionTrait() ) );
+	}
+
+	@ParameterizedTest(name = "{3}")
+	@MethodSource("params")
+	void projectable_no_trait(
+			SimpleMappedIndex<AbstractProjectionProjectableIT.ProjectableDefaultIndexBinding> projectableDefaultIndex,
+			SimpleMappedIndex<AbstractProjectionProjectableIT.ProjectableYesIndexBinding> projectableYesIndex,
+			SimpleMappedIndex<AbstractProjectionProjectableIT.ProjectableNoIndexBinding> projectableNoIndex,
+			FieldTypeDescriptor<?, ?> fieldType) {
+		String fieldPath = projectableNoIndex.binding().field.get( fieldType ).relativeFieldName;
+
+		assertThat( projectableNoIndex.toApi().descriptor().field( fieldPath ) )
+				.hasValueSatisfying( fieldDescriptor -> assertThat( fieldDescriptor.type().traits() )
+						.as( "traits of field '" + fieldPath + "'" )
+						.doesNotContain( projectionTrait() ) );
+	}
 
 	@ParameterizedTest(name = "{3}")
 	@MethodSource("params")

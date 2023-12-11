@@ -6,6 +6,7 @@
  */
 package org.hibernate.search.integrationtest.backend.tck.search.sort;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import java.util.Collection;
@@ -23,6 +24,51 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 
 abstract class AbstractSortSortableIT {
+
+	@ParameterizedTest(name = "{3}")
+	@MethodSource("params")
+	void sortable_default_trait(
+			SimpleMappedIndex<SortableDefaultIndexBinding> sortableDefaultIndex,
+			SimpleMappedIndex<SortableYesIndexBinding> sortableYesIndex,
+			SimpleMappedIndex<SortableNoIndexBinding> sortableNoIndex,
+			FieldTypeDescriptor<?, ?> fieldType) {
+		String fieldPath = sortableDefaultIndex.binding().field.get( fieldType ).relativeFieldName;
+
+		assertThat( sortableDefaultIndex.toApi().descriptor().field( fieldPath ) )
+				.hasValueSatisfying( fieldDescriptor -> assertThat( fieldDescriptor.type().traits() )
+						.as( "traits of field '" + fieldPath + "'" )
+						.doesNotContain( sortTrait() ) );
+	}
+
+	@ParameterizedTest(name = "{3}")
+	@MethodSource("params")
+	void sortable_yes_trait(
+			SimpleMappedIndex<SortableDefaultIndexBinding> sortableDefaultIndex,
+			SimpleMappedIndex<SortableYesIndexBinding> sortableYesIndex,
+			SimpleMappedIndex<SortableNoIndexBinding> sortableNoIndex,
+			FieldTypeDescriptor<?, ?> fieldType) {
+		String fieldPath = sortableYesIndex.binding().field.get( fieldType ).relativeFieldName;
+
+		assertThat( sortableYesIndex.toApi().descriptor().field( fieldPath ) )
+				.hasValueSatisfying( fieldDescriptor -> assertThat( fieldDescriptor.type().traits() )
+						.as( "traits of field '" + fieldPath + "'" )
+						.contains( sortTrait() ) );
+	}
+
+	@ParameterizedTest(name = "{3}")
+	@MethodSource("params")
+	void sortable_no_trait(
+			SimpleMappedIndex<SortableDefaultIndexBinding> sortableDefaultIndex,
+			SimpleMappedIndex<SortableYesIndexBinding> sortableYesIndex,
+			SimpleMappedIndex<SortableNoIndexBinding> sortableNoIndex,
+			FieldTypeDescriptor<?, ?> fieldType) {
+		String fieldPath = sortableNoIndex.binding().field.get( fieldType ).relativeFieldName;
+
+		assertThat( sortableNoIndex.toApi().descriptor().field( fieldPath ) )
+				.hasValueSatisfying( fieldDescriptor -> assertThat( fieldDescriptor.type().traits() )
+						.as( "traits of field '" + fieldPath + "'" )
+						.doesNotContain( sortTrait() ) );
+	}
 
 	@ParameterizedTest(name = "{3}")
 	@MethodSource("params")
@@ -88,7 +134,7 @@ abstract class AbstractSortSortableIT {
 	protected abstract String sortTrait();
 
 	public static final class SortableDefaultIndexBinding {
-		private final SimpleFieldModelsByType field;
+		final SimpleFieldModelsByType field;
 
 		public SortableDefaultIndexBinding(IndexSchemaElement root, Collection<
 				? extends StandardFieldTypeDescriptor<?>> fieldTypes) {
@@ -106,7 +152,7 @@ abstract class AbstractSortSortableIT {
 	}
 
 	public static final class SortableNoIndexBinding {
-		private final SimpleFieldModelsByType field;
+		final SimpleFieldModelsByType field;
 
 		public SortableNoIndexBinding(IndexSchemaElement root, Collection<
 				? extends StandardFieldTypeDescriptor<?>> fieldTypes) {

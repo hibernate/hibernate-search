@@ -87,6 +87,10 @@ public abstract class TckBackendFeatures implements StubMappingBackendFeatures {
 		return true;
 	}
 
+	public boolean supportsHighlightableWithoutProjectable() {
+		return true;
+	}
+
 	public boolean supportsHighlighterEncoderAtFieldLevel() {
 		return true;
 	}

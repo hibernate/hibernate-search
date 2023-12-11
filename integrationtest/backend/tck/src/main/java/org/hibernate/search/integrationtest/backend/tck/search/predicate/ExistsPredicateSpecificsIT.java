@@ -6,6 +6,7 @@
  */
 package org.hibernate.search.integrationtest.backend.tck.search.predicate;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.hibernate.search.util.impl.integrationtest.common.assertion.SearchResultAssert.assertThatQuery;
 import static org.junit.jupiter.api.Assumptions.assumeFalse;
 import static org.junit.jupiter.api.Assumptions.assumeTrue;
@@ -36,6 +37,7 @@ import org.hibernate.search.util.impl.integrationtest.mapper.stub.SimpleMappedIn
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappingScope;
 
 import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
@@ -103,6 +105,27 @@ class ExistsPredicateSpecificsIT<F> {
 				.routing( dataSet.routingKey ) )
 				.hasDocRefHitsAnyOrder( mainIndex.typeName(), dataSet.docId( 2 ), dataSet.docId( 3 ) );
 	}
+
+	@Test
+	void trait_nested() {
+		String fieldPath = mainIndex.binding().nestedObject.relativeFieldName;
+
+		assertThat( mainIndex.toApi().descriptor().field( fieldPath ) )
+				.hasValueSatisfying( fieldDescriptor -> assertThat( fieldDescriptor.type().traits() )
+						.as( "traits of field '" + fieldPath + "'" )
+						.contains( "predicate:exists" ) );
+	}
+
+	@Test
+	void trait_flattened() {
+		String fieldPath = mainIndex.binding().flattenedObject.relativeFieldName;
+
+		assertThat( mainIndex.toApi().descriptor().field( fieldPath ) )
+				.hasValueSatisfying( fieldDescriptor -> assertThat( fieldDescriptor.type().traits() )
+						.as( "traits of field '" + fieldPath + "'" )
+						.contains( "predicate:exists" ) );
+	}
+
 
 	/**
 	 * Fields with docvalues may be optimized and use a different Lucene query.
