@@ -62,7 +62,8 @@ class MatchPredicateBaseIT {
 						AnalysisConfigured.index, AnalysisConfigured.compatibleIndex, AnalysisConfigured.incompatibleIndex,
 						ScoreConfigured.index,
 						InvalidFieldConfigured.index, UnsupportedTypeConfigured.index,
-						SearchableConfigured.searchableYesIndex, SearchableConfigured.searchableNoIndex,
+						SearchableConfigured.searchableDefaultIndex, SearchableConfigured.searchableYesIndex,
+						SearchableConfigured.searchableNoIndex,
 						ArgumentCheckingConfigured.index,
 						TypeCheckingAndConversionConfigured.index, TypeCheckingAndConversionConfigured.compatibleIndex,
 						TypeCheckingAndConversionConfigured.rawFieldCompatibleIndex,
@@ -374,7 +375,7 @@ class MatchPredicateBaseIT {
 		}
 
 		@Override
-		protected String predicateNameInErrorMessage() {
+		protected String predicateTrait() {
 			return "predicate:match";
 		}
 	}
@@ -406,7 +407,7 @@ class MatchPredicateBaseIT {
 		}
 
 		@Override
-		protected String predicateNameInErrorMessage() {
+		protected String predicateTrait() {
 			return "predicate:match";
 		}
 	}
@@ -417,6 +418,9 @@ class MatchPredicateBaseIT {
 	}
 
 	abstract static class SearchableConfigured extends AbstractPredicateSearchableIT {
+		private static final SimpleMappedIndex<SearchableDefaultIndexBinding> searchableDefaultIndex =
+				SimpleMappedIndex.of( root -> new SearchableDefaultIndexBinding( root, supportedFieldTypes ) )
+						.name( "searchableDefault" );
 		private static final SimpleMappedIndex<SearchableYesIndexBinding> searchableYesIndex =
 				SimpleMappedIndex.of( root -> new SearchableYesIndexBinding( root, supportedFieldTypes ) )
 						.name( "searchableYes" );
@@ -428,7 +432,7 @@ class MatchPredicateBaseIT {
 		private static final List<Arguments> parameters = new ArrayList<>();
 		static {
 			for ( FieldTypeDescriptor<?, ?> fieldType : supportedFieldTypes ) {
-				parameters.add( Arguments.of( searchableYesIndex, searchableNoIndex, fieldType ) );
+				parameters.add( Arguments.of( searchableDefaultIndex, searchableYesIndex, searchableNoIndex, fieldType ) );
 			}
 		}
 
@@ -442,7 +446,7 @@ class MatchPredicateBaseIT {
 		}
 
 		@Override
-		protected String predicateNameInErrorMessage() {
+		protected String predicateTrait() {
 			return "predicate:match";
 		}
 	}
@@ -545,7 +549,7 @@ class MatchPredicateBaseIT {
 		}
 
 		@Override
-		protected String predicateNameInErrorMessage() {
+		protected String predicateTrait() {
 			return "predicate:match";
 		}
 	}
@@ -576,7 +580,7 @@ class MatchPredicateBaseIT {
 		}
 
 		@Override
-		protected String predicateNameInErrorMessage() {
+		protected String predicateTrait() {
 			return "predicate:match";
 		}
 	}

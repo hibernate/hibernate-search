@@ -71,7 +71,7 @@ public abstract class AbstractPredicateScaleCheckingIT {
 				.hasMessageContainingAll(
 						"Inconsistent configuration for field '" + bigDecimalFieldPath()
 								+ "' in a search query across multiple indexes",
-						"Inconsistent support for '" + predicateNameInErrorMessage() + "'",
+						"Inconsistent support for '" + predicateTrait() + "'",
 						"Field codec differs:", "decimalScale=2", " vs. ", "decimalScale=7"
 				)
 				.satisfies( FailureReportUtils.hasContext(
@@ -83,7 +83,7 @@ public abstract class AbstractPredicateScaleCheckingIT {
 				.hasMessageContainingAll(
 						"Inconsistent configuration for field '" + bigIntegerFieldPath()
 								+ "' in a search query across multiple indexes",
-						"Inconsistent support for '" + predicateNameInErrorMessage() + "'",
+						"Inconsistent support for '" + predicateTrait() + "'",
 						"Field codec differs:", "decimalScale=-2", " vs. ", "decimalScale=-7"
 				)
 				.satisfies( FailureReportUtils.hasContext(
@@ -93,7 +93,7 @@ public abstract class AbstractPredicateScaleCheckingIT {
 
 	protected abstract PredicateFinalStep predicate(SearchPredicateFactory f, String fieldPath, Object matchingParam);
 
-	protected abstract String predicateNameInErrorMessage();
+	protected abstract String predicateTrait();
 
 	private String bigDecimalFieldPath() {
 		return "bigDecimal";

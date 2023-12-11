@@ -45,7 +45,8 @@ class ExistsPredicateBaseIT {
 						InObjectFieldConfigured.mainIndex, InObjectFieldConfigured.missingFieldIndex,
 						ScoreConfigured.index,
 						InvalidFieldConfigured.index,
-						SearchableConfigured.searchableYesIndex, SearchableConfigured.searchableNoIndex,
+						SearchableConfigured.searchableDefaultIndex, SearchableConfigured.searchableYesIndex,
+						SearchableConfigured.searchableNoIndex,
 						TypeCheckingNoConversionConfigured.index, TypeCheckingNoConversionConfigured.compatibleIndex,
 						TypeCheckingNoConversionConfigured.rawFieldCompatibleIndex,
 						TypeCheckingNoConversionConfigured.missingFieldIndex,
@@ -272,12 +273,12 @@ class ExistsPredicateBaseIT {
 		}
 
 		@Override
-		public void objectField_flattened() {
+		public void use_objectField_flattened() {
 			throw new org.opentest4j.TestAbortedException( "The 'exists' predicate actually can be used on object fields" );
 		}
 
 		@Override
-		public void objectField_nested() {
+		public void use_objectField_nested() {
 			throw new org.opentest4j.TestAbortedException( "The 'exists' predicate actually can be used on object fields" );
 		}
 
@@ -287,7 +288,7 @@ class ExistsPredicateBaseIT {
 		}
 
 		@Override
-		protected String predicateNameInErrorMessage() {
+		protected String predicateTrait() {
 			return "predicate:exists";
 		}
 	}
@@ -299,6 +300,9 @@ class ExistsPredicateBaseIT {
 
 	abstract static class SearchableConfigured extends AbstractPredicateSearchableIT {
 
+		private static final SimpleMappedIndex<SearchableDefaultIndexBinding> searchableDefaultIndex =
+				SimpleMappedIndex.of( root -> new SearchableDefaultIndexBinding( root, supportedFieldTypes ) )
+						.name( "searchableDefault" );
 		private static final SimpleMappedIndex<SearchableYesIndexBinding> searchableYesIndex =
 				SimpleMappedIndex.of( root -> new SearchableYesIndexBinding( root, supportedFieldTypes ) )
 						.name( "searchableYes" );
@@ -310,7 +314,7 @@ class ExistsPredicateBaseIT {
 		private static final List<Arguments> parameters = new ArrayList<>();
 		static {
 			for ( FieldTypeDescriptor<?, ?> fieldType : supportedFieldTypes ) {
-				parameters.add( Arguments.of( searchableYesIndex, searchableNoIndex, fieldType ) );
+				parameters.add( Arguments.of( searchableDefaultIndex, searchableYesIndex, searchableNoIndex, fieldType ) );
 			}
 		}
 
@@ -319,9 +323,9 @@ class ExistsPredicateBaseIT {
 		}
 
 		@Override
-		public void unsearchable(SimpleMappedIndex<SearchableYesIndexBinding> searchableYesIndex,
-				SimpleMappedIndex<SearchableNoIndexBinding> searchableNoIndex,
-				FieldTypeDescriptor<?, ?> fieldType) {
+		void searchable_no_use(SimpleMappedIndex<SearchableDefaultIndexBinding> searchableDefaultIndex,
+				SimpleMappedIndex<SearchableYesIndexBinding> searchableYesIndex,
+				SimpleMappedIndex<SearchableNoIndexBinding> searchableNoIndex, FieldTypeDescriptor<?, ?> fieldType) {
 			throw new org.opentest4j.TestAbortedException(
 					"The 'exists' predicate actually can be used on unsearchable fields" );
 		}
@@ -332,7 +336,7 @@ class ExistsPredicateBaseIT {
 		}
 
 		@Override
-		protected String predicateNameInErrorMessage() {
+		protected String predicateTrait() {
 			return "predicate:exists";
 		}
 	}
@@ -407,7 +411,7 @@ class ExistsPredicateBaseIT {
 		}
 
 		@Override
-		protected String predicateNameInErrorMessage() {
+		protected String predicateTrait() {
 			return "predicate:exists";
 		}
 	}
@@ -444,7 +448,7 @@ class ExistsPredicateBaseIT {
 		}
 
 		@Override
-		protected String predicateNameInErrorMessage() {
+		protected String predicateTrait() {
 			return "predicate:exists";
 		}
 	}

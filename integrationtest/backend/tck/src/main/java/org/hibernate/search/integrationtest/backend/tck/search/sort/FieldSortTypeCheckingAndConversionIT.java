@@ -172,22 +172,6 @@ class FieldSortTypeCheckingAndConversionIT<F> {
 
 	@ParameterizedTest(name = "{0}")
 	@MethodSource("params")
-	void unsortable(StandardFieldTypeDescriptor<F> fieldTypeDescriptor) {
-		StubMappingScope scope = mainIndex.createScope();
-		String fieldPath = getNonSortableFieldPath( fieldTypeDescriptor );
-
-		assertThatThrownBy( () -> {
-			scope.sort().field( fieldPath );
-		} )
-				.isInstanceOf( SearchException.class )
-				.hasMessageContainingAll(
-						"Cannot use 'sort:field' on field '" + fieldPath + "'",
-						"Make sure the field is marked as searchable/sortable/projectable/aggregable/highlightable (whichever is relevant)"
-				);
-	}
-
-	@ParameterizedTest(name = "{0}")
-	@MethodSource("params")
 	void invalidType_noDslConverter(StandardFieldTypeDescriptor<F> fieldTypeDescriptor) {
 		StubMappingScope scope = mainIndex.createScope();
 
@@ -486,10 +470,6 @@ class FieldSortTypeCheckingAndConversionIT<F> {
 		return mainIndex.binding().fieldWithDslConverterModels.get( fieldTypeDescriptor ).relativeFieldName;
 	}
 
-	private String getNonSortableFieldPath(StandardFieldTypeDescriptor<F> fieldTypeDescriptor) {
-		return mainIndex.binding().nonSortableFieldModels.get( fieldTypeDescriptor ).relativeFieldName;
-	}
-
 	private static void initDocument(IndexBinding indexBinding, DocumentElement document, Integer ordinal) {
 		indexBinding.fieldModels.forEach( fieldModel -> addValue( fieldModel, document, ordinal ) );
 		indexBinding.fieldWithDslConverterModels.forEach( fieldModel -> addValue( fieldModel, document, ordinal ) );
@@ -548,7 +528,6 @@ class FieldSortTypeCheckingAndConversionIT<F> {
 	private static class AbstractObjectMapping {
 		final SimpleFieldModelsByType fieldModels;
 		final SimpleFieldModelsByType fieldWithDslConverterModels;
-		final SimpleFieldModelsByType nonSortableFieldModels;
 
 		AbstractObjectMapping(IndexSchemaElement root,
 				Consumer<StandardIndexFieldTypeOptionsStep<?, ?>> additionalConfiguration) {
@@ -562,11 +541,6 @@ class FieldSortTypeCheckingAndConversionIT<F> {
 					additionalConfiguration.andThen(
 							c -> c.dslConverter( ValueWrapper.class, ValueWrapper.toDocumentValueConverter() )
 					)
-			);
-			nonSortableFieldModels = SimpleFieldModelsByType.mapAll(
-					supportedFieldTypes, root, "nonSortable_",
-					c -> c.sortable( Sortable.YES ),
-					additionalConfiguration.andThen( c -> c.sortable( Sortable.NO ) )
 			);
 		}
 	}

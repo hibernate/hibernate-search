@@ -12,6 +12,7 @@ import java.util.Comparator;
 import java.util.List;
 
 import org.hibernate.search.engine.backend.types.ObjectStructure;
+import org.hibernate.search.engine.backend.types.dsl.SearchableProjectableIndexFieldTypeOptionsStep;
 import org.hibernate.search.engine.search.projection.dsl.ProjectionFinalStep;
 import org.hibernate.search.engine.search.projection.dsl.SearchProjectionFactory;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.FieldTypeDescriptor;
@@ -33,6 +34,10 @@ import org.assertj.core.api.recursive.comparison.RecursiveComparisonConfiguratio
 class FieldProjectionBaseIT {
 	//CHECKSTYLE:ON
 
+	private static final List<
+			FieldTypeDescriptor<?, ? extends SearchableProjectableIndexFieldTypeOptionsStep<?, ?>>> supportedFieldTypes =
+					FieldTypeDescriptor.getAll();
+
 	@RegisterExtension
 	public static final SearchSetupHelper setupHelper = SearchSetupHelper.create();
 
@@ -46,7 +51,10 @@ class FieldProjectionBaseIT {
 				.withIndexes( InObjectProjectionConfigured.mainIndex, InObjectProjectionConfigured.missingLevel1Index,
 						InObjectProjectionConfigured.missingLevel1SingleValuedFieldIndex,
 						InObjectProjectionConfigured.missingLevel2Index,
-						InObjectProjectionConfigured.missingLevel2SingleValuedFieldIndex )
+						InObjectProjectionConfigured.missingLevel2SingleValuedFieldIndex,
+						InvalidFieldConfigured.index,
+						ProjectableConfigured.projectableDefaultIndex, ProjectableConfigured.projectableYesIndex,
+						ProjectableConfigured.projectableNoIndex )
 				.setup();
 
 		BulkIndexer compositeForEachMainIndexer = InObjectProjectionConfigured.mainIndex.bulkIndexer();
@@ -140,5 +148,68 @@ class FieldProjectionBaseIT {
 			return f.field( absoluteFieldPath, dataSet.fieldType.getJavaType() ).multi();
 		}
 
+	}
+
+	@Nested
+	class InvalidFieldIT extends InvalidFieldConfigured {
+		// JDK 11 does not allow static fields in non-static inner class and JUnit does not allow running @Nested tests in static inner classes...
+	}
+
+	abstract static class InvalidFieldConfigured extends AbstractProjectionInvalidFieldIT {
+		private static final SimpleMappedIndex<IndexBinding> index = SimpleMappedIndex.of( IndexBinding::new )
+				.name( "invalidField" );
+
+		public InvalidFieldConfigured() {
+			super( index );
+		}
+
+		@Override
+		protected void tryProjection(SearchProjectionFactory<?, ?> f, String fieldPath) {
+			f.field( fieldPath );
+		}
+
+		@Override
+		protected String projectionTrait() {
+			return "projection:field";
+		}
+	}
+
+	@Nested
+	class ProjectableIT extends ProjectableConfigured {
+		// JDK 11 does not allow static fields in non-static inner class and JUnit does not allow running @Nested tests in static inner classes...
+	}
+
+	abstract static class ProjectableConfigured extends AbstractProjectionProjectableIT {
+		private static final SimpleMappedIndex<ProjectableDefaultIndexBinding> projectableDefaultIndex =
+				SimpleMappedIndex.of( root -> new ProjectableDefaultIndexBinding( root, supportedFieldTypes ) )
+						.name( "projectableDefault" );
+		private static final SimpleMappedIndex<ProjectableYesIndexBinding> projectableYesIndex =
+				SimpleMappedIndex.of( root -> new ProjectableYesIndexBinding( root, supportedFieldTypes ) )
+						.name( "projectableYes" );
+
+		private static final SimpleMappedIndex<ProjectableNoIndexBinding> projectableNoIndex =
+				SimpleMappedIndex.of( root -> new ProjectableNoIndexBinding( root, supportedFieldTypes ) )
+						.name( "projectableNo" );
+
+		private static final List<Arguments> parameters = new ArrayList<>();
+		static {
+			for ( FieldTypeDescriptor<?, ?> fieldType : supportedFieldTypes ) {
+				parameters.add( Arguments.of( projectableDefaultIndex, projectableYesIndex, projectableNoIndex, fieldType ) );
+			}
+		}
+
+		public static List<? extends Arguments> params() {
+			return parameters;
+		}
+
+		@Override
+		protected void tryProjection(SearchProjectionFactory<?, ?> f, String fieldPath, FieldTypeDescriptor<?, ?> fieldType) {
+			f.field( fieldPath );
+		}
+
+		@Override
+		protected String projectionTrait() {
+			return "projection:field";
+		}
 	}
 }

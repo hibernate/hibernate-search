@@ -7,7 +7,6 @@
 package org.hibernate.search.integrationtest.backend.tck.search.projection;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 import org.hibernate.search.engine.backend.types.ObjectStructure;
@@ -35,6 +34,23 @@ import org.assertj.core.api.recursive.comparison.RecursiveComparisonConfiguratio
 class DistanceProjectionBaseIT {
 	//CHECKSTYLE:ON
 
+	private static final GeoPointFieldTypeDescriptor supportedFieldType;
+	private static final List<
+			FieldTypeDescriptor<GeoPoint, ? extends SearchableProjectableIndexFieldTypeOptionsStep<?, ?>>> supportedFieldTypes =
+					new ArrayList<>();
+	private static final List<
+			FieldTypeDescriptor<?, ? extends SearchableProjectableIndexFieldTypeOptionsStep<?, ?>>> unsupportedFieldTypes =
+					new ArrayList<>();
+	static {
+		supportedFieldType = GeoPointFieldTypeDescriptor.INSTANCE;
+		supportedFieldTypes.add( supportedFieldType );
+		for ( FieldTypeDescriptor<?, ?> fieldType : FieldTypeDescriptor.getAll() ) {
+			if ( !supportedFieldType.equals( fieldType ) ) {
+				unsupportedFieldTypes.add( fieldType );
+			}
+		}
+	}
+
 	@RegisterExtension
 	public static final SearchSetupHelper setupHelper = SearchSetupHelper.create();
 
@@ -48,7 +64,10 @@ class DistanceProjectionBaseIT {
 				.withIndexes( InObjectProjectionConfigured.mainIndex, InObjectProjectionConfigured.missingLevel1Index,
 						InObjectProjectionConfigured.missingLevel1SingleValuedFieldIndex,
 						InObjectProjectionConfigured.missingLevel2Index,
-						InObjectProjectionConfigured.missingLevel2SingleValuedFieldIndex )
+						InObjectProjectionConfigured.missingLevel2SingleValuedFieldIndex,
+						InvalidFieldConfigured.index, UnsupportedTypeConfigured.index,
+						ProjectableConfigured.projectableDefaultIndex, ProjectableConfigured.projectableYesIndex,
+						ProjectableConfigured.projectableNoIndex )
 				.setup();
 
 		BulkIndexer compositeForEachMainIndexer = InObjectProjectionConfigured.mainIndex.bulkIndexer();
@@ -79,9 +98,6 @@ class DistanceProjectionBaseIT {
 
 	abstract static class InObjectProjectionConfigured
 			extends AbstractProjectionInObjectProjectionIT<GeoPoint, Double, DistanceProjectionTestValues> {
-		private static final List<
-				FieldTypeDescriptor<?, ? extends SearchableProjectableIndexFieldTypeOptionsStep<?, ?>>> supportedFieldTypes =
-						Arrays.asList( GeoPointFieldTypeDescriptor.INSTANCE );
 		private static final SimpleMappedIndex<IndexBinding> mainIndex =
 				SimpleMappedIndex.of( root -> new IndexBinding( root, supportedFieldTypes ) )
 						.name( "main" );
@@ -142,5 +158,100 @@ class DistanceProjectionBaseIT {
 			return f.distance( absoluteFieldPath, dataSet.values.projectionCenterPoint() ).multi();
 		}
 
+	}
+
+	@Nested
+	class InvalidFieldIT extends InvalidFieldConfigured {
+		// JDK 11 does not allow static fields in non-static inner class and JUnit does not allow running @Nested tests in static inner classes...
+	}
+
+	abstract static class InvalidFieldConfigured extends AbstractProjectionInvalidFieldIT {
+		private static final SimpleMappedIndex<IndexBinding> index = SimpleMappedIndex.of( IndexBinding::new )
+				.name( "invalidField" );
+
+		public InvalidFieldConfigured() {
+			super( index );
+		}
+
+		@Override
+		protected void tryProjection(SearchProjectionFactory<?, ?> f, String fieldPath) {
+			f.distance( fieldPath, GeoPoint.of( 0.0, 0.0 ) );
+		}
+
+		@Override
+		protected String projectionTrait() {
+			return "projection:distance";
+		}
+	}
+
+	@Nested
+	class UnsupportedTypeIT extends UnsupportedTypeConfigured {
+		// JDK 11 does not allow static fields in non-static inner class and JUnit does not allow running @Nested tests in static inner classes...
+	}
+
+	abstract static class UnsupportedTypeConfigured extends AbstractProjectionUnsupportedTypesIT {
+		private static final SimpleMappedIndex<IndexBinding> index =
+				SimpleMappedIndex.of( root -> new IndexBinding( root, unsupportedFieldTypes ) )
+						.name( "unsupportedType" );
+
+		private static final List<Arguments> parameters = new ArrayList<>();
+		static {
+			for ( FieldTypeDescriptor<?, ?> fieldType : unsupportedFieldTypes ) {
+				parameters.add( Arguments.of( index, fieldType ) );
+			}
+		}
+
+		public static List<? extends Arguments> params() {
+			return parameters;
+		}
+
+		@Override
+		protected void tryProjection(SearchProjectionFactory<?, ?> f, String fieldPath) {
+			f.distance( fieldPath, GeoPoint.of( 0.0, 0.0 ) );
+		}
+
+		@Override
+		protected String projectionTrait() {
+			return "projection:distance";
+		}
+	}
+
+	@Nested
+	class ProjectableIT extends ProjectableConfigured {
+		// JDK 11 does not allow static fields in non-static inner class and JUnit does not allow running @Nested tests in static inner classes...
+	}
+
+	abstract static class ProjectableConfigured extends AbstractProjectionProjectableIT {
+		private static final SimpleMappedIndex<ProjectableDefaultIndexBinding> projectableDefaultIndex =
+				SimpleMappedIndex.of( root -> new ProjectableDefaultIndexBinding( root, supportedFieldTypes ) )
+						.name( "projectableDefault" );
+		private static final SimpleMappedIndex<ProjectableYesIndexBinding> projectableYesIndex =
+				SimpleMappedIndex.of( root -> new ProjectableYesIndexBinding( root, supportedFieldTypes ) )
+						.name( "projectableYes" );
+
+		private static final SimpleMappedIndex<ProjectableNoIndexBinding> projectableNoIndex =
+				SimpleMappedIndex.of( root -> new ProjectableNoIndexBinding( root, supportedFieldTypes ) )
+						.name( "projectableNo" );
+
+		private static final List<Arguments> parameters = new ArrayList<>();
+		static {
+			for ( FieldTypeDescriptor<?, ?> fieldType : supportedFieldTypes ) {
+				parameters.add( Arguments.of( projectableDefaultIndex, projectableYesIndex, projectableNoIndex, fieldType ) );
+			}
+		}
+
+		public static List<? extends Arguments> params() {
+			return parameters;
+		}
+
+		@Override
+		protected void tryProjection(SearchProjectionFactory<?, ?> f, String fieldPath, FieldTypeDescriptor<?, ?> fieldType) {
+			f.distance( fieldPath, GeoPoint.of( 0.0, 0.0 ) );
+		}
+
+		@Override
+		protected String projectionTrait() {
+			return "projection:distance";
+		}
 	}
 }

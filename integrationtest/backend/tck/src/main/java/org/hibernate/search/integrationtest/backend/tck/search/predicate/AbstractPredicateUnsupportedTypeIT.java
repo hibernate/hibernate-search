@@ -27,7 +27,7 @@ public abstract class AbstractPredicateUnsupportedTypeIT {
 
 	@ParameterizedTest(name = "{1}")
 	@MethodSource("params")
-	void unsupported(SimpleMappedIndex<IndexBinding> index, FieldTypeDescriptor<?, ?> fieldType) {
+	void use(SimpleMappedIndex<IndexBinding> index, FieldTypeDescriptor<?, ?> fieldType) {
 		SearchPredicateFactory f = index.createScope().predicate();
 
 		String fieldPath = index.binding().field.get( fieldType ).relativeFieldName;
@@ -35,8 +35,8 @@ public abstract class AbstractPredicateUnsupportedTypeIT {
 		assertThatThrownBy( () -> tryPredicate( f, fieldPath ) )
 				.isInstanceOf( SearchException.class )
 				.hasMessageContainingAll(
-						"Cannot use '" + predicateNameInErrorMessage() + "' on field '" + fieldPath + "'",
-						"'" + predicateNameInErrorMessage() + "' is not available for fields of this type"
+						"Cannot use '" + predicateTrait() + "' on field '" + fieldPath + "'",
+						"'" + predicateTrait() + "' is not available for fields of this type"
 				)
 				.satisfies( FailureReportUtils.hasContext(
 						EventContexts.fromIndexFieldAbsolutePath( fieldPath )
@@ -45,7 +45,7 @@ public abstract class AbstractPredicateUnsupportedTypeIT {
 
 	protected abstract void tryPredicate(SearchPredicateFactory f, String fieldPath);
 
-	protected abstract String predicateNameInErrorMessage();
+	protected abstract String predicateTrait();
 
 	public static final class IndexBinding {
 		private final SimpleFieldModelsByType field;

@@ -45,7 +45,7 @@ import org.junit.jupiter.api.extension.RegisterExtension;
 
 /**
  * Generic tests for sorts. More specific tests can be found in other classes,
- * such as {@link FieldSortBaseIT} or {@link DistanceSortBaseIT}.
+ * such as {@link FieldSortBaseIT} or {@link DistanceSortSpecificsIT}.
  */
 class SearchSortIT {
 

@@ -58,7 +58,8 @@ class SpatialWithinBoundingBoxPredicateBaseIT {
 						InObjectFieldConfigured.mainIndex, InObjectFieldConfigured.missingFieldIndex,
 						ScoreConfigured.index,
 						InvalidFieldConfigured.index, UnsupportedTypeConfigured.index,
-						SearchableConfigured.searchableYesIndex, SearchableConfigured.searchableNoIndex,
+						SearchableConfigured.searchableDefaultIndex, SearchableConfigured.searchableYesIndex,
+						SearchableConfigured.searchableNoIndex,
 						ArgumentCheckingConfigured.index,
 						TypeCheckingNoConversionConfigured.index, TypeCheckingNoConversionConfigured.compatibleIndex,
 						TypeCheckingNoConversionConfigured.rawFieldCompatibleIndex,
@@ -295,7 +296,7 @@ class SpatialWithinBoundingBoxPredicateBaseIT {
 		}
 
 		@Override
-		protected String predicateNameInErrorMessage() {
+		protected String predicateTrait() {
 			return "predicate:spatial:within-bounding-box";
 		}
 	}
@@ -329,7 +330,7 @@ class SpatialWithinBoundingBoxPredicateBaseIT {
 		}
 
 		@Override
-		protected String predicateNameInErrorMessage() {
+		protected String predicateTrait() {
 			return "predicate:spatial:within-bounding-box";
 		}
 	}
@@ -340,6 +341,9 @@ class SpatialWithinBoundingBoxPredicateBaseIT {
 	}
 
 	abstract static class SearchableConfigured extends AbstractPredicateSearchableIT {
+		private static final SimpleMappedIndex<SearchableDefaultIndexBinding> searchableDefaultIndex =
+				SimpleMappedIndex.of( root -> new SearchableDefaultIndexBinding( root, supportedFieldTypes ) )
+						.name( "searchableDefault" );
 		private static final SimpleMappedIndex<SearchableYesIndexBinding> searchableYesIndex =
 				SimpleMappedIndex.of( root -> new SearchableYesIndexBinding( root, supportedFieldTypes ) )
 						.name( "searchableYes" );
@@ -349,7 +353,8 @@ class SpatialWithinBoundingBoxPredicateBaseIT {
 						.name( "searchableNo" );
 
 		public static List<? extends Arguments> params() {
-			return Arrays.asList( Arguments.of( searchableYesIndex, searchableNoIndex, supportedFieldType ) );
+			return Arrays.asList(
+					Arguments.of( searchableDefaultIndex, searchableYesIndex, searchableNoIndex, supportedFieldType ) );
 		}
 
 		@Override
@@ -360,7 +365,7 @@ class SpatialWithinBoundingBoxPredicateBaseIT {
 		}
 
 		@Override
-		protected String predicateNameInErrorMessage() {
+		protected String predicateTrait() {
 			return "predicate:spatial:within-bounding-box";
 		}
 	}
@@ -431,7 +436,7 @@ class SpatialWithinBoundingBoxPredicateBaseIT {
 		}
 
 		@Override
-		protected String predicateNameInErrorMessage() {
+		protected String predicateTrait() {
 			return "predicate:spatial:within-bounding-box";
 		}
 	}

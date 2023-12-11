@@ -174,7 +174,7 @@ public abstract class AbstractPredicateTypeCheckingNoConversionIT<V extends Abst
 				.isInstanceOf( SearchException.class )
 				.hasMessageContainingAll(
 						"Inconsistent configuration for field '" + fieldPath + "' in a search query across multiple indexes",
-						"Inconsistent support for '" + predicateNameInErrorMessage() + "'"
+						"Inconsistent support for '" + predicateTrait() + "'"
 				)
 				.satisfies( FailureReportUtils.hasContext(
 						EventContexts.fromIndexNames( index.name(), incompatibleIndex.name() )
@@ -187,7 +187,7 @@ public abstract class AbstractPredicateTypeCheckingNoConversionIT<V extends Abst
 	protected abstract PredicateFinalStep predicate(SearchPredicateFactory f, String field0Path, String field1Path,
 			int matchingDocOrdinal, DataSet<?, V> dataSet);
 
-	protected abstract String predicateNameInErrorMessage();
+	protected abstract String predicateTrait();
 
 	protected final String defaultDslConverterField0Path(SimpleMappedIndex<IndexBinding> index, DataSet<?, V> dataSet) {
 		return index.binding().defaultDslConverterField0.get( dataSet.fieldType ).relativeFieldName;

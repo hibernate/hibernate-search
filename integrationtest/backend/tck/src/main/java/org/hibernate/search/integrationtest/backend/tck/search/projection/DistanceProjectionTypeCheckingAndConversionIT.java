@@ -9,7 +9,6 @@ package org.hibernate.search.integrationtest.backend.tck.search.projection;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.hibernate.search.integrationtest.backend.tck.testsupport.types.values.IndexableGeoPointWithDistanceFromCenterValues.CENTER_POINT_1;
 import static org.hibernate.search.util.impl.integrationtest.common.assertion.SearchResultAssert.assertThatQuery;
-import static org.junit.jupiter.api.Assumptions.assumeFalse;
 
 import org.hibernate.search.engine.backend.document.DocumentElement;
 import org.hibernate.search.engine.backend.document.IndexObjectFieldReference;
@@ -28,7 +27,6 @@ import org.hibernate.search.integrationtest.backend.tck.testsupport.types.FieldT
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.GeoPointFieldTypeDescriptor;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.values.IndexableGeoPointWithDistanceFromCenterValues;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.SimpleFieldModel;
-import org.hibernate.search.integrationtest.backend.tck.testsupport.util.TckConfiguration;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.ValueWrapper;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.extension.SearchSetupHelper;
 import org.hibernate.search.util.common.SearchException;
@@ -81,40 +79,6 @@ class DistanceProjectionTypeCheckingAndConversionIT {
 				.setup();
 
 		initData();
-	}
-
-	@Test
-	void nonProjectable() {
-		StubMappingScope scope = mainIndex.createScope();
-
-		String fieldPath = getNonProjectableFieldPath();
-
-		assertThatThrownBy( () -> scope.projection()
-				.distance( fieldPath, CENTER_POINT_1 ).toProjection() )
-				.isInstanceOf( SearchException.class )
-				.hasMessageContainingAll(
-						"Cannot use 'projection:distance' on field '" + fieldPath + "'",
-						"Make sure the field is marked as searchable/sortable/projectable/aggregable/highlightable (whichever is relevant)"
-				);
-	}
-
-	@Test
-	void projectableDefault() {
-		assumeFalse(
-				TckConfiguration.get().getBackendFeatures().fieldsProjectableByDefault(),
-				"Skipping this test as the backend makes fields projectable by default."
-		);
-		StubMappingScope scope = mainIndex.createScope();
-
-		String fieldPath = getProjectableDefaultFieldPath();
-
-		assertThatThrownBy( () -> scope.projection()
-				.distance( fieldPath, CENTER_POINT_1 ).toProjection() )
-				.isInstanceOf( SearchException.class )
-				.hasMessageContainingAll(
-						"Cannot use 'projection:distance' on field '" + fieldPath + "'",
-						"Make sure the field is marked as searchable/sortable/projectable/aggregable/highlightable (whichever is relevant)"
-				);
 	}
 
 	@Test
@@ -285,14 +249,6 @@ class DistanceProjectionTypeCheckingAndConversionIT {
 		return mainIndex.binding().fieldWithConverterModel.relativeFieldName;
 	}
 
-	private String getNonProjectableFieldPath() {
-		return mainIndex.binding().fieldWithProjectionDisabledModel.relativeFieldName;
-	}
-
-	private String getProjectableDefaultFieldPath() {
-		return mainIndex.binding().fieldWithDefaultProjectionModel.relativeFieldName;
-	}
-
 	private static GeoPoint getFieldValue(int documentNumber) {
 		return IndexableGeoPointWithDistanceFromCenterValues.INSTANCE.getSingle().get( documentNumber - 1 );
 	}
@@ -345,8 +301,6 @@ class DistanceProjectionTypeCheckingAndConversionIT {
 	private static class IndexBinding {
 		final SimpleFieldModel<GeoPoint> fieldModel;
 		final SimpleFieldModel<GeoPoint> fieldWithConverterModel;
-		final SimpleFieldModel<GeoPoint> fieldWithProjectionDisabledModel;
-		final SimpleFieldModel<GeoPoint> fieldWithDefaultProjectionModel;
 		final SimpleFieldModel<GeoPoint> fieldWithMultipleValuesModel;
 
 		final ObjectBinding flattenedObject;
@@ -362,10 +316,6 @@ class DistanceProjectionTypeCheckingAndConversionIT {
 					.map( root, "converted", c -> c.projectable( Projectable.YES )
 							.dslConverter( ValueWrapper.class, ValueWrapper.toDocumentValueConverter() )
 							.projectionConverter( ValueWrapper.class, ValueWrapper.fromDocumentValueConverter() ) );
-			fieldWithProjectionDisabledModel = SimpleFieldModel.mapper( fieldType )
-					.map( root, "nonProjectable", c -> c.projectable( Projectable.NO ) );
-			fieldWithDefaultProjectionModel = SimpleFieldModel.mapper( fieldType )
-					.map( root, "projectableDefault", c -> c.projectable( Projectable.DEFAULT ) );
 			fieldWithMultipleValuesModel = SimpleFieldModel.mapper( fieldType )
 					.mapMultiValued( root, "multiValued", c -> c.projectable( Projectable.YES ) );
 

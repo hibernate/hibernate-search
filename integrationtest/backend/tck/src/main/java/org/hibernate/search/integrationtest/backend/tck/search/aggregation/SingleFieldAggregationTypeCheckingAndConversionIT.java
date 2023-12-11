@@ -340,12 +340,29 @@ class SingleFieldAggregationTypeCheckingAndConversionIT<F> {
 
 	@ParameterizedTest(name = "{0}")
 	@MethodSource("params")
+	void aggregable_default_use(SupportedSingleFieldAggregationExpectations<F> expectations, DataSet<F> dataSet) {
+		String fieldPath =
+				mainIndex.binding().fieldWithAggregableDefaultModels.get( expectations.fieldType() ).relativeFieldName;
+
+		AggregationScenario<?> scenario =
+				expectations.withFieldType( TypeAssertionHelper.identity( expectations.fieldType() ) );
+
+		assertThatThrownBy( () -> scenario.setup( mainIndex.createScope().aggregation(), fieldPath ) )
+				.isInstanceOf( SearchException.class )
+				.hasMessageContainingAll(
+						"Cannot use 'aggregation:" + expectations.aggregationName() + "' on field '" + fieldPath + "'",
+						"Make sure the field is marked as searchable/sortable/projectable/aggregable/highlightable (whichever is relevant)"
+				);
+	}
+
+	@ParameterizedTest(name = "{0}")
+	@MethodSource("params")
 	@TestForIssue(jiraKey = "HSEARCH-1748")
 	@PortedFromSearch5(
 			original = "org.hibernate.search.test.query.facet.FacetUnknownFieldFailureTest.testKnownFieldNameNotConfiguredForFacetingThrowsException")
-	void aggregationsDisabled(SupportedSingleFieldAggregationExpectations<F> expectations, DataSet<F> dataSet) {
+	void aggregable_no_use(SupportedSingleFieldAggregationExpectations<F> expectations, DataSet<F> dataSet) {
 		String fieldPath =
-				mainIndex.binding().fieldWithAggregationDisabledModels.get( expectations.fieldType() ).relativeFieldName;
+				mainIndex.binding().fieldWithAggregableNoModels.get( expectations.fieldType() ).relativeFieldName;
 
 		AggregationScenario<?> scenario =
 				expectations.withFieldType( TypeAssertionHelper.identity( expectations.fieldType() ) );
@@ -595,7 +612,8 @@ class SingleFieldAggregationTypeCheckingAndConversionIT<F> {
 	private static class IndexBinding {
 		final SimpleFieldModelsByType fieldModels;
 		final SimpleFieldModelsByType fieldWithConverterModels;
-		final SimpleFieldModelsByType fieldWithAggregationDisabledModels;
+		final SimpleFieldModelsByType fieldWithAggregableDefaultModels;
+		final SimpleFieldModelsByType fieldWithAggregableNoModels;
 
 		final ObjectBinding flattenedObject;
 		final ObjectBinding nestedObject;
@@ -607,8 +625,10 @@ class SingleFieldAggregationTypeCheckingAndConversionIT<F> {
 					"converted_", c -> c.aggregable( Aggregable.YES )
 							.dslConverter( ValueWrapper.class, ValueWrapper.toDocumentValueConverter() )
 							.projectionConverter( ValueWrapper.class, ValueWrapper.fromDocumentValueConverter() ) );
-			fieldWithAggregationDisabledModels = SimpleFieldModelsByType.mapAll( supportedFieldTypes, root,
-					"nonAggregable_", c -> c.aggregable( Aggregable.NO ) );
+			fieldWithAggregableDefaultModels = SimpleFieldModelsByType.mapAll( supportedFieldTypes, root,
+					"aggregableDefault_", c -> c.aggregable( Aggregable.NO ) );
+			fieldWithAggregableNoModels = SimpleFieldModelsByType.mapAll( supportedFieldTypes, root,
+					"aggreableNo_", c -> c.aggregable( Aggregable.NO ) );
 
 			flattenedObject = new ObjectBinding( root, "flattenedObject", ObjectStructure.FLATTENED );
 			nestedObject = new ObjectBinding( root, "nestedObject", ObjectStructure.NESTED );

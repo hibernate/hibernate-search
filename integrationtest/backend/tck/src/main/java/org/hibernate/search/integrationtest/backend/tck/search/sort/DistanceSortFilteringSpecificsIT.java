@@ -33,7 +33,7 @@ import org.junit.jupiter.api.extension.RegisterExtension;
 /**
  * Tests behavior related to
  * {@link org.hibernate.search.engine.search.sort.dsl.SortFilterStep#filter(Function) filtering}
- * that is not tested in {@link DistanceSortBaseIT}.
+ * that is not tested in {@link DistanceSortSpecificsIT}.
  */
 
 class DistanceSortFilteringSpecificsIT {

@@ -54,7 +54,7 @@ class ObjectProjectionSpecificsIT {
 	}
 
 	@Test
-	void nonObjectFieldPath() {
+	void use_nonObjectFieldPath() {
 		assertThatThrownBy( () -> index.createScope().projection().object( "level1.field1" ) )
 				.hasMessageContainingAll( "Cannot use 'projection:object' on field 'level1.field1'" );
 	}
