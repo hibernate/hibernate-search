@@ -27,6 +27,7 @@ import org.hibernate.search.engine.backend.types.dsl.StringIndexFieldTypeOptions
 import org.hibernate.search.engine.backend.types.dsl.VectorFieldTypeOptionsStep;
 import org.hibernate.search.engine.mapper.mapping.building.spi.IndexFieldTypeDefaultsProvider;
 import org.hibernate.search.engine.spatial.GeoPoint;
+import org.hibernate.search.util.common.SearchException;
 
 public class StubIndexFieldTypeFactory implements IndexFieldTypeFactory {
 
@@ -167,7 +168,7 @@ public class StubIndexFieldTypeFactory implements IndexFieldTypeFactory {
 		if ( float[].class.equals( valueType ) ) {
 			return (VectorFieldTypeOptionsStep<?, F>) asFloatVector( dimension );
 		}
-		return new StubVectorFieldTypeOptionsStep<>( dimension, valueType );
+		throw new SearchException( "No built-in vector index field type for class: '" + valueType.getName() + "'." );
 	}
 
 	@Override
