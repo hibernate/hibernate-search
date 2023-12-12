@@ -16,6 +16,7 @@ import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
 import org.hibernate.search.backend.elasticsearch.gson.impl.JsonAccessor;
+import org.hibernate.search.backend.elasticsearch.gson.impl.JsonObjectAccessor;
 import org.hibernate.search.backend.elasticsearch.logging.impl.Log;
 import org.hibernate.search.backend.elasticsearch.lowlevel.query.impl.Queries;
 import org.hibernate.search.backend.elasticsearch.orchestration.impl.ElasticsearchParallelWorkOrchestrator;
@@ -73,6 +74,7 @@ public class ElasticsearchSearchQueryBuilder<H>
 
 	private final Set<String> routingKeys;
 	private JsonObject jsonPredicate;
+	private JsonElement jsonKnn;
 	private JsonArray jsonSort;
 	private Map<DistanceSortKey, Integer> distanceSorts;
 	private Map<AggregationKey<?>, ElasticsearchSearchAggregation<?>> aggregations;
@@ -111,6 +113,7 @@ public class ElasticsearchSearchQueryBuilder<H>
 	public void predicate(SearchPredicate predicate) {
 		ElasticsearchSearchPredicate elasticsearchPredicate = ElasticsearchSearchPredicate.from( scope, predicate );
 		this.jsonPredicate = elasticsearchPredicate.toJsonQuery( rootPredicateContext );
+		this.jsonKnn = elasticsearchPredicate.toJsonKnn( rootPredicateContext );
 	}
 
 	@Override
@@ -237,6 +240,10 @@ public class ElasticsearchSearchQueryBuilder<H>
 			payload.add( "query", jsonQuery );
 		}
 
+		if ( jsonKnn != null ) {
+			payload.add( "knn", addFiltersToKnn( jsonKnn, filters ) );
+		}
+
 		if ( jsonSort != null ) {
 			payload.add( "sort", jsonSort );
 		}
@@ -286,5 +293,24 @@ public class ElasticsearchSearchQueryBuilder<H>
 				timeoutManager,
 				scrollTimeout, totalHitCountThreshold
 		);
+	}
+
+	private static JsonElement addFiltersToKnn(JsonElement jsonKnn, JsonArray filters) {
+		if ( filters == null || filters.isEmpty() ) {
+			return jsonKnn;
+		}
+
+		if ( jsonKnn.isJsonArray() ) {
+			for ( JsonElement jsonElement : jsonKnn.getAsJsonArray() ) {
+				addFiltersToKnn( jsonElement.getAsJsonObject(), filters );
+			}
+		}
+		return jsonKnn;
+	}
+
+	private static JsonElement addFiltersToKnn(JsonObject jsonKnn, JsonArray filters) {
+		JsonObjectAccessor filterAccessor = JsonAccessor.root().property( "filter" ).asObject();
+		filterAccessor.set( jsonKnn, Queries.boolFilter( filterAccessor.getOrCreate( jsonKnn, Queries::matchAll ), filters ) );
+		return jsonKnn;
 	}
 }

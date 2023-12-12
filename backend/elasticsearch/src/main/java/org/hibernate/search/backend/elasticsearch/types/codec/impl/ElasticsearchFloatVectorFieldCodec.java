@@ -35,4 +35,9 @@ public class ElasticsearchFloatVectorFieldCodec extends AbstractElasticsearchVec
 		}
 		return result;
 	}
+
+	@Override
+	public Class<?> vectorElementsType() {
+		return float.class;
+	}
 }

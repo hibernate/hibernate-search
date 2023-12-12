@@ -731,4 +731,8 @@ public interface Log extends BasicLogger {
 	@Message(id = ID_OFFSET + 179, value = "Invalid index field type: missing vector dimension."
 			+ " Define the vector dimension explicitly. %1$s")
 	SearchException nullVectorDimension(String hint, @Param EventContext eventContext);
+
+	@Message(id = ID_OFFSET + 180, value = "A Lucene backend does not allow specifying the `number of candidates` option. "
+			+ "This option is only applicable to an Elasticsearch distribution of an Elasticsearch backend.")
+	SearchException knnNumberOfCandidatesUnsupportedOption();
 }

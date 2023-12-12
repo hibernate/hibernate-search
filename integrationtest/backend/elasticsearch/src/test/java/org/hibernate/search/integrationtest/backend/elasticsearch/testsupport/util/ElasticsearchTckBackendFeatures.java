@@ -255,4 +255,13 @@ public class ElasticsearchTckBackendFeatures extends TckBackendFeatures {
 	public boolean supportsVectorSearchIndexNullsAs() {
 		return false;
 	}
+
+	@Override
+	public boolean supportsVectorSearchInsideOtherPredicates() {
+		return isActualVersion(
+				es -> false,
+				os -> true,
+				aoss -> false
+		);
+	}
 }

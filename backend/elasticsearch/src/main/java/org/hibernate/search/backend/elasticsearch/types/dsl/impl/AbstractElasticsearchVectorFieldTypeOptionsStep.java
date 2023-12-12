@@ -11,6 +11,7 @@ import java.lang.invoke.MethodHandles;
 import org.hibernate.search.backend.elasticsearch.logging.impl.Log;
 import org.hibernate.search.backend.elasticsearch.lowlevel.index.mapping.impl.PropertyMapping;
 import org.hibernate.search.backend.elasticsearch.search.predicate.impl.ElasticsearchExistsPredicate;
+import org.hibernate.search.backend.elasticsearch.search.predicate.impl.ElasticsearchKnnPredicate;
 import org.hibernate.search.backend.elasticsearch.search.projection.impl.ElasticsearchFieldProjection;
 import org.hibernate.search.backend.elasticsearch.types.codec.impl.AbstractElasticsearchVectorFieldCodec;
 import org.hibernate.search.backend.elasticsearch.types.impl.ElasticsearchIndexValueFieldType;
@@ -107,7 +108,7 @@ abstract class AbstractElasticsearchVectorFieldTypeOptionsStep<
 		if ( resolvedSearchable ) {
 			builder.searchable( true );
 			builder.queryElementFactory( PredicateTypeKeys.EXISTS, new ElasticsearchExistsPredicate.Factory<>() );
-			// builder.queryElementFactory( PredicateTypeKeys.KNN, new ElasticsearchKnnPredicate.DefaultFactory<>() );
+			builder.queryElementFactory( PredicateTypeKeys.KNN, new ElasticsearchKnnPredicate.Factory<>( codec ) );
 		}
 
 		if ( resolvedProjectable ) {

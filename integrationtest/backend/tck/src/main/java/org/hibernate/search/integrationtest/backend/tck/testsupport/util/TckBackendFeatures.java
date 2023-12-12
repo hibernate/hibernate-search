@@ -139,4 +139,8 @@ public abstract class TckBackendFeatures implements StubMappingBackendFeatures {
 	public boolean supportsVectorSearchIndexNullsAs() {
 		return true;
 	}
+
+	public boolean supportsVectorSearchInsideOtherPredicates() {
+		return true;
+	}
 }

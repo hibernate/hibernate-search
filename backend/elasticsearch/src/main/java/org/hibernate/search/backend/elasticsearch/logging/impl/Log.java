@@ -855,4 +855,23 @@ public interface Log extends BasicLogger {
 
 	@Message(id = ID_OFFSET + 181, value = "Fields of this type cannot be multivalued.")
 	SearchException multiValuedFieldNotAllowed(@Param EventContext context);
+
+	@Message(id = ID_OFFSET + 181, value = "Vector field '%1$s' is defined as a '%2$s' array."
+			+ " Matching against '%3$s' array is unsupported."
+			+ " Use the array of the same type as the vector field.")
+	SearchException vectorKnnMatchVectorTypeDiffersFromField(String absoluteFieldPath,
+			@FormatWith(ClassFormatter.class) Class<?> expected, @FormatWith(ClassFormatter.class) Class<?> actual);
+
+	@Message(id = ID_OFFSET + 182, value = "Vector field '%1$s' is defined as a vector with '%2$s' dimensions (array length)."
+			+ " Matching against an array with length of '%3$s' is unsupported."
+			+ " Use the array of the same size as the vector field.")
+	SearchException vectorKnnMatchVectorDimensionDiffersFromField(String absoluteFieldPath, int expected, int actual);
+
+	@Message(id = ID_OFFSET + 183, value = "A knn predicate can only be added as a should clause to the bool predicate.")
+	SearchException knnPredicateCanOnlyBeShouldClause();
+
+	@Message(id = ID_OFFSET + 184, value = "A knn predicate cannot be added. "
+			+ "With Elasticsearch, a knn predicate can only be a top-level predicate or a should clause of a top-level bool predicate.")
+	SearchException cannotBeNestedPredicate();
+
 }

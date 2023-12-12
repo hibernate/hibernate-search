@@ -87,13 +87,13 @@ abstract class AccumulatingSourceExtractor<E, V, A, P>
 			// Present, but null
 			return accumulator.accumulate( accumulated, extract( projectionHitMapper, hit, fieldValue, context ) );
 		}
-		else if ( fieldValue.isJsonArray() ) {
-			for ( JsonElement childElement : fieldValue.getAsJsonArray() ) {
-				accumulated = accumulator.accumulate( accumulated,
-						extract( projectionHitMapper, hit, childElement, context ) );
-			}
-			return accumulated;
-		}
+		//		else if ( fieldValue.isJsonArray() ) {
+		//			for ( JsonElement childElement : fieldValue.getAsJsonArray() ) {
+		//				accumulated = accumulator.accumulate( accumulated,
+		//						extract( projectionHitMapper, hit, childElement, context ) );
+		//			}
+		//			return accumulated;
+		//		}
 		else {
 			return accumulator.accumulate( accumulated, extract( projectionHitMapper, hit, fieldValue, context ) );
 		}

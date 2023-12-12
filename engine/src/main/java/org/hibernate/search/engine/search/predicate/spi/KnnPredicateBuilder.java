@@ -18,6 +18,8 @@ public interface KnnPredicateBuilder extends SearchPredicateBuilder {
 
 	void filter(SearchPredicate filter);
 
+	void numberOfCandidates(int numberOfCandidates);
+
 	/**
 	 * @return An implementation-specific view of this builder,
 	 * allowing the backend to call a {@code build()} method in particular.

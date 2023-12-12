@@ -112,6 +112,11 @@ public class LuceneKnnPredicate extends AbstractLuceneSingleFieldPredicate imple
 		}
 
 		@Override
+		public void numberOfCandidates(int numberOfCandidates) {
+			throw log.knnNumberOfCandidatesUnsupportedOption();
+		}
+
+		@Override
 		public SearchPredicate build() {
 			return new LuceneKnnPredicate( this );
 		}

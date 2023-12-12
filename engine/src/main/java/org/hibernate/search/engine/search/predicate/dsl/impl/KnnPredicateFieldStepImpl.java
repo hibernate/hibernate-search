@@ -63,6 +63,12 @@ public final class KnnPredicateFieldStepImpl extends AbstractPredicateFinalStep
 	}
 
 	@Override
+	public KnnPredicateOptionsStep numberOfCandidates(int numberOfCandidates) {
+		this.builder.numberOfCandidates( numberOfCandidates );
+		return this;
+	}
+
+	@Override
 	public KnnPredicateOptionsStep matching(byte... vector) {
 		this.builder.vector( vector );
 		return this;

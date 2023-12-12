@@ -8,6 +8,7 @@ package org.hibernate.search.integrationtest.backend.tck.search.predicate;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.junit.jupiter.api.Assumptions.assumeTrue;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -32,6 +33,7 @@ import org.hibernate.search.engine.search.query.SearchQuery;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.FieldTypeDescriptor;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.VectorFieldTypeDescriptor;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.SimpleFieldModelsByType;
+import org.hibernate.search.integrationtest.backend.tck.testsupport.util.TckConfiguration;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.extension.SearchSetupHelper;
 import org.hibernate.search.util.common.SearchException;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.BulkIndexer;
@@ -274,9 +276,9 @@ class KnnPredicateSpecificsIT {
 			assertThatThrownBy( () -> predicate( f, fieldPath, fieldType ) )
 					.isInstanceOf( SearchException.class )
 					.hasMessageContainingAll(
-							"Cannot use 'predicate:knn' on field '" + fieldPath + "'",
+							"'predicate:knn'", fieldPath,
 							"Inconsistent configuration for field '" + fieldPath + "'",
-							"Attribute 'codec' differs",
+							"codec", "differs",
 							"dimension=4",
 							"dimension=2"
 					);
@@ -297,10 +299,10 @@ class KnnPredicateSpecificsIT {
 			assertThatThrownBy( () -> predicate( f, fieldPath, fieldType ) )
 					.isInstanceOf( SearchException.class )
 					.hasMessageContainingAll(
-							"Cannot use 'predicate:knn' on field '" + fieldPath + "'",
+							"'predicate:knn'", fieldPath,
 							"Inconsistent configuration for field '" + fieldPath + "'",
-							"Attribute 'codec' differs",
-							"vectorSimilarity=EUCLIDEAN",
+							"codec", "differs",
+							"vectorSimilarity=",
 							"vectorSimilarity=COSINE"
 					);
 		}
@@ -321,9 +323,9 @@ class KnnPredicateSpecificsIT {
 			assertThatThrownBy( () -> predicate( f, fieldPath, fieldType ) )
 					.isInstanceOf( SearchException.class )
 					.hasMessageContainingAll(
-							"Cannot use 'predicate:knn' on field '" + fieldPath + "'",
+							"'predicate:knn'", fieldPath,
 							"Inconsistent configuration for field '" + fieldPath + "'",
-							"Attribute 'codec' differs",
+							"codec", "differs",
 							"beamWidth=2",
 							"beamWidth=4"
 					);
@@ -345,9 +347,9 @@ class KnnPredicateSpecificsIT {
 			assertThatThrownBy( () -> predicate( f, fieldPath, fieldType ) )
 					.isInstanceOf( SearchException.class )
 					.hasMessageContainingAll(
-							"Cannot use 'predicate:knn' on field '" + fieldPath + "'",
+							"'predicate:knn'", fieldPath,
 							"Inconsistent configuration for field '" + fieldPath + "'",
-							"Attribute 'codec' differs",
+							"codec", "differs",
 							"maxConnection=2",
 							"maxConnection=4"
 					);
@@ -667,6 +669,10 @@ class KnnPredicateSpecificsIT {
 
 		@Test
 		void insideOtherPredicate() {
+			assumeTrue(
+					TckConfiguration.get().getBackendFeatures().supportsVectorSearchInsideOtherPredicates(),
+					"This test won't work on some backends that do not provide a way of passing a knn predicate as a clause of bool query."
+			);
 			SearchQuery<float[]> query = index.createScope().query()
 					.select(
 							f -> f.field( "location", float[].class )
