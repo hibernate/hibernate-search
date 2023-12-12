@@ -6,10 +6,13 @@
  */
 package org.hibernate.search.integrationtest.backend.tck.testsupport.types;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 import java.util.Random;
+import java.util.TreeSet;
+import java.util.stream.IntStream;
 
 import org.hibernate.search.engine.backend.types.dsl.IndexFieldTypeFactory;
 import org.hibernate.search.engine.backend.types.dsl.VectorFieldTypeOptionsStep;
@@ -49,16 +52,17 @@ public class ByteVectorFieldTypeDescriptor extends VectorFieldTypeDescriptor<byt
 
 	@Override
 	protected List<byte[]> createUniquelyMatchableValues() {
-		return Arrays.asList(
-				arrayOf( size, Byte.MIN_VALUE ),
-				arrayOf( size, (byte) -42 ),
-				arrayOf( size, (byte) -1 ),
-				arrayOf( size, (byte) 0 ),
-				arrayOf( size, (byte) 1 ),
-				arrayOf( size, (byte) 3 ),
-				arrayOf( size, (byte) 42 ),
-				arrayOf( size, Byte.MAX_VALUE )
-		);
+		// need to make sure that we'll get only unique arrays;
+		TreeSet<byte[]> set = new TreeSet<>( Arrays::compare );
+		set.add( arrayOf( size, Byte.MIN_VALUE ) );
+		set.add( arrayOf( size, (byte) -42 ) );
+		set.add( arrayOf( size, (byte) -1 ) );
+		set.add( arrayOf( size, (byte) 0 ) );
+		set.add( arrayOf( size, (byte) 1 ) );
+		set.add( arrayOf( size, (byte) 3 ) );
+		set.add( arrayOf( size, (byte) 42 ) );
+		set.add( arrayOf( size, Byte.MAX_VALUE ) );
+		return new ArrayList<>( set );
 	}
 
 	@Override
@@ -71,6 +75,13 @@ public class ByteVectorFieldTypeDescriptor extends VectorFieldTypeDescriptor<byt
 				arrayOf( size, (byte) 99 ),
 				arrayOf( size, (byte) 100 )
 		);
+	}
+
+	@Override
+	public List<byte[]> unitLengthVectors() {
+		return IntStream.range( 0, size )
+				.mapToObj( index -> unit( size, index ) )
+				.toList();
 	}
 
 	@Override
@@ -94,7 +105,17 @@ public class ByteVectorFieldTypeDescriptor extends VectorFieldTypeDescriptor<byt
 
 	private static byte[] arrayOf(int size, byte value) {
 		byte[] bytes = new byte[size];
-		Arrays.fill( bytes, value );
+		for ( int i = 0; i < size; i++ ) {
+			bytes[i] = (byte) ( ( i + value ) % size );
+		}
+
+		return bytes;
+	}
+
+	private static byte[] unit(int size, int index) {
+		byte[] bytes = new byte[size];
+		Arrays.fill( bytes, (byte) 0 );
+		bytes[index] = (byte) 1;
 		return bytes;
 	}
 }

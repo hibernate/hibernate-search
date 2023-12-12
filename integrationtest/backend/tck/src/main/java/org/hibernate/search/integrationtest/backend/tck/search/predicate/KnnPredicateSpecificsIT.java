@@ -8,7 +8,6 @@ package org.hibernate.search.integrationtest.backend.tck.search.predicate;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.junit.jupiter.api.Assumptions.assumeTrue;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -28,11 +27,11 @@ import org.hibernate.search.engine.backend.types.VectorSimilarity;
 import org.hibernate.search.engine.backend.types.dsl.SearchableProjectableIndexFieldTypeOptionsStep;
 import org.hibernate.search.engine.search.predicate.dsl.KnnPredicateOptionsStep;
 import org.hibernate.search.engine.search.predicate.dsl.SearchPredicateFactory;
+import org.hibernate.search.engine.search.projection.dsl.SearchProjectionFactory;
 import org.hibernate.search.engine.search.query.SearchQuery;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.FieldTypeDescriptor;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.VectorFieldTypeDescriptor;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.SimpleFieldModelsByType;
-import org.hibernate.search.integrationtest.backend.tck.testsupport.util.TckConfiguration;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.extension.SearchSetupHelper;
 import org.hibernate.search.util.common.SearchException;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.BulkIndexer;
@@ -59,10 +58,6 @@ class KnnPredicateSpecificsIT {
 
 	@BeforeAll
 	static void setup() {
-		assumeTrue(
-				TckConfiguration.get().getBackendFeatures().supportsVectorSearch(),
-				"These tests only make sense for a backend where Vector Search is supported and implemented."
-		);
 		setupHelper.start()
 				.withIndexes(
 						WrongVectorConfigured.index,
@@ -464,10 +459,10 @@ class KnnPredicateSpecificsIT {
 		protected KnnPredicateOptionsStep predicate(SearchPredicateFactory f, String fieldPath,
 				VectorFieldTypeDescriptor<?> fieldType) {
 			if ( fieldType.getJavaType() == byte[].class ) {
-				return f.knn( 2 ).field( fieldPath ).matching( (byte) 1, (byte) 1, (byte) 1, (byte) 1 );
+				return f.knn( 2 ).field( fieldPath ).matching( (byte) 1, (byte) 0, (byte) 0, (byte) 0 );
 			}
 			else {
-				return f.knn( 2 ).field( fieldPath ).matching( 1.0f, 1.0f, 1.0f, 1.0f );
+				return f.knn( 2 ).field( fieldPath ).matching( 1.0f, 0.0f, 0.0f, 0.0f );
 			}
 		}
 
@@ -490,7 +485,7 @@ class KnnPredicateSpecificsIT {
 
 			public void contribute(SimpleMappedIndex<IndexBinding> index, BulkIndexer indexer) {
 				int id = 0;
-				for ( F value : fieldType.getNonMatchingValues() ) {
+				for ( F value : fieldType.unitLengthVectors() ) {
 					indexer.add( docId( id++ ), routingKey, document -> initDocument( index, document, value ) );
 				}
 			}
@@ -614,7 +609,7 @@ class KnnPredicateSpecificsIT {
 							.field( "location" )
 							.matching( 5f, 4f )
 							.filter( f.range().field( "rating" ).between( 8, 10 ) )
-							.filter( f.terms().field( "parking" ).matchingAny( true ) )
+							.filter( fa -> fa.terms().field( "parking" ).matchingAny( true ) )
 					).toQuery();
 
 			List<float[]> result = query.fetchAll().hits();
@@ -646,6 +641,28 @@ class KnnPredicateSpecificsIT {
 			List<float[]> result = query.fetchAll().hits();
 
 			assertThat( result ).hasSize( 9 );
+		}
+
+		@Test
+		void knnAsKnnFilter() {
+			SearchQuery<Object> query = index.createScope().query()
+					.select(
+							SearchProjectionFactory::id
+					)
+					.where( f -> f.knn( 3 )
+							.field( "location" )
+							.matching( 5f, 4f )
+							.filter(
+									f.knn( 6 )
+											.field( "location" )
+											.matching( 6f, 3f )
+							)
+					).toQuery();
+
+			List<Object> result = query.fetchAll().hits();
+
+			assertThat( result ).hasSize( 3 )
+					.containsOnly( "ID:2", "ID:1", "ID:3" );
 		}
 
 		@Test
@@ -682,8 +699,7 @@ class KnnPredicateSpecificsIT {
 													.multi()
 									).asList()
 							).where(
-									f -> f.nested( "nested" )
-											.add( f.knn( 1 ).field( "nested.byteVector" ).matching( bytes( 2, (byte) -120 ) ) )
+									f -> f.knn( 1 ).field( "nested.byteVector" ).matching( bytes( 2, (byte) -120 ) )
 							).fetchAllHits()
 			).hasSize( 1 )
 					.element( 0 )
