@@ -24,5 +24,12 @@ public class PropertyMappingJsonAdapterFactory extends AbstractTypeMappingJsonAd
 		builder.add( "format", new FormatJsonAdapter() );
 		builder.add( "scalingFactor", Double.class );
 		builder.add( "termVector", String.class );
+		builder.add( "elementType", String.class );
+		builder.add( "dims", Integer.class );
+		builder.add( "similarity", String.class );
+		builder.add( "indexOptions", JsonElement.class );
+		builder.add( "dimension", Integer.class );
+		builder.add( "method", JsonElement.class );
+		builder.add( "dataType", String.class );
 	}
 }

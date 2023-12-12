@@ -88,8 +88,6 @@
                             </systemPropertyVariables>
                             <excludes>
                                 <exclude>org.hibernate.search.integrationtest.mapper.pojo.standalone.realbackend.schema.management.LuceneSchemaManagerExporterIT</exclude>
-                                <!-- Include once HSEARCH-4950 is implemented -->
-                                <exclude>org.hibernate.search.integrationtest.mapper.pojo.standalone.realbackend.mapping.VectorFieldIT</exclude>
                             </excludes>
                         </configuration>
                     </execution>

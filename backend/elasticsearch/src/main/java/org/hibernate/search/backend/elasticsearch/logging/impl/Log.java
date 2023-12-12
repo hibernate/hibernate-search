@@ -842,4 +842,14 @@ public interface Log extends BasicLogger {
 			+ " so index status requirements cannot be enforced.")
 	SearchException cannotRequireIndexStatus();
 
+	@Message(id = ID_OFFSET + 178, value = "No built-in vector index field type for class: '%1$s'.")
+	SearchException cannotGuessVectorFieldType(@FormatWith(ClassFormatter.class) Class<?> inputType,
+			@Param EventContext context);
+
+	@Message(id = ID_OFFSET + 179, value = "Specifying how to index null values is not supported by this backend.")
+	SearchException vectorFieldIndexNullAsNotSupported();
+
+	@Message(id = ID_OFFSET + 180, value = "Invalid index field type: missing vector dimension."
+			+ " Define the vector dimension explicitly. %1$s")
+	SearchException nullVectorDimension(String hint, @Param EventContext eventContext);
 }

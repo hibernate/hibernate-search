@@ -30,5 +30,7 @@ public final class DataTypes {
 	public static final String BOOLEAN = "boolean";
 	public static final String GEO_POINT = "geo_point";
 	public static final String SCALED_FLOAT = "scaled_float";
+	public static final String DENSE_VECTOR = "dense_vector";
+	public static final String KNN_VECTOR = "knn_vector";
 
 }

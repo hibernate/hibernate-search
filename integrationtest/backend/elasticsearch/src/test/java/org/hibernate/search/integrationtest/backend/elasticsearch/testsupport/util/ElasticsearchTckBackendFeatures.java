@@ -250,4 +250,9 @@ public class ElasticsearchTckBackendFeatures extends TckBackendFeatures {
 	public boolean supportsVectorSearch() {
 		return false;
 	}
+
+	@Override
+	public boolean supportsVectorSearchIndexNullsAs() {
+		return false;
+	}
 }

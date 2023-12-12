@@ -86,6 +86,52 @@ public class PropertyMapping extends AbstractTypeMapping {
 	@SerializedName("term_vector")
 	private String termVector;
 
+	/*
+	 * Dense vector datatype
+	 * https://www.elastic.co/guide/en/elasticsearch/reference/current/dense-vector.html
+	 */
+	@SerializedName("element_type")
+	private String elementType;
+
+	/*
+	 * Dense vector datatype
+	 * https://www.elastic.co/guide/en/elasticsearch/reference/current/dense-vector.html
+	 */
+	private Integer dims;
+
+	/*
+	 * Dense vector datatype
+	 * https://www.elastic.co/guide/en/elasticsearch/reference/current/dense-vector.html
+	 */
+	private String similarity;
+
+	/*
+	 * Dense vector datatype
+	 * https://www.elastic.co/guide/en/elasticsearch/reference/current/dense-vector.html
+	 */
+	@SerializedName("index_options")
+	private JsonElement indexOptions;
+
+	/*
+	 * k-NN vector datatype
+	 * https://opensearch.org/docs/latest/field-types/supported-field-types/knn-vector/
+	 */
+	private Integer dimension;
+
+	/*
+	 * k-NN vector datatype
+	 * https://opensearch.org/docs/latest/field-types/supported-field-types/knn-vector/
+	 */
+	private JsonElement method;
+
+	/*
+	 * k-NN vector datatype
+	 * https://opensearch.org/docs/latest/field-types/supported-field-types/knn-vector/
+	 */
+	@SerializedName("data_type")
+	private String dataType;
+
+
 	public String getType() {
 		return type;
 	}
@@ -172,5 +218,61 @@ public class PropertyMapping extends AbstractTypeMapping {
 
 	public void setTermVector(String termVector) {
 		this.termVector = termVector;
+	}
+
+	public String getElementType() {
+		return elementType;
+	}
+
+	public void setElementType(String elementType) {
+		this.elementType = elementType;
+	}
+
+	public Integer getDims() {
+		return dims;
+	}
+
+	public void setDims(Integer dims) {
+		this.dims = dims;
+	}
+
+	public String getSimilarity() {
+		return similarity;
+	}
+
+	public void setSimilarity(String similarity) {
+		this.similarity = similarity;
+	}
+
+	public JsonElement getIndexOptions() {
+		return indexOptions;
+	}
+
+	public void setIndexOptions(JsonElement indexOptions) {
+		this.indexOptions = indexOptions;
+	}
+
+	public Integer getDimension() {
+		return dimension;
+	}
+
+	public void setDimension(Integer dimension) {
+		this.dimension = dimension;
+	}
+
+	public JsonElement getMethod() {
+		return method;
+	}
+
+	public void setMethod(JsonElement method) {
+		this.method = method;
+	}
+
+	public String getDataType() {
+		return dataType;
+	}
+
+	public void setDataType(String dataType) {
+		this.dataType = dataType;
 	}
 }

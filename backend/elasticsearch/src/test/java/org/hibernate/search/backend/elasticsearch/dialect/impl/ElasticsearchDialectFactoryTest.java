@@ -17,6 +17,8 @@ import org.hibernate.search.backend.elasticsearch.ElasticsearchVersion;
 import org.hibernate.search.backend.elasticsearch.dialect.model.impl.Elasticsearch7ModelDialect;
 import org.hibernate.search.backend.elasticsearch.dialect.model.impl.Elasticsearch8ModelDialect;
 import org.hibernate.search.backend.elasticsearch.dialect.model.impl.ElasticsearchModelDialect;
+import org.hibernate.search.backend.elasticsearch.dialect.model.impl.OpenSearch1ModelDialect;
+import org.hibernate.search.backend.elasticsearch.dialect.model.impl.OpenSearch2ModelDialect;
 import org.hibernate.search.backend.elasticsearch.dialect.protocol.impl.Elasticsearch70ProtocolDialect;
 import org.hibernate.search.backend.elasticsearch.dialect.protocol.impl.Elasticsearch80ProtocolDialect;
 import org.hibernate.search.backend.elasticsearch.dialect.protocol.impl.Elasticsearch81ProtocolDialect;
@@ -251,7 +253,7 @@ class ElasticsearchDialectFactoryTest {
 				),
 				success(
 						ElasticsearchDistributionName.OPENSEARCH, "1", "1.3.1",
-						Elasticsearch7ModelDialect.class, Elasticsearch70ProtocolDialect.class
+						OpenSearch1ModelDialect.class, Elasticsearch70ProtocolDialect.class
 				),
 				unsupported( ElasticsearchDistributionName.OPENSEARCH, "1.0" ),
 				unsupported( ElasticsearchDistributionName.OPENSEARCH, "1.0.0-rc1" ),
@@ -262,115 +264,115 @@ class ElasticsearchDialectFactoryTest {
 				unsupported( ElasticsearchDistributionName.OPENSEARCH, "1.2.1" ),
 				success(
 						ElasticsearchDistributionName.OPENSEARCH, "1.3", "1.3.1",
-						Elasticsearch7ModelDialect.class, Elasticsearch70ProtocolDialect.class
+						OpenSearch1ModelDialect.class, Elasticsearch70ProtocolDialect.class
 				),
 				success(
 						ElasticsearchDistributionName.OPENSEARCH, "1.3.0", "1.3.0",
-						Elasticsearch7ModelDialect.class, Elasticsearch70ProtocolDialect.class
+						OpenSearch1ModelDialect.class, Elasticsearch70ProtocolDialect.class
 				),
 				success(
 						ElasticsearchDistributionName.OPENSEARCH, "1.3.1", "1.3.1",
-						Elasticsearch7ModelDialect.class, Elasticsearch70ProtocolDialect.class
+						OpenSearch1ModelDialect.class, Elasticsearch70ProtocolDialect.class
 				),
 				successWithWarning(
 						ElasticsearchDistributionName.OPENSEARCH, "1.4", "1.4.0",
-						Elasticsearch7ModelDialect.class, Elasticsearch70ProtocolDialect.class
+						OpenSearch1ModelDialect.class, Elasticsearch70ProtocolDialect.class
 				),
 				successWithWarning(
 						ElasticsearchDistributionName.OPENSEARCH, "1.4.0", "1.4.0",
-						Elasticsearch7ModelDialect.class, Elasticsearch70ProtocolDialect.class
+						OpenSearch1ModelDialect.class, Elasticsearch70ProtocolDialect.class
 				),
 				success(
 						ElasticsearchDistributionName.OPENSEARCH, "2", "2.3.0",
-						Elasticsearch7ModelDialect.class, Elasticsearch70ProtocolDialect.class
+						OpenSearch2ModelDialect.class, Elasticsearch70ProtocolDialect.class
 				),
 				success(
 						ElasticsearchDistributionName.OPENSEARCH, "2.0", "2.3.0",
-						Elasticsearch7ModelDialect.class, Elasticsearch70ProtocolDialect.class
+						OpenSearch2ModelDialect.class, Elasticsearch70ProtocolDialect.class
 				),
 				success(
 						ElasticsearchDistributionName.OPENSEARCH, "2.0.0", "2.0.0",
-						Elasticsearch7ModelDialect.class, Elasticsearch70ProtocolDialect.class
+						OpenSearch2ModelDialect.class, Elasticsearch70ProtocolDialect.class
 				),
 				success(
 						ElasticsearchDistributionName.OPENSEARCH, "2.1.0", "2.1.0",
-						Elasticsearch7ModelDialect.class, Elasticsearch70ProtocolDialect.class
+						OpenSearch2ModelDialect.class, Elasticsearch70ProtocolDialect.class
 				),
 				success(
 						ElasticsearchDistributionName.OPENSEARCH, "2.2.1", "2.2.1",
-						Elasticsearch7ModelDialect.class, Elasticsearch70ProtocolDialect.class
+						OpenSearch2ModelDialect.class, Elasticsearch70ProtocolDialect.class
 				),
 				success(
 						ElasticsearchDistributionName.OPENSEARCH, "2.3.0", "2.3.0",
-						Elasticsearch7ModelDialect.class, Elasticsearch70ProtocolDialect.class
+						OpenSearch2ModelDialect.class, Elasticsearch70ProtocolDialect.class
 				),
 				success(
 						ElasticsearchDistributionName.OPENSEARCH, "2.4.0", "2.4.0",
-						Elasticsearch7ModelDialect.class, Elasticsearch70ProtocolDialect.class
+						OpenSearch2ModelDialect.class, Elasticsearch70ProtocolDialect.class
 				),
 				success(
 						ElasticsearchDistributionName.OPENSEARCH, "2.5.0", "2.5.0",
-						Elasticsearch7ModelDialect.class, Elasticsearch70ProtocolDialect.class
+						OpenSearch2ModelDialect.class, Elasticsearch70ProtocolDialect.class
 				),
 				success(
 						ElasticsearchDistributionName.OPENSEARCH, "2.6.0", "2.6.0",
-						Elasticsearch7ModelDialect.class, Elasticsearch70ProtocolDialect.class
+						OpenSearch2ModelDialect.class, Elasticsearch70ProtocolDialect.class
 				),
 				success(
 						ElasticsearchDistributionName.OPENSEARCH, "2.7.0", "2.7.0",
-						Elasticsearch7ModelDialect.class, Elasticsearch70ProtocolDialect.class
+						OpenSearch2ModelDialect.class, Elasticsearch70ProtocolDialect.class
 				),
 				success(
 						ElasticsearchDistributionName.OPENSEARCH, "2.8", "2.8.0",
-						Elasticsearch7ModelDialect.class, Elasticsearch70ProtocolDialect.class
+						OpenSearch2ModelDialect.class, Elasticsearch70ProtocolDialect.class
 				),
 				success(
 						ElasticsearchDistributionName.OPENSEARCH, "2.8.0", "2.8.0",
-						Elasticsearch7ModelDialect.class, Elasticsearch70ProtocolDialect.class
+						OpenSearch2ModelDialect.class, Elasticsearch70ProtocolDialect.class
 				),
 				success(
 						ElasticsearchDistributionName.OPENSEARCH, "2.9", "2.9.0",
-						Elasticsearch7ModelDialect.class, Elasticsearch70ProtocolDialect.class
+						OpenSearch2ModelDialect.class, Elasticsearch70ProtocolDialect.class
 				),
 				success(
 						ElasticsearchDistributionName.OPENSEARCH, "2.9.0", "2.9.0",
-						Elasticsearch7ModelDialect.class, Elasticsearch70ProtocolDialect.class
+						OpenSearch2ModelDialect.class, Elasticsearch70ProtocolDialect.class
 				),
 				success(
 						ElasticsearchDistributionName.OPENSEARCH, "2.10", "2.10.0",
-						Elasticsearch7ModelDialect.class, Elasticsearch70ProtocolDialect.class
+						OpenSearch2ModelDialect.class, Elasticsearch70ProtocolDialect.class
 				),
 				success(
 						ElasticsearchDistributionName.OPENSEARCH, "2.10.0", "2.10.0",
-						Elasticsearch7ModelDialect.class, Elasticsearch70ProtocolDialect.class
+						OpenSearch2ModelDialect.class, Elasticsearch70ProtocolDialect.class
 				),
 				success(
 						ElasticsearchDistributionName.OPENSEARCH, "2.11", "2.11.0",
-						Elasticsearch7ModelDialect.class, Elasticsearch70ProtocolDialect.class
+						OpenSearch2ModelDialect.class, Elasticsearch70ProtocolDialect.class
 				),
 				success(
 						ElasticsearchDistributionName.OPENSEARCH, "2.11.0", "2.11.0",
-						Elasticsearch7ModelDialect.class, Elasticsearch70ProtocolDialect.class
+						OpenSearch2ModelDialect.class, Elasticsearch70ProtocolDialect.class
 				),
 				successWithWarning(
 						ElasticsearchDistributionName.OPENSEARCH, "2.12", "2.12.0",
-						Elasticsearch7ModelDialect.class, Elasticsearch70ProtocolDialect.class
+						OpenSearch2ModelDialect.class, Elasticsearch70ProtocolDialect.class
 				),
 				successWithWarning(
 						ElasticsearchDistributionName.OPENSEARCH, "2.12.0", "2.12.0",
-						Elasticsearch7ModelDialect.class, Elasticsearch70ProtocolDialect.class
+						OpenSearch2ModelDialect.class, Elasticsearch70ProtocolDialect.class
 				),
 				successWithWarning(
 						ElasticsearchDistributionName.OPENSEARCH, "3", "3.0.0",
-						Elasticsearch7ModelDialect.class, Elasticsearch70ProtocolDialect.class
+						OpenSearch2ModelDialect.class, Elasticsearch70ProtocolDialect.class
 				),
 				successWithWarning(
 						ElasticsearchDistributionName.OPENSEARCH, "3.0", "3.0.0",
-						Elasticsearch7ModelDialect.class, Elasticsearch70ProtocolDialect.class
+						OpenSearch2ModelDialect.class, Elasticsearch70ProtocolDialect.class
 				),
 				successWithWarning(
 						ElasticsearchDistributionName.OPENSEARCH, "3.0.0", "3.0.0",
-						Elasticsearch7ModelDialect.class, Elasticsearch70ProtocolDialect.class
+						OpenSearch2ModelDialect.class, Elasticsearch70ProtocolDialect.class
 				)
 		);
 	}
