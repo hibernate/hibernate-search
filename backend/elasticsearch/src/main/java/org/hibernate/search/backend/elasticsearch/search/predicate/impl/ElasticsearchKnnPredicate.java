@@ -26,24 +26,16 @@ import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 
-public class ElasticsearchKnnPredicate extends AbstractElasticsearchSingleFieldPredicate {
+public abstract class ElasticsearchKnnPredicate extends AbstractElasticsearchSingleFieldPredicate {
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
-	private static final JsonAccessor<String> FIELD_ACCESSOR = JsonAccessor.root().property( "field" ).asString();
-	private static final JsonArrayAccessor QUERY_VECTOR_ACCESSOR = JsonAccessor.root().property( "query_vector" ).asArray();
-	private static final JsonAccessor<Integer> K_ACCESSOR = JsonAccessor.root().property( "k" ).asInteger();
+	protected final ElasticsearchSearchPredicate filter;
+	protected final int k;
+	protected final JsonArray vector;
+	protected final Integer numberOfCandidates;
 
-	private static final JsonObjectAccessor FILTER_ACCESSOR = JsonAccessor.root().property( "filter" ).asObject();
-	private static final JsonAccessor<Integer> NUM_CANDIDATES_ACCESSOR =
-			JsonAccessor.root().property( "num_candidates" ).asInteger();
-
-	private final ElasticsearchSearchPredicate filter;
-	private final int k;
-	private final JsonArray vector;
-	private final Integer numberOfCandidates;
-
-	private ElasticsearchKnnPredicate(Builder<?> builder) {
+	private ElasticsearchKnnPredicate(AbstractKnnBuilder<?> builder) {
 		super( builder );
 		this.filter = builder.filter;
 		this.k = builder.k;
@@ -53,70 +45,42 @@ public class ElasticsearchKnnPredicate extends AbstractElasticsearchSingleFieldP
 		builder.vector = null;
 	}
 
-	@Override
-	protected JsonObject doToJsonKnn(PredicateRequestContext context) {
-		JsonObject object = new JsonObject();
-		FIELD_ACCESSOR.set( object, absoluteFieldPath );
-		K_ACCESSOR.set( object, k );
-		if ( filter != null ) {
-			FILTER_ACCESSOR.set( object, filter.toJsonQuery( context ) );
-		}
-		if ( numberOfCandidates != null ) {
-			NUM_CANDIDATES_ACCESSOR.set( object, numberOfCandidates );
-		}
-		QUERY_VECTOR_ACCESSOR.set( object, vector );
-
-		return object;
-	}
-
-	@Override
-	public JsonObject toJsonQuery(PredicateRequestContext context) {
-		return null;
-	}
-
-	@Override
-	protected JsonObject doToJsonQuery(PredicateRequestContext context, JsonObject outerObject, JsonObject innerObject) {
-		throw new AssertionFailure( "Shouldn't be reached since we've overridden the toJsonQuery" );
-	}
-
-	@Override
-	public ElasticsearchSearchPredicate checkAcceptableAsBoolPredicateClause(String clauseType) {
-		if ( !ElasticsearchBooleanPredicate.SHOULD_PROPERTY_NAME.equals( clauseType ) ) {
-			throw log.knnPredicateCanOnlyBeShouldClause();
-		}
-		return super.checkAcceptableAsBoolPredicateClause( clauseType );
-	}
-
-	@Override
-	public void checkNestableWithin(String expectedParentNestedPath) {
-		if ( expectedParentNestedPath != null ) {
-			throw log.cannotBeNestedPredicate();
-		}
-	}
-
-	public static class Factory<F>
+	public static class ElasticsearchFactory<F>
 			extends AbstractElasticsearchCodecAwareSearchQueryElementFactory<KnnPredicateBuilder, F> {
-		public Factory(ElasticsearchFieldCodec<F> codec) {
+		public ElasticsearchFactory(ElasticsearchFieldCodec<F> codec) {
 			super( codec );
 		}
 
 		@Override
 		public KnnPredicateBuilder create(ElasticsearchSearchIndexScope<?> scope,
 				ElasticsearchSearchIndexValueFieldContext<F> field) {
-			return new Builder<>( codec, scope, field );
+			return new ElasticsearchImpl.Builder<>( codec, scope, field );
 		}
 	}
 
-	private static class Builder<F> extends AbstractBuilder implements KnnPredicateBuilder {
+	public static class OpenSearchFactory<F>
+			extends AbstractElasticsearchCodecAwareSearchQueryElementFactory<KnnPredicateBuilder, F> {
+		public OpenSearchFactory(ElasticsearchFieldCodec<F> codec) {
+			super( codec );
+		}
+
+		@Override
+		public KnnPredicateBuilder create(ElasticsearchSearchIndexScope<?> scope,
+				ElasticsearchSearchIndexValueFieldContext<F> field) {
+			return new OpenSearchImpl.Builder<>( codec, scope, field );
+		}
+	}
+
+	private abstract static class AbstractKnnBuilder<F> extends AbstractBuilder implements KnnPredicateBuilder {
 
 		private final Class<?> vectorElementsType;
 		private final int indexedVectorsDimension;
 		private int k;
 		private JsonArray vector;
-		private Integer numberOfCandidates;
 		private ElasticsearchSearchPredicate filter;
+		protected Integer numberOfCandidates;
 
-		private Builder(ElasticsearchFieldCodec<F> codec, ElasticsearchSearchIndexScope<?> scope,
+		private AbstractKnnBuilder(ElasticsearchFieldCodec<F> codec, ElasticsearchSearchIndexScope<?> scope,
 				ElasticsearchSearchIndexValueFieldContext<F> field) {
 			super( scope, field );
 			if ( codec instanceof ElasticsearchVectorFieldCodec ) {
@@ -157,15 +121,6 @@ public class ElasticsearchKnnPredicate extends AbstractElasticsearchSingleFieldP
 			this.filter = ElasticsearchSearchPredicate.from( scope, filter );
 		}
 
-		@Override
-		public void numberOfCandidates(int numberOfCandidates) {
-			this.numberOfCandidates = numberOfCandidates;
-		}
-
-		@Override
-		public SearchPredicate build() {
-			return new ElasticsearchKnnPredicate( this );
-		}
 	}
 
 	private static JsonArray vectorToJsonArray(Object vector, Class<?> vectorElementsType) {
@@ -181,5 +136,127 @@ public class ElasticsearchKnnPredicate extends AbstractElasticsearchSingleFieldP
 			}
 		}
 		return array;
+	}
+
+	private static class ElasticsearchImpl extends ElasticsearchKnnPredicate {
+
+		private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
+
+		private static final JsonAccessor<String> FIELD_ACCESSOR = JsonAccessor.root().property( "field" ).asString();
+		private static final JsonArrayAccessor QUERY_VECTOR_ACCESSOR = JsonAccessor.root().property( "query_vector" ).asArray();
+		private static final JsonAccessor<Integer> K_ACCESSOR = JsonAccessor.root().property( "k" ).asInteger();
+
+		private static final JsonObjectAccessor FILTER_ACCESSOR = JsonAccessor.root().property( "filter" ).asObject();
+		private static final JsonAccessor<Integer> NUM_CANDIDATES_ACCESSOR =
+				JsonAccessor.root().property( "num_candidates" ).asInteger();
+
+
+		private ElasticsearchImpl(Builder<?> builder) {
+			super( builder );
+		}
+
+		@Override
+		protected JsonObject doToJsonKnn(PredicateRequestContext context) {
+			JsonObject object = new JsonObject();
+			FIELD_ACCESSOR.set( object, absoluteFieldPath );
+			K_ACCESSOR.set( object, k );
+			if ( filter != null ) {
+				FILTER_ACCESSOR.set( object, filter.toJsonQuery( context ) );
+			}
+			if ( numberOfCandidates != null ) {
+				NUM_CANDIDATES_ACCESSOR.set( object, numberOfCandidates );
+			}
+			QUERY_VECTOR_ACCESSOR.set( object, vector );
+
+			return object;
+		}
+
+		@Override
+		public JsonObject toJsonQuery(PredicateRequestContext context) {
+			return null;
+		}
+
+		@Override
+		protected JsonObject doToJsonQuery(PredicateRequestContext context, JsonObject outerObject, JsonObject innerObject) {
+			throw new AssertionFailure( "Shouldn't be reached since we've overridden the toJsonQuery" );
+		}
+
+		@Override
+		public ElasticsearchSearchPredicate checkAcceptableAsBoolPredicateClause(String clauseType) {
+			if ( !ElasticsearchBooleanPredicate.SHOULD_PROPERTY_NAME.equals( clauseType ) ) {
+				throw log.knnPredicateCanOnlyBeShouldClause();
+			}
+			return super.checkAcceptableAsBoolPredicateClause( clauseType );
+		}
+
+		@Override
+		public void checkNestableWithin(String expectedParentNestedPath) {
+			if ( expectedParentNestedPath != null ) {
+				throw log.cannotBeNestedPredicate();
+			}
+		}
+
+		private static class Builder<F> extends AbstractKnnBuilder<F> {
+
+			private Builder(ElasticsearchFieldCodec<F> codec, ElasticsearchSearchIndexScope<?> scope,
+					ElasticsearchSearchIndexValueFieldContext<F> field) {
+				super( codec, scope, field );
+			}
+
+			@Override
+			public void numberOfCandidates(int numberOfCandidates) {
+				this.numberOfCandidates = numberOfCandidates;
+			}
+
+			@Override
+			public SearchPredicate build() {
+				return new ElasticsearchImpl( this );
+			}
+		}
+	}
+
+	private static class OpenSearchImpl extends ElasticsearchKnnPredicate {
+
+		private static final JsonObjectAccessor KNN_ACCESSOR = JsonAccessor.root().property( "knn" ).asObject();
+		private static final JsonArrayAccessor VECTOR_ACCESSOR = JsonAccessor.root().property( "vector" ).asArray();
+		private static final JsonAccessor<Integer> K_ACCESSOR = JsonAccessor.root().property( "k" ).asInteger();
+
+		private static final JsonObjectAccessor FILTER_ACCESSOR = JsonAccessor.root().property( "filter" ).asObject();
+
+		private OpenSearchImpl(Builder<?> builder) {
+			super( builder );
+		}
+
+		@Override
+		protected JsonObject doToJsonQuery(PredicateRequestContext context, JsonObject outerObject, JsonObject innerObject) {
+			JsonObject field = new JsonObject();
+			KNN_ACCESSOR.set( outerObject, field );
+
+			field.add( absoluteFieldPath, innerObject );
+			if ( filter != null ) {
+				FILTER_ACCESSOR.set( innerObject, filter.toJsonQuery( context ) );
+			}
+			K_ACCESSOR.set( innerObject, k );
+			VECTOR_ACCESSOR.set( innerObject, vector );
+
+			return outerObject;
+		}
+
+		protected static class Builder<F> extends AbstractKnnBuilder<F> {
+			protected Builder(ElasticsearchFieldCodec<F> codec, ElasticsearchSearchIndexScope<?> scope,
+					ElasticsearchSearchIndexValueFieldContext<F> field) {
+				super( codec, scope, field );
+			}
+
+			@Override
+			public void numberOfCandidates(int numberOfCandidates) {
+				throw log.knnNumberOfCandidatesUnsupportedOption();
+			}
+
+			@Override
+			public SearchPredicate build() {
+				return new OpenSearchImpl( this );
+			}
+		}
 	}
 }

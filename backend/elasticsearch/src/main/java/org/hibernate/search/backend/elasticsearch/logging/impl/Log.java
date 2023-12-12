@@ -874,4 +874,8 @@ public interface Log extends BasicLogger {
 			+ "With Elasticsearch, a knn predicate can only be a top-level predicate or a should clause of a top-level bool predicate.")
 	SearchException cannotBeNestedPredicate();
 
+	@Message(id = ID_OFFSET + 185,
+			value = "An OpenSearch distribution does not allow specifying the `number of candidates` option. "
+					+ "This option is only applicable to an Elasticsearch distribution of an Elasticsearch backend.")
+	SearchException knnNumberOfCandidatesUnsupportedOption();
 }

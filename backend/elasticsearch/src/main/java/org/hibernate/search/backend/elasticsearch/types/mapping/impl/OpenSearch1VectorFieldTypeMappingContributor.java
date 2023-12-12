@@ -8,7 +8,10 @@ package org.hibernate.search.backend.elasticsearch.types.mapping.impl;
 
 import org.hibernate.search.backend.elasticsearch.lowlevel.index.mapping.impl.DataTypes;
 import org.hibernate.search.backend.elasticsearch.lowlevel.index.mapping.impl.PropertyMapping;
+import org.hibernate.search.backend.elasticsearch.search.predicate.impl.ElasticsearchKnnPredicate;
+import org.hibernate.search.backend.elasticsearch.types.impl.ElasticsearchIndexValueFieldType;
 import org.hibernate.search.engine.backend.types.VectorSimilarity;
+import org.hibernate.search.engine.search.predicate.spi.PredicateTypeKeys;
 import org.hibernate.search.util.common.AssertionFailure;
 
 import com.google.gson.JsonObject;
@@ -48,6 +51,12 @@ public class OpenSearch1VectorFieldTypeMappingContributor implements Elasticsear
 		}
 
 		mapping.setMethod( method );
+	}
+
+	@Override
+	public <F> void contribute(ElasticsearchIndexValueFieldType.Builder<F> builder, Context context) {
+		builder.queryElementFactory( PredicateTypeKeys.KNN,
+				new ElasticsearchKnnPredicate.OpenSearchFactory<>( builder.codec() ) );
 	}
 
 	private static String resolveDefault(VectorSimilarity vectorSimilarity) {
