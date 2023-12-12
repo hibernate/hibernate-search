@@ -6,20 +6,20 @@
  */
 package org.hibernate.search.backend.elasticsearch.types.dsl.provider.impl;
 
-import org.hibernate.search.backend.elasticsearch.types.mapping.impl.Elasticsearch7VectorFieldTypeMappingContributor;
 import org.hibernate.search.backend.elasticsearch.types.mapping.impl.ElasticsearchVectorFieldTypeMappingContributor;
+import org.hibernate.search.backend.elasticsearch.types.mapping.impl.OpenSearch1VectorFieldTypeMappingContributor;
 
 import com.google.gson.Gson;
 
 /**
- * The index field type factory provider for ES7.x.
+ * The index field type factory provider for OpenSearch 1.x/2.x.
  */
-public class Elasticsearch7IndexFieldTypeFactoryProvider extends AbstractIndexFieldTypeFactoryProvider {
+public class OpenSearch1IndexFieldTypeFactoryProvider extends AbstractIndexFieldTypeFactoryProvider {
 
-	private final Elasticsearch7VectorFieldTypeMappingContributor vectorFieldTypeMappingContributor =
-			new Elasticsearch7VectorFieldTypeMappingContributor();
+	private final OpenSearch1VectorFieldTypeMappingContributor vectorFieldTypeMappingContributor =
+			new OpenSearch1VectorFieldTypeMappingContributor();
 
-	public Elasticsearch7IndexFieldTypeFactoryProvider(Gson userFacingGson) {
+	public OpenSearch1IndexFieldTypeFactoryProvider(Gson userFacingGson) {
 		super( userFacingGson );
 	}
 

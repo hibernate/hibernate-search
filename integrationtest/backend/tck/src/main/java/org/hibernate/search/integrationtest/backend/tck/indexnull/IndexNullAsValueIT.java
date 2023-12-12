@@ -8,7 +8,9 @@ package org.hibernate.search.integrationtest.backend.tck.indexnull;
 
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.hibernate.search.util.impl.integrationtest.common.assertion.SearchResultAssert.assertThatQuery;
+import static org.junit.jupiter.api.Assumptions.assumeTrue;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -23,6 +25,7 @@ import org.hibernate.search.integrationtest.backend.tck.testsupport.configuratio
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.FieldTypeDescriptor;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.expectations.IndexNullAsMatchPredicateExpectactions;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.SimpleFieldMapper;
+import org.hibernate.search.integrationtest.backend.tck.testsupport.util.TckConfiguration;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.extension.SearchSetupHelper;
 import org.hibernate.search.util.common.SearchException;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.SimpleMappedIndex;
@@ -74,6 +77,10 @@ class IndexNullAsValueIT {
 
 	@Test
 	void indexNullAsValue_vector() {
+		assumeTrue(
+				TckConfiguration.get().getBackendFeatures().supportsVectorSearchIndexNullsAs(),
+				"These tests only make sense for a backend where Vector Search is supported and implemented."
+		);
 		setUp();
 		StubMappingScope scope = index.createScope();
 
@@ -173,10 +180,16 @@ class IndexNullAsValueIT {
 					.filter( typeDescriptor -> typeDescriptor.getIndexNullAsMatchPredicateExpectations().isPresent() )
 					.map( typeDescriptor -> ByTypeFieldModel.mapper( root, typeDescriptor ) )
 					.collect( Collectors.toList() );
-			knnFieldModels = FieldTypeDescriptor.getAllVector().stream()
-					.filter( typeDescriptor -> typeDescriptor.getIndexNullAsMatchPredicateExpectations().isPresent() )
-					.map( typeDescriptor -> ByTypeFieldModel.mapper( root, typeDescriptor ) )
-					.collect( Collectors.toList() );
+			if ( TckConfiguration.get().getBackendFeatures().supportsVectorSearch() ) {
+				knnFieldModels = FieldTypeDescriptor.getAllVector().stream()
+						.filter( typeDescriptor -> typeDescriptor.getIndexNullAsMatchPredicateExpectations()
+								.isPresent() )
+						.map( typeDescriptor -> ByTypeFieldModel.mapper( root, typeDescriptor ) )
+						.collect( Collectors.toList() );
+			}
+			else {
+				knnFieldModels = Collections.emptyList();
+			}
 
 			geoPointField = root.field(
 					"geoPointField",

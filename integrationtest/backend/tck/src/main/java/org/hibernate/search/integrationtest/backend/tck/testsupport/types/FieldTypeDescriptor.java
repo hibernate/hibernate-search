@@ -75,13 +75,11 @@ public abstract class FieldTypeDescriptor<F, S extends SearchableProjectableInde
 	public static List<VectorFieldTypeDescriptor<?>> getAllVector() {
 		if ( allVector == null ) {
 			List<VectorFieldTypeDescriptor<?>> list = new ArrayList<>();
-			if ( TckConfiguration.get().getBackendFeatures().supportsVectorSearch() ) {
-				Collections.addAll(
-						list,
-						ByteVectorFieldTypeDescriptor.INSTANCE,
-						FloatVectorFieldTypeDescriptor.INSTANCE
-				);
-			}
+			Collections.addAll(
+					list,
+					ByteVectorFieldTypeDescriptor.INSTANCE,
+					FloatVectorFieldTypeDescriptor.INSTANCE
+			);
 			allVector = Collections.unmodifiableList( list );
 		}
 		return allVector;

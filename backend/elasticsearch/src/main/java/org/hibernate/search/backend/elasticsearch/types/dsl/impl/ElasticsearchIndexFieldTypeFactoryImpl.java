@@ -24,6 +24,7 @@ import org.hibernate.search.backend.elasticsearch.logging.impl.Log;
 import org.hibernate.search.backend.elasticsearch.types.dsl.ElasticsearchIndexFieldTypeFactory;
 import org.hibernate.search.backend.elasticsearch.types.dsl.ElasticsearchNativeIndexFieldTypeMappingStep;
 import org.hibernate.search.backend.elasticsearch.types.format.impl.ElasticsearchDefaultFieldFormatProvider;
+import org.hibernate.search.backend.elasticsearch.types.mapping.impl.ElasticsearchVectorFieldTypeMappingContributor;
 import org.hibernate.search.engine.backend.mapping.spi.BackendMapperContext;
 import org.hibernate.search.engine.backend.reporting.spi.BackendMappingHints;
 import org.hibernate.search.engine.backend.types.dsl.ScaledNumberIndexFieldTypeOptionsStep;
@@ -47,16 +48,19 @@ public class ElasticsearchIndexFieldTypeFactoryImpl
 	private final Gson userFacingGson;
 	private final ElasticsearchDefaultFieldFormatProvider defaultFieldFormatProvider;
 	private final IndexFieldTypeDefaultsProvider typeDefaultsProvider;
+	private final ElasticsearchVectorFieldTypeMappingContributor vectorFieldTypeMappingContributor;
 
 	public ElasticsearchIndexFieldTypeFactoryImpl(EventContext eventContext, BackendMapperContext backendMapperContext,
 			Gson userFacingGson,
 			ElasticsearchDefaultFieldFormatProvider defaultFieldFormatProvider,
-			IndexFieldTypeDefaultsProvider typeDefaultsProvider) {
+			IndexFieldTypeDefaultsProvider typeDefaultsProvider,
+			ElasticsearchVectorFieldTypeMappingContributor vectorFieldTypeMappingContributor) {
 		this.eventContext = eventContext;
 		this.backendMapperContext = backendMapperContext;
 		this.userFacingGson = userFacingGson;
 		this.defaultFieldFormatProvider = defaultFieldFormatProvider;
 		this.typeDefaultsProvider = typeDefaultsProvider;
+		this.vectorFieldTypeMappingContributor = vectorFieldTypeMappingContributor;
 	}
 
 	@Override
@@ -235,19 +239,28 @@ public class ElasticsearchIndexFieldTypeFactoryImpl
 		return new ElasticsearchBigIntegerIndexFieldTypeOptionsStep( this, typeDefaultsProvider );
 	}
 
+	@SuppressWarnings("unchecked")
 	@Override
 	public <F> VectorFieldTypeOptionsStep<?, F> asVector(Class<F> valueType) {
-		throw new UnsupportedOperationException( "The Elasticsearch backend does not support vector field yet." );
+		if ( byte[].class.equals( valueType ) ) {
+			return (VectorFieldTypeOptionsStep<?, F>) asByteVector();
+		}
+		else if ( float[].class.equals( valueType ) ) {
+			return (VectorFieldTypeOptionsStep<?, F>) asFloatVector();
+		}
+		else {
+			throw log.cannotGuessVectorFieldType( valueType, getEventContext() );
+		}
 	}
 
 	@Override
 	public VectorFieldTypeOptionsStep<?, byte[]> asByteVector() {
-		throw new UnsupportedOperationException( "The Elasticsearch backend does not support vector field yet." );
+		return new ElasticsearchByteVectorFieldTypeOptionsStep( this, vectorFieldTypeMappingContributor );
 	}
 
 	@Override
 	public VectorFieldTypeOptionsStep<?, float[]> asFloatVector() {
-		throw new UnsupportedOperationException( "The Elasticsearch backend does not support vector field yet." );
+		return new ElasticsearchFloatVectorFieldTypeOptionsStep( this, vectorFieldTypeMappingContributor );
 	}
 
 	@Override
