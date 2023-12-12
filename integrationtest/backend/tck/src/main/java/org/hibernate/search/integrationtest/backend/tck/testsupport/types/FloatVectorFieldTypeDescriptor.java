@@ -6,10 +6,13 @@
  */
 package org.hibernate.search.integrationtest.backend.tck.testsupport.types;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 import java.util.Random;
+import java.util.TreeSet;
+import java.util.stream.IntStream;
 
 import org.hibernate.search.engine.backend.types.dsl.IndexFieldTypeFactory;
 import org.hibernate.search.engine.backend.types.dsl.VectorFieldTypeOptionsStep;
@@ -44,14 +47,16 @@ public class FloatVectorFieldTypeDescriptor extends VectorFieldTypeDescriptor<fl
 
 	@Override
 	protected List<float[]> createUniquelyMatchableValues() {
-		return Arrays.asList(
-				arrayOf( size, -42.0f ),
-				arrayOf( size, -1.0f ),
-				arrayOf( size, 0.0f ),
-				arrayOf( size, 1.0f ),
-				arrayOf( size, 3.0f ),
-				arrayOf( size, 42.0f )
-		);
+		// need to make sure that we'll get only unique arrays;
+		TreeSet<float[]> set = new TreeSet<>( Arrays::compare );
+		set.add( arrayOf( size, -42.0f ) );
+		set.add( arrayOf( size, -1.0f ) );
+		set.add( arrayOf( size, 0.0f ) );
+		set.add( arrayOf( size, 1.0f ) );
+		set.add( arrayOf( size, 3.0f ) );
+		set.add( arrayOf( size, 42.0f ) );
+
+		return new ArrayList<>( set );
 	}
 
 	@Override
@@ -67,6 +72,13 @@ public class FloatVectorFieldTypeDescriptor extends VectorFieldTypeDescriptor<fl
 	}
 
 	@Override
+	public List<float[]> unitLengthVectors() {
+		return IntStream.range( 0, size )
+				.mapToObj( index -> unit( size, index ) )
+				.toList();
+	}
+
+	@Override
 	public float[] valueFromInteger(int integer) {
 		return arrayOf( size, integer );
 	}
@@ -78,9 +90,24 @@ public class FloatVectorFieldTypeDescriptor extends VectorFieldTypeDescriptor<fl
 		) );
 	}
 
-	private static float[] arrayOf(int size, float value) {
+	private static float[] arrayOf(int size, float startingValue) {
 		float[] floats = new float[size];
-		Arrays.fill( floats, value );
+		float sum = 0.0f;
+		for ( int i = 0; i < size; i++ ) {
+			floats[i] = startingValue + i;
+			sum += floats[i] * floats[i];
+		}
+		sum = (float) Math.sqrt( size );
+		for ( int i = 0; i < size; i++ ) {
+			floats[i] = floats[i] / sum;
+		}
+		return floats;
+	}
+
+	private static float[] unit(int size, int index) {
+		float[] floats = new float[size];
+		Arrays.fill( floats, 0.0f );
+		floats[index] = 1.0f;
 		return floats;
 	}
 }

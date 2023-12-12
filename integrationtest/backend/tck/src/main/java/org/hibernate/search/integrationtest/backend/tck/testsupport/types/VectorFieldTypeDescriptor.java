@@ -64,4 +64,6 @@ public abstract class VectorFieldTypeDescriptor<F>
 
 	public abstract F sampleVector();
 
+	public abstract List<F> unitLengthVectors();
+
 }
