@@ -99,8 +99,8 @@ abstract class AbstractHighlighterIT {
 					d.addValue( "string", "<body><h1>This is a Heading</h1><p>This is a paragraph</p></body>" );
 				} )
 				.add( "9", d -> {
-					d.addObject( "nested" )
-							.addValue( "nestedString", "The quick brown fox jumps right over the little lazy dog" );
+					d.addObject( "objectFlattened" )
+							.addValue( "string", "The quick brown fox jumps right over the little lazy dog" );
 					d.addValue( "notAnalyzedString", "The quick brown fox jumps right over the little lazy dog" );
 					d.addValue( "multiValuedString", "The quick brown fox jumps right over the little lazy dog" );
 					d.addValue( "multiValuedString", "This string mentions a dog" );
@@ -496,7 +496,7 @@ abstract class AbstractHighlighterIT {
 		SearchQuery<List<String>> highlights = scope.query().select(
 				f -> f.highlight( "multiValuedString" )
 		)
-				.where( f -> f.match().field( "nested.nestedString" ).matching( "dog" ) )
+				.where( f -> f.match().field( "objectFlattened.string" ).matching( "dog" ) )
 				// set to max possible value so that all highlighters can return something:
 				.highlighter( h -> highlighter( h ).noMatchSize( Integer.MAX_VALUE ) )
 				.toQuery();
@@ -634,13 +634,13 @@ abstract class AbstractHighlighterIT {
 	}
 
 	@Test
-	void nestedField() {
+	void inObjectField() {
 		StubMappingScope scope = index.createScope();
 
 		SearchQuery<List<String>> highlights = scope.query().select(
-				f -> f.highlight( "nested.nestedString" )
+				f -> f.highlight( "objectFlattened.string" )
 		)
-				.where( f -> f.match().field( "nested.nestedString" ).matching( "fox" ) )
+				.where( f -> f.match().field( "objectFlattened.string" ).matching( "fox" ) )
 				.highlighter( h -> highlighter( h ) )
 				.toQuery();
 
@@ -653,13 +653,13 @@ abstract class AbstractHighlighterIT {
 	}
 
 	@Test
-	void nestedFieldWildcard() {
+	void inObjectFieldFieldWildcard() {
 		StubMappingScope scope = index.createScope();
 
 		SearchQuery<List<String>> highlights = scope.query().select(
-				f -> f.highlight( "nested.nestedString" )
+				f -> f.highlight( "objectFlattened.string" )
 		)
-				.where( f -> f.wildcard().field( "nested.nestedString" ).matching( "fo?" ) )
+				.where( f -> f.wildcard().field( "objectFlattened.string" ).matching( "fo?" ) )
 				.highlighter( h -> highlighter( h ) )
 				.toQuery();
 
@@ -773,10 +773,10 @@ abstract class AbstractHighlighterIT {
 	}
 
 	@Test
-	void multipleIndexesScopeIncompatibleTypesNested() {
+	void multipleIndexesScopeIncompatibleTypesInObjectField() {
 		assertThatThrownBy(
 				() -> index.createScope( notMatchingTypeIndex ).query().select(
-						f -> f.highlight( "nested.nestedString" )
+						f -> f.highlight( "objectFlattened.string" )
 				).where( f -> f.matchAll() )
 						.toQuery()
 		).isInstanceOf( SearchException.class )
@@ -926,10 +926,10 @@ abstract class AbstractHighlighterIT {
 	private static class IndexBinding {
 		final IndexFieldReference<String> stringField;
 		final IndexFieldReference<String> anotherStringField;
-		final IndexFieldReference<String> nestedString;
+		final IndexFieldReference<String> objectFlattenedString;
 		final IndexFieldReference<String> notAnalyzedString;
 		final IndexFieldReference<String> multiValuedString;
-		final IndexObjectFieldReference nested;
+		final IndexObjectFieldReference objectFlattened;
 		final IndexFieldReference<String> stringNoTermVectorField;
 		final IndexFieldReference<Integer> intField;
 		final IndexFieldReference<String> stringNotProjectableField;
@@ -947,10 +947,10 @@ abstract class AbstractHighlighterIT {
 					.termVector( TermVector.WITH_POSITIONS_OFFSETS )
 			).toReference();
 
-			IndexSchemaObjectField objectField = root.objectField( "nested" );
-			nested = objectField.toReference();
+			IndexSchemaObjectField objectField = root.objectField( "objectFlattened" );
+			objectFlattened = objectField.toReference();
 
-			nestedString = objectField.field( "nestedString", f -> f.asString()
+			objectFlattenedString = objectField.field( "string", f -> f.asString()
 					.highlightable( Collections.singletonList( Highlightable.ANY ) )
 					.analyzer( DefaultAnalysisDefinitions.ANALYZER_STANDARD_ENGLISH.name )
 			).toReference();
@@ -1017,15 +1017,15 @@ abstract class AbstractHighlighterIT {
 	private static class NotMatchingTypeIndexBinding {
 		final IndexFieldReference<Integer> stringField;
 		final IndexObjectFieldReference nested;
-		final IndexFieldReference<LocalDate> nestedString;
+		final IndexFieldReference<LocalDate> objectFlattenedString;
 
 		NotMatchingTypeIndexBinding(IndexSchemaElement root) {
 			stringField = root.field( "string", f -> f.asInteger() ).toReference();
 
-			IndexSchemaObjectField objectField = root.objectField( "nested" );
+			IndexSchemaObjectField objectField = root.objectField( "objectFlattened" );
 			nested = objectField.toReference();
 
-			nestedString = objectField.field( "nestedString", f -> f.asLocalDate()
+			objectFlattenedString = objectField.field( "string", f -> f.asLocalDate()
 					.projectable( Projectable.YES )
 			).toReference();
 		}
