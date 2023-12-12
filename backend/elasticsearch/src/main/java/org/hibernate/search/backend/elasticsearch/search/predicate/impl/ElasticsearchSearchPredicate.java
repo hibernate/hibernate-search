@@ -14,6 +14,7 @@ import org.hibernate.search.backend.elasticsearch.search.common.impl.Elasticsear
 import org.hibernate.search.engine.search.predicate.SearchPredicate;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
+import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 
 public interface ElasticsearchSearchPredicate extends SearchPredicate {
@@ -24,7 +25,13 @@ public interface ElasticsearchSearchPredicate extends SearchPredicate {
 
 	void checkNestableWithin(String expectedParentNestedPath);
 
+	default ElasticsearchSearchPredicate checkAcceptableAsBoolPredicateClause(String clauseType) {
+		return this;
+	}
+
 	JsonObject toJsonQuery(PredicateRequestContext context);
+
+	JsonElement toJsonKnn(PredicateRequestContext rootPredicateContext);
 
 	static ElasticsearchSearchPredicate from(ElasticsearchSearchIndexScope<?> scope, SearchPredicate predicate) {
 		if ( !( predicate instanceof ElasticsearchSearchPredicate ) ) {
@@ -37,5 +44,4 @@ public interface ElasticsearchSearchPredicate extends SearchPredicate {
 		}
 		return casted;
 	}
-
 }

@@ -24,4 +24,15 @@ public interface KnnPredicateOptionsStep extends PredicateScoreStep<KnnPredicate
 	KnnPredicateOptionsStep filter(Function<? super SearchPredicateFactory, ? extends PredicateFinalStep> clauseContributor);
 
 
+	/**
+	 * Set the number of approximate nearest neighbor candidates on each shard.
+	 * <p>
+	 * An Elasticsearch specific option of an Elasticsearch distribution. Setting this on any other backends/distributions
+	 * will lead to an exception being thrown.
+	 * See also <a href="https://www.elastic.co/guide/en/elasticsearch/reference/current/knn-search.html#tune-approximate-knn-for-speed-accuracy">Tune approximate kNN for speed or accuracy</a>.
+	 * @param numberOfCandidates The number of candidates per shard to consider.
+	 * @return {@code this}, for method chaining.
+	 */
+	KnnPredicateOptionsStep numberOfCandidates(int numberOfCandidates);
+
 }

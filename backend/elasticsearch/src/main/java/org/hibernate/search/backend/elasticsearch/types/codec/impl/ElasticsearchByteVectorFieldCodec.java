@@ -35,4 +35,9 @@ public class ElasticsearchByteVectorFieldCodec extends AbstractElasticsearchVect
 		}
 		return result;
 	}
+
+	@Override
+	public Class<?> vectorElementsType() {
+		return byte.class;
+	}
 }

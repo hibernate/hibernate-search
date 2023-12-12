@@ -15,7 +15,7 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonNull;
 
-public abstract class AbstractElasticsearchVectorFieldCodec<F> implements ElasticsearchFieldCodec<F> {
+public abstract class AbstractElasticsearchVectorFieldCodec<F> implements ElasticsearchVectorFieldCodec<F> {
 
 	private final VectorSimilarity similarity;
 	private final int dimension;
@@ -51,6 +51,11 @@ public abstract class AbstractElasticsearchVectorFieldCodec<F> implements Elasti
 	protected abstract F fromJsonArray(JsonArray jsonElements);
 
 	@Override
+	public int getConfiguredDimensions() {
+		return dimension;
+	}
+
+	@Override
 	public boolean isCompatibleWith(ElasticsearchFieldCodec<?> other) {
 
 		if ( this == other ) {
@@ -64,5 +69,15 @@ public abstract class AbstractElasticsearchVectorFieldCodec<F> implements Elasti
 				&& Objects.equals( similarity, that.similarity )
 				&& Objects.equals( maxConnections, that.maxConnections )
 				&& Objects.equals( beamWidth, that.beamWidth );
+	}
+
+	@Override
+	public String toString() {
+		return getClass().getSimpleName() + "{" +
+				"vectorSimilarity=" + similarity +
+				", dimension=" + dimension +
+				", beamWidth=" + beamWidth +
+				", maxConnection=" + maxConnections +
+				'}';
 	}
 }
