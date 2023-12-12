@@ -852,4 +852,7 @@ public interface Log extends BasicLogger {
 	@Message(id = ID_OFFSET + 180, value = "Invalid index field type: missing vector dimension."
 			+ " Define the vector dimension explicitly. %1$s")
 	SearchException nullVectorDimension(String hint, @Param EventContext eventContext);
+
+	@Message(id = ID_OFFSET + 181, value = "Fields of this type cannot be multivalued.")
+	SearchException multiValuedFieldNotAllowed(@Param EventContext context);
 }

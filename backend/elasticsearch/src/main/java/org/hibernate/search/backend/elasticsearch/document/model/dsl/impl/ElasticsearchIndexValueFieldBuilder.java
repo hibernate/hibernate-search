@@ -56,6 +56,9 @@ class ElasticsearchIndexValueFieldBuilder<F>
 
 	@Override
 	public ElasticsearchIndexValueFieldBuilder<F> multiValued() {
+		if ( !type.multivaluable() ) {
+			throw log.multiValuedFieldNotAllowed( eventContext() );
+		}
 		this.multiValued = true;
 		return this;
 	}
