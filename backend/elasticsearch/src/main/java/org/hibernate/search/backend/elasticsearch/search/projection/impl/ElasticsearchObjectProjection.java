@@ -118,6 +118,11 @@ public class ElasticsearchObjectProjection<E, V, P>
 		}
 
 		@Override
+		protected boolean canDecodeArrays() {
+			return false;
+		}
+
+		@Override
 		public final P transform(LoadingResult<?> loadingResult, A accumulated,
 				ProjectionTransformContext context) {
 			for ( int i = 0; i < accumulator.size( accumulated ); i++ ) {

@@ -60,4 +60,11 @@ public interface ElasticsearchFieldCodec<F> {
 	 * in doubt.
 	 */
 	boolean isCompatibleWith(ElasticsearchFieldCodec<?> other);
+
+	/**
+	 * Whether this codec can extract data from JsonArrays when decoding.
+	 */
+	default boolean canDecodeArrays() {
+		return false;
+	}
 }

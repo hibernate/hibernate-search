@@ -88,7 +88,7 @@ public class ElasticsearchDistanceToFieldProjection<A, P> extends AbstractElasti
 			scriptFieldName = null;
 			this.sourceProjection = new ElasticsearchFieldProjection<>(
 					builder.scope, builder.field,
-					this::computeDistanceWithUnit, NO_OP_DOUBLE_CONVERTER, accumulatorProvider
+					this::computeDistanceWithUnit, false, NO_OP_DOUBLE_CONVERTER, accumulatorProvider
 			);
 		}
 	}

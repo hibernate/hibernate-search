@@ -72,6 +72,11 @@ public abstract class AbstractElasticsearchVectorFieldCodec<F> implements Elasti
 	}
 
 	@Override
+	public boolean canDecodeArrays() {
+		return true;
+	}
+
+	@Override
 	public String toString() {
 		return getClass().getSimpleName() + "{" +
 				"vectorSimilarity=" + similarity +

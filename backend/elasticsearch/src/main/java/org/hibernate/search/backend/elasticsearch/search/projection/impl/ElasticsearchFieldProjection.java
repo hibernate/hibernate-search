@@ -44,17 +44,20 @@ public class ElasticsearchFieldProjection<F, V, P> extends AbstractElasticsearch
 	private final String requiredContextAbsoluteFieldPath;
 
 	private final Function<JsonElement, F> decodeFunction;
+	private final boolean canDecodeArrays;
 	private final ProjectionConverter<? super F, ? extends V> converter;
 	private final ProjectionAccumulator.Provider<V, P> accumulatorProvider;
 
 	private ElasticsearchFieldProjection(Builder<F, V> builder,
 			ProjectionAccumulator.Provider<V, P> accumulatorProvider) {
-		this( builder.scope, builder.field, builder.codec::decode, builder.converter, accumulatorProvider );
+		this( builder.scope, builder.field, builder.codec::decode, builder.codec.canDecodeArrays(), builder.converter,
+				accumulatorProvider );
 	}
 
 	ElasticsearchFieldProjection(ElasticsearchSearchIndexScope<?> scope,
 			ElasticsearchSearchIndexValueFieldContext<?> field,
-			Function<JsonElement, F> decodeFunction, ProjectionConverter<? super F, ? extends V> converter,
+			Function<JsonElement, F> decodeFunction, boolean canDecodeArrays,
+			ProjectionConverter<? super F, ? extends V> converter,
 			ProjectionAccumulator.Provider<V, P> accumulatorProvider) {
 		super( scope );
 		this.absoluteFieldPath = field.absolutePath();
@@ -63,6 +66,7 @@ public class ElasticsearchFieldProjection<F, V, P> extends AbstractElasticsearch
 				? field.closestMultiValuedParentAbsolutePath()
 				: null;
 		this.decodeFunction = decodeFunction;
+		this.canDecodeArrays = canDecodeArrays;
 		this.converter = converter;
 		this.accumulatorProvider = accumulatorProvider;
 	}
@@ -108,6 +112,11 @@ public class ElasticsearchFieldProjection<F, V, P> extends AbstractElasticsearch
 		protected F extract(ProjectionHitMapper<?> projectionHitMapper, JsonObject hit, JsonElement sourceElement,
 				ProjectionExtractContext context) {
 			return decodeFunction.apply( sourceElement );
+		}
+
+		@Override
+		protected boolean canDecodeArrays() {
+			return canDecodeArrays;
 		}
 
 		@Override
@@ -158,10 +167,8 @@ public class ElasticsearchFieldProjection<F, V, P> extends AbstractElasticsearch
 		private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 		private final ElasticsearchFieldCodec<F> codec;
-
 		private final ElasticsearchSearchIndexScope<?> scope;
 		private final ElasticsearchSearchIndexValueFieldContext<F> field;
-
 		private final ProjectionConverter<F, ? extends V> converter;
 
 		private Builder(ElasticsearchFieldCodec<F> codec, ElasticsearchSearchIndexScope<?> scope,
