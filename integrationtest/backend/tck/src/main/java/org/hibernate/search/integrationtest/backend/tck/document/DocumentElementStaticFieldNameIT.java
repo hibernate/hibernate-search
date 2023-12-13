@@ -7,6 +7,7 @@
 package org.hibernate.search.integrationtest.backend.tck.document;
 
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.junit.jupiter.api.Assumptions.assumeTrue;
 
 import java.util.Collections;
 import java.util.List;
@@ -95,6 +96,7 @@ class DocumentElementStaticFieldNameIT<F> {
 	@ParameterizedTest(name = "{0}")
 	@MethodSource("params")
 	void addObject(FieldTypeDescriptor<F, ?> fieldType) {
+		assumeTrue( fieldType.isMultivaluable() );
 		executeAdd( "1", document -> {
 			setNullValue( document, fieldType );
 

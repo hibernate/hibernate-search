@@ -7,6 +7,7 @@
 package org.hibernate.search.integrationtest.backend.tck.document;
 
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.junit.jupiter.api.Assumptions.assumeTrue;
 
 import java.util.Collections;
 import java.util.List;
@@ -20,6 +21,7 @@ import org.hibernate.search.engine.backend.types.dsl.SearchableProjectableIndexF
 import org.hibernate.search.engine.common.tree.TreeFilterDefinition;
 import org.hibernate.search.engine.mapper.mapping.building.spi.IndexedEntityBindingContext;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.FieldTypeDescriptor;
+import org.hibernate.search.integrationtest.backend.tck.testsupport.util.TckConfiguration;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.extension.SearchSetupHelper;
 import org.hibernate.search.util.common.SearchException;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.SimpleMappedIndex;
@@ -90,6 +92,7 @@ class DocumentElementDynamicFieldNameIT<F> {
 	@ParameterizedTest(name = "{0}")
 	@MethodSource("params")
 	void addObject(FieldTypeDescriptor<F, ?> fieldType) {
+		assumeTrue( fieldType.isMultivaluable() );
 		executeAdd( "1", document -> {
 			setNullValue( document, fieldType );
 
@@ -148,6 +151,7 @@ class DocumentElementDynamicFieldNameIT<F> {
 	@ParameterizedTest(name = "{0}")
 	@MethodSource("params")
 	void add_excludedFields(FieldTypeDescriptor<F, ?> fieldType) {
+		assumeTrue( fieldType.isMultivaluable() );
 		executeAdd( "1", document -> {
 			DocumentElement excludingObject = document.addObject( "excludingObject" );
 			setNonNullValue( excludingObject, fieldType );
