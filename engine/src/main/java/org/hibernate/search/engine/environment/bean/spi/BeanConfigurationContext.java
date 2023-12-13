@@ -24,7 +24,7 @@ public interface BeanConfigurationContext {
 	 * provided that reference is not {@code BeanReference.of( exposedType )} (which would create a cycle).
 	 * @param <T> The exposed type of the bean.
 	 */
-	<T> void define(Class<T> exposedType, BeanReference<T> reference);
+	<T> void define(Class<T> exposedType, BeanReference<? extends T> reference);
 
 	/**
 	 * Define a way to resolve a bean referenced by its {@code exposedType} and {@code name}.
@@ -40,6 +40,6 @@ public interface BeanConfigurationContext {
 	 * provided that reference is not {@code BeanReference.of( exposedType, name )} (which would create a cycle).
 	 * @param <T> The exposed type of the bean.
 	 */
-	<T> void define(Class<T> exposedType, String name, BeanReference<T> reference);
+	<T> void define(Class<T> exposedType, String name, BeanReference<? extends T> reference);
 
 }
