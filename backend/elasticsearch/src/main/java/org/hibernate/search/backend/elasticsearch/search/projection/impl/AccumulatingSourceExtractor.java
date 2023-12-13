@@ -87,13 +87,13 @@ abstract class AccumulatingSourceExtractor<E, V, A, P>
 			// Present, but null
 			return accumulator.accumulate( accumulated, extract( projectionHitMapper, hit, fieldValue, context ) );
 		}
-		//		else if ( fieldValue.isJsonArray() ) {
-		//			for ( JsonElement childElement : fieldValue.getAsJsonArray() ) {
-		//				accumulated = accumulator.accumulate( accumulated,
-		//						extract( projectionHitMapper, hit, childElement, context ) );
-		//			}
-		//			return accumulated;
-		//		}
+		else if ( !canDecodeArrays() && fieldValue.isJsonArray() ) {
+			for ( JsonElement childElement : fieldValue.getAsJsonArray() ) {
+				accumulated = accumulator.accumulate( accumulated,
+						extract( projectionHitMapper, hit, childElement, context ) );
+			}
+			return accumulated;
+		}
 		else {
 			return accumulator.accumulate( accumulated, extract( projectionHitMapper, hit, fieldValue, context ) );
 		}
@@ -101,6 +101,8 @@ abstract class AccumulatingSourceExtractor<E, V, A, P>
 
 	protected abstract E extract(ProjectionHitMapper<?> projectionHitMapper, JsonObject hit,
 			JsonElement sourceElement, ProjectionExtractContext context);
+
+	protected abstract boolean canDecodeArrays();
 
 	private JsonObject toJsonObject(JsonElement childElement, int currentPathComponentIndex) {
 		if ( childElement == null || childElement.isJsonNull() ) {
