@@ -61,17 +61,19 @@ public class BeanReferenceRegistryForType<T> {
 		return named.get( name );
 	}
 
-	void add(BeanReference<T> reference) {
-		all.add( reference );
+	@SuppressWarnings("unchecked") // Safe cast from BeanReference<? extends T> to BeanReference<T> as BeanReference is covariant in T
+	void add(BeanReference<? extends T> reference) {
+		all.add( (BeanReference<T>) reference );
 	}
 
-	void add(String name, BeanReference<T> reference) {
-		Object previous = named.putIfAbsent( name, reference );
+	@SuppressWarnings("unchecked") // Safe cast from BeanReference<? extends T> to BeanReference<T> as BeanReference is covariant in T
+	void add(String name, BeanReference<? extends T> reference) {
+		Object previous = named.putIfAbsent( name, (BeanReference<T>) reference );
 		if ( previous != null ) {
 			throw new AssertionFailure( String.format( Locale.ROOT,
 					"Duplicate bean references for name '%1$s': %2$s, %3$s",
 					name, previous, reference ) );
 		}
-		all.add( reference );
+		all.add( (BeanReference<T>) reference );
 	}
 }

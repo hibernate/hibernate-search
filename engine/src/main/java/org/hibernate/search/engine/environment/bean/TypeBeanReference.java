@@ -36,6 +36,7 @@ class TypeBeanReference<T> implements BeanReference<T> {
 			return (BeanReference<? extends U>) this;
 		}
 		else {
+			// We don't know the concrete type of returned beans, so we'll have to check upon retrieval
 			return BeanReference.super.asSubTypeOf( expectedType );
 		}
 	}

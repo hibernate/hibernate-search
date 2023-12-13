@@ -65,11 +65,11 @@ class BeanResolverImplBaseTest {
 	@Mock
 	private BeanReference<RoleType> roleInternalBean1FactoryMock;
 	@Mock
-	private BeanReference<RoleType> roleInternalBean2FactoryMock;
+	private BeanReference<InternalType3> roleInternalBean2FactoryMock;
 	@Mock
 	private BeanReference<RoleType> roleInternalBean3FactoryMock;
 	@Mock
-	private BeanReference<RoleType> roleInternalBean4FactoryMock;
+	private BeanReference<InternalType3> roleInternalBean4FactoryMock;
 
 	private BeanResolver beanResolver;
 
@@ -436,9 +436,9 @@ class BeanResolverImplBaseTest {
 	@Test
 	void resolveRole() {
 		BeanHolder<RoleType> beanHolder1 = BeanHolder.of( new InternalType3() );
-		BeanHolder<RoleType> beanHolder2 = BeanHolder.of( new InternalType3() );
+		BeanHolder<InternalType3> beanHolder2 = BeanHolder.of( new InternalType3() );
 		BeanHolder<RoleType> beanHolder3 = BeanHolder.of( new InternalType3() );
-		BeanHolder<RoleType> beanHolder4 = BeanHolder.of( new InternalType3() );
+		BeanHolder<InternalType3> beanHolder4 = BeanHolder.of( new InternalType3() );
 
 		// resolveRole
 		when( roleInternalBean1FactoryMock.resolve( any() ) ).thenReturn( beanHolder1 );

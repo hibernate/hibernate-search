@@ -18,14 +18,14 @@ final class BeanConfigurationContextImpl implements BeanConfigurationContext {
 	private final Map<Class<?>, BeanReferenceRegistryForType<?>> configuredBeans = new HashMap<>();
 
 	@Override
-	public <T> void define(Class<T> exposedType, BeanReference<T> reference) {
+	public <T> void define(Class<T> exposedType, BeanReference<? extends T> reference) {
 		Contracts.assertNotNull( exposedType, "exposedType" );
 		Contracts.assertNotNull( reference, "reference" );
 		configuredBeans( exposedType ).add( reference );
 	}
 
 	@Override
-	public <T> void define(Class<T> exposedType, String name, BeanReference<T> reference) {
+	public <T> void define(Class<T> exposedType, String name, BeanReference<? extends T> reference) {
 		Contracts.assertNotNull( exposedType, "exposedType" );
 		Contracts.assertNotNull( name, "name" );
 		Contracts.assertNotNull( reference, "reference" );
