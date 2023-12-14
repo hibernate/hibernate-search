@@ -1476,8 +1476,6 @@
                     -Djdk.attach.allowAttachSelf=true
                     -Dnet.bytebuddy.experimental=true
                 </surefire.jvm.args.java-version>
-                <!-- Spring Boot 3 isn't ready for JDK22 yet -->
-                <failsafe.spring.skip>true</failsafe.spring.skip>
                 <!-- impsort-maven-plugin doesn't work with JDK22 yet -->
                 <format.skip>true</format.skip>
             </properties>
