@@ -1534,6 +1534,35 @@ include::{sourcedir}/org/hibernate/search/documentation/search/predicate/Predica
 <2> Improve the score of science fiction books that have a cover similar to the one we are searching for.
 ====
 
+[[search-dsl-predicate-knn-with-similarity]]
+=== Filtering out irrelevant results with `knn` similarity
+
+By its nature a `knn` predicate will always try to find `k` nearest vectors,
+even if the found vectors are quite far away from each other, i.e. are not that similar.
+This may lead to getting irrelevant results returned by the query.
+
+To address this, a `knn` predicate allows configuring the minimum required similarity.
+If configured, `knn` predicate will find `k` nearest vectors
+and filter out any that will have similarity lower than this configured threshold.
+Note that the expected value for this property is a distance value between two vectors according to configured
+<<mapping-directfieldmapping-vectorSimilarity,vector similarity>>.
+
+.Filtering out irrelevant results
+====
+[source, JAVA, indent=0, subs="+callouts"]
+----
+include::{sourcedir}/org/hibernate/search/documentation/search/predicate/PredicateDslIT.java[tags=knn-similarity]
+----
+<1> Create a knn predicate as usual.
+<2> Specify the required minimum similarity value, to filter out irrelevant results.
+====
+
+NOTE: This configuration is only available for a <<backend-lucene, Lucene backend>>
+and for the <<backend-elasticsearch-compatibility-elasticsearch,Elastic>> distribution of
+an <<backend-elasticsearch,Elasticsearch backend>>.
+<<backend-elasticsearch-compatibility-opensearch,OpenSearch>> does not have this option available,
+and trying to use it will lead to an exception being thrown.
+
 [[search-dsl-predicate-knn-limitations]]
 === Backend specifics and limitations
 

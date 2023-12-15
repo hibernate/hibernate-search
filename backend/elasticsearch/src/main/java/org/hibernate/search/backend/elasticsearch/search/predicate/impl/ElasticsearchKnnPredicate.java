@@ -35,6 +35,7 @@ public abstract class ElasticsearchKnnPredicate extends AbstractElasticsearchSin
 	protected final int k;
 	protected final JsonArray vector;
 	protected final Integer numberOfCandidates;
+	protected final Float similarity;
 
 	private ElasticsearchKnnPredicate(AbstractKnnBuilder<?> builder) {
 		super( builder );
@@ -42,6 +43,7 @@ public abstract class ElasticsearchKnnPredicate extends AbstractElasticsearchSin
 		this.k = builder.k;
 		this.vector = builder.vector;
 		this.numberOfCandidates = builder.numberOfCandidates;
+		this.similarity = builder.similarity;
 		builder.filter = null;
 		builder.vector = null;
 	}
@@ -80,6 +82,7 @@ public abstract class ElasticsearchKnnPredicate extends AbstractElasticsearchSin
 		private JsonArray vector;
 		private ElasticsearchSearchPredicate filter;
 		protected Integer numberOfCandidates;
+		protected Float similarity;
 
 		private AbstractKnnBuilder(ElasticsearchFieldCodec<F> codec, ElasticsearchSearchIndexScope<?> scope,
 				ElasticsearchSearchIndexValueFieldContext<F> field) {
@@ -152,6 +155,7 @@ public abstract class ElasticsearchKnnPredicate extends AbstractElasticsearchSin
 		private static final JsonObjectAccessor FILTER_ACCESSOR = JsonAccessor.root().property( "filter" ).asObject();
 		private static final JsonAccessor<Integer> NUM_CANDIDATES_ACCESSOR =
 				JsonAccessor.root().property( "num_candidates" ).asInteger();
+		private static final JsonAccessor<Float> SIMILARITY_ACCESSOR = JsonAccessor.root().property( "similarity" ).asFloat();
 
 
 		private ElasticsearchImpl(Builder<?> builder) {
@@ -178,7 +182,9 @@ public abstract class ElasticsearchKnnPredicate extends AbstractElasticsearchSin
 			}
 			NUM_CANDIDATES_ACCESSOR.set( innerObject, numberOfCandidates != null ? numberOfCandidates : k );
 			QUERY_VECTOR_ACCESSOR.set( innerObject, vector );
-
+			if ( similarity != null ) {
+				SIMILARITY_ACCESSOR.set( innerObject, similarity );
+			}
 			return innerObject;
 		}
 
@@ -204,6 +210,11 @@ public abstract class ElasticsearchKnnPredicate extends AbstractElasticsearchSin
 			@Override
 			public void constantScore() {
 				log.elasticsearchKnnIgnoresConstantScore();
+			}
+
+			@Override
+			public void requiredMinimumSimilarity(float similarity) {
+				this.similarity = similarity;
 			}
 
 			@Override
@@ -249,6 +260,11 @@ public abstract class ElasticsearchKnnPredicate extends AbstractElasticsearchSin
 			@Override
 			public void numberOfCandidates(int numberOfCandidates) {
 				throw log.knnNumberOfCandidatesUnsupportedOption();
+			}
+
+			@Override
+			public void requiredMinimumSimilarity(float similarity) {
+				throw log.knnRequiredMinimumSimilarityUnsupportedOption();
 			}
 
 			@Override

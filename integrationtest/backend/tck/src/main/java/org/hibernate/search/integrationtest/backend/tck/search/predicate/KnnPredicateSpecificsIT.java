@@ -13,7 +13,11 @@ import static org.junit.jupiter.api.Assumptions.assumeTrue;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
@@ -64,8 +68,9 @@ class KnnPredicateSpecificsIT {
 				TckConfiguration.get().getBackendFeatures().supportsVectorSearch(),
 				"These tests only make sense for a backend where Vector Search is supported and implemented."
 		);
-		setupHelper.start()
-				.withIndexes(
+		List<SimpleMappedIndex<?>> indexes = new ArrayList<>( SimilarityFilterKnnSearchConfigured.indexes.values() );
+		indexes.addAll(
+				Arrays.asList(
 						WrongVectorConfigured.index,
 						SearchScopeConfigured.index,
 						SearchScopeConfigured.indexDifferentDimension,
@@ -78,7 +83,9 @@ class KnnPredicateSpecificsIT {
 						VectorSimilarityConfigured.indexCosine,
 						ExampleKnnSearchConfigured.index,
 						ExampleKnnSearchConfigured.indexNested
-				).setup();
+				) );
+
+		setupHelper.start().withIndexes( indexes ).setup();
 
 		final BulkIndexer scopeIndexer = SearchScopeConfigured.index.bulkIndexer();
 		SearchScopeConfigured.dataSets.forEach( d -> d.contribute( SearchScopeConfigured.index, scopeIndexer ) );
@@ -115,18 +122,26 @@ class KnnPredicateSpecificsIT {
 		BulkIndexer exampleKnnSearchNestedIndexer = ExampleKnnSearchConfigured.indexNested.bulkIndexer();
 		ExampleKnnSearchConfigured.datasetNested.accept( exampleKnnSearchNestedIndexer );
 
-		scopeIndexer.join(
-				scopeDifferentDimensionIndexer,
-				scopeDifferentBeamWidthIndexer,
-				scopeDifferentMaxConnectionIndexer,
-				scopeDifferentSimilarityIndexer,
-				similarityIndexer,
-				similarityL2Indexer,
-				similarityInnerProductIndexer,
-				similarityCosineIndexer,
-				exampleKnnSearchIndexer,
-				exampleKnnSearchNestedIndexer
-		);
+		List<BulkIndexer> bulkIndexers = new ArrayList<>();
+		for ( SimpleMappedIndex<
+				SimilarityFilterKnnSearchConfigured.IndexBinding> index : SimilarityFilterKnnSearchConfigured.indexes
+						.values() ) {
+			BulkIndexer indexer = index.bulkIndexer();
+			SimilarityFilterKnnSearchConfigured.dataset.accept( index, indexer );
+			bulkIndexers.add( indexer );
+		}
+
+		bulkIndexers.add( scopeDifferentDimensionIndexer );
+		bulkIndexers.add( scopeDifferentBeamWidthIndexer );
+		bulkIndexers.add( scopeDifferentMaxConnectionIndexer );
+		bulkIndexers.add( scopeDifferentSimilarityIndexer );
+		bulkIndexers.add( similarityIndexer );
+		bulkIndexers.add( similarityL2Indexer );
+		bulkIndexers.add( similarityInnerProductIndexer );
+		bulkIndexers.add( similarityCosineIndexer );
+		bulkIndexers.add( exampleKnnSearchIndexer );
+		bulkIndexers.add( exampleKnnSearchNestedIndexer );
+		scopeIndexer.join( bulkIndexers.toArray( BulkIndexer[]::new ) );
 	}
 
 	@Nested
@@ -808,6 +823,289 @@ class KnnPredicateSpecificsIT {
 			float[] bytes = new float[size];
 			Arrays.fill( bytes, value );
 			return bytes;
+		}
+	}
+
+
+	@Nested
+	class SimilarityFilterKnnSearchIT extends SimilarityFilterKnnSearchConfigured {
+		// JDK 11 does not allow static fields in non-static inner class and JUnit does not allow running @Nested tests in static inner classes...
+	}
+
+	abstract static class SimilarityFilterKnnSearchConfigured {
+
+		private static final Map<VectorSimilarity, SimpleMappedIndex<IndexBinding>> indexes;
+
+		static {
+			HashMap<VectorSimilarity, SimpleMappedIndex<IndexBinding>> map = new HashMap<>();
+			for ( VectorSimilarity similarity : VectorSimilarity.values() ) {
+				if ( VectorSimilarity.DEFAULT.equals( similarity ) ) {
+					continue;
+				}
+				map.put( similarity, SimpleMappedIndex.of( r -> new IndexBinding( r, similarity ) )
+						.name( "similarityFilterKnnSearch" + similarity.name() ) );
+			}
+
+			indexes = Collections.unmodifiableMap( map );
+		}
+
+		private static final BiConsumer<SimpleMappedIndex<IndexBinding>, BulkIndexer> dataset =
+				(index, bulkIndexer) -> bulkIndexer
+						.add( "ID:1", document -> {
+							document.addValue( index.binding().location, noramlize( 5.2f, 4.4f ) );
+							document.addValue( index.binding().bytes, noramlize( index.binding().similarity, 5, 4 ) );
+							document.addValue( index.binding().rating, 5 );
+						} )
+						.add( "ID:2", document -> {
+							document.addValue( index.binding().location, noramlize( 5.2f, 3.9f ) );
+							document.addValue( index.binding().bytes, noramlize( index.binding().similarity, 5, 3 ) );
+							document.addValue( index.binding().rating, 4 );
+						} )
+						.add( "ID:3", document -> {
+							document.addValue( index.binding().location, noramlize( 4.9f, 3.4f ) );
+							document.addValue( index.binding().bytes, noramlize( index.binding().similarity, 4, 3 ) );
+							document.addValue( index.binding().rating, 9 );
+						} )
+						.add( "ID:4", document -> {
+							document.addValue( index.binding().location, noramlize( 4.2f, 4.6f ) );
+							document.addValue( index.binding().bytes, noramlize( index.binding().similarity, 4, 4 ) );
+							document.addValue( index.binding().rating, 6 );
+						} )
+						.add( "ID:5", document -> {
+							document.addValue( index.binding().location, noramlize( 3.3f, 4.5f ) );
+							document.addValue( index.binding().bytes, noramlize( index.binding().similarity, 3, 4 ) );
+							document.addValue( index.binding().rating, 8 );
+						} )
+						.add( "ID:6", document -> {
+							document.addValue( index.binding().location, noramlize( 6.4f, 3.4f ) );
+							document.addValue( index.binding().bytes, noramlize( index.binding().similarity, 6, 3 ) );
+							document.addValue( index.binding().rating, 9 );
+						} )
+						.add( "ID:7", document -> {
+							document.addValue( index.binding().location, noramlize( 4.2f, 6.2f ) );
+							document.addValue( index.binding().bytes, noramlize( index.binding().similarity, 4, 6 ) );
+							document.addValue( index.binding().rating, 5 );
+						} )
+						.add( "ID:8", document -> {
+							document.addValue( index.binding().location, noramlize( 2.4f, 4.0f ) );
+							document.addValue( index.binding().bytes, noramlize( index.binding().similarity, 2, 4 ) );
+							document.addValue( index.binding().rating, 8 );
+						} )
+						.add( "ID:9", document -> {
+							document.addValue( index.binding().location, noramlize( 1.4f, 3.2f ) );
+							document.addValue( index.binding().bytes, noramlize( index.binding().similarity, 1, 3 ) );
+							document.addValue( index.binding().rating, 5 );
+						} )
+						.add( "ID:10", document -> {
+							document.addValue( index.binding().location, noramlize( 7.0f, 9.9f ) );
+							document.addValue( index.binding().bytes, noramlize( index.binding().similarity, 7, 9 ) );
+							document.addValue( index.binding().rating, 9 );
+						} )
+						.add( "ID:11", document -> {
+							document.addValue( index.binding().location, noramlize( 3.0f, 2.3f ) );
+							document.addValue( index.binding().bytes, noramlize( index.binding().similarity, 3, 2 ) );
+							document.addValue( index.binding().rating, 6 );
+						} )
+						.add( "ID:12", document -> {
+							document.addValue( index.binding().location, noramlize( 5.0f, 1.0f ) );
+							document.addValue( index.binding().bytes, noramlize( index.binding().similarity, 5, 1 ) );
+							document.addValue( index.binding().rating, 3 );
+						} );
+
+		private static float[] noramlize(float... vector) {
+			float sum = 0.0f;
+			for ( int i = 0; i < vector.length; ++i ) {
+				sum += vector[i] * vector[i];
+			}
+			sum = (float) Math.sqrt( sum );
+			for ( int i = 0; i < vector.length; i++ ) {
+				vector[i] /= sum;
+			}
+			return vector;
+		}
+
+		private static byte[] noramlize(VectorSimilarity similarity, int... vector) {
+			byte[] result = new byte[vector.length];
+			for ( int i = 0; i < vector.length; i++ ) {
+				result[i] = (byte) ( vector[i] );
+			}
+			return result;
+		}
+
+		@BeforeAll
+		static void beforeAll() {
+			assumeTrue(
+					TckConfiguration.get().getBackendFeatures().supportsVectorSearchRequiredMinimumSimilarity(),
+					"This test only make sense for backends that have a way to specify the required minimum similarity."
+			);
+		}
+
+		@ParameterizedTest
+		@MethodSource
+		void similarityFilterFloat(SimpleMappedIndex<IndexBinding> index, float similarity, float score, int matches) {
+			assertThat( index.createScope().query()
+					.select( SearchProjectionFactory::score )
+					.where( f -> f.knn( 10 )
+							.field( "location" )
+							.matching( noramlize( 5f, 4f ) )
+							.requiredMinimumSimilarity( similarity )
+					).fetchAll().hits() )
+					.hasSize( matches )
+					.allSatisfy( s -> assertThat( s ).isGreaterThanOrEqualTo( score ) );
+		}
+
+		/*
+		* index, similarity, score, number of hits
+		*/
+		public static List<? extends Arguments> similarityFilterFloat() {
+			List<Arguments> args = new ArrayList<>();
+			SimpleMappedIndex<IndexBinding> index = indexes.get( VectorSimilarity.L2 );
+
+			// L2 scores for vector [5f, 4f]
+			// [0.9995734, 0.9992435, 0.9990251, 0.99538076, 0.9762654, 0.9665131, 0.9355144, 0.92745376, 0.91767627, 0.8887709]
+			// score is 1/(1+d*d) and we are passing d here: d = sqrt( 1/s - 1 )
+			args.add( Arguments.of( index, 0.06812251021f, 0.5f, 4 ) );
+			args.add( Arguments.of( index, 0.15592186099f, 0.25f, 5 ) );
+			args.add( Arguments.of( index, 0.26254644016f, 0.14f, 7 ) );
+
+			index = indexes.get( VectorSimilarity.COSINE );
+
+			// COSINE scores for vector [5f, 4f]
+			// [0.9998933, 0.9998107, 0.99975604, 0.9988398, 0.9939221, 0.9913382, 0.98276734, 0.9804448, 0.9775728, 0.9687126]
+			// score is ( 1.0f + d ) / 2.0f and we are passing d here: d = 2s-1
+			args.add( Arguments.of( index, 0.9976796f, 0.9988397f, 4 ) );
+			args.add( Arguments.of( index, 0.9996214f, 0.9998106f, 2 ) );
+			args.add( Arguments.of( index, 0.960889f, 0.9804447f, 8 ) );
+
+			index = indexes.get( VectorSimilarity.INNER_PRODUCT );
+
+			// INNER_PRODUCT scores for vector [5f, 4f]
+			// [0.9998933, 0.9998107, 0.99975604, 0.99883986, 0.9939221, 0.9913382, 0.9827673, 0.9804447, 0.9775728, 0.9687126]
+			// score is ( 1.0f + d ) / 2.0f and we are passing d here: d = 2s-1
+			args.add( Arguments.of( index, 0.99767972f, 0.99883985f, 4 ) );
+			args.add( Arguments.of( index, 0.99951208f, 0.99975603f, 3 ) );
+			args.add( Arguments.of( index, 0.9608894f, 0.9804446f, 8 ) );
+
+			return args;
+		}
+
+		@ParameterizedTest
+		@MethodSource
+		void similarityFilterFloatWithBoost(SimpleMappedIndex<IndexBinding> index, float similarity, float score, int matches) {
+			assertThat( index.createScope().query()
+					.select( SearchProjectionFactory::score )
+					.where( f -> f.knn(
+							10 )
+							.field( "location" )
+							.matching( noramlize( 5f, 4f ) )
+							.requiredMinimumSimilarity( similarity )
+							.boost( 100.0f )
+					).fetchAll().hits() )
+					.hasSize( matches )
+					.allSatisfy( s -> assertThat( s ).isGreaterThanOrEqualTo( score ) );
+		}
+
+		/*
+		 * index, similarity, score, number of hits
+		 */
+		public static List<? extends Arguments> similarityFilterFloatWithBoost() {
+			List<Arguments> args = new ArrayList<>();
+			SimpleMappedIndex<IndexBinding> index = indexes.get( VectorSimilarity.L2 );
+
+			// L2 scores for vector [5f, 4f]
+			// [0.9995734, 0.9992435, 0.9990251, 0.99538076, 0.9762654, 0.9665131, 0.9355144, 0.92745376, 0.91767627, 0.8887709]
+			// score is 1/(1+d*d) and we are passing d here: d = sqrt( 1/s - 1 )
+			args.add( Arguments.of( index, 0.06812251021f, 50.f, 4 ) );
+			args.add( Arguments.of( index, 0.15592186099f, 25.f, 5 ) );
+			args.add( Arguments.of( index, 0.26254644016f, 14.f, 7 ) );
+
+			index = indexes.get( VectorSimilarity.COSINE );
+
+			// COSINE scores for vector [5f, 4f]
+			// [0.9998933, 0.9998107, 0.99975604, 0.9988398, 0.9939221, 0.9913382, 0.98276734, 0.9804448, 0.9775728, 0.9687126]
+			// score is ( 1.0f + d ) / 2.0f and we are passing d here: d = 2s-1
+			args.add( Arguments.of( index, 0.9976796f, 99.88397f, 4 ) );
+			args.add( Arguments.of( index, 0.9996214f, 99.98106f, 2 ) );
+			args.add( Arguments.of( index, 0.960889f, 98.04447f, 8 ) );
+
+			index = indexes.get( VectorSimilarity.INNER_PRODUCT );
+
+			// INNER_PRODUCT scores for vector [5f, 4f]
+			// [0.9998933, 0.9998107, 0.99975604, 0.99883986, 0.9939221, 0.9913382, 0.9827673, 0.9804447, 0.9775728, 0.9687126]
+			// score is ( 1.0f + d ) / 2.0f and we are passing d here: d = 2s-1
+			args.add( Arguments.of( index, 0.99767972f, 99.883985f, 4 ) );
+			args.add( Arguments.of( index, 0.99951208f, 99.975603f, 3 ) );
+			args.add( Arguments.of( index, 0.9608894f, 98.04446f, 8 ) );
+
+			return args;
+		}
+
+		@ParameterizedTest
+		@MethodSource
+		void similarityFilterByte(SimpleMappedIndex<IndexBinding> index, float similarity, float score, int matches) {
+			assertThat( index.createScope().query()
+					.select( SearchProjectionFactory::score )
+					.where( f -> f.knn( 10 )
+							.field( "bytes" )
+							.matching( noramlize( index.binding().similarity, 5, 4 ) )
+							.requiredMinimumSimilarity( similarity )
+					).fetchAll().hits() )
+					.hasSize( matches )
+					.allSatisfy( s -> assertThat( s ).isGreaterThanOrEqualTo( score ) );
+		}
+
+		/*
+		 * index, similarity, score, number of hits
+		 */
+		public static List<? extends Arguments> similarityFilterByte() {
+			List<Arguments> args = new ArrayList<>();
+			SimpleMappedIndex<IndexBinding> index = indexes.get( VectorSimilarity.L2 );
+
+			// L2 scores for vector [5f, 4f]
+			// [1.0, 0.5, 0.5, 0.33333334, 0.33333334, 0.2, 0.16666667, 0.11111111, 0.1, 0.1]
+			// score is 1/(1+d*d) and we are passing d here: d = sqrt( 1/s - 1 )
+			args.add( Arguments.of( index, 1.0f, 0.5f, 3 ) );
+			args.add( Arguments.of( index, 2.0f, 0.2f, 6 ) );
+			args.add( Arguments.of( index, 2.23606795067f, 0.16666667f, 7 ) );
+
+			index = indexes.get( VectorSimilarity.COSINE );
+
+			// COSINE scores for vector [5f, 4f]
+			// [1.0, 0.99975604, 0.9981203, 0.99694186, 0.9954962, 0.9889012, 0.98625576, 0.98413867, 0.9764629, 0.95397973]
+			// score is ( 1.0f + d ) / 2.0f and we are passing d here: d = 2s-1
+			args.add( Arguments.of( index, 0.99388372f, 0.99694186f, 4 ) );
+			args.add( Arguments.of( index, 0.99951208f, 0.99975604f, 2 ) );
+			args.add( Arguments.of( index, 0.96827734f, 0.98413867f, 8 ) );
+
+			index = indexes.get( VectorSimilarity.INNER_PRODUCT );
+
+			// INNER_PRODUCT scores for vector [5f, 4f]
+			// [0.5010834, 0.5006714, 0.50064087, 0.5006256, 0.5005646, 0.5005493, 0.5004883, 0.500473, 0.5004425, 0.5003967]
+			// score is 0.5f + d / (float) ( 2 * ( 1 << 15 ) ) and we are passing d here: d = (s - 0.5) * 65536.0
+			args.add( Arguments.of( index, 40.9993216f, 0.5006256f, 4 ) );
+			args.add( Arguments.of( index, 42.00005632f, 0.50064087f, 3 ) );
+			args.add( Arguments.of( index, 30.998528f, 0.500473f, 8 ) );
+
+			return args;
+		}
+
+		private static class IndexBinding {
+
+			private final VectorSimilarity similarity;
+			final IndexFieldReference<Integer> rating;
+			final IndexFieldReference<float[]> location;
+
+			final IndexFieldReference<byte[]> bytes;
+
+			IndexBinding(IndexSchemaElement root, VectorSimilarity similarity) {
+				this.similarity = similarity;
+				rating = root.field( "rating", f -> f.asInteger().projectable( Projectable.YES ) ).toReference();
+				location =
+						root.field( "location", f -> f.asVector( float[].class ).dimension( 2 ).vectorSimilarity( similarity ) )
+								.toReference();
+				bytes = root.field( "bytes", f -> f.asVector( byte[].class ).dimension( 2 ).vectorSimilarity( similarity ) )
+						.toReference();
+			}
 		}
 	}
 }

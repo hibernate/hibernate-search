@@ -79,6 +79,12 @@ public abstract class AbstractKnnPredicateFieldStep<T extends KnnPredicateOption
 	}
 
 	@Override
+	public T requiredMinimumSimilarity(float similarity) {
+		this.builder.requiredMinimumSimilarity( similarity );
+		return thisAsT();
+	}
+
+	@Override
 	public T boost(float boost) {
 		this.builder.boost( boost );
 		return thisAsT();

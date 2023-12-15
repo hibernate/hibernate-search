@@ -272,4 +272,13 @@ public class ElasticsearchTckBackendFeatures extends TckBackendFeatures {
 				aoss -> false
 		);
 	}
+
+	@Override
+	public boolean supportsVectorSearchRequiredMinimumSimilarity() {
+		return isActualVersion(
+				es -> true,
+				os -> false,
+				aoss -> false
+		);
+	}
 }
