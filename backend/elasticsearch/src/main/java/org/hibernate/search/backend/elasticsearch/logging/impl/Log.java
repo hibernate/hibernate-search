@@ -883,4 +883,9 @@ public interface Log extends BasicLogger {
 			value = "The Elastic distribution of Elasticsearch does not allow to apply constant score to a knn predicate."
 					+ " Constant score will not be applied.")
 	void elasticsearchKnnIgnoresConstantScore();
+
+	@Message(id = ID_OFFSET + 187,
+			value = "An OpenSearch distribution does not allow specifying the `required minimum similarity` option. "
+					+ "This option is only applicable to an Elastic distribution of an Elasticsearch backend.")
+	SearchException knnRequiredMinimumSimilarityUnsupportedOption();
 }

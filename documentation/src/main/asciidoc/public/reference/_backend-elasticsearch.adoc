@@ -50,7 +50,7 @@ and regularly tested against versions {elasticsearchTestedVersions}.
 Using Elasticsearch currently doesn't require specific configuration.
 There are some limitations applied by Hibernate Search when it comes to using a <<search-dsl-predicate-knn,knn predicate>> with Elasticsearch.
 These limitations come from Elasticsearch's integration of k-NN search,
-see <<search-dsl-predicate-knn-limitations,this section of the documentations>> for more details.
+see <<search-dsl-predicate-knn-limitations,this section of the documentation>> for more details.
 
 [[backend-elasticsearch-compatibility-opensearch]]
 === OpenSearch
@@ -60,7 +60,9 @@ link:{openSearchUrl}[OpenSearch] clusters running version {openSearchCompatibleV
 and regularly tested against versions {openSearchTestedVersions}.
 
 Using OpenSearch currently doesn't require specific configuration
-and doesn't imply specific limitations.
+There are some limitations applied by Hibernate Search when it comes to using a <<search-dsl-predicate-knn,knn predicate>> with OpenSearch.
+These limitations come from OpenSearch's feature availability,
+see <<mapping-directfieldmapping-vectorSimilarity,this section of the documentation>> for more details.
 
 [[backend-elasticsearch-compatibility-amazon-opensearch-service]]
 === Amazon OpenSearch Service

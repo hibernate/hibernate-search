@@ -21,6 +21,7 @@ import jakarta.persistence.EntityManagerFactory;
 import org.hibernate.search.backend.elasticsearch.ElasticsearchExtension;
 import org.hibernate.search.documentation.testsupport.BackendConfigurations;
 import org.hibernate.search.documentation.testsupport.DocumentationSetupHelper;
+import org.hibernate.search.engine.backend.types.VectorSimilarity;
 import org.hibernate.search.engine.search.common.BooleanOperator;
 import org.hibernate.search.engine.search.predicate.dsl.RegexpQueryFlag;
 import org.hibernate.search.engine.search.predicate.dsl.SimpleQueryFlag;
@@ -71,7 +72,7 @@ class PredicateDslIT {
 		entityManagerFactory = setupHelper.start().setup( Book.class, Author.class, EmbeddableGeoPoint.class );
 
 		DocumentationSetupHelper.SetupContext setupContext = setupHelper.start();
-		// NOTE: If backend does not support vector search it will lead to runtime exceptions, so we cannot  simply annotate
+		// NOTE: If backend does not support vector search it will lead to runtime exceptions, so we cannot simply annotate
 		// the corresponding properties with @VectorField; instead we add it programmatically when it's possible
 		if ( isVectorSearchSupported() ) {
 			setupContext.withProperty(
@@ -80,9 +81,11 @@ class PredicateDslIT {
 						TypeMappingStep book = context.programmaticMapping()
 								.type( Book.class );
 						book.property( "coverImageEmbeddings" )
-								.vectorField( 128 );
+								// set an L2 similarity explicitly to get predictable results between different backends:
+								.vectorField( 128 ).vectorSimilarity( VectorSimilarity.L2 );
 						book.property( "alternativeCoverImageEmbeddings" )
-								.vectorField( 128 );
+								// set an L2 similarity explicitly to get predictable results between different backends:
+								.vectorField( 128 ).vectorSimilarity( VectorSimilarity.L2 );
 					}
 			);
 		}
@@ -1123,8 +1126,6 @@ class PredicateDslIT {
 
 	@Test
 	void knn() {
-		// NOTE: To keep this documentation example simple there is no testing with Elasticsearch/OpenSearch
-		// as not all versions have integration implemented e.g. Elasticsearch 7 or OpenSearch 1.3 will throw exceptions
 		assumeTrue(
 				isVectorSearchSupported(),
 				"This test only makes sense if the backend supports vectors"
@@ -1231,6 +1232,30 @@ class PredicateDslIT {
 				assertThat( hits )
 						.extracting( Book::getId )
 						.containsExactlyInAnyOrder( BOOK1_ID, BOOK2_ID, BOOK3_ID, BOOK4_ID );
+			} );
+		}
+
+		// similarity is only applicable to Lucene and an Elastic distribution of Elasticsearch:
+		if ( BackendConfiguration.isLucene()
+				|| ElasticsearchTestDialect.isActualVersion(
+						es -> !es.isLessThan( "8.0" ),
+						os -> false,
+						aoss -> false
+				) ) {
+			withinSearchSession( searchSession -> {
+				// tag::knn-similarity[]
+				float[] coverImageEmbeddingsVector = /*...*/
+						// end::knn-similarity[]
+						floats( 128, 1.0f );
+				// tag::knn-similarity[]
+				List<Book> hits = searchSession.search( Book.class )
+						.where( f -> f.knn( 5 ).field( "coverImageEmbeddings" ).matching( coverImageEmbeddingsVector ) // <1>
+								.requiredMinimumSimilarity( 5 ) ) // <2>
+						.fetchHits( 20 );
+				// end::knn-similarity[]
+				assertThat( hits )
+						.extracting( Book::getId )
+						.containsExactlyInAnyOrder( BOOK1_ID );
 			} );
 		}
 	}

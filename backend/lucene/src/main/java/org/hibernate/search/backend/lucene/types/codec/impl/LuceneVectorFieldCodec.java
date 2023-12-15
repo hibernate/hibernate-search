@@ -7,6 +7,7 @@
 package org.hibernate.search.backend.lucene.types.codec.impl;
 
 import org.apache.lucene.codecs.KnnVectorsFormat;
+import org.apache.lucene.index.VectorSimilarityFunction;
 
 /**
  * Vector field specific codec that allows redefining {@link KnnVectorsFormat}.
@@ -30,4 +31,9 @@ public interface LuceneVectorFieldCodec<F> extends LuceneStandardFieldCodec<F, b
 	 * @return The number of dimensions (array length) of vectors to be indexed that this codec can process.
 	 */
 	int getConfiguredDimensions();
+
+	/**
+	 * @return The vector similarity function used by this codec.
+	 */
+	VectorSimilarityFunction getVectorSimilarity();
 }

@@ -98,6 +98,11 @@ public abstract class AbstractLuceneVectorFieldCodec<F> implements LuceneVectorF
 	}
 
 	@Override
+	public VectorSimilarityFunction getVectorSimilarity() {
+		return vectorSimilarity;
+	}
+
+	@Override
 	public String toString() {
 		return getClass().getSimpleName() + "{" +
 				"vectorSimilarity=" + vectorSimilarity +
