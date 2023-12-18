@@ -18,8 +18,11 @@ import com.google.gson.annotations.SerializedName;
  * See https://www.elastic.co/guide/en/elasticsearch/reference/current/mapping.html#mapping-type
  */
 /*
- * CAUTION: JSON serialization is controlled by a specific adapter, which must be
+ * CAUTION:
+ * 1. JSON serialization is controlled by a specific adapter, which must be
  * updated whenever fields of this class are added, renamed or removed.
+ *
+ * 2. Whenever adding more properties consider adding property validation to PropertyMappingValidator.
  */
 @JsonAdapter(PropertyMappingJsonAdapterFactory.class)
 public class PropertyMapping extends AbstractTypeMapping {

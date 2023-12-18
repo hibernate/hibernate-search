@@ -8,11 +8,16 @@ package org.hibernate.search.util.impl.integrationtest.backend.elasticsearch.dia
 
 import java.io.IOException;
 import java.util.Comparator;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Optional;
+import java.util.OptionalInt;
 import java.util.function.Predicate;
 
 import org.hibernate.search.backend.elasticsearch.ElasticsearchDistributionName;
 import org.hibernate.search.backend.elasticsearch.ElasticsearchVersion;
+import org.hibernate.search.engine.backend.types.VectorSimilarity;
+import org.hibernate.search.util.common.AssertionFailure;
 import org.hibernate.search.util.impl.integrationtest.backend.elasticsearch.ElasticsearchTestHostConnectionConfiguration;
 import org.hibernate.search.util.impl.integrationtest.backend.elasticsearch.extension.TestElasticsearchClient;
 import org.hibernate.search.util.impl.integrationtest.common.TestConfigurationProvider;
@@ -62,6 +67,129 @@ public class ElasticsearchTestDialect {
 
 	public String getLocalDateDefaultMappingFormat() {
 		return LOCAL_DATE_DEFAULT_FORMAT;
+	}
+
+	public String vectorFieldMapping(int dim, Class<?> elementType, OptionalInt m, OptionalInt efConstruction,
+			Optional<String> similarity) {
+		switch ( getActualVersion().distribution() ) {
+			case ELASTIC:
+				return "{"
+						+ "  'type': 'dense_vector',"
+						+ "  'element_type': '" + elementType.getName() + "',"
+						+ "  'dims': " + dim
+						+ similarity.map( s -> ",  'similarity': '" + s + "'" ).orElse( "" )
+						+ ( ( m.isPresent() || efConstruction.isPresent() )
+								? ( ",  'index_options': {"
+										+ ( m.isPresent() ? "    'm': " + m.getAsInt() + "," : "" )
+										+ ( efConstruction.isPresent()
+												? "    'ef_construction': " + efConstruction.getAsInt() + ","
+												: "" )
+										+ "    'type': 'hnsw'"
+										+ "  }" )
+								: "" )
+						+ "}";
+			case OPENSEARCH:
+			case AMAZON_OPENSEARCH_SERVERLESS:
+				return "{"
+						+ "  'type': 'knn_vector',"
+						+ "  'dimension': " + dim + ","
+						+ "  'data_type': '" + elementType.getName() + "',"
+						+ "  'method': {"
+						+ "    'name': 'hnsw',"
+						+ similarity.map( s -> "    'space_type': '" + s + "'," ).orElse( "" )
+						+ "    'engine': 'lucene'"
+						+ ( ( m.isPresent() || efConstruction.isPresent() )
+								? ",    'parameters': {"
+										+ ( m.isPresent() ? "    'm': " + m.getAsInt() : "" )
+										+ ( efConstruction.isPresent()
+												? ( m.isPresent() ? "," : "" ) + "    'ef_construction': "
+														+ efConstruction.getAsInt()
+												: "" )
+										+ "    }"
+								: "" )
+						+ "  }"
+						+ "}";
+			default:
+				throw new IllegalStateException( "Unknown distribution" );
+		}
+	}
+
+	public Map<String, String> vectorFieldNames() {
+		Map<String, String> map = new HashMap<>();
+		switch ( getActualVersion().distribution() ) {
+			case ELASTIC:
+				map.put( "dimension", "dims" );
+				map.put( "element_type", "element_type" );
+				map.put( "similarity", "similarity" );
+				map.put( "m", "index_options.m" );
+				map.put( "ef_construction", "index_options.ef_construction" );
+				break;
+			case OPENSEARCH:
+			case AMAZON_OPENSEARCH_SERVERLESS:
+				map.put( "dimension", "dimension" );
+				map.put( "element_type", "data_type" );
+				map.put( "similarity", "method.space_type" );
+				map.put( "m", "method.parameters.m" );
+				map.put( "ef_construction", "method.parameters.ef_construction" );
+				break;
+			default:
+				throw new IllegalStateException( "Unknown distribution" );
+		}
+		return map;
+	}
+
+	public String elementType(Class<?> type) {
+		switch ( getActualVersion().distribution() ) {
+			case ELASTIC:
+				if ( byte.class.equals( type ) ) {
+					return "byte";
+				}
+				if ( float.class.equals( type ) ) {
+					return "float";
+				}
+				throw new AssertionFailure( "Unknown element type" );
+			case OPENSEARCH:
+			case AMAZON_OPENSEARCH_SERVERLESS:
+				if ( byte.class.equals( type ) ) {
+					return "BYTE";
+				}
+				if ( float.class.equals( type ) ) {
+					return null;
+				}
+				throw new AssertionFailure( "Unknown element type" );
+			default:
+				throw new IllegalStateException( "Unknown distribution" );
+		}
+	}
+
+	public String vectorSimilarity(VectorSimilarity similarity) {
+		switch ( getActualVersion().distribution() ) {
+			case ELASTIC:
+				switch ( similarity ) {
+					case L2:
+						return "l2_norm";
+					case INNER_PRODUCT:
+						return "dot_product";
+					case COSINE:
+						return "cosine";
+					default:
+						throw new IllegalStateException( "Unknown similarity" );
+				}
+			case OPENSEARCH:
+			case AMAZON_OPENSEARCH_SERVERLESS:
+				switch ( similarity ) {
+					case L2:
+						return "l2";
+					case INNER_PRODUCT:
+						return "l2";
+					case COSINE:
+						return "cosinesimil";
+					default:
+						throw new IllegalStateException( "Unknown similarity" );
+				}
+			default:
+				throw new IllegalStateException( "Unknown distribution" );
+		}
 	}
 
 	public boolean supportsExplicitPurge() {

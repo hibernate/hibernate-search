@@ -30,6 +30,7 @@ import org.hibernate.search.backend.elasticsearch.multitenancy.impl.MultiTenancy
 import org.hibernate.search.backend.elasticsearch.multitenancy.impl.NoMultiTenancyStrategy;
 import org.hibernate.search.backend.elasticsearch.resources.impl.BackendThreads;
 import org.hibernate.search.backend.elasticsearch.types.dsl.provider.impl.ElasticsearchIndexFieldTypeFactoryProvider;
+import org.hibernate.search.backend.elasticsearch.validation.impl.ElasticsearchPropertyMappingValidatorProvider;
 import org.hibernate.search.engine.backend.spi.BackendBuildContext;
 import org.hibernate.search.engine.backend.spi.BackendFactory;
 import org.hibernate.search.engine.backend.spi.BackendImplementor;
@@ -139,6 +140,8 @@ public class ElasticsearchBackendFactory implements BackendFactory {
 
 			ElasticsearchIndexFieldTypeFactoryProvider typeFactoryProvider =
 					dialect.createIndexTypeFieldFactoryProvider( userFacingGson );
+			ElasticsearchPropertyMappingValidatorProvider propertyMappingValidatorProvider =
+					dialect.createElasticsearchPropertyMappingValidatorProvider();
 
 			indexLayoutStrategyHolder = createIndexLayoutStrategy( buildContext, propertySource );
 
@@ -147,6 +150,7 @@ public class ElasticsearchBackendFactory implements BackendFactory {
 					eventContext,
 					threads, link,
 					typeFactoryProvider,
+					propertyMappingValidatorProvider,
 					userFacingGson,
 					getMultiTenancyStrategy( propertySource, buildContext ),
 					indexLayoutStrategyHolder,

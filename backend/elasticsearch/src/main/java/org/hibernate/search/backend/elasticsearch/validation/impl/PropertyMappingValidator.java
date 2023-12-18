@@ -15,7 +15,10 @@ import org.hibernate.search.backend.elasticsearch.lowlevel.index.mapping.impl.Pr
 import org.hibernate.search.engine.backend.analysis.AnalyzerNames;
 import org.hibernate.search.util.common.impl.CollectionHelper;
 
-class PropertyMappingValidator extends AbstractTypeMappingValidator<PropertyMapping> {
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
+
+abstract class PropertyMappingValidator extends AbstractTypeMappingValidator<PropertyMapping> {
 
 	private static final List<String> DEFAULT_DATE_FORMAT;
 	static {
@@ -65,6 +68,8 @@ class PropertyMappingValidator extends AbstractTypeMappingValidator<PropertyMapp
 				expectedMapping.getTermVector(), actualMapping.getTermVector(), "no"
 		);
 
+		validateVectorMapping( errorCollector, expectedMapping, actualMapping );
+
 		super.validate( errorCollector, expectedMapping, actualMapping );
 	}
 
@@ -113,6 +118,115 @@ class PropertyMappingValidator extends AbstractTypeMappingValidator<PropertyMapp
 					errorCollector, ValidationContextType.MAPPING_ATTRIBUTE, "doc_values",
 					expectedDocValues, actualMapping.getDocValues(), true
 			);
+		}
+	}
+
+	protected abstract void validateVectorMapping(ValidationErrorCollector errorCollector, PropertyMapping expectedMapping,
+			PropertyMapping actualMapping);
+
+	static class ElasticsearchPropertyMappingValidator extends PropertyMappingValidator {
+
+		@Override
+		protected void validateVectorMapping(ValidationErrorCollector errorCollector, PropertyMapping expectedMapping,
+				PropertyMapping actualMapping) {
+			LeafValidators.EQUAL.validateWithDefault(
+					errorCollector, ValidationContextType.MAPPING_ATTRIBUTE, "element_type",
+					expectedMapping.getElementType(), actualMapping.getElementType(), "float"
+			);
+
+			LeafValidators.EQUAL.validate(
+					errorCollector, ValidationContextType.MAPPING_ATTRIBUTE, "dims",
+					expectedMapping.getDims(), actualMapping.getDims()
+			);
+
+			LeafValidators.EQUAL.validateWithDefault(
+					errorCollector, ValidationContextType.MAPPING_ATTRIBUTE, "similarity",
+					expectedMapping.getSimilarity(), actualMapping.getSimilarity(), "cosine"
+			);
+
+			JsonElement expectedIndexOptionsElement = expectedMapping.getIndexOptions();
+			if ( expectedIndexOptionsElement != null && expectedIndexOptionsElement.isJsonObject() ) {
+				JsonObject expectedIndexOptions = expectedIndexOptionsElement.getAsJsonObject();
+				JsonObject actualIndexOptions = actualMapping.getIndexOptions().getAsJsonObject();
+				LeafValidators.EQUAL.validate(
+						errorCollector, ValidationContextType.MAPPING_ATTRIBUTE, "index_options.type",
+						expectedIndexOptions.get( "type" ), actualIndexOptions.get( "type" )
+				);
+				LeafValidators.EQUAL.validateWithDefault(
+						errorCollector, ValidationContextType.MAPPING_ATTRIBUTE, "index_options.m",
+						expectedIndexOptions.get( "m" ), actualIndexOptions.get( "m" ), 16
+				);
+				LeafValidators.EQUAL.validateWithDefault(
+						errorCollector, ValidationContextType.MAPPING_ATTRIBUTE, "index_options.ef_construction",
+						expectedIndexOptions.get( "ef_construction" ), actualIndexOptions.get( "ef_construction" ), 100
+				);
+			}
+		}
+	}
+
+	static class OpenSearchPropertyMappingValidator extends PropertyMappingValidator {
+
+		@Override
+		protected void validateVectorMapping(ValidationErrorCollector errorCollector, PropertyMapping expectedMapping,
+				PropertyMapping actualMapping) {
+			LeafValidators.EQUAL.validate(
+					errorCollector, ValidationContextType.MAPPING_ATTRIBUTE, "dimension",
+					expectedMapping.getDimension(), actualMapping.getDimension()
+			);
+
+			LeafValidators.EQUAL.validate(
+					errorCollector, ValidationContextType.MAPPING_ATTRIBUTE, "data_type",
+					expectedMapping.getDataType(), actualMapping.getDataType()
+			);
+
+			JsonElement methodElement = expectedMapping.getMethod();
+			if ( methodElement != null && methodElement.isJsonObject() ) {
+				JsonObject expectedMethod = methodElement.getAsJsonObject();
+				JsonObject actualMethod = actualMapping.getMethod().getAsJsonObject();
+
+				LeafValidators.EQUAL.validate(
+						errorCollector, ValidationContextType.MAPPING_ATTRIBUTE, "method.name",
+						getAsString( expectedMethod, "name" ), getAsString( actualMethod, "name" )
+				);
+
+				LeafValidators.EQUAL.validateWithDefault(
+						errorCollector, ValidationContextType.MAPPING_ATTRIBUTE, "method.space_type",
+						getAsString( expectedMethod, "space_type" ), getAsString( actualMethod, "space_type" ),
+						"l2"
+				);
+
+				LeafValidators.EQUAL.validate(
+						errorCollector, ValidationContextType.MAPPING_ATTRIBUTE, "method.engine",
+						getAsString( expectedMethod, "engine" ), getAsString( actualMethod, "engine" )
+				);
+
+				JsonElement parametersElement = expectedMethod.get( "parameters" );
+				if ( parametersElement != null && parametersElement.isJsonObject() ) {
+					JsonObject expectedParameters = parametersElement.getAsJsonObject();
+					JsonObject actualParameters = actualMethod.get( "parameters" ).getAsJsonObject();
+
+					LeafValidators.EQUAL.validate(
+							errorCollector, ValidationContextType.MAPPING_ATTRIBUTE, "method.parameters.m",
+							getAsInteger( expectedParameters, "m" ), getAsInteger( actualParameters, "m" )
+					);
+
+					LeafValidators.EQUAL.validate(
+							errorCollector, ValidationContextType.MAPPING_ATTRIBUTE, "method.parameters.ef_construction",
+							getAsInteger( expectedParameters, "ef_construction" ),
+							getAsInteger( actualParameters, "ef_construction" )
+					);
+				}
+			}
+		}
+
+		private static String getAsString(JsonObject object, String property) {
+			JsonElement element = object.get( property );
+			return element == null || element.isJsonNull() ? null : element.getAsString();
+		}
+
+		private static Integer getAsInteger(JsonObject object, String property) {
+			JsonElement element = object.get( property );
+			return element == null || element.isJsonNull() ? null : element.getAsInt();
 		}
 	}
 }

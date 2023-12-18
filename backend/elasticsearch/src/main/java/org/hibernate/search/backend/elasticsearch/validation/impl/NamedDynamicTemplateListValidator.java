@@ -14,11 +14,16 @@ import java.util.stream.Collectors;
 
 import org.hibernate.search.backend.elasticsearch.lowlevel.index.mapping.impl.DynamicTemplate;
 import org.hibernate.search.backend.elasticsearch.lowlevel.index.mapping.impl.NamedDynamicTemplate;
+import org.hibernate.search.backend.elasticsearch.lowlevel.index.mapping.impl.PropertyMapping;
 import org.hibernate.search.backend.elasticsearch.reporting.impl.ElasticsearchValidationMessages;
 
 public class NamedDynamicTemplateListValidator implements Validator<List<NamedDynamicTemplate>> {
 
-	private final DynamicTemplateValidator dynamicTemplateValidator = new DynamicTemplateValidator();
+	private final DynamicTemplateValidator dynamicTemplateValidator;
+
+	public NamedDynamicTemplateListValidator(Validator<PropertyMapping> propertyMappingValidator) {
+		this.dynamicTemplateValidator = new DynamicTemplateValidator( propertyMappingValidator );
+	}
 
 	@Override
 	public void validate(ValidationErrorCollector errorCollector, List<NamedDynamicTemplate> expected,
