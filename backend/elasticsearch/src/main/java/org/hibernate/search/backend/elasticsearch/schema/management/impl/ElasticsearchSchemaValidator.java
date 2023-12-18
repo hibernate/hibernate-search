@@ -11,6 +11,7 @@ import org.hibernate.search.backend.elasticsearch.lowlevel.index.impl.IndexMetad
 import org.hibernate.search.backend.elasticsearch.lowlevel.index.mapping.impl.RootTypeMapping;
 import org.hibernate.search.backend.elasticsearch.lowlevel.index.settings.impl.IndexSettings;
 import org.hibernate.search.backend.elasticsearch.reporting.impl.ElasticsearchValidationMessages;
+import org.hibernate.search.backend.elasticsearch.validation.impl.ElasticsearchPropertyMappingValidatorProvider;
 import org.hibernate.search.backend.elasticsearch.validation.impl.IndexAliasDefinitionValidator;
 import org.hibernate.search.backend.elasticsearch.validation.impl.IndexSettingsValidator;
 import org.hibernate.search.backend.elasticsearch.validation.impl.RootTypeMappingValidator;
@@ -31,7 +32,11 @@ final class ElasticsearchSchemaValidator {
 
 	private final Validator<IndexAliasDefinition> aliasDefinitionValidator = new IndexAliasDefinitionValidator();
 	private final Validator<IndexSettings> indexSettingsValidator = new IndexSettingsValidator();
-	private final Validator<RootTypeMapping> rootTypeMappingValidator = new RootTypeMappingValidator();
+	private final Validator<RootTypeMapping> rootTypeMappingValidator;
+
+	public ElasticsearchSchemaValidator(ElasticsearchPropertyMappingValidatorProvider propertyMappingValidatorProvider) {
+		this.rootTypeMappingValidator = new RootTypeMappingValidator( propertyMappingValidatorProvider );
+	}
 
 	/**
 	 * Validate actual index metadata, pushing any validation failure to the given collector.

@@ -34,6 +34,7 @@ import org.hibernate.search.backend.elasticsearch.search.projection.impl.SearchP
 import org.hibernate.search.backend.elasticsearch.search.query.impl.ElasticsearchSearchQueryBuilder;
 import org.hibernate.search.backend.elasticsearch.search.query.impl.ElasticsearchSearchQueryIndexScope;
 import org.hibernate.search.backend.elasticsearch.search.query.impl.SearchBackendContext;
+import org.hibernate.search.backend.elasticsearch.validation.impl.ElasticsearchPropertyMappingValidatorProvider;
 import org.hibernate.search.backend.elasticsearch.work.execution.impl.ElasticsearchIndexIndexer;
 import org.hibernate.search.backend.elasticsearch.work.execution.impl.ElasticsearchIndexIndexingPlan;
 import org.hibernate.search.backend.elasticsearch.work.execution.impl.ElasticsearchIndexWorkspace;
@@ -81,7 +82,7 @@ public class IndexManagerBackendContext implements SearchBackendContext, WorkExe
 	private final FailureHandler failureHandler;
 	private final TimingSource timingSource;
 	private final ElasticsearchParallelWorkOrchestrator generalPurposeOrchestrator;
-
+	private final ElasticsearchPropertyMappingValidatorProvider propertyMappingValidatorProvider;
 	private final SearchProjectionBackendContext searchProjectionBackendContext;
 
 	public IndexManagerBackendContext(ElasticsearchBackend backendAPI,
@@ -92,7 +93,8 @@ public class IndexManagerBackendContext implements SearchBackendContext, WorkExe
 			TypeNameMapping typeNameMapping,
 			FailureHandler failureHandler,
 			TimingSource timingSource,
-			ElasticsearchParallelWorkOrchestrator generalPurposeOrchestrator) {
+			ElasticsearchParallelWorkOrchestrator generalPurposeOrchestrator,
+			ElasticsearchPropertyMappingValidatorProvider propertyMappingValidatorProvider) {
 		this.backendAPI = backendAPI;
 		this.eventContext = eventContext;
 		this.threads = threads;
@@ -103,6 +105,7 @@ public class IndexManagerBackendContext implements SearchBackendContext, WorkExe
 		this.failureHandler = failureHandler;
 		this.timingSource = timingSource;
 		this.generalPurposeOrchestrator = generalPurposeOrchestrator;
+		this.propertyMappingValidatorProvider = propertyMappingValidatorProvider;
 
 		this.searchProjectionBackendContext = new SearchProjectionBackendContext(
 				typeNameMapping.getTypeNameExtractionHelper(),
@@ -228,7 +231,8 @@ public class IndexManagerBackendContext implements SearchBackendContext, WorkExe
 				userFacingGson,
 				link.getWorkFactory(), generalPurposeOrchestrator,
 				indexLayoutStrategy, model.names(), expectedMetadata,
-				executionOptions
+				executionOptions,
+				propertyMappingValidatorProvider
 		);
 	}
 

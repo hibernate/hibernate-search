@@ -12,6 +12,8 @@ import static org.hibernate.search.integrationtest.backend.elasticsearch.schema.
 import static org.hibernate.search.integrationtest.backend.elasticsearch.schema.management.ElasticsearchIndexSchemaManagerTestUtils.simpleMappingForInitialization;
 
 import java.util.List;
+import java.util.Optional;
+import java.util.OptionalInt;
 import java.util.stream.Collectors;
 
 import org.hibernate.search.backend.elasticsearch.ElasticsearchExtension;
@@ -19,6 +21,7 @@ import org.hibernate.search.backend.elasticsearch.analysis.ElasticsearchAnalysis
 import org.hibernate.search.backend.elasticsearch.analysis.ElasticsearchAnalysisConfigurer;
 import org.hibernate.search.backend.elasticsearch.cfg.ElasticsearchIndexSettings;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaObjectField;
+import org.hibernate.search.engine.backend.types.VectorSimilarity;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.extension.SearchSetupHelper;
 import org.hibernate.search.util.common.SearchException;
 import org.hibernate.search.util.common.impl.Futures;
@@ -370,6 +373,202 @@ class ElasticsearchIndexSchemaManagerValidationMappingBaseIT {
 						.failure(
 								"Invalid value. Expected 'keyword', actual is 'integer'"
 						),
+				operation
+		);
+	}
+
+	@ParameterizedTest(name = "With operation {0}")
+	@MethodSource("params")
+	void vector_success_1(ElasticsearchIndexSchemaManagerValidationOperation operation) {
+		StubMappedIndex index = StubMappedIndex.ofNonRetrievable( root -> {
+			root.field( "vector", f -> f.asByteVector().dimension( 100 ) )
+					.toReference();
+		} );
+
+		elasticSearchClient.index( index.name() ).deleteAndCreate();
+		elasticSearchClient.index( index.name() ).type().putMapping(
+				simpleMappingForInitialization(
+						"'vector': "
+								+ elasticSearchClient.getDialect()
+										.vectorFieldMapping( 100, byte.class, OptionalInt.empty(), OptionalInt.empty(),
+												Optional.empty() )
+				)
+		);
+
+		setupAndValidate( index, operation );
+
+		// If we get here, it means validation passed (no exception was thrown)
+	}
+
+	@ParameterizedTest(name = "With operation {0}")
+	@MethodSource("params")
+	void vector_success_2(ElasticsearchIndexSchemaManagerValidationOperation operation) {
+		StubMappedIndex index = StubMappedIndex.ofNonRetrievable( root -> {
+			root.field( "vector",
+					f -> f.asFloatVector().dimension( 50 ).vectorSimilarity( VectorSimilarity.L2 ).maxConnections( 2 )
+							.beamWidth( 10 ) )
+					.toReference();
+		} );
+
+		elasticSearchClient.index( index.name() ).deleteAndCreate();
+		elasticSearchClient.index( index.name() ).type().putMapping(
+				simpleMappingForInitialization(
+						"'vector': "
+								+ elasticSearchClient.getDialect()
+										.vectorFieldMapping( 50, float.class, OptionalInt.of( 2 ), OptionalInt.of( 10 ),
+												Optional.of( elasticSearchClient.getDialect()
+														.vectorSimilarity( VectorSimilarity.L2 ) ) )
+				)
+		);
+
+		setupAndValidate( index, operation );
+
+		// If we get here, it means validation passed (no exception was thrown)
+	}
+
+	@ParameterizedTest(name = "With operation {0}")
+	@MethodSource("params")
+	void vector_invalid_dimension(ElasticsearchIndexSchemaManagerValidationOperation operation) {
+		StubMappedIndex index = StubMappedIndex.ofNonRetrievable( root -> {
+			root.field( "vectorB", f -> f.asByteVector().dimension( 2 ) ).toReference();
+			root.field( "vectorF", f -> f.asFloatVector().dimension( 2 ) ).toReference();
+		} );
+
+		elasticSearchClient.index( index.name() ).deleteAndCreate();
+		elasticSearchClient.index( index.name() ).type().putMapping(
+				simpleMappingForInitialization(
+						"'vectorB': "
+								+ elasticSearchClient.getDialect()
+										.vectorFieldMapping( 100, byte.class, OptionalInt.empty(), OptionalInt.empty(),
+												Optional.empty() )
+								+ ", 'vectorF': "
+								+ elasticSearchClient.getDialect()
+										.vectorFieldMapping( 100, float.class, OptionalInt.empty(), OptionalInt.empty(),
+												Optional.empty() )
+				)
+		);
+
+		setupAndValidateExpectingFailure( index,
+				hasValidationFailureReport()
+						.indexFieldContext( "vectorB" )
+						.mappingAttributeContext( elasticSearchClient.getDialect().vectorFieldNames().get( "dimension" ) )
+						.failure( "Invalid value. Expected '2', actual is '100'" )
+						.indexFieldContext( "vectorF" )
+						.mappingAttributeContext( elasticSearchClient.getDialect().vectorFieldNames().get( "dimension" ) )
+						.failure( "Invalid value. Expected '2', actual is '100'" ),
+				operation
+		);
+	}
+
+	@ParameterizedTest(name = "With operation {0}")
+	@MethodSource("params")
+	void vector_invalid_elementType(ElasticsearchIndexSchemaManagerValidationOperation operation) {
+		StubMappedIndex index = StubMappedIndex.ofNonRetrievable( root -> {
+			root.field( "vectorB", f -> f.asByteVector().dimension( 2 ) ).toReference();
+			root.field( "vectorF", f -> f.asFloatVector().dimension( 2 ) ).toReference();
+		} );
+
+		elasticSearchClient.index( index.name() ).deleteAndCreate();
+		elasticSearchClient.index( index.name() ).type().putMapping(
+				simpleMappingForInitialization(
+						"'vectorF': "
+								+ elasticSearchClient.getDialect()
+										.vectorFieldMapping( 2, byte.class, OptionalInt.empty(), OptionalInt.empty(),
+												Optional.empty() )
+								+ ", 'vectorB': "
+								+ elasticSearchClient.getDialect()
+										.vectorFieldMapping( 2, float.class, OptionalInt.empty(), OptionalInt.empty(),
+												Optional.empty() )
+				)
+		);
+
+		String byteString = elasticSearchClient.getDialect().elementType( byte.class );
+		String floatString = elasticSearchClient.getDialect().elementType( float.class );
+
+		setupAndValidateExpectingFailure( index,
+				hasValidationFailureReport()
+						.indexFieldContext( "vectorB" )
+						.mappingAttributeContext( elasticSearchClient.getDialect().vectorFieldNames().get( "element_type" ) )
+						.failure( "Invalid value. Expected '" + byteString + "', actual is 'null'" )
+						.indexFieldContext( "vectorF" )
+						.mappingAttributeContext( elasticSearchClient.getDialect().vectorFieldNames().get( "element_type" ) )
+						.failure( "Invalid value. Expected '" + floatString + "', actual is '" + byteString + "'" ),
+				operation
+		);
+	}
+
+	@ParameterizedTest(name = "With operation {0}")
+	@MethodSource("params")
+	void vector_invalid_similarity(ElasticsearchIndexSchemaManagerValidationOperation operation) {
+		StubMappedIndex index = StubMappedIndex.ofNonRetrievable( root -> {
+			root.field( "vectorB", f -> f.asByteVector().dimension( 2 ).vectorSimilarity( VectorSimilarity.COSINE ) )
+					.toReference();
+			root.field( "vectorF", f -> f.asFloatVector().dimension( 2 ).vectorSimilarity( VectorSimilarity.COSINE ) )
+					.toReference();
+		} );
+
+		String l2 = elasticSearchClient.getDialect().vectorSimilarity( VectorSimilarity.L2 );
+		String cosine = elasticSearchClient.getDialect().vectorSimilarity( VectorSimilarity.COSINE );
+		elasticSearchClient.index( index.name() ).deleteAndCreate();
+		elasticSearchClient.index( index.name() ).type().putMapping(
+				simpleMappingForInitialization(
+						"'vectorF': "
+								+ elasticSearchClient.getDialect()
+										.vectorFieldMapping( 2, float.class, OptionalInt.empty(), OptionalInt.empty(),
+												Optional.of( l2 ) )
+								+ ", 'vectorB': "
+								+ elasticSearchClient.getDialect()
+										.vectorFieldMapping( 2, byte.class, OptionalInt.empty(), OptionalInt.empty(),
+												Optional.of( l2 ) )
+				)
+		);
+
+		setupAndValidateExpectingFailure( index,
+				hasValidationFailureReport()
+						.indexFieldContext( "vectorB" )
+						.mappingAttributeContext( elasticSearchClient.getDialect().vectorFieldNames().get( "similarity" ) )
+						.failure( "Invalid value. Expected '" + cosine + "', actual is '" + l2 + "'" )
+						.indexFieldContext( "vectorF" )
+						.mappingAttributeContext( elasticSearchClient.getDialect().vectorFieldNames().get( "similarity" ) )
+						.failure( "Invalid value. Expected '" + cosine + "', actual is '" + l2 + "'" ),
+				operation
+		);
+	}
+
+	@ParameterizedTest(name = "With operation {0}")
+	@MethodSource("params")
+	void vector_invalid_m_ef(ElasticsearchIndexSchemaManagerValidationOperation operation) {
+		StubMappedIndex index = StubMappedIndex.ofNonRetrievable( root -> {
+			root.field( "vectorB", f -> f.asByteVector().dimension( 2 ).beamWidth( 2 ).maxConnections( 20 ) ).toReference();
+			root.field( "vectorF", f -> f.asFloatVector().dimension( 2 ).beamWidth( 5 ).maxConnections( 50 ) ).toReference();
+		} );
+
+		elasticSearchClient.index( index.name() ).deleteAndCreate();
+		elasticSearchClient.index( index.name() ).type().putMapping(
+				simpleMappingForInitialization(
+						"'vectorF': "
+								+ elasticSearchClient.getDialect()
+										.vectorFieldMapping( 2, float.class, OptionalInt.of( 60 ), OptionalInt.of( 6 ),
+												Optional.empty() )
+								+ ", 'vectorB': "
+								+ elasticSearchClient.getDialect()
+										.vectorFieldMapping( 2, byte.class, OptionalInt.of( 30 ), OptionalInt.of( 3 ),
+												Optional.empty() )
+				)
+		);
+
+		setupAndValidateExpectingFailure( index,
+				hasValidationFailureReport()
+						.indexFieldContext( "vectorB" )
+						.mappingAttributeContext( elasticSearchClient.getDialect().vectorFieldNames().get( "m" ) )
+						.failure( "Invalid value. Expected '20', actual is '30'" )
+						.mappingAttributeContext( elasticSearchClient.getDialect().vectorFieldNames().get( "ef_construction" ) )
+						.failure( "Invalid value. Expected '2', actual is '3" )
+						.indexFieldContext( "vectorF" )
+						.mappingAttributeContext( elasticSearchClient.getDialect().vectorFieldNames().get( "m" ) )
+						.failure( "Invalid value. Expected '50', actual is '60'" )
+						.mappingAttributeContext( elasticSearchClient.getDialect().vectorFieldNames().get( "ef_construction" ) )
+						.failure( "Invalid value. Expected '5', actual is '6'" ),
 				operation
 		);
 	}

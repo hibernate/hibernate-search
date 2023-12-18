@@ -38,6 +38,7 @@ import org.hibernate.search.backend.elasticsearch.orchestration.impl.Elasticsear
 import org.hibernate.search.backend.elasticsearch.resources.impl.BackendThreads;
 import org.hibernate.search.backend.elasticsearch.types.dsl.provider.impl.ElasticsearchIndexFieldTypeFactoryProvider;
 import org.hibernate.search.backend.elasticsearch.util.spi.URLEncodedString;
+import org.hibernate.search.backend.elasticsearch.validation.impl.ElasticsearchPropertyMappingValidatorProvider;
 import org.hibernate.search.engine.backend.Backend;
 import org.hibernate.search.engine.backend.index.spi.IndexManagerBuilder;
 import org.hibernate.search.engine.backend.mapping.spi.BackendMapperContext;
@@ -111,6 +112,7 @@ class ElasticsearchBackendImpl
 			BackendThreads threads,
 			ElasticsearchLinkImpl link,
 			ElasticsearchIndexFieldTypeFactoryProvider typeFactoryProvider,
+			ElasticsearchPropertyMappingValidatorProvider propertyMappingValidatorProvider,
 			Gson userFacingGson,
 			MultiTenancyStrategy multiTenancyStrategy,
 			BeanHolder<? extends IndexLayoutStrategy> indexLayoutStrategyHolder,
@@ -138,7 +140,8 @@ class ElasticsearchBackendImpl
 				indexLayoutStrategyHolder.get(),
 				typeNameMapping,
 				failureHandler, timingSource,
-				generalPurposeOrchestrator
+				generalPurposeOrchestrator,
+				propertyMappingValidatorProvider
 		);
 		this.indexNamesRegistry = new IndexNamesRegistry();
 	}

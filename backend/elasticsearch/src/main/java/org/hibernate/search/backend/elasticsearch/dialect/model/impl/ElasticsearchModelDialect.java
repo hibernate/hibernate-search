@@ -7,6 +7,7 @@
 package org.hibernate.search.backend.elasticsearch.dialect.model.impl;
 
 import org.hibernate.search.backend.elasticsearch.types.dsl.provider.impl.ElasticsearchIndexFieldTypeFactoryProvider;
+import org.hibernate.search.backend.elasticsearch.validation.impl.ElasticsearchPropertyMappingValidatorProvider;
 
 import com.google.gson.Gson;
 
@@ -28,5 +29,7 @@ import com.google.gson.Gson;
 public interface ElasticsearchModelDialect {
 
 	ElasticsearchIndexFieldTypeFactoryProvider createIndexTypeFieldFactoryProvider(Gson userFacingGson);
+
+	ElasticsearchPropertyMappingValidatorProvider createElasticsearchPropertyMappingValidatorProvider();
 
 }

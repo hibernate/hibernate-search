@@ -14,6 +14,7 @@ import org.hibernate.search.backend.elasticsearch.index.layout.impl.IndexNames;
 import org.hibernate.search.backend.elasticsearch.lowlevel.index.impl.IndexMetadata;
 import org.hibernate.search.backend.elasticsearch.orchestration.impl.ElasticsearchParallelWorkOrchestrator;
 import org.hibernate.search.backend.elasticsearch.util.spi.URLEncodedString;
+import org.hibernate.search.backend.elasticsearch.validation.impl.ElasticsearchPropertyMappingValidatorProvider;
 import org.hibernate.search.backend.elasticsearch.work.factory.impl.ElasticsearchWorkFactory;
 import org.hibernate.search.engine.backend.schema.management.spi.IndexSchemaCollector;
 import org.hibernate.search.engine.backend.schema.management.spi.IndexSchemaManager;
@@ -42,12 +43,13 @@ public class ElasticsearchIndexSchemaManager implements IndexSchemaManager {
 			ElasticsearchParallelWorkOrchestrator workOrchestrator,
 			IndexLayoutStrategy indexLayoutStrategy,
 			IndexNames indexNames, IndexMetadata expectedMetadata,
-			ElasticsearchIndexLifecycleExecutionOptions executionOptions) {
+			ElasticsearchIndexLifecycleExecutionOptions executionOptions,
+			ElasticsearchPropertyMappingValidatorProvider propertyMappingValidatorProvider) {
 		this.schemaAccessor = new ElasticsearchSchemaAccessor( workFactory, workOrchestrator );
 
 		this.schemaCreator = new ElasticsearchSchemaCreator( schemaAccessor, indexLayoutStrategy );
 		this.schemaDropper = new ElasticsearchSchemaDropper( schemaAccessor );
-		this.schemaValidator = new ElasticsearchSchemaValidator();
+		this.schemaValidator = new ElasticsearchSchemaValidator( propertyMappingValidatorProvider );
 		this.schemaMigrator = new ElasticsearchSchemaMigrator( schemaAccessor, schemaValidator );
 		this.schemaExporter = new ElasticsearchSchemaExporter( userFacingGson, workFactory, indexLayoutStrategy );
 
