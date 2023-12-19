@@ -13,8 +13,8 @@ import com.google.gson.JsonArray;
 public class ElasticsearchByteVectorFieldCodec extends AbstractElasticsearchVectorFieldCodec<byte[]> {
 
 	public ElasticsearchByteVectorFieldCodec(VectorSimilarity similarity, int dimension, Integer maxConnections,
-			Integer beamWidth) {
-		super( similarity, dimension, maxConnections, beamWidth );
+			Integer beamWidth, byte[] indexNullAs) {
+		super( similarity, dimension, maxConnections, beamWidth, indexNullAs );
 	}
 
 	@Override

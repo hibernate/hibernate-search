@@ -37,6 +37,7 @@ abstract class AbstractElasticsearchVectorFieldTypeOptionsStep<
 	protected Integer dimension;
 	protected Integer beamWidth;
 	protected Integer maxConnections;
+	protected F indexNullAs;
 	private Projectable projectable = Projectable.DEFAULT;
 	private Searchable searchable = Searchable.DEFAULT;
 
@@ -60,7 +61,8 @@ abstract class AbstractElasticsearchVectorFieldTypeOptionsStep<
 
 	@Override
 	public S indexNullAs(F indexNullAs) {
-		throw log.vectorFieldIndexNullAsNotSupported();
+		this.indexNullAs = indexNullAs;
+		return thisAsS();
 	}
 
 	@Override
@@ -102,7 +104,7 @@ abstract class AbstractElasticsearchVectorFieldTypeOptionsStep<
 		mappingContributor.contribute( mapping, this );
 
 		AbstractElasticsearchVectorFieldCodec<F> codec =
-				createCodec( vectorSimilarity, dimension, maxConnections, beamWidth );
+				createCodec( vectorSimilarity, dimension, maxConnections, beamWidth, indexNullAs );
 		builder.codec( codec );
 		if ( resolvedSearchable ) {
 			builder.searchable( true );
@@ -121,7 +123,7 @@ abstract class AbstractElasticsearchVectorFieldTypeOptionsStep<
 	}
 
 	protected abstract AbstractElasticsearchVectorFieldCodec<F> createCodec(VectorSimilarity vectorSimilarity, int dimension,
-			Integer maxConnections, Integer beamWidth);
+			Integer maxConnections, Integer beamWidth, F indexNullAs);
 
 	protected static boolean resolveDefault(Projectable projectable) {
 		switch ( projectable ) {

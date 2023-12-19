@@ -846,14 +846,11 @@ public interface Log extends BasicLogger {
 	SearchException cannotGuessVectorFieldType(@FormatWith(ClassFormatter.class) Class<?> inputType,
 			@Param EventContext context);
 
-	@Message(id = ID_OFFSET + 179, value = "Specifying how to index null values is not supported by this backend.")
-	SearchException vectorFieldIndexNullAsNotSupported();
-
-	@Message(id = ID_OFFSET + 180, value = "Invalid index field type: missing vector dimension."
+	@Message(id = ID_OFFSET + 179, value = "Invalid index field type: missing vector dimension."
 			+ " Define the vector dimension explicitly. %1$s")
 	SearchException nullVectorDimension(String hint, @Param EventContext eventContext);
 
-	@Message(id = ID_OFFSET + 181, value = "Fields of this type cannot be multivalued.")
+	@Message(id = ID_OFFSET + 180, value = "Fields of this type cannot be multivalued.")
 	SearchException multiValuedFieldNotAllowed(@Param EventContext context);
 
 	@Message(id = ID_OFFSET + 181, value = "Vector field '%1$s' is defined as a '%2$s' array."

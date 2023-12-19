@@ -28,8 +28,8 @@ class ElasticsearchFloatVectorFieldTypeOptionsStep
 
 	@Override
 	protected AbstractElasticsearchVectorFieldCodec<float[]> createCodec(VectorSimilarity similarity, int dimension,
-			Integer maxConnections, Integer beamWidth) {
-		return new ElasticsearchFloatVectorFieldCodec( similarity, dimension, maxConnections, beamWidth );
+			Integer maxConnections, Integer beamWidth, float[] indexNullAs) {
+		return new ElasticsearchFloatVectorFieldCodec( similarity, dimension, maxConnections, beamWidth, indexNullAs );
 	}
 
 	@Override

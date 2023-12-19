@@ -13,8 +13,8 @@ import com.google.gson.JsonArray;
 public class ElasticsearchFloatVectorFieldCodec extends AbstractElasticsearchVectorFieldCodec<float[]> {
 
 	public ElasticsearchFloatVectorFieldCodec(VectorSimilarity similarity, int dimension, Integer maxConnections,
-			Integer beamWidth) {
-		super( similarity, dimension, maxConnections, beamWidth );
+			Integer beamWidth, float[] indexNullAs) {
+		super( similarity, dimension, maxConnections, beamWidth, indexNullAs );
 	}
 
 	@Override
