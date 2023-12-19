@@ -89,12 +89,13 @@ class IndexNullAsValueIT {
 			Object valueToMatch = fieldModel.indexNullAsValue.indexedValue;
 			SearchPredicate predicate;
 			if ( valueToMatch instanceof byte[] ) {
-				predicate =
-						scope.predicate().knn( 2 ).field( absoluteFieldPath ).matching( (byte[]) valueToMatch ).toPredicate();
+				predicate = TckConfiguration.get().getBackendFeatures().setKnnBackendDefaults(
+						scope.predicate().knn( 2 ).field( absoluteFieldPath ).matching( (byte[]) valueToMatch ) ).toPredicate();
 			}
 			else {
-				predicate =
-						scope.predicate().knn( 2 ).field( absoluteFieldPath ).matching( (float[]) valueToMatch ).toPredicate();
+				predicate = TckConfiguration.get().getBackendFeatures().setKnnBackendDefaults(
+						scope.predicate().knn( 2 ).field( absoluteFieldPath ).matching( (float[]) valueToMatch ) )
+						.toPredicate();
 			}
 
 			SearchQuery<DocumentReference> query = scope.query()

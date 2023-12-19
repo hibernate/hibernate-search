@@ -28,8 +28,6 @@ import org.hibernate.search.engine.spatial.GeoBoundingBox;
 import org.hibernate.search.engine.spatial.GeoPoint;
 import org.hibernate.search.engine.spatial.GeoPolygon;
 import org.hibernate.search.mapper.orm.Search;
-import org.hibernate.search.mapper.orm.cfg.HibernateOrmMapperSettings;
-import org.hibernate.search.mapper.orm.mapping.HibernateOrmSearchMappingConfigurer;
 import org.hibernate.search.mapper.orm.scope.SearchScope;
 import org.hibernate.search.mapper.orm.session.SearchSession;
 import org.hibernate.search.util.common.data.RangeBoundInclusion;
@@ -59,16 +57,6 @@ class PredicateDslIT {
 		entityManagerFactory = setupHelper.start().setup( Book.class, Author.class, EmbeddableGeoPoint.class );
 
 		DocumentationSetupHelper.SetupContext setupContext = setupHelper.start();
-		// TODO HSEARCH-4950 Remove this if and add @VectorField to the Book entity once we support KNN search using Elasticsearch/OpenSearch
-		if ( BackendConfiguration.isLucene() ) {
-			setupContext.withProperty(
-					HibernateOrmMapperSettings.MAPPING_CONFIGURER,
-					(HibernateOrmSearchMappingConfigurer) context -> context.programmaticMapping()
-							.type( Book.class )
-							.property( "coverImageEmbeddings" )
-							.vectorField( 128 )
-			);
-		}
 		entityManagerFactory = setupContext.setup( Book.class, Author.class, EmbeddableGeoPoint.class );
 		initData();
 	}
@@ -1106,7 +1094,8 @@ class PredicateDslIT {
 
 	@Test
 	void knn() {
-		// TODO HSEARCH-4950 Remove this assumption when we support KNN search using Elasticsearch/OpenSearch
+		// NOTE: To keep this documentation example simple there is no testing with Elasticsearch/OpenSearch
+		// as Elasticsearch requires an additional numberOfCandidates option that throws an exception on other backend/distributions
 		assumeTrue(
 				BackendConfiguration.isLucene(),
 				"This test only makes sense if the backend supports vectors"

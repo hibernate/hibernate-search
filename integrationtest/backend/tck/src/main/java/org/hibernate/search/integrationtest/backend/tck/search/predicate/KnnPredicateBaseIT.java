@@ -157,7 +157,8 @@ class KnnPredicateBaseIT {
 
 		@Override
 		protected void tryPredicate(SearchPredicateFactory f, String fieldPath) {
-			f.knn( 1 ).field( fieldPath ).matching( new byte[] { 1 } );
+			TckConfiguration.get().getBackendFeatures()
+					.setKnnBackendDefaults( f.knn( 1 ).field( fieldPath ).matching( new byte[] { 1 } ) );
 		}
 
 		@Override
@@ -189,7 +190,8 @@ class KnnPredicateBaseIT {
 
 		@Override
 		protected void tryPredicate(SearchPredicateFactory f, String fieldPath) {
-			f.knn( 1 ).field( fieldPath ).matching( new byte[] { 1 } );
+			TckConfiguration.get().getBackendFeatures()
+					.setKnnBackendDefaults( f.knn( 1 ).field( fieldPath ).matching( new byte[] { 1 } ) );
 		}
 
 		@Override
@@ -229,12 +231,12 @@ class KnnPredicateBaseIT {
 		@Override
 		protected void tryPredicate(SearchPredicateFactory f, String fieldPath, FieldTypeDescriptor<?, ?> fieldType) {
 			if ( byte[].class.equals( fieldType.getJavaType() ) ) {
-				f.knn( 1 ).field( fieldPath ).matching(
-						new byte[( (VectorFieldTypeDescriptor<?>) fieldType ).vectorSize()] );
+				TckConfiguration.get().getBackendFeatures().setKnnBackendDefaults( f.knn( 1 ).field( fieldPath ).matching(
+						new byte[( (VectorFieldTypeDescriptor<?>) fieldType ).vectorSize()] ) );
 			}
 			if ( float[].class.equals( fieldType.getJavaType() ) ) {
-				f.knn( 1 ).field( fieldPath ).matching(
-						new float[( (VectorFieldTypeDescriptor<?>) fieldType ).vectorSize()] );
+				TckConfiguration.get().getBackendFeatures().setKnnBackendDefaults( f.knn( 1 ).field( fieldPath ).matching(
+						new float[( (VectorFieldTypeDescriptor<?>) fieldType ).vectorSize()] ) );
 			}
 		}
 
@@ -329,10 +331,12 @@ class KnnPredicateBaseIT {
 	private static <F> KnnPredicateOptionsStep knnPredicateOptionsStep(SearchPredicateFactory f, String fieldPath,
 			int matchingDocOrdinal, F matchingArg) {
 		if ( matchingArg instanceof byte[] ) {
-			return f.knn( 1 ).field( fieldPath ).matching( ( (byte[]) matchingArg ) );
+			return TckConfiguration.get().getBackendFeatures()
+					.setKnnBackendDefaults( f.knn( 1 ).field( fieldPath ).matching( ( (byte[]) matchingArg ) ) );
 		}
 		else {
-			return f.knn( 1 ).field( fieldPath ).matching( ( (float[]) matchingArg ) );
+			return TckConfiguration.get().getBackendFeatures()
+					.setKnnBackendDefaults( f.knn( 1 ).field( fieldPath ).matching( ( (float[]) matchingArg ) ) );
 		}
 	}
 }
