@@ -12,7 +12,6 @@ import org.hibernate.search.backend.elasticsearch.gson.impl.JsonAccessor;
 import org.hibernate.search.backend.elasticsearch.search.common.impl.ElasticsearchSearchIndexScope;
 import org.hibernate.search.engine.search.predicate.spi.SearchPredicateBuilder;
 
-import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 
 public abstract class AbstractElasticsearchPredicate implements ElasticsearchSearchPredicate {
@@ -38,29 +37,6 @@ public abstract class AbstractElasticsearchPredicate implements ElasticsearchSea
 	}
 
 	@Override
-	public JsonElement toJsonKnn(PredicateRequestContext context) {
-		JsonElement result = doToJsonKnn( context );
-
-		if ( result == null ) {
-			return null;
-		}
-
-		// in case of withConstantScore boots is set by constant_score clause
-		if ( boost != null ) {
-			if ( result.isJsonArray() ) {
-				for ( JsonElement element : result.getAsJsonArray() ) {
-					BOOST_ACCESSOR.set( element.getAsJsonObject(), boost );
-				}
-			}
-			else {
-				BOOST_ACCESSOR.set( result.getAsJsonObject(), boost );
-			}
-		}
-
-		return result;
-	}
-
-	@Override
 	public JsonObject toJsonQuery(PredicateRequestContext context) {
 		JsonObject outerObject = new JsonObject();
 		JsonObject innerObject = new JsonObject();
@@ -71,15 +47,11 @@ public abstract class AbstractElasticsearchPredicate implements ElasticsearchSea
 		}
 
 		JsonObject result = doToJsonQuery( context, outerObject, innerObject );
-		return ( withConstantScore ) ? applyConstantScore( result ) : result;
+		return ( withConstantScore && result != null ) ? applyConstantScore( result ) : result;
 	}
 
 	protected abstract JsonObject doToJsonQuery(PredicateRequestContext context,
 			JsonObject outerObject, JsonObject innerObject);
-
-	protected JsonElement doToJsonKnn(PredicateRequestContext context) {
-		return null;
-	}
 
 	protected boolean hasNoModifiers() {
 		return !withConstantScore && boost == null;

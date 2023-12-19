@@ -24,18 +24,16 @@ import org.hibernate.search.engine.search.predicate.SearchPredicate;
 import org.hibernate.search.engine.search.predicate.spi.BooleanPredicateBuilder;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
-import com.google.gson.JsonArray;
-import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 
 class ElasticsearchBooleanPredicate extends AbstractElasticsearchPredicate {
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
-	static final String MUST_PROPERTY_NAME = "must";
-	static final String MUST_NOT_PROPERTY_NAME = "must_not";
-	static final String SHOULD_PROPERTY_NAME = "should";
-	static final String FILTER_PROPERTY_NAME = "filter";
+	private static final String MUST_PROPERTY_NAME = "must";
+	private static final String MUST_NOT_PROPERTY_NAME = "must_not";
+	private static final String SHOULD_PROPERTY_NAME = "should";
+	private static final String FILTER_PROPERTY_NAME = "filter";
 
 	private static final JsonAccessor<String> MINIMUM_SHOULD_MATCH_ACCESSOR =
 			JsonAccessor.root().property( "minimum_should_match" ).asString();
@@ -74,22 +72,6 @@ class ElasticsearchBooleanPredicate extends AbstractElasticsearchPredicate {
 	}
 
 	@Override
-	protected JsonArray doToJsonKnn(PredicateRequestContext context) {
-		JsonArray knns = new JsonArray();
-		if ( shouldClauses == null ) {
-			return null;
-		}
-
-		for ( ElasticsearchSearchPredicate clause : shouldClauses ) {
-			JsonElement knn = clause.toJsonKnn( context );
-			if ( knn != null ) {
-				knns.add( knn.getAsJsonObject() );
-			}
-		}
-		return knns.isEmpty() ? null : knns;
-	}
-
-	@Override
 	protected JsonObject doToJsonQuery(PredicateRequestContext context,
 			JsonObject outerObject, JsonObject innerObject) {
 		contributeClauses( context, innerObject, MUST_PROPERTY_NAME, mustClauses );
@@ -97,7 +79,13 @@ class ElasticsearchBooleanPredicate extends AbstractElasticsearchPredicate {
 		contributeClauses( context, innerObject, SHOULD_PROPERTY_NAME, shouldClauses );
 		contributeClauses( context, innerObject, FILTER_PROPERTY_NAME, filterClauses );
 
-		if ( isOnlyMustNot() && !super.hasNoModifiers() ) {
+		if ( !hasAnyClauses( innerObject ) ) {
+			// a "rare" case when knn predicates were added through should clauses
+			// and there are no actual clauses available
+			return null;
+		}
+
+		if ( isOnlyMustNot( innerObject ) && !super.hasNoModifiers() ) {
 			JsonObject matchAllClause = new JsonObject();
 			MATCH_ALL_ACCESSOR.set( matchAllClause, new JsonObject() );
 			GsonUtils.setOrAppendToArray( innerObject, MUST_PROPERTY_NAME, matchAllClause );
@@ -122,9 +110,18 @@ class ElasticsearchBooleanPredicate extends AbstractElasticsearchPredicate {
 		}
 
 		for ( ElasticsearchSearchPredicate clause : clauses ) {
-			JsonObject clauseQuery = clause.toJsonQuery( context );
-			if ( clauseQuery != null ) {
-				GsonUtils.setOrAppendToArray( innerObject, occurProperty, clauseQuery );
+			JsonObject jsonQuery = clause.toJsonQuery( context );
+			if ( jsonQuery == null ) {
+				if ( !SHOULD_PROPERTY_NAME.equals( occurProperty ) ) {
+					throw log.knnPredicateCanOnlyBeShouldClause();
+				}
+				// This is an exceptional case for a KNN search on Elasticsearch distribution.
+				// A Knn predicate would contribute to a knn clause inside the request context itself
+				// and we do not want to add this json as a clause to the bool predicate.
+				// So the predicate returns null as JSON query and we ignore it.
+			}
+			else {
+				GsonUtils.setOrAppendToArray( innerObject, occurProperty, jsonQuery );
 			}
 		}
 	}
@@ -169,6 +166,20 @@ class ElasticsearchBooleanPredicate extends AbstractElasticsearchPredicate {
 		return builder.toString();
 	}
 
+	private boolean isOnlyMustNot(JsonObject innerObject) {
+		return innerObject.has( MUST_NOT_PROPERTY_NAME )
+				&& !innerObject.has( MUST_PROPERTY_NAME )
+				&& !innerObject.has( SHOULD_PROPERTY_NAME )
+				&& !innerObject.has( FILTER_PROPERTY_NAME );
+	}
+
+	private boolean hasAnyClauses(JsonObject innerObject) {
+		return innerObject.has( MUST_NOT_PROPERTY_NAME )
+				|| innerObject.has( MUST_PROPERTY_NAME )
+				|| innerObject.has( SHOULD_PROPERTY_NAME )
+				|| innerObject.has( FILTER_PROPERTY_NAME );
+	}
+
 	private boolean isOnlyMustNot() {
 		return mustNotClauses != null
 				&& !mustNotClauses.isEmpty()
@@ -207,8 +218,7 @@ class ElasticsearchBooleanPredicate extends AbstractElasticsearchPredicate {
 			if ( mustClauses == null ) {
 				mustClauses = new ArrayList<>();
 			}
-			mustClauses.add( ElasticsearchSearchPredicate.from( scope, clause )
-					.checkAcceptableAsBoolPredicateClause( MUST_PROPERTY_NAME ) );
+			mustClauses.add( ElasticsearchSearchPredicate.from( scope, clause ) );
 		}
 
 		@Override
@@ -216,8 +226,7 @@ class ElasticsearchBooleanPredicate extends AbstractElasticsearchPredicate {
 			if ( mustNotClauses == null ) {
 				mustNotClauses = new ArrayList<>();
 			}
-			mustNotClauses.add( ElasticsearchSearchPredicate.from( scope, clause )
-					.checkAcceptableAsBoolPredicateClause( MUST_NOT_PROPERTY_NAME ) );
+			mustNotClauses.add( ElasticsearchSearchPredicate.from( scope, clause ) );
 		}
 
 		@Override
@@ -225,8 +234,7 @@ class ElasticsearchBooleanPredicate extends AbstractElasticsearchPredicate {
 			if ( shouldClauses == null ) {
 				shouldClauses = new ArrayList<>();
 			}
-			shouldClauses.add( ElasticsearchSearchPredicate.from( scope, clause )
-					.checkAcceptableAsBoolPredicateClause( SHOULD_PROPERTY_NAME ) );
+			shouldClauses.add( ElasticsearchSearchPredicate.from( scope, clause ) );
 		}
 
 		@Override
@@ -234,8 +242,7 @@ class ElasticsearchBooleanPredicate extends AbstractElasticsearchPredicate {
 			if ( filterClauses == null ) {
 				filterClauses = new ArrayList<>();
 			}
-			filterClauses.add( ElasticsearchSearchPredicate.from( scope, clause )
-					.checkAcceptableAsBoolPredicateClause( FILTER_PROPERTY_NAME ) );
+			filterClauses.add( ElasticsearchSearchPredicate.from( scope, clause ) );
 		}
 
 		@Override

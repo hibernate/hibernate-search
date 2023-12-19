@@ -16,7 +16,6 @@ import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
 import org.hibernate.search.backend.elasticsearch.gson.impl.JsonAccessor;
-import org.hibernate.search.backend.elasticsearch.gson.impl.JsonObjectAccessor;
 import org.hibernate.search.backend.elasticsearch.logging.impl.Log;
 import org.hibernate.search.backend.elasticsearch.lowlevel.query.impl.Queries;
 import org.hibernate.search.backend.elasticsearch.orchestration.impl.ElasticsearchParallelWorkOrchestrator;
@@ -74,7 +73,6 @@ public class ElasticsearchSearchQueryBuilder<H>
 
 	private final Set<String> routingKeys;
 	private JsonObject jsonPredicate;
-	private JsonElement jsonKnn;
 	private JsonArray jsonSort;
 	private Map<DistanceSortKey, Integer> distanceSorts;
 	private Map<AggregationKey<?>, ElasticsearchSearchAggregation<?>> aggregations;
@@ -113,7 +111,6 @@ public class ElasticsearchSearchQueryBuilder<H>
 	public void predicate(SearchPredicate predicate) {
 		ElasticsearchSearchPredicate elasticsearchPredicate = ElasticsearchSearchPredicate.from( scope, predicate );
 		this.jsonPredicate = elasticsearchPredicate.toJsonQuery( rootPredicateContext );
-		this.jsonKnn = elasticsearchPredicate.toJsonKnn( rootPredicateContext );
 	}
 
 	@Override
@@ -234,14 +231,19 @@ public class ElasticsearchSearchQueryBuilder<H>
 		if ( !routingKeys.isEmpty() ) {
 			filters.add( Queries.anyTerm( "_routing", routingKeys ) );
 		}
-		JsonObject jsonQuery = Queries.boolFilter( jsonPredicate, filters );
-
-		if ( jsonQuery != null ) {
-			payload.add( "query", jsonQuery );
+		JsonElement jsonKnn = rootPredicateContext.knnSearch( filters );
+		if ( !jsonKnn.isJsonNull() ) {
+			payload.add( "knn", jsonKnn );
 		}
 
-		if ( jsonKnn != null ) {
-			payload.add( "knn", addFiltersToKnn( jsonKnn, filters ) );
+		if ( jsonKnn.isJsonNull() || jsonPredicate != null ) {
+			// with Elasticsearch distribution it can be that we only have a knn clause and no query.
+			// in such scenario there's no need to add a query for filters, since those will be added to the
+			// knn clause itself.
+			JsonObject jsonQuery = Queries.boolFilter( jsonPredicate, filters );
+			if ( jsonQuery != null ) {
+				payload.add( "query", jsonQuery );
+			}
 		}
 
 		if ( jsonSort != null ) {
@@ -293,24 +295,5 @@ public class ElasticsearchSearchQueryBuilder<H>
 				timeoutManager,
 				scrollTimeout, totalHitCountThreshold
 		);
-	}
-
-	private static JsonElement addFiltersToKnn(JsonElement jsonKnn, JsonArray filters) {
-		if ( filters == null || filters.isEmpty() ) {
-			return jsonKnn;
-		}
-
-		if ( jsonKnn.isJsonArray() ) {
-			for ( JsonElement jsonElement : jsonKnn.getAsJsonArray() ) {
-				addFiltersToKnn( jsonElement.getAsJsonObject(), filters );
-			}
-		}
-		return jsonKnn;
-	}
-
-	private static JsonElement addFiltersToKnn(JsonObject jsonKnn, JsonArray filters) {
-		JsonObjectAccessor filterAccessor = JsonAccessor.root().property( "filter" ).asObject();
-		filterAccessor.set( jsonKnn, Queries.boolFilter( filterAccessor.getOrCreate( jsonKnn, Queries::matchAll ), filters ) );
-		return jsonKnn;
 	}
 }

@@ -873,6 +873,17 @@ public interface Log extends BasicLogger {
 
 	@Message(id = ID_OFFSET + 185,
 			value = "An OpenSearch distribution does not allow specifying the `number of candidates` option. "
-					+ "This option is only applicable to an Elasticsearch distribution of an Elasticsearch backend.")
+					+ "This option is only applicable to an Elastic distribution of an Elasticsearch backend.")
 	SearchException knnNumberOfCandidatesUnsupportedOption();
+
+	@Message(id = ID_OFFSET + 186,
+			value = "An %1$s distribution version in use is not compatible with the Hibernate Search integration of vector search. "
+					+ "Update your %1$s cluster to a %2$s series to get vector search integration enabled.")
+	SearchException searchBackendVersionIncompatibleWithVectorIntegration(String distribution, String version);
+
+	@LogMessage(level = Logger.Level.WARN)
+	@Message(id = ID_OFFSET + 187,
+			value = "The Elastic distribution of Elasticsearch does not allow to apply constant score to a knn predicate."
+					+ " Constant score will not be applied.")
+	void elasticsearchKnnIgnoresConstantScore();
 }
