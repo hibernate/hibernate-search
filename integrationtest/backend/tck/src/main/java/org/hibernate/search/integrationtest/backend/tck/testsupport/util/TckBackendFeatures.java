@@ -7,6 +7,7 @@
 package org.hibernate.search.integrationtest.backend.tck.testsupport.util;
 
 import org.hibernate.search.engine.backend.types.ObjectStructure;
+import org.hibernate.search.engine.search.predicate.dsl.KnnPredicateOptionsStep;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappingBackendFeatures;
 
 public abstract class TckBackendFeatures implements StubMappingBackendFeatures {
@@ -142,5 +143,9 @@ public abstract class TckBackendFeatures implements StubMappingBackendFeatures {
 
 	public boolean supportsVectorSearchInsideOtherPredicates() {
 		return true;
+	}
+
+	public KnnPredicateOptionsStep setKnnBackendDefaults(KnnPredicateOptionsStep step) {
+		return step;
 	}
 }
