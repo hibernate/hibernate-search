@@ -157,35 +157,28 @@ public abstract class ElasticsearchKnnPredicate extends AbstractElasticsearchSin
 		}
 
 		@Override
-		protected JsonObject doToJsonKnn(PredicateRequestContext context) {
-			JsonObject object = new JsonObject();
-			FIELD_ACCESSOR.set( object, absoluteFieldPath );
-			K_ACCESSOR.set( object, k );
-			if ( filter != null ) {
-				FILTER_ACCESSOR.set( object, filter.toJsonQuery( context ) );
-			}
-			NUM_CANDIDATES_ACCESSOR.set( object, numberOfCandidates != null ? numberOfCandidates : k );
-			QUERY_VECTOR_ACCESSOR.set( object, vector );
-
-			return object;
-		}
-
-		@Override
 		public JsonObject toJsonQuery(PredicateRequestContext context) {
+			// we want the query to get created and passed to the request context
+			context.contributeKnnClause( ( super.toJsonQuery( context ) ) );
+			// but we don't want it to be an actual query so we return `null`:
 			return null;
 		}
 
 		@Override
 		protected JsonObject doToJsonQuery(PredicateRequestContext context, JsonObject outerObject, JsonObject innerObject) {
-			throw new AssertionFailure( "Shouldn't be reached since we've overridden the toJsonQuery" );
-		}
-
-		@Override
-		public ElasticsearchSearchPredicate checkAcceptableAsBoolPredicateClause(String clauseType) {
-			if ( !ElasticsearchBooleanPredicate.SHOULD_PROPERTY_NAME.equals( clauseType ) ) {
-				throw log.knnPredicateCanOnlyBeShouldClause();
+			FIELD_ACCESSOR.set( innerObject, absoluteFieldPath );
+			K_ACCESSOR.set( innerObject, k );
+			if ( filter != null ) {
+				JsonObject query = filter.toJsonQuery( context );
+				// remove ths null check once the tracking of
+				if ( query != null ) {
+					FILTER_ACCESSOR.set( innerObject, query );
+				}
 			}
-			return super.checkAcceptableAsBoolPredicateClause( clauseType );
+			NUM_CANDIDATES_ACCESSOR.set( innerObject, numberOfCandidates != null ? numberOfCandidates : k );
+			QUERY_VECTOR_ACCESSOR.set( innerObject, vector );
+
+			return innerObject;
 		}
 
 		@Override
@@ -205,6 +198,11 @@ public abstract class ElasticsearchKnnPredicate extends AbstractElasticsearchSin
 			@Override
 			public void numberOfCandidates(int numberOfCandidates) {
 				this.numberOfCandidates = numberOfCandidates;
+			}
+
+			@Override
+			public void constantScore() {
+				log.elasticsearchKnnIgnoresConstantScore();
 			}
 
 			@Override

@@ -10,7 +10,6 @@ import java.util.Set;
 
 import org.hibernate.search.backend.elasticsearch.search.common.impl.ElasticsearchSearchIndexScope;
 
-import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 
 class ElasticsearchUserProvidedJsonPredicate implements ElasticsearchSearchPredicate {
@@ -37,10 +36,5 @@ class ElasticsearchUserProvidedJsonPredicate implements ElasticsearchSearchPredi
 	@Override
 	public JsonObject toJsonQuery(PredicateRequestContext context) {
 		return json;
-	}
-
-	@Override
-	public JsonElement toJsonKnn(PredicateRequestContext rootPredicateContext) {
-		return null;
 	}
 }
