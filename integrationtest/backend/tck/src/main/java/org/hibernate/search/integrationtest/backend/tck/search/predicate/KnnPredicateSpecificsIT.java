@@ -656,6 +656,10 @@ class KnnPredicateSpecificsIT {
 
 		@Test
 		void knnAsKnnFilter() {
+			assumeTrue(
+					TckConfiguration.get().getBackendFeatures().supportsVectorSearchInsideOtherPredicates(),
+					"This test won't work on some backends that do not provide a way of passing a knn predicate as a clause of bool query/filter."
+			);
 			SearchQuery<Object> query = index.createScope().query()
 					.select(
 							SearchProjectionFactory::id

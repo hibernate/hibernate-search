@@ -21,19 +21,24 @@ public abstract class AbstractElasticsearchVectorFieldCodec<F> implements Elasti
 	private final int dimension;
 	private final Integer maxConnections;
 	private final Integer beamWidth;
+	private final F indexNullAs;
 
 	protected AbstractElasticsearchVectorFieldCodec(VectorSimilarity similarity, int dimension,
-			Integer maxConnections, Integer beamWidth) {
+			Integer maxConnections, Integer beamWidth, F indexNullAs) {
 		this.similarity = similarity;
 		this.dimension = dimension;
 		this.maxConnections = maxConnections;
 		this.beamWidth = beamWidth;
+		this.indexNullAs = indexNullAs;
 	}
 
 	@Override
 	public JsonElement encode(F value) {
 		if ( value == null ) {
-			return JsonNull.INSTANCE;
+			if ( indexNullAs == null ) {
+				return JsonNull.INSTANCE;
+			}
+			value = indexNullAs;
 		}
 		return toJsonArray( value );
 	}
