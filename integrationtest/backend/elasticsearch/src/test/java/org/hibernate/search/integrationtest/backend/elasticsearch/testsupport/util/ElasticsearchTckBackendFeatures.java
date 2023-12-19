@@ -6,14 +6,11 @@
  */
 package org.hibernate.search.integrationtest.backend.elasticsearch.testsupport.util;
 
-import static org.hibernate.search.util.impl.integrationtest.backend.elasticsearch.dialect.ElasticsearchTestDialect.getActualVersion;
 import static org.hibernate.search.util.impl.integrationtest.backend.elasticsearch.dialect.ElasticsearchTestDialect.isActualVersion;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
 
-import org.hibernate.search.backend.elasticsearch.ElasticsearchDistributionName;
-import org.hibernate.search.engine.search.predicate.dsl.KnnPredicateOptionsStep;
 import org.hibernate.search.engine.spatial.GeoPoint;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.TckBackendFeatures;
 import org.hibernate.search.util.impl.integrationtest.backend.elasticsearch.dialect.ElasticsearchTestDialect;
@@ -259,15 +256,16 @@ public class ElasticsearchTckBackendFeatures extends TckBackendFeatures {
 		return isActualVersion(
 				es -> false,
 				os -> true,
-				aoss -> false
+				aoss -> true
 		);
 	}
 
 	@Override
-	public KnnPredicateOptionsStep setKnnBackendDefaults(KnnPredicateOptionsStep step) {
-		if ( ElasticsearchDistributionName.ELASTIC.equals( getActualVersion().distribution() ) ) {
-			return step.numberOfCandidates( 100 );
-		}
-		return super.setKnnBackendDefaults( step );
+	public boolean supportsVectorSearchNumberOfCandidates() {
+		return isActualVersion(
+				es -> true,
+				os -> false,
+				aoss -> false
+		);
 	}
 }
