@@ -157,8 +157,7 @@ class KnnPredicateBaseIT {
 
 		@Override
 		protected void tryPredicate(SearchPredicateFactory f, String fieldPath) {
-			TckConfiguration.get().getBackendFeatures()
-					.setKnnBackendDefaults( f.knn( 1 ).field( fieldPath ).matching( new byte[] { 1 } ) );
+			f.knn( 1 ).field( fieldPath ).matching( new byte[] { 1 } );
 		}
 
 		@Override
@@ -190,8 +189,7 @@ class KnnPredicateBaseIT {
 
 		@Override
 		protected void tryPredicate(SearchPredicateFactory f, String fieldPath) {
-			TckConfiguration.get().getBackendFeatures()
-					.setKnnBackendDefaults( f.knn( 1 ).field( fieldPath ).matching( new byte[] { 1 } ) );
+			f.knn( 1 ).field( fieldPath ).matching( new byte[] { 1 } );
 		}
 
 		@Override
@@ -231,12 +229,12 @@ class KnnPredicateBaseIT {
 		@Override
 		protected void tryPredicate(SearchPredicateFactory f, String fieldPath, FieldTypeDescriptor<?, ?> fieldType) {
 			if ( byte[].class.equals( fieldType.getJavaType() ) ) {
-				TckConfiguration.get().getBackendFeatures().setKnnBackendDefaults( f.knn( 1 ).field( fieldPath ).matching(
-						new byte[( (VectorFieldTypeDescriptor<?>) fieldType ).vectorSize()] ) );
+				f.knn( 1 ).field( fieldPath ).matching(
+						new byte[( (VectorFieldTypeDescriptor<?>) fieldType ).vectorSize()] );
 			}
 			if ( float[].class.equals( fieldType.getJavaType() ) ) {
-				TckConfiguration.get().getBackendFeatures().setKnnBackendDefaults( f.knn( 1 ).field( fieldPath ).matching(
-						new float[( (VectorFieldTypeDescriptor<?>) fieldType ).vectorSize()] ) );
+				f.knn( 1 ).field( fieldPath ).matching(
+						new float[( (VectorFieldTypeDescriptor<?>) fieldType ).vectorSize()] );
 			}
 		}
 
@@ -278,7 +276,7 @@ class KnnPredicateBaseIT {
 		}
 
 		@Override
-		protected KnnPredicateOptionsStep predicate(SearchPredicateFactory f, String fieldPath, int matchingDocOrdinal,
+		protected KnnPredicateOptionsStep<?> predicate(SearchPredicateFactory f, String fieldPath, int matchingDocOrdinal,
 				DataSet<?, KnnPredicateTestValues<F>> dataSet) {
 			return knnPredicateOptionsStep( f, fieldPath, matchingDocOrdinal,
 					dataSet.values.matchingArg( matchingDocOrdinal ) );
@@ -328,15 +326,13 @@ class KnnPredicateBaseIT {
 		return new KnnPredicateTestValues<>( fieldType );
 	}
 
-	private static <F> KnnPredicateOptionsStep knnPredicateOptionsStep(SearchPredicateFactory f, String fieldPath,
+	private static <F> KnnPredicateOptionsStep<?> knnPredicateOptionsStep(SearchPredicateFactory f, String fieldPath,
 			int matchingDocOrdinal, F matchingArg) {
 		if ( matchingArg instanceof byte[] ) {
-			return TckConfiguration.get().getBackendFeatures()
-					.setKnnBackendDefaults( f.knn( 1 ).field( fieldPath ).matching( ( (byte[]) matchingArg ) ) );
+			return f.knn( 1 ).field( fieldPath ).matching( ( (byte[]) matchingArg ) );
 		}
 		else {
-			return TckConfiguration.get().getBackendFeatures()
-					.setKnnBackendDefaults( f.knn( 1 ).field( fieldPath ).matching( ( (float[]) matchingArg ) ) );
+			return f.knn( 1 ).field( fieldPath ).matching( ( (float[]) matchingArg ) );
 		}
 	}
 }

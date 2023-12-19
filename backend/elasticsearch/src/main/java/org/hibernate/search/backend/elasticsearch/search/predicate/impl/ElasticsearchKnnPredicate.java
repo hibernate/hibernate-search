@@ -16,6 +16,7 @@ import org.hibernate.search.backend.elasticsearch.logging.impl.Log;
 import org.hibernate.search.backend.elasticsearch.search.common.impl.AbstractElasticsearchCodecAwareSearchQueryElementFactory;
 import org.hibernate.search.backend.elasticsearch.search.common.impl.ElasticsearchSearchIndexScope;
 import org.hibernate.search.backend.elasticsearch.search.common.impl.ElasticsearchSearchIndexValueFieldContext;
+import org.hibernate.search.backend.elasticsearch.search.predicate.spi.ElasticsearchKnnPredicateBuilder;
 import org.hibernate.search.backend.elasticsearch.types.codec.impl.ElasticsearchFieldCodec;
 import org.hibernate.search.backend.elasticsearch.types.codec.impl.ElasticsearchVectorFieldCodec;
 import org.hibernate.search.engine.search.predicate.SearchPredicate;
@@ -71,7 +72,7 @@ public abstract class ElasticsearchKnnPredicate extends AbstractElasticsearchSin
 		}
 	}
 
-	private abstract static class AbstractKnnBuilder<F> extends AbstractBuilder implements KnnPredicateBuilder {
+	private abstract static class AbstractKnnBuilder<F> extends AbstractBuilder implements ElasticsearchKnnPredicateBuilder {
 
 		private final Class<?> vectorElementsType;
 		private final int indexedVectorsDimension;
@@ -163,9 +164,7 @@ public abstract class ElasticsearchKnnPredicate extends AbstractElasticsearchSin
 			if ( filter != null ) {
 				FILTER_ACCESSOR.set( object, filter.toJsonQuery( context ) );
 			}
-			if ( numberOfCandidates != null ) {
-				NUM_CANDIDATES_ACCESSOR.set( object, numberOfCandidates );
-			}
+			NUM_CANDIDATES_ACCESSOR.set( object, numberOfCandidates != null ? numberOfCandidates : k );
 			QUERY_VECTOR_ACCESSOR.set( object, vector );
 
 			return object;

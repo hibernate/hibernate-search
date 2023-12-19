@@ -23,7 +23,6 @@ import org.hibernate.search.integrationtest.backend.tck.testsupport.configuratio
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.FieldTypeDescriptor;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.expectations.IndexNullAsMatchPredicateExpectactions;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.SimpleFieldMapper;
-import org.hibernate.search.integrationtest.backend.tck.testsupport.util.TckConfiguration;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.extension.SearchSetupHelper;
 import org.hibernate.search.util.common.SearchException;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.SimpleMappedIndex;
@@ -83,13 +82,12 @@ class IndexNullAsValueIT {
 			Object valueToMatch = fieldModel.indexNullAsValue.indexedValue;
 			SearchPredicate predicate;
 			if ( valueToMatch instanceof byte[] ) {
-				predicate = TckConfiguration.get().getBackendFeatures().setKnnBackendDefaults(
-						scope.predicate().knn( 2 ).field( absoluteFieldPath ).matching( (byte[]) valueToMatch ) ).toPredicate();
+				predicate =
+						scope.predicate().knn( 2 ).field( absoluteFieldPath ).matching( (byte[]) valueToMatch ).toPredicate();
 			}
 			else {
-				predicate = TckConfiguration.get().getBackendFeatures().setKnnBackendDefaults(
-						scope.predicate().knn( 2 ).field( absoluteFieldPath ).matching( (float[]) valueToMatch ) )
-						.toPredicate();
+				predicate =
+						scope.predicate().knn( 2 ).field( absoluteFieldPath ).matching( (float[]) valueToMatch ).toPredicate();
 			}
 
 			SearchQuery<DocumentReference> query = scope.query()

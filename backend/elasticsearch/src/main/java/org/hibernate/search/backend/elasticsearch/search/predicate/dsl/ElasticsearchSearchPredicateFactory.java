@@ -7,6 +7,7 @@
 package org.hibernate.search.backend.elasticsearch.search.predicate.dsl;
 
 import org.hibernate.search.engine.search.predicate.dsl.ExtendedSearchPredicateFactory;
+import org.hibernate.search.engine.search.predicate.dsl.KnnPredicateFieldStep;
 import org.hibernate.search.engine.search.predicate.dsl.PredicateFinalStep;
 
 import com.google.gson.JsonObject;
@@ -37,4 +38,6 @@ public interface ElasticsearchSearchPredicateFactory
 	 */
 	PredicateFinalStep fromJson(JsonObject jsonObject);
 
+	@Override
+	KnnPredicateFieldStep<? extends ElasticsearchKnnPredicateOptionsStep<?>> knn(int k);
 }

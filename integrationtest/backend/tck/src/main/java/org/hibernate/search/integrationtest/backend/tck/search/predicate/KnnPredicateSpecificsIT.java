@@ -182,24 +182,20 @@ class KnnPredicateSpecificsIT {
 		protected void tryPredicateWrongType(SearchPredicateFactory f, String fieldPath,
 				VectorFieldTypeDescriptor<?> fieldType) {
 			if ( fieldType.getJavaType() == byte[].class ) {
-				TckConfiguration.get().getBackendFeatures()
-						.setKnnBackendDefaults( f.knn( 1 ).field( fieldPath ).matching( 1.0f, 1.0f ) );
+				f.knn( 1 ).field( fieldPath ).matching( 1.0f, 1.0f );
 			}
 			else {
-				TckConfiguration.get().getBackendFeatures()
-						.setKnnBackendDefaults( f.knn( 1 ).field( fieldPath ).matching( (byte) 1, (byte) 1 ) );
+				f.knn( 1 ).field( fieldPath ).matching( (byte) 1, (byte) 1 );
 			}
 		}
 
-		protected KnnPredicateOptionsStep tryPredicateWrongLength(SearchPredicateFactory f, String fieldPath,
+		protected KnnPredicateOptionsStep<?> tryPredicateWrongLength(SearchPredicateFactory f, String fieldPath,
 				VectorFieldTypeDescriptor<?> fieldType) {
 			if ( fieldType.getJavaType() == byte[].class ) {
-				return TckConfiguration.get().getBackendFeatures().setKnnBackendDefaults(
-						f.knn( 1 ).field( fieldPath ).matching( new byte[fieldType.vectorSize() * 2] ) );
+				return f.knn( 1 ).field( fieldPath ).matching( new byte[fieldType.vectorSize() * 2] );
 			}
 			else {
-				return TckConfiguration.get().getBackendFeatures().setKnnBackendDefaults(
-						f.knn( 1 ).field( fieldPath ).matching( new float[fieldType.vectorSize() * 2] ) );
+				return f.knn( 1 ).field( fieldPath ).matching( new float[fieldType.vectorSize() * 2] );
 			}
 		}
 
@@ -359,15 +355,13 @@ class KnnPredicateSpecificsIT {
 					);
 		}
 
-		protected KnnPredicateOptionsStep predicate(SearchPredicateFactory f, String fieldPath,
+		protected KnnPredicateOptionsStep<?> predicate(SearchPredicateFactory f, String fieldPath,
 				VectorFieldTypeDescriptor<?> fieldType) {
 			if ( fieldType.getJavaType() == byte[].class ) {
-				return TckConfiguration.get().getBackendFeatures()
-						.setKnnBackendDefaults( f.knn( 1 ).field( fieldPath ).matching( (byte) 1, (byte) 1 ) );
+				return f.knn( 1 ).field( fieldPath ).matching( (byte) 1, (byte) 1 );
 			}
 			else {
-				return TckConfiguration.get().getBackendFeatures()
-						.setKnnBackendDefaults( f.knn( 1 ).field( fieldPath ).matching( 1.0f, 1.0f ) );
+				return f.knn( 1 ).field( fieldPath ).matching( 1.0f, 1.0f );
 			}
 		}
 
@@ -408,10 +402,6 @@ class KnnPredicateSpecificsIT {
 			}
 
 		}
-	}
-
-	private static <F> KnnPredicateTestValues<F> testValues(FieldTypeDescriptor<F, ?> fieldType) {
-		return new KnnPredicateTestValues<>( fieldType );
 	}
 
 	@Nested
@@ -464,15 +454,13 @@ class KnnPredicateSpecificsIT {
 					.hasSize( 2 );
 		}
 
-		protected KnnPredicateOptionsStep predicate(SearchPredicateFactory f, String fieldPath,
+		protected KnnPredicateOptionsStep<?> predicate(SearchPredicateFactory f, String fieldPath,
 				VectorFieldTypeDescriptor<?> fieldType) {
 			if ( fieldType.getJavaType() == byte[].class ) {
-				return TckConfiguration.get().getBackendFeatures().setKnnBackendDefaults(
-						f.knn( 2 ).field( fieldPath ).matching( (byte) 1, (byte) 0, (byte) 0, (byte) 0 ) );
+				return f.knn( 2 ).field( fieldPath ).matching( (byte) 1, (byte) 0, (byte) 0, (byte) 0 );
 			}
 			else {
-				return TckConfiguration.get().getBackendFeatures()
-						.setKnnBackendDefaults( f.knn( 2 ).field( fieldPath ).matching( 1.0f, 0.0f, 0.0f, 0.0f ) );
+				return f.knn( 2 ).field( fieldPath ).matching( 1.0f, 0.0f, 0.0f, 0.0f );
 			}
 		}
 
@@ -615,12 +603,11 @@ class KnnPredicateSpecificsIT {
 					.select(
 							f -> f.field( "location", float[].class )
 					)
-					.where( f -> TckConfiguration.get().getBackendFeatures().setKnnBackendDefaults( f.knn( k )
+					.where( f -> f.knn( k )
 							.field( "location" )
 							.matching( 5f, 4f )
 							.filter( f.range().field( "rating" ).between( 8, 10 ) )
 							.filter( fa -> fa.terms().field( "parking" ).matchingAny( true ) )
-					)
 					).toQuery();
 
 			List<float[]> result = query.fetchAll().hits();
@@ -642,12 +629,11 @@ class KnnPredicateSpecificsIT {
 							f -> f.field( "location", float[].class )
 					)
 					.where( f -> f.or(
-							TckConfiguration.get().getBackendFeatures().setKnnBackendDefaults( f.knn( k )
+							f.knn( k )
 									.field( "location" )
-									.matching( 5f, 4f ) ),
+									.matching( 5f, 4f ),
 							f.terms().field( "parking" ).matchingAny( true )
-					)
-					).toQuery();
+					) ).toQuery();
 
 			List<float[]> result = query.fetchAll().hits();
 
@@ -691,8 +677,7 @@ class KnnPredicateSpecificsIT {
 							f -> f.field( "location", float[].class )
 					)
 					.where( f -> f.bool()
-							.must( TckConfiguration.get().getBackendFeatures()
-									.setKnnBackendDefaults( f.knn( 5 ).field( "location" ).matching( 5f, 4f ) ) )
+							.must( f.knn( 5 ).field( "location" ).matching( 5f, 4f ) )
 							.must( f.match().field( "parking" ).matching( true ) )
 					)
 					.toQuery();
@@ -719,8 +704,7 @@ class KnnPredicateSpecificsIT {
 													.multi()
 									).asList()
 							).where(
-									f -> TckConfiguration.get().getBackendFeatures().setKnnBackendDefaults(
-											f.knn( 1 ).field( "nested.byteVector" ).matching( bytes( 2, (byte) -120 ) ) )
+									f -> f.knn( 1 ).field( "nested.byteVector" ).matching( bytes( 2, (byte) -120 ) )
 							).fetchAllHits()
 			).hasSize( 1 )
 					.element( 0 )

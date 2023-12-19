@@ -38,8 +38,8 @@ import org.hibernate.search.engine.search.predicate.dsl.SpatialPredicateInitialS
 import org.hibernate.search.engine.search.predicate.dsl.TermsPredicateFieldStep;
 import org.hibernate.search.engine.search.predicate.dsl.WildcardPredicateFieldStep;
 import org.hibernate.search.engine.search.predicate.dsl.impl.BooleanPredicateClausesStepImpl;
+import org.hibernate.search.engine.search.predicate.dsl.impl.DefaultKnnPredicateFieldStep;
 import org.hibernate.search.engine.search.predicate.dsl.impl.ExistsPredicateFieldStepImpl;
-import org.hibernate.search.engine.search.predicate.dsl.impl.KnnPredicateFieldStepImpl;
 import org.hibernate.search.engine.search.predicate.dsl.impl.MatchAllPredicateOptionsStepImpl;
 import org.hibernate.search.engine.search.predicate.dsl.impl.MatchIdPredicateMatchingStepImpl;
 import org.hibernate.search.engine.search.predicate.dsl.impl.MatchNonePredicateFinalStepImpl;
@@ -217,9 +217,9 @@ public abstract class AbstractSearchPredicateFactory<
 	}
 
 	@Override
-	public KnnPredicateFieldStep knn(int k) {
+	public KnnPredicateFieldStep<?> knn(int k) {
 		Contracts.assertStrictlyPositive( k, "k" );
-		return new KnnPredicateFieldStepImpl( this, dslContext, k );
+		return new DefaultKnnPredicateFieldStep( this, dslContext, k );
 	}
 
 	@Override
