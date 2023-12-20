@@ -25,4 +25,9 @@ public interface HibernateOrmMappingHints extends BackendMappingHints {
 	@Override
 	@Message("If you used a @*Field annotation here, make sure to use @ScaledNumberField and configure the `decimalScale` attribute as necessary.")
 	String missingDecimalScale();
+
+	@Override
+	@Message("Either specify dimension as an annotation property (@VectorField(dimension = somePositiveInteger)), "
+			+ "or define a value binder (@VectorField(valueBinder = @ValueBinderRef(..))) that explicitly declares a vector field specifying the dimension.")
+	String missingVectorDimension();
 }

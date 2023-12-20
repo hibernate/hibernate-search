@@ -23,4 +23,7 @@ public interface BackendMappingHints {
 	@Message("")
 	String missingDecimalScale();
 
+	@Message("")
+	String missingVectorDimension();
+
 }

@@ -421,26 +421,6 @@ class VectorFieldIT {
 	}
 
 	@Test
-	void customBridge_vectorDimensionUnknown() {
-		@Indexed(index = INDEX_NAME)
-		class IndexedEntity {
-			@DocumentId
-			Integer id;
-			@VectorField(valueBinder = @ValueBinderRef(type = ValidImplicitTypeBridge.ValidImplicitTypeBinder.class))
-			Collection<Float> floats;
-		}
-
-		assertThatThrownBy( () -> setupHelper.start().expectCustomBeans().setup( IndexedEntity.class ) )
-				.isInstanceOf( SearchException.class )
-				.satisfies( FailureReportUtils.hasFailureReport()
-						.typeContext( IndexedEntity.class.getName() )
-						.pathContext( ".floats" )
-						.failure( "Vector dimension is a required property. "
-								+ "Either specify it as an annotation property (@VectorField(dimension = somePositiveInteger)),"
-								+ " or define a value binder (@VectorField(valueBinder = @ValueBinderRef(..))) that explicitly declares a vector field specifying the dimension." ) );
-	}
-
-	@Test
 	void valueExtractorsEnabled() {
 		@Indexed(index = INDEX_NAME)
 		class IndexedEntity {
@@ -510,6 +490,24 @@ class VectorFieldIT {
 								+ "e.g. @ContainerExtraction(extract = ContainerExtract.DEFAULT, value = { ... })." ) );
 	}
 
+	@Test
+	void customBridge_dimensionFromAnnotationTypeInBridge() {
+		@Indexed(index = INDEX_NAME)
+		class IndexedEntity {
+			@DocumentId
+			Integer id;
+			@VectorField(dimension = 3,
+					valueBinder = @ValueBinderRef(type = ListTypeBridgeDimensionFromAnnotation.ExplicitFieldTypeBinder.class))
+			List<Float> floats;
+		}
+
+		backendMock.expectSchema( INDEX_NAME, b -> b
+				.field( "floats", float[].class, f -> f.dimension( 3 ) )
+		);
+		setupHelper.start().expectCustomBeans().setup( IndexedEntity.class );
+		backendMock.verifyExpectationsMet();
+	}
+
 	@SuppressWarnings("rawtypes")
 	public static class ValidTypeBridge implements ValueBridge<List, byte[]> {
 		@Override
@@ -528,7 +526,31 @@ class VectorFieldIT {
 		public static class ExplicitFieldTypeBinder implements ValueBinder {
 			@Override
 			public void bind(ValueBindingContext<?> context) {
-				context.bridge( List.class, new ValidTypeBridge(), context.typeFactory().asByteVector( 2 ) );
+				context.bridge( List.class, new ValidTypeBridge(), context.typeFactory().asByteVector().dimension( 2 ) );
+			}
+		}
+	}
+
+	@SuppressWarnings("rawtypes")
+	public static class ListTypeBridgeDimensionFromAnnotation implements ValueBridge<List, float[]> {
+		@Override
+		public float[] toIndexedValue(List value, ValueBridgeToIndexedValueContext context) {
+			if ( value == null ) {
+				return null;
+			}
+			float[] floats = new float[value.size()];
+			int index = 0;
+			for ( Object o : value ) {
+				floats[index++] = Byte.parseByte( Objects.toString( o, null ) );
+			}
+			return floats;
+		}
+
+		public static class ExplicitFieldTypeBinder implements ValueBinder {
+			@Override
+			public void bind(ValueBindingContext<?> context) {
+				context.bridge( List.class, new ListTypeBridgeDimensionFromAnnotation(),
+						context.typeFactory().asFloatVector() );
 			}
 		}
 	}
@@ -553,7 +575,7 @@ class VectorFieldIT {
 			@Override
 			public void bind(ValueBindingContext<?> context) {
 				context.bridge( List.class, new ParametricBridge(),
-						context.typeFactory().asFloatVector( extractDimension( context ) )
+						context.typeFactory().asFloatVector().dimension( extractDimension( context ) )
 				);
 			}
 		}

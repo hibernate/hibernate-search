@@ -44,7 +44,7 @@ class LuceneVectorFieldIT {
 				.withIndex( SimpleMappedIndex
 						.of( root -> root
 								.field( "vector",
-										f -> f.asByteVector( dimension ).beamWidth( beamWidth )
+										f -> f.asByteVector().dimension( dimension ).beamWidth( beamWidth )
 												.maxConnections( maxConnections ) )
 								.toReference() ) )
 				.setup()

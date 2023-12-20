@@ -37,4 +37,10 @@ public interface VectorFieldTypeOptionsStep<S extends VectorFieldTypeOptionsStep
 	 */
 	S maxConnections(int maxConnections);
 
+	/**
+	 * @param dimension The number of dimensions (array length) of vectors to be indexed.
+	 * @return {@code this}, for method chaining.
+	 */
+	S dimension(int dimension);
+
 }
