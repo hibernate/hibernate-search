@@ -23,4 +23,9 @@ public final class StubMappingHints implements BackendMappingHints {
 	public String missingDecimalScale() {
 		return getClass().getName() + "#missingDecimalScale";
 	}
+
+	@Override
+	public String missingVectorDimension() {
+		return getClass().getName() + "#missingVectorDimension";
+	}
 }

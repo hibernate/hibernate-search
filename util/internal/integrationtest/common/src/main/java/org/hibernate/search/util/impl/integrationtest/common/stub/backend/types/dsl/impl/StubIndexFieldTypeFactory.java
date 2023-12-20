@@ -161,24 +161,24 @@ public class StubIndexFieldTypeFactory implements IndexFieldTypeFactory {
 
 	@Override
 	@SuppressWarnings("unchecked")
-	public <F> VectorFieldTypeOptionsStep<?, F> asVector(int dimension, Class<F> valueType) {
+	public <F> VectorFieldTypeOptionsStep<?, F> asVector(Class<F> valueType) {
 		if ( byte[].class.equals( valueType ) ) {
-			return (VectorFieldTypeOptionsStep<?, F>) asByteVector( dimension );
+			return (VectorFieldTypeOptionsStep<?, F>) asByteVector();
 		}
 		if ( float[].class.equals( valueType ) ) {
-			return (VectorFieldTypeOptionsStep<?, F>) asFloatVector( dimension );
+			return (VectorFieldTypeOptionsStep<?, F>) asFloatVector();
 		}
 		throw new SearchException( "No built-in vector index field type for class: '" + valueType.getName() + "'." );
 	}
 
 	@Override
-	public VectorFieldTypeOptionsStep<?, byte[]> asByteVector(int dimension) {
-		return new StubVectorFieldTypeOptionsStep<>( dimension, byte[].class );
+	public VectorFieldTypeOptionsStep<?, byte[]> asByteVector() {
+		return new StubVectorFieldTypeOptionsStep<>( byte[].class );
 	}
 
 	@Override
-	public VectorFieldTypeOptionsStep<?, float[]> asFloatVector(int dimension) {
-		return new StubVectorFieldTypeOptionsStep<>( dimension, float[].class );
+	public VectorFieldTypeOptionsStep<?, float[]> asFloatVector() {
+		return new StubVectorFieldTypeOptionsStep<>( float[].class );
 	}
 
 	public <T> IndexFieldTypeOptionsStep<?, T> asNonStandard(Class<T> fieldValueType) {

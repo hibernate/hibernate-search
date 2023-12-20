@@ -44,15 +44,15 @@ public interface IndexFieldTypeFactory {
 	/**
 	 * Define a vector field type whose values are represented as a given type in Hibernate Search.
 	 * <p>
-	 * When possible, prefer the other methods such as {@link #asByteVector(int)} or {@link #asFloatVector(int)}
+	 * When possible, prefer the other methods such as {@link #asByteVector()} or {@link #asFloatVector()}
 	 * to avoid unnecessary type checks.
 	 *
 	 * @param <F> The type of values for this field type.
-	 * @param dimension The number of dimensions (array length) of vectors to be indexed.
 	 * @param valueType The type of values for this field type. Should be an array type like {@code byte[]} or {@code float[]}.
 	 * @return A DSL step where the index vector field type can be defined in more details.
 	 */
-	<F> VectorFieldTypeOptionsStep<?, F> asVector(int dimension, Class<F> valueType);
+	@Incubating
+	<F> VectorFieldTypeOptionsStep<?, F> asVector(Class<F> valueType);
 
 	/**
 	 * Define a field type whose values are represented as a {@link String} in Hibernate Search.
@@ -180,26 +180,23 @@ public interface IndexFieldTypeFactory {
 	 */
 	ScaledNumberIndexFieldTypeOptionsStep<?, BigInteger> asBigInteger();
 
-
 	/**
 	 * Define a field type intended for use in vector search
 	 * and whose values are represented as a {@code byte[]} in Hibernate Search.
 	 *
-	 * @param dimension The number of dimensions (array length) of vectors to be indexed.
 	 * @return A DSL step where the index field type can be defined in more details.
 	 */
 	@Incubating
-	VectorFieldTypeOptionsStep<?, byte[]> asByteVector(int dimension);
+	VectorFieldTypeOptionsStep<?, byte[]> asByteVector();
 
 	/**
 	 * Define a field type intended for use in vector search
 	 * and whose values are represented as a {@code float[]} in Hibernate Search.
 	 *
-	 * @param dimension The number of dimensions (array length) of vectors to be indexed.
 	 * @return A DSL step where the index field type can be defined in more details.
 	 */
 	@Incubating
-	VectorFieldTypeOptionsStep<?, float[]> asFloatVector(int dimension);
+	VectorFieldTypeOptionsStep<?, float[]> asFloatVector();
 
 	/**
 	 * Extend the current factory with the given extension,

@@ -718,7 +718,7 @@ class KnnPredicateSpecificsIT {
 			PredicateIndexBinding(IndexSchemaElement root) {
 				parking = root.field( "parking", f -> f.asBoolean().projectable( Projectable.YES ) ).toReference();
 				rating = root.field( "rating", f -> f.asInteger().projectable( Projectable.YES ) ).toReference();
-				location = root.field( "location", f -> f.asFloatVector( 2 ).projectable( Projectable.YES )
+				location = root.field( "location", f -> f.asFloatVector().dimension( 2 ).projectable( Projectable.YES )
 						.maxConnections( 16 ).beamWidth( 100 ).vectorSimilarity( VectorSimilarity.L2 ) ).toReference();
 			}
 		}
@@ -727,7 +727,7 @@ class KnnPredicateSpecificsIT {
 			final IndexFieldReference<byte[]> vector;
 
 			private MultiValuedIndexBinding(IndexSchemaElement root) {
-				vector = root.field( "vector", f -> f.asByteVector( 2 ) ).multiValued().toReference();
+				vector = root.field( "vector", f -> f.asByteVector().dimension( 2 ) ).multiValued().toReference();
 			}
 		}
 
@@ -742,10 +742,10 @@ class KnnPredicateSpecificsIT {
 				nested = nestedField.toReference();
 
 				byteVector = nestedField.field(
-						"byteVector", f -> f.asByteVector( 2 ).projectable( Projectable.YES ) )
+						"byteVector", f -> f.asByteVector().dimension( 2 ).projectable( Projectable.YES ) )
 						.toReference();
 				floatVector = nestedField
-						.field( "floatVector", f -> f.asFloatVector( 2 ).projectable( Projectable.YES ) )
+						.field( "floatVector", f -> f.asFloatVector().dimension( 2 ).projectable( Projectable.YES ) )
 						.toReference();
 			}
 		}

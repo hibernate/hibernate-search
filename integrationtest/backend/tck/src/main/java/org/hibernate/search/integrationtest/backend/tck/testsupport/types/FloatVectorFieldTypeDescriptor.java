@@ -34,7 +34,7 @@ public class FloatVectorFieldTypeDescriptor extends VectorFieldTypeDescriptor<fl
 
 	@Override
 	public VectorFieldTypeOptionsStep<?, float[]> configure(IndexFieldTypeFactory fieldContext) {
-		return fieldContext.asFloatVector( size );
+		return fieldContext.asFloatVector().dimension( size );
 	}
 
 	@Override

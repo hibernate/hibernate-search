@@ -12,14 +12,12 @@ import org.hibernate.search.engine.backend.types.Projectable;
 import org.hibernate.search.engine.backend.types.Searchable;
 import org.hibernate.search.engine.backend.types.VectorSimilarity;
 import org.hibernate.search.engine.backend.types.dsl.IndexFieldTypeFactory;
-import org.hibernate.search.engine.backend.types.dsl.IndexFieldTypeOptionsStep;
 import org.hibernate.search.mapper.pojo.bridge.binding.spi.FieldModelContributorContext;
 import org.hibernate.search.mapper.pojo.extractor.mapping.programmatic.ContainerExtractorPath;
 import org.hibernate.search.mapper.pojo.logging.impl.Log;
 import org.hibernate.search.mapper.pojo.mapping.building.spi.PojoPropertyMetadataContributor;
 import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.PropertyMappingStep;
 import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.PropertyMappingVectorFieldOptionsStep;
-import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.impl.PojoCompositeFieldModelContributor.DefaultInitiator;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
 class PropertyMappingVectorFieldOptionsStepImpl
@@ -30,16 +28,11 @@ class PropertyMappingVectorFieldOptionsStepImpl
 
 	PropertyMappingVectorFieldOptionsStepImpl(PropertyMappingStep parent, Integer dimension, String relativeFieldName) {
 		super( parent, relativeFieldName,
-				new DefaultInitiator() {
-					@Override
-					public <F> IndexFieldTypeOptionsStep<?, F> initiate(IndexFieldTypeFactory factory, Class<F> clazz) {
-						if ( dimension == null ) {
-							throw log.vectorDimensionNotSpecified();
-						}
-						return factory.asVector( dimension, clazz );
-					}
-				},
+				IndexFieldTypeFactory::asVector,
 				FieldModelContributorContext::vectorTypeOptionsStep );
+		if ( dimension != null ) {
+			fieldModelContributor.add( c -> c.vectorTypeOptionsStep().dimension( dimension ) );
+		}
 		extractors( ContainerExtractorPath.noExtractors() );
 	}
 

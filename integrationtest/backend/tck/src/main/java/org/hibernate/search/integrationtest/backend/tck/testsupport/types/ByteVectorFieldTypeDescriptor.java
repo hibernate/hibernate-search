@@ -34,7 +34,7 @@ public class ByteVectorFieldTypeDescriptor extends VectorFieldTypeDescriptor<byt
 
 	@Override
 	public VectorFieldTypeOptionsStep<?, byte[]> configure(IndexFieldTypeFactory fieldContext) {
-		return fieldContext.asByteVector( size );
+		return fieldContext.asByteVector().dimension( size );
 	}
 
 	@Override

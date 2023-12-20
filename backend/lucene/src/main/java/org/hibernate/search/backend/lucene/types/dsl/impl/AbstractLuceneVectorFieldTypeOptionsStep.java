@@ -43,19 +43,15 @@ abstract class AbstractLuceneVectorFieldTypeOptionsStep<S extends AbstractLucene
 	private static final int MAX_MAX_CONNECTIONS = 512;
 
 	protected VectorSimilarity vectorSimilarity = VectorSimilarity.DEFAULT;
-	protected final int dimension;
+	protected Integer dimension;
 	protected int beamWidth = MAX_MAX_CONNECTIONS;
 	protected int maxConnections = 16;
 	private Projectable projectable = Projectable.DEFAULT;
 	private Searchable searchable = Searchable.DEFAULT;
 	private F indexNullAsValue = null;
 
-	AbstractLuceneVectorFieldTypeOptionsStep(LuceneIndexFieldTypeBuildContext buildContext, Class<F> valueType, int dimension) {
+	AbstractLuceneVectorFieldTypeOptionsStep(LuceneIndexFieldTypeBuildContext buildContext, Class<F> valueType) {
 		super( buildContext, valueType );
-		if ( dimension < 1 || dimension > DEFAULT_MAX_DIMENSIONS ) {
-			throw log.vectorPropertyUnsupportedValue( "dimension", dimension, DEFAULT_MAX_DIMENSIONS );
-		}
-		this.dimension = dimension;
 	}
 
 	@Override
@@ -95,6 +91,15 @@ abstract class AbstractLuceneVectorFieldTypeOptionsStep<S extends AbstractLucene
 	}
 
 	@Override
+	public S dimension(int dimension) {
+		if ( dimension < 1 || dimension > DEFAULT_MAX_DIMENSIONS ) {
+			throw log.vectorPropertyUnsupportedValue( "dimension", dimension, DEFAULT_MAX_DIMENSIONS );
+		}
+		this.dimension = dimension;
+		return thisAsS();
+	}
+
+	@Override
 	public S indexNullAs(F indexNullAsValue) {
 		this.indexNullAsValue = indexNullAsValue;
 		return thisAsS();
@@ -102,6 +107,9 @@ abstract class AbstractLuceneVectorFieldTypeOptionsStep<S extends AbstractLucene
 
 	@Override
 	public LuceneIndexValueFieldType<F> toIndexFieldType() {
+		if ( dimension == null ) {
+			throw log.nullVectorDimension( buildContext.hints().missingVectorDimension(), buildContext.getEventContext() );
+		}
 		VectorSimilarityFunction resolvedVectorSimilarity = resolveDefault( vectorSimilarity );
 		boolean resolvedProjectable = resolveDefault( projectable );
 		boolean resolvedSearchable = resolveDefault( searchable );

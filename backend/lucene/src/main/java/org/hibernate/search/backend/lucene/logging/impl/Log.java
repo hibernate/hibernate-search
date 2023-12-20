@@ -727,4 +727,8 @@ public interface Log extends BasicLogger {
 			+ " Matching against an array with length of '%3$s' is unsupported."
 			+ " Use the array of the same size as the vector field.")
 	SearchException vectorKnnMatchVectorDimensionDiffersFromField(String absoluteFieldPath, int expected, int actual);
+
+	@Message(id = ID_OFFSET + 179, value = "Invalid index field type: missing vector dimension."
+			+ " Define the vector dimension explicitly. %1$s")
+	SearchException nullVectorDimension(String hint, @Param EventContext eventContext);
 }
