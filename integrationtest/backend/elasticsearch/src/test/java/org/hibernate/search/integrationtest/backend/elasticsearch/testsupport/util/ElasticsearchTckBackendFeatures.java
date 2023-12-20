@@ -248,7 +248,11 @@ public class ElasticsearchTckBackendFeatures extends TckBackendFeatures {
 
 	@Override
 	public boolean supportsVectorSearch() {
-		return false;
+		return isActualVersion(
+				es -> !es.isLessThan( "8.0" ),
+				os -> !os.isLessThan( "2.0" ),
+				aoss -> true
+		);
 	}
 
 	@Override

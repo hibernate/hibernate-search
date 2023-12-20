@@ -16,7 +16,7 @@ import org.hibernate.search.util.common.AssertionFailure;
 
 import com.google.gson.JsonObject;
 
-public class Elasticsearch7VectorFieldTypeMappingContributor implements ElasticsearchVectorFieldTypeMappingContributor {
+public class Elasticsearch8VectorFieldTypeMappingContributor implements ElasticsearchVectorFieldTypeMappingContributor {
 	@Override
 	public void contribute(PropertyMapping mapping, Context context) {
 		mapping.setType( DataTypes.DENSE_VECTOR );

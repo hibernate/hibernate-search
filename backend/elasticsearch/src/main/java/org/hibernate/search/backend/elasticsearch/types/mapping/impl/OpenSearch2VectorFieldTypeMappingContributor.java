@@ -16,7 +16,7 @@ import org.hibernate.search.util.common.AssertionFailure;
 
 import com.google.gson.JsonObject;
 
-public class OpenSearch1VectorFieldTypeMappingContributor implements ElasticsearchVectorFieldTypeMappingContributor {
+public class OpenSearch2VectorFieldTypeMappingContributor implements ElasticsearchVectorFieldTypeMappingContributor {
 
 	private static final String BYTE_TYPE = "BYTE";
 

@@ -124,7 +124,16 @@ abstract class PropertyMappingValidator extends AbstractTypeMappingValidator<Pro
 	protected abstract void validateVectorMapping(ValidationErrorCollector errorCollector, PropertyMapping expectedMapping,
 			PropertyMapping actualMapping);
 
-	static class ElasticsearchPropertyMappingValidator extends PropertyMappingValidator {
+	static class Elasticsearch7PropertyMappingValidator extends PropertyMappingValidator {
+
+		@Override
+		protected void validateVectorMapping(ValidationErrorCollector errorCollector, PropertyMapping expectedMapping,
+				PropertyMapping actualMapping) {
+
+		}
+	}
+
+	static class Elasticsearch8PropertyMappingValidator extends PropertyMappingValidator {
 
 		@Override
 		protected void validateVectorMapping(ValidationErrorCollector errorCollector, PropertyMapping expectedMapping,
@@ -164,7 +173,16 @@ abstract class PropertyMappingValidator extends AbstractTypeMappingValidator<Pro
 		}
 	}
 
-	static class OpenSearchPropertyMappingValidator extends PropertyMappingValidator {
+	static class OpenSearch1PropertyMappingValidator extends PropertyMappingValidator {
+
+		@Override
+		protected void validateVectorMapping(ValidationErrorCollector errorCollector, PropertyMapping expectedMapping,
+				PropertyMapping actualMapping) {
+
+		}
+	}
+
+	static class OpenSearch2PropertyMappingValidator extends PropertyMappingValidator {
 
 		@Override
 		protected void validateVectorMapping(ValidationErrorCollector errorCollector, PropertyMapping expectedMapping,

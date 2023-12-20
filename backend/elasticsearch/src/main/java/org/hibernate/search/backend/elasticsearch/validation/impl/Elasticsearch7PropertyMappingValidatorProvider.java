@@ -11,6 +11,6 @@ import org.hibernate.search.backend.elasticsearch.lowlevel.index.mapping.impl.Pr
 public class Elasticsearch7PropertyMappingValidatorProvider implements ElasticsearchPropertyMappingValidatorProvider {
 	@Override
 	public Validator<PropertyMapping> create() {
-		return new PropertyMappingValidator.ElasticsearchPropertyMappingValidator();
+		return new PropertyMappingValidator.Elasticsearch7PropertyMappingValidator();
 	}
 }
