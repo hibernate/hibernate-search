@@ -157,9 +157,9 @@ public abstract class ElasticsearchKnnPredicate extends AbstractElasticsearchSin
 		}
 
 		@Override
-		public JsonObject toJsonQuery(PredicateRequestContext context) {
+		public JsonObject buildJsonQuery(PredicateRequestContext context) {
 			// we want the query to get created and passed to the request context
-			context.contributeKnnClause( ( super.toJsonQuery( context ) ) );
+			context.contributeKnnClause( ( super.buildJsonQuery( context ) ) );
 			// but we don't want it to be an actual query so we return `null`:
 			return null;
 		}
@@ -170,10 +170,9 @@ public abstract class ElasticsearchKnnPredicate extends AbstractElasticsearchSin
 			K_ACCESSOR.set( innerObject, k );
 			if ( filter != null ) {
 				JsonObject query = filter.toJsonQuery( context );
-				// remove ths null check once the tracking of
-				if ( query != null ) {
-					FILTER_ACCESSOR.set( innerObject, query );
-				}
+				// we shouldn't get a null query here, since that's only possible if a filter was a knn predicate,
+				//   and in that case we are failing much faster for am Elasticsearch distribution...
+				FILTER_ACCESSOR.set( innerObject, query );
 			}
 			NUM_CANDIDATES_ACCESSOR.set( innerObject, numberOfCandidates != null ? numberOfCandidates : k );
 			QUERY_VECTOR_ACCESSOR.set( innerObject, vector );
@@ -184,7 +183,7 @@ public abstract class ElasticsearchKnnPredicate extends AbstractElasticsearchSin
 		@Override
 		public void checkNestableWithin(String expectedParentNestedPath) {
 			if ( expectedParentNestedPath != null ) {
-				throw log.cannotBeNestedPredicate();
+				throw log.cannotAddKnnClauseAtThisStep();
 			}
 		}
 
