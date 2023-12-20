@@ -12,7 +12,7 @@ import org.hibernate.search.backend.elasticsearch.search.common.impl.Elasticsear
 
 import com.google.gson.JsonObject;
 
-class ElasticsearchUserProvidedJsonPredicate implements ElasticsearchSearchPredicate {
+class ElasticsearchUserProvidedJsonPredicate extends ElasticsearchSearchPredicate {
 
 	private final Set<String> indexNames;
 	private final JsonObject json;
@@ -34,7 +34,7 @@ class ElasticsearchUserProvidedJsonPredicate implements ElasticsearchSearchPredi
 	}
 
 	@Override
-	public JsonObject toJsonQuery(PredicateRequestContext context) {
+	public JsonObject buildJsonQuery(PredicateRequestContext context) {
 		return json;
 	}
 }

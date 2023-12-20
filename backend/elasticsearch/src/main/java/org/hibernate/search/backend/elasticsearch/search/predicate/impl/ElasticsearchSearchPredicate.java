@@ -16,17 +16,21 @@ import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
 import com.google.gson.JsonObject;
 
-public interface ElasticsearchSearchPredicate extends SearchPredicate {
+public abstract class ElasticsearchSearchPredicate implements SearchPredicate {
 
-	Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
+	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
-	Set<String> indexNames();
+	public abstract Set<String> indexNames();
 
-	void checkNestableWithin(String expectedParentNestedPath);
+	public abstract void checkNestableWithin(String expectedParentNestedPath);
 
-	JsonObject toJsonQuery(PredicateRequestContext context);
+	public final JsonObject toJsonQuery(PredicateRequestContext context) {
+		return buildJsonQuery( context.predicateContext( this ) );
+	}
 
-	static ElasticsearchSearchPredicate from(ElasticsearchSearchIndexScope<?> scope, SearchPredicate predicate) {
+	public abstract JsonObject buildJsonQuery(PredicateRequestContext context);
+
+	public static ElasticsearchSearchPredicate from(ElasticsearchSearchIndexScope<?> scope, SearchPredicate predicate) {
 		if ( !( predicate instanceof ElasticsearchSearchPredicate ) ) {
 			throw log.cannotMixElasticsearchSearchQueryWithOtherPredicates( predicate );
 		}

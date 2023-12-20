@@ -113,7 +113,7 @@ class ElasticsearchBooleanPredicate extends AbstractElasticsearchPredicate {
 			JsonObject jsonQuery = clause.toJsonQuery( context );
 			if ( jsonQuery == null ) {
 				if ( !SHOULD_PROPERTY_NAME.equals( occurProperty ) ) {
-					throw log.knnPredicateCanOnlyBeShouldClause();
+					throw log.cannotAddKnnClauseAtThisStep();
 				}
 				// This is an exceptional case for a KNN search on Elasticsearch distribution.
 				// A Knn predicate would contribute to a knn clause inside the request context itself
