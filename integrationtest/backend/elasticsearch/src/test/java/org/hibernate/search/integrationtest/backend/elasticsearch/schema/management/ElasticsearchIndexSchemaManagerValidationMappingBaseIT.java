@@ -10,6 +10,7 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.hibernate.search.integrationtest.backend.elasticsearch.schema.management.ElasticsearchIndexSchemaManagerTestUtils.defaultMetadataMappingAndCommaForInitialization;
 import static org.hibernate.search.integrationtest.backend.elasticsearch.schema.management.ElasticsearchIndexSchemaManagerTestUtils.hasValidationFailureReport;
 import static org.hibernate.search.integrationtest.backend.elasticsearch.schema.management.ElasticsearchIndexSchemaManagerTestUtils.simpleMappingForInitialization;
+import static org.junit.jupiter.api.Assumptions.assumeTrue;
 
 import java.util.List;
 import java.util.Optional;
@@ -22,6 +23,7 @@ import org.hibernate.search.backend.elasticsearch.analysis.ElasticsearchAnalysis
 import org.hibernate.search.backend.elasticsearch.cfg.ElasticsearchIndexSettings;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaObjectField;
 import org.hibernate.search.engine.backend.types.VectorSimilarity;
+import org.hibernate.search.integrationtest.backend.tck.testsupport.util.TckConfiguration;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.extension.SearchSetupHelper;
 import org.hibernate.search.util.common.SearchException;
 import org.hibernate.search.util.common.impl.Futures;
@@ -380,6 +382,10 @@ class ElasticsearchIndexSchemaManagerValidationMappingBaseIT {
 	@ParameterizedTest(name = "With operation {0}")
 	@MethodSource("params")
 	void vector_success_1(ElasticsearchIndexSchemaManagerValidationOperation operation) {
+		assumeTrue(
+				TckConfiguration.get().getBackendFeatures().supportsVectorSearch(),
+				"These tests only make sense for a backend where Vector Search is supported and implemented."
+		);
 		StubMappedIndex index = StubMappedIndex.ofNonRetrievable( root -> {
 			root.field( "vector", f -> f.asByteVector().dimension( 100 ) )
 					.toReference();
@@ -403,6 +409,10 @@ class ElasticsearchIndexSchemaManagerValidationMappingBaseIT {
 	@ParameterizedTest(name = "With operation {0}")
 	@MethodSource("params")
 	void vector_success_2(ElasticsearchIndexSchemaManagerValidationOperation operation) {
+		assumeTrue(
+				TckConfiguration.get().getBackendFeatures().supportsVectorSearch(),
+				"These tests only make sense for a backend where Vector Search is supported and implemented."
+		);
 		StubMappedIndex index = StubMappedIndex.ofNonRetrievable( root -> {
 			root.field( "vector",
 					f -> f.asFloatVector().dimension( 50 ).vectorSimilarity( VectorSimilarity.L2 ).maxConnections( 2 )
@@ -429,6 +439,10 @@ class ElasticsearchIndexSchemaManagerValidationMappingBaseIT {
 	@ParameterizedTest(name = "With operation {0}")
 	@MethodSource("params")
 	void vector_invalid_dimension(ElasticsearchIndexSchemaManagerValidationOperation operation) {
+		assumeTrue(
+				TckConfiguration.get().getBackendFeatures().supportsVectorSearch(),
+				"These tests only make sense for a backend where Vector Search is supported and implemented."
+		);
 		StubMappedIndex index = StubMappedIndex.ofNonRetrievable( root -> {
 			root.field( "vectorB", f -> f.asByteVector().dimension( 2 ) ).toReference();
 			root.field( "vectorF", f -> f.asFloatVector().dimension( 2 ) ).toReference();
@@ -463,6 +477,10 @@ class ElasticsearchIndexSchemaManagerValidationMappingBaseIT {
 	@ParameterizedTest(name = "With operation {0}")
 	@MethodSource("params")
 	void vector_invalid_elementType(ElasticsearchIndexSchemaManagerValidationOperation operation) {
+		assumeTrue(
+				TckConfiguration.get().getBackendFeatures().supportsVectorSearch(),
+				"These tests only make sense for a backend where Vector Search is supported and implemented."
+		);
 		StubMappedIndex index = StubMappedIndex.ofNonRetrievable( root -> {
 			root.field( "vectorB", f -> f.asByteVector().dimension( 2 ) ).toReference();
 			root.field( "vectorF", f -> f.asFloatVector().dimension( 2 ) ).toReference();
@@ -500,6 +518,10 @@ class ElasticsearchIndexSchemaManagerValidationMappingBaseIT {
 	@ParameterizedTest(name = "With operation {0}")
 	@MethodSource("params")
 	void vector_invalid_similarity(ElasticsearchIndexSchemaManagerValidationOperation operation) {
+		assumeTrue(
+				TckConfiguration.get().getBackendFeatures().supportsVectorSearch(),
+				"These tests only make sense for a backend where Vector Search is supported and implemented."
+		);
 		StubMappedIndex index = StubMappedIndex.ofNonRetrievable( root -> {
 			root.field( "vectorB", f -> f.asByteVector().dimension( 2 ).vectorSimilarity( VectorSimilarity.COSINE ) )
 					.toReference();
@@ -538,6 +560,10 @@ class ElasticsearchIndexSchemaManagerValidationMappingBaseIT {
 	@ParameterizedTest(name = "With operation {0}")
 	@MethodSource("params")
 	void vector_invalid_m_ef(ElasticsearchIndexSchemaManagerValidationOperation operation) {
+		assumeTrue(
+				TckConfiguration.get().getBackendFeatures().supportsVectorSearch(),
+				"These tests only make sense for a backend where Vector Search is supported and implemented."
+		);
 		StubMappedIndex index = StubMappedIndex.ofNonRetrievable( root -> {
 			root.field( "vectorB", f -> f.asByteVector().dimension( 2 ).beamWidth( 2 ).maxConnections( 20 ) ).toReference();
 			root.field( "vectorF", f -> f.asFloatVector().dimension( 2 ).beamWidth( 5 ).maxConnections( 50 ) ).toReference();

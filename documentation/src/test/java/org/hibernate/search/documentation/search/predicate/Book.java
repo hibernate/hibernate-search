@@ -19,7 +19,6 @@ import org.hibernate.search.mapper.pojo.mapping.definition.annotation.GenericFie
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.IndexedEmbedded;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.KeywordField;
-import org.hibernate.search.mapper.pojo.mapping.definition.annotation.VectorField;
 
 @Entity
 @Indexed
@@ -44,7 +43,6 @@ public class Book {
 	@FullTextField(analyzer = "english")
 	private String comment;
 
-	@VectorField(dimension = 128)
 	private float[] coverImageEmbeddings;
 
 	@ManyToMany

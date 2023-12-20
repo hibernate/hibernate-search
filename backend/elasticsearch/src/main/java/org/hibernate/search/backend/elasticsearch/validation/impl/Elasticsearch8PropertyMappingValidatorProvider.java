@@ -8,9 +8,9 @@ package org.hibernate.search.backend.elasticsearch.validation.impl;
 
 import org.hibernate.search.backend.elasticsearch.lowlevel.index.mapping.impl.PropertyMapping;
 
-public class OpenSearch1PropertyMappingValidatorProvider implements ElasticsearchPropertyMappingValidatorProvider {
+public class Elasticsearch8PropertyMappingValidatorProvider implements ElasticsearchPropertyMappingValidatorProvider {
 	@Override
 	public Validator<PropertyMapping> create() {
-		return new PropertyMappingValidator.OpenSearch1PropertyMappingValidator();
+		return new PropertyMappingValidator.Elasticsearch8PropertyMappingValidator();
 	}
 }

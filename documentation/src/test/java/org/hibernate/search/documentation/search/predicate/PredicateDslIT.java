@@ -28,6 +28,8 @@ import org.hibernate.search.engine.spatial.GeoBoundingBox;
 import org.hibernate.search.engine.spatial.GeoPoint;
 import org.hibernate.search.engine.spatial.GeoPolygon;
 import org.hibernate.search.mapper.orm.Search;
+import org.hibernate.search.mapper.orm.cfg.HibernateOrmMapperSettings;
+import org.hibernate.search.mapper.orm.mapping.HibernateOrmSearchMappingConfigurer;
 import org.hibernate.search.mapper.orm.scope.SearchScope;
 import org.hibernate.search.mapper.orm.session.SearchSession;
 import org.hibernate.search.util.common.data.RangeBoundInclusion;
@@ -57,6 +59,17 @@ class PredicateDslIT {
 		entityManagerFactory = setupHelper.start().setup( Book.class, Author.class, EmbeddableGeoPoint.class );
 
 		DocumentationSetupHelper.SetupContext setupContext = setupHelper.start();
+		// NOTE: To keep this documentation example simple there is no testing with Elasticsearch/OpenSearch
+		// as not all versions have integration implemented e.g. Elasticsearch 7 or OpenSearch 1.3 will throw exceptions
+		if ( BackendConfiguration.isLucene() ) {
+			setupContext.withProperty(
+					HibernateOrmMapperSettings.MAPPING_CONFIGURER,
+					(HibernateOrmSearchMappingConfigurer) context -> context.programmaticMapping()
+							.type( Book.class )
+							.property( "coverImageEmbeddings" )
+							.vectorField( 128 )
+			);
+		}
 		entityManagerFactory = setupContext.setup( Book.class, Author.class, EmbeddableGeoPoint.class );
 		initData();
 	}
@@ -1095,7 +1108,7 @@ class PredicateDslIT {
 	@Test
 	void knn() {
 		// NOTE: To keep this documentation example simple there is no testing with Elasticsearch/OpenSearch
-		// as Elasticsearch requires an additional numberOfCandidates option that throws an exception on other backend/distributions
+		// as not all versions have integration implemented e.g. Elasticsearch 7 or OpenSearch 1.3 will throw exceptions
 		assumeTrue(
 				BackendConfiguration.isLucene(),
 				"This test only makes sense if the backend supports vectors"

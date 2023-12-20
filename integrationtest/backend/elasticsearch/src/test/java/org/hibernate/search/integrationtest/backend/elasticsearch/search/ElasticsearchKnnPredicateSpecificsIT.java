@@ -38,6 +38,10 @@ class ElasticsearchKnnPredicateSpecificsIT {
 
 	@BeforeAll
 	static void setup() {
+		assumeTrue(
+				TckConfiguration.get().getBackendFeatures().supportsVectorSearch(),
+				"These tests only make sense for a backend where Vector Search is supported and implemented."
+		);
 		setupHelper.start().withIndexes( index ).setup();
 		BulkIndexer exampleKnnSearchIndexer = index.bulkIndexer();
 		dataset.accept( exampleKnnSearchIndexer );

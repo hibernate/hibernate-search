@@ -108,6 +108,14 @@ class KnnPredicateBaseIT {
 	@Nested
 	class InObjectFieldIT<F> extends InObjectFieldConfigured<F> {
 		// JDK 11 does not allow static fields in non-static inner class and JUnit does not allow running @Nested tests in static inner classes...
+
+		@BeforeAll
+		static void beforeAll() {
+			assumeTrue(
+					TckConfiguration.get().getBackendFeatures().supportsVectorSearchInsideOtherPredicates(),
+					"This test won't work on some backends that do not provide a way of passing a knn predicate as a clause of bool query."
+			);
+		}
 	}
 
 	abstract static class InObjectFieldConfigured<F>
