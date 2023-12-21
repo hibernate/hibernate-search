@@ -1,6 +1,25 @@
 Hibernate Search Changelog
 ==========================
 
+6.2.3.Final (2023-12-21)
+-------------------------
+
+** Improvement
+    * HSEARCH-5049 Upgrade -orm6 artifacts to Hibernate ORM 6.2.17.Final
+    * HSEARCH-5044 Upgrade -orm6 artifacts to Hibernate ORM 6.2.16.Final
+    * HSEARCH-5030 Upgrade -orm6 artifacts to Hibernate ORM 6.2.15.Final
+    * HSEARCH-5027 Upgrade -orm6 artifacts to Hibernate ORM 6.2.14.Final
+    * HSEARCH-5024 Adjust Jandex index reading and building for Spring Boot 3.2 nested JARs
+    * HSEARCH-4994 Upgrade to Elasticsearch client 8.10.4 and test against Elasticsearch 8.10.4
+    * HSEARCH-4993 Add compatibility with OpenSearch 2.11.0
+    * HSEARCH-4990 Upgrade to Elasticsearch client 8.10.3 and test against Elasticsearch 8.10.3
+    * HSEARCH-4987 Upgrade -orm6 artifacts to Hibernate ORM 6.2.13.Final
+
+** Task
+    * HSEARCH-5022 Mention WildFly in the documentation
+    * HSEARCH-4998 Make the build compatible with podman
+    * HSEARCH-4991 Test against latest Elasticsearch 7.17.14
+
 6.2.2.Final (2023-10-03)
 -------------------------
 
