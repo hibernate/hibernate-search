@@ -136,8 +136,6 @@ which generally gives much more flexibility.
 +
 include::../components/_incubating-warning.adoc[]
 +
-WARNING: Vector fields are only supported by the <<backend-lucene, Lucene backend>> for now.
-+
 Specific field type for vector fields to be used in a <<search-dsl-predicate-knn,vector search>>.
 +
 Vector fields accept values of type `float[]` or `byte[]` and *require* that
