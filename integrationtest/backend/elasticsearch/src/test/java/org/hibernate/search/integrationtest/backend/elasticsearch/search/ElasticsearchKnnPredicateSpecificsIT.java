@@ -183,7 +183,7 @@ class ElasticsearchKnnPredicateSpecificsIT {
 					index.query().select()
 							.where( f -> f.matchAll() )
 							.aggregation( countsByParking, agg -> agg.terms().field( "object.nestedParking", Boolean.class )
-									.filter( f -> f.knn( 10 ).field( "location" ).matching(50.0f, 50.0f) ) )
+									.filter( f -> f.knn( 10 ).field( "location" ).matching( 50.0f, 50.0f ) ) )
 							.toQuery();
 				} );
 	}
@@ -230,7 +230,9 @@ class ElasticsearchKnnPredicateSpecificsIT {
 			IndexSchemaObjectField nested = root.objectField( "object", ObjectStructure.NESTED );
 			object = nested.toReference();
 			nestedParking = nested.field( "nestedParking", f -> f.asBoolean().aggregable( Aggregable.YES ) ).toReference();
-			nestedRating = nested.field( "nestedRating", f -> f.asInteger().projectable( Projectable.YES ).sortable( Sortable.YES ) ).toReference();
+			nestedRating =
+					nested.field( "nestedRating", f -> f.asInteger().projectable( Projectable.YES ).sortable( Sortable.YES ) )
+							.toReference();
 		}
 
 	}

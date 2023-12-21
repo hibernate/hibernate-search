@@ -44,6 +44,7 @@ public class Book {
 	private String comment;
 
 	private float[] coverImageEmbeddings;
+	private float[] alternativeCoverImageEmbeddings;
 
 	@ManyToMany
 	@IndexedEmbedded(structure = ObjectStructure.NESTED)
@@ -106,6 +107,14 @@ public class Book {
 
 	public void setCoverImageEmbeddings(float[] coverImageEmbeddings) {
 		this.coverImageEmbeddings = coverImageEmbeddings;
+	}
+
+	public float[] getAlternativeCoverImageEmbeddings() {
+		return alternativeCoverImageEmbeddings;
+	}
+
+	public void setAlternativeCoverImageEmbeddings(float[] alternativeCoverImageEmbeddings) {
+		this.alternativeCoverImageEmbeddings = alternativeCoverImageEmbeddings;
 	}
 
 	public List<Author> getAuthors() {

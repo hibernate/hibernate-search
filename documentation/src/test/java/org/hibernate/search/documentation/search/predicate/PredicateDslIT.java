@@ -18,6 +18,7 @@ import java.util.function.Consumer;
 
 import jakarta.persistence.EntityManagerFactory;
 
+import org.hibernate.search.backend.elasticsearch.ElasticsearchExtension;
 import org.hibernate.search.documentation.testsupport.BackendConfigurations;
 import org.hibernate.search.documentation.testsupport.DocumentationSetupHelper;
 import org.hibernate.search.engine.search.common.BooleanOperator;
@@ -32,7 +33,9 @@ import org.hibernate.search.mapper.orm.cfg.HibernateOrmMapperSettings;
 import org.hibernate.search.mapper.orm.mapping.HibernateOrmSearchMappingConfigurer;
 import org.hibernate.search.mapper.orm.scope.SearchScope;
 import org.hibernate.search.mapper.orm.session.SearchSession;
+import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.TypeMappingStep;
 import org.hibernate.search.util.common.data.RangeBoundInclusion;
+import org.hibernate.search.util.impl.integrationtest.backend.elasticsearch.dialect.ElasticsearchTestDialect;
 import org.hibernate.search.util.impl.integrationtest.common.extension.BackendConfiguration;
 
 import org.junit.jupiter.api.BeforeEach;
@@ -54,20 +57,33 @@ class PredicateDslIT {
 
 	private EntityManagerFactory entityManagerFactory;
 
+	private static boolean isVectorSearchSupported() {
+		return BackendConfiguration.isLucene()
+				|| ElasticsearchTestDialect.isActualVersion(
+						es -> !es.isLessThan( "8.0" ),
+						os -> !os.isLessThan( "2.0" ),
+						aoss -> true
+				);
+	}
+
 	@BeforeEach
 	void setup() {
 		entityManagerFactory = setupHelper.start().setup( Book.class, Author.class, EmbeddableGeoPoint.class );
 
 		DocumentationSetupHelper.SetupContext setupContext = setupHelper.start();
-		// NOTE: To keep this documentation example simple there is no testing with Elasticsearch/OpenSearch
-		// as not all versions have integration implemented e.g. Elasticsearch 7 or OpenSearch 1.3 will throw exceptions
-		if ( BackendConfiguration.isLucene() ) {
+		// NOTE: If backend does not support vector search it will lead to runtime exceptions, so we cannot  simply annotate
+		// the corresponding properties with @VectorField; instead we add it programmatically when it's possible
+		if ( isVectorSearchSupported() ) {
 			setupContext.withProperty(
 					HibernateOrmMapperSettings.MAPPING_CONFIGURER,
-					(HibernateOrmSearchMappingConfigurer) context -> context.programmaticMapping()
-							.type( Book.class )
-							.property( "coverImageEmbeddings" )
-							.vectorField( 128 )
+					(HibernateOrmSearchMappingConfigurer) context -> {
+						TypeMappingStep book = context.programmaticMapping()
+								.type( Book.class );
+						book.property( "coverImageEmbeddings" )
+								.vectorField( 128 );
+						book.property( "alternativeCoverImageEmbeddings" )
+								.vectorField( 128 );
+					}
 			);
 		}
 		entityManagerFactory = setupContext.setup( Book.class, Author.class, EmbeddableGeoPoint.class );
@@ -1110,14 +1126,14 @@ class PredicateDslIT {
 		// NOTE: To keep this documentation example simple there is no testing with Elasticsearch/OpenSearch
 		// as not all versions have integration implemented e.g. Elasticsearch 7 or OpenSearch 1.3 will throw exceptions
 		assumeTrue(
-				BackendConfiguration.isLucene(),
+				isVectorSearchSupported(),
 				"This test only makes sense if the backend supports vectors"
 		);
 		withinSearchSession( searchSession -> {
 			// tag::knn[]
 			float[] coverImageEmbeddingsVector = /*...*/
 					// end::knn[]
-					new float[128];
+					floats( 128, 1.0f );
 			// tag::knn[]
 			List<Book> hits = searchSession.search( Book.class )
 					.where( f -> f.knn( 5 ).field( "coverImageEmbeddings" ).matching( coverImageEmbeddingsVector ) )
@@ -1132,7 +1148,7 @@ class PredicateDslIT {
 			// tag::knn-filter[]
 			float[] coverImageEmbeddingsVector = /*...*/
 					// end::knn-filter[]
-					new float[128];
+					floats( 128, 1.0f );
 			// tag::knn-filter[]
 			List<Book> hits = searchSession.search( Book.class )
 					.where( f -> f.knn( 5 ).field( "coverImageEmbeddings" ).matching( coverImageEmbeddingsVector )
@@ -1143,6 +1159,80 @@ class PredicateDslIT {
 					.extracting( Book::getId )
 					.containsExactlyInAnyOrder( BOOK1_ID, BOOK2_ID, BOOK3_ID );
 		} );
+
+		withinSearchSession( searchSession -> {
+			// tag::knn-should[]
+			float[] coverImageEmbeddingsVector = /*...*/
+					// end::knn-should[]
+					floats( 128, 1.0f );
+			// tag::knn-should[]
+			float[] alternativeCoverImageEmbeddingsVector = /*...*/
+					// end::knn-should[]
+					floats( 128, 1.0f );
+			// tag::knn-should[]
+			List<Book> hits = searchSession.search( Book.class )
+					.where( f -> f.bool()
+							.should( f.knn( 10 ).field( "coverImageEmbeddings" ).matching( coverImageEmbeddingsVector ) )
+							.should( f.knn( 5 ).field( "alternativeCoverImageEmbeddings" )
+									.matching( alternativeCoverImageEmbeddingsVector ) )
+					)
+					.fetchHits( 20 );
+			// end::knn-should[]
+			assertThat( hits )
+					.extracting( Book::getId )
+					.containsExactlyInAnyOrder( BOOK1_ID, BOOK2_ID, BOOK3_ID, BOOK4_ID );
+		} );
+
+		if ( !BackendConfiguration.isElasticsearch()
+				|| ElasticsearchTestDialect.isActualVersion(
+						es -> false,
+						os -> !os.isLessThan( "2.0" ),
+						aoss -> true
+				) ) {
+			withinSearchSession( searchSession -> {
+				// tag::knn-and-match[]
+				float[] coverImageEmbeddingsVector = /*...*/
+						// end::knn-and-match[]
+						floats( 128, 1.0f );
+				// tag::knn-and-match[]
+				List<Book> hits = searchSession.search( Book.class )
+						.where( f -> f.bool()
+								.must( f.match().field( "genre" ).matching( Genre.SCIENCE_FICTION ) ) // <1>
+								.should( f.knn( 10 ).field( "coverImageEmbeddings" ).matching( coverImageEmbeddingsVector ) ) // <2>
+						)
+						.fetchHits( 20 );
+				// end::knn-and-match[]
+				assertThat( hits )
+						.extracting( Book::getId )
+						.containsExactlyInAnyOrder( BOOK1_ID, BOOK2_ID, BOOK3_ID );
+			} );
+		}
+
+
+		// numberOfCandidates is only applicable to an Elastic distribution of Elasticsearch:
+		if ( BackendConfiguration.isElasticsearch()
+				&& ElasticsearchTestDialect.isActualVersion(
+						es -> !es.isLessThan( "8.0" ),
+						os -> false,
+						aoss -> false
+				) ) {
+			withinSearchSession( searchSession -> {
+				// tag::knn-candidates[]
+				float[] coverImageEmbeddingsVector = /*...*/
+						// end::knn-candidates[]
+						floats( 128, 1.0f );
+				// tag::knn-candidates[]
+				List<Book> hits = searchSession.search( Book.class )
+						.where( f -> f.extension( ElasticsearchExtension.get() ) // <1>
+								.knn( 5 ).field( "coverImageEmbeddings" ).matching( coverImageEmbeddingsVector ) // <2>
+								.numberOfCandidates( 15 ) )// <3>
+						.fetchHits( 20 );
+				// end::knn-candidates[]
+				assertThat( hits )
+						.extracting( Book::getId )
+						.containsExactlyInAnyOrder( BOOK1_ID, BOOK2_ID, BOOK3_ID, BOOK4_ID );
+			} );
+		}
 	}
 
 	private MySearchParameters getSearchParameters() {
@@ -1208,6 +1298,7 @@ class PredicateDslIT {
 			book1.setGenre( Genre.SCIENCE_FICTION );
 			book1.getAuthors().add( isaacAsimov );
 			book1.setCoverImageEmbeddings( floats( 128, 1.0f ) );
+			book1.setAlternativeCoverImageEmbeddings( floats( 128, 10.0f ) );
 			isaacAsimov.getBooks().add( book1 );
 
 			Book book2 = new Book();
@@ -1219,6 +1310,7 @@ class PredicateDslIT {
 			book2.setComment( "Really liked this one!" );
 			book2.getAuthors().add( isaacAsimov );
 			book2.setCoverImageEmbeddings( floats( 128, 2.0f ) );
+			book2.setAlternativeCoverImageEmbeddings( floats( 128, 20.0f ) );
 			isaacAsimov.getBooks().add( book2 );
 
 			Book book3 = new Book();
@@ -1229,6 +1321,7 @@ class PredicateDslIT {
 			book3.setGenre( Genre.SCIENCE_FICTION );
 			book3.getAuthors().add( isaacAsimov );
 			book3.setCoverImageEmbeddings( floats( 128, 3.0f ) );
+			book3.setAlternativeCoverImageEmbeddings( floats( 128, 30.0f ) );
 			isaacAsimov.getBooks().add( book3 );
 
 			Book book4 = new Book();
@@ -1239,6 +1332,7 @@ class PredicateDslIT {
 			book4.setGenre( Genre.CRIME_FICTION );
 			book4.getAuthors().add( aLeeMartinez );
 			book4.setCoverImageEmbeddings( floats( 128, 4.0f ) );
+			book4.setAlternativeCoverImageEmbeddings( floats( 128, 40.0f ) );
 			aLeeMartinez.getBooks().add( book3 );
 
 			entityManager.persist( isaacAsimov );
