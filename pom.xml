@@ -271,7 +271,8 @@
         <version.checkstyle.plugin>3.3.1</version.checkstyle.plugin>
         <version.bundle.plugin>5.1.9</version.bundle.plugin>
         <!-- Needing 3.6.2 at least because of MCOMPILER-294 -->
-        <version.compiler.plugin>3.12.0</version.compiler.plugin>
+        <!-- Cannot update to 3.12 because of https://issues.apache.org/jira/browse/MCOMPILER-567 -->
+        <version.compiler.plugin>3.11.0</version.compiler.plugin>
         <version.dependency.plugin>3.6.1</version.dependency.plugin>
         <!-- Check dependencies for security vulnerabilities -->
         <version.dependency-check.plugin>9.0.7</version.dependency-check.plugin>
