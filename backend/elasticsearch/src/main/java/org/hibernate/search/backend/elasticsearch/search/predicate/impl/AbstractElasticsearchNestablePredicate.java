@@ -35,7 +35,6 @@ public abstract class AbstractElasticsearchNestablePredicate extends AbstractEla
 
 	@Override
 	public JsonObject toJsonQuery(PredicateRequestContext context) {
-		checkNestableWithin( context.getNestedPath() );
 
 		List<String> nestedPathHierarchy = getNestedPathHierarchy();
 		String expectedNestedPath = nestedPathHierarchy.isEmpty()
@@ -44,6 +43,7 @@ public abstract class AbstractElasticsearchNestablePredicate extends AbstractEla
 
 		if ( Objects.equals( context.getNestedPath(), expectedNestedPath ) ) {
 			// Implicit nesting is not necessary
+			checkNestableWithin( context.getNestedPath() );
 			return super.toJsonQuery( context );
 		}
 
@@ -52,6 +52,7 @@ public abstract class AbstractElasticsearchNestablePredicate extends AbstractEla
 		// so that the predicate is actually executed in this context.
 		PredicateRequestContext contextAfterImplicitNesting =
 				context.withNestedPath( expectedNestedPath );
+		checkNestableWithin( expectedNestedPath );
 
 		JsonObject result = super.toJsonQuery( contextAfterImplicitNesting );
 

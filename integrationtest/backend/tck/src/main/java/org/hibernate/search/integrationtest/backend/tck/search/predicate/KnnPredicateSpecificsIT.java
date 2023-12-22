@@ -690,6 +690,10 @@ class KnnPredicateSpecificsIT {
 		@Test
 		@SuppressWarnings("unchecked")
 		void nestedVector() {
+			assumeTrue(
+					TckConfiguration.get().getBackendFeatures().supportsVectorSearchInsideOtherPredicates(),
+					"This test won't work on some backends that can only accept a knn predicate at top level."
+			);
 			assertThat(
 					indexNested.createScope().query()
 							.select( f -> f.composite()
