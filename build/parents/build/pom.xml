@@ -1207,7 +1207,7 @@
                     <configuration>
                         <environmentVariables>
                             <!-- Just to be sure that we are pulling/using the Ryuk from docker.io -->
-                            <TESTCONTAINERS_RYUK_CONTAINER_IMAGE>docker.io/testcontainers/ryuk:0.5.1</TESTCONTAINERS_RYUK_CONTAINER_IMAGE>
+                            <TESTCONTAINERS_RYUK_CONTAINER_IMAGE>docker.io/testcontainers/ryuk:0.6.0</TESTCONTAINERS_RYUK_CONTAINER_IMAGE>
                             <!--
                                 Startup checks might want to test whether the images can be pulled (e.g. see `tinyimage.container.image` config property).
                                 To prevent that and speedup the startup a bit the checks are disabled.
