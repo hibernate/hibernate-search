@@ -7,6 +7,7 @@
 package org.hibernate.search.integrationtest.mapper.orm.bootstrap;
 
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.assertj.core.api.InstanceOfAssertFactories.list;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -146,7 +147,7 @@ class ObsoletePropertiesIT {
 					matcher.find();
 					return Arrays.asList( matcher.group( 1 ).split( ", " ) );
 				} )
-				.asList()
+				.asInstanceOf( list( String.class ) )
 				.containsExactlyInAnyOrderElementsOf( obsoletePropertyKeys );
 	}
 

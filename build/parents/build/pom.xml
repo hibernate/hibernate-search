@@ -132,7 +132,7 @@
 
         <version.org.hamcrest>2.2</version.org.hamcrest>
         <version.org.mockito>5.8.0</version.org.mockito>
-        <version.org.assertj.assertj-core>3.24.2</version.org.assertj.assertj-core>
+        <version.org.assertj.assertj-core>3.25.1</version.org.assertj.assertj-core>
         <version.org.awaitily>4.2.0</version.org.awaitily>
         <version.org.skyscreamer.jsonassert>1.5.1</version.org.skyscreamer.jsonassert>
         <version.io.takari.junit>1.2.7</version.io.takari.junit>
