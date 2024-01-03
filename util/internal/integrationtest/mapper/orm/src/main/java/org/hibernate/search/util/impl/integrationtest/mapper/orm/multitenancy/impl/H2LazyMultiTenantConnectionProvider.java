@@ -6,13 +6,22 @@
  */
 package org.hibernate.search.util.impl.integrationtest.mapper.orm.multitenancy.impl;
 
+import static org.hibernate.testing.env.ConnectionProviderBuilder.URL_FORMAT;
+
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.util.HashMap;
+import java.util.Locale;
 import java.util.Map;
+import java.util.Properties;
 
 import org.hibernate.HibernateException;
+import org.hibernate.cfg.Environment;
+import org.hibernate.cfg.JdbcSettings;
 import org.hibernate.engine.jdbc.connections.spi.AbstractMultiTenantConnectionProvider;
 import org.hibernate.engine.jdbc.connections.spi.ConnectionProvider;
 import org.hibernate.search.util.common.impl.Closer;
+import org.hibernate.search.util.impl.integrationtest.mapper.orm.DatabaseContainer;
 import org.hibernate.service.spi.Stoppable;
 
 import org.hibernate.testing.env.ConnectionProviderBuilder;
@@ -61,14 +70,34 @@ public class H2LazyMultiTenantConnectionProvider extends AbstractMultiTenantConn
 		return connectionProviderImpl;
 	}
 
+	@SuppressWarnings("deprecation")
 	private Map<String, ConnectionProvider> getOrCreateDelegates() {
 		if ( !delegates.isEmpty() ) {
 			return delegates;
 		}
-		for ( String tenantId : tenantIds ) {
-			ConnectionProvider connectionProvider = ConnectionProviderBuilder.buildConnectionProvider( tenantId );
-			delegates.put( tenantId, connectionProvider );
+
+		Properties properties = Environment.getProperties();
+		HashMap<String, Object> map = new HashMap<>();
+		DatabaseContainer.configuration().add( map );
+		// properties should be a copy, so we edit it as we want!
+		properties.putAll( map );
+
+		try {
+			Method buildConnectionProvider = ConnectionProviderBuilder.class.getDeclaredMethod( "buildConnectionProvider",
+					Properties.class, boolean.class );
+			buildConnectionProvider.setAccessible( true );
+
+			for ( String tenantId : tenantIds ) {
+				properties.put( JdbcSettings.URL, String.format( Locale.ROOT, URL_FORMAT, tenantId ) );
+				ConnectionProvider connectionProvider =
+						(ConnectionProvider) buildConnectionProvider.invoke( null, properties, false );
+				delegates.put( tenantId, connectionProvider );
+			}
 		}
+		catch (NoSuchMethodException | IllegalAccessException | InvocationTargetException e) {
+			throw new IllegalStateException( "Unable to prepare connection providers", e );
+		}
+
 		return delegates;
 	}
 }

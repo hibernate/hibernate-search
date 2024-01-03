@@ -36,7 +36,7 @@ public class MultitenancyTestHelper {
 		assumeTrue(
 				// Until we adapt the dialect context ... (that is if we need to adapt it)
 				// DialectContext.getDialect() instanceof H2Dialect,
-				org.hibernate.dialect.H2Dialect.class.getName().equals( DatabaseContainer.configuration().driver() ),
+				org.hibernate.dialect.H2Dialect.class.getName().equals( DatabaseContainer.configuration().dialect() ),
 				"This test relies on multi-tenancy, which can currently only be set up with H2"
 		);
 
