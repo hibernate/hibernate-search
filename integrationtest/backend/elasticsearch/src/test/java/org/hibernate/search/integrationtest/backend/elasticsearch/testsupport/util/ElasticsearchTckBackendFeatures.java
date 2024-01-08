@@ -11,6 +11,7 @@ import static org.hibernate.search.util.impl.integrationtest.backend.elasticsear
 import java.math.BigDecimal;
 import java.math.BigInteger;
 
+import org.hibernate.search.engine.backend.types.VectorSimilarity;
 import org.hibernate.search.engine.spatial.GeoPoint;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.TckBackendFeatures;
 import org.hibernate.search.util.impl.integrationtest.backend.elasticsearch.dialect.ElasticsearchTestDialect;
@@ -280,5 +281,20 @@ public class ElasticsearchTckBackendFeatures extends TckBackendFeatures {
 				os -> false,
 				aoss -> false
 		);
+	}
+
+	@Override
+	public boolean supportsSimilarity(VectorSimilarity vectorSimilarity) {
+		switch ( vectorSimilarity ) {
+			case DOT_PRODUCT:
+			case MAX_INNER_PRODUCT:
+				return isActualVersion(
+						es -> true,
+						os -> false,
+						aoss -> false
+				);
+			default:
+				return true;
+		}
 	}
 }

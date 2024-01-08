@@ -50,10 +50,12 @@ public class Elasticsearch8VectorFieldTypeMappingContributor implements Elastics
 				return null;
 			case L2:
 				return "l2_norm";
-			case INNER_PRODUCT:
+			case DOT_PRODUCT:
 				return "dot_product";
 			case COSINE:
 				return "cosine";
+			case MAX_INNER_PRODUCT:
+				return "max_inner_product";
 			default:
 				throw new AssertionFailure( "Unexpected value for Similarity: " + vectorSimilarity );
 		}

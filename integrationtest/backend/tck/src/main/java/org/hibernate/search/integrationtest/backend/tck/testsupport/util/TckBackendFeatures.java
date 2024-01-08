@@ -7,6 +7,7 @@
 package org.hibernate.search.integrationtest.backend.tck.testsupport.util;
 
 import org.hibernate.search.engine.backend.types.ObjectStructure;
+import org.hibernate.search.engine.backend.types.VectorSimilarity;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappingBackendFeatures;
 
 public abstract class TckBackendFeatures implements StubMappingBackendFeatures {
@@ -145,6 +146,10 @@ public abstract class TckBackendFeatures implements StubMappingBackendFeatures {
 	}
 
 	public boolean supportsVectorSearchRequiredMinimumSimilarity() {
+		return true;
+	}
+
+	public boolean supportsSimilarity(VectorSimilarity vectorSimilarity) {
 		return true;
 	}
 }

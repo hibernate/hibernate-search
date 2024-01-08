@@ -162,7 +162,7 @@ public class ElasticsearchTestDialect {
 				switch ( similarity ) {
 					case L2:
 						return "l2_norm";
-					case INNER_PRODUCT:
+					case DOT_PRODUCT:
 						return "dot_product";
 					case COSINE:
 						return "cosine";
@@ -174,7 +174,7 @@ public class ElasticsearchTestDialect {
 				switch ( similarity ) {
 					case L2:
 						return "l2";
-					case INNER_PRODUCT:
+					case DOT_PRODUCT:
 						return "l2";
 					case COSINE:
 						return "cosinesimil";

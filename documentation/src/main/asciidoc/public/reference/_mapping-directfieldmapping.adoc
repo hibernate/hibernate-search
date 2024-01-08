@@ -383,7 +383,7 @@ Only available on `@VectorField`.
 |`VectorSimilarity.L2`|An L2 (Euclidean) norm, that is a sensible default for most scenarios.
 Distance between vectors `x` and `y` is calculated as latexmath:[d(x,y) = \sum_{i=1}^{n} (x_i - y_i)^2 ]
 and the score function is latexmath:[s = \frac{1}{1+d}]
-|`VectorSimilarity.INNER_PRODUCT`|Inner product (dot product in particular).
+|`VectorSimilarity.DOT_PRODUCT`|Inner product (dot product in particular).
 Distance between vectors `x` and `y` is calculated as latexmath:[d(x,y) = \sum_{i=1}^{n} x_i \cdot y_i ]
 and the score function is latexmath:[s = \frac{1}{1+d}]
 
@@ -398,7 +398,24 @@ while byte vectors should simply all have the same norm.
 |`VectorSimilarity.COSINE`|Cosine similarity.
 Distance between vectors `x` and `y` is calculated as latexmath:[d(x,y) = \frac{1 - \sum_{i=1} ^{n} x_i \cdot y_i }{ \sqrt{ \sum_{i=1} ^{n} x_i^2 } \sqrt{ \sum_{i=1} ^{n} y_i^2 }} ]
 and the score function is latexmath:[s = \frac{1}{1+d}]
+|`VectorSimilarity.MAX_INNER_PRODUCT`|Similar to a dot product similarity, but does not require vector normalization.
+Distance between vectors `x` and `y` is calculated as latexmath:[d(x,y) = \sum_{i=1}^{n} x_i \cdot y_i ]
+and the score function is latexmath:[s = \begin{cases}
+\frac{1}{1-d} & \text{if d < 0}\\
+d+1 & \text{otherwise}
+\end{cases} ]
 |`VectorSimilarity.DEFAULT`|Use the backend-specific default. For the <<backend-lucene, Lucene backend>> an `L2` similarity is used.
+|===============
++
+.How the vector similarity matches to a backend-specific value
+[cols=",,,",options="header"]
+|===============
+|Hibernate Search Value|Lucene Backend |Elasticsearch Backend|Elasticsearch Backend (OpenSearch distribution)
+|`DEFAULT`          | `EUCLIDEAN`            | Elasticsearch default | OpenSearch default.
+|`L2`               | `EUCLIDEAN`            | `l2_norm`             | `l2`
+|`DOT_PRODUCT`      | `DOT_PRODUCT`          | `dot_product`         | currently *not supported* by OpenSearch and will result in an exception.
+|`COSINE`           | `COSINE`               | `cosine`              | `cosinesimil`
+|`MAX_INNER_PRODUCT`| `MAXIMUM_INNER_PRODUCT`| `max_inner_product`   | currently *not supported* by OpenSearch and will result in an exception.
 |===============
 
 [[mapping-directfieldmapping-beamWidth]] `beamWidth`::

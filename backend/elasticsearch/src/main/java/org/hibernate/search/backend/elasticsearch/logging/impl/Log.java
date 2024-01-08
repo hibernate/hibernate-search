@@ -23,6 +23,7 @@ import org.hibernate.search.backend.elasticsearch.util.spi.URLEncodedString;
 import org.hibernate.search.engine.backend.scope.spi.IndexScopeBuilder;
 import org.hibernate.search.engine.backend.types.Highlightable;
 import org.hibernate.search.engine.backend.types.TermVector;
+import org.hibernate.search.engine.backend.types.VectorSimilarity;
 import org.hibernate.search.engine.logging.spi.AggregationKeyFormatter;
 import org.hibernate.search.engine.search.aggregation.AggregationKey;
 import org.hibernate.search.engine.search.aggregation.SearchAggregation;
@@ -888,4 +889,9 @@ public interface Log extends BasicLogger {
 			value = "An OpenSearch distribution does not allow specifying the `required minimum similarity` option. "
 					+ "This option is only applicable to an Elastic distribution of an Elasticsearch backend.")
 	SearchException knnRequiredMinimumSimilarityUnsupportedOption();
+
+	@Message(id = ID_OFFSET + 188,
+			value = "The OpenSearch distribution does not allow using %1$s as a space type for a Lucene engine."
+					+ " Try using a different similarity type and refer to the OpenSearch documentation for more details.")
+	SearchException vectorSimilarityNotSupportedByOpenSearchBackend(VectorSimilarity vectorSimilarity);
 }
