@@ -146,10 +146,12 @@ abstract class AbstractLuceneVectorFieldTypeOptionsStep<S extends AbstractLucene
 			case DEFAULT:
 			case L2:
 				return VectorSimilarityFunction.EUCLIDEAN;
-			case INNER_PRODUCT:
+			case DOT_PRODUCT:
 				return VectorSimilarityFunction.DOT_PRODUCT;
 			case COSINE:
 				return VectorSimilarityFunction.COSINE;
+			case MAX_INNER_PRODUCT:
+				return VectorSimilarityFunction.MAXIMUM_INNER_PRODUCT;
 			default:
 				throw new AssertionFailure( "Unexpected value for Similarity: " + vectorSimilarity );
 		}

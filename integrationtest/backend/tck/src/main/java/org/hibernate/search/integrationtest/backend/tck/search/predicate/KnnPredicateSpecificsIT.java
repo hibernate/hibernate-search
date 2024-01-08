@@ -15,8 +15,10 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
@@ -37,6 +39,7 @@ import org.hibernate.search.engine.search.query.SearchQuery;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.FieldTypeDescriptor;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.VectorFieldTypeDescriptor;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.SimpleFieldModelsByType;
+import org.hibernate.search.integrationtest.backend.tck.testsupport.util.TckBackendFeatures;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.TckConfiguration;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.extension.SearchSetupHelper;
 import org.hibernate.search.util.common.SearchException;
@@ -78,51 +81,64 @@ class KnnPredicateSpecificsIT {
 						SearchScopeConfigured.indexDifferentMaxConnection,
 						SearchScopeConfigured.indexDifferentSimilarity,
 						VectorSimilarityConfigured.indexDefault,
-						VectorSimilarityConfigured.indexL2,
-						VectorSimilarityConfigured.indexInnerProduct,
-						VectorSimilarityConfigured.indexCosine,
 						ExampleKnnSearchConfigured.index,
-						ExampleKnnSearchConfigured.indexNested
+						ExampleKnnSearchConfigured.indexNested,
+						WrongVectorConfigured.index
 				) );
+		if ( TckConfiguration.get().getBackendFeatures().supportsSimilarity( VectorSimilarity.L2 ) ) {
+			indexes.add( VectorSimilarityConfigured.indexL2 );
+		}
+		if ( TckConfiguration.get().getBackendFeatures().supportsSimilarity( VectorSimilarity.MAX_INNER_PRODUCT ) ) {
+			indexes.add( VectorSimilarityConfigured.indexMaxInnerProduct );
+		}
+		if ( TckConfiguration.get().getBackendFeatures().supportsSimilarity( VectorSimilarity.DOT_PRODUCT ) ) {
+			indexes.add( VectorSimilarityConfigured.indexDotProduct );
+		}
+		if ( TckConfiguration.get().getBackendFeatures().supportsSimilarity( VectorSimilarity.COSINE ) ) {
+			indexes.add( VectorSimilarityConfigured.indexCosine );
+		}
 
 		setupHelper.start().withIndexes( indexes ).setup();
 
+		List<BulkIndexer> bulkIndexers = new ArrayList<>();
+
 		final BulkIndexer scopeIndexer = SearchScopeConfigured.index.bulkIndexer();
 		SearchScopeConfigured.dataSets.forEach( d -> d.contribute( SearchScopeConfigured.index, scopeIndexer ) );
+		bulkIndexers.add( scopeIndexer );
 		final BulkIndexer scopeDifferentDimensionIndexer = SearchScopeConfigured.indexDifferentDimension.bulkIndexer();
 		SearchScopeConfigured.dataSetsDimension
 				.forEach( d -> d.contribute( SearchScopeConfigured.indexDifferentDimension, scopeDifferentDimensionIndexer ) );
+		bulkIndexers.add( scopeDifferentDimensionIndexer );
 		final BulkIndexer scopeDifferentBeamWidthIndexer = SearchScopeConfigured.indexDifferentBeamWidth.bulkIndexer();
 		SearchScopeConfigured.dataSets
 				.forEach( d -> d.contribute( SearchScopeConfigured.indexDifferentBeamWidth, scopeDifferentBeamWidthIndexer ) );
+		bulkIndexers.add( scopeDifferentBeamWidthIndexer );
 		final BulkIndexer scopeDifferentMaxConnectionIndexer = SearchScopeConfigured.indexDifferentMaxConnection.bulkIndexer();
 		SearchScopeConfigured.dataSets
 				.forEach( d -> d.contribute( SearchScopeConfigured.indexDifferentMaxConnection,
 						scopeDifferentMaxConnectionIndexer ) );
+		bulkIndexers.add( scopeDifferentMaxConnectionIndexer );
 		final BulkIndexer scopeDifferentSimilarityIndexer = SearchScopeConfigured.indexDifferentSimilarity.bulkIndexer();
 		SearchScopeConfigured.dataSets
 				.forEach(
 						d -> d.contribute( SearchScopeConfigured.indexDifferentSimilarity, scopeDifferentSimilarityIndexer ) );
-		final BulkIndexer similarityIndexer = VectorSimilarityConfigured.indexDefault.bulkIndexer();
-		VectorSimilarityConfigured.dataSets
-				.forEach( d -> d.contribute( VectorSimilarityConfigured.indexDefault, similarityIndexer ) );
-		final BulkIndexer similarityL2Indexer = VectorSimilarityConfigured.indexL2.bulkIndexer();
-		VectorSimilarityConfigured.dataSets
-				.forEach( d -> d.contribute( VectorSimilarityConfigured.indexL2, similarityL2Indexer ) );
-		final BulkIndexer similarityInnerProductIndexer = VectorSimilarityConfigured.indexInnerProduct.bulkIndexer();
-		VectorSimilarityConfigured.dataSets
-				.forEach( d -> d.contribute( VectorSimilarityConfigured.indexInnerProduct, similarityInnerProductIndexer ) );
-		final BulkIndexer similarityCosineIndexer = VectorSimilarityConfigured.indexCosine.bulkIndexer();
-		VectorSimilarityConfigured.dataSets
-				.forEach( d -> d.contribute( VectorSimilarityConfigured.indexCosine, similarityCosineIndexer ) );
+		bulkIndexers.add( scopeDifferentSimilarityIndexer );
+
+		for ( SimpleMappedIndex<VectorSimilarityConfigured.IndexBinding> index : VectorSimilarityConfigured.supportedIndexes ) {
+			final BulkIndexer similarityIndexer = index.bulkIndexer();
+			VectorSimilarityConfigured.dataSets
+					.forEach( d -> d.contribute( index, similarityIndexer ) );
+			bulkIndexers.add( similarityIndexer );
+		}
 
 		BulkIndexer exampleKnnSearchIndexer = ExampleKnnSearchConfigured.index.bulkIndexer();
 		ExampleKnnSearchConfigured.dataset.accept( exampleKnnSearchIndexer );
+		bulkIndexers.add( exampleKnnSearchIndexer );
 
 		BulkIndexer exampleKnnSearchNestedIndexer = ExampleKnnSearchConfigured.indexNested.bulkIndexer();
 		ExampleKnnSearchConfigured.datasetNested.accept( exampleKnnSearchNestedIndexer );
+		bulkIndexers.add( exampleKnnSearchNestedIndexer );
 
-		List<BulkIndexer> bulkIndexers = new ArrayList<>();
 		for ( SimpleMappedIndex<
 				SimilarityFilterKnnSearchConfigured.IndexBinding> index : SimilarityFilterKnnSearchConfigured.indexes
 						.values() ) {
@@ -135,13 +151,10 @@ class KnnPredicateSpecificsIT {
 		bulkIndexers.add( scopeDifferentBeamWidthIndexer );
 		bulkIndexers.add( scopeDifferentMaxConnectionIndexer );
 		bulkIndexers.add( scopeDifferentSimilarityIndexer );
-		bulkIndexers.add( similarityIndexer );
-		bulkIndexers.add( similarityL2Indexer );
-		bulkIndexers.add( similarityInnerProductIndexer );
-		bulkIndexers.add( similarityCosineIndexer );
 		bulkIndexers.add( exampleKnnSearchIndexer );
 		bulkIndexers.add( exampleKnnSearchNestedIndexer );
-		scopeIndexer.join( bulkIndexers.toArray( BulkIndexer[]::new ) );
+
+		scopeIndexer.join( bulkIndexers.stream().toArray( BulkIndexer[]::new ) );
 	}
 
 	@Nested
@@ -435,23 +448,46 @@ class KnnPredicateSpecificsIT {
 		private static final SimpleMappedIndex<IndexBinding> indexL2 =
 				SimpleMappedIndex.of( root -> new IndexBinding( root, supportedFieldTypes, VectorSimilarity.L2 ) )
 						.name( "similarityL2" );
-		private static final SimpleMappedIndex<IndexBinding> indexInnerProduct =
-				SimpleMappedIndex.of( root -> new IndexBinding( root, supportedFieldTypes, VectorSimilarity.INNER_PRODUCT ) )
+		private static final SimpleMappedIndex<IndexBinding> indexDotProduct =
+				SimpleMappedIndex.of( root -> new IndexBinding( root, supportedFieldTypes, VectorSimilarity.DOT_PRODUCT ) )
 						.name( "similarityInnerProduct" );
 		private static final SimpleMappedIndex<IndexBinding> indexCosine =
 				SimpleMappedIndex.of( root -> new IndexBinding( root, supportedFieldTypes, VectorSimilarity.COSINE ) )
 						.name( "similarityCosine" );
+		private static final SimpleMappedIndex<IndexBinding> indexMaxInnerProduct =
+				SimpleMappedIndex
+						.of( root -> new IndexBinding( root, supportedFieldTypes, VectorSimilarity.MAX_INNER_PRODUCT ) )
+						.name( "similarityMaxInnerProduct" );
+
+		private static final Set<SimpleMappedIndex<IndexBinding>> supportedIndexes;
 
 		private static final List<DataSet<?>> dataSets = new ArrayList<>();
 		private static final List<Arguments> parameters = new ArrayList<>();
 		static {
+			Set<SimpleMappedIndex<IndexBinding>> set = new HashSet<>();
+			TckBackendFeatures backendFeatures = TckConfiguration.get().getBackendFeatures();
 			for ( VectorFieldTypeDescriptor<?> fieldType : supportedFieldTypes ) {
 				parameters.add( Arguments.of( fieldType, indexDefault ) );
-				parameters.add( Arguments.of( fieldType, indexL2 ) );
-				parameters.add( Arguments.of( fieldType, indexInnerProduct ) );
-				parameters.add( Arguments.of( fieldType, indexCosine ) );
+				set.add( indexDefault );
+				if ( backendFeatures.supportsSimilarity( VectorSimilarity.L2 ) ) {
+					parameters.add( Arguments.of( fieldType, indexL2 ) );
+					set.add( indexL2 );
+				}
+				if ( backendFeatures.supportsSimilarity( VectorSimilarity.DOT_PRODUCT ) ) {
+					parameters.add( Arguments.of( fieldType, indexDotProduct ) );
+					set.add( indexDotProduct );
+				}
+				if ( backendFeatures.supportsSimilarity( VectorSimilarity.COSINE ) ) {
+					parameters.add( Arguments.of( fieldType, indexCosine ) );
+					set.add( indexCosine );
+				}
+				if ( backendFeatures.supportsSimilarity( VectorSimilarity.MAX_INNER_PRODUCT ) ) {
+					parameters.add( Arguments.of( fieldType, indexMaxInnerProduct ) );
+					set.add( indexMaxInnerProduct );
+				}
 				dataSets.add( new DataSet<>( fieldType ) );
 			}
+			supportedIndexes = Collections.unmodifiableSet( set );
 		}
 
 		public static List<? extends Arguments> params() {
@@ -842,8 +878,10 @@ class KnnPredicateSpecificsIT {
 				if ( VectorSimilarity.DEFAULT.equals( similarity ) ) {
 					continue;
 				}
-				map.put( similarity, SimpleMappedIndex.of( r -> new IndexBinding( r, similarity ) )
-						.name( "similarityFilterKnnSearch" + similarity.name() ) );
+				if ( TckConfiguration.get().getBackendFeatures().supportsSimilarity( similarity ) ) {
+					map.put( similarity, SimpleMappedIndex.of( r -> new IndexBinding( r, similarity ) )
+							.name( "similarityFilterKnnSearch" + similarity.name() ) );
+				}
 			}
 
 			indexes = Collections.unmodifiableMap( map );
@@ -977,9 +1015,18 @@ class KnnPredicateSpecificsIT {
 			args.add( Arguments.of( index, 0.9996214f, 0.9998106f, 2 ) );
 			args.add( Arguments.of( index, 0.960889f, 0.9804447f, 8 ) );
 
-			index = indexes.get( VectorSimilarity.INNER_PRODUCT );
+			index = indexes.get( VectorSimilarity.DOT_PRODUCT );
 
-			// INNER_PRODUCT scores for vector [5f, 4f]
+			// DOT_PRODUCT scores for vector [5f, 4f]
+			// [0.9998933, 0.9998107, 0.99975604, 0.99883986, 0.9939221, 0.9913382, 0.9827673, 0.9804447, 0.9775728, 0.9687126]
+			// score is ( 1.0f + d ) / 2.0f and we are passing d here: d = 2s-1
+			args.add( Arguments.of( index, 0.99767972f, 0.99883985f, 4 ) );
+			args.add( Arguments.of( index, 0.99951208f, 0.99975603f, 3 ) );
+			args.add( Arguments.of( index, 0.9608894f, 0.9804446f, 8 ) );
+
+			index = indexes.get( VectorSimilarity.MAX_INNER_PRODUCT );
+
+			// MAX_INNER_PRODUCT scores for vector [5f, 4f]
 			// [0.9998933, 0.9998107, 0.99975604, 0.99883986, 0.9939221, 0.9913382, 0.9827673, 0.9804447, 0.9775728, 0.9687126]
 			// score is ( 1.0f + d ) / 2.0f and we are passing d here: d = 2s-1
 			args.add( Arguments.of( index, 0.99767972f, 0.99883985f, 4 ) );
@@ -1028,9 +1075,18 @@ class KnnPredicateSpecificsIT {
 			args.add( Arguments.of( index, 0.9996214f, 99.98106f, 2 ) );
 			args.add( Arguments.of( index, 0.960889f, 98.04447f, 8 ) );
 
-			index = indexes.get( VectorSimilarity.INNER_PRODUCT );
+			index = indexes.get( VectorSimilarity.DOT_PRODUCT );
 
-			// INNER_PRODUCT scores for vector [5f, 4f]
+			// DOT_PRODUCT scores for vector [5f, 4f]
+			// [0.9998933, 0.9998107, 0.99975604, 0.99883986, 0.9939221, 0.9913382, 0.9827673, 0.9804447, 0.9775728, 0.9687126]
+			// score is ( 1.0f + d ) / 2.0f and we are passing d here: d = 2s-1
+			args.add( Arguments.of( index, 0.99767972f, 99.883985f, 4 ) );
+			args.add( Arguments.of( index, 0.99951208f, 99.975603f, 3 ) );
+			args.add( Arguments.of( index, 0.9608894f, 98.04446f, 8 ) );
+
+			index = indexes.get( VectorSimilarity.MAX_INNER_PRODUCT );
+
+			// MAX_INNER_PRODUCT scores for vector [5f, 4f]
 			// [0.9998933, 0.9998107, 0.99975604, 0.99883986, 0.9939221, 0.9913382, 0.9827673, 0.9804447, 0.9775728, 0.9687126]
 			// score is ( 1.0f + d ) / 2.0f and we are passing d here: d = 2s-1
 			args.add( Arguments.of( index, 0.99767972f, 99.883985f, 4 ) );
@@ -1077,13 +1133,22 @@ class KnnPredicateSpecificsIT {
 			args.add( Arguments.of( index, 0.99951208f, 0.99975604f, 2 ) );
 			args.add( Arguments.of( index, 0.96827734f, 0.98413867f, 8 ) );
 
-			index = indexes.get( VectorSimilarity.INNER_PRODUCT );
+			index = indexes.get( VectorSimilarity.DOT_PRODUCT );
 
-			// INNER_PRODUCT scores for vector [5f, 4f]
+			// DOT_PRODUCT scores for vector [5f, 4f]
 			// [0.5010834, 0.5006714, 0.50064087, 0.5006256, 0.5005646, 0.5005493, 0.5004883, 0.500473, 0.5004425, 0.5003967]
 			// score is 0.5f + d / (float) ( 2 * ( 1 << 15 ) ) and we are passing d here: d = (s - 0.5) * 65536.0
 			args.add( Arguments.of( index, 40.9993216f, 0.5006256f, 4 ) );
 			args.add( Arguments.of( index, 42.00005632f, 0.50064087f, 3 ) );
+			args.add( Arguments.of( index, 30.998528f, 0.500473f, 8 ) );
+
+			index = indexes.get( VectorSimilarity.MAX_INNER_PRODUCT );
+
+			// MAX_INNER_PRODUCT scores for vector [5f, 4f]
+			// [0.5010834, 0.5006714, 0.50064087, 0.5006256, 0.5005646, 0.5005493, 0.5004883, 0.500473, 0.5004425, 0.5003967]
+			// score is 0.5f + d / (float) ( 2 * ( 1 << 15 ) ) and we are passing d here: d = (s - 0.5) * 65536.0
+			args.add( Arguments.of( index, 40.9993216f, 0.5006256f, 4 ) );
+			args.add( Arguments.of( index, 42.00005632f, 0.50064087f, 2 ) );
 			args.add( Arguments.of( index, 30.998528f, 0.500473f, 8 ) );
 
 			return args;

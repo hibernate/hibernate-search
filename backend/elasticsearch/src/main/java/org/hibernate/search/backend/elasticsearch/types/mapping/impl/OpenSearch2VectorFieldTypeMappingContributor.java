@@ -6,6 +6,9 @@
  */
 package org.hibernate.search.backend.elasticsearch.types.mapping.impl;
 
+import java.lang.invoke.MethodHandles;
+
+import org.hibernate.search.backend.elasticsearch.logging.impl.Log;
 import org.hibernate.search.backend.elasticsearch.lowlevel.index.mapping.impl.DataTypes;
 import org.hibernate.search.backend.elasticsearch.lowlevel.index.mapping.impl.OpenSearchVectorTypeMethod;
 import org.hibernate.search.backend.elasticsearch.lowlevel.index.mapping.impl.PropertyMapping;
@@ -14,8 +17,11 @@ import org.hibernate.search.backend.elasticsearch.types.impl.ElasticsearchIndexV
 import org.hibernate.search.engine.backend.types.VectorSimilarity;
 import org.hibernate.search.engine.search.predicate.spi.PredicateTypeKeys;
 import org.hibernate.search.util.common.AssertionFailure;
+import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
 public class OpenSearch2VectorFieldTypeMappingContributor implements ElasticsearchVectorFieldTypeMappingContributor {
+
+	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	private static final String BYTE_TYPE = "BYTE";
 
@@ -64,12 +70,12 @@ public class OpenSearch2VectorFieldTypeMappingContributor implements Elasticsear
 				return null;
 			case L2:
 				return "l2";
-			case INNER_PRODUCT:
-				// TODO: figure out what's actually supported: innerproduct/l1/linf all throw exceptions ...
-				//   see HSEARCH-5038
-				return "l2";
 			case COSINE:
 				return "cosinesimil";
+			case DOT_PRODUCT:
+			case MAX_INNER_PRODUCT:
+				throw log.vectorSimilarityNotSupportedByOpenSearchBackend( vectorSimilarity );
+
 			default:
 				throw new AssertionFailure( "Unexpected value for Similarity: " + vectorSimilarity );
 		}

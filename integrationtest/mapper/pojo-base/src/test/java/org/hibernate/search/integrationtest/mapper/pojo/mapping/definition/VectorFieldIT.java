@@ -187,7 +187,7 @@ class VectorFieldIT {
 			float[] vectorSimilarityL2;
 			@VectorField(dimension = 4, vectorSimilarity = VectorSimilarity.COSINE)
 			float[] vectorSimilarityCosine;
-			@VectorField(dimension = 4, vectorSimilarity = VectorSimilarity.INNER_PRODUCT)
+			@VectorField(dimension = 4, vectorSimilarity = VectorSimilarity.DOT_PRODUCT)
 			float[] vectorSimilarityInnerProduct;
 			@VectorField(dimension = 4, vectorSimilarity = VectorSimilarity.DEFAULT)
 			float[] vectorSimilarityDefault;
@@ -200,7 +200,7 @@ class VectorFieldIT {
 				.field( "vectorSimilarityCosine", float[].class,
 						f -> f.dimension( 4 ).vectorSimilarity( VectorSimilarity.COSINE ) )
 				.field( "vectorSimilarityInnerProduct", float[].class,
-						f -> f.dimension( 4 ).vectorSimilarity( VectorSimilarity.INNER_PRODUCT ) )
+						f -> f.dimension( 4 ).vectorSimilarity( VectorSimilarity.DOT_PRODUCT ) )
 				.field( "vectorSimilarityDefault", float[].class, f -> f.dimension( 4 ) )
 				.field( "implicit", float[].class, f -> f.dimension( 4 ) )
 		);
