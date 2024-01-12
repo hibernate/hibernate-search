@@ -7,14 +7,13 @@
 package org.hibernate.search.backend.elasticsearch.types.mapping.impl;
 
 import org.hibernate.search.backend.elasticsearch.lowlevel.index.mapping.impl.DataTypes;
+import org.hibernate.search.backend.elasticsearch.lowlevel.index.mapping.impl.ElasticsearchDenseVectorIndexOptions;
 import org.hibernate.search.backend.elasticsearch.lowlevel.index.mapping.impl.PropertyMapping;
 import org.hibernate.search.backend.elasticsearch.search.predicate.impl.ElasticsearchKnnPredicate;
 import org.hibernate.search.backend.elasticsearch.types.impl.ElasticsearchIndexValueFieldType;
 import org.hibernate.search.engine.backend.types.VectorSimilarity;
 import org.hibernate.search.engine.search.predicate.spi.PredicateTypeKeys;
 import org.hibernate.search.util.common.AssertionFailure;
-
-import com.google.gson.JsonObject;
 
 public class Elasticsearch8VectorFieldTypeMappingContributor implements ElasticsearchVectorFieldTypeMappingContributor {
 	@Override
@@ -27,13 +26,13 @@ public class Elasticsearch8VectorFieldTypeMappingContributor implements Elastics
 			mapping.setSimilarity( resolvedVectorSimilarity );
 		}
 		if ( context.maxConnections() != null || context.beamWidth() != null ) {
-			JsonObject indexOptions = new JsonObject();
-			indexOptions.addProperty( "type", "hnsw" );
+			ElasticsearchDenseVectorIndexOptions indexOptions = new ElasticsearchDenseVectorIndexOptions();
+			indexOptions.setType( "hnsw" );
 			if ( context.maxConnections() != null ) {
-				indexOptions.addProperty( "m", context.maxConnections() );
+				indexOptions.setM( context.maxConnections() );
 			}
 			if ( context.beamWidth() != null ) {
-				indexOptions.addProperty( "ef_construction", context.beamWidth() );
+				indexOptions.setEfConstruction( context.beamWidth() );
 			}
 			mapping.setIndexOptions( indexOptions );
 		}

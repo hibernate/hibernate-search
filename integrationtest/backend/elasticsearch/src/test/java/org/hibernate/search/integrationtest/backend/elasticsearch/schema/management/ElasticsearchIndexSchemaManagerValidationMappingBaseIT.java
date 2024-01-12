@@ -17,6 +17,7 @@ import java.util.Optional;
 import java.util.OptionalInt;
 import java.util.stream.Collectors;
 
+import org.hibernate.search.backend.elasticsearch.ElasticsearchDistributionName;
 import org.hibernate.search.backend.elasticsearch.ElasticsearchExtension;
 import org.hibernate.search.backend.elasticsearch.analysis.ElasticsearchAnalysisConfigurationContext;
 import org.hibernate.search.backend.elasticsearch.analysis.ElasticsearchAnalysisConfigurer;
@@ -27,6 +28,7 @@ import org.hibernate.search.integrationtest.backend.tck.testsupport.util.TckConf
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.extension.SearchSetupHelper;
 import org.hibernate.search.util.common.SearchException;
 import org.hibernate.search.util.common.impl.Futures;
+import org.hibernate.search.util.impl.integrationtest.backend.elasticsearch.dialect.ElasticsearchTestDialect;
 import org.hibernate.search.util.impl.integrationtest.backend.elasticsearch.extension.TestElasticsearchClient;
 import org.hibernate.search.util.impl.integrationtest.common.reporting.FailureReportChecker;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappedIndex;
@@ -545,16 +547,30 @@ class ElasticsearchIndexSchemaManagerValidationMappingBaseIT {
 				)
 		);
 
-		setupAndValidateExpectingFailure( index,
-				hasValidationFailureReport()
-						.indexFieldContext( "vectorB" )
-						.mappingAttributeContext( elasticSearchClient.getDialect().vectorFieldNames().get( "similarity" ) )
-						.failure( "Invalid value. Expected '" + cosine + "', actual is '" + l2 + "'" )
-						.indexFieldContext( "vectorF" )
-						.mappingAttributeContext( elasticSearchClient.getDialect().vectorFieldNames().get( "similarity" ) )
-						.failure( "Invalid value. Expected '" + cosine + "', actual is '" + l2 + "'" ),
-				operation
-		);
+		FailureReportChecker reportChecker;
+
+		if ( ElasticsearchDistributionName.ELASTIC.equals( ElasticsearchTestDialect.getActualVersion().distribution() ) ) {
+			reportChecker = hasValidationFailureReport()
+					.indexFieldContext( "vectorB" )
+					.mappingAttributeContext( "similarity" )
+					.failure( "Invalid value. Expected '" + cosine + "', actual is '" + l2 + "'" )
+					.indexFieldContext( "vectorF" )
+					.mappingAttributeContext( "similarity" )
+					.failure( "Invalid value. Expected '" + cosine + "', actual is '" + l2 + "'" );
+		}
+		else {
+			reportChecker = hasValidationFailureReport()
+					.indexFieldContext( "vectorB" )
+					.mappingAttributeContext( "method" )
+					.mappingAttributeContext( "space_type" )
+					.failure( "Invalid value. Expected '" + cosine + "', actual is '" + l2 + "'" )
+					.indexFieldContext( "vectorF" )
+					.mappingAttributeContext( "method" )
+					.mappingAttributeContext( "space_type" )
+					.failure( "Invalid value. Expected '" + cosine + "', actual is '" + l2 + "'" );
+		}
+
+		setupAndValidateExpectingFailure( index, reportChecker, operation );
 	}
 
 	@ParameterizedTest(name = "With operation {0}")
@@ -582,21 +598,48 @@ class ElasticsearchIndexSchemaManagerValidationMappingBaseIT {
 												Optional.empty() )
 				)
 		);
+		FailureReportChecker reportChecker;
 
-		setupAndValidateExpectingFailure( index,
-				hasValidationFailureReport()
-						.indexFieldContext( "vectorB" )
-						.mappingAttributeContext( elasticSearchClient.getDialect().vectorFieldNames().get( "m" ) )
-						.failure( "Invalid value. Expected '20', actual is '30'" )
-						.mappingAttributeContext( elasticSearchClient.getDialect().vectorFieldNames().get( "ef_construction" ) )
-						.failure( "Invalid value. Expected '2', actual is '3" )
-						.indexFieldContext( "vectorF" )
-						.mappingAttributeContext( elasticSearchClient.getDialect().vectorFieldNames().get( "m" ) )
-						.failure( "Invalid value. Expected '50', actual is '60'" )
-						.mappingAttributeContext( elasticSearchClient.getDialect().vectorFieldNames().get( "ef_construction" ) )
-						.failure( "Invalid value. Expected '5', actual is '6'" ),
-				operation
-		);
+		if ( ElasticsearchDistributionName.ELASTIC.equals( ElasticsearchTestDialect.getActualVersion().distribution() ) ) {
+			FailureReportChecker indexOptionsB = hasValidationFailureReport()
+					.indexFieldContext( "vectorB" )
+					.mappingAttributeContext( "index_options" );
+			indexOptionsB.mappingAttributeContext( "m" )
+					.failure( "Invalid value. Expected '20', actual is '30'" );
+			indexOptionsB.mappingAttributeContext( "ef_construction" )
+					.failure( "Invalid value. Expected '2', actual is '3" );
+
+			FailureReportChecker indexOptionsF = indexOptionsB.indexFieldContext( "vectorF" )
+					.mappingAttributeContext( "index_options" );
+			indexOptionsF.mappingAttributeContext( "m" )
+					.failure( "Invalid value. Expected '50', actual is '60'" );
+			indexOptionsF.mappingAttributeContext( "ef_construction" )
+					.failure( "Invalid value. Expected '5', actual is '6'" );
+
+			reportChecker = indexOptionsF;
+		}
+		else {
+			FailureReportChecker indexOptionsB = hasValidationFailureReport()
+					.indexFieldContext( "vectorB" )
+					.mappingAttributeContext( "method" )
+					.mappingAttributeContext( "parameters" );
+			indexOptionsB.mappingAttributeContext( "m" )
+					.failure( "Invalid value. Expected '20', actual is '30'" );
+			indexOptionsB.mappingAttributeContext( "ef_construction" )
+					.failure( "Invalid value. Expected '2', actual is '3" );
+
+			FailureReportChecker indexOptionsF = indexOptionsB.indexFieldContext( "vectorF" )
+					.mappingAttributeContext( "method" )
+					.mappingAttributeContext( "parameters" );
+			indexOptionsF.mappingAttributeContext( "m" )
+					.failure( "Invalid value. Expected '50', actual is '60'" );
+			indexOptionsF.mappingAttributeContext( "ef_construction" )
+					.failure( "Invalid value. Expected '5', actual is '6'" );
+
+			reportChecker = indexOptionsF;
+		}
+
+		setupAndValidateExpectingFailure( index, reportChecker, operation );
 	}
 
 	private void setupAndValidateExpectingFailure(StubMappedIndex index, FailureReportChecker failureReportChecker,

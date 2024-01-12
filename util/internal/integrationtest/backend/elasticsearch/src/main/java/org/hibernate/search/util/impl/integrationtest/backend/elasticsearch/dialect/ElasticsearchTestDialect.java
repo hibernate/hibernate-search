@@ -120,17 +120,11 @@ public class ElasticsearchTestDialect {
 			case ELASTIC:
 				map.put( "dimension", "dims" );
 				map.put( "element_type", "element_type" );
-				map.put( "similarity", "similarity" );
-				map.put( "m", "index_options.m" );
-				map.put( "ef_construction", "index_options.ef_construction" );
 				break;
 			case OPENSEARCH:
 			case AMAZON_OPENSEARCH_SERVERLESS:
 				map.put( "dimension", "dimension" );
 				map.put( "element_type", "data_type" );
-				map.put( "similarity", "method.space_type" );
-				map.put( "m", "method.parameters.m" );
-				map.put( "ef_construction", "method.parameters.ef_construction" );
 				break;
 			default:
 				throw new IllegalStateException( "Unknown distribution" );

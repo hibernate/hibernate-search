@@ -80,6 +80,9 @@ class GsonClassesTest {
 			for ( ClassInfo implementor : backendElasticsearchIndex.getAllKnownSubclasses( gsonContract ) ) {
 				classes.add( implementor.name() );
 			}
+			for ( ClassInfo implementor : backendElasticsearchIndex.getAllKnownImplementors( gsonContract ) ) {
+				classes.add( implementor.name() );
+			}
 		}
 
 		Set<String> classesAndSubclasses = JandexTestUtils.toStrings(

@@ -27,9 +27,9 @@ public class PropertyMappingJsonAdapterFactory extends AbstractTypeMappingJsonAd
 		builder.add( "elementType", String.class );
 		builder.add( "dims", Integer.class );
 		builder.add( "similarity", String.class );
-		builder.add( "indexOptions", JsonElement.class );
+		builder.add( "indexOptions", ElasticsearchDenseVectorIndexOptions.class );
 		builder.add( "dimension", Integer.class );
-		builder.add( "method", JsonElement.class );
+		builder.add( "method", OpenSearchVectorTypeMethod.class );
 		builder.add( "dataType", String.class );
 	}
 }

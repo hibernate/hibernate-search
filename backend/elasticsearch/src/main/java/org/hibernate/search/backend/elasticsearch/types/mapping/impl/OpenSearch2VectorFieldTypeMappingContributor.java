@@ -7,14 +7,13 @@
 package org.hibernate.search.backend.elasticsearch.types.mapping.impl;
 
 import org.hibernate.search.backend.elasticsearch.lowlevel.index.mapping.impl.DataTypes;
+import org.hibernate.search.backend.elasticsearch.lowlevel.index.mapping.impl.OpenSearchVectorTypeMethod;
 import org.hibernate.search.backend.elasticsearch.lowlevel.index.mapping.impl.PropertyMapping;
 import org.hibernate.search.backend.elasticsearch.search.predicate.impl.ElasticsearchKnnPredicate;
 import org.hibernate.search.backend.elasticsearch.types.impl.ElasticsearchIndexValueFieldType;
 import org.hibernate.search.engine.backend.types.VectorSimilarity;
 import org.hibernate.search.engine.search.predicate.spi.PredicateTypeKeys;
 import org.hibernate.search.util.common.AssertionFailure;
-
-import com.google.gson.JsonObject;
 
 public class OpenSearch2VectorFieldTypeMappingContributor implements ElasticsearchVectorFieldTypeMappingContributor {
 
@@ -33,21 +32,21 @@ public class OpenSearch2VectorFieldTypeMappingContributor implements Elasticsear
 		String resolvedVectorSimilarity = resolveDefault( context.vectorSimilarity() );
 
 		// we want to always set Lucene as an engine:
-		JsonObject method = new JsonObject();
-		method.addProperty( "name", "hnsw" );
-		method.addProperty( "engine", "lucene" );
+		OpenSearchVectorTypeMethod method = new OpenSearchVectorTypeMethod();
+		method.setName( "hnsw" );
+		method.setEngine( "lucene" );
 		if ( resolvedVectorSimilarity != null ) {
-			method.addProperty( "space_type", resolvedVectorSimilarity );
+			method.setSpaceType( resolvedVectorSimilarity );
 		}
 		if ( context.maxConnections() != null || context.beamWidth() != null ) {
-			JsonObject parameters = new JsonObject();
+			OpenSearchVectorTypeMethod.Parameters parameters = new OpenSearchVectorTypeMethod.Parameters();
 			if ( context.maxConnections() != null ) {
-				parameters.addProperty( "m", context.maxConnections() );
+				parameters.setM( context.maxConnections() );
 			}
 			if ( context.beamWidth() != null ) {
-				parameters.addProperty( "ef_construction", context.beamWidth() );
+				parameters.setEfConstruction( context.beamWidth() );
 			}
-			method.add( "parameters", parameters );
+			method.setParameters( parameters );
 		}
 
 		mapping.setMethod( method );
