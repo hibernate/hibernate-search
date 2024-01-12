@@ -37,7 +37,7 @@ public abstract class AbstractElasticsearchPredicate extends ElasticsearchSearch
 	}
 
 	@Override
-	public JsonObject buildJsonQuery(PredicateRequestContext context) {
+	public JsonObject toJsonQuery(PredicateRequestContext context) {
 		JsonObject outerObject = new JsonObject();
 		JsonObject innerObject = new JsonObject();
 

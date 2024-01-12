@@ -119,7 +119,9 @@ public abstract class ElasticsearchKnnPredicate extends AbstractElasticsearchSin
 
 		@Override
 		public void filter(SearchPredicate filter) {
-			this.filter = ElasticsearchSearchPredicate.from( scope, filter );
+			ElasticsearchSearchPredicate elasticsearchFilter = ElasticsearchSearchPredicate.from( scope, filter );
+			elasticsearchFilter.checkNestableWithin( PredicateNestingContext.doesNotAcceptKnn() );
+			this.filter = elasticsearchFilter;
 		}
 
 	}
@@ -157,9 +159,9 @@ public abstract class ElasticsearchKnnPredicate extends AbstractElasticsearchSin
 		}
 
 		@Override
-		public JsonObject buildJsonQuery(PredicateRequestContext context) {
+		public JsonObject toJsonQuery(PredicateRequestContext context) {
 			// we want the query to get created and passed to the request context
-			context.contributeKnnClause( ( super.buildJsonQuery( context ) ) );
+			context.contributeKnnClause( ( super.toJsonQuery( context ) ) );
 			// but we don't want it to be an actual query so we return `null`:
 			return null;
 		}
@@ -181,8 +183,8 @@ public abstract class ElasticsearchKnnPredicate extends AbstractElasticsearchSin
 		}
 
 		@Override
-		public void checkNestableWithin(String expectedParentNestedPath) {
-			if ( expectedParentNestedPath != null ) {
+		public void doCheckNestableWithin(PredicateNestingContext context) {
+			if ( context.getNestedPath() != null || !context.acceptsKnnClause() ) {
 				throw log.cannotAddKnnClauseAtThisStep();
 			}
 		}

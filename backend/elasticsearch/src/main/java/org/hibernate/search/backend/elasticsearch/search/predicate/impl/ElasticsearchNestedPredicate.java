@@ -77,7 +77,7 @@ public class ElasticsearchNestedPredicate extends AbstractElasticsearchSingleFie
 		public void nested(SearchPredicate nestedPredicate) {
 			ElasticsearchSearchPredicate elasticsearchPredicate = ElasticsearchSearchPredicate.from(
 					scope, nestedPredicate );
-			elasticsearchPredicate.checkNestableWithin( absoluteFieldPath );
+			elasticsearchPredicate.checkNestableWithin( PredicateNestingContext.nested( absoluteFieldPath ) );
 			this.nestedPredicate = elasticsearchPredicate;
 		}
 

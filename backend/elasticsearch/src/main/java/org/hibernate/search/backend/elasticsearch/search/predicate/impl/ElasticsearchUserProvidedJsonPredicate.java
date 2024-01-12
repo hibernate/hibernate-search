@@ -29,12 +29,12 @@ class ElasticsearchUserProvidedJsonPredicate extends ElasticsearchSearchPredicat
 	}
 
 	@Override
-	public void checkNestableWithin(String expectedParentNestedPath) {
+	public void doCheckNestableWithin(PredicateNestingContext context) {
 		// Nothing to do: we'll assume the user knows what they are doing.
 	}
 
 	@Override
-	public JsonObject buildJsonQuery(PredicateRequestContext context) {
+	public JsonObject toJsonQuery(PredicateRequestContext context) {
 		return json;
 	}
 }

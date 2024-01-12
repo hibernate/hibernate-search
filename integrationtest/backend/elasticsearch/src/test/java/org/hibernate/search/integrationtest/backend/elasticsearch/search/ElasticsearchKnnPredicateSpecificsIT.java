@@ -26,6 +26,7 @@ import org.hibernate.search.engine.backend.types.Projectable;
 import org.hibernate.search.engine.backend.types.Sortable;
 import org.hibernate.search.engine.backend.types.VectorSimilarity;
 import org.hibernate.search.engine.search.aggregation.AggregationKey;
+import org.hibernate.search.engine.search.predicate.SearchPredicate;
 import org.hibernate.search.engine.search.projection.dsl.SearchProjectionFactory;
 import org.hibernate.search.engine.search.query.SearchQuery;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.TckConfiguration;
@@ -33,8 +34,10 @@ import org.hibernate.search.integrationtest.backend.tck.testsupport.util.extensi
 import org.hibernate.search.util.common.SearchException;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.BulkIndexer;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.SimpleMappedIndex;
+import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappingScope;
 
 import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
 
@@ -103,6 +106,7 @@ class ElasticsearchKnnPredicateSpecificsIT {
 	}
 
 	@Test
+	@Disabled("NOTE: this will now fail since it was based on the optimization that must clause will be dropped.")
 	void knnPredicateInWrongPlace_boolMustIsNotWrong() {
 		// Since we are doing optimizations, and also because we are adding only a single knn must, it is actually ok to do so:
 		assertThat(
@@ -172,6 +176,36 @@ class ElasticsearchKnnPredicateSpecificsIT {
 						f -> f.nested( "object" )
 								.add( f.bool().must( f.knn( 15 ).field( "location" ).matching( 50.0f, 50.0f ) ) )
 				).toQuery() );
+	}
+
+	@Test
+	void knnPredicateInWrongPlace_addingPrebuiltKnn() {
+		StubMappingScope scope = index.createScope();
+
+		// all good:
+		SearchPredicate knn = scope.predicate().knn( 15 ).field( "location" ).matching( 50.0f, 50.0f ).toPredicate();
+		// we add multiple clauses to prevent "optimizations" leading to bool predicate being replaced by a simple knn predicate
+		SearchPredicate boolKnnInShould = scope.predicate().bool().should( knn )
+				.should( scope.predicate().match().field( "parking" ).matching( Boolean.TRUE ) ).toPredicate();
+
+		// adding knn to non-should bool clauses is not ok,
+		//  we only allow knn as a should clause!
+		knnPredicateInWrongPlace( () -> scope.predicate().bool().must( knn ) );
+		knnPredicateInWrongPlace( () -> scope.predicate().bool().mustNot( knn ) );
+		knnPredicateInWrongPlace( () -> scope.predicate().bool().filter( knn ) );
+
+		// adding boolean predicate with a should knn clause as any boolean clause (nesting a correct bool into another one)
+		//  is not ok !
+		knnPredicateInWrongPlace( () -> scope.predicate().bool().should( boolKnnInShould ) );
+		knnPredicateInWrongPlace( () -> scope.predicate().bool().must( boolKnnInShould ) );
+		knnPredicateInWrongPlace( () -> scope.predicate().bool().mustNot( boolKnnInShould ) );
+		knnPredicateInWrongPlace( () -> scope.predicate().bool().filter( boolKnnInShould ) );
+
+		// adding as a knn filter:
+		knnPredicateInWrongPlace(
+				() -> scope.predicate().knn( 10 ).field( "location" ).matching( 50.0f, 50.0f ).filter( knn ) );
+		knnPredicateInWrongPlace(
+				() -> scope.predicate().knn( 10 ).field( "location" ).matching( 50.0f, 50.0f ).filter( boolKnnInShould ) );
 	}
 
 	@Test

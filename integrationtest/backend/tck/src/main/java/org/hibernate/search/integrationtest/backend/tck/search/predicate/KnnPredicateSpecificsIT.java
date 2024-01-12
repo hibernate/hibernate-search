@@ -739,6 +739,25 @@ class KnnPredicateSpecificsIT {
 					);
 		}
 
+		@Test
+		void multipleKnn_shouldClauses() {
+			SearchQuery<Object> query = index.createScope().query()
+					.select(
+							SearchProjectionFactory::id
+					)
+					.where( f -> f.bool()
+							.should( f.knn( 3 ).field( "location" ).matching( 5f, 4f ) )
+							.should( f.knn( 3 ).field( "location" ).matching( 6f, 3f ) )
+							// so that we can get to a step where we add another knn clause to already an array of knn clauses:
+							.should( f.knn( 3 ).field( "location" ).matching( 7f, 4f ) )
+					).toQuery();
+
+			List<Object> result = query.fetchAll().hits();
+
+			assertThat( result ).hasSize( 4 )
+					.containsOnly( "ID:1", "ID:2", "ID:3", "ID:6" );
+		}
+
 		private static class PredicateIndexBinding {
 			final IndexFieldReference<Boolean> parking;
 			final IndexFieldReference<Integer> rating;

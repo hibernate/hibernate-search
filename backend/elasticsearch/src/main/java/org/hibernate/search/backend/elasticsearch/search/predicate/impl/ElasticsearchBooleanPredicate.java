@@ -64,11 +64,11 @@ class ElasticsearchBooleanPredicate extends AbstractElasticsearchPredicate {
 	}
 
 	@Override
-	public void checkNestableWithin(String expectedParentNestedPath) {
-		checkNestableWithin( expectedParentNestedPath, mustClauses );
-		checkNestableWithin( expectedParentNestedPath, shouldClauses );
-		checkNestableWithin( expectedParentNestedPath, filterClauses );
-		checkNestableWithin( expectedParentNestedPath, mustNotClauses );
+	public void doCheckNestableWithin(PredicateNestingContext context) {
+		checkAcceptableWithin( context, mustClauses );
+		checkAcceptableWithin( context, shouldClauses );
+		checkAcceptableWithin( context, filterClauses );
+		checkAcceptableWithin( context, mustNotClauses );
 	}
 
 	@Override
@@ -111,27 +111,23 @@ class ElasticsearchBooleanPredicate extends AbstractElasticsearchPredicate {
 
 		for ( ElasticsearchSearchPredicate clause : clauses ) {
 			JsonObject jsonQuery = clause.toJsonQuery( context );
-			if ( jsonQuery == null ) {
-				if ( !SHOULD_PROPERTY_NAME.equals( occurProperty ) ) {
-					throw log.cannotAddKnnClauseAtThisStep();
-				}
+			if ( jsonQuery != null ) {
 				// This is an exceptional case for a KNN search on Elasticsearch distribution.
-				// A Knn predicate would contribute to a knn clause inside the request context itself
-				// and we do not want to add this json as a clause to the bool predicate.
-				// So the predicate returns null as JSON query and we ignore it.
-			}
-			else {
+				//  A Knn predicate would contribute to a knn clause inside the request context itself,
+				//  and we do not want to add this json as a clause to the bool predicate.
+				//  Hence, when the predicate returns null as JSON query and we ignore it.
+
 				GsonUtils.setOrAppendToArray( innerObject, occurProperty, jsonQuery );
 			}
 		}
 	}
 
-	private void checkNestableWithin(String expectedParentNestedPath, List<ElasticsearchSearchPredicate> clauses) {
+	private void checkAcceptableWithin(PredicateNestingContext context, List<ElasticsearchSearchPredicate> clauses) {
 		if ( clauses == null ) {
 			return;
 		}
 		for ( ElasticsearchSearchPredicate clause : clauses ) {
-			clause.checkNestableWithin( expectedParentNestedPath );
+			clause.checkNestableWithin( context );
 		}
 	}
 
@@ -218,7 +214,9 @@ class ElasticsearchBooleanPredicate extends AbstractElasticsearchPredicate {
 			if ( mustClauses == null ) {
 				mustClauses = new ArrayList<>();
 			}
-			mustClauses.add( ElasticsearchSearchPredicate.from( scope, clause ) );
+			ElasticsearchSearchPredicate elasticsearchClause = ElasticsearchSearchPredicate.from( scope, clause );
+			elasticsearchClause.checkNestableWithin( PredicateNestingContext.doesNotAcceptKnn() );
+			mustClauses.add( elasticsearchClause );
 		}
 
 		@Override
@@ -226,7 +224,9 @@ class ElasticsearchBooleanPredicate extends AbstractElasticsearchPredicate {
 			if ( mustNotClauses == null ) {
 				mustNotClauses = new ArrayList<>();
 			}
-			mustNotClauses.add( ElasticsearchSearchPredicate.from( scope, clause ) );
+			ElasticsearchSearchPredicate elasticsearchClause = ElasticsearchSearchPredicate.from( scope, clause );
+			elasticsearchClause.checkNestableWithin( PredicateNestingContext.doesNotAcceptKnn() );
+			mustNotClauses.add( elasticsearchClause );
 		}
 
 		@Override
@@ -234,7 +234,9 @@ class ElasticsearchBooleanPredicate extends AbstractElasticsearchPredicate {
 			if ( shouldClauses == null ) {
 				shouldClauses = new ArrayList<>();
 			}
-			shouldClauses.add( ElasticsearchSearchPredicate.from( scope, clause ) );
+			ElasticsearchSearchPredicate elasticsearchClause = ElasticsearchSearchPredicate.from( scope, clause );
+			elasticsearchClause.checkNestableWithin( PredicateNestingContext.acceptsKnn() );
+			shouldClauses.add( elasticsearchClause );
 		}
 
 		@Override
@@ -242,7 +244,9 @@ class ElasticsearchBooleanPredicate extends AbstractElasticsearchPredicate {
 			if ( filterClauses == null ) {
 				filterClauses = new ArrayList<>();
 			}
-			filterClauses.add( ElasticsearchSearchPredicate.from( scope, clause ) );
+			ElasticsearchSearchPredicate elasticsearchClause = ElasticsearchSearchPredicate.from( scope, clause );
+			elasticsearchClause.checkNestableWithin( PredicateNestingContext.doesNotAcceptKnn() );
+			filterClauses.add( elasticsearchClause );
 		}
 
 		@Override
