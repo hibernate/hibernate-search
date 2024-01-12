@@ -59,7 +59,7 @@ public class ElasticsearchMatchIdPredicate extends AbstractElasticsearchPredicat
 	}
 
 	@Override
-	public void checkNestableWithin(String expectedParentNestedPath) {
+	public void doCheckNestableWithin(PredicateNestingContext context) {
 		// Nothing to do
 	}
 

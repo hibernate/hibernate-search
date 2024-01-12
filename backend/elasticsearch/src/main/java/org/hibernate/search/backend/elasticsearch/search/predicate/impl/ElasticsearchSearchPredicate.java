@@ -22,13 +22,13 @@ public abstract class ElasticsearchSearchPredicate implements SearchPredicate {
 
 	public abstract Set<String> indexNames();
 
-	public abstract void checkNestableWithin(String expectedParentNestedPath);
-
-	public final JsonObject toJsonQuery(PredicateRequestContext context) {
-		return buildJsonQuery( context.predicateContext( this ) );
+	public final void checkNestableWithin(PredicateNestingContext context) {
+		doCheckNestableWithin( context.wrap( this ) );
 	}
 
-	public abstract JsonObject buildJsonQuery(PredicateRequestContext context);
+	protected abstract void doCheckNestableWithin(PredicateNestingContext context);
+
+	public abstract JsonObject toJsonQuery(PredicateRequestContext context);
 
 	public static ElasticsearchSearchPredicate from(ElasticsearchSearchIndexScope<?> scope, SearchPredicate predicate) {
 		if ( !( predicate instanceof ElasticsearchSearchPredicate ) ) {

@@ -23,9 +23,11 @@ public abstract class AbstractElasticsearchNestablePredicate extends AbstractEla
 		super( builder );
 	}
 
+
 	@Override
-	public void checkNestableWithin(String expectedParentNestedPath) {
+	public void doCheckNestableWithin(PredicateNestingContext context) {
 		List<String> nestedPathHierarchy = getNestedPathHierarchy();
+		String expectedParentNestedPath = context.getNestedPath();
 
 		if ( expectedParentNestedPath != null && !nestedPathHierarchy.contains( expectedParentNestedPath ) ) {
 			throw log.invalidNestedObjectPathForPredicate( this, expectedParentNestedPath,
@@ -34,7 +36,7 @@ public abstract class AbstractElasticsearchNestablePredicate extends AbstractEla
 	}
 
 	@Override
-	public JsonObject buildJsonQuery(PredicateRequestContext context) {
+	public JsonObject toJsonQuery(PredicateRequestContext context) {
 		List<String> nestedPathHierarchy = getNestedPathHierarchy();
 		String expectedNestedPath = nestedPathHierarchy.isEmpty()
 				? null
@@ -42,8 +44,7 @@ public abstract class AbstractElasticsearchNestablePredicate extends AbstractEla
 
 		if ( Objects.equals( context.getNestedPath(), expectedNestedPath ) ) {
 			// Implicit nesting is not necessary
-			checkNestableWithin( context.getNestedPath() );
-			return super.buildJsonQuery( context );
+			return super.toJsonQuery( context );
 		}
 
 		// The context we expect this predicate to be built in.
@@ -51,9 +52,8 @@ public abstract class AbstractElasticsearchNestablePredicate extends AbstractEla
 		// so that the predicate is actually executed in this context.
 		PredicateRequestContext contextAfterImplicitNesting =
 				context.withNestedPath( expectedNestedPath );
-		checkNestableWithin( expectedNestedPath );
 
-		JsonObject result = super.buildJsonQuery( contextAfterImplicitNesting );
+		JsonObject result = super.toJsonQuery( contextAfterImplicitNesting );
 
 		// traversing the nestedPathHierarchy in the inverted order
 		int hierarchyLastIndex = nestedPathHierarchy.size() - 1;
