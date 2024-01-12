@@ -240,7 +240,7 @@ stage('Configure') {
 					new LocalElasticsearchBuildEnvironment(version: '8.8.2', condition: TestCondition.ON_DEMAND),
 					new LocalElasticsearchBuildEnvironment(version: '8.9.2', condition: TestCondition.ON_DEMAND),
 					new LocalElasticsearchBuildEnvironment(version: '8.10.4', condition: TestCondition.ON_DEMAND),
-					new LocalElasticsearchBuildEnvironment(version: '8.11.3', condition: TestCondition.BEFORE_MERGE, isDefault: true),
+					new LocalElasticsearchBuildEnvironment(version: '8.11.4', condition: TestCondition.BEFORE_MERGE, isDefault: true),
 
 					// --------------------------------------------
 					// OpenSearch
