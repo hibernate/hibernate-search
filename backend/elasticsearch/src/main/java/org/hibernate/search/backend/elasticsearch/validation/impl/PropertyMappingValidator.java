@@ -9,14 +9,17 @@ package org.hibernate.search.backend.elasticsearch.validation.impl;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 
 import org.hibernate.search.backend.elasticsearch.lowlevel.index.mapping.impl.DataTypes;
+import org.hibernate.search.backend.elasticsearch.lowlevel.index.mapping.impl.ElasticsearchDenseVectorIndexOptions;
+import org.hibernate.search.backend.elasticsearch.lowlevel.index.mapping.impl.OpenSearchVectorTypeMethod;
 import org.hibernate.search.backend.elasticsearch.lowlevel.index.mapping.impl.PropertyMapping;
+import org.hibernate.search.backend.elasticsearch.reporting.impl.ElasticsearchValidationMessages;
 import org.hibernate.search.engine.backend.analysis.AnalyzerNames;
 import org.hibernate.search.util.common.impl.CollectionHelper;
 
 import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
 
 abstract class PropertyMappingValidator extends AbstractTypeMappingValidator<PropertyMapping> {
 
@@ -135,6 +138,9 @@ abstract class PropertyMappingValidator extends AbstractTypeMappingValidator<Pro
 
 	static class Elasticsearch8PropertyMappingValidator extends PropertyMappingValidator {
 
+		private final ElasticsearchDenseVectorIndexOptionsValidator indexOptionsValidator =
+				new ElasticsearchDenseVectorIndexOptionsValidator();
+
 		@Override
 		protected void validateVectorMapping(ValidationErrorCollector errorCollector, PropertyMapping expectedMapping,
 				PropertyMapping actualMapping) {
@@ -153,22 +159,9 @@ abstract class PropertyMappingValidator extends AbstractTypeMappingValidator<Pro
 					expectedMapping.getSimilarity(), actualMapping.getSimilarity(), "cosine"
 			);
 
-			JsonElement expectedIndexOptionsElement = expectedMapping.getIndexOptions();
-			if ( expectedIndexOptionsElement != null && expectedIndexOptionsElement.isJsonObject() ) {
-				JsonObject expectedIndexOptions = expectedIndexOptionsElement.getAsJsonObject();
-				JsonObject actualIndexOptions = actualMapping.getIndexOptions().getAsJsonObject();
-				LeafValidators.EQUAL.validate(
-						errorCollector, ValidationContextType.MAPPING_ATTRIBUTE, "index_options.type",
-						expectedIndexOptions.get( "type" ), actualIndexOptions.get( "type" )
-				);
-				LeafValidators.EQUAL.validateWithDefault(
-						errorCollector, ValidationContextType.MAPPING_ATTRIBUTE, "index_options.m",
-						expectedIndexOptions.get( "m" ), actualIndexOptions.get( "m" ), 16
-				);
-				LeafValidators.EQUAL.validateWithDefault(
-						errorCollector, ValidationContextType.MAPPING_ATTRIBUTE, "index_options.ef_construction",
-						expectedIndexOptions.get( "ef_construction" ), actualIndexOptions.get( "ef_construction" ), 100
-				);
+			ElasticsearchDenseVectorIndexOptions indexOptions = expectedMapping.getIndexOptions();
+			if ( indexOptions != null ) {
+				indexOptionsValidator.validate( errorCollector, indexOptions, actualMapping.getIndexOptions() );
 			}
 		}
 	}
@@ -184,6 +177,8 @@ abstract class PropertyMappingValidator extends AbstractTypeMappingValidator<Pro
 
 	static class OpenSearch2PropertyMappingValidator extends PropertyMappingValidator {
 
+		private final OpenSearchVectorTypeMethodValidator methodValidator = new OpenSearchVectorTypeMethodValidator();
+
 		@Override
 		protected void validateVectorMapping(ValidationErrorCollector errorCollector, PropertyMapping expectedMapping,
 				PropertyMapping actualMapping) {
@@ -197,54 +192,155 @@ abstract class PropertyMappingValidator extends AbstractTypeMappingValidator<Pro
 					expectedMapping.getDataType(), actualMapping.getDataType()
 			);
 
-			JsonElement methodElement = expectedMapping.getMethod();
-			if ( methodElement != null && methodElement.isJsonObject() ) {
-				JsonObject expectedMethod = methodElement.getAsJsonObject();
-				JsonObject actualMethod = actualMapping.getMethod().getAsJsonObject();
+			OpenSearchVectorTypeMethod expectedMethod = expectedMapping.getMethod();
+			if ( expectedMethod != null ) {
+				methodValidator.validate( errorCollector, expectedMethod, actualMapping.getMethod() );
+			}
+		}
+	}
 
-				LeafValidators.EQUAL.validate(
-						errorCollector, ValidationContextType.MAPPING_ATTRIBUTE, "method.name",
-						getAsString( expectedMethod, "name" ), getAsString( actualMethod, "name" )
-				);
+	private static class ElasticsearchDenseVectorIndexOptionsValidator
+			extends AbstractVectorAttributesValidator<ElasticsearchDenseVectorIndexOptions> {
 
-				LeafValidators.EQUAL.validateWithDefault(
-						errorCollector, ValidationContextType.MAPPING_ATTRIBUTE, "method.space_type",
-						getAsString( expectedMethod, "space_type" ), getAsString( actualMethod, "space_type" ),
-						"l2"
-				);
+		@Override
+		protected String propertyName() {
+			return "index_options";
+		}
 
-				LeafValidators.EQUAL.validate(
-						errorCollector, ValidationContextType.MAPPING_ATTRIBUTE, "method.engine",
-						getAsString( expectedMethod, "engine" ), getAsString( actualMethod, "engine" )
-				);
+		@Override
+		public void doValidate(ValidationErrorCollector errorCollector, ElasticsearchDenseVectorIndexOptions expected,
+				ElasticsearchDenseVectorIndexOptions actual) {
+			LeafValidators.EQUAL.validate(
+					errorCollector, ValidationContextType.MAPPING_ATTRIBUTE, "type",
+					expected.getType(), actual.getType()
+			);
+			LeafValidators.EQUAL.validateWithDefault(
+					errorCollector, ValidationContextType.MAPPING_ATTRIBUTE, "m",
+					expected.getM(), actual.getM(), 16
+			);
+			LeafValidators.EQUAL.validateWithDefault(
+					errorCollector, ValidationContextType.MAPPING_ATTRIBUTE, "ef_construction",
+					expected.getEfConstruction(), actual.getEfConstruction(), 100
+			);
+		}
 
-				JsonElement parametersElement = expectedMethod.get( "parameters" );
-				if ( parametersElement != null && parametersElement.isJsonObject() ) {
-					JsonObject expectedParameters = parametersElement.getAsJsonObject();
-					JsonObject actualParameters = actualMethod.get( "parameters" ).getAsJsonObject();
+		@Override
+		protected Map<String, JsonElement> expectedMappingExtraAttributes(ElasticsearchDenseVectorIndexOptions expected) {
+			return expected.getExtraAttributes();
+		}
 
-					LeafValidators.EQUAL.validate(
-							errorCollector, ValidationContextType.MAPPING_ATTRIBUTE, "method.parameters.m",
-							getAsInteger( expectedParameters, "m" ), getAsInteger( actualParameters, "m" )
-					);
+		@Override
+		protected Map<String, JsonElement> actualMappingExtraAttributes(ElasticsearchDenseVectorIndexOptions actual) {
+			return actual.getExtraAttributes();
+		}
+	}
 
-					LeafValidators.EQUAL.validate(
-							errorCollector, ValidationContextType.MAPPING_ATTRIBUTE, "method.parameters.ef_construction",
-							getAsInteger( expectedParameters, "ef_construction" ),
-							getAsInteger( actualParameters, "ef_construction" )
-					);
-				}
+	private static class OpenSearchVectorTypeMethodValidator
+			extends AbstractVectorAttributesValidator<OpenSearchVectorTypeMethod> {
+
+		private final OpenSearchVectorTypeMethodParametersValidator parametersValidator =
+				new OpenSearchVectorTypeMethodParametersValidator();
+
+		@Override
+		protected String propertyName() {
+			return "method";
+		}
+
+		@Override
+		public void doValidate(ValidationErrorCollector errorCollector, OpenSearchVectorTypeMethod expected,
+				OpenSearchVectorTypeMethod actual) {
+			LeafValidators.EQUAL.validate(
+					errorCollector, ValidationContextType.MAPPING_ATTRIBUTE, "name",
+					expected.getName(), actual.getName()
+			);
+
+			LeafValidators.EQUAL.validateWithDefault(
+					errorCollector, ValidationContextType.MAPPING_ATTRIBUTE, "space_type",
+					expected.getSpaceType(), actual.getSpaceType(),
+					"l2"
+			);
+
+			LeafValidators.EQUAL.validate(
+					errorCollector, ValidationContextType.MAPPING_ATTRIBUTE, "engine",
+					expected.getEngine(), actual.getEngine()
+			);
+
+			OpenSearchVectorTypeMethod.Parameters expectedParameters = expected.getParameters();
+			if ( expectedParameters != null ) {
+				parametersValidator.validate( errorCollector, expectedParameters, actual.getParameters() );
 			}
 		}
 
-		private static String getAsString(JsonObject object, String property) {
-			JsonElement element = object.get( property );
-			return element == null || element.isJsonNull() ? null : element.getAsString();
+		@Override
+		protected Map<String, JsonElement> expectedMappingExtraAttributes(OpenSearchVectorTypeMethod expected) {
+			return expected.getExtraAttributes();
 		}
 
-		private static Integer getAsInteger(JsonObject object, String property) {
-			JsonElement element = object.get( property );
-			return element == null || element.isJsonNull() ? null : element.getAsInt();
+		@Override
+		protected Map<String, JsonElement> actualMappingExtraAttributes(OpenSearchVectorTypeMethod actual) {
+			return actual.getExtraAttributes();
 		}
+	}
+
+	private static class OpenSearchVectorTypeMethodParametersValidator
+			extends AbstractVectorAttributesValidator<OpenSearchVectorTypeMethod.Parameters> {
+		@Override
+		protected String propertyName() {
+			return "parameters";
+		}
+
+		@Override
+		public void doValidate(ValidationErrorCollector errorCollector, OpenSearchVectorTypeMethod.Parameters expected,
+				OpenSearchVectorTypeMethod.Parameters actual) {
+			LeafValidators.EQUAL.validate(
+					errorCollector, ValidationContextType.MAPPING_ATTRIBUTE, "m",
+					expected.getM(), actual.getM()
+			);
+
+			LeafValidators.EQUAL.validate(
+					errorCollector, ValidationContextType.MAPPING_ATTRIBUTE, "ef_construction",
+					expected.getEfConstruction(),
+					actual.getEfConstruction()
+			);
+		}
+
+		@Override
+		protected Map<String, JsonElement> expectedMappingExtraAttributes(OpenSearchVectorTypeMethod.Parameters expected) {
+			return expected.getExtraAttributes();
+		}
+
+		@Override
+		protected Map<String, JsonElement> actualMappingExtraAttributes(OpenSearchVectorTypeMethod.Parameters actual) {
+			return actual.getExtraAttributes();
+		}
+	}
+
+	abstract static class AbstractVectorAttributesValidator<T> implements Validator<T> {
+		private final Validator<JsonElement> extraAttributeValidator = new JsonElementValidator( new JsonElementEquivalence() );
+
+		@Override
+		public final void validate(ValidationErrorCollector errorCollector, T expected, T actual) {
+			errorCollector.push( ValidationContextType.MAPPING_ATTRIBUTE, propertyName() );
+			try {
+				doValidate( errorCollector, expected, actual );
+
+				extraAttributeValidator.validateAllIgnoreUnexpected(
+						errorCollector, ValidationContextType.CUSTOM_INDEX_MAPPING_ATTRIBUTE,
+						ElasticsearchValidationMessages.INSTANCE.customIndexMappingAttributeMissing(),
+						expectedMappingExtraAttributes( expected ), actualMappingExtraAttributes( actual )
+				);
+			}
+			finally {
+				errorCollector.pop();
+			}
+		}
+
+		protected abstract String propertyName();
+
+		protected abstract void doValidate(ValidationErrorCollector errorCollector, T expected, T actual);
+
+		protected abstract Map<String, JsonElement> expectedMappingExtraAttributes(T expected);
+
+		protected abstract Map<String, JsonElement> actualMappingExtraAttributes(T actual);
 	}
 }

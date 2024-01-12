@@ -113,7 +113,7 @@ public class PropertyMapping extends AbstractTypeMapping {
 	 * https://www.elastic.co/guide/en/elasticsearch/reference/current/dense-vector.html
 	 */
 	@SerializedName("index_options")
-	private JsonElement indexOptions;
+	private ElasticsearchDenseVectorIndexOptions indexOptions;
 
 	/*
 	 * k-NN vector datatype
@@ -125,7 +125,7 @@ public class PropertyMapping extends AbstractTypeMapping {
 	 * k-NN vector datatype
 	 * https://opensearch.org/docs/latest/field-types/supported-field-types/knn-vector/
 	 */
-	private JsonElement method;
+	private OpenSearchVectorTypeMethod method;
 
 	/*
 	 * k-NN vector datatype
@@ -247,11 +247,11 @@ public class PropertyMapping extends AbstractTypeMapping {
 		this.similarity = similarity;
 	}
 
-	public JsonElement getIndexOptions() {
+	public ElasticsearchDenseVectorIndexOptions getIndexOptions() {
 		return indexOptions;
 	}
 
-	public void setIndexOptions(JsonElement indexOptions) {
+	public void setIndexOptions(ElasticsearchDenseVectorIndexOptions indexOptions) {
 		this.indexOptions = indexOptions;
 	}
 
@@ -263,11 +263,11 @@ public class PropertyMapping extends AbstractTypeMapping {
 		this.dimension = dimension;
 	}
 
-	public JsonElement getMethod() {
+	public OpenSearchVectorTypeMethod getMethod() {
 		return method;
 	}
 
-	public void setMethod(JsonElement method) {
+	public void setMethod(OpenSearchVectorTypeMethod method) {
 		this.method = method;
 	}
 
