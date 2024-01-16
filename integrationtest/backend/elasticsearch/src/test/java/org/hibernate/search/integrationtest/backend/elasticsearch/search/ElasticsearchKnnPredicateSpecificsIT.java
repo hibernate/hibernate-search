@@ -11,6 +11,7 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.jupiter.api.Assumptions.assumeFalse;
 import static org.junit.jupiter.api.Assumptions.assumeTrue;
 
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Consumer;
@@ -183,29 +184,68 @@ class ElasticsearchKnnPredicateSpecificsIT {
 		StubMappingScope scope = index.createScope();
 
 		// all good:
-		SearchPredicate knn = scope.predicate().knn( 15 ).field( "location" ).matching( 50.0f, 50.0f ).toPredicate();
-		// we add multiple clauses to prevent "optimizations" leading to bool predicate being replaced by a simple knn predicate
-		SearchPredicate boolKnnInShould = scope.predicate().bool().should( knn )
-				.should( scope.predicate().match().field( "parking" ).matching( Boolean.TRUE ) ).toPredicate();
+		SearchPredicate inlineKnn = scope.predicate().knn( 15 ).field( "location" ).matching( 50.0f, 50.0f ).toPredicate();
+		SearchPredicate namedKnn = scope.predicate().named( "knn-named" )
+				.param( "k", 25 )
+				.param( "vector", new float[] { 50.0f, 50.0f } ).toPredicate();
 
-		// adding knn to non-should bool clauses is not ok,
-		//  we only allow knn as a should clause!
-		knnPredicateInWrongPlace( () -> scope.predicate().bool().must( knn ) );
-		knnPredicateInWrongPlace( () -> scope.predicate().bool().mustNot( knn ) );
-		knnPredicateInWrongPlace( () -> scope.predicate().bool().filter( knn ) );
+		for ( SearchPredicate knn : Arrays.asList( inlineKnn, namedKnn ) ) {
+			// adding knn to non-should bool clauses is not ok,
+			//  we only allow knn as a should clause!
+			knnPredicateInWrongPlace( () -> scope.predicate().bool().must( knn ) );
+			knnPredicateInWrongPlace( () -> scope.predicate().bool().mustNot( knn ) );
+			knnPredicateInWrongPlace( () -> scope.predicate().bool().filter( knn ) );
 
-		// adding boolean predicate with a should knn clause as any boolean clause (nesting a correct bool into another one)
-		//  is not ok !
-		knnPredicateInWrongPlace( () -> scope.predicate().bool().should( boolKnnInShould ) );
-		knnPredicateInWrongPlace( () -> scope.predicate().bool().must( boolKnnInShould ) );
-		knnPredicateInWrongPlace( () -> scope.predicate().bool().mustNot( boolKnnInShould ) );
-		knnPredicateInWrongPlace( () -> scope.predicate().bool().filter( boolKnnInShould ) );
+			knnPredicateInWrongPlace( () -> scope.predicate().bool()
+					// should is ok
+					.should( knn )
+					// not ok since we already have a knn in should we can only add more should clauses
+					.must( scope.predicate().match().field( "parking" ).matching( Boolean.TRUE ) ) );
+			knnPredicateInWrongPlace( () -> scope.predicate().bool()
+					// so far so good:
+					.must( scope.predicate().match().field( "parking" ).matching( Boolean.TRUE ) )
+					// cannot add a knn through should as we already have a non-should clause
+					.should( knn ) );
+			knnPredicateInWrongPlace( () -> scope.predicate().bool()
+					// so far so good:
+					.mustNot( scope.predicate().match().field( "parking" ).matching( Boolean.TRUE ) )
+					// cannot add a knn through should as we already have a non-should clause
+					.should( knn ) );
+			knnPredicateInWrongPlace( () -> scope.predicate().bool()
+					// so far so good:
+					.filter( scope.predicate().match().field( "parking" ).matching( Boolean.TRUE ) )
+					// cannot add a knn through should as we already have a non-should clause
+					.should( knn ) );
 
-		// adding as a knn filter:
-		knnPredicateInWrongPlace(
-				() -> scope.predicate().knn( 10 ).field( "location" ).matching( 50.0f, 50.0f ).filter( knn ) );
-		knnPredicateInWrongPlace(
-				() -> scope.predicate().knn( 10 ).field( "location" ).matching( 50.0f, 50.0f ).filter( boolKnnInShould ) );
+			// nested knn predicates are not allowed
+			knnPredicateInWrongPlace( () -> scope.predicate().nested( "object" ).add( knn ) );
+
+			// we add multiple clauses to prevent "optimizations" leading to bool predicate being replaced by a simple knn predicate
+			SearchPredicate inlineBoolKnnInShould = scope.predicate().bool().should( knn )
+					.should( scope.predicate().match().field( "parking" ).matching( Boolean.TRUE ) ).toPredicate();
+			SearchPredicate namedBoolKnnInShould = scope.predicate().named( "bool-knn-in-should-named" )
+					.param( "knn", knn )
+					.toPredicate();
+
+			for ( SearchPredicate boolKnnInShould : Arrays.asList( inlineBoolKnnInShould, namedBoolKnnInShould ) ) {
+				// adding boolean predicate with a should knn clause as any boolean clause (nesting a correct bool into another one)
+				//  is not ok !
+				knnPredicateInWrongPlace( () -> scope.predicate().bool().should( boolKnnInShould ) );
+				knnPredicateInWrongPlace( () -> scope.predicate().bool().must( boolKnnInShould ) );
+				knnPredicateInWrongPlace( () -> scope.predicate().bool().mustNot( boolKnnInShould ) );
+				knnPredicateInWrongPlace( () -> scope.predicate().bool().filter( boolKnnInShould ) );
+
+				// adding as a knn filter:
+				knnPredicateInWrongPlace(
+						() -> scope.predicate().knn( 10 ).field( "location" ).matching( 50.0f, 50.0f ).filter( knn ) );
+				knnPredicateInWrongPlace(
+						() -> scope.predicate().knn( 10 ).field( "location" ).matching( 50.0f, 50.0f )
+								.filter( boolKnnInShould ) );
+
+				// nested knn predicates are not allowed
+				knnPredicateInWrongPlace( () -> scope.predicate().nested( "object" ).add( boolKnnInShould ) );
+			}
+		}
 	}
 
 	@Test
@@ -267,6 +307,22 @@ class ElasticsearchKnnPredicateSpecificsIT {
 			nestedRating =
 					nested.field( "nestedRating", f -> f.asInteger().projectable( Projectable.YES ).sortable( Sortable.YES ) )
 							.toReference();
+
+			root.namedPredicate( "knn-named", context -> {
+				int k = context.param( "k", Integer.class );
+				float[] vector = context.param( "vector", float[].class );
+
+				return context.predicate().knn( k ).field( "location" )
+						.matching( vector )
+						.toPredicate();
+			} );
+
+			root.namedPredicate( "bool-knn-in-should-named", context -> {
+				SearchPredicate knn = context.param( "knn", SearchPredicate.class );
+
+				return context.predicate().bool().should( knn )
+						.should( context.predicate().match().field( "parking" ).matching( Boolean.TRUE ) ).toPredicate();
+			} );
 		}
 
 	}

@@ -38,7 +38,7 @@ public class ElasticsearchNamedPredicate extends AbstractElasticsearchSingleFiel
 	}
 
 	@Override
-	public void doCheckNestableWithin(PredicateNestingContext context) {
+	public void checkNestableWithin(PredicateNestingContext context) {
 		providedPredicate.checkNestableWithin( context );
 		super.checkNestableWithin( context );
 	}

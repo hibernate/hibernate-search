@@ -183,7 +183,7 @@ public abstract class ElasticsearchKnnPredicate extends AbstractElasticsearchSin
 		}
 
 		@Override
-		public void doCheckNestableWithin(PredicateNestingContext context) {
+		public void checkNestableWithin(PredicateNestingContext context) {
 			if ( context.getNestedPath() != null || !context.acceptsKnnClause() ) {
 				throw log.cannotAddKnnClauseAtThisStep();
 			}

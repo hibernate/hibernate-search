@@ -12,7 +12,7 @@ import org.hibernate.search.backend.elasticsearch.search.common.impl.Elasticsear
 
 import com.google.gson.JsonObject;
 
-class ElasticsearchUserProvidedJsonPredicate extends ElasticsearchSearchPredicate {
+class ElasticsearchUserProvidedJsonPredicate implements ElasticsearchSearchPredicate {
 
 	private final Set<String> indexNames;
 	private final JsonObject json;
@@ -29,7 +29,7 @@ class ElasticsearchUserProvidedJsonPredicate extends ElasticsearchSearchPredicat
 	}
 
 	@Override
-	public void doCheckNestableWithin(PredicateNestingContext context) {
+	public void checkNestableWithin(PredicateNestingContext context) {
 		// Nothing to do: we'll assume the user knows what they are doing.
 	}
 

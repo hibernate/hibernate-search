@@ -64,11 +64,17 @@ class ElasticsearchBooleanPredicate extends AbstractElasticsearchPredicate {
 	}
 
 	@Override
-	public void doCheckNestableWithin(PredicateNestingContext context) {
-		checkAcceptableWithin( context, mustClauses );
-		checkAcceptableWithin( context, shouldClauses );
-		checkAcceptableWithin( context, filterClauses );
-		checkAcceptableWithin( context, mustNotClauses );
+	public void checkNestableWithin(PredicateNestingContext context) {
+		// For Elasticsearch backend only:
+		// If this method is called that means we are trying to pass a bool predicate as a clause/filter/etc to some other predicate
+		//  and that would mean that if our current bool predicate has a knn should clause -- it is not ok to continue,
+		//  since it will place a knn clause deeper than a should clause of a top level bool predicate, which is not acceptable.
+		//  Because of that we are making sure that the context we pass in to check the clauses is updated:
+		PredicateNestingContext updatedContext = context.rejectKnn();
+		checkAcceptableWithin( updatedContext, mustClauses );
+		checkAcceptableWithin( updatedContext, shouldClauses );
+		checkAcceptableWithin( updatedContext, filterClauses );
+		checkAcceptableWithin( updatedContext, mustNotClauses );
 	}
 
 	@Override
@@ -217,6 +223,8 @@ class ElasticsearchBooleanPredicate extends AbstractElasticsearchPredicate {
 			ElasticsearchSearchPredicate elasticsearchClause = ElasticsearchSearchPredicate.from( scope, clause );
 			elasticsearchClause.checkNestableWithin( PredicateNestingContext.doesNotAcceptKnn() );
 			mustClauses.add( elasticsearchClause );
+
+			checkShouldClausesForKnnAcceptability();
 		}
 
 		@Override
@@ -227,6 +235,8 @@ class ElasticsearchBooleanPredicate extends AbstractElasticsearchPredicate {
 			ElasticsearchSearchPredicate elasticsearchClause = ElasticsearchSearchPredicate.from( scope, clause );
 			elasticsearchClause.checkNestableWithin( PredicateNestingContext.doesNotAcceptKnn() );
 			mustNotClauses.add( elasticsearchClause );
+
+			checkShouldClausesForKnnAcceptability();
 		}
 
 		@Override
@@ -234,8 +244,12 @@ class ElasticsearchBooleanPredicate extends AbstractElasticsearchPredicate {
 			if ( shouldClauses == null ) {
 				shouldClauses = new ArrayList<>();
 			}
+
 			ElasticsearchSearchPredicate elasticsearchClause = ElasticsearchSearchPredicate.from( scope, clause );
-			elasticsearchClause.checkNestableWithin( PredicateNestingContext.acceptsKnn() );
+			elasticsearchClause.checkNestableWithin(
+					!hasNonShouldClause()
+							? PredicateNestingContext.acceptsKnn()
+							: PredicateNestingContext.doesNotAcceptKnn() );
 			shouldClauses.add( elasticsearchClause );
 		}
 
@@ -247,6 +261,8 @@ class ElasticsearchBooleanPredicate extends AbstractElasticsearchPredicate {
 			ElasticsearchSearchPredicate elasticsearchClause = ElasticsearchSearchPredicate.from( scope, clause );
 			elasticsearchClause.checkNestableWithin( PredicateNestingContext.doesNotAcceptKnn() );
 			filterClauses.add( elasticsearchClause );
+
+			checkShouldClausesForKnnAcceptability();
 		}
 
 		@Override
@@ -335,6 +351,20 @@ class ElasticsearchBooleanPredicate extends AbstractElasticsearchPredicate {
 			}
 		}
 
+		/*
+		 * For Elasticsearch backend only:
+		 * It may be that we've added knn should clauses and all was fine.
+		 * But now we are adding to such bool predicate a non-should clause.
+		 * We want to make sure that in such case there are no knn clauses in should or fail.
+		 * OpenSearch backend will not be affected by these checks.
+		 */
+		private void checkShouldClausesForKnnAcceptability() {
+			if ( shouldClauses != null ) {
+				shouldClauses.forEach(
+						should -> should.checkNestableWithin( PredicateNestingContext.doesNotAcceptKnn() ) );
+			}
+		}
+
 		private void checkAndClearClauseCollections() {
 			if ( mustClauses != null && mustClauses.isEmpty() ) {
 				mustClauses = null;
@@ -346,6 +376,10 @@ class ElasticsearchBooleanPredicate extends AbstractElasticsearchPredicate {
 
 		private boolean hasAtLeastOneMustOrFilterPredicate() {
 			return mustClauses != null || filterClauses != null;
+		}
+
+		private boolean hasNonShouldClause() {
+			return mustClauses != null || filterClauses != null || mustNotClauses != null;
 		}
 
 		private boolean hasOnlyOneMustClause() {

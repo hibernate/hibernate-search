@@ -12,8 +12,6 @@ public class PredicateNestingContext {
 	private final String nestedPath;
 	private final boolean acceptsKnnClause;
 
-	private final Class<? extends ElasticsearchSearchPredicate> predicateType;
-
 	public static PredicateNestingContext acceptsKnn() {
 		return ACCEPTS_KNN;
 	}
@@ -27,14 +25,8 @@ public class PredicateNestingContext {
 	}
 
 	private PredicateNestingContext(String nestedPath, boolean acceptsKnnClause) {
-		this( nestedPath, acceptsKnnClause, null );
-	}
-
-	private PredicateNestingContext(String nestedPath, boolean acceptsKnnClause,
-			Class<? extends ElasticsearchSearchPredicate> predicateType) {
 		this.nestedPath = nestedPath;
 		this.acceptsKnnClause = acceptsKnnClause;
-		this.predicateType = predicateType;
 	}
 
 	private PredicateNestingContext(String nestedPath) {
@@ -53,11 +45,13 @@ public class PredicateNestingContext {
 		return acceptsKnnClause;
 	}
 
-	public PredicateNestingContext wrap(ElasticsearchSearchPredicate elasticsearchSearchPredicate) {
-		return new PredicateNestingContext(
-				nestedPath,
-				acceptsKnnClause && this.predicateType == null,
-				elasticsearchSearchPredicate.getClass()
-		);
+	public PredicateNestingContext rejectKnn() {
+		if ( !acceptsKnnClause ) {
+			return this;
+		}
+		if ( nestedPath == null ) {
+			return DOES_NOT_ACCEPT_KNN;
+		}
+		return new PredicateNestingContext( nestedPath, false );
 	}
 }
