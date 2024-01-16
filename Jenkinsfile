@@ -299,10 +299,9 @@ stage('Configure') {
 					// --------------------------------------------
 					// AWS OpenSearch service
 					new OpenSearchAwsBuildEnvironment(version: '1.3', condition: TestCondition.AFTER_MERGE),
-					new OpenSearchAwsBuildEnvironment(version: '2.3', condition: TestCondition.ON_DEMAND),
-					new OpenSearchAwsBuildEnvironment(version: '2.5', condition: TestCondition.AFTER_MERGE),
+					new OpenSearchAwsBuildEnvironment(version: '2.11', condition: TestCondition.AFTER_MERGE),
 					// Also test static credentials, but only for the latest version
-					new OpenSearchAwsBuildEnvironment(version: '2.5', condition: TestCondition.AFTER_MERGE, staticCredentials: true)
+					new OpenSearchAwsBuildEnvironment(version: '2.11', condition: TestCondition.AFTER_MERGE, staticCredentials: true)
 			]
 	])
 
