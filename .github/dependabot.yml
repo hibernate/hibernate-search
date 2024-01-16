@@ -17,7 +17,7 @@ updates:
     schedule:
       interval: "weekly"
       day: "tuesday"
-    assignees: ["yrodiere"]
+    assignees: ["marko-bekhta"]
     # We don't trigger Jenkins or GitHub Actions builds on pull requests from dependabot,
     # so we can safely use a high limit here.
     open-pull-requests-limit: 20
@@ -123,7 +123,7 @@ updates:
     schedule:
       interval: "weekly"
       day: "tuesday"
-    assignees: ["yrodiere"]
+    assignees: ["marko-bekhta"]
     groups:
       # This group combines all build containers dependencies.
       build-containers:
@@ -140,7 +140,7 @@ updates:
     directory: "/build/container/database"
     schedule:
       interval: "monthly"
-    assignees: ["yrodiere"]
+    assignees: ["marko-bekhta"]
     groups:
       # This group combines all database containers dependencies.
       database-containers:
@@ -155,7 +155,7 @@ updates:
     directory: "/build/container/search-backend"
     schedule:
       interval: "daily"
-    assignees: ["yrodiere"]
+    assignees: ["marko-bekhta"]
     groups:
       # This group combines all search backends containers dependencies.
       # We will still need to create specific tickets to address these updates and do some code changes,
