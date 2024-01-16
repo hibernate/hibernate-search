@@ -23,7 +23,7 @@ class ElasticsearchMatchAllPredicate extends AbstractElasticsearchPredicate {
 	}
 
 	@Override
-	public void doCheckNestableWithin(PredicateNestingContext context) {
+	public void checkNestableWithin(PredicateNestingContext context) {
 		// Nothing to do
 	}
 

@@ -25,7 +25,7 @@ public abstract class AbstractElasticsearchNestablePredicate extends AbstractEla
 
 
 	@Override
-	public void doCheckNestableWithin(PredicateNestingContext context) {
+	public void checkNestableWithin(PredicateNestingContext context) {
 		List<String> nestedPathHierarchy = getNestedPathHierarchy();
 		String expectedParentNestedPath = context.getNestedPath();
 

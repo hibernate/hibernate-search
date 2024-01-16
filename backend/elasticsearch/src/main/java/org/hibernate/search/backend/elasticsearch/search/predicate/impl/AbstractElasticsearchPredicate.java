@@ -14,7 +14,7 @@ import org.hibernate.search.engine.search.predicate.spi.SearchPredicateBuilder;
 
 import com.google.gson.JsonObject;
 
-public abstract class AbstractElasticsearchPredicate extends ElasticsearchSearchPredicate {
+public abstract class AbstractElasticsearchPredicate implements ElasticsearchSearchPredicate {
 
 	private static final JsonAccessor<Float> BOOST_ACCESSOR = JsonAccessor.root().property( "boost" ).asFloat();
 
