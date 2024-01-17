@@ -128,7 +128,7 @@ public class ElasticsearchDialectFactory {
 		if ( !AMAZON_OPENSEARCH_SERVERLESS.equals( version ) ) {
 			throw log.unexpectedAwsOpenSearchServerlessVersion( version, AMAZON_OPENSEARCH_SERVERLESS );
 		}
-		return new Elasticsearch7ModelDialect();
+		return new OpenSearch2ModelDialect();
 	}
 
 	public ElasticsearchProtocolDialect createProtocolDialect(ElasticsearchVersion version) {
