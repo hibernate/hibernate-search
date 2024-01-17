@@ -22,8 +22,8 @@ class ElasticsearchByteVectorFieldTypeOptionsStep
 
 	@Override
 	protected AbstractElasticsearchVectorFieldCodec<byte[]> createCodec(VectorSimilarity vectorSimilarity,
-			int dimension, Integer maxConnections, Integer beamWidth, byte[] indexNullAs) {
-		return new ElasticsearchByteVectorFieldCodec( vectorSimilarity, dimension, maxConnections, beamWidth, indexNullAs );
+			int dimension, Integer m, Integer efConstruction, byte[] indexNullAs) {
+		return new ElasticsearchByteVectorFieldCodec( vectorSimilarity, dimension, m, efConstruction, indexNullAs );
 	}
 
 	@Override

@@ -417,8 +417,8 @@ class ElasticsearchIndexSchemaManagerValidationMappingBaseIT {
 		);
 		StubMappedIndex index = StubMappedIndex.ofNonRetrievable( root -> {
 			root.field( "vector",
-					f -> f.asFloatVector().dimension( 50 ).vectorSimilarity( VectorSimilarity.L2 ).maxConnections( 2 )
-							.beamWidth( 10 ) )
+					f -> f.asFloatVector().dimension( 50 ).vectorSimilarity( VectorSimilarity.L2 ).m( 2 )
+							.efConstruction( 10 ) )
 					.toReference();
 		} );
 
@@ -581,8 +581,8 @@ class ElasticsearchIndexSchemaManagerValidationMappingBaseIT {
 				"These tests only make sense for a backend where Vector Search is supported and implemented."
 		);
 		StubMappedIndex index = StubMappedIndex.ofNonRetrievable( root -> {
-			root.field( "vectorB", f -> f.asByteVector().dimension( 2 ).beamWidth( 2 ).maxConnections( 20 ) ).toReference();
-			root.field( "vectorF", f -> f.asFloatVector().dimension( 2 ).beamWidth( 5 ).maxConnections( 50 ) ).toReference();
+			root.field( "vectorB", f -> f.asByteVector().dimension( 2 ).efConstruction( 2 ).m( 20 ) ).toReference();
+			root.field( "vectorF", f -> f.asFloatVector().dimension( 2 ).efConstruction( 5 ).m( 50 ) ).toReference();
 		} );
 
 		elasticSearchClient.index( index.name() ).deleteAndCreate();

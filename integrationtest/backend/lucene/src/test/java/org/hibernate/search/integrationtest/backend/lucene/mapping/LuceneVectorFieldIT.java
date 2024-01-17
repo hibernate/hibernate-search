@@ -29,23 +29,23 @@ class LuceneVectorFieldIT {
 
 	@ParameterizedTest
 	@ValueSource(ints = { -1, -1000, 3201, 10000, Integer.MAX_VALUE, Integer.MIN_VALUE })
-	void assertBeamWidth(int beamWidth) {
-		test( 2, beamWidth, 10, "beamWidth", beamWidth, 3200 );
+	void assertEfConstruction(int efConstruction) {
+		test( 2, efConstruction, 10, "efConstruction", efConstruction, 3200 );
 	}
 
 	@ParameterizedTest
 	@ValueSource(ints = { -1, -1000, 513, 10000, Integer.MAX_VALUE, Integer.MIN_VALUE })
-	void assertMaxConnections(int maxConnections) {
-		test( 2, 2, maxConnections, "maxConnections", maxConnections, 512 );
+	void assertM(int m) {
+		test( 2, 2, m, "m", m, 512 );
 	}
 
-	void test(int dimension, int beamWidth, int maxConnections, String property, int value, int maxValue) {
+	void test(int dimension, int efConstruction, int m, String property, int value, int maxValue) {
 		assertThatThrownBy( () -> setupHelper.start()
 				.withIndex( SimpleMappedIndex
 						.of( root -> root
 								.field( "vector",
-										f -> f.asByteVector().dimension( dimension ).beamWidth( beamWidth )
-												.maxConnections( maxConnections ) )
+										f -> f.asByteVector().dimension( dimension ).efConstruction( efConstruction )
+												.m( m ) )
 								.toReference() ) )
 				.setup()
 		).isInstanceOf( SearchException.class )

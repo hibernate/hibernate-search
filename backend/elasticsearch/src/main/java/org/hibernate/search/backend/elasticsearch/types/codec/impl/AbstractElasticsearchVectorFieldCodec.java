@@ -19,16 +19,16 @@ public abstract class AbstractElasticsearchVectorFieldCodec<F> implements Elasti
 
 	private final VectorSimilarity similarity;
 	private final int dimension;
-	private final Integer maxConnections;
-	private final Integer beamWidth;
+	private final Integer m;
+	private final Integer efConstruction;
 	private final F indexNullAs;
 
 	protected AbstractElasticsearchVectorFieldCodec(VectorSimilarity similarity, int dimension,
-			Integer maxConnections, Integer beamWidth, F indexNullAs) {
+			Integer m, Integer efConstruction, F indexNullAs) {
 		this.similarity = similarity;
 		this.dimension = dimension;
-		this.maxConnections = maxConnections;
-		this.beamWidth = beamWidth;
+		this.m = m;
+		this.efConstruction = efConstruction;
 		this.indexNullAs = indexNullAs;
 	}
 
@@ -72,8 +72,8 @@ public abstract class AbstractElasticsearchVectorFieldCodec<F> implements Elasti
 		AbstractElasticsearchVectorFieldCodec<?> that = (AbstractElasticsearchVectorFieldCodec<?>) other;
 		return dimension == that.dimension
 				&& Objects.equals( similarity, that.similarity )
-				&& Objects.equals( maxConnections, that.maxConnections )
-				&& Objects.equals( beamWidth, that.beamWidth );
+				&& Objects.equals( m, that.m )
+				&& Objects.equals( efConstruction, that.efConstruction );
 	}
 
 	@Override
@@ -86,8 +86,8 @@ public abstract class AbstractElasticsearchVectorFieldCodec<F> implements Elasti
 		return getClass().getSimpleName() + "{" +
 				"vectorSimilarity=" + similarity +
 				", dimension=" + dimension +
-				", beamWidth=" + beamWidth +
-				", maxConnection=" + maxConnections +
+				", efConstruction=" + efConstruction +
+				", m=" + m +
 				'}';
 	}
 }

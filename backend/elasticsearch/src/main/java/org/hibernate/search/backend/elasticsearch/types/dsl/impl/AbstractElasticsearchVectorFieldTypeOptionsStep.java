@@ -35,8 +35,8 @@ abstract class AbstractElasticsearchVectorFieldTypeOptionsStep<
 
 	protected VectorSimilarity vectorSimilarity = VectorSimilarity.DEFAULT;
 	protected Integer dimension;
-	protected Integer beamWidth;
-	protected Integer maxConnections;
+	protected Integer efConstruction;
+	protected Integer m;
 	protected F indexNullAs;
 	private Projectable projectable = Projectable.DEFAULT;
 	private Searchable searchable = Searchable.DEFAULT;
@@ -72,14 +72,14 @@ abstract class AbstractElasticsearchVectorFieldTypeOptionsStep<
 	}
 
 	@Override
-	public S beamWidth(int beamWidth) {
-		this.beamWidth = beamWidth;
+	public S efConstruction(int efConstruction) {
+		this.efConstruction = efConstruction;
 		return thisAsS();
 	}
 
 	@Override
-	public S maxConnections(int maxConnections) {
-		this.maxConnections = maxConnections;
+	public S m(int m) {
+		this.m = m;
 		return thisAsS();
 	}
 
@@ -104,7 +104,7 @@ abstract class AbstractElasticsearchVectorFieldTypeOptionsStep<
 		mappingContributor.contribute( mapping, this );
 
 		AbstractElasticsearchVectorFieldCodec<F> codec =
-				createCodec( vectorSimilarity, dimension, maxConnections, beamWidth, indexNullAs );
+				createCodec( vectorSimilarity, dimension, m, efConstruction, indexNullAs );
 		builder.codec( codec );
 		if ( resolvedSearchable ) {
 			builder.searchable( true );
@@ -123,7 +123,7 @@ abstract class AbstractElasticsearchVectorFieldTypeOptionsStep<
 	}
 
 	protected abstract AbstractElasticsearchVectorFieldCodec<F> createCodec(VectorSimilarity vectorSimilarity, int dimension,
-			Integer maxConnections, Integer beamWidth, F indexNullAs);
+			Integer m, Integer efConstruction, F indexNullAs);
 
 	protected static boolean resolveDefault(Projectable projectable) {
 		switch ( projectable ) {
@@ -168,12 +168,12 @@ abstract class AbstractElasticsearchVectorFieldTypeOptionsStep<
 	}
 
 	@Override
-	public Integer beamWidth() {
-		return beamWidth;
+	public Integer efConstruction() {
+		return efConstruction;
 	}
 
 	@Override
-	public Integer maxConnections() {
-		return maxConnections;
+	public Integer m() {
+		return m;
 	}
 }

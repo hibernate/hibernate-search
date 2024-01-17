@@ -144,8 +144,8 @@ size match this dimension.
 +
 Besides that, vector fields allow optionally configuring
 the <<mapping-directfieldmapping-vectorSimilarity,similarity function>> used during search,
-the <<mapping-directfieldmapping-beamWidth,beam width>>
-and the <<mapping-directfieldmapping-maxConnections,maximum connections>> used during indexing.
+<<mapping-directfieldmapping-efConstruction,`efConstruction`>>
+and <<mapping-directfieldmapping-m,`m`>> used during indexing.
 +
 WARNING: Vector fields, on the contrary to the other field types, disable the container extraction by default
 Manually setting the <<mapping-directfieldmapping-extraction,extraction>> to `DEFAULT` will result in an exception.
@@ -418,18 +418,18 @@ d+1 & \text{otherwise}
 |`MAX_INNER_PRODUCT`| `MAXIMUM_INNER_PRODUCT`| `max_inner_product`   | currently *not supported* by OpenSearch and will result in an exception.
 |===============
 
-[[mapping-directfieldmapping-beamWidth]] `beamWidth`::
+[[mapping-directfieldmapping-efConstruction]] `efConstruction`::
 +
 include::../components/_incubating-warning.adoc[]
 +
-Beam width is the size of the dynamic list used during k-NN graph creation. It affects how vectors are stored.
+`efConstruction` is the size of the dynamic list used during k-NN graph creation. It affects how vectors are stored.
 Higher values lead to a more accurate graph but slower indexing speed.
 +
 Default value is backend-specific.
 +
 Only available on `@VectorField`.
 
-[[mapping-directfieldmapping-maxConnections]] `maxConnections`::
+[[mapping-directfieldmapping-m]] `m`::
 +
 include::../components/_incubating-warning.adoc[]
 +

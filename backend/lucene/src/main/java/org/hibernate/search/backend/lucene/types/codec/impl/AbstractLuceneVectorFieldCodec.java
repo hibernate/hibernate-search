@@ -79,7 +79,7 @@ public abstract class AbstractLuceneVectorFieldCodec<F> implements LuceneVectorF
 
 		return dimension == other.dimension
 				&& vectorSimilarity == other.vectorSimilarity
-				// to check beam width and max connections:
+				// to check ef construction and m
 				&& Objects.equals( knnVectorsFormat, other.knnVectorsFormat );
 	}
 

@@ -24,13 +24,13 @@ public final class AnnotationDefaultValues {
 	 * This extreme value is both invalid and very unlikely to be used.
 	 * So we use it to mark that the user has not set the value.
 	 */
-	public static final int DEFAULT_BEAM_WIDTH = Integer.MIN_VALUE;
+	public static final int DEFAULT_EF_CONSTRUCTION = Integer.MIN_VALUE;
 
 	/**
 	 * This extreme value is both invalid and very unlikely to be used.
 	 * So we use it to mark that the user has not set the value.
 	 */
-	public static final int DEFAULT_MAX_CONNECTIONS = Integer.MIN_VALUE;
+	public static final int DEFAULT_M = Integer.MIN_VALUE;
 
 	/**
 	 * This extreme value is both invalid and very unlikely to be used.

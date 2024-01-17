@@ -24,14 +24,14 @@ class StubVectorFieldTypeOptionsStep<F>
 	}
 
 	@Override
-	public StubVectorFieldTypeOptionsStep<F> beamWidth(int beamWidth) {
-		builder.modifier( b -> b.beamWidth( beamWidth ) );
+	public StubVectorFieldTypeOptionsStep<F> efConstruction(int efConstruction) {
+		builder.modifier( b -> b.efConstruction( efConstruction ) );
 		return this;
 	}
 
 	@Override
-	public StubVectorFieldTypeOptionsStep<F> maxConnections(int maxConnections) {
-		builder.modifier( b -> b.maxConnections( maxConnections ) );
+	public StubVectorFieldTypeOptionsStep<F> m(int m) {
+		builder.modifier( b -> b.m( m ) );
 		return this;
 	}
 

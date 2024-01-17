@@ -248,13 +248,13 @@ public final class StubIndexSchemaDataNode extends StubTreeNode<StubIndexSchemaD
 			return this;
 		}
 
-		public Builder maxConnections(int maxConnections) {
-			attribute( "maxConnections", maxConnections );
+		public Builder m(int m) {
+			attribute( "m", m );
 			return this;
 		}
 
-		public Builder beamWidth(int beamWidth) {
-			attribute( "beamWidth", beamWidth );
+		public Builder efConstruction(int efConstruction) {
+			attribute( "efConstruction", efConstruction );
 			return this;
 		}
 

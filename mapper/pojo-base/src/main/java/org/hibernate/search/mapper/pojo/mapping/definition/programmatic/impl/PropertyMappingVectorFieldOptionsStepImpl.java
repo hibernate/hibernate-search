@@ -55,14 +55,14 @@ class PropertyMappingVectorFieldOptionsStepImpl
 	}
 
 	@Override
-	public PropertyMappingVectorFieldOptionsStep beamWidth(int beamWidth) {
-		fieldModelContributor.add( c -> c.vectorTypeOptionsStep().beamWidth( beamWidth ) );
+	public PropertyMappingVectorFieldOptionsStep efConstruction(int efConstruction) {
+		fieldModelContributor.add( c -> c.vectorTypeOptionsStep().efConstruction( efConstruction ) );
 		return thisAsS();
 	}
 
 	@Override
-	public PropertyMappingVectorFieldOptionsStep maxConnections(int maxConnections) {
-		fieldModelContributor.add( c -> c.vectorTypeOptionsStep().maxConnections( maxConnections ) );
+	public PropertyMappingVectorFieldOptionsStep m(int m) {
+		fieldModelContributor.add( c -> c.vectorTypeOptionsStep().m( m ) );
 		return thisAsS();
 	}
 

@@ -23,9 +23,9 @@ public interface ElasticsearchVectorFieldTypeMappingContributor {
 
 		int dimension();
 
-		Integer beamWidth();
+		Integer efConstruction();
 
-		Integer maxConnections();
+		Integer m();
 
 		boolean searchable();
 	}

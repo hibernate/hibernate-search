@@ -83,7 +83,7 @@ public @interface VectorField {
 	 * Higher values lead to a more accurate graph but slower indexing speed.
 	 * Default value is backend-specific.
 	 */
-	int beamWidth() default AnnotationDefaultValues.DEFAULT_BEAM_WIDTH;
+	int efConstruction() default AnnotationDefaultValues.DEFAULT_EF_CONSTRUCTION;
 
 	/**
 	 * @return The number of neighbors each node will be connected to in the HNSW graph.
@@ -91,7 +91,7 @@ public @interface VectorField {
 	 * It is recommended to keep this value between 2 and 100.
 	 * Default value is backend-specific.
 	 */
-	int maxConnections() default AnnotationDefaultValues.DEFAULT_MAX_CONNECTIONS;
+	int m() default AnnotationDefaultValues.DEFAULT_M;
 
 	/**
 	 * @return A reference to the value bridge to use for this field.
