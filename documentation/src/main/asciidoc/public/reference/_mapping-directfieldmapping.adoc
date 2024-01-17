@@ -381,8 +381,8 @@ Only available on `@VectorField`.
 |===============
 |Value|Definition
 |`VectorSimilarity.L2`|An L2 (Euclidean) norm, that is a sensible default for most scenarios.
-Distance between vectors `x` and `y` is calculated as latexmath:[d(x,y) = \sum_{i=1}^{n} (x_i - y_i)^2 ]
-and the score function is latexmath:[s = \frac{1}{1+d}]
+Distance between vectors `x` and `y` is calculated as latexmath:[d(x,y) = \sqrt{\sum_{i=1}^{n} (x_i - y_i)^2 } ]
+and the score function is latexmath:[s = \frac{1}{1+d*d}]
 |`VectorSimilarity.DOT_PRODUCT`|Inner product (dot product in particular).
 Distance between vectors `x` and `y` is calculated as latexmath:[d(x,y) = \sum_{i=1}^{n} x_i \cdot y_i ]
 and the score function is latexmath:[s = \frac{1}{1+d}]
