@@ -12,6 +12,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Random;
 import java.util.TreeSet;
+import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
 import org.hibernate.search.engine.backend.types.dsl.IndexFieldTypeFactory;
@@ -75,7 +76,7 @@ public class FloatVectorFieldTypeDescriptor extends VectorFieldTypeDescriptor<fl
 	public List<float[]> unitLengthVectors() {
 		return IntStream.range( 0, size )
 				.mapToObj( index -> unit( size, index ) )
-				.toList();
+				.collect( Collectors.toList() );
 	}
 
 	@Override
