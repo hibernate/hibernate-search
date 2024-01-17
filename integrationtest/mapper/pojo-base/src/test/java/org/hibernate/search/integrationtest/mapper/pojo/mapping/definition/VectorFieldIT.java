@@ -75,34 +75,34 @@ class VectorFieldIT {
 	}
 
 	@Test
-	void beamWidth() {
+	void efConstruction() {
 		@Indexed(index = INDEX_NAME)
 		class IndexedEntity {
 			@DocumentId
 			Integer id;
-			@VectorField(dimension = 5, beamWidth = 10)
+			@VectorField(dimension = 5, efConstruction = 10)
 			byte[] vector;
 		}
 
 		backendMock.expectSchema( INDEX_NAME, b -> b
-				.field( "vector", byte[].class, f -> f.dimension( 5 ).beamWidth( 10 ) )
+				.field( "vector", byte[].class, f -> f.dimension( 5 ).efConstruction( 10 ) )
 		);
 		setupHelper.start().setup( IndexedEntity.class );
 		backendMock.verifyExpectationsMet();
 	}
 
 	@Test
-	void maxConnections() {
+	void m() {
 		@Indexed(index = INDEX_NAME)
 		class IndexedEntity {
 			@DocumentId
 			Integer id;
-			@VectorField(dimension = 5, maxConnections = 10)
+			@VectorField(dimension = 5, m = 10)
 			byte[] vector;
 		}
 
 		backendMock.expectSchema( INDEX_NAME, b -> b
-				.field( "vector", byte[].class, f -> f.dimension( 5 ).maxConnections( 10 ) )
+				.field( "vector", byte[].class, f -> f.dimension( 5 ).m( 10 ) )
 		);
 		setupHelper.start().setup( IndexedEntity.class );
 		backendMock.verifyExpectationsMet();

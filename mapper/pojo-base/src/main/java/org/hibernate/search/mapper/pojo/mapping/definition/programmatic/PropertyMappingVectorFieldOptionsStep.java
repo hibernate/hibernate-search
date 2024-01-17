@@ -47,18 +47,18 @@ public interface PropertyMappingVectorFieldOptionsStep
 	PropertyMappingVectorFieldOptionsStep vectorSimilarity(VectorSimilarity vectorSimilarity);
 
 	/**
-	 * @param beamWidth The size of the dynamic list used during k-NN graph creation.
+	 * @param efConstruction The size of the dynamic list used during k-NN graph creation.
 	 * @return {@code this}, for method chaining.
-	 * @see VectorField#beamWidth()
+	 * @see VectorField#efConstruction()
 	 */
-	PropertyMappingVectorFieldOptionsStep beamWidth(int beamWidth);
+	PropertyMappingVectorFieldOptionsStep efConstruction(int efConstruction);
 
 	/**
-	 * @param maxConnections The number of neighbors each node will be connected to in the HNSW graph.
+	 * @param m The number of neighbors each node will be connected to in the HNSW graph.
 	 * @return {@code this}, for method chaining.
-	 * @see VectorField#maxConnections()
+	 * @see VectorField#m()
 	 */
-	PropertyMappingVectorFieldOptionsStep maxConnections(int maxConnections);
+	PropertyMappingVectorFieldOptionsStep m(int m);
 
 	/**
 	 * @param indexNullAs A value used instead of null values when indexing.

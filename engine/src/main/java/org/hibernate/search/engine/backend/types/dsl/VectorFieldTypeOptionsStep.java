@@ -26,16 +26,16 @@ public interface VectorFieldTypeOptionsStep<S extends VectorFieldTypeOptionsStep
 	S vectorSimilarity(VectorSimilarity vectorSimilarity);
 
 	/**
-	 * @param beamWidth Defines the size of the dynamic list used during k-NN graph creation.
+	 * @param efConstruction Defines the size of the dynamic list used during k-NN graph creation.
 	 * @return {@code this}, for method chaining.
 	 */
-	S beamWidth(int beamWidth);
+	S efConstruction(int efConstruction);
 
 	/**
-	 * @param maxConnections Defines the number of neighbors each node will be connected to in the HNSW graph.
+	 * @param m Defines the number of neighbors each node will be connected to in the HNSW graph.
 	 * @return {@code this}, for method chaining.
 	 */
-	S maxConnections(int maxConnections);
+	S m(int m);
 
 	/**
 	 * @param dimension The number of dimensions (array length) of vectors to be indexed.

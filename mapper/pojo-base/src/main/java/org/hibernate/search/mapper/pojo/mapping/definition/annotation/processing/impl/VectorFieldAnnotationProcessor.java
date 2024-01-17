@@ -30,14 +30,14 @@ public class VectorFieldAnnotationProcessor extends AbstractFieldAnnotationProce
 				? mappingContext.vectorField( fieldName )
 				: mappingContext.vectorField( dimension, fieldName );
 
-		int maxConnections = annotation.maxConnections();
-		if ( maxConnections != AnnotationDefaultValues.DEFAULT_MAX_CONNECTIONS ) {
-			fieldContext.maxConnections( maxConnections );
+		int m = annotation.m();
+		if ( m != AnnotationDefaultValues.DEFAULT_M ) {
+			fieldContext.m( m );
 		}
 
-		int beamWidth = annotation.beamWidth();
-		if ( beamWidth != AnnotationDefaultValues.DEFAULT_BEAM_WIDTH ) {
-			fieldContext.beamWidth( beamWidth );
+		int efConstruction = annotation.efConstruction();
+		if ( efConstruction != AnnotationDefaultValues.DEFAULT_EF_CONSTRUCTION ) {
+			fieldContext.efConstruction( efConstruction );
 		}
 
 		VectorSimilarity vectorSimilarity = annotation.vectorSimilarity();

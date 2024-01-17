@@ -300,7 +300,7 @@ class ElasticsearchKnnPredicateSpecificsIT {
 			parking = root.field( "parking", f -> f.asBoolean().projectable( Projectable.YES ) ).toReference();
 			rating = root.field( "rating", f -> f.asInteger().projectable( Projectable.YES ) ).toReference();
 			location = root.field( "location", f -> f.asFloatVector().dimension( 2 ).projectable( Projectable.YES )
-					.maxConnections( 16 ).beamWidth( 100 ).vectorSimilarity( VectorSimilarity.L2 ) ).toReference();
+					.m( 16 ).efConstruction( 100 ).vectorSimilarity( VectorSimilarity.L2 ) ).toReference();
 			IndexSchemaObjectField nested = root.objectField( "object", ObjectStructure.NESTED );
 			object = nested.toReference();
 			nestedParking = nested.field( "nestedParking", f -> f.asBoolean().aggregable( Aggregable.YES ) ).toReference();

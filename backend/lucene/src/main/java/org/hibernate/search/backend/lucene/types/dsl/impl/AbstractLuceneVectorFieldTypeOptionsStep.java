@@ -39,13 +39,13 @@ abstract class AbstractLuceneVectorFieldTypeOptionsStep<S extends AbstractLucene
 		implements LuceneVectorFieldTypeOptionsStep<S, F> {
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
-	private static final int MAX_BEAM_WIDTH = 3200;
-	private static final int MAX_MAX_CONNECTIONS = 512;
+	private static final int MAX_EF_CONSTRUCTION = 3200;
+	private static final int MAX_M = 512;
 
 	protected VectorSimilarity vectorSimilarity = VectorSimilarity.DEFAULT;
 	protected Integer dimension;
-	protected int beamWidth = 512;
-	protected int maxConnections = 16;
+	protected int efConstruction = 512;
+	protected int m = 16;
 	private Projectable projectable = Projectable.DEFAULT;
 	private Searchable searchable = Searchable.DEFAULT;
 	private F indexNullAsValue = null;
@@ -73,20 +73,20 @@ abstract class AbstractLuceneVectorFieldTypeOptionsStep<S extends AbstractLucene
 	}
 
 	@Override
-	public S beamWidth(int beamWidth) {
-		if ( beamWidth < 1 || beamWidth > MAX_BEAM_WIDTH ) {
-			throw log.vectorPropertyUnsupportedValue( "beamWidth", beamWidth, MAX_BEAM_WIDTH );
+	public S efConstruction(int efConstruction) {
+		if ( efConstruction < 1 || efConstruction > MAX_EF_CONSTRUCTION ) {
+			throw log.vectorPropertyUnsupportedValue( "efConstruction", efConstruction, MAX_EF_CONSTRUCTION );
 		}
-		this.beamWidth = beamWidth;
+		this.efConstruction = efConstruction;
 		return thisAsS();
 	}
 
 	@Override
-	public S maxConnections(int maxConnections) {
-		if ( maxConnections < 1 || maxConnections > MAX_MAX_CONNECTIONS ) {
-			throw log.vectorPropertyUnsupportedValue( "maxConnections", maxConnections, MAX_MAX_CONNECTIONS );
+	public S m(int m) {
+		if ( m < 1 || m > MAX_M ) {
+			throw log.vectorPropertyUnsupportedValue( "m", m, MAX_M );
 		}
-		this.maxConnections = maxConnections;
+		this.m = m;
 		return thisAsS();
 	}
 
@@ -118,7 +118,7 @@ abstract class AbstractLuceneVectorFieldTypeOptionsStep<S extends AbstractLucene
 		Storage storage = resolvedProjectable ? Storage.ENABLED : Storage.DISABLED;
 
 		AbstractLuceneVectorFieldCodec<F> codec = createCodec( resolvedVectorSimilarity, dimension, storage, indexing,
-				indexNullAsValue, new HibernateSearchKnnVectorsFormat( maxConnections, beamWidth )
+				indexNullAsValue, new HibernateSearchKnnVectorsFormat( m, efConstruction )
 		);
 		builder.codec( codec );
 		if ( resolvedSearchable ) {

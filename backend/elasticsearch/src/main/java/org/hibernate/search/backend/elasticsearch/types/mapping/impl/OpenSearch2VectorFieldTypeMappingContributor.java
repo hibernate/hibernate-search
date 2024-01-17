@@ -44,13 +44,13 @@ public class OpenSearch2VectorFieldTypeMappingContributor implements Elasticsear
 		if ( resolvedVectorSimilarity != null ) {
 			method.setSpaceType( resolvedVectorSimilarity );
 		}
-		if ( context.maxConnections() != null || context.beamWidth() != null ) {
+		if ( context.m() != null || context.efConstruction() != null ) {
 			OpenSearchVectorTypeMethod.Parameters parameters = new OpenSearchVectorTypeMethod.Parameters();
-			if ( context.maxConnections() != null ) {
-				parameters.setM( context.maxConnections() );
+			if ( context.m() != null ) {
+				parameters.setM( context.m() );
 			}
-			if ( context.beamWidth() != null ) {
-				parameters.setEfConstruction( context.beamWidth() );
+			if ( context.efConstruction() != null ) {
+				parameters.setEfConstruction( context.efConstruction() );
 			}
 			method.setParameters( parameters );
 		}

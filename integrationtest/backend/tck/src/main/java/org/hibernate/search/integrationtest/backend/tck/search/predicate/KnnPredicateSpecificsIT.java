@@ -77,8 +77,8 @@ class KnnPredicateSpecificsIT {
 						WrongVectorConfigured.index,
 						SearchScopeConfigured.index,
 						SearchScopeConfigured.indexDifferentDimension,
-						SearchScopeConfigured.indexDifferentBeamWidth,
-						SearchScopeConfigured.indexDifferentMaxConnection,
+						SearchScopeConfigured.indexDifferentEfConstruction,
+						SearchScopeConfigured.indexDifferentM,
 						SearchScopeConfigured.indexDifferentSimilarity,
 						VectorSimilarityConfigured.indexDefault,
 						ExampleKnnSearchConfigured.index,
@@ -109,15 +109,17 @@ class KnnPredicateSpecificsIT {
 		SearchScopeConfigured.dataSetsDimension
 				.forEach( d -> d.contribute( SearchScopeConfigured.indexDifferentDimension, scopeDifferentDimensionIndexer ) );
 		bulkIndexers.add( scopeDifferentDimensionIndexer );
-		final BulkIndexer scopeDifferentBeamWidthIndexer = SearchScopeConfigured.indexDifferentBeamWidth.bulkIndexer();
+		final BulkIndexer scopeDifferentEfConstructionIndexer =
+				SearchScopeConfigured.indexDifferentEfConstruction.bulkIndexer();
 		SearchScopeConfigured.dataSets
-				.forEach( d -> d.contribute( SearchScopeConfigured.indexDifferentBeamWidth, scopeDifferentBeamWidthIndexer ) );
-		bulkIndexers.add( scopeDifferentBeamWidthIndexer );
-		final BulkIndexer scopeDifferentMaxConnectionIndexer = SearchScopeConfigured.indexDifferentMaxConnection.bulkIndexer();
+				.forEach( d -> d.contribute( SearchScopeConfigured.indexDifferentEfConstruction,
+						scopeDifferentEfConstructionIndexer ) );
+		bulkIndexers.add( scopeDifferentEfConstructionIndexer );
+		final BulkIndexer scopeDifferentMIndexer = SearchScopeConfigured.indexDifferentM.bulkIndexer();
 		SearchScopeConfigured.dataSets
-				.forEach( d -> d.contribute( SearchScopeConfigured.indexDifferentMaxConnection,
-						scopeDifferentMaxConnectionIndexer ) );
-		bulkIndexers.add( scopeDifferentMaxConnectionIndexer );
+				.forEach( d -> d.contribute( SearchScopeConfigured.indexDifferentM,
+						scopeDifferentMIndexer ) );
+		bulkIndexers.add( scopeDifferentMIndexer );
 		final BulkIndexer scopeDifferentSimilarityIndexer = SearchScopeConfigured.indexDifferentSimilarity.bulkIndexer();
 		SearchScopeConfigured.dataSets
 				.forEach(
@@ -148,8 +150,8 @@ class KnnPredicateSpecificsIT {
 		}
 
 		bulkIndexers.add( scopeDifferentDimensionIndexer );
-		bulkIndexers.add( scopeDifferentBeamWidthIndexer );
-		bulkIndexers.add( scopeDifferentMaxConnectionIndexer );
+		bulkIndexers.add( scopeDifferentEfConstructionIndexer );
+		bulkIndexers.add( scopeDifferentMIndexer );
 		bulkIndexers.add( scopeDifferentSimilarityIndexer );
 		bulkIndexers.add( exampleKnnSearchIndexer );
 		bulkIndexers.add( exampleKnnSearchNestedIndexer );
@@ -262,13 +264,13 @@ class KnnPredicateSpecificsIT {
 						VectorSimilarity.L2
 				) ).name( "scopeDifferentDimension" );
 
-		private static final SimpleMappedIndex<IndexBinding> indexDifferentBeamWidth =
+		private static final SimpleMappedIndex<IndexBinding> indexDifferentEfConstruction =
 				SimpleMappedIndex.of( root -> new IndexBinding( root, supportedFieldTypes, 4, 2, VectorSimilarity.L2 ) )
-						.name( "scopeDifferentBeamWidth" );
+						.name( "scopeDifferentEfConstruction" );
 
-		private static final SimpleMappedIndex<IndexBinding> indexDifferentMaxConnection =
+		private static final SimpleMappedIndex<IndexBinding> indexDifferentM =
 				SimpleMappedIndex.of( root -> new IndexBinding( root, supportedFieldTypes, 2, 4, VectorSimilarity.L2 ) )
-						.name( "scopeDifferentMaxConnection" );
+						.name( "scopeDifferentM" );
 
 		private static final SimpleMappedIndex<IndexBinding> indexDifferentSimilarity =
 				SimpleMappedIndex.of( root -> new IndexBinding( root, supportedFieldTypes, 2, 2, VectorSimilarity.COSINE ) )
@@ -280,8 +282,8 @@ class KnnPredicateSpecificsIT {
 		private static final List<Arguments> parameters = new ArrayList<>();
 		static {
 			for ( VectorFieldTypeDescriptor<?> fieldType : supportedFieldTypes ) {
-				parameters.add( Arguments.of( fieldType, index, indexDifferentDimension, indexDifferentBeamWidth,
-						indexDifferentMaxConnection, indexDifferentSimilarity ) );
+				parameters.add( Arguments.of( fieldType, index, indexDifferentDimension, indexDifferentEfConstruction,
+						indexDifferentM, indexDifferentSimilarity ) );
 				dataSets.add( new DataSet<>( fieldType ) );
 			}
 			for ( VectorFieldTypeDescriptor<?> fieldType : supportedFieldTypesWithDifferentDimension ) {
@@ -298,8 +300,8 @@ class KnnPredicateSpecificsIT {
 		void dimension(VectorFieldTypeDescriptor<?> fieldType,
 				SimpleMappedIndex<IndexBinding> index,
 				SimpleMappedIndex<IndexBinding> indexDifferentDimension,
-				SimpleMappedIndex<IndexBinding> indexDifferentBeamWidth,
-				SimpleMappedIndex<IndexBinding> indexDifferentMaxConnection,
+				SimpleMappedIndex<IndexBinding> indexDifferentEfConstruction,
+				SimpleMappedIndex<IndexBinding> indexDifferentM,
 				SimpleMappedIndex<IndexBinding> indexDifferentSimilarity) {
 			SearchPredicateFactory f = index.createScope( indexDifferentDimension ).predicate();
 
@@ -321,8 +323,8 @@ class KnnPredicateSpecificsIT {
 		void similarity(VectorFieldTypeDescriptor<?> fieldType,
 				SimpleMappedIndex<IndexBinding> index,
 				SimpleMappedIndex<IndexBinding> indexDifferentDimension,
-				SimpleMappedIndex<IndexBinding> indexDifferentBeamWidth,
-				SimpleMappedIndex<IndexBinding> indexDifferentMaxConnection,
+				SimpleMappedIndex<IndexBinding> indexDifferentEfConstruction,
+				SimpleMappedIndex<IndexBinding> indexDifferentM,
 				SimpleMappedIndex<IndexBinding> indexDifferentSimilarity) {
 			SearchPredicateFactory f = index.createScope( indexDifferentSimilarity ).predicate();
 
@@ -341,13 +343,13 @@ class KnnPredicateSpecificsIT {
 
 		@ParameterizedTest(name = "{0}")
 		@MethodSource("params")
-		void beamWidth(VectorFieldTypeDescriptor<?> fieldType,
+		void efConstruction(VectorFieldTypeDescriptor<?> fieldType,
 				SimpleMappedIndex<IndexBinding> index,
 				SimpleMappedIndex<IndexBinding> indexDifferentDimension,
-				SimpleMappedIndex<IndexBinding> indexDifferentBeamWidth,
-				SimpleMappedIndex<IndexBinding> indexDifferentMaxConnection,
+				SimpleMappedIndex<IndexBinding> indexDifferentEfConstruction,
+				SimpleMappedIndex<IndexBinding> indexDifferentM,
 				SimpleMappedIndex<IndexBinding> indexDifferentSimilarity) {
-			StubMappingScope scope = index.createScope( indexDifferentBeamWidth );
+			StubMappingScope scope = index.createScope( indexDifferentEfConstruction );
 			SearchPredicateFactory f = scope.predicate();
 
 			String fieldPath = index.binding().field.get( fieldType ).relativeFieldName;
@@ -358,20 +360,20 @@ class KnnPredicateSpecificsIT {
 							"'predicate:knn'", fieldPath,
 							"Inconsistent configuration for field '" + fieldPath + "'",
 							"codec", "differs",
-							"beamWidth=2",
-							"beamWidth=4"
+							"efConstruction=2",
+							"efConstruction=4"
 					);
 		}
 
 		@ParameterizedTest(name = "{0}")
 		@MethodSource("params")
-		void maxConnection(VectorFieldTypeDescriptor<?> fieldType,
+		void m(VectorFieldTypeDescriptor<?> fieldType,
 				SimpleMappedIndex<IndexBinding> index,
 				SimpleMappedIndex<IndexBinding> indexDifferentDimension,
-				SimpleMappedIndex<IndexBinding> indexDifferentBeamWidth,
-				SimpleMappedIndex<IndexBinding> indexDifferentMaxConnection,
+				SimpleMappedIndex<IndexBinding> indexDifferentEfConstruction,
+				SimpleMappedIndex<IndexBinding> indexDifferentM,
 				SimpleMappedIndex<IndexBinding> indexDifferentSimilarity) {
-			StubMappingScope scope = index.createScope( indexDifferentMaxConnection );
+			StubMappingScope scope = index.createScope( indexDifferentM );
 			SearchPredicateFactory f = scope.predicate();
 
 			String fieldPath = index.binding().field.get( fieldType ).relativeFieldName;
@@ -382,8 +384,8 @@ class KnnPredicateSpecificsIT {
 							"'predicate:knn'", fieldPath,
 							"Inconsistent configuration for field '" + fieldPath + "'",
 							"codec", "differs",
-							"maxConnection=2",
-							"maxConnection=4"
+							"m=2",
+							"m=4"
 					);
 		}
 
@@ -402,10 +404,10 @@ class KnnPredicateSpecificsIT {
 
 
 			public IndexBinding(IndexSchemaElement root, Collection<? extends VectorFieldTypeDescriptor<?>> fieldTypes,
-					int beamWidth, int maxConnections, VectorSimilarity vectorSimilarity) {
+					int efConstruction, int m, VectorSimilarity vectorSimilarity) {
 
-				field = SimpleFieldModelsByType.mapAll( fieldTypes, root, "", c -> c.beamWidth( beamWidth )
-						.maxConnections( maxConnections ).vectorSimilarity( vectorSimilarity ) );
+				field = SimpleFieldModelsByType.mapAll( fieldTypes, root, "", c -> c.efConstruction( efConstruction )
+						.m( m ).vectorSimilarity( vectorSimilarity ) );
 			}
 
 			public <F> F sampleVector(VectorFieldTypeDescriptor<F> vectorFieldTypeDescriptor) {
@@ -818,7 +820,7 @@ class KnnPredicateSpecificsIT {
 				parking = root.field( "parking", f -> f.asBoolean().projectable( Projectable.YES ) ).toReference();
 				rating = root.field( "rating", f -> f.asInteger().projectable( Projectable.YES ) ).toReference();
 				location = root.field( "location", f -> f.asFloatVector().dimension( 2 ).projectable( Projectable.YES )
-						.maxConnections( 16 ).beamWidth( 100 ).vectorSimilarity( VectorSimilarity.L2 ) ).toReference();
+						.m( 16 ).efConstruction( 100 ).vectorSimilarity( VectorSimilarity.L2 ) ).toReference();
 			}
 		}
 

@@ -18,7 +18,7 @@ public interface LuceneVectorFieldCodec<F> extends LuceneStandardFieldCodec<F, b
 
 	/**
 	 * Custom {@link KnnVectorsFormat knn vector format} that will be used in {@link org.apache.lucene.codecs.perfield.PerFieldKnnVectorsFormat}
-	 * and can for example define custom {@code beamWidth} or {@code maxConnections} or even provide a completely custom implementation (needs to be registered via ServiceLoader mechanism).
+	 * and can for example define custom {@code efConstruction} or {@code m} or even provide a completely custom implementation (needs to be registered via ServiceLoader mechanism).
 	 */
 	KnnVectorsFormat knnVectorFormat();
 

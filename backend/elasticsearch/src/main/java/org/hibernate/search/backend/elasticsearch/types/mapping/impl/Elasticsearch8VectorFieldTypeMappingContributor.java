@@ -25,14 +25,14 @@ public class Elasticsearch8VectorFieldTypeMappingContributor implements Elastics
 		if ( resolvedVectorSimilarity != null ) {
 			mapping.setSimilarity( resolvedVectorSimilarity );
 		}
-		if ( context.maxConnections() != null || context.beamWidth() != null ) {
+		if ( context.m() != null || context.efConstruction() != null ) {
 			ElasticsearchDenseVectorIndexOptions indexOptions = new ElasticsearchDenseVectorIndexOptions();
 			indexOptions.setType( "hnsw" );
-			if ( context.maxConnections() != null ) {
-				indexOptions.setM( context.maxConnections() );
+			if ( context.m() != null ) {
+				indexOptions.setM( context.m() );
 			}
-			if ( context.beamWidth() != null ) {
-				indexOptions.setEfConstruction( context.beamWidth() );
+			if ( context.efConstruction() != null ) {
+				indexOptions.setEfConstruction( context.efConstruction() );
 			}
 			mapping.setIndexOptions( indexOptions );
 		}
