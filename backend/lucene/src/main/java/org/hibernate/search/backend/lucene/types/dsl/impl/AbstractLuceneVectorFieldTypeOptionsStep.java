@@ -44,7 +44,7 @@ abstract class AbstractLuceneVectorFieldTypeOptionsStep<S extends AbstractLucene
 
 	protected VectorSimilarity vectorSimilarity = VectorSimilarity.DEFAULT;
 	protected Integer dimension;
-	protected int beamWidth = MAX_MAX_CONNECTIONS;
+	protected int beamWidth = 512;
 	protected int maxConnections = 16;
 	private Projectable projectable = Projectable.DEFAULT;
 	private Searchable searchable = Searchable.DEFAULT;
