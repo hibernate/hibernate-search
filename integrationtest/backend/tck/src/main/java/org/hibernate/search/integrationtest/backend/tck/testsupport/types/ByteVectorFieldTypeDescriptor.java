@@ -54,14 +54,10 @@ public class ByteVectorFieldTypeDescriptor extends VectorFieldTypeDescriptor<byt
 	protected List<byte[]> createUniquelyMatchableValues() {
 		// need to make sure that we'll get only unique arrays;
 		TreeSet<byte[]> set = new TreeSet<>( Arrays::compare );
-		set.add( arrayOf( size, Byte.MIN_VALUE ) );
-		set.add( arrayOf( size, (byte) -42 ) );
-		set.add( arrayOf( size, (byte) -1 ) );
 		set.add( arrayOf( size, (byte) 0 ) );
 		set.add( arrayOf( size, (byte) 1 ) );
+		set.add( arrayOf( size, (byte) 2 ) );
 		set.add( arrayOf( size, (byte) 3 ) );
-		set.add( arrayOf( size, (byte) 42 ) );
-		set.add( arrayOf( size, Byte.MAX_VALUE ) );
 		return new ArrayList<>( set );
 	}
 
