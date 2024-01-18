@@ -28,6 +28,7 @@ import org.hibernate.search.backend.elasticsearch.lowlevel.index.mapping.impl.Na
 import org.hibernate.search.backend.elasticsearch.lowlevel.index.mapping.impl.RootTypeMapping;
 import org.hibernate.search.backend.elasticsearch.lowlevel.index.mapping.impl.RoutingType;
 import org.hibernate.search.backend.elasticsearch.lowlevel.index.settings.impl.IndexSettings;
+import org.hibernate.search.backend.elasticsearch.lowlevel.index.settings.impl.PropertyMappingIndexSettingsContributor;
 import org.hibernate.search.backend.elasticsearch.types.dsl.ElasticsearchIndexFieldTypeFactory;
 import org.hibernate.search.backend.elasticsearch.types.dsl.provider.impl.ElasticsearchIndexFieldTypeFactoryProvider;
 import org.hibernate.search.backend.elasticsearch.types.impl.ElasticsearchIndexCompositeNodeType;
@@ -139,6 +140,8 @@ public class ElasticsearchIndexRootBuilder extends AbstractElasticsearchIndexCom
 		Map<String, ElasticsearchIndexField> staticFields = new HashMap<>();
 		List<AbstractElasticsearchIndexFieldTemplate<?>> fieldTemplates = new ArrayList<>();
 
+		PropertyMappingIndexSettingsContributor propertyMappingIndexSettingsContributor =
+				new PropertyMappingIndexSettingsContributor();
 		ElasticsearchIndexNodeCollector collector = new ElasticsearchIndexNodeCollector() {
 			@Override
 			public void collect(String absolutePath, ElasticsearchIndexObjectField node) {
@@ -163,6 +166,11 @@ public class ElasticsearchIndexRootBuilder extends AbstractElasticsearchIndexCom
 			@Override
 			public void collect(NamedDynamicTemplate templateForMapping) {
 				mapping.addDynamicTemplate( templateForMapping );
+			}
+
+			@Override
+			public PropertyMappingIndexSettingsContributor propertyMappingIndexSettingsContributor() {
+				return propertyMappingIndexSettingsContributor;
 			}
 		};
 
@@ -199,7 +207,8 @@ public class ElasticsearchIndexRootBuilder extends AbstractElasticsearchIndexCom
 
 		return new ElasticsearchIndexModel( indexNames, mappedTypeName, identifier,
 				rootNode, staticFields, fieldTemplates,
-				analysisDefinitionRegistry, customIndexSettings, mapping, customIndexMapping );
+				analysisDefinitionRegistry, propertyMappingIndexSettingsContributor, customIndexSettings, mapping,
+				customIndexMapping );
 	}
 
 	@Override

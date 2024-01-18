@@ -6,8 +6,12 @@
  */
 package org.hibernate.search.backend.elasticsearch.types.impl;
 
+import java.util.Optional;
+import java.util.function.Consumer;
+
 import org.hibernate.search.backend.elasticsearch.lowlevel.index.mapping.impl.DataTypes;
 import org.hibernate.search.backend.elasticsearch.lowlevel.index.mapping.impl.PropertyMapping;
+import org.hibernate.search.backend.elasticsearch.lowlevel.index.settings.impl.PropertyMappingIndexSettingsContributor;
 import org.hibernate.search.backend.elasticsearch.search.common.impl.ElasticsearchSearchIndexScope;
 import org.hibernate.search.backend.elasticsearch.search.common.impl.ElasticsearchSearchIndexValueFieldContext;
 import org.hibernate.search.backend.elasticsearch.search.common.impl.ElasticsearchSearchIndexValueFieldTypeContext;
@@ -26,11 +30,14 @@ public class ElasticsearchIndexValueFieldType<F>
 	private final ElasticsearchFieldCodec<F> codec;
 	private final PropertyMapping mapping;
 
+	private final Consumer<PropertyMappingIndexSettingsContributor> indexSettingsContributor;
+
 	public ElasticsearchIndexValueFieldType(Builder<F> builder) {
 		super( builder );
 		this.elasticsearchTypeAsJson = builder.elasticsearchTypeAsJson();
 		this.codec = builder.codec;
 		this.mapping = builder.mapping;
+		this.indexSettingsContributor = builder.indexSettingsContributor;
 	}
 
 	@Override
@@ -51,6 +58,10 @@ public class ElasticsearchIndexValueFieldType<F>
 		return mapping;
 	}
 
+	public Optional<Consumer<PropertyMappingIndexSettingsContributor>> additionalIndexSettings() {
+		return Optional.ofNullable( indexSettingsContributor );
+	}
+
 	public static class Builder<F>
 			extends AbstractIndexValueFieldType.Builder<
 					ElasticsearchSearchIndexScope<?>,
@@ -59,6 +70,7 @@ public class ElasticsearchIndexValueFieldType<F>
 
 		private ElasticsearchFieldCodec<F> codec;
 		private final PropertyMapping mapping;
+		private Consumer<PropertyMappingIndexSettingsContributor> indexSettingsContributor;
 
 		public Builder(Class<F> valueType, PropertyMapping mapping) {
 			super( valueType );
@@ -75,6 +87,11 @@ public class ElasticsearchIndexValueFieldType<F>
 
 		public PropertyMapping mapping() {
 			return mapping;
+		}
+
+		public void contributeAdditionalIndexSettings(
+				Consumer<PropertyMappingIndexSettingsContributor> indexSettingsContributor) {
+			this.indexSettingsContributor = indexSettingsContributor;
 		}
 
 		@Override

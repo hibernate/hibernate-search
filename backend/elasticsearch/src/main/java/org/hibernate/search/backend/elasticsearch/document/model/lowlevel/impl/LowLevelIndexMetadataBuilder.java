@@ -18,6 +18,7 @@ import org.hibernate.search.backend.elasticsearch.lowlevel.index.impl.IndexMetad
 import org.hibernate.search.backend.elasticsearch.lowlevel.index.mapping.impl.RootTypeMapping;
 import org.hibernate.search.backend.elasticsearch.lowlevel.index.settings.impl.Analysis;
 import org.hibernate.search.backend.elasticsearch.lowlevel.index.settings.impl.IndexSettings;
+import org.hibernate.search.backend.elasticsearch.lowlevel.index.settings.impl.PropertyMappingIndexSettingsContributor;
 import org.hibernate.search.backend.elasticsearch.lowlevel.syntax.metadata.impl.ElasticsearchIndexMetadataSyntax;
 
 public class LowLevelIndexMetadataBuilder {
@@ -25,6 +26,7 @@ public class LowLevelIndexMetadataBuilder {
 	private final GsonProvider gsonProvider;
 	private final ElasticsearchIndexMetadataSyntax syntax;
 	private final IndexNames indexNames;
+	private PropertyMappingIndexSettingsContributor propertyMappingIndexSettingsContributor;
 	private ElasticsearchAnalysisDefinitionRegistry analysisDefinitionRegistry;
 	private IndexSettings customIndexSettings;
 	private RootTypeMapping mapping;
@@ -43,6 +45,11 @@ public class LowLevelIndexMetadataBuilder {
 
 	public void setCustomIndexSettings(IndexSettings customIndexSettings) {
 		this.customIndexSettings = customIndexSettings;
+	}
+
+	public void setPropertyMappingIndexSettingsContributor(
+			PropertyMappingIndexSettingsContributor propertyMappingIndexSettingsContributor) {
+		this.propertyMappingIndexSettingsContributor = propertyMappingIndexSettingsContributor;
 	}
 
 	public void setMapping(RootTypeMapping mapping) {
@@ -76,6 +83,10 @@ public class LowLevelIndexMetadataBuilder {
 
 	private IndexSettings buildSettings() {
 		IndexSettings settings = new IndexSettings();
+
+		if ( propertyMappingIndexSettingsContributor != null ) {
+			propertyMappingIndexSettingsContributor.contribute( settings );
+		}
 
 		if ( !analysisDefinitionRegistry.getAnalyzerDefinitions().isEmpty() ) {
 			getAnalysis( settings ).setAnalyzers( analysisDefinitionRegistry.getAnalyzerDefinitions() );

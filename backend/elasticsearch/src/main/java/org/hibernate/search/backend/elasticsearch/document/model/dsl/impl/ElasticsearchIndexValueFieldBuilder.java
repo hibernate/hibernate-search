@@ -89,6 +89,7 @@ class ElasticsearchIndexValueFieldBuilder<F>
 
 		if ( TreeNodeInclusion.INCLUDED.equals( fieldNode.inclusion() ) ) {
 			parentMapping.addProperty( relativeFieldName, type.mapping() );
+			type.additionalIndexSettings().ifPresent( c -> c.accept( collector.propertyMappingIndexSettingsContributor() ) );
 		}
 
 		reference.setSchemaNode( fieldNode );
