@@ -11,6 +11,7 @@ import org.hibernate.search.backend.elasticsearch.document.model.impl.Elasticsea
 import org.hibernate.search.backend.elasticsearch.document.model.impl.ElasticsearchIndexValueField;
 import org.hibernate.search.backend.elasticsearch.document.model.impl.ElasticsearchIndexValueFieldTemplate;
 import org.hibernate.search.backend.elasticsearch.lowlevel.index.mapping.impl.NamedDynamicTemplate;
+import org.hibernate.search.backend.elasticsearch.lowlevel.index.settings.impl.PropertyMappingIndexSettingsContributor;
 
 public interface ElasticsearchIndexNodeCollector {
 
@@ -23,5 +24,7 @@ public interface ElasticsearchIndexNodeCollector {
 	void collect(ElasticsearchIndexValueFieldTemplate template);
 
 	void collect(NamedDynamicTemplate templateForMapping);
+
+	PropertyMappingIndexSettingsContributor propertyMappingIndexSettingsContributor();
 
 }

@@ -393,7 +393,12 @@ class ElasticsearchIndexSchemaManagerValidationMappingBaseIT {
 					.toReference();
 		} );
 
-		elasticSearchClient.index( index.name() ).deleteAndCreate();
+		if ( ElasticsearchDistributionName.ELASTIC.equals( ElasticsearchTestDialect.getActualVersion().distribution() ) ) {
+			elasticSearchClient.index( index.name() ).deleteAndCreate();
+		}
+		else {
+			elasticSearchClient.index( index.name() ).deleteAndCreate( "index", "{ 'knn': true }" );
+		}
 		elasticSearchClient.index( index.name() ).type().putMapping(
 				simpleMappingForInitialization(
 						"'vector': "
@@ -422,7 +427,12 @@ class ElasticsearchIndexSchemaManagerValidationMappingBaseIT {
 					.toReference();
 		} );
 
-		elasticSearchClient.index( index.name() ).deleteAndCreate();
+		if ( ElasticsearchDistributionName.ELASTIC.equals( ElasticsearchTestDialect.getActualVersion().distribution() ) ) {
+			elasticSearchClient.index( index.name() ).deleteAndCreate();
+		}
+		else {
+			elasticSearchClient.index( index.name() ).deleteAndCreate( "index", "{ 'knn': true }" );
+		}
 		elasticSearchClient.index( index.name() ).type().putMapping(
 				simpleMappingForInitialization(
 						"'vector': "
@@ -450,7 +460,12 @@ class ElasticsearchIndexSchemaManagerValidationMappingBaseIT {
 			root.field( "vectorF", f -> f.asFloatVector().dimension( 2 ) ).toReference();
 		} );
 
-		elasticSearchClient.index( index.name() ).deleteAndCreate();
+		if ( ElasticsearchDistributionName.ELASTIC.equals( ElasticsearchTestDialect.getActualVersion().distribution() ) ) {
+			elasticSearchClient.index( index.name() ).deleteAndCreate();
+		}
+		else {
+			elasticSearchClient.index( index.name() ).deleteAndCreate( "index", "{ 'knn': true }" );
+		}
 		elasticSearchClient.index( index.name() ).type().putMapping(
 				simpleMappingForInitialization(
 						"'vectorB': "
@@ -488,7 +503,12 @@ class ElasticsearchIndexSchemaManagerValidationMappingBaseIT {
 			root.field( "vectorF", f -> f.asFloatVector().dimension( 2 ) ).toReference();
 		} );
 
-		elasticSearchClient.index( index.name() ).deleteAndCreate();
+		if ( ElasticsearchDistributionName.ELASTIC.equals( ElasticsearchTestDialect.getActualVersion().distribution() ) ) {
+			elasticSearchClient.index( index.name() ).deleteAndCreate();
+		}
+		else {
+			elasticSearchClient.index( index.name() ).deleteAndCreate( "index", "{ 'knn': true }" );
+		}
 		elasticSearchClient.index( index.name() ).type().putMapping(
 				simpleMappingForInitialization(
 						"'vectorF': "
@@ -533,7 +553,13 @@ class ElasticsearchIndexSchemaManagerValidationMappingBaseIT {
 
 		String l2 = elasticSearchClient.getDialect().vectorSimilarity( VectorSimilarity.L2 );
 		String cosine = elasticSearchClient.getDialect().vectorSimilarity( VectorSimilarity.COSINE );
-		elasticSearchClient.index( index.name() ).deleteAndCreate();
+		if ( ElasticsearchDistributionName.ELASTIC.equals( ElasticsearchTestDialect.getActualVersion().distribution() ) ) {
+			elasticSearchClient.index( index.name() ).deleteAndCreate();
+		}
+		else {
+			elasticSearchClient.index( index.name() ).deleteAndCreate( "index", "{ 'knn': true }" );
+		}
+
 		elasticSearchClient.index( index.name() ).type().putMapping(
 				simpleMappingForInitialization(
 						"'vectorF': "
@@ -585,7 +611,12 @@ class ElasticsearchIndexSchemaManagerValidationMappingBaseIT {
 			root.field( "vectorF", f -> f.asFloatVector().dimension( 2 ).efConstruction( 5 ).m( 50 ) ).toReference();
 		} );
 
-		elasticSearchClient.index( index.name() ).deleteAndCreate();
+		if ( ElasticsearchDistributionName.ELASTIC.equals( ElasticsearchTestDialect.getActualVersion().distribution() ) ) {
+			elasticSearchClient.index( index.name() ).deleteAndCreate();
+		}
+		else {
+			elasticSearchClient.index( index.name() ).deleteAndCreate( "index", "{ 'knn': true }" );
+		}
 		elasticSearchClient.index( index.name() ).type().putMapping(
 				simpleMappingForInitialization(
 						"'vectorF': "

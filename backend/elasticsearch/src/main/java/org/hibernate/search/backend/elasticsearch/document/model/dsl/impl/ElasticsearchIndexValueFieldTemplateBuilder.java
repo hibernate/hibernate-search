@@ -49,6 +49,7 @@ class ElasticsearchIndexValueFieldTemplateBuilder
 			NamedDynamicTemplate namedDynamicTemplate = new NamedDynamicTemplate( absolutePath, dynamicTemplate );
 
 			collector.collect( namedDynamicTemplate );
+			type.additionalIndexSettings().ifPresent( c -> c.accept( collector.propertyMappingIndexSettingsContributor() ) );
 		}
 	}
 

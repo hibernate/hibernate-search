@@ -42,6 +42,11 @@ public class IndexSettingsValidator implements Validator<IndexSettings> {
 				IndexSettings.MAX_RESULT_WINDOW_DEFAULT
 		);
 
+		LeafValidators.EQUAL.validate(
+				errorCollector, ValidationContextType.CUSTOM_INDEX_SETTINGS_ATTRIBUTE,
+				IndexSettings.KNN_ATTRIBUTE, expected.getKnn(), actual.getKnn()
+		);
+
 		extraAttributeValidator.validateAllIgnoreUnexpected(
 				errorCollector, ValidationContextType.CUSTOM_INDEX_SETTINGS_ATTRIBUTE,
 				ElasticsearchValidationMessages.INSTANCE.customIndexSettingAttributeMissing(),

@@ -14,6 +14,7 @@ import org.hibernate.search.backend.elasticsearch.document.model.lowlevel.impl.L
 import org.hibernate.search.backend.elasticsearch.index.layout.impl.IndexNames;
 import org.hibernate.search.backend.elasticsearch.lowlevel.index.mapping.impl.RootTypeMapping;
 import org.hibernate.search.backend.elasticsearch.lowlevel.index.settings.impl.IndexSettings;
+import org.hibernate.search.backend.elasticsearch.lowlevel.index.settings.impl.PropertyMappingIndexSettingsContributor;
 import org.hibernate.search.backend.elasticsearch.metamodel.ElasticsearchIndexDescriptor;
 import org.hibernate.search.backend.elasticsearch.search.common.impl.ElasticsearchSearchIndexContext;
 import org.hibernate.search.engine.backend.document.model.spi.AbstractIndexModel;
@@ -26,6 +27,7 @@ public class ElasticsearchIndexModel
 	private final IndexNames names;
 
 	private final ElasticsearchAnalysisDefinitionRegistry analysisDefinitionRegistry;
+	private final PropertyMappingIndexSettingsContributor propertyMappingIndexSettingsContributor;
 	private final IndexSettings customIndexSettings;
 	private final RootTypeMapping mapping;
 	private final RootTypeMapping customMapping;
@@ -34,11 +36,14 @@ public class ElasticsearchIndexModel
 			IndexIdentifier identifier,
 			ElasticsearchIndexRoot rootNode, Map<String, ElasticsearchIndexField> staticFields,
 			List<AbstractElasticsearchIndexFieldTemplate<?>> fieldTemplates,
-			ElasticsearchAnalysisDefinitionRegistry analysisDefinitionRegistry, IndexSettings customIndexSettings,
+			ElasticsearchAnalysisDefinitionRegistry analysisDefinitionRegistry,
+			PropertyMappingIndexSettingsContributor propertyMappingIndexSettingsContributor,
+			IndexSettings customIndexSettings,
 			RootTypeMapping mapping, RootTypeMapping customMapping) {
 		super( names.hibernateSearchIndex(), mappedTypeName, identifier, rootNode, staticFields, fieldTemplates );
 		this.names = names;
 		this.analysisDefinitionRegistry = analysisDefinitionRegistry;
+		this.propertyMappingIndexSettingsContributor = propertyMappingIndexSettingsContributor;
 		this.customIndexSettings = customIndexSettings;
 		this.mapping = mapping;
 		this.customMapping = customMapping;
@@ -67,6 +72,7 @@ public class ElasticsearchIndexModel
 	}
 
 	public void contributeLowLevelMetadata(LowLevelIndexMetadataBuilder builder) {
+		builder.setPropertyMappingIndexSettingsContributor( propertyMappingIndexSettingsContributor );
 		builder.setAnalysisDefinitionRegistry( analysisDefinitionRegistry );
 		builder.setCustomIndexSettings( customIndexSettings );
 		builder.setMapping( mapping );

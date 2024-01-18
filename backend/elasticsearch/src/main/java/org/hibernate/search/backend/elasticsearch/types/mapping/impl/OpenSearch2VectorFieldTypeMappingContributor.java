@@ -62,6 +62,8 @@ public class OpenSearch2VectorFieldTypeMappingContributor implements Elasticsear
 	public <F> void contribute(ElasticsearchIndexValueFieldType.Builder<F> builder, Context context) {
 		builder.queryElementFactory( PredicateTypeKeys.KNN,
 				new ElasticsearchKnnPredicate.OpenSearchFactory<>( builder.codec() ) );
+
+		builder.contributeAdditionalIndexSettings( settings -> settings.addKnn( true ) );
 	}
 
 	private static String resolveDefault(VectorSimilarity vectorSimilarity) {
