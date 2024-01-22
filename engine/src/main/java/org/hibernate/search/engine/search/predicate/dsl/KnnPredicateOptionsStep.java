@@ -13,22 +13,22 @@ import org.hibernate.search.engine.search.predicate.SearchPredicate;
 /**
  * The final step in a "knn" predicate definition, where optional parameters can be set.
  */
-public interface KnnPredicateOptionsStep<S extends KnnPredicateOptionsStep<?>>
-		extends PredicateScoreStep<S>, PredicateFinalStep {
+public interface KnnPredicateOptionsStep
+		extends PredicateScoreStep<KnnPredicateOptionsStep>, PredicateFinalStep {
 
-	S filter(SearchPredicate searchPredicate);
+	KnnPredicateOptionsStep filter(SearchPredicate searchPredicate);
 
-	default S filter(PredicateFinalStep searchPredicate) {
+	default KnnPredicateOptionsStep filter(PredicateFinalStep searchPredicate) {
 		return filter( searchPredicate.toPredicate() );
 	}
 
-	S filter(Function<? super SearchPredicateFactory, ? extends PredicateFinalStep> clauseContributor);
+	KnnPredicateOptionsStep filter(Function<? super SearchPredicateFactory, ? extends PredicateFinalStep> clauseContributor);
 
 	/**
 	 * @param similarity A similarity limit: documents with vectors distance to which, according to the configured similarity function,
 	 * is further than this limit will be filtered out from the results.
 	 * @return {@code this}, for method chaining.
 	 */
-	S requiredMinimumSimilarity(float similarity);
+	KnnPredicateOptionsStep requiredMinimumSimilarity(float similarity);
 
 }

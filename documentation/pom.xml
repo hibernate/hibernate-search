@@ -297,6 +297,7 @@
                         <elasticsearchTestedVersions>${version.org.elasticsearch.compatible.regularly-tested.text}</elasticsearchTestedVersions>
                         <elasticsearchOtherPotentiallyCompatibleVersions>${version.org.elasticsearch.compatible.not-regularly-tested.text}</elasticsearchOtherPotentiallyCompatibleVersions>
                         <openSearchUrl>https://www.opensearch.org</openSearchUrl>
+                        <openSearchDocUrl>${documentation.org.opensearch.url}</openSearchDocUrl>
                         <openSearchCompatibleVersions>${version.org.opensearch.compatible.expected.text}</openSearchCompatibleVersions>
                         <openSearchTestedVersions>${version.org.opensearch.compatible.regularly-tested.text}</openSearchTestedVersions>
                         <amazonOpenSearchServiceUrl>https://docs.aws.amazon.com/opensearch-service/latest/developerguide</amazonOpenSearchServiceUrl>

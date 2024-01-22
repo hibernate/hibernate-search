@@ -285,7 +285,7 @@ public interface SearchPredicateFactory {
 	 * @see KnnPredicateVectorStep
 	 * @see KnnPredicateOptionsStep
 	 */
-	KnnPredicateFieldStep<?> knn(int k);
+	KnnPredicateFieldStep knn(int k);
 
 	/**
 	 * Extend the current factory with the given extension,

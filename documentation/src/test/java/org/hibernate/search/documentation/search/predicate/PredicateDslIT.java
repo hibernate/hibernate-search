@@ -18,7 +18,6 @@ import java.util.function.Consumer;
 
 import jakarta.persistence.EntityManagerFactory;
 
-import org.hibernate.search.backend.elasticsearch.ElasticsearchExtension;
 import org.hibernate.search.documentation.testsupport.BackendConfigurations;
 import org.hibernate.search.documentation.testsupport.DocumentationSetupHelper;
 import org.hibernate.search.engine.backend.types.VectorSimilarity;
@@ -1206,32 +1205,6 @@ class PredicateDslIT {
 				assertThat( hits )
 						.extracting( Book::getId )
 						.containsExactlyInAnyOrder( BOOK1_ID, BOOK2_ID, BOOK3_ID );
-			} );
-		}
-
-
-		// numberOfCandidates is only applicable to an Elastic distribution of Elasticsearch:
-		if ( BackendConfiguration.isElasticsearch()
-				&& ElasticsearchTestDialect.isActualVersion(
-						es -> !es.isLessThan( "8.0" ),
-						os -> false,
-						aoss -> false
-				) ) {
-			withinSearchSession( searchSession -> {
-				// tag::knn-candidates[]
-				float[] coverImageEmbeddingsVector = /*...*/
-						// end::knn-candidates[]
-						floats( 128, 1.0f );
-				// tag::knn-candidates[]
-				List<Book> hits = searchSession.search( Book.class )
-						.where( f -> f.extension( ElasticsearchExtension.get() ) // <1>
-								.knn( 5 ).field( "coverImageEmbeddings" ).matching( coverImageEmbeddingsVector ) // <2>
-								.numberOfCandidates( 15 ) )// <3>
-						.fetchHits( 20 );
-				// end::knn-candidates[]
-				assertThat( hits )
-						.extracting( Book::getId )
-						.containsExactlyInAnyOrder( BOOK1_ID, BOOK2_ID, BOOK3_ID, BOOK4_ID );
 			} );
 		}
 

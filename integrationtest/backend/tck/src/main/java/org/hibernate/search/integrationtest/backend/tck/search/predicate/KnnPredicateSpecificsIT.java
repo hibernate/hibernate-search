@@ -224,7 +224,7 @@ class KnnPredicateSpecificsIT {
 			}
 		}
 
-		protected KnnPredicateOptionsStep<?> tryPredicateWrongLength(SearchPredicateFactory f, String fieldPath,
+		protected KnnPredicateOptionsStep tryPredicateWrongLength(SearchPredicateFactory f, String fieldPath,
 				VectorFieldTypeDescriptor<?> fieldType) {
 			if ( fieldType.getJavaType() == byte[].class ) {
 				return f.knn( 1 ).field( fieldPath ).matching( new byte[fieldType.vectorSize() * 2] );
@@ -390,7 +390,7 @@ class KnnPredicateSpecificsIT {
 					);
 		}
 
-		protected KnnPredicateOptionsStep<?> predicate(SearchPredicateFactory f, String fieldPath,
+		protected KnnPredicateOptionsStep predicate(SearchPredicateFactory f, String fieldPath,
 				VectorFieldTypeDescriptor<?> fieldType) {
 			if ( fieldType.getJavaType() == byte[].class ) {
 				return f.knn( 1 ).field( fieldPath ).matching( (byte) 1, (byte) 1 );
@@ -512,7 +512,7 @@ class KnnPredicateSpecificsIT {
 					.hasSize( 2 );
 		}
 
-		protected KnnPredicateOptionsStep<?> predicate(SearchPredicateFactory f, String fieldPath,
+		protected KnnPredicateOptionsStep predicate(SearchPredicateFactory f, String fieldPath,
 				VectorFieldTypeDescriptor<?> fieldType) {
 			if ( fieldType.getJavaType() == byte[].class ) {
 				return f.knn( 2 ).field( fieldPath ).matching( (byte) 1, (byte) 0, (byte) 0, (byte) 0 );
