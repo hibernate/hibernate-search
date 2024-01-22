@@ -98,7 +98,8 @@ class KnnPredicateSpecificsIT {
 			indexes.add( VectorSimilarityConfigured.indexCosine );
 		}
 
-		setupHelper.start().withIndexes( indexes ).setup();
+		setupHelper.start( tckBackendHelper -> tckBackendHelper.createHashBasedShardingBackendSetupStrategy( 1 ) )
+				.withIndexes( indexes ).setup();
 
 		List<BulkIndexer> bulkIndexers = new ArrayList<>();
 
