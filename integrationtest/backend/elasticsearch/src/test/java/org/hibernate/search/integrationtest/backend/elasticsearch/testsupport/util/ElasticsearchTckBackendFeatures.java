@@ -297,4 +297,13 @@ public class ElasticsearchTckBackendFeatures extends TckBackendFeatures {
 				return true;
 		}
 	}
+
+	@Override
+	public boolean supportsVectorSearchKPerShard() {
+		return isActualVersion(
+				es -> false,
+				os -> true,
+				aoss -> true
+		);
+	}
 }

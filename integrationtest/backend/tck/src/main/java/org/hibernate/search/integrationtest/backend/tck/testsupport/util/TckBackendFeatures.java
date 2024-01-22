@@ -152,4 +152,8 @@ public abstract class TckBackendFeatures implements StubMappingBackendFeatures {
 	public boolean supportsSimilarity(VectorSimilarity vectorSimilarity) {
 		return true;
 	}
+
+	public boolean supportsVectorSearchKPerShard() {
+		return false;
+	}
 }
