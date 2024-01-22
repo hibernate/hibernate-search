@@ -10,6 +10,7 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import org.hibernate.FlushMode;
 import org.hibernate.engine.spi.SessionFactoryImplementor;
@@ -37,11 +38,13 @@ public abstract class AbstractHibernateOrmLoadingStrategy<E, I>
 		implements HibernateOrmEntityLoadingStrategy<E, I> {
 
 	protected final String rootEntityName;
-	private final TypeQueryFactory<E, I> queryFactory;
+	protected final Class<I> uniquePropertyType;
+	protected final String uniquePropertyName;
 
-	AbstractHibernateOrmLoadingStrategy(String rootEntityName, TypeQueryFactory<E, I> queryFactory) {
+	AbstractHibernateOrmLoadingStrategy(String rootEntityName, Class<I> uniquePropertyType, String uniquePropertyName) {
 		this.rootEntityName = rootEntityName;
-		this.queryFactory = queryFactory;
+		this.uniquePropertyType = uniquePropertyType;
+		this.uniquePropertyName = uniquePropertyName;
 	}
 
 	@Override
@@ -135,9 +138,14 @@ public abstract class AbstractHibernateOrmLoadingStrategy<E, I>
 	public HibernateOrmQueryLoader<E, I> createQueryLoader(SessionFactoryImplementor sessionFactory,
 			Set<? extends PojoLoadingTypeContext<? extends E>> typeContexts,
 			List<ConditionalExpression> conditionalExpressions, String order) {
-		var rootEntityMappingType = HibernateOrmUtils.entityMappingType( sessionFactory, rootEntityName );
+
+		EntityMappingType commonSuperType = toMostSpecificCommonEntitySuperType( sessionFactory, typeContexts );
+		if ( commonSuperType == null ) {
+			throw invalidTypesException( typeContexts );
+		}
+
 		Set<Class<? extends E>> includedTypesFilter;
-		if ( HibernateOrmUtils.targetsAllConcreteSubTypes( sessionFactory, rootEntityMappingType, typeContexts ) ) {
+		if ( HibernateOrmUtils.targetsAllConcreteSubTypes( sessionFactory, commonSuperType, typeContexts ) ) {
 			// All concrete types are included, no need to filter by type.
 			includedTypesFilter = Collections.emptySet();
 		}
@@ -148,6 +156,8 @@ public abstract class AbstractHibernateOrmLoadingStrategy<E, I>
 			}
 		}
 
+		TypeQueryFactory<E, I> actualQueryFactory = createFactory( commonSuperType );
+
 		if ( !conditionalExpressions.isEmpty() || order != null ) {
 			if ( typeContexts.size() != 1 ) {
 				// TODO HSEARCH-4252 Apply a condition to multiple types in the same query
@@ -156,10 +166,48 @@ public abstract class AbstractHibernateOrmLoadingStrategy<E, I>
 
 			EntityMappingType entityMappingType = HibernateOrmUtils.entityMappingType( sessionFactory,
 					typeContexts.iterator().next().secondaryEntityName() );
-			return new HibernateOrmQueryLoaderImpl<>( queryFactory, entityMappingType,
+			return new HibernateOrmQueryLoaderImpl<>( actualQueryFactory, entityMappingType,
 					includedTypesFilter, conditionalExpressions, order );
 		}
-		return new HibernateOrmQueryLoaderImpl<>( queryFactory, includedTypesFilter );
+		return new HibernateOrmQueryLoaderImpl<>( actualQueryFactory, includedTypesFilter );
+	}
+
+	protected abstract TypeQueryFactory<E, I> createFactory(Class<E> entityClass, String ormEntityName,
+			Class<I> uniquePropertyType, String uniquePropertyName);
+
+	@SuppressWarnings("unchecked")
+	protected TypeQueryFactory<E, I> createFactory(EntityMappingType entityMappingType) {
+		return createFactory( (Class<E>) entityMappingType.getJavaType().getJavaTypeClass(), entityMappingType.getEntityName(),
+				uniquePropertyType, uniquePropertyName );
+	}
+
+	protected static EntityMappingType toMostSpecificCommonEntitySuperType(
+			SessionFactoryImplementor sessionFactory,
+			Iterable<? extends PojoLoadingTypeContext<?>> targetEntityTypeContexts) {
+		EntityMappingType result = null;
+		for ( PojoLoadingTypeContext<?> targetTypeContext : targetEntityTypeContexts ) {
+			EntityMappingType type = HibernateOrmUtils.entityMappingType( sessionFactory,
+					targetTypeContext.secondaryEntityName() );
+			if ( result == null ) {
+				result = type;
+			}
+			else {
+				result = HibernateOrmUtils.toMostSpecificCommonEntitySuperType( result, type );
+			}
+		}
+		return result;
+	}
+
+	protected org.hibernate.AssertionFailure invalidTypesException(
+			Set<? extends PojoLoadingTypeContext<?>> targetEntityTypeContexts) {
+		return new org.hibernate.AssertionFailure(
+				"Some types among the targeted entity types are not subclasses of the expected root entity type."
+						+ " Expected entity name: " + rootEntityName
+						+ " Targeted entity names: "
+						+ targetEntityTypeContexts.stream()
+								.map( PojoLoadingTypeContext::secondaryEntityName )
+								.collect( Collectors.toUnmodifiableList() )
+		);
 	}
 
 }

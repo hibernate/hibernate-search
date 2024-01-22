@@ -42,28 +42,29 @@ public class HibernateOrmNonEntityIdPropertyEntityLoadingStrategy<E, I>
 			Class<I> documentIdSourcePropertyClass, String documentIdSourcePropertyName,
 			ValueReadHandle<? extends I> documentIdSourceHandle) {
 		var idProperty = persistentClass.getIdentifierProperty();
-		TypeQueryFactory<E, I> queryFactory = TypeQueryFactory.create( mappedClass, persistentClass.getEntityName(),
-				documentIdSourcePropertyClass, documentIdSourcePropertyName,
-				idProperty != null && documentIdSourcePropertyName.equals( idProperty.getName() ) );
-		return new HibernateOrmNonEntityIdPropertyEntityLoadingStrategy<>( persistentClass.getRootClass().getEntityName(),
-				persistentClass.getEntityName(), queryFactory,
-				documentIdSourcePropertyName, documentIdSourceHandle );
+		return new HibernateOrmNonEntityIdPropertyEntityLoadingStrategy<>(
+				persistentClass.getRootClass().getEntityName(),
+				persistentClass.getEntityName(), documentIdSourcePropertyClass, documentIdSourcePropertyName,
+				idProperty != null && documentIdSourcePropertyName.equals( idProperty.getName() ),
+				documentIdSourceHandle
+		);
 	}
 
 	private final String entityName;
-	private final TypeQueryFactory<E, I> queryFactory;
 	private final String documentIdSourcePropertyName;
 	private final ValueReadHandle<? extends I> documentIdSourceHandle;
+	private final boolean uniquePropertyIsTheEntityId;
 
 	private HibernateOrmNonEntityIdPropertyEntityLoadingStrategy(String rootEntityName, String entityName,
-			TypeQueryFactory<E, I> queryFactory,
+			Class<I> documentIdSourcePropertyType,
 			String documentIdSourcePropertyName,
+			boolean uniquePropertyIsTheEntityId,
 			ValueReadHandle<? extends I> documentIdSourceHandle) {
-		super( rootEntityName, queryFactory );
+		super( rootEntityName, documentIdSourcePropertyType, documentIdSourcePropertyName );
 		this.entityName = entityName;
-		this.queryFactory = queryFactory;
 		this.documentIdSourcePropertyName = documentIdSourcePropertyName;
 		this.documentIdSourceHandle = documentIdSourceHandle;
+		this.uniquePropertyIsTheEntityId = uniquePropertyIsTheEntityId;
 	}
 
 	@Override
@@ -97,6 +98,13 @@ public class HibernateOrmNonEntityIdPropertyEntityLoadingStrategy<E, I>
 				loadingContext.cacheLookupStrategy(), loadingContext.loadingOptions() );
 	}
 
+	@Override
+	protected TypeQueryFactory<E, I> createFactory(Class<E> entityClass, String ormEntityName,
+			Class<I> uniquePropertyType, String uniquePropertyName) {
+		return TypeQueryFactory.create(
+				entityClass, ormEntityName, uniquePropertyType, uniquePropertyName, uniquePropertyIsTheEntityId );
+	}
+
 	private PojoSelectionEntityLoader<E> doCreate(PojoLoadingTypeContext<? extends E> targetEntityTypeContext,
 			HibernateOrmLoadingSessionContext sessionContext,
 			EntityLoadingCacheLookupStrategy cacheLookupStrategy,
@@ -116,7 +124,7 @@ public class HibernateOrmNonEntityIdPropertyEntityLoadingStrategy<E, I>
 		@SuppressWarnings("unchecked")
 		PojoSelectionEntityLoader<E> result = new HibernateOrmSelectionEntityByNonIdPropertyLoader<>(
 				entityMapping, (PojoLoadingTypeContext<E>) targetEntityTypeContext,
-				queryFactory,
+				createFactory( entityMapping ),
 				documentIdSourcePropertyName, documentIdSourceHandle,
 				sessionContext, loadingOptions
 		);
