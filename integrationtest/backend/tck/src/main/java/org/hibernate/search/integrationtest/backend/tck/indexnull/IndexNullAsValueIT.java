@@ -123,7 +123,11 @@ class IndexNullAsValueIT {
 	}
 
 	private void setUp() {
-		setupHelper.start().withIndexes( index ).setup();
+		// We want to have a single shard here, since we are using a `knn` predicate in some tests based on this setup.
+		//  While these tests do not create a lot of documents (3) it's still probably better to keep it safe and let
+		//  those knn queries be executed against a single shard.
+		setupHelper.start( tckBackendHelper -> tckBackendHelper.createHashBasedShardingBackendSetupStrategy( 1 ) )
+				.withIndexes( index ).setup();
 
 		initData();
 	}

@@ -46,7 +46,7 @@ class KnnPredicateBaseIT {
 				TckConfiguration.get().getBackendFeatures().supportsVectorSearch(),
 				"These tests only make sense for a backend where Vector Search is supported and implemented."
 		);
-		setupHelper.start()
+		setupHelper.start( tckBackendHelper -> tckBackendHelper.createHashBasedShardingBackendSetupStrategy( 1 ) )
 				.withIndexes(
 						SingleFieldConfigured.index,
 						ScoreConfigured.index,
