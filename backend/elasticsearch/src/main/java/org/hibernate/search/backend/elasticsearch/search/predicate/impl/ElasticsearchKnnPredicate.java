@@ -16,7 +16,6 @@ import org.hibernate.search.backend.elasticsearch.logging.impl.Log;
 import org.hibernate.search.backend.elasticsearch.search.common.impl.AbstractElasticsearchCodecAwareSearchQueryElementFactory;
 import org.hibernate.search.backend.elasticsearch.search.common.impl.ElasticsearchSearchIndexScope;
 import org.hibernate.search.backend.elasticsearch.search.common.impl.ElasticsearchSearchIndexValueFieldContext;
-import org.hibernate.search.backend.elasticsearch.search.predicate.spi.ElasticsearchKnnPredicateBuilder;
 import org.hibernate.search.backend.elasticsearch.types.codec.impl.ElasticsearchFieldCodec;
 import org.hibernate.search.backend.elasticsearch.types.codec.impl.ElasticsearchVectorFieldCodec;
 import org.hibernate.search.engine.search.predicate.SearchPredicate;
@@ -34,7 +33,6 @@ public abstract class ElasticsearchKnnPredicate extends AbstractElasticsearchSin
 	protected final ElasticsearchSearchPredicate filter;
 	protected final int k;
 	protected final JsonArray vector;
-	protected final Integer numberOfCandidates;
 	protected final Float similarity;
 
 	private ElasticsearchKnnPredicate(AbstractKnnBuilder<?> builder) {
@@ -42,7 +40,6 @@ public abstract class ElasticsearchKnnPredicate extends AbstractElasticsearchSin
 		this.filter = builder.filter;
 		this.k = builder.k;
 		this.vector = builder.vector;
-		this.numberOfCandidates = builder.numberOfCandidates;
 		this.similarity = builder.similarity;
 		builder.filter = null;
 		builder.vector = null;
@@ -74,14 +71,13 @@ public abstract class ElasticsearchKnnPredicate extends AbstractElasticsearchSin
 		}
 	}
 
-	private abstract static class AbstractKnnBuilder<F> extends AbstractBuilder implements ElasticsearchKnnPredicateBuilder {
+	private abstract static class AbstractKnnBuilder<F> extends AbstractBuilder implements KnnPredicateBuilder {
 
 		private final Class<?> vectorElementsType;
 		private final int indexedVectorsDimension;
 		private int k;
 		private JsonArray vector;
 		private ElasticsearchSearchPredicate filter;
-		protected Integer numberOfCandidates;
 		protected Float similarity;
 
 		private AbstractKnnBuilder(ElasticsearchFieldCodec<F> codec, ElasticsearchSearchIndexScope<?> scope,
@@ -180,7 +176,7 @@ public abstract class ElasticsearchKnnPredicate extends AbstractElasticsearchSin
 				//   and in that case we are failing much faster for am Elasticsearch distribution...
 				FILTER_ACCESSOR.set( innerObject, query );
 			}
-			NUM_CANDIDATES_ACCESSOR.set( innerObject, numberOfCandidates != null ? numberOfCandidates : k );
+			NUM_CANDIDATES_ACCESSOR.set( innerObject, k );
 			QUERY_VECTOR_ACCESSOR.set( innerObject, vector );
 			if ( similarity != null ) {
 				SIMILARITY_ACCESSOR.set( innerObject, similarity );
@@ -200,11 +196,6 @@ public abstract class ElasticsearchKnnPredicate extends AbstractElasticsearchSin
 			private Builder(ElasticsearchFieldCodec<F> codec, ElasticsearchSearchIndexScope<?> scope,
 					ElasticsearchSearchIndexValueFieldContext<F> field) {
 				super( codec, scope, field );
-			}
-
-			@Override
-			public void numberOfCandidates(int numberOfCandidates) {
-				this.numberOfCandidates = numberOfCandidates;
 			}
 
 			@Override
@@ -255,11 +246,6 @@ public abstract class ElasticsearchKnnPredicate extends AbstractElasticsearchSin
 			protected Builder(ElasticsearchFieldCodec<F> codec, ElasticsearchSearchIndexScope<?> scope,
 					ElasticsearchSearchIndexValueFieldContext<F> field) {
 				super( codec, scope, field );
-			}
-
-			@Override
-			public void numberOfCandidates(int numberOfCandidates) {
-				throw log.knnNumberOfCandidatesUnsupportedOption();
 			}
 
 			@Override

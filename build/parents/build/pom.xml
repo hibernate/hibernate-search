@@ -51,8 +51,6 @@
         <!-- Use the latest open-source version here. Currently, low-level clients are open-source even in 8.5+ -->
         <version.org.elasticsearch.client>8.12.0</version.org.elasticsearch.client>
         <!-- The main compatible version of Elasticsearch, advertised by default. Used in documentation links. -->
-        <!-- When updating the following version you will likely need to update the test profiles as well,
-             to make sure the corresponding profile (e.g. elasticsearch-8.4) becomes the default. -->
         <version.org.elasticsearch.compatible.main>${version.org.elasticsearch.latest}</version.org.elasticsearch.compatible.main>
         <documentation.org.elasticsearch.url>https://www.elastic.co/guide/en/elasticsearch/reference/${parsed-version.org.elasticsearch.compatible.main.majorVersion}.${parsed-version.org.elasticsearch.compatible.main.minorVersion}</documentation.org.elasticsearch.url>
 
@@ -79,6 +77,9 @@
         <version.org.opensearch.compatible.expected.text>1.3 or 2.x</version.org.opensearch.compatible.expected.text>
         <!-- The latest version of OpenSearch tested against by default -->
         <version.org.opensearch.latest>2.11.0</version.org.opensearch.latest>
+        <!-- The main compatible version of OpenSearch, advertised by default. Used in documentation links. -->
+        <version.org.opensearch.compatible.main>${version.org.opensearch.latest}</version.org.opensearch.compatible.main>
+        <documentation.org.opensearch.url>https://opensearch.org/docs/${parsed-version.org.opensearch.compatible.main.majorVersion}.${parsed-version.org.opensearch.compatible.main.minorVersion}</documentation.org.opensearch.url>
 
         <version.com.google.code.gson>2.9.1</version.com.google.code.gson>
         <version.software.amazon.awssdk>2.23.3</version.software.amazon.awssdk>
@@ -1272,6 +1273,16 @@
                         <configuration>
                             <propertyPrefix>parsed-version.org.elasticsearch.compatible.main</propertyPrefix>
                             <versionString>${version.org.elasticsearch.compatible.main}</versionString>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>parse-opensearch-main-compatible-version</id>
+                        <goals>
+                            <goal>parse-version</goal>
+                        </goals>
+                        <configuration>
+                            <propertyPrefix>parsed-version.org.opensearch.compatible.main</propertyPrefix>
+                            <versionString>${version.org.opensearch.compatible.main}</versionString>
                         </configuration>
                     </execution>
                     <execution>

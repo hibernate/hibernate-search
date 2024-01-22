@@ -6,15 +6,12 @@
  */
 package org.hibernate.search.backend.elasticsearch.search.predicate.dsl.impl;
 
-import org.hibernate.search.backend.elasticsearch.search.predicate.dsl.ElasticsearchKnnPredicateOptionsStep;
 import org.hibernate.search.backend.elasticsearch.search.predicate.dsl.ElasticsearchSearchPredicateFactory;
 import org.hibernate.search.backend.elasticsearch.search.predicate.impl.ElasticsearchSearchPredicateIndexScope;
-import org.hibernate.search.engine.search.predicate.dsl.KnnPredicateFieldStep;
 import org.hibernate.search.engine.search.predicate.dsl.PredicateFinalStep;
 import org.hibernate.search.engine.search.predicate.dsl.spi.AbstractSearchPredicateFactory;
 import org.hibernate.search.engine.search.predicate.dsl.spi.SearchPredicateDslContext;
 import org.hibernate.search.engine.search.predicate.dsl.spi.StaticPredicateFinalStep;
-import org.hibernate.search.util.common.impl.Contracts;
 
 import com.google.gson.JsonObject;
 
@@ -43,11 +40,5 @@ public class ElasticsearchSearchPredicateFactoryImpl
 	@Override
 	public PredicateFinalStep fromJson(JsonObject jsonObject) {
 		return new StaticPredicateFinalStep( dslContext.scope().predicateBuilders().fromJson( jsonObject ) );
-	}
-
-	@Override
-	public KnnPredicateFieldStep<? extends ElasticsearchKnnPredicateOptionsStep<?>> knn(int k) {
-		Contracts.assertStrictlyPositive( k, "k" );
-		return new ElasticsearchKnnPredicateFieldStep( this, dslContext, k );
 	}
 }

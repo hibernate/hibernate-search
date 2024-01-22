@@ -12,11 +12,9 @@ import static org.junit.jupiter.api.Assumptions.assumeFalse;
 import static org.junit.jupiter.api.Assumptions.assumeTrue;
 
 import java.util.Arrays;
-import java.util.List;
 import java.util.Map;
 import java.util.function.Consumer;
 
-import org.hibernate.search.backend.elasticsearch.ElasticsearchExtension;
 import org.hibernate.search.engine.backend.document.IndexFieldReference;
 import org.hibernate.search.engine.backend.document.IndexObjectFieldReference;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaElement;
@@ -28,8 +26,6 @@ import org.hibernate.search.engine.backend.types.Sortable;
 import org.hibernate.search.engine.backend.types.VectorSimilarity;
 import org.hibernate.search.engine.search.aggregation.AggregationKey;
 import org.hibernate.search.engine.search.predicate.SearchPredicate;
-import org.hibernate.search.engine.search.projection.dsl.SearchProjectionFactory;
-import org.hibernate.search.engine.search.query.SearchQuery;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.TckConfiguration;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.extension.SearchSetupHelper;
 import org.hibernate.search.util.common.SearchException;
@@ -63,31 +59,6 @@ class ElasticsearchKnnPredicateSpecificsIT {
 		BulkIndexer exampleKnnSearchIndexer = index.bulkIndexer();
 		dataset.accept( exampleKnnSearchIndexer );
 		exampleKnnSearchIndexer.join();
-	}
-
-
-	@Test
-	void useElasticsearchSpecificKnnWithNumberOfCandidatesOption() {
-		assumeTrue(
-				TckConfiguration.get().getBackendFeatures().supportsVectorSearchNumberOfCandidates(),
-				"This test is only for an Elasticsearch distribution where we cannot add knn as a predicate inside other predicate."
-		);
-		int k = 3;
-		SearchQuery<Object> query = index.createScope().query()
-				.select(
-						SearchProjectionFactory::id
-				)
-				.where( f -> f.extension( ElasticsearchExtension.get() )
-						.knn( k )
-						.field( "location" )
-						.matching( 5f, 4f )
-						.numberOfCandidates( 123 )
-				).toQuery();
-
-		List<Object> result = query.fetchAll().hits();
-
-		assertThat( result ).hasSize( k )
-				.containsOnly( "ID:2", "ID:1", "ID:3" );
 	}
 
 	@Test

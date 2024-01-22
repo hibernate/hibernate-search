@@ -284,7 +284,7 @@ class KnnPredicateBaseIT {
 		}
 
 		@Override
-		protected KnnPredicateOptionsStep<?> predicate(SearchPredicateFactory f, String fieldPath, int matchingDocOrdinal,
+		protected KnnPredicateOptionsStep predicate(SearchPredicateFactory f, String fieldPath, int matchingDocOrdinal,
 				DataSet<?, KnnPredicateTestValues<F>> dataSet) {
 			return knnPredicateOptionsStep( f, fieldPath, matchingDocOrdinal,
 					dataSet.values.matchingArg( matchingDocOrdinal ) );
@@ -334,7 +334,7 @@ class KnnPredicateBaseIT {
 		return new KnnPredicateTestValues<>( fieldType );
 	}
 
-	private static <F> KnnPredicateOptionsStep<?> knnPredicateOptionsStep(SearchPredicateFactory f, String fieldPath,
+	private static <F> KnnPredicateOptionsStep knnPredicateOptionsStep(SearchPredicateFactory f, String fieldPath,
 			int matchingDocOrdinal, F matchingArg) {
 		if ( matchingArg instanceof byte[] ) {
 			return f.knn( 1 ).field( fieldPath ).matching( ( (byte[]) matchingArg ) );

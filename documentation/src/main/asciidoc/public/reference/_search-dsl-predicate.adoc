@@ -1566,6 +1566,18 @@ and trying to use it will lead to an exception being thrown.
 [[search-dsl-predicate-knn-limitations]]
 === Backend specifics and limitations
 
+The parameter `k` has different behavior between backends, and their distributions.
+
+With the <<backend-lucene,Lucene backend>> `k` is the number that will limit the final amount of documents
+matched by a <<search-dsl-predicate-knn,`knn` predicate>>.
+When using the <<backend-elasticsearch-compatibility-elasticsearch,Elastic>> distribution of the <<backend-elasticsearch,Elasticsearch backend>>
+`k` will be treated as both `k` and `num_candidates`.
+See the Elasticsearch link:{elasticsearchDocUrl}/knn-search.html#tune-approximate-knn-for-speed-accuracy[documentation] for more details.
+While when an <<backend-elasticsearch-compatibility-opensearch,OpenSearch>> distribution is used,
+`k` will be mapped to `k` attribute of `knn` query. Note that in this case you may get more than `k` results,
+when the index is configured to have more than one shard.
+See this section of the OpenSearch link:{openSearchDocUrl}/search-plugins/knn/approximate-knn/#get-started-with-approximate-k-nn[documentation] for more details.
+
 With the Elasticsearch backend and when using <<backend-elasticsearch-compatibility-elasticsearch,Elasticsearch>>,
 a `knn` predicate can only be added as a top-level predicate,
 i.e. a predicate directly passed to a where clause of a search query,
@@ -1584,25 +1596,6 @@ in particular to learn more about how Elasticsearch combines regular queries wit
 ----
 include::{sourcedir}/org/hibernate/search/documentation/search/predicate/PredicateDslIT.java[tags=knn-should]
 ----
-====
-
-The Elasticsearch backend, when using <<backend-elasticsearch-compatibility-elasticsearch,Elasticsearch>>,
-also allows configuring a backend-specific `knn` predicate option: the number of candidates.
-This option specifies a number of approximate nearest neighbor candidates to be found on each shard,
-then the results from each shard are merged and the top `k` are selected.
-When not specified explicitly, Hibernate Search will default the number of candidates value to `k`.
-See the Elasticsearch link:{elasticsearchDocUrl}/knn-search.html#tune-approximate-knn-for-speed-accuracy[documentation] for more details.
-<<backend-elasticsearch-compatibility-opensearch,OpenSearch>> does not expose this option.
-
-.Setting a number of candidates Elasticsearch-specific knn option
-====
-[source, JAVA, indent=0, subs="+callouts"]
-----
-include::{sourcedir}/org/hibernate/search/documentation/search/predicate/PredicateDslIT.java[tags=knn-candidates]
-----
-<1> Get an extended, Elasticsearch-specific, predicate factory.
-<2> Build a `knn` predicate as ususal.
-<3> Provide an Elasticsearch-specific predicate option.
 ====
 
 [[search-dsl-predicate-knn-other]]
