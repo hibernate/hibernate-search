@@ -7,10 +7,8 @@
 package org.hibernate.search.mapper.orm.loading.impl;
 
 import java.util.Set;
-import java.util.stream.Collectors;
 
 import org.hibernate.AssertionFailure;
-import org.hibernate.engine.spi.SessionFactoryImplementor;
 import org.hibernate.mapping.PersistentClass;
 import org.hibernate.mapping.RootClass;
 import org.hibernate.metamodel.mapping.EntityMappingType;
@@ -22,8 +20,7 @@ import org.hibernate.search.mapper.orm.search.loading.EntityLoadingCacheLookupSt
 import org.hibernate.search.mapper.pojo.loading.spi.PojoLoadingTypeContext;
 import org.hibernate.search.mapper.pojo.loading.spi.PojoSelectionEntityLoader;
 
-public class HibernateOrmEntityIdEntityLoadingStrategy<E, I>
-		extends AbstractHibernateOrmLoadingStrategy<E, I> {
+public class HibernateOrmEntityIdEntityLoadingStrategy<E, I> extends AbstractHibernateOrmLoadingStrategy<E, I> {
 
 	public static HibernateOrmEntityLoadingStrategy<?, ?> create(PersistentClass persistentClass) {
 		var rootClass = persistentClass.getRootClass();
@@ -32,21 +29,16 @@ public class HibernateOrmEntityIdEntityLoadingStrategy<E, I>
 
 	private static <E> HibernateOrmEntityIdEntityLoadingStrategy<E, ?> create(RootClass rootClass, Class<E> rootMappedClass) {
 		var idProperty = rootClass.getIdentifierProperty();
-		TypeQueryFactory<E, ?> queryFactory = TypeQueryFactory.create( rootMappedClass, rootClass.getEntityName(),
-				idProperty.getType().getReturnedClass(), idProperty.getName(),
-				true );
 		return new HibernateOrmEntityIdEntityLoadingStrategy<>( rootMappedClass, rootClass.getEntityName(),
-				queryFactory );
+				idProperty.getType().getReturnedClass(), idProperty.getName() );
 	}
 
 	private final Class<E> rootEntityClass;
-	private final TypeQueryFactory<E, I> queryFactory;
 
 	HibernateOrmEntityIdEntityLoadingStrategy(Class<E> rootEntityClass, String rootEntityName,
-			TypeQueryFactory<E, I> queryFactory) {
-		super( rootEntityName, queryFactory );
+			Class<I> uniquePropertyType, String uniquePropertyName) {
+		super( rootEntityName, uniquePropertyType, uniquePropertyName );
 		this.rootEntityClass = rootEntityClass;
-		this.queryFactory = queryFactory;
 	}
 
 	@Override
@@ -92,6 +84,12 @@ public class HibernateOrmEntityIdEntityLoadingStrategy<E, I>
 						loadingContext.cacheLookupStrategy(), loadingContext.loadingOptions() );
 
 		return result;
+	}
+
+	@Override
+	protected TypeQueryFactory<E, I> createFactory(Class<E> entityClass, String ormEntityName,
+			Class<I> uniquePropertyType, String uniquePropertyName) {
+		return TypeQueryFactory.create( entityClass, ormEntityName, uniquePropertyType, uniquePropertyName, true );
 	}
 
 	private PojoSelectionEntityLoader<?> doCreate(EntityMappingType entityMappingType,
@@ -141,25 +139,10 @@ public class HibernateOrmEntityIdEntityLoadingStrategy<E, I>
 		// We must pass rootEntityMappingType here, to avoid getting a WrongClassException when loading from the cache,
 		// even if we know we actually want instances from the most specific entity type,
 		// because that exception cannot be recovered from.
-		return new HibernateOrmSelectionEntityByIdLoader<>( rootEntityMappingType, queryFactory, sessionContext,
+		return new HibernateOrmSelectionEntityByIdLoader<>( rootEntityMappingType,
+				createFactory( entityMappingType ),
+				sessionContext,
 				persistenceContextLookup, cacheLookupStrategyImplementor, loadingOptions );
-	}
-
-	private static EntityMappingType toMostSpecificCommonEntitySuperType(
-			SessionFactoryImplementor sessionFactory,
-			Iterable<? extends PojoLoadingTypeContext<?>> targetEntityTypeContexts) {
-		EntityMappingType result = null;
-		for ( PojoLoadingTypeContext<?> targetTypeContext : targetEntityTypeContexts ) {
-			EntityMappingType type = HibernateOrmUtils.entityMappingType( sessionFactory,
-					targetTypeContext.secondaryEntityName() );
-			if ( result == null ) {
-				result = type;
-			}
-			else {
-				result = HibernateOrmUtils.toMostSpecificCommonEntitySuperType( result, type );
-			}
-		}
-		return result;
 	}
 
 	private AssertionFailure invalidTypeException(EntityMappingType otherEntityMappingType) {
@@ -169,17 +152,4 @@ public class HibernateOrmEntityIdEntityLoadingStrategy<E, I>
 						+ " Targeted entity name: " + otherEntityMappingType.getEntityName()
 		);
 	}
-
-	private AssertionFailure invalidTypesException(
-			Set<? extends PojoLoadingTypeContext<?>> targetEntityTypeContexts) {
-		return new AssertionFailure(
-				"Some types among the targeted entity types are not subclasses of the expected root entity type."
-						+ " Expected entity name: " + rootEntityName
-						+ " Targeted entity names: "
-						+ targetEntityTypeContexts.stream()
-								.map( PojoLoadingTypeContext::secondaryEntityName )
-								.collect( Collectors.toUnmodifiableList() )
-		);
-	}
-
 }

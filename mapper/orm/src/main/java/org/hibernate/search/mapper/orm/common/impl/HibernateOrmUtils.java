@@ -9,6 +9,7 @@ package org.hibernate.search.mapper.orm.common.impl;
 import java.lang.invoke.MethodHandles;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -28,6 +29,7 @@ import org.hibernate.mapping.Property;
 import org.hibernate.metamodel.MappingMetamodel;
 import org.hibernate.metamodel.mapping.EntityMappingType;
 import org.hibernate.search.mapper.orm.logging.impl.Log;
+import org.hibernate.search.mapper.pojo.loading.spi.PojoLoadingTypeContext;
 import org.hibernate.search.util.common.AssertionFailure;
 import org.hibernate.search.util.common.annotation.impl.SuppressForbiddenApis;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
@@ -111,8 +113,8 @@ public final class HibernateOrmUtils {
 	}
 
 	public static boolean targetsAllConcreteSubTypes(SessionFactoryImplementor sessionFactory,
-			EntityMappingType parentType, Collection<?> targetConcreteSubTypes) {
-		Set<String> subClassEntityNames = parentType.getSubclassEntityNames();
+			EntityMappingType commonSupertype, Collection<? extends PojoLoadingTypeContext<?>> targetConcreteSubTypes) {
+		Set<String> subClassEntityNames = commonSupertype.getSubclassEntityNames();
 		// Quick check to return true immediately if all subtypes are concrete
 		if ( subClassEntityNames.size() == targetConcreteSubTypes.size() ) {
 			return true;
@@ -126,7 +128,9 @@ public final class HibernateOrmUtils {
 				++concreteSubTypesCount;
 			}
 		}
+
 		return concreteSubTypesCount == targetConcreteSubTypes.size();
+
 	}
 
 	@SuppressForbiddenApis(reason = "Safer wrapper")
