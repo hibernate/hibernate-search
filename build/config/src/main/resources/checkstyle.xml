@@ -132,7 +132,7 @@
     <module name="RegexpSingleline">
         <!-- not using an "illegal import" rule as the java.lang package doesn't need to be imported -->
         <property name="format" value="\s+throw new AssertionError\(" />
-        <property name="message" value="Avoid throwing 'AssertionError': use org.hibernate.search.exception.AssertionFailure" />
+        <property name="message" value="Avoid throwing 'AssertionError': use org.hibernate.search.util.common.AssertionFailure" />
     </module>
 
     <module name="SuppressionFilter">
