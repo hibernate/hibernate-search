@@ -22,7 +22,7 @@ import org.hibernate.search.mapper.pojo.standalone.session.impl.StandalonePojoSe
 import org.hibernate.search.util.common.data.spi.KeyValueProvider;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
-class StandalonePojoTypeContextContainer
+public class StandalonePojoTypeContextContainer
 		implements StandalonePojoSearchSessionTypeContextProvider, LoadingTypeContextProvider {
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 

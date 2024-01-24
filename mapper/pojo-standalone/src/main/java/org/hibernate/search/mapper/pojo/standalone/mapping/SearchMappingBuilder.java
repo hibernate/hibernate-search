@@ -8,65 +8,28 @@ package org.hibernate.search.mapper.pojo.standalone.mapping;
 
 import java.io.IOException;
 import java.io.Reader;
-import java.lang.invoke.MethodHandles;
-import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Properties;
 import java.util.stream.Collectors;
 
 import org.hibernate.search.engine.cfg.ConfigurationPropertySource;
-import org.hibernate.search.engine.cfg.spi.AllAwareConfigurationPropertySource;
-import org.hibernate.search.engine.cfg.spi.ConfigurationProperty;
-import org.hibernate.search.engine.cfg.spi.ConfigurationPropertyChecker;
-import org.hibernate.search.engine.cfg.spi.OptionalConfigurationProperty;
-import org.hibernate.search.engine.common.spi.SearchIntegration;
-import org.hibernate.search.engine.common.spi.SearchIntegrationEnvironment;
-import org.hibernate.search.engine.common.spi.SearchIntegrationFinalizer;
-import org.hibernate.search.engine.common.spi.SearchIntegrationPartialBuildState;
-import org.hibernate.search.engine.environment.bean.spi.BeanProvider;
-import org.hibernate.search.mapper.pojo.standalone.cfg.spi.StandalonePojoMapperSpiSettings;
-import org.hibernate.search.mapper.pojo.standalone.impl.StandalonePojoMappingInitiator;
-import org.hibernate.search.mapper.pojo.standalone.logging.impl.Log;
-import org.hibernate.search.mapper.pojo.standalone.mapping.impl.StandalonePojoMapping;
-import org.hibernate.search.mapper.pojo.standalone.mapping.impl.StandalonePojoMappingKey;
-import org.hibernate.search.mapper.pojo.standalone.model.impl.StandalonePojoBootstrapIntrospector;
+import org.hibernate.search.mapper.pojo.standalone.bootstrap.spi.StandalonePojoIntegrationBooter;
 import org.hibernate.search.util.common.annotation.Incubating;
-import org.hibernate.search.util.common.impl.SuppressingCloser;
-import org.hibernate.search.util.common.logging.impl.LoggerFactory;
+import org.hibernate.search.util.common.reflect.spi.ValueHandleFactory;
 
 @Incubating
 public final class SearchMappingBuilder {
 
-	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
+	private final StandalonePojoIntegrationBooter.Builder booterBuilder;
 
-	private static final OptionalConfigurationProperty<BeanProvider> BEAN_PROVIDER =
-			ConfigurationProperty.forKey( StandalonePojoMapperSpiSettings.BEAN_PROVIDER )
-					.as( BeanProvider.class, value -> {
-						throw log.invalidStringForBeanProvider( value, BeanProvider.class );
-					} )
-					.build();
-
-	private static ConfigurationPropertySource getPropertySource(Map<String, Object> properties,
-			ConfigurationPropertyChecker propertyChecker) {
-		return propertyChecker.wrap( AllAwareConfigurationPropertySource.fromMap( properties ) );
+	SearchMappingBuilder() {
+		booterBuilder = StandalonePojoIntegrationBooter.builder();
 	}
 
-	private final ConfigurationPropertyChecker propertyChecker;
-	private final StandalonePojoMappingKey mappingKey;
-	private final StandalonePojoMappingInitiator mappingInitiator;
-	private final Map<String, Object> properties = new HashMap<>();
-
-	SearchMappingBuilder(MethodHandles.Lookup lookup) {
-		propertyChecker = ConfigurationPropertyChecker.create();
-		StandalonePojoBootstrapIntrospector introspector = StandalonePojoBootstrapIntrospector.create( lookup );
-		mappingKey = new StandalonePojoMappingKey();
-		mappingInitiator = new StandalonePojoMappingInitiator( introspector );
-		// Enable annotated type discovery by default
-		mappingInitiator.annotationMapping()
-				.discoverAnnotatedTypesFromRootMappingAnnotations( true )
-				.discoverJandexIndexesFromAddedTypes( true )
-				.discoverAnnotationsFromReferencedTypes( true );
+	/* package-protected */ SearchMappingBuilder valueReadHandleFactory(ValueHandleFactory valueHandleFactory) {
+		booterBuilder.valueReadHandleFactory( valueHandleFactory );
+		return this;
 	}
 
 	/**
@@ -80,7 +43,7 @@ public final class SearchMappingBuilder {
 	 * @return {@code this}, for call chaining.
 	 */
 	public SearchMappingBuilder property(String name, Object value) {
-		properties.put( name, value );
+		booterBuilder.property( name, value );
 		return this;
 	}
 
@@ -94,7 +57,7 @@ public final class SearchMappingBuilder {
 	 * @return {@code this}, for call chaining.
 	 */
 	public SearchMappingBuilder properties(Map<String, ?> map) {
-		properties.putAll( map );
+		booterBuilder.properties( map );
 		return this;
 	}
 
@@ -130,42 +93,6 @@ public final class SearchMappingBuilder {
 	 * @return The {@link SearchMapping}.
 	 */
 	public CloseableSearchMapping build() {
-		// Double-check if we've added any properties to the map before building the mapping.
-		// We do so to make sure we are tracking all the property keys:
-		ConfigurationPropertySource propertySource = properties.isEmpty()
-				? ConfigurationPropertySource.empty()
-				: getPropertySource( properties, propertyChecker );
-
-		SearchIntegrationEnvironment environment = null;
-		SearchIntegrationPartialBuildState integrationPartialBuildState = null;
-		StandalonePojoMapping mapping = null;
-		try {
-			SearchIntegrationEnvironment.Builder environmentBuilder =
-					SearchIntegrationEnvironment.builder( propertySource, propertyChecker );
-			BEAN_PROVIDER.get( propertySource ).ifPresent( environmentBuilder::beanProvider );
-			environment = environmentBuilder.build();
-
-			SearchIntegration.Builder integrationBuilder = SearchIntegration.builder( environment );
-			integrationBuilder.addMappingInitiator( mappingKey, mappingInitiator );
-
-			integrationPartialBuildState = integrationBuilder.prepareBuild();
-
-			SearchIntegrationFinalizer finalizer =
-					integrationPartialBuildState.finalizer( propertySource, propertyChecker );
-
-			mapping = finalizer.finalizeMapping(
-					mappingKey,
-					(context, partialMapping) -> partialMapping.finalizeMapping()
-			);
-			finalizer.finalizeIntegration();
-			return mapping;
-		}
-		catch (RuntimeException e) {
-			new SuppressingCloser( e )
-					.push( StandalonePojoMapping::close, mapping )
-					.push( environment )
-					.push( SearchIntegrationPartialBuildState::closeOnFailure, integrationPartialBuildState );
-			throw e;
-		}
+		return booterBuilder.build().boot();
 	}
 }
