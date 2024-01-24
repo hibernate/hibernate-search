@@ -4,7 +4,7 @@
  * License: GNU Lesser General Public License (LGPL), version 2.1 or later
  * See the lgpl.txt file in the root directory or <http://www.gnu.org/licenses/lgpl-2.1.html>.
  */
-package org.hibernate.search.mapper.pojo.standalone.impl;
+package org.hibernate.search.mapper.pojo.standalone.mapping.impl;
 
 import java.util.List;
 
@@ -21,8 +21,6 @@ import org.hibernate.search.mapper.pojo.mapping.spi.AbstractPojoMappingInitiator
 import org.hibernate.search.mapper.pojo.standalone.cfg.StandalonePojoMapperSettings;
 import org.hibernate.search.mapper.pojo.standalone.mapping.StandalonePojoMappingConfigurationContext;
 import org.hibernate.search.mapper.pojo.standalone.mapping.StandalonePojoMappingConfigurer;
-import org.hibernate.search.mapper.pojo.standalone.mapping.impl.StandalonePojoMapperDelegate;
-import org.hibernate.search.mapper.pojo.standalone.mapping.impl.StandalonePojoMappingPartialBuildState;
 import org.hibernate.search.mapper.pojo.standalone.mapping.metadata.EntityConfigurer;
 import org.hibernate.search.mapper.pojo.standalone.mapping.metadata.impl.StandalonePojoEntityTypeMetadataProvider;
 import org.hibernate.search.mapper.pojo.standalone.model.impl.StandalonePojoBootstrapIntrospector;
@@ -59,6 +57,12 @@ public class StandalonePojoMappingInitiator extends AbstractPojoMappingInitiator
 	public StandalonePojoMappingInitiator(StandalonePojoBootstrapIntrospector introspector) {
 		super( introspector );
 		entityTypeMetadataProviderBuilder = new StandalonePojoEntityTypeMetadataProvider.Builder( introspector );
+
+		// Enable annotated type discovery by default
+		annotationMapping()
+				.discoverAnnotatedTypesFromRootMappingAnnotations( true )
+				.discoverJandexIndexesFromAddedTypes( true )
+				.discoverAnnotationsFromReferencedTypes( true );
 	}
 
 	public <E> StandalonePojoMappingInitiator addEntityType(Class<E> clazz, String entityName,

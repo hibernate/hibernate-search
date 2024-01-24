@@ -37,8 +37,7 @@ public class StandalonePojoBootstrapIntrospector extends AbstractPojoHCAnnBootst
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
-	public static StandalonePojoBootstrapIntrospector create(MethodHandles.Lookup lookup) {
-		ValueHandleFactory valueHandleFactory = ValueHandleFactory.usingMethodHandle( lookup );
+	public static StandalonePojoBootstrapIntrospector create(ValueHandleFactory valueHandleFactory) {
 		return new StandalonePojoBootstrapIntrospector( valueHandleFactory );
 	}
 
