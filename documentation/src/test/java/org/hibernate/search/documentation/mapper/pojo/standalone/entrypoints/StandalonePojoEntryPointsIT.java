@@ -115,12 +115,12 @@ class StandalonePojoEntryPointsIT {
 	@Test
 	void searchScope_fromSearchMapping() {
 		SearchMapping searchMapping = theSearchMapping;
-		// tag::searchScope-fromSearchMapping[]
 		SearchScope<Book> bookScope = searchMapping.scope( Book.class );
 		SearchScope<Person> associateAndManagerScope = searchMapping.scope( Arrays.asList( Associate.class, Manager.class ) );
 		SearchScope<Person> personScope = searchMapping.scope( Person.class );
+		SearchScope<Person> personSubTypesScope = searchMapping.scope( Person.class,
+				Arrays.asList( "Manager", "Associate" ) );
 		SearchScope<Object> allScope = searchMapping.scope( Object.class );
-		// end::searchScope-fromSearchMapping[]
 		assertThat( bookScope.includedTypes() )
 				.extracting( SearchIndexedEntity::name )
 				.containsExactlyInAnyOrder( "Book" );
@@ -128,6 +128,9 @@ class StandalonePojoEntryPointsIT {
 				.extracting( SearchIndexedEntity::name )
 				.containsExactlyInAnyOrder( "Manager", "Associate" );
 		assertThat( personScope.includedTypes() )
+				.extracting( SearchIndexedEntity::name )
+				.containsExactlyInAnyOrder( "Manager", "Associate" );
+		assertThat( personSubTypesScope.includedTypes() )
 				.extracting( SearchIndexedEntity::name )
 				.containsExactlyInAnyOrder( "Manager", "Associate" );
 		assertThat( allScope.includedTypes() )
@@ -143,8 +146,9 @@ class StandalonePojoEntryPointsIT {
 			SearchScope<Person> associateAndManagerScope =
 					searchSession.scope( Arrays.asList( Associate.class, Manager.class ) );
 			SearchScope<Person> personScope = searchSession.scope( Person.class );
+			SearchScope<Person> personSubTypesScope = searchSession.scope( Person.class,
+					Arrays.asList( "Manager", "Associate" ) );
 			SearchScope<Object> allScope = searchSession.scope( Object.class );
-			// end::searchScope-fromSearchSession[]
 			assertThat( bookScope.includedTypes() )
 					.extracting( SearchIndexedEntity::name )
 					.containsExactlyInAnyOrder( "Book" );
@@ -152,6 +156,9 @@ class StandalonePojoEntryPointsIT {
 					.extracting( SearchIndexedEntity::name )
 					.containsExactlyInAnyOrder( "Manager", "Associate" );
 			assertThat( personScope.includedTypes() )
+					.extracting( SearchIndexedEntity::name )
+					.containsExactlyInAnyOrder( "Manager", "Associate" );
+			assertThat( personSubTypesScope.includedTypes() )
 					.extracting( SearchIndexedEntity::name )
 					.containsExactlyInAnyOrder( "Manager", "Associate" );
 			assertThat( allScope.includedTypes() )

@@ -19,4 +19,6 @@ public interface StandalonePojoSearchSessionMappingContext
 
 	<T> SearchScopeImpl<T> createScope(Collection<? extends Class<? extends T>> types);
 
+	<T> SearchScopeImpl<T> createScope(Class<T> expectedSuperType, Collection<String> entityNames);
+
 }
