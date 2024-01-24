@@ -150,6 +150,11 @@ public class StandalonePojoSearchSession extends AbstractPojoSearchSession
 	}
 
 	@Override
+	public <T> SearchScopeImpl<T> scope(Class<T> expectedSuperType, Collection<String> entityNames) {
+		return mappingContext.createScope( expectedSuperType, entityNames );
+	}
+
+	@Override
 	public SearchIndexingPlan indexingPlan() {
 		if ( indexingPlan == null ) {
 			indexingPlan = new SearchIndexingPlanImpl(

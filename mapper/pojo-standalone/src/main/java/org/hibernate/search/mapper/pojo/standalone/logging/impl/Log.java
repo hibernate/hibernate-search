@@ -92,4 +92,21 @@ public interface Log extends BasicLogger {
 			+ " Valid classes for mapped entity types are: %2$s")
 	SearchException unknownClassForMappedEntityType(@FormatWith(ClassFormatter.class) Class<?> invalidClass,
 			@FormatWith(CommaSeparatedClassesFormatter.class) Collection<Class<?>> validClasses);
+
+	@Message(id = ID_OFFSET + 19, value = "No matching entity type for class '%1$s'."
+			+ " Valid classes are: %2$s")
+	SearchException unknownClassForEntityType(@FormatWith(ClassFormatter.class) Class<?> invalidClass,
+			@FormatWith(CommaSeparatedClassesFormatter.class) Collection<Class<?>> validClasses);
+
+	@Message(id = ID_OFFSET + 20, value = "No matching entity type for name '%1$s'."
+			+ " Valid names for entity types are: %2$s")
+	SearchException unknownEntityNameForEntityType(String invalidName, Collection<String> validNames);
+
+	@Message(id = ID_OFFSET + 21,
+			value = "Invalid type for '%1$s': the entity type must extend '%2$s'," +
+					" but entity type '%3$s' does not."
+	)
+	SearchException invalidEntitySuperType(String entityName,
+			@FormatWith(ClassFormatter.class) Class<?> expectedSuperType,
+			@FormatWith(ClassFormatter.class) Class<?> actualJavaType);
 }

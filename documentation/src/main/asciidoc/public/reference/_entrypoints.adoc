@@ -198,9 +198,12 @@ The scope's generic type parameter can be any common supertype of those entity t
 <4> A scope will always target all subtypes of the given classes, and the given classes do not need to be indexed entity types themselves.
 This creates a `SearchScope` targeting all (indexed entity) subtypes of the `Person` interface;
 in our case this will target both the `Associate` entity type and the `Manager` entity type.
-<5> For advanced use cases and with the <<mapper-orm,Hibernate ORM integration>> only,
-it is possible to target (indexed entity) types by their name,
-e.g. the JPA entity name.
+<5> For advanced use cases,
+it is possible to target entity types by their name.
+For <<mapper-orm,Hibernate ORM>> this would be the JPA entity name,
+and for the <<mapper-pojo-standalone,Standalone POJO Mapper>>
+this would be the name assigned to the entity type upon declaration in the <<mapper-pojo-standalone-startup,configurer>>.
+In both cases, the entity name is the simple name of the Java class by default.
 <6> Passing `Object.class` will create a scope targeting every single indexed entity types.
 ====
 
@@ -217,8 +220,11 @@ The scope's generic type parameter can be any common supertype of those entity t
 <4> A scope will always target all subtypes of the given classes, and the given classes do not need to be indexed entity types themselves.
 This creates a `SearchScope` targeting all (indexed entity) subtypes of the `Person` interface;
 in our case this will target both the `Associate` entity type and the `Manager` entity type.
-<5> For advanced use cases and with the <<mapper-orm,Hibernate ORM integration>> only,
-it is possible to target (indexed entity) types by their name,
-e.g. the JPA entity name.
+<5> For advanced use cases,
+it is possible to target entity types by their name.
+For <<mapper-orm,Hibernate ORM>> this would be the JPA entity name,
+and for the <<mapper-pojo-standalone,Standalone POJO Mapper>>
+this would be the name assigned to the entity type upon declaration in the <<mapper-pojo-standalone-startup,configurer>>.
+In both cases, the entity name is the simple name of the Java class by default.
 <6> Passing `Object.class` will create a scope targeting every single indexed entity types.
 ====

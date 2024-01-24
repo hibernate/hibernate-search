@@ -20,13 +20,13 @@ public final class StandalonePojoMapperDelegate
 		implements PojoMapperDelegate<StandalonePojoMappingPartialBuildState> {
 
 	private final StandalonePojoEntityTypeMetadataProvider metadataProvider;
-	private final StandalonePojoTypeContextContainer.Builder typeContextContainerBuilder =
-			new StandalonePojoTypeContextContainer.Builder();
+	private final StandalonePojoTypeContextContainer.Builder typeContextContainerBuilder;
 	private final SchemaManagementListener schemaManagementListener;
 
 	public StandalonePojoMapperDelegate(StandalonePojoEntityTypeMetadataProvider metadataProvider,
 			SchemaManagementListener schemaManagementListener) {
 		this.metadataProvider = metadataProvider;
+		this.typeContextContainerBuilder = new StandalonePojoTypeContextContainer.Builder( metadataProvider );
 		this.schemaManagementListener = schemaManagementListener;
 	}
 
