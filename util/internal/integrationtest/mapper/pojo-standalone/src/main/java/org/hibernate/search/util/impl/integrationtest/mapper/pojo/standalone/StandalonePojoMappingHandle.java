@@ -10,7 +10,7 @@ import java.util.concurrent.CompletableFuture;
 
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.BackendMappingHandle;
 
-final class StandalonePojoMappingHandle implements BackendMappingHandle {
+public final class StandalonePojoMappingHandle implements BackendMappingHandle {
 	@Override
 	public CompletableFuture<?> backgroundIndexingCompletion() {
 		throw new IllegalStateException( "We never test asynchronous indexing with the Standalone POJO mapper,"

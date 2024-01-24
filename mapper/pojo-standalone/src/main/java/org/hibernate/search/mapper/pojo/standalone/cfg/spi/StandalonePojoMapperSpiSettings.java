@@ -18,12 +18,17 @@ public final class StandalonePojoMapperSpiSettings {
 
 	public static final String BEAN_PROVIDER = PREFIX + Radicals.BEAN_PROVIDER;
 
+	public static final String INTEGRATION_PARTIAL_BUILD_STATE =
+			PREFIX + Radicals.INTEGRATION_PARTIAL_BUILD_STATE;
+
 	public static class Radicals {
 
 		private Radicals() {
 		}
 
 		public static final String BEAN_PROVIDER = "bean_provider";
+
+		public static final String INTEGRATION_PARTIAL_BUILD_STATE = "integration_partial_build_state";
 	}
 
 	/**
