@@ -1,6 +1,45 @@
 Hibernate Search Changelog
 ==========================
 
+7.1.0.Alpha2 (2024-01-24)
+-------------------------
+
+** Bug
+    * HSEARCH-5031 Mass indexing ID loading queries with discriminator multi-tenancy may cross tenant boundaries in some cases
+
+** Improvement
+    * HSEARCH-5065 Two-phase boot for the standalone POJO mapper
+    * HSEARCH-5060 Upgrade to Hibernate ORM 6.4.2.Final
+    * HSEARCH-5059 Add compatiblity with Elasticsearch 8.12.0 and upgrade to Elasticsearch client 8.12.0
+    * HSEARCH-5057 Upgrade to AWS SDK 2.23.3
+    * HSEARCH-5056 Rename VectorField#beamWidth / VectorField#maxConnections to align with Elasticsearch/OpenSearch naming
+    * HSEARCH-5055 Upgrade to Elasticsearch client 8.11.4 and test against Elasticsearch 8.11.4
+    * HSEARCH-5052 knn predicate: filter out results based on similarity
+    * HSEARCH-5047 Upgrade JBeret to 2.2.0.Final
+    * HSEARCH-5046 Upgrade to AWS SDK 2.22.1
+    * HSEARCH-5043 Upgrade to Lucene 9.9.1
+    * HSEARCH-5042 Upgrade to Hibernate ORM 6.4.1.Final
+    * HSEARCH-5038 Align vector similarity naming between backends
+    * HSEARCH-5036 Upgrade to Elasticsearch client 8.11.3 and test against Elasticsearch 8.11.3
+    * HSEARCH-5034 Allow passing BeanReference<? extends T> when registering beans to BeanConfigurationContext
+    * HSEARCH-5032 Upgrade to Elasticsearch client 8.11.2 and test against Elasticsearch 8.11.2
+    * HSEARCH-5025 Add container extraction support to @VectorField
+    * HSEARCH-5021 Improve support for custom value bridges for vector fields
+    * HSEARCH-5010 Upgrade to Lucene 9.9
+    * HSEARCH-5004 Default to SqlTypes.UUID instead of CHAR for the OutboxEvent/Agent ID in databases supporting it
+
+** New Feature
+    * HSEARCH-4950 Vector search using Elasticsearch/OpenSearch
+    * HSEARCH-3909 Allow looking up the capabilities of each field in the metamodel
+
+** Task
+    * HSEARCH-5041 Test against latest OpenSearch 1.3.14
+    * HSEARCH-5040 Use Maven 3.9.6 in CI builds and as a required minimum version for the build
+    * HSEARCH-5037 Test against latest Elasticsearch 7.17.16
+    * HSEARCH-5029 Simplify entity cleanup in ORM-related tests
+    * HSEARCH-5026 Test against latest OpenSearch 2.11.1
+    * HSEARCH-5023 Simplify the format for indexNullAs on float[]/byte[] bridges
+
 7.1.0.Alpha1 (2023-11-30)
 -------------------------
 
