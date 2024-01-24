@@ -11,7 +11,7 @@
     <parent>
         <artifactId>hibernate-search-parent-public</artifactId>
         <groupId>org.hibernate.search</groupId>
-        <version>7.1.0-SNAPSHOT</version>
+        <version>7.1.0.Alpha2</version>
         <relativePath>../../build/parents/public</relativePath>
     </parent>
     <artifactId>hibernate-search-v5migrationhelper-engine</artifactId>
