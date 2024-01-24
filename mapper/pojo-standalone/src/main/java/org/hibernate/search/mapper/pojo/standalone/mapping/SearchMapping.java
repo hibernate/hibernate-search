@@ -18,6 +18,7 @@ import org.hibernate.search.mapper.pojo.standalone.scope.SearchScope;
 import org.hibernate.search.mapper.pojo.standalone.session.SearchSession;
 import org.hibernate.search.mapper.pojo.standalone.session.SearchSessionBuilder;
 import org.hibernate.search.util.common.annotation.Incubating;
+import org.hibernate.search.util.common.reflect.spi.ValueHandleFactory;
 
 /**
  * The Hibernate Search mapping between the POJO model and the backend(s).
@@ -104,7 +105,7 @@ public interface SearchMapping {
 	 * @return A {@link SearchMapping} builder.
 	 */
 	static SearchMappingBuilder builder() {
-		return builder( MethodHandles.publicLookup() );
+		return new SearchMappingBuilder();
 	}
 
 	/**
@@ -112,7 +113,8 @@ public interface SearchMapping {
 	 * @return A {@link SearchMapping} builder.
 	 */
 	static SearchMappingBuilder builder(MethodHandles.Lookup lookup) {
-		return new SearchMappingBuilder( lookup );
+		return builder()
+				.valueReadHandleFactory( ValueHandleFactory.usingMethodHandle( lookup ) );
 	}
 
 }
