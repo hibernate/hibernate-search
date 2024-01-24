@@ -51,6 +51,30 @@ public interface SearchMapping {
 	<T> SearchScope<T> scope(Collection<? extends Class<? extends T>> types);
 
 	/**
+	 * Create a {@link SearchScope} limited to entity types referenced by their name.
+	 *
+	 * @param expectedSuperType A supertype of all entity types to include in the scope.
+	 * @param entityName An entity name. See {@link StandalonePojoMappingConfigurationContext#addEntityType(Class, String)}.
+	 * @param <T> A supertype of all entity types to include in the scope.
+	 * @return The created scope.
+	 * @see SearchScope
+	 */
+	default <T> SearchScope<T> scope(Class<T> expectedSuperType, String entityName) {
+		return scope( expectedSuperType, Collections.singleton( entityName ) );
+	}
+
+	/**
+	 * Create a {@link SearchScope} limited to entity types referenced by their name.
+	 *
+	 * @param expectedSuperType A supertype of all entity types to include in the scope.
+	 * @param entityNames A collection of entity names. See {@link StandalonePojoMappingConfigurationContext#addEntityType(Class, String)}.
+	 * @param <T> A supertype of all entity types to include in the scope.
+	 * @return The created scope.
+	 * @see SearchScope
+	 */
+	<T> SearchScope<T> scope(Class<T> expectedSuperType, Collection<String> entityNames);
+
+	/**
 	 * @return A new session allowing to {@link SearchSession#indexingPlan() index} or
 	 * {@link SearchSession#search(Class) search for} entities.
 	 * @see #createSessionWithOptions()

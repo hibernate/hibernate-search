@@ -133,6 +133,95 @@ class SearchQueryBaseIT {
 		}
 	}
 
+	@Test
+	void target_byName_singleType() {
+		try ( SearchSession searchSession = mapping.createSession() ) {
+			SearchQuery<EntityReference> query = searchSession.search( searchSession.scope( Book.class, Book.NAME ) )
+					.selectEntityReference()
+					.where( f -> f.matchAll() )
+					.toQuery();
+
+			backendMock.expectSearchObjects(
+					Arrays.asList( Book.NAME ),
+					b -> {},
+					StubSearchWorkBehavior.of(
+							3L,
+							reference( Book.NAME, "1" ),
+							reference( Book.NAME, "2" ),
+							reference( Book.NAME, "3" )
+					)
+			);
+
+			assertThat( query.fetchAllHits() ).containsExactly(
+					PojoEntityReference.withName( Book.class, Book.NAME, 1 ),
+					PojoEntityReference.withName( Book.class, Book.NAME, 2 ),
+					PojoEntityReference.withName( Book.class, Book.NAME, 3 )
+			);
+		}
+	}
+
+	@Test
+	void target_byName_multipleTypes() {
+		try ( SearchSession searchSession = mapping.createSession() ) {
+			SearchQuery<EntityReference> query = searchSession.search( searchSession.scope(
+					Object.class, Arrays.asList( Book.NAME, Author.NAME )
+			) )
+					.selectEntityReference()
+					.where( f -> f.matchAll() )
+					.toQuery();
+
+			backendMock.expectSearchObjects(
+					Arrays.asList( Book.NAME, Author.NAME ),
+					b -> {},
+					StubSearchWorkBehavior.of(
+							2L,
+							reference( Book.NAME, "1" ),
+							reference( Author.NAME, "2" )
+					)
+			);
+
+			assertThat( query.fetchAllHits() ).containsExactly(
+					PojoEntityReference.withName( Book.class, Book.NAME, 1 ),
+					PojoEntityReference.withName( Author.class, Author.NAME, 2 )
+			);
+		}
+	}
+
+	@Test
+	void target_byName_invalidType() {
+		try ( SearchSession searchSession = mapping.createSession() ) {
+			Class<?> invalidClass = String.class;
+
+			assertThatThrownBy( () -> searchSession.scope(
+					invalidClass, Book.NAME
+			) )
+					.hasMessageContainingAll(
+							"Invalid type for '" + Book.NAME + "'",
+							"the entity type must extend '" + invalidClass.getName()
+									+ "', but entity type '" + Book.class.getName() + "' does not"
+					);
+		}
+	}
+
+	@Test
+	void target_byName_invalidName() {
+		try ( SearchSession searchSession = mapping.createSession() ) {
+			String invalidName = "foo";
+
+			assertThatThrownBy( () -> searchSession.scope(
+					Book.class, invalidName
+			) )
+					.hasMessageContainingAll(
+							"No matching entity type for name '" + invalidName + "'",
+							"Valid names for entity types are: ["
+									+ Book.NAME + ", "
+									+ Author.NAME + ", "
+									+ NotIndexed.NAME
+									+ "]"
+					);
+		}
+	}
+
 	@Indexed
 	public static class Book {
 
