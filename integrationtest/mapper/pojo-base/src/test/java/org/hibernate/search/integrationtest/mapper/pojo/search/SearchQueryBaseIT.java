@@ -118,14 +118,30 @@ class SearchQueryBaseIT {
 	}
 
 	@Test
-	void target_byClass_invalidClass() {
+	void target_byClass_invalidClass_noEntitySubType() {
 		try ( SearchSession searchSession = mapping.createSession() ) {
 			Class<?> invalidClass = String.class;
 
 			assertThatThrownBy( () -> searchSession.scope( invalidClass ) )
-					.hasMessageContainingAll( "No matching indexed entity types for types: [" + invalidClass.getName() + "]",
-							"These types are not indexed entity types, nor is any of their subtypes",
-							"Valid indexed entity classes, superclasses and superinterfaces are: ["
+					.hasMessageContainingAll( "No matching indexed entity types for classes [" + invalidClass.getName() + "]",
+							"Neither these classes nor any of their subclasses are indexed in Hibernate Search",
+							"Valid classes are: ["
+									+ Object.class.getName() + ", "
+									+ Book.class.getName() + ", "
+									+ Author.class.getName()
+									+ "]" );
+		}
+	}
+
+	@Test
+	void target_byClass_invalidClass_noIndexedSubtype() {
+		try ( SearchSession searchSession = mapping.createSession() ) {
+			Class<?> invalidClass = NotIndexed.class;
+
+			assertThatThrownBy( () -> searchSession.scope( invalidClass ) )
+					.hasMessageContainingAll( "No matching indexed entity types for classes [" + invalidClass.getName() + "]",
+							"Neither these classes nor any of their subclasses are indexed in Hibernate Search",
+							"Valid classes are: ["
 									+ Object.class.getName() + ", "
 									+ Book.class.getName() + ", "
 									+ Author.class.getName()
@@ -212,11 +228,13 @@ class SearchQueryBaseIT {
 					Book.class, invalidName
 			) )
 					.hasMessageContainingAll(
-							"No matching entity type for name '" + invalidName + "'",
-							"Valid names for entity types are: ["
+							"No matching indexed entity types for entity names [" + invalidName + "]",
+							"Either these are not the names of entity types",
+							"or neither the entity types nor any of their subclasses are indexed in Hibernate Search",
+							"Valid entity names are: ["
 									+ Book.NAME + ", "
-									+ Author.NAME + ", "
-									+ NotIndexed.NAME
+									+ Author.NAME
+									// NotIndexed should not be mentioned here
 									+ "]"
 					);
 		}

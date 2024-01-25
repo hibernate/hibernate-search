@@ -7,10 +7,8 @@
 package org.hibernate.search.mapper.orm.mapping.impl;
 
 import java.lang.invoke.MethodHandles;
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 
@@ -44,7 +42,6 @@ import org.hibernate.search.mapper.orm.logging.impl.Log;
 import org.hibernate.search.mapper.orm.mapping.SearchMapping;
 import org.hibernate.search.mapper.orm.mapping.context.HibernateOrmMappingContext;
 import org.hibernate.search.mapper.orm.mapping.spi.CoordinationStrategyContext;
-import org.hibernate.search.mapper.orm.model.impl.HibernateOrmRawTypeIdentifierResolver;
 import org.hibernate.search.mapper.orm.reporting.impl.HibernateOrmMappingHints;
 import org.hibernate.search.mapper.orm.schema.management.SchemaManagementStrategyName;
 import org.hibernate.search.mapper.orm.schema.management.impl.SchemaManagementListener;
@@ -401,20 +398,32 @@ public class HibernateOrmMapping extends AbstractPojoMappingImplementor<Hibernat
 
 	@Override
 	public <T> SearchScopeImpl<T> createScope(Collection<? extends Class<? extends T>> classes) {
-		List<PojoRawTypeIdentifier<? extends T>> typeIdentifiers = new ArrayList<>( classes.size() );
-		for ( Class<? extends T> clazz : classes ) {
-			typeIdentifiers.add( typeContextContainer.typeIdentifierResolver().resolveByJavaClass( clazz ) );
-		}
-		return doCreateScope( typeIdentifiers );
+		PojoScopeDelegate<org.hibernate.search.mapper.orm.common.EntityReference,
+				T,
+				HibernateOrmScopeIndexedTypeContext<? extends T>> scopeDelegate =
+						delegate().createPojoScopeForClasses(
+								this,
+								classes,
+								typeContextContainer::indexedForExactType
+						);
+
+		// Explicit type parameter is necessary here for ECJ (Eclipse compiler)
+		return new SearchScopeImpl<T>( this, tenancyConfiguration, scopeDelegate );
 	}
 
 	@Override
 	public <T> SearchScopeImpl<T> createScope(Class<T> expectedSuperType, Collection<String> entityNames) {
-		List<PojoRawTypeIdentifier<? extends T>> typeIdentifiers = new ArrayList<>( entityNames.size() );
-		for ( String entityName : entityNames ) {
-			typeIdentifiers.add( entityTypeIdentifier( expectedSuperType, entityName ) );
-		}
-		return doCreateScope( typeIdentifiers );
+		PojoScopeDelegate<org.hibernate.search.mapper.orm.common.EntityReference,
+				T,
+				HibernateOrmScopeIndexedTypeContext<? extends T>> scopeDelegate =
+						delegate().createPojoScopeForEntityNames(
+								this,
+								expectedSuperType, entityNames,
+								typeContextContainer::indexedForExactType
+						);
+
+		// Explicit type parameter is necessary here for ECJ (Eclipse compiler)
+		return new SearchScopeImpl<T>( this, tenancyConfiguration, scopeDelegate );
 	}
 
 	@Override
@@ -439,23 +448,6 @@ public class HibernateOrmMapping extends AbstractPojoMappingImplementor<Hibernat
 		return integrationHandle.getOrFail();
 	}
 
-	private <T> PojoRawTypeIdentifier<? extends T> entityTypeIdentifier(Class<T> expectedSuperType,
-			String entityName) {
-		HibernateOrmRawTypeIdentifierResolver resolver = typeContextContainer.typeIdentifierResolver();
-		PojoRawTypeIdentifier<?> typeIdentifier = resolver.resolveByJpaOrHibernateOrmEntityName( entityName );
-		if ( typeIdentifier == null ) {
-			throw log.unknownEntityNameForEntityType( entityName, resolver.allKnownJpaOrHibernateOrmEntityNames() );
-		}
-		Class<?> actualJavaType = typeIdentifier.javaClass();
-		if ( !expectedSuperType.isAssignableFrom( actualJavaType ) ) {
-			throw log.invalidEntitySuperType( entityName, expectedSuperType, actualJavaType );
-		}
-		// The cast below is safe because we just checked above that the type extends "expectedSuperType", which extends E
-		@SuppressWarnings("unchecked")
-		PojoRawTypeIdentifier<? extends T> castedTypeIdentifier = (PojoRawTypeIdentifier<? extends T>) typeIdentifier;
-		return castedTypeIdentifier;
-	}
-
 	private Optional<SearchScopeImpl<Object>> createAllScope() {
 		return delegate().<org.hibernate.search.mapper.orm.common.EntityReference,
 				HibernateOrmScopeIndexedTypeContext<?>>createPojoAllScope(
@@ -465,17 +457,4 @@ public class HibernateOrmMapping extends AbstractPojoMappingImplementor<Hibernat
 				.map( scopeDelegate -> new SearchScopeImpl<>( this, tenancyConfiguration, scopeDelegate ) );
 	}
 
-	private <T> SearchScopeImpl<T> doCreateScope(Collection<PojoRawTypeIdentifier<? extends T>> typeIdentifiers) {
-		PojoScopeDelegate<org.hibernate.search.mapper.orm.common.EntityReference,
-				T,
-				HibernateOrmScopeIndexedTypeContext<? extends T>> scopeDelegate =
-						delegate().createPojoScope(
-								this,
-								typeIdentifiers,
-								typeContextContainer::indexedForExactType
-						);
-
-		// Explicit type parameter is necessary here for ECJ (Eclipse compiler)
-		return new SearchScopeImpl<T>( this, tenancyConfiguration, scopeDelegate );
-	}
 }

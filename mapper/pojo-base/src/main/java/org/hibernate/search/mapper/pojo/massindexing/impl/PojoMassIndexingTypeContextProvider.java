@@ -15,7 +15,7 @@ public interface PojoMassIndexingTypeContextProvider {
 
 	<E> PojoMassIndexingIndexedTypeContext<E> indexedForExactType(PojoRawTypeIdentifier<E> typeIdentifier);
 
-	<E> Optional<? extends Set<? extends PojoMassIndexingIndexedTypeContext<? extends E>>> allIndexedForSuperType(
+	<E> Optional<? extends Set<? extends PojoMassIndexingIndexedTypeContext<? extends E>>> indexedForSuperType(
 			PojoRawTypeIdentifier<E> typeIdentifier);
 
 }

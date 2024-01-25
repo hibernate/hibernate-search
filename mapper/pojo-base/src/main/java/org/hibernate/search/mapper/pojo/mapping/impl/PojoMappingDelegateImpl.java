@@ -6,8 +6,8 @@
  */
 package org.hibernate.search.mapper.pojo.mapping.impl;
 
+import java.lang.invoke.MethodHandles;
 import java.util.Collection;
-import java.util.LinkedHashSet;
 import java.util.Optional;
 import java.util.Set;
 
@@ -19,7 +19,9 @@ import org.hibernate.search.engine.reporting.FailureHandler;
 import org.hibernate.search.engine.search.projection.definition.spi.ProjectionRegistry;
 import org.hibernate.search.engine.tenancy.spi.TenancyMode;
 import org.hibernate.search.mapper.pojo.common.spi.PojoEntityReferenceFactoryDelegate;
+import org.hibernate.search.mapper.pojo.logging.impl.Log;
 import org.hibernate.search.mapper.pojo.mapping.spi.PojoMappingDelegate;
+import org.hibernate.search.mapper.pojo.mapping.spi.PojoRawTypeIdentifierResolver;
 import org.hibernate.search.mapper.pojo.model.spi.PojoRawTypeIdentifier;
 import org.hibernate.search.mapper.pojo.scope.impl.PojoScopeDelegateImpl;
 import org.hibernate.search.mapper.pojo.scope.spi.PojoScopeDelegate;
@@ -40,8 +42,10 @@ import org.hibernate.search.mapper.pojo.work.spi.PojoIndexingPlan;
 import org.hibernate.search.mapper.pojo.work.spi.PojoIndexingQueueEventProcessingPlan;
 import org.hibernate.search.mapper.pojo.work.spi.PojoIndexingQueueEventSendingPlan;
 import org.hibernate.search.mapper.pojo.work.spi.PojoWorkSessionContext;
+import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
 public class PojoMappingDelegateImpl implements PojoMappingDelegate {
+	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	private final ThreadPoolProvider threadPoolProvider;
 	private final FailureHandler failureHandler;
@@ -77,6 +81,11 @@ public class PojoMappingDelegateImpl implements PojoMappingDelegate {
 	}
 
 	@Override
+	public PojoRawTypeIdentifierResolver typeIdentifierResolver() {
+		return typeManagers;
+	}
+
+	@Override
 	public TenancyMode tenancyMode() {
 		return tenancyMode;
 	}
@@ -92,14 +101,57 @@ public class PojoMappingDelegateImpl implements PojoMappingDelegate {
 	}
 
 	@Override
+	public <R extends EntityReference, E, C> PojoScopeDelegate<R, E, C> createPojoScopeForClasses(
+			PojoScopeMappingContext mappingContext,
+			Collection<? extends Class<? extends E>> classes,
+			PojoScopeTypeExtendedContextProvider<E, C> indexedTypeExtendedContextProvider) {
+		if ( classes.isEmpty() ) {
+			throw log.invalidEmptyTargetForScope();
+		}
+		return PojoScopeDelegateImpl.create(
+				mappingContext,
+				typeManagers,
+				typeManagers.indexedForSuperTypeClasses( classes ),
+				indexedTypeExtendedContextProvider
+		);
+	}
+
+	@Override
+	@SuppressWarnings("unchecked") // The cast is checked through reflection
+	public <R extends EntityReference, E, C> PojoScopeDelegate<R, E, C> createPojoScopeForEntityNames(
+			PojoScopeMappingContext mappingContext, Class<E> expectedSuperType, Collection<String> entityNames,
+			PojoScopeTypeExtendedContextProvider<E, C> indexedTypeExtendedContextProvider) {
+		if ( entityNames.isEmpty() ) {
+			throw log.invalidEmptyTargetForScope();
+		}
+		Set<? extends PojoIndexedTypeManager<?, ?>> typeContexts = typeManagers.indexedForSuperTypeEntityNames( entityNames );
+		for ( PojoIndexedTypeManager<?, ?> typeContext : typeContexts ) {
+			Class<?> actualJavaType = typeContext.typeIdentifier().javaClass();
+			if ( !expectedSuperType.isAssignableFrom( actualJavaType ) ) {
+				throw log.invalidEntitySuperType( typeContext.entityName(), expectedSuperType, actualJavaType );
+			}
+		}
+		return PojoScopeDelegateImpl.create(
+				mappingContext,
+				typeManagers,
+				(Set<? extends PojoIndexedTypeManager<?, ? extends E>>) typeContexts,
+				indexedTypeExtendedContextProvider
+		);
+	}
+
+	@Override
+	@Deprecated
 	public <R extends EntityReference, E, C> PojoScopeDelegate<R, E, C> createPojoScope(
 			PojoScopeMappingContext mappingContext,
 			Collection<? extends PojoRawTypeIdentifier<? extends E>> targetedTypes,
 			PojoScopeTypeExtendedContextProvider<E, C> indexedTypeExtendedContextProvider) {
+		if ( targetedTypes.isEmpty() ) {
+			throw log.invalidEmptyTargetForScope();
+		}
 		return PojoScopeDelegateImpl.create(
 				mappingContext,
 				typeManagers,
-				targetedTypes,
+				typeManagers.indexedForSuperTypes( targetedTypes ),
 				indexedTypeExtendedContextProvider
 		);
 	}
@@ -111,14 +163,10 @@ public class PojoMappingDelegateImpl implements PojoMappingDelegate {
 		if ( typeManagers.allIndexed().isEmpty() ) {
 			return Optional.empty();
 		}
-		Set<PojoRawTypeIdentifier<?>> typeIdentifiers = new LinkedHashSet<>();
-		for ( PojoIndexedTypeManager<?, ?> typeContext : typeManagers.allIndexed() ) {
-			typeIdentifiers.add( typeContext.typeIdentifier() );
-		}
 		return Optional.of( PojoScopeDelegateImpl.create(
 				mappingContext,
 				typeManagers,
-				typeIdentifiers,
+				typeManagers.allIndexed(),
 				indexedTypeExtendedContextProvider
 		) );
 	}

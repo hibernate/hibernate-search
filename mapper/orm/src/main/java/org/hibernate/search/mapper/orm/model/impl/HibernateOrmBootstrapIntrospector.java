@@ -22,6 +22,7 @@ import org.hibernate.AssertionFailure;
 import org.hibernate.annotations.common.reflection.ReflectionManager;
 import org.hibernate.bytecode.enhance.spi.EnhancerConstants;
 import org.hibernate.engine.spi.PersistentAttributeInterceptable;
+import org.hibernate.mapping.PersistentClass;
 import org.hibernate.search.mapper.orm.logging.impl.Log;
 import org.hibernate.search.mapper.pojo.model.hcann.spi.AbstractPojoHCAnnBootstrapIntrospector;
 import org.hibernate.search.mapper.pojo.model.hcann.spi.PojoHCannOrmGenericContextHelper;
@@ -82,15 +83,14 @@ public class HibernateOrmBootstrapIntrospector extends AbstractPojoHCAnnBootstra
 			return dynamicMapTypeModelCache.computeIfAbsent( name, this::createDynamicMapTypeModel );
 		}
 
-		PojoRawTypeIdentifier<?> typeIdentifier = basicTypeMetadataProvider.getTypeIdentifierResolver()
-				.resolveByJpaOrHibernateOrmEntityName( name );
-		if ( typeIdentifier != null ) {
+		PersistentClass persistentClass = basicTypeMetadataProvider.getPersistentClass( name );
+		if ( persistentClass != null ) {
 			// Class entity type
-			return typeModel( typeIdentifier.javaClass() );
+			return typeModel( persistentClass.getMappedClass() );
 		}
 
 		Set<String> typeNames = new LinkedHashSet<>( basicTypeMetadataProvider.getKnownDynamicMapTypeNames() );
-		typeNames.addAll( basicTypeMetadataProvider.getTypeIdentifierResolver().allKnownJpaOrHibernateOrmEntityNames() );
+		typeNames.addAll( basicTypeMetadataProvider.getKnownHibernateOrmEntityNames() );
 		throw log.unknownNamedType( name, typeNames );
 	}
 
@@ -136,7 +136,7 @@ public class HibernateOrmBootstrapIntrospector extends AbstractPojoHCAnnBootstra
 	private HibernateOrmDynamicMapRawTypeModel createDynamicMapTypeModel(String name) {
 		HibernateOrmBasicDynamicMapTypeMetadata ormMetadata = basicTypeMetadataProvider.getBasicDynamicMapTypeMetadata( name );
 		PojoRawTypeIdentifier<Map> typeIdentifier =
-				HibernateOrmRawTypeIdentifierResolver.createDynamicMapTypeIdentifier( name );
+				PojoRawTypeIdentifier.of( Map.class, name );
 		return new HibernateOrmDynamicMapRawTypeModel(
 				this, typeIdentifier, ormMetadata
 		);
@@ -146,7 +146,7 @@ public class HibernateOrmBootstrapIntrospector extends AbstractPojoHCAnnBootstra
 		HibernateOrmBasicClassTypeMetadata ormMetadataOrNull =
 				basicTypeMetadataProvider.getBasicClassTypeMetadata( type );
 		PojoRawTypeIdentifier<T> typeIdentifier =
-				HibernateOrmRawTypeIdentifierResolver.createClassTypeIdentifier( type );
+				PojoRawTypeIdentifier.of( type );
 		return new HibernateOrmClassRawTypeModel<>(
 				this, typeIdentifier, ormMetadataOrNull,
 				new RawTypeDeclaringContext<>( genericContextHelper, type )

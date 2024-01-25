@@ -177,19 +177,6 @@ public interface Log extends BasicLogger {
 	)
 	SearchException unknownNamedType(String typeName, Collection<String> availableNamedTypes);
 
-	@Message(id = ID_OFFSET + 28, value = "No matching entity type for name '%1$s'."
-			+ " This is not the name of a Hibernate ORM entity type."
-			+ " Valid names for Hibernate ORM entity types are: %2$s")
-	SearchException unknownEntityNameForEntityType(String invalidName, Collection<String> validNames);
-
-	@Message(id = ID_OFFSET + 29,
-			value = "Invalid type for '%1$s': the entity type must extend '%2$s'," +
-					" but entity type '%3$s' does not."
-	)
-	SearchException invalidEntitySuperType(String entityName,
-			@FormatWith(ClassFormatter.class) Class<?> expectedSuperType,
-			@FormatWith(ClassFormatter.class) Class<?> actualJavaType);
-
 	@Message(id = ID_OFFSET + 32, value = "Invalid schema management strategy name: '%1$s'."
 			+ " Valid names are: %2$s.")
 	SearchException invalidSchemaManagementStrategyName(String invalidRepresentation,
@@ -286,11 +273,6 @@ public interface Log extends BasicLogger {
 			+ " Either this is not the name of an entity type, or the entity type is not mapped in Hibernate Search."
 			+ " Valid names for mapped entity types are: %2$s")
 	SearchException unknownEntityNameForMappedEntityType(String invalidName, Collection<String> validNames);
-
-	@Message(id = ID_OFFSET + 62, value = "No matching entity type for name '%1$s'."
-			+ " Either this is not the JPA name of an entity type, or the entity type is not mapped in Hibernate Search."
-			+ " Valid JPA names for mapped entities are: %2$s")
-	SearchException unknownJpaEntityNameForMappedEntityType(String invalidName, Collection<String> validNames);
 
 	@Message(id = ID_OFFSET + 63, value = "No matching indexed entity type for name '%1$s'."
 			+ " Either this is not the JPA name of an entity type, or the entity type is not indexed in Hibernate Search."

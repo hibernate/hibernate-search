@@ -170,7 +170,7 @@ public class PojoMassIndexingIndexedTypeGroup<E> {
 
 	private boolean isFirstSuperTypeOfSecond(PojoMassIndexingIndexedTypeContext<?> first,
 			PojoMassIndexingIndexedTypeContext<?> second) {
-		return typeContextProvider.allIndexedForSuperType( first.typeIdentifier() )
+		return typeContextProvider.indexedForSuperType( first.typeIdentifier() )
 				.map( s -> s.contains( second ) )
 				.orElse( false );
 	}

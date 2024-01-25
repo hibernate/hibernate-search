@@ -12,19 +12,25 @@ import org.hibernate.search.mapper.pojo.model.path.spi.PojoPathDefinitionProvide
 
 public class PojoEntityTypeAdditionalMetadata {
 	private final String entityName;
+	private final String secondaryEntityName;
 	private final PojoPathDefinitionProvider pathDefinitionProvider;
 	private final Optional<String> entityIdPropertyName;
 
-	public PojoEntityTypeAdditionalMetadata(String entityName,
+	public PojoEntityTypeAdditionalMetadata(String entityName, String secondaryEntityName,
 			PojoPathDefinitionProvider pathDefinitionProvider,
 			Optional<String> entityIdPropertyName) {
 		this.entityName = entityName;
+		this.secondaryEntityName = secondaryEntityName;
 		this.pathDefinitionProvider = pathDefinitionProvider;
 		this.entityIdPropertyName = entityIdPropertyName;
 	}
 
 	public String getEntityName() {
 		return entityName;
+	}
+
+	public String getSecondaryEntityName() {
+		return secondaryEntityName;
 	}
 
 	public PojoPathDefinitionProvider pathDefinitionProvider() {

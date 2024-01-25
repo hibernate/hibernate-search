@@ -110,6 +110,11 @@ public abstract class AbstractPojoMappingImplementor<M>
 	}
 
 	@Override
+	public final PojoRawTypeIdentifierResolver typeIdentifierResolver() {
+		return delegate.typeIdentifierResolver();
+	}
+
+	@Override
 	public final PojoEntityReferenceFactoryDelegate entityReferenceFactoryDelegate() {
 		return entityReferenceFactoryDelegate;
 	}

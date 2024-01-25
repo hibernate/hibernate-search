@@ -11,6 +11,7 @@ import org.hibernate.HibernateException;
 import org.hibernate.engine.spi.SharedSessionContractImplementor;
 import org.hibernate.proxy.HibernateProxy;
 import org.hibernate.proxy.LazyInitializer;
+import org.hibernate.search.mapper.pojo.mapping.spi.PojoRawTypeIdentifierResolver;
 import org.hibernate.search.mapper.pojo.model.spi.PojoRawTypeIdentifier;
 import org.hibernate.search.mapper.pojo.model.spi.PojoRuntimeIntrospector;
 
@@ -19,12 +20,12 @@ import org.hibernate.search.mapper.pojo.model.spi.PojoRuntimeIntrospector;
  */
 public class HibernateOrmRuntimeIntrospector implements PojoRuntimeIntrospector {
 
-	private final HibernateOrmRuntimeIntrospectorTypeContextProvider typeContextProvider;
+	private final PojoRawTypeIdentifierResolver typeIdentifierResolver;
 	private final SharedSessionContractImplementor sessionImplementor;
 
-	public HibernateOrmRuntimeIntrospector(HibernateOrmRuntimeIntrospectorTypeContextProvider typeContextProvider,
+	public HibernateOrmRuntimeIntrospector(PojoRawTypeIdentifierResolver typeIdentifierResolver,
 			SharedSessionContractImplementor sessionImplementor) {
-		this.typeContextProvider = typeContextProvider;
+		this.typeIdentifierResolver = typeIdentifierResolver;
 		this.sessionImplementor = sessionImplementor;
 	}
 
@@ -39,8 +40,11 @@ public class HibernateOrmRuntimeIntrospector implements PojoRuntimeIntrospector 
 		if ( entityName == null ) {
 			return null;
 		}
-		return (PojoRawTypeIdentifier<? extends T>) typeContextProvider.typeIdentifierResolver()
-				.resolveByHibernateOrmEntityName( entityName );
+		// bestGuessEntityName(...) returns a Hibernate ORM "native" entity name,
+		// and that's what we call "secondary" entity names in Hibernate Search
+		// (the primary name is the JPA entity name).
+		return (PojoRawTypeIdentifier<? extends T>) typeIdentifierResolver.typeIdentifierBySecondaryEntityName()
+				.getOrNull( entityName );
 	}
 
 	@Override

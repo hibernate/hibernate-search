@@ -23,6 +23,7 @@ import java.util.Set;
 
 import org.hibernate.search.engine.backend.types.dsl.IndexFieldTypeOptionsStep;
 import org.hibernate.search.engine.common.EntityReference;
+import org.hibernate.search.engine.logging.spi.MappableTypeModelFormatter;
 import org.hibernate.search.engine.mapper.model.spi.MappingElement;
 import org.hibernate.search.mapper.pojo.automaticindexing.building.impl.DerivedDependencyWalkingInfo;
 import org.hibernate.search.mapper.pojo.common.annotation.impl.SearchProcessingWithContextException;
@@ -153,11 +154,11 @@ public interface Log extends BasicLogger {
 			@FormatWith(PojoModelPathFormatter.class) PojoModelPathValueNode path);
 
 	@Message(id = ID_OFFSET_LEGACY_ENGINE + 234,
-			value = "No matching indexed entity types for types: %1$s"
+			value = "No matching indexed entity types for types %1$s"
 					+ " These types are not indexed entity types, nor is any of their subtypes."
 					+ " Valid indexed entity classes, superclasses and superinterfaces are: %2$s."
 	)
-	SearchException invalidScopeTarget(Collection<PojoRawTypeIdentifier<?>> nonIndexedTypes,
+	SearchException invalidIndexedSuperTypes(Collection<PojoRawTypeIdentifier<?>> nonIndexedTypes,
 			Collection<PojoRawTypeIdentifier<?>> validSuperTypes);
 
 	@Message(id = ID_OFFSET_LEGACY_ENGINE + 295, value = "Invalid value for type '$2%s': '$1%s'. %3$s")
@@ -807,22 +808,24 @@ public interface Log extends BasicLogger {
 
 	@Message(id = ID_OFFSET + 130,
 			value = "No matching entity type for class '%1$s'."
-					+ " This class is neither an entity type mapped in Hibernate Search nor a superclass of such entity type."
+					+ " Neither this class nor any of its subclasses is mapped in Hibernate Search."
 					+ " Note interfaces are not considered superclasses and are not permitted here."
 					+ " Valid classes are: %2$s")
 	SearchException unknownClassForNonInterfaceSuperType(@FormatWith(ClassFormatter.class) Class<?> invalidClass,
 			@FormatWith(CommaSeparatedClassesFormatter.class) Collection<Class<?>> validClasses);
 
 	@Message(id = ID_OFFSET + 131,
-			value = "No matching entity type for the name '%1$s'."
-					+ " This name represents neither an entity type mapped in Hibernate Search nor a superclass of such entity type."
-					+ " Valid entity type names are: %2$s")
-	SearchException unknownEntityNameForAnyEntityByName(String invalidName, Collection<String> validNames);
+			value = "No matching entity type for name '%1$s'."
+					+ " This is not the name of an entity type in Hibernate Search."
+					+ " Valid entity names are: %2$s")
+	SearchException unknownEntityName(String invalidName, Collection<String> validNames);
 
 	@Message(id = ID_OFFSET + 132,
-			value = "No matching supertype type for type identifier '%1$s'."
-					+ " Valid identifiers for indexed entity types are: %2$s")
-	SearchException unknownSupertypeTypeIdentifier(PojoRawTypeIdentifier<?> typeIdentifier,
+			value = "No matching entity type for type '%1$s'."
+					+ " Neither this type nor any of its subclasses is mapped in Hibernate Search."
+					+ " Note interfaces are not considered superclasses and are not permitted here."
+					+ " Valid types are: %2$s")
+	SearchException unknownNonInterfaceSuperTypeIdentifier(PojoRawTypeIdentifier<?> typeIdentifier,
 			Set<PojoRawTypeIdentifier<?>> availableTypeIdentifiers);
 
 	@Message(id = ID_OFFSET + 133,
@@ -920,4 +923,56 @@ public interface Log extends BasicLogger {
 			+ "i.e. extraction must be set to DEFAULT and a nonempty array of container value extractor names provided, "
 			+ "e.g. @ContainerExtraction(extract = ContainerExtract.DEFAULT, value = { ... }).")
 	SearchException vectorFieldMustUseExplicitExtractorPath();
+
+	@Message(id = ID_OFFSET + 147,
+			value = "No matching entity type for entity name '%1$s'."
+					+ " Either this is not the name of an entity type,"
+					+ " or neither the entity type nor any of its subclasses is mapped in Hibernate Search."
+					+ " Note interfaces are not considered superclasses and are not permitted here."
+					+ " Valid entity names are: %2$s")
+	SearchException unknownEntityNameForNonInterfaceSuperType(String invalidEntityName,
+			Collection<String> validEntityNames);
+
+	@Message(id = ID_OFFSET + 148,
+			value = "Multiple entity types configured with the same name '%1$s': '%2$s', '%3$s'")
+	SearchException multipleEntityTypesWithSameName(String entityName,
+			@FormatWith(MappableTypeModelFormatter.class) PojoRawTypeModel<?> previousType,
+			@FormatWith(MappableTypeModelFormatter.class) PojoRawTypeModel<?> type);
+
+	@Message(id = ID_OFFSET + 149,
+			value = "Multiple secondary entity names assigned to the same type: '%1$s', '%2$s'.")
+	SearchException multipleSecondaryEntityNames(String entityName, String otherEntityName);
+
+	@Message(id = ID_OFFSET + 150,
+			value = "Multiple entity types configured with the same secondary name '%1$s': '%2$s', '%3$s'")
+	SearchException multipleEntityTypesWithSameSecondaryName(String entityName,
+			@FormatWith(MappableTypeModelFormatter.class) PojoRawTypeModel<?> previousType,
+			@FormatWith(MappableTypeModelFormatter.class) PojoRawTypeModel<?> type);
+
+	@Message(id = ID_OFFSET + 151,
+			value = "Invalid type for '%1$s': the entity type must extend '%2$s'," +
+					" but entity type '%3$s' does not."
+	)
+	SearchException invalidEntitySuperType(String entityName,
+			@FormatWith(ClassFormatter.class) Class<?> expectedSuperType,
+			@FormatWith(ClassFormatter.class) Class<?> actualJavaType);
+
+	@Message(id = ID_OFFSET + 152,
+			value = "No matching indexed entity types for entity names %1$s."
+					+ " Either these are not the names of entity types,"
+					+ " or neither the entity types nor any of their subclasses are indexed in Hibernate Search."
+					+ " Valid entity names are: %2$s."
+	)
+	SearchException invalidIndexedSuperTypeEntityNames(Collection<String> nonIndexedTypes,
+			Collection<String> validSuperTypes);
+
+	@Message(id = ID_OFFSET + 153,
+			value = "No matching indexed entity types for classes %1$s."
+					+ " Neither these classes nor any of their subclasses are indexed in Hibernate Search."
+					+ " Valid classes are: %2$s."
+	)
+	SearchException invalidIndexedSuperTypeClasses(
+			@FormatWith(CommaSeparatedClassesFormatter.class) Collection<Class<?>> invalidClasses,
+			@FormatWith(CommaSeparatedClassesFormatter.class) Collection<Class<?>> validClasses);
+
 }

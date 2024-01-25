@@ -16,6 +16,14 @@ public interface PojoAdditionalMetadataCollectorEntityTypeNode extends PojoAddit
 	void entityName(String entityName);
 
 	/**
+	 * @param secondaryEntityName A secondary name for this entity type,
+	 * for instance the "native" Hibernate ORM entity name (generally just the fully qualified class name).
+	 * Secondary names may conflict with the primary {@link #entityName(String)}.
+	 * The primary name takes precedence in case of lookup by name.
+	 */
+	void secondaryEntityName(String secondaryEntityName);
+
+	/**
 	 * @param pathDefinitionProvider A provider of path definition for this entity type,
 	 * i.e. the object supporting the creation of path filters that will be used in particular
 	 * when performing dirty checking during automatic reindexing.

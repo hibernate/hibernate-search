@@ -6,11 +6,8 @@
  */
 package org.hibernate.search.mapper.pojo.standalone.mapping.impl;
 
-import java.lang.invoke.MethodHandles;
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 
@@ -26,13 +23,11 @@ import org.hibernate.search.mapper.pojo.mapping.spi.AbstractPojoMappingImplement
 import org.hibernate.search.mapper.pojo.mapping.spi.PojoMappingDelegate;
 import org.hibernate.search.mapper.pojo.massindexing.spi.PojoMassIndexerAgent;
 import org.hibernate.search.mapper.pojo.massindexing.spi.PojoMassIndexerAgentCreateContext;
-import org.hibernate.search.mapper.pojo.model.spi.PojoRawTypeIdentifier;
 import org.hibernate.search.mapper.pojo.model.spi.PojoRuntimeIntrospector;
 import org.hibernate.search.mapper.pojo.schema.management.spi.PojoScopeSchemaManager;
 import org.hibernate.search.mapper.pojo.scope.spi.PojoScopeDelegate;
 import org.hibernate.search.mapper.pojo.standalone.entity.SearchIndexedEntity;
 import org.hibernate.search.mapper.pojo.standalone.loading.impl.StandalonePojoLoadingContext;
-import org.hibernate.search.mapper.pojo.standalone.logging.impl.Log;
 import org.hibernate.search.mapper.pojo.standalone.mapping.CloseableSearchMapping;
 import org.hibernate.search.mapper.pojo.standalone.massindexing.impl.StandalonePojoMassIndexingSessionContext;
 import org.hibernate.search.mapper.pojo.standalone.reporting.impl.StandalonePojoMappingHints;
@@ -45,12 +40,9 @@ import org.hibernate.search.mapper.pojo.standalone.session.SearchSessionBuilder;
 import org.hibernate.search.mapper.pojo.standalone.session.impl.StandalonePojoSearchSession;
 import org.hibernate.search.mapper.pojo.standalone.session.impl.StandalonePojoSearchSessionMappingContext;
 import org.hibernate.search.util.common.impl.Closer;
-import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
 public class StandalonePojoMapping extends AbstractPojoMappingImplementor<StandalonePojoMapping>
 		implements CloseableSearchMapping, StandalonePojoSearchSessionMappingContext {
-
-	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	private final StandalonePojoTypeContextContainer typeContextContainer;
 	private final SchemaManagementListener schemaManagementListener;
@@ -158,20 +150,28 @@ public class StandalonePojoMapping extends AbstractPojoMappingImplementor<Standa
 
 	@Override
 	public <T> SearchScopeImpl<T> createScope(Collection<? extends Class<? extends T>> classes) {
-		List<PojoRawTypeIdentifier<? extends T>> typeIdentifiers = new ArrayList<>( classes.size() );
-		for ( Class<? extends T> clazz : classes ) {
-			typeIdentifiers.add( typeContextContainer.typeIdentifierForExactClass( clazz ) );
-		}
-		return doCreateScope( typeIdentifiers );
+		PojoScopeDelegate<EntityReference, T, StandalonePojoScopeIndexedTypeContext<? extends T>> scopeDelegate =
+				delegate().createPojoScopeForClasses(
+						this,
+						classes,
+						typeContextContainer::indexedForExactType
+				);
+
+		// Explicit type parameter is necessary here for ECJ (Eclipse compiler)
+		return new SearchScopeImpl<T>( this, scopeDelegate );
 	}
 
 	@Override
 	public <T> SearchScopeImpl<T> createScope(Class<T> expectedSuperType, Collection<String> entityNames) {
-		List<PojoRawTypeIdentifier<? extends T>> typeIdentifiers = new ArrayList<>( entityNames.size() );
-		for ( String entityName : entityNames ) {
-			typeIdentifiers.add( entityTypeIdentifier( expectedSuperType, entityName ) );
-		}
-		return doCreateScope( typeIdentifiers );
+		PojoScopeDelegate<EntityReference, T, StandalonePojoScopeIndexedTypeContext<? extends T>> scopeDelegate =
+				delegate().createPojoScopeForEntityNames(
+						this,
+						expectedSuperType, entityNames,
+						typeContextContainer::indexedForExactType
+				);
+
+		// Explicit type parameter is necessary here for ECJ (Eclipse compiler)
+		return new SearchScopeImpl<T>( this, scopeDelegate );
 	}
 
 	@Override
@@ -224,19 +224,6 @@ public class StandalonePojoMapping extends AbstractPojoMappingImplementor<Standa
 		return integrationHandle.getOrFail();
 	}
 
-	private <T> PojoRawTypeIdentifier<? extends T> entityTypeIdentifier(Class<T> expectedSuperType,
-			String entityName) {
-		PojoRawTypeIdentifier<?> typeIdentifier = typeContextContainer.typeIdentifierByEntityName().getOrFail( entityName );
-		Class<?> actualJavaType = typeIdentifier.javaClass();
-		if ( !expectedSuperType.isAssignableFrom( actualJavaType ) ) {
-			throw log.invalidEntitySuperType( entityName, expectedSuperType, actualJavaType );
-		}
-		// The cast below is safe because we just checked above that the type extends "expectedSuperType", which extends E
-		@SuppressWarnings("unchecked")
-		PojoRawTypeIdentifier<? extends T> castedTypeIdentifier = (PojoRawTypeIdentifier<? extends T>) typeIdentifier;
-		return castedTypeIdentifier;
-	}
-
 	private Optional<SearchScopeImpl<Object>> createAllScope() {
 		return delegate()
 				.<EntityReference, StandalonePojoScopeIndexedTypeContext<?>>createPojoAllScope(
@@ -244,18 +231,6 @@ public class StandalonePojoMapping extends AbstractPojoMappingImplementor<Standa
 						typeContextContainer::indexedForExactType
 				)
 				.map( scopeDelegate -> new SearchScopeImpl<>( this, scopeDelegate ) );
-	}
-
-	private <T> SearchScopeImpl<T> doCreateScope(Collection<PojoRawTypeIdentifier<? extends T>> typeIdentifiers) {
-		PojoScopeDelegate<EntityReference, T, StandalonePojoScopeIndexedTypeContext<? extends T>> scopeDelegate =
-				delegate().createPojoScope(
-						this,
-						typeIdentifiers,
-						typeContextContainer::indexedForExactType
-				);
-
-		// Explicit type parameter is necessary here for ECJ (Eclipse compiler)
-		return new SearchScopeImpl<T>( this, scopeDelegate );
 	}
 
 	private StandalonePojoSearchSession.Builder createSessionBuilder() {

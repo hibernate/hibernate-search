@@ -22,6 +22,7 @@ class PojoEntityTypeAdditionalMetadataBuilder implements PojoAdditionalMetadataC
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	private String entityName;
+	private String secondaryEntityName;
 	private PojoPathDefinitionProvider pathDefinitionProvider;
 	private String entityIdPropertyName;
 
@@ -40,6 +41,17 @@ class PojoEntityTypeAdditionalMetadataBuilder implements PojoAdditionalMetadataC
 	}
 
 	@Override
+	public void secondaryEntityName(String secondaryEntityName) {
+		if ( this.secondaryEntityName != null && !this.secondaryEntityName.equals( secondaryEntityName ) ) {
+			throw log.multipleSecondaryEntityNames(
+					this.secondaryEntityName,
+					secondaryEntityName
+			);
+		}
+		this.secondaryEntityName = secondaryEntityName;
+	}
+
+	@Override
 	public void pathDefinitionProvider(PojoPathDefinitionProvider pathDefinitionProvider) {
 		this.pathDefinitionProvider = pathDefinitionProvider;
 	}
@@ -52,6 +64,7 @@ class PojoEntityTypeAdditionalMetadataBuilder implements PojoAdditionalMetadataC
 	public PojoEntityTypeAdditionalMetadata build(PojoRawTypeModel<?> typeModel) {
 		return new PojoEntityTypeAdditionalMetadata(
 				entityName != null ? entityName : typeModel.typeIdentifier().javaClass().getSimpleName(),
+				secondaryEntityName,
 				pathDefinitionProvider != null ? pathDefinitionProvider : new SimplePojoPathsDefinitionProvider(),
 				Optional.ofNullable( entityIdPropertyName )
 		);

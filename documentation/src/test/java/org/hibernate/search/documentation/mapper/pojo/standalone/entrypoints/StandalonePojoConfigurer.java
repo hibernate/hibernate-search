@@ -10,8 +10,6 @@ import org.hibernate.search.mapper.pojo.automaticindexing.ReindexOnUpdate;
 import org.hibernate.search.mapper.pojo.standalone.mapping.StandalonePojoMappingConfigurationContext;
 import org.hibernate.search.mapper.pojo.standalone.mapping.StandalonePojoMappingConfigurer;
 
-// tag::configurer[]
-
 public class StandalonePojoConfigurer implements StandalonePojoMappingConfigurer {
 	@Override
 	public void configure(StandalonePojoMappingConfigurationContext context) {
@@ -20,4 +18,3 @@ public class StandalonePojoConfigurer implements StandalonePojoMappingConfigurer
 		context.defaultReindexOnUpdate( ReindexOnUpdate.SHALLOW ); // <2>
 	}
 }
-// end::configurer[]

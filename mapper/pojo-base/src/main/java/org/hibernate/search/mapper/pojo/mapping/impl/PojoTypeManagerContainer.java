@@ -10,7 +10,6 @@ import java.lang.invoke.MethodHandles;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
@@ -19,18 +18,19 @@ import java.util.Optional;
 import java.util.Set;
 
 import org.hibernate.search.mapper.pojo.logging.impl.Log;
+import org.hibernate.search.mapper.pojo.mapping.spi.PojoRawTypeIdentifierResolver;
 import org.hibernate.search.mapper.pojo.model.spi.PojoRawTypeIdentifier;
 import org.hibernate.search.mapper.pojo.model.spi.PojoRawTypeModel;
-import org.hibernate.search.mapper.pojo.scope.impl.PojoScopeIndexedTypeContext;
 import org.hibernate.search.mapper.pojo.scope.impl.PojoScopeTypeContextProvider;
 import org.hibernate.search.mapper.pojo.work.impl.PojoWorkTypeContext;
 import org.hibernate.search.mapper.pojo.work.impl.PojoWorkTypeContextProvider;
 import org.hibernate.search.util.common.data.spi.KeyValueProvider;
 import org.hibernate.search.util.common.impl.Closer;
+import org.hibernate.search.util.common.impl.CollectionHelper;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
 public class PojoTypeManagerContainer
-		implements AutoCloseable, PojoWorkTypeContextProvider, PojoScopeTypeContextProvider {
+		implements AutoCloseable, PojoWorkTypeContextProvider, PojoScopeTypeContextProvider, PojoRawTypeIdentifierResolver {
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	public static Builder builder() {
@@ -41,24 +41,25 @@ public class PojoTypeManagerContainer
 	private final KeyValueProvider<PojoRawTypeIdentifier<?>, PojoIndexedTypeManager<?, ?>> indexedByExactType;
 	private final KeyValueProvider<String, AbstractPojoTypeManager<?, ?>> byEntityName;
 	private final KeyValueProvider<String, PojoRawTypeIdentifier<?>> typeIdentifierByEntityName;
+	private final KeyValueProvider<String, PojoRawTypeIdentifier<?>> typeIdentifierBySecondaryEntityName;
+
 	private final KeyValueProvider<PojoRawTypeIdentifier<?>,
-			Set<? extends AbstractPojoTypeManager<?, ?>>> allByNonInterfaceSuperType;
+			Set<? extends AbstractPojoTypeManager<?, ?>>> byNonInterfaceSuperType;
+	private final KeyValueProvider<String, PojoRawTypeIdentifier<?>> nonInterfaceSuperTypeIdentifierByEntityName;
+	private final KeyValueProvider<Class<?>, PojoRawTypeIdentifier<?>> nonInterfaceSuperTypeIdentifierByClass;
 
-	private final Map<PojoRawTypeIdentifier<?>, Set<? extends PojoIndexedTypeManager<?, ?>>> indexedBySuperType;
+	private final KeyValueProvider<PojoRawTypeIdentifier<?>, Set<? extends PojoIndexedTypeManager<?, ?>>> indexedBySuperType;
+	private final KeyValueProvider<Class<?>, Set<? extends PojoIndexedTypeManager<?, ?>>> indexedBySuperTypeClass;
+	private final KeyValueProvider<String, Set<? extends PojoIndexedTypeManager<?, ?>>> indexedBySuperTypeEntityName;
 
-	private final Collection<PojoIndexedTypeManager<?, ?>> allIndexed;
+	private final Set<PojoIndexedTypeManager<?, ?>> allIndexed;
 	private final Set<PojoRawTypeIdentifier<?>> allIndexedAndContainedTypes;
-	private final Set<PojoRawTypeIdentifier<?>> allNonInterfaceSuperTypes;
-	private final Set<Class<?>> allNonInterfaceSuperTypesClasses;
 
 	private PojoTypeManagerContainer(Builder builder) {
 		// Use a LinkedHashMap for deterministic iteration in the "all" set
 		Map<PojoRawTypeIdentifier<?>, AbstractPojoTypeManager<?, ?>> byExactTypeContent = new LinkedHashMap<>();
 		Map<PojoRawTypeIdentifier<?>, PojoIndexedTypeManager<?, ?>> indexedByExactTypeContent = new LinkedHashMap<>();
 		Map<String, AbstractPojoTypeManager<?, ?>> byEntityNameContent = new LinkedHashMap<>();
-		Map<String, PojoRawTypeIdentifier<?>> typeIdentifierByEntityNameContent = new LinkedHashMap<>();
-		Set<Class<?>> allNonInterfaceSuperTypesClassesContent = new HashSet<>();
-
 		for ( PojoIndexedTypeManager<?, ?> typeManager : builder.indexed ) {
 			PojoRawTypeIdentifier<?> typeIdentifier = typeManager.typeIdentifier;
 
@@ -74,39 +75,91 @@ public class PojoTypeManagerContainer
 
 			byEntityNameContent.put( typeManager.entityName(), typeManager );
 		}
-		for ( PojoRawTypeIdentifier<?> identifier : builder.allByNonInterfaceSuperType.keySet() ) {
-			// we want to skip any interfaces since this set should only be used to report an error when we cannot
-			// find a type by a class, and that should only be a case when we are looking up non-named types.
-			if ( !identifier.javaClass().isInterface() ) {
-				allNonInterfaceSuperTypesClassesContent.add( identifier.javaClass() );
-			}
-		}
-		// only limit to the indexed/contained and their supertype entities, no need to keep the others.
-		for ( Map.Entry<String, PojoRawTypeModel<?>> entry : builder.allEntitiesByName.entrySet() ) {
-			PojoRawTypeIdentifier<?> typedIdentifier = entry.getValue().typeIdentifier();
-			if ( builder.allByNonInterfaceSuperType.containsKey( typedIdentifier ) ) {
-				typeIdentifierByEntityNameContent.put( entry.getKey(), typedIdentifier );
-			}
-		}
-
 		this.byExactType = new KeyValueProvider<>( byExactTypeContent, log::unknownTypeIdentifierForMappedEntityType );
 		this.indexedByExactType =
 				new KeyValueProvider<>( indexedByExactTypeContent, log::unknownTypeIdentifierForIndexedEntityType );
 		this.byEntityName = new KeyValueProvider<>( byEntityNameContent, log::unknownEntityNameForMappedEntityType );
+
+		Map<String, PojoRawTypeIdentifier<?>> typeIdentifierByEntityNameContent = new LinkedHashMap<>();
+		Map<String, PojoRawTypeIdentifier<?>> typeIdentifierBySecondaryEntityNameContent = new LinkedHashMap<>();
+		for ( Map.Entry<String, PojoRawTypeModel<?>> entry : builder.allEntitiesByName.entrySet() ) {
+			PojoRawTypeIdentifier<?> typeIdentifier = entry.getValue().typeIdentifier();
+			typeIdentifierByEntityNameContent.put( entry.getKey(), typeIdentifier );
+		}
+		for ( Map.Entry<String, PojoRawTypeModel<?>> entry : builder.allEntitiesBySecondaryName.entrySet() ) {
+			PojoRawTypeIdentifier<?> typeIdentifier = entry.getValue().typeIdentifier();
+			typeIdentifierBySecondaryEntityNameContent.put( entry.getKey(), typeIdentifier );
+			// Take secondary names into account in the primary map, too
+			// ... but resolve conflicts in favor of primary names.
+			typeIdentifierByEntityNameContent.putIfAbsent( entry.getKey(), typeIdentifier );
+		}
 		this.typeIdentifierByEntityName =
-				new KeyValueProvider<>( typeIdentifierByEntityNameContent, log::unknownEntityNameForAnyEntityByName );
+				new KeyValueProvider<>( typeIdentifierByEntityNameContent, log::unknownEntityName );
+		this.typeIdentifierBySecondaryEntityName =
+				new KeyValueProvider<>( typeIdentifierBySecondaryEntityNameContent, log::unknownEntityName );
 
-		builder.allByNonInterfaceSuperType.replaceAll( (k, v) -> Collections.unmodifiableSet( v ) );
-		this.allByNonInterfaceSuperType =
-				new KeyValueProvider<>( builder.allByNonInterfaceSuperType, log::unknownSupertypeTypeIdentifier );
-		this.allNonInterfaceSuperTypes = Collections.unmodifiableSet( builder.allByNonInterfaceSuperType.keySet() );
+		Map<PojoRawTypeIdentifier<?>, Set<PojoIndexedTypeManager<?, ?>>> indexedBySuperTypeContent =
+				new LinkedHashMap<>( builder.indexedBySuperType );
+		Map<String, Set<PojoIndexedTypeManager<?, ?>>> indexedBySuperTypeEntityNameContent =
+				new LinkedHashMap<>();
+		Map<Class<?>, Set<PojoIndexedTypeManager<?, ?>>> indexedBySuperTypeClassContent =
+				new LinkedHashMap<>();
+		for ( Map.Entry<PojoRawTypeIdentifier<?>, Set<PojoIndexedTypeManager<?, ?>>> entry : indexedBySuperTypeContent
+				.entrySet() ) {
+			PojoRawTypeIdentifier<?> typeIdentifier = entry.getKey();
 
-		this.indexedBySuperType = new LinkedHashMap<>( builder.indexedBySuperType );
-		indexedBySuperType.replaceAll( (k, v) -> Collections.unmodifiableSet( v ) );
+			Set<String> entityNames = builder.allEntityNamesByTypeIdentifier.get( typeIdentifier );
+			if ( entityNames != null ) {
+				for ( String entityName : entityNames ) {
+					indexedBySuperTypeEntityNameContent.put( entityName, entry.getValue() );
+				}
+			}
+			// Multiple named types can share a single java class, so those wouldn't work here.
+			if ( !typeIdentifier.isNamed() ) {
+				indexedBySuperTypeClassContent.put( typeIdentifier.javaClass(), entry.getValue() );
+			}
+		}
+		indexedBySuperTypeContent.replaceAll( (k, v) -> Collections.unmodifiableSet( v ) );
+		this.indexedBySuperType =
+				KeyValueProvider.createWithMultiKeyException( indexedBySuperTypeContent, log::invalidIndexedSuperTypes );
+		indexedBySuperTypeEntityNameContent.replaceAll( (k, v) -> Collections.unmodifiableSet( v ) );
+		this.indexedBySuperTypeEntityName = KeyValueProvider.createWithMultiKeyException( indexedBySuperTypeEntityNameContent,
+				log::invalidIndexedSuperTypeEntityNames );
+		indexedBySuperTypeClassContent.replaceAll( (k, v) -> Collections.unmodifiableSet( v ) );
+		this.indexedBySuperTypeClass = KeyValueProvider.createWithMultiKeyException( indexedBySuperTypeClassContent,
+				log::invalidIndexedSuperTypeClasses );
 
-		this.allIndexed = Collections.unmodifiableCollection( indexedByExactTypeContent.values() );
+		Map<Class<?>, PojoRawTypeIdentifier<?>> nonInterfaceSuperTypeIdentifierByClassContent = new LinkedHashMap<>();
+		Map<String, PojoRawTypeIdentifier<?>> nonInterfaceSuperTypeIdentifierByEntityNameContent = new LinkedHashMap<>();
+		Map<PojoRawTypeIdentifier<?>, Set<AbstractPojoTypeManager<?, ?>>> byNonInterfaceSuperTypeContent =
+				new LinkedHashMap<>();
+		for ( Map.Entry<PojoRawTypeIdentifier<?>, Set<AbstractPojoTypeManager<?, ?>>> entry : builder.bySuperType.entrySet() ) {
+			PojoRawTypeIdentifier<?> typeIdentifier = entry.getKey();
+			// for these, we want to skip any interfaces since this set should only be used to report an error when we cannot
+			// find a type by a class, and that should only be a case when we are looking up non-named types.
+			if ( typeIdentifier.isNamed() || !typeIdentifier.javaClass().isInterface() ) {
+				byNonInterfaceSuperTypeContent.put( typeIdentifier, entry.getValue() );
+				Set<String> entityNames = builder.allEntityNamesByTypeIdentifier.get( typeIdentifier );
+				if ( entityNames != null ) {
+					for ( String entityName : entityNames ) {
+						nonInterfaceSuperTypeIdentifierByEntityNameContent.put( entityName, typeIdentifier );
+					}
+				}
+				// Multiple named types can share a single java class, so those wouldn't work here.
+				if ( !typeIdentifier.isNamed() ) {
+					nonInterfaceSuperTypeIdentifierByClassContent.put( typeIdentifier.javaClass(), typeIdentifier );
+				}
+			}
+		}
+		this.byNonInterfaceSuperType =
+				new KeyValueProvider<>( byNonInterfaceSuperTypeContent, log::unknownNonInterfaceSuperTypeIdentifier );
+		this.nonInterfaceSuperTypeIdentifierByEntityName = new KeyValueProvider<>(
+				nonInterfaceSuperTypeIdentifierByEntityNameContent, log::unknownEntityNameForNonInterfaceSuperType );
+		this.nonInterfaceSuperTypeIdentifierByClass = new KeyValueProvider<>( nonInterfaceSuperTypeIdentifierByClassContent,
+				log::unknownClassForNonInterfaceSuperType );
+
+		this.allIndexed = Collections.unmodifiableSet( new LinkedHashSet<>( indexedByExactTypeContent.values() ) );
 		this.allIndexedAndContainedTypes = Collections.unmodifiableSet( byExactTypeContent.keySet() );
-		this.allNonInterfaceSuperTypesClasses = Collections.unmodifiableSet( allNonInterfaceSuperTypesClassesContent );
 	}
 
 	@Override
@@ -129,18 +182,8 @@ public class PojoTypeManagerContainer
 	}
 
 	@Override
-	public Set<PojoRawTypeIdentifier<?>> allIndexedSuperTypes() {
-		return indexedBySuperType.keySet();
-	}
-
-	@Override
 	public Set<PojoRawTypeIdentifier<?>> allNonInterfaceSuperTypes() {
-		return allNonInterfaceSuperTypes;
-	}
-
-	@Override
-	public Set<Class<?>> allNonInterfaceSuperTypesClasses() {
-		return allNonInterfaceSuperTypesClasses;
+		return byNonInterfaceSuperType.keys();
 	}
 
 	@Override
@@ -150,17 +193,47 @@ public class PojoTypeManagerContainer
 
 	@Override
 	@SuppressWarnings("unchecked")
-	public <E> Optional<? extends Set<? extends PojoScopeIndexedTypeContext<?, ? extends E>>> allIndexedForSuperType(
-			PojoRawTypeIdentifier<E> typeIdentifier) {
-		return Optional.ofNullable( (Set<PojoIndexedTypeManager<?, ? extends E>>) indexedBySuperType.get( typeIdentifier ) );
+	public <E> Set<? extends PojoIndexedTypeManager<?, ? extends E>> indexedForSuperTypes(
+			Collection<? extends PojoRawTypeIdentifier<? extends E>> typeIdentifiers) {
+		return (Set<? extends PojoIndexedTypeManager<?, ? extends E>>) CollectionHelper
+				.flattenAsSet( indexedBySuperType.getAllOrFail( typeIdentifiers ) );
 	}
 
 	@Override
 	@SuppressWarnings("unchecked")
-	public <E> Set<? extends PojoWorkTypeContext<?, ? extends E>> allByNonInterfaceSuperType(
+	public <E> Optional<? extends Set<? extends PojoIndexedTypeManager<?, ? extends E>>> indexedForSuperType(
 			PojoRawTypeIdentifier<E> typeIdentifier) {
-		return (Set<? extends PojoWorkTypeContext<?, ? extends E>>) allByNonInterfaceSuperType.getOrFail(
-				typeIdentifier );
+		return (Optional<? extends Set<? extends PojoIndexedTypeManager<?, ? extends E>>>) indexedBySuperType
+				.getOptional( typeIdentifier );
+	}
+
+	@SuppressWarnings("unchecked")
+	public <T> Set<? extends PojoIndexedTypeManager<?, ? extends T>> indexedForSuperTypeClasses(
+			Collection<? extends Class<? extends T>> classes) {
+		return (Set<? extends PojoIndexedTypeManager<?, ? extends T>>) CollectionHelper
+				.flattenAsSet( indexedBySuperTypeClass.getAllOrFail( classes ) );
+	}
+
+	public Set<? extends PojoIndexedTypeManager<?, ?>> indexedForSuperTypeEntityNames(Collection<String> entityNames) {
+		return CollectionHelper.flattenAsSet( indexedBySuperTypeEntityName.getAllOrFail( entityNames ) );
+	}
+
+	@Override
+	@SuppressWarnings("unchecked")
+	public <E> Set<? extends PojoWorkTypeContext<?, ? extends E>> forNonInterfaceSuperType(
+			PojoRawTypeIdentifier<E> typeIdentifier) {
+		return (Set<? extends PojoWorkTypeContext<?, ? extends E>>) byNonInterfaceSuperType.getOrFail( typeIdentifier );
+	}
+
+	@Override
+	public KeyValueProvider<String, PojoRawTypeIdentifier<?>> nonInterfaceSuperTypeIdentifierByEntityName() {
+		return nonInterfaceSuperTypeIdentifierByEntityName;
+	}
+
+	@Override
+	@SuppressWarnings("unchecked")
+	public <E> PojoRawTypeIdentifier<E> nonInterfaceSuperTypeIdentifierForClass(Class<E> clazz) {
+		return (PojoRawTypeIdentifier<E>) nonInterfaceSuperTypeIdentifierByClass.getOrFail( clazz );
 	}
 
 	@Override
@@ -173,7 +246,12 @@ public class PojoTypeManagerContainer
 		return typeIdentifierByEntityName;
 	}
 
-	Collection<PojoIndexedTypeManager<?, ?>> allIndexed() {
+	@Override
+	public KeyValueProvider<String, PojoRawTypeIdentifier<?>> typeIdentifierBySecondaryEntityName() {
+		return typeIdentifierBySecondaryEntityName;
+	}
+
+	Set<PojoIndexedTypeManager<?, ?>> allIndexed() {
 		return allIndexed;
 	}
 
@@ -184,38 +262,56 @@ public class PojoTypeManagerContainer
 		private final List<PojoContainedTypeManager<?, ?>> contained = new ArrayList<>();
 		private final Map<PojoRawTypeIdentifier<?>, Set<PojoIndexedTypeManager<?, ?>>> indexedBySuperType =
 				new LinkedHashMap<>();
-		private final Map<PojoRawTypeIdentifier<?>, Set<AbstractPojoTypeManager<?, ?>>> allByNonInterfaceSuperType =
+		private final Map<PojoRawTypeIdentifier<?>, Set<AbstractPojoTypeManager<?, ?>>> bySuperType =
 				new LinkedHashMap<>();
+		private final Map<PojoRawTypeIdentifier<?>, Set<PojoRawTypeIdentifier<?>>> entityTypeIdentifiersBySuperType =
+				new LinkedHashMap<>();
+		private final Map<PojoRawTypeIdentifier<?>, Set<String>> allEntityNamesByTypeIdentifier = new LinkedHashMap<>();
 		private final Map<String, PojoRawTypeModel<?>> allEntitiesByName = new LinkedHashMap<>();
+		private final Map<String, PojoRawTypeModel<?>> allEntitiesBySecondaryName = new LinkedHashMap<>();
 
 		private Builder() {
 		}
 
 		public <E> void addIndexed(PojoRawTypeModel<E> typeModel, PojoIndexedTypeManager<?, E> typeManager) {
 			indexed.add( typeManager );
-			typeModel.descendingSuperTypes()
-					.map( PojoRawTypeModel::typeIdentifier )
-					.forEach( clazz -> {
-						indexedBySuperType.computeIfAbsent( clazz, ignored -> new LinkedHashSet<>() )
-								.add( typeManager );
-						if ( clazz.isNamed() || !clazz.javaClass().isInterface() ) {
-							allByNonInterfaceSuperType.computeIfAbsent( clazz, ignored -> new LinkedHashSet<>() )
-									.add( typeManager );
-						}
-					} );
+			registerSuperTypes( indexedBySuperType, typeModel, typeManager );
+			registerSuperTypes( bySuperType, typeModel, typeManager );
 		}
 
 		public <E> void addContained(PojoRawTypeModel<E> typeModel, PojoContainedTypeManager<?, E> typeManager) {
 			contained.add( typeManager );
-			typeModel.descendingSuperTypes()
-					.map( PojoRawTypeModel::typeIdentifier )
-					.filter( clazz -> clazz.isNamed() || !clazz.javaClass().isInterface() )
-					.forEach( clazz -> allByNonInterfaceSuperType.computeIfAbsent( clazz, ignored -> new LinkedHashSet<>() )
-							.add( typeManager ) );
+			registerSuperTypes( bySuperType, typeModel, typeManager );
 		}
 
-		public void addEntity(String entityName, PojoRawTypeModel<?> entityType) {
-			allEntitiesByName.put( entityName, entityType );
+		public void addEntity(PojoRawTypeModel<?> entityType, String entityName, String secondaryEntityName) {
+			PojoRawTypeIdentifier<?> typeIdentifier = entityType.typeIdentifier();
+			allEntityNamesByTypeIdentifier
+					.computeIfAbsent( typeIdentifier, ignored -> new LinkedHashSet<>() )
+					.add( entityName );
+			PojoRawTypeModel<?> previousType = allEntitiesByName.putIfAbsent( entityName, entityType );
+			if ( previousType != null ) {
+				throw log.multipleEntityTypesWithSameName( entityName, previousType, entityType );
+			}
+			if ( secondaryEntityName != null ) {
+				allEntityNamesByTypeIdentifier
+						.computeIfAbsent( typeIdentifier, ignored -> new LinkedHashSet<>() )
+						.add( secondaryEntityName );
+				previousType = allEntitiesBySecondaryName.putIfAbsent( secondaryEntityName, entityType );
+				if ( previousType != null ) {
+					throw log.multipleEntityTypesWithSameSecondaryName( secondaryEntityName, previousType, entityType );
+				}
+			}
+			registerSuperTypes( entityTypeIdentifiersBySuperType, entityType, entityType.typeIdentifier() );
+		}
+
+		private <T> void registerSuperTypes(Map<PojoRawTypeIdentifier<?>, Set<T>> bySuperType,
+				PojoRawTypeModel<?> entityType, T value) {
+			entityType.descendingSuperTypes()
+					.map( PojoRawTypeModel::typeIdentifier )
+					.forEach( superTypeIdentifier -> bySuperType
+							.computeIfAbsent( superTypeIdentifier, ignored -> new LinkedHashSet<>() )
+							.add( value ) );
 		}
 
 		public void closeOnFailure() {

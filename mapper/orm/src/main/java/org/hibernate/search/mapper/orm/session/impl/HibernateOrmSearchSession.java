@@ -388,7 +388,7 @@ public class HibernateOrmSearchSession extends AbstractPojoSearchSession
 		}
 
 		private HibernateOrmRuntimeIntrospector buildRuntimeIntrospector() {
-			return new HibernateOrmRuntimeIntrospector( typeContextProvider, sessionImplementor );
+			return new HibernateOrmRuntimeIntrospector( mappingContext.typeIdentifierResolver(), sessionImplementor );
 		}
 
 		public HibernateOrmSearchSession build() {
