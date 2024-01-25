@@ -385,11 +385,19 @@ Only available on `@VectorField`.
 |===============
 |Value|Definition
 |`VectorSimilarity.L2`|An L2 (Euclidean) norm, that is a sensible default for most scenarios.
-Distance between vectors `x` and `y` is calculated as latexmath:[d(x,y) = \sqrt{\sum_{i=1}^{n} (x_i - y_i)^2 } ]
-and the score function is latexmath:[s = \frac{1}{1+d*d}]
+Distance between vectors `x` and `y` is calculated as
+ifdef::backend-html5[stem:[d(x,y) = \sqrt{\sum_{i=1}^{n} (x_i - y_i)^2 } ]]
+ifdef::backend-pdf[`d(x,y) = sqrt(sum[i=1; i<n+1]( (x(i) - y(i))*(x(i) - y(i)) )`]
+and the score function is
+ifdef::backend-html5[stem:[s = \frac{1}{1+d^2}]]
+ifdef::backend-pdf[`s = 1/(1+d*d)`]
 |`VectorSimilarity.DOT_PRODUCT`|Inner product (dot product in particular).
-Distance between vectors `x` and `y` is calculated as latexmath:[d(x,y) = \sum_{i=1}^{n} x_i \cdot y_i ]
-and the score function is latexmath:[s = \frac{1}{1+d}]
+Distance between vectors `x` and `y` is calculated as
+ifdef::backend-html5[stem:[d(x,y) = \sum_{i=1}^{n} x_i \cdot y_i ]]
+ifdef::backend-pdf[`d(x,y) = sum[i=1; i< n+1] ( x(i)*y(i) ) `]
+and the score function is
+ifdef::backend-html5[stem:[s = \frac{1}{1+d}]]
+ifdef::backend-pdf[`s = 1/(1+d)`]
 
 [WARNING]
 ====
@@ -400,14 +408,24 @@ while byte vectors should simply all have the same norm.
 ====
 
 |`VectorSimilarity.COSINE`|Cosine similarity.
-Distance between vectors `x` and `y` is calculated as latexmath:[d(x,y) = \frac{1 - \sum_{i=1} ^{n} x_i \cdot y_i }{ \sqrt{ \sum_{i=1} ^{n} x_i^2 } \sqrt{ \sum_{i=1} ^{n} y_i^2 }} ]
-and the score function is latexmath:[s = \frac{1}{1+d}]
+Distance between vectors `x` and `y` is calculated as
+ifdef::backend-html5[stem:[d(x,y) = \frac{1 - \sum_{i=1} ^{n} x_i \cdot y_i }{ \sqrt{ \sum_{i=1} ^{n} x_i^2 } \sqrt{ \sum_{i=1} ^{n} y_i^2 }} ]]
+ifdef::backend-pdf[`d(x,y) = (1 - sum[i=1; i<n+1] ( x(i)*y(i) )/( sqrt( sum[i=1; i<n+1] x(i)*x(i) ) sqrt( sum[i=1; i<n+1] y(i)*y(i) ) ) )`]
+and the score function is
+ifdef::backend-html5[stem:[s = \frac{1}{1+d}]]
+ifdef::backend-pdf[`s = 1/(1+d)`]
 |`VectorSimilarity.MAX_INNER_PRODUCT`|Similar to a dot product similarity, but does not require vector normalization.
-Distance between vectors `x` and `y` is calculated as latexmath:[d(x,y) = \sum_{i=1}^{n} x_i \cdot y_i ]
-and the score function is latexmath:[s = \begin{cases}
+Distance between vectors `x` and `y` is calculated as
+ifdef::backend-html5[stem:[d(x,y) = \sum_{i=1}^{n} x_i \cdot y_i ]]
+ifdef::backend-pdf[`d(x,y) = sum[i=1; i<n+1] ( x(i)*y(i) )`]
+and the score function is
+ifdef::backend-html5[]
+stem:[s = \begin{cases}
 \frac{1}{1-d} & \text{if d < 0}\\
 d+1 & \text{otherwise}
 \end{cases} ]
+endif::[]
+ifdef::backend-pdf[`d<0 ? 1/(1-d) : d+1`]
 |`VectorSimilarity.DEFAULT`|Use the backend-specific default. For the <<backend-lucene, Lucene backend>> an `L2` similarity is used.
 |===============
 +
