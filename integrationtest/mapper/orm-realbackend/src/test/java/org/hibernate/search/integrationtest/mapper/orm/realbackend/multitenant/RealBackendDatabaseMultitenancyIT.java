@@ -133,22 +133,20 @@ class RealBackendDatabaseMultitenancyIT {
 		// and let's check mass indexing as well:
 		SearchMapping searchMapping = Search.mapping( sessionFactory );
 		searchMapping.scope( Object.class ).massIndexer( asSet( TENANT_ID_1, TENANT_ID_2, TENANT_ID_3 ) )
-				.purgeAllOnStart( true )
+				// aws-serverless does not support purge, so we'll just drop the entire index here:
+				.dropAndCreateSchemaOnStart( true )
 				.startAndWait();
 
-		with( sessionFactory, TENANT_ID_1 ).runInTransaction( session -> {
-			assertForCurrentTenant( session, type, TENANT_TEXT_1 );
-		} );
-		with( sessionFactory, TENANT_ID_2 ).runInTransaction( session -> {
-			assertForCurrentTenant( session, type, TENANT_TEXT_2 );
-		} );
-		with( sessionFactory, TENANT_ID_3 ).runInTransaction( session -> {
-			assertThat( Search.session( session )
-					.search( type )
-					.where( SearchPredicateFactory::matchAll )
-					.fetchTotalHitCount() )
-					.isZero();
-		} );
+		with( sessionFactory, TENANT_ID_1 ).runInTransaction( session -> setupHelper.assertions()
+				.searchAfterIndexChangesAndPotentialRefresh( () -> assertForCurrentTenant( session, type, TENANT_TEXT_1 ) ) );
+		with( sessionFactory, TENANT_ID_2 ).runInTransaction( session -> setupHelper.assertions()
+				.searchAfterIndexChangesAndPotentialRefresh( () -> assertForCurrentTenant( session, type, TENANT_TEXT_2 ) ) );
+		with( sessionFactory, TENANT_ID_3 ).runInTransaction( session -> setupHelper.assertions()
+				.searchAfterIndexChangesAndPotentialRefresh( () -> assertThat( Search.session( session )
+						.search( type )
+						.where( SearchPredicateFactory::matchAll )
+						.fetchTotalHitCount() )
+						.isZero() ) );
 	}
 
 	private static void assertForCurrentTenant(Session session, Class<?> type, String text) {
