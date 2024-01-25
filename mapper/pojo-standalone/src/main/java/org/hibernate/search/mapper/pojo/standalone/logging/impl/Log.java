@@ -35,7 +35,7 @@ public interface Log extends BasicLogger {
 	@Message(id = ID_OFFSET + 3, value = "Unable to retrieve type model for class '%1$s'.")
 	SearchException errorRetrievingTypeModel(@FormatWith(ClassFormatter.class) Class<?> clazz, @Cause Exception cause);
 
-	@Message(id = ID_OFFSET + 5, value = "Entity type '%1$s' has multiple, conflicting defintions in the mapping builder.")
+	@Message(id = ID_OFFSET + 5, value = "Entity type '%1$s' has multiple, conflicting definitions in the mapping builder.")
 	SearchException multipleEntityTypeDefinitions(@FormatWith(MappableTypeModelFormatter.class) PojoRawTypeModel<?> type);
 
 	@Message(id = ID_OFFSET + 6, value = "Multiple entity types configured with the same name '%1$s': '%2$s', '%3$s'")
