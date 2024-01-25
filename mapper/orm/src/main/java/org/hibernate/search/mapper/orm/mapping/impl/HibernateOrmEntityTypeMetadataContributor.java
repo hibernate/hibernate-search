@@ -33,10 +33,9 @@ final class HibernateOrmEntityTypeMetadataContributor implements PojoTypeMetadat
 			// Entity metadata is not inherited; only contribute it to the exact type.
 			return;
 		}
-		collector.markAsEntity(
-				persistentClass.getJpaEntityName(),
-				new HibernateOrmPathDefinitionProvider( typeModel, persistentClass )
-		)
-				.entityIdPropertyName( identifierPropertyNameOptional.orElse( null ) );
+		var node = collector.markAsEntity();
+		node.entityName( persistentClass.getJpaEntityName() );
+		node.pathDefinitionProvider( new HibernateOrmPathDefinitionProvider( typeModel, persistentClass ) );
+		node.entityIdPropertyName( identifierPropertyNameOptional.orElse( null ) );
 	}
 }

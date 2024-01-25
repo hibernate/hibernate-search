@@ -9,7 +9,6 @@ package org.hibernate.search.mapper.pojo.standalone.mapping.impl;
 import org.hibernate.search.mapper.pojo.mapping.building.spi.PojoTypeMetadataContributor;
 import org.hibernate.search.mapper.pojo.model.additionalmetadata.building.spi.PojoAdditionalMetadataCollectorTypeNode;
 import org.hibernate.search.mapper.pojo.model.spi.PojoRawTypeIdentifier;
-import org.hibernate.search.mapper.pojo.standalone.model.impl.StandalonePojoPathsDefinitionProvider;
 
 class StandalonePojoEntityTypeContributor implements PojoTypeMetadataContributor {
 
@@ -27,6 +26,9 @@ class StandalonePojoEntityTypeContributor implements PojoTypeMetadataContributor
 			// Entity metadata is not inherited; only contribute it to the exact type.
 			return;
 		}
-		collector.markAsEntity( entityName, new StandalonePojoPathsDefinitionProvider() );
+		var node = collector.markAsEntity();
+		if ( entityName != null ) {
+			node.entityName( entityName );
+		}
 	}
 }

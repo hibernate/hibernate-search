@@ -4,7 +4,7 @@
  * License: GNU Lesser General Public License (LGPL), version 2.1 or later
  * See the lgpl.txt file in the root directory or <http://www.gnu.org/licenses/lgpl-2.1.html>.
  */
-package org.hibernate.search.mapper.pojo.standalone.model.impl;
+package org.hibernate.search.mapper.pojo.model.path.impl;
 
 import java.util.Collections;
 import java.util.LinkedHashSet;
@@ -23,7 +23,7 @@ import org.hibernate.search.mapper.pojo.model.path.spi.PojoPathDefinitionProvide
  * <p>
  * See {@link PojoModelPathPropertyNode#toPropertyString()}.
  */
-public class StandalonePojoPathsDefinitionProvider implements PojoPathDefinitionProvider {
+public class SimplePojoPathsDefinitionProvider implements PojoPathDefinitionProvider {
 
 	@Override
 	public List<String> preDefinedOrdinals() {
