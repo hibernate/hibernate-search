@@ -142,11 +142,13 @@ public class StandalonePojoIntegrationBooterImpl implements StandalonePojoIntegr
 			return this;
 		}
 
+		@Override
 		public BuilderImpl property(String name, Object value) {
 			properties.put( name, value );
 			return this;
 		}
 
+		@Override
 		public BuilderImpl properties(Map<String, ?> map) {
 			properties.putAll( map );
 			return this;
