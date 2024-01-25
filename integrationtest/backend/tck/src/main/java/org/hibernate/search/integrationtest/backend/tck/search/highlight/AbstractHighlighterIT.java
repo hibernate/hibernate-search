@@ -6,13 +6,11 @@
  */
 package org.hibernate.search.integrationtest.backend.tck.search.highlight;
 
-import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.hibernate.search.util.impl.integrationtest.common.assertion.SearchHitsAssert.assertThatHits;
 import static org.junit.jupiter.api.Assumptions.assumeFalse;
 import static org.junit.jupiter.api.Assumptions.assumeTrue;
 
-import java.time.LocalDate;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
@@ -22,9 +20,6 @@ import org.hibernate.search.engine.backend.document.IndexObjectFieldReference;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaElement;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaObjectField;
 import org.hibernate.search.engine.backend.types.Highlightable;
-import org.hibernate.search.engine.backend.types.IndexFieldTraits;
-import org.hibernate.search.engine.backend.types.ObjectStructure;
-import org.hibernate.search.engine.backend.types.Projectable;
 import org.hibernate.search.engine.backend.types.TermVector;
 import org.hibernate.search.engine.search.highlighter.SearchHighlighter;
 import org.hibernate.search.engine.search.highlighter.dsl.HighlighterEncoder;
@@ -54,20 +49,15 @@ abstract class AbstractHighlighterIT {
 	public final ExpectedLog4jLog logged = ExpectedLog4jLog.create();
 
 	protected static final SimpleMappedIndex<IndexBinding> index = SimpleMappedIndex.of( IndexBinding::new );
-	protected static final SimpleMappedIndex<IndexBinding> matchingIndex = SimpleMappedIndex.of( IndexBinding::new )
-			.name( "matchingIndex" );
-	protected static final SimpleMappedIndex<NotMatchingTypeIndexBinding> notMatchingTypeIndex =
+	private static final SimpleMappedIndex<NotMatchingTypeIndexBinding> notMatchingTypeIndex =
 			SimpleMappedIndex.of( NotMatchingTypeIndexBinding::new )
 					.name( "notMatchingTypeIndex" );
-	protected static final SimpleMappedIndex<NestedIndexBinding> nestedIndex = SimpleMappedIndex.of( NestedIndexBinding::new )
-			.name( "nestedIndex" );
 
 	@BeforeAll
 	static void setup() {
 		setupHelper.start().withIndex( index )
-				.withIndex( matchingIndex )
 				.withIndex( notMatchingTypeIndex )
-				.withIndex( nestedIndex ).setup();
+				.setup();
 
 		index.bulkIndexer()
 				.add( "1", d -> d.addValue( "string", "some value" ) )
@@ -118,62 +108,11 @@ abstract class AbstractHighlighterIT {
 				} )
 				.add( "12", d -> {
 					d.addValue( "stringNoTermVector", "boo and boo and boo much more times" );
-					d.addValue( "stringNotProjectable", "The quick brown fox jumps right over the little lazy dog" );
 				} )
-				.join();
-
-		matchingIndex.bulkIndexer()
-				.add( "100", d -> d.addValue( "string", "string with dog" ) )
 				.join();
 	}
 
 	abstract HighlighterOptionsStep<?> highlighter(SearchHighlighterFactory factory);
-
-	@Test
-	void highlightable_enabled_trait() {
-		assertThat( Arrays.asList( "string", "objectFlattened.string" ) )
-				.allSatisfy( fieldPath -> assertThat( index.toApi().descriptor().field( fieldPath ) )
-						.hasValueSatisfying( fieldDescriptor -> assertThat( fieldDescriptor.type().traits() )
-								.as( "traits of field '" + fieldPath + "'" )
-								.contains( "projection:highlight" ) ) );
-	}
-
-	@Test
-	void projectable_no_trait() {
-		String fieldPath = "stringNotProjectable";
-		if ( TckConfiguration.get().getBackendFeatures().supportsHighlightableWithoutProjectable() ) {
-			assertThat( index.toApi().descriptor().field( fieldPath ) )
-					.hasValueSatisfying( fieldDescriptor -> assertThat( fieldDescriptor.type().traits() )
-							.as( "traits of field '" + fieldPath + "'" )
-							.contains( IndexFieldTraits.Projections.HIGHLIGHT ) );
-		}
-		else {
-			assertThat( index.toApi().descriptor().field( fieldPath ) )
-					.hasValueSatisfying( fieldDescriptor -> assertThat( fieldDescriptor.type().traits() )
-							.as( "traits of field '" + fieldPath + "'" )
-							.doesNotContain( IndexFieldTraits.Projections.HIGHLIGHT ) );
-		}
-	}
-
-	@Test
-	void highlightable_enabled_trait_nested() {
-		assertThat( Arrays.asList(
-				"objectNested.string",
-				"objectNested.level2objectDefault.string",
-				"objectNested.level2objectNested.string",
-				"objectNested.level2objectFlattened.string",
-				"objectDefault.level2objectNested.string",
-				"objectFlattened.level2objectNested.string"
-		) )
-				.allSatisfy( inObjectFieldPath -> assertThat( nestedIndex.toApi().descriptor().field( inObjectFieldPath ) )
-						.hasValueSatisfying( fieldDescriptor -> assertThat( fieldDescriptor.type().traits() )
-								.as( "traits of field '" + inObjectFieldPath + "'" )
-								// See HSEARCH-4841: highlighting is forbidden on nested fields...
-								// but here we're inspecting the field *type*, which unfortunately
-								// is independent of the field structure and thus doesn't know
-								// highlighting is not available.
-								.contains( IndexFieldTraits.Projections.HIGHLIGHT ) ) );
-	}
 
 	@Test
 	void highlighterNoConfigurationAtAll() {
@@ -791,67 +730,6 @@ abstract class AbstractHighlighterIT {
 	}
 
 	@Test
-	void highlightNonAnalyzedField() {
-		assertThatThrownBy(
-				() -> index.createScope().query().select(
-						f -> f.highlight( "notAnalyzedString" )
-				).where( f -> f.matchAll() )
-						.toQuery()
-		).isInstanceOf( SearchException.class )
-				.hasMessageContainingAll(
-						"Cannot use 'projection:highlight' on field 'notAnalyzedString':",
-						"Make sure the field is marked as searchable/sortable/projectable/aggregable/highlightable (whichever is relevant).",
-						"If it already is, then 'projection:highlight' is not available for fields of this type."
-				);
-	}
-
-	@Test
-	void multipleIndexesScopeIncompatibleTypes() {
-		assertThatThrownBy(
-				() -> index.createScope( notMatchingTypeIndex ).query().select(
-						f -> f.highlight( "string" )
-				).where( f -> f.matchAll() )
-						.toQuery()
-		).isInstanceOf( SearchException.class )
-				.hasMessageContainingAll(
-						"Inconsistent support for 'projection:highlight'",
-						"'projection:highlight' can be used in some of the targeted indexes, but not all of them.",
-						"Make sure the field is marked as searchable/sortable/projectable/aggregable/highlightable (whichever is relevant) in all indexes, and that the field has the same type in all indexes"
-				);
-	}
-
-	@Test
-	void multipleIndexesScopeIncompatibleTypesInObjectField() {
-		assertThatThrownBy(
-				() -> index.createScope( notMatchingTypeIndex ).query().select(
-						f -> f.highlight( "objectFlattened.string" )
-				).where( f -> f.matchAll() )
-						.toQuery()
-		).isInstanceOf( SearchException.class )
-				.hasMessageContainingAll(
-						"Inconsistent support for 'projection:highlight'",
-						"'projection:highlight' can be used in some of the targeted indexes, but not all of them.",
-						"Make sure the field is marked as searchable/sortable/projectable/aggregable/highlightable (whichever is relevant) in all indexes, and that the field has the same type in all indexes."
-				);
-	}
-
-	@Test
-	void multipleIndexesScopeCompatibleTypes() {
-		SearchQuery<List<String>> highlights = index.createScope( matchingIndex ).query().select(
-				f -> f.highlight( "string" )
-		).where( f -> f.match().field( "string" ).matching( "dog" ) )
-				.highlighter( h -> highlighter( h ) )
-				.toQuery();
-
-		assertThatHits( highlights.fetchAllHits() )
-				.hasHitsAnyOrder( Arrays.asList(
-						Collections.singletonList( "string with <em>dog</em>" ),
-						Collections.singletonList( "This string mentions a <em>dog</em>" ),
-						Collections.singletonList( "This string mentions a <em>dog</em> too" )
-				) );
-	}
-
-	@Test
 	void prebuiltHighlighter() {
 		SearchHighlighter highlighter = highlighter( index.createScope().highlighter() ).tag( "---", "---" )
 				.toHighlighter();
@@ -909,36 +787,6 @@ abstract class AbstractHighlighterIT {
 	}
 
 	@Test
-	void inObjectProjection() {
-		List<String> objects = Arrays.asList( "objectDefault", "objectFlattened" );
-		for ( String object : objects ) {
-			for ( String level2 : objects ) {
-				assertThatThrownBy( () -> nestedIndex.query().select(
-						f -> f.object( object )
-								.from(
-										f.composite().from(
-												f.field( object + ".string" ),
-												f.object( object + ".level2" + level2 )
-														.from( f.highlight( object + ".level2" + level2 + ".string" ) )
-														.asList()
-										).asList()
-								)
-								.asList()
-				)
-						.where( f -> f.matchAll() )
-						.toQuery() )
-						.as( object )
-						.isInstanceOf( SearchException.class )
-						.hasMessageContainingAll(
-								"Highlight projection cannot be applied within nested context of",
-								object,
-								level2
-						);
-			}
-		}
-	}
-
-	@Test
 	void phraseMatching() {
 		SearchQuery<List<String>> highlights = index.createScope().query().select(
 				f -> f.highlight( "multiValuedString" )
@@ -971,7 +819,7 @@ abstract class AbstractHighlighterIT {
 		}
 	}
 
-	private static class IndexBinding {
+	protected static class IndexBinding {
 		final IndexFieldReference<String> stringField;
 		final IndexFieldReference<String> anotherStringField;
 		final IndexFieldReference<String> objectFlattenedString;
@@ -980,7 +828,6 @@ abstract class AbstractHighlighterIT {
 		final IndexObjectFieldReference objectFlattened;
 		final IndexFieldReference<String> stringNoTermVectorField;
 		final IndexFieldReference<Integer> intField;
-		final IndexFieldReference<String> stringNotProjectableField;
 
 		IndexBinding(IndexSchemaElement root) {
 			stringField = root.field( "string", f -> f.asString()
@@ -1016,66 +863,14 @@ abstract class AbstractHighlighterIT {
 			).toReference();
 
 			intField = root.field( "int", f -> f.asInteger() ).toReference();
-
-			stringNotProjectableField = root.field( "stringNotProjectable", f -> f.asString()
-					.analyzer( DefaultAnalysisDefinitions.ANALYZER_STANDARD_ENGLISH.name )
-			).toReference();
-		}
-	}
-
-	private static class NestedIndexBinding {
-
-		NestedIndexBinding(IndexSchemaElement root) {
-			createObjects( "", root, 2, true );
-		}
-
-		private void createObjects(String prefix, IndexSchemaElement element, int level, boolean addNested) {
-			IndexSchemaObjectField objectDefault = element.objectField( prefix + "objectDefault" );
-
-			createString( "string", objectDefault );
-			if ( addNested ) {
-				createObjects( "level" + ( level ), objectDefault, level + 1, false );
-			}
-			objectDefault.toReference();
-
-			IndexSchemaObjectField objectNested = element.objectField( prefix + "objectNested", ObjectStructure.NESTED );
-			createString( "string", objectNested );
-			if ( addNested ) {
-				createObjects( "level" + ( level ), objectNested, level + 1, false );
-			}
-			objectNested.toReference();
-
-			IndexSchemaObjectField objectFlattened =
-					element.objectField( prefix + "objectFlattened", ObjectStructure.FLATTENED );
-			createString( "string", objectFlattened );
-			if ( addNested ) {
-				createObjects( "level" + ( level ), objectFlattened, level + 1, false );
-			}
-			objectFlattened.toReference();
-		}
-
-		private IndexFieldReference<String> createString(String name, IndexSchemaObjectField objectField) {
-			return objectField.field( name, f -> f.asString()
-					.highlightable( Arrays.asList( Highlightable.UNIFIED, Highlightable.PLAIN ) )
-					.analyzer( DefaultAnalysisDefinitions.ANALYZER_STANDARD_ENGLISH.name )
-			).toReference();
 		}
 	}
 
 	private static class NotMatchingTypeIndexBinding {
 		final IndexFieldReference<Integer> stringField;
-		final IndexObjectFieldReference nested;
-		final IndexFieldReference<LocalDate> objectFlattenedString;
 
 		NotMatchingTypeIndexBinding(IndexSchemaElement root) {
 			stringField = root.field( "string", f -> f.asInteger() ).toReference();
-
-			IndexSchemaObjectField objectField = root.objectField( "objectFlattened" );
-			nested = objectField.toReference();
-
-			objectFlattenedString = objectField.field( "string", f -> f.asLocalDate()
-					.projectable( Projectable.YES )
-			).toReference();
 		}
 	}
 }

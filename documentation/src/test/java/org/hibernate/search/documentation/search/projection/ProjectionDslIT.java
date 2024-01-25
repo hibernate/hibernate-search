@@ -7,6 +7,7 @@
 package org.hibernate.search.documentation.search.projection;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.hibernate.search.util.impl.integrationtest.common.assertion.SearchHitsAssert.assertThatHits;
 import static org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmUtils.with;
 
@@ -35,6 +36,7 @@ import org.hibernate.search.mapper.orm.Search;
 import org.hibernate.search.mapper.orm.scope.SearchScope;
 import org.hibernate.search.mapper.orm.session.SearchSession;
 import org.hibernate.search.mapper.pojo.common.spi.PojoEntityReference;
+import org.hibernate.search.util.common.SearchException;
 import org.hibernate.search.util.impl.integrationtest.common.assertion.TestComparators;
 
 import org.junit.jupiter.api.BeforeEach;
@@ -903,11 +905,33 @@ class ProjectionDslIT {
 					) // <3>
 					.fetchHits( 20 );
 			// end::highlighter-named[]
-			Session session = searchSession.toOrmSession();
 			assertThat( hits ).containsExactlyInAnyOrder(
 					Arrays.asList( Collections.singletonList( "The Automatic <b>Detective</b>" ), Collections.emptyList() )
 			);
 		} );
+
+		withinSearchSession( searchSession -> assertThatThrownBy( () -> {
+			// tag::highlighter-inside-object-projection-fail[]
+			List<List<?>> hits = searchSession.search( Book.class )
+					.select( f -> f.object( "authors" )
+							.from(
+									f.highlight( "authors.firstName" ),
+									f.highlight( "authors.lastName" )
+							).asList()
+					)
+					.where( f -> f.match().field( "authors.firstName" ).matching( "Art*" ) )
+					.fetchHits( 20 );
+			// end::highlighter-inside-object-projection-fail[]
+		} ).isInstanceOf( SearchException.class ) );
+
+		withinSearchSession( searchSession -> assertThatThrownBy( () -> {
+			// tag::highlighter-object-nested-field-fail[]
+			List<?> hits = searchSession.search( Book.class )
+					.select( f -> f.highlight( "authors.firstName" ) )
+					.where( f -> f.match().field( "authors.firstName" ).matching( "Art*" ) )
+					.fetchHits( 20 );
+			// end::highlighter-object-nested-field-fail[]
+		} ).isInstanceOf( SearchException.class ) );
 	}
 
 	private void withinSearchSession(Consumer<SearchSession> action) {
