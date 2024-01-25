@@ -9,7 +9,7 @@ package org.hibernate.search.mapper.pojo.standalone.mapping.impl;
 import org.hibernate.search.mapper.pojo.mapping.building.spi.PojoTypeMetadataContributor;
 import org.hibernate.search.mapper.pojo.model.additionalmetadata.building.spi.PojoAdditionalMetadataCollectorTypeNode;
 import org.hibernate.search.mapper.pojo.model.spi.PojoRawTypeIdentifier;
-import org.hibernate.search.mapper.pojo.standalone.model.impl.StandalonePojoPathsDefinition;
+import org.hibernate.search.mapper.pojo.standalone.model.impl.StandalonePojoPathsDefinitionProvider;
 
 class StandalonePojoEntityTypeContributor implements PojoTypeMetadataContributor {
 
@@ -22,13 +22,11 @@ class StandalonePojoEntityTypeContributor implements PojoTypeMetadataContributor
 	}
 
 	@Override
-	// Keeping the deprecated form in order to test that it works correctly (for Infinispan in particular)
-	@SuppressWarnings("deprecation")
 	public void contributeAdditionalMetadata(PojoAdditionalMetadataCollectorTypeNode collector) {
 		if ( !typeIdentifier.equals( collector.typeIdentifier() ) ) {
 			// Entity metadata is not inherited; only contribute it to the exact type.
 			return;
 		}
-		collector.markAsEntity( entityName, new StandalonePojoPathsDefinition() );
+		collector.markAsEntity( entityName, new StandalonePojoPathsDefinitionProvider() );
 	}
 }

@@ -35,32 +35,6 @@ public interface PojoAdditionalMetadataCollectorTypeNode extends PojoAdditionalM
 	 * @see PojoTypeAdditionalMetadata#isEntity()
 	 *
 	 * @param entityName The name of this entity type.
-	 * @param pathsDefinition The paths definition for this entity type,
-	 * i.e. the object supporting the creation of path filters that will be used in particular
-	 * when performing dirty checking during automatic reindexing.
-	 * @return A {@link PojoAdditionalMetadataCollectorEntityTypeNode}, to provide optional metadata
-	 * about the entity.
-	 *
-	 * @deprecated Use {@link #markAsEntity(String, PojoPathDefinitionProvider)} instead.
-	 */
-	@Deprecated
-	PojoAdditionalMetadataCollectorEntityTypeNode markAsEntity(String entityName,
-			org.hibernate.search.mapper.pojo.model.path.spi.PojoPathsDefinition pathsDefinition);
-
-	/**
-	 * Mark this type as an entity type.
-	 * <p>
-	 * <strong>WARNING:</strong> entity types must always be defined upfront without relying on
-	 * {@link MappingConfigurationCollector#collectDiscoverer(TypeMetadataDiscoverer) metadata discovery},
-	 * because Hibernate Search needs to be able to have a complete view of all the possible entity types
-	 * in order to handle automatic reindexing.
-	 * Relying on type discovery for entity detection would mean running the risk of one particular
-	 * entity subtype not being detected (because only its supertype is mentioned in the schema of indexed entities),
-	 * which could result in incomplete automatic reindexing.
-	 *
-	 * @see PojoTypeAdditionalMetadata#isEntity()
-	 *
-	 * @param entityName The name of this entity type.
 	 * @param pathDefinitionProvider A provider of path definition for this entity type,
 	 * i.e. the object supporting the creation of path filters that will be used in particular
 	 * when performing dirty checking during automatic reindexing.
