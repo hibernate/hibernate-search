@@ -1378,7 +1378,6 @@ The <<mapping-directfieldmapping-highlightable,highlightable>> default may alrea
 in some cases. For more details see <<mapping-directfieldmapping-highlightable-default, how the `DEFAULT` highlightable value behaves>>.
 ====
 
-
 [[search-dsl-projection-highlight-syntax]]
 === Syntax
 
@@ -1514,6 +1513,41 @@ For <<mapping-projection-programmatic,programmatic mapping>>, use `HighlightProj
 include::{sourcedirJava17}/org/hibernate/search/documentation/search/projection/ProjectionDslJava17IT.java[tags=programmatic-highlight-projection]
 ----
 ====
+
+[[search-dsl-projection-highlight-limitations]]
+=== Highlight limitations
+
+For now, Hibernate Search has limitations on where <<search-dsl-projection-highlight,highlight projections>> can be included,
+and trying to apply highlight projections in these scenarios will lead to an exception being thrown, in particular:
+
+* Such projection cannot be a part of an <<search-dsl-projection-object, object projection>>.
++
+.Illegal use of `.highlight(..)` projection within an `.object(..)` projection
+====
+[source, JAVA, indent=0, subs="+callouts"]
+----
+include::{sourcedir}/org/hibernate/search/documentation/search/projection/ProjectionDslIT.java[tags=highlighter-inside-object-projection-fail]
+----
+Doing so *will* lead to an *exception*.
+====
++
+* Fields of an object with a <<mapping-indexedembedded-structure-nested,nested>> structure cannot be highlighted under any circumstances.
++
+.Illegal use of `.highlight(..)` projection within an `.object(..)` projection
+====
+[source, JAVA, indent=0, subs="+callouts"]
+----
+include::{sourcedir}/org/hibernate/search/documentation/search/projection/ProjectionDslIT.java[tags=highlighter-object-nested-field-fail]
+----
+Assuming that `authors` are mapped as <<mapping-indexedembedded-structure-nested,nested>> structure, e.g.:
+```java
+@IndexedEmbedded(structure = ObjectStructure.NESTED)
+private List<Author> authors = new ArrayList<>();
+```
+Trying to apply such projection *will* result in an *exception* being thrown.
+====
+
+These limitations should be addressed by link:{hibernateSearchJiraUrl}/HSEARCH-4841[HSEARCH-4841].
 
 [[search-dsl-projection-extensions]]
 == Backend-specific extensions
