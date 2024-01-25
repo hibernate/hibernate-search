@@ -12,30 +12,36 @@ import java.util.Optional;
 import org.hibernate.search.mapper.pojo.logging.impl.Log;
 import org.hibernate.search.mapper.pojo.model.additionalmetadata.building.spi.PojoAdditionalMetadataCollectorEntityTypeNode;
 import org.hibernate.search.mapper.pojo.model.additionalmetadata.impl.PojoEntityTypeAdditionalMetadata;
+import org.hibernate.search.mapper.pojo.model.path.impl.SimplePojoPathsDefinitionProvider;
 import org.hibernate.search.mapper.pojo.model.path.spi.PojoPathDefinitionProvider;
+import org.hibernate.search.mapper.pojo.model.spi.PojoRawTypeModel;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
 class PojoEntityTypeAdditionalMetadataBuilder implements PojoAdditionalMetadataCollectorEntityTypeNode {
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
-	private final String entityName;
-	private final PojoPathDefinitionProvider pathDefinitionProvider;
+	private String entityName;
+	private PojoPathDefinitionProvider pathDefinitionProvider;
 	private String entityIdPropertyName;
 
-	PojoEntityTypeAdditionalMetadataBuilder(String entityName, PojoPathDefinitionProvider pathDefinitionProvider) {
-		this.entityName = entityName;
-		this.pathDefinitionProvider = pathDefinitionProvider;
+	PojoEntityTypeAdditionalMetadataBuilder() {
 	}
 
-	void checkSameEntity(String entityName) {
-		if ( this.entityName.equals( entityName ) ) {
-			return;
+	@Override
+	public void entityName(String entityName) {
+		if ( this.entityName != null && !this.entityName.equals( entityName ) ) {
+			throw log.multipleEntityNames(
+					this.entityName,
+					entityName
+			);
 		}
-		throw log.multipleEntityNames(
-				this.entityName,
-				entityName
-		);
+		this.entityName = entityName;
+	}
+
+	@Override
+	public void pathDefinitionProvider(PojoPathDefinitionProvider pathDefinitionProvider) {
+		this.pathDefinitionProvider = pathDefinitionProvider;
 	}
 
 	@Override
@@ -43,10 +49,10 @@ class PojoEntityTypeAdditionalMetadataBuilder implements PojoAdditionalMetadataC
 		this.entityIdPropertyName = propertyName;
 	}
 
-	public PojoEntityTypeAdditionalMetadata build() {
+	public PojoEntityTypeAdditionalMetadata build(PojoRawTypeModel<?> typeModel) {
 		return new PojoEntityTypeAdditionalMetadata(
-				entityName,
-				pathDefinitionProvider,
+				entityName != null ? entityName : typeModel.typeIdentifier().javaClass().getSimpleName(),
+				pathDefinitionProvider != null ? pathDefinitionProvider : new SimplePojoPathsDefinitionProvider(),
 				Optional.ofNullable( entityIdPropertyName )
 		);
 	}

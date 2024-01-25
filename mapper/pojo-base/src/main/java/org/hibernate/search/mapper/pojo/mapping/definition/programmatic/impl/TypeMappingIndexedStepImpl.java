@@ -21,7 +21,7 @@ class TypeMappingIndexedStepImpl implements TypeMappingIndexedStep, PojoTypeMeta
 
 	private String backendName;
 	private String indexName;
-	private boolean enabled = true;
+	private Boolean enabled;
 	private RoutingBinder binder;
 	private Map<String, Object> params;
 
@@ -56,7 +56,10 @@ class TypeMappingIndexedStepImpl implements TypeMappingIndexedStep, PojoTypeMeta
 
 	@Override
 	public void contributeAdditionalMetadata(PojoAdditionalMetadataCollectorTypeNode collector) {
-		PojoAdditionalMetadataCollectorIndexedTypeNode indexedCollector = collector.markAsIndexed( enabled );
+		PojoAdditionalMetadataCollectorIndexedTypeNode indexedCollector = collector.markAsIndexed();
+		if ( enabled != null ) {
+			indexedCollector.enabled( enabled );
+		}
 		if ( backendName != null ) {
 			indexedCollector.backendName( backendName );
 		}

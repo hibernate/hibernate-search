@@ -20,7 +20,6 @@ import org.hibernate.search.mapper.pojo.model.additionalmetadata.building.spi.Po
 import org.hibernate.search.mapper.pojo.model.additionalmetadata.building.spi.PojoAdditionalMetadataCollectorTypeNode;
 import org.hibernate.search.mapper.pojo.model.additionalmetadata.impl.PojoPropertyAdditionalMetadata;
 import org.hibernate.search.mapper.pojo.model.additionalmetadata.impl.PojoTypeAdditionalMetadata;
-import org.hibernate.search.mapper.pojo.model.path.spi.PojoPathDefinitionProvider;
 import org.hibernate.search.mapper.pojo.model.spi.PojoRawTypeIdentifier;
 import org.hibernate.search.mapper.pojo.model.spi.PojoRawTypeModel;
 
@@ -46,24 +45,18 @@ class PojoTypeAdditionalMetadataBuilder implements PojoAdditionalMetadataCollect
 	}
 
 	@Override
-	public PojoEntityTypeAdditionalMetadataBuilder markAsEntity(String entityName,
-			PojoPathDefinitionProvider pathDefinitionProvider) {
+	public PojoEntityTypeAdditionalMetadataBuilder markAsEntity() {
 		if ( entityTypeMetadataBuilder == null ) {
-			entityTypeMetadataBuilder = new PojoEntityTypeAdditionalMetadataBuilder(
-					entityName, pathDefinitionProvider );
-		}
-		else {
-			entityTypeMetadataBuilder.checkSameEntity( entityName );
+			entityTypeMetadataBuilder = new PojoEntityTypeAdditionalMetadataBuilder();
 		}
 		return entityTypeMetadataBuilder;
 	}
 
 	@Override
-	public PojoIndexedTypeAdditionalMetadataBuilder markAsIndexed(boolean enabled) {
+	public PojoIndexedTypeAdditionalMetadataBuilder markAsIndexed() {
 		if ( indexedTypeMetadataBuilder == null ) {
 			indexedTypeMetadataBuilder = new PojoIndexedTypeAdditionalMetadataBuilder();
 		}
-		indexedTypeMetadataBuilder.enabled( enabled );
 		return indexedTypeMetadataBuilder;
 	}
 
@@ -90,7 +83,9 @@ class PojoTypeAdditionalMetadataBuilder implements PojoAdditionalMetadataCollect
 			} );
 		}
 		return new PojoTypeAdditionalMetadata(
-				entityTypeMetadataBuilder == null ? Optional.empty() : Optional.of( entityTypeMetadataBuilder.build() ),
+				entityTypeMetadataBuilder == null
+						? Optional.empty()
+						: Optional.of( entityTypeMetadataBuilder.build( rawTypeModel ) ),
 				indexedTypeMetadataBuilder == null ? Optional.empty() : indexedTypeMetadataBuilder.build(),
 				propertiesAdditionalMetadataSuppliers
 		);
