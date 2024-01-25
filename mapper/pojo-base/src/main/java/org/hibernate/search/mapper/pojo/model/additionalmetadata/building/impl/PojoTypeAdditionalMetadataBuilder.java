@@ -16,8 +16,6 @@ import java.util.function.Consumer;
 import java.util.function.Supplier;
 
 import org.hibernate.search.engine.environment.bean.BeanResolver;
-import org.hibernate.search.mapper.pojo.bridge.binding.impl.MarkerBindingContextImpl;
-import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.MarkerBinder;
 import org.hibernate.search.mapper.pojo.model.additionalmetadata.building.spi.PojoAdditionalMetadataCollectorPropertyNode;
 import org.hibernate.search.mapper.pojo.model.additionalmetadata.building.spi.PojoAdditionalMetadataCollectorTypeNode;
 import org.hibernate.search.mapper.pojo.model.additionalmetadata.impl.PojoPropertyAdditionalMetadata;
@@ -74,11 +72,6 @@ class PojoTypeAdditionalMetadataBuilder implements PojoAdditionalMetadataCollect
 			Consumer<PojoAdditionalMetadataCollectorPropertyNode> propertyMetadataContributor) {
 		propertyContributors.computeIfAbsent( propertyName, ignored -> new ArrayList<>() )
 				.add( propertyMetadataContributor );
-	}
-
-	Object bindMarker(MarkerBinder binder, Map<String, Object> params) {
-		MarkerBindingContextImpl bindingContext = new MarkerBindingContextImpl( beanResolver, params );
-		return bindingContext.applyBinder( binder );
 	}
 
 	public PojoTypeAdditionalMetadata build() {
