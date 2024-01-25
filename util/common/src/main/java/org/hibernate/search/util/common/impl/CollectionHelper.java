@@ -8,6 +8,7 @@ package org.hibernate.search.util.common.impl;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -140,6 +141,14 @@ public final class CollectionHelper {
 			default:
 				return Collections.unmodifiableMap( map );
 		}
+	}
+
+	public static <T> Set<? extends T> flattenAsSet(Collection<? extends Collection<? extends T>> input) {
+		Set<T> flattened = new LinkedHashSet<>();
+		for ( Collection<? extends T> part : input ) {
+			flattened.addAll( part );
+		}
+		return flattened;
 	}
 
 	/**

@@ -38,11 +38,6 @@ public interface Log extends BasicLogger {
 	@Message(id = ID_OFFSET + 5, value = "Entity type '%1$s' has multiple, conflicting definitions in the mapping builder.")
 	SearchException multipleEntityTypeDefinitions(@FormatWith(MappableTypeModelFormatter.class) PojoRawTypeModel<?> type);
 
-	@Message(id = ID_OFFSET + 6, value = "Multiple entity types configured with the same name '%1$s': '%2$s', '%3$s'")
-	SearchException multipleEntityTypesWithSameName(String entityName,
-			@FormatWith(MappableTypeModelFormatter.class) PojoRawTypeModel<?> previousType,
-			@FormatWith(MappableTypeModelFormatter.class) PojoRawTypeModel<?> type);
-
 	@Message(id = ID_OFFSET + 7,
 			value = "Type with name '%1$s' does not exist: the standalone POJO mapper does not support named types."
 	)
@@ -93,20 +88,4 @@ public interface Log extends BasicLogger {
 	SearchException unknownClassForMappedEntityType(@FormatWith(ClassFormatter.class) Class<?> invalidClass,
 			@FormatWith(CommaSeparatedClassesFormatter.class) Collection<Class<?>> validClasses);
 
-	@Message(id = ID_OFFSET + 19, value = "No matching entity type for class '%1$s'."
-			+ " Valid classes are: %2$s")
-	SearchException unknownClassForEntityType(@FormatWith(ClassFormatter.class) Class<?> invalidClass,
-			@FormatWith(CommaSeparatedClassesFormatter.class) Collection<Class<?>> validClasses);
-
-	@Message(id = ID_OFFSET + 20, value = "No matching entity type for name '%1$s'."
-			+ " Valid names for entity types are: %2$s")
-	SearchException unknownEntityNameForEntityType(String invalidName, Collection<String> validNames);
-
-	@Message(id = ID_OFFSET + 21,
-			value = "Invalid type for '%1$s': the entity type must extend '%2$s'," +
-					" but entity type '%3$s' does not."
-	)
-	SearchException invalidEntitySuperType(String entityName,
-			@FormatWith(ClassFormatter.class) Class<?> expectedSuperType,
-			@FormatWith(ClassFormatter.class) Class<?> actualJavaType);
 }

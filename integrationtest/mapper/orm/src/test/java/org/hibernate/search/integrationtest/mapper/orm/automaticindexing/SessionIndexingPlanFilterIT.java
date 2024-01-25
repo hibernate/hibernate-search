@@ -314,7 +314,7 @@ class SessionIndexingPlanFilterIT extends AbstractIndexingPlanFilterIT {
 					.hasMessageContainingAll(
 							"No matching entity type for class",
 							SimpleNotIndexedEntity.class.getName(),
-							"This class is neither an entity type mapped in Hibernate Search nor a superclass of such entity type"
+							"Neither this class nor any of its subclasses is mapped in Hibernate Search"
 					);
 		} );
 	}
@@ -329,7 +329,7 @@ class SessionIndexingPlanFilterIT extends AbstractIndexingPlanFilterIT {
 					.hasMessageContainingAll(
 							"No matching entity type for class",
 							NotAnEntity.class.getName(),
-							"This class is neither an entity type mapped in Hibernate Search nor a superclass of such entity type"
+							"Neither this class nor any of its subclasses is mapped in Hibernate Search"
 					);
 		} );
 	}
@@ -344,7 +344,7 @@ class SessionIndexingPlanFilterIT extends AbstractIndexingPlanFilterIT {
 					.hasMessageContainingAll(
 							"No matching entity type for class",
 							NotIndexedEntityFromSuperclass.class.getName(),
-							"This class is neither an entity type mapped in Hibernate Search nor a superclass of such entity type"
+							"Neither this class nor any of its subclasses is mapped in Hibernate Search"
 					);
 		} );
 	}
@@ -359,7 +359,7 @@ class SessionIndexingPlanFilterIT extends AbstractIndexingPlanFilterIT {
 					.hasMessageContainingAll(
 							"No matching entity type for class",
 							IndexedNotAnEntity.class.getName(),
-							"This class is neither an entity type mapped in Hibernate Search nor a superclass of such entity type"
+							"Neither this class nor any of its subclasses is mapped in Hibernate Search"
 					);
 		} );
 	}
@@ -374,7 +374,7 @@ class SessionIndexingPlanFilterIT extends AbstractIndexingPlanFilterIT {
 					.hasMessageContainingAll(
 							"No matching entity type for class",
 							Integer.class.getName(),
-							"This class is neither an entity type mapped in Hibernate Search nor a superclass of such entity type"
+							"Neither this class nor any of its subclasses is mapped in Hibernate Search"
 					);
 		} );
 		with( sessionFactory ).runInTransaction( session -> {
@@ -385,7 +385,7 @@ class SessionIndexingPlanFilterIT extends AbstractIndexingPlanFilterIT {
 					.hasMessageContainingAll(
 							"No matching entity type for class",
 							Integer.class.getName(),
-							"This class is neither an entity type mapped in Hibernate Search nor a superclass of such entity type"
+							"Neither this class nor any of its subclasses is mapped in Hibernate Search"
 					);
 		} );
 	}
@@ -399,20 +399,20 @@ class SessionIndexingPlanFilterIT extends AbstractIndexingPlanFilterIT {
 			)
 			).isInstanceOf( SearchException.class )
 					.hasMessageContainingAll(
-							"No matching entity type for the name",
+							"No matching entity type for entity name",
 							name,
-							"This name represents neither an entity type mapped in Hibernate Search nor a superclass of such entity type",
-							"Valid entity type names are"
+							"Either this is not the name of an entity type, or neither the entity type nor any of its subclasses is mapped in Hibernate Search",
+							"Valid entity names are"
 					);
 			assertThatThrownBy( () -> Search.session( session ).indexingPlanFilter(
 					ctx -> ctx.include( name )
 			)
 			).isInstanceOf( SearchException.class )
 					.hasMessageContainingAll(
-							"No matching entity type for the name",
+							"No matching entity type for entity name",
 							name,
-							"This name represents neither an entity type mapped in Hibernate Search nor a superclass of such entity type",
-							"Valid entity type names are"
+							"Either this is not the name of an entity type, or neither the entity type nor any of its subclasses is mapped in Hibernate Search",
+							"Valid entity names are"
 					);
 		} );
 	}
@@ -475,7 +475,7 @@ class SessionIndexingPlanFilterIT extends AbstractIndexingPlanFilterIT {
 					.hasMessageContainingAll(
 							"No matching entity type for class",
 							InterfaceA.class.getName(),
-							"This class is neither an entity type mapped in Hibernate Search nor a superclass of such entity type."
+							"Neither this class nor any of its subclasses is mapped in Hibernate Search"
 					);
 			assertThatThrownBy( () -> Search.session( session ).indexingPlanFilter(
 					ctx -> ctx.include( InterfaceA.class )
@@ -484,7 +484,7 @@ class SessionIndexingPlanFilterIT extends AbstractIndexingPlanFilterIT {
 					.hasMessageContainingAll(
 							"No matching entity type for class",
 							InterfaceA.class.getName(),
-							"This class is neither an entity type mapped in Hibernate Search nor a superclass of such entity type."
+							"Neither this class nor any of its subclasses is mapped in Hibernate Search"
 					);
 		} );
 	}
@@ -510,7 +510,7 @@ class SessionIndexingPlanFilterIT extends AbstractIndexingPlanFilterIT {
 					.hasMessageContainingAll(
 							"No matching entity type for class",
 							Map.class.getName(),
-							"This class is neither an entity type mapped in Hibernate Search nor a superclass of such entity type."
+							"Neither this class nor any of its subclasses is mapped in Hibernate Search"
 					);
 		} );
 	}
@@ -604,9 +604,9 @@ class SessionIndexingPlanFilterIT extends AbstractIndexingPlanFilterIT {
 			)
 			).isInstanceOf( SearchException.class )
 					.hasMessageContainingAll(
-							"No matching entity type for the name",
+							"No matching entity type for entity name",
 							DYNAMIC_NOT_INDEXED_BASE_TYPE_B,
-							"This name represents neither an entity type mapped in Hibernate Search nor a superclass of such entity type."
+							"Either this is not the name of an entity type, or neither the entity type nor any of its subclasses is mapped in Hibernate Search"
 					);
 		} );
 		backendMock.verifyExpectationsMet();

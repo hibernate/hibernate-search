@@ -47,7 +47,6 @@ public class StandalonePojoEntityTypeMetadataProvider {
 
 		// Use a LinkedHashMap for deterministic iteration
 		private final Map<PojoRawTypeModel<?>, EntityDefinition<?>> entityDefinitionByType = new LinkedHashMap<>();
-		private final Map<String, PojoRawTypeModel<?>> entityTypeByName = new LinkedHashMap<>();
 
 		public Builder(StandalonePojoBootstrapIntrospector introspector) {
 			this.introspector = introspector;
@@ -57,10 +56,6 @@ public class StandalonePojoEntityTypeMetadataProvider {
 			PojoRawTypeModel<E> type = introspector.typeModel( clazz );
 			entityDefinitionByType.merge( type, new EntityDefinition<>( type, entityName, configurerOrNull ),
 					EntityDefinition::mergeWith );
-			PojoRawTypeModel<?> previousType = entityTypeByName.putIfAbsent( entityName, type );
-			if ( previousType != null && !previousType.equals( type ) ) {
-				throw log.multipleEntityTypesWithSameName( entityName, previousType, type );
-			}
 		}
 
 		public StandalonePojoEntityTypeMetadataProvider build() {

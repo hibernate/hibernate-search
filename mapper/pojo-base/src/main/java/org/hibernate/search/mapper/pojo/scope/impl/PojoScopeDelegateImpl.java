@@ -8,14 +8,11 @@ package org.hibernate.search.mapper.pojo.scope.impl;
 
 import static org.hibernate.search.util.common.impl.CollectionHelper.asSetIgnoreNull;
 
-import java.lang.invoke.MethodHandles;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.Map;
-import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -30,11 +27,9 @@ import org.hibernate.search.engine.search.projection.dsl.SearchProjectionFactory
 import org.hibernate.search.engine.search.query.dsl.SearchQuerySelectStep;
 import org.hibernate.search.engine.search.sort.dsl.SearchSortFactory;
 import org.hibernate.search.mapper.pojo.loading.spi.PojoSelectionLoadingContextBuilder;
-import org.hibernate.search.mapper.pojo.logging.impl.Log;
 import org.hibernate.search.mapper.pojo.massindexing.impl.PojoDefaultMassIndexer;
 import org.hibernate.search.mapper.pojo.massindexing.spi.PojoMassIndexer;
 import org.hibernate.search.mapper.pojo.massindexing.spi.PojoMassIndexingContext;
-import org.hibernate.search.mapper.pojo.model.spi.PojoRawTypeIdentifier;
 import org.hibernate.search.mapper.pojo.schema.management.impl.PojoScopeSchemaManagerImpl;
 import org.hibernate.search.mapper.pojo.schema.management.spi.PojoScopeSchemaManager;
 import org.hibernate.search.mapper.pojo.scope.spi.PojoScopeDelegate;
@@ -45,39 +40,14 @@ import org.hibernate.search.mapper.pojo.search.loading.impl.PojoSearchLoadingCon
 import org.hibernate.search.mapper.pojo.search.loading.impl.PojoSearchLoadingIndexedTypeContext;
 import org.hibernate.search.mapper.pojo.work.impl.PojoScopeWorkspaceImpl;
 import org.hibernate.search.mapper.pojo.work.spi.PojoScopeWorkspace;
-import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
 public final class PojoScopeDelegateImpl<R extends EntityReference, E, C> implements PojoScopeDelegate<R, E, C> {
-
-	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	public static <R extends EntityReference, E, C> PojoScopeDelegate<R, E, C> create(
 			PojoScopeMappingContext mappingContext,
 			PojoScopeTypeContextProvider typeContextProvider,
-			Collection<? extends PojoRawTypeIdentifier<? extends E>> targetedTypes,
+			Set<? extends PojoScopeIndexedTypeContext<?, ? extends E>> targetedTypeContexts,
 			PojoScopeTypeExtendedContextProvider<E, C> indexedTypeExtendedContextProvider) {
-		if ( targetedTypes.isEmpty() ) {
-			throw log.invalidEmptyTargetForScope();
-		}
-
-		Set<PojoScopeIndexedTypeContext<?, ? extends E>> targetedTypeContexts = new LinkedHashSet<>();
-		Set<PojoRawTypeIdentifier<?>> nonIndexedTypes = new LinkedHashSet<>();
-		for ( PojoRawTypeIdentifier<? extends E> targetedType : targetedTypes ) {
-			Optional<? extends Set<? extends PojoScopeIndexedTypeContext<?, ? extends E>>> targetedTypeManagersForType =
-					typeContextProvider.allIndexedForSuperType( targetedType );
-			if ( targetedTypeManagersForType.isPresent() ) {
-				targetedTypeContexts.addAll( targetedTypeManagersForType.get() );
-			}
-			else {
-				// Remember this to produce a clear error message
-				nonIndexedTypes.add( targetedType );
-			}
-		}
-
-		if ( !nonIndexedTypes.isEmpty() ) {
-			throw log.invalidScopeTarget( nonIndexedTypes, typeContextProvider.allIndexedSuperTypes() );
-		}
-
 		Set<C> targetedTypeExtendedContexts =
 				targetedTypeContexts.stream()
 						.map( PojoScopeIndexedTypeContext::typeIdentifier )

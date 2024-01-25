@@ -19,7 +19,6 @@ import org.hibernate.search.mapper.orm.event.impl.HibernateOrmListenerTypeContex
 import org.hibernate.search.mapper.orm.loading.impl.LoadingIndexedTypeContextProvider;
 import org.hibernate.search.mapper.orm.logging.impl.Log;
 import org.hibernate.search.mapper.orm.model.impl.HibernateOrmBasicTypeMetadataProvider;
-import org.hibernate.search.mapper.orm.model.impl.HibernateOrmRawTypeIdentifierResolver;
 import org.hibernate.search.mapper.orm.session.impl.HibernateOrmSessionTypeContextProvider;
 import org.hibernate.search.mapper.orm.spi.BatchTypeContextProvider;
 import org.hibernate.search.mapper.pojo.model.spi.PojoRawTypeIdentifier;
@@ -33,8 +32,6 @@ class HibernateOrmTypeContextContainer
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
-	private final HibernateOrmRawTypeIdentifierResolver typeIdentifierResolver;
-
 	private final KeyValueProvider<PojoRawTypeIdentifier<?>, AbstractHibernateOrmTypeContext<?>> byTypeIdentifier;
 	private final KeyValueProvider<PojoRawTypeIdentifier<?>, HibernateOrmIndexedTypeContext<?>> indexedByTypeIdentifier;
 	private final KeyValueProvider<Class<?>, AbstractHibernateOrmTypeContext<?>> byExactClass;
@@ -42,11 +39,9 @@ class HibernateOrmTypeContextContainer
 	private final KeyValueProvider<String, AbstractHibernateOrmTypeContext<?>> byEntityName;
 	private final KeyValueProvider<String, HibernateOrmIndexedTypeContext<?>> indexedByEntityName;
 	private final KeyValueProvider<String, AbstractHibernateOrmTypeContext<?>> byHibernateOrmEntityName;
-	private final KeyValueProvider<String, AbstractHibernateOrmTypeContext<?>> byJpaEntityName;
 	private final KeyValueProvider<String, HibernateOrmIndexedTypeContext<?>> indexedByJpaEntityName;
 
 	private HibernateOrmTypeContextContainer(Builder builder, SessionFactoryImplementor sessionFactory) {
-		this.typeIdentifierResolver = builder.basicTypeMetadataProvider.getTypeIdentifierResolver();
 		// Use a LinkedHashMap for deterministic iteration
 		Map<PojoRawTypeIdentifier<?>, AbstractHibernateOrmTypeContext<?>> byTypeIdentifierContent = new LinkedHashMap<>();
 		Map<PojoRawTypeIdentifier<?>, HibernateOrmIndexedTypeContext<?>> indexedByTypeIdentifierContent = new LinkedHashMap<>();
@@ -109,16 +104,10 @@ class HibernateOrmTypeContextContainer
 		this.byEntityName = new KeyValueProvider<>( byEntityNameContent, log::unknownEntityNameForMappedEntityType );
 		this.indexedByEntityName =
 				new KeyValueProvider<>( indexedByEntityNameContent, log::unknownEntityNameForIndexedEntityType );
-		this.byJpaEntityName = new KeyValueProvider<>( byJpaEntityNameContent, log::unknownJpaEntityNameForMappedEntityType );
 		this.indexedByJpaEntityName =
 				new KeyValueProvider<>( indexedByJpaEntityNameContent, log::unknownJpaEntityNameForIndexedEntityType );
 		this.byHibernateOrmEntityName = new KeyValueProvider<>( byHibernateOrmEntityNameContent,
 				log::unknownHibernateOrmEntityNameForMappedEntityType );
-	}
-
-	@Override
-	public HibernateOrmRawTypeIdentifierResolver typeIdentifierResolver() {
-		return typeIdentifierResolver;
 	}
 
 	@Override
@@ -151,11 +140,6 @@ class HibernateOrmTypeContextContainer
 
 	public KeyValueProvider<String, HibernateOrmIndexedTypeContext<?>> indexedByEntityName() {
 		return indexedByEntityName;
-	}
-
-	@Override
-	public KeyValueProvider<String, AbstractHibernateOrmTypeContext<?>> byJpaEntityName() {
-		return byJpaEntityName;
 	}
 
 	public KeyValueProvider<String, HibernateOrmIndexedTypeContext<?>> indexedByJpaEntityName() {

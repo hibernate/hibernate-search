@@ -26,7 +26,7 @@ public final class StandalonePojoMapperDelegate
 	public StandalonePojoMapperDelegate(StandalonePojoEntityTypeMetadataProvider metadataProvider,
 			SchemaManagementListener schemaManagementListener) {
 		this.metadataProvider = metadataProvider;
-		this.typeContextContainerBuilder = new StandalonePojoTypeContextContainer.Builder( metadataProvider );
+		this.typeContextContainerBuilder = new StandalonePojoTypeContextContainer.Builder();
 		this.schemaManagementListener = schemaManagementListener;
 	}
 

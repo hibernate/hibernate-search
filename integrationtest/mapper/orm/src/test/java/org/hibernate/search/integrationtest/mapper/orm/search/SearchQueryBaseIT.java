@@ -299,16 +299,16 @@ class SearchQueryBaseIT {
 	}
 
 	@Test
-	void target_byClass_invalidClass() {
+	void target_byClass_invalidClass_noEntitySubType() {
 		with( sessionFactory ).runInTransaction( session -> {
 			SearchSession searchSession = Search.session( session );
 
 			Class<?> invalidClass = String.class;
 
 			assertThatThrownBy( () -> searchSession.scope( invalidClass ) )
-					.hasMessageContainingAll( "No matching indexed entity types for types: [" + invalidClass.getName() + "]",
-							"These types are not indexed entity types, nor is any of their subtypes",
-							"Valid indexed entity classes, superclasses and superinterfaces are: ["
+					.hasMessageContainingAll( "No matching indexed entity types for classes [" + invalidClass.getName() + "]",
+							"Neither these classes nor any of their subclasses are indexed in Hibernate Search",
+							"Valid classes are: ["
 									+ Object.class.getName() + ", "
 									+ Author.class.getName() + ", "
 									+ Book.class.getName()
@@ -317,58 +317,20 @@ class SearchQueryBaseIT {
 	}
 
 	@Test
-	void target_byName_singleType() {
+	void target_byClass_invalidClass_noIndexedSubtype() {
 		with( sessionFactory ).runInTransaction( session -> {
 			SearchSession searchSession = Search.session( session );
 
-			SearchQuery<Book> query = searchSession.search( searchSession.scope( Book.class, Book.NAME ) )
-					.where( f -> f.matchAll() )
-					.toQuery();
+			Class<?> invalidClass = NotIndexed.class;
 
-			backendMock.expectSearchObjects(
-					Arrays.asList( Book.NAME ),
-					b -> {},
-					StubSearchWorkBehavior.of(
-							3L,
-							reference( Book.NAME, "1" ),
-							reference( Book.NAME, "2" ),
-							reference( Book.NAME, "3" )
-					)
-			);
-
-			assertThat( query.fetchAllHits() ).containsExactly(
-					session.getReference( Book.class, 1 ),
-					session.getReference( Book.class, 2 ),
-					session.getReference( Book.class, 3 )
-			);
-		} );
-	}
-
-	@Test
-	void target_byName_multipleTypes() {
-		with( sessionFactory ).runInTransaction( session -> {
-			SearchSession searchSession = Search.session( session );
-
-			SearchQuery<Object> query = searchSession.search( searchSession.scope(
-					Object.class, Arrays.asList( Book.NAME, Author.NAME )
-			) )
-					.where( f -> f.matchAll() )
-					.toQuery();
-
-			backendMock.expectSearchObjects(
-					Arrays.asList( Book.NAME, Author.NAME ),
-					b -> {},
-					StubSearchWorkBehavior.of(
-							2L,
-							reference( Book.NAME, "1" ),
-							reference( Author.NAME, "2" )
-					)
-			);
-
-			assertThat( query.fetchAllHits() ).containsExactly(
-					session.getReference( Book.class, 1 ),
-					session.getReference( Author.class, 2 )
-			);
+			assertThatThrownBy( () -> searchSession.scope( invalidClass ) )
+					.hasMessageContainingAll( "No matching indexed entity types for classes [" + invalidClass.getName() + "]",
+							"Neither these classes nor any of their subclasses are indexed in Hibernate Search",
+							"Valid classes are: ["
+									+ Object.class.getName() + ", "
+									+ Author.class.getName() + ", "
+									+ Book.class.getName()
+									+ "]" );
 		} );
 	}
 
@@ -401,16 +363,16 @@ class SearchQueryBaseIT {
 					Book.class, invalidName
 			) )
 					.hasMessageContainingAll(
-							"No matching entity type for name '" + invalidName + "'",
-							"This is not the name of a Hibernate ORM entity type",
-							"Valid names for Hibernate ORM entity types are: ["
+							"No matching indexed entity types for entity names [" + invalidName + "]",
+							"Either these are not the names of entity types",
+							"or neither the entity types nor any of their subclasses are indexed in Hibernate Search",
+							"Valid entity names are: ["
 									// JPA entity names + Hibernate ORM entity names
 									+ Author.NAME + ", "
 									+ Author.class.getName() + ", "
 									+ Book.NAME + ", "
-									+ Book.class.getName() + ", "
-									+ NotIndexed.NAME + ", "
-									+ NotIndexed.class.getName()
+									+ Book.class.getName()
+			// NotIndexed should not be mentioned here
 									+ "]"
 					);
 		} );

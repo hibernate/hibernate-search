@@ -33,7 +33,7 @@ public class SearchIndexingPlanFilterContextImpl implements SearchIndexingPlanFi
 	@Override
 	public SearchIndexingPlanFilterContext include(String name) {
 		addIfNotPresentInOther(
-				contextProvider.typeIdentifierByEntityName().getOrFail( name ),
+				contextProvider.nonInterfaceSuperTypeIdentifierByEntityName().getOrFail( name ),
 				includes,
 				excludes
 		);
@@ -43,7 +43,7 @@ public class SearchIndexingPlanFilterContextImpl implements SearchIndexingPlanFi
 	@Override
 	public SearchIndexingPlanFilterContext include(Class<?> clazz) {
 		addIfNotPresentInOther(
-				toTypeIdentifier( clazz ),
+				contextProvider.nonInterfaceSuperTypeIdentifierForClass( clazz ),
 				includes,
 				excludes
 		);
@@ -53,7 +53,7 @@ public class SearchIndexingPlanFilterContextImpl implements SearchIndexingPlanFi
 	@Override
 	public SearchIndexingPlanFilterContext exclude(String name) {
 		addIfNotPresentInOther(
-				contextProvider.typeIdentifierByEntityName().getOrFail( name ),
+				contextProvider.nonInterfaceSuperTypeIdentifierByEntityName().getOrFail( name ),
 				excludes,
 				includes
 		);
@@ -63,19 +63,11 @@ public class SearchIndexingPlanFilterContextImpl implements SearchIndexingPlanFi
 	@Override
 	public SearchIndexingPlanFilterContext exclude(Class<?> clazz) {
 		addIfNotPresentInOther(
-				toTypeIdentifier( clazz ),
+				contextProvider.nonInterfaceSuperTypeIdentifierForClass( clazz ),
 				excludes,
 				includes
 		);
 		return this;
-	}
-
-	private PojoRawTypeIdentifier<?> toTypeIdentifier(Class<?> clazz) {
-		PojoRawTypeIdentifier<?> typeIdentifier = PojoRawTypeIdentifier.of( clazz );
-		if ( !contextProvider.allNonInterfaceSuperTypes().contains( typeIdentifier ) ) {
-			throw log.unknownClassForNonInterfaceSuperType( clazz, contextProvider.allNonInterfaceSuperTypesClasses() );
-		}
-		return typeIdentifier;
 	}
 
 	public ConfiguredSearchIndexingPlanFilter createFilter(ConfiguredSearchIndexingPlanFilter fallback) {
@@ -121,7 +113,7 @@ public class SearchIndexingPlanFilterContextImpl implements SearchIndexingPlanFi
 
 	private void exclude(Set<PojoRawTypeIdentifier<?>> allIncludes, Set<PojoRawTypeIdentifier<?>> allExcludes,
 			Set<PojoRawTypeIdentifier<?>> processed, PojoRawTypeIdentifier<?> typeIdentifier) {
-		contextProvider.allByNonInterfaceSuperType( typeIdentifier ).forEach( typeContext -> {
+		contextProvider.forNonInterfaceSuperType( typeIdentifier ).forEach( typeContext -> {
 			PojoRawTypeIdentifier<?> identifier = typeContext.typeIdentifier();
 			allIncludes.remove( identifier );
 			allExcludes.add( identifier );
@@ -131,7 +123,7 @@ public class SearchIndexingPlanFilterContextImpl implements SearchIndexingPlanFi
 
 	private void include(Set<PojoRawTypeIdentifier<?>> allIncludes, Set<PojoRawTypeIdentifier<?>> allExcludes,
 			Set<PojoRawTypeIdentifier<?>> processed, PojoRawTypeIdentifier<?> typeIdentifier) {
-		contextProvider.allByNonInterfaceSuperType( typeIdentifier ).forEach( typeContext -> {
+		contextProvider.forNonInterfaceSuperType( typeIdentifier ).forEach( typeContext -> {
 			PojoRawTypeIdentifier<?> identifier = typeContext.typeIdentifier();
 			allIncludes.add( identifier );
 			allExcludes.remove( identifier );

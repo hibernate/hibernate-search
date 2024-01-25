@@ -47,8 +47,8 @@ class BuildQueryBuilderTest {
 		assertThatThrownBy(
 				() -> sfHolder.getSearchFactory().buildQueryBuilder().forEntity( ConfiguredNotIndexed.class ).get() )
 				.hasMessageContainingAll(
-						"No matching indexed entity types for types: [" + ConfiguredNotIndexed.class.getName() + "]",
-						"These types are not indexed entity types, nor is any of their subtypes"
+						"No matching indexed entity types for classes [" + ConfiguredNotIndexed.class.getName() + "]",
+						"Neither these classes nor any of their subclasses are indexed"
 				);
 	}
 
@@ -57,8 +57,8 @@ class BuildQueryBuilderTest {
 		assertThatThrownBy(
 				() -> sfHolder.getSearchFactory().buildQueryBuilder().forEntity( NotConfiguredIndexed.class ).get() )
 				.hasMessageContainingAll(
-						"No matching indexed entity types for types: [" + NotConfiguredIndexed.class.getName() + "]",
-						"These types are not indexed entity types, nor is any of their subtypes"
+						"No matching indexed entity types for classes [" + NotConfiguredIndexed.class.getName() + "]",
+						"Neither these classes nor any of their subclasses are indexed"
 				);
 	}
 
@@ -67,8 +67,8 @@ class BuildQueryBuilderTest {
 		assertThatThrownBy(
 				() -> sfHolder.getSearchFactory().buildQueryBuilder().forEntity( NotConfiguredNotIndexed.class ).get() )
 				.hasMessageContainingAll(
-						"No matching indexed entity types for types: [" + NotConfiguredNotIndexed.class.getName() + "]",
-						"These types are not indexed entity types, nor is any of their subtypes",
+						"No matching indexed entity types for classes [" + NotConfiguredNotIndexed.class.getName() + "]",
+						"Neither these classes nor any of their subclasses are indexed",
 						NotConfiguredNotIndexed.class.getSimpleName()
 				);
 	}
