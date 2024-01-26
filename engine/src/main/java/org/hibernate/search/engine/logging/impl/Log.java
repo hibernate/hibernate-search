@@ -22,6 +22,7 @@ import org.hibernate.search.engine.environment.bean.spi.BeanNotFoundException;
 import org.hibernate.search.engine.environment.classpath.spi.ClassLoadingException;
 import org.hibernate.search.engine.mapper.model.spi.MappingElement;
 import org.hibernate.search.engine.search.aggregation.AggregationKey;
+import org.hibernate.search.engine.search.common.RewriteMethod;
 import org.hibernate.search.engine.search.common.spi.SearchQueryElementTypeKey;
 import org.hibernate.search.engine.search.projection.definition.ProjectionDefinition;
 import org.hibernate.search.engine.spatial.GeoPoint;
@@ -570,4 +571,14 @@ public interface Log extends BasicLogger {
 			value = "Multiple configuration providers are available for scope '%1$s'. "
 					+ "They will be taken under consideration in the following order: '%2$s'.")
 	void multipleConfigurationProvidersAvailable(String scope, List<ConfigurationProvider> configurationProviders);
+
+	@Message(id = ID_OFFSET + 121,
+			value = "Cannot use rewrite method '%1$s': this method requires parameter 'n', which was not specified."
+					+ " Use another version of the rewrite(...) method that accepts parameter 'n'.")
+	SearchException parameterizedRewriteMethodWithoutParameter(RewriteMethod rewriteMethod);
+
+	@Message(id = ID_OFFSET + 122,
+			value = "Cannot use rewrite method '%1$s': this method does not accept parameter 'n', but it was specified."
+					+ " Use another version of the rewrite(...) method that does not accept parameter 'n'.")
+	SearchException nonParameterizedRewriteMethodWithParameter(RewriteMethod rewriteMethod);
 }

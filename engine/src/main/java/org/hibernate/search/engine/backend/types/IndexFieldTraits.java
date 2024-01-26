@@ -45,6 +45,7 @@ public final class IndexFieldTraits {
 		public static final String NESTED = "predicate:nested";
 		public static final String PHRASE = "predicate:phrase";
 		public static final String RANGE = "predicate:range";
+		public static final String QUERY_STRING = "predicate:query-string";
 		public static final String REGEXP = "predicate:regexp";
 		public static final String SIMPLE_QUERY_STRING = "predicate:simple-query-string";
 		public static final String SPATIAL_WITHIN_BOUNDING_BOX = "predicate:spatial:within-bounding-box";

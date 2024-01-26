@@ -875,6 +875,27 @@ class PredicateDslIT {
 	}
 
 	@Test
+	void queryString() {
+		withinSearchSession( searchSession -> {
+			System.err.println(
+					searchSession.search( Book.class )
+							.where( f -> f.queryString().field( "title" ).matching( "\"robots of dawn\"" ) ).toQuery()
+							.queryString()
+			);
+			System.err.println( searchSession.search( Book.class )
+					.where( f -> f.queryString()
+							.field( "title" ).boost( 20.0f )
+							.field( "description" ).boost( 2.0f )
+							.matching( "robots" )
+							.minimumShouldMatch()
+							.ifMoreThan( 0 )
+							.thenRequireNumber( 2 )
+							.end()
+					).toQuery().queryString() );
+		} );
+	}
+
+	@Test
 	void exists() {
 		withinSearchSession( searchSession -> {
 			// tag::exists[]

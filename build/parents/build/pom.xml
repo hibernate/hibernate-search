@@ -33,6 +33,8 @@
         <!--
             When upgrading Lucene, check HibernateSearchKnnVectorsFormat to see if its internals should be updated too.
             In particular if a delegating Lucene95HnswVectorsFormat should be changed to a different version.
+
+            Also make sure to update Javadocs for RewriteMethod.
         -->
         <version.org.apache.lucene>9.9.2</version.org.apache.lucene>
         <javadoc.org.apache.lucene.tag>${parsed-version.org.apache.lucene.majorVersion}_${parsed-version.org.apache.lucene.minorVersion}_${parsed-version.org.apache.lucene.incrementalVersion}</javadoc.org.apache.lucene.tag>

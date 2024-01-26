@@ -46,7 +46,7 @@ class ElasticsearchBooleanPredicate extends AbstractElasticsearchPredicate {
 	// NOTE: below modifiers (minimumShouldMatchConstraints) are used to implement hasNoModifiers() which is based on a
 	// parent implementation.
 	// IMPORTANT: Review where current modifiers are used and how the new modifier affects that logic, when adding a new modifier.
-	private final Map<Integer, MinimumShouldMatchConstraint> minimumShouldMatchConstraints;
+	private final Map<Integer, ElasticsearchCommonMinimumShouldMatchConstraint> minimumShouldMatchConstraints;
 
 	private ElasticsearchBooleanPredicate(Builder builder) {
 		super( builder );
@@ -94,7 +94,8 @@ class ElasticsearchBooleanPredicate extends AbstractElasticsearchPredicate {
 		if ( minimumShouldMatchConstraints != null ) {
 			MINIMUM_SHOULD_MATCH_ACCESSOR.set(
 					innerObject,
-					formatMinimumShouldMatchConstraints( minimumShouldMatchConstraints )
+					ElasticsearchCommonMinimumShouldMatchConstraint
+							.formatMinimumShouldMatchConstraints( minimumShouldMatchConstraints )
 			);
 		}
 
@@ -121,37 +122,6 @@ class ElasticsearchBooleanPredicate extends AbstractElasticsearchPredicate {
 		for ( ElasticsearchSearchPredicate clause : clauses ) {
 			clause.checkNestableWithin( context );
 		}
-	}
-
-	private String formatMinimumShouldMatchConstraints(
-			Map<Integer, MinimumShouldMatchConstraint> minimumShouldMatchConstraints) {
-		StringBuilder builder = new StringBuilder();
-		Iterator<Map.Entry<Integer, MinimumShouldMatchConstraint>> iterator =
-				minimumShouldMatchConstraints.entrySet().iterator();
-
-		// Process the first constraint differently
-		Map.Entry<Integer, MinimumShouldMatchConstraint> entry = iterator.next();
-		Integer ignoreConstraintCeiling = entry.getKey();
-		MinimumShouldMatchConstraint constraint = entry.getValue();
-		if ( ignoreConstraintCeiling.equals( 0 ) && minimumShouldMatchConstraints.size() == 1 ) {
-			// Special case: if there's only one constraint and its ignore ceiling is 0, do not mention the ceiling
-			constraint.appendTo( builder, null );
-			return builder.toString();
-		}
-		else {
-			entry.getValue().appendTo( builder, ignoreConstraintCeiling );
-		}
-
-		// Process the other constraints normally
-		while ( iterator.hasNext() ) {
-			entry = iterator.next();
-			ignoreConstraintCeiling = entry.getKey();
-			constraint = entry.getValue();
-			builder.append( ' ' );
-			constraint.appendTo( builder, ignoreConstraintCeiling );
-		}
-
-		return builder.toString();
 	}
 
 	private boolean isOnlyMustNot(JsonObject innerObject) {
@@ -195,7 +165,7 @@ class ElasticsearchBooleanPredicate extends AbstractElasticsearchPredicate {
 		// NOTE: below modifiers (minimumShouldMatchConstraints) are used to implement hasNoModifiers() which is based on a
 		// parent implementation.
 		// IMPORTANT: Review where current modifiers are used and how the new modifier affects that logic, when adding a new modifier.
-		private Map<Integer, MinimumShouldMatchConstraint> minimumShouldMatchConstraints;
+		private Map<Integer, ElasticsearchCommonMinimumShouldMatchConstraint> minimumShouldMatchConstraints;
 
 		Builder(ElasticsearchSearchIndexScope<?> scope) {
 			super( scope );
@@ -245,7 +215,7 @@ class ElasticsearchBooleanPredicate extends AbstractElasticsearchPredicate {
 		public void minimumShouldMatchNumber(int ignoreConstraintCeiling, int matchingClausesNumber) {
 			addMinimumShouldMatchConstraint(
 					ignoreConstraintCeiling,
-					new MinimumShouldMatchConstraint( matchingClausesNumber, null )
+					new ElasticsearchCommonMinimumShouldMatchConstraint( matchingClausesNumber, null )
 			);
 		}
 
@@ -253,7 +223,7 @@ class ElasticsearchBooleanPredicate extends AbstractElasticsearchPredicate {
 		public void minimumShouldMatchPercent(int ignoreConstraintCeiling, int matchingClausesPercent) {
 			addMinimumShouldMatchConstraint(
 					ignoreConstraintCeiling,
-					new MinimumShouldMatchConstraint( null, matchingClausesPercent )
+					new ElasticsearchCommonMinimumShouldMatchConstraint( null, matchingClausesPercent )
 			);
 		}
 
@@ -263,7 +233,7 @@ class ElasticsearchBooleanPredicate extends AbstractElasticsearchPredicate {
 		}
 
 		private void addMinimumShouldMatchConstraint(int ignoreConstraintCeiling,
-				MinimumShouldMatchConstraint constraint) {
+				ElasticsearchCommonMinimumShouldMatchConstraint constraint) {
 			if ( minimumShouldMatchConstraints == null ) {
 				// We'll need to go through the data in ascending order, so use a TreeMap
 				minimumShouldMatchConstraints = new TreeMap<>();
@@ -362,34 +332,4 @@ class ElasticsearchBooleanPredicate extends AbstractElasticsearchPredicate {
 		}
 	}
 
-	private static final class MinimumShouldMatchConstraint {
-		private final Integer matchingClausesNumber;
-		private final Integer matchingClausesPercent;
-
-		MinimumShouldMatchConstraint(Integer matchingClausesNumber, Integer matchingClausesPercent) {
-			this.matchingClausesNumber = matchingClausesNumber;
-			this.matchingClausesPercent = matchingClausesPercent;
-		}
-
-		/**
-		 * Format the constraint according to
-		 * <a href="https://www.elastic.co/guide/en/elasticsearch/reference/current/query-dsl-minimum-should-match.html">
-		 * the format specified in the Elasticsearch documentation
-		 * </a>.
-		 *
-		 * @param builder The builder to append the formatted value to.
-		 * @param ignoreConstraintCeiling The ceiling above which this constraint is no longer ignored.
-		 */
-		void appendTo(StringBuilder builder, Integer ignoreConstraintCeiling) {
-			if ( ignoreConstraintCeiling != null ) {
-				builder.append( ignoreConstraintCeiling ).append( '<' );
-			}
-			if ( matchingClausesNumber != null ) {
-				builder.append( matchingClausesNumber );
-			}
-			else {
-				builder.append( matchingClausesPercent ).append( '%' );
-			}
-		}
-	}
 }

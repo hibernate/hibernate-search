@@ -114,7 +114,7 @@ public class LuceneSimpleQueryStringPredicate extends AbstractLuceneNestablePred
 		}
 
 		@Override
-		public void simpleQueryString(String simpleQueryString) {
+		public void queryString(String simpleQueryString) {
 			this.simpleQueryString = simpleQueryString;
 		}
 

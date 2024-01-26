@@ -9,7 +9,7 @@ package org.hibernate.search.engine.search.predicate.spi;
 import org.hibernate.search.engine.search.predicate.SearchPredicate;
 import org.hibernate.search.engine.search.predicate.dsl.BooleanPredicateClausesStep;
 
-public interface BooleanPredicateBuilder extends SearchPredicateBuilder {
+public interface BooleanPredicateBuilder extends MinimumShouldMatchBuilder, SearchPredicateBuilder {
 
 	void must(SearchPredicate clause);
 
