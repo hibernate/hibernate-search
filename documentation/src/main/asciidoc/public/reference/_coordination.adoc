@@ -110,7 +110,7 @@ as well as your database.
 With the <<mapper-orm,Hibernate ORM integration>>, this extra cost can be mitigated to some extent by:
 +
 * leveraging Hibernate ORM's batch fetching:
-see link:{hibernateDocUrl}#configurations-database-fetch[the `batch_fetch_size` property]
+see link:{hibernateDocUrl}#settings-hibernate.default_batch_fetch_size[the `batch_fetch_size` property]
 and link:{hibernateDocUrl}#fetching-batch[the `@BatchSize` annotation].
 * leveraging Hibernate ORM's link:{hibernateDocUrl}#caching[second-level cache],
 especially for immutable entities referenced from indexed entities
@@ -235,7 +235,7 @@ Depending on your mapping, it may also need to load lazy associations to other e
 This extra cost can be mitigated to some extent by:
 +
 * leveraging Hibernate ORM's batch fetching;
-see link:{hibernateDocUrl}#configurations-database-fetch[the `batch_fetch_size` property]
+see link:{hibernateDocUrl}#settings-hibernate.default_batch_fetch_size[the `batch_fetch_size` property]
 and link:{hibernateDocUrl}#fetching-batch[the `@BatchSize` annotation].
 * leveraging Hibernate ORM's link:{hibernateDocUrl}#caching[second-level cache],
 especially for immutable entities referenced from indexed entities
