@@ -20,7 +20,10 @@ import org.apache.lucene.index.SegmentReadState;
 import org.apache.lucene.index.SegmentWriteState;
 
 public class HibernateSearchKnnVectorsFormat extends KnnVectorsFormat {
-	public static final int DEFAULT_MAX_DIMENSIONS = KnnVectorsFormat.DEFAULT_MAX_DIMENSIONS;
+	// OpenSearch has a limit of 16000
+	// Elasticsearch has a limit of 4096
+	// We'll keep it at 4096 for now as well:
+	public static final int DEFAULT_MAX_DIMENSIONS = 4096;
 	private static final KnnVectorsFormat DEFAULT_KNN_VECTORS_FORMAT = new HibernateSearchKnnVectorsFormat();
 
 	public static KnnVectorsFormat defaultFormat() {
@@ -59,7 +62,6 @@ public class HibernateSearchKnnVectorsFormat extends KnnVectorsFormat {
 
 	@Override
 	public int getMaxDimensions(String fieldName) {
-		// TODO: HSEARCH-5020: we can make this configurable, apparently there are models that produce larger vectors than this default allows.
 		return DEFAULT_MAX_DIMENSIONS;
 	}
 
