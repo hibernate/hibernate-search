@@ -22,9 +22,9 @@ class LuceneVectorFieldIT {
 	public final SearchSetupHelper setupHelper = SearchSetupHelper.create();
 
 	@ParameterizedTest
-	@ValueSource(ints = { -1, -1000, 1025, 10000, Integer.MAX_VALUE, Integer.MIN_VALUE })
+	@ValueSource(ints = { -1, -1000, 4097, 10000, Integer.MAX_VALUE, Integer.MIN_VALUE })
 	void assertDimension(int dimension) {
-		test( dimension, 5, 10, "dimension", dimension, 1024 );
+		test( dimension, 5, 10, "dimension", dimension, 4096 );
 	}
 
 	@ParameterizedTest
