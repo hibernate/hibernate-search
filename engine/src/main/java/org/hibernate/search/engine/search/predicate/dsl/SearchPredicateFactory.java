@@ -246,6 +246,20 @@ public interface SearchPredicateFactory {
 	SimpleQueryStringPredicateFieldStep<?> simpleQueryString();
 
 	/**
+	 * Match documents according to a given query string,
+	 * using the Lucene's query language.
+	 * <p>
+	 * Note that by default, unless the query string contains explicit operators,
+	 * documents will match if <em>any</em> term mentioned in the query string is present in the document (OR operator).
+	 * This makes sense when sorting results by relevance, but is not ideal otherwise.
+	 * See {@link QueryStringPredicateOptionsStep#defaultOperator(BooleanOperator)} to change this behavior.
+	 *
+	 * @return The initial step of a DSL where the "query string" predicate can be defined.
+	 * @see QueryStringPredicateFieldStep
+	 */
+	QueryStringPredicateFieldStep<?> queryString();
+
+	/**
 	 * Match documents where a given field exists.
 	 * <p>
 	 * Fields are considered to exist in a document when they have at least one non-null value in this document.

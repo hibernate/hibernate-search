@@ -10,10 +10,10 @@ import java.util.List;
 
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.FieldTypeDescriptor;
 
-public final class SimpleQueryStringPredicateTestValues extends AbstractPredicateTestValues<String> {
+public final class CommonQueryStringPredicateTestValues extends AbstractPredicateTestValues<String> {
 	private final List<String> values;
 
-	public SimpleQueryStringPredicateTestValues(FieldTypeDescriptor<String, ?> fieldType) {
+	public CommonQueryStringPredicateTestValues(FieldTypeDescriptor<String, ?> fieldType) {
 		super( fieldType );
 		this.values = fieldType.getUniquelyMatchableValues();
 	}
@@ -25,8 +25,8 @@ public final class SimpleQueryStringPredicateTestValues extends AbstractPredicat
 
 	public String matchingArg(int docOrdinal) {
 		// Using phrase queries, because that's the easiest way to achieve
-		// simple, unique matches with the simple query string predicate.
-		// Other types of queries are tested separately in SimpleQueryStringPredicateSpecificsIT.
+		// simple, unique matches with the query string predicates (simple/regular).
+		// Other types of queries are tested separately in *PredicateSpecificsIT.
 		return "\"" + fieldValue( docOrdinal ) + "\"";
 	}
 

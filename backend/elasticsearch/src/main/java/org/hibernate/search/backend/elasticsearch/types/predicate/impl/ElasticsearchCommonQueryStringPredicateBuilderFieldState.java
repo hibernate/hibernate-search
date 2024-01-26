@@ -9,18 +9,18 @@ package org.hibernate.search.backend.elasticsearch.types.predicate.impl;
 import org.hibernate.search.backend.elasticsearch.search.common.impl.AbstractElasticsearchValueFieldSearchQueryElementFactory;
 import org.hibernate.search.backend.elasticsearch.search.common.impl.ElasticsearchSearchIndexScope;
 import org.hibernate.search.backend.elasticsearch.search.common.impl.ElasticsearchSearchIndexValueFieldContext;
-import org.hibernate.search.engine.search.predicate.spi.SimpleQueryStringPredicateBuilder;
+import org.hibernate.search.engine.search.predicate.spi.CommonQueryStringPredicateBuilder;
 
 import com.google.gson.JsonPrimitive;
 
-public final class ElasticsearchSimpleQueryStringPredicateBuilderFieldState
-		implements SimpleQueryStringPredicateBuilder.FieldState {
+public final class ElasticsearchCommonQueryStringPredicateBuilderFieldState
+		implements CommonQueryStringPredicateBuilder.FieldState {
 	private static final String BOOST_OPERATOR = "^";
 
 	private final ElasticsearchSearchIndexValueFieldContext<String> field;
 	private Float boost;
 
-	private ElasticsearchSimpleQueryStringPredicateBuilderFieldState(
+	private ElasticsearchCommonQueryStringPredicateBuilderFieldState(
 			ElasticsearchSearchIndexValueFieldContext<String> field) {
 		this.field = field;
 	}
@@ -49,12 +49,12 @@ public final class ElasticsearchSimpleQueryStringPredicateBuilderFieldState
 
 	public static class Factory
 			extends
-			AbstractElasticsearchValueFieldSearchQueryElementFactory<ElasticsearchSimpleQueryStringPredicateBuilderFieldState,
+			AbstractElasticsearchValueFieldSearchQueryElementFactory<ElasticsearchCommonQueryStringPredicateBuilderFieldState,
 					String> {
 		@Override
-		public ElasticsearchSimpleQueryStringPredicateBuilderFieldState create(
+		public ElasticsearchCommonQueryStringPredicateBuilderFieldState create(
 				ElasticsearchSearchIndexScope<?> scope, ElasticsearchSearchIndexValueFieldContext<String> field) {
-			return new ElasticsearchSimpleQueryStringPredicateBuilderFieldState( field );
+			return new ElasticsearchCommonQueryStringPredicateBuilderFieldState( field );
 		}
 	}
 }

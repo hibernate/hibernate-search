@@ -9,10 +9,10 @@ package org.hibernate.search.backend.lucene.types.predicate.impl;
 import org.hibernate.search.backend.lucene.search.common.impl.AbstractLuceneValueFieldSearchQueryElementFactory;
 import org.hibernate.search.backend.lucene.search.common.impl.LuceneSearchIndexScope;
 import org.hibernate.search.backend.lucene.search.common.impl.LuceneSearchIndexValueFieldContext;
-import org.hibernate.search.engine.search.predicate.spi.SimpleQueryStringPredicateBuilder;
+import org.hibernate.search.engine.search.predicate.spi.CommonQueryStringPredicateBuilder;
 
 public final class LuceneSimpleQueryStringPredicateBuilderFieldState
-		implements SimpleQueryStringPredicateBuilder.FieldState {
+		implements CommonQueryStringPredicateBuilder.FieldState {
 
 	private final LuceneSearchIndexValueFieldContext<?> field;
 	private Float boost;

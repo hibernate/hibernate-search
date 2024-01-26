@@ -10,12 +10,14 @@ import java.util.Collection;
 import java.util.Set;
 
 import org.hibernate.search.engine.search.common.BooleanOperator;
+import org.hibernate.search.engine.search.common.RewriteMethod;
 import org.hibernate.search.engine.search.common.ValueConvert;
 import org.hibernate.search.engine.search.predicate.SearchPredicate;
 import org.hibernate.search.engine.search.predicate.dsl.RegexpQueryFlag;
 import org.hibernate.search.engine.search.predicate.dsl.SearchPredicateFactory;
 import org.hibernate.search.engine.search.predicate.dsl.SimpleQueryFlag;
 import org.hibernate.search.engine.search.predicate.spi.BooleanPredicateBuilder;
+import org.hibernate.search.engine.search.predicate.spi.CommonQueryStringPredicateBuilder;
 import org.hibernate.search.engine.search.predicate.spi.ExistsPredicateBuilder;
 import org.hibernate.search.engine.search.predicate.spi.MatchAllPredicateBuilder;
 import org.hibernate.search.engine.search.predicate.spi.MatchIdPredicateBuilder;
@@ -24,6 +26,7 @@ import org.hibernate.search.engine.search.predicate.spi.MatchPredicateBuilder;
 import org.hibernate.search.engine.search.predicate.spi.NamedPredicateBuilder;
 import org.hibernate.search.engine.search.predicate.spi.NestedPredicateBuilder;
 import org.hibernate.search.engine.search.predicate.spi.PhrasePredicateBuilder;
+import org.hibernate.search.engine.search.predicate.spi.QueryStringPredicateBuilder;
 import org.hibernate.search.engine.search.predicate.spi.RangePredicateBuilder;
 import org.hibernate.search.engine.search.predicate.spi.RegexpPredicateBuilder;
 import org.hibernate.search.engine.search.predicate.spi.SimpleQueryStringPredicateBuilder;
@@ -90,7 +93,7 @@ public class StubSearchPredicate implements SearchPredicate {
 		}
 
 		@Override
-		public void simpleQueryString(String simpleQueryString) {
+		public void queryString(String simpleQueryString) {
 			// No-op
 		}
 
@@ -99,6 +102,44 @@ public class StubSearchPredicate implements SearchPredicate {
 			// No-op, just simulates a call on this object
 		}
 
+	}
+
+	public static class QueryStringBuilder extends Builder implements QueryStringPredicateBuilder {
+
+		@Override
+		public FieldState field(String fieldPath) {
+			return new StubFieldState();
+		}
+
+		@Override
+		public void defaultOperator(BooleanOperator operator) {
+			// No-op
+		}
+
+		@Override
+		public void queryString(String simpleQueryString) {
+			// No-op
+		}
+
+		@Override
+		public void allowLeadingWildcard(boolean allowLeadingWildcard) {
+			// No-op
+		}
+
+		@Override
+		public void enablePositionIncrements(boolean enablePositionIncrements) {
+			// No-op
+		}
+
+		@Override
+		public void phraseSlop(Integer phraseSlop) {
+			// No-op
+		}
+
+		@Override
+		public void rewriteMethod(RewriteMethod rewriteMethod, Integer n) {
+			// No-op
+		}
 	}
 
 	public static class Builder
@@ -261,7 +302,7 @@ public class StubSearchPredicate implements SearchPredicate {
 		}
 	}
 
-	private static class StubFieldState implements SimpleQueryStringPredicateBuilder.FieldState {
+	private static class StubFieldState implements CommonQueryStringPredicateBuilder.FieldState {
 
 		@Override
 		public void boost(float boost) {

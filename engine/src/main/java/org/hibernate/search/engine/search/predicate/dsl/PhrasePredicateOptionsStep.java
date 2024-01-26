@@ -27,7 +27,7 @@ public interface PhrasePredicateOptionsStep<S extends PhrasePredicateOptionsStep
 	 * or even {@code fox quick} (two operations: moved {@code fox} to the left and {@code quick} to the right).
 	 * And similarly for higher slops and for phrases with more words.
 	 *
-	 * @param slop The slop value
+	 * @param slop The slop value.
 	 * @return {@code this}, for method chaining.
 	 */
 	S slop(int slop);

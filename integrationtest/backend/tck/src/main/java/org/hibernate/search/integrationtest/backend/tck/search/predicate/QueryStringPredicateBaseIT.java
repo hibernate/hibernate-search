@@ -24,7 +24,7 @@ import org.junit.jupiter.params.provider.Arguments;
 
 //CHECKSTYLE:OFF HideUtilityClassConstructor ignore the rule since it is a class with nested test classes.
 // cannot make a private constructor.
-class SimpleQueryStringPredicateBaseIT {
+class QueryStringPredicateBaseIT {
 	//CHECKSTYLE:ON
 
 	private static final List<
@@ -141,7 +141,7 @@ class SimpleQueryStringPredicateBaseIT {
 		@Override
 		protected PredicateFinalStep predicate(SearchPredicateFactory f, String fieldPath, int matchingDocOrdinal,
 				DataSet<?, CommonQueryStringPredicateTestValues> dataSet) {
-			return f.simpleQueryString().field( fieldPath ).matching( dataSet.values.matchingArg( matchingDocOrdinal ) );
+			return f.queryString().field( fieldPath ).matching( dataSet.values.matchingArg( matchingDocOrdinal ) );
 		}
 	}
 
@@ -172,20 +172,20 @@ class SimpleQueryStringPredicateBaseIT {
 		@Override
 		protected PredicateFinalStep predicateOnFieldAndField(SearchPredicateFactory f, String fieldPath,
 				String otherFieldPath, int matchingDocOrdinal, DataSet<?, CommonQueryStringPredicateTestValues> dataSet) {
-			return f.simpleQueryString().field( fieldPath ).field( otherFieldPath )
+			return f.queryString().field( fieldPath ).field( otherFieldPath )
 					.matching( dataSet.values.matchingArg( matchingDocOrdinal ) );
 		}
 
 		@Override
 		protected PredicateFinalStep predicateOnFields(SearchPredicateFactory f, String[] fieldPaths, int matchingDocOrdinal,
 				DataSet<?, CommonQueryStringPredicateTestValues> dataSet) {
-			return f.simpleQueryString().fields( fieldPaths ).matching( dataSet.values.matchingArg( matchingDocOrdinal ) );
+			return f.queryString().fields( fieldPaths ).matching( dataSet.values.matchingArg( matchingDocOrdinal ) );
 		}
 
 		@Override
 		protected PredicateFinalStep predicateOnFieldAndFields(SearchPredicateFactory f, String fieldPath,
 				String[] fieldPaths, int matchingDocOrdinal, DataSet<?, CommonQueryStringPredicateTestValues> dataSet) {
-			return f.simpleQueryString().field( fieldPath ).fields( fieldPaths )
+			return f.queryString().field( fieldPath ).fields( fieldPaths )
 					.matching( dataSet.values.matchingArg( matchingDocOrdinal ) );
 		}
 	}
@@ -222,7 +222,7 @@ class SimpleQueryStringPredicateBaseIT {
 		@Override
 		protected PredicateFinalStep predicate(SearchPredicateFactory f, String fieldPath, int matchingDocOrdinal,
 				DataSet<?, CommonQueryStringPredicateTestValues> dataSet) {
-			return f.simpleQueryString().field( fieldPath ).matching( dataSet.values.matchingArg( matchingDocOrdinal ) );
+			return f.queryString().field( fieldPath ).matching( dataSet.values.matchingArg( matchingDocOrdinal ) );
 		}
 	}
 
@@ -247,19 +247,19 @@ class SimpleQueryStringPredicateBaseIT {
 
 		@Override
 		protected PredicateFinalStep predicate(SearchPredicateFactory f, String fieldPath, String matchingParam) {
-			return f.simpleQueryString().field( fieldPath ).matching( matchingParam );
+			return f.queryString().field( fieldPath ).matching( matchingParam );
 		}
 
 		@Override
 		protected PredicateFinalStep predicateWithAnalyzerOverride(SearchPredicateFactory f, String fieldPath,
 				String matchingParam, String analyzerName) {
-			return f.simpleQueryString().field( fieldPath ).matching( matchingParam ).analyzer( analyzerName );
+			return f.queryString().field( fieldPath ).matching( matchingParam ).analyzer( analyzerName );
 		}
 
 		@Override
 		protected PredicateFinalStep predicateWithSkipAnalysis(SearchPredicateFactory f, String fieldPath,
 				String matchingParam) {
-			return f.simpleQueryString().field( fieldPath ).matching( matchingParam ).skipAnalysis();
+			return f.queryString().field( fieldPath ).matching( matchingParam ).skipAnalysis();
 		}
 	}
 
@@ -291,13 +291,13 @@ class SimpleQueryStringPredicateBaseIT {
 		public void constantScore_fieldLevelBoost(SimpleMappedIndex<IndexBinding> index,
 				DataSet<?, CommonQueryStringPredicateTestValues> dataSet) {
 			throw new org.opentest4j.TestAbortedException(
-					"The simpleQueryString predicate currently does not fail when using constantScore() + a field-level boost" );
+					"The queryString predicate currently does not fail when using constantScore() + a field-level boost" );
 		}
 
 		@Override
 		protected PredicateFinalStep predicate(SearchPredicateFactory f, String fieldPath, int matchingDocOrdinal,
 				DataSet<?, CommonQueryStringPredicateTestValues> dataSet) {
-			return f.simpleQueryString().field( fieldPath )
+			return f.queryString().field( fieldPath )
 					.matching( ( (DataSet<?, CommonQueryStringPredicateTestValues>) dataSet ).values
 							.matchingArg( matchingDocOrdinal ) );
 		}
@@ -305,7 +305,7 @@ class SimpleQueryStringPredicateBaseIT {
 		@Override
 		protected PredicateFinalStep predicateWithConstantScore(SearchPredicateFactory f, String[] fieldPaths,
 				int matchingDocOrdinal, DataSet<?, CommonQueryStringPredicateTestValues> dataSet) {
-			return f.simpleQueryString().fields( fieldPaths )
+			return f.queryString().fields( fieldPaths )
 					.matching( ( (DataSet<?, CommonQueryStringPredicateTestValues>) dataSet ).values
 							.matchingArg( matchingDocOrdinal ) )
 					.constantScore();
@@ -314,7 +314,7 @@ class SimpleQueryStringPredicateBaseIT {
 		@Override
 		protected PredicateFinalStep predicateWithPredicateLevelBoost(SearchPredicateFactory f, String[] fieldPaths,
 				int matchingDocOrdinal, float predicateBoost, DataSet<?, CommonQueryStringPredicateTestValues> dataSet) {
-			return f.simpleQueryString().fields( fieldPaths )
+			return f.queryString().fields( fieldPaths )
 					.matching( ( (DataSet<?, CommonQueryStringPredicateTestValues>) dataSet ).values
 							.matchingArg( matchingDocOrdinal ) )
 					.boost( predicateBoost );
@@ -324,7 +324,7 @@ class SimpleQueryStringPredicateBaseIT {
 		protected PredicateFinalStep predicateWithConstantScoreAndPredicateLevelBoost(SearchPredicateFactory f,
 				String[] fieldPaths, int matchingDocOrdinal, float predicateBoost,
 				DataSet<?, CommonQueryStringPredicateTestValues> dataSet) {
-			return f.simpleQueryString().fields( fieldPaths )
+			return f.queryString().fields( fieldPaths )
 					.matching( ( (DataSet<?, CommonQueryStringPredicateTestValues>) dataSet ).values
 							.matchingArg( matchingDocOrdinal ) )
 					.constantScore().boost( predicateBoost );
@@ -333,7 +333,7 @@ class SimpleQueryStringPredicateBaseIT {
 		@Override
 		protected PredicateFinalStep predicateWithFieldLevelBoost(SearchPredicateFactory f, String fieldPath,
 				float fieldBoost, int matchingDocOrdinal, DataSet<?, CommonQueryStringPredicateTestValues> dataSet) {
-			return f.simpleQueryString().field( fieldPath ).boost( fieldBoost )
+			return f.queryString().field( fieldPath ).boost( fieldBoost )
 					.matching( ( (DataSet<?, CommonQueryStringPredicateTestValues>) dataSet ).values
 							.matchingArg( matchingDocOrdinal ) );
 		}
@@ -342,7 +342,7 @@ class SimpleQueryStringPredicateBaseIT {
 		protected PredicateFinalStep predicateWithFieldLevelBoostAndConstantScore(SearchPredicateFactory f,
 				String fieldPath, float fieldBoost, int matchingDocOrdinal,
 				DataSet<?, CommonQueryStringPredicateTestValues> dataSet) {
-			return f.simpleQueryString().field( fieldPath ).boost( fieldBoost )
+			return f.queryString().field( fieldPath ).boost( fieldBoost )
 					.matching( ( (DataSet<?, CommonQueryStringPredicateTestValues>) dataSet ).values
 							.matchingArg( matchingDocOrdinal ) )
 					.constantScore();
@@ -352,7 +352,7 @@ class SimpleQueryStringPredicateBaseIT {
 		protected PredicateFinalStep predicateWithFieldLevelBoostAndPredicateLevelBoost(SearchPredicateFactory f,
 				String fieldPath, float fieldBoost, int matchingDocOrdinal, float predicateBoost,
 				DataSet<?, CommonQueryStringPredicateTestValues> dataSet) {
-			return f.simpleQueryString().field( fieldPath ).boost( fieldBoost )
+			return f.queryString().field( fieldPath ).boost( fieldBoost )
 					.matching( ( (DataSet<?, CommonQueryStringPredicateTestValues>) dataSet ).values
 							.matchingArg( matchingDocOrdinal ) )
 					.boost( predicateBoost );
@@ -374,7 +374,7 @@ class SimpleQueryStringPredicateBaseIT {
 
 		@Override
 		protected void tryPredicate(SearchPredicateFactory f, String fieldPath) {
-			f.simpleQueryString().field( fieldPath );
+			f.queryString().field( fieldPath );
 		}
 
 		@Override
@@ -406,7 +406,7 @@ class SimpleQueryStringPredicateBaseIT {
 
 		@Override
 		protected void tryPredicate(SearchPredicateFactory f, String fieldPath) {
-			f.simpleQueryString().field( fieldPath );
+			f.queryString().field( fieldPath );
 		}
 
 		@Override
@@ -445,7 +445,7 @@ class SimpleQueryStringPredicateBaseIT {
 
 		@Override
 		protected void tryPredicate(SearchPredicateFactory f, String fieldPath, FieldTypeDescriptor<?, ?> fieldType) {
-			f.simpleQueryString().field( fieldPath );
+			f.queryString().field( fieldPath );
 		}
 
 		@Override
@@ -477,7 +477,7 @@ class SimpleQueryStringPredicateBaseIT {
 
 		@Override
 		protected void tryPredicateWithNullMatchingParam(SearchPredicateFactory f, String fieldPath) {
-			f.simpleQueryString().field( fieldPath ).matching( null );
+			f.queryString().field( fieldPath ).matching( null );
 		}
 	}
 
@@ -522,13 +522,13 @@ class SimpleQueryStringPredicateBaseIT {
 		@Override
 		protected PredicateFinalStep predicate(SearchPredicateFactory f, String fieldPath, int matchingDocOrdinal,
 				DataSet<?, CommonQueryStringPredicateTestValues> dataSet) {
-			return f.simpleQueryString().field( fieldPath ).matching( dataSet.values.matchingArg( matchingDocOrdinal ) );
+			return f.queryString().field( fieldPath ).matching( dataSet.values.matchingArg( matchingDocOrdinal ) );
 		}
 
 		@Override
 		protected PredicateFinalStep predicate(SearchPredicateFactory f, String field0Path, String field1Path,
 				int matchingDocOrdinal, DataSet<?, CommonQueryStringPredicateTestValues> dataSet) {
-			return f.simpleQueryString().field( field0Path ).field( field1Path )
+			return f.queryString().field( field0Path ).field( field1Path )
 					.matching( dataSet.values.matchingArg( matchingDocOrdinal ) );
 		}
 

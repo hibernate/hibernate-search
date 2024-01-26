@@ -6,12 +6,9 @@
  */
 package org.hibernate.search.engine.search.predicate.spi;
 
-import java.util.Set;
+public interface MinimumShouldMatchBuilder {
+	void minimumShouldMatchNumber(int ignoreConstraintCeiling, int matchingClausesNumber);
 
-import org.hibernate.search.engine.search.predicate.dsl.SimpleQueryFlag;
-
-public interface SimpleQueryStringPredicateBuilder extends CommonQueryStringPredicateBuilder {
-
-	void flags(Set<SimpleQueryFlag> flags);
+	void minimumShouldMatchPercent(int ignoreConstraintCeiling, int matchingClausesPercent);
 
 }

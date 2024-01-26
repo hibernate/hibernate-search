@@ -18,6 +18,7 @@ import org.hibernate.search.engine.search.predicate.dsl.SimpleQueryStringPredica
 import org.hibernate.search.engine.search.predicate.dsl.SimpleQueryStringPredicateOptionsStep;
 import org.hibernate.search.engine.search.predicate.dsl.spi.AbstractPredicateFinalStep;
 import org.hibernate.search.engine.search.predicate.dsl.spi.SearchPredicateDslContext;
+import org.hibernate.search.engine.search.predicate.spi.CommonQueryStringPredicateBuilder;
 import org.hibernate.search.engine.search.predicate.spi.SimpleQueryStringPredicateBuilder;
 import org.hibernate.search.util.common.impl.Contracts;
 
@@ -28,7 +29,7 @@ class SimpleQueryStringPredicateFieldMoreStepImpl
 
 	private final CommonState commonState;
 
-	private final List<SimpleQueryStringPredicateBuilder.FieldState> fieldStates = new ArrayList<>();
+	private final List<CommonQueryStringPredicateBuilder.FieldState> fieldStates = new ArrayList<>();
 
 	SimpleQueryStringPredicateFieldMoreStepImpl(CommonState commonState, List<String> fieldPaths) {
 		this.commonState = commonState;
@@ -68,13 +69,13 @@ class SimpleQueryStringPredicateFieldMoreStepImpl
 			return builder.build();
 		}
 
-		SimpleQueryStringPredicateBuilder.FieldState field(String fieldPath) {
+		CommonQueryStringPredicateBuilder.FieldState field(String fieldPath) {
 			return builder.field( fieldPath );
 		}
 
 		private SimpleQueryStringPredicateOptionsStep<?> matching(String simpleQueryString) {
 			Contracts.assertNotNull( simpleQueryString, "simpleQueryString" );
-			builder.simpleQueryString( simpleQueryString );
+			builder.queryString( simpleQueryString );
 			return this;
 		}
 

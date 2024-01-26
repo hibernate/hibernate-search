@@ -6,7 +6,7 @@
  */
 package org.hibernate.search.backend.elasticsearch.search.predicate.impl;
 
-import org.hibernate.search.backend.elasticsearch.types.predicate.impl.ElasticsearchSimpleQueryStringPredicateBuilderFieldState;
+import org.hibernate.search.backend.elasticsearch.types.predicate.impl.ElasticsearchCommonQueryStringPredicateBuilderFieldState;
 import org.hibernate.search.engine.backend.types.IndexFieldTraits;
 import org.hibernate.search.engine.search.common.spi.SearchQueryElementTypeKey;
 
@@ -16,7 +16,9 @@ public final class ElasticsearchPredicateTypeKeys {
 	}
 
 	public static final SearchQueryElementTypeKey<
-			ElasticsearchSimpleQueryStringPredicateBuilderFieldState> SIMPLE_QUERY_STRING =
+			ElasticsearchCommonQueryStringPredicateBuilderFieldState> SIMPLE_QUERY_STRING =
 					SearchQueryElementTypeKey.of( IndexFieldTraits.Predicates.SIMPLE_QUERY_STRING );
-
+	public static final SearchQueryElementTypeKey<
+			ElasticsearchCommonQueryStringPredicateBuilderFieldState> QUERY_STRING =
+					SearchQueryElementTypeKey.of( IndexFieldTraits.Predicates.QUERY_STRING );
 }
