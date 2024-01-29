@@ -58,6 +58,19 @@ public abstract class ElasticsearchKnnPredicate extends AbstractElasticsearchSin
 		}
 	}
 
+	public static class Elasticsearch812Factory<F>
+			extends AbstractElasticsearchCodecAwareSearchQueryElementFactory<KnnPredicateBuilder, F> {
+		public Elasticsearch812Factory(ElasticsearchFieldCodec<F> codec) {
+			super( codec );
+		}
+
+		@Override
+		public KnnPredicateBuilder create(ElasticsearchSearchIndexScope<?> scope,
+				ElasticsearchSearchIndexValueFieldContext<F> field) {
+			return new Elasticsearch812Impl.Builder<>( codec, scope, field );
+		}
+	}
+
 	public static class OpenSearchFactory<F>
 			extends AbstractElasticsearchCodecAwareSearchQueryElementFactory<KnnPredicateBuilder, F> {
 		public OpenSearchFactory(ElasticsearchFieldCodec<F> codec) {
@@ -211,6 +224,58 @@ public abstract class ElasticsearchKnnPredicate extends AbstractElasticsearchSin
 			@Override
 			public SearchPredicate build() {
 				return new ElasticsearchImpl( this );
+			}
+		}
+	}
+
+	private static class Elasticsearch812Impl extends ElasticsearchKnnPredicate {
+
+		private static final JsonObjectAccessor KNN_ACCESSOR = JsonAccessor.root().property( "knn" ).asObject();
+		private static final JsonAccessor<String> FIELD_ACCESSOR = JsonAccessor.root().property( "field" ).asString();
+		private static final JsonArrayAccessor VECTOR_ACCESSOR = JsonAccessor.root().property( "query_vector" ).asArray();
+		private static final JsonObjectAccessor FILTER_ACCESSOR = JsonAccessor.root().property( "filter" ).asObject();
+		private static final JsonAccessor<Integer> NUM_CANDIDATES_ACCESSOR =
+				JsonAccessor.root().property( "num_candidates" ).asInteger();
+		private static final JsonAccessor<Float> SIMILARITY_ACCESSOR = JsonAccessor.root().property( "similarity" ).asFloat();
+
+
+		private Elasticsearch812Impl(Builder<?> builder) {
+			super( builder );
+		}
+
+		@Override
+		protected JsonObject doToJsonQuery(PredicateRequestContext context, JsonObject outerObject, JsonObject innerObject) {
+			KNN_ACCESSOR.set( outerObject, innerObject );
+
+			FIELD_ACCESSOR.set( innerObject, absoluteFieldPath );
+			NUM_CANDIDATES_ACCESSOR.set( innerObject, k );
+			VECTOR_ACCESSOR.set( innerObject, vector );
+
+			if ( filter != null ) {
+				FILTER_ACCESSOR.set( innerObject, filter.toJsonQuery( context ) );
+			}
+			if ( similarity != null ) {
+				SIMILARITY_ACCESSOR.set( innerObject, similarity );
+			}
+
+			return outerObject;
+		}
+
+		private static class Builder<F> extends AbstractKnnBuilder<F> {
+
+			private Builder(ElasticsearchFieldCodec<F> codec, ElasticsearchSearchIndexScope<?> scope,
+					ElasticsearchSearchIndexValueFieldContext<F> field) {
+				super( codec, scope, field );
+			}
+
+			@Override
+			public void requiredMinimumSimilarity(float similarity) {
+				this.similarity = similarity;
+			}
+
+			@Override
+			public SearchPredicate build() {
+				return new Elasticsearch812Impl( this );
 			}
 		}
 	}

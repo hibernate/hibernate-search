@@ -15,6 +15,7 @@ import java.util.List;
 import org.hibernate.search.backend.elasticsearch.ElasticsearchDistributionName;
 import org.hibernate.search.backend.elasticsearch.ElasticsearchVersion;
 import org.hibernate.search.backend.elasticsearch.dialect.model.impl.Elasticsearch7ModelDialect;
+import org.hibernate.search.backend.elasticsearch.dialect.model.impl.Elasticsearch812ModelDialect;
 import org.hibernate.search.backend.elasticsearch.dialect.model.impl.Elasticsearch8ModelDialect;
 import org.hibernate.search.backend.elasticsearch.dialect.model.impl.ElasticsearchModelDialect;
 import org.hibernate.search.backend.elasticsearch.dialect.model.impl.OpenSearch1ModelDialect;
@@ -241,23 +242,23 @@ class ElasticsearchDialectFactoryTest {
 				),
 				success(
 						ElasticsearchDistributionName.ELASTIC, "8.12", "8.12.0",
-						Elasticsearch8ModelDialect.class, Elasticsearch81ProtocolDialect.class
+						Elasticsearch812ModelDialect.class, Elasticsearch81ProtocolDialect.class
 				),
 				success(
 						ElasticsearchDistributionName.ELASTIC, "8.12.0", "8.12.0",
-						Elasticsearch8ModelDialect.class, Elasticsearch81ProtocolDialect.class
+						Elasticsearch812ModelDialect.class, Elasticsearch81ProtocolDialect.class
 				),
 				successWithWarning(
 						ElasticsearchDistributionName.ELASTIC, "8.13", "8.13.0",
-						Elasticsearch8ModelDialect.class, Elasticsearch81ProtocolDialect.class
+						Elasticsearch812ModelDialect.class, Elasticsearch81ProtocolDialect.class
 				),
 				successWithWarning(
 						ElasticsearchDistributionName.ELASTIC, "8.13.0", "8.13.0",
-						Elasticsearch8ModelDialect.class, Elasticsearch81ProtocolDialect.class
+						Elasticsearch812ModelDialect.class, Elasticsearch81ProtocolDialect.class
 				),
 				successWithWarning(
 						ElasticsearchDistributionName.ELASTIC, "9.0.0", "9.0.0",
-						Elasticsearch8ModelDialect.class, Elasticsearch81ProtocolDialect.class
+						Elasticsearch812ModelDialect.class, Elasticsearch81ProtocolDialect.class
 				),
 				success(
 						ElasticsearchDistributionName.OPENSEARCH, "1", "1.3.1",

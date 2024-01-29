@@ -1578,7 +1578,7 @@ While when an <<backend-elasticsearch-compatibility-opensearch,OpenSearch>> dist
 when the index is configured to have more than one shard.
 See this section of the OpenSearch link:{openSearchDocUrl}/search-plugins/knn/approximate-knn/#get-started-with-approximate-k-nn[documentation] for more details.
 
-With the Elasticsearch backend and when using <<backend-elasticsearch-compatibility-elasticsearch,Elasticsearch>>,
+With the Elasticsearch backend and when using <<backend-elasticsearch-compatibility-elasticsearch,Elasticsearch>> version < 8.12,
 a `knn` predicate can only be added as a top-level predicate,
 i.e. a predicate directly passed to a where clause of a search query,
 or as part of a top-level disjunction,
@@ -1588,7 +1588,9 @@ A `knn` predicate can be combined with other predicate types by adding them thro
 Any other usages of a `knn` predicate, with this backend, would lead to an exception being thrown.
 See this section of the Elasticsearch link:{elasticsearchDocUrl}/knn-search.html#_combine_approximate_knn_with_other_features[documentation]
 in particular to learn more about how Elasticsearch combines regular queries with knn.
-<<backend-elasticsearch-compatibility-opensearch,OpenSearch>> does not have these limitation.
+For Elasticsearch 8.12+ a knn predicate is converted to a link:{elasticsearchDocUrl}/query-dsl-knn-query.html#query-dsl-knn-query[knn-query]
+removing the limitations described for earlier versions.
+<<backend-elasticsearch-compatibility-opensearch,OpenSearch>> also does not have these limitation.
 
 .Multiple `knn` predicates added via `should` clauses
 ====
