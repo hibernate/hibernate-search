@@ -231,19 +231,10 @@ public class ElasticsearchSearchQueryBuilder<H>
 		if ( !routingKeys.isEmpty() ) {
 			filters.add( Queries.anyTerm( "_routing", routingKeys ) );
 		}
-		JsonElement jsonKnn = rootPredicateContext.knnSearch( filters );
-		if ( !jsonKnn.isJsonNull() ) {
-			payload.add( "knn", jsonKnn );
-		}
 
-		if ( jsonKnn.isJsonNull() || jsonPredicate != null ) {
-			// with Elasticsearch distribution it can be that we only have a knn clause and no query.
-			// in such scenario there's no need to add a query for filters, since those will be added to the
-			// knn clause itself.
-			JsonObject jsonQuery = Queries.boolFilter( jsonPredicate, filters );
-			if ( jsonQuery != null ) {
-				payload.add( "query", jsonQuery );
-			}
+		JsonObject jsonQuery = Queries.boolFilter( jsonPredicate, filters );
+		if ( jsonQuery != null ) {
+			payload.add( "query", jsonQuery );
 		}
 
 		if ( jsonSort != null ) {

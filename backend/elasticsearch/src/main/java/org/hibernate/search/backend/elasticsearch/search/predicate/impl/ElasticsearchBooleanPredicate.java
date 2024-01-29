@@ -65,16 +65,10 @@ class ElasticsearchBooleanPredicate extends AbstractElasticsearchPredicate {
 
 	@Override
 	public void checkNestableWithin(PredicateNestingContext context) {
-		// For Elasticsearch backend only:
-		// If this method is called that means we are trying to pass a bool predicate as a clause/filter/etc to some other predicate
-		//  and that would mean that if our current bool predicate has a knn should clause -- it is not ok to continue,
-		//  since it will place a knn clause deeper than a should clause of a top level bool predicate, which is not acceptable.
-		//  Because of that we are making sure that the context we pass in to check the clauses is updated:
-		PredicateNestingContext updatedContext = context.rejectKnn();
-		checkAcceptableWithin( updatedContext, mustClauses );
-		checkAcceptableWithin( updatedContext, shouldClauses );
-		checkAcceptableWithin( updatedContext, filterClauses );
-		checkAcceptableWithin( updatedContext, mustNotClauses );
+		checkAcceptableWithin( context, mustClauses );
+		checkAcceptableWithin( context, shouldClauses );
+		checkAcceptableWithin( context, filterClauses );
+		checkAcceptableWithin( context, mustNotClauses );
 	}
 
 	@Override
@@ -116,15 +110,7 @@ class ElasticsearchBooleanPredicate extends AbstractElasticsearchPredicate {
 		}
 
 		for ( ElasticsearchSearchPredicate clause : clauses ) {
-			JsonObject jsonQuery = clause.toJsonQuery( context );
-			if ( jsonQuery != null ) {
-				// This is an exceptional case for a KNN search on Elasticsearch distribution.
-				//  A Knn predicate would contribute to a knn clause inside the request context itself,
-				//  and we do not want to add this json as a clause to the bool predicate.
-				//  Hence, when the predicate returns null as JSON query and we ignore it.
-
-				GsonUtils.setOrAppendToArray( innerObject, occurProperty, jsonQuery );
-			}
+			GsonUtils.setOrAppendToArray( innerObject, occurProperty, clause.toJsonQuery( context ) );
 		}
 	}
 
@@ -221,10 +207,8 @@ class ElasticsearchBooleanPredicate extends AbstractElasticsearchPredicate {
 				mustClauses = new ArrayList<>();
 			}
 			ElasticsearchSearchPredicate elasticsearchClause = ElasticsearchSearchPredicate.from( scope, clause );
-			elasticsearchClause.checkNestableWithin( PredicateNestingContext.doesNotAcceptKnn() );
+			elasticsearchClause.checkNestableWithin( PredicateNestingContext.simple() );
 			mustClauses.add( elasticsearchClause );
-
-			checkShouldClausesForKnnAcceptability();
 		}
 
 		@Override
@@ -233,10 +217,8 @@ class ElasticsearchBooleanPredicate extends AbstractElasticsearchPredicate {
 				mustNotClauses = new ArrayList<>();
 			}
 			ElasticsearchSearchPredicate elasticsearchClause = ElasticsearchSearchPredicate.from( scope, clause );
-			elasticsearchClause.checkNestableWithin( PredicateNestingContext.doesNotAcceptKnn() );
+			elasticsearchClause.checkNestableWithin( PredicateNestingContext.simple() );
 			mustNotClauses.add( elasticsearchClause );
-
-			checkShouldClausesForKnnAcceptability();
 		}
 
 		@Override
@@ -244,12 +226,8 @@ class ElasticsearchBooleanPredicate extends AbstractElasticsearchPredicate {
 			if ( shouldClauses == null ) {
 				shouldClauses = new ArrayList<>();
 			}
-
 			ElasticsearchSearchPredicate elasticsearchClause = ElasticsearchSearchPredicate.from( scope, clause );
-			elasticsearchClause.checkNestableWithin(
-					!hasNonShouldClause()
-							? PredicateNestingContext.acceptsKnn()
-							: PredicateNestingContext.doesNotAcceptKnn() );
+			elasticsearchClause.checkNestableWithin( PredicateNestingContext.simple() );
 			shouldClauses.add( elasticsearchClause );
 		}
 
@@ -259,10 +237,8 @@ class ElasticsearchBooleanPredicate extends AbstractElasticsearchPredicate {
 				filterClauses = new ArrayList<>();
 			}
 			ElasticsearchSearchPredicate elasticsearchClause = ElasticsearchSearchPredicate.from( scope, clause );
-			elasticsearchClause.checkNestableWithin( PredicateNestingContext.doesNotAcceptKnn() );
+			elasticsearchClause.checkNestableWithin( PredicateNestingContext.simple() );
 			filterClauses.add( elasticsearchClause );
-
-			checkShouldClausesForKnnAcceptability();
 		}
 
 		@Override
@@ -351,20 +327,6 @@ class ElasticsearchBooleanPredicate extends AbstractElasticsearchPredicate {
 			}
 		}
 
-		/*
-		 * For Elasticsearch backend only:
-		 * It may be that we've added knn should clauses and all was fine.
-		 * But now we are adding to such bool predicate a non-should clause.
-		 * We want to make sure that in such case there are no knn clauses in should or fail.
-		 * OpenSearch backend will not be affected by these checks.
-		 */
-		private void checkShouldClausesForKnnAcceptability() {
-			if ( shouldClauses != null ) {
-				shouldClauses.forEach(
-						should -> should.checkNestableWithin( PredicateNestingContext.doesNotAcceptKnn() ) );
-			}
-		}
-
 		private void checkAndClearClauseCollections() {
 			if ( mustClauses != null && mustClauses.isEmpty() ) {
 				mustClauses = null;
@@ -376,10 +338,6 @@ class ElasticsearchBooleanPredicate extends AbstractElasticsearchPredicate {
 
 		private boolean hasAtLeastOneMustOrFilterPredicate() {
 			return mustClauses != null || filterClauses != null;
-		}
-
-		private boolean hasNonShouldClause() {
-			return mustClauses != null || filterClauses != null || mustNotClauses != null;
 		}
 
 		private boolean hasOnlyOneMustClause() {

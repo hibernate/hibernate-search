@@ -7,8 +7,6 @@
 package org.hibernate.search.integrationtest.backend.elasticsearch.search;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.junit.jupiter.api.Assumptions.assumeFalse;
 import static org.junit.jupiter.api.Assumptions.assumeTrue;
 
 import java.util.Arrays;
@@ -26,19 +24,17 @@ import org.hibernate.search.engine.backend.types.Sortable;
 import org.hibernate.search.engine.backend.types.VectorSimilarity;
 import org.hibernate.search.engine.search.aggregation.AggregationKey;
 import org.hibernate.search.engine.search.predicate.SearchPredicate;
+import org.hibernate.search.engine.search.predicate.dsl.PredicateFinalStep;
+import org.hibernate.search.engine.search.query.SearchQuery;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.TckConfiguration;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.extension.SearchSetupHelper;
-import org.hibernate.search.util.common.SearchException;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.BulkIndexer;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.SimpleMappedIndex;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappingScope;
 
 import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
-
-import org.assertj.core.api.ThrowableAssert;
 
 class ElasticsearchKnnPredicateSpecificsIT {
 
@@ -62,25 +58,24 @@ class ElasticsearchKnnPredicateSpecificsIT {
 	}
 
 	@Test
-	void knnPredicateInWrongPlace_knnAsFilter() {
-		knnPredicateInWrongPlace(
-				() -> index.query().select().where(
+	void knnPredicateInOkPlace_knnAsFilter() {
+		knnPredicateIsOk(
+				index.query().select().where(
 						f -> f.knn( 5 ).field( "location" ).matching( 5.0f, 5.0f )
 								.filter( f.knn( 15 ).field( "location" ).matching( 50.0f, 50.0f ) )
 				).toQuery() );
 	}
 
 	@Test
-	void knnPredicateInWrongPlace_boolMustNot() {
-		knnPredicateInWrongPlace(
-				() -> index.query().select().where(
+	void knnPredicateInOkPlace_boolMustNot() {
+		knnPredicateIsOk(
+				index.query().select().where(
 						f -> f.bool().mustNot( f.knn( 15 ).field( "location" ).matching( 50.0f, 50.0f ) )
 				).toQuery() );
 	}
 
 	@Test
-	@Disabled("NOTE: this will now fail since it was based on the optimization that must clause will be dropped.")
-	void knnPredicateInWrongPlace_boolMustIsNotWrong() {
+	void knnPredicateInOkPlace_boolMustIsNotWrong() {
 		// Since we are doing optimizations, and also because we are adding only a single knn must, it is actually ok to do so:
 		assertThat(
 				index.query().select().where(
@@ -90,69 +85,69 @@ class ElasticsearchKnnPredicateSpecificsIT {
 	}
 
 	@Test
-	void knnPredicateInWrongPlace_boolMultipleMust() {
-		knnPredicateInWrongPlace(
-				() -> index.query().select().where(
+	void knnPredicateInOkPlace_boolMultipleMust() {
+		knnPredicateIsOk(
+				index.query().select().where(
 						f -> f.bool().must( f.knn( 15 ).field( "location" ).matching( 50.0f, 50.0f ) )
 								.must( f.knn( 15 ).field( "location" ).matching( 5.0f, 5.0f ) )
 				).toQuery() );
 	}
 
 	@Test
-	void knnPredicateInWrongPlace_boolFilter() {
-		knnPredicateInWrongPlace(
-				() -> index.query().select().where(
+	void knnPredicateInOkPlace_boolFilter() {
+		knnPredicateIsOk(
+				index.query().select().where(
 						f -> f.bool().filter( f.knn( 15 ).field( "location" ).matching( 50.0f, 50.0f ) )
 				).toQuery() );
 	}
 
 	@Test
-	void knnPredicateInWrongPlace_boolBoolFilter() {
-		knnPredicateInWrongPlace(
-				() -> index.query().select().where(
+	void knnPredicateInOkPlace_boolBoolFilter() {
+		knnPredicateIsOk(
+				index.query().select().where(
 						f -> f.bool().must( f.matchAll() )
 								.must( f.bool().filter( f.knn( 15 ).field( "location" ).matching( 50.0f, 50.0f ) ) )
 				).toQuery() );
 	}
 
 	@Test
-	void knnPredicateInWrongPlace_boolBoolShould() {
-		knnPredicateInWrongPlace(
-				() -> index.query().select().where(
+	void knnPredicateInOkPlace_boolBoolShould() {
+		knnPredicateIsOk(
+				index.query().select().where(
 						f -> f.bool().must( f.matchAll() )
 								.must( f.bool().should( f.knn( 15 ).field( "location" ).matching( 50.0f, 50.0f ) ) )
 				).toQuery() );
 	}
 
 	@Test
-	void knnPredicateInWrongPlace_boolBoolMust() {
-		knnPredicateInWrongPlace(
-				() -> index.query().select().where(
+	void knnPredicateInOkPlace_boolBoolMust() {
+		knnPredicateIsOk(
+				index.query().select().where(
 						f -> f.bool().must( f.matchAll() )
 								.mustNot( f.bool().must( f.knn( 15 ).field( "location" ).matching( 50.0f, 50.0f ) ) )
 				).toQuery() );
 	}
 
 	@Test
-	void knnPredicateInWrongPlace_boolBoolMustNot() {
-		knnPredicateInWrongPlace(
-				() -> index.query().select().where(
+	void knnPredicateInOkPlace_boolBoolMustNot() {
+		knnPredicateIsOk(
+				index.query().select().where(
 						f -> f.bool().must( f.matchAll() )
 								.mustNot( f.bool().mustNot( f.knn( 15 ).field( "location" ).matching( 50.0f, 50.0f ) ) )
 				).toQuery() );
 	}
 
 	@Test
-	void knnPredicateInWrongPlace_nested() {
-		knnPredicateInWrongPlace(
-				() -> index.query().select().where(
+	void knnPredicateInOkPlace_nested() {
+		knnPredicateIsOk(
+				index.query().select().where(
 						f -> f.nested( "object" )
-								.add( f.bool().must( f.knn( 15 ).field( "location" ).matching( 50.0f, 50.0f ) ) )
+								.add( f.bool().must( f.knn( 15 ).field( "object.location" ).matching( 50.0f, 50.0f ) ) )
 				).toQuery() );
 	}
 
 	@Test
-	void knnPredicateInWrongPlace_addingPrebuiltKnn() {
+	void knnPredicateInOkPlace_addingPrebuiltKnn() {
 		StubMappingScope scope = index.createScope();
 
 		// all good:
@@ -162,35 +157,31 @@ class ElasticsearchKnnPredicateSpecificsIT {
 				.param( "vector", new float[] { 50.0f, 50.0f } ).toPredicate();
 
 		for ( SearchPredicate knn : Arrays.asList( inlineKnn, namedKnn ) ) {
-			// adding knn to non-should bool clauses is not ok,
-			//  we only allow knn as a should clause!
-			knnPredicateInWrongPlace( () -> scope.predicate().bool().must( knn ) );
-			knnPredicateInWrongPlace( () -> scope.predicate().bool().mustNot( knn ) );
-			knnPredicateInWrongPlace( () -> scope.predicate().bool().filter( knn ) );
+			// adding knn to non-should bool clauses is ok,
+			knnPredicateIsOk( scope.predicate().bool().must( knn ) );
+			knnPredicateIsOk( scope.predicate().bool().mustNot( knn ) );
+			knnPredicateIsOk( scope.predicate().bool().filter( knn ) );
 
-			knnPredicateInWrongPlace( () -> scope.predicate().bool()
+			knnPredicateIsOk( scope.predicate().bool()
 					// should is ok
 					.should( knn )
-					// not ok since we already have a knn in should we can only add more should clauses
+					// ok since we are already have a knn in should we can add more should clauses
 					.must( scope.predicate().match().field( "parking" ).matching( Boolean.TRUE ) ) );
-			knnPredicateInWrongPlace( () -> scope.predicate().bool()
+			knnPredicateIsOk( scope.predicate().bool()
 					// so far so good:
 					.must( scope.predicate().match().field( "parking" ).matching( Boolean.TRUE ) )
-					// cannot add a knn through should as we already have a non-should clause
+					// add a knn through should while we already have a non-should clause
 					.should( knn ) );
-			knnPredicateInWrongPlace( () -> scope.predicate().bool()
+			knnPredicateIsOk( scope.predicate().bool()
 					// so far so good:
 					.mustNot( scope.predicate().match().field( "parking" ).matching( Boolean.TRUE ) )
-					// cannot add a knn through should as we already have a non-should clause
+					// add a knn through should while we already have a non-should clause
 					.should( knn ) );
-			knnPredicateInWrongPlace( () -> scope.predicate().bool()
+			knnPredicateIsOk( scope.predicate().bool()
 					// so far so good:
 					.filter( scope.predicate().match().field( "parking" ).matching( Boolean.TRUE ) )
-					// cannot add a knn through should as we already have a non-should clause
+					// add a knn through should while we already have a non-should clause
 					.should( knn ) );
-
-			// nested knn predicates are not allowed
-			knnPredicateInWrongPlace( () -> scope.predicate().nested( "object" ).add( knn ) );
 
 			// we add multiple clauses to prevent "optimizations" leading to bool predicate being replaced by a simple knn predicate
 			SearchPredicate inlineBoolKnnInShould = scope.predicate().bool().should( knn )
@@ -201,62 +192,51 @@ class ElasticsearchKnnPredicateSpecificsIT {
 
 			for ( SearchPredicate boolKnnInShould : Arrays.asList( inlineBoolKnnInShould, namedBoolKnnInShould ) ) {
 				// adding boolean predicate with a should knn clause as any boolean clause (nesting a correct bool into another one)
-				//  is not ok !
-				knnPredicateInWrongPlace( () -> scope.predicate().bool().should( boolKnnInShould ) );
-				knnPredicateInWrongPlace( () -> scope.predicate().bool().must( boolKnnInShould ) );
-				knnPredicateInWrongPlace( () -> scope.predicate().bool().mustNot( boolKnnInShould ) );
-				knnPredicateInWrongPlace( () -> scope.predicate().bool().filter( boolKnnInShould ) );
+				//  is ok !
+				knnPredicateIsOk( scope.predicate().bool().should( boolKnnInShould ) );
+				knnPredicateIsOk( scope.predicate().bool().must( boolKnnInShould ) );
+				knnPredicateIsOk( scope.predicate().bool().mustNot( boolKnnInShould ) );
+				knnPredicateIsOk( scope.predicate().bool().filter( boolKnnInShould ) );
 
 				// adding as a knn filter:
-				knnPredicateInWrongPlace(
-						() -> scope.predicate().knn( 10 ).field( "location" ).matching( 50.0f, 50.0f ).filter( knn ) );
-				knnPredicateInWrongPlace(
-						() -> scope.predicate().knn( 10 ).field( "location" ).matching( 50.0f, 50.0f )
-								.filter( boolKnnInShould ) );
-
-				// nested knn predicates are not allowed
-				knnPredicateInWrongPlace( () -> scope.predicate().nested( "object" ).add( boolKnnInShould ) );
+				knnPredicateIsOk( scope.predicate().knn( 10 ).field( "location" ).matching( 50.0f, 50.0f ).filter( knn ) );
+				knnPredicateIsOk(
+						scope.predicate().knn( 10 ).field( "location" ).matching( 50.0f, 50.0f ).filter( boolKnnInShould ) );
 			}
 		}
 	}
 
 	@Test
-	void knnPredicateInWrongPlace_aggregation() {
-		knnPredicateInWrongPlace(
-				() -> {
-					AggregationKey<Map<Boolean, Long>> countsByParking = AggregationKey.of( "countsByParking" );
-
-					index.query().select()
-							.where( f -> f.matchAll() )
-							.aggregation( countsByParking, agg -> agg.terms().field( "object.nestedParking", Boolean.class )
-									.filter( f -> f.knn( 10 ).field( "location" ).matching( 50.0f, 50.0f ) ) )
-							.toQuery();
-				} );
+	void knnPredicateInOkPlace_aggregation() {
+		AggregationKey<Map<Boolean, Long>> countsByParking = AggregationKey.of( "countsByParking" );
+		knnPredicateIsOk(
+				index.query().select()
+						.where( f -> f.matchAll() )
+						.aggregation( countsByParking, agg -> agg.terms().field( "object.nestedParking", Boolean.class )
+								.filter( f -> f.knn( 10 ).field( "object.location" ).matching( 50.0f, 50.0f ) ) )
+						.toQuery()
+		);
 	}
 
 	@Test
-	void knnPredicateInWrongPlace_sorting() {
-		knnPredicateInWrongPlace(
-				() -> {
-					index.query().select()
-							.where( f -> f.matchAll() )
-							.sort( s -> s.field( "object.nestedRating" )
-									.filter( f -> f.knn( 10 ).field( "location" ).matching( 50.0f, 50.0f ) ) )
-							.toQuery();
-				} );
+	void knnPredicateInOkPlace_sorting() {
+		knnPredicateIsOk(
+				index.query().select()
+						.where( f -> f.matchAll() )
+						.sort( s -> s.field( "object.nestedRating" )
+								.filter( f -> f.knn( 10 ).field( "object.location" )
+										.matching( 50.0f, 50.0f ) ) )
+						.toQuery()
+		);
 	}
 
-	void knnPredicateInWrongPlace(ThrowableAssert.ThrowingCallable query) {
-		assumeFalse(
-				TckConfiguration.get().getBackendFeatures().supportsVectorSearchInsideOtherPredicates(),
-				"This test is only for an Elasticsearch distribution where we cannot add knn as a predicate inside other predicate."
-		);
-		assertThatThrownBy( query )
-				.isInstanceOf( SearchException.class )
-				.hasMessageContainingAll(
-						"A knn predicate cannot be added",
-						"With Elasticsearch, a knn predicate can only be a top-level predicate or a should clause of a top-level bool predicate."
-				);
+	void knnPredicateIsOk(SearchQuery<?> query) {
+		assertThat( query.fetchAllHits() )
+				.hasSizeGreaterThanOrEqualTo( 0 );
+	}
+
+	void knnPredicateIsOk(PredicateFinalStep predicate) {
+		knnPredicateIsOk( index.query().select().where( predicate.toPredicate() ).toQuery() );
 	}
 
 	private static class PredicateIndexBinding {
@@ -267,6 +247,7 @@ class ElasticsearchKnnPredicateSpecificsIT {
 		final IndexObjectFieldReference object;
 		final IndexFieldReference<Boolean> nestedParking;
 		final IndexFieldReference<Integer> nestedRating;
+		final IndexFieldReference<float[]> nestedLocation;
 
 		PredicateIndexBinding(IndexSchemaElement root) {
 			parking = root.field( "parking", f -> f.asBoolean().projectable( Projectable.YES ) ).toReference();
@@ -279,6 +260,8 @@ class ElasticsearchKnnPredicateSpecificsIT {
 			nestedRating =
 					nested.field( "nestedRating", f -> f.asInteger().projectable( Projectable.YES ).sortable( Sortable.YES ) )
 							.toReference();
+			nestedLocation = nested.field( "location", f -> f.asFloatVector().dimension( 2 ).projectable( Projectable.YES )
+					.m( 16 ).efConstruction( 100 ).vectorSimilarity( VectorSimilarity.L2 ) ).toReference();
 
 			root.namedPredicate( "knn-named", context -> {
 				int k = context.param( "k", Integer.class );
@@ -296,7 +279,6 @@ class ElasticsearchKnnPredicateSpecificsIT {
 						.should( context.predicate().match().field( "parking" ).matching( Boolean.TRUE ) ).toPredicate();
 			} );
 		}
-
 	}
 
 	private static final Consumer<BulkIndexer> dataset = bulkIndexer -> bulkIndexer

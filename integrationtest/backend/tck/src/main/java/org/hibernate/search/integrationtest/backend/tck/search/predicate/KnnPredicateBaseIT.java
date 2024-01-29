@@ -134,14 +134,6 @@ class KnnPredicateBaseIT {
 			return parameters;
 		}
 
-		@BeforeAll
-		static void beforeAll() {
-			assumeTrue(
-					TckConfiguration.get().getBackendFeatures().supportsVectorSearchInsideOtherPredicates(),
-					"This test won't work on some backends that do not provide a way of passing a knn predicate as a clause of bool query."
-			);
-		}
-
 		@Override
 		protected PredicateFinalStep predicate(SearchPredicateFactory f, String fieldPath, int matchingDocOrdinal,
 				DataSet<?, KnnPredicateTestValues<F>> dataSet) {
