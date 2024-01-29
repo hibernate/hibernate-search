@@ -1185,7 +1185,7 @@ class PredicateDslIT {
 
 		if ( !BackendConfiguration.isElasticsearch()
 				|| ElasticsearchTestDialect.isActualVersion(
-						es -> false,
+						es -> !es.isLessThan( "8.12.0" ),
 						os -> !os.isLessThan( "2.0" ),
 						aoss -> true
 				) ) {

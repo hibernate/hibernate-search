@@ -844,10 +844,14 @@ class KnnPredicateSpecificsIT {
 				nested = nestedField.toReference();
 
 				byteVector = nestedField.field(
-						"byteVector", f -> f.asByteVector().dimension( 2 ).projectable( Projectable.YES ) )
+						"byteVector",
+						f -> f.asByteVector().dimension( 2 ).vectorSimilarity( VectorSimilarity.L2 )
+								.projectable( Projectable.YES ) )
 						.toReference();
 				floatVector = nestedField
-						.field( "floatVector", f -> f.asFloatVector().dimension( 2 ).projectable( Projectable.YES ) )
+						.field( "floatVector",
+								f -> f.asFloatVector().dimension( 2 ).vectorSimilarity( VectorSimilarity.L2 )
+										.projectable( Projectable.YES ) )
 						.toReference();
 			}
 		}

@@ -6,7 +6,7 @@
  */
 package org.hibernate.search.backend.elasticsearch.dialect.model.impl;
 
-import org.hibernate.search.backend.elasticsearch.types.dsl.provider.impl.Elasticsearch8IndexFieldTypeFactoryProvider;
+import org.hibernate.search.backend.elasticsearch.types.dsl.provider.impl.Elasticsearch812IndexFieldTypeFactoryProvider;
 import org.hibernate.search.backend.elasticsearch.types.dsl.provider.impl.ElasticsearchIndexFieldTypeFactoryProvider;
 import org.hibernate.search.backend.elasticsearch.validation.impl.Elasticsearch8PropertyMappingValidatorProvider;
 import org.hibernate.search.backend.elasticsearch.validation.impl.ElasticsearchPropertyMappingValidatorProvider;
@@ -14,13 +14,13 @@ import org.hibernate.search.backend.elasticsearch.validation.impl.ElasticsearchP
 import com.google.gson.Gson;
 
 /**
- * The model dialect for Elasticsearch [8.0-8.11].
+ * The model dialect for Elasticsearch 8.12+.
  */
-public class Elasticsearch8ModelDialect implements ElasticsearchModelDialect {
+public class Elasticsearch812ModelDialect implements ElasticsearchModelDialect {
 
 	@Override
 	public ElasticsearchIndexFieldTypeFactoryProvider createIndexTypeFieldFactoryProvider(Gson userFacingGson) {
-		return new Elasticsearch8IndexFieldTypeFactoryProvider( userFacingGson );
+		return new Elasticsearch812IndexFieldTypeFactoryProvider( userFacingGson );
 	}
 
 	@Override

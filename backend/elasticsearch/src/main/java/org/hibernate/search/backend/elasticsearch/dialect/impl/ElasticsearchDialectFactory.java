@@ -12,6 +12,7 @@ import java.util.OptionalInt;
 import org.hibernate.search.backend.elasticsearch.ElasticsearchDistributionName;
 import org.hibernate.search.backend.elasticsearch.ElasticsearchVersion;
 import org.hibernate.search.backend.elasticsearch.dialect.model.impl.Elasticsearch7ModelDialect;
+import org.hibernate.search.backend.elasticsearch.dialect.model.impl.Elasticsearch812ModelDialect;
 import org.hibernate.search.backend.elasticsearch.dialect.model.impl.Elasticsearch8ModelDialect;
 import org.hibernate.search.backend.elasticsearch.dialect.model.impl.ElasticsearchModelDialect;
 import org.hibernate.search.backend.elasticsearch.dialect.model.impl.OpenSearch1ModelDialect;
@@ -97,7 +98,12 @@ public class ElasticsearchDialectFactory {
 			return new Elasticsearch7ModelDialect();
 		}
 		else {
-			return new Elasticsearch8ModelDialect();
+			// if there's no minor -- who knows which version it is, better stay safe
+			// and assume that only 8 features are available, and nothing from 8.12+
+			if ( major == 8 && ( minorOptional.isEmpty() || minorOptional.getAsInt() < 12 ) ) {
+				return new Elasticsearch8ModelDialect();
+			}
+			return new Elasticsearch812ModelDialect();
 		}
 	}
 

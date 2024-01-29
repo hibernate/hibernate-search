@@ -250,8 +250,8 @@ public class ElasticsearchTckBackendFeatures extends TckBackendFeatures {
 	@Override
 	public boolean supportsVectorSearch() {
 		return isActualVersion(
-				es -> !es.isLessThan( "8.0" ),
-				os -> !os.isLessThan( "2.0" ),
+				es -> !es.isLessThan( "8.0.0" ),
+				os -> !os.isLessThan( "2.0.0" ),
 				aoss -> true
 		);
 	}
@@ -259,7 +259,7 @@ public class ElasticsearchTckBackendFeatures extends TckBackendFeatures {
 	@Override
 	public boolean supportsVectorSearchInsideOtherPredicates() {
 		return isActualVersion(
-				es -> false,
+				es -> !es.isLessThan( "8.12.0" ),
 				os -> true,
 				aoss -> true
 		);
@@ -301,7 +301,7 @@ public class ElasticsearchTckBackendFeatures extends TckBackendFeatures {
 	@Override
 	public boolean supportsVectorSearchKPerShard() {
 		return isActualVersion(
-				es -> false,
+				es -> !es.isLessThan( "8.12.0" ),
 				os -> true,
 				aoss -> true
 		);
