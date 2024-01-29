@@ -856,13 +856,6 @@ but can be <<search-dsl-predicate-common-constantScore,made constant with `.cons
 * The score of an `and` predicate can be <<search-dsl-predicate-common-boost,boosted>>
 with a call to `.boost(...)`.
 
-[[search-dsl-predicate-and-limitations]]
-=== Limitations
-
-Keep in mind that adding a <<search-dsl-predicate-knn,knn>> as an `and` clause will lead to an exception when using
-<<backend-elasticsearch-compatibility-elasticsearch,an Elastic distribution of Elasticsearch>>.
-See <<search-dsl-predicate-knn-limitations,`knn` limitations>> for more details.
-
 [[search-dsl-predicate-or]]
 == `or`: match any clause
 
@@ -1153,13 +1146,6 @@ In this case, we only add clauses if the relevant parameter was filled in by the
 but can be <<search-dsl-predicate-common-constantScore,made constant with `.constantScore()`>>.
 * The score of a `bool` predicate can be <<search-dsl-predicate-common-boost,boosted>>
 with a call to `.boost(...)`.
-
-[[search-dsl-predicate-boolean-limitations]]
-=== Limitations
-
-Keep in mind that adding a <<search-dsl-predicate-knn,knn>> as a clause to a boolean predicates
-has some <<search-dsl-predicate-knn-limitations,limitations>> when using
-<<backend-elasticsearch-compatibility-elasticsearch,an Elastic distribution of Elasticsearch>>.
 
 [[search-dsl-predicate-simple-query-string]]
 == [[_simple_query_string_queries]] `simpleQueryString`: match a user-provided query string
@@ -1564,7 +1550,7 @@ an <<backend-elasticsearch,Elasticsearch backend>>.
 and trying to use it will lead to an exception being thrown.
 
 [[search-dsl-predicate-knn-limitations]]
-=== Backend specifics and limitations
+=== Backend specifics
 
 The parameter `k` has different behavior between backends, and their distributions.
 
@@ -1577,28 +1563,6 @@ While when an <<backend-elasticsearch-compatibility-opensearch,OpenSearch>> dist
 `k` will be mapped to `k` attribute of `knn` query. Note that in this case you may get more than `k` results,
 when the index is configured to have more than one shard.
 See this section of the OpenSearch link:{openSearchDocUrl}/search-plugins/knn/approximate-knn/#get-started-with-approximate-k-nn[documentation] for more details.
-
-With the Elasticsearch backend and when using <<backend-elasticsearch-compatibility-elasticsearch,Elasticsearch>> version < 8.12,
-a `knn` predicate can only be added as a top-level predicate,
-i.e. a predicate directly passed to a where clause of a search query,
-or as part of a top-level disjunction,
-i.e. as `should` clauses of a top-level <<search-dsl-predicate-boolean,`boolean` predicate>>
-(the same can be achieved by using an <<search-dsl-predicate-or,`or` predicate>>).
-A `knn` predicate can be combined with other predicate types by adding them through should clauses.
-Any other usages of a `knn` predicate, with this backend, would lead to an exception being thrown.
-See this section of the Elasticsearch link:{elasticsearchDocUrl}/knn-search.html#_combine_approximate_knn_with_other_features[documentation]
-in particular to learn more about how Elasticsearch combines regular queries with knn.
-For Elasticsearch 8.12+ a knn predicate is converted to a link:{elasticsearchDocUrl}/query-dsl-knn-query.html#query-dsl-knn-query[knn-query]
-removing the limitations described for earlier versions.
-<<backend-elasticsearch-compatibility-opensearch,OpenSearch>> also does not have these limitation.
-
-.Multiple `knn` predicates added via `should` clauses
-====
-[source, JAVA, indent=0, subs="+callouts"]
-----
-include::{sourcedir}/org/hibernate/search/documentation/search/predicate/PredicateDslIT.java[tags=knn-should]
-----
-====
 
 [[search-dsl-predicate-knn-other]]
 === Other options

@@ -136,7 +136,7 @@ abstract class PropertyMappingValidator extends AbstractTypeMappingValidator<Pro
 		}
 	}
 
-	static class Elasticsearch8PropertyMappingValidator extends PropertyMappingValidator {
+	static class Elasticsearch812PropertyMappingValidator extends PropertyMappingValidator {
 
 		private final ElasticsearchDenseVectorIndexOptionsValidator indexOptionsValidator =
 				new ElasticsearchDenseVectorIndexOptionsValidator();

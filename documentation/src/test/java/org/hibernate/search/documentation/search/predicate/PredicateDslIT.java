@@ -60,8 +60,8 @@ class PredicateDslIT {
 	private static boolean isVectorSearchSupported() {
 		return BackendConfiguration.isLucene()
 				|| ElasticsearchTestDialect.isActualVersion(
-						es -> !es.isLessThan( "8.0" ),
-						os -> !os.isLessThan( "2.0" ),
+						es -> !es.isLessThan( "8.12.0" ),
+						os -> !os.isLessThan( "2.0.0" ),
 						aoss -> true
 				);
 	}
@@ -1160,33 +1160,10 @@ class PredicateDslIT {
 					.containsExactlyInAnyOrder( BOOK1_ID, BOOK2_ID, BOOK3_ID );
 		} );
 
-		withinSearchSession( searchSession -> {
-			// tag::knn-should[]
-			float[] coverImageEmbeddingsVector = /*...*/
-					// end::knn-should[]
-					floats( 128, 1.0f );
-			// tag::knn-should[]
-			float[] alternativeCoverImageEmbeddingsVector = /*...*/
-					// end::knn-should[]
-					floats( 128, 1.0f );
-			// tag::knn-should[]
-			List<Book> hits = searchSession.search( Book.class )
-					.where( f -> f.bool()
-							.should( f.knn( 10 ).field( "coverImageEmbeddings" ).matching( coverImageEmbeddingsVector ) )
-							.should( f.knn( 5 ).field( "alternativeCoverImageEmbeddings" )
-									.matching( alternativeCoverImageEmbeddingsVector ) )
-					)
-					.fetchHits( 20 );
-			// end::knn-should[]
-			assertThat( hits )
-					.extracting( Book::getId )
-					.containsExactlyInAnyOrder( BOOK1_ID, BOOK2_ID, BOOK3_ID, BOOK4_ID );
-		} );
-
 		if ( !BackendConfiguration.isElasticsearch()
 				|| ElasticsearchTestDialect.isActualVersion(
 						es -> !es.isLessThan( "8.12.0" ),
-						os -> !os.isLessThan( "2.0" ),
+						os -> !os.isLessThan( "2.0.0" ),
 						aoss -> true
 				) ) {
 			withinSearchSession( searchSession -> {
@@ -1211,7 +1188,7 @@ class PredicateDslIT {
 		// similarity is only applicable to Lucene and an Elastic distribution of Elasticsearch:
 		if ( BackendConfiguration.isLucene()
 				|| ElasticsearchTestDialect.isActualVersion(
-						es -> !es.isLessThan( "8.0" ),
+						es -> !es.isLessThan( "8.12.0" ),
 						os -> false,
 						aoss -> false
 				) ) {

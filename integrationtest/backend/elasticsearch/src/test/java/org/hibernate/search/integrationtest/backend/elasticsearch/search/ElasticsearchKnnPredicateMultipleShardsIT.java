@@ -41,10 +41,6 @@ class ElasticsearchKnnPredicateMultipleShardsIT {
 				TckConfiguration.get().getBackendFeatures().supportsVectorSearch(),
 				"These tests only make sense for a backend where Vector Search is supported and implemented."
 		);
-		assumeTrue(
-				TckConfiguration.get().getBackendFeatures().supportsVectorSearchKPerShard(),
-				"For now only OpenSearch implementation will produce more results if there's more than 1 shard."
-		);
 		setupHelper.start( tckBackendHelper -> tckBackendHelper.createHashBasedShardingBackendSetupStrategy( 4 ) )
 				.withIndexes( index ).setup();
 		BulkIndexer exampleKnnSearchIndexer = index.bulkIndexer();

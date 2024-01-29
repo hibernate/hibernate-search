@@ -700,10 +700,6 @@ class KnnPredicateSpecificsIT {
 
 		@Test
 		void knnAsKnnFilter() {
-			assumeTrue(
-					TckConfiguration.get().getBackendFeatures().supportsVectorSearchInsideOtherPredicates(),
-					"This test won't work on some backends that do not provide a way of passing a knn predicate as a clause of bool query/filter."
-			);
 			SearchQuery<Object> query = index.createScope().query()
 					.select(
 							SearchProjectionFactory::id
@@ -726,10 +722,6 @@ class KnnPredicateSpecificsIT {
 
 		@Test
 		void insideOtherPredicate() {
-			assumeTrue(
-					TckConfiguration.get().getBackendFeatures().supportsVectorSearchInsideOtherPredicates(),
-					"This test won't work on some backends that do not provide a way of passing a knn predicate as a clause of bool query."
-			);
 			SearchQuery<float[]> query = index.createScope().query()
 					.select(
 							f -> f.field( "location", float[].class )
@@ -748,10 +740,6 @@ class KnnPredicateSpecificsIT {
 		@Test
 		@SuppressWarnings("unchecked")
 		void nestedVector() {
-			assumeTrue(
-					TckConfiguration.get().getBackendFeatures().supportsVectorSearchInsideOtherPredicates(),
-					"This test won't work on some backends that can only accept a knn predicate at top level."
-			);
 			assertThat(
 					indexNested.createScope().query()
 							.select( f -> f.composite()

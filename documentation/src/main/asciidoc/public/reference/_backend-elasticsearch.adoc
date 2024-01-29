@@ -47,10 +47,8 @@ Hibernate Search's Elasticsearch backend is compatible with
 link:{elasticsearchUrl}[Elasticsearch] clusters running version {elasticsearchCompatibleVersions}
 and regularly tested against versions {elasticsearchTestedVersions}.
 
-Using Elasticsearch currently doesn't require specific configuration.
-There are some limitations applied by Hibernate Search when it comes to using a <<search-dsl-predicate-knn,knn predicate>> with Elasticsearch.
-These limitations come from Elasticsearch's integration of k-NN search,
-see <<search-dsl-predicate-knn-limitations,this section of the documentation>> for more details.
+Using Elasticsearch currently doesn't require specific configuration
+and doesn't imply specific limitations.
 
 [[backend-elasticsearch-compatibility-opensearch]]
 === OpenSearch

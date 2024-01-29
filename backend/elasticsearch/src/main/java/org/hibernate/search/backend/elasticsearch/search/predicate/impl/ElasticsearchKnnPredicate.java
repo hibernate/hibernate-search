@@ -45,19 +45,6 @@ public abstract class ElasticsearchKnnPredicate extends AbstractElasticsearchSin
 		builder.vector = null;
 	}
 
-	public static class ElasticsearchFactory<F>
-			extends AbstractElasticsearchCodecAwareSearchQueryElementFactory<KnnPredicateBuilder, F> {
-		public ElasticsearchFactory(ElasticsearchFieldCodec<F> codec) {
-			super( codec );
-		}
-
-		@Override
-		public KnnPredicateBuilder create(ElasticsearchSearchIndexScope<?> scope,
-				ElasticsearchSearchIndexValueFieldContext<F> field) {
-			return new ElasticsearchImpl.Builder<>( codec, scope, field );
-		}
-	}
-
 	public static class Elasticsearch812Factory<F>
 			extends AbstractElasticsearchCodecAwareSearchQueryElementFactory<KnnPredicateBuilder, F> {
 		public Elasticsearch812Factory(ElasticsearchFieldCodec<F> codec) {
@@ -132,7 +119,7 @@ public abstract class ElasticsearchKnnPredicate extends AbstractElasticsearchSin
 		@Override
 		public void filter(SearchPredicate filter) {
 			ElasticsearchSearchPredicate elasticsearchFilter = ElasticsearchSearchPredicate.from( scope, filter );
-			elasticsearchFilter.checkNestableWithin( PredicateNestingContext.doesNotAcceptKnn() );
+			elasticsearchFilter.checkNestableWithin( PredicateNestingContext.simple() );
 			this.filter = elasticsearchFilter;
 		}
 
@@ -151,81 +138,6 @@ public abstract class ElasticsearchKnnPredicate extends AbstractElasticsearchSin
 			}
 		}
 		return array;
-	}
-
-	private static class ElasticsearchImpl extends ElasticsearchKnnPredicate {
-
-		private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
-
-		private static final JsonAccessor<String> FIELD_ACCESSOR = JsonAccessor.root().property( "field" ).asString();
-		private static final JsonArrayAccessor QUERY_VECTOR_ACCESSOR = JsonAccessor.root().property( "query_vector" ).asArray();
-		private static final JsonAccessor<Integer> K_ACCESSOR = JsonAccessor.root().property( "k" ).asInteger();
-
-		private static final JsonObjectAccessor FILTER_ACCESSOR = JsonAccessor.root().property( "filter" ).asObject();
-		private static final JsonAccessor<Integer> NUM_CANDIDATES_ACCESSOR =
-				JsonAccessor.root().property( "num_candidates" ).asInteger();
-		private static final JsonAccessor<Float> SIMILARITY_ACCESSOR = JsonAccessor.root().property( "similarity" ).asFloat();
-
-
-		private ElasticsearchImpl(Builder<?> builder) {
-			super( builder );
-		}
-
-		@Override
-		public JsonObject toJsonQuery(PredicateRequestContext context) {
-			// we want the query to get created and passed to the request context
-			context.contributeKnnClause( ( super.toJsonQuery( context ) ) );
-			// but we don't want it to be an actual query so we return `null`:
-			return null;
-		}
-
-		@Override
-		protected JsonObject doToJsonQuery(PredicateRequestContext context, JsonObject outerObject, JsonObject innerObject) {
-			FIELD_ACCESSOR.set( innerObject, absoluteFieldPath );
-			K_ACCESSOR.set( innerObject, k );
-			if ( filter != null ) {
-				JsonObject query = filter.toJsonQuery( context );
-				// we shouldn't get a null query here, since that's only possible if a filter was a knn predicate,
-				//   and in that case we are failing much faster for am Elasticsearch distribution...
-				FILTER_ACCESSOR.set( innerObject, query );
-			}
-			NUM_CANDIDATES_ACCESSOR.set( innerObject, k );
-			QUERY_VECTOR_ACCESSOR.set( innerObject, vector );
-			if ( similarity != null ) {
-				SIMILARITY_ACCESSOR.set( innerObject, similarity );
-			}
-			return innerObject;
-		}
-
-		@Override
-		public void checkNestableWithin(PredicateNestingContext context) {
-			if ( context.getNestedPath() != null || !context.acceptsKnnClause() ) {
-				throw log.cannotAddKnnClauseAtThisStep();
-			}
-		}
-
-		private static class Builder<F> extends AbstractKnnBuilder<F> {
-
-			private Builder(ElasticsearchFieldCodec<F> codec, ElasticsearchSearchIndexScope<?> scope,
-					ElasticsearchSearchIndexValueFieldContext<F> field) {
-				super( codec, scope, field );
-			}
-
-			@Override
-			public void constantScore() {
-				log.elasticsearchKnnIgnoresConstantScore();
-			}
-
-			@Override
-			public void requiredMinimumSimilarity(float similarity) {
-				this.similarity = similarity;
-			}
-
-			@Override
-			public SearchPredicate build() {
-				return new ElasticsearchImpl( this );
-			}
-		}
 	}
 
 	private static class Elasticsearch812Impl extends ElasticsearchKnnPredicate {
