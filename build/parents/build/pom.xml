@@ -118,7 +118,7 @@
 
         <!-- >>> WildFly dependencies -->
         <!-- This is used to generate a link to the WildFly documentation -->
-        <version.org.wildfly>30.0.0.Final</version.org.wildfly>
+        <version.org.wildfly>31.0.0.Final</version.org.wildfly>
 
         <!-- Test dependencies -->
 
@@ -129,11 +129,11 @@
         <version.junit-platform-suite-engine>1.10.0</version.junit-platform-suite-engine>
         <version.org.osgi.core>6.0.0</version.org.osgi.core>
         <!-- Make sure to update Ryuk container version in `ryuk.Dockerfile` whenever updating testcontainers to align it with the lib. -->
-        <version.testcontainers>1.19.3</version.testcontainers>
+        <version.testcontainers>1.19.4</version.testcontainers>
 
         <version.org.hamcrest>2.2</version.org.hamcrest>
-        <version.org.mockito>5.9.0</version.org.mockito>
-        <version.org.assertj.assertj-core>3.25.1</version.org.assertj.assertj-core>
+        <version.org.mockito>5.10.0</version.org.mockito>
+        <version.org.assertj.assertj-core>3.25.2</version.org.assertj.assertj-core>
         <version.org.awaitily>4.2.0</version.org.awaitily>
         <version.org.skyscreamer.jsonassert>1.5.1</version.org.skyscreamer.jsonassert>
         <version.io.takari.junit>1.2.7</version.io.takari.junit>
