@@ -8,6 +8,7 @@ package org.hibernate.search.integrationtest.mapper.pojo.standalone.realbackend.
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.junit.jupiter.api.Assumptions.assumeTrue;
 
 import java.lang.invoke.MethodHandles;
 import java.util.ArrayList;
@@ -42,6 +43,7 @@ import org.hibernate.search.util.impl.integrationtest.common.reporting.FailureRe
 import org.hibernate.search.util.impl.integrationtest.common.reporting.FailureReportUtils;
 import org.hibernate.search.util.impl.integrationtest.mapper.pojo.standalone.StandalonePojoMappingSetupHelper;
 
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -56,6 +58,14 @@ class VectorFieldIT {
 	@RegisterExtension
 	public StandalonePojoMappingSetupHelper setupHelper = StandalonePojoMappingSetupHelper.withSingleBackend(
 			MethodHandles.lookup(), BackendConfigurations.simple() );
+
+	@BeforeAll
+	static void beforeAll() {
+		assumeTrue(
+				isVectorSearchSupported(),
+				"This test only makes sense if the backend supports vectors and vector search."
+		);
+	}
 
 	/*
 	 * While for the test of the max-allowed dimension it would be enough to index a single document and then search for it,
@@ -250,5 +260,14 @@ class VectorFieldIT {
 			}
 			return floats;
 		}
+	}
+
+	private static boolean isVectorSearchSupported() {
+		return BackendConfiguration.isLucene()
+				|| ElasticsearchTestDialect.isActualVersion(
+						es -> !es.isLessThan( "8.12.0" ),
+						os -> !os.isLessThan( "2.0.0" ),
+						aoss -> true
+				);
 	}
 }
