@@ -396,13 +396,14 @@ public class PojoMapper<MPBS extends MappingPartialBuildState> implements Mapper
 			IdentifierMappingImplementor<?, T> identifierMapping = identityMappingCollector
 					.buildAndContributeTo( extendedMappingCollector, containedEntityIdentityMappingMode );
 
-			PojoContainedTypeManager<?, T> typeManager = new PojoContainedTypeManager<>(
-					entityName, entityType.typeIdentifier(), entityType.caster(),
+			var typeManagerBuilder = new PojoContainedTypeManager.Builder<>(
+					entityType, entityName,
 					reindexingResolverBuildingHelper.isSingleConcreteTypeInEntityHierarchy( entityType ),
 					identifierMapping,
 					reindexingResolverBuildingHelper.runtimePathsBuildingHelper( entityType ).pathOrdinals(),
 					reindexingResolver
 			);
+			var typeManager = typeManagerBuilder.build();
 			log.containedTypeManager( entityType, typeManager );
 			typeManagerContainerBuilder.addContained( entityType, typeManager );
 		}

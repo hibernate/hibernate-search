@@ -17,16 +17,19 @@ import org.hibernate.search.engine.backend.work.execution.DocumentRefreshStrateg
 import org.hibernate.search.engine.backend.work.execution.spi.IndexIndexer;
 import org.hibernate.search.engine.backend.work.execution.spi.IndexIndexingPlan;
 import org.hibernate.search.engine.backend.work.execution.spi.IndexWorkspace;
+import org.hibernate.search.engine.environment.bean.BeanHolder;
 import org.hibernate.search.engine.mapper.mapping.spi.MappedIndexManager;
 import org.hibernate.search.engine.mapper.scope.spi.MappedIndexScopeBuilder;
 import org.hibernate.search.mapper.pojo.automaticindexing.impl.PojoImplicitReindexingResolver;
+import org.hibernate.search.mapper.pojo.bridge.RoutingBridge;
 import org.hibernate.search.mapper.pojo.bridge.runtime.impl.DocumentRouter;
+import org.hibernate.search.mapper.pojo.bridge.runtime.impl.NoOpDocumentRouter;
+import org.hibernate.search.mapper.pojo.bridge.runtime.impl.RoutingBridgeDocumentRouter;
 import org.hibernate.search.mapper.pojo.identity.impl.IdentifierMappingImplementor;
 import org.hibernate.search.mapper.pojo.massindexing.impl.PojoMassIndexingIndexedTypeContext;
 import org.hibernate.search.mapper.pojo.model.path.impl.PojoPathOrdinals;
 import org.hibernate.search.mapper.pojo.model.path.spi.PojoPathFilter;
-import org.hibernate.search.mapper.pojo.model.spi.PojoCaster;
-import org.hibernate.search.mapper.pojo.model.spi.PojoRawTypeIdentifier;
+import org.hibernate.search.mapper.pojo.model.spi.PojoRawTypeModel;
 import org.hibernate.search.mapper.pojo.processing.impl.PojoIndexingProcessor;
 import org.hibernate.search.mapper.pojo.processing.spi.PojoIndexingProcessorRootContext;
 import org.hibernate.search.mapper.pojo.scope.impl.PojoScopeIndexedTypeContext;
@@ -47,17 +50,11 @@ public class PojoIndexedTypeManager<I, E> extends AbstractPojoTypeManager<I, E>
 	private final PojoIndexingProcessor<E> processor;
 	private final MappedIndexManager indexManager;
 
-	public PojoIndexedTypeManager(String entityName, PojoRawTypeIdentifier<E> typeIdentifier,
-			PojoCaster<E> caster, boolean singleConcreteTypeInEntityHierarchy,
-			IdentifierMappingImplementor<I, E> identifierMapping,
-			DocumentRouter<? super E> documentRouter, PojoPathOrdinals pathOrdinals,
-			PojoIndexingProcessor<E> processor, MappedIndexManager indexManager,
-			PojoImplicitReindexingResolver<E> reindexingResolver) {
-		super( entityName, typeIdentifier, caster, singleConcreteTypeInEntityHierarchy,
-				identifierMapping, pathOrdinals, reindexingResolver );
-		this.documentRouter = documentRouter;
-		this.processor = processor;
-		this.indexManager = indexManager;
+	public PojoIndexedTypeManager(Builder<I, E> builder) {
+		super( builder );
+		this.documentRouter = builder.documentRouter;
+		this.processor = builder.processor;
+		this.indexManager = builder.indexManager;
 	}
 
 	@Override
@@ -134,5 +131,33 @@ public class PojoIndexedTypeManager<I, E> extends AbstractPojoTypeManager<I, E>
 	@Override
 	public void addTo(MappedIndexScopeBuilder<?, ?> builder) {
 		indexManager.addTo( builder );
+	}
+
+	public static class Builder<I, E> extends AbstractBuilder<I, E> {
+		private final PojoIndexingProcessor<E> processor;
+		private final MappedIndexManager indexManager;
+		private DocumentRouter<? super E> documentRouter = NoOpDocumentRouter.INSTANCE;
+
+		public Builder(PojoRawTypeModel<E> typeModel, String entityName,
+				boolean singleConcreteTypeInEntityHierarchy,
+				IdentifierMappingImplementor<I, E> identifierMapping,
+				PojoPathOrdinals pathOrdinals,
+				PojoImplicitReindexingResolver<E> reindexingResolver,
+				PojoIndexingProcessor<E> processor,
+				MappedIndexManager indexManager) {
+			super( typeModel, entityName, singleConcreteTypeInEntityHierarchy, identifierMapping,
+					pathOrdinals, reindexingResolver );
+			this.processor = processor;
+			this.indexManager = indexManager;
+		}
+
+		public void routingBridge(BeanHolder<? extends RoutingBridge<? super E>> bridgeHolder) {
+			documentRouter = new RoutingBridgeDocumentRouter<>( bridgeHolder );
+		}
+
+		@Override
+		public PojoIndexedTypeManager<I, E> build() {
+			return new PojoIndexedTypeManager<>( this );
+		}
 	}
 }
