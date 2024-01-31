@@ -6,11 +6,12 @@
  */
 package org.hibernate.search.backend.lucene.search.predicate.impl;
 
+import static org.hibernate.search.backend.lucene.search.predicate.impl.LuceneCommonMinimumShouldMatchConstraint.minimumShouldMatch;
+
 import java.lang.invoke.MethodHandles;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
 import java.util.NavigableMap;
 import java.util.TreeMap;
 import java.util.function.Consumer;
@@ -38,7 +39,7 @@ class LuceneBooleanPredicate extends AbstractLuceneSearchPredicate {
 	// NOTE: below modifiers (minimumShouldMatchConstraints) are used to implement hasNoModifiers() which is based on a
 	// parent implementation.
 	// IMPORTANT: Review where current modifiers are used and how the new modifier affects that logic, when adding a new modifier.
-	private final NavigableMap<Integer, MinimumShouldMatchConstraint> minimumShouldMatchConstraints;
+	private final NavigableMap<Integer, LuceneCommonMinimumShouldMatchConstraint> minimumShouldMatchConstraints;
 
 	private LuceneBooleanPredicate(Builder builder) {
 		super( builder );
@@ -77,15 +78,7 @@ class LuceneBooleanPredicate extends AbstractLuceneSearchPredicate {
 		}
 
 		if ( minimumShouldMatchConstraints != null && shouldClauses != null ) {
-			int minimumShouldMatch;
-			Map.Entry<Integer, MinimumShouldMatchConstraint> entry =
-					minimumShouldMatchConstraints.lowerEntry( shouldClauses.size() );
-			if ( entry != null ) {
-				minimumShouldMatch = entry.getValue().toMinimum( shouldClauses.size() );
-			}
-			else {
-				minimumShouldMatch = shouldClauses.size();
-			}
+			int minimumShouldMatch = minimumShouldMatch( minimumShouldMatchConstraints, shouldClauses );
 			booleanQueryBuilder.setMinimumNumberShouldMatch( minimumShouldMatch );
 		}
 
@@ -139,7 +132,7 @@ class LuceneBooleanPredicate extends AbstractLuceneSearchPredicate {
 		// NOTE: below modifiers (minimumShouldMatchConstraints) are used to implement hasNoModifiers() which is based on a
 		// parent implementation.
 		// IMPORTANT: Review where current modifiers are used and how the new modifier affects that logic, when adding a new modifier.
-		private NavigableMap<Integer, MinimumShouldMatchConstraint> minimumShouldMatchConstraints;
+		private NavigableMap<Integer, LuceneCommonMinimumShouldMatchConstraint> minimumShouldMatchConstraints;
 
 		Builder(LuceneSearchIndexScope<?> scope) {
 			super( scope );
@@ -181,7 +174,7 @@ class LuceneBooleanPredicate extends AbstractLuceneSearchPredicate {
 		public void minimumShouldMatchNumber(int ignoreConstraintCeiling, int matchingClausesNumber) {
 			addMinimumShouldMatchConstraint(
 					ignoreConstraintCeiling,
-					new MinimumShouldMatchConstraint( matchingClausesNumber, null )
+					new LuceneCommonMinimumShouldMatchConstraint( matchingClausesNumber, null )
 			);
 		}
 
@@ -189,7 +182,7 @@ class LuceneBooleanPredicate extends AbstractLuceneSearchPredicate {
 		public void minimumShouldMatchPercent(int ignoreConstraintCeiling, int matchingClausesPercent) {
 			addMinimumShouldMatchConstraint(
 					ignoreConstraintCeiling,
-					new MinimumShouldMatchConstraint( null, matchingClausesPercent )
+					new LuceneCommonMinimumShouldMatchConstraint( null, matchingClausesPercent )
 			);
 		}
 
@@ -272,7 +265,7 @@ class LuceneBooleanPredicate extends AbstractLuceneSearchPredicate {
 		}
 
 		private void addMinimumShouldMatchConstraint(int ignoreConstraintCeiling,
-				MinimumShouldMatchConstraint constraint) {
+				LuceneCommonMinimumShouldMatchConstraint constraint) {
 			if ( minimumShouldMatchConstraints == null ) {
 				// We'll need to go through the data in ascending order, so use a TreeMap
 				minimumShouldMatchConstraints = new TreeMap<>();
@@ -284,39 +277,4 @@ class LuceneBooleanPredicate extends AbstractLuceneSearchPredicate {
 		}
 	}
 
-	private static final class MinimumShouldMatchConstraint {
-		private final Integer matchingClausesNumber;
-		private final Integer matchingClausesPercent;
-
-		MinimumShouldMatchConstraint(Integer matchingClausesNumber, Integer matchingClausesPercent) {
-			this.matchingClausesNumber = matchingClausesNumber;
-			this.matchingClausesPercent = matchingClausesPercent;
-		}
-
-		int toMinimum(int totalShouldClauseNumber) {
-			int minimum;
-			if ( matchingClausesNumber != null ) {
-				if ( matchingClausesNumber >= 0 ) {
-					minimum = matchingClausesNumber;
-				}
-				else {
-					minimum = totalShouldClauseNumber + matchingClausesNumber;
-				}
-			}
-			else {
-				if ( matchingClausesPercent >= 0 ) {
-					minimum = matchingClausesPercent * totalShouldClauseNumber / 100;
-				}
-				else {
-					minimum = totalShouldClauseNumber + matchingClausesPercent * totalShouldClauseNumber / 100;
-				}
-			}
-
-			if ( minimum < 1 || minimum > totalShouldClauseNumber ) {
-				throw log.minimumShouldMatchMinimumOutOfBounds( totalShouldClauseNumber, minimum );
-			}
-
-			return minimum;
-		}
-	}
 }

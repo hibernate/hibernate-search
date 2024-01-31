@@ -23,8 +23,8 @@ import org.hibernate.search.backend.lucene.types.aggregation.impl.LuceneTextTerm
 import org.hibernate.search.backend.lucene.types.codec.impl.DocValues;
 import org.hibernate.search.backend.lucene.types.codec.impl.LuceneStringFieldCodec;
 import org.hibernate.search.backend.lucene.types.impl.LuceneIndexValueFieldType;
+import org.hibernate.search.backend.lucene.types.predicate.impl.LuceneCommonQueryStringPredicateBuilderFieldState;
 import org.hibernate.search.backend.lucene.types.predicate.impl.LuceneExistsPredicate;
-import org.hibernate.search.backend.lucene.types.predicate.impl.LuceneSimpleQueryStringPredicateBuilderFieldState;
 import org.hibernate.search.backend.lucene.types.predicate.impl.LuceneTextMatchPredicate;
 import org.hibernate.search.backend.lucene.types.predicate.impl.LuceneTextPhrasePredicate;
 import org.hibernate.search.backend.lucene.types.predicate.impl.LuceneTextRangePredicate;
@@ -211,7 +211,9 @@ class LuceneStringIndexFieldTypeOptionsStep
 			builder.queryElementFactory( PredicateTypeKeys.WILDCARD, new LuceneTextWildcardPredicate.Factory<>() );
 			builder.queryElementFactory( PredicateTypeKeys.REGEXP, new LuceneTextRegexpPredicate.Factory<>() );
 			builder.queryElementFactory( LucenePredicateTypeKeys.SIMPLE_QUERY_STRING,
-					new LuceneSimpleQueryStringPredicateBuilderFieldState.Factory() );
+					new LuceneCommonQueryStringPredicateBuilderFieldState.Factory() );
+			builder.queryElementFactory( LucenePredicateTypeKeys.QUERY_STRING,
+					new LuceneCommonQueryStringPredicateBuilderFieldState.Factory() );
 		}
 
 		if ( resolvedSortable ) {
