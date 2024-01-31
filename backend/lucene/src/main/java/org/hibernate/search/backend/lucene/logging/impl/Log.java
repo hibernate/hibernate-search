@@ -731,4 +731,7 @@ public interface Log extends BasicLogger {
 	@Message(id = ID_OFFSET + 179, value = "Invalid index field type: missing vector dimension."
 			+ " Define the vector dimension explicitly. %1$s")
 	SearchException nullVectorDimension(String hint, @Param EventContext eventContext);
+
+	@Message(id = ID_OFFSET + 180, value = "An error occurred while parsing the query string '%1$s': %2$s")
+	SearchException queryStringParseException(String query, String message, @Cause Exception cause);
 }

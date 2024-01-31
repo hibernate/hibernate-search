@@ -52,7 +52,7 @@ public class LuceneSearchPredicateBuilderFactory implements SearchPredicateBuild
 
 	@Override
 	public QueryStringPredicateBuilder queryString() {
-		throw new UnsupportedOperationException( "Query string predicate is not yet supported" );
+		return new LuceneQueryStringPredicate.Builder( scope );
 	}
 
 	public LuceneSearchPredicate fromLuceneQuery(Query query) {
