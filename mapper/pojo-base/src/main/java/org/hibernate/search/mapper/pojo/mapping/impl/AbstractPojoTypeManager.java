@@ -19,6 +19,7 @@ import org.hibernate.search.mapper.pojo.logging.impl.Log;
 import org.hibernate.search.mapper.pojo.model.path.impl.PojoPathOrdinals;
 import org.hibernate.search.mapper.pojo.model.spi.PojoCaster;
 import org.hibernate.search.mapper.pojo.model.spi.PojoRawTypeIdentifier;
+import org.hibernate.search.mapper.pojo.model.spi.PojoRawTypeModel;
 import org.hibernate.search.mapper.pojo.model.spi.PojoRuntimeIntrospector;
 import org.hibernate.search.mapper.pojo.work.impl.CachingCastingEntitySupplier;
 import org.hibernate.search.mapper.pojo.work.impl.PojoWorkTypeContext;
@@ -43,17 +44,14 @@ public class AbstractPojoTypeManager<I, E>
 	private final PojoPathOrdinals pathOrdinals;
 	protected final PojoImplicitReindexingResolver<E> reindexingResolver;
 
-	public AbstractPojoTypeManager(String entityName, PojoRawTypeIdentifier<E> typeIdentifier,
-			PojoCaster<E> caster, boolean singleConcreteTypeInEntityHierarchy,
-			IdentifierMappingImplementor<I, E> identifierMapping, PojoPathOrdinals pathOrdinals,
-			PojoImplicitReindexingResolver<E> reindexingResolver) {
-		this.entityName = entityName;
-		this.typeIdentifier = typeIdentifier;
-		this.caster = caster;
-		this.singleConcreteTypeInEntityHierarchy = singleConcreteTypeInEntityHierarchy;
-		this.identifierMapping = identifierMapping;
-		this.pathOrdinals = pathOrdinals;
-		this.reindexingResolver = reindexingResolver;
+	public AbstractPojoTypeManager(AbstractBuilder<I, E> builder) {
+		this.entityName = builder.entityName;
+		this.typeIdentifier = builder.typeModel.typeIdentifier();
+		this.caster = builder.typeModel.caster();
+		this.singleConcreteTypeInEntityHierarchy = builder.singleConcreteTypeInEntityHierarchy;
+		this.identifierMapping = builder.identifierMapping;
+		this.pathOrdinals = builder.pathOrdinals;
+		this.reindexingResolver = builder.reindexingResolver;
 	}
 
 	@Override
@@ -164,4 +162,26 @@ public class AbstractPojoTypeManager<I, E>
 		}
 	}
 
+	public static abstract class AbstractBuilder<I, E> {
+		private final PojoRawTypeModel<E> typeModel;
+		private final String entityName;
+		private final boolean singleConcreteTypeInEntityHierarchy;
+		private final IdentifierMappingImplementor<I, E> identifierMapping;
+		private final PojoPathOrdinals pathOrdinals;
+		private final PojoImplicitReindexingResolver<E> reindexingResolver;
+
+		public AbstractBuilder(PojoRawTypeModel<E> typeModel, String entityName,
+				boolean singleConcreteTypeInEntityHierarchy,
+				IdentifierMappingImplementor<I, E> identifierMapping, PojoPathOrdinals pathOrdinals,
+				PojoImplicitReindexingResolver<E> reindexingResolver) {
+			this.typeModel = typeModel;
+			this.entityName = entityName;
+			this.singleConcreteTypeInEntityHierarchy = singleConcreteTypeInEntityHierarchy;
+			this.identifierMapping = identifierMapping;
+			this.pathOrdinals = pathOrdinals;
+			this.reindexingResolver = reindexingResolver;
+		}
+
+		public abstract AbstractPojoTypeManager<I, E> build();
+	}
 }

@@ -11,8 +11,7 @@ import java.util.Optional;
 import org.hibernate.search.mapper.pojo.automaticindexing.impl.PojoImplicitReindexingResolver;
 import org.hibernate.search.mapper.pojo.identity.impl.IdentifierMappingImplementor;
 import org.hibernate.search.mapper.pojo.model.path.impl.PojoPathOrdinals;
-import org.hibernate.search.mapper.pojo.model.spi.PojoCaster;
-import org.hibernate.search.mapper.pojo.model.spi.PojoRawTypeIdentifier;
+import org.hibernate.search.mapper.pojo.model.spi.PojoRawTypeModel;
 import org.hibernate.search.mapper.pojo.scope.impl.PojoScopeContainedTypeContext;
 import org.hibernate.search.mapper.pojo.work.impl.PojoWorkContainedTypeContext;
 
@@ -22,16 +21,28 @@ import org.hibernate.search.mapper.pojo.work.impl.PojoWorkContainedTypeContext;
  */
 public class PojoContainedTypeManager<I, E> extends AbstractPojoTypeManager<I, E>
 		implements PojoWorkContainedTypeContext<I, E>, PojoScopeContainedTypeContext<I, E> {
-	public PojoContainedTypeManager(String entityName, PojoRawTypeIdentifier<E> typeIdentifier,
-			PojoCaster<E> caster, boolean singleConcreteTypeInEntityHierarchy,
-			IdentifierMappingImplementor<I, E> identifierMapping, PojoPathOrdinals pathOrdinals,
-			PojoImplicitReindexingResolver<E> reindexingResolver) {
-		super( entityName, typeIdentifier, caster, singleConcreteTypeInEntityHierarchy,
-				identifierMapping, pathOrdinals, reindexingResolver );
+	private PojoContainedTypeManager(Builder<I, E> builder) {
+		super( builder );
 	}
 
 	@Override
 	public Optional<PojoContainedTypeManager<I, E>> asContained() {
 		return Optional.of( this );
+	}
+
+	public static class Builder<I, E> extends AbstractBuilder<I, E> {
+		public Builder(PojoRawTypeModel<E> typeModel, String entityName,
+				boolean singleConcreteTypeInEntityHierarchy,
+				IdentifierMappingImplementor<I, E> identifierMapping,
+				PojoPathOrdinals pathOrdinals,
+				PojoImplicitReindexingResolver<E> reindexingResolver) {
+			super( typeModel, entityName, singleConcreteTypeInEntityHierarchy, identifierMapping,
+					pathOrdinals, reindexingResolver );
+		}
+
+		@Override
+		public PojoContainedTypeManager<I, E> build() {
+			return new PojoContainedTypeManager<>( this );
+		}
 	}
 }

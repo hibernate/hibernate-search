@@ -20,8 +20,6 @@ import org.hibernate.search.mapper.pojo.automaticindexing.impl.PojoImplicitReind
 import org.hibernate.search.mapper.pojo.bridge.IdentifierBridge;
 import org.hibernate.search.mapper.pojo.bridge.RoutingBridge;
 import org.hibernate.search.mapper.pojo.bridge.binding.impl.BoundRoutingBridge;
-import org.hibernate.search.mapper.pojo.bridge.runtime.impl.NoOpDocumentRouter;
-import org.hibernate.search.mapper.pojo.bridge.runtime.impl.RoutingBridgeDocumentRouter;
 import org.hibernate.search.mapper.pojo.identity.impl.IdentifierMappingImplementor;
 import org.hibernate.search.mapper.pojo.identity.impl.IdentityMappingMode;
 import org.hibernate.search.mapper.pojo.identity.impl.PojoRootIdentityMappingCollector;
@@ -134,21 +132,20 @@ class PojoIndexedTypeManagerBuilder<E> {
 		MappedIndexManager indexManager = indexManagerBuilder.build();
 		extendedMappingCollector.indexManager( indexManager );
 
-
-		PojoIndexedTypeManager<?, E> typeManager = new PojoIndexedTypeManager<>(
-				entityName, typeModel.typeIdentifier(), typeModel.caster(),
+		var typeManagerBuilder = new PojoIndexedTypeManager.Builder<>(
+				typeModel, entityName,
 				reindexingResolverBuildingHelper.isSingleConcreteTypeInEntityHierarchy( typeModel ),
 				identifierMapping,
-				routingBridge == null
-						? NoOpDocumentRouter.INSTANCE
-						: new RoutingBridgeDocumentRouter<>( routingBridge.getBridgeHolder() ),
 				reindexingResolverBuildingHelper.runtimePathsBuildingHelper( typeModel ).pathOrdinals(),
+				reindexingResolver,
 				preBuiltIndexingProcessor,
-				indexManager,
-				reindexingResolver
+				indexManager
 		);
+		if ( routingBridge != null ) {
+			typeManagerBuilder.routingBridge( routingBridge.getBridgeHolder() );
+		}
+		var typeManager = typeManagerBuilder.build();
 		log.indexedTypeManager( typeModel, typeManager );
-
 		typeManagerContainerBuilder.addIndexed( typeModel, typeManager );
 
 		closed = true;
