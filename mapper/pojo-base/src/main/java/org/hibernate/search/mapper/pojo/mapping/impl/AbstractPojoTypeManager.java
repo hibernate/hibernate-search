@@ -15,7 +15,10 @@ import org.hibernate.search.mapper.pojo.automaticindexing.impl.PojoImplicitReind
 import org.hibernate.search.mapper.pojo.automaticindexing.impl.PojoImplicitReindexingResolverRootContext;
 import org.hibernate.search.mapper.pojo.automaticindexing.impl.PojoReindexingCollector;
 import org.hibernate.search.mapper.pojo.identity.impl.IdentifierMappingImplementor;
+import org.hibernate.search.mapper.pojo.identity.impl.IdentityMappingMode;
+import org.hibernate.search.mapper.pojo.identity.impl.PojoRootIdentityMappingCollector;
 import org.hibernate.search.mapper.pojo.logging.impl.Log;
+import org.hibernate.search.mapper.pojo.mapping.building.spi.PojoTypeExtendedMappingCollector;
 import org.hibernate.search.mapper.pojo.model.path.impl.PojoPathOrdinals;
 import org.hibernate.search.mapper.pojo.model.spi.PojoCaster;
 import org.hibernate.search.mapper.pojo.model.spi.PojoRawTypeIdentifier;
@@ -24,6 +27,8 @@ import org.hibernate.search.mapper.pojo.model.spi.PojoRuntimeIntrospector;
 import org.hibernate.search.mapper.pojo.work.impl.CachingCastingEntitySupplier;
 import org.hibernate.search.mapper.pojo.work.impl.PojoWorkTypeContext;
 import org.hibernate.search.mapper.pojo.work.spi.PojoWorkSessionContext;
+import org.hibernate.search.util.common.AssertionFailure;
+import org.hibernate.search.util.common.impl.Closer;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 import org.hibernate.search.util.common.spi.ToStringTreeAppendable;
 import org.hibernate.search.util.common.spi.ToStringTreeAppender;
@@ -36,20 +41,20 @@ public class AbstractPojoTypeManager<I, E>
 		implements AutoCloseable, ToStringTreeAppendable, PojoWorkTypeContext<I, E> {
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
-	protected final String entityName;
 	protected final PojoRawTypeIdentifier<E> typeIdentifier;
 	protected final PojoCaster<E> caster;
+	protected final String entityName;
 	private final boolean singleConcreteTypeInEntityHierarchy;
 	protected final IdentifierMappingImplementor<I, E> identifierMapping;
 	private final PojoPathOrdinals pathOrdinals;
 	protected final PojoImplicitReindexingResolver<E> reindexingResolver;
 
-	public AbstractPojoTypeManager(AbstractBuilder<I, E> builder) {
-		this.entityName = builder.entityName;
+	public AbstractPojoTypeManager(Builder<E> builder, IdentifierMappingImplementor<I, E> identifierMapping) {
 		this.typeIdentifier = builder.typeModel.typeIdentifier();
 		this.caster = builder.typeModel.caster();
+		this.entityName = builder.entityName;
 		this.singleConcreteTypeInEntityHierarchy = builder.singleConcreteTypeInEntityHierarchy;
-		this.identifierMapping = builder.identifierMapping;
+		this.identifierMapping = identifierMapping;
 		this.pathOrdinals = builder.pathOrdinals;
 		this.reindexingResolver = builder.reindexingResolver;
 	}
@@ -162,26 +167,71 @@ public class AbstractPojoTypeManager<I, E>
 		}
 	}
 
-	public static abstract class AbstractBuilder<I, E> {
-		private final PojoRawTypeModel<E> typeModel;
+	public abstract static class Builder<E> {
+		public final PojoRawTypeModel<E> typeModel;
 		private final String entityName;
-		private final boolean singleConcreteTypeInEntityHierarchy;
-		private final IdentifierMappingImplementor<I, E> identifierMapping;
-		private final PojoPathOrdinals pathOrdinals;
-		private final PojoImplicitReindexingResolver<E> reindexingResolver;
 
-		public AbstractBuilder(PojoRawTypeModel<E> typeModel, String entityName,
-				boolean singleConcreteTypeInEntityHierarchy,
-				IdentifierMappingImplementor<I, E> identifierMapping, PojoPathOrdinals pathOrdinals,
-				PojoImplicitReindexingResolver<E> reindexingResolver) {
+		private PojoRootIdentityMappingCollector<E> identityMappingCollector;
+		protected IdentifierMappingImplementor<?, E> identifierMapping;
+
+		private PojoImplicitReindexingResolver<E> reindexingResolver;
+
+		private Boolean singleConcreteTypeInEntityHierarchy;
+		private PojoPathOrdinals pathOrdinals;
+
+		protected boolean closed = false;
+
+		Builder(PojoRawTypeModel<E> typeModel, String entityName,
+				PojoRootIdentityMappingCollector<E> identityMappingCollector) {
 			this.typeModel = typeModel;
 			this.entityName = entityName;
-			this.singleConcreteTypeInEntityHierarchy = singleConcreteTypeInEntityHierarchy;
-			this.identifierMapping = identifierMapping;
-			this.pathOrdinals = pathOrdinals;
-			this.reindexingResolver = reindexingResolver;
+			this.identityMappingCollector = identityMappingCollector;
 		}
 
-		public abstract AbstractPojoTypeManager<I, E> build();
+		public final void closeOnFailure() {
+			if ( closed ) {
+				return;
+			}
+			try ( Closer<RuntimeException> closer = new Closer<>() ) {
+				doCloseOnFailure( closer );
+				closed = true;
+			}
+		}
+
+		protected void doCloseOnFailure(Closer<RuntimeException> closer) {
+			closer.push( PojoRootIdentityMappingCollector::closeOnFailure, identityMappingCollector );
+			closer.push( IdentifierMappingImplementor::close, identifierMapping );
+			closer.push( PojoImplicitReindexingResolver::close, reindexingResolver );
+		}
+
+		protected abstract PojoTypeExtendedMappingCollector extendedMappingCollector();
+
+		public void preBuildIdentifierMapping(IdentityMappingMode identityMappingMode) {
+			if ( this.identifierMapping != null ) {
+				throw new AssertionFailure( "Internal error - preBuildIdentifierMapping should be called only once" );
+			}
+			this.identifierMapping = this.identityMappingCollector.buildAndContributeTo(
+					extendedMappingCollector(), identityMappingMode );
+			this.identityMappingCollector = null;
+		}
+
+		public void reindexingResolver(PojoImplicitReindexingResolver<E> reindexingResolver) {
+			if ( this.reindexingResolver != null ) {
+				throw new AssertionFailure( "Internal error - reindexingResolver should be called only once" );
+			}
+			this.reindexingResolver = reindexingResolver;
+			extendedMappingCollector().dirtyFilter( reindexingResolver.dirtySelfOrContainingFilter() );
+			extendedMappingCollector().dirtyContainingAssociationFilter(
+					reindexingResolver.associationInverseSideResolver().dirtyContainingAssociationFilter() );
+		}
+
+		public void preBuildOtherMetadata(boolean singleConcreteTypeInEntityHierarchy,
+				PojoPathOrdinals pathOrdinals) {
+			this.singleConcreteTypeInEntityHierarchy = singleConcreteTypeInEntityHierarchy;
+			this.pathOrdinals = pathOrdinals;
+		}
+
+		public abstract AbstractPojoTypeManager<?, E> build();
+
 	}
 }

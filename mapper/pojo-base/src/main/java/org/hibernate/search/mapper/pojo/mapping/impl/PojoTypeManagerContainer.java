@@ -7,20 +7,24 @@
 package org.hibernate.search.mapper.pojo.mapping.impl;
 
 import java.lang.invoke.MethodHandles;
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
-import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 
+import org.hibernate.search.engine.mapper.mapping.building.spi.MappedIndexManagerBuilder;
+import org.hibernate.search.mapper.pojo.bridge.binding.impl.BoundRoutingBridge;
+import org.hibernate.search.mapper.pojo.identity.impl.PojoRootIdentityMappingCollector;
 import org.hibernate.search.mapper.pojo.logging.impl.Log;
+import org.hibernate.search.mapper.pojo.mapping.building.spi.PojoContainedTypeExtendedMappingCollector;
+import org.hibernate.search.mapper.pojo.mapping.building.spi.PojoIndexedTypeExtendedMappingCollector;
 import org.hibernate.search.mapper.pojo.mapping.spi.PojoRawTypeIdentifierResolver;
 import org.hibernate.search.mapper.pojo.model.spi.PojoRawTypeIdentifier;
 import org.hibernate.search.mapper.pojo.model.spi.PojoRawTypeModel;
+import org.hibernate.search.mapper.pojo.processing.building.impl.PojoIndexingProcessorOriginalTypeNodeBuilder;
 import org.hibernate.search.mapper.pojo.scope.impl.PojoScopeTypeContextProvider;
 import org.hibernate.search.mapper.pojo.work.impl.PojoWorkTypeContext;
 import org.hibernate.search.mapper.pojo.work.impl.PojoWorkTypeContextProvider;
@@ -59,26 +63,42 @@ public class PojoTypeManagerContainer
 		// Use a LinkedHashMap for deterministic iteration in the "all" set
 		Map<PojoRawTypeIdentifier<?>, AbstractPojoTypeManager<?, ?>> byExactTypeContent = new LinkedHashMap<>();
 		Map<PojoRawTypeIdentifier<?>, PojoIndexedTypeManager<?, ?>> indexedByExactTypeContent = new LinkedHashMap<>();
+		Map<PojoRawTypeIdentifier<?>, Set<AbstractPojoTypeManager<?, ?>>> bySuperTypeContent = new LinkedHashMap<>();
+		Map<PojoRawTypeIdentifier<?>, Set<PojoIndexedTypeManager<?, ?>>> indexedBySuperTypeContent = new LinkedHashMap<>();
 		Map<String, AbstractPojoTypeManager<?, ?>> byEntityNameContent = new LinkedHashMap<>();
-		for ( PojoIndexedTypeManager<?, ?> typeManager : builder.indexed ) {
-			PojoRawTypeIdentifier<?> typeIdentifier = typeManager.typeIdentifier;
+		for ( PojoIndexedTypeManager.Builder<?> typeManagerBuilder : builder.indexed.values() ) {
+			PojoRawTypeModel<?> typeModel = typeManagerBuilder.typeModel;
+			PojoRawTypeIdentifier<?> typeIdentifier = typeModel.typeIdentifier();
+			var typeManager = typeManagerBuilder.build();
+			log.indexedTypeManager( typeModel, typeManager );
 
 			byExactTypeContent.put( typeIdentifier, typeManager );
 			indexedByExactTypeContent.put( typeIdentifier, typeManager );
 
 			byEntityNameContent.put( typeManager.entityName(), typeManager );
+
+			registerSuperTypes( bySuperTypeContent, typeModel, typeManager );
+			registerSuperTypes( indexedBySuperTypeContent, typeModel, typeManager );
 		}
-		for ( PojoContainedTypeManager<?, ?> typeManager : builder.contained ) {
-			PojoRawTypeIdentifier<?> typeIdentifier = typeManager.typeIdentifier;
+		for ( PojoContainedTypeManager.Builder<?> typeManagerBuilder : builder.contained.values() ) {
+			PojoRawTypeModel<?> typeModel = typeManagerBuilder.typeModel;
+			PojoRawTypeIdentifier<?> typeIdentifier = typeModel.typeIdentifier();
+			var typeManager = typeManagerBuilder.build();
+			log.containedTypeManager( typeModel, typeManager );
 
 			byExactTypeContent.put( typeIdentifier, typeManager );
 
 			byEntityNameContent.put( typeManager.entityName(), typeManager );
+
+			registerSuperTypes( bySuperTypeContent, typeModel, typeManager );
 		}
 		this.byExactType = new KeyValueProvider<>( byExactTypeContent, log::unknownTypeIdentifierForMappedEntityType );
 		this.indexedByExactType =
 				new KeyValueProvider<>( indexedByExactTypeContent, log::unknownTypeIdentifierForIndexedEntityType );
 		this.byEntityName = new KeyValueProvider<>( byEntityNameContent, log::unknownEntityNameForMappedEntityType );
+		indexedBySuperTypeContent.replaceAll( (k, v) -> Collections.unmodifiableSet( v ) );
+		this.indexedBySuperType =
+				KeyValueProvider.createWithMultiKeyException( indexedBySuperTypeContent, log::invalidIndexedSuperTypes );
 
 		Map<String, PojoRawTypeIdentifier<?>> typeIdentifierByEntityNameContent = new LinkedHashMap<>();
 		Map<String, PojoRawTypeIdentifier<?>> typeIdentifierBySecondaryEntityNameContent = new LinkedHashMap<>();
@@ -98,8 +118,6 @@ public class PojoTypeManagerContainer
 		this.typeIdentifierBySecondaryEntityName =
 				new KeyValueProvider<>( typeIdentifierBySecondaryEntityNameContent, log::unknownEntityName );
 
-		Map<PojoRawTypeIdentifier<?>, Set<PojoIndexedTypeManager<?, ?>>> indexedBySuperTypeContent =
-				new LinkedHashMap<>( builder.indexedBySuperType );
 		Map<String, Set<PojoIndexedTypeManager<?, ?>>> indexedBySuperTypeEntityNameContent =
 				new LinkedHashMap<>();
 		Map<Class<?>, Set<PojoIndexedTypeManager<?, ?>>> indexedBySuperTypeClassContent =
@@ -119,9 +137,6 @@ public class PojoTypeManagerContainer
 				indexedBySuperTypeClassContent.put( typeIdentifier.javaClass(), entry.getValue() );
 			}
 		}
-		indexedBySuperTypeContent.replaceAll( (k, v) -> Collections.unmodifiableSet( v ) );
-		this.indexedBySuperType =
-				KeyValueProvider.createWithMultiKeyException( indexedBySuperTypeContent, log::invalidIndexedSuperTypes );
 		indexedBySuperTypeEntityNameContent.replaceAll( (k, v) -> Collections.unmodifiableSet( v ) );
 		this.indexedBySuperTypeEntityName = KeyValueProvider.createWithMultiKeyException( indexedBySuperTypeEntityNameContent,
 				log::invalidIndexedSuperTypeEntityNames );
@@ -133,7 +148,7 @@ public class PojoTypeManagerContainer
 		Map<String, PojoRawTypeIdentifier<?>> nonInterfaceSuperTypeIdentifierByEntityNameContent = new LinkedHashMap<>();
 		Map<PojoRawTypeIdentifier<?>, Set<AbstractPojoTypeManager<?, ?>>> byNonInterfaceSuperTypeContent =
 				new LinkedHashMap<>();
-		for ( Map.Entry<PojoRawTypeIdentifier<?>, Set<AbstractPojoTypeManager<?, ?>>> entry : builder.bySuperType.entrySet() ) {
+		for ( Map.Entry<PojoRawTypeIdentifier<?>, Set<AbstractPojoTypeManager<?, ?>>> entry : bySuperTypeContent.entrySet() ) {
 			PojoRawTypeIdentifier<?> typeIdentifier = entry.getKey();
 			// for these, we want to skip any interfaces since this set should only be used to report an error when we cannot
 			// find a type by a class, and that should only be a case when we are looking up non-named types.
@@ -255,15 +270,20 @@ public class PojoTypeManagerContainer
 		return allIndexed;
 	}
 
+	private static <T> void registerSuperTypes(Map<PojoRawTypeIdentifier<?>, Set<T>> bySuperType,
+			PojoRawTypeModel<?> entityType, T value) {
+		entityType.descendingSuperTypes()
+				.map( PojoRawTypeModel::typeIdentifier )
+				.forEach( superTypeIdentifier -> bySuperType
+						.computeIfAbsent( superTypeIdentifier, ignored -> new LinkedHashSet<>() )
+						.add( value ) );
+	}
+
 	public static class Builder {
 
 		// Use a LinkedHashMap for deterministic iteration
-		private final List<PojoIndexedTypeManager<?, ?>> indexed = new ArrayList<>();
-		private final List<PojoContainedTypeManager<?, ?>> contained = new ArrayList<>();
-		private final Map<PojoRawTypeIdentifier<?>, Set<PojoIndexedTypeManager<?, ?>>> indexedBySuperType =
-				new LinkedHashMap<>();
-		private final Map<PojoRawTypeIdentifier<?>, Set<AbstractPojoTypeManager<?, ?>>> bySuperType =
-				new LinkedHashMap<>();
+		public final Map<PojoRawTypeModel<?>, PojoIndexedTypeManager.Builder<?>> indexed = new LinkedHashMap<>();
+		public final Map<PojoRawTypeModel<?>, PojoContainedTypeManager.Builder<?>> contained = new LinkedHashMap<>();
 		private final Map<PojoRawTypeIdentifier<?>, Set<PojoRawTypeIdentifier<?>>> entityTypeIdentifiersBySuperType =
 				new LinkedHashMap<>();
 		private final Map<PojoRawTypeIdentifier<?>, Set<String>> allEntityNamesByTypeIdentifier = new LinkedHashMap<>();
@@ -273,15 +293,25 @@ public class PojoTypeManagerContainer
 		private Builder() {
 		}
 
-		public <E> void addIndexed(PojoRawTypeModel<E> typeModel, PojoIndexedTypeManager<?, E> typeManager) {
-			indexed.add( typeManager );
-			registerSuperTypes( indexedBySuperType, typeModel, typeManager );
-			registerSuperTypes( bySuperType, typeModel, typeManager );
+		public <E> PojoIndexedTypeManager.Builder<E> addIndexed(PojoRawTypeModel<E> typeModel, String entityName,
+				PojoRootIdentityMappingCollector<E> identityMappingCollector,
+				PojoIndexedTypeExtendedMappingCollector extendedMappingCollector,
+				BoundRoutingBridge<E> routingBridge,
+				PojoIndexingProcessorOriginalTypeNodeBuilder<E> indexingProcessorBuilder,
+				MappedIndexManagerBuilder indexManagerBuilder) {
+			var builder = new PojoIndexedTypeManager.Builder<>( typeModel, entityName, identityMappingCollector,
+					extendedMappingCollector, routingBridge, indexingProcessorBuilder, indexManagerBuilder );
+			indexed.put( typeModel, builder );
+			return builder;
 		}
 
-		public <E> void addContained(PojoRawTypeModel<E> typeModel, PojoContainedTypeManager<?, E> typeManager) {
-			contained.add( typeManager );
-			registerSuperTypes( bySuperType, typeModel, typeManager );
+		public <E> PojoContainedTypeManager.Builder<E> addContained(PojoRawTypeModel<E> typeModel, String entityName,
+				PojoRootIdentityMappingCollector<E> identityMappingCollector,
+				PojoContainedTypeExtendedMappingCollector extendedMappingCollector) {
+			var builder = new PojoContainedTypeManager.Builder<>( typeModel, entityName, identityMappingCollector,
+					extendedMappingCollector );
+			contained.put( typeModel, builder );
+			return builder;
 		}
 
 		public void addEntity(PojoRawTypeModel<?> entityType, String entityName, String secondaryEntityName) {
@@ -305,25 +335,17 @@ public class PojoTypeManagerContainer
 			registerSuperTypes( entityTypeIdentifiersBySuperType, entityType, entityType.typeIdentifier() );
 		}
 
-		private <T> void registerSuperTypes(Map<PojoRawTypeIdentifier<?>, Set<T>> bySuperType,
-				PojoRawTypeModel<?> entityType, T value) {
-			entityType.descendingSuperTypes()
-					.map( PojoRawTypeModel::typeIdentifier )
-					.forEach( superTypeIdentifier -> bySuperType
-							.computeIfAbsent( superTypeIdentifier, ignored -> new LinkedHashSet<>() )
-							.add( value ) );
-		}
-
 		public void closeOnFailure() {
 			try ( Closer<RuntimeException> closer = new Closer<>() ) {
-				closer.pushAll( PojoIndexedTypeManager::close, indexed );
-				closer.pushAll( PojoContainedTypeManager::close, contained );
+				closer.pushAll( PojoIndexedTypeManager.Builder::closeOnFailure, indexed.values() );
+				closer.pushAll( PojoContainedTypeManager.Builder::closeOnFailure, contained.values() );
 			}
 		}
 
 		public PojoTypeManagerContainer build() {
 			return new PojoTypeManagerContainer( this );
 		}
+
 	}
 
 }

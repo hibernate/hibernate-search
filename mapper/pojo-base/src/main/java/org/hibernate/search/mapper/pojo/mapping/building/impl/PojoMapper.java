@@ -8,9 +8,8 @@ package org.hibernate.search.mapper.pojo.mapping.building.impl;
 
 import java.lang.invoke.MethodHandles;
 import java.util.Collection;
-import java.util.LinkedHashMap;
+import java.util.Collections;
 import java.util.LinkedHashSet;
-import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 
@@ -38,15 +37,14 @@ import org.hibernate.search.mapper.pojo.bridge.binding.impl.RoutingBindingContex
 import org.hibernate.search.mapper.pojo.bridge.mapping.impl.BridgeResolver;
 import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.RoutingBinder;
 import org.hibernate.search.mapper.pojo.extractor.impl.ContainerExtractorBinder;
-import org.hibernate.search.mapper.pojo.identity.impl.IdentifierMappingImplementor;
 import org.hibernate.search.mapper.pojo.identity.impl.IdentityMappingMode;
 import org.hibernate.search.mapper.pojo.identity.impl.PojoRootIdentityMappingCollector;
 import org.hibernate.search.mapper.pojo.logging.impl.Log;
-import org.hibernate.search.mapper.pojo.mapping.building.spi.PojoContainedTypeExtendedMappingCollector;
 import org.hibernate.search.mapper.pojo.mapping.building.spi.PojoIndexMappingCollectorTypeNode;
 import org.hibernate.search.mapper.pojo.mapping.building.spi.PojoMapperDelegate;
 import org.hibernate.search.mapper.pojo.mapping.building.spi.PojoTypeMetadataContributor;
-import org.hibernate.search.mapper.pojo.mapping.impl.PojoContainedTypeManager;
+import org.hibernate.search.mapper.pojo.mapping.impl.AbstractPojoTypeManager;
+import org.hibernate.search.mapper.pojo.mapping.impl.PojoIndexedTypeManager;
 import org.hibernate.search.mapper.pojo.mapping.impl.PojoMappingDelegateImpl;
 import org.hibernate.search.mapper.pojo.mapping.impl.PojoTypeManagerContainer;
 import org.hibernate.search.mapper.pojo.mapping.spi.PojoMappingDelegate;
@@ -59,6 +57,7 @@ import org.hibernate.search.mapper.pojo.model.impl.PojoModelTypeRootElement;
 import org.hibernate.search.mapper.pojo.model.path.impl.BoundPojoModelPath;
 import org.hibernate.search.mapper.pojo.model.spi.PojoBootstrapIntrospector;
 import org.hibernate.search.mapper.pojo.model.spi.PojoRawTypeModel;
+import org.hibernate.search.mapper.pojo.processing.building.impl.PojoIndexingProcessorOriginalTypeNodeBuilder;
 import org.hibernate.search.mapper.pojo.reporting.spi.PojoEventContexts;
 import org.hibernate.search.mapper.pojo.search.definition.impl.PojoSearchQueryElementRegistry;
 import org.hibernate.search.mapper.pojo.search.definition.impl.PojoSearchQueryElementRegistryBuilder;
@@ -90,9 +89,7 @@ public class PojoMapper<MPBS extends MappingPartialBuildState> implements Mapper
 	private final Set<PojoRawTypeModel<?>> entityTypes = new LinkedHashSet<>();
 	private final Set<PojoRawTypeModel<?>> indexedEntityTypes = new LinkedHashSet<>();
 	private final Set<PojoRawTypeModel<?>> initialMappedTypes = new LinkedHashSet<>();
-	// Use a LinkedHashMap for deterministic iteration
-	private final Map<PojoRawTypeModel<?>, PojoIndexedTypeManagerBuilder<?>> indexedTypeManagerBuilders =
-			new LinkedHashMap<>();
+	private final PojoTypeManagerContainer.Builder typeManagerContainerBuilder = PojoTypeManagerContainer.builder();
 	private PojoSearchQueryElementRegistry searchQueryElementRegistry;
 
 	private boolean closed = false;
@@ -138,7 +135,7 @@ public class PojoMapper<MPBS extends MappingPartialBuildState> implements Mapper
 		if ( !closed ) {
 			closed = true;
 			try ( Closer<RuntimeException> closer = new Closer<>() ) {
-				closer.pushAll( PojoIndexedTypeManagerBuilder::closeOnFailure, indexedTypeManagerBuilders.values() );
+				closer.push( PojoTypeManagerContainer.Builder::closeOnFailure, typeManagerContainerBuilder );
 				closer.push( PojoMapperDelegate::closeOnFailure, delegate );
 			}
 		}
@@ -248,20 +245,26 @@ public class PojoMapper<MPBS extends MappingPartialBuildState> implements Mapper
 					.applyBinder( routingBinderOptional.get() );
 		}
 
-		PojoIndexedTypeManagerBuilder<E> builder = new PojoIndexedTypeManagerBuilder<>( entityName, indexedEntityType,
-				mappingHelper, indexManagerBuilder,
-				delegate.createIndexedTypeExtendedMappingCollector( indexedEntityType, entityName ),
-				providedIdentifierBridge, routingBridge );
-
-		// Put the builder in the map before anything else, so it will be closed on error
-		indexedTypeManagerBuilders.put( indexedEntityType, builder );
-
-		collectIndexMapping( indexedEntityType, builder.asCollector() );
+		var identityMappingCollector = new PojoRootIdentityMappingCollector<>(
+				indexedEntityType,
+				mappingHelper,
+				Optional.of( indexManagerBuilder.rootBindingContext() ),
+				providedIdentifierBridge
+		);
+		var indexingProcessorBuilder = new PojoIndexingProcessorOriginalTypeNodeBuilder<>(
+				BoundPojoModelPath.root( indexedEntityType ),
+				mappingHelper, indexManagerBuilder.rootBindingContext(),
+				identityMappingCollector,
+				Collections.emptyList()
+		);
+		var extendedMappingCollector = delegate.createIndexedTypeExtendedMappingCollector( indexedEntityType, entityName );
+		typeManagerContainerBuilder.addIndexed( indexedEntityType, entityName, identityMappingCollector,
+				extendedMappingCollector, routingBridge, indexingProcessorBuilder, indexManagerBuilder );
+		collectIndexMapping( indexedEntityType, indexingProcessorBuilder );
 	}
 
 	@Override
 	public MPBS prepareBuild() throws MappingAbortedException {
-		PojoTypeManagerContainer.Builder typeManagerContainerBuilder = PojoTypeManagerContainer.builder();
 		PojoImplicitReindexingResolverBuildingHelper reindexingResolverBuildingHelper =
 				new PojoImplicitReindexingResolverBuildingHelper(
 						extractorBinder, typeAdditionalMetadataProvider, entityTypes,
@@ -287,43 +290,35 @@ public class PojoMapper<MPBS extends MappingPartialBuildState> implements Mapper
 				);
 			}
 
-			// Second step: build the processors and contribute to the reindexing resolvers
-			for ( PojoIndexedTypeManagerBuilder<?> pojoIndexedTypeManagerBuilder : indexedTypeManagerBuilders.values() ) {
-				pojoIndexedTypeManagerBuilder.preBuild( reindexingResolverBuildingHelper );
+			// Second step: build indexing processors, thereby collecting dependencies.
+			// This must happen for all types before anything else,
+			// because it has side-effects on other type managers (their reindexing resolvers in particular).
+			for ( PojoIndexedTypeManager.Builder<?> builder : typeManagerContainerBuilder.indexed.values() ) {
+				preBuildIndexingProcessorAndCollectDependencies( builder, reindexingResolverBuildingHelper );
 			}
 			if ( failureCollector.hasFailure() ) {
 				throw new MappingAbortedException();
 			}
 
-			// Third step: build the indexed type managers and their reindexing resolvers
-			for ( Map.Entry<PojoRawTypeModel<?>, PojoIndexedTypeManagerBuilder<?>> entry : indexedTypeManagerBuilders
-					.entrySet() ) {
-				PojoRawTypeModel<?> typeModel = entry.getKey();
-				PojoIndexedTypeManagerBuilder<?> pojoIndexedTypeManagerBuilder = entry.getValue();
+			// Third step: pre-build what can be for indexed types
+			for ( PojoIndexedTypeManager.Builder<?> builder : typeManagerContainerBuilder.indexed.values() ) {
 				try {
-					pojoIndexedTypeManagerBuilder.buildAndAddTo(
-							typeManagerContainerBuilder, reindexingResolverBuildingHelper
-					);
+					preBuildIndexed( builder, reindexingResolverBuildingHelper );
 				}
 				catch (RuntimeException e) {
-					failureCollector.withContext( PojoEventContexts.fromType( typeModel ) )
+					failureCollector.withContext( PojoEventContexts.fromType( builder.typeModel ) )
 							.add( e );
 				}
 			}
 
-			// Fourth step: build the non-indexed, contained type managers and their reindexing resolvers
+			// Fourth step: pre-build what can be for contained types
 			for ( PojoRawTypeModel<?> entityType : entityTypes ) {
-				// Ignore abstract classes: we create one manager per concrete subclass, which is enough
-				if ( !entityType.isAbstract() && !indexedTypeManagerBuilders.containsKey( entityType ) ) {
-					try {
-						buildAndAddContainedTypeManagerTo(
-								typeManagerContainerBuilder, reindexingResolverBuildingHelper, entityType
-						);
-					}
-					catch (RuntimeException e) {
-						failureCollector.withContext( PojoEventContexts.fromType( entityType ) )
-								.add( e );
-					}
+				try {
+					preBuildIfContained( entityType, reindexingResolverBuildingHelper );
+				}
+				catch (RuntimeException e) {
+					failureCollector.withContext( PojoEventContexts.fromType( entityType ) )
+							.add( e );
 				}
 			}
 
@@ -331,9 +326,12 @@ public class PojoMapper<MPBS extends MappingPartialBuildState> implements Mapper
 				throw new MappingAbortedException();
 			}
 
+			// Fifth step: build the type managers
+			var typeManagerContainer = typeManagerContainerBuilder.build();
+
 			mappingDelegate = new PojoMappingDelegateImpl(
 					threadPoolProvider, failureHandler, tenancyMode,
-					typeManagerContainerBuilder.build(),
+					typeManagerContainer,
 					searchQueryElementRegistry
 			);
 		}
@@ -367,52 +365,68 @@ public class PojoMapper<MPBS extends MappingPartialBuildState> implements Mapper
 		}
 	}
 
-	private <T> void buildAndAddContainedTypeManagerTo(
-			PojoTypeManagerContainer.Builder typeManagerContainerBuilder,
-			PojoImplicitReindexingResolverBuildingHelper reindexingResolverBuildingHelper,
-			PojoRawTypeModel<T> entityType) {
-		PojoEntityTypeAdditionalMetadata entityTypeMetadata = typeAdditionalMetadataProvider.get( entityType )
-				.getEntityTypeMetadata()
-				// This should not be possible since this method is only called for entity types (see caller)
-				.orElseThrow( () -> new AssertionFailure( "Missing metadata for entity type '" + entityType ) );
-		Optional<? extends PojoImplicitReindexingResolver<T>> reindexingResolverOptional =
-				reindexingResolverBuildingHelper.buildOptional( entityType );
-		if ( reindexingResolverOptional.isPresent() ) {
-			String entityName = entityTypeMetadata.getEntityName();
-
-			PojoImplicitReindexingResolver<T> reindexingResolver = reindexingResolverOptional.get();
-
-			PojoContainedTypeExtendedMappingCollector extendedMappingCollector = delegate
-					.createContainedTypeExtendedMappingCollector( entityType, entityName );
-
-			extendedMappingCollector.dirtyFilter( reindexingResolver.dirtySelfOrContainingFilter() );
-			extendedMappingCollector.dirtyContainingAssociationFilter(
-					reindexingResolver.associationInverseSideResolver().dirtyContainingAssociationFilter() );
-
-			PojoRootIdentityMappingCollector<T> identityMappingCollector = new PojoRootIdentityMappingCollector<>(
-					entityType, mappingHelper, Optional.empty(), providedIdentifierBridge
-			);
-			collectIndexMapping( entityType, identityMappingCollector.toMappingCollectorRootNode() );
-			IdentifierMappingImplementor<?, T> identifierMapping = identityMappingCollector
-					.buildAndContributeTo( extendedMappingCollector, containedEntityIdentityMappingMode );
-
-			var typeManagerBuilder = new PojoContainedTypeManager.Builder<>(
-					entityType, entityName,
-					reindexingResolverBuildingHelper.isSingleConcreteTypeInEntityHierarchy( entityType ),
-					identifierMapping,
-					reindexingResolverBuildingHelper.runtimePathsBuildingHelper( entityType ).pathOrdinals(),
-					reindexingResolver
-			);
-			var typeManager = typeManagerBuilder.build();
-			log.containedTypeManager( entityType, typeManager );
-			typeManagerContainerBuilder.addContained( entityType, typeManager );
-		}
-	}
-
 	private <T> void collectIndexMapping(PojoRawTypeModel<T> type, PojoIndexMappingCollectorTypeNode collector) {
 		for ( PojoTypeMetadataContributor contributor : contributorProvider.get( type ) ) {
 			contributor.contributeIndexMapping( collector );
 		}
+	}
+
+	private <E> void preBuildIndexingProcessorAndCollectDependencies(PojoIndexedTypeManager.Builder<E> builder,
+			PojoImplicitReindexingResolverBuildingHelper helper) {
+		var dependencyCollector = helper.createDependencyCollector( builder.typeModel );
+
+		if ( builder.routingBridge != null ) {
+			builder.routingBridge.contributeDependencies( dependencyCollector );
+		}
+
+		builder.preBuildIndexingProcessor( dependencyCollector );
+	}
+
+	private <E> void preBuildIndexed(PojoIndexedTypeManager.Builder<E> builder,
+			PojoImplicitReindexingResolverBuildingHelper helper) {
+		builder.preBuildIdentifierMapping( IdentityMappingMode.REQUIRED );
+		builder.reindexingResolver( helper.build( builder.typeModel ) );
+		preBuildOtherMetadata( builder, helper );
+		builder.preBuildIndexManager();
+	}
+
+	private <E> void preBuildOtherMetadata(AbstractPojoTypeManager.Builder<E> builder,
+			PojoImplicitReindexingResolverBuildingHelper helper) {
+		builder.preBuildOtherMetadata( helper.isSingleConcreteTypeInEntityHierarchy( builder.typeModel ),
+				helper.runtimePathsBuildingHelper( builder.typeModel ).pathOrdinals() );
+	}
+
+	private <E> void preBuildIfContained(PojoRawTypeModel<E> entityType,
+			PojoImplicitReindexingResolverBuildingHelper reindexingResolverBuildingHelper) {
+		// Ignore abstract classes: we create one manager per concrete subclass, which is enough.
+		if ( entityType.isAbstract()
+				// Ignore indexed types: those are already taken care of elsewhere.
+				|| typeManagerContainerBuilder.indexed.containsKey( entityType ) ) {
+			return;
+		}
+
+		PojoEntityTypeAdditionalMetadata entityTypeMetadata = typeAdditionalMetadataProvider.get( entityType )
+				.getEntityTypeMetadata()
+				// This should not be possible since this method is only called for entity types (see caller)
+				.orElseThrow( () -> new AssertionFailure( "Missing metadata for entity type '" + entityType ) );
+		Optional<? extends PojoImplicitReindexingResolver<E>> reindexingResolverOptional =
+				reindexingResolverBuildingHelper.buildOptional( entityType );
+		// Ignore types that are not actually contained.
+		if ( reindexingResolverOptional.isEmpty() ) {
+			return;
+		}
+
+		String entityName = entityTypeMetadata.getEntityName();
+		var extendedMappingCollector = delegate.createContainedTypeExtendedMappingCollector( entityType, entityName );
+		var identityMappingCollector = new PojoRootIdentityMappingCollector<>( entityType, mappingHelper,
+				Optional.empty(), providedIdentifierBridge );
+		var builder = typeManagerContainerBuilder.addContained( entityType, entityName, identityMappingCollector,
+				extendedMappingCollector );
+
+		collectIndexMapping( entityType, identityMappingCollector.toMappingCollectorRootNode() );
+		builder.preBuildIdentifierMapping( containedEntityIdentityMappingMode );
+		builder.reindexingResolver( reindexingResolverOptional.get() );
+		preBuildOtherMetadata( builder, reindexingResolverBuildingHelper );
 	}
 
 }

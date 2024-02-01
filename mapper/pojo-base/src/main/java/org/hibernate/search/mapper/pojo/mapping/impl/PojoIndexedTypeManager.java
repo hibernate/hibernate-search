@@ -18,24 +18,31 @@ import org.hibernate.search.engine.backend.work.execution.spi.IndexIndexer;
 import org.hibernate.search.engine.backend.work.execution.spi.IndexIndexingPlan;
 import org.hibernate.search.engine.backend.work.execution.spi.IndexWorkspace;
 import org.hibernate.search.engine.environment.bean.BeanHolder;
+import org.hibernate.search.engine.mapper.mapping.building.spi.MappedIndexManagerBuilder;
 import org.hibernate.search.engine.mapper.mapping.spi.MappedIndexManager;
 import org.hibernate.search.engine.mapper.scope.spi.MappedIndexScopeBuilder;
+import org.hibernate.search.mapper.pojo.automaticindexing.building.impl.PojoIndexingDependencyCollectorTypeNode;
 import org.hibernate.search.mapper.pojo.automaticindexing.impl.PojoImplicitReindexingResolver;
 import org.hibernate.search.mapper.pojo.bridge.RoutingBridge;
+import org.hibernate.search.mapper.pojo.bridge.binding.impl.BoundRoutingBridge;
 import org.hibernate.search.mapper.pojo.bridge.runtime.impl.DocumentRouter;
 import org.hibernate.search.mapper.pojo.bridge.runtime.impl.NoOpDocumentRouter;
 import org.hibernate.search.mapper.pojo.bridge.runtime.impl.RoutingBridgeDocumentRouter;
 import org.hibernate.search.mapper.pojo.identity.impl.IdentifierMappingImplementor;
+import org.hibernate.search.mapper.pojo.identity.impl.PojoRootIdentityMappingCollector;
+import org.hibernate.search.mapper.pojo.mapping.building.spi.PojoIndexedTypeExtendedMappingCollector;
+import org.hibernate.search.mapper.pojo.mapping.building.spi.PojoTypeExtendedMappingCollector;
 import org.hibernate.search.mapper.pojo.massindexing.impl.PojoMassIndexingIndexedTypeContext;
-import org.hibernate.search.mapper.pojo.model.path.impl.PojoPathOrdinals;
 import org.hibernate.search.mapper.pojo.model.path.spi.PojoPathFilter;
 import org.hibernate.search.mapper.pojo.model.spi.PojoRawTypeModel;
+import org.hibernate.search.mapper.pojo.processing.building.impl.PojoIndexingProcessorOriginalTypeNodeBuilder;
 import org.hibernate.search.mapper.pojo.processing.impl.PojoIndexingProcessor;
 import org.hibernate.search.mapper.pojo.processing.spi.PojoIndexingProcessorRootContext;
 import org.hibernate.search.mapper.pojo.scope.impl.PojoScopeIndexedTypeContext;
 import org.hibernate.search.mapper.pojo.work.impl.PojoDocumentContributor;
 import org.hibernate.search.mapper.pojo.work.impl.PojoWorkIndexedTypeContext;
 import org.hibernate.search.mapper.pojo.work.spi.PojoWorkSessionContext;
+import org.hibernate.search.util.common.AssertionFailure;
 import org.hibernate.search.util.common.impl.Closer;
 import org.hibernate.search.util.common.spi.ToStringTreeAppender;
 
@@ -50,10 +57,12 @@ public class PojoIndexedTypeManager<I, E> extends AbstractPojoTypeManager<I, E>
 	private final PojoIndexingProcessor<E> processor;
 	private final MappedIndexManager indexManager;
 
-	public PojoIndexedTypeManager(Builder<I, E> builder) {
-		super( builder );
-		this.documentRouter = builder.documentRouter;
-		this.processor = builder.processor;
+	public PojoIndexedTypeManager(Builder<E> builder, IdentifierMappingImplementor<I, E> identifierMapping) {
+		super( builder, identifierMapping );
+		this.documentRouter = builder.routingBridge != null
+				? new RoutingBridgeDocumentRouter<>( builder.routingBridge.getBridgeHolder() )
+				: NoOpDocumentRouter.INSTANCE;
+		this.processor = builder.indexingProcessor;
 		this.indexManager = builder.indexManager;
 	}
 
@@ -133,31 +142,67 @@ public class PojoIndexedTypeManager<I, E> extends AbstractPojoTypeManager<I, E>
 		indexManager.addTo( builder );
 	}
 
-	public static class Builder<I, E> extends AbstractBuilder<I, E> {
-		private final PojoIndexingProcessor<E> processor;
-		private final MappedIndexManager indexManager;
-		private DocumentRouter<? super E> documentRouter = NoOpDocumentRouter.INSTANCE;
+	public static class Builder<E> extends AbstractPojoTypeManager.Builder<E> {
 
-		public Builder(PojoRawTypeModel<E> typeModel, String entityName,
-				boolean singleConcreteTypeInEntityHierarchy,
-				IdentifierMappingImplementor<I, E> identifierMapping,
-				PojoPathOrdinals pathOrdinals,
-				PojoImplicitReindexingResolver<E> reindexingResolver,
-				PojoIndexingProcessor<E> processor,
-				MappedIndexManager indexManager) {
-			super( typeModel, entityName, singleConcreteTypeInEntityHierarchy, identifierMapping,
-					pathOrdinals, reindexingResolver );
-			this.processor = processor;
-			this.indexManager = indexManager;
-		}
+		public final PojoIndexedTypeExtendedMappingCollector extendedMappingCollector;
 
-		public void routingBridge(BeanHolder<? extends RoutingBridge<? super E>> bridgeHolder) {
-			documentRouter = new RoutingBridgeDocumentRouter<>( bridgeHolder );
+		public final BoundRoutingBridge<E> routingBridge;
+
+		private PojoIndexingProcessorOriginalTypeNodeBuilder<E> indexingProcessorBuilder;
+		private PojoIndexingProcessor<E> indexingProcessor;
+
+		private MappedIndexManagerBuilder indexManagerBuilder;
+		private MappedIndexManager indexManager;
+
+		Builder(PojoRawTypeModel<E> typeModel, String entityName,
+				PojoRootIdentityMappingCollector<E> identityMappingCollector,
+				PojoIndexedTypeExtendedMappingCollector extendedMappingCollector,
+				BoundRoutingBridge<E> routingBridge,
+				PojoIndexingProcessorOriginalTypeNodeBuilder<E> indexingProcessorBuilder,
+				MappedIndexManagerBuilder indexManagerBuilder) {
+			super( typeModel, entityName, identityMappingCollector );
+			this.extendedMappingCollector = extendedMappingCollector;
+			this.routingBridge = routingBridge;
+			this.indexManagerBuilder = indexManagerBuilder;
+			this.indexingProcessorBuilder = indexingProcessorBuilder;
 		}
 
 		@Override
-		public PojoIndexedTypeManager<I, E> build() {
-			return new PojoIndexedTypeManager<>( this );
+		protected void doCloseOnFailure(Closer<RuntimeException> closer) {
+			super.doCloseOnFailure( closer );
+			closer.push( RoutingBridge::close, routingBridge, BoundRoutingBridge::getBridge );
+			closer.push( BeanHolder::close, routingBridge, BoundRoutingBridge::getBridgeHolder );
+			closer.push( PojoIndexingProcessorOriginalTypeNodeBuilder::closeOnFailure, indexingProcessorBuilder );
+			closer.push( PojoIndexingProcessor::close, indexingProcessor );
+		}
+
+		@Override
+		protected PojoTypeExtendedMappingCollector extendedMappingCollector() {
+			return extendedMappingCollector;
+		}
+
+		public void preBuildIndexingProcessor(PojoIndexingDependencyCollectorTypeNode<E> dependencyCollector) {
+			if ( indexingProcessor != null ) {
+				throw new AssertionFailure( "Internal error - preBuildIndexingProcessor should be called only once" );
+			}
+			this.indexingProcessor = this.indexingProcessorBuilder.build( dependencyCollector )
+					.orElseGet( PojoIndexingProcessor::noOp );
+			this.indexingProcessorBuilder = null;
+		}
+
+		public void preBuildIndexManager() {
+			if ( this.indexManager != null ) {
+				throw new AssertionFailure( "Internal error - preBuildIndexManager should be called only once" );
+			}
+			this.indexManager = this.indexManagerBuilder.build();
+			this.indexManagerBuilder = null;
+			extendedMappingCollector.indexManager( indexManager );
+		}
+
+		@Override
+		public PojoIndexedTypeManager<?, E> build() {
+			closed = true;
+			return new PojoIndexedTypeManager<>( this, identifierMapping );
 		}
 	}
 }
