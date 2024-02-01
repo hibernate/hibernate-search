@@ -164,6 +164,29 @@ public class PojoMapper<MPBS extends MappingPartialBuildState> implements Mapper
 		}
 
 		log.detectedMappedTypes( entityTypes, indexedEntityTypes, initialMappedTypes );
+
+		// Register entity types and check for naming conflicts
+		// we want to have a map of all entities by their name so that we can later use this information
+		// when looking up supertypes by an entity name. E.g.
+		// NotIndexedEntity(name=A); IndexedEntity(name=B) extends NotIndexedEntity
+		// and let's say we want to do indexing plan filtering by "A" - this type is neither indexed nor contained
+		// but we still need to be able to identify it.
+		for ( PojoRawTypeModel<?> entityType : entityTypes ) {
+			try {
+				var metadata = typeAdditionalMetadataProvider.get( entityType )
+						.getEntityTypeMetadata()
+						// This should not be possible since this is only called for entity types
+						.orElseThrow( () -> new AssertionFailure(
+								"Missing metadata for entity type '" + entityType ) );
+				typeManagerContainerBuilder.addEntity(
+						entityType, metadata.getEntityName(), metadata.getSecondaryEntityName()
+				);
+			}
+			catch (RuntimeException e) {
+				failureCollector.withContext( EventContexts.fromType( entityType ) )
+						.add( e );
+			}
+		}
 	}
 
 	private void prepareEntityOrIndexedType(PojoRawTypeModel<?> rawTypeModel, BackendsInfo backendsInfo) {
@@ -273,24 +296,7 @@ public class PojoMapper<MPBS extends MappingPartialBuildState> implements Mapper
 
 		PojoMappingDelegate mappingDelegate;
 		try {
-			// First step: register entity types and check for naming conflicts
-			// we want to have a map of all entities by their name so that we can later use this information
-			// when looking up supertypes by an entity name. E.g.
-			// NotIndexedEntity(name=A); IndexedEntity(name=B) extends NotIndexedEntity
-			// and let's say we want to do indexing plan filtering by "A" - this type is neither indexed nor contained
-			// but we still need to be able to identify it.
-			for ( PojoRawTypeModel<?> entityType : entityTypes ) {
-				var metadata = typeAdditionalMetadataProvider.get( entityType )
-						.getEntityTypeMetadata()
-						// This should not be possible since this is only called for entity types
-						.orElseThrow( () -> new AssertionFailure(
-								"Missing metadata for entity type '" + entityType ) );
-				typeManagerContainerBuilder.addEntity(
-						entityType, metadata.getEntityName(), metadata.getSecondaryEntityName()
-				);
-			}
-
-			// Second step: build indexing processors, thereby collecting dependencies.
+			// Build indexing processors, thereby collecting dependencies.
 			// This must happen for all types before anything else,
 			// because it has side-effects on other type managers (their reindexing resolvers in particular).
 			for ( PojoIndexedTypeManager.Builder<?> builder : typeManagerContainerBuilder.indexed.values() ) {
@@ -300,7 +306,7 @@ public class PojoMapper<MPBS extends MappingPartialBuildState> implements Mapper
 				throw new MappingAbortedException();
 			}
 
-			// Third step: pre-build what can be for indexed types
+			// Pre-build what can be for indexed types
 			for ( PojoIndexedTypeManager.Builder<?> builder : typeManagerContainerBuilder.indexed.values() ) {
 				try {
 					preBuildIndexed( builder, reindexingResolverBuildingHelper );
@@ -311,7 +317,7 @@ public class PojoMapper<MPBS extends MappingPartialBuildState> implements Mapper
 				}
 			}
 
-			// Fourth step: pre-build what can be for contained types
+			// Pre-build what can be for contained types
 			for ( PojoRawTypeModel<?> entityType : entityTypes ) {
 				try {
 					preBuildIfContained( entityType, reindexingResolverBuildingHelper );
@@ -326,7 +332,7 @@ public class PojoMapper<MPBS extends MappingPartialBuildState> implements Mapper
 				throw new MappingAbortedException();
 			}
 
-			// Fifth step: build the type managers
+			// Build the type managers
 			var typeManagerContainer = typeManagerContainerBuilder.build();
 
 			mappingDelegate = new PojoMappingDelegateImpl(
