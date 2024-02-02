@@ -10,15 +10,16 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 import org.hibernate.AssertionFailure;
+import org.hibernate.engine.spi.SessionFactoryImplementor;
 import org.hibernate.mapping.PersistentClass;
 import org.hibernate.mapping.RootClass;
 import org.hibernate.metamodel.mapping.EntityMappingType;
 import org.hibernate.search.mapper.orm.common.impl.HibernateOrmUtils;
 import org.hibernate.search.mapper.orm.loading.spi.HibernateOrmEntityLoadingStrategy;
 import org.hibernate.search.mapper.orm.loading.spi.LoadingSessionContext;
-import org.hibernate.search.mapper.orm.loading.spi.LoadingTypeContext;
 import org.hibernate.search.mapper.orm.loading.spi.MutableEntityLoadingOptions;
 import org.hibernate.search.mapper.orm.search.loading.EntityLoadingCacheLookupStrategy;
+import org.hibernate.search.mapper.pojo.loading.spi.PojoLoadingTypeContext;
 import org.hibernate.search.mapper.pojo.loading.spi.PojoSelectionEntityLoader;
 
 public class HibernateOrmEntityIdEntityLoadingStrategy<E, I>
@@ -65,25 +66,11 @@ public class HibernateOrmEntityIdEntityLoadingStrategy<E, I>
 	}
 
 	@Override
-	public <E2> PojoSelectionEntityLoader<E2> createLoader(Set<LoadingTypeContext<? extends E2>> targetEntityTypeContexts,
-			LoadingSessionContext sessionContext, EntityLoadingCacheLookupStrategy cacheLookupStrategy,
-			MutableEntityLoadingOptions loadingOptions) {
-		if ( targetEntityTypeContexts.size() == 1 ) {
-			LoadingTypeContext<? extends E2> targetEntityTypeContext =
-					targetEntityTypeContexts.iterator().next();
-			/*
-			 * This cast is safe: the loader will only return instances of E2.
-			 * See PojoLoader.castToExactTypeOrNull() and its callers for more information,
-			 * in particular runtime checks handling edge cases.
-			 */
-			@SuppressWarnings("unchecked")
-			PojoSelectionEntityLoader<E2> result =
-					(PojoSelectionEntityLoader<E2>) doCreate( targetEntityTypeContext.entityMappingType(), sessionContext,
-							cacheLookupStrategy, loadingOptions );
-			return result;
-		}
-
-		EntityMappingType commonSuperType = toMostSpecificCommonEntitySuperType( targetEntityTypeContexts );
+	public PojoSelectionEntityLoader<E> createEntityLoader(
+			Set<? extends PojoLoadingTypeContext<? extends E>> targetEntityTypeContexts,
+			HibernateOrmSelectionLoadingContext loadingContext) {
+		var sessionFactory = loadingContext.sessionImplementor().getSessionFactory();
+		EntityMappingType commonSuperType = toMostSpecificCommonEntitySuperType( sessionFactory, targetEntityTypeContexts );
 		if ( commonSuperType == null ) {
 			throw invalidTypesException( targetEntityTypeContexts );
 		}
@@ -100,9 +87,9 @@ public class HibernateOrmEntityIdEntityLoadingStrategy<E, I>
 		 * See PojoLoader.castToExactTypeOrNull() and its callers for more information.
 		 */
 		@SuppressWarnings("unchecked")
-		PojoSelectionEntityLoader<E2> result =
-				(PojoSelectionEntityLoader<E2>) doCreate( commonSuperType, sessionContext, cacheLookupStrategy,
-						loadingOptions );
+		PojoSelectionEntityLoader<E> result =
+				(PojoSelectionEntityLoader<E>) doCreate( commonSuperType, loadingContext.sessionContext(),
+						loadingContext.cacheLookupStrategy(), loadingContext.loadingOptions() );
 
 		return result;
 	}
@@ -159,10 +146,12 @@ public class HibernateOrmEntityIdEntityLoadingStrategy<E, I>
 	}
 
 	private static EntityMappingType toMostSpecificCommonEntitySuperType(
-			Iterable<? extends LoadingTypeContext<?>> targetEntityTypeContexts) {
+			SessionFactoryImplementor sessionFactory,
+			Iterable<? extends PojoLoadingTypeContext<?>> targetEntityTypeContexts) {
 		EntityMappingType result = null;
-		for ( LoadingTypeContext<?> targetTypeContext : targetEntityTypeContexts ) {
-			EntityMappingType type = targetTypeContext.entityMappingType();
+		for ( PojoLoadingTypeContext<?> targetTypeContext : targetEntityTypeContexts ) {
+			EntityMappingType type = HibernateOrmUtils.entityMappingType( sessionFactory,
+					targetTypeContext.secondaryEntityName() );
 			if ( result == null ) {
 				result = type;
 			}
@@ -182,15 +171,14 @@ public class HibernateOrmEntityIdEntityLoadingStrategy<E, I>
 	}
 
 	private AssertionFailure invalidTypesException(
-			Set<? extends LoadingTypeContext<?>> targetEntityTypeContexts) {
+			Set<? extends PojoLoadingTypeContext<?>> targetEntityTypeContexts) {
 		return new AssertionFailure(
 				"Some types among the targeted entity types are not subclasses of the expected root entity type."
 						+ " Expected entity name: " + rootEntityName
 						+ " Targeted entity names: "
 						+ targetEntityTypeContexts.stream()
-								.map( LoadingTypeContext::entityMappingType )
-								.map( EntityMappingType::getEntityName )
-								.collect( Collectors.toList() )
+								.map( PojoLoadingTypeContext::secondaryEntityName )
+								.collect( Collectors.toUnmodifiableList() )
 		);
 	}
 

@@ -7,9 +7,11 @@
 package org.hibernate.search.mapper.pojo.standalone.work.impl;
 
 import org.hibernate.search.mapper.pojo.model.path.spi.PojoPathFilter;
-import org.hibernate.search.mapper.pojo.standalone.loading.impl.LoadingTypeContext;
+import org.hibernate.search.mapper.pojo.model.spi.PojoRawTypeIdentifier;
 
-public interface SearchIndexingPlanTypeContext<E> extends LoadingTypeContext<E> {
+public interface SearchIndexingPlanTypeContext<E> {
+
+	PojoRawTypeIdentifier<E> typeIdentifier();
 
 	PojoPathFilter dirtyFilter();
 

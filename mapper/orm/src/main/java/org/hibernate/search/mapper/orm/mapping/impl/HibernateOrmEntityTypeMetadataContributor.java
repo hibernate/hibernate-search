@@ -58,5 +58,6 @@ final class HibernateOrmEntityTypeMetadataContributor implements PojoTypeMetadat
 
 		node.pathDefinitionProvider( new HibernateOrmPathDefinitionProvider( typeModel, persistentClass ) );
 		node.entityIdPropertyName( identifierPropertyNameOptional.orElse( null ) );
+		node.loadingBinder( new HibernateOrmEntityLoadingBinder<>() );
 	}
 }

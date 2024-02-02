@@ -36,7 +36,7 @@ public interface PojoSelectionEntityLoader<E> {
 	 * but it means some timeouts in Hibernate Search will not work properly.
 	 * @return A list of entities, in the same order the references were given.
 	 * {@code null} is inserted when an object is not found or has an excluded types
-	 * (see {@link PojoSelectionLoadingStrategy#createLoader(Set)}).
+	 * (see {@link PojoSelectionLoadingStrategy#createEntityLoader(Set, PojoSelectionLoadingContext)}).
 	 */
 	List<E> loadBlocking(List<?> identifiers, Deadline deadline);
 

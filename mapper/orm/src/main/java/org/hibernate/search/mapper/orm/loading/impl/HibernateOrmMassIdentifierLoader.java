@@ -24,7 +24,7 @@ public final class HibernateOrmMassIdentifierLoader<E, I> implements PojoMassIde
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
-	private final HibernateOrmMassLoadingOptions options;
+	private final HibernateOrmMassLoadingContext options;
 	private final PojoMassIdentifierSink<I> sink;
 	private final SharedSessionContractImplementor session;
 	private final TransactionHelper transactionHelper;
@@ -33,7 +33,7 @@ public final class HibernateOrmMassIdentifierLoader<E, I> implements PojoMassIde
 	private final ScrollableResults<I> results;
 
 	public HibernateOrmMassIdentifierLoader(HibernateOrmQueryLoader<E, I> typeQueryLoader,
-			HibernateOrmMassLoadingOptions options,
+			HibernateOrmMassLoadingContext options,
 			PojoMassIdentifierSink<I> sink,
 			SharedSessionContractImplementor session) {
 		this.options = options;

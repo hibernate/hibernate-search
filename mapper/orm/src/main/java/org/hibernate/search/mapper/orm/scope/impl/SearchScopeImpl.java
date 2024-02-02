@@ -43,13 +43,13 @@ public class SearchScopeImpl<E> implements SearchScope<E>, BatchScopeContext<E> 
 	private final TenancyConfiguration tenancyConfiguration;
 	private final PojoScopeDelegate<org.hibernate.search.mapper.orm.common.EntityReference,
 			E,
-			HibernateOrmScopeIndexedTypeContext<? extends E>> delegate;
+			SearchIndexedEntity<? extends E>> delegate;
 
 	public SearchScopeImpl(HibernateOrmScopeMappingContext mappingContext,
 			TenancyConfiguration tenancyConfiguration,
 			PojoScopeDelegate<org.hibernate.search.mapper.orm.common.EntityReference,
 					E,
-					HibernateOrmScopeIndexedTypeContext<? extends E>> delegate) {
+					SearchIndexedEntity<? extends E>> delegate) {
 		this.mappingContext = mappingContext;
 		this.tenancyConfiguration = tenancyConfiguration;
 		this.delegate = delegate;
@@ -128,8 +128,7 @@ public class SearchScopeImpl<E> implements SearchScope<E>, BatchScopeContext<E> 
 			tenantIds = tenancyConfiguration.tenantIdsOrFail();
 		}
 
-		HibernateOrmMassIndexingContext massIndexingContext = new HibernateOrmMassIndexingContext( mappingContext,
-				mappingContext.typeContextProvider() );
+		HibernateOrmMassIndexingContext massIndexingContext = new HibernateOrmMassIndexingContext( mappingContext );
 
 		PojoMassIndexer massIndexerDelegate = delegate
 				.massIndexer( massIndexingContext, tenantIds );

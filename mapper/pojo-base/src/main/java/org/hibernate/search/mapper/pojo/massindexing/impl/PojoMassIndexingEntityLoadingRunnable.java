@@ -8,20 +8,20 @@ package org.hibernate.search.mapper.pojo.massindexing.impl;
 
 import java.lang.invoke.MethodHandles;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
-import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 
 import org.hibernate.search.engine.backend.work.execution.DocumentCommitStrategy;
 import org.hibernate.search.engine.backend.work.execution.DocumentRefreshStrategy;
 import org.hibernate.search.engine.backend.work.execution.OperationSubmitter;
 import org.hibernate.search.mapper.pojo.loading.spi.PojoMassEntityLoader;
+import org.hibernate.search.mapper.pojo.loading.spi.PojoMassEntityLoadingContext;
 import org.hibernate.search.mapper.pojo.loading.spi.PojoMassEntitySink;
+import org.hibernate.search.mapper.pojo.loading.spi.PojoMassLoadingContext;
+import org.hibernate.search.mapper.pojo.loading.spi.PojoMassLoadingStrategy;
 import org.hibernate.search.mapper.pojo.logging.impl.Log;
 import org.hibernate.search.mapper.pojo.massindexing.MassIndexingEnvironment;
-import org.hibernate.search.mapper.pojo.massindexing.spi.PojoMassIndexingEntityLoadingContext;
-import org.hibernate.search.mapper.pojo.massindexing.spi.PojoMassIndexingLoadingStrategy;
+import org.hibernate.search.mapper.pojo.massindexing.spi.PojoMassIndexingContext;
 import org.hibernate.search.mapper.pojo.massindexing.spi.PojoMassIndexingSessionContext;
 import org.hibernate.search.mapper.pojo.model.spi.PojoRawTypeIdentifier;
 import org.hibernate.search.mapper.pojo.work.spi.PojoIndexer;
@@ -34,18 +34,21 @@ public class PojoMassIndexingEntityLoadingRunnable<E, I>
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
+	private final PojoMassIndexingContext massIndexingContext;
 	private final PojoMassIndexingIndexedTypeGroup<E> typeGroup;
-	private final PojoMassIndexingLoadingStrategy<E, I> loadingStrategy;
+	private final PojoMassLoadingStrategy<E, I> loadingStrategy;
 	private final PojoProducerConsumerQueue<List<I>> identifierQueue;
 	private final String tenantId;
 	private final MassIndexingEnvironment.EntityLoadingContext entityLoadingContext;
 
 	protected PojoMassIndexingEntityLoadingRunnable(PojoMassIndexingNotifier notifier,
-			MassIndexingEnvironment environment, PojoMassIndexingIndexedTypeGroup<E> typeGroup,
-			PojoMassIndexingLoadingStrategy<E, I> loadingStrategy,
+			PojoMassIndexingContext massIndexingContext, MassIndexingEnvironment environment,
+			PojoMassIndexingIndexedTypeGroup<E> typeGroup,
+			PojoMassLoadingStrategy<E, I> loadingStrategy,
 			PojoProducerConsumerQueue<List<I>> identifierQueue,
 			String tenantId) {
 		super( notifier, environment );
+		this.massIndexingContext = massIndexingContext;
 		this.typeGroup = typeGroup;
 		this.loadingStrategy = loadingStrategy;
 		this.identifierQueue = identifierQueue;
@@ -58,7 +61,8 @@ public class PojoMassIndexingEntityLoadingRunnable<E, I>
 	protected void runWithFailureHandler() throws InterruptedException {
 		log.trace( "started" );
 		LoadingContext context = new LoadingContext();
-		try ( PojoMassEntityLoader<I> entityLoader = loadingStrategy.createEntityLoader( context ) ) {
+		try ( PojoMassEntityLoader<I> entityLoader =
+				loadingStrategy.createEntityLoader( typeGroup.includedTypes(), context ) ) {
 			List<I> idList;
 			do {
 				idList = identifierQueue.take();
@@ -104,7 +108,7 @@ public class PojoMassIndexingEntityLoadingRunnable<E, I>
 		return log.massIndexingLoadingAndExtractingEntityData( typeGroup.notifiedGroupName() );
 	}
 
-	private final class LoadingContext implements PojoMassIndexingEntityLoadingContext<E> {
+	private final class LoadingContext implements PojoMassEntityLoadingContext<E> {
 		// The traditional implementation was equivalent to using 1.
 		// Theoretically we could raise this above 2, but it would only help
 		// if loading performance is inconsistent, so as to provide a "buffer"
@@ -124,8 +128,8 @@ public class PojoMassIndexingEntityLoadingRunnable<E, I>
 		}
 
 		@Override
-		public Set<PojoRawTypeIdentifier<? extends E>> includedTypes() {
-			return Collections.unmodifiableSet( typeGroup.includedTypesIdentifiers() );
+		public PojoMassLoadingContext parent() {
+			return massIndexingContext;
 		}
 
 		@Override

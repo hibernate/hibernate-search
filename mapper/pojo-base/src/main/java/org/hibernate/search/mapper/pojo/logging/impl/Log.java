@@ -975,4 +975,27 @@ public interface Log extends BasicLogger {
 			@FormatWith(CommaSeparatedClassesFormatter.class) Collection<Class<?>> invalidClasses,
 			@FormatWith(CommaSeparatedClassesFormatter.class) Collection<Class<?>> validClasses);
 
+	@Message(id = ID_OFFSET + 154,
+			value = "No matching indexed entity type for name '%1$s'."
+					+ " Either this is not the name of an entity type, or the entity type is not indexed in Hibernate Search."
+					+ " Valid names for indexed entity types are: %2$s")
+	SearchException unknownEntityNameForIndexedEntityType(String invalidName, Collection<String> validNames);
+
+	@Message(id = ID_OFFSET + 155,
+			value = "Cannot load entities of type '%s': no selection loading strategy registered for this type.")
+	SearchException noSelectionLoadingStrategy(String entityName);
+
+	@Message(id = ID_OFFSET + 156,
+			value = "Cannot load entities of type '%s': no mass loading strategy registered for this type.")
+	SearchException noMassLoadingStrategy(String entityName);
+
+	@Message(id = ID_OFFSET + 157,
+			value = "Type mismatch when applying loading binder to type '%1$s': the binder expects the entity type to extend '%2$s',"
+					+ " but entity type '%1$s' does not."
+	)
+	SearchException loadingConfigurationTypeMismatch(
+			@FormatWith(MappableTypeModelFormatter.class) PojoRawTypeModel<?> entityType,
+			@FormatWith(ClassFormatter.class) Class<?> expectedSuperType);
+
+
 }

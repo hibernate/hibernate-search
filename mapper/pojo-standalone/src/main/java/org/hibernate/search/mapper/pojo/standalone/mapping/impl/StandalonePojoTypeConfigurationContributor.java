@@ -6,32 +6,27 @@
  */
 package org.hibernate.search.mapper.pojo.standalone.mapping.impl;
 
+import java.util.Collection;
+
 import org.hibernate.search.engine.mapper.mapping.building.spi.MappingBuildContext;
 import org.hibernate.search.engine.mapper.mapping.building.spi.MappingConfigurationCollector;
 import org.hibernate.search.mapper.pojo.mapping.building.spi.PojoTypeMetadataContributor;
 import org.hibernate.search.mapper.pojo.mapping.spi.PojoMappingConfigurationContext;
 import org.hibernate.search.mapper.pojo.mapping.spi.PojoMappingConfigurationContributor;
-import org.hibernate.search.mapper.pojo.model.spi.PojoRawTypeModel;
-import org.hibernate.search.mapper.pojo.standalone.mapping.metadata.impl.StandalonePojoEntityTypeMetadataProvider;
 
 class StandalonePojoTypeConfigurationContributor implements PojoMappingConfigurationContributor {
 
-	private final StandalonePojoEntityTypeMetadataProvider entityTypeMetadataProvider;
+	private final Collection<StandalonePojoEntityTypeMetadata<?>> entityTypeMetadata;
 
-	public StandalonePojoTypeConfigurationContributor(
-			StandalonePojoEntityTypeMetadataProvider entityTypeMetadataProvider) {
-		this.entityTypeMetadataProvider = entityTypeMetadataProvider;
+	public StandalonePojoTypeConfigurationContributor(Collection<StandalonePojoEntityTypeMetadata<?>> entityTypeMetadata) {
+		this.entityTypeMetadata = entityTypeMetadata;
 	}
 
 	@Override
 	public void configure(MappingBuildContext buildContext, PojoMappingConfigurationContext configurationContext,
 			MappingConfigurationCollector<PojoTypeMetadataContributor> configurationCollector) {
-		for ( PojoRawTypeModel<?> type : entityTypeMetadataProvider.allEntityTypes() ) {
-			configurationCollector.collectContributor(
-					type,
-					new StandalonePojoEntityTypeContributor(
-							type.typeIdentifier(), entityTypeMetadataProvider.get( type ).name )
-			);
+		for ( var metadata : entityTypeMetadata ) {
+			configurationCollector.collectContributor( metadata.type, metadata );
 		}
 	}
 }

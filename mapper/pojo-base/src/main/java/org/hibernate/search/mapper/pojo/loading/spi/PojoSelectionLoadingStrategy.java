@@ -32,9 +32,12 @@ public interface PojoSelectionLoadingStrategy<E> {
 
 	/**
 	 * @param expectedTypes The expected types of loaded objects.
-	 * The types are guaranteed to be {@link PojoSelectionLoadingContext#loadingStrategy(PojoLoadingTypeContext) assigned this strategy}.
+	 * The types are guaranteed to be {@link PojoLoadingTypeContext#selectionLoadingStrategy() assigned this strategy}.
+	 * @param context
+	 *
 	 * @return A loader.
 	 */
-	PojoSelectionEntityLoader<E> createLoader(Set<? extends PojoLoadingTypeContext<? extends E>> expectedTypes);
+	PojoSelectionEntityLoader<E> createEntityLoader(Set<? extends PojoLoadingTypeContext<? extends E>> expectedTypes,
+			PojoSelectionLoadingContext context);
 
 }

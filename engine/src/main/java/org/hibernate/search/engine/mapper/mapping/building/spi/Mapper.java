@@ -6,8 +6,6 @@
  */
 package org.hibernate.search.engine.mapper.mapping.building.spi;
 
-import org.hibernate.search.engine.reporting.spi.ContextualFailureCollector;
-
 /**
  * @param <MPBS> The Java type of the partial build state of the produced mapping.
  */
@@ -48,8 +46,7 @@ public interface Mapper<MPBS extends MappingPartialBuildState> {
 	 * Called exactly once just after {@link #mapTypes(MappedIndexManagerFactory)}.
 	 *
 	 * @return The partially-built mapping.
-	 * @throws MappingAbortedException When aborting the mapping due to
-	 * {@link ContextualFailureCollector#add(Throwable) collected} failures.
+	 * @throws MappingAbortedException If something went wrong when preparing the mapping.
 	 */
 	MPBS prepareBuild() throws MappingAbortedException;
 

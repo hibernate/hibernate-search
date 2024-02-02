@@ -58,10 +58,6 @@ public interface Log extends BasicLogger {
 			value = "Invalid String value for the bean provider: '%s'. The bean provider must be an instance of '%s'.")
 	SearchException invalidStringForBeanProvider(String value, Class<BeanProvider> expectedType);
 
-	@Message(id = ID_OFFSET + 12,
-			value = "Unable to set up entity loading for type '%s', because no entity loading strategy was registered for this type.")
-	SearchException entityLoadingStrategyNotRegistered(PojoRawTypeIdentifier<?> typeIdentifier);
-
 	@Message(id = ID_OFFSET + 14, value = "Unable to access search session: %1$s")
 	SearchException hibernateSessionAccessError(String causeMessage);
 

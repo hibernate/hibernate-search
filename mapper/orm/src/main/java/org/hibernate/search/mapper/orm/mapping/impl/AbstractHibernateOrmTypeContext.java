@@ -6,20 +6,17 @@
  */
 package org.hibernate.search.mapper.orm.mapping.impl;
 
-import java.util.List;
-import java.util.stream.Collectors;
-
 import org.hibernate.engine.spi.SessionFactoryImplementor;
 import org.hibernate.mapping.PersistentClass;
 import org.hibernate.metamodel.MappingMetamodel;
 import org.hibernate.metamodel.mapping.EntityMappingType;
 import org.hibernate.search.mapper.orm.event.impl.HibernateOrmListenerTypeContext;
-import org.hibernate.search.mapper.orm.loading.impl.HibernateOrmEntityIdEntityLoadingStrategy;
-import org.hibernate.search.mapper.orm.loading.impl.HibernateOrmNonEntityIdPropertyEntityLoadingStrategy;
 import org.hibernate.search.mapper.orm.loading.spi.HibernateOrmEntityLoadingStrategy;
 import org.hibernate.search.mapper.orm.loading.spi.LoadingTypeContext;
 import org.hibernate.search.mapper.orm.model.impl.DocumentIdSourceProperty;
 import org.hibernate.search.mapper.orm.session.impl.HibernateOrmSessionTypeContext;
+import org.hibernate.search.mapper.pojo.loading.definition.spi.PojoEntityLoadingBindingContext;
+import org.hibernate.search.mapper.pojo.loading.spi.PojoLoadingTypeContext;
 import org.hibernate.search.mapper.pojo.mapping.building.spi.PojoTypeExtendedMappingCollector;
 import org.hibernate.search.mapper.pojo.model.path.spi.PojoPathFilter;
 import org.hibernate.search.mapper.pojo.model.spi.PojoPropertyModel;
@@ -32,43 +29,24 @@ abstract class AbstractHibernateOrmTypeContext<E>
 		LoadingTypeContext<E> {
 
 	private final PojoRawTypeIdentifier<E> typeIdentifier;
+	private final PojoLoadingTypeContext<E> delegate;
 	private final String jpaEntityName;
 	private final EntityMappingType entityMappingType;
 	private final boolean documentIdIsEntityId;
 	private final HibernateOrmEntityLoadingStrategy<? super E, ?> loadingStrategy;
 	private final PojoPathFilter dirtyFilter;
 	private final PojoPathFilter dirtyContainingAssociationFilter;
-	private final List<PojoRawTypeIdentifier<? super E>> ascendingSuperTypes;
 
-	// Casts are safe because the loading strategy will target either "E" or "? super E", by contract
-	@SuppressWarnings("unchecked")
-	AbstractHibernateOrmTypeContext(AbstractBuilder<E> builder, SessionFactoryImplementor sessionFactory) {
+	AbstractHibernateOrmTypeContext(Builder<E> builder, PojoLoadingTypeContext<E> delegate,
+			SessionFactoryImplementor sessionFactory) {
 		this.typeIdentifier = builder.typeIdentifier;
+		this.delegate = delegate;
 		this.jpaEntityName = builder.jpaEntityName;
 		MappingMetamodel metamodel = sessionFactory.getMappingMetamodel();
 		this.entityMappingType = metamodel.getEntityDescriptor( builder.hibernateOrmEntityName );
-		this.ascendingSuperTypes = builder.ascendingSuperTypes;
-		if ( builder.documentIdSourceProperty != null ) {
-			var idProperty = builder.persistentClass.getIdentifierProperty();
-			if ( idProperty != null && builder.documentIdSourceProperty.name.equals( idProperty.getName() ) ) {
-				documentIdIsEntityId = true;
-				loadingStrategy = (HibernateOrmEntityLoadingStrategy<? super E, ?>) HibernateOrmEntityIdEntityLoadingStrategy
-						.create( builder.persistentClass );
-			}
-			else {
-				// The entity ID is not the property used to generate the document ID
-				// We need to use a criteria query to load entities from the document IDs
-				documentIdIsEntityId = false;
-				loadingStrategy = (HibernateOrmEntityLoadingStrategy<? super E,
-						?>) HibernateOrmNonEntityIdPropertyEntityLoadingStrategy.create( builder.persistentClass,
-								builder.documentIdSourceProperty );
-			}
-		}
-		else {
-			// Can only happen for contained types, which may not be loadable.
-			documentIdIsEntityId = false;
-			loadingStrategy = null;
-		}
+		this.documentIdIsEntityId = builder.documentIdSourceProperty != null
+				&& builder.documentIdSourceProperty.name.equals( entityMappingType.getIdentifierMapping().getAttributeName() );
+		this.loadingStrategy = builder.loadingStrategy;
 		this.dirtyFilter = builder.dirtyFilter;
 		this.dirtyContainingAssociationFilter = builder.dirtyContainingAssociationFilter;
 	}
@@ -81,6 +59,11 @@ abstract class AbstractHibernateOrmTypeContext<E>
 	@Override
 	public PojoRawTypeIdentifier<E> typeIdentifier() {
 		return typeIdentifier;
+	}
+
+	@Override
+	public PojoLoadingTypeContext<E> delegate() {
+		return delegate;
 	}
 
 	@Override
@@ -100,11 +83,6 @@ abstract class AbstractHibernateOrmTypeContext<E>
 	@Override
 	public HibernateOrmEntityLoadingStrategy<? super E, ?> loadingStrategy() {
 		return loadingStrategy;
-	}
-
-	@Override
-	public List<PojoRawTypeIdentifier<? super E>> ascendingSuperTypes() {
-		return ascendingSuperTypes;
 	}
 
 	@Override
@@ -129,24 +107,21 @@ abstract class AbstractHibernateOrmTypeContext<E>
 		return dirtyContainingAssociationFilter;
 	}
 
-	abstract static class AbstractBuilder<E> implements PojoTypeExtendedMappingCollector {
-		private final PojoRawTypeIdentifier<E> typeIdentifier;
+	public abstract static class Builder<E> implements PojoTypeExtendedMappingCollector {
+		public final PojoRawTypeIdentifier<E> typeIdentifier;
 		private final PersistentClass persistentClass;
 		private final String jpaEntityName;
 		private final String hibernateOrmEntityName;
 		private DocumentIdSourceProperty<?> documentIdSourceProperty;
 		private PojoPathFilter dirtyFilter;
 		private PojoPathFilter dirtyContainingAssociationFilter;
-		private final List<PojoRawTypeIdentifier<? super E>> ascendingSuperTypes;
+		private HibernateOrmEntityLoadingStrategy<? super E, ?> loadingStrategy;
 
-		AbstractBuilder(PojoRawTypeModel<E> typeModel, PersistentClass persistentClass) {
+		Builder(PojoRawTypeModel<E> typeModel, PersistentClass persistentClass) {
 			this.typeIdentifier = typeModel.typeIdentifier();
 			this.persistentClass = persistentClass;
 			this.jpaEntityName = persistentClass.getJpaEntityName();
 			this.hibernateOrmEntityName = persistentClass.getEntityName();
-			this.ascendingSuperTypes = typeModel.ascendingSuperTypes()
-					.map( PojoRawTypeModel::typeIdentifier )
-					.collect( Collectors.toList() );
 		}
 
 		@Override
@@ -162,6 +137,17 @@ abstract class AbstractHibernateOrmTypeContext<E>
 		@Override
 		public void dirtyContainingAssociationFilter(PojoPathFilter filter) {
 			this.dirtyContainingAssociationFilter = filter;
+		}
+
+		@Override
+		public void applyLoadingBinder(Object binder, PojoEntityLoadingBindingContext context) {
+			@SuppressWarnings("unchecked") // We make sure of that when contributing the loading binder, see org.hibernate.search.mapper.pojo.standalone.mapping.StandalonePojoMappingConfigurationContext.addEntityType(java.lang.Class<E>, org.hibernate.search.mapper.pojo.standalone.mapping.metadata.EntityConfigurer<E>)
+			var castBinder = (HibernateOrmEntityLoadingBinder<E>) binder;
+			this.loadingStrategy = castBinder.createLoadingStrategy( persistentClass, documentIdSourceProperty );
+			if ( this.loadingStrategy != null ) {
+				context.selectionLoadingStrategy( typeIdentifier.javaClass(), this.loadingStrategy );
+				context.massLoadingStrategy( typeIdentifier.javaClass(), this.loadingStrategy );
+			}
 		}
 	}
 

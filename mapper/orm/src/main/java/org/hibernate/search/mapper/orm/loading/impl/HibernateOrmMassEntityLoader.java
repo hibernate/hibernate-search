@@ -21,13 +21,13 @@ public final class HibernateOrmMassEntityLoader<E, I> implements PojoMassEntityL
 	private static final String ID_PARAMETER_NAME = "ids";
 
 	private final HibernateOrmQueryLoader<E, ?> typeQueryLoader;
-	private final HibernateOrmMassLoadingOptions options;
+	private final HibernateOrmMassLoadingContext options;
 	private final PojoMassEntitySink<E> sink;
 	private final SessionImplementor session;
 	private final TransactionHelper transactionHelper;
 
 	public HibernateOrmMassEntityLoader(HibernateOrmQueryLoader<E, ?> typeGroupLoader,
-			HibernateOrmMassLoadingOptions options,
+			HibernateOrmMassLoadingContext options,
 			PojoMassEntitySink<E> sink,
 			SessionImplementor session) {
 		this.typeQueryLoader = typeGroupLoader;

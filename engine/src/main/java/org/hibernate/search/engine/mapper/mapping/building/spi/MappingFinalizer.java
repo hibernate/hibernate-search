@@ -22,7 +22,10 @@ public interface MappingFinalizer<PBM, M> {
 	 * @param context The context, including configuration properties.
 	 * @param partiallyBuiltMapping The partially built mapping.
 	 * @return The fully-built mapping.
+	 * @throws RuntimeException If something went wrong when finalizing the mapping.
+	 * @throws MappingAbortedException If something went wrong when finalizing the mapping.
 	 */
-	MappingImplementor<M> finalizeMapping(MappingFinalizationContext context, PBM partiallyBuiltMapping);
+	MappingImplementor<M> finalizeMapping(MappingFinalizationContext context, PBM partiallyBuiltMapping)
+			throws MappingAbortedException;
 
 }

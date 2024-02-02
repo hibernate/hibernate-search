@@ -51,7 +51,7 @@ final class PojoSingleLoaderLoadingPlan<T> implements PojoLoadingPlan<T> {
 			return;
 		}
 		try {
-			PojoSelectionEntityLoader<T> loader = loadingStrategy.createLoader( expectedTypes );
+			PojoSelectionEntityLoader<T> loader = loadingStrategy.createEntityLoader( expectedTypes, context );
 			singleConcreteTypeInEntityHierarchy = expectedTypes.size() == 1
 					&& expectedTypes.iterator().next().isSingleConcreteTypeInEntityHierarchy();
 			loaded = loader.loadBlocking( identifiers, deadline );
@@ -106,7 +106,7 @@ final class PojoSingleLoaderLoadingPlan<T> implements PojoLoadingPlan<T> {
 	 *
 	 * @param <T2> The expected type for the entity instance.
 	 * @param expectedType The expected type for the entity instance. Must be one of the types passed
-	 * to {@link PojoSelectionLoadingStrategy#createLoader(Set)}
+	 * to {@link PojoSelectionLoadingStrategy#createEntityLoader(Set, PojoSelectionLoadingContext)}
 	 * when creating this loader.
 	 * @param loadedObject A loaded object, i.e. an element from {@link #loaded}.
 	 * @return The given {@code loadedObject} if is an instance of {@code expectedType} exactly (not an instance of a subtype).

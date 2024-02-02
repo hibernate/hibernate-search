@@ -251,12 +251,6 @@ public interface Log extends BasicLogger {
 					+ " See the reference documentation for more information.")
 	SearchException cannotSetFetchSize();
 
-	@Message(id = ID_OFFSET + 58, value = "No matching entity type for type identifier '%1$s'."
-			+ " Either this type is not an entity type, or the entity type is not mapped in Hibernate Search."
-			+ " Valid identifiers for mapped entity types are: %2$s")
-	SearchException unknownTypeIdentifierForMappedEntityType(PojoRawTypeIdentifier<?> invalidTypeId,
-			Collection<PojoRawTypeIdentifier<?>> validTypeIds);
-
 	@Message(id = ID_OFFSET + 59, value = "No matching indexed entity type for type identifier '%1$s'."
 			+ " Either this type is not an entity type, or the entity type is not indexed in Hibernate Search."
 			+ " Valid identifiers for indexed entity types are: %2$s")
@@ -273,11 +267,6 @@ public interface Log extends BasicLogger {
 			+ " Either this is not the name of an entity type, or the entity type is not mapped in Hibernate Search."
 			+ " Valid names for mapped entity types are: %2$s")
 	SearchException unknownEntityNameForMappedEntityType(String invalidName, Collection<String> validNames);
-
-	@Message(id = ID_OFFSET + 63, value = "No matching indexed entity type for name '%1$s'."
-			+ " Either this is not the JPA name of an entity type, or the entity type is not indexed in Hibernate Search."
-			+ " Valid JPA names for indexed entities are: %2$s")
-	SearchException unknownJpaEntityNameForIndexedEntityType(String invalidName, Collection<String> validNames);
 
 	@Message(id = ID_OFFSET + 64, value = "No matching entity type for name '%1$s'."
 			+ " Either this is not the Hibernate ORM name of an entity type, or the entity type is not mapped in Hibernate Search."

@@ -12,15 +12,14 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 import org.hibernate.mapping.PersistentClass;
-import org.hibernate.metamodel.mapping.EntityMappingType;
 import org.hibernate.search.mapper.orm.common.impl.HibernateOrmUtils;
 import org.hibernate.search.mapper.orm.loading.spi.HibernateOrmEntityLoadingStrategy;
 import org.hibernate.search.mapper.orm.loading.spi.LoadingSessionContext;
-import org.hibernate.search.mapper.orm.loading.spi.LoadingTypeContext;
 import org.hibernate.search.mapper.orm.loading.spi.MutableEntityLoadingOptions;
 import org.hibernate.search.mapper.orm.logging.impl.Log;
 import org.hibernate.search.mapper.orm.model.impl.DocumentIdSourceProperty;
 import org.hibernate.search.mapper.orm.search.loading.EntityLoadingCacheLookupStrategy;
+import org.hibernate.search.mapper.pojo.loading.spi.PojoLoadingTypeContext;
 import org.hibernate.search.mapper.pojo.loading.spi.PojoSelectionEntityLoader;
 import org.hibernate.search.util.common.AssertionFailure;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
@@ -75,7 +74,7 @@ public class HibernateOrmNonEntityIdPropertyEntityLoadingStrategy<E, I>
 		HibernateOrmNonEntityIdPropertyEntityLoadingStrategy<?, ?> other =
 				(HibernateOrmNonEntityIdPropertyEntityLoadingStrategy<?, ?>) obj;
 		// If the entity type or document ID property is different,
-		// the factories work in separate ID spaces and should be used separately.
+		// the factories may be working with separate ID spaces and should be used separately.
 		return entityName.equals( other.entityName )
 				&& documentIdSourcePropertyName.equals( other.documentIdSourcePropertyName )
 				&& documentIdSourceHandle.equals( other.documentIdSourceHandle );
@@ -87,32 +86,37 @@ public class HibernateOrmNonEntityIdPropertyEntityLoadingStrategy<E, I>
 	}
 
 	@Override
-	public <E2> PojoSelectionEntityLoader<E2> createLoader(Set<LoadingTypeContext<? extends E2>> targetEntityTypeContexts,
-			LoadingSessionContext sessionContext,
-			EntityLoadingCacheLookupStrategy cacheLookupStrategy, MutableEntityLoadingOptions loadingOptions) {
+	public PojoSelectionEntityLoader<E> createEntityLoader(
+			Set<? extends PojoLoadingTypeContext<? extends E>> targetEntityTypeContexts,
+			HibernateOrmSelectionLoadingContext loadingContext) {
 		if ( targetEntityTypeContexts.size() != 1 ) {
 			throw multipleTypesException( targetEntityTypeContexts );
 		}
 
-		return doCreate( targetEntityTypeContexts.iterator().next(), sessionContext, cacheLookupStrategy, loadingOptions );
+		return doCreate( targetEntityTypeContexts.iterator().next(), loadingContext.sessionContext(),
+				loadingContext.cacheLookupStrategy(), loadingContext.loadingOptions() );
 	}
 
-	private <E2> PojoSelectionEntityLoader<E2> doCreate(LoadingTypeContext<?> targetEntityTypeContext,
+	private PojoSelectionEntityLoader<E> doCreate(PojoLoadingTypeContext<? extends E> targetEntityTypeContext,
 			LoadingSessionContext sessionContext,
 			EntityLoadingCacheLookupStrategy cacheLookupStrategy,
 			MutableEntityLoadingOptions loadingOptions) {
-		if ( !entityName.equals( targetEntityTypeContext.entityMappingType().getEntityName() ) ) {
-			throw invalidTypeException( targetEntityTypeContext.entityMappingType() );
+		if ( !entityName.equals( targetEntityTypeContext.secondaryEntityName() ) ) {
+			throw invalidTypeException( targetEntityTypeContext );
 		}
+
+		var sessionFactory = sessionContext.session().getSessionFactory();
+		var entityMapping = HibernateOrmUtils.entityMappingType( sessionFactory,
+				targetEntityTypeContext.secondaryEntityName() );
 
 		/*
 		 * We checked just above that "entityMappingType" is equal to "targetEntityTypeContext.entityMappingType()",
-		 * so this loader will actually return entities of type E2.
+		 * so this loader will actually return entities of type E.
 		 */
 		@SuppressWarnings("unchecked")
-		PojoSelectionEntityLoader<E2> result = new HibernateOrmSelectionEntityByNonIdPropertyLoader<>(
-				targetEntityTypeContext.entityMappingType(), (LoadingTypeContext<E2>) targetEntityTypeContext,
-				(TypeQueryFactory<E2, ?>) queryFactory,
+		PojoSelectionEntityLoader<E> result = new HibernateOrmSelectionEntityByNonIdPropertyLoader<>(
+				entityMapping, (PojoLoadingTypeContext<E>) targetEntityTypeContext,
+				queryFactory,
 				documentIdSourcePropertyName, documentIdSourceHandle,
 				sessionContext, loadingOptions
 		);
@@ -126,30 +130,29 @@ public class HibernateOrmNonEntityIdPropertyEntityLoadingStrategy<E, I>
 			 * Let's log something, at least.
 			 */
 			log.skippingPreliminaryCacheLookupsForNonEntityIdEntityLoader(
-					targetEntityTypeContext.jpaEntityName(), cacheLookupStrategy
+					targetEntityTypeContext.entityName(), cacheLookupStrategy
 			);
 		}
 
 		return result;
 	}
 
-	private AssertionFailure invalidTypeException(EntityMappingType otherEntityMappingType) {
+	private AssertionFailure invalidTypeException(PojoLoadingTypeContext<?> otherType) {
 		throw new AssertionFailure(
 				"Attempt to use a criteria-based entity loader with an unexpected target entity type."
 						+ " Expected entity name: " + entityName
-						+ " Targeted entity name: " + otherEntityMappingType.getEntityName()
+						+ " Targeted entity name: " + otherType.secondaryEntityName()
 		);
 	}
 
-	private AssertionFailure multipleTypesException(Set<? extends LoadingTypeContext<?>> targetEntityTypeContexts) {
+	private AssertionFailure multipleTypesException(Set<? extends PojoLoadingTypeContext<?>> targetEntityTypeContexts) {
 		return new AssertionFailure(
 				"Attempt to use a criteria-based entity loader with multiple target entity types."
 						+ " Expected entity name: " + entityName
 						+ " Targeted entity names: "
 						+ targetEntityTypeContexts.stream()
-								.map( LoadingTypeContext::entityMappingType )
-								.map( EntityMappingType::getEntityName )
-								.collect( Collectors.toList() )
+								.map( PojoLoadingTypeContext::secondaryEntityName )
+								.collect( Collectors.toUnmodifiableList() )
 		);
 	}
 }

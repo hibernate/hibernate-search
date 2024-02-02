@@ -15,14 +15,17 @@ public class PojoEntityTypeAdditionalMetadata {
 	private final String secondaryEntityName;
 	private final PojoPathDefinitionProvider pathDefinitionProvider;
 	private final Optional<String> entityIdPropertyName;
+	private final Object loadingBinder;
 
 	public PojoEntityTypeAdditionalMetadata(String entityName, String secondaryEntityName,
 			PojoPathDefinitionProvider pathDefinitionProvider,
-			Optional<String> entityIdPropertyName) {
+			Optional<String> entityIdPropertyName,
+			Object loadingBinder) {
 		this.entityName = entityName;
 		this.secondaryEntityName = secondaryEntityName;
 		this.pathDefinitionProvider = pathDefinitionProvider;
 		this.entityIdPropertyName = entityIdPropertyName;
+		this.loadingBinder = loadingBinder;
 	}
 
 	public String getEntityName() {
@@ -39,5 +42,9 @@ public class PojoEntityTypeAdditionalMetadata {
 
 	public Optional<String> getEntityIdPropertyName() {
 		return entityIdPropertyName;
+	}
+
+	public Object getLoadingBinder() {
+		return loadingBinder;
 	}
 }

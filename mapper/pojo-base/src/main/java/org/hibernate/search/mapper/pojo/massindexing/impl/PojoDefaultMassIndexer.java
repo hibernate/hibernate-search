@@ -46,7 +46,7 @@ public class PojoDefaultMassIndexer implements PojoMassIndexer {
 		}
 	};
 
-	private final PojoMassIndexingContext indexingContext;
+	private final PojoMassIndexingContext massIndexingContext;
 	private final PojoMassIndexingMappingContext mappingContext;
 	private final PojoMassIndexingTypeContextProvider typeContextProvider;
 	private final Set<? extends PojoMassIndexingIndexedTypeContext<?>> targetedIndexedTypes;
@@ -67,14 +67,14 @@ public class PojoDefaultMassIndexer implements PojoMassIndexer {
 	private MassIndexingMonitor monitor;
 	private MassIndexingEnvironment environment;
 
-	public PojoDefaultMassIndexer(PojoMassIndexingContext indexingContext,
+	public PojoDefaultMassIndexer(PojoMassIndexingContext massIndexingContext,
 			PojoMassIndexingMappingContext mappingContext,
 			PojoMassIndexingTypeContextProvider typeContextProvider,
 			Set<? extends PojoMassIndexingIndexedTypeContext<?>> targetedIndexedTypes,
 			PojoScopeSchemaManager scopeSchemaManager,
 			Set<String> tenantIds,
 			PojoScopeDelegate<?, ?, ?> pojoScopeDelegate) {
-		this.indexingContext = indexingContext;
+		this.massIndexingContext = massIndexingContext;
 		this.mappingContext = mappingContext;
 		this.typeContextProvider = typeContextProvider;
 		this.targetedIndexedTypes = targetedIndexedTypes;
@@ -166,7 +166,7 @@ public class PojoDefaultMassIndexer implements PojoMassIndexer {
 
 	private PojoMassIndexingBatchCoordinator createCoordinator() {
 		List<PojoMassIndexingIndexedTypeGroup<?>> typeGroupsToIndex = PojoMassIndexingIndexedTypeGroup.disjoint(
-				indexingContext, mappingContext, typeContextProvider, targetedIndexedTypes
+				mappingContext, typeContextProvider, targetedIndexedTypes, massIndexingContext
 		);
 		typesToIndexInParallel = Math.min( typesToIndexInParallel, typeGroupsToIndex.size() );
 		PojoMassIndexingNotifier notifier = new PojoMassIndexingNotifier(
@@ -182,7 +182,8 @@ public class PojoDefaultMassIndexer implements PojoMassIndexer {
 		return new PojoMassIndexingBatchCoordinator(
 				mappingContext,
 				notifier,
-				typeGroupsToIndex, scopeSchemaManager,
+				typeGroupsToIndex, massIndexingContext,
+				scopeSchemaManager,
 				tenantIds, pojoScopeDelegate,
 				resolvedMassIndexingEnvironment(),
 				typesToIndexInParallel, documentBuilderThreads,

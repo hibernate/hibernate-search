@@ -8,27 +8,19 @@ package org.hibernate.search.mapper.pojo.standalone.mapping.impl;
 
 import org.hibernate.search.engine.backend.index.IndexManager;
 import org.hibernate.search.engine.mapper.mapping.spi.MappedIndexManager;
-import org.hibernate.search.engine.search.projection.spi.ProjectionMappedTypeContext;
 import org.hibernate.search.mapper.pojo.mapping.building.spi.PojoIndexedTypeExtendedMappingCollector;
 import org.hibernate.search.mapper.pojo.model.spi.PojoRawTypeIdentifier;
-import org.hibernate.search.mapper.pojo.standalone.mapping.metadata.impl.StandalonePojoEntityTypeMetadata;
-import org.hibernate.search.mapper.pojo.standalone.scope.impl.StandalonePojoScopeIndexedTypeContext;
+import org.hibernate.search.mapper.pojo.standalone.entity.SearchIndexedEntity;
 import org.hibernate.search.mapper.pojo.standalone.session.impl.StandalonePojoSessionIndexedTypeContext;
 
 class StandalonePojoIndexedTypeContext<E> extends AbstractStandalonePojoTypeContext<E>
-		implements ProjectionMappedTypeContext,
-		StandalonePojoScopeIndexedTypeContext<E>, StandalonePojoSessionIndexedTypeContext<E> {
+		implements SearchIndexedEntity<E>, StandalonePojoSessionIndexedTypeContext<E> {
 
 	private final MappedIndexManager indexManager;
 
 	private StandalonePojoIndexedTypeContext(Builder<E> builder) {
 		super( builder );
 		this.indexManager = builder.indexManager;
-	}
-
-	@Override
-	public boolean loadingAvailable() {
-		return selectionLoadingStrategy().isPresent();
 	}
 
 	@Override
@@ -39,8 +31,8 @@ class StandalonePojoIndexedTypeContext<E> extends AbstractStandalonePojoTypeCont
 	static class Builder<E> extends AbstractBuilder<E> implements PojoIndexedTypeExtendedMappingCollector {
 		private MappedIndexManager indexManager;
 
-		Builder(PojoRawTypeIdentifier<E> typeIdentifier, String entityName, StandalonePojoEntityTypeMetadata<E> metadata) {
-			super( typeIdentifier, entityName, metadata );
+		Builder(PojoRawTypeIdentifier<E> typeIdentifier, String entityName) {
+			super( typeIdentifier, entityName );
 		}
 
 		@Override

@@ -7,40 +7,20 @@
 package org.hibernate.search.mapper.orm.massindexing.impl;
 
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 import org.hibernate.CacheMode;
-import org.hibernate.FlushMode;
-import org.hibernate.engine.spi.SessionFactoryImplementor;
-import org.hibernate.engine.spi.SessionImplementor;
-import org.hibernate.engine.spi.SharedSessionContractImplementor;
-import org.hibernate.search.mapper.orm.loading.impl.HibernateOrmMassEntityLoader;
-import org.hibernate.search.mapper.orm.loading.impl.HibernateOrmMassIdentifierLoader;
-import org.hibernate.search.mapper.orm.loading.impl.HibernateOrmMassLoadingOptions;
+import org.hibernate.search.mapper.orm.loading.impl.HibernateOrmMassLoadingContext;
 import org.hibernate.search.mapper.orm.loading.spi.ConditionalExpression;
-import org.hibernate.search.mapper.orm.loading.spi.HibernateOrmEntityLoadingStrategy;
-import org.hibernate.search.mapper.orm.loading.spi.HibernateOrmQueryLoader;
-import org.hibernate.search.mapper.orm.loading.spi.LoadingTypeContext;
-import org.hibernate.search.mapper.orm.session.impl.HibernateOrmSessionTypeContextProvider;
-import org.hibernate.search.mapper.pojo.loading.spi.PojoMassEntityLoader;
-import org.hibernate.search.mapper.pojo.loading.spi.PojoMassEntitySink;
-import org.hibernate.search.mapper.pojo.loading.spi.PojoMassIdentifierLoader;
-import org.hibernate.search.mapper.pojo.loading.spi.PojoMassIdentifierSink;
+import org.hibernate.search.mapper.pojo.loading.spi.PojoLoadingTypeContext;
 import org.hibernate.search.mapper.pojo.massindexing.spi.PojoMassIndexingContext;
-import org.hibernate.search.mapper.pojo.massindexing.spi.PojoMassIndexingEntityLoadingContext;
-import org.hibernate.search.mapper.pojo.massindexing.spi.PojoMassIndexingIdentifierLoadingContext;
-import org.hibernate.search.mapper.pojo.massindexing.spi.PojoMassIndexingLoadingStrategy;
-import org.hibernate.search.mapper.pojo.model.spi.PojoRawTypeIdentifier;
-import org.hibernate.search.util.common.impl.SuppressingCloser;
 
 public final class HibernateOrmMassIndexingContext
-		implements PojoMassIndexingContext, HibernateOrmMassLoadingOptions {
-	private final HibernateOrmMassIndexingMappingContext mappingContext;
-	private final HibernateOrmSessionTypeContextProvider typeContextProvider;
+		implements PojoMassIndexingContext, HibernateOrmMassLoadingContext {
+
+	private final HibernateOrmMassIndexingMappingContext mapping;
 	private final Map<Class<?>, ConditionalExpression> conditionalExpressions = new HashMap<>();
 	private CacheMode cacheMode = CacheMode.IGNORE;
 	private Integer idLoadingTransactionTimeout;
@@ -48,17 +28,13 @@ public final class HibernateOrmMassIndexingContext
 	private int objectLoadingBatchSize = 10;
 	private long objectsLimit = 0; //means no limit at all
 
-	public HibernateOrmMassIndexingContext(HibernateOrmMassIndexingMappingContext mappingContext,
-			HibernateOrmSessionTypeContextProvider typeContextContainer) {
-		this.mappingContext = mappingContext;
-		this.typeContextProvider = typeContextContainer;
+	public HibernateOrmMassIndexingContext(HibernateOrmMassIndexingMappingContext mapping) {
+		this.mapping = mapping;
 	}
 
 	@Override
-	public <T> PojoMassIndexingLoadingStrategy<? super T, ?> loadingStrategy(PojoRawTypeIdentifier<T> expectedType) {
-		LoadingTypeContext<T> typeContext = typeContextProvider.forExactType( expectedType );
-		return new HibernateOrmMassIndexingLoadingStrategy<>( typeContext.loadingStrategy(),
-				conditionalExpression( typeContext ), typeContextProvider );
+	public HibernateOrmMassIndexingMappingContext mapping() {
+		return mapping;
 	}
 
 	public void idLoadingTransactionTimeout(int timeoutInSeconds) {
@@ -117,110 +93,16 @@ public final class HibernateOrmMassIndexingContext
 		return expression;
 	}
 
-	private Optional<ConditionalExpression> conditionalExpression(LoadingTypeContext<?> typeContext) {
+	@Override
+	public Optional<ConditionalExpression> conditionalExpression(PojoLoadingTypeContext<?> typeContext) {
 		if ( conditionalExpressions.isEmpty() ) {
 			return Optional.empty();
 		}
 
-		return typeContext.ascendingSuperTypes()
-				.stream()
-				.map( type -> conditionalExpressions.get( type.javaClass() ) )
+		return typeContext.ascendingSuperTypes().stream()
+				.map( typeId -> conditionalExpressions.get( typeId.javaClass() ) )
 				.filter( Objects::nonNull )
 				.findFirst();
 	}
 
-	private final class HibernateOrmMassIndexingLoadingStrategy<E, I> implements PojoMassIndexingLoadingStrategy<E, I> {
-
-		private final HibernateOrmEntityLoadingStrategy<E, I> delegate;
-		private final Optional<ConditionalExpression> conditionalExpression;
-		private final HibernateOrmSessionTypeContextProvider typeContextProvider;
-
-		public HibernateOrmMassIndexingLoadingStrategy(HibernateOrmEntityLoadingStrategy<E, I> delegate,
-				Optional<ConditionalExpression> conditionalExpression,
-				HibernateOrmSessionTypeContextProvider typeContextProvider) {
-			this.delegate = delegate;
-			this.conditionalExpression = conditionalExpression;
-			this.typeContextProvider = typeContextProvider;
-		}
-
-		@Override
-		public boolean equals(Object o) {
-			if ( this == o ) {
-				return true;
-			}
-			if ( o == null || getClass() != o.getClass() ) {
-				return false;
-			}
-			HibernateOrmMassIndexingLoadingStrategy<?, ?> that = (HibernateOrmMassIndexingLoadingStrategy<?, ?>) o;
-			if ( conditionalExpression.isPresent() || that.conditionalExpression.isPresent() ) {
-				// Never merge strategies with conditional expressions, it's too complicated to apply a condition to multiple types
-				// TODO-4252 Verify if there is a good way to do that
-				return false;
-			}
-			return Objects.equals( delegate, that.delegate );
-		}
-
-		@Override
-		public int hashCode() {
-			return Objects.hash( delegate, conditionalExpression );
-		}
-
-		@Override
-		public PojoMassIdentifierLoader createIdentifierLoader(PojoMassIndexingIdentifierLoadingContext<E, I> context) {
-			SessionFactoryImplementor sessionFactory = mappingContext.sessionFactory();
-			List<LoadingTypeContext<? extends E>> typeContexts = context.includedTypes().stream()
-					.map( typeContextProvider::forExactType )
-					.collect( Collectors.toList() );
-
-			HibernateOrmQueryLoader<E, I> typeQueryLoader = createQueryLoader( sessionFactory, typeContexts );
-			SharedSessionContractImplementor session = (SharedSessionContractImplementor) sessionFactory
-					.withStatelessOptions()
-					.tenantIdentifier( (Object) context.tenantIdentifier() )
-					.openStatelessSession();
-			try {
-				PojoMassIdentifierSink<I> sink = context.createSink();
-				return new HibernateOrmMassIdentifierLoader<>( typeQueryLoader,
-						HibernateOrmMassIndexingContext.this, sink, session );
-			}
-			catch (RuntimeException e) {
-				new SuppressingCloser( e ).push( SharedSessionContractImplementor::close, session );
-				throw e;
-			}
-		}
-
-		@Override
-		public PojoMassEntityLoader<I> createEntityLoader(PojoMassIndexingEntityLoadingContext<E> context) {
-			SessionFactoryImplementor sessionFactory = mappingContext.sessionFactory();
-			List<LoadingTypeContext<? extends E>> typeContexts = context.includedTypes().stream()
-					.map( typeContextProvider::forExactType )
-					.collect( Collectors.toList() );
-
-			HibernateOrmQueryLoader<E, ?> typeQueryLoader = createQueryLoader( sessionFactory, typeContexts );
-			SessionImplementor session = (SessionImplementor) sessionFactory
-					.withOptions()
-					.tenantIdentifier( (Object) context.tenantIdentifier() )
-					.openSession();
-			try {
-				session.setHibernateFlushMode( FlushMode.MANUAL );
-				session.setCacheMode( cacheMode() );
-				session.setDefaultReadOnly( true );
-
-				PojoMassEntitySink<E> sink = context.createSink( mappingContext.sessionContext( session ) );
-				return new HibernateOrmMassEntityLoader<>( typeQueryLoader,
-						HibernateOrmMassIndexingContext.this, sink, session );
-			}
-			catch (RuntimeException e) {
-				new SuppressingCloser( e ).push( SessionImplementor::close, session );
-				throw e;
-			}
-		}
-
-		private HibernateOrmQueryLoader<E, I> createQueryLoader(SessionFactoryImplementor sessionFactory,
-				List<LoadingTypeContext<? extends E>> typeContexts) {
-			return delegate.createQueryLoader( sessionFactory, typeContexts, conditionalExpression.isPresent()
-					? List.of( conditionalExpression.get() )
-					: List.of() );
-		}
-
-	}
 }

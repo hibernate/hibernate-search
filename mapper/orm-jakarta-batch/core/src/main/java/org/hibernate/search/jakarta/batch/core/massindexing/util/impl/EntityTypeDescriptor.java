@@ -7,6 +7,7 @@
 package org.hibernate.search.jakarta.batch.core.massindexing.util.impl;
 
 import java.util.List;
+import java.util.Set;
 
 import org.hibernate.engine.spi.SessionFactoryImplementor;
 import org.hibernate.engine.spi.SessionImplementor;
@@ -79,7 +80,7 @@ public class EntityTypeDescriptor<E, I> {
 	}
 
 	private HibernateOrmQueryLoader<? super E, I> queryLoader(List<ConditionalExpression> conditions, String order) {
-		return loadingStrategy.createQueryLoader( sessionFactory, List.of( delegate ), conditions, order );
+		return loadingStrategy.createQueryLoader( sessionFactory, Set.of( delegate.delegate() ), conditions, order );
 	}
 
 }

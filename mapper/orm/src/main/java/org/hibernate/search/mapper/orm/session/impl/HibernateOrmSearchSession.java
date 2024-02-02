@@ -321,7 +321,7 @@ public class HibernateOrmSearchSession extends AbstractPojoSearchSession
 	}
 
 	private HibernateOrmSelectionLoadingContext.Builder loadingContextBuilder() {
-		return new HibernateOrmSelectionLoadingContext.Builder( mappingContext, typeContextProvider, this );
+		return new HibernateOrmSelectionLoadingContext.Builder( mappingContext, this );
 	}
 
 	private void registerSynchronization(SessionImplementor sessionImplementor, Synchronization synchronization) {

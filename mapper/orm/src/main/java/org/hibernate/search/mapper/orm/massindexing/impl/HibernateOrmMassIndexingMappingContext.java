@@ -6,18 +6,10 @@
  */
 package org.hibernate.search.mapper.orm.massindexing.impl;
 
-import jakarta.persistence.EntityManager;
-
-import org.hibernate.engine.spi.SessionFactoryImplementor;
-import org.hibernate.search.mapper.orm.scope.impl.HibernateOrmScopeSessionContext;
-import org.hibernate.search.mapper.orm.session.impl.HibernateOrmSessionTypeContextProvider;
+import org.hibernate.search.mapper.orm.loading.spi.LoadingMappingContext;
 import org.hibernate.search.mapper.pojo.massindexing.spi.PojoMassIndexingMappingContext;
 
-public interface HibernateOrmMassIndexingMappingContext extends PojoMassIndexingMappingContext {
+public interface HibernateOrmMassIndexingMappingContext
+		extends PojoMassIndexingMappingContext, LoadingMappingContext {
 
-	SessionFactoryImplementor sessionFactory();
-
-	HibernateOrmScopeSessionContext sessionContext(EntityManager entityManager);
-
-	HibernateOrmSessionTypeContextProvider typeContextProvider();
 }

@@ -43,7 +43,6 @@ import org.hibernate.search.engine.mapper.model.spi.TypeMetadataDiscoverer;
 import org.hibernate.search.engine.reporting.FailureHandler;
 import org.hibernate.search.engine.reporting.impl.EngineEventContextMessages;
 import org.hibernate.search.engine.reporting.impl.FailSafeFailureHandlerWrapper;
-import org.hibernate.search.engine.reporting.spi.ContextualFailureCollector;
 import org.hibernate.search.engine.reporting.spi.RootFailureCollector;
 import org.hibernate.search.util.common.AssertionFailure;
 import org.hibernate.search.util.common.SearchException;
@@ -289,40 +288,13 @@ public class SearchIntegrationBuilder implements SearchIntegration.Builder {
 				mappings.put( mappingKey, partiallyBuiltMapping );
 			}
 			catch (MappingAbortedException e) {
-				handleMappingAborted( e );
+				e.collectSilentlyAndCheck( buildContext.failureCollector() );
 			}
 		}
 
 		public void closeOnFailure() {
 			if ( mapper != null ) {
 				mapper.closeOnFailure();
-			}
-		}
-
-		private void handleMappingAborted(MappingAbortedException e) {
-			ContextualFailureCollector failureCollector = buildContext.failureCollector();
-
-			if ( !failureCollector.hasFailure() ) {
-				throw new AssertionFailure(
-						"Caught " + MappingAbortedException.class.getSimpleName()
-								+ ", but the mapper did not collect any failure.",
-						e
-				);
-			}
-
-			/*
-			 * This generally shouldn't do anything, because we don't expect a cause nor suppressed exceptions
-			 * in the MappingAbortedException, but ignoring exceptions can lead to
-			 * spending some really annoying hours debugging.
-			 * So let's be extra cautious not to lose these.
-			 */
-			Throwable cause = e.getCause();
-			if ( cause != null ) {
-				failureCollector.add( cause );
-			}
-			Throwable[] suppressed = e.getSuppressed();
-			for ( Throwable throwable : suppressed ) {
-				failureCollector.add( throwable );
 			}
 		}
 

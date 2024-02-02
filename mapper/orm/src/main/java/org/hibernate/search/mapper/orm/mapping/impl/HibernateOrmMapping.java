@@ -29,7 +29,6 @@ import org.hibernate.search.engine.environment.bean.BeanHolder;
 import org.hibernate.search.engine.mapper.mapping.spi.MappingImplementor;
 import org.hibernate.search.engine.mapper.mapping.spi.MappingPreStopContext;
 import org.hibernate.search.engine.mapper.mapping.spi.MappingStartContext;
-import org.hibernate.search.engine.search.projection.spi.ProjectionMappedTypeContext;
 import org.hibernate.search.mapper.orm.automaticindexing.impl.AutomaticIndexingQueueEventProcessingPlanImpl;
 import org.hibernate.search.mapper.orm.automaticindexing.spi.AutomaticIndexingMappingContext;
 import org.hibernate.search.mapper.orm.automaticindexing.spi.AutomaticIndexingQueueEventProcessingPlan;
@@ -45,7 +44,6 @@ import org.hibernate.search.mapper.orm.mapping.spi.CoordinationStrategyContext;
 import org.hibernate.search.mapper.orm.reporting.impl.HibernateOrmMappingHints;
 import org.hibernate.search.mapper.orm.schema.management.SchemaManagementStrategyName;
 import org.hibernate.search.mapper.orm.schema.management.impl.SchemaManagementListener;
-import org.hibernate.search.mapper.orm.scope.impl.HibernateOrmScopeIndexedTypeContext;
 import org.hibernate.search.mapper.orm.scope.impl.HibernateOrmScopeMappingContext;
 import org.hibernate.search.mapper.orm.scope.impl.HibernateOrmScopeSessionContext;
 import org.hibernate.search.mapper.orm.scope.impl.SearchScopeImpl;
@@ -215,11 +213,6 @@ public class HibernateOrmMapping extends AbstractPojoMappingImplementor<Hibernat
 	@Override
 	public BackendMappingHints hints() {
 		return HibernateOrmMappingHints.INSTANCE;
-	}
-
-	@Override
-	public ProjectionMappedTypeContext mappedTypeContext(String mappedTypeName) {
-		return typeContextContainer.indexedByJpaEntityName().getOrFail( mappedTypeName );
 	}
 
 	@Override
@@ -400,7 +393,7 @@ public class HibernateOrmMapping extends AbstractPojoMappingImplementor<Hibernat
 	public <T> SearchScopeImpl<T> createScope(Collection<? extends Class<? extends T>> classes) {
 		PojoScopeDelegate<org.hibernate.search.mapper.orm.common.EntityReference,
 				T,
-				HibernateOrmScopeIndexedTypeContext<? extends T>> scopeDelegate =
+				SearchIndexedEntity<? extends T>> scopeDelegate =
 						delegate().createPojoScopeForClasses(
 								this,
 								classes,
@@ -415,7 +408,7 @@ public class HibernateOrmMapping extends AbstractPojoMappingImplementor<Hibernat
 	public <T> SearchScopeImpl<T> createScope(Class<T> expectedSuperType, Collection<String> entityNames) {
 		PojoScopeDelegate<org.hibernate.search.mapper.orm.common.EntityReference,
 				T,
-				HibernateOrmScopeIndexedTypeContext<? extends T>> scopeDelegate =
+				SearchIndexedEntity<? extends T>> scopeDelegate =
 						delegate().createPojoScopeForEntityNames(
 								this,
 								expectedSuperType, entityNames,
@@ -450,7 +443,7 @@ public class HibernateOrmMapping extends AbstractPojoMappingImplementor<Hibernat
 
 	private Optional<SearchScopeImpl<Object>> createAllScope() {
 		return delegate().<org.hibernate.search.mapper.orm.common.EntityReference,
-				HibernateOrmScopeIndexedTypeContext<?>>createPojoAllScope(
+				SearchIndexedEntity<?>>createPojoAllScope(
 						this,
 						typeContextContainer::indexedForExactType
 				)

@@ -20,6 +20,7 @@ import org.hibernate.search.engine.mapper.mapping.spi.MappingPreStopContext;
 import org.hibernate.search.engine.mapper.mapping.spi.MappingStartContext;
 import org.hibernate.search.engine.reporting.FailureHandler;
 import org.hibernate.search.engine.search.projection.definition.spi.ProjectionRegistry;
+import org.hibernate.search.engine.search.projection.spi.ProjectionMappedTypeContext;
 import org.hibernate.search.mapper.pojo.bridge.runtime.IdentifierBridgeToDocumentIdentifierContext;
 import org.hibernate.search.mapper.pojo.bridge.runtime.ValueBridgeToIndexedValueContext;
 import org.hibernate.search.mapper.pojo.bridge.runtime.impl.IdentifierBridgeToDocumentIdentifierContextImpl;
@@ -130,8 +131,13 @@ public abstract class AbstractPojoMappingImplementor<M>
 	}
 
 	@Override
-	public ProjectionRegistry projectionRegistry() {
+	public final ProjectionRegistry projectionRegistry() {
 		return delegate.projectionRegistry();
+	}
+
+	@Override
+	public final ProjectionMappedTypeContext mappedTypeContext(String mappedTypeName) {
+		return delegate.mappedTypeContext( mappedTypeName );
 	}
 
 	@Override
@@ -173,5 +179,4 @@ public abstract class AbstractPojoMappingImplementor<M>
 
 	protected void doStop() {
 	}
-
 }
