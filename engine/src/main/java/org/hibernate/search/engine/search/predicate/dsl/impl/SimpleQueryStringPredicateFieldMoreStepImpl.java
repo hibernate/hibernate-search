@@ -50,8 +50,8 @@ class SimpleQueryStringPredicateFieldMoreStepImpl
 	}
 
 	@Override
-	public SimpleQueryStringPredicateOptionsStep<?> matching(String simpleQueryString) {
-		return commonState.matching( simpleQueryString );
+	public SimpleQueryStringPredicateOptionsStep<?> matching(String queryString) {
+		return commonState.matching( queryString );
 	}
 
 	static class CommonState extends AbstractPredicateFinalStep

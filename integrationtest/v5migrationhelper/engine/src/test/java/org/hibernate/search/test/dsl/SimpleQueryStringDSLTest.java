@@ -178,7 +178,7 @@ class SimpleQueryStringDSLTest {
 					.matching( null )
 					.createQuery();
 		} ).isInstanceOf( IllegalArgumentException.class )
-				.hasMessageContaining( "'simpleQueryString' must not be null" );
+				.hasMessageContaining( "'queryString' must not be null" );
 
 	}
 
