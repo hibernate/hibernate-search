@@ -18,40 +18,6 @@ package org.hibernate.search.engine.search.predicate.dsl;
 public interface SimpleQueryStringPredicateFieldMoreStep<
 		S extends SimpleQueryStringPredicateFieldMoreStep<?, N>,
 		N extends SimpleQueryStringPredicateOptionsStep<?>>
-		extends SimpleQueryStringPredicateMatchingStep<N>, MultiFieldPredicateFieldBoostStep<S> {
-
-	/**
-	 * Target the given field in the simple query string predicate,
-	 * as an alternative to the already-targeted fields.
-	 * <p>
-	 * Only text fields are supported.
-	 * <p>
-	 * See {@link SimpleQueryStringPredicateFieldStep#field(String)} for more information on targeted fields.
-	 *
-	 * @param fieldPath The <a href="SearchPredicateFactory.html#field-paths">path</a> to the index field
-	 * to apply the predicate on.
-	 * @return The next step.
-	 *
-	 * @see SimpleQueryStringPredicateFieldStep#field(String)
-	 */
-	default S field(String fieldPath) {
-		return fields( fieldPath );
-	}
-
-	/**
-	 * Target the given fields in the simple query string predicate,
-	 * as an alternative to the already-targeted fields.
-	 * <p>
-	 * Only text fields are supported.
-	 * <p>
-	 * See {@link SimpleQueryStringPredicateFieldStep#fields(String...)} for more information on targeted fields.
-	 *
-	 * @param fieldPaths The <a href="SearchPredicateFactory.html#field-paths">paths</a> to the index fields
-	 * to apply the predicate on.
-	 * @return The next step.
-	 *
-	 * @see SimpleQueryStringPredicateFieldStep#fields(String...)
-	 */
-	S fields(String... fieldPaths);
+		extends CommonQueryStringPredicateFieldMoreStep<S, N> {
 
 }

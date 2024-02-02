@@ -7,18 +7,11 @@
 package org.hibernate.search.engine.search.predicate.dsl;
 
 /**
- * The step in an "simple query string" predicate definition where the query string to match can be set.
+ * The step in a "query string" predicate definition where the query string to match can be set.
  *
  * @param <N> The type of the next step.
  */
-public interface QueryStringPredicateMatchingStep<N extends QueryStringPredicateOptionsStep<?>> {
-
-	/**
-	 * Require at least one of the targeted fields to match the given query string.
-	 *
-	 * @param simpleQueryString The query string to match.
-	 * @return The next step.
-	 */
-	N matching(String simpleQueryString);
+public interface QueryStringPredicateMatchingStep<N extends QueryStringPredicateOptionsStep<?>>
+		extends CommonQueryStringPredicateMatchingStep<N> {
 
 }
