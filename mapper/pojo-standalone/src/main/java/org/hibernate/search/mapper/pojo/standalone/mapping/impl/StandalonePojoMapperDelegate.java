@@ -12,20 +12,16 @@ import org.hibernate.search.mapper.pojo.mapping.building.spi.PojoIndexedTypeExte
 import org.hibernate.search.mapper.pojo.mapping.building.spi.PojoMapperDelegate;
 import org.hibernate.search.mapper.pojo.mapping.spi.PojoMappingDelegate;
 import org.hibernate.search.mapper.pojo.model.spi.PojoRawTypeModel;
-import org.hibernate.search.mapper.pojo.standalone.mapping.metadata.impl.StandalonePojoEntityTypeMetadataProvider;
 import org.hibernate.search.mapper.pojo.standalone.reporting.impl.StandalonePojoMappingHints;
 import org.hibernate.search.mapper.pojo.standalone.schema.management.impl.SchemaManagementListener;
 
 public final class StandalonePojoMapperDelegate
 		implements PojoMapperDelegate<StandalonePojoMappingPartialBuildState> {
 
-	private final StandalonePojoEntityTypeMetadataProvider metadataProvider;
 	private final StandalonePojoTypeContextContainer.Builder typeContextContainerBuilder;
 	private final SchemaManagementListener schemaManagementListener;
 
-	public StandalonePojoMapperDelegate(StandalonePojoEntityTypeMetadataProvider metadataProvider,
-			SchemaManagementListener schemaManagementListener) {
-		this.metadataProvider = metadataProvider;
+	public StandalonePojoMapperDelegate(SchemaManagementListener schemaManagementListener) {
 		this.typeContextContainerBuilder = new StandalonePojoTypeContextContainer.Builder();
 		this.schemaManagementListener = schemaManagementListener;
 	}
@@ -38,13 +34,13 @@ public final class StandalonePojoMapperDelegate
 	@Override
 	public <E> PojoIndexedTypeExtendedMappingCollector createIndexedTypeExtendedMappingCollector(
 			PojoRawTypeModel<E> rawTypeModel, String entityName) {
-		return typeContextContainerBuilder.addIndexed( rawTypeModel, entityName, metadataProvider.get( rawTypeModel ) );
+		return typeContextContainerBuilder.addIndexed( rawTypeModel, entityName );
 	}
 
 	@Override
 	public <E> PojoContainedTypeExtendedMappingCollector createContainedTypeExtendedMappingCollector(
 			PojoRawTypeModel<E> rawTypeModel, String entityName) {
-		return typeContextContainerBuilder.addContained( rawTypeModel, entityName, metadataProvider.get( rawTypeModel ) );
+		return typeContextContainerBuilder.addContained( rawTypeModel, entityName );
 	}
 
 	@Override

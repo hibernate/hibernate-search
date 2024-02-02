@@ -35,12 +35,12 @@ public class HibernateOrmMappingPartialBuildState implements MappingPartialBuild
 
 	public MappingImplementor<HibernateOrmMapping> bindToSessionFactory(
 			MappingFinalizationContext context,
-			SessionFactoryImplementor sessionFactoryImplementor) {
-		return HibernateOrmMapping.create(
-				mappingDelegate, typeContextContainerBuilder.build( sessionFactoryImplementor ),
+			SessionFactoryImplementor sessionFactory) {
+		return HibernateOrmMapping.create( mappingDelegate,
+				typeContextContainerBuilder.build( mappingDelegate.typeContextProvider(), sessionFactory ),
 				coordinationStrategyHolder,
 				configuredAutomaticIndexingStrategy,
-				sessionFactoryImplementor,
+				sessionFactory,
 				context.configurationPropertySource()
 		);
 	}

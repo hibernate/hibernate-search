@@ -7,12 +7,11 @@
 package org.hibernate.search.mapper.orm.loading.spi;
 
 import org.hibernate.engine.spi.SessionImplementor;
-import org.hibernate.search.mapper.pojo.model.spi.PojoRuntimeIntrospector;
+import org.hibernate.search.mapper.pojo.loading.spi.PojoLoadingSessionContext;
+import org.hibernate.search.mapper.pojo.massindexing.spi.PojoMassIndexingSessionContext;
 
-public interface LoadingSessionContext {
+public interface LoadingSessionContext extends PojoLoadingSessionContext, PojoMassIndexingSessionContext {
 
 	SessionImplementor session();
-
-	PojoRuntimeIntrospector runtimeIntrospector();
 
 }

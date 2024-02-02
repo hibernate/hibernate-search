@@ -10,6 +10,7 @@ import java.lang.invoke.MethodHandles;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.LinkedHashSet;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 
@@ -281,7 +282,8 @@ public class PojoMapper<MPBS extends MappingPartialBuildState> implements Mapper
 				Collections.emptyList()
 		);
 		var extendedMappingCollector = delegate.createIndexedTypeExtendedMappingCollector( indexedEntityType, entityName );
-		typeManagerContainerBuilder.addIndexed( indexedEntityType, entityName, identityMappingCollector,
+		typeManagerContainerBuilder.addIndexed( indexedEntityType,
+				entityName, entityTypeMetadata.getSecondaryEntityName(), identityMappingCollector,
 				extendedMappingCollector, routingBridge, indexingProcessorBuilder, indexManagerBuilder );
 		collectIndexMapping( indexedEntityType, indexingProcessorBuilder );
 	}
@@ -398,8 +400,17 @@ public class PojoMapper<MPBS extends MappingPartialBuildState> implements Mapper
 
 	private <E> void preBuildOtherMetadata(AbstractPojoTypeManager.Builder<E> builder,
 			PojoImplicitReindexingResolverBuildingHelper helper) {
-		builder.preBuildOtherMetadata( helper.isSingleConcreteTypeInEntityHierarchy( builder.typeModel ),
-				helper.runtimePathsBuildingHelper( builder.typeModel ).pathOrdinals() );
+		PojoRawTypeModel<E> typeModel = builder.typeModel;
+		var loadingBinderOptional = typeModel.ascendingSuperTypes()
+				.map( superType -> typeAdditionalMetadataProvider.get( superType )
+						.getEntityTypeMetadata()
+						.map( PojoEntityTypeAdditionalMetadata::getLoadingBinder )
+						.orElse( null ) )
+				.filter( Objects::nonNull )
+				.findFirst();
+		builder.preBuildOtherMetadata( helper.isSingleConcreteTypeInEntityHierarchy( typeModel ),
+				helper.runtimePathsBuildingHelper( typeModel ).pathOrdinals(),
+				loadingBinderOptional );
 	}
 
 	private <E> void preBuildIfContained(PojoRawTypeModel<E> entityType,
@@ -426,7 +437,8 @@ public class PojoMapper<MPBS extends MappingPartialBuildState> implements Mapper
 		var extendedMappingCollector = delegate.createContainedTypeExtendedMappingCollector( entityType, entityName );
 		var identityMappingCollector = new PojoRootIdentityMappingCollector<>( entityType, mappingHelper,
 				Optional.empty(), providedIdentifierBridge );
-		var builder = typeManagerContainerBuilder.addContained( entityType, entityName, identityMappingCollector,
+		var builder = typeManagerContainerBuilder.addContained( entityType,
+				entityName, entityTypeMetadata.getSecondaryEntityName(), identityMappingCollector,
 				extendedMappingCollector );
 
 		collectIndexMapping( entityType, identityMappingCollector.toMappingCollectorRootNode() );

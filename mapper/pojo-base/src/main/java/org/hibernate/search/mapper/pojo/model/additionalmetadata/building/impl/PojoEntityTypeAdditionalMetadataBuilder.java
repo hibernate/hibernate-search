@@ -25,6 +25,7 @@ class PojoEntityTypeAdditionalMetadataBuilder implements PojoAdditionalMetadataC
 	private String secondaryEntityName;
 	private PojoPathDefinitionProvider pathDefinitionProvider;
 	private String entityIdPropertyName;
+	private Object loadingBinder;
 
 	PojoEntityTypeAdditionalMetadataBuilder() {
 	}
@@ -61,12 +62,18 @@ class PojoEntityTypeAdditionalMetadataBuilder implements PojoAdditionalMetadataC
 		this.entityIdPropertyName = propertyName;
 	}
 
+	@Override
+	public void loadingBinder(Object binder) {
+		this.loadingBinder = binder;
+	}
+
 	public PojoEntityTypeAdditionalMetadata build(PojoRawTypeModel<?> typeModel) {
 		return new PojoEntityTypeAdditionalMetadata(
 				entityName != null ? entityName : typeModel.typeIdentifier().javaClass().getSimpleName(),
 				secondaryEntityName,
 				pathDefinitionProvider != null ? pathDefinitionProvider : new SimplePojoPathsDefinitionProvider(),
-				Optional.ofNullable( entityIdPropertyName )
+				Optional.ofNullable( entityIdPropertyName ),
+				loadingBinder
 		);
 	}
 }

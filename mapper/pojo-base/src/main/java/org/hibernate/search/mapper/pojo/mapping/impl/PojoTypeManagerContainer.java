@@ -18,6 +18,7 @@ import java.util.Set;
 import org.hibernate.search.engine.mapper.mapping.building.spi.MappedIndexManagerBuilder;
 import org.hibernate.search.mapper.pojo.bridge.binding.impl.BoundRoutingBridge;
 import org.hibernate.search.mapper.pojo.identity.impl.PojoRootIdentityMappingCollector;
+import org.hibernate.search.mapper.pojo.loading.spi.PojoLoadingTypeContextProvider;
 import org.hibernate.search.mapper.pojo.logging.impl.Log;
 import org.hibernate.search.mapper.pojo.mapping.building.spi.PojoContainedTypeExtendedMappingCollector;
 import org.hibernate.search.mapper.pojo.mapping.building.spi.PojoIndexedTypeExtendedMappingCollector;
@@ -34,7 +35,8 @@ import org.hibernate.search.util.common.impl.CollectionHelper;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
 public class PojoTypeManagerContainer
-		implements AutoCloseable, PojoWorkTypeContextProvider, PojoScopeTypeContextProvider, PojoRawTypeIdentifierResolver {
+		implements AutoCloseable, PojoWorkTypeContextProvider, PojoScopeTypeContextProvider,
+		PojoRawTypeIdentifierResolver, PojoLoadingTypeContextProvider {
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	public static Builder builder() {
@@ -44,6 +46,7 @@ public class PojoTypeManagerContainer
 	private final KeyValueProvider<PojoRawTypeIdentifier<?>, AbstractPojoTypeManager<?, ?>> byExactType;
 	private final KeyValueProvider<PojoRawTypeIdentifier<?>, PojoIndexedTypeManager<?, ?>> indexedByExactType;
 	private final KeyValueProvider<String, AbstractPojoTypeManager<?, ?>> byEntityName;
+	private final KeyValueProvider<String, PojoIndexedTypeManager<?, ?>> indexedByEntityName;
 	private final KeyValueProvider<String, PojoRawTypeIdentifier<?>> typeIdentifierByEntityName;
 	private final KeyValueProvider<String, PojoRawTypeIdentifier<?>> typeIdentifierBySecondaryEntityName;
 
@@ -66,6 +69,7 @@ public class PojoTypeManagerContainer
 		Map<PojoRawTypeIdentifier<?>, Set<AbstractPojoTypeManager<?, ?>>> bySuperTypeContent = new LinkedHashMap<>();
 		Map<PojoRawTypeIdentifier<?>, Set<PojoIndexedTypeManager<?, ?>>> indexedBySuperTypeContent = new LinkedHashMap<>();
 		Map<String, AbstractPojoTypeManager<?, ?>> byEntityNameContent = new LinkedHashMap<>();
+		Map<String, PojoIndexedTypeManager<?, ?>> indexedByEntityNameContent = new LinkedHashMap<>();
 		for ( PojoIndexedTypeManager.Builder<?> typeManagerBuilder : builder.indexed.values() ) {
 			PojoRawTypeModel<?> typeModel = typeManagerBuilder.typeModel;
 			PojoRawTypeIdentifier<?> typeIdentifier = typeModel.typeIdentifier();
@@ -75,7 +79,9 @@ public class PojoTypeManagerContainer
 			byExactTypeContent.put( typeIdentifier, typeManager );
 			indexedByExactTypeContent.put( typeIdentifier, typeManager );
 
-			byEntityNameContent.put( typeManager.entityName(), typeManager );
+			String entityName = typeManager.name();
+			byEntityNameContent.put( entityName, typeManager );
+			indexedByEntityNameContent.put( entityName, typeManager );
 
 			registerSuperTypes( bySuperTypeContent, typeModel, typeManager );
 			registerSuperTypes( indexedBySuperTypeContent, typeModel, typeManager );
@@ -88,7 +94,7 @@ public class PojoTypeManagerContainer
 
 			byExactTypeContent.put( typeIdentifier, typeManager );
 
-			byEntityNameContent.put( typeManager.entityName(), typeManager );
+			byEntityNameContent.put( typeManager.name(), typeManager );
 
 			registerSuperTypes( bySuperTypeContent, typeModel, typeManager );
 		}
@@ -96,6 +102,8 @@ public class PojoTypeManagerContainer
 		this.indexedByExactType =
 				new KeyValueProvider<>( indexedByExactTypeContent, log::unknownTypeIdentifierForIndexedEntityType );
 		this.byEntityName = new KeyValueProvider<>( byEntityNameContent, log::unknownEntityNameForMappedEntityType );
+		this.indexedByEntityName =
+				new KeyValueProvider<>( indexedByEntityNameContent, log::unknownEntityNameForIndexedEntityType );
 		indexedBySuperTypeContent.replaceAll( (k, v) -> Collections.unmodifiableSet( v ) );
 		this.indexedBySuperType =
 				KeyValueProvider.createWithMultiKeyException( indexedBySuperTypeContent, log::invalidIndexedSuperTypes );
@@ -256,6 +264,10 @@ public class PojoTypeManagerContainer
 		return byEntityName;
 	}
 
+	public KeyValueProvider<String, PojoIndexedTypeManager<?, ?>> indexedByEntityName() {
+		return indexedByEntityName;
+	}
+
 	@Override
 	public KeyValueProvider<String, PojoRawTypeIdentifier<?>> typeIdentifierByEntityName() {
 		return typeIdentifierByEntityName;
@@ -293,22 +305,26 @@ public class PojoTypeManagerContainer
 		private Builder() {
 		}
 
-		public <E> PojoIndexedTypeManager.Builder<E> addIndexed(PojoRawTypeModel<E> typeModel, String entityName,
+		public <E> PojoIndexedTypeManager.Builder<E> addIndexed(PojoRawTypeModel<E> typeModel,
+				String entityName, String secondaryEntityName,
 				PojoRootIdentityMappingCollector<E> identityMappingCollector,
 				PojoIndexedTypeExtendedMappingCollector extendedMappingCollector,
 				BoundRoutingBridge<E> routingBridge,
 				PojoIndexingProcessorOriginalTypeNodeBuilder<E> indexingProcessorBuilder,
 				MappedIndexManagerBuilder indexManagerBuilder) {
-			var builder = new PojoIndexedTypeManager.Builder<>( typeModel, entityName, identityMappingCollector,
+			var builder = new PojoIndexedTypeManager.Builder<>( typeModel,
+					entityName, secondaryEntityName, identityMappingCollector,
 					extendedMappingCollector, routingBridge, indexingProcessorBuilder, indexManagerBuilder );
 			indexed.put( typeModel, builder );
 			return builder;
 		}
 
-		public <E> PojoContainedTypeManager.Builder<E> addContained(PojoRawTypeModel<E> typeModel, String entityName,
+		public <E> PojoContainedTypeManager.Builder<E> addContained(PojoRawTypeModel<E> typeModel,
+				String entityName, String secondaryEntityName,
 				PojoRootIdentityMappingCollector<E> identityMappingCollector,
 				PojoContainedTypeExtendedMappingCollector extendedMappingCollector) {
-			var builder = new PojoContainedTypeManager.Builder<>( typeModel, entityName, identityMappingCollector,
+			var builder = new PojoContainedTypeManager.Builder<>( typeModel,
+					entityName, secondaryEntityName, identityMappingCollector,
 					extendedMappingCollector );
 			contained.put( typeModel, builder );
 			return builder;

@@ -36,10 +36,10 @@ import org.hibernate.search.util.common.impl.Contracts;
 public class SearchScopeImpl<E> implements SearchScope<E> {
 
 	private final StandalonePojoScopeMappingContext mappingContext;
-	private final PojoScopeDelegate<EntityReference, E, StandalonePojoScopeIndexedTypeContext<? extends E>> delegate;
+	private final PojoScopeDelegate<EntityReference, E, SearchIndexedEntity<? extends E>> delegate;
 
 	public SearchScopeImpl(StandalonePojoScopeMappingContext mappingContext,
-			PojoScopeDelegate<EntityReference, E, StandalonePojoScopeIndexedTypeContext<? extends E>> delegate) {
+			PojoScopeDelegate<EntityReference, E, SearchIndexedEntity<? extends E>> delegate) {
 		this.mappingContext = mappingContext;
 		this.delegate = delegate;
 	}

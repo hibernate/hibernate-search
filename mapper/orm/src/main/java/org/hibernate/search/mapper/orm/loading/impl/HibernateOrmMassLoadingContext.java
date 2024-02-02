@@ -6,9 +6,17 @@
  */
 package org.hibernate.search.mapper.orm.loading.impl;
 
-import org.hibernate.CacheMode;
+import java.util.Optional;
 
-public interface HibernateOrmMassLoadingOptions {
+import org.hibernate.CacheMode;
+import org.hibernate.search.mapper.orm.loading.spi.ConditionalExpression;
+import org.hibernate.search.mapper.orm.loading.spi.LoadingMappingContext;
+import org.hibernate.search.mapper.pojo.loading.spi.PojoLoadingTypeContext;
+import org.hibernate.search.mapper.pojo.massindexing.spi.PojoMassIndexingContext;
+
+public interface HibernateOrmMassLoadingContext extends PojoMassIndexingContext {
+
+	LoadingMappingContext mapping();
 
 	/**
 	 * @return the transaction timeout
@@ -35,4 +43,10 @@ public interface HibernateOrmMassLoadingOptions {
 	 */
 	int idFetchSize();
 
+	/**
+	 * @return The conditional expression to apply when loading the given type,
+	 * inherited from supertypes by default,
+	 * or {@link Optional#empty()} if there is no condition to apply.
+	 */
+	Optional<ConditionalExpression> conditionalExpression(PojoLoadingTypeContext<?> typeContext);
 }

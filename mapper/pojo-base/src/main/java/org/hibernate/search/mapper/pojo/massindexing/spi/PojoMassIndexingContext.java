@@ -6,18 +6,11 @@
  */
 package org.hibernate.search.mapper.pojo.massindexing.spi;
 
-import org.hibernate.search.mapper.pojo.model.spi.PojoRawTypeIdentifier;
+import org.hibernate.search.mapper.pojo.loading.spi.PojoMassLoadingContext;
 
 /**
  * Contextual information about a mass indexing proccess.
  */
-public interface PojoMassIndexingContext {
-
-	/**
-	 * @param <T> The exposed type of indexed entities.
-	 * @param expectedType The expected types of indexed objects.
-	 * @return A loading strategy.
-	 */
-	<T> PojoMassIndexingLoadingStrategy<? super T, ?> loadingStrategy(PojoRawTypeIdentifier<T> expectedType);
+public interface PojoMassIndexingContext extends PojoMassLoadingContext {
 
 }

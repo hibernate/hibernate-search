@@ -9,15 +9,15 @@ package org.hibernate.search.mapper.pojo.massindexing.impl;
 import java.lang.invoke.MethodHandles;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Set;
 
 import org.hibernate.search.mapper.pojo.loading.spi.PojoMassIdentifierLoader;
+import org.hibernate.search.mapper.pojo.loading.spi.PojoMassIdentifierLoadingContext;
 import org.hibernate.search.mapper.pojo.loading.spi.PojoMassIdentifierSink;
+import org.hibernate.search.mapper.pojo.loading.spi.PojoMassLoadingContext;
+import org.hibernate.search.mapper.pojo.loading.spi.PojoMassLoadingStrategy;
 import org.hibernate.search.mapper.pojo.logging.impl.Log;
 import org.hibernate.search.mapper.pojo.massindexing.MassIndexingEnvironment;
-import org.hibernate.search.mapper.pojo.massindexing.spi.PojoMassIndexingIdentifierLoadingContext;
-import org.hibernate.search.mapper.pojo.massindexing.spi.PojoMassIndexingLoadingStrategy;
-import org.hibernate.search.mapper.pojo.model.spi.PojoRawTypeIdentifier;
+import org.hibernate.search.mapper.pojo.massindexing.spi.PojoMassIndexingContext;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
 public class PojoMassIndexingEntityIdentifierLoadingRunnable<E, I>
@@ -25,17 +25,20 @@ public class PojoMassIndexingEntityIdentifierLoadingRunnable<E, I>
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
+	private final PojoMassIndexingContext massIndexingContext;
 	private final PojoMassIndexingIndexedTypeGroup<E> typeGroup;
-	private final PojoMassIndexingLoadingStrategy<E, I> loadingStrategy;
+	private final PojoMassLoadingStrategy<E, I> loadingStrategy;
 	private final PojoProducerConsumerQueue<List<I>> identifierQueue;
 	private final String tenantId;
 	private final MassIndexingEnvironment.EntityIdentifierLoadingContext identifierLoadingContext;
 
 	public PojoMassIndexingEntityIdentifierLoadingRunnable(PojoMassIndexingNotifier notifier,
-			MassIndexingEnvironment environment, PojoMassIndexingIndexedTypeGroup<E> typeGroup,
-			PojoMassIndexingLoadingStrategy<E, I> loadingStrategy,
+			PojoMassIndexingContext massIndexingContext, MassIndexingEnvironment environment,
+			PojoMassIndexingIndexedTypeGroup<E> typeGroup,
+			PojoMassLoadingStrategy<E, I> loadingStrategy,
 			PojoProducerConsumerQueue<List<I>> identifierQueue, String tenantId) {
 		super( notifier, environment );
+		this.massIndexingContext = massIndexingContext;
 		this.loadingStrategy = loadingStrategy;
 		this.typeGroup = typeGroup;
 		this.identifierQueue = identifierQueue;
@@ -48,7 +51,8 @@ public class PojoMassIndexingEntityIdentifierLoadingRunnable<E, I>
 	protected void runWithFailureHandler() throws InterruptedException {
 		log.trace( "started" );
 		LoadingContext context = new LoadingContext();
-		try ( PojoMassIdentifierLoader loader = loadingStrategy.createIdentifierLoader( context ) ) {
+		try ( PojoMassIdentifierLoader loader =
+				loadingStrategy.createIdentifierLoader( typeGroup.includedTypes(), context ) ) {
 			long totalCount = loader.totalCount();
 			getNotifier().reportAddedTotalCount( totalCount );
 			do {
@@ -89,12 +93,12 @@ public class PojoMassIndexingEntityIdentifierLoadingRunnable<E, I>
 		return log.massIndexerFetchingIds( typeGroup.notifiedGroupName() );
 	}
 
-	private class LoadingContext implements PojoMassIndexingIdentifierLoadingContext<E, I> {
+	private class LoadingContext implements PojoMassIdentifierLoadingContext<I> {
 		private boolean done = false;
 
 		@Override
-		public Set<PojoRawTypeIdentifier<? extends E>> includedTypes() {
-			return typeGroup.includedTypesIdentifiers();
+		public PojoMassLoadingContext parent() {
+			return massIndexingContext;
 		}
 
 		@Override

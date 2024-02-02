@@ -21,6 +21,7 @@ import org.hibernate.search.engine.environment.bean.BeanHolder;
 import org.hibernate.search.engine.mapper.mapping.building.spi.MappedIndexManagerBuilder;
 import org.hibernate.search.engine.mapper.mapping.spi.MappedIndexManager;
 import org.hibernate.search.engine.mapper.scope.spi.MappedIndexScopeBuilder;
+import org.hibernate.search.engine.search.projection.spi.ProjectionMappedTypeContext;
 import org.hibernate.search.mapper.pojo.automaticindexing.building.impl.PojoIndexingDependencyCollectorTypeNode;
 import org.hibernate.search.mapper.pojo.automaticindexing.impl.PojoImplicitReindexingResolver;
 import org.hibernate.search.mapper.pojo.bridge.RoutingBridge;
@@ -52,7 +53,7 @@ import org.hibernate.search.util.common.spi.ToStringTreeAppender;
  */
 public class PojoIndexedTypeManager<I, E> extends AbstractPojoTypeManager<I, E>
 		implements PojoWorkIndexedTypeContext<I, E>, PojoScopeIndexedTypeContext<I, E>,
-		PojoMassIndexingIndexedTypeContext<E> {
+		PojoMassIndexingIndexedTypeContext<E>, ProjectionMappedTypeContext {
 	private final DocumentRouter<? super E> documentRouter;
 	private final PojoIndexingProcessor<E> processor;
 	private final MappedIndexManager indexManager;
@@ -78,13 +79,10 @@ public class PojoIndexedTypeManager<I, E> extends AbstractPojoTypeManager<I, E>
 
 	@Override
 	public void appendTo(ToStringTreeAppender appender) {
-		appender.attribute( "entityName", entityName )
-				.attribute( "typeIdentifier", typeIdentifier )
-				.attribute( "indexManager", indexManager )
-				.attribute( "identifierMapping", identifierMapping )
-				.attribute( "documentRouter", documentRouter )
+		super.appendTo( appender );
+		appender.attribute( "documentRouter", documentRouter )
 				.attribute( "processor", processor )
-				.attribute( "reindexingResolver", reindexingResolver );
+				.attribute( "indexManager", indexManager );
 	}
 
 	@Override
@@ -154,13 +152,13 @@ public class PojoIndexedTypeManager<I, E> extends AbstractPojoTypeManager<I, E>
 		private MappedIndexManagerBuilder indexManagerBuilder;
 		private MappedIndexManager indexManager;
 
-		Builder(PojoRawTypeModel<E> typeModel, String entityName,
+		Builder(PojoRawTypeModel<E> typeModel, String entityName, String secondaryEntityName,
 				PojoRootIdentityMappingCollector<E> identityMappingCollector,
 				PojoIndexedTypeExtendedMappingCollector extendedMappingCollector,
 				BoundRoutingBridge<E> routingBridge,
 				PojoIndexingProcessorOriginalTypeNodeBuilder<E> indexingProcessorBuilder,
 				MappedIndexManagerBuilder indexManagerBuilder) {
-			super( typeModel, entityName, identityMappingCollector );
+			super( typeModel, entityName, secondaryEntityName, identityMappingCollector );
 			this.extendedMappingCollector = extendedMappingCollector;
 			this.routingBridge = routingBridge;
 			this.indexManagerBuilder = indexManagerBuilder;

@@ -16,8 +16,10 @@ import org.hibernate.search.engine.common.EntityReference;
 import org.hibernate.search.engine.environment.thread.spi.ThreadPoolProvider;
 import org.hibernate.search.engine.reporting.FailureHandler;
 import org.hibernate.search.engine.search.projection.definition.spi.ProjectionRegistry;
+import org.hibernate.search.engine.search.projection.spi.ProjectionMappedTypeContext;
 import org.hibernate.search.engine.tenancy.spi.TenancyMode;
 import org.hibernate.search.mapper.pojo.common.spi.PojoEntityReferenceFactoryDelegate;
+import org.hibernate.search.mapper.pojo.loading.spi.PojoLoadingTypeContextProvider;
 import org.hibernate.search.mapper.pojo.model.spi.PojoRawTypeIdentifier;
 import org.hibernate.search.mapper.pojo.scope.spi.PojoScopeDelegate;
 import org.hibernate.search.mapper.pojo.scope.spi.PojoScopeMappingContext;
@@ -41,9 +43,13 @@ public interface PojoMappingDelegate extends AutoCloseable {
 
 	PojoRawTypeIdentifierResolver typeIdentifierResolver();
 
+	PojoLoadingTypeContextProvider typeContextProvider();
+
 	TenancyMode tenancyMode();
 
 	ProjectionRegistry projectionRegistry();
+
+	ProjectionMappedTypeContext mappedTypeContext(String name);
 
 	EntityReferenceFactory createEntityReferenceFactory(PojoEntityReferenceFactoryDelegate delegate);
 

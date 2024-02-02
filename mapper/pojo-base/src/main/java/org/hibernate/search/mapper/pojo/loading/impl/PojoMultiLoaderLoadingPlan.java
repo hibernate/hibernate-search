@@ -57,7 +57,7 @@ public final class PojoMultiLoaderLoadingPlan<T> implements PojoLoadingPlan<T> {
 			return delegate;
 		}
 
-		PojoSelectionLoadingStrategy<? super T2> loadingStrategy = context.loadingStrategy( type );
+		PojoSelectionLoadingStrategy<? super T2> loadingStrategy = type.selectionLoadingStrategy();
 		delegate = (PojoSingleLoaderLoadingPlan<? super T2>) planByLoadingStrategy.get( loadingStrategy );
 		if ( delegate != null ) {
 			planByType.put( type, delegate );

@@ -33,10 +33,10 @@ public class PojoContainedTypeManager<I, E> extends AbstractPojoTypeManager<I, E
 	public static class Builder<E> extends AbstractPojoTypeManager.Builder<E> {
 		private final PojoContainedTypeExtendedMappingCollector extendedMappingCollector;
 
-		Builder(PojoRawTypeModel<E> typeModel, String entityName,
+		Builder(PojoRawTypeModel<E> typeModel, String entityName, String secondaryEntityName,
 				PojoRootIdentityMappingCollector<E> identityMappingCollector,
 				PojoContainedTypeExtendedMappingCollector extendedMappingCollector) {
-			super( typeModel, entityName, identityMappingCollector );
+			super( typeModel, entityName, secondaryEntityName, identityMappingCollector );
 			this.extendedMappingCollector = extendedMappingCollector;
 		}
 

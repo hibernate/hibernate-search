@@ -31,8 +31,6 @@ public interface PojoWorkTypeContext<I, E> extends PojoLoadingTypeContext<E> {
 
 	String toDocumentIdentifier(PojoWorkSessionContext sessionContext, I identifier);
 
-	String entityName();
-
 	PojoImplicitReindexingResolver<E> reindexingResolver();
 
 	E toEntity(Object unproxiedEntity);

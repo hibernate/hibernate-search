@@ -8,7 +8,6 @@ package org.hibernate.search.mapper.orm.session.impl;
 
 import java.util.Collection;
 
-import org.hibernate.engine.spi.SessionFactoryImplementor;
 import org.hibernate.engine.spi.SessionImplementor;
 import org.hibernate.search.engine.reporting.FailureHandler;
 import org.hibernate.search.mapper.orm.loading.spi.LoadingMappingContext;
@@ -22,8 +21,6 @@ public interface HibernateOrmSearchSessionMappingContext
 
 	@Override
 	FailureHandler failureHandler();
-
-	SessionFactoryImplementor sessionFactory();
 
 	<T> SearchScopeImpl<T> createScope(Collection<? extends Class<? extends T>> types);
 

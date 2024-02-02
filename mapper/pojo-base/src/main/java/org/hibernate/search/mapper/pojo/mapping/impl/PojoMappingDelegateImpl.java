@@ -17,8 +17,10 @@ import org.hibernate.search.engine.common.EntityReference;
 import org.hibernate.search.engine.environment.thread.spi.ThreadPoolProvider;
 import org.hibernate.search.engine.reporting.FailureHandler;
 import org.hibernate.search.engine.search.projection.definition.spi.ProjectionRegistry;
+import org.hibernate.search.engine.search.projection.spi.ProjectionMappedTypeContext;
 import org.hibernate.search.engine.tenancy.spi.TenancyMode;
 import org.hibernate.search.mapper.pojo.common.spi.PojoEntityReferenceFactoryDelegate;
+import org.hibernate.search.mapper.pojo.loading.spi.PojoLoadingTypeContextProvider;
 import org.hibernate.search.mapper.pojo.logging.impl.Log;
 import org.hibernate.search.mapper.pojo.mapping.spi.PojoMappingDelegate;
 import org.hibernate.search.mapper.pojo.mapping.spi.PojoRawTypeIdentifierResolver;
@@ -86,6 +88,11 @@ public class PojoMappingDelegateImpl implements PojoMappingDelegate {
 	}
 
 	@Override
+	public PojoLoadingTypeContextProvider typeContextProvider() {
+		return typeManagers;
+	}
+
+	@Override
 	public TenancyMode tenancyMode() {
 		return tenancyMode;
 	}
@@ -93,6 +100,11 @@ public class PojoMappingDelegateImpl implements PojoMappingDelegate {
 	@Override
 	public ProjectionRegistry projectionRegistry() {
 		return searchQueryElementRegistry;
+	}
+
+	@Override
+	public ProjectionMappedTypeContext mappedTypeContext(String name) {
+		return typeManagers.indexedByEntityName().getOrFail( name );
 	}
 
 	@Override
@@ -128,7 +140,7 @@ public class PojoMappingDelegateImpl implements PojoMappingDelegate {
 		for ( PojoIndexedTypeManager<?, ?> typeContext : typeContexts ) {
 			Class<?> actualJavaType = typeContext.typeIdentifier().javaClass();
 			if ( !expectedSuperType.isAssignableFrom( actualJavaType ) ) {
-				throw log.invalidEntitySuperType( typeContext.entityName(), expectedSuperType, actualJavaType );
+				throw log.invalidEntitySuperType( typeContext.name(), expectedSuperType, actualJavaType );
 			}
 		}
 		return PojoScopeDelegateImpl.create(

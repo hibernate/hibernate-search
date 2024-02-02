@@ -6,29 +6,28 @@
  */
 package org.hibernate.search.mapper.pojo.standalone.mapping.impl;
 
-import java.util.Optional;
-
+import org.hibernate.search.mapper.pojo.loading.definition.spi.PojoEntityLoadingBindingContext;
 import org.hibernate.search.mapper.pojo.mapping.building.spi.PojoTypeExtendedMappingCollector;
 import org.hibernate.search.mapper.pojo.model.path.spi.PojoPathFilter;
 import org.hibernate.search.mapper.pojo.model.spi.PojoRawTypeIdentifier;
 import org.hibernate.search.mapper.pojo.standalone.loading.MassLoadingStrategy;
 import org.hibernate.search.mapper.pojo.standalone.loading.SelectionLoadingStrategy;
-import org.hibernate.search.mapper.pojo.standalone.loading.impl.LoadingTypeContext;
-import org.hibernate.search.mapper.pojo.standalone.mapping.metadata.impl.StandalonePojoEntityTypeMetadata;
+import org.hibernate.search.mapper.pojo.standalone.loading.impl.StandalonePojoMassLoadingStrategy;
+import org.hibernate.search.mapper.pojo.standalone.loading.impl.StandalonePojoSelectionLoadingStrategy;
+import org.hibernate.search.mapper.pojo.standalone.mapping.metadata.EntityConfigurationContext;
+import org.hibernate.search.mapper.pojo.standalone.mapping.metadata.EntityConfigurer;
 import org.hibernate.search.mapper.pojo.standalone.work.impl.SearchIndexingPlanTypeContext;
 
 abstract class AbstractStandalonePojoTypeContext<E>
-		implements SearchIndexingPlanTypeContext<E>, LoadingTypeContext<E> {
+		implements SearchIndexingPlanTypeContext<E> {
 
 	private final PojoRawTypeIdentifier<E> typeIdentifier;
 	private final String entityName;
-	private final StandalonePojoEntityTypeMetadata<E> metadata;
 	private final PojoPathFilter dirtyFilter;
 
 	AbstractStandalonePojoTypeContext(AbstractBuilder<E> builder) {
 		this.typeIdentifier = builder.typeIdentifier;
 		this.entityName = builder.entityName;
-		this.metadata = builder.metadata;
 		this.dirtyFilter = builder.dirtyFilter;
 	}
 
@@ -42,23 +41,12 @@ abstract class AbstractStandalonePojoTypeContext<E>
 		return typeIdentifier;
 	}
 
-	@Override
 	public String name() {
 		return entityName;
 	}
 
 	public Class<E> javaClass() {
 		return typeIdentifier.javaClass();
-	}
-
-	@Override
-	public Optional<SelectionLoadingStrategy<? super E>> selectionLoadingStrategy() {
-		return metadata.selectionLoadingStrategy;
-	}
-
-	@Override
-	public Optional<MassLoadingStrategy<? super E, ?>> massLoadingStrategy() {
-		return metadata.massLoadingStrategy;
 	}
 
 	@Override
@@ -69,19 +57,37 @@ abstract class AbstractStandalonePojoTypeContext<E>
 	abstract static class AbstractBuilder<E> implements PojoTypeExtendedMappingCollector {
 		private final PojoRawTypeIdentifier<E> typeIdentifier;
 		private final String entityName;
-		private final StandalonePojoEntityTypeMetadata<E> metadata;
 		private PojoPathFilter dirtyFilter;
 
-		AbstractBuilder(PojoRawTypeIdentifier<E> typeIdentifier, String entityName,
-				StandalonePojoEntityTypeMetadata<E> metadata) {
+		AbstractBuilder(PojoRawTypeIdentifier<E> typeIdentifier, String entityName) {
 			this.typeIdentifier = typeIdentifier;
 			this.entityName = entityName;
-			this.metadata = metadata;
 		}
 
 		@Override
 		public void dirtyFilter(PojoPathFilter dirtyFilter) {
 			this.dirtyFilter = dirtyFilter;
+		}
+
+		@Override
+		public void applyLoadingBinder(Object binder, PojoEntityLoadingBindingContext context) {
+			@SuppressWarnings("unchecked") // We make sure of that in APIs, see org.hibernate.search.mapper.pojo.standalone.mapping.StandalonePojoMappingConfigurationContext.addEntityType(java.lang.Class<E>, org.hibernate.search.mapper.pojo.standalone.mapping.metadata.EntityConfigurer<E>)
+			var castConfigurer = (EntityConfigurer<E>) binder;
+			castConfigurer.configure( new EntityConfigurationContext<>() {
+				@Override
+				public void selectionLoadingStrategy(SelectionLoadingStrategy<? super E> strategy) {
+					context.selectionLoadingStrategy( typeIdentifier.javaClass(), strategy == null
+							? null
+							: new StandalonePojoSelectionLoadingStrategy<>( strategy ) );
+				}
+
+				@Override
+				public void massLoadingStrategy(MassLoadingStrategy<? super E, ?> strategy) {
+					context.massLoadingStrategy( typeIdentifier.javaClass(), strategy == null
+							? null
+							: new StandalonePojoMassLoadingStrategy<>( strategy ) );
+				}
+			} );
 		}
 	}
 }

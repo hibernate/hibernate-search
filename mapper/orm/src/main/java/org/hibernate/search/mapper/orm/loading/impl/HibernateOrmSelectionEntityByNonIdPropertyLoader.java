@@ -15,9 +15,9 @@ import org.hibernate.Hibernate;
 import org.hibernate.metamodel.mapping.EntityMappingType;
 import org.hibernate.query.Query;
 import org.hibernate.search.mapper.orm.loading.spi.LoadingSessionContext;
-import org.hibernate.search.mapper.orm.loading.spi.LoadingTypeContext;
 import org.hibernate.search.mapper.orm.loading.spi.MutableEntityLoadingOptions;
 import org.hibernate.search.mapper.orm.logging.impl.Log;
+import org.hibernate.search.mapper.pojo.loading.spi.PojoLoadingTypeContext;
 import org.hibernate.search.util.common.impl.CollectionHelper;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 import org.hibernate.search.util.common.reflect.spi.ValueReadHandle;
@@ -32,12 +32,12 @@ class HibernateOrmSelectionEntityByNonIdPropertyLoader<E> extends AbstractHibern
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
-	private final LoadingTypeContext<E> targetEntityTypeContext;
+	private final PojoLoadingTypeContext<E> targetEntityTypeContext;
 	private final String documentIdSourcePropertyName;
 	private final ValueReadHandle<?> documentIdSourceHandle;
 
 	HibernateOrmSelectionEntityByNonIdPropertyLoader(EntityMappingType entityMappingType,
-			LoadingTypeContext<E> targetEntityTypeContext,
+			PojoLoadingTypeContext<E> targetEntityTypeContext,
 			TypeQueryFactory<E, ?> queryFactory,
 			String documentIdSourcePropertyName,
 			ValueReadHandle<?> documentIdSourceHandle,
@@ -84,7 +84,7 @@ class HibernateOrmSelectionEntityByNonIdPropertyLoader<E> extends AbstractHibern
 			Object documentIdSourceValue = documentIdSourceHandle.get( unproxied );
 			Object previous = resultMap.put( documentIdSourceValue, loadedEntity );
 			if ( previous != null ) {
-				throw log.foundMultipleEntitiesForDocumentId( targetEntityTypeContext.jpaEntityName(),
+				throw log.foundMultipleEntitiesForDocumentId( targetEntityTypeContext.entityName(),
 						documentIdSourcePropertyName, documentIdSourceValue );
 			}
 		}

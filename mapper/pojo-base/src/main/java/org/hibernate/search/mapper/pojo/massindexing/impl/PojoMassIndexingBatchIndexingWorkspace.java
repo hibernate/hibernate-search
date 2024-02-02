@@ -13,9 +13,10 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Future;
 import java.util.concurrent.ThreadPoolExecutor;
 
+import org.hibernate.search.mapper.pojo.loading.spi.PojoMassLoadingStrategy;
 import org.hibernate.search.mapper.pojo.logging.impl.Log;
 import org.hibernate.search.mapper.pojo.massindexing.MassIndexingEnvironment;
-import org.hibernate.search.mapper.pojo.massindexing.spi.PojoMassIndexingLoadingStrategy;
+import org.hibernate.search.mapper.pojo.massindexing.spi.PojoMassIndexingContext;
 import org.hibernate.search.mapper.pojo.massindexing.spi.PojoMassIndexingMappingContext;
 import org.hibernate.search.util.common.AssertionFailure;
 import org.hibernate.search.util.common.impl.Futures;
@@ -39,7 +40,8 @@ public class PojoMassIndexingBatchIndexingWorkspace<E, I> extends PojoMassIndexi
 	private final List<CompletableFuture<?>> indexingFutures = new ArrayList<>();
 	private final PojoMassIndexingMappingContext mappingContext;
 	private final PojoMassIndexingIndexedTypeGroup<E> typeGroup;
-	private final PojoMassIndexingLoadingStrategy<E, I> loadingStrategy;
+	private final PojoMassLoadingStrategy<E, I> loadingStrategy;
+	private final PojoMassIndexingContext massIndexingContext;
 
 	private final int entityExtractingThreads;
 	private final String tenantId;
@@ -48,12 +50,14 @@ public class PojoMassIndexingBatchIndexingWorkspace<E, I> extends PojoMassIndexi
 			PojoMassIndexingNotifier notifier,
 			MassIndexingEnvironment environment,
 			PojoMassIndexingIndexedTypeGroup<E> typeGroup,
-			PojoMassIndexingLoadingStrategy<E, I> loadingStrategy,
+			PojoMassLoadingStrategy<E, I> loadingStrategy,
+			PojoMassIndexingContext massIndexingContext,
 			int entityExtractingThreads, String tenantId) {
 		super( notifier, environment );
 		this.mappingContext = mappingContext;
 		this.typeGroup = typeGroup;
 		this.loadingStrategy = loadingStrategy;
+		this.massIndexingContext = massIndexingContext;
 		this.entityExtractingThreads = entityExtractingThreads;
 		this.tenantId = tenantId;
 	}
@@ -100,8 +104,9 @@ public class PojoMassIndexingBatchIndexingWorkspace<E, I> extends PojoMassIndexi
 	private void startProducingPrimaryKeys(PojoProducerConsumerQueue<List<I>> identifierQueue) {
 		final Runnable runnable = new PojoMassIndexingEntityIdentifierLoadingRunnable<>(
 				getNotifier(),
-				getMassIndexingEnvironment(),
-				typeGroup, loadingStrategy, identifierQueue, tenantId
+				massIndexingContext, getMassIndexingEnvironment(),
+				typeGroup, loadingStrategy,
+				identifierQueue, tenantId
 		);
 		//execIdentifiersLoader has size 1 and is not configurable: ensures the list is consistent as produced by one transaction
 		final ThreadPoolExecutor identifierProducingExecutor = mappingContext.threadPoolProvider().newFixedThreadPool(
@@ -119,8 +124,9 @@ public class PojoMassIndexingBatchIndexingWorkspace<E, I> extends PojoMassIndexi
 	private void startIndexing(PojoProducerConsumerQueue<List<I>> identifierQueue) {
 		final Runnable runnable = new PojoMassIndexingEntityLoadingRunnable<>(
 				getNotifier(),
-				getMassIndexingEnvironment(),
-				typeGroup, loadingStrategy, identifierQueue, tenantId
+				massIndexingContext, getMassIndexingEnvironment(),
+				typeGroup, loadingStrategy,
+				identifierQueue, tenantId
 		);
 		final ThreadPoolExecutor indexingExecutor = mappingContext.threadPoolProvider().newFixedThreadPool(
 				entityExtractingThreads,

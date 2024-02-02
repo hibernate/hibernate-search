@@ -18,7 +18,6 @@ import org.hibernate.search.engine.common.EntityReference;
 import org.hibernate.search.engine.common.spi.SearchIntegration;
 import org.hibernate.search.engine.mapper.mapping.spi.MappingPreStopContext;
 import org.hibernate.search.engine.mapper.mapping.spi.MappingStartContext;
-import org.hibernate.search.engine.search.projection.spi.ProjectionMappedTypeContext;
 import org.hibernate.search.mapper.pojo.mapping.spi.AbstractPojoMappingImplementor;
 import org.hibernate.search.mapper.pojo.mapping.spi.PojoMappingDelegate;
 import org.hibernate.search.mapper.pojo.massindexing.spi.PojoMassIndexerAgent;
@@ -34,7 +33,6 @@ import org.hibernate.search.mapper.pojo.standalone.reporting.impl.StandalonePojo
 import org.hibernate.search.mapper.pojo.standalone.schema.management.impl.SchemaManagementListener;
 import org.hibernate.search.mapper.pojo.standalone.scope.SearchScope;
 import org.hibernate.search.mapper.pojo.standalone.scope.impl.SearchScopeImpl;
-import org.hibernate.search.mapper.pojo.standalone.scope.impl.StandalonePojoScopeIndexedTypeContext;
 import org.hibernate.search.mapper.pojo.standalone.session.SearchSession;
 import org.hibernate.search.mapper.pojo.standalone.session.SearchSessionBuilder;
 import org.hibernate.search.mapper.pojo.standalone.session.impl.StandalonePojoSearchSession;
@@ -114,11 +112,6 @@ public class StandalonePojoMapping extends AbstractPojoMappingImplementor<Standa
 	}
 
 	@Override
-	public ProjectionMappedTypeContext mappedTypeContext(String mappedTypeName) {
-		return typeContextContainer.indexedByEntityName().getOrFail( mappedTypeName );
-	}
-
-	@Override
 	public PojoRuntimeIntrospector runtimeIntrospector() {
 		return PojoRuntimeIntrospector.simple();
 	}
@@ -150,7 +143,7 @@ public class StandalonePojoMapping extends AbstractPojoMappingImplementor<Standa
 
 	@Override
 	public <T> SearchScopeImpl<T> createScope(Collection<? extends Class<? extends T>> classes) {
-		PojoScopeDelegate<EntityReference, T, StandalonePojoScopeIndexedTypeContext<? extends T>> scopeDelegate =
+		PojoScopeDelegate<EntityReference, T, SearchIndexedEntity<? extends T>> scopeDelegate =
 				delegate().createPojoScopeForClasses(
 						this,
 						classes,
@@ -163,7 +156,7 @@ public class StandalonePojoMapping extends AbstractPojoMappingImplementor<Standa
 
 	@Override
 	public <T> SearchScopeImpl<T> createScope(Class<T> expectedSuperType, Collection<String> entityNames) {
-		PojoScopeDelegate<EntityReference, T, StandalonePojoScopeIndexedTypeContext<? extends T>> scopeDelegate =
+		PojoScopeDelegate<EntityReference, T, SearchIndexedEntity<? extends T>> scopeDelegate =
 				delegate().createPojoScopeForEntityNames(
 						this,
 						expectedSuperType, entityNames,
@@ -206,7 +199,7 @@ public class StandalonePojoMapping extends AbstractPojoMappingImplementor<Standa
 
 	@Override
 	public StandalonePojoLoadingContext.Builder loadingContextBuilder() {
-		return new StandalonePojoLoadingContext.Builder( this, typeContextContainer );
+		return new StandalonePojoLoadingContext.Builder( this );
 	}
 
 	@Override
@@ -226,7 +219,7 @@ public class StandalonePojoMapping extends AbstractPojoMappingImplementor<Standa
 
 	private Optional<SearchScopeImpl<Object>> createAllScope() {
 		return delegate()
-				.<EntityReference, StandalonePojoScopeIndexedTypeContext<?>>createPojoAllScope(
+				.<EntityReference, SearchIndexedEntity<?>>createPojoAllScope(
 						this,
 						typeContextContainer::indexedForExactType
 				)

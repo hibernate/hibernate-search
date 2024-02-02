@@ -11,8 +11,6 @@ import org.hibernate.search.mapper.pojo.loading.spi.PojoLoadingTypeContext;
 
 public interface PojoSearchLoadingIndexedTypeContext<E> extends PojoLoadingTypeContext<E> {
 
-	String entityName();
-
 	IdentifierMapping identifierMapping();
 
 }

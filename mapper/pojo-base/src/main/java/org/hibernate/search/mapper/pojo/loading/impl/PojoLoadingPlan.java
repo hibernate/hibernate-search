@@ -26,7 +26,7 @@ public interface PojoLoadingPlan<T> {
 		PojoSelectionLoadingStrategy<?> strategy = null;
 		for ( PojoLoadingTypeContext<? extends T> typeContext : targetTypes ) {
 			Optional<? extends PojoSelectionLoadingStrategy<?>> thisTypeStrategyOptional =
-					context.loadingStrategyOptional( typeContext );
+					typeContext.selectionLoadingStrategyOptional();
 			if ( !thisTypeStrategyOptional.isPresent() ) {
 				// One of the types cannot be loaded -- something is wrong.
 				// Forget about the optimization, and fail later,

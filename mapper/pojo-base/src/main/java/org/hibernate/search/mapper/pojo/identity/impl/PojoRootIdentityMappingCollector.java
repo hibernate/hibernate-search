@@ -75,7 +75,7 @@ public final class PojoRootIdentityMappingCollector<E> implements PojoIdentityMa
 	}
 
 	public IdentifierMappingImplementor<?, E> buildAndContributeTo(
-			PojoTypeExtendedMappingCollector extendedMappingCollector, IdentityMappingMode mode) {
+			PojoTypeExtendedMappingCollector<?> extendedMappingCollector, IdentityMappingMode mode) {
 		applyDefaults( mode );
 
 		if ( documentIdSourceProperty != null ) {

@@ -14,7 +14,7 @@ import org.hibernate.search.util.common.annotation.Incubating;
  * <p>
  * If a configurer is assigned to a given entity type,
  * it will also apply to its subtypes,
- * but its configuration can be overridden in a subtype by assigning another configurer to that subtype.
+ * except for subtypes that have another configurer assigned.
  */
 @Incubating
 public interface EntityConfigurer<E> {

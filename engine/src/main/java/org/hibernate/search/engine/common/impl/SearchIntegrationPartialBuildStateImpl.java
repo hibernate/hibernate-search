@@ -29,6 +29,7 @@ import org.hibernate.search.engine.environment.bean.BeanHolder;
 import org.hibernate.search.engine.environment.bean.BeanResolver;
 import org.hibernate.search.engine.environment.bean.spi.BeanProvider;
 import org.hibernate.search.engine.environment.thread.impl.ThreadPoolProviderImpl;
+import org.hibernate.search.engine.mapper.mapping.building.spi.MappingAbortedException;
 import org.hibernate.search.engine.mapper.mapping.building.spi.MappingFinalizationContext;
 import org.hibernate.search.engine.mapper.mapping.building.spi.MappingFinalizer;
 import org.hibernate.search.engine.mapper.mapping.building.spi.MappingKey;
@@ -36,6 +37,7 @@ import org.hibernate.search.engine.mapper.mapping.building.spi.MappingPartialBui
 import org.hibernate.search.engine.mapper.mapping.spi.MappingImplementor;
 import org.hibernate.search.engine.reporting.FailureHandler;
 import org.hibernate.search.engine.reporting.impl.EngineEventContextMessages;
+import org.hibernate.search.engine.reporting.spi.ContextualFailureCollector;
 import org.hibernate.search.engine.reporting.spi.RootFailureCollector;
 import org.hibernate.search.util.common.AssertionFailure;
 import org.hibernate.search.util.common.impl.Closer;
@@ -125,6 +127,8 @@ class SearchIntegrationPartialBuildStateImpl implements SearchIntegrationPartial
 
 	private class SearchIntegrationFinalizerImpl implements SearchIntegrationFinalizer {
 
+		private final RootFailureCollector failureCollector =
+				new RootFailureCollector( EngineEventContextMessages.INSTANCE.bootstrap() );
 		private final ConfigurationPropertySource propertySource;
 		private final ConfigurationPropertyChecker propertyChecker;
 
@@ -146,10 +150,22 @@ class SearchIntegrationPartialBuildStateImpl implements SearchIntegrationPartial
 				);
 			}
 
+			ContextualFailureCollector mappingFailureCollector = failureCollector.withContext( mappingKey );
 			MappingFinalizationContext mappingFinalizationContext =
-					new MappingFinalizationContextImpl( propertySource, beanResolver );
+					new MappingFinalizationContextImpl( mappingFailureCollector, propertySource, beanResolver );
 
-			MappingImplementor<M> mapping = finalizer.finalizeMapping( mappingFinalizationContext, partiallyBuiltMapping );
+			MappingImplementor<M> mapping = null;
+			try {
+				mapping = finalizer.finalizeMapping( mappingFinalizationContext, partiallyBuiltMapping );
+			}
+			catch (RuntimeException e) {
+				mappingFailureCollector.add( e );
+			}
+			catch (MappingAbortedException e) {
+				e.collectSilentlyAndCheck( mappingFailureCollector );
+			}
+			failureCollector.checkNoFailure();
+
 			fullyBuiltNonStartedMappings.put( mappingKey, new MappingNonStartedState( mappingKey, mapping ) );
 			partiallyBuiltMappings.remove( mappingKey );
 
@@ -158,14 +174,13 @@ class SearchIntegrationPartialBuildStateImpl implements SearchIntegrationPartial
 
 		@Override
 		public SearchIntegration finalizeIntegration() {
+			failureCollector.checkNoFailure();
+
 			if ( !partiallyBuiltMappings.isEmpty() ) {
 				throw new AssertionFailure(
 						"Some mappings were not fully built. Partially built mappings: " + partiallyBuiltMappings
 				);
 			}
-
-			RootFailureCollector failureCollector =
-					new RootFailureCollector( EngineEventContextMessages.INSTANCE.bootstrap() );
 
 			// Start backends
 			for ( Map.Entry<String, BackendNonStartedState> entry : nonStartedBackends.entrySet() ) {

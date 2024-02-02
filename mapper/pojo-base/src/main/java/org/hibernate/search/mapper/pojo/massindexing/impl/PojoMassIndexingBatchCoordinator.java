@@ -21,6 +21,7 @@ import org.hibernate.search.engine.backend.work.execution.spi.UnsupportedOperati
 import org.hibernate.search.engine.reporting.spi.RootFailureCollector;
 import org.hibernate.search.mapper.pojo.massindexing.MassIndexingEnvironment;
 import org.hibernate.search.mapper.pojo.massindexing.spi.PojoMassIndexerAgent;
+import org.hibernate.search.mapper.pojo.massindexing.spi.PojoMassIndexingContext;
 import org.hibernate.search.mapper.pojo.massindexing.spi.PojoMassIndexingMappingContext;
 import org.hibernate.search.mapper.pojo.reporting.impl.PojoEventContextMessages;
 import org.hibernate.search.mapper.pojo.schema.management.spi.PojoScopeSchemaManager;
@@ -42,6 +43,7 @@ public class PojoMassIndexingBatchCoordinator extends PojoMassIndexingFailureHan
 	private final PojoMassIndexingMappingContext mappingContext;
 	private final PojoMassIndexerAgentStartContextImpl agentStartContext;
 	private final List<PojoMassIndexingIndexedTypeGroup<?>> typeGroupsToIndex;
+	private final PojoMassIndexingContext massIndexingContext;
 
 	private final PojoScopeSchemaManager scopeSchemaManager;
 	private final Set<String> tenantIds;
@@ -61,6 +63,7 @@ public class PojoMassIndexingBatchCoordinator extends PojoMassIndexingFailureHan
 	public PojoMassIndexingBatchCoordinator(PojoMassIndexingMappingContext mappingContext,
 			PojoMassIndexingNotifier notifier,
 			List<PojoMassIndexingIndexedTypeGroup<?>> typeGroupsToIndex,
+			PojoMassIndexingContext massIndexingContext,
 			PojoScopeSchemaManager scopeSchemaManager,
 			Set<String> tenantIds,
 			PojoScopeDelegate<?, ?, ?> pojoScopeDelegate,
@@ -74,6 +77,7 @@ public class PojoMassIndexingBatchCoordinator extends PojoMassIndexingFailureHan
 		this.scopeSchemaManager = scopeSchemaManager;
 		this.tenantIds = tenantIds;
 		this.pojoScopeDelegate = pojoScopeDelegate;
+		this.massIndexingContext = massIndexingContext;
 		this.typesToIndexInParallel = typesToIndexInParallel;
 		this.documentBuilderThreads = documentBuilderThreads;
 		this.mergeSegmentsOnFinish = mergeSegmentsOnFinish;
@@ -194,7 +198,7 @@ public class PojoMassIndexingBatchCoordinator extends PojoMassIndexingFailureHan
 			PojoMassIndexingIndexedTypeGroup<E> typeGroup, SessionContext context) {
 		return new PojoMassIndexingBatchIndexingWorkspace<>(
 				mappingContext, getNotifier(), getMassIndexingEnvironment(), typeGroup,
-				typeGroup.loadingStrategy(),
+				typeGroup.loadingStrategy(), massIndexingContext,
 				documentBuilderThreads,
 				context.tenantIdentifier()
 		);
