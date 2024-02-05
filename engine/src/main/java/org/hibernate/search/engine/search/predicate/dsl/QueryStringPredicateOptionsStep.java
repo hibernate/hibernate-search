@@ -6,8 +6,6 @@
  */
 package org.hibernate.search.engine.search.predicate.dsl;
 
-import java.util.function.Consumer;
-
 import org.hibernate.search.engine.search.common.RewriteMethod;
 
 /**
@@ -39,38 +37,6 @@ public interface QueryStringPredicateOptionsStep<S extends QueryStringPredicateO
 	 * @return {@code this}, for method chaining.
 	 */
 	S enablePositionIncrements(boolean enablePositionIncrements);
-
-	/**
-	 * TODO: WILL BE MOVED.
-	 * @param matchingClausesNumber
-	 * @return {@code this}, for method chaining.
-	 */
-	default S minimumShouldMatchNumber(int matchingClausesNumber) {
-		return minimumShouldMatch()
-				.ifMoreThan( 0 ).thenRequireNumber( matchingClausesNumber )
-				.end();
-	}
-
-	/**
-	 * TODO: WILL BE MOVED.
-	 * @param matchingClausesPercent
-	 * @return {@code this}, for method chaining.
-	 */
-	default S minimumShouldMatchPercent(int matchingClausesPercent) {
-		return minimumShouldMatch()
-				.ifMoreThan( 0 ).thenRequirePercent( matchingClausesPercent )
-				.end();
-	}
-
-	MinimumShouldMatchConditionStep<? extends S> minimumShouldMatch();
-
-	/**
-	 * TODO: WILL BE MOVED.
-	 * @param constraintContributor
-	 * @return {@code this}, for method chaining.
-	 */
-	S minimumShouldMatch(
-			Consumer<? super MinimumShouldMatchConditionStep<?>> constraintContributor);
 
 	/**
 	 * Sets the slop, which defines how permissive the phrase predicate will be.

@@ -6,12 +6,8 @@
  */
 package org.hibernate.search.backend.lucene.search.predicate.impl;
 
-import static org.hibernate.search.backend.lucene.search.predicate.impl.LuceneCommonMinimumShouldMatchConstraint.minimumShouldMatch;
-
 import java.lang.invoke.MethodHandles;
 import java.util.Map;
-import java.util.NavigableMap;
-import java.util.TreeMap;
 
 import org.hibernate.search.backend.lucene.logging.impl.Log;
 import org.hibernate.search.backend.lucene.search.common.impl.LuceneSearchIndexScope;
@@ -28,8 +24,6 @@ import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.queryparser.classic.MultiFieldQueryParser;
 import org.apache.lucene.queryparser.classic.ParseException;
 import org.apache.lucene.queryparser.classic.QueryParser;
-import org.apache.lucene.search.BooleanClause;
-import org.apache.lucene.search.BooleanQuery;
 import org.apache.lucene.search.MatchNoDocsQuery;
 import org.apache.lucene.search.MultiTermQuery;
 import org.apache.lucene.search.Query;
@@ -49,7 +43,6 @@ public class LuceneQueryStringPredicate extends LuceneCommonQueryStringPredicate
 		private Integer phraseSlop;
 		private RewriteMethod rewriteMethod;
 		private Integer rewriteN;
-		private NavigableMap<Integer, LuceneCommonMinimumShouldMatchConstraint> minimumShouldMatchConstraints;
 
 		Builder(LuceneSearchIndexScope<?> scope) {
 			super( scope );
@@ -74,34 +67,6 @@ public class LuceneQueryStringPredicate extends LuceneCommonQueryStringPredicate
 		public void rewriteMethod(RewriteMethod rewriteMethod, Integer n) {
 			this.rewriteMethod = rewriteMethod;
 			this.rewriteN = n;
-		}
-
-		@Override
-		public void minimumShouldMatchNumber(int ignoreConstraintCeiling, int matchingClausesNumber) {
-			addMinimumShouldMatchConstraint(
-					ignoreConstraintCeiling,
-					new LuceneCommonMinimumShouldMatchConstraint( matchingClausesNumber, null )
-			);
-		}
-
-		@Override
-		public void minimumShouldMatchPercent(int ignoreConstraintCeiling, int matchingClausesPercent) {
-			addMinimumShouldMatchConstraint(
-					ignoreConstraintCeiling,
-					new LuceneCommonMinimumShouldMatchConstraint( null, matchingClausesPercent )
-			);
-		}
-
-		private void addMinimumShouldMatchConstraint(int ignoreConstraintCeiling,
-				LuceneCommonMinimumShouldMatchConstraint constraint) {
-			if ( minimumShouldMatchConstraints == null ) {
-				// We'll need to go through the data in ascending order, so use a TreeMap
-				minimumShouldMatchConstraints = new TreeMap<>();
-			}
-			Object previous = minimumShouldMatchConstraints.put( ignoreConstraintCeiling, constraint );
-			if ( previous != null ) {
-				throw log.minimumShouldMatchConflictingConstraints( ignoreConstraintCeiling );
-			}
 		}
 
 		@Override
@@ -139,34 +104,11 @@ public class LuceneQueryStringPredicate extends LuceneCommonQueryStringPredicate
 			}
 
 			try {
-				Query query = queryParser.parse( queryString );
-
-				if ( minimumShouldMatchConstraints != null ) {
-					query = applyMinimumShouldMatch( query );
-				}
-
-				return query;
+				return applyMinimumShouldMatch( queryParser.parse( queryString ) );
 			}
 			catch (ParseException e) {
 				throw log.queryStringParseException( queryString, e.getMessage(), e );
 			}
-		}
-
-		private Query applyMinimumShouldMatch(Query query) {
-			if ( query instanceof BooleanQuery ) {
-				int shouldClauses = (int) ( (BooleanQuery) query ).clauses().stream().map( BooleanClause::getOccur )
-						.filter( BooleanClause.Occur.SHOULD::equals )
-						.count();
-				int minimumShouldMatch = minimumShouldMatch( minimumShouldMatchConstraints, shouldClauses );
-
-				BooleanQuery.Builder builder = new BooleanQuery.Builder();
-				for ( BooleanClause clause : ( (BooleanQuery) query ).clauses() ) {
-					builder.add( clause );
-				}
-
-				query = builder.setMinimumNumberShouldMatch( minimumShouldMatch ).build();
-			}
-			return query;
 		}
 
 		private MultiFieldQueryParser create(Map<String, Float> weights, Analyzer analyzer) {

@@ -49,7 +49,7 @@ public class LuceneSimpleQueryStringPredicate extends LuceneCommonQueryStringPre
 		protected Query buildQuery() {
 			SimpleQueryParser queryParser = new SimpleQueryParser( buildAnalyzer(), buildWeights(), flags );
 			queryParser.setDefaultOperator( toOccur( defaultOperator ) );
-			return queryParser.parse( queryString );
+			return applyMinimumShouldMatch( queryParser.parse( queryString ) );
 		}
 
 		@Override

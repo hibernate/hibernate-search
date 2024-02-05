@@ -8,7 +8,7 @@ package org.hibernate.search.engine.search.predicate.spi;
 
 import org.hibernate.search.engine.search.common.RewriteMethod;
 
-public interface QueryStringPredicateBuilder extends MinimumShouldMatchBuilder, CommonQueryStringPredicateBuilder {
+public interface QueryStringPredicateBuilder extends CommonQueryStringPredicateBuilder {
 
 	void allowLeadingWildcard(boolean allowLeadingWildcard);
 
