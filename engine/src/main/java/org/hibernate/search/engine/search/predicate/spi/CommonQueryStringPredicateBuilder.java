@@ -8,7 +8,7 @@ package org.hibernate.search.engine.search.predicate.spi;
 
 import org.hibernate.search.engine.search.common.BooleanOperator;
 
-public interface CommonQueryStringPredicateBuilder extends SearchPredicateBuilder {
+public interface CommonQueryStringPredicateBuilder extends MinimumShouldMatchBuilder, SearchPredicateBuilder {
 
 	FieldState field(String fieldPath);
 

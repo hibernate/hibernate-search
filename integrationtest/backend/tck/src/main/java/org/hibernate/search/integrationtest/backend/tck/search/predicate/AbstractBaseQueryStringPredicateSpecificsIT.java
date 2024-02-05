@@ -9,6 +9,7 @@ package org.hibernate.search.integrationtest.backend.tck.search.predicate;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.hibernate.search.util.impl.integrationtest.common.assertion.SearchResultAssert.assertThatQuery;
 
+import java.util.List;
 import java.util.function.Function;
 
 import org.hibernate.search.engine.backend.common.DocumentReference;
@@ -35,6 +36,9 @@ import org.hibernate.search.util.impl.test.annotation.TestForIssue;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 
 abstract class AbstractBaseQueryStringPredicateSpecificsIT<P extends CommonQueryStringPredicateFieldStep<?>> {
 
@@ -239,6 +243,96 @@ abstract class AbstractBaseQueryStringPredicateSpecificsIT<P extends CommonQuery
 
 		assertThatQuery( createQuery.apply( PREFIX_FOR_TERM_6_DIFFERENT_CASE + "*" ) )
 				.hasDocRefHitsAnyOrder( index.typeName(), DOCUMENT_5 );
+	}
+
+	@ParameterizedTest
+	@MethodSource("minimumShouldMatch")
+	void minimumShouldMatch(String phrase, int min, String docId, String[] otherDocIds) {
+		StubMappingScope scope = index.createScope();
+		String absoluteFieldPath = index.binding().analyzedStringField1.relativeFieldName;
+
+		SearchQuery<DocumentReference> query = scope.query()
+				.where( f -> predicate( f )
+						.field( absoluteFieldPath )
+						.matching( phrase )
+						.minimumShouldMatchNumber( min ) )
+				.toQuery();
+		if ( docId == null ) {
+			assertThatQuery( query )
+					.hasNoHits();
+		}
+		else {
+			assertThatQuery( query )
+					.hasDocRefHitsAnyOrder( index.typeName(), docId, otherDocIds );
+		}
+	}
+
+	@ParameterizedTest
+	@MethodSource("minimumShouldMatch")
+	void minimumShouldMatch_dsl(String phrase, int min, String docId, String[] otherDocIds) {
+		StubMappingScope scope = index.createScope();
+		String absoluteFieldPath = index.binding().analyzedStringField1.relativeFieldName;
+
+		SearchQuery<DocumentReference> query = scope.query()
+				.where( f -> predicate( f )
+						.field( absoluteFieldPath )
+						.matching( phrase )
+						.minimumShouldMatch().ifMoreThan( 0 )
+						.thenRequireNumber( min )
+						.end() )
+				.toQuery();
+		if ( docId == null ) {
+			assertThatQuery( query )
+					.hasNoHits();
+		}
+		else {
+			assertThatQuery( query )
+					.hasDocRefHitsAnyOrder( index.typeName(), docId, otherDocIds );
+		}
+	}
+
+	public static List<? extends Arguments> minimumShouldMatch() {
+		// "Here I was, feeding my panda, and the crowd had no word."
+		return List.of(
+				Arguments.of( "feeding my panda", 1, DOCUMENT_1, new String[] { DOCUMENT_3 } ),
+				Arguments.of( "feeding my panda", 2, DOCUMENT_1, new String[] { } ),
+				Arguments.of( "feeding my panda", 3, DOCUMENT_1, new String[] { } ),
+				Arguments.of( "feeding my panda crowd had", 5, DOCUMENT_1, new String[] { } ),
+				Arguments.of( "some other panda less matches", 5, null, new String[] { } )
+		);
+	}
+
+	@ParameterizedTest
+	@MethodSource("minimumShouldMatchPercent")
+	void minimumShouldMatch_percent(String phrase, int min, String docId, String[] otherDocIds) {
+		StubMappingScope scope = index.createScope();
+		String absoluteFieldPath = index.binding().analyzedStringField1.relativeFieldName;
+
+		SearchQuery<DocumentReference> query = scope.query()
+				.where( f -> predicate( f )
+						.field( absoluteFieldPath )
+						.matching( phrase )
+						.minimumShouldMatchPercent( min ) )
+				.toQuery();
+		if ( docId == null ) {
+			assertThatQuery( query )
+					.hasNoHits();
+		}
+		else {
+			assertThatQuery( query )
+					.hasDocRefHitsAnyOrder( index.typeName(), docId, otherDocIds );
+		}
+	}
+
+	public static List<? extends Arguments> minimumShouldMatchPercent() {
+		// "Here I was, feeding my panda, and the crowd had no word."
+		return List.of(
+				Arguments.of( "feeding my panda", 34, DOCUMENT_1, new String[] { DOCUMENT_3 } ),
+				Arguments.of( "feeding my panda", 67, DOCUMENT_1, new String[] { } ),
+				Arguments.of( "feeding my panda", 100, DOCUMENT_1, new String[] { } ),
+				Arguments.of( "feeding my panda crowd had", 100, DOCUMENT_1, new String[] { } ),
+				Arguments.of( "some other panda less matches", 100, null, new String[] { } )
+		);
 	}
 
 	@Test

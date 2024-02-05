@@ -6,11 +6,15 @@
  */
 package org.hibernate.search.backend.lucene.search.predicate.impl;
 
+import static org.hibernate.search.backend.lucene.search.predicate.impl.LuceneCommonMinimumShouldMatchConstraint.minimumShouldMatch;
+
 import java.lang.invoke.MethodHandles;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.NavigableMap;
+import java.util.TreeMap;
 
 import org.hibernate.search.backend.lucene.analysis.impl.ScopedAnalyzer;
 import org.hibernate.search.backend.lucene.analysis.model.impl.LuceneAnalysisDefinitionRegistry;
@@ -26,6 +30,8 @@ import org.hibernate.search.engine.search.predicate.spi.CommonQueryStringPredica
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
 import org.apache.lucene.analysis.Analyzer;
+import org.apache.lucene.search.BooleanClause;
+import org.apache.lucene.search.BooleanQuery;
 import org.apache.lucene.search.Query;
 
 abstract class LuceneCommonQueryStringPredicate extends AbstractLuceneNestablePredicate {
@@ -68,6 +74,7 @@ abstract class LuceneCommonQueryStringPredicate extends AbstractLuceneNestablePr
 		protected String queryString;
 		private Analyzer overrideAnalyzer;
 		private boolean ignoreAnalyzer = false;
+		private NavigableMap<Integer, LuceneCommonMinimumShouldMatchConstraint> minimumShouldMatchConstraints;
 
 		Builder(LuceneSearchIndexScope<?> scope) {
 			super( scope );
@@ -112,6 +119,54 @@ abstract class LuceneCommonQueryStringPredicate extends AbstractLuceneNestablePr
 		@Override
 		public void skipAnalysis() {
 			this.ignoreAnalyzer = true;
+		}
+
+		@Override
+		public void minimumShouldMatchNumber(int ignoreConstraintCeiling, int matchingClausesNumber) {
+			addMinimumShouldMatchConstraint(
+					ignoreConstraintCeiling,
+					new LuceneCommonMinimumShouldMatchConstraint( matchingClausesNumber, null )
+			);
+		}
+
+		@Override
+		public void minimumShouldMatchPercent(int ignoreConstraintCeiling, int matchingClausesPercent) {
+			addMinimumShouldMatchConstraint(
+					ignoreConstraintCeiling,
+					new LuceneCommonMinimumShouldMatchConstraint( null, matchingClausesPercent )
+			);
+		}
+
+		private void addMinimumShouldMatchConstraint(int ignoreConstraintCeiling,
+				LuceneCommonMinimumShouldMatchConstraint constraint) {
+			if ( minimumShouldMatchConstraints == null ) {
+				// We'll need to go through the data in ascending order, so use a TreeMap
+				minimumShouldMatchConstraints = new TreeMap<>();
+			}
+			Object previous = minimumShouldMatchConstraints.put( ignoreConstraintCeiling, constraint );
+			if ( previous != null ) {
+				throw log.minimumShouldMatchConflictingConstraints( ignoreConstraintCeiling );
+			}
+		}
+
+		protected Query applyMinimumShouldMatch(Query query) {
+			if ( minimumShouldMatchConstraints == null ) {
+				return query;
+			}
+			if ( query instanceof BooleanQuery ) {
+				int shouldClauses = (int) ( (BooleanQuery) query ).clauses().stream().map( BooleanClause::getOccur )
+						.filter( BooleanClause.Occur.SHOULD::equals )
+						.count();
+				int minimumShouldMatch = minimumShouldMatch( minimumShouldMatchConstraints, shouldClauses );
+
+				BooleanQuery.Builder builder = new BooleanQuery.Builder();
+				for ( BooleanClause clause : ( (BooleanQuery) query ).clauses() ) {
+					builder.add( clause );
+				}
+
+				query = builder.setMinimumNumberShouldMatch( minimumShouldMatch ).build();
+			}
+			return query;
 		}
 
 		protected abstract Query buildQuery();

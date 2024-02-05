@@ -6,29 +6,20 @@
  */
 package org.hibernate.search.backend.elasticsearch.search.predicate.impl;
 
-import static org.hibernate.search.backend.elasticsearch.search.predicate.impl.ElasticsearchCommonMinimumShouldMatchConstraint.formatMinimumShouldMatchConstraints;
-
-import java.lang.invoke.MethodHandles;
 import java.util.Locale;
-import java.util.Map;
-import java.util.TreeMap;
 
 import org.hibernate.search.backend.elasticsearch.gson.impl.JsonAccessor;
 import org.hibernate.search.backend.elasticsearch.gson.impl.JsonObjectAccessor;
-import org.hibernate.search.backend.elasticsearch.logging.impl.Log;
 import org.hibernate.search.backend.elasticsearch.search.common.impl.ElasticsearchSearchIndexScope;
 import org.hibernate.search.backend.elasticsearch.types.predicate.impl.ElasticsearchCommonQueryStringPredicateBuilderFieldState;
 import org.hibernate.search.engine.search.common.RewriteMethod;
 import org.hibernate.search.engine.search.common.spi.SearchQueryElementTypeKey;
 import org.hibernate.search.engine.search.predicate.SearchPredicate;
 import org.hibernate.search.engine.search.predicate.spi.QueryStringPredicateBuilder;
-import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
 import com.google.gson.JsonObject;
 
 public class ElasticsearchQueryStringPredicate extends ElasticsearchCommonQueryStringPredicate {
-
-	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	private static final JsonObjectAccessor QUERY_STRING_ACCESSOR = JsonAccessor.root().property( "query_string" ).asObject();
 
@@ -38,16 +29,12 @@ public class ElasticsearchQueryStringPredicate extends ElasticsearchCommonQueryS
 			JsonAccessor.root().property( "enable_position_increments" ).asBoolean();
 	private static final JsonAccessor<Integer> PHRASE_SLOP_ACCESSOR = JsonAccessor.root().property( "phrase_slop" ).asInteger();
 	private static final JsonAccessor<String> REWRITE_ACCESSOR = JsonAccessor.root().property( "rewrite" ).asString();
-	private static final JsonAccessor<String> MINIMUM_SHOULD_MATCH_ACCESSOR =
-			JsonAccessor.root().property( "minimum_should_match" ).asString();
 
 	private final Boolean allowLeadingWildcard;
 	private final Boolean enablePositionIncrements;
 	private final Integer phraseSlop;
 	private final RewriteMethod rewriteMethod;
 	private final Integer rewriteN;
-	private final Map<Integer, ElasticsearchCommonMinimumShouldMatchConstraint> minimumShouldMatchConstraints;
-
 
 	ElasticsearchQueryStringPredicate(Builder builder) {
 		super( builder );
@@ -57,9 +44,6 @@ public class ElasticsearchQueryStringPredicate extends ElasticsearchCommonQueryS
 		this.phraseSlop = builder.phraseSlop;
 		this.rewriteMethod = builder.rewriteMethod;
 		this.rewriteN = builder.rewriteN;
-		this.minimumShouldMatchConstraints = builder.minimumShouldMatchConstraints;
-
-		builder.minimumShouldMatchConstraints = null;
 	}
 
 	@Override
@@ -76,13 +60,6 @@ public class ElasticsearchQueryStringPredicate extends ElasticsearchCommonQueryS
 		}
 		if ( this.rewriteMethod != null ) {
 			REWRITE_ACCESSOR.set( innerObject, rewriteMethodAsString( this.rewriteMethod, this.rewriteN ) );
-		}
-
-		if ( minimumShouldMatchConstraints != null ) {
-			MINIMUM_SHOULD_MATCH_ACCESSOR.set(
-					innerObject,
-					formatMinimumShouldMatchConstraints( minimumShouldMatchConstraints )
-			);
 		}
 	}
 
@@ -109,8 +86,6 @@ public class ElasticsearchQueryStringPredicate extends ElasticsearchCommonQueryS
 		private Integer phraseSlop;
 		private RewriteMethod rewriteMethod;
 		private Integer rewriteN;
-		private Map<Integer, ElasticsearchCommonMinimumShouldMatchConstraint> minimumShouldMatchConstraints;
-
 
 		Builder(ElasticsearchSearchIndexScope<?> scope) {
 			super( scope );
@@ -135,34 +110,6 @@ public class ElasticsearchQueryStringPredicate extends ElasticsearchCommonQueryS
 		public void rewriteMethod(RewriteMethod rewriteMethod, Integer n) {
 			this.rewriteMethod = rewriteMethod;
 			this.rewriteN = n;
-		}
-
-		@Override
-		public void minimumShouldMatchNumber(int ignoreConstraintCeiling, int matchingClausesNumber) {
-			addMinimumShouldMatchConstraint(
-					ignoreConstraintCeiling,
-					new ElasticsearchCommonMinimumShouldMatchConstraint( matchingClausesNumber, null )
-			);
-		}
-
-		@Override
-		public void minimumShouldMatchPercent(int ignoreConstraintCeiling, int matchingClausesPercent) {
-			addMinimumShouldMatchConstraint(
-					ignoreConstraintCeiling,
-					new ElasticsearchCommonMinimumShouldMatchConstraint( null, matchingClausesPercent )
-			);
-		}
-
-		private void addMinimumShouldMatchConstraint(int ignoreConstraintCeiling,
-				ElasticsearchCommonMinimumShouldMatchConstraint constraint) {
-			if ( minimumShouldMatchConstraints == null ) {
-				// We'll need to go through the data in ascending order, so use a TreeMap
-				minimumShouldMatchConstraints = new TreeMap<>();
-			}
-			Object previous = minimumShouldMatchConstraints.put( ignoreConstraintCeiling, constraint );
-			if ( previous != null ) {
-				throw log.minimumShouldMatchConflictingConstraints( ignoreConstraintCeiling );
-			}
 		}
 
 		@Override

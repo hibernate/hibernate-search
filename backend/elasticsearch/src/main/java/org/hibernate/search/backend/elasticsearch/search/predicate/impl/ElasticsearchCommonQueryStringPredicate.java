@@ -6,13 +6,18 @@
  */
 package org.hibernate.search.backend.elasticsearch.search.predicate.impl;
 
+import static org.hibernate.search.backend.elasticsearch.search.predicate.impl.ElasticsearchCommonMinimumShouldMatchConstraint.formatMinimumShouldMatchConstraints;
+
+import java.lang.invoke.MethodHandles;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.TreeMap;
 
 import org.hibernate.search.backend.elasticsearch.gson.impl.JsonAccessor;
 import org.hibernate.search.backend.elasticsearch.gson.impl.JsonObjectAccessor;
+import org.hibernate.search.backend.elasticsearch.logging.impl.Log;
 import org.hibernate.search.backend.elasticsearch.lowlevel.index.analysis.impl.AnalyzerConstants;
 import org.hibernate.search.backend.elasticsearch.search.common.impl.ElasticsearchSearchIndexScope;
 import org.hibernate.search.backend.elasticsearch.types.predicate.impl.ElasticsearchCommonQueryStringPredicateBuilderFieldState;
@@ -21,6 +26,7 @@ import org.hibernate.search.engine.search.common.spi.SearchIndexSchemaElementCon
 import org.hibernate.search.engine.search.common.spi.SearchQueryElementTypeKey;
 import org.hibernate.search.engine.search.predicate.SearchPredicate;
 import org.hibernate.search.engine.search.predicate.spi.CommonQueryStringPredicateBuilder;
+import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
@@ -29,11 +35,15 @@ import com.google.gson.JsonPrimitive;
 
 abstract class ElasticsearchCommonQueryStringPredicate extends AbstractElasticsearchNestablePredicate {
 
+	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
+
 	private static final JsonAccessor<String> QUERY_ACCESSOR = JsonAccessor.root().property( "query" ).asString();
 	private static final JsonAccessor<JsonElement> DEFAULT_OPERATOR_ACCESSOR =
 			JsonAccessor.root().property( "default_operator" );
 	private static final JsonAccessor<JsonArray> FIELDS_ACCESSOR = JsonAccessor.root().property( "fields" ).asArray();
 	private static final JsonAccessor<String> ANALYZER_ACCESSOR = JsonAccessor.root().property( "analyzer" ).asString();
+	private static final JsonAccessor<String> MINIMUM_SHOULD_MATCH_ACCESSOR =
+			JsonAccessor.root().property( "minimum_should_match" ).asString();
 
 	private static final JsonPrimitive AND_OPERATOR_KEYWORD_JSON = new JsonPrimitive( "and" );
 	private static final JsonPrimitive OR_OPERATOR_KEYWORD_JSON = new JsonPrimitive( "or" );
@@ -45,6 +55,7 @@ abstract class ElasticsearchCommonQueryStringPredicate extends AbstractElasticse
 	private final JsonPrimitive defaultOperator;
 	private final String queryString;
 	private final String analyzer;
+	private final Map<Integer, ElasticsearchCommonMinimumShouldMatchConstraint> minimumShouldMatchConstraints;
 
 	ElasticsearchCommonQueryStringPredicate(Builder builder) {
 		super( builder );
@@ -62,6 +73,9 @@ abstract class ElasticsearchCommonQueryStringPredicate extends AbstractElasticse
 		defaultOperator = builder.defaultOperator;
 		queryString = builder.queryString;
 		analyzer = builder.analyzer;
+		minimumShouldMatchConstraints = builder.minimumShouldMatchConstraints;
+
+		builder.minimumShouldMatchConstraints = null;
 	}
 
 	@Override
@@ -78,6 +92,14 @@ abstract class ElasticsearchCommonQueryStringPredicate extends AbstractElasticse
 
 		if ( analyzer != null ) {
 			ANALYZER_ACCESSOR.set( innerObject, analyzer );
+		}
+
+
+		if ( minimumShouldMatchConstraints != null ) {
+			MINIMUM_SHOULD_MATCH_ACCESSOR.set(
+					innerObject,
+					formatMinimumShouldMatchConstraints( minimumShouldMatchConstraints )
+			);
 		}
 
 		addSpecificProperties( context, outerObject, innerObject );
@@ -111,6 +133,7 @@ abstract class ElasticsearchCommonQueryStringPredicate extends AbstractElasticse
 		protected JsonPrimitive defaultOperator = OR_OPERATOR_KEYWORD_JSON;
 		protected String queryString;
 		protected String analyzer;
+		private Map<Integer, ElasticsearchCommonMinimumShouldMatchConstraint> minimumShouldMatchConstraints;
 
 		Builder(ElasticsearchSearchIndexScope<?> scope) {
 			super( scope );
@@ -158,6 +181,34 @@ abstract class ElasticsearchCommonQueryStringPredicate extends AbstractElasticse
 		@Override
 		public final void skipAnalysis() {
 			analyzer( AnalyzerConstants.KEYWORD_ANALYZER );
+		}
+
+		@Override
+		public void minimumShouldMatchNumber(int ignoreConstraintCeiling, int matchingClausesNumber) {
+			addMinimumShouldMatchConstraint(
+					ignoreConstraintCeiling,
+					new ElasticsearchCommonMinimumShouldMatchConstraint( matchingClausesNumber, null )
+			);
+		}
+
+		@Override
+		public void minimumShouldMatchPercent(int ignoreConstraintCeiling, int matchingClausesPercent) {
+			addMinimumShouldMatchConstraint(
+					ignoreConstraintCeiling,
+					new ElasticsearchCommonMinimumShouldMatchConstraint( null, matchingClausesPercent )
+			);
+		}
+
+		private void addMinimumShouldMatchConstraint(int ignoreConstraintCeiling,
+				ElasticsearchCommonMinimumShouldMatchConstraint constraint) {
+			if ( minimumShouldMatchConstraints == null ) {
+				// We'll need to go through the data in ascending order, so use a TreeMap
+				minimumShouldMatchConstraints = new TreeMap<>();
+			}
+			Object previous = minimumShouldMatchConstraints.put( ignoreConstraintCeiling, constraint );
+			if ( previous != null ) {
+				throw log.minimumShouldMatchConflictingConstraints( ignoreConstraintCeiling );
+			}
 		}
 
 		@Override

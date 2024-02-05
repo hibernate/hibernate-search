@@ -11,16 +11,12 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Set;
 
-import org.hibernate.search.engine.search.common.BooleanOperator;
-import org.hibernate.search.engine.search.predicate.SearchPredicate;
 import org.hibernate.search.engine.search.predicate.dsl.SimpleQueryFlag;
 import org.hibernate.search.engine.search.predicate.dsl.SimpleQueryStringPredicateFieldMoreStep;
 import org.hibernate.search.engine.search.predicate.dsl.SimpleQueryStringPredicateOptionsStep;
-import org.hibernate.search.engine.search.predicate.dsl.spi.AbstractPredicateFinalStep;
 import org.hibernate.search.engine.search.predicate.dsl.spi.SearchPredicateDslContext;
 import org.hibernate.search.engine.search.predicate.spi.CommonQueryStringPredicateBuilder;
 import org.hibernate.search.engine.search.predicate.spi.SimpleQueryStringPredicateBuilder;
-import org.hibernate.search.util.common.impl.Contracts;
 
 class SimpleQueryStringPredicateFieldMoreStepImpl
 		implements SimpleQueryStringPredicateFieldMoreStep<
@@ -54,64 +50,30 @@ class SimpleQueryStringPredicateFieldMoreStepImpl
 		return commonState.matching( queryString );
 	}
 
-	static class CommonState extends AbstractPredicateFinalStep
+	static class CommonState
+			extends
+			AbstractStringQueryPredicateCommonState<CommonState,
+					SimpleQueryStringPredicateOptionsStep<CommonState>,
+					SimpleQueryStringPredicateBuilder>
 			implements SimpleQueryStringPredicateOptionsStep<CommonState> {
-
-		private final SimpleQueryStringPredicateBuilder builder;
 
 		CommonState(SearchPredicateDslContext<?> dslContext) {
 			super( dslContext );
-			this.builder = dslContext.scope().predicateBuilders().simpleQueryString();
 		}
 
 		@Override
-		protected SearchPredicate build() {
-			return builder.build();
-		}
-
-		CommonQueryStringPredicateBuilder.FieldState field(String fieldPath) {
-			return builder.field( fieldPath );
-		}
-
-		private SimpleQueryStringPredicateOptionsStep<?> matching(String simpleQueryString) {
-			Contracts.assertNotNull( simpleQueryString, "simpleQueryString" );
-			builder.queryString( simpleQueryString );
-			return this;
-		}
-
-		@Override
-		public CommonState constantScore() {
-			builder.constantScore();
-			return this;
-		}
-
-		@Override
-		public CommonState boost(float boost) {
-			builder.boost( boost );
-			return this;
-		}
-
-		@Override
-		public CommonState defaultOperator(BooleanOperator operator) {
-			builder.defaultOperator( operator );
-			return this;
-		}
-
-		@Override
-		public CommonState analyzer(String analyzerName) {
-			builder.analyzer( analyzerName );
-			return this;
-		}
-
-		@Override
-		public CommonState skipAnalysis() {
-			builder.skipAnalysis();
-			return this;
+		protected SimpleQueryStringPredicateBuilder createBuilder(SearchPredicateDslContext<?> dslContext) {
+			return dslContext.scope().predicateBuilders().simpleQueryString();
 		}
 
 		@Override
 		public CommonState flags(Set<SimpleQueryFlag> flags) {
 			builder.flags( flags );
+			return this;
+		}
+
+		@Override
+		protected CommonState thisAsT() {
 			return this;
 		}
 

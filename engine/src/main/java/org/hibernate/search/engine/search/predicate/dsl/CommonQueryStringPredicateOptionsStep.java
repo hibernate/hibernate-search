@@ -6,6 +6,8 @@
  */
 package org.hibernate.search.engine.search.predicate.dsl;
 
+import java.util.function.Consumer;
+
 import org.hibernate.search.engine.search.common.BooleanOperator;
 
 /**
@@ -45,5 +47,48 @@ public interface CommonQueryStringPredicateOptionsStep<S extends CommonQueryStri
 	 * @return {@code this}, for method chaining.
 	 */
 	S skipAnalysis();
+
+	/**
+	 * Add a default <a href="MinimumShouldMatchConditionStep.html#minimumshouldmatch">"minimumShouldMatch" constraint</a>.
+	 *
+	 * @param matchingClausesNumber A definition of the number of "should" clauses that have to match.
+	 * If positive, it is the number of clauses that have to match.
+	 * See <a href="MinimumShouldMatchConditionStep.html#minimumshouldmatch-minimum">Definition of the minimum</a>
+	 * for details and possible values, in particular negative values.
+	 * @return {@code this}, for method chaining.
+	 */
+	default S minimumShouldMatchNumber(int matchingClausesNumber) {
+		return minimumShouldMatch()
+				.ifMoreThan( 0 ).thenRequireNumber( matchingClausesNumber )
+				.end();
+	}
+
+	/**
+	 * Add a default <a href="MinimumShouldMatchConditionStep.html#minimumshouldmatch">"minimumShouldMatch" constraint</a>.
+	 *
+	 * @param matchingClausesPercent A definition of the number of "should" clauses that have to match, as a percentage.
+	 * If positive, it is the percentage of the total number of "should" clauses that have to match.
+	 * See <a href="MinimumShouldMatchConditionStep.html#minimumshouldmatch-minimum">Definition of the minimum</a>
+	 * for details and possible values, in particular negative values.
+	 * @return {@code this}, for method chaining.
+	 */
+	default S minimumShouldMatchPercent(int matchingClausesPercent) {
+		return minimumShouldMatch()
+				.ifMoreThan( 0 ).thenRequirePercent( matchingClausesPercent )
+				.end();
+	}
+
+	MinimumShouldMatchConditionStep<? extends S> minimumShouldMatch();
+
+	/**
+	 * Start defining the minimum number of "should" constraints that have to match
+	 * in order for the boolean predicate to match.
+	 * <p>
+	 * See {@link MinimumShouldMatchConditionStep}.
+	 *
+	 * @return A {@link MinimumShouldMatchConditionStep} where constraints can be defined.
+	 */
+	S minimumShouldMatch(
+			Consumer<? super MinimumShouldMatchConditionStep<?>> constraintContributor);
 
 }

@@ -12,20 +12,14 @@ import java.util.Arrays;
 import java.util.EnumSet;
 import java.util.List;
 import java.util.Set;
-import java.util.function.Consumer;
 
 import org.hibernate.search.engine.logging.impl.Log;
-import org.hibernate.search.engine.search.common.BooleanOperator;
 import org.hibernate.search.engine.search.common.RewriteMethod;
-import org.hibernate.search.engine.search.predicate.SearchPredicate;
-import org.hibernate.search.engine.search.predicate.dsl.MinimumShouldMatchConditionStep;
 import org.hibernate.search.engine.search.predicate.dsl.QueryStringPredicateFieldMoreStep;
 import org.hibernate.search.engine.search.predicate.dsl.QueryStringPredicateOptionsStep;
-import org.hibernate.search.engine.search.predicate.dsl.spi.AbstractPredicateFinalStep;
 import org.hibernate.search.engine.search.predicate.dsl.spi.SearchPredicateDslContext;
 import org.hibernate.search.engine.search.predicate.spi.CommonQueryStringPredicateBuilder;
 import org.hibernate.search.engine.search.predicate.spi.QueryStringPredicateBuilder;
-import org.hibernate.search.util.common.impl.Contracts;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
 class QueryStringPredicateFieldMoreStepImpl
@@ -61,7 +55,12 @@ class QueryStringPredicateFieldMoreStepImpl
 		return commonState.matching( queryString );
 	}
 
-	static class CommonState extends AbstractPredicateFinalStep
+
+	static class CommonState
+			extends
+			AbstractStringQueryPredicateCommonState<CommonState,
+					QueryStringPredicateOptionsStep<CommonState>,
+					QueryStringPredicateBuilder>
 			implements QueryStringPredicateOptionsStep<CommonState> {
 
 		private static final Set<RewriteMethod> PARAMETERIZED_REWRITE_METHODS = EnumSet.of(
@@ -70,58 +69,14 @@ class QueryStringPredicateFieldMoreStepImpl
 				RewriteMethod.TOP_TERMS_N
 		);
 
-		private final QueryStringPredicateBuilder builder;
-		private final MinimumShouldMatchConditionStepImpl<CommonState> minimumShouldMatchStep;
 
 		CommonState(SearchPredicateDslContext<?> dslContext) {
 			super( dslContext );
-			this.builder = dslContext.scope().predicateBuilders().queryString();
-			this.minimumShouldMatchStep = new MinimumShouldMatchConditionStepImpl<>( builder, this );
 		}
 
 		@Override
-		protected SearchPredicate build() {
-			return builder.build();
-		}
-
-		CommonQueryStringPredicateBuilder.FieldState field(String fieldPath) {
-			return builder.field( fieldPath );
-		}
-
-		private QueryStringPredicateOptionsStep<?> matching(String queryString) {
-			Contracts.assertNotNull( queryString, "queryString" );
-			builder.queryString( queryString );
-			return this;
-		}
-
-		@Override
-		public CommonState constantScore() {
-			builder.constantScore();
-			return this;
-		}
-
-		@Override
-		public CommonState boost(float boost) {
-			builder.boost( boost );
-			return this;
-		}
-
-		@Override
-		public CommonState defaultOperator(BooleanOperator operator) {
-			builder.defaultOperator( operator );
-			return this;
-		}
-
-		@Override
-		public CommonState analyzer(String analyzerName) {
-			builder.analyzer( analyzerName );
-			return this;
-		}
-
-		@Override
-		public CommonState skipAnalysis() {
-			builder.skipAnalysis();
-			return this;
+		protected QueryStringPredicateBuilder createBuilder(SearchPredicateDslContext<?> dslContext) {
+			return dslContext.scope().predicateBuilders().queryString();
 		}
 
 		@Override
@@ -133,17 +88,6 @@ class QueryStringPredicateFieldMoreStepImpl
 		@Override
 		public CommonState enablePositionIncrements(boolean enablePositionIncrements) {
 			builder.enablePositionIncrements( enablePositionIncrements );
-			return this;
-		}
-
-		@Override
-		public MinimumShouldMatchConditionStep<? extends CommonState> minimumShouldMatch() {
-			return minimumShouldMatchStep;
-		}
-
-		@Override
-		public CommonState minimumShouldMatch(Consumer<? super MinimumShouldMatchConditionStep<?>> constraintContributor) {
-			constraintContributor.accept( minimumShouldMatchStep );
 			return this;
 		}
 
@@ -170,5 +114,11 @@ class QueryStringPredicateFieldMoreStepImpl
 			builder.rewriteMethod( rewriteMethod, n );
 			return this;
 		}
+
+		@Override
+		protected CommonState thisAsT() {
+			return this;
+		}
+
 	}
 }
