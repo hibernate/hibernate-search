@@ -1275,6 +1275,24 @@ include::{sourcedir}/org/hibernate/search/documentation/search/predicate/Predica
 ----
 ====
 
+[[search-dsl-predicate-simple-query-string-minimumshouldmatch]]
+=== `minimumShouldMatch`: fine-tuning how many `should` clauses are required to match
+
+The resulting query parsed from the query string may result in a boolean query with should clauses.
+It may be helpful to control how many `should` clauses must match to consider a document as a match.
+
+.Fine-tuning `should` clauses matching requirements with `minimumShouldMatch`
+====
+[source, JAVA, indent=0, subs="+callouts"]
+----
+include::{sourcedir}/org/hibernate/search/documentation/search/predicate/PredicateDslIT.java[tags=simpleQueryString-minimum-should-match]
+----
+====
+
+This is similar to <<search-dsl-predicate-boolean-minimumshouldmatch,boolean>> or
+<<search-dsl-predicate-query-string-minimumshouldmatch,query string>>
+predicates `minimumShouldMatch` options.
+
 [[search-dsl-predicate-simpleQueryString-multiple-fields]]
 === Targeting multiple fields
 
@@ -1571,6 +1589,197 @@ See this section of the OpenSearch link:{openSearchDocUrl}/search-plugins/knn/ap
 but can be <<search-dsl-predicate-common-constantScore,made constant with `.constantScore()`>>.
 * The score of a `knn` predicate can be <<search-dsl-predicate-common-boost,boosted>>
 for the whole predicate with a call to `.boost(...)` after `.matching(...)`.
+
+[[search-dsl-predicate-query-string]]
+== `queryString`: match a user-provided query string
+
+The `queryString` predicate matches documents according to a structured query given as a string.
+It allows building more advanced query strings and has more configuration options than a <<search-dsl-predicate-simple-query-string,`simpleQueryString`>> predicate.
+
+We will not go much into details of a query syntax in this guide
+To familiarize yourself with it, please refer to your backend
+(link:{elasticsearchDocUrl}/query-dsl-query-string-query.html#query-string-syntax[Elasticsearch]/link:{openSearchDocUrl}/query-dsl/full-text/query-string/[OpenSearch]/link:{luceneJavadocUrl}../queryparser/org/apache/lucene/queryparser/classic/package-summary.html#package.description/[Lucene])
+guides.
+
+.Matching a query string
+====
+[source, JAVA, indent=0, subs="+callouts"]
+----
+include::{sourcedir}/org/hibernate/search/documentation/search/predicate/PredicateDslIT.java[tags=queryString-query]
+----
+<1> This query string will result in a boolean query with 4 clauses:
+
+* a should clause matching `robots`;
+* two must clauses
+  ** another boolean query constructed from `(crime || investigation || disappearance)` string with a boost of `10`
+  ** a query matching the phrase `investigation help` with the phrase slop equals to `2`
+* a must not clause matching a regular expression `(dis)?a[p]+ea?ance`
+
++
+Note that each of the mentioned clauses may itself end up being translated into other types of queries.
+====
+
+[[search-dsl-predicate-query-string-boolean-operators-default]]
+=== Default boolean operator
+
+By default, the query uses the OR operator if the operator is not explicitly defined.
+If you prefer using the AND operator as default,
+you can call `.defaultOperator(...)`.
+
+.Matching a query string: AND as default operator
+====
+[source, JAVA, indent=0, subs="+callouts"]
+----
+include::{sourcedir}/org/hibernate/search/documentation/search/predicate/PredicateDslIT.java[tags=queryString-defaultOperator-and]
+----
+====
+
+[[search-dsl-predicate-query-string-phrase-slop]]
+=== Phrase slop
+
+The phrase slop option defines how permissive a constructed phrase predicate will be;
+in other words, how many transpositions in the phrase are allowed for it to still be considered a match.
+With query predicate, this option can be set in the query string itself.
+
+.Matching a query string: phrase slop as part of query string itself
+====
+[source, JAVA, indent=0, subs="+callouts"]
+----
+include::{sourcedir}/org/hibernate/search/documentation/search/predicate/PredicateDslIT.java[tags=queryString-phrase-slop-through-query]
+----
+====
+
+Alternatively, `.phraseSlop(...)` can be applied to a query string predicate.
+
+.Matching a query string: phrase slop as predicate option
+====
+[source, JAVA, indent=0, subs="+callouts"]
+----
+include::{sourcedir}/org/hibernate/search/documentation/search/predicate/PredicateDslIT.java[tags=queryString-phrase-slop-through-parameter]
+----
+====
+
+Note that passing the value to `.phraseSlop(...)` sets the default phrase slop value, that can be overridden in the query string.
+
+.Matching a query string: phrase slop as predicate option overridden by query
+====
+[source, JAVA, indent=0, subs="+callouts"]
+----
+include::{sourcedir}/org/hibernate/search/documentation/search/predicate/PredicateDslIT.java[tags=queryString-phrase-slop-through-parameter-overridden]
+----
+<1> Query string is combination of two phrase queries.
+First phrase query `"dawn robot"` applies an override of the default phrase slop parameter and sets it to `3`.
+Second phrase query `"automatic detective"` uses the default phrase slop set in (2).
+<2> Set the default pharse slop value to apply to the phrase queries that do not specify the slop explicitly in the query string.
+====
+
+[[search-dsl-predicate-query-string-allow-leading-wildcard]]
+=== Allowing leading wildcards
+
+A query string can use a wildcard at any position within a query by default.
+If there is a need to prevent users from using leading wildcards, `.allowLeadingWildcard(..)` can be called
+with a `false` value to disallow such queries.
+
+.Matching a query string: disallowing leading wildcards
+====
+[source, JAVA, indent=0, subs="+callouts"]
+----
+include::{sourcedir}/org/hibernate/search/documentation/search/predicate/PredicateDslIT.java[tags=queryString-allow-leading-wildcard]
+----
+In this example, a query uses the wildcard at the end of the word; hence, it is acceptable regardless of the option value.
+If queries like `?obot` or `*bot` were supplied, and at the same time, leading wildcards were disallowed
+it would have resulted in an exception being thrown.
+====
+
+Note that this option affects not just the whole query string, but individual clauses in that query string.
+For example, in a query string `robot ?etective` the wildcard `?` is not a leading character,
+but this query is broken down as two clauses for `robot` and `?etecitve` where in the second
+clause, the `?` wildcard becomes a leading character.
+
+[[search-dsl-predicate-query-string-enable-position-increments]]
+=== Enabling position increments
+
+Position increments are enabled by default.
+Position increments are enabled by default, allowing phrase queries to take into account stop words removed by a `stopwords` filter.
+Position increments can be disabled as shown below,
+leading to a change in the behaviour of phrase queries:
+assuming that there is a phrase `book at the shelve` in the document, and the stop filter removes both `at` and `the`,
+with disabled position increments, phrase query `"book shelve"` will not match such document.
+
+.Matching a query string: disabling position increments
+====
+[source, JAVA, indent=0, subs="+callouts"]
+----
+include::{sourcedir}/org/hibernate/search/documentation/search/predicate/PredicateDslIT.java[tags=queryString-enable-position-increments]
+----
+====
+
+[[search-dsl-predicate-query-string-rewrite-method]]
+=== Rewrite method
+
+The rewrite method determines how the backend's query parser rewrites and scores multi-term queries.
+
+To change the default `CONSTANT_SCORE` rewrite method, one of the allowed `RewriteMethod` enum values can be passed
+to `.rewriteMethod(RewriteMethod)`/`rewriteMethod(RewriteMethod, int)`.
+
+Note, even though the default rewrite method is called `CONSTANT_SCORE`
+it does not mean that the matched documents' final score will be constant across all results,
+it is more about how the query parsing works internally.
+To achieve a constant score for results, see <<search-dsl-predicate-query-string-other,this documentation section>> on the query string predicate.
+
+We will not go into details about different rewrite methods in this guide.
+To learn more about them, please refer to your backend's guide
+(link:{elasticsearchDocUrl}/query-dsl-multi-term-rewrite.html[Elasticsearch]/link:{openSearchDocUrl}/query-dsl/full-text/query-string/[OpenSearch]/link:{luceneJavadocUrl}org/apache/lucene/search/MultiTermQuery.html[Lucene]).
+
+.Matching a query string: rewrite method
+====
+[source, JAVA, indent=0, subs="+callouts"]
+----
+include::{sourcedir}/org/hibernate/search/documentation/search/predicate/PredicateDslIT.java[tags=queryString-rewrite-method]
+----
+====
+
+[[search-dsl-predicate-query-string-minimumshouldmatch]]
+=== `minimumShouldMatch`: fine-tuning how many `should` clauses are required to match
+
+The resulting query parsed from the query string may result in a boolean query with should clauses.
+It may be helpful to control how many `should` clauses must match to consider a document as a match.
+
+.Fine-tuning `should` clauses matching requirements with `minimumShouldMatch`
+====
+[source, JAVA, indent=0, subs="+callouts"]
+----
+include::{sourcedir}/org/hibernate/search/documentation/search/predicate/PredicateDslIT.java[tags=simpleQueryString-minimum-should-match]
+----
+====
+
+This is similar to <<search-dsl-predicate-boolean-minimumshouldmatch,boolean>> or
+<<search-dsl-predicate-simple-query-string-minimumshouldmatch,simple query string>>
+predicates `minimumShouldMatch` options.
+
+[[search-dsl-predicate-query-string-multiple-fields]]
+=== Targeting multiple fields
+
+Optionally, the predicate can target multiple fields.
+In that case, the predicate will match documents for which _any_ of the given fields matches.
+
+See <<search-dsl-predicate-common-multiple-fields>>.
+
+IMPORTANT: If targeted fields have different analyzers, an exception will be thrown.
+You can avoid this by <<search-dsl-predicate-common-overriding-analysis,picking an analyzer explicitly>>,
+but make sure you know what you're doing.
+
+[[search-dsl-predicate-query-string-other]]
+=== Other options
+
+* The score of a `queryString` predicate is variable by default,
+but can be <<search-dsl-predicate-common-constantScore,made constant with `.constantScore()`>>.
+* The score of a `queryString` predicate can be <<search-dsl-predicate-common-boost,boosted>>,
+either on a per-field basis with a call to `.boost(...)` just after `.field(...)`/`.fields(...)`
+or for the whole predicate with a call to `.boost(...)` after `.matching(...)`.
+* The `queryString` predicate uses the <<mapping-directfieldmapping-search-analyzer,search analyzer>>
+of targeted fields to analyze searched text by default,
+but this can be <<search-dsl-predicate-common-overriding-analysis,overridden>>.
 
 [[search-dsl-predicate-named]]
 == [[query-filter-fulltext]] `named`: call a predicate defined in the mapping

@@ -22,6 +22,7 @@ import org.hibernate.search.documentation.testsupport.BackendConfigurations;
 import org.hibernate.search.documentation.testsupport.DocumentationSetupHelper;
 import org.hibernate.search.engine.backend.types.VectorSimilarity;
 import org.hibernate.search.engine.search.common.BooleanOperator;
+import org.hibernate.search.engine.search.common.RewriteMethod;
 import org.hibernate.search.engine.search.predicate.dsl.RegexpQueryFlag;
 import org.hibernate.search.engine.search.predicate.dsl.SimpleQueryFlag;
 import org.hibernate.search.engine.spatial.DistanceUnit;
@@ -872,26 +873,150 @@ class PredicateDslIT {
 					.extracting( Book::getId )
 					.containsExactlyInAnyOrder( BOOK1_ID, BOOK3_ID );
 		} );
+
+		withinSearchSession( searchSession -> {
+			// tag::simpleQueryString-minimum-should-match[]
+			List<Book> hits = searchSession.search( Book.class )
+					.where( f -> f.queryString().field( "title" )
+							.matching( "crime robot investigate automatic detective" )
+							.minimumShouldMatchNumber( 2 ) )
+					.fetchHits( 20 );
+			// end::simpleQueryString-minimum-should-match[]
+			assertThat( hits )
+					.extracting( Book::getId )
+					.containsExactlyInAnyOrder( BOOK4_ID );
+		} );
 	}
 
 	@Test
 	void queryString() {
 		withinSearchSession( searchSession -> {
-			System.err.println(
-					searchSession.search( Book.class )
-							.where( f -> f.queryString().field( "title" ).matching( "\"robots of dawn\"" ) ).toQuery()
-							.queryString()
-			);
-			System.err.println( searchSession.search( Book.class )
-					.where( f -> f.queryString()
-							.field( "title" ).boost( 20.0f )
-							.field( "description" ).boost( 2.0f )
-							.matching( "robots" )
-							.minimumShouldMatch()
-							.ifMoreThan( 0 )
-							.thenRequireNumber( 2 )
-							.end()
-					).toQuery().queryString() );
+			// tag::queryString-query[]
+			List<Book> hits = searchSession.search( Book.class )
+					.where( f -> f.queryString().field( "description" )
+							.matching(
+									"robots +(crime investigation disappearance)^10 +\"investigation help\"~2 -/(dis)?a[p]+ea?ance/" ) ) // <1>
+					.fetchHits( 20 );
+			// end::queryString-query[]
+			assertThat( hits )
+					.extracting( Book::getId )
+					.containsExactlyInAnyOrder( BOOK2_ID );
+		} );
+
+		withinSearchSession( searchSession -> {
+			// tag::queryString-defaultOperator-and[]
+			List<Book> hits = searchSession.search( Book.class )
+					.where( f -> f.queryString().field( "description" )
+							.matching( "robots investigation" )
+							.defaultOperator( BooleanOperator.AND ) )
+					.fetchHits( 20 );
+			// end::queryString-defaultOperator-and[]
+			assertThat( hits )
+					.extracting( Book::getId )
+					.containsExactlyInAnyOrder( BOOK2_ID );
+		} );
+
+		withinSearchSession( searchSession -> {
+			// tag::queryString-phrase-slop-through-query[]
+			List<Book> hits = searchSession.search( Book.class )
+					.where( f -> f.queryString().field( "title" )
+							.matching( "\"dawn robot\"~3" ) )
+					.fetchHits( 20 );
+			// end::queryString-phrase-slop-through-query[]
+			assertThat( hits )
+					.extracting( Book::getId )
+					.containsExactlyInAnyOrder( BOOK3_ID );
+		} );
+
+		withinSearchSession( searchSession -> {
+			// tag::queryString-phrase-slop-through-parameter[]
+			List<Book> hits = searchSession.search( Book.class )
+					.where( f -> f.queryString().field( "title" )
+							.matching( "\"dawn robot\"" )
+							.phraseSlop( 3 ) )
+					.fetchHits( 20 );
+			// end::queryString-phrase-slop-through-parameter[]
+			assertThat( hits )
+					.extracting( Book::getId )
+					.containsExactlyInAnyOrder( BOOK3_ID );
+		} );
+
+		withinSearchSession( searchSession -> {
+			// tag::queryString-phrase-slop-through-parameter-overridden[]
+			List<Book> hits = searchSession.search( Book.class )
+					.where( f -> f.queryString().field( "title" )
+							.matching( "\"dawn robot\"~3 -\"automatic detective\"" ) // <1>
+							.phraseSlop( 1 ) ) // <2>
+					.fetchHits( 20 );
+			// end::queryString-phrase-slop-through-parameter-overridden[]
+			assertThat( hits )
+					.extracting( Book::getId )
+					.containsExactlyInAnyOrder( BOOK3_ID );
+
+			// just to test that overrides work both ways (increased/decreased value):
+			hits = searchSession.search( Book.class )
+					.where( f -> f.queryString().field( "title" )
+							.matching( "\"dawn robot\"~1" )
+							.phraseSlop( 3 ) )
+					.fetchHits( 20 );
+			assertThat( hits )
+					.extracting( Book::getId )
+					.isEmpty();
+		} );
+
+		withinSearchSession( searchSession -> {
+			// tag::queryString-allow-leading-wildcard[]
+			List<Book> hits = searchSession.search( Book.class )
+					.where( f -> f.queryString().field( "title" )
+							.matching( "robo?" )
+							.allowLeadingWildcard( false ) )
+					.fetchHits( 20 );
+			// end::queryString-allow-leading-wildcard[]
+			assertThat( hits )
+					.extracting( Book::getId )
+					.containsExactlyInAnyOrder( BOOK1_ID, BOOK3_ID );
+		} );
+
+		withinSearchSession( searchSession -> {
+			// tag::queryString-enable-position-increments[]
+			List<Book> hits = searchSession.search( Book.class )
+					.where( f -> f.queryString().field( "title" )
+							.matching( "\"crime robots\"" )
+							.enablePositionIncrements( false ) )
+					.fetchHits( 20 );
+			// end::queryString-enable-position-increments[]
+			assertThat( hits ).isEmpty();
+		} );
+
+		withinSearchSession( searchSession -> {
+			// tag::queryString-rewrite-method[]
+			List<Book> hits = searchSession.search( Book.class )
+					.where( f -> f.queryString().field( "title" )
+							.matching(
+									// some complex query string
+									// end::queryString-rewrite-method[]
+									"robot"
+			// tag::queryString-rewrite-method[]
+							)
+							.rewriteMethod( RewriteMethod.CONSTANT_SCORE_BOOLEAN ) )
+					.fetchHits( 20 );
+			// end::queryString-rewrite-method[]
+			assertThat( hits )
+					.extracting( Book::getId )
+					.containsExactlyInAnyOrder( BOOK1_ID, BOOK3_ID );
+		} );
+
+		withinSearchSession( searchSession -> {
+			// tag::queryString-minimum-should-match[]
+			List<Book> hits = searchSession.search( Book.class )
+					.where( f -> f.queryString().field( "title" )
+							.matching( "crime robot investigate automatic detective" )
+							.minimumShouldMatchNumber( 2 ) )
+					.fetchHits( 20 );
+			// end::queryString-minimum-should-match[]
+			assertThat( hits )
+					.extracting( Book::getId )
+					.containsExactlyInAnyOrder( BOOK4_ID );
 		} );
 	}
 
