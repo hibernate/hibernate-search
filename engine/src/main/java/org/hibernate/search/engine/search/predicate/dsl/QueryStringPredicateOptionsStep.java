@@ -39,7 +39,7 @@ public interface QueryStringPredicateOptionsStep<S extends QueryStringPredicateO
 	S enablePositionIncrements(boolean enablePositionIncrements);
 
 	/**
-	 * Sets the slop, which defines how permissive the phrase predicate will be.
+	 * Sets the slop, which defines how permissive the phrase predicate (created when parsing the query string) will be.
 	 * <p>
 	 * If zero (the default), then the predicate will only match the exact phrase given (after analysis).
 	 * Higher values are increasingly permissive, allowing unexpected words or words that switched position.
