@@ -105,10 +105,10 @@ updates:
         update-types: ["version-update:semver-major"]
       # We only define a maven's minimum version, so we don't need it to be updated to the latest:
       - dependency-name: "org.apache.maven:maven-core"
-      # This dependency uses classifiers (-jdk8, ...) in its version, and dependabot can't decide which versions are relevant.
-      # See https://github.com/dependabot/dependabot-core/issues/4028
-      # And, additionally, it is only for performance testing.
+      # We require JDK 11, so we don't need "-jdk8"
       - dependency-name: "org.bsc.maven:maven-processor-plugin"
+        # Apparently patterns using wildcards are not supported here. Hopefully this will last until they drop these silly -jdk8 packages.
+        versions: ["5.0-jdk8", "5.1-jdk8", "5.2-jdk8", "5.3-jdk8", "5.4-jdk8", "5.5-jdk8", "5.6-jdk8", "5.7-jdk8", "5.8-jdk8", "5.9-jdk8"]
       # We only use the major version of WildFly, and only for a link in the documentation
       - dependency-name: "org.wildfly.bom:wildfly"
         update-types: [ "version-update:semver-minor", "version-update:semver-patch" ]
