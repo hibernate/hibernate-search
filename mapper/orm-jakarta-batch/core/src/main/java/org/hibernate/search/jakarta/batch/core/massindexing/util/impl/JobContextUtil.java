@@ -15,6 +15,7 @@ import java.util.Set;
 import jakarta.batch.runtime.context.JobContext;
 import jakarta.persistence.EntityManagerFactory;
 
+import org.hibernate.engine.spi.SessionFactoryImplementor;
 import org.hibernate.search.jakarta.batch.core.context.jpa.impl.ActiveSessionFactoryRegistry;
 import org.hibernate.search.jakarta.batch.core.context.jpa.spi.EntityManagerFactoryRegistry;
 import org.hibernate.search.jakarta.batch.core.logging.impl.Log;
@@ -89,7 +90,9 @@ public final class JobContextUtil {
 			entityTypesToIndex.add( mapping.typeContextProvider().byEntityName().getOrFail( s ) );
 		}
 
-		List<EntityTypeDescriptor<?, ?>> descriptors = PersistenceUtil.createDescriptors( entityTypesToIndex );
+		List<EntityTypeDescriptor<?, ?>> descriptors = PersistenceUtil.createDescriptors(
+				emf.unwrap( SessionFactoryImplementor.class ),
+				entityTypesToIndex );
 
 		JobContextData jobContextData = new JobContextData();
 		jobContextData.setEntityManagerFactory( emf );

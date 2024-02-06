@@ -7,6 +7,7 @@
 package org.hibernate.search.mapper.orm.mapping.impl;
 
 import org.hibernate.engine.spi.SessionFactoryImplementor;
+import org.hibernate.mapping.PersistentClass;
 import org.hibernate.search.engine.backend.index.IndexManager;
 import org.hibernate.search.engine.mapper.mapping.spi.MappedIndexManager;
 import org.hibernate.search.engine.search.projection.spi.ProjectionMappedTypeContext;
@@ -55,8 +56,8 @@ class HibernateOrmIndexedTypeContext<E> extends AbstractHibernateOrmTypeContext<
 	static class Builder<E> extends AbstractBuilder<E> implements PojoIndexedTypeExtendedMappingCollector {
 		private MappedIndexManager indexManager;
 
-		Builder(PojoRawTypeModel<E> typeModel, String jpaEntityName, String hibernateOrmEntityName) {
-			super( typeModel, jpaEntityName, hibernateOrmEntityName );
+		Builder(PojoRawTypeModel<E> typeModel, PersistentClass persistentClass) {
+			super( typeModel, persistentClass );
 		}
 
 		@Override

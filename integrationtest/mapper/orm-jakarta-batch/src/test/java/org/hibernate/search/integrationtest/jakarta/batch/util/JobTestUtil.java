@@ -22,6 +22,7 @@ import jakarta.persistence.EntityManagerFactory;
 
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
+import org.hibernate.engine.spi.SessionFactoryImplementor;
 import org.hibernate.search.jakarta.batch.core.logging.impl.Log;
 import org.hibernate.search.jakarta.batch.core.massindexing.MassIndexingJob;
 import org.hibernate.search.jakarta.batch.core.massindexing.util.impl.EntityTypeDescriptor;
@@ -151,6 +152,6 @@ public final class JobTestUtil {
 		BatchMappingContext mappingContext = (BatchMappingContext) mapping;
 		LoadingTypeContext<?> type = mappingContext.typeContextProvider()
 				.byEntityName().getOrFail( mapping.indexedEntity( clazz ).jpaName() );
-		return EntityTypeDescriptor.create( type );
+		return EntityTypeDescriptor.create( emf.unwrap( SessionFactoryImplementor.class ), type );
 	}
 }

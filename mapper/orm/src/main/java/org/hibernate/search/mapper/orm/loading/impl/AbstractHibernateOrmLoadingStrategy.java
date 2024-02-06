@@ -23,26 +23,26 @@ import org.hibernate.search.util.common.AssertionFailure;
 public abstract class AbstractHibernateOrmLoadingStrategy<E, I>
 		implements HibernateOrmEntityLoadingStrategy<E, I> {
 
-	private final SessionFactoryImplementor sessionFactory;
-	private final EntityMappingType rootEntityMappingType;
+	protected final String rootEntityName;
 	private final TypeQueryFactory<E, I> queryFactory;
 
-	AbstractHibernateOrmLoadingStrategy(SessionFactoryImplementor sessionFactory,
-			EntityMappingType rootEntityMappingType, TypeQueryFactory<E, I> queryFactory) {
-		this.sessionFactory = sessionFactory;
-		this.rootEntityMappingType = rootEntityMappingType;
+	AbstractHibernateOrmLoadingStrategy(String rootEntityName, TypeQueryFactory<E, I> queryFactory) {
+		this.rootEntityName = rootEntityName;
 		this.queryFactory = queryFactory;
 	}
 
 	@Override
-	public HibernateOrmQueryLoader<E, I> createQueryLoader(List<LoadingTypeContext<? extends E>> typeContexts,
+	public HibernateOrmQueryLoader<E, I> createQueryLoader(SessionFactoryImplementor sessionFactory,
+			List<LoadingTypeContext<? extends E>> typeContexts,
 			List<ConditionalExpression> conditionalExpressions) {
-		return createQueryLoader( typeContexts, conditionalExpressions, null );
+		return createQueryLoader( sessionFactory, typeContexts, conditionalExpressions, null );
 	}
 
 	@Override
-	public HibernateOrmQueryLoader<E, I> createQueryLoader(List<LoadingTypeContext<? extends E>> typeContexts,
+	public HibernateOrmQueryLoader<E, I> createQueryLoader(SessionFactoryImplementor sessionFactory,
+			List<LoadingTypeContext<? extends E>> typeContexts,
 			List<ConditionalExpression> conditionalExpressions, String order) {
+		var rootEntityMappingType = HibernateOrmUtils.entityMappingType( sessionFactory, rootEntityName );
 		Set<Class<? extends E>> includedTypesFilter;
 		if ( HibernateOrmUtils.targetsAllConcreteSubTypes( sessionFactory, rootEntityMappingType, typeContexts ) ) {
 			// All concrete types are included, no need to filter by type.

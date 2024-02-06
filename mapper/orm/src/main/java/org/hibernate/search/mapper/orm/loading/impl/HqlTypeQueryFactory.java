@@ -11,27 +11,26 @@ import java.util.Set;
 import org.hibernate.MultiIdentifierLoadAccess;
 import org.hibernate.engine.spi.SessionImplementor;
 import org.hibernate.engine.spi.SharedSessionContractImplementor;
-import org.hibernate.metamodel.mapping.EntityMappingType;
 import org.hibernate.query.Query;
 
 class HqlTypeQueryFactory<E, I> extends ConditionalExpressionQueryFactory<E, I> {
 
-	private final EntityMappingType entityMappingType;
+	private final Class<E> entityClass;
+	private final String ormEntityName;
 
-	@SuppressWarnings("unchecked") // Can't do better here: EntityMappingType has no generics
-	HqlTypeQueryFactory(EntityMappingType entityMappingType, String uniquePropertyName) {
-		super( uniquePropertyName.equals( entityMappingType.getIdentifierMapping().getAttributeName() )
-				? (Class<I>) entityMappingType.getIdentifierMapping().getJavaType().getJavaTypeClass()
-				: (Class<I>) entityMappingType.findAttributeMapping( uniquePropertyName ).getJavaType().getJavaTypeClass(),
-				uniquePropertyName );
-		this.entityMappingType = entityMappingType;
+	HqlTypeQueryFactory(Class<E> entityClass, String ormEntityName,
+			Class<I> uniquePropertyType, String uniquePropertyName,
+			boolean uniquePropertyIsTheEntityId) {
+		super( uniquePropertyType, uniquePropertyName, uniquePropertyIsTheEntityId );
+		this.entityClass = entityClass;
+		this.ormEntityName = ormEntityName;
 	}
 
 	@Override
 	public Query<Long> createQueryForCount(SharedSessionContractImplementor session,
 			Set<? extends Class<? extends E>> includedTypesFilter) {
 		return createQueryWithTypesFilter( session,
-				"select count(e) from " + entityMappingType.getEntityName() + " e",
+				"select count(e) from " + ormEntityName + " e",
 				Long.class,
 				"e", includedTypesFilter );
 	}
@@ -40,7 +39,7 @@ class HqlTypeQueryFactory<E, I> extends ConditionalExpressionQueryFactory<E, I> 
 	public Query<I> createQueryForIdentifierListing(SharedSessionContractImplementor session,
 			Set<? extends Class<? extends E>> includedTypesFilter) {
 		return createQueryWithTypesFilter( session,
-				"select e. " + uniquePropertyName + " from " + entityMappingType.getEntityName() + " e",
+				"select e. " + uniquePropertyName + " from " + ormEntityName + " e",
 				uniquePropertyType, "e", includedTypesFilter );
 	}
 
@@ -48,20 +47,15 @@ class HqlTypeQueryFactory<E, I> extends ConditionalExpressionQueryFactory<E, I> 
 	@Override
 	public Query<E> createQueryForLoadByUniqueProperty(SessionImplementor session, String parameterName) {
 		return session.createQuery(
-				"select e from " + entityMappingType.getEntityName()
+				"select e from " + ormEntityName
 						+ " e where " + uniquePropertyName + " in (:" + parameterName + ")",
-				(Class<E>) entityMappingType.getMappedJavaType().getJavaTypeClass()
+				entityClass
 		);
 	}
 
 	@Override
 	public MultiIdentifierLoadAccess<E> createMultiIdentifierLoadAccess(SessionImplementor session) {
-		return session.byMultipleIds( entityMappingType.getEntityName() );
-	}
-
-	@Override
-	public boolean uniquePropertyIsTheEntityId() {
-		return uniquePropertyName.equals( entityMappingType.getIdentifierMapping().getAttributeName() );
+		return session.byMultipleIds( ormEntityName );
 	}
 
 	private <T> Query<T> createQueryWithTypesFilter(SharedSessionContractImplementor session,

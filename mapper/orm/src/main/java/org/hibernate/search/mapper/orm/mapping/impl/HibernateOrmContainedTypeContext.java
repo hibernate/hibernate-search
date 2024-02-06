@@ -7,6 +7,7 @@
 package org.hibernate.search.mapper.orm.mapping.impl;
 
 import org.hibernate.engine.spi.SessionFactoryImplementor;
+import org.hibernate.mapping.PersistentClass;
 import org.hibernate.search.mapper.pojo.mapping.building.spi.PojoContainedTypeExtendedMappingCollector;
 import org.hibernate.search.mapper.pojo.model.spi.PojoRawTypeModel;
 
@@ -26,8 +27,8 @@ class HibernateOrmContainedTypeContext<E> extends AbstractHibernateOrmTypeContex
 
 	static class Builder<E> extends AbstractBuilder<E> implements PojoContainedTypeExtendedMappingCollector {
 
-		Builder(PojoRawTypeModel<E> typeModel, String jpaEntityName, String hibernateOrmEntityName) {
-			super( typeModel, jpaEntityName, hibernateOrmEntityName );
+		Builder(PojoRawTypeModel<E> typeModel, PersistentClass persistentClass) {
+			super( typeModel, persistentClass );
 		}
 
 		HibernateOrmContainedTypeContext<E> build(SessionFactoryImplementor sessionFactory) {

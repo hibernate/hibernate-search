@@ -172,7 +172,7 @@ public final class HibernateOrmMassIndexingContext
 					.map( typeContextProvider::forExactType )
 					.collect( Collectors.toList() );
 
-			HibernateOrmQueryLoader<E, I> typeQueryLoader = createQueryLoader( typeContexts );
+			HibernateOrmQueryLoader<E, I> typeQueryLoader = createQueryLoader( sessionFactory, typeContexts );
 			SharedSessionContractImplementor session = (SharedSessionContractImplementor) sessionFactory
 					.withStatelessOptions()
 					.tenantIdentifier( (Object) context.tenantIdentifier() )
@@ -195,7 +195,7 @@ public final class HibernateOrmMassIndexingContext
 					.map( typeContextProvider::forExactType )
 					.collect( Collectors.toList() );
 
-			HibernateOrmQueryLoader<E, ?> typeQueryLoader = createQueryLoader( typeContexts );
+			HibernateOrmQueryLoader<E, ?> typeQueryLoader = createQueryLoader( sessionFactory, typeContexts );
 			SessionImplementor session = (SessionImplementor) sessionFactory
 					.withOptions()
 					.tenantIdentifier( (Object) context.tenantIdentifier() )
@@ -215,8 +215,9 @@ public final class HibernateOrmMassIndexingContext
 			}
 		}
 
-		private HibernateOrmQueryLoader<E, I> createQueryLoader(List<LoadingTypeContext<? extends E>> typeContexts) {
-			return delegate.createQueryLoader( typeContexts, conditionalExpression.isPresent()
+		private HibernateOrmQueryLoader<E, I> createQueryLoader(SessionFactoryImplementor sessionFactory,
+				List<LoadingTypeContext<? extends E>> typeContexts) {
+			return delegate.createQueryLoader( sessionFactory, typeContexts, conditionalExpression.isPresent()
 					? List.of( conditionalExpression.get() )
 					: List.of() );
 		}

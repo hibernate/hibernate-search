@@ -8,6 +8,7 @@ package org.hibernate.search.jakarta.batch.core.massindexing.util.impl;
 
 import java.util.List;
 
+import org.hibernate.engine.spi.SessionFactoryImplementor;
 import org.hibernate.engine.spi.SessionImplementor;
 import org.hibernate.engine.spi.SharedSessionContractImplementor;
 import org.hibernate.metamodel.mapping.EmbeddableMappingType;
@@ -21,7 +22,8 @@ import org.hibernate.search.mapper.pojo.model.spi.PojoRawTypeIdentifier;
 
 public class EntityTypeDescriptor<E, I> {
 
-	public static <E> EntityTypeDescriptor<E, ?> create(LoadingTypeContext<E> type) {
+	public static <E> EntityTypeDescriptor<E, ?> create(SessionFactoryImplementor sessionFactory,
+			LoadingTypeContext<E> type) {
 		EntityIdentifierMapping identifierMapping = type.entityMappingType().getIdentifierMapping();
 		IdOrder idOrder;
 		if ( identifierMapping.getPartMappingType() instanceof EmbeddableMappingType ) {
@@ -30,15 +32,17 @@ public class EntityTypeDescriptor<E, I> {
 		else {
 			idOrder = new SingularIdOrder<>( type );
 		}
-		return new EntityTypeDescriptor<>( type, type.loadingStrategy(), idOrder );
+		return new EntityTypeDescriptor<>( sessionFactory, type, type.loadingStrategy(), idOrder );
 	}
 
+	private final SessionFactoryImplementor sessionFactory;
 	private final LoadingTypeContext<E> delegate;
 	private final HibernateOrmEntityLoadingStrategy<? super E, I> loadingStrategy;
 	private final IdOrder idOrder;
 
-	public EntityTypeDescriptor(LoadingTypeContext<E> delegate,
+	public EntityTypeDescriptor(SessionFactoryImplementor sessionFactory, LoadingTypeContext<E> delegate,
 			HibernateOrmEntityLoadingStrategy<? super E, I> loadingStrategy, IdOrder idOrder) {
+		this.sessionFactory = sessionFactory;
 		this.delegate = delegate;
 		this.loadingStrategy = loadingStrategy;
 		this.idOrder = idOrder;
@@ -75,7 +79,7 @@ public class EntityTypeDescriptor<E, I> {
 	}
 
 	private HibernateOrmQueryLoader<? super E, I> queryLoader(List<ConditionalExpression> conditions, String order) {
-		return loadingStrategy.createQueryLoader( List.of( delegate ), conditions, order );
+		return loadingStrategy.createQueryLoader( sessionFactory, List.of( delegate ), conditions, order );
 	}
 
 }
