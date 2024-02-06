@@ -166,19 +166,17 @@ class HibernateOrmTypeContextContainer
 		}
 
 		<E> HibernateOrmIndexedTypeContext.Builder<E> addIndexed(PojoRawTypeModel<E> typeModel, String jpaEntityName) {
-			HibernateOrmIndexedTypeContext.Builder<E> builder = new HibernateOrmIndexedTypeContext.Builder<>(
-					typeModel,
-					jpaEntityName, basicTypeMetadataProvider.getHibernateOrmEntityNameByJpaEntityName( jpaEntityName )
-			);
+			String hibernateOrmEntityName = basicTypeMetadataProvider.getHibernateOrmEntityNameByJpaEntityName( jpaEntityName );
+			HibernateOrmIndexedTypeContext.Builder<E> builder = new HibernateOrmIndexedTypeContext.Builder<>( typeModel,
+					basicTypeMetadataProvider.getPersistentClass( hibernateOrmEntityName ) );
 			indexedTypeContextBuilders.add( builder );
 			return builder;
 		}
 
 		<E> HibernateOrmContainedTypeContext.Builder<E> addContained(PojoRawTypeModel<E> typeModel, String jpaEntityName) {
-			HibernateOrmContainedTypeContext.Builder<E> builder = new HibernateOrmContainedTypeContext.Builder<>(
-					typeModel,
-					jpaEntityName, basicTypeMetadataProvider.getHibernateOrmEntityNameByJpaEntityName( jpaEntityName )
-			);
+			String hibernateOrmEntityName = basicTypeMetadataProvider.getHibernateOrmEntityNameByJpaEntityName( jpaEntityName );
+			HibernateOrmContainedTypeContext.Builder<E> builder = new HibernateOrmContainedTypeContext.Builder<>( typeModel,
+					basicTypeMetadataProvider.getPersistentClass( hibernateOrmEntityName ) );
 			containedTypeContextBuilders.add( builder );
 			return builder;
 		}

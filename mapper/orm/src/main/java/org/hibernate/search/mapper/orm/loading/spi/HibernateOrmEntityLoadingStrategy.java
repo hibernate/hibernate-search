@@ -9,6 +9,7 @@ package org.hibernate.search.mapper.orm.loading.spi;
 import java.util.List;
 import java.util.Set;
 
+import org.hibernate.engine.spi.SessionFactoryImplementor;
 import org.hibernate.search.mapper.orm.search.loading.EntityLoadingCacheLookupStrategy;
 import org.hibernate.search.mapper.pojo.loading.spi.PojoSelectionEntityLoader;
 
@@ -37,10 +38,12 @@ public interface HibernateOrmEntityLoadingStrategy<E, I> {
 			LoadingSessionContext sessionContext, EntityLoadingCacheLookupStrategy cacheLookupStrategy,
 			MutableEntityLoadingOptions loadingOptions);
 
-	HibernateOrmQueryLoader<E, I> createQueryLoader(List<LoadingTypeContext<? extends E>> typeContexts,
+	HibernateOrmQueryLoader<E, I> createQueryLoader(SessionFactoryImplementor sessionFactory,
+			List<LoadingTypeContext<? extends E>> typeContexts,
 			List<ConditionalExpression> conditionalExpressions);
 
-	HibernateOrmQueryLoader<E, I> createQueryLoader(List<LoadingTypeContext<? extends E>> typeContexts,
+	HibernateOrmQueryLoader<E, I> createQueryLoader(SessionFactoryImplementor sessionFactory,
+			List<LoadingTypeContext<? extends E>> typeContexts,
 			List<ConditionalExpression> conditionalExpressions, String order);
 
 }

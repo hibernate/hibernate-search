@@ -14,28 +14,28 @@ import jakarta.persistence.criteria.CriteriaQuery;
 import jakarta.persistence.criteria.ParameterExpression;
 import jakarta.persistence.criteria.Path;
 import jakarta.persistence.criteria.Root;
-import jakarta.persistence.metamodel.SingularAttribute;
 
 import org.hibernate.MultiIdentifierLoadAccess;
 import org.hibernate.engine.spi.SessionImplementor;
 import org.hibernate.engine.spi.SharedSessionContractImplementor;
-import org.hibernate.metamodel.model.domain.EntityDomainType;
 import org.hibernate.query.Query;
 
 class CriteriaTypeQueryFactory<E, I> extends ConditionalExpressionQueryFactory<E, I> {
 
-	public static <E> CriteriaTypeQueryFactory<E, ?> create(EntityDomainType<E> type,
-			String uniquePropertyName) {
-		return new CriteriaTypeQueryFactory<>( type, type.getSingularAttribute( uniquePropertyName ) );
+	public static <E, I> CriteriaTypeQueryFactory<E, I> create(Class<E> entityClass,
+			Class<I> uniquePropertyType, String uniquePropertyName,
+			boolean uniquePropertyIsTheEntityId) {
+		return new CriteriaTypeQueryFactory<>( entityClass, uniquePropertyType, uniquePropertyName,
+				uniquePropertyIsTheEntityId );
 	}
 
-	private final EntityDomainType<E> type;
-	private final SingularAttribute<? super E, I> uniqueProperty;
+	private final Class<E> entityClass;
 
-	private CriteriaTypeQueryFactory(EntityDomainType<E> type, SingularAttribute<? super E, I> uniqueProperty) {
-		super( uniqueProperty.getJavaType(), uniqueProperty.getName() );
-		this.type = type;
-		this.uniqueProperty = uniqueProperty;
+	private CriteriaTypeQueryFactory(Class<E> entityClass,
+			Class<I> uniquePropertyType, String uniquePropertyName,
+			boolean uniquePropertyIsTheEntityId) {
+		super( uniquePropertyType, uniquePropertyName, uniquePropertyIsTheEntityId );
+		this.entityClass = entityClass;
 	}
 
 	@Override
@@ -43,7 +43,7 @@ class CriteriaTypeQueryFactory<E, I> extends ConditionalExpressionQueryFactory<E
 			Set<? extends Class<? extends E>> includedTypesFilter) {
 		CriteriaBuilder criteriaBuilder = session.getFactory().getCriteriaBuilder();
 		CriteriaQuery<Long> criteriaQuery = criteriaBuilder.createQuery( Long.class );
-		Root<E> root = criteriaQuery.from( type );
+		Root<E> root = criteriaQuery.from( entityClass );
 		criteriaQuery.select( criteriaBuilder.count( root ) );
 		if ( !includedTypesFilter.isEmpty() ) {
 			criteriaQuery.where( root.type().in( includedTypesFilter ) );
@@ -54,10 +54,10 @@ class CriteriaTypeQueryFactory<E, I> extends ConditionalExpressionQueryFactory<E
 	@Override
 	public Query<I> createQueryForIdentifierListing(SharedSessionContractImplementor session,
 			Set<? extends Class<? extends E>> includedTypesFilter) {
-		CriteriaBuilder criteriaBuilder = session.getFactory().getCriteriaBuilder();
-		CriteriaQuery<I> criteriaQuery = criteriaBuilder.createQuery( uniqueProperty.getJavaType() );
-		Root<E> root = criteriaQuery.from( type );
-		Path<I> idPath = root.get( uniqueProperty );
+		CriteriaBuilder criteriaBuilder = session.getCriteriaBuilder();
+		CriteriaQuery<I> criteriaQuery = criteriaBuilder.createQuery( uniquePropertyType );
+		Root<E> root = criteriaQuery.from( entityClass );
+		Path<I> idPath = root.get( uniquePropertyName );
 		criteriaQuery.select( idPath );
 		if ( !includedTypesFilter.isEmpty() ) {
 			criteriaQuery.where( root.type().in( includedTypesFilter ) );
@@ -70,20 +70,15 @@ class CriteriaTypeQueryFactory<E, I> extends ConditionalExpressionQueryFactory<E
 	public Query<E> createQueryForLoadByUniqueProperty(SessionImplementor session, String parameterName) {
 		CriteriaBuilder criteriaBuilder = session.getCriteriaBuilder();
 		ParameterExpression<Collection> idsParameter = criteriaBuilder.parameter( Collection.class, parameterName );
-		CriteriaQuery<E> criteriaQuery = criteriaBuilder.createQuery( type.getJavaType() );
-		Root<E> root = criteriaQuery.from( type );
-		Path<?> uniquePropertyInRoot = root.get( uniqueProperty );
+		CriteriaQuery<E> criteriaQuery = criteriaBuilder.createQuery( entityClass );
+		Root<E> root = criteriaQuery.from( entityClass );
+		Path<?> uniquePropertyInRoot = root.get( uniquePropertyName );
 		criteriaQuery.where( uniquePropertyInRoot.in( idsParameter ) );
 		return session.createQuery( criteriaQuery );
 	}
 
 	@Override
 	public MultiIdentifierLoadAccess<E> createMultiIdentifierLoadAccess(SessionImplementor session) {
-		return session.byMultipleIds( type.getJavaType() );
-	}
-
-	@Override
-	public boolean uniquePropertyIsTheEntityId() {
-		return uniqueProperty.isId();
+		return session.byMultipleIds( entityClass );
 	}
 }

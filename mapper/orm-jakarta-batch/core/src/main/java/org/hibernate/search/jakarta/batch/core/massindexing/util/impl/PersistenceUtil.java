@@ -18,6 +18,7 @@ import org.hibernate.SessionBuilder;
 import org.hibernate.SessionFactory;
 import org.hibernate.StatelessSession;
 import org.hibernate.StatelessSessionBuilder;
+import org.hibernate.engine.spi.SessionFactoryImplementor;
 import org.hibernate.search.mapper.orm.loading.spi.LoadingTypeContext;
 import org.hibernate.search.util.common.impl.StringHelper;
 
@@ -74,10 +75,11 @@ public final class PersistenceUtil {
 		return builder.openStatelessSession();
 	}
 
-	public static List<EntityTypeDescriptor<?, ?>> createDescriptors(Set<LoadingTypeContext<?>> types) {
+	public static List<EntityTypeDescriptor<?, ?>> createDescriptors(SessionFactoryImplementor sessionFactory,
+			Set<LoadingTypeContext<?>> types) {
 		List<EntityTypeDescriptor<?, ?>> result = new ArrayList<>( types.size() );
 		for ( LoadingTypeContext<?> type : types ) {
-			result.add( EntityTypeDescriptor.create( type ) );
+			result.add( EntityTypeDescriptor.create( sessionFactory, type ) );
 		}
 		return result;
 	}

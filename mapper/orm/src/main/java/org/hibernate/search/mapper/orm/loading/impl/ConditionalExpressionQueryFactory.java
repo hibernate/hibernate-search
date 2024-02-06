@@ -20,10 +20,18 @@ public abstract class ConditionalExpressionQueryFactory<E, I> implements TypeQue
 	private static final String TYPES_PARAM_NAME = "HIBERNATE_SEARCH_INCLUDED_TYPES_FILTER";
 	protected final Class<I> uniquePropertyType;
 	protected final String uniquePropertyName;
+	private final boolean uniquePropertyIsTheEntityId;
 
-	public ConditionalExpressionQueryFactory(Class<I> uniquePropertyType, String uniquePropertyName) {
+	public ConditionalExpressionQueryFactory(Class<I> uniquePropertyType, String uniquePropertyName,
+			boolean uniquePropertyIsTheEntityId) {
 		this.uniquePropertyType = uniquePropertyType;
 		this.uniquePropertyName = uniquePropertyName;
+		this.uniquePropertyIsTheEntityId = uniquePropertyIsTheEntityId;
+	}
+
+	@Override
+	public final boolean uniquePropertyIsTheEntityId() {
+		return uniquePropertyIsTheEntityId;
 	}
 
 	@Override

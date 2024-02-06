@@ -11,6 +11,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 
@@ -22,6 +23,7 @@ import org.hibernate.binder.internal.TenantIdBinder;
 import org.hibernate.boot.Metadata;
 import org.hibernate.engine.spi.SessionFactoryImplementor;
 import org.hibernate.engine.spi.SessionImplementor;
+import org.hibernate.mapping.PersistentClass;
 import org.hibernate.mapping.Property;
 import org.hibernate.metamodel.MappingMetamodel;
 import org.hibernate.metamodel.mapping.EntityMappingType;
@@ -70,6 +72,21 @@ public final class HibernateOrmUtils {
 
 	private static boolean isSuperTypeOf(EntityMappingType type1, EntityMappingType type2) {
 		return type1.getSubclassEntityNames().contains( type2.getEntityName() );
+	}
+
+	public static EntityMappingType entityMappingType(SessionFactoryImplementor sessionFactory, String entityName) {
+		MappingMetamodel metamodel = sessionFactory.getMappingMetamodel();
+		return metamodel.getEntityDescriptor( entityName );
+	}
+
+	public static Class<?> entityClass(PersistentClass persistentClass) {
+		if ( persistentClass.hasPojoRepresentation() ) {
+			return persistentClass.getMappedClass();
+		}
+		else {
+			// This is a dynamic-map entity.
+			return Map.class;
+		}
 	}
 
 	public static EntityMappingType toMostSpecificCommonEntitySuperType(EntityMappingType type1, EntityMappingType type2) {
