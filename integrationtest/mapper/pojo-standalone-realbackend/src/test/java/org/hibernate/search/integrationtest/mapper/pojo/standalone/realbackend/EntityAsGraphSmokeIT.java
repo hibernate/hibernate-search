@@ -23,7 +23,9 @@ import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.IndexedEmbedded;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.ObjectPath;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.PropertyValue;
+import org.hibernate.search.mapper.pojo.mapping.definition.annotation.SearchEntity;
 import org.hibernate.search.mapper.pojo.standalone.loading.SelectionLoadingStrategy;
+import org.hibernate.search.mapper.pojo.standalone.loading.binding.EntityLoadingBinder;
 import org.hibernate.search.mapper.pojo.standalone.mapping.SearchMapping;
 import org.hibernate.search.mapper.pojo.standalone.session.SearchSession;
 import org.hibernate.search.mapper.pojo.work.IndexingPlanSynchronizationStrategy;
@@ -56,11 +58,11 @@ class EntityAsGraphSmokeIT {
 	void setup() {
 		mapping = setupHelper.start()
 				.withAnnotatedTypes( ContainedNonEntity.class, IndexedEntity.class, ContainedEntity.class )
-				.withConfiguration( b -> b
-						.addEntityType( IndexedEntity.class, c -> c
-								.selectionLoadingStrategy(
-										SelectionLoadingStrategy.fromMap( simulatedIndexedEntityDatastore ) ) )
-						.addEntityType( ContainedEntity.class ) )
+				.withConfiguration( b -> b.programmaticMapping().type( IndexedEntity.class )
+						.searchEntity().loadingBinder( (EntityLoadingBinder) c -> {
+							c.selectionLoadingStrategy( IndexedEntity.class,
+									SelectionLoadingStrategy.fromMap( simulatedIndexedEntityDatastore ) );
+						} ) )
 				.setup();
 	}
 
@@ -125,6 +127,7 @@ class EntityAsGraphSmokeIT {
 		}
 	}
 
+	@SearchEntity
 	@Indexed
 	public static class IndexedEntity {
 		@DocumentId
@@ -142,6 +145,7 @@ class EntityAsGraphSmokeIT {
 		}
 	}
 
+	@SearchEntity
 	public static class ContainedEntity {
 		@DocumentId
 		public String id;

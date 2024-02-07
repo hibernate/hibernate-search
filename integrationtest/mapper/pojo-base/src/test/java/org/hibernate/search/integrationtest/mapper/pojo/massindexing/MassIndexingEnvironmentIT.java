@@ -18,10 +18,12 @@ import java.util.concurrent.ArrayBlockingQueue;
 import org.hibernate.search.engine.backend.work.execution.DocumentCommitStrategy;
 import org.hibernate.search.engine.backend.work.execution.DocumentRefreshStrategy;
 import org.hibernate.search.integrationtest.mapper.pojo.testsupport.loading.PersistenceTypeKey;
+import org.hibernate.search.integrationtest.mapper.pojo.testsupport.loading.StubEntityLoadingBinder;
 import org.hibernate.search.integrationtest.mapper.pojo.testsupport.loading.StubLoadingContext;
-import org.hibernate.search.integrationtest.mapper.pojo.testsupport.loading.StubMassLoadingStrategy;
+import org.hibernate.search.mapper.pojo.loading.mapping.annotation.EntityLoadingBinderRef;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.DocumentId;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
+import org.hibernate.search.mapper.pojo.mapping.definition.annotation.SearchEntity;
 import org.hibernate.search.mapper.pojo.massindexing.MassIndexingEnvironment;
 import org.hibernate.search.mapper.pojo.standalone.mapping.SearchMapping;
 import org.hibernate.search.mapper.pojo.standalone.massindexing.MassIndexer;
@@ -50,13 +52,10 @@ class MassIndexingEnvironmentIT {
 
 	@BeforeEach
 	void setup() {
-		backendMock.expectAnySchema( Entity.INDEX );
+		backendMock.expectAnySchema( Entity.NAME );
 
 		mapping = setupHelper.start()
-				.withConfiguration( b -> {
-					b.addEntityType( Entity.class, c -> c
-							.massLoadingStrategy( new StubMassLoadingStrategy<>( Entity.PERSISTENCE_KEY ) ) );
-				} )
+				.expectCustomBeans()
 				.setup( Entity.class );
 
 		backendMock.verifyExpectationsMet();
@@ -89,13 +88,13 @@ class MassIndexingEnvironmentIT {
 					} );
 
 			backendMock.expectWorks(
-					Entity.INDEX, DocumentCommitStrategy.NONE, DocumentRefreshStrategy.NONE
+					Entity.NAME, DocumentCommitStrategy.NONE, DocumentRefreshStrategy.NONE
 			)
 					.add( "1", b -> {} );
 
 			// purgeAtStart and mergeSegmentsAfterPurge are enabled by default,
 			// so we expect 1 purge, 1 mergeSegments and 1 flush calls in this order:
-			backendMock.expectIndexScaleWorks( Entity.INDEX, searchSession.tenantIdentifier() )
+			backendMock.expectIndexScaleWorks( Entity.NAME, searchSession.tenantIdentifier() )
 					.purge()
 					.mergeSegments()
 					.mergeSegments()
@@ -170,7 +169,7 @@ class MassIndexingEnvironmentIT {
 
 			// purgeAtStart and mergeSegmentsAfterPurge are enabled by default,
 			// so we expect 1 purge, 1 mergeSegments after that we'll get exceptions so no flush or refresh:
-			backendMock.expectIndexScaleWorks( Entity.INDEX, searchSession.tenantIdentifier() )
+			backendMock.expectIndexScaleWorks( Entity.NAME, searchSession.tenantIdentifier() )
 					.purge()
 					.mergeSegments();
 
@@ -194,15 +193,17 @@ class MassIndexingEnvironmentIT {
 		loadingContext.persistenceMap( Entity.PERSISTENCE_KEY ).put( entity.id, entity );
 	}
 
-	@Indexed(index = Entity.INDEX)
+	@SearchEntity(name = Entity.NAME,
+			loadingBinder = @EntityLoadingBinderRef(type = StubEntityLoadingBinder.class))
+	@Indexed
 	public static class Entity {
 
-		public static final String INDEX = "Entity";
+		public static final String NAME = "Entity";
 		public static final PersistenceTypeKey<Entity, Integer> PERSISTENCE_KEY =
-				new PersistenceTypeKey<>( Entity.class, int.class );
+				new PersistenceTypeKey<>( Entity.class, Integer.class );
 
 		@DocumentId
-		private int id;
+		private Integer id;
 
 		public Entity() {
 		}

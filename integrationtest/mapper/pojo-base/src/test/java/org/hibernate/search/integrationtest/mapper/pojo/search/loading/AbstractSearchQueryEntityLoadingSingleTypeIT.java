@@ -10,7 +10,6 @@ import java.util.Collections;
 import java.util.function.Consumer;
 
 import org.hibernate.search.integrationtest.mapper.pojo.search.loading.model.singletype.BasicIndexedEntity;
-import org.hibernate.search.integrationtest.mapper.pojo.testsupport.loading.StubSelectionLoadingStrategy;
 import org.hibernate.search.mapper.pojo.standalone.mapping.SearchMapping;
 
 import org.junit.jupiter.api.BeforeEach;
@@ -26,11 +25,8 @@ public abstract class AbstractSearchQueryEntityLoadingSingleTypeIT extends Abstr
 		backendMock.expectAnySchema( BasicIndexedEntity.NAME );
 
 		mapping = setupHelper.start()
-				.withConfiguration( b -> {
-					b.addEntityType( BasicIndexedEntity.class, BasicIndexedEntity.NAME, c -> c.selectionLoadingStrategy(
-							new StubSelectionLoadingStrategy<>( BasicIndexedEntity.PERSISTENCE_KEY ) ) );
-				} )
-				.setup();
+				.expectCustomBeans()
+				.setup( BasicIndexedEntity.class );
 
 		backendMock.verifyExpectationsMet();
 	}

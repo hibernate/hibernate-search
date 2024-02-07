@@ -14,11 +14,13 @@ import java.util.Map;
 import org.hibernate.search.engine.backend.work.execution.DocumentCommitStrategy;
 import org.hibernate.search.engine.backend.work.execution.DocumentRefreshStrategy;
 import org.hibernate.search.integrationtest.mapper.pojo.testsupport.loading.PersistenceTypeKey;
+import org.hibernate.search.integrationtest.mapper.pojo.testsupport.loading.StubEntityLoadingBinder;
 import org.hibernate.search.integrationtest.mapper.pojo.testsupport.loading.StubLoadingContext;
-import org.hibernate.search.integrationtest.mapper.pojo.testsupport.loading.StubMassLoadingStrategy;
+import org.hibernate.search.mapper.pojo.loading.mapping.annotation.EntityLoadingBinderRef;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.DocumentId;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.GenericField;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
+import org.hibernate.search.mapper.pojo.mapping.definition.annotation.SearchEntity;
 import org.hibernate.search.mapper.pojo.standalone.mapping.SearchMapping;
 import org.hibernate.search.mapper.pojo.standalone.massindexing.MassIndexer;
 import org.hibernate.search.mapper.pojo.standalone.session.SearchSession;
@@ -53,12 +55,7 @@ class MassIndexingComplexHierarchyIT {
 		backendMock.expectAnySchema( H2_A_C_Indexed.NAME );
 		backendMock.expectAnySchema( H2_B_Indexed.NAME );
 		mapping = setupHelper.start()
-				.withConfiguration( b -> {
-					b.addEntityType( H1_Root_NotIndexed.class, c -> c
-							.massLoadingStrategy( new StubMassLoadingStrategy<>( H1_Root_NotIndexed.PERSISTENCE_KEY ) ) );
-					b.addEntityType( H2_Root_Indexed.class, c -> c
-							.massLoadingStrategy( new StubMassLoadingStrategy<>( H2_Root_Indexed.PERSISTENCE_KEY ) ) );
-				} )
+				.expectCustomBeans()
 				.setup(
 						H1_Root_NotIndexed.class, H1_A_NotIndexed.class, H1_B_Indexed.class,
 						H2_Root_Indexed.class,
@@ -209,6 +206,8 @@ class MassIndexingComplexHierarchyIT {
 		backendMock.verifyExpectationsMet();
 	}
 
+	@SearchEntity(name = H1_Root_NotIndexed.NAME,
+			loadingBinder = @EntityLoadingBinderRef(type = StubEntityLoadingBinder.class))
 	public static class H1_Root_NotIndexed {
 
 		public static final String NAME = "H1_Root_NotIndexed";
@@ -230,6 +229,7 @@ class MassIndexingComplexHierarchyIT {
 		}
 	}
 
+	@SearchEntity(name = H1_A_NotIndexed.NAME)
 	public static class H1_A_NotIndexed extends H1_Root_NotIndexed {
 
 		public static final String NAME = "H1_A_NotIndexed";
@@ -246,6 +246,7 @@ class MassIndexingComplexHierarchyIT {
 		}
 	}
 
+	@SearchEntity(name = H1_B_Indexed.NAME)
 	@Indexed
 	public static class H1_B_Indexed extends H1_Root_NotIndexed {
 
@@ -263,6 +264,8 @@ class MassIndexingComplexHierarchyIT {
 		}
 	}
 
+	@SearchEntity(name = H2_Root_Indexed.NAME,
+			loadingBinder = @EntityLoadingBinderRef(type = StubEntityLoadingBinder.class))
 	@Indexed
 	public static class H2_Root_Indexed {
 
@@ -285,6 +288,7 @@ class MassIndexingComplexHierarchyIT {
 		}
 	}
 
+	@SearchEntity(name = H2_A_NotIndexed.NAME)
 	@Indexed(enabled = false)
 	public static class H2_A_NotIndexed extends H2_Root_Indexed {
 
@@ -302,6 +306,7 @@ class MassIndexingComplexHierarchyIT {
 		}
 	}
 
+	@SearchEntity(name = H2_B_Indexed.NAME)
 	public static class H2_B_Indexed extends H2_Root_Indexed {
 
 		public static final String NAME = "H2_B_Indexed";
@@ -318,6 +323,7 @@ class MassIndexingComplexHierarchyIT {
 		}
 	}
 
+	@SearchEntity(name = H2_A_C_Indexed.NAME)
 	@Indexed
 	public static class H2_A_C_Indexed extends H2_A_NotIndexed {
 
@@ -335,6 +341,7 @@ class MassIndexingComplexHierarchyIT {
 		}
 	}
 
+	@SearchEntity(name = H2_B_D_NotIndexed.NAME)
 	@Indexed(enabled = false)
 	public static class H2_B_D_NotIndexed extends H2_B_Indexed {
 

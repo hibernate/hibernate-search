@@ -16,7 +16,6 @@ import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.Programm
 import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.TypeMappingStep;
 import org.hibernate.search.mapper.pojo.standalone.mapping.SearchMapping;
 import org.hibernate.search.mapper.pojo.standalone.session.SearchSession;
-import org.hibernate.search.util.common.impl.CollectionHelper;
 import org.hibernate.search.util.impl.integrationtest.common.extension.BackendMock;
 import org.hibernate.search.util.impl.integrationtest.mapper.pojo.standalone.StandalonePojoMappingSetupHelper;
 
@@ -37,32 +36,27 @@ class ProgrammaticMappingGeoPointBindingIT {
 
 	@BeforeEach
 	void setup() {
-		backendMock.expectSchema( GeoPointOnTypeEntity.INDEX, b -> b
+		backendMock.expectSchema( GeoPointOnTypeEntity.NAME, b -> b
 				.field( "homeLocation", GeoPoint.class, b2 -> b2.projectable( Projectable.YES ).sortable( Sortable.YES ) )
 				.field( "workLocation", GeoPoint.class,
 						b2 -> b2.projectable( Projectable.DEFAULT ).sortable( Sortable.DEFAULT ) )
 		);
-		backendMock.expectSchema( GeoPointOnCoordinatesPropertyEntity.INDEX, b -> b
+		backendMock.expectSchema( GeoPointOnCoordinatesPropertyEntity.NAME, b -> b
 				.field( "coord", GeoPoint.class )
 				.field( "location", GeoPoint.class, b2 -> b2.projectable( Projectable.NO ) )
 		);
-		backendMock.expectSchema( GeoPointOnCustomCoordinatesPropertyEntity.INDEX, b -> b
+		backendMock.expectSchema( GeoPointOnCustomCoordinatesPropertyEntity.NAME, b -> b
 				.field( "coord", GeoPoint.class, b2 -> b2.projectable( Projectable.DEFAULT ).sortable( Sortable.DEFAULT ) )
 				.field( "location", GeoPoint.class, b2 -> b2.projectable( Projectable.DEFAULT ).sortable( Sortable.DEFAULT ) )
 		);
 
 		mapping = setupHelper.start()
 				.withConfiguration( builder -> {
-					builder.addEntityTypes( CollectionHelper.asSet(
-							GeoPointOnTypeEntity.class,
-							GeoPointOnCoordinatesPropertyEntity.class,
-							GeoPointOnCustomCoordinatesPropertyEntity.class
-					) );
-
 					ProgrammaticMappingConfigurationContext mappingDefinition = builder.programmaticMapping();
 
 					TypeMappingStep geoPointOntTypeEntityMapping = mappingDefinition.type( GeoPointOnTypeEntity.class );
-					geoPointOntTypeEntityMapping.indexed().index( GeoPointOnTypeEntity.INDEX );
+					geoPointOntTypeEntityMapping.searchEntity().name( GeoPointOnTypeEntity.NAME );
+					geoPointOntTypeEntityMapping.indexed();
 					geoPointOntTypeEntityMapping.binder( GeoPointBinder.create()
 							.fieldName( "homeLocation" )
 							.markerSet( "home" )
@@ -85,7 +79,8 @@ class ProgrammaticMappingGeoPointBindingIT {
 
 					TypeMappingStep geoPointOnCoordinatesPropertyEntityMapping =
 							mappingDefinition.type( GeoPointOnCoordinatesPropertyEntity.class );
-					geoPointOnCoordinatesPropertyEntityMapping.indexed().index( GeoPointOnCoordinatesPropertyEntity.INDEX );
+					geoPointOnCoordinatesPropertyEntityMapping.searchEntity().name( GeoPointOnCoordinatesPropertyEntity.NAME );
+					geoPointOnCoordinatesPropertyEntityMapping.indexed();
 					geoPointOnCoordinatesPropertyEntityMapping.property( "id" )
 							.documentId();
 					geoPointOnCoordinatesPropertyEntityMapping.property( "coord" )
@@ -94,8 +89,9 @@ class ProgrammaticMappingGeoPointBindingIT {
 
 					TypeMappingStep geoPointOnCustomCoordinatesPropertyEntityMapping =
 							mappingDefinition.type( GeoPointOnCustomCoordinatesPropertyEntity.class );
-					geoPointOnCustomCoordinatesPropertyEntityMapping.indexed()
-							.index( GeoPointOnCustomCoordinatesPropertyEntity.INDEX );
+					geoPointOnCustomCoordinatesPropertyEntityMapping.searchEntity()
+							.name( GeoPointOnCustomCoordinatesPropertyEntity.NAME );
+					geoPointOnCustomCoordinatesPropertyEntityMapping.indexed();
 					geoPointOnCustomCoordinatesPropertyEntityMapping.property( "id" ).documentId();
 					geoPointOnCustomCoordinatesPropertyEntityMapping.property( "coord" )
 							.binder( GeoPointBinder.create() )
@@ -144,7 +140,7 @@ class ProgrammaticMappingGeoPointBindingIT {
 			session.indexingPlan().add( entity2 );
 			session.indexingPlan().add( entity3 );
 
-			backendMock.expectWorks( GeoPointOnTypeEntity.INDEX )
+			backendMock.expectWorks( GeoPointOnTypeEntity.NAME )
 					.add( "1", b -> b
 							.field( "homeLocation", GeoPoint.of(
 									entity1.homeLatitude, entity1.homeLongitude
@@ -153,12 +149,12 @@ class ProgrammaticMappingGeoPointBindingIT {
 									entity1.workLatitude, entity1.workLongitude
 							) )
 					);
-			backendMock.expectWorks( GeoPointOnCoordinatesPropertyEntity.INDEX )
+			backendMock.expectWorks( GeoPointOnCoordinatesPropertyEntity.NAME )
 					.add( "2", b -> b
 							.field( "coord", entity2.coord )
 							.field( "location", entity2.coord )
 					);
-			backendMock.expectWorks( GeoPointOnCustomCoordinatesPropertyEntity.INDEX )
+			backendMock.expectWorks( GeoPointOnCustomCoordinatesPropertyEntity.NAME )
 					.add( "3", b -> b
 							.field( "coord", GeoPoint.of(
 									entity3.coord.lat, entity3.coord.lon
@@ -172,7 +168,7 @@ class ProgrammaticMappingGeoPointBindingIT {
 
 	public static final class GeoPointOnTypeEntity {
 
-		public static final String INDEX = "GeoPointOnTypeEntity";
+		public static final String NAME = "GeoPointOnTypeEntity";
 
 		private Integer id;
 
@@ -188,7 +184,7 @@ class ProgrammaticMappingGeoPointBindingIT {
 
 	public static final class GeoPointOnCoordinatesPropertyEntity {
 
-		public static final String INDEX = "GeoPointOnCoordinatesPropertyEntity";
+		public static final String NAME = "GeoPointOnCoordinatesPropertyEntity";
 
 		private Integer id;
 
@@ -214,7 +210,7 @@ class ProgrammaticMappingGeoPointBindingIT {
 
 	public static final class GeoPointOnCustomCoordinatesPropertyEntity {
 
-		public static final String INDEX = "GeoPointOnCustomCoordinatesPropertyEntity";
+		public static final String NAME = "GeoPointOnCustomCoordinatesPropertyEntity";
 
 		private Integer id;
 

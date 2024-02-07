@@ -108,10 +108,14 @@ class FieldDefaultBridgeBaseIT<V, F> {
 				indexModel -> this.index2Field = indexModel.fieldOrNull( FIELD_NAME )
 		);
 		mapping = setupHelper.start()
-				.withAnnotatedEntityType( expectations.getTypeWithValueBridge1(),
-						DefaultValueBridgeExpectations.TYPE_WITH_VALUE_BRIDGE_1_NAME )
-				.withAnnotatedEntityType( expectations.getTypeWithValueBridge2(),
-						DefaultValueBridgeExpectations.TYPE_WITH_VALUE_BRIDGE_2_NAME )
+				.withAnnotatedTypes( expectations.getTypeWithValueBridge1(),
+						expectations.getTypeWithValueBridge2() )
+				.withConfiguration( b -> {
+					b.programmaticMapping().type( expectations.getTypeWithValueBridge1() )
+							.searchEntity().name( DefaultValueBridgeExpectations.TYPE_WITH_VALUE_BRIDGE_1_NAME );
+					b.programmaticMapping().type( expectations.getTypeWithValueBridge2() )
+							.searchEntity().name( DefaultValueBridgeExpectations.TYPE_WITH_VALUE_BRIDGE_2_NAME );
+				} )
 				.setup();
 		backendMock.verifyExpectationsMet();
 	}

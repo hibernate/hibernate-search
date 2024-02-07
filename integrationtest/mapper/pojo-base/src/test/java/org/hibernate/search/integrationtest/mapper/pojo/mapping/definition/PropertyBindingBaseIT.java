@@ -171,9 +171,8 @@ class PropertyBindingBaseIT {
 		} );
 		SearchMapping mapping = setupHelper.start()
 				.withConfiguration( builder -> {
-					builder.addEntityType( NotAnnotatedEntity.class );
-
 					TypeMappingStep indexedEntity = builder.programmaticMapping().type( NotAnnotatedEntity.class );
+					indexedEntity.searchEntity();
 					indexedEntity.indexed().index( INDEX_NAME );
 					indexedEntity.property( "id" ).documentId();
 					indexedEntity.property( "value" ).binder( new ParametricBinder(),

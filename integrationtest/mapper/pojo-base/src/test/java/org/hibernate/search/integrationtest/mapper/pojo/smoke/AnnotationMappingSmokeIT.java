@@ -37,10 +37,10 @@ import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.IndexedEmbedded;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.ObjectPath;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.PropertyValue;
+import org.hibernate.search.mapper.pojo.mapping.definition.annotation.SearchEntity;
 import org.hibernate.search.mapper.pojo.standalone.mapping.SearchMapping;
 import org.hibernate.search.mapper.pojo.standalone.scope.SearchScope;
 import org.hibernate.search.mapper.pojo.standalone.session.SearchSession;
-import org.hibernate.search.util.common.impl.CollectionHelper;
 import org.hibernate.search.util.impl.integrationtest.common.extension.BackendMock;
 import org.hibernate.search.util.impl.integrationtest.common.extension.StubSearchWorkBehavior;
 import org.hibernate.search.util.impl.integrationtest.mapper.pojo.standalone.StandalonePojoMappingSetupHelper;
@@ -62,11 +62,11 @@ class AnnotationMappingSmokeIT {
 
 	@BeforeEach
 	void setup() {
-		backendMock.expectSchema( OtherIndexedEntity.INDEX, b -> b
+		backendMock.expectSchema( OtherIndexedEntity.NAME, b -> b
 				.field( "numeric", Integer.class )
 				.field( "numericAsString", String.class )
 		);
-		backendMock.expectSchema( YetAnotherIndexedEntity.INDEX, b -> b
+		backendMock.expectSchema( YetAnotherIndexedEntity.NAME, b -> b
 				.objectField( "customBridgeOnProperty", b2 -> b2
 						.field( "date", LocalDate.class )
 						.field( "text", String.class )
@@ -103,7 +103,7 @@ class AnnotationMappingSmokeIT {
 						)
 				)
 		);
-		backendMock.expectSchema( IndexedEntity.INDEX, b -> b
+		backendMock.expectSchema( IndexedEntity.NAME, b -> b
 				.objectField( "customBridgeOnClass", b2 -> b2
 						.field( "date", LocalDate.class )
 						.field( "text", String.class )
@@ -136,12 +136,6 @@ class AnnotationMappingSmokeIT {
 		mapping = setupHelper.start()
 				.expectCustomBeans()
 				.withConfiguration( builder -> {
-					builder.addEntityTypes( CollectionHelper.asSet(
-							IndexedEntity.class,
-							OtherIndexedEntity.class,
-							YetAnotherIndexedEntity.class
-					) );
-
 					builder.annotationMapping().add( IndexedEntity.class );
 
 					Set<Class<?>> classSet = new HashSet<>();
@@ -219,7 +213,7 @@ class AnnotationMappingSmokeIT {
 			session.indexingPlan().add( entity5 );
 			session.indexingPlan().add( entity6 );
 
-			backendMock.expectWorks( IndexedEntity.INDEX )
+			backendMock.expectWorks( IndexedEntity.NAME )
 					.add( "2", b -> b
 							.field( "myLocalDateField", entity2.getLocalDate() )
 							.field( "myTextField", entity2.getText() )
@@ -286,12 +280,12 @@ class AnnotationMappingSmokeIT {
 									.field( "date", entity6.getLocalDate() )
 							)
 					);
-			backendMock.expectWorks( OtherIndexedEntity.INDEX )
+			backendMock.expectWorks( OtherIndexedEntity.NAME )
 					.add( "4", b -> b
 							.field( "numeric", entity4.getNumeric() )
 							.field( "numericAsString", String.valueOf( entity4.getNumeric() ) )
 					);
-			backendMock.expectWorks( YetAnotherIndexedEntity.INDEX )
+			backendMock.expectWorks( YetAnotherIndexedEntity.NAME )
 					.add( "5", b -> b
 							.field( "myLocalDateField", entity5.getLocalDate() )
 							.field( "numeric", entity5.getNumeric() )
@@ -355,14 +349,14 @@ class AnnotationMappingSmokeIT {
 					.toQuery();
 
 			backendMock.expectSearchReferences(
-					Arrays.asList( IndexedEntity.INDEX, YetAnotherIndexedEntity.INDEX ),
+					Arrays.asList( IndexedEntity.NAME, YetAnotherIndexedEntity.NAME ),
 					b -> b
 							.offset( 3 )
 							.limit( 2 ),
 					StubSearchWorkBehavior.of(
 							6L,
-							reference( IndexedEntity.INDEX, "0" ),
-							reference( YetAnotherIndexedEntity.INDEX, "1" )
+							reference( IndexedEntity.NAME, "0" ),
+							reference( YetAnotherIndexedEntity.NAME, "1" )
 					)
 			);
 
@@ -390,7 +384,7 @@ class AnnotationMappingSmokeIT {
 					.toQuery();
 
 			backendMock.expectSearchProjection(
-					Arrays.asList( IndexedEntity.INDEX, YetAnotherIndexedEntity.INDEX ),
+					Arrays.asList( IndexedEntity.NAME, YetAnotherIndexedEntity.NAME ),
 					b -> b
 							.offset( 3 )
 							.limit( 2 ),
@@ -433,23 +427,23 @@ class AnnotationMappingSmokeIT {
 					.toQuery();
 
 			backendMock.expectSearchProjection(
-					Arrays.asList( IndexedEntity.INDEX, YetAnotherIndexedEntity.INDEX ),
+					Arrays.asList( IndexedEntity.NAME, YetAnotherIndexedEntity.NAME ),
 					StubSearchWorkBehavior.of(
 							2L,
 							Arrays.asList(
 									"text1",
-									reference( IndexedEntity.INDEX, "0" ),
+									reference( IndexedEntity.NAME, "0" ),
 									"0",
 									LocalDate.of( 2017, 11, 1 ),
-									reference( IndexedEntity.INDEX, "0" ),
+									reference( IndexedEntity.NAME, "0" ),
 									"text2"
 							),
 							Arrays.asList(
 									null,
-									reference( YetAnotherIndexedEntity.INDEX, "1" ),
+									reference( YetAnotherIndexedEntity.NAME, "1" ),
 									"1",
 									LocalDate.of( 2017, 11, 2 ),
-									reference( YetAnotherIndexedEntity.INDEX, "1" ),
+									reference( YetAnotherIndexedEntity.NAME, "1" ),
 									null
 							)
 					)
@@ -463,7 +457,7 @@ class AnnotationMappingSmokeIT {
 									PojoEntityReference.withDefaultName( IndexedEntity.class, 0 ),
 									0,
 									LocalDate.of( 2017, 11, 1 ),
-									reference( IndexedEntity.INDEX, "0" ),
+									reference( IndexedEntity.NAME, "0" ),
 									"text2"
 							),
 							Arrays.asList(
@@ -471,7 +465,7 @@ class AnnotationMappingSmokeIT {
 									PojoEntityReference.withDefaultName( YetAnotherIndexedEntity.class, 1 ),
 									1,
 									LocalDate.of( 2017, 11, 2 ),
-									reference( YetAnotherIndexedEntity.INDEX, "1" ),
+									reference( YetAnotherIndexedEntity.NAME, "1" ),
 									null
 							)
 					);
@@ -511,11 +505,12 @@ class AnnotationMappingSmokeIT {
 		}
 	}
 
-	@Indexed(index = IndexedEntity.INDEX)
+	@SearchEntity(name = IndexedEntity.NAME)
+	@Indexed
 	@CustomTypeBinding(objectName = "customBridgeOnClass")
 	public static final class IndexedEntity extends ParentIndexedEntity {
 
-		public static final String INDEX = "IndexedEntity";
+		public static final String NAME = "IndexedEntity";
 
 		private Integer id;
 
@@ -577,10 +572,11 @@ class AnnotationMappingSmokeIT {
 		}
 	}
 
-	@Indexed(index = OtherIndexedEntity.INDEX)
+	@SearchEntity(name = OtherIndexedEntity.NAME)
+	@Indexed
 	public static final class OtherIndexedEntity {
 
-		public static final String INDEX = "OtherIndexedEntity";
+		public static final String NAME = "OtherIndexedEntity";
 
 		private Integer id;
 
@@ -607,10 +603,11 @@ class AnnotationMappingSmokeIT {
 
 	}
 
-	@Indexed(index = YetAnotherIndexedEntity.INDEX)
+	@SearchEntity(name = YetAnotherIndexedEntity.NAME)
+	@Indexed
 	public static final class YetAnotherIndexedEntity extends ParentIndexedEntity {
 
-		public static final String INDEX = "YetAnotherIndexedEntity";
+		public static final String NAME = "YetAnotherIndexedEntity";
 
 		private Integer id;
 

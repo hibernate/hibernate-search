@@ -168,10 +168,9 @@ class TypeBindingBaseIT {
 		} );
 		SearchMapping mapping = setupHelper.start().expectCustomBeans()
 				.withConfiguration( builder -> {
-					builder.addEntityType( NotAnnotatedEntity.class );
-
 					TypeMappingStep indexedEntity = builder.programmaticMapping().type( NotAnnotatedEntity.class )
 							.binder( new ParametricBinder(), Collections.singletonMap( "base", 7 ) );
+					indexedEntity.searchEntity();
 					indexedEntity.indexed().index( INDEX_NAME );
 					indexedEntity.property( "id" ).documentId();
 					indexedEntity.property( "value1" );

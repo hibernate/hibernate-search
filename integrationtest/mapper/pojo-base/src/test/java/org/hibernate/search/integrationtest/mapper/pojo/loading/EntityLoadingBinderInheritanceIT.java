@@ -21,6 +21,7 @@ import org.hibernate.search.mapper.pojo.mapping.definition.annotation.DocumentId
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.GenericField;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
 import org.hibernate.search.mapper.pojo.standalone.loading.MassLoadingStrategy;
+import org.hibernate.search.mapper.pojo.standalone.loading.binding.EntityLoadingBinder;
 import org.hibernate.search.mapper.pojo.standalone.mapping.SearchMapping;
 import org.hibernate.search.mapper.pojo.standalone.session.SearchSession;
 import org.hibernate.search.util.impl.integrationtest.common.extension.BackendMock;
@@ -33,7 +34,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
 
 @TestForIssue(jiraKey = "HSEARCH-4203") // See https://github.com/hibernate/hibernate-search/pull/2564#issuecomment-833808403
-class LoadingStrategyInheritanceIT {
+class EntityLoadingBinderInheritanceIT {
 
 	@RegisterExtension
 	public BackendMock backendMock = BackendMock.create();
@@ -57,27 +58,34 @@ class LoadingStrategyInheritanceIT {
 	}
 
 	@Test
-	void addEntity_configurer_inheritance() throws InterruptedException {
+	void binder_inheritance() throws InterruptedException {
 		String rootEntityName = RootEntity.class.getSimpleName();
 		String derivedEntityName = DerivedEntity.class.getSimpleName();
 
 		backendMock.expectAnySchema( rootEntityName );
 		backendMock.expectAnySchema( derivedEntityName );
 		SearchMapping mapping = setupHelper.start()
-				.withConfiguration( b -> b
-						.addEntityType( RootEntity.class, c -> {
-							// Use a lambda here: it can trigger compiler problems with generics.
-							c.selectionLoadingStrategy( (includedTypes, options) -> {
-								return (identifiers, deadline) -> {
-									return identifiers.stream().map( entityMap::get ).collect( Collectors.toList() );
-								};
+				.withConfiguration( b -> {
+					b.programmaticMapping()
+							.type( RootEntity.class )
+							.searchEntity()
+							.loadingBinder( (EntityLoadingBinder) ctx -> {
+								// Use a lambda here: it can trigger compiler problems with generics.
+								ctx.selectionLoadingStrategy( RootEntity.class, (includedTypes, options) -> {
+									return (identifiers, deadline) -> {
+										return identifiers.stream().map( entityMap::get ).collect(
+												Collectors.toList() );
+									};
+								} );
+								// Pass generic type arguments explicitly here, even if it's not necessary:
+								// it can trigger compiler problems with generics.
+								ctx.massLoadingStrategy( RootEntity.class,
+										MassLoadingStrategy.<RootEntity, Integer>fromMap( entityMap ) );
 							} );
-							// Pass generic type arguments explicitly here, even if it's not necessary:
-							// it can trigger compiler problems with generics.
-							c.massLoadingStrategy( MassLoadingStrategy.<RootEntity, Integer>fromMap( entityMap ) );
-						} )
-						.addEntityType( DerivedEntity.class )
-				)
+					b.programmaticMapping()
+							.type( DerivedEntity.class )
+							.searchEntity();
+				} )
 				.setup();
 		backendMock.verifyExpectationsMet();
 
@@ -111,27 +119,36 @@ class LoadingStrategyInheritanceIT {
 
 	// Same as the test above, but with explicit names
 	@Test
-	void addEntity_name_configurer_inheritance() throws InterruptedException {
+	void inheritance_explicitName() throws InterruptedException {
 		String rootEntityName = "customRootName";
 		String derivedEntityName = "customDerivedName";
 
 		backendMock.expectAnySchema( rootEntityName );
 		backendMock.expectAnySchema( derivedEntityName );
 		SearchMapping mapping = setupHelper.start()
-				.withConfiguration( b -> b
-						.addEntityType( RootEntity.class, rootEntityName, c -> {
-							// Use a lambda here: it can trigger compiler problems with generics.
-							c.selectionLoadingStrategy( (includedTypes, options) -> {
-								return (identifiers, deadline) -> {
-									return identifiers.stream().map( entityMap::get ).collect( Collectors.toList() );
-								};
+				.withConfiguration( b -> {
+					b.programmaticMapping()
+							.type( RootEntity.class )
+							.searchEntity()
+							.name( rootEntityName )
+							.loadingBinder( (EntityLoadingBinder) ctx -> {
+								// Use a lambda here: it can trigger compiler problems with generics.
+								ctx.selectionLoadingStrategy( RootEntity.class, (includedTypes, options) -> {
+									return (identifiers, deadline) -> {
+										return identifiers.stream().map( entityMap::get ).collect(
+												Collectors.toList() );
+									};
+								} );
+								// Pass generic type arguments explicitly here, even if it's not necessary:
+								// it can trigger compiler problems with generics.
+								ctx.massLoadingStrategy( RootEntity.class,
+										MassLoadingStrategy.<RootEntity, Integer>fromMap( entityMap ) );
 							} );
-							// Pass generic type arguments explicitly here, even if it's not necessary:
-							// it can trigger compiler problems with generics.
-							c.massLoadingStrategy( MassLoadingStrategy.<RootEntity, Integer>fromMap( entityMap ) );
-						} )
-						.addEntityType( DerivedEntity.class, derivedEntityName )
-				)
+					b.programmaticMapping()
+							.type( DerivedEntity.class )
+							.searchEntity()
+							.name( derivedEntityName );
+				} )
 				.setup();
 		backendMock.verifyExpectationsMet();
 

@@ -7,8 +7,10 @@
 package org.hibernate.search.integrationtest.mapper.pojo.search.loading.model.multipletypes;
 
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
+import org.hibernate.search.mapper.pojo.mapping.definition.annotation.SearchEntity;
 
-@Indexed(index = Hierarchy7_A_B.NAME)
+@SearchEntity(name = Hierarchy7_A_B.NAME)
+@Indexed
 public class Hierarchy7_A_B extends Hierarchy7_A__Abstract implements Interface1 {
 
 	public static final String NAME = "H7_A_B";

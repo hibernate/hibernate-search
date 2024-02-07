@@ -19,6 +19,7 @@ import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.IndexedEmbedded;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.IndexingDependency;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.KeywordField;
+import org.hibernate.search.mapper.pojo.mapping.definition.annotation.SearchEntity;
 import org.hibernate.search.mapper.pojo.standalone.mapping.SearchMapping;
 import org.hibernate.search.mapper.pojo.standalone.session.SearchSession;
 import org.hibernate.search.util.common.SearchException;
@@ -54,6 +55,7 @@ class IndexedEmbeddedCycleIT {
 	@Test
 	void cycle_brokenByExcludePaths() {
 		class Model {
+			@SearchEntity
 			@Indexed(index = INDEX_NAME)
 			class EntityA {
 				@DocumentId
@@ -102,7 +104,7 @@ class IndexedEmbeddedCycleIT {
 		);
 
 		SearchMapping mapping = setupHelper.start()
-				.withAnnotatedEntityTypes( Model.EntityA.class )
+				.withAnnotatedTypes( Model.EntityA.class )
 				.setup();
 
 		backendMock.verifyExpectationsMet();
@@ -141,6 +143,7 @@ class IndexedEmbeddedCycleIT {
 	@Test
 	void cycle_brokenByExcludePathsWithPrefixEndingWithDot() {
 		class Model {
+			@SearchEntity
 			@Indexed(index = INDEX_NAME)
 			class EntityA {
 				@DocumentId
@@ -189,7 +192,7 @@ class IndexedEmbeddedCycleIT {
 		);
 
 		SearchMapping mapping = setupHelper.start()
-				.withAnnotatedEntityTypes( Model.EntityA.class )
+				.withAnnotatedTypes( Model.EntityA.class )
 				.setup();
 
 		backendMock.verifyExpectationsMet();
@@ -228,6 +231,7 @@ class IndexedEmbeddedCycleIT {
 	@Test
 	void cycle_brokenByExcludePathsWithPrefixWithMultipleDotsAndEndingWithDot() {
 		class Model {
+			@SearchEntity
 			@Indexed(index = INDEX_NAME)
 			class EntityA {
 				@DocumentId
@@ -284,7 +288,7 @@ class IndexedEmbeddedCycleIT {
 						) ) );
 
 		SearchMapping mapping = setupHelper.start()
-				.withAnnotatedEntityTypes( Model.EntityA.class )
+				.withAnnotatedTypes( Model.EntityA.class )
 				.setup();
 
 		backendMock.verifyExpectationsMet();
@@ -329,6 +333,7 @@ class IndexedEmbeddedCycleIT {
 	@Test
 	void cycle_cannotBeBrokenByExcludePathsWithPrefixNoDot() {
 		class Model {
+			@SearchEntity
 			@Indexed(index = INDEX_NAME)
 			class EntityA {
 				@DocumentId
@@ -363,7 +368,7 @@ class IndexedEmbeddedCycleIT {
 		}
 
 		assertThatThrownBy( () -> setupHelper.start()
-				.withAnnotatedEntityTypes( Model.EntityA.class )
+				.withAnnotatedTypes( Model.EntityA.class )
 				.setup() )
 				.isInstanceOf( SearchException.class )
 				.satisfies( FailureReportUtils.hasFailureReport()
@@ -382,6 +387,7 @@ class IndexedEmbeddedCycleIT {
 	@Test
 	void cycle_brokenByExcludePaths_deeply() {
 		class Model {
+			@SearchEntity
 			@Indexed(index = INDEX_NAME)
 			class EntityA {
 				@DocumentId
@@ -436,7 +442,7 @@ class IndexedEmbeddedCycleIT {
 		);
 
 		SearchMapping mapping = setupHelper.start()
-				.withAnnotatedEntityTypes( Model.EntityA.class )
+				.withAnnotatedTypes( Model.EntityA.class )
 				.setup();
 
 		backendMock.verifyExpectationsMet();
@@ -484,6 +490,7 @@ class IndexedEmbeddedCycleIT {
 	@Test
 	void cycle_brokenByExcludePaths_deeply_nonRoot() {
 		class Model {
+			@SearchEntity
 			@Indexed(index = INDEX_NAME)
 			class EntityA {
 				@DocumentId
@@ -546,7 +553,7 @@ class IndexedEmbeddedCycleIT {
 		);
 
 		SearchMapping mapping = setupHelper.start()
-				.withAnnotatedEntityTypes( Model.EntityA.class )
+				.withAnnotatedTypes( Model.EntityA.class )
 				.setup();
 
 		backendMock.verifyExpectationsMet();
@@ -591,6 +598,7 @@ class IndexedEmbeddedCycleIT {
 	@Test
 	void cycle_brokenByExcludePathsSomewhereMidCycle_deeply_nonRoot() {
 		class Model {
+			@SearchEntity
 			@Indexed(index = INDEX_NAME)
 			class EntityA {
 				@DocumentId
@@ -656,7 +664,7 @@ class IndexedEmbeddedCycleIT {
 		);
 
 		SearchMapping mapping = setupHelper.start()
-				.withAnnotatedEntityTypes( Model.EntityA.class )
+				.withAnnotatedTypes( Model.EntityA.class )
 				.setup();
 
 		backendMock.verifyExpectationsMet();
@@ -704,6 +712,7 @@ class IndexedEmbeddedCycleIT {
 	@Test
 	void cycle() {
 		class Model {
+			@SearchEntity
 			@Indexed(index = INDEX_NAME)
 			class EntityA {
 				@DocumentId
@@ -720,7 +729,7 @@ class IndexedEmbeddedCycleIT {
 		}
 
 		assertThatThrownBy( () -> setupHelper.start()
-				.withAnnotatedEntityTypes( Model.EntityA.class )
+				.withAnnotatedTypes( Model.EntityA.class )
 				.setup() )
 				.isInstanceOf( SearchException.class )
 				.satisfies( FailureReportUtils.hasFailureReport()
@@ -739,6 +748,7 @@ class IndexedEmbeddedCycleIT {
 	@Test
 	void cycle_nonRoot() {
 		class Model {
+			@SearchEntity
 			@Indexed(index = INDEX_NAME)
 			class EntityA {
 				@DocumentId
@@ -761,7 +771,7 @@ class IndexedEmbeddedCycleIT {
 		}
 
 		assertThatThrownBy( () -> setupHelper.start()
-				.withAnnotatedEntityTypes( Model.EntityA.class )
+				.withAnnotatedTypes( Model.EntityA.class )
 				.setup() )
 				.isInstanceOf( SearchException.class )
 				.satisfies( FailureReportUtils.hasFailureReport()
@@ -780,6 +790,7 @@ class IndexedEmbeddedCycleIT {
 	@Test
 	void cycle_irrelevantExcludePaths() {
 		class Model {
+			@SearchEntity
 			@Indexed(index = INDEX_NAME)
 			class EntityA {
 				@DocumentId
@@ -798,7 +809,7 @@ class IndexedEmbeddedCycleIT {
 		}
 
 		assertThatThrownBy( () -> setupHelper.start()
-				.withAnnotatedEntityTypes( Model.EntityA.class )
+				.withAnnotatedTypes( Model.EntityA.class )
 				.setup() )
 				.isInstanceOf( SearchException.class )
 				.satisfies( FailureReportUtils.hasFailureReport()
@@ -817,6 +828,7 @@ class IndexedEmbeddedCycleIT {
 	@Test
 	void cycle_nonRoot_irrelevantExcludePaths() {
 		class Model {
+			@SearchEntity
 			@Indexed(index = INDEX_NAME)
 			class EntityA {
 				@DocumentId
@@ -841,7 +853,7 @@ class IndexedEmbeddedCycleIT {
 		}
 
 		assertThatThrownBy( () -> setupHelper.start()
-				.withAnnotatedEntityTypes( Model.EntityA.class )
+				.withAnnotatedTypes( Model.EntityA.class )
 				.setup() )
 				.isInstanceOf( SearchException.class )
 				.satisfies( FailureReportUtils.hasFailureReport()
@@ -860,6 +872,7 @@ class IndexedEmbeddedCycleIT {
 
 	@Test
 	void cycle_selfReferenceBreaksEventuallyWithExclude() {
+		@SearchEntity
 		@Indexed(index = INDEX_NAME)
 		class EntityA {
 			@DocumentId
@@ -891,7 +904,7 @@ class IndexedEmbeddedCycleIT {
 		);
 
 		SearchMapping mapping = setupHelper.start()
-				.withAnnotatedEntityTypes( EntityA.class )
+				.withAnnotatedTypes( EntityA.class )
 				.setup();
 
 		backendMock.verifyExpectationsMet();
@@ -930,6 +943,7 @@ class IndexedEmbeddedCycleIT {
 
 	@Test
 	void cycle_selfReferenceWontBreak_excludeSomePropertyNotInCycle() {
+		@SearchEntity
 		@Indexed(index = INDEX_NAME)
 		class EntityA {
 			@DocumentId
@@ -941,7 +955,7 @@ class IndexedEmbeddedCycleIT {
 		}
 
 		assertThatThrownBy( () -> setupHelper.start()
-				.withAnnotatedEntityTypes( EntityA.class )
+				.withAnnotatedTypes( EntityA.class )
 				.setup() )
 				.isInstanceOf( SearchException.class )
 				.satisfies( FailureReportUtils.hasFailureReport()

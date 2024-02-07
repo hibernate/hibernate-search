@@ -26,6 +26,7 @@ import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.IndexedEmbedded;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.ObjectPath;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.PropertyValue;
+import org.hibernate.search.mapper.pojo.mapping.definition.annotation.SearchEntity;
 import org.hibernate.search.mapper.pojo.standalone.mapping.SearchMapping;
 import org.hibernate.search.mapper.pojo.standalone.session.SearchSession;
 import org.hibernate.search.util.impl.integrationtest.common.extension.BackendMock;
@@ -59,9 +60,7 @@ class SearchQueryBaseIT {
 		backendMock.expectAnySchema( Author.NAME );
 
 		mapping = setupHelper.start()
-				.withAnnotatedEntityType( Book.class, Book.NAME )
-				.withAnnotatedEntityType( Author.class, Author.NAME )
-				.withAnnotatedEntityType( NotIndexed.class, NotIndexed.NAME )
+				.withAnnotatedTypes( Book.class, Author.class, NotIndexed.class )
 				.setup();
 	}
 
@@ -240,6 +239,7 @@ class SearchQueryBaseIT {
 		}
 	}
 
+	@SearchEntity(name = Book.NAME)
 	@Indexed
 	public static class Book {
 
@@ -279,6 +279,7 @@ class SearchQueryBaseIT {
 		}
 	}
 
+	@SearchEntity(name = Author.NAME)
 	@Indexed
 	public static class Author {
 
@@ -314,6 +315,7 @@ class SearchQueryBaseIT {
 		}
 	}
 
+	@SearchEntity(name = NotIndexed.NAME)
 	public static class NotIndexed {
 
 		public static final String NAME = "NotInd";

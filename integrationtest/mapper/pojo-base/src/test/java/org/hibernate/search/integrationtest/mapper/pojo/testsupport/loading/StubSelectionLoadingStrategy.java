@@ -11,10 +11,10 @@ import org.hibernate.search.mapper.pojo.standalone.loading.SelectionEntityLoader
 import org.hibernate.search.mapper.pojo.standalone.loading.SelectionLoadingOptions;
 import org.hibernate.search.mapper.pojo.standalone.loading.SelectionLoadingStrategy;
 
-public class StubSelectionLoadingStrategy<E, I> implements SelectionLoadingStrategy<E> {
+class StubSelectionLoadingStrategy<E, I> implements SelectionLoadingStrategy<E> {
 	private final PersistenceTypeKey<E, I> key;
 
-	public StubSelectionLoadingStrategy(PersistenceTypeKey<E, I> key) {
+	StubSelectionLoadingStrategy(PersistenceTypeKey<E, I> key) {
 		this.key = key;
 	}
 

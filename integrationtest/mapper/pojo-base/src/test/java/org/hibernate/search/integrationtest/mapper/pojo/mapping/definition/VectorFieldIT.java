@@ -305,9 +305,8 @@ class VectorFieldIT {
 		backendMock.expectSchema( INDEX_NAME, b -> b.field( "floats", float[].class, f -> f.dimension( 2 ) ) );
 		SearchMapping mapping = setupHelper.start()
 				.withConfiguration( builder -> {
-					builder.addEntityType( IndexedEntity.class );
-
 					TypeMappingStep indexedEntity = builder.programmaticMapping().type( IndexedEntity.class );
+					indexedEntity.searchEntity();
 					indexedEntity.indexed().index( INDEX_NAME );
 					indexedEntity.property( "id" ).documentId();
 					indexedEntity.property( "floats" ).vectorField( 2 ).valueBinder(

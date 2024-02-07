@@ -13,10 +13,12 @@ import java.lang.invoke.MethodHandles;
 import org.hibernate.search.engine.backend.work.execution.DocumentCommitStrategy;
 import org.hibernate.search.engine.backend.work.execution.DocumentRefreshStrategy;
 import org.hibernate.search.integrationtest.mapper.pojo.testsupport.loading.PersistenceTypeKey;
+import org.hibernate.search.integrationtest.mapper.pojo.testsupport.loading.StubEntityLoadingBinder;
 import org.hibernate.search.integrationtest.mapper.pojo.testsupport.loading.StubLoadingContext;
-import org.hibernate.search.integrationtest.mapper.pojo.testsupport.loading.StubMassLoadingStrategy;
+import org.hibernate.search.mapper.pojo.loading.mapping.annotation.EntityLoadingBinderRef;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.DocumentId;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
+import org.hibernate.search.mapper.pojo.mapping.definition.annotation.SearchEntity;
 import org.hibernate.search.mapper.pojo.standalone.mapping.SearchMapping;
 import org.hibernate.search.mapper.pojo.standalone.massindexing.MassIndexer;
 import org.hibernate.search.mapper.pojo.standalone.session.SearchSession;
@@ -44,13 +46,10 @@ class MassIndexingPrimitiveIdIT {
 
 	@BeforeEach
 	void setup() {
-		backendMock.expectAnySchema( EntityWithPrimitiveId.INDEX );
+		backendMock.expectAnySchema( EntityWithPrimitiveId.NAME );
 
 		mapping = setupHelper.start()
-				.withConfiguration( b -> {
-					b.addEntityType( EntityWithPrimitiveId.class, c -> c
-							.massLoadingStrategy( new StubMassLoadingStrategy<>( EntityWithPrimitiveId.PERSISTENCE_KEY ) ) );
-				} )
+				.expectCustomBeans()
 				.setup( EntityWithPrimitiveId.class );
 
 		backendMock.verifyExpectationsMet();
@@ -69,7 +68,7 @@ class MassIndexingPrimitiveIdIT {
 			// add operations on indexes can follow any random order,
 			// since they are executed by different threads
 			backendMock.expectWorks(
-					EntityWithPrimitiveId.INDEX, DocumentCommitStrategy.NONE, DocumentRefreshStrategy.NONE
+					EntityWithPrimitiveId.NAME, DocumentCommitStrategy.NONE, DocumentRefreshStrategy.NONE
 			)
 					.add( "1", b -> {} )
 					.add( "2", b -> {} )
@@ -77,7 +76,7 @@ class MassIndexingPrimitiveIdIT {
 
 			// purgeAtStart and mergeSegmentsAfterPurge are enabled by default,
 			// so we expect 1 purge, 1 mergeSegments and 1 flush calls in this order:
-			backendMock.expectIndexScaleWorks( EntityWithPrimitiveId.INDEX, searchSession.tenantIdentifier() )
+			backendMock.expectIndexScaleWorks( EntityWithPrimitiveId.NAME, searchSession.tenantIdentifier() )
 					.purge()
 					.mergeSegments()
 					.mergeSegments()
@@ -106,12 +105,14 @@ class MassIndexingPrimitiveIdIT {
 		loadingContext.persistenceMap( EntityWithPrimitiveId.PERSISTENCE_KEY ).put( entity.id, entity );
 	}
 
-	@Indexed(index = EntityWithPrimitiveId.INDEX)
+	@SearchEntity(name = EntityWithPrimitiveId.NAME,
+			loadingBinder = @EntityLoadingBinderRef(type = StubEntityLoadingBinder.class))
+	@Indexed
 	public static class EntityWithPrimitiveId {
 
-		public static final String INDEX = "EntityWithPrimitiveId";
+		public static final String NAME = "EntityWithPrimitiveId";
 		public static final PersistenceTypeKey<EntityWithPrimitiveId, Integer> PERSISTENCE_KEY =
-				new PersistenceTypeKey<>( EntityWithPrimitiveId.class, int.class );
+				new PersistenceTypeKey<>( EntityWithPrimitiveId.class, Integer.class );
 
 		@DocumentId
 		private int id;

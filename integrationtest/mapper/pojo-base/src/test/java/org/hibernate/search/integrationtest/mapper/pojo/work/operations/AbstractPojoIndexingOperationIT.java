@@ -20,7 +20,7 @@ import java.util.function.Consumer;
 import org.hibernate.search.engine.backend.work.execution.DocumentCommitStrategy;
 import org.hibernate.search.engine.backend.work.execution.DocumentRefreshStrategy;
 import org.hibernate.search.mapper.pojo.standalone.loading.SelectionEntityLoader;
-import org.hibernate.search.mapper.pojo.standalone.loading.SelectionLoadingStrategy;
+import org.hibernate.search.mapper.pojo.standalone.loading.binding.EntityLoadingBinder;
 import org.hibernate.search.mapper.pojo.standalone.mapping.SearchMapping;
 import org.hibernate.search.mapper.pojo.standalone.session.SearchSession;
 import org.hibernate.search.mapper.pojo.work.IndexingPlanSynchronizationStrategy;
@@ -111,12 +111,16 @@ public abstract class AbstractPojoIndexingOperationIT {
 						b.programmaticMapping().type( IndexedEntity.class )
 								.indexed().routingBinder( routingBinder );
 					}
-					b.addEntityType( IndexedEntity.class, context -> context
-							.selectionLoadingStrategy( (SelectionLoadingStrategy<
-									IndexedEntity>) (includedTypes, options) -> indexedEntityLoaderMock ) );
-					b.addEntityType( ContainedEntity.class, context -> context
-							.selectionLoadingStrategy( (SelectionLoadingStrategy<
-									ContainedEntity>) (includedTypes, options) -> containedEntityLoaderMock ) );
+					b.programmaticMapping().type( IndexedEntity.class )
+							.searchEntity()
+							.loadingBinder( (EntityLoadingBinder) context -> context
+									.selectionLoadingStrategy( IndexedEntity.class,
+											(includedTypes, options) -> indexedEntityLoaderMock ) );
+					b.programmaticMapping().type( ContainedEntity.class )
+							.searchEntity()
+							.loadingBinder( (EntityLoadingBinder) context -> context
+									.selectionLoadingStrategy( ContainedEntity.class,
+											(includedTypes, options) -> containedEntityLoaderMock ) );
 				} )
 				.setup( IndexedEntity.class );
 

@@ -19,6 +19,7 @@ import org.hibernate.search.mapper.pojo.mapping.definition.annotation.GenericFie
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.ObjectPath;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.PropertyValue;
+import org.hibernate.search.mapper.pojo.mapping.definition.annotation.SearchEntity;
 import org.hibernate.search.mapper.pojo.standalone.mapping.SearchMapping;
 import org.hibernate.search.util.common.SearchException;
 import org.hibernate.search.util.impl.integrationtest.common.extension.BackendMock;
@@ -58,9 +59,7 @@ class SearchMappingNoDefaultBackendIT {
 		backend1Mock.expectAnySchema( Person.INDEX_NAME );
 		backend2Mock.expectAnySchema( Pet.ENTITY_NAME );
 		mapping = setupHelper.start()
-				.withAnnotatedEntityType( Person.class, Person.ENTITY_NAME )
-				.withAnnotatedEntityType( Pet.class, Pet.ENTITY_NAME )
-				.withAnnotatedEntityType( Toy.class, Toy.ENTITY_NAME )
+				.withAnnotatedTypes( Person.class, Pet.class, Toy.class )
 				.setup();
 		backend1Mock.verifyExpectationsMet();
 		backend2Mock.verifyExpectationsMet();
@@ -91,6 +90,7 @@ class SearchMappingNoDefaultBackendIT {
 				);
 	}
 
+	@SearchEntity(name = Person.ENTITY_NAME)
 	@Indexed(backend = BACKEND_1_NAME, index = Person.INDEX_NAME)
 	private static class Person {
 		public static final String ENTITY_NAME = "PersonEntity";
@@ -113,6 +113,7 @@ class SearchMappingNoDefaultBackendIT {
 		}
 	}
 
+	@SearchEntity(name = Pet.ENTITY_NAME)
 	@Indexed(backend = BACKEND_2_NAME)
 	private static class Pet {
 		public static final String ENTITY_NAME = "Pet";
@@ -127,6 +128,7 @@ class SearchMappingNoDefaultBackendIT {
 		}
 	}
 
+	@SearchEntity(name = Toy.ENTITY_NAME)
 	private static class Toy {
 		public static final String ENTITY_NAME = "Toy";
 

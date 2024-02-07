@@ -302,9 +302,8 @@ class GenericFieldIT {
 		backendMock.expectSchema( INDEX_NAME, b -> b.field( "value", String.class ) );
 		SearchMapping mapping = setupHelper.start()
 				.withConfiguration( builder -> {
-					builder.addEntityType( IndexedEntity.class );
-
 					TypeMappingStep indexedEntity = builder.programmaticMapping().type( IndexedEntity.class );
+					indexedEntity.searchEntity();
 					indexedEntity.indexed().index( INDEX_NAME );
 					indexedEntity.property( "id" ).documentId();
 					indexedEntity.property( "value" ).genericField().valueBinder(

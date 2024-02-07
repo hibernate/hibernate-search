@@ -7,10 +7,15 @@
 package org.hibernate.search.integrationtest.mapper.pojo.search.loading.model.singletype;
 
 import org.hibernate.search.integrationtest.mapper.pojo.testsupport.loading.PersistenceTypeKey;
+import org.hibernate.search.integrationtest.mapper.pojo.testsupport.loading.StubEntityLoadingBinder;
+import org.hibernate.search.mapper.pojo.loading.mapping.annotation.EntityLoadingBinderRef;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.DocumentId;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
+import org.hibernate.search.mapper.pojo.mapping.definition.annotation.SearchEntity;
 
-@Indexed(index = BasicIndexedEntity.NAME)
+@SearchEntity(name = BasicIndexedEntity.NAME,
+		loadingBinder = @EntityLoadingBinderRef(type = StubEntityLoadingBinder.class))
+@Indexed
 public class BasicIndexedEntity {
 
 	public static final String NAME = "indexed";

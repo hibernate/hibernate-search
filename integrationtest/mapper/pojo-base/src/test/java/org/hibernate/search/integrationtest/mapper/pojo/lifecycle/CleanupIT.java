@@ -352,9 +352,6 @@ class CleanupIT {
 		this.mapping = setupHelper.start()
 				.withConfiguration(
 						builder -> {
-							builder.addEntityType( IndexedEntity.class );
-							builder.addEntityType( OtherIndexedEntity.class );
-
 							ContainerExtractorConfigurationContext containerExtractorDefinition = builder.containerExtractors();
 							containerExtractorDefinition.define( StartupStubContainerExtractor.NAME,
 									StartupStubContainerExtractor.class,
@@ -369,6 +366,7 @@ class CleanupIT {
 
 							ProgrammaticMappingConfigurationContext mappingDefinition = builder.programmaticMapping();
 							TypeMappingStep indexedEntityMapping = mappingDefinition.type( IndexedEntity.class );
+							indexedEntityMapping.searchEntity();
 							indexedEntityMapping.indexed().index( IndexedEntity.INDEX )
 									.routingBinder( StartupStubBridge.binder( ROUTING_BRIDGE_COUNTER_KEYS ) );
 							indexedEntityMapping.binder( StartupStubBridge.binder( TYPE_BRIDGE_COUNTER_KEYS ) );
@@ -401,6 +399,9 @@ class CleanupIT {
 													.value( StartupStubContainerExtractor.NAME )
 													.toValuePath()
 									);
+
+							mappingDefinition.type( OtherIndexedEntity.class )
+									.searchEntity();
 
 							additionalMappingContributor.accept( mappingDefinition );
 						}

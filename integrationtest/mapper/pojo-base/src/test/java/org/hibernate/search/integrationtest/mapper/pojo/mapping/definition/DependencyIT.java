@@ -19,6 +19,7 @@ import org.hibernate.search.mapper.pojo.mapping.definition.annotation.IndexedEmb
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.IndexingDependency;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.ObjectPath;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.PropertyValue;
+import org.hibernate.search.mapper.pojo.mapping.definition.annotation.SearchEntity;
 import org.hibernate.search.mapper.pojo.standalone.mapping.SearchMapping;
 import org.hibernate.search.mapper.pojo.standalone.session.SearchSession;
 import org.hibernate.search.util.common.SearchException;
@@ -644,6 +645,7 @@ class DependencyIT {
 	@Test
 	void derivedFrom_error_cycle() {
 		class DerivedFromCycle {
+			@SearchEntity
 			@Indexed
 			class A {
 				@DocumentId
@@ -688,7 +690,7 @@ class DependencyIT {
 		}
 		assertThatThrownBy(
 				() -> setupHelper.start()
-						.withAnnotatedEntityTypes( DerivedFromCycle.A.class )
+						.withAnnotatedTypes( DerivedFromCycle.A.class )
 						.withAnnotatedTypes( DerivedFromCycle.B.class, DerivedFromCycle.C.class )
 						.setup()
 		)
@@ -715,6 +717,7 @@ class DependencyIT {
 	@TestForIssue(jiraKey = "HSEARCH-4565")
 	void derivedFrom_error_cycle_buried() {
 		class DerivedFromCycle {
+			@SearchEntity
 			@Indexed
 			class Zero {
 				@DocumentId
@@ -772,7 +775,7 @@ class DependencyIT {
 		}
 		assertThatThrownBy(
 				() -> setupHelper.start()
-						.withAnnotatedEntityTypes( DerivedFromCycle.Zero.class )
+						.withAnnotatedTypes( DerivedFromCycle.Zero.class )
 						.withAnnotatedTypes( DerivedFromCycle.A.class, DerivedFromCycle.B.class, DerivedFromCycle.C.class )
 						.setup()
 		)
@@ -801,6 +804,7 @@ class DependencyIT {
 	void derivedFrom_cycleFalsePositive() {
 		final String indexName = "myindex";
 		class DerivedFromCycle {
+			@SearchEntity
 			@Indexed(index = indexName)
 			class A {
 				@DocumentId
@@ -838,7 +842,7 @@ class DependencyIT {
 
 		assertThatCode(
 				() -> setupHelper.start()
-						.withAnnotatedEntityTypes( DerivedFromCycle.A.class )
+						.withAnnotatedTypes( DerivedFromCycle.A.class )
 						.withAnnotatedTypes( DerivedFromCycle.B.class, DerivedFromCycle.C.class )
 						.setup()
 		)

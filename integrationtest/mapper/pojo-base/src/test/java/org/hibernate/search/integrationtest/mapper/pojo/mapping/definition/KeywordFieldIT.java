@@ -307,9 +307,8 @@ class KeywordFieldIT {
 		backendMock.expectSchema( INDEX_NAME, b -> b.field( "wrap", String.class ) );
 		SearchMapping mapping = setupHelper.start()
 				.withConfiguration( builder -> {
-					builder.addEntityType( IndexedEntity.class );
-
 					TypeMappingStep indexedEntity = builder.programmaticMapping().type( IndexedEntity.class );
+					indexedEntity.searchEntity();
 					indexedEntity.indexed().index( INDEX_NAME );
 					indexedEntity.property( "id" ).documentId();
 					indexedEntity.property( "wrap" ).keywordField().valueBinder(

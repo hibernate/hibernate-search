@@ -18,6 +18,7 @@ import org.hibernate.search.mapper.pojo.mapping.definition.annotation.GenericFie
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.ObjectPath;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.PropertyValue;
+import org.hibernate.search.mapper.pojo.mapping.definition.annotation.SearchEntity;
 import org.hibernate.search.util.common.SearchException;
 import org.hibernate.search.util.impl.integrationtest.common.extension.BackendMock;
 import org.hibernate.search.util.impl.integrationtest.mapper.pojo.standalone.StandalonePojoMappingSetupHelper;
@@ -40,8 +41,7 @@ class IncorrectPropertyNameObjectPathIT {
 	void brokenPathWithDotsThrowsException() {
 		assertThatThrownBy( () -> {
 			setupHelper.start()
-					.withAnnotatedEntityType( Person.class, Person.ENTITY_NAME )
-					.withAnnotatedEntityType( PhoneNumber.class, PhoneNumber.ENTITY_NAME )
+					.withAnnotatedTypes( Person.class, PhoneNumber.class )
 					.setup();
 		} ).isInstanceOf( SearchException.class )
 				.hasMessageFindingMatch( "propertyName=.?" + Pattern.quote( BROKEN_PATH_WITH_DOTS ) + ".?" )
@@ -54,6 +54,7 @@ class IncorrectPropertyNameObjectPathIT {
 	}
 
 
+	@SearchEntity(name = Person.ENTITY_NAME)
 	@Indexed(index = Person.INDEX_NAME)
 	private static class Person {
 		public static final String ENTITY_NAME = "PersonEntity";
@@ -78,6 +79,7 @@ class IncorrectPropertyNameObjectPathIT {
 		}
 	}
 
+	@SearchEntity(name = PhoneNumber.ENTITY_NAME)
 	private static class PhoneNumber {
 		public static final String ENTITY_NAME = "PhoneNumber";
 

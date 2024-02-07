@@ -28,6 +28,7 @@ import org.hibernate.search.mapper.pojo.bridge.runtime.IdentifierBridgeFromDocum
 import org.hibernate.search.mapper.pojo.bridge.runtime.IdentifierBridgeToDocumentIdentifierContext;
 import org.hibernate.search.mapper.pojo.common.spi.PojoEntityReference;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
+import org.hibernate.search.mapper.pojo.mapping.definition.annotation.SearchEntity;
 import org.hibernate.search.mapper.pojo.standalone.mapping.SearchMapping;
 import org.hibernate.search.mapper.pojo.standalone.session.SearchSession;
 import org.hibernate.search.util.common.SearchException;
@@ -54,6 +55,7 @@ class ProvidedIdIT {
 	@Test
 	void converters() {
 		final String entityAndIndexName = "indexed";
+		@SearchEntity(name = entityAndIndexName)
 		@Indexed
 		class IndexedEntity {
 		}
@@ -62,7 +64,7 @@ class ProvidedIdIT {
 		backendMock.expectSchema( entityAndIndexName, b -> {},
 				indexModel -> this.indexModel = indexModel );
 		SearchMapping mapping = withBaseConfiguration()
-				.withAnnotatedEntityType( IndexedEntity.class, entityAndIndexName )
+				.withAnnotatedTypes( IndexedEntity.class )
 				.setup();
 		backendMock.verifyExpectationsMet();
 
@@ -92,6 +94,7 @@ class ProvidedIdIT {
 	@Test
 	void indexAndSearch() {
 		final String entityAndIndexName = "indexed";
+		@SearchEntity(name = entityAndIndexName)
 		@Indexed
 		class IndexedEntity {
 		}
@@ -99,7 +102,7 @@ class ProvidedIdIT {
 		// Schema
 		backendMock.expectSchema( entityAndIndexName, b -> {} );
 		SearchMapping mapping = withBaseConfiguration()
-				.withAnnotatedEntityType( IndexedEntity.class, entityAndIndexName )
+				.withAnnotatedTypes( IndexedEntity.class )
 				.setup();
 		backendMock.verifyExpectationsMet();
 
@@ -149,13 +152,14 @@ class ProvidedIdIT {
 	@Test
 	void error_nullProvidedId() {
 		final String entityAndIndexName = "indexed";
+		@SearchEntity(name = entityAndIndexName)
 		@Indexed
 		class IndexedEntity {
 		}
 
 		backendMock.expectAnySchema( entityAndIndexName );
 		SearchMapping mapping = withBaseConfiguration()
-				.withAnnotatedEntityType( IndexedEntity.class, entityAndIndexName )
+				.withAnnotatedTypes( IndexedEntity.class )
 				.setup();
 		backendMock.verifyExpectationsMet();
 

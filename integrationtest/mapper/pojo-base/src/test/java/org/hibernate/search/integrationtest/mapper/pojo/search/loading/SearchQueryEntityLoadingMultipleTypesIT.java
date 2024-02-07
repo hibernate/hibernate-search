@@ -23,6 +23,7 @@ import org.hibernate.search.integrationtest.mapper.pojo.search.loading.model.mul
 import org.hibernate.search.integrationtest.mapper.pojo.search.loading.model.multipletypes.Hierarchy4_A__NonAbstract_NonIndexed;
 import org.hibernate.search.integrationtest.mapper.pojo.search.loading.model.multipletypes.Hierarchy5_A_B_C;
 import org.hibernate.search.integrationtest.mapper.pojo.search.loading.model.multipletypes.Hierarchy5_A_B_D;
+import org.hibernate.search.integrationtest.mapper.pojo.search.loading.model.multipletypes.Hierarchy5_A_B__MappedSuperClass;
 import org.hibernate.search.integrationtest.mapper.pojo.search.loading.model.multipletypes.Hierarchy5_A__Abstract;
 import org.hibernate.search.integrationtest.mapper.pojo.search.loading.model.multipletypes.Hierarchy7_A_B;
 import org.hibernate.search.integrationtest.mapper.pojo.search.loading.model.multipletypes.Hierarchy7_A_C;
@@ -30,7 +31,6 @@ import org.hibernate.search.integrationtest.mapper.pojo.search.loading.model.mul
 import org.hibernate.search.integrationtest.mapper.pojo.search.loading.model.multipletypes.Hierarchy7_A__Abstract;
 import org.hibernate.search.integrationtest.mapper.pojo.search.loading.model.multipletypes.Interface1;
 import org.hibernate.search.integrationtest.mapper.pojo.testsupport.loading.PersistenceTypeKey;
-import org.hibernate.search.integrationtest.mapper.pojo.testsupport.loading.StubSelectionLoadingStrategy;
 import org.hibernate.search.mapper.pojo.standalone.mapping.SearchMapping;
 import org.hibernate.search.util.impl.test.annotation.TestForIssue;
 
@@ -74,53 +74,15 @@ class SearchQueryEntityLoadingMultipleTypesIT extends AbstractSearchQueryEntityL
 		backendMock.expectAnySchema( Hierarchy7_A_D.NAME );
 
 		mapping = setupHelper.start()
-				.withConfiguration( b -> {
-					b.addEntityType( Hierarchy1_A__Abstract.class, Hierarchy1_A__Abstract.NAME,
-							c -> c.selectionLoadingStrategy(
-									new StubSelectionLoadingStrategy<>( Hierarchy1_A__Abstract.PERSISTENCE_KEY ) ) );
-					b.addEntityType( Hierarchy1_A_B.class, Hierarchy1_A_B.NAME );
-					b.addEntityType( Hierarchy1_A_C.class, Hierarchy1_A_C.NAME );
-
-					b.addEntityType( Hierarchy2_A__NonAbstract_Indexed.class, Hierarchy2_A__NonAbstract_Indexed.NAME,
-							c -> c.selectionLoadingStrategy(
-									new StubSelectionLoadingStrategy<>( Hierarchy2_A__NonAbstract_Indexed.PERSISTENCE_KEY ) ) );
-					b.addEntityType( Hierarchy2_A_B.class, Hierarchy2_A_B.NAME );
-					b.addEntityType( Hierarchy2_A_C.class, Hierarchy2_A_C.NAME );
-
-					b.addEntityType( Hierarchy3_A__NonAbstract_NonIndexed.class, Hierarchy3_A__NonAbstract_NonIndexed.NAME,
-							c -> c.selectionLoadingStrategy(
-									new StubSelectionLoadingStrategy<>(
-											Hierarchy3_A__NonAbstract_NonIndexed.PERSISTENCE_KEY ) ) );
-					b.addEntityType( Hierarchy3_A_B.class, Hierarchy3_A_B.NAME );
-					b.addEntityType( Hierarchy3_A_C.class, Hierarchy3_A_C.NAME );
-
-					b.addEntityType( Hierarchy4_A__NonAbstract_NonIndexed.class, Hierarchy4_A__NonAbstract_NonIndexed.NAME,
-							c -> c.selectionLoadingStrategy(
-									new StubSelectionLoadingStrategy<>(
-											Hierarchy4_A__NonAbstract_NonIndexed.PERSISTENCE_KEY ) ) );
-					b.addEntityType( Hierarchy4_A_B__integer1DocumentId.class, Hierarchy4_A_B__integer1DocumentId.NAME,
-							c -> c.selectionLoadingStrategy(
-									new StubSelectionLoadingStrategy<>(
-											Hierarchy4_A_B__integer1DocumentId.PERSISTENCE_KEY ) ) );
-					b.addEntityType( Hierarchy4_A_C__integer2DocumentId.class, Hierarchy4_A_C__integer2DocumentId.NAME,
-							c -> c.selectionLoadingStrategy(
-									new StubSelectionLoadingStrategy<>(
-											Hierarchy4_A_C__integer2DocumentId.PERSISTENCE_KEY ) ) );
-					b.addEntityType( Hierarchy4_A_D.class, Hierarchy4_A_D.NAME );
-
-					b.addEntityType( Hierarchy5_A__Abstract.class, Hierarchy5_A__Abstract.NAME,
-							c -> c.selectionLoadingStrategy(
-									new StubSelectionLoadingStrategy<>( Hierarchy5_A__Abstract.PERSISTENCE_KEY ) ) );
-					b.addEntityType( Hierarchy5_A_B_C.class, Hierarchy5_A_B_C.NAME );
-					b.addEntityType( Hierarchy5_A_B_D.class, Hierarchy5_A_B_D.NAME );
-
-					b.addEntityType( Hierarchy7_A__Abstract.class, Hierarchy7_A__Abstract.NAME,
-							c -> c.selectionLoadingStrategy(
-									new StubSelectionLoadingStrategy<>( Hierarchy7_A__Abstract.PERSISTENCE_KEY ) ) );
-					b.addEntityType( Hierarchy7_A_B.class, Hierarchy7_A_B.NAME );
-					b.addEntityType( Hierarchy7_A_C.class, Hierarchy7_A_C.NAME );
-					b.addEntityType( Hierarchy7_A_D.class, Hierarchy7_A_D.NAME );
-				} )
+				.expectCustomBeans()
+				.withAnnotatedTypes( Hierarchy1_A__Abstract.class, Hierarchy1_A_B.class, Hierarchy1_A_C.class,
+						Hierarchy2_A__NonAbstract_Indexed.class, Hierarchy2_A_B.class, Hierarchy2_A_C.class,
+						Hierarchy3_A__NonAbstract_NonIndexed.class, Hierarchy3_A_B.class, Hierarchy3_A_C.class,
+						Hierarchy4_A__NonAbstract_NonIndexed.class, Hierarchy4_A_B__integer1DocumentId.class,
+						Hierarchy4_A_C__integer2DocumentId.class, Hierarchy4_A_D.class,
+						Hierarchy5_A__Abstract.class, Hierarchy5_A_B__MappedSuperClass.class,
+						Hierarchy5_A_B_C.class, Hierarchy5_A_B_D.class,
+						Hierarchy7_A__Abstract.class, Hierarchy7_A_B.class, Hierarchy7_A_C.class, Hierarchy7_A_D.class )
 				.setup();
 
 		backendMock.verifyExpectationsMet();

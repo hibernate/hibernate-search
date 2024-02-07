@@ -12,9 +12,11 @@ import java.lang.invoke.MethodHandles;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import org.hibernate.search.mapper.pojo.loading.mapping.annotation.EntityLoadingBinderRef;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.DocumentId;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.GenericField;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
+import org.hibernate.search.mapper.pojo.mapping.definition.annotation.SearchEntity;
 import org.hibernate.search.mapper.pojo.standalone.loading.LoadingTypeGroup;
 import org.hibernate.search.mapper.pojo.standalone.loading.MassEntityLoader;
 import org.hibernate.search.mapper.pojo.standalone.loading.MassEntitySink;
@@ -22,6 +24,8 @@ import org.hibernate.search.mapper.pojo.standalone.loading.MassIdentifierLoader;
 import org.hibernate.search.mapper.pojo.standalone.loading.MassIdentifierSink;
 import org.hibernate.search.mapper.pojo.standalone.loading.MassLoadingOptions;
 import org.hibernate.search.mapper.pojo.standalone.loading.MassLoadingStrategy;
+import org.hibernate.search.mapper.pojo.standalone.loading.binding.EntityLoadingBinder;
+import org.hibernate.search.mapper.pojo.standalone.loading.binding.EntityLoadingBindingContext;
 import org.hibernate.search.mapper.pojo.standalone.mapping.SearchMapping;
 import org.hibernate.search.mapper.pojo.standalone.massindexing.MassIndexer;
 import org.hibernate.search.mapper.pojo.standalone.session.SearchSession;
@@ -62,12 +66,8 @@ class MassIndexingIncludedEntityMapHierarchyIT {
 		backendMock.expectAnySchema( H2_B_Indexed.NAME );
 		backendMock.expectAnySchema( H2_B_E_Indexed.NAME );
 
-		FailingMassIndexingStrategy<H1_Root_NotIndexed> h1LoadingStrategy = failingStrategy();
-		FailingMassIndexingStrategy<H2_Root_Indexed> h2LoadingStrategy = failingStrategy();
 		mapping = setupHelper.start()
-				.withConfiguration( b -> b
-						.addEntityType( H1_Root_NotIndexed.class, c -> c.massLoadingStrategy( h1LoadingStrategy ) )
-						.addEntityType( H2_Root_Indexed.class, c -> c.massLoadingStrategy( h2LoadingStrategy ) ) )
+				.expectCustomBeans()
 				.setup(
 						H1_Root_NotIndexed.class, H1_A_NotIndexed.class, H1_B_Indexed.class,
 						H2_Root_Indexed.class,
@@ -191,11 +191,25 @@ class MassIndexingIncludedEntityMapHierarchyIT {
 
 	}
 
-	public static <E> FailingMassIndexingStrategy<E> failingStrategy() {
-		return new FailingMassIndexingStrategy<>();
-	}
-
 	public static class FailingMassIndexingStrategy<E> implements MassLoadingStrategy<E, Object> {
+		public static class Binder implements EntityLoadingBinder {
+			@Override
+			public void bind(EntityLoadingBindingContext context) {
+				context.massLoadingStrategy( context.entityType().rawType(), new FailingMassIndexingStrategy<>() );
+			}
+		}
+
+		@Override
+		public boolean equals(Object obj) {
+			// All instances are the same
+			return obj instanceof FailingMassIndexingStrategy;
+		}
+
+		@Override
+		public int hashCode() {
+			// All instances are the same
+			return 1;
+		}
 
 		@Override
 		public MassIdentifierLoader createIdentifierLoader(LoadingTypeGroup<E> includedTypes,
@@ -222,6 +236,8 @@ class MassIndexingIncludedEntityMapHierarchyIT {
 
 	}
 
+	@SearchEntity(name = H1_Root_NotIndexed.NAME,
+			loadingBinder = @EntityLoadingBinderRef(type = FailingMassIndexingStrategy.Binder.class))
 	public static class H1_Root_NotIndexed {
 
 		public static final String NAME = "H1_Root_NotIndexed";
@@ -241,6 +257,7 @@ class MassIndexingIncludedEntityMapHierarchyIT {
 		}
 	}
 
+	@SearchEntity(name = H1_A_NotIndexed.NAME)
 	public static class H1_A_NotIndexed extends H1_Root_NotIndexed {
 
 		public static final String NAME = "H1_A_NotIndexed";
@@ -257,6 +274,7 @@ class MassIndexingIncludedEntityMapHierarchyIT {
 		}
 	}
 
+	@SearchEntity(name = H1_B_Indexed.NAME)
 	@Indexed
 	public static class H1_B_Indexed extends H1_Root_NotIndexed {
 
@@ -274,6 +292,8 @@ class MassIndexingIncludedEntityMapHierarchyIT {
 		}
 	}
 
+	@SearchEntity(name = H2_Root_Indexed.NAME,
+			loadingBinder = @EntityLoadingBinderRef(type = FailingMassIndexingStrategy.Binder.class))
 	@Indexed
 	public static class H2_Root_Indexed {
 
@@ -294,6 +314,7 @@ class MassIndexingIncludedEntityMapHierarchyIT {
 		}
 	}
 
+	@SearchEntity(name = H2_A_NotIndexed.NAME)
 	@Indexed(enabled = false)
 	public static class H2_A_NotIndexed extends H2_Root_Indexed {
 
@@ -311,6 +332,7 @@ class MassIndexingIncludedEntityMapHierarchyIT {
 		}
 	}
 
+	@SearchEntity(name = H2_B_Indexed.NAME)
 	public static class H2_B_Indexed extends H2_Root_Indexed {
 
 		public static final String NAME = "H2_B_Indexed";
@@ -327,6 +349,7 @@ class MassIndexingIncludedEntityMapHierarchyIT {
 		}
 	}
 
+	@SearchEntity(name = H2_A_C_Indexed.NAME)
 	@Indexed
 	public static class H2_A_C_Indexed extends H2_A_NotIndexed {
 
@@ -344,6 +367,7 @@ class MassIndexingIncludedEntityMapHierarchyIT {
 		}
 	}
 
+	@SearchEntity(name = H2_B_D_NotIndexed.NAME)
 	@Indexed(enabled = false)
 	public static class H2_B_D_NotIndexed extends H2_B_Indexed {
 
@@ -361,6 +385,7 @@ class MassIndexingIncludedEntityMapHierarchyIT {
 		}
 	}
 
+	@SearchEntity(name = H2_B_E_Indexed.NAME)
 	@Indexed(enabled = true)
 	public static class H2_B_E_Indexed extends H2_B_Indexed {
 

@@ -12,16 +12,17 @@ import java.lang.invoke.MethodHandles;
 import java.util.Arrays;
 
 import org.hibernate.search.integrationtest.mapper.pojo.testsupport.loading.PersistenceTypeKey;
+import org.hibernate.search.integrationtest.mapper.pojo.testsupport.loading.StubEntityLoadingBinder;
 import org.hibernate.search.integrationtest.mapper.pojo.testsupport.loading.StubLoadingContext;
-import org.hibernate.search.integrationtest.mapper.pojo.testsupport.loading.StubSelectionLoadingStrategy;
+import org.hibernate.search.mapper.pojo.loading.mapping.annotation.EntityLoadingBinderRef;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.DocumentId;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.EntityProjection;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.FullTextField;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.IndexedEmbedded;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.ProjectionConstructor;
+import org.hibernate.search.mapper.pojo.mapping.definition.annotation.SearchEntity;
 import org.hibernate.search.mapper.pojo.standalone.mapping.SearchMapping;
-import org.hibernate.search.mapper.pojo.standalone.mapping.StandalonePojoMappingConfigurationContext;
 import org.hibernate.search.mapper.pojo.standalone.session.SearchSession;
 import org.hibernate.search.util.common.SearchException;
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.StubBackendUtils;
@@ -64,8 +65,8 @@ class ProjectionConstructorEntityProjectionIT extends AbstractProjectionConstruc
 
 		backendMock.expectAnySchema( INDEX_NAME );
 		SearchMapping mapping = setupHelper.start()
-				.withAnnotatedTypes( MyProjection.class )
-				.withConfiguration( this::addLoadableEntityType )
+				.expectCustomBeans()
+				.withAnnotatedTypes( IndexedEntity.class, MyProjection.class )
 				.setup();
 
 		testSuccessfulRootProjection(
@@ -100,8 +101,8 @@ class ProjectionConstructorEntityProjectionIT extends AbstractProjectionConstruc
 
 		backendMock.expectAnySchema( INDEX_NAME );
 		SearchMapping mapping = setupHelper.start()
-				.withAnnotatedTypes( MyProjection.class )
-				.withConfiguration( this::addLoadableEntityType )
+				.expectCustomBeans()
+				.withAnnotatedTypes( IndexedEntity.class, MyProjection.class )
 				.setup();
 
 		testSuccessfulRootProjection(
@@ -136,8 +137,8 @@ class ProjectionConstructorEntityProjectionIT extends AbstractProjectionConstruc
 
 		backendMock.expectAnySchema( INDEX_NAME );
 		SearchMapping mapping = setupHelper.start()
-				.withAnnotatedTypes( MyProjection.class )
-				.withConfiguration( this::addLoadableEntityType )
+				.expectCustomBeans()
+				.withAnnotatedTypes( IndexedEntity.class, MyProjection.class )
 				.setup();
 
 		try ( SearchSession session = createSession( mapping ) ) {
@@ -152,11 +153,6 @@ class ProjectionConstructorEntityProjectionIT extends AbstractProjectionConstruc
 		}
 	}
 
-	private void addLoadableEntityType(StandalonePojoMappingConfigurationContext context) {
-		context.addEntityType( IndexedEntity.class, IndexedEntity.NAME, c -> c.selectionLoadingStrategy(
-				new StubSelectionLoadingStrategy<>( IndexedEntity.PERSISTENCE_KEY ) ) );
-	}
-
 	@Override
 	protected SearchSession createSession(SearchMapping mapping) {
 		return mapping.createSessionWithOptions()
@@ -164,8 +160,10 @@ class ProjectionConstructorEntityProjectionIT extends AbstractProjectionConstruc
 				.build();
 	}
 
+	@SearchEntity(name = IndexedEntity.NAME,
+			loadingBinder = @EntityLoadingBinderRef(type = StubEntityLoadingBinder.class))
 	@Indexed(index = INDEX_NAME)
-	static class IndexedEntity {
+	public static class IndexedEntity {
 		public static final String NAME = "IndexedEntity";
 		public static final PersistenceTypeKey<IndexedEntity, Integer> PERSISTENCE_KEY =
 				new PersistenceTypeKey<>( IndexedEntity.class, Integer.class );

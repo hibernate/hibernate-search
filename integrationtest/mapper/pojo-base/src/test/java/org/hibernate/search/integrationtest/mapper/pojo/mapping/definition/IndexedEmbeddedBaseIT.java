@@ -43,6 +43,7 @@ import org.hibernate.search.mapper.pojo.mapping.definition.annotation.IndexingDe
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.KeywordField;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.ObjectPath;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.PropertyValue;
+import org.hibernate.search.mapper.pojo.mapping.definition.annotation.SearchEntity;
 import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.TypeMappingStep;
 import org.hibernate.search.mapper.pojo.model.path.PojoModelPath;
 import org.hibernate.search.mapper.pojo.standalone.mapping.SearchMapping;
@@ -96,6 +97,7 @@ class IndexedEmbeddedBaseIT {
 			@IndexedEmbedded
 			IndexedEmbeddedLevel2 level2;
 		}
+		@SearchEntity
 		@Indexed(index = INDEX_NAME)
 		class IndexedEntity {
 			@DocumentId
@@ -121,7 +123,7 @@ class IndexedEmbeddedBaseIT {
 				)
 		);
 		SearchMapping mapping = setupHelper.start()
-				.withAnnotatedEntityTypes( IndexedEntity.class )
+				.withAnnotatedTypes( IndexedEntity.class )
 				.withAnnotatedTypes( IndexedEmbeddedLevel1.class, IndexedEmbeddedLevel2.class )
 				.setup();
 		backendMock.verifyExpectationsMet();
@@ -144,6 +146,7 @@ class IndexedEmbeddedBaseIT {
 			@GenericField
 			String level1Property;
 		}
+		@SearchEntity
 		@Indexed(index = INDEX_NAME)
 		class IndexedEntity {
 			@DocumentId
@@ -164,7 +167,7 @@ class IndexedEmbeddedBaseIT {
 				)
 		);
 		SearchMapping mapping = setupHelper.start()
-				.withAnnotatedEntityTypes( IndexedEntity.class )
+				.withAnnotatedTypes( IndexedEntity.class )
 				.withAnnotatedTypes( IndexedEmbeddedLevel1.class )
 				.setup();
 		backendMock.verifyExpectationsMet();
@@ -273,6 +276,7 @@ class IndexedEmbeddedBaseIT {
 				return common;
 			}
 		}
+		@SearchEntity
 		@Indexed(index = INDEX_NAME)
 		class IndexedEntity {
 			@DocumentId
@@ -331,7 +335,7 @@ class IndexedEmbeddedBaseIT {
 		}
 		);
 		SearchMapping mapping = setupHelper.start()
-				.withAnnotatedEntityTypes( IndexedEntity.class )
+				.withAnnotatedTypes( IndexedEntity.class )
 				.withAnnotatedTypes( Embedded.class )
 				.setup();
 		backendMock.verifyExpectationsMet();
@@ -351,6 +355,7 @@ class IndexedEmbeddedBaseIT {
 			@GenericField
 			List<String> level1MultiValuedProperty;
 		}
+		@SearchEntity
 		@Indexed(index = INDEX_NAME)
 		class IndexedEntity {
 			@DocumentId
@@ -367,7 +372,7 @@ class IndexedEmbeddedBaseIT {
 				)
 		);
 		SearchMapping mapping = setupHelper.start()
-				.withAnnotatedEntityTypes( IndexedEntity.class )
+				.withAnnotatedTypes( IndexedEntity.class )
 				.withAnnotatedTypes( IndexedEmbeddedLevel1.class )
 				.setup();
 		backendMock.verifyExpectationsMet();
@@ -443,6 +448,7 @@ class IndexedEmbeddedBaseIT {
 				return level2TwoDotsInPrefix;
 			}
 		}
+		@SearchEntity
 		@Indexed(index = INDEX_NAME)
 		class IndexedEntity {
 			@DocumentId
@@ -470,7 +476,7 @@ class IndexedEmbeddedBaseIT {
 				)
 		);
 		SearchMapping mapping = setupHelper.start()
-				.withAnnotatedEntityTypes( IndexedEntity.class )
+				.withAnnotatedTypes( IndexedEntity.class )
 				.withAnnotatedTypes( IndexedEmbeddedLevel1.class )
 				.setup();
 		backendMock.verifyExpectationsMet();
@@ -527,6 +533,7 @@ class IndexedEmbeddedBaseIT {
 			@GenericField
 			String level1Property;
 		}
+		@SearchEntity
 		@Indexed(index = INDEX_NAME)
 		class IndexedEntity {
 			@DocumentId
@@ -546,7 +553,7 @@ class IndexedEmbeddedBaseIT {
 				.field( "customPrefix_level1Property", String.class )
 		);
 		SearchMapping mapping = setupHelper.start()
-				.withAnnotatedEntityTypes( IndexedEntity.class )
+				.withAnnotatedTypes( IndexedEntity.class )
 				.withAnnotatedTypes( IndexedEmbeddedLevel1.class )
 				.setup();
 		backendMock.verifyExpectationsMet();
@@ -580,6 +587,7 @@ class IndexedEmbeddedBaseIT {
 				return includedProperty;
 			}
 		}
+		@SearchEntity
 		@Indexed(index = INDEX_NAME)
 		class IndexedEntity {
 			@DocumentId
@@ -622,6 +630,7 @@ class IndexedEmbeddedBaseIT {
 				return includedProperty;
 			}
 		}
+		@SearchEntity
 		@Indexed(index = INDEX_NAME)
 		class IndexedEntity {
 			@DocumentId
@@ -650,7 +659,7 @@ class IndexedEmbeddedBaseIT {
 				)
 		);
 		SearchMapping mapping = setupHelper.start()
-				.withAnnotatedEntityTypes( entity )
+				.withAnnotatedTypes( entity )
 				.withAnnotatedTypes( embedded )
 				.setup();
 		backendMock.verifyExpectationsMet();
@@ -676,6 +685,7 @@ class IndexedEmbeddedBaseIT {
 			@GenericField
 			String includedProperty;
 		}
+		@SearchEntity
 		@Indexed(index = INDEX_NAME)
 		class IndexedEntity {
 			@DocumentId
@@ -705,6 +715,7 @@ class IndexedEmbeddedBaseIT {
 			@GenericField
 			String includedProperty;
 		}
+		@SearchEntity
 		@Indexed(index = INDEX_NAME)
 		class IndexedEntity {
 			@DocumentId
@@ -726,7 +737,7 @@ class IndexedEmbeddedBaseIT {
 	private void nonMatchedError(Class<?> entityClass, Class<?> embeddedClass, String attribute) {
 		assertThatThrownBy(
 				() -> setupHelper.start()
-						.withAnnotatedEntityTypes( entityClass )
+						.withAnnotatedTypes( entityClass )
 						.withAnnotatedTypes( embeddedClass )
 						.setup()
 		)
@@ -773,6 +784,7 @@ class IndexedEmbeddedBaseIT {
 				return level2;
 			}
 		}
+		@SearchEntity
 		@Indexed(index = INDEX_NAME)
 		class IndexedEntity {
 			@DocumentId
@@ -795,7 +807,7 @@ class IndexedEmbeddedBaseIT {
 				)
 		);
 		SearchMapping mapping = setupHelper.start()
-				.withAnnotatedEntityTypes( IndexedEntity.class )
+				.withAnnotatedTypes( IndexedEntity.class )
 				.withAnnotatedTypes( IndexedEmbeddedLevel1.class, IndexedEmbeddedLevel2.class )
 				.setup();
 		backendMock.verifyExpectationsMet();
@@ -824,6 +836,7 @@ class IndexedEmbeddedBaseIT {
 				return level1Property;
 			}
 		}
+		@SearchEntity
 		@Indexed(index = INDEX_NAME)
 		class IndexedEntity {
 			@DocumentId
@@ -845,7 +858,7 @@ class IndexedEmbeddedBaseIT {
 				)
 		);
 		SearchMapping mapping = setupHelper.start()
-				.withAnnotatedEntityTypes( IndexedEntity.class )
+				.withAnnotatedTypes( IndexedEntity.class )
 				.withAnnotatedTypes( IndexedEmbeddedLevel1.class )
 				.setup();
 		backendMock.verifyExpectationsMet();
@@ -913,8 +926,8 @@ class IndexedEmbeddedBaseIT {
 		);
 		SearchMapping mapping = setupHelper.start()
 				.withConfiguration( b -> {
-					b.addEntityType( IndexedEntity.class );
 					TypeMappingStep indexedEntityMapping = b.programmaticMapping().type( IndexedEntity.class );
+					indexedEntityMapping.searchEntity();
 					indexedEntityMapping.indexed().index( INDEX_NAME );
 					indexedEntityMapping.property( "id" ).documentId();
 					if ( include ) {
@@ -989,6 +1002,7 @@ class IndexedEmbeddedBaseIT {
 				this.level1Property = level1Property;
 			}
 		}
+		@SearchEntity
 		@Indexed(index = INDEX_NAME)
 		class IndexedEntity {
 			@DocumentId
@@ -1009,7 +1023,7 @@ class IndexedEmbeddedBaseIT {
 				)
 		);
 		SearchMapping mapping = setupHelper.start()
-				.withAnnotatedEntityTypes( IndexedEntity.class )
+				.withAnnotatedTypes( IndexedEntity.class )
 				.withAnnotatedTypes( IndexedEmbeddedLevel1.class )
 				.setup();
 		backendMock.verifyExpectationsMet();
@@ -1059,6 +1073,7 @@ class IndexedEmbeddedBaseIT {
 				this.level1Property = level1Property;
 			}
 		}
+		@SearchEntity
 		@Indexed(index = INDEX_NAME)
 		class IndexedEntity {
 			@DocumentId
@@ -1080,7 +1095,7 @@ class IndexedEmbeddedBaseIT {
 				)
 		);
 		SearchMapping mapping = setupHelper.start()
-				.withAnnotatedEntityTypes( IndexedEntity.class )
+				.withAnnotatedTypes( IndexedEntity.class )
 				.withAnnotatedTypes( IndexedEmbeddedLevel1.class )
 				.setup();
 		backendMock.verifyExpectationsMet();
@@ -1119,6 +1134,7 @@ class IndexedEmbeddedBaseIT {
 				this.level1Property = level1Property;
 			}
 		}
+		@SearchEntity
 		@Indexed(index = INDEX_NAME)
 		class IndexedEntity {
 			@DocumentId
@@ -1139,7 +1155,7 @@ class IndexedEmbeddedBaseIT {
 				)
 		);
 		SearchMapping mapping = setupHelper.start()
-				.withAnnotatedEntityTypes( IndexedEntity.class )
+				.withAnnotatedTypes( IndexedEntity.class )
 				.withAnnotatedTypes( IndexedEmbeddedLevel1.class )
 				.setup();
 		backendMock.verifyExpectationsMet();
@@ -1553,9 +1569,6 @@ class IndexedEmbeddedBaseIT {
 		);
 		SearchMapping mapping = setupHelper.start().expectCustomBeans()
 				.withConfiguration( builder -> {
-					builder.addEntityType( IndexedEntity.class );
-					builder.addEntityType( IndexedEmbeddedLevel1.class );
-
 					TypeMappingStep indexedEmbeddedLevel1 = builder.programmaticMapping()
 							.type( IndexedEmbeddedLevel1.class );
 					indexedEmbeddedLevel1.property( "theId" ).documentId().identifierBinder( new ParametricBinder(),
@@ -1566,9 +1579,13 @@ class IndexedEmbeddedBaseIT {
 
 					TypeMappingStep indexedEntity = builder.programmaticMapping()
 							.type( IndexedEntity.class );
+					indexedEntity.searchEntity();
 					indexedEntity.indexed().index( INDEX_NAME );
 					indexedEntity.property( "id" ).documentId();
 					indexedEntity.property( "level1" ).indexedEmbedded().includeEmbeddedObjectId( true );
+
+					builder.programmaticMapping().type( IndexedEmbeddedLevel1.class )
+							.searchEntity();
 				} )
 				.setup( IndexedEntity.class, IndexedEmbeddedLevel1.class );
 		backendMock.verifyExpectationsMet();
@@ -1669,6 +1686,7 @@ class IndexedEmbeddedBaseIT {
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-899")
 	void invalid_wrongType() {
+		@SearchEntity
 		@Indexed(index = INDEX_NAME)
 		class IndexedEntity {
 			@DocumentId
@@ -1680,7 +1698,7 @@ class IndexedEmbeddedBaseIT {
 		}
 
 		assertThatThrownBy( () -> setupHelper.start()
-				.withAnnotatedEntityTypes( IndexedEntity.class )
+				.withAnnotatedTypes( IndexedEntity.class )
 				.setup() )
 				.isInstanceOf( SearchException.class )
 				.satisfies( FailureReportUtils.hasFailureReport()
@@ -1705,6 +1723,7 @@ class IndexedEmbeddedBaseIT {
 		class EmptyNested {
 		}
 
+		@SearchEntity
 		@Indexed(index = INDEX_NAME)
 		class IndexedEntity {
 			@DocumentId
@@ -1716,7 +1735,7 @@ class IndexedEmbeddedBaseIT {
 		}
 
 		assertThatThrownBy( () -> setupHelper.start()
-				.withAnnotatedEntityTypes( IndexedEntity.class )
+				.withAnnotatedTypes( IndexedEntity.class )
 				.setup() )
 				.isInstanceOf( SearchException.class )
 				.satisfies( FailureReportUtils.hasFailureReport()
@@ -1733,6 +1752,7 @@ class IndexedEmbeddedBaseIT {
 	@Test
 	void parentIncludeChildExclude() {
 		class Model {
+			@SearchEntity
 			@Indexed(index = INDEX_NAME)
 			class IndexedEntity {
 				@DocumentId
@@ -1786,7 +1806,7 @@ class IndexedEmbeddedBaseIT {
 		}
 
 		assertThatThrownBy( () -> setupHelper.start()
-				.withAnnotatedEntityTypes( Model.IndexedEntity.class )
+				.withAnnotatedTypes( Model.IndexedEntity.class )
 				.setup() )
 				.isInstanceOf( SearchException.class )
 				.satisfies( FailureReportUtils.hasFailureReport()
@@ -1807,6 +1827,7 @@ class IndexedEmbeddedBaseIT {
 	@Test
 	void parentExcludeChildIncludeResultingInEmbeddedNotIncludedEntirely() {
 		class Model {
+			@SearchEntity
 			@Indexed(index = INDEX_NAME)
 			class IndexedEntity {
 				@DocumentId
@@ -1871,7 +1892,7 @@ class IndexedEmbeddedBaseIT {
 		);
 
 		SearchMapping mapping = setupHelper.start()
-				.withAnnotatedEntityTypes( Model.IndexedEntity.class )
+				.withAnnotatedTypes( Model.IndexedEntity.class )
 				.setup();
 
 		backendMock.verifyExpectationsMet();
@@ -1973,6 +1994,7 @@ class IndexedEmbeddedBaseIT {
 				this.includedWithoutLastNode = included;
 			}
 		}
+		@SearchEntity
 		@Indexed(index = INDEX_NAME)
 		class IndexedEntity {
 			@DocumentId
@@ -2018,7 +2040,7 @@ class IndexedEmbeddedBaseIT {
 		);
 
 		SearchMapping mapping = setupHelper.start()
-				.withAnnotatedEntityTypes( IndexedEntity.class )
+				.withAnnotatedTypes( IndexedEntity.class )
 				.setup();
 
 		backendMock.verifyExpectationsMet();
@@ -2069,6 +2091,7 @@ class IndexedEmbeddedBaseIT {
 	@Test
 	void parentExcludeChildIncludeMultipleResultingInEmbeddedBeingIncludedPartially() {
 		class Model {
+			@SearchEntity
 			@Indexed(index = INDEX_NAME)
 			class IndexedEntity {
 				@DocumentId
@@ -2139,7 +2162,7 @@ class IndexedEmbeddedBaseIT {
 		);
 
 		SearchMapping mapping = setupHelper.start()
-				.withAnnotatedEntityTypes( Model.IndexedEntity.class )
+				.withAnnotatedTypes( Model.IndexedEntity.class )
 				.setup();
 
 		backendMock.verifyExpectationsMet();
@@ -2174,6 +2197,7 @@ class IndexedEmbeddedBaseIT {
 	@Test
 	void parentExcludeChildIncludeForDifferentFields() {
 		class Model {
+			@SearchEntity
 			@Indexed(index = INDEX_NAME)
 			class IndexedEntity {
 				@DocumentId
@@ -2231,7 +2255,7 @@ class IndexedEmbeddedBaseIT {
 		}
 
 		assertThatThrownBy( () -> setupHelper.start()
-				.withAnnotatedEntityTypes( Model.IndexedEntity.class )
+				.withAnnotatedTypes( Model.IndexedEntity.class )
 				.setup() )
 				.isInstanceOf( SearchException.class )
 				.satisfies( FailureReportUtils.hasFailureReport()
@@ -2253,6 +2277,7 @@ class IndexedEmbeddedBaseIT {
 	@Test
 	void parentIncludeChildExcludeForDifferentFieldsIsFine() {
 		class Model {
+			@SearchEntity
 			@Indexed(index = INDEX_NAME)
 			class IndexedEntity {
 				@DocumentId
@@ -2324,7 +2349,7 @@ class IndexedEmbeddedBaseIT {
 		);
 
 		SearchMapping mapping = setupHelper.start()
-				.withAnnotatedEntityTypes( Model.IndexedEntity.class )
+				.withAnnotatedTypes( Model.IndexedEntity.class )
 				.setup();
 
 		backendMock.verifyExpectationsMet();
@@ -2351,6 +2376,7 @@ class IndexedEmbeddedBaseIT {
 	@Test
 	void parentIncludeByDepthChildExcludeSomething() {
 		class Model {
+			@SearchEntity
 			@Indexed(index = INDEX_NAME)
 			class IndexedEntity {
 				@DocumentId
@@ -2409,7 +2435,7 @@ class IndexedEmbeddedBaseIT {
 		);
 
 		SearchMapping mapping = setupHelper.start()
-				.withAnnotatedEntityTypes( Model.IndexedEntity.class )
+				.withAnnotatedTypes( Model.IndexedEntity.class )
 				.setup();
 
 		backendMock.verifyExpectationsMet();
@@ -2438,6 +2464,7 @@ class IndexedEmbeddedBaseIT {
 	@Test
 	void parentExcludeChildExcludeSameProperty() {
 		class Model {
+			@SearchEntity
 			@Indexed(index = INDEX_NAME)
 			class IndexedEntity {
 				@DocumentId
@@ -2485,7 +2512,7 @@ class IndexedEmbeddedBaseIT {
 		}
 
 		assertThatThrownBy( () -> setupHelper.start()
-				.withAnnotatedEntityTypes( Model.IndexedEntity.class )
+				.withAnnotatedTypes( Model.IndexedEntity.class )
 				.setup() )
 				.isInstanceOf( SearchException.class )
 				.satisfies( FailureReportUtils.hasFailureReport()
@@ -2508,6 +2535,7 @@ class IndexedEmbeddedBaseIT {
 			@KeywordField
 			String excludedString;
 		}
+		@SearchEntity
 		@Indexed(index = INDEX_NAME)
 		class IndexedEntity {
 			@DocumentId
@@ -2520,7 +2548,7 @@ class IndexedEmbeddedBaseIT {
 		}
 
 		assertThatThrownBy( () -> setupHelper.start()
-				.withAnnotatedEntityTypes( IndexedEntity.class )
+				.withAnnotatedTypes( IndexedEntity.class )
 				.setup() )
 				.isInstanceOf( SearchException.class )
 				.satisfies( FailureReportUtils.hasFailureReport()
@@ -2548,6 +2576,7 @@ class IndexedEmbeddedBaseIT {
 				this.excludedIncluded = excludedIncluded;
 			}
 		}
+		@SearchEntity
 		@Indexed(index = INDEX_NAME)
 		class IndexedEntity {
 			@DocumentId
@@ -2574,7 +2603,7 @@ class IndexedEmbeddedBaseIT {
 		);
 
 		SearchMapping mapping = setupHelper.start()
-				.withAnnotatedEntityTypes( IndexedEntity.class )
+				.withAnnotatedTypes( IndexedEntity.class )
 				.setup();
 
 		backendMock.verifyExpectationsMet();
@@ -2608,6 +2637,7 @@ class IndexedEmbeddedBaseIT {
 				this.aaa = includedString;
 			}
 		}
+		@SearchEntity
 		@Indexed(index = INDEX_NAME)
 		class IndexedEntity {
 			@DocumentId
@@ -2632,7 +2662,7 @@ class IndexedEmbeddedBaseIT {
 		);
 
 		SearchMapping mapping = setupHelper.start()
-				.withAnnotatedEntityTypes( IndexedEntity.class )
+				.withAnnotatedTypes( IndexedEntity.class )
 				.setup();
 
 		backendMock.verifyExpectationsMet();
@@ -2654,6 +2684,7 @@ class IndexedEmbeddedBaseIT {
 	@Test
 	void excludePathsWithPrefixWithoutDot() {
 		class Model {
+			@SearchEntity
 			@Indexed(index = INDEX_NAME)
 			class IndexedEntity {
 				@DocumentId
@@ -2728,7 +2759,7 @@ class IndexedEmbeddedBaseIT {
 				.field( "prefixAprefixBprefixCcString4", String.class ) );
 
 		SearchMapping mapping = setupHelper.start()
-				.withAnnotatedEntityTypes( Model.IndexedEntity.class )
+				.withAnnotatedTypes( Model.IndexedEntity.class )
 				.setup();
 
 		backendMock.verifyExpectationsMet();
@@ -2756,6 +2787,7 @@ class IndexedEmbeddedBaseIT {
 	@Test
 	void excludePathsWithPrefixWithAndWithoutDot() {
 		class Model {
+			@SearchEntity
 			@Indexed(index = INDEX_NAME)
 			class IndexedEntity {
 				@DocumentId
@@ -2854,7 +2886,7 @@ class IndexedEmbeddedBaseIT {
 						.objectField( "prefixAprefixOtherD2", b2 -> {} ) ) );
 
 		SearchMapping mapping = setupHelper.start()
-				.withAnnotatedEntityTypes( Model.IndexedEntity.class )
+				.withAnnotatedTypes( Model.IndexedEntity.class )
 				.setup();
 
 		backendMock.verifyExpectationsMet();

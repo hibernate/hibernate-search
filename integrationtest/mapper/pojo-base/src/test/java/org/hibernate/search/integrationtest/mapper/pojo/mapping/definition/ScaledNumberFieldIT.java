@@ -333,9 +333,8 @@ class ScaledNumberFieldIT {
 		backendMock.expectSchema( INDEX_NAME, b -> b.field( "wrap", BigDecimal.class, f -> f.decimalScale( 2 ) ) );
 		SearchMapping mapping = setupHelper.start()
 				.withConfiguration( builder -> {
-					builder.addEntityType( IndexedEntity.class );
-
 					TypeMappingStep indexedEntity = builder.programmaticMapping().type( IndexedEntity.class );
+					indexedEntity.searchEntity();
 					indexedEntity.indexed().index( INDEX_NAME );
 					indexedEntity.property( "id" ).documentId();
 					indexedEntity.property( "wrap" ).scaledNumberField().decimalScale( 2 ).valueBinder(
