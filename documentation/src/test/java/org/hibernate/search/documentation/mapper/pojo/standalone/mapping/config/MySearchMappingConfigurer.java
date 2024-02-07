@@ -6,20 +6,28 @@
  */
 package org.hibernate.search.documentation.mapper.pojo.standalone.mapping.config;
 
-import org.hibernate.search.mapper.orm.mapping.HibernateOrmMappingConfigurationContext;
-import org.hibernate.search.mapper.orm.mapping.HibernateOrmSearchMappingConfigurer;
 import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.ProgrammaticMappingConfigurationContext;
 import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.TypeMappingStep;
+import org.hibernate.search.mapper.pojo.standalone.mapping.StandalonePojoMappingConfigurationContext;
+import org.hibernate.search.mapper.pojo.standalone.mapping.StandalonePojoMappingConfigurer;
 
 //tag::include[]
-public class MySearchMappingConfigurer implements HibernateOrmSearchMappingConfigurer {
+public class MySearchMappingConfigurer implements StandalonePojoMappingConfigurer {
 	@Override
-	public void configure(HibernateOrmMappingConfigurationContext context) {
-		ProgrammaticMappingConfigurationContext mapping = context.programmaticMapping(); // <1>
-		TypeMappingStep bookMapping = mapping.type( Book.class ); // <2>
-		bookMapping.indexed(); // <3>
-		bookMapping.property( "title" ) // <4>
-				.fullTextField().analyzer( "english" ); // <5>
+	public void configure(StandalonePojoMappingConfigurationContext context) {
+		context.addEntityType( Book.class ); // <1>
+
+		context.annotationMapping() // <2>
+				.discoverAnnotationsFromReferencedTypes( false )
+				.discoverAnnotatedTypesFromRootMappingAnnotations( false );
+
+		ProgrammaticMappingConfigurationContext mappingContext = context.programmaticMapping(); // <3>
+		TypeMappingStep bookMapping = mappingContext.type( Book.class ); // <4>
+		bookMapping.indexed(); // <5>
+		bookMapping.property( "id" ) // <6>
+				.documentId(); // <7>
+		bookMapping.property( "title" ) // <8>
+				.fullTextField().analyzer( "english" ); // <9>
 	}
 }
 //end::include[]

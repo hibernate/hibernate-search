@@ -12,12 +12,9 @@ import java.util.List;
 
 import org.hibernate.search.documentation.testsupport.BackendConfigurations;
 import org.hibernate.search.documentation.testsupport.TestConfiguration;
-import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.ProgrammaticMappingConfigurationContext;
-import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.TypeMappingStep;
 import org.hibernate.search.mapper.pojo.standalone.mapping.CloseableSearchMapping;
 import org.hibernate.search.mapper.pojo.standalone.mapping.SearchMapping;
 import org.hibernate.search.mapper.pojo.standalone.mapping.SearchMappingBuilder;
-import org.hibernate.search.mapper.pojo.standalone.mapping.StandalonePojoMappingConfigurer;
 import org.hibernate.search.mapper.pojo.standalone.session.SearchSession;
 import org.hibernate.search.mapper.pojo.work.IndexingPlanSynchronizationStrategy;
 import org.hibernate.search.util.impl.integrationtest.common.TestConfigurationProvider;
@@ -36,30 +33,14 @@ class MappingConfigurationIT {
 
 	@BeforeEach
 	void setup() {
-		// tag::setup[]
 		SearchMappingBuilder builder = SearchMapping.builder()
-				// end::setup[]
 				.properties( TestConfiguration.standalonePojoMapperProperties(
 						configurationProvider,
 						BackendConfigurations.simple()
 				) )
-				// tag::setup[]
 				.property(
 						"hibernate.search.mapping.configurer",
-						(StandalonePojoMappingConfigurer) context -> {
-							context.addEntityType( Book.class ); // <1>
-
-							context.annotationMapping() // <2>
-									.discoverAnnotationsFromReferencedTypes( false )
-									.discoverAnnotatedTypesFromRootMappingAnnotations( false );
-
-							ProgrammaticMappingConfigurationContext mappingContext = context.programmaticMapping(); // <3>
-							TypeMappingStep bookMapping = mappingContext.type( Book.class );
-							bookMapping.indexed();
-							bookMapping.property( "id" ).documentId();
-							bookMapping.property( "title" )
-									.fullTextField().analyzer( "english" );
-						}
+						MySearchMappingConfigurer.class.getName()
 				);
 
 		CloseableSearchMapping searchMapping = builder.build();
@@ -94,5 +75,4 @@ class MappingConfigurationIT {
 			assertThat( result ).hasSize( 1 );
 		}
 	}
-
 }
