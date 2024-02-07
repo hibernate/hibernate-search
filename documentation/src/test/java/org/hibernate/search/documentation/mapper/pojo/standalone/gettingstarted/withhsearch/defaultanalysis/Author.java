@@ -15,17 +15,19 @@ import org.hibernate.search.mapper.pojo.mapping.definition.annotation.DocumentId
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.FullTextField;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.ObjectPath;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.PropertyValue;
+import org.hibernate.search.mapper.pojo.mapping.definition.annotation.SearchEntity;
 
-// <7>
+@SearchEntity // <8>
+// <9>
 public class Author {
 
-	@DocumentId // <8>
+	@DocumentId // <10>
 	private Integer id;
 
-	@FullTextField // <4>
+	@FullTextField // <5>
 	private String name;
 
-	@AssociationInverseSide(inversePath = @ObjectPath(@PropertyValue(propertyName = "authors"))) // <9>
+	@AssociationInverseSide(inversePath = @ObjectPath(@PropertyValue(propertyName = "authors"))) // <11>
 	private Set<Book> books = new HashSet<>();
 
 	public Author() {

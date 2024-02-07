@@ -6,9 +6,7 @@
  */
 package org.hibernate.search.mapper.pojo.standalone.mapping.impl;
 
-import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Map;
 
 import org.hibernate.search.engine.cfg.spi.ConfigurationProperty;
 import org.hibernate.search.engine.cfg.spi.OptionalConfigurationProperty;
@@ -20,11 +18,9 @@ import org.hibernate.search.engine.tenancy.spi.TenancyMode;
 import org.hibernate.search.mapper.pojo.mapping.building.spi.PojoMapperDelegate;
 import org.hibernate.search.mapper.pojo.mapping.building.spi.PojoTypeMetadataContributor;
 import org.hibernate.search.mapper.pojo.mapping.spi.AbstractPojoMappingInitiator;
-import org.hibernate.search.mapper.pojo.model.spi.PojoRawTypeModel;
 import org.hibernate.search.mapper.pojo.standalone.cfg.StandalonePojoMapperSettings;
 import org.hibernate.search.mapper.pojo.standalone.mapping.StandalonePojoMappingConfigurationContext;
 import org.hibernate.search.mapper.pojo.standalone.mapping.StandalonePojoMappingConfigurer;
-import org.hibernate.search.mapper.pojo.standalone.mapping.metadata.EntityConfigurer;
 import org.hibernate.search.mapper.pojo.standalone.model.impl.StandalonePojoBootstrapIntrospector;
 import org.hibernate.search.mapper.pojo.standalone.schema.management.SchemaManagementStrategyName;
 import org.hibernate.search.mapper.pojo.standalone.schema.management.impl.SchemaManagementListener;
@@ -52,9 +48,6 @@ public class StandalonePojoMappingInitiator extends AbstractPojoMappingInitiator
 					.build();
 
 	private final StandalonePojoBootstrapIntrospector introspector;
-	// Use a LinkedHashMap for deterministic iteration
-	private final Map<PojoRawTypeModel<?>, StandalonePojoEntityTypeMetadata<?>> entityTypeMetadataByType =
-			new LinkedHashMap<>();
 	private SchemaManagementListener schemaManagementListener;
 
 	public StandalonePojoMappingInitiator(StandalonePojoBootstrapIntrospector introspector) {
@@ -65,14 +58,6 @@ public class StandalonePojoMappingInitiator extends AbstractPojoMappingInitiator
 				.discoverAnnotatedTypesFromRootMappingAnnotations( true )
 				.discoverJandexIndexesFromAddedTypes( true )
 				.discoverAnnotationsFromReferencedTypes( true );
-	}
-
-	public <E> StandalonePojoMappingInitiator addEntityType(Class<E> clazz, String entityName,
-			EntityConfigurer<E> configurerOrNull) {
-		PojoRawTypeModel<E> type = introspector.typeModel( clazz );
-		entityTypeMetadataByType.merge( type, new StandalonePojoEntityTypeMetadata<>( type, entityName, configurerOrNull ),
-				StandalonePojoEntityTypeMetadata::mergeWith );
-		return this;
 	}
 
 	@Override
@@ -97,8 +82,6 @@ public class StandalonePojoMappingInitiator extends AbstractPojoMappingInitiator
 		SchemaManagementStrategyName schemaManagementStrategyName = SCHEMA_MANAGEMENT_STRATEGY.get(
 				buildContext.configurationPropertySource() );
 		schemaManagementListener = new SchemaManagementListener( schemaManagementStrategyName );
-
-		addConfigurationContributor( new StandalonePojoTypeConfigurationContributor( entityTypeMetadataByType.values() ) );
 
 		super.configure( buildContext, configurationCollector );
 	}

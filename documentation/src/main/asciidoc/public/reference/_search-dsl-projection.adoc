@@ -285,7 +285,7 @@ How the entity is loaded exactly depends on your mapper and configuration:
 * With the <<mapper-orm,Hibernate ORM integration>>, returned objects are managed entities loaded by Hibernate ORM from the database.
 You can use them as you would use any entity returned from traditional Hibernate ORM queries.
 * With the <<mapper-pojo-standalone,Standalone POJO Mapper>>,
-entities are loaded from an external datastore if <<mapper-pojo-standalone-search-query-loading,configured>>,
+entities are loaded from an external datastore if <<mapping-entitydefinition-loading-selection,configured>>,
 or (failing that) are projected from the index if the entity type declares a <<mapping-projection,projection constructor>>.
 If neither loading configuration nor projection constructor are found,
 the `entity` projection will simply fail.

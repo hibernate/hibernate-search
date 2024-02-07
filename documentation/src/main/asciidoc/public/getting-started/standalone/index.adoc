@@ -158,10 +158,9 @@ are set programmatically when building the mapping.
 include::{sourcedir}/org/hibernate/search/documentation/mapper/pojo/standalone/gettingstarted/withhsearch/defaultanalysis/GettingStartedDefaultAnalysisIT.java[tags=setup-lucene]
 ----
 <1> Create a builder, passing an `AnnotatedTypeSource` to let Hibernate Search know where to look for annotations.
-<2> Declare *all* entity types that Hibernate Search may need to work with.
-<3> Set the location of indexes in the filesystem.
+<2> Set the location of indexes in the filesystem.
 By default, the backend will store indexes in the current working directory.
-<4> Build the `SearchMapping`.
+<3> Build the `SearchMapping`.
 ====
 
 .Hibernate Search properties for a "Standalone POJO Mapper + Elasticsearch/OpenSearch" setup
@@ -171,13 +170,12 @@ By default, the backend will store indexes in the current working directory.
 include::{sourcedir}/org/hibernate/search/documentation/mapper/pojo/standalone/gettingstarted/withhsearch/defaultanalysis/GettingStartedDefaultAnalysisIT.java[tags=setup-elasticsearch]
 ----
 <1> Create a builder, passing an `AnnotatedTypeSource` to let Hibernate Search know where to look for annotations.
-<2> Declare *all* entity types that Hibernate Search may need to work with.
-<3> Set the Elasticsearch hosts to connect to.
+<2> Set the Elasticsearch hosts to connect to.
 By default, the backend will attempt to connect to `localhost:9200`.
-<4> Set the protocol. The default is `http`, but you may need to use `https`.
-<5> Set the username and password for basic HTTP authentication.
+<3> Set the protocol. The default is `http`, but you may need to use `https`.
+<4> Set the username and password for basic HTTP authentication.
 You may also be interested in xref:{reference-documentation-location}#backend-elasticsearch-configuration-aws[AWS IAM authentication].
-<6> Build the `SearchMapping`.
+<5> Build the `SearchMapping`.
 ====
 
 [TIP]
@@ -200,10 +198,10 @@ the dynamic building of property keys.
 [[mapper-pojo-standalone-getting-started-mapping]]
 == Mapping
 
-Let's assume that your application contains the entity classes `Book` and `Author`
+Let's assume that your application contains the classes `Book` and `Author`
 and you want to index them in order to search for books.
 
-.Book and Author entities BEFORE adding Hibernate Search specific annotations
+.Book and Author types BEFORE adding Hibernate Search specific annotations
 ====
 [source, JAVA, indent=0]
 ----
@@ -215,7 +213,10 @@ include::{sourcedir}/org/hibernate/search/documentation/mapper/pojo/standalone/g
 ----
 ====
 
-To make these entities searchable, you will need to map them to an index structure.
+To make these types searchable,
+you will need to mark them as xref:{reference-documentation-location}#concepts-entity[entity types],
+and map these entity types to an index structure.
+
 The mapping can be defined using xref:{reference-documentation-location}#mapping-annotations[annotations],
 or using a xref:{reference-documentation-location}#mapping-programmatic[programmatic API];
 this getting started guide will show you a simple annotation mapping.
@@ -233,20 +234,26 @@ include::{sourcedir}/org/hibernate/search/documentation/mapper/pojo/standalone/g
 ----
 include::{sourcedir}/org/hibernate/search/documentation/mapper/pojo/standalone/gettingstarted/withhsearch/defaultanalysis/Author.java[tags=include;!getters-setters]
 ----
-<1> `@Indexed` marks `Book` as indexed, i.e. an index will be created for that entity, and that index will be kept up to date.
-<2> `@DocumentId` marks the property used to generate a document identifier.
-<3> `@FullTextField` maps a property to a full-text index field with the same name and type.
+<1> `@SearchEntity` marks the `Book` type as an xref:{reference-documentation-location}#concepts-entity[entity type],
+which is necessary in order for it to be mapped to an index.
+<2> `@Indexed` marks the `Book` type as xref:{reference-documentation-location}#mapping-entityindexmapping[indexed],
+i.e. an index will be created for that entity, and that index will be kept up to date.
+Note `@SearchEntity` could be added here, but is not necessary:
+with the <<mapper-pojo-standalone,Standalone POJO Mapper>>,
+an `@Indexed` type is implicitly always an entity.
+<3> `@DocumentId` marks the property used to generate a document identifier.
+<4> `@FullTextField` maps a property to a full-text index field with the same name and type.
 Full-text fields are broken down into tokens and normalized (lowercased, ...).
 Here we're relying on default analysis configuration,
 but most applications need to customize it;
 this will be addressed <<mapper-pojo-standalone-getting-started-analysis,further down>>.
-<4> `@KeywordField` maps a property to a non-analyzed index field.
+<5> `@KeywordField` maps a property to a non-analyzed index field.
 Useful for identifiers, for example.
-<5> Hibernate Search is not just for full-text search: you can index non-`String` types with the `@GenericField` annotation,
+<6> Hibernate Search is not just for full-text search: you can index non-`String` types with the `@GenericField` annotation,
 A xref:{reference-documentation-location}#mapping-directfieldmapping-supported-types[broad range of property types] are supported out-of-the-box,
 such as primitive types (`int`, `double`, ...) and their boxed counterpart (`Integer`, `Double`, ...),
 enums, date/time types, `BigInteger`/`BigDecimal`, etc.
-<6> `@IndexedEmbedded` "embeds" the indexed form of associated objects (entities or embeddables)
+<7> `@IndexedEmbedded` "embeds" the indexed form of associated objects (entities or embeddables)
 into the indexed form of the embedding entity.
 +
 Here, the `Author` class defines a single indexed field, `name`.
@@ -255,11 +262,14 @@ will add a single field named `authors.name` to the `Book` index.
 This field will be populated automatically based on the content of the `authors` property,
 and the books will be re-indexed whenever Hibernate Search xref:{reference-documentation-location}#architecture-hsearch-indexing[detects that the `name` property of their author changes].
 See xref:{reference-documentation-location}#mapping-indexedembedded[Mapping associated elements with `@IndexedEmbedded`] for more information.
-<7> Entities that are only `@IndexedEmbedded` in other entities,
-but do not require to be searchable by themselves, do not need to be annotated with `@Indexed`.
-<8> Most of the time, you will need to put `@DocumentId` on contained, non-indexed entity types such as `Author`,
-to allow Hibernate Search to retrieve the identifier from entities of that type.
-<9> `Book` embeds data from the `Author` entity, so `Book` needs to be reindexed when `Author` changes,
+<8> `@SearchEntity` marks `Author` as an xref:{reference-documentation-location}#concepts-entity[entity type].
+<9> `Author` is `@IndexedEmbedded` in other entities,
+but does not need to be searchable by itself,
+so it does not need an index and does not need to be annotated with `@Indexed`.
+<10> `Author` is not indexed, but it is `@IndexedEmbedded`,
+so Hibernate Search will need to manipulate identifiers of `Author` instances.
+Putting `@DocumentId` on a uniquely identifying property makes that possible.
+<11> `Book` embeds data from the `Author` entity, so `Book` needs to be reindexed when `Author` changes,
 and thus Hibernate Search needs to be able to retrieve the books of a particular author when the author changes.
 For that reason, we need to provide information to Hibernate Search about the inverse side of associations.
 ====

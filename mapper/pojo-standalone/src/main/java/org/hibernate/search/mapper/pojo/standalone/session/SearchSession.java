@@ -12,7 +12,7 @@ import java.util.Collections;
 
 import org.hibernate.search.engine.common.EntityReference;
 import org.hibernate.search.engine.search.query.dsl.SearchQuerySelectStep;
-import org.hibernate.search.mapper.pojo.standalone.mapping.StandalonePojoMappingConfigurationContext;
+import org.hibernate.search.mapper.pojo.mapping.definition.annotation.SearchEntity;
 import org.hibernate.search.mapper.pojo.standalone.massindexing.MassIndexer;
 import org.hibernate.search.mapper.pojo.standalone.schema.management.SearchSchemaManager;
 import org.hibernate.search.mapper.pojo.standalone.scope.SearchScope;
@@ -193,7 +193,7 @@ public interface SearchSession extends AutoCloseable {
 	 * Create a {@link SearchScope} limited to entity types referenced by their name.
 	 *
 	 * @param expectedSuperType A supertype of all entity types to include in the scope.
-	 * @param entityName An entity name. See {@link StandalonePojoMappingConfigurationContext#addEntityType(Class, String)}.
+	 * @param entityName An entity name. See {@link SearchEntity#name()}.
 	 * @param <T> A supertype of all entity types to include in the scope.
 	 * @return The created scope.
 	 * @see SearchScope
@@ -206,7 +206,7 @@ public interface SearchSession extends AutoCloseable {
 	 * Create a {@link SearchScope} limited to entity types referenced by their name.
 	 *
 	 * @param expectedSuperType A supertype of all entity types to include in the scope.
-	 * @param entityNames A collection of entity names. See {@link StandalonePojoMappingConfigurationContext#addEntityType(Class, String)}.
+	 * @param entityNames A collection of entity names. See {@link SearchEntity#name()}.
 	 * @param <T> A supertype of all entity types to include in the scope.
 	 * @return The created scope.
 	 * @see SearchScope

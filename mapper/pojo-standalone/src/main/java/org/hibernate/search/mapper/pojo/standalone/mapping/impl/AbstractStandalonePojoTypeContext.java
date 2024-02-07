@@ -6,16 +6,20 @@
  */
 package org.hibernate.search.mapper.pojo.standalone.mapping.impl;
 
+import java.util.Optional;
+
+import org.hibernate.search.engine.environment.bean.BeanResolver;
 import org.hibernate.search.mapper.pojo.loading.definition.spi.PojoEntityLoadingBindingContext;
 import org.hibernate.search.mapper.pojo.mapping.building.spi.PojoTypeExtendedMappingCollector;
+import org.hibernate.search.mapper.pojo.model.PojoModelElement;
 import org.hibernate.search.mapper.pojo.model.path.spi.PojoPathFilter;
 import org.hibernate.search.mapper.pojo.model.spi.PojoRawTypeIdentifier;
 import org.hibernate.search.mapper.pojo.standalone.loading.MassLoadingStrategy;
 import org.hibernate.search.mapper.pojo.standalone.loading.SelectionLoadingStrategy;
+import org.hibernate.search.mapper.pojo.standalone.loading.binding.EntityLoadingBinder;
+import org.hibernate.search.mapper.pojo.standalone.loading.binding.EntityLoadingBindingContext;
 import org.hibernate.search.mapper.pojo.standalone.loading.impl.StandalonePojoMassLoadingStrategy;
 import org.hibernate.search.mapper.pojo.standalone.loading.impl.StandalonePojoSelectionLoadingStrategy;
-import org.hibernate.search.mapper.pojo.standalone.mapping.metadata.EntityConfigurationContext;
-import org.hibernate.search.mapper.pojo.standalone.mapping.metadata.EntityConfigurer;
 import org.hibernate.search.mapper.pojo.standalone.work.impl.SearchIndexingPlanTypeContext;
 
 abstract class AbstractStandalonePojoTypeContext<E>
@@ -71,21 +75,47 @@ abstract class AbstractStandalonePojoTypeContext<E>
 
 		@Override
 		public void applyLoadingBinder(Object binder, PojoEntityLoadingBindingContext context) {
-			@SuppressWarnings("unchecked") // We make sure of that in APIs, see org.hibernate.search.mapper.pojo.standalone.mapping.StandalonePojoMappingConfigurationContext.addEntityType(java.lang.Class<E>, org.hibernate.search.mapper.pojo.standalone.mapping.metadata.EntityConfigurer<E>)
-			var castConfigurer = (EntityConfigurer<E>) binder;
-			castConfigurer.configure( new EntityConfigurationContext<>() {
+			var castConfigurer = (EntityLoadingBinder) binder;
+			castConfigurer.bind( new EntityLoadingBindingContext() {
 				@Override
-				public void selectionLoadingStrategy(SelectionLoadingStrategy<? super E> strategy) {
-					context.selectionLoadingStrategy( typeIdentifier.javaClass(), strategy == null
+				public PojoModelElement entityType() {
+					return context.entityType();
+				}
+
+				@Override
+				public PojoModelElement identifierType() {
+					return context.identifierType();
+				}
+
+				@Override
+				public <E2> void selectionLoadingStrategy(Class<E2> expectedEntitySuperType,
+						SelectionLoadingStrategy<? super E2> strategy) {
+					context.selectionLoadingStrategy( expectedEntitySuperType, strategy == null
 							? null
 							: new StandalonePojoSelectionLoadingStrategy<>( strategy ) );
 				}
 
 				@Override
-				public void massLoadingStrategy(MassLoadingStrategy<? super E, ?> strategy) {
-					context.massLoadingStrategy( typeIdentifier.javaClass(), strategy == null
+				public <E2> void massLoadingStrategy(Class<E2> expectedEntitySuperType,
+						MassLoadingStrategy<? super E2, ?> strategy) {
+					context.massLoadingStrategy( expectedEntitySuperType, strategy == null
 							? null
 							: new StandalonePojoMassLoadingStrategy<>( strategy ) );
+				}
+
+				@Override
+				public BeanResolver beanResolver() {
+					return context.beanResolver();
+				}
+
+				@Override
+				public <T> T param(String name, Class<T> paramType) {
+					return context.param( name, paramType );
+				}
+
+				@Override
+				public <T> Optional<T> paramOptional(String name, Class<T> paramType) {
+					return context.paramOptional( name, paramType );
 				}
 			} );
 		}

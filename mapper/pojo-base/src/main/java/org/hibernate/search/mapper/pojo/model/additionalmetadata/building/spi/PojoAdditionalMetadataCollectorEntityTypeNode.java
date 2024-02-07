@@ -6,6 +6,7 @@
  */
 package org.hibernate.search.mapper.pojo.model.additionalmetadata.building.spi;
 
+import org.hibernate.search.engine.environment.bean.spi.ParameterizedBeanReference;
 import org.hibernate.search.mapper.pojo.loading.definition.spi.PojoEntityLoadingBindingContext;
 import org.hibernate.search.mapper.pojo.model.path.spi.PojoPathDefinitionProvider;
 
@@ -38,9 +39,9 @@ public interface PojoAdditionalMetadataCollectorEntityTypeNode extends PojoAddit
 	void entityIdPropertyName(String propertyName);
 
 	/**
-	 * @param binder A binder for loading of entities of this type.
+	 * @param binderRef A reference to a binder for loading of entities of this type.
 	 * @see org.hibernate.search.mapper.pojo.mapping.building.spi.PojoIndexedTypeExtendedMappingCollector#applyLoadingBinder(Object, PojoEntityLoadingBindingContext)
 	 */
-	void loadingBinder(Object binder);
+	void loadingBinder(ParameterizedBeanReference<?> binderRef);
 
 }

@@ -11,6 +11,8 @@ import java.util.Map;
 
 import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.TypeBinder;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
+import org.hibernate.search.mapper.pojo.mapping.definition.annotation.SearchEntity;
+import org.hibernate.search.util.common.annotation.Incubating;
 
 /**
  * The step in a mapping definition where a type can be mapped,
@@ -24,6 +26,20 @@ public interface TypeMappingStep {
 	 * @see Indexed
 	 */
 	TypeMappingIndexedStep indexed();
+
+	/**
+	 * Marks a type as an entity type.
+	 * <p>
+	 * WARNING: this is unnecessary when using the Hibernate ORM integration,
+	 * which contributes this information automatically,
+	 * and is in fact unsupported with the Hibernate ORM integration.
+	 * See <a href="https://hibernate.atlassian.net/browse/HSEARCH-5076">HSEARCH-5076</a>
+	 * to track progress on allowing the use of `@SearchEntity` in the Hibernate ORM integration
+	 * to map non-ORM entities.
+	 * @see SearchEntity
+	 */
+	@Incubating
+	TypeMappingSearchEntityStep searchEntity();
 
 	/**
 	 * Define a type binder, responsible for creating a bridge.

@@ -5,6 +5,8 @@
 
 include::_mapping-configuration.adoc[]
 
+include::_mapping-entitydefinition.adoc[]
+
 include::_mapping-entityindexmapping.adoc[]
 
 include::_mapping-identifiermapping.adoc[]

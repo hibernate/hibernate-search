@@ -140,10 +140,11 @@ abstract class AbstractHibernateOrmTypeContext<E>
 		}
 
 		@Override
+		@SuppressWarnings("unchecked") // The binder uses reflection to create a strategy of the appropriate type
 		public void applyLoadingBinder(Object binder, PojoEntityLoadingBindingContext context) {
-			@SuppressWarnings("unchecked") // We make sure of that when contributing the loading binder, see org.hibernate.search.mapper.pojo.standalone.mapping.StandalonePojoMappingConfigurationContext.addEntityType(java.lang.Class<E>, org.hibernate.search.mapper.pojo.standalone.mapping.metadata.EntityConfigurer<E>)
-			var castBinder = (HibernateOrmEntityLoadingBinder<E>) binder;
-			this.loadingStrategy = castBinder.createLoadingStrategy( persistentClass, documentIdSourceProperty );
+			var castBinder = (HibernateOrmEntityLoadingBinder) binder;
+			this.loadingStrategy = (HibernateOrmEntityLoadingStrategy<? super E, ?>) castBinder
+					.createLoadingStrategy( persistentClass, documentIdSourceProperty );
 			if ( this.loadingStrategy != null ) {
 				context.selectionLoadingStrategy( typeIdentifier.javaClass(), this.loadingStrategy );
 				context.massLoadingStrategy( typeIdentifier.javaClass(), this.loadingStrategy );

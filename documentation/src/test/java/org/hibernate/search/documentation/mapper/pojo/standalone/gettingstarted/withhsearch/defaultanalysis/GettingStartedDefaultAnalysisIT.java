@@ -16,7 +16,6 @@ import org.hibernate.search.engine.search.query.SearchResult;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.AnnotatedTypeSource;
 import org.hibernate.search.mapper.pojo.standalone.mapping.CloseableSearchMapping;
 import org.hibernate.search.mapper.pojo.standalone.mapping.SearchMapping;
-import org.hibernate.search.mapper.pojo.standalone.mapping.StandalonePojoMappingConfigurer;
 import org.hibernate.search.mapper.pojo.standalone.scope.SearchScope;
 import org.hibernate.search.mapper.pojo.standalone.session.SearchSession;
 import org.hibernate.search.util.impl.integrationtest.common.TestConfigurationProvider;
@@ -41,20 +40,13 @@ class GettingStartedDefaultAnalysisIT {
 			CloseableSearchMapping searchMapping = SearchMapping.builder( AnnotatedTypeSource.fromClasses( // <1>
 					Book.class, Author.class
 			) )
-					.property(
-							"hibernate.search.mapping.configurer",
-							(StandalonePojoMappingConfigurer) context -> {
-								context.addEntityType( Book.class ) // <2>
-										.addEntityType( Author.class );
-							}
-					)
 					.property( "hibernate.search.backend.directory.root",
-							"some/filesystem/path" ) // <3>
+							"some/filesystem/path" ) // <2>
 					// end::setup-lucene[]
 					.properties( TestConfiguration.standalonePojoMapperProperties( configurationProvider,
 							BackendConfigurations.plain() ) )
 					// tag::setup-lucene[]
-					.build(); // <4>
+					.build(); // <3>
 			// end::setup-lucene[]
 			this.searchMapping = searchMapping;
 		}
@@ -63,26 +55,19 @@ class GettingStartedDefaultAnalysisIT {
 			CloseableSearchMapping searchMapping = SearchMapping.builder( AnnotatedTypeSource.fromClasses( // <1>
 					Book.class, Author.class
 			) )
-					.property(
-							"hibernate.search.mapping.configurer",
-							(StandalonePojoMappingConfigurer) context -> {
-								context.addEntityType( Book.class ) // <2>
-										.addEntityType( Author.class );
-							}
-					)
 					.property( "hibernate.search.backend.hosts",
-							"elasticsearch.mycompany.com" ) // <3>
+							"elasticsearch.mycompany.com" ) // <2>
 					.property( "hibernate.search.backend.protocol",
-							"https" ) // <4>
+							"https" ) // <3>
 					.property( "hibernate.search.backend.username",
-							"ironman" ) // <5>
+							"ironman" ) // <4>
 					.property( "hibernate.search.backend.password",
 							"j@rV1s" )
 					// end::setup-elasticsearch[]
 					.properties( TestConfiguration.standalonePojoMapperProperties( configurationProvider,
 							BackendConfigurations.plain() ) )
 					// tag::setup-elasticsearch[]
-					.build(); // <6>
+					.build(); // <5>
 			// end::setup-elasticsearch[]
 			this.searchMapping = searchMapping;
 		}

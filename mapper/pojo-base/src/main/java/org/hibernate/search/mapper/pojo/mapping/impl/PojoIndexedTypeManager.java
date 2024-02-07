@@ -200,7 +200,7 @@ public class PojoIndexedTypeManager<I, E> extends AbstractPojoTypeManager<I, E>
 		@Override
 		public PojoIndexedTypeManager<?, E> build() {
 			closed = true;
-			return new PojoIndexedTypeManager<>( this, identifierMapping );
+			return new PojoIndexedTypeManager<>( this, identifierMapping.mapping );
 		}
 	}
 }

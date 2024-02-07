@@ -15,14 +15,13 @@ import org.hibernate.search.mapper.pojo.standalone.mapping.StandalonePojoMapping
 public class MySearchMappingConfigurer implements StandalonePojoMappingConfigurer {
 	@Override
 	public void configure(StandalonePojoMappingConfigurationContext context) {
-		context.addEntityType( Book.class ); // <1>
-
-		context.annotationMapping() // <2>
+		context.annotationMapping() // <1>
 				.discoverAnnotationsFromReferencedTypes( false )
 				.discoverAnnotatedTypesFromRootMappingAnnotations( false );
 
-		ProgrammaticMappingConfigurationContext mappingContext = context.programmaticMapping(); // <3>
-		TypeMappingStep bookMapping = mappingContext.type( Book.class ); // <4>
+		ProgrammaticMappingConfigurationContext mappingContext = context.programmaticMapping(); // <2>
+		TypeMappingStep bookMapping = mappingContext.type( Book.class ); // <3>
+		bookMapping.searchEntity(); // <4>
 		bookMapping.indexed(); // <5>
 		bookMapping.property( "id" ) // <6>
 				.documentId(); // <7>

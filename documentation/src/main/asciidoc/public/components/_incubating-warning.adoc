@@ -1,6 +1,6 @@
 [WARNING]
 ====
-Features detailed in this section are _incubating_: they are still under active development.
+Features detailed below are _incubating_: they are still under active development.
 
 The usual https://hibernate.org/community/compatibility-policy/[compatibility policy] does not apply:
 the contract of incubating elements (e.g. types, methods, configuration properties, etc.)

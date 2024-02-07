@@ -5,7 +5,7 @@
 == Annotation-based mapping
 
 The main way to map entities to indexes is through annotations,
-as explained in <<mapping-entityindexmapping>> and the following sections.
+as explained in <<mapping-entitydefinition>>, <<mapping-entityindexmapping>> and the following sections.
 
 By default, Hibernate Search will automatically process mapping annotations for entity types,
 as well as nested types in those entity types, for instance embedded types.
@@ -26,7 +26,7 @@ Hibernate Search will also try to find some annotated types through <<mapping-cl
 
 [TIP]
 ====
-See <<mapping-entityindexmapping>> and <<mapping-directfieldmapping>>
+See <<mapping-entitydefinition>>, <<mapping-entityindexmapping>> and <<mapping-directfieldmapping>>
 to get started with annotation-based mapping.
 ====
 
@@ -201,10 +201,10 @@ define the programmatic mapping, for example:
 ----
 include::{sourcedir}/org/hibernate/search/documentation/mapper/pojo/standalone/mapping/config/MySearchMappingConfigurer.java[tags=include]
 ----
-<1> Define `Book` as an entity type.
-<2> Access the annotation mapping context to configure annotation mapping.
-<3> Access the programmatic mapping context to configure programmatic mapping.
-<4> Access the programmatic mapping of type `Book`.
+<1> Access the annotation mapping context to configure annotation mapping.
+<2> Access the programmatic mapping context to configure programmatic mapping.
+<3> Access the programmatic mapping of type `Book`.
+<4> Define `Book` as <<mapping-entitydefinition-explicit,an entity type>>.
 <5> Define `Book` as <<mapping-entityindexmapping-programmatic,indexed>>.
 <6> Access the programmatic mapping of property `id` of type `Book`.
 <7> <<mapping-identifiermapping-explicit,Define the identifier>> of type `Book` as its property `id`.

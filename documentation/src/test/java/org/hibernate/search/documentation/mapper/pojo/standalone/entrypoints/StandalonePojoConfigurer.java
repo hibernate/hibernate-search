@@ -13,8 +13,8 @@ import org.hibernate.search.mapper.pojo.standalone.mapping.StandalonePojoMapping
 public class StandalonePojoConfigurer implements StandalonePojoMappingConfigurer {
 	@Override
 	public void configure(StandalonePojoMappingConfigurationContext context) {
-		context.addEntityTypes( Book.class, Associate.class, Manager.class );// <1>
+		context.addEntityTypes( Book.class, Associate.class, Manager.class );
 
-		context.defaultReindexOnUpdate( ReindexOnUpdate.SHALLOW ); // <2>
+		context.defaultReindexOnUpdate( ReindexOnUpdate.SHALLOW );
 	}
 }

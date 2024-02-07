@@ -9,7 +9,9 @@ package org.hibernate.search.documentation.mapper.pojo.standalone.entrypoints;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.DocumentId;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.FullTextField;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
+import org.hibernate.search.mapper.pojo.mapping.definition.annotation.SearchEntity;
 
+@SearchEntity
 @Indexed
 public class Book {
 

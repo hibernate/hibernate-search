@@ -10,9 +10,7 @@ import java.util.Collection;
 import java.util.List;
 
 import org.hibernate.search.engine.environment.bean.spi.BeanProvider;
-import org.hibernate.search.engine.logging.spi.MappableTypeModelFormatter;
 import org.hibernate.search.mapper.pojo.model.spi.PojoRawTypeIdentifier;
-import org.hibernate.search.mapper.pojo.model.spi.PojoRawTypeModel;
 import org.hibernate.search.util.common.SearchException;
 import org.hibernate.search.util.common.logging.impl.ClassFormatter;
 import org.hibernate.search.util.common.logging.impl.CommaSeparatedClassesFormatter;
@@ -34,9 +32,6 @@ public interface Log extends BasicLogger {
 
 	@Message(id = ID_OFFSET + 3, value = "Unable to retrieve type model for class '%1$s'.")
 	SearchException errorRetrievingTypeModel(@FormatWith(ClassFormatter.class) Class<?> clazz, @Cause Exception cause);
-
-	@Message(id = ID_OFFSET + 5, value = "Entity type '%1$s' has multiple, conflicting definitions in the mapping builder.")
-	SearchException multipleEntityTypeDefinitions(@FormatWith(MappableTypeModelFormatter.class) PojoRawTypeModel<?> type);
 
 	@Message(id = ID_OFFSET + 7,
 			value = "Type with name '%1$s' does not exist: the standalone POJO mapper does not support named types."

@@ -48,7 +48,7 @@ public class PojoContainedTypeManager<I, E> extends AbstractPojoTypeManager<I, E
 		@Override
 		public PojoContainedTypeManager<?, E> build() {
 			closed = true;
-			return new PojoContainedTypeManager<>( this, identifierMapping );
+			return new PojoContainedTypeManager<>( this, identifierMapping.mapping );
 		}
 	}
 }

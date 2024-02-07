@@ -832,12 +832,12 @@ other annotations such as `@GenericField` will fail.
 ====
 
 [[backend-elasticsearch-type-name]]
-=== Type name mapping
+=== Entity type name mapping
 
 When Hibernate Search performs a search query targeting multiple entity types, and thus multiple indexes,
-it needs to determine the type of each search hit in order to map it back to an entity.
+it needs to determine the <<concepts-entity,entity type>> of each search hit in order to map it back to an entity.
 
-There are multiple strategies to handle this "type name resolution",
+There are multiple strategies to handle this "entity type name resolution",
 and each has pros and cons.
 
 The strategy is set at the backend level:
@@ -853,11 +853,11 @@ See the following subsections for details about available strategies.
 [[backend-elasticsearch-type-name-discriminator]]
 ==== `discriminator`: type name mapping using a discriminator field
 
-With the `discriminator` strategy, a discriminator field is used to retrieve the type name directly from each document.
+With the `discriminator` strategy, a discriminator field is used to retrieve the entity type name directly from each document.
 
-When indexing, the `_entity_type` field is populated transparently with type name for each document.
+When indexing, the `_entity_type` field is populated transparently with the name of the <<concepts-entity,entity type>> for each document.
 
-When searching, the docvalues for the type field is transparently requested to Elasticsearch
+When searching, the docvalues for the `_entity_type` field are transparently requested from Elasticsearch
 and extracted from the response.
 
 Pros:
@@ -867,13 +867,14 @@ Pros:
 Cons:
 
 * Small storage overhead: a few bytes of storage per document.
-* Requires reindexing if an entity name changes, even if the index name doesn't change.
+* Requires <<indexing-massindexer,full reindexing>> if an <<concepts-entity,entity>> name changes,
+even if the index name doesn't change.
 
 [[backend-elasticsearch-type-name-index-name]]
 ==== `index-name`: type name mapping using the index name
 
 With the `index-name` strategy, the `_index` meta-field returned for each search hit
-is used to resolve the index name, and from that the type name.
+is used to resolve the index name, and from that the <<concepts-entity,entity type>> name.
 
 Pros:
 
@@ -884,7 +885,7 @@ Cons:
 * Relies on the actual index name, not aliases,
 because the `_index` meta-field returned by Elasticsearch
 contains the actual index name (e.g. `myindex-000001`), not the alias (e.g. `myindex-read`).
-If indexes do not follow the default naming scheme `<hibernateSearchIndexName>-<6 digits>`,
+Thus, if indexes do not follow the default naming scheme `<hibernateSearchIndexName>-<6 digits>`,
 a custom <<backend-elasticsearch-indexlayout,index layout>> must be configured.
 
 [[backend-elasticsearch-mapping-dynamic]]

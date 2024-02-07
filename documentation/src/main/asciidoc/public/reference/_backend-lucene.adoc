@@ -86,7 +86,7 @@ hibernate.search.backend.indexes.<index-name>.directory.root = /path/to/my/root
 ----
 
 For example, with the configuration above,
-an entity type named `Order` will be indexed in directory
+an <<concepts-entity,entity type>> named `Order` will be indexed in directory
 `/path/to/my/root/Order/`.
 If that entity is explicitly assigned the index name `orders`
 (see `@Indexed(index = ...)` in <<mapping-entityindexmapping>>),

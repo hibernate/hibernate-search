@@ -24,4 +24,9 @@ public interface PojoModelElement {
 	 */
 	boolean isAssignableTo(Class<?> clazz);
 
+	/**
+	 * @return The {@link Class} representing the raw type of this element.
+	 */
+	Class<?> rawType();
+
 }

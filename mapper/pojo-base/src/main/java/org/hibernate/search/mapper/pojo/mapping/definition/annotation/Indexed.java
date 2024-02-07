@@ -36,7 +36,7 @@ public @interface Indexed {
 
 	/**
 	 * @return The name of the index.
-	 * Defaults to the entity name.
+	 * Defaults to the {@link SearchEntity#name() entity name}.
 	 */
 	String index() default "";
 

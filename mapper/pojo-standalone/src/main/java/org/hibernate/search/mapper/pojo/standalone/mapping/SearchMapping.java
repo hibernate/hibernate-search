@@ -14,6 +14,7 @@ import org.hibernate.search.engine.backend.Backend;
 import org.hibernate.search.engine.backend.index.IndexManager;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.AnnotatedTypeSource;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
+import org.hibernate.search.mapper.pojo.mapping.definition.annotation.SearchEntity;
 import org.hibernate.search.mapper.pojo.standalone.entity.SearchIndexedEntity;
 import org.hibernate.search.mapper.pojo.standalone.scope.SearchScope;
 import org.hibernate.search.mapper.pojo.standalone.session.SearchSession;
@@ -55,7 +56,7 @@ public interface SearchMapping {
 	 * Create a {@link SearchScope} limited to entity types referenced by their name.
 	 *
 	 * @param expectedSuperType A supertype of all entity types to include in the scope.
-	 * @param entityName An entity name. See {@link StandalonePojoMappingConfigurationContext#addEntityType(Class, String)}.
+	 * @param entityName An entity name. See {@link SearchEntity#name()}.
 	 * @param <T> A supertype of all entity types to include in the scope.
 	 * @return The created scope.
 	 * @see SearchScope
@@ -68,7 +69,7 @@ public interface SearchMapping {
 	 * Create a {@link SearchScope} limited to entity types referenced by their name.
 	 *
 	 * @param expectedSuperType A supertype of all entity types to include in the scope.
-	 * @param entityNames A collection of entity names. See {@link StandalonePojoMappingConfigurationContext#addEntityType(Class, String)}.
+	 * @param entityNames A collection of entity names. See {@link SearchEntity#name()}.
 	 * @param <T> A supertype of all entity types to include in the scope.
 	 * @return The created scope.
 	 * @see SearchScope
@@ -98,7 +99,7 @@ public interface SearchMapping {
 	<E> SearchIndexedEntity<E> indexedEntity(Class<E> entityType);
 
 	/**
-	 * @param entityName The name of an indexed entity. See {@link StandalonePojoMappingConfigurationContext#addEntityType(Class, String)}.
+	 * @param entityName The name of an indexed entity. See {@link SearchEntity#name()}.
 	 * @return A {@link SearchIndexedEntity} for the indexed entity with the given name.
 	 * @throws org.hibernate.search.util.common.SearchException If the name does not match any indexed entity.
 	 */

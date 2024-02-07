@@ -1,0 +1,346 @@
+[[mapping-entitydefinition]]
+= Entity definition
+
+[[mapping-entitydefinition-basics]]
+== Basics
+
+Before a type can be <<mapping-entityindexmapping,mapped to indexes>>,
+Hibernate Search needs to be aware of which types
+in the application domain model are <<concepts-entity,entity types>>.
+
+When <<mapper-orm,indexing Hibernate ORM entities>>,
+the entity types are fully defined by Hibernate ORM (generally through Jakarta's `@Entity` annotation),
+and no explicit definition is necessary: **you can safely skip this entire section**.
+
+When using the <<mapper-pojo-standalone,Standalone POJO Mapper>>,
+entity types need to be <<mapping-entitydefinition-explicit,defined explicitly>>.
+
+[[mapping-entitydefinition-explicit]]
+== Explicit entity definition
+
+include::../components/_incubating-warning.adoc[]
+
+include::../components/_search-entity-orm-warning.adoc[]
+
+With the <<mapper-pojo-standalone,Standalone POJO Mapper>>,
+<<concepts-entity,entity types>> must be marked explicitly with the `@SearchEntity` annotation.
+
+.Marking a class as an entity with `@SearchEntity`
+====
+[source, JAVA, indent=0]
+----
+include::{sourcedir}/org/hibernate/search/documentation/mapper/pojo/standalone/entitydefinition/Book.java[tags=search-entity-default]
+----
+<1> Annotate the type with `@SearchEntity`
+<2> `@Indexed` is optional: it is only necessary if you intend to <<mapping-entityindexmapping,map this type to an index>>.
+====
+
+[CAUTION]
+====
+Not all types are entity types, even if they have a composite structure.
+
+Incorrectly marking types as entity types may force you to add unnecessary complexity to your domain model,
+such as <<mapping-identifiermapping-explicit,defining identifiers>>
+or <<mapping-reindexing-associationinverseside,an inverse side for "associations" to such types>>
+that won't get used.
+
+Make sure to read <<concepts-entity,this section>> for more information on
+what entity types are and why they are necessary.
+====
+
+[NOTE]
+====
+Subclasses do **not** inherit the `@SearchEntity` annotation.
+
+Each subclass must be annotated with `@SearchEntity` as well,
+or it will not be considered as an entity by Hibernate Search.
+
+However, for subclasses that are also annotated with `@SearchEntity`,
+some entity-related configuration can be inherited;
+see the relevant sections for details.
+====
+
+By default, with the <<mapper-pojo-standalone,Standalone POJO Mapper>>:
+
+* The <<mapping-entitydefinition-name,entity name>>
+will be equal to the class' simple name (`java.lang.Class#getSimpleName`).
+* The entity will not be configured for loading,
+be it to <<mapping-entitydefinition-loading-selection,return entities as hits in search queries>>
+or for <<mapping-entitydefinition-loading-mass,mass indexing>>.
+
+See the following sections to override these defaults.
+
+[[mapping-entitydefinition-name]]
+== Entity name
+
+include::../components/_incubating-warning.adoc[]
+
+The <<concepts-entity,entity>> name,
+distinct from the name of the corresponding class,
+is involved in various places, including but not limited to:
+
+* as the default index name for <<mapping-entityindexmapping,`@Indexed`>>;
+* for <<backend-elasticsearch-type-name,entity type name mapping in Elasticsearch>>;
+* to <<search-dsl-query-targeting-entityName,target entity types using a String>>.
+
+The entity name defaults to the class' simple name (`java.lang.Class#getSimpleName`).
+
+[WARNING]
+====
+Changing the entity name of an <<mapping-entityindexmapping,indexed>> entity
+may require <<indexing-massindexer,full reindexing>>,
+in particular when using the <<backend-elasticsearch,Elasticsearch/OpenSearch backend>>.
+
+See <<backend-elasticsearch-type-name-discriminator,this section>> for more information.
+====
+
+With the <<mapper-orm,Hibernate ORM integration>>,
+this name may be overridden through various means,
+but usually is through Jakarta Persistence's `@Entity` annotation,
+i.e. with `@Entity(name = ...)`.
+
+With the <<mapper-pojo-standalone,Standalone POJO Mapper>>,
+entity types are <<mapping-entitydefinition-explicit,defined with `@SearchEntity`>>,
+and the entity name may be overridden with `@SearchEntity(name = ...)`.
+
+include::../components/_search-entity-orm-warning.adoc[]
+
+.Setting a custom entity name with `@SearchEntity(name = ...)`
+====
+[source, JAVA, indent=0]
+----
+include::{sourcedir}/org/hibernate/search/documentation/mapper/pojo/standalone/entitydefinition/Author.java[tags=search-entity-explicitname]
+----
+====
+
+[[mapping-entitydefinition-loading-mass]]
+=== Mass loading strategy
+
+A "mass loading strategy" gives Hibernate Search
+the ability to load entities of a given type
+for <<indexing-massindexer,mass indexing>>.
+
+With the <<mapper-orm,Hibernate ORM integration>>,
+a mass loading strategy gets configured automatically for every single Hibernate ORM entity,
+and no further configuration is required.
+
+With the <<mapper-pojo-standalone,Standalone POJO Mapper>>,
+entity types are <<mapping-entitydefinition-explicit,defined with `@SearchEntity`>>,
+and, in order to take advantage of mass indexing,
+a mass loading strategy must be applied explicitly
+with `@SearchEntity(loadingBinder = ...)`.
+
+include::../components/_incubating-warning.adoc[]
+
+include::../components/_search-entity-orm-warning.adoc[]
+
+.Assigning a mass loading strategy with the Standalone POJO Mapper
+====
+[source, JAVA, indent=0]
+----
+include::{sourcedir}/org/hibernate/search/documentation/mapper/pojo/standalone/loading/mass/Book.java[tags=include]
+----
+<1> Assign a loading binder to the entity.
+
+NOTE: Subclasses inherit the loading binder of their parent class,
+unless they override it with a loading binder of their own.
+
+[source, JAVA, indent=0]
+----
+include::{sourcedir}/org/hibernate/search/documentation/mapper/pojo/standalone/loading/mass/MyLoadingBinder.java[tags=include]
+----
+<1> The binder must implement the `EntityLoadingBinder` interface.
+<2> Inject the implementation-specific datastore into the loading binder,
+for example here using CDI (or `@Autowired` on Spring, or ...).
+<3> Implement the `bind` method.
+<4> Call `context.massLoadingStrategy(...)` to define the loading strategy to use.
+<5> Pass the expected supertype of loaded entities.
+<6> Pass the loading strategy.
+
+NOTE: Using injection in the loading binder
+with the <<mapper-pojo-standalone,Standalone POJO Mapper>>
+requires <<mapper-pojo-standalone-beanprovider,providing a `BeanProvider` through additional configuration>>.
+====
+
+Below is an example of `MassLoadingStrategy` implementation for an imaginary datastore.
+
+.Implementing `MassLoadingStrategy`
+====
+[source, JAVA, indent=0]
+----
+include::{sourcedir}/org/hibernate/search/documentation/mapper/pojo/standalone/loading/mass/MyMassLoadingStrategy.java[tags=include]
+----
+<1> The strategy must have access to the datastore to be able to open connections,
+but it should not generally have any open connection.
+<2> Implement an identifier loader to retrieve the identifiers of all entities that will have to be indexed.
+Hibernate Search will only call this method once per mass indexing.
+<3> Retrieve the <<indexing-massindexer-parameters-batchsizetoloadobjects,batch size>> configured on the `MassIndexer`.
+This defines how many IDs (at most) must be returned in each `List` passed to the sink.
+<4> Retrieve the list of entity types to be loaded:
+Hibernate Search may request loading of multiple types from a single loader
+if those types share similar mass loading strategies (see tips/warnings below).
+<5> The identifier loader owns a connection exclusively: it should create one when it's created, and close it when it's closed.
+Related: the identifier loader always executes in the same thread.
+<6> Count the number of entities to index.
+This is just an estimate: it can be off to some extent,
+but that will lead to incorrect reporting in the <<indexing-massindexer-parameters-monitor,monitor>> (by default, the logs).
+<7> Retrieve identifiers in successive batches, one per call to `loadNext()`, and pass them to the sink.
+<8> When there are no more identifiers to load, let the sink know by calling `complete()`.
+<9> Implement an entity loader to actually load entities from the identifiers retrieved above.
+Hibernate Search will call this method multiple times for a single mass indexing,
+to create <<indexing-massindexer-parameters-threadstoloadobjects,multiple loaders>> that execute in parallel.
+<10> Each entity loader owns a connection exclusively: it should create one when it's created, and close it when it's closed.
+Related: each entity loader always executes in the same thread.
+<11> Load the entities corresponding to the identifiers passed in argument and pass them to the sink.
+Entities passed to the sink do not need to be in the same order as the identifiers passed in argument.
+====
+
+[NOTE]
+====
+Hibernate Search will optimize loading by grouping together
+types that have the same `MassLoadingStrategy`,
+or different strategies that are equal according to `equals()`/`hashCode()`.
+
+When grouping types together, only one of the strategies will be called,
+and it will get passed a "type group" that includes all types that should be loaded.
+
+This happens in particular when configuring the loading binder from a "parent" entity type
+is inherited by subtypes, and sets the same strategy on subtypes.
+====
+
+[WARNING]
+====
+Be careful of non-abstract (instantiable) parent classes in inheritance trees:
+when the "type group" passed to the `createIdentifierLoader` method
+contains a parent type (say, `Animal`) and none of the subtypes (neither `Lion` nor `Zebra`),
+then the loader really should only load identifiers of instances of the parent type,
+not of its subtypes
+(it should load identifiers of entities whose type is exactly `Animal`, not `Lion` nor `Zebra`).
+====
+
+Once all types to reindex have their mass loading strategy implemented and assigned,
+they can be reindexed using the <<indexing-massindexer,mass indexer>>:
+
+.Mass indexing with the Standalone POJO Mapper
+====
+[source, JAVA, indent=0]
+----
+include::{sourcedir}/org/hibernate/search/documentation/mapper/pojo/standalone/loading/mass/StandalonePojoMassLoadingIT.java[tags=massIndexer]
+----
+<1> <<entrypoints-search-mapping-mapper-pojo-standalone,Retrieve the `SearchMapping`>>.
+<2> Create a `MassIndexer` targeting every indexed entity type.
+<3> Start the mass indexing process and return when it is over.
+====
+
+[[mapping-entitydefinition-loading-selection]]
+=== Selection loading strategy
+
+A "selection loading strategy" gives Hibernate Search
+the ability to load entities of a given type
+to <<search-dsl-query-generality,return entities loaded from an external source as hits in search queries>>.
+
+With the <<mapper-orm,Hibernate ORM integration>>,
+a selection loading strategy gets configured automatically for every single Hibernate ORM entity,
+and no further configuration is required.
+
+With the <<mapper-pojo-standalone,Standalone POJO Mapper>>,
+entity types are <<mapping-entitydefinition-explicit,defined with `@SearchEntity`>>,
+and, in order to return entities loaded from an external source in search queries,
+a selection loading strategy must be applied explicitly
+with `@SearchEntity(loadingBinder = ...)`.
+
+include::../components/_incubating-warning.adoc[]
+
+include::../components/_search-entity-orm-warning.adoc[]
+
+.Assigning a selection loading strategy with the Standalone POJO Mapper
+====
+[source, JAVA, indent=0]
+----
+include::{sourcedir}/org/hibernate/search/documentation/mapper/pojo/standalone/loading/mass/Book.java[tags=include]
+----
+<1> Assign a loading binder to the entity.
+
+NOTE: Subclasses inherit the loading binder of their parent class,
+unless they override it with a loading binder of their own.
+
+[source, JAVA, indent=0]
+----
+include::{sourcedir}/org/hibernate/search/documentation/mapper/pojo/standalone/loading/selection/MyLoadingBinder.java[tags=include]
+----
+<1> The binder must implement the `EntityLoadingBinder` interface.
+<2> Implement the `bind` method.
+<3> Call `context.selectionLoadingStrategy(...)` to define the loading strategy to use.
+<4> Pass the expected supertype of loaded entities.
+<5> Pass the loading strategy.
+====
+
+Below is an example of `SelectionLoadingStrategy` implementation for an imaginary datastore.
+
+.Implementing `SelectionLoadingStrategy`
+====
+[source, JAVA, indent=0]
+----
+include::{sourcedir}/org/hibernate/search/documentation/mapper/pojo/standalone/loading/selection/MySelectionLoadingStrategy.java[tags=include]
+----
+<1> Implement an entity loader to actually load entities from the identifiers returned by Lucene/Elasticsearch.
+Hibernate Search will call this method multiple times for a single mass indexing,
+<2> The entity loader does not own a connection, but retrieves it from the context passed to the `SearchSession` (see next example).
+<3> Load the entities corresponding to the identifiers passed in argument and return them.
+Returned entities **must** be in the same order as the identifiers passed in argument.
+====
+
+[NOTE]
+====
+Hibernate Search will optimize loading by grouping together
+types that have the same `SelectionLoadingStrategy`,
+or different strategies that are equal according to `equals()`/`hashCode()`.
+
+When grouping types together, only one of the strategies will be called,
+and it will get passed a "type group" that includes all types that should be loaded.
+
+This happens in particular when configuring the loading binder from a "parent" entity type
+is inherited by subtypes, and sets the same strategy on subtypes.
+====
+
+Once all types to search for have their selection loading strategy implemented and assigned,
+they can be loaded as hits when <<search-dsl-query,querying>>:
+
+.Loading entities as search query hits with the Standalone POJO Mapper
+====
+[source, JAVA, indent=0]
+----
+include::{sourcedir}/org/hibernate/search/documentation/mapper/pojo/standalone/loading/selection/StandalonePojoSelectionLoadingIT.java[tags=search]
+----
+<1> Retrieve a reference to an implementation-specific datastore.
+<2> <<entrypoints-search-mapping-mapper-pojo-standalone,Retrieve the `SearchMapping`>>.
+<3> Open a connection to the datastore (this is just an imaginary API, for the purpose of this example).
+Note we're using a try-with-resources block,
+so that the connection will automatically be closed when we're done with it.
+<4> Start creating a new session.
+Note we're using a try-with-resources block,
+so that the session will automatically be closed when we're done with it.
+<5> Pass the connection to the new session.
+<6> Build the new session.
+<7> Create a <<search-dsl-query,search query>>: since we don't use `select()`,
+hits will have their default representations: entities loaded from the datastore.
+<8> Retrieve the search hits as entities loaded from the datastore.
+====
+
+[[mapping-entitydefinition-programmatic]]
+== Programmatic mapping
+
+include::../components/_incubating-warning.adoc[]
+
+include::../components/_search-entity-orm-warning.adoc[]
+
+You can mark a type as an entity type through the <<mapping-programmatic,programmatic mapping>> too.
+Behavior and options are identical to annotation-based mapping.
+
+.Marking a type as an entity type with `.searchEntity()`
+====
+[source, JAVA, indent=0]
+----
+include::{sourcedir}/org/hibernate/search/documentation/mapper/pojo/standalone/entitydefinition/StandalonePojoSearchEntityIT.java[tags=programmatic]
+----
+====

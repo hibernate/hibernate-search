@@ -16,9 +16,4 @@ import org.hibernate.search.util.common.annotation.Incubating;
 @Incubating
 public interface PojoModelValue<T> extends PojoModelElement {
 
-	/**
-	 * @return The {@link Class} representing the raw type of this value.
-	 */
-	Class<?> rawType();
-
 }

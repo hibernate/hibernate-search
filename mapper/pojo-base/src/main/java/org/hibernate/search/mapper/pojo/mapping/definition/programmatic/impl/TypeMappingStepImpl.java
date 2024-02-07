@@ -22,6 +22,7 @@ import org.hibernate.search.mapper.pojo.mapping.building.spi.PojoTypeMetadataCon
 import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.ConstructorMappingStep;
 import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.PropertyMappingStep;
 import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.TypeMappingIndexedStep;
+import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.TypeMappingSearchEntityStep;
 import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.TypeMappingStep;
 import org.hibernate.search.mapper.pojo.mapping.spi.PojoMappingConfigurationContext;
 import org.hibernate.search.mapper.pojo.mapping.spi.PojoMappingConfigurationContributor;
@@ -61,6 +62,13 @@ public class TypeMappingStepImpl
 	@Override
 	public TypeMappingIndexedStep indexed() {
 		TypeMappingIndexedStepImpl child = new TypeMappingIndexedStepImpl( typeModel.typeIdentifier() );
+		children.add( child );
+		return child;
+	}
+
+	@Override
+	public TypeMappingSearchEntityStep searchEntity() {
+		TypeMappingSearchEntityStepImpl child = new TypeMappingSearchEntityStepImpl( typeModel.typeIdentifier() );
 		children.add( child );
 		return child;
 	}
