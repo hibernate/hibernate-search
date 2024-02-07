@@ -8,6 +8,7 @@ package org.hibernate.search.util.impl.integrationtest.mapper.pojo.standalone;
 
 import java.lang.invoke.MethodHandles;
 import java.util.LinkedHashMap;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -16,6 +17,7 @@ import java.util.stream.Collectors;
 
 import org.hibernate.search.engine.environment.bean.spi.BeanProvider;
 import org.hibernate.search.mapper.pojo.automaticindexing.ReindexOnUpdate;
+import org.hibernate.search.mapper.pojo.mapping.definition.annotation.AnnotatedTypeSource;
 import org.hibernate.search.mapper.pojo.standalone.cfg.StandalonePojoMapperSettings;
 import org.hibernate.search.mapper.pojo.standalone.cfg.spi.StandalonePojoMapperSpiSettings;
 import org.hibernate.search.mapper.pojo.standalone.mapping.CloseableSearchMapping;
@@ -129,8 +131,8 @@ public final class StandalonePojoMappingSetupHelper
 					StandalonePojoMappingConfigurationContext,
 					CloseableSearchMapping,
 					SetupVariant>.AbstractSetupContext {
-
-		// Use a LinkedHashMap for deterministic iteration
+		// Use a LinkedHashSet/LinkedHashMap for deterministic iteration
+		private final Set<Class<?>> annotatedTypes = new LinkedHashSet<>();
 		private final Map<String, Object> properties = new LinkedHashMap<>();
 
 		// Disable the bean-manager-based bean provider by default,
@@ -165,9 +167,9 @@ public final class StandalonePojoMappingSetupHelper
 		}
 
 		public SetupContext withAnnotatedEntityType(Class<?> annotatedEntityType, String entityName) {
+			this.annotatedTypes.add( annotatedEntityType );
 			return withConfiguration( builder -> {
 				builder.addEntityType( annotatedEntityType, entityName );
-				builder.annotationMapping().add( annotatedEntityType );
 			} );
 		}
 
@@ -176,9 +178,9 @@ public final class StandalonePojoMappingSetupHelper
 		}
 
 		public SetupContext withAnnotatedEntityTypes(Set<Class<?>> annotatedEntityTypes) {
+			this.annotatedTypes.addAll( annotatedEntityTypes );
 			return withConfiguration( builder -> {
 				builder.addEntityTypes( annotatedEntityTypes );
-				builder.annotationMapping().add( annotatedEntityTypes );
 			} );
 		}
 
@@ -187,7 +189,8 @@ public final class StandalonePojoMappingSetupHelper
 		}
 
 		public SetupContext withAnnotatedTypes(Set<Class<?>> annotatedTypes) {
-			return withConfiguration( builder -> builder.annotationMapping().add( annotatedTypes ) );
+			this.annotatedTypes.addAll( annotatedTypes );
+			return this;
 		}
 
 		public SearchMapping setup(Class<?>... annotatedEntityTypes) {
@@ -196,7 +199,7 @@ public final class StandalonePojoMappingSetupHelper
 
 		@Override
 		protected SearchMappingBuilder createBuilder() {
-			return SearchMapping.builder( lookup )
+			return SearchMapping.builder( AnnotatedTypeSource.fromClasses( annotatedTypes ), lookup )
 					.property( StandalonePojoMapperSpiSettings.BEAN_PROVIDER, beanManagerBeanProvider )
 					.properties( properties );
 		}

@@ -20,6 +20,7 @@ import java.util.function.Consumer;
 import org.hibernate.search.engine.backend.analysis.AnalyzerNames;
 import org.hibernate.search.engine.backend.types.Projectable;
 import org.hibernate.search.engine.cfg.EngineSettings;
+import org.hibernate.search.mapper.pojo.mapping.definition.annotation.AnnotatedTypeSource;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.DocumentId;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.FullTextField;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
@@ -99,7 +100,7 @@ class ConfiguringPropertiesInSearchMappingBuilderIT {
 				"some properties in the given configuration are not used",
 				"hibernate.search.programmatic.something.unused"
 		);
-		SearchMappingBuilder builder = SearchMapping.builder( MethodHandles.lookup() )
+		SearchMappingBuilder builder = SearchMapping.builder( AnnotatedTypeSource.empty(), MethodHandles.lookup() )
 				.property( StandalonePojoMapperSpiSettings.BEAN_PROVIDER, new ForbiddenBeanProvider() )
 				.property( "hibernate.search.programmatic.something.unused", false );
 		configurer.accept( builder );

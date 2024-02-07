@@ -13,6 +13,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 import org.hibernate.search.engine.search.query.SearchQuery;
 import org.hibernate.search.integrationtest.java.modules.pojo.standalone.lucene.entity.Author;
+import org.hibernate.search.mapper.pojo.mapping.definition.annotation.AnnotatedTypeSource;
 import org.hibernate.search.mapper.pojo.standalone.loading.SelectionLoadingStrategy;
 import org.hibernate.search.mapper.pojo.standalone.mapping.CloseableSearchMapping;
 import org.hibernate.search.mapper.pojo.standalone.mapping.SearchMapping;
@@ -31,7 +32,7 @@ public class AuthorService implements AutoCloseable {
 	}
 
 	private CloseableSearchMapping createSearchMapping() {
-		return SearchMapping.builder()
+		return SearchMapping.builder( AnnotatedTypeSource.fromClasses( AuthorService.class ) )
 				.property( "hibernate.search.backend.directory.type", "local-heap" )
 				.property(
 						"hibernate.search.backend.analysis.configurer",

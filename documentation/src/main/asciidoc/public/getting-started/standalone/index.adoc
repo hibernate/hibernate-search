@@ -157,7 +157,7 @@ are set programmatically when building the mapping.
 ----
 include::{sourcedir}/org/hibernate/search/documentation/mapper/pojo/standalone/gettingstarted/withhsearch/defaultanalysis/GettingStartedDefaultAnalysisIT.java[tags=setup-lucene]
 ----
-<1> Create a builder.
+<1> Create a builder, passing an `AnnotatedTypeSource` to let Hibernate Search know where to look for annotations.
 <2> Declare *all* entity types that Hibernate Search may need to work with.
 <3> Set the location of indexes in the filesystem.
 By default, the backend will store indexes in the current working directory.
@@ -170,7 +170,7 @@ By default, the backend will store indexes in the current working directory.
 ----
 include::{sourcedir}/org/hibernate/search/documentation/mapper/pojo/standalone/gettingstarted/withhsearch/defaultanalysis/GettingStartedDefaultAnalysisIT.java[tags=setup-elasticsearch]
 ----
-<1> Create a builder.
+<1> Create a builder, passing an `AnnotatedTypeSource` to let Hibernate Search know where to look for annotations.
 <2> Declare *all* entity types that Hibernate Search may need to work with.
 <3> Set the Elasticsearch hosts to connect to.
 By default, the backend will attempt to connect to `localhost:9200`.
@@ -178,6 +178,17 @@ By default, the backend will attempt to connect to `localhost:9200`.
 <5> Set the username and password for basic HTTP authentication.
 You may also be interested in xref:{reference-documentation-location}#backend-elasticsearch-configuration-aws[AWS IAM authentication].
 <6> Build the `SearchMapping`.
+====
+
+[TIP]
+====
+Thanks to xref:{reference-documentation-location}#mapping-classpath-scanning[classpath scanning],
+your `AnnotatedTypeSource` only needs to include one class
+from each JAR containing annotated types.
+Other types should be automatically discovered.
+
+See also xref:{reference-documentation-location}#mapping-classpath-scanning-faster[this section]
+to troubleshoot or improve performance of classpath scanning.
 ====
 
 [TIP]

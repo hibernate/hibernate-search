@@ -13,6 +13,7 @@ import org.hibernate.search.documentation.testsupport.TestConfiguration;
 import org.hibernate.search.engine.environment.bean.BeanReference;
 import org.hibernate.search.engine.environment.bean.BeanRetrieval;
 import org.hibernate.search.engine.search.query.SearchResult;
+import org.hibernate.search.mapper.pojo.mapping.definition.annotation.AnnotatedTypeSource;
 import org.hibernate.search.mapper.pojo.standalone.mapping.CloseableSearchMapping;
 import org.hibernate.search.mapper.pojo.standalone.mapping.SearchMapping;
 import org.hibernate.search.mapper.pojo.standalone.mapping.StandalonePojoMappingConfigurer;
@@ -36,7 +37,9 @@ class GettingStartedCustomAnalysisIT {
 	void setup() {
 		if ( BackendConfiguration.isLucene() ) {
 			// tag::setup-lucene[]
-			CloseableSearchMapping searchMapping = SearchMapping.builder()
+			CloseableSearchMapping searchMapping = SearchMapping.builder( AnnotatedTypeSource.fromClasses(
+					Book.class, Author.class
+			) )
 					.property(
 							"hibernate.search.mapping.configurer",
 							(StandalonePojoMappingConfigurer) context -> {
@@ -58,7 +61,9 @@ class GettingStartedCustomAnalysisIT {
 		}
 		else if ( BackendConfiguration.isElasticsearch() ) {
 			// tag::setup-elasticsearch[]
-			CloseableSearchMapping searchMapping = SearchMapping.builder()
+			CloseableSearchMapping searchMapping = SearchMapping.builder( AnnotatedTypeSource.fromClasses(
+					Book.class, Author.class
+			) )
 					.property(
 							"hibernate.search.mapping.configurer",
 							(StandalonePojoMappingConfigurer) context -> {

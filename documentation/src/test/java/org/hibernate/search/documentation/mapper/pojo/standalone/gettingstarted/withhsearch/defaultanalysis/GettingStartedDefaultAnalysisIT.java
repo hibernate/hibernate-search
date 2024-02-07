@@ -13,6 +13,7 @@ import java.util.List;
 import org.hibernate.search.documentation.testsupport.BackendConfigurations;
 import org.hibernate.search.documentation.testsupport.TestConfiguration;
 import org.hibernate.search.engine.search.query.SearchResult;
+import org.hibernate.search.mapper.pojo.mapping.definition.annotation.AnnotatedTypeSource;
 import org.hibernate.search.mapper.pojo.standalone.mapping.CloseableSearchMapping;
 import org.hibernate.search.mapper.pojo.standalone.mapping.SearchMapping;
 import org.hibernate.search.mapper.pojo.standalone.mapping.StandalonePojoMappingConfigurer;
@@ -37,7 +38,9 @@ class GettingStartedDefaultAnalysisIT {
 	void setup() {
 		if ( BackendConfiguration.isLucene() ) {
 			// tag::setup-lucene[]
-			CloseableSearchMapping searchMapping = SearchMapping.builder() // <1>
+			CloseableSearchMapping searchMapping = SearchMapping.builder( AnnotatedTypeSource.fromClasses( // <1>
+					Book.class, Author.class
+			) )
 					.property(
 							"hibernate.search.mapping.configurer",
 							(StandalonePojoMappingConfigurer) context -> {
@@ -57,7 +60,9 @@ class GettingStartedDefaultAnalysisIT {
 		}
 		else if ( BackendConfiguration.isElasticsearch() ) {
 			// tag::setup-elasticsearch[]
-			CloseableSearchMapping searchMapping = SearchMapping.builder() // <1>
+			CloseableSearchMapping searchMapping = SearchMapping.builder( AnnotatedTypeSource.fromClasses( // <1>
+					Book.class, Author.class
+			) )
 					.property(
 							"hibernate.search.mapping.configurer",
 							(StandalonePojoMappingConfigurer) context -> {

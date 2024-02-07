@@ -7,12 +7,14 @@
 package org.hibernate.search.testsupport.junit;
 
 import java.util.LinkedHashMap;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
+import org.hibernate.search.mapper.pojo.mapping.definition.annotation.AnnotatedTypeSource;
 import org.hibernate.search.mapper.pojo.standalone.cfg.StandalonePojoMapperSettings;
 import org.hibernate.search.mapper.pojo.standalone.mapping.CloseableSearchMapping;
 import org.hibernate.search.mapper.pojo.standalone.mapping.SearchMapping;
@@ -84,7 +86,8 @@ public final class V5MigrationHelperEngineSetupHelper
 					CloseableSearchMapping,
 					SetupVariant>.AbstractSetupContext {
 
-		// Use a LinkedHashMap for deterministic iteration
+		// Use a LinkedHashSet/LinkedHashMap for deterministic iteration
+		private final Set<Class<?>> annotatedTypes = new LinkedHashSet<>();
 		private final Map<String, Object> properties = new LinkedHashMap<>();
 
 		SetupContext() {
@@ -100,9 +103,9 @@ public final class V5MigrationHelperEngineSetupHelper
 		}
 
 		public SetupContext withAnnotatedEntityType(Class<?> annotatedEntityType, String entityName) {
+			annotatedTypes.add( annotatedEntityType );
 			return withConfiguration( builder -> {
 				builder.addEntityType( annotatedEntityType, entityName );
-				builder.annotationMapping().add( annotatedEntityType );
 			} );
 		}
 
@@ -111,9 +114,9 @@ public final class V5MigrationHelperEngineSetupHelper
 		}
 
 		public SetupContext withAnnotatedEntityTypes(Set<Class<?>> annotatedEntityTypes) {
+			annotatedTypes.addAll( annotatedEntityTypes );
 			return withConfiguration( builder -> {
 				builder.addEntityTypes( annotatedEntityTypes );
-				builder.annotationMapping().add( annotatedEntityTypes );
 			} );
 		}
 
@@ -122,7 +125,8 @@ public final class V5MigrationHelperEngineSetupHelper
 		}
 
 		public SetupContext withAnnotatedTypes(Set<Class<?>> annotatedTypes) {
-			return withConfiguration( builder -> builder.annotationMapping().add( annotatedTypes ) );
+			annotatedTypes.addAll( annotatedTypes );
+			return this;
 		}
 
 		public SearchMapping setup(Class<?>... annotatedEntityTypes) {
@@ -131,7 +135,7 @@ public final class V5MigrationHelperEngineSetupHelper
 
 		@Override
 		protected SearchMappingBuilder createBuilder() {
-			return SearchMapping.builder().properties( properties );
+			return SearchMapping.builder( AnnotatedTypeSource.fromClasses( annotatedTypes )).properties( properties );
 		}
 
 		@Override

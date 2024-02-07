@@ -7,7 +7,9 @@
 package org.hibernate.search.mapper.pojo.standalone.bootstrap.impl;
 
 import java.lang.invoke.MethodHandles;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.function.BiConsumer;
@@ -21,6 +23,7 @@ import org.hibernate.search.engine.common.spi.SearchIntegration;
 import org.hibernate.search.engine.common.spi.SearchIntegrationEnvironment;
 import org.hibernate.search.engine.common.spi.SearchIntegrationPartialBuildState;
 import org.hibernate.search.engine.environment.bean.spi.BeanProvider;
+import org.hibernate.search.mapper.pojo.mapping.definition.annotation.AnnotatedTypeSource;
 import org.hibernate.search.mapper.pojo.standalone.bootstrap.spi.StandalonePojoIntegrationBooter;
 import org.hibernate.search.mapper.pojo.standalone.bootstrap.spi.StandalonePojoIntegrationBooterBehavior;
 import org.hibernate.search.mapper.pojo.standalone.cfg.spi.StandalonePojoMapperSpiSettings;
@@ -44,11 +47,13 @@ public class StandalonePojoIntegrationBooterImpl implements StandalonePojoIntegr
 					} )
 					.build();
 
+	private final List<AnnotatedTypeSource> annotatedTypeSources;
 	private final ConfigurationPropertyChecker propertyChecker;
 	private final ValueHandleFactory valueHandleFactory;
 	private final ConfigurationPropertySource propertySource;
 
 	private StandalonePojoIntegrationBooterImpl(BuilderImpl builder) {
+		annotatedTypeSources = builder.annotatedTypeSources;
 		propertyChecker = ConfigurationPropertyChecker.create();
 		valueHandleFactory = builder.valueHandleFactory;
 
@@ -87,6 +92,9 @@ public class StandalonePojoIntegrationBooterImpl implements StandalonePojoIntegr
 						: ValueHandleFactory.usingMethodHandle( MethodHandles.publicLookup() ) );
 		StandalonePojoMappingKey mappingKey = new StandalonePojoMappingKey();
 		StandalonePojoMappingInitiator mappingInitiator = new StandalonePojoMappingInitiator( introspector );
+		for ( AnnotatedTypeSource source : annotatedTypeSources ) {
+			source.apply( mappingInitiator.annotationMapping() );
+		}
 
 		SearchIntegrationEnvironment environment = null;
 		SearchIntegrationPartialBuildState integrationPartialBuildState = null;
@@ -130,10 +138,17 @@ public class StandalonePojoIntegrationBooterImpl implements StandalonePojoIntegr
 	}
 
 	public static class BuilderImpl implements Builder {
+		private final List<AnnotatedTypeSource> annotatedTypeSources = new ArrayList<>();
 		private ValueHandleFactory valueHandleFactory;
 		private final Map<String, Object> properties = new HashMap<>();
 
 		public BuilderImpl() {
+		}
+
+		@Override
+		public BuilderImpl annotatedTypeSource(AnnotatedTypeSource source) {
+			this.annotatedTypeSources.add( source );
+			return this;
 		}
 
 		@Override

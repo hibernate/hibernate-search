@@ -12,6 +12,7 @@ import java.util.List;
 
 import org.hibernate.search.documentation.testsupport.BackendConfigurations;
 import org.hibernate.search.documentation.testsupport.TestConfiguration;
+import org.hibernate.search.mapper.pojo.mapping.definition.annotation.AnnotatedTypeSource;
 import org.hibernate.search.mapper.pojo.standalone.mapping.CloseableSearchMapping;
 import org.hibernate.search.mapper.pojo.standalone.mapping.SearchMapping;
 import org.hibernate.search.mapper.pojo.standalone.mapping.SearchMappingBuilder;
@@ -33,7 +34,7 @@ class MappingConfigurationIT {
 
 	@BeforeEach
 	void setup() {
-		SearchMappingBuilder builder = SearchMapping.builder()
+		SearchMappingBuilder builder = SearchMapping.builder( AnnotatedTypeSource.empty() )
 				.properties( TestConfiguration.standalonePojoMapperProperties(
 						configurationProvider,
 						BackendConfigurations.simple()
