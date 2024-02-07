@@ -9,6 +9,7 @@ package org.hibernate.search.mapper.pojo.model.additionalmetadata.building.impl;
 import java.lang.invoke.MethodHandles;
 import java.util.Optional;
 
+import org.hibernate.search.engine.environment.bean.spi.ParameterizedBeanReference;
 import org.hibernate.search.mapper.pojo.logging.impl.Log;
 import org.hibernate.search.mapper.pojo.model.additionalmetadata.building.spi.PojoAdditionalMetadataCollectorEntityTypeNode;
 import org.hibernate.search.mapper.pojo.model.additionalmetadata.impl.PojoEntityTypeAdditionalMetadata;
@@ -25,7 +26,7 @@ class PojoEntityTypeAdditionalMetadataBuilder implements PojoAdditionalMetadataC
 	private String secondaryEntityName;
 	private PojoPathDefinitionProvider pathDefinitionProvider;
 	private String entityIdPropertyName;
-	private Object loadingBinder;
+	private ParameterizedBeanReference<?> loadingBinderRef;
 
 	PojoEntityTypeAdditionalMetadataBuilder() {
 	}
@@ -63,8 +64,8 @@ class PojoEntityTypeAdditionalMetadataBuilder implements PojoAdditionalMetadataC
 	}
 
 	@Override
-	public void loadingBinder(Object binder) {
-		this.loadingBinder = binder;
+	public void loadingBinder(ParameterizedBeanReference<?> binderRef) {
+		this.loadingBinderRef = binderRef;
 	}
 
 	public PojoEntityTypeAdditionalMetadata build(PojoRawTypeModel<?> typeModel) {
@@ -73,7 +74,7 @@ class PojoEntityTypeAdditionalMetadataBuilder implements PojoAdditionalMetadataC
 				secondaryEntityName,
 				pathDefinitionProvider != null ? pathDefinitionProvider : new SimplePojoPathsDefinitionProvider(),
 				Optional.ofNullable( entityIdPropertyName ),
-				loadingBinder
+				loadingBinderRef
 		);
 	}
 }

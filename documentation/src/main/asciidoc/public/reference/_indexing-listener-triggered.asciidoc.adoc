@@ -7,7 +7,7 @@
 include::../components/_mapper-orm-only-note.adoc[]
 
 By default, every time an entity is changed through a Hibernate ORM Session,
-if that entity is <<mapping-entityindexmapping,mapped to an index>>,
+if the <<concepts-entity,entity type>> is <<mapping-entityindexmapping,mapped to an index>>,
 Hibernate Search updates the relevant index transparently.
 
 Here is how listener-triggered indexing works at a high level:

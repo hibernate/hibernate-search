@@ -41,11 +41,7 @@ class StandalonePojoEntryPointsIT {
 						Book.class, Associate.class, Manager.class
 				) )
 						.property(
-								"hibernate.search.mapping.configurer", // <2>
-								"class:org.hibernate.search.documentation.mapper.pojo.standalone.entrypoints.StandalonePojoConfigurer"
-						)
-						.property(
-								"hibernate.search.backend.hosts", // <3>
+								"hibernate.search.backend.hosts", // <2>
 								"elasticsearch.mycompany.com"
 						)
 						// end::setup[]
@@ -54,7 +50,7 @@ class StandalonePojoEntryPointsIT {
 								BackendConfigurations.simple()
 						) )
 						// tag::setup[]
-						.build(); // <4>
+						.build(); // <3>
 		// end::setup[]
 		this.theSearchMapping = searchMapping;
 	}

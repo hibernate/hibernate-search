@@ -20,7 +20,6 @@ import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.IdentifierBi
 import org.hibernate.search.mapper.pojo.logging.impl.Log;
 import org.hibernate.search.mapper.pojo.mapping.building.impl.PojoMappingHelper;
 import org.hibernate.search.mapper.pojo.mapping.building.spi.PojoIndexMappingCollectorTypeNode;
-import org.hibernate.search.mapper.pojo.mapping.building.spi.PojoTypeExtendedMappingCollector;
 import org.hibernate.search.mapper.pojo.model.path.impl.BoundPojoModelPath;
 import org.hibernate.search.mapper.pojo.model.path.impl.BoundPojoModelPathPropertyNode;
 import org.hibernate.search.mapper.pojo.model.spi.PojoPropertyModel;
@@ -37,8 +36,7 @@ public final class PojoRootIdentityMappingCollector<E> implements PojoIdentityMa
 
 	private final BeanReference<? extends IdentifierBridge<Object>> providedIdentifierBridge;
 
-	private IdentifierMappingImplementor<?, E> identifierMapping;
-	private PojoPropertyModel<?> documentIdSourceProperty;
+	private BoundIdentifierMapping<?, E> identifierMapping;
 
 	public PojoRootIdentityMappingCollector(PojoRawTypeModel<E> typeModel,
 			PojoMappingHelper mappingHelper,
@@ -52,7 +50,7 @@ public final class PojoRootIdentityMappingCollector<E> implements PojoIdentityMa
 
 	public void closeOnFailure() {
 		try ( Closer<RuntimeException> closer = new Closer<>() ) {
-			closer.push( IdentifierMappingImplementor::close, identifierMapping );
+			closer.push( IdentifierMappingImplementor::close, identifierMapping, BoundIdentifierMapping::mapping );
 		}
 	}
 
@@ -66,24 +64,19 @@ public final class PojoRootIdentityMappingCollector<E> implements PojoIdentityMa
 		BoundIdentifierBridge<T> boundIdentifierBridge = mappingHelper.indexModelBinder()
 				.bindIdentifier( bindingContext, modelPath, binder, params );
 		PojoPropertyModel<T> propertyModel = modelPath.getPropertyModel();
-		this.identifierMapping = new PropertyIdentifierMapping<>(
-				propertyModel.typeModel().rawType().caster(),
-				propertyModel.handle(),
-				boundIdentifierBridge.getBridgeHolder()
+		this.identifierMapping = new BoundIdentifierMapping<>(
+				new PropertyIdentifierMapping<>(
+						propertyModel.typeModel().rawType().caster(),
+						propertyModel.handle(),
+						boundIdentifierBridge.getBridgeHolder()
+				),
+				propertyModel.typeModel(),
+				Optional.of( propertyModel )
 		);
-		this.documentIdSourceProperty = propertyModel;
 	}
 
-	public IdentifierMappingImplementor<?, E> buildAndContributeTo(
-			PojoTypeExtendedMappingCollector<?> extendedMappingCollector, IdentityMappingMode mode) {
+	public BoundIdentifierMapping<?, E> build(IdentityMappingMode mode) {
 		applyDefaults( mode );
-
-		if ( documentIdSourceProperty != null ) {
-			extendedMappingCollector.documentIdSourceProperty( documentIdSourceProperty );
-		}
-
-		extendedMappingCollector.identifierMapping( identifierMapping );
-
 		return identifierMapping;
 	}
 
@@ -94,11 +87,14 @@ public final class PojoRootIdentityMappingCollector<E> implements PojoIdentityMa
 
 		// Assume a provided ID if requested
 		if ( providedIdentifierBridge != null ) {
+			var identifierType = mappingHelper.introspector().typeModel( Object.class );
 			BoundIdentifierBridge<Object> boundIdentifierBridge = mappingHelper.indexModelBinder()
-					.bindIdentifier( bindingContext, mappingHelper.introspector().typeModel( Object.class ),
-							new BeanBinder( providedIdentifierBridge ),
+					.bindIdentifier( bindingContext, identifierType, new BeanBinder( providedIdentifierBridge ),
 							Collections.emptyMap() );
-			identifierMapping = ProvidedIdentifierMapping.get( boundIdentifierBridge.getBridgeHolder() );
+			identifierMapping = new BoundIdentifierMapping<>(
+					ProvidedIdentifierMapping.get( boundIdentifierBridge.getBridgeHolder() ),
+					identifierType,
+					Optional.empty() );
 			return;
 		}
 
@@ -118,17 +114,26 @@ public final class PojoRootIdentityMappingCollector<E> implements PojoIdentityMa
 				identifierMapping = unmappedIdentifier( entityIdPropertyPath.get() );
 			}
 			else {
-				identifierMapping = new UnconfiguredIdentifierMapping<>( typeModel.typeIdentifier() );
+				var identifierType = mappingHelper.introspector().typeModel( Object.class );
+				identifierMapping = new BoundIdentifierMapping<>(
+						new UnconfiguredIdentifierMapping<>( typeModel.typeIdentifier() ),
+						identifierType,
+						Optional.empty()
+				);
 			}
 		}
 	}
 
-	private <T> IdentifierMappingImplementor<T, E> unmappedIdentifier(BoundPojoModelPathPropertyNode<?, T> modelPath) {
+	private <T> BoundIdentifierMapping<T, E> unmappedIdentifier(BoundPojoModelPathPropertyNode<?, T> modelPath) {
 		PojoPropertyModel<T> propertyModel = modelPath.getPropertyModel();
-		return new UnmappedPropertyIdentifierMapping<>(
-				typeModel.typeIdentifier(),
-				propertyModel.typeModel().rawType().caster(),
-				propertyModel.handle()
+		return new BoundIdentifierMapping<>(
+				new UnmappedPropertyIdentifierMapping<>(
+						typeModel.typeIdentifier(),
+						propertyModel.typeModel().rawType().caster(),
+						propertyModel.handle()
+				),
+				propertyModel.typeModel(),
+				Optional.of( propertyModel )
 		);
 	}
 }

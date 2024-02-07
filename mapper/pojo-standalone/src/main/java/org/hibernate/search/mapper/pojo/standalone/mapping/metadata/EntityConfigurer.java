@@ -6,6 +6,7 @@
  */
 package org.hibernate.search.mapper.pojo.standalone.mapping.metadata;
 
+import org.hibernate.search.mapper.pojo.standalone.loading.binding.EntityLoadingBinder;
 import org.hibernate.search.util.common.annotation.Incubating;
 
 /**
@@ -15,8 +16,11 @@ import org.hibernate.search.util.common.annotation.Incubating;
  * If a configurer is assigned to a given entity type,
  * it will also apply to its subtypes,
  * except for subtypes that have another configurer assigned.
+ *
+ * @deprecated Implement {@link EntityLoadingBinder} instead.
  */
 @Incubating
+@Deprecated
 public interface EntityConfigurer<E> {
 
 	/**

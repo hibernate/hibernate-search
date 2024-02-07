@@ -76,6 +76,11 @@ public abstract class AbstractPojoModelCompositeElement<V> implements PojoModelC
 	}
 
 	@Override
+	public Class<?> rawType() {
+		return getTypeModel().rawType().typeIdentifier().javaClass();
+	}
+
+	@Override
 	public PojoModelNestedCompositeElement<?, ?> property(String relativeFieldName) {
 		return properties.computeIfAbsent( relativeFieldName, name -> {
 			BoundPojoModelPathTypeNode<V> modelPathTypeNode = getModelPathTypeNode();

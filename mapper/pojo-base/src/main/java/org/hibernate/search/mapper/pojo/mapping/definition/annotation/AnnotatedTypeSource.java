@@ -33,7 +33,7 @@ public abstract class AnnotatedTypeSource {
 	 * @return A source that {@link AnnotationMappingConfigurationContext#add(Set) adds} the provided classes explicitly,
 	 * and by default also allows {@link AnnotationMappingConfigurationContext#discoverJandexIndexesFromAddedTypes(boolean) other classes from the same JAR to be discovered automatically}
 	 * if they are {@link AnnotationMappingConfigurationContext#discoverAnnotatedTypesFromRootMappingAnnotations(boolean) annotated with root mapping annotations}
-	 * such as {@link ProjectionConstructor}.
+	 * such as {@link SearchEntity} or {@link ProjectionConstructor}.
 	 */
 	public static AnnotatedTypeSource fromClasses(Class<?> clazz, Class<?>... otherClasses) {
 		return fromClasses( Set.copyOf( CollectionHelper.asList( clazz, otherClasses ) ) );
@@ -44,7 +44,7 @@ public abstract class AnnotatedTypeSource {
 	 * @return A source that {@link AnnotationMappingConfigurationContext#add(Set) adds} the provided classes explicitly.
 	 * Note that {@link AnnotationMappingConfigurationContext#discoverJandexIndexesFromAddedTypes(boolean) other classes from the same JAR may be discovered automatically}
 	 * if they are {@link AnnotationMappingConfigurationContext#discoverAnnotatedTypesFromRootMappingAnnotations(boolean) annotated with root mapping annotations}
-	 * such as {@link ProjectionConstructor}.
+	 * such as {@link SearchEntity} or {@link ProjectionConstructor}.
 	 */
 	public static AnnotatedTypeSource fromClasses(Set<Class<?>> annotatedClasses) {
 		return new AnnotatedTypeSource() {

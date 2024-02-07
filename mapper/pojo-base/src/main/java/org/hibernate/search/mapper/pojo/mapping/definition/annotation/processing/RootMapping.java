@@ -23,6 +23,7 @@ import java.lang.annotation.Target;
  * Note that discovery of such annotations relies on Hibernate Search scanning the application JARs,
  * which may require additional setup.
  *
+ * @see org.hibernate.search.mapper.pojo.mapping.definition.annotation.SearchEntity
  * @see org.hibernate.search.mapper.pojo.mapping.definition.annotation.ProjectionConstructor
  * @see org.hibernate.search.mapper.pojo.mapping.definition.annotation.AnnotationMappingConfigurationContext
  */

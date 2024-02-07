@@ -6,9 +6,12 @@
  */
 package org.hibernate.search.mapper.orm.mapping.impl;
 
+import java.util.Map;
 import java.util.Optional;
 
 import org.hibernate.mapping.PersistentClass;
+import org.hibernate.search.engine.environment.bean.BeanReference;
+import org.hibernate.search.engine.environment.bean.spi.ParameterizedBeanReference;
 import org.hibernate.search.mapper.orm.model.impl.HibernateOrmPathDefinitionProvider;
 import org.hibernate.search.mapper.pojo.mapping.building.spi.PojoTypeMetadataContributor;
 import org.hibernate.search.mapper.pojo.model.additionalmetadata.building.spi.PojoAdditionalMetadataCollectorTypeNode;
@@ -58,6 +61,8 @@ final class HibernateOrmEntityTypeMetadataContributor implements PojoTypeMetadat
 
 		node.pathDefinitionProvider( new HibernateOrmPathDefinitionProvider( typeModel, persistentClass ) );
 		node.entityIdPropertyName( identifierPropertyNameOptional.orElse( null ) );
-		node.loadingBinder( new HibernateOrmEntityLoadingBinder<>() );
+		node.loadingBinder( ParameterizedBeanReference.of(
+				BeanReference.ofInstance( new HibernateOrmEntityLoadingBinder() ),
+				Map.of() ) );
 	}
 }

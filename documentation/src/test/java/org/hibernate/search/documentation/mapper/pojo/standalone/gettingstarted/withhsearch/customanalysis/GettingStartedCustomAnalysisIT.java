@@ -16,7 +16,6 @@ import org.hibernate.search.engine.search.query.SearchResult;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.AnnotatedTypeSource;
 import org.hibernate.search.mapper.pojo.standalone.mapping.CloseableSearchMapping;
 import org.hibernate.search.mapper.pojo.standalone.mapping.SearchMapping;
-import org.hibernate.search.mapper.pojo.standalone.mapping.StandalonePojoMappingConfigurer;
 import org.hibernate.search.mapper.pojo.standalone.session.SearchSession;
 import org.hibernate.search.util.impl.integrationtest.common.TestConfigurationProvider;
 import org.hibernate.search.util.impl.integrationtest.common.extension.BackendConfiguration;
@@ -40,13 +39,6 @@ class GettingStartedCustomAnalysisIT {
 			CloseableSearchMapping searchMapping = SearchMapping.builder( AnnotatedTypeSource.fromClasses(
 					Book.class, Author.class
 			) )
-					.property(
-							"hibernate.search.mapping.configurer",
-							(StandalonePojoMappingConfigurer) context -> {
-								context.addEntityType( Book.class )
-										.addEntityType( Author.class );
-							}
-					)
 					.property( "hibernate.search.backend.directory.root",
 							"some/filesystem/path" )
 					.property( "hibernate.search.backend.analysis.configurer",
@@ -64,13 +56,6 @@ class GettingStartedCustomAnalysisIT {
 			CloseableSearchMapping searchMapping = SearchMapping.builder( AnnotatedTypeSource.fromClasses(
 					Book.class, Author.class
 			) )
-					.property(
-							"hibernate.search.mapping.configurer",
-							(StandalonePojoMappingConfigurer) context -> {
-								context.addEntityType( Book.class )
-										.addEntityType( Author.class );
-							}
-					)
 					.property( "hibernate.search.backend.hosts",
 							"elasticsearch.mycompany.com" )
 					.property( "hibernate.search.backend.analysis.configurer",

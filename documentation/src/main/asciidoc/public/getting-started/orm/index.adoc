@@ -219,7 +219,9 @@ include::{sourcedir}/org/hibernate/search/documentation/mapper/orm/gettingstarte
 ----
 include::{sourcedir}/org/hibernate/search/documentation/mapper/orm/gettingstarted/withhsearch/defaultanalysis/Author.java[tags=include;!getters-setters]
 ----
-<1> `@Indexed` marks `Book` as indexed, i.e. an index will be created for that entity, and that index will be kept up to date.
+<1> `@Indexed` marks the `Book` xref:{reference-documentation-location}#concepts-entity[entity type]
+as xref:{reference-documentation-location}#mapping-entityindexmapping[indexed],
+i.e. an index will be created for that entity type, and that index will be kept up to date.
 <2> By default, the JPA `@Id` is used to generate a document identifier.
 In some more complex scenarios it might be needed to map the ID explicitly with xref:{reference-documentation-location}#mapping-identifiermapping-explicit[`@DocumentId`].
 <3> `@FullTextField` maps a property to a full-text index field with the same name and type.
@@ -242,8 +244,9 @@ will add a single field named `authors.name` to the `Book` index.
 This field will be populated automatically based on the content of the `authors` property,
 and the books will be re-indexed whenever Hibernate Search xref:{reference-documentation-location}#architecture-hsearch-indexing[detects that the `name` property of their author changes].
 See xref:{reference-documentation-location}#mapping-indexedembedded[Mapping associated elements with `@IndexedEmbedded`] for more information.
-<7> Entities that are only `@IndexedEmbedded` in other entities,
-but do not require to be searchable by themselves, do not need to be annotated with `@Indexed`.
+<7> `Author` is `@IndexedEmbedded` in other entities,
+but does not need to be searchable by itself,
+so it does not need an index and does not need to be annotated with `@Indexed`.
 ====
 
 This is a very simple example, but is enough to get started.

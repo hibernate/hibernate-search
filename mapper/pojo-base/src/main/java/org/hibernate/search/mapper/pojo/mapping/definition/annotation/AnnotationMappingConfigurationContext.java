@@ -24,12 +24,13 @@ public interface AnnotationMappingConfigurationContext {
 	 * with {@link RootMapping root mapping annotations}.
 	 * When enabled, if an annotation meta-annotated with {@link RootMapping}
 	 * is found in the Jandex index,
-	 * and a type annotated with that annotation (e.g. {@link ProjectionConstructor}) is found in the Jandex index,
+	 * and a type annotated with that annotation (e.g. {@link SearchEntity} or {@link ProjectionConstructor}) is found in the Jandex index,
 	 * then that type will automatically be scanned for mapping annotations,
 	 * even if the type wasn't {@link #add(Class) added explicitly}.
 	 * {@code false} if that discovery should be disabled.
 	 * @return {@code this}, for method chaining.
 	 * @see RootMapping
+	 * @see SearchEntity
 	 * @see ProjectionConstructor
 	 * @see #addJandexIndex(IndexView)
 	 * @see #discoverJandexIndexesFromAddedTypes(boolean)

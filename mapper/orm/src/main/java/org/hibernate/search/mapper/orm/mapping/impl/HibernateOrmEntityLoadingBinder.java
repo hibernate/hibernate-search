@@ -12,25 +12,23 @@ import org.hibernate.search.mapper.orm.loading.impl.HibernateOrmNonEntityIdPrope
 import org.hibernate.search.mapper.orm.loading.spi.HibernateOrmEntityLoadingStrategy;
 import org.hibernate.search.mapper.orm.model.impl.DocumentIdSourceProperty;
 
-public class HibernateOrmEntityLoadingBinder<E> {
+public class HibernateOrmEntityLoadingBinder {
 
 	public HibernateOrmEntityLoadingBinder() {
 	}
 
-	// Casts are safe because the loading strategy will target either "E" or "? super E", by contract
-	@SuppressWarnings("unchecked")
-	public <I> HibernateOrmEntityLoadingStrategy<? super E, I> createLoadingStrategy(
+	public <I> HibernateOrmEntityLoadingStrategy<?, ?> createLoadingStrategy(
 			PersistentClass persistentClass, DocumentIdSourceProperty<I> documentIdSourceProperty) {
 		if ( documentIdSourceProperty != null ) {
 			var idProperty = persistentClass.getIdentifierProperty();
 			if ( idProperty != null && documentIdSourceProperty.name.equals( idProperty.getName() ) ) {
-				return (HibernateOrmEntityLoadingStrategy<? super E, I>) HibernateOrmEntityIdEntityLoadingStrategy
+				return HibernateOrmEntityIdEntityLoadingStrategy
 						.create( persistentClass );
 			}
 			else {
 				// The entity ID is not the property used to generate the document ID
 				// We need to use a criteria query to load entities from the document IDs
-				return (HibernateOrmEntityLoadingStrategy<? super E, I>) HibernateOrmNonEntityIdPropertyEntityLoadingStrategy
+				return HibernateOrmNonEntityIdPropertyEntityLoadingStrategy
 						.create( persistentClass, documentIdSourceProperty );
 			}
 		}

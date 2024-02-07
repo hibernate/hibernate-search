@@ -8,6 +8,7 @@ package org.hibernate.search.mapper.pojo.model.additionalmetadata.impl;
 
 import java.util.Optional;
 
+import org.hibernate.search.engine.environment.bean.spi.ParameterizedBeanReference;
 import org.hibernate.search.mapper.pojo.model.path.spi.PojoPathDefinitionProvider;
 
 public class PojoEntityTypeAdditionalMetadata {
@@ -15,17 +16,17 @@ public class PojoEntityTypeAdditionalMetadata {
 	private final String secondaryEntityName;
 	private final PojoPathDefinitionProvider pathDefinitionProvider;
 	private final Optional<String> entityIdPropertyName;
-	private final Object loadingBinder;
+	private final ParameterizedBeanReference<?> loadingBinderRef;
 
 	public PojoEntityTypeAdditionalMetadata(String entityName, String secondaryEntityName,
 			PojoPathDefinitionProvider pathDefinitionProvider,
 			Optional<String> entityIdPropertyName,
-			Object loadingBinder) {
+			ParameterizedBeanReference<?> loadingBinderRef) {
 		this.entityName = entityName;
 		this.secondaryEntityName = secondaryEntityName;
 		this.pathDefinitionProvider = pathDefinitionProvider;
 		this.entityIdPropertyName = entityIdPropertyName;
-		this.loadingBinder = loadingBinder;
+		this.loadingBinderRef = loadingBinderRef;
 	}
 
 	public String getEntityName() {
@@ -44,7 +45,7 @@ public class PojoEntityTypeAdditionalMetadata {
 		return entityIdPropertyName;
 	}
 
-	public Object getLoadingBinder() {
-		return loadingBinder;
+	public ParameterizedBeanReference<?> getLoadingBinderRef() {
+		return loadingBinderRef;
 	}
 }

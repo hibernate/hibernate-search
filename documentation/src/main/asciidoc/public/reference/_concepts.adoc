@@ -37,16 +37,54 @@ These types are indexed and queried using a slightly different approach,
 which obviously does not involve text processing.
 ====
 
+[[concepts-entity]]
+== Entity types
+
+When it comes to the domain model of applications,
+Hibernate Search distinguishes between types (Java classes) that are considered entities,
+and those that are not.
+
+The defining characteristic of entity types in Hibernate Search
+is that their instances have a distinct lifecycle:
+an entity instance may be saved into a datastore, or retrieved from it,
+without requiring the saving or retrieval of an instance of another type.
+For that purpose,
+each entity instance is assumed to carry an immutable, unique identifier.
+
+These characteristics allow Hibernate Search to <<concepts-mapping,map>>
+entity types to indexes, but only entity types.
+"Embeddable" types that are referenced from or contained within an entity,
+but whose lifecycle is completely tied to that entity,
+cannot be mapped to an index.
+
+Multiple aspects of Hibernate Search involve the concept of entity types:
+
+1. Each entity type has an <<mapping-entitydefinition-name,entity name>>, distinct from the type name.
+E.g. for a class named `com.acme.Book`, the entity name could be `Book` (the default),
+or any arbitrarily chosen string.
+2. Properties pointing to an entity type (called _associations_) have specific mechanics;
+in particular, in order to handle <<mapping-reindexing-basics,reindexing>>,
+Hibernate Search needs to <<mapping-reindexing-associationinverseside,know about the inverse side of associations>>.
+3. For the purposes of change tracking when <<mapping-reindexing-basics,reindexing>>,
+(e.g. in <<indexing-plan,indexing plans>>),
+entity types represent the smallest scope Hibernate Search considers.
++
+This means the paths representing "changed properties" in Hibernate Search
+always have an entity as their starting point,
+and the components within these paths never reach into another entity
+(but may point to one, when an _association_ changes.
+4. Hibernate Search may need additional configuration to enable loading of entity types from an external datastore,
+be it to <<mapping-entitydefinition-loading-selection,load entities matching a query from an external source>>
+or to <<mapping-entitydefinition-loading-mass,load all entity instances from an external source for full reindexing>>.
+
 [[concepts-mapping]]
 == Mapping
 
-Applications targeted by Hibernate search generally use an entity-based model to represent data.
+Applications targeted by Hibernate search use an <<concepts-entity,entity>>-based model to represent data.
 In this model, each entity is a single object with a few properties of atomic type
 (`String`, `Integer`, `LocalDate`, ...).
-Each entity can have multiple associations to one or even many other entities.
-
-Entities are thus organized as a graph,
-where each node is an entity and each association is an edge.
+Each entity can contain non-root aggregates ("embeddable" types),
+and each can also have multiple associations to one or even many other entities.
 
 By contrast, Lucene and Elasticsearch work with documents.
 Each document is a collection of "fields",
@@ -54,13 +92,20 @@ each field being assigned a name -- a unique string --
 and a value -- which can be text, but also numeric data such as an integer or a date.
 Fields also have a type, which not only determines the type of values (text/numeric),
 but more importantly the way this value will be stored: indexed, stored, with doc values, etc.
-It is possible to introduce nested documents, but not real associations.
+Each document can contain nested aggregates ("objects"/"nested documents"),
+but there cannot really be associations between top-level documents.
 
-Documents are thus organized, at best, as a collection of trees,
+Thus:
+
+* Entities are organized as a graph,
+where each node is an entity and each association is an edge.
+* Documents are organized, at best, as a collection of trees,
 where each tree is a document, optionally with nested documents.
 
 There are multiple mismatches between the entity model and the document model:
-properties vs. fields, associations vs. nested documents, graph vs. collection of trees.
+simple property types vs. more complex field types,
+associations vs. no associations,
+graph vs. collection of trees.
 
 The goal of _mapping_, in Hibernate search, is to resolve these mismatches
 by defining how to transform one or more entities into a document,

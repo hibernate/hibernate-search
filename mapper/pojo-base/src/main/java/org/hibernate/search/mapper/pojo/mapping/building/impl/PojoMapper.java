@@ -401,16 +401,17 @@ public class PojoMapper<MPBS extends MappingPartialBuildState> implements Mapper
 	private <E> void preBuildOtherMetadata(AbstractPojoTypeManager.Builder<E> builder,
 			PojoImplicitReindexingResolverBuildingHelper helper) {
 		PojoRawTypeModel<E> typeModel = builder.typeModel;
-		var loadingBinderOptional = typeModel.ascendingSuperTypes()
+		var loadingBinderRefOptional = typeModel.ascendingSuperTypes()
 				.map( superType -> typeAdditionalMetadataProvider.get( superType )
 						.getEntityTypeMetadata()
-						.map( PojoEntityTypeAdditionalMetadata::getLoadingBinder )
+						.map( PojoEntityTypeAdditionalMetadata::getLoadingBinderRef )
 						.orElse( null ) )
 				.filter( Objects::nonNull )
 				.findFirst();
-		builder.preBuildOtherMetadata( helper.isSingleConcreteTypeInEntityHierarchy( typeModel ),
+		builder.preBuildOtherMetadata( mappingHelper.beanResolver(), mappingHelper.introspector(),
+				helper.isSingleConcreteTypeInEntityHierarchy( typeModel ),
 				helper.runtimePathsBuildingHelper( typeModel ).pathOrdinals(),
-				loadingBinderOptional );
+				loadingBinderRefOptional );
 	}
 
 	private <E> void preBuildIfContained(PojoRawTypeModel<E> entityType,

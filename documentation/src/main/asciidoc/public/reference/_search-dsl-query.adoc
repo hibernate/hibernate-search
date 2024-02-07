@@ -13,7 +13,7 @@ Preparing and executing a query requires just a few lines:
 include::{sourcedir}/org/hibernate/search/documentation/search/query/QueryDslIT.java[tags=entryPoint]
 ----
 <1> <<entrypoints-search-session,Retrieve the `SearchSession`>>.
-<2> Initiate a search query on the index mapped to the `Book` entity.
+<2> Initiate a search query on the index mapped to the `Book` <<concepts-entity,entity>>.
 <3> Define that only documents matching the given predicate should be returned.
 The predicate is created using a factory `f` passed as an argument to the lambda expression.
 See <<search-dsl-predicate>> for more information about predicates.
@@ -24,7 +24,7 @@ See <<search-dsl-query-fetching-results-total>> for ways to optimize computation
 ====
 
 This will work fine with the <<mapper-orm,Hibernate ORM integration>>:
-by default, the hits of a search query will be entities managed by Hibernate ORM,
+by default, the hits of a search query will be <<concepts-entity,entities>> managed by Hibernate ORM,
 bound to the entity manager used to create the search session.
 This provides all the benefits of Hibernate ORM,
 in particular the ability to navigate the entity graph to retrieve associated entities if necessary.
@@ -36,7 +36,7 @@ the snippet above will fail by default.
 
 You will need to either:
 
-* <<mapper-pojo-standalone-search-query-loading,configure target entity types to enable loading>>,
+* <<mapping-entitydefinition-loading-selection,configure target entity types to enable loading>>,
 if you want to load entities from an external datasource.
 * add a <<mapping-projection-basics,projection constructor>> to target entity types,
 if you want to reconstruct entities from the content of the index.
@@ -100,8 +100,8 @@ see <<search-dsl-multiple-fields>>.
 [[search-dsl-query-targeting-entityName]]
 === Targeting entity types by name
 
-Though rarely necessary, it is also possible to use entity names instead of classes
-to designate the entity types targeted by the search:
+Though rarely necessary, it is also possible to use <<mapping-entitydefinition-name,entity names>> instead of classes
+to designate the <<concepts-entity,entity types>> targeted by the search:
 
 .Targeting entity types by name
 ====

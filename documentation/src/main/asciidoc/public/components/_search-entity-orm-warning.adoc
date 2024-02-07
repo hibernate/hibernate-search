@@ -1,0 +1,10 @@
+[WARNING]
+====
+`@SearchEntity` and its corresponding programmatic mapping `.searchEntity()`
+are unnecessary for Hibernate ORM entities,
+and in fact unsupported when using the <<mapper-orm,Hibernate ORM integration>>.
+
+See https://hibernate.atlassian.net/browse/HSEARCH-5076[HSEARCH-5076]
+to track progress on allowing the use of `@SearchEntity` in the Hibernate ORM integration
+to map non-ORM entities.
+====

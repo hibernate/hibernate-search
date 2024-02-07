@@ -16,23 +16,25 @@ import org.hibernate.search.mapper.pojo.mapping.definition.annotation.GenericFie
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.IndexedEmbedded;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.KeywordField;
+import org.hibernate.search.mapper.pojo.mapping.definition.annotation.SearchEntity;
 
-@Indexed // <1>
+@SearchEntity // <1>
+@Indexed // <2>
 public class Book {
 
-	@DocumentId // <2>
+	@DocumentId // <3>
 	private Integer id;
 
-	@FullTextField // <3>
+	@FullTextField // <4>
 	private String title;
 
-	@KeywordField // <4>
+	@KeywordField // <5>
 	private String isbn;
 
-	@GenericField // <5>
+	@GenericField // <6>
 	private int pageCount;
 
-	@IndexedEmbedded // <6>
+	@IndexedEmbedded // <7>
 	private Set<Author> authors = new HashSet<>();
 
 	public Book() {
