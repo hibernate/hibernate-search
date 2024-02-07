@@ -7,13 +7,9 @@
 package org.hibernate.search.integrationtest.mapper.orm.outboxpolling.automaticindexing;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.fail;
 import static org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmUtils.with;
 
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.util.ArrayList;
+import java.time.Instant;
 import java.util.List;
 import java.util.UUID;
 
@@ -23,8 +19,6 @@ import jakarta.persistence.Id;
 
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
-import org.hibernate.engine.jdbc.spi.JdbcCoordinator;
-import org.hibernate.engine.spi.SharedSessionContractImplementor;
 import org.hibernate.search.integrationtest.mapper.orm.outboxpolling.testsupport.util.OutboxEventFilter;
 import org.hibernate.search.integrationtest.mapper.orm.outboxpolling.testsupport.util.TestingOutboxPollingInternalConfigurer;
 import org.hibernate.search.mapper.orm.outboxpolling.cfg.impl.HibernateOrmMapperOutboxPollingImplSettings;
@@ -41,12 +35,6 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
 
 class OutboxPollingAutomaticIndexingOutOfOrderIdsIT {
-
-	private static final String OUTBOX_EVENT_UPDATE_ID_AND_TIME =
-			"UPDATE HSEARCH_OUTBOX_EVENT SET ID = ?, PROCESSAFTER = ? WHERE ID = ?";
-
-	private static final String OUTBOX_EVENT_SELECT_ORDERED_IDS_AND_PROCESS_AFTER_TIME =
-			"SELECT ID, PROCESSAFTER FROM HSEARCH_OUTBOX_EVENT ORDER BY PROCESSAFTER, ID";
 
 	private final OutboxEventFilter eventFilter = new OutboxEventFilter();
 
@@ -366,42 +354,26 @@ class OutboxPollingAutomaticIndexingOutOfOrderIdsIT {
 	}
 
 	private void swapOutboxTableRowIdAndCreatedValues(Session session, int row1, int row2) {
-		try {
-			SharedSessionContractImplementor implementor = session.unwrap( SharedSessionContractImplementor.class );
+		List<OutboxEvent> events = session.createQuery(
+				"select e from org.hibernate.search.mapper.orm.outboxpolling.event.impl.OutboxEvent e order by e.processAfter, e.id",
+				OutboxEvent.class
+		).getResultList();
+		OutboxEvent event1 = events.get( row1 );
+		OutboxEvent event2 = events.get( row2 );
 
-			JdbcCoordinator jdbc = implementor.getJdbcCoordinator();
+		session.detach( event1 );
+		session.detach( event2 );
 
-			List<String> uuids = new ArrayList<>();
-			List<java.sql.Timestamp> times = new ArrayList<>();
-			try ( PreparedStatement statement = jdbc.getStatementPreparer().prepareStatement(
-					OUTBOX_EVENT_SELECT_ORDERED_IDS_AND_PROCESS_AFTER_TIME ) ) {
-				ResultSet resultSet = statement.executeQuery();
-				while ( resultSet.next() ) {
-					uuids.add( resultSet.getString( 1 ) );
-					times.add( resultSet.getTimestamp( 2 ) );
-				}
-			}
+		Instant processAfter = event1.getProcessAfter();
+		event1.setProcessAfter( event2.getProcessAfter() );
+		event2.setProcessAfter( processAfter );
 
-			String temporaryUuid = UUID.randomUUID().toString();
-			updateOutboxTableRow( jdbc, temporaryUuid, uuids.get( row2 ), times.get( row1 ) );
-			updateOutboxTableRow( jdbc, uuids.get( row2 ), uuids.get( row1 ), times.get( row2 ) );
-			updateOutboxTableRow( jdbc, uuids.get( row1 ), temporaryUuid, times.get( row1 ) );
-		}
-		catch (SQLException exception) {
-			fail( "Unexpected SQL exception: " + exception );
-		}
-	}
+		UUID id = event1.getId();
+		event1.setId( event2.getId() );
+		event2.setId( id );
 
-	private void updateOutboxTableRow(JdbcCoordinator jdbc, String newId, String rowToUpdateId,
-			java.sql.Timestamp newCreated)
-			throws SQLException {
-		try ( PreparedStatement ps = jdbc.getStatementPreparer().prepareStatement( OUTBOX_EVENT_UPDATE_ID_AND_TIME ) ) {
-			ps.setString( 1, newId );
-			ps.setTimestamp( 2, newCreated );
-			ps.setString( 3, rowToUpdateId );
-
-			jdbc.getResultSetReturn().executeUpdate( ps, OUTBOX_EVENT_UPDATE_ID_AND_TIME );
-		}
+		session.merge( event1 );
+		session.merge( event2 );
 	}
 
 	@Entity(name = IndexedEntity.INDEX)
