@@ -15,6 +15,7 @@ import java.nio.charset.StandardCharsets;
 
 import org.hibernate.search.documentation.testsupport.BackendConfigurations;
 import org.hibernate.search.documentation.testsupport.TestConfiguration;
+import org.hibernate.search.mapper.pojo.mapping.definition.annotation.AnnotatedTypeSource;
 import org.hibernate.search.mapper.pojo.standalone.entity.SearchIndexedEntity;
 import org.hibernate.search.mapper.pojo.standalone.mapping.CloseableSearchMapping;
 import org.hibernate.search.mapper.pojo.standalone.mapping.SearchMapping;
@@ -45,7 +46,7 @@ class StandalonePojoReadPropertiesFromFileIT {
 						)
 		// tag::setup[]
 		) {
-			CloseableSearchMapping searchMapping = SearchMapping.builder() // <2>
+			CloseableSearchMapping searchMapping = SearchMapping.builder( AnnotatedTypeSource.empty() ) // <2>
 					.properties( propertyFileReader ) // <3>
 					// end::setup[]
 					.properties( TestConfiguration.standalonePojoMapperProperties(

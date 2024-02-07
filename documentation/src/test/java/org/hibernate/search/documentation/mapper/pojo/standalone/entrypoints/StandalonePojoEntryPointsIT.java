@@ -12,6 +12,7 @@ import java.util.Arrays;
 
 import org.hibernate.search.documentation.testsupport.BackendConfigurations;
 import org.hibernate.search.documentation.testsupport.TestConfiguration;
+import org.hibernate.search.mapper.pojo.mapping.definition.annotation.AnnotatedTypeSource;
 import org.hibernate.search.mapper.pojo.standalone.entity.SearchIndexedEntity;
 import org.hibernate.search.mapper.pojo.standalone.mapping.CloseableSearchMapping;
 import org.hibernate.search.mapper.pojo.standalone.mapping.SearchMapping;
@@ -35,22 +36,25 @@ class StandalonePojoEntryPointsIT {
 	@BeforeEach
 	void setup() {
 		// tag::setup[]
-		CloseableSearchMapping searchMapping = SearchMapping.builder() // <1>
-				.property(
-						"hibernate.search.mapping.configurer", // <2>
-						"class:org.hibernate.search.documentation.mapper.pojo.standalone.entrypoints.StandalonePojoConfigurer"
-				)
-				.property(
-						"hibernate.search.backend.hosts", // <3>
-						"elasticsearch.mycompany.com"
-				)
-				// end::setup[]
-				.properties( TestConfiguration.standalonePojoMapperProperties(
-						configurationProvider,
-						BackendConfigurations.simple()
+		CloseableSearchMapping searchMapping =
+				SearchMapping.builder( AnnotatedTypeSource.fromClasses( // <1>
+						Book.class, Associate.class, Manager.class
 				) )
-				// tag::setup[]
-				.build(); // <4>
+						.property(
+								"hibernate.search.mapping.configurer", // <2>
+								"class:org.hibernate.search.documentation.mapper.pojo.standalone.entrypoints.StandalonePojoConfigurer"
+						)
+						.property(
+								"hibernate.search.backend.hosts", // <3>
+								"elasticsearch.mycompany.com"
+						)
+						// end::setup[]
+						.properties( TestConfiguration.standalonePojoMapperProperties(
+								configurationProvider,
+								BackendConfigurations.simple()
+						) )
+						// tag::setup[]
+						.build(); // <4>
 		// end::setup[]
 		this.theSearchMapping = searchMapping;
 	}

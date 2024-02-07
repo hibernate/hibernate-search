@@ -12,6 +12,7 @@ import java.util.Collections;
 
 import org.hibernate.search.engine.backend.Backend;
 import org.hibernate.search.engine.backend.index.IndexManager;
+import org.hibernate.search.mapper.pojo.mapping.definition.annotation.AnnotatedTypeSource;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
 import org.hibernate.search.mapper.pojo.standalone.entity.SearchIndexedEntity;
 import org.hibernate.search.mapper.pojo.standalone.scope.SearchScope;
@@ -126,18 +127,22 @@ public interface SearchMapping {
 	Backend backend(String backendName);
 
 	/**
+	 * @param annotatedTypeSource A source of types to be processed for annotations by Hibernate Search.
 	 * @return A {@link SearchMapping} builder.
+	 * @see AnnotatedTypeSource
 	 */
-	static SearchMappingBuilder builder() {
-		return new SearchMappingBuilder();
+	static SearchMappingBuilder builder(AnnotatedTypeSource annotatedTypeSource) {
+		return new SearchMappingBuilder( annotatedTypeSource );
 	}
 
 	/**
-	 * @param lookup A {@link java.lang.invoke.MethodHandles.Lookup} to perform reflection on entities.
+	 * @param annotatedTypeSource A source of types to be processed for annotations by Hibernate Search.
+	 * @param lookup A {@link MethodHandles.Lookup} to perform reflection on mapped types.
 	 * @return A {@link SearchMapping} builder.
+	 * @see AnnotatedTypeSource
 	 */
-	static SearchMappingBuilder builder(MethodHandles.Lookup lookup) {
-		return builder()
+	static SearchMappingBuilder builder(AnnotatedTypeSource annotatedTypeSource, MethodHandles.Lookup lookup) {
+		return builder( annotatedTypeSource )
 				.valueReadHandleFactory( ValueHandleFactory.usingMethodHandle( lookup ) );
 	}
 

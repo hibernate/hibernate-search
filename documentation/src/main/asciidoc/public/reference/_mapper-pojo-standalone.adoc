@@ -45,10 +45,21 @@ include::{sourcedir}/org/hibernate/search/documentation/mapper/pojo/standalone/e
 ----
 include::{sourcedir}/org/hibernate/search/documentation/mapper/pojo/standalone/entrypoints/StandalonePojoEntryPointsIT.java[tags=setup]
 ----
-<1> Create a builder.
+<1> Create a builder, passing an `AnnotatedTypeSource` to let Hibernate Search know where to look for annotations.
 <2> Set configurer.
 <3> Set additional configuration properties (see also <<configuration>>).
 <4> Build the `SearchMapping`.
+====
+
+[TIP]
+====
+Thanks to <<mapping-classpath-scanning,classpath scanning>>,
+your `AnnotatedTypeSource` only needs to include one class
+from each JAR containing annotated types.
+Other types should be automatically discovered.
+
+See also <<mapping-classpath-scanning-faster,this section>>
+to troubleshoot or improve performance of classpath scanning.
 ====
 
 [[mapper-pojo-standalone-shutdown]]

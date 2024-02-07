@@ -10,6 +10,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import org.hibernate.search.documentation.testsupport.BackendConfigurations;
 import org.hibernate.search.documentation.testsupport.TestConfiguration;
+import org.hibernate.search.mapper.pojo.mapping.definition.annotation.AnnotatedTypeSource;
 import org.hibernate.search.mapper.pojo.standalone.mapping.CloseableSearchMapping;
 import org.hibernate.search.mapper.pojo.standalone.mapping.SearchMapping;
 import org.hibernate.search.mapper.pojo.standalone.mapping.StandalonePojoMappingConfigurer;
@@ -31,7 +32,9 @@ class StandalonePojoMultiTenancyIT {
 	@BeforeEach
 	void setup() {
 		// tag::setup[]
-		CloseableSearchMapping searchMapping = SearchMapping.builder() // <1>
+		CloseableSearchMapping searchMapping = SearchMapping.builder( AnnotatedTypeSource.fromClasses( // <1>
+				Book.class
+		) )
 				// ...
 				.property( "hibernate.search.mapping.multi_tenancy.enabled", true ) // <2>
 				// end::setup[]

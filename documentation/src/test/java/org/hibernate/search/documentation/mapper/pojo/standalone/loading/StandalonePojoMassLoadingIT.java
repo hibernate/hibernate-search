@@ -16,6 +16,7 @@ import java.util.Map;
 import org.hibernate.search.documentation.mapper.pojo.standalone.loading.mydatastore.MyDatastore;
 import org.hibernate.search.documentation.testsupport.BackendConfigurations;
 import org.hibernate.search.documentation.testsupport.TestConfiguration;
+import org.hibernate.search.mapper.pojo.mapping.definition.annotation.AnnotatedTypeSource;
 import org.hibernate.search.mapper.pojo.standalone.mapping.CloseableSearchMapping;
 import org.hibernate.search.mapper.pojo.standalone.mapping.SearchMapping;
 import org.hibernate.search.mapper.pojo.standalone.mapping.StandalonePojoMappingConfigurer;
@@ -54,7 +55,9 @@ class StandalonePojoMassLoadingIT {
 				// end::setup[]
 				new MyDatastore( entities );
 		// tag::setup[]
-		CloseableSearchMapping searchMapping = SearchMapping.builder() // <2>
+		CloseableSearchMapping searchMapping = SearchMapping.builder( AnnotatedTypeSource.fromClasses( // <2> 
+				Book.class
+		) )
 				.property(
 						"hibernate.search.mapping.configurer",
 						(StandalonePojoMappingConfigurer) configurerContext -> {
