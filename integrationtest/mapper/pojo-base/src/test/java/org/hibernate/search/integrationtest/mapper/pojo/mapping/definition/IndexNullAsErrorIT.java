@@ -54,8 +54,8 @@ class IndexNullAsErrorIT<V, F> {
 		assumeTrue( Objects.nonNull( unparsableNullAsValue ) );
 
 		assertThatThrownBy( () -> setupHelper.start().withConfiguration( c -> {
-			c.addEntityType( expectations.getTypeWithValueBridge1() );
 			TypeMappingStep typeMapping = c.programmaticMapping().type( expectations.getTypeWithValueBridge1() );
+			typeMapping.searchEntity();
 			typeMapping.indexed();
 			typeMapping.property( FIELD_NAME ).genericField( FIELD_NAME );
 			typeMapping.property( FIELD_NAME )

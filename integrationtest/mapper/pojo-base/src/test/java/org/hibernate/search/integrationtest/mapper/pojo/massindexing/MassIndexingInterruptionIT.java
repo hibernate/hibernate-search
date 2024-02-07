@@ -18,11 +18,13 @@ import org.hibernate.search.engine.backend.work.execution.DocumentCommitStrategy
 import org.hibernate.search.engine.backend.work.execution.DocumentRefreshStrategy;
 import org.hibernate.search.engine.cfg.spi.EngineSpiSettings;
 import org.hibernate.search.integrationtest.mapper.pojo.testsupport.loading.PersistenceTypeKey;
+import org.hibernate.search.integrationtest.mapper.pojo.testsupport.loading.StubEntityLoadingBinder;
 import org.hibernate.search.integrationtest.mapper.pojo.testsupport.loading.StubLoadingContext;
-import org.hibernate.search.integrationtest.mapper.pojo.testsupport.loading.StubMassLoadingStrategy;
+import org.hibernate.search.mapper.pojo.loading.mapping.annotation.EntityLoadingBinderRef;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.DocumentId;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.GenericField;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
+import org.hibernate.search.mapper.pojo.mapping.definition.annotation.SearchEntity;
 import org.hibernate.search.mapper.pojo.standalone.mapping.SearchMapping;
 import org.hibernate.search.mapper.pojo.standalone.massindexing.MassIndexer;
 import org.hibernate.search.util.common.SearchException;
@@ -61,14 +63,11 @@ class MassIndexingInterruptionIT {
 
 	@BeforeEach
 	void setup() {
-		backendMock.expectAnySchema( Book.INDEX );
+		backendMock.expectAnySchema( Book.NAME );
 
 		mapping = setupHelper.start()
+				.expectCustomBeans()
 				.withPropertyRadical( EngineSpiSettings.Radicals.THREAD_PROVIDER, threadSpy.getThreadProvider() )
-				.withConfiguration( b -> {
-					b.addEntityType( Book.class, c -> c
-							.massLoadingStrategy( new StubMassLoadingStrategy<>( Book.PERSISTENCE_KEY ) ) );
-				} )
 				.setup( Book.class );
 
 		backendMock.verifyExpectationsMet();
@@ -190,12 +189,12 @@ class MassIndexingInterruptionIT {
 				.typesToIndexInParallel( 1 )
 				.threadsToLoadObjects( 1 );
 
-		backendMock.expectIndexScaleWorks( Book.INDEX )
+		backendMock.expectIndexScaleWorks( Book.NAME )
 				.purge()
 				.mergeSegments();
 
 		backendMock.expectWorks(
-				Book.INDEX, DocumentCommitStrategy.NONE, DocumentRefreshStrategy.NONE
+				Book.NAME, DocumentCommitStrategy.NONE, DocumentRefreshStrategy.NONE
 		)
 				// Return a CompletableFuture that will never complete
 				.createAndExecuteFollowingWorks( new CompletableFuture<>() )
@@ -253,10 +252,13 @@ class MassIndexingInterruptionIT {
 		loadingContext.persistenceMap( Book.PERSISTENCE_KEY ).put( book.id, book );
 	}
 
-	@Indexed(index = Book.INDEX)
+
+	@SearchEntity(name = Book.NAME,
+			loadingBinder = @EntityLoadingBinderRef(type = StubEntityLoadingBinder.class))
+	@Indexed
 	public static class Book {
 
-		public static final String INDEX = "Book";
+		public static final String NAME = "Book";
 		public static final PersistenceTypeKey<Book, Integer> PERSISTENCE_KEY =
 				new PersistenceTypeKey<>( Book.class, Integer.class );
 

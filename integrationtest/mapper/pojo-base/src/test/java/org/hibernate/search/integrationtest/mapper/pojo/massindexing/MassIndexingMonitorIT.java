@@ -16,11 +16,13 @@ import org.hibernate.search.engine.backend.work.execution.DocumentCommitStrategy
 import org.hibernate.search.engine.backend.work.execution.DocumentRefreshStrategy;
 import org.hibernate.search.engine.cfg.EngineSettings;
 import org.hibernate.search.integrationtest.mapper.pojo.testsupport.loading.PersistenceTypeKey;
+import org.hibernate.search.integrationtest.mapper.pojo.testsupport.loading.StubEntityLoadingBinder;
 import org.hibernate.search.integrationtest.mapper.pojo.testsupport.loading.StubLoadingContext;
-import org.hibernate.search.integrationtest.mapper.pojo.testsupport.loading.StubMassLoadingStrategy;
+import org.hibernate.search.mapper.pojo.loading.mapping.annotation.EntityLoadingBinderRef;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.DocumentId;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.GenericField;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
+import org.hibernate.search.mapper.pojo.mapping.definition.annotation.SearchEntity;
 import org.hibernate.search.mapper.pojo.massindexing.MassIndexingMonitor;
 import org.hibernate.search.mapper.pojo.standalone.mapping.SearchMapping;
 import org.hibernate.search.mapper.pojo.standalone.massindexing.MassIndexer;
@@ -54,14 +56,11 @@ class MassIndexingMonitorIT {
 	private final StubLoadingContext loadingContext = new StubLoadingContext();
 
 	private SearchMapping setup(String failureHandler) {
-		backendMock.expectAnySchema( Book.INDEX );
+		backendMock.expectAnySchema( Book.NAME );
 
 		SearchMapping mapping = setupHelper.start()
+				.expectCustomBeans()
 				.withPropertyRadical( EngineSettings.BACKGROUND_FAILURE_HANDLER, failureHandler )
-				.withConfiguration( b -> {
-					b.addEntityType( Book.class, c -> c
-							.massLoadingStrategy( new StubMassLoadingStrategy<>( Book.PERSISTENCE_KEY ) ) );
-				} )
 				.setup( Book.class );
 
 		backendMock.verifyExpectationsMet();
@@ -86,7 +85,7 @@ class MassIndexingMonitorIT {
 			// add operations on indexes can follow any random order,
 			// since they are executed by different threads
 			backendMock.expectWorks(
-					Book.INDEX, DocumentCommitStrategy.NONE, DocumentRefreshStrategy.NONE
+					Book.NAME, DocumentCommitStrategy.NONE, DocumentRefreshStrategy.NONE
 			)
 					.add( "1", b -> b
 							.field( "title", TITLE_1 )
@@ -104,7 +103,7 @@ class MassIndexingMonitorIT {
 
 			// purgeAtStart and mergeSegmentsAfterPurge are enabled by default,
 			// so we expect 1 purge, 1 mergeSegments and 1 flush calls in this order:
-			backendMock.expectIndexScaleWorks( Book.INDEX, searchSession.tenantIdentifier() )
+			backendMock.expectIndexScaleWorks( Book.NAME, searchSession.tenantIdentifier() )
 					.purge()
 					.mergeSegments()
 					.flush()
@@ -141,10 +140,12 @@ class MassIndexingMonitorIT {
 		loadingContext.persistenceMap( Book.PERSISTENCE_KEY ).put( book.id, book );
 	}
 
-	@Indexed(index = Book.INDEX)
+	@SearchEntity(name = Book.NAME,
+			loadingBinder = @EntityLoadingBinderRef(type = StubEntityLoadingBinder.class))
+	@Indexed(index = Book.NAME)
 	public static class Book {
 
-		public static final String INDEX = "Book";
+		public static final String NAME = "Book";
 		public static final PersistenceTypeKey<Book, Integer> PERSISTENCE_KEY =
 				new PersistenceTypeKey<>( Book.class, Integer.class );
 

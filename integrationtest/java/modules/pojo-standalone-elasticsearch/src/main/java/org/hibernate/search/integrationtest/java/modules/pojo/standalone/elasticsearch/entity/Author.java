@@ -7,10 +7,14 @@
 package org.hibernate.search.integrationtest.java.modules.pojo.standalone.elasticsearch.entity;
 
 import org.hibernate.search.integrationtest.java.modules.pojo.standalone.elasticsearch.config.MyElasticsearchAnalysisConfigurer;
+import org.hibernate.search.integrationtest.java.modules.pojo.standalone.elasticsearch.service.SimulatedDatastore;
+import org.hibernate.search.mapper.pojo.loading.mapping.annotation.EntityLoadingBinderRef;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.DocumentId;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.FullTextField;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
+import org.hibernate.search.mapper.pojo.mapping.definition.annotation.SearchEntity;
 
+@SearchEntity(loadingBinder = @EntityLoadingBinderRef(type = SimulatedDatastore.AuthorLoadingBinder.class))
 @Indexed
 public class Author {
 

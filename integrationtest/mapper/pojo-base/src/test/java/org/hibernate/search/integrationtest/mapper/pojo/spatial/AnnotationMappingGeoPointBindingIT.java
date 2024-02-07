@@ -17,6 +17,7 @@ import org.hibernate.search.mapper.pojo.bridge.builtin.annotation.Longitude;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.DocumentId;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.GenericField;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
+import org.hibernate.search.mapper.pojo.mapping.definition.annotation.SearchEntity;
 import org.hibernate.search.mapper.pojo.standalone.mapping.SearchMapping;
 import org.hibernate.search.mapper.pojo.standalone.session.SearchSession;
 import org.hibernate.search.util.impl.integrationtest.common.extension.BackendMock;
@@ -54,7 +55,7 @@ class AnnotationMappingGeoPointBindingIT {
 		);
 
 		mapping = setupHelper.start()
-				.withAnnotatedEntityTypes(
+				.withAnnotatedTypes(
 						GeoPointOnTypeEntity.class,
 						GeoPointOnCoordinatesPropertyEntity.class,
 						GeoPointOnCustomCoordinatesPropertyEntity.class
@@ -123,6 +124,7 @@ class AnnotationMappingGeoPointBindingIT {
 		}
 	}
 
+	@SearchEntity
 	@Indexed(index = GeoPointOnTypeEntity.INDEX)
 	@GeoPointBinding(fieldName = "homeLocation", markerSet = "home", projectable = Projectable.YES, sortable = Sortable.YES)
 	@GeoPointBinding(fieldName = "workLocation", markerSet = "work")
@@ -147,6 +149,7 @@ class AnnotationMappingGeoPointBindingIT {
 
 	}
 
+	@SearchEntity
 	@Indexed(index = GeoPointOnCoordinatesPropertyEntity.INDEX)
 	public static final class GeoPointOnCoordinatesPropertyEntity {
 
@@ -161,6 +164,7 @@ class AnnotationMappingGeoPointBindingIT {
 
 	}
 
+	@SearchEntity
 	@Indexed(index = GeoPointOnCustomCoordinatesPropertyEntity.INDEX)
 	public static final class GeoPointOnCustomCoordinatesPropertyEntity {
 

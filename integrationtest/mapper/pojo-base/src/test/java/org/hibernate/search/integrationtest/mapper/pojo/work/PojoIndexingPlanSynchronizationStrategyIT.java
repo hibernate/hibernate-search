@@ -13,6 +13,7 @@ import org.hibernate.search.engine.backend.work.execution.DocumentRefreshStrateg
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.DocumentId;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.GenericField;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
+import org.hibernate.search.mapper.pojo.mapping.definition.annotation.SearchEntity;
 import org.hibernate.search.mapper.pojo.standalone.mapping.SearchMapping;
 import org.hibernate.search.mapper.pojo.standalone.session.SearchSession;
 import org.hibernate.search.mapper.pojo.work.IndexingPlanSynchronizationStrategy;
@@ -39,7 +40,7 @@ class PojoIndexingPlanSynchronizationStrategyIT {
 		backendMock.expectAnySchema( IndexedEntity.NAME );
 
 		mapping = setupHelper.start()
-				.withAnnotatedEntityType( IndexedEntity.class, IndexedEntity.NAME )
+				.withAnnotatedTypes( IndexedEntity.class )
 				.setup();
 	}
 
@@ -78,6 +79,7 @@ class PojoIndexingPlanSynchronizationStrategyIT {
 		backendMock.verifyExpectationsMet();
 	}
 
+	@SearchEntity(name = IndexedEntity.NAME)
 	@Indexed(index = IndexedEntity.NAME)
 	public static class IndexedEntity {
 

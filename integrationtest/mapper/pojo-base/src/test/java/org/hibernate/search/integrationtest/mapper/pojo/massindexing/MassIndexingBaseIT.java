@@ -14,11 +14,13 @@ import java.lang.invoke.MethodHandles;
 import org.hibernate.search.engine.backend.work.execution.DocumentCommitStrategy;
 import org.hibernate.search.engine.backend.work.execution.DocumentRefreshStrategy;
 import org.hibernate.search.integrationtest.mapper.pojo.testsupport.loading.PersistenceTypeKey;
+import org.hibernate.search.integrationtest.mapper.pojo.testsupport.loading.StubEntityLoadingBinder;
 import org.hibernate.search.integrationtest.mapper.pojo.testsupport.loading.StubLoadingContext;
-import org.hibernate.search.integrationtest.mapper.pojo.testsupport.loading.StubMassLoadingStrategy;
+import org.hibernate.search.mapper.pojo.loading.mapping.annotation.EntityLoadingBinderRef;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.DocumentId;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.GenericField;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
+import org.hibernate.search.mapper.pojo.mapping.definition.annotation.SearchEntity;
 import org.hibernate.search.mapper.pojo.standalone.mapping.SearchMapping;
 import org.hibernate.search.mapper.pojo.standalone.massindexing.MassIndexer;
 import org.hibernate.search.mapper.pojo.standalone.session.SearchSession;
@@ -56,13 +58,10 @@ class MassIndexingBaseIT {
 
 	@BeforeEach
 	void setup() {
-		backendMock.expectAnySchema( Book.INDEX );
+		backendMock.expectAnySchema( Book.NAME );
 
 		mapping = setupHelper.start()
-				.withConfiguration( b -> {
-					b.addEntityType( Book.class, c -> c
-							.massLoadingStrategy( new StubMassLoadingStrategy<>( Book.PERSISTENCE_KEY ) ) );
-				} )
+				.expectCustomBeans()
 				.setup( Book.class );
 
 		backendMock.verifyExpectationsMet();
@@ -80,7 +79,7 @@ class MassIndexingBaseIT {
 			// add operations on indexes can follow any random order,
 			// since they are executed by different threads
 			backendMock.expectWorks(
-					Book.INDEX, DocumentCommitStrategy.NONE, DocumentRefreshStrategy.NONE
+					Book.NAME, DocumentCommitStrategy.NONE, DocumentRefreshStrategy.NONE
 			)
 					.add( "1", b -> b
 							.field( "title", TITLE_1 )
@@ -97,7 +96,7 @@ class MassIndexingBaseIT {
 
 			// purgeAtStart and mergeSegmentsAfterPurge are enabled by default,
 			// so we expect 1 purge, 1 mergeSegments and 1 flush calls in this order:
-			backendMock.expectIndexScaleWorks( Book.INDEX, searchSession.tenantIdentifier() )
+			backendMock.expectIndexScaleWorks( Book.NAME, searchSession.tenantIdentifier() )
 					.purge()
 					.mergeSegments()
 					.flush()
@@ -126,7 +125,7 @@ class MassIndexingBaseIT {
 			// add operations on indexes can follow any random order,
 			// since they are executed by different threads
 			backendMock.expectWorks(
-					Book.INDEX, DocumentCommitStrategy.NONE, DocumentRefreshStrategy.NONE
+					Book.NAME, DocumentCommitStrategy.NONE, DocumentRefreshStrategy.NONE
 			)
 					.add( "1", b -> b
 							.field( "title", TITLE_1 )
@@ -141,12 +140,12 @@ class MassIndexingBaseIT {
 							.field( "author", AUTHOR_3 )
 					);
 
-			backendMock.expectSchemaManagementWorks( Book.INDEX )
+			backendMock.expectSchemaManagementWorks( Book.NAME )
 					.work( StubSchemaManagementWork.Type.DROP_AND_CREATE );
 
 			// because we set dropAndCreateSchemaOnStart = true and do not explicitly set the purge value
 			// it means that purge will default to false hence only flush and refresh are expected:
-			backendMock.expectIndexScaleWorks( Book.INDEX, searchSession.tenantIdentifier() )
+			backendMock.expectIndexScaleWorks( Book.NAME, searchSession.tenantIdentifier() )
 					.flush()
 					.refresh();
 
@@ -173,7 +172,7 @@ class MassIndexingBaseIT {
 			// add operations on indexes can follow any random order,
 			// since they are executed by different threads
 			backendMock.expectWorks(
-					Book.INDEX, DocumentCommitStrategy.NONE, DocumentRefreshStrategy.NONE
+					Book.NAME, DocumentCommitStrategy.NONE, DocumentRefreshStrategy.NONE
 			)
 					.add( "1", b -> b
 							.field( "title", TITLE_1 )
@@ -191,7 +190,7 @@ class MassIndexingBaseIT {
 			// purgeAtStart and mergeSegmentsAfterPurge are enabled by default,
 			// and optimizeOnFinish is enabled explicitly,
 			// so we expect 1 purge, 2 optimize and 1 flush calls in this order:
-			backendMock.expectIndexScaleWorks( Book.INDEX, searchSession.tenantIdentifier() )
+			backendMock.expectIndexScaleWorks( Book.NAME, searchSession.tenantIdentifier() )
 					.purge()
 					.mergeSegments()
 					.mergeSegments()
@@ -222,7 +221,7 @@ class MassIndexingBaseIT {
 			// add operations on indexes can follow any random order,
 			// since they are executed by different threads
 			backendMock.expectWorks(
-					Book.INDEX, DocumentCommitStrategy.NONE, DocumentRefreshStrategy.NONE
+					Book.NAME, DocumentCommitStrategy.NONE, DocumentRefreshStrategy.NONE
 			)
 					.add( "1", b -> b
 							.field( "title", TITLE_1 )
@@ -237,12 +236,12 @@ class MassIndexingBaseIT {
 							.field( "author", AUTHOR_3 )
 					);
 
-			backendMock.expectSchemaManagementWorks( Book.INDEX )
+			backendMock.expectSchemaManagementWorks( Book.NAME )
 					.work( StubSchemaManagementWork.Type.DROP_AND_CREATE );
 
 			// as purgeAllOnStart is explicitly set to true, and merge is true by default
 			// it means that both purge and merge will be triggered:
-			backendMock.expectIndexScaleWorks( Book.INDEX, searchSession.tenantIdentifier() )
+			backendMock.expectIndexScaleWorks( Book.NAME, searchSession.tenantIdentifier() )
 					.purge()
 					.mergeSegments()
 					.flush()
@@ -269,7 +268,7 @@ class MassIndexingBaseIT {
 		// add operations on indexes can follow any random order,
 		// since they are executed by different threads
 		backendMock.expectWorks(
-				Book.INDEX, DocumentCommitStrategy.NONE, DocumentRefreshStrategy.NONE
+				Book.NAME, DocumentCommitStrategy.NONE, DocumentRefreshStrategy.NONE
 		)
 				.add( "1", b -> b
 						.field( "title", TITLE_1 )
@@ -286,7 +285,7 @@ class MassIndexingBaseIT {
 
 		// purgeAtStart and mergeSegmentsAfterPurge are enabled by default,
 		// so we expect 1 purge, 1 mergeSegments and 1 flush calls in this order:
-		backendMock.expectIndexScaleWorks( Book.INDEX )
+		backendMock.expectIndexScaleWorks( Book.NAME )
 				.purge()
 				.mergeSegments()
 				.flush()
@@ -340,10 +339,12 @@ class MassIndexingBaseIT {
 		loadingContext.persistenceMap( Book.PERSISTENCE_KEY ).put( book.id, book );
 	}
 
-	@Indexed(index = Book.INDEX)
+	@SearchEntity(name = Book.NAME,
+			loadingBinder = @EntityLoadingBinderRef(type = StubEntityLoadingBinder.class))
+	@Indexed
 	public static class Book {
 
-		public static final String INDEX = "Book";
+		public static final String NAME = "Book";
 		public static final PersistenceTypeKey<Book, Integer> PERSISTENCE_KEY =
 				new PersistenceTypeKey<>( Book.class, Integer.class );
 

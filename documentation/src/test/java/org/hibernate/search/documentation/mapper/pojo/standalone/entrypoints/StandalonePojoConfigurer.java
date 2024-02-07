@@ -13,7 +13,9 @@ import org.hibernate.search.mapper.pojo.standalone.mapping.StandalonePojoMapping
 public class StandalonePojoConfigurer implements StandalonePojoMappingConfigurer {
 	@Override
 	public void configure(StandalonePojoMappingConfigurationContext context) {
-		context.addEntityTypes( Book.class, Associate.class, Manager.class );
+		context.programmaticMapping().type( Book.class ).searchEntity();
+		context.programmaticMapping().type( Associate.class ).searchEntity();
+		context.programmaticMapping().type( Manager.class ).searchEntity();
 
 		context.defaultReindexOnUpdate( ReindexOnUpdate.SHALLOW );
 	}

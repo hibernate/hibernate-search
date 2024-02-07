@@ -6,25 +6,20 @@
  */
 package org.hibernate.search.integrationtest.java.modules.pojo.standalone.lucene.service;
 
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import org.hibernate.search.engine.search.query.SearchQuery;
 import org.hibernate.search.integrationtest.java.modules.pojo.standalone.lucene.entity.Author;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.AnnotatedTypeSource;
-import org.hibernate.search.mapper.pojo.standalone.loading.SelectionLoadingStrategy;
 import org.hibernate.search.mapper.pojo.standalone.mapping.CloseableSearchMapping;
 import org.hibernate.search.mapper.pojo.standalone.mapping.SearchMapping;
-import org.hibernate.search.mapper.pojo.standalone.mapping.StandalonePojoMappingConfigurer;
 import org.hibernate.search.mapper.pojo.standalone.session.SearchSession;
 import org.hibernate.search.mapper.pojo.work.IndexingPlanSynchronizationStrategy;
 
 public class AuthorService implements AutoCloseable {
 
 	private static final AtomicInteger ID_PROVIDER = new AtomicInteger( 1 );
-	private final Map<Integer, Author> datastore = new HashMap<>();
 	private final CloseableSearchMapping mapping;
 
 	public AuthorService() {
@@ -38,17 +33,6 @@ public class AuthorService implements AutoCloseable {
 						"hibernate.search.backend.analysis.configurer",
 						"org.hibernate.search.integrationtest.java.modules.pojo.standalone.lucene.config.MyLuceneAnalysisConfigurer"
 				)
-				.property(
-						"hibernate.search.mapping.configurer",
-						(StandalonePojoMappingConfigurer) context -> {
-							context.addEntityType(
-									Author.class,
-									c -> c.selectionLoadingStrategy(
-											SelectionLoadingStrategy.fromMap( datastore )
-									)
-							);
-						}
-				)
 				.build();
 	}
 
@@ -59,7 +43,7 @@ public class AuthorService implements AutoCloseable {
 
 			Author author = new Author( ID_PROVIDER.getAndIncrement(), name );
 			session.indexingPlan().add( author );
-			datastore.put( author.getId(), author );
+			SimulatedDatastore.put( author );
 		}
 	}
 
@@ -75,7 +59,7 @@ public class AuthorService implements AutoCloseable {
 
 	@Override
 	public void close() {
-		datastore.clear();
+		SimulatedDatastore.clear();
 		mapping.close();
 	}
 }

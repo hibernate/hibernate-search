@@ -23,6 +23,7 @@ import org.hibernate.search.engine.cfg.EngineSettings;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.DocumentId;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.FullTextField;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
+import org.hibernate.search.mapper.pojo.mapping.definition.annotation.SearchEntity;
 import org.hibernate.search.mapper.pojo.standalone.bootstrap.spi.StandalonePojoIntegrationBooter;
 import org.hibernate.search.mapper.pojo.standalone.cfg.StandalonePojoMapperSettings;
 import org.hibernate.search.mapper.pojo.standalone.mapping.CloseableSearchMapping;
@@ -85,7 +86,7 @@ class StandalonePojoIntegrationBooterIT {
 				.property( StandalonePojoMapperSettings.MAPPING_CONFIGURER, new StandalonePojoMappingConfigurer() {
 					@Override
 					public void configure(StandalonePojoMappingConfigurationContext context) {
-						context.addEntityType( IndexedEntity.class );
+						context.annotationMapping().add( IndexedEntity.class );
 					}
 				} )
 				.build();
@@ -152,6 +153,7 @@ class StandalonePojoIntegrationBooterIT {
 		}
 	}
 
+	@SearchEntity
 	@Indexed(index = INDEX_NAME)
 	private static class IndexedEntity {
 		private static final Field ID_FIELD;

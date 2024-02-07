@@ -21,6 +21,7 @@ import org.hibernate.search.mapper.pojo.bridge.runtime.RoutingBridgeRouteContext
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.DocumentId;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.GenericField;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
+import org.hibernate.search.mapper.pojo.mapping.definition.annotation.SearchEntity;
 import org.hibernate.search.mapper.pojo.route.DocumentRoutes;
 import org.hibernate.search.mapper.pojo.standalone.mapping.SearchMapping;
 import org.hibernate.search.util.common.AssertionFailure;
@@ -87,6 +88,7 @@ class IndexedBaseIT {
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-3705")
 	void implicitIndexName_explicitEntityName() {
+		@SearchEntity(name = "myEntityName")
 		@Indexed
 		class IndexedEntity {
 			@DocumentId
@@ -99,11 +101,7 @@ class IndexedBaseIT {
 				.field( "text", String.class )
 		);
 		setupHelper.start()
-				.withConfiguration( b -> {
-					b.annotationMapping().add( IndexedEntity.class );
-					b.addEntityType( IndexedEntity.class, "myEntityName" );
-				} )
-				.setup();
+				.setup( IndexedEntity.class );
 		defaultBackendMock.verifyExpectationsMet();
 	}
 

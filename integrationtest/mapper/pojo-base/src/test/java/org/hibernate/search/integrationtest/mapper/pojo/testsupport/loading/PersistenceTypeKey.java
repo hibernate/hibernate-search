@@ -9,7 +9,7 @@ package org.hibernate.search.integrationtest.mapper.pojo.testsupport.loading;
 import java.util.Objects;
 
 public class PersistenceTypeKey<E, I> {
-	private final Class<E> entityType;
+	public final Class<E> entityType;
 	private final Class<I> idType;
 
 	public PersistenceTypeKey(Class<E> entityType, Class<I> idType) {

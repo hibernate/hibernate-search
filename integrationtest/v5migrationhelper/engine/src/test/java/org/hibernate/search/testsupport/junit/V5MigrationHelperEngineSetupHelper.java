@@ -102,26 +102,8 @@ public final class V5MigrationHelperEngineSetupHelper
 			return thisAsC();
 		}
 
-		public SetupContext withAnnotatedEntityType(Class<?> annotatedEntityType, String entityName) {
-			annotatedTypes.add( annotatedEntityType );
-			return withConfiguration( builder -> {
-				builder.addEntityType( annotatedEntityType, entityName );
-			} );
-		}
-
-		public SetupContext withAnnotatedEntityTypes(Class<?>... annotatedEntityTypes) {
-			return withAnnotatedEntityTypes( CollectionHelper.asLinkedHashSet( annotatedEntityTypes ) );
-		}
-
-		public SetupContext withAnnotatedEntityTypes(Set<Class<?>> annotatedEntityTypes) {
-			annotatedTypes.addAll( annotatedEntityTypes );
-			return withConfiguration( builder -> {
-				builder.addEntityTypes( annotatedEntityTypes );
-			} );
-		}
-
-		public SetupContext withAnnotatedTypes(Class<?>... annotatedTypes) {
-			return withAnnotatedTypes( CollectionHelper.asLinkedHashSet( annotatedTypes ) );
+		public SetupContext withAnnotatedTypes(Class<?>... annotatedEntityTypes) {
+			return withAnnotatedTypes( CollectionHelper.asLinkedHashSet( annotatedEntityTypes ) );
 		}
 
 		public SetupContext withAnnotatedTypes(Set<Class<?>> annotatedTypes) {
@@ -130,12 +112,19 @@ public final class V5MigrationHelperEngineSetupHelper
 		}
 
 		public SearchMapping setup(Class<?>... annotatedEntityTypes) {
-			return withAnnotatedEntityTypes( annotatedEntityTypes ).setup();
+			return withAnnotatedTypes( annotatedEntityTypes )
+					.withConfiguration( builder -> {
+						for ( Class<?> type : annotatedEntityTypes ) {
+							builder.programmaticMapping().type( type )
+									.searchEntity();
+						}
+					} )
+					.setup();
 		}
 
 		@Override
 		protected SearchMappingBuilder createBuilder() {
-			return SearchMapping.builder( AnnotatedTypeSource.fromClasses( annotatedTypes )).properties( properties );
+			return SearchMapping.builder( AnnotatedTypeSource.fromClasses( annotatedTypes ) ).properties( properties );
 		}
 
 		@Override

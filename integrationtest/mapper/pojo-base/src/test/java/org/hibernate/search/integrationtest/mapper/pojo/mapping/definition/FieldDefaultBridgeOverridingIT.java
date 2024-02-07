@@ -85,8 +85,11 @@ class FieldDefaultBridgeOverridingIT<V, F> {
 				indexModel -> this.indexField = indexModel.fieldOrNull( FIELD_NAME )
 		);
 		mapping = setupHelper.start()
-				.withAnnotatedEntityType( expectations.getTypeWithValueBridge1(),
-						DefaultValueBridgeExpectations.TYPE_WITH_VALUE_BRIDGE_1_NAME )
+				.withAnnotatedTypes( expectations.getTypeWithValueBridge1() )
+				.withConfiguration( b -> {
+					b.programmaticMapping().type( expectations.getTypeWithValueBridge1() )
+							.searchEntity().name( DefaultValueBridgeExpectations.TYPE_WITH_VALUE_BRIDGE_1_NAME );
+				} )
 				// HERE we override the default bridge for the type being tested.
 				.withConfiguration( builder -> builder.bridges().exactType( typeDescriptor.getJavaType() )
 						.valueBridge( new OverridingDefaultBridge<>() ) )

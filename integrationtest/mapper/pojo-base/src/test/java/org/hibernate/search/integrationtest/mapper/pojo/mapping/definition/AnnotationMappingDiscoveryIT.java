@@ -26,6 +26,7 @@ import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.IndexedEmbedded;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.MarkerBinding;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.PropertyBinding;
+import org.hibernate.search.mapper.pojo.mapping.definition.annotation.SearchEntity;
 import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.ProgrammaticMappingConfigurationContext;
 import org.hibernate.search.mapper.pojo.model.PojoModelProperty;
 import org.hibernate.search.util.impl.integrationtest.common.extension.BackendMock;
@@ -71,8 +72,6 @@ class AnnotationMappingDiscoveryIT {
 		setupHelper.start()
 				.expectCustomBeans()
 				.withConfiguration( builder -> {
-					builder.addEntityType( IndexedEntity.class );
-
 					// Do not register NonExplicitlyRegistered* types, they should be discovered automatically if required
 					builder.annotationMapping().add( IndexedEntity.class );
 
@@ -110,7 +109,6 @@ class AnnotationMappingDiscoveryIT {
 		setupHelper.start()
 				.withConfiguration( builder -> {
 					builder.annotationMapping().discoverAnnotationsFromReferencedTypes( false );
-					builder.addEntityType( IndexedEntity.class );
 
 					// Do not register NonExplicitlyRegistered* types, they should be discovered automatically if required
 					builder.annotationMapping().add( IndexedEntity.class );
@@ -135,6 +133,7 @@ class AnnotationMappingDiscoveryIT {
 				.property( "alwaysPresent" ).genericField();
 	}
 
+	@SearchEntity
 	@Indexed(index = IndexedEntity.INDEX)
 	public static final class IndexedEntity {
 		public static final String INDEX = "IndexedEntity";

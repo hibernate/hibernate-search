@@ -39,6 +39,7 @@ import org.hibernate.search.mapper.pojo.standalone.loading.MassIdentifierLoader;
 import org.hibernate.search.mapper.pojo.standalone.loading.MassIdentifierSink;
 import org.hibernate.search.mapper.pojo.standalone.loading.MassLoadingOptions;
 import org.hibernate.search.mapper.pojo.standalone.loading.MassLoadingStrategy;
+import org.hibernate.search.mapper.pojo.standalone.loading.binding.EntityLoadingBinder;
 import org.hibernate.search.mapper.pojo.standalone.mapping.SearchMapping;
 import org.hibernate.search.mapper.pojo.standalone.massindexing.MassIndexer;
 import org.hibernate.search.util.common.SearchException;
@@ -888,9 +889,9 @@ public abstract class AbstractMassIndexingFailureIT {
 				.withPropertyRadical( EngineSettings.Radicals.BACKGROUND_FAILURE_HANDLER,
 						getBackgroundFailureHandlerReference() )
 				.withPropertyRadical( EngineSpiSettings.Radicals.THREAD_PROVIDER, threadSpy.getThreadProvider() )
-				.withConfiguration( b -> {
-					b.addEntityType( Book.class, c -> c.massLoadingStrategy( loadingStrategy ) );
-				} )
+				.withConfiguration( b -> b.programmaticMapping().type( Book.class )
+						.searchEntity()
+						.loadingBinder( (EntityLoadingBinder) ctx -> ctx.massLoadingStrategy( Book.class, loadingStrategy ) ) )
 				.setup( Book.class );
 
 		backendMock.verifyExpectationsMet();

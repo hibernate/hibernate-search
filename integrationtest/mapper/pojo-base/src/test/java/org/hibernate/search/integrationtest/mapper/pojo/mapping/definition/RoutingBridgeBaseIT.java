@@ -687,9 +687,8 @@ class RoutingBridgeBaseIT {
 		backendMock.expectSchema( INDEX_NAME, b -> {} );
 		SearchMapping mapping = setupHelper.start().expectCustomBeans()
 				.withConfiguration( builder -> {
-					builder.addEntityType( NotAnnotatedRoutedEntity.class );
-
 					TypeMappingStep entity = builder.programmaticMapping().type( NotAnnotatedRoutedEntity.class );
+					entity.searchEntity();
 					entity.indexed().index( INDEX_NAME ).routingBinder( new ParametricBinder(),
 							Collections.singletonMap( "modulus", 7 ) );
 					entity.property( "id" ).documentId();

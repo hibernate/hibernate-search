@@ -10,9 +10,17 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import org.hibernate.search.mapper.pojo.standalone.session.SearchSession;
 
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
 class JavaModulePathIT {
+
+	@BeforeAll
+	@AfterAll
+	static void clear() {
+		SimulatedDatastore.clear();
+	}
 
 	/*
 	 * Test that the service successfully uses Hibernate Search in the module path.

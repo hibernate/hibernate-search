@@ -64,7 +64,9 @@ class ConfiguringPropertiesInSearchMappingBuilderIT {
 			// Override the config value from the property file:
 			b.property(
 					StandalonePojoMapperSettings.MAPPING_CONFIGURER,
-					(StandalonePojoMappingConfigurer) context -> context.addEntityType( IndexedEntity.class )
+					(StandalonePojoMappingConfigurer) context -> context.programmaticMapping()
+							.type( IndexedEntity.class )
+							.searchEntity()
 			);
 		}, IndexedEntity.INDEX, IndexedEntity.class );
 	}
@@ -75,7 +77,9 @@ class ConfiguringPropertiesInSearchMappingBuilderIT {
 			// this should get overridden by the config value from the property file:
 			b.property(
 					StandalonePojoMapperSettings.MAPPING_CONFIGURER,
-					(StandalonePojoMappingConfigurer) context -> context.addEntityType( IndexedEntity.class )
+					(StandalonePojoMappingConfigurer) context -> context.programmaticMapping()
+							.type( IndexedEntity.class )
+							.searchEntity()
 			);
 			try ( Reader properties = new InputStreamReader(
 					getClass().getClassLoader().getResourceAsStream( "standalone-test.properties" ),
@@ -127,7 +131,7 @@ class ConfiguringPropertiesInSearchMappingBuilderIT {
 	public static class FileStandalonePojoMappingConfigurer implements StandalonePojoMappingConfigurer {
 		@Override
 		public void configure(StandalonePojoMappingConfigurationContext context) {
-			context.addEntityType( IndexedEntityFromFile.class );
+			context.programmaticMapping().type( IndexedEntityFromFile.class ).searchEntity();
 		}
 	}
 

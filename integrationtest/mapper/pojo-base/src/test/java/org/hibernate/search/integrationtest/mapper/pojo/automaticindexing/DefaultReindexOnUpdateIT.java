@@ -11,6 +11,7 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import java.lang.invoke.MethodHandles;
 
 import org.hibernate.search.mapper.pojo.automaticindexing.ReindexOnUpdate;
+import org.hibernate.search.mapper.pojo.mapping.definition.annotation.SearchEntity;
 import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.ProgrammaticMappingConfigurationContext;
 import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.TypeMappingStep;
 import org.hibernate.search.mapper.pojo.model.path.PojoModelPath;
@@ -64,9 +65,6 @@ class DefaultReindexOnUpdateIT {
 				.withConfiguration(
 						builder -> {
 							builder.defaultReindexOnUpdate( ReindexOnUpdate.DEFAULT );
-
-							builder.addEntityType( ParentEntity.class );
-							builder.addEntityType( ChildEntity.class );
 
 							ProgrammaticMappingConfigurationContext mappingDefinition = builder.programmaticMapping();
 							TypeMappingStep parentMapping = mappingDefinition.type( ParentEntity.class );
@@ -141,9 +139,6 @@ class DefaultReindexOnUpdateIT {
 						builder -> {
 							builder.defaultReindexOnUpdate( ReindexOnUpdate.DEFAULT );
 
-							builder.addEntityType( ParentEntity.class );
-							builder.addEntityType( ChildEntity.class );
-
 							ProgrammaticMappingConfigurationContext mappingDefinition = builder.programmaticMapping();
 							TypeMappingStep parentMapping = mappingDefinition.type( ParentEntity.class );
 							parentMapping.indexed();
@@ -195,9 +190,6 @@ class DefaultReindexOnUpdateIT {
 				.withConfiguration(
 						builder -> {
 							builder.defaultReindexOnUpdate( ReindexOnUpdate.NO );
-
-							builder.addEntityType( ParentEntity.class );
-							builder.addEntityType( ChildEntity.class );
 
 							ProgrammaticMappingConfigurationContext mappingDefinition = builder.programmaticMapping();
 							TypeMappingStep parentMapping = mappingDefinition.type( ParentEntity.class );
@@ -254,6 +246,7 @@ class DefaultReindexOnUpdateIT {
 		}
 	}
 
+	@SearchEntity
 	public static final class ParentEntity {
 
 		private Integer id;
@@ -262,6 +255,7 @@ class DefaultReindexOnUpdateIT {
 
 	}
 
+	@SearchEntity
 	public static final class ChildEntity {
 
 		public static final String INDEX = "IndexedEntity";

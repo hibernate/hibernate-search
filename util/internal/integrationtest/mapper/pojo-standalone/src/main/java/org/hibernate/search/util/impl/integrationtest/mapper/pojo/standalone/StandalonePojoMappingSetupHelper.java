@@ -166,26 +166,8 @@ public final class StandalonePojoMappingSetupHelper
 			return thisAsC();
 		}
 
-		public SetupContext withAnnotatedEntityType(Class<?> annotatedEntityType, String entityName) {
-			this.annotatedTypes.add( annotatedEntityType );
-			return withConfiguration( builder -> {
-				builder.addEntityType( annotatedEntityType, entityName );
-			} );
-		}
-
-		public SetupContext withAnnotatedEntityTypes(Class<?>... annotatedEntityTypes) {
-			return withAnnotatedEntityTypes( CollectionHelper.asLinkedHashSet( annotatedEntityTypes ) );
-		}
-
-		public SetupContext withAnnotatedEntityTypes(Set<Class<?>> annotatedEntityTypes) {
-			this.annotatedTypes.addAll( annotatedEntityTypes );
-			return withConfiguration( builder -> {
-				builder.addEntityTypes( annotatedEntityTypes );
-			} );
-		}
-
-		public SetupContext withAnnotatedTypes(Class<?>... annotatedTypes) {
-			return withAnnotatedTypes( CollectionHelper.asLinkedHashSet( annotatedTypes ) );
+		public SetupContext withAnnotatedTypes(Class<?>... annotatedEntityTypes) {
+			return withAnnotatedTypes( CollectionHelper.asLinkedHashSet( annotatedEntityTypes ) );
 		}
 
 		public SetupContext withAnnotatedTypes(Set<Class<?>> annotatedTypes) {
@@ -194,7 +176,14 @@ public final class StandalonePojoMappingSetupHelper
 		}
 
 		public SearchMapping setup(Class<?>... annotatedEntityTypes) {
-			return withAnnotatedEntityTypes( annotatedEntityTypes ).setup();
+			return withAnnotatedTypes( annotatedEntityTypes )
+					.withConfiguration( builder -> {
+						for ( Class<?> annotatedEntityType : annotatedEntityTypes ) {
+							builder.programmaticMapping().type( annotatedEntityType )
+									.searchEntity();
+						}
+					} )
+					.setup();
 		}
 
 		@Override

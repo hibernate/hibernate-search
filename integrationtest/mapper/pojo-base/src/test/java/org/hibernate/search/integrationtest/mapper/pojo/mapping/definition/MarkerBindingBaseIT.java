@@ -59,10 +59,9 @@ class MarkerBindingBaseIT {
 		backendMock.expectSchema( INDEX_NAME, b -> {} );
 		setupHelper.start()
 				.withConfiguration( builder -> {
-					builder.addEntityType( NonAnnotatedEntity.class );
-
 					TypeMappingStep indexedEntity = builder.programmaticMapping().type( NonAnnotatedEntity.class )
 							.binder( new ExtractTypeModelBinder() );
+					indexedEntity.searchEntity();
 					indexedEntity.indexed().index( INDEX_NAME );
 					indexedEntity.property( "id" ).documentId();
 					indexedEntity.property( "scale3Property" ).marker( new ParametricBinder(),

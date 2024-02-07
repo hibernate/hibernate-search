@@ -7,20 +7,19 @@
 package org.hibernate.search.integrationtest.mapper.pojo.testsupport.loading;
 
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 public class StubLoadingContext {
 
-	private final Map<PersistenceTypeKey<?, ?>, Map<?, ?>> persistenceMaps = new HashMap<>();
+	private final Map<PersistenceTypeKey<?, ?>, Map<?, ?>> persistenceMaps = new ConcurrentHashMap<>();
 
 	private final List<LoaderCall> loaderCalls = new ArrayList<>();
 
 	@SuppressWarnings("unchecked")
 	public <I, E> Map<I, E> persistenceMap(PersistenceTypeKey<E, I> key) {
-		return (Map<I, E>) persistenceMaps.computeIfAbsent( key, ignored -> new LinkedHashMap<>() );
+		return (Map<I, E>) persistenceMaps.computeIfAbsent( key, ignored -> new ConcurrentHashMap<>() );
 	}
 
 	public List<LoaderCall> loaderCalls() {

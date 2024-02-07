@@ -80,10 +80,14 @@ class DocumentIdDefaultBridgeBaseIT<I> {
 				indexModel -> this.index2Model = indexModel
 		);
 		mapping = setupHelper.start()
-				.withAnnotatedEntityType( expectations.getTypeWithIdentifierBridge1(),
-						DefaultIdentifierBridgeExpectations.TYPE_WITH_IDENTIFIER_BRIDGE_1_NAME )
-				.withAnnotatedEntityType( expectations.getTypeWithIdentifierBridge2(),
-						DefaultIdentifierBridgeExpectations.TYPE_WITH_IDENTIFIER_BRIDGE_2_NAME )
+				.withAnnotatedTypes( expectations.getTypeWithIdentifierBridge1(),
+						expectations.getTypeWithIdentifierBridge2() )
+				.withConfiguration( b -> {
+					b.programmaticMapping().type( expectations.getTypeWithIdentifierBridge1() )
+							.searchEntity().name( DefaultIdentifierBridgeExpectations.TYPE_WITH_IDENTIFIER_BRIDGE_1_NAME );
+					b.programmaticMapping().type( expectations.getTypeWithIdentifierBridge2() )
+							.searchEntity().name( DefaultIdentifierBridgeExpectations.TYPE_WITH_IDENTIFIER_BRIDGE_2_NAME );
+				} )
 				.setup();
 		backendMock.verifyExpectationsMet();
 	}

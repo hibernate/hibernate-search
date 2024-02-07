@@ -25,7 +25,7 @@ import org.hibernate.search.mapper.pojo.mapping.definition.annotation.IndexedEmb
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.ObjectPath;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.PropertyValue;
 import org.hibernate.search.mapper.pojo.standalone.loading.SelectionEntityLoader;
-import org.hibernate.search.mapper.pojo.standalone.loading.SelectionLoadingStrategy;
+import org.hibernate.search.mapper.pojo.standalone.loading.binding.EntityLoadingBinder;
 import org.hibernate.search.mapper.pojo.standalone.mapping.SearchMapping;
 import org.hibernate.search.mapper.pojo.standalone.session.SearchSession;
 import org.hibernate.search.util.impl.integrationtest.common.extension.BackendMock;
@@ -71,10 +71,13 @@ class PojoIndexingPlanBaseIT {
 		);
 
 		mapping = setupHelper.start()
-				.withConfiguration( builder -> builder
-						.addEntityType( IndexedEntity.class, context -> context
-								.selectionLoadingStrategy(
-										(SelectionLoadingStrategy<IndexedEntity>) (includedTypes, options) -> loaderMock ) ) )
+				.withConfiguration( b -> {
+					b.programmaticMapping().type( IndexedEntity.class )
+							.searchEntity()
+							.loadingBinder( (EntityLoadingBinder) context -> context
+									.selectionLoadingStrategy( IndexedEntity.class,
+											(includedTypes, options) -> loaderMock ) );
+				} )
 				.setup( IndexedEntity.class, ContainedEntity.class );
 
 		backendMock.verifyExpectationsMet();

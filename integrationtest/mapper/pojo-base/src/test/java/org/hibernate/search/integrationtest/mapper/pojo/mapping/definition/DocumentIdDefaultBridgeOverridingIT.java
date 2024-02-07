@@ -68,8 +68,11 @@ class DocumentIdDefaultBridgeOverridingIT<I> {
 				indexModel -> this.indexModel = indexModel
 		);
 		mapping = setupHelper.start()
-				.withAnnotatedEntityType( expectations.getTypeWithIdentifierBridge1(),
-						DefaultIdentifierBridgeExpectations.TYPE_WITH_IDENTIFIER_BRIDGE_1_NAME )
+				.withAnnotatedTypes( expectations.getTypeWithIdentifierBridge1() )
+				.withConfiguration( b -> {
+					b.programmaticMapping().type( expectations.getTypeWithIdentifierBridge1() )
+							.searchEntity().name( DefaultIdentifierBridgeExpectations.TYPE_WITH_IDENTIFIER_BRIDGE_1_NAME );
+				} )
 				// HERE we override the default bridge for the type being tested.
 				.withConfiguration( builder -> builder.bridges().exactType( typeDescriptor.getJavaType() )
 						.identifierBridge( new OverridingDefaultBridge( typeDescriptor ) ) )
