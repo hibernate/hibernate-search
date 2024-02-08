@@ -130,7 +130,7 @@ public class LuceneIndexRootBuilder extends AbstractLuceneIndexCompositeNodeBuil
 		LuceneIndexRoot rootNode = new LuceneIndexRoot( typeBuilder.build(), staticChildrenByName );
 		contributeChildren( rootNode, collector, staticChildrenByName );
 
-		return new LuceneIndexModel( indexName, mappedTypeName, identifier,
+		return new LuceneIndexModel( analysisDefinitionRegistry, indexName, mappedTypeName, identifier,
 				rootNode, staticFields, fieldTemplates, hasNestedDocument[0] );
 	}
 

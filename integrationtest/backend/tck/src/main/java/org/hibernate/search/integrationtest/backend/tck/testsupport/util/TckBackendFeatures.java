@@ -145,4 +145,7 @@ public abstract class TckBackendFeatures implements StubMappingBackendFeatures {
 		return true;
 	}
 
+	public boolean hasBuiltInAnalyzerDescriptorsAvailable() {
+		return true;
+	}
 }

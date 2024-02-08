@@ -10,7 +10,10 @@ import java.util.Collection;
 import java.util.Optional;
 import java.util.function.Function;
 
+import org.hibernate.search.engine.backend.analysis.AnalyzerDescriptor;
+import org.hibernate.search.engine.backend.analysis.NormalizerDescriptor;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaElement;
+import org.hibernate.search.util.common.annotation.Incubating;
 
 /**
  * A descriptor of an index, exposing in particular the available fields and their characteristics.
@@ -51,5 +54,35 @@ public interface IndexDescriptor {
 	 * @return A collection containing all fields.
 	 */
 	Collection<IndexFieldDescriptor> staticFields();
+
+	/**
+	 * Looks up the configured analyzers available to the index represented by this descriptor.
+	 *
+	 * @param name The name of the analyzer.
+	 * @return An {@link Optional#empty() empty optional} if there is no analyzer configured with the given name.
+	 */
+	@Incubating
+	Optional<? extends AnalyzerDescriptor> analyzer(String name);
+
+	/**
+	 * @return A collection of configured analyzer descriptors available to the index represented by this descriptor.
+	 */
+	@Incubating
+	Collection<? extends AnalyzerDescriptor> analyzers();
+
+	/**
+	 * Looks up the configured normalizers available to the index represented by this descriptor.
+	 *
+	 * @param name The name of the normalizer.
+	 * @return An {@link Optional#empty() empty optional} if there is no normalizer configured with the given name.
+	 */
+	@Incubating
+	Optional<? extends NormalizerDescriptor> normalizer(String name);
+
+	/**
+	 * @return A collection of configured normalizer descriptors available to the index represented by this descriptor.
+	 */
+	@Incubating
+	Collection<? extends NormalizerDescriptor> normalizers();
 
 }

@@ -15,6 +15,9 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 import java.util.stream.Collectors;
 
+import org.hibernate.search.engine.backend.analysis.AnalyzerDescriptor;
+import org.hibernate.search.engine.backend.analysis.NormalizerDescriptor;
+import org.hibernate.search.engine.backend.analysis.spi.AnalysisDescriptorRegistry;
 import org.hibernate.search.engine.backend.metamodel.IndexDescriptor;
 import org.hibernate.search.engine.backend.metamodel.IndexFieldDescriptor;
 import org.hibernate.search.engine.common.tree.spi.TreeNodeInclusion;
@@ -33,6 +36,7 @@ public abstract class AbstractIndexModel<
 		implements EventContextProvider, IndexDescriptor {
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
+	private final AnalysisDescriptorRegistry analysisDescriptorRegistry;
 	private final String hibernateSearchIndexName;
 	private final EventContext eventContext;
 
@@ -45,11 +49,12 @@ public abstract class AbstractIndexModel<
 	private final List<? extends AbstractIndexFieldTemplate<? super S, ? extends F, ? super R, ?>> fieldTemplates;
 	private final ConcurrentMap<String, F> dynamicFieldsCache = new ConcurrentHashMap<>();
 
-	public AbstractIndexModel(String hibernateSearchIndexName,
+	public AbstractIndexModel(AnalysisDescriptorRegistry analysisDescriptorRegistry, String hibernateSearchIndexName,
 			String mappedTypeName,
 			IndexIdentifier identifier,
 			R root, Map<String, F> staticFields,
 			List<? extends AbstractIndexFieldTemplate<? super S, ? extends F, ? super R, ?>> fieldTemplates) {
+		this.analysisDescriptorRegistry = analysisDescriptorRegistry;
 		this.hibernateSearchIndexName = hibernateSearchIndexName;
 		this.eventContext = EventContexts.fromIndexName( hibernateSearchIndexName );
 		this.mappedTypeName = mappedTypeName;
@@ -110,6 +115,26 @@ public abstract class AbstractIndexModel<
 	@Override
 	public final Collection<IndexFieldDescriptor> staticFields() {
 		return includedStaticFields;
+	}
+
+	@Override
+	public Optional<? extends AnalyzerDescriptor> analyzer(String name) {
+		return analysisDescriptorRegistry.analyzerDescriptor( name );
+	}
+
+	@Override
+	public Collection<? extends AnalyzerDescriptor> analyzers() {
+		return analysisDescriptorRegistry.analyzerDescriptors();
+	}
+
+	@Override
+	public Optional<? extends NormalizerDescriptor> normalizer(String name) {
+		return analysisDescriptorRegistry.normalizerDescriptor( name );
+	}
+
+	@Override
+	public Collection<? extends NormalizerDescriptor> normalizers() {
+		return analysisDescriptorRegistry.normalizerDescriptors();
 	}
 
 	public final String mappedTypeName() {

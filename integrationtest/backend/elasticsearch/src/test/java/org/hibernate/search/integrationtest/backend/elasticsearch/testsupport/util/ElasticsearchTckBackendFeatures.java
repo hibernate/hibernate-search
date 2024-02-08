@@ -279,4 +279,9 @@ public class ElasticsearchTckBackendFeatures extends TckBackendFeatures {
 				return true;
 		}
 	}
+
+	@Override
+	public boolean hasBuiltInAnalyzerDescriptorsAvailable() {
+		return false;
+	}
 }

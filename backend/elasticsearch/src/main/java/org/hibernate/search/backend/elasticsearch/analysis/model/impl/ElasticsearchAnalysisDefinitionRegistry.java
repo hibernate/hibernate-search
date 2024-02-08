@@ -7,16 +7,25 @@
 package org.hibernate.search.backend.elasticsearch.analysis.model.impl;
 
 import java.lang.invoke.MethodHandles;
+import java.util.Collection;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Optional;
+import java.util.Set;
 import java.util.TreeMap;
+import java.util.stream.Collectors;
 
+import org.hibernate.search.backend.elasticsearch.analysis.impl.ElasticsearchAnalysisDescriptor;
 import org.hibernate.search.backend.elasticsearch.logging.impl.Log;
 import org.hibernate.search.backend.elasticsearch.lowlevel.index.analysis.impl.AnalyzerDefinition;
 import org.hibernate.search.backend.elasticsearch.lowlevel.index.analysis.impl.CharFilterDefinition;
 import org.hibernate.search.backend.elasticsearch.lowlevel.index.analysis.impl.NormalizerDefinition;
 import org.hibernate.search.backend.elasticsearch.lowlevel.index.analysis.impl.TokenFilterDefinition;
 import org.hibernate.search.backend.elasticsearch.lowlevel.index.analysis.impl.TokenizerDefinition;
+import org.hibernate.search.engine.backend.analysis.AnalyzerDescriptor;
+import org.hibernate.search.engine.backend.analysis.NormalizerDescriptor;
+import org.hibernate.search.engine.backend.analysis.spi.AnalysisDescriptorRegistry;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
 /**
@@ -26,7 +35,7 @@ import org.hibernate.search.util.common.logging.impl.LoggerFactory;
  * (see {@link #getAnalyzerDefinitions} for instance).
  *
  */
-public final class ElasticsearchAnalysisDefinitionRegistry {
+public final class ElasticsearchAnalysisDefinitionRegistry implements AnalysisDescriptorRegistry {
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
@@ -110,4 +119,39 @@ public final class ElasticsearchAnalysisDefinitionRegistry {
 		return Collections.unmodifiableMap( charFilterDefinitions );
 	}
 
+	@Override
+	public Optional<? extends AnalyzerDescriptor> analyzerDescriptor(String name) {
+		if ( analyzerDefinitions.containsKey( name ) ) {
+			return Optional.of( new ElasticsearchAnalysisDescriptor( name ) );
+		}
+		else {
+			return Optional.empty();
+		}
+	}
+
+	@Override
+	public Collection<? extends AnalyzerDescriptor> analyzerDescriptors() {
+		Set<AnalyzerDescriptor> descriptors = new HashSet<>();
+		for ( String name : analyzerDefinitions.keySet() ) {
+			descriptors.add( new ElasticsearchAnalysisDescriptor( name ) );
+		}
+		return Collections.unmodifiableSet( descriptors );
+	}
+
+	@Override
+	public Optional<? extends NormalizerDescriptor> normalizerDescriptor(String name) {
+		if ( normalizerDefinitions.containsKey( name ) ) {
+			return Optional.of( new ElasticsearchAnalysisDescriptor( name ) );
+		}
+		else {
+			return Optional.empty();
+		}
+	}
+
+	@Override
+	public Collection<? extends NormalizerDescriptor> normalizerDescriptors() {
+		return normalizerDefinitions.keySet().stream()
+				.map( ElasticsearchAnalysisDescriptor::new )
+				.collect( Collectors.toUnmodifiableSet() );
+	}
 }
