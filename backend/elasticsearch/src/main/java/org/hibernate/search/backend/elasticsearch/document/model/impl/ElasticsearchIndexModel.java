@@ -40,7 +40,8 @@ public class ElasticsearchIndexModel
 			PropertyMappingIndexSettingsContributor propertyMappingIndexSettingsContributor,
 			IndexSettings customIndexSettings,
 			RootTypeMapping mapping, RootTypeMapping customMapping) {
-		super( names.hibernateSearchIndex(), mappedTypeName, identifier, rootNode, staticFields, fieldTemplates );
+		super( analysisDefinitionRegistry, names.hibernateSearchIndex(), mappedTypeName, identifier, rootNode, staticFields,
+				fieldTemplates );
 		this.names = names;
 		this.analysisDefinitionRegistry = analysisDefinitionRegistry;
 		this.propertyMappingIndexSettingsContributor = propertyMappingIndexSettingsContributor;

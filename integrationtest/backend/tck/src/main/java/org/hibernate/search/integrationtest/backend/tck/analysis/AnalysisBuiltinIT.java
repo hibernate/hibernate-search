@@ -6,13 +6,17 @@
  */
 package org.hibernate.search.integrationtest.backend.tck.analysis;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.hibernate.search.util.impl.integrationtest.common.assertion.SearchResultAssert.assertThatQuery;
 
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.List;
 import java.util.function.Function;
 
+import org.hibernate.search.engine.backend.analysis.AnalyzerDescriptor;
 import org.hibernate.search.engine.backend.analysis.AnalyzerNames;
+import org.hibernate.search.engine.backend.analysis.NormalizerDescriptor;
 import org.hibernate.search.engine.backend.common.DocumentReference;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaElement;
 import org.hibernate.search.engine.search.query.SearchQuery;
@@ -20,6 +24,7 @@ import org.hibernate.search.integrationtest.backend.tck.testsupport.types.Keywor
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.SimpleFieldModel;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.TckBackendHelper;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.TckBackendSetupStrategy;
+import org.hibernate.search.integrationtest.backend.tck.testsupport.util.TckConfiguration;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.extension.SearchSetupHelper;
 import org.hibernate.search.util.impl.integrationtest.common.assertion.SearchResultAssert;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.SimpleMappedIndex;
@@ -44,10 +49,10 @@ class AnalysisBuiltinIT {
 		return Arrays.asList(
 				// Test with no analysis configurer whatsoever
 				Arguments.of( (Function<TckBackendHelper,
-						TckBackendSetupStrategy<?>>) TckBackendHelper::createAnalysisNotConfiguredBackendSetupStrategy ),
+						TckBackendSetupStrategy<?>>) TckBackendHelper::createAnalysisNotConfiguredBackendSetupStrategy, false ),
 				// Test with an analysis configurer that does not override the defaults but defines other analyzers
 				Arguments.of( (Function<TckBackendHelper,
-						TckBackendSetupStrategy<?>>) TckBackendHelper::createAnalysisCustomBackendSetupStrategy )
+						TckBackendSetupStrategy<?>>) TckBackendHelper::createAnalysisCustomBackendSetupStrategy, true )
 		);
 	}
 
@@ -55,10 +60,14 @@ class AnalysisBuiltinIT {
 	public static SearchSetupHelper setupHelper = SearchSetupHelper.create();
 	private final SimpleMappedIndex<IndexBinding> index = SimpleMappedIndex.of( IndexBinding::new );
 
+	private boolean hasCustomConfiguration;
+
 	@ParameterizedSetup
 	@MethodSource("params")
-	public void init(Function<TckBackendHelper, TckBackendSetupStrategy<?>> setupStrategyFunction) {
+	public void init(Function<TckBackendHelper, TckBackendSetupStrategy<?>> setupStrategyFunction,
+			boolean hasCustomConfiguration) {
 		setupHelper.start( setupStrategyFunction ).withIndex( index ).setup();
+		this.hasCustomConfiguration = hasCustomConfiguration;
 	}
 
 	@Test
@@ -185,6 +194,70 @@ class AnalysisBuiltinIT {
 
 		// as a keyword field, it will match only the whole text
 		assertMatchQuery( field, "two wôrds" ).hasDocRefHitsAnyOrder( index.typeName(), "6" );
+	}
+
+	@Test
+	void indexAnalyzerDescriptor() {
+		Collection<? extends AnalyzerDescriptor> analyzerDescriptors = index.toApi().descriptor().analyzers();
+		if ( TckConfiguration.get().getBackendFeatures().hasBuiltInAnalyzerDescriptorsAvailable() ) {
+			assertThat( analyzerDescriptors )
+					.isNotEmpty()
+					.extracting( AnalyzerDescriptor::name )
+					.contains(
+							AnalyzerNames.DEFAULT,
+							AnalyzerNames.STOP,
+							AnalyzerNames.KEYWORD,
+							AnalyzerNames.WHITESPACE,
+							AnalyzerNames.SIMPLE,
+							AnalyzerNames.STANDARD
+					);
+		}
+		else if ( !hasCustomConfiguration ) {
+			assertThat( analyzerDescriptors ).isEmpty();
+		}
+		// means we are testing with a second setup strategy that adds non-builtin analyzers:
+		if ( hasCustomConfiguration ) {
+			assertThat( analyzerDescriptors )
+					.extracting( AnalyzerDescriptor::name )
+					.contains(
+							AnalysisCustomIT.AnalysisDefinitions.ANALYZER_NOOP.name,
+							AnalysisCustomIT.AnalysisDefinitions.ANALYZER_WHITESPACE_LOWERCASE.name,
+							AnalysisCustomIT.AnalysisDefinitions.ANALYZER_PATTERNS_STOPWORD.name
+					);
+		}
+
+		for ( AnalyzerDescriptor descriptor : analyzerDescriptors ) {
+			assertThat( index.toApi().descriptor().analyzer( descriptor.name() ) )
+					.isPresent()
+					.get()
+					.isEqualTo( descriptor );
+		}
+	}
+
+	@Test
+	void indexNormalizerDescriptor() {
+		Collection<? extends NormalizerDescriptor> normalizerDescriptors = index.toApi().descriptor().normalizers();
+
+		// means we are testing with a second setup strategy that adds some normalizers:
+		if ( hasCustomConfiguration ) {
+			assertThat( normalizerDescriptors )
+					.extracting( NormalizerDescriptor::name )
+					.contains(
+							AnalysisCustomIT.AnalysisDefinitions.NORMALIZER_LOWERCASE.name,
+							AnalysisCustomIT.AnalysisDefinitions.NORMALIZER_NOOP.name,
+							AnalysisCustomIT.AnalysisDefinitions.NORMALIZER_PATTERN_REPLACING.name
+					);
+		}
+		else {
+			assertThat( normalizerDescriptors ).isEmpty();
+		}
+
+		for ( NormalizerDescriptor descriptor : normalizerDescriptors ) {
+			assertThat( index.toApi().descriptor().normalizer( descriptor.name() ) )
+					.isPresent()
+					.get()
+					.isEqualTo( descriptor );
+		}
 	}
 
 	private SearchResultAssert<DocumentReference> assertMatchQuery(SimpleFieldModel<String> fieldModel, String valueToMatch) {

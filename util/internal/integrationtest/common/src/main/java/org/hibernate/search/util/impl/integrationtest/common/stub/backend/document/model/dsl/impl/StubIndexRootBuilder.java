@@ -6,9 +6,15 @@
  */
 package org.hibernate.search.util.impl.integrationtest.common.stub.backend.document.model.dsl.impl;
 
+import java.util.Collection;
+import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.Optional;
 
+import org.hibernate.search.engine.backend.analysis.AnalyzerDescriptor;
+import org.hibernate.search.engine.backend.analysis.NormalizerDescriptor;
+import org.hibernate.search.engine.backend.analysis.spi.AnalysisDescriptorRegistry;
 import org.hibernate.search.engine.backend.document.model.dsl.spi.IndexRootBuilder;
 import org.hibernate.search.engine.backend.document.model.spi.IndexIdentifier;
 import org.hibernate.search.engine.backend.types.ObjectStructure;
@@ -83,7 +89,8 @@ public class StubIndexRootBuilder extends AbstractStubIndexCompositeNodeBuilder
 		type.apply( schemaDataNodeBuilder );
 		StubIndexRoot root = new StubIndexRoot( type, staticChildren, schemaDataNodeBuilder.build() );
 		contributeChildren( root, staticChildren, allFields::put );
-		return new StubIndexModel( indexName, mappedTypeName, identifier, root, allFields );
+		return new StubIndexModel( StubAnalysisDescriptorRegistry.REGISTRY, indexName, mappedTypeName, identifier, root,
+				allFields );
 	}
 
 	@Override
@@ -101,5 +108,29 @@ public class StubIndexRootBuilder extends AbstractStubIndexCompositeNodeBuilder
 
 	String getIndexName() {
 		return indexName;
+	}
+
+	private static class StubAnalysisDescriptorRegistry implements AnalysisDescriptorRegistry {
+		private static final StubAnalysisDescriptorRegistry REGISTRY = new StubAnalysisDescriptorRegistry();
+
+		@Override
+		public Optional<? extends AnalyzerDescriptor> analyzerDescriptor(String name) {
+			return Optional.empty();
+		}
+
+		@Override
+		public Collection<? extends AnalyzerDescriptor> analyzerDescriptors() {
+			return Collections.emptySet();
+		}
+
+		@Override
+		public Optional<? extends NormalizerDescriptor> normalizerDescriptor(String name) {
+			return Optional.empty();
+		}
+
+		@Override
+		public Collection<? extends NormalizerDescriptor> normalizerDescriptors() {
+			return Collections.emptySet();
+		}
 	}
 }

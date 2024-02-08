@@ -6,10 +6,13 @@
  */
 package org.hibernate.search.integrationtest.backend.tck.analysis;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.hibernate.search.util.impl.integrationtest.common.assertion.SearchResultAssert.assertThatQuery;
 
+import java.util.Collection;
 import java.util.function.Consumer;
 
+import org.hibernate.search.engine.backend.analysis.AnalyzerDescriptor;
 import org.hibernate.search.engine.backend.analysis.AnalyzerNames;
 import org.hibernate.search.engine.backend.common.DocumentReference;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaElement;
@@ -74,6 +77,29 @@ class AnalysisBuiltinOverrideIT {
 	@Test
 	void analyzer_keyword() {
 		verifyOverride( index.binding().keywordAnalyzer );
+	}
+
+	@Test
+	void indexAnalyzerDescriptor() {
+		Collection<? extends AnalyzerDescriptor> analyzerDescriptors = index.toApi().descriptor().analyzers();
+		assertThat( analyzerDescriptors )
+				.isNotEmpty()
+				.extracting( AnalyzerDescriptor::name )
+				.containsExactlyInAnyOrder(
+						AnalyzerNames.DEFAULT,
+						AnalyzerNames.STOP,
+						AnalyzerNames.KEYWORD,
+						AnalyzerNames.WHITESPACE,
+						AnalyzerNames.SIMPLE,
+						AnalyzerNames.STANDARD
+				);
+
+		for ( AnalyzerDescriptor descriptor : analyzerDescriptors ) {
+			assertThat( index.toApi().descriptor().analyzer( descriptor.name() ) )
+					.isPresent()
+					.get()
+					.isEqualTo( descriptor );
+		}
 	}
 
 	private void verifyOverride(SimpleFieldModel<String> field) {
