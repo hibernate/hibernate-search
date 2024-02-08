@@ -52,6 +52,14 @@ what are the analyzers/normalizer set on this field,
 each trait represents a predicate/sort/projection/aggregation
 that can be used on fields of that type.
 <10> Object fields can also be inspected.
+<11> A collection of all configured analyzers
+available for the index represented by the descriptor can also be inspected.
+<12> Alternatively, analyzer descriptors can be retrieved by name
+to see if a particular analyzer is available within the index context.
+<13> A collection of all configured normalizers
+available for the index represented by the descriptor can also be inspected.
+<14> Alternatively, normalizer descriptors can be retrieved by name
+to see if a particular normalizer is available within the index context.
 ====
 
 [TIP]
