@@ -1457,10 +1457,8 @@
                 </property>
             </activation>
             <properties>
-                <!-- We need net.bytebuddy.experimental=true to make BytecodeEnhancementIT and mockito-based tests pass -->
                 <surefire.jvm.args.java-version>
                     -Djdk.attach.allowAttachSelf=true
-                    -Dnet.bytebuddy.experimental=true
                 </surefire.jvm.args.java-version>
                 <!-- Spring Boot 3 isn't ready for JDK22 yet -->
                 <failsafe.spring.skip>true</failsafe.spring.skip>
