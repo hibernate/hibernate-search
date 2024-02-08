@@ -46,7 +46,7 @@ or <<mapping-custom-annotations-root,custom root mapping annotations>>.
 Without this scanning, Hibernate Search would learn about e.g. projection constructors too late
 (when the projection is actually executed) and would fail due to a lack of metadata.
 
-The scanning is backed by https://github.com/wildfly/jandex[Jandex], a library that indexes the content of JARs.
+The scanning is backed by https://smallrye.io/jandex/[Jandex], a library that indexes the content of JARs.
 
 [[mapping-classpath-scanning-dependencies]]
 === [[mapper-orm-mapping-configuration-scanning-dependencies]] Scanning dependencies of the application
@@ -76,7 +76,7 @@ This indexing should be reasonably short, but if it causes performance issues, y
 which among other things executes this part of Hibernate Search's startup at build time.
 * OR migrate your application to the <<compatibility-framework-wildfly,WildFly>> application server,
 which among other things executes this part of Hibernate Search's startup in a more optimized way.
-* OR execute the https://github.com/wildfly/jandex-maven-plugin[Jandex Maven Plugin]
+* OR execute the https://smallrye.io/jandex/[Jandex] Maven Plugin
 during the build of your application, so that indexes are already built when the application starts.
 * OR instruct Hibernate Search to never build Jandex indexes on startup,
 by setting the configuration property
