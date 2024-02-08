@@ -10,6 +10,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.fail;
 
 import java.sql.Date;
+import java.util.Collection;
 import java.util.Optional;
 import java.util.Set;
 
@@ -18,6 +19,8 @@ import jakarta.persistence.EntityManagerFactory;
 import org.hibernate.search.documentation.testsupport.BackendConfigurations;
 import org.hibernate.search.documentation.testsupport.DocumentationSetupHelper;
 import org.hibernate.search.engine.backend.Backend;
+import org.hibernate.search.engine.backend.analysis.AnalyzerDescriptor;
+import org.hibernate.search.engine.backend.analysis.NormalizerDescriptor;
 import org.hibernate.search.engine.backend.index.IndexManager;
 import org.hibernate.search.engine.backend.metamodel.IndexDescriptor;
 import org.hibernate.search.engine.backend.metamodel.IndexObjectFieldDescriptor;
@@ -139,6 +142,24 @@ class SearchMappingIndexedEntitiesIT {
 				// Etc.
 			}
 		} );
+
+		Collection<? extends AnalyzerDescriptor> analyzerDescriptors = indexDescriptor.analyzers(); // <11>
+		for ( AnalyzerDescriptor analyzerDescriptor : analyzerDescriptors ) {
+			String analyzerName = analyzerDescriptor.name();
+			// ...
+		}
+
+		Optional<? extends AnalyzerDescriptor> analyzerDescriptor = indexDescriptor.analyzer( "some-analyzer-name" ); // <12>
+		// ...
+
+		Collection<? extends NormalizerDescriptor> normalizerDescriptors = indexDescriptor.normalizers(); // <13>
+		for ( NormalizerDescriptor normalizerDescriptor : normalizerDescriptors ) {
+			String normalizerName = normalizerDescriptor.name();
+			// ...
+		}
+
+		Optional<? extends NormalizerDescriptor> normalizerDescriptor = indexDescriptor.normalizer( "some-normalizer-name" ); // <14>
+		// ...
 		//end::indexMetamodel[]
 	}
 
