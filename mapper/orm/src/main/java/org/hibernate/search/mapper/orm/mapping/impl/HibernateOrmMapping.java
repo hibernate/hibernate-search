@@ -216,8 +216,8 @@ public class HibernateOrmMapping extends AbstractPojoMappingImplementor<Hibernat
 	}
 
 	@Override
-	public <T> SearchScopeImpl<T> scope(Class<T> type) {
-		return scope( Collections.singleton( type ) );
+	public <T> SearchScopeImpl<T> scope(Class<T> clazz) {
+		return scope( Collections.singleton( clazz ) );
 	}
 
 	@Override
@@ -226,8 +226,8 @@ public class HibernateOrmMapping extends AbstractPojoMappingImplementor<Hibernat
 	}
 
 	@Override
-	public <T> SearchScopeImpl<T> scope(Collection<? extends Class<? extends T>> types) {
-		return createScope( types );
+	public <T> SearchScopeImpl<T> scope(Collection<? extends Class<? extends T>> classes) {
+		return createScope( classes );
 	}
 
 	@Override

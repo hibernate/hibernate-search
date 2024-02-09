@@ -98,9 +98,9 @@ public class StandalonePojoSearchSession extends AbstractPojoSearchSession
 	}
 
 	@Override
-	public MassIndexer massIndexer(Collection<? extends Class<?>> types) {
+	public MassIndexer massIndexer(Collection<? extends Class<?>> classes) {
 		checkOpenAndThrow();
-		return scope( types ).massIndexer( asSetIgnoreNull( this.tenantIdentifier() ) );
+		return scope( classes ).massIndexer( asSetIgnoreNull( this.tenantIdentifier() ) );
 	}
 
 	@Override
@@ -125,8 +125,8 @@ public class StandalonePojoSearchSession extends AbstractPojoSearchSession
 	}
 
 	@Override
-	public <T> SearchQuerySelectStep<?, EntityReference, T, ?, ?, ?> search(Collection<? extends Class<? extends T>> types) {
-		return search( scope( types ) );
+	public <T> SearchQuerySelectStep<?, EntityReference, T, ?, ?, ?> search(Collection<? extends Class<? extends T>> classes) {
+		return search( scope( classes ) );
 	}
 
 	@Override
@@ -135,13 +135,13 @@ public class StandalonePojoSearchSession extends AbstractPojoSearchSession
 	}
 
 	@Override
-	public SearchSchemaManager schemaManager(Collection<? extends Class<?>> types) {
-		return scope( types ).schemaManager();
+	public SearchSchemaManager schemaManager(Collection<? extends Class<?>> classes) {
+		return scope( classes ).schemaManager();
 	}
 
 	@Override
-	public SearchWorkspace workspace(Collection<? extends Class<?>> types) {
-		return scope( types ).workspace( tenantIdentifier() );
+	public SearchWorkspace workspace(Collection<? extends Class<?>> classes) {
+		return scope( classes ).workspace( tenantIdentifier() );
 	}
 
 	@Override

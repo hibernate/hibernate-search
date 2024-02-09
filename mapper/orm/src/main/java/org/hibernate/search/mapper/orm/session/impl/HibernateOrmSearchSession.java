@@ -141,8 +141,8 @@ public class HibernateOrmSearchSession extends AbstractPojoSearchSession
 			SearchLoadingOptionsStep,
 			?,
 			?> search(
-					Collection<? extends Class<? extends T>> types) {
-		return search( scope( types ) );
+					Collection<? extends Class<? extends T>> classes) {
+		return search( scope( classes ) );
 	}
 
 	@Override
@@ -167,24 +167,24 @@ public class HibernateOrmSearchSession extends AbstractPojoSearchSession
 	}
 
 	@Override
-	public SearchSchemaManager schemaManager(Collection<? extends Class<?>> types) {
-		return scope( types ).schemaManager();
+	public SearchSchemaManager schemaManager(Collection<? extends Class<?>> classes) {
+		return scope( classes ).schemaManager();
 	}
 
 	@Override
-	public SearchWorkspace workspace(Collection<? extends Class<?>> types) {
-		return scope( types ).workspace( tenantIdentifier() );
+	public SearchWorkspace workspace(Collection<? extends Class<?>> classes) {
+		return scope( classes ).workspace( tenantIdentifier() );
 	}
 
 	@Override
-	public MassIndexer massIndexer(Collection<? extends Class<?>> types) {
-		return scope( types ).massIndexer( asSetIgnoreNull( tenantIdentifier() ) );
+	public MassIndexer massIndexer(Collection<? extends Class<?>> classes) {
+		return scope( classes ).massIndexer( asSetIgnoreNull( tenantIdentifier() ) );
 	}
 
 	@Override
-	public <T> SearchScopeImpl<T> scope(Collection<? extends Class<? extends T>> types) {
+	public <T> SearchScopeImpl<T> scope(Collection<? extends Class<? extends T>> classes) {
 		checkOpen();
-		return mappingContext.createScope( types );
+		return mappingContext.createScope( classes );
 	}
 
 	@Override

@@ -50,8 +50,8 @@ public class DelegatingSearchSession implements SearchSession {
 			SearchLoadingOptionsStep,
 			?,
 			?> search(
-					Collection<? extends Class<? extends T>> types) {
-		return getDelegate().search( types );
+					Collection<? extends Class<? extends T>> classes) {
+		return getDelegate().search( classes );
 	}
 
 	@Override
@@ -67,23 +67,23 @@ public class DelegatingSearchSession implements SearchSession {
 	}
 
 	@Override
-	public SearchSchemaManager schemaManager(Collection<? extends Class<?>> types) {
-		return getDelegate().schemaManager( types );
+	public SearchSchemaManager schemaManager(Collection<? extends Class<?>> classes) {
+		return getDelegate().schemaManager( classes );
 	}
 
 	@Override
-	public SearchWorkspace workspace(Collection<? extends Class<?>> types) {
-		return getDelegate().workspace( types );
+	public SearchWorkspace workspace(Collection<? extends Class<?>> classes) {
+		return getDelegate().workspace( classes );
 	}
 
 	@Override
-	public MassIndexer massIndexer(Collection<? extends Class<?>> types) {
-		return getDelegate().massIndexer( types );
+	public MassIndexer massIndexer(Collection<? extends Class<?>> classes) {
+		return getDelegate().massIndexer( classes );
 	}
 
 	@Override
-	public <T> SearchScope<T> scope(Collection<? extends Class<? extends T>> types) {
-		return getDelegate().scope( types );
+	public <T> SearchScope<T> scope(Collection<? extends Class<? extends T>> classes) {
+		return getDelegate().scope( classes );
 	}
 
 	@Override
