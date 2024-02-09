@@ -10,7 +10,6 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 
-import jakarta.persistence.Entity;
 import jakarta.persistence.EntityManager;
 
 import org.hibernate.Session;
@@ -19,6 +18,7 @@ import org.hibernate.search.mapper.orm.mapping.SearchMapping;
 import org.hibernate.search.mapper.orm.massindexing.MassIndexer;
 import org.hibernate.search.mapper.orm.schema.management.SearchSchemaManager;
 import org.hibernate.search.mapper.orm.scope.SearchScope;
+import org.hibernate.search.mapper.orm.scope.SearchScopeProvider;
 import org.hibernate.search.mapper.orm.search.loading.dsl.SearchLoadingOptionsStep;
 import org.hibernate.search.mapper.orm.work.SearchIndexingPlan;
 import org.hibernate.search.mapper.orm.work.SearchWorkspace;
@@ -32,14 +32,15 @@ import org.hibernate.search.util.common.annotation.Incubating;
  * Provides entry points to Hibernate Search operations that involve indexing and searching,
  * and that make use of the ORM session.
  */
-public interface SearchSession {
+public interface SearchSession extends SearchScopeProvider {
 
 	/**
 	 * Initiate the building of a search query.
 	 * <p>
-	 * The query will target the indexes mapped to the given type, or to any of its sub-types.
+	 * The query will target the indexes mapped to
+	 * indexed entity types among the given class and its subtypes.
 	 *
-	 * @param type An indexed type, or a supertype of all indexed types that will be targeted by the search query.
+	 * @param clazz A class that must be an indexed entity type or a supertype of such type.
 	 * @param <T> An indexed type, or a supertype of all indexed types that will be targeted by the search query.
 	 * @return The initial step of a DSL where the search query can be defined.
 	 * @see SearchQuerySelectStep
@@ -50,16 +51,18 @@ public interface SearchSession {
 			T,
 			SearchLoadingOptionsStep,
 			?,
-			?> search(Class<T> type) {
-		return search( Collections.singleton( type ) );
+			?> search(Class<T> clazz) {
+		return search( Collections.singleton( clazz ) );
 	}
 
 	/**
 	 * Initiate the building of a search query.
 	 * <p>
-	 * The query will target the indexes mapped to the given types, or to any of their sub-types.
+	 * The query will target the indexes mapped to
+	 * indexed entity types among the given classes and their subtypes.
 	 *
-	 * @param types A collection of indexed types, or supertypes of all indexed types that will be targeted by the search query.
+	 * @param classes A collection of classes.
+	 * Each must be an indexed entity type or a supertype of such type.
 	 * @param <T> A supertype of all indexed types that will be targeted by the search query.
 	 * @return The initial step of a DSL where the search query can be defined.
 	 * @see SearchQuerySelectStep
@@ -70,8 +73,7 @@ public interface SearchSession {
 			T,
 			SearchLoadingOptionsStep,
 			?,
-			?> search(
-					Collection<? extends Class<? extends T>> types);
+			?> search(Collection<? extends Class<? extends T>> classes);
 
 	/**
 	 * Initiate the building of a search query.
@@ -101,22 +103,26 @@ public interface SearchSession {
 	}
 
 	/**
-	 * Create a {@link SearchSchemaManager} for the indexes mapped to the given type, or to any of its sub-types.
+	 * Create a {@link SearchSchemaManager} for the indexes mapped to
+	 * indexed entity types among the given classes and their subtypes.
 	 *
-	 * @param types One or more indexed types, or supertypes of all indexed types that will be targeted by the schema manager.
+	 * @param classes An array of classes.
+	 * Each must be an indexed entity type or a supertype of such type.
 	 * @return A {@link SearchSchemaManager}.
 	 */
-	default SearchSchemaManager schemaManager(Class<?>... types) {
-		return schemaManager( Arrays.asList( types ) );
+	default SearchSchemaManager schemaManager(Class<?>... classes) {
+		return schemaManager( Arrays.asList( classes ) );
 	}
 
 	/**
-	 * Create a {@link SearchSchemaManager} for the indexes mapped to the given types, or to any of their sub-types.
+	 * Create a {@link SearchSchemaManager} for the indexes mapped to
+	 * indexed entity types among the given classes and their subtypes.
 	 *
-	 * @param types A collection of indexed types, or supertypes of all indexed types that will be targeted by the schema manager.
+	 * @param classes A collection of classes.
+	 * Each must be an indexed entity type or a supertype of such type.
 	 * @return A {@link SearchSchemaManager}.
 	 */
-	SearchSchemaManager schemaManager(Collection<? extends Class<?>> types);
+	SearchSchemaManager schemaManager(Collection<? extends Class<?>> classes);
 
 	/**
 	 * Create a {@link SearchWorkspace} for the indexes mapped to all indexed types.
@@ -128,22 +134,26 @@ public interface SearchSession {
 	}
 
 	/**
-	 * Create a {@link SearchWorkspace} for the indexes mapped to the given type, or to any of its sub-types.
+	 * Create a {@link SearchWorkspace} for the indexes mapped to
+	 * indexed entity types among the given classes and their subtypes.
 	 *
-	 * @param types One or more indexed types, or supertypes of all indexed types that will be targeted by the workspace.
+	 * @param classes An array of classes.
+	 * Each must be an indexed entity type or a supertype of such type.
 	 * @return A {@link SearchWorkspace}.
 	 */
-	default SearchWorkspace workspace(Class<?>... types) {
-		return workspace( Arrays.asList( types ) );
+	default SearchWorkspace workspace(Class<?>... classes) {
+		return workspace( Arrays.asList( classes ) );
 	}
 
 	/**
-	 * Create a {@link SearchWorkspace} for the indexes mapped to the given types, or to any of their sub-types.
+	 * Create a {@link SearchWorkspace} for the indexes mapped to
+	 * indexed entity types among the given classes and their subtypes.
 	 *
-	 * @param types A collection of indexed types, or supertypes of all indexed types that will be targeted by the workspace.
+	 * @param classes A collection of classes.
+	 * Each must be an indexed entity type or a supertype of such type.
 	 * @return A {@link SearchWorkspace}.
 	 */
-	SearchWorkspace workspace(Collection<? extends Class<?>> types);
+	SearchWorkspace workspace(Collection<? extends Class<?>> classes);
 
 	/**
 	 * Creates a {@link MassIndexer} to rebuild the indexes of all indexed entity types.
@@ -157,70 +167,28 @@ public interface SearchSession {
 	}
 
 	/**
-	 * Creates a {@link MassIndexer} to rebuild the indexes mapped to the given types, or to any of their sub-types.
+	 * Creates a {@link MassIndexer} to rebuild the indexes mapped to
+	 * indexed entity types among the given classes and their subtypes.
 	 * <p>
 	 * {@link MassIndexer} instances cannot be reused.
 	 *
-	 * @param types An array of indexed types, or supertypes of all indexed types that will be targeted by the workspace.
+	 * @param classes An array of classes.
+	 * Each must be an indexed entity type or a supertype of such type.
 	 * @return The created mass indexer.
 	 */
-	default MassIndexer massIndexer(Class<?>... types) {
-		return massIndexer( Arrays.asList( types ) );
+	default MassIndexer massIndexer(Class<?>... classes) {
+		return massIndexer( Arrays.asList( classes ) );
 	}
 
 	/**
-	 * Creates a {@link MassIndexer} to rebuild the indexes mapped to the given types, or to any of their sub-types.
+	 * Creates a {@link MassIndexer} to rebuild the indexes mapped to
+	 * indexed entity types among the given classes and their subtypes.
 	 *
-	 * @param types A collection of indexed types, or supertypes of all indexed types that will be targeted by the workspace.
-	 * @return A {@link SearchWorkspace}.
+	 * @param classes A collection of classes.
+	 * Each must be an indexed entity type or a supertype of such type.
+	 * @return The created mass indexer.
 	 */
-	MassIndexer massIndexer(Collection<? extends Class<?>> types);
-
-	/**
-	 * Create a {@link SearchScope} limited to the given type.
-	 *
-	 * @param type A type to include in the scope.
-	 * @param <T> A type to include in the scope.
-	 * @return The created scope.
-	 * @see SearchScope
-	 */
-	default <T> SearchScope<T> scope(Class<T> type) {
-		return scope( Collections.singleton( type ) );
-	}
-
-	/**
-	 * Create a {@link SearchScope} limited to the given types.
-	 *
-	 * @param types A collection of types to include in the scope.
-	 * @param <T> A supertype of all types to include in the scope.
-	 * @return The created scope.
-	 * @see SearchScope
-	 */
-	<T> SearchScope<T> scope(Collection<? extends Class<? extends T>> types);
-
-	/**
-	 * Create a {@link SearchScope} limited to entity types referenced by their name.
-	 *
-	 * @param expectedSuperType A supertype of all entity types to include in the scope.
-	 * @param entityName An entity name. See {@link Entity#name()}.
-	 * @param <T> A supertype of all entity types to include in the scope.
-	 * @return The created scope.
-	 * @see SearchScope
-	 */
-	default <T> SearchScope<T> scope(Class<T> expectedSuperType, String entityName) {
-		return scope( expectedSuperType, Collections.singleton( entityName ) );
-	}
-
-	/**
-	 * Create a {@link SearchScope} limited to entity types referenced by their name.
-	 *
-	 * @param expectedSuperType A supertype of all entity types to include in the scope.
-	 * @param entityNames A collection of entity names. See {@link Entity#name()}.
-	 * @param <T> A supertype of all entity types to include in the scope.
-	 * @return The created scope.
-	 * @see SearchScope
-	 */
-	<T> SearchScope<T> scope(Class<T> expectedSuperType, Collection<String> entityNames);
+	MassIndexer massIndexer(Collection<? extends Class<?>> classes);
 
 	/**
 	 * @return The indexing plan for this session, allowing to explicitly index entities or delete them from the index,
