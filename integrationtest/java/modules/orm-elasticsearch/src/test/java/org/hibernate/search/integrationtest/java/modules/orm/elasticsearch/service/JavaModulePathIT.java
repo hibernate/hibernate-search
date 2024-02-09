@@ -27,19 +27,20 @@ class JavaModulePathIT {
 		checkIsInModulePath( AuthorService.class );
 		checkIsInModulePath( Search.class );
 
-		AuthorService service = new AuthorService();
-		service.add( "foo" );
-		service.add( "bar" );
-		service.add( "foo bar" );
-		assertThat( service.search( "foo" ) ).hasSize( 2 );
+		try ( AuthorService service = new AuthorService() ) {
+			service.add( "foo" );
+			service.add( "bar" );
+			service.add( "foo bar" );
+			assertThat( service.search( "foo" ) ).hasSize( 2 );
 
-		assertThatThrownBy( service::triggerValidationFailure )
-				.isInstanceOf( SearchException.class )
-				.hasMessageContainingAll(
-						"Hibernate Search encountered failures during Schema management",
-						"attribute 'analyzer'",
-						"Invalid value. Expected 'default', actual is 'myAnalyzer'"
-				);
+			assertThatThrownBy( service::triggerValidationFailure )
+					.isInstanceOf( SearchException.class )
+					.hasMessageContainingAll(
+							"Hibernate Search encountered failures during Schema management",
+							"attribute 'analyzer'",
+							"Invalid value. Expected 'default', actual is 'myAnalyzer'"
+					);
+		}
 	}
 
 	private void checkIsInModulePath(Class<?> clazz) {

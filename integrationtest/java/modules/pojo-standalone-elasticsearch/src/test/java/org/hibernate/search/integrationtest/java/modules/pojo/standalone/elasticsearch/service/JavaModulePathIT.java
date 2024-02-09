@@ -33,11 +33,12 @@ class JavaModulePathIT {
 		checkIsInModulePath( AuthorService.class );
 		checkIsInModulePath( SearchMapping.class );
 
-		AuthorService service = new AuthorService();
-		service.add( "foo" );
-		service.add( "bar" );
-		service.add( "foo bar" );
-		assertThat( service.search( "foo" ) ).hasSize( 2 );
+		try ( AuthorService service = new AuthorService() ) {
+			service.add( "foo" );
+			service.add( "bar" );
+			service.add( "foo bar" );
+			assertThat( service.search( "foo" ) ).hasSize( 2 );
+		}
 	}
 
 	private void checkIsInModulePath(Class<?> clazz) {
