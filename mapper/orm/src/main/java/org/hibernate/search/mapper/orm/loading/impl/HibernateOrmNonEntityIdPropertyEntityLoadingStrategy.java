@@ -14,7 +14,7 @@ import java.util.stream.Collectors;
 import org.hibernate.mapping.PersistentClass;
 import org.hibernate.search.mapper.orm.common.impl.HibernateOrmUtils;
 import org.hibernate.search.mapper.orm.loading.spi.HibernateOrmEntityLoadingStrategy;
-import org.hibernate.search.mapper.orm.loading.spi.LoadingSessionContext;
+import org.hibernate.search.mapper.orm.loading.spi.HibernateOrmLoadingSessionContext;
 import org.hibernate.search.mapper.orm.loading.spi.MutableEntityLoadingOptions;
 import org.hibernate.search.mapper.orm.logging.impl.Log;
 import org.hibernate.search.mapper.orm.model.impl.DocumentIdSourceProperty;
@@ -98,7 +98,7 @@ public class HibernateOrmNonEntityIdPropertyEntityLoadingStrategy<E, I>
 	}
 
 	private PojoSelectionEntityLoader<E> doCreate(PojoLoadingTypeContext<? extends E> targetEntityTypeContext,
-			LoadingSessionContext sessionContext,
+			HibernateOrmLoadingSessionContext sessionContext,
 			EntityLoadingCacheLookupStrategy cacheLookupStrategy,
 			MutableEntityLoadingOptions loadingOptions) {
 		if ( !entityName.equals( targetEntityTypeContext.secondaryEntityName() ) ) {

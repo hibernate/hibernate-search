@@ -12,7 +12,7 @@ import org.hibernate.metamodel.MappingMetamodel;
 import org.hibernate.metamodel.mapping.EntityMappingType;
 import org.hibernate.search.mapper.orm.event.impl.HibernateOrmListenerTypeContext;
 import org.hibernate.search.mapper.orm.loading.spi.HibernateOrmEntityLoadingStrategy;
-import org.hibernate.search.mapper.orm.loading.spi.LoadingTypeContext;
+import org.hibernate.search.mapper.orm.loading.spi.HibernateOrmLoadingTypeContext;
 import org.hibernate.search.mapper.orm.model.impl.DocumentIdSourceProperty;
 import org.hibernate.search.mapper.orm.session.impl.HibernateOrmSessionTypeContext;
 import org.hibernate.search.mapper.pojo.loading.definition.spi.PojoEntityLoadingBindingContext;
@@ -26,7 +26,7 @@ import org.hibernate.search.mapper.pojo.model.spi.PojoTypeContext;
 
 abstract class AbstractHibernateOrmTypeContext<E>
 		implements PojoTypeContext<E>, HibernateOrmListenerTypeContext, HibernateOrmSessionTypeContext<E>,
-		LoadingTypeContext<E> {
+		HibernateOrmLoadingTypeContext<E> {
 
 	private final PojoRawTypeIdentifier<E> typeIdentifier;
 	private final PojoLoadingTypeContext<E> delegate;

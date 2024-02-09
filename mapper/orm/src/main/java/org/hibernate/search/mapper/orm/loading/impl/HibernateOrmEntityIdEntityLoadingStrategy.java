@@ -16,7 +16,7 @@ import org.hibernate.mapping.RootClass;
 import org.hibernate.metamodel.mapping.EntityMappingType;
 import org.hibernate.search.mapper.orm.common.impl.HibernateOrmUtils;
 import org.hibernate.search.mapper.orm.loading.spi.HibernateOrmEntityLoadingStrategy;
-import org.hibernate.search.mapper.orm.loading.spi.LoadingSessionContext;
+import org.hibernate.search.mapper.orm.loading.spi.HibernateOrmLoadingSessionContext;
 import org.hibernate.search.mapper.orm.loading.spi.MutableEntityLoadingOptions;
 import org.hibernate.search.mapper.orm.search.loading.EntityLoadingCacheLookupStrategy;
 import org.hibernate.search.mapper.pojo.loading.spi.PojoLoadingTypeContext;
@@ -95,7 +95,7 @@ public class HibernateOrmEntityIdEntityLoadingStrategy<E, I>
 	}
 
 	private PojoSelectionEntityLoader<?> doCreate(EntityMappingType entityMappingType,
-			LoadingSessionContext sessionContext, EntityLoadingCacheLookupStrategy cacheLookupStrategy,
+			HibernateOrmLoadingSessionContext sessionContext, EntityLoadingCacheLookupStrategy cacheLookupStrategy,
 			MutableEntityLoadingOptions loadingOptions) {
 		var session = sessionContext.session();
 		var sessionFactory = session.getSessionFactory();

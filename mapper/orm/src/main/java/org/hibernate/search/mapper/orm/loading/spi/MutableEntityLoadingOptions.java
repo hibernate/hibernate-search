@@ -18,7 +18,7 @@ public final class MutableEntityLoadingOptions {
 
 	private List<EntityGraphHint<?>> entityGraphHints;
 
-	public MutableEntityLoadingOptions(LoadingMappingContext mappingContext) {
+	public MutableEntityLoadingOptions(HibernateOrmLoadingMappingContext mappingContext) {
 		this.fetchSize = mappingContext.fetchSize();
 	}
 

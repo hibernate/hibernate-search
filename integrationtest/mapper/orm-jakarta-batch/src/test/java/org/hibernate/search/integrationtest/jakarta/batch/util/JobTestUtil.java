@@ -27,7 +27,7 @@ import org.hibernate.search.jakarta.batch.core.logging.impl.Log;
 import org.hibernate.search.jakarta.batch.core.massindexing.MassIndexingJob;
 import org.hibernate.search.jakarta.batch.core.massindexing.util.impl.EntityTypeDescriptor;
 import org.hibernate.search.mapper.orm.Search;
-import org.hibernate.search.mapper.orm.loading.spi.LoadingTypeContext;
+import org.hibernate.search.mapper.orm.loading.spi.HibernateOrmLoadingTypeContext;
 import org.hibernate.search.mapper.orm.mapping.SearchMapping;
 import org.hibernate.search.mapper.orm.session.SearchSession;
 import org.hibernate.search.mapper.orm.spi.BatchMappingContext;
@@ -150,7 +150,7 @@ public final class JobTestUtil {
 	public static EntityTypeDescriptor<?, ?> createEntityTypeDescriptor(EntityManagerFactory emf, Class<?> clazz) {
 		SearchMapping mapping = Search.mapping( emf );
 		BatchMappingContext mappingContext = (BatchMappingContext) mapping;
-		LoadingTypeContext<?> type = mappingContext.typeContextProvider()
+		HibernateOrmLoadingTypeContext<?> type = mappingContext.typeContextProvider()
 				.byEntityName().getOrFail( mapping.indexedEntity( clazz ).jpaName() );
 		return EntityTypeDescriptor.create( emf.unwrap( SessionFactoryImplementor.class ), type );
 	}

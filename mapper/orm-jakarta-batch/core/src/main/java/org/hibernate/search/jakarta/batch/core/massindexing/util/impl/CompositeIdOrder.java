@@ -18,7 +18,7 @@ import org.hibernate.metamodel.mapping.EntityIdentifierMapping;
 import org.hibernate.metamodel.mapping.ModelPart;
 import org.hibernate.metamodel.model.domain.NavigableRole;
 import org.hibernate.search.mapper.orm.loading.spi.ConditionalExpression;
-import org.hibernate.search.mapper.orm.loading.spi.LoadingTypeContext;
+import org.hibernate.search.mapper.orm.loading.spi.HibernateOrmLoadingTypeContext;
 
 /**
  * Order over multiple ID attributes.
@@ -49,7 +49,7 @@ public class CompositeIdOrder<E> implements IdOrder {
 	private final EntityIdentifierMapping idMapping;
 	private final EmbeddableMappingType idMappingType;
 
-	public CompositeIdOrder(LoadingTypeContext<E> type) {
+	public CompositeIdOrder(HibernateOrmLoadingTypeContext<E> type) {
 		this.idMapping = type.entityMappingType().getIdentifierMapping();
 		this.idMappingType = (EmbeddableMappingType) idMapping.getPartMappingType();
 	}
