@@ -24,7 +24,7 @@ class PojoEntityTypeAdditionalMetadataBuilder implements PojoAdditionalMetadataC
 
 	private String entityName;
 	private String secondaryEntityName;
-	private PojoPathDefinitionProvider pathDefinitionProvider;
+	private PojoPathDefinitionProvider pathDefinitionProvider = SimplePojoPathsDefinitionProvider.INSTANCE;
 	private String entityIdPropertyName;
 	private ParameterizedBeanReference<?> loadingBinderRef;
 
@@ -72,7 +72,7 @@ class PojoEntityTypeAdditionalMetadataBuilder implements PojoAdditionalMetadataC
 		return new PojoEntityTypeAdditionalMetadata(
 				entityName != null ? entityName : typeModel.typeIdentifier().javaClass().getSimpleName(),
 				secondaryEntityName,
-				pathDefinitionProvider != null ? pathDefinitionProvider : new SimplePojoPathsDefinitionProvider(),
+				pathDefinitionProvider,
 				Optional.ofNullable( entityIdPropertyName ),
 				loadingBinderRef
 		);
