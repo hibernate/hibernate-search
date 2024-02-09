@@ -25,6 +25,11 @@ import org.hibernate.search.mapper.pojo.model.path.spi.PojoPathDefinitionProvide
  */
 public class SimplePojoPathsDefinitionProvider implements PojoPathDefinitionProvider {
 
+	public static final SimplePojoPathsDefinitionProvider INSTANCE = new SimplePojoPathsDefinitionProvider();
+
+	private SimplePojoPathsDefinitionProvider() {
+	}
+
 	@Override
 	public List<String> preDefinedOrdinals() {
 		return Collections.emptyList(); // No pre-defined ordinals
