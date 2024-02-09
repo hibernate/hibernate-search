@@ -15,8 +15,6 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
 import java.util.Objects;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 import jakarta.persistence.Entity;
@@ -41,6 +39,10 @@ import org.hibernate.type.format.FormatMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
+
+import org.json.JSONException;
+import org.json.JSONObject;
+import org.skyscreamer.jsonassert.JSONParser;
 
 class JsonPropertyIT {
 
@@ -79,19 +81,20 @@ class JsonPropertyIT {
 						if ( charSequence == null ) {
 							return null;
 						}
-						JsonThing jsonThing = new JsonThing();
-						String json = charSequence.toString();
-						Matcher matcher = Pattern.compile(
-								"\\{\\s*\"content\":\\s*\"([\\w\\s]+)\",\\s*\"keyword\":\\s*\"(\\w+)\",\\s*\"numbers\":\\s*\\[((\\d+[,\\s]*)+)\\]\\s*\\}" )
-								.matcher( json );
-						if ( matcher.matches() ) {
-							jsonThing.setContent( matcher.group( 1 ) );
-							jsonThing.setKeyword( matcher.group( 2 ) );
-							jsonThing.setNumbers( Arrays.stream( matcher.group( 3 ).split( ",[ ]?" ) ).map( Integer::parseInt )
-									.collect( Collectors.toList() ) );
-						}
+						try {
+							JsonThing jsonThing = new JsonThing();
+							JSONObject object = (JSONObject) JSONParser.parseJSON( charSequence.toString() );
 
-						return (T) jsonThing;
+							jsonThing.setContent( object.getString( "content" ) );
+							jsonThing.setKeyword( object.getString( "keyword" ) );
+							jsonThing.setNumbers( Arrays.stream( object.getJSONArray( "numbers" ).join( "," ).split( "," ) )
+									.map( Integer::parseInt )
+									.collect( Collectors.toList() ) );
+							return (T) jsonThing;
+						}
+						catch (JSONException e) {
+							throw new RuntimeException( e );
+						}
 					}
 
 					@Override
