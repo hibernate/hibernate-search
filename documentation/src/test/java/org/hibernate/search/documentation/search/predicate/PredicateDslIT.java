@@ -877,7 +877,7 @@ class PredicateDslIT {
 		withinSearchSession( searchSession -> {
 			// tag::simpleQueryString-minimum-should-match[]
 			List<Book> hits = searchSession.search( Book.class )
-					.where( f -> f.queryString().field( "title" )
+					.where( f -> f.simpleQueryString().field( "title" )
 							.matching( "crime robot investigate automatic detective" )
 							.minimumShouldMatchNumber( 2 ) )
 					.fetchHits( 20 );
