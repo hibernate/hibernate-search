@@ -10,7 +10,7 @@ import org.hibernate.metamodel.mapping.EntityMappingType;
 import org.hibernate.search.mapper.pojo.loading.spi.PojoLoadingTypeContext;
 import org.hibernate.search.mapper.pojo.model.spi.PojoRawTypeIdentifier;
 
-public interface LoadingTypeContext<E> {
+public interface HibernateOrmLoadingTypeContext<E> {
 
 	/**
 	 * @return The name of the entity in the JPA metamodel.

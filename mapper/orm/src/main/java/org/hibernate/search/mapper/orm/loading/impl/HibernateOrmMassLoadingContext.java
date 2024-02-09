@@ -10,13 +10,13 @@ import java.util.Optional;
 
 import org.hibernate.CacheMode;
 import org.hibernate.search.mapper.orm.loading.spi.ConditionalExpression;
-import org.hibernate.search.mapper.orm.loading.spi.LoadingMappingContext;
+import org.hibernate.search.mapper.orm.loading.spi.HibernateOrmLoadingMappingContext;
 import org.hibernate.search.mapper.pojo.loading.spi.PojoLoadingTypeContext;
 import org.hibernate.search.mapper.pojo.massindexing.spi.PojoMassIndexingContext;
 
 public interface HibernateOrmMassLoadingContext extends PojoMassIndexingContext {
 
-	LoadingMappingContext mapping();
+	HibernateOrmLoadingMappingContext mapping();
 
 	/**
 	 * @return the transaction timeout

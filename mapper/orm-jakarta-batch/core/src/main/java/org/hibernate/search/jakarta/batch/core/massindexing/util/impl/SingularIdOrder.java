@@ -7,7 +7,7 @@
 package org.hibernate.search.jakarta.batch.core.massindexing.util.impl;
 
 import org.hibernate.search.mapper.orm.loading.spi.ConditionalExpression;
-import org.hibernate.search.mapper.orm.loading.spi.LoadingTypeContext;
+import org.hibernate.search.mapper.orm.loading.spi.HibernateOrmLoadingTypeContext;
 
 /**
  * Order over a single ID attribute.
@@ -21,7 +21,7 @@ public class SingularIdOrder<E> implements IdOrder {
 
 	private final String idPropertyName;
 
-	public SingularIdOrder(LoadingTypeContext<E> type) {
+	public SingularIdOrder(HibernateOrmLoadingTypeContext<E> type) {
 		this.idPropertyName = type.entityMappingType().getIdentifierMapping().getAttributeName();
 	}
 

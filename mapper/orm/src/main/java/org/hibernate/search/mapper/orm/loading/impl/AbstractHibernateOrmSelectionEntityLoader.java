@@ -14,7 +14,7 @@ import org.hibernate.metamodel.mapping.EntityMappingType;
 import org.hibernate.query.Query;
 import org.hibernate.search.engine.common.timing.Deadline;
 import org.hibernate.search.mapper.orm.loading.spi.EntityGraphHint;
-import org.hibernate.search.mapper.orm.loading.spi.LoadingSessionContext;
+import org.hibernate.search.mapper.orm.loading.spi.HibernateOrmLoadingSessionContext;
 import org.hibernate.search.mapper.orm.loading.spi.MutableEntityLoadingOptions;
 import org.hibernate.search.mapper.orm.search.query.spi.HibernateOrmSearchQueryHints;
 import org.hibernate.search.mapper.pojo.loading.spi.PojoSelectionEntityLoader;
@@ -23,12 +23,12 @@ abstract class AbstractHibernateOrmSelectionEntityLoader<E> implements PojoSelec
 	protected static final String IDS_PARAMETER_NAME = "ids";
 
 	protected final EntityMappingType entityMappingType;
-	protected final LoadingSessionContext sessionContext;
+	protected final HibernateOrmLoadingSessionContext sessionContext;
 	protected final MutableEntityLoadingOptions loadingOptions;
 	protected final TypeQueryFactory<E, ?> queryFactory;
 
 	public AbstractHibernateOrmSelectionEntityLoader(EntityMappingType entityMappingType, TypeQueryFactory<E, ?> queryFactory,
-			LoadingSessionContext sessionContext, MutableEntityLoadingOptions loadingOptions) {
+			HibernateOrmLoadingSessionContext sessionContext, MutableEntityLoadingOptions loadingOptions) {
 		this.entityMappingType = entityMappingType;
 		this.sessionContext = sessionContext;
 		this.loadingOptions = loadingOptions;

@@ -21,7 +21,7 @@ import org.hibernate.search.jakarta.batch.core.context.jpa.spi.EntityManagerFact
 import org.hibernate.search.jakarta.batch.core.logging.impl.Log;
 import org.hibernate.search.jakarta.batch.core.massindexing.impl.JobContextData;
 import org.hibernate.search.mapper.orm.Search;
-import org.hibernate.search.mapper.orm.loading.spi.LoadingTypeContext;
+import org.hibernate.search.mapper.orm.loading.spi.HibernateOrmLoadingTypeContext;
 import org.hibernate.search.mapper.orm.spi.BatchMappingContext;
 import org.hibernate.search.util.common.impl.StringHelper;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
@@ -85,7 +85,7 @@ public final class JobContextUtil {
 		BatchMappingContext mapping = (BatchMappingContext) Search.mapping( emf );
 		List<String> entityNamesToIndex = Arrays.asList( entityTypes.split( "," ) );
 
-		Set<LoadingTypeContext<?>> entityTypesToIndex = new LinkedHashSet<>();
+		Set<HibernateOrmLoadingTypeContext<?>> entityTypesToIndex = new LinkedHashSet<>();
 		for ( String s : entityNamesToIndex ) {
 			entityTypesToIndex.add( mapping.typeContextProvider().byEntityName().getOrFail( s ) );
 		}

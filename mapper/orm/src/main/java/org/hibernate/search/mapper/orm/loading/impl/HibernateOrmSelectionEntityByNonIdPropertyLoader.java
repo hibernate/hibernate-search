@@ -14,7 +14,7 @@ import java.util.Map;
 import org.hibernate.Hibernate;
 import org.hibernate.metamodel.mapping.EntityMappingType;
 import org.hibernate.query.Query;
-import org.hibernate.search.mapper.orm.loading.spi.LoadingSessionContext;
+import org.hibernate.search.mapper.orm.loading.spi.HibernateOrmLoadingSessionContext;
 import org.hibernate.search.mapper.orm.loading.spi.MutableEntityLoadingOptions;
 import org.hibernate.search.mapper.orm.logging.impl.Log;
 import org.hibernate.search.mapper.pojo.loading.spi.PojoLoadingTypeContext;
@@ -41,7 +41,7 @@ class HibernateOrmSelectionEntityByNonIdPropertyLoader<E> extends AbstractHibern
 			TypeQueryFactory<E, ?> queryFactory,
 			String documentIdSourcePropertyName,
 			ValueReadHandle<?> documentIdSourceHandle,
-			LoadingSessionContext sessionContext,
+			HibernateOrmLoadingSessionContext sessionContext,
 			MutableEntityLoadingOptions loadingOptions) {
 		super( entityMappingType, queryFactory, sessionContext, loadingOptions );
 		this.targetEntityTypeContext = targetEntityTypeContext;

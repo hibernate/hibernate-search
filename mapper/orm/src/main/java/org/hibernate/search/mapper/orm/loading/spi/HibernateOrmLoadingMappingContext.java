@@ -11,7 +11,7 @@ import jakarta.persistence.EntityManager;
 import org.hibernate.engine.spi.SessionFactoryImplementor;
 import org.hibernate.search.mapper.orm.search.loading.EntityLoadingCacheLookupStrategy;
 
-public interface LoadingMappingContext {
+public interface HibernateOrmLoadingMappingContext {
 
 	EntityLoadingCacheLookupStrategy cacheLookupStrategy();
 
@@ -19,6 +19,6 @@ public interface LoadingMappingContext {
 
 	SessionFactoryImplementor sessionFactory();
 
-	LoadingSessionContext sessionContext(EntityManager entityManager);
+	HibernateOrmLoadingSessionContext sessionContext(EntityManager entityManager);
 
 }

@@ -17,14 +17,14 @@ import org.hibernate.metamodel.mapping.EntityIdentifierMapping;
 import org.hibernate.query.SelectionQuery;
 import org.hibernate.search.mapper.orm.loading.spi.ConditionalExpression;
 import org.hibernate.search.mapper.orm.loading.spi.HibernateOrmEntityLoadingStrategy;
+import org.hibernate.search.mapper.orm.loading.spi.HibernateOrmLoadingTypeContext;
 import org.hibernate.search.mapper.orm.loading.spi.HibernateOrmQueryLoader;
-import org.hibernate.search.mapper.orm.loading.spi.LoadingTypeContext;
 import org.hibernate.search.mapper.pojo.model.spi.PojoRawTypeIdentifier;
 
 public class EntityTypeDescriptor<E, I> {
 
 	public static <E> EntityTypeDescriptor<E, ?> create(SessionFactoryImplementor sessionFactory,
-			LoadingTypeContext<E> type) {
+			HibernateOrmLoadingTypeContext<E> type) {
 		EntityIdentifierMapping identifierMapping = type.entityMappingType().getIdentifierMapping();
 		IdOrder idOrder;
 		if ( identifierMapping.getPartMappingType() instanceof EmbeddableMappingType ) {
@@ -37,11 +37,11 @@ public class EntityTypeDescriptor<E, I> {
 	}
 
 	private final SessionFactoryImplementor sessionFactory;
-	private final LoadingTypeContext<E> delegate;
+	private final HibernateOrmLoadingTypeContext<E> delegate;
 	private final HibernateOrmEntityLoadingStrategy<? super E, I> loadingStrategy;
 	private final IdOrder idOrder;
 
-	public EntityTypeDescriptor(SessionFactoryImplementor sessionFactory, LoadingTypeContext<E> delegate,
+	public EntityTypeDescriptor(SessionFactoryImplementor sessionFactory, HibernateOrmLoadingTypeContext<E> delegate,
 			HibernateOrmEntityLoadingStrategy<? super E, I> loadingStrategy, IdOrder idOrder) {
 		this.sessionFactory = sessionFactory;
 		this.delegate = delegate;

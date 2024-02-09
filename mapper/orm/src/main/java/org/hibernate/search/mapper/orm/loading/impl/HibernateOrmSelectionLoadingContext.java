@@ -14,8 +14,8 @@ import org.hibernate.engine.spi.SessionImplementor;
 import org.hibernate.graph.GraphSemantic;
 import org.hibernate.graph.RootGraph;
 import org.hibernate.search.mapper.orm.loading.spi.EntityGraphHint;
-import org.hibernate.search.mapper.orm.loading.spi.LoadingMappingContext;
-import org.hibernate.search.mapper.orm.loading.spi.LoadingSessionContext;
+import org.hibernate.search.mapper.orm.loading.spi.HibernateOrmLoadingMappingContext;
+import org.hibernate.search.mapper.orm.loading.spi.HibernateOrmLoadingSessionContext;
 import org.hibernate.search.mapper.orm.loading.spi.MutableEntityLoadingOptions;
 import org.hibernate.search.mapper.orm.logging.impl.Log;
 import org.hibernate.search.mapper.orm.search.loading.EntityLoadingCacheLookupStrategy;
@@ -30,7 +30,7 @@ public final class HibernateOrmSelectionLoadingContext implements PojoSelectionL
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
-	private final LoadingSessionContext sessionContext;
+	private final HibernateOrmLoadingSessionContext sessionContext;
 	private final MutableEntityLoadingOptions loadingOptions;
 	private final EntityLoadingCacheLookupStrategy cacheLookupStrategy;
 
@@ -55,7 +55,7 @@ public final class HibernateOrmSelectionLoadingContext implements PojoSelectionL
 		return sessionContext.runtimeIntrospector();
 	}
 
-	public LoadingSessionContext sessionContext() {
+	public HibernateOrmLoadingSessionContext sessionContext() {
 		return sessionContext;
 	}
 
@@ -73,12 +73,12 @@ public final class HibernateOrmSelectionLoadingContext implements PojoSelectionL
 
 	public static final class Builder
 			implements PojoSelectionLoadingContextBuilder<SearchLoadingOptionsStep>, SearchLoadingOptionsStep {
-		private final LoadingSessionContext sessionContext;
+		private final HibernateOrmLoadingSessionContext sessionContext;
 		private final MutableEntityLoadingOptions loadingOptions;
 		private EntityLoadingCacheLookupStrategy cacheLookupStrategy;
 
-		public Builder(LoadingMappingContext mappingContext,
-				LoadingSessionContext sessionContext) {
+		public Builder(HibernateOrmLoadingMappingContext mappingContext,
+				HibernateOrmLoadingSessionContext sessionContext) {
 			this.sessionContext = sessionContext;
 			this.loadingOptions = new MutableEntityLoadingOptions( mappingContext );
 			this.cacheLookupStrategy = mappingContext.cacheLookupStrategy();
