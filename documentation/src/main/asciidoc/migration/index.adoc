@@ -283,16 +283,62 @@ are backward-compatible with Hibernate Search {hibernateSearchPreviousStableVers
 [[api]]
 == API
 
-The https://hibernate.org/community/compatibility-policy/#code-categorization[API]
+All stable https://hibernate.org/community/compatibility-policy/#code-categorization[API]
 in Hibernate Search {hibernateSearchVersion}
 is backward-compatible with Hibernate Search {hibernateSearchPreviousStableVersionShort}.
+
+However, some *incubating* APIs changed:
+
+* `SearchMapping.builder(...)` in the Standalone POJO Mapper expects different arguments.
+See link:{hibernateSearchDocUrl}#mapper-pojo-standalone-startup[this section of the documentation] for usage.
+* `org.hibernate.search.mapper.pojo.standalone.mapping.metadata.EntityConfigurer`,
+`org.hibernate.search.mapper.pojo.standalone.mapping.metadata.EntityConfigurationContext`,
+as well as `StandalonePojoMappingConfigurationContext#addEntity(...)` methods have been deprecated.
++
+The Standalone POJO Mapper no longer expects entities and their loading strategies
+to be primarily defined using a link:{hibernateSearchDocUrl}#mapper-pojo-standalone-mapping-configurer[mapping configurer],
+but rather using the link:{hibernateSearchDocUrl}#mapping-entitydefinition-explicit[`@SearchEntity` annotation].
++
+Programmatic definition of entities is still available, but is now
+link:{hibernateSearchDocUrl}#mapping-entitydefinition-programmatic[fully integrated in the programmatic mapping API].
 
 [[spi]]
 == SPI
 
-The https://hibernate.org/community/compatibility-policy/#code-categorization[SPI]
+Most https://hibernate.org/community/compatibility-policy/#code-categorization[SPI]
 in Hibernate Search {hibernateSearchVersion}
 is backward-compatible with Hibernate Search {hibernateSearchPreviousStableVersionShort}.
+
+However, a few SPIs are not:
+
+* `org.hibernate.search.mapper.pojo.mapping.spi.PojoMappingDelegate.createPojoScope` has been deprecated.
++
+Consider taking advantage of `org.hibernate.search.mapper.pojo.mapping.spi.PojoMappingDelegate#createPojoScopeForClasses`
+or `org.hibernate.search.mapper.pojo.mapping.spi.PojoMappingDelegate.createPojoScopeForEntityNames`,
+which should greatly simplify the implementation of a mapper.
+* `markAsEntity(...)` and `markAsIndexed(...)` `org.hibernate.search.mapper.pojo.model.additionalmetadata.building.spi.PojoAdditionalMetadataCollectorTypeNode`
+have been deprecated in favor of methods with the same name but not taking any argument.
++
+Use methods in the returned `PojoAdditionalMetadataCollectorEntityTypeNode` and `PojoAdditionalMetadataCollectorIndexedTypeNode`
+to pass this information instead.
+* A few SPIs related to loading in `hibernate-search-mapper-pojo-base` have changed in https://github.com/hibernate/hibernate-search/pull/3954[pull request #3954].
++
+In particular, `pojo-base` now exposes entity definition APIs (including loading configuration),
+and handles most of the loading during search and mass indexing;
+mappers are only expected to implement `org.hibernate.search.mapper.pojo.mapping.building.spi.PojoTypeExtendedMappingCollector#applyLoadingBinder`
+to turn a user-provided (or mapper-provided) binder into loading strategies on startup.
++
+As a consequence, mappers are no longer expected to provide loading strategies at runtime,
+e.g. in `PojoMassIndexingContext`, and some SPI types/methods have been removed in that area.
++
+Loading strategy interfaces (`PojoSelectionLoadingStrategy`, `PojoMassLoadingStrategy`),
+experienced some changes as well, mostly to provide them with more context coming from the mapper,
+and to move them to the loading package (`org.hibernate.search.mapper.pojo.loading.spi`).
+* A few SPIs related to loading in the Hibernate ORM mapper have changed in https://github.com/hibernate/hibernate-search/pull/3954[pull request #3954].
+* Deprecated class `org.hibernate.search.mapper.pojo.model.path.spi.PojoPathsDefinition` has been removed.
+
+Feel free to https://hibernate.org/community/#contribute[reach out to the Hibernate Search team]
+if you integrate with those SPIs and need help upgrading.
 
 [[behavior]]
 == Behavior
