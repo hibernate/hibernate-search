@@ -202,7 +202,7 @@ in our case this will target both the `Associate` entity type and the `Manager` 
 it is possible to target entity types by their name.
 For <<mapper-orm,Hibernate ORM>> this would be the JPA entity name,
 and for the <<mapper-pojo-standalone,Standalone POJO Mapper>>
-this would be the name assigned to the entity type upon declaration in the <<mapper-pojo-standalone-startup,configurer>>.
+this would be the name assigned to the entity type upon <<mapping-entitydefinition,entity definition>>.
 In both cases, the entity name is the simple name of the Java class by default.
 <6> Passing `Object.class` will create a scope targeting every single indexed entity types.
 ====
@@ -224,7 +224,7 @@ in our case this will target both the `Associate` entity type and the `Manager` 
 it is possible to target entity types by their name.
 For <<mapper-orm,Hibernate ORM>> this would be the JPA entity name,
 and for the <<mapper-pojo-standalone,Standalone POJO Mapper>>
-this would be the name assigned to the entity type upon declaration in the <<mapper-pojo-standalone-startup,configurer>>.
+this would be the name assigned to the entity type upon <<mapping-entitydefinition,entity definition>>.
 In both cases, the entity name is the simple name of the Java class by default.
 <6> Passing `Object.class` will create a scope targeting every single indexed entity types.
 ====
