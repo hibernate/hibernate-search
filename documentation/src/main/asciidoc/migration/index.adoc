@@ -65,214 +65,11 @@ older indexes can be read from and written to without reindexing.
 [[outboxpolling]]
 === Outbox polling database tables
 
-If you use the incubating link:{hibernateSearchDocUrl}#coordination-outbox-polling[`outbox-polling` coordination strategy],
-you may be impacted by the changes to entity mapping for entities that represents the outbox event and agent,
-requiring database schema changes.
-
-Changes are only necessary if configuration properties `hibernate.search.coordination.entity.mapping.*.uuid_type` are not set or are set to `default`.
-If schema changes are not possible to apply at the moment, the following settings can be provided
-to specify the type to represent UUIDs in the database:
-
-[source, properties]
-----
-hibernate.search.coordination.entity.mapping.outboxevent.uuid_type=CHAR
-hibernate.search.coordination.entity.mapping.agent.uuid_type=CHAR
-----
-
-The default type for UUIDs in outbox-polling tables now match
-link:{hibernateDocUrl}#basic-uuid[the default type for UUIDs in Hibernate ORM].
-See suggested migration scripts:
-
-.Postgresql:
-[,sql]
-----
--- change outbox event `id` column type to uuid:
-alter table hsearch_outbox_event
-    alter column id TYPE uuid USING cast(id as uuid);
-
--- change agent `id` column type to uuid:
-alter table hsearch_agent
-    alter column id TYPE uuid USING cast(id as uuid);
-----
-
-.CockroachDB:
-[,sql]
-----
--- change outbox event `id` column type to uuid:
--- altering type directly is not supported: https://go.crdb.dev/issue-v/47636/v22.1
-alter table hsearch_outbox_event
-    add tmp uuid;
-update hsearch_outbox_event
-set tmp = cast(id as uuid)
-where 1 = 1;
-alter table hsearch_outbox_event
-    alter column tmp set not null;
-alter table hsearch_outbox_event
-    alter primary key using columns (tmp);
-alter table hsearch_outbox_event
-    drop column id;
-alter table hsearch_outbox_event
-    rename column tmp to id;
-
--- change agent `id` column type to char:
-alter table hsearch_agent
-    add tmp uuid;
-update hsearch_agent
-set tmp = cast(id as uuid)
-where 1 = 1;
-alter table hsearch_agent
-    alter column tmp set not null;
-alter table hsearch_agent
-    alter primary key using columns (tmp);
-alter table hsearch_agent
-    drop column id;
-alter table hsearch_agent
-    rename column tmp to id;
-----
-
-.MySQL:
-[,sql]
-----
--- change outbox event `id` column type to binary(16):
-alter table hsearch_outbox_event
-    add column tmp binary(16);
-update hsearch_outbox_event
-set tmp = UUID_TO_BIN(id)
-where 1 = 1;
-alter table hsearch_outbox_event
-    drop column id,
-    rename column tmp to id;
-alter table hsearch_outbox_event
-    add primary key (id);
-
--- change agent `id` column type to binary(16):
-alter table hsearch_agent
-    add column tmp binary(16);
-update hsearch_agent
-set tmp = UUID_TO_BIN(id)
-where 1 = 1;
-alter table hsearch_agent
-    drop column id,
-    rename column tmp to id;
-alter table hsearch_outbox_event
-    add primary key (id);
-----
-
-.MariaDB:
-[,sql]
-----
--- change outbox event `id` column type to uuid:
-alter table hsearch_outbox_event
-    modify column id uuid;
-
--- change agent `id` column type to uuid:
-alter table hsearch_agent
-    modify column id uuid;
-----
-
-.DB2:
-[,sql]
-----
--- change outbox event `id` column type to binary(16):
-alter table hsearch_outbox_event
-    drop primary key;
-alter table hsearch_outbox_event
-    drop column id;
-alter table hsearch_outbox_event
-    add column id binary(16);
-update hsearch_outbox_event
-set id = generate_unique()
-where 1 = 1;
-alter table hsearch_outbox_event
-    alter column id set not null;
--- make this call if the adding constraint fails:
-call sysproc.admin_cmd('reorg table hsearch_outbox_event');
-alter table hsearch_outbox_event
-    add constraint hsearch_outbox_event_pkey primary key (id);
-
--- change agent `id` column type to binary(16):
-alter table hsearch_agent
-    drop primary key;
-alter table hsearch_agent
-    drop column id;
-alter table hsearch_agent
-    add column id binary(16);
-update hsearch_agent
-set id = generate_unique()
-where 1 = 1;
-alter table hsearch_agent
-    alter column id set not null;
--- make this call if the adding constraint fails:
-call sysproc.admin_cmd('reorg table hsearch_agent');
-alter table hsearch_agent
-    add constraint hsearch_agent_pkey primary key (id);
-----
-
-.Oracle:
-[,sql]
-----
--- change outbox event `id` column type to raw:
-alter table hsearch_outbox_event
-    add tmp raw(16);
-update hsearch_outbox_event
-set tmp = SYS_GUID()
-where 1 = 1;
-alter table hsearch_outbox_event
-    modify tmp not null;
-alter table hsearch_outbox_event
-    drop column id;
-alter table hsearch_outbox_event
-    rename column tmp to id;
-alter table hsearch_outbox_event
-    add constraint hsearch_outbox_event_pkey primary key (id);
-
--- change agent `id` column type to raw:
-alter table hsearch_agent
-    add tmp raw(16);
-update hsearch_agent
-set tmp = SYS_GUID()
-where 1 = 1;
-alter table hsearch_agent
-    modify tmp not null;
-alter table hsearch_agent
-    drop column id;
-alter table hsearch_agent
-    rename column tmp to id;
-alter table hsearch_agent
-    add constraint hsearch_agent_pkey primary key (id);
-----
-
-.MSSQL:
-[,sql]
-----
--- change outbox event `id` column type to uniqueidentifier:
-alter table hsearch_outbox_event
-    drop constraint if exists hsearch_outbox_event_pkey;
-alter table hsearch_outbox_event
-    alter column id uniqueidentifier not null;
-alter table hsearch_outbox_event
-    add constraint hsearch_outbox_event_pkey primary key (id);
-
--- change agent `id` column type to uuid:
-alter table hsearch_agent
-    drop constraint if exists hsearch_agent_pkey;
-alter table hsearch_agent
-    alter column id uniqueidentifier not null;
-alter table hsearch_agent
-    add constraint hsearch_agent_pkey primary key (id);
-----
-
-.H2:
-[,sql]
-----
--- change outbox event `id` column type to uuid:
-alter table hsearch_outbox_event
-    alter column id uuid not null;
-
--- change agent `id` column type to uuid:
-alter table hsearch_agent
-    alter column id uuid not null;
-----
+The event and agent database tables used for
+link:https://docs.jboss.org/hibernate/search/{hibernateSearchVersionShort}/reference/en-US/html_single/#coordination-database-polling[outbox-polling]
+in Hibernate Search {hibernateSearchVersion}
+are backward-compatible with Hibernate Search {hibernateSearchPreviousStableVersionShort}:
+no database schema update is necessary for these tables.
 
 [[configuration]]
 == Configuration
@@ -283,62 +80,16 @@ are backward-compatible with Hibernate Search {hibernateSearchPreviousStableVers
 [[api]]
 == API
 
-All stable https://hibernate.org/community/compatibility-policy/#code-categorization[API]
+The https://hibernate.org/community/compatibility-policy/#code-categorization[API]
 in Hibernate Search {hibernateSearchVersion}
 is backward-compatible with Hibernate Search {hibernateSearchPreviousStableVersionShort}.
-
-However, some *incubating* APIs changed:
-
-* `SearchMapping.builder(...)` in the Standalone POJO Mapper expects different arguments.
-See link:{hibernateSearchDocUrl}#mapper-pojo-standalone-startup[this section of the documentation] for usage.
-* `org.hibernate.search.mapper.pojo.standalone.mapping.metadata.EntityConfigurer`,
-`org.hibernate.search.mapper.pojo.standalone.mapping.metadata.EntityConfigurationContext`,
-as well as `StandalonePojoMappingConfigurationContext#addEntity(...)` methods have been deprecated.
-+
-The Standalone POJO Mapper no longer expects entities and their loading strategies
-to be primarily defined using a link:{hibernateSearchDocUrl}#mapper-pojo-standalone-mapping-configurer[mapping configurer],
-but rather using the link:{hibernateSearchDocUrl}#mapping-entitydefinition-explicit[`@SearchEntity` annotation].
-+
-Programmatic definition of entities is still available, but is now
-link:{hibernateSearchDocUrl}#mapping-entitydefinition-programmatic[fully integrated in the programmatic mapping API].
 
 [[spi]]
 == SPI
 
-Most https://hibernate.org/community/compatibility-policy/#code-categorization[SPI]
+The https://hibernate.org/community/compatibility-policy/#code-categorization[SPI]
 in Hibernate Search {hibernateSearchVersion}
 is backward-compatible with Hibernate Search {hibernateSearchPreviousStableVersionShort}.
-
-However, a few SPIs are not:
-
-* `org.hibernate.search.mapper.pojo.mapping.spi.PojoMappingDelegate.createPojoScope` has been deprecated.
-+
-Consider taking advantage of `org.hibernate.search.mapper.pojo.mapping.spi.PojoMappingDelegate#createPojoScopeForClasses`
-or `org.hibernate.search.mapper.pojo.mapping.spi.PojoMappingDelegate.createPojoScopeForEntityNames`,
-which should greatly simplify the implementation of a mapper.
-* `markAsEntity(...)` and `markAsIndexed(...)` `org.hibernate.search.mapper.pojo.model.additionalmetadata.building.spi.PojoAdditionalMetadataCollectorTypeNode`
-have been deprecated in favor of methods with the same name but not taking any argument.
-+
-Use methods in the returned `PojoAdditionalMetadataCollectorEntityTypeNode` and `PojoAdditionalMetadataCollectorIndexedTypeNode`
-to pass this information instead.
-* A few SPIs related to loading in `hibernate-search-mapper-pojo-base` have changed in https://github.com/hibernate/hibernate-search/pull/3954[pull request #3954].
-+
-In particular, `pojo-base` now exposes entity definition APIs (including loading configuration),
-and handles most of the loading during search and mass indexing;
-mappers are only expected to implement `org.hibernate.search.mapper.pojo.mapping.building.spi.PojoTypeExtendedMappingCollector#applyLoadingBinder`
-to turn a user-provided (or mapper-provided) binder into loading strategies on startup.
-+
-As a consequence, mappers are no longer expected to provide loading strategies at runtime,
-e.g. in `PojoMassIndexingContext`, and some SPI types/methods have been removed in that area.
-+
-Loading strategy interfaces (`PojoSelectionLoadingStrategy`, `PojoMassLoadingStrategy`),
-experienced some changes as well, mostly to provide them with more context coming from the mapper,
-and to move them to the loading package (`org.hibernate.search.mapper.pojo.loading.spi`).
-* A few SPIs related to loading in the Hibernate ORM mapper have changed in https://github.com/hibernate/hibernate-search/pull/3954[pull request #3954].
-* Deprecated class `org.hibernate.search.mapper.pojo.model.path.spi.PojoPathsDefinition` has been removed.
-
-Feel free to https://hibernate.org/community/#contribute[reach out to the Hibernate Search team]
-if you integrate with those SPIs and need help upgrading.
 
 [[behavior]]
 == Behavior
