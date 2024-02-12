@@ -1,6 +1,30 @@
 Hibernate Search Changelog
 ==========================
 
+7.1.0.CR1 (2024-02-12)
+-------------------------
+
+** Improvement
+    * HSEARCH-5078 Upgrade to Hibernate ORM 6.4.4.Final
+    * HSEARCH-5077 Upgrade to Elasticsearch client 8.12.1 and test against Elasticsearch 8.12.1
+    * HSEARCH-5074 Upgrade JBeret to 2.2.1.Final
+    * HSEARCH-5073 Add minimum_should_match to simple query string predicate 
+    * HSEARCH-5071 Upgrade to Hibernate ORM 6.4.3.Final
+    * HSEARCH-5070 Update latexmath formulas in the documentation to correctly render in a PDF 
+    * HSEARCH-5069 Upgrade to Lucene 9.9.2
+    * HSEARCH-5068 Simplify entity registration in the Standalone POJO mapper
+    * HSEARCH-5067 Allow targeting entities by name in the Standalone POJO Mapper
+    * HSEARCH-5064 Integrate Elasticsearch's knn query introduced in 8.12
+    * HSEARCH-5020 Increase the max allowed dimension for a Lucene backend
+
+** New Feature
+    * HSEARCH-5079 Support `@IndexedEmbedded` on Hibernate ORM column mapped with `@JdbcTypeCode(SqlTypes.JSON)`
+    * HSEARCH-4563 queryString predicate for advanced, Lucene-syntax query strings
+
+** Task
+    * HSEARCH-5050 Update link to documentation for batch_fetch_size in Hibernate ORM 6.4+
+    * HSEARCH-5033 Better tests and documentation of limitations around nested fields for highlighting
+
 7.1.0.Alpha2 (2024-01-24)
 -------------------------
 
