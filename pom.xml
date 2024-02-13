@@ -341,10 +341,10 @@
 
         <!-- Asciidoctor -->
 
-        <version.asciidoctor.plugin>2.2.5</version.asciidoctor.plugin>
+        <version.asciidoctor.plugin>2.2.6</version.asciidoctor.plugin>
         <version.org.hibernate.infra.hibernate-asciidoctor-theme>2.0.0.Final</version.org.hibernate.infra.hibernate-asciidoctor-theme>
         <version.org.asciidoctor.asciidoctorj>2.5.11</version.org.asciidoctor.asciidoctorj>
-        <version.org.asciidoctor.asciidoctorj-pdf>2.3.10</version.org.asciidoctor.asciidoctorj-pdf>
+        <version.org.asciidoctor.asciidoctorj-pdf>2.3.12</version.org.asciidoctor.asciidoctorj-pdf>
 
         <!--
             Defines what to do with dependency management section of the flattened pom.
