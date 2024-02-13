@@ -27,7 +27,9 @@ public final class LuceneMigrationUtils {
 	}
 
 	public static Query toLuceneQuery(SearchPredicate predicate) {
-		return ( (LuceneSearchPredicate) predicate ).toQuery( PredicateRequestContext.root() );
+		// TODO: this util is for v5 predicates so we won't get a knn predicate here ...
+		//  and if we do, there will be an exception that user would need to report back so we can see what's their use case is...
+		return ( (LuceneSearchPredicate) predicate ).toQuery( PredicateRequestContext.withoutSession() );
 	}
 
 	public static Sort toLuceneSort(SearchSort sort) {
@@ -41,6 +43,12 @@ public final class LuceneMigrationUtils {
 			@Override
 			public void collectSortFields(SortField[] sortFields) {
 				Collections.addAll( result, sortFields );
+			}
+
+			@Override
+			public PredicateRequestContext toPredicateRequestContext(String absoluteNestedPath) {
+				// and if someone tries to access filter methods the sessionless context will take care of throwing an exception.
+				return PredicateRequestContext.withoutSession().withNestedPath( absoluteNestedPath );
 			}
 		};
 		( (LuceneSearchSort) sort ).toSortFields( collector );

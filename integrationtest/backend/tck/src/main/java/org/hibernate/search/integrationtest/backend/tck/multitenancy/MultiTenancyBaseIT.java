@@ -20,6 +20,7 @@ import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaElement
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaObjectField;
 import org.hibernate.search.engine.backend.types.ObjectStructure;
 import org.hibernate.search.engine.backend.types.Projectable;
+import org.hibernate.search.engine.backend.types.VectorSimilarity;
 import org.hibernate.search.engine.backend.work.execution.OperationSubmitter;
 import org.hibernate.search.engine.backend.work.execution.spi.IndexIndexingPlan;
 import org.hibernate.search.engine.search.query.SearchQuery;
@@ -55,6 +56,11 @@ class MultiTenancyBaseIT {
 	private static final Integer INTEGER_VALUE_3 = 3;
 	private static final Integer INTEGER_VALUE_4 = 4;
 	private static final Integer INTEGER_VALUE_5 = 5;
+
+	private static final float[] FLOATS_VALUE_1 = new float[] { 1.0f, 1.0f };
+	private static final float[] FLOATS_VALUE_2 = new float[] { -50.0f, -50.0f };
+	private static final float[] FLOATS_VALUE_3 = new float[] { 1000.0f, 1000.0f };
+	private static final float[] FLOATS_VALUE_4 = new float[] { 687.0f, 359.0f };
 
 	@RegisterExtension
 	public final SearchSetupHelper setupHelper = SearchSetupHelper.create();
@@ -371,24 +377,93 @@ class MultiTenancyBaseIT {
 						"A tenant identifier is expected, because multi-tenancy is enabled for this backend" );
 	}
 
+	@Test
+	void searchingForVectors_vectorCloseToTheOneForTenant() {
+		StubMappingScope scope = index.createScope();
+
+		SearchQuery<?> query = scope.query( tenant1SessionContext )
+				.where( f -> f.knn( 1 ).field( "floats" ).matching( FLOATS_VALUE_1 ) )
+				.toQuery();
+
+		assertThatQuery( query ).hasDocRefHitsAnyOrder( index.typeName(), DOCUMENT_ID_1 );
+	}
+
+	@Test
+	void searchingForVectors_moreElements() {
+		StubMappingScope scope = index.createScope();
+
+		SearchQuery<List<?>> query = scope.query( tenant2SessionContext )
+				.select( f -> f.composite(
+						f.id(),
+						f.field( "integer" )
+				) )
+				.where( f -> f.knn( 5 ).field( "floats" ).matching( FLOATS_VALUE_1 ) )
+				.toQuery();
+
+
+		assertThatQuery( query )
+				.hits().hasHitsAnyOrder(
+						List.of( DOCUMENT_ID_1, INTEGER_VALUE_3 ),
+						List.of( DOCUMENT_ID_2, INTEGER_VALUE_4 )
+				);
+	}
+
+	@Test
+	void searchingForVectors_vectorCloseToTheOneForOtherTenant() {
+		StubMappingScope scope = index.createScope();
+
+		SearchQuery<List<?>> query = scope.query( tenant1SessionContext )
+				.select( f -> f.composite(
+						f.id(),
+						f.field( "integer" )
+				) )
+				.where( f -> f.knn( 1 ).field( "floats" ).matching( FLOATS_VALUE_3 ) )
+				.toQuery();
+
+
+		assertThatQuery( query )
+				.hits().hasHitsAnyOrder( List.of( DOCUMENT_ID_1, INTEGER_VALUE_1 ) );
+	}
+
+	@Test
+	void searchingForVectors_nested_vectorCloseToTheOneForOtherTenant() {
+		StubMappingScope scope = index.createScope();
+
+		SearchQuery<List<?>> query = scope.query( tenant1SessionContext )
+				.select( f -> f.composite(
+						f.id(),
+						f.field( "integer" )
+				) )
+				.where( f -> f.knn( 1 ).field( "nestedObject.floats" ).matching( FLOATS_VALUE_3 ) )
+				.toQuery();
+
+
+		assertThatQuery( query )
+				.hits().hasHitsAnyOrder( List.of( DOCUMENT_ID_1, INTEGER_VALUE_1 ) );
+	}
+
 	private void initData() {
 		IndexIndexingPlan plan = index.createIndexingPlan( tenant1SessionContext );
 		plan.add( referenceProvider( DOCUMENT_ID_1 ), document -> {
 			document.addValue( index.binding().string, STRING_VALUE_1 );
 			document.addValue( index.binding().integer, INTEGER_VALUE_1 );
+			document.addValue( index.binding().floats, FLOATS_VALUE_1 );
 
 			DocumentElement nestedObject = document.addObject( index.binding().nestedObject.self );
 			nestedObject.addValue( index.binding().nestedObject.string, STRING_VALUE_1 );
 			nestedObject.addValue( index.binding().nestedObject.integer, INTEGER_VALUE_1 );
+			nestedObject.addValue( index.binding().nestedObject.floats, FLOATS_VALUE_1 );
 		} );
 
 		plan.add( referenceProvider( DOCUMENT_ID_2 ), document -> {
 			document.addValue( index.binding().string, STRING_VALUE_2 );
 			document.addValue( index.binding().integer, INTEGER_VALUE_2 );
+			document.addValue( index.binding().floats, FLOATS_VALUE_2 );
 
 			DocumentElement nestedObject = document.addObject( index.binding().nestedObject.self );
 			nestedObject.addValue( index.binding().nestedObject.string, STRING_VALUE_2 );
 			nestedObject.addValue( index.binding().nestedObject.integer, INTEGER_VALUE_2 );
+			nestedObject.addValue( index.binding().nestedObject.floats, FLOATS_VALUE_2 );
 		} );
 
 		plan.execute( OperationSubmitter.blocking() ).join();
@@ -397,19 +472,23 @@ class MultiTenancyBaseIT {
 		plan.add( referenceProvider( DOCUMENT_ID_1 ), document -> {
 			document.addValue( index.binding().string, STRING_VALUE_1 );
 			document.addValue( index.binding().integer, INTEGER_VALUE_3 );
+			document.addValue( index.binding().floats, FLOATS_VALUE_3 );
 
 			DocumentElement nestedObject = document.addObject( index.binding().nestedObject.self );
 			nestedObject.addValue( index.binding().nestedObject.string, STRING_VALUE_1 );
 			nestedObject.addValue( index.binding().nestedObject.integer, INTEGER_VALUE_3 );
+			nestedObject.addValue( index.binding().nestedObject.floats, FLOATS_VALUE_3 );
 		} );
 
 		plan.add( referenceProvider( DOCUMENT_ID_2 ), document -> {
 			document.addValue( index.binding().string, STRING_VALUE_2 );
 			document.addValue( index.binding().integer, INTEGER_VALUE_4 );
+			document.addValue( index.binding().floats, FLOATS_VALUE_4 );
 
 			DocumentElement nestedObject = document.addObject( index.binding().nestedObject.self );
 			nestedObject.addValue( index.binding().nestedObject.string, STRING_VALUE_2 );
 			nestedObject.addValue( index.binding().nestedObject.integer, INTEGER_VALUE_4 );
+			nestedObject.addValue( index.binding().nestedObject.floats, FLOATS_VALUE_4 );
 		} );
 
 		plan.execute( OperationSubmitter.blocking() ).join();
@@ -458,6 +537,7 @@ class MultiTenancyBaseIT {
 	private static class IndexBinding {
 		final IndexFieldReference<String> string;
 		final IndexFieldReference<Integer> integer;
+		final IndexFieldReference<float[]> floats;
 		final ObjectMapping nestedObject;
 
 		IndexBinding(IndexSchemaElement root) {
@@ -465,6 +545,8 @@ class MultiTenancyBaseIT {
 					.toReference();
 			integer = root.field( "integer", f -> f.asInteger().projectable( Projectable.YES ) )
 					.toReference();
+			floats = root.field( "floats", f -> f.asFloatVector().dimension( 2 ).vectorSimilarity( VectorSimilarity.L2 )
+					.projectable( Projectable.YES ) ).toReference();
 			IndexSchemaObjectField nestedObjectField =
 					root.objectField( "nestedObject", ObjectStructure.NESTED ).multiValued();
 			nestedObject = new ObjectMapping( nestedObjectField );
@@ -475,6 +557,7 @@ class MultiTenancyBaseIT {
 		final IndexObjectFieldReference self;
 		final IndexFieldReference<Integer> integer;
 		final IndexFieldReference<String> string;
+		final IndexFieldReference<float[]> floats;
 
 		ObjectMapping(IndexSchemaObjectField objectField) {
 			self = objectField.toReference();
@@ -482,6 +565,8 @@ class MultiTenancyBaseIT {
 					.toReference();
 			integer = objectField.field( "integer", f -> f.asInteger().projectable( Projectable.YES ) )
 					.toReference();
+			floats = objectField.field( "floats", f -> f.asFloatVector().dimension( 2 ).vectorSimilarity( VectorSimilarity.L2 )
+					.projectable( Projectable.YES ) ).toReference();
 		}
 	}
 }
