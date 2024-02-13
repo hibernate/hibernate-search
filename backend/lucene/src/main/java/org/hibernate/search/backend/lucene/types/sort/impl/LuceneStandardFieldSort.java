@@ -10,11 +10,13 @@ import java.lang.invoke.MethodHandles;
 import java.time.temporal.TemporalAccessor;
 
 import org.hibernate.search.backend.lucene.logging.impl.Log;
+import org.hibernate.search.backend.lucene.lowlevel.docvalues.impl.MultiValueMode;
 import org.hibernate.search.backend.lucene.search.common.impl.AbstractLuceneCodecAwareSearchQueryElementFactory;
 import org.hibernate.search.backend.lucene.search.common.impl.LuceneSearchIndexScope;
 import org.hibernate.search.backend.lucene.search.common.impl.LuceneSearchIndexValueFieldContext;
 import org.hibernate.search.backend.lucene.types.codec.impl.AbstractLuceneNumericFieldCodec;
 import org.hibernate.search.backend.lucene.types.codec.impl.LuceneStandardFieldCodec;
+import org.hibernate.search.backend.lucene.types.lowlevel.impl.LuceneNumericDomain;
 import org.hibernate.search.backend.lucene.types.sort.comparatorsource.impl.LuceneFieldComparatorSource;
 import org.hibernate.search.backend.lucene.types.sort.comparatorsource.impl.LuceneNumericFieldComparatorSource;
 import org.hibernate.search.backend.lucene.types.sort.comparatorsource.impl.LuceneTextFieldComparatorSource;
@@ -27,10 +29,11 @@ import org.hibernate.search.engine.search.sort.spi.FieldSortBuilder;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
 import org.apache.lucene.analysis.Analyzer;
+import org.apache.lucene.search.Query;
 import org.apache.lucene.search.SortField;
 import org.apache.lucene.util.BytesRef;
 
-public class LuceneStandardFieldSort extends AbstractLuceneDocumentValueSort {
+public abstract class LuceneStandardFieldSort extends AbstractLuceneDocumentValueSort {
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
@@ -103,16 +106,12 @@ public class LuceneStandardFieldSort extends AbstractLuceneDocumentValueSort {
 			}
 		}
 
-		@Override
-		public SearchSort build() {
-			return new LuceneStandardFieldSort( this );
-		}
-
 		protected Object encodeMissingAs(F converted) {
 			return codec.encode( converted );
 		}
 
-		protected final Object getEffectiveMissingValue() {
+		@SuppressWarnings("unchecked")
+		protected final E getEffectiveMissingValue() {
 			Object effectiveMissingValue;
 			if ( missingValue == SortMissingValue.MISSING_FIRST ) {
 				effectiveMissingValue = order == SortOrder.DESC
@@ -133,7 +132,7 @@ public class LuceneStandardFieldSort extends AbstractLuceneDocumentValueSort {
 			else {
 				effectiveMissingValue = missingValue;
 			}
-			return effectiveMissingValue;
+			return (E) effectiveMissingValue;
 		}
 	}
 
@@ -157,10 +156,27 @@ public class LuceneStandardFieldSort extends AbstractLuceneDocumentValueSort {
 		}
 
 		@Override
-		@SuppressWarnings("unchecked")
-		protected LuceneFieldComparatorSource toFieldComparatorSource() {
-			return new LuceneNumericFieldComparatorSource<>( nestedDocumentPath, codec.getDomain(),
-					(E) getEffectiveMissingValue(), getMultiValueMode(), getNestedFilter() );
+		public SearchSort build() {
+			return new NumericFieldSort<>( this );
+		}
+	}
+
+	private static class NumericFieldSort<E extends Number> extends LuceneStandardFieldSort {
+
+		private final LuceneNumericDomain<E> domain;
+		private final E effectiveMissingValue;
+
+		private NumericFieldSort(NumericFieldBuilder<?, E> builder) {
+			super( builder );
+			domain = builder.codec.getDomain();
+			effectiveMissingValue = builder.getEffectiveMissingValue();
+		}
+
+		@Override
+		protected LuceneFieldComparatorSource doCreateFieldComparatorSource(String nestedDocumentPath,
+				MultiValueMode multiValueMode, Query nestedFilter) {
+			return new LuceneNumericFieldComparatorSource<>(
+					nestedDocumentPath, domain, effectiveMissingValue, multiValueMode, nestedFilter );
 		}
 	}
 
@@ -202,18 +218,34 @@ public class LuceneStandardFieldSort extends AbstractLuceneDocumentValueSort {
 			}
 		}
 
-		@Override
-		protected LuceneFieldComparatorSource toFieldComparatorSource() {
-			return new LuceneTextFieldComparatorSource( nestedDocumentPath, missingValue,
-					getMultiValueMode(), getNestedFilter() );
-		}
-
 		private BytesRef normalize(String value) {
 			if ( value == null ) {
 				return null;
 			}
 			Analyzer searchAnalyzerOrNormalizer = field.type().searchAnalyzerOrNormalizer();
 			return searchAnalyzerOrNormalizer.normalize( absoluteFieldPath, value );
+		}
+
+		@Override
+		public SearchSort build() {
+			return new TextFieldSort( this );
+		}
+	}
+
+	private static class TextFieldSort extends LuceneStandardFieldSort {
+
+		private final Object effectiveMissingValue;
+
+		private TextFieldSort(TextFieldBuilder<?> builder) {
+			super( builder );
+			effectiveMissingValue = builder.missingValue;
+		}
+
+		@Override
+		protected LuceneFieldComparatorSource doCreateFieldComparatorSource(String nestedDocumentPath,
+				MultiValueMode multiValueMode, Query nestedFilter) {
+			return new LuceneTextFieldComparatorSource( nestedDocumentPath, effectiveMissingValue, multiValueMode,
+					nestedFilter );
 		}
 	}
 

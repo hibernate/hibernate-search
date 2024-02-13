@@ -97,7 +97,7 @@ public class LuceneSearchQueryBuilder<H> implements SearchQueryBuilder<H>, Lucen
 	@Override
 	public void predicate(SearchPredicate predicate) {
 		LuceneSearchPredicate lucenePredicate = LuceneSearchPredicate.from( scope, predicate );
-		this.luceneQuery = lucenePredicate.toQuery( PredicateRequestContext.root() );
+		this.luceneQuery = lucenePredicate.toQuery( PredicateRequestContext.withSession( scope, sessionContext ) );
 	}
 
 	@Override
@@ -195,6 +195,11 @@ public class LuceneSearchQueryBuilder<H> implements SearchQueryBuilder<H>, Lucen
 	}
 
 	@Override
+	public PredicateRequestContext toPredicateRequestContext(String absoluteNestedPath) {
+		return PredicateRequestContext.withSession( scope, sessionContext ).withNestedPath( absoluteNestedPath );
+	}
+
+	@Override
 	public LuceneSearchQuery<H> build() {
 		SearchLoadingContext<?> loadingContext = loadingContextBuilder.build();
 
@@ -222,7 +227,7 @@ public class LuceneSearchQueryBuilder<H> implements SearchQueryBuilder<H>, Lucen
 		}
 
 		LuceneSearchQueryRequestContext requestContext = new LuceneSearchQueryRequestContext(
-				sessionContext, loadingContext, definitiveLuceneQuery, luceneSort
+				scope, sessionContext, loadingContext, definitiveLuceneQuery, luceneSort
 		);
 
 		LuceneAbstractSearchHighlighter resolvedGlobalHighlighter =

@@ -10,6 +10,7 @@ import java.lang.invoke.MethodHandles;
 import java.lang.reflect.Array;
 
 import org.hibernate.search.backend.lucene.logging.impl.Log;
+import org.hibernate.search.backend.lucene.lowlevel.query.impl.Queries;
 import org.hibernate.search.backend.lucene.lowlevel.query.impl.VectorSimilarityFilterQuery;
 import org.hibernate.search.backend.lucene.search.common.impl.AbstractLuceneValueFieldSearchQueryElementFactory;
 import org.hibernate.search.backend.lucene.search.common.impl.LuceneSearchIndexScope;
@@ -47,22 +48,32 @@ public class LuceneKnnPredicate extends AbstractLuceneSingleFieldPredicate imple
 
 	@Override
 	protected Query doToQuery(PredicateRequestContext context) {
+
 		if ( vector instanceof byte[] ) {
 			byte[] byteVector = (byte[]) vector;
-			KnnByteVectorQuery query = new KnnByteVectorQuery(
-					absoluteFieldPath, byteVector, k, filter == null ? null : filter.toQuery( context ) );
+			KnnByteVectorQuery query = new KnnByteVectorQuery( absoluteFieldPath, byteVector, k, prepareFilter( context ) );
 			return similarity == null
 					? query
 					: VectorSimilarityFilterQuery.create( query, similarity, byteVector.length, similarityFunction );
 		}
 		if ( vector instanceof float[] ) {
-			KnnFloatVectorQuery query = new KnnFloatVectorQuery(
-					absoluteFieldPath, (float[]) vector, k, filter == null ? null : filter.toQuery( context ) );
+			KnnFloatVectorQuery query =
+					new KnnFloatVectorQuery( absoluteFieldPath, (float[]) vector, k, prepareFilter( context ) );
 			return similarity == null ? query : VectorSimilarityFilterQuery.create( query, similarity, similarityFunction );
 		}
 
 		throw new UnsupportedOperationException(
 				"Unknown vector type " + vector.getClass() + ". only byte[] and float[] vectors are supported." );
+	}
+
+	private Query prepareFilter(PredicateRequestContext context) {
+		Query tenantFilter = context.tenantFilterOrNull();
+		if ( tenantFilter != null ) {
+			return filter == null ? tenantFilter : Queries.boolFilter( filter.toQuery( context ), tenantFilter );
+		}
+		else {
+			return filter == null ? null : filter.toQuery( context );
+		}
 	}
 
 	public static class DefaultFactory<F>

@@ -18,20 +18,26 @@ import org.apache.lucene.search.Sort;
  */
 class LuceneSearchQueryRequestContext {
 
+	private final LuceneSearchQueryIndexScope<?> queryIndexScope;
 	private final BackendSessionContext sessionContext;
 	private final SearchLoadingContext<?> loadingContext;
 	private final Query luceneQuery;
 	private final Sort luceneSort;
 
 	LuceneSearchQueryRequestContext(
-			BackendSessionContext sessionContext,
+			LuceneSearchQueryIndexScope<?> queryIndexScope, BackendSessionContext sessionContext,
 			SearchLoadingContext<?> loadingContext,
 			Query luceneQuery,
 			Sort luceneSort) {
+		this.queryIndexScope = queryIndexScope;
 		this.sessionContext = sessionContext;
 		this.loadingContext = loadingContext;
 		this.luceneQuery = luceneQuery;
 		this.luceneSort = luceneSort;
+	}
+
+	public LuceneSearchQueryIndexScope<?> getQueryIndexScope() {
+		return queryIndexScope;
 	}
 
 	BackendSessionContext getSessionContext() {
