@@ -51,7 +51,7 @@ abstract class AbstractLuceneNestablePredicate extends AbstractLuceneSearchPredi
 		// We'll make sure to wrap it in nested predicates as appropriate in the next few lines,
 		// so that the Query is actually executed in this context.
 		PredicateRequestContext contextAfterImplicitNesting =
-				new PredicateRequestContext( expectedNestedPath );
+				context.withNestedPath( expectedNestedPath );
 
 		Query result = super.toQuery( contextAfterImplicitNesting );
 

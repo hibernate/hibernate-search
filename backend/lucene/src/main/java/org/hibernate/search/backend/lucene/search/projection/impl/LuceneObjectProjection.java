@@ -194,7 +194,9 @@ public class LuceneObjectProjection<E, V, P>
 				}
 				try {
 					filter = LuceneSearchPredicate.from( scope, node.queryElement( PredicateTypeKeys.EXISTS, scope ).build() )
-							.toQuery( PredicateRequestContext.root() );
+							// We are creating an exists predicate that does not need any session info,
+							//  hence it should be safe here to use the context without session:
+							.toQuery( PredicateRequestContext.withoutSession() );
 				}
 				catch (SearchException e) {
 					throw node.cannotUseQueryElement( ProjectionTypeKeys.OBJECT, e.getMessage(), e );

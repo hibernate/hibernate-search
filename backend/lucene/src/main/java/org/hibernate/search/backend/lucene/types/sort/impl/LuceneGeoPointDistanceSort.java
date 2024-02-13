@@ -9,6 +9,7 @@ package org.hibernate.search.backend.lucene.types.sort.impl;
 import java.lang.invoke.MethodHandles;
 
 import org.hibernate.search.backend.lucene.logging.impl.Log;
+import org.hibernate.search.backend.lucene.lowlevel.docvalues.impl.MultiValueMode;
 import org.hibernate.search.backend.lucene.search.common.impl.AbstractLuceneValueFieldSearchQueryElementFactory;
 import org.hibernate.search.backend.lucene.search.common.impl.LuceneSearchIndexScope;
 import org.hibernate.search.backend.lucene.search.common.impl.LuceneSearchIndexValueFieldContext;
@@ -22,14 +23,26 @@ import org.hibernate.search.engine.spatial.GeoPoint;
 import org.hibernate.search.util.common.AssertionFailure;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
+import org.apache.lucene.search.Query;
 import org.apache.lucene.util.SloppyMath;
 
 public class LuceneGeoPointDistanceSort extends AbstractLuceneDocumentValueSort {
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
+	private final double effectiveMissingValue;
+	private final GeoPoint center;
 
 	private LuceneGeoPointDistanceSort(Builder builder) {
 		super( builder );
+		effectiveMissingValue = builder.getEffectiveMissingValue();
+		center = builder.center;
+	}
+
+	@Override
+	protected LuceneFieldComparatorSource doCreateFieldComparatorSource(String nestedDocumentPath,
+			MultiValueMode multiValueMode, Query nestedFilter) {
+		return new LuceneGeoPointDistanceComparatorSource( nestedDocumentPath, center, effectiveMissingValue, multiValueMode,
+				nestedFilter );
 	}
 
 	public static class Factory
@@ -99,14 +112,7 @@ public class LuceneGeoPointDistanceSort extends AbstractLuceneDocumentValueSort 
 			return new LuceneGeoPointDistanceSort( this );
 		}
 
-		@Override
-		protected LuceneFieldComparatorSource toFieldComparatorSource() {
-			return new LuceneGeoPointDistanceComparatorSource( nestedDocumentPath, center, getEffectiveMissingValue(),
-					getMultiValueMode(), getNestedFilter()
-			);
-		}
-
-		protected final double getEffectiveMissingValue() {
+		private double getEffectiveMissingValue() {
 			if ( missingValue == null ) {
 				// missing value implicit distance (same as ES):
 				return Double.POSITIVE_INFINITY;
