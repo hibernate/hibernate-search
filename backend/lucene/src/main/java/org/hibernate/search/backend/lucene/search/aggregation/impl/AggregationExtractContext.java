@@ -8,7 +8,7 @@ package org.hibernate.search.backend.lucene.search.aggregation.impl;
 
 import org.hibernate.search.backend.lucene.lowlevel.collector.impl.CollectorKey;
 import org.hibernate.search.backend.lucene.lowlevel.join.impl.NestedDocsProvider;
-import org.hibernate.search.backend.lucene.search.extraction.impl.CollectorSet;
+import org.hibernate.search.backend.lucene.search.extraction.impl.HibernateSearchMultiCollectorManager;
 import org.hibernate.search.engine.backend.types.converter.runtime.FromDocumentValueConvertContext;
 
 import org.apache.lucene.index.IndexReader;
@@ -19,14 +19,14 @@ public class AggregationExtractContext {
 
 	private final IndexReader indexReader;
 	private final FromDocumentValueConvertContext fromDocumentValueConvertContext;
-	private final CollectorSet collectors;
+	private final HibernateSearchMultiCollectorManager.MultiCollectedResults multiCollectedResults;
 
 	public AggregationExtractContext(IndexReader indexReader,
 			FromDocumentValueConvertContext fromDocumentValueConvertContext,
-			CollectorSet collectors) {
+			HibernateSearchMultiCollectorManager.MultiCollectedResults multiCollectedResults) {
 		this.indexReader = indexReader;
 		this.fromDocumentValueConvertContext = fromDocumentValueConvertContext;
-		this.collectors = collectors;
+		this.multiCollectedResults = multiCollectedResults;
 	}
 
 	public IndexReader getIndexReader() {
@@ -37,8 +37,8 @@ public class AggregationExtractContext {
 		return fromDocumentValueConvertContext;
 	}
 
-	public <C extends Collector> C getCollector(CollectorKey<C> key) {
-		return collectors.get( key );
+	public <C extends Collector, T> T getFacets(CollectorKey<C, T> key) {
+		return multiCollectedResults.get( key );
 	}
 
 	public NestedDocsProvider createNestedDocsProvider(String nestedDocumentPath, Query nestedFilter) {

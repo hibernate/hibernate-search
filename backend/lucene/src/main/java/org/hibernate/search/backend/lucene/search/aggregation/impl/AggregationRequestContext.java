@@ -10,6 +10,7 @@ import org.hibernate.search.backend.lucene.lowlevel.collector.impl.CollectorFact
 import org.hibernate.search.backend.lucene.search.extraction.impl.ExtractionRequirements;
 
 import org.apache.lucene.search.Collector;
+import org.apache.lucene.search.CollectorManager;
 
 public final class AggregationRequestContext {
 
@@ -19,7 +20,8 @@ public final class AggregationRequestContext {
 		this.extractionRequirementsBuilder = extractionRequirementsBuilder;
 	}
 
-	public <C extends Collector> void requireCollector(CollectorFactory<C> collectorFactory) {
+	public <C extends Collector, T, CM extends CollectorManager<C, T>> void requireCollector(
+			CollectorFactory<C, T, CM> collectorFactory) {
 		extractionRequirementsBuilder.requireCollectorForAllMatchingDocs( collectorFactory );
 	}
 }
