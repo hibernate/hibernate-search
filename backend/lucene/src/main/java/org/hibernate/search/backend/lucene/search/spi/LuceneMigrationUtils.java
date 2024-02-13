@@ -14,7 +14,6 @@ import org.hibernate.search.backend.lucene.search.predicate.impl.LuceneSearchPre
 import org.hibernate.search.backend.lucene.search.predicate.impl.PredicateRequestContext;
 import org.hibernate.search.backend.lucene.search.sort.impl.LuceneSearchSort;
 import org.hibernate.search.backend.lucene.search.sort.impl.LuceneSearchSortCollector;
-import org.hibernate.search.backend.lucene.types.sort.comparatorsource.impl.LuceneFieldComparatorSource;
 import org.hibernate.search.engine.search.predicate.SearchPredicate;
 import org.hibernate.search.engine.search.sort.SearchSort;
 
@@ -36,11 +35,6 @@ public final class LuceneMigrationUtils {
 		LuceneSearchSortCollector collector = new LuceneSearchSortCollector() {
 			@Override
 			public void collectSortField(SortField sortField) {
-				result.add( sortField );
-			}
-
-			@Override
-			public void collectSortField(SortField sortField, LuceneFieldComparatorSource nestedFieldSort) {
 				result.add( sortField );
 			}
 
