@@ -13,9 +13,9 @@ import org.hibernate.search.backend.lucene.lowlevel.docvalues.impl.MultiValueMod
 import org.hibernate.search.backend.lucene.search.common.impl.LuceneSearchIndexScope;
 import org.hibernate.search.backend.lucene.search.common.impl.LuceneSearchIndexValueFieldContext;
 import org.hibernate.search.backend.lucene.search.predicate.impl.LuceneSearchPredicate;
-import org.hibernate.search.backend.lucene.search.predicate.impl.PredicateRequestContext;
 import org.hibernate.search.backend.lucene.search.sort.impl.AbstractLuceneReversibleSort;
 import org.hibernate.search.backend.lucene.search.sort.impl.LuceneSearchSortCollector;
+import org.hibernate.search.backend.lucene.search.sort.impl.SortRequestContext;
 import org.hibernate.search.backend.lucene.types.sort.comparatorsource.impl.LuceneFieldComparatorSource;
 import org.hibernate.search.engine.reporting.spi.EventContexts;
 import org.hibernate.search.engine.search.common.SortMode;
@@ -32,24 +32,45 @@ public abstract class AbstractLuceneDocumentValueSort extends AbstractLuceneReve
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
-	protected final SortField sortField;
+	private final String absoluteFieldPath;
+	private final LuceneSearchPredicate nestedFilter;
+	private final String nestedDocumentPath;
+	private final MultiValueMode multiValueMode;
 
 	protected AbstractLuceneDocumentValueSort(AbstractBuilder builder) {
 		super( builder );
-		LuceneFieldComparatorSource fieldComparatorSource = builder.toFieldComparatorSource();
-		sortField = new SortField( builder.absoluteFieldPath, fieldComparatorSource, order == SortOrder.DESC );
+		absoluteFieldPath = builder.absoluteFieldPath;
+		nestedFilter = builder.nestedFilter;
+		nestedDocumentPath = builder.nestedDocumentPath;
+		multiValueMode = builder.getMultiValueMode();
 	}
 
 	@Override
 	public void toSortFields(LuceneSearchSortCollector collector) {
+		var fieldComparatorSource = createFieldComparatorSource( collector );
+		var sortField = new SortField( this.absoluteFieldPath, fieldComparatorSource, order == SortOrder.DESC );
 		collector.collectSortField( sortField );
+	}
+
+	private LuceneFieldComparatorSource createFieldComparatorSource(LuceneSearchSortCollector collector) {
+		Query nestedFilter = getNestedFilter( collector );
+		return doCreateFieldComparatorSource( nestedDocumentPath, multiValueMode, nestedFilter );
+	}
+
+	protected abstract LuceneFieldComparatorSource doCreateFieldComparatorSource(String nestedDocumentPath,
+			MultiValueMode multiValueMode, Query nestedFilter);
+
+	private Query getNestedFilter(SortRequestContext context) {
+		return nestedFilter == null
+				? null
+				: nestedFilter.toQuery( context.toPredicateRequestContext( nestedDocumentPath ) );
 	}
 
 	public abstract static class AbstractBuilder extends AbstractLuceneReversibleSort.AbstractBuilder {
 		protected final String absoluteFieldPath;
 		protected final String nestedDocumentPath;
 		private SortMode mode;
-		protected Query nestedFilter;
+		protected LuceneSearchPredicate nestedFilter;
 
 		protected AbstractBuilder(LuceneSearchIndexScope<?> scope,
 				LuceneSearchIndexValueFieldContext<?> field) {
@@ -76,13 +97,10 @@ public abstract class AbstractLuceneDocumentValueSort extends AbstractLuceneReve
 			}
 			LuceneSearchPredicate luceneFilter = LuceneSearchPredicate.from( scope, filter );
 			luceneFilter.checkNestableWithin( nestedDocumentPath );
-			PredicateRequestContext filterContext = new PredicateRequestContext( nestedDocumentPath );
-			this.nestedFilter = luceneFilter.toQuery( filterContext );
+			this.nestedFilter = luceneFilter;
 		}
 
-		protected abstract LuceneFieldComparatorSource toFieldComparatorSource();
-
-		protected final MultiValueMode getMultiValueMode() {
+		private MultiValueMode getMultiValueMode() {
 			MultiValueMode multiValueMode;
 			if ( mode == null ) {
 				multiValueMode = order == SortOrder.DESC ? MultiValueMode.MAX : MultiValueMode.MIN;
@@ -109,10 +127,6 @@ public abstract class AbstractLuceneDocumentValueSort extends AbstractLuceneReve
 				}
 			}
 			return multiValueMode;
-		}
-
-		protected Query getNestedFilter() {
-			return nestedFilter;
 		}
 
 		protected final EventContext getEventContext() {

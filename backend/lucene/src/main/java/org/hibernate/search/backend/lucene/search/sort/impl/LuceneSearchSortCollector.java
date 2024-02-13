@@ -15,7 +15,7 @@ import org.apache.lucene.search.SortField;
  *
  * @see LuceneSearchSort#toSortFields(org.hibernate.search.backend.lucene.search.sort.impl.LuceneSearchSortCollector)
  */
-public interface LuceneSearchSortCollector {
+public interface LuceneSearchSortCollector extends SortRequestContext {
 
 	void collectSortField(SortField sortField);
 
