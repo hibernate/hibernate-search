@@ -32,7 +32,6 @@ import org.hibernate.search.backend.lucene.search.projection.impl.ProjectionRequ
 import org.hibernate.search.backend.lucene.search.query.LuceneSearchQuery;
 import org.hibernate.search.backend.lucene.search.sort.impl.LuceneSearchSort;
 import org.hibernate.search.backend.lucene.search.sort.impl.LuceneSearchSortCollector;
-import org.hibernate.search.backend.lucene.types.sort.comparatorsource.impl.LuceneFieldComparatorSource;
 import org.hibernate.search.backend.lucene.work.impl.LuceneWorkFactory;
 import org.hibernate.search.engine.backend.session.spi.BackendSessionContext;
 import org.hibernate.search.engine.search.aggregation.AggregationKey;
@@ -181,11 +180,6 @@ public class LuceneSearchQueryBuilder<H> implements SearchQueryBuilder<H>, Lucen
 			sortFields = new ArrayList<>( 5 );
 		}
 		sortFields.add( sortField );
-	}
-
-	@Override
-	public void collectSortField(SortField sortField, LuceneFieldComparatorSource nestedFieldSort) {
-		collectSortField( sortField );
 	}
 
 	@Override
