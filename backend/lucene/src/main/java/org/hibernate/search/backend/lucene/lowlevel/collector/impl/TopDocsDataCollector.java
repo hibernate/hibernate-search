@@ -12,6 +12,7 @@ import com.carrotsearch.hppc.IntObjectHashMap;
 import com.carrotsearch.hppc.IntObjectMap;
 
 import org.apache.lucene.index.LeafReaderContext;
+import org.apache.lucene.search.CollectorManager;
 import org.apache.lucene.search.ScoreMode;
 import org.apache.lucene.search.SimpleCollector;
 
@@ -22,9 +23,10 @@ import org.apache.lucene.search.SimpleCollector;
  */
 public class TopDocsDataCollector<T> extends SimpleCollector {
 
-	public interface Factory<T> extends CollectorKey<TopDocsDataCollector<T>> {
+	public interface Factory<T> extends CollectorKey<TopDocsDataCollector<T>, IntObjectMap<T>> {
 
-		TopDocsDataCollector<T> create(TopDocsDataCollectorExecutionContext context) throws IOException;
+		CollectorManager<TopDocsDataCollector<T>, IntObjectMap<T>> create(TopDocsDataCollectorExecutionContext context)
+				throws IOException;
 
 	}
 
@@ -62,7 +64,7 @@ public class TopDocsDataCollector<T> extends SimpleCollector {
 		return ScoreMode.COMPLETE_NO_SCORES;
 	}
 
-	public T get(int doc) {
-		return collected.get( doc );
+	public IntObjectMap<T> collected() {
+		return collected;
 	}
 }

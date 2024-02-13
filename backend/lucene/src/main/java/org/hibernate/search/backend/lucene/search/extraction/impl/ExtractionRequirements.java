@@ -7,6 +7,7 @@
 package org.hibernate.search.backend.lucene.search.extraction.impl;
 
 import java.io.IOException;
+import java.util.Collection;
 import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.Set;
@@ -18,15 +19,22 @@ import org.hibernate.search.backend.lucene.lowlevel.reader.impl.IndexReaderMetad
 import org.hibernate.search.engine.search.timeout.spi.TimeoutManager;
 
 import org.apache.lucene.search.Collector;
+import org.apache.lucene.search.CollectorManager;
+import org.apache.lucene.search.FieldDoc;
 import org.apache.lucene.search.IndexSearcher;
 import org.apache.lucene.search.MatchAllDocsQuery;
 import org.apache.lucene.search.Query;
+import org.apache.lucene.search.ScoreDoc;
 import org.apache.lucene.search.Sort;
 import org.apache.lucene.search.SortField;
+import org.apache.lucene.search.TopDocs;
 import org.apache.lucene.search.TopDocsCollector;
 import org.apache.lucene.search.TopFieldCollector;
+import org.apache.lucene.search.TopFieldCollectorManager;
+import org.apache.lucene.search.TopFieldDocs;
 import org.apache.lucene.search.TopScoreDocCollector;
-import org.apache.lucene.search.TotalHitCountCollector;
+import org.apache.lucene.search.TopScoreDocCollectorManager;
+import org.apache.lucene.search.TotalHitCountCollectorManager;
 
 /**
  * Regroups information about the data used as input of extraction (projections or aggregations):
@@ -35,7 +43,7 @@ import org.apache.lucene.search.TotalHitCountCollector;
 public final class ExtractionRequirements {
 
 	private final boolean requireScore;
-	private final Set<CollectorFactory<?>> requiredCollectorForAllMatchingDocsFactories;
+	private final Set<CollectorFactory<?, ?, ?>> requiredCollectorForAllMatchingDocsFactories;
 	private final StoredFieldsValuesDelegate.Factory storedFieldsSourceFactoryOrNull;
 
 	private ExtractionRequirements(Builder builder) {
@@ -45,7 +53,7 @@ public final class ExtractionRequirements {
 	}
 
 	public LuceneCollectors createCollectors(IndexSearcher indexSearcher, Query originalLuceneQuery, Sort sort,
-			IndexReaderMetadataResolver metadataResolver, int maxDocs, TimeoutManager timeoutManager,
+			IndexReaderMetadataResolver metadataResolver, int maxDocs, int offset, TimeoutManager timeoutManager,
 			int requestedTotalHitCountThreshold)
 			throws IOException {
 		// Necessary to unwrap boolean queries with a single clause, in particular:
@@ -63,19 +71,20 @@ public final class ExtractionRequirements {
 			totalHitCountThreshold = requestedTotalHitCountThreshold;
 		}
 
-		TopDocsCollector<?> topDocsCollector = null;
+		CollectorManager<? extends TopDocsCollector<?>, ? extends TopDocs> topDocsCollectorManager = null;
 		Integer scoreSortFieldIndexForRescoring = null;
 		boolean requireFieldDocRescoring = false;
 
 		CollectorExecutionContext executionContext =
 				new CollectorExecutionContext( metadataResolver, indexSearcher, maxDocs );
 
-		CollectorSet.Builder collectorsForAllMatchingDocsBuilder =
-				new CollectorSet.Builder( executionContext, timeoutManager );
+		HibernateSearchMultiCollectorManager.Builder collectorsForAllMatchingDocsBuilder =
+				new HibernateSearchMultiCollectorManager.Builder( executionContext, timeoutManager );
 
 		if ( maxDocs > 0 ) {
 			if ( sort == null || isDescendingScoreSort( sort ) ) {
-				topDocsCollector = TopScoreDocCollector.create( maxDocs, totalHitCountThreshold );
+				topDocsCollectorManager = new HibernateSearchTopScoreDocCollectorManager( offset, maxDocs, null,
+						totalHitCountThreshold, true );
 			}
 			else {
 				if ( requireScore ) {
@@ -86,21 +95,22 @@ public final class ExtractionRequirements {
 					// If there's a SCORE sort field, make sure we remember that, so that later we can optimize rescoring
 					scoreSortFieldIndexForRescoring = getScoreSortFieldIndexOrNull( sort );
 				}
-				topDocsCollector = TopFieldCollector.create( sort, maxDocs, totalHitCountThreshold );
+				topDocsCollectorManager = new HibernateSearchTopFieldCollectorManager( offset, sort, maxDocs, null,
+						totalHitCountThreshold, true );
 			}
-			collectorsForAllMatchingDocsBuilder.add( LuceneCollectors.TOP_DOCS_KEY, topDocsCollector );
+			collectorsForAllMatchingDocsBuilder.add( LuceneCollectors.TOP_DOCS_KEY, topDocsCollectorManager );
 		}
 
-		if ( topDocsCollector == null && totalHitCountThreshold > 0 ) {
+		if ( topDocsCollectorManager == null && totalHitCountThreshold > 0 ) {
 			// Normally the topDocsCollector collects the total hit count,
 			// but if it's not there and not all docs are matched, we need a separate collector.
 			// Note that adding this collector can have a significant cost in some situations
 			// (e.g. for queries matching many hits), so we only add it if it's really necessary.
-			TotalHitCountCollector totalHitCountCollector = new TotalHitCountCollector();
-			collectorsForAllMatchingDocsBuilder.add( LuceneCollectors.TOTAL_HIT_COUNT_KEY, totalHitCountCollector );
+			TotalHitCountCollectorManager totalHitCountCollectorManager = new TotalHitCountCollectorManager();
+			collectorsForAllMatchingDocsBuilder.add( LuceneCollectors.TOTAL_HIT_COUNT_KEY, totalHitCountCollectorManager );
 		}
 		collectorsForAllMatchingDocsBuilder.addAll( requiredCollectorForAllMatchingDocsFactories );
-		CollectorSet collectorsForAllMatchingDocs = collectorsForAllMatchingDocsBuilder.build();
+		HibernateSearchMultiCollectorManager collectorManager = collectorsForAllMatchingDocsBuilder.build();
 
 		return new LuceneCollectors(
 				metadataResolver,
@@ -108,7 +118,7 @@ public final class ExtractionRequirements {
 				rewrittenLuceneQuery,
 				originalLuceneQuery,
 				requireFieldDocRescoring, scoreSortFieldIndexForRescoring,
-				collectorsForAllMatchingDocs,
+				collectorManager,
 				storedFieldsSourceFactoryOrNull,
 				timeoutManager
 		);
@@ -137,7 +147,7 @@ public final class ExtractionRequirements {
 	public static class Builder {
 
 		private boolean requireScore;
-		private final Set<CollectorFactory<?>> requiredCollectorForAllMatchingDocsFactories = new LinkedHashSet<>();
+		private final Set<CollectorFactory<?, ?, ?>> requiredCollectorForAllMatchingDocsFactories = new LinkedHashSet<>();
 
 		private boolean requireAllStoredFields = false;
 		private final Set<String> requiredStoredFields = new HashSet<>();
@@ -147,7 +157,8 @@ public final class ExtractionRequirements {
 			this.requireScore = true;
 		}
 
-		public <C extends Collector> void requireCollectorForAllMatchingDocs(CollectorFactory<C> collectorFactory) {
+		public <C extends Collector, T, CM extends CollectorManager<C, T>> void requireCollectorForAllMatchingDocs(
+				CollectorFactory<C, T, CM> collectorFactory) {
 			requiredCollectorForAllMatchingDocsFactories.add( collectorFactory );
 		}
 
@@ -182,6 +193,52 @@ public final class ExtractionRequirements {
 			}
 
 			return new StoredFieldsValuesDelegate.Factory( storedFieldVisitor, requiredNestedDocumentPathsForStoredFields );
+		}
+	}
+
+	private static final class HibernateSearchTopScoreDocCollectorManager extends TopScoreDocCollectorManager {
+		private final int numHits;
+		private final int offset;
+
+		public HibernateSearchTopScoreDocCollectorManager(int offset, int numHits, ScoreDoc after, int totalHitsThreshold,
+				boolean supportsConcurrency) {
+			super( numHits, after, totalHitsThreshold, supportsConcurrency );
+			this.numHits = numHits;
+			this.offset = offset;
+		}
+
+		@Override
+		public TopDocs reduce(Collection<TopScoreDocCollector> collectors) {
+			final TopDocs[] topDocs = new TopDocs[collectors.size()];
+			int i = 0;
+			for ( TopScoreDocCollector collector : collectors ) {
+				topDocs[i++] = collector.topDocs();
+			}
+			return TopDocs.merge( offset, numHits, topDocs );
+		}
+	}
+
+	private static final class HibernateSearchTopFieldCollectorManager extends TopFieldCollectorManager {
+		private final int numHits;
+		private final Sort sort;
+		private final int offset;
+
+		public HibernateSearchTopFieldCollectorManager(int offset, Sort sort, int numHits, FieldDoc after,
+				int totalHitsThreshold, boolean supportsConcurrency) {
+			super( sort, numHits, after, totalHitsThreshold, supportsConcurrency );
+			this.numHits = numHits;
+			this.offset = offset;
+			this.sort = sort;
+		}
+
+		@Override
+		public TopFieldDocs reduce(Collection<TopFieldCollector> collectors) {
+			final TopFieldDocs[] topDocs = new TopFieldDocs[collectors.size()];
+			int i = 0;
+			for ( TopFieldCollector collector : collectors ) {
+				topDocs[i++] = collector.topDocs();
+			}
+			return TopDocs.merge( sort, offset, numHits, topDocs );
 		}
 	}
 }
