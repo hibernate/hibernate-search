@@ -32,7 +32,7 @@ public class LuceneNestedPredicate extends AbstractLuceneSingleFieldPredicate {
 
 	@Override
 	protected Query doToQuery(PredicateRequestContext context) {
-		PredicateRequestContext childContext = new PredicateRequestContext( absoluteFieldPath );
+		PredicateRequestContext childContext = context.withNestedPath( absoluteFieldPath );
 		return createNestedQuery( context.getNestedPath(), absoluteFieldPath, nestedPredicate.toQuery( childContext ) );
 	}
 

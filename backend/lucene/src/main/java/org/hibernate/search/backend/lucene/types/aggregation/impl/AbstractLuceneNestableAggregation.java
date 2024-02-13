@@ -27,7 +27,7 @@ public abstract class AbstractLuceneNestableAggregation<A> implements LuceneSear
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	private final String nestedDocumentPath;
-	private final Query nestedFilter;
+	private final LuceneSearchPredicate nestedFilter;
 
 	AbstractLuceneNestableAggregation(AbstractBuilder<A> builder) {
 		this.nestedDocumentPath = builder.nestedDocumentPath;
@@ -37,9 +37,14 @@ public abstract class AbstractLuceneNestableAggregation<A> implements LuceneSear
 	protected NestedDocsProvider createNestedDocsProvider(AggregationExtractContext context) {
 		NestedDocsProvider nestedDocsProvider = null;
 		if ( nestedDocumentPath != null ) {
-			nestedDocsProvider = context.createNestedDocsProvider( nestedDocumentPath, nestedFilter );
+			nestedDocsProvider = context.createNestedDocsProvider( nestedDocumentPath,
+					toNestedFilterQuery( context.toPredicateRequestContext( nestedDocumentPath ) ) );
 		}
 		return nestedDocsProvider;
+	}
+
+	private Query toNestedFilterQuery(PredicateRequestContext filterContext) {
+		return nestedFilter == null ? null : nestedFilter.toQuery( filterContext );
 	}
 
 	public abstract static class AbstractBuilder<A> implements SearchAggregationBuilder<A> {
@@ -47,7 +52,7 @@ public abstract class AbstractLuceneNestableAggregation<A> implements LuceneSear
 		protected final LuceneSearchIndexScope<?> scope;
 		protected final LuceneSearchIndexValueFieldContext<?> field;
 		private final String nestedDocumentPath;
-		private Query nestedFilter;
+		private LuceneSearchPredicate nestedFilter;
 
 		public AbstractBuilder(LuceneSearchIndexScope<?> scope, LuceneSearchIndexValueFieldContext<?> field) {
 			this.scope = scope;
@@ -61,8 +66,7 @@ public abstract class AbstractLuceneNestableAggregation<A> implements LuceneSear
 			}
 			LuceneSearchPredicate luceneFilter = LuceneSearchPredicate.from( scope, filter );
 			luceneFilter.checkNestableWithin( nestedDocumentPath );
-			PredicateRequestContext filterContext = new PredicateRequestContext( nestedDocumentPath );
-			this.nestedFilter = luceneFilter.toQuery( filterContext );
+			this.nestedFilter = luceneFilter;
 		}
 
 		@Override

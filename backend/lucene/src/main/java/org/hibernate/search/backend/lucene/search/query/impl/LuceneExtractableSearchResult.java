@@ -110,6 +110,8 @@ public class LuceneExtractableSearchResult<H> {
 
 	private Map<AggregationKey<?>, ?> extractAggregations() throws IOException {
 		AggregationExtractContext aggregationExtractContext = new AggregationExtractContext(
+				requestContext.getQueryIndexScope(),
+				requestContext.getSessionContext(),
 				indexSearcher.getIndexReader(),
 				fromDocumentValueConvertContext,
 				luceneCollectors.getCollectorsForAllMatchingDocs()

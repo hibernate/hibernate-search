@@ -13,6 +13,7 @@ import org.hibernate.search.backend.elasticsearch.gson.impl.JsonAccessor;
 import org.hibernate.search.backend.elasticsearch.gson.impl.JsonArrayAccessor;
 import org.hibernate.search.backend.elasticsearch.gson.impl.JsonObjectAccessor;
 import org.hibernate.search.backend.elasticsearch.logging.impl.Log;
+import org.hibernate.search.backend.elasticsearch.lowlevel.query.impl.Queries;
 import org.hibernate.search.backend.elasticsearch.search.common.impl.AbstractElasticsearchCodecAwareSearchQueryElementFactory;
 import org.hibernate.search.backend.elasticsearch.search.common.impl.ElasticsearchSearchIndexScope;
 import org.hibernate.search.backend.elasticsearch.search.common.impl.ElasticsearchSearchIndexValueFieldContext;
@@ -43,6 +44,19 @@ public abstract class ElasticsearchKnnPredicate extends AbstractElasticsearchSin
 		this.similarity = builder.similarity;
 		builder.filter = null;
 		builder.vector = null;
+	}
+
+	protected JsonObject prepareFilter(PredicateRequestContext context) {
+		String tenantIdentifier = context.getTenantId();
+		if ( tenantIdentifier != null ) {
+			JsonObject tenantFilter = context.getSearchIndexScope().filterOrNull( tenantIdentifier );
+			if ( tenantFilter != null ) {
+				JsonArray filters = new JsonArray();
+				filters.add( tenantFilter );
+				return filter == null ? tenantFilter : Queries.boolFilter( filter.toJsonQuery( context ), filters );
+			}
+		}
+		return filter == null ? null : filter.toJsonQuery( context );
 	}
 
 	public static class Elasticsearch812Factory<F>
@@ -163,8 +177,9 @@ public abstract class ElasticsearchKnnPredicate extends AbstractElasticsearchSin
 			NUM_CANDIDATES_ACCESSOR.set( innerObject, k );
 			VECTOR_ACCESSOR.set( innerObject, vector );
 
+			JsonObject filter = prepareFilter( context );
 			if ( filter != null ) {
-				FILTER_ACCESSOR.set( innerObject, filter.toJsonQuery( context ) );
+				FILTER_ACCESSOR.set( innerObject, filter );
 			}
 			if ( similarity != null ) {
 				SIMILARITY_ACCESSOR.set( innerObject, similarity );
@@ -210,8 +225,9 @@ public abstract class ElasticsearchKnnPredicate extends AbstractElasticsearchSin
 			KNN_ACCESSOR.set( outerObject, field );
 
 			field.add( absoluteFieldPath, innerObject );
+			JsonObject filter = prepareFilter( context );
 			if ( filter != null ) {
-				FILTER_ACCESSOR.set( innerObject, filter.toJsonQuery( context ) );
+				FILTER_ACCESSOR.set( innerObject, filter );
 			}
 			K_ACCESSOR.set( innerObject, k );
 			VECTOR_ACCESSOR.set( innerObject, vector );

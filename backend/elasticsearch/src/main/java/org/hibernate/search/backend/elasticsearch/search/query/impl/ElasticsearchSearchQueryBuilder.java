@@ -72,7 +72,7 @@ public class ElasticsearchSearchQueryBuilder<H>
 	private final Integer scrollTimeout;
 
 	private final Set<String> routingKeys;
-	private JsonObject jsonPredicate;
+	private ElasticsearchSearchPredicate elasticsearchPredicate;
 	private JsonArray jsonSort;
 	private Map<DistanceSortKey, Integer> distanceSorts;
 	private Map<AggregationKey<?>, ElasticsearchSearchAggregation<?>> aggregations;
@@ -101,7 +101,7 @@ public class ElasticsearchSearchQueryBuilder<H>
 		this.sessionContext = sessionContext;
 		this.routingKeys = new HashSet<>();
 
-		this.rootPredicateContext = new PredicateRequestContext( sessionContext );
+		this.rootPredicateContext = new PredicateRequestContext( sessionContext, scope );
 		this.loadingContextBuilder = loadingContextBuilder;
 		this.rootProjection = rootProjection;
 		this.scrollTimeout = scrollTimeout;
@@ -110,7 +110,7 @@ public class ElasticsearchSearchQueryBuilder<H>
 	@Override
 	public void predicate(SearchPredicate predicate) {
 		ElasticsearchSearchPredicate elasticsearchPredicate = ElasticsearchSearchPredicate.from( scope, predicate );
-		this.jsonPredicate = elasticsearchPredicate.toJsonQuery( rootPredicateContext );
+		this.elasticsearchPredicate = elasticsearchPredicate;
 	}
 
 	@Override
@@ -231,6 +231,8 @@ public class ElasticsearchSearchQueryBuilder<H>
 		if ( !routingKeys.isEmpty() ) {
 			filters.add( Queries.anyTerm( "_routing", routingKeys ) );
 		}
+
+		JsonObject jsonPredicate = elasticsearchPredicate.toJsonQuery( rootPredicateContext );
 
 		JsonObject jsonQuery = Queries.boolFilter( jsonPredicate, filters );
 		if ( jsonQuery != null ) {
