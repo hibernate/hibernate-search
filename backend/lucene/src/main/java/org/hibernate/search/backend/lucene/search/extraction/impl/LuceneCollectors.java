@@ -6,6 +6,8 @@
  */
 package org.hibernate.search.backend.lucene.search.extraction.impl;
 
+import static org.hibernate.search.backend.lucene.search.extraction.impl.HibernateSearchMultiCollectorManager.MultiCollectedResults;
+
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
@@ -22,7 +24,8 @@ import org.hibernate.search.engine.search.query.spi.SimpleSearchResultTotal;
 import org.hibernate.search.engine.search.timeout.spi.TimeoutManager;
 import org.hibernate.search.util.common.AssertionFailure;
 
-import org.apache.lucene.search.Collector;
+import com.carrotsearch.hppc.IntObjectMap;
+
 import org.apache.lucene.search.FieldDoc;
 import org.apache.lucene.search.IndexSearcher;
 import org.apache.lucene.search.MatchAllDocsQuery;
@@ -32,14 +35,13 @@ import org.apache.lucene.search.TimeLimitingCollector;
 import org.apache.lucene.search.TopDocs;
 import org.apache.lucene.search.TopDocsCollector;
 import org.apache.lucene.search.TopFieldCollector;
-import org.apache.lucene.search.TopFieldDocs;
 import org.apache.lucene.search.TotalHitCountCollector;
 import org.apache.lucene.search.TotalHits;
 
 public class LuceneCollectors {
 
-	static final CollectorKey<TotalHitCountCollector> TOTAL_HIT_COUNT_KEY = CollectorKey.create();
-	static final CollectorKey<TopDocsCollector<?>> TOP_DOCS_KEY = CollectorKey.create();
+	static final CollectorKey<TotalHitCountCollector, Integer> TOTAL_HIT_COUNT_KEY = CollectorKey.create();
+	static final CollectorKey<TopDocsCollector<?>, TopDocs> TOP_DOCS_KEY = CollectorKey.create();
 
 	private final IndexReaderMetadataResolver metadataResolver;
 
@@ -50,18 +52,19 @@ public class LuceneCollectors {
 	private final boolean requireFieldDocRescoring;
 	private final Integer scoreSortFieldIndexForRescoring;
 
-	private final CollectorSet collectorsForAllMatchingDocs;
+	private final HibernateSearchMultiCollectorManager collectorsForAllMatchingDocs;
 	private final StoredFieldsValuesDelegate.Factory storedFieldsValuesDelegateOrNull;
 
 	private final TimeoutManager timeoutManager;
 
 	private SearchResultTotal resultTotal;
 	private TopDocs topDocs = null;
+	private MultiCollectedResults results = MultiCollectedResults.EMPTY;
 
 	LuceneCollectors(IndexReaderMetadataResolver metadataResolver, IndexSearcher indexSearcher,
 			Query rewrittenLuceneQuery, Query originalLuceneQuery,
 			boolean requireFieldDocRescoring, Integer scoreSortFieldIndexForRescoring,
-			CollectorSet collectorsForAllMatchingDocs,
+			HibernateSearchMultiCollectorManager collectorsForAllMatchingDocs,
 			StoredFieldsValuesDelegate.Factory storedFieldsValuesDelegateOrNull,
 			TimeoutManager timeoutManager) {
 		this.metadataResolver = metadataResolver;
@@ -79,21 +82,18 @@ public class LuceneCollectors {
 	 * Phase 1: collect matching docs.
 	 * Collects the total hit count, aggregations, and top docs.
 	 *
-	 * @param offset The index of the first collected top doc.
-	 * @param limit The maximum amount of top docs to collect.
 	 * @throws IOException If Lucene throws an {@link IOException}.
 	 */
-	public void collectMatchingDocs(int offset, Integer limit) throws IOException {
+	public void collectMatchingDocs() throws IOException {
 		if ( timeoutManager.checkTimedOut() ) {
 			resultTotal = SimpleSearchResultTotal.lowerBound( 0L );
 			// in case of timeout before the query execution, skip the query
 			return;
 		}
-
 		try {
-			Collector composed = collectorsForAllMatchingDocs.getComposed();
-			if ( composed != null ) {
-				indexSearcher.search( rewrittenLuceneQuery, composed );
+			if ( collectorsForAllMatchingDocs != null ) {
+				results = indexSearcher.search(
+						rewrittenLuceneQuery, collectorsForAllMatchingDocs );
 			}
 		}
 		catch (TimeLimitingCollector.TimeExceededException e) {
@@ -104,31 +104,30 @@ public class LuceneCollectors {
 			deadline.forceTimeout( e );
 		}
 
-		processCollectedMatchingDocs( offset, limit );
+		processCollectedMatchingDocs();
 	}
 
-	private void processCollectedMatchingDocs(int offset, Integer limit) throws IOException {
+	private void processCollectedMatchingDocs() throws IOException {
 		if ( rewrittenLuceneQuery instanceof MatchAllDocsQuery ) {
 			// We can compute the total hit count in constant time.
 			resultTotal = SimpleSearchResultTotal.exact( indexSearcher.getIndexReader().numDocs() );
 		}
 		else {
-			TotalHitCountCollector totalHitCountCollector = collectorsForAllMatchingDocs.get( TOTAL_HIT_COUNT_KEY );
-			if ( totalHitCountCollector != null ) {
+			Integer total = results.get( TOTAL_HIT_COUNT_KEY );
+			if ( total != null ) {
 				boolean exact = !timeoutManager.isTimedOut();
-				resultTotal = SimpleSearchResultTotal.of( totalHitCountCollector.getTotalHits(), exact );
+				resultTotal = SimpleSearchResultTotal.of( total, exact );
 			}
 		}
 
-		TopDocsCollector<?> topDocsCollector = collectorsForAllMatchingDocs.get( TOP_DOCS_KEY );
-		if ( topDocsCollector == null ) {
+		topDocs = results.get( TOP_DOCS_KEY );
+		if ( topDocs == null ) {
 			if ( resultTotal == null ) {
 				resultTotal = SimpleSearchResultTotal.lowerBound( 0 );
 			}
 			return;
 		}
 
-		extractTopDocs( topDocsCollector, offset, limit );
 		if ( resultTotal == null ) {
 			boolean exact = TotalHits.Relation.EQUAL_TO.equals( topDocs.totalHits.relation )
 					&& !timeoutManager.isTimedOut();
@@ -146,8 +145,8 @@ public class LuceneCollectors {
 		}
 	}
 
-	public CollectorSet getCollectorsForAllMatchingDocs() {
-		return collectorsForAllMatchingDocs;
+	public MultiCollectedResults collectedMultiResults() {
+		return results;
 	}
 
 	/**
@@ -167,11 +166,11 @@ public class LuceneCollectors {
 		try {
 			ScoreDoc[] scoreDocs = topDocs.scoreDocs;
 			ExplicitDocIdsQuery topDocsQuery = new ExplicitDocIdsQuery( scoreDocs, startInclusive, endExclusive );
-			CollectorSet collectorsForTopDocs = buildTopDocsDataCollectors( collectorFactory );
-			indexSearcher.search( topDocsQuery, collectorsForTopDocs.getComposed() );
-			TopDocsDataCollector<T> topDocsDataCollector = collectorsForTopDocs.get( collectorFactory );
+			HibernateSearchMultiCollectorManager collectorManager = buildTopDocsDataCollectors( collectorFactory );
+			MultiCollectedResults collectedResults = indexSearcher.search( topDocsQuery, collectorManager );
+			IntObjectMap<T> collected = collectedResults.get( collectorFactory );
 			for ( int i = startInclusive; i < endExclusive; i++ ) {
-				extractedData.add( topDocsDataCollector.get( scoreDocs[i].doc ) );
+				extractedData.add( collected.get( scoreDocs[i].doc ) );
 			}
 		}
 		catch (TimeLimitingCollector.TimeExceededException e) {
@@ -192,30 +191,6 @@ public class LuceneCollectors {
 		return topDocs;
 	}
 
-	private void extractTopDocs(TopDocsCollector<?> topDocsCollector, int offset, Integer limit) {
-		if ( offset >= topDocsCollector.getTotalHits() ) {
-			// Hack.
-			// In this case, we cannot execute the code below as Lucene considers we passed incorrect arguments
-			// and returns a TopDocs instance with no ScoreDocs (correct)
-			// and a total hit count set to 0 (not always correct).
-			// Also, we cannot reconstruct the total hit count from just the collector
-			// since we don't have access to the relation (EQUAL/GT_OR_EQUAL).
-			// So we get just one topDoc, and infer everything from there.
-			TopDocs firstTopDoc = topDocsCollector.topDocs( 0, 1 );
-			topDocs = firstTopDoc instanceof TopFieldDocs
-					? new TopFieldDocs( firstTopDoc.totalHits, new FieldDoc[0], ( (TopFieldDocs) firstTopDoc ).fields )
-					: new TopDocs( firstTopDoc.totalHits, new ScoreDoc[0] );
-			return;
-		}
-
-		if ( limit == null ) {
-			topDocs = topDocsCollector.topDocs( offset );
-		}
-		else {
-			topDocs = topDocsCollector.topDocs( offset, limit );
-		}
-	}
-
 	private void handleRescoring() throws IOException {
 		if ( scoreSortFieldIndexForRescoring != null ) {
 			// If there's a SCORE sort field, just get the score value from the sort field
@@ -231,7 +206,9 @@ public class LuceneCollectors {
 		}
 	}
 
-	private <T> CollectorSet buildTopDocsDataCollectors(TopDocsDataCollector.Factory<T> collectorFactory) throws IOException {
+	private <T> HibernateSearchMultiCollectorManager buildTopDocsDataCollectors(
+			TopDocsDataCollector.Factory<T> collectorManagerFactory)
+			throws IOException {
 		TopDocsDataCollectorExecutionContext executionContext = new TopDocsDataCollectorExecutionContext(
 				metadataResolver, indexSearcher,
 				rewrittenLuceneQuery,
@@ -240,9 +217,9 @@ public class LuceneCollectors {
 				storedFieldsValuesDelegateOrNull
 		);
 
-		CollectorSet.Builder collectorForTopDocsBuilder =
-				new CollectorSet.Builder( executionContext, timeoutManager );
-		collectorForTopDocsBuilder.add( collectorFactory, collectorFactory.create( executionContext ) );
+		HibernateSearchMultiCollectorManager.Builder collectorForTopDocsBuilder =
+				new HibernateSearchMultiCollectorManager.Builder( executionContext, timeoutManager );
+		collectorForTopDocsBuilder.add( collectorManagerFactory, collectorManagerFactory.create( executionContext ) );
 		return collectorForTopDocsBuilder.build();
 	}
 }

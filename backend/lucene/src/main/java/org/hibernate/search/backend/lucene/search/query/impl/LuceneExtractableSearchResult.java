@@ -7,6 +7,7 @@
 package org.hibernate.search.backend.lucene.search.query.impl;
 
 import java.io.IOException;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -26,6 +27,10 @@ import org.hibernate.search.engine.search.loading.spi.ProjectionHitMapper;
 import org.hibernate.search.engine.search.query.SearchResultTotal;
 import org.hibernate.search.engine.search.timeout.spi.TimeoutManager;
 
+import com.carrotsearch.hppc.IntObjectHashMap;
+import com.carrotsearch.hppc.IntObjectMap;
+
+import org.apache.lucene.search.CollectorManager;
 import org.apache.lucene.search.IndexSearcher;
 import org.apache.lucene.search.ScoreDoc;
 import org.apache.lucene.search.TopDocs;
@@ -112,7 +117,7 @@ public class LuceneExtractableSearchResult<H> {
 		AggregationExtractContext aggregationExtractContext = new AggregationExtractContext(
 				indexSearcher.getIndexReader(),
 				fromDocumentValueConvertContext,
-				luceneCollectors.getCollectorsForAllMatchingDocs()
+				luceneCollectors.collectedMultiResults()
 		);
 
 		Map<AggregationKey<?>, Object> extractedMap = new LinkedHashMap<>();
@@ -142,10 +147,27 @@ public class LuceneExtractableSearchResult<H> {
 		}
 
 		@Override
-		public TopDocsDataCollector<Object> create(TopDocsDataCollectorExecutionContext context) throws IOException {
-			ProjectionExtractContext projectionExtractContext =
-					new ProjectionExtractContext( context, projectionHitMapper );
-			return new TopDocsDataCollector<>( context, rootExtractor.values( projectionExtractContext ) );
+		public CollectorManager<TopDocsDataCollector<Object>, IntObjectMap<Object>> create(
+				TopDocsDataCollectorExecutionContext context) {
+			ProjectionExtractContext projectionExtractContext = new ProjectionExtractContext( context, projectionHitMapper );
+			return new CollectorManager<>() {
+				@Override
+				public TopDocsDataCollector<Object> newCollector() {
+					return new TopDocsDataCollector<>( context, rootExtractor.values( projectionExtractContext ) );
+				}
+
+				@Override
+				public IntObjectMap<Object> reduce(Collection<TopDocsDataCollector<Object>> collectors) {
+					if ( collectors.size() == 1 ) {
+						return collectors.iterator().next().collected();
+					}
+					IntObjectMap<Object> combined = new IntObjectHashMap<>();
+					for ( TopDocsDataCollector<Object> collector : collectors ) {
+						combined.putAll( collector.collected() );
+					}
+					return combined;
+				}
+			};
 		}
 	}
 }

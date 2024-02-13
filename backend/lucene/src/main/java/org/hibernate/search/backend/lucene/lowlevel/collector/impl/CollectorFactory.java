@@ -9,11 +9,12 @@ package org.hibernate.search.backend.lucene.lowlevel.collector.impl;
 import java.io.IOException;
 
 import org.apache.lucene.search.Collector;
+import org.apache.lucene.search.CollectorManager;
 
-public interface CollectorFactory<C extends Collector> {
+public interface CollectorFactory<C extends Collector, T, CM extends CollectorManager<C, T>> {
 
-	C createCollector(CollectorExecutionContext context) throws IOException;
+	CM createCollectorManager(CollectorExecutionContext context) throws IOException;
 
-	CollectorKey<C> getCollectorKey();
+	CollectorKey<C, T> getCollectorKey();
 
 }
