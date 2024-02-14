@@ -6,6 +6,8 @@
  */
 package org.hibernate.search.backend.lucene.search.aggregation.impl;
 
+import java.util.Set;
+
 import org.hibernate.search.backend.lucene.lowlevel.collector.impl.CollectorKey;
 import org.hibernate.search.backend.lucene.lowlevel.join.impl.NestedDocsProvider;
 import org.hibernate.search.backend.lucene.search.extraction.impl.CollectorSet;
@@ -25,20 +27,23 @@ public class AggregationExtractContext {
 	private final IndexReader indexReader;
 	private final FromDocumentValueConvertContext fromDocumentValueConvertContext;
 	private final CollectorSet collectors;
+	private final Set<String> routingKeys;
 
 	public AggregationExtractContext(LuceneSearchQueryIndexScope<?> queryIndexScope, BackendSessionContext sessionContext,
 			IndexReader indexReader,
 			FromDocumentValueConvertContext fromDocumentValueConvertContext,
-			CollectorSet collectors) {
+			CollectorSet collectors, Set<String> routingKeys) {
 		this.queryIndexScope = queryIndexScope;
 		this.sessionContext = sessionContext;
 		this.indexReader = indexReader;
 		this.fromDocumentValueConvertContext = fromDocumentValueConvertContext;
 		this.collectors = collectors;
+		this.routingKeys = routingKeys;
 	}
 
 	public PredicateRequestContext toPredicateRequestContext(String absolutePath) {
-		return PredicateRequestContext.withSession( queryIndexScope, sessionContext ).withNestedPath( absolutePath );
+		return PredicateRequestContext.withSession( queryIndexScope, sessionContext, routingKeys )
+				.withNestedPath( absolutePath );
 	}
 
 	public IndexReader getIndexReader() {
