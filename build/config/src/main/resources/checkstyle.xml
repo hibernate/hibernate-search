@@ -52,6 +52,13 @@
             <property name="ignoreComments" value="true" />
         </module>
 
+        <!-- Keep Tck Runners clean from local changes -->
+        <module name="RegexpSinglelineJava">
+            <property name="format" value="@IncludeClassNamePatterns\(\{ &quot;(?!\.\*Test&quot;, &quot;\.\*IT).*&quot; \}\)" />
+            <property name="message" value="Do not commit updated Tck Runner filter patterns!" />
+            <property name="ignoreComments" value="true" />
+        </module>
+
        <!-- Checks for imports -->
         <module name="AvoidStarImport" />
 
