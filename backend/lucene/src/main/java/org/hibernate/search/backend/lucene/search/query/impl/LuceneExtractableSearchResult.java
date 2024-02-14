@@ -40,7 +40,7 @@ public class LuceneExtractableSearchResult<H> {
 	private final Map<AggregationKey<?>, LuceneSearchAggregation<?>> aggregations;
 	private final TimeoutManager timeoutManager;
 
-	public LuceneExtractableSearchResult(LuceneSearchQueryRequestContext requestContext,
+	LuceneExtractableSearchResult(LuceneSearchQueryRequestContext requestContext,
 			IndexSearcher indexSearcher,
 			LuceneCollectors luceneCollectors,
 			LuceneSearchProjection.Extractor<?, H> rootExtractor,
@@ -114,7 +114,8 @@ public class LuceneExtractableSearchResult<H> {
 				requestContext.getSessionContext(),
 				indexSearcher.getIndexReader(),
 				fromDocumentValueConvertContext,
-				luceneCollectors.getCollectorsForAllMatchingDocs()
+				luceneCollectors.getCollectorsForAllMatchingDocs(),
+				requestContext.getRoutingKeys()
 		);
 
 		Map<AggregationKey<?>, Object> extractedMap = new LinkedHashMap<>();

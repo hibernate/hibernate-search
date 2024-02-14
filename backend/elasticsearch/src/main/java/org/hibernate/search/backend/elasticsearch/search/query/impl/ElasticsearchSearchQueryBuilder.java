@@ -101,7 +101,7 @@ public class ElasticsearchSearchQueryBuilder<H>
 		this.sessionContext = sessionContext;
 		this.routingKeys = new HashSet<>();
 
-		this.rootPredicateContext = new PredicateRequestContext( sessionContext, scope );
+		this.rootPredicateContext = new PredicateRequestContext( sessionContext, scope, routingKeys );
 		this.loadingContextBuilder = loadingContextBuilder;
 		this.rootProjection = rootProjection;
 		this.scrollTimeout = scrollTimeout;
@@ -223,14 +223,14 @@ public class ElasticsearchSearchQueryBuilder<H>
 	public ElasticsearchSearchQuery<H> build() {
 		JsonObject payload = new JsonObject();
 
-		JsonArray filters = new JsonArray();
-		JsonObject filter = scope.filterOrNull( sessionContext.tenantIdentifier() );
-		if ( filter != null ) {
-			filters.add( filter );
-		}
-		if ( !routingKeys.isEmpty() ) {
-			filters.add( Queries.anyTerm( "_routing", routingKeys ) );
-		}
+		SearchLoadingContext<?> loadingContext = loadingContextBuilder.build();
+
+		ElasticsearchSearchQueryRequestContext requestContext = new ElasticsearchSearchQueryRequestContext(
+				scope, sessionContext, loadingContext, rootPredicateContext, distanceSorts,
+				namedHighlighters, queryHighlighter
+		);
+
+		JsonArray filters = rootPredicateContext.tenantAndRoutingFilters();
 
 		JsonObject jsonPredicate = elasticsearchPredicate.toJsonQuery( rootPredicateContext );
 
@@ -242,13 +242,6 @@ public class ElasticsearchSearchQueryBuilder<H>
 		if ( jsonSort != null ) {
 			payload.add( "sort", jsonSort );
 		}
-
-		SearchLoadingContext<?> loadingContext = loadingContextBuilder.build();
-
-		ElasticsearchSearchQueryRequestContext requestContext = new ElasticsearchSearchQueryRequestContext(
-				scope, sessionContext, loadingContext, rootPredicateContext, distanceSorts,
-				namedHighlighters, queryHighlighter
-		);
 
 		ElasticsearchSearchProjection.Extractor<?, H> rootExtractor = rootProjection.request( payload, requestContext );
 
