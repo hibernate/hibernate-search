@@ -66,7 +66,7 @@ public class LuceneSearchQueryBuilder<H> implements SearchQueryBuilder<H>, Lucen
 	private final SearchLoadingContextBuilder<?, ?> loadingContextBuilder;
 	private final LuceneSearchProjection<H> rootProjection;
 
-	private Query luceneQuery;
+	private LuceneSearchPredicate lucenePredicate;
 	private List<SortField> sortFields;
 	private Map<AggregationKey<?>, LuceneSearchAggregation<?>> aggregations;
 	private Long timeout;
@@ -96,8 +96,7 @@ public class LuceneSearchQueryBuilder<H> implements SearchQueryBuilder<H>, Lucen
 
 	@Override
 	public void predicate(SearchPredicate predicate) {
-		LuceneSearchPredicate lucenePredicate = LuceneSearchPredicate.from( scope, predicate );
-		this.luceneQuery = lucenePredicate.toQuery( PredicateRequestContext.withSession( scope, sessionContext ) );
+		this.lucenePredicate = LuceneSearchPredicate.from( scope, predicate );
 	}
 
 	@Override
@@ -196,11 +195,14 @@ public class LuceneSearchQueryBuilder<H> implements SearchQueryBuilder<H>, Lucen
 
 	@Override
 	public PredicateRequestContext toPredicateRequestContext(String absoluteNestedPath) {
-		return PredicateRequestContext.withSession( scope, sessionContext ).withNestedPath( absoluteNestedPath );
+		return PredicateRequestContext.withSession( scope, sessionContext, routingKeys ).withNestedPath( absoluteNestedPath );
 	}
 
 	@Override
 	public LuceneSearchQuery<H> build() {
+		Query luceneQuery = lucenePredicate.toQuery(
+				PredicateRequestContext.withSession( scope, sessionContext, routingKeys ) );
+
 		SearchLoadingContext<?> loadingContext = loadingContextBuilder.build();
 
 		BooleanQuery.Builder luceneQueryBuilder = new BooleanQuery.Builder();
@@ -227,7 +229,7 @@ public class LuceneSearchQueryBuilder<H> implements SearchQueryBuilder<H>, Lucen
 		}
 
 		LuceneSearchQueryRequestContext requestContext = new LuceneSearchQueryRequestContext(
-				scope, sessionContext, loadingContext, definitiveLuceneQuery, luceneSort
+				scope, sessionContext, loadingContext, definitiveLuceneQuery, luceneSort, routingKeys
 		);
 
 		LuceneAbstractSearchHighlighter resolvedGlobalHighlighter =

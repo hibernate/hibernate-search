@@ -49,7 +49,7 @@ public final class Queries {
 	}
 
 	public static JsonObject boolFilter(JsonObject must, JsonArray filters) {
-		if ( filters == null || filters.size() == 0 ) {
+		if ( filters == null || filters.isEmpty() ) {
 			return must;
 		}
 
@@ -61,6 +61,27 @@ public final class Queries {
 			innerObject.add( "must", must );
 		}
 		innerObject.add( "filter", filters );
+
+		return predicate;
+	}
+
+	public static JsonObject boolCombineMust(JsonObject must, JsonArray otherMustClauses) {
+		if ( otherMustClauses == null || otherMustClauses.isEmpty() ) {
+			return must;
+		}
+		if ( must == null && otherMustClauses.size() == 1 ) {
+			return otherMustClauses.get( 0 ).getAsJsonObject();
+		}
+
+		JsonObject predicate = new JsonObject();
+		JsonObject innerObject = new JsonObject();
+		predicate.add( "bool", innerObject );
+		JsonArray mustClauses = new JsonArray();
+		if ( must != null ) {
+			mustClauses.add( must );
+		}
+		mustClauses.addAll( otherMustClauses );
+		innerObject.add( "must", mustClauses );
 
 		return predicate;
 	}
