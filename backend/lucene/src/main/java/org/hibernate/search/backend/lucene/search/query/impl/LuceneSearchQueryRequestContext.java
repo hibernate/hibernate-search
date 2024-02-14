@@ -6,6 +6,8 @@
  */
 package org.hibernate.search.backend.lucene.search.query.impl;
 
+import java.util.Set;
+
 import org.hibernate.search.engine.backend.session.spi.BackendSessionContext;
 import org.hibernate.search.engine.search.loading.spi.SearchLoadingContext;
 
@@ -23,17 +25,20 @@ class LuceneSearchQueryRequestContext {
 	private final SearchLoadingContext<?> loadingContext;
 	private final Query luceneQuery;
 	private final Sort luceneSort;
+	private final Set<String> routingKeys;
 
 	LuceneSearchQueryRequestContext(
 			LuceneSearchQueryIndexScope<?> queryIndexScope, BackendSessionContext sessionContext,
 			SearchLoadingContext<?> loadingContext,
 			Query luceneQuery,
-			Sort luceneSort) {
+			Sort luceneSort,
+			Set<String> routingKeys) {
 		this.queryIndexScope = queryIndexScope;
 		this.sessionContext = sessionContext;
 		this.loadingContext = loadingContext;
 		this.luceneQuery = luceneQuery;
 		this.luceneSort = luceneSort;
+		this.routingKeys = routingKeys;
 	}
 
 	public LuceneSearchQueryIndexScope<?> getQueryIndexScope() {
@@ -56,4 +61,7 @@ class LuceneSearchQueryRequestContext {
 		return luceneSort;
 	}
 
+	public Set<String> getRoutingKeys() {
+		return routingKeys;
+	}
 }

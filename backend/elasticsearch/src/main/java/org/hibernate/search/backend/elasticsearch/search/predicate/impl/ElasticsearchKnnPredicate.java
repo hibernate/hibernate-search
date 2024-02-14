@@ -47,16 +47,9 @@ public abstract class ElasticsearchKnnPredicate extends AbstractElasticsearchSin
 	}
 
 	protected JsonObject prepareFilter(PredicateRequestContext context) {
-		String tenantIdentifier = context.getTenantId();
-		if ( tenantIdentifier != null ) {
-			JsonObject tenantFilter = context.getSearchIndexScope().filterOrNull( tenantIdentifier );
-			if ( tenantFilter != null ) {
-				JsonArray filters = new JsonArray();
-				filters.add( tenantFilter );
-				return filter == null ? tenantFilter : Queries.boolFilter( filter.toJsonQuery( context ), filters );
-			}
-		}
-		return filter == null ? null : filter.toJsonQuery( context );
+		JsonObject mainFilter = filter == null ? null : filter.toJsonQuery( context );
+		JsonArray filters = context.tenantAndRoutingFilters();
+		return Queries.boolCombineMust( mainFilter, filters );
 	}
 
 	public static class Elasticsearch812Factory<F>

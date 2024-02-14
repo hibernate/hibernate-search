@@ -10,7 +10,6 @@ import java.lang.invoke.MethodHandles;
 import java.lang.reflect.Array;
 
 import org.hibernate.search.backend.lucene.logging.impl.Log;
-import org.hibernate.search.backend.lucene.lowlevel.query.impl.Queries;
 import org.hibernate.search.backend.lucene.lowlevel.query.impl.VectorSimilarityFilterQuery;
 import org.hibernate.search.backend.lucene.search.common.impl.AbstractLuceneValueFieldSearchQueryElementFactory;
 import org.hibernate.search.backend.lucene.search.common.impl.LuceneSearchIndexScope;
@@ -67,13 +66,7 @@ public class LuceneKnnPredicate extends AbstractLuceneSingleFieldPredicate imple
 	}
 
 	private Query prepareFilter(PredicateRequestContext context) {
-		Query tenantFilter = context.tenantFilterOrNull();
-		if ( tenantFilter != null ) {
-			return filter == null ? tenantFilter : Queries.boolFilter( filter.toQuery( context ), tenantFilter );
-		}
-		else {
-			return filter == null ? null : filter.toQuery( context );
-		}
+		return context.appendTenantAndRoutingFilters( filter == null ? null : filter.toQuery( context ) );
 	}
 
 	public static class DefaultFactory<F>
