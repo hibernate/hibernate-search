@@ -153,4 +153,8 @@ public abstract class TckBackendFeatures implements StubMappingBackendFeatures {
 	public boolean canPerformTermsQuery(FieldTypeDescriptor<?, ?> fieldType) {
 		return true;
 	}
+
+	public boolean knnWorksInsideNestedPredicateWithImplicitFilters() {
+		return true;
+	}
 }

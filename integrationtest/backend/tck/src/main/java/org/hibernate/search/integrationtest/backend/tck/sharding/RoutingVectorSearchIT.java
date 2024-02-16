@@ -8,6 +8,7 @@ package org.hibernate.search.integrationtest.backend.tck.sharding;
 
 import static org.hibernate.search.util.impl.integrationtest.common.assertion.SearchResultAssert.assertThatQuery;
 import static org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMapperUtils.referenceProvider;
+import static org.junit.jupiter.api.Assumptions.assumeTrue;
 
 import org.hibernate.search.engine.backend.document.DocumentElement;
 import org.hibernate.search.engine.backend.document.IndexFieldReference;
@@ -20,6 +21,7 @@ import org.hibernate.search.engine.backend.types.VectorSimilarity;
 import org.hibernate.search.engine.backend.work.execution.OperationSubmitter;
 import org.hibernate.search.engine.backend.work.execution.spi.IndexIndexingPlan;
 import org.hibernate.search.engine.search.query.SearchQuery;
+import org.hibernate.search.integrationtest.backend.tck.testsupport.util.TckConfiguration;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.extension.SearchSetupHelper;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.SimpleMappedIndex;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMapping;
@@ -133,6 +135,9 @@ class RoutingVectorSearchIT {
 
 	@Test
 	void searchingForVectors_nested_vectorCloseToTheOneForOtherRoute() {
+		assumeTrue(
+				TckConfiguration.get().getBackendFeatures().knnWorksInsideNestedPredicateWithImplicitFilters()
+		);
 		StubMappingScope scope = index.createScope();
 
 		SearchQuery<?> query = scope.query()
