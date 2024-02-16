@@ -879,4 +879,5 @@ public interface Log extends BasicLogger {
 			value = "The OpenSearch distribution does not allow using %1$s as a space type for a Lucene engine."
 					+ " Try using a different similarity type and refer to the OpenSearch documentation for more details.")
 	SearchException vectorSimilarityNotSupportedByOpenSearchBackend(VectorSimilarity vectorSimilarity);
+
 }
