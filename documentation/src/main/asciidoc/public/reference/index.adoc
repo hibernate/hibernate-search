@@ -50,6 +50,8 @@ include::_indexing.adoc[]
 
 include::_search-dsl.adoc[]
 
+include::_explicit_index_backend_operations.adoc[]
+
 include::_backend-lucene.adoc[]
 
 include::_backend-elasticsearch.adoc[]
