@@ -11,6 +11,7 @@ import java.util.Optional;
 import java.util.Set;
 
 import org.hibernate.search.backend.elasticsearch.ElasticsearchBackend;
+import org.hibernate.search.backend.elasticsearch.analysis.impl.ElasticsearchAnalysisPerformer;
 import org.hibernate.search.backend.elasticsearch.cfg.ElasticsearchIndexSettings;
 import org.hibernate.search.backend.elasticsearch.document.model.impl.ElasticsearchIndexModel;
 import org.hibernate.search.backend.elasticsearch.document.model.lowlevel.impl.LowLevelIndexMetadataBuilder;
@@ -248,4 +249,7 @@ public class IndexManagerBackendContext implements SearchBackendContext, WorkExe
 		return multiTenancyStrategy.documentIdHelper().toElasticsearchId( tenantId, id );
 	}
 
+	public ElasticsearchAnalysisPerformer createAnalysisPerformer(ElasticsearchIndexModel model) {
+		return new ElasticsearchAnalysisPerformer( model, link.getWorkFactory(), generalPurposeOrchestrator );
+	}
 }

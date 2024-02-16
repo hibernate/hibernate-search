@@ -14,6 +14,7 @@ import org.hibernate.search.backend.elasticsearch.lowlevel.index.aliases.impl.In
 import org.hibernate.search.backend.elasticsearch.lowlevel.index.mapping.impl.RootTypeMapping;
 import org.hibernate.search.backend.elasticsearch.lowlevel.index.settings.impl.IndexSettings;
 import org.hibernate.search.backend.elasticsearch.util.spi.URLEncodedString;
+import org.hibernate.search.backend.elasticsearch.work.impl.AnalyzeWork;
 import org.hibernate.search.backend.elasticsearch.work.impl.BulkWork;
 import org.hibernate.search.backend.elasticsearch.work.impl.BulkableWork;
 import org.hibernate.search.backend.elasticsearch.work.impl.ClearScrollWork;
@@ -100,4 +101,6 @@ public interface ElasticsearchWorkFactory {
 
 	PutIndexAliasesWork.Builder putIndexAliases(URLEncodedString indexName, Map<String, IndexAliasDefinition> aliases);
 
+	AnalyzeWork.Builder analyze(URLEncodedString indexName, String text, String analyzer,
+			String normalizer);
 }

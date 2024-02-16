@@ -10,8 +10,10 @@ import java.lang.invoke.MethodHandles;
 import java.util.List;
 import java.util.Set;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.CompletionStage;
 
 import org.hibernate.search.backend.elasticsearch.ElasticsearchBackend;
+import org.hibernate.search.backend.elasticsearch.analysis.impl.ElasticsearchAnalysisPerformer;
 import org.hibernate.search.backend.elasticsearch.document.impl.DocumentMetadataContributor;
 import org.hibernate.search.backend.elasticsearch.document.impl.ElasticsearchDocumentObjectBuilder;
 import org.hibernate.search.backend.elasticsearch.document.model.impl.ElasticsearchIndexModel;
@@ -22,7 +24,7 @@ import org.hibernate.search.backend.elasticsearch.orchestration.impl.Elasticsear
 import org.hibernate.search.backend.elasticsearch.schema.management.impl.ElasticsearchIndexSchemaManager;
 import org.hibernate.search.backend.elasticsearch.util.spi.URLEncodedString;
 import org.hibernate.search.backend.elasticsearch.work.execution.impl.WorkExecutionIndexManagerContext;
-import org.hibernate.search.engine.backend.analysis.AnalysisPerformer;
+import org.hibernate.search.engine.backend.analysis.AnalysisToken;
 import org.hibernate.search.engine.backend.index.IndexManager;
 import org.hibernate.search.engine.backend.index.spi.IndexManagerImplementor;
 import org.hibernate.search.engine.backend.index.spi.IndexManagerStartContext;
@@ -32,6 +34,7 @@ import org.hibernate.search.engine.backend.scope.spi.IndexScopeBuilder;
 import org.hibernate.search.engine.backend.session.spi.BackendSessionContext;
 import org.hibernate.search.engine.backend.work.execution.DocumentCommitStrategy;
 import org.hibernate.search.engine.backend.work.execution.DocumentRefreshStrategy;
+import org.hibernate.search.engine.backend.work.execution.OperationSubmitter;
 import org.hibernate.search.engine.backend.work.execution.spi.DocumentContributor;
 import org.hibernate.search.engine.backend.work.execution.spi.IndexIndexer;
 import org.hibernate.search.engine.backend.work.execution.spi.IndexIndexingPlan;
@@ -40,6 +43,7 @@ import org.hibernate.search.engine.cfg.spi.ConfigurationProperty;
 import org.hibernate.search.engine.cfg.spi.OptionalConfigurationProperty;
 import org.hibernate.search.engine.reporting.spi.EventContexts;
 import org.hibernate.search.util.common.impl.Closer;
+import org.hibernate.search.util.common.impl.Futures;
 import org.hibernate.search.util.common.impl.SuppressingCloser;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 import org.hibernate.search.util.common.reporting.EventContext;
@@ -65,6 +69,7 @@ class ElasticsearchIndexManagerImpl
 	private final ElasticsearchBatchingWorkOrchestrator indexingOrchestrator;
 
 	private ElasticsearchIndexSchemaManager schemaManager;
+	private ElasticsearchAnalysisPerformer analysisPerformer;
 
 	ElasticsearchIndexManagerImpl(IndexManagerBackendContext backendContext,
 			ElasticsearchIndexModel model,
@@ -106,6 +111,8 @@ class ElasticsearchIndexManagerImpl
 			);
 
 			indexingOrchestrator.start( context.configurationPropertySource() );
+
+			analysisPerformer = backendContext.createAnalysisPerformer( model );
 		}
 		catch (RuntimeException e) {
 			new SuppressingCloser( e )
@@ -224,8 +231,27 @@ class ElasticsearchIndexManagerImpl
 	}
 
 	@Override
-	public AnalysisPerformer analysisPerformer() {
-		throw new UnsupportedOperationException( "Not implemented." );
+	public List<? extends AnalysisToken> analyze(String analyzerName, String terms) {
+		return Futures.unwrappedExceptionJoin(
+				analyzeAsync( analyzerName, terms, OperationSubmitter.blocking() ).toCompletableFuture() );
+	}
+
+	@Override
+	public AnalysisToken normalize(String normalizerName, String terms) {
+		return Futures.unwrappedExceptionJoin(
+				normalizeAsync( normalizerName, terms, OperationSubmitter.blocking() ).toCompletableFuture() );
+	}
+
+	@Override
+	public CompletionStage<List<? extends AnalysisToken>> analyzeAsync(String analyzerName, String terms,
+			OperationSubmitter operationSubmitter) {
+		return analysisPerformer.analyze( analyzerName, terms, operationSubmitter );
+	}
+
+	@Override
+	public CompletionStage<AnalysisToken> normalizeAsync(String normalizerName, String terms,
+			OperationSubmitter operationSubmitter) {
+		return analysisPerformer.normalize( normalizerName, terms, operationSubmitter );
 	}
 
 	@Override
