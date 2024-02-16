@@ -34,5 +34,6 @@ public final class Paths {
 	public static final URLEncodedString _ALIASES = URLEncodedString.fromString( "_aliases" );
 	public static final URLEncodedString SCROLL = URLEncodedString.fromString( "scroll" );
 	public static final URLEncodedString HEALTH = URLEncodedString.fromString( "health" );
+	public static final URLEncodedString _ANALYZE = URLEncodedString.fromString( "_analyze" );
 
 }
