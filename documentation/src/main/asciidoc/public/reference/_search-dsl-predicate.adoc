@@ -1568,7 +1568,7 @@ an <<backend-elasticsearch,Elasticsearch backend>>.
 and trying to use it will lead to an exception being thrown.
 
 [[search-dsl-predicate-knn-limitations]]
-=== Backend specifics
+=== Backend specifics and limitations
 
 The parameter `k` has different behavior between backends, and their distributions.
 
@@ -1581,6 +1581,11 @@ While when an <<backend-elasticsearch-compatibility-opensearch,OpenSearch>> dist
 `k` will be mapped to `k` attribute of `knn` query. Note that in this case you may get more than `k` results,
 when the index is configured to have more than one shard.
 See this section of the OpenSearch link:{openSearchDocUrl}/search-plugins/knn/approximate-knn/#get-started-with-approximate-k-nn[documentation] for more details.
+
+Using the `knn` predicate inside a nested predicate with the Elasticsearch backend has some limitations.
+In particular, when a <<backend-elasticsearch-multi-tenancy,tenant>> or <<concepts-sharding-routing,routing>> filters
+are implicitly applied, the produced results may contain fewer documents than expected. To address this limitation,
+a schema change is required and should be addressed in one of the future major releases (link:{hibernateSearchJiraUrl}/HSEARCH-5085[HSEARCH-5085]).
 
 [[search-dsl-predicate-knn-other]]
 === Other options

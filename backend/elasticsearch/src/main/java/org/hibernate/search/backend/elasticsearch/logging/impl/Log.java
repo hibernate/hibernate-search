@@ -880,4 +880,9 @@ public interface Log extends BasicLogger {
 					+ " Try using a different similarity type and refer to the OpenSearch documentation for more details.")
 	SearchException vectorSimilarityNotSupportedByOpenSearchBackend(VectorSimilarity vectorSimilarity);
 
+	@LogMessage(level = Level.WARN)
+	@Message(id = ID_OFFSET + 189,
+			value = "Using a knn predicate in the nested context when tenant or routing filters are required "
+					+ "will lead to unpredictable results and may return fewer documents then expected.")
+	void knnUsedInNestedContextRequiresFilters();
 }
