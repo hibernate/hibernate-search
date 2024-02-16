@@ -49,7 +49,13 @@ public abstract class ElasticsearchKnnPredicate extends AbstractElasticsearchSin
 	protected JsonObject prepareFilter(PredicateRequestContext context) {
 		JsonObject mainFilter = filter == null ? null : filter.toJsonQuery( context );
 		JsonArray filters = context.tenantAndRoutingFilters();
-		return Queries.boolCombineMust( mainFilter, filters );
+		if ( context.getNestedPath() == null ) {
+			return Queries.boolCombineMust( mainFilter, filters );
+		}
+		else if ( !filters.isEmpty() ) {
+			log.knnUsedInNestedContextRequiresFilters();
+		}
+		return mainFilter;
 	}
 
 	public static class Elasticsearch812Factory<F>
