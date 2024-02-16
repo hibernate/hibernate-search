@@ -22,6 +22,7 @@ import org.hibernate.search.backend.elasticsearch.orchestration.impl.Elasticsear
 import org.hibernate.search.backend.elasticsearch.schema.management.impl.ElasticsearchIndexSchemaManager;
 import org.hibernate.search.backend.elasticsearch.util.spi.URLEncodedString;
 import org.hibernate.search.backend.elasticsearch.work.execution.impl.WorkExecutionIndexManagerContext;
+import org.hibernate.search.engine.backend.analysis.AnalysisPerformer;
 import org.hibernate.search.engine.backend.index.IndexManager;
 import org.hibernate.search.engine.backend.index.spi.IndexManagerImplementor;
 import org.hibernate.search.engine.backend.index.spi.IndexManagerStartContext;
@@ -220,6 +221,11 @@ class ElasticsearchIndexManagerImpl
 	@Override
 	public ElasticsearchIndexDescriptor descriptor() {
 		return model;
+	}
+
+	@Override
+	public AnalysisPerformer analysisPerformer() {
+		throw new UnsupportedOperationException( "Not implemented." );
 	}
 
 	@Override

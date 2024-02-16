@@ -8,10 +8,13 @@ package org.hibernate.search.util.impl.integrationtest.common.stub.backend.index
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import java.util.List;
 import java.util.Set;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.CompletionStage;
 
 import org.hibernate.search.engine.backend.Backend;
+import org.hibernate.search.engine.backend.analysis.AnalysisToken;
 import org.hibernate.search.engine.backend.index.IndexManager;
 import org.hibernate.search.engine.backend.index.spi.IndexManagerImplementor;
 import org.hibernate.search.engine.backend.index.spi.IndexManagerStartContext;
@@ -22,6 +25,7 @@ import org.hibernate.search.engine.backend.scope.spi.IndexScopeBuilder;
 import org.hibernate.search.engine.backend.session.spi.BackendSessionContext;
 import org.hibernate.search.engine.backend.work.execution.DocumentCommitStrategy;
 import org.hibernate.search.engine.backend.work.execution.DocumentRefreshStrategy;
+import org.hibernate.search.engine.backend.work.execution.OperationSubmitter;
 import org.hibernate.search.engine.backend.work.execution.spi.IndexIndexer;
 import org.hibernate.search.engine.backend.work.execution.spi.IndexIndexingPlan;
 import org.hibernate.search.engine.backend.work.execution.spi.IndexWorkspace;
@@ -136,6 +140,28 @@ public class StubIndexManager implements IndexManagerImplementor, IndexManager {
 	@Override
 	public IndexDescriptor descriptor() {
 		throw new UnsupportedOperationException( "Metamodel not supported in the stub backend" );
+	}
+
+	@Override
+	public List<? extends AnalysisToken> analyze(String analyzerName, String terms) {
+		throw new UnsupportedOperationException( "Analysis operations not supported in the stub backend" );
+	}
+
+	@Override
+	public AnalysisToken normalize(String normalizerName, String terms) {
+		throw new UnsupportedOperationException( "Analysis operations not supported in the stub backend" );
+	}
+
+	@Override
+	public CompletionStage<List<? extends AnalysisToken>> analyzeAsync(String analyzerName, String terms,
+			OperationSubmitter operationSubmitter) {
+		throw new UnsupportedOperationException( "Analysis operations not supported in the stub backend" );
+	}
+
+	@Override
+	public CompletionStage<AnalysisToken> normalizeAsync(String normalizerName, String terms,
+			OperationSubmitter operationSubmitter) {
+		throw new UnsupportedOperationException( "Analysis operations not supported in the stub backend" );
 	}
 
 	@Override

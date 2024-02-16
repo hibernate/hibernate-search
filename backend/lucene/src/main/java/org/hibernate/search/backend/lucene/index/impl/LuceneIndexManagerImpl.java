@@ -11,8 +11,10 @@ import java.lang.invoke.MethodHandles;
 import java.util.List;
 import java.util.Set;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.CompletionStage;
 
 import org.hibernate.search.backend.lucene.LuceneBackend;
+import org.hibernate.search.backend.lucene.analysis.impl.LuceneAnalysisPerformer;
 import org.hibernate.search.backend.lucene.document.impl.LuceneIndexEntryFactory;
 import org.hibernate.search.backend.lucene.document.model.impl.LuceneIndexModel;
 import org.hibernate.search.backend.lucene.index.LuceneIndexManager;
@@ -20,6 +22,7 @@ import org.hibernate.search.backend.lucene.logging.impl.Log;
 import org.hibernate.search.backend.lucene.lowlevel.reader.impl.DirectoryReaderCollector;
 import org.hibernate.search.backend.lucene.schema.management.impl.LuceneIndexSchemaManager;
 import org.hibernate.search.backend.lucene.scope.model.impl.LuceneScopeIndexManagerContext;
+import org.hibernate.search.engine.backend.analysis.AnalysisToken;
 import org.hibernate.search.engine.backend.index.IndexManager;
 import org.hibernate.search.engine.backend.index.spi.IndexManagerImplementor;
 import org.hibernate.search.engine.backend.index.spi.IndexManagerStartContext;
@@ -61,6 +64,7 @@ public class LuceneIndexManagerImpl
 	private final ShardHolder shardHolder;
 
 	private final LuceneIndexSchemaManager schemaManager;
+	private final LuceneAnalysisPerformer analysisPerformer;
 
 	LuceneIndexManagerImpl(IndexManagerBackendContext backendContext,
 			String indexName, LuceneIndexModel model, LuceneIndexEntryFactory indexEntryFactory) {
@@ -72,6 +76,7 @@ public class LuceneIndexManagerImpl
 
 		this.shardHolder = new ShardHolder( backendContext, model );
 		this.schemaManager = backendContext.createSchemaManager( indexName, shardHolder );
+		this.analysisPerformer = new LuceneAnalysisPerformer( backendContext.toAPI() );
 	}
 
 	@Override
@@ -188,6 +193,28 @@ public class LuceneIndexManagerImpl
 	@Override
 	public IndexDescriptor descriptor() {
 		return model;
+	}
+
+	@Override
+	public List<? extends AnalysisToken> analyze(String analyzerName, String terms) {
+		return analysisPerformer.analyze( analyzerName, terms );
+	}
+
+	@Override
+	public AnalysisToken normalize(String normalizerName, String terms) {
+		return analysisPerformer.normalize( normalizerName, terms );
+	}
+
+	@Override
+	public CompletionStage<List<? extends AnalysisToken>> analyzeAsync(String analyzerName, String terms,
+			OperationSubmitter operationSubmitter) {
+		return CompletableFuture.completedFuture( analyze( analyzerName, terms ) );
+	}
+
+	@Override
+	public CompletionStage<AnalysisToken> normalizeAsync(String normalizerName, String terms,
+			OperationSubmitter operationSubmitter) {
+		return CompletableFuture.completedFuture( normalize( normalizerName, terms ) );
 	}
 
 	@Override
