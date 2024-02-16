@@ -734,4 +734,14 @@ public interface Log extends BasicLogger {
 
 	@Message(id = ID_OFFSET + 180, value = "An error occurred while parsing the query string '%1$s': %2$s")
 	SearchException queryStringParseException(String query, String message, @Cause Exception cause);
+
+	@Message(id = ID_OFFSET + 181, value = "An analyzer '%1$s' cannot be found.")
+	SearchException noSuchAnalyzer(String analyzer);
+
+	@Message(id = ID_OFFSET + 182, value = "A normalizer '%1$s' cannot be found.")
+	SearchException noSuchNormalizer(String normalizer);
+
+	@Message(id = ID_OFFSET + 183, value = "Failed to apply '%1$s' to '%2$s': '%3$s'")
+	SearchException unableToPerformAnalysisOperation(String analyzerName, String string, String reason,
+			@Cause IOException cause);
 }
