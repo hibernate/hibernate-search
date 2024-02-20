@@ -1,5 +1,46 @@
-[[indexing-workspace]]
-= [[mapper-orm-indexing-manual-largescale]] Explicitly altering a whole index
+[[explicit-backend-index-operations-analysis-run-analysis]]
+= Applying configured analyzers/normalizers to a string
+
+include::../components/_incubating-warning.adoc[]
+
+Hibernate Search provides an API that applies an analyzer/normalizer to a given string.
+This can be useful to test how these analyzers/normalizers work.
+
+.Inspecting tokens produced by a configured analyzer.
+====
+[source, JAVA, indent=0, subs="+callouts"]
+----
+include::{sourcedir}/org/hibernate/search/documentation/analysis/ApplyAnalyzerNormalizerIT.java[tags=analyzer]
+----
+<1> <<entrypoints-search-mapping,Retrieve the `SearchMapping`>>.
+<2> Retrieve the `IndexManager`.
+<3> Perform the analysis.
+<4> Pass the name of a <<concepts-analysis,configured analyzer>>.
+<5> Pass the text on which the analysis should be performed.
+<6> Inspect the tokens produced by the analysis.
+====
+
+.Inspecting tokens produced by a configured normalizer.
+====
+[source, JAVA, indent=0, subs="+callouts"]
+----
+include::{sourcedir}/org/hibernate/search/documentation/analysis/ApplyAnalyzerNormalizerIT.java[tags=normalizer]
+----
+<1> <<entrypoints-search-mapping,Retrieve the `SearchMapping`>>.
+<2> Retrieve the `IndexManager`.
+<3> Perform the normalization.
+<4> Pass the name of a <<concepts-analysis,configured normalizer>>.
+<5> Pass the text to which the normalizer should be applied.
+<6> Inspect the token produced by the normalizer.
+====
+
+[NOTE]
+====
+There are also async versions of the methods to perform analysis/normalization: `analyzeAsync(..)`/`normalizeAsync(..)`.
+====
+
+[[explicit-backend-index-operations-indexing-workspace]]
+= [[indexing-workspace]][[mapper-orm-indexing-manual-largescale]] Explicitly altering a whole index
 
 Some index operations are not about a specific entity/document,
 but rather about a large number of documents, possibly all of them.
