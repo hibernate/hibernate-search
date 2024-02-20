@@ -1,38 +1,11 @@
 [[explicit-backend-index-operations]]
 = Explicit backend/index operations
+:leveloffset: +1
 
-[[explicit-backend-index-operations-analysis-run-analysis]]
-=== Applying configured analyzers/normalizers to a string
+include::_explicit_backend_index_operations_common.adoc[]
 
-include::../components/_incubating-warning.adoc[]
+include::_explicit_operations_lucene-specific.adoc[]
 
-Hibernate Search provides an API that applies an analyzer/normalizer to a given string.
-This can be useful to test how these analyzers/normalizers work.
+include::_explicit_operations_elasticsearch-specific.adoc[]
 
-.Inspecting tokens produced by a configured analyzer.
-====
-[source, JAVA, indent=0, subs="+callouts"]
-----
-include::{sourcedir}/org/hibernate/search/documentation/analysis/ApplyAnalyzerNormalizerIT.java[tags=analyzer]
-----
-<1> <<entrypoints-search-mapping,Retrieve the `SearchMapping`>>.
-<2> Retrieve the `IndexManager`.
-<3> Perform the analysis.
-<4> Pass the name of a <<concepts-analysis,configured analyzer>>.
-<5> Pass the text on which the analysis should be performed.
-<6> Inspect the tokens produced by the analysis.
-====
-
-.Inspecting tokens produced by a configured normalizer.
-====
-[source, JAVA, indent=0, subs="+callouts"]
-----
-include::{sourcedir}/org/hibernate/search/documentation/analysis/ApplyAnalyzerNormalizerIT.java[tags=normalizer]
-----
-<1> <<entrypoints-search-mapping,Retrieve the `SearchMapping`>>.
-<2> Retrieve the `IndexManager`.
-<3> Perform the normalization.
-<4> Pass the name of a <<concepts-analysis,configured normalizer>>.
-<5> Pass the text to which the normalizer should be applied.
-<6> Inspect the token produced by the normalizer.
-====
+:leveloffset: -1
