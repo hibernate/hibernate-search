@@ -1,0 +1,89 @@
+[[explicit-backend-index-operations-lucene]]
+= Lucene-specific explicit backend/index operations
+
+[[explicit-backend-index-operations-lucene-access-analyzers]]
+== [[backend-lucene-access-analyzers]] Retrieving analyzers and normalizers through the Lucene-specific `Backend`
+
+Lucene analyzers and normalizers <<backend-lucene-analysis,defined in Hibernate Search>>
+can be retrieved from the Lucene backend.
+
+.Retrieving the Lucene analyzers by name from the backend
+====
+[source, JAVA, indent=0, subs="+callouts"]
+----
+include::{sourcedir}/org/hibernate/search/documentation/backend/lucene/analyzer/LuceneGetAnalyzerIT.java[tags=fromBackend]
+----
+<1> <<entrypoints-search-mapping,Retrieve the `SearchMapping`>>.
+<2> Retrieve the `Backend`.
+<3> Narrow down the backend to the `LuceneBackend` type.
+<4> Get an analyzer by name.
+The method returns an `Optional`, which is empty if the analyzer does not exist.
+The analyzer must have been <<backend-lucene-analysis,defined in Hibernate Search>>,
+otherwise it won't exist.
+<5> Get a normalizer by name.
+The method returns an `Optional`, which is empty if the normalizer does not exist.
+The normalizer must have been <<backend-lucene-analysis,defined in Hibernate Search>>,
+otherwise it won't exist.
+====
+
+Alternatively, you can also retrieve the (composite) analyzers for a whole index.
+These analyzers behave differently for each field,
+delegating to the analyzer configured in the mapping for each field.
+
+.Retrieving the Lucene analyzers for a whole index
+====
+[source, JAVA, indent=0, subs="+callouts"]
+----
+include::{sourcedir}/org/hibernate/search/documentation/backend/lucene/analyzer/LuceneGetAnalyzerIT.java[tags=fromIndexManager]
+----
+<1> <<entrypoints-search-mapping,Retrieve the `SearchMapping`>>.
+<2> Retrieve the `IndexManager`.
+<3> Narrow down the index manager to the `LuceneIndexManager` type.
+<4> Get the indexing analyzer.
+This is the analyzer used when indexing documents.
+It ignores the <<mapping-directfieldmapping-search-analyzer,search analyzer>> in particular.
+<5> Get the search analyzer.
+This is the analyzer used when building search queries through the <<search-dsl,Search DSL>>.
+On contrary to the indexing analyzer, it takes into account the <<mapping-directfieldmapping-search-analyzer,search analyzer>>.
+====
+
+[[explicit-backend-index-operations-lucene-access-size]]
+== [[backend-lucene-access-size]] Retrieving the Lucene's index size
+
+The size of a Lucene index can be retrieved from the `LuceneIndexManager`.
+
+.Retrieving the index size from a Lucene index manager
+====
+[source, JAVA, indent=0, subs="+callouts"]
+----
+include::{sourcedir}/org/hibernate/search/documentation/backend/lucene/indexmanager/LuceneGetIndexSizeIT.java[tags=computeIndexSize]
+----
+<1> <<entrypoints-search-mapping,Retrieve the `SearchMapping`>>.
+<2> Retrieve the `IndexManager`.
+<3> Narrow down the index manager to the `LuceneIndexManager` type.
+<4> Compute the index size and get the result.
+<5> An asynchronous version of the method is also available.
+====
+
+[[explicit-backend-index-operations-lucene-access-index-reader]]
+== [[backend-lucene-access-index-reader]] [[_retrieving_a_lucene_indexreader]] Retrieving a Lucene `IndexReader`
+
+The low-level `IndexReader` can be retrieved from the `LuceneIndexScope`.
+
+.Retrieving the index reader from a Lucene index scope
+====
+[source, JAVA, indent=0, subs="+callouts"]
+----
+include::{sourcedir}/org/hibernate/search/documentation/backend/lucene/lowlevel/LuceneLowLevelIndexReaderIT.java[tags=indexReader]
+----
+<1> <<entrypoints-search-mapping,Retrieve the `SearchMapping`>>.
+<2> Retrieve the `LuceneIndexScope` extending the search scope with the `LuceneExtension`.
+<3> Open an instance of `IndexReader`. Optionally it is possible to provide the routing keys
+to target only some shards of the indexes using the method `openIndexReader(Set<String>)`.
+The IndexReader **must be closed** after use.
+====
+
+[WARNING]
+====
+Even if multi-tenancy is enabled, the returned reader exposes documents of *all* tenants.
+====

@@ -50,7 +50,7 @@ include::_indexing.adoc[]
 
 include::_search-dsl.adoc[]
 
-include::_explicit_index_backend_operations.adoc[]
+include::_explicit_backend_index_operations.adoc[]
 
 include::_backend-lucene.adoc[]
 
