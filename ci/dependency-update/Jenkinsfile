@@ -77,7 +77,14 @@ def withMavenWorkspace(Closure body) {
 	var actualJdk = settings().testCompilerTool == null ? 'OpenJDK 17 Latest' : settings().testCompilerTool
 	withMaven(jdk: actualJdk, maven: 'Apache Maven 3.9',
 			mavenLocalRepo: env.WORKSPACE_TMP + '/.m2repository',
-			options: [artifactsPublisher(disabled: true)]) {
+			options: [
+					// Artifacts are not needed and take up disk space
+					artifactsPublisher(disabled: true),
+					// stdout/stderr for successful tests is not needed and takes up disk space
+					// we archive test results and stdout/stderr as part of the build scan anyway,
+					// see https://ge.hibernate.org/scans?search.rootProjectNames=Hibernate%20Search
+					junitPublisher(disabled: true)
+			]) {
 		withCredentials([string(credentialsId: 'ge.hibernate.org-access-key',
 				variable: 'GRADLE_ENTERPRISE_ACCESS_KEY')]) {
 			withGradle { // withDevelocity, actually: https://plugins.jenkins.io/gradle/#plugin-content-capturing-build-scans-from-jenkins-pipeline
