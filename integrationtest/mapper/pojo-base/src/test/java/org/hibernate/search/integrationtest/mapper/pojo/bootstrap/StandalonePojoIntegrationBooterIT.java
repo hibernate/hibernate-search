@@ -29,6 +29,7 @@ import org.hibernate.search.mapper.pojo.standalone.cfg.StandalonePojoMapperSetti
 import org.hibernate.search.mapper.pojo.standalone.mapping.CloseableSearchMapping;
 import org.hibernate.search.mapper.pojo.standalone.mapping.StandalonePojoMappingConfigurationContext;
 import org.hibernate.search.mapper.pojo.standalone.mapping.StandalonePojoMappingConfigurer;
+import org.hibernate.search.mapper.pojo.standalone.schema.management.SchemaManagementStrategyName;
 import org.hibernate.search.mapper.pojo.standalone.session.SearchSession;
 import org.hibernate.search.util.common.impl.Closer;
 import org.hibernate.search.util.common.reflect.spi.ValueHandleFactory;
@@ -119,11 +120,16 @@ class StandalonePojoIntegrationBooterIT {
 						Fail.fail( "Hibernate Search did not re-use the mapping generated when pre-booting" );
 					}
 				} )
+				// We set a non-default schema management strategy in the second phase of booting
+				// to check that Hibernate Search takes it into account then, not in the first phase.
+				.property( StandalonePojoMapperSettings.SCHEMA_MANAGEMENT_STRATEGY,
+						SchemaManagementStrategyName.DROP_AND_CREATE )
 				.build();
 
 		// Actually booting the mapping should lead to a schema creation in the backend.
 		backendMock.expectSchemaManagementWorks( INDEX_NAME )
-				.work( StubSchemaManagementWork.Type.CREATE_OR_VALIDATE );
+				// And the schema management strategy should be the one set in the second phase of bootstrap.
+				.work( StubSchemaManagementWork.Type.DROP_AND_CREATE );
 		try ( CloseableSearchMapping mapping = actualBooter.boot() ) {
 			mappingHandlePromise.complete( new StandalonePojoMappingHandle() );
 
