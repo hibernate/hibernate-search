@@ -19,6 +19,7 @@ import org.hibernate.search.backend.elasticsearch.dialect.model.impl.Elasticsear
 import org.hibernate.search.backend.elasticsearch.dialect.model.impl.Elasticsearch8ModelDialect;
 import org.hibernate.search.backend.elasticsearch.dialect.model.impl.ElasticsearchModelDialect;
 import org.hibernate.search.backend.elasticsearch.dialect.model.impl.OpenSearch1ModelDialect;
+import org.hibernate.search.backend.elasticsearch.dialect.model.impl.OpenSearch29ModelDialect;
 import org.hibernate.search.backend.elasticsearch.dialect.model.impl.OpenSearch2ModelDialect;
 import org.hibernate.search.backend.elasticsearch.dialect.protocol.impl.Elasticsearch70ProtocolDialect;
 import org.hibernate.search.backend.elasticsearch.dialect.protocol.impl.Elasticsearch80ProtocolDialect;
@@ -341,55 +342,55 @@ class ElasticsearchDialectFactoryTest {
 				),
 				success(
 						ElasticsearchDistributionName.OPENSEARCH, "2.9", "2.9.0",
-						OpenSearch2ModelDialect.class, Elasticsearch70ProtocolDialect.class
+						OpenSearch29ModelDialect.class, Elasticsearch70ProtocolDialect.class
 				),
 				success(
 						ElasticsearchDistributionName.OPENSEARCH, "2.9.0", "2.9.0",
-						OpenSearch2ModelDialect.class, Elasticsearch70ProtocolDialect.class
+						OpenSearch29ModelDialect.class, Elasticsearch70ProtocolDialect.class
 				),
 				success(
 						ElasticsearchDistributionName.OPENSEARCH, "2.10", "2.10.0",
-						OpenSearch2ModelDialect.class, Elasticsearch70ProtocolDialect.class
+						OpenSearch29ModelDialect.class, Elasticsearch70ProtocolDialect.class
 				),
 				success(
 						ElasticsearchDistributionName.OPENSEARCH, "2.10.0", "2.10.0",
-						OpenSearch2ModelDialect.class, Elasticsearch70ProtocolDialect.class
+						OpenSearch29ModelDialect.class, Elasticsearch70ProtocolDialect.class
 				),
 				success(
 						ElasticsearchDistributionName.OPENSEARCH, "2.11", "2.11.0",
-						OpenSearch2ModelDialect.class, Elasticsearch70ProtocolDialect.class
+						OpenSearch29ModelDialect.class, Elasticsearch70ProtocolDialect.class
 				),
 				success(
 						ElasticsearchDistributionName.OPENSEARCH, "2.11.0", "2.11.0",
-						OpenSearch2ModelDialect.class, Elasticsearch70ProtocolDialect.class
+						OpenSearch29ModelDialect.class, Elasticsearch70ProtocolDialect.class
 				),
 				success(
 						ElasticsearchDistributionName.OPENSEARCH, "2.12", "2.12.0",
-						OpenSearch2ModelDialect.class, Elasticsearch70ProtocolDialect.class
+						OpenSearch29ModelDialect.class, Elasticsearch70ProtocolDialect.class
 				),
 				success(
 						ElasticsearchDistributionName.OPENSEARCH, "2.12.0", "2.12.0",
-						OpenSearch2ModelDialect.class, Elasticsearch70ProtocolDialect.class
+						OpenSearch29ModelDialect.class, Elasticsearch70ProtocolDialect.class
 				),
 				successWithWarning(
 						ElasticsearchDistributionName.OPENSEARCH, "2.13", "2.13.0",
-						OpenSearch2ModelDialect.class, Elasticsearch70ProtocolDialect.class
+						OpenSearch29ModelDialect.class, Elasticsearch70ProtocolDialect.class
 				),
 				successWithWarning(
 						ElasticsearchDistributionName.OPENSEARCH, "2.13.0", "2.13.0",
-						OpenSearch2ModelDialect.class, Elasticsearch70ProtocolDialect.class
+						OpenSearch29ModelDialect.class, Elasticsearch70ProtocolDialect.class
 				),
 				successWithWarning(
 						ElasticsearchDistributionName.OPENSEARCH, "3", "3.0.0",
-						OpenSearch2ModelDialect.class, Elasticsearch70ProtocolDialect.class
+						OpenSearch29ModelDialect.class, Elasticsearch70ProtocolDialect.class
 				),
 				successWithWarning(
 						ElasticsearchDistributionName.OPENSEARCH, "3.0", "3.0.0",
-						OpenSearch2ModelDialect.class, Elasticsearch70ProtocolDialect.class
+						OpenSearch29ModelDialect.class, Elasticsearch70ProtocolDialect.class
 				),
 				successWithWarning(
 						ElasticsearchDistributionName.OPENSEARCH, "3.0.0", "3.0.0",
-						OpenSearch2ModelDialect.class, Elasticsearch70ProtocolDialect.class
+						OpenSearch29ModelDialect.class, Elasticsearch70ProtocolDialect.class
 				)
 		);
 	}
