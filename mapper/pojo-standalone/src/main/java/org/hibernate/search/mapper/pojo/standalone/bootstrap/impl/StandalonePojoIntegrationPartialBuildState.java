@@ -68,7 +68,7 @@ final class StandalonePojoIntegrationPartialBuildState {
 
 		StandalonePojoMapping mapping = finalizer.finalizeMapping(
 				mappingKey,
-				(context, partialMapping) -> partialMapping.finalizeMapping()
+				(context, partialMapping) -> partialMapping.finalizeMapping( context )
 		);
 		finalizer.finalizeIntegration();
 

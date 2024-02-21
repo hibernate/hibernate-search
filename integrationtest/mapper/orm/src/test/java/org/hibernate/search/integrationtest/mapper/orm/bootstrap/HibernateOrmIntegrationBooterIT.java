@@ -37,6 +37,7 @@ import org.hibernate.search.mapper.orm.bootstrap.spi.HibernateOrmIntegrationBoot
 import org.hibernate.search.mapper.orm.cfg.HibernateOrmMapperSettings;
 import org.hibernate.search.mapper.orm.mapping.HibernateOrmMappingConfigurationContext;
 import org.hibernate.search.mapper.orm.mapping.HibernateOrmSearchMappingConfigurer;
+import org.hibernate.search.mapper.orm.schema.management.SchemaManagementStrategyName;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.FullTextField;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
 import org.hibernate.search.util.common.impl.Closer;
@@ -116,7 +117,11 @@ class HibernateOrmIntegrationBooterIT {
 					public void configure(HibernateOrmMappingConfigurationContext context) {
 						Fail.fail( "Hibernate Search did not re-use the mapping generated when pre-booting" );
 					}
-				} );
+				} )
+				// We set a non-default schema management strategy in the second phase of booting
+				// to check that Hibernate Search takes it into account then, not in the first phase.
+				.setProperty( HibernateOrmMapperSettings.SCHEMA_MANAGEMENT_STRATEGY,
+						SchemaManagementStrategyName.DROP_AND_CREATE );
 
 		DatabaseContainer.configuration().add( booterGeneratedProperties );
 		for ( Map.Entry<String, Object> booterGeneratedProperty : booterGeneratedProperties.entrySet() ) {
@@ -125,7 +130,8 @@ class HibernateOrmIntegrationBooterIT {
 
 		// Actually booting the session factory should lead to a schema creation in the backend.
 		backendMock.expectSchemaManagementWorks( INDEX_NAME )
-				.work( StubSchemaManagementWork.Type.CREATE_OR_VALIDATE );
+				// And the schema management strategy should be the one set in the second phase of bootstrap.
+				.work( StubSchemaManagementWork.Type.DROP_AND_CREATE );
 		try ( SessionFactory sessionFactory = builder.build() ) {
 			mappingHandlePromise.complete( new HibernateOrmMappingHandle( sessionFactory ) );
 

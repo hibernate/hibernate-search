@@ -22,17 +22,9 @@ import org.hibernate.search.mapper.pojo.standalone.cfg.StandalonePojoMapperSetti
 import org.hibernate.search.mapper.pojo.standalone.mapping.StandalonePojoMappingConfigurationContext;
 import org.hibernate.search.mapper.pojo.standalone.mapping.StandalonePojoMappingConfigurer;
 import org.hibernate.search.mapper.pojo.standalone.model.impl.StandalonePojoBootstrapIntrospector;
-import org.hibernate.search.mapper.pojo.standalone.schema.management.SchemaManagementStrategyName;
-import org.hibernate.search.mapper.pojo.standalone.schema.management.impl.SchemaManagementListener;
 
 public class StandalonePojoMappingInitiator extends AbstractPojoMappingInitiator<StandalonePojoMappingPartialBuildState>
 		implements StandalonePojoMappingConfigurationContext {
-
-	private static final ConfigurationProperty<SchemaManagementStrategyName> SCHEMA_MANAGEMENT_STRATEGY =
-			ConfigurationProperty.forKey( StandalonePojoMapperSettings.Radicals.SCHEMA_MANAGEMENT_STRATEGY )
-					.as( SchemaManagementStrategyName.class, SchemaManagementStrategyName::of )
-					.withDefault( StandalonePojoMapperSettings.Defaults.SCHEMA_MANAGEMENT_STRATEGY )
-					.build();
 
 	private static final OptionalConfigurationProperty<
 			List<BeanReference<? extends StandalonePojoMappingConfigurer>>> MAPPING_CONFIGURER =
@@ -47,12 +39,8 @@ public class StandalonePojoMappingInitiator extends AbstractPojoMappingInitiator
 					.withDefault( StandalonePojoMapperSettings.Defaults.MULTI_TENANCY_ENABLED )
 					.build();
 
-	private final StandalonePojoBootstrapIntrospector introspector;
-	private SchemaManagementListener schemaManagementListener;
-
 	public StandalonePojoMappingInitiator(StandalonePojoBootstrapIntrospector introspector) {
 		super( introspector );
-		this.introspector = introspector;
 		// Enable annotated type discovery by default
 		annotationMapping()
 				.discoverAnnotatedTypesFromRootMappingAnnotations( true )
@@ -79,15 +67,11 @@ public class StandalonePojoMappingInitiator extends AbstractPojoMappingInitiator
 					}
 				} );
 
-		SchemaManagementStrategyName schemaManagementStrategyName = SCHEMA_MANAGEMENT_STRATEGY.get(
-				buildContext.configurationPropertySource() );
-		schemaManagementListener = new SchemaManagementListener( schemaManagementStrategyName );
-
 		super.configure( buildContext, configurationCollector );
 	}
 
 	@Override
 	protected PojoMapperDelegate<StandalonePojoMappingPartialBuildState> createMapperDelegate() {
-		return new StandalonePojoMapperDelegate( schemaManagementListener );
+		return new StandalonePojoMapperDelegate();
 	}
 }
