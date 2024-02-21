@@ -62,7 +62,7 @@ class PredicateDslIT {
 		return BackendConfiguration.isLucene()
 				|| ElasticsearchTestDialect.isActualVersion(
 						es -> !es.isLessThan( "8.12.0" ),
-						os -> !os.isLessThan( "2.0.0" ),
+						os -> !os.isLessThan( "2.9.0" ),
 						aoss -> true
 				);
 	}
@@ -1309,7 +1309,7 @@ class PredicateDslIT {
 		if ( !BackendConfiguration.isElasticsearch()
 				|| ElasticsearchTestDialect.isActualVersion(
 						es -> !es.isLessThan( "8.12.0" ),
-						os -> !os.isLessThan( "2.0.0" ),
+						os -> !os.isLessThan( "2.9.0" ),
 						aoss -> true
 				) ) {
 			withinSearchSession( searchSession -> {
