@@ -878,6 +878,12 @@ void withMavenWorkspace(Closure body) {
 }
 
 void withMavenWorkspace(Map args, Closure body) {
+	args.put("options", [
+			// Artifacts are not needed and take up disk space
+			artifactsPublisher(disabled: true),
+			// stdout/stderr for successful tests is not needed and takes up disk space
+			junitPublisher(stdioRetention: 'failed')
+	])
 	helper.withMavenWorkspace(args, {
 		// The script is in the code repository, so we need the scm checkout
 		// to be performed by helper.withMavenWorkspace before we can call the script.
