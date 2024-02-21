@@ -5,7 +5,7 @@
  * See the lgpl.txt file in the root directory or <http://www.gnu.org/licenses/lgpl-2.1.html>.
  */
 
-@Library('hibernate-jenkins-pipeline-helpers@1.5') _
+@Library('hibernate-jenkins-pipeline-helpers') _
 
 // NOTE: Remember to update the matrix axes below when adding/removing entries here.
 // Also make sure to update the parameters in the parameters {} section of the pipeline.
@@ -64,7 +64,7 @@ def pullContainerImages() {
 def withMavenWorkspace(Closure body) {
 	withMaven(jdk: 'OpenJDK 17 Latest', maven: 'Apache Maven 3.9',
 			mavenLocalRepo: env.WORKSPACE_TMP + '/.m2repository',
-			options: [artifactsPublisher(disabled: true)]) {
+			options: [artifactsPublisher(disabled: true), junitPublisher(disabled: true)]) {
 		body()
 	}
 }
