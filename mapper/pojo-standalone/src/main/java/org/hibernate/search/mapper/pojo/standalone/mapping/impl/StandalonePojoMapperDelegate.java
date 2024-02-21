@@ -13,17 +13,14 @@ import org.hibernate.search.mapper.pojo.mapping.building.spi.PojoMapperDelegate;
 import org.hibernate.search.mapper.pojo.mapping.spi.PojoMappingDelegate;
 import org.hibernate.search.mapper.pojo.model.spi.PojoRawTypeModel;
 import org.hibernate.search.mapper.pojo.standalone.reporting.impl.StandalonePojoMappingHints;
-import org.hibernate.search.mapper.pojo.standalone.schema.management.impl.SchemaManagementListener;
 
 public final class StandalonePojoMapperDelegate
 		implements PojoMapperDelegate<StandalonePojoMappingPartialBuildState> {
 
 	private final StandalonePojoTypeContextContainer.Builder typeContextContainerBuilder;
-	private final SchemaManagementListener schemaManagementListener;
 
-	public StandalonePojoMapperDelegate(SchemaManagementListener schemaManagementListener) {
+	public StandalonePojoMapperDelegate() {
 		this.typeContextContainerBuilder = new StandalonePojoTypeContextContainer.Builder();
-		this.schemaManagementListener = schemaManagementListener;
 	}
 
 	@Override
@@ -45,8 +42,7 @@ public final class StandalonePojoMapperDelegate
 
 	@Override
 	public StandalonePojoMappingPartialBuildState prepareBuild(PojoMappingDelegate mappingDelegate) {
-		return new StandalonePojoMappingPartialBuildState( mappingDelegate, typeContextContainerBuilder.build(),
-				schemaManagementListener );
+		return new StandalonePojoMappingPartialBuildState( mappingDelegate, typeContextContainerBuilder.build() );
 	}
 
 	@Override
