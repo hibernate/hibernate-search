@@ -895,6 +895,14 @@ void withMavenWorkspace(Closure body) {
 }
 
 void withMavenWorkspace(Map args, Closure body) {
+	args.put("options", [
+			// Artifacts are not needed and take up disk space
+			artifactsPublisher(disabled: true),
+			// stdout/stderr for successful tests is not needed and takes up disk space
+			// we archive test results and stdout/stderr as part of the build scan anyway,
+			// see https://ge.hibernate.org/scans?search.rootProjectNames=Hibernate%20Search
+			junitPublisher(disabled: true)
+	])
 	helper.withMavenWorkspace(args, {
 		// The script is in the code repository, so we need the scm checkout
 		// to be performed by helper.withMavenWorkspace before we can call the script.
