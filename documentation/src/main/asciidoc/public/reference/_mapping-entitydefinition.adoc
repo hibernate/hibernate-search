@@ -114,7 +114,7 @@ include::{sourcedir}/org/hibernate/search/documentation/mapper/pojo/standalone/e
 ====
 
 [[mapping-entitydefinition-loading-mass]]
-=== Mass loading strategy
+== Mass loading strategy
 
 A "mass loading strategy" gives Hibernate Search
 the ability to load entities of a given type
@@ -233,7 +233,7 @@ include::{sourcedir}/org/hibernate/search/documentation/mapper/pojo/standalone/l
 ====
 
 [[mapping-entitydefinition-loading-selection]]
-=== Selection loading strategy
+== Selection loading strategy
 
 A "selection loading strategy" gives Hibernate Search
 the ability to load entities of a given type
