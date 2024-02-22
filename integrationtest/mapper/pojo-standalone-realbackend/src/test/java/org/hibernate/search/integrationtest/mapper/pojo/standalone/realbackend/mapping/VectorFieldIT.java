@@ -18,6 +18,7 @@ import java.util.List;
 import java.util.Objects;
 
 import org.hibernate.search.backend.elasticsearch.ElasticsearchDistributionName;
+import org.hibernate.search.backend.elasticsearch.ElasticsearchVersion;
 import org.hibernate.search.engine.backend.types.VectorSimilarity;
 import org.hibernate.search.engine.search.projection.dsl.SearchProjectionFactory;
 import org.hibernate.search.integrationtest.mapper.pojo.standalone.realbackend.testsupport.BackendConfigurations;
@@ -77,7 +78,8 @@ class VectorFieldIT {
 	 */
 	@Test
 	void vectorSizeLimits_max_allowed_dimension_with_lots_of_documents() {
-		int maxDimension = maxDimension();
+		// with OpenSearch 2.12 it allows up to 16000 which will lead to an OOM in this particular test:
+		int maxDimension = Math.min( 4096, maxDimension() );
 		@Indexed(index = INDEX_NAME)
 		class IndexedEntity {
 			@DocumentId
@@ -214,13 +216,19 @@ class VectorFieldIT {
 			return 4096;
 		}
 		else {
-			ElasticsearchDistributionName distribution = ElasticsearchTestDialect.getActualVersion().distribution();
+			ElasticsearchVersion actualVersion = ElasticsearchTestDialect.getActualVersion();
+			ElasticsearchDistributionName distribution = actualVersion.distribution();
 			if ( ElasticsearchDistributionName.ELASTIC.equals( distribution ) ) {
 				return 4096;
 			}
 			else {
-				// looks like there's a bug in OpenSearch? it won't accept 16000
-				return 1024;
+				if ( actualVersion.majorOptional().orElse( Integer.MIN_VALUE ) == 2
+						&& ( actualVersion.minor().isEmpty() || actualVersion.minor().getAsInt() > 11 ) ) {
+					return 16000;
+				}
+				else {
+					return 1024;
+				}
 			}
 		}
 	}

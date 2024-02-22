@@ -13,6 +13,8 @@ import java.math.BigInteger;
 
 import org.hibernate.search.engine.backend.types.VectorSimilarity;
 import org.hibernate.search.engine.spatial.GeoPoint;
+import org.hibernate.search.integrationtest.backend.tck.testsupport.types.FieldTypeDescriptor;
+import org.hibernate.search.integrationtest.backend.tck.testsupport.types.FloatFieldTypeDescriptor;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.TckBackendFeatures;
 import org.hibernate.search.util.impl.integrationtest.backend.elasticsearch.dialect.ElasticsearchTestDialect;
 
@@ -143,7 +145,8 @@ public class ElasticsearchTckBackendFeatures extends TckBackendFeatures {
 		// Hopefully this will get fixed in a future version.
 		return isActualVersion(
 				esVersion -> !esVersion.isBetween( "7.17.7", "7.17" ) && esVersion.isLessThan( "8.5.0" ),
-				osVersion -> true
+				// https://github.com/opensearch-project/OpenSearch/issues/12433
+				osVersion -> osVersion.isLessThan( "2.12.0" )
 		);
 	}
 
@@ -278,5 +281,15 @@ public class ElasticsearchTckBackendFeatures extends TckBackendFeatures {
 			default:
 				return true;
 		}
+	}
+
+	@Override
+	public boolean canPerformTermsQuery(FieldTypeDescriptor<?, ?> fieldType) {
+		return isActualVersion(
+				es -> true,
+				// https://github.com/opensearch-project/OpenSearch/issues/12432
+				os -> os.isLessThan( "2.12.0" ) || !FloatFieldTypeDescriptor.INSTANCE.equals( fieldType ),
+				aoss -> false
+		);
 	}
 }
