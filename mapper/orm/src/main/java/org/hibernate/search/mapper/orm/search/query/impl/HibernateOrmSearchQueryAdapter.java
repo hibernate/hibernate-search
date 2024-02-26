@@ -148,6 +148,10 @@ public final class HibernateOrmSearchQueryAdapter<R> extends AbstractQuery<R> {
 		return scroll( ScrollMode.FORWARD_ONLY );
 	}
 
+	public long getResultCount() {
+		return delegate.fetchTotalHitCount();
+	}
+
 	@Override
 	protected ScrollableResultsImplementor<R> doScroll(ScrollMode scrollMode) {
 		if ( !ScrollMode.FORWARD_ONLY.equals( scrollMode ) ) {
@@ -185,7 +189,7 @@ public final class HibernateOrmSearchQueryAdapter<R> extends AbstractQuery<R> {
 			delegate.failAfter( queryTimeout, TimeUnit.SECONDS );
 		}
 		EntityGraphHint<?> entityGraphHint = null;
-		if ( hasAppliedGraph( queryOptions ) ) {
+		if ( isGraphApplied( queryOptions ) ) {
 			AppliedGraph appliedGraph = queryOptions.getAppliedGraph();
 			RootGraph<?> graph = appliedGraph.getGraph();
 			if ( graph != null ) {
@@ -317,4 +321,8 @@ public final class HibernateOrmSearchQueryAdapter<R> extends AbstractQuery<R> {
 		}
 	}
 
+	private static boolean isGraphApplied(MutableQueryOptions queryOptions) {
+		final AppliedGraph appliedGraph = queryOptions.getAppliedGraph();
+		return appliedGraph != null && appliedGraph.getSemantic() != null;
+	}
 }
