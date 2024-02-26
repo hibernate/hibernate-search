@@ -26,6 +26,8 @@ import org.hibernate.graph.GraphSemantic;
 import org.hibernate.graph.RootGraph;
 import org.hibernate.graph.spi.AppliedGraph;
 import org.hibernate.graph.spi.RootGraphImplementor;
+import org.hibernate.query.KeyedPage;
+import org.hibernate.query.KeyedResultList;
 import org.hibernate.query.ResultListTransformer;
 import org.hibernate.query.TupleTransformer;
 import org.hibernate.query.spi.AbstractQuery;
@@ -148,8 +150,14 @@ public final class HibernateOrmSearchQueryAdapter<R> extends AbstractQuery<R> {
 		return scroll( ScrollMode.FORWARD_ONLY );
 	}
 
+	@Override
 	public long getResultCount() {
 		return delegate.fetchTotalHitCount();
+	}
+
+	@Override
+	public KeyedResultList<R> getKeyedResultList(KeyedPage<R> page) {
+		throw new UnsupportedOperationException( "Query " + this + " does not implement getKeyedResultList(...)." );
 	}
 
 	@Override

@@ -443,34 +443,22 @@ class MassIndexingInheritanceIT {
 				//    select count(a1_0.id) from aaaba a1_0
 				//    select count(b1_0.id) from ba b1_0
 				//            join a b1_1 on b1_0.id=b1_1.id
-				//            left join aaaba b1_2 on b1_0.id=b1_2.id
-				//            left join aba b1_3 on b1_0.id=b1_3.id
-				//            left join bba b1_4 on b1_0.id=b1_4.id
 				//            where b1_1.type in (?)
 				.anyMatch( "select count(_big)?\\([a-z0-9_.]+\\) from bba [a-z0-9_.]+" )
 				.anyMatch( "select count(_big)?\\([a-z0-9_.]+\\) from aaaba [a-z0-9_.]+" )
 				.anyMatch( "select count(_big)?\\([a-z0-9_.]+\\) from ba [a-z0-9_.]+ "
 						+ "join a [a-z0-9_.]+ on [a-z0-9_.=]+ "
-						+ "left join aaaba [a-z0-9_.]+ on [a-z0-9_.=]+ "
-						+ "left join aba [a-z0-9_.]+ on [a-z0-9_.=]+ "
-						+ "left join bba [a-z0-9_.]+ on [a-z0-9_.=]+ "
 						+ "where .+"
 				)
 				//    select b1_0.id from bba b1_0
 				//    select a1_0.id from aaaba a1_0
 				//    select b1_0.id from ba b1_0
 				//            join a b1_1 on b1_0.id=b1_1.id
-				//            left join aaaba b1_2 on b1_0.id=b1_2.id
-				//            left join aba b1_3 on b1_0.id=b1_3.id
-				//            left join bba b1_4 on b1_0.id=b1_4.id
 				//            where b1_1.type in (?)
 				.anyMatch( "select [a-z0-9_.]+ from bba [a-z0-9_.]+" )
 				.anyMatch( "select [a-z0-9_.]+ from aaaba [a-z0-9_.]+" )
 				.anyMatch( "select [a-z0-9_.]+ from ba [a-z0-9_.]+ "
 						+ "join a [a-z0-9_.]+ on [a-z0-9_.=]+ "
-						+ "left join aaaba [a-z0-9_.]+ on [a-z0-9_.=]+ "
-						+ "left join aba [a-z0-9_.]+ on [a-z0-9_.=]+ "
-						+ "left join bba [a-z0-9_.]+ on [a-z0-9_.=]+ "
 						+ "where .+"
 				)
 
@@ -534,21 +522,15 @@ class MassIndexingInheritanceIT {
 		statementInspector.hasSelects( 6 )
 				// select count(a1_0.id) from aroot a1_0
 				// select count(r1_0.id) from root r1_0
-				//           left join aroot r1_1 on r1_0.id=r1_1.id
-				//           left join broot r1_2 on r1_0.id=r1_2.id
 				//           where r1_0.type in (?)
 				.anyMatch( "select count(_big)?\\([a-z0-9_.]+\\) from aroot [a-z0-9_.]+" )
 				.anyMatch( "select count(_big)?\\([a-z0-9_.]+\\) from root [a-z0-9_.]+ "
-						+ "left join aroot [a-z0-9_.]+ on [a-z0-9_.=]+ "
-						+ "left join broot [a-z0-9_.]+ on [a-z0-9_.=]+ "
 						+ "where .+"
 				)
 				// select a1_0.id from aroot a1_0
-				// select r1_0.id from root r1_0 left join aroot r1_1 on r1_0.id=r1_1.id left join broot r1_2 on r1_0.id=r1_2.id where r1_0.type in (?)
+				// select r1_0.id from root r1_0 where r1_0.type in (?)
 				.anyMatch( "select [a-z0-9_.]+ from aroot [a-z0-9_.]+" )
 				.anyMatch( "select [a-z0-9_.]+ from root [a-z0-9_.]+ "
-						+ "left join aroot [a-z0-9_.]+ on [a-z0-9_.=]+ "
-						+ "left join broot [a-z0-9_.]+ on [a-z0-9_.=]+ "
 						+ "where .+"
 				)
 				// select a1_0.id from aroot a1_0 where a1_0.id=?
