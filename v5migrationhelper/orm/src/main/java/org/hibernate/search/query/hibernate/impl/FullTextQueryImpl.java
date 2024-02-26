@@ -30,6 +30,8 @@ import org.hibernate.graph.GraphSemantic;
 import org.hibernate.graph.RootGraph;
 import org.hibernate.graph.spi.RootGraphImplementor;
 import org.hibernate.query.IllegalQueryOperationException;
+import org.hibernate.query.KeyedPage;
+import org.hibernate.query.KeyedResultList;
 import org.hibernate.query.spi.AbstractQuery;
 import org.hibernate.query.spi.MutableQueryOptions;
 import org.hibernate.query.spi.ParameterMetadataImplementor;
@@ -116,6 +118,16 @@ public class FullTextQueryImpl extends AbstractQuery implements FullTextQuery {
 	@Override
 	public ScrollableResultsImplementor scroll() {
 		return scroll( ScrollMode.FORWARD_ONLY );
+	}
+
+	@Override
+	public long getResultCount() {
+		return hSearchQuery.getResultSize();
+	}
+
+	@Override
+	public KeyedResultList getKeyedResultList(KeyedPage page) {
+		throw new UnsupportedOperationException( "Query " + this + " does not implement getKeyedResultList(...)." );
 	}
 
 	@Override
