@@ -1,0 +1,38 @@
+<gradleEnterprise
+        xmlns="https://www.gradle.com/gradle-enterprise-maven" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="https://www.gradle.com/gradle-enterprise-maven https://www.gradle.com/schema/gradle-enterprise-maven.xsd">
+    <server>
+        <url>https://ge.hibernate.org</url>
+        <allowUntrusted>false</allowUntrusted>
+    </server>
+    <buildScan>
+        <!-- adjust conditions ?
+        mvn gradle-enterprise:provision-access-key
+        https://docs.gradle.com/enterprise/maven-extension/#publishing_based_on_criteria
+         -->
+        <!-- build scan publication is configured in gradle-enterprise-custom-user-data.groovy
+        to leverage options to disable build scan publication for test builds
+        -->
+        <!--
+        Expression support is documented here: https://docs.gradle.com/enterprise/maven-extension/#expression_support
+        -->
+        <obfuscation>
+          <!-- Don't share ip addresses-->
+          <ipAddresses>#{{'0.0.0.0'}}</ipAddresses>
+        </obfuscation>
+        <capture>
+          <goalInputFiles>true</goalInputFiles>
+        </capture>
+        <!-- https://docs.gradle.com/enterprise/maven-extension/#manual_access_key_configuration -->
+        <backgroundBuildScanUpload>#{env['CI'] == null}</backgroundBuildScanUpload>
+    </buildScan>
+    <buildCache>
+        <local>
+            <enabled>#{properties['no-build-cache'] == null}</enabled>
+        </local>
+        <remote>
+            <enabled>#{properties['no-build-cache'] == null}</enabled>
+            <storeEnabled>#{env['CI'] != null and env['GRADLE_ENTERPRISE_ACCESS_KEY'] != null and env['GRADLE_ENTERPRISE_ACCESS_KEY'] != ''}</storeEnabled>
+        </remote>
+    </buildCache>
+</gradleEnterprise>
