@@ -222,8 +222,11 @@ class VectorFieldIT {
 				return 4096;
 			}
 			else {
-				if ( actualVersion.majorOptional().orElse( Integer.MIN_VALUE ) == 2
-						&& ( actualVersion.minor().isEmpty() || actualVersion.minor().getAsInt() > 11 ) ) {
+				// with OpenSearch 2.12 the max size for a lucene engine is also set to 16_000
+				// and since serverless is using the latest OpenSearch build - we should treat it the same:
+				if ( ElasticsearchDistributionName.AMAZON_OPENSEARCH_SERVERLESS.equals( distribution )
+						|| actualVersion.majorOptional().orElse( Integer.MIN_VALUE ) == 2
+								&& ( actualVersion.minor().isEmpty() || actualVersion.minor().getAsInt() > 11 ) ) {
 					return 16000;
 				}
 				else {
