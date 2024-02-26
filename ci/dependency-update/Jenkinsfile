@@ -20,6 +20,8 @@ Map settings() {
 			return [
 					updateProperties: ['version.org.hibernate.orm'],
 					onlyRunTestDependingOn: ['hibernate-search-mapper-orm'],
+					// Note: we *must* rebuild the mapper, since we are applying a patch to it to address migration to ORM 6.5+
+					additionalMavenArgs: '-pl :hibernate-search-mapper-orm'
 			]
 		case 'lucene9.9':
 			return [
