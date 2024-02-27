@@ -276,7 +276,7 @@
         <version.dependency.plugin>3.6.1</version.dependency.plugin>
         <!-- Check dependencies for security vulnerabilities -->
         <version.dependency-check.plugin>9.0.9</version.dependency-check.plugin>
-        <version.exec.plugin>3.1.1</version.exec.plugin>
+        <version.exec.plugin>3.2.0</version.exec.plugin>
         <version.forbiddenapis.plugin>3.6</version.forbiddenapis.plugin>
         <version.jandex.plugin>3.1.6</version.jandex.plugin>
         <version.maven.injection.plugin>1.0.2</version.maven.injection.plugin>
@@ -285,7 +285,7 @@
         <version.jdeps.plugin>0.5.1</version.jdeps.plugin>
         <version.processor.plugin>5.0</version.processor.plugin>
         <version.resources.plugin>3.3.1</version.resources.plugin>
-        <version.shade.plugin>3.5.1</version.shade.plugin>
+        <version.shade.plugin>3.5.2</version.shade.plugin>
         <version.source.plugin>3.3.0</version.source.plugin>
         <!-- Surefire versions are a minefield of bugs: be careful with upgrades -->
         <version.surefire.plugin>3.2.5</version.surefire.plugin>
