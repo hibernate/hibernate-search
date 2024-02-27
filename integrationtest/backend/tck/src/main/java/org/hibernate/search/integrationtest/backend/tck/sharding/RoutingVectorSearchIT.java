@@ -27,6 +27,7 @@ import org.hibernate.search.util.impl.integrationtest.mapper.stub.SimpleMappedIn
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMapping;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappingScope;
 
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
@@ -54,6 +55,11 @@ class RoutingVectorSearchIT {
 	public final SearchSetupHelper setupHelper = SearchSetupHelper.create();
 
 	private final SimpleMappedIndex<IndexBinding> index = SimpleMappedIndex.of( IndexBinding::new );
+
+	@BeforeAll
+	static void beforeAll() {
+		assumeTrue( TckConfiguration.get().getBackendFeatures().supportsVectorSearch() );
+	}
 
 	@BeforeEach
 	void setup() {
