@@ -381,6 +381,7 @@ class MultiTenancyBaseIT {
 
 	@Test
 	void searchingForVectors_vectorCloseToTheOneForTenant() {
+		assumeTrue( TckConfiguration.get().getBackendFeatures().supportsVectorSearch() );
 		StubMappingScope scope = index.createScope();
 
 		SearchQuery<?> query = scope.query( tenant1SessionContext )
@@ -392,6 +393,7 @@ class MultiTenancyBaseIT {
 
 	@Test
 	void searchingForVectors_moreElements() {
+		assumeTrue( TckConfiguration.get().getBackendFeatures().supportsVectorSearch() );
 		StubMappingScope scope = index.createScope();
 
 		SearchQuery<List<?>> query = scope.query( tenant2SessionContext )
@@ -412,6 +414,7 @@ class MultiTenancyBaseIT {
 
 	@Test
 	void searchingForVectors_vectorCloseToTheOneForOtherTenant() {
+		assumeTrue( TckConfiguration.get().getBackendFeatures().supportsVectorSearch() );
 		StubMappingScope scope = index.createScope();
 
 		SearchQuery<List<?>> query = scope.query( tenant1SessionContext )
@@ -452,23 +455,31 @@ class MultiTenancyBaseIT {
 		plan.add( referenceProvider( DOCUMENT_ID_1 ), document -> {
 			document.addValue( index.binding().string, STRING_VALUE_1 );
 			document.addValue( index.binding().integer, INTEGER_VALUE_1 );
-			document.addValue( index.binding().floats, FLOATS_VALUE_1 );
+			if ( TckConfiguration.get().getBackendFeatures().supportsVectorSearch() ) {
+				document.addValue( index.binding().floats, FLOATS_VALUE_1 );
+			}
 
 			DocumentElement nestedObject = document.addObject( index.binding().nestedObject.self );
 			nestedObject.addValue( index.binding().nestedObject.string, STRING_VALUE_1 );
 			nestedObject.addValue( index.binding().nestedObject.integer, INTEGER_VALUE_1 );
-			nestedObject.addValue( index.binding().nestedObject.floats, FLOATS_VALUE_1 );
+			if ( TckConfiguration.get().getBackendFeatures().supportsVectorSearch() ) {
+				nestedObject.addValue( index.binding().nestedObject.floats, FLOATS_VALUE_1 );
+			}
 		} );
 
 		plan.add( referenceProvider( DOCUMENT_ID_2 ), document -> {
 			document.addValue( index.binding().string, STRING_VALUE_2 );
 			document.addValue( index.binding().integer, INTEGER_VALUE_2 );
-			document.addValue( index.binding().floats, FLOATS_VALUE_2 );
+			if ( TckConfiguration.get().getBackendFeatures().supportsVectorSearch() ) {
+				document.addValue( index.binding().floats, FLOATS_VALUE_2 );
+			}
 
 			DocumentElement nestedObject = document.addObject( index.binding().nestedObject.self );
 			nestedObject.addValue( index.binding().nestedObject.string, STRING_VALUE_2 );
 			nestedObject.addValue( index.binding().nestedObject.integer, INTEGER_VALUE_2 );
-			nestedObject.addValue( index.binding().nestedObject.floats, FLOATS_VALUE_2 );
+			if ( TckConfiguration.get().getBackendFeatures().supportsVectorSearch() ) {
+				nestedObject.addValue( index.binding().nestedObject.floats, FLOATS_VALUE_2 );
+			}
 		} );
 
 		plan.execute( OperationSubmitter.blocking() ).join();
@@ -477,23 +488,31 @@ class MultiTenancyBaseIT {
 		plan.add( referenceProvider( DOCUMENT_ID_1 ), document -> {
 			document.addValue( index.binding().string, STRING_VALUE_1 );
 			document.addValue( index.binding().integer, INTEGER_VALUE_3 );
-			document.addValue( index.binding().floats, FLOATS_VALUE_3 );
+			if ( TckConfiguration.get().getBackendFeatures().supportsVectorSearch() ) {
+				document.addValue( index.binding().floats, FLOATS_VALUE_3 );
+			}
 
 			DocumentElement nestedObject = document.addObject( index.binding().nestedObject.self );
 			nestedObject.addValue( index.binding().nestedObject.string, STRING_VALUE_1 );
 			nestedObject.addValue( index.binding().nestedObject.integer, INTEGER_VALUE_3 );
-			nestedObject.addValue( index.binding().nestedObject.floats, FLOATS_VALUE_3 );
+			if ( TckConfiguration.get().getBackendFeatures().supportsVectorSearch() ) {
+				nestedObject.addValue( index.binding().nestedObject.floats, FLOATS_VALUE_3 );
+			}
 		} );
 
 		plan.add( referenceProvider( DOCUMENT_ID_2 ), document -> {
 			document.addValue( index.binding().string, STRING_VALUE_2 );
 			document.addValue( index.binding().integer, INTEGER_VALUE_4 );
-			document.addValue( index.binding().floats, FLOATS_VALUE_4 );
+			if ( TckConfiguration.get().getBackendFeatures().supportsVectorSearch() ) {
+				document.addValue( index.binding().floats, FLOATS_VALUE_4 );
+			}
 
 			DocumentElement nestedObject = document.addObject( index.binding().nestedObject.self );
 			nestedObject.addValue( index.binding().nestedObject.string, STRING_VALUE_2 );
 			nestedObject.addValue( index.binding().nestedObject.integer, INTEGER_VALUE_4 );
-			nestedObject.addValue( index.binding().nestedObject.floats, FLOATS_VALUE_4 );
+			if ( TckConfiguration.get().getBackendFeatures().supportsVectorSearch() ) {
+				nestedObject.addValue( index.binding().nestedObject.floats, FLOATS_VALUE_4 );
+			}
 		} );
 
 		plan.execute( OperationSubmitter.blocking() ).join();
@@ -550,8 +569,14 @@ class MultiTenancyBaseIT {
 					.toReference();
 			integer = root.field( "integer", f -> f.asInteger().projectable( Projectable.YES ) )
 					.toReference();
-			floats = root.field( "floats", f -> f.asFloatVector().dimension( 2 ).vectorSimilarity( VectorSimilarity.L2 )
-					.projectable( Projectable.YES ) ).toReference();
+			if ( TckConfiguration.get().getBackendFeatures().supportsVectorSearch() ) {
+				floats = root.field( "floats", f -> f.asFloatVector().dimension( 2 )
+						.vectorSimilarity( VectorSimilarity.L2 )
+						.projectable( Projectable.YES ) ).toReference();
+			}
+			else {
+				floats = null;
+			}
 			IndexSchemaObjectField nestedObjectField =
 					root.objectField( "nestedObject", ObjectStructure.NESTED ).multiValued();
 			nestedObject = new ObjectMapping( nestedObjectField );
@@ -570,8 +595,14 @@ class MultiTenancyBaseIT {
 					.toReference();
 			integer = objectField.field( "integer", f -> f.asInteger().projectable( Projectable.YES ) )
 					.toReference();
-			floats = objectField.field( "floats", f -> f.asFloatVector().dimension( 2 ).vectorSimilarity( VectorSimilarity.L2 )
-					.projectable( Projectable.YES ) ).toReference();
+			if ( TckConfiguration.get().getBackendFeatures().supportsVectorSearch() ) {
+				floats = objectField.field( "floats", f -> f.asFloatVector().dimension( 2 )
+						.vectorSimilarity( VectorSimilarity.L2 )
+						.projectable( Projectable.YES ) ).toReference();
+			}
+			else {
+				floats = null;
+			}
 		}
 	}
 }
