@@ -79,6 +79,11 @@ import org.hibernate.jenkins.pipeline.helpers.alternative.AlternativeMultiMap
  * Then you will also need to add SonarCloud credentials in Jenkins
  * and reference them from the configuration file (see below).
  *
+ * #### Develocity (optional)
+ *
+ * You will need to add Develocity credentials in Jenkins
+ * and reference them from the configuration file (see below).
+ *
  * #### Gitter (optional)
  *
  * You need to enable the Jenkins integration in your Gitter room first:
@@ -126,6 +131,17 @@ import org.hibernate.jenkins.pipeline.helpers.alternative.AlternativeMultiMap
  *       # Expects username/password credentials where the username is the organization ID on sonarcloud.io
  *       # and the password is a sonarcloud.io access token with sufficient rights for that organization.
  *       credentials: ...
+ *     develocity:
+ *       credentials:
+ *         # String containing the ID of Develocity credentials used on "main" (non-PR) builds. Optional.
+ *         # Expects something valid for the GRADLE_ENTERPRISE_ACCESS_KEY environment variable.
+ *         # See https://docs.gradle.com/enterprise/gradle-plugin/#via_environment_variable
+ *         main: ...
+ *         # String containing the ID of Develocity credentials used on PR builds. Optional.
+ *         # Expects something valid for the GRADLE_ENTERPRISE_ACCESS_KEY environment variable.
+ *         # See https://docs.gradle.com/enterprise/gradle-plugin/#via_environment_variable
+ *         # WARNING: These credentials should not give write access to the build cache!
+ *         pr: ...
  *     deployment:
  *       maven:
  *         # String containing the ID of a Maven settings file registered using the config-file-provider Jenkins plugin.
@@ -429,27 +445,23 @@ stage('Default build') {
 			// Jacoco will just not report coverage for these classes.
 			// In PRs, "relevant" modules are only those affected by changes.
 			// However:
-			// - Maven will normally not recompile anything as class files are still here.
-			// - We disable running unit tests (surefire) because we already ran them just above.
+			// - We have the Develocity local build cache to avoid re-compiling/re-running unit tests.
 			// - We disable a couple checks that were run above.
-			// - We activate a profile that fixes the second Maven execution
-			//   by disabling a few misbehaving plugins whose output is already there anyway.
 			String itMavenArgs = """ \
 					${commonMavenArgs} \
-					-DskipSurefireTests \
 					-Pskip-checks \
 					-Pci-build \
-					-Pci-rebuild \
 					${incrementalBuild ? """ \
 							-Dincremental \
 							-Dgib.referenceBranch=refs/remotes/origin/${helper.scmSource.pullRequest.target.name} \
 					""" : '' } \
 			"""
 			pullContainerImages( itMavenArgs )
+			// Note "clean" is necessary here in order to store the result of the build in the remote build cache
 			sh """ \
 					mvn \
 					${itMavenArgs} \
-					verify \
+					clean verify \
 			"""
 
 			def sonarCredentialsId = helper.configuration.file?.sonar?.credentials
@@ -884,7 +896,19 @@ void withMavenWorkspace(Map args, Closure body) {
 		// to be performed by helper.withMavenWorkspace before we can call the script.
 		sh 'ci/docker-cleanup.sh'
 		try {
-			body()
+			def develocityCredentialsId = helper.scmSource.pullRequest ?
+					helper.configuration.file?.develocity?.credentials?.pr : helper.configuration.file?.develocity?.credentials?.main
+			if (develocityCredentialsId) {
+				withCredentials([string(credentialsId: develocityCredentialsId,
+						variable: 'GRADLE_ENTERPRISE_ACCESS_KEY')]) {
+					withGradle { // withDevelocity, actually: https://plugins.jenkins.io/gradle/#plugin-content-capturing-build-scans-from-jenkins-pipeline
+						body()
+					}
+				}
+			}
+			else {
+				body()
+			}
 		}
 		finally {
 			sh 'ci/docker-cleanup.sh'
@@ -945,6 +969,7 @@ void mavenNonDefaultBuild(BuildEnvironment buildEnv, String args, List<String> a
 	// of the same test in different environments in reports
 	def testSuffix = buildEnv.tag.replaceAll('[^a-zA-Z0-9_\\-+]+', '_')
 
+	// Note "clean" is necessary here in order to store the result of the build in the remote build cache
 	sh """ \
 			mvn clean install -Pci-build -Dsurefire.environment=$testSuffix \
 					${toTestJdkArg(buildEnv)} \

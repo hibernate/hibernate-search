@@ -78,7 +78,12 @@ def withMavenWorkspace(Closure body) {
 	withMaven(jdk: actualJdk, maven: 'Apache Maven 3.9',
 			mavenLocalRepo: env.WORKSPACE_TMP + '/.m2repository',
 			options: [artifactsPublisher(disabled: true)]) {
-		body()
+		withCredentials([string(credentialsId: 'ge.hibernate.org-access-key',
+				variable: 'GRADLE_ENTERPRISE_ACCESS_KEY')]) {
+			withGradle { // withDevelocity, actually: https://plugins.jenkins.io/gradle/#plugin-content-capturing-build-scans-from-jenkins-pipeline
+				body()
+			}
+		}
 	}
 }
 
