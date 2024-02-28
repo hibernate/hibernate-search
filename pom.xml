@@ -1693,40 +1693,6 @@
             </properties>
         </profile>
 
-        <!-- A profile for CI when we've already built the whole tree but for some reason need
-             to run Maven again, preferably without cleaning.
-             Useful for example when we do `mvn clean verify -DskipITs` then `mvn verify -Dincremental`;
-             the second execution needs this profile to fix a few things.
-         -->
-        <profile>
-            <id>ci-rebuild</id>
-            <properties>
-                <!-- Don't inject code again if we already did a full build (we only do this in the engine).
-                     Necessary to avoid rebuilding JARs when executing Maven twice,
-                     which has dramatic cascading effects as it leads to recompiling
-                     sources for all depending projects. -->
-                <injection-plugin.phase>none</injection-plugin.phase>
-                <!-- Once we've already built the main modules, we don't need to run Moditect a second time,
-                     and doing so will actually lead to errors because Moditect worries about overwriting
-                     module-info.class files. -->
-                <moditect.skip>true</moditect.skip>
-            </properties>
-            <build>
-                <pluginManagement>
-                    <plugins>
-                        <plugin>
-                            <groupId>org.apache.maven.plugins</groupId>
-                            <artifactId>maven-surefire-plugin</artifactId>
-                            <configuration>
-                                <!-- This is to skip Surefire without skipping Failsafe -->
-                                <skipTests>true</skipTests >
-                            </configuration>
-                        </plugin>
-                    </plugins>
-                </pluginManagement>
-            </build>
-        </profile>
-
         <profile>
             <id>IDEA</id>
             <!--

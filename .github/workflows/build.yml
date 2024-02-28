@@ -107,13 +107,17 @@ jobs:
         run: ./ci/docker-cleanup.sh
       - name: Building code and running unit tests and basic checks
         run: |
-          ./mvnw $MAVEN_ARGS ${{ matrix.os.maven.args }} install \
+          ./mvnw $MAVEN_ARGS ${{ matrix.os.maven.args }} clean install \
           -Pjqassistant -Pdist -Pci-sources-check -DskipITs
+        env:
+          GRADLE_ENTERPRISE_ACCESS_KEY: ${{ secrets.GRADLE_ENTERPRISE_ACCESS_KEY }}
       - name: Running integration tests in the default environment
         run: |
-          ./mvnw $MAVEN_ARGS ${{ matrix.os.maven.args }} verify \
-          -DskipSurefireTests -Pskip-checks -Pci-rebuild \
+          ./mvnw $MAVEN_ARGS ${{ matrix.os.maven.args }} clean verify \
+          -Pskip-checks \
           ${{ github.event.pull_request.base.ref && format('-Dincremental -Dgib.referenceBranch=refs/remotes/origin/{0}', github.event.pull_request.base.ref) || '' }}
+        env:
+          GRADLE_ENTERPRISE_ACCESS_KEY: ${{ secrets.GRADLE_ENTERPRISE_ACCESS_KEY }}
       - name: Docker cleanup
         if: always()
         run: ./ci/docker-cleanup.sh
