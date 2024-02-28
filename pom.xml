@@ -1709,7 +1709,6 @@
                 <!-- Once we've already built the main modules, we don't need to run Moditect a second time,
                      and doing so will actually lead to errors because Moditect worries about overwriting
                      module-info.class files. -->
-                <moditect.skip>true</moditect.skip>
             </properties>
             <build>
                 <pluginManagement>
