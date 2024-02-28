@@ -137,3 +137,10 @@ jobs:
           name: ${{ format('build-reports-{0}', matrix.os.name ) }}
           path: ${{ env.buildReportPaths }}
           retention-days: 7
+      - name: Upload workspace directory (if build failed)
+        uses: actions/upload-artifact@v4
+        if: ${{ failure() }}
+        with:
+          name: workspace
+          path: .
+          retention-days: 7
