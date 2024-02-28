@@ -967,12 +967,8 @@ void mavenNonDefaultBuild(BuildEnvironment buildEnv, String args, List<String> a
 
 	pullContainerImages( args )
 
-	// Add a suffix to tests to distinguish between different executions
-	// of the same test in different environments in reports
-	def testSuffix = buildEnv.tag.replaceAll('[^a-zA-Z0-9_\\-+]+', '_')
-
 	sh """ \
-			mvn clean install -Pci-build -Dsurefire.environment=$testSuffix \
+			mvn clean install -Pci-build \
 					${toTestJdkArg(buildEnv)} \
 					--fail-at-end \
 					$args \
@@ -990,6 +986,13 @@ void mavenNonDefaultBuild(BuildEnvironment buildEnv, String args, List<String> a
 
 String toTestJdkArg(BuildEnvironment buildEnv) {
 	String args = ''
+
+	// Make the build env tag available in Develocity
+	args +=  "-Dscan.tag.${buildEnv.tag}"
+	// Add a suffix to tests to distinguish between different executions
+	// of the same test in different environments in reports
+	def testSuffix = buildEnv.tag.replaceAll('[^a-zA-Z0-9_\\-+]+', '_')
+	args +=  "-Dsurefire.environment=$testSuffix -Dscan.tag.${buildEnv.tag}"
 
 	if ( ! (buildEnv instanceof JdkBuildEnvironment) ) {
 		return args;
