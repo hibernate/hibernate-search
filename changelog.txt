@@ -1,6 +1,24 @@
 Hibernate Search Changelog
 ==========================
 
+7.1.0.Final (2024-02-28)
+-------------------------
+
+** Bug
+    * HSEARCH-5089 Retrieve the schema management strategy on start for the Standalone Pojo Mapper
+    * HSEARCH-5039 Tenant filter should be a pre-filter for knn predicates
+
+** Improvement
+    * HSEARCH-5092 Make `HibernateOrmSearchQueryAdapter` compatible with a future ORM 6.5 release
+    * HSEARCH-5091 Upgrade to Elasticsearch client 8.12.2 and test against Elasticsearch 8.12.2
+    * HSEARCH-5088 Limit OpenSearch vector search capabilities to 2.9+ versions
+    * HSEARCH-5087 Add compatibility with OpenSearch 2.12.0
+    * HSEARCH-5083 Upgrade to AWS SDK 2.24.1
+
+** Task
+    * HSEARCH-5090 Fix typos/headings in `@SearchEntity` documentation
+    * HSEARCH-5081 Fix very slow unit tests
+
 7.1.0.CR1 (2024-02-12)
 -------------------------
 
