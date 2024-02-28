@@ -46,7 +46,7 @@ defaults:
     shell: bash
 
 env:
-  MAVEN_ARGS: "-e -B --settings .github/mvn-settings.xml --fail-at-end"
+  MAVEN_ARGS: "-e -B --settings .github/mvn-settings.xml --fail-at-end -Dorg.slf4j.simpleLogger.log.gradle.goal.cache=debug -Dorg.slf4j.simpleLogger.log.io.hibernate.search.develocity=debug -Dorg.slf4j.simpleLogger.log.gradle.goal.fingerprint=trace"
 
 jobs:
   build:
