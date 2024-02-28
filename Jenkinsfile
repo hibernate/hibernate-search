@@ -412,7 +412,7 @@ stage('Default build') {
 			String commonMavenArgs = """ \
 					--fail-at-end \
 					-Pcoverage \
-					${toTestJdkArg(environments.content.jdk.default)} \
+					${toTestEnvironmentArgs(environments.content.jdk.default)} \
 			"""
 
 			echo "Building code and running unit tests and basic checks."
@@ -965,14 +965,10 @@ void mavenNonDefaultBuild(BuildEnvironment buildEnv, String args, List<String> a
 
 	pullContainerImages( args )
 
-	// Add a suffix to tests to distinguish between different executions
-	// of the same test in different environments in reports
-	def testSuffix = buildEnv.tag.replaceAll('[^a-zA-Z0-9_\\-+]+', '_')
-
 	// Note "clean" is necessary here in order to store the result of the build in the remote build cache
 	sh """ \
-			mvn clean install -Pci-build -Dsurefire.environment=$testSuffix \
-					${toTestJdkArg(buildEnv)} \
+			mvn clean install -Pci-build \
+					${toTestEnvironmentArgs(buildEnv)} \
 					--fail-at-end \
 					$args \
 	"""
@@ -987,8 +983,15 @@ void mavenNonDefaultBuild(BuildEnvironment buildEnv, String args, List<String> a
 	}
 }
 
-String toTestJdkArg(BuildEnvironment buildEnv) {
+String toTestEnvironmentArgs(BuildEnvironment buildEnv) {
 	String args = ''
+
+	// Make the build env tag available in Develocity
+	args +=  "-Dscan.tag.${buildEnv.tag}"
+	// Add a suffix to tests to distinguish between different executions
+	// of the same test in different environments in reports
+	def testSuffix = buildEnv.tag.replaceAll('[^a-zA-Z0-9_\\-+]+', '_')
+	args +=  "-Dsurefire.environment=$testSuffix"
 
 	if ( ! (buildEnv instanceof JdkBuildEnvironment) ) {
 		return args;
