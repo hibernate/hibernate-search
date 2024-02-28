@@ -79,6 +79,11 @@ import org.hibernate.jenkins.pipeline.helpers.alternative.AlternativeMultiMap
  * Then you will also need to add SonarCloud credentials in Jenkins
  * and reference them from the configuration file (see below).
  *
+ * #### Develocity (optional)
+ *
+ * You will need to add Develocity credentials in Jenkins
+ * and reference them from the configuration file (see below).
+ *
  * #### Gitter (optional)
  *
  * You need to enable the Jenkins integration in your Gitter room first:
@@ -126,6 +131,17 @@ import org.hibernate.jenkins.pipeline.helpers.alternative.AlternativeMultiMap
  *       # Expects username/password credentials where the username is the organization ID on sonarcloud.io
  *       # and the password is a sonarcloud.io access token with sufficient rights for that organization.
  *       credentials: ...
+ *     develocity:
+ *       credentials:
+ *         # String containing the ID of Develocity credentials used on "main" (non-PR) builds. Optional.
+ *         # Expects something valid for the GRADLE_ENTERPRISE_ACCESS_KEY environment variable.
+ *         # See https://docs.gradle.com/enterprise/gradle-plugin/#via_environment_variable
+ *         main: ...
+ *         # String containing the ID of Develocity credentials used on PR builds. Optional.
+ *         # Expects something valid for the GRADLE_ENTERPRISE_ACCESS_KEY environment variable.
+ *         # See https://docs.gradle.com/enterprise/gradle-plugin/#via_environment_variable
+ *         # WARNING: These credentials should not give write access to the build cache!
+ *         pr: ...
  *     deployment:
  *       maven:
  *         # String containing the ID of a Maven settings file registered using the config-file-provider Jenkins plugin.
@@ -883,7 +899,17 @@ void withMavenWorkspace(Map args, Closure body) {
 		// to be performed by helper.withMavenWorkspace before we can call the script.
 		sh 'ci/docker-cleanup.sh'
 		try {
-			body()
+			def develocityCredentialsId = helper.scmSource.pullRequest ?
+					helper.configuration.file?.develocity?.credentials?.main : helper.configuration.file?.develocity?.credentials?.pr
+			if (develocityCredentialsId) {
+				withCredentials([string(credentialsId: develocityCredentialsId,
+						variable: 'GRADLE_ENTERPRISE_ACCESS_KEY')]) {
+					body()
+				}
+			}
+			else {
+				body()
+			}
 		}
 		finally {
 			sh 'ci/docker-cleanup.sh'
