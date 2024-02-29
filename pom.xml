@@ -235,7 +235,11 @@
             This is used in places where we need a path to an existing, empty directory,
             such as when fooling Sonar into thinking there is no "main" source in a project.
          -->
-        <rootProject.emptySubdirectory>${rootProject.directory}/.empty</rootProject.emptySubdirectory>
+        <rootProject.empty.directory>${rootProject.directory}/.empty/directory</rootProject.empty.directory>
+        <!--
+            The absolute path to an empty Failsafe summary file.
+         -->
+        <rootProject.empty.failsafe.summaryFile>${rootProject.directory}/.empty/failsafe-summary.xml</rootProject.empty.failsafe.summaryFile>
 
         <!-- Maven version required for the build -->
         <!--
@@ -416,7 +420,7 @@
         <failsafe.spring.skip>false</failsafe.spring.skip>
 
         <!-- This allows us to distinguish between multiple executions of the same test in test reports. -->
-        <surefire.reportNameSuffix>${surefire.module}-${surefire.environment}</surefire.reportNameSuffix>
+        <surefire.executionIdentifier>${surefire.module}-${surefire.environment}</surefire.executionIdentifier>
         <!-- This should be set from the command line by CI jobs that execute the same tests in multiple environments -->
         <surefire.environment>default</surefire.environment>
         <!-- This should be set in modules that re-execute tests imported from a dependency (using <dependenciesToScan>)
@@ -808,7 +812,7 @@
                             <usePhrasedClassNameInRunning>true</usePhrasedClassNameInRunning>
                             <usePhrasedClassNameInTestCaseSummary>true</usePhrasedClassNameInTestCaseSummary>
                         </statelessTestsetInfoReporter>
-                        <reportNameSuffix>${surefire.reportNameSuffix}</reportNameSuffix>
+                        <reportNameSuffix>${surefire.executionIdentifier}</reportNameSuffix>
                     </configuration>
                     <dependencies>
                         <!--
@@ -869,7 +873,7 @@
                             <usePhrasedClassNameInRunning>true</usePhrasedClassNameInRunning>
                             <usePhrasedClassNameInTestCaseSummary>true</usePhrasedClassNameInTestCaseSummary>
                         </statelessTestsetInfoReporter>
-                        <reportNameSuffix>${surefire.reportNameSuffix}</reportNameSuffix>
+                        <reportNameSuffix>${surefire.executionIdentifier}</reportNameSuffix>
                     </configuration>
                     <dependencies>
                         <!--

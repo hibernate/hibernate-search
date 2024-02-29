@@ -1,1 +1,1 @@
-Do not move, rename or remove this directory, it *is* useful. See property 'rootProject.emptySubdirectory' in the parent POM.
+Do not move, rename or remove this directory or its content, it *is* useful. See property 'rootProject.empty.directory' in the parent POM.

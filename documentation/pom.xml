@@ -20,6 +20,11 @@
     <description>Hibernate Search reference documentation</description>
 
     <properties>
+        <failsafe.lucene.reportsDirectory>${project.build.directory}/failsafe-reports/lucene</failsafe.lucene.reportsDirectory>
+        <failsafe.lucene.summaryFile>${failsafe.lucene.reportsDirectory}/failsafe-summary.xml</failsafe.lucene.summaryFile>
+        <failsafe.elasticsearch.reportsDirectory>${project.build.directory}/failsafe-reports/elasticsearch</failsafe.elasticsearch.reportsDirectory>
+        <failsafe.elasticsearch.summaryFile>${failsafe.elasticsearch.reportsDirectory}/failsafe-summary.xml</failsafe.elasticsearch.summaryFile>
+
         <asciidoctor.base-output-dir>${project.build.directory}/asciidoctor/</asciidoctor.base-output-dir>
         <asciidoctor.theme-dir>${project.build.directory}/hibernate-asciidoctor-theme</asciidoctor.theme-dir>
         <asciidoctor.aggregated-resources-dir>${project.build.directory}/aggregated-resources</asciidoctor.aggregated-resources-dir>
@@ -122,7 +127,9 @@
                         </goals>
                         <configuration>
                             <skip>${test.lucene.skip}</skip>
-                            <reportNameSuffix>${surefire.reportNameSuffix}-lucene</reportNameSuffix>
+                            <reportNameSuffix>${surefire.executionIdentifier}-lucene</reportNameSuffix>
+                            <reportsDirectory>${failsafe.lucene.reportsDirectory}</reportsDirectory>
+                            <summaryFile>${failsafe.lucene.summaryFile}</summaryFile>
                             <classpathDependencyExcludes>
                                 <classpathDependencyExclude>org.hibernate.search:hibernate-search-backend-elasticsearch</classpathDependencyExclude>
                             </classpathDependencyExcludes>
@@ -141,7 +148,9 @@
                         </goals>
                         <configuration>
                             <skip>${test.elasticsearch.skip}</skip>
-                            <reportNameSuffix>${surefire.reportNameSuffix}-elasticsearch</reportNameSuffix>
+                            <reportNameSuffix>${surefire.executionIdentifier}-elasticsearch</reportNameSuffix>
+                            <reportsDirectory>${failsafe.elasticsearch.reportsDirectory}</reportsDirectory>
+                            <summaryFile>${failsafe.elasticsearch.summaryFile}</summaryFile>
                             <classpathDependencyExcludes>
                                 <classpathDependencyExclude>org.hibernate.search:hibernate-search-backend-lucene</classpathDependencyExclude>
                             </classpathDependencyExcludes>
@@ -158,6 +167,12 @@
                         <goals>
                             <goal>verify</goal>
                         </goals>
+                        <configuration>
+                            <summaryFiles>
+                                <summaryFile>${failsafe.lucene.summaryFile}</summaryFile>
+                                <summaryFile>${failsafe.elasticsearch.summaryFile}</summaryFile>
+                            </summaryFiles>
+                        </configuration>
                     </execution>
                 </executions>
             </plugin>
@@ -381,6 +396,35 @@
                     </plugin>
                 </plugins>
             </build>
+        </profile>
+        <!--
+             The "verify" goal fails if a file specified in "summaryFiles" doesn't exist,
+             and that's exactly what happens when we skip an "integration-test" goal.
+             See https://github.com/apache/maven-surefire/blob/2fed802397f8c7de4cfc72f49ab4565e72f7aab7/maven-failsafe-plugin/src/main/java/org/apache/maven/plugin/failsafe/VerifyMojo.java#L179-L183
+         -->
+        <profile>
+            <id>lucene-test-skip</id>
+            <activation>
+                <property>
+                    <name>test.lucene.skip</name>
+                    <value>true</value>
+                </property>
+            </activation>
+            <properties>
+                <failsafe.lucene.summaryFile>${rootProject.empty.failsafe.summaryFile}</failsafe.lucene.summaryFile>
+            </properties>
+        </profile>
+        <profile>
+            <id>elasticsearch-test-skip</id>
+            <activation>
+                <property>
+                    <name>test.elasticsearch.skip</name>
+                    <value>true</value>
+                </property>
+            </activation>
+            <properties>
+                <failsafe.elasticsearch.summaryFile>${rootProject.empty.failsafe.summaryFile}</failsafe.elasticsearch.summaryFile>
+            </properties>
         </profile>
     </profiles>
 </project>
