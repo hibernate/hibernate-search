@@ -108,7 +108,7 @@ jobs:
       - name: Building code and running unit tests and basic checks
         run: |
           ./mvnw $MAVEN_ARGS ${{ matrix.os.maven.args }} clean install \
-          -Pjqassistant -Pdist -Pci-sources-check -DskipITs
+          -Pjqassistant -Pdist -Pci-build -DskipITs
         env:
           GRADLE_ENTERPRISE_ACCESS_KEY: ${{ secrets.GRADLE_ENTERPRISE_ACCESS_KEY }}
       - name: Running integration tests in the default environment

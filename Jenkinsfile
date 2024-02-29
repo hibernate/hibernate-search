@@ -420,7 +420,7 @@ stage('Default build') {
 					mvn \
 					${commonMavenArgs} \
 					-Pdist \
-					-Pjqassistant -Pci-sources-check \
+					-Pjqassistant -Pci-build \
 					-DskipITs \
 					clean \
 					${deploySnapshot ? "\

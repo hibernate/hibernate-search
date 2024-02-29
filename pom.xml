@@ -1591,7 +1591,7 @@
         </profile>
 
         <profile>
-            <id>ci-sources-check</id>
+            <id>ci-build</id>
             <properties>
                 <goal.impsort-maven-plugin>check</goal.impsort-maven-plugin>
                 <goal.formatter-maven-plugin>validate</goal.formatter-maven-plugin>
