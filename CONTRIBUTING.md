@@ -46,6 +46,35 @@ A maven wrapper script is provided at the root of the repository (`./mvnw`),
 so you can use that and don't need to care about the required version of Maven
 (it will be downloaded automatically).
 
+### <a id="setup-develocity"></a> Develocity build cache and build scans
+
+Hibernate Search relies on a [Develocity](https://gradle.com/develocity/) instance
+at [https://ge.hibernate.org](https://ge.hibernate.org/scans?search.rootProjectNames=Hibernate%20Search)
+to speed up its build through a build cache
+
+By default, only [continuous integration](#ci) builds will write to the remote build cache or publish build scans.
+
+Local builds of Hibernate Search will:
+
+* write to a local build cache;
+* read from both a local and a remote build cache to speed up builds;
+* not write to the remote build cache;
+* not publish any build scans.
+
+To opt out from build caches for a particular build (e.g. to debug flaky tests),
+pass `-Dno-build-cache` to Maven.
+
+To publish build scans for your local builds,
+[reach out to the team](https://hibernate.org/community/#contribute) to set up an account,
+and once you have one, run this from the root of your local clone of Hibernate Search:
+
+```shell
+./mvnw gradle-enterprise:provision-access-key
+```
+
+To opt out from build scans for a particular build (e.g. when working on a security vulnerability),
+pass `-Dscan=false` to Maven.
+
 ### <a id="setup-ide"></a> IDE
 
 #### <a id="setup-ide-intellij-idea"></a> IntelliJ IDEA
@@ -445,7 +474,7 @@ provided that build had the `jqassistant` profile enabled:
 
 The Neo4j web UI will be accessible from http://localhost:7474/.
 
-## Continuous integration
+## <a id="ci"></a> Continuous integration
 
 Continuous integration happens on a self-hosted Jenkins instance at https://ci.hibernate.org.
 
