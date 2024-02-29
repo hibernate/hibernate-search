@@ -413,10 +413,15 @@
         <failsafe.jvm.args.jdbc></failsafe.jvm.args.jdbc>
         <!-- Argument passed from the command line -->
         <test.launcher.args></test.launcher.args>
-        <surefire.jvm.args>${surefire.jvm.args.memory} ${surefire.jvm.args.misc} ${surefire.jvm.args.java-version} ${surefire.jvm.args.module} ${surefire.jvm.args.jacoco} ${test.launcher.args}</surefire.jvm.args>
-        <failsafe.jvm.args>${surefire.jvm.args.memory} ${surefire.jvm.args.misc} ${surefire.jvm.args.java-version} ${surefire.jvm.args.module} ${failsafe.jvm.args.jacoco} ${failsafe.jvm.args.hibernate-orm} ${failsafe.jvm.args.jdbc} ${test.launcher.args}</failsafe.jvm.args>
+        <!--
+            Caution, jacoco properties use @{...} for late property evaluation:
+            http://maven.apache.org/surefire/maven-surefire-plugin/faq.html#late-property-evaluation
+            This is necessary for Jacoco to work as expected.
+         -->
+        <surefire.jvm.args>${surefire.jvm.args.memory} ${surefire.jvm.args.misc} ${surefire.jvm.args.java-version} ${surefire.jvm.args.module} @{surefire.jvm.args.jacoco} ${test.launcher.args}</surefire.jvm.args>
+        <failsafe.jvm.args>${surefire.jvm.args.memory} ${surefire.jvm.args.misc} ${surefire.jvm.args.java-version} ${surefire.jvm.args.module} @{failsafe.jvm.args.jacoco} ${failsafe.jvm.args.hibernate-orm} ${failsafe.jvm.args.jdbc} ${test.launcher.args}</failsafe.jvm.args>
 
-        <!-- Disable integration tests selectively. To be set in specific profile, e.g. for a specific JDK version. -->
+<!-- Disable integration tests selectively. To be set in specific profile, e.g. for a specific JDK version. -->
         <failsafe.spring.skip>false</failsafe.spring.skip>
 
         <!-- This allows us to distinguish between multiple executions of the same test in test reports. -->
@@ -1478,23 +1483,6 @@
 
         <profile>
             <id>coverage</id>
-            <properties>
-                <!--
-                    Caution, we use @{...} for late property evaluation here:
-                    http://maven.apache.org/surefire/maven-surefire-plugin/faq.html#late-property-evaluation
-                    This is necessary for Jacoco to work as expected.
-                    However, we wrap the @{...} references into two early-evaluated properties
-                    because in certain environments (IntelliJ IDEA), the use of late property evaluation
-                    is not supported and breaks test execution.
-                    This is because IntelliJ tries to parse the POM to retrieve the surefire/failsafe
-                    argLine and pass them to the test execution directly,
-                    but then fails to evaluate "@{...}" references, resulting in errors.
-                    As a result, this profile will not work in IntelliJ,
-                    but we don't need JaCoCo in IntelliJ anyway.
-                 -->
-                <surefire.jvm.args.jacoco>@{surefire.jvm.args.jacoco.lateEval}</surefire.jvm.args.jacoco>
-                <failsafe.jvm.args.jacoco>@{failsafe.jvm.args.jacoco.lateEval}</failsafe.jvm.args.jacoco>
-            </properties>
             <build>
                 <plugins>
                     <plugin>
@@ -1515,7 +1503,7 @@
                                     <goal>prepare-agent</goal>
                                 </goals>
                                 <configuration>
-                                    <propertyName>surefire.jvm.args.jacoco.lateEval</propertyName>
+                                    <propertyName>surefire.jvm.args.jacoco</propertyName>
                                 </configuration>
                             </execution>
                             <execution>
@@ -1529,7 +1517,7 @@
                                     <goal>prepare-agent-integration</goal>
                                 </goals>
                                 <configuration>
-                                    <propertyName>failsafe.jvm.args.jacoco.lateEval</propertyName>
+                                    <propertyName>failsafe.jvm.args.jacoco</propertyName>
                                 </configuration>
                             </execution>
                         </executions>
