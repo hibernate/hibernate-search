@@ -335,7 +335,7 @@ public class PojoMapper<MPBS extends MappingPartialBuildState> implements Mapper
 			}
 
 			// Build the type managers
-			var typeManagerContainer = typeManagerContainerBuilder.build();
+			var typeManagerContainer = typeManagerContainerBuilder.build( reindexingResolverBuildingHelper );
 
 			mappingDelegate = new PojoMappingDelegateImpl(
 					threadPoolProvider, failureHandler, tenancyMode,

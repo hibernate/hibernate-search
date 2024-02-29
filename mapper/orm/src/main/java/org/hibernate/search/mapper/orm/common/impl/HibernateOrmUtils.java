@@ -9,7 +9,6 @@ package org.hibernate.search.mapper.orm.common.impl;
 import java.lang.invoke.MethodHandles;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -181,4 +180,5 @@ public final class HibernateOrmUtils {
 	public static boolean isDiscriminatorMultiTenancyEnabled(Metadata metadata) {
 		return metadata.getFilterDefinition( TenantIdBinder.FILTER_NAME ) != null;
 	}
+
 }

@@ -16,6 +16,10 @@ import org.hibernate.FlushMode;
 import org.hibernate.engine.spi.SessionFactoryImplementor;
 import org.hibernate.engine.spi.SessionImplementor;
 import org.hibernate.engine.spi.SharedSessionContractImplementor;
+import org.hibernate.mapping.JoinedSubclass;
+import org.hibernate.mapping.PersistentClass;
+import org.hibernate.mapping.RootClass;
+import org.hibernate.mapping.SingleTableSubclass;
 import org.hibernate.metamodel.mapping.EntityMappingType;
 import org.hibernate.search.mapper.orm.common.impl.HibernateOrmUtils;
 import org.hibernate.search.mapper.orm.loading.spi.ConditionalExpression;
@@ -37,14 +41,58 @@ import org.hibernate.search.util.common.impl.SuppressingCloser;
 public abstract class AbstractHibernateOrmLoadingStrategy<E, I>
 		implements HibernateOrmEntityLoadingStrategy<E, I> {
 
+	enum GroupingAllowed {
+		NEVER {
+			@Override
+			public boolean allowed(boolean hasNonIndexedConcreteSubtypes) {
+				return false;
+			}
+		},
+		ALWAYS {
+			@Override
+			public boolean allowed(boolean hasNonIndexedConcreteSubtypes) {
+				return true;
+			}
+		},
+		ONLY_FOR_NO_NON_INDEXED_CONCRETE_SUBTYPES {
+			@Override
+			public boolean allowed(boolean hasNonIndexedConcreteSubtypes) {
+				return !hasNonIndexedConcreteSubtypes;
+			}
+		};
+
+		public static GroupingAllowed determine(PersistentClass persistentClass) {
+			if ( isFromInheritanceType( persistentClass, JoinedSubclass.class ) ) {
+				return ONLY_FOR_NO_NON_INDEXED_CONCRETE_SUBTYPES;
+			}
+			if ( isFromInheritanceType( persistentClass, SingleTableSubclass.class ) ) {
+				return ALWAYS;
+			}
+			return NEVER;
+
+		}
+
+		private static boolean isFromInheritanceType(PersistentClass persistentClass, Class<? extends PersistentClass> kind) {
+			return kind.isAssignableFrom( persistentClass.getClass() )
+					|| persistentClass instanceof RootClass
+							&& persistentClass.getSubclasses().stream()
+									.anyMatch( c -> kind.isAssignableFrom( c.getClass() ) );
+		}
+
+		public abstract boolean allowed(boolean hasNonIndexedConcreteSubtypes);
+	}
+
 	protected final String rootEntityName;
 	protected final Class<I> uniquePropertyType;
 	protected final String uniquePropertyName;
+	private final GroupingAllowed groupingAllowed;
 
-	AbstractHibernateOrmLoadingStrategy(String rootEntityName, Class<I> uniquePropertyType, String uniquePropertyName) {
+	AbstractHibernateOrmLoadingStrategy(String rootEntityName, Class<I> uniquePropertyType, String uniquePropertyName,
+			GroupingAllowed groupingAllowed) {
 		this.rootEntityName = rootEntityName;
 		this.uniquePropertyType = uniquePropertyType;
 		this.uniquePropertyName = uniquePropertyName;
+		this.groupingAllowed = groupingAllowed;
 	}
 
 	@Override
@@ -64,7 +112,13 @@ public abstract class AbstractHibernateOrmLoadingStrategy<E, I>
 		// Only allow grouping for types that don't have a conditional expression:
 		// it's too complicated to apply a condition to multiple types in the same query.
 		// TODO HSEARCH-4252 Apply a condition to multiple types in the same query
-		return ( (HibernateOrmMassLoadingContext) context ).conditionalExpression( type ).isEmpty();
+
+		// Also if we are looking at the InheritanceType.JOINED hierarchy and we are not targeting all subtypes
+		// i.e. there's an @Indexed(enabled=false) on some subtype -- we don't want to join, as we'd be
+		// creating queries with lots of joins and where clause containing `type in (???)`.
+		// and in this case targeting a more specific type leads to generating a bit less joins
+		return groupingAllowed.allowed( type.hasNonIndexedConcreteSubtypes() )
+				&& ( (HibernateOrmMassLoadingContext) context ).conditionalExpression( type ).isEmpty();
 	}
 
 	@Override

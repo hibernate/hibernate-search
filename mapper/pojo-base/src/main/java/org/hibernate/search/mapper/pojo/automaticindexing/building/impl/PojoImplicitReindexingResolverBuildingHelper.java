@@ -267,7 +267,7 @@ public final class PojoImplicitReindexingResolverBuildingHelper {
 	 * we generally want to take this information into account for every concrete subtype of that type,
 	 * because the association could target any of them at runtime.
 	 */
-	Set<? extends PojoRawTypeModel<?>> getConcreteEntitySubTypesForEntitySuperType(PojoRawTypeModel<?> superTypeModel) {
+	public Set<? extends PojoRawTypeModel<?>> getConcreteEntitySubTypesForEntitySuperType(PojoRawTypeModel<?> superTypeModel) {
 		return concreteEntitySubTypesByEntitySuperType.computeIfAbsent( superTypeModel, ignored -> Collections.emptySet() );
 	}
 

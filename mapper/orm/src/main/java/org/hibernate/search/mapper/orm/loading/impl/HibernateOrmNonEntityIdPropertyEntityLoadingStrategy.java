@@ -32,19 +32,21 @@ public class HibernateOrmNonEntityIdPropertyEntityLoadingStrategy<E, I>
 
 	public static <I> HibernateOrmEntityLoadingStrategy<?, ? super I> create(PersistentClass persistentClass,
 			DocumentIdSourceProperty<I> documentIdSourceProperty) {
-		return create( persistentClass, HibernateOrmUtils.entityClass( persistentClass ),
+		return create( persistentClass,
 				documentIdSourceProperty.clazz, documentIdSourceProperty.name,
 				documentIdSourceProperty.handle );
 	}
 
 	private static <E, I> HibernateOrmNonEntityIdPropertyEntityLoadingStrategy<E, I> create(
-			PersistentClass persistentClass, Class<E> mappedClass,
+			PersistentClass persistentClass,
 			Class<I> documentIdSourcePropertyClass, String documentIdSourcePropertyName,
 			ValueReadHandle<? extends I> documentIdSourceHandle) {
 		var idProperty = persistentClass.getIdentifierProperty();
 		return new HibernateOrmNonEntityIdPropertyEntityLoadingStrategy<>(
 				persistentClass.getRootClass().getEntityName(),
-				persistentClass.getEntityName(), documentIdSourcePropertyClass, documentIdSourcePropertyName,
+				persistentClass.getEntityName(),
+				GroupingAllowed.determine( persistentClass ),
+				documentIdSourcePropertyClass, documentIdSourcePropertyName,
 				idProperty != null && documentIdSourcePropertyName.equals( idProperty.getName() ),
 				documentIdSourceHandle
 		);
@@ -56,11 +58,12 @@ public class HibernateOrmNonEntityIdPropertyEntityLoadingStrategy<E, I>
 	private final boolean uniquePropertyIsTheEntityId;
 
 	private HibernateOrmNonEntityIdPropertyEntityLoadingStrategy(String rootEntityName, String entityName,
+			GroupingAllowed groupingAllowed,
 			Class<I> documentIdSourcePropertyType,
 			String documentIdSourcePropertyName,
 			boolean uniquePropertyIsTheEntityId,
 			ValueReadHandle<? extends I> documentIdSourceHandle) {
-		super( rootEntityName, documentIdSourcePropertyType, documentIdSourcePropertyName );
+		super( rootEntityName, documentIdSourcePropertyType, documentIdSourcePropertyName, groupingAllowed );
 		this.entityName = entityName;
 		this.documentIdSourcePropertyName = documentIdSourcePropertyName;
 		this.documentIdSourceHandle = documentIdSourceHandle;

@@ -24,20 +24,24 @@ public class HibernateOrmEntityIdEntityLoadingStrategy<E, I> extends AbstractHib
 
 	public static HibernateOrmEntityLoadingStrategy<?, ?> create(PersistentClass persistentClass) {
 		var rootClass = persistentClass.getRootClass();
-		return create( rootClass, HibernateOrmUtils.entityClass( rootClass ) );
+		return create(
+				rootClass, HibernateOrmUtils.entityClass( rootClass ),
+				GroupingAllowed.determine( persistentClass )
+		);
 	}
 
-	private static <E> HibernateOrmEntityIdEntityLoadingStrategy<E, ?> create(RootClass rootClass, Class<E> rootMappedClass) {
+	private static <E> HibernateOrmEntityIdEntityLoadingStrategy<E, ?> create(RootClass rootClass, Class<E> rootMappedClass,
+			GroupingAllowed groupingAllowed) {
 		var idProperty = rootClass.getIdentifierProperty();
 		return new HibernateOrmEntityIdEntityLoadingStrategy<>( rootMappedClass, rootClass.getEntityName(),
-				idProperty.getType().getReturnedClass(), idProperty.getName() );
+				idProperty.getType().getReturnedClass(), idProperty.getName(), groupingAllowed );
 	}
 
 	private final Class<E> rootEntityClass;
 
 	HibernateOrmEntityIdEntityLoadingStrategy(Class<E> rootEntityClass, String rootEntityName,
-			Class<I> uniquePropertyType, String uniquePropertyName) {
-		super( rootEntityName, uniquePropertyType, uniquePropertyName );
+			Class<I> uniquePropertyType, String uniquePropertyName, GroupingAllowed groupingAllowed) {
+		super( rootEntityName, uniquePropertyType, uniquePropertyName, groupingAllowed );
 		this.rootEntityClass = rootEntityClass;
 	}
 

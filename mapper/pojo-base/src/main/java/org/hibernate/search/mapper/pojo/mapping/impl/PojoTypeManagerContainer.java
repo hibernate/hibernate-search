@@ -9,6 +9,7 @@ package org.hibernate.search.mapper.pojo.mapping.impl;
 import java.lang.invoke.MethodHandles;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.Map;
@@ -16,6 +17,7 @@ import java.util.Optional;
 import java.util.Set;
 
 import org.hibernate.search.engine.mapper.mapping.building.spi.MappedIndexManagerBuilder;
+import org.hibernate.search.mapper.pojo.automaticindexing.building.impl.PojoImplicitReindexingResolverBuildingHelper;
 import org.hibernate.search.mapper.pojo.bridge.binding.impl.BoundRoutingBridge;
 import org.hibernate.search.mapper.pojo.identity.impl.PojoRootIdentityMappingCollector;
 import org.hibernate.search.mapper.pojo.loading.spi.PojoLoadingTypeContextProvider;
@@ -62,7 +64,8 @@ public class PojoTypeManagerContainer
 	private final Set<PojoIndexedTypeManager<?, ?>> allIndexed;
 	private final Set<PojoRawTypeIdentifier<?>> allIndexedAndContainedTypes;
 
-	private PojoTypeManagerContainer(Builder builder) {
+	private PojoTypeManagerContainer(Builder builder,
+			PojoImplicitReindexingResolverBuildingHelper reindexingResolverBuildingHelper) {
 		// Use a LinkedHashMap for deterministic iteration in the "all" set
 		Map<PojoRawTypeIdentifier<?>, AbstractPojoTypeManager<?, ?>> byExactTypeContent = new LinkedHashMap<>();
 		Map<PojoRawTypeIdentifier<?>, PojoIndexedTypeManager<?, ?>> indexedByExactTypeContent = new LinkedHashMap<>();
@@ -70,9 +73,14 @@ public class PojoTypeManagerContainer
 		Map<PojoRawTypeIdentifier<?>, Set<PojoIndexedTypeManager<?, ?>>> indexedBySuperTypeContent = new LinkedHashMap<>();
 		Map<String, AbstractPojoTypeManager<?, ?>> byEntityNameContent = new LinkedHashMap<>();
 		Map<String, PojoIndexedTypeManager<?, ?>> indexedByEntityNameContent = new LinkedHashMap<>();
+
+		Set<PojoIndexedTypeManager.Builder<?>> hasNonIndexedConcreteSubtypesSet = createHasNonIndexedConcreteSubtypesSet(
+				builder, reindexingResolverBuildingHelper );
+
 		for ( PojoIndexedTypeManager.Builder<?> typeManagerBuilder : builder.indexed.values() ) {
 			PojoRawTypeModel<?> typeModel = typeManagerBuilder.typeModel;
 			PojoRawTypeIdentifier<?> typeIdentifier = typeModel.typeIdentifier();
+			typeManagerBuilder.hasNonIndexedConcreteSubtypes( hasNonIndexedConcreteSubtypesSet.contains( typeManagerBuilder ) );
 			var typeManager = typeManagerBuilder.build();
 			log.indexedTypeManager( typeModel, typeManager );
 
@@ -183,6 +191,32 @@ public class PojoTypeManagerContainer
 
 		this.allIndexed = Collections.unmodifiableSet( new LinkedHashSet<>( indexedByExactTypeContent.values() ) );
 		this.allIndexedAndContainedTypes = Collections.unmodifiableSet( byExactTypeContent.keySet() );
+	}
+
+	private static Set<PojoIndexedTypeManager.Builder<?>> createHasNonIndexedConcreteSubtypesSet(Builder builder,
+			PojoImplicitReindexingResolverBuildingHelper reindexingResolverBuildingHelper) {
+		Set<PojoRawTypeIdentifier<?>> indexedIdentifiers = new HashSet<>();
+		for ( PojoIndexedTypeManager.Builder<?> typeManagerBuilder : builder.indexed.values() ) {
+			indexedIdentifiers.add( typeManagerBuilder.typeModel.typeIdentifier() );
+		}
+
+		Set<PojoIndexedTypeManager.Builder<?>> hasNonIndexedConcreteSubtypesSet = new HashSet<>();
+
+		for ( PojoIndexedTypeManager.Builder<?> typeManagerBuilder : builder.indexed.values() ) {
+			boolean hasNonIndexedConcreteSubtypes = false;
+			Set<? extends PojoRawTypeModel<?>> concreteSubTypes = reindexingResolverBuildingHelper
+					.getConcreteEntitySubTypesForEntitySuperType( typeManagerBuilder.typeModel );
+			for ( PojoRawTypeModel<?> subtype : concreteSubTypes ) {
+				if ( !indexedIdentifiers.contains( subtype.typeIdentifier() ) ) {
+					hasNonIndexedConcreteSubtypes = true;
+					break;
+				}
+			}
+			if ( hasNonIndexedConcreteSubtypes ) {
+				hasNonIndexedConcreteSubtypesSet.add( typeManagerBuilder );
+			}
+		}
+		return hasNonIndexedConcreteSubtypesSet;
 	}
 
 	@Override
@@ -358,8 +392,8 @@ public class PojoTypeManagerContainer
 			}
 		}
 
-		public PojoTypeManagerContainer build() {
-			return new PojoTypeManagerContainer( this );
+		public PojoTypeManagerContainer build(PojoImplicitReindexingResolverBuildingHelper reindexingResolverBuildingHelper) {
+			return new PojoTypeManagerContainer( this, reindexingResolverBuildingHelper );
 		}
 
 	}
