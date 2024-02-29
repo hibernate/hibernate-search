@@ -31,4 +31,6 @@ public interface PojoLoadingTypeContext<E> {
 
 	Optional<PojoMassLoadingStrategy<? super E, ?>> massLoadingStrategyOptional();
 
+	boolean hasNonIndexedConcreteSubtypes();
+
 }

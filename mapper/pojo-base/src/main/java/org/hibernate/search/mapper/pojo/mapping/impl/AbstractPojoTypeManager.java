@@ -66,6 +66,7 @@ public abstract class AbstractPojoTypeManager<I, E>
 	protected final PojoImplicitReindexingResolver<E> reindexingResolver;
 	private final Optional<PojoSelectionLoadingStrategy<? super E>> selectionLoadingStrategyOptional;
 	private final Optional<PojoMassLoadingStrategy<? super E, ?>> massLoadingStrategyOptional;
+	private final boolean hasNonIndexedConcreteSubtypes;
 
 	public AbstractPojoTypeManager(Builder<E> builder, IdentifierMappingImplementor<I, E> identifierMapping) {
 		this.typeIdentifier = builder.typeModel.typeIdentifier();
@@ -81,6 +82,7 @@ public abstract class AbstractPojoTypeManager<I, E>
 		this.reindexingResolver = builder.reindexingResolver;
 		this.selectionLoadingStrategyOptional = Optional.ofNullable( builder.selectionLoadingStrategy );
 		this.massLoadingStrategyOptional = Optional.ofNullable( builder.massLoadingStrategy );
+		this.hasNonIndexedConcreteSubtypes = builder.hasNonIndexedConcreteSubtypes;
 	}
 
 	@Override
@@ -237,6 +239,11 @@ public abstract class AbstractPojoTypeManager<I, E>
 		return massLoadingStrategyOptional;
 	}
 
+	@Override
+	public boolean hasNonIndexedConcreteSubtypes() {
+		return hasNonIndexedConcreteSubtypes;
+	}
+
 	public abstract static class Builder<E> {
 		public final PojoRawTypeModel<E> typeModel;
 		private final String entityName;
@@ -251,6 +258,7 @@ public abstract class AbstractPojoTypeManager<I, E>
 		private PojoPathOrdinals pathOrdinals;
 		private PojoSelectionLoadingStrategy<? super E> selectionLoadingStrategy;
 		private PojoMassLoadingStrategy<? super E, ?> massLoadingStrategy;
+		private boolean hasNonIndexedConcreteSubtypes = false;
 
 		protected boolean closed = false;
 
@@ -384,6 +392,10 @@ public abstract class AbstractPojoTypeManager<I, E>
 							}
 						} );
 			}
+		}
+
+		public void hasNonIndexedConcreteSubtypes(boolean hasNonIndexedConcreteSubtypes) {
+			this.hasNonIndexedConcreteSubtypes = hasNonIndexedConcreteSubtypes;
 		}
 
 		public abstract AbstractPojoTypeManager<?, E> build();
