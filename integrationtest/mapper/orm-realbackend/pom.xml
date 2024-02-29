@@ -15,6 +15,13 @@
     <properties>
         <!-- See profiles below -->
         <test.multiplebackends.skip>false</test.multiplebackends.skip>
+
+        <failsafe.lucene.reportsDirectory>${project.build.directory}/failsafe-reports/lucene</failsafe.lucene.reportsDirectory>
+        <failsafe.lucene.summaryFile>${failsafe.lucene.reportsDirectory}/failsafe-summary.xml</failsafe.lucene.summaryFile>
+        <failsafe.elasticsearch.reportsDirectory>${project.build.directory}/failsafe-reports/elasticsearch</failsafe.elasticsearch.reportsDirectory>
+        <failsafe.elasticsearch.summaryFile>${failsafe.elasticsearch.reportsDirectory}/failsafe-summary.xml</failsafe.elasticsearch.summaryFile>
+        <failsafe.multiplebackends.reportsDirectory>${project.build.directory}/failsafe-reports/multiplebackends</failsafe.multiplebackends.reportsDirectory>
+        <failsafe.multiplebackends.summaryFile>${failsafe.multiplebackends.reportsDirectory}/failsafe-summary.xml</failsafe.multiplebackends.summaryFile>
     </properties>
 
     <dependencies>
@@ -78,7 +85,9 @@
                         </goals>
                         <configuration>
                             <skip>${test.lucene.skip}</skip>
-                            <reportNameSuffix>${surefire.reportNameSuffix}-lucene</reportNameSuffix>
+                            <reportNameSuffix>${surefire.executionIdentifier}-lucene</reportNameSuffix>
+                            <reportsDirectory>${failsafe.lucene.reportsDirectory}</reportsDirectory>
+                            <summaryFile>${failsafe.lucene.summaryFile}</summaryFile>
                             <classpathDependencyExcludes>
                                 <classpathDependencyExclude>org.hibernate.search:hibernate-search-backend-elasticsearch</classpathDependencyExclude>
                             </classpathDependencyExcludes>
@@ -99,7 +108,9 @@
                         </goals>
                         <configuration>
                             <skip>${test.elasticsearch.skip}</skip>
-                            <reportNameSuffix>${surefire.reportNameSuffix}-elasticsearch</reportNameSuffix>
+                            <reportNameSuffix>${surefire.executionIdentifier}-elasticsearch</reportNameSuffix>
+                            <reportsDirectory>${failsafe.elasticsearch.reportsDirectory}</reportsDirectory>
+                            <summaryFile>${failsafe.elasticsearch.summaryFile}</summaryFile>
                             <classpathDependencyExcludes>
                                 <classpathDependencyExclude>org.hibernate.search:hibernate-search-backend-lucene</classpathDependencyExclude>
                             </classpathDependencyExcludes>
@@ -120,7 +131,9 @@
                         </goals>
                         <configuration>
                             <skip>${test.multiplebackends.skip}</skip>
-                            <reportNameSuffix>${surefire.reportNameSuffix}-multiplebackends</reportNameSuffix>
+                            <reportNameSuffix>${surefire.executionIdentifier}-multiplebackends</reportNameSuffix>
+                            <reportsDirectory>${failsafe.multiplebackends.reportsDirectory}</reportsDirectory>
+                            <summaryFile>${failsafe.multiplebackends.summaryFile}</summaryFile>
                             <includes>
                                 <exclude>org.hibernate.search.integrationtest.mapper.orm.realbackend.bootstrap.ElasticsearchBackendTypeAutoDetectMultipleBackendTypesInClasspathIT</exclude>
                                 <exclude>org.hibernate.search.integrationtest.mapper.orm.realbackend.bootstrap.LuceneBackendTypeAutoDetectMultipleBackendTypesInClasspathIT</exclude>
@@ -132,6 +145,13 @@
                         <goals>
                             <goal>verify</goal>
                         </goals>
+                        <configuration>
+                            <summaryFiles>
+                                <summaryFile>${failsafe.lucene.summaryFile}</summaryFile>
+                                <summaryFile>${failsafe.elasticsearch.summaryFile}</summaryFile>
+                                <summaryFile>${failsafe.multiplebackends.summaryFile}</summaryFile>
+                            </summaryFiles>
+                        </configuration>
                     </execution>
                 </executions>
             </plugin>
@@ -139,8 +159,13 @@
     </build>
 
     <profiles>
+        <!--
+             The "verify" goal fails if a file specified in "summaryFiles" doesn't exist,
+             and that's exactly what happens when we skip an "integration-test" goal.
+             See https://github.com/apache/maven-surefire/blob/2fed802397f8c7de4cfc72f49ab4565e72f7aab7/maven-failsafe-plugin/src/main/java/org/apache/maven/plugin/failsafe/VerifyMojo.java#L179-L183
+         -->
         <profile>
-            <id>skipLuceneTests</id>
+            <id>lucene-test-skip</id>
             <activation>
                 <property>
                     <name>test.lucene.skip</name>
@@ -148,11 +173,13 @@
                 </property>
             </activation>
             <properties>
+                <failsafe.lucene.summaryFile>${rootProject.empty.failsafe.summaryFile}</failsafe.lucene.summaryFile>
                 <test.multiplebackends.skip>true</test.multiplebackends.skip>
+                <failsafe.multiplebackends.summaryFile>${rootProject.empty.failsafe.summaryFile}</failsafe.multiplebackends.summaryFile>
             </properties>
         </profile>
         <profile>
-            <id>skipElasticsearchTests</id>
+            <id>elasticsearch-test-skip</id>
             <activation>
                 <property>
                     <name>test.elasticsearch.skip</name>
@@ -160,7 +187,9 @@
                 </property>
             </activation>
             <properties>
+                <failsafe.elasticsearch.summaryFile>${rootProject.empty.failsafe.summaryFile}</failsafe.elasticsearch.summaryFile>
                 <test.multiplebackends.skip>true</test.multiplebackends.skip>
+                <failsafe.multiplebackends.summaryFile>${rootProject.empty.failsafe.summaryFile}</failsafe.multiplebackends.summaryFile>
             </properties>
         </profile>
     </profiles>

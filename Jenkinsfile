@@ -991,7 +991,7 @@ String toTestEnvironmentArgs(BuildEnvironment buildEnv) {
 	// Add a suffix to tests to distinguish between different executions
 	// of the same test in different environments in reports
 	def testSuffix = buildEnv.tag.replaceAll('[^a-zA-Z0-9_\\-+]+', '_')
-	args +=  "-Dsurefire.environment=$testSuffix"
+	args +=  " -Dsurefire.environment=$testSuffix"
 
 	if ( ! (buildEnv instanceof JdkBuildEnvironment) ) {
 		return args;

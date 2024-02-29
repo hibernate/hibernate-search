@@ -17,6 +17,15 @@
             ${test.elasticsearch.connection.jvm.args}
             ${test.weld.jvm.args}
         </surefire.jvm.args.module>
+        
+        <failsafe.lucene-jbatch.reportsDirectory>${project.build.directory}/failsafe-reports/lucene-jbatch</failsafe.lucene-jbatch.reportsDirectory>
+        <failsafe.lucene-jbatch.summaryFile>${failsafe.lucene-jbatch.reportsDirectory}/failsafe-summary.xml</failsafe.lucene-jbatch.summaryFile>
+        <failsafe.lucene-jberet.reportsDirectory>${project.build.directory}/failsafe-reports/lucene-jberet</failsafe.lucene-jberet.reportsDirectory>
+        <failsafe.lucene-jberet.summaryFile>${failsafe.lucene-jberet.reportsDirectory}/failsafe-summary.xml</failsafe.lucene-jberet.summaryFile>
+        <failsafe.elasticsearch-jbatch.reportsDirectory>${project.build.directory}/failsafe-reports/elasticsearch-jbatch</failsafe.elasticsearch-jbatch.reportsDirectory>
+        <failsafe.elasticsearch-jbatch.summaryFile>${failsafe.elasticsearch-jbatch.reportsDirectory}/failsafe-summary.xml</failsafe.elasticsearch-jbatch.summaryFile>
+        <failsafe.elasticsearch-jberet.reportsDirectory>${project.build.directory}/failsafe-reports/elasticsearch-jberet</failsafe.elasticsearch-jberet.reportsDirectory>
+        <failsafe.elasticsearch-jberet.summaryFile>${failsafe.elasticsearch-jberet.reportsDirectory}/failsafe-summary.xml</failsafe.elasticsearch-jberet.summaryFile>
     </properties>
 
     <dependencies>
@@ -92,7 +101,9 @@
                             <goal>integration-test</goal>
                         </goals>
                         <configuration>
-                            <reportNameSuffix>${surefire.reportNameSuffix}-lucene-jbatch</reportNameSuffix>
+                            <reportNameSuffix>${surefire.executionIdentifier}-lucene-jbatch</reportNameSuffix>
+                            <reportsDirectory>${failsafe.lucene-jbatch.reportsDirectory}</reportsDirectory>
+                            <summaryFile>${failsafe.lucene-jbatch.summaryFile}</summaryFile>
                             <classpathDependencyExcludes>
                                 <classpathDependencyExclude>org.hibernate.search:hibernate-search-backend-elasticsearch</classpathDependencyExclude>
                                 <classpathDependencyExclude>org.hibernate.search:hibernate-search-util-internal-integrationtest-jberet-se</classpathDependencyExclude>
@@ -111,7 +122,9 @@
                             <goal>integration-test</goal>
                         </goals>
                         <configuration>
-                            <reportNameSuffix>${surefire.reportNameSuffix}-lucene-jberet</reportNameSuffix>
+                            <reportNameSuffix>${surefire.executionIdentifier}-lucene-jberet</reportNameSuffix>
+                            <reportsDirectory>${failsafe.lucene-jberet.reportsDirectory}</reportsDirectory>
+                            <summaryFile>${failsafe.lucene-jberet.summaryFile}</summaryFile>
                             <classpathDependencyExcludes>
                                 <classpathDependencyExclude>org.hibernate.search:hibernate-search-backend-elasticsearch</classpathDependencyExclude>
                                 <classpathDependencyExclude>org.hibernate.search:hibernate-search-util-internal-integrationtest-jbatch-runtime</classpathDependencyExclude>
@@ -130,7 +143,9 @@
                         </goals>
                         <configuration>
                             <skip>${test.elasticsearch.skip}</skip>
-                            <reportNameSuffix>${surefire.reportNameSuffix}-elasticsearch-jbatch</reportNameSuffix>
+                            <reportNameSuffix>${surefire.executionIdentifier}-elasticsearch-jbatch</reportNameSuffix>
+                            <reportsDirectory>${failsafe.elasticsearch-jbatch.reportsDirectory}</reportsDirectory>
+                            <summaryFile>${failsafe.elasticsearch-jbatch.summaryFile}</summaryFile>
                             <classpathDependencyExcludes>
                                 <classpathDependencyExclude>org.hibernate.search:hibernate-search-backend-lucene</classpathDependencyExclude>
                                 <classpathDependencyExclude>org.hibernate.search:hibernate-search-util-internal-integrationtest-jberet-se</classpathDependencyExclude>
@@ -150,7 +165,9 @@
                         </goals>
                         <configuration>
                             <skip>${test.elasticsearch.skip}</skip>
-                            <reportNameSuffix>${surefire.reportNameSuffix}-elasticsearch-jberet</reportNameSuffix>
+                            <reportNameSuffix>${surefire.executionIdentifier}-elasticsearch-jberet</reportNameSuffix>
+                            <reportsDirectory>${failsafe.elasticsearch-jberet.reportsDirectory}</reportsDirectory>
+                            <summaryFile>${failsafe.elasticsearch-jberet.summaryFile}</summaryFile>
                             <classpathDependencyExcludes>
                                 <classpathDependencyExclude>org.hibernate.search:hibernate-search-backend-lucene</classpathDependencyExclude>
                                 <classpathDependencyExclude>org.hibernate.search:hibernate-search-util-internal-integrationtest-jbatch-runtime</classpathDependencyExclude>
@@ -167,6 +184,14 @@
                         <goals>
                             <goal>verify</goal>
                         </goals>
+                        <configuration>
+                            <summaryFiles>
+                                <summaryFile>${failsafe.lucene-jbatch.summaryFile}</summaryFile>
+                                <summaryFile>${failsafe.lucene-jberet.summaryFile}</summaryFile>
+                                <summaryFile>${failsafe.elasticsearch-jbatch.summaryFile}</summaryFile>
+                                <summaryFile>${failsafe.elasticsearch-jberet.summaryFile}</summaryFile>
+                            </summaryFiles>
+                        </configuration>
                     </execution>
                 </executions>
             </plugin>
@@ -174,6 +199,37 @@
     </build>
 
     <profiles>
+        <!--
+             The "verify" goal fails if a file specified in "summaryFiles" doesn't exist,
+             and that's exactly what happens when we skip an "integration-test" goal.
+             See https://github.com/apache/maven-surefire/blob/2fed802397f8c7de4cfc72f49ab4565e72f7aab7/maven-failsafe-plugin/src/main/java/org/apache/maven/plugin/failsafe/VerifyMojo.java#L179-L183
+         -->
+        <profile>
+            <id>lucene-test-skip</id>
+            <activation>
+                <property>
+                    <name>test.lucene.skip</name>
+                    <value>true</value>
+                </property>
+            </activation>
+            <properties>
+                <failsafe.lucene-jbatch.summaryFile>${rootProject.empty.failsafe.summaryFile}</failsafe.lucene-jbatch.summaryFile>
+                <failsafe.lucene-jberet.summaryFile>${rootProject.empty.failsafe.summaryFile}</failsafe.lucene-jberet.summaryFile>
+            </properties>
+        </profile>
+        <profile>
+            <id>elasticsearch-test-skip</id>
+            <activation>
+                <property>
+                    <name>test.elasticsearch.skip</name>
+                    <value>true</value>
+                </property>
+            </activation>
+            <properties>
+                <failsafe.elasticsearch-jbatch.summaryFile>${rootProject.empty.failsafe.summaryFile}</failsafe.elasticsearch-jbatch.summaryFile>
+                <failsafe.elasticsearch-jberet.summaryFile>${rootProject.empty.failsafe.summaryFile}</failsafe.elasticsearch-jberet.summaryFile>
+            </properties>
+        </profile>
         <profile>
             <id>amazon-opensearch-serverless</id>
             <activation>
@@ -189,6 +245,8 @@
                      https://hibernate.atlassian.net/browse/HSEARCH-4930
                  -->
                 <test.elasticsearch.skip>true</test.elasticsearch.skip>
+                <failsafe.elasticsearch-jbatch.summaryFile>${rootProject.empty.failsafe.summaryFile}</failsafe.elasticsearch-jbatch.summaryFile>
+                <failsafe.elasticsearch-jberet.summaryFile>${rootProject.empty.failsafe.summaryFile}</failsafe.elasticsearch-jberet.summaryFile>
             </properties>
         </profile>
     </profiles>

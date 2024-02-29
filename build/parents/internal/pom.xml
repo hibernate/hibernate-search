@@ -44,7 +44,7 @@
             consider all sources as tests during Sonar analysis.
             This is important because some analysis rules do not apply to test code.
          -->
-        <sonar.sources>${rootProject.emptySubdirectory}</sonar.sources>
+        <sonar.sources>${rootProject.empty.directory}</sonar.sources>
         <sonar.tests>${project.basedir}/src</sonar.tests>
     </properties>
 
