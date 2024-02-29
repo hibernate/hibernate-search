@@ -418,8 +418,10 @@
             http://maven.apache.org/surefire/maven-surefire-plugin/faq.html#late-property-evaluation
             This is necessary for Jacoco to work as expected.
          -->
-        <surefire.jvm.args>${surefire.jvm.args.memory} ${surefire.jvm.args.misc} ${surefire.jvm.args.java-version} ${surefire.jvm.args.module} @{surefire.jvm.args.jacoco} ${test.launcher.args}</surefire.jvm.args>
-        <failsafe.jvm.args>${surefire.jvm.args.memory} ${surefire.jvm.args.misc} ${surefire.jvm.args.java-version} ${surefire.jvm.args.module} @{failsafe.jvm.args.jacoco} ${failsafe.jvm.args.hibernate-orm} ${failsafe.jvm.args.jdbc} ${test.launcher.args}</failsafe.jvm.args>
+        <surefire.jvm.args.no-jacoco>${surefire.jvm.args.memory} ${surefire.jvm.args.misc} ${surefire.jvm.args.java-version} ${surefire.jvm.args.module} ${test.launcher.args}</surefire.jvm.args.no-jacoco>
+        <failsafe.jvm.args.no-jacoco>${surefire.jvm.args.memory} ${surefire.jvm.args.misc} ${surefire.jvm.args.java-version} ${surefire.jvm.args.module} ${test.launcher.args} ${failsafe.jvm.args.hibernate-orm} ${failsafe.jvm.args.jdbc}</failsafe.jvm.args.no-jacoco>
+        <surefire.jvm.args>${surefire.jvm.args.no-jacoco} @{surefire.jvm.args.jacoco}</surefire.jvm.args>
+        <failsafe.jvm.args>${surefire.jvm.args.no-jacoco} @{failsafe.jvm.args.jacoco}</failsafe.jvm.args>
 
 <!-- Disable integration tests selectively. To be set in specific profile, e.g. for a specific JDK version. -->
         <failsafe.spring.skip>false</failsafe.spring.skip>
@@ -1507,7 +1509,7 @@
                                 </configuration>
                             </execution>
                             <execution>
-                                <id>jacoco-prepare-prepare-agent-integration</id>
+                                <id>jacoco-prepare-agent-integration</id>
                                 <!--
                                     This is necessary in order for the property to be set before we process resources,
                                     such as arquillian.xml in WildFly tests or maven.properties in OSGi tests.
