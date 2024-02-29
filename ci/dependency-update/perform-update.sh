@@ -69,9 +69,11 @@ fi
 if [ -n "$PROPERTIES" ]
 then
 	echo "Updating properties '$PROPERTIES'."
+	# We don't want to use the build cache or build scans for this execution
+	MISC_MAVEN_ARGS="-Dscan=false -Dno-build-cache"
 	# We allow any update, but constrain using a rules file (more flexible)
 	# We allow downgrades because the versions plugin considers e.g. 6.2.0-SNAPSHOT to be lower than 6.2.0.CR2
-	./mvnw --quiet -U -Pdependency-update -Pdist org.codehaus.mojo:versions-maven-plugin:update-properties \
+	./mvnw --quiet $MISC_MAVEN_ARGS -U -Pdependency-update -Pdist org.codehaus.mojo:versions-maven-plugin:update-properties \
 		-DgenerateBackupPoms=false \
 		-DallowMajorUpdates=true -DallowMinorUpdates=true -DallowSnapshots=true -DallowDowngrade=true \
 		-DincludeProperties="$PROPERTIES" \

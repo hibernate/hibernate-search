@@ -474,8 +474,11 @@ stage('Default build') {
 								usernameVariable: 'SONARCLOUD_ORGANIZATION',
 								passwordVariable: 'SONARCLOUD_TOKEN'
 				)]) {
+					// We don't want to use the build cache or build scans for this execution
+					def miscMavenArgs = '-Dscan=false -Dno-build-cache'
 					sh """ \
 							mvn sonar:sonar \
+							${miscMavenArgs} \
 							-Dsonar.organization=\${SONARCLOUD_ORGANIZATION} \
 							-Dsonar.host.url=https://sonarcloud.io \
 							-Dsonar.token=\${SONARCLOUD_TOKEN} \

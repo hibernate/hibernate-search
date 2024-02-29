@@ -64,6 +64,14 @@
                         <!-- Exclude implementation classes from the javadoc -->
                         <excludePackageNames>*.impl,*.impl.*</excludePackageNames>
                         <!--
+                            This feature tries to set up links between javadoc of different modules.
+                            We don't need that since we merge everything together in the end,
+                            and it leads to really annoying additional Maven executions
+                            that end up publishing build scans on CI,
+                            so we disable it.
+                         -->
+                        <detectOfflineLinks>false</detectOfflineLinks>
+                        <!--
                             Make sure to always use offline links,
                             otherwise the build will need to access external websites,
                             which leads to build failures from time to time when the websites are not available
