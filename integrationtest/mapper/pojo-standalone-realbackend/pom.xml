@@ -56,6 +56,42 @@
 
     <build>
         <plugins>
+            <!-- We need to send the jacoco report of each test execution to a different file,
+                 otherwise Develocity won't be able to cache test executions. -->
+            <plugin>
+                <groupId>org.jacoco</groupId>
+                <artifactId>jacoco-maven-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>jacoco-prepare-agent-integration</id>
+                        <configuration>
+                            <skip>true</skip>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>jacoco-prepare-agent-integration-lucene</id>
+                        <phase>initialize</phase>
+                        <goals>
+                            <goal>prepare-agent-integration</goal>
+                        </goals>
+                        <configuration>
+                            <propertyName>failsafe.jvm.args.jacoco.lucene</propertyName>
+                            <destFile>${project.build.directory}/lucene/jacoco.exec</destFile>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>jacoco-prepare-agent-integration-elasticsearch</id>
+                        <phase>initialize</phase>
+                        <goals>
+                            <goal>prepare-agent-integration</goal>
+                        </goals>
+                        <configuration>
+                            <propertyName>failsafe.jvm.args.jacoco.elasticsearch</propertyName>
+                            <destFile>${project.build.directory}/elasticsearch/jacoco.exec</destFile>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-failsafe-plugin</artifactId>
@@ -67,6 +103,7 @@
                         </goals>
                         <configuration>
                             <skip>${test.lucene.skip}</skip>
+                            <argLine>${failsafe.jvm.args.no-jacoco} @{failsafe.jvm.args.jacoco.lucene}</argLine>
                             <reportNameSuffix>${surefire.executionIdentifier}-lucene</reportNameSuffix>
                             <reportsDirectory>${failsafe.lucene.reportsDirectory}</reportsDirectory>
                             <summaryFile>${failsafe.lucene.summaryFile}</summaryFile>
@@ -88,6 +125,7 @@
                         </goals>
                         <configuration>
                             <skip>${test.elasticsearch.skip}</skip>
+                            <argLine>${failsafe.jvm.args.no-jacoco} @{failsafe.jvm.args.jacoco.elasticsearch}</argLine>
                             <reportNameSuffix>${surefire.executionIdentifier}-elasticsearch</reportNameSuffix>
                             <reportsDirectory>${failsafe.elasticsearch.reportsDirectory}</reportsDirectory>
                             <summaryFile>${failsafe.elasticsearch.summaryFile}</summaryFile>
