@@ -94,5 +94,10 @@ is backward-compatible with Hibernate Search {hibernateSearchPreviousStableVersi
 [[behavior]]
 == Behavior
 
-The behavior of Hibernate Search {hibernateSearchVersion}
-is backward-compatible with Hibernate Search {hibernateSearchPreviousStableVersionShort}.
+The behavior of Hibernate Search {hibernateSearchVersion} is backward-compatible with Hibernate Search {hibernateSearchPreviousStableVersionShort}.
+
+NOTE: It is worth mentioning that with the changes in link:{hibernateSearchJiraUrl}/HSEARCH-5062[HSEARCH-5062]
+you may notice changes in the queries Hibernate Search creates to load entities.
+While we are expecting that the introduced changes should help with performance,
+if you notice any problems with them, we'd appreciate you reaching out to let us know.
+
