@@ -744,4 +744,8 @@ public interface Log extends BasicLogger {
 	@Message(id = ID_OFFSET + 183, value = "Failed to apply '%1$s' to '%2$s': '%3$s'")
 	SearchException unableToPerformAnalysisOperation(String analyzerName, String string, String reason,
 			@Cause IOException cause);
+
+	@Message(id = ID_OFFSET + 184,
+			value = "Expecting the '%1$s' vector to have the norm value equal to: %2$s, but was equal to %3$s instead.")
+	SearchException byteVectorLengthExpectationFailed(byte[] vector, float expected, float actual);
 }

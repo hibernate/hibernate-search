@@ -43,4 +43,6 @@ public interface VectorFieldTypeOptionsStep<S extends VectorFieldTypeOptionsStep
 	 */
 	S dimension(int dimension);
 
+
+	S magnitude(float magnitude);
 }

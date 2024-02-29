@@ -263,6 +263,11 @@ public final class StubIndexSchemaDataNode extends StubTreeNode<StubIndexSchemaD
 			return this;
 		}
 
+		public Builder magnitude(float magnitude) {
+			attribute( "magnitude", magnitude );
+			return this;
+		}
+
 		@Override
 		public StubIndexSchemaDataNode build() {
 			return new StubIndexSchemaDataNode( this );

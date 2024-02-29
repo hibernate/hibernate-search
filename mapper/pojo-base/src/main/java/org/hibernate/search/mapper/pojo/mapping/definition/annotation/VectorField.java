@@ -94,6 +94,14 @@ public @interface VectorField {
 	int m() default AnnotationDefaultValues.DEFAULT_M;
 
 	/**
+	 * @return The vector magnitude.
+	 * <p>
+	 * With float vectors, if set to {@code > 0} automatic normalization will be applied, i.e. {@code ||vector|| == magnitude }.
+	 * With byte vectors, if set to {@code > 0} a check will be performed that the passed vector is of required magnitude.
+	 */
+	float magnitude() default AnnotationDefaultValues.DEFAULT_MAGNITUDE;
+
+	/**
 	 * @return A reference to the value bridge to use for this field.
 	 * Must not be set if {@link #valueBinder()} is set.
 	 * @see GenericField#valueBridge()

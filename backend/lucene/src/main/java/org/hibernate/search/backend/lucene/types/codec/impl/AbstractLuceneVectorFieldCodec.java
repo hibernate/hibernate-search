@@ -19,7 +19,8 @@ import org.apache.lucene.index.VectorSimilarityFunction;
 import org.apache.lucene.util.BytesRef;
 
 public abstract class AbstractLuceneVectorFieldCodec<F> implements LuceneVectorFieldCodec<F> {
-
+	// TODO: should we make this one configurable ?
+	protected static final double EPS = 0.0000000001;
 	protected final FieldType fieldType;
 	protected final VectorSimilarityFunction vectorSimilarity;
 	private final int dimension;

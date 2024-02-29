@@ -46,6 +46,7 @@ abstract class AbstractLuceneVectorFieldTypeOptionsStep<S extends AbstractLucene
 	protected Integer dimension;
 	protected int efConstruction = 512;
 	protected int m = 16;
+	protected Float magnitude;
 	private Projectable projectable = Projectable.DEFAULT;
 	private Searchable searchable = Searchable.DEFAULT;
 	private F indexNullAsValue = null;
@@ -100,6 +101,12 @@ abstract class AbstractLuceneVectorFieldTypeOptionsStep<S extends AbstractLucene
 	}
 
 	@Override
+	public S magnitude(float magnitude) {
+		this.magnitude = magnitude;
+		return thisAsS();
+	}
+
+	@Override
 	public S indexNullAs(F indexNullAsValue) {
 		this.indexNullAsValue = indexNullAsValue;
 		return thisAsS();
@@ -118,7 +125,7 @@ abstract class AbstractLuceneVectorFieldTypeOptionsStep<S extends AbstractLucene
 		Storage storage = resolvedProjectable ? Storage.ENABLED : Storage.DISABLED;
 
 		AbstractLuceneVectorFieldCodec<F> codec = createCodec( resolvedVectorSimilarity, dimension, storage, indexing,
-				indexNullAsValue, new HibernateSearchKnnVectorsFormat( m, efConstruction )
+				indexNullAsValue, magnitude, new HibernateSearchKnnVectorsFormat( m, efConstruction )
 		);
 		builder.codec( codec );
 		if ( resolvedSearchable ) {
@@ -138,7 +145,8 @@ abstract class AbstractLuceneVectorFieldTypeOptionsStep<S extends AbstractLucene
 	}
 
 	protected abstract AbstractLuceneVectorFieldCodec<F> createCodec(VectorSimilarityFunction vectorSimilarity, int dimension,
-			Storage storage, Indexing indexing, F indexNullAsValue, HibernateSearchKnnVectorsFormat knnVectorsFormat);
+			Storage storage, Indexing indexing, F indexNullAsValue, Float magnitude,
+			HibernateSearchKnnVectorsFormat knnVectorsFormat);
 
 
 	private static VectorSimilarityFunction resolveDefault(VectorSimilarity vectorSimilarity) {

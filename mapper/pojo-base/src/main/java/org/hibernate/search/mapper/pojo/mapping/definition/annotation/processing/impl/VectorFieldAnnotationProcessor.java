@@ -40,6 +40,12 @@ public class VectorFieldAnnotationProcessor extends AbstractFieldAnnotationProce
 			fieldContext.efConstruction( efConstruction );
 		}
 
+		float magnitude = annotation.magnitude();
+		if ( magnitude != AnnotationDefaultValues.DEFAULT_MAGNITUDE ) {
+			fieldContext.magnitude( m );
+		}
+
+
 		VectorSimilarity vectorSimilarity = annotation.vectorSimilarity();
 		if ( !VectorSimilarity.DEFAULT.equals( vectorSimilarity ) ) {
 			fieldContext.vectorSimilarity( vectorSimilarity );

@@ -60,6 +60,8 @@ public interface PropertyMappingVectorFieldOptionsStep
 	 */
 	PropertyMappingVectorFieldOptionsStep m(int m);
 
+	PropertyMappingVectorFieldOptionsStep magnitude(float m);
+
 	/**
 	 * @param indexNullAs A value used instead of null values when indexing.
 	 * @return {@code this}, for method chaining.

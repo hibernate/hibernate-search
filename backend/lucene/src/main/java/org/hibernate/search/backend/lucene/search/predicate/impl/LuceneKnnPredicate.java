@@ -8,6 +8,7 @@ package org.hibernate.search.backend.lucene.search.predicate.impl;
 
 import java.lang.invoke.MethodHandles;
 import java.lang.reflect.Array;
+import java.util.function.Function;
 
 import org.hibernate.search.backend.lucene.logging.impl.Log;
 import org.hibernate.search.backend.lucene.lowlevel.query.impl.VectorSimilarityFilterQuery;
@@ -19,6 +20,7 @@ import org.hibernate.search.backend.lucene.types.codec.impl.LuceneVectorFieldCod
 import org.hibernate.search.engine.search.predicate.SearchPredicate;
 import org.hibernate.search.engine.search.predicate.spi.KnnPredicateBuilder;
 import org.hibernate.search.util.common.AssertionFailure;
+import org.hibernate.search.util.common.impl.Contracts;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
 import org.apache.lucene.index.VectorSimilarityFunction;
@@ -81,6 +83,7 @@ public class LuceneKnnPredicate extends AbstractLuceneSingleFieldPredicate imple
 		private final Class<?> vectorElementsType;
 		private final int indexedVectorsDimension;
 		private final VectorSimilarityFunction similarityFunction;
+		private final Function<F, F> normalizer;
 		private int k;
 		private Object vector;
 		private LuceneSearchPredicate filter;
@@ -95,6 +98,7 @@ public class LuceneKnnPredicate extends AbstractLuceneSingleFieldPredicate imple
 				vectorElementsType = vectorCodec.vectorElementsType();
 				indexedVectorsDimension = vectorCodec.getConfiguredDimensions();
 				similarityFunction = vectorCodec.getVectorSimilarity();
+				normalizer = vectorCodec.normalizer();
 			}
 			else {
 				// shouldn't really happen as if someone tries this it should fail on `queryElementFactory` lookup.
@@ -109,6 +113,7 @@ public class LuceneKnnPredicate extends AbstractLuceneSingleFieldPredicate imple
 
 		@Override
 		public void vector(Object vector) {
+			Contracts.assertNotNull( vector, "vector" );
 			if ( !vector.getClass().isArray() ) {
 				throw new IllegalArgumentException( "Vector can only be either a float or a byte array (float[], byte[])." );
 			}
@@ -121,7 +126,7 @@ public class LuceneKnnPredicate extends AbstractLuceneSingleFieldPredicate imple
 						Array.getLength( vector )
 				);
 			}
-			this.vector = vector;
+			this.vector = normalizer.apply( (F) vector );
 		}
 
 		@Override

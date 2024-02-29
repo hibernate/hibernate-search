@@ -42,6 +42,12 @@ class StubVectorFieldTypeOptionsStep<F>
 	}
 
 	@Override
+	public StubVectorFieldTypeOptionsStep<F> magnitude(float magnitude) {
+		builder.modifier( b -> b.magnitude( magnitude ) );
+		return this;
+	}
+
+	@Override
 	StubVectorFieldTypeOptionsStep<F> thisAsS() {
 		return this;
 	}

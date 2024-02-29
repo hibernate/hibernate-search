@@ -6,6 +6,8 @@
  */
 package org.hibernate.search.backend.lucene.types.codec.impl;
 
+import java.util.function.Function;
+
 import org.apache.lucene.codecs.KnnVectorsFormat;
 import org.apache.lucene.index.VectorSimilarityFunction;
 
@@ -15,6 +17,8 @@ import org.apache.lucene.index.VectorSimilarityFunction;
  * @param <F> The field type exposed to the mapper.
  */
 public interface LuceneVectorFieldCodec<F> extends LuceneStandardFieldCodec<F, byte[]> {
+
+	Function<F, F> normalizer();
 
 	/**
 	 * Custom {@link KnnVectorsFormat knn vector format} that will be used in {@link org.apache.lucene.codecs.perfield.PerFieldKnnVectorsFormat}

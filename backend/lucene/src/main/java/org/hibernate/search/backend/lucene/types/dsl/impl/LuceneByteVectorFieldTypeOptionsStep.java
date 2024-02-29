@@ -28,8 +28,10 @@ class LuceneByteVectorFieldTypeOptionsStep
 
 	@Override
 	protected AbstractLuceneVectorFieldCodec<byte[]> createCodec(VectorSimilarityFunction vectorSimilarity, int dimension,
-			Storage storage, Indexing indexing, byte[] indexNullAsValue, HibernateSearchKnnVectorsFormat knnVectorsFormat) {
-		return new LuceneByteVectorCodec( vectorSimilarity, dimension, storage, indexing, indexNullAsValue, knnVectorsFormat );
+			Storage storage, Indexing indexing, byte[] indexNullAsValue, Float magnitude,
+			HibernateSearchKnnVectorsFormat knnVectorsFormat) {
+		return new LuceneByteVectorCodec( vectorSimilarity, dimension, storage, indexing, indexNullAsValue, magnitude,
+				knnVectorsFormat );
 	}
 
 }

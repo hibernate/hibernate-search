@@ -67,6 +67,12 @@ class PropertyMappingVectorFieldOptionsStepImpl
 	}
 
 	@Override
+	public PropertyMappingVectorFieldOptionsStep magnitude(float magnitude) {
+		fieldModelContributor.add( c -> c.vectorTypeOptionsStep().magnitude( magnitude ) );
+		return thisAsS();
+	}
+
+	@Override
 	public PropertyMappingVectorFieldOptionsStep indexNullAs(String indexNullAs) {
 		fieldModelContributor.add( c -> c.indexNullAs( indexNullAs ) );
 		return thisAsS();
