@@ -120,7 +120,7 @@ public final class V5MigrationHelperOrmSetupHelper
 			return thisAsC();
 		}
 
-		public SetupContext tenants(String... tenants) {
+		public SetupContext tenants(Object... tenants) {
 			withConfiguration( b -> MultitenancyTestHelper.enable( b, tenants ) );
 			return thisAsC();
 		}

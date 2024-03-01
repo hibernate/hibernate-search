@@ -19,8 +19,17 @@ public interface SearchSessionBuilder {
 	 * @param tenantId The tenant ID to use when performing index-related operations (indexing, searching, ...)
 	 * in the resulting session.
 	 * @return {@code this} for method chaining.
+	 * @deprecated Use {@link #tenantId(Object)} instead.
 	 */
+	@Deprecated(forRemoval = true)
 	SearchSessionBuilder tenantId(String tenantId);
+
+	/**
+	 * @param tenantId The tenant ID to use when performing index-related operations (indexing, searching, ...)
+	 * in the resulting session.
+	 * @return {@code this} for method chaining.
+	 */
+	SearchSessionBuilder tenantId(Object tenantId);
 
 	/**
 	 * @param synchronizationStrategy The synchronization strategy for indexing works added to the {@link SearchSession#indexingPlan() indexing plan}.

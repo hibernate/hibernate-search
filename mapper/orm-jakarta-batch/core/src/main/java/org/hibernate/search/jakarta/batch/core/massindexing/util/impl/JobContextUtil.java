@@ -97,6 +97,7 @@ public final class JobContextUtil {
 		JobContextData jobContextData = new JobContextData();
 		jobContextData.setEntityManagerFactory( emf );
 		jobContextData.setEntityTypeDescriptors( descriptors );
+		jobContextData.setTenancyConfiguration( mapping.tenancyConfiguration() );
 		return jobContextData;
 	}
 

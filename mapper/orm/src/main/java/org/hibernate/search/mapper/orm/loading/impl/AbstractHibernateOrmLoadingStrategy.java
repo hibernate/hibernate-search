@@ -132,7 +132,7 @@ public abstract class AbstractHibernateOrmLoadingStrategy<E, I>
 				conditionalExpressions( expectedTypes, ormContext ) );
 		SharedSessionContractImplementor session = (SharedSessionContractImplementor) sessionFactory
 				.withStatelessOptions()
-				.tenantIdentifier( (Object) context.tenantIdentifier() )
+				.tenantIdentifier( ormContext.tenancyConfiguration().convert( context.tenantIdentifier() ) )
 				.openStatelessSession();
 		try {
 			PojoMassIdentifierSink<I> sink = context.createSink();
@@ -154,7 +154,7 @@ public abstract class AbstractHibernateOrmLoadingStrategy<E, I>
 				conditionalExpressions( expectedTypes, ormContext ) );
 		SessionImplementor session = (SessionImplementor) sessionFactory
 				.withOptions()
-				.tenantIdentifier( (Object) context.tenantIdentifier() )
+				.tenantIdentifier( ormContext.tenancyConfiguration().convert( context.tenantIdentifier() ) )
 				.openSession();
 		try {
 			session.setHibernateFlushMode( FlushMode.MANUAL );

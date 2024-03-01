@@ -100,12 +100,18 @@ public class StandalonePojoSearchSession extends AbstractPojoSearchSession
 	@Override
 	public MassIndexer massIndexer(Collection<? extends Class<?>> classes) {
 		checkOpenAndThrow();
-		return scope( classes ).massIndexer( asSetIgnoreNull( this.tenantIdentifier() ) );
+		return scope( classes ).massIndexer( asSetIgnoreNull( this.tenantIdentifierValue() ) );
 	}
 
 	@Override
+	@SuppressWarnings("removal")
 	public String tenantIdentifier() {
 		return tenantId;
+	}
+
+	@Override
+	public Object tenantIdentifierValue() {
+		return mappingContext.tenancyConfiguration().convert( tenantId );
 	}
 
 	@Override
@@ -141,7 +147,7 @@ public class StandalonePojoSearchSession extends AbstractPojoSearchSession
 
 	@Override
 	public SearchWorkspace workspace(Collection<? extends Class<?>> classes) {
-		return scope( classes ).workspace( tenantIdentifier() );
+		return scope( classes ).workspace( tenantIdentifierValue() );
 	}
 
 	@Override
@@ -228,8 +234,15 @@ public class StandalonePojoSearchSession extends AbstractPojoSearchSession
 		}
 
 		@Override
+		@SuppressWarnings("removal")
 		public Builder tenantId(String tenantId) {
 			this.tenantId = tenantId;
+			return this;
+		}
+
+		@Override
+		public SearchSessionBuilder tenantId(Object tenantId) {
+			this.tenantId = mappingContext.tenancyConfiguration().convert( tenantId );
 			return this;
 		}
 

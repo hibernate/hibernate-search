@@ -8,6 +8,8 @@ package org.hibernate.search.mapper.orm.spi;
 
 import jakarta.persistence.EntityManager;
 
+import org.hibernate.search.mapper.orm.tenancy.spi.TenancyConfiguration;
+
 public interface BatchMappingContext {
 
 	BatchTypeContextProvider typeContextProvider();
@@ -17,5 +19,7 @@ public interface BatchMappingContext {
 	<T> BatchScopeContext<T> scope(Class<T> expectedSuperType);
 
 	<T> BatchScopeContext<T> scope(Class<T> expectedSuperType, String entityName);
+
+	TenancyConfiguration tenancyConfiguration();
 
 }

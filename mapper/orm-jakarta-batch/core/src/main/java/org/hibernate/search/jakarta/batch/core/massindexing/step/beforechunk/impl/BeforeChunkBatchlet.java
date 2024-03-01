@@ -7,6 +7,7 @@
 package org.hibernate.search.jakarta.batch.core.massindexing.step.beforechunk.impl;
 
 import java.util.Collections;
+import java.util.Objects;
 
 import jakarta.batch.api.AbstractBatchlet;
 import jakarta.batch.api.BatchProperty;
@@ -61,7 +62,9 @@ public class BeforeChunkBatchlet extends AbstractBatchlet {
 			JobContextData jobData = (JobContextData) jobContext.getTransientUserData();
 			EntityManagerFactory emf = jobData.getEntityManagerFactory();
 			BatchMappingContext mappingContext = (BatchMappingContext) Search.mapping( emf );
-			PojoScopeWorkspace workspace = mappingContext.scope( Object.class ).pojoWorkspace( tenantId );
+			// TODO : .........
+			PojoScopeWorkspace workspace =
+					mappingContext.scope( Object.class ).pojoWorkspace( Objects.toString( tenantId, null ) );
 			Futures.unwrappedExceptionJoin( workspace.purge( Collections.emptySet(), OperationSubmitter.blocking(),
 					UnsupportedOperationBehavior.FAIL ) );
 

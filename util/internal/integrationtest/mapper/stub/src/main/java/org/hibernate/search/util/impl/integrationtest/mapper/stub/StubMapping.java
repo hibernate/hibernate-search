@@ -18,7 +18,7 @@ public interface StubMapping extends AutoCloseable, BackendMappingContext {
 
 	StubSession session();
 
-	StubSession session(String tenantId);
+	StubSession session(Object tenantId);
 
 	/**
 	 * @return A fixture for this mapping, to easily set various mapping-related components.

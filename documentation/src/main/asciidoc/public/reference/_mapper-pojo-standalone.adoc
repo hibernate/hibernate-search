@@ -122,6 +122,21 @@ include::{sourcedir}/org/hibernate/search/documentation/mapper/pojo/standalone/m
 <4> Build the new session.
 ====
 
+[NOTE]
+====
+When using non-string tenant identifiers, a custom `TenantIdentifierConverter` must be provided:
+
+[source, JAVA, indent=0]
+----
+include::{sourcedir}/org/hibernate/search/documentation/mapper/pojo/standalone/multitenancy/StandalonePojoMultiTenancyUuidIT.java[tags=setup]
+----
+<1> Create a builder.
+<2> Enable multi-tenancy.
+<3> Set a custom tenant identifier converter.
+<4> Build the `SearchMapping`.
+====
+
+
 [[mapper-pojo-standalone-mapping]]
 == Mapping
 

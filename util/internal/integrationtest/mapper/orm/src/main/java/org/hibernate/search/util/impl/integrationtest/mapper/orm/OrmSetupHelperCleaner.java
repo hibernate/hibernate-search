@@ -122,14 +122,14 @@ class OrmSetupHelperCleaner {
 			clearDatabase( sessionFactory, mapping, null );
 		}
 		else {
-			for ( String tenantsId : config.tenantsIds ) {
+			for ( Object tenantsId : config.tenantsIds ) {
 				clearDatabase( sessionFactory, mapping, tenantsId );
 			}
 		}
 	}
 
 
-	private void clearDatabase(SessionFactoryImplementor sessionFactory, HibernateOrmMapping mapping, String tenantId) {
+	private void clearDatabase(SessionFactoryImplementor sessionFactory, HibernateOrmMapping mapping, Object tenantId) {
 		for ( ThrowingConsumer<Session, RuntimeException> preClear : config.preClear ) {
 			if ( mapping != null ) {
 				mapping.listenerEnabled( false );
@@ -174,7 +174,7 @@ class OrmSetupHelperCleaner {
 	}
 
 	private static void clearEntityInstances(SessionFactoryImplementor sessionFactory, HibernateOrmMapping mapping,
-			String tenantId, EntityType<?> entityType) {
+			Object tenantId, EntityType<?> entityType) {
 		if ( Modifier.isAbstract( entityType.getJavaType().getModifiers() ) ) {
 			// There are no instances of this specific class,
 			// only instances of subclasses, and those are handled separately.
@@ -303,7 +303,7 @@ class OrmSetupHelperCleaner {
 	}
 
 	private static class DataClearConfigImpl implements DataClearConfig {
-		private final List<String> tenantsIds = new ArrayList<>();
+		private final List<Object> tenantsIds = new ArrayList<>();
 
 		private final List<Class<?>> entityClearOrder = new ArrayList<>();
 
@@ -319,7 +319,7 @@ class OrmSetupHelperCleaner {
 		}
 
 		@Override
-		public DataClearConfig tenants(String... tenantIds) {
+		public DataClearConfig tenants(Object... tenantIds) {
 			Collections.addAll( this.tenantsIds, tenantIds );
 			return this;
 		}

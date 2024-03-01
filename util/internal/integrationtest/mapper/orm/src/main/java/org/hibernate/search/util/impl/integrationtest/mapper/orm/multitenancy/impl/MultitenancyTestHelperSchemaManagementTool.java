@@ -40,9 +40,9 @@ class MultitenancyTestHelperSchemaManagementTool
 
 	static class Initiator
 			implements StandardServiceInitiator<SchemaManagementTool> {
-		private final String[] tenantIds;
+		private final Object[] tenantIds;
 
-		public Initiator(String[] tenantIds) {
+		public Initiator(Object[] tenantIds) {
 			this.tenantIds = tenantIds;
 		}
 
@@ -59,11 +59,11 @@ class MultitenancyTestHelperSchemaManagementTool
 	}
 
 	private final HibernateSchemaManagementTool toolDelegate = new HibernateSchemaManagementTool();
-	private final String[] tenantIds;
+	private final Object[] tenantIds;
 
 	private GenerationTargetToDatabase[] generationTargets;
 
-	private MultitenancyTestHelperSchemaManagementTool(String[] tenantIds) {
+	private MultitenancyTestHelperSchemaManagementTool(Object[] tenantIds) {
 		this.tenantIds = tenantIds;
 	}
 
@@ -78,7 +78,7 @@ class MultitenancyTestHelperSchemaManagementTool
 				(H2LazyMultiTenantConnectionProvider) serviceRegistry.getService( MultiTenantConnectionProvider.class );
 		GenerationTargetToDatabase[] targets = new GenerationTargetToDatabase[tenantIds.length];
 		int index = 0;
-		for ( String tenantId : tenantIds ) {
+		for ( Object tenantId : tenantIds ) {
 			ConnectionProvider connectionProvider = multiTenantConnectionProvider.selectConnectionProvider( tenantId );
 			targets[index] = new GenerationTargetToDatabase(
 					new DdlTransactionIsolatorTestingImpl( serviceRegistry,

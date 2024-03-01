@@ -84,12 +84,42 @@ The https://hibernate.org/community/compatibility-policy/#code-categorization[AP
 in Hibernate Search {hibernateSearchVersion}
 is backward-compatible with Hibernate Search {hibernateSearchPreviousStableVersionShort}.
 
+With Hibernate ORM allowing non-`String` tenant identifiers, some of the Hibernate Search methods got deprecated and alternatives were introduced:
+
+* `org.hibernate.search.mapper.orm.scope.SearchScope#workspace(String tenantId)` deprecated in favor of
+`org.hibernate.search.mapper.orm.scope.SearchScope#workspace(Object tenantId)`
+* `org.hibernate.search.mapper.orm.scope.SearchScope#massIndexer(String tenantId)` deprecated in favor of
+`org.hibernate.search.mapper.orm.scope.SearchScope#massIndexer(Object tenantId)`
+
+* `org.hibernate.search.mapper.pojo.standalone.scope.SearchScope#workspace(String tenantId)` deprecated in favor of
+`org.hibernate.search.mapper.pojo.standalone.scope.SearchScope#workspace(Object tenantId)`
+* `org.hibernate.search.mapper.pojo.standalone.scope.SearchScope#massIndexer(String tenantId)` deprecated in favor of
+`org.hibernate.search.mapper.pojo.standalone.scope.SearchScope#massIndexer(Object tenantId)`
+
+* `org.hibernate.search.mapper.pojo.standalone.session.SearchSession#tenantIdentifier()` deprecated in favor of
+`org.hibernate.search.mapper.pojo.standalone.session.SearchSession#tenantIdentifierValue()`
+
+* `org.hibernate.search.mapper.pojo.standalone.session.SearchSessionBuilder#tenantId(String tenantId)` deprecated in favor of
+`org.hibernate.search.mapper.pojo.standalone.session.SearchSessionBuilder#tenantId(Object tenantId)`
+
+* `org.hibernate.search.mapper.orm.outboxpolling.mapping.OutboxPollingSearchMapping#countAbortedEvents(String tenantId)` deprecated in favor of
+`org.hibernate.search.mapper.orm.outboxpolling.mapping.OutboxPollingSearchMapping#countAbortedEvents(Object tenantId)`
+* `org.hibernate.search.mapper.orm.outboxpolling.mapping.OutboxPollingSearchMapping#reprocessAbortedEvents(String tenantId)` deprecated in favor of
+`org.hibernate.search.mapper.orm.outboxpolling.mapping.OutboxPollingSearchMapping#reprocessAbortedEvents(Object tenantId)`
+* `org.hibernate.search.mapper.orm.outboxpolling.mapping.OutboxPollingSearchMapping#clearAllAbortedEvents(String tenantId)` deprecated in favor of
+`org.hibernate.search.mapper.orm.outboxpolling.mapping.OutboxPollingSearchMapping#clearAllAbortedEvents(Object tenantId)`
+
 [[spi]]
 == SPI
 
 The https://hibernate.org/community/compatibility-policy/#code-categorization[SPI]
 in Hibernate Search {hibernateSearchVersion}
 is backward-compatible with Hibernate Search {hibernateSearchPreviousStableVersionShort}.
+
+Deprecated methods removed:
+
+* `org.hibernate.search.mapper.pojo.scope.spi.PojoScopeDelegate#workspace(DetachedBackendSessionContext)`
+* `org.hibernate.search.mapper.pojo.scope.spi.PojoScopeDelegate#massIndexer(PojoMassIndexingContext,DetachedBackendSessionContext)`
 
 [[behavior]]
 == Behavior

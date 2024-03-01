@@ -89,7 +89,7 @@ class MassIndexingComplexHierarchyIT {
 					.add( "3", b -> b.field( "rootText", "text3" )
 							.field( "bText", "text3" ) );
 
-			backendMock.expectIndexScaleWorks( H1_B_Indexed.NAME, searchSession.tenantIdentifier() )
+			backendMock.expectIndexScaleWorks( H1_B_Indexed.NAME, searchSession.tenantIdentifierValue() )
 					.purge()
 					.mergeSegments()
 					.flush()
@@ -117,7 +117,7 @@ class MassIndexingComplexHierarchyIT {
 					.add( "3", b -> b.field( "rootText", "text3" )
 							.field( "bText", "text3" ) );
 
-			backendMock.expectIndexScaleWorks( H1_B_Indexed.NAME, searchSession.tenantIdentifier() )
+			backendMock.expectIndexScaleWorks( H1_B_Indexed.NAME, searchSession.tenantIdentifierValue() )
 					.purge()
 					.mergeSegments()
 					.flush()
@@ -151,17 +151,17 @@ class MassIndexingComplexHierarchyIT {
 					.add( "4", b -> b.field( "rootText", "text4" )
 							.field( "bText", "text4" ) );
 
-			backendMock.expectIndexScaleWorks( H2_Root_Indexed.NAME, searchSession.tenantIdentifier() )
+			backendMock.expectIndexScaleWorks( H2_Root_Indexed.NAME, searchSession.tenantIdentifierValue() )
 					.purge()
 					.mergeSegments()
 					.flush()
 					.refresh();
-			backendMock.expectIndexScaleWorks( H2_A_C_Indexed.NAME, searchSession.tenantIdentifier() )
+			backendMock.expectIndexScaleWorks( H2_A_C_Indexed.NAME, searchSession.tenantIdentifierValue() )
 					.purge()
 					.mergeSegments()
 					.flush()
 					.refresh();
-			backendMock.expectIndexScaleWorks( H2_B_Indexed.NAME, searchSession.tenantIdentifier() )
+			backendMock.expectIndexScaleWorks( H2_B_Indexed.NAME, searchSession.tenantIdentifierValue() )
 					.purge()
 					.mergeSegments()
 					.flush()
@@ -189,7 +189,7 @@ class MassIndexingComplexHierarchyIT {
 					.add( "4", b -> b.field( "rootText", "text4" )
 							.field( "bText", "text4" ) );
 
-			backendMock.expectIndexScaleWorks( H2_B_Indexed.NAME, searchSession.tenantIdentifier() )
+			backendMock.expectIndexScaleWorks( H2_B_Indexed.NAME, searchSession.tenantIdentifierValue() )
 					.purge()
 					.mergeSegments()
 					.flush()

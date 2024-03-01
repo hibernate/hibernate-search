@@ -242,16 +242,16 @@ public class OrmSetupHelper
 			return thisAsC();
 		}
 
-		public SetupContext tenants(String... tenants) {
+		public SetupContext tenantsWithHelperEnabled(Object... tenants) {
 			return tenants( true, tenants );
 		}
 
-		public SetupContext tenants(boolean enableMultitenancyHelper, String... tenants) {
+		public SetupContext tenants(boolean enableMultitenancyHelper, Object... tenants) {
 			if ( enableMultitenancyHelper ) {
 				withConfiguration( b -> MultitenancyTestHelper.enable( b, tenants ) );
 			}
 			if ( coordinationStrategyExpectations.requiresTenantIds ) {
-				withProperty( HibernateOrmMapperSettings.MULTI_TENANCY_TENANT_IDS, String.join( ",", tenants ) );
+				withProperty( HibernateOrmMapperSettings.MULTI_TENANCY_TENANT_IDS, Arrays.asList( tenants ) );
 			}
 			dataClearing( config -> config.tenants( tenants ) );
 			return thisAsC();

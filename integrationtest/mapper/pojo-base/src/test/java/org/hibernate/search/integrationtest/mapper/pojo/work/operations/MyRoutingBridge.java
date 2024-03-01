@@ -17,7 +17,7 @@ public final class MyRoutingBridge implements RoutingBridge<IndexedEntity> {
 	protected static boolean previouslyIndexed = false;
 	protected static List<String> previousValues = null;
 
-	public static String toRoutingKey(String tenantIdentifier, Object entityIdentifier, String value) {
+	public static String toRoutingKey(Object tenantIdentifier, Object entityIdentifier, String value) {
 		StringBuilder keyBuilder = new StringBuilder();
 		if ( tenantIdentifier != null ) {
 			keyBuilder.append( tenantIdentifier ).append( "/" );

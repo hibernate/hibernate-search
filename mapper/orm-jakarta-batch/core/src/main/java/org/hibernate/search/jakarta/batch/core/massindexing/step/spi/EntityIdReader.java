@@ -40,6 +40,7 @@ import org.hibernate.search.jakarta.batch.core.massindexing.util.impl.PartitionB
 import org.hibernate.search.jakarta.batch.core.massindexing.util.impl.PersistenceUtil;
 import org.hibernate.search.jakarta.batch.core.massindexing.util.impl.SerializationUtil;
 import org.hibernate.search.mapper.orm.loading.spi.ConditionalExpression;
+import org.hibernate.search.mapper.orm.tenancy.spi.TenancyConfiguration;
 import org.hibernate.search.util.common.impl.Closer;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
@@ -121,6 +122,7 @@ public class EntityIdReader extends AbstractItemReader {
 
 	private EntityManagerFactory emf;
 	private EntityTypeDescriptor<?, ?> type;
+	private TenancyConfiguration tenancyConfiguration;
 
 	private int idFetchSize;
 	private Integer maxResults;
@@ -170,6 +172,7 @@ public class EntityIdReader extends AbstractItemReader {
 
 		emf = jobData.getEntityManagerFactory();
 		type = jobData.getEntityTypeDescriptor( entityName );
+		tenancyConfiguration = jobData.getTenancyConfiguration();
 
 		idFetchSize = SerializationUtil.parseIntegerParameterOptional(
 				MassIndexingJobParameters.ID_FETCH_SIZE, serializedIdFetchSize,
@@ -323,7 +326,7 @@ public class EntityIdReader extends AbstractItemReader {
 		}
 
 		private void start() {
-			session = PersistenceUtil.openStatelessSession( emf, tenantId );
+			session = PersistenceUtil.openStatelessSession( emf, tenancyConfiguration.convert( tenantId ) );
 			try {
 				scroll = createScroll( type, session );
 			}

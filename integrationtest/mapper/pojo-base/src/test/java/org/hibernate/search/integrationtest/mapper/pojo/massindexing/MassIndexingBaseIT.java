@@ -96,7 +96,7 @@ class MassIndexingBaseIT {
 
 			// purgeAtStart and mergeSegmentsAfterPurge are enabled by default,
 			// so we expect 1 purge, 1 mergeSegments and 1 flush calls in this order:
-			backendMock.expectIndexScaleWorks( Book.NAME, searchSession.tenantIdentifier() )
+			backendMock.expectIndexScaleWorks( Book.NAME, searchSession.tenantIdentifierValue() )
 					.purge()
 					.mergeSegments()
 					.flush()
@@ -145,7 +145,7 @@ class MassIndexingBaseIT {
 
 			// because we set dropAndCreateSchemaOnStart = true and do not explicitly set the purge value
 			// it means that purge will default to false hence only flush and refresh are expected:
-			backendMock.expectIndexScaleWorks( Book.NAME, searchSession.tenantIdentifier() )
+			backendMock.expectIndexScaleWorks( Book.NAME, searchSession.tenantIdentifierValue() )
 					.flush()
 					.refresh();
 
@@ -190,7 +190,7 @@ class MassIndexingBaseIT {
 			// purgeAtStart and mergeSegmentsAfterPurge are enabled by default,
 			// and optimizeOnFinish is enabled explicitly,
 			// so we expect 1 purge, 2 optimize and 1 flush calls in this order:
-			backendMock.expectIndexScaleWorks( Book.NAME, searchSession.tenantIdentifier() )
+			backendMock.expectIndexScaleWorks( Book.NAME, searchSession.tenantIdentifierValue() )
 					.purge()
 					.mergeSegments()
 					.mergeSegments()
@@ -241,7 +241,7 @@ class MassIndexingBaseIT {
 
 			// as purgeAllOnStart is explicitly set to true, and merge is true by default
 			// it means that both purge and merge will be triggered:
-			backendMock.expectIndexScaleWorks( Book.NAME, searchSession.tenantIdentifier() )
+			backendMock.expectIndexScaleWorks( Book.NAME, searchSession.tenantIdentifierValue() )
 					.purge()
 					.mergeSegments()
 					.flush()

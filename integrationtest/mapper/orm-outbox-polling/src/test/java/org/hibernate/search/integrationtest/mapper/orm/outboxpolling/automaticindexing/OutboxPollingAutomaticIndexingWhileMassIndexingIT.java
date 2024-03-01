@@ -108,14 +108,14 @@ class OutboxPollingAutomaticIndexingWhileMassIndexingIT {
 
 	@Test
 	void multiTenant() throws InterruptedException {
-		String tenant1Id = "tenant1";
-		String tenant2Id = "tenant2";
+		Object tenant1Id = "tenant1";
+		Object tenant2Id = "tenant2";
 
 		backendMock.expectSchema( IndexedEntity.NAME, b -> b
 				.field( "text", String.class, f -> f.analyzerName( AnalyzerNames.DEFAULT ) ) );
 
 		SessionFactory sessionFactory = setupHelper.start()
-				.tenants( tenant1Id, tenant2Id )
+				.tenantsWithHelperEnabled( tenant1Id, tenant2Id )
 				.setup( IndexedEntity.class );
 
 		with( sessionFactory, tenant1Id ).runInTransaction( session -> {

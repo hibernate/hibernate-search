@@ -37,6 +37,7 @@ import org.hibernate.search.jakarta.batch.core.massindexing.util.impl.Serializat
 import org.hibernate.search.mapper.orm.Search;
 import org.hibernate.search.mapper.orm.mapping.SearchMapping;
 import org.hibernate.search.mapper.orm.spi.BatchMappingContext;
+import org.hibernate.search.mapper.orm.tenancy.spi.TenancyConfiguration;
 import org.hibernate.search.mapper.pojo.work.spi.PojoIndexer;
 import org.hibernate.search.mapper.pojo.work.spi.PojoScopeWorkspace;
 import org.hibernate.search.util.common.SearchException;
@@ -87,6 +88,7 @@ public class EntityWriter extends AbstractItemWriter {
 	private PojoScopeWorkspace workspace;
 
 	private WriteMode writeMode;
+	private TenancyConfiguration tenancyConfiguration;
 
 	/**
 	 * The open method prepares the writer to write items.
@@ -101,6 +103,7 @@ public class EntityWriter extends AbstractItemWriter {
 		JobContextData jobContextData = (JobContextData) jobContext.getTransientUserData();
 
 		emf = jobContextData.getEntityManagerFactory();
+		tenancyConfiguration = jobContextData.getTenancyConfiguration();
 		SearchMapping searchMapping = Search.mapping( emf );
 		mappingContext = (BatchMappingContext) searchMapping;
 		type = jobContextData.getEntityTypeDescriptor( entityName );
@@ -129,7 +132,7 @@ public class EntityWriter extends AbstractItemWriter {
 
 	@Override
 	public void writeItems(List<Object> entityIds) {
-		try ( Session session = PersistenceUtil.openSession( emf, tenantId ) ) {
+		try ( Session session = PersistenceUtil.openSession( emf, tenancyConfiguration.convert( tenantId ) ) ) {
 			SessionImplementor sessionImplementor = session.unwrap( SessionImplementor.class );
 
 			PojoIndexer indexer = mappingContext.sessionContext( session ).createIndexer();

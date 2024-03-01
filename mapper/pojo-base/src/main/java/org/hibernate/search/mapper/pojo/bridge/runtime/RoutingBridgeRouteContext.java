@@ -21,6 +21,11 @@ public interface RoutingBridgeRouteContext {
 	String tenantIdentifier();
 
 	/**
+	 * @return The tenant identifier currently in use ({@code null} if none).
+	 */
+	Object tenantIdentifierValue();
+
+	/**
 	 * Extend the current context with the given extension,
 	 * resulting in an extended context offering more options.
 	 *

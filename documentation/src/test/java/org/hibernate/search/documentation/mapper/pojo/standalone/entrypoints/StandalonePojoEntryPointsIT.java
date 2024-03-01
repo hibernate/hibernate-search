@@ -99,9 +99,10 @@ class StandalonePojoEntryPointsIT {
 				// end::searchSession-withOptions[]
 				theSearchMapping;
 		// tag::searchSession-withOptions[]
+		Object tenantId = "myTenant";
 		try ( SearchSession searchSession = searchMapping.createSessionWithOptions() // <2>
 				.indexingPlanSynchronizationStrategy( IndexingPlanSynchronizationStrategy.sync() )// <3>
-				.tenantId( "myTenant" )
+				.tenantId( tenantId )
 				.build() ) { // <4>
 			// ...
 			// end::searchSession-withOptions[]

@@ -12,6 +12,7 @@ import org.hibernate.engine.spi.SessionFactoryImplementor;
 import org.hibernate.search.engine.backend.common.spi.EntityReferenceFactory;
 import org.hibernate.search.engine.backend.work.execution.OperationSubmitter;
 import org.hibernate.search.engine.reporting.FailureHandler;
+import org.hibernate.search.mapper.orm.tenancy.spi.TenancyConfiguration;
 
 public interface AutomaticIndexingMappingContext {
 
@@ -24,6 +25,8 @@ public interface AutomaticIndexingMappingContext {
 	 * @return A failure handler, to report indexing errors in background processes.
 	 */
 	FailureHandler failureHandler();
+
+	TenancyConfiguration tenancyConfiguration();
 
 	/**
 	 * @param session A Hibernate ORM {@link Session} created from the same {@link #sessionFactory()} as this mapping.

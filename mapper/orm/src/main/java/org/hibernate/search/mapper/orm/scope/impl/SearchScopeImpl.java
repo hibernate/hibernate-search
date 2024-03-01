@@ -10,6 +10,7 @@ import static org.hibernate.search.util.common.impl.CollectionHelper.asSetIgnore
 
 import java.util.Collections;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import org.hibernate.search.engine.backend.scope.IndexScopeExtension;
 import org.hibernate.search.engine.search.aggregation.dsl.SearchAggregationFactory;
@@ -102,8 +103,14 @@ public class SearchScopeImpl<E> implements SearchScope<E>, BatchScopeContext<E> 
 	}
 
 	@Override
+	@SuppressWarnings("removal")
 	public SearchWorkspace workspace(String tenantId) {
 		return new SearchWorkspaceImpl( pojoWorkspace( tenantId ) );
+	}
+
+	@Override
+	public SearchWorkspace workspace(Object tenantId) {
+		return new SearchWorkspaceImpl( pojoWorkspace( tenancyConfiguration.convert( tenantId ) ) );
 	}
 
 	@Override
@@ -113,25 +120,34 @@ public class SearchScopeImpl<E> implements SearchScope<E>, BatchScopeContext<E> 
 
 	@Override
 	public MassIndexer massIndexer() {
-		return massIndexer( Collections.<String>emptySet() );
+		return massIndexer( Collections.<Object>emptySet() );
 	}
 
 	@Override
+	@SuppressWarnings("removal")
 	public MassIndexer massIndexer(String tenantId) {
+		return massIndexer( (Object) tenantId );
+	}
+
+	@Override
+	public MassIndexer massIndexer(Object tenantId) {
 		return massIndexer( asSetIgnoreNull( tenantId ) );
 	}
 
 	@Override
-	public MassIndexer massIndexer(Set<String> tenantIds) {
+	public MassIndexer massIndexer(Set<?> tenantIds) {
+		Set<String> actualTenantIds;
 		if ( tenantIds.isEmpty() ) {
 			// Let's see if we are in multi-tenant environment and try to get the tenant ids
-			tenantIds = tenancyConfiguration.tenantIdsOrFail();
+			actualTenantIds = tenancyConfiguration.tenantIdsOrFail();
+		}
+		else {
+			actualTenantIds = tenantIds.stream().map( tenancyConfiguration::convert ).collect( Collectors.toUnmodifiableSet() );
 		}
 
 		HibernateOrmMassIndexingContext massIndexingContext = new HibernateOrmMassIndexingContext( mappingContext );
 
-		PojoMassIndexer massIndexerDelegate = delegate
-				.massIndexer( massIndexingContext, tenantIds );
+		PojoMassIndexer massIndexerDelegate = delegate.massIndexer( massIndexingContext, actualTenantIds );
 
 		return new HibernateOrmMassIndexer( massIndexerDelegate, massIndexingContext );
 	}

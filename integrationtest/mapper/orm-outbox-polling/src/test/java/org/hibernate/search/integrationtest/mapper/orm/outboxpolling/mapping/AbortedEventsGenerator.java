@@ -23,7 +23,7 @@ public class AbortedEventsGenerator {
 
 	private final SessionFactory sessionFactory;
 	private final BackendMock backendMock;
-	private final String tenantId;
+	private final Object tenantId;
 
 	private final String indexName;
 	private final BiConsumer<Session, Integer> entityCreator;
@@ -41,7 +41,7 @@ public class AbortedEventsGenerator {
 		} );
 	}
 
-	public AbortedEventsGenerator(SessionFactory sessionFactory, BackendMock backendMock, String tenantId,
+	public AbortedEventsGenerator(SessionFactory sessionFactory, BackendMock backendMock, Object tenantId,
 			String indexName, BiConsumer<Session, Integer> entityCreator) {
 		this.sessionFactory = sessionFactory;
 		this.backendMock = backendMock;

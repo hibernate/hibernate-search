@@ -107,7 +107,7 @@ public class StubMappingImpl
 	}
 
 	@Override
-	public StubSession session(String tenantId) {
+	public StubSession session(Object tenantId) {
 		return new StubSession( this, tenantId );
 	}
 

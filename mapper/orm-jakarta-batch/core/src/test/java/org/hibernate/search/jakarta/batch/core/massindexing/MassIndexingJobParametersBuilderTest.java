@@ -28,7 +28,7 @@ class MassIndexingJobParametersBuilderTest {
 
 	private static final String SESSION_FACTORY_NAME = "someUniqueString";
 
-	private static final String TENANT_ID = "myTenantId";
+	private static final Object TENANT_ID = "myTenantId";
 
 	private static final boolean MERGE_SEGMENTS_AFTER_PURGE = true;
 	private static final boolean MERGE_SEGMENTS_ON_FINISH = true;
