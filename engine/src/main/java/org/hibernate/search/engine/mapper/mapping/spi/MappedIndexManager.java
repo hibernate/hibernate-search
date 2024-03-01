@@ -35,15 +35,6 @@ public interface MappedIndexManager {
 
 	IndexIndexer createIndexer(BackendSessionContext sessionContext);
 
-	/**
-	 * @param sessionContext The detached session context.
-	 * @return An {@link IndexWorkspace}.
-	 * @deprecated Use {@link #createWorkspace(BackendMappingContext, Set)} instead.
-	 */
-	@Deprecated
-	IndexWorkspace createWorkspace(
-			org.hibernate.search.engine.backend.session.spi.DetachedBackendSessionContext sessionContext);
-
 	IndexWorkspace createWorkspace(BackendMappingContext mappingContext, Set<String> tenantId);
 
 	<R, E> MappedIndexScopeBuilder<R, E> createScopeBuilder(BackendMappingContext mappingContext);
