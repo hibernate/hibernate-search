@@ -31,11 +31,11 @@ public final class SearchBackendContainer {
 		ElasticsearchDistributionName distributionName = ElasticsearchDistributionName
 				.of( System.getProperty( "org.hibernate.search.integrationtest.backend.elasticsearch.distribution", "" ) );
 		String tag = System.getProperty( "org.hibernate.search.integrationtest.backend.elasticsearch.version" );
-		Path root = Path.of( System.getProperty( "org.hibernate.search.integrationtest.project.root.directory", "" ) );
+		Path containers = Path.of( System.getProperty( "org.hibernate.search.integrationtest.container.directory", "" ) );
 
 		try {
-			DockerImageName dockerImageName = parseDockerImageName( root.resolve( "build" ).resolve( "container" )
-					.resolve( "search-backend" ).resolve( distributionName.externalRepresentation() + ".Dockerfile" ), tag );
+			DockerImageName dockerImageName = parseDockerImageName( containers.resolve( "search-backend" )
+					.resolve( distributionName.externalRepresentation() + ".Dockerfile" ), tag );
 			switch ( distributionName ) {
 				case ELASTIC:
 					SEARCH_CONTAINER = elasticsearch( dockerImageName );
@@ -50,7 +50,9 @@ public final class SearchBackendContainer {
 		}
 		catch (IOException e) {
 			throw new IllegalStateException(
-					"Unable to initialize a Search Engine container [" + distributionName + ", " + tag + ", " + root + "]", e );
+					"Unable to initialize a Search Engine container [" + distributionName + ", " + tag + ", " + containers
+							+ "]",
+					e );
 		}
 	}
 
