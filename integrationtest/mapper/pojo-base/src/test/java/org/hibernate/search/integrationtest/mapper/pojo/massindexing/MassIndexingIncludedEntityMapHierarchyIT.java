@@ -83,7 +83,7 @@ class MassIndexingIncludedEntityMapHierarchyIT {
 		try ( SearchSession searchSession = mapping.createSession() ) {
 			MassIndexer indexer = searchSession.massIndexer( H1_Root_NotIndexed.class );
 
-			backendMock.expectIndexScaleWorks( H1_B_Indexed.NAME, searchSession.tenantIdentifier() )
+			backendMock.expectIndexScaleWorks( H1_B_Indexed.NAME, searchSession.tenantIdentifierValue() )
 					.purge()
 					.mergeSegments();
 
@@ -108,7 +108,7 @@ class MassIndexingIncludedEntityMapHierarchyIT {
 		try ( SearchSession searchSession = mapping.createSession() ) {
 			MassIndexer indexer = searchSession.massIndexer( H1_B_Indexed.class );
 
-			backendMock.expectIndexScaleWorks( H1_B_Indexed.NAME, searchSession.tenantIdentifier() )
+			backendMock.expectIndexScaleWorks( H1_B_Indexed.NAME, searchSession.tenantIdentifierValue() )
 					.purge()
 					.mergeSegments();
 
@@ -133,16 +133,16 @@ class MassIndexingIncludedEntityMapHierarchyIT {
 		try ( SearchSession searchSession = mapping.createSession() ) {
 			MassIndexer indexer = searchSession.massIndexer( H2_Root_Indexed.class );
 
-			backendMock.expectIndexScaleWorks( H2_Root_Indexed.NAME, searchSession.tenantIdentifier() )
+			backendMock.expectIndexScaleWorks( H2_Root_Indexed.NAME, searchSession.tenantIdentifierValue() )
 					.purge()
 					.mergeSegments();
-			backendMock.expectIndexScaleWorks( H2_A_C_Indexed.NAME, searchSession.tenantIdentifier() )
+			backendMock.expectIndexScaleWorks( H2_A_C_Indexed.NAME, searchSession.tenantIdentifierValue() )
 					.purge()
 					.mergeSegments();
-			backendMock.expectIndexScaleWorks( H2_B_Indexed.NAME, searchSession.tenantIdentifier() )
+			backendMock.expectIndexScaleWorks( H2_B_Indexed.NAME, searchSession.tenantIdentifierValue() )
 					.purge()
 					.mergeSegments();
-			backendMock.expectIndexScaleWorks( H2_B_E_Indexed.NAME, searchSession.tenantIdentifier() )
+			backendMock.expectIndexScaleWorks( H2_B_E_Indexed.NAME, searchSession.tenantIdentifierValue() )
 					.purge()
 					.mergeSegments();
 
@@ -167,10 +167,10 @@ class MassIndexingIncludedEntityMapHierarchyIT {
 		try ( SearchSession searchSession = mapping.createSession() ) {
 			MassIndexer indexer = searchSession.massIndexer( H2_B_Indexed.class );
 
-			backendMock.expectIndexScaleWorks( H2_B_Indexed.NAME, searchSession.tenantIdentifier() )
+			backendMock.expectIndexScaleWorks( H2_B_Indexed.NAME, searchSession.tenantIdentifierValue() )
 					.purge()
 					.mergeSegments();
-			backendMock.expectIndexScaleWorks( H2_B_E_Indexed.NAME, searchSession.tenantIdentifier() )
+			backendMock.expectIndexScaleWorks( H2_B_E_Indexed.NAME, searchSession.tenantIdentifierValue() )
 					.purge()
 					.mergeSegments();
 

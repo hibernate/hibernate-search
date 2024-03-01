@@ -179,7 +179,8 @@ public class HibernateOrmMapping extends AbstractPojoMappingImplementor<Hibernat
 		SearchScopeImpl<Object> scope = scopeOptional.get();
 
 		this.tenancyConfiguration =
-				TenancyConfiguration.create( delegate().tenancyMode(), context.configurationPropertySource() );
+				TenancyConfiguration.create( context.beanResolver(), delegate().tenancyMode(),
+						context.configurationPropertySource() );
 
 		// Schema management
 		PojoScopeSchemaManager schemaManager = scope.schemaManagerDelegate();
@@ -207,6 +208,7 @@ public class HibernateOrmMapping extends AbstractPojoMappingImplementor<Hibernat
 			closer.push( ConfiguredAutomaticIndexingStrategy::stop, configuredAutomaticIndexingStrategy );
 			closer.push( CoordinationStrategy::stop, coordinationStrategyHolder, BeanHolder::get );
 			closer.push( BeanHolder::close, coordinationStrategyHolder );
+			closer.push( TenancyConfiguration::close, tenancyConfiguration );
 		}
 	}
 
@@ -307,6 +309,11 @@ public class HibernateOrmMapping extends AbstractPojoMappingImplementor<Hibernat
 	@Override
 	public SessionFactoryImplementor sessionFactory() {
 		return sessionFactory;
+	}
+
+	@Override
+	public TenancyConfiguration tenancyConfiguration() {
+		return tenancyConfiguration;
 	}
 
 	@Override

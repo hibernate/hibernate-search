@@ -105,7 +105,7 @@ public final class MassIndexingJob {
 		private String reindexOnlyHql;
 		private String serializedReindexOnlyParameters;
 		private Integer maxResultsPerEntity;
-		private String tenantId;
+		private Object tenantId;
 
 		private ParametersBuilder(Class<?> entityType, Class<?>... entityTypes) {
 			if ( entityType == null ) {
@@ -383,6 +383,21 @@ public final class MassIndexingJob {
 			}
 			if ( tenantId.isEmpty() ) {
 				throw new IllegalArgumentException( "Your tenantId is empty, please provide a valid tenant ID." );
+			}
+			this.tenantId = tenantId;
+			return this;
+		}
+
+		/**
+		 * Define the tenant ID for the job execution.
+		 *
+		 * @param tenantId Tenant ID. Null or empty value is not allowed.
+		 *
+		 * @return itself
+		 */
+		public ParametersBuilder tenantId(Object tenantId) {
+			if ( tenantId == null ) {
+				throw new NullPointerException( "Your tenantId is null, please provide a valid tenant ID." );
 			}
 			this.tenantId = tenantId;
 			return this;

@@ -48,7 +48,7 @@ class AutomaticIndexingMultiTenancyIT {
 				.field( "text", String.class, f -> f.analyzerName( AnalyzerNames.DEFAULT ) ) );
 
 		SessionFactory sessionFactory = setupHelper.start()
-				.tenants( TENANT_1_ID, TENANT_2_ID )
+				.tenantsWithHelperEnabled( TENANT_1_ID, TENANT_2_ID )
 				.setup( IndexedEntity.class );
 
 		with( sessionFactory, TENANT_1_ID ).runInTransaction( session -> {

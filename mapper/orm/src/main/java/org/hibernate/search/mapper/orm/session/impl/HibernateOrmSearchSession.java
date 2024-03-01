@@ -130,6 +130,11 @@ public class HibernateOrmSearchSession extends AbstractPojoSearchSession
 	}
 
 	@Override
+	public Object tenantIdentifierValue() {
+		return session().getTenantIdentifierValue();
+	}
+
+	@Override
 	public PojoIndexer createIndexer() {
 		return mappingContext.createIndexer( this );
 	}

@@ -10,6 +10,8 @@ import org.hibernate.search.engine.environment.bean.BeanReference;
 import org.hibernate.search.mapper.pojo.standalone.mapping.SearchMapping;
 import org.hibernate.search.mapper.pojo.standalone.mapping.StandalonePojoMappingConfigurer;
 import org.hibernate.search.mapper.pojo.standalone.schema.management.SchemaManagementStrategyName;
+import org.hibernate.search.mapper.pojo.tenancy.TenantIdentifierConverter;
+import org.hibernate.search.mapper.pojo.tenancy.spi.StringTenantIdentifierConverter;
 import org.hibernate.search.mapper.pojo.work.IndexingPlanSynchronizationStrategy;
 import org.hibernate.search.mapper.pojo.work.IndexingPlanSynchronizationStrategyNames;
 import org.hibernate.search.util.common.annotation.Incubating;
@@ -57,6 +59,18 @@ public final class StandalonePojoMapperSettings {
 	 */
 	public static final String MULTI_TENANCY_ENABLED = PREFIX + Radicals.MULTI_TENANCY_ENABLED;
 
+	/**
+	 * How to convert tenant identifier to and form the string representation.
+	 * <p>
+	 * When multi-tenancy is enabled, and non-string tenant identifiers are used
+	 * a custom converter <strong>must</strong> be provided through this property.
+	 * <p>
+	 * Defaults to {@link Defaults#MULTI_TENANCY_TENANT_IDENTIFIER_CONVERTER}.
+	 * This converter only supports string tenant identifiers and will fail if some other type of identifiers is used.
+	 * @see TenantIdentifierConverter
+	 */
+	public static final String MULTI_TENANCY_TENANT_IDENTIFIER_CONVERTER =
+			PREFIX + Radicals.MULTI_TENANCY_TENANT_IDENTIFIER_CONVERTER;
 
 	/**
 	 * How to synchronize between application threads and indexing triggered by the
@@ -83,6 +97,8 @@ public final class StandalonePojoMapperSettings {
 		public static final String SCHEMA_MANAGEMENT_STRATEGY = "schema_management.strategy";
 		public static final String MAPPING_CONFIGURER = "mapping.configurer";
 		public static final String MULTI_TENANCY_ENABLED = "mapping.multi_tenancy.enabled";
+		public static final String MULTI_TENANCY_TENANT_IDENTIFIER_CONVERTER =
+				"mapping.multi_tenancy.tenant_identifier_converter";
 		public static final String INDEXING_PLAN_SYNCHRONIZATION_PREFIX = "indexing.plan.synchronization.";
 		public static final String INDEXING_PLAN_SYNCHRONIZATION_STRATEGY = INDEXING_PLAN_SYNCHRONIZATION_PREFIX + "strategy";
 
@@ -102,6 +118,9 @@ public final class StandalonePojoMapperSettings {
 
 		public static final BeanReference<IndexingPlanSynchronizationStrategy> INDEXING_PLAN_SYNCHRONIZATION_STRATEGY =
 				BeanReference.of( IndexingPlanSynchronizationStrategy.class, "write-sync" );
+
+		public static final BeanReference<TenantIdentifierConverter> MULTI_TENANCY_TENANT_IDENTIFIER_CONVERTER =
+				BeanReference.of( TenantIdentifierConverter.class, StringTenantIdentifierConverter.NAME );
 	}
 
 }

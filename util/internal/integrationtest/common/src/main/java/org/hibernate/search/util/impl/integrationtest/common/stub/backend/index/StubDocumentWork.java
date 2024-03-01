@@ -6,6 +6,8 @@
  */
 package org.hibernate.search.util.impl.integrationtest.common.stub.backend.index;
 
+import java.util.Objects;
+
 import org.hibernate.search.engine.backend.work.execution.DocumentCommitStrategy;
 import org.hibernate.search.engine.backend.work.execution.DocumentRefreshStrategy;
 import org.hibernate.search.util.common.spi.ToStringTreeAppendable;
@@ -108,6 +110,11 @@ public final class StubDocumentWork implements ToStringTreeAppendable {
 
 		public Builder tenantIdentifier(String tenantIdentifier) {
 			this.tenantIdentifier = tenantIdentifier;
+			return this;
+		}
+
+		public Builder tenantIdentifier(Object tenantIdentifier) {
+			this.tenantIdentifier = Objects.toString( tenantIdentifier, null );
 			return this;
 		}
 

@@ -148,8 +148,21 @@ public interface SearchScope<E> {
 	 *
 	 * @param tenantId The identifier of the tenant whose index content should be targeted.
 	 * @return A {@link SearchWorkspace}.
+	 * @deprecated Use {@link #workspace(Object)} instead.
 	 */
+	@Deprecated(forRemoval = true)
 	SearchWorkspace workspace(String tenantId);
+
+	/**
+	 * Create a {@link SearchWorkspace} for the indexes mapped to types in this scope, or to any of their sub-types.
+	 * <p>
+	 * This method only works for multi-tenant applications.
+	 * If multi-tenancy is disabled, use {@link #workspace()} instead.
+	 *
+	 * @param tenantId The identifier of the tenant whose index content should be targeted.
+	 * @return A {@link SearchWorkspace}.
+	 */
+	SearchWorkspace workspace(Object tenantId);
 
 	/**
 	 * Create a {@link MassIndexer} for the indexes mapped to types in this scope, or to any of their sub-types.
@@ -173,8 +186,23 @@ public interface SearchScope<E> {
 	 *
 	 * @param tenantId The identifier of the tenant whose index content should be targeted.
 	 * @return A {@link MassIndexer}.
+	 * @deprecated Use {@link #massIndexer(Object)} instead.
 	 */
+	@Deprecated(forRemoval = true)
 	MassIndexer massIndexer(String tenantId);
+
+	/**
+	 * Create a {@link MassIndexer} for the indexes mapped to types in this scope, or to any of their sub-types.
+	 * <p>
+	 * This method only works for multi-tenant applications.
+	 * If multi-tenancy is disabled, use {@link #massIndexer()} instead.
+	 * <p>
+	 * {@link MassIndexer} instances cannot be reused.
+	 *
+	 * @param tenantId The identifier of the tenant whose index content should be targeted.
+	 * @return A {@link MassIndexer}.
+	 */
+	MassIndexer massIndexer(Object tenantId);
 
 	/**
 	 * Create a {@link MassIndexer} for the indexes mapped to types in this scope, or to any of their sub-types.
@@ -187,7 +215,7 @@ public interface SearchScope<E> {
 	 * @param tenantIds The tenants identifiers whose index content should be targeted. If empty, all tenants will be targeted.
 	 * @return A {@link MassIndexer}.
 	 */
-	MassIndexer massIndexer(Set<String> tenantIds);
+	MassIndexer massIndexer(Set<?> tenantIds);
 
 	/**
 	 * @return A set containing one {@link SearchIndexedEntity} for each indexed entity in this scope.

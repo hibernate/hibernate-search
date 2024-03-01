@@ -26,6 +26,8 @@ public interface BridgeSessionContext {
 
 	String tenantIdentifier();
 
+	Object tenantIdentifierValue();
+
 	IdentifierBridgeFromDocumentIdentifierContext identifierBridgeFromDocumentIdentifierContext();
 
 	RoutingBridgeRouteContext routingBridgeRouteContext();

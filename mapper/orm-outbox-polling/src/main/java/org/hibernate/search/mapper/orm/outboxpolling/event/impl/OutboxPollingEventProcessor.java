@@ -181,7 +181,7 @@ public final class OutboxPollingEventProcessor implements ToStringTreeAppendable
 			OutboxPollingEventProcessorClusterLink clusterLink) {
 		this.name = name;
 		this.mapping = factory.mapping;
-		String tenantId = factory.tenantId;
+		Object tenantId = mapping.tenancyConfiguration().convert( factory.tenantId );
 		this.loader = factory.loader;
 		this.pollingInterval = factory.pollingInterval.toMillis();
 		this.batchSize = factory.batchSize;

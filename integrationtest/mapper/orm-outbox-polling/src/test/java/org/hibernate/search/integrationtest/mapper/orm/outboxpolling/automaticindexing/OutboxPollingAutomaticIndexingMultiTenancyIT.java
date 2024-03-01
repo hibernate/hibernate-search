@@ -64,7 +64,7 @@ class OutboxPollingAutomaticIndexingMultiTenancyIT {
 
 		OrmSetupHelper.SetupContext context = setupHelper.start()
 				.withProperty( Environment.HBM2DDL_AUTO, hbm2ddlAction )
-				.tenants( TENANT_1_ID, TENANT_2_ID, TENANT_3_ID )
+				.tenantsWithHelperEnabled( TENANT_1_ID, TENANT_2_ID, TENANT_3_ID )
 				.with( indexingCountHelper::bind )
 				.with( config );
 

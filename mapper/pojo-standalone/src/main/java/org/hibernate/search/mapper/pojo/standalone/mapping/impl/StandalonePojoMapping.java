@@ -37,6 +37,7 @@ import org.hibernate.search.mapper.pojo.standalone.session.SearchSession;
 import org.hibernate.search.mapper.pojo.standalone.session.SearchSessionBuilder;
 import org.hibernate.search.mapper.pojo.standalone.session.impl.StandalonePojoSearchSession;
 import org.hibernate.search.mapper.pojo.standalone.session.impl.StandalonePojoSearchSessionMappingContext;
+import org.hibernate.search.mapper.pojo.standalone.tenancy.impl.TenancyConfiguration;
 import org.hibernate.search.util.common.impl.Closer;
 
 public class StandalonePojoMapping extends AbstractPojoMappingImplementor<StandalonePojoMapping>
@@ -47,6 +48,7 @@ public class StandalonePojoMapping extends AbstractPojoMappingImplementor<Standa
 	private final ConfiguredIndexingPlanSynchronizationStrategyHolder configuredIndexingPlanSynchronizationStrategyHolder;
 
 	private SearchIntegration.Handle integrationHandle;
+	private TenancyConfiguration tenancyConfiguration;
 	private boolean active;
 
 
@@ -76,6 +78,9 @@ public class StandalonePojoMapping extends AbstractPojoMappingImplementor<Standa
 		// Schema management
 		PojoScopeSchemaManager schemaManager = scope.schemaManagerDelegate();
 
+		this.tenancyConfiguration = TenancyConfiguration.create(
+				context.beanResolver(), delegate().tenancyMode(), context.configurationPropertySource() );
+
 		return schemaManagementListener.onStart( context, schemaManager );
 	}
 
@@ -101,6 +106,7 @@ public class StandalonePojoMapping extends AbstractPojoMappingImplementor<Standa
 					ConfiguredIndexingPlanSynchronizationStrategyHolder::close,
 					configuredIndexingPlanSynchronizationStrategyHolder
 			);
+			closer.push( TenancyConfiguration::close, tenancyConfiguration );
 			integrationHandle = null;
 			active = false;
 		}
@@ -151,7 +157,7 @@ public class StandalonePojoMapping extends AbstractPojoMappingImplementor<Standa
 				);
 
 		// Explicit type parameter is necessary here for ECJ (Eclipse compiler)
-		return new SearchScopeImpl<T>( this, scopeDelegate );
+		return new SearchScopeImpl<T>( this, tenancyConfiguration, scopeDelegate );
 	}
 
 	@Override
@@ -164,7 +170,7 @@ public class StandalonePojoMapping extends AbstractPojoMappingImplementor<Standa
 				);
 
 		// Explicit type parameter is necessary here for ECJ (Eclipse compiler)
-		return new SearchScopeImpl<T>( this, scopeDelegate );
+		return new SearchScopeImpl<T>( this, tenancyConfiguration, scopeDelegate );
 	}
 
 	@Override
@@ -213,6 +219,11 @@ public class StandalonePojoMapping extends AbstractPojoMappingImplementor<Standa
 		return createSessionBuilder().tenantId( tenantIdentifier ).build();
 	}
 
+	@Override
+	public TenancyConfiguration tenancyConfiguration() {
+		return tenancyConfiguration;
+	}
+
 	private SearchIntegration searchIntegration() {
 		return integrationHandle.getOrFail();
 	}
@@ -223,7 +234,7 @@ public class StandalonePojoMapping extends AbstractPojoMappingImplementor<Standa
 						this,
 						typeContextContainer::indexedForExactType
 				)
-				.map( scopeDelegate -> new SearchScopeImpl<>( this, scopeDelegate ) );
+				.map( scopeDelegate -> new SearchScopeImpl<>( this, tenancyConfiguration, scopeDelegate ) );
 	}
 
 	private StandalonePojoSearchSession.Builder createSessionBuilder() {

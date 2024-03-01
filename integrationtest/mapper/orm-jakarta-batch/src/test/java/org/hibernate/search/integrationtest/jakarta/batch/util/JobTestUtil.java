@@ -133,7 +133,7 @@ public final class JobTestUtil {
 	}
 
 	public static <T> List<T> findIndexedResultsInTenant(EntityManagerFactory emf, Class<T> clazz, String key, String value,
-			String tenantId) {
+			Object tenantId) {
 		SessionFactory sessionFactory = emf.unwrap( SessionFactory.class );
 		return with( sessionFactory, tenantId )
 				.applyNoTransaction( session -> find( session, clazz, key, value ) );

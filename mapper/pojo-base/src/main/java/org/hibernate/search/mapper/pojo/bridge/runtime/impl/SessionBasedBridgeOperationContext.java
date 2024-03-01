@@ -50,6 +50,11 @@ public final class SessionBasedBridgeOperationContext
 	}
 
 	@Override
+	public Object tenantIdentifierValue() {
+		return sessionContext.tenantIdentifierValue();
+	}
+
+	@Override
 	public <T> T extension(RoutingBridgeRouteContextExtension<T> extension) {
 		return DslExtensionState.returnIfSupported( extension, extension.extendOptional( this, sessionContext ) );
 	}

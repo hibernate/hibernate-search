@@ -11,6 +11,7 @@ import static org.hibernate.search.util.impl.integrationtest.common.stub.backend
 
 import java.util.Collections;
 import java.util.List;
+import java.util.UUID;
 
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
@@ -23,30 +24,51 @@ import org.hibernate.search.util.impl.integrationtest.common.extension.StubSearc
 import org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmSetupHelper;
 import org.hibernate.search.util.impl.test.annotation.PortedFromSearch5;
 import org.hibernate.search.util.impl.test.annotation.TestForIssue;
+import org.hibernate.search.util.impl.test.extension.parameterized.ParameterizedPerClass;
+import org.hibernate.search.util.impl.test.extension.parameterized.ParameterizedSetup;
+import org.hibernate.search.util.impl.test.extension.parameterized.ParameterizedSetupBeforeTest;
 
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 
 @TestForIssue(jiraKey = "HSEARCH-4034")
 @PortedFromSearch5(original = "org.hibernate.search.test.batchindexing.DatabaseMultitenancyTest")
+@ParameterizedPerClass
 class DatabaseMultitenancyIT {
 
 	@RegisterExtension
-	public BackendMock backendMock = BackendMock.create();
+	public static BackendMock backendMock = BackendMock.create();
 
 	@RegisterExtension
-	public OrmSetupHelper ormSetupHelper = OrmSetupHelper.withBackendMock( backendMock );
+	public static OrmSetupHelper ormSetupHelper = OrmSetupHelper.withBackendMock( backendMock );
 
-	/**
-	 * Metamec tenant identifier
-	 */
-	private static final String METAMEC_TID = "metamec";
+	private Object tenant1;
+	private Object tenant2;
 
-	/**
-	 * Geochron tenant identifier
-	 */
-	private static final String GEOCHRON_TID = "geochron";
+	public static List<? extends Arguments> params() {
+		return List.of(
+				Arguments.of( "metamec", "geochron" ),
+				Arguments.of( 1, 2 ),
+				Arguments.of( UUID.fromString( "55555555-7777-6666-9999-000000000001" ),
+						UUID.fromString( "55555555-7777-6666-9999-000000000002" ) )
+		);
+	}
+
+	@ParameterizedSetup
+	@MethodSource("params")
+	void setup(Object tenant1, Object tenant2) {
+		this.tenant1 = tenant1;
+		this.tenant2 = tenant2;
+
+		backendMock.expectSchema( Clock.INDEX, b -> b.field( "brand", String.class ) );
+		sessionFactory = ormSetupHelper
+				.start()
+				.tenantsWithHelperEnabled( tenant1, tenant2 )
+				.setup( Clock.class );
+		backendMock.verifyExpectationsMet();
+	}
 
 	private static Clock[] METAMEC_MODELS = {
 			new Clock( 1, "Metamec - Model A850" ),
@@ -62,44 +84,37 @@ class DatabaseMultitenancyIT {
 
 	private SessionFactory sessionFactory;
 
-	@BeforeEach
+	@ParameterizedSetupBeforeTest
 	void setup() {
-		backendMock.expectSchema( Clock.INDEX, b -> b.field( "brand", String.class ) );
-		sessionFactory = ormSetupHelper
-				.start()
-				.tenants( METAMEC_TID, GEOCHRON_TID )
-				.setup( Clock.class );
-		backendMock.verifyExpectationsMet();
-
 		// init data:
-		persist( METAMEC_TID, METAMEC_MODELS );
-		persist( GEOCHRON_TID, GEOCHRON_MODELS );
+		persist( tenant1, METAMEC_MODELS );
+		persist( tenant2, GEOCHRON_MODELS );
 	}
 
 	@Test
 	void shouldOnlyFindMetamecModels() {
-		List<Clock> list = searchAll( METAMEC_TID, METAMEC_MODELS );
+		List<Clock> list = searchAll( tenant1, METAMEC_MODELS );
 		assertThat( list ).containsExactlyInAnyOrder( METAMEC_MODELS );
 	}
 
 	@Test
 	void shouldOnlyFindGeochronModels() {
-		List<Clock> list = searchAll( GEOCHRON_TID, GEOCHRON_MODELS );
+		List<Clock> list = searchAll( tenant2, GEOCHRON_MODELS );
 		assertThat( list ).containsExactlyInAnyOrder( GEOCHRON_MODELS );
 	}
 
 	@Test
 	void shouldMatchOnlyElementsFromOneTenant() {
-		List<Clock> list = searchModel( "model", GEOCHRON_TID, GEOCHRON_MODELS );
+		List<Clock> list = searchModel( "model", tenant2, GEOCHRON_MODELS );
 		assertThat( list ).containsExactlyInAnyOrder( GEOCHRON_MODELS );
 	}
 
 	@Test
 	void searchReferences() {
-		assertThat( searchReferences( GEOCHRON_TID, GEOCHRON_MODELS ) ).hasSize( GEOCHRON_MODELS.length );
+		assertThat( searchReferences( tenant2, GEOCHRON_MODELS ) ).hasSize( GEOCHRON_MODELS.length );
 	}
 
-	private void persist(String tenantId, Clock[] models) {
+	private void persist(Object tenantId, Clock[] models) {
 		BackendMock.DocumentWorkCallListContext expectWorks = backendMock.expectWorks( Clock.INDEX, tenantId );
 		for ( Clock clock : models ) {
 			expectWorks.add( clock.getId() + "", b -> b.field( "brand", clock.getBrand() ) );
@@ -117,7 +132,7 @@ class DatabaseMultitenancyIT {
 		backendMock.verifyExpectationsMet();
 	}
 
-	private List<Clock> searchAll(String tenantId, Clock[] models) {
+	private List<Clock> searchAll(Object tenantId, Clock[] models) {
 		try ( Session session = openSessionWithTenantId( tenantId ) ) {
 			SearchQuery<Clock> query = Search.session( session )
 					.search( Clock.class )
@@ -132,7 +147,7 @@ class DatabaseMultitenancyIT {
 		}
 	}
 
-	private List<Clock> searchModel(String searchString, String tenantId, Clock[] models) {
+	private List<Clock> searchModel(String searchString, Object tenantId, Clock[] models) {
 		try ( Session session = openSessionWithTenantId( tenantId ) ) {
 			SearchQuery<Clock> query = Search.session( session )
 					.search( Clock.class )
@@ -147,7 +162,7 @@ class DatabaseMultitenancyIT {
 		}
 	}
 
-	private List<? extends EntityReference> searchReferences(String tenantId, Clock[] models) {
+	private List<? extends EntityReference> searchReferences(Object tenantId, Clock[] models) {
 		try ( Session session = openSessionWithTenantId( tenantId ) ) {
 			SearchQuery<? extends EntityReference> query = Search.session( session )
 					.search( Clock.class )

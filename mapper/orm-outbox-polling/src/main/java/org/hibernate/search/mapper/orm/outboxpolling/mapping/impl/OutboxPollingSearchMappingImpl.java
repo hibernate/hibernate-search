@@ -10,8 +10,11 @@ import static org.hibernate.search.mapper.orm.outboxpolling.event.impl.OutboxPol
 
 import java.lang.invoke.MethodHandles;
 import java.util.Set;
+import java.util.function.Function;
 
 import org.hibernate.Session;
+import org.hibernate.SessionBuilder;
+import org.hibernate.SessionFactory;
 import org.hibernate.engine.spi.SessionFactoryImplementor;
 import org.hibernate.engine.spi.SharedSessionContractImplementor;
 import org.hibernate.query.MutationQuery;
@@ -50,21 +53,24 @@ public class OutboxPollingSearchMappingImpl implements OutboxPollingSearchMappin
 	@Override
 	public long countAbortedEvents() {
 		checkNoTenant();
-
-		try ( Session session = sessionFactory.openSession() ) {
-			return transactionHelper.inTransaction( (SharedSessionContractImplementor) session, () -> {
-				Query<Long> query = session.createQuery( COUNT_EVENTS_WITH_STATUS, Long.class );
-				query.setParameter( "status", OutboxEvent.Status.ABORTED );
-				return query.getSingleResult();
-			} );
-		}
+		return doCountAbortedEvents( SessionFactory::withOptions );
 	}
 
 	@Override
+	@SuppressWarnings("removal")
 	public long countAbortedEvents(String tenantId) {
 		checkTenant( tenantId );
+		return doCountAbortedEvents( sf -> sf.withOptions().tenantIdentifier( tenancyConfiguration.convert( tenantId ) ) );
+	}
 
-		try ( Session session = sessionFactory.withOptions().tenantIdentifier( (Object) tenantId ).openSession() ) {
+	@Override
+	public long countAbortedEvents(Object tenantId) {
+		checkTenant( tenantId );
+		return doCountAbortedEvents( sf -> sf.withOptions().tenantIdentifier( tenantId ) );
+	}
+
+	private long doCountAbortedEvents(Function<SessionFactory, SessionBuilder> sessionCreator) {
+		try ( Session session = sessionCreator.apply( sessionFactory ).openSession() ) {
 			return transactionHelper.inTransaction( (SharedSessionContractImplementor) session, () -> {
 				Query<Long> query = session.createQuery( COUNT_EVENTS_WITH_STATUS, Long.class );
 				query.setParameter( "status", OutboxEvent.Status.ABORTED );
@@ -76,22 +82,24 @@ public class OutboxPollingSearchMappingImpl implements OutboxPollingSearchMappin
 	@Override
 	public int reprocessAbortedEvents() {
 		checkNoTenant();
-
-		try ( Session session = sessionFactory.openSession() ) {
-			return transactionHelper.inTransaction( (SharedSessionContractImplementor) session, () -> {
-				MutationQuery query = session.createMutationQuery( UPDATE_EVENTS_WITH_STATUS );
-				query.setParameter( "status", OutboxEvent.Status.ABORTED );
-				query.setParameter( "newStatus", OutboxEvent.Status.PENDING );
-				return query.executeUpdate();
-			} );
-		}
+		return doReprocessAbortedEvents( SessionFactory::withOptions );
 	}
 
 	@Override
+	@SuppressWarnings("removal")
 	public int reprocessAbortedEvents(String tenantId) {
 		checkTenant( tenantId );
+		return doReprocessAbortedEvents( sf -> sf.withOptions().tenantIdentifier( tenancyConfiguration.convert( tenantId ) ) );
+	}
 
-		try ( Session session = sessionFactory.withOptions().tenantIdentifier( (Object) tenantId ).openSession() ) {
+	@Override
+	public int reprocessAbortedEvents(Object tenantId) {
+		checkTenant( tenantId );
+		return doReprocessAbortedEvents( sf -> sf.withOptions().tenantIdentifier( tenantId ) );
+	}
+
+	private int doReprocessAbortedEvents(Function<SessionFactory, SessionBuilder> sessionCreator) {
+		try ( Session session = sessionCreator.apply( sessionFactory ).openSession() ) {
 			return transactionHelper.inTransaction( (SharedSessionContractImplementor) session, () -> {
 				MutationQuery query = session.createMutationQuery( UPDATE_EVENTS_WITH_STATUS );
 				query.setParameter( "status", OutboxEvent.Status.ABORTED );
@@ -104,21 +112,24 @@ public class OutboxPollingSearchMappingImpl implements OutboxPollingSearchMappin
 	@Override
 	public int clearAllAbortedEvents() {
 		checkNoTenant();
-
-		try ( Session session = sessionFactory.openSession() ) {
-			return transactionHelper.inTransaction( (SharedSessionContractImplementor) session, () -> {
-				MutationQuery query = session.createMutationQuery( DELETE_EVENTS_WITH_STATUS );
-				query.setParameter( "status", OutboxEvent.Status.ABORTED );
-				return query.executeUpdate();
-			} );
-		}
+		return doClearAllAbortedEvents( SessionFactory::withOptions );
 	}
 
 	@Override
+	@SuppressWarnings("removal")
 	public int clearAllAbortedEvents(String tenantId) {
 		checkTenant( tenantId );
+		return doClearAllAbortedEvents( sf -> sf.withOptions().tenantIdentifier( tenancyConfiguration.convert( tenantId ) ) );
+	}
 
-		try ( Session session = sessionFactory.withOptions().tenantIdentifier( (Object) tenantId ).openSession() ) {
+	@Override
+	public int clearAllAbortedEvents(Object tenantId) {
+		checkTenant( tenantId );
+		return doClearAllAbortedEvents( sf -> sf.withOptions().tenantIdentifier( tenantId ) );
+	}
+
+	private int doClearAllAbortedEvents(Function<SessionFactory, SessionBuilder> sessionCreator) {
+		try ( Session session = sessionCreator.apply( sessionFactory ).openSession() ) {
 			return transactionHelper.inTransaction( (SharedSessionContractImplementor) session, () -> {
 				MutationQuery query = session.createMutationQuery( DELETE_EVENTS_WITH_STATUS );
 				query.setParameter( "status", OutboxEvent.Status.ABORTED );
@@ -131,6 +142,10 @@ public class OutboxPollingSearchMappingImpl implements OutboxPollingSearchMappin
 		if ( !tenantIds.isEmpty() ) {
 			throw log.noTenantIdSpecified( tenantIds );
 		}
+	}
+
+	private void checkTenant(Object tenantId) {
+		checkTenant( tenancyConfiguration.convert( tenantId ) );
 	}
 
 	private void checkTenant(String tenantId) {

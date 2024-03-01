@@ -13,6 +13,8 @@ import org.hibernate.search.mapper.orm.coordination.impl.NoCoordinationStrategy;
 import org.hibernate.search.mapper.orm.mapping.HibernateOrmSearchMappingConfigurer;
 import org.hibernate.search.mapper.orm.schema.management.SchemaManagementStrategyName;
 import org.hibernate.search.mapper.orm.search.loading.EntityLoadingCacheLookupStrategy;
+import org.hibernate.search.mapper.pojo.tenancy.TenantIdentifierConverter;
+import org.hibernate.search.mapper.pojo.tenancy.spi.StringTenantIdentifierConverter;
 import org.hibernate.search.mapper.pojo.work.IndexingPlanSynchronizationStrategy;
 import org.hibernate.search.mapper.pojo.work.IndexingPlanSynchronizationStrategyNames;
 
@@ -205,6 +207,22 @@ public final class HibernateOrmMapperSettings {
 	public static final String MULTI_TENANCY_TENANT_IDS = PREFIX + Radicals.MULTI_TENANCY_TENANT_IDS;
 
 	/**
+	 * How to convert tenant identifier to and form the string representation.
+	 * <p>
+	 * Converts a tenant identifier to a string representation to be written to the index,
+	 * and converts to its object representation from a string when a new Hibernate ORM session must be opened.
+	 * <p>
+	 * When multi-tenancy is enabled, and non-string tenant identifiers are used
+	 * a custom converter <strong>must</strong> be provided through this property.
+	 * <p>
+	 * Defaults to {@link Defaults#MULTI_TENANCY_TENANT_IDENTIFIER_CONVERTER}.
+	 * This converter only supports string tenant identifiers and will fail if some other type of identifiers is used.
+	 * @see TenantIdentifierConverter
+	 */
+	public static final String MULTI_TENANCY_TENANT_IDENTIFIER_CONVERTER =
+			PREFIX + Radicals.MULTI_TENANCY_TENANT_IDENTIFIER_CONVERTER;
+
+	/**
 	 * How to synchronize between application threads and indexing triggered by the
 	 * {@link org.hibernate.search.mapper.orm.work.SearchIndexingPlan SearchIndexingPlan}.
 	 * <p>
@@ -280,6 +298,8 @@ public final class HibernateOrmMapperSettings {
 		public static final String MULTI_TENANCY = "multi_tenancy";
 		public static final String MULTI_TENANCY_PREFIX = MULTI_TENANCY + ".";
 		public static final String MULTI_TENANCY_TENANT_IDS = MULTI_TENANCY_PREFIX + MultiTenancyRadicals.TENANT_IDS;
+		public static final String MULTI_TENANCY_TENANT_IDENTIFIER_CONVERTER =
+				MULTI_TENANCY_PREFIX + MultiTenancyRadicals.TENANT_IDENTIFIER_CONVERTER;
 		public static final String INDEXING_PREFIX = "indexing.";
 		public static final String INDEXING_PLAN_SYNCHRONIZATION_STRATEGY =
 				INDEXING_PREFIX + IndexingRadicals.PLAN_SYNCHRONIZATION_STRATEGY;
@@ -353,6 +373,7 @@ public final class HibernateOrmMapperSettings {
 		}
 
 		public static final String TENANT_IDS = "tenant_ids";
+		public static final String TENANT_IDENTIFIER_CONVERTER = "tenant_identifier_converter";
 	}
 
 	/**
@@ -401,7 +422,8 @@ public final class HibernateOrmMapperSettings {
 		public static final BeanReference<IndexingPlanSynchronizationStrategy> INDEXING_PLAN_SYNCHRONIZATION_STRATEGY =
 				BeanReference.of( IndexingPlanSynchronizationStrategy.class, "write-sync" );
 		public static final boolean INDEXING_LISTENERS_ENABLED = true;
-
+		public static final BeanReference<TenantIdentifierConverter> MULTI_TENANCY_TENANT_IDENTIFIER_CONVERTER =
+				BeanReference.of( TenantIdentifierConverter.class, StringTenantIdentifierConverter.NAME );
 	}
 
 }

@@ -75,7 +75,8 @@ public class StepProgressSetupListener extends AbstractStepListener {
 			ConditionalExpression reindexOnly =
 					SerializationUtil.parseReindexOnlyParameters( reindexOnlyHql, serializedReindexOnlyParameters );
 
-			try ( StatelessSession session = PersistenceUtil.openStatelessSession( emf, tenantId ) ) {
+			try ( StatelessSession session =
+					PersistenceUtil.openStatelessSession( emf, jobData.getTenancyConfiguration().convert( tenantId ) ) ) {
 				for ( EntityTypeDescriptor<?, ?> type : jobData.getEntityTypeDescriptors() ) {
 					Long rowCount = countAll( session, type, reindexOnly );
 					log.rowsToIndex( type.jpaEntityName(), rowCount );

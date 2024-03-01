@@ -47,6 +47,14 @@ i.e. the name of the owning entity, followed by a dot ("."),
 followed by the dot-separated path to the component in that entity.
 For example `MyEntity.myEmbedded` or `MyEntity.myEmbedded.myNestedEmbedded`.
 
+[[mapper-orm-multi-tenancy]]
+== Multi-tenancy with non-string tenant identifiers
+
+While working with string tenant identifiers in Hibernate ORM has built-in support in Hibernate Search,
+using non-string tenant identifiers requires configuring a custom tenant identifier converter.
+This can be done by passing a bean reference of `TenantIdentifierConverter` type to
+the `hibernate.search.multi_tenancy.tenant_identifier_converter` configuration property.
+
 [[mapper-orm-configuration-other]]
 == [[mapper-orm-mapping-configuration-other]] Other configuration
 

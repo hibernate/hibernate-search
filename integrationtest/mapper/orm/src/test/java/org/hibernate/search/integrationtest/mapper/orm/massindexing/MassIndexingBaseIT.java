@@ -89,7 +89,7 @@ class MassIndexingBaseIT {
 				.withAnnotatedTypes( Book.class );
 
 		if ( TenancyMode.MULTI_TENANCY.equals( tenancyMode ) ) {
-			setupContext.tenants( TENANT_1_ID, TENANT_2_ID );
+			setupContext.tenantsWithHelperEnabled( TENANT_1_ID, TENANT_2_ID );
 			setupContext.withProperty(
 					HibernateOrmMapperSettings.MULTI_TENANCY_TENANT_IDS,
 					String.join( ",", TENANT_1_ID, TENANT_2_ID )
@@ -123,11 +123,11 @@ class MassIndexingBaseIT {
 		}
 	}
 
-	private String targetTenantId() {
+	private Object targetTenantId() {
 		return TenancyMode.MULTI_TENANCY.equals( tenancyMode ) ? TENANT_1_ID : null;
 	}
 
-	private Set<String> allTenantIds() {
+	private Set<Object> allTenantIds() {
 		return TenancyMode.MULTI_TENANCY.equals( tenancyMode ) ? asSet( TENANT_1_ID, TENANT_2_ID ) : Collections.emptySet();
 	}
 
@@ -528,7 +528,7 @@ class MassIndexingBaseIT {
 	@Test
 	void lazyCreateSearchSessionAfterOrmSessionIsClosed_createMassIndexer() {
 		Session session = sessionFactory.withOptions()
-				.tenantIdentifier( (Object) targetTenantId() )
+				.tenantIdentifier( targetTenantId() )
 				.openSession();
 		// Search session is not created, since we don't use it
 		SearchSession searchSession = Search.session( session );

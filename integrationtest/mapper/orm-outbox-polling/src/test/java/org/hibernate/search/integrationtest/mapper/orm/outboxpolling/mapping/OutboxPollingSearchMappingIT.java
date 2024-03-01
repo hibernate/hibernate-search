@@ -51,7 +51,7 @@ class OutboxPollingSearchMappingIT {
 
 	@Test
 	void countAbortedEvents_tenantIdSpecified() {
-		assertThatThrownBy( () -> searchMapping.countAbortedEvents( "tenantX" ) )
+		assertThatThrownBy( () -> searchMapping.countAbortedEvents( (Object) "tenantX" ) )
 				.isInstanceOf( SearchException.class )
 				.hasMessageContainingAll(
 						"Multi-tenancy is not enabled but a tenant id is specified.",
@@ -61,7 +61,7 @@ class OutboxPollingSearchMappingIT {
 
 	@Test
 	void reprocessAbortedEvents_tenantIdSpecified() {
-		assertThatThrownBy( () -> searchMapping.reprocessAbortedEvents( "tenantX" ) )
+		assertThatThrownBy( () -> searchMapping.reprocessAbortedEvents( (Object) "tenantX" ) )
 				.isInstanceOf( SearchException.class )
 				.hasMessageContainingAll(
 						"Multi-tenancy is not enabled but a tenant id is specified.",
@@ -71,7 +71,7 @@ class OutboxPollingSearchMappingIT {
 
 	@Test
 	void clearAllAbortedEvents_tenantIdSpecified() {
-		assertThatThrownBy( () -> searchMapping.clearAllAbortedEvents( "tenantX" ) )
+		assertThatThrownBy( () -> searchMapping.clearAllAbortedEvents( (Object) "tenantX" ) )
 				.isInstanceOf( SearchException.class )
 				.hasMessageContainingAll(
 						"Multi-tenancy is not enabled but a tenant id is specified.",

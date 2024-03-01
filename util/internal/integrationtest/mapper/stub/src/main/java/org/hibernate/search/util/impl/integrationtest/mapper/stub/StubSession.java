@@ -6,15 +6,17 @@
  */
 package org.hibernate.search.util.impl.integrationtest.mapper.stub;
 
+import java.util.Objects;
+
 import org.hibernate.search.engine.backend.mapping.spi.BackendMappingContext;
 import org.hibernate.search.engine.backend.session.spi.BackendSessionContext;
 
 public class StubSession implements BackendSessionContext {
 
 	private final StubMapping mapping;
-	private final String tenantIdentifier;
+	private final Object tenantIdentifier;
 
-	StubSession(StubMapping mapping, String tenantIdentifier) {
+	StubSession(StubMapping mapping, Object tenantIdentifier) {
 		this.mapping = mapping;
 		this.tenantIdentifier = tenantIdentifier;
 	}
@@ -26,6 +28,6 @@ public class StubSession implements BackendSessionContext {
 
 	@Override
 	public String tenantIdentifier() {
-		return tenantIdentifier;
+		return Objects.toString( tenantIdentifier, null );
 	}
 }

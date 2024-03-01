@@ -12,6 +12,7 @@ import org.hibernate.search.mapper.pojo.session.spi.PojoSearchSessionMappingCont
 import org.hibernate.search.mapper.pojo.standalone.massindexing.impl.StandalonePojoMassIndexingMappingContext;
 import org.hibernate.search.mapper.pojo.standalone.scope.impl.SearchScopeImpl;
 import org.hibernate.search.mapper.pojo.standalone.scope.impl.StandalonePojoScopeMappingContext;
+import org.hibernate.search.mapper.pojo.standalone.tenancy.impl.TenancyConfiguration;
 
 public interface StandalonePojoSearchSessionMappingContext
 		extends PojoSearchSessionMappingContext, StandalonePojoScopeMappingContext,
@@ -21,4 +22,5 @@ public interface StandalonePojoSearchSessionMappingContext
 
 	<T> SearchScopeImpl<T> createScope(Class<T> expectedSuperType, Collection<String> entityNames);
 
+	TenancyConfiguration tenancyConfiguration();
 }

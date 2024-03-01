@@ -21,14 +21,14 @@ import org.hibernate.search.util.impl.integrationtest.mapper.orm.SimpleSessionFa
  */
 public class MultitenancyTestHelper {
 
-	public static void enable(SimpleSessionFactoryBuilder builder, String... tenantIds) {
+	public static void enable(SimpleSessionFactoryBuilder builder, Object... tenantIds) {
 		MultitenancyTestHelper helper = new MultitenancyTestHelper( tenantIds );
 		helper.attachTo( builder );
 	}
 
-	private final String[] tenantIds;
+	private final Object[] tenantIds;
 
-	private MultitenancyTestHelper(String[] tenantIds) {
+	private MultitenancyTestHelper(Object[] tenantIds) {
 		this.tenantIds = tenantIds;
 	}
 

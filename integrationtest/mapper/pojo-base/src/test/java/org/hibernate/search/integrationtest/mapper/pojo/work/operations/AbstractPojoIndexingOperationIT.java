@@ -81,7 +81,7 @@ public abstract class AbstractPojoIndexingOperationIT {
 
 	public DocumentCommitStrategy commitStrategy;
 	public DocumentRefreshStrategy refreshStrategy;
-	public String tenantId;
+	public Object tenantId;
 	public MyRoutingBinder routingBinder;
 	public IndexingPlanSynchronizationStrategy strategy;
 

@@ -123,7 +123,8 @@ public class HibernateSearchPartitionMapper implements PartitionMapper {
 		JobContextData jobData = (JobContextData) jobContext.getTransientUserData();
 		emf = jobData.getEntityManagerFactory();
 
-		try ( StatelessSession ss = PersistenceUtil.openStatelessSession( emf, tenantId ) ) {
+		try ( StatelessSession ss =
+				PersistenceUtil.openStatelessSession( emf, jobData.getTenancyConfiguration().convert( tenantId ) ) ) {
 			Integer maxResults = SerializationUtil.parseIntegerParameterOptional(
 					MassIndexingJobParameters.MAX_RESULTS_PER_ENTITY, serializedMaxResultsPerEntity, null
 			);

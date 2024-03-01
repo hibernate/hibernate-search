@@ -12,6 +12,7 @@ import static org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMap
 import static org.junit.jupiter.api.Assumptions.assumeTrue;
 
 import java.util.List;
+import java.util.UUID;
 
 import org.hibernate.search.engine.backend.common.DocumentReference;
 import org.hibernate.search.engine.backend.document.DocumentElement;
@@ -34,15 +35,17 @@ import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMapping;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappingScope;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubSession;
 import org.hibernate.search.util.impl.test.annotation.TestForIssue;
+import org.hibernate.search.util.impl.test.extension.parameterized.ParameterizedPerClass;
+import org.hibernate.search.util.impl.test.extension.parameterized.ParameterizedSetup;
+import org.hibernate.search.util.impl.test.extension.parameterized.ParameterizedSetupBeforeTest;
 
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 
+@ParameterizedPerClass
 class MultiTenancyBaseIT {
-
-	private static final String TENANT_1 = "tenant_1";
-	private static final String TENANT_2 = "tenant_2";
 
 	private static final String DOCUMENT_ID_1 = "1";
 	private static final String DOCUMENT_ID_2 = "2";
@@ -65,21 +68,40 @@ class MultiTenancyBaseIT {
 	private static final float[] FLOATS_VALUE_4 = new float[] { 687.0f, 359.0f };
 
 	@RegisterExtension
-	public final SearchSetupHelper setupHelper = SearchSetupHelper.create();
+	public static final SearchSetupHelper setupHelper = SearchSetupHelper.create();
 
 	private final SimpleMappedIndex<IndexBinding> index = SimpleMappedIndex.of( IndexBinding::new );
 
 	private StubSession tenant1SessionContext;
 	private StubSession tenant2SessionContext;
 
-	@BeforeEach
+	private Object tenant1;
+	private Object tenant2;
+
+	public static List<? extends Arguments> params() {
+		return List.of(
+				Arguments.of( "tenant_1", "tenant_2" ),
+				Arguments.of( 1, 2 ),
+				Arguments.of( UUID.fromString( "55555555-7777-6666-9999-000000000001" ),
+						UUID.fromString( "55555555-7777-6666-9999-000000000002" ) )
+		);
+	}
+
+	@ParameterizedSetup
+	@MethodSource("params")
+	void setup(Object tenant1, Object tenant2) {
+		this.tenant1 = tenant1;
+		this.tenant2 = tenant2;
+	}
+
+	@ParameterizedSetupBeforeTest
 	void setup() {
 		StubMapping mapping = setupHelper.start( TckBackendHelper::createMultiTenancyBackendSetupStrategy )
 				.withIndex( index ).withMultiTenancy()
 				.setup();
 
-		tenant1SessionContext = mapping.session( TENANT_1 );
-		tenant2SessionContext = mapping.session( TENANT_2 );
+		tenant1SessionContext = mapping.session( tenant1 );
+		tenant2SessionContext = mapping.session( tenant2 );
 
 		initData();
 	}

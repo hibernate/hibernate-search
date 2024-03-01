@@ -94,7 +94,7 @@ class MassIndexingEnvironmentIT {
 
 			// purgeAtStart and mergeSegmentsAfterPurge are enabled by default,
 			// so we expect 1 purge, 1 mergeSegments and 1 flush calls in this order:
-			backendMock.expectIndexScaleWorks( Entity.NAME, searchSession.tenantIdentifier() )
+			backendMock.expectIndexScaleWorks( Entity.NAME, searchSession.tenantIdentifierValue() )
 					.purge()
 					.mergeSegments()
 					.mergeSegments()
@@ -169,7 +169,7 @@ class MassIndexingEnvironmentIT {
 
 			// purgeAtStart and mergeSegmentsAfterPurge are enabled by default,
 			// so we expect 1 purge, 1 mergeSegments after that we'll get exceptions so no flush or refresh:
-			backendMock.expectIndexScaleWorks( Entity.NAME, searchSession.tenantIdentifier() )
+			backendMock.expectIndexScaleWorks( Entity.NAME, searchSession.tenantIdentifierValue() )
 					.purge()
 					.mergeSegments();
 

@@ -14,37 +14,37 @@ public enum BackendIndexingOperation {
 
 	ADD {
 		@Override
-		void expect(BackendMock.DocumentWorkCallListContext context, String tenantId,
+		void expect(BackendMock.DocumentWorkCallListContext context, Object tenantId,
 				String id, String routingKey, String value, String containedValue) {
 			context.add( b -> addWorkInfoAndDocument( b, tenantId, id, routingKey, value, containedValue ) );
 		}
 	},
 	ADD_OR_UPDATE {
 		@Override
-		void expect(BackendMock.DocumentWorkCallListContext context, String tenantId,
+		void expect(BackendMock.DocumentWorkCallListContext context, Object tenantId,
 				String id, String routingKey, String value, String containedValue) {
 			context.addOrUpdate( b -> addWorkInfoAndDocument( b, tenantId, id, routingKey, value, containedValue ) );
 		}
 	},
 	DELETE {
 		@Override
-		void expect(BackendMock.DocumentWorkCallListContext context, String tenantId,
+		void expect(BackendMock.DocumentWorkCallListContext context, Object tenantId,
 				String id, String routingKey, String value, String containedValue) {
 			context.delete( b -> addWorkInfo( b, tenantId, id, routingKey ) );
 		}
 	};
 
-	abstract void expect(BackendMock.DocumentWorkCallListContext context, String tenantId,
+	abstract void expect(BackendMock.DocumentWorkCallListContext context, Object tenantId,
 			String id, String routingKey, String value, String containedValue);
 
-	static void addWorkInfo(StubDocumentWork.Builder builder, String tenantId,
+	static void addWorkInfo(StubDocumentWork.Builder builder, Object tenantId,
 			String identifier, String routingKey) {
 		builder.tenantIdentifier( tenantId );
 		builder.identifier( identifier );
 		builder.routingKey( routingKey );
 	}
 
-	static void addWorkInfoAndDocument(StubDocumentWork.Builder builder, String tenantId,
+	static void addWorkInfoAndDocument(StubDocumentWork.Builder builder, Object tenantId,
 			String identifier, String routingKey, String value, String containedValue) {
 		builder.tenantIdentifier( tenantId );
 		builder.identifier( identifier );

@@ -12,7 +12,7 @@ import org.hibernate.Session;
 
 public interface DataClearConfig {
 
-	DataClearConfig tenants(String... tenantIds);
+	DataClearConfig tenants(Object... tenantIds);
 
 	DataClearConfig preClear(Consumer<Session> preClear);
 

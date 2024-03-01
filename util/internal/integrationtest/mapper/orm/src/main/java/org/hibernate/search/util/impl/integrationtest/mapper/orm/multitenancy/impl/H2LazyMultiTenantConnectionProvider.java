@@ -28,15 +28,15 @@ import org.hibernate.testing.env.ConnectionProviderBuilder;
 
 import org.jboss.logging.Logger;
 
-public class H2LazyMultiTenantConnectionProvider extends AbstractMultiTenantConnectionProvider<String>
+public class H2LazyMultiTenantConnectionProvider extends AbstractMultiTenantConnectionProvider<Object>
 		implements Stoppable {
 
 	private static final Logger log = Logger.getLogger( H2LazyMultiTenantConnectionProvider.class.getName() );
 
-	private final String[] tenantIds;
-	private final Map<String, ConnectionProvider> delegates = new HashMap<>();
+	private final Object[] tenantIds;
+	private final Map<Object, ConnectionProvider> delegates = new HashMap<>();
 
-	public H2LazyMultiTenantConnectionProvider(String[] tenantIds) {
+	public H2LazyMultiTenantConnectionProvider(Object[] tenantIds) {
 		this.tenantIds = tenantIds;
 	}
 
@@ -62,7 +62,7 @@ public class H2LazyMultiTenantConnectionProvider extends AbstractMultiTenantConn
 	}
 
 	@Override
-	public ConnectionProvider selectConnectionProvider(String tenantIdentifier) {
+	public ConnectionProvider selectConnectionProvider(Object tenantIdentifier) {
 		ConnectionProvider connectionProviderImpl = getOrCreateDelegates().get( tenantIdentifier );
 		if ( connectionProviderImpl == null ) {
 			throw new HibernateException( "Unknown tenant identifier" );
@@ -71,7 +71,7 @@ public class H2LazyMultiTenantConnectionProvider extends AbstractMultiTenantConn
 	}
 
 	@SuppressWarnings("deprecation")
-	private Map<String, ConnectionProvider> getOrCreateDelegates() {
+	private Map<Object, ConnectionProvider> getOrCreateDelegates() {
 		if ( !delegates.isEmpty() ) {
 			return delegates;
 		}
@@ -87,7 +87,7 @@ public class H2LazyMultiTenantConnectionProvider extends AbstractMultiTenantConn
 					Properties.class, boolean.class );
 			buildConnectionProvider.setAccessible( true );
 
-			for ( String tenantId : tenantIds ) {
+			for ( Object tenantId : tenantIds ) {
 				properties.put( JdbcSettings.URL, String.format( Locale.ROOT, URL_FORMAT, tenantId ) );
 				ConnectionProvider connectionProvider =
 						(ConnectionProvider) buildConnectionProvider.invoke( null, properties, false );

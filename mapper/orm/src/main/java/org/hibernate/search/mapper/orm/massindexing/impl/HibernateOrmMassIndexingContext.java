@@ -14,6 +14,7 @@ import java.util.Optional;
 import org.hibernate.CacheMode;
 import org.hibernate.search.mapper.orm.loading.impl.HibernateOrmMassLoadingContext;
 import org.hibernate.search.mapper.orm.loading.spi.ConditionalExpression;
+import org.hibernate.search.mapper.orm.tenancy.spi.TenancyConfiguration;
 import org.hibernate.search.mapper.pojo.loading.spi.PojoLoadingTypeContext;
 import org.hibernate.search.mapper.pojo.massindexing.spi.PojoMassIndexingContext;
 
@@ -103,6 +104,11 @@ public final class HibernateOrmMassIndexingContext
 				.map( typeId -> conditionalExpressions.get( typeId.javaClass() ) )
 				.filter( Objects::nonNull )
 				.findFirst();
+	}
+
+	@Override
+	public TenancyConfiguration tenancyConfiguration() {
+		return mapping.tenancyConfiguration();
 	}
 
 }

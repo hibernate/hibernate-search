@@ -124,7 +124,7 @@ public final class OutboxPollingMassIndexerAgent implements PojoMassIndexerAgent
 		this.name = name;
 		AutomaticIndexingMappingContext mapping = factory.mapping;
 		this.pollingInterval = factory.pollingInterval.toMillis();
-		String tenantId = factory.tenantId;
+		Object tenantId = mapping.tenancyConfiguration().convert( factory.tenantId );
 		this.clusterLink = clusterLink;
 
 		TransactionHelper transactionHelper = new TransactionHelper( mapping.sessionFactory(), null );

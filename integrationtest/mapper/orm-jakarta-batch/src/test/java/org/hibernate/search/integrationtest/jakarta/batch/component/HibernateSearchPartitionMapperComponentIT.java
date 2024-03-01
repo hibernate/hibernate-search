@@ -13,12 +13,14 @@ import static org.mockito.Mockito.when;
 
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.Optional;
 import java.util.Properties;
 
 import jakarta.batch.api.partition.PartitionPlan;
 import jakarta.batch.runtime.context.JobContext;
 import jakarta.persistence.EntityManagerFactory;
 
+import org.hibernate.search.engine.environment.bean.BeanHolder;
 import org.hibernate.search.integrationtest.jakarta.batch.massindexing.entity.Company;
 import org.hibernate.search.integrationtest.jakarta.batch.massindexing.entity.CompanyGroup;
 import org.hibernate.search.integrationtest.jakarta.batch.massindexing.entity.Person;
@@ -28,6 +30,8 @@ import org.hibernate.search.jakarta.batch.core.massindexing.impl.JobContextData;
 import org.hibernate.search.jakarta.batch.core.massindexing.step.impl.HibernateSearchPartitionMapper;
 import org.hibernate.search.jakarta.batch.core.massindexing.util.impl.MassIndexingPartitionProperties;
 import org.hibernate.search.mapper.orm.cfg.HibernateOrmMapperSettings;
+import org.hibernate.search.mapper.orm.tenancy.spi.TenancyConfiguration;
+import org.hibernate.search.mapper.pojo.tenancy.spi.StringTenantIdentifierConverter;
 import org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmSetupHelper;
 
 import org.junit.jupiter.api.BeforeAll;
@@ -97,6 +101,11 @@ class HibernateSearchPartitionMapperComponentIT {
 		var companyType = JobTestUtil.createEntityTypeDescriptor( emf, Company.class );
 		var personType = JobTestUtil.createEntityTypeDescriptor( emf, Person.class );
 		jobData.setEntityTypeDescriptors( Arrays.asList( companyType, personType ) );
+		jobData.setTenancyConfiguration( TenancyConfiguration.create(
+				BeanHolder.of( StringTenantIdentifierConverter.INSTANCE ),
+				Optional.empty(),
+				""
+		) );
 		when( mockedJobContext.getTransientUserData() ).thenReturn( jobData );
 
 		PartitionPlan partitionPlan = partitionMapper.mapPartitions();
@@ -131,6 +140,11 @@ class HibernateSearchPartitionMapperComponentIT {
 		jobData.setEntityManagerFactory( emf );
 		var companyGroupType = JobTestUtil.createEntityTypeDescriptor( emf, CompanyGroup.class );
 		jobData.setEntityTypeDescriptors( Collections.singletonList( companyGroupType ) );
+		jobData.setTenancyConfiguration( TenancyConfiguration.create(
+				BeanHolder.of( StringTenantIdentifierConverter.INSTANCE ),
+				Optional.empty(),
+				""
+		) );
 		when( mockedJobContext.getTransientUserData() ).thenReturn( jobData );
 
 		PartitionPlan partitionPlan = partitionMapper.mapPartitions();

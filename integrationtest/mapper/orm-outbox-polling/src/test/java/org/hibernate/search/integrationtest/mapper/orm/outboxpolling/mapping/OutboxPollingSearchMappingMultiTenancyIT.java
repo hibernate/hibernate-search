@@ -31,9 +31,9 @@ import org.junit.jupiter.params.provider.MethodSource;
 
 class OutboxPollingSearchMappingMultiTenancyIT {
 
-	private static final String TENANT_1_ID = "tenant1";
-	private static final String TENANT_2_ID = "tenant2";
-	private static final String TENANT_3_ID = "tenant3";
+	private static final Object TENANT_1_ID = "tenant1";
+	private static final Object TENANT_2_ID = "tenant2";
+	private static final Object TENANT_3_ID = "tenant3";
 
 	@RegisterExtension
 	public BackendMock backendMock = BackendMock.create();
@@ -67,7 +67,7 @@ class OutboxPollingSearchMappingMultiTenancyIT {
 							session.persist( entity1 );
 						},
 						(Consumer<OrmSetupHelper.SetupContext>) context -> {
-							context.tenants( TENANT_1_ID, TENANT_2_ID, TENANT_3_ID );
+							context.tenantsWithHelperEnabled( TENANT_1_ID, TENANT_2_ID, TENANT_3_ID );
 						}
 				)
 		);
@@ -112,7 +112,7 @@ class OutboxPollingSearchMappingMultiTenancyIT {
 	void countAbortedEvents_wrongTenantId(String indexName, Class<?> indexedEntity,
 			BiConsumer<Session, Integer> entityCreator, Consumer<OrmSetupHelper.SetupContext> tenantConfigurer) {
 		init( indexName, indexedEntity, entityCreator, tenantConfigurer );
-		assertThatThrownBy( () -> searchMapping.countAbortedEvents( "tenantX" ) )
+		assertThatThrownBy( () -> searchMapping.countAbortedEvents( (Object) "tenantX" ) )
 				.isInstanceOf( SearchException.class )
 				.hasMessageContainingAll(
 						"Cannot target tenant 'tenantX'",
@@ -138,7 +138,7 @@ class OutboxPollingSearchMappingMultiTenancyIT {
 	void reprocessAbortedEvents_wrongTenantId(String indexName, Class<?> indexedEntity,
 			BiConsumer<Session, Integer> entityCreator, Consumer<OrmSetupHelper.SetupContext> tenantConfigurer) {
 		init( indexName, indexedEntity, entityCreator, tenantConfigurer );
-		assertThatThrownBy( () -> searchMapping.reprocessAbortedEvents( "tenantX" ) )
+		assertThatThrownBy( () -> searchMapping.reprocessAbortedEvents( (Object) "tenantX" ) )
 				.isInstanceOf( SearchException.class )
 				.hasMessageContainingAll(
 						"Cannot target tenant 'tenantX'",
@@ -164,7 +164,7 @@ class OutboxPollingSearchMappingMultiTenancyIT {
 	void clearAllAbortedEvents_wrongTenantId(String indexName, Class<?> indexedEntity,
 			BiConsumer<Session, Integer> entityCreator, Consumer<OrmSetupHelper.SetupContext> tenantConfigurer) {
 		init( indexName, indexedEntity, entityCreator, tenantConfigurer );
-		assertThatThrownBy( () -> searchMapping.clearAllAbortedEvents( "tenantX" ) )
+		assertThatThrownBy( () -> searchMapping.clearAllAbortedEvents( (Object) "tenantX" ) )
 				.isInstanceOf( SearchException.class )
 				.hasMessageContainingAll(
 						"Cannot target tenant 'tenantX'",

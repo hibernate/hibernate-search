@@ -12,12 +12,14 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.LinkedHashSet;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionStage;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
+import java.util.stream.Collectors;
 
 import org.hibernate.search.engine.backend.common.DocumentReference;
 import org.hibernate.search.engine.backend.work.execution.DocumentCommitStrategy;
@@ -43,10 +45,13 @@ import org.junit.jupiter.api.extension.BeforeAllCallback;
 import org.junit.jupiter.api.extension.BeforeEachCallback;
 import org.junit.jupiter.api.extension.BeforeTestExecutionCallback;
 import org.junit.jupiter.api.extension.ExtensionContext;
+import org.junit.jupiter.api.extension.TestExecutionExceptionHandler;
 
 import org.opentest4j.TestAbortedException;
 
-public class BackendMock implements BeforeTestExecutionCallback, AfterEachCallback, BeforeAllCallback, BeforeEachCallback {
+public class BackendMock
+		implements BeforeTestExecutionCallback, AfterEachCallback, BeforeAllCallback, BeforeEachCallback,
+		TestExecutionExceptionHandler {
 
 	private final VerifyingStubBackendBehavior backendBehavior =
 			new VerifyingStubBackendBehavior( this::indexingWorkExpectations );
@@ -214,7 +219,7 @@ public class BackendMock implements BeforeTestExecutionCallback, AfterEachCallba
 		return expectWorks( indexName, null );
 	}
 
-	public DocumentWorkCallListContext expectWorks(String indexName, String tenantId) {
+	public DocumentWorkCallListContext expectWorks(String indexName, Object tenantId) {
 		// Default to force commit and no refresh, which is what the mapper should use by default
 		return expectWorks( indexName, tenantId, DocumentCommitStrategy.FORCE, DocumentRefreshStrategy.NONE );
 	}
@@ -224,7 +229,7 @@ public class BackendMock implements BeforeTestExecutionCallback, AfterEachCallba
 		return expectWorks( indexName, null, commitStrategy, refreshStrategy );
 	}
 
-	public DocumentWorkCallListContext expectWorks(String indexName, String tenantId,
+	public DocumentWorkCallListContext expectWorks(String indexName, Object tenantId,
 			DocumentCommitStrategy commitStrategy, DocumentRefreshStrategy refreshStrategy) {
 		return new DocumentWorkCallListContext(
 				indexName, tenantId,
@@ -233,7 +238,7 @@ public class BackendMock implements BeforeTestExecutionCallback, AfterEachCallba
 		);
 	}
 
-	public IndexScaleWorkCallListContext expectIndexScaleWorks(String indexName, String... tenantIds) {
+	public IndexScaleWorkCallListContext expectIndexScaleWorks(String indexName, Object... tenantIds) {
 		CallQueue<IndexScaleWorkCall> callQueue = backendBehavior().getIndexScaleWorkCalls( indexName );
 		return new IndexScaleWorkCallListContext(
 				indexName,
@@ -343,6 +348,15 @@ public class BackendMock implements BeforeTestExecutionCallback, AfterEachCallba
 		return this;
 	}
 
+	@Override
+	public void handleTestExecutionException(ExtensionContext extensionContext, Throwable throwable) throws Throwable {
+		// if we've aborted the test then let's clean up the expectations....
+		if ( throwable instanceof TestAbortedException ) {
+			resetExpectations();
+		}
+		throw throwable;
+	}
+
 	public static class SchemaManagementWorkCallListContext {
 		private final String indexName;
 		private final Consumer<SchemaManagementWorkCall> expectationConsumer;
@@ -382,14 +396,14 @@ public class BackendMock implements BeforeTestExecutionCallback, AfterEachCallba
 
 	public class DocumentWorkCallListContext {
 		private final String indexName;
-		private final String tenantId;
+		private final Object tenantId;
 		private final DocumentCommitStrategy commitStrategyForDocumentWorks;
 		private final DocumentRefreshStrategy refreshStrategyForDocumentWorks;
 
 		private final DocumentWorkCallKind kind;
 		private final CompletableFuture<?> executionFuture;
 
-		private DocumentWorkCallListContext(String indexName, String tenantId,
+		private DocumentWorkCallListContext(String indexName, Object tenantId,
 				DocumentCommitStrategy commitStrategyForDocumentWorks,
 				DocumentRefreshStrategy refreshStrategyForDocumentWorks,
 				DocumentWorkCallKind kind, CompletableFuture<?> executionFuture) {
@@ -546,10 +560,11 @@ public class BackendMock implements BeforeTestExecutionCallback, AfterEachCallba
 		private final Consumer<IndexScaleWorkCall> expectationConsumer;
 
 		private IndexScaleWorkCallListContext(String indexName,
-				Set<String> tenantIdentifiers,
+				Set<Object> tenantIdentifiers,
 				Consumer<IndexScaleWorkCall> expectationConsumer) {
 			this.indexName = indexName;
-			this.tenantIdentifiers = tenantIdentifiers;
+			this.tenantIdentifiers = tenantIdentifiers.stream().map( id -> Objects.toString( id, null ) )
+					.collect( Collectors.toUnmodifiableSet() );
 			this.expectationConsumer = expectationConsumer;
 		}
 

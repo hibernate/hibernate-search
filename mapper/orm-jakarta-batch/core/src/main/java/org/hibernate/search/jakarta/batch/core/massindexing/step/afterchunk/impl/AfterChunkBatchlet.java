@@ -6,6 +6,8 @@
  */
 package org.hibernate.search.jakarta.batch.core.massindexing.step.afterchunk.impl;
 
+import java.util.Objects;
+
 import jakarta.batch.api.AbstractBatchlet;
 import jakarta.batch.api.BatchProperty;
 import jakarta.batch.runtime.context.JobContext;
@@ -51,7 +53,9 @@ public class AfterChunkBatchlet extends AbstractBatchlet {
 			JobContextData jobData = (JobContextData) jobContext.getTransientUserData();
 			EntityManagerFactory emf = jobData.getEntityManagerFactory();
 			BatchMappingContext mappingContext = (BatchMappingContext) Search.mapping( emf );
-			PojoScopeWorkspace workspace = mappingContext.scope( Object.class ).pojoWorkspace( tenantId );
+			// TODO : .........
+			PojoScopeWorkspace workspace =
+					mappingContext.scope( Object.class ).pojoWorkspace( Objects.toString( tenantId, null ) );
 			Futures.unwrappedExceptionJoin( workspace.mergeSegments( OperationSubmitter.blocking(),
 					serializedMergeSegmentsOnFinish != null
 							? UnsupportedOperationBehavior.FAIL

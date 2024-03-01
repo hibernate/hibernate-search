@@ -20,7 +20,6 @@ import org.hibernate.StatelessSession;
 import org.hibernate.StatelessSessionBuilder;
 import org.hibernate.engine.spi.SessionFactoryImplementor;
 import org.hibernate.search.mapper.orm.loading.spi.HibernateOrmLoadingTypeContext;
-import org.hibernate.search.util.common.impl.StringHelper;
 
 /**
  * Internal utility class for persistence usage.
@@ -41,12 +40,12 @@ public final class PersistenceUtil {
 	 * @param tenantId tenant ID, can be {@literal null} or empty.
 	 * @return a new session
 	 */
-	public static Session openSession(EntityManagerFactory entityManagerFactory, String tenantId) {
+	public static Session openSession(EntityManagerFactory entityManagerFactory, Object tenantId) {
 		SessionFactory sessionFactory = entityManagerFactory.unwrap( SessionFactory.class );
 		@SuppressWarnings("rawtypes")
 		SessionBuilder builder = sessionFactory.withOptions();
-		if ( StringHelper.isNotEmpty( tenantId ) ) {
-			builder.tenantIdentifier( (Object) tenantId );
+		if ( tenantId != null ) {
+			builder.tenantIdentifier( tenantId );
 		}
 		Session session = builder.openSession();
 		// We don't need to write to the database
@@ -65,12 +64,13 @@ public final class PersistenceUtil {
 	 * @param tenantId tenant ID, can be {@literal null} or empty.
 	 * @return a new stateless session
 	 */
-	public static StatelessSession openStatelessSession(EntityManagerFactory entityManagerFactory, String tenantId) {
+	public static StatelessSession openStatelessSession(EntityManagerFactory entityManagerFactory, Object tenantId) {
 		SessionFactory sessionFactory = entityManagerFactory.unwrap( SessionFactory.class );
 		@SuppressWarnings("rawtypes")
 		StatelessSessionBuilder builder = sessionFactory.withStatelessOptions();
-		if ( StringHelper.isNotEmpty( tenantId ) ) {
-			builder.tenantIdentifier( (Object) tenantId );
+		if ( tenantId != null ) {
+			// TODO: needs a converter here too!
+			builder.tenantIdentifier( tenantId );
 		}
 		return builder.openStatelessSession();
 	}

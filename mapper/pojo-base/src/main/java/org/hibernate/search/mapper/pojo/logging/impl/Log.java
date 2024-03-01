@@ -998,4 +998,8 @@ public interface Log extends BasicLogger {
 			@FormatWith(ClassFormatter.class) Class<?> expectedSuperType);
 
 
+	@Message(id = ID_OFFSET + 158,
+			value = "A non-string tenant ID '%1$s' cannot be used with a default TenantIdentifierConverter. "
+					+ "Provide your custom implementation of TenantIdentifierConverter to use non-string tenant identifiers.")
+	SearchException nonStringTenantId(Object tenantId);
 }
