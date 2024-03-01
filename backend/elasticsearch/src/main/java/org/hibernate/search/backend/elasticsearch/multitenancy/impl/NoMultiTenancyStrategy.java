@@ -34,11 +34,6 @@ public class NoMultiTenancyStrategy implements MultiTenancyStrategy {
 			new NoMultiTenancyIdProjectionExtractionHelper();
 
 	@Override
-	public boolean isMultiTenancySupported() {
-		return false;
-	}
-
-	@Override
 	public Optional<IndexSchemaRootContributor> indexSchemaRootContributor() {
 		// No need to add anything to documents, Elasticsearch metadata is enough
 		return Optional.empty();
