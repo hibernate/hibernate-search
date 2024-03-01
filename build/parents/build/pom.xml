@@ -1229,7 +1229,7 @@
                             <org.hibernate.search.integrationtest.backend.elasticsearch.distribution>${test.elasticsearch.distribution}</org.hibernate.search.integrationtest.backend.elasticsearch.distribution>
                             <org.hibernate.search.integrationtest.backend.elasticsearch.version>${test.elasticsearch.version}</org.hibernate.search.integrationtest.backend.elasticsearch.version>
                             <org.hibernate.search.integrationtest.orm.database.kind>${test.database.run.kind}</org.hibernate.search.integrationtest.orm.database.kind>
-                            <org.hibernate.search.integrationtest.project.root.directory>${rootProject.directory}</org.hibernate.search.integrationtest.project.root.directory>
+                            <org.hibernate.search.integrationtest.container.directory>${rootProject.directory}/build/container</org.hibernate.search.integrationtest.container.directory>
                         </systemPropertyVariables>
                     </configuration>
                 </plugin>

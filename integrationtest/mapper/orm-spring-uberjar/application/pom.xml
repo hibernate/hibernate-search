@@ -91,6 +91,9 @@
                     <mainClass>
                         org.hibernate.search.integrationtest.spring.repackaged.application.Application
                     </mainClass>
+                    <!-- Not critical here as it's just for tests.
+                         This hardcoded value allows us to cache integration tests in Develocity. -->
+                    <outputTimestamp>2017-11-06T19:19:00+01:00</outputTimestamp>
                 </configuration>
             </plugin>
             <plugin>
