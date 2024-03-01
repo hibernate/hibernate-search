@@ -22,11 +22,6 @@ public class NoMultiTenancyStrategy implements MultiTenancyStrategy {
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	@Override
-	public boolean isMultiTenancySupported() {
-		return false;
-	}
-
-	@Override
 	public void contributeToIndexedDocument(Document document, String tenantId) {
 		// No need to add anything to documents, the ID field (already added elsewhere) is enough
 	}

@@ -19,13 +19,6 @@ import org.apache.lucene.search.Query;
 public interface MultiTenancyStrategy {
 
 	/**
-	 * Indicates if the strategy supports multiTenancy.
-	 *
-	 * @return {@code true} if multiTenancy is supported, {@code false} otherwise.
-	 */
-	boolean isMultiTenancySupported();
-
-	/**
 	 * Contributes additional information to the indexed document.
 	 *
 	 * @param document The indexed document.

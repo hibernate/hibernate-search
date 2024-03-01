@@ -165,7 +165,6 @@ public class PojoMassIndexingBatchCoordinator extends PojoMassIndexingFailureHan
 				mappingContext.createMassIndexerAgent(
 						new PojoMassIndexerAgentCreateContextImpl( mappingContext, tenantId )
 				),
-				pojoScopeDelegate.workspace( tenantId ),
 				tenantId
 		);
 	}
@@ -281,21 +280,15 @@ public class PojoMassIndexingBatchCoordinator extends PojoMassIndexingFailureHan
 
 	public static class SessionContext {
 		private final PojoMassIndexerAgent agent;
-		private final PojoScopeWorkspace scopeWorkspace;
 		private final String tenantIdentifier;
 
-		public SessionContext(PojoMassIndexerAgent agent, PojoScopeWorkspace scopeWorkspace, String tenantIdentifier) {
+		public SessionContext(PojoMassIndexerAgent agent, String tenantIdentifier) {
 			this.agent = agent;
-			this.scopeWorkspace = scopeWorkspace;
 			this.tenantIdentifier = tenantIdentifier;
 		}
 
 		public PojoMassIndexerAgent agent() {
 			return agent;
-		}
-
-		public PojoScopeWorkspace scopeWorkspace() {
-			return scopeWorkspace;
 		}
 
 		public String tenantIdentifier() {

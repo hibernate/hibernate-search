@@ -23,11 +23,6 @@ public class DiscriminatorMultiTenancyStrategy implements MultiTenancyStrategy {
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	@Override
-	public boolean isMultiTenancySupported() {
-		return true;
-	}
-
-	@Override
 	public void contributeToIndexedDocument(Document document, String tenantId) {
 		document.add( MetadataFields.searchableMetadataField( MetadataFields.tenantIdFieldName(), tenantId ) );
 	}

@@ -51,11 +51,6 @@ public class DiscriminatorMultiTenancyStrategy implements MultiTenancyStrategy {
 			new DiscriminatorMultiTenancyIdProjectionExtractionHelper();
 
 	@Override
-	public boolean isMultiTenancySupported() {
-		return true;
-	}
-
-	@Override
 	public Optional<IndexSchemaRootContributor> indexSchemaRootContributor() {
 		return Optional.of( schemaRootContributor );
 	}

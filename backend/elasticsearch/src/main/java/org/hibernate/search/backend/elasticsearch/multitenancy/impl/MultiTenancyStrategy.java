@@ -22,13 +22,6 @@ import com.google.gson.JsonObject;
 public interface MultiTenancyStrategy {
 
 	/**
-	 * Indicates if the strategy supports multiTenancy.
-	 *
-	 * @return {@code true} if multiTenancy is supported, {@code false} otherwise.
-	 */
-	boolean isMultiTenancySupported();
-
-	/**
 	 * @return A schema contributor for the required additional properties (tenant ID, ...),
 	 * or an empty optional.
 	 */
