@@ -6,8 +6,6 @@
  */
 package org.hibernate.search.engine.mapper.mapping.impl;
 
-import static org.hibernate.search.util.common.impl.CollectionHelper.asSetIgnoreNull;
-
 import java.util.Set;
 
 import org.hibernate.search.engine.backend.index.IndexManager;
@@ -58,13 +56,6 @@ public class MappedIndexManagerImpl implements MappedIndexManager {
 	@Override
 	public IndexIndexer createIndexer(BackendSessionContext sessionContext) {
 		return implementor.createIndexer( sessionContext );
-	}
-
-	@Override
-	@Deprecated
-	public IndexWorkspace createWorkspace(
-			org.hibernate.search.engine.backend.session.spi.DetachedBackendSessionContext sessionContext) {
-		return createWorkspace( sessionContext.mappingContext(), asSetIgnoreNull( sessionContext.tenantIdentifier() ) );
 	}
 
 	@Override

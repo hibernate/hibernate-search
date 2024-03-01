@@ -50,29 +50,11 @@ public interface PojoScopeDelegate<R extends EntityReference, E, C> {
 
 	SearchHighlighterFactory highlighter();
 
-	/**
-	 * @param sessionContext The detached session, for the tenant ID.
-	 * @return A {@link PojoScopeWorkspace}.
-	 * @deprecated Use {@link #workspace(String)} instead.
-	 */
-	@Deprecated
-	PojoScopeWorkspace workspace(org.hibernate.search.engine.backend.session.spi.DetachedBackendSessionContext sessionContext);
-
 	PojoScopeWorkspace workspace(String tenantId);
 
 	PojoScopeWorkspace workspace(Set<String> tenantIds);
 
 	PojoScopeSchemaManager schemaManager();
-
-	/**
-	 * @param context The mass indexing context.
-	 * @param detachedSession The detached session, for the tenant ID.
-	 * @return A {@link PojoMassIndexer}.
-	 * @deprecated Use {@link #massIndexer(PojoMassIndexingContext, Set)} instead.
-	 */
-	@Deprecated
-	PojoMassIndexer massIndexer(PojoMassIndexingContext context,
-			org.hibernate.search.engine.backend.session.spi.DetachedBackendSessionContext detachedSession);
 
 	PojoMassIndexer massIndexer(PojoMassIndexingContext context, Set<String> tenantIds);
 
