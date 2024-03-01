@@ -989,8 +989,14 @@ void mavenNonDefaultBuild(BuildEnvironment buildEnv, String args, List<String> a
 String toTestEnvironmentArgs(BuildEnvironment buildEnv) {
 	String args = ''
 
-	// Make the build env tag available in Develocity
-	args +=  "-Dscan.tag.${buildEnv.tag}"
+	// Enable exact matching of the JDK version for Develocity build caches.
+	// This is enabled on this build only to avoid problems with
+	// Other builds (local, GitHub actions) do not enable this and thus benefit
+	// from more lenient cache hits.
+	// The behavior is implemented in our Maven extension, see:
+	// https://github.com/hibernate/hibernate-search-develocity-extension
+	args +=  " -Dbuild-cache.java-version.exact"
+
 	// Add a suffix to tests to distinguish between different executions
 	// of the same test in different environments in reports
 	def testSuffix = buildEnv.tag.replaceAll('[^a-zA-Z0-9_\\-+]+', '_')
