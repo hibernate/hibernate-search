@@ -9,6 +9,7 @@ package org.hibernate.search.integrationtest.mapper.orm.outboxpolling.automatici
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmUtils.with;
 
+import java.time.Duration;
 import java.util.List;
 
 import jakarta.persistence.Basic;
@@ -57,25 +58,33 @@ class OutboxPollingAutomaticIndexingLifecycleIT {
 	void stopWhileOutboxEventsIsBeingProcessed() {
 		SessionFactory sessionFactory = setup();
 		backendMock.verifyExpectationsMet();
-		int size = 10000;
+		int batch = 1000;
+		int batches = 10;
+		int size = batch * batches;
 
-		with( sessionFactory ).runInTransaction( session -> {
-			for ( int i = 1; i <= size; i++ ) {
-				IndexedEntity entity = new IndexedEntity();
-				entity.setId( i );
-				entity.setIndexedField( "value for the field" );
-				session.persist( entity );
-				if ( i % 1000 == 0 ) {
-					session.flush();
-					session.clear();
+		eventFilter.hideAllEvents();
+
+		for ( int j = 0; j < batches; j++ ) {
+			int initalId = j * batch + 1;
+			// let's have shorter transactions as with some DBs like Cockroach there's a chance to get some errors like:
+			//   > Caused by: org.postgresql.util.PSQLException: ERROR: restart transaction: TransactionRetryWithProtoRefreshError: TransactionRetryError: retry txn (RETRY_ASYNC_WRITE_FAILURE - missing intent on: /Table/139/1/1595/0): "sql txn" meta={id=55442a95 key=/Table/139/1/1/0 pri=0.01049326 epo=0 ts=1709565666.230677521,2 min=1709565649.912589844,0 seq=50001} lock=true stat=PENDING rts=1709565666.230677521,2 wto=false gul=1709565650.412589844,0
+			//   >     Hint: See: https://www.cockroachlabs.com/docs/v23.1/transaction-retry-error-reference.html#retry_async_write_failure
+			//   >	     at org.postgresql.core.v3.QueryExecutorImpl.receiveErrorResponse(QueryExecutorImpl.java:2725)
+			with( sessionFactory ).runInTransaction( session -> {
+				for ( int i = initalId; i < batch + initalId; i++ ) {
+					IndexedEntity entity = new IndexedEntity();
+					entity.setId( i );
+					entity.setIndexedField( "value for the field" );
+					session.persist( entity );
 				}
-			}
+			} );
+		}
 
-			BackendMock.DocumentWorkCallListContext context = backendMock.expectWorks( IndexedEntity.NAME );
-			for ( int i = 1; i <= size; i++ ) {
-				context.add( i + "", b -> b.field( "indexedField", "value for the field" ) );
-			}
-		} );
+		// expectations can be added outside the session/transaction
+		BackendMock.DocumentWorkCallListContext context = backendMock.expectWorks( IndexedEntity.NAME );
+		for ( int i = 1; i <= size; i++ ) {
+			context.add( i + "", b -> b.field( "indexedField", "value for the field" ) );
+		}
 
 		// wait for the first batch to be processed (partial processing)
 		eventFilter.showAllEvents();
@@ -103,6 +112,18 @@ class OutboxPollingAutomaticIndexingLifecycleIT {
 		// process the entities restarting Search:
 		eventFilter.showAllEvents();
 		sessionFactory = setup();
+
+		// since there's a timeout of 30 seconds on backend mock verification,
+		// let's wait a bit before that to give Hibernate Search some time to talk to slow DBs and index the docs first:
+		final SessionFactory sessionFactoryForLambdaAssert = sessionFactory;
+		backendMock.indexingWorkExpectations().awaitIndexingAssertions(
+				// while we expect the indexing to finish faster, let's give some DBs like CockroachDB more time here:
+				Duration.ofMinutes( 2 ),
+				() -> with( sessionFactoryForLambdaAssert ).runInTransaction( session -> {
+					// expect partial processing, meaning that the remaining event count is *strictly* between 0 and the full size:
+					assertThat( eventFilter.countOutboxEventsNoFilter( session ) ).isZero();
+				} )
+		);
 
 		backendMock.verifyExpectationsMet();
 	}
