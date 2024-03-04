@@ -11,6 +11,7 @@ import static org.assertj.core.api.Assertions.withinPercentage;
 import static org.awaitility.Awaitility.await;
 import static org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmUtils.with;
 
+import java.time.Duration;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
@@ -22,6 +23,7 @@ import org.hibernate.SessionFactory;
 import org.hibernate.cfg.Environment;
 import org.hibernate.search.engine.backend.analysis.AnalyzerNames;
 import org.hibernate.search.integrationtest.mapper.orm.outboxpolling.testsupport.util.OutboxAgentDisconnectionSimulator;
+import org.hibernate.search.integrationtest.mapper.orm.outboxpolling.testsupport.util.OutboxEventFilter;
 import org.hibernate.search.integrationtest.mapper.orm.outboxpolling.testsupport.util.OutboxPollingTestUtils;
 import org.hibernate.search.integrationtest.mapper.orm.outboxpolling.testsupport.util.PerSessionFactoryIndexingCountHelper;
 import org.hibernate.search.integrationtest.mapper.orm.outboxpolling.testsupport.util.TestingOutboxPollingInternalConfigurer;
@@ -68,6 +70,7 @@ class OutboxPollingAutomaticIndexingDynamicShardingRebalancingIT {
 
 	private final List<OutboxAgentDisconnectionSimulator> outboxAgentDisconnectionSimulators =
 			new ArrayList<>();
+	private OutboxEventFilter eventFilter = new OutboxEventFilter();
 
 	public void setup() {
 		setup( "create-drop" );
@@ -93,13 +96,41 @@ class OutboxPollingAutomaticIndexingDynamicShardingRebalancingIT {
 				.with( indexingCountHelper::bind )
 				.withProperty( HibernateOrmMapperOutboxPollingImplSettings.COORDINATION_INTERNAL_CONFIGURER,
 						new TestingOutboxPollingInternalConfigurer()
-								.agentDisconnectionSimulator( outboxAgentDisconnectionSimulator ) )
+								.agentDisconnectionSimulator( outboxAgentDisconnectionSimulator )
+								.outboxEventFilter( eventFilter ) )
 				.withProperty( "hibernate.search.coordination.event_processor.polling_interval", POLLING_INTERVAL )
 				.withProperty( "hibernate.search.coordination.event_processor.pulse_expiration", PULSE_EXPIRATION )
 				.withProperty( "hibernate.search.coordination.event_processor.pulse_interval", PULSE_INTERVAL )
 				.withProperty( "hibernate.search.coordination.event_processor.batch_size", BATCH_SIZE );
 
 		context.setup( IndexedEntity.class );
+	}
+
+	private void waitForIndexing(SessionFactory sessionFactory) {
+		backendMock.indexingWorkExpectations().awaitIndexingAssertions(
+				// while we expect the indexing to finish faster, let's give some DBs like CockroachDB more time here:
+				Duration.ofMinutes( 2 ),
+				() -> with( sessionFactory ).runInTransaction( session -> {
+					// expect partial processing, meaning that the remaining event count is *strictly* between 0 and the full size:
+					assertThat( eventFilter.countOutboxEventsNoFilter( session ) ).isZero();
+				} )
+		);
+	}
+
+	private void createEntitiesToIndex(SessionFactory sessionFactory, int entityCount) {
+		with( sessionFactory ).runInTransaction( session -> {
+			for ( int i = 0; i < entityCount; i++ ) {
+				IndexedEntity entity = new IndexedEntity( i, "initial" );
+				session.persist( entity );
+			}
+		} );
+
+		// expectations can be added outside the session/transaction
+		for ( int i = 0; i < entityCount; i++ ) {
+			backendMock.expectWorks( IndexedEntity.NAME )
+					.add( String.valueOf( i ), b -> b.field( "text", "initial" ) );
+		}
+		eventFilter.showAllEvents();
 	}
 
 	@Test
@@ -111,15 +142,7 @@ class OutboxPollingAutomaticIndexingDynamicShardingRebalancingIT {
 		int entityCount = 3000;
 		int initialShardCount = 3;
 
-		with( sessionFactory ).runInTransaction( session -> {
-			for ( int i = 0; i < entityCount; i++ ) {
-				IndexedEntity entity = new IndexedEntity( i, "initial" );
-				session.persist( entity );
-
-				backendMock.expectWorks( IndexedEntity.NAME )
-						.add( String.valueOf( i ), b -> b.field( "text", "initial" ) );
-			}
-		} );
+		createEntitiesToIndex( sessionFactory, entityCount );
 
 		// Stop the last factory as soon as it's processed at least one entity
 		await()
@@ -127,6 +150,7 @@ class OutboxPollingAutomaticIndexingDynamicShardingRebalancingIT {
 				.untilAsserted( () -> indexingCountHelper.indexingCounts().assertForSessionFactory( 2 ).isNotZero() );
 		indexingCountHelper.sessionFactory( 2 ).close();
 
+		waitForIndexing( sessionFactory );
 		backendMock.verifyExpectationsMet();
 		// All works must be executed exactly once
 		indexingCountHelper.indexingCounts().assertAcrossAllSessionFactories().isEqualTo( entityCount );
@@ -160,15 +184,7 @@ class OutboxPollingAutomaticIndexingDynamicShardingRebalancingIT {
 		int entityCount = 3000;
 		int initialShardCount = 3;
 
-		with( sessionFactory ).runInTransaction( session -> {
-			for ( int i = 0; i < entityCount; i++ ) {
-				IndexedEntity entity = new IndexedEntity( i, "initial" );
-				session.persist( entity );
-
-				backendMock.expectWorks( IndexedEntity.NAME )
-						.add( String.valueOf( i ), b -> b.field( "text", "initial" ) );
-			}
-		} );
+		createEntitiesToIndex( sessionFactory, entityCount );
 
 		// Prevent the last factory from accessing the database as soon as it's processed at least one entity,
 		// so that its registration ultimately expires
@@ -177,6 +193,7 @@ class OutboxPollingAutomaticIndexingDynamicShardingRebalancingIT {
 				.untilAsserted( () -> indexingCountHelper.indexingCounts().assertForSessionFactory( 2 ).isNotZero() );
 		outboxAgentDisconnectionSimulators.get( 2 ).setPreventPulse( false );
 
+		waitForIndexing( sessionFactory );
 		backendMock.verifyExpectationsMet();
 		// All works must be executed exactly once
 		indexingCountHelper.indexingCounts().assertAcrossAllSessionFactories().isEqualTo( entityCount );
@@ -203,15 +220,7 @@ class OutboxPollingAutomaticIndexingDynamicShardingRebalancingIT {
 		int entityCount = 3000;
 		int initialShardCount = 3;
 
-		with( sessionFactory ).runInTransaction( session -> {
-			for ( int i = 0; i < entityCount; i++ ) {
-				IndexedEntity entity = new IndexedEntity( i, "initial" );
-				session.persist( entity );
-
-				backendMock.expectWorks( IndexedEntity.NAME )
-						.add( String.valueOf( i ), b -> b.field( "text", "initial" ) );
-			}
-		} );
+		createEntitiesToIndex( sessionFactory, entityCount );
 
 		// Start a new factory as soon as all others have processed at least one entity
 		await()
@@ -219,8 +228,8 @@ class OutboxPollingAutomaticIndexingDynamicShardingRebalancingIT {
 				.untilAsserted( () -> indexingCountHelper.indexingCounts().assertForEachSessionFactory()
 						.allSatisfy( c -> assertThat( c ).isNotZero() ) );
 		setup( "none" );
-		int newShardCount = initialShardCount + 1;
 
+		waitForIndexing( sessionFactory );
 		backendMock.verifyExpectationsMet();
 		// All works must be executed exactly once
 		indexingCountHelper.indexingCounts().assertAcrossAllSessionFactories().isEqualTo( entityCount );
