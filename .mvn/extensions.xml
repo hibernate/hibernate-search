@@ -12,6 +12,6 @@
     <extension>
         <groupId>org.hibernate.search.develocity</groupId>
         <artifactId>hibernate-search-develocity-extension</artifactId>
-        <version>1.0.7.Final</version>
+        <version>1.0.8.Final</version>
     </extension>
 </extensions>
