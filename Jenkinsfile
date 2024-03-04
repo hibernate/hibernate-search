@@ -147,7 +147,7 @@ import org.hibernate.jenkins.pipeline.helpers.alternative.AlternativeMultiMap
  *         settingsId: ...
  */
 
-@Field final String DEFAULT_JDK_TOOL = 'OpenJDK 17 Latest'
+@Field final String DEFAULT_JDK_TOOL = 'OpenJDK 21 Latest'
 @Field final String MAVEN_TOOL = 'Apache Maven 3.9'
 
 // Default node pattern, to be used for resource-intensive stages.
@@ -186,17 +186,13 @@ stage('Configure') {
 			jdk: [
 					// This should not include every JDK; in particular let's not care too much about EOL'd JDKs like version 9
 					// See http://www.oracle.com/technetwork/java/javase/eol-135779.html
-					new JdkBuildEnvironment(version: '11', testCompilerTool: 'OpenJDK 11 Latest',
-							condition: TestCondition.AFTER_MERGE),
-					new JdkBuildEnvironment(version: '17', testCompilerTool: 'OpenJDK 17 Latest',
-							condition: TestCondition.BEFORE_MERGE,
-							isDefault: true),
 					// We want to enable preview features when testing newer builds of OpenJDK:
 					// even if we don't use these features, just enabling them can cause side effects
 					// and it's useful to test that.
 					new JdkBuildEnvironment(version: '21', testCompilerTool: 'OpenJDK 21 Latest',
 							testLauncherArgs: '--enable-preview',
-							condition: TestCondition.AFTER_MERGE),
+							condition: TestCondition.BEFORE_MERGE,
+							isDefault: true),
 					new JdkBuildEnvironment(version: '22', testCompilerTool: 'OpenJDK 22 Latest',
 							testLauncherArgs: '--enable-preview',
 							condition: TestCondition.AFTER_MERGE),
