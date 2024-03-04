@@ -48,6 +48,10 @@ public final class BackendIndexingWorkExpectations {
 	}
 
 	public void awaitIndexingAssertions(ThrowingRunnable assertions) {
+		awaitIndexingAssertions( Duration.ofSeconds( 30 ), assertions );
+	}
+
+	public void awaitIndexingAssertions(Duration atMost, ThrowingRunnable assertions) {
 		if ( sync ) {
 			try {
 				assertions.run();
@@ -63,7 +67,7 @@ public final class BackendIndexingWorkExpectations {
 					// are only about in-memory state (i.e. the CallQueues in BackendMock),
 					// so it's fine to poll aggressively every 5ms.
 					.pollInterval( Duration.ofMillis( 5 ) )
-					.atMost( Duration.ofSeconds( 30 ) )
+					.atMost( atMost )
 					.untilAsserted( assertions );
 		}
 	}
