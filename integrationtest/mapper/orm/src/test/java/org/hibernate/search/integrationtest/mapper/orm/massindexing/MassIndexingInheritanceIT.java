@@ -190,7 +190,7 @@ class MassIndexingInheritanceIT {
 
 		statementInspector.hasSelects( 3 )
 				// select count(c1_0.id) from car c1_0
-				.anyMatch( "select count\\([a-z0-9_.]+\\) from car [a-z0-9_.]+" )
+				.anyMatch( "select count(_big)?\\([a-z0-9_.]+\\) from car [a-z0-9_.]+" )
 				// select c1_0.id from Car c1_0
 				.anyMatch( "select [a-z0-9_.]+ from car [a-z0-9_.]+" )
 				// select c1_0.id,c1_1.bodyType,c1_2.doorType,c1_0.carHood from Car c1_0 join BaseVehicle c1_1 on c1_0.id=c1_1.id join DooredVehicle c1_2 on c1_0.id=c1_2.id where c1_0.id in (?,?,?)
@@ -246,7 +246,7 @@ class MassIndexingInheritanceIT {
 
 		statementInspector.hasSelects( 3 )
 				// select count(bv1_0.id) from bedvehicle bv1_0
-				.anyMatch( "select count\\([a-z0-9_.]+\\) from bedvehicle [a-z0-9_.]+" )
+				.anyMatch( "select count(_big)?\\([a-z0-9_.]+\\) from bedvehicle [a-z0-9_.]+" )
 				// select bv1_0.id from bedvehicle bv1_0
 				.anyMatch( "select [a-z0-9_.]+ from bedvehicle [a-z0-9_.]+" )
 				// select bv1_0.id,bv1_1.type,bv1_2.bodytype,bv1_3.doortype,bv1_0.bedtype,bv1_4.truckroof
@@ -312,7 +312,7 @@ class MassIndexingInheritanceIT {
 
 		statementInspector.hasSelects( 6 )
 				// select count(c1_0.id) from car c1_0
-				.anyMatch( "select count\\([a-z0-9_.]+\\) from car [a-z0-9_.]+" )
+				.anyMatch( "select count(_big)?\\([a-z0-9_.]+\\) from car [a-z0-9_.]+" )
 				// select c1_0.id from Car c1_0
 				.anyMatch( "select [a-z0-9_.]+ from car [a-z0-9_.]+" )
 				// select c1_0.id,c1_1.bodyType,c1_2.doorType,c1_0.carHood from Car c1_0 join BaseVehicle c1_1 on c1_0.id=c1_1.id join DooredVehicle c1_2 on c1_0.id=c1_2.id where c1_0.id in (?,?,?)
@@ -322,7 +322,7 @@ class MassIndexingInheritanceIT {
 						+ "where .+" )
 
 				// count(t1_0.id) from truck t1_0
-				.anyMatch( "select count\\([a-z0-9_.]+\\) from truck [a-z0-9_.]+" )
+				.anyMatch( "select count(_big)?\\([a-z0-9_.]+\\) from truck [a-z0-9_.]+" )
 				// select t1_0.id from truck t1_0
 				.anyMatch( "select [a-z0-9_.]+ from truck [a-z0-9_.]+" )
 				// select t1_0.id,t1_1.bodytype,t1_2.doortype,t1_3.bedtype,t1_0.truckroof
@@ -384,7 +384,7 @@ class MassIndexingInheritanceIT {
 
 		statementInspector.hasSelects( 3 )
 				// select count(bv1_0.id) from bedvehicle bv1_0
-				.anyMatch( "select count\\([a-z0-9_.]+\\) from bedvehicle [a-z0-9_.]+" )
+				.anyMatch( "select count(_big)?\\([a-z0-9_.]+\\) from bedvehicle [a-z0-9_.]+" )
 				// select bv1_0.id from bedvehicle bv1_0
 				.anyMatch( "select [a-z0-9_.]+ from bedvehicle [a-z0-9_.]+" )
 				// select bv1_0.id,bv1_1.type,bv1_2.bodytype,bv1_3.doortype,bv1_0.bedtype,bv1_4.truckroof
@@ -447,9 +447,9 @@ class MassIndexingInheritanceIT {
 				//            left join aba b1_3 on b1_0.id=b1_3.id
 				//            left join bba b1_4 on b1_0.id=b1_4.id
 				//            where b1_1.type in (?)
-				.anyMatch( "select count\\([a-z0-9_.]+\\) from bba [a-z0-9_.]+" )
-				.anyMatch( "select count\\([a-z0-9_.]+\\) from aaaba [a-z0-9_.]+" )
-				.anyMatch( "select count\\([a-z0-9_.]+\\) from ba [a-z0-9_.]+ "
+				.anyMatch( "select count(_big)?\\([a-z0-9_.]+\\) from bba [a-z0-9_.]+" )
+				.anyMatch( "select count(_big)?\\([a-z0-9_.]+\\) from aaaba [a-z0-9_.]+" )
+				.anyMatch( "select count(_big)?\\([a-z0-9_.]+\\) from ba [a-z0-9_.]+ "
 						+ "join a [a-z0-9_.]+ on [a-z0-9_.=]+ "
 						+ "left join aaaba [a-z0-9_.]+ on [a-z0-9_.=]+ "
 						+ "left join aba [a-z0-9_.]+ on [a-z0-9_.=]+ "
@@ -537,8 +537,8 @@ class MassIndexingInheritanceIT {
 				//           left join aroot r1_1 on r1_0.id=r1_1.id
 				//           left join broot r1_2 on r1_0.id=r1_2.id
 				//           where r1_0.type in (?)
-				.anyMatch( "select count\\([a-z0-9_.]+\\) from aroot [a-z0-9_.]+" )
-				.anyMatch( "select count\\([a-z0-9_.]+\\) from root [a-z0-9_.]+ "
+				.anyMatch( "select count(_big)?\\([a-z0-9_.]+\\) from aroot [a-z0-9_.]+" )
+				.anyMatch( "select count(_big)?\\([a-z0-9_.]+\\) from root [a-z0-9_.]+ "
 						+ "left join aroot [a-z0-9_.]+ on [a-z0-9_.=]+ "
 						+ "left join broot [a-z0-9_.]+ on [a-z0-9_.=]+ "
 						+ "where .+"
@@ -611,9 +611,9 @@ class MassIndexingInheritanceIT {
 				// select count(atpc1_0.id) from aroottableperclass atpc1_0
 				// select count(btpc1_0.id) from broottableperclass btpc1_0
 				// select count(rtpc1_0.id) from (select id, 0 as clazz_ from roottableperclass union all select id, 1 as clazz_ from aroottableperclass union all select id, 2 as clazz_ from broottableperclass) rtpc1_0 where rtpc1_0.clazz_ in (?)
-				.anyMatch( "select count\\([a-z0-9_.]+\\) from aroottableperclass [a-z0-9_.]+" )
-				.anyMatch( "select count\\([a-z0-9_.]+\\) from broottableperclass [a-z0-9_.]+" )
-				.anyMatch( "select count\\([a-z0-9_.]+\\) from \\(select .+union all.+\\) [a-z0-9_.]+ where .+" )
+				.anyMatch( "select count(_big)?\\([a-z0-9_.]+\\) from aroottableperclass [a-z0-9_.]+" )
+				.anyMatch( "select count(_big)?\\([a-z0-9_.]+\\) from broottableperclass [a-z0-9_.]+" )
+				.anyMatch( "select count(_big)?\\([a-z0-9_.]+\\) from \\(select .+union all.+\\) [a-z0-9_.]+ where .+" )
 
 				// select btpc1_0.id from broottableperclass btpc1_0
 				// select atpc1_0.id from aroottableperclass atpc1_0
@@ -671,7 +671,7 @@ class MassIndexingInheritanceIT {
 
 		statementInspector.hasSelects( 3 )
 				// select count(rst1_0.id) from rootsingletable rst1_0 where rst1_0.dtype in (?,?)
-				.anyMatch( "select count\\([a-z0-9_.]+\\) from rootsingletable [a-z0-9_.]+ where .+" )
+				.anyMatch( "select count(_big)?\\([a-z0-9_.]+\\) from rootsingletable [a-z0-9_.]+ where .+" )
 
 				// select rst1_0.id from rootsingletable rst1_0 where rst1_0.dtype in (?,?)
 				.anyMatch( "select [a-z0-9_.]+ from rootsingletable [a-z0-9_.]+ where .+" )
