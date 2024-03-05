@@ -167,8 +167,8 @@
                         <ELASTICSEARCH_AWS_SIGNING_ENABLED>${test.elasticsearch.connection.aws.signing.enabled}</ELASTICSEARCH_AWS_SIGNING_ENABLED>
                         <ELASTICSEARCH_AWS_REGION>${test.elasticsearch.connection.aws.region}</ELASTICSEARCH_AWS_REGION>
                         <ELASTICSEARCH_AWS_CREDENTIALS_TYPE>${test.elasticsearch.connection.aws.credentials.type}</ELASTICSEARCH_AWS_CREDENTIALS_TYPE>
-                        <ELASTICSEARCH_AWS_CREDENTIALS_ACCESS_KEY_ID>${test.elasticsearch.connection.aws.credentials.access_key_id}</ELASTICSEARCH_AWS_CREDENTIALS_ACCESS_KEY_ID>
-                        <ELASTICSEARCH_AWS_CREDENTIALS_SECRET_ACCESS_KEY>${test.elasticsearch.connection.aws.credentials.secret_access_key}</ELASTICSEARCH_AWS_CREDENTIALS_SECRET_ACCESS_KEY>
+                        <ELASTICSEARCH_AWS_CREDENTIALS_ACCESS_KEY_ID>${env.HIBERNATE_SEARCH_AWS_STATIC_CREDENTIALS_ACCESS_KEY_ID}</ELASTICSEARCH_AWS_CREDENTIALS_ACCESS_KEY_ID>
+                        <ELASTICSEARCH_AWS_CREDENTIALS_SECRET_ACCESS_KEY>${env.HIBERNATE_SEARCH_AWS_STATIC_CREDENTIALS_SECRET_ACCESS_KEY}</ELASTICSEARCH_AWS_CREDENTIALS_SECRET_ACCESS_KEY>
                         <!--
                              The test settings add a different suffix to this value for each test execution.
                              We can't add this suffix (${random.uuid}) here due to IDEA limitations:

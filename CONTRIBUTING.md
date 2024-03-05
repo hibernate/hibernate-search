@@ -413,23 +413,24 @@ You may also use authentication:
 
 Also, the elasticsearch integration tests can be executed
 against an Elasticsearch service on AWS.
-You will need to execute something along the lines of:
-
-```bash
-./mvnw clean install -Dtest.elasticsearch.connection.uris=http://<host:port> \
-        -Dtest.elasticsearch.connection.aws.signing.enabled=true \
-        -Dtest.elasticsearch.connection.aws.region=<Your AWS region ID> \
-        -Dtest.elasticsearch.connection.aws.credentials.type=static \
-        -Dtest.elasticsearch.connection.aws.credentials.access_key_id=<Your access key ID> \
-        -Dtest.elasticsearch.connection.aws.credentials.secret_access_key=<Your secret access key>
-```
-
-Or more simply, if your AWS credentials are already stored in `~/.aws/credentials`:
+If your AWS credentials are already stored in `~/.aws/credentials`, just run:
 
 ```bash
 ./mvnw clean install -Dtest.elasticsearch.connection.uris=http://<host:port> \
         -Dtest.elasticsearch.connection.aws.signing.enabled=true \
         -Dtest.elasticsearch.connection.aws.region=<Your AWS region ID>
+```
+
+If you want to use statically-provided AWS credentials,
+use the following instead:
+
+```bash
+export HIBERNATE_SEARCH_AWS_STATIC_CREDENTIALS_ACCESS_KEY_ID=<Your access key ID>
+export HIBERNATE_SEARCH_AWS_STATIC_CREDENTIALS_SECRET_ACCESS_KEY=<Your secret access key>
+./mvnw clean install -Dtest.elasticsearch.connection.uris=http://<host:port> \
+        -Dtest.elasticsearch.connection.aws.signing.enabled=true \
+        -Dtest.elasticsearch.connection.aws.region=<Your AWS region ID> \
+        -Dtest.elasticsearch.connection.aws.credentials.type=static
 ```
 
 ### Testcontainers
