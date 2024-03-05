@@ -472,7 +472,8 @@ stage('Default build') {
 				withCredentials([usernamePassword(
 								credentialsId: sonarCredentialsId,
 								usernameVariable: 'SONARCLOUD_ORGANIZATION',
-								passwordVariable: 'SONARCLOUD_TOKEN'
+								// https://docs.sonarsource.com/sonarqube/latest/analyzing-source-code/scanners/sonarscanner-for-maven/#analyzing
+								passwordVariable: 'SONAR_TOKEN'
 				)]) {
 					// We don't want to use the build cache or build scans for this execution
 					def miscMavenArgs = '-Dscan=false -Dno-build-cache'
@@ -481,7 +482,6 @@ stage('Default build') {
 							${miscMavenArgs} \
 							-Dsonar.organization=\${SONARCLOUD_ORGANIZATION} \
 							-Dsonar.host.url=https://sonarcloud.io \
-							-Dsonar.token=\${SONARCLOUD_TOKEN} \
 							${helper.scmSource.pullRequest ? """ \
 									-Dsonar.pullrequest.branch=${helper.scmSource.branch.name} \
 									-Dsonar.pullrequest.key=${helper.scmSource.pullRequest.id} \
@@ -656,8 +656,11 @@ stage('Non-default environments') {
 							// See https://www.jenkins.io/doc/book/pipeline/jenkinsfile/#string-interpolation
 							withCredentials([[$class          : 'AmazonWebServicesCredentialsBinding',
 											  credentialsId   : awsCredentialsId,
-											  usernameVariable: 'AWS_ACCESS_KEY_ID',
-											  passwordVariable: 'AWS_SECRET_ACCESS_KEY'
+											  // We use non-standard env variable names because we want the credentials
+											  // to be provided through configuration properties.
+											  // See how ElasticsearchTestHostConnectionConfiguration does that.
+											  accessKeyVariable: 'HIBERNATE_SEARCH_AWS_STATIC_CREDENTIALS_ACCESS_KEY_ID',
+											  secretKeyVariable: 'HIBERNATE_SEARCH_AWS_STATIC_CREDENTIALS_SECRET_ACCESS_KEY'
 											 ]]) {
 
 								// Tests may fail because of hourly AWS snapshots,
@@ -680,8 +683,6 @@ stage('Non-default environments') {
 										-Dtest.elasticsearch.connection.aws.signing.enabled=true \
 										-Dtest.elasticsearch.connection.aws.region=$env.ES_AWS_REGION \
 										-Dtest.elasticsearch.connection.aws.credentials.type=static \
-										-Dtest.elasticsearch.connection.aws.credentials.access_key_id=\${AWS_ACCESS_KEY_ID} \
-										-Dtest.elasticsearch.connection.aws.credentials.secret_access_key=\${AWS_SECRET_ACCESS_KEY} \
 										"""
 										// We're not using ./ci/list-dependent-integration-tests.sh here on purpose:
 										// testing using AWS services is slow, and requires tweaks in test modules,
