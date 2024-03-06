@@ -28,6 +28,7 @@
         <checkstyle.skip>true</checkstyle.skip>
         <forbiddenapis.skip>true</forbiddenapis.skip>
         <format.skip>true</format.skip>
+        <enforcer.dependencyconvergence.skip>true</enforcer.dependencyconvergence.skip>
 
         <tmpdir.dependencies-javadoc-packagelists>${project.build.directory}/dependencies-javadoc-packagelists</tmpdir.dependencies-javadoc-packagelists>
         <tmpdir.dependencies-to-parse>${project.build.directory}/dependencies-to-parse</tmpdir.dependencies-to-parse>
