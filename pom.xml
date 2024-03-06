@@ -296,7 +296,7 @@
         <version.sonar.plugin>3.10.0.2594</version.sonar.plugin>
         <version.scripting.plugin>3.0.0</version.scripting.plugin>
         <version.org.apache.groovy.groovy-jsr223>4.0.13</version.org.apache.groovy.groovy-jsr223>
-        <version.com.puppycrawl.tools.checkstyle>10.9.3</version.com.puppycrawl.tools.checkstyle>
+        <version.com.puppycrawl.tools.checkstyle>10.14.0</version.com.puppycrawl.tools.checkstyle>
         <version.versions.plugin>2.16.2</version.versions.plugin>
         <version.maven-wrapper-plugin>3.2.0</version.maven-wrapper-plugin>
         <version.impsort-maven-plugin>1.9.0</version.impsort-maven-plugin>
