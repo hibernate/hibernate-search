@@ -81,6 +81,7 @@ public class LuceneKnnPredicate extends AbstractLuceneSingleFieldPredicate imple
 		private final Class<?> vectorElementsType;
 		private final int indexedVectorsDimension;
 		private final VectorSimilarityFunction similarityFunction;
+		private final LuceneVectorFieldCodec<F> vectorCodec;
 		private int k;
 		private Object vector;
 		private LuceneSearchPredicate filter;
@@ -91,7 +92,7 @@ public class LuceneKnnPredicate extends AbstractLuceneSingleFieldPredicate imple
 
 			LuceneFieldCodec<F> codec = field.type().codec();
 			if ( codec instanceof LuceneVectorFieldCodec ) {
-				LuceneVectorFieldCodec<F> vectorCodec = (LuceneVectorFieldCodec<F>) codec;
+				vectorCodec = (LuceneVectorFieldCodec<F>) codec;
 				vectorElementsType = vectorCodec.vectorElementsType();
 				indexedVectorsDimension = vectorCodec.getConfiguredDimensions();
 				similarityFunction = vectorCodec.getVectorSimilarity();
@@ -108,6 +109,7 @@ public class LuceneKnnPredicate extends AbstractLuceneSingleFieldPredicate imple
 		}
 
 		@Override
+		@SuppressWarnings("unchecked")
 		public void vector(Object vector) {
 			if ( !vector.getClass().isArray() ) {
 				throw new IllegalArgumentException( "Vector can only be either a float or a byte array (float[], byte[])." );
@@ -121,7 +123,9 @@ public class LuceneKnnPredicate extends AbstractLuceneSingleFieldPredicate imple
 						Array.getLength( vector )
 				);
 			}
-			this.vector = vector;
+
+			// we just checked the array type above, so we do the cast:
+			this.vector = vectorCodec.encode( (F) vector );
 		}
 
 		@Override

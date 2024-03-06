@@ -744,4 +744,12 @@ public interface Log extends BasicLogger {
 	@Message(id = ID_OFFSET + 183, value = "Failed to apply '%1$s' to '%2$s': '%3$s'")
 	SearchException unableToPerformAnalysisOperation(String analyzerName, String string, String reason,
 			@Cause IOException cause);
+
+	@Message(id = ID_OFFSET + 184, value = "The cosine vector similarity cannot process vectors with 0 magnitude. "
+			+ "The vector violating this constraint is %1$s.")
+	SearchException vectorCosineZeroMagnitudeNotAcceptable(Object vector);
+
+	@Message(id = ID_OFFSET + 185, value = "The dot product vector similarity cannot process non-unit magnitude vectors. "
+			+ "The vector violating this constraint is %1$s.")
+	SearchException vectorDotProductNonUnitMagnitudeNotAcceptable(Object vector);
 }
