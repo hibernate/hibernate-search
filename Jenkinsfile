@@ -231,7 +231,7 @@ stage('Configure') {
 					// so we don't test them
 					// See https://hibernate.atlassian.net/browse/HSEARCH-4340
 					new LocalElasticsearchBuildEnvironment(version: '7.16.3', condition: TestCondition.ON_DEMAND),
-					new LocalElasticsearchBuildEnvironment(version: '7.17.16', condition: TestCondition.AFTER_MERGE),
+					new LocalElasticsearchBuildEnvironment(version: '7.17.18', condition: TestCondition.AFTER_MERGE),
 					// Not testing 8.0 because we know there are problems in 8.0.1 (see https://hibernate.atlassian.net/browse/HSEARCH-4497)
 					// Not testing 8.1-8.6 to make the build quicker.
 					new LocalElasticsearchBuildEnvironment(version: '8.1.3', condition: TestCondition.ON_DEMAND),
