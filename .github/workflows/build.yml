@@ -135,7 +135,7 @@ jobs:
             echo EOF
           } >> "$GITHUB_ENV"
       - name: Upload build reports (if build failed)
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         if: ${{ failure() || cancelled() }}
         with:
           name: ${{ format('build-reports-{0}', matrix.os.name ) }}
