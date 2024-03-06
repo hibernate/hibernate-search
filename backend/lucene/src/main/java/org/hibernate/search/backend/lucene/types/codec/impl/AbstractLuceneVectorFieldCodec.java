@@ -6,9 +6,13 @@
  */
 package org.hibernate.search.backend.lucene.types.codec.impl;
 
+import java.lang.invoke.MethodHandles;
 import java.util.Objects;
+import java.util.function.Consumer;
 
+import org.hibernate.search.backend.lucene.logging.impl.Log;
 import org.hibernate.search.backend.lucene.lowlevel.codec.impl.HibernateSearchKnnVectorsFormat;
+import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
 import org.apache.lucene.codecs.KnnVectorsFormat;
 import org.apache.lucene.document.FieldType;
@@ -20,6 +24,8 @@ import org.apache.lucene.util.BytesRef;
 
 public abstract class AbstractLuceneVectorFieldCodec<F> implements LuceneVectorFieldCodec<F> {
 
+	protected static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
+
 	protected final FieldType fieldType;
 	protected final VectorSimilarityFunction vectorSimilarity;
 	private final int dimension;
@@ -27,15 +33,18 @@ public abstract class AbstractLuceneVectorFieldCodec<F> implements LuceneVectorF
 	private final Indexing indexing;
 	private final F indexNullAsValue;
 	private final HibernateSearchKnnVectorsFormat knnVectorsFormat;
+	private final Consumer<F> checkVectorConsumer;
 
 	protected AbstractLuceneVectorFieldCodec(VectorSimilarityFunction vectorSimilarity, int dimension, Storage storage,
-			Indexing indexing, F indexNullAsValue, HibernateSearchKnnVectorsFormat knnVectorsFormat) {
+			Indexing indexing, F indexNullAsValue, HibernateSearchKnnVectorsFormat knnVectorsFormat,
+			Consumer<F> checkVectorConsumer) {
 		this.vectorSimilarity = vectorSimilarity;
 		this.dimension = dimension;
 		this.storage = storage;
 		this.indexing = indexing;
 		this.indexNullAsValue = indexNullAsValue;
 		this.knnVectorsFormat = knnVectorsFormat;
+		this.checkVectorConsumer = checkVectorConsumer;
 
 		this.fieldType = new FieldType();
 		this.fieldType.setVectorAttributes( dimension, vectorEncoding(), vectorSimilarity );
@@ -52,19 +61,28 @@ public abstract class AbstractLuceneVectorFieldCodec<F> implements LuceneVectorF
 			return;
 		}
 
-		byte[] encodedValue = encode( value );
+		F encodedValue = encode( value );
 
 		if ( Indexing.ENABLED == indexing ) {
-			documentBuilder.addField( createIndexField( absoluteFieldPath, value ) );
+			documentBuilder.addField( createIndexField( absoluteFieldPath, encodedValue ) );
 		}
 		if ( Storage.ENABLED == storage ) {
-			documentBuilder.addField( toStoredField( absoluteFieldPath, encodedValue ) );
+			documentBuilder.addField( toStoredField( absoluteFieldPath, toByteArray( encodedValue ) ) );
 		}
 	}
 
 	private IndexableField toStoredField(String absoluteFieldPath, byte[] encodedValue) {
 		return new StoredField( absoluteFieldPath, new BytesRef( encodedValue ) );
 	}
+
+	@Override
+	public final F encode(F value) {
+		checkVectorConsumer.accept( value );
+
+		return value;
+	}
+
+	protected abstract byte[] toByteArray(F value);
 
 	@Override
 	public boolean isCompatibleWith(LuceneFieldCodec<?> obj) {
