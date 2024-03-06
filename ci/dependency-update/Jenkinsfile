@@ -74,7 +74,7 @@ def pullContainerImages() {
 }
 
 def withMavenWorkspace(Closure body) {
-	var actualJdk = settings().testCompilerTool == null ? 'OpenJDK 17 Latest' : settings().testCompilerTool
+	def actualJdk = settings().testCompilerTool == null ? 'OpenJDK 17 Latest' : settings().testCompilerTool
 	withMaven(jdk: actualJdk, maven: 'Apache Maven 3.9',
 			mavenLocalRepo: env.WORKSPACE_TMP + '/.m2repository',
 			options: [
