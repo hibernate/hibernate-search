@@ -1427,23 +1427,6 @@
                         <updatePolicy>always</updatePolicy>
                     </snapshots>
                 </repository>
-                <!--
-                    Enable the JBoss Snapshots repository, for Hibernate ORM 5.6 in particular.
-                 -->
-                <repository>
-                    <id>jboss-public-repository-group</id>
-                    <name>JBoss Public Maven Repository Snapshots</name>
-                    <url>https://repository.jboss.org/nexus/content/repositories/snapshots/</url>
-                    <layout>default</layout>
-                    <releases>
-                        <enabled>false</enabled>
-                        <updatePolicy>never</updatePolicy>
-                    </releases>
-                    <snapshots>
-                        <enabled>true</enabled>
-                        <updatePolicy>always</updatePolicy>
-                    </snapshots>
-                </repository>
                 <repository>
                     <id>apache-snapshots</id>
                     <url>https://repository.apache.org/content/groups/snapshots</url>
