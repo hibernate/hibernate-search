@@ -36,6 +36,7 @@ updates:
           - "*forbiddenapis*"
           - "*owasp*"
           - "io.github.gitflow-incremental-builder:*"
+          - "com.puppycrawl.tools:*"
           # DB drivers:
           - "com.h2database:h2"
           - "org.apache.derby:derby"
@@ -65,6 +66,8 @@ updates:
           - "org.jsoup:*"
           - "org.ow2.asm:*" # for Surefire/Failsafe plugins to support builds on latest JDKs
           - "org.testcontainers:testcontainers-bom"
+          - "org.junit:*"
+          - "org.jboss.weld.se:*"
           # Eclipse compiler
           - "org.codehaus.plexus:*"
           - "org.eclipse.jdt:*"
