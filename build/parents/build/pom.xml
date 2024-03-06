@@ -129,13 +129,13 @@
         <!-- Test dependencies -->
 
         <!-- >>> Common -->
-        <version.log4j>2.20.0</version.log4j>
+        <version.log4j>2.23.0</version.log4j>
         <version.junit>4.13.2</version.junit>
         <version.junit-jupiter>5.10.0</version.junit-jupiter>
         <version.junit-platform-suite-engine>1.10.0</version.junit-platform-suite-engine>
         <version.org.osgi.core>6.0.0</version.org.osgi.core>
         <!-- Make sure to update Ryuk container version in `ryuk.Dockerfile` whenever updating testcontainers to align it with the lib. -->
-        <version.testcontainers>1.19.6</version.testcontainers>
+        <version.testcontainers>1.19.7</version.testcontainers>
 
         <version.org.hamcrest>2.2</version.org.hamcrest>
         <version.org.mockito>5.11.0</version.org.mockito>
@@ -144,7 +144,7 @@
         <version.org.skyscreamer.jsonassert>1.5.1</version.org.skyscreamer.jsonassert>
         <version.io.takari.junit>1.2.7</version.io.takari.junit>
         <version.com.github.tomakehurst.wiremock>3.0.0-beta-10</version.com.github.tomakehurst.wiremock>
-        <version.org.apache.commons.lang3>3.13.0</version.org.apache.commons.lang3>
+        <version.org.apache.commons.lang3>3.14.0</version.org.apache.commons.lang3>
         <version.org.apache.commons.math3>3.6.1</version.org.apache.commons.math3>
         <!-- When upgrading Avro make sure to create a new payload in EventPayloadSerializationUtilsTest -->
         <version.org.apache.avro>1.11.3</version.org.apache.avro>
@@ -156,7 +156,7 @@
              See https://db.apache.org/derby/derby_downloads.html -->
         <version.org.apache.derby>10.15.2.0</version.org.apache.derby>
         <version.org.postgresql>42.7.2</version.org.postgresql>
-        <version.org.mariadb.jdbc>3.3.2</version.org.mariadb.jdbc>
+        <version.org.mariadb.jdbc>3.3.3</version.org.mariadb.jdbc>
         <version.mysql.mysql-connector-j>8.3.0</version.mysql.mysql-connector-j>
         <version.com.ibm.db2.jcc>11.5.9.0</version.com.ibm.db2.jcc>
         <version.com.oracle.database.jdbc>23.3.0.23.09</version.com.oracle.database.jdbc>
@@ -171,7 +171,7 @@
         <!-- >>> Jakarta Batch: JBeret SE dependencies -->
         <version.org.jboss.marshalling>2.1.4.Final</version.org.jboss.marshalling>
         <version.org.wildfly.security.wildfly-security-manager>1.1.2.Final</version.org.wildfly.security.wildfly-security-manager>
-        <version.org.google.guava>32.1.2-jre</version.org.google.guava>
+        <version.org.google.guava>33.0.0-jre</version.org.google.guava>
 
         <!-- >>> Spring integration tests -->
         <!-- When updating Spring Boot check if it supports JDK23 and enable testing with it if so (see testWithJdk23 profile). -->
@@ -179,7 +179,7 @@
         <!-- Spring Boot 3 Atomikos starter and related libs version: -->
         <version.com.atomikos>6.0.0</version.com.atomikos>
 
-        <version.jsoup>1.15.3</version.jsoup>
+        <version.jsoup>1.17.2</version.jsoup>
 
         <!-- Whether javadoc warnings should fail the build -->
         <failOnJavadocWarning>true</failOnJavadocWarning>

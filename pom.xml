@@ -259,7 +259,7 @@
         <!-- Plugin versions -->
         <version.clean.plugin>3.3.2</version.clean.plugin>
         <version.install.plugin>3.1.1</version.install.plugin>
-        <version.enforcer.plugin>3.4.0</version.enforcer.plugin>
+        <version.enforcer.plugin>3.4.1</version.enforcer.plugin>
         <version.project-info.plugin>3.5.0</version.project-info.plugin>
         <version.japicmp.plugin>0.19.1</version.japicmp.plugin>
         <version.nexus-staging.plugin>1.6.13</version.nexus-staging.plugin>
