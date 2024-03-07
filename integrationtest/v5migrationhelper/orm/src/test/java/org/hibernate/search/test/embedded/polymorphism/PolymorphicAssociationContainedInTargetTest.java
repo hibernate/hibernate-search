@@ -25,7 +25,6 @@ import org.hibernate.search.annotations.IndexedEmbedded;
 import org.hibernate.search.test.SearchTestBase;
 import org.hibernate.search.testsupport.TestForIssue;
 
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
 import org.apache.lucene.index.Term;
@@ -40,7 +39,6 @@ class PolymorphicAssociationContainedInTargetTest extends SearchTestBase {
 
 	// Nominal case: the level3 refers to a level2 of a configured type (DerivedLevel2).
 	@Test
-	@Disabled("https://hibernate.atlassian.net/browse/HHH-17408")
 	void testPolymorphicAssociationConfiguredType() {
 		try ( Session session = openSession() ) {
 			Transaction transaction = session.beginTransaction();
