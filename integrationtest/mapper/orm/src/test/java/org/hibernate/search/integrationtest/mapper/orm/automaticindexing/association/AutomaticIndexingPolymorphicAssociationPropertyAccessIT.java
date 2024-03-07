@@ -23,7 +23,6 @@ import org.hibernate.search.util.impl.test.annotation.PortedFromSearch5;
 import org.hibernate.search.util.impl.test.annotation.TestForIssue;
 
 import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
 import org.junit.jupiter.api.extension.RegisterExtension;
@@ -31,7 +30,6 @@ import org.junit.jupiter.api.extension.RegisterExtension;
 @TestForIssue(jiraKey = "HSEARCH-1241")
 @PortedFromSearch5(original = "org.hibernate.search.test.embedded.polymorphism.PolymorphicAssociationPropertyAccessTest")
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
-@Disabled("https://hibernate.atlassian.net/browse/HHH-17408")
 class AutomaticIndexingPolymorphicAssociationPropertyAccessIT {
 
 	private static final String INIT_NAME = "initname";
