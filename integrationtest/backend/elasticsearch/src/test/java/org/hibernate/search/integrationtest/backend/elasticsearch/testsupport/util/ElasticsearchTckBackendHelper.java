@@ -40,6 +40,12 @@ public class ElasticsearchTckBackendHelper implements TckBackendHelper {
 	}
 
 	@Override
+	public TckBackendSetupStrategy<?> createNoShardingMultiTenancyBackendSetupStrategy() {
+		return createNoShardingBackendSetupStrategy()
+				.setProperty( "multi_tenancy.strategy", "discriminator" );
+	}
+
+	@Override
 	public TckBackendSetupStrategy<?> createAnalysisNotConfiguredBackendSetupStrategy() {
 		return new ElasticsearchTckBackendSetupStrategy()
 				.setProperty( "analysis.configurer", null );
