@@ -879,9 +879,9 @@ public interface Log extends BasicLogger {
 	SearchException missingParameterNameForHighlightProjectionInProjectionConstructor();
 
 	@Message(id = ID_OFFSET + 141,
-			value = "Invalid constructor parameter type: '%1$s'. The highlight projection results in values of type 'List<String>'.")
+			value = "Invalid constructor parameter type: '%1$s'. The highlight projection results in values of type '%2$s'.")
 	SearchException invalidParameterTypeForHighlightProjectionInProjectionConstructor(
-			@FormatWith(ClassFormatter.class) Class<?> rawClass);
+			@FormatWith(ClassFormatter.class) Class<?> rawClass, String expectedClass);
 
 	@Message(id = ID_OFFSET + 142,
 			value = "%1$s defines excludePaths filters that do not match anything."

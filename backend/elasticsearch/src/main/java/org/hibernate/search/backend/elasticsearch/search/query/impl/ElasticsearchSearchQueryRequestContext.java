@@ -24,6 +24,7 @@ import org.hibernate.search.backend.elasticsearch.search.projection.impl.Project
 import org.hibernate.search.engine.backend.session.spi.BackendSessionContext;
 import org.hibernate.search.engine.search.common.spi.SearchQueryElementTypeKey;
 import org.hibernate.search.engine.search.loading.spi.SearchLoadingContext;
+import org.hibernate.search.engine.search.projection.spi.ProjectionAccumulator;
 import org.hibernate.search.engine.spatial.GeoPoint;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
@@ -133,6 +134,21 @@ class ElasticsearchSearchQueryRequestContext implements ProjectionRequestRootCon
 	@Override
 	public ElasticsearchSearchHighlighter queryHighlighter() {
 		return queryHighlighter;
+	}
+
+	@Override
+	public boolean isCompatibleHighlighter(String highlighterName, ProjectionAccumulator.Provider<?, ?> accumulatorProvider) {
+		ElasticsearchSearchHighlighter highlighter = highlighter( highlighterName );
+		if ( ElasticsearchSearchHighlighterImpl.NO_OPTIONS_CONFIGURATION == highlighter ) {
+			// if there was no highlighter configured at all it means that the settings are default,
+			// and we assume that they are incompatible with the single-valued accumulator:
+			return queryHighlighter != null
+					? queryHighlighter.isCompatible( accumulatorProvider )
+					: !accumulatorProvider.isSingleValued();
+		}
+		else {
+			return highlighter.isCompatible( accumulatorProvider );
+		}
 	}
 
 	ElasticsearchSearchQueryExtractContext createExtractContext(JsonObject responseBody) {

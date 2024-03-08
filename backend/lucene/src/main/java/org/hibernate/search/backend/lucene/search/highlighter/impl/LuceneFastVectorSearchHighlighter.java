@@ -42,7 +42,6 @@ import org.apache.lucene.search.vectorhighlight.SimpleFragmentsBuilder;
 import org.apache.lucene.search.vectorhighlight.SingleFragListBuilder;
 
 class LuceneFastVectorSearchHighlighter extends LuceneAbstractSearchHighlighter {
-
 	private static final LuceneFastVectorSearchHighlighter DEFAULTS = new LuceneFastVectorSearchHighlighter(
 			BoundaryScannerType.CHARS
 	);
@@ -87,9 +86,9 @@ class LuceneFastVectorSearchHighlighter extends LuceneAbstractSearchHighlighter 
 	}
 
 	@Override
-	public <A> Values<A> createValues(String parentDocumentPath, String nestedDocumentPath,
+	public <A, T> Values<A> createValues(String parentDocumentPath, String nestedDocumentPath,
 			String absoluteFieldPath, Analyzer analyzer, ProjectionExtractContext context,
-			ProjectionAccumulator<String, ?, A, List<String>> accumulator) {
+			ProjectionAccumulator<String, ?, A, T> accumulator) {
 		return new FastVectorHighlighterValues<>( parentDocumentPath, nestedDocumentPath, absoluteFieldPath, context,
 				accumulator );
 	}
@@ -99,7 +98,7 @@ class LuceneFastVectorSearchHighlighter extends LuceneAbstractSearchHighlighter 
 		return SearchHighlighterType.FAST_VECTOR;
 	}
 
-	private final class FastVectorHighlighterValues<A> extends HighlighterValues<A> {
+	private final class FastVectorHighlighterValues<A, T> extends HighlighterValues<A, T> {
 		private final FastVectorHighlighter highlighter;
 		private final String field;
 		private final Query query;
@@ -111,7 +110,7 @@ class LuceneFastVectorSearchHighlighter extends LuceneAbstractSearchHighlighter 
 		private final Integer maxNumFragments;
 
 		FastVectorHighlighterValues(String parentDocumentPath, String nestedDocumentPath, String field,
-				ProjectionExtractContext context, ProjectionAccumulator<String, ?, A, List<String>> accumulator) {
+				ProjectionExtractContext context, ProjectionAccumulator<String, ?, A, T> accumulator) {
 			super( parentDocumentPath, nestedDocumentPath, context.collectorExecutionContext(), accumulator );
 			this.field = field;
 
@@ -136,8 +135,7 @@ class LuceneFastVectorSearchHighlighter extends LuceneAbstractSearchHighlighter 
 				this.fragmentsBuilder = builder;
 			}
 			else {
-				SimpleFragmentsBuilder builder = new SimpleFragmentsBuilder(
-						this.preTags, this.postTags, boundaryScanner );
+				SimpleFragmentsBuilder builder = new SimpleFragmentsBuilder( this.preTags, this.postTags, boundaryScanner );
 				builder.setDiscreteMultiValueHighlighting( true );
 				this.fragmentsBuilder = builder;
 			}

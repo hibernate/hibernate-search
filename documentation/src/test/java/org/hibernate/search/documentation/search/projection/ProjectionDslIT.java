@@ -865,6 +865,19 @@ class ProjectionDslIT {
 					Collections.singletonList( "The Automatic <em>Detective</em>" )
 			);
 		} );
+		withinSearchSession( searchSession -> {
+			// tag::highlight-single-value[]
+			List<String> hits = searchSession.search( Book.class )
+					.select( f -> f.highlight( "title" ).single() ) // <1>
+					.where( f -> f.match().field( "title" ).matching( "detective" ) )
+					.highlighter( f -> f.unified()
+							.numberOfFragments( 1 ) ) // <2>
+					.fetchHits( 20 );
+			// end::highlight-single-value[]
+			assertThat( hits ).containsExactlyInAnyOrder(
+					"The Automatic <em>Detective</em>"
+			);
+		} );
 
 		withinSearchSession( searchSession -> {
 			// tag::highlight-multiValued[]

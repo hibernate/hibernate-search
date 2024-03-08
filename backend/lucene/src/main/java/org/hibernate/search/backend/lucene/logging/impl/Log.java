@@ -752,4 +752,8 @@ public interface Log extends BasicLogger {
 	@Message(id = ID_OFFSET + 185, value = "The dot product vector similarity cannot process non-unit magnitude vectors. "
 			+ "The vector violating this constraint is %1$s.")
 	SearchException vectorDotProductNonUnitMagnitudeNotAcceptable(Object vector);
+
+	@Message(id = ID_OFFSET + 186, value = "A single-valued highlight projection requested, "
+			+ "but the corresponding highlighter does not set number of fragments to 1.")
+	SearchException highlighterIncompatibleCardinality();
 }

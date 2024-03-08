@@ -203,6 +203,29 @@ abstract class AbstractHighlighterIT {
 	}
 
 	@Test
+	void lastHighlighterWins() {
+		StubMappingScope scope = index.createScope();
+
+		SearchQuery<List<String>> highlights = scope.query().select(
+				f -> f.highlight( "string" )
+						.highlighter( "does-not-exist" )
+						.highlighter( "some-unused-highlighter" )
+						.highlighter( "strong-tag-highlighter" )
+		)
+				.where( f -> f.match().field( "string" ).matching( "another" ) )
+				.highlighter( "strong-tag-highlighter", h2 -> highlighter( h2 ).tag( "<strong>", "</strong>" ) )
+				.highlighter( "some-unused-highlighter",
+						h2 -> highlighter( h2 ).tag( "<strong>", "</strong>" ).numberOfFragments( 1 ) )
+				.toQuery();
+
+		assertThatHits( highlights.fetchAllHits() )
+				.hasHitsAnyOrder(
+						Arrays.asList( "some <strong>another</strong> value" ),
+						Arrays.asList( "some yet <strong>another</strong> value" )
+				);
+	}
+
+	@Test
 	void customTagOverride() {
 		StubMappingScope scope = index.createScope();
 
@@ -407,6 +430,82 @@ abstract class AbstractHighlighterIT {
 				.hasHitsAnyOrder(
 						numberOfFragmentsResult()
 				);
+	}
+
+	@Test
+	void numberOfFragmentsSingle() {
+		StubMappingScope scope = index.createScope();
+
+		SearchQuery<String> highlights = scope.query().select(
+				f -> f.highlight( "anotherString" ).single()
+		)
+				.where( f -> f.match().field( "anotherString" ).matching( "ipsum" ) )
+				.highlighter( h -> highlighter( h ).numberOfFragments( 1 ) )
+				.toQuery();
+
+		assertThatHits( highlights.fetchAllHits() )
+				.hasHitsAnyOrder(
+						numberOfFragmentsResult()
+				);
+	}
+
+	@Test
+	void numberOfFragmentsSingleNamedHighlighter() {
+		StubMappingScope scope = index.createScope();
+
+		SearchQuery<String> highlights = scope.query().select(
+				f -> f.highlight( "anotherString" ).highlighter( "single" ).single()
+		)
+				.where( f -> f.match().field( "anotherString" ).matching( "ipsum" ) )
+				.highlighter( "single", h -> highlighter( h ).numberOfFragments( 1 ) )
+				.toQuery();
+
+		assertThatHits( highlights.fetchAllHits() )
+				.hasHitsAnyOrder(
+						numberOfFragmentsResult()
+				);
+	}
+
+	@Test
+	void numberOfFragmentsSingleError() {
+		StubMappingScope scope = index.createScope();
+
+		// numberOfFragments > 1
+		assertThatThrownBy( () -> scope.query().select(
+				f -> f.highlight( "anotherString" ).single()
+		)
+				.where( f -> f.match().field( "anotherString" ).matching( "ipsum" ) )
+				.highlighter( h -> highlighter( h ).numberOfFragments( 2 ) )
+				.toQuery()
+		).isInstanceOf( SearchException.class )
+				.hasMessageContainingAll(
+						"A single-valued highlight projection requested, but the corresponding highlighter does not set number of fragments to 1" );
+
+		// numberOfFragments not defined
+		assertThatThrownBy( () -> scope.query().select(
+				f -> f.highlight( "anotherString" ).single()
+		)
+				.where( f -> f.match().field( "anotherString" ).matching( "ipsum" ) )
+				.highlighter( h -> highlighter( h ) )
+				.toQuery()
+		).isInstanceOf( SearchException.class )
+				.hasMessageContainingAll(
+						"A single-valued highlight projection requested, but the corresponding highlighter does not set number of fragments to 1" );
+	}
+
+	@Test
+	void numberOfFragmentsSingleButNoExpectedValuesReturned() {
+		StubMappingScope scope = index.createScope();
+
+		SearchQuery<String> highlights = scope.query().select(
+				f -> f.highlight( "anotherString" ).single()
+		)
+				.where( f -> f.match().field( "anotherString" ).matching( "thisCannotBeMatchedToAnythingInTheText" ) )
+				.highlighter( h -> highlighter( h ).numberOfFragments( 1 ) )
+				.toQuery();
+
+		assertThatHits( highlights.fetchAllHits() )
+				.hasHitsAnyOrder( List.of() );
 	}
 
 	protected List<String> numberOfFragmentsResult() {

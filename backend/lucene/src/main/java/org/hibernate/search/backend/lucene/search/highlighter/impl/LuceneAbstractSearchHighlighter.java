@@ -189,9 +189,14 @@ public abstract class LuceneAbstractSearchHighlighter implements SearchHighlight
 		return indexNames;
 	}
 
-	public abstract <A> Values<A> createValues(String parentDocumentPath, String nestedDocumentPath,
+	public abstract <A, T> Values<A> createValues(String parentDocumentPath, String nestedDocumentPath,
 			String absoluteFieldPath, Analyzer analyzer, ProjectionExtractContext context,
-			ProjectionAccumulator<String, ?, A, List<String>> accumulator);
+			ProjectionAccumulator<String, ?, A, T> accumulator);
+
+	public boolean isCompatible(ProjectionAccumulator.Provider<?, ?> provider) {
+		return !provider.isSingleValued()
+				|| ( provider.isSingleValued() && ( numberOfFragments != null && numberOfFragments.equals( 1 ) ) );
+	}
 
 	public abstract SearchHighlighterType type();
 

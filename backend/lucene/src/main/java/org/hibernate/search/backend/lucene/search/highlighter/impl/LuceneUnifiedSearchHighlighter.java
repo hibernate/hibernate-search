@@ -90,9 +90,9 @@ class LuceneUnifiedSearchHighlighter extends LuceneAbstractSearchHighlighter {
 	}
 
 	@Override
-	public <A> Values<A> createValues(String parentDocumentPath, String nestedDocumentPath,
+	public <A, T> Values<A> createValues(String parentDocumentPath, String nestedDocumentPath,
 			String absoluteFieldPath, Analyzer analyzer, ProjectionExtractContext context,
-			ProjectionAccumulator<String, ?, A, List<String>> accumulator) {
+			ProjectionAccumulator<String, ?, A, T> accumulator) {
 		return new UnifiedHighlighterValues<>(
 				parentDocumentPath, nestedDocumentPath, absoluteFieldPath, analyzer, context, accumulator );
 	}
@@ -103,7 +103,7 @@ class LuceneUnifiedSearchHighlighter extends LuceneAbstractSearchHighlighter {
 	}
 
 
-	private final class UnifiedHighlighterValues<A> extends HighlighterValues<A> {
+	private final class UnifiedHighlighterValues<A, T> extends HighlighterValues<A, T> {
 
 		private final String[] fieldsIn;
 		private final int[] maxPassagesIn;
@@ -111,7 +111,7 @@ class LuceneUnifiedSearchHighlighter extends LuceneAbstractSearchHighlighter {
 		private final MultiValueUnifiedHighlighter highlighter;
 
 		UnifiedHighlighterValues(String parentDocumentPath, String nestedDocumentPath, String field, Analyzer analyzer,
-				ProjectionExtractContext context, ProjectionAccumulator<String, ?, A, List<String>> accumulator) {
+				ProjectionExtractContext context, ProjectionAccumulator<String, ?, A, T> accumulator) {
 			super( parentDocumentPath, nestedDocumentPath, context.collectorExecutionContext(), accumulator );
 			this.fieldsIn = new String[] { field };
 			this.maxPassagesIn = new int[] { LuceneUnifiedSearchHighlighter.this.numberOfFragments };

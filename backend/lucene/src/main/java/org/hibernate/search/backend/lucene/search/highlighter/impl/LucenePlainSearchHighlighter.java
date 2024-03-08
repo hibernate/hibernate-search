@@ -87,9 +87,9 @@ class LucenePlainSearchHighlighter extends LuceneAbstractSearchHighlighter {
 	}
 
 	@Override
-	public <A> Values<A> createValues(String parentDocumentPath, String nestedDocumentPath,
+	public <A, T> Values<A> createValues(String parentDocumentPath, String nestedDocumentPath,
 			String absoluteFieldPath, Analyzer analyzer, ProjectionExtractContext context,
-			ProjectionAccumulator<String, ?, A, List<String>> accumulator) {
+			ProjectionAccumulator<String, ?, A, T> accumulator) {
 		return new PlainHighlighterValues<>(
 				parentDocumentPath, nestedDocumentPath, absoluteFieldPath, analyzer, context, accumulator );
 	}
@@ -104,14 +104,14 @@ class LucenePlainSearchHighlighter extends LuceneAbstractSearchHighlighter {
 		context.requireStoredField( absoluteFieldPath, context.absoluteCurrentNestedFieldPath() );
 	}
 
-	private final class PlainHighlighterValues<A> extends HighlighterValues<A> {
+	private final class PlainHighlighterValues<A, T> extends HighlighterValues<A, T> {
 		private final StoredFieldsValuesDelegate storedFieldsValuesDelegate;
 		private final Highlighter highlighter;
 		private final Analyzer analyzer;
 		private final String field;
 
 		PlainHighlighterValues(String parentDocumentPath, String nestedDocumentPath, String field, Analyzer analyzer,
-				ProjectionExtractContext context, ProjectionAccumulator<String, ?, A, List<String>> accumulator) {
+				ProjectionExtractContext context, ProjectionAccumulator<String, ?, A, T> accumulator) {
 			super( parentDocumentPath, nestedDocumentPath, context.collectorExecutionContext(), accumulator );
 			this.storedFieldsValuesDelegate = context.collectorExecutionContext().storedFieldsValuesDelegate();
 			this.field = field;
@@ -184,7 +184,7 @@ class LucenePlainSearchHighlighter extends LuceneAbstractSearchHighlighter {
 							continue;
 						}
 						String text = indexableField.stringValue();
-						if ( text.length() > 0 ) {
+						if ( !text.isEmpty() ) {
 							return Collections.singletonList( text.substring(
 									0,
 									Math.min( LucenePlainSearchHighlighter.this.noMatchSize, text.length() )
