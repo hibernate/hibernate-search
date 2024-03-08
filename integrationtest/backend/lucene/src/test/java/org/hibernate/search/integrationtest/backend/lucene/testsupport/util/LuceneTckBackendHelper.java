@@ -39,6 +39,12 @@ public class LuceneTckBackendHelper implements TckBackendHelper {
 	}
 
 	@Override
+	public TckBackendSetupStrategy<?> createNoShardingMultiTenancyBackendSetupStrategy() {
+		return createNoShardingBackendSetupStrategy()
+				.setProperty( "multi_tenancy.strategy", "discriminator" );
+	}
+
+	@Override
 	public TckBackendSetupStrategy<?> createAnalysisCustomBackendSetupStrategy() {
 		return new LuceneTckBackendSetupStrategy()
 				.expectCustomBeans()

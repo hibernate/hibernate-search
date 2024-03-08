@@ -39,6 +39,7 @@ import org.hibernate.search.util.impl.test.extension.parameterized.Parameterized
 import org.hibernate.search.util.impl.test.extension.parameterized.ParameterizedSetup;
 import org.hibernate.search.util.impl.test.extension.parameterized.ParameterizedSetupBeforeTest;
 
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
 import org.junit.jupiter.params.provider.Arguments;
@@ -70,13 +71,14 @@ class MultiTenancyBaseIT {
 	@RegisterExtension
 	public static final SearchSetupHelper setupHelper = SearchSetupHelper.create();
 
-	private final SimpleMappedIndex<IndexBinding> index = SimpleMappedIndex.of( IndexBinding::new );
+	private static final SimpleMappedIndex<IndexBinding> index = SimpleMappedIndex.of( IndexBinding::new );
 
 	private StubSession tenant1SessionContext;
 	private StubSession tenant2SessionContext;
 
 	private Object tenant1;
 	private Object tenant2;
+	private static StubMapping mapping;
 
 	public static List<? extends Arguments> params() {
 		return List.of(
@@ -85,6 +87,13 @@ class MultiTenancyBaseIT {
 				Arguments.of( UUID.fromString( "55555555-7777-6666-9999-000000000001" ),
 						UUID.fromString( "55555555-7777-6666-9999-000000000002" ) )
 		);
+	}
+
+	@BeforeAll
+	static void beforeAll() {
+		mapping = setupHelper.start( TckBackendHelper::createNoShardingMultiTenancyBackendSetupStrategy )
+				.withIndex( index ).withMultiTenancy()
+				.setup();
 	}
 
 	@ParameterizedSetup
@@ -96,10 +105,6 @@ class MultiTenancyBaseIT {
 
 	@ParameterizedSetupBeforeTest
 	void setup() {
-		StubMapping mapping = setupHelper.start( TckBackendHelper::createMultiTenancyBackendSetupStrategy )
-				.withIndex( index ).withMultiTenancy()
-				.setup();
-
 		tenant1SessionContext = mapping.session( tenant1 );
 		tenant2SessionContext = mapping.session( tenant2 );
 
@@ -474,7 +479,7 @@ class MultiTenancyBaseIT {
 
 	private void initData() {
 		IndexIndexingPlan plan = index.createIndexingPlan( tenant1SessionContext );
-		plan.add( referenceProvider( DOCUMENT_ID_1 ), document -> {
+		plan.addOrUpdate( referenceProvider( DOCUMENT_ID_1 ), document -> {
 			document.addValue( index.binding().string, STRING_VALUE_1 );
 			document.addValue( index.binding().integer, INTEGER_VALUE_1 );
 			if ( TckConfiguration.get().getBackendFeatures().supportsVectorSearch() ) {
@@ -489,7 +494,7 @@ class MultiTenancyBaseIT {
 			}
 		} );
 
-		plan.add( referenceProvider( DOCUMENT_ID_2 ), document -> {
+		plan.addOrUpdate( referenceProvider( DOCUMENT_ID_2 ), document -> {
 			document.addValue( index.binding().string, STRING_VALUE_2 );
 			document.addValue( index.binding().integer, INTEGER_VALUE_2 );
 			if ( TckConfiguration.get().getBackendFeatures().supportsVectorSearch() ) {
@@ -507,7 +512,7 @@ class MultiTenancyBaseIT {
 		plan.execute( OperationSubmitter.blocking() ).join();
 
 		plan = index.createIndexingPlan( tenant2SessionContext );
-		plan.add( referenceProvider( DOCUMENT_ID_1 ), document -> {
+		plan.addOrUpdate( referenceProvider( DOCUMENT_ID_1 ), document -> {
 			document.addValue( index.binding().string, STRING_VALUE_1 );
 			document.addValue( index.binding().integer, INTEGER_VALUE_3 );
 			if ( TckConfiguration.get().getBackendFeatures().supportsVectorSearch() ) {
@@ -522,7 +527,7 @@ class MultiTenancyBaseIT {
 			}
 		} );
 
-		plan.add( referenceProvider( DOCUMENT_ID_2 ), document -> {
+		plan.addOrUpdate( referenceProvider( DOCUMENT_ID_2 ), document -> {
 			document.addValue( index.binding().string, STRING_VALUE_2 );
 			document.addValue( index.binding().integer, INTEGER_VALUE_4 );
 			if ( TckConfiguration.get().getBackendFeatures().supportsVectorSearch() ) {

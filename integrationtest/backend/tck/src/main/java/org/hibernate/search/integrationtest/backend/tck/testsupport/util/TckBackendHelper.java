@@ -19,6 +19,8 @@ public interface TckBackendHelper {
 
 	TckBackendSetupStrategy<?> createMultiTenancyBackendSetupStrategy();
 
+	TckBackendSetupStrategy<?> createNoShardingMultiTenancyBackendSetupStrategy();
+
 	/**
 	 * @return A setup strategy for {@link org.hibernate.search.integrationtest.backend.tck.analysis.AnalysisBuiltinIT}.
 	 */
