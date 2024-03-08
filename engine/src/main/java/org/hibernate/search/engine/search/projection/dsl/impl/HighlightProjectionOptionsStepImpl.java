@@ -11,8 +11,10 @@ import java.util.List;
 import org.hibernate.search.engine.search.projection.SearchProjection;
 import org.hibernate.search.engine.search.projection.dsl.HighlightProjectionFinalStep;
 import org.hibernate.search.engine.search.projection.dsl.HighlightProjectionOptionsStep;
+import org.hibernate.search.engine.search.projection.dsl.SingleHighlightProjectionFinalStep;
 import org.hibernate.search.engine.search.projection.dsl.spi.HighlightProjectionBuilder;
 import org.hibernate.search.engine.search.projection.dsl.spi.SearchProjectionDslContext;
+import org.hibernate.search.engine.search.projection.spi.ProjectionAccumulator;
 import org.hibernate.search.engine.search.projection.spi.ProjectionTypeKeys;
 
 public class HighlightProjectionOptionsStepImpl
@@ -26,13 +28,26 @@ public class HighlightProjectionOptionsStepImpl
 	}
 
 	@Override
-	public HighlightProjectionFinalStep highlighter(String highlighterName) {
+	public HighlightProjectionOptionsStep highlighter(String highlighterName) {
 		highlight.highlighter( highlighterName );
 		return this;
 	}
 
 	@Override
+	public SingleHighlightProjectionFinalStep single() {
+		return new SingleHighlightProjectionFinalStepImpl();
+	}
+
+	@Override
 	public SearchProjection<List<String>> toProjection() {
-		return highlight.build();
+		return highlight.build( ProjectionAccumulator.list() );
+	}
+
+	private class SingleHighlightProjectionFinalStepImpl implements SingleHighlightProjectionFinalStep {
+		@Override
+		public SearchProjection<String> toProjection() {
+			return highlight.build( ProjectionAccumulator.single() );
+		}
+
 	}
 }

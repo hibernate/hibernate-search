@@ -224,16 +224,28 @@ class ProjectionConstructorHighlightProjectionIT extends AbstractProjectionConst
 			}
 		}
 
-		assertThatThrownBy( () -> setupHelper.start()
+		backendMock.expectAnySchema( INDEX_NAME );
+		SearchMapping mapping = setupHelper.start()
 				.withAnnotatedTypes( MyProjection.class )
-				.setup( IndexedEntity.class ) )
-				.isInstanceOf( SearchException.class )
-				.satisfies( FailureReportUtils.hasFailureReport()
-						.typeContext( MyProjection.class.getName() )
-						.constructorContext( ProjectionConstructorHighlightProjectionIT.class, String.class )
-						.methodParameterContext( 1, "text" )
-						.failure( "Invalid constructor parameter type: 'java.lang.String'",
-								"The highlight projection results in values of type 'List<String>'" ) );
+				.setup( IndexedEntity.class );
+
+		testSuccessfulRootProjection(
+				mapping, IndexedEntity.class, MyProjection.class,
+				Arrays.asList(
+						Arrays.asList( "result1_term1" ),
+						Arrays.asList( "result1_term1" )
+				),
+				f -> f.composite()
+						.from(
+								dummyProjectionForEnclosingClassInstance( f ),
+								f.highlight( "text" ).single()
+						)
+						.asList(),
+				Arrays.asList(
+						new MyProjection( "result1_term1" ),
+						new MyProjection( "result1_term1" )
+				)
+		);
 	}
 
 	// Technically this is not supported on the backend side,
@@ -420,8 +432,8 @@ class ProjectionConstructorHighlightProjectionIT extends AbstractProjectionConst
 						.typeContext( MyProjection.class.getName() )
 						.constructorContext( ProjectionConstructorHighlightProjectionIT.class, Set.class )
 						.methodParameterContext( 1, "text" )
-						.failure( "Invalid constructor parameter type: 'java.util.Set'",
-								"The highlight projection results in values of type 'List<String>'" ) );
+						.failure( "Invalid parameter type for projection constructor: java.util.Set<java.lang.String>",
+								"When inferring the cardinality of inner projections from constructor parameters, multi-valued constructor parameters must be lists (java.util.List<...>) or list supertypes (java.lang.Iterable<...>, java.util.Collection<...>)" ) );
 	}
 
 	@Test

@@ -19,13 +19,14 @@ import org.hibernate.search.backend.lucene.search.common.impl.LuceneSearchIndexV
 import org.hibernate.search.backend.lucene.search.highlighter.impl.LuceneAbstractSearchHighlighter;
 import org.hibernate.search.engine.reporting.spi.EventContexts;
 import org.hibernate.search.engine.search.loading.spi.LoadingResult;
+import org.hibernate.search.engine.search.projection.SearchProjection;
 import org.hibernate.search.engine.search.projection.dsl.spi.HighlightProjectionBuilder;
 import org.hibernate.search.engine.search.projection.spi.ProjectionAccumulator;
 
 import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.index.LeafReaderContext;
 
-public class LuceneFieldHighlightProjection implements LuceneSearchProjection<List<String>> {
+public class LuceneFieldHighlightProjection<T> implements LuceneSearchProjection<T> {
 
 	private final Set<String> indexNames;
 	private final Analyzer analyzer;
@@ -33,20 +34,22 @@ public class LuceneFieldHighlightProjection implements LuceneSearchProjection<Li
 	private final String highlighterName;
 	private final String nestedDocumentPath;
 	private final LuceneSearchIndexValueFieldTypeContext<?> typeContext;
+	private final ProjectionAccumulator.Provider<String, T> accumulatorProvider;
 
-	private LuceneFieldHighlightProjection(Builder builder) {
-		this( builder.scope, builder.field, builder.highlighterName() );
+	private LuceneFieldHighlightProjection(Builder builder, ProjectionAccumulator.Provider<String, T> accumulatorProvider) {
+		this( builder.scope, builder.field, builder.highlighterName(), accumulatorProvider );
 	}
 
 	LuceneFieldHighlightProjection(LuceneSearchIndexScope<?> scope,
 			LuceneSearchIndexValueFieldContext<?> field,
-			String highlighterName) {
+			String highlighterName, ProjectionAccumulator.Provider<String, T> accumulatorProvider) {
 		this.indexNames = scope.hibernateSearchIndexNames();
 		this.analyzer = field.type().searchAnalyzerOrNormalizer();
 		this.absoluteFieldPath = field.absolutePath();
 		this.highlighterName = highlighterName;
 		this.nestedDocumentPath = field.nestedDocumentPath();
 		this.typeContext = field.type();
+		this.accumulatorProvider = accumulatorProvider;
 	}
 
 	@Override
@@ -63,7 +66,7 @@ public class LuceneFieldHighlightProjection implements LuceneSearchProjection<Li
 	}
 
 	@Override
-	public FieldHighlightExtractor<?> request(ProjectionRequestContext context) {
+	public Extractor<?, T> request(ProjectionRequestContext context) {
 		if ( context.absoluteCurrentFieldPath() != null ) {
 			throw log.cannotHighlightInNestedContext(
 					context.absoluteCurrentFieldPath(),
@@ -76,20 +79,23 @@ public class LuceneFieldHighlightProjection implements LuceneSearchProjection<Li
 			throw log.highlighterTypeNotSupported( highlighter.type(), absoluteFieldPath );
 		}
 		highlighter.request( context, absoluteFieldPath );
+		if ( !highlighter.isCompatible( accumulatorProvider ) ) {
+			throw log.highlighterIncompatibleCardinality();
+		}
 
 		return new FieldHighlightExtractor<>( context.absoluteCurrentNestedFieldPath(), highlighter,
-				ProjectionAccumulator.<String>list().get() );
+				accumulatorProvider.get()
+		);
 	}
 
 
-	private class FieldHighlightExtractor<A> implements Extractor<A, List<String>> {
+	private class FieldHighlightExtractor<A> implements Extractor<A, T> {
 		private final String parentDocumentPath;
 		private final LuceneAbstractSearchHighlighter highlighter;
-
-		private final ProjectionAccumulator<String, String, A, List<String>> accumulator;
+		private final ProjectionAccumulator<String, String, A, T> accumulator;
 
 		private FieldHighlightExtractor(String parentDocumentPath, LuceneAbstractSearchHighlighter highlighter,
-				ProjectionAccumulator<String, String, A, List<String>> accumulator) {
+				ProjectionAccumulator<String, String, A, T> accumulator) {
 			this.parentDocumentPath = parentDocumentPath;
 			this.highlighter = highlighter;
 			this.accumulator = accumulator;
@@ -108,19 +114,19 @@ public class LuceneFieldHighlightProjection implements LuceneSearchProjection<Li
 		}
 
 		@Override
-		public List<String> transform(LoadingResult<?> loadingResult, A extractedData,
+		public T transform(LoadingResult<?> loadingResult, A extractedData,
 				ProjectionTransformContext context) {
 			return accumulator.finish( extractedData );
 		}
 	}
 
-	public abstract static class HighlighterValues<A> extends AbstractNestingAwareAccumulatingValues<String, A> {
+	public abstract static class HighlighterValues<A, T> extends AbstractNestingAwareAccumulatingValues<String, A> {
 
 		protected LeafReaderContext leafReaderContext;
 
 		protected HighlighterValues(String parentDocumentPath, String nestedDocumentPath,
 				TopDocsDataCollectorExecutionContext context,
-				ProjectionAccumulator<String, ?, A, List<String>> accumulator) {
+				ProjectionAccumulator<String, ?, A, T> accumulator) {
 			super( parentDocumentPath, nestedDocumentPath, accumulator, context );
 		}
 
@@ -171,8 +177,8 @@ public class LuceneFieldHighlightProjection implements LuceneSearchProjection<Li
 		}
 
 		@Override
-		public LuceneFieldHighlightProjection build() {
-			return new LuceneFieldHighlightProjection( this );
+		public <V> SearchProjection<V> build(ProjectionAccumulator.Provider<String, V> accumulatorProvider) {
+			return new LuceneFieldHighlightProjection<>( this, accumulatorProvider );
 		}
 	}
 }

@@ -7,17 +7,17 @@
 package org.hibernate.search.util.impl.integrationtest.common.stub.backend.search.projection.impl;
 
 import java.util.Iterator;
-import java.util.List;
 
 import org.hibernate.search.engine.search.loading.spi.LoadingResult;
 import org.hibernate.search.engine.search.loading.spi.ProjectionHitMapper;
 import org.hibernate.search.engine.search.projection.SearchProjection;
 import org.hibernate.search.engine.search.projection.dsl.spi.HighlightProjectionBuilder;
+import org.hibernate.search.engine.search.projection.spi.ProjectionAccumulator;
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.search.common.impl.AbstractStubSearchQueryElementFactory;
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.search.common.impl.StubSearchIndexNodeContext;
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.search.common.impl.StubSearchIndexScope;
 
-public class StubFieldHighlightProjection extends StubSearchProjection<List<String>> {
+public class StubFieldHighlightProjection<T> extends StubSearchProjection<T> {
 	private final String fieldPath;
 	private final String highlighterName;
 
@@ -34,9 +34,9 @@ public class StubFieldHighlightProjection extends StubSearchProjection<List<Stri
 
 	@Override
 	@SuppressWarnings("unchecked")
-	public List<String> transform(LoadingResult<?> loadingResult, Object extractedData,
+	public T transform(LoadingResult<?> loadingResult, Object extractedData,
 			StubSearchProjectionContext context) {
-		return (List<String>) extractedData;
+		return (T) extractedData;
 	}
 
 	@Override
@@ -64,8 +64,8 @@ public class StubFieldHighlightProjection extends StubSearchProjection<List<Stri
 		}
 
 		@Override
-		public SearchProjection<List<String>> build() {
-			return new StubFieldHighlightProjection( path, highlighterName );
+		public <V> SearchProjection<V> build(ProjectionAccumulator.Provider<String, V> accumulatorProvider) {
+			return new StubFieldHighlightProjection<>( path, highlighterName );
 		}
 	}
 }

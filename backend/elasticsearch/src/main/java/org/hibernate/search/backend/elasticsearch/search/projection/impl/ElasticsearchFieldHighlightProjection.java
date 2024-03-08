@@ -6,9 +6,6 @@
  */
 package org.hibernate.search.backend.elasticsearch.search.projection.impl;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 
@@ -24,13 +21,15 @@ import org.hibernate.search.engine.reporting.spi.EventContexts;
 import org.hibernate.search.engine.search.highlighter.spi.SearchHighlighterType;
 import org.hibernate.search.engine.search.loading.spi.LoadingResult;
 import org.hibernate.search.engine.search.loading.spi.ProjectionHitMapper;
+import org.hibernate.search.engine.search.projection.SearchProjection;
 import org.hibernate.search.engine.search.projection.dsl.spi.HighlightProjectionBuilder;
+import org.hibernate.search.engine.search.projection.spi.ProjectionAccumulator;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 
-public class ElasticsearchFieldHighlightProjection implements ElasticsearchSearchProjection<List<String>> {
+public class ElasticsearchFieldHighlightProjection<T> implements ElasticsearchSearchProjection<T> {
 
 	private static final JsonObjectAccessor REQUEST_HIGHLIGHT_FIELDS_ACCESSOR =
 			JsonAccessor.root().property( "highlight" ).asObject().property( "fields" ).asObject();
@@ -41,19 +40,23 @@ public class ElasticsearchFieldHighlightProjection implements ElasticsearchSearc
 
 	private final String highlighterName;
 	private final ElasticsearchSearchIndexValueFieldTypeContext<?> typeContext;
+	private final ProjectionAccumulator.Provider<String, T> accumulatorProvider;
 
-	private ElasticsearchFieldHighlightProjection(Builder builder) {
-		this( builder.scope, builder.field, builder.highlighterName() );
+	private ElasticsearchFieldHighlightProjection(Builder builder,
+			ProjectionAccumulator.Provider<String, T> accumulatorProvider) {
+		this( builder.scope, builder.field, builder.highlighterName(), accumulatorProvider );
 	}
 
 	private ElasticsearchFieldHighlightProjection(ElasticsearchSearchIndexScope<?> scope,
 			ElasticsearchSearchIndexValueFieldContext<?> field,
-			String highlighterName) {
+			String highlighterName,
+			ProjectionAccumulator.Provider<String, T> accumulatorProvider) {
 		this.indexNames = scope.hibernateSearchIndexNames();
 		this.absoluteFieldPath = field.absolutePath();
 		this.absoluteFieldPathComponents = field.absolutePathComponents();
 		this.highlighterName = highlighterName;
 		this.typeContext = field.type();
+		this.accumulatorProvider = accumulatorProvider;
 	}
 
 	@Override
@@ -70,7 +73,7 @@ public class ElasticsearchFieldHighlightProjection implements ElasticsearchSearc
 	}
 
 	@Override
-	public FieldHighlightExtractor request(JsonObject requestBody, ProjectionRequestContext context) {
+	public Extractor<?, T> request(JsonObject requestBody, ProjectionRequestContext context) {
 		if ( context.absoluteCurrentFieldPath() != null ) {
 			throw log.cannotHighlightInNestedContext(
 					context.absoluteCurrentFieldPath(),
@@ -92,40 +95,43 @@ public class ElasticsearchFieldHighlightProjection implements ElasticsearchSearc
 		if ( !typeContext.highlighterTypeSupported( highlighterType ) ) {
 			throw log.highlighterTypeNotSupported( highlighterType, absoluteFieldPath );
 		}
+		if ( !context.root().isCompatibleHighlighter( highlighterName, accumulatorProvider ) ) {
+			throw log.highlighterIncompatibleCardinality();
+		}
 
 		highlighter.applyToField(
 				absoluteFieldPath,
 				REQUEST_HIGHLIGHT_FIELDS_ACCESSOR.getOrCreate( requestBody, JsonObject::new )
 		);
 
-		return new FieldHighlightExtractor( innerContext.absoluteCurrentFieldPath() );
+		return new FieldHighlightExtractor<>( innerContext.absoluteCurrentFieldPath(), accumulatorProvider.get() );
 	}
 
-	private static class FieldHighlightExtractor implements Extractor<List<String>, List<String>> {
+	private class FieldHighlightExtractor<A> implements Extractor<A, T> {
 		private final JsonArrayAccessor highlightAccessor;
+		private final ProjectionAccumulator<String, String, A, T> accumulator;
 
-		private FieldHighlightExtractor(String fieldPath) {
+		private FieldHighlightExtractor(String fieldPath, ProjectionAccumulator<String, String, A, T> accumulator) {
 			this.highlightAccessor = JsonAccessor.root().property( "highlight" ).property( fieldPath ).asArray();
+			this.accumulator = accumulator;
 		}
 
 		@Override
-		public List<String> extract(ProjectionHitMapper<?> projectionHitMapper, JsonObject hit, JsonObject source,
+		public A extract(ProjectionHitMapper<?> projectionHitMapper, JsonObject hit, JsonObject source,
 				ProjectionExtractContext context) {
+			A initial = accumulator.createInitial();
 			Optional<JsonArray> highlights = highlightAccessor.get( hit );
 			if ( highlights.isPresent() ) {
-				List<String> result = new ArrayList<>();
 				for ( JsonElement element : highlights.get() ) {
-					result.add( element.getAsString() );
+					initial = accumulator.accumulate( initial, element.getAsString() );
 				}
-				return result;
 			}
-			return Collections.emptyList();
+			return initial;
 		}
 
 		@Override
-		public List<String> transform(LoadingResult<?> loadingResult, List<String> extractedData,
-				ProjectionTransformContext context) {
-			return extractedData;
+		public T transform(LoadingResult<?> loadingResult, A extractedData, ProjectionTransformContext context) {
+			return accumulator.finish( extractedData );
 		}
 	}
 
@@ -160,8 +166,8 @@ public class ElasticsearchFieldHighlightProjection implements ElasticsearchSearc
 		}
 
 		@Override
-		public ElasticsearchFieldHighlightProjection build() {
-			return new ElasticsearchFieldHighlightProjection( this );
+		public <V> SearchProjection<V> build(ProjectionAccumulator.Provider<String, V> accumulatorProvider) {
+			return new ElasticsearchFieldHighlightProjection<>( this, accumulatorProvider );
 		}
 	}
 }

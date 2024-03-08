@@ -86,15 +86,20 @@ public final class HighlightProjectionBinder implements ProjectionBinder {
 	public void bind(ProjectionBindingContext context) {
 		String fieldPath = fieldPathOrFail( context );
 		Class<?> rawType = context.constructorParameter().rawType();
-		if ( !rawType.isAssignableFrom( List.class ) ) {
-			throw log.invalidParameterTypeForHighlightProjectionInProjectionConstructor( rawType );
-		}
 		Optional<? extends ProjectionBindingMultiContext> multiOptional = context.multi();
-		if ( !multiOptional.isPresent() ) {
-			throw log.invalidParameterTypeForHighlightProjectionInProjectionConstructor( rawType );
+
+		if ( multiOptional.isPresent() ) {
+			if ( !rawType.isAssignableFrom( List.class ) ) {
+				throw log.invalidParameterTypeForHighlightProjectionInProjectionConstructor( rawType, "List<String>" );
+			}
+			multiOptional.get().definition( String.class, new Multi( fieldPath, highlighterName ) );
 		}
-		ProjectionBindingMultiContext multi = multiOptional.get();
-		multi.definition( String.class, new Definition( fieldPath, highlighterName ) );
+		else {
+			if ( !rawType.isAssignableFrom( String.class ) ) {
+				throw log.invalidParameterTypeForHighlightProjectionInProjectionConstructor( rawType, "String" );
+			}
+			context.definition( String.class, new Single( fieldPath, highlighterName ) );
+		}
 	}
 
 	private String fieldPathOrFail(ProjectionBindingContext context) {
@@ -102,15 +107,15 @@ public final class HighlightProjectionBinder implements ProjectionBinder {
 			return fieldPathOrNull;
 		}
 		Optional<String> paramName = context.constructorParameter().name();
-		if ( !paramName.isPresent() ) {
+		if ( paramName.isEmpty() ) {
 			throw log.missingParameterNameForHighlightProjectionInProjectionConstructor();
 		}
 		return paramName.get();
 	}
 
-	private static class Definition extends AbstractProjectionDefinition<List<String>> {
-		private final String fieldPath;
-		private final String highlighterName;
+	private abstract static class Definition<T> extends AbstractProjectionDefinition<T> {
+		protected final String fieldPath;
+		protected final String highlighterName;
 
 		private Definition(String fieldPath, String highlighterName) {
 			this.fieldPath = fieldPath;
@@ -127,6 +132,26 @@ public final class HighlightProjectionBinder implements ProjectionBinder {
 			super.appendTo( appender );
 			appender.attribute( "fieldPath", fieldPath );
 			appender.attribute( "highlighter", highlighterName );
+		}
+	}
+
+	private static class Single extends Definition<String> {
+
+		private Single(String fieldPath, String highlighterName) {
+			super( fieldPath, highlighterName );
+		}
+
+		@Override
+		public SearchProjection<? extends String> create(SearchProjectionFactory<?, ?> factory,
+				ProjectionDefinitionContext context) {
+			return factory.highlight( fieldPath ).highlighter( highlighterName ).single().toProjection();
+		}
+	}
+
+	private static class Multi extends Definition<List<String>> {
+
+		private Multi(String fieldPath, String highlighterName) {
+			super( fieldPath, highlighterName );
 		}
 
 		@Override

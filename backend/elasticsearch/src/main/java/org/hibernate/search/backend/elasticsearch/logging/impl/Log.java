@@ -886,4 +886,8 @@ public interface Log extends BasicLogger {
 			value = "Using a knn predicate in the nested context when tenant or routing filters are required "
 					+ "will lead to unpredictable results and may return fewer documents then expected.")
 	void knnUsedInNestedContextRequiresFilters();
+
+	@Message(id = ID_OFFSET + 190, value = "A single-valued highlight projection requested, "
+			+ "but the corresponding highlighter does not set number of fragments to 1.")
+	SearchException highlighterIncompatibleCardinality();
 }

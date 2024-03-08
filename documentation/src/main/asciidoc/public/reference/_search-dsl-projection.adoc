@@ -1381,8 +1381,9 @@ in some cases. For more details see <<mapping-directfieldmapping-highlightable-d
 [[search-dsl-projection-highlight-syntax]]
 === Syntax
 
-The `highlight` projection always returns a list of string values per highlighted field, no matter if the field is
-a single or a multivalued one:
+The `highlight` projection, by default, returns a list of string values per highlighted field, no matter if the field is
+a single or a multivalued one, since there can be multiple highlighted terms in a field value and depending on the
+highlighter configuration that can result in multiple text fragments with highlighted terms in them:
 
 .Returning highlights for matched documents
 ====
@@ -1405,6 +1406,20 @@ As an example, the result may look like:
 <1> First hit.
 <2> Second hit.
 <3> Third hit with multiple highlighted snippets.
+====
+
+In some scenarios, when we know that there is going to be only one highlighted fragment returned, it may be helpful to
+force the highlight projection to produce a single `String` rather than a `List<String`.
+This is only possible when the <<search-dsl-highlighting-highlighter-options-fragment-size, number of fragments>> is explicitly set to `1`.
+
+.Forcing a single-valued highlight projection
+====
+[source, JAVA, indent=0, subs="+callouts"]
+----
+include::{sourcedir}/org/hibernate/search/documentation/search/projection/ProjectionDslIT.java[tags=highlight-single-value]
+----
+<1> Force the single-valued highlight projection by calling `.single()`.
+<2> Force the number of fragments to `1` so that the highlighter returns a single highlighted fragment at most.
 ====
 
 [[search-dsl-projection-highlight-multivalued]]
@@ -1466,7 +1481,7 @@ See <<search-dsl-highlighting>> for more information on highlighter configuratio
 To achieve a `highlight` projection inside a <<search-dsl-projection-mapped,projection to an annotated custom type>>,
 use the `@HighlightProjection` annotation on the constructor parameter:
 
-.Returning highlights for matched documents within a projection constructor
+.Returning highlights for matched documents within a projection constructor. Multiple highlighted fragments
 ====
 [source, JAVA, indent=0, subs="+callouts"]
 ----
@@ -1474,7 +1489,8 @@ include::{sourcedirJava17}/org/hibernate/search/documentation/search/projection/
 ----
 <1> Annotate the record type with <<mapping-projection-basics,`@ProjectionConstructor`>>.
 <2> Annotate the parameter that should receive the highlights value with `@HighlightProjection`.
-<3> The type of the constructor parameter must be assignable from `List<String>`.
+<3> The type of the constructor parameter, in this case, must be assignable from `List<String>`,
+since we are expecting to return multiple highlighted fragments.
 <4> You can of course also declare other parameters with different projections;
 in this example an <<mapping-projection-inner-inference,inferred projection>> to the `title` field.
 
@@ -1485,6 +1501,29 @@ include::{sourcedirJava17}/org/hibernate/search/documentation/search/projection/
 <1> Pass the custom projection type to `.select(...)`.
 <2> Each hit will be an instance of the custom projection type,
 populated with the requested highlights and field.
+====
+
+.Returning highlights for matched documents within a projection constructor. Single highlighted fragment
+====
+[source, JAVA, indent=0, subs="+callouts"]
+----
+include::{sourcedirJava17}/org/hibernate/search/documentation/search/projection/MyBookHighlightedTitleProjection.java[tags=include]
+----
+<1> Annotate the record type with <<mapping-projection-basics,`@ProjectionConstructor`>>.
+<2> Annotate the parameter that should receive the highlights value with `@HighlightProjection`.
+<3> The type of the constructor parameter, in this case, must be assignable from `String`,
+since we are planning to return a single highlighted fragment.
+Note, that only a highlighter that calls the <<search-dsl-highlighting-highlighter-options-fragment-size,`.numberOfFragments(1)`>>
+can be used for single-valued highlight projections.
+
+[source, JAVA, indent=0, subs="+callouts"]
+----
+include::{sourcedirJava17}/org/hibernate/search/documentation/search/projection/ProjectionDslJava17IT.java[tags=projection-constructor-highlight-single]
+----
+<1> Pass the custom projection type to `.select(...)`.
+<2> Configure the highlighter to return a single highlighted fragment.
+<3> Each hit will be an instance of the custom projection type,
+populated with the requested highlight and field.
 ====
 
 The annotation exposes the following attributes:

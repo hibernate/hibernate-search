@@ -69,7 +69,8 @@ class ProjectionDslJava17IT {
 						MyBookEntityAndTitleProjection.class,
 						MyBookEntityRefAndTitleProjection.class,
 						MyBookMiscInfoAndTitleProjection.class, MyBookMiscInfoAndTitleProjection.MiscInfo.class,
-						MyBookTitleAndHighlightedDescriptionProjection.class ),
+						MyBookTitleAndHighlightedDescriptionProjection.class,
+						MyBookHighlightedTitleProjection.class ),
 				mapping -> {
 					var bookMapping = mapping.type( Book.class );
 					bookMapping.indexed();
@@ -199,6 +200,13 @@ class ProjectionDslJava17IT {
 					myBookIdAndHighlightedTitleProjection.mainConstructor().parameter( 0 )
 							.projection( HighlightProjectionBinder.create() );
 					//end::programmatic-highlight-projection[]
+
+					TypeMappingStep myBookHighlightedTitleProjection =
+							mapping.type( MyBookHighlightedTitleProjection.class );
+					myBookHighlightedTitleProjection.mainConstructor()
+							.projectionConstructor();
+					myBookHighlightedTitleProjection.mainConstructor().parameter( 0 )
+							.projection( HighlightProjectionBinder.create() );
 				}
 		);
 	}
@@ -517,6 +525,33 @@ class ProjectionDslJava17IT {
 					new MyBookTitleAndHighlightedDescriptionProjection(
 							List.of( "A robot becomes <em>self</em>-<em>aware</em>." ),
 							"I, Robot"
+					)
+			);
+		} );
+	}
+
+	@ParameterizedTest(name = "{0}")
+	@MethodSource("params")
+	void projectionConstructor_highlightSingle(DocumentationSetupHelper.SetupVariant variant) {
+		init( variant );
+		with( entityManagerFactory ).runInTransaction( entityManager -> {
+			SearchSession searchSession = Search.session( entityManager );
+
+			// tag::projection-constructor-highlight-single[]
+			List<MyBookHighlightedTitleProjection> hits = searchSession.search( Book.class )
+					.select( MyBookHighlightedTitleProjection.class )// <1>
+					.where( f -> f.match().field( "title" ).matching( "robot" ) )
+					.highlighter( f -> f.unified().numberOfFragments( 1 ) ) // <2>
+					.fetchHits( 20 ); // <3>
+			// end::projection-constructor-highlight-single[]
+			assertThat( hits ).containsExactlyInAnyOrder(
+					new MyBookHighlightedTitleProjection(
+							"I, <em>Robot</em>",
+							"A robot becomes self-aware."
+					),
+					new MyBookHighlightedTitleProjection(
+							"The <em>Robots</em> of Dawn",
+							"A crime story about the first \"roboticide\"."
 					)
 			);
 		} );
