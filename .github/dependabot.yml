@@ -122,6 +122,10 @@ updates:
       # We only use the major version of WildFly, and only for a link in the documentation
       - dependency-name: "org.wildfly.bom:wildfly"
         update-types: [ "version-update:semver-minor", "version-update:semver-patch" ]
+      # We ignore any plexus-compiler updates that are > 2.14.2 since that's the last version
+      #  with which jboss-logging annotation processor can still work.
+      #  To be removed once we update the AP to the one with a fix.
+      - dependency-name: "org.codehaus.plexus:*"
   - package-ecosystem: "docker"
     registries:
       - dockerhub
