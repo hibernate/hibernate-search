@@ -211,9 +211,9 @@ class LuceneStringIndexFieldTypeOptionsStep
 			builder.queryElementFactory( PredicateTypeKeys.WILDCARD, new LuceneTextWildcardPredicate.Factory<>() );
 			builder.queryElementFactory( PredicateTypeKeys.REGEXP, new LuceneTextRegexpPredicate.Factory<>() );
 			builder.queryElementFactory( LucenePredicateTypeKeys.SIMPLE_QUERY_STRING,
-					new LuceneCommonQueryStringPredicateBuilderFieldState.Factory() );
+					new LuceneCommonQueryStringPredicateBuilderFieldState.Factory<>() );
 			builder.queryElementFactory( LucenePredicateTypeKeys.QUERY_STRING,
-					new LuceneCommonQueryStringPredicateBuilderFieldState.Factory() );
+					new LuceneCommonQueryStringPredicateBuilderFieldState.Factory<>() );
 		}
 
 		if ( resolvedSortable ) {

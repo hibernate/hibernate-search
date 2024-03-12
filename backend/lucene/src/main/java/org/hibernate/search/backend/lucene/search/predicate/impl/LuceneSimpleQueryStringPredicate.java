@@ -6,9 +6,12 @@
  */
 package org.hibernate.search.backend.lucene.search.predicate.impl;
 
+import java.util.Map;
 import java.util.Set;
 
 import org.hibernate.search.backend.lucene.search.common.impl.LuceneSearchIndexScope;
+import org.hibernate.search.backend.lucene.types.codec.impl.AbstractLuceneNumericFieldCodec;
+import org.hibernate.search.backend.lucene.types.codec.impl.LuceneFieldCodec;
 import org.hibernate.search.backend.lucene.types.predicate.impl.LuceneCommonQueryStringPredicateBuilderFieldState;
 import org.hibernate.search.engine.search.common.BooleanOperator;
 import org.hibernate.search.engine.search.common.spi.SearchQueryElementTypeKey;
@@ -17,6 +20,7 @@ import org.hibernate.search.engine.search.predicate.dsl.SimpleQueryFlag;
 import org.hibernate.search.engine.search.predicate.spi.SimpleQueryStringPredicateBuilder;
 import org.hibernate.search.util.common.AssertionFailure;
 
+import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.queryparser.simple.SimpleQueryParser;
 import org.apache.lucene.search.BooleanClause;
 import org.apache.lucene.search.Query;
@@ -47,7 +51,8 @@ public class LuceneSimpleQueryStringPredicate extends LuceneCommonQueryStringPre
 
 		@Override
 		protected Query buildQuery() {
-			SimpleQueryParser queryParser = new SimpleQueryParser( buildAnalyzer(), buildWeights(), flags );
+			SimpleQueryParser queryParser =
+					new HibernateSearchSimpleQueryParser( buildAnalyzer(), buildWeights(), fieldStateLookup(), flags );
 			queryParser.setDefaultOperator( toOccur( defaultOperator ) );
 			return applyMinimumShouldMatch( queryParser.parse( queryString ) );
 		}
@@ -108,6 +113,43 @@ public class LuceneSimpleQueryStringPredicate extends LuceneCommonQueryStringPre
 				}
 			}
 			return flag;
+		}
+	}
+
+	private static class HibernateSearchSimpleQueryParser extends SimpleQueryParser {
+
+		private final Map<String, LuceneCommonQueryStringPredicateBuilderFieldState> fieldStates;
+
+		public HibernateSearchSimpleQueryParser(Analyzer analyzer, Map<String, Float> weights,
+				Map<String, LuceneCommonQueryStringPredicateBuilderFieldState> fieldStates, int flags) {
+			super( analyzer, weights, flags );
+			this.fieldStates = fieldStates;
+		}
+
+		@Override
+		protected Query createFieldQuery(Analyzer analyzer, BooleanClause.Occur operator, String field,
+				String queryText, boolean quoted, int phraseSlop) {
+			var state = fieldStates.get( field );
+			LuceneFieldCodec<?> codec = state.field().type().codec();
+			if ( codec instanceof AbstractLuceneNumericFieldCodec<?, ?> ) {
+				AbstractLuceneNumericFieldCodec<?, Number> numericFieldCodec =
+						(AbstractLuceneNumericFieldCodec<?, Number>) codec;
+				Number number = numericFieldCodec.fromString( queryText );
+				return numericFieldCodec.getDomain().createExactQuery( field, number );
+			}
+			return super.createFieldQuery( analyzer, operator, field, queryText, quoted, phraseSlop );
+		}
+
+		@Override
+		protected Query newPrefixQuery(String text) {
+			checkFieldsAreAcceptable( "Prefix", fieldStates );
+			return super.newPrefixQuery( text );
+		}
+
+		@Override
+		protected Query newFuzzyQuery(String text, int fuzziness) {
+			checkFieldsAreAcceptable( "Fuzzy", fieldStates );
+			return super.newFuzzyQuery( text, fuzziness );
 		}
 	}
 }

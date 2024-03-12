@@ -29,17 +29,15 @@ abstract class AbstractBaseQueryStringPredicateBaseIT<P extends CommonQueryStrin
 	//CHECKSTYLE:ON
 
 	private static final List<
-			FieldTypeDescriptor<String, ? extends SearchableProjectableIndexFieldTypeOptionsStep<?, ?>>> supportedFieldTypes =
+			FieldTypeDescriptor<?, ? extends SearchableProjectableIndexFieldTypeOptionsStep<?, ?>>> supportedFieldTypes =
 					new ArrayList<>();
 	private static final List<
 			FieldTypeDescriptor<?, ? extends SearchableProjectableIndexFieldTypeOptionsStep<?, ?>>> unsupportedFieldTypes =
 					new ArrayList<>();
 	static {
 		for ( FieldTypeDescriptor<?, ?> fieldType : FieldTypeDescriptor.getAll() ) {
-			if ( String.class.equals( fieldType.getJavaType() ) ) {
-				@SuppressWarnings("unchecked")
-				FieldTypeDescriptor<String, ?> casted = (FieldTypeDescriptor<String, ?>) fieldType;
-				supportedFieldTypes.add( casted );
+			if ( String.class.equals( fieldType.getJavaType() ) || Integer.class.equals( fieldType.getJavaType() ) ) {
+				supportedFieldTypes.add( fieldType );
 			}
 			else {
 				unsupportedFieldTypes.add( fieldType );
@@ -111,8 +109,8 @@ abstract class AbstractBaseQueryStringPredicateBaseIT<P extends CommonQueryStrin
 		);
 	}
 
-	private static CommonQueryStringPredicateTestValues testValues(FieldTypeDescriptor<String, ?> fieldType) {
-		return new CommonQueryStringPredicateTestValues( fieldType );
+	private static CommonQueryStringPredicateTestValues<?> testValues(FieldTypeDescriptor<?, ?> fieldType) {
+		return new CommonQueryStringPredicateTestValues<>( fieldType );
 	}
 
 	@Nested
@@ -124,16 +122,18 @@ abstract class AbstractBaseQueryStringPredicateBaseIT<P extends CommonQueryStrin
 		}
 	}
 
-	abstract static class SingleFieldConfigured extends AbstractPredicateSingleFieldIT<CommonQueryStringPredicateTestValues> {
+	abstract static class SingleFieldConfigured
+			extends AbstractPredicateSingleFieldIT<CommonQueryStringPredicateTestValues<?>> {
 		private static final SimpleMappedIndex<IndexBinding> index =
 				SimpleMappedIndex.of( root -> new IndexBinding( root, supportedFieldTypes ) )
 						.name( "singleField" );
 
-		private static final List<DataSet<String, CommonQueryStringPredicateTestValues>> dataSets = new ArrayList<>();
+		private static final List<DataSet<?, ?>> dataSets = new ArrayList<>();
 		private static final List<Arguments> parameters = new ArrayList<>();
 		static {
-			for ( FieldTypeDescriptor<String, ?> fieldType : supportedFieldTypes ) {
-				DataSet<String, CommonQueryStringPredicateTestValues> dataSet = new DataSet<>( testValues( fieldType ) );
+			for ( FieldTypeDescriptor<?, ?> fieldType : supportedFieldTypes ) {
+				DataSet<?, ?> dataSet =
+						new DataSet<>( testValues( fieldType ) );
 				dataSets.add( dataSet );
 				parameters.add( Arguments.of( index, dataSet ) );
 			}
@@ -145,7 +145,7 @@ abstract class AbstractBaseQueryStringPredicateBaseIT<P extends CommonQueryStrin
 
 		@Override
 		protected PredicateFinalStep predicate(SearchPredicateFactory f, String fieldPath, int matchingDocOrdinal,
-				DataSet<?, CommonQueryStringPredicateTestValues> dataSet) {
+				DataSet<?, CommonQueryStringPredicateTestValues<?>> dataSet) {
 			return predicate( f ).field( fieldPath ).matching( dataSet.values.matchingArg( matchingDocOrdinal ) );
 		}
 
@@ -161,16 +161,16 @@ abstract class AbstractBaseQueryStringPredicateBaseIT<P extends CommonQueryStrin
 		}
 	}
 
-	abstract static class MultiFieldConfigured extends AbstractPredicateMultiFieldIT<CommonQueryStringPredicateTestValues> {
+	abstract static class MultiFieldConfigured extends AbstractPredicateMultiFieldIT<CommonQueryStringPredicateTestValues<?>> {
 		private static final SimpleMappedIndex<IndexBinding> index =
 				SimpleMappedIndex.of( root -> new IndexBinding( root, supportedFieldTypes ) )
 						.name( "multiField" );
 
-		private static final List<DataSet<String, CommonQueryStringPredicateTestValues>> dataSets = new ArrayList<>();
+		private static final List<DataSet<?, ?>> dataSets = new ArrayList<>();
 		private static final List<Arguments> parameters = new ArrayList<>();
 		static {
-			for ( FieldTypeDescriptor<String, ?> fieldType : supportedFieldTypes ) {
-				DataSet<String, CommonQueryStringPredicateTestValues> dataSet = new DataSet<>( testValues( fieldType ) );
+			for ( FieldTypeDescriptor<?, ?> fieldType : supportedFieldTypes ) {
+				DataSet<?, ?> dataSet = new DataSet<>( testValues( fieldType ) );
 				dataSets.add( dataSet );
 				parameters.add( Arguments.of( index, dataSet ) );
 			}
@@ -182,20 +182,20 @@ abstract class AbstractBaseQueryStringPredicateBaseIT<P extends CommonQueryStrin
 
 		@Override
 		protected PredicateFinalStep predicateOnFieldAndField(SearchPredicateFactory f, String fieldPath,
-				String otherFieldPath, int matchingDocOrdinal, DataSet<?, CommonQueryStringPredicateTestValues> dataSet) {
+				String otherFieldPath, int matchingDocOrdinal, DataSet<?, CommonQueryStringPredicateTestValues<?>> dataSet) {
 			return predicate( f ).field( fieldPath ).field( otherFieldPath )
 					.matching( dataSet.values.matchingArg( matchingDocOrdinal ) );
 		}
 
 		@Override
 		protected PredicateFinalStep predicateOnFields(SearchPredicateFactory f, String[] fieldPaths, int matchingDocOrdinal,
-				DataSet<?, CommonQueryStringPredicateTestValues> dataSet) {
+				DataSet<?, CommonQueryStringPredicateTestValues<?>> dataSet) {
 			return predicate( f ).fields( fieldPaths ).matching( dataSet.values.matchingArg( matchingDocOrdinal ) );
 		}
 
 		@Override
 		protected PredicateFinalStep predicateOnFieldAndFields(SearchPredicateFactory f, String fieldPath,
-				String[] fieldPaths, int matchingDocOrdinal, DataSet<?, CommonQueryStringPredicateTestValues> dataSet) {
+				String[] fieldPaths, int matchingDocOrdinal, DataSet<?, CommonQueryStringPredicateTestValues<?>> dataSet) {
 			return predicate( f ).field( fieldPath ).fields( fieldPaths )
 					.matching( dataSet.values.matchingArg( matchingDocOrdinal ) );
 		}
@@ -213,7 +213,7 @@ abstract class AbstractBaseQueryStringPredicateBaseIT<P extends CommonQueryStrin
 	}
 
 	abstract static class InObjectFieldConfigured
-			extends AbstractPredicateFieldInObjectFieldIT<CommonQueryStringPredicateTestValues> {
+			extends AbstractPredicateFieldInObjectFieldIT<CommonQueryStringPredicateTestValues<?>> {
 		private static final SimpleMappedIndex<IndexBinding> mainIndex =
 				SimpleMappedIndex.of( root -> new IndexBinding( root, supportedFieldTypes ) )
 						.name( "nesting" );
@@ -225,7 +225,7 @@ abstract class AbstractBaseQueryStringPredicateBaseIT<P extends CommonQueryStrin
 		private static final List<DataSet<?, ?>> dataSets = new ArrayList<>();
 		private static final List<Arguments> parameters = new ArrayList<>();
 		static {
-			for ( FieldTypeDescriptor<String, ?> fieldType : supportedFieldTypes ) {
+			for ( FieldTypeDescriptor<?, ?> fieldType : supportedFieldTypes ) {
 				DataSet<?, ?> dataSet = new DataSet<>( testValues( fieldType ) );
 				dataSets.add( dataSet );
 				parameters.add( Arguments.of( mainIndex, missingFieldIndex, dataSet ) );
@@ -238,7 +238,7 @@ abstract class AbstractBaseQueryStringPredicateBaseIT<P extends CommonQueryStrin
 
 		@Override
 		protected PredicateFinalStep predicate(SearchPredicateFactory f, String fieldPath, int matchingDocOrdinal,
-				DataSet<?, CommonQueryStringPredicateTestValues> dataSet) {
+				DataSet<?, CommonQueryStringPredicateTestValues<?>> dataSet) {
 			return predicate( f ).field( fieldPath ).matching( dataSet.values.matchingArg( matchingDocOrdinal ) );
 		}
 
@@ -297,16 +297,16 @@ abstract class AbstractBaseQueryStringPredicateBaseIT<P extends CommonQueryStrin
 		}
 	}
 
-	abstract static class ScoreConfigured extends AbstractPredicateFieldScoreIT<CommonQueryStringPredicateTestValues> {
+	abstract static class ScoreConfigured extends AbstractPredicateFieldScoreIT<CommonQueryStringPredicateTestValues<?>> {
 		private static final SimpleMappedIndex<IndexBinding> index =
 				SimpleMappedIndex.of( root -> new IndexBinding( root, supportedFieldTypes ) )
 						.name( "score" );
 
-		private static final List<DataSet<String, CommonQueryStringPredicateTestValues>> dataSets = new ArrayList<>();
+		private static final List<DataSet<?, ?>> dataSets = new ArrayList<>();
 		private static final List<Arguments> parameters = new ArrayList<>();
 		static {
-			for ( FieldTypeDescriptor<String, ?> fieldType : supportedFieldTypes ) {
-				DataSet<String, CommonQueryStringPredicateTestValues> dataSet = new DataSet<>( testValues( fieldType ) );
+			for ( FieldTypeDescriptor<?, ?> fieldType : supportedFieldTypes ) {
+				DataSet<?, ?> dataSet = new DataSet<>( testValues( fieldType ) );
 				dataSets.add( dataSet );
 				parameters.add( Arguments.of( index, dataSet ) );
 			}
@@ -318,21 +318,21 @@ abstract class AbstractBaseQueryStringPredicateBaseIT<P extends CommonQueryStrin
 
 		@Override
 		public void constantScore_fieldLevelBoost(SimpleMappedIndex<IndexBinding> index,
-				DataSet<?, CommonQueryStringPredicateTestValues> dataSet) {
+				DataSet<?, CommonQueryStringPredicateTestValues<?>> dataSet) {
 			throw new org.opentest4j.TestAbortedException(
 					"The simpleQueryString predicate currently does not fail when using constantScore() + a field-level boost" );
 		}
 
 		@Override
 		protected PredicateFinalStep predicate(SearchPredicateFactory f, String fieldPath, int matchingDocOrdinal,
-				DataSet<?, CommonQueryStringPredicateTestValues> dataSet) {
+				DataSet<?, CommonQueryStringPredicateTestValues<?>> dataSet) {
 			return predicate( f ).field( fieldPath )
 					.matching( dataSet.values.matchingArg( matchingDocOrdinal ) );
 		}
 
 		@Override
 		protected PredicateFinalStep predicateWithConstantScore(SearchPredicateFactory f, String[] fieldPaths,
-				int matchingDocOrdinal, DataSet<?, CommonQueryStringPredicateTestValues> dataSet) {
+				int matchingDocOrdinal, DataSet<?, CommonQueryStringPredicateTestValues<?>> dataSet) {
 			return predicate( f ).fields( fieldPaths )
 					.matching( dataSet.values.matchingArg( matchingDocOrdinal ) )
 					.constantScore();
@@ -340,7 +340,7 @@ abstract class AbstractBaseQueryStringPredicateBaseIT<P extends CommonQueryStrin
 
 		@Override
 		protected PredicateFinalStep predicateWithPredicateLevelBoost(SearchPredicateFactory f, String[] fieldPaths,
-				int matchingDocOrdinal, float predicateBoost, DataSet<?, CommonQueryStringPredicateTestValues> dataSet) {
+				int matchingDocOrdinal, float predicateBoost, DataSet<?, CommonQueryStringPredicateTestValues<?>> dataSet) {
 			return predicate( f ).fields( fieldPaths )
 					.matching( dataSet.values.matchingArg( matchingDocOrdinal ) )
 					.boost( predicateBoost );
@@ -349,7 +349,7 @@ abstract class AbstractBaseQueryStringPredicateBaseIT<P extends CommonQueryStrin
 		@Override
 		protected PredicateFinalStep predicateWithConstantScoreAndPredicateLevelBoost(SearchPredicateFactory f,
 				String[] fieldPaths, int matchingDocOrdinal, float predicateBoost,
-				DataSet<?, CommonQueryStringPredicateTestValues> dataSet) {
+				DataSet<?, CommonQueryStringPredicateTestValues<?>> dataSet) {
 			return predicate( f ).fields( fieldPaths )
 					.matching( dataSet.values.matchingArg( matchingDocOrdinal ) )
 					.constantScore().boost( predicateBoost );
@@ -357,7 +357,7 @@ abstract class AbstractBaseQueryStringPredicateBaseIT<P extends CommonQueryStrin
 
 		@Override
 		protected PredicateFinalStep predicateWithFieldLevelBoost(SearchPredicateFactory f, String fieldPath,
-				float fieldBoost, int matchingDocOrdinal, DataSet<?, CommonQueryStringPredicateTestValues> dataSet) {
+				float fieldBoost, int matchingDocOrdinal, DataSet<?, CommonQueryStringPredicateTestValues<?>> dataSet) {
 			return predicate( f ).field( fieldPath ).boost( fieldBoost )
 					.matching( dataSet.values.matchingArg( matchingDocOrdinal ) );
 		}
@@ -365,7 +365,7 @@ abstract class AbstractBaseQueryStringPredicateBaseIT<P extends CommonQueryStrin
 		@Override
 		protected PredicateFinalStep predicateWithFieldLevelBoostAndConstantScore(SearchPredicateFactory f,
 				String fieldPath, float fieldBoost, int matchingDocOrdinal,
-				DataSet<?, CommonQueryStringPredicateTestValues> dataSet) {
+				DataSet<?, CommonQueryStringPredicateTestValues<?>> dataSet) {
 			return predicate( f ).field( fieldPath ).boost( fieldBoost )
 					.matching( dataSet.values.matchingArg( matchingDocOrdinal ) )
 					.constantScore();
@@ -374,7 +374,7 @@ abstract class AbstractBaseQueryStringPredicateBaseIT<P extends CommonQueryStrin
 		@Override
 		protected PredicateFinalStep predicateWithFieldLevelBoostAndPredicateLevelBoost(SearchPredicateFactory f,
 				String fieldPath, float fieldBoost, int matchingDocOrdinal, float predicateBoost,
-				DataSet<?, CommonQueryStringPredicateTestValues> dataSet) {
+				DataSet<?, CommonQueryStringPredicateTestValues<?>> dataSet) {
 			return predicate( f ).field( fieldPath ).boost( fieldBoost )
 					.matching( dataSet.values.matchingArg( matchingDocOrdinal ) )
 					.boost( predicateBoost );
@@ -552,7 +552,7 @@ abstract class AbstractBaseQueryStringPredicateBaseIT<P extends CommonQueryStrin
 	}
 
 	abstract static class TypeCheckingNoConversionConfigured
-			extends AbstractPredicateTypeCheckingNoConversionIT<CommonQueryStringPredicateTestValues> {
+			extends AbstractPredicateTypeCheckingNoConversionIT<CommonQueryStringPredicateTestValues<?>> {
 		private static final SimpleMappedIndex<IndexBinding> index =
 				SimpleMappedIndex.of( root -> new IndexBinding( root, supportedFieldTypes ) )
 						.name( "typeChecking_main" );
@@ -569,11 +569,11 @@ abstract class AbstractBaseQueryStringPredicateBaseIT<P extends CommonQueryStrin
 				SimpleMappedIndex.of( root -> new IncompatibleIndexBinding( root, supportedFieldTypes ) )
 						.name( "typeChecking_incompatible" );
 
-		private static final List<DataSet<String, CommonQueryStringPredicateTestValues>> dataSets = new ArrayList<>();
+		private static final List<DataSet<?, ?>> dataSets = new ArrayList<>();
 		private static final List<Arguments> parameters = new ArrayList<>();
 		static {
-			for ( FieldTypeDescriptor<String, ?> fieldType : supportedFieldTypes ) {
-				DataSet<String, CommonQueryStringPredicateTestValues> dataSet = new DataSet<>( testValues( fieldType ) );
+			for ( FieldTypeDescriptor<?, ?> fieldType : supportedFieldTypes ) {
+				DataSet<?, ?> dataSet = new DataSet<>( testValues( fieldType ) );
 				dataSets.add( dataSet );
 				parameters.add( Arguments.of( index, compatibleIndex, rawFieldCompatibleIndex, missingFieldIndex,
 						incompatibleIndex, dataSet ) );
@@ -586,13 +586,13 @@ abstract class AbstractBaseQueryStringPredicateBaseIT<P extends CommonQueryStrin
 
 		@Override
 		protected PredicateFinalStep predicate(SearchPredicateFactory f, String fieldPath, int matchingDocOrdinal,
-				DataSet<?, CommonQueryStringPredicateTestValues> dataSet) {
+				DataSet<?, CommonQueryStringPredicateTestValues<?>> dataSet) {
 			return predicate( f ).field( fieldPath ).matching( dataSet.values.matchingArg( matchingDocOrdinal ) );
 		}
 
 		@Override
 		protected PredicateFinalStep predicate(SearchPredicateFactory f, String field0Path, String field1Path,
-				int matchingDocOrdinal, DataSet<?, CommonQueryStringPredicateTestValues> dataSet) {
+				int matchingDocOrdinal, DataSet<?, CommonQueryStringPredicateTestValues<?>> dataSet) {
 			return predicate( f ).field( field0Path ).field( field1Path )
 					.matching( dataSet.values.matchingArg( matchingDocOrdinal ) );
 		}

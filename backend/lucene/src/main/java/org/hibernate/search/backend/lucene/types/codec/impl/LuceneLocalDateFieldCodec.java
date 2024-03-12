@@ -65,4 +65,9 @@ public final class LuceneLocalDateFieldCodec extends AbstractLuceneNumericFieldC
 	public LuceneNumericDomain<Long> getDomain() {
 		return LuceneLongDomain.get();
 	}
+
+	@Override
+	protected Long doFromString(String string) {
+		return encode( LocalDate.parse( string, FORMATTER ) );
+	}
 }

@@ -7,6 +7,7 @@
 package org.hibernate.search.backend.lucene.types.codec.impl;
 
 import org.hibernate.search.backend.lucene.types.lowlevel.impl.LuceneNumericDomain;
+import org.hibernate.search.util.common.SearchException;
 
 public abstract class AbstractLuceneNumericFieldCodec<F, E extends Number>
 		implements LuceneStandardFieldCodec<F, E> {
@@ -69,5 +70,19 @@ public abstract class AbstractLuceneNumericFieldCodec<F, E extends Number>
 
 	abstract void addStoredToDocument(LuceneDocumentContent documentBuilder, String absoluteFieldPath,
 			F value, E encodedValue);
+
+	@Override
+	public final E fromString(String string) {
+		try {
+			return string == null ? null : doFromString( string );
+		}
+		catch (Exception e) {
+			throw new SearchException( "Unable to parse a query token '" + string + "': " + e.getMessage(), e );
+		}
+	}
+
+	protected E doFromString(String string) {
+		throw new UnsupportedOperationException( "Parsing from string is not supported." );
+	}
 
 }

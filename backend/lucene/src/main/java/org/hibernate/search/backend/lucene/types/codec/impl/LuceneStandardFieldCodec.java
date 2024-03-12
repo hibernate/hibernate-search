@@ -21,4 +21,6 @@ public interface LuceneStandardFieldCodec<F, E> extends LuceneFieldCodec<F> {
 	 */
 	E encode(F value);
 
+	E fromString(String string);
+
 }

@@ -34,12 +34,12 @@ public final class LuceneCommonQueryStringPredicateBuilderFieldState
 		return boost;
 	}
 
-	public static class Factory
+	public static class Factory<T>
 			extends
-			AbstractLuceneValueFieldSearchQueryElementFactory<LuceneCommonQueryStringPredicateBuilderFieldState, String> {
+			AbstractLuceneValueFieldSearchQueryElementFactory<LuceneCommonQueryStringPredicateBuilderFieldState, T> {
 		@Override
 		public LuceneCommonQueryStringPredicateBuilderFieldState create(LuceneSearchIndexScope<?> scope,
-				LuceneSearchIndexValueFieldContext<String> field) {
+				LuceneSearchIndexValueFieldContext<T> field) {
 			return new LuceneCommonQueryStringPredicateBuilderFieldState( field );
 		}
 	}
