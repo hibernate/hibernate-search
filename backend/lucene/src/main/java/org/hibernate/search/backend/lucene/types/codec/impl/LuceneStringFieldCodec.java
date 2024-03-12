@@ -73,6 +73,11 @@ public final class LuceneStringFieldCodec implements LuceneStandardFieldCodec<St
 		return value;
 	}
 
+	@Override
+	public String fromString(String string) {
+		return string;
+	}
+
 	private BytesRef normalize(String absoluteFieldPath, String value) {
 		if ( value == null ) {
 			return null;

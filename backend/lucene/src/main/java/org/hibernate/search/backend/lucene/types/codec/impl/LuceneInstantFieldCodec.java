@@ -55,4 +55,9 @@ public final class LuceneInstantFieldCodec extends AbstractLuceneNumericFieldCod
 	public LuceneNumericDomain<Long> getDomain() {
 		return LuceneLongDomain.get();
 	}
+
+	@Override
+	protected Long doFromString(String string) {
+		return encode( FORMATTER.parse( string, Instant::from ) );
+	}
 }

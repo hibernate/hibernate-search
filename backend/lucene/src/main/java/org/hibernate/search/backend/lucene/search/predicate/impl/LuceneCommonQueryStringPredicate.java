@@ -10,8 +10,10 @@ import static org.hibernate.search.backend.lucene.search.predicate.impl.LuceneCo
 
 import java.lang.invoke.MethodHandles;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.NavigableMap;
 import java.util.TreeMap;
@@ -27,6 +29,7 @@ import org.hibernate.search.engine.search.common.BooleanOperator;
 import org.hibernate.search.engine.search.common.spi.SearchIndexSchemaElementContextHelper;
 import org.hibernate.search.engine.search.common.spi.SearchQueryElementTypeKey;
 import org.hibernate.search.engine.search.predicate.spi.CommonQueryStringPredicateBuilder;
+import org.hibernate.search.util.common.SearchException;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
 import org.apache.lucene.analysis.Analyzer;
@@ -48,6 +51,22 @@ abstract class LuceneCommonQueryStringPredicate extends AbstractLuceneNestablePr
 		nestedPathHierarchy = builder.firstFieldState.field().nestedPathHierarchy();
 		fieldPaths = new ArrayList<>( builder.fieldStates.keySet() );
 		query = builder.buildQuery();
+	}
+
+	static void checkFieldsAreAcceptable(String queryName,
+			Map<String, LuceneCommonQueryStringPredicateBuilderFieldState> fieldStates) {
+		List<String> badFields = new ArrayList<>();
+
+		for ( LuceneCommonQueryStringPredicateBuilderFieldState state : fieldStates.values() ) {
+			if ( state.field().type().searchAnalyzerOrNormalizer() == null ) {
+				badFields.add(
+						String.format( Locale.ROOT, "{'%s':%s}", state.field().absolutePath(), state.field().type().valueClass() ) );
+			}
+		}
+		if ( !badFields.isEmpty() ) {
+			throw new SearchException( queryName + " queries are not allowed for non-string fields. "
+					+ "Fields violating this constraint are: " + badFields );
+		}
 	}
 
 	@Override
@@ -220,6 +239,16 @@ abstract class LuceneCommonQueryStringPredicate extends AbstractLuceneNestablePr
 				weights.put( state.field().absolutePath(), boost );
 			}
 			return weights;
+		}
+
+		protected Map<String, LuceneCommonQueryStringPredicateBuilderFieldState> fieldStateLookup() {
+			Map<String, LuceneCommonQueryStringPredicateBuilderFieldState> fieldStatesRemapped = new HashMap<>();
+			for ( LuceneCommonQueryStringPredicateBuilderFieldState state : fieldStates.values() ) {
+				// See warning in the buildWeights(). we have to have the same keys in the map,
+				//  as query parsers will be working with what we pass in the weights map.
+				fieldStatesRemapped.put( state.field().absolutePath(), state );
+			}
+			return fieldStatesRemapped;
 		}
 	}
 }

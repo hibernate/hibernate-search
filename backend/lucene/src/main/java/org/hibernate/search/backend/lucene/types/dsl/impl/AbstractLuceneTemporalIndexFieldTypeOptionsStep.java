@@ -8,6 +8,7 @@ package org.hibernate.search.backend.lucene.types.dsl.impl;
 
 import java.time.temporal.TemporalAccessor;
 
+import org.hibernate.search.backend.lucene.search.predicate.impl.LucenePredicateTypeKeys;
 import org.hibernate.search.backend.lucene.search.projection.impl.LuceneFieldProjection;
 import org.hibernate.search.backend.lucene.types.aggregation.impl.LuceneNumericRangeAggregation;
 import org.hibernate.search.backend.lucene.types.aggregation.impl.LuceneNumericTermsAggregation;
@@ -16,6 +17,7 @@ import org.hibernate.search.backend.lucene.types.codec.impl.DocValues;
 import org.hibernate.search.backend.lucene.types.codec.impl.Indexing;
 import org.hibernate.search.backend.lucene.types.codec.impl.Storage;
 import org.hibernate.search.backend.lucene.types.impl.LuceneIndexValueFieldType;
+import org.hibernate.search.backend.lucene.types.predicate.impl.LuceneCommonQueryStringPredicateBuilderFieldState;
 import org.hibernate.search.backend.lucene.types.predicate.impl.LuceneExistsPredicate;
 import org.hibernate.search.backend.lucene.types.predicate.impl.LuceneNumericMatchPredicate;
 import org.hibernate.search.backend.lucene.types.predicate.impl.LuceneNumericRangePredicate;
@@ -67,6 +69,10 @@ abstract class AbstractLuceneTemporalIndexFieldTypeOptionsStep<
 					DocValues.ENABLED.equals( docValues )
 							? new LuceneExistsPredicate.DocValuesOrNormsBasedFactory<>()
 							: new LuceneExistsPredicate.DefaultFactory<>() );
+			builder.queryElementFactory( LucenePredicateTypeKeys.SIMPLE_QUERY_STRING,
+					new LuceneCommonQueryStringPredicateBuilderFieldState.Factory<>() );
+			builder.queryElementFactory( LucenePredicateTypeKeys.QUERY_STRING,
+					new LuceneCommonQueryStringPredicateBuilderFieldState.Factory<>() );
 		}
 
 		if ( resolvedSortable ) {
