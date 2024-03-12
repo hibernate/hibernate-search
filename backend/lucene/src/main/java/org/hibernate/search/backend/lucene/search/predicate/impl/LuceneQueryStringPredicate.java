@@ -11,6 +11,9 @@ import java.util.Map;
 
 import org.hibernate.search.backend.lucene.logging.impl.Log;
 import org.hibernate.search.backend.lucene.search.common.impl.LuceneSearchIndexScope;
+import org.hibernate.search.backend.lucene.types.codec.impl.AbstractLuceneNumericFieldCodec;
+import org.hibernate.search.backend.lucene.types.codec.impl.LuceneFieldCodec;
+import org.hibernate.search.backend.lucene.types.lowlevel.impl.LuceneNumericDomain;
 import org.hibernate.search.backend.lucene.types.predicate.impl.LuceneCommonQueryStringPredicateBuilderFieldState;
 import org.hibernate.search.engine.search.common.BooleanOperator;
 import org.hibernate.search.engine.search.common.RewriteMethod;
@@ -86,7 +89,7 @@ public class LuceneQueryStringPredicate extends LuceneCommonQueryStringPredicate
 				return new MatchNoDocsQuery();
 			}
 
-			MultiFieldQueryParser queryParser = create( buildWeights(), buildAnalyzer() );
+			MultiFieldQueryParser queryParser = create( buildWeights(), buildAnalyzer(), fieldStateLookup() );
 
 			queryParser.setDefaultOperator( toOperator( defaultOperator ) );
 			if ( rewriteMethod != null ) {
@@ -111,9 +114,9 @@ public class LuceneQueryStringPredicate extends LuceneCommonQueryStringPredicate
 			}
 		}
 
-		private MultiFieldQueryParser create(Map<String, Float> weights, Analyzer analyzer) {
-			String[] fields = weights.keySet().toArray( String[]::new );
-			return new MultiFieldQueryParser( fields, analyzer, weights );
+		private MultiFieldQueryParser create(Map<String, Float> weights, Analyzer analyzer,
+				Map<String, LuceneCommonQueryStringPredicateBuilderFieldState> fieldStateMap) {
+			return new HibernateSearchMultiFieldQueryParser( analyzer, weights, fieldStateMap );
 		}
 
 		private MultiTermQuery.RewriteMethod toRewriteMethod(RewriteMethod rewriteMethod, Integer n) {
@@ -145,6 +148,85 @@ public class LuceneQueryStringPredicate extends LuceneCommonQueryStringPredicate
 					throw new AssertionFailure( "Unknown boolean operator: " + operator );
 			}
 		}
+	}
 
+	private static class HibernateSearchMultiFieldQueryParser extends MultiFieldQueryParser {
+		private final Map<String, LuceneCommonQueryStringPredicateBuilderFieldState> fieldStates;
+
+		public HibernateSearchMultiFieldQueryParser(Analyzer analyzer, Map<String, Float> boosts,
+				Map<String, LuceneCommonQueryStringPredicateBuilderFieldState> fieldStates) {
+			super( boosts.keySet().toArray( String[]::new ), analyzer, boosts );
+			this.fieldStates = fieldStates;
+		}
+
+		@Override
+		protected Query newFieldQuery(Analyzer analyzer, String field, String queryText, boolean quoted)
+				throws ParseException {
+			var state = fieldStates.get( field );
+			LuceneFieldCodec<?> codec = state.field().type().codec();
+			if ( codec instanceof AbstractLuceneNumericFieldCodec<?, ?> ) {
+				AbstractLuceneNumericFieldCodec<?, Number> numericFieldCodec =
+						(AbstractLuceneNumericFieldCodec<?, Number>) codec;
+				Number number = numericFieldCodec.fromString( queryText );
+				return numericFieldCodec.getDomain().createExactQuery( field, number );
+			}
+			return super.newFieldQuery( analyzer, field, queryText, quoted );
+		}
+
+		@Override
+		protected Query getFuzzyQuery(String field, String termStr, float minSimilarity) throws ParseException {
+			checkFieldsAreAcceptable( "Fuzzy", fieldStates );
+			return super.getFuzzyQuery( field, termStr, minSimilarity );
+		}
+
+		@Override
+		protected Query getPrefixQuery(String field, String termStr) throws ParseException {
+			checkFieldsAreAcceptable( "Prefix", fieldStates );
+			return super.getPrefixQuery( field, termStr );
+		}
+
+		@Override
+		protected Query getRegexpQuery(String field, String termStr) throws ParseException {
+			checkFieldsAreAcceptable( "Regexp", fieldStates );
+			return super.getRegexpQuery( field, termStr );
+		}
+
+		@Override
+		protected Query getWildcardQuery(String field, String termStr) throws ParseException {
+			checkFieldsAreAcceptable( "Wildcard", fieldStates );
+			return super.getWildcardQuery( field, termStr );
+		}
+
+		@Override
+		protected Query newRangeQuery(String field, String part1, String part2, boolean startInclusive, boolean endInclusive) {
+			var state = fieldStates.get( field );
+			LuceneFieldCodec<?> codec = state.field().type().codec();
+			if ( codec instanceof AbstractLuceneNumericFieldCodec<?, ?> ) {
+				AbstractLuceneNumericFieldCodec<?, Number> numericFieldCodec =
+						(AbstractLuceneNumericFieldCodec<?, Number>) codec;
+				LuceneNumericDomain<Number> domain = numericFieldCodec.getDomain();
+
+				return domain.createRangeQuery(
+						field,
+						getLowerValue( domain, numericFieldCodec.fromString( part1 ), startInclusive ),
+						getUpperValue( domain, numericFieldCodec.fromString( part2 ), endInclusive )
+				);
+			}
+			return super.newRangeQuery( field, part1, part2, startInclusive, endInclusive );
+		}
+
+		private static <E extends Number> E getLowerValue(LuceneNumericDomain<E> domain, E value, boolean inclusion) {
+			if ( value == null ) {
+				return domain.getMinValue();
+			}
+			return inclusion ? value : domain.getNextValue( value );
+		}
+
+		private static <E extends Number> E getUpperValue(LuceneNumericDomain<E> domain, E value, boolean inclusion) {
+			if ( value == null ) {
+				return domain.getMaxValue();
+			}
+			return inclusion ? value : domain.getPreviousValue( value );
+		}
 	}
 }

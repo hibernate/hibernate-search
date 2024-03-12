@@ -10,16 +10,16 @@ import java.util.List;
 
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.FieldTypeDescriptor;
 
-public final class CommonQueryStringPredicateTestValues extends AbstractPredicateTestValues<String> {
-	private final List<String> values;
+public final class CommonQueryStringPredicateTestValues<T> extends AbstractPredicateTestValues<T> {
+	private final List<T> values;
 
-	public CommonQueryStringPredicateTestValues(FieldTypeDescriptor<String, ?> fieldType) {
+	public CommonQueryStringPredicateTestValues(FieldTypeDescriptor<T, ?> fieldType) {
 		super( fieldType );
 		this.values = fieldType.getUniquelyMatchableValues();
 	}
 
 	@Override
-	public String fieldValue(int docOrdinal) {
+	public T fieldValue(int docOrdinal) {
 		return values.get( docOrdinal );
 	}
 
