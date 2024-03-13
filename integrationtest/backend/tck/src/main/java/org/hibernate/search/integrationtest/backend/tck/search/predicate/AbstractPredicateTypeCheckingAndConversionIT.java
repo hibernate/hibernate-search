@@ -10,12 +10,17 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.hibernate.search.util.impl.integrationtest.common.assertion.SearchResultAssert.assertThatQuery;
 
 import java.util.Collection;
+import java.util.Locale;
+import java.util.Map;
 
 import org.hibernate.search.engine.backend.document.DocumentElement;
+import org.hibernate.search.engine.backend.document.IndexFieldReference;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaElement;
 import org.hibernate.search.engine.backend.types.Aggregable;
 import org.hibernate.search.engine.backend.types.Projectable;
 import org.hibernate.search.engine.backend.types.Sortable;
+import org.hibernate.search.engine.backend.types.converter.ToDocumentValueConverter;
+import org.hibernate.search.engine.backend.types.converter.runtime.ToDocumentValueConvertContext;
 import org.hibernate.search.engine.backend.types.dsl.SearchableProjectableIndexFieldTypeOptionsStep;
 import org.hibernate.search.engine.backend.types.dsl.StandardIndexFieldTypeOptionsStep;
 import org.hibernate.search.engine.reporting.spi.EventContexts;
@@ -23,10 +28,12 @@ import org.hibernate.search.engine.search.common.ValueConvert;
 import org.hibernate.search.engine.search.predicate.dsl.PredicateFinalStep;
 import org.hibernate.search.engine.search.predicate.dsl.SearchPredicateFactory;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.FieldTypeDescriptor;
+import org.hibernate.search.integrationtest.backend.tck.testsupport.types.IntegerFieldTypeDescriptor;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.InvalidType;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.SimpleFieldModel;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.SimpleFieldModelsByType;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.ValueWrapper;
+import org.hibernate.search.util.common.AssertionFailure;
 import org.hibernate.search.util.common.SearchException;
 import org.hibernate.search.util.impl.integrationtest.common.reporting.FailureReportUtils;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.BulkIndexer;
@@ -34,6 +41,7 @@ import org.hibernate.search.util.impl.integrationtest.mapper.stub.SimpleMappedIn
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappingScope;
 import org.hibernate.search.util.impl.test.annotation.TestForIssue;
 
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 
@@ -484,6 +492,87 @@ public abstract class AbstractPredicateTypeCheckingAndConversionIT<V extends Abs
 				) );
 	}
 
+	@ParameterizedTest(name = "{5}")
+	@MethodSource("params")
+	void defaultDslConverter_valueConvertParse_validType(SimpleMappedIndex<IndexBinding> index,
+			SimpleMappedIndex<CompatibleIndexBinding> compatibleIndex,
+			SimpleMappedIndex<RawFieldCompatibleIndexBinding> rawFieldCompatibleIndex,
+			SimpleMappedIndex<MissingFieldIndexBinding> missingFieldIndex,
+			SimpleMappedIndex<IncompatibleIndexBinding> incompatibleIndex,
+			DataSet<?, V> dataSet) {
+		assertThatQuery( index.query()
+				.where( f -> predicate( f, customDslConverterField0Path( index, dataSet ),
+						stringMatchingParam( 0, dataSet ), ValueConvert.PARSE ) )
+				.routing( dataSet.routingKey ) )
+				.hasDocRefHitsAnyOrder( index.typeName(), dataSet.docId( 0 ) );
+	}
+
+	@ParameterizedTest(name = "{5}")
+	@MethodSource("params")
+	void defaultDslConverter_valueConvertParse_invalidType(SimpleMappedIndex<IndexBinding> index,
+			SimpleMappedIndex<CompatibleIndexBinding> compatibleIndex,
+			SimpleMappedIndex<RawFieldCompatibleIndexBinding> rawFieldCompatibleIndex,
+			SimpleMappedIndex<MissingFieldIndexBinding> missingFieldIndex,
+			SimpleMappedIndex<IncompatibleIndexBinding> incompatibleIndex,
+			DataSet<?, V> dataSet) {
+		SearchPredicateFactory f = index.createScope().predicate();
+		assertThatThrownBy( () -> predicate( f, defaultDslConverterField0Path( index, dataSet ), invalidTypeParam(),
+				ValueConvert.PARSE ) )
+				.isInstanceOf( SearchException.class )
+				.hasMessageContaining( "Unable to convert DSL argument: " )
+				.hasMessageContaining( InvalidType.class.getName() )
+				.hasCauseInstanceOf( ClassCastException.class )
+				.satisfies( FailureReportUtils.hasContext(
+						EventContexts.fromIndexFieldAbsolutePath( defaultDslConverterField0Path( index, dataSet ) )
+				) );
+	}
+
+	@ParameterizedTest(name = "{5}")
+	@MethodSource("params")
+	void customDslConverter_valueConvertParse_validType(SimpleMappedIndex<IndexBinding> index,
+			SimpleMappedIndex<CompatibleIndexBinding> compatibleIndex,
+			SimpleMappedIndex<RawFieldCompatibleIndexBinding> rawFieldCompatibleIndex,
+			SimpleMappedIndex<MissingFieldIndexBinding> missingFieldIndex,
+			SimpleMappedIndex<IncompatibleIndexBinding> incompatibleIndex,
+			DataSet<?, V> dataSet) {
+		assertThatQuery( index.query()
+				.where( f -> predicate( f, customDslConverterField0Path( index, dataSet ),
+						stringMatchingParam( 0, dataSet ), ValueConvert.PARSE ) )
+				.routing( dataSet.routingKey ) )
+				.hasDocRefHitsAnyOrder( index.typeName(), dataSet.docId( 0 ) );
+	}
+
+	@ParameterizedTest(name = "{5}")
+	@MethodSource("params")
+	void customDslConverter_valueConvertParse_invalidType(SimpleMappedIndex<IndexBinding> index,
+			SimpleMappedIndex<CompatibleIndexBinding> compatibleIndex,
+			SimpleMappedIndex<RawFieldCompatibleIndexBinding> rawFieldCompatibleIndex,
+			SimpleMappedIndex<MissingFieldIndexBinding> missingFieldIndex,
+			SimpleMappedIndex<IncompatibleIndexBinding> incompatibleIndex,
+			DataSet<?, V> dataSet) {
+		SearchPredicateFactory f = index.createScope().predicate();
+		assertThatThrownBy( () -> predicate( f, customDslConverterField0Path( index, dataSet ), invalidTypeParam(),
+				ValueConvert.PARSE ) )
+				.isInstanceOf( SearchException.class )
+				.hasMessageContaining( "Unable to convert DSL argument: " )
+				.hasMessageContaining( InvalidType.class.getName() )
+				.hasCauseInstanceOf( ClassCastException.class )
+				.satisfies( FailureReportUtils.hasContext(
+						EventContexts.fromIndexFieldAbsolutePath( customDslConverterField0Path( index, dataSet ) )
+				) );
+	}
+
+	@ParameterizedTest(name = "{1}")
+	@MethodSource("integerIndexParams")
+	void customParser_valueConvertParse_validType(SimpleMappedIndex<IndexBinding> integerIndex, DataSet<?, V> dataSet) {
+		for ( Map.Entry<String, Integer> entry : IndexIntegerBinding.Converter.NUMBERS.entrySet() ) {
+			assertThatQuery( integerIndex.query()
+					.where( f -> predicate( f, "integer", stringMatchingParamCustomParser( entry.getValue(), dataSet ),
+							ValueConvert.PARSE ) )
+			).hasDocRefHitsAnyOrder( integerIndex.typeName(), dataSet.docId( entry.getValue() ) );
+		}
+	}
+
 	protected abstract PredicateFinalStep predicate(SearchPredicateFactory f, String fieldPath, P matchingParam);
 
 	protected abstract PredicateFinalStep predicate(SearchPredicateFactory f, String fieldPath, P matchingParam,
@@ -497,6 +586,10 @@ public abstract class AbstractPredicateTypeCheckingAndConversionIT<V extends Abs
 	protected abstract P unwrappedMatchingParam(int matchingDocOrdinal, DataSet<?, V> dataSet);
 
 	protected abstract P wrappedMatchingParam(int matchingDocOrdinal, DataSet<?, V> dataSet);
+
+	protected abstract P stringMatchingParam(int matchingDocOrdinal, DataSet<?, V> dataSet);
+
+	protected abstract P stringMatchingParamCustomParser(int matchingDocOrdinal, DataSet<?, V> dataSet);
 
 	protected abstract String predicateTrait();
 
@@ -591,6 +684,72 @@ public abstract class AbstractPredicateTypeCheckingAndConversionIT<V extends Abs
 
 	public static class MissingFieldIndexBinding {
 		public MissingFieldIndexBinding(IndexSchemaElement root, Collection<? extends FieldTypeDescriptor<?, ?>> fieldTypes) {
+		}
+	}
+
+	public static final class IndexIntegerBinding {
+		private final IndexFieldReference<Integer> integer;
+
+		public IndexIntegerBinding(IndexSchemaElement root) {
+			integer = root.field( "integer", f -> f.asInteger().parser( Converter.INSTANCE ) ).toReference();
+		}
+
+		public static BulkIndexer contribute(SimpleMappedIndex<IndexIntegerBinding> index) {
+			BulkIndexer indexer = index.bulkIndexer();
+			for ( int i = 0; i < 10; i++ ) {
+				int value = i;
+				indexer.add( docId( i ), d -> d.addValue( index.binding().integer, value ) );
+			}
+			return indexer;
+		}
+
+		private static String docId(int docOrdinal) {
+			return IntegerFieldTypeDescriptor.INSTANCE.getUniqueName() + "_doc_" + docOrdinal;
+		}
+
+		public static class Converter implements ToDocumentValueConverter<String, Integer> {
+
+			public static final Converter INSTANCE = new Converter();
+
+			public static final Map<String, Integer> NUMBERS = Map.of(
+					"zero", 0,
+					"one", 1,
+					"two", 2,
+					"three", 3,
+					"four", 4,
+					"five", 5,
+					"six", 6,
+					"seven", 7,
+					"eight", 8,
+					"nine", 9
+			);
+
+			public static String string(Object value) {
+				for ( Map.Entry<String, Integer> entry : NUMBERS.entrySet() ) {
+					if ( entry.getValue().equals( value ) ) {
+						return entry.getKey();
+					}
+				}
+				throw new AssertionFailure(
+						"Unexpected string-integer " + value + ". Only 0-9 values are supported by this converter." );
+			}
+
+			@Override
+			public Integer toDocumentValue(String value, ToDocumentValueConvertContext context) {
+				if ( value == null ) {
+					return null;
+				}
+				if ( !NUMBERS.containsKey( value.toLowerCase( Locale.ROOT ) ) ) {
+					throw new AssertionFailure(
+							"Unexpected string-integer " + value + ". Only 0-9 values are supported by this converter." );
+				}
+				return NUMBERS.get( value.toLowerCase( Locale.ROOT ) );
+			}
+
+			@Override
+			public boolean isCompatibleWith(ToDocumentValueConverter<?, ?> other) {
+				return other == this;
+			}
 		}
 	}
 

@@ -99,6 +99,31 @@ include::{sourcedir}/org/hibernate/search/documentation/mapper/orm/binding/ident
 Here we just deem any instance of the same class to be compatible.
 ====
 
+[[binding-identifierbridge-parse-identifier-literal]]
+== Parsing identifier's string representation with `parseIdentifierLiteral(..)`
+
+In some scenarios, Hibernate Search may need to parse a string representation of an identifier,
+e.g. when the `ValueConvert.PARSE` is used in the matching clause of an <<search-dsl-predicate-id,identifier match predicate>>.
+
+With a custom identifier bridge, Hibernate Search cannot automatically parse such identifier literals by default.
+To address this, `parseIdentifierLiteral(..)` can be implemented.
+
+.Implementing `parseIdentifierLiteral(..)`
+====
+[source, JAVA, indent=0, subs="+callouts"]
+----
+include::{sourcedir}/org/hibernate/search/documentation/mapper/orm/binding/identifierbridge/parse/BookIdBridge.java[tags=include]
+----
+<1> Start implementing the identifier bridge as <<binding-identifierbridge-basics,usual>>.
+<2> Implement `parseIdentifierLiteral(..)` to convert a string value to a `BookId`.
+
+[source, JAVA, indent=0, subs="+callouts"]
+----
+include::{sourcedir}/org/hibernate/search/documentation/mapper/orm/binding/identifierbridge/parse/IdentifierBridgeSimpleIT.java[tags=include]
+----
+<1> Use the `ValueConvert.PARSE` and a string representation of the identifier in the <<search-dsl-predicate-id,identifier match predicate>>.
+====
+
 [[binding-identifierbridge-identifierbinder]]
 == [[mapper-orm-bridge-identifierbridge-identifierbinder]] Configuring the bridge more finely with `IdentifierBinder`
 

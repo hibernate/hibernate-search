@@ -480,10 +480,11 @@ see <<backend-lucene-field-types,Lucene field types>>
 or <<backend-elasticsearch-field-types,Elasticsearch field types>> depending on your backend.
 ====
 
+[[mapping-directfieldmapping-supported-types-table]]
 [cols="m,1,1,1",options="header"]
 .Property types with built-in value bridges
 |===
-|Property type|Value of index field (if different)|Limitations|Parsing method for 'indexNullAs'
+|Property type|Value of index field (if different)|Limitations|Parsing method for 'indexNullAs'/terms in query string predicates
 |All enum types|`name()` as a `java.lang.String`|-|`Enum.valueOf(String)`
 |java.lang.String|-|-|-
 |java.lang.Character, char|A single-character `java.lang.String`|-|Accepts any single-character `java.lang.String`

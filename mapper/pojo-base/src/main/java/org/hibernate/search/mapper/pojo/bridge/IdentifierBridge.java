@@ -10,6 +10,7 @@ import org.hibernate.search.mapper.pojo.bridge.runtime.IdentifierBridgeFromDocum
 import org.hibernate.search.mapper.pojo.bridge.runtime.IdentifierBridgeFromDocumentIdentifierContextExtension;
 import org.hibernate.search.mapper.pojo.bridge.runtime.IdentifierBridgeToDocumentIdentifierContext;
 import org.hibernate.search.mapper.pojo.bridge.runtime.IdentifierBridgeToDocumentIdentifierContextExtension;
+import org.hibernate.search.util.common.annotation.Incubating;
 
 /**
  * A bridge between a POJO property of type {@code I} and a document identifier.
@@ -48,6 +49,19 @@ public interface IdentifierBridge<I> extends AutoCloseable {
 
 	default boolean isCompatibleWith(IdentifierBridge<?> other) {
 		return equals( other );
+	}
+
+	/**
+	 * Transform the given document identifier string value back to the value of the POJO property.
+	 *
+	 * @param value The value to parse.
+	 * @return The raw index field value.
+	 * @throws RuntimeException If the value cannot be parsed to the raw index field value.
+	 */
+	@Incubating
+	default I parseIdentifierLiteral(String value) {
+		throw new UnsupportedOperationException( "Bridge " + toString()
+				+ " does not support parsing a value from a String. Trying to parse the value: " + value + "." );
 	}
 
 	/**

@@ -32,6 +32,7 @@ public abstract class AbstractIndexValueFieldType<
 	private final ProjectionConverter<F, F> rawProjectionConverter;
 	private final DslConverter<?, F> dslConverter;
 	private final ProjectionConverter<F, ?> projectionConverter;
+	private final DslConverter<?, F> parseConverter;
 
 	private final boolean searchable;
 	private final boolean sortable;
@@ -50,6 +51,7 @@ public abstract class AbstractIndexValueFieldType<
 		this.rawDslConverter = builder.rawDslConverter;
 		this.rawProjectionConverter = builder.rawProjectionConverter;
 		this.dslConverter = builder.dslConverter != null ? builder.dslConverter : rawDslConverter;
+		this.parseConverter = builder.parser != null ? builder.parser : rawDslConverter;
 		this.projectionConverter = builder.projectionConverter != null ? builder.projectionConverter : rawProjectionConverter;
 		this.searchable = builder.searchable;
 		this.sortable = builder.sortable;
@@ -114,6 +116,11 @@ public abstract class AbstractIndexValueFieldType<
 	}
 
 	@Override
+	public DslConverter<?, F> parser() {
+		return parseConverter;
+	}
+
+	@Override
 	public final DslConverter<F, F> rawDslConverter() {
 		return rawDslConverter;
 	}
@@ -165,6 +172,7 @@ public abstract class AbstractIndexValueFieldType<
 
 		private DslConverter<?, F> dslConverter;
 		private ProjectionConverter<F, ?> projectionConverter;
+		private DslConverter<?, F> parser;
 
 		private boolean searchable;
 		private boolean sortable;
@@ -194,6 +202,10 @@ public abstract class AbstractIndexValueFieldType<
 		public final <V> void projectionConverter(Class<V> valueType,
 				FromDocumentValueConverter<? super F, V> fromIndexConverter) {
 			this.projectionConverter = new ProjectionConverter<>( valueType, fromIndexConverter );
+		}
+
+		public final void parser(ToDocumentValueConverter<String, ? extends F> parser) {
+			this.parser = new DslConverter<>( String.class, parser );
 		}
 
 		public final void searchable(boolean searchable) {

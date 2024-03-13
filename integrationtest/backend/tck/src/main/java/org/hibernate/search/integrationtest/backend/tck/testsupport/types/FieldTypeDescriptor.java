@@ -9,6 +9,7 @@ package org.hibernate.search.integrationtest.backend.tck.testsupport.types;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 
 import org.hibernate.search.engine.backend.types.dsl.IndexFieldTypeFactory;
@@ -63,7 +64,6 @@ public abstract class FieldTypeDescriptor<F, S extends SearchableProjectableInde
 					BigDecimalFieldTypeDescriptor.INSTANCE,
 					BigIntegerFieldTypeDescriptor.INSTANCE
 			);
-			Collections.addAll( VectorFieldTypeDescriptor.getAllVector() );
 			if ( TckConfiguration.get().getBackendFeatures().supportsYearType() ) {
 				list.add( YearFieldTypeDescriptor.INSTANCE );
 			}
@@ -222,4 +222,8 @@ public abstract class FieldTypeDescriptor<F, S extends SearchableProjectableInde
 	}
 
 	public abstract Optional<IndexNullAsMatchPredicateExpectactions<F>> getIndexNullAsMatchPredicateExpectations();
+
+	public String format(F value) {
+		return Objects.toString( value, null );
+	}
 }

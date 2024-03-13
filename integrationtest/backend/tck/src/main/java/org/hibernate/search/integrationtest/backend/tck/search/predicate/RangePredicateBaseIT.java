@@ -10,12 +10,16 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 import org.hibernate.search.engine.search.common.ValueConvert;
 import org.hibernate.search.engine.search.predicate.dsl.PredicateFinalStep;
 import org.hibernate.search.engine.search.predicate.dsl.SearchPredicateFactory;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.FieldTypeDescriptor;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.GeoPointFieldTypeDescriptor;
+import org.hibernate.search.integrationtest.backend.tck.testsupport.types.IntegerFieldTypeDescriptor;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.StandardFieldTypeDescriptor;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.InvalidType;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.ValueWrapper;
@@ -70,6 +74,7 @@ class RangePredicateBaseIT {
 						TypeCheckingAndConversionConfigured.rawFieldCompatibleIndex,
 						TypeCheckingAndConversionConfigured.missingFieldIndex,
 						TypeCheckingAndConversionConfigured.incompatibleIndex,
+						TypeCheckingAndConversionConfigured.integerIndex,
 						ScaleCheckingConfigured.index, ScaleCheckingConfigured.compatibleIndex,
 						ScaleCheckingConfigured.incompatibleIndex
 				)
@@ -107,6 +112,8 @@ class RangePredicateBaseIT {
 						TypeCheckingAndConversionConfigured.compatibleIndex, typeCheckingCompatibleIndexer,
 						TypeCheckingAndConversionConfigured.rawFieldCompatibleIndex, typeCheckingRawFieldCompatibleIndexer,
 						TypeCheckingAndConversionConfigured.missingFieldIndex, typeCheckingMissingFieldIndexer ) );
+		BulkIndexer typeCheckingIntegerIndexer = AbstractPredicateTypeCheckingAndConversionIT.IndexIntegerBinding.contribute(
+				TypeCheckingAndConversionConfigured.integerIndex );
 
 		final BulkIndexer scaleCheckingMainIndexer = ScaleCheckingConfigured.index.bulkIndexer();
 		final BulkIndexer scaleCheckingCompatibleIndexer = ScaleCheckingConfigured.compatibleIndex.bulkIndexer();
@@ -118,7 +125,7 @@ class RangePredicateBaseIT {
 				analysisMainIndexIndexer, analysisCompatibleIndexIndexer, analysisIncompatibleIndexIndexer,
 				scoreIndexer,
 				typeCheckingMainIndexer, typeCheckingCompatibleIndexer,
-				typeCheckingRawFieldCompatibleIndexer, typeCheckingMissingFieldIndexer,
+				typeCheckingRawFieldCompatibleIndexer, typeCheckingMissingFieldIndexer, typeCheckingIntegerIndexer,
 				scaleCheckingMainIndexer, scaleCheckingCompatibleIndexer
 		);
 	}
@@ -497,9 +504,11 @@ class RangePredicateBaseIT {
 		private static final SimpleMappedIndex<IncompatibleIndexBinding> incompatibleIndex =
 				SimpleMappedIndex.of( root -> new IncompatibleIndexBinding( root, supportedFieldTypes ) )
 						.name( "typeChecking_incompatible" );
-
+		private static final SimpleMappedIndex<IndexIntegerBinding> integerIndex =
+				SimpleMappedIndex.of( IndexIntegerBinding::new ).name( "integer_index" );
 		private static final List<DataSet<?, ?>> dataSets = new ArrayList<>();
 		private static final List<Arguments> parameters = new ArrayList<>();
+		private static final List<Arguments> integerIndexParams = new ArrayList<>();
 		static {
 			for ( FieldTypeDescriptor<?, ?> fieldType : supportedFieldTypes ) {
 				DataSet<?, ?> dataSet = new DataSet<>( testValues( fieldType ) );
@@ -507,10 +516,17 @@ class RangePredicateBaseIT {
 				parameters.add( Arguments.of( index, compatibleIndex, rawFieldCompatibleIndex, missingFieldIndex,
 						incompatibleIndex, dataSet ) );
 			}
+			integerIndexParams.add( Arguments.of( integerIndex, new DataSet<>(
+					new RangePredicateTestValues<>( IntegerFieldTypeDescriptor.INSTANCE,
+							IntStream.range( 0, 10 ).boxed().collect( Collectors.toList() ) ) ) ) );
 		}
 
 		public static List<? extends Arguments> params() {
 			return parameters;
+		}
+
+		public static List<? extends Arguments> integerIndexParams() {
+			return integerIndexParams;
 		}
 
 		@Override
@@ -543,6 +559,27 @@ class RangePredicateBaseIT {
 		@Override
 		protected Range<?> wrappedMatchingParam(int matchingDocOrdinal, DataSet<?, RangePredicateTestValues<F>> dataSet) {
 			return unwrappedMatchingParam( matchingDocOrdinal, dataSet ).map( ValueWrapper::new );
+		}
+
+		@Override
+		protected Range<?> stringMatchingParam(int matchingDocOrdinal, DataSet<?, RangePredicateTestValues<F>> dataSet) {
+			Range<F> range = dataSet.values.matchingRange( matchingDocOrdinal );
+			return Range.between(
+					range.lowerBoundValue().map( Objects::toString ).orElse( null ), range.lowerBoundInclusion(),
+					range.upperBoundValue().map( Objects::toString ).orElse( null ), range.upperBoundInclusion()
+			);
+		}
+
+		@Override
+		protected Range<?> stringMatchingParamCustomParser(int matchingDocOrdinal,
+				DataSet<?, RangePredicateTestValues<F>> dataSet) {
+			Range<F> range = dataSet.values.matchingRange( matchingDocOrdinal );
+			return Range.between(
+					range.lowerBoundValue().map( IndexIntegerBinding.Converter::string ).orElse( null ),
+					range.lowerBoundInclusion(),
+					range.upperBoundValue().map( IndexIntegerBinding.Converter::string ).orElse( null ),
+					range.upperBoundInclusion()
+			);
 		}
 
 		@Override

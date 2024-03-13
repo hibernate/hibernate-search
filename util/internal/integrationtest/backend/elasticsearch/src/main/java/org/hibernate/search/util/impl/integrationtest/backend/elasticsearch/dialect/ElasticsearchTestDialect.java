@@ -16,6 +16,8 @@ import java.util.function.Predicate;
 
 import org.hibernate.search.backend.elasticsearch.ElasticsearchDistributionName;
 import org.hibernate.search.backend.elasticsearch.ElasticsearchVersion;
+import org.hibernate.search.backend.elasticsearch.types.format.impl.Elasticsearch7DefaultFieldFormatProvider;
+import org.hibernate.search.backend.elasticsearch.types.format.impl.ElasticsearchDefaultFieldFormatProvider;
 import org.hibernate.search.engine.backend.types.VectorSimilarity;
 import org.hibernate.search.util.common.AssertionFailure;
 import org.hibernate.search.util.impl.integrationtest.backend.elasticsearch.ElasticsearchTestHostConnectionConfiguration;
@@ -28,6 +30,8 @@ public class ElasticsearchTestDialect {
 
 	private static final ElasticsearchTestDialect INSTANCE = new ElasticsearchTestDialect();
 	private static final String LOCAL_DATE_DEFAULT_FORMAT = "uuuu-MM-dd";
+	private static final Elasticsearch7DefaultFieldFormatProvider DEFAULT_FIELD_FORMAT_PROVIDER =
+			new Elasticsearch7DefaultFieldFormatProvider();
 
 	public static ElasticsearchTestDialect get() {
 		return INSTANCE;
@@ -192,6 +196,10 @@ public class ElasticsearchTestDialect {
 				os -> true,
 				aoss -> false
 		);
+	}
+
+	public ElasticsearchDefaultFieldFormatProvider getDefaultFieldFormatProvider() {
+		return DEFAULT_FIELD_FORMAT_PROVIDER;
 	}
 
 	public static boolean isActualVersion(

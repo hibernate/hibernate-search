@@ -96,6 +96,12 @@ public abstract class AbstractMultiIndexSearchIndexValueFieldContext<
 	}
 
 	@Override
+	public DslConverter<?, F> parser() {
+		return fromTypeIfCompatible( SearchIndexValueFieldTypeContext::parser, DslConverter::isCompatibleWith,
+				"parser" );
+	}
+
+	@Override
 	public boolean highlighterTypeSupported(SearchHighlighterType type) {
 		return fromTypeIfCompatible(
 				t -> t.highlighterTypeSupported( type ),
