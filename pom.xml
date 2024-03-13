@@ -296,8 +296,8 @@
         <version.surefire.plugin.java-version.asm>9.6</version.surefire.plugin.java-version.asm>
         <version.jacoco.plugin>0.8.11</version.jacoco.plugin>
         <version.com.buschmais.jqassistant.plugin>2.1.0</version.com.buschmais.jqassistant.plugin>
-        <version.moditect.plugin>1.1.0</version.moditect.plugin>
-        <version.sonar.plugin>3.10.0.2594</version.sonar.plugin>
+        <version.moditect.plugin>1.2.0.Final</version.moditect.plugin>
+        <version.sonar.plugin>3.11.0.3922</version.sonar.plugin>
         <version.scripting.plugin>3.0.0</version.scripting.plugin>
         <version.org.apache.groovy.groovy-jsr223>4.0.13</version.org.apache.groovy.groovy-jsr223>
         <version.com.puppycrawl.tools.checkstyle>10.14.1</version.com.puppycrawl.tools.checkstyle>
