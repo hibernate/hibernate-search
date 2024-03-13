@@ -126,6 +126,7 @@ public class TypeBindingContextImpl<T> extends AbstractCompositeBindingContext
 		}
 	}
 
+	@SuppressWarnings("resource") // For the eclipse-compiler: complains on bridge not bing closed
 	private <T2> void checkAndBind(BeanHolder<? extends TypeBridge<T2>> bridgeHolder,
 			PojoRawTypeModel<?> expectedPropertyTypeModel) {
 		if ( !typeModel.rawType().isSubTypeOf( expectedPropertyTypeModel ) ) {

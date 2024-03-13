@@ -66,6 +66,7 @@ final class StandalonePojoIntegrationPartialBuildState {
 			ConfigurationPropertyChecker propertyChecker) {
 		SearchIntegrationFinalizer finalizer = integrationBuildState.finalizer( propertySource, propertyChecker );
 
+		@SuppressWarnings("resource") // For the eclipse-compiler: complains on mapping not bing closed
 		StandalonePojoMapping mapping = finalizer.finalizeMapping(
 				mappingKey,
 				(context, partialMapping) -> partialMapping.finalizeMapping( context )

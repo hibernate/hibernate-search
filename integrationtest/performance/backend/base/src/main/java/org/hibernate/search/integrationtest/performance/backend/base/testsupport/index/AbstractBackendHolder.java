@@ -44,6 +44,7 @@ public abstract class AbstractBackendHolder {
 	private List<MappedIndex> indexes;
 
 	@Setup(Level.Trial)
+	@SuppressWarnings("resource") // For the eclipse-compiler: complains on StubMappingImpl not bing closed
 	public void startHibernateSearch(TemporaryFileHolder temporaryFileHolder) throws IOException {
 		Map<String, Object> baseProperties = new LinkedHashMap<>();
 

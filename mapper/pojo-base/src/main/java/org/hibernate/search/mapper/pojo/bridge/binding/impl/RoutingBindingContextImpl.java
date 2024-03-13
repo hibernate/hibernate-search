@@ -53,7 +53,9 @@ public class RoutingBindingContextImpl<E> extends AbstractCompositeBindingContex
 	}
 
 	@Override
-	@SuppressWarnings("unchecked") // Checked using reflection
+	@SuppressWarnings({
+			"unchecked" /*Checked using reflection*/,
+			"resource" /* For the eclipse-compiler: complains on bridge not bing closed */ })
 	public <E2> void bridge(Class<E2> expectedType, BeanHolder<? extends RoutingBridge<E2>> bridgeHolder) {
 		PojoRawTypeModel<E2> expectedTypeModel = introspector.typeModel( expectedType );
 		if ( !indexedEntityType.isSubTypeOf( expectedTypeModel ) ) {

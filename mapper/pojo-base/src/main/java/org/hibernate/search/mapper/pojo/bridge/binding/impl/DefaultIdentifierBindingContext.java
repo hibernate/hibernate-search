@@ -57,9 +57,10 @@ public class DefaultIdentifierBindingContext<I> extends AbstractBindingContext
 	}
 
 	@Override
+	@SuppressWarnings("resource") // For the eclipse-compiler: complains on bridge not bing closed
 	public <I2> void bridge(Class<I2> expectedValueType, BeanHolder<? extends IdentifierBridge<I2>> bridgeHolder) {
+		PojoRawTypeModel<I2> expectedValueTypeModel = introspector.typeModel( expectedValueType );
 		try {
-			PojoRawTypeModel<I2> expectedValueTypeModel = introspector.typeModel( expectedValueType );
 			if ( !identifierTypeModel.rawType().equals( expectedValueTypeModel ) ) {
 				throw log.invalidInputTypeForBridge( bridgeHolder.get(), identifierTypeModel, expectedValueTypeModel );
 			}

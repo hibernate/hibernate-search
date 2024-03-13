@@ -70,6 +70,7 @@ public final class RoutingBridgeDocumentRouter<E> implements DocumentRouter<E> {
 		private boolean skip = false;
 
 		@Override
+		@SuppressWarnings("resource") // For the eclipse-compiler: complains on bridge not bing closed
 		public DocumentRoute addRoute() {
 			if ( currentRoute != null ) {
 				// TODO HSEARCH-3971 allow routing to multiple indexes *simultaneously*?
@@ -84,6 +85,7 @@ public final class RoutingBridgeDocumentRouter<E> implements DocumentRouter<E> {
 			skip = true;
 		}
 
+		@SuppressWarnings("resource") // For the eclipse-compiler: complains on bridge not bing closed
 		DocumentRouteDescriptor currentRoute(Object entityIdentifier, E entity, BridgeSessionContext context) {
 			routingBridgeHolder.get()
 					.route( this, entityIdentifier, entity, context.routingBridgeRouteContext() );
@@ -117,6 +119,7 @@ public final class RoutingBridgeDocumentRouter<E> implements DocumentRouter<E> {
 			skip = true;
 		}
 
+		@SuppressWarnings("resource") // For the eclipse-compiler: complains on bridge not bing closed
 		Collection<DocumentRouteDescriptor> previousDifferentRoutes(DocumentRouteDescriptor currentRoute,
 				Object entityIdentifier, E entity, DocumentRoutesDescriptor providedRoutes, BridgeSessionContext context) {
 			routingBridgeHolder.get()
