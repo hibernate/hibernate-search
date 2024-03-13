@@ -89,6 +89,7 @@ public class ValueBindingContextImpl<V> extends AbstractBindingContext
 	}
 
 	@Override
+	@SuppressWarnings("resource") // For the eclipse-compiler: complains on bridge not bing closed
 	public <V2, F> void bridge(Class<V2> expectedValueType, BeanHolder<? extends ValueBridge<V2, F>> bridgeHolder,
 			IndexFieldTypeOptionsStep<?, F> fieldTypeOptionsStep) {
 		try {

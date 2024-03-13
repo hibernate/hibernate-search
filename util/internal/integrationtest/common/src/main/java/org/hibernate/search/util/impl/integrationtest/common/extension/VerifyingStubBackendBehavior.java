@@ -401,6 +401,7 @@ class VerifyingStubBackendBehavior extends StubBackendBehavior {
 	}
 
 	@Override
+	@SuppressWarnings("resource") // For the eclipse-compiler: complains on StubSearchScroll not bing closed
 	public <T> SearchScroll<T> executeScrollWork(Set<String> indexNames, StubSearchWork work, int chunkSize,
 			StubSearchProjectionContext projectionContext, SearchLoadingContext<?> loadingContext,
 			StubSearchProjection<T> rootProjection, TimingSource timingSource) {
