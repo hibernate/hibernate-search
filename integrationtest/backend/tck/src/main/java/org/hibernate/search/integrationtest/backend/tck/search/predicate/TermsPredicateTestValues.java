@@ -19,8 +19,12 @@ public final class TermsPredicateTestValues<F> extends AbstractPredicateTestValu
 	private final List<F> nonMatchingValues;
 
 	public TermsPredicateTestValues(FieldTypeDescriptor<F, ?> fieldType) {
+		this( fieldType, fieldType.getAscendingUniqueTermValues().getSingle() );
+	}
+
+	public TermsPredicateTestValues(FieldTypeDescriptor<F, ?> fieldType, List<F> values) {
 		super( fieldType );
-		this.values = fieldType.getAscendingUniqueTermValues().getSingle();
+		this.values = values;
 		this.nonMatchingValues = fieldType.getNonMatchingValues();
 	}
 

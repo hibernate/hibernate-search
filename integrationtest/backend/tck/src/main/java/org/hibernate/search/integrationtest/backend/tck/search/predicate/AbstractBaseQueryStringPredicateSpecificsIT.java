@@ -9,10 +9,14 @@ package org.hibernate.search.integrationtest.backend.tck.search.predicate;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.hibernate.search.util.impl.integrationtest.common.assertion.SearchResultAssert.assertThatQuery;
 
+import java.time.Instant;
+import java.time.LocalDate;
 import java.util.List;
 import java.util.function.Function;
 
+import org.hibernate.search.engine.backend.analysis.AnalyzerNames;
 import org.hibernate.search.engine.backend.common.DocumentReference;
+import org.hibernate.search.engine.backend.document.IndexFieldReference;
 import org.hibernate.search.engine.backend.document.IndexObjectFieldReference;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaElement;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaObjectField;
@@ -68,18 +72,51 @@ abstract class AbstractBaseQueryStringPredicateSpecificsIT<P extends CommonQuery
 	public static final SearchSetupHelper setupHelper = SearchSetupHelper.create();
 
 	protected static final SimpleMappedIndex<IndexBinding> index = SimpleMappedIndex.of( IndexBinding::new );
+	protected static final SimpleMappedIndex<IndexSyntaxParsingBinding> indexForSyntaxParsingCheck =
+			SimpleMappedIndex.of( IndexSyntaxParsingBinding::new )
+					.name( "indexForSyntaxParsingCheck" );
 
 	private static final DataSet dataSet = new DataSet();
 
 	@BeforeAll
 	static void setup() {
 		setupHelper.start()
-				.withIndexes( index )
+				.withIndexes( index, indexForSyntaxParsingCheck )
 				.setup();
 
 		BulkIndexer indexer = index.bulkIndexer();
 		dataSet.contribute( indexer );
 		indexer.join();
+
+		indexForSyntaxParsingCheck.bulkIndexer()
+				.add( "1", doc -> {
+					doc.addValue( "string", "1" );
+					doc.addValue( "integer", 1 );
+					doc.addValue( "integer2", 1 );
+					doc.addValue( "instant", Instant.parse( "2000-01-01T01:01:01Z" ) );
+					doc.addValue( "instant2", Instant.parse( "2000-01-01T01:01:01Z" ) );
+					doc.addValue( "localDate", LocalDate.of( 2000, 1, 1 ) );
+					doc.addValue( "localDate2", LocalDate.of( 2000, 1, 1 ) );
+				} )
+				.add( "2", doc -> {
+					doc.addValue( "string", "2" );
+					doc.addValue( "integer", 2 );
+					doc.addValue( "integer2", 2 );
+					doc.addValue( "instant", Instant.parse( "2000-02-02T02:02:02Z" ) );
+					doc.addValue( "instant2", Instant.parse( "2000-02-02T02:02:02Z" ) );
+					doc.addValue( "localDate", LocalDate.of( 2000, 2, 2 ) );
+					doc.addValue( "localDate2", LocalDate.of( 2000, 2, 2 ) );
+				} )
+				.add( "3", doc -> {
+					doc.addValue( "string", "3" );
+					doc.addValue( "integer", 3 );
+					doc.addValue( "integer2", 3 );
+					doc.addValue( "instant", Instant.parse( "2000-03-03T03:03:03Z" ) );
+					doc.addValue( "instant2", Instant.parse( "2000-03-03T03:03:03Z" ) );
+					doc.addValue( "localDate", LocalDate.of( 2000, 3, 3 ) );
+					doc.addValue( "localDate2", LocalDate.of( 2000, 3, 3 ) );
+				} )
+				.join();
 	}
 
 	@Test
@@ -412,6 +449,26 @@ abstract class AbstractBaseQueryStringPredicateSpecificsIT<P extends CommonQuery
 			} ).add( DOCUMENT_5, document -> {
 				document.addValue( index.binding().analyzedStringField1.reference, TEXT_TERM_1_EDIT_DISTANCE_1_OR_TERM_6 );
 			} ).add( EMPTY, document -> {} );
+		}
+	}
+
+	protected static class IndexSyntaxParsingBinding {
+		final IndexFieldReference<Integer> integer;
+		final IndexFieldReference<Integer> integer2;
+		final IndexFieldReference<String> string;
+		final IndexFieldReference<Instant> instant;
+		final IndexFieldReference<Instant> instant2;
+		final IndexFieldReference<LocalDate> localDate;
+		final IndexFieldReference<LocalDate> localDate2;
+
+		IndexSyntaxParsingBinding(IndexSchemaElement root) {
+			this.integer = root.field( "integer", c -> c.asInteger() ).toReference();
+			this.integer2 = root.field( "integer2", c -> c.asInteger() ).toReference();
+			this.string = root.field( "string", c -> c.asString().analyzer( AnalyzerNames.DEFAULT ) ).toReference();
+			this.instant = root.field( "instant", c -> c.asInstant() ).toReference();
+			this.instant2 = root.field( "instant2", c -> c.asInstant() ).toReference();
+			this.localDate = root.field( "localDate", c -> c.asLocalDate() ).toReference();
+			this.localDate2 = root.field( "localDate2", c -> c.asLocalDate() ).toReference();
 		}
 	}
 

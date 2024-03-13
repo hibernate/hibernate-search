@@ -11,16 +11,16 @@ import java.util.Map;
 
 import org.hibernate.search.backend.lucene.logging.impl.Log;
 import org.hibernate.search.backend.lucene.search.common.impl.LuceneSearchIndexScope;
-import org.hibernate.search.backend.lucene.types.codec.impl.AbstractLuceneNumericFieldCodec;
-import org.hibernate.search.backend.lucene.types.codec.impl.LuceneFieldCodec;
-import org.hibernate.search.backend.lucene.types.lowlevel.impl.LuceneNumericDomain;
 import org.hibernate.search.backend.lucene.types.predicate.impl.LuceneCommonQueryStringPredicateBuilderFieldState;
 import org.hibernate.search.engine.search.common.BooleanOperator;
 import org.hibernate.search.engine.search.common.RewriteMethod;
+import org.hibernate.search.engine.search.common.ValueConvert;
 import org.hibernate.search.engine.search.common.spi.SearchQueryElementTypeKey;
 import org.hibernate.search.engine.search.predicate.SearchPredicate;
+import org.hibernate.search.engine.search.predicate.spi.PredicateTypeKeys;
 import org.hibernate.search.engine.search.predicate.spi.QueryStringPredicateBuilder;
 import org.hibernate.search.util.common.AssertionFailure;
+import org.hibernate.search.util.common.data.RangeBoundInclusion;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
 import org.apache.lucene.analysis.Analyzer;
@@ -107,7 +107,7 @@ public class LuceneQueryStringPredicate extends LuceneCommonQueryStringPredicate
 			}
 
 			try {
-				return applyMinimumShouldMatch( queryParser.parse( queryString ) );
+				return addMatchAllForBoolMustNotOnly( applyMinimumShouldMatch( queryParser.parse( queryString ) ) );
 			}
 			catch (ParseException e) {
 				throw log.queryStringParseException( queryString, e.getMessage(), e );
@@ -116,7 +116,7 @@ public class LuceneQueryStringPredicate extends LuceneCommonQueryStringPredicate
 
 		private MultiFieldQueryParser create(Map<String, Float> weights, Analyzer analyzer,
 				Map<String, LuceneCommonQueryStringPredicateBuilderFieldState> fieldStateMap) {
-			return new HibernateSearchMultiFieldQueryParser( analyzer, weights, fieldStateMap );
+			return new HibernateSearchMultiFieldQueryParser( analyzer, weights, fieldStateMap, scope );
 		}
 
 		private MultiTermQuery.RewriteMethod toRewriteMethod(RewriteMethod rewriteMethod, Integer n) {
@@ -152,24 +152,27 @@ public class LuceneQueryStringPredicate extends LuceneCommonQueryStringPredicate
 
 	private static class HibernateSearchMultiFieldQueryParser extends MultiFieldQueryParser {
 		private final Map<String, LuceneCommonQueryStringPredicateBuilderFieldState> fieldStates;
+		private final LuceneSearchIndexScope<?> scope;
 
 		public HibernateSearchMultiFieldQueryParser(Analyzer analyzer, Map<String, Float> boosts,
-				Map<String, LuceneCommonQueryStringPredicateBuilderFieldState> fieldStates) {
+				Map<String, LuceneCommonQueryStringPredicateBuilderFieldState> fieldStates, LuceneSearchIndexScope<?> scope) {
 			super( boosts.keySet().toArray( String[]::new ), analyzer, boosts );
 			this.fieldStates = fieldStates;
+			this.scope = scope;
 		}
 
 		@Override
 		protected Query newFieldQuery(Analyzer analyzer, String field, String queryText, boolean quoted)
 				throws ParseException {
 			var state = fieldStates.get( field );
-			LuceneFieldCodec<?> codec = state.field().type().codec();
-			if ( codec instanceof AbstractLuceneNumericFieldCodec<?, ?> ) {
-				AbstractLuceneNumericFieldCodec<?, Number> numericFieldCodec =
-						(AbstractLuceneNumericFieldCodec<?, Number>) codec;
-				Number number = numericFieldCodec.fromString( queryText );
-				return numericFieldCodec.getDomain().createExactQuery( field, number );
+
+			if ( !state.field().type().valueClass().isAssignableFrom( String.class ) ) {
+				var builder = state.field().queryElement( PredicateTypeKeys.MATCH, scope );
+				builder.value( queryText, ValueConvert.PARSE );
+
+				return LuceneSearchPredicate.from( scope, builder.build() ).toQuery( contextForField( state ) );
 			}
+
 			return super.newFieldQuery( analyzer, field, queryText, quoted );
 		}
 
@@ -200,33 +203,19 @@ public class LuceneQueryStringPredicate extends LuceneCommonQueryStringPredicate
 		@Override
 		protected Query newRangeQuery(String field, String part1, String part2, boolean startInclusive, boolean endInclusive) {
 			var state = fieldStates.get( field );
-			LuceneFieldCodec<?> codec = state.field().type().codec();
-			if ( codec instanceof AbstractLuceneNumericFieldCodec<?, ?> ) {
-				AbstractLuceneNumericFieldCodec<?, Number> numericFieldCodec =
-						(AbstractLuceneNumericFieldCodec<?, Number>) codec;
-				LuceneNumericDomain<Number> domain = numericFieldCodec.getDomain();
 
-				return domain.createRangeQuery(
-						field,
-						getLowerValue( domain, numericFieldCodec.fromString( part1 ), startInclusive ),
-						getUpperValue( domain, numericFieldCodec.fromString( part2 ), endInclusive )
-				);
+			if ( !state.field().type().valueClass().isAssignableFrom( String.class ) ) {
+				var builder = state.field().queryElement( PredicateTypeKeys.RANGE, scope );
+				builder.range(
+						org.hibernate.search.util.common.data.Range.between(
+								part1, startInclusive ? RangeBoundInclusion.INCLUDED : RangeBoundInclusion.EXCLUDED,
+								part2, endInclusive ? RangeBoundInclusion.INCLUDED : RangeBoundInclusion.EXCLUDED
+						),
+						ValueConvert.PARSE, ValueConvert.PARSE );
+				return LuceneSearchPredicate.from( scope, builder.build() ).toQuery( contextForField( state ) );
 			}
+
 			return super.newRangeQuery( field, part1, part2, startInclusive, endInclusive );
-		}
-
-		private static <E extends Number> E getLowerValue(LuceneNumericDomain<E> domain, E value, boolean inclusion) {
-			if ( value == null ) {
-				return domain.getMinValue();
-			}
-			return inclusion ? value : domain.getNextValue( value );
-		}
-
-		private static <E extends Number> E getUpperValue(LuceneNumericDomain<E> domain, E value, boolean inclusion) {
-			if ( value == null ) {
-				return domain.getMaxValue();
-			}
-			return inclusion ? value : domain.getPreviousValue( value );
 		}
 	}
 }

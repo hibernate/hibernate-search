@@ -501,6 +501,28 @@ class SingleFieldAggregationTypeCheckingAndConversionIT<F> {
 
 	@ParameterizedTest(name = "{0}")
 	@MethodSource("params")
+	void withConverter_conversionParser(SupportedSingleFieldAggregationExpectations<F> expectations,
+			DataSet<F> dataSet) {
+		String fieldPath = mainIndex.binding().fieldModels.get( expectations.fieldType() ).relativeFieldName;
+		AggregationScenario<?> scenario = expectations.withFieldType(
+				TypeAssertionHelper.parser( expectations.fieldType() ) );
+		if ( "range".equalsIgnoreCase( expectations.aggregationName() ) ) {
+			testValidAggregationWithConverterSetting(
+					scenario, mainIndex.createScope(), fieldPath, ValueConvert.PARSE,
+					dataSet
+			);
+		}
+		else {
+			assertThatThrownBy( () -> scenario.setupWithConverterSetting( mainIndex.createScope().aggregation(), fieldPath,
+					ValueConvert.PARSE ) )
+					.isInstanceOf( SearchException.class )
+					.hasMessageContainingAll(
+							"Cannot use ValueConvert.PARSE as a converter. Use one of the allowed values [YES, NO] instead" );
+		}
+	}
+
+	@ParameterizedTest(name = "{0}")
+	@MethodSource("params")
 	void withConverter_invalidFieldType(SupportedSingleFieldAggregationExpectations<F> expectations,
 			DataSet<F> dataSet) {
 		String fieldPath = mainIndex.binding().fieldWithConverterModels.get( expectations.fieldType() ).relativeFieldName;

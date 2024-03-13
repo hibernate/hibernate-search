@@ -25,6 +25,7 @@ public interface IndexRootBuilder extends IndexCompositeNodeBuilder {
 	/**
 	 * Defines how identifier values passed to the search DSL should be converted to document identifiers.
 	 * <p>
+	 * Corresponding converter is used for {@link org.hibernate.search.engine.search.common.ValueConvert#YES}.
 	 * When not set, users are expected to pass document identifiers directly.
 	 *
 	 * @param valueType The type of values that can be passed to the DSL.
@@ -32,6 +33,16 @@ public interface IndexRootBuilder extends IndexCompositeNodeBuilder {
 	 * @param <I> The type of identifier values that can be passed to the DSL.
 	 */
 	<I> void idDslConverter(Class<I> valueType, ToDocumentValueConverter<I, String> converter);
+
+	/**
+	 * Defines how identifier values passed to the search DSL should be converted to document identifiers.
+	 * <p>
+	 * Corresponding converter is used for {@link org.hibernate.search.engine.search.common.ValueConvert#PARSE}.
+	 * When not set, users are expected to pass document identifiers directly.
+	 *
+	 * @param converter A converter from the string value type to the document identifier (a string).
+	 */
+	void idParser(ToDocumentValueConverter<String, String> converter);
 
 	/**
 	 * Define how values returned when projecting on identifiers

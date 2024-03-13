@@ -36,5 +36,12 @@ abstract class AbstractLuceneIndexFieldTypeOptionsStep<S extends AbstractLuceneI
 		return thisAsS();
 	}
 
+	@Override
+	public S parser(ToDocumentValueConverter<String, ? extends F> parser) {
+		Contracts.assertNotNull( parser, "parser" );
+		builder.parser( parser );
+		return thisAsS();
+	}
+
 	protected abstract S thisAsS();
 }

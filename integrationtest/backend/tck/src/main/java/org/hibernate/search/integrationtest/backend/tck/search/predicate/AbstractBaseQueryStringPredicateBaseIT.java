@@ -8,11 +8,13 @@ package org.hibernate.search.integrationtest.backend.tck.search.predicate;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 import org.hibernate.search.engine.backend.types.dsl.SearchableProjectableIndexFieldTypeOptionsStep;
 import org.hibernate.search.engine.search.predicate.dsl.CommonQueryStringPredicateFieldStep;
 import org.hibernate.search.engine.search.predicate.dsl.PredicateFinalStep;
 import org.hibernate.search.engine.search.predicate.dsl.SearchPredicateFactory;
+import org.hibernate.search.engine.spatial.GeoPoint;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.FieldTypeDescriptor;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.extension.SearchSetupHelper;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.BulkIndexer;
@@ -35,12 +37,13 @@ abstract class AbstractBaseQueryStringPredicateBaseIT<P extends CommonQueryStrin
 			FieldTypeDescriptor<?, ? extends SearchableProjectableIndexFieldTypeOptionsStep<?, ?>>> unsupportedFieldTypes =
 					new ArrayList<>();
 	static {
+		Set<Class<?>> unsupported = Set.of( byte[].class, float[].class, GeoPoint.class );
 		for ( FieldTypeDescriptor<?, ?> fieldType : FieldTypeDescriptor.getAll() ) {
-			if ( String.class.equals( fieldType.getJavaType() ) || Integer.class.equals( fieldType.getJavaType() ) ) {
-				supportedFieldTypes.add( fieldType );
+			if ( unsupported.contains( fieldType.getJavaType() ) ) {
+				unsupportedFieldTypes.add( fieldType );
 			}
 			else {
-				unsupportedFieldTypes.add( fieldType );
+				supportedFieldTypes.add( fieldType );
 			}
 		}
 	}
@@ -132,8 +135,7 @@ abstract class AbstractBaseQueryStringPredicateBaseIT<P extends CommonQueryStrin
 		private static final List<Arguments> parameters = new ArrayList<>();
 		static {
 			for ( FieldTypeDescriptor<?, ?> fieldType : supportedFieldTypes ) {
-				DataSet<?, ?> dataSet =
-						new DataSet<>( testValues( fieldType ) );
+				DataSet<?, ?> dataSet = new DataSet<>( testValues( fieldType ) );
 				dataSets.add( dataSet );
 				parameters.add( Arguments.of( index, dataSet ) );
 			}

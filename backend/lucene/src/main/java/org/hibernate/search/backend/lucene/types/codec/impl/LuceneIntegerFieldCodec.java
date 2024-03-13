@@ -44,9 +44,4 @@ public final class LuceneIntegerFieldCodec extends AbstractLuceneNumericFieldCod
 	public LuceneNumericDomain<Integer> getDomain() {
 		return LuceneIntegerDomain.get();
 	}
-
-	@Override
-	protected Integer doFromString(String string) {
-		return Integer.parseInt( string );
-	}
 }

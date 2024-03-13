@@ -7,18 +7,25 @@
 package org.hibernate.search.integrationtest.backend.tck.search.predicate;
 
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.hibernate.search.util.impl.integrationtest.common.assertion.SearchHitsAssert.assertThatHits;
 import static org.hibernate.search.util.impl.integrationtest.common.assertion.SearchResultAssert.assertThatQuery;
 
+import java.time.Instant;
 import java.util.List;
+import java.util.Locale;
 import java.util.function.Supplier;
 
 import org.hibernate.search.engine.backend.common.DocumentReference;
+import org.hibernate.search.engine.search.common.BooleanOperator;
 import org.hibernate.search.engine.search.common.RewriteMethod;
 import org.hibernate.search.engine.search.predicate.SearchPredicate;
 import org.hibernate.search.engine.search.predicate.dsl.QueryStringPredicateFieldStep;
 import org.hibernate.search.engine.search.predicate.dsl.QueryStringPredicateOptionsStep;
 import org.hibernate.search.engine.search.predicate.dsl.SearchPredicateFactory;
 import org.hibernate.search.engine.search.query.SearchQuery;
+import org.hibernate.search.integrationtest.backend.tck.testsupport.types.InstantFieldTypeDescriptor;
+import org.hibernate.search.integrationtest.backend.tck.testsupport.util.TckBackendFeatures;
+import org.hibernate.search.integrationtest.backend.tck.testsupport.util.TckConfiguration;
 import org.hibernate.search.util.common.SearchException;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappingScope;
 
@@ -224,6 +231,204 @@ class QueryStringPredicateSpecificsIT extends AbstractBaseQueryStringPredicateSp
 
 		assertThatQuery( query )
 				.hasDocRefHitsAnyOrder( index.typeName(), DOCUMENT_2 );
+	}
+
+	@ParameterizedTest
+	@MethodSource
+	void queryStringSyntax(String field, String value1, String value2, String noMatch, String unParsableValue) {
+		StubMappingScope scope = indexForSyntaxParsingCheck.createScope();
+
+		assertThatHits(
+				scope.query()
+						.where( f -> f.queryString().field( field ).matching( value1 ) )
+						.fetchAllHits()
+		).hasDocRefHitsAnyOrder( indexForSyntaxParsingCheck.typeName(), "1" );
+
+		assertThatHits(
+				scope.query()
+						.where( f -> f.queryString().field( field ).matching( value1 + "^10" ) )
+						.fetchAllHits()
+		).hasDocRefHitsAnyOrder( indexForSyntaxParsingCheck.typeName(), "1" );
+
+		assertThatHits(
+				scope.query()
+						.where( f -> f.queryString().field( field ).matching( value1 + " || " + value2 )
+								.defaultOperator( BooleanOperator.AND ) )
+						.fetchAllHits()
+		).hasDocRefHitsAnyOrder( indexForSyntaxParsingCheck.typeName(), "1", "2" );
+
+		assertThatHits(
+				scope.query()
+						.where( f -> f.queryString().field( field ).matching( value1 + " OR " + value2 )
+								.defaultOperator( BooleanOperator.AND ) )
+						.fetchAllHits()
+		).hasDocRefHitsAnyOrder( indexForSyntaxParsingCheck.typeName(), "1", "2" );
+
+		assertThatHits(
+				scope.query()
+						.where( f -> f.queryString().field( field ).matching( value1 + " && " + value2 ) )
+						.fetchAllHits()
+		).isEmpty();
+
+		assertThatHits(
+				scope.query()
+						.where( f -> f.queryString().field( field ).matching( value1 + " AND " + value2 ) )
+						.fetchAllHits()
+		).isEmpty();
+
+		assertThatHits(
+				scope.query()
+						.where( f -> f.queryString().field( field )
+								.matching( String.format( Locale.ROOT, "(%s OR %s) AND !%s", value1, value2, value1 ) ) )
+						.fetchAllHits()
+		).hasDocRefHitsAnyOrder( indexForSyntaxParsingCheck.typeName(), "2" );
+
+		// ranges:
+		assertThatHits(
+				scope.query()
+						.where( f -> f.queryString().field( field )
+								.matching( String.format( Locale.ROOT, "[%s TO %s]", value1, value2 ) ) )
+						.fetchAllHits()
+		).hasDocRefHitsAnyOrder( indexForSyntaxParsingCheck.typeName(), "1", "2" );
+
+		assertThatHits(
+				scope.query()
+						.where( f -> f.queryString().field( field )
+								.matching( String.format( Locale.ROOT, "{%s TO %s}", value1, value2 ) ) )
+						.fetchAllHits()
+		).isEmpty();
+
+		assertThatHits(
+				scope.query()
+						.where( f -> f.queryString().field( field )
+								.matching( String.format( Locale.ROOT, "[%s TO %s}", value1, value2 ) ) )
+						.fetchAllHits()
+		).hasDocRefHitsAnyOrder( indexForSyntaxParsingCheck.typeName(), "1" );
+
+		assertThatHits(
+				scope.query()
+						.where( f -> f.queryString().field( field )
+								.matching( String.format( Locale.ROOT, "{%s TO %s]", value1, value2 ) ) )
+						.fetchAllHits()
+		).hasDocRefHitsAnyOrder( indexForSyntaxParsingCheck.typeName(), "2" );
+
+		assertThatHits(
+				scope.query()
+						.where( f -> f.queryString().field( field )
+								.matching( String.format( Locale.ROOT, "[%s TO *]", value1 ) ) )
+						.fetchAllHits()
+		).hasDocRefHitsAnyOrder( indexForSyntaxParsingCheck.typeName(), "1", "2", "3" );
+
+		assertThatHits(
+				scope.query()
+						.where( f -> f.queryString().field( field )
+								.matching( String.format( Locale.ROOT, "{%s TO *]", value1 ) ) )
+						.fetchAllHits()
+		).hasDocRefHitsAnyOrder( indexForSyntaxParsingCheck.typeName(), "2", "3" );
+
+		assertThatHits(
+				scope.query()
+						.where( f -> f.queryString().field( field )
+								.matching( String.format( Locale.ROOT, "[* TO %s]", value2 ) ) )
+						.fetchAllHits()
+		).hasDocRefHitsAnyOrder( indexForSyntaxParsingCheck.typeName(), "1", "2" );
+
+		assertThatHits(
+				scope.query()
+						.where( f -> f.queryString().field( field )
+								.matching( String.format( Locale.ROOT, "[* TO %s}", value2 ) ) )
+						.fetchAllHits()
+		).hasDocRefHitsAnyOrder( indexForSyntaxParsingCheck.typeName(), "1" );
+
+		assertThatHits(
+				scope.query()
+						.where( f -> f.queryString().field( field ).matching( "-" + noMatch ) )
+						.fetchAllHits()
+		).hasDocRefHitsAnyOrder( indexForSyntaxParsingCheck.typeName(), "1", "2", "3" );
+		assertThatHits(
+				scope.query()
+						.where( f -> f.queryString().field( field ).matching( "!" + noMatch ) )
+						.fetchAllHits()
+		).hasDocRefHitsAnyOrder( indexForSyntaxParsingCheck.typeName(), "1", "2", "3" );
+
+		assertThatHits(
+				scope.query()
+						.where( f -> f.queryString().field( field ).matching( noMatch ) )
+						.fetchAllHits()
+		).isEmpty();
+
+		assertThatHits(
+				scope.query()
+						.where( f -> f.queryString().field( field ).matching( String.format( Locale.ROOT, "\"%s\"", value1 ) ) )
+						.fetchAllHits()
+		).hasDocRefHitsAnyOrder( indexForSyntaxParsingCheck.typeName(), "1" );
+
+		assertThatHits(
+				scope.query()
+						.where( f -> f.queryString().fields( field, field + "2" )
+								.matching( String.format( Locale.ROOT, "\"%s\"", value1 ) ) )
+						.fetchAllHits()
+		).hasDocRefHitsAnyOrder( indexForSyntaxParsingCheck.typeName(), "1" );
+
+		assertThatThrownBy( () -> scope.query()
+				.where( f -> f.queryString().field( field )
+						.matching( String.format( Locale.ROOT, "\"%s %s\"", value1, value2 ) ) )
+				.fetchAllHits()
+		).isInstanceOf( SearchException.class );
+
+		assertThatThrownBy( () -> scope.query()
+				.where( f -> f.queryString().field( field )
+						.matching( String.format( Locale.ROOT, "\"%s %s\"~10", value1, value2 ) ) )
+				.fetchAllHits()
+		).isInstanceOf( SearchException.class );
+
+		assertThatThrownBy( () -> scope.query()
+				.where( f -> f.queryString().field( field ).matching( String.format( Locale.ROOT, "%s~10", value1 ) ) )
+				.fetchAllHits()
+		).isInstanceOf( SearchException.class );
+
+		//  "reason": "Can only use prefix queries on keyword, text and wildcard fields - not on [integer] which is of type [long]",
+		assertThatThrownBy( () -> scope.query()
+				.where( f -> f.queryString().field( field ).matching( String.format( Locale.ROOT, "%s*", value1 ) ) )
+				.fetchAllHits()
+		).isInstanceOf( SearchException.class );
+
+		if ( TckConfiguration.get().getBackendFeatures().queryStringFailOnPatternQueries() ) {
+			assertThatThrownBy( () -> scope.query()
+					.where( f -> f.queryString().field( field ).matching( String.format( Locale.ROOT, "/%s/", value2 ) ) )
+					.fetchAllHits()
+			).isInstanceOf( SearchException.class );
+		}
+
+		assertThatThrownBy( () -> scope.query()
+				.where( f -> f.queryString().field( field ).matching( String.format( Locale.ROOT, "%s?", value2 ) ) )
+				.fetchAllHits()
+		).isInstanceOf( SearchException.class );
+
+		assertThatThrownBy( () -> scope.query()
+				.where( f -> f.queryString().field( field ).matching(
+						String.format( Locale.ROOT, "%s", unParsableValue ) ) )
+				.fetchAllHits()
+		).isInstanceOf( SearchException.class );
+
+	}
+
+	public static List<? extends Arguments> queryStringSyntax() {
+		// String field, String value1, String value2, String noMatch, String unParsableValue
+		TckBackendFeatures backendFeatures = TckConfiguration.get().getBackendFeatures();
+		return List.of(
+				Arguments.of( "integer", "1", "2", "100", "not-an-int" ),
+				Arguments.of( "instant",
+						//"2000-01-01T01\\:01\\:01Z", "2000-02-02T02\\:02\\:02Z", "2222-02-02T02\\:02\\:02Z",
+						backendFeatures.formatForQueryStringPredicate( InstantFieldTypeDescriptor.INSTANCE,
+								Instant.parse( "2000-01-01T01:01:01Z" ) ).replace( ":", "\\:" ),
+						backendFeatures.formatForQueryStringPredicate( InstantFieldTypeDescriptor.INSTANCE,
+								Instant.parse( "2000-02-02T02:02:02Z" ) ).replace( ":", "\\:" ),
+						backendFeatures.formatForQueryStringPredicate( InstantFieldTypeDescriptor.INSTANCE,
+								Instant.parse( "2222-02-02T02:02:02Z" ) ).replace( ":", "\\:" ),
+						"not-an-instant" ),
+				Arguments.of( "localDate", "2000-01-01", "2000-02-02", "2222-02-02", "not-an-localDate" )
+		);
 	}
 
 	@Override

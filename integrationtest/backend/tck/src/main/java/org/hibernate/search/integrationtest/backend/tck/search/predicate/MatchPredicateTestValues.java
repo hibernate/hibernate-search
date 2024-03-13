@@ -14,8 +14,12 @@ public final class MatchPredicateTestValues<F> extends AbstractPredicateTestValu
 	private final List<F> values;
 
 	public MatchPredicateTestValues(FieldTypeDescriptor<F, ?> fieldType) {
+		this( fieldType, fieldType.getUniquelyMatchableValues() );
+	}
+
+	public MatchPredicateTestValues(FieldTypeDescriptor<F, ?> fieldType, List<F> values) {
 		super( fieldType );
-		this.values = fieldType.getUniquelyMatchableValues();
+		this.values = values;
 	}
 
 	@Override

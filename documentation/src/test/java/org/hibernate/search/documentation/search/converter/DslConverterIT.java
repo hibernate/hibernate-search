@@ -80,6 +80,24 @@ class DslConverterIT {
 		} );
 	}
 
+	@Test
+	void dslConverterParse() {
+		with( entityManagerFactory ).runInTransaction( entityManager -> {
+			SearchSession searchSession = Search.session( entityManager );
+
+			// tag::dsl-converter-parse[]
+			List<AuthenticationEvent> result = searchSession.search( AuthenticationEvent.class )
+					.where( f -> f.match().field( "outcome" )
+							.matching( "INVALID_PASSWORD", ValueConvert.PARSE ) )
+					.fetchHits( 20 );
+			// end::dsl-converter-parse[]
+
+			assertThat( result )
+					.extracting( "id" )
+					.containsExactly( 2 );
+		} );
+	}
+
 	private void initData() {
 		with( entityManagerFactory ).runInTransaction( entityManager -> {
 			AuthenticationEvent event1 = new AuthenticationEvent( 1 );
@@ -145,6 +163,11 @@ class DslConverterIT {
 		@Override
 		public String toIndexedValue(AuthenticationOutcome value, ValueBridgeToIndexedValueContext context) {
 			return value == null ? null : value.text;
+		}
+
+		@Override
+		public String parse(String value) {
+			return toIndexedValue( AuthenticationOutcome.valueOf( value ), null );
 		}
 	}
 

@@ -15,6 +15,7 @@ import org.hibernate.search.util.common.impl.Contracts;
 
 abstract class AbstractElasticsearchIndexFieldTypeOptionsStep<S extends AbstractElasticsearchIndexFieldTypeOptionsStep<?, F>, F>
 		implements IndexFieldTypeOptionsStep<S, F> {
+
 	protected final ElasticsearchIndexFieldTypeBuildContext buildContext;
 	protected final ElasticsearchIndexValueFieldType.Builder<F> builder;
 
@@ -37,6 +38,13 @@ abstract class AbstractElasticsearchIndexFieldTypeOptionsStep<S extends Abstract
 		Contracts.assertNotNull( valueType, "valueType" );
 		Contracts.assertNotNull( fromIndexConverter, "fromIndexConverter" );
 		builder.projectionConverter( valueType, fromIndexConverter );
+		return thisAsS();
+	}
+
+	@Override
+	public S parser(ToDocumentValueConverter<String, ? extends F> parser) {
+		Contracts.assertNotNull( parser, "parser" );
+		builder.parser( parser );
 		return thisAsS();
 	}
 

@@ -36,6 +36,12 @@ abstract class AbstractStubIndexFieldTypeOptionsStep<S extends AbstractStubIndex
 	}
 
 	@Override
+	public S parser(ToDocumentValueConverter<String, ? extends F> parser) {
+		builder.parser( parser );
+		return thisAsS();
+	}
+
+	@Override
 	public IndexFieldType<F> toIndexFieldType() {
 		return builder.build();
 	}

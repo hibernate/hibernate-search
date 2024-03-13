@@ -8,6 +8,9 @@ package org.hibernate.search.integrationtest.backend.tck.search.predicate;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 import org.hibernate.search.engine.backend.types.dsl.SearchableProjectableIndexFieldTypeOptionsStep;
 import org.hibernate.search.engine.search.common.ValueConvert;
@@ -15,6 +18,7 @@ import org.hibernate.search.engine.search.predicate.dsl.PredicateFinalStep;
 import org.hibernate.search.engine.search.predicate.dsl.SearchPredicateFactory;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.FieldTypeDescriptor;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.GeoPointFieldTypeDescriptor;
+import org.hibernate.search.integrationtest.backend.tck.testsupport.types.IntegerFieldTypeDescriptor;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.StandardFieldTypeDescriptor;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.InvalidType;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.ValueWrapper;
@@ -69,6 +73,7 @@ class MatchPredicateBaseIT {
 						TypeCheckingAndConversionConfigured.rawFieldCompatibleIndex,
 						TypeCheckingAndConversionConfigured.missingFieldIndex,
 						TypeCheckingAndConversionConfigured.incompatibleIndex,
+						TypeCheckingAndConversionConfigured.integerIndex,
 						ScaleCheckingConfigured.index, ScaleCheckingConfigured.compatibleIndex,
 						ScaleCheckingConfigured.incompatibleIndex
 				)
@@ -106,6 +111,8 @@ class MatchPredicateBaseIT {
 						TypeCheckingAndConversionConfigured.compatibleIndex, typeCheckingCompatibleIndexer,
 						TypeCheckingAndConversionConfigured.rawFieldCompatibleIndex, typeCheckingRawFieldCompatibleIndexer,
 						TypeCheckingAndConversionConfigured.missingFieldIndex, typeCheckingMissingFieldIndexer ) );
+		BulkIndexer typeCheckingIntegerIndexer = AbstractPredicateTypeCheckingAndConversionIT.IndexIntegerBinding.contribute(
+				TypeCheckingAndConversionConfigured.integerIndex );
 
 		final BulkIndexer scaleCheckingMainIndexer = ScaleCheckingConfigured.index.bulkIndexer();
 		final BulkIndexer scaleCheckingCompatibleIndexer = ScaleCheckingConfigured.compatibleIndex.bulkIndexer();
@@ -117,7 +124,7 @@ class MatchPredicateBaseIT {
 				analysisMainIndexIndexer, analysisCompatibleIndexIndexer, analysisIncompatibleIndexIndexer,
 				scoreIndexer,
 				typeCheckingMainIndexer, typeCheckingCompatibleIndexer,
-				typeCheckingRawFieldCompatibleIndexer, typeCheckingMissingFieldIndexer,
+				typeCheckingRawFieldCompatibleIndexer, typeCheckingMissingFieldIndexer, typeCheckingIntegerIndexer,
 				scaleCheckingMainIndexer, scaleCheckingCompatibleIndexer
 		);
 	}
@@ -500,9 +507,12 @@ class MatchPredicateBaseIT {
 		private static final SimpleMappedIndex<IncompatibleIndexBinding> incompatibleIndex =
 				SimpleMappedIndex.of( root -> new IncompatibleIndexBinding( root, supportedFieldTypes ) )
 						.name( "typeChecking_incompatible" );
+		private static final SimpleMappedIndex<IndexIntegerBinding> integerIndex =
+				SimpleMappedIndex.of( IndexIntegerBinding::new ).name( "integer_index" );
 
 		private static final List<DataSet<?, ?>> dataSets = new ArrayList<>();
 		private static final List<Arguments> parameters = new ArrayList<>();
+		private static final List<Arguments> integerIndexParams = new ArrayList<>();
 		static {
 			for ( FieldTypeDescriptor<?, ?> fieldType : supportedFieldTypes ) {
 				DataSet<?, ?> dataSet = new DataSet<>( testValues( fieldType ) );
@@ -510,10 +520,17 @@ class MatchPredicateBaseIT {
 				parameters.add( Arguments.of( index, compatibleIndex, rawFieldCompatibleIndex, missingFieldIndex,
 						incompatibleIndex, dataSet ) );
 			}
+			integerIndexParams.add( Arguments.of( integerIndex, new DataSet<>(
+					new MatchPredicateTestValues<>( IntegerFieldTypeDescriptor.INSTANCE,
+							IntStream.range( 0, 10 ).boxed().collect( Collectors.toList() ) ) ) ) );
 		}
 
 		public static List<? extends Arguments> params() {
 			return parameters;
+		}
+
+		public static List<? extends Arguments> integerIndexParams() {
+			return integerIndexParams;
 		}
 
 		@Override
@@ -546,6 +563,17 @@ class MatchPredicateBaseIT {
 		@Override
 		protected Object wrappedMatchingParam(int matchingDocOrdinal, DataSet<?, MatchPredicateTestValues<F>> dataSet) {
 			return new ValueWrapper<>( dataSet.values.matchingArg( matchingDocOrdinal ) );
+		}
+
+		@Override
+		protected String stringMatchingParam(int matchingDocOrdinal, DataSet<?, MatchPredicateTestValues<F>> dataSet) {
+			return Objects.toString( dataSet.values.matchingArg( matchingDocOrdinal ), null );
+		}
+
+		@Override
+		protected Object stringMatchingParamCustomParser(int matchingDocOrdinal,
+				DataSet<?, MatchPredicateTestValues<F>> dataSet) {
+			return IndexIntegerBinding.Converter.string( dataSet.values.matchingArg( matchingDocOrdinal ) );
 		}
 
 		@Override

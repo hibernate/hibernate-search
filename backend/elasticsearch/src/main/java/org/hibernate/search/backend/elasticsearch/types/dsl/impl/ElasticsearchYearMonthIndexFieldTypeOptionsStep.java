@@ -11,13 +11,14 @@ import java.time.format.DateTimeFormatter;
 
 import org.hibernate.search.backend.elasticsearch.types.codec.impl.ElasticsearchFieldCodec;
 import org.hibernate.search.backend.elasticsearch.types.codec.impl.ElasticsearchYearMonthFieldCodec;
+import org.hibernate.search.engine.backend.types.converter.spi.DefaultParseConverters;
 
 class ElasticsearchYearMonthIndexFieldTypeOptionsStep
 		extends
 		AbstractElasticsearchTemporalIndexFieldTypeOptionsStep<ElasticsearchYearMonthIndexFieldTypeOptionsStep, YearMonth> {
 
 	ElasticsearchYearMonthIndexFieldTypeOptionsStep(ElasticsearchIndexFieldTypeBuildContext buildContext) {
-		super( buildContext, YearMonth.class );
+		super( buildContext, YearMonth.class, DefaultParseConverters.YEAR_MONTH );
 	}
 
 	@Override

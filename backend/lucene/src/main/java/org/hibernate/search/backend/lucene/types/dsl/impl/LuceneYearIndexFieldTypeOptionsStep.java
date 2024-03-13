@@ -13,12 +13,13 @@ import org.hibernate.search.backend.lucene.types.codec.impl.DocValues;
 import org.hibernate.search.backend.lucene.types.codec.impl.Indexing;
 import org.hibernate.search.backend.lucene.types.codec.impl.LuceneYearFieldCodec;
 import org.hibernate.search.backend.lucene.types.codec.impl.Storage;
+import org.hibernate.search.engine.backend.types.converter.spi.DefaultParseConverters;
 
 class LuceneYearIndexFieldTypeOptionsStep
 		extends AbstractLuceneTemporalIndexFieldTypeOptionsStep<LuceneYearIndexFieldTypeOptionsStep, Year> {
 
 	LuceneYearIndexFieldTypeOptionsStep(LuceneIndexFieldTypeBuildContext buildContext) {
-		super( buildContext, Year.class );
+		super( buildContext, Year.class, DefaultParseConverters.YEAR );
 	}
 
 	@Override

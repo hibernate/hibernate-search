@@ -382,6 +382,34 @@ class AggregationDslIT {
 							)
 					);
 		} );
+
+		withinSearchSession( searchSession -> {
+			// @formatter:off
+			// tag::range-parse[]
+			AggregationKey<Map<Range<String>, Long>> countsByPriceKey = AggregationKey.of( "countsByPrice" );
+			SearchResult<Book> result = searchSession.search( Book.class )
+					.where( f -> f.matchAll() )
+					.aggregation( countsByPriceKey, f -> f.range()
+							// Assuming "releaseDate" is of type "java.util.Date" or "java.sql.Date"
+							.field( "releaseDate", String.class, ValueConvert.PARSE )
+							.range( null,
+									"1970-01-01T00:00:00Z" )
+							.range( "1970-01-01T00:00:00Z",
+									"2000-01-01T00:00:00Z" )
+							.range( "2000-01-01T00:00:00Z",									null )
+					)
+					.fetch( 20 );
+
+			Map<Range<String>, Long> countsByPrice = result.aggregation( countsByPriceKey );
+			// end::range-parse[]
+			// @formatter:on
+			assertThat( countsByPrice )
+					.containsExactly(
+							entry( Range.canonical( null, "1970-01-01T00:00:00Z" ), 2L ),
+							entry( Range.canonical( "1970-01-01T00:00:00Z", "2000-01-01T00:00:00Z" ), 1L ),
+							entry( Range.canonical( "2000-01-01T00:00:00Z", null ), 1L )
+					);
+		} );
 	}
 
 	@Test

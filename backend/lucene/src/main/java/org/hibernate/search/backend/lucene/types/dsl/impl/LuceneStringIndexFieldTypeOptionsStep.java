@@ -37,6 +37,7 @@ import org.hibernate.search.engine.backend.types.Norms;
 import org.hibernate.search.engine.backend.types.Projectable;
 import org.hibernate.search.engine.backend.types.Sortable;
 import org.hibernate.search.engine.backend.types.TermVector;
+import org.hibernate.search.engine.backend.types.converter.spi.DefaultParseConverters;
 import org.hibernate.search.engine.backend.types.dsl.StringIndexFieldTypeOptionsStep;
 import org.hibernate.search.engine.search.aggregation.spi.AggregationTypeKeys;
 import org.hibernate.search.engine.search.highlighter.spi.SearchHighlighterType;
@@ -74,7 +75,7 @@ class LuceneStringIndexFieldTypeOptionsStep
 	private Set<Highlightable> highlightable;
 
 	LuceneStringIndexFieldTypeOptionsStep(LuceneIndexFieldTypeBuildContext buildContext) {
-		super( buildContext, String.class );
+		super( buildContext, String.class, DefaultParseConverters.STRING );
 	}
 
 	@Override
@@ -211,9 +212,9 @@ class LuceneStringIndexFieldTypeOptionsStep
 			builder.queryElementFactory( PredicateTypeKeys.WILDCARD, new LuceneTextWildcardPredicate.Factory<>() );
 			builder.queryElementFactory( PredicateTypeKeys.REGEXP, new LuceneTextRegexpPredicate.Factory<>() );
 			builder.queryElementFactory( LucenePredicateTypeKeys.SIMPLE_QUERY_STRING,
-					new LuceneCommonQueryStringPredicateBuilderFieldState.Factory<>() );
+					new LuceneCommonQueryStringPredicateBuilderFieldState.Factory<>( codec ) );
 			builder.queryElementFactory( LucenePredicateTypeKeys.QUERY_STRING,
-					new LuceneCommonQueryStringPredicateBuilderFieldState.Factory<>() );
+					new LuceneCommonQueryStringPredicateBuilderFieldState.Factory<>( codec ) );
 		}
 
 		if ( resolvedSortable ) {

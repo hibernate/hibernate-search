@@ -316,6 +316,21 @@ include::{sourcedir}/org/hibernate/search/documentation/search/aggregation/Aggre
 
 See <<search-dsl-argument-type>> for more information.
 
+[[search-dsl-aggregation-range-parse-conversion]]
+=== Parse conversion
+
+include::../components/_incubating-warning.adoc[]
+
+With the range aggregations it is also possible to use the `ValueConvert.PARSE` and pass range values as strings:
+
+.Using string values to create ranges
+====
+[source, JAVA, indent=0, subs="+callouts"]
+----
+include::{sourcedir}/org/hibernate/search/documentation/search/aggregation/AggregationDslIT.java[tags=range-parse]
+----
+====
+
 [[search-dsl-aggregation-range-other]]
 === Other options
 
