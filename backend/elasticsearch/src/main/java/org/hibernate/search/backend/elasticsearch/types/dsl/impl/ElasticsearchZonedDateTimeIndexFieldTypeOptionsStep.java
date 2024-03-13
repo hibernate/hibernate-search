@@ -11,6 +11,7 @@ import java.time.format.DateTimeFormatter;
 
 import org.hibernate.search.backend.elasticsearch.types.codec.impl.ElasticsearchFieldCodec;
 import org.hibernate.search.backend.elasticsearch.types.codec.impl.ElasticsearchZonedDateTimeFieldCodec;
+import org.hibernate.search.engine.backend.types.converter.spi.DefaultParseConverters;
 
 class ElasticsearchZonedDateTimeIndexFieldTypeOptionsStep
 		extends
@@ -18,7 +19,7 @@ class ElasticsearchZonedDateTimeIndexFieldTypeOptionsStep
 				ZonedDateTime> {
 
 	ElasticsearchZonedDateTimeIndexFieldTypeOptionsStep(ElasticsearchIndexFieldTypeBuildContext buildContext) {
-		super( buildContext, ZonedDateTime.class );
+		super( buildContext, ZonedDateTime.class, DefaultParseConverters.ZONED_DATE_TIME );
 	}
 
 	@Override

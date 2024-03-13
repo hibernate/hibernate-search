@@ -8,6 +8,7 @@ package org.hibernate.search.engine.mapper.mapping.building.spi;
 
 import org.hibernate.search.engine.backend.types.converter.FromDocumentValueConverter;
 import org.hibernate.search.engine.backend.types.converter.ToDocumentValueConverter;
+import org.hibernate.search.util.common.annotation.Incubating;
 
 /**
  * The binding context associated to the root node in the entity tree.
@@ -26,5 +27,8 @@ public interface IndexedEntityBindingContext extends IndexBindingContext {
 	<I> void idDslConverter(Class<I> valueType, ToDocumentValueConverter<I, String> converter);
 
 	<I> void idProjectionConverter(Class<I> valueType, FromDocumentValueConverter<String, I> converter);
+
+	@Incubating
+	void idParser(ToDocumentValueConverter<String, String> parser);
 
 }

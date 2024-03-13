@@ -709,6 +709,7 @@ you will need a bridge that defines a native field type.
 See <<backend-elasticsearch-field-types-extension>>.
 ====
 
+[[backend-elasticsearch-field-types-table]]
 [cols="m,1,1",options="header"]
 .Field types supported by the Elasticsearch backend
 |====

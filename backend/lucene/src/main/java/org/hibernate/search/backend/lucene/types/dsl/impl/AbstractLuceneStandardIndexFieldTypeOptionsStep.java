@@ -12,6 +12,7 @@ import org.hibernate.search.engine.backend.types.Aggregable;
 import org.hibernate.search.engine.backend.types.Projectable;
 import org.hibernate.search.engine.backend.types.Searchable;
 import org.hibernate.search.engine.backend.types.Sortable;
+import org.hibernate.search.engine.backend.types.converter.ToDocumentValueConverter;
 import org.hibernate.search.util.common.AssertionFailure;
 
 /**
@@ -29,8 +30,10 @@ abstract class AbstractLuceneStandardIndexFieldTypeOptionsStep<
 	protected Aggregable aggregable = Aggregable.DEFAULT;
 	protected F indexNullAsValue = null;
 
-	AbstractLuceneStandardIndexFieldTypeOptionsStep(LuceneIndexFieldTypeBuildContext buildContext, Class<F> valueType) {
+	AbstractLuceneStandardIndexFieldTypeOptionsStep(LuceneIndexFieldTypeBuildContext buildContext, Class<F> valueType,
+			ToDocumentValueConverter<String, F> defaultParseConverter) {
 		super( buildContext, valueType );
+		builder.parser( defaultParseConverter );
 	}
 
 	@Override

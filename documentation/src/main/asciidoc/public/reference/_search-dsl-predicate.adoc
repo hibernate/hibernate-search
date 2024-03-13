@@ -1305,6 +1305,22 @@ IMPORTANT: If targeted fields have different analyzers, an exception will be thr
 You can avoid this by <<search-dsl-predicate-common-overriding-analysis,picking an analyzer explicitly>>,
 but make sure you know what you're doing.
 
+[[search-dsl-predicate-simpleQueryString-format-types]]
+=== Field types and expected format of field values
+
+This predicate is applicable to most of the <<mapping-directfieldmapping-supported-types,supported field types>>
+except `GeoPoint` and <<mapping-directfieldmapping-annotations-vectorfield,vector field>> types.
+
+The format of string literals used in the query string is backend-specific.
+With the Lucene backend, the format of these literals should be compatible with the parsing logic defined in <<mapping-directfieldmapping-supported-types-table>>,
+and for fields with custom bridges it <<binding-valuebridge-parse,must be defined >>.
+As for the Elasticsearch backend, see the <<backend-elasticsearch-field-types-table>>.
+
+Keep in mind that *not* all query constructs can be applied to non-string fields,
+e.g. adding <<search-dsl-predicate-simple-query-string-fuzzy,fuzziness>>,
+<<search-dsl-predicate-query-string-phrase-slop,slop>> or <<search-dsl-predicate-simple-query-string-prefix,wildcards>>
+will not work.
+
 [[search-dsl-predicate-simpleQueryString-other]]
 === Other options
 
@@ -1773,6 +1789,20 @@ See <<search-dsl-predicate-common-multiple-fields>>.
 IMPORTANT: If targeted fields have different analyzers, an exception will be thrown.
 You can avoid this by <<search-dsl-predicate-common-overriding-analysis,picking an analyzer explicitly>>,
 but make sure you know what you're doing.
+
+[[search-dsl-predicate-query-string-format-types]]
+=== Field types and expected format of field values
+
+This predicate is applicable to most of the <<mapping-directfieldmapping-supported-types,supported field types>>
+except `GeoPoint` and <<mapping-directfieldmapping-annotations-vectorfield,vector field>> types.
+
+The format of string literals used in the query string is backend-specific.
+With the Lucene backend, the format of these literals should be compatible with the parsing logic defined in <<mapping-directfieldmapping-supported-types-table>>,
+and for fields with custom bridges it <<binding-valuebridge-parse,must be defined >>.
+As for the Elasticsearch backend, see the <<backend-elasticsearch-field-types-table>>.
+
+Keep in mind that *not* all query constructs can be applied to non-string fields,
+e.g. creating regexp queries, using wildcards/slop/fuzziness will not work.
 
 [[search-dsl-predicate-query-string-other]]
 === Other options

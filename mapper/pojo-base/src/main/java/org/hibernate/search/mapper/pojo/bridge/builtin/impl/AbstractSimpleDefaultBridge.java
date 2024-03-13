@@ -47,6 +47,11 @@ abstract class AbstractSimpleDefaultBridge<V, F> implements ValueBridge<V, F>, I
 	}
 
 	@Override
+	public V parseIdentifierLiteral(String value) {
+		return fromString( value );
+	}
+
+	@Override
 	public boolean isCompatibleWith(IdentifierBridge<?> other) {
 		return other == this || getClass().equals( other.getClass() );
 	}

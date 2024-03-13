@@ -91,6 +91,11 @@ public class FloatVectorFieldTypeDescriptor extends VectorFieldTypeDescriptor<fl
 		) );
 	}
 
+	@Override
+	public String format(float[] value) {
+		return Arrays.toString( value );
+	}
+
 	private static float[] arrayOf(int size, float startingValue) {
 		float[] floats = new float[size];
 		float sum = 0.0f;

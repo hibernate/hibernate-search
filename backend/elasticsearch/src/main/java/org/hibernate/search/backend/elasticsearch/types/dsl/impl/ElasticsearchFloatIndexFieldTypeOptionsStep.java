@@ -9,12 +9,13 @@ package org.hibernate.search.backend.elasticsearch.types.dsl.impl;
 import org.hibernate.search.backend.elasticsearch.lowlevel.index.mapping.impl.DataTypes;
 import org.hibernate.search.backend.elasticsearch.types.codec.impl.ElasticsearchFieldCodec;
 import org.hibernate.search.backend.elasticsearch.types.codec.impl.ElasticsearchFloatFieldCodec;
+import org.hibernate.search.engine.backend.types.converter.spi.DefaultParseConverters;
 
 class ElasticsearchFloatIndexFieldTypeOptionsStep
 		extends AbstractElasticsearchNumericFieldTypeOptionsStep<ElasticsearchFloatIndexFieldTypeOptionsStep, Float> {
 
 	ElasticsearchFloatIndexFieldTypeOptionsStep(ElasticsearchIndexFieldTypeBuildContext buildContext) {
-		super( buildContext, Float.class, DataTypes.FLOAT );
+		super( buildContext, Float.class, DataTypes.FLOAT, DefaultParseConverters.FLOAT );
 	}
 
 	@Override

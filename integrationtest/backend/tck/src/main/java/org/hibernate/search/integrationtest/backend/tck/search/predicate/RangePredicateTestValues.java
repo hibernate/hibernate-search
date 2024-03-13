@@ -18,8 +18,12 @@ public final class RangePredicateTestValues<F> extends AbstractPredicateTestValu
 	private final List<F> values;
 
 	public RangePredicateTestValues(FieldTypeDescriptor<F, ?> fieldType) {
+		this( fieldType, fieldType.getAscendingUniqueTermValues().getSingle() );
+	}
+
+	public RangePredicateTestValues(FieldTypeDescriptor<F, ?> fieldType, List<F> values) {
 		super( fieldType );
-		this.values = fieldType.getAscendingUniqueTermValues().getSingle();
+		this.values = values;
 	}
 
 	@Override

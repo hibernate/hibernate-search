@@ -11,12 +11,13 @@ import org.hibernate.search.backend.lucene.types.codec.impl.DocValues;
 import org.hibernate.search.backend.lucene.types.codec.impl.Indexing;
 import org.hibernate.search.backend.lucene.types.codec.impl.LuceneDoubleFieldCodec;
 import org.hibernate.search.backend.lucene.types.codec.impl.Storage;
+import org.hibernate.search.engine.backend.types.converter.spi.DefaultParseConverters;
 
 class LuceneDoubleIndexFieldTypeOptionsStep
 		extends AbstractLuceneNumericIndexFieldTypeOptionsStep<LuceneDoubleIndexFieldTypeOptionsStep, Double> {
 
 	LuceneDoubleIndexFieldTypeOptionsStep(LuceneIndexFieldTypeBuildContext buildContext) {
-		super( buildContext, Double.class );
+		super( buildContext, Double.class, DefaultParseConverters.DOUBLE );
 	}
 
 	@Override

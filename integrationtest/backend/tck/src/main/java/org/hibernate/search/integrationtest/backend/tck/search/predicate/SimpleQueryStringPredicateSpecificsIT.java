@@ -6,10 +6,16 @@
  */
 package org.hibernate.search.integrationtest.backend.tck.search.predicate;
 
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.hibernate.search.util.impl.integrationtest.common.assertion.SearchHitsAssert.assertThatHits;
 import static org.hibernate.search.util.impl.integrationtest.common.assertion.SearchResultAssert.assertThatQuery;
 
+import java.time.Instant;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.EnumSet;
+import java.util.List;
+import java.util.Locale;
 import java.util.function.Function;
 
 import org.hibernate.search.engine.backend.common.DocumentReference;
@@ -18,11 +24,19 @@ import org.hibernate.search.engine.search.predicate.dsl.SearchPredicateFactory;
 import org.hibernate.search.engine.search.predicate.dsl.SimpleQueryFlag;
 import org.hibernate.search.engine.search.predicate.dsl.SimpleQueryStringPredicateFieldStep;
 import org.hibernate.search.engine.search.query.SearchQuery;
+import org.hibernate.search.integrationtest.backend.tck.testsupport.types.InstantFieldTypeDescriptor;
+import org.hibernate.search.integrationtest.backend.tck.testsupport.types.StandardFieldTypeDescriptor;
+import org.hibernate.search.integrationtest.backend.tck.testsupport.util.TckBackendFeatures;
+import org.hibernate.search.integrationtest.backend.tck.testsupport.util.TckConfiguration;
+import org.hibernate.search.util.common.SearchException;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappingScope;
 import org.hibernate.search.util.impl.test.annotation.PortedFromSearch5;
 import org.hibernate.search.util.impl.test.annotation.TestForIssue;
 
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 
 class SimpleQueryStringPredicateSpecificsIT
 		extends AbstractBaseQueryStringPredicateSpecificsIT<SimpleQueryStringPredicateFieldStep<?>> {
@@ -299,6 +313,124 @@ class SimpleQueryStringPredicateSpecificsIT
 				.toQuery() )
 				// "ESCAPE" disabled: "\" is interpreted as a literal and the prefix cannot be found
 				.hasNoHits();
+	}
+
+	@ParameterizedTest
+	@MethodSource
+	void simpleQueryStringSyntax(String field, String value1, String value2, String noMatch, String unParsableValue) {
+		StubMappingScope scope = indexForSyntaxParsingCheck.createScope();
+
+		assertThatHits(
+				scope.query()
+						.where( f -> f.simpleQueryString().field( field ).matching( value1 ) )
+						.fetchAllHits()
+		).hasDocRefHitsAnyOrder( indexForSyntaxParsingCheck.typeName(), syntaxDataSet.docId( 1 ) );
+
+		assertThatHits(
+				scope.query()
+						.where( f -> f.simpleQueryString().field( field ).matching( value1 + " | " + value2 )
+								.defaultOperator( BooleanOperator.AND ) )
+						.fetchAllHits()
+		).hasDocRefHitsAnyOrder( indexForSyntaxParsingCheck.typeName(), syntaxDataSet.docId( 1 ), syntaxDataSet.docId( 2 ) );
+
+		assertThatHits(
+				scope.query()
+						.where( f -> f.simpleQueryString().field( field ).matching(
+								String.format( Locale.ROOT, "(%s | %s) + -%s", value1, value2, value1 ) )
+								.defaultOperator( BooleanOperator.AND ) )
+						.fetchAllHits()
+		).hasDocRefHitsAnyOrder( indexForSyntaxParsingCheck.typeName(), syntaxDataSet.docId( 2 ) );
+
+		if ( noMatch != null ) {
+
+			assertThatHits(
+					scope.query()
+							.where( f -> f.simpleQueryString().field( field ).matching( "-" + noMatch ) )
+							.fetchAllHits()
+			).hasDocRefHitsAnyOrder( indexForSyntaxParsingCheck.typeName(), syntaxDataSet.docId( 1 ), syntaxDataSet.docId( 2 ),
+					syntaxDataSet.docId( 3 ) );
+
+			assertThatHits(
+					scope.query()
+							.where( f -> f.simpleQueryString().field( field ).matching( noMatch ) )
+							.fetchAllHits()
+			).isEmpty();
+		}
+
+		assertThatHits(
+				scope.query()
+						.where( f -> f.simpleQueryString().field( field ).matching(
+								String.format( Locale.ROOT, "\"%s\"", value1 ) ) )
+						.fetchAllHits()
+		).hasDocRefHitsAnyOrder( indexForSyntaxParsingCheck.typeName(), syntaxDataSet.docId( 1 ) );
+
+		assertThatHits(
+				scope.query()
+						.where( f -> f.simpleQueryString().fields( field, field + "2" ).matching(
+								String.format( Locale.ROOT, "\"%s\"", value1 ) ) )
+						.fetchAllHits()
+		).hasDocRefHitsAnyOrder( indexForSyntaxParsingCheck.typeName(), syntaxDataSet.docId( 1 ) );
+
+		assertThatThrownBy( () -> scope.query()
+				.where( f -> f.simpleQueryString().field( field ).matching(
+						String.format( Locale.ROOT, "\"%s %s\"", value1, value2 ) ) )
+				.fetchAllHits()
+		).isInstanceOf( SearchException.class );
+
+		assertThatThrownBy( () -> scope.query()
+				.where( f -> f.simpleQueryString().field( field ).matching(
+						String.format( Locale.ROOT, "\"%s %s\"~10", value1, value2 ) ) )
+				.fetchAllHits()
+		).isInstanceOf( SearchException.class );
+
+		assertThatThrownBy( () -> scope.query()
+				.where( f -> f.simpleQueryString().field( field ).matching(
+						String.format( Locale.ROOT, "%s~10", value1 ) ) )
+				.fetchAllHits()
+		).isInstanceOf( SearchException.class );
+
+		//  "reason": "Can only use prefix queries on keyword, text and wildcard fields - not on [integer] which is of type [long]",
+		assertThatThrownBy( () -> scope.query()
+				.where( f -> f.simpleQueryString().field( field ).matching(
+						String.format( Locale.ROOT, "%s*", value1 ) ) )
+				.fetchAllHits()
+		).isInstanceOf( SearchException.class );
+
+		assertThatThrownBy( () -> scope.query()
+				.where( f -> f.simpleQueryString().field( field ).matching(
+						String.format( Locale.ROOT, "%s", unParsableValue ) ) )
+				.fetchAllHits()
+		).isInstanceOf( SearchException.class );
+
+	}
+
+	public static List<? extends Arguments> simpleQueryStringSyntax1() {
+		// String field, String value1, String value2, String noMatch, String unParsableValue
+		TckBackendFeatures backendFeatures = TckConfiguration.get().getBackendFeatures();
+		return List.of(
+				Arguments.of( "integer", "1", "2", "100", "not-an-int" ),
+				Arguments.of( "instant",
+						backendFeatures.formatForQueryStringPredicate( InstantFieldTypeDescriptor.INSTANCE,
+								Instant.parse( "2000-01-01T01:01:01Z" ) ),
+						backendFeatures.formatForQueryStringPredicate( InstantFieldTypeDescriptor.INSTANCE,
+								Instant.parse( "2000-02-02T02:02:02Z" ) ),
+						backendFeatures.formatForQueryStringPredicate( InstantFieldTypeDescriptor.INSTANCE,
+								Instant.parse( "2222-02-02T02:02:02Z" ) ),
+						"not-an-instant" ),
+				Arguments.of( "localDate", "2000-01-01", "2000-02-02", "2222-02-02", "not-an-localDate" )
+		);
+	}
+
+	public static List<? extends Arguments> simpleQueryStringSyntax() {
+		// String field, String value1, String value2, String noMatch, String unParsableValue
+		TckBackendFeatures backendFeatures = TckConfiguration.get().getBackendFeatures();
+		List<Arguments> parameters = new ArrayList<>();
+
+		for ( StandardFieldTypeDescriptor<?> typeDescriptor : supported ) {
+			parameters.add( arguments( backendFeatures, typeDescriptor ) );
+		}
+
+		return parameters;
 	}
 
 	@Override

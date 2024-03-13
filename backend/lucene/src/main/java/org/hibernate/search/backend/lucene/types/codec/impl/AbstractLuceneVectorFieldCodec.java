@@ -121,11 +121,6 @@ public abstract class AbstractLuceneVectorFieldCodec<F> implements LuceneVectorF
 	}
 
 	@Override
-	public byte[] fromString(String string) {
-		throw new UnsupportedOperationException( "Parsing from string is not supported." );
-	}
-
-	@Override
 	public String toString() {
 		return getClass().getSimpleName() + "{" +
 				"vectorSimilarity=" + vectorSimilarity +

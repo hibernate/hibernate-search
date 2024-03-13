@@ -11,6 +11,8 @@ import static org.hibernate.search.util.impl.integrationtest.common.assertion.Se
 
 import java.util.List;
 import java.util.function.Function;
+import java.util.function.Predicate;
+import java.util.stream.Collectors;
 
 import org.hibernate.search.engine.backend.common.DocumentReference;
 import org.hibernate.search.engine.backend.document.IndexObjectFieldReference;
@@ -23,8 +25,12 @@ import org.hibernate.search.engine.search.predicate.dsl.SearchPredicateFactory;
 import org.hibernate.search.engine.search.query.SearchQuery;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.configuration.DefaultAnalysisDefinitions;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.AnalyzedStringFieldTypeDescriptor;
+import org.hibernate.search.integrationtest.backend.tck.testsupport.types.FieldTypeDescriptor;
+import org.hibernate.search.integrationtest.backend.tck.testsupport.types.GeoPointFieldTypeDescriptor;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.KeywordStringFieldTypeDescriptor;
+import org.hibernate.search.integrationtest.backend.tck.testsupport.types.StandardFieldTypeDescriptor;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.SimpleFieldModel;
+import org.hibernate.search.integrationtest.backend.tck.testsupport.util.TckBackendFeatures;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.extension.SearchSetupHelper;
 import org.hibernate.search.util.common.SearchException;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.BulkIndexer;
@@ -68,18 +74,34 @@ abstract class AbstractBaseQueryStringPredicateSpecificsIT<P extends CommonQuery
 	public static final SearchSetupHelper setupHelper = SearchSetupHelper.create();
 
 	protected static final SimpleMappedIndex<IndexBinding> index = SimpleMappedIndex.of( IndexBinding::new );
+	protected static final SimpleMappedIndex<IndexSyntaxParsingBinding> indexForSyntaxParsingCheck =
+			SimpleMappedIndex.of( IndexSyntaxParsingBinding::new )
+					.name( "indexForSyntaxParsingCheck" );
 
 	private static final DataSet dataSet = new DataSet();
+	protected static final List<StandardFieldTypeDescriptor<?>> supported =
+			FieldTypeDescriptor.getAllStandard().stream()
+					// geo point is not supported:
+					.filter( Predicate.not( GeoPointFieldTypeDescriptor.INSTANCE::equals ) )
+					// strings are tested elsewhere:
+					.filter( descriptor -> !String.class.isAssignableFrom( descriptor.getJavaType() ) )
+					.collect( Collectors.toList() );
+	protected static final SyntaxDataSet syntaxDataSet = new SyntaxDataSet( supported );
+
 
 	@BeforeAll
 	static void setup() {
 		setupHelper.start()
-				.withIndexes( index )
+				.withIndexes( index, indexForSyntaxParsingCheck )
 				.setup();
 
 		BulkIndexer indexer = index.bulkIndexer();
 		dataSet.contribute( indexer );
-		indexer.join();
+
+		BulkIndexer syntaxIndexer = indexForSyntaxParsingCheck.bulkIndexer();
+		syntaxDataSet.contribute( syntaxIndexer );
+
+		indexer.join( syntaxIndexer );
 	}
 
 	@Test
@@ -413,6 +435,76 @@ abstract class AbstractBaseQueryStringPredicateSpecificsIT<P extends CommonQuery
 				document.addValue( index.binding().analyzedStringField1.reference, TEXT_TERM_1_EDIT_DISTANCE_1_OR_TERM_6 );
 			} ).add( EMPTY, document -> {} );
 		}
+	}
+
+	protected static final class SyntaxDataSet extends AbstractPredicateDataSet {
+
+		private final List<StandardFieldTypeDescriptor<?>> descriptors;
+
+		public SyntaxDataSet(List<StandardFieldTypeDescriptor<?>> descriptors) {
+			super( "" );
+			this.descriptors = descriptors;
+		}
+
+		public void contribute(BulkIndexer indexer) {
+			indexer.add( docId( 1 ), document -> {
+				for ( StandardFieldTypeDescriptor<?> descriptor : descriptors ) {
+					document.addValue( descriptor.getUniqueName(),
+							descriptor.getAscendingUniqueTermValues().getSingle().get( 0 ) );
+				}
+			} ).add( docId( 2 ), document -> {
+				for ( StandardFieldTypeDescriptor<?> descriptor : descriptors ) {
+					document.addValue( descriptor.getUniqueName(),
+							descriptor.getAscendingUniqueTermValues().getSingle().get( 1 ) );
+				}
+			} ).add( docId( 3 ), document -> {
+				for ( StandardFieldTypeDescriptor<?> descriptor : descriptors ) {
+					List<?> single = descriptor.getAscendingUniqueTermValues().getSingle();
+					document.addValue(
+							descriptor.getUniqueName(),
+							single.size() < 3 ? null : single.get( 2 )
+					);
+				}
+			} );
+		}
+	}
+
+	protected static class IndexSyntaxParsingBinding {
+		IndexSyntaxParsingBinding(IndexSchemaElement root) {
+			for ( StandardFieldTypeDescriptor<?> descriptor : supported ) {
+				root.field( descriptor.getUniqueName(), descriptor::configure ).toReference();
+				root.field( descriptor.getUniqueName() + 2, descriptor::configure ).toReference();
+			}
+		}
+	}
+
+	protected static <T> Arguments arguments(TckBackendFeatures backendFeatures,
+			StandardFieldTypeDescriptor<T> typeDescriptor) {
+		List<T> single = typeDescriptor.getAscendingUniqueTermValues().getSingle();
+		return Arguments.of(
+				typeDescriptor.getUniqueName(),
+				escape( backendFeatures.formatForQueryStringPredicate( typeDescriptor, single.get( 0 ) ) ),
+				escape( backendFeatures.formatForQueryStringPredicate( typeDescriptor, single.get( 1 ) ) ),
+				escape( backendFeatures.formatForQueryStringPredicate( typeDescriptor,
+						single.size() < 4 ? null : single.get( 3 ) ) ),
+				"not-an-" + typeDescriptor.getUniqueName()
+		);
+	}
+
+	private static String escape(String value) {
+		if ( value == null ) {
+			return null;
+		}
+		value = value.replace( ":", "\\:" );
+		value = value.replace( "[", "\\[" );
+		value = value.replace( "]", "\\]" );
+		value = value.replace( "/", "\\/" );
+		value = value.replace( "+", "\\+" );
+		value = value.replace( "-", "\\-" );
+		if ( value.startsWith( "-" ) || value.startsWith( "+" ) ) {
+			value = "\\" + value;
+		}
+		return value;
 	}
 
 	abstract P predicate(SearchPredicateFactory f);

@@ -17,6 +17,7 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.NavigableMap;
 import java.util.TreeMap;
+import java.util.function.Predicate;
 
 import org.hibernate.search.backend.lucene.analysis.impl.ScopedAnalyzer;
 import org.hibernate.search.backend.lucene.analysis.model.impl.LuceneAnalysisDefinitionRegistry;
@@ -35,6 +36,7 @@ import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.search.BooleanClause;
 import org.apache.lucene.search.BooleanQuery;
+import org.apache.lucene.search.MatchAllDocsQuery;
 import org.apache.lucene.search.Query;
 
 abstract class LuceneCommonQueryStringPredicate extends AbstractLuceneNestablePredicate {
@@ -60,13 +62,25 @@ abstract class LuceneCommonQueryStringPredicate extends AbstractLuceneNestablePr
 		for ( LuceneCommonQueryStringPredicateBuilderFieldState state : fieldStates.values() ) {
 			if ( state.field().type().searchAnalyzerOrNormalizer() == null ) {
 				badFields.add(
-						String.format( Locale.ROOT, "{'%s':%s}", state.field().absolutePath(), state.field().type().valueClass() ) );
+						String.format( Locale.ROOT, "{'%s':%s}", state.field().absolutePath(),
+								state.field().type().valueClass() ) );
 			}
 		}
 		if ( !badFields.isEmpty() ) {
 			throw new SearchException( queryName + " queries are not allowed for non-string fields. "
 					+ "Fields violating this constraint are: " + badFields );
 		}
+	}
+
+	static PredicateRequestContext contextForField(LuceneCommonQueryStringPredicateBuilderFieldState state) {
+		// Note we want to build a predicate context that won't trigger implicit nesting
+		//  when we build inner queries as the nesting part is going to be covered by the main predicate
+		List<String> nestedPathHierarchy = state.field().nestedPathHierarchy();
+		String expectedNestedPath = nestedPathHierarchy.isEmpty()
+				? null
+				: nestedPathHierarchy.get( nestedPathHierarchy.size() - 1 );
+
+		return PredicateRequestContext.withoutSession().withNestedPath( expectedNestedPath );
 	}
 
 	@Override
@@ -173,17 +187,39 @@ abstract class LuceneCommonQueryStringPredicate extends AbstractLuceneNestablePr
 				return query;
 			}
 			if ( query instanceof BooleanQuery ) {
-				int shouldClauses = (int) ( (BooleanQuery) query ).clauses().stream().map( BooleanClause::getOccur )
+				BooleanQuery booleanQuery = (BooleanQuery) query;
+				int shouldClauses = (int) booleanQuery.clauses().stream().map( BooleanClause::getOccur )
 						.filter( BooleanClause.Occur.SHOULD::equals )
 						.count();
 				int minimumShouldMatch = minimumShouldMatch( minimumShouldMatchConstraints, shouldClauses );
 
 				BooleanQuery.Builder builder = new BooleanQuery.Builder();
-				for ( BooleanClause clause : ( (BooleanQuery) query ).clauses() ) {
+				for ( BooleanClause clause : booleanQuery.clauses() ) {
 					builder.add( clause );
 				}
 
 				query = builder.setMinimumNumberShouldMatch( minimumShouldMatch ).build();
+			}
+			return query;
+		}
+
+		protected Query addMatchAllForBoolMustNotOnly(Query query) {
+			if ( query instanceof BooleanQuery ) {
+				BooleanQuery booleanQuery = (BooleanQuery) query;
+				long notMustNot = booleanQuery.clauses().stream().map( BooleanClause::getOccur )
+						.filter( Predicate.not( BooleanClause.Occur.MUST_NOT::equals ) )
+						.count();
+
+				if ( notMustNot == 0 && !booleanQuery.clauses().isEmpty() ) {
+					// means we only have must not clauses,
+					// and we want to add a match all in this case!
+					BooleanQuery.Builder builder = new BooleanQuery.Builder();
+					for ( BooleanClause clause : booleanQuery.clauses() ) {
+						builder.add( clause );
+					}
+					builder.add( new BooleanClause( new MatchAllDocsQuery(), BooleanClause.Occur.MUST ) );
+					query = builder.build();
+				}
 			}
 			return query;
 		}

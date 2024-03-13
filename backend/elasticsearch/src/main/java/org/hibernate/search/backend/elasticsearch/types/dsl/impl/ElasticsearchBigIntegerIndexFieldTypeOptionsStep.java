@@ -13,6 +13,7 @@ import org.hibernate.search.backend.elasticsearch.logging.impl.Log;
 import org.hibernate.search.backend.elasticsearch.lowlevel.index.mapping.impl.DataTypes;
 import org.hibernate.search.backend.elasticsearch.types.codec.impl.ElasticsearchBigIntegerFieldCodec;
 import org.hibernate.search.backend.elasticsearch.types.codec.impl.ElasticsearchFieldCodec;
+import org.hibernate.search.engine.backend.types.converter.spi.DefaultParseConverters;
 import org.hibernate.search.engine.backend.types.dsl.ScaledNumberIndexFieldTypeOptionsStep;
 import org.hibernate.search.engine.mapper.mapping.building.spi.IndexFieldTypeDefaultsProvider;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
@@ -29,7 +30,7 @@ class ElasticsearchBigIntegerIndexFieldTypeOptionsStep
 
 	ElasticsearchBigIntegerIndexFieldTypeOptionsStep(ElasticsearchIndexFieldTypeBuildContext buildContext,
 			IndexFieldTypeDefaultsProvider defaultsProvider) {
-		super( buildContext, BigInteger.class, DataTypes.SCALED_FLOAT );
+		super( buildContext, BigInteger.class, DataTypes.SCALED_FLOAT, DefaultParseConverters.BIG_INTEGER );
 		this.defaultsProvider = defaultsProvider;
 	}
 

@@ -42,6 +42,7 @@ public class StubIndexRootBuilder extends AbstractStubIndexCompositeNodeBuilder
 	private final String mappedTypeName;
 
 	private DslConverter<?, String> idDslConverter;
+	private DslConverter<String, String> idParser;
 	private ProjectionConverter<String, ?> idProjectionConverter;
 
 	public StubIndexRootBuilder(StubBackendBehavior backendBehavior, String indexName, String mappedTypeName) {
@@ -72,6 +73,11 @@ public class StubIndexRootBuilder extends AbstractStubIndexCompositeNodeBuilder
 	}
 
 	@Override
+	public void idParser(ToDocumentValueConverter<String, String> converter) {
+		this.idParser = new DslConverter<>( String.class, converter );
+	}
+
+	@Override
 	public <I> void idProjectionConverter(Class<I> valueType, FromDocumentValueConverter<String, I> converter) {
 		this.idProjectionConverter = new ProjectionConverter<>( valueType, converter );
 	}
@@ -82,7 +88,7 @@ public class StubIndexRootBuilder extends AbstractStubIndexCompositeNodeBuilder
 	}
 
 	public StubIndexModel buildModel() {
-		IndexIdentifier identifier = new IndexIdentifier( idDslConverter, idProjectionConverter );
+		IndexIdentifier identifier = new IndexIdentifier( idDslConverter, idParser, idProjectionConverter );
 		Map<String, StubIndexField> allFields = new LinkedHashMap<>();
 		Map<String, StubIndexField> staticChildren = new LinkedHashMap<>();
 		StubIndexCompositeNodeType type = new StubIndexCompositeNodeType.Builder( ObjectStructure.DEFAULT ).build();

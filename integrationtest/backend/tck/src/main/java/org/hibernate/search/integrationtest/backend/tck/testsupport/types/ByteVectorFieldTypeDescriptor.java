@@ -93,6 +93,11 @@ public class ByteVectorFieldTypeDescriptor extends VectorFieldTypeDescriptor<byt
 		) );
 	}
 
+	@Override
+	public String format(byte[] value) {
+		return Arrays.toString( value );
+	}
+
 	private static byte[] arrayOf(int size, int value) {
 		if ( value < Byte.MIN_VALUE || Byte.MAX_VALUE < value ) {
 			throw new IllegalStateException( "Test dataset contains an out-of-bound value for byte: " + value );

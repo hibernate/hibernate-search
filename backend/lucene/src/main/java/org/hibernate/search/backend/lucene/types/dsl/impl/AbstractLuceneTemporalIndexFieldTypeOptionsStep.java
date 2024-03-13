@@ -24,6 +24,7 @@ import org.hibernate.search.backend.lucene.types.predicate.impl.LuceneNumericRan
 import org.hibernate.search.backend.lucene.types.predicate.impl.LuceneNumericTermsPredicate;
 import org.hibernate.search.backend.lucene.types.sort.impl.LuceneStandardFieldSort;
 import org.hibernate.search.engine.backend.types.Sortable;
+import org.hibernate.search.engine.backend.types.converter.ToDocumentValueConverter;
 import org.hibernate.search.engine.search.aggregation.spi.AggregationTypeKeys;
 import org.hibernate.search.engine.search.predicate.spi.PredicateTypeKeys;
 import org.hibernate.search.engine.search.projection.spi.ProjectionTypeKeys;
@@ -36,8 +37,9 @@ abstract class AbstractLuceneTemporalIndexFieldTypeOptionsStep<
 
 	private Sortable sortable = Sortable.DEFAULT;
 
-	AbstractLuceneTemporalIndexFieldTypeOptionsStep(LuceneIndexFieldTypeBuildContext buildContext, Class<F> fieldType) {
-		super( buildContext, fieldType );
+	AbstractLuceneTemporalIndexFieldTypeOptionsStep(LuceneIndexFieldTypeBuildContext buildContext, Class<F> fieldType,
+			ToDocumentValueConverter<String, F> defaultParseConverter) {
+		super( buildContext, fieldType, defaultParseConverter );
 	}
 
 	@Override
@@ -70,9 +72,9 @@ abstract class AbstractLuceneTemporalIndexFieldTypeOptionsStep<
 							? new LuceneExistsPredicate.DocValuesOrNormsBasedFactory<>()
 							: new LuceneExistsPredicate.DefaultFactory<>() );
 			builder.queryElementFactory( LucenePredicateTypeKeys.SIMPLE_QUERY_STRING,
-					new LuceneCommonQueryStringPredicateBuilderFieldState.Factory<>() );
+					new LuceneCommonQueryStringPredicateBuilderFieldState.Factory<>( codec ) );
 			builder.queryElementFactory( LucenePredicateTypeKeys.QUERY_STRING,
-					new LuceneCommonQueryStringPredicateBuilderFieldState.Factory<>() );
+					new LuceneCommonQueryStringPredicateBuilderFieldState.Factory<>( codec ) );
 		}
 
 		if ( resolvedSortable ) {
