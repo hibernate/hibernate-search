@@ -172,7 +172,7 @@
         <!-- >>> Jakarta Batch: JBeret SE dependencies -->
         <version.org.jboss.marshalling>2.1.4.Final</version.org.jboss.marshalling>
         <version.org.wildfly.security.wildfly-security-manager>1.1.2.Final</version.org.wildfly.security.wildfly-security-manager>
-        <version.org.google.guava>33.0.0-jre</version.org.google.guava>
+        <version.org.google.guava>33.1.0-jre</version.org.google.guava>
 
         <!-- >>> Spring integration tests -->
         <!-- When updating Spring Boot check if it supports JDK23 and enable testing with it if so (see testWithJdk23 profile). -->
