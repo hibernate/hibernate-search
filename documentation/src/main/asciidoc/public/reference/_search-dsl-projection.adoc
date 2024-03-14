@@ -1578,6 +1578,7 @@ include::{sourcedir}/org/hibernate/search/documentation/search/projection/Lucene
 ----
 ====
 
+[[search-dsl-projection-extensions-lucene-document-characteristics]]
 [NOTE]
 ====
 The returned document is similar to the one that was indexed.
@@ -1604,6 +1605,42 @@ use a <<search-dsl-projection-field,`field` projection>>.
 ==== In projections to custom types
 
 There is no built-in annotation to use the `document` projection
+inside a <<search-dsl-projection-mapped,projection to an annotated custom type>>.
+
+You can <<binding-projection-parameters-custom-annotation,create your own annotation>> if you need one,
+backed by a <<binding-projection,custom projection binder>>.
+
+[[search-dsl-projection-extensions-lucene-document-tree]]
+=== Lucene: `documentTree`
+
+include::../components/_incubating-warning.adoc[]
+
+The `.documentTree()` projection returns the matched document as a tree containing native Lucene `Document` and corresponding nested tree nodes.
+
+include::../components/_lucene-api-warning.adoc[]
+
+[[search-dsl-projection-extensions-lucene-document-tree-syntax]]
+==== Syntax
+
+.Returning the matched document as a `DocumentTree`
+====
+[source, JAVA, indent=0, subs="+callouts"]
+----
+include::{sourcedir}/org/hibernate/search/documentation/search/projection/LuceneProjectionDslIT.java[tags=lucene-document-tree]
+----
+====
+
+[NOTE]
+====
+The documents returned in this tree have the same <<search-dsl-projection-extensions-lucene-document-characteristics,characteristics>>
+as the documents returned by the <<search-dsl-projection-extensions-lucene-document,`.document()`>> projection,
+with the exception of not being flattened.
+====
+
+[[search-dsl-projection-extensions-lucene-document-tree-mapping]]
+==== In projections to custom types
+
+There is no built-in annotation to use the `documentTree` projection
 inside a <<search-dsl-projection-mapped,projection to an annotated custom type>>.
 
 You can <<binding-projection-parameters-custom-annotation,create your own annotation>> if you need one,

@@ -6,6 +6,7 @@
  */
 package org.hibernate.search.backend.lucene.search.projection.dsl.impl;
 
+import org.hibernate.search.backend.lucene.search.projection.dsl.DocumentTree;
 import org.hibernate.search.backend.lucene.search.projection.dsl.LuceneSearchProjectionFactory;
 import org.hibernate.search.backend.lucene.search.projection.impl.LuceneSearchProjectionIndexScope;
 import org.hibernate.search.engine.search.projection.dsl.ProjectionFinalStep;
@@ -42,5 +43,10 @@ public class LuceneSearchProjectionFactoryImpl<R, E>
 	@Override
 	public ProjectionFinalStep<Explanation> explanation() {
 		return new StaticProjectionFinalStep<>( dslContext.scope().projectionBuilders().explanation() );
+	}
+
+	@Override
+	public ProjectionFinalStep<DocumentTree> documentTree() {
+		return new StaticProjectionFinalStep<>( dslContext.scope().projectionBuilders().documentTree() );
 	}
 }

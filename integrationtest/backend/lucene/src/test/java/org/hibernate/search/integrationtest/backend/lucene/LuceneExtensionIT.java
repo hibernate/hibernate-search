@@ -9,12 +9,14 @@ package org.hibernate.search.integrationtest.backend.lucene;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.assertj.core.api.Assertions.entry;
+import static org.hibernate.search.integrationtest.backend.lucene.testsupport.util.DocumentAssert.assertThatDocument;
 import static org.hibernate.search.integrationtest.backend.lucene.testsupport.util.DocumentAssert.containsDocument;
 import static org.hibernate.search.util.impl.integrationtest.common.assertion.SearchHitsAssert.assertThatHits;
 import static org.hibernate.search.util.impl.integrationtest.common.assertion.SearchResultAssert.assertThatQuery;
 import static org.hibernate.search.util.impl.integrationtest.common.assertion.SearchResultAssert.assertThatResult;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -26,6 +28,7 @@ import org.hibernate.search.backend.lucene.LuceneExtension;
 import org.hibernate.search.backend.lucene.index.LuceneIndexManager;
 import org.hibernate.search.backend.lucene.lowlevel.common.impl.MetadataFields;
 import org.hibernate.search.backend.lucene.search.predicate.dsl.LuceneSearchPredicateFactory;
+import org.hibernate.search.backend.lucene.search.projection.dsl.DocumentTree;
 import org.hibernate.search.backend.lucene.search.query.LuceneSearchQuery;
 import org.hibernate.search.backend.lucene.search.query.LuceneSearchResult;
 import org.hibernate.search.backend.lucene.search.query.LuceneSearchScroll;
@@ -103,12 +106,16 @@ class LuceneExtensionIT {
 
 	private final SimpleMappedIndex<IndexBinding> mainIndex = SimpleMappedIndex.of( IndexBinding::new ).name( "main" );
 	private final SimpleMappedIndex<IndexBinding> otherIndex = SimpleMappedIndex.of( IndexBinding::new ).name( "other" );
+	private final SimpleMappedIndex<IndexBinding> treeIndex = SimpleMappedIndex.of( IndexBinding::new ).name( "tree" );
+	private final SimpleMappedIndex<SomeOtherIndexBinding> someOtherIndex =
+			SimpleMappedIndex.of( SomeOtherIndexBinding::new ).name( "someOther" );
 
 	private SearchIntegration integration;
 
 	@BeforeEach
 	void setup() {
-		this.integration = setupHelper.start().withIndexes( mainIndex, otherIndex ).setup().integration();
+		this.integration =
+				setupHelper.start().withIndexes( mainIndex, otherIndex, treeIndex, someOtherIndex ).setup().integration();
 
 		initData();
 	}
@@ -909,12 +916,228 @@ class LuceneExtensionIT {
 				);
 	}
 
+	@Test
+	void documentTree() {
+		List<DocumentTree> documentTrees = treeIndex.query().select(
+				f -> f.extension( LuceneExtension.get() ).documentTree() )
+				.where( f -> f.matchAll() )
+				.fetchAllHits();
+
+		assertThat( documentTrees ).hasSize( 1 )
+				.satisfiesOnlyOnce( LuceneExtensionIT::assertTreeIndexDocumentTree );
+	}
+
+	@Test
+	void documentTreeMultipleIndexes() {
+		// not really document tree, but let's make sure that we've correctly constructed the documents,
+		//  and we can reconstruct back the nesting:
+		assertThat(
+				someOtherIndex.query().select( f -> f.object( "someOtherNestedObject" ).from( f
+						.object( "someOtherNestedObject.someOtherNestedNestedObject" )
+						.from( f.field( "someOtherNestedObject.someOtherNestedNestedObject.nestedNestedSomeOtherInteger" )
+								.multi() )
+						.asList().multi() ).asList().multi() )
+						.where( f -> f.match().field( "someOtherString" ).matching( "text 2" ) ).fetchAllHits()
+		).containsExactly(
+				List.of(
+						List.of( List.of() ),
+						List.of( List.of( List.of( List.of( 211, 212, 213 ) ), List.of( List.of( 221, 222 ) ) ) ),
+						List.of( List.of( List.of( List.of( 311, 312, 313 ) ), List.of( List.of( 321, 322 ) ),
+								List.of( List.of( 331, 332 ) ) ) ) )
+		);
+
+		// now test the tree structure:
+		List<DocumentTree> documentTrees = treeIndex.createScope( someOtherIndex )
+				.query().select( f -> f.extension( LuceneExtension.get() ).documentTree() )
+				.where( f -> f.matchAll() )
+				.fetchAllHits();
+
+		assertThat( documentTrees ).hasSize( 3 )
+				.satisfiesOnlyOnce( LuceneExtensionIT::assertTreeIndexDocumentTree )
+				.satisfiesOnlyOnce( rootTree -> {
+					// first doc from someOtherIndex
+					assertThatDocument( rootTree.document() )
+							.hasField( "someOtherString", "text 1" )
+							.hasField( "someOtherInteger", 555 )
+							.andOnlyInternalFields();
+
+					assertThat( rootTree.nested() )
+							.containsOnlyKeys( "someOtherNestedObject" );
+					Collection<DocumentTree> someOtherNestedObjects = rootTree.nested().get( "someOtherNestedObject" );
+					assertThat( someOtherNestedObjects )
+							.hasSize( 1 )
+							.satisfiesOnlyOnce( someOtherNestedObject -> {
+								assertThatDocument( someOtherNestedObject.document() )
+										.hasField( "someOtherNestedObject.someOtherInteger", 456 )
+										.andOnlyInternalFields();
+
+								assertThat( someOtherNestedObject.nested() )
+										.isEmpty();
+							} );
+				} )
+				.satisfiesOnlyOnce( rootTree -> {
+					// second doc from someOtherIndex
+					assertThatDocument( rootTree.document() )
+							.hasField( "someOtherString", "text 2" )
+							.hasField( "someOtherInteger", 2 )
+							.andOnlyInternalFields();
+
+					assertThat( rootTree.nested() )
+							.containsOnlyKeys( "someOtherNestedObject" );
+					Collection<DocumentTree> someOtherNestedObjects = rootTree.nested().get( "someOtherNestedObject" );
+					assertThat( someOtherNestedObjects )
+							.hasSize( 3 )
+							// nested1
+							.satisfiesOnlyOnce( someOtherNestedObject -> {
+								assertThatDocument( someOtherNestedObject.document() )
+										.hasField( "someOtherNestedObject.someOtherInteger", 11, 12, 13 )
+										.andOnlyInternalFields();
+
+								assertThat( someOtherNestedObject.nested() )
+										.isEmpty();
+							} )
+							// nested2
+							.satisfiesOnlyOnce( someOtherNestedObject -> {
+								assertThatDocument( someOtherNestedObject.document() )
+										.hasField( "someOtherNestedObject.someOtherInteger", 21, 22 )
+										.andOnlyInternalFields();
+
+								assertThat( someOtherNestedObject.nested() )
+										.containsOnlyKeys( "someOtherNestedNestedObject" );
+								Collection<DocumentTree> someOtherNestedNestedObjects =
+										someOtherNestedObject.nested().get( "someOtherNestedNestedObject" );
+								assertThat( someOtherNestedNestedObjects )
+										.hasSize( 2 )
+										.satisfiesOnlyOnce( someOtherNestedNestedObject -> {
+											assertThatDocument( someOtherNestedNestedObject.document() )
+													.hasField(
+															"someOtherNestedObject.someOtherNestedNestedObject.nestedNestedSomeOtherInteger",
+															211, 212, 213 )
+													.andOnlyInternalFields();
+
+											assertThat( someOtherNestedNestedObject.nested() )
+													.isEmpty();
+										} )
+										.satisfiesOnlyOnce( someOtherNestedNestedObject -> {
+											assertThatDocument( someOtherNestedNestedObject.document() )
+													.hasField(
+															"someOtherNestedObject.someOtherNestedNestedObject.nestedNestedSomeOtherInteger",
+															221, 222 )
+													.andOnlyInternalFields();
+
+											assertThat( someOtherNestedNestedObject.nested() )
+													.isEmpty();
+										} );
+
+							} )
+							// nested3
+							.satisfiesOnlyOnce( someOtherNestedObject -> {
+								assertThatDocument( someOtherNestedObject.document() )
+										.hasField( "someOtherNestedObject.someOtherInteger", 31 )
+										.andOnlyInternalFields();
+
+								assertThat( someOtherNestedObject.nested() )
+										.containsOnlyKeys( "someOtherNestedNestedObject" );
+								Collection<DocumentTree> someOtherNestedNestedObjects =
+										someOtherNestedObject.nested().get( "someOtherNestedNestedObject" );
+								assertThat( someOtherNestedNestedObjects )
+										.hasSize( 3 )
+										.satisfiesOnlyOnce( someOtherNestedNestedObject -> {
+											assertThatDocument( someOtherNestedNestedObject.document() )
+													.hasField(
+															"someOtherNestedObject.someOtherNestedNestedObject.nestedNestedSomeOtherInteger",
+															311, 312, 313 )
+													.andOnlyInternalFields();
+
+											assertThat( someOtherNestedNestedObject.nested() )
+													.isEmpty();
+										} )
+										.satisfiesOnlyOnce( someOtherNestedNestedObject -> {
+											assertThatDocument( someOtherNestedNestedObject.document() )
+													.hasField(
+															"someOtherNestedObject.someOtherNestedNestedObject.nestedNestedSomeOtherInteger",
+															321, 322 )
+													.andOnlyInternalFields();
+
+											assertThat( someOtherNestedNestedObject.nested() )
+													.isEmpty();
+										} )
+										.satisfiesOnlyOnce( someOtherNestedNestedObject -> {
+											assertThatDocument( someOtherNestedNestedObject.document() )
+													.hasField(
+															"someOtherNestedObject.someOtherNestedNestedObject.nestedNestedSomeOtherInteger",
+															331, 332 )
+													.andOnlyInternalFields();
+
+											assertThat( someOtherNestedNestedObject.nested() )
+													.isEmpty();
+										} );
+							} );
+				} );
+	}
+
+	private static void assertTreeIndexDocumentTree(DocumentTree rootTree) {
+		assertThatDocument( rootTree.document() )
+				.hasField( "string", "text 1" )
+				.hasField( "nativeField", "37" )
+				.hasField( "nativeField_converted", "37" )
+				.hasField( "nativeField_unsupportedProjection", "37" )
+				.hasField( "flattenedObject.stringInObject", "text 2" )
+				.hasField( "flattenedObject.flattenedObject2.integerInObject", 4 )
+				.hasField( "flattenedObject.flattenedObject2.flattenedObject3.integerInObject", 6 )
+				.andOnlyInternalFields();
+
+		assertThat( rootTree.nested() )
+				.containsOnlyKeys( "nestedObject" );
+		Collection<DocumentTree> nestedObjects = rootTree.nested().get( "nestedObject" );
+		assertThat( nestedObjects )
+				.hasSize( 2 )
+				.satisfiesOnlyOnce( nestedObject -> {
+					assertThatDocument( nestedObject.document() )
+							.andOnlyInternalFields();
+					assertThat( nestedObject.nested() ).isEmpty();
+				} )
+				.satisfiesOnlyOnce( nestedObject -> {
+					assertThatDocument( nestedObject.document() )
+							.hasField( "nestedObject.integerInObject", 123 )
+							.andOnlyInternalFields();
+					assertThat( nestedObject.nested() ).containsKeys( "nestedObject2" );
+					Collection<DocumentTree> nestedObject2s = nestedObject.nested().get( "nestedObject2" );
+					assertThat( nestedObject2s )
+							.hasSize( 2 )
+							.satisfiesOnlyOnce( nestedObject2 -> {
+								assertThatDocument( nestedObject2.document() )
+										.hasField( "nestedObject.nestedObject2.integerInObject", 1 )
+										.andOnlyInternalFields();
+								assertThat( nestedObject2.nested() ).isEmpty();
+							} )
+							.satisfiesOnlyOnce( nestedObject2 -> {
+								assertThatDocument( nestedObject2.document() )
+										.hasField( "nestedObject.nestedObject2.integerInObject", 2 )
+										.andOnlyInternalFields();
+								assertThat( nestedObject2.nested() ).containsKeys( "nestedObject3" );
+								assertThat( nestedObject2.nested().get( "nestedObject3" ) )
+										.hasSize( 1 )
+										.satisfiesOnlyOnce( nestedObject3 -> {
+											assertThatDocument( nestedObject3.document() )
+													.hasField( "nestedObject.nestedObject2.nestedObject3.integerInObject", 20 )
+													.andOnlyInternalFields();
+											assertThat( nestedObject3.nested() ).isEmpty();
+										} );
+							} );
+
+
+				} );
+	}
+
 	private void initData() {
 		indexDataSet( mainIndex );
 
 		// Use the same IDs and dataset for otherIndex.binding() to trigger
 		// a failure in explain() tests if index selection doesn't work correctly.
 		indexDataSet( otherIndex );
+		indexDataSetDocumentTree( treeIndex );
+		indexDataSetSomeOtherDocumentTree( someOtherIndex );
 
 		// Check that all documents are searchable
 		assertThatQuery( mainIndex.createScope().query().where( f -> f.matchAll() ).toQuery() )
@@ -1055,6 +1278,109 @@ class LuceneExtensionIT {
 				.join();
 	}
 
+	private static void indexDataSetDocumentTree(SimpleMappedIndex<IndexBinding> index) {
+		index.bulkIndexer()
+				.add( FIRST_ID, document -> {
+					document.addValue( index.binding().string, "text 1" );
+					document.addValue( index.binding().nativeField, 37 );
+					document.addValue( index.binding().nativeField_converted, 37 );
+					document.addValue( index.binding().nativeField_unsupportedProjection, 37 );
+
+					// won't show any fields
+					DocumentElement nestedObject1 = document.addObject( index.binding().nestedObject.self );
+					nestedObject1.addValue( index.binding().nestedObject.discriminator, "included" );
+
+					DocumentElement nestedObject2 = document.addObject( index.binding().nestedObject.self );
+					nestedObject2.addValue( index.binding().nestedObject.integerInObject, 123 );
+
+					DocumentElement nestedObject2x1 = nestedObject2.addObject( index.binding().nestedObject.nestedObject.self );
+					nestedObject2x1.addValue( index.binding().nestedObject.nestedObject.integerInObject, 1 );
+
+					DocumentElement nestedObject2x2 = nestedObject2.addObject( index.binding().nestedObject.nestedObject.self );
+					nestedObject2x2.addValue( index.binding().nestedObject.nestedObject.integerInObject, 2 );
+
+					DocumentElement nestedObject2x2nested =
+							nestedObject2x2.addObject( index.binding().nestedObject.nestedObject.nestedObject.self );
+					nestedObject2x2nested.addValue( index.binding().nestedObject.nestedObject.nestedObject.integerInObject,
+							20 );
+
+					DocumentElement flattenedObject1 = document.addObject( index.binding().flattenedObject.self );
+					flattenedObject1.addValue( index.binding().flattenedObject.stringInObject, "text 2" );
+					flattenedObject1.addValue( index.binding().flattenedObject.sortInObject, "1" );
+
+					DocumentElement flattenedObject1nested =
+							flattenedObject1.addObject( index.binding().flattenedObject.nestedObject.self );
+					flattenedObject1nested.addValue( index.binding().flattenedObject.nestedObject.integerInObject, 3 );
+
+					DocumentElement flattenedObject1flattened =
+							flattenedObject1.addObject( index.binding().flattenedObject.flattenedObject.self );
+					flattenedObject1flattened.addValue( index.binding().flattenedObject.flattenedObject.integerInObject, 4 );
+
+					DocumentElement flattenedObject1x2nested =
+							flattenedObject1nested.addObject( index.binding().flattenedObject.nestedObject.nestedObject.self );
+					flattenedObject1x2nested
+							.addValue( index.binding().flattenedObject.nestedObject.nestedObject.integerInObject, 5 );
+
+					DocumentElement flattenedObject1x2flattened = flattenedObject1flattened
+							.addObject( index.binding().flattenedObject.flattenedObject.flattenedObject.self );
+					flattenedObject1x2flattened
+							.addValue( index.binding().flattenedObject.flattenedObject.flattenedObject.integerInObject, 6 );
+
+				} )
+				.join();
+	}
+
+	private static void indexDataSetSomeOtherDocumentTree(SimpleMappedIndex<SomeOtherIndexBinding> index) {
+		index.bulkIndexer()
+				.add( FIRST_ID, document -> {
+					document.addValue( index.binding().someOtherString, "text 1" );
+					document.addValue( index.binding().someOtherInteger, 555 );
+
+					DocumentElement nested = document.addObject( index.binding().someOtherNestedObject );
+					nested.addValue( index.binding().nestedSomeOtherInteger, 456 );
+				} )
+				.add( SECOND_ID, document -> {
+					document.addValue( index.binding().someOtherString, "text 2" );
+					document.addValue( index.binding().someOtherInteger, 2 );
+
+					DocumentElement nested1 = document.addObject( index.binding().someOtherNestedObject );
+					nested1.addValue( index.binding().nestedSomeOtherInteger, 11 );
+					nested1.addValue( index.binding().nestedSomeOtherInteger, 12 );
+					nested1.addValue( index.binding().nestedSomeOtherInteger, 13 );
+
+					DocumentElement nested2 = document.addObject( index.binding().someOtherNestedObject );
+					nested2.addValue( index.binding().nestedSomeOtherInteger, 21 );
+					nested2.addValue( index.binding().nestedSomeOtherInteger, 22 );
+
+					DocumentElement nested21 = nested2.addObject( index.binding().someOtherNestedNestedObject );
+					nested21.addValue( index.binding().nestedNestedSomeOtherInteger, 211 );
+					nested21.addValue( index.binding().nestedNestedSomeOtherInteger, 212 );
+					nested21.addValue( index.binding().nestedNestedSomeOtherInteger, 213 );
+
+					DocumentElement nested22 = nested2.addObject( index.binding().someOtherNestedNestedObject );
+					nested22.addValue( index.binding().nestedNestedSomeOtherInteger, 221 );
+					nested22.addValue( index.binding().nestedNestedSomeOtherInteger, 222 );
+
+					DocumentElement nested3 = document.addObject( index.binding().someOtherNestedObject );
+					nested3.addValue( index.binding().nestedSomeOtherInteger, 31 );
+
+					DocumentElement nested31 = nested3.addObject( index.binding().someOtherNestedNestedObject );
+					nested31.addValue( index.binding().nestedNestedSomeOtherInteger, 311 );
+					nested31.addValue( index.binding().nestedNestedSomeOtherInteger, 312 );
+					nested31.addValue( index.binding().nestedNestedSomeOtherInteger, 313 );
+
+					DocumentElement nested32 = nested3.addObject( index.binding().someOtherNestedNestedObject );
+					nested32.addValue( index.binding().nestedNestedSomeOtherInteger, 321 );
+					nested32.addValue( index.binding().nestedNestedSomeOtherInteger, 322 );
+
+					DocumentElement nested33 = nested3.addObject( index.binding().someOtherNestedNestedObject );
+					nested33.addValue( index.binding().nestedNestedSomeOtherInteger, 331 );
+					nested33.addValue( index.binding().nestedNestedSomeOtherInteger, 332 );
+
+				} ).join();
+	}
+
+
 	private static class IndexBinding {
 		final IndexFieldReference<Integer> integer;
 		final IndexFieldReference<String> string;
@@ -1122,8 +1448,8 @@ class LuceneExtensionIT {
 			sort3 = root.field( "sort3", f -> f.asString().sortable( Sortable.YES ) )
 					.toReference();
 
-			nestedObject = ObjectMapping.create( root, "nestedObject", ObjectStructure.NESTED, true );
-			flattenedObject = ObjectMapping.create( root, "flattenedObject", ObjectStructure.FLATTENED, true );
+			nestedObject = ObjectMapping.create( root, "nestedObject", ObjectStructure.NESTED, true, 2 );
+			flattenedObject = ObjectMapping.create( root, "flattenedObject", ObjectStructure.FLATTENED, true, 2 );
 		}
 	}
 
@@ -1138,18 +1464,20 @@ class LuceneExtensionIT {
 		final IndexFieldReference<Integer> integerInObject;
 		final IndexFieldReference<String> stringInObject;
 		final IndexFieldReference<String> sortInObject;
+		final ObjectMapping nestedObject;
+		final ObjectMapping flattenedObject;
 
 		public static ObjectMapping create(IndexSchemaElement parent, String relativeFieldName,
 				ObjectStructure structure,
-				boolean multiValued) {
+				boolean multiValued, int nestLevel) {
 			IndexSchemaObjectField objectField = parent.objectField( relativeFieldName, structure );
 			if ( multiValued ) {
 				objectField.multiValued();
 			}
-			return new ObjectMapping( relativeFieldName, objectField );
+			return new ObjectMapping( relativeFieldName, objectField, nestLevel );
 		}
 
-		private ObjectMapping(String relativeFieldName, IndexSchemaObjectField objectField) {
+		private ObjectMapping(String relativeFieldName, IndexSchemaObjectField objectField, int nestLevel) {
 			this.relativeFieldName = relativeFieldName;
 			self = objectField.toReference();
 
@@ -1165,6 +1493,58 @@ class LuceneExtensionIT {
 					.toReference();
 			sortInObject = objectField.field( "sortInObject", f -> f.asString().sortable( Sortable.YES ) )
 					.toReference();
+
+			if ( nestLevel < 4 ) {
+				nestedObject = ObjectMapping.create(
+						objectField, "nestedObject" + nestLevel, ObjectStructure.NESTED, true, nestLevel + 1 );
+				flattenedObject = ObjectMapping.create(
+						objectField, "flattenedObject" + nestLevel, ObjectStructure.FLATTENED, true, nestLevel + 1 );
+			}
+			else {
+				nestedObject = null;
+				flattenedObject = null;
+			}
+		}
+	}
+
+	private static class SomeOtherIndexBinding {
+		final IndexFieldReference<Integer> someOtherInteger;
+		final IndexFieldReference<String> someOtherString;
+		private final IndexObjectFieldReference someOtherNestedObject;
+		private final IndexFieldReference<Integer> nestedSomeOtherInteger;
+
+		private final IndexObjectFieldReference someOtherNestedNestedObject;
+		private final IndexFieldReference<Integer> nestedNestedSomeOtherInteger;
+
+		SomeOtherIndexBinding(IndexSchemaElement root) {
+			someOtherInteger = root.field(
+					"someOtherInteger",
+					f -> f.asInteger().projectable( Projectable.YES )
+			)
+					.toReference();
+			someOtherString = root.field(
+					"someOtherString",
+					f -> f.asString().projectable( Projectable.YES )
+			)
+					.toReference();
+			IndexSchemaObjectField nested = root.objectField( "someOtherNestedObject", ObjectStructure.NESTED )
+					.multiValued();
+			nestedSomeOtherInteger = nested.field(
+					"someOtherInteger",
+					f -> f.asInteger().projectable( Projectable.YES )
+			).multiValued().toReference();
+
+			someOtherNestedObject = nested.toReference();
+
+
+			IndexSchemaObjectField nestedNested = nested.objectField( "someOtherNestedNestedObject", ObjectStructure.NESTED )
+					.multiValued();
+			nestedNestedSomeOtherInteger = nestedNested.field(
+					"nestedNestedSomeOtherInteger",
+					f -> f.asInteger().projectable( Projectable.YES )
+			).multiValued().toReference();
+
+			someOtherNestedNestedObject = nestedNested.toReference();
 		}
 	}
 

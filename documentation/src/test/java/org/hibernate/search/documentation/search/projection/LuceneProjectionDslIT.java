@@ -15,6 +15,7 @@ import java.util.function.Consumer;
 import jakarta.persistence.EntityManagerFactory;
 
 import org.hibernate.search.backend.lucene.LuceneExtension;
+import org.hibernate.search.backend.lucene.search.projection.dsl.DocumentTree;
 import org.hibernate.search.documentation.testsupport.BackendConfigurations;
 import org.hibernate.search.documentation.testsupport.DocumentationSetupHelper;
 import org.hibernate.search.mapper.orm.Search;
@@ -59,6 +60,20 @@ class LuceneProjectionDslIT {
 					.where( f -> f.matchAll() )
 					.fetchHits( 20 );
 			// end::lucene-document[]
+			assertThat( hits ).hasSize( 4 );
+		} );
+	}
+
+	@Test
+	void documentTree() {
+		withinSearchSession( searchSession -> {
+			// tag::lucene-document-tree[]
+			List<DocumentTree> hits = searchSession.search( Book.class )
+					.extension( LuceneExtension.get() )
+					.select( f -> f.documentTree() )
+					.where( f -> f.matchAll() )
+					.fetchHits( 20 );
+			// end::lucene-document-tree[]
 			assertThat( hits ).hasSize( 4 );
 		} );
 	}

@@ -10,7 +10,8 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.function.Supplier;
 
-import org.hibernate.search.backend.lucene.search.common.impl.LuceneSearchIndexScope;
+import org.hibernate.search.backend.lucene.scope.model.impl.LuceneSearchIndexScopeImpl;
+import org.hibernate.search.backend.lucene.search.projection.dsl.DocumentTree;
 import org.hibernate.search.engine.backend.common.DocumentReference;
 import org.hibernate.search.engine.search.common.spi.SearchIndexIdentifierContext;
 import org.hibernate.search.engine.search.projection.SearchProjection;
@@ -23,9 +24,9 @@ import org.apache.lucene.search.Explanation;
 
 public class LuceneSearchProjectionBuilderFactory implements SearchProjectionBuilderFactory {
 
-	private final LuceneSearchIndexScope<?> scope;
+	private final LuceneSearchIndexScopeImpl scope;
 
-	public LuceneSearchProjectionBuilderFactory(LuceneSearchIndexScope<?> scope) {
+	public LuceneSearchProjectionBuilderFactory(LuceneSearchIndexScopeImpl scope) {
 		this.scope = scope;
 	}
 
@@ -93,4 +94,7 @@ public class LuceneSearchProjectionBuilderFactory implements SearchProjectionBui
 		return new LuceneExplanationProjection( scope );
 	}
 
+	public SearchProjection<DocumentTree> documentTree() {
+		return new LuceneDocumentTreeProjection( scope );
+	}
 }

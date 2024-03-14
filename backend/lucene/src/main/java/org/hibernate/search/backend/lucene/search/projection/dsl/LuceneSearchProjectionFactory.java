@@ -9,6 +9,7 @@ package org.hibernate.search.backend.lucene.search.projection.dsl;
 import org.hibernate.search.engine.search.projection.dsl.ExtendedSearchProjectionFactory;
 import org.hibernate.search.engine.search.projection.dsl.ProjectionFinalStep;
 import org.hibernate.search.engine.search.projection.dsl.SearchProjectionFactory;
+import org.hibernate.search.util.common.annotation.Incubating;
 
 import org.apache.lucene.document.Document;
 import org.apache.lucene.search.Explanation;
@@ -43,5 +44,17 @@ public interface LuceneSearchProjectionFactory<R, E>
 	 * @return The final step of the projection DSL.
 	 */
 	ProjectionFinalStep<Explanation> explanation();
+
+	/**
+	 * Project to a {@link DocumentTree} containing all the stored fields and nested documents.
+	 * <p>
+	 * Note that only stored fields are returned: fields that are not marked as
+	 * {@link org.hibernate.search.engine.backend.types.Projectable#YES projectable}
+	 * may be missing.
+	 *
+	 * @return The final step of the projection DSL.
+	 */
+	@Incubating
+	ProjectionFinalStep<DocumentTree> documentTree();
 
 }
