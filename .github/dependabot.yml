@@ -126,6 +126,8 @@ updates:
       #  with which jboss-logging annotation processor can still work.
       #  To be removed once we update the AP to the one with a fix.
       - dependency-name: "org.codehaus.plexus:*"
+      # Ignoring Jackson updates as we are aligning this version with the one used by Wildfly.
+      - dependency-name: "com.fasterxml.jackson.core:*"
   - package-ecosystem: "docker"
     registries:
       - dockerhub
