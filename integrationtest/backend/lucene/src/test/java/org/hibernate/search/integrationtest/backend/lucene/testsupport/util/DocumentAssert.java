@@ -31,15 +31,19 @@ public class DocumentAssert {
 	 * Creates a consumer that checks that a list of documents contains a document with the given ID,
 	 * and that this document passes the given assertion.
 	 * <p>
-	 * The consumer should generally be passed to {@link ListAssert#satisfies(java.util.function.Consumer)}.
+	 * The consumer should generally be passed to {@link ListAssert#satisfies(java.util.function.Consumer[])}
 	 *
 	 * @param assertions An assertion that should pass on the document with the given id.
-	 * @return A consumer to be passed to {@link ListAssert#satisfies(java.util.function.Consumer)}.
+	 * @return A consumer to be passed to {@link ListAssert#satisfies(java.util.function.Consumer[])}.
 	 */
 	public static Consumer<List<? extends Document>> containsDocument(Consumer<DocumentAssert> assertions) {
 		return allDocuments -> assertThat( allDocuments ).anySatisfy(
 				document -> assertions.accept( new DocumentAssert( document ) )
 		);
+	}
+
+	public static DocumentAssert assertThatDocument(Document document) {
+		return new DocumentAssert( document );
 	}
 
 	private final Document actual;

@@ -167,6 +167,10 @@ public final class ExtractionRequirements {
 			requiredStoredFields.clear();
 		}
 
+		public void requireNestedObjects(Collection<String> paths) {
+			requiredNestedDocumentPathsForStoredFields.addAll( paths );
+		}
+
 		public void requireStoredField(String absoluteFieldPath, String nestedDocumentPath) {
 			if ( !requireAllStoredFields ) {
 				requiredStoredFields.add( absoluteFieldPath );

@@ -7,6 +7,7 @@
 package org.hibernate.search.backend.lucene.search.projection.impl;
 
 import java.lang.invoke.MethodHandles;
+import java.util.Collection;
 import java.util.Map;
 
 import org.hibernate.search.backend.lucene.logging.impl.Log;
@@ -44,6 +45,10 @@ public final class ProjectionRequestContext {
 
 	public void requireAllStoredFields() {
 		extractionRequirementsBuilder.requireAllStoredFields();
+	}
+
+	public void requireNestedObjects(Collection<String> paths) {
+		extractionRequirementsBuilder.requireNestedObjects( paths );
 	}
 
 	public void requireStoredField(String absoluteFieldPath, String nestedDocumentPath) {
