@@ -146,6 +146,8 @@ public final class SearchBackendContainer {
 				// OpenSearch expects SSL and uses a self-signed certificate by default;
 				// it's not practical for testing, so we disable that.
 				.withEnv( "plugins.security.disabled", "true" )
+				// Limit the RAM usage.
+				.withEnv( "OPENSEARCH_JAVA_OPTS", "-Xms1g -Xmx1g" )
 				// ISM floods the logs with errors, and we don't need it.
 				// See https://docs-beta.opensearch.org/im-plugin/ism/settings/
 				.withEnv( "plugins.index_state_management.enabled", "false" )
