@@ -329,6 +329,7 @@ stage('Configure') {
 							+ helper.generateUpstreamTriggers()
 			),
 			helper.generateNotificationProperty(),
+			[$class: 'EnvInjectJobProperty', info: [propertiesContent: 'TESTCONTAINERS_REUSE_ENABLE=true']],
 			parameters([
 					choice(
 							name: 'ENVIRONMENT_SET',

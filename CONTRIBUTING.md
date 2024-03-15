@@ -447,7 +447,7 @@ or `docker kill <container name>`).
 There are a few ways to enable reusable testcontainers:
 
 1. Enable reusable testcontainers in `~/.testcontainers.properties`, by adding `testcontainers.reuse.enable=true`
-2. Build with `ci-build` Maven profile: `./mvnw clean install -Pci-build`
+2. Set the environment variable `TESTCONTAINERS_REUSE_ENABLE` to `true`.
 
 ### JQAssistant
 

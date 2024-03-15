@@ -123,6 +123,7 @@ pipeline {
 		buildDiscarder logRotator(daysToKeepStr: '10', numToKeepStr: '3')
 		disableConcurrentBuilds(abortPrevious: true)
 		overrideIndexTriggers(false)
+		[$class: 'EnvInjectJobProperty', info: [propertiesContent: 'TESTCONTAINERS_REUSE_ENABLE=true']]
 	}
 	stages {
 		// This allows testing the original (unpatched) artifacts,
