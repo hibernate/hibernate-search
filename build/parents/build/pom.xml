@@ -1362,25 +1362,6 @@
     </build>
 
     <profiles>
-        <profile>
-            <id>ci-build</id>
-            <build>
-                <pluginManagement>
-                    <plugins>
-                        <plugin>
-                            <groupId>org.apache.maven.plugins</groupId>
-                            <artifactId>maven-failsafe-plugin</artifactId>
-                            <configuration>
-                                <environmentVariables>
-                                    <!-- To make Testcontainers reusable on CI, where ~/.testcontainers.properties is not necessarily defined -->
-                                    <TESTCONTAINERS_REUSE_ENABLE>true</TESTCONTAINERS_REUSE_ENABLE>
-                                </environmentVariables>
-                            </configuration>
-                        </plugin>
-                    </plugins>
-                </pluginManagement>
-            </build>
-        </profile>
         <!-- Profile used when testing dependency updates on CI -->
         <profile>
             <id>dependency-update</id>
