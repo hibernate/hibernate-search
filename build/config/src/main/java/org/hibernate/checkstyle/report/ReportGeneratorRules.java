@@ -7,7 +7,7 @@
 package org.hibernate.checkstyle.report;
 
 import java.util.Collections;
-import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.Optional;
 import java.util.Set;
 import java.util.regex.Pattern;
@@ -19,8 +19,9 @@ final class ReportGeneratorRules {
 	private final Set<Pattern> internalRules;
 
 	ReportGeneratorRules(int start, String[] args) {
-		Set<Pattern> internal = new HashSet<>();
-		Set<Pattern> pub = new HashSet<>();
+		// Iteration order must be stable, to get reproducible report content.
+		Set<Pattern> internal = new LinkedHashSet<>();
+		Set<Pattern> pub = new LinkedHashSet<>();
 		for ( int index = start; index < args.length; index++ ) {
 			String regex = args[index];
 			if ( regex.startsWith( INTERNAL_PREFIX ) ) {
