@@ -15,6 +15,8 @@ import java.io.Writer;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
 import java.util.List;
+import java.util.Set;
+import java.util.TreeSet;
 
 import org.jboss.jandex.AnnotationInstance;
 import org.jboss.jandex.AnnotationTarget;
@@ -41,6 +43,16 @@ public class AnnotationReportGenerator {
 			ReportGeneratorRules ignoreRules)
 			throws IOException {
 		List<AnnotationInstance> incubating = index.getAnnotations( DotName.createSimple( annotationName ) );
+		// Iteration order must be stable, to get reproducible report content (including line order).
+		// No idea if the content of the Jandex index is stable, so we use a TreeSet to sort everything.
+		Set<String> paths = new TreeSet<>();
+		for ( AnnotationInstance annotationInstance : incubating ) {
+			AnnotationTarget target = annotationInstance.target();
+			String path = ReportGeneratorHelper.determinePath( target );
+			if ( path != null ) {
+				paths.add( path );
+			}
+		}
 
 		try ( Writer writer = new OutputStreamWriter(
 				new FileOutputStream( Path.of( outputPath ).resolve( reportName + ".txt" ).toFile() ),
@@ -51,13 +63,9 @@ public class AnnotationReportGenerator {
 				) ) {
 			writer.write( "@defaultMessage Do not use code marked with " + annotationName + " annotation\n" );
 
-			for ( AnnotationInstance annotationInstance : incubating ) {
-				AnnotationTarget target = annotationInstance.target();
-				String path = ReportGeneratorHelper.determinePath( target );
-				if ( path != null ) {
-					ReportGeneratorHelper.writeReportLines( writer, path, ignoreRules.matchAnyPublicRule( path ) );
-					ReportGeneratorHelper.writeReportLines( writerInternal, path, ignoreRules.matchAnyInternalRule( path ) );
-				}
+			for ( String path : paths ) {
+				ReportGeneratorHelper.writeReportLines( writer, path, ignoreRules.matchAnyPublicRule( path ) );
+				ReportGeneratorHelper.writeReportLines( writerInternal, path, ignoreRules.matchAnyInternalRule( path ) );
 			}
 		}
 	}
