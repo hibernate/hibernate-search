@@ -268,15 +268,15 @@
         <version.japicmp.plugin>0.20.0</version.japicmp.plugin>
         <version.nexus-staging.plugin>1.6.13</version.nexus-staging.plugin>
         <version.deploy.plugin>3.1.1</version.deploy.plugin>
-        <version.gpg.plugin>3.2.0</version.gpg.plugin>
+        <version.gpg.plugin>3.2.1</version.gpg.plugin>
         <version.flatten-maven-plugin>1.6.0</version.flatten-maven-plugin>
-        <version.assembly.plugin>3.7.0</version.assembly.plugin>
+        <version.assembly.plugin>3.7.1</version.assembly.plugin>
         <version.buildhelper.plugin>3.5.0</version.buildhelper.plugin>
         <version.checkstyle.plugin>3.3.1</version.checkstyle.plugin>
         <version.bundle.plugin>5.1.9</version.bundle.plugin>
         <!-- Needing 3.6.2 at least because of MCOMPILER-294 -->
         <!-- Cannot update to 3.12 because of https://issues.apache.org/jira/browse/MCOMPILER-567 -->
-        <version.compiler.plugin>3.12.1</version.compiler.plugin>
+        <version.compiler.plugin>3.13.0</version.compiler.plugin>
         <version.dependency.plugin>3.6.1</version.dependency.plugin>
         <!-- Check dependencies for security vulnerabilities -->
         <version.dependency-check.plugin>9.0.10</version.dependency-check.plugin>
