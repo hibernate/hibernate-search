@@ -6,6 +6,9 @@
  */
 package org.hibernate.search.backend.lucene.search.query.impl;
 
+import static org.hibernate.search.util.common.impl.CollectionHelper.isSubset;
+import static org.hibernate.search.util.common.impl.CollectionHelper.notInTheOtherSet;
+
 import java.lang.invoke.MethodHandles;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -112,9 +115,10 @@ public class LuceneSearchQueryBuilder<H> implements SearchQueryBuilder<H>, Lucen
 		}
 
 		LuceneSearchAggregation<A> casted = (LuceneSearchAggregation<A>) aggregation;
-		if ( !scope.hibernateSearchIndexNames().equals( casted.getIndexNames() ) ) {
+		if ( !isSubset( scope.hibernateSearchIndexNames(), casted.indexNames() ) ) {
 			throw log.aggregationDefinedOnDifferentIndexes(
-					aggregation, casted.getIndexNames(), scope.hibernateSearchIndexNames()
+					aggregation, casted.indexNames(), scope.hibernateSearchIndexNames(),
+					notInTheOtherSet( scope.hibernateSearchIndexNames(), casted.indexNames() )
 			);
 		}
 

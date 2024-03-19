@@ -68,6 +68,26 @@ class NamedPredicateMultiIndexCompatibilityIT {
 		assertThatQuery( scope.query()
 				.where( f -> f.named( "my-predicate" ).param( "value", "compatible" ) ) )
 				.hasDocRefHitsAnyOrder( compatibleIndex.typeName(), dataSet.docId( 1 ) );
+
+		SearchPredicate predicate = scope.predicate()
+				.named( "my-predicate" ).param( "value", "main" )
+				.toPredicate();
+		assertThatQuery( scope.query()
+				.where( predicate ) )
+				.hasDocRefHitsAnyOrder( index.typeName(), dataSet.docId( 0 ) );
+		assertThatQuery( index.createScope().query()
+				.where( predicate ) )
+				.hasDocRefHitsAnyOrder( index.typeName(), dataSet.docId( 0 ) );
+
+		predicate = scope.predicate()
+				.named( "my-predicate" ).param( "value", "compatible" )
+				.toPredicate();
+		assertThatQuery( scope.query()
+				.where( predicate ) )
+				.hasDocRefHitsAnyOrder( compatibleIndex.typeName(), dataSet.docId( 1 ) );
+		assertThatQuery( compatibleIndex.createScope().query()
+				.where( predicate ) )
+				.hasDocRefHitsAnyOrder( compatibleIndex.typeName(), dataSet.docId( 1 ) );
 	}
 
 	@Test

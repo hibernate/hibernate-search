@@ -31,7 +31,7 @@ public abstract class AbstractLuceneBucketAggregation<K, V> extends AbstractLuce
 	}
 
 	@Override
-	public Set<String> getIndexNames() {
+	public Set<String> indexNames() {
 		return indexNames;
 	}
 

@@ -7,6 +7,8 @@
 package org.hibernate.search.backend.lucene.search.highlighter.impl;
 
 import static org.hibernate.search.util.common.impl.CollectionHelper.asImmutableList;
+import static org.hibernate.search.util.common.impl.CollectionHelper.isSubset;
+import static org.hibernate.search.util.common.impl.CollectionHelper.notInTheOtherSet;
 
 import java.lang.invoke.MethodHandles;
 import java.util.Collections;
@@ -137,10 +139,10 @@ public abstract class LuceneAbstractSearchHighlighter implements SearchHighlight
 			throw log.cannotMixLuceneSearchQueryWithOtherQueryHighlighters( highlighter );
 		}
 		LuceneAbstractSearchHighlighter casted = (LuceneAbstractSearchHighlighter) highlighter;
-		if ( !scope.hibernateSearchIndexNames().equals( casted.indexNames() ) ) {
+		if ( !isSubset( scope.hibernateSearchIndexNames(), casted.indexNames() ) ) {
 			throw log.queryHighlighterDefinedOnDifferentIndexes( highlighter, casted.indexNames(),
-					scope.hibernateSearchIndexNames()
-			);
+					scope.hibernateSearchIndexNames(),
+					notInTheOtherSet( scope.hibernateSearchIndexNames(), casted.indexNames() ) );
 		}
 		return casted;
 	}

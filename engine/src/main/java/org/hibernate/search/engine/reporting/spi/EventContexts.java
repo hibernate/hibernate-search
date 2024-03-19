@@ -103,7 +103,7 @@ public class EventContexts {
 	}
 
 	public static EventContext fromIndexNames(String... indexNames) {
-		return fromIndexNames( CollectionHelper.asLinkedHashSet( indexNames ) );
+		return fromIndexNames( CollectionHelper.asTreeSet( indexNames ) );
 	}
 
 	public static EventContext fromIndexNames(Set<String> indexNames) {
