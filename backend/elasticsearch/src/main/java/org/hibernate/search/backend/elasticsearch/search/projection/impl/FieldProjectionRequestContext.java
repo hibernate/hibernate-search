@@ -81,4 +81,14 @@ public class FieldProjectionRequestContext implements ProjectionRequestContext {
 	public String[] relativeCurrentFieldPathComponents() {
 		return relativeCurrentFieldPathComponents;
 	}
+
+	@Override
+	public Object parameter(String parameterName) {
+		return root.parameter( parameterName );
+	}
+
+	@Override
+	public <T> T parameter(String parameterName, Class<T> parameterValueType) {
+		return root.parameter( parameterName, parameterValueType );
+	}
 }

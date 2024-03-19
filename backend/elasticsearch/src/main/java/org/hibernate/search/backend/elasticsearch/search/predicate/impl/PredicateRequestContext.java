@@ -11,29 +11,33 @@ import java.util.Set;
 import org.hibernate.search.backend.elasticsearch.lowlevel.query.impl.Queries;
 import org.hibernate.search.backend.elasticsearch.search.common.impl.ElasticsearchSearchIndexScope;
 import org.hibernate.search.engine.backend.session.spi.BackendSessionContext;
+import org.hibernate.search.engine.search.query.spi.QueryParameters;
+import org.hibernate.search.engine.search.query.spi.QueryParametersContext;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 
-public class PredicateRequestContext {
+public class PredicateRequestContext implements QueryParametersContext {
 
 	private final BackendSessionContext sessionContext;
 	private final ElasticsearchSearchIndexScope<?> searchIndexScope;
 	private final Set<String> routingKeys;
+	private final QueryParameters parameters;
 	private final String nestedPath;
 
 
 	public PredicateRequestContext(BackendSessionContext sessionContext, ElasticsearchSearchIndexScope<?> searchIndexScope,
-			Set<String> routingKeys) {
-		this( sessionContext, searchIndexScope, routingKeys, null );
+			Set<String> routingKeys, QueryParameters parameters) {
+		this( sessionContext, searchIndexScope, routingKeys, parameters, null );
 	}
 
 	private PredicateRequestContext(BackendSessionContext sessionContext,
 			ElasticsearchSearchIndexScope<?> searchIndexScope,
-			Set<String> routingKeys, String nestedPath) {
+			Set<String> routingKeys, QueryParameters parameters, String nestedPath) {
 		this.sessionContext = sessionContext;
 		this.searchIndexScope = searchIndexScope;
 		this.routingKeys = routingKeys;
+		this.parameters = parameters;
 		this.nestedPath = nestedPath;
 	}
 
@@ -58,6 +62,16 @@ public class PredicateRequestContext {
 	}
 
 	public PredicateRequestContext withNestedPath(String path) {
-		return new PredicateRequestContext( sessionContext, searchIndexScope, routingKeys, path );
+		return new PredicateRequestContext( sessionContext, searchIndexScope, routingKeys, parameters, path );
+	}
+
+	@Override
+	public Object parameter(String parameterName) {
+		return parameters.get( parameterName );
+	}
+
+	@Override
+	public <T> T parameter(String parameterName, Class<T> parameterValueType) {
+		return parameters.get( parameterName, parameterValueType );
 	}
 }

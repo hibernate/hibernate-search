@@ -7,8 +7,9 @@
 package org.hibernate.search.backend.elasticsearch.search.projection.impl;
 
 import org.hibernate.search.engine.search.common.spi.SearchQueryElementTypeKey;
+import org.hibernate.search.engine.search.query.spi.QueryParametersContext;
 
-public interface ProjectionRequestContext {
+public interface ProjectionRequestContext extends QueryParametersContext {
 
 	void checkValidField(String absoluteFieldPath);
 

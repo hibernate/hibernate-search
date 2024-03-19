@@ -120,7 +120,8 @@ public class LuceneExtractableSearchResult<H> {
 				indexSearcher.getIndexReader(),
 				fromDocumentValueConvertContext,
 				luceneCollectors.collectedMultiResults(),
-				requestContext.getRoutingKeys()
+				requestContext.getRoutingKeys(),
+				requestContext.getParameters()
 		);
 
 		Map<AggregationKey<?>, Object> extractedMap = new LinkedHashMap<>();

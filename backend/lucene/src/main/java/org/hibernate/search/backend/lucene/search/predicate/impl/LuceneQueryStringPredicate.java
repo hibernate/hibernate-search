@@ -80,7 +80,7 @@ public class LuceneQueryStringPredicate extends LuceneCommonQueryStringPredicate
 		}
 
 		@Override
-		protected Query buildQuery() {
+		protected Query buildQuery(PredicateRequestContext context) {
 			if ( queryString == null || queryString.trim().isEmpty() ) {
 				// empty string -- no docs, to match the behaviour of a simple query predicate
 				return new MatchNoDocsQuery();

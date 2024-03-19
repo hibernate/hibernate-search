@@ -25,6 +25,7 @@ import org.hibernate.search.engine.backend.session.spi.BackendSessionContext;
 import org.hibernate.search.engine.search.common.spi.SearchQueryElementTypeKey;
 import org.hibernate.search.engine.search.loading.spi.SearchLoadingContext;
 import org.hibernate.search.engine.search.projection.spi.ProjectionAccumulator;
+import org.hibernate.search.engine.search.query.spi.QueryParameters;
 import org.hibernate.search.engine.spatial.GeoPoint;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
@@ -52,6 +53,7 @@ class ElasticsearchSearchQueryRequestContext implements ProjectionRequestRootCon
 	private final Map<DistanceSortKey, Integer> distanceSorts;
 	private final Map<String, ElasticsearchSearchHighlighter> namedHighlighters;
 	private final ElasticsearchSearchHighlighter queryHighlighter;
+	private final QueryParameters parameters;
 
 	ElasticsearchSearchQueryRequestContext(
 			ElasticsearchSearchIndexScope<?> scope,
@@ -60,7 +62,7 @@ class ElasticsearchSearchQueryRequestContext implements ProjectionRequestRootCon
 			PredicateRequestContext rootPredicateContext,
 			Map<DistanceSortKey, Integer> distanceSorts,
 			Map<String, ElasticsearchSearchHighlighter> namedHighlighters,
-			ElasticsearchSearchHighlighter queryHighlighter) {
+			ElasticsearchSearchHighlighter queryHighlighter, QueryParameters parameters) {
 		this.scope = scope;
 		this.sessionContext = sessionContext;
 		this.loadingContext = loadingContext;
@@ -68,6 +70,7 @@ class ElasticsearchSearchQueryRequestContext implements ProjectionRequestRootCon
 		this.distanceSorts = distanceSorts != null ? Collections.unmodifiableMap( distanceSorts ) : null;
 		this.namedHighlighters = namedHighlighters;
 		this.queryHighlighter = queryHighlighter;
+		this.parameters = parameters;
 	}
 
 	@Override
@@ -117,6 +120,16 @@ class ElasticsearchSearchQueryRequestContext implements ProjectionRequestRootCon
 	@Override
 	public String[] relativeCurrentFieldPathComponents() {
 		return null;
+	}
+
+	@Override
+	public Object parameter(String name) {
+		return parameters.get( name );
+	}
+
+	@Override
+	public <T> T parameter(String parameterName, Class<T> parameterValueType) {
+		return parameters.get( parameterName, parameterValueType );
 	}
 
 	@Override

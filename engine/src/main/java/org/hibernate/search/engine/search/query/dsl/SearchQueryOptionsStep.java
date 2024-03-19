@@ -227,4 +227,7 @@ public interface SearchQueryOptionsStep<
 	 */
 	@Incubating
 	S highlighter(String highlighterName, SearchHighlighter highlighter);
+
+	@Incubating
+	S param(String parameterName, Object value);
 }
