@@ -274,7 +274,7 @@
         <version.buildhelper.plugin>3.5.0</version.buildhelper.plugin>
         <version.checkstyle.plugin>3.3.1</version.checkstyle.plugin>
         <version.bundle.plugin>5.1.9</version.bundle.plugin>
-        <version.compiler.plugin>3.13.0</version.compiler.plugin>
+        <version.compiler.plugin>3.12.1</version.compiler.plugin>
         <version.dependency.plugin>3.6.1</version.dependency.plugin>
         <!-- Check dependencies for security vulnerabilities -->
         <version.dependency-check.plugin>9.0.10</version.dependency-check.plugin>
