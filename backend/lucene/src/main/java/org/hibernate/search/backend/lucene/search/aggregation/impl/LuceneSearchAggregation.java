@@ -32,6 +32,6 @@ public interface LuceneSearchAggregation<A> extends SearchAggregation<A> {
 	 */
 	A extract(AggregationExtractContext context) throws IOException;
 
-	Set<String> getIndexNames();
+	Set<String> indexNames();
 
 }

@@ -6,6 +6,9 @@
  */
 package org.hibernate.search.backend.lucene.search.predicate.impl;
 
+import static org.hibernate.search.util.common.impl.CollectionHelper.isSubset;
+import static org.hibernate.search.util.common.impl.CollectionHelper.notInTheOtherSet;
+
 import java.lang.invoke.MethodHandles;
 import java.util.Set;
 
@@ -31,9 +34,9 @@ public interface LuceneSearchPredicate extends SearchPredicate {
 			throw log.cannotMixLuceneSearchQueryWithOtherPredicates( predicate );
 		}
 		LuceneSearchPredicate casted = (LuceneSearchPredicate) predicate;
-		if ( !scope.hibernateSearchIndexNames().equals( casted.indexNames() ) ) {
-			throw log.predicateDefinedOnDifferentIndexes( predicate, casted.indexNames(),
-					scope.hibernateSearchIndexNames() );
+		if ( !isSubset( scope.hibernateSearchIndexNames(), casted.indexNames() ) ) {
+			throw log.predicateDefinedOnDifferentIndexes( predicate, casted.indexNames(), scope.hibernateSearchIndexNames(),
+					notInTheOtherSet( scope.hibernateSearchIndexNames(), casted.indexNames() ) );
 		}
 		return casted;
 	}

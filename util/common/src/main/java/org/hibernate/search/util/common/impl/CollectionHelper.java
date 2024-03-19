@@ -12,6 +12,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
@@ -19,6 +20,8 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Objects;
 import java.util.Set;
+import java.util.SortedSet;
+import java.util.TreeSet;
 import java.util.stream.Collectors;
 
 /**
@@ -69,6 +72,13 @@ public final class CollectionHelper {
 	@SafeVarargs
 	public static <T> Set<T> asLinkedHashSet(T... ts) {
 		Set<T> set = new LinkedHashSet<>( getInitialCapacityFromExpectedSize( ts.length ) );
+		Collections.addAll( set, ts );
+		return set;
+	}
+
+	@SafeVarargs
+	public static <T> Set<T> asTreeSet(T... ts) {
+		Set<T> set = new TreeSet<>();
 		Collections.addAll( set, ts );
 		return set;
 	}
@@ -164,5 +174,51 @@ public final class CollectionHelper {
 			return expectedSize + 1;
 		}
 		return (int) ( expectedSize / 0.75f + 1.0f );
+	}
+
+	/**
+	 * @return Whether all elements that are present in the first set are available in the second one.
+	 */
+	public static <T> boolean isSubset(Set<T> subset, Set<T> superset) {
+		if ( subset.size() > superset.size() ) {
+			return false;
+		}
+		if ( subset == superset ) {
+			return true;
+		}
+		if ( !( subset instanceof SortedSet ) || !( superset instanceof SortedSet ) ) {
+			return superset.containsAll( subset );
+		}
+		else {
+			Iterator<T> subIterator = subset.iterator();
+			Iterator<T> superIterator = superset.iterator();
+
+			T el = null;
+			T al = null;
+			while ( subIterator.hasNext() ) {
+				el = subIterator.next();
+				while ( superIterator.hasNext() ) {
+					al = superIterator.next();
+					if ( el.equals( al ) ) {
+						break;
+					}
+				}
+				if ( !superIterator.hasNext() ) {
+					break;
+				}
+			}
+
+			return !subIterator.hasNext() && Objects.equals( el, al );
+		}
+	}
+
+	public static <T> Set<T> notInTheOtherSet(Set<T> subset, Set<T> superset) {
+		Set<T> difference = new HashSet<>();
+		for ( T t : subset ) {
+			if ( !superset.contains( t ) ) {
+				difference.add( t );
+			}
+		}
+		return difference;
 	}
 }

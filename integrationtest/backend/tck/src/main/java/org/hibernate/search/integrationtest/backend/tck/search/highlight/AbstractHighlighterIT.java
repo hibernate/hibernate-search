@@ -6,14 +6,17 @@
  */
 package org.hibernate.search.integrationtest.backend.tck.search.highlight;
 
+import static org.assertj.core.api.Assertions.assertThatCode;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.hibernate.search.util.impl.integrationtest.common.assertion.SearchHitsAssert.assertThatHits;
 import static org.junit.jupiter.api.Assumptions.assumeFalse;
 import static org.junit.jupiter.api.Assumptions.assumeTrue;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.Set;
 
 import org.hibernate.search.engine.backend.document.IndexFieldReference;
 import org.hibernate.search.engine.backend.document.IndexObjectFieldReference;
@@ -39,6 +42,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
 
 import org.apache.logging.log4j.Level;
+import org.assertj.core.api.ThrowableAssert;
 
 abstract class AbstractHighlighterIT {
 
@@ -49,6 +53,9 @@ abstract class AbstractHighlighterIT {
 	public final ExpectedLog4jLog logged = ExpectedLog4jLog.create();
 
 	protected static final SimpleMappedIndex<IndexBinding> index = SimpleMappedIndex.of( IndexBinding::new );
+
+	protected static final SimpleMappedIndex<IndexBinding> indexMatching = SimpleMappedIndex.of( IndexBinding::new )
+			.name( "matching" );
 	private static final SimpleMappedIndex<NotMatchingTypeIndexBinding> notMatchingTypeIndex =
 			SimpleMappedIndex.of( NotMatchingTypeIndexBinding::new )
 					.name( "notMatchingTypeIndex" );
@@ -57,6 +64,7 @@ abstract class AbstractHighlighterIT {
 	static void setup() {
 		setupHelper.start().withIndex( index )
 				.withIndex( notMatchingTypeIndex )
+				.withIndex( indexMatching )
 				.setup();
 
 		index.bulkIndexer()
@@ -774,16 +782,49 @@ abstract class AbstractHighlighterIT {
 		SearchHighlighter highlighter = highlighter( notMatchingTypeIndex.createScope().highlighter() ).tag( "---", "---" )
 				.toHighlighter();
 
-		assertThatThrownBy( () -> index.createScope().query().select(
+		assertFailScope(
+				() -> index.createScope().query().select(
+						f -> f.highlight( "string" )
+				).where( f -> f.match().field( "string" ).matching( "dog" ) )
+						.highlighter( highlighter )
+						.toQuery(),
+				Set.of( index.name() ),
+				Set.of( notMatchingTypeIndex.name() ),
+				Set.of( index.name() )
+		);
+
+		SearchHighlighter highlighter2 = highlighter( index.createScope( indexMatching ).highlighter() ).tag( "---", "---" )
+				.toHighlighter();
+
+		assertThatCode( () -> index.createScope().query().select(
 				f -> f.highlight( "string" )
 		).where( f -> f.match().field( "string" ).matching( "dog" ) )
-				.highlighter( highlighter )
-				.toQuery() ).isInstanceOf( SearchException.class )
-				.hasMessageContainingAll(
-						"Invalid highlighter",
-						"You must build the highlighter from a scope targeting indexes [indexName]",
-						"but the given highlighter was built from a scope targeting indexes [notMatchingTypeIndex]."
-				);
+				.highlighter( highlighter2 )
+				.toQuery() )
+				.doesNotThrowAnyException();
+		assertThatCode( () -> indexMatching.createScope().query().select(
+				f -> f.highlight( "string" )
+		).where( f -> f.match().field( "string" ).matching( "dog" ) )
+				.highlighter( highlighter2 )
+				.toQuery() )
+				.doesNotThrowAnyException();
+	}
+
+	private static void assertFailScope(ThrowableAssert.ThrowingCallable query, Set<String> scope,
+			Set<String> highlighter, Set<String> differences) {
+		List<String> messageParts = new ArrayList<>();
+		messageParts.add( "Invalid highlighter" );
+		messageParts.add( "You must build the highlighter from a scope targeting indexes " );
+		messageParts.addAll( scope );
+		messageParts.add( "the given highlighter was built from a scope targeting " );
+		messageParts.addAll( highlighter );
+		messageParts.add( "where indexes [" );
+		messageParts.addAll( differences );
+		messageParts.add( "] are missing" );
+
+		assertThatThrownBy( query )
+				.isInstanceOf( SearchException.class )
+				.hasMessageContainingAll( messageParts.toArray( String[]::new ) );
 	}
 
 	@Test

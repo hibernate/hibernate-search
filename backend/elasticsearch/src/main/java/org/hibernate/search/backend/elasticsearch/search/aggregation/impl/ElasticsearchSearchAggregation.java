@@ -35,6 +35,6 @@ public interface ElasticsearchSearchAggregation<A> extends SearchAggregation<A> 
 	 */
 	A extract(JsonObject aggregationResult, AggregationExtractContext context);
 
-	Set<String> getIndexNames();
+	Set<String> indexNames();
 
 }

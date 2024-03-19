@@ -7,6 +7,7 @@
 package org.hibernate.search.integrationtest.backend.tck.search.aggregation;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatCode;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.hibernate.search.util.impl.integrationtest.common.assertion.SearchResultAssert.assertThatQuery;
 
@@ -60,6 +61,8 @@ import org.junit.jupiter.api.extension.RegisterExtension;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
+
+import org.assertj.core.api.ThrowableAssert;
 
 /**
  * Tests behavior related to type checking and type conversion of DSL arguments
@@ -198,29 +201,88 @@ class SingleFieldAggregationTypeCheckingAndConversionIT<F> {
 				.toAggregation();
 
 		// reuse the aggregation instance on a different scope targeting a different index
-		assertThatThrownBy( () -> compatibleIndex.createScope().query()
-				.where( f -> f.matchAll() )
-				.aggregation( aggregationKey, aggregation )
-				.routing( dataSet.name )
-				.toQuery()
-		)
-				.isInstanceOf( SearchException.class )
-				.hasMessageContainingAll( "Invalid search aggregation",
-						"You must build the aggregation from a scope targeting indexes ", compatibleIndex.name(),
-						"the given aggregation was built from a scope targeting indexes ", mainIndex.name() );
+		assertFailScope(
+				() -> compatibleIndex.createScope().query()
+						.where( f -> f.matchAll() )
+						.aggregation( aggregationKey, aggregation )
+						.routing( dataSet.name )
+						.toQuery(),
+				Set.of( compatibleIndex.name() ),
+				Set.of( mainIndex.name() ),
+				Set.of( compatibleIndex.name() )
+		);
 
 		// reuse the aggregation instance on a different scope targeting a superset of the original indexes
-		assertThatThrownBy( () -> mainIndex.createScope( compatibleIndex ).query()
+		assertFailScope(
+				() -> mainIndex.createScope( compatibleIndex ).query()
+						.where( f -> f.matchAll() )
+						.aggregation( aggregationKey, aggregation )
+						.routing( dataSet.name )
+						.toQuery(),
+				Set.of( mainIndex.name(), compatibleIndex.name() ),
+				Set.of( mainIndex.name() ),
+				Set.of( compatibleIndex.name() )
+		);
+
+		scope = mainIndex.createScope( compatibleIndex );
+		SearchAggregation<A> aggregation2 = scenario.setup( scope.aggregation(), fieldPath )
+				.toAggregation();
+
+		assertFailScope(
+				() -> incompatibleIndex.createScope().query()
+						.where( f -> f.matchAll() )
+						.aggregation( aggregationKey, aggregation2 )
+						.routing( dataSet.name )
+						.toQuery(),
+				Set.of( incompatibleIndex.name() ),
+				Set.of( mainIndex.name(), compatibleIndex.name() ),
+				Set.of( incompatibleIndex.name() )
+		);
+
+		assertThatCode( () -> mainIndex.createScope().query()
 				.where( f -> f.matchAll() )
-				.aggregation( aggregationKey, aggregation )
+				.aggregation( aggregationKey, aggregation2 )
 				.routing( dataSet.name )
-				.toQuery()
-		)
+				.toQuery() )
+				.doesNotThrowAnyException();
+
+		assertThatCode( () -> compatibleIndex.createScope().query()
+				.where( f -> f.matchAll() )
+				.aggregation( aggregationKey, aggregation2 )
+				.routing( dataSet.name )
+				.toQuery() )
+				.doesNotThrowAnyException();
+
+		assertThatCode( () -> compatibleIndex.createScope( mainIndex ).query()
+				.where( f -> f.matchAll() )
+				.aggregation( aggregationKey, aggregation2 )
+				.routing( dataSet.name )
+				.toQuery() )
+				.doesNotThrowAnyException();
+		assertThatCode( () -> mainIndex.createScope( compatibleIndex ).query()
+				.where( f -> f.matchAll() )
+				.aggregation( aggregationKey, aggregation2 )
+				.routing( dataSet.name )
+				.toQuery() )
+				.doesNotThrowAnyException();
+
+	}
+
+	private static void assertFailScope(ThrowableAssert.ThrowingCallable query, Set<String> scope,
+			Set<String> aggregation, Set<String> differences) {
+		List<String> messageParts = new ArrayList<>();
+		messageParts.add( "Invalid search aggregation" );
+		messageParts.add( "You must build the aggregation from a scope targeting indexes " );
+		messageParts.addAll( scope );
+		messageParts.add( "the given aggregation was built from a scope targeting " );
+		messageParts.addAll( aggregation );
+		messageParts.add( "where indexes [" );
+		messageParts.addAll( differences );
+		messageParts.add( "] are missing" );
+
+		assertThatThrownBy( query )
 				.isInstanceOf( SearchException.class )
-				.hasMessageContainingAll( "Invalid search aggregation",
-						"You must build the aggregation from a scope targeting indexes ",
-						mainIndex.name(), compatibleIndex.name(),
-						"the given aggregation was built from a scope targeting indexes ", mainIndex.name() );
+				.hasMessageContainingAll( messageParts.toArray( String[]::new ) );
 	}
 
 	@ParameterizedTest(name = "{0}")

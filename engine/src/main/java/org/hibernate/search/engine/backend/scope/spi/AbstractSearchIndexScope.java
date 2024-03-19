@@ -8,9 +8,9 @@ package org.hibernate.search.engine.backend.scope.spi;
 
 import java.lang.invoke.MethodHandles;
 import java.util.ArrayList;
-import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.TreeSet;
 
 import org.hibernate.search.engine.backend.document.model.spi.AbstractIndexModel;
 import org.hibernate.search.engine.backend.mapping.spi.BackendMappingContext;
@@ -56,7 +56,7 @@ public abstract class AbstractSearchIndexScope<
 		this.mappingContext = mappingContext;
 
 		// Use LinkedHashMap/LinkedHashSet to ensure stable order when generating requests
-		this.hibernateSearchIndexNames = new LinkedHashSet<>();
+		this.hibernateSearchIndexNames = new TreeSet<>();
 		this.mappedTypeContexts = new ArrayList<>();
 		for ( M model : indexModels ) {
 			hibernateSearchIndexNames.add( model.hibernateSearchName() );

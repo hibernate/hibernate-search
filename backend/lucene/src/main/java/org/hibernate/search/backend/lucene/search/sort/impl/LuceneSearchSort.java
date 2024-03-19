@@ -6,6 +6,9 @@
  */
 package org.hibernate.search.backend.lucene.search.sort.impl;
 
+import static org.hibernate.search.util.common.impl.CollectionHelper.isSubset;
+import static org.hibernate.search.util.common.impl.CollectionHelper.notInTheOtherSet;
+
 import java.lang.invoke.MethodHandles;
 import java.util.Set;
 
@@ -26,8 +29,9 @@ public interface LuceneSearchSort extends SearchSort {
 			throw log.cannotMixLuceneSearchSortWithOtherSorts( sort );
 		}
 		LuceneSearchSort casted = (LuceneSearchSort) sort;
-		if ( !scope.hibernateSearchIndexNames().equals( casted.indexNames() ) ) {
-			throw log.sortDefinedOnDifferentIndexes( sort, casted.indexNames(), scope.hibernateSearchIndexNames() );
+		if ( !isSubset( scope.hibernateSearchIndexNames(), casted.indexNames() ) ) {
+			throw log.sortDefinedOnDifferentIndexes( sort, casted.indexNames(), scope.hibernateSearchIndexNames(),
+					notInTheOtherSet( scope.hibernateSearchIndexNames(), casted.indexNames() ) );
 		}
 		return casted;
 	}

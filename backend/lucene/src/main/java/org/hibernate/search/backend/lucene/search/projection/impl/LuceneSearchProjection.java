@@ -6,6 +6,9 @@
  */
 package org.hibernate.search.backend.lucene.search.projection.impl;
 
+import static org.hibernate.search.util.common.impl.CollectionHelper.isSubset;
+import static org.hibernate.search.util.common.impl.CollectionHelper.notInTheOtherSet;
+
 import java.lang.invoke.MethodHandles;
 import java.util.Set;
 
@@ -86,9 +89,9 @@ public interface LuceneSearchProjection<P> extends SearchProjection<P> {
 		}
 		@SuppressWarnings("unchecked") // Necessary for ecj (Eclipse compiler)
 		LuceneSearchProjection<P> casted = (LuceneSearchProjection<P>) projection;
-		if ( !scope.hibernateSearchIndexNames().equals( casted.indexNames() ) ) {
-			throw log.projectionDefinedOnDifferentIndexes( projection, casted.indexNames(),
-					scope.hibernateSearchIndexNames() );
+		if ( !isSubset( scope.hibernateSearchIndexNames(), casted.indexNames() ) ) {
+			throw log.projectionDefinedOnDifferentIndexes( projection, casted.indexNames(), scope.hibernateSearchIndexNames(),
+					notInTheOtherSet( scope.hibernateSearchIndexNames(), casted.indexNames() ) );
 		}
 		return casted;
 	}

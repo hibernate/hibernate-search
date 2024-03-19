@@ -7,6 +7,7 @@
 package org.hibernate.search.integrationtest.backend.tck.search.projection;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatCode;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.hibernate.search.integrationtest.backend.tck.testsupport.stub.MapperMockUtils.expectHitMapping;
 import static org.hibernate.search.util.impl.integrationtest.common.NormalizationUtils.reference;
@@ -15,8 +16,10 @@ import static org.hibernate.search.util.impl.integrationtest.common.assertion.Se
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 import java.util.function.Function;
 
 import org.hibernate.search.engine.backend.common.DocumentReference;
@@ -52,6 +55,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
 
+import org.assertj.core.api.ThrowableAssert;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoSettings;
 import org.mockito.quality.Strictness;
@@ -79,10 +83,14 @@ class SearchProjectionIT {
 			// Using the same mapping here. But a different mapping would work the same.
 			// What matters here is that is a different index.
 			SimpleMappedIndex.of( IndexBinding::new ).name( "other" );
+	private final SimpleMappedIndex<IndexBinding> anotherIndex =
+			// Using the same mapping here. But a different mapping would work the same.
+			// What matters here is that is a different index.
+			SimpleMappedIndex.of( IndexBinding::new ).name( "another" );
 
 	@BeforeEach
 	void setup() {
-		setupHelper.start().withIndexes( mainIndex, otherIndex ).setup();
+		setupHelper.start().withIndexes( mainIndex, otherIndex, anotherIndex ).setup();
 
 		initData();
 	}
@@ -494,6 +502,114 @@ class SearchProjectionIT {
 						"You must build the projection from a scope targeting indexes ",
 						mainIndex.name(), otherIndex.name(),
 						"the given projection was built from a scope targeting ", mainIndex.name() );
+
+		assertFailScope( () -> mainIndex.createScope( otherIndex ).query()
+				.select( projection )
+				.where( f -> f.matchAll() )
+				.toQuery(),
+				Set.of( otherIndex.name() ),
+				Set.of( mainIndex.name() ),
+				Set.of( otherIndex.name() )
+		);
+
+		// reuse the same predicate instance on a different scope,
+		// targeting different indexes
+		assertFailScope( () -> mainIndex.createScope( otherIndex ).query()
+				.select( projection )
+				.where( f -> f.matchAll() )
+				.toQuery(),
+				Set.of( mainIndex.name(), otherIndex.name() ),
+				Set.of( mainIndex.name() ),
+				Set.of( otherIndex.name() )
+		);
+		assertFailScope( () -> otherIndex.createScope( mainIndex ).query()
+				.select( projection )
+				.where( f -> f.matchAll() )
+				.toQuery(),
+				Set.of( mainIndex.name(), otherIndex.name() ),
+				Set.of( mainIndex.name() ),
+				Set.of( otherIndex.name() )
+		);
+
+		scope = mainIndex.createScope( otherIndex );
+		SearchProjection<String> projection2 = scope.projection()
+				.field( mainIndex.binding().string1Field.relativeFieldName, String.class ).toProjection();
+
+		assertThatCode( () -> mainIndex.createScope( otherIndex ).query()
+				.select( projection2 )
+				.where( f -> f.matchAll() )
+				.toQuery() )
+				.doesNotThrowAnyException();
+
+		assertFailScope( () -> otherIndex.createScope( anotherIndex ).query()
+				.select( projection2 )
+				.where( f -> f.matchAll() )
+				.toQuery(),
+				Set.of( otherIndex.name(), anotherIndex.name() ),
+				Set.of( mainIndex.name(), otherIndex.name() ),
+				Set.of( mainIndex.name() )
+		);
+
+		assertFailScope( () -> mainIndex.createScope( anotherIndex ).query()
+				.select( projection2 )
+				.where( f -> f.matchAll() )
+				.toQuery(),
+				Set.of( mainIndex.name(), anotherIndex.name() ),
+				Set.of( mainIndex.name(), otherIndex.name() ),
+				Set.of( otherIndex.name() )
+		);
+
+		scope = mainIndex.createScope( otherIndex, anotherIndex );
+		SearchProjection<String> projection3 = scope.projection()
+				.field( mainIndex.binding().string1Field.relativeFieldName, String.class ).toProjection();
+		assertThatCode( () -> mainIndex.createScope( otherIndex ).query()
+				.select( projection3 )
+				.where( f -> f.matchAll() )
+				.toQuery() )
+				.doesNotThrowAnyException();
+		assertThatCode( () -> otherIndex.createScope().query()
+				.select( projection3 )
+				.where( f -> f.matchAll() )
+				.toQuery() )
+				.doesNotThrowAnyException();
+		assertThatCode( () -> anotherIndex.createScope().query()
+				.select( projection3 )
+				.where( f -> f.matchAll() )
+				.toQuery() )
+				.doesNotThrowAnyException();
+
+		assertThatCode( () -> otherIndex.createScope( mainIndex ).query()
+				.select( projection3 )
+				.where( f -> f.matchAll() )
+				.toQuery() )
+				.doesNotThrowAnyException();
+		assertThatCode( () -> anotherIndex.createScope( mainIndex ).query()
+				.select( projection3 )
+				.where( f -> f.matchAll() )
+				.toQuery() )
+				.doesNotThrowAnyException();
+		assertThatCode( () -> anotherIndex.createScope( otherIndex ).query()
+				.select( projection3 )
+				.where( f -> f.matchAll() )
+				.toQuery() )
+				.doesNotThrowAnyException();
+	}
+
+	private static void assertFailScope(ThrowableAssert.ThrowingCallable query, Set<String> scope,
+			Set<String> projection, Set<String> differences) {
+		List<String> messageParts = new ArrayList<>();
+		messageParts.add( "Invalid search projection" );
+		messageParts.add( "You must build the projection from a scope targeting indexes " );
+		messageParts.addAll( scope );
+		messageParts.add( "the given projection was built from a scope targeting " );
+		messageParts.addAll( projection );
+		messageParts.add( "where indexes [" );
+		messageParts.addAll( differences );
+		messageParts.add( "] are missing" );
+
+		assertThatThrownBy( query )
+				.isInstanceOf( SearchException.class )
+				.hasMessageContainingAll( messageParts.toArray( String[]::new ) );
 	}
 
 	@Test

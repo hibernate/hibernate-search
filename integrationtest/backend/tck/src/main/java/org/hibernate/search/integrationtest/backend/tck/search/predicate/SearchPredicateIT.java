@@ -7,10 +7,14 @@
 package org.hibernate.search.integrationtest.backend.tck.search.predicate;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatCode;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.hibernate.search.util.impl.integrationtest.common.assertion.SearchResultAssert.assertThatQuery;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 import java.util.function.Function;
 
 import org.hibernate.search.engine.backend.common.DocumentReference;
@@ -34,6 +38,8 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
 
+import org.assertj.core.api.ThrowableAssert;
+
 class SearchPredicateIT {
 
 	private static final String DOCUMENT_1 = "doc1";
@@ -52,10 +58,14 @@ class SearchPredicateIT {
 			// Using the same mapping here. But a different mapping would work the same.
 			// What matters here is that is a different index.
 			SimpleMappedIndex.of( IndexBinding::new ).name( "other" );
+	private final SimpleMappedIndex<IndexBinding> anotherIndex =
+			// Using the same mapping here. But a different mapping would work the same.
+			// What matters here is that is a different index.
+			SimpleMappedIndex.of( IndexBinding::new ).name( "another" );
 
 	@BeforeEach
 	void setup() {
-		setupHelper.start().withIndexes( mainIndex, otherIndex ).setup();
+		setupHelper.start().withIndexes( mainIndex, otherIndex, anotherIndex ).setup();
 
 		initData();
 	}
@@ -133,24 +143,101 @@ class SearchPredicateIT {
 
 		// reuse the same predicate instance on a different scope,
 		// targeting a different index
-		assertThatThrownBy( () -> otherIndex.createScope().query()
+		assertFailScope( () -> mainIndex.createScope( otherIndex ).query()
 				.where( predicate )
-				.toQuery() )
-				.isInstanceOf( SearchException.class )
-				.hasMessageContainingAll( "Invalid search predicate",
-						"You must build the predicate from a scope targeting indexes ", otherIndex.name(),
-						"the given predicate was built from a scope targeting ", mainIndex.name() );
+				.toQuery(),
+				Set.of( otherIndex.name() ),
+				Set.of( mainIndex.name() ),
+				Set.of( otherIndex.name() )
+		);
 
 		// reuse the same predicate instance on a different scope,
 		// targeting different indexes
-		assertThatThrownBy( () -> mainIndex.createScope( otherIndex ).query()
+		assertFailScope( () -> mainIndex.createScope( otherIndex ).query()
 				.where( predicate )
+				.toQuery(),
+				Set.of( mainIndex.name(), otherIndex.name() ),
+				Set.of( mainIndex.name() ),
+				Set.of( otherIndex.name() )
+		);
+		assertFailScope( () -> otherIndex.createScope( mainIndex ).query()
+				.where( predicate )
+				.toQuery(),
+				Set.of( mainIndex.name(), otherIndex.name() ),
+				Set.of( mainIndex.name() ),
+				Set.of( otherIndex.name() )
+		);
+
+		scope = mainIndex.createScope( otherIndex );
+		SearchPredicate predicate2 = scope
+				.predicate().match().field( "string" ).matching( STRING_1 ).toPredicate();
+
+		assertThatCode( () -> mainIndex.createScope( otherIndex ).query()
+				.where( predicate2 )
 				.toQuery() )
+				.doesNotThrowAnyException();
+
+		assertFailScope( () -> otherIndex.createScope( anotherIndex ).query()
+				.where( predicate2 )
+				.toQuery(),
+				Set.of( otherIndex.name(), anotherIndex.name() ),
+				Set.of( mainIndex.name(), otherIndex.name() ),
+				Set.of( mainIndex.name() )
+		);
+
+		assertFailScope( () -> mainIndex.createScope( anotherIndex ).query()
+				.where( predicate2 )
+				.toQuery(),
+				Set.of( mainIndex.name(), anotherIndex.name() ),
+				Set.of( mainIndex.name(), otherIndex.name() ),
+				Set.of( otherIndex.name() )
+		);
+
+		scope = mainIndex.createScope( otherIndex, anotherIndex );
+		SearchPredicate predicate3 = scope
+				.predicate().match().field( "string" ).matching( STRING_1 ).toPredicate();
+		assertThatCode( () -> mainIndex.createScope( otherIndex ).query()
+				.where( predicate3 )
+				.toQuery() )
+				.doesNotThrowAnyException();
+		assertThatCode( () -> otherIndex.createScope().query()
+				.where( predicate3 )
+				.toQuery() )
+				.doesNotThrowAnyException();
+		assertThatCode( () -> anotherIndex.createScope().query()
+				.where( predicate3 )
+				.toQuery() )
+				.doesNotThrowAnyException();
+
+		assertThatCode( () -> otherIndex.createScope( mainIndex ).query()
+				.where( predicate3 )
+				.toQuery() )
+				.doesNotThrowAnyException();
+		assertThatCode( () -> anotherIndex.createScope( mainIndex ).query()
+				.where( predicate3 )
+				.toQuery() )
+				.doesNotThrowAnyException();
+		assertThatCode( () -> anotherIndex.createScope( otherIndex ).query()
+				.where( predicate3 )
+				.toQuery() )
+				.doesNotThrowAnyException();
+	}
+
+	private static void assertFailScope(ThrowableAssert.ThrowingCallable query, Set<String> scope,
+			Set<String> predicate, Set<String> differences) {
+		List<String> messageParts = new ArrayList<>();
+		messageParts.add( "Invalid search predicate" );
+		messageParts.add( "You must build the predicate from a scope targeting indexes " );
+		messageParts.addAll( scope );
+		messageParts.add( "the given predicate was built from a scope targeting " );
+		messageParts.addAll( predicate );
+		messageParts.add( "where indexes [" );
+		messageParts.addAll( differences );
+		messageParts.add( "] are missing" );
+
+		assertThatThrownBy( query )
 				.isInstanceOf( SearchException.class )
-				.hasMessageContainingAll( "Invalid search predicate",
-						"You must build the predicate from a scope targeting indexes ",
-						mainIndex.name(), otherIndex.name(),
-						"the given predicate was built from a scope targeting ", mainIndex.name() );
+				.hasMessageContainingAll( messageParts.toArray( String[]::new ) );
 	}
 
 	@Test

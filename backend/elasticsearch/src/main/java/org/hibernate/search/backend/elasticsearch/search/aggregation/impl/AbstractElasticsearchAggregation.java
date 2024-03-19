@@ -20,7 +20,7 @@ public abstract class AbstractElasticsearchAggregation<A> implements Elasticsear
 	}
 
 	@Override
-	public final Set<String> getIndexNames() {
+	public final Set<String> indexNames() {
 		return indexNames;
 	}
 

@@ -380,21 +380,22 @@ public interface Log extends BasicLogger {
 	SearchException invalidDecimalScale(Integer decimalScale, @Param EventContext eventContext);
 
 	@Message(id = ID_OFFSET + 84,
-			value = "Invalid search predicate: '%1$s'. You must build the predicate from a scope targeting indexes %3$s,"
-					+ " but the given predicate was built from a scope targeting indexes %2$s.")
+			value = "Invalid search predicate: '%1$s'. You must build the predicate from a scope targeting indexes %3$s or a superset of them,"
+					+ " but the given predicate was built from a scope targeting indexes %2$s, where indexes %4$s are missing.")
 	SearchException predicateDefinedOnDifferentIndexes(SearchPredicate predicate, Set<String> predicateIndexes,
-			Set<String> scopeIndexes);
+			Set<String> scopeIndexes, Set<String> scopeDifference);
 
 	@Message(id = ID_OFFSET + 85,
-			value = "Invalid search sort: '%1$s'. You must build the sort from a scope targeting indexes %3$s,"
-					+ " but the given sort was built from a scope targeting indexes %2$s.")
-	SearchException sortDefinedOnDifferentIndexes(SearchSort predicate, Set<String> predicateIndexes, Set<String> scopeIndexes);
+			value = "Invalid search sort: '%1$s'. You must build the sort from a scope targeting indexes %3$s or a superset of them,"
+					+ " but the given sort was built from a scope targeting indexes %2$s, where indexes %4$s are missing.")
+	SearchException sortDefinedOnDifferentIndexes(SearchSort sort, Set<String> sortIndexes, Set<String> scopeIndexes,
+			Set<String> scopeDifference);
 
 	@Message(id = ID_OFFSET + 86,
-			value = "Invalid search projection: '%1$s'. You must build the projection from a scope targeting indexes %3$s,"
-					+ " but the given projection was built from a scope targeting indexes %2$s.")
-	SearchException projectionDefinedOnDifferentIndexes(SearchProjection<?> predicate, Set<String> predicateIndexes,
-			Set<String> scopeIndexes);
+			value = "Invalid search projection: '%1$s'. You must build the projection from a scope targeting indexes %3$s or a superset of them,"
+					+ " but the given projection was built from a scope targeting indexes %2$s, where indexes %4$s are missing.")
+	SearchException projectionDefinedOnDifferentIndexes(SearchProjection<?> projection, Set<String> projectionIndexes,
+			Set<String> scopeIndexes, Set<String> scopeDifference);
 
 	@Message(id = ID_OFFSET + 87,
 			value = "Invalid filesystem access strategy name: '%1$s'. Valid names are: %2$s.")
@@ -433,10 +434,10 @@ public interface Log extends BasicLogger {
 	SearchException cannotMixLuceneSearchQueryWithOtherAggregations(SearchAggregation<?> aggregation);
 
 	@Message(id = ID_OFFSET + 99,
-			value = "Invalid search aggregation: '%1$s'. You must build the aggregation from a scope targeting indexes %3$s,"
-					+ " but the given aggregation was built from a scope targeting indexes %2$s.")
+			value = "Invalid search aggregation: '%1$s'. You must build the aggregation from a scope targeting indexes %3$s or a superset of them,"
+					+ " but the given aggregation was built from a scope targeting indexes %2$s, where indexes %4$s are missing")
 	SearchException aggregationDefinedOnDifferentIndexes(SearchAggregation<?> aggregation,
-			Set<String> aggregationIndexes, Set<String> scopeIndexes);
+			Set<String> aggregationIndexes, Set<String> scopeIndexes, Set<String> scopeDifference);
 
 	@Message(id = ID_OFFSET + 102,
 			value = "Duplicate aggregation definitions for key: '%1$s'")
@@ -633,10 +634,10 @@ public interface Log extends BasicLogger {
 	SearchException cannotMixLuceneSearchQueryWithOtherQueryHighlighters(SearchHighlighter highlighter);
 
 	@Message(id = ID_OFFSET + 159,
-			value = "Invalid highlighter: '%1$s'. You must build the highlighter from a scope targeting indexes %3$s,"
-					+ " but the given highlighter was built from a scope targeting indexes %2$s.")
-	SearchException queryHighlighterDefinedOnDifferentIndexes(SearchHighlighter highlighter, Set<String> indexNames,
-			Set<String> hibernateSearchIndexNames);
+			value = "Invalid highlighter: '%1$s'. You must build the highlighter from a scope targeting indexes %3$s or a superset of them,"
+					+ " but the given highlighter was built from a scope targeting indexes %2$s, where indexes %4$s are missing.")
+	SearchException queryHighlighterDefinedOnDifferentIndexes(SearchHighlighter highlighter, Set<String> highlighterIndexes,
+			Set<String> scopeIndexes, Set<String> scopeDifference);
 
 	@Message(id = ID_OFFSET + 160,
 			value = "Overriding a '%2$s' highlighter with a '%1$s' is not supported. " +

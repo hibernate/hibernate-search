@@ -6,6 +6,9 @@
  */
 package org.hibernate.search.backend.elasticsearch.search.predicate.impl;
 
+import static org.hibernate.search.util.common.impl.CollectionHelper.isSubset;
+import static org.hibernate.search.util.common.impl.CollectionHelper.notInTheOtherSet;
+
 import java.lang.invoke.MethodHandles;
 import java.util.Set;
 
@@ -31,9 +34,11 @@ public interface ElasticsearchSearchPredicate extends SearchPredicate {
 			throw log.cannotMixElasticsearchSearchQueryWithOtherPredicates( predicate );
 		}
 		ElasticsearchSearchPredicate casted = (ElasticsearchSearchPredicate) predicate;
-		if ( !scope.hibernateSearchIndexNames().equals( casted.indexNames() ) ) {
+		if ( !isSubset( scope.hibernateSearchIndexNames(), casted.indexNames() ) ) {
 			throw log.predicateDefinedOnDifferentIndexes( predicate, casted.indexNames(),
-					scope.hibernateSearchIndexNames() );
+					scope.hibernateSearchIndexNames(),
+					notInTheOtherSet( scope.hibernateSearchIndexNames(), casted.indexNames() )
+			);
 		}
 		return casted;
 	}
