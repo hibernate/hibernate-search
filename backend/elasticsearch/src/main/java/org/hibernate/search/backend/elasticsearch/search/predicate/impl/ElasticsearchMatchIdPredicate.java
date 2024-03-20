@@ -6,6 +6,9 @@
  */
 package org.hibernate.search.backend.elasticsearch.search.predicate.impl;
 
+import static org.hibernate.search.engine.search.query.spi.QueryParametersValueProvider.parameter;
+import static org.hibernate.search.engine.search.query.spi.QueryParametersValueProvider.simple;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -18,6 +21,7 @@ import org.hibernate.search.engine.backend.types.converter.spi.DslConverter;
 import org.hibernate.search.engine.search.common.ValueConvert;
 import org.hibernate.search.engine.search.predicate.SearchPredicate;
 import org.hibernate.search.engine.search.predicate.spi.MatchIdPredicateBuilder;
+import org.hibernate.search.engine.search.query.spi.QueryParametersValueProvider;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
@@ -48,14 +52,14 @@ public class ElasticsearchMatchIdPredicate extends AbstractElasticsearchPredicat
 	private static final JsonAccessor<JsonElement> VALUES_ACCESSOR = JsonAccessor.root().property( "values" );
 
 	private final DocumentIdHelper documentIdHelper;
-	private final List<String> values;
+	private final List<QueryParametersValueProvider<String>> valueProviders;
 
 	private ElasticsearchMatchIdPredicate(Builder builder) {
 		super( builder );
 		documentIdHelper = builder.scope.documentIdHelper();
-		values = builder.values;
+		valueProviders = builder.valueProviders;
 		// Ensure illegal attempts to mutate the predicate will fail
-		builder.values = null;
+		builder.valueProviders = null;
 	}
 
 	@Override
@@ -66,7 +70,7 @@ public class ElasticsearchMatchIdPredicate extends AbstractElasticsearchPredicat
 	@Override
 	protected JsonObject doToJsonQuery(PredicateRequestContext context,
 			JsonObject outerObject, JsonObject innerObject) {
-		JsonArray array = toJsonArray( values, context.getTenantId() );
+		JsonArray array = toJsonArray( valueProviders, context );
 
 		VALUES_ACCESSOR.set( innerObject, array );
 
@@ -74,17 +78,17 @@ public class ElasticsearchMatchIdPredicate extends AbstractElasticsearchPredicat
 		return outerObject;
 	}
 
-	private JsonArray toJsonArray(List<String> list, String tenantId) {
-		JsonArray jsonArray = new JsonArray( list.size() );
-		for ( String value : list ) {
-			jsonArray.add( documentIdHelper.toElasticsearchId( tenantId, value ) );
+	private JsonArray toJsonArray(List<QueryParametersValueProvider<String>> valueProviders, PredicateRequestContext context) {
+		JsonArray jsonArray = new JsonArray( valueProviders.size() );
+		for ( QueryParametersValueProvider<String> provider : valueProviders ) {
+			jsonArray.add( documentIdHelper.toElasticsearchId( context.getTenantId(), provider.provide( context ) ) );
 		}
 		return jsonArray;
 	}
 
 	static class Builder extends AbstractElasticsearchPredicate.AbstractBuilder implements MatchIdPredicateBuilder {
 
-		private List<String> values = new ArrayList<>();
+		private List<QueryParametersValueProvider<String>> valueProviders = new ArrayList<>();
 
 		Builder(ElasticsearchSearchIndexScope<?> scope) {
 			super( scope );
@@ -94,7 +98,15 @@ public class ElasticsearchMatchIdPredicate extends AbstractElasticsearchPredicat
 		public void value(Object value, ValueConvert valueConvert) {
 			DslConverter<?, String> converter = scope.identifier().dslConverter( valueConvert );
 			ToDocumentValueConvertContext context = scope.toDocumentValueConvertContext();
-			values.add( converter.unknownTypeToDocumentValue( value, context ) );
+			valueProviders.add( simple( converter.unknownTypeToDocumentValue( value, context ) ) );
+		}
+
+		@Override
+		public void param(String parameterName, ValueConvert valueConvert) {
+			DslConverter<?, String> converter = scope.identifier().dslConverter( valueConvert );
+			ToDocumentValueConvertContext context = scope.toDocumentValueConvertContext();
+			valueProviders.add(
+					parameter( parameterName, String.class, value -> converter.unknownTypeToDocumentValue( value, context ) ) );
 		}
 
 		@Override

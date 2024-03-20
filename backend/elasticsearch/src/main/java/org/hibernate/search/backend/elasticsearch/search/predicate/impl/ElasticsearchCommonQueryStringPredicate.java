@@ -7,6 +7,8 @@
 package org.hibernate.search.backend.elasticsearch.search.predicate.impl;
 
 import static org.hibernate.search.backend.elasticsearch.search.predicate.impl.ElasticsearchCommonMinimumShouldMatchConstraint.formatMinimumShouldMatchConstraints;
+import static org.hibernate.search.engine.search.query.spi.QueryParametersValueProvider.parameter;
+import static org.hibernate.search.engine.search.query.spi.QueryParametersValueProvider.simple;
 
 import java.lang.invoke.MethodHandles;
 import java.util.ArrayList;
@@ -26,6 +28,7 @@ import org.hibernate.search.engine.search.common.spi.SearchIndexSchemaElementCon
 import org.hibernate.search.engine.search.common.spi.SearchQueryElementTypeKey;
 import org.hibernate.search.engine.search.predicate.SearchPredicate;
 import org.hibernate.search.engine.search.predicate.spi.CommonQueryStringPredicateBuilder;
+import org.hibernate.search.engine.search.query.spi.QueryParametersValueProvider;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
 import com.google.gson.JsonArray;
@@ -53,7 +56,7 @@ abstract class ElasticsearchCommonQueryStringPredicate extends AbstractElasticse
 
 	private final List<JsonPrimitive> fieldNameAndBoosts;
 	private final JsonPrimitive defaultOperator;
-	private final String queryString;
+	private final QueryParametersValueProvider<String> queryStringProvider;
 	private final String analyzer;
 	private final Map<Integer, ElasticsearchCommonMinimumShouldMatchConstraint> minimumShouldMatchConstraints;
 
@@ -71,7 +74,7 @@ abstract class ElasticsearchCommonQueryStringPredicate extends AbstractElasticse
 			fieldNameAndBoosts.add( fieldContext.build() );
 		}
 		defaultOperator = builder.defaultOperator;
-		queryString = builder.queryString;
+		queryStringProvider = builder.queryStringProvider;
 		analyzer = builder.analyzer;
 		minimumShouldMatchConstraints = builder.minimumShouldMatchConstraints;
 
@@ -81,7 +84,7 @@ abstract class ElasticsearchCommonQueryStringPredicate extends AbstractElasticse
 	@Override
 	protected final JsonObject doToJsonQuery(PredicateRequestContext context, JsonObject outerObject,
 			JsonObject innerObject) {
-		QUERY_ACCESSOR.set( innerObject, queryString );
+		QUERY_ACCESSOR.set( innerObject, queryStringProvider.provide( context ) );
 		DEFAULT_OPERATOR_ACCESSOR.set( innerObject, defaultOperator );
 
 		JsonArray fieldArray = new JsonArray();
@@ -131,7 +134,7 @@ abstract class ElasticsearchCommonQueryStringPredicate extends AbstractElasticse
 		protected final Map<String, ElasticsearchCommonQueryStringPredicateBuilderFieldState> fieldStates =
 				new LinkedHashMap<>();
 		protected JsonPrimitive defaultOperator = OR_OPERATOR_KEYWORD_JSON;
-		protected String queryString;
+		protected QueryParametersValueProvider<String> queryStringProvider;
 		protected String analyzer;
 		private Map<Integer, ElasticsearchCommonMinimumShouldMatchConstraint> minimumShouldMatchConstraints;
 
@@ -153,7 +156,12 @@ abstract class ElasticsearchCommonQueryStringPredicate extends AbstractElasticse
 
 		@Override
 		public final void queryString(String queryString) {
-			this.queryString = queryString;
+			this.queryStringProvider = simple( queryString );
+		}
+
+		@Override
+		public void queryStringParam(String parameterName) {
+			this.queryStringProvider = parameter( parameterName, String.class );
 		}
 
 		@Override

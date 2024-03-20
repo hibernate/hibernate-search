@@ -6,6 +6,9 @@
  */
 package org.hibernate.search.backend.elasticsearch.search.predicate.impl;
 
+import static org.hibernate.search.engine.search.query.spi.QueryParametersValueProvider.parameter;
+import static org.hibernate.search.engine.search.query.spi.QueryParametersValueProvider.simple;
+
 import java.lang.invoke.MethodHandles;
 import java.lang.reflect.Array;
 
@@ -21,6 +24,7 @@ import org.hibernate.search.backend.elasticsearch.types.codec.impl.Elasticsearch
 import org.hibernate.search.backend.elasticsearch.types.codec.impl.ElasticsearchVectorFieldCodec;
 import org.hibernate.search.engine.search.predicate.SearchPredicate;
 import org.hibernate.search.engine.search.predicate.spi.KnnPredicateBuilder;
+import org.hibernate.search.engine.search.query.spi.QueryParametersValueProvider;
 import org.hibernate.search.util.common.AssertionFailure;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
@@ -33,17 +37,17 @@ public abstract class ElasticsearchKnnPredicate extends AbstractElasticsearchSin
 
 	protected final ElasticsearchSearchPredicate filter;
 	protected final int k;
-	protected final JsonArray vector;
+	protected final QueryParametersValueProvider<JsonArray> vectorProvider;
 	protected final Float similarity;
 
 	private ElasticsearchKnnPredicate(AbstractKnnBuilder<?> builder) {
 		super( builder );
 		this.filter = builder.filter;
 		this.k = builder.k;
-		this.vector = builder.vector;
+		this.vectorProvider = builder.vectorProvider;
 		this.similarity = builder.similarity;
 		builder.filter = null;
-		builder.vector = null;
+		builder.vectorProvider = null;
 	}
 
 	protected JsonObject prepareFilter(PredicateRequestContext context) {
@@ -89,7 +93,7 @@ public abstract class ElasticsearchKnnPredicate extends AbstractElasticsearchSin
 		private final Class<?> vectorElementsType;
 		private final int indexedVectorsDimension;
 		private int k;
-		private JsonArray vector;
+		private QueryParametersValueProvider<JsonArray> vectorProvider;
 		private ElasticsearchSearchPredicate filter;
 		protected Float similarity;
 
@@ -114,19 +118,14 @@ public abstract class ElasticsearchKnnPredicate extends AbstractElasticsearchSin
 
 		@Override
 		public void vector(Object vector) {
-			if ( !vector.getClass().isArray() ) {
-				throw new IllegalArgumentException( "Vector can only be either a float or a byte array (float[], byte[])." );
-			}
-			if ( !vectorElementsType.equals( vector.getClass().getComponentType() ) ) {
-				throw log.vectorKnnMatchVectorTypeDiffersFromField( absoluteFieldPath, vectorElementsType,
-						vector.getClass().getComponentType() );
-			}
-			if ( Array.getLength( vector ) != indexedVectorsDimension ) {
-				throw log.vectorKnnMatchVectorDimensionDiffersFromField( absoluteFieldPath, indexedVectorsDimension,
-						Array.getLength( vector )
-				);
-			}
-			this.vector = vectorToJsonArray( vector, vectorElementsType );
+			this.vectorProvider =
+					simple( vectorToJsonArray( vector, vectorElementsType, indexedVectorsDimension, absoluteFieldPath ) );
+		}
+
+		@Override
+		public void vectorParam(String parameterName) {
+			this.vectorProvider = parameter( parameterName, Object.class,
+					vector -> vectorToJsonArray( vector, vectorElementsType, indexedVectorsDimension, absoluteFieldPath ) );
 		}
 
 		@Override
@@ -138,7 +137,21 @@ public abstract class ElasticsearchKnnPredicate extends AbstractElasticsearchSin
 
 	}
 
-	private static JsonArray vectorToJsonArray(Object vector, Class<?> vectorElementsType) {
+	private static JsonArray vectorToJsonArray(Object vector, Class<?> vectorElementsType, int indexedVectorsDimension,
+			String absoluteFieldPath) {
+		if ( !vector.getClass().isArray() ) {
+			throw new IllegalArgumentException( "Vector can only be either a float or a byte array (float[], byte[])." );
+		}
+		if ( !vectorElementsType.equals( vector.getClass().getComponentType() ) ) {
+			throw log.vectorKnnMatchVectorTypeDiffersFromField( absoluteFieldPath, vectorElementsType,
+					vector.getClass().getComponentType() );
+		}
+		if ( Array.getLength( vector ) != indexedVectorsDimension ) {
+			throw log.vectorKnnMatchVectorDimensionDiffersFromField( absoluteFieldPath, indexedVectorsDimension,
+					Array.getLength( vector )
+			);
+		}
+
 		// we know it is an array since we've checked it when we got the vector
 		int length = Array.getLength( vector );
 		JsonArray array = new JsonArray( length );
@@ -174,7 +187,7 @@ public abstract class ElasticsearchKnnPredicate extends AbstractElasticsearchSin
 
 			FIELD_ACCESSOR.set( innerObject, absoluteFieldPath );
 			NUM_CANDIDATES_ACCESSOR.set( innerObject, k );
-			VECTOR_ACCESSOR.set( innerObject, vector );
+			VECTOR_ACCESSOR.set( innerObject, vectorProvider.provide( context ) );
 
 			JsonObject filter = prepareFilter( context );
 			if ( filter != null ) {
@@ -229,7 +242,7 @@ public abstract class ElasticsearchKnnPredicate extends AbstractElasticsearchSin
 				FILTER_ACCESSOR.set( innerObject, filter );
 			}
 			K_ACCESSOR.set( innerObject, k );
-			VECTOR_ACCESSOR.set( innerObject, vector );
+			VECTOR_ACCESSOR.set( innerObject, vectorProvider.provide( context ) );
 
 			return outerObject;
 		}

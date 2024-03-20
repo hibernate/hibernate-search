@@ -6,6 +6,9 @@
  */
 package org.hibernate.search.backend.elasticsearch.types.predicate.impl;
 
+import static org.hibernate.search.engine.search.query.spi.QueryParametersValueProvider.parameter;
+import static org.hibernate.search.engine.search.query.spi.QueryParametersValueProvider.simple;
+
 import java.lang.invoke.MethodHandles;
 
 import org.hibernate.search.backend.elasticsearch.gson.impl.JsonAccessor;
@@ -22,6 +25,7 @@ import org.hibernate.search.engine.reporting.spi.EventContexts;
 import org.hibernate.search.engine.search.common.ValueConvert;
 import org.hibernate.search.engine.search.predicate.SearchPredicate;
 import org.hibernate.search.engine.search.predicate.spi.MatchPredicateBuilder;
+import org.hibernate.search.engine.search.query.spi.QueryParametersValueProvider;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
 import com.google.gson.JsonElement;
@@ -35,17 +39,17 @@ public class ElasticsearchStandardMatchPredicate extends AbstractElasticsearchSi
 
 	private static final JsonObjectAccessor MATCH_ACCESSOR = JsonAccessor.root().property( "match" ).asObject();
 
-	private final JsonElement value;
+	private final QueryParametersValueProvider<JsonElement> valueProvider;
 
 	ElasticsearchStandardMatchPredicate(Builder<?> builder) {
 		super( builder );
-		value = builder.value;
+		valueProvider = builder.valueProvider;
 	}
 
 	@Override
 	protected JsonObject doToJsonQuery(PredicateRequestContext context, JsonObject outerObject,
 			JsonObject innerObject) {
-		QUERY_ACCESSOR.set( innerObject, value );
+		QUERY_ACCESSOR.set( innerObject, valueProvider.provide( context ) );
 
 		JsonObject middleObject = new JsonObject();
 		middleObject.add( absoluteFieldPath, innerObject );
@@ -72,7 +76,7 @@ public class ElasticsearchStandardMatchPredicate extends AbstractElasticsearchSi
 		protected final ElasticsearchSearchIndexValueFieldContext<F> field;
 		private final ElasticsearchFieldCodec<F> codec;
 
-		private JsonElement value;
+		private QueryParametersValueProvider<JsonElement> valueProvider;
 
 		Builder(ElasticsearchFieldCodec<F> codec, ElasticsearchSearchIndexScope<?> scope,
 				ElasticsearchSearchIndexValueFieldContext<F> field) {
@@ -98,14 +102,25 @@ public class ElasticsearchStandardMatchPredicate extends AbstractElasticsearchSi
 
 		@Override
 		public void value(Object value, ValueConvert convert) {
-			DslConverter<?, ? extends F> dslToIndexConverter = field.type().dslConverter( convert );
+			this.valueProvider = simple( convert( scope, codec, field, value, convert ) );
+		}
+
+		@Override
+		public void param(String parameterName, ValueConvert convert) {
+			this.valueProvider = parameter( parameterName, Object.class,
+					value -> convert( scope, codec, field, value, convert ) );
+		}
+
+		private static <T> JsonElement convert(ElasticsearchSearchIndexScope<?> scope, ElasticsearchFieldCodec<T> codec,
+				ElasticsearchSearchIndexValueFieldContext<T> field, Object value, ValueConvert convert) {
+			DslConverter<?, ? extends T> dslToIndexConverter = field.type().dslConverter( convert );
 			try {
-				F converted = dslToIndexConverter.unknownTypeToDocumentValue( value, scope.toDocumentValueConvertContext() );
-				this.value = codec.encode( converted );
+				T converted = dslToIndexConverter.unknownTypeToDocumentValue( value, scope.toDocumentValueConvertContext() );
+				return codec.encode( converted );
 			}
 			catch (RuntimeException e) {
 				throw log.cannotConvertDslParameter(
-						e.getMessage(), e, EventContexts.fromIndexFieldAbsolutePath( absoluteFieldPath )
+						e.getMessage(), e, EventContexts.fromIndexFieldAbsolutePath( field.absolutePath() )
 				);
 			}
 		}

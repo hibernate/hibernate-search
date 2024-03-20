@@ -6,6 +6,9 @@
  */
 package org.hibernate.search.backend.elasticsearch.types.predicate.impl;
 
+import static org.hibernate.search.engine.search.query.spi.QueryParametersValueProvider.parameter;
+import static org.hibernate.search.engine.search.query.spi.QueryParametersValueProvider.simple;
+
 import java.util.Collections;
 import java.util.EnumSet;
 import java.util.Set;
@@ -20,6 +23,7 @@ import org.hibernate.search.backend.elasticsearch.search.predicate.impl.Predicat
 import org.hibernate.search.engine.search.predicate.SearchPredicate;
 import org.hibernate.search.engine.search.predicate.dsl.RegexpQueryFlag;
 import org.hibernate.search.engine.search.predicate.spi.RegexpPredicateBuilder;
+import org.hibernate.search.engine.search.query.spi.QueryParametersValueProvider;
 import org.hibernate.search.util.common.AssertionFailure;
 
 import com.google.gson.JsonElement;
@@ -35,19 +39,19 @@ public class ElasticsearchTextRegexpPredicate extends AbstractElasticsearchSingl
 
 	private static final String NO_OPTIONAL_OPERATORS_FLAG_MARK = "NONE";
 
-	private final JsonPrimitive pattern;
+	private final QueryParametersValueProvider<JsonPrimitive> patternProvider;
 	private final Set<RegexpQueryFlag> flags;
 
 	public ElasticsearchTextRegexpPredicate(Builder builder) {
 		super( builder );
-		this.pattern = builder.pattern;
+		this.patternProvider = builder.patternProvider;
 		this.flags = builder.flags;
 	}
 
 	@Override
 	protected JsonObject doToJsonQuery(PredicateRequestContext context, JsonObject outerObject,
 			JsonObject innerObject) {
-		VALUE_ACCESSOR.set( innerObject, pattern );
+		VALUE_ACCESSOR.set( innerObject, patternProvider.provide( context ) );
 
 		// set no optional flag as default
 		FLAGS_ACCESSOR.set( innerObject, toFlagsMask( flags ) );
@@ -69,7 +73,7 @@ public class ElasticsearchTextRegexpPredicate extends AbstractElasticsearchSingl
 	}
 
 	private static class Builder extends AbstractBuilder implements RegexpPredicateBuilder {
-		private JsonPrimitive pattern;
+		private QueryParametersValueProvider<JsonPrimitive> patternProvider;
 		private Set<RegexpQueryFlag> flags;
 
 		private Builder(ElasticsearchSearchIndexScope<?> scope, ElasticsearchSearchIndexValueFieldContext<String> field) {
@@ -78,7 +82,12 @@ public class ElasticsearchTextRegexpPredicate extends AbstractElasticsearchSingl
 
 		@Override
 		public void pattern(String pattern) {
-			this.pattern = new JsonPrimitive( pattern );
+			this.patternProvider = simple( new JsonPrimitive( pattern ) );
+		}
+
+		@Override
+		public void param(String parameterName) {
+			this.patternProvider = parameter( parameterName, String.class, JsonPrimitive::new );
 		}
 
 		@Override

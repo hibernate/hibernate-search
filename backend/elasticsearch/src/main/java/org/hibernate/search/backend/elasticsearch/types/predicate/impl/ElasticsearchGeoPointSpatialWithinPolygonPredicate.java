@@ -6,6 +6,9 @@
  */
 package org.hibernate.search.backend.elasticsearch.types.predicate.impl;
 
+import static org.hibernate.search.engine.search.query.spi.QueryParametersValueProvider.parameter;
+import static org.hibernate.search.engine.search.query.spi.QueryParametersValueProvider.simple;
+
 import java.util.List;
 
 import org.hibernate.search.backend.elasticsearch.gson.impl.JsonAccessor;
@@ -17,6 +20,7 @@ import org.hibernate.search.backend.elasticsearch.search.predicate.impl.Abstract
 import org.hibernate.search.backend.elasticsearch.search.predicate.impl.PredicateRequestContext;
 import org.hibernate.search.engine.search.predicate.SearchPredicate;
 import org.hibernate.search.engine.search.predicate.spi.SpatialWithinPolygonPredicateBuilder;
+import org.hibernate.search.engine.search.query.spi.QueryParametersValueProvider;
 import org.hibernate.search.engine.spatial.GeoPoint;
 import org.hibernate.search.engine.spatial.GeoPolygon;
 
@@ -35,16 +39,17 @@ public class ElasticsearchGeoPointSpatialWithinPolygonPredicate extends Abstract
 	private static final String TYPE_PROPERTY_VALUE = "Polygon";
 	private static final String SHAPE_PROPERTY_NAME = "shape";
 
-	private final double[] coordinates;
+	private final QueryParametersValueProvider<double[]> coordinatesProvider;
 
 	private ElasticsearchGeoPointSpatialWithinPolygonPredicate(Builder builder) {
 		super( builder );
-		coordinates = builder.coordinates;
+		coordinatesProvider = builder.coordinatesProvider;
 	}
 
 	@Override
-	protected JsonObject doToJsonQuery(PredicateRequestContext context, JsonObject outerObject,
-			JsonObject innerObject) {
+	protected JsonObject doToJsonQuery(PredicateRequestContext context, JsonObject outerObject, JsonObject innerObject) {
+		double[] coordinates = coordinatesProvider.provide( context );
+
 		JsonObject geometryObject = new JsonObject();
 		JsonArray pointsArray = new JsonArray();
 		for ( int i = 0; i < coordinates.length; i += 2 ) {
@@ -97,7 +102,7 @@ public class ElasticsearchGeoPointSpatialWithinPolygonPredicate extends Abstract
 	}
 
 	private static class Builder extends AbstractBuilder implements SpatialWithinPolygonPredicateBuilder {
-		private double[] coordinates;
+		private QueryParametersValueProvider<double[]> coordinatesProvider;
 
 		private Builder(ElasticsearchSearchIndexScope<?> scope, ElasticsearchSearchIndexValueFieldContext<GeoPoint> field) {
 			super( scope, field );
@@ -105,13 +110,23 @@ public class ElasticsearchGeoPointSpatialWithinPolygonPredicate extends Abstract
 
 		@Override
 		public void polygon(GeoPolygon polygon) {
+			coordinatesProvider = simple( convert( polygon ) );
+		}
+
+		@Override
+		public void param(String parameterName) {
+			coordinatesProvider = parameter( parameterName, GeoPolygon.class, Builder::convert );
+		}
+
+		private static double[] convert(GeoPolygon polygon) {
 			List<GeoPoint> points = polygon.points();
-			this.coordinates = new double[points.size() * 2];
+			double[] coordinates = new double[points.size() * 2];
 			int index = 0;
 			for ( GeoPoint point : points ) {
 				coordinates[index++] = point.longitude();
 				coordinates[index++] = point.latitude();
 			}
+			return coordinates;
 		}
 
 		@Override

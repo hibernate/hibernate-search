@@ -6,6 +6,9 @@
  */
 package org.hibernate.search.backend.elasticsearch.types.predicate.impl;
 
+import static org.hibernate.search.engine.search.query.spi.QueryParametersValueProvider.parameterCollectionOrSingle;
+import static org.hibernate.search.engine.search.query.spi.QueryParametersValueProvider.simple;
+
 import java.lang.invoke.MethodHandles;
 import java.util.Collection;
 
@@ -24,6 +27,7 @@ import org.hibernate.search.engine.reporting.spi.EventContexts;
 import org.hibernate.search.engine.search.common.ValueConvert;
 import org.hibernate.search.engine.search.predicate.SearchPredicate;
 import org.hibernate.search.engine.search.predicate.spi.TermsPredicateBuilder;
+import org.hibernate.search.engine.search.query.spi.QueryParametersValueProvider;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
 import com.google.gson.JsonArray;
@@ -43,24 +47,21 @@ public class ElasticsearchTermsPredicate extends AbstractElasticsearchSingleFiel
 
 	private static final JsonAccessor<JsonElement> VALUE_ACCESSOR = JsonAccessor.root().property( "value" );
 
-	private final JsonElement term;
-	private final JsonElement[] terms;
+	private final QueryParametersValueProvider<JsonElement[]> termsProvider;
 	private boolean allMatch;
 
 	public ElasticsearchTermsPredicate(Builder<?> builder) {
 		super( builder );
-		this.term = builder.term;
-		this.terms = builder.terms;
+		this.termsProvider = builder.termsProvider;
 		this.allMatch = builder.allMatch;
 	}
 
 	@Override
-	protected JsonObject doToJsonQuery(PredicateRequestContext context, JsonObject outerObject,
-			JsonObject innerObject) {
-
+	protected JsonObject doToJsonQuery(PredicateRequestContext context, JsonObject outerObject, JsonObject innerObject) {
+		JsonElement[] terms = termsProvider.provide( context );
 		// single term
-		if ( term != null ) {
-			VALUE_ACCESSOR.set( innerObject, term );
+		if ( terms.length == 1 ) {
+			VALUE_ACCESSOR.set( innerObject, terms[0] );
 			JsonObject middleObject = new JsonObject();
 			middleObject.add( absoluteFieldPath, innerObject );
 			TERM_ACCESSOR.set( outerObject, middleObject );
@@ -113,9 +114,7 @@ public class ElasticsearchTermsPredicate extends AbstractElasticsearchSingleFiel
 
 		private final ElasticsearchSearchIndexValueFieldContext<F> field;
 		private final ElasticsearchFieldCodec<F> codec;
-
-		private JsonElement term;
-		private JsonElement[] terms;
+		private QueryParametersValueProvider<JsonElement[]> termsProvider;
 		private boolean allMatch;
 
 		private Builder(ElasticsearchFieldCodec<F> codec, ElasticsearchSearchIndexScope<?> scope,
@@ -141,36 +140,48 @@ public class ElasticsearchTermsPredicate extends AbstractElasticsearchSingleFiel
 		}
 
 		@Override
+		public void matchingAnyParam(String parameterName, ValueConvert convert) {
+			allMatch = false;
+			fillTermsParam( parameterName, convert );
+		}
+
+		@Override
+		public void matchingAllParam(String parameterName, ValueConvert convert) {
+			allMatch = true;
+			fillTermsParam( parameterName, convert );
+		}
+
+		@Override
 		public SearchPredicate build() {
 			return new ElasticsearchTermsPredicate( this );
 		}
 
 		private void fillTerms(Collection<?> terms, ValueConvert convert) {
 			DslConverter<?, F> dslConverter = field.type().dslConverter( convert );
-
-			if ( terms.size() == 1 ) {
-				this.term = encode( terms.iterator().next(), dslConverter );
-				this.terms = null;
-				return;
-			}
-
-			this.term = null;
-			this.terms = encode( terms, dslConverter );
+			this.termsProvider = simple( encode( scope, codec, terms, dslConverter, absoluteFieldPath ) );
 		}
 
-		private JsonElement[] encode(Collection<?> terms, DslConverter<?, F> dslConverter) {
+		private void fillTermsParam(String parameterName, ValueConvert convert) {
+			DslConverter<?, F> dslConverter = field.type().dslConverter( convert );
+			this.termsProvider = parameterCollectionOrSingle( parameterName,
+					terms -> encode( scope, codec, terms, dslConverter, absoluteFieldPath ) );
+		}
+
+		private static <T> JsonElement[] encode(ElasticsearchSearchIndexScope<?> scope, ElasticsearchFieldCodec<T> codec,
+				Collection<?> terms, DslConverter<?, T> dslConverter, String absoluteFieldPath) {
 			JsonElement[] result = new JsonElement[terms.size()];
 			int i = 0;
 			for ( Object term : terms ) {
-				result[i++] = encode( term, dslConverter );
+				result[i++] = encode( scope, codec, term, dslConverter, absoluteFieldPath );
 			}
 
 			return result;
 		}
 
-		private JsonElement encode(Object term, DslConverter<?, F> dslConverter) {
+		private static <T> JsonElement encode(ElasticsearchSearchIndexScope<?> scope, ElasticsearchFieldCodec<T> codec,
+				Object term, DslConverter<?, T> dslConverter, String absoluteFieldPath) {
 			try {
-				F converted = dslConverter.unknownTypeToDocumentValue( term, scope.toDocumentValueConvertContext() );
+				T converted = dslConverter.unknownTypeToDocumentValue( term, scope.toDocumentValueConvertContext() );
 				return codec.encode( converted );
 			}
 			catch (RuntimeException e) {

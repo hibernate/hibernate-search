@@ -6,6 +6,8 @@
  */
 package org.hibernate.search.backend.elasticsearch.search.predicate.impl;
 
+import static org.hibernate.search.engine.search.query.spi.QueryParametersValueProvider.parameter;
+
 import java.lang.invoke.MethodHandles;
 import java.util.Optional;
 
@@ -21,6 +23,7 @@ import org.hibernate.search.engine.reporting.spi.EventContexts;
 import org.hibernate.search.engine.search.common.ValueConvert;
 import org.hibernate.search.engine.search.predicate.SearchPredicate;
 import org.hibernate.search.engine.search.predicate.spi.RangePredicateBuilder;
+import org.hibernate.search.engine.search.query.spi.QueryParametersValueProvider;
 import org.hibernate.search.util.common.data.Range;
 import org.hibernate.search.util.common.data.RangeBoundInclusion;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
@@ -39,16 +42,16 @@ public class ElasticsearchRangePredicate extends AbstractElasticsearchSingleFiel
 	private static final JsonAccessor<JsonElement> LT_ACCESSOR = JsonAccessor.root().property( "lt" );
 	private static final JsonAccessor<JsonElement> LTE_ACCESSOR = JsonAccessor.root().property( "lte" );
 
-	private final Range<JsonElement> range;
+	private final QueryParametersValueProvider<Range<JsonElement>> rangeProvider;
 
 	private ElasticsearchRangePredicate(Builder<?> builder) {
 		super( builder );
-		range = builder.range;
+		rangeProvider = builder.rangeProvider;
 	}
 
 	@Override
-	protected JsonObject doToJsonQuery(PredicateRequestContext context, JsonObject outerObject,
-			JsonObject innerObject) {
+	protected JsonObject doToJsonQuery(PredicateRequestContext context, JsonObject outerObject, JsonObject innerObject) {
+		Range<JsonElement> range = rangeProvider.provide( context );
 		JsonAccessor<JsonElement> accessor;
 		Optional<JsonElement> lowerBoundValue = range.lowerBoundValue();
 		if ( lowerBoundValue.isPresent() ) {
@@ -86,7 +89,7 @@ public class ElasticsearchRangePredicate extends AbstractElasticsearchSingleFiel
 		private final ElasticsearchSearchIndexValueFieldContext<F> field;
 		private final ElasticsearchFieldCodec<F> codec;
 
-		private Range<JsonElement> range;
+		private QueryParametersValueProvider<Range<JsonElement>> rangeProvider;
 
 		private Builder(ElasticsearchFieldCodec<F> codec, ElasticsearchSearchIndexScope<?> scope,
 				ElasticsearchSearchIndexValueFieldContext<F> field) {
@@ -97,11 +100,20 @@ public class ElasticsearchRangePredicate extends AbstractElasticsearchSingleFiel
 
 		@Override
 		public void range(Range<?> range, ValueConvert convertLowerBound, ValueConvert convertUpperBound) {
-			this.range = Range.between(
-					convertToFieldValue( range.lowerBoundValue(), convertLowerBound ),
-					range.lowerBoundInclusion(),
-					convertToFieldValue( range.upperBoundValue(), convertUpperBound ),
-					range.upperBoundInclusion()
+			this.rangeProvider = QueryParametersValueProvider.simple(
+					convertAndEncode( scope, field, codec, range, convertLowerBound, convertUpperBound ) );
+		}
+
+		@Override
+		public void param(String parameterName, ValueConvert lowerBoundConvert, ValueConvert upperBoundConvert) {
+			this.rangeProvider = parameter( parameterName, Range.class,
+					range -> convertAndEncode( scope, field, codec, range, lowerBoundConvert, upperBoundConvert ) );
+		}
+
+		@Override
+		public void parameterized(Range<String> range, ValueConvert lowerBoundConvert, ValueConvert upperBoundConvert) {
+			this.rangeProvider = context -> convertAndEncode(
+					scope, field, codec, range.map( context::parameter ), lowerBoundConvert, upperBoundConvert
 			);
 		}
 
@@ -114,21 +126,34 @@ public class ElasticsearchRangePredicate extends AbstractElasticsearchSingleFiel
 			return new ElasticsearchRangePredicate( this );
 		}
 
-		private JsonElement convertToFieldValue(Optional<?> valueOptional, ValueConvert convert) {
+		protected static <T> Range<JsonElement> convertAndEncode(ElasticsearchSearchIndexScope<?> scope,
+				ElasticsearchSearchIndexValueFieldContext<T> field, ElasticsearchFieldCodec<T> codec, Range<?> range,
+				ValueConvert convertLowerBound, ValueConvert convertUpperBound) {
+			return Range.between(
+					convertToFieldValue( scope, field, codec, range.lowerBoundValue(), convertLowerBound ),
+					range.lowerBoundInclusion(),
+					convertToFieldValue( scope, field, codec, range.upperBoundValue(), convertUpperBound ),
+					range.upperBoundInclusion()
+			);
+		}
+
+		private static <T> JsonElement convertToFieldValue(ElasticsearchSearchIndexScope<?> scope,
+				ElasticsearchSearchIndexValueFieldContext<T> field, ElasticsearchFieldCodec<T> codec, Optional<?> valueOptional,
+				ValueConvert convert) {
 			if ( !valueOptional.isPresent() ) {
 				return null;
 			}
 			Object value = valueOptional.get();
-			DslConverter<?, ? extends F> toFieldValueConverter = field.type().dslConverter( convert );
+			DslConverter<?, ? extends T> toFieldValueConverter = field.type().dslConverter( convert );
 			try {
-				F converted = toFieldValueConverter.unknownTypeToDocumentValue(
+				T converted = toFieldValueConverter.unknownTypeToDocumentValue(
 						value, scope.toDocumentValueConvertContext()
 				);
 				return codec.encode( converted );
 			}
 			catch (RuntimeException e) {
 				throw log.cannotConvertDslParameter(
-						e.getMessage(), e, EventContexts.fromIndexFieldAbsolutePath( absoluteFieldPath )
+						e.getMessage(), e, EventContexts.fromIndexFieldAbsolutePath( field.absolutePath() )
 				);
 			}
 		}

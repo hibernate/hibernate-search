@@ -6,6 +6,9 @@
  */
 package org.hibernate.search.backend.elasticsearch.types.predicate.impl;
 
+import static org.hibernate.search.engine.search.query.spi.QueryParametersValueProvider.parameter;
+import static org.hibernate.search.engine.search.query.spi.QueryParametersValueProvider.simple;
+
 import org.hibernate.search.backend.elasticsearch.gson.impl.JsonAccessor;
 import org.hibernate.search.backend.elasticsearch.gson.impl.JsonObjectAccessor;
 import org.hibernate.search.backend.elasticsearch.search.common.impl.AbstractElasticsearchValueFieldSearchQueryElementFactory;
@@ -15,6 +18,7 @@ import org.hibernate.search.backend.elasticsearch.search.predicate.impl.Abstract
 import org.hibernate.search.backend.elasticsearch.search.predicate.impl.PredicateRequestContext;
 import org.hibernate.search.engine.search.predicate.SearchPredicate;
 import org.hibernate.search.engine.search.predicate.spi.WildcardPredicateBuilder;
+import org.hibernate.search.engine.search.query.spi.QueryParametersValueProvider;
 
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
@@ -26,17 +30,17 @@ public class ElasticsearchTextWildcardPredicate extends AbstractElasticsearchSin
 
 	private static final JsonAccessor<JsonElement> VALUE_ACCESSOR = JsonAccessor.root().property( "value" );
 
-	private final JsonPrimitive pattern;
+	private final QueryParametersValueProvider<JsonPrimitive> patternProvider;
 
-	public ElasticsearchTextWildcardPredicate(Builder builder) {
+	private ElasticsearchTextWildcardPredicate(Builder builder) {
 		super( builder );
-		this.pattern = builder.pattern;
+		this.patternProvider = builder.patternProvider;
 	}
 
 	@Override
 	protected JsonObject doToJsonQuery(PredicateRequestContext context, JsonObject outerObject,
 			JsonObject innerObject) {
-		VALUE_ACCESSOR.set( innerObject, pattern );
+		VALUE_ACCESSOR.set( innerObject, patternProvider.provide( context ) );
 
 		JsonObject middleObject = new JsonObject();
 		middleObject.add( absoluteFieldPath, innerObject );
@@ -55,7 +59,7 @@ public class ElasticsearchTextWildcardPredicate extends AbstractElasticsearchSin
 	}
 
 	private static class Builder extends AbstractBuilder implements WildcardPredicateBuilder {
-		private JsonPrimitive pattern;
+		private QueryParametersValueProvider<JsonPrimitive> patternProvider;
 
 		private Builder(ElasticsearchSearchIndexScope<?> scope, ElasticsearchSearchIndexValueFieldContext<String> field) {
 			super( scope, field );
@@ -63,7 +67,12 @@ public class ElasticsearchTextWildcardPredicate extends AbstractElasticsearchSin
 
 		@Override
 		public void pattern(String pattern) {
-			this.pattern = new JsonPrimitive( pattern );
+			this.patternProvider = simple( new JsonPrimitive( pattern ) );
+		}
+
+		@Override
+		public void param(String parameterName) {
+			this.patternProvider = parameter( parameterName, String.class, JsonPrimitive::new );
 		}
 
 		@Override

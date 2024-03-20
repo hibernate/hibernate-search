@@ -6,6 +6,9 @@
  */
 package org.hibernate.search.backend.elasticsearch.types.predicate.impl;
 
+import static org.hibernate.search.engine.search.query.spi.QueryParametersValueProvider.parameter;
+import static org.hibernate.search.engine.search.query.spi.QueryParametersValueProvider.simple;
+
 import org.hibernate.search.backend.elasticsearch.gson.impl.JsonAccessor;
 import org.hibernate.search.backend.elasticsearch.gson.impl.JsonObjectAccessor;
 import org.hibernate.search.backend.elasticsearch.lowlevel.index.analysis.impl.AnalyzerConstants;
@@ -16,6 +19,7 @@ import org.hibernate.search.backend.elasticsearch.search.predicate.impl.Abstract
 import org.hibernate.search.backend.elasticsearch.search.predicate.impl.PredicateRequestContext;
 import org.hibernate.search.engine.search.predicate.SearchPredicate;
 import org.hibernate.search.engine.search.predicate.spi.PhrasePredicateBuilder;
+import org.hibernate.search.engine.search.query.spi.QueryParametersValueProvider;
 
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
@@ -30,20 +34,20 @@ public class ElasticsearchTextPhrasePredicate extends AbstractElasticsearchSingl
 	private static final JsonAccessor<String> ANALYZER_ACCESSOR = JsonAccessor.root().property( "analyzer" ).asString();
 
 	private final Integer slop;
-	private final JsonElement phrase;
+	private final QueryParametersValueProvider<JsonElement> phraseProvider;
 	private final String analyzer;
 
 	private ElasticsearchTextPhrasePredicate(Builder builder) {
 		super( builder );
 		slop = builder.slop;
-		phrase = builder.phrase;
+		phraseProvider = builder.phraseProvider;
 		analyzer = builder.analyzer;
 	}
 
 	@Override
 	protected JsonObject doToJsonQuery(PredicateRequestContext context, JsonObject outerObject,
 			JsonObject innerObject) {
-		QUERY_ACCESSOR.set( innerObject, phrase );
+		QUERY_ACCESSOR.set( innerObject, phraseProvider.provide( context ) );
 		if ( slop != null ) {
 			SLOP_ACCESSOR.set( innerObject, slop );
 		}
@@ -70,7 +74,7 @@ public class ElasticsearchTextPhrasePredicate extends AbstractElasticsearchSingl
 	private static class Builder extends AbstractBuilder implements PhrasePredicateBuilder {
 		private final ElasticsearchSearchIndexValueFieldContext<String> field;
 		private Integer slop;
-		private JsonElement phrase;
+		private QueryParametersValueProvider<JsonElement> phraseProvider;
 		private String analyzer;
 
 		private Builder(ElasticsearchSearchIndexScope<?> scope,
@@ -86,7 +90,12 @@ public class ElasticsearchTextPhrasePredicate extends AbstractElasticsearchSingl
 
 		@Override
 		public void phrase(String phrase) {
-			this.phrase = new JsonPrimitive( phrase );
+			this.phraseProvider = simple( new JsonPrimitive( phrase ) );
+		}
+
+		@Override
+		public void param(String parameterName) {
+			this.phraseProvider = parameter( parameterName, String.class, JsonPrimitive::new );
 		}
 
 		@Override

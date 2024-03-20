@@ -6,6 +6,10 @@
  */
 package org.hibernate.search.backend.elasticsearch.types.predicate.impl;
 
+import static org.hibernate.search.engine.search.query.spi.QueryParametersValueProvider.distanceInMeters;
+import static org.hibernate.search.engine.search.query.spi.QueryParametersValueProvider.parameter;
+import static org.hibernate.search.engine.search.query.spi.QueryParametersValueProvider.simple;
+
 import org.hibernate.search.backend.elasticsearch.gson.impl.JsonAccessor;
 import org.hibernate.search.backend.elasticsearch.gson.impl.JsonObjectAccessor;
 import org.hibernate.search.backend.elasticsearch.search.common.impl.AbstractElasticsearchCodecAwareSearchQueryElementFactory;
@@ -16,6 +20,7 @@ import org.hibernate.search.backend.elasticsearch.search.predicate.impl.Predicat
 import org.hibernate.search.backend.elasticsearch.types.codec.impl.ElasticsearchFieldCodec;
 import org.hibernate.search.engine.search.predicate.SearchPredicate;
 import org.hibernate.search.engine.search.predicate.spi.SpatialWithinCirclePredicateBuilder;
+import org.hibernate.search.engine.search.query.spi.QueryParametersValueProvider;
 import org.hibernate.search.engine.spatial.DistanceUnit;
 import org.hibernate.search.engine.spatial.GeoPoint;
 
@@ -31,20 +36,20 @@ public class ElasticsearchGeoPointSpatialWithinCirclePredicate extends AbstractE
 	private static final JsonAccessor<Boolean> IGNORE_UNMAPPED_ACCESSOR =
 			JsonAccessor.root().property( "ignore_unmapped" ).asBoolean();
 
-	private final double distanceInMeters;
-	private final JsonElement center;
+	private final QueryParametersValueProvider<Double> distanceInMetersProvider;
+	private final QueryParametersValueProvider<JsonElement> centerProvider;
 
 	private ElasticsearchGeoPointSpatialWithinCirclePredicate(Builder builder) {
 		super( builder );
-		distanceInMeters = builder.distanceInMeters;
-		center = builder.center;
+		distanceInMetersProvider = builder.distanceInMetersProvider;
+		centerProvider = builder.centerProvider;
 	}
 
 	@Override
 	protected JsonObject doToJsonQuery(PredicateRequestContext context, JsonObject outerObject,
 			JsonObject innerObject) {
-		DISTANCE_ACCESSOR.set( innerObject, distanceInMeters );
-		innerObject.add( absoluteFieldPath, center );
+		DISTANCE_ACCESSOR.set( innerObject, distanceInMetersProvider.provide( context ) );
+		innerObject.add( absoluteFieldPath, centerProvider.provide( context ) );
 
 		if ( indexNames().size() > 1 ) {
 			// There are multiple target indexes; some of them may not declare the field.
@@ -73,8 +78,8 @@ public class ElasticsearchGeoPointSpatialWithinCirclePredicate extends AbstractE
 	private static class Builder extends AbstractBuilder implements SpatialWithinCirclePredicateBuilder {
 		private final ElasticsearchFieldCodec<GeoPoint> codec;
 
-		private double distanceInMeters;
-		private JsonElement center;
+		private QueryParametersValueProvider<Double> distanceInMetersProvider;
+		private QueryParametersValueProvider<JsonElement> centerProvider;
 
 		private Builder(ElasticsearchFieldCodec<GeoPoint> codec, ElasticsearchSearchIndexScope<?> scope,
 				ElasticsearchSearchIndexValueFieldContext<GeoPoint> field) {
@@ -84,8 +89,14 @@ public class ElasticsearchGeoPointSpatialWithinCirclePredicate extends AbstractE
 
 		@Override
 		public void circle(GeoPoint center, double radius, DistanceUnit unit) {
-			this.distanceInMeters = unit.toMeters( radius );
-			this.center = codec.encode( center );
+			this.distanceInMetersProvider = simple( unit.toMeters( radius ) );
+			this.centerProvider = simple( codec.encode( center ) );
+		}
+
+		@Override
+		public void param(String center, String radius, String unit) {
+			this.distanceInMetersProvider = distanceInMeters( radius, unit );
+			this.centerProvider = parameter( center, GeoPoint.class, codec::encode );
 		}
 
 		@Override
