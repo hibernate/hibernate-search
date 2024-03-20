@@ -8,6 +8,7 @@ package org.hibernate.search.integrationtest.backend.tck.search.predicate;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import org.hibernate.search.engine.backend.types.dsl.SearchableProjectableIndexFieldTypeOptionsStep;
 import org.hibernate.search.engine.search.predicate.dsl.CommonQueryStringPredicateFieldStep;
@@ -147,6 +148,17 @@ abstract class AbstractBaseQueryStringPredicateBaseIT<P extends CommonQueryStrin
 		protected PredicateFinalStep predicate(SearchPredicateFactory f, String fieldPath, int matchingDocOrdinal,
 				DataSet<?, CommonQueryStringPredicateTestValues> dataSet) {
 			return predicate( f ).field( fieldPath ).matching( dataSet.values.matchingArg( matchingDocOrdinal ) );
+		}
+
+		@Override
+		protected PredicateFinalStep predicate(SearchPredicateFactory f, String fieldPath, String paramName) {
+			return predicate( f ).field( fieldPath ).matchingParam( paramName );
+		}
+
+		@Override
+		protected Map<String, Object> parameterValues(int matchingDocOrdinal,
+				DataSet<?, CommonQueryStringPredicateTestValues> dataSet, String paramName) {
+			return Map.of( paramName, dataSet.values.matchingArg( matchingDocOrdinal ) );
 		}
 
 		abstract CommonQueryStringPredicateFieldStep<?> predicate(SearchPredicateFactory f);

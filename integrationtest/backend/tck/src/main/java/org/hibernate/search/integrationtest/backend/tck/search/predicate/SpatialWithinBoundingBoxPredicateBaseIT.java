@@ -9,6 +9,7 @@ package org.hibernate.search.integrationtest.backend.tck.search.predicate;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 
 import org.hibernate.search.engine.backend.types.dsl.SearchableProjectableIndexFieldTypeOptionsStep;
 import org.hibernate.search.engine.search.predicate.dsl.PredicateFinalStep;
@@ -126,8 +127,19 @@ class SpatialWithinBoundingBoxPredicateBaseIT {
 		@Override
 		protected PredicateFinalStep predicate(SearchPredicateFactory f, String fieldPath, int matchingDocOrdinal,
 				DataSet<?, SpatialWithinBoundingBoxPredicateTestValues> dataSet) {
+			return f.spatial().within().field( fieldPath ).boundingBox( dataSet.values.matchingArg( matchingDocOrdinal ) );
+		}
+
+		@Override
+		protected PredicateFinalStep predicate(SearchPredicateFactory f, String fieldPath, String paramName) {
 			return f.spatial().within().field( fieldPath )
-					.boundingBox( SingleFieldConfigured.dataSet.values.matchingArg( matchingDocOrdinal ) );
+					.boundingBoxParam( paramName );
+		}
+
+		@Override
+		protected Map<String, Object> parameterValues(int matchingDocOrdinal,
+				DataSet<?, SpatialWithinBoundingBoxPredicateTestValues> dataSet, String paramName) {
+			return Map.of( paramName, dataSet.values.matchingArg( matchingDocOrdinal ) );
 		}
 	}
 

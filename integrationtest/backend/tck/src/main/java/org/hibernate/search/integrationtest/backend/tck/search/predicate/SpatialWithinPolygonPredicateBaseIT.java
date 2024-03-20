@@ -9,6 +9,7 @@ package org.hibernate.search.integrationtest.backend.tck.search.predicate;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 
 import org.hibernate.search.engine.backend.types.dsl.SearchableProjectableIndexFieldTypeOptionsStep;
 import org.hibernate.search.engine.search.predicate.dsl.PredicateFinalStep;
@@ -133,6 +134,18 @@ class SpatialWithinPolygonPredicateBaseIT {
 				DataSet<?, SpatialWithinPolygonPredicateTestValues> dataSet) {
 			return f.spatial().within().field( fieldPath )
 					.polygon( SingleFieldConfigured.dataSet.values.matchingArg( matchingDocOrdinal ) );
+		}
+
+		@Override
+		protected PredicateFinalStep predicate(SearchPredicateFactory f, String fieldPath, String paramName) {
+			return f.spatial().within().field( fieldPath ).polygonParam( paramName );
+		}
+
+		@Override
+		protected Map<String, Object> parameterValues(int matchingDocOrdinal,
+				DataSet<?, SpatialWithinPolygonPredicateTestValues> dataSet,
+				String paramName) {
+			return Map.of( paramName, SingleFieldConfigured.dataSet.values.matchingArg( matchingDocOrdinal ) );
 		}
 	}
 
