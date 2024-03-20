@@ -6,6 +6,9 @@
  */
 package org.hibernate.search.backend.lucene.types.predicate.impl;
 
+import static org.hibernate.search.engine.search.query.spi.QueryParametersValueProvider.parameter;
+import static org.hibernate.search.engine.search.query.spi.QueryParametersValueProvider.simple;
+
 import java.lang.invoke.MethodHandles;
 
 import org.hibernate.search.backend.lucene.analysis.model.impl.LuceneAnalysisDefinitionRegistry;
@@ -19,6 +22,7 @@ import org.hibernate.search.backend.lucene.search.predicate.impl.PredicateReques
 import org.hibernate.search.engine.reporting.spi.EventContexts;
 import org.hibernate.search.engine.search.predicate.SearchPredicate;
 import org.hibernate.search.engine.search.predicate.spi.PhrasePredicateBuilder;
+import org.hibernate.search.engine.search.query.spi.QueryParametersValueProvider;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
 import org.apache.lucene.analysis.Analyzer;
@@ -49,7 +53,7 @@ public class LuceneTextPhrasePredicate extends AbstractLuceneLeafSingleFieldPred
 		private final LuceneAnalysisDefinitionRegistry analysisDefinitionRegistry;
 
 		private int slop;
-		private String phrase;
+		private QueryParametersValueProvider<String> phraseProvider;
 
 		private Analyzer overrideAnalyzer;
 
@@ -65,7 +69,12 @@ public class LuceneTextPhrasePredicate extends AbstractLuceneLeafSingleFieldPred
 
 		@Override
 		public void phrase(String phrase) {
-			this.phrase = phrase;
+			this.phraseProvider = simple( phrase );
+		}
+
+		@Override
+		public void param(String parameterName) {
+			this.phraseProvider = parameter( parameterName, String.class );
 		}
 
 		@Override
@@ -95,11 +104,11 @@ public class LuceneTextPhrasePredicate extends AbstractLuceneLeafSingleFieldPred
 
 			if ( effectiveAnalyzerOrNormalizer == AnalyzerConstants.KEYWORD_ANALYZER ) {
 				// Optimization when analysis is disabled
-				return new TermQuery( new Term( absoluteFieldPath, phrase ) );
+				return new TermQuery( new Term( absoluteFieldPath, phraseProvider.provide( context ) ) );
 			}
 
-			Query analyzed =
-					new QueryBuilder( effectiveAnalyzerOrNormalizer ).createPhraseQuery( absoluteFieldPath, phrase, slop );
+			Query analyzed = new QueryBuilder( effectiveAnalyzerOrNormalizer ).createPhraseQuery( absoluteFieldPath,
+					phraseProvider.provide( context ), slop );
 			if ( analyzed == null ) {
 				// Either the value was an empty string
 				// or the analysis removed all tokens (that can happen if the value contained only stopwords, for example)

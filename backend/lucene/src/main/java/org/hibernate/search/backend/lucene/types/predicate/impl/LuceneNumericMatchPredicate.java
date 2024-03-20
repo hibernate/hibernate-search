@@ -6,6 +6,9 @@
  */
 package org.hibernate.search.backend.lucene.types.predicate.impl;
 
+import static org.hibernate.search.engine.search.query.spi.QueryParametersValueProvider.parameter;
+import static org.hibernate.search.engine.search.query.spi.QueryParametersValueProvider.simple;
+
 import java.lang.invoke.MethodHandles;
 
 import org.hibernate.search.backend.lucene.logging.impl.Log;
@@ -18,6 +21,7 @@ import org.hibernate.search.backend.lucene.types.codec.impl.AbstractLuceneNumeri
 import org.hibernate.search.engine.search.common.ValueConvert;
 import org.hibernate.search.engine.search.predicate.SearchPredicate;
 import org.hibernate.search.engine.search.predicate.spi.MatchPredicateBuilder;
+import org.hibernate.search.engine.search.query.spi.QueryParametersValueProvider;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
 import org.apache.lucene.search.Query;
@@ -46,7 +50,7 @@ public class LuceneNumericMatchPredicate extends AbstractLuceneLeafSingleFieldPr
 	private static class Builder<F, E extends Number> extends AbstractBuilder<F> implements MatchPredicateBuilder {
 		private final AbstractLuceneNumericFieldCodec<F, E> codec;
 
-		private E value;
+		private QueryParametersValueProvider<E> valueProvider;
 
 		private Builder(AbstractLuceneNumericFieldCodec<F, E> codec, LuceneSearchIndexScope<?> scope,
 				LuceneSearchIndexValueFieldContext<F> field) {
@@ -56,7 +60,13 @@ public class LuceneNumericMatchPredicate extends AbstractLuceneLeafSingleFieldPr
 
 		@Override
 		public void value(Object value, ValueConvert convert) {
-			this.value = convertAndEncode( codec, value, convert );
+			this.valueProvider = simple( convertAndEncode( scope, field, codec, value, convert ) );
+		}
+
+		@Override
+		public void param(String parameterName, ValueConvert convert) {
+			this.valueProvider =
+					parameter( parameterName, Object.class, value -> convertAndEncode( scope, field, codec, value, convert ) );
 		}
 
 		@Override
@@ -81,7 +91,7 @@ public class LuceneNumericMatchPredicate extends AbstractLuceneLeafSingleFieldPr
 
 		@Override
 		protected Query buildQuery(PredicateRequestContext context) {
-			return codec.getDomain().createExactQuery( absoluteFieldPath, value );
+			return codec.getDomain().createExactQuery( absoluteFieldPath, valueProvider.provide( context ) );
 		}
 	}
 }

@@ -6,6 +6,9 @@
  */
 package org.hibernate.search.backend.lucene.types.predicate.impl;
 
+import static org.hibernate.search.engine.search.query.spi.QueryParametersValueProvider.parameter;
+import static org.hibernate.search.engine.search.query.spi.QueryParametersValueProvider.simple;
+
 import java.util.Set;
 
 import org.hibernate.search.backend.lucene.search.common.impl.AbstractLuceneValueFieldSearchQueryElementFactory;
@@ -16,6 +19,7 @@ import org.hibernate.search.backend.lucene.search.predicate.impl.PredicateReques
 import org.hibernate.search.engine.search.predicate.SearchPredicate;
 import org.hibernate.search.engine.search.predicate.dsl.RegexpQueryFlag;
 import org.hibernate.search.engine.search.predicate.spi.RegexpPredicateBuilder;
+import org.hibernate.search.engine.search.query.spi.QueryParametersValueProvider;
 
 import org.apache.lucene.index.Term;
 import org.apache.lucene.search.Query;
@@ -37,7 +41,7 @@ public class LuceneTextRegexpPredicate extends AbstractLuceneLeafSingleFieldPred
 	}
 
 	private static class Builder<F> extends AbstractBuilder<F> implements RegexpPredicateBuilder {
-		private String pattern;
+		private QueryParametersValueProvider<String> patternProvider;
 		private int flags = RegExp.NONE;
 
 		private Builder(LuceneSearchIndexScope<?> scope, LuceneSearchIndexValueFieldContext<F> field) {
@@ -46,7 +50,12 @@ public class LuceneTextRegexpPredicate extends AbstractLuceneLeafSingleFieldPred
 
 		@Override
 		public void pattern(String regexpPattern) {
-			this.pattern = regexpPattern;
+			this.patternProvider = simple( regexpPattern );
+		}
+
+		@Override
+		public void param(String parameterName) {
+			this.patternProvider = parameter( parameterName, String.class );
 		}
 
 		@Override
@@ -62,7 +71,7 @@ public class LuceneTextRegexpPredicate extends AbstractLuceneLeafSingleFieldPred
 		@Override
 		protected Query buildQuery(PredicateRequestContext context) {
 			// set no optional flag as default
-			return new RegexpQuery( new Term( absoluteFieldPath, pattern ), flags );
+			return new RegexpQuery( new Term( absoluteFieldPath, patternProvider.provide( context ) ), flags );
 		}
 	}
 

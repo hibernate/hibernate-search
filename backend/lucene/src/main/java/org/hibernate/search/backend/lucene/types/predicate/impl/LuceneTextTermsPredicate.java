@@ -6,7 +6,9 @@
  */
 package org.hibernate.search.backend.lucene.types.predicate.impl;
 
-import java.util.ArrayList;
+import static org.hibernate.search.engine.search.query.spi.QueryParametersValueProvider.parameterCollectionOrSingle;
+import static org.hibernate.search.engine.search.query.spi.QueryParametersValueProvider.simple;
+
 import java.util.Collection;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -20,6 +22,7 @@ import org.hibernate.search.backend.lucene.types.codec.impl.LuceneStandardFieldC
 import org.hibernate.search.engine.search.common.ValueConvert;
 import org.hibernate.search.engine.search.predicate.SearchPredicate;
 import org.hibernate.search.engine.search.predicate.spi.TermsPredicateBuilder;
+import org.hibernate.search.engine.search.query.spi.QueryParametersValueProvider;
 
 import org.apache.lucene.index.Term;
 import org.apache.lucene.search.BooleanClause;
@@ -51,8 +54,7 @@ public class LuceneTextTermsPredicate extends AbstractLuceneLeafSingleFieldPredi
 	private static class Builder<F> extends AbstractBuilder<F> implements TermsPredicateBuilder {
 		private final LuceneStandardFieldCodec<F, String> codec;
 
-		private String term;
-		private List<String> terms;
+		private QueryParametersValueProvider<List<String>> termProvider;
 		private boolean allMatch;
 
 		private Builder(LuceneStandardFieldCodec<F, String> codec, LuceneSearchIndexScope<?> scope,
@@ -77,14 +79,27 @@ public class LuceneTextTermsPredicate extends AbstractLuceneLeafSingleFieldPredi
 		}
 
 		@Override
+		public void matchingAnyParam(String parameterName, ValueConvert convert) {
+			allMatch = false;
+			fillTermParams( parameterName, convert );
+		}
+
+		@Override
+		public void matchingAllParam(String parameterName, ValueConvert convert) {
+			allMatch = true;
+			fillTermParams( parameterName, convert );
+		}
+
+		@Override
 		public SearchPredicate build() {
 			return new LuceneTextTermsPredicate( this );
 		}
 
 		@Override
 		protected Query buildQuery(PredicateRequestContext context) {
-			if ( term != null ) {
-				return new TermQuery( new Term( absoluteFieldPath, term ) );
+			List<String> terms = termProvider.provide( context );
+			if ( terms.size() == 1 ) {
+				return new TermQuery( new Term( absoluteFieldPath, terms.get( 0 ) ) );
 			}
 
 			if ( !allMatch ) {
@@ -101,17 +116,22 @@ public class LuceneTextTermsPredicate extends AbstractLuceneLeafSingleFieldPredi
 		}
 
 		private void fillTerms(Collection<?> terms, ValueConvert convert) {
-			if ( terms.size() == 1 ) {
-				this.term = convertAndEncode( codec, terms.iterator().next(), convert );
-				this.terms = null;
-				return;
-			}
+			this.termProvider = simple( terms.stream()
+					.map( term -> convertAndEncode( scope, field, codec, term, convert ) )
+					.collect( Collectors.toList() ) );
+		}
 
-			this.term = null;
-			this.terms = new ArrayList<>( terms.size() );
-			for ( Object termItem : terms ) {
-				this.terms.add( convertAndEncode( codec, termItem, convert ) );
-			}
+		private void fillTermParams(String parameterName, ValueConvert convert) {
+			this.termProvider = parameterCollectionOrSingle( parameterName,
+					terms -> convertAndEncode( terms, scope, field, codec, convert ) );
+		}
+
+		private static <T, R> List<R> convertAndEncode(Collection<?> terms, LuceneSearchIndexScope<?> scope,
+				LuceneSearchIndexValueFieldContext<T> field,
+				LuceneStandardFieldCodec<T, R> codec, ValueConvert convert) {
+			return terms.stream()
+					.map( term -> convertAndEncode( scope, field, codec, term, convert ) )
+					.collect( Collectors.toList() );
 		}
 	}
 }

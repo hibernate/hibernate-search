@@ -6,6 +6,9 @@
  */
 package org.hibernate.search.backend.lucene.types.predicate.impl;
 
+import static org.hibernate.search.engine.search.query.spi.QueryParametersValueProvider.parameter;
+import static org.hibernate.search.engine.search.query.spi.QueryParametersValueProvider.simple;
+
 import org.hibernate.search.backend.lucene.search.common.impl.AbstractLuceneValueFieldSearchQueryElementFactory;
 import org.hibernate.search.backend.lucene.search.common.impl.LuceneSearchIndexScope;
 import org.hibernate.search.backend.lucene.search.common.impl.LuceneSearchIndexValueFieldContext;
@@ -13,6 +16,7 @@ import org.hibernate.search.backend.lucene.search.predicate.impl.AbstractLuceneL
 import org.hibernate.search.backend.lucene.search.predicate.impl.PredicateRequestContext;
 import org.hibernate.search.engine.search.predicate.SearchPredicate;
 import org.hibernate.search.engine.search.predicate.spi.SpatialWithinBoundingBoxPredicateBuilder;
+import org.hibernate.search.engine.search.query.spi.QueryParametersValueProvider;
 import org.hibernate.search.engine.spatial.GeoBoundingBox;
 import org.hibernate.search.engine.spatial.GeoPoint;
 
@@ -35,7 +39,7 @@ public class LuceneGeoPointSpatialWithinBoundingBoxPredicate extends AbstractLuc
 	}
 
 	private static class Builder extends AbstractBuilder<GeoPoint> implements SpatialWithinBoundingBoxPredicateBuilder {
-		protected GeoBoundingBox boundingBox;
+		protected QueryParametersValueProvider<GeoBoundingBox> boundingBoxProvider;
 
 		private Builder(LuceneSearchIndexScope<?> scope, LuceneSearchIndexValueFieldContext<GeoPoint> field) {
 			super( scope, field );
@@ -43,7 +47,12 @@ public class LuceneGeoPointSpatialWithinBoundingBoxPredicate extends AbstractLuc
 
 		@Override
 		public void boundingBox(GeoBoundingBox boundingBox) {
-			this.boundingBox = boundingBox;
+			this.boundingBoxProvider = simple( boundingBox );
+		}
+
+		@Override
+		public void param(String parameterName) {
+			this.boundingBoxProvider = parameter( parameterName, GeoBoundingBox.class );
 		}
 
 		@Override
@@ -53,6 +62,8 @@ public class LuceneGeoPointSpatialWithinBoundingBoxPredicate extends AbstractLuc
 
 		@Override
 		protected Query buildQuery(PredicateRequestContext context) {
+			GeoBoundingBox boundingBox = boundingBoxProvider.provide( context );
+
 			return LatLonPoint.newBoxQuery( absoluteFieldPath, boundingBox.bottomRight().latitude(),
 					boundingBox.topLeft().latitude(),
 					boundingBox.topLeft().longitude(), boundingBox.bottomRight().longitude() );

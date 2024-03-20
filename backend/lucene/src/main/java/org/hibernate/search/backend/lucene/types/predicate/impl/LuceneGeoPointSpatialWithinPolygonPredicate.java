@@ -6,6 +6,9 @@
  */
 package org.hibernate.search.backend.lucene.types.predicate.impl;
 
+import static org.hibernate.search.engine.search.query.spi.QueryParametersValueProvider.parameter;
+import static org.hibernate.search.engine.search.query.spi.QueryParametersValueProvider.simple;
+
 import java.util.List;
 
 import org.hibernate.search.backend.lucene.search.common.impl.AbstractLuceneValueFieldSearchQueryElementFactory;
@@ -15,6 +18,7 @@ import org.hibernate.search.backend.lucene.search.predicate.impl.AbstractLuceneL
 import org.hibernate.search.backend.lucene.search.predicate.impl.PredicateRequestContext;
 import org.hibernate.search.engine.search.predicate.SearchPredicate;
 import org.hibernate.search.engine.search.predicate.spi.SpatialWithinPolygonPredicateBuilder;
+import org.hibernate.search.engine.search.query.spi.QueryParametersValueProvider;
 import org.hibernate.search.engine.spatial.GeoPoint;
 import org.hibernate.search.engine.spatial.GeoPolygon;
 
@@ -37,7 +41,7 @@ public class LuceneGeoPointSpatialWithinPolygonPredicate extends AbstractLuceneL
 	}
 
 	static class Builder extends AbstractBuilder<GeoPoint> implements SpatialWithinPolygonPredicateBuilder {
-		protected GeoPolygon polygon;
+		protected QueryParametersValueProvider<GeoPolygon> polygonProvider;
 
 		Builder(LuceneSearchIndexScope<?> scope, LuceneSearchIndexValueFieldContext<GeoPoint> field) {
 			super( scope, field );
@@ -45,7 +49,12 @@ public class LuceneGeoPointSpatialWithinPolygonPredicate extends AbstractLuceneL
 
 		@Override
 		public void polygon(GeoPolygon polygon) {
-			this.polygon = polygon;
+			this.polygonProvider = simple( polygon );
+		}
+
+		@Override
+		public void param(String parameterName) {
+			this.polygonProvider = parameter( parameterName, GeoPolygon.class );
 		}
 
 		@Override
@@ -55,7 +64,7 @@ public class LuceneGeoPointSpatialWithinPolygonPredicate extends AbstractLuceneL
 
 		@Override
 		protected Query buildQuery(PredicateRequestContext context) {
-			List<GeoPoint> points = polygon.points();
+			List<GeoPoint> points = polygonProvider.provide( context ).points();
 
 			double[] polyLats = new double[points.size()];
 			double[] polyLons = new double[points.size()];

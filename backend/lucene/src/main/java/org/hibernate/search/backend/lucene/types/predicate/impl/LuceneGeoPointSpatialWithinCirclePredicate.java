@@ -6,6 +6,10 @@
  */
 package org.hibernate.search.backend.lucene.types.predicate.impl;
 
+import static org.hibernate.search.engine.search.query.spi.QueryParametersValueProvider.distanceInMeters;
+import static org.hibernate.search.engine.search.query.spi.QueryParametersValueProvider.parameter;
+import static org.hibernate.search.engine.search.query.spi.QueryParametersValueProvider.simple;
+
 import org.hibernate.search.backend.lucene.search.common.impl.AbstractLuceneValueFieldSearchQueryElementFactory;
 import org.hibernate.search.backend.lucene.search.common.impl.LuceneSearchIndexScope;
 import org.hibernate.search.backend.lucene.search.common.impl.LuceneSearchIndexValueFieldContext;
@@ -13,6 +17,7 @@ import org.hibernate.search.backend.lucene.search.predicate.impl.AbstractLuceneL
 import org.hibernate.search.backend.lucene.search.predicate.impl.PredicateRequestContext;
 import org.hibernate.search.engine.search.predicate.SearchPredicate;
 import org.hibernate.search.engine.search.predicate.spi.SpatialWithinCirclePredicateBuilder;
+import org.hibernate.search.engine.search.query.spi.QueryParametersValueProvider;
 import org.hibernate.search.engine.spatial.DistanceUnit;
 import org.hibernate.search.engine.spatial.GeoPoint;
 
@@ -34,8 +39,8 @@ public class LuceneGeoPointSpatialWithinCirclePredicate extends AbstractLuceneLe
 	}
 
 	private static class Builder extends AbstractBuilder<GeoPoint> implements SpatialWithinCirclePredicateBuilder {
-		protected GeoPoint center;
-		protected double radiusInMeters;
+		protected QueryParametersValueProvider<GeoPoint> centerProvider;
+		protected QueryParametersValueProvider<Double> radiusInMetersProvider;
 
 		private Builder(LuceneSearchIndexScope<?> scope, LuceneSearchIndexValueFieldContext<GeoPoint> field) {
 			super( scope, field );
@@ -43,8 +48,14 @@ public class LuceneGeoPointSpatialWithinCirclePredicate extends AbstractLuceneLe
 
 		@Override
 		public void circle(GeoPoint center, double radius, DistanceUnit unit) {
-			this.center = center;
-			this.radiusInMeters = unit.toMeters( radius );
+			this.centerProvider = simple( center );
+			this.radiusInMetersProvider = simple( unit.toMeters( radius ) );
+		}
+
+		@Override
+		public void param(String center, String radius, String unit) {
+			this.centerProvider = parameter( center, GeoPoint.class );
+			this.radiusInMetersProvider = distanceInMeters( radius, unit );
 		}
 
 		@Override
@@ -54,6 +65,9 @@ public class LuceneGeoPointSpatialWithinCirclePredicate extends AbstractLuceneLe
 
 		@Override
 		protected Query buildQuery(PredicateRequestContext context) {
+			GeoPoint center = centerProvider.provide( context );
+			Double radiusInMeters = radiusInMetersProvider.provide( context );
+
 			return LatLonPoint.newDistanceQuery( absoluteFieldPath, center.latitude(), center.longitude(), radiusInMeters );
 		}
 	}

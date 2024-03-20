@@ -47,10 +47,11 @@ public abstract class AbstractLuceneLeafSingleFieldPredicate extends AbstractLuc
 
 		protected abstract Query buildQuery(PredicateRequestContext context);
 
-		protected <E> E convertAndEncode(LuceneStandardFieldCodec<F, E> codec, Object value, ValueConvert convert) {
-			DslConverter<?, ? extends F> toFieldValueConverter = field.type().dslConverter( convert );
+		protected static <E, T> E convertAndEncode(LuceneSearchIndexScope<?> scope, LuceneSearchIndexValueFieldContext<T> field,
+				LuceneStandardFieldCodec<T, E> codec, Object value, ValueConvert convert) {
+			DslConverter<?, ? extends T> toFieldValueConverter = field.type().dslConverter( convert );
 			try {
-				F converted = toFieldValueConverter.unknownTypeToDocumentValue( value,
+				T converted = toFieldValueConverter.unknownTypeToDocumentValue( value,
 						scope.toDocumentValueConvertContext() );
 				return codec.encode( converted );
 			}
@@ -59,24 +60,24 @@ public abstract class AbstractLuceneLeafSingleFieldPredicate extends AbstractLuc
 			}
 		}
 
-		protected <E> Range<E> convertAndEncode(LuceneStandardFieldCodec<F, E> codec, Range<?> range,
-				ValueConvert convertLowerBound,
-				ValueConvert convertUpperBound) {
+		protected static <E, T> Range<E> convertAndEncode(LuceneSearchIndexScope<?> scope,
+				LuceneSearchIndexValueFieldContext<T> field, LuceneStandardFieldCodec<T, E> codec, Range<?> range,
+				ValueConvert convertLowerBound, ValueConvert convertUpperBound) {
 			return Range.between(
-					convertAndEncode( codec, range.lowerBoundValue(), convertLowerBound ),
+					convertAndEncode( scope, field, codec, range.lowerBoundValue(), convertLowerBound ),
 					range.lowerBoundInclusion(),
-					convertAndEncode( codec, range.upperBoundValue(), convertUpperBound ),
+					convertAndEncode( scope, field, codec, range.upperBoundValue(), convertUpperBound ),
 					range.upperBoundInclusion()
 			);
 		}
 
-		private <E> E convertAndEncode(LuceneStandardFieldCodec<F, E> codec, Optional<?> valueOptional,
-				ValueConvert convert) {
-			if ( !valueOptional.isPresent() ) {
+		private static <E, T> E convertAndEncode(LuceneSearchIndexScope<?> scope, LuceneSearchIndexValueFieldContext<T> field,
+				LuceneStandardFieldCodec<T, E> codec, Optional<?> valueOptional, ValueConvert convert) {
+			if ( valueOptional.isEmpty() ) {
 				return null;
 			}
 			else {
-				return convertAndEncode( codec, valueOptional.get(), convert );
+				return convertAndEncode( scope, field, codec, valueOptional.get(), convert );
 			}
 		}
 	}

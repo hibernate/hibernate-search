@@ -6,6 +6,9 @@
  */
 package org.hibernate.search.backend.lucene.types.predicate.impl;
 
+import static org.hibernate.search.engine.search.query.spi.QueryParametersValueProvider.parameter;
+import static org.hibernate.search.engine.search.query.spi.QueryParametersValueProvider.simple;
+
 import org.hibernate.search.backend.lucene.search.common.impl.AbstractLuceneCodecAwareSearchQueryElementFactory;
 import org.hibernate.search.backend.lucene.search.common.impl.LuceneSearchIndexScope;
 import org.hibernate.search.backend.lucene.search.common.impl.LuceneSearchIndexValueFieldContext;
@@ -15,6 +18,7 @@ import org.hibernate.search.backend.lucene.types.codec.impl.LuceneStandardFieldC
 import org.hibernate.search.engine.search.common.ValueConvert;
 import org.hibernate.search.engine.search.predicate.SearchPredicate;
 import org.hibernate.search.engine.search.predicate.spi.RangePredicateBuilder;
+import org.hibernate.search.engine.search.query.spi.QueryParametersValueProvider;
 import org.hibernate.search.util.common.data.Range;
 import org.hibernate.search.util.common.data.RangeBoundInclusion;
 
@@ -45,7 +49,7 @@ public class LuceneTextRangePredicate extends AbstractLuceneLeafSingleFieldPredi
 	private static class Builder<F> extends AbstractBuilder<F> implements RangePredicateBuilder {
 		private final LuceneStandardFieldCodec<F, String> codec;
 
-		private Range<String> range;
+		private QueryParametersValueProvider<Range<String>> rangeProvider;
 
 		private Builder(LuceneStandardFieldCodec<F, String> codec, LuceneSearchIndexScope<?> scope,
 				LuceneSearchIndexValueFieldContext<F> field) {
@@ -55,7 +59,20 @@ public class LuceneTextRangePredicate extends AbstractLuceneLeafSingleFieldPredi
 
 		@Override
 		public void range(Range<?> range, ValueConvert convertLowerBound, ValueConvert convertUpperBound) {
-			this.range = convertAndEncode( codec, range, convertLowerBound, convertUpperBound );
+			this.rangeProvider = simple( convertAndEncode( scope, field, codec, range, convertLowerBound, convertUpperBound ) );
+		}
+
+		@Override
+		public void param(String parameterName, ValueConvert lowerBoundConvert, ValueConvert upperBoundConvert) {
+			this.rangeProvider = parameter( parameterName, Range.class,
+					range -> convertAndEncode( scope, field, codec, range, lowerBoundConvert, upperBoundConvert ) );
+		}
+
+		@Override
+		public void parameterized(Range<String> range, ValueConvert lowerBoundConvert, ValueConvert upperBoundConvert) {
+			this.rangeProvider = context -> convertAndEncode(
+					scope, field, codec, range.map( context::parameter ), lowerBoundConvert, upperBoundConvert
+			);
 		}
 
 		@Override
@@ -68,7 +85,7 @@ public class LuceneTextRangePredicate extends AbstractLuceneLeafSingleFieldPredi
 			// Note that a range query only makes sense if only one token is returned by the analyzer
 			// and we should even consider forcing having a normalizer here, instead of supporting
 			// range queries on analyzed fields.
-
+			Range<String> range = rangeProvider.provide( context );
 			return new TermRangeQuery(
 					absoluteFieldPath,
 					normalize( range.lowerBoundValue().orElse( null ) ),

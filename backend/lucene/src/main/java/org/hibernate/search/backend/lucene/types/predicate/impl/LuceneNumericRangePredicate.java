@@ -6,6 +6,9 @@
  */
 package org.hibernate.search.backend.lucene.types.predicate.impl;
 
+import static org.hibernate.search.engine.search.query.spi.QueryParametersValueProvider.parameter;
+import static org.hibernate.search.engine.search.query.spi.QueryParametersValueProvider.simple;
+
 import java.util.Optional;
 
 import org.hibernate.search.backend.lucene.search.common.impl.AbstractLuceneCodecAwareSearchQueryElementFactory;
@@ -18,6 +21,7 @@ import org.hibernate.search.backend.lucene.types.lowlevel.impl.LuceneNumericDoma
 import org.hibernate.search.engine.search.common.ValueConvert;
 import org.hibernate.search.engine.search.predicate.SearchPredicate;
 import org.hibernate.search.engine.search.predicate.spi.RangePredicateBuilder;
+import org.hibernate.search.engine.search.query.spi.QueryParametersValueProvider;
 import org.hibernate.search.util.common.data.Range;
 import org.hibernate.search.util.common.data.RangeBoundInclusion;
 
@@ -46,7 +50,7 @@ public class LuceneNumericRangePredicate extends AbstractLuceneLeafSingleFieldPr
 			implements RangePredicateBuilder {
 		private final AbstractLuceneNumericFieldCodec<F, E> codec;
 
-		private Range<E> range;
+		private QueryParametersValueProvider<Range<E>> rangeProvider;
 
 		Builder(AbstractLuceneNumericFieldCodec<F, E> codec, LuceneSearchIndexScope<?> scope,
 				LuceneSearchIndexValueFieldContext<F> field) {
@@ -56,7 +60,20 @@ public class LuceneNumericRangePredicate extends AbstractLuceneLeafSingleFieldPr
 
 		@Override
 		public void range(Range<?> range, ValueConvert convertLowerBound, ValueConvert convertUpperBound) {
-			this.range = convertAndEncode( codec, range, convertLowerBound, convertUpperBound );
+			this.rangeProvider = simple( convertAndEncode( scope, field, codec, range, convertLowerBound, convertUpperBound ) );
+		}
+
+		@Override
+		public void param(String parameterName, ValueConvert lowerBoundConvert, ValueConvert upperBoundConvert) {
+			this.rangeProvider = parameter( parameterName, Range.class,
+					range -> convertAndEncode( scope, field, codec, range, lowerBoundConvert, upperBoundConvert ) );
+		}
+
+		@Override
+		public void parameterized(Range<String> range, ValueConvert lowerBoundConvert, ValueConvert upperBoundConvert) {
+			this.rangeProvider = context -> convertAndEncode(
+					scope, field, codec, range.map( context::parameter ), lowerBoundConvert, upperBoundConvert
+			);
 		}
 
 		@Override
@@ -67,6 +84,7 @@ public class LuceneNumericRangePredicate extends AbstractLuceneLeafSingleFieldPr
 		@Override
 		protected Query buildQuery(PredicateRequestContext context) {
 			LuceneNumericDomain<E> domain = codec.getDomain();
+			Range<E> range = rangeProvider.provide( context );
 			return domain.createRangeQuery(
 					absoluteFieldPath,
 					getLowerValue( domain, range.lowerBoundValue(), range.lowerBoundInclusion() ),
@@ -76,7 +94,7 @@ public class LuceneNumericRangePredicate extends AbstractLuceneLeafSingleFieldPr
 
 		private static <E extends Number> E getLowerValue(LuceneNumericDomain<E> domain, Optional<E> boundValueOptional,
 				RangeBoundInclusion inclusion) {
-			if ( !boundValueOptional.isPresent() ) {
+			if ( boundValueOptional.isEmpty() ) {
 				return domain.getMinValue();
 			}
 			E boundValue = boundValueOptional.get();
@@ -85,7 +103,7 @@ public class LuceneNumericRangePredicate extends AbstractLuceneLeafSingleFieldPr
 
 		private static <E extends Number> E getUpperValue(LuceneNumericDomain<E> domain, Optional<E> boundValueOptional,
 				RangeBoundInclusion inclusion) {
-			if ( !boundValueOptional.isPresent() ) {
+			if ( boundValueOptional.isEmpty() ) {
 				return domain.getMaxValue();
 			}
 			E boundValue = boundValueOptional.get();

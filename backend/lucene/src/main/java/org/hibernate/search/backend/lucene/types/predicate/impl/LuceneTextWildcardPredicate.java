@@ -6,6 +6,9 @@
  */
 package org.hibernate.search.backend.lucene.types.predicate.impl;
 
+import static org.hibernate.search.engine.search.query.spi.QueryParametersValueProvider.parameter;
+import static org.hibernate.search.engine.search.query.spi.QueryParametersValueProvider.simple;
+
 import org.hibernate.search.backend.lucene.search.common.impl.AbstractLuceneValueFieldSearchQueryElementFactory;
 import org.hibernate.search.backend.lucene.search.common.impl.LuceneSearchIndexScope;
 import org.hibernate.search.backend.lucene.search.common.impl.LuceneSearchIndexValueFieldContext;
@@ -14,6 +17,7 @@ import org.hibernate.search.backend.lucene.search.predicate.impl.PredicateReques
 import org.hibernate.search.backend.lucene.types.predicate.parse.impl.LuceneWildcardExpressionHelper;
 import org.hibernate.search.engine.search.predicate.SearchPredicate;
 import org.hibernate.search.engine.search.predicate.spi.WildcardPredicateBuilder;
+import org.hibernate.search.engine.search.query.spi.QueryParametersValueProvider;
 
 import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.index.Term;
@@ -39,7 +43,7 @@ public class LuceneTextWildcardPredicate extends AbstractLuceneLeafSingleFieldPr
 
 		private final Analyzer analyzerOrNormalizer;
 
-		private String pattern;
+		private QueryParametersValueProvider<String> patternProvider;
 
 		private Builder(LuceneSearchIndexScope<?> scope, LuceneSearchIndexValueFieldContext<F> field) {
 			super( scope, field );
@@ -48,7 +52,12 @@ public class LuceneTextWildcardPredicate extends AbstractLuceneLeafSingleFieldPr
 
 		@Override
 		public void pattern(String wildcardPattern) {
-			this.pattern = wildcardPattern;
+			this.patternProvider = simple( wildcardPattern );
+		}
+
+		@Override
+		public void param(String parameterName) {
+			this.patternProvider = parameter( parameterName, String.class );
 		}
 
 		@Override
@@ -58,8 +67,8 @@ public class LuceneTextWildcardPredicate extends AbstractLuceneLeafSingleFieldPr
 
 		@Override
 		protected Query buildQuery(PredicateRequestContext context) {
-			BytesRef analyzedWildcard =
-					LuceneWildcardExpressionHelper.analyzeWildcard( analyzerOrNormalizer, absoluteFieldPath, pattern );
+			BytesRef analyzedWildcard = LuceneWildcardExpressionHelper.analyzeWildcard( analyzerOrNormalizer, absoluteFieldPath,
+					patternProvider.provide( context ) );
 			return new WildcardQuery( new Term( absoluteFieldPath, analyzedWildcard ) );
 		}
 	}

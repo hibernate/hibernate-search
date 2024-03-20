@@ -7,6 +7,8 @@
 package org.hibernate.search.backend.lucene.search.predicate.impl;
 
 import static org.hibernate.search.backend.lucene.search.predicate.impl.LuceneCommonMinimumShouldMatchConstraint.minimumShouldMatch;
+import static org.hibernate.search.engine.search.query.spi.QueryParametersValueProvider.parameter;
+import static org.hibernate.search.engine.search.query.spi.QueryParametersValueProvider.simple;
 
 import java.lang.invoke.MethodHandles;
 import java.util.ArrayList;
@@ -27,6 +29,7 @@ import org.hibernate.search.engine.search.common.BooleanOperator;
 import org.hibernate.search.engine.search.common.spi.SearchIndexSchemaElementContextHelper;
 import org.hibernate.search.engine.search.common.spi.SearchQueryElementTypeKey;
 import org.hibernate.search.engine.search.predicate.spi.CommonQueryStringPredicateBuilder;
+import org.hibernate.search.engine.search.query.spi.QueryParametersValueProvider;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
 import org.apache.lucene.analysis.Analyzer;
@@ -70,7 +73,7 @@ abstract class LuceneCommonQueryStringPredicate extends AbstractLuceneNestablePr
 		private LuceneCommonQueryStringPredicateBuilderFieldState firstFieldState;
 		private final Map<String, LuceneCommonQueryStringPredicateBuilderFieldState> fieldStates = new LinkedHashMap<>();
 		protected BooleanOperator defaultOperator = BooleanOperator.OR;
-		protected String queryString;
+		protected QueryParametersValueProvider<String> queryStringProvider;
 		private Analyzer overrideAnalyzer;
 		private boolean ignoreAnalyzer = false;
 		private NavigableMap<Integer, LuceneCommonMinimumShouldMatchConstraint> minimumShouldMatchConstraints;
@@ -104,7 +107,12 @@ abstract class LuceneCommonQueryStringPredicate extends AbstractLuceneNestablePr
 
 		@Override
 		public void queryString(String queryString) {
-			this.queryString = queryString;
+			this.queryStringProvider = simple( queryString );
+		}
+
+		@Override
+		public void queryStringParam(String parameterName) {
+			this.queryStringProvider = parameter( parameterName, String.class );
 		}
 
 		@Override

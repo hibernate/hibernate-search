@@ -6,6 +6,9 @@
  */
 package org.hibernate.search.backend.lucene.types.predicate.impl;
 
+import static org.hibernate.search.engine.search.query.spi.QueryParametersValueProvider.parameter;
+import static org.hibernate.search.engine.search.query.spi.QueryParametersValueProvider.simple;
+
 import java.lang.invoke.MethodHandles;
 
 import org.hibernate.search.backend.lucene.analysis.model.impl.LuceneAnalysisDefinitionRegistry;
@@ -21,6 +24,7 @@ import org.hibernate.search.backend.lucene.types.codec.impl.LuceneStandardFieldC
 import org.hibernate.search.engine.search.common.ValueConvert;
 import org.hibernate.search.engine.search.predicate.SearchPredicate;
 import org.hibernate.search.engine.search.predicate.spi.MatchPredicateBuilder;
+import org.hibernate.search.engine.search.query.spi.QueryParametersValueProvider;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
 import org.apache.lucene.analysis.Analyzer;
@@ -55,9 +59,7 @@ public class LuceneTextMatchPredicate extends AbstractLuceneLeafSingleFieldPredi
 	private static class Builder<F> extends AbstractBuilder<F> implements MatchPredicateBuilder {
 		private final LuceneStandardFieldCodec<F, String> codec;
 		private final LuceneAnalysisDefinitionRegistry analysisDefinitionRegistry;
-
-		private String value;
-
+		private QueryParametersValueProvider<String> valueProvider;
 		private Integer maxEditDistance;
 		private Integer prefixLength;
 
@@ -72,7 +74,13 @@ public class LuceneTextMatchPredicate extends AbstractLuceneLeafSingleFieldPredi
 
 		@Override
 		public void value(Object value, ValueConvert convert) {
-			this.value = convertAndEncode( codec, value, convert );
+			this.valueProvider = simple( convertAndEncode( scope, field, codec, value, convert ) );
+		}
+
+		@Override
+		public void param(String parameterName, ValueConvert convert) {
+			this.valueProvider =
+					parameter( parameterName, Object.class, v -> convertAndEncode( scope, field, codec, v, convert ) );
 		}
 
 		@Override
@@ -108,7 +116,7 @@ public class LuceneTextMatchPredicate extends AbstractLuceneLeafSingleFieldPredi
 
 			if ( effectiveAnalyzerOrNormalizer == AnalyzerConstants.KEYWORD_ANALYZER ) {
 				// Optimization when analysis is disabled
-				Term term = new Term( absoluteFieldPath, value );
+				Term term = new Term( absoluteFieldPath, valueProvider.provide( context ) );
 
 				if ( maxEditDistance != null ) {
 					return new FuzzyQuery( term, maxEditDistance, prefixLength );
@@ -126,7 +134,7 @@ public class LuceneTextMatchPredicate extends AbstractLuceneLeafSingleFieldPredi
 				effectiveQueryBuilder = new QueryBuilder( effectiveAnalyzerOrNormalizer );
 			}
 
-			Query analyzed = effectiveQueryBuilder.createBooleanQuery( absoluteFieldPath, value );
+			Query analyzed = effectiveQueryBuilder.createBooleanQuery( absoluteFieldPath, valueProvider.provide( context ) );
 			if ( analyzed == null ) {
 				// Either the value was an empty string
 				// or the analysis removed all tokens (that can happen if the value contained only stopwords, for example)

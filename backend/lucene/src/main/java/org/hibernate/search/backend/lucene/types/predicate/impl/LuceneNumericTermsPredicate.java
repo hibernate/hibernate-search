@@ -6,9 +6,12 @@
  */
 package org.hibernate.search.backend.lucene.types.predicate.impl;
 
-import java.util.ArrayList;
+import static org.hibernate.search.engine.search.query.spi.QueryParametersValueProvider.parameterCollectionOrSingle;
+import static org.hibernate.search.engine.search.query.spi.QueryParametersValueProvider.simple;
+
 import java.util.Collection;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import org.hibernate.search.backend.lucene.search.common.impl.AbstractLuceneCodecAwareSearchQueryElementFactory;
 import org.hibernate.search.backend.lucene.search.common.impl.LuceneSearchIndexScope;
@@ -16,9 +19,11 @@ import org.hibernate.search.backend.lucene.search.common.impl.LuceneSearchIndexV
 import org.hibernate.search.backend.lucene.search.predicate.impl.AbstractLuceneLeafSingleFieldPredicate;
 import org.hibernate.search.backend.lucene.search.predicate.impl.PredicateRequestContext;
 import org.hibernate.search.backend.lucene.types.codec.impl.AbstractLuceneNumericFieldCodec;
+import org.hibernate.search.backend.lucene.types.codec.impl.LuceneStandardFieldCodec;
 import org.hibernate.search.engine.search.common.ValueConvert;
 import org.hibernate.search.engine.search.predicate.SearchPredicate;
 import org.hibernate.search.engine.search.predicate.spi.TermsPredicateBuilder;
+import org.hibernate.search.engine.search.query.spi.QueryParametersValueProvider;
 
 import org.apache.lucene.search.BooleanClause;
 import org.apache.lucene.search.BooleanQuery;
@@ -46,8 +51,7 @@ public class LuceneNumericTermsPredicate extends AbstractLuceneLeafSingleFieldPr
 	private static class Builder<F, E extends Number> extends AbstractBuilder<F> implements TermsPredicateBuilder {
 		private final AbstractLuceneNumericFieldCodec<F, E> codec;
 
-		private E term;
-		private List<E> terms;
+		private QueryParametersValueProvider<List<E>> termProvider;
 		private boolean allMatch;
 
 		private Builder(AbstractLuceneNumericFieldCodec<F, E> codec, LuceneSearchIndexScope<?> scope,
@@ -72,14 +76,27 @@ public class LuceneNumericTermsPredicate extends AbstractLuceneLeafSingleFieldPr
 		}
 
 		@Override
+		public void matchingAnyParam(String parameterName, ValueConvert convert) {
+			allMatch = false;
+			fillTermParams( parameterName, convert );
+		}
+
+		@Override
+		public void matchingAllParam(String parameterName, ValueConvert convert) {
+			allMatch = true;
+			fillTermParams( parameterName, convert );
+		}
+
+		@Override
 		public SearchPredicate build() {
 			return new LuceneNumericTermsPredicate( this );
 		}
 
 		@Override
 		protected Query buildQuery(PredicateRequestContext context) {
-			if ( term != null ) {
-				return codec.getDomain().createExactQuery( absoluteFieldPath, term );
+			List<E> terms = termProvider.provide( context );
+			if ( terms.size() == 1 ) {
+				return codec.getDomain().createExactQuery( absoluteFieldPath, terms.get( 0 ) );
 			}
 
 			if ( !allMatch ) {
@@ -95,17 +112,22 @@ public class LuceneNumericTermsPredicate extends AbstractLuceneLeafSingleFieldPr
 		}
 
 		private void fillTerms(Collection<?> terms, ValueConvert convert) {
-			if ( terms.size() == 1 ) {
-				this.term = convertAndEncode( codec, terms.iterator().next(), convert );
-				this.terms = null;
-				return;
-			}
+			this.termProvider = simple( terms.stream()
+					.map( term -> convertAndEncode( scope, field, codec, term, convert ) )
+					.collect( Collectors.toList() ) );
+		}
 
-			this.term = null;
-			this.terms = new ArrayList<>( terms.size() );
-			for ( Object termItem : terms ) {
-				this.terms.add( convertAndEncode( codec, termItem, convert ) );
-			}
+		private void fillTermParams(String parameterName, ValueConvert convert) {
+			this.termProvider = parameterCollectionOrSingle( parameterName,
+					terms -> convertAndEncode( terms, scope, field, codec, convert ) );
+		}
+
+		private static <T, R> List<R> convertAndEncode(Collection<?> terms, LuceneSearchIndexScope<?> scope,
+				LuceneSearchIndexValueFieldContext<T> field,
+				LuceneStandardFieldCodec<T, R> codec, ValueConvert convert) {
+			return terms.stream()
+					.map( term -> convertAndEncode( scope, field, codec, term, convert ) )
+					.collect( Collectors.toList() );
 		}
 	}
 }

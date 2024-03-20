@@ -6,6 +6,9 @@
  */
 package org.hibernate.search.backend.lucene.search.predicate.impl;
 
+import static org.hibernate.search.engine.search.query.spi.QueryParametersValueProvider.parameter;
+import static org.hibernate.search.engine.search.query.spi.QueryParametersValueProvider.simple;
+
 import java.lang.invoke.MethodHandles;
 import java.lang.reflect.Array;
 
@@ -18,6 +21,7 @@ import org.hibernate.search.backend.lucene.types.codec.impl.LuceneFieldCodec;
 import org.hibernate.search.backend.lucene.types.codec.impl.LuceneVectorFieldCodec;
 import org.hibernate.search.engine.search.predicate.SearchPredicate;
 import org.hibernate.search.engine.search.predicate.spi.KnnPredicateBuilder;
+import org.hibernate.search.engine.search.query.spi.QueryParametersValueProvider;
 import org.hibernate.search.util.common.AssertionFailure;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
@@ -31,7 +35,7 @@ public abstract class LuceneKnnPredicate<T> extends AbstractLuceneSingleFieldPre
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	protected final int k;
-	protected final T vector;
+	protected final QueryParametersValueProvider<T> vectorProvider;
 	protected final Float similarity;
 	protected final VectorSimilarityFunction similarityFunction;
 	private final LuceneSearchPredicate filter;
@@ -39,7 +43,7 @@ public abstract class LuceneKnnPredicate<T> extends AbstractLuceneSingleFieldPre
 	private LuceneKnnPredicate(Builder<T> builder) {
 		super( builder );
 		this.k = builder.k;
-		this.vector = builder.vector;
+		this.vectorProvider = builder.vectorProvider;
 		this.filter = builder.filter;
 		this.similarity = builder.similarity;
 		this.similarityFunction = builder.similarityFunction;
@@ -55,7 +59,7 @@ public abstract class LuceneKnnPredicate<T> extends AbstractLuceneSingleFieldPre
 		private final VectorSimilarityFunction similarityFunction;
 		private final LuceneVectorFieldCodec<F> vectorCodec;
 		private int k;
-		private F vector;
+		private QueryParametersValueProvider<F> vectorProvider;
 		private LuceneSearchPredicate filter;
 		private Float similarity;
 
@@ -81,10 +85,24 @@ public abstract class LuceneKnnPredicate<T> extends AbstractLuceneSingleFieldPre
 		}
 
 		@Override
-		@SuppressWarnings("unchecked")
 		public void vector(Object vector) {
+			this.vectorProvider = simple(
+					objectToVector( vector, vectorCodec, absoluteFieldPath, vectorElementsType, indexedVectorsDimension ) );
+		}
+
+		@Override
+		public void vectorParam(String parameterName) {
+			this.vectorProvider =
+					parameter( parameterName, Object.class, vector -> objectToVector( vector, vectorCodec, absoluteFieldPath,
+							vectorElementsType, indexedVectorsDimension ) );
+		}
+
+		@SuppressWarnings("unchecked")
+		private static <R> R objectToVector(Object vector, LuceneVectorFieldCodec<R> vectorCodec, String absoluteFieldPath,
+				Class<?> vectorElementsType, int indexedVectorsDimension) {
 			if ( !vector.getClass().isArray() ) {
-				throw new IllegalArgumentException( "Vector can only be either a float or a byte array (float[], byte[])." );
+				throw new AssertionFailure(
+						"Vector can only be a " + vectorElementsType.getClass().getSimpleName() + "[]." );
 			}
 			if ( !vectorElementsType.equals( vector.getClass().getComponentType() ) ) {
 				throw log.vectorKnnMatchVectorTypeDiffersFromField( absoluteFieldPath, vectorElementsType,
@@ -95,9 +113,8 @@ public abstract class LuceneKnnPredicate<T> extends AbstractLuceneSingleFieldPre
 						Array.getLength( vector )
 				);
 			}
-
 			// we just checked the array type above, so we do the cast:
-			this.vector = vectorCodec.encode( (F) vector );
+			return vectorCodec.encode( (R) vector );
 		}
 
 		@Override
@@ -135,6 +152,7 @@ public abstract class LuceneKnnPredicate<T> extends AbstractLuceneSingleFieldPre
 
 		@Override
 		protected Query doToQuery(PredicateRequestContext context) {
+			byte[] vector = vectorProvider.provide( context );
 			KnnByteVectorQuery query = new KnnByteVectorQuery( absoluteFieldPath, vector, k, prepareFilter( context ) );
 			return similarity == null
 					? query
@@ -161,6 +179,7 @@ public abstract class LuceneKnnPredicate<T> extends AbstractLuceneSingleFieldPre
 
 		@Override
 		protected Query doToQuery(PredicateRequestContext context) {
+			float[] vector = vectorProvider.provide( context );
 			KnnFloatVectorQuery query = new KnnFloatVectorQuery( absoluteFieldPath, vector, k, prepareFilter( context ) );
 			return similarity == null ? query : VectorSimilarityFilterQuery.create( query, similarity, similarityFunction );
 		}
