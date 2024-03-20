@@ -9,7 +9,7 @@ import java.util.Map;
 import java.util.Optional;
 
 import org.hibernate.Length;
-import org.hibernate.boot.jaxb.mapping.JaxbEntityMappings;
+import org.hibernate.boot.jaxb.mapping.spi.JaxbEntityMappingsImpl;
 import org.hibernate.boot.spi.MetadataBuildingContext;
 import org.hibernate.search.engine.cfg.ConfigurationPropertySource;
 import org.hibernate.search.engine.cfg.spi.ConfigurationProperty;
@@ -86,7 +86,7 @@ public final class OutboxPollingOutboxEventAdditionalJaxbMappingProducer
 
 
 	@Override
-	public Map<Class<?>, JaxbEntityMappings> produceMappings(ConfigurationPropertySource propertySource,
+	public Map<Class<?>, JaxbEntityMappingsImpl> produceMappings(ConfigurationPropertySource propertySource,
 			MetadataBuildingContext buildingContext) {
 		Optional<String> mapping = OUTBOXEVENT_ENTITY_MAPPING.get( propertySource );
 		Optional<String> schema = ENTITY_MAPPING_OUTBOXEVENT_SCHEMA.get( propertySource );
@@ -117,7 +117,7 @@ public final class OutboxPollingOutboxEventAdditionalJaxbMappingProducer
 			);
 		}
 
-		JaxbEntityMappings mappings;
+		JaxbEntityMappingsImpl mappings;
 		if ( mapping.isPresent() ) {
 			mappings = JaxbMappingHelper.unmarshall( mapping.get() );
 		}
@@ -141,7 +141,7 @@ public final class OutboxPollingOutboxEventAdditionalJaxbMappingProducer
 		return Map.of( OutboxEvent.class, mappings );
 	}
 
-	private static JaxbEntityMappings createMappings(String schema, String catalog,
+	private static JaxbEntityMappingsImpl createMappings(String schema, String catalog,
 			String table, Integer resolvedUuidType, String resolvedUuidStrategy,
 			boolean tenantIdRequired) {
 		AdditionalMappingBuilder builder = new AdditionalMappingBuilder(
