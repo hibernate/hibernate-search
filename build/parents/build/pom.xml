@@ -97,7 +97,7 @@
             NOTE: when Hibernate ORM updates Byte Buddy, make sure to check Jenkinsfile to see if
             `net.bytebuddy.experimental` property can be removed.
          -->
-        <version.org.hibernate.orm>6.5.0.CR1</version.org.hibernate.orm>
+        <version.org.hibernate.orm>7.0.0-SNAPSHOT</version.org.hibernate.orm>
 
         <javadoc.org.hibernate.orm.url>https://docs.jboss.org/hibernate/orm/${parsed-version.org.hibernate.orm.majorVersion}.${parsed-version.org.hibernate.orm.minorVersion}/javadocs/</javadoc.org.hibernate.orm.url>
         <documentation.org.hibernate.orm.url>https://docs.jboss.org/hibernate/orm/${parsed-version.org.hibernate.orm.majorVersion}.${parsed-version.org.hibernate.orm.minorVersion}/userguide/html_single/Hibernate_User_Guide.html</documentation.org.hibernate.orm.url>
@@ -113,7 +113,7 @@
             Even though we are importing the Hibernate ORM BOM where Jakarta Persistence is managed, we don't have easy access
             to its version. We need a version to be able to display it in the docs. This property is exactly to address that need.
         -->
-        <version.jakarta.persistence>3.1.0</version.jakarta.persistence>
+        <version.jakarta.persistence>3.2.0-B02</version.jakarta.persistence>
 
         <!-- >>> Jakarta Batch -->
         <version.jakarta.batch>2.1.1</version.jakarta.batch>

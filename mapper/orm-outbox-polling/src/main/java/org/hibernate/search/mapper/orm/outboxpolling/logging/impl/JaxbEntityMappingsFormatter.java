@@ -6,18 +6,18 @@
  */
 package org.hibernate.search.mapper.orm.outboxpolling.logging.impl;
 
-import org.hibernate.boot.jaxb.mapping.JaxbEntityMappings;
+import org.hibernate.boot.jaxb.mapping.spi.JaxbEntityMappingsImpl;
 import org.hibernate.search.mapper.orm.outboxpolling.mapping.impl.JaxbMappingHelper;
 
 /**
  * Used with JBoss Logging's {@link org.jboss.logging.annotations.FormatWith} to format
- * {@link JaxbEntityMappings} objects using marshaling.
+ * {@link JaxbEntityMappingsImpl} objects using marshaling.
  */
 public final class JaxbEntityMappingsFormatter {
 
-	private final JaxbEntityMappings mappings;
+	private final JaxbEntityMappingsImpl mappings;
 
-	public JaxbEntityMappingsFormatter(JaxbEntityMappings mappings) {
+	public JaxbEntityMappingsFormatter(JaxbEntityMappingsImpl mappings) {
 		this.mappings = mappings;
 	}
 

@@ -17,7 +17,7 @@ import jakarta.xml.bind.JAXBException;
 import jakarta.xml.bind.Marshaller;
 import jakarta.xml.bind.Unmarshaller;
 
-import org.hibernate.boot.jaxb.mapping.JaxbEntityMappings;
+import org.hibernate.boot.jaxb.mapping.spi.JaxbEntityMappingsImpl;
 import org.hibernate.search.mapper.orm.outboxpolling.logging.impl.Log;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
@@ -28,9 +28,9 @@ public class JaxbMappingHelper {
 	private JaxbMappingHelper() {
 	}
 
-	public static String marshall(JaxbEntityMappings mappings) {
+	public static String marshall(JaxbEntityMappingsImpl mappings) {
 		try ( ByteArrayOutputStream out = new ByteArrayOutputStream() ) {
-			JAXBContext context = JAXBContext.newInstance( JaxbEntityMappings.class );
+			JAXBContext context = JAXBContext.newInstance( JaxbEntityMappingsImpl.class );
 			Marshaller marshaller = context.createMarshaller();
 			marshaller.setProperty( Marshaller.JAXB_FORMATTED_OUTPUT, true );
 			marshaller.marshal( mappings, out );
@@ -41,11 +41,11 @@ public class JaxbMappingHelper {
 		}
 	}
 
-	public static JaxbEntityMappings unmarshall(String mappings) {
+	public static JaxbEntityMappingsImpl unmarshall(String mappings) {
 		try ( ByteArrayInputStream in = new ByteArrayInputStream( mappings.getBytes( StandardCharsets.UTF_8 ) ) ) {
-			JAXBContext context = JAXBContext.newInstance( JaxbEntityMappings.class );
+			JAXBContext context = JAXBContext.newInstance( JaxbEntityMappingsImpl.class );
 			Unmarshaller unmarshaller = context.createUnmarshaller();
-			return (JaxbEntityMappings) unmarshaller.unmarshal( in );
+			return (JaxbEntityMappingsImpl) unmarshaller.unmarshal( in );
 		}
 		catch (IOException | JAXBException e) {
 			throw log.unableToProcessEntityMappings( e.getMessage(), e );

@@ -11,7 +11,7 @@ import java.util.Map;
 import java.util.Optional;
 
 import org.hibernate.Length;
-import org.hibernate.boot.jaxb.mapping.JaxbEntityMappings;
+import org.hibernate.boot.jaxb.mapping.spi.JaxbEntityMappingsImpl;
 import org.hibernate.boot.spi.MetadataBuildingContext;
 import org.hibernate.search.engine.cfg.ConfigurationPropertySource;
 import org.hibernate.search.engine.cfg.spi.ConfigurationProperty;
@@ -41,7 +41,6 @@ public class OutboxPollingAgentAdditionalJaxbMappingProducer implements Hibernat
 	// because our override actually matches the default for the native entity name.
 	public static final String ENTITY_NAME = CLASS_NAME;
 
-	@SuppressWarnings("deprecation")
 	public static final String ENTITY_DEFINITION = JaxbMappingHelper.marshall( createMappings( "", "",
 			HibernateOrmMapperOutboxPollingSettings.Defaults.COORDINATION_ENTITY_MAPPING_AGENT_TABLE,
 			SqlTypes.CHAR,
@@ -86,7 +85,7 @@ public class OutboxPollingAgentAdditionalJaxbMappingProducer implements Hibernat
 					.build();
 
 	@Override
-	public Map<Class<?>, JaxbEntityMappings> produceMappings(ConfigurationPropertySource propertySource,
+	public Map<Class<?>, JaxbEntityMappingsImpl> produceMappings(ConfigurationPropertySource propertySource,
 			MetadataBuildingContext buildingContext) {
 		Optional<String> mapping = AGENT_ENTITY_MAPPING.get( propertySource );
 		Optional<String> schema = ENTITY_MAPPING_AGENT_SCHEMA.get( propertySource );
@@ -117,7 +116,7 @@ public class OutboxPollingAgentAdditionalJaxbMappingProducer implements Hibernat
 			);
 		}
 
-		JaxbEntityMappings mappings;
+		JaxbEntityMappingsImpl mappings;
 		if ( mapping.isPresent() ) {
 			mappings = JaxbMappingHelper.unmarshall( mapping.get() );
 		}
@@ -141,7 +140,7 @@ public class OutboxPollingAgentAdditionalJaxbMappingProducer implements Hibernat
 		return Map.of( Agent.class, mappings );
 	}
 
-	private static JaxbEntityMappings createMappings(String schema, String catalog,
+	private static JaxbEntityMappingsImpl createMappings(String schema, String catalog,
 			String table, Integer resolvedUuidType, String resolvedUuidStrategy,
 			boolean tenantIdRequired) {
 		AdditionalMappingBuilder builder = new AdditionalMappingBuilder(

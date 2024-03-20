@@ -123,6 +123,18 @@ public class HSQueryImpl<LOS> implements HSQuery {
 	}
 
 	@Override
+	public void failAfter(Long timeout, TimeUnit timeUnit) {
+		if ( timeout == null ) {
+			timeoutValue = 0L;
+			timeoutUnit = null;
+			timeoutType = null;
+		}
+		else {
+			failAfter( (long) timeout, timeUnit );
+		}
+	}
+
+	@Override
 	public void failAfter(long timeout, TimeUnit timeUnit) {
 		timeoutValue = timeout;
 		timeoutUnit = timeUnit;

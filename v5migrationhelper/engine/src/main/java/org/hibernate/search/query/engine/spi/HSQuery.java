@@ -119,6 +119,13 @@ public interface HSQuery extends ProjectionConstants {
 	 * @param timeUnit Timeout unit.
 	 * @see org.hibernate.search.engine.search.query.dsl.SearchQueryOptionsStep#failAfter(long, TimeUnit)
 	 */
+	void failAfter(Long timeout, TimeUnit timeUnit);
+
+	/**
+	 * @param timeout Timeout value.
+	 * @param timeUnit Timeout unit.
+	 * @see org.hibernate.search.engine.search.query.dsl.SearchQueryOptionsStep#failAfter(long, TimeUnit)
+	 */
 	void failAfter(long timeout, TimeUnit timeUnit);
 
 	/**

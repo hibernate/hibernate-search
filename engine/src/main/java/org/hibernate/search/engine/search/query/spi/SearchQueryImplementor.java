@@ -20,5 +20,10 @@ import org.hibernate.search.engine.search.query.SearchQuery;
  */
 public interface SearchQueryImplementor<H> extends SearchQuery<H> {
 
-	void failAfter(long timeout, TimeUnit timeUnit);
+	@Deprecated
+	default void failAfter(long timeout, TimeUnit timeUnit) {
+		failAfter( (Long) timeout, timeUnit );
+	}
+
+	void failAfter(Long timeout, TimeUnit timeUnit);
 }

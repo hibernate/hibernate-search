@@ -127,7 +127,11 @@ public class FullTextQueryImpl extends AbstractQuery implements FullTextQuery {
 
 	@Override
 	public KeyedResultList getKeyedResultList(KeyedPage page) {
-		throw new UnsupportedOperationException( "Query " + this + " does not implement getKeyedResultList(...)." );
+		throw keyedResultListNoSupported();
+	}
+
+	private UnsupportedOperationException keyedResultListNoSupported() {
+		return new UnsupportedOperationException( "Keyed result lists are not supported in Hibernate Search queries" );
 	}
 
 	@Override
@@ -297,22 +301,22 @@ public class FullTextQueryImpl extends AbstractQuery implements FullTextQuery {
 	}
 
 	@Override
-	protected QueryParameterBinding locateBinding(String name) {
+	protected <P> QueryParameterBinding<P> locateBinding(String name) {
 		throw parametersNoSupported();
 	}
 
 	@Override
-	protected QueryParameterBinding locateBinding(int position) {
+	protected <P> QueryParameterBinding<P> locateBinding(int position) {
 		throw parametersNoSupported();
 	}
 
 	@Override
-	protected QueryParameterBinding locateBinding(Parameter parameter) {
+	protected <P> QueryParameterBinding<P> locateBinding(Parameter<P> parameter) {
 		throw parametersNoSupported();
 	}
 
 	@Override
-	protected QueryParameterBinding locateBinding(QueryParameterImplementor parameter) {
+	protected <P> QueryParameterBinding<P> locateBinding(QueryParameterImplementor<P> parameter) {
 		throw parametersNoSupported();
 	}
 
@@ -413,6 +417,12 @@ public class FullTextQueryImpl extends AbstractQuery implements FullTextQuery {
 	}
 
 	@Override
+	public FullTextQueryImpl setTimeout(Integer timeout) {
+		hSearchQuery.failAfter( timeout == null ? null : Long.valueOf( timeout ), TimeUnit.SECONDS );
+		return this;
+	}
+
+	@Override
 	public FullTextQueryImpl setTimeout(int timeout) {
 		return setTimeout( timeout, TimeUnit.SECONDS );
 	}
@@ -476,7 +486,10 @@ public class FullTextQueryImpl extends AbstractQuery implements FullTextQuery {
 		}
 	}
 
-	private static int hintValueToInteger(Object value) {
+	private static Integer hintValueToInteger(Object value) {
+		if ( value == null ) {
+			return null;
+		}
 		if ( value instanceof Number ) {
 			return ( (Number) value ).intValue();
 		}

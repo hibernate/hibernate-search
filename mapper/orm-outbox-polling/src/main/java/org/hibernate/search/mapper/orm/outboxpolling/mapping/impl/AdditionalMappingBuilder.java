@@ -12,30 +12,30 @@ import jakarta.persistence.AccessType;
 import jakarta.persistence.EnumType;
 
 import org.hibernate.annotations.UuidGenerator;
-import org.hibernate.boot.jaxb.mapping.JaxbAttributes;
-import org.hibernate.boot.jaxb.mapping.JaxbBasic;
-import org.hibernate.boot.jaxb.mapping.JaxbColumn;
-import org.hibernate.boot.jaxb.mapping.JaxbEntity;
-import org.hibernate.boot.jaxb.mapping.JaxbEntityMappings;
-import org.hibernate.boot.jaxb.mapping.JaxbId;
-import org.hibernate.boot.jaxb.mapping.JaxbIndex;
-import org.hibernate.boot.jaxb.mapping.JaxbTable;
-import org.hibernate.boot.jaxb.mapping.JaxbTenantId;
-import org.hibernate.boot.jaxb.mapping.JaxbUuidGenerator;
+import org.hibernate.boot.jaxb.mapping.spi.JaxbAttributesContainerImpl;
+import org.hibernate.boot.jaxb.mapping.spi.JaxbBasicImpl;
+import org.hibernate.boot.jaxb.mapping.spi.JaxbColumnImpl;
+import org.hibernate.boot.jaxb.mapping.spi.JaxbEntityImpl;
+import org.hibernate.boot.jaxb.mapping.spi.JaxbEntityMappingsImpl;
+import org.hibernate.boot.jaxb.mapping.spi.JaxbIdImpl;
+import org.hibernate.boot.jaxb.mapping.spi.JaxbIndexImpl;
+import org.hibernate.boot.jaxb.mapping.spi.JaxbTableImpl;
+import org.hibernate.boot.jaxb.mapping.spi.JaxbTenantIdImpl;
+import org.hibernate.boot.jaxb.mapping.spi.JaxbUuidGeneratorImpl;
 
 public class AdditionalMappingBuilder {
 
-	private final JaxbEntity entity;
+	private final JaxbEntityImpl entity;
 
 	public AdditionalMappingBuilder(Class<?> type, String name) {
-		entity = new JaxbEntity();
+		entity = new JaxbEntityImpl();
 		entity.setAccess( AccessType.FIELD );
 		entity.setClazz( type.getName() );
 		entity.setName( name );
-		JaxbTable table = new JaxbTable();
+		JaxbTableImpl table = new JaxbTableImpl();
 		entity.setTable( table );
 
-		entity.setAttributes( new JaxbAttributes() );
+		entity.setAttributes( new JaxbAttributesContainerImpl() );
 	}
 
 	public AdditionalMappingBuilder table(String schema, String catalog, String table) {
@@ -51,7 +51,7 @@ public class AdditionalMappingBuilder {
 	}
 
 	public AdditionalMappingBuilder index(String name, String columns) {
-		JaxbIndex index = new JaxbIndex();
+		JaxbIndexImpl index = new JaxbIndexImpl();
 		index.setName( name );
 		index.setColumnList( columns );
 
@@ -71,47 +71,47 @@ public class AdditionalMappingBuilder {
 	}
 
 	public AdditionalMappingBuilder tenantId(String name) {
-		entity.setTenantId( new JaxbTenantId() );
+		entity.setTenantId( new JaxbTenantIdImpl() );
 		entity.getTenantId().setName( name );
 		return this;
 	}
 
 	public AdditionalMappingBuilder enumAttribute(String name, Integer length, Boolean nullable) {
-		JaxbBasic attribute = createAttribute( name, length, nullable );
+		JaxbBasicImpl attribute = createAttribute( name, length, nullable );
 		attribute.setEnumerated( EnumType.STRING );
 		entity.getAttributes().getBasicAttributes().add( attribute );
 		return this;
 	}
 
 	public AdditionalMappingBuilder id(Integer type, String strategy) {
-		JaxbId id = new JaxbId();
+		JaxbIdImpl id = new JaxbIdImpl();
 		id.setName( "id" );
 		if ( type != null ) {
 			id.setJdbcTypeCode( type );
 		}
-		id.setUuidGenerator( new JaxbUuidGenerator() );
+		id.setUuidGenerator( new JaxbUuidGeneratorImpl() );
 		id.getUuidGenerator().setStyle( UuidGenerator.Style.valueOf( strategy.toUpperCase( Locale.ROOT ) ) );
-		entity.getAttributes().getId().add( id );
+		entity.getAttributes().getIdAttributes().add( id );
 
 		return this;
 	}
 
-	public JaxbEntityMappings build() {
-		JaxbEntityMappings mappings = new JaxbEntityMappings();
+	public JaxbEntityMappingsImpl build() {
+		JaxbEntityMappingsImpl mappings = new JaxbEntityMappingsImpl();
 
 		mappings.getEntities().add( entity );
 
 		return mappings;
 	}
 
-	private JaxbBasic createAttribute(String name, Integer size, boolean nullable) {
+	private JaxbBasicImpl createAttribute(String name, Integer size, boolean nullable) {
 		return createAttribute( name, size, nullable, null );
 	}
 
-	private JaxbBasic createAttribute(String name, Integer size, boolean nullable, Integer type) {
-		JaxbBasic attribute = new JaxbBasic();
+	private JaxbBasicImpl createAttribute(String name, Integer size, boolean nullable, Integer type) {
+		JaxbBasicImpl attribute = new JaxbBasicImpl();
 		attribute.setName( name );
-		JaxbColumn column = new JaxbColumn();
+		JaxbColumnImpl column = new JaxbColumnImpl();
 		attribute.setColumn( column );
 		column.setName( name );
 		column.setNullable( nullable );

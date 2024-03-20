@@ -123,6 +123,10 @@ public class StubSearchWork {
 		}
 
 		public Builder failAfter(long timeout, TimeUnit timeUnit) {
+			return failAfter( (Long) timeout, timeUnit );
+		}
+
+		public Builder failAfter(Long timeout, TimeUnit timeUnit) {
 			this.failAfterTimeout = timeout;
 			this.failAfterTimeUnit = timeUnit;
 			return this;
