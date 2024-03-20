@@ -28,12 +28,12 @@ public class Elasticsearch7IndexFieldTypeFactoryProvider extends AbstractIndexFi
 
 				@Override
 				public void contribute(PropertyMapping mapping, Context context) {
-					throw log.searchBackendVersionIncompatibleWithVectorIntegration( "Elasticsearch", "8.x" );
+					throw log.searchBackendVersionIncompatibleWithVectorIntegration( "Elasticsearch", "8.12" );
 				}
 
 				@Override
 				public <F> void contribute(ElasticsearchIndexValueFieldType.Builder<F> builder, Context context) {
-					throw log.searchBackendVersionIncompatibleWithVectorIntegration( "Elasticsearch", "8.x" );
+					throw log.searchBackendVersionIncompatibleWithVectorIntegration( "Elasticsearch", "8.12" );
 				}
 			};
 
