@@ -866,8 +866,9 @@ public interface Log extends BasicLogger {
 	SearchException vectorKnnMatchVectorDimensionDiffersFromField(String absoluteFieldPath, int expected, int actual);
 
 	@Message(id = ID_OFFSET + 185,
-			value = "An %1$s distribution version in use is not compatible with the Hibernate Search integration of vector search. "
-					+ "Update your %1$s cluster to a %2$s series to get vector search integration enabled.")
+			value = "The targeted %1$s version is not compatible with the Hibernate Search integration of vector search. "
+					+ "To get vector search integration, upgrade your %1$s cluster to version %2$s or later,"
+					+ " and if you configured the %1$s version in Hibernate Search, update it accordingly.")
 	SearchException searchBackendVersionIncompatibleWithVectorIntegration(String distribution, String version);
 
 	@Message(id = ID_OFFSET + 187,
