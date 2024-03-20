@@ -26,17 +26,17 @@ import org.apache.lucene.search.KnnByteVectorQuery;
 import org.apache.lucene.search.KnnFloatVectorQuery;
 import org.apache.lucene.search.Query;
 
-public class LuceneKnnPredicate extends AbstractLuceneSingleFieldPredicate implements LuceneSearchPredicate {
+public abstract class LuceneKnnPredicate<T> extends AbstractLuceneSingleFieldPredicate implements LuceneSearchPredicate {
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
-	private final int k;
-	private final Object vector;
+	protected final int k;
+	protected final T vector;
+	protected final Float similarity;
+	protected final VectorSimilarityFunction similarityFunction;
 	private final LuceneSearchPredicate filter;
-	private final Float similarity;
-	private final VectorSimilarityFunction similarityFunction;
 
-	private LuceneKnnPredicate(Builder<?> builder) {
+	private LuceneKnnPredicate(Builder<T> builder) {
 		super( builder );
 		this.k = builder.k;
 		this.vector = builder.vector;
@@ -45,49 +45,21 @@ public class LuceneKnnPredicate extends AbstractLuceneSingleFieldPredicate imple
 		this.similarityFunction = builder.similarityFunction;
 	}
 
-	@Override
-	protected Query doToQuery(PredicateRequestContext context) {
-
-		if ( vector instanceof byte[] ) {
-			byte[] byteVector = (byte[]) vector;
-			KnnByteVectorQuery query = new KnnByteVectorQuery( absoluteFieldPath, byteVector, k, prepareFilter( context ) );
-			return similarity == null
-					? query
-					: VectorSimilarityFilterQuery.create( query, similarity, byteVector.length, similarityFunction );
-		}
-		if ( vector instanceof float[] ) {
-			KnnFloatVectorQuery query =
-					new KnnFloatVectorQuery( absoluteFieldPath, (float[]) vector, k, prepareFilter( context ) );
-			return similarity == null ? query : VectorSimilarityFilterQuery.create( query, similarity, similarityFunction );
-		}
-
-		throw new UnsupportedOperationException(
-				"Unknown vector type " + vector.getClass() + ". only byte[] and float[] vectors are supported." );
-	}
-
-	private Query prepareFilter(PredicateRequestContext context) {
+	protected Query prepareFilter(PredicateRequestContext context) {
 		return context.appendTenantAndRoutingFilters( filter == null ? null : filter.toQuery( context ) );
 	}
 
-	public static class DefaultFactory<F>
-			extends AbstractLuceneValueFieldSearchQueryElementFactory<KnnPredicateBuilder, F> {
-		@Override
-		public KnnPredicateBuilder create(LuceneSearchIndexScope<?> scope, LuceneSearchIndexValueFieldContext<F> field) {
-			return new Builder<>( scope, field );
-		}
-	}
-
-	private static class Builder<F> extends AbstractBuilder implements KnnPredicateBuilder {
+	private abstract static class Builder<F> extends AbstractBuilder implements KnnPredicateBuilder {
 		private final Class<?> vectorElementsType;
 		private final int indexedVectorsDimension;
 		private final VectorSimilarityFunction similarityFunction;
 		private final LuceneVectorFieldCodec<F> vectorCodec;
 		private int k;
-		private Object vector;
+		private F vector;
 		private LuceneSearchPredicate filter;
 		private Float similarity;
 
-		private Builder(LuceneSearchIndexScope<?> scope, LuceneSearchIndexValueFieldContext<F> field) {
+		protected Builder(LuceneSearchIndexScope<?> scope, LuceneSearchIndexValueFieldContext<F> field) {
 			super( scope, field );
 
 			LuceneFieldCodec<F> codec = field.type().codec();
@@ -137,10 +109,71 @@ public class LuceneKnnPredicate extends AbstractLuceneSingleFieldPredicate imple
 		public void requiredMinimumSimilarity(float similarity) {
 			this.similarity = similarity;
 		}
+	}
+
+	public static class FloatFactory extends AbstractLuceneValueFieldSearchQueryElementFactory<KnnPredicateBuilder, float[]> {
+		@Override
+		public KnnPredicateBuilder create(LuceneSearchIndexScope<?> scope, LuceneSearchIndexValueFieldContext<float[]> field) {
+			return new LuceneFloatKnnPredicate.FloatBuilder( scope, field );
+		}
+	}
+
+	public static class ByteFactory
+			extends
+			AbstractLuceneValueFieldSearchQueryElementFactory<KnnPredicateBuilder, byte[]> {
+		@Override
+		public KnnPredicateBuilder create(LuceneSearchIndexScope<?> scope, LuceneSearchIndexValueFieldContext<byte[]> field) {
+			return new LuceneByteKnnPredicate.ByteBuilder( scope, field );
+		}
+	}
+
+	private static class LuceneByteKnnPredicate extends LuceneKnnPredicate<byte[]> {
+
+		private LuceneByteKnnPredicate(ByteBuilder builder) {
+			super( builder );
+		}
 
 		@Override
-		public SearchPredicate build() {
-			return new LuceneKnnPredicate( this );
+		protected Query doToQuery(PredicateRequestContext context) {
+			KnnByteVectorQuery query = new KnnByteVectorQuery( absoluteFieldPath, vector, k, prepareFilter( context ) );
+			return similarity == null
+					? query
+					: VectorSimilarityFilterQuery.create( query, similarity, vector.length, similarityFunction );
+		}
+
+		private static class ByteBuilder extends Builder<byte[]> {
+			protected ByteBuilder(LuceneSearchIndexScope<?> scope, LuceneSearchIndexValueFieldContext<byte[]> field) {
+				super( scope, field );
+			}
+
+			@Override
+			public SearchPredicate build() {
+				return new LuceneByteKnnPredicate( this );
+			}
+		}
+	}
+
+	private static class LuceneFloatKnnPredicate extends LuceneKnnPredicate<float[]> {
+
+		private LuceneFloatKnnPredicate(FloatBuilder builder) {
+			super( builder );
+		}
+
+		@Override
+		protected Query doToQuery(PredicateRequestContext context) {
+			KnnFloatVectorQuery query = new KnnFloatVectorQuery( absoluteFieldPath, vector, k, prepareFilter( context ) );
+			return similarity == null ? query : VectorSimilarityFilterQuery.create( query, similarity, similarityFunction );
+		}
+
+		private static class FloatBuilder extends Builder<float[]> {
+			protected FloatBuilder(LuceneSearchIndexScope<?> scope, LuceneSearchIndexValueFieldContext<float[]> field) {
+				super( scope, field );
+			}
+
+			@Override
+			public SearchPredicate build() {
+				return new LuceneFloatKnnPredicate( this );
+			}
 		}
 	}
 }
