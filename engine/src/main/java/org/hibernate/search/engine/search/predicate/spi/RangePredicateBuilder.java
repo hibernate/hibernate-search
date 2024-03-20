@@ -13,4 +13,7 @@ public interface RangePredicateBuilder extends SearchPredicateBuilder {
 
 	void range(Range<?> range, ValueConvert convertLowerBound, ValueConvert convertUpperBound);
 
+	void param(String parameterName, ValueConvert lowerBoundConvert, ValueConvert upperBoundConvert);
+
+	void parameterized(Range<String> range, ValueConvert lowerBoundConvert, ValueConvert upperBoundConvert);
 }

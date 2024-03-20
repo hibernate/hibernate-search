@@ -50,6 +50,12 @@ abstract class AbstractStringQueryPredicateCommonState<
 		return thisAsT();
 	}
 
+	protected T matchingParam(String parameterName) {
+		Contracts.assertNotNullNorEmpty( parameterName, "parameterName" );
+		builder.queryStringParam( parameterName );
+		return thisAsT();
+	}
+
 	@Override
 	public T constantScore() {
 		builder.constantScore();

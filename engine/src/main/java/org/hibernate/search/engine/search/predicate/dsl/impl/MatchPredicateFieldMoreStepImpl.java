@@ -62,6 +62,11 @@ class MatchPredicateFieldMoreStepImpl
 	}
 
 	@Override
+	public MatchPredicateOptionsStep<?> matchingParam(String parameterName, ValueConvert convert) {
+		return commonState.matchingParam( parameterName, convert );
+	}
+
+	@Override
 	public void contributePredicates(Consumer<SearchPredicate> collector) {
 		for ( MatchPredicateBuilder predicateBuilder : predicateBuilders ) {
 			// Perform last-minute changes, since it's the last call that will be made on this field set state
@@ -85,6 +90,18 @@ class MatchPredicateFieldMoreStepImpl
 			for ( MatchPredicateFieldMoreStepImpl fieldSetState : getFieldSetStates() ) {
 				for ( MatchPredicateBuilder predicateBuilder : fieldSetState.predicateBuilders ) {
 					predicateBuilder.value( value, convert );
+				}
+			}
+			return this;
+		}
+
+		public MatchPredicateOptionsStep<?> matchingParam(String parameterName, ValueConvert convert) {
+			Contracts.assertNotNullNorEmpty( parameterName, "parameterName" );
+			Contracts.assertNotNull( convert, "convert" );
+
+			for ( MatchPredicateFieldMoreStepImpl fieldSetState : getFieldSetStates() ) {
+				for ( MatchPredicateBuilder predicateBuilder : fieldSetState.predicateBuilders ) {
+					predicateBuilder.param( parameterName, convert );
 				}
 			}
 			return this;

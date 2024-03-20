@@ -56,6 +56,11 @@ class WildcardPredicateFieldMoreStepImpl
 	}
 
 	@Override
+	public WildcardPredicateOptionsStep<?> matchingParam(String parameterName) {
+		return commonState.matchingParam( parameterName );
+	}
+
+	@Override
 	public void contributePredicates(Consumer<SearchPredicate> collector) {
 		for ( WildcardPredicateBuilder predicateBuilder : predicateBuilders ) {
 			// Perform last-minute changes, since it's the last call that will be made on this field set state
@@ -78,6 +83,16 @@ class WildcardPredicateFieldMoreStepImpl
 			for ( WildcardPredicateFieldMoreStepImpl fieldSetState : getFieldSetStates() ) {
 				for ( WildcardPredicateBuilder predicateBuilder : fieldSetState.predicateBuilders ) {
 					predicateBuilder.pattern( wildcardPattern );
+				}
+			}
+			return this;
+		}
+
+		private WildcardPredicateOptionsStep<?> matchingParam(String parameterName) {
+			Contracts.assertNotNullNorEmpty( parameterName, "parameterName" );
+			for ( WildcardPredicateFieldMoreStepImpl fieldSetState : getFieldSetStates() ) {
+				for ( WildcardPredicateBuilder predicateBuilder : fieldSetState.predicateBuilders ) {
+					predicateBuilder.param( parameterName );
 				}
 			}
 			return this;

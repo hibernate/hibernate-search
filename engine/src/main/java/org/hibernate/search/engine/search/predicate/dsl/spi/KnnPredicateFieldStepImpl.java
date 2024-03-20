@@ -74,6 +74,12 @@ public class KnnPredicateFieldStepImpl
 	}
 
 	@Override
+	public KnnPredicateOptionsStep matchingParam(String parameterName) {
+		this.builder.vectorParam( parameterName );
+		return this;
+	}
+
+	@Override
 	public KnnPredicateOptionsStep requiredMinimumSimilarity(float similarity) {
 		this.builder.requiredMinimumSimilarity( similarity );
 		return this;

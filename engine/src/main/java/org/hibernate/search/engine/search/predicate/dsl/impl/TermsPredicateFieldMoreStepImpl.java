@@ -63,6 +63,16 @@ class TermsPredicateFieldMoreStepImpl
 	}
 
 	@Override
+	public TermsPredicateOptionsStep<?> matchingAnyParam(String parameterName, ValueConvert convert) {
+		return commonState.matchingAnyParam( parameterName, convert );
+	}
+
+	@Override
+	public TermsPredicateOptionsStep<?> matchingAllParam(String parameterName, ValueConvert convert) {
+		return commonState.matchingAllParam( parameterName, convert );
+	}
+
+	@Override
 	public void contributePredicates(Consumer<SearchPredicate> collector) {
 		for ( TermsPredicateBuilder predicateBuilder : predicateBuilders ) {
 			// Perform last-minute changes, since it's the last call that will be made on this field set state
@@ -99,6 +109,30 @@ class TermsPredicateFieldMoreStepImpl
 			for ( TermsPredicateFieldMoreStepImpl fieldSetState : getFieldSetStates() ) {
 				for ( TermsPredicateBuilder predicateBuilder : fieldSetState.predicateBuilders ) {
 					predicateBuilder.matchingAll( terms, convert );
+				}
+			}
+			return this;
+		}
+
+		public TermsPredicateOptionsStep<?> matchingAnyParam(String parameterName, ValueConvert convert) {
+			Contracts.assertNotNullNorEmpty( parameterName, "parameterName" );
+			Contracts.assertNotNull( convert, "convert" );
+
+			for ( TermsPredicateFieldMoreStepImpl fieldSetState : getFieldSetStates() ) {
+				for ( TermsPredicateBuilder predicateBuilder : fieldSetState.predicateBuilders ) {
+					predicateBuilder.matchingAnyParam( parameterName, convert );
+				}
+			}
+			return this;
+		}
+
+		public TermsPredicateOptionsStep<?> matchingAllParam(String parameterName, ValueConvert convert) {
+			Contracts.assertNotNullNorEmpty( parameterName, "parameterName" );
+			Contracts.assertNotNull( convert, "convert" );
+
+			for ( TermsPredicateFieldMoreStepImpl fieldSetState : getFieldSetStates() ) {
+				for ( TermsPredicateBuilder predicateBuilder : fieldSetState.predicateBuilders ) {
+					predicateBuilder.matchingAllParam( parameterName, convert );
 				}
 			}
 			return this;

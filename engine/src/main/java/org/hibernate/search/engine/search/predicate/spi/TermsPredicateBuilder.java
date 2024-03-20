@@ -16,4 +16,7 @@ public interface TermsPredicateBuilder extends SearchPredicateBuilder {
 
 	void matchingAll(Collection<?> terms, ValueConvert convert);
 
+	void matchingAnyParam(String parameterName, ValueConvert convert);
+
+	void matchingAllParam(String parameterName, ValueConvert convert);
 }

@@ -34,6 +34,12 @@ public final class MatchIdPredicateMatchingStepImpl
 	}
 
 	@Override
+	public MatchIdPredicateMatchingStepImpl matchingParam(String parameterName, ValueConvert convert) {
+		matchIdBuilder.param( parameterName, convert );
+		return this;
+	}
+
+	@Override
 	public MatchIdPredicateMatchingStepImpl boost(float boost) {
 		matchIdBuilder.boost( boost );
 		return this;

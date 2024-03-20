@@ -9,6 +9,7 @@ package org.hibernate.search.engine.search.predicate.dsl;
 import java.util.Collection;
 
 import org.hibernate.search.engine.search.common.ValueConvert;
+import org.hibernate.search.util.common.annotation.Incubating;
 import org.hibernate.search.util.common.impl.CollectionHelper;
 
 /**
@@ -97,5 +98,57 @@ public interface TermsPredicateMatchingStep<N extends TermsPredicateOptionsStep<
 	 * @return The next step.
 	 */
 	N matchingAll(Collection<?> terms, ValueConvert convert);
+
+	/**
+	 * Require at least one of the targeted fields to match <b>any</b> of the terms that will be passed to a query via a query parameter.
+	 * <p>
+	 * Same as {@link #matchingAny(Collection)} but delaying the match value to be passed via a query parameter.
+	 *
+	 * @param parameterName The name of a query parameter representing the terms to match.
+	 * @return The next step.
+	 */
+	@Incubating
+	default N matchingAnyParam(String parameterName) {
+		return matchingAnyParam( parameterName, ValueConvert.YES );
+	}
+
+	/**
+	 * Require at least one of the targeted fields to match <b>any</b> of the terms that will be passed to a query via a query parameter.
+	 * <p>
+	 * Same as {@link #matchingAny(Collection, ValueConvert)} but delaying the match value to be passed via a query parameter.
+	 *
+	 * @param parameterName The name of a query parameter representing the terms to match.
+	 * @param convert Controls how the query parameter {@code value} should be converted before Hibernate Search attempts to interpret it as a field value.
+	 * See {@link ValueConvert} for more information.
+	 * @return The next step.
+	 */
+	@Incubating
+	N matchingAnyParam(String parameterName, ValueConvert convert);
+
+	/**
+	 * Require at least one of the targeted fields to match <b>all</b> of the terms that will be passed to a query via a query parameter.
+	 * <p>
+	 * Same as {@link #matchingAll(Collection)} but delaying the match value to be passed via a query parameter.
+	 *
+	 * @param parameterName The name of a query parameter representing the terms to match.
+	 * @return The next step.
+	 */
+	@Incubating
+	private N matchingAllParam(String parameterName) {
+		return matchingAllParam( parameterName, ValueConvert.YES );
+	}
+
+	/**
+	 * Require at least one of the targeted fields to match <b>all</b> of the terms that will be passed to a query via a query parameter.
+	 * <p>
+	 * Same as {@link #matchingAll(Collection)} but delaying the match value to be passed via a query parameter.
+	 *
+	 * @param parameterName The name of a query parameter representing the terms to match.
+	 * @param convert Controls how the query parameter {@code value} should be converted before Hibernate Search attempts to interpret it as a field value.
+	 * See {@link ValueConvert} for more information.
+	 * @return The next step.
+	 */
+	@Incubating
+	N matchingAllParam(String parameterName, ValueConvert convert);
 
 }

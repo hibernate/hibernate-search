@@ -6,6 +6,8 @@
  */
 package org.hibernate.search.engine.search.predicate.dsl;
 
+import org.hibernate.search.util.common.annotation.Incubating;
+
 /**
  * The step in a query string predicate definition, where the query string to match can be set.
  *
@@ -21,4 +23,12 @@ public interface CommonQueryStringPredicateMatchingStep<N extends CommonQueryStr
 	 */
 	N matching(String queryString);
 
+	/**
+	 * Require at least one of the targeted fields to match the query string that will be passed to a query via a query parameter.
+	 *
+	 * @param parameterName The name of a query parameter representing the query string to match.
+	 * @return The next step.
+	 */
+	@Incubating
+	N matchingParam(String parameterName);
 }

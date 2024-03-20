@@ -68,6 +68,16 @@ class RangePredicateFieldMoreStepImpl
 	}
 
 	@Override
+	public RangePredicateOptionsStep<?> rangeParam(String parameterName, ValueConvert convert) {
+		return commonState.rangeParam( parameterName, convert, convert );
+	}
+
+	@Override
+	public RangePredicateOptionsStep<?> parameterizedRange(Range<String> range, ValueConvert convert) {
+		return commonState.parameterizedRange( range, convert, convert );
+	}
+
+	@Override
 	public void contributePredicates(Consumer<SearchPredicate> collector) {
 		for ( RangePredicateBuilder predicateBuilder : predicateBuilders ) {
 			// Perform last-minute changes, since it's the last call that will be made on this field set state
@@ -95,6 +105,33 @@ class RangePredicateFieldMoreStepImpl
 			for ( RangePredicateFieldMoreStepImpl fieldSetState : getFieldSetStates() ) {
 				for ( RangePredicateBuilder predicateBuilder : fieldSetState.predicateBuilders ) {
 					predicateBuilder.range( range, lowerBoundConvert, upperBoundConvert );
+				}
+			}
+			return this;
+		}
+
+		CommonState rangeParam(String parameterName, ValueConvert lowerBoundConvert, ValueConvert upperBoundConvert) {
+			Contracts.assertNotNullNorEmpty( parameterName, "parameterName" );
+			Contracts.assertNotNull( lowerBoundConvert, "lowerBoundConvert" );
+			Contracts.assertNotNull( upperBoundConvert, "upperBoundConvert" );
+			for ( RangePredicateFieldMoreStepImpl fieldSetState : getFieldSetStates() ) {
+				for ( RangePredicateBuilder predicateBuilder : fieldSetState.predicateBuilders ) {
+					predicateBuilder.param( parameterName, lowerBoundConvert, upperBoundConvert );
+				}
+			}
+			return this;
+		}
+
+		CommonState parameterizedRange(Range<String> range, ValueConvert lowerBoundConvert, ValueConvert upperBoundConvert) {
+			Contracts.assertNotNull( range, "range" );
+			Contracts.assertNotNull( lowerBoundConvert, "lowerBoundConvert" );
+			Contracts.assertNotNull( upperBoundConvert, "upperBoundConvert" );
+			if ( !range.lowerBoundValue().isPresent() && !range.upperBoundValue().isPresent() ) {
+				throw log.rangePredicateCannotMatchNullValue( getEventContext() );
+			}
+			for ( RangePredicateFieldMoreStepImpl fieldSetState : getFieldSetStates() ) {
+				for ( RangePredicateBuilder predicateBuilder : fieldSetState.predicateBuilders ) {
+					predicateBuilder.parameterized( range, lowerBoundConvert, upperBoundConvert );
 				}
 			}
 			return this;

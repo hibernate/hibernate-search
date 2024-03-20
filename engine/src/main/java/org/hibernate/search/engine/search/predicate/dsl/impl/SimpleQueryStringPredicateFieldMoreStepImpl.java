@@ -50,6 +50,11 @@ class SimpleQueryStringPredicateFieldMoreStepImpl
 		return commonState.matching( queryString );
 	}
 
+	@Override
+	public SimpleQueryStringPredicateOptionsStep<?> matchingParam(String parameterName) {
+		return commonState.matchingParam( parameterName );
+	}
+
 	static class CommonState
 			extends
 			AbstractStringQueryPredicateCommonState<CommonState,
@@ -76,7 +81,6 @@ class SimpleQueryStringPredicateFieldMoreStepImpl
 		protected CommonState thisAsT() {
 			return this;
 		}
-
 	}
 
 }

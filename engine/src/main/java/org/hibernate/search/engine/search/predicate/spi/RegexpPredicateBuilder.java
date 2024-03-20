@@ -14,6 +14,7 @@ public interface RegexpPredicateBuilder extends SearchPredicateBuilder {
 
 	void pattern(String regexpPattern);
 
-	void flags(Set<RegexpQueryFlag> flags);
+	void param(String parameterName);
 
+	void flags(Set<RegexpQueryFlag> flags);
 }

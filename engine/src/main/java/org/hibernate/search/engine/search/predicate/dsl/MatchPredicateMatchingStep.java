@@ -7,6 +7,7 @@
 package org.hibernate.search.engine.search.predicate.dsl;
 
 import org.hibernate.search.engine.search.common.ValueConvert;
+import org.hibernate.search.util.common.annotation.Incubating;
 
 /**
  * The step in a "match" predicate definition where the value to match can be set.
@@ -47,5 +48,33 @@ public interface MatchPredicateMatchingStep<N extends MatchPredicateOptionsStep<
 	 * @see ValueConvert
 	 */
 	N matching(Object value, ValueConvert convert);
+
+	/**
+	 * Require at least one of the targeted fields to match the value that will be passed to a query via a query parameter.
+	 * <p>
+	 * Same as {@link #matching(Object)} but delaying the match value to be passed via a query parameter.
+	 *
+	 * @param parameterName The name of a query parameter representing the value to match.
+	 * @return The next step.
+	 */
+	@Incubating
+	default N matchingParam(String parameterName) {
+		return matchingParam( parameterName, ValueConvert.YES );
+	}
+
+	/**
+	 * Require at least one of the targeted fields to match the value that will be passed to a query via a query parameter.
+	 * <p>
+	 * Same as {@link #matching(Object, ValueConvert)} but delaying the match value to be passed via a query parameter.
+	 *
+	 * @param parameterName The name of a query parameter representing the value to match.
+	 * @param convert Controls how the {@code parameter value} should be converted before Hibernate Search attempts to interpret it as a field value.
+	 * See {@link ValueConvert} for more information.
+	 * @return The next step.
+	 *
+	 * @see ValueConvert
+	 */
+	@Incubating
+	N matchingParam(String parameterName, ValueConvert convert);
 
 }

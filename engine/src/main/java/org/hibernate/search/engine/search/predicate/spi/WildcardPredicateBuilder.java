@@ -10,4 +10,5 @@ public interface WildcardPredicateBuilder extends SearchPredicateBuilder {
 
 	void pattern(String wildcardPattern);
 
+	void param(String parameterName);
 }

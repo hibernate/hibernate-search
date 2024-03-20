@@ -99,4 +99,31 @@ public interface SpatialWithinPredicateAreaStep<N extends SpatialWithinPredicate
 				topLeftLatitude, topLeftLongitude, bottomRightLatitude, bottomRightLongitude
 		) );
 	}
+
+	/**
+	 * Require at least one of the targeted fields to point to a location within the polygon that will be passed to a query via a query parameter.
+	 *
+	 * @param parameterName The name of a query parameter representing the bounding polygon.
+	 * @return The next step.
+	 */
+	N polygonParam(String parameterName);
+
+	/**
+	 * Require at least one of the targeted fields to point to a location within the box (~rectangle) that will be passed to a query via a query parameter.
+	 *
+	 * @param parameterName The name of a query parameter representing the bounding box.
+	 * @return The next step.
+	 */
+	N boundingBoxParam(String parameterName);
+
+	/**
+	 * Require at least one of the targeted fields to point to a location within the given circle,
+	 * i.e. a location that is at most at the distance from the center, passed to a query via a query parameter.
+	 *
+	 * @param centerParameterName The name of a query parameter representing the center of the bounding circle.
+	 * @param radiusParameterName The name of a query parameter representing the radius of the bounding circle, in the unit defined by parameter {@code unit}.
+	 * @param unitParameterName The name of a query parameter representing the unit used for the radius.
+	 * @return The next step.
+	 */
+	N circleParam(String centerParameterName, String radiusParameterName, String unitParameterName);
 }

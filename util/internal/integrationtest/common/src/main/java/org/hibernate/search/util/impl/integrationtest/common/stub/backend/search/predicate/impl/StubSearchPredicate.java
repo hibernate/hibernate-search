@@ -98,6 +98,11 @@ public class StubSearchPredicate implements SearchPredicate {
 		}
 
 		@Override
+		public void queryStringParam(String parameterName) {
+			// No-op
+		}
+
+		@Override
 		public void flags(Set<SimpleQueryFlag> flags) {
 			// No-op, just simulates a call on this object
 		}
@@ -118,6 +123,11 @@ public class StubSearchPredicate implements SearchPredicate {
 
 		@Override
 		public void queryString(String simpleQueryString) {
+			// No-op
+		}
+
+		@Override
+		public void queryStringParam(String parameterName) {
 			// No-op
 		}
 
@@ -220,6 +230,16 @@ public class StubSearchPredicate implements SearchPredicate {
 		}
 
 		@Override
+		public void param(String parameterName, ValueConvert valueConvert) {
+			// No-op
+		}
+
+		@Override
+		public void param(String parameterName) {
+			// No-op
+		}
+
+		@Override
 		public void analyzer(String analyzerName) {
 			// No-op
 		}
@@ -231,6 +251,16 @@ public class StubSearchPredicate implements SearchPredicate {
 
 		@Override
 		public void range(Range<?> range, ValueConvert convertLowerBound, ValueConvert convertUpperBound) {
+			// No-op
+		}
+
+		@Override
+		public void param(String parameterName, ValueConvert lowerBoundConvert, ValueConvert upperBoundConvert) {
+			// No-op
+		}
+
+		@Override
+		public void parameterized(Range<String> range, ValueConvert lowerBoundConvert, ValueConvert upperBoundConvert) {
 			// No-op
 		}
 
@@ -261,6 +291,16 @@ public class StubSearchPredicate implements SearchPredicate {
 		}
 
 		@Override
+		public void matchingAnyParam(String parameterName, ValueConvert convert) {
+			// No-op
+		}
+
+		@Override
+		public void matchingAllParam(String parameterName, ValueConvert convert) {
+			// No-op
+		}
+
+		@Override
 		public void boost(float boost) {
 			// No-op
 		}
@@ -273,6 +313,11 @@ public class StubSearchPredicate implements SearchPredicate {
 		@Override
 		public void circle(GeoPoint center, double radius, DistanceUnit unit) {
 			// No-op
+		}
+
+		@Override
+		public void param(String center, String radius, String unit) {
+
 		}
 
 		@Override

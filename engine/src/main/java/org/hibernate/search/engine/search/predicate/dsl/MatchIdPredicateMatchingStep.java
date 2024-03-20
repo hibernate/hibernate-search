@@ -9,6 +9,7 @@ package org.hibernate.search.engine.search.predicate.dsl;
 import java.util.Collection;
 
 import org.hibernate.search.engine.search.common.ValueConvert;
+import org.hibernate.search.util.common.annotation.Incubating;
 
 /**
  * The step in a "match id" predicate definition where the IDs to match can be set.
@@ -66,4 +67,37 @@ public interface MatchIdPredicateMatchingStep<N extends MatchIdPredicateMatching
 		}
 		return next;
 	}
+
+	/**
+	 * Target the identifier with the id that will be passed to a query via a query parameter .
+	 * <p>
+	 * Same as {@link #matching(Object)} but delaying the match value to be passed via a query parameter.
+	 * <p>
+	 * If used multiple times, it will target any of the specified parameter values.
+	 *
+	 * @param parameterName The name of a query parameter representing the id to match.
+	 * @return The next step.
+	 */
+	@Incubating
+	default N matchingParam(String parameterName) {
+		return matchingParam( parameterName, ValueConvert.YES );
+	}
+
+	/**
+	 * Target the identifier with the id that will be passed to a query via a query parameter .
+	 * <p>
+	 * Same as {@link #matching(Object, ValueConvert)} but delaying the match value to be passed via a query parameter.
+	 * <p>
+	 * If used multiple times, it will target any of the specified parameter values.
+	 *
+	 * @param parameterName The name of a query parameter representing the id to match.
+	 * @param convert Controls how the parameter {@code value} should be converted
+	 * before Hibernate Search attempts to interpret it as an identifier value.
+	 * See {@link ValueConvert} for more information.
+	 * @return The next step.
+	 *
+	 * @see ValueConvert
+	 */
+	@Incubating
+	N matchingParam(String parameterName, ValueConvert convert);
 }

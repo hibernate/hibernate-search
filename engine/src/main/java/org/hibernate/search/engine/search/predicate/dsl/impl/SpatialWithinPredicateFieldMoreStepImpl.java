@@ -83,6 +83,30 @@ class SpatialWithinPredicateFieldMoreStepImpl
 	}
 
 	@Override
+	public SpatialWithinPredicateOptionsStep<?> polygonParam(String parameterName) {
+		Contracts.assertNotNullNorEmpty( parameterName, "parameterName" );
+
+		return commonState.polygonParam( parameterName );
+	}
+
+	@Override
+	public SpatialWithinPredicateOptionsStep<?> boundingBoxParam(String parameterName) {
+		Contracts.assertNotNullNorEmpty( parameterName, "parameterName" );
+
+		return commonState.boundingBoxParam( parameterName );
+	}
+
+	@Override
+	public SpatialWithinPredicateOptionsStep<?> circleParam(String centerParameterName, String radiusParameterName,
+			String unitParameterName) {
+		Contracts.assertNotNullNorEmpty( centerParameterName, "parameterName" );
+		Contracts.assertNotNullNorEmpty( radiusParameterName, "radiusParameterName" );
+		Contracts.assertNotNullNorEmpty( unitParameterName, "unitParameterName" );
+
+		return commonState.circleParam( centerParameterName, radiusParameterName, unitParameterName );
+	}
+
+	@Override
 	public void contributePredicates(Consumer<SearchPredicate> collector) {
 		for ( SearchPredicateBuilder predicateBuilder : predicateBuilders ) {
 			// Perform last-minute changes, since it's the last call that will be made on this field set state
@@ -122,6 +146,36 @@ class SpatialWithinPredicateFieldMoreStepImpl
 		}
 	}
 
+	private void generateWithinCircleQueryBuildersParam(String center, String radius, String unit) {
+		SearchIndexScope<?> scope = commonState.scope();
+		for ( String fieldPath : fieldPaths ) {
+			SpatialWithinCirclePredicateBuilder predicateBuilder =
+					scope.fieldQueryElement( fieldPath, PredicateTypeKeys.SPATIAL_WITHIN_CIRCLE );
+			predicateBuilder.param( center, radius, unit );
+			predicateBuilders.add( predicateBuilder );
+		}
+	}
+
+	private void generateWithinPolygonQueryBuildersParam(String parameterName) {
+		SearchIndexScope<?> scope = commonState.scope();
+		for ( String fieldPath : fieldPaths ) {
+			SpatialWithinPolygonPredicateBuilder predicateBuilder =
+					scope.fieldQueryElement( fieldPath, PredicateTypeKeys.SPATIAL_WITHIN_POLYGON );
+			predicateBuilder.param( parameterName );
+			predicateBuilders.add( predicateBuilder );
+		}
+	}
+
+	private void generateWithinBoundingBoxQueryBuildersParam(String parameterName) {
+		SearchIndexScope<?> scope = commonState.scope();
+		for ( String fieldPath : fieldPaths ) {
+			SpatialWithinBoundingBoxPredicateBuilder predicateBuilder =
+					scope.fieldQueryElement( fieldPath, PredicateTypeKeys.SPATIAL_WITHIN_BOUNDING_BOX );
+			predicateBuilder.param( parameterName );
+			predicateBuilders.add( predicateBuilder );
+		}
+	}
+
 	static class CommonState
 			extends AbstractBooleanMultiFieldPredicateCommonState<CommonState, SpatialWithinPredicateFieldMoreStepImpl>
 			implements SpatialWithinPredicateOptionsStep<CommonState> {
@@ -149,6 +203,30 @@ class SpatialWithinPredicateFieldMoreStepImpl
 		SpatialWithinPredicateOptionsStep<?> boundingBox(GeoBoundingBox boundingBox) {
 			for ( SpatialWithinPredicateFieldMoreStepImpl fieldSetState : getFieldSetStates() ) {
 				fieldSetState.generateWithinBoundingBoxQueryBuilders( boundingBox );
+			}
+
+			return this;
+		}
+
+		public SpatialWithinPredicateOptionsStep<?> polygonParam(String parameterName) {
+			for ( SpatialWithinPredicateFieldMoreStepImpl fieldSetState : getFieldSetStates() ) {
+				fieldSetState.generateWithinPolygonQueryBuildersParam( parameterName );
+			}
+			return this;
+		}
+
+		public SpatialWithinPredicateOptionsStep<?> boundingBoxParam(String parameterName) {
+			for ( SpatialWithinPredicateFieldMoreStepImpl fieldSetState : getFieldSetStates() ) {
+				fieldSetState.generateWithinBoundingBoxQueryBuildersParam( parameterName );
+			}
+			return this;
+		}
+
+		public SpatialWithinPredicateOptionsStep<?> circleParam(String centerParameterName, String radiusParameterName,
+				String unitParameterName) {
+			for ( SpatialWithinPredicateFieldMoreStepImpl fieldSetState : getFieldSetStates() ) {
+				fieldSetState.generateWithinCircleQueryBuildersParam( centerParameterName, radiusParameterName,
+						unitParameterName );
 			}
 
 			return this;

@@ -12,6 +12,8 @@ public interface PhrasePredicateBuilder extends SearchPredicateBuilder {
 
 	void phrase(String phrase);
 
+	void param(String parameterName);
+
 	void analyzer(String analyzerName);
 
 	void skipAnalysis();

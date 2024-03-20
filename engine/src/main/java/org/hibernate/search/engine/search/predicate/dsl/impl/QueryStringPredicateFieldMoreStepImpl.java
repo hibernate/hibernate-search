@@ -55,6 +55,10 @@ class QueryStringPredicateFieldMoreStepImpl
 		return commonState.matching( queryString );
 	}
 
+	@Override
+	public QueryStringPredicateOptionsStep<?> matchingParam(String parameterName) {
+		return commonState.matchingParam( parameterName );
+	}
 
 	static class CommonState
 			extends

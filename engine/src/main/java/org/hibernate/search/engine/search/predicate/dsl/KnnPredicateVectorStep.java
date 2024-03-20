@@ -6,6 +6,8 @@
  */
 package org.hibernate.search.engine.search.predicate.dsl;
 
+import org.hibernate.search.util.common.annotation.Incubating;
+
 /**
  * The step in a "knn" predicate definition where the vector to match is defined.
  */
@@ -21,5 +23,12 @@ public interface KnnPredicateVectorStep {
 	 * @return The next step in the knn predicate DSL.
 	 */
 	KnnPredicateOptionsStep matching(float... vector);
+
+	/**
+	 * @param parameterName The name of a query parameter representing the vector from which to compute the distance to vectors in the indexed field.
+	 * @return The next step in the knn predicate DSL.
+	 */
+	@Incubating
+	KnnPredicateOptionsStep matchingParam(String parameterName);
 
 }

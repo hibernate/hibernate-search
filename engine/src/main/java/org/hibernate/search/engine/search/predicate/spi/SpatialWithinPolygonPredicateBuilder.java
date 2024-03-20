@@ -12,4 +12,5 @@ public interface SpatialWithinPolygonPredicateBuilder extends SearchPredicateBui
 
 	void polygon(GeoPolygon polygon);
 
+	void param(String parameterName);
 }

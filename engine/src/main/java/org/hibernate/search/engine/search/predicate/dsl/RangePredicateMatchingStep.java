@@ -7,6 +7,7 @@
 package org.hibernate.search.engine.search.predicate.dsl;
 
 import org.hibernate.search.engine.search.common.ValueConvert;
+import org.hibernate.search.util.common.annotation.Incubating;
 import org.hibernate.search.util.common.data.Range;
 import org.hibernate.search.util.common.data.RangeBoundInclusion;
 
@@ -47,7 +48,7 @@ public interface RangePredicateMatchingStep<N extends RangePredicateOptionsStep<
 	 * The signature of this method defines this parameter as an {@link Object},
 	 * but a specific type is expected depending on the targeted field and on the {@code convert} parameter.
 	 * See {@link ValueConvert} for more information.
-	 * @param convert Controls how {@code lowerBoundValue} should be converted
+	 * @param convert Controls how {@code lowerBoundValue}/{@code upperBoundValue} should be converted
 	 * before Hibernate Search attempts to interpret it as a field value.
 	 * See {@link ValueConvert} for more information.
 	 * @return The next step.
@@ -227,5 +228,225 @@ public interface RangePredicateMatchingStep<N extends RangePredicateOptionsStep<
 	 * @return The next step.
 	 */
 	N range(Range<?> range, ValueConvert convert);
+
+	/**
+	 * Require at least one of the targeted fields to be in the range
+	 * defined by the bounds that will be passed to a query via a query parameter.
+	 *
+	 * @param lowerBoundParameterName The name of a query parameter representing the lower bound of the range.
+	 * {@code null} means {@code -Infinity} (no lower bound).
+	 * @param upperBoundParameterName The name of a query parameter representing the upper bound of the range.
+	 * {@code null} means {@code +Infinity} (no upper bound).
+	 * @return The next step.
+	 */
+	@Incubating
+	default N betweenParam(String lowerBoundParameterName, String upperBoundParameterName) {
+		return betweenParam( lowerBoundParameterName, upperBoundParameterName, ValueConvert.YES );
+	}
+
+	/**
+	 * Require at least one of the targeted fields to be in the range
+	 * defined by the bounds that will be passed to a query via a query parameter.
+	 *
+	 * @param lowerBoundParameterName The name of a query parameter representing the lower bound of the range.
+	 * {@code null} means {@code -Infinity} (no lower bound).
+	 * @param upperBoundParameterName The name of a query parameter representing the upper bound of the range.
+	 * {@code null} means {@code +Infinity} (no upper bound).
+	 * @param convert Controls how the parameter {@code value} should be converted
+	 * before Hibernate Search attempts to interpret it as a field value.
+	 * See {@link ValueConvert} for more information.
+	 * @return The next step.
+	 */
+	@Incubating
+	default N betweenParam(String lowerBoundParameterName, String upperBoundParameterName, ValueConvert convert) {
+		return parameterizedRange( Range.between( lowerBoundParameterName, upperBoundParameterName ), convert );
+	}
+
+	/**
+	 * Require at least one of the targeted fields to be in the range
+	 * defined by the bounds that will be passed to a query via a query parameter.
+	 *
+	 * @param lowerBoundParameterName The name of a query parameter representing the lower bound of the range.
+	 * {@code null} means {@code -Infinity} (no lower bound).
+	 * @param lowerBoundInclusion Whether the lower bound is included in the range or excluded.
+	 * @param upperBoundParameterName The name of a query parameter representing the upper bound of the range.
+	 * {@code null} means {@code +Infinity} (no upper bound).
+	 * @param upperBoundInclusion Whether the upper bound is included in the range or excluded.
+	 * @return The next step.
+	 */
+	@Incubating
+	default N betweenParam(String lowerBoundParameterName, RangeBoundInclusion lowerBoundInclusion,
+			String upperBoundParameterName, RangeBoundInclusion upperBoundInclusion) {
+		return parameterizedRange(
+				Range.between( lowerBoundParameterName, lowerBoundInclusion, upperBoundParameterName, upperBoundInclusion ) );
+	}
+
+	/**
+	 * Require at least one of the targeted fields to be "greater than or equal to" the value that will be passed to a query via a query parameter,
+	 * with no limit as to how high it can be.
+	 *
+	 * @param lowerBoundValueParameterName The name of a query parameter representing the lower bound of the range.
+	 * @return The next step.
+	 */
+	@Incubating
+	default N atLeastParam(String lowerBoundValueParameterName) {
+		return atLeastParam( lowerBoundValueParameterName, ValueConvert.YES );
+	}
+
+	/**
+	 * Require at least one of the targeted fields to be "greater than or equal to" the value that will be passed to a query via a query parameter,
+	 * with no limit as to how high it can be.
+	 *
+	 * @param lowerBoundValueParameterName The name of a query parameter representing the lower bound of the range.
+	 * @param convert Controls how the parameter {@code value} should be converted
+	 * before Hibernate Search attempts to interpret it as a field value.
+	 * See {@link ValueConvert} for more information.
+	 * @return The next step.
+	 */
+	@Incubating
+	default N atLeastParam(String lowerBoundValueParameterName, ValueConvert convert) {
+		return parameterizedRange( Range.atLeast( lowerBoundValueParameterName ), convert );
+	}
+
+	/**
+	 * Require at least one of the targeted fields to be "strictly greater than" the value that will be passed to a query via a query parameter,
+	 * with no limit as to how high it can be.
+	 *
+	 * @param lowerBoundValueParameterName The name of a query parameter representing the lower bound of the range.
+	 * @return The next step.
+	 */
+	@Incubating
+	default N greaterThanParam(String lowerBoundValueParameterName) {
+		return greaterThanParam( lowerBoundValueParameterName, ValueConvert.YES );
+	}
+
+	/**
+	 * Require at least one of the targeted fields to be "strictly greater than" the value that will be passed to a query via a query parameter,
+	 * with no limit as to how high it can be.
+	 *
+	 * @param lowerBoundValueParameterName The name of a query parameter representing the lower bound of the range.
+	 * @param convert Controls how the parameter {@code value} should be converted
+	 * before Hibernate Search attempts to interpret it as a field value.
+	 * See {@link ValueConvert} for more information.
+	 * @return The next step.
+	 */
+	@Incubating
+	default N greaterThanParam(String lowerBoundValueParameterName, ValueConvert convert) {
+		return parameterizedRange( Range.greaterThan( lowerBoundValueParameterName ), convert );
+	}
+
+	/**
+	 * Require at least one of the targeted fields to be "lesser than or equal to" the value that will be passed to a query via a query parameter,
+	 * with no limit as to how low it can be.
+	 *
+	 * @param upperBoundValueParameterName The name of a query parameter representing the upper bound of the range.
+	 * @return The next step.
+	 */
+	@Incubating
+	default N atMostParam(String upperBoundValueParameterName) {
+		return atMostParam( upperBoundValueParameterName, ValueConvert.YES );
+	}
+
+	/**
+	 * Require at least one of the targeted fields to be "lesser than or equal to" the value that will be passed to a query via a query parameter,
+	 * with no limit as to how low it can be.
+	 *
+	 * @param upperBoundValueParameterName The name of a query parameter representing the upper bound of the range.
+	 * @param convert Controls how the parameter {@code value} should be converted
+	 * before Hibernate Search attempts to interpret it as a field value.
+	 * See {@link ValueConvert} for more information.
+	 * @return The next step.
+	 */
+	@Incubating
+	default N atMostParam(String upperBoundValueParameterName, ValueConvert convert) {
+		return parameterizedRange( Range.atMost( upperBoundValueParameterName ), convert );
+	}
+
+	/**
+	 * Require at least one of the targeted fields to be "lesser than" the value that will be passed to a query via a query parameter,
+	 * with no limit as to how low it can be.
+	 *
+	 * @param upperBoundValueParameterName The name of a query parameter representing the upper bound of the range.
+	 * @return The next step.
+	 */
+	@Incubating
+	default N lessThanParam(String upperBoundValueParameterName) {
+		return lessThanParam( upperBoundValueParameterName, ValueConvert.YES );
+	}
+
+	/**
+	 * Require at least one of the targeted fields to be "lesser than" the value that will be passed to a query via a query parameter,
+	 * with no limit as to how low it can be.
+	 *
+	 * @param upperBoundValueParameterName The name of a query parameter representing the upper bound of the range.
+	 * @param convert Controls how the parameter {@code value} should be converted
+	 * before Hibernate Search attempts to interpret it as a field value.
+	 * See {@link ValueConvert} for more information.
+	 * @return The next step.
+	 */
+	@Incubating
+	default N lessThanParam(String upperBoundValueParameterName, ValueConvert convert) {
+		return parameterizedRange( Range.lessThan( upperBoundValueParameterName ), convert );
+	}
+
+	/**
+	 * Require at least one of the targeted fields to be in the range that will be passed to a query via a query parameter.
+	 *
+	 * @param parameterName The name of a query parameter representing the range to match.
+	 * @return The next step.
+	 */
+	@Incubating
+	default N rangeParam(String parameterName) {
+		return rangeParam( parameterName, ValueConvert.YES );
+	}
+
+	/**
+	 * Require at least one of the targeted fields to be in the range that will be passed to a query via a query parameter.
+	 *
+	 * @param parameterName The name of a query parameter representing the range to match.
+	 * The signature of this method defines this parameter as a range with bounds of any type,
+	 * but a specific type is expected depending on the targeted field and on the {@code convert} parameter.
+	 * See {@link ValueConvert} for more information.
+	 * @param convert Controls how the range bounds of a parameter value should be converted
+	 * before Hibernate Search attempts to interpret them as a field value.
+	 * See {@link ValueConvert} for more information.
+	 * @return The next step.
+	 */
+	@Incubating
+	N rangeParam(String parameterName, ValueConvert convert);
+
+	/**
+	 * Require at least one of the targeted fields to be in the given parameterized range.
+	 * <p>
+	 * Range upper and lower bound values in this case a names of the query parameters
+	 * that will be mapped:
+	 * {@code range|lowerBoundParamName,upperBoundParamName| -> range|lowerBoundParamValue,upperBoundParamValue| }.
+	 *
+	 * @param range The name of a query parameter representing the parameterized range to match.
+	 * The signature of this method defines this parameter as a range with bounds of any type,
+	 * but a specific type is expected depending on the targeted field.
+	 * See {@link ValueConvert#YES} for more information.
+	 * @return The next step.
+	 */
+	@Incubating
+	default N parameterizedRange(Range<String> range) {
+		return parameterizedRange( range, ValueConvert.YES );
+	}
+
+	/**
+	 * Require at least one of the targeted fields to be in the given parameterized range.
+	 * <p>
+	 * Range upper and lower bound values in this case a names of the query parameters
+	 * that will be mapped:
+	 * {@code range|lowerBoundParamName,upperBoundParamName| -> range|lowerBoundParamValue,upperBoundParamValue| }.
+	 *
+	 * @param range The name of a query parameter representing the parameterized range to match.
+	 * @param convert Controls how the resolved range bounds should be converted
+	 * before Hibernate Search attempts to interpret them as a field value.
+	 * See {@link ValueConvert} for more information.
+	 * @return The next step.
+	 */
+	@Incubating
+	N parameterizedRange(Range<String> range, ValueConvert convert);
 
 }

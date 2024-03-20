@@ -16,6 +16,8 @@ public interface CommonQueryStringPredicateBuilder extends MinimumShouldMatchBui
 
 	void queryString(String queryString);
 
+	void queryStringParam(String parameterName);
+
 	void analyzer(String analyzerName);
 
 	void skipAnalysis();

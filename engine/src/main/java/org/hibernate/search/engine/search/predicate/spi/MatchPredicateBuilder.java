@@ -14,6 +14,8 @@ public interface MatchPredicateBuilder extends SearchPredicateBuilder {
 
 	void value(Object value, ValueConvert convert);
 
+	void param(String parameterName, ValueConvert convert);
+
 	void analyzer(String analyzerName);
 
 	void skipAnalysis();

@@ -13,4 +13,5 @@ public interface SpatialWithinCirclePredicateBuilder extends SearchPredicateBuil
 
 	void circle(GeoPoint center, double radius, DistanceUnit unit);
 
+	void param(String center, String radius, String unit);
 }

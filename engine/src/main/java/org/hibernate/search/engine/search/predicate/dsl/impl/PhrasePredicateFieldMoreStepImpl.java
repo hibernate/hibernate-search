@@ -61,6 +61,11 @@ class PhrasePredicateFieldMoreStepImpl
 	}
 
 	@Override
+	public PhrasePredicateOptionsStep<?> matchingParam(String parameterName) {
+		return commonState.matchingParam( parameterName );
+	}
+
+	@Override
 	public void contributePredicates(Consumer<SearchPredicate> collector) {
 		for ( PhrasePredicateBuilder predicateBuilder : predicateBuilders ) {
 			// Fieldset states won't be accessed anymore, it's time to apply their options
@@ -83,6 +88,16 @@ class PhrasePredicateFieldMoreStepImpl
 			for ( PhrasePredicateFieldMoreStepImpl fieldSetState : getFieldSetStates() ) {
 				for ( PhrasePredicateBuilder predicateBuilder : fieldSetState.predicateBuilders ) {
 					predicateBuilder.phrase( phrase );
+				}
+			}
+			return this;
+		}
+
+		public PhrasePredicateOptionsStep<?> matchingParam(String parameterName) {
+			Contracts.assertNotNullNorEmpty( parameterName, "parameterName" );
+			for ( PhrasePredicateFieldMoreStepImpl fieldSetState : getFieldSetStates() ) {
+				for ( PhrasePredicateBuilder predicateBuilder : fieldSetState.predicateBuilders ) {
+					predicateBuilder.param( parameterName );
 				}
 			}
 			return this;

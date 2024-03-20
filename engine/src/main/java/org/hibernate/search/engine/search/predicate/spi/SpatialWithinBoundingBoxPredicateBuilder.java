@@ -12,4 +12,5 @@ public interface SpatialWithinBoundingBoxPredicateBuilder extends SearchPredicat
 
 	void boundingBox(GeoBoundingBox boundingBox);
 
+	void param(String parameterName);
 }

@@ -16,6 +16,8 @@ public interface KnnPredicateBuilder extends SearchPredicateBuilder {
 
 	void vector(Object vector);
 
+	void vectorParam(String parameterName);
+
 	void filter(SearchPredicate filter);
 
 	void requiredMinimumSimilarity(float similarity);

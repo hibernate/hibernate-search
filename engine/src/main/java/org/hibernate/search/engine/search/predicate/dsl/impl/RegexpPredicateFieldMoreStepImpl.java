@@ -58,6 +58,11 @@ class RegexpPredicateFieldMoreStepImpl
 	}
 
 	@Override
+	public RegexpPredicateOptionsStep<?> matchingParam(String parameterName) {
+		return commonState.matchingParam( parameterName );
+	}
+
+	@Override
 	public void contributePredicates(Consumer<SearchPredicate> collector) {
 		for ( RegexpPredicateBuilder predicateBuilder : predicateBuilders ) {
 			// Perform last-minute changes, since it's the last call that will be made on this field set state
@@ -80,6 +85,16 @@ class RegexpPredicateFieldMoreStepImpl
 			for ( RegexpPredicateFieldMoreStepImpl fieldSetState : getFieldSetStates() ) {
 				for ( RegexpPredicateBuilder predicateBuilder : fieldSetState.predicateBuilders ) {
 					predicateBuilder.pattern( regexpPattern );
+				}
+			}
+			return this;
+		}
+
+		public RegexpPredicateOptionsStep<?> matchingParam(String parameterName) {
+			Contracts.assertNotNullNorEmpty( parameterName, "parameterName" );
+			for ( RegexpPredicateFieldMoreStepImpl fieldSetState : getFieldSetStates() ) {
+				for ( RegexpPredicateBuilder predicateBuilder : fieldSetState.predicateBuilders ) {
+					predicateBuilder.param( parameterName );
 				}
 			}
 			return this;
