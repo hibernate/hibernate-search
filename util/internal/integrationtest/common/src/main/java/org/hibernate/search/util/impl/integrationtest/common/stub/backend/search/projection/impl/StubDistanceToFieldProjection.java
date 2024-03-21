@@ -36,7 +36,17 @@ public abstract class StubDistanceToFieldProjection<T> extends StubSearchProject
 		}
 
 		@Override
+		public void centerParam(String parameterName) {
+			// No-op
+		}
+
+		@Override
 		public void unit(DistanceUnit unit) {
+			// No-op
+		}
+
+		@Override
+		public void unitParam(String parameterName) {
 			// No-op
 		}
 

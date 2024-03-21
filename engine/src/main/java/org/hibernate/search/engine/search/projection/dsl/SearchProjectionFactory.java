@@ -177,6 +177,15 @@ public interface SearchProjectionFactory<R, E> {
 	DistanceToFieldProjectionValueStep<?, Double> distance(String fieldPath, GeoPoint center);
 
 	/**
+	 * Project on the distance from the center, defined in the next step, to a {@link GeoPoint} field.
+	 *
+	 * @param fieldPath The <a href="#field-paths">path</a> to the index field containing the location
+	 * to compute the distance to.
+	 * @return A DSL step where the "distance" projection can be defined in more details.
+	 */
+	DistanceToFieldProjectionFromStep<?, Double> distance(String fieldPath);
+
+	/**
 	 * Starts the definition of an object projection,
 	 * which will yield one value per object in a given object field,
 	 * the value being the result of combining multiple given projections

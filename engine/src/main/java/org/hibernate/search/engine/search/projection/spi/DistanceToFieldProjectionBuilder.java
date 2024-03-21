@@ -14,7 +14,11 @@ public interface DistanceToFieldProjectionBuilder extends SearchProjectionBuilde
 
 	void center(GeoPoint center);
 
+	void centerParam(String parameterName);
+
 	void unit(DistanceUnit unit);
+
+	void unitParam(String parameterName);
 
 	@Override
 	default SearchProjection<Double> build() {
@@ -22,5 +26,4 @@ public interface DistanceToFieldProjectionBuilder extends SearchProjectionBuilde
 	}
 
 	<P> SearchProjection<P> build(ProjectionAccumulator.Provider<Double, P> accumulatorProvider);
-
 }

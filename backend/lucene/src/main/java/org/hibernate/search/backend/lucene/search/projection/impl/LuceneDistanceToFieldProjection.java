@@ -6,6 +6,9 @@
  */
 package org.hibernate.search.backend.lucene.search.projection.impl;
 
+import static org.hibernate.search.engine.search.query.spi.QueryParametersValueProvider.parameter;
+import static org.hibernate.search.engine.search.query.spi.QueryParametersValueProvider.simple;
+
 import java.io.IOException;
 import java.lang.invoke.MethodHandles;
 
@@ -22,6 +25,7 @@ import org.hibernate.search.engine.search.loading.spi.LoadingResult;
 import org.hibernate.search.engine.search.projection.SearchProjection;
 import org.hibernate.search.engine.search.projection.spi.DistanceToFieldProjectionBuilder;
 import org.hibernate.search.engine.search.projection.spi.ProjectionAccumulator;
+import org.hibernate.search.engine.search.query.spi.QueryParametersValueProvider;
 import org.hibernate.search.engine.spatial.DistanceUnit;
 import org.hibernate.search.engine.spatial.GeoPoint;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
@@ -48,12 +52,14 @@ public class LuceneDistanceToFieldProjection<P> extends AbstractLuceneProjection
 
 	private final LuceneFieldCodec<GeoPoint> codec;
 
-	private final GeoPoint center;
-	private final DistanceUnit unit;
-
+	private final QueryParametersValueProvider<GeoPoint> centerProvider;
+	private final QueryParametersValueProvider<DistanceUnit> unitProvider;
 	private final ProjectionAccumulator.Provider<Double, P> accumulatorProvider;
 
 	private final LuceneFieldProjection<Double, Double, P> fieldProjection;
+
+	private GeoPoint center;
+	private DistanceUnit unit;
 
 	private LuceneDistanceToFieldProjection(Builder builder,
 			ProjectionAccumulator.Provider<Double, P> accumulatorProvider) {
@@ -64,8 +70,8 @@ public class LuceneDistanceToFieldProjection<P> extends AbstractLuceneProjection
 				? builder.field.closestMultiValuedParentAbsolutePath()
 				: null;
 		this.codec = builder.codec;
-		this.center = builder.center;
-		this.unit = builder.unit;
+		this.centerProvider = builder.centerProvider;
+		this.unitProvider = builder.unitProvider;
 		this.accumulatorProvider = accumulatorProvider;
 		if ( builder.field.multiValued() ) {
 			// For multi-valued fields, use a field projection, because we need order to be preserved.
@@ -84,13 +90,16 @@ public class LuceneDistanceToFieldProjection<P> extends AbstractLuceneProjection
 	public String toString() {
 		return getClass().getSimpleName() + "["
 				+ "absoluteFieldPath=" + absoluteFieldPath
-				+ ", center=" + center
+				+ ", center=" + centerProvider
 				+ ", accumulatorProvider=" + accumulatorProvider
 				+ "]";
 	}
 
 	@Override
 	public Extractor<?, P> request(ProjectionRequestContext context) {
+		center = centerProvider.provide( context );
+		unit = unitProvider.provide( context );
+
 		if ( fieldProjection != null ) {
 			return fieldProjection.request( context );
 		}
@@ -210,8 +219,8 @@ public class LuceneDistanceToFieldProjection<P> extends AbstractLuceneProjection
 
 		private final LuceneSearchIndexValueFieldContext<GeoPoint> field;
 
-		private GeoPoint center;
-		private DistanceUnit unit = DistanceUnit.METERS;
+		private QueryParametersValueProvider<GeoPoint> centerProvider;
+		private QueryParametersValueProvider<DistanceUnit> unitProvider = simple( DistanceUnit.METERS );
 
 		private Builder(LuceneFieldCodec<GeoPoint> codec, LuceneSearchIndexScope<?> scope,
 				LuceneSearchIndexValueFieldContext<GeoPoint> field) {
@@ -222,12 +231,22 @@ public class LuceneDistanceToFieldProjection<P> extends AbstractLuceneProjection
 
 		@Override
 		public void center(GeoPoint center) {
-			this.center = center;
+			this.centerProvider = simple( center );
+		}
+
+		@Override
+		public void centerParam(String parameterName) {
+			this.centerProvider = parameter( parameterName, GeoPoint.class );
 		}
 
 		@Override
 		public void unit(DistanceUnit unit) {
-			this.unit = unit;
+			this.unitProvider = simple( unit );
+		}
+
+		@Override
+		public void unitParam(String parameterName) {
+			this.unitProvider = parameter( parameterName, DistanceUnit.class );
 		}
 
 		@Override

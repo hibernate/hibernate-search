@@ -13,6 +13,7 @@ import org.hibernate.search.engine.search.common.ValueConvert;
 import org.hibernate.search.engine.search.projection.SearchProjection;
 import org.hibernate.search.engine.search.projection.dsl.CompositeProjectionInnerStep;
 import org.hibernate.search.engine.search.projection.dsl.CompositeProjectionValueStep;
+import org.hibernate.search.engine.search.projection.dsl.DistanceToFieldProjectionFromStep;
 import org.hibernate.search.engine.search.projection.dsl.DistanceToFieldProjectionValueStep;
 import org.hibernate.search.engine.search.projection.dsl.DocumentReferenceProjectionOptionsStep;
 import org.hibernate.search.engine.search.projection.dsl.EntityProjectionOptionsStep;
@@ -100,7 +101,12 @@ public abstract class AbstractSearchProjectionFactory<
 	@Override
 	public DistanceToFieldProjectionValueStep<?, Double> distance(String fieldPath, GeoPoint center) {
 		Contracts.assertNotNull( center, "center" );
-		return new DistanceToFieldProjectionValueStepImpl( dslContext, fieldPath, center );
+		return new DistanceToFieldProjectionValueStepImpl( dslContext, fieldPath ).from( center );
+	}
+
+	@Override
+	public DistanceToFieldProjectionFromStep<?, Double> distance(String fieldPath) {
+		return new DistanceToFieldProjectionValueStepImpl( dslContext, fieldPath );
 	}
 
 	@Override

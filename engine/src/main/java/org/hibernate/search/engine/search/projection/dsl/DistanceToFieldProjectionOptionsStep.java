@@ -25,4 +25,12 @@ public interface DistanceToFieldProjectionOptionsStep<S extends DistanceToFieldP
 	 */
 	S unit(DistanceUnit unit);
 
+	/**
+	 * Defines query parameter representing the unit of the computed distance (default is meters).
+	 *
+	 * @param parameterName The name of a query parameter representing the unit.
+	 * @return {@code this}, for method chaining.
+	 */
+	S unitParam(String parameterName);
+
 }

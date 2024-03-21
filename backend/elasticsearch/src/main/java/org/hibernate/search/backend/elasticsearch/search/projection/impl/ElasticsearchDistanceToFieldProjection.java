@@ -6,6 +6,9 @@
  */
 package org.hibernate.search.backend.elasticsearch.search.projection.impl;
 
+import static org.hibernate.search.engine.search.query.spi.QueryParametersValueProvider.parameter;
+import static org.hibernate.search.engine.search.query.spi.QueryParametersValueProvider.simple;
+
 import java.util.Optional;
 import java.util.regex.Pattern;
 
@@ -23,6 +26,7 @@ import org.hibernate.search.engine.search.loading.spi.ProjectionHitMapper;
 import org.hibernate.search.engine.search.projection.SearchProjection;
 import org.hibernate.search.engine.search.projection.spi.DistanceToFieldProjectionBuilder;
 import org.hibernate.search.engine.search.projection.spi.ProjectionAccumulator;
+import org.hibernate.search.engine.search.query.spi.QueryParametersValueProvider;
 import org.hibernate.search.engine.spatial.DistanceUnit;
 import org.hibernate.search.engine.spatial.GeoPoint;
 
@@ -61,13 +65,17 @@ public class ElasticsearchDistanceToFieldProjection<A, P> extends AbstractElasti
 	private final String absoluteFieldPath;
 	private final boolean singleValuedInRoot;
 
-	private final GeoPoint center;
-	private final DistanceUnit unit;
+	private final QueryParametersValueProvider<GeoPoint> centerProvider;
+	private final QueryParametersValueProvider<DistanceUnit> unitProvider;
 
 	private final ProjectionAccumulator<Double, Double, A, P> accumulator;
 
-	private final String scriptFieldName;
 	private final ElasticsearchFieldProjection<?, Double, P> sourceProjection;
+
+	// Defined at request time:
+	private String scriptFieldName;
+	private GeoPoint center;
+	private DistanceUnit unit;
 
 	private ElasticsearchDistanceToFieldProjection(Builder builder,
 			ProjectionAccumulator.Provider<Double, P> accumulatorProvider,
@@ -75,17 +83,15 @@ public class ElasticsearchDistanceToFieldProjection<A, P> extends AbstractElasti
 		super( builder );
 		this.absoluteFieldPath = builder.field.absolutePath();
 		this.singleValuedInRoot = !builder.field.multiValuedInRoot();
-		this.center = builder.center;
-		this.unit = builder.unit;
+		this.centerProvider = builder.centerProvider;
+		this.unitProvider = builder.unitProvider;
 		this.accumulator = accumulator;
 		if ( singleValuedInRoot && builder.field.nestedPathHierarchy().isEmpty() ) {
 			// Rely on docValues when there is no sort to extract the distance from.
-			scriptFieldName = createScriptFieldName( absoluteFieldPath, center );
 			sourceProjection = null;
 		}
 		else {
 			// Rely on _source when there is no sort to extract the distance from.
-			scriptFieldName = null;
 			this.sourceProjection = new ElasticsearchFieldProjection<>(
 					builder.scope, builder.field,
 					this::computeDistanceWithUnit, false, NO_OP_DOUBLE_CONVERTER, accumulatorProvider
@@ -106,21 +112,24 @@ public class ElasticsearchDistanceToFieldProjection<A, P> extends AbstractElasti
 	@Override
 	public Extractor<?, P> request(JsonObject requestBody, ProjectionRequestContext context) {
 		context.checkValidField( absoluteFieldPath );
+		center = centerProvider.provide( context );
+		unit = unitProvider.provide( context );
 		if ( singleValuedInRoot && context.root().getDistanceSortIndex( absoluteFieldPath, center ) != null ) {
 			// Nothing to do, we'll rely on the sort key
 			return this;
 		}
-		else if ( scriptFieldName != null ) {
+		else if ( sourceProjection != null ) {
+			// we rely on the _source to compute the distance
+			return sourceProjection.request( requestBody, context );
+		}
+		else {
+			scriptFieldName = createScriptFieldName( absoluteFieldPath, center );
 			// we rely on a script to compute the distance
 			SCRIPT_FIELDS_ACCESSOR
 					.property( scriptFieldName ).asObject()
 					.property( "script" ).asObject()
 					.set( requestBody, createScript( absoluteFieldPath, center ) );
 			return this;
-		}
-		else {
-			// we rely on the _source to compute the distance
-			return sourceProjection.request( requestBody, context );
 		}
 	}
 
@@ -236,8 +245,8 @@ public class ElasticsearchDistanceToFieldProjection<A, P> extends AbstractElasti
 
 		private final ElasticsearchSearchIndexValueFieldContext<GeoPoint> field;
 
-		private GeoPoint center;
-		private DistanceUnit unit = DistanceUnit.METERS;
+		private QueryParametersValueProvider<GeoPoint> centerProvider;
+		private QueryParametersValueProvider<DistanceUnit> unitProvider = simple( DistanceUnit.METERS );
 
 		private Builder(ElasticsearchSearchIndexScope<?> scope, ElasticsearchSearchIndexValueFieldContext<GeoPoint> field) {
 			super( scope );
@@ -246,12 +255,22 @@ public class ElasticsearchDistanceToFieldProjection<A, P> extends AbstractElasti
 
 		@Override
 		public void center(GeoPoint center) {
-			this.center = center;
+			this.centerProvider = simple( center );
+		}
+
+		@Override
+		public void centerParam(String parameterName) {
+			this.centerProvider = parameter( parameterName, GeoPoint.class );
 		}
 
 		@Override
 		public void unit(DistanceUnit unit) {
-			this.unit = unit;
+			this.unitProvider = simple( unit );
+		}
+
+		@Override
+		public void unitParam(String parameterName) {
+			this.unitProvider = parameter( parameterName, DistanceUnit.class );
 		}
 
 		@Override

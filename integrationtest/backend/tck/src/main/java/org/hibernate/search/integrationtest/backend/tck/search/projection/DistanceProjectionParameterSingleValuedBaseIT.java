@@ -15,25 +15,25 @@ import org.hibernate.search.engine.search.query.dsl.SearchQueryOptionsStep;
 import org.hibernate.search.engine.spatial.DistanceUnit;
 import org.hibernate.search.engine.spatial.GeoPoint;
 
-class DistanceProjectionSingleValuedBaseIT extends AbstractDistanceProjectionSingleValuedBaseIT {
+class DistanceProjectionParameterSingleValuedBaseIT extends AbstractDistanceProjectionSingleValuedBaseIT {
 
 
 	@Override
 	protected void addParameter(SearchQueryOptionsStep<?, ?, ?, ?, ?> query, String parameterName, Object value) {
-		// do nothing
+		query.param( parameterName, value );
 	}
 
 	@Override
 	protected DistanceToFieldProjectionValueStep<?, Double> distance(
 			SearchProjectionFactory<EntityReference, DocumentReference> projection, String path, GeoPoint center,
 			String parameterName) {
-		return projection.distance( path, center );
+		return projection.distance( path ).fromParam( parameterName );
 	}
 
 	@Override
 	protected DistanceToFieldProjectionOptionsStep<?, Double> distance(
 			SearchProjectionFactory<EntityReference, DocumentReference> projection, String path, GeoPoint center,
 			DistanceUnit unit, String centerParam, String unitParam) {
-		return projection.distance( path, center ).unit( unit );
+		return projection.distance( path ).fromParam( centerParam ).unitParam( unitParam );
 	}
 }

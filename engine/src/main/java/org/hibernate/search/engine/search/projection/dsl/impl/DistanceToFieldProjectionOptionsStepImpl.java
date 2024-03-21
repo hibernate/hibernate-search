@@ -34,6 +34,14 @@ public class DistanceToFieldProjectionOptionsStepImpl<P>
 	}
 
 	@Override
+	public DistanceToFieldProjectionOptionsStepImpl<P> unitParam(String parameterName) {
+		Contracts.assertNotNullNorEmpty( parameterName, "parameterName" );
+
+		distanceFieldProjectionBuilder.unitParam( parameterName );
+		return this;
+	}
+
+	@Override
 	public SearchProjection<P> toProjection() {
 		return distanceFieldProjectionBuilder.build( accumulatorProvider );
 	}
