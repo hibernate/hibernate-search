@@ -45,14 +45,13 @@ abstract class LuceneCommonQueryStringPredicate extends AbstractLuceneNestablePr
 
 	private final List<String> nestedPathHierarchy;
 	private final List<String> fieldPaths;
-
-	private final Query query;
+	private final Builder builder;
 
 	protected LuceneCommonQueryStringPredicate(Builder builder) {
 		super( builder );
 		nestedPathHierarchy = builder.firstFieldState.field().nestedPathHierarchy();
 		fieldPaths = new ArrayList<>( builder.fieldStates.keySet() );
-		query = builder.buildQuery();
+		this.builder = builder;
 	}
 
 	static void checkFieldsAreAcceptable(String queryName,
@@ -85,7 +84,7 @@ abstract class LuceneCommonQueryStringPredicate extends AbstractLuceneNestablePr
 
 	@Override
 	protected Query doToQuery(PredicateRequestContext context) {
-		return query;
+		return builder.buildQuery( context );
 	}
 
 	@Override
@@ -224,7 +223,7 @@ abstract class LuceneCommonQueryStringPredicate extends AbstractLuceneNestablePr
 			return query;
 		}
 
-		protected abstract Query buildQuery();
+		protected abstract Query buildQuery(PredicateRequestContext context);
 
 		protected abstract SearchQueryElementTypeKey<LuceneCommonQueryStringPredicateBuilderFieldState> typeKey();
 

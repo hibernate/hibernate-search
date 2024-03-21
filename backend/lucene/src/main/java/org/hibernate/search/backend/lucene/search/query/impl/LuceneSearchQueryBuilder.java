@@ -43,6 +43,7 @@ import org.hibernate.search.engine.search.highlighter.SearchHighlighter;
 import org.hibernate.search.engine.search.loading.spi.SearchLoadingContext;
 import org.hibernate.search.engine.search.loading.spi.SearchLoadingContextBuilder;
 import org.hibernate.search.engine.search.predicate.SearchPredicate;
+import org.hibernate.search.engine.search.query.spi.QueryParameters;
 import org.hibernate.search.engine.search.query.spi.SearchQueryBuilder;
 import org.hibernate.search.engine.search.sort.SearchSort;
 import org.hibernate.search.engine.search.timeout.spi.TimeoutManager;
@@ -78,6 +79,7 @@ public class LuceneSearchQueryBuilder<H> implements SearchQueryBuilder<H>, Lucen
 	private Long totalHitCountThreshold;
 	private LuceneAbstractSearchHighlighter globalHighlighter;
 	private final Map<String, LuceneAbstractSearchHighlighter> namedHighlighters = new HashMap<>();
+	private final QueryParameters parameters = new QueryParameters();
 
 	public LuceneSearchQueryBuilder(
 			LuceneWorkFactory workFactory,
@@ -178,6 +180,11 @@ public class LuceneSearchQueryBuilder<H> implements SearchQueryBuilder<H>, Lucen
 	}
 
 	@Override
+	public void param(String parameterName, Object value) {
+		parameters.add( parameterName, value );
+	}
+
+	@Override
 	public void collectSortField(SortField sortField) {
 		if ( sortFields == null ) {
 			sortFields = new ArrayList<>( 5 );
@@ -199,13 +206,14 @@ public class LuceneSearchQueryBuilder<H> implements SearchQueryBuilder<H>, Lucen
 
 	@Override
 	public PredicateRequestContext toPredicateRequestContext(String absoluteNestedPath) {
-		return PredicateRequestContext.withSession( scope, sessionContext, routingKeys ).withNestedPath( absoluteNestedPath );
+		return PredicateRequestContext.withSession( scope, sessionContext, routingKeys, parameters )
+				.withNestedPath( absoluteNestedPath );
 	}
 
 	@Override
 	public LuceneSearchQuery<H> build() {
 		Query luceneQuery = lucenePredicate.toQuery(
-				PredicateRequestContext.withSession( scope, sessionContext, routingKeys ) );
+				PredicateRequestContext.withSession( scope, sessionContext, routingKeys, parameters ) );
 
 		SearchLoadingContext<?> loadingContext = loadingContextBuilder.build();
 
@@ -233,7 +241,7 @@ public class LuceneSearchQueryBuilder<H> implements SearchQueryBuilder<H>, Lucen
 		}
 
 		LuceneSearchQueryRequestContext requestContext = new LuceneSearchQueryRequestContext(
-				scope, sessionContext, loadingContext, definitiveLuceneQuery, luceneSort, routingKeys
+				scope, sessionContext, loadingContext, definitiveLuceneQuery, luceneSort, routingKeys, parameters
 		);
 
 		LuceneAbstractSearchHighlighter resolvedGlobalHighlighter =
@@ -260,7 +268,8 @@ public class LuceneSearchQueryBuilder<H> implements SearchQueryBuilder<H>, Lucen
 		ProjectionRequestContext projectionRequestContext = new ProjectionRequestContext(
 				extractionRequirementsBuilder,
 				resolvedGlobalHighlighter,
-				resolvedNamedHighlighters
+				resolvedNamedHighlighters,
+				parameters
 		);
 		LuceneSearchProjection.Extractor<?, H> rootExtractor =
 				rootProjection.request( projectionRequestContext );

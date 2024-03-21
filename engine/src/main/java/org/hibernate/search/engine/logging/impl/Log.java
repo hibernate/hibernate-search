@@ -587,4 +587,15 @@ public interface Log extends BasicLogger {
 			value = "Cannot use %1$s.%2$s as a converter."
 					+ " Use one of the allowed values %3$s instead.")
 	SearchException parseConverterNotAllowed(String enumName, ValueConvert parse, List<ValueConvert> allowed);
+
+	@Message(id = ID_OFFSET + 124,
+			value = "Query parameter '%1$s' value is not set."
+					+ " Use `.param(..)` methods on the query to set any parameters that the query requires'.")
+	SearchException cannotFindQueryParameter(String parameter);
+
+	@Message(id = ID_OFFSET + 125,
+			value = "Expecting query parameter '%1$s' value to be of %2$s type,"
+					+ " but instead got value of %3$s type.")
+	SearchException unexpectedQueryParameterType(String name, @FormatWith(ClassFormatter.class) Class<?> expected,
+			@FormatWith(ClassFormatter.class) Class<?> actual);
 }

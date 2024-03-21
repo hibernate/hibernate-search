@@ -12,6 +12,7 @@ import java.util.Arrays;
 import org.hibernate.search.backend.elasticsearch.logging.impl.Log;
 import org.hibernate.search.engine.backend.common.spi.FieldPaths;
 import org.hibernate.search.engine.reporting.spi.EventContexts;
+import org.hibernate.search.engine.search.common.NamedValues;
 import org.hibernate.search.engine.search.common.spi.SearchQueryElementTypeKey;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
@@ -81,4 +82,10 @@ public class FieldProjectionRequestContext implements ProjectionRequestContext {
 	public String[] relativeCurrentFieldPathComponents() {
 		return relativeCurrentFieldPathComponents;
 	}
+
+	@Override
+	public NamedValues queryParameters() {
+		return root().queryParameters();
+	}
+
 }

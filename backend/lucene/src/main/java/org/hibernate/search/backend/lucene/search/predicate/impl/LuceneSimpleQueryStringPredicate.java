@@ -50,7 +50,7 @@ public class LuceneSimpleQueryStringPredicate extends LuceneCommonQueryStringPre
 		}
 
 		@Override
-		protected Query buildQuery() {
+		protected Query buildQuery(PredicateRequestContext context) {
 			SimpleQueryParser queryParser =
 					new HibernateSearchSimpleQueryParser( buildAnalyzer(), buildWeights(), fieldStateLookup(), flags, scope );
 			queryParser.setDefaultOperator( toOccur( defaultOperator ) );

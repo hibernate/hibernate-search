@@ -15,6 +15,7 @@ import org.hibernate.search.backend.lucene.search.common.impl.AbstractLuceneCode
 import org.hibernate.search.backend.lucene.search.common.impl.LuceneSearchIndexScope;
 import org.hibernate.search.backend.lucene.search.common.impl.LuceneSearchIndexValueFieldContext;
 import org.hibernate.search.backend.lucene.search.predicate.impl.AbstractLuceneLeafSingleFieldPredicate;
+import org.hibernate.search.backend.lucene.search.predicate.impl.PredicateRequestContext;
 import org.hibernate.search.backend.lucene.types.codec.impl.LuceneStandardFieldCodec;
 import org.hibernate.search.engine.search.common.ValueConvert;
 import org.hibernate.search.engine.search.predicate.SearchPredicate;
@@ -81,7 +82,7 @@ public class LuceneTextTermsPredicate extends AbstractLuceneLeafSingleFieldPredi
 		}
 
 		@Override
-		protected Query buildQuery() {
+		protected Query buildQuery(PredicateRequestContext context) {
 			if ( term != null ) {
 				return new TermQuery( new Term( absoluteFieldPath, term ) );
 			}

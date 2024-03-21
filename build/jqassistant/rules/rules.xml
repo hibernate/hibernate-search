@@ -333,6 +333,7 @@
         <requiresConcept refId="hsearch:MethodOverrides" />
         <requiresConcept refId="hsearch:HibernateSearch" />
         <requiresConcept refId="hsearch:Public" />
+        <requiresConcept refId="hsearch:SuppressJQAssistant" />
         <description>
             API or SPI methods must not start with "get" or "set".
             Exceptions are allowed when:
@@ -360,6 +361,7 @@
                 AND NOT type.name ENDS WITH "ConfigurationPropertySource"
                 AND NOT type.name ENDS WITH "ScrollableResultsAdapter"
                 AND NOT type.name ENDS WITH "_$bundle"
+                AND NOT type:SuppressJQAssistant
             RETURN
                 type, method
         ]]></cypher>

@@ -6,6 +6,7 @@
  */
 package org.hibernate.search.backend.elasticsearch.search.projection.impl;
 
+import org.hibernate.search.engine.search.common.NamedValues;
 import org.hibernate.search.engine.search.common.spi.SearchQueryElementTypeKey;
 
 public interface ProjectionRequestContext {
@@ -21,5 +22,7 @@ public interface ProjectionRequestContext {
 	String absoluteCurrentFieldPath();
 
 	String[] relativeCurrentFieldPathComponents();
+
+	NamedValues queryParameters();
 
 }
