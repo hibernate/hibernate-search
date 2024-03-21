@@ -42,6 +42,7 @@ import org.hibernate.search.engine.search.highlighter.SearchHighlighter;
 import org.hibernate.search.engine.search.loading.spi.SearchLoadingContext;
 import org.hibernate.search.engine.search.loading.spi.SearchLoadingContextBuilder;
 import org.hibernate.search.engine.search.predicate.SearchPredicate;
+import org.hibernate.search.engine.search.query.spi.QueryParameters;
 import org.hibernate.search.engine.search.query.spi.SearchQueryBuilder;
 import org.hibernate.search.engine.search.sort.SearchSort;
 import org.hibernate.search.engine.search.timeout.spi.TimeoutManager;
@@ -85,6 +86,7 @@ public class ElasticsearchSearchQueryBuilder<H>
 	private Long totalHitCountThreshold;
 	private ElasticsearchSearchHighlighter queryHighlighter;
 	private final Map<String, ElasticsearchSearchHighlighter> namedHighlighters = new HashMap<>();
+	private final QueryParameters parameters = new QueryParameters();
 	private ElasticsearchSearchRequestTransformer requestTransformer;
 
 	public ElasticsearchSearchQueryBuilder(
@@ -104,7 +106,7 @@ public class ElasticsearchSearchQueryBuilder<H>
 		this.sessionContext = sessionContext;
 		this.routingKeys = new HashSet<>();
 
-		this.rootPredicateContext = new PredicateRequestContext( sessionContext, scope, routingKeys );
+		this.rootPredicateContext = new PredicateRequestContext( sessionContext, scope, routingKeys, parameters );
 		this.loadingContextBuilder = loadingContextBuilder;
 		this.rootProjection = rootProjection;
 		this.scrollTimeout = scrollTimeout;
@@ -194,6 +196,11 @@ public class ElasticsearchSearchQueryBuilder<H>
 	}
 
 	@Override
+	public void param(String parameterName, Object value) {
+		parameters.add( parameterName, value );
+	}
+
+	@Override
 	public PredicateRequestContext getRootPredicateContext() {
 		return rootPredicateContext;
 	}
@@ -231,7 +238,7 @@ public class ElasticsearchSearchQueryBuilder<H>
 
 		ElasticsearchSearchQueryRequestContext requestContext = new ElasticsearchSearchQueryRequestContext(
 				scope, sessionContext, loadingContext, rootPredicateContext, distanceSorts,
-				namedHighlighters, queryHighlighter
+				namedHighlighters, queryHighlighter, parameters
 		);
 
 		JsonArray filters = rootPredicateContext.tenantAndRoutingFilters();

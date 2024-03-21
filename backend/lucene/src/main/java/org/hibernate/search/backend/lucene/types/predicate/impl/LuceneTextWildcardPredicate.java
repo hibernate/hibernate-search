@@ -10,6 +10,7 @@ import org.hibernate.search.backend.lucene.search.common.impl.AbstractLuceneValu
 import org.hibernate.search.backend.lucene.search.common.impl.LuceneSearchIndexScope;
 import org.hibernate.search.backend.lucene.search.common.impl.LuceneSearchIndexValueFieldContext;
 import org.hibernate.search.backend.lucene.search.predicate.impl.AbstractLuceneLeafSingleFieldPredicate;
+import org.hibernate.search.backend.lucene.search.predicate.impl.PredicateRequestContext;
 import org.hibernate.search.backend.lucene.types.predicate.parse.impl.LuceneWildcardExpressionHelper;
 import org.hibernate.search.engine.search.predicate.SearchPredicate;
 import org.hibernate.search.engine.search.predicate.spi.WildcardPredicateBuilder;
@@ -56,7 +57,7 @@ public class LuceneTextWildcardPredicate extends AbstractLuceneLeafSingleFieldPr
 		}
 
 		@Override
-		protected Query buildQuery() {
+		protected Query buildQuery(PredicateRequestContext context) {
 			BytesRef analyzedWildcard =
 					LuceneWildcardExpressionHelper.analyzeWildcard( analyzerOrNormalizer, absoluteFieldPath, pattern );
 			return new WildcardQuery( new Term( absoluteFieldPath, analyzedWildcard ) );

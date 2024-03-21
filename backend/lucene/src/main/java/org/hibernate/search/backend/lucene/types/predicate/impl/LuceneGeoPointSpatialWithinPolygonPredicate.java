@@ -12,6 +12,7 @@ import org.hibernate.search.backend.lucene.search.common.impl.AbstractLuceneValu
 import org.hibernate.search.backend.lucene.search.common.impl.LuceneSearchIndexScope;
 import org.hibernate.search.backend.lucene.search.common.impl.LuceneSearchIndexValueFieldContext;
 import org.hibernate.search.backend.lucene.search.predicate.impl.AbstractLuceneLeafSingleFieldPredicate;
+import org.hibernate.search.backend.lucene.search.predicate.impl.PredicateRequestContext;
 import org.hibernate.search.engine.search.predicate.SearchPredicate;
 import org.hibernate.search.engine.search.predicate.spi.SpatialWithinPolygonPredicateBuilder;
 import org.hibernate.search.engine.spatial.GeoPoint;
@@ -53,7 +54,7 @@ public class LuceneGeoPointSpatialWithinPolygonPredicate extends AbstractLuceneL
 		}
 
 		@Override
-		protected Query buildQuery() {
+		protected Query buildQuery(PredicateRequestContext context) {
 			List<GeoPoint> points = polygon.points();
 
 			double[] polyLats = new double[points.size()];

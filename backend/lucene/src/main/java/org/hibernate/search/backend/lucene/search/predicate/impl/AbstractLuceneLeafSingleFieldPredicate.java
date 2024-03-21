@@ -24,16 +24,16 @@ public abstract class AbstractLuceneLeafSingleFieldPredicate extends AbstractLuc
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
-	private final Query query;
+	private final AbstractBuilder<?> builder;
 
 	protected AbstractLuceneLeafSingleFieldPredicate(AbstractBuilder<?> builder) {
 		super( builder );
-		query = builder.buildQuery();
+		this.builder = builder;
 	}
 
 	@Override
 	protected final Query doToQuery(PredicateRequestContext context) {
-		return query;
+		return builder.buildQuery( context );
 	}
 
 	public abstract static class AbstractBuilder<F>
@@ -45,7 +45,7 @@ public abstract class AbstractLuceneLeafSingleFieldPredicate extends AbstractLuc
 			this.field = field;
 		}
 
-		protected abstract Query buildQuery();
+		protected abstract Query buildQuery(PredicateRequestContext context);
 
 		protected <E> E convertAndEncode(LuceneStandardFieldCodec<F, E> codec, Object value, ValueConvert convert) {
 			DslConverter<?, ? extends F> toFieldValueConverter = field.type().dslConverter( convert );
