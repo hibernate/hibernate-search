@@ -6,16 +6,22 @@
  */
 package org.hibernate.search.backend.lucene.types.sort.impl;
 
+import static org.hibernate.search.engine.search.query.spi.QueryParametersValueProvider.parameter;
+import static org.hibernate.search.engine.search.query.spi.QueryParametersValueProvider.simple;
+
 import java.lang.invoke.MethodHandles;
+import java.util.function.Function;
 
 import org.hibernate.search.backend.lucene.logging.impl.Log;
 import org.hibernate.search.backend.lucene.lowlevel.docvalues.impl.MultiValueMode;
 import org.hibernate.search.backend.lucene.search.common.impl.AbstractLuceneValueFieldSearchQueryElementFactory;
 import org.hibernate.search.backend.lucene.search.common.impl.LuceneSearchIndexScope;
 import org.hibernate.search.backend.lucene.search.common.impl.LuceneSearchIndexValueFieldContext;
+import org.hibernate.search.backend.lucene.search.sort.impl.LuceneSearchSortCollector;
 import org.hibernate.search.backend.lucene.types.sort.comparatorsource.impl.LuceneFieldComparatorSource;
 import org.hibernate.search.backend.lucene.types.sort.comparatorsource.impl.LuceneGeoPointDistanceComparatorSource;
 import org.hibernate.search.engine.search.common.SortMode;
+import org.hibernate.search.engine.search.query.spi.QueryParametersValueProvider;
 import org.hibernate.search.engine.search.sort.SearchSort;
 import org.hibernate.search.engine.search.sort.dsl.SortOrder;
 import org.hibernate.search.engine.search.sort.spi.DistanceSortBuilder;
@@ -29,20 +35,23 @@ import org.apache.lucene.util.SloppyMath;
 public class LuceneGeoPointDistanceSort extends AbstractLuceneDocumentValueSort {
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
-	private final double effectiveMissingValue;
-	private final GeoPoint center;
+	private final Function<GeoPoint, Double> effectiveMissingValue;
+	private final QueryParametersValueProvider<GeoPoint> centerProvider;
 
 	private LuceneGeoPointDistanceSort(Builder builder) {
 		super( builder );
 		effectiveMissingValue = builder.getEffectiveMissingValue();
-		center = builder.center;
+		centerProvider = builder.centerProvider;
 	}
 
 	@Override
 	protected LuceneFieldComparatorSource doCreateFieldComparatorSource(String nestedDocumentPath,
-			MultiValueMode multiValueMode, Query nestedFilter) {
-		return new LuceneGeoPointDistanceComparatorSource( nestedDocumentPath, center, effectiveMissingValue, multiValueMode,
-				nestedFilter );
+			MultiValueMode multiValueMode, Query nestedFilter, LuceneSearchSortCollector collector) {
+
+		GeoPoint center = centerProvider.provide( collector.toPredicateRequestContext( nestedDocumentPath ) );
+
+		return new LuceneGeoPointDistanceComparatorSource( nestedDocumentPath, center, effectiveMissingValue.apply( center ),
+				multiValueMode, nestedFilter );
 	}
 
 	public static class Factory
@@ -55,7 +64,7 @@ public class LuceneGeoPointDistanceSort extends AbstractLuceneDocumentValueSort 
 	}
 
 	private static class Builder extends AbstractBuilder implements DistanceSortBuilder {
-		private GeoPoint center;
+		private QueryParametersValueProvider<GeoPoint> centerProvider;
 		private Object missingValue;
 
 		private Builder(LuceneSearchIndexScope<?> scope, LuceneSearchIndexValueFieldContext<GeoPoint> field) {
@@ -64,7 +73,12 @@ public class LuceneGeoPointDistanceSort extends AbstractLuceneDocumentValueSort 
 
 		@Override
 		public void center(GeoPoint center) {
-			this.center = center;
+			this.centerProvider = simple( center );
+		}
+
+		@Override
+		public void param(String parameterName) {
+			this.centerProvider = parameter( parameterName, GeoPoint.class );
 		}
 
 		@Override
@@ -112,32 +126,32 @@ public class LuceneGeoPointDistanceSort extends AbstractLuceneDocumentValueSort 
 			return new LuceneGeoPointDistanceSort( this );
 		}
 
-		private double getEffectiveMissingValue() {
+		private Function<GeoPoint, Double> getEffectiveMissingValue() {
 			if ( missingValue == null ) {
 				// missing value implicit distance (same as ES):
-				return Double.POSITIVE_INFINITY;
+				return gp -> Double.POSITIVE_INFINITY;
 			}
 
 			if ( missingValue == SortMissingValue.MISSING_FIRST ) {
-				return ( order == SortOrder.DESC ) ? Double.POSITIVE_INFINITY : Double.NEGATIVE_INFINITY;
+				return ( order == SortOrder.DESC ) ? gp -> Double.POSITIVE_INFINITY : gp -> Double.NEGATIVE_INFINITY;
 			}
 
 			if ( missingValue == SortMissingValue.MISSING_LAST ) {
-				return ( order == SortOrder.DESC ) ? Double.NEGATIVE_INFINITY : Double.POSITIVE_INFINITY;
+				return ( order == SortOrder.DESC ) ? gp -> Double.NEGATIVE_INFINITY : gp -> Double.POSITIVE_INFINITY;
 			}
 
 			if ( missingValue == SortMissingValue.MISSING_LOWEST ) {
-				return Double.NEGATIVE_INFINITY;
+				return gp -> Double.NEGATIVE_INFINITY;
 			}
 
 			if ( missingValue == SortMissingValue.MISSING_HIGHEST ) {
-				return Double.POSITIVE_INFINITY;
+				return gp -> Double.POSITIVE_INFINITY;
 			}
 
 			if ( missingValue instanceof GeoPoint ) {
 				GeoPoint geoPointMissingValue = (GeoPoint) missingValue;
 
-				return SloppyMath.haversinMeters(
+				return center -> SloppyMath.haversinMeters(
 						geoPointMissingValue.latitude(), geoPointMissingValue.longitude(),
 						center.latitude(), center.longitude()
 				);

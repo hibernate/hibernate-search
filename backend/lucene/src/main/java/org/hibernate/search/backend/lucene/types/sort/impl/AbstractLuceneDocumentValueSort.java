@@ -54,11 +54,11 @@ public abstract class AbstractLuceneDocumentValueSort extends AbstractLuceneReve
 
 	private LuceneFieldComparatorSource createFieldComparatorSource(LuceneSearchSortCollector collector) {
 		Query nestedFilter = getNestedFilter( collector );
-		return doCreateFieldComparatorSource( nestedDocumentPath, multiValueMode, nestedFilter );
+		return doCreateFieldComparatorSource( nestedDocumentPath, multiValueMode, nestedFilter, collector );
 	}
 
 	protected abstract LuceneFieldComparatorSource doCreateFieldComparatorSource(String nestedDocumentPath,
-			MultiValueMode multiValueMode, Query nestedFilter);
+			MultiValueMode multiValueMode, Query nestedFilter, LuceneSearchSortCollector collector);
 
 	private Query getNestedFilter(SortRequestContext context) {
 		return nestedFilter == null

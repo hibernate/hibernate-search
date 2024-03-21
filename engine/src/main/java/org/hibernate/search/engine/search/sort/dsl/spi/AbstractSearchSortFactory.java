@@ -12,6 +12,7 @@ import org.hibernate.search.engine.common.dsl.spi.DslExtensionState;
 import org.hibernate.search.engine.search.predicate.dsl.SearchPredicateFactory;
 import org.hibernate.search.engine.search.sort.SearchSort;
 import org.hibernate.search.engine.search.sort.dsl.CompositeSortComponentsStep;
+import org.hibernate.search.engine.search.sort.dsl.DistanceSortFromStep;
 import org.hibernate.search.engine.search.sort.dsl.DistanceSortOptionsStep;
 import org.hibernate.search.engine.search.sort.dsl.ExtendedSearchSortFactory;
 import org.hibernate.search.engine.search.sort.dsl.FieldSortOptionsStep;
@@ -56,9 +57,12 @@ public abstract class AbstractSearchSortFactory<
 
 	@Override
 	public DistanceSortOptionsStep<?, PDF> distance(String fieldPath, GeoPoint location) {
-		return new DistanceSortOptionsStepImpl<>(
-				dslContext, fieldPath, location
-		);
+		return new DistanceSortOptionsStepImpl<>( dslContext, fieldPath ).from( location );
+	}
+
+	@Override
+	public DistanceSortFromStep<?, PDF> distance(String fieldPath) {
+		return new DistanceSortOptionsStepImpl<>( dslContext, fieldPath );
 	}
 
 	@Override

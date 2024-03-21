@@ -27,6 +27,8 @@ import org.hibernate.search.engine.search.projection.dsl.DistanceToFieldProjecti
 import org.hibernate.search.engine.search.projection.dsl.DistanceToFieldProjectionValueStep;
 import org.hibernate.search.engine.search.projection.dsl.SearchProjectionFactory;
 import org.hibernate.search.engine.search.query.dsl.SearchQueryOptionsStep;
+import org.hibernate.search.engine.search.sort.dsl.DistanceSortOptionsStep;
+import org.hibernate.search.engine.search.sort.dsl.SearchSortFactory;
 import org.hibernate.search.engine.spatial.DistanceUnit;
 import org.hibernate.search.engine.spatial.GeoPoint;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.model.singlefield.SingleFieldIndexBinding;
@@ -253,7 +255,8 @@ abstract class AbstractDistanceProjectionMultiValuedBaseIT {
 
 		assertThatQuery( query
 				// TODO: SORT!!!!!!!!!!!
-				.sort( f -> f.distance( fieldPath, AscendingUniqueDistanceFromCenterValues.CENTER_POINT ) )
+				.sort( sort( scope.sort(), fieldPath, AscendingUniqueDistanceFromCenterValues.CENTER_POINT, "center-param" )
+						.toSort() )
 				.routing( dataSet.routingKey )
 				.toQuery() )
 				.hits().asIs()
@@ -391,6 +394,9 @@ abstract class AbstractDistanceProjectionMultiValuedBaseIT {
 	protected abstract DistanceToFieldProjectionOptionsStep<?, List<Double>> distance(
 			SearchProjectionFactory<EntityReference, DocumentReference> projection, String path, GeoPoint center,
 			DistanceUnit unit, String centerParam, String unitParam);
+
+	protected abstract DistanceSortOptionsStep<?, ?> sort(SearchSortFactory sort, String path, GeoPoint center,
+			String parameterName);
 
 	private static class DataSet {
 		private final TestedFieldStructure fieldStructure;

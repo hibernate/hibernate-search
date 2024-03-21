@@ -85,6 +85,11 @@ public class StubSearchSort implements SearchSort {
 		}
 
 		@Override
+		public void param(String parameterName) {
+			// No-op
+		}
+
+		@Override
 		public void order(SortOrder order) {
 			// No-op
 		}

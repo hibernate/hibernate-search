@@ -81,6 +81,18 @@ public interface SearchSortFactory {
 	 *
 	 * @param fieldPath The <a href="#field-paths">path</a> to the index field
 	 * containing the location to compute the distance from.
+	 * @return A DSL step where the "distance" sort can be defined in more details.
+	 * @throws SearchException If the field type does not constitute a valid location.
+	 */
+	DistanceSortFromStep<?, ? extends SearchPredicateFactory> distance(String fieldPath);
+
+	/**
+	 * Order elements by the distance from the location stored in the specified field to the location specified.
+	 * <p>
+	 * The default order is <strong>ascending</strong>.
+	 *
+	 * @param fieldPath The <a href="#field-paths">path</a> to the index field
+	 * containing the location to compute the distance from.
 	 * @param latitude The latitude of the location to which we want to compute the distance.
 	 * @param longitude The longitude of the location to which we want to compute the distance.
 	 * @return A DSL step where the "distance" sort can be defined in more details.

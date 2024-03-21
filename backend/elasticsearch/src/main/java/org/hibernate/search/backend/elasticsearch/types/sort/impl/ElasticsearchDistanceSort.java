@@ -6,6 +6,9 @@
  */
 package org.hibernate.search.backend.elasticsearch.types.sort.impl;
 
+import static org.hibernate.search.engine.search.query.spi.QueryParametersValueProvider.parameter;
+import static org.hibernate.search.engine.search.query.spi.QueryParametersValueProvider.simple;
+
 import java.lang.invoke.MethodHandles;
 
 import org.hibernate.search.backend.elasticsearch.gson.impl.JsonAccessor;
@@ -17,6 +20,7 @@ import org.hibernate.search.backend.elasticsearch.search.common.impl.Elasticsear
 import org.hibernate.search.backend.elasticsearch.search.sort.impl.ElasticsearchSearchSortCollector;
 import org.hibernate.search.backend.elasticsearch.types.codec.impl.ElasticsearchGeoPointFieldCodec;
 import org.hibernate.search.engine.search.common.SortMode;
+import org.hibernate.search.engine.search.query.spi.QueryParametersValueProvider;
 import org.hibernate.search.engine.search.sort.SearchSort;
 import org.hibernate.search.engine.search.sort.dsl.SortOrder;
 import org.hibernate.search.engine.search.sort.spi.DistanceSortBuilder;
@@ -31,15 +35,17 @@ public class ElasticsearchDistanceSort extends AbstractElasticsearchDocumentValu
 
 	private static final JsonObjectAccessor GEO_DISTANCE_ACCESSOR = JsonAccessor.root().property( "_geo_distance" ).asObject();
 
-	private final GeoPoint center;
+	private final QueryParametersValueProvider<GeoPoint> centerProvider;
 
 	private ElasticsearchDistanceSort(Builder builder) {
 		super( builder );
-		center = builder.center;
+		centerProvider = builder.centerProvider;
 	}
 
 	@Override
 	protected void doToJsonSorts(ElasticsearchSearchSortCollector collector, JsonObject innerObject) {
+		GeoPoint center = centerProvider.provide( collector.getRootPredicateContext() );
+
 		innerObject.add( absoluteFieldPath, ElasticsearchGeoPointFieldCodec.INSTANCE.encode( center ) );
 		// If there are multiple target indexes, or if the field is dynamic,
 		// some target indexes may not have this field in their mapping (yet),
@@ -62,7 +68,7 @@ public class ElasticsearchDistanceSort extends AbstractElasticsearchDocumentValu
 	}
 
 	private static class Builder extends AbstractBuilder<GeoPoint> implements DistanceSortBuilder {
-		private GeoPoint center;
+		private QueryParametersValueProvider<GeoPoint> centerProvider;
 
 		private boolean missingFirst = false;
 		private boolean missingLast = false;
@@ -73,7 +79,12 @@ public class ElasticsearchDistanceSort extends AbstractElasticsearchDocumentValu
 
 		@Override
 		public void center(GeoPoint center) {
-			this.center = center;
+			this.centerProvider = simple( center );
+		}
+
+		@Override
+		public void param(String parameterName) {
+			this.centerProvider = parameter( parameterName, GeoPoint.class );
 		}
 
 		@Override

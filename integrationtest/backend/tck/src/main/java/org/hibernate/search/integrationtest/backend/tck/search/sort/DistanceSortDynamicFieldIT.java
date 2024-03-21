@@ -87,17 +87,75 @@ class DistanceSortDynamicFieldIT {
 				.hasDocRefHitsExactOrder( mainIndex.typeName(), DOCUMENT_3, DOCUMENT_2, DOCUMENT_1 );
 	}
 
-	private SearchQuery<DocumentReference> matchNonEmptyQuery(
-			Function<? super SearchSortFactory, ? extends SortFinalStep> sortContributor) {
-		return matchNonEmptyQuery( sortContributor, mainIndex.createScope() );
+	@Test
+	void simpleParameter() {
+		String fieldPath = mainFieldPath();
+
+		assertThatQuery( matchNonEmptyQuery( f -> f.distance( fieldPath ).from( CENTER_POINT ).asc() ) )
+				.hasDocRefHitsExactOrder( mainIndex.typeName(), DOCUMENT_1, DOCUMENT_2, DOCUMENT_3 );
+		assertThatQuery( matchNonEmptyQuery( f -> f.distance( fieldPath ).from( CENTER_POINT ).desc() ) )
+				.hasDocRefHitsExactOrder( mainIndex.typeName(), DOCUMENT_3, DOCUMENT_2, DOCUMENT_1 );
+
+		assertThatQuery( matchNonEmptyQuery(
+				f -> f.distance( fieldPath ).fromParam( "param" ).asc(), "param", CENTER_POINT ) )
+				.hasDocRefHitsExactOrder( mainIndex.typeName(), DOCUMENT_1, DOCUMENT_2, DOCUMENT_3 );
+		assertThatQuery( matchNonEmptyQuery( f -> f.distance( fieldPath ).fromParam( "param" ).desc(), "param", CENTER_POINT ) )
+				.hasDocRefHitsExactOrder( mainIndex.typeName(), DOCUMENT_3, DOCUMENT_2, DOCUMENT_1 );
+	}
+
+	@Test
+	@TestForIssue(jiraKey = "HSEARCH-4531")
+	void neverPopulatedParameter() {
+		String neverPopulatedFieldPath = neverPopulatedFieldPath();
+		String mainFieldPath = mainFieldPath();
+
+		// The field that wasn't populated shouldn't have any effect on the sort,
+		// but it shouldn't trigger an exception, either (see HSEARCH-4531).
+		assertThatQuery( matchNonEmptyQuery( f -> f.composite()
+				.add( f.distance( neverPopulatedFieldPath ).from( CENTER_POINT ).asc() )
+				.add( f.distance( mainFieldPath ).from( CENTER_POINT ).asc() ) ) )
+				.hasDocRefHitsExactOrder( mainIndex.typeName(), DOCUMENT_1, DOCUMENT_2, DOCUMENT_3 );
+		assertThatQuery( matchNonEmptyQuery( f -> f.composite()
+				.add( f.distance( neverPopulatedFieldPath ).from( CENTER_POINT ).desc() )
+				.add( f.distance( mainFieldPath ).from( CENTER_POINT ).desc() ) ) )
+				.hasDocRefHitsExactOrder( mainIndex.typeName(), DOCUMENT_3, DOCUMENT_2, DOCUMENT_1 );
+
+		assertThatQuery( matchNonEmptyQuery( f -> f.composite()
+				.add( f.distance( neverPopulatedFieldPath ).fromParam( "param" ).asc() )
+				.add( f.distance( mainFieldPath ).fromParam( "param" ).asc() ), "param", CENTER_POINT ) )
+				.hasDocRefHitsExactOrder( mainIndex.typeName(), DOCUMENT_1, DOCUMENT_2, DOCUMENT_3 );
+		assertThatQuery( matchNonEmptyQuery( f -> f.composite()
+				.add( f.distance( neverPopulatedFieldPath ).fromParam( "param" ).desc() )
+				.add( f.distance( mainFieldPath ).fromParam( "param" ).desc() ), "param", CENTER_POINT ) )
+				.hasDocRefHitsExactOrder( mainIndex.typeName(), DOCUMENT_3, DOCUMENT_2, DOCUMENT_1 );
 	}
 
 	private SearchQuery<DocumentReference> matchNonEmptyQuery(
-			Function<? super SearchSortFactory, ? extends SortFinalStep> sortContributor, StubMappingScope scope) {
-		return scope.query()
-				.where( f -> f.matchAll().except( f.id().matching( EMPTY ) ) )
-				.sort( sortContributor )
-				.toQuery();
+			Function<? super SearchSortFactory, ? extends SortFinalStep> sortContributor) {
+		return matchNonEmptyQuery( sortContributor, mainIndex.createScope(), null, null );
+	}
+
+	private SearchQuery<DocumentReference> matchNonEmptyQuery(
+			Function<? super SearchSortFactory, ? extends SortFinalStep> sortContributor, String parameter, Object value) {
+		return matchNonEmptyQuery( sortContributor, mainIndex.createScope(), parameter, value );
+	}
+
+	private SearchQuery<DocumentReference> matchNonEmptyQuery(
+			Function<? super SearchSortFactory, ? extends SortFinalStep> sortContributor, StubMappingScope scope,
+			String parameter, Object value) {
+		if ( parameter == null ) {
+			return scope.query()
+					.where( f -> f.matchAll().except( f.id().matching( EMPTY ) ) )
+					.sort( sortContributor )
+					.toQuery();
+		}
+		else {
+			return scope.query()
+					.where( f -> f.matchAll().except( f.id().matching( EMPTY ) ) )
+					.sort( sortContributor )
+					.param( parameter, value )
+					.toQuery();
+		}
 	}
 
 	private static String mainFieldPath() {

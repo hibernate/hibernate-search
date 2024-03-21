@@ -14,6 +14,7 @@ import org.hibernate.search.backend.lucene.lowlevel.docvalues.impl.MultiValueMod
 import org.hibernate.search.backend.lucene.search.common.impl.AbstractLuceneCodecAwareSearchQueryElementFactory;
 import org.hibernate.search.backend.lucene.search.common.impl.LuceneSearchIndexScope;
 import org.hibernate.search.backend.lucene.search.common.impl.LuceneSearchIndexValueFieldContext;
+import org.hibernate.search.backend.lucene.search.sort.impl.LuceneSearchSortCollector;
 import org.hibernate.search.backend.lucene.types.codec.impl.AbstractLuceneNumericFieldCodec;
 import org.hibernate.search.backend.lucene.types.codec.impl.LuceneStandardFieldCodec;
 import org.hibernate.search.backend.lucene.types.lowlevel.impl.LuceneNumericDomain;
@@ -174,7 +175,7 @@ public abstract class LuceneStandardFieldSort extends AbstractLuceneDocumentValu
 
 		@Override
 		protected LuceneFieldComparatorSource doCreateFieldComparatorSource(String nestedDocumentPath,
-				MultiValueMode multiValueMode, Query nestedFilter) {
+				MultiValueMode multiValueMode, Query nestedFilter, LuceneSearchSortCollector collector) {
 			return new LuceneNumericFieldComparatorSource<>(
 					nestedDocumentPath, domain, effectiveMissingValue, multiValueMode, nestedFilter );
 		}
@@ -243,7 +244,7 @@ public abstract class LuceneStandardFieldSort extends AbstractLuceneDocumentValu
 
 		@Override
 		protected LuceneFieldComparatorSource doCreateFieldComparatorSource(String nestedDocumentPath,
-				MultiValueMode multiValueMode, Query nestedFilter) {
+				MultiValueMode multiValueMode, Query nestedFilter, LuceneSearchSortCollector collector) {
 			return new LuceneTextFieldComparatorSource( nestedDocumentPath, effectiveMissingValue, multiValueMode,
 					nestedFilter );
 		}
