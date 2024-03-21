@@ -108,6 +108,11 @@ public class StubSearchAggregation<A> implements SearchAggregation<A> {
 		}
 
 		@Override
+		public void param(String parameterName) {
+			// No-op
+		}
+
+		@Override
 		public void filter(SearchPredicate filter) {
 			// No-op
 		}

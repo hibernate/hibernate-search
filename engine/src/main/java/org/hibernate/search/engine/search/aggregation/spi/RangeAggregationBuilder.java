@@ -15,10 +15,13 @@ import org.hibernate.search.util.common.data.Range;
 public interface RangeAggregationBuilder<K> extends SearchAggregationBuilder<Map<Range<K>, Long>> {
 
 	interface TypeSelector {
+
 		<K> RangeAggregationBuilder<K> type(Class<K> expectedType, ValueConvert convert);
 	}
 
 	void filter(SearchPredicate filter);
 
 	void range(Range<? extends K> range);
+
+	void param(String parameterName);
 }

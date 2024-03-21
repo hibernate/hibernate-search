@@ -37,7 +37,7 @@ public interface RangeAggregationRangeStep<
 	}
 
 	/**
-	 * Add a bucket for given range.
+	 * Add a bucket for the given range.
 	 *
 	 * @param range The range to add.
 	 * @return The next step.
@@ -56,4 +56,23 @@ public interface RangeAggregationRangeStep<
 	 */
 	N ranges(Collection<? extends Range<? extends F>> ranges);
 
+	/**
+	 * Add a bucket for a range that will be passed to a query via a query parameter.
+	 *
+	 * @param parameterName The name of a query parameter representing the range to add.
+	 * @return The next step.
+	 *
+	 * @see Range
+	 */
+	N rangeParam(String parameterName);
+
+	/**
+	 * Add one bucket for each of ranges that will be passed to a query via query parameters.
+	 *
+	 * @param parameters The names of query parameters representing the ranges to add.
+	 * @return The next step.
+	 *
+	 * @see Range
+	 */
+	N rangesParams(Collection<String> parameters);
 }

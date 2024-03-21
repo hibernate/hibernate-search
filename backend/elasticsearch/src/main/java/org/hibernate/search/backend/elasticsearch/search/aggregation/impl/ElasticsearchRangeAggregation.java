@@ -6,6 +6,9 @@
  */
 package org.hibernate.search.backend.elasticsearch.search.aggregation.impl;
 
+import static org.hibernate.search.engine.search.query.spi.QueryParametersValueProvider.parameter;
+import static org.hibernate.search.engine.search.query.spi.QueryParametersValueProvider.simple;
+
 import java.lang.invoke.MethodHandles;
 import java.util.ArrayList;
 import java.util.List;
@@ -21,6 +24,8 @@ import org.hibernate.search.backend.elasticsearch.types.codec.impl.Elasticsearch
 import org.hibernate.search.engine.backend.types.converter.spi.DslConverter;
 import org.hibernate.search.engine.search.aggregation.spi.RangeAggregationBuilder;
 import org.hibernate.search.engine.search.common.ValueConvert;
+import org.hibernate.search.engine.search.query.spi.QueryParametersContext;
+import org.hibernate.search.engine.search.query.spi.QueryParametersValueProvider;
 import org.hibernate.search.util.common.data.Range;
 import org.hibernate.search.util.common.data.RangeBoundInclusion;
 import org.hibernate.search.util.common.impl.CollectionHelper;
@@ -42,22 +47,36 @@ public class ElasticsearchRangeAggregation<F, K>
 
 	private final String absoluteFieldPath;
 
-	private final List<Range<K>> rangesInOrder;
-	private final JsonArray rangesJson;
+	private final List<QueryParametersValueProvider<Range<K>>> rangeProvidersInOrder;
+	private final List<QueryParametersValueProvider<JsonObject>> rangeJsonProvidersInOrder;
+	private List<Range<K>> rangesInOrder;
+	private JsonArray rangesJson;
 
 	private ElasticsearchRangeAggregation(Builder<F, K> builder) {
 		super( builder );
 		this.absoluteFieldPath = builder.field.absolutePath();
-		this.rangesInOrder = builder.rangesInOrder;
-		this.rangesJson = builder.rangesJson;
+		this.rangeProvidersInOrder = builder.rangeProvidersInOrder;
+		this.rangeJsonProvidersInOrder = builder.rangeJsonProvidersInOrder;
 	}
 
 	@Override
-	protected void doRequest(JsonObject outerObject, JsonObject innerObject) {
+	protected void doRequest(AggregationRequestContext context, JsonObject outerObject, JsonObject innerObject) {
+		produceValuesFromProviders( context.getRootPredicateContext().toQueryParametersContext() );
 		outerObject.add( "range", innerObject );
 		innerObject.addProperty( "field", absoluteFieldPath );
 		innerObject.addProperty( "keyed", true );
 		innerObject.add( "ranges", rangesJson );
+	}
+
+	private void produceValuesFromProviders(QueryParametersContext parametersContext) {
+		this.rangesInOrder = new ArrayList<>();
+		for ( QueryParametersValueProvider<Range<K>> provider : rangeProvidersInOrder ) {
+			rangesInOrder.add( provider.provide( parametersContext ) );
+		}
+		this.rangesJson = new JsonArray();
+		for ( QueryParametersValueProvider<JsonObject> provider : rangeJsonProvidersInOrder ) {
+			rangesJson.add( provider.provide( parametersContext ) );
+		}
 	}
 
 	@Override
@@ -111,8 +130,8 @@ public class ElasticsearchRangeAggregation<F, K>
 		private final ElasticsearchFieldCodec<F> codec;
 		private final DslConverter<? super K, F> toFieldValueConverter;
 
-		private final List<Range<K>> rangesInOrder = new ArrayList<>();
-		private final JsonArray rangesJson = new JsonArray();
+		private final List<QueryParametersValueProvider<Range<K>>> rangeProvidersInOrder = new ArrayList<>();
+		private final List<QueryParametersValueProvider<JsonObject>> rangeJsonProvidersInOrder = new ArrayList<>();
 
 		private Builder(ElasticsearchFieldCodec<F> codec, ElasticsearchSearchIndexScope<?> scope,
 				ElasticsearchSearchIndexValueFieldContext<F> field, DslConverter<? super K, F> toFieldValueConverter) {
@@ -123,26 +142,24 @@ public class ElasticsearchRangeAggregation<F, K>
 
 		@Override
 		public void range(Range<? extends K> range) {
-			JsonObject rangeJson = new JsonObject();
-			Optional<? extends K> lowerBoundValue = range.lowerBoundValue();
-			if ( lowerBoundValue.isPresent() ) {
-				if ( !RangeBoundInclusion.INCLUDED.equals( range.lowerBoundInclusion() ) ) {
-					throw log.elasticsearchRangeAggregationRequiresCanonicalFormForRanges( range );
-				}
-				rangeJson.add( "from", convertToFieldValue( lowerBoundValue.get() ) );
-			}
-			Optional<? extends K> upperBoundValue = range.upperBoundValue();
-			if ( upperBoundValue.isPresent() ) {
-				if ( !RangeBoundInclusion.EXCLUDED.equals( range.upperBoundInclusion() ) ) {
-					throw log.elasticsearchRangeAggregationRequiresCanonicalFormForRanges( range );
-				}
-				rangeJson.add( "to", convertToFieldValue( upperBoundValue.get() ) );
-			}
-			// We need to request a keyed response,
-			// because ranges are not always returned in the order they are submitted
-			rangeJson.addProperty( "key", String.valueOf( rangesJson.size() ) );
-			rangesInOrder.add( range.map( Function.identity() ) );
-			rangesJson.add( rangeJson );
+			Range<K> mappedRange = range.map( Function.identity() );
+			rangeProvidersInOrder.add( simple( mappedRange ) );
+
+			int position = rangeJsonProvidersInOrder.size();
+			JsonObject jsonObject = rangeJson( codec, field, scope, toFieldValueConverter, mappedRange, position );
+			rangeJsonProvidersInOrder.add( simple( jsonObject ) );
+		}
+
+		@Override
+		@SuppressWarnings("unchecked")
+		public void param(String parameterName) {
+			rangeProvidersInOrder.add( parameter( parameterName, Range.class, r -> r ) );
+
+			int position = rangeJsonProvidersInOrder.size();
+			QueryParametersValueProvider<JsonObject> provider = parameter( parameterName, Range.class,
+					r -> rangeJson( codec, field, scope, toFieldValueConverter, (Range<K>) r, position )
+			);
+			rangeJsonProvidersInOrder.add( provider );
 		}
 
 		@Override
@@ -150,7 +167,34 @@ public class ElasticsearchRangeAggregation<F, K>
 			return new ElasticsearchRangeAggregation<>( this );
 		}
 
-		private JsonElement convertToFieldValue(K value) {
+		private static <F, T> JsonObject rangeJson(ElasticsearchFieldCodec<F> codec,
+				ElasticsearchSearchIndexValueFieldContext<?> field, ElasticsearchSearchIndexScope<?> scope,
+				DslConverter<? super T, F> toFieldValueConverter, Range<? extends T> range, int position) {
+			JsonObject rangeJson = new JsonObject();
+			Optional<? extends T> lowerBoundValue = range.lowerBoundValue();
+			if ( lowerBoundValue.isPresent() ) {
+				if ( !RangeBoundInclusion.INCLUDED.equals( range.lowerBoundInclusion() ) ) {
+					throw log.elasticsearchRangeAggregationRequiresCanonicalFormForRanges( range );
+				}
+				rangeJson.add( "from",
+						convertToFieldValue( codec, field, scope, toFieldValueConverter, lowerBoundValue.get() ) );
+			}
+			Optional<? extends T> upperBoundValue = range.upperBoundValue();
+			if ( upperBoundValue.isPresent() ) {
+				if ( !RangeBoundInclusion.EXCLUDED.equals( range.upperBoundInclusion() ) ) {
+					throw log.elasticsearchRangeAggregationRequiresCanonicalFormForRanges( range );
+				}
+				rangeJson.add( "to", convertToFieldValue( codec, field, scope, toFieldValueConverter, upperBoundValue.get() ) );
+			}
+			// We need to request a keyed response,
+			// because ranges are not always returned in the order they are submitted
+			rangeJson.addProperty( "key", String.valueOf( position ) );
+			return rangeJson;
+		}
+
+		private static <F, K> JsonElement convertToFieldValue(ElasticsearchFieldCodec<F> codec,
+				ElasticsearchSearchIndexValueFieldContext<?> field, ElasticsearchSearchIndexScope<?> scope,
+				DslConverter<? super K, F> toFieldValueConverter, K value) {
 			try {
 				F converted = toFieldValueConverter.toDocumentValue( value, scope.toDocumentValueConvertContext() );
 				return codec.encodeForAggregation( scope.searchSyntax(), converted );

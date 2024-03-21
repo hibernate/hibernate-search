@@ -509,6 +509,54 @@ class RangeAggregationSpecificsIT<F> {
 				);
 	}
 
+	@ParameterizedTest(name = "{0}")
+	@MethodSource("params")
+	void rangeOverlap_parmeters(FieldTypeDescriptor<F, ?> fieldType, DataSet<F> dataSet) {
+		String fieldPath = index.binding().fieldModels.get( fieldType ).relativeFieldName;
+
+		AggregationKey<Map<Range<F>, Long>> aggregationKey = AggregationKey.of( AGGREGATION_NAME );
+
+		var aggregation = index.createScope().aggregation().range().field(
+				fieldPath, fieldType.getJavaType() )
+				.rangeParam( "range1" )
+				.rangeParam( "range2" )
+				.rangeParam( "range3" )
+				.rangeParam( "range4" )
+				.rangeParam( "range5" )
+				.rangeParam( "range6" )
+				.rangeParam( "range7" ).toAggregation();
+
+		assertThatQuery(
+				matchAllQuery()
+						.aggregation( aggregationKey, aggregation )
+						.param( "range1", Range.canonical( dataSet.ascendingValues.get( 0 ), null ) )
+						.param( "range2", Range.canonical( null, dataSet.ascendingValues.get( 2 ) ) )
+						.param( "range3",
+								Range.canonical( dataSet.ascendingValues.get( 2 ), dataSet.ascendingValues.get( 5 ) ) )
+						.param( "range4", Range.canonical( null, null ) )
+						.param( "range5",
+								Range.canonical( dataSet.ascendingValues.get( 0 ), dataSet.ascendingValues.get( 7 ) ) )
+						.param( "range6", Range.canonical( dataSet.ascendingValues.get( 5 ), null ) )
+						.param( "range7", Range.canonical( null, dataSet.ascendingValues.get( 6 ) ) )
+						.routing( dataSet.name )
+						.toQuery()
+		)
+				.aggregation(
+						aggregationKey,
+						containsExactly( c -> {
+							c.accept( Range.canonical( dataSet.ascendingValues.get( 0 ), null ), 7L );
+							c.accept( Range.canonical( null, dataSet.ascendingValues.get( 2 ) ), 2L );
+							c.accept( Range.canonical( dataSet.ascendingValues.get( 2 ), dataSet.ascendingValues.get( 5 ) ),
+									3L );
+							c.accept( Range.canonical( null, null ), 7L );
+							c.accept( Range.canonical( dataSet.ascendingValues.get( 0 ), dataSet.ascendingValues.get( 7 ) ),
+									7L );
+							c.accept( Range.canonical( dataSet.ascendingValues.get( 5 ), null ), 2L );
+							c.accept( Range.canonical( null, dataSet.ascendingValues.get( 6 ) ), 6L );
+						} )
+				);
+	}
+
 	private void assumeNonCanonicalRangesSupported() {
 		assumeTrue(
 				TckConfiguration.get().getBackendFeatures().nonCanonicalRangeInAggregations(),

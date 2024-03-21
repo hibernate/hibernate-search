@@ -47,7 +47,7 @@ public abstract class AbstractElasticsearchBucketAggregation<K, V>
 		JsonObject outerObject = new JsonObject();
 		JsonObject innerObject = new JsonObject();
 
-		doRequest( outerObject, innerObject );
+		doRequest( context, outerObject, innerObject );
 
 		if ( isNested() ) {
 			JsonObject rootDocCountSubAggregationOuterObject = new JsonObject();
@@ -67,7 +67,7 @@ public abstract class AbstractElasticsearchBucketAggregation<K, V>
 		return doExtract( context, buckets );
 	}
 
-	protected abstract void doRequest(JsonObject outerObject, JsonObject innerObject);
+	protected abstract void doRequest(AggregationRequestContext context, JsonObject outerObject, JsonObject innerObject);
 
 	protected abstract Map<K, V> doExtract(AggregationExtractContext context, JsonElement buckets);
 

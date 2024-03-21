@@ -50,6 +50,22 @@ class RangeAggregationRangeStepImpl<PDF extends SearchPredicateFactory, F>
 	}
 
 	@Override
+	public RangeAggregationRangeStepImpl<PDF, F> rangeParam(String parameterName) {
+		Contracts.assertNotNullNorEmpty( parameterName, "range" );
+		builder.param( parameterName );
+		return this;
+	}
+
+	@Override
+	public RangeAggregationRangeStepImpl<PDF, F> rangesParams(Collection<String> parameters) {
+		Contracts.assertNotNull( parameters, "ranges" );
+		for ( String parameter : parameters ) {
+			rangeParam( parameter );
+		}
+		return this;
+	}
+
+	@Override
 	public RangeAggregationRangeStepImpl<PDF, F> filter(
 			Function<? super PDF, ? extends PredicateFinalStep> clauseContributor) {
 		SearchPredicate predicate = clauseContributor.apply( dslContext.predicateFactory() ).toPredicate();

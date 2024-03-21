@@ -50,7 +50,7 @@ public class ElasticsearchTermsAggregation<F, K>
 	}
 
 	@Override
-	protected void doRequest(JsonObject outerObject, JsonObject innerObject) {
+	protected void doRequest(AggregationRequestContext context, JsonObject outerObject, JsonObject innerObject) {
 		outerObject.add( "terms", innerObject );
 		innerObject.addProperty( "field", absoluteFieldPath );
 		if ( order != null ) {

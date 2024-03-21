@@ -6,6 +6,9 @@
  */
 package org.hibernate.search.backend.lucene.types.aggregation.impl;
 
+import static org.hibernate.search.engine.search.query.spi.QueryParametersValueProvider.parameter;
+import static org.hibernate.search.engine.search.query.spi.QueryParametersValueProvider.simple;
+
 import java.io.IOException;
 import java.lang.invoke.MethodHandles;
 import java.util.ArrayList;
@@ -13,6 +16,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
+import java.util.stream.Collectors;
 
 import org.hibernate.search.backend.lucene.logging.impl.Log;
 import org.hibernate.search.backend.lucene.lowlevel.collector.impl.FacetsCollectorFactory;
@@ -27,6 +31,7 @@ import org.hibernate.search.backend.lucene.types.lowlevel.impl.LuceneNumericDoma
 import org.hibernate.search.engine.backend.types.converter.spi.DslConverter;
 import org.hibernate.search.engine.search.aggregation.spi.RangeAggregationBuilder;
 import org.hibernate.search.engine.search.common.ValueConvert;
+import org.hibernate.search.engine.search.query.spi.QueryParametersValueProvider;
 import org.hibernate.search.util.common.data.Range;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
@@ -47,14 +52,14 @@ public class LuceneNumericRangeAggregation<F, E extends Number, K>
 
 	private final AbstractLuceneNumericFieldCodec<F, E> codec;
 
-	private final List<Range<K>> rangesInOrder;
-	private final List<Range<E>> encodedRangesInOrder;
+	private final List<QueryParametersValueProvider<Range<K>>> rangeProvidersInOrder;
+	private final List<QueryParametersValueProvider<Range<E>>> encodedRangeProvidersInOrder;
 
 	private LuceneNumericRangeAggregation(Builder<F, E, K> builder) {
 		super( builder );
 		this.codec = builder.codec;
-		this.rangesInOrder = builder.rangesInOrder;
-		this.encodedRangesInOrder = builder.encodedRangesInOrder;
+		this.rangeProvidersInOrder = builder.rangeProvidersInOrder;
+		this.encodedRangeProvidersInOrder = builder.encodedRangeProvidersInOrder;
 	}
 
 	@Override
@@ -64,6 +69,16 @@ public class LuceneNumericRangeAggregation<F, E extends Number, K>
 
 	@Override
 	public Map<Range<K>, Long> extract(AggregationExtractContext context) throws IOException {
+		List<Range<K>> rangesInOrder = rangeProvidersInOrder.stream()
+				.map( provider -> provider
+						.provide( context.toPredicateRequestContext( absoluteFieldPath ).toQueryParametersContext() ) )
+				.collect( Collectors.toList() );
+
+		List<Range<E>> encodedRangesInOrder = encodedRangeProvidersInOrder.stream()
+				.map( provider -> provider.provide(
+						context.toPredicateRequestContext( absoluteFieldPath ).toQueryParametersContext() ) )
+				.collect( Collectors.toList() );
+
 		LuceneNumericDomain<E> numericDomain = codec.getDomain();
 
 		FacetsCollector facetsCollector = context.getFacets( FacetsCollectorFactory.KEY );
@@ -126,8 +141,8 @@ public class LuceneNumericRangeAggregation<F, E extends Number, K>
 		private final DslConverter<? super K, F> toFieldValueConverter;
 		private final AbstractLuceneNumericFieldCodec<F, E> codec;
 
-		private final List<Range<K>> rangesInOrder = new ArrayList<>();
-		private final List<Range<E>> encodedRangesInOrder = new ArrayList<>();
+		private final List<QueryParametersValueProvider<Range<K>>> rangeProvidersInOrder = new ArrayList<>();
+		private final List<QueryParametersValueProvider<Range<E>>> encodedRangeProvidersInOrder = new ArrayList<>();
 
 		public Builder(AbstractLuceneNumericFieldCodec<F, E> codec,
 				LuceneSearchIndexScope<?> scope, LuceneSearchIndexValueFieldContext<?> field,
@@ -139,8 +154,19 @@ public class LuceneNumericRangeAggregation<F, E extends Number, K>
 
 		@Override
 		public void range(Range<? extends K> range) {
-			rangesInOrder.add( range.map( Function.identity() ) );
-			encodedRangesInOrder.add( range.map( this::convertAndEncode ) );
+			rangeProvidersInOrder.add( simple( range.map( Function.identity() ) ) );
+			encodedRangeProvidersInOrder.add(
+					simple( range.map( value -> convertAndEncode( codec, field, scope, toFieldValueConverter, value ) ) ) );
+		}
+
+		@Override
+		@SuppressWarnings("unchecked")
+		public void param(String parameterName) {
+			rangeProvidersInOrder.add( parameter( parameterName, Range.class,
+					range -> ( (Range<? extends K>) range ).map( Function.identity() ) ) );
+			encodedRangeProvidersInOrder.add( parameter( parameterName, Range.class,
+					range -> ( (Range<? extends K>) range )
+							.map( value -> convertAndEncode( codec, field, scope, toFieldValueConverter, value ) ) ) );
 		}
 
 		@Override
@@ -148,7 +174,9 @@ public class LuceneNumericRangeAggregation<F, E extends Number, K>
 			return new LuceneNumericRangeAggregation<>( this );
 		}
 
-		private E convertAndEncode(K value) {
+		private static <F, E extends Number, K> E convertAndEncode(AbstractLuceneNumericFieldCodec<F, E> codec,
+				LuceneSearchIndexValueFieldContext<?> field, LuceneSearchIndexScope<?> scope,
+				DslConverter<? super K, F> toFieldValueConverter, K value) {
 			try {
 				F converted = toFieldValueConverter.toDocumentValue( value, scope.toDocumentValueConvertContext() );
 				return codec.encode( converted );
