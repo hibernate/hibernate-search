@@ -32,3 +32,6 @@ jira:
     - "build/jqassistant/"
     - "build/reports/"
     - "build/script/"
+develocity:
+  buildScan:
+    addCheck: true
