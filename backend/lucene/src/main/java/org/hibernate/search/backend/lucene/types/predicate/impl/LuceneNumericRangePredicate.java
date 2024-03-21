@@ -12,6 +12,7 @@ import org.hibernate.search.backend.lucene.search.common.impl.AbstractLuceneCode
 import org.hibernate.search.backend.lucene.search.common.impl.LuceneSearchIndexScope;
 import org.hibernate.search.backend.lucene.search.common.impl.LuceneSearchIndexValueFieldContext;
 import org.hibernate.search.backend.lucene.search.predicate.impl.AbstractLuceneLeafSingleFieldPredicate;
+import org.hibernate.search.backend.lucene.search.predicate.impl.PredicateRequestContext;
 import org.hibernate.search.backend.lucene.types.codec.impl.AbstractLuceneNumericFieldCodec;
 import org.hibernate.search.backend.lucene.types.lowlevel.impl.LuceneNumericDomain;
 import org.hibernate.search.engine.search.common.ValueConvert;
@@ -64,7 +65,7 @@ public class LuceneNumericRangePredicate extends AbstractLuceneLeafSingleFieldPr
 		}
 
 		@Override
-		protected Query buildQuery() {
+		protected Query buildQuery(PredicateRequestContext context) {
 			LuceneNumericDomain<E> domain = codec.getDomain();
 			return domain.createRangeQuery(
 					absoluteFieldPath,

@@ -15,7 +15,9 @@ import org.hibernate.search.backend.lucene.search.extraction.impl.ExtractionRequ
 import org.hibernate.search.backend.lucene.search.highlighter.impl.LuceneAbstractSearchHighlighter;
 import org.hibernate.search.engine.backend.common.spi.FieldPaths;
 import org.hibernate.search.engine.reporting.spi.EventContexts;
+import org.hibernate.search.engine.search.common.NamedValues;
 import org.hibernate.search.engine.search.common.spi.SearchQueryElementTypeKey;
+import org.hibernate.search.engine.search.query.spi.QueryParameters;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
 public final class ProjectionRequestContext {
@@ -27,18 +29,22 @@ public final class ProjectionRequestContext {
 	private final String absoluteCurrentFieldPath;
 	private final LuceneAbstractSearchHighlighter globalHighlighter;
 	private final Map<String, LuceneAbstractSearchHighlighter> namedHighlighters;
+	private final QueryParameters parameters;
 
 	public ProjectionRequestContext(ExtractionRequirements.Builder extractionRequirementsBuilder,
-			LuceneAbstractSearchHighlighter globalHighlighter, Map<String, LuceneAbstractSearchHighlighter> namedHighlighters) {
-		this( extractionRequirementsBuilder, globalHighlighter, namedHighlighters, null, null );
+			LuceneAbstractSearchHighlighter globalHighlighter, Map<String, LuceneAbstractSearchHighlighter> namedHighlighters,
+			QueryParameters parameters) {
+		this( extractionRequirementsBuilder, globalHighlighter, namedHighlighters, parameters, null, null );
 	}
 
 	private ProjectionRequestContext(ExtractionRequirements.Builder extractionRequirementsBuilder,
 			LuceneAbstractSearchHighlighter globalHighlighter, Map<String, LuceneAbstractSearchHighlighter> namedHighlighters,
+			QueryParameters parameters,
 			String absoluteCurrentFieldPath, String absoluteCurrentNestedFieldPath) {
+		this.extractionRequirementsBuilder = extractionRequirementsBuilder;
 		this.globalHighlighter = globalHighlighter;
 		this.namedHighlighters = namedHighlighters;
-		this.extractionRequirementsBuilder = extractionRequirementsBuilder;
+		this.parameters = parameters;
 		this.absoluteCurrentNestedFieldPath = absoluteCurrentNestedFieldPath;
 		this.absoluteCurrentFieldPath = absoluteCurrentFieldPath;
 	}
@@ -76,13 +82,13 @@ public final class ProjectionRequestContext {
 	}
 
 	public ProjectionRequestContext root() {
-		return new ProjectionRequestContext( extractionRequirementsBuilder, globalHighlighter, namedHighlighters );
+		return new ProjectionRequestContext( extractionRequirementsBuilder, globalHighlighter, namedHighlighters, parameters );
 	}
 
 	public ProjectionRequestContext forField(String absoluteFieldPath, boolean nestedObject) {
 		checkValidField( absoluteFieldPath );
 		return new ProjectionRequestContext(
-				extractionRequirementsBuilder, globalHighlighter, namedHighlighters,
+				extractionRequirementsBuilder, globalHighlighter, namedHighlighters, parameters,
 				absoluteFieldPath, nestedObject ? absoluteFieldPath : absoluteCurrentFieldPath
 		);
 	}
@@ -108,4 +114,7 @@ public final class ProjectionRequestContext {
 		}
 	}
 
+	public NamedValues queryParameters() {
+		return parameters;
+	}
 }

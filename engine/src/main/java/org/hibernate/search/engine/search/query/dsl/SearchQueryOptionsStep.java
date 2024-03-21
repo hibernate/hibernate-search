@@ -227,4 +227,17 @@ public interface SearchQueryOptionsStep<
 	 */
 	@Incubating
 	S highlighter(String highlighterName, SearchHighlighter highlighter);
+
+	/**
+	 * Add query parameter.
+	 * <p>
+	 * Query parameters are intended to use in various {@code withParameters(..)} to create projections/predicates/sorts/aggregations
+	 * relying on these query parameters.
+	 *
+	 * @param parameterName The name of a query parameter.
+	 * @param value The value of a query parameter.
+	 * @return {@code this}, for method chaining.
+	 */
+	@Incubating
+	S param(String parameterName, Object value);
 }
