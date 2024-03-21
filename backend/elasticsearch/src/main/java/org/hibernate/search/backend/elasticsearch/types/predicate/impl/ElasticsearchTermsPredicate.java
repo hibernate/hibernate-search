@@ -58,7 +58,7 @@ public class ElasticsearchTermsPredicate extends AbstractElasticsearchSingleFiel
 
 	@Override
 	protected JsonObject doToJsonQuery(PredicateRequestContext context, JsonObject outerObject, JsonObject innerObject) {
-		JsonElement[] terms = termsProvider.provide( context );
+		JsonElement[] terms = termsProvider.provide( context.toQueryParametersContext() );
 		// single term
 		if ( terms.length == 1 ) {
 			VALUE_ACCESSOR.set( innerObject, terms[0] );

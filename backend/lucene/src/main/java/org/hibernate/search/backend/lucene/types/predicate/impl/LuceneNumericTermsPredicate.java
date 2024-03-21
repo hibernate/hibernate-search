@@ -94,7 +94,7 @@ public class LuceneNumericTermsPredicate extends AbstractLuceneLeafSingleFieldPr
 
 		@Override
 		protected Query buildQuery(PredicateRequestContext context) {
-			List<E> terms = termProvider.provide( context );
+			List<E> terms = termProvider.provide( context.toQueryParametersContext() );
 			if ( terms.size() == 1 ) {
 				return codec.getDomain().createExactQuery( absoluteFieldPath, terms.get( 0 ) );
 			}

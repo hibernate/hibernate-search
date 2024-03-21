@@ -48,7 +48,7 @@ public class ElasticsearchGeoPointSpatialWithinPolygonPredicate extends Abstract
 
 	@Override
 	protected JsonObject doToJsonQuery(PredicateRequestContext context, JsonObject outerObject, JsonObject innerObject) {
-		double[] coordinates = coordinatesProvider.provide( context );
+		double[] coordinates = coordinatesProvider.provide( context.toQueryParametersContext() );
 
 		JsonObject geometryObject = new JsonObject();
 		JsonArray pointsArray = new JsonArray();

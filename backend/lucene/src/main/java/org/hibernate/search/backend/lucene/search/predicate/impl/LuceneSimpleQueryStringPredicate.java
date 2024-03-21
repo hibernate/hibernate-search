@@ -47,7 +47,7 @@ public class LuceneSimpleQueryStringPredicate extends LuceneCommonQueryStringPre
 
 		@Override
 		protected Query buildQuery(PredicateRequestContext context) {
-			String queryString = queryStringProvider.provide( context );
+			String queryString = queryStringProvider.provide( context.toQueryParametersContext() );
 			SimpleQueryParser queryParser = new SimpleQueryParser( buildAnalyzer(), buildWeights(), flags );
 			queryParser.setDefaultOperator( toOccur( defaultOperator ) );
 			return applyMinimumShouldMatch( queryParser.parse( queryString ) );

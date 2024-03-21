@@ -64,7 +64,7 @@ public class LuceneGeoPointSpatialWithinPolygonPredicate extends AbstractLuceneL
 
 		@Override
 		protected Query buildQuery(PredicateRequestContext context) {
-			List<GeoPoint> points = polygonProvider.provide( context ).points();
+			List<GeoPoint> points = polygonProvider.provide( context.toQueryParametersContext() ).points();
 
 			double[] polyLats = new double[points.size()];
 			double[] polyLons = new double[points.size()];

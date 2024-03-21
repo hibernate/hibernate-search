@@ -45,7 +45,7 @@ public class LuceneMatchIdPredicate extends AbstractLuceneSearchPredicate {
 	@Override
 	protected Query doToQuery(PredicateRequestContext context) {
 		List<BytesRef> bytesRefs = valueProviders.stream()
-				.map( provider -> provider.provide( context ) )
+				.map( provider -> provider.provide( context.toQueryParametersContext() ) )
 				.map( BytesRef::new )
 				.collect( Collectors.toList() );
 		return new TermInSetQuery( MetadataFields.idFieldName(), bytesRefs );

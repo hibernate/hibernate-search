@@ -91,7 +91,8 @@ public class LuceneNumericMatchPredicate extends AbstractLuceneLeafSingleFieldPr
 
 		@Override
 		protected Query buildQuery(PredicateRequestContext context) {
-			return codec.getDomain().createExactQuery( absoluteFieldPath, valueProvider.provide( context ) );
+			return codec.getDomain().createExactQuery( absoluteFieldPath,
+					valueProvider.provide( context.toQueryParametersContext() ) );
 		}
 	}
 }

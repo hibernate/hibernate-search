@@ -97,7 +97,7 @@ public class LuceneTextTermsPredicate extends AbstractLuceneLeafSingleFieldPredi
 
 		@Override
 		protected Query buildQuery(PredicateRequestContext context) {
-			List<String> terms = termProvider.provide( context );
+			List<String> terms = termProvider.provide( context.toQueryParametersContext() );
 			if ( terms.size() == 1 ) {
 				return new TermQuery( new Term( absoluteFieldPath, terms.get( 0 ) ) );
 			}

@@ -187,7 +187,7 @@ public abstract class ElasticsearchKnnPredicate extends AbstractElasticsearchSin
 
 			FIELD_ACCESSOR.set( innerObject, absoluteFieldPath );
 			NUM_CANDIDATES_ACCESSOR.set( innerObject, k );
-			VECTOR_ACCESSOR.set( innerObject, vectorProvider.provide( context ) );
+			VECTOR_ACCESSOR.set( innerObject, vectorProvider.provide( context.toQueryParametersContext() ) );
 
 			JsonObject filter = prepareFilter( context );
 			if ( filter != null ) {
@@ -242,7 +242,7 @@ public abstract class ElasticsearchKnnPredicate extends AbstractElasticsearchSin
 				FILTER_ACCESSOR.set( innerObject, filter );
 			}
 			K_ACCESSOR.set( innerObject, k );
-			VECTOR_ACCESSOR.set( innerObject, vectorProvider.provide( context ) );
+			VECTOR_ACCESSOR.set( innerObject, vectorProvider.provide( context.toQueryParametersContext() ) );
 
 			return outerObject;
 		}

@@ -97,8 +97,8 @@ public class LuceneDistanceToFieldProjection<P> extends AbstractLuceneProjection
 
 	@Override
 	public Extractor<?, P> request(ProjectionRequestContext context) {
-		center = centerProvider.provide( context );
-		unit = unitProvider.provide( context );
+		center = centerProvider.provide( context.toQueryParametersContext() );
+		unit = unitProvider.provide( context.toQueryParametersContext() );
 
 		if ( fieldProjection != null ) {
 			return fieldProjection.request( context );

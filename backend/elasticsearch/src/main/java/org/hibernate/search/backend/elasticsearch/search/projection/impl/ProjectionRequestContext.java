@@ -9,7 +9,7 @@ package org.hibernate.search.backend.elasticsearch.search.projection.impl;
 import org.hibernate.search.engine.search.common.spi.SearchQueryElementTypeKey;
 import org.hibernate.search.engine.search.query.spi.QueryParametersContext;
 
-public interface ProjectionRequestContext extends QueryParametersContext {
+public interface ProjectionRequestContext {
 
 	void checkValidField(String absoluteFieldPath);
 
@@ -22,5 +22,7 @@ public interface ProjectionRequestContext extends QueryParametersContext {
 	String absoluteCurrentFieldPath();
 
 	String[] relativeCurrentFieldPathComponents();
+
+	QueryParametersContext toQueryParametersContext();
 
 }

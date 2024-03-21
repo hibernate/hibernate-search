@@ -20,7 +20,7 @@ import org.hibernate.search.engine.search.query.spi.QueryParameters;
 import org.hibernate.search.engine.search.query.spi.QueryParametersContext;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
-public final class ProjectionRequestContext implements QueryParametersContext {
+public final class ProjectionRequestContext {
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
@@ -114,13 +114,7 @@ public final class ProjectionRequestContext implements QueryParametersContext {
 		}
 	}
 
-	@Override
-	public Object parameter(String parameterName) {
-		return parameters.get( parameterName );
-	}
-
-	@Override
-	public <T> T parameter(String parameterName, Class<T> parameterValueType) {
-		return parameters.get( parameterName, parameterValueType );
+	public QueryParametersContext toQueryParametersContext() {
+		return parameters;
 	}
 }

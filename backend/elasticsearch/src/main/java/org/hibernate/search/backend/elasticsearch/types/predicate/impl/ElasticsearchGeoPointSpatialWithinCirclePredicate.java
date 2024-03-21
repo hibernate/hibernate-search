@@ -48,8 +48,8 @@ public class ElasticsearchGeoPointSpatialWithinCirclePredicate extends AbstractE
 	@Override
 	protected JsonObject doToJsonQuery(PredicateRequestContext context, JsonObject outerObject,
 			JsonObject innerObject) {
-		DISTANCE_ACCESSOR.set( innerObject, distanceInMetersProvider.provide( context ) );
-		innerObject.add( absoluteFieldPath, centerProvider.provide( context ) );
+		DISTANCE_ACCESSOR.set( innerObject, distanceInMetersProvider.provide( context.toQueryParametersContext() ) );
+		innerObject.add( absoluteFieldPath, centerProvider.provide( context.toQueryParametersContext() ) );
 
 		if ( indexNames().size() > 1 ) {
 			// There are multiple target indexes; some of them may not declare the field.

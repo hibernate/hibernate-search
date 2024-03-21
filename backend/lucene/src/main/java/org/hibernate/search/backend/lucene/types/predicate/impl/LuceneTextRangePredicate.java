@@ -85,7 +85,7 @@ public class LuceneTextRangePredicate extends AbstractLuceneLeafSingleFieldPredi
 			// Note that a range query only makes sense if only one token is returned by the analyzer
 			// and we should even consider forcing having a normalizer here, instead of supporting
 			// range queries on analyzed fields.
-			Range<String> range = rangeProvider.provide( context );
+			Range<String> range = rangeProvider.provide( context.toQueryParametersContext() );
 			return new TermRangeQuery(
 					absoluteFieldPath,
 					normalize( range.lowerBoundValue().orElse( null ) ),

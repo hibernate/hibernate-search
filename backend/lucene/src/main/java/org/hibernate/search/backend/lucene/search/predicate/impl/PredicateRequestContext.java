@@ -21,7 +21,7 @@ import org.apache.lucene.search.BooleanClause;
 import org.apache.lucene.search.BooleanQuery;
 import org.apache.lucene.search.Query;
 
-public abstract class PredicateRequestContext implements QueryParametersContext {
+public abstract class PredicateRequestContext {
 	private final String nestedPath;
 
 	private PredicateRequestContext(String nestedPath) {
@@ -35,6 +35,8 @@ public abstract class PredicateRequestContext implements QueryParametersContext 
 	public abstract Query appendTenantAndRoutingFilters(Query originalFilterQuery);
 
 	public abstract PredicateRequestContext withNestedPath(String nestedPath);
+
+	public abstract QueryParametersContext toQueryParametersContext();
 
 	public static PredicateRequestContext withSession(LuceneSearchQueryIndexScope<?> scope,
 			BackendSessionContext sessionContext, Set<String> routingKeys, QueryParameters parameters) {
@@ -68,13 +70,22 @@ public abstract class PredicateRequestContext implements QueryParametersContext 
 		}
 
 		@Override
-		public Object parameter(String name) {
-			throw new AssertionFailure( "Accessing parameters requires session context." );
+		public QueryParametersContext toQueryParametersContext() {
+			return FailingQueryParametersContext.INSTANCE;
 		}
 
-		@Override
-		public <T> T parameter(String parameterName, Class<T> parameterValueType) {
-			throw new AssertionFailure( "Accessing parameters requires session context." );
+		private static class FailingQueryParametersContext implements QueryParametersContext {
+			private static final FailingQueryParametersContext INSTANCE = new FailingQueryParametersContext();
+
+			@Override
+			public Object parameter(String parameterName) {
+				throw new AssertionFailure( "Accessing parameters requires session context." );
+			}
+
+			@Override
+			public <T> T parameter(String parameterName, Class<T> parameterValueType) {
+				throw new AssertionFailure( "Accessing parameters requires session context." );
+			}
 		}
 	}
 
@@ -119,13 +130,8 @@ public abstract class PredicateRequestContext implements QueryParametersContext 
 		}
 
 		@Override
-		public Object parameter(String parameterName) {
-			return parameters.get( parameterName );
-		}
-
-		@Override
-		public <T> T parameter(String parameterName, Class<T> parameterValueType) {
-			return parameters.get( parameterName, parameterValueType );
+		public QueryParametersContext toQueryParametersContext() {
+			return parameters;
 		}
 	}
 }

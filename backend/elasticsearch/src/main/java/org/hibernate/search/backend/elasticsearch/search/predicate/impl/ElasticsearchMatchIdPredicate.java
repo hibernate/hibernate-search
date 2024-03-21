@@ -81,7 +81,8 @@ public class ElasticsearchMatchIdPredicate extends AbstractElasticsearchPredicat
 	private JsonArray toJsonArray(List<QueryParametersValueProvider<String>> valueProviders, PredicateRequestContext context) {
 		JsonArray jsonArray = new JsonArray( valueProviders.size() );
 		for ( QueryParametersValueProvider<String> provider : valueProviders ) {
-			jsonArray.add( documentIdHelper.toElasticsearchId( context.getTenantId(), provider.provide( context ) ) );
+			jsonArray.add( documentIdHelper.toElasticsearchId( context.getTenantId(),
+					provider.provide( context.toQueryParametersContext() ) ) );
 		}
 		return jsonArray;
 	}

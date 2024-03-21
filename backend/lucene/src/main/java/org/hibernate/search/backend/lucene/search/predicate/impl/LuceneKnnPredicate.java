@@ -152,7 +152,7 @@ public abstract class LuceneKnnPredicate<T> extends AbstractLuceneSingleFieldPre
 
 		@Override
 		protected Query doToQuery(PredicateRequestContext context) {
-			byte[] vector = vectorProvider.provide( context );
+			byte[] vector = vectorProvider.provide( context.toQueryParametersContext() );
 			KnnByteVectorQuery query = new KnnByteVectorQuery( absoluteFieldPath, vector, k, prepareFilter( context ) );
 			return similarity == null
 					? query
@@ -179,7 +179,7 @@ public abstract class LuceneKnnPredicate<T> extends AbstractLuceneSingleFieldPre
 
 		@Override
 		protected Query doToQuery(PredicateRequestContext context) {
-			float[] vector = vectorProvider.provide( context );
+			float[] vector = vectorProvider.provide( context.toQueryParametersContext() );
 			KnnFloatVectorQuery query = new KnnFloatVectorQuery( absoluteFieldPath, vector, k, prepareFilter( context ) );
 			return similarity == null ? query : VectorSimilarityFilterQuery.create( query, similarity, similarityFunction );
 		}

@@ -84,7 +84,7 @@ abstract class ElasticsearchCommonQueryStringPredicate extends AbstractElasticse
 	@Override
 	protected final JsonObject doToJsonQuery(PredicateRequestContext context, JsonObject outerObject,
 			JsonObject innerObject) {
-		QUERY_ACCESSOR.set( innerObject, queryStringProvider.provide( context ) );
+		QUERY_ACCESSOR.set( innerObject, queryStringProvider.provide( context.toQueryParametersContext() ) );
 		DEFAULT_OPERATOR_ACCESSOR.set( innerObject, defaultOperator );
 
 		JsonArray fieldArray = new JsonArray();

@@ -26,6 +26,7 @@ import org.hibernate.search.engine.search.common.spi.SearchQueryElementTypeKey;
 import org.hibernate.search.engine.search.loading.spi.SearchLoadingContext;
 import org.hibernate.search.engine.search.projection.spi.ProjectionAccumulator;
 import org.hibernate.search.engine.search.query.spi.QueryParameters;
+import org.hibernate.search.engine.search.query.spi.QueryParametersContext;
 import org.hibernate.search.engine.spatial.GeoPoint;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
@@ -123,13 +124,8 @@ class ElasticsearchSearchQueryRequestContext implements ProjectionRequestRootCon
 	}
 
 	@Override
-	public Object parameter(String name) {
-		return parameters.get( name );
-	}
-
-	@Override
-	public <T> T parameter(String parameterName, Class<T> parameterValueType) {
-		return parameters.get( parameterName, parameterValueType );
+	public QueryParametersContext toQueryParametersContext() {
+		return parameters;
 	}
 
 	@Override

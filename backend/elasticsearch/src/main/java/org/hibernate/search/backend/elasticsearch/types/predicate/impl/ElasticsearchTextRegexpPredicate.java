@@ -51,7 +51,7 @@ public class ElasticsearchTextRegexpPredicate extends AbstractElasticsearchSingl
 	@Override
 	protected JsonObject doToJsonQuery(PredicateRequestContext context, JsonObject outerObject,
 			JsonObject innerObject) {
-		VALUE_ACCESSOR.set( innerObject, patternProvider.provide( context ) );
+		VALUE_ACCESSOR.set( innerObject, patternProvider.provide( context.toQueryParametersContext() ) );
 
 		// set no optional flag as default
 		FLAGS_ACCESSOR.set( innerObject, toFlagsMask( flags ) );

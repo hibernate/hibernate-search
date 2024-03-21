@@ -65,8 +65,8 @@ public class LuceneGeoPointSpatialWithinCirclePredicate extends AbstractLuceneLe
 
 		@Override
 		protected Query buildQuery(PredicateRequestContext context) {
-			GeoPoint center = centerProvider.provide( context );
-			Double radiusInMeters = radiusInMetersProvider.provide( context );
+			GeoPoint center = centerProvider.provide( context.toQueryParametersContext() );
+			Double radiusInMeters = radiusInMetersProvider.provide( context.toQueryParametersContext() );
 
 			return LatLonPoint.newDistanceQuery( absoluteFieldPath, center.latitude(), center.longitude(), radiusInMeters );
 		}

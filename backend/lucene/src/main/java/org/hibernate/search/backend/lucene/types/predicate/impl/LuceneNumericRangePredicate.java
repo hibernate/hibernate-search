@@ -84,7 +84,7 @@ public class LuceneNumericRangePredicate extends AbstractLuceneLeafSingleFieldPr
 		@Override
 		protected Query buildQuery(PredicateRequestContext context) {
 			LuceneNumericDomain<E> domain = codec.getDomain();
-			Range<E> range = rangeProvider.provide( context );
+			Range<E> range = rangeProvider.provide( context.toQueryParametersContext() );
 			return domain.createRangeQuery(
 					absoluteFieldPath,
 					getLowerValue( domain, range.lowerBoundValue(), range.lowerBoundInclusion() ),

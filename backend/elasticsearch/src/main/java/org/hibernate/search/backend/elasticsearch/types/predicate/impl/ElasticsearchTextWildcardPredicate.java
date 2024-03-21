@@ -40,7 +40,7 @@ public class ElasticsearchTextWildcardPredicate extends AbstractElasticsearchSin
 	@Override
 	protected JsonObject doToJsonQuery(PredicateRequestContext context, JsonObject outerObject,
 			JsonObject innerObject) {
-		VALUE_ACCESSOR.set( innerObject, patternProvider.provide( context ) );
+		VALUE_ACCESSOR.set( innerObject, patternProvider.provide( context.toQueryParametersContext() ) );
 
 		JsonObject middleObject = new JsonObject();
 		middleObject.add( absoluteFieldPath, innerObject );

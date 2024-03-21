@@ -112,8 +112,8 @@ public class ElasticsearchDistanceToFieldProjection<A, P> extends AbstractElasti
 	@Override
 	public Extractor<?, P> request(JsonObject requestBody, ProjectionRequestContext context) {
 		context.checkValidField( absoluteFieldPath );
-		center = centerProvider.provide( context );
-		unit = unitProvider.provide( context );
+		center = centerProvider.provide( context.toQueryParametersContext() );
+		unit = unitProvider.provide( context.toQueryParametersContext() );
 		if ( singleValuedInRoot && context.root().getDistanceSortIndex( absoluteFieldPath, center ) != null ) {
 			// Nothing to do, we'll rely on the sort key
 			return this;

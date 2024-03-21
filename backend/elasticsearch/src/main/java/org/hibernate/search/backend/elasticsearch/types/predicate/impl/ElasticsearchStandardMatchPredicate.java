@@ -49,7 +49,7 @@ public class ElasticsearchStandardMatchPredicate extends AbstractElasticsearchSi
 	@Override
 	protected JsonObject doToJsonQuery(PredicateRequestContext context, JsonObject outerObject,
 			JsonObject innerObject) {
-		QUERY_ACCESSOR.set( innerObject, valueProvider.provide( context ) );
+		QUERY_ACCESSOR.set( innerObject, valueProvider.provide( context.toQueryParametersContext() ) );
 
 		JsonObject middleObject = new JsonObject();
 		middleObject.add( absoluteFieldPath, innerObject );

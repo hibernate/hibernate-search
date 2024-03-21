@@ -49,8 +49,8 @@ public class ElasticsearchGeoPointSpatialWithinBoundingBoxPredicate extends Abst
 	protected JsonObject doToJsonQuery(PredicateRequestContext context, JsonObject outerObject,
 			JsonObject innerObject) {
 		JsonObject boundingBoxObject = new JsonObject();
-		boundingBoxObject.add( TOP_LEFT_PROPERTY_NAME, topLeftProvider.provide( context ) );
-		boundingBoxObject.add( BOTTOM_RIGHT_PROPERTY_NAME, bottomRightProvider.provide( context ) );
+		boundingBoxObject.add( TOP_LEFT_PROPERTY_NAME, topLeftProvider.provide( context.toQueryParametersContext() ) );
+		boundingBoxObject.add( BOTTOM_RIGHT_PROPERTY_NAME, bottomRightProvider.provide( context.toQueryParametersContext() ) );
 
 		innerObject.add( absoluteFieldPath, boundingBoxObject );
 

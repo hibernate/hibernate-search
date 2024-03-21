@@ -71,7 +71,8 @@ public class LuceneTextRegexpPredicate extends AbstractLuceneLeafSingleFieldPred
 		@Override
 		protected Query buildQuery(PredicateRequestContext context) {
 			// set no optional flag as default
-			return new RegexpQuery( new Term( absoluteFieldPath, patternProvider.provide( context ) ), flags );
+			return new RegexpQuery(
+					new Term( absoluteFieldPath, patternProvider.provide( context.toQueryParametersContext() ) ), flags );
 		}
 	}
 

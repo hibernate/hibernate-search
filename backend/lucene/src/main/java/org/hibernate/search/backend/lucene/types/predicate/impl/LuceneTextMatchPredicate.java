@@ -116,7 +116,7 @@ public class LuceneTextMatchPredicate extends AbstractLuceneLeafSingleFieldPredi
 
 			if ( effectiveAnalyzerOrNormalizer == AnalyzerConstants.KEYWORD_ANALYZER ) {
 				// Optimization when analysis is disabled
-				Term term = new Term( absoluteFieldPath, valueProvider.provide( context ) );
+				Term term = new Term( absoluteFieldPath, valueProvider.provide( context.toQueryParametersContext() ) );
 
 				if ( maxEditDistance != null ) {
 					return new FuzzyQuery( term, maxEditDistance, prefixLength );
@@ -134,7 +134,8 @@ public class LuceneTextMatchPredicate extends AbstractLuceneLeafSingleFieldPredi
 				effectiveQueryBuilder = new QueryBuilder( effectiveAnalyzerOrNormalizer );
 			}
 
-			Query analyzed = effectiveQueryBuilder.createBooleanQuery( absoluteFieldPath, valueProvider.provide( context ) );
+			Query analyzed = effectiveQueryBuilder.createBooleanQuery( absoluteFieldPath,
+					valueProvider.provide( context.toQueryParametersContext() ) );
 			if ( analyzed == null ) {
 				// Either the value was an empty string
 				// or the analysis removed all tokens (that can happen if the value contained only stopwords, for example)

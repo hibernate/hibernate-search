@@ -44,7 +44,7 @@ public class ElasticsearchDistanceSort extends AbstractElasticsearchDocumentValu
 
 	@Override
 	protected void doToJsonSorts(ElasticsearchSearchSortCollector collector, JsonObject innerObject) {
-		GeoPoint center = centerProvider.provide( collector.getRootPredicateContext() );
+		GeoPoint center = centerProvider.provide( collector.getRootPredicateContext().toQueryParametersContext() );
 
 		innerObject.add( absoluteFieldPath, ElasticsearchGeoPointFieldCodec.INSTANCE.encode( center ) );
 		// If there are multiple target indexes, or if the field is dynamic,

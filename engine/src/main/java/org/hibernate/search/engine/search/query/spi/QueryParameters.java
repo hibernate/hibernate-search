@@ -16,21 +16,29 @@ import org.hibernate.search.util.common.impl.Contracts;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
 @Incubating
-public class QueryParameters {
+public class QueryParameters implements QueryParametersContext {
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	private final Map<String, Object> parameters = new HashMap<>();
 
-	public Object get(String name) {
-		if ( !parameters.containsKey( name ) ) {
-			// TODO: if a value is null ^. see add(..)
-			throw log.cannotFindQueryParameter( name );
-		}
-		return parameters.get( name );
+	public void add(String parameter, Object value) {
+		Contracts.assertNotNullNorEmpty( parameter, "parameter" );
+		// TODO: does null parameter values make any sense? seems no, but ...
+		parameters.put( parameter, value );
 	}
 
-	public <T> T get(String parameterName, Class<T> parameterValueType) {
-		Object value = get( parameterName );
+	@Override
+	public Object parameter(String parameterName) {
+		if ( !parameters.containsKey( parameterName ) ) {
+			// TODO: if a value is null ^. see add(..)
+			throw log.cannotFindQueryParameter( parameterName );
+		}
+		return parameters.get( parameterName );
+	}
+
+	@Override
+	public <T> T parameter(String parameterName, Class<T> parameterValueType) {
+		Object value = parameter( parameterName );
 		if ( value == null ) {
 			return null;
 		}
@@ -38,11 +46,5 @@ public class QueryParameters {
 			return parameterValueType.cast( value );
 		}
 		throw log.unexpectedQueryParameterType( parameterName, parameterValueType, value.getClass() );
-	}
-
-	public void add(String parameter, Object value) {
-		Contracts.assertNotNullNorEmpty( parameter, "parameter" );
-		// TODO: does null parameter values make any sense? seems no, but ...
-		parameters.put( parameter, value );
 	}
 }

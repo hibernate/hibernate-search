@@ -13,6 +13,7 @@ import org.hibernate.search.backend.elasticsearch.logging.impl.Log;
 import org.hibernate.search.engine.backend.common.spi.FieldPaths;
 import org.hibernate.search.engine.reporting.spi.EventContexts;
 import org.hibernate.search.engine.search.common.spi.SearchQueryElementTypeKey;
+import org.hibernate.search.engine.search.query.spi.QueryParametersContext;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
 public class FieldProjectionRequestContext implements ProjectionRequestContext {
@@ -83,12 +84,8 @@ public class FieldProjectionRequestContext implements ProjectionRequestContext {
 	}
 
 	@Override
-	public Object parameter(String parameterName) {
-		return root.parameter( parameterName );
+	public QueryParametersContext toQueryParametersContext() {
+		return root().toQueryParametersContext();
 	}
 
-	@Override
-	public <T> T parameter(String parameterName, Class<T> parameterValueType) {
-		return root.parameter( parameterName, parameterValueType );
-	}
 }

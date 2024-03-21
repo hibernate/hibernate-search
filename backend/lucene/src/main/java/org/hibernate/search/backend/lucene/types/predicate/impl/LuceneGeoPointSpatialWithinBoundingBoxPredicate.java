@@ -62,7 +62,7 @@ public class LuceneGeoPointSpatialWithinBoundingBoxPredicate extends AbstractLuc
 
 		@Override
 		protected Query buildQuery(PredicateRequestContext context) {
-			GeoBoundingBox boundingBox = boundingBoxProvider.provide( context );
+			GeoBoundingBox boundingBox = boundingBoxProvider.provide( context.toQueryParametersContext() );
 
 			return LatLonPoint.newBoxQuery( absoluteFieldPath, boundingBox.bottomRight().latitude(),
 					boundingBox.topLeft().latitude(),

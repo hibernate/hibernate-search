@@ -47,7 +47,7 @@ public class ElasticsearchTextPhrasePredicate extends AbstractElasticsearchSingl
 	@Override
 	protected JsonObject doToJsonQuery(PredicateRequestContext context, JsonObject outerObject,
 			JsonObject innerObject) {
-		QUERY_ACCESSOR.set( innerObject, phraseProvider.provide( context ) );
+		QUERY_ACCESSOR.set( innerObject, phraseProvider.provide( context.toQueryParametersContext() ) );
 		if ( slop != null ) {
 			SLOP_ACCESSOR.set( innerObject, slop );
 		}

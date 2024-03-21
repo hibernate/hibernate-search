@@ -51,7 +51,7 @@ public class ElasticsearchRangePredicate extends AbstractElasticsearchSingleFiel
 
 	@Override
 	protected JsonObject doToJsonQuery(PredicateRequestContext context, JsonObject outerObject, JsonObject innerObject) {
-		Range<JsonElement> range = rangeProvider.provide( context );
+		Range<JsonElement> range = rangeProvider.provide( context.toQueryParametersContext() );
 		JsonAccessor<JsonElement> accessor;
 		Optional<JsonElement> lowerBoundValue = range.lowerBoundValue();
 		if ( lowerBoundValue.isPresent() ) {

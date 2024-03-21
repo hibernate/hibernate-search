@@ -48,7 +48,8 @@ public class LuceneGeoPointDistanceSort extends AbstractLuceneDocumentValueSort 
 	protected LuceneFieldComparatorSource doCreateFieldComparatorSource(String nestedDocumentPath,
 			MultiValueMode multiValueMode, Query nestedFilter, LuceneSearchSortCollector collector) {
 
-		GeoPoint center = centerProvider.provide( collector.toPredicateRequestContext( nestedDocumentPath ) );
+		GeoPoint center =
+				centerProvider.provide( collector.toPredicateRequestContext( nestedDocumentPath ).toQueryParametersContext() );
 
 		return new LuceneGeoPointDistanceComparatorSource( nestedDocumentPath, center, effectiveMissingValue.apply( center ),
 				multiValueMode, nestedFilter );

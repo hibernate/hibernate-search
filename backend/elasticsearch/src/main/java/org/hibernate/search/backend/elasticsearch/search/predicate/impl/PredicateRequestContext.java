@@ -17,7 +17,7 @@ import org.hibernate.search.engine.search.query.spi.QueryParametersContext;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 
-public class PredicateRequestContext implements QueryParametersContext {
+public class PredicateRequestContext {
 
 	private final BackendSessionContext sessionContext;
 	private final ElasticsearchSearchIndexScope<?> searchIndexScope;
@@ -65,13 +65,7 @@ public class PredicateRequestContext implements QueryParametersContext {
 		return new PredicateRequestContext( sessionContext, searchIndexScope, routingKeys, parameters, path );
 	}
 
-	@Override
-	public Object parameter(String parameterName) {
-		return parameters.get( parameterName );
-	}
-
-	@Override
-	public <T> T parameter(String parameterName, Class<T> parameterValueType) {
-		return parameters.get( parameterName, parameterValueType );
+	public QueryParametersContext toQueryParametersContext() {
+		return parameters;
 	}
 }
