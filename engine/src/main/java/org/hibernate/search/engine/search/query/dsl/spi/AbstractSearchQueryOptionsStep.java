@@ -184,6 +184,12 @@ public abstract class AbstractSearchQueryOptionsStep<
 	}
 
 	@Override
+	public S param(String parameterName, Object value) {
+		searchQueryBuilder.param( parameterName, value );
+		return thisAsS();
+	}
+
+	@Override
 	public SearchQuery<H> toQuery() {
 		return searchQueryBuilder.build();
 	}

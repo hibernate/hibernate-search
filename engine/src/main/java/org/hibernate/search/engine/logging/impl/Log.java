@@ -581,4 +581,15 @@ public interface Log extends BasicLogger {
 			value = "Cannot use rewrite method '%1$s': this method does not accept parameter 'n', but it was specified."
 					+ " Use another version of the rewrite(...) method that does not accept parameter 'n'.")
 	SearchException nonParameterizedRewriteMethodWithParameter(RewriteMethod rewriteMethod);
+
+	@Message(id = ID_OFFSET + 123,
+			value = "Query parameter '%1$s' value is not set."
+					+ " Use `.param(..)` methods on the query to set any parameters that the query requires'.")
+	SearchException cannotFindQueryParameter(String parameter);
+
+	@Message(id = ID_OFFSET + 124,
+			value = "Expecting query parameter '%1$s' value to be of %2$s type,"
+					+ " but instead got value of %3$s type.")
+	SearchException unexpectedQueryParameterType(String name, @FormatWith(ClassFormatter.class) Class<?> expected,
+			@FormatWith(ClassFormatter.class) Class<?> actual);
 }

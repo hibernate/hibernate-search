@@ -10,6 +10,7 @@ import java.util.Set;
 
 import org.hibernate.search.engine.backend.session.spi.BackendSessionContext;
 import org.hibernate.search.engine.search.loading.spi.SearchLoadingContext;
+import org.hibernate.search.engine.search.query.spi.QueryParameters;
 
 import org.apache.lucene.search.Query;
 import org.apache.lucene.search.Sort;
@@ -26,19 +27,21 @@ class LuceneSearchQueryRequestContext {
 	private final Query luceneQuery;
 	private final Sort luceneSort;
 	private final Set<String> routingKeys;
+	private final QueryParameters parameters;
 
 	LuceneSearchQueryRequestContext(
 			LuceneSearchQueryIndexScope<?> queryIndexScope, BackendSessionContext sessionContext,
 			SearchLoadingContext<?> loadingContext,
 			Query luceneQuery,
 			Sort luceneSort,
-			Set<String> routingKeys) {
+			Set<String> routingKeys, QueryParameters parameters) {
 		this.queryIndexScope = queryIndexScope;
 		this.sessionContext = sessionContext;
 		this.loadingContext = loadingContext;
 		this.luceneQuery = luceneQuery;
 		this.luceneSort = luceneSort;
 		this.routingKeys = routingKeys;
+		this.parameters = parameters;
 	}
 
 	public LuceneSearchQueryIndexScope<?> getQueryIndexScope() {
@@ -63,5 +66,9 @@ class LuceneSearchQueryRequestContext {
 
 	public Set<String> getRoutingKeys() {
 		return routingKeys;
+	}
+
+	public QueryParameters getQueryParameters() {
+		return parameters;
 	}
 }

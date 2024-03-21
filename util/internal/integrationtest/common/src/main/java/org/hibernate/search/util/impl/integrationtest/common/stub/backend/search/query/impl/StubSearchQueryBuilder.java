@@ -95,6 +95,11 @@ public class StubSearchQueryBuilder<H> implements SearchQueryBuilder<H> {
 	}
 
 	@Override
+	public void param(String parameterName, Object value) {
+		// parameters are not tested from the mapper
+	}
+
+	@Override
 	public SearchQuery<H> build() {
 		return new StubSearchQuery<>(
 				backend, scope.hibernateSearchIndexNames(), workBuilder, projectionContext,
