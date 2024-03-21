@@ -197,6 +197,10 @@ public class FullTextQueryImpl extends AbstractQuery implements FullTextQuery {
 		return hSearchQuery.getResultSize();
 	}
 
+	public long getResultCount() {
+		return doGetResultSize();
+	}
+
 	@Override
 	public FullTextQuery applyGraph(RootGraph graph, GraphSemantic semantic) {
 		applyGraph( (RootGraphImplementor) graph, semantic );

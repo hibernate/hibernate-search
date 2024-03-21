@@ -6,15 +6,12 @@
  */
 package org.hibernate.search.test.query.objectloading.mixedhierarchy;
 
-import jakarta.persistence.Inheritance;
-import jakarta.persistence.InheritanceType;
 import jakarta.persistence.MappedSuperclass;
 
 /**
  * @author Gunnar Morling
  */
 @MappedSuperclass
-@Inheritance(strategy = InheritanceType.TABLE_PER_CLASS)
 public class School extends EducationalInstitution {
 
 	School() {
