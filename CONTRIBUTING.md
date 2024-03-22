@@ -8,9 +8,9 @@ This guide focuses on how to contribute back to Hibernate Search using GitHub pu
 ## Legal
 
 All original contributions to Hibernate Search are licensed under the
-[GNU Lesser General Public License (LGPL)](https://www.gnu.org/licenses/old-licenses/lgpl-2.1.txt),
-version 2.1 or later, or, if another license is specified as governing the file or directory being
-modified, such other license. The LGPL text is included verbatim in the [lgpl.txt](lgpl.txt) file
+[Apache License version 2.0 (Apache-2.0)](https://www.apache.org/licenses/LICENSE-2.0.txt),
+or, if another license is specified as governing the file or directory being modified, such other license.
+The Apache-2.0 license text is included verbatim in the [`LICENSE.txt`](LICENSE.txt) file
 in the root directory of the repository.
 
 All contributions are subject to the [Developer Certificate of Origin (DCO)](https://developercertificate.org/).

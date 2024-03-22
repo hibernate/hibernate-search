@@ -108,7 +108,7 @@
                             </offlineLink>
                         </offlineLinks>
                         <bottom>
-                            <![CDATA[Copyright &copy; ${project.inceptionYear}-{currentYear} <a href="https://www.redhat.com/">Red Hat, Inc.</a> and others. Licensed under the GNU Lesser General Public License (LGPL), version 2.1 or later.]]>
+                            <![CDATA[Copyright &copy; ${project.inceptionYear}-{currentYear} <a href="https://www.redhat.com/">Red Hat, Inc.</a> and Hibernate Authors. Licensed under the <a href="https://www.apache.org/licenses/LICENSE-2.0.txt">Apache License version 2.0 (Apache-2.0)</a>.]]>
                         </bottom>
                         <additionalDependencies>
                             <additionalDependency>
