@@ -8,6 +8,7 @@ package org.hibernate.search.integrationtest.backend.tck.search.predicate;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
@@ -161,6 +162,19 @@ class MatchPredicateBaseIT {
 		protected PredicateFinalStep predicate(SearchPredicateFactory f, String fieldPath, int matchingDocOrdinal,
 				DataSet<?, MatchPredicateTestValues<F>> dataSet) {
 			return f.match().field( fieldPath ).matching( dataSet.values.matchingArg( matchingDocOrdinal ) );
+		}
+
+		@Override
+		protected PredicateFinalStep predicate(SearchPredicateFactory f, String fieldPath, String paramName,
+				DataSet<?, MatchPredicateTestValues<F>> dataSet) {
+			return f.withParameters( params -> f.match().field( fieldPath )
+					.matching( params.get( paramName, dataSet.fieldType.getJavaType() ), ValueConvert.YES ) );
+		}
+
+		@Override
+		protected Map<String, Object> parameterValues(int matchingDocOrdinal, DataSet<?, MatchPredicateTestValues<F>> dataSet,
+				String paramName) {
+			return Map.of( paramName, dataSet.values.matchingArg( matchingDocOrdinal ) );
 		}
 	}
 

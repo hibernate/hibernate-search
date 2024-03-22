@@ -9,8 +9,10 @@ package org.hibernate.search.integrationtest.backend.tck.search.predicate;
 import static org.junit.jupiter.api.Assumptions.assumeTrue;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
@@ -161,6 +163,19 @@ class TermsPredicateBaseIT {
 				DataSet<?, TermsPredicateTestValues<F>> dataSet) {
 			return f.terms().field( fieldPath ).matchingAny( dataSet.values.matchingArg( matchingDocOrdinal ) );
 		}
+
+		@Override
+		protected PredicateFinalStep predicate(SearchPredicateFactory f, String fieldPath, String paramName,
+				DataSet<?, TermsPredicateTestValues<F>> dataSet) {
+			return f.withParameters( params -> f.terms().field( fieldPath )
+					.matchingAny( params.get( paramName, dataSet.fieldType.getJavaType() ) ) );
+		}
+
+		@Override
+		protected Map<String, Object> parameterValues(int matchingDocOrdinal, DataSet<?, TermsPredicateTestValues<F>> dataSet,
+				String paramName) {
+			return Map.of( paramName, dataSet.values.matchingArg( matchingDocOrdinal ) );
+		}
 	}
 
 	@Nested
@@ -203,6 +218,29 @@ class TermsPredicateBaseIT {
 			}
 
 			return f.terms().field( fieldPath ).matchingAny( dataSet.values.matchingArg( matchingDocOrdinal ) );
+		}
+
+		@Override
+		protected PredicateFinalStep predicate(SearchPredicateFactory f, String fieldPath, String paramName,
+				DataSet<?, TermsPredicateTestValues<F>> dataSet) {
+			return f.withParameters( params -> f.terms().field( fieldPath )
+					.matchingAny( params.get( paramName, Collection.class ) ) );
+		}
+
+		@Override
+		protected Map<String, Object> parameterValues(int matchingDocOrdinal, DataSet<?, TermsPredicateTestValues<F>> dataSet,
+				String paramName) {
+			assumeTrue(
+					TckConfiguration.get().getBackendFeatures().canPerformTermsQuery( dataSet.fieldType )
+			);
+			if ( dataSet.values.providesNonMatchingArgs() ) {
+				return Map.of( paramName, List.of( dataSet.values.nonMatchingArg( 0 ),
+						dataSet.values.matchingArg( matchingDocOrdinal ), dataSet.values.nonMatchingArg( 1 ),
+						dataSet.values.nonMatchingArg( 2 ), dataSet.values.nonMatchingArg( 3 )
+				) );
+			}
+
+			return Map.of( paramName, List.of( dataSet.values.matchingArg( matchingDocOrdinal ) ) );
 		}
 	}
 

@@ -11,10 +11,12 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 
 import org.hibernate.search.engine.backend.types.dsl.SearchableProjectableIndexFieldTypeOptionsStep;
 import org.hibernate.search.engine.search.predicate.dsl.PredicateFinalStep;
 import org.hibernate.search.engine.search.predicate.dsl.SearchPredicateFactory;
+import org.hibernate.search.engine.spatial.DistanceUnit;
 import org.hibernate.search.engine.spatial.GeoPoint;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.FieldTypeDescriptor;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.GeoPointFieldTypeDescriptor;
@@ -131,6 +133,26 @@ class SpatialWithinCirclePredicateBaseIT {
 			return f.spatial().within().field( fieldPath )
 					.circle( SingleFieldConfigured.dataSet.values.matchingCenter( matchingDocOrdinal ),
 							SingleFieldConfigured.dataSet.values.matchingRadius( matchingDocOrdinal ) );
+		}
+
+		@Override
+		protected PredicateFinalStep predicate(SearchPredicateFactory f, String fieldPath, String paramName,
+				DataSet<?, SpatialWithinCirclePredicateTestValues> dataSet) {
+			return f.withParameters( params -> f.spatial().within().field( fieldPath )
+					.circle( params.get( paramName + "_center", GeoPoint.class ),
+							params.get( paramName + "_radius", Double.class ),
+							params.get( paramName + "_unit", DistanceUnit.class ) )
+			);
+		}
+
+		@Override
+		protected Map<String, Object> parameterValues(int matchingDocOrdinal,
+				DataSet<?, SpatialWithinCirclePredicateTestValues> dataSet, String paramName) {
+			return Map.of(
+					paramName + "_center", SingleFieldConfigured.dataSet.values.matchingCenter( matchingDocOrdinal ),
+					paramName + "_radius", SingleFieldConfigured.dataSet.values.matchingRadius( matchingDocOrdinal ),
+					paramName + "_unit", DistanceUnit.METERS
+			);
 		}
 	}
 
