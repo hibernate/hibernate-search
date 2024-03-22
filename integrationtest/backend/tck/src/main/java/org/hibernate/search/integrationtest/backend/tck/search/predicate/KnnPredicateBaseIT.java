@@ -10,6 +10,7 @@ import static org.junit.jupiter.api.Assumptions.assumeTrue;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import org.hibernate.search.engine.search.predicate.dsl.KnnPredicateOptionsStep;
 import org.hibernate.search.engine.search.predicate.dsl.PredicateFinalStep;
@@ -102,6 +103,26 @@ class KnnPredicateBaseIT {
 				DataSet<?, KnnPredicateTestValues<F>> dataSet) {
 			return knnPredicateOptionsStep( f, fieldPath, matchingDocOrdinal,
 					dataSet.values.matchingArg( matchingDocOrdinal ) );
+		}
+
+		@Override
+		protected PredicateFinalStep predicate(SearchPredicateFactory f, String fieldPath, String paramName,
+				DataSet<?, KnnPredicateTestValues<F>> dataSet) {
+			return f.withParameters( params -> {
+				Object param = params.get( paramName, dataSet.fieldType.getJavaType() );
+				if ( param instanceof byte[] ) {
+					return f.knn( 1 ).field( fieldPath ).matching( (byte[]) param );
+				}
+				else {
+					return f.knn( 1 ).field( fieldPath ).matching( (float[]) param );
+				}
+			} );
+		}
+
+		@Override
+		protected Map<String, Object> parameterValues(int matchingDocOrdinal, DataSet<?, KnnPredicateTestValues<F>> dataSet,
+				String paramName) {
+			return Map.of( paramName, dataSet.values.matchingArg( matchingDocOrdinal ) );
 		}
 	}
 
