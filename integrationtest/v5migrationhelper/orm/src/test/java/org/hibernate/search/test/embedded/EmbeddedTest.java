@@ -368,56 +368,6 @@ class EmbeddedTest extends SearchTestBase {
 		s.close();
 	}
 
-	@Test
-	void testEmbeddedToManyInSuperclass() throws ParseException {
-		ProductFeature featureA = new ProductFeature();
-		featureA.setName( "featureA" );
-		ProductFeature featureB = new ProductFeature();
-		featureB.setName( "featureB" );
-
-		AbstractProduct book = new Book();
-		book.setName( "A Book" );
-		featureA.setProduct( book );
-		book.getFeatures().add( featureA );
-
-		Session s = openSession();
-		Transaction tx = s.beginTransaction();
-		s.persist( book );
-		tx.commit();
-
-		s.clear();
-
-		FullTextSession session = Search.getFullTextSession( s );
-		tx = session.beginTransaction();
-
-		QueryParser parser = new QueryParser( "name", TestConstants.standardAnalyzer );
-		Query query;
-		List<?> result;
-
-		query = parser.parse( "features.name:featureA" );
-		result = session.createFullTextQuery( query, AbstractProduct.class ).list();
-		assertThat( result ).as( "Feature A should be indexed" ).hasSize( 1 );
-
-		// Add product features - product should be re-indexed
-		book = (AbstractProduct) result.get( 0 );
-		book.getFeatures().add( featureB );
-
-		tx.commit();
-		s.clear();
-
-		tx = s.beginTransaction();
-		tx.commit();
-		s.clear();
-
-		tx = s.beginTransaction();
-		query = parser.parse( "features.name:featureB" );
-		result = session.createFullTextQuery( query, AbstractProduct.class ).list();
-		assertThat( result ).as( "Feature B should be indexed now as well" ).hasSize( 1 );
-		tx.commit();
-
-		s.close();
-	}
-
 	@Override
 	public Class<?>[] getAnnotatedClasses() {
 		return new Class[] {
@@ -429,10 +379,7 @@ class EmbeddedTest extends SearchTestBase {
 				Country.class,
 				State.class,
 				StateCandidate.class,
-				NonIndexedEntity.class,
-				AbstractProduct.class,
-				Book.class,
-				ProductFeature.class
+				NonIndexedEntity.class
 		};
 	}
 }

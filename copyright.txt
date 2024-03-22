@@ -48,7 +48,6 @@ Pedro Ruivo
 Randall Hauch
 Richard Hallier
 Rick Gagne
-Samppa Saarela
 Sanne Grinovero
 Stéphane Gleizes
 Steve Ebersole
