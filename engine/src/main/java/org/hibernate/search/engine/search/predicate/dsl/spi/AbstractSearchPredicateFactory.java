@@ -10,9 +10,11 @@ import static org.hibernate.search.engine.search.predicate.dsl.impl.AbstractSimp
 import static org.hibernate.search.engine.search.predicate.dsl.impl.AbstractSimpleBooleanPredicateClausesStep.SimpleBooleanPredicateOperator.OR;
 
 import java.util.function.Consumer;
+import java.util.function.Function;
 
 import org.hibernate.search.engine.backend.common.spi.FieldPaths;
 import org.hibernate.search.engine.common.dsl.spi.DslExtensionState;
+import org.hibernate.search.engine.search.common.NamedValues;
 import org.hibernate.search.engine.search.predicate.SearchPredicate;
 import org.hibernate.search.engine.search.predicate.dsl.BooleanPredicateClausesStep;
 import org.hibernate.search.engine.search.predicate.dsl.ExistsPredicateFieldStep;
@@ -58,6 +60,7 @@ import org.hibernate.search.engine.search.predicate.dsl.impl.SimpleQueryStringPr
 import org.hibernate.search.engine.search.predicate.dsl.impl.SpatialPredicateInitialStepImpl;
 import org.hibernate.search.engine.search.predicate.dsl.impl.TermsPredicateFieldStepImpl;
 import org.hibernate.search.engine.search.predicate.dsl.impl.WildcardPredicateFieldStepImpl;
+import org.hibernate.search.engine.search.predicate.dsl.impl.WithParametersPredicateFinalStep;
 import org.hibernate.search.engine.search.predicate.spi.SearchPredicateIndexScope;
 import org.hibernate.search.util.common.impl.Contracts;
 
@@ -227,6 +230,11 @@ public abstract class AbstractSearchPredicateFactory<
 	public KnnPredicateFieldStep knn(int k) {
 		Contracts.assertStrictlyPositive( k, "k" );
 		return new KnnPredicateFieldStepImpl( this, dslContext, k );
+	}
+
+	@Override
+	public PredicateFinalStep withParameters(Function<? super NamedValues, ? extends PredicateFinalStep> predicateCreator) {
+		return new WithParametersPredicateFinalStep( dslContext, predicateCreator );
 	}
 
 	@Override
