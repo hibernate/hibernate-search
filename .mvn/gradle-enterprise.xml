@@ -33,9 +33,6 @@
         <remote>
             <enabled>#{properties['no-build-cache'] == null}</enabled>
             <storeEnabled>#{env['CI'] != null and (env['CHANGE_ID']?:'').isBlank() and (env['GITHUB_BASE_REF']?:'').isBlank() and !(env['GRADLE_ENTERPRISE_ACCESS_KEY']?:'').isBlank()}</storeEnabled>
-            <server>
-                <url>https://ge.hibernate.org/cache/hsearchtest01/</url>
-            </server>
         </remote>
     </buildCache>
 </gradleEnterprise>
