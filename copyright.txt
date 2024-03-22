@@ -13,7 +13,6 @@ Damien Clément d'Huart
 David Steinkopff
 Davide D'Alto
 Dawid Kurzyniec
-Elmer van Chastelet
 Emmanuel Bernard
 Fabio Massimo Ercoli
 Gail Badner
