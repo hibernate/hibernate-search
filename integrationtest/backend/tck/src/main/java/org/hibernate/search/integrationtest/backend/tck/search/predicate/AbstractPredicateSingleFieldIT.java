@@ -9,6 +9,7 @@ package org.hibernate.search.integrationtest.backend.tck.search.predicate;
 import static org.hibernate.search.util.impl.integrationtest.common.assertion.SearchResultAssert.assertThatQuery;
 
 import java.util.Collection;
+import java.util.Map;
 
 import org.hibernate.search.engine.backend.document.DocumentElement;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaElement;
@@ -39,8 +40,33 @@ public abstract class AbstractPredicateSingleFieldIT<V extends AbstractPredicate
 		}
 	}
 
+	@ParameterizedTest(name = "{1}")
+	@MethodSource("params")
+	void matchParameter(SimpleMappedIndex<IndexBinding> index, DataSet<?, V> dataSet) {
+		int valueCount = dataSet.values.size();
+
+		var scope = index.createScope();
+		var predicate = predicate( scope.predicate(), fieldPath( index, dataSet ), "query-parameter", dataSet ).toPredicate();
+
+		for ( int matchingDocOrdinal = 0; matchingDocOrdinal < valueCount; matchingDocOrdinal++ ) {
+			Map<String, Object> parameters = parameterValues( matchingDocOrdinal, dataSet, "query-parameter" );
+			var query = index.query().where( predicate );
+			for ( Map.Entry<String, Object> parameter : parameters.entrySet() ) {
+				query.param( parameter.getKey(), parameter.getValue() );
+			}
+			assertThatQuery( query
+					.routing( dataSet.routingKey ) )
+					.hasDocRefHitsAnyOrder( index.typeName(), dataSet.docId( matchingDocOrdinal ) );
+		}
+	}
+
 	protected abstract PredicateFinalStep predicate(SearchPredicateFactory f, String fieldPath, int matchingDocOrdinal,
 			DataSet<?, V> dataSet);
+
+	protected abstract PredicateFinalStep predicate(SearchPredicateFactory f, String fieldPath, String paramName,
+			DataSet<?, V> dataSet);
+
+	protected abstract Map<String, Object> parameterValues(int matchingDocOrdinal, DataSet<?, V> dataSet, String paramName);
 
 	private String fieldPath(SimpleMappedIndex<IndexBinding> index, DataSet<?, V> dataSet) {
 		return index.binding().field.get( dataSet.fieldType ).relativeFieldName;
