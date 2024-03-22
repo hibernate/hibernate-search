@@ -10,6 +10,7 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
@@ -162,6 +163,19 @@ class RangePredicateBaseIT {
 		protected PredicateFinalStep predicate(SearchPredicateFactory f, String fieldPath, int matchingDocOrdinal,
 				DataSet<?, RangePredicateTestValues<F>> dataSet) {
 			return f.range().field( fieldPath ).range( dataSet.values.matchingRange( matchingDocOrdinal ) );
+		}
+
+		@Override
+		protected PredicateFinalStep predicate(SearchPredicateFactory f, String fieldPath, String paramName,
+				DataSet<?, RangePredicateTestValues<F>> dataSet) {
+			return f.withParameters( params -> f.range().field( fieldPath )
+					.range( params.get( paramName, Range.class ) ) );
+		}
+
+		@Override
+		protected Map<String, Object> parameterValues(int matchingDocOrdinal,
+				DataSet<?, RangePredicateTestValues<F>> dataSet, String paramName) {
+			return Map.of( paramName, dataSet.values.matchingRange( matchingDocOrdinal ) );
 		}
 	}
 
