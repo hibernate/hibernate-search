@@ -40,6 +40,7 @@ import org.hibernate.search.engine.search.predicate.dsl.TermsPredicateFieldStep;
 import org.hibernate.search.engine.search.predicate.dsl.WildcardPredicateFieldStep;
 import org.hibernate.search.engine.search.predicate.dsl.impl.BooleanPredicateClausesStepImpl;
 import org.hibernate.search.engine.search.predicate.dsl.impl.ExistsPredicateFieldStepImpl;
+import org.hibernate.search.engine.search.predicate.dsl.impl.KnnPredicateFieldStepImpl;
 import org.hibernate.search.engine.search.predicate.dsl.impl.MatchAllPredicateOptionsStepImpl;
 import org.hibernate.search.engine.search.predicate.dsl.impl.MatchIdPredicateMatchingStepImpl;
 import org.hibernate.search.engine.search.predicate.dsl.impl.MatchNonePredicateFinalStepImpl;
