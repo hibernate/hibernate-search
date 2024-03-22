@@ -43,6 +43,7 @@ public final class IndexFieldTraits {
 		public static final String KNN = "predicate:knn";
 		public static final String MATCH = "predicate:match";
 		public static final String NESTED = "predicate:nested";
+		public static final String WITH_PARAMETERS = "predicate:with_parameters";
 		public static final String PHRASE = "predicate:phrase";
 		public static final String RANGE = "predicate:range";
 		public static final String QUERY_STRING = "predicate:query-string";
