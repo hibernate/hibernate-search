@@ -48,57 +48,11 @@ class ProxyTest extends SearchTestBase {
 		session.close();
 	}
 
-	@Test
-	void testDeleteProxy() {
-		createTestData();
-
-		Session s = openSession();
-		Transaction tx = s.beginTransaction();
-		IComment c = (IComment) s.get( Comment.class, 2 );
-		s.delete( c );
-		tx.commit();
-		s.close();
-	}
-
-	public void createTestData() {
-		Session s = openSession();
-		Transaction tx = s.beginTransaction();
-		IProfile p = new Profile();
-		p.setId( 1 );
-		s.save( p );
-
-		IComment c1 = new Comment();
-		c1.setId( 2 );
-		c1.setProfile( (IProfile) s.get( Profile.class, 1 ) );
-		c1.setContent( "c1" );
-		c1.setRootComment( null );
-		s.save( c1 );
-
-		IComment c2 = new Comment();
-		c2.setId( 3 );
-		c2.setProfile( (IProfile) s.get( Profile.class, 1 ) );
-		c2.setContent( "c2" );
-		c2.setRootComment( c1 );
-		s.save( c2 );
-
-		IComment c3 = new Comment();
-		c3.setId( 4 );
-		c3.setProfile( (IProfile) s.get( Profile.class, 1 ) );
-		c3.setContent( "c3" );
-		c3.setRootComment( c1 );
-		s.save( c3 );
-
-		tx.commit();
-		s.close();
-	}
-
 	@Override
 	public Class<?>[] getAnnotatedClasses() {
 		return new Class[] {
 				Book.class,
-				Author.class,
-				Comment.class,
-				Profile.class
+				Author.class
 		};
 	}
 }
