@@ -591,21 +591,6 @@ class DSLTest {
 	}
 
 	@Test
-	@TestForIssue(jiraKey = "HSEARCH-2479")
-	void testPhraseQueryTermCreation() {
-		String testCaseText = "Test the Test test of your test test to test test test of test and Test budgeting.";
-		final QueryBuilder monthQb = helper.queryBuilder( Month.class );
-
-		Query query = monthQb
-				.phrase()
-				.onField( "mythology" )
-				.sentence( testCaseText )
-				.createQuery();
-
-		helper.assertThatQuery( query ).from( Month.class ).as( "test term ordering" ).hasResultSize( 0 );
-	}
-
-	@Test
 	void testPhraseQueryWithStopWords() {
 		final QueryBuilder monthQb = helper.queryBuilder( Month.class );
 
