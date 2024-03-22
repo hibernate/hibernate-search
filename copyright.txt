@@ -12,7 +12,6 @@ Chase Seibert
 Damien Clément d'Huart
 David Steinkopff
 Davide D'Alto
-Davide Di Somma
 Dawid Kurzyniec
 Elmer van Chastelet
 Emmanuel Bernard
