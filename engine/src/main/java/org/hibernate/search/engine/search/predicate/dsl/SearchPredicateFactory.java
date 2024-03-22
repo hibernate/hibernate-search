@@ -7,9 +7,11 @@
 package org.hibernate.search.engine.search.predicate.dsl;
 
 import java.util.function.Consumer;
+import java.util.function.Function;
 
 import org.hibernate.search.engine.backend.types.ObjectStructure;
 import org.hibernate.search.engine.search.common.BooleanOperator;
+import org.hibernate.search.engine.search.common.NamedValues;
 import org.hibernate.search.engine.search.predicate.SearchPredicate;
 import org.hibernate.search.util.common.SearchException;
 import org.hibernate.search.util.common.annotation.Incubating;
@@ -300,6 +302,18 @@ public interface SearchPredicateFactory {
 	 * @see KnnPredicateOptionsStep
 	 */
 	KnnPredicateFieldStep knn(int k);
+
+	/**
+	 * Delegating predicate that creates the actual predicate at query create time and provides access to query parameters.
+	 * <p>
+	 * Which predicate exactly to create is defined by a function passed to the arguments of this predicate.
+	 *
+	 * @param predicateCreator The function defining an actual predicate to apply.
+	 * @return A final DSL step in a parameterized predicate definition.
+	 */
+	@Incubating
+	PredicateFinalStep withParameters(
+			Function<? super NamedValues, ? extends PredicateFinalStep> predicateCreator);
 
 	/**
 	 * Extend the current factory with the given extension,
