@@ -47,9 +47,10 @@
 
     <licenses>
         <license>
-            <name>GNU Lesser General Public License v2.1 or later</name>
-            <url>http://www.opensource.org/licenses/LGPL-2.1</url>
-            <comments>See also: http://hibernate.org/license</comments>
+            <name>Apache-2.0</name>
+            <url>https://www.apache.org/licenses/LICENSE-2.0.txt</url>
+            <distribution>repo</distribution>
+            <comments>See also: https://hibernate.org/license</comments>
         </license>
     </licenses>
 

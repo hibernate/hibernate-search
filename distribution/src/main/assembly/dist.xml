@@ -165,7 +165,7 @@
             <outputDirectory></outputDirectory>
         </file>
         <file>
-            <source>../lgpl.txt</source>
+            <source>../LICENSE.txt</source>
             <outputDirectory></outputDirectory>
         </file>
         <file>
@@ -190,7 +190,7 @@
                 <exclude>CONTRIBUTING.md</exclude>
                 <exclude>changelog.txt</exclude>
                 <exclude>copyright.txt</exclude>
-                <exclude>lgpl.txt</exclude>
+                <exclude>LICENSE.txt</exclude>
 
                 <!-- only needed for documentation and helper scripts, no need to include them -->
                 <exclude>hibernate-noorm-release-scripts/**</exclude>
