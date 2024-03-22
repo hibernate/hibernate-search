@@ -17,7 +17,6 @@ Emmanuel Bernard
 Fabio Massimo Ercoli
 Gail Badner
 Gavin King
-Grégoire Rolland
 Guillaume Smet
 Gunnar Morling
 Gustavo Fernandes
