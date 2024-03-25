@@ -417,8 +417,7 @@ stage('Default build') {
 			"""
 
 			echo "Building code and running unit tests and basic checks."
-			sh """ \
-					mvn \
+			mvn """ \
 					${commonMavenArgs} \
 					-Pdist \
 					-Pjqassistant -Pci-build \
@@ -459,8 +458,7 @@ stage('Default build') {
 			"""
 			pullContainerImages( itMavenArgs )
 			// Note "clean" is necessary here in order to store the result of the build in the remote build cache
-			sh """ \
-					mvn \
+			mvn """ \
 					${itMavenArgs} \
 					clean verify \
 			"""
@@ -907,24 +905,43 @@ void withMavenWorkspace(Map args, Closure body) {
 		// The script is in the code repository, so we need the scm checkout
 		// to be performed by helper.withMavenWorkspace before we can call the script.
 		sh 'ci/docker-cleanup.sh'
-		tryFinally({
-			def develocityCredentialsId = helper.scmSource.pullRequest ?
-					helper.configuration.file?.develocity?.credentials?.pr : helper.configuration.file?.develocity?.credentials?.main
-			if (develocityCredentialsId) {
-				withCredentials([string(credentialsId: develocityCredentialsId,
-						variable: 'GRADLE_ENTERPRISE_ACCESS_KEY')]) {
-					withGradle { // withDevelocity, actually: https://plugins.jenkins.io/gradle/#plugin-content-capturing-build-scans-from-jenkins-pipeline
-						body()
-					}
-				}
-			}
-			else {
-				body()
-			}
-		}, { // Finally
+		tryFinally(body, { // Finally
 			sh 'ci/docker-cleanup.sh'
 		})
 	})
+}
+
+void mvn(String args) {
+	def develocityMainCredentialsId = helper.configuration.file?.develocity?.credentials?.main
+	def develocityPrCredentialsId = helper.configuration.file?.develocity?.credentials?.pr
+	if ( !helper.scmSource.pullRequest && develocityMainCredentialsId ) {
+		// Not a PR: we can pass credentials to the build, allowing it to populate the build cache
+		// and to publish build scans directly.
+		withCredentials([string(credentialsId: develocityMainCredentialsId,
+				variable: 'GRADLE_ENTERPRISE_ACCESS_KEY')]) {
+			withGradle { // withDevelocity, actually: https://plugins.jenkins.io/gradle/#plugin-content-capturing-build-scans-from-jenkins-pipeline
+				sh "mvn $args"
+			}
+		}
+	}
+	else if ( helper.scmSource.pullRequest && develocityPrCredentialsId ) {
+		// Pull request: we can't pass credentials to the build, since we'd be exposing secrets to e.g. tests.
+		// We do the build first, then publish the build scan separately.
+		tryFinally({
+			sh "mvn $args"
+		}, { // Finally
+			withCredentials([string(credentialsId: develocityPrCredentialsId,
+					variable: 'GRADLE_ENTERPRISE_ACCESS_KEY')]) {
+				withGradle { // withDevelocity, actually: https://plugins.jenkins.io/gradle/#plugin-content-capturing-build-scans-from-jenkins-pipeline
+					sh 'mvn gradle-enterprise:build-scan-publish-previous'
+				}
+			}
+		})
+	}
+	else {
+		// No Develocity credentials.
+		sh "mvn $args"
+	}
 }
 
 // Perform authenticated pulls of container images, to avoid failure due to download throttling on dockerhub.
@@ -977,8 +994,8 @@ void mavenNonDefaultBuild(BuildEnvironment buildEnv, String args, List<String> a
 	pullContainerImages( args )
 
 	// Note "clean" is necessary here in order to store the result of the build in the remote build cache
-	sh """ \
-			mvn clean install -Pci-build \
+	mvn """ \
+			clean install -Pci-build \
 					${toTestEnvironmentArgs(buildEnv)} \
 					--fail-at-end \
 					$args \
