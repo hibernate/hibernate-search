@@ -10,6 +10,7 @@ import org.hibernate.search.engine.search.sort.SearchSort;
 import org.hibernate.search.engine.search.sort.spi.CompositeSortBuilder;
 import org.hibernate.search.engine.search.sort.spi.ScoreSortBuilder;
 import org.hibernate.search.engine.search.sort.spi.SearchSortBuilderFactory;
+import org.hibernate.search.engine.search.sort.spi.WithParametersSortBuilder;
 
 public class StubSearchSortBuilderFactory
 		implements SearchSortBuilderFactory {
@@ -26,6 +27,11 @@ public class StubSearchSortBuilderFactory
 
 	@Override
 	public CompositeSortBuilder composite() {
+		return new StubSearchSort.Builder();
+	}
+
+	@Override
+	public WithParametersSortBuilder withParameters() {
 		return new StubSearchSort.Builder();
 	}
 }

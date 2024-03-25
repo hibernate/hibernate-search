@@ -22,4 +22,6 @@ public interface SearchSortBuilderFactory {
 
 	CompositeSortBuilder composite();
 
+	WithParametersSortBuilder withParameters();
+
 }
