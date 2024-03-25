@@ -131,7 +131,7 @@ jobs:
           # WARNING: exposes secrets, so must only be passed to a step that doesn't run unapproved code.
           GRADLE_ENTERPRISE_ACCESS_KEY: "${{ github.event.pull_request.number && '' || secrets.GRADLE_ENTERPRISE_ACCESS_KEY }}"
       - name: Publish Develocity build scan for previous build (pull request)
-        if: "!cancelled() && github.event.pull_request.number && secrets.GRADLE_ENTERPRISE_ACCESS_KEY_PR"
+        if: "${{ !cancelled() && github.event.pull_request.number && secrets.GRADLE_ENTERPRISE_ACCESS_KEY_PR }}"
         run: |
           ./mvnw gradle-enterprise:build-scan-publish-previous
         env:
@@ -147,7 +147,7 @@ jobs:
           # WARNING: exposes secrets, so must only be passed to a step that doesn't run unapproved code.
           GRADLE_ENTERPRISE_ACCESS_KEY: "${{ github.event.pull_request.number && '' || secrets.GRADLE_ENTERPRISE_ACCESS_KEY }}"
       - name: Publish Develocity build scan for previous build (pull request)
-        if: "!cancelled() && github.event.pull_request.number && secrets.GRADLE_ENTERPRISE_ACCESS_KEY_PR"
+        if: "${{ !cancelled() && github.event.pull_request.number && secrets.GRADLE_ENTERPRISE_ACCESS_KEY_PR }}"
         run: |
           ./mvnw gradle-enterprise:build-scan-publish-previous
         env:
