@@ -40,14 +40,14 @@ class LuceneSearcherImpl<H> implements LuceneSearcher<LuceneLoadableSearchResult
 	private final LuceneSearchQueryRequestContext requestContext;
 
 	private final LuceneSearchProjection.Extractor<?, H> rootExtractor;
-	private final Map<AggregationKey<?>, LuceneSearchAggregation<?>> aggregations;
+	private final Map<AggregationKey<?>, LuceneSearchAggregation.Extractor<?>> aggregations;
 	private final ExtractionRequirements extractionRequirements;
 
 	private TimeoutManager timeoutManager;
 
 	LuceneSearcherImpl(LuceneSearchQueryRequestContext requestContext,
 			LuceneSearchProjection.Extractor<?, H> rootExtractor,
-			Map<AggregationKey<?>, LuceneSearchAggregation<?>> aggregations,
+			Map<AggregationKey<?>, LuceneSearchAggregation.Extractor<?>> aggregations,
 			ExtractionRequirements extractionRequirements,
 			TimeoutManager timeoutManager) {
 		this.requestContext = requestContext;

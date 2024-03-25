@@ -8,10 +8,12 @@ package org.hibernate.search.backend.lucene.types.aggregation.impl;
 
 import java.io.IOException;
 import java.util.Comparator;
+import java.util.Map;
 import java.util.SortedSet;
 import java.util.TreeSet;
 
 import org.hibernate.search.backend.lucene.lowlevel.join.impl.NestedDocsProvider;
+import org.hibernate.search.backend.lucene.search.aggregation.impl.AggregationRequestContext;
 import org.hibernate.search.backend.lucene.search.common.impl.AbstractLuceneCodecAwareSearchQueryElementFactory;
 import org.hibernate.search.backend.lucene.search.common.impl.LuceneSearchIndexScope;
 import org.hibernate.search.backend.lucene.search.common.impl.LuceneSearchIndexValueFieldContext;
@@ -51,52 +53,8 @@ public class LuceneNumericTermsAggregation<F, E extends Number, K>
 	}
 
 	@Override
-	FacetResult getTopChildren(IndexReader reader, FacetsCollector facetsCollector,
-			NestedDocsProvider nestedDocsProvider, int limit)
-			throws IOException {
-		Facets facetCounts = numericDomain.createTermsFacetCounts(
-				absoluteFieldPath, facetsCollector, nestedDocsProvider
-		);
-		return facetCounts.getTopChildren( limit, absoluteFieldPath );
-	}
-
-	@Override
-	SortedSet<E> collectFirstTerms(IndexReader reader, boolean descending, int limit)
-			throws IOException {
-		TreeSet<E> collectedTerms = new TreeSet<>( descending ? termComparator.reversed() : termComparator );
-		for ( LeafReaderContext leaf : reader.leaves() ) {
-			final LeafReader atomicReader = leaf.reader();
-			SortedNumericDocValues docValues = atomicReader.getSortedNumericDocValues( absoluteFieldPath );
-			if ( docValues == null ) {
-				continue;
-			}
-			while ( docValues.nextDoc() != DocIdSetIterator.NO_MORE_DOCS ) {
-				for ( int i = 0; i < docValues.docValueCount(); i++ ) {
-					E term = numericDomain.sortedDocValueToTerm( docValues.nextValue() );
-					collectedTerms.add( term );
-					// Try not to keep too many terms in memory
-					if ( collectedTerms.size() > limit ) {
-						collectedTerms.remove( collectedTerms.last() );
-					}
-				}
-			}
-		}
-		return collectedTerms;
-	}
-
-	@Override
-	Comparator<E> getAscendingTermComparator() {
-		return termComparator;
-	}
-
-	@Override
-	E labelToTerm(String termAsString) {
-		return numericDomain.sortedDocValueToTerm( Long.parseLong( termAsString ) );
-	}
-
-	@Override
-	F termToFieldValue(E term) {
-		return codec.decode( term );
+	protected Extractor<Map<K, Long>> extractor(AggregationRequestContext context) {
+		return new LuceneNumericTermsAggregationExtractor();
 	}
 
 	public static class Factory<F>
@@ -109,8 +67,60 @@ public class LuceneNumericTermsAggregation<F, E extends Number, K>
 		}
 
 		@Override
-		public TypeSelector<?> create(LuceneSearchIndexScope<?> scope, LuceneSearchIndexValueFieldContext<F> field) {
+		public TermsAggregationBuilder.TypeSelector create(LuceneSearchIndexScope<?> scope,
+				LuceneSearchIndexValueFieldContext<F> field) {
 			return new TypeSelector<>( codec, scope, field );
+		}
+	}
+
+	private class LuceneNumericTermsAggregationExtractor extends AbstractExtractor {
+		@Override
+		FacetResult getTopChildren(IndexReader reader, FacetsCollector facetsCollector,
+				NestedDocsProvider nestedDocsProvider, int limit)
+				throws IOException {
+			Facets facetCounts = numericDomain.createTermsFacetCounts(
+					absoluteFieldPath, facetsCollector, nestedDocsProvider
+			);
+			return facetCounts.getTopChildren( limit, absoluteFieldPath );
+		}
+
+		@Override
+		SortedSet<E> collectFirstTerms(IndexReader reader, boolean descending, int limit)
+				throws IOException {
+			TreeSet<E> collectedTerms = new TreeSet<>( descending ? termComparator.reversed() : termComparator );
+			for ( LeafReaderContext leaf : reader.leaves() ) {
+				final LeafReader atomicReader = leaf.reader();
+				SortedNumericDocValues docValues = atomicReader.getSortedNumericDocValues( absoluteFieldPath );
+				if ( docValues == null ) {
+					continue;
+				}
+				while ( docValues.nextDoc() != DocIdSetIterator.NO_MORE_DOCS ) {
+					for ( int i = 0; i < docValues.docValueCount(); i++ ) {
+						E term = numericDomain.sortedDocValueToTerm( docValues.nextValue() );
+						collectedTerms.add( term );
+						// Try not to keep too many terms in memory
+						if ( collectedTerms.size() > limit ) {
+							collectedTerms.remove( collectedTerms.last() );
+						}
+					}
+				}
+			}
+			return collectedTerms;
+		}
+
+		@Override
+		Comparator<E> getAscendingTermComparator() {
+			return termComparator;
+		}
+
+		@Override
+		E labelToTerm(String termAsString) {
+			return numericDomain.sortedDocValueToTerm( Long.parseLong( termAsString ) );
+		}
+
+		@Override
+		F termToFieldValue(E term) {
+			return codec.decode( term );
 		}
 	}
 

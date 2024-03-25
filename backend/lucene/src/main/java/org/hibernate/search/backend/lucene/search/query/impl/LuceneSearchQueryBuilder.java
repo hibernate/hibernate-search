@@ -280,14 +280,18 @@ public class LuceneSearchQueryBuilder<H> implements SearchQueryBuilder<H>, Lucen
 				resolvedNamedHighlighters,
 				parameters
 		);
-		LuceneSearchProjection.Extractor<?, H> rootExtractor =
-				rootProjection.request( projectionRequestContext );
+		LuceneSearchProjection.Extractor<?, H> rootExtractor = rootProjection.request( projectionRequestContext );
+		Map<AggregationKey<?>, LuceneSearchAggregation.Extractor<?>> aggregationExtractors;
 		if ( aggregations != null ) {
+			aggregationExtractors = new LinkedHashMap<>();
 			AggregationRequestContext aggregationRequestContext =
-					new AggregationRequestContext( extractionRequirementsBuilder );
-			for ( LuceneSearchAggregation<?> aggregation : aggregations.values() ) {
-				aggregation.request( aggregationRequestContext );
+					new AggregationRequestContext( extractionRequirementsBuilder, parameters );
+			for ( Map.Entry<AggregationKey<?>, LuceneSearchAggregation<?>> entry : aggregations.entrySet() ) {
+				aggregationExtractors.put( entry.getKey(), entry.getValue().request( aggregationRequestContext ) );
 			}
+		}
+		else {
+			aggregationExtractors = Collections.emptyMap();
 		}
 		ExtractionRequirements extractionRequirements = extractionRequirementsBuilder.build();
 
@@ -296,7 +300,7 @@ public class LuceneSearchQueryBuilder<H> implements SearchQueryBuilder<H>, Lucen
 		LuceneSearcherImpl<H> searcher = new LuceneSearcherImpl<>(
 				requestContext,
 				rootExtractor,
-				aggregations == null ? Collections.emptyMap() : aggregations,
+				aggregationExtractors,
 				extractionRequirements,
 				timeoutManager
 		);

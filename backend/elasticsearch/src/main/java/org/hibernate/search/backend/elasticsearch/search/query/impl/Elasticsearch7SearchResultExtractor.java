@@ -64,12 +64,12 @@ class Elasticsearch7SearchResultExtractor<H>
 	private final ElasticsearchSearchQueryRequestContext requestContext;
 
 	private final ElasticsearchSearchProjection.Extractor<?, H> rootExtractor;
-	private final Map<AggregationKey<?>, ElasticsearchSearchAggregation<?>> aggregations;
+	private final Map<AggregationKey<?>, ElasticsearchSearchAggregation.Extractor<?>> aggregations;
 
 	Elasticsearch7SearchResultExtractor(
 			ElasticsearchSearchQueryRequestContext requestContext,
 			ElasticsearchSearchProjection.Extractor<?, H> rootExtractor,
-			Map<AggregationKey<?>, ElasticsearchSearchAggregation<?>> aggregations) {
+			Map<AggregationKey<?>, ElasticsearchSearchAggregation.Extractor<?>> aggregations) {
 		this.requestContext = requestContext;
 		this.rootExtractor = rootExtractor;
 		this.aggregations = aggregations;
@@ -145,9 +145,9 @@ class Elasticsearch7SearchResultExtractor<H>
 
 		Map<AggregationKey<?>, Object> extractedMap = new LinkedHashMap<>();
 
-		for ( Map.Entry<AggregationKey<?>, ElasticsearchSearchAggregation<?>> entry : aggregations.entrySet() ) {
+		for ( Map.Entry<AggregationKey<?>, ElasticsearchSearchAggregation.Extractor<?>> entry : aggregations.entrySet() ) {
 			AggregationKey<?> key = entry.getKey();
-			ElasticsearchSearchAggregation<?> aggregation = entry.getValue();
+			ElasticsearchSearchAggregation.Extractor<?> aggregation = entry.getValue();
 
 			Object extracted = aggregation.extract( jsonAggregations.getAsJsonObject( key.name() ), extractContext );
 			extractedMap.put( key, extracted );
