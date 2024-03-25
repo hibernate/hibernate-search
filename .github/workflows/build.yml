@@ -133,7 +133,7 @@ jobs:
       - name: Publish Develocity build scan for previous build (pull request)
         if: "${{ !cancelled() && github.event_name == 'pull_request_target' && github.repository == 'hibernate/hibernate-search' }}"
         run: |
-          ./mvnw gradle-enterprise:build-scan-publish-previous
+          ./mvnw $MAVEN_ARGS gradle-enterprise:build-scan-publish-previous
         env:
           # WARNING: exposes secrets, so must only be passed to a step that doesn't run unapproved code.
           GRADLE_ENTERPRISE_ACCESS_KEY: ${{ secrets.GRADLE_ENTERPRISE_ACCESS_KEY_PR }}
@@ -149,7 +149,7 @@ jobs:
       - name: Publish Develocity build scan for previous build (pull request)
         if: "${{ !cancelled() && github.event_name == 'pull_request_target' && github.repository == 'hibernate/hibernate-search' }}"
         run: |
-          ./mvnw gradle-enterprise:build-scan-publish-previous
+          ./mvnw $MAVEN_ARGS gradle-enterprise:build-scan-publish-previous
         env:
           # WARNING: exposes secrets, so must only be passed to a step that doesn't run unapproved code.
           GRADLE_ENTERPRISE_ACCESS_KEY: ${{ secrets.GRADLE_ENTERPRISE_ACCESS_KEY_PR }}
