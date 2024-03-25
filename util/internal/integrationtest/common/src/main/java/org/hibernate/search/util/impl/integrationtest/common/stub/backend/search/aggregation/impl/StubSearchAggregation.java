@@ -7,10 +7,14 @@
 package org.hibernate.search.util.impl.integrationtest.common.stub.backend.search.aggregation.impl;
 
 import java.util.Map;
+import java.util.function.Function;
 
 import org.hibernate.search.engine.search.aggregation.SearchAggregation;
+import org.hibernate.search.engine.search.aggregation.dsl.AggregationFinalStep;
 import org.hibernate.search.engine.search.aggregation.spi.RangeAggregationBuilder;
 import org.hibernate.search.engine.search.aggregation.spi.TermsAggregationBuilder;
+import org.hibernate.search.engine.search.aggregation.spi.WithParametersAggregationBuilder;
+import org.hibernate.search.engine.search.common.NamedValues;
 import org.hibernate.search.engine.search.common.ValueConvert;
 import org.hibernate.search.engine.search.predicate.SearchPredicate;
 import org.hibernate.search.util.common.data.Range;
@@ -114,6 +118,18 @@ public class StubSearchAggregation<A> implements SearchAggregation<A> {
 
 		@Override
 		public SearchAggregation<Map<Range<K>, Long>> build() {
+			return new StubSearchAggregation<>();
+		}
+	}
+
+	public static class StubWithParametersAggregationBuilder<T> implements WithParametersAggregationBuilder<T> {
+		@Override
+		public void creator(Function<? super NamedValues, ? extends AggregationFinalStep<T>> aggregationCreator) {
+
+		}
+
+		@Override
+		public SearchAggregation<T> build() {
 			return new StubSearchAggregation<>();
 		}
 	}

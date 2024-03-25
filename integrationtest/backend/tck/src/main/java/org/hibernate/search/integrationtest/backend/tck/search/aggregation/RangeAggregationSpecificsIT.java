@@ -28,6 +28,7 @@ import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaElement
 import org.hibernate.search.engine.backend.types.Aggregable;
 import org.hibernate.search.engine.backend.types.Searchable;
 import org.hibernate.search.engine.search.aggregation.AggregationKey;
+import org.hibernate.search.engine.search.aggregation.dsl.SearchAggregationFactory;
 import org.hibernate.search.engine.search.query.dsl.SearchQueryOptionsStep;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.operations.AggregationDescriptor;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.operations.RangeAggregationDescriptor;
@@ -505,6 +506,56 @@ class RangeAggregationSpecificsIT<F> {
 							c.accept( Range.canonical( dataSet.ascendingValues.get( 2 ), dataSet.ascendingValues.get( 5 ) ),
 									3L );
 							c.accept( Range.canonical( dataSet.ascendingValues.get( 5 ), null ), 2L );
+						} )
+				);
+	}
+
+	@ParameterizedTest(name = "{0}")
+	@MethodSource("params")
+	@SuppressWarnings("unchecked")
+	void rangeOverlap_parmeters(FieldTypeDescriptor<F, ?> fieldType, DataSet<F> dataSet) {
+		String fieldPath = index.binding().fieldModels.get( fieldType ).relativeFieldName;
+
+		AggregationKey<Map<Range<F>, Long>> aggregationKey = AggregationKey.of( AGGREGATION_NAME );
+
+		SearchAggregationFactory af = index.createScope().aggregation();
+		var aggregation = af.withParameters( param -> af.range().field(
+				fieldPath, fieldType.getJavaType() )
+				.range( param.get( "range1", Range.class ) )
+				.range( param.get( "range2", Range.class ) )
+				.range( param.get( "range3", Range.class ) )
+				.range( param.get( "range4", Range.class ) )
+				.range( param.get( "range5", Range.class ) )
+				.range( param.get( "range6", Range.class ) )
+				.range( param.get( "range7", Range.class ) ) ).toAggregation();
+
+		assertThatQuery(
+				matchAllQuery()
+						.aggregation( aggregationKey, aggregation )
+						.param( "range1", Range.canonical( dataSet.ascendingValues.get( 0 ), null ) )
+						.param( "range2", Range.canonical( null, dataSet.ascendingValues.get( 2 ) ) )
+						.param( "range3",
+								Range.canonical( dataSet.ascendingValues.get( 2 ), dataSet.ascendingValues.get( 5 ) ) )
+						.param( "range4", Range.canonical( null, null ) )
+						.param( "range5",
+								Range.canonical( dataSet.ascendingValues.get( 0 ), dataSet.ascendingValues.get( 7 ) ) )
+						.param( "range6", Range.canonical( dataSet.ascendingValues.get( 5 ), null ) )
+						.param( "range7", Range.canonical( null, dataSet.ascendingValues.get( 6 ) ) )
+						.routing( dataSet.name )
+						.toQuery()
+		)
+				.aggregation(
+						aggregationKey,
+						containsExactly( c -> {
+							c.accept( Range.canonical( dataSet.ascendingValues.get( 0 ), null ), 7L );
+							c.accept( Range.canonical( null, dataSet.ascendingValues.get( 2 ) ), 2L );
+							c.accept( Range.canonical( dataSet.ascendingValues.get( 2 ), dataSet.ascendingValues.get( 5 ) ),
+									3L );
+							c.accept( Range.canonical( null, null ), 7L );
+							c.accept( Range.canonical( dataSet.ascendingValues.get( 0 ), dataSet.ascendingValues.get( 7 ) ),
+									7L );
+							c.accept( Range.canonical( dataSet.ascendingValues.get( 5 ), null ), 2L );
+							c.accept( Range.canonical( null, dataSet.ascendingValues.get( 6 ) ), 6L );
 						} )
 				);
 	}
