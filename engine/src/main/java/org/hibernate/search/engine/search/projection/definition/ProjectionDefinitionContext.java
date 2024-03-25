@@ -16,6 +16,4 @@ import org.hibernate.search.util.common.annotation.Incubating;
 @Incubating
 public interface ProjectionDefinitionContext {
 
-	// TODO HSEARCH-4806/HSEARCH-4807 expose parameters here, to be defined in the query, useful in particular for the distance projection.
-
 }

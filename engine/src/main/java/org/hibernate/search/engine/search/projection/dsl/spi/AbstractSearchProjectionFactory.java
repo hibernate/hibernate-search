@@ -7,8 +7,10 @@
 package org.hibernate.search.engine.search.projection.dsl.spi;
 
 import java.util.List;
+import java.util.function.Function;
 
 import org.hibernate.search.engine.common.dsl.spi.DslExtensionState;
+import org.hibernate.search.engine.search.common.NamedValues;
 import org.hibernate.search.engine.search.common.ValueConvert;
 import org.hibernate.search.engine.search.projection.SearchProjection;
 import org.hibernate.search.engine.search.projection.dsl.CompositeProjectionInnerStep;
@@ -123,6 +125,12 @@ public abstract class AbstractSearchProjectionFactory<
 	@Override
 	public <T> ProjectionFinalStep<T> constant(T value) {
 		return new StaticProjectionFinalStep<>( dslContext.scope().projectionBuilders().constant( value ) );
+	}
+
+	@Override
+	public <T> ProjectionFinalStep<T> withParameters(
+			Function<? super NamedValues, ? extends ProjectionFinalStep<T>> projectionCreator) {
+		return new StaticProjectionFinalStep<>( dslContext.scope().projectionBuilders().withParameters( projectionCreator ) );
 	}
 
 	@Override
