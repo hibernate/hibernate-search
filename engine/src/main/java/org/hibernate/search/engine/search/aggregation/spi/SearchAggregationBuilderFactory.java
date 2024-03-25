@@ -14,4 +14,6 @@ package org.hibernate.search.engine.search.aggregation.spi;
  */
 public interface SearchAggregationBuilderFactory {
 
+	<T> WithParametersAggregationBuilder<T> withParameters();
+
 }

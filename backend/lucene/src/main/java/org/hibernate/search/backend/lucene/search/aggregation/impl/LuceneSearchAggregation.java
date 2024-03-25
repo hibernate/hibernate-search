@@ -6,12 +6,20 @@
  */
 package org.hibernate.search.backend.lucene.search.aggregation.impl;
 
+import static org.hibernate.search.util.common.impl.CollectionHelper.isSubset;
+import static org.hibernate.search.util.common.impl.CollectionHelper.notInTheOtherSet;
+
 import java.io.IOException;
+import java.lang.invoke.MethodHandles;
 import java.util.Set;
 
+import org.hibernate.search.backend.lucene.logging.impl.Log;
+import org.hibernate.search.backend.lucene.search.common.impl.LuceneSearchIndexScope;
 import org.hibernate.search.engine.search.aggregation.SearchAggregation;
+import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
 public interface LuceneSearchAggregation<A> extends SearchAggregation<A> {
+	Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	/**
 	 * Request the collection of per-document data that will be used in
@@ -36,5 +44,22 @@ public interface LuceneSearchAggregation<A> extends SearchAggregation<A> {
 		 */
 		T extract(AggregationExtractContext context) throws IOException;
 	}
+
+	static <A> LuceneSearchAggregation<A> from(LuceneSearchIndexScope<?> scope,
+			SearchAggregation<A> aggregation) {
+		if ( !( aggregation instanceof LuceneSearchAggregation ) ) {
+			throw log.cannotMixLuceneSearchQueryWithOtherAggregations( aggregation );
+		}
+
+		LuceneSearchAggregation<A> casted = (LuceneSearchAggregation<A>) aggregation;
+		if ( !isSubset( scope.hibernateSearchIndexNames(), casted.indexNames() ) ) {
+			throw log.aggregationDefinedOnDifferentIndexes(
+					aggregation, casted.indexNames(), scope.hibernateSearchIndexNames(),
+					notInTheOtherSet( scope.hibernateSearchIndexNames(), casted.indexNames() )
+			);
+		}
+		return casted;
+	}
+
 
 }
