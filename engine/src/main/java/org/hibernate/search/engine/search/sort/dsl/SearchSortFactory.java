@@ -7,7 +7,9 @@
 package org.hibernate.search.engine.search.sort.dsl;
 
 import java.util.function.Consumer;
+import java.util.function.Function;
 
+import org.hibernate.search.engine.search.common.NamedValues;
 import org.hibernate.search.engine.search.predicate.dsl.SearchPredicateFactory;
 import org.hibernate.search.engine.spatial.GeoPoint;
 import org.hibernate.search.util.common.SearchException;
@@ -125,6 +127,17 @@ public interface SearchSortFactory {
 	 * @return A DSL step where the "composite" sort can be defined in more details.
 	 */
 	SortThenStep composite(Consumer<? super CompositeSortComponentsStep<?>> elementContributor);
+
+	/**
+	 * Delegating sort that creates the actual sort at query create time and provides access to query parameters.
+	 * <p>
+	 * Which sort exactly to create is defined by a function passed to the arguments of this sort.
+	 *
+	 * @param sortCreator The function defining an actual sort to apply.
+	 * @return A final DSL step in a parameterized sort definition.
+	 */
+	@Incubating
+	SortThenStep withParameters(Function<? super NamedValues, ? extends SortFinalStep> sortCreator);
 
 	/**
 	 * Extend the current factory with the given extension,

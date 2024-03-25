@@ -15,6 +15,8 @@ import org.hibernate.search.engine.search.projection.dsl.DistanceToFieldProjecti
 import org.hibernate.search.engine.search.projection.dsl.ProjectionFinalStep;
 import org.hibernate.search.engine.search.projection.dsl.SearchProjectionFactory;
 import org.hibernate.search.engine.search.query.dsl.SearchQueryOptionsStep;
+import org.hibernate.search.engine.search.sort.dsl.SearchSortFactory;
+import org.hibernate.search.engine.search.sort.dsl.SortFinalStep;
 import org.hibernate.search.engine.spatial.DistanceUnit;
 import org.hibernate.search.engine.spatial.GeoPoint;
 
@@ -45,5 +47,10 @@ class DistanceProjectionSingleValuedBaseIT extends AbstractDistanceProjectionSin
 			SearchProjectionFactory<EntityReference, DocumentReference> projection, String path, GeoPoint center,
 			DistanceUnit unit, String centerParam, String unitParam) {
 		return projection.distance( path, center ).unit( unit );
+	}
+
+	@Override
+	protected SortFinalStep sort(SearchSortFactory sort, String path, GeoPoint center, String parameterName) {
+		return sort.distance( path, center );
 	}
 }
