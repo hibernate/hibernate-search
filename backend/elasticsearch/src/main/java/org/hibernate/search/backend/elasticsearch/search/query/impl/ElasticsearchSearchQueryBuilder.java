@@ -265,14 +265,20 @@ public class ElasticsearchSearchQueryBuilder<H>
 
 		ElasticsearchSearchProjection.Extractor<?, H> rootExtractor = rootProjection.request( payload, requestContext );
 
+		Map<AggregationKey<?>, ElasticsearchSearchAggregation.Extractor<?>> aggregationExtractors;
 		if ( aggregations != null ) {
+			aggregationExtractors = new LinkedHashMap<>();
 			JsonObject jsonAggregations = new JsonObject();
 
 			for ( Map.Entry<AggregationKey<?>, ElasticsearchSearchAggregation<?>> entry : aggregations.entrySet() ) {
-				jsonAggregations.add( entry.getKey().name(), entry.getValue().request( requestContext ) );
+				aggregationExtractors.put( entry.getKey(),
+						entry.getValue().request( requestContext, entry.getKey(), jsonAggregations ) );
 			}
 
 			payload.add( "aggregations", jsonAggregations );
+		}
+		else {
+			aggregationExtractors = Collections.emptyMap();
 		}
 
 		if ( queryHighlighter != null ) {
@@ -290,7 +296,7 @@ public class ElasticsearchSearchQueryBuilder<H>
 				searchResultExtractorFactory.createResultExtractor(
 						requestContext,
 						rootExtractor,
-						aggregations == null ? Collections.emptyMap() : aggregations
+						aggregationExtractors
 				);
 
 		return new ElasticsearchSearchQueryImpl<>(

@@ -7,6 +7,7 @@
 package org.hibernate.search.backend.elasticsearch.search.aggregation.impl;
 
 import org.hibernate.search.backend.elasticsearch.search.common.impl.ElasticsearchSearchIndexScope;
+import org.hibernate.search.engine.search.aggregation.AggregationKey;
 
 import com.google.gson.JsonObject;
 
@@ -20,13 +21,10 @@ class ElasticsearchUserProvidedJsonAggregation extends AbstractElasticsearchAggr
 	}
 
 	@Override
-	public JsonObject request(AggregationRequestContext context) {
-		return requestJson;
-	}
-
-	@Override
-	public JsonObject extract(JsonObject aggregationResult, AggregationExtractContext context) {
-		return aggregationResult;
+	public Extractor<JsonObject> request(AggregationRequestContext context, AggregationKey<?> key,
+			JsonObject jsonAggregations) {
+		jsonAggregations.add( key.name(), requestJson );
+		return PassThroughExtractor.INSTANCE;
 	}
 
 	static class Builder extends AbstractBuilder<JsonObject> {
@@ -41,6 +39,15 @@ class ElasticsearchUserProvidedJsonAggregation extends AbstractElasticsearchAggr
 		@Override
 		public ElasticsearchSearchAggregation<JsonObject> build() {
 			return new ElasticsearchUserProvidedJsonAggregation( this );
+		}
+	}
+
+	private static class PassThroughExtractor implements Extractor<JsonObject> {
+		public static final PassThroughExtractor INSTANCE = new PassThroughExtractor();
+
+		@Override
+		public JsonObject extract(JsonObject aggregationResult, AggregationExtractContext context) {
+			return aggregationResult;
 		}
 	}
 }
