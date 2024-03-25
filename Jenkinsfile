@@ -564,19 +564,18 @@ stage('Non-default environments') {
 					'''
 					String mavenDockerArgs = ""
 					def startedContainers = false
-					try {
+					tryFinally({
 						mavenNonDefaultBuild buildEnv, """ \
 								-Pdist \
 								-P$buildEnv.mavenProfile \
 								$mavenBuildAdditionalArgs \
 								""",
 								artifactsToTest
-					}
-					finally {
+					}, { // Finally
 						if ( startedContainers ) {
 							sh "mvn docker:stop $mavenDockerArgs"
 						}
-					}
+					})
 				}
 			}
 		})
@@ -908,7 +907,7 @@ void withMavenWorkspace(Map args, Closure body) {
 		// The script is in the code repository, so we need the scm checkout
 		// to be performed by helper.withMavenWorkspace before we can call the script.
 		sh 'ci/docker-cleanup.sh'
-		try {
+		tryFinally({
 			def develocityCredentialsId = helper.scmSource.pullRequest ?
 					helper.configuration.file?.develocity?.credentials?.pr : helper.configuration.file?.develocity?.credentials?.main
 			if (develocityCredentialsId) {
@@ -922,10 +921,9 @@ void withMavenWorkspace(Map args, Closure body) {
 			else {
 				body()
 			}
-		}
-		finally {
+		}, { // Finally
 			sh 'ci/docker-cleanup.sh'
-		}
+		})
 	})
 }
 
@@ -1038,4 +1036,34 @@ String toTestEnvironmentArgs(BuildEnvironment buildEnv) {
 	}
 
 	return args
+}
+
+// try-finally construct that properly suppresses exceptions thrown in the finally block.
+def tryFinally(Closure main, Closure ... finallies) {
+	def mainFailure = null
+	try {
+		main()
+	}
+	catch (Throwable t) {
+		mainFailure = t
+		throw t
+	}
+	finally {
+		finallies.each {it ->
+			try {
+				it()
+			}
+			catch (Throwable t) {
+				if ( mainFailure ) {
+					mainFailure.addSuppressed( t )
+				}
+				else {
+					mainFailure = t
+				}
+			}
+		}
+	}
+	if ( mainFailure ) { // We may reach here if only the "finally" failed
+		throw mainFailure
+	}
 }
