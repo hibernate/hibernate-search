@@ -8,11 +8,14 @@ package org.hibernate.search.util.impl.integrationtest.common.stub.backend.searc
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.function.Function;
 import java.util.function.Supplier;
 
 import org.hibernate.search.engine.backend.common.DocumentReference;
+import org.hibernate.search.engine.search.common.NamedValues;
 import org.hibernate.search.engine.search.common.spi.SearchIndexIdentifierContext;
 import org.hibernate.search.engine.search.projection.SearchProjection;
+import org.hibernate.search.engine.search.projection.dsl.ProjectionFinalStep;
 import org.hibernate.search.engine.search.projection.spi.CompositeProjectionBuilder;
 import org.hibernate.search.engine.search.projection.spi.SearchProjectionBuilderFactory;
 import org.hibernate.search.util.common.SearchException;
@@ -83,4 +86,9 @@ public class StubSearchProjectionBuilderFactory implements SearchProjectionBuild
 		return new StubByMappedTypeProjection<>( stubInners );
 	}
 
+	@Override
+	public <T> SearchProjection<T> withParameters(
+			Function<? super NamedValues, ? extends ProjectionFinalStep<T>> projectionCreator) {
+		return new StubWithParametersProjection<>( projectionCreator );
+	}
 }

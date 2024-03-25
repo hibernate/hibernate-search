@@ -10,40 +10,42 @@ import java.util.List;
 
 import org.hibernate.search.engine.backend.common.DocumentReference;
 import org.hibernate.search.engine.common.EntityReference;
-import org.hibernate.search.engine.search.projection.dsl.DistanceToFieldProjectionOptionsStep;
-import org.hibernate.search.engine.search.projection.dsl.DistanceToFieldProjectionValueStep;
 import org.hibernate.search.engine.search.projection.dsl.ProjectionFinalStep;
 import org.hibernate.search.engine.search.projection.dsl.SearchProjectionFactory;
 import org.hibernate.search.engine.search.query.dsl.SearchQueryOptionsStep;
 import org.hibernate.search.engine.spatial.DistanceUnit;
 import org.hibernate.search.engine.spatial.GeoPoint;
 
-class DistanceProjectionSingleValuedBaseIT extends AbstractDistanceProjectionSingleValuedBaseIT {
+class DistanceProjectionParameterSingleValuedBaseIT extends AbstractDistanceProjectionSingleValuedBaseIT {
 
 
 	@Override
 	protected void addParameter(SearchQueryOptionsStep<?, ?, ?, ?, ?> query, String parameterName, Object value) {
-		// do nothing
+		query.param( parameterName, value );
 	}
 
 	@Override
-	protected DistanceToFieldProjectionValueStep<?, Double> distance(
+	protected ProjectionFinalStep<Double> distance(
 			SearchProjectionFactory<EntityReference, DocumentReference> projection, String path, GeoPoint center,
 			String parameterName) {
-		return projection.distance( path, center );
+		return projection.withParameters(
+				params -> projection.distance( path, params.get( parameterName, GeoPoint.class ) ) );
 	}
 
 	@Override
 	protected ProjectionFinalStep<List<Double>> distanceMulti(
 			SearchProjectionFactory<EntityReference, DocumentReference> projection, String path, GeoPoint center,
 			String parameterName) {
-		return projection.distance( path, center ).multi();
+		return projection.withParameters(
+				params -> projection.distance( path, params.get( parameterName, GeoPoint.class ) ).multi() );
 	}
 
 	@Override
-	protected DistanceToFieldProjectionOptionsStep<?, Double> distance(
+	protected ProjectionFinalStep<Double> distance(
 			SearchProjectionFactory<EntityReference, DocumentReference> projection, String path, GeoPoint center,
 			DistanceUnit unit, String centerParam, String unitParam) {
-		return projection.distance( path, center ).unit( unit );
+		return projection.withParameters(
+				params -> projection.distance( path, params.get( centerParam, GeoPoint.class ) )
+						.unit( params.get( unitParam, DistanceUnit.class ) ) );
 	}
 }
