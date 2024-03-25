@@ -127,6 +127,10 @@ the [Apache License version 2.0 (Apache-2.0)](https://www.apache.org/licenses/LI
 The Apache-2.0 license text is included verbatim in the [`LICENSE.txt`](LICENSE.txt) file
 in the root directory of the repository.
 
+Note that Hibernate Search 7.2.0.Alpha1 and lower are distributed under a different license;
+for more information, check the licensing information provided alongside published binaries,
+or the [corresponding branch in the source repository](https://github.com/hibernate/hibernate-search/tree/7.1#license).
+
 ## Getting started
 
 Getting started guides are available

@@ -13,6 +13,10 @@ or, if another license is specified as governing the file or directory being mod
 The Apache-2.0 license text is included verbatim in the [`LICENSE.txt`](LICENSE.txt) file
 in the root directory of the repository.
 
+Note that Hibernate Search 7.2.0.Alpha1 and lower are distributed under
+[a different license](https://github.com/hibernate/hibernate-search/tree/7.1#license).
+To allow for backports, the Hibernate team may ask contributors to dual-license their contribution.
+
 All contributions are subject to the [Developer Certificate of Origin (DCO)](https://developercertificate.org/).
 The DCO text is also included verbatim in the [dco.txt](dco.txt) file in the root directory of the repository.
 
