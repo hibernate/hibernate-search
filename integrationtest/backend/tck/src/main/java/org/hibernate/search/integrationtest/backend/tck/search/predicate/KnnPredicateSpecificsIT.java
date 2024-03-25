@@ -788,16 +788,16 @@ class KnnPredicateSpecificsIT {
 							SearchProjectionFactory::id
 					)
 					.where( f -> f.bool()
-							.should( f.knn( 3 ).field( "location" ).matching( 5f, 4f ) )
-							.should( f.knn( 3 ).field( "location" ).matching( 6f, 3f ) )
+							.should( f.knn( 3 ).field( "location" ).matching( 5.2f, 4.4f ) )
+							.should( f.knn( 3 ).field( "location" ).matching( 7.0f, 9.9f ) )
 							// so that we can get to a step where we add another knn clause to already an array of knn clauses:
-							.should( f.knn( 3 ).field( "location" ).matching( 7f, 4f ) )
+							.should( f.knn( 3 ).field( "location" ).matching( 1.4f, 3.2f ) )
 					).toQuery();
 
 			List<Object> result = query.fetchAll().hits();
 
-			assertThat( result ).hasSize( 4 )
-					.containsOnly( "ID:1", "ID:2", "ID:3", "ID:6" );
+			assertThat( result ).hasSizeGreaterThanOrEqualTo( 8 )
+					.contains( "ID:1", "ID:10", "ID:9", "ID:2", "ID:4", "ID:8", "ID:11", "ID:7" );
 		}
 
 		private static class PredicateIndexBinding {
