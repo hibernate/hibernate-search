@@ -8,12 +8,14 @@ package org.hibernate.search.backend.lucene.types.aggregation.impl;
 
 import java.io.IOException;
 import java.util.Comparator;
+import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
 
 import org.hibernate.search.backend.lucene.lowlevel.docvalues.impl.JoiningTextMultiValuesSource;
 import org.hibernate.search.backend.lucene.lowlevel.facet.impl.TextMultiValueFacetCounts;
 import org.hibernate.search.backend.lucene.lowlevel.join.impl.NestedDocsProvider;
+import org.hibernate.search.backend.lucene.search.aggregation.impl.AggregationRequestContext;
 import org.hibernate.search.backend.lucene.search.common.impl.AbstractLuceneValueFieldSearchQueryElementFactory;
 import org.hibernate.search.backend.lucene.search.common.impl.LuceneSearchIndexScope;
 import org.hibernate.search.backend.lucene.search.common.impl.LuceneSearchIndexValueFieldContext;
@@ -42,59 +44,67 @@ public class LuceneTextTermsAggregation<K>
 	}
 
 	@Override
-	FacetResult getTopChildren(IndexReader reader, FacetsCollector facetsCollector,
-			NestedDocsProvider nestedDocsProvider, int limit)
-			throws IOException {
-		JoiningTextMultiValuesSource valueSource = JoiningTextMultiValuesSource.fromField(
-				absoluteFieldPath, nestedDocsProvider
-		);
-		TextMultiValueFacetCounts facetCounts = new TextMultiValueFacetCounts(
-				reader, absoluteFieldPath, valueSource, facetsCollector
-		);
-
-		return facetCounts.getTopChildren( limit, absoluteFieldPath );
+	protected Extractor<Map<K, Long>> extractor(AggregationRequestContext context) {
+		return new LuceneTextTermsAggregationExtractor();
 	}
 
-	@Override
-	Set<String> collectFirstTerms(IndexReader reader, boolean descending, int limit)
-			throws IOException {
-		TreeSet<String> collectedTerms = new TreeSet<>( descending ? STRING_COMPARATOR.reversed() : STRING_COMPARATOR );
-		for ( LeafReaderContext leaf : reader.leaves() ) {
-			final LeafReader atomicReader = leaf.reader();
-			SortedSetDocValues docValues = atomicReader.getSortedSetDocValues( absoluteFieldPath );
-			if ( docValues == null ) {
-				continue;
-			}
-			int valueCount = (int) docValues.getValueCount();
-			if ( descending ) {
-				int start = Math.max( 0, valueCount - limit );
-				for ( int i = start; i < valueCount; ++i ) {
-					collectedTerms.add( docValues.lookupOrd( i ).utf8ToString() );
-				}
-			}
-			else {
-				int end = Math.min( limit, valueCount );
-				for ( int i = 0; i < end; ++i ) {
-					collectedTerms.add( docValues.lookupOrd( i ).utf8ToString() );
-				}
-			}
+	private class LuceneTextTermsAggregationExtractor extends AbstractExtractor {
+		@Override
+		FacetResult getTopChildren(IndexReader reader, FacetsCollector facetsCollector,
+				NestedDocsProvider nestedDocsProvider, int limit)
+				throws IOException {
+			JoiningTextMultiValuesSource valueSource = JoiningTextMultiValuesSource.fromField(
+					absoluteFieldPath, nestedDocsProvider
+			);
+			TextMultiValueFacetCounts facetCounts = new TextMultiValueFacetCounts(
+					reader, absoluteFieldPath, valueSource, facetsCollector
+			);
+
+			return facetCounts.getTopChildren( limit, absoluteFieldPath );
 		}
-		return collectedTerms;
-	}
 
-	@Override
-	Comparator<String> getAscendingTermComparator() {
-		return STRING_COMPARATOR;
-	}
+		@Override
+		Set<String> collectFirstTerms(IndexReader reader, boolean descending, int limit)
+				throws IOException {
+			TreeSet<String> collectedTerms = new TreeSet<>(
+					descending ? STRING_COMPARATOR.reversed() : STRING_COMPARATOR );
+			for ( LeafReaderContext leaf : reader.leaves() ) {
+				final LeafReader atomicReader = leaf.reader();
+				SortedSetDocValues docValues = atomicReader.getSortedSetDocValues( absoluteFieldPath );
+				if ( docValues == null ) {
+					continue;
+				}
+				int valueCount = (int) docValues.getValueCount();
+				if ( descending ) {
+					int start = Math.max( 0, valueCount - limit );
+					for ( int i = start; i < valueCount; ++i ) {
+						collectedTerms.add( docValues.lookupOrd( i ).utf8ToString() );
+					}
+				}
+				else {
+					int end = Math.min( limit, valueCount );
+					for ( int i = 0; i < end; ++i ) {
+						collectedTerms.add( docValues.lookupOrd( i ).utf8ToString() );
+					}
+				}
+			}
+			return collectedTerms;
+		}
 
-	@Override
-	String labelToTerm(String label) {
-		return label;
-	}
+		@Override
+		Comparator<String> getAscendingTermComparator() {
+			return STRING_COMPARATOR;
+		}
 
-	@Override
-	String termToFieldValue(String key) {
-		return key;
+		@Override
+		String labelToTerm(String label) {
+			return label;
+		}
+
+		@Override
+		String termToFieldValue(String key) {
+			return key;
+		}
 	}
 
 	public static class Factory

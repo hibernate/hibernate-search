@@ -17,6 +17,7 @@ import org.hibernate.search.backend.elasticsearch.logging.impl.Log;
 import org.hibernate.search.backend.elasticsearch.search.common.impl.AbstractElasticsearchCodecAwareSearchQueryElementFactory;
 import org.hibernate.search.backend.elasticsearch.search.common.impl.ElasticsearchSearchIndexScope;
 import org.hibernate.search.backend.elasticsearch.search.common.impl.ElasticsearchSearchIndexValueFieldContext;
+import org.hibernate.search.backend.elasticsearch.search.predicate.impl.ElasticsearchSearchPredicate;
 import org.hibernate.search.backend.elasticsearch.types.codec.impl.ElasticsearchFieldCodec;
 import org.hibernate.search.engine.backend.types.converter.spi.DslConverter;
 import org.hibernate.search.engine.search.aggregation.spi.RangeAggregationBuilder;
@@ -61,16 +62,8 @@ public class ElasticsearchRangeAggregation<F, K>
 	}
 
 	@Override
-	protected Map<Range<K>, Long> doExtract(AggregationExtractContext context, JsonElement buckets) {
-		JsonObject bucketMap = buckets.getAsJsonObject();
-		Map<Range<K>, Long> result = CollectionHelper.newLinkedHashMap( rangesJson.size() );
-		for ( int i = 0; i < rangesJson.size(); i++ ) {
-			JsonObject bucket = bucketMap.get( String.valueOf( i ) ).getAsJsonObject();
-			Range<K> range = rangesInOrder.get( i );
-			long documentCount = getBucketDocCount( bucket );
-			result.put( range, documentCount );
-		}
-		return result;
+	protected Extractor<Map<Range<K>, Long>> extractor(AggregationRequestContext context) {
+		return new RangeBucketExtractor( nestedPathHierarchy, filter, rangesInOrder );
 	}
 
 	public static class Factory<F>
@@ -80,7 +73,7 @@ public class ElasticsearchRangeAggregation<F, K>
 		}
 
 		@Override
-		public TypeSelector<?> create(ElasticsearchSearchIndexScope<?> scope,
+		public RangeAggregationBuilder.TypeSelector create(ElasticsearchSearchIndexScope<?> scope,
 				ElasticsearchSearchIndexValueFieldContext<F> field) {
 			return new TypeSelector<>( codec, scope, field );
 		}
@@ -102,6 +95,30 @@ public class ElasticsearchRangeAggregation<F, K>
 		public <T> Builder<F, T> type(Class<T> expectedType, ValueConvert convert) {
 			return new Builder<>( codec, scope, field,
 					field.type().dslConverter( convert ).withInputType( expectedType, field ) );
+		}
+	}
+
+	protected class RangeBucketExtractor extends AbstractBucketExtractor<Range<K>, Long> {
+		private final List<Range<K>> rangesInOrder;
+
+		protected RangeBucketExtractor(List<String> nestedPathHierarchy, ElasticsearchSearchPredicate filter,
+				List<Range<K>> rangesInOrder) {
+			super( nestedPathHierarchy, filter );
+			this.rangesInOrder = rangesInOrder;
+		}
+
+
+		@Override
+		protected Map<Range<K>, Long> doExtract(AggregationExtractContext context, JsonElement buckets) {
+			JsonObject bucketMap = buckets.getAsJsonObject();
+			Map<Range<K>, Long> result = CollectionHelper.newLinkedHashMap( rangesInOrder.size() );
+			for ( int i = 0; i < rangesInOrder.size(); i++ ) {
+				JsonObject bucket = bucketMap.get( String.valueOf( i ) ).getAsJsonObject();
+				Range<K> range = rangesInOrder.get( i );
+				long documentCount = getBucketDocCount( bucket );
+				result.put( range, documentCount );
+			}
+			return result;
 		}
 	}
 

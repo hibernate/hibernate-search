@@ -42,14 +42,14 @@ public class LuceneExtractableSearchResult<H> {
 	private final IndexSearcher indexSearcher;
 	private final LuceneCollectors luceneCollectors;
 	private final LuceneSearchProjection.Extractor<?, H> rootExtractor;
-	private final Map<AggregationKey<?>, LuceneSearchAggregation<?>> aggregations;
+	private final Map<AggregationKey<?>, LuceneSearchAggregation.Extractor<?>> aggregations;
 	private final TimeoutManager timeoutManager;
 
 	LuceneExtractableSearchResult(LuceneSearchQueryRequestContext requestContext,
 			IndexSearcher indexSearcher,
 			LuceneCollectors luceneCollectors,
 			LuceneSearchProjection.Extractor<?, H> rootExtractor,
-			Map<AggregationKey<?>, LuceneSearchAggregation<?>> aggregations, TimeoutManager timeoutManager) {
+			Map<AggregationKey<?>, LuceneSearchAggregation.Extractor<?>> aggregations, TimeoutManager timeoutManager) {
 		this.requestContext = requestContext;
 		this.fromDocumentValueConvertContext = new FromDocumentValueConvertContextImpl( requestContext.getSessionContext() );
 		this.indexSearcher = indexSearcher;
@@ -126,7 +126,7 @@ public class LuceneExtractableSearchResult<H> {
 
 		Map<AggregationKey<?>, Object> extractedMap = new LinkedHashMap<>();
 
-		for ( Map.Entry<AggregationKey<?>, LuceneSearchAggregation<?>> entry : aggregations.entrySet() ) {
+		for ( Map.Entry<AggregationKey<?>, LuceneSearchAggregation.Extractor<?>> entry : aggregations.entrySet() ) {
 			// Check for timeout before every element.
 			// Do this *before* the element, so that we don't fail after the last element.
 			if ( timeoutManager.checkTimedOut() ) {
@@ -134,7 +134,7 @@ public class LuceneExtractableSearchResult<H> {
 			}
 
 			AggregationKey<?> key = entry.getKey();
-			LuceneSearchAggregation<?> aggregation = entry.getValue();
+			LuceneSearchAggregation.Extractor<?> aggregation = entry.getValue();
 
 			Object extracted = aggregation.extract( aggregationExtractContext );
 			extractedMap.put( key, extracted );
