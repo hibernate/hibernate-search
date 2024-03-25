@@ -72,6 +72,7 @@ public class LuceneSearchQueryBuilder<H> implements SearchQueryBuilder<H>, Lucen
 
 	private LuceneSearchPredicate lucenePredicate;
 	private List<SortField> sortFields;
+	private List<LuceneSearchSort> luceneSearchSorts;
 	private Map<AggregationKey<?>, LuceneSearchAggregation<?>> aggregations;
 	private Long timeout;
 	private TimeUnit timeUnit;
@@ -106,8 +107,10 @@ public class LuceneSearchQueryBuilder<H> implements SearchQueryBuilder<H>, Lucen
 
 	@Override
 	public void sort(SearchSort sort) {
-		LuceneSearchSort luceneSort = LuceneSearchSort.from( scope, sort );
-		luceneSort.toSortFields( this );
+		if ( luceneSearchSorts == null ) {
+			luceneSearchSorts = new ArrayList<>();
+		}
+		luceneSearchSorts.add( LuceneSearchSort.from( scope, sort ) );
 	}
 
 	@Override
@@ -234,6 +237,12 @@ public class LuceneSearchQueryBuilder<H> implements SearchQueryBuilder<H>, Lucen
 		}
 
 		Query definitiveLuceneQuery = luceneQueryBuilder.build();
+
+		if ( luceneSearchSorts != null ) {
+			for ( LuceneSearchSort luceneSearchSort : luceneSearchSorts ) {
+				luceneSearchSort.toSortFields( this );
+			}
+		}
 
 		Sort luceneSort = null;
 		if ( sortFields != null && !sortFields.isEmpty() ) {

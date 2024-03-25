@@ -13,6 +13,8 @@ import org.hibernate.search.engine.common.EntityReference;
 import org.hibernate.search.engine.search.projection.dsl.ProjectionFinalStep;
 import org.hibernate.search.engine.search.projection.dsl.SearchProjectionFactory;
 import org.hibernate.search.engine.search.query.dsl.SearchQueryOptionsStep;
+import org.hibernate.search.engine.search.sort.dsl.SearchSortFactory;
+import org.hibernate.search.engine.search.sort.dsl.SortFinalStep;
 import org.hibernate.search.engine.spatial.DistanceUnit;
 import org.hibernate.search.engine.spatial.GeoPoint;
 import org.hibernate.search.util.impl.test.annotation.TestForIssue;
@@ -40,5 +42,10 @@ class DistanceProjectionParameterMultiValuedBaseIT extends AbstractDistanceProje
 		return projection.withParameters(
 				params -> projection.distance( path, params.get( centerParam, GeoPoint.class ) ).multi()
 						.unit( params.get( unitParam, DistanceUnit.class ) ) );
+	}
+
+	@Override
+	protected SortFinalStep sort(SearchSortFactory sort, String path, GeoPoint center, String parameterName) {
+		return sort.withParameters( param -> sort.distance( path, param.get( parameterName, GeoPoint.class ) ) );
 	}
 }

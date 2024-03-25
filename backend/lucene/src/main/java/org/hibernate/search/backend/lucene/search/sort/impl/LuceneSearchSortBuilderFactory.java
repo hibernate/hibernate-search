@@ -11,6 +11,7 @@ import org.hibernate.search.engine.search.sort.SearchSort;
 import org.hibernate.search.engine.search.sort.spi.CompositeSortBuilder;
 import org.hibernate.search.engine.search.sort.spi.ScoreSortBuilder;
 import org.hibernate.search.engine.search.sort.spi.SearchSortBuilderFactory;
+import org.hibernate.search.engine.search.sort.spi.WithParametersSortBuilder;
 
 import org.apache.lucene.search.Sort;
 import org.apache.lucene.search.SortField;
@@ -36,6 +37,11 @@ public class LuceneSearchSortBuilderFactory implements SearchSortBuilderFactory 
 	@Override
 	public CompositeSortBuilder composite() {
 		return new LuceneCompositeSort.Builder( scope );
+	}
+
+	@Override
+	public WithParametersSortBuilder withParameters() {
+		return new LuceneWithParametersSort.Builder( scope );
 	}
 
 	public LuceneSearchSort fromLuceneSortField(SortField luceneSortField) {
