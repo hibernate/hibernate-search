@@ -10,10 +10,12 @@ import static org.hibernate.search.util.common.impl.CollectionHelper.isSubset;
 import static org.hibernate.search.util.common.impl.CollectionHelper.notInTheOtherSet;
 
 import java.lang.invoke.MethodHandles;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
@@ -74,10 +76,10 @@ public class ElasticsearchSearchQueryBuilder<H>
 	private final SearchLoadingContextBuilder<?, ?> loadingContextBuilder;
 	private final ElasticsearchSearchProjection<H> rootProjection;
 	private final Integer scrollTimeout;
-
 	private final Set<String> routingKeys;
 	private ElasticsearchSearchPredicate elasticsearchPredicate;
 	private JsonArray jsonSort;
+	private List<ElasticsearchSearchSort> elasticsearchSearchSorts;
 	private Map<DistanceSortKey, Integer> distanceSorts;
 	private Map<AggregationKey<?>, ElasticsearchSearchAggregation<?>> aggregations;
 	private Long timeoutValue;
@@ -114,14 +116,15 @@ public class ElasticsearchSearchQueryBuilder<H>
 
 	@Override
 	public void predicate(SearchPredicate predicate) {
-		ElasticsearchSearchPredicate elasticsearchPredicate = ElasticsearchSearchPredicate.from( scope, predicate );
-		this.elasticsearchPredicate = elasticsearchPredicate;
+		this.elasticsearchPredicate = ElasticsearchSearchPredicate.from( scope, predicate );
 	}
 
 	@Override
 	public void sort(SearchSort sort) {
-		ElasticsearchSearchSort elasticsearchSort = ElasticsearchSearchSort.from( scope, sort );
-		elasticsearchSort.toJsonSorts( this );
+		if ( elasticsearchSearchSorts == null ) {
+			elasticsearchSearchSorts = new ArrayList<>();
+		}
+		elasticsearchSearchSorts.add( ElasticsearchSearchSort.from( scope, sort ) );
 	}
 
 	@Override
@@ -248,6 +251,12 @@ public class ElasticsearchSearchQueryBuilder<H>
 		JsonObject jsonQuery = Queries.boolFilter( jsonPredicate, filters );
 		if ( jsonQuery != null ) {
 			payload.add( "query", jsonQuery );
+		}
+
+		if ( elasticsearchSearchSorts != null ) {
+			for ( ElasticsearchSearchSort elasticsearchSearchSort : elasticsearchSearchSorts ) {
+				elasticsearchSearchSort.toJsonSorts( this );
+			}
 		}
 
 		if ( jsonSort != null ) {

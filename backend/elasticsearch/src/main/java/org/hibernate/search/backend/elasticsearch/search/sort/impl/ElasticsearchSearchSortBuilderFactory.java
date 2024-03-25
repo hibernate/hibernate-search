@@ -11,6 +11,7 @@ import org.hibernate.search.engine.search.sort.SearchSort;
 import org.hibernate.search.engine.search.sort.spi.CompositeSortBuilder;
 import org.hibernate.search.engine.search.sort.spi.ScoreSortBuilder;
 import org.hibernate.search.engine.search.sort.spi.SearchSortBuilderFactory;
+import org.hibernate.search.engine.search.sort.spi.WithParametersSortBuilder;
 
 import com.google.gson.JsonObject;
 
@@ -35,6 +36,11 @@ public class ElasticsearchSearchSortBuilderFactory implements SearchSortBuilderF
 	@Override
 	public CompositeSortBuilder composite() {
 		return new ElasticsearchCompositeSort.Builder( scope );
+	}
+
+	@Override
+	public WithParametersSortBuilder withParameters() {
+		return new ElasticsearchWithParametersSort.Builder( scope );
 	}
 
 	public ElasticsearchSearchSort fromJson(JsonObject jsonObject) {

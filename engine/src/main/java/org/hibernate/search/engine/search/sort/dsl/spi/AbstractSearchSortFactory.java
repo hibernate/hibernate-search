@@ -7,8 +7,10 @@
 package org.hibernate.search.engine.search.sort.dsl.spi;
 
 import java.util.function.Consumer;
+import java.util.function.Function;
 
 import org.hibernate.search.engine.common.dsl.spi.DslExtensionState;
+import org.hibernate.search.engine.search.common.NamedValues;
 import org.hibernate.search.engine.search.predicate.dsl.SearchPredicateFactory;
 import org.hibernate.search.engine.search.sort.SearchSort;
 import org.hibernate.search.engine.search.sort.dsl.CompositeSortComponentsStep;
@@ -18,12 +20,14 @@ import org.hibernate.search.engine.search.sort.dsl.FieldSortOptionsStep;
 import org.hibernate.search.engine.search.sort.dsl.ScoreSortOptionsStep;
 import org.hibernate.search.engine.search.sort.dsl.SearchSortFactoryExtension;
 import org.hibernate.search.engine.search.sort.dsl.SearchSortFactoryExtensionIfSupportedStep;
+import org.hibernate.search.engine.search.sort.dsl.SortFinalStep;
 import org.hibernate.search.engine.search.sort.dsl.SortThenStep;
 import org.hibernate.search.engine.search.sort.dsl.impl.CompositeSortComponentsStepImpl;
 import org.hibernate.search.engine.search.sort.dsl.impl.DistanceSortOptionsStepImpl;
 import org.hibernate.search.engine.search.sort.dsl.impl.FieldSortOptionsStepImpl;
 import org.hibernate.search.engine.search.sort.dsl.impl.ScoreSortOptionsStepImpl;
 import org.hibernate.search.engine.search.sort.dsl.impl.SearchSortFactoryExtensionStep;
+import org.hibernate.search.engine.search.sort.dsl.impl.WithParametersSortFinalStep;
 import org.hibernate.search.engine.search.sort.spi.SearchSortIndexScope;
 import org.hibernate.search.engine.spatial.GeoPoint;
 
@@ -71,6 +75,11 @@ public abstract class AbstractSearchSortFactory<
 		CompositeSortComponentsStep<?> next = composite();
 		elementContributor.accept( next );
 		return next;
+	}
+
+	@Override
+	public SortThenStep withParameters(Function<? super NamedValues, ? extends SortFinalStep> sortCreator) {
+		return new WithParametersSortFinalStep( dslContext, sortCreator );
 	}
 
 	@Override
