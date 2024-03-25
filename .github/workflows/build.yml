@@ -41,7 +41,7 @@ on:
 
 concurrency:
   group: "workflow = ${{ github.workflow }}, ref = ${{ github.event.ref }}, pr = ${{ github.event.pull_request.id }}"
-  cancel-in-progress: ${{ github.event_name == 'pull_request' || github.repository != 'hibernate/hibernate-search' }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request_target' || github.repository != 'hibernate/hibernate-search' }}
 
 defaults:
   run:
@@ -129,9 +129,9 @@ jobs:
           -Pjqassistant -Pdist -Pci-build -DskipITs
         env:
           # WARNING: exposes secrets, so must only be passed to a step that doesn't run unapproved code.
-          GRADLE_ENTERPRISE_ACCESS_KEY: "${{ github.event.pull_request.number && '' || secrets.GRADLE_ENTERPRISE_ACCESS_KEY }}"
+          GRADLE_ENTERPRISE_ACCESS_KEY: "${{ github.event_name == 'push' && secrets.GRADLE_ENTERPRISE_ACCESS_KEY }}"
       - name: Publish Develocity build scan for previous build (pull request)
-        if: "${{ !cancelled() && github.event.pull_request.number && secrets.GRADLE_ENTERPRISE_ACCESS_KEY_PR }}"
+        if: "${{ !cancelled() && github.event_name == 'pull_request_target' && github.repository == 'hibernate/hibernate-search' }}"
         run: |
           ./mvnw gradle-enterprise:build-scan-publish-previous
         env:
@@ -145,9 +145,9 @@ jobs:
           ${{ github.event.pull_request.base.ref && format('-Dincremental -Dgib.referenceBranch=refs/remotes/origin/{0}', github.event.pull_request.base.ref) || '' }}
         env:
           # WARNING: exposes secrets, so must only be passed to a step that doesn't run unapproved code.
-          GRADLE_ENTERPRISE_ACCESS_KEY: "${{ github.event.pull_request.number && '' || secrets.GRADLE_ENTERPRISE_ACCESS_KEY }}"
+          GRADLE_ENTERPRISE_ACCESS_KEY: "${{ github.event_name == 'push' && secrets.GRADLE_ENTERPRISE_ACCESS_KEY }}"
       - name: Publish Develocity build scan for previous build (pull request)
-        if: "${{ !cancelled() && github.event.pull_request.number && secrets.GRADLE_ENTERPRISE_ACCESS_KEY_PR }}"
+        if: "${{ !cancelled() && github.event_name == 'pull_request_target' && github.repository == 'hibernate/hibernate-search' }}"
         run: |
           ./mvnw gradle-enterprise:build-scan-publish-previous
         env:
