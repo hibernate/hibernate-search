@@ -90,7 +90,7 @@ jobs:
       - name: Check out commit already pushed to branch
         if: "! github.event.pull_request.number"
         uses: actions/checkout@v4
-      - name: Check out PR merge commit
+      - name: Check out PR head
         uses: actions/checkout@v2
         if: github.event.pull_request.number
         with:
@@ -101,7 +101,7 @@ jobs:
           # This means in particular we won't expose Develocity credentials to the main maven executions,
           # but instead will execute maven a third time just to push build scans to Develocity;
           # see below.
-          ref: "refs/pull/${{ github.event.pull_request.number }}/merge"
+          ref: "refs/pull/${{ github.event.pull_request.number }}/head"
           # Fetch the whole history to make sure that gitflow incremental builder
           # can find the base commit.
           fetch-depth: 0
