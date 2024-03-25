@@ -6,11 +6,13 @@
  */
 package org.hibernate.search.backend.elasticsearch.search.aggregation.impl;
 
+import java.util.List;
 import java.util.Map;
 
 import org.hibernate.search.backend.elasticsearch.search.common.impl.AbstractElasticsearchCodecAwareSearchQueryElementFactory;
 import org.hibernate.search.backend.elasticsearch.search.common.impl.ElasticsearchSearchIndexScope;
 import org.hibernate.search.backend.elasticsearch.search.common.impl.ElasticsearchSearchIndexValueFieldContext;
+import org.hibernate.search.backend.elasticsearch.search.predicate.impl.ElasticsearchSearchPredicate;
 import org.hibernate.search.backend.elasticsearch.types.codec.impl.ElasticsearchFieldCodec;
 import org.hibernate.search.engine.backend.types.converter.runtime.FromDocumentValueConvertContext;
 import org.hibernate.search.engine.backend.types.converter.spi.ProjectionConverter;
@@ -61,22 +63,8 @@ public class ElasticsearchTermsAggregation<F, K>
 	}
 
 	@Override
-	protected Map<K, Long> doExtract(AggregationExtractContext context, JsonElement buckets) {
-		JsonArray bucketArray = buckets.getAsJsonArray();
-		Map<K, Long> result = CollectionHelper.newLinkedHashMap( bucketArray.size() );
-		FromDocumentValueConvertContext convertContext = context.fromDocumentValueConvertContext();
-		for ( JsonElement bucketElement : bucketArray ) {
-			JsonObject bucket = bucketElement.getAsJsonObject();
-			JsonElement keyJson = bucket.get( "key" );
-			JsonElement keyAsStringJson = bucket.get( "key_as_string" );
-			K key = fromFieldValueConverter.fromDocumentValue(
-					codec.decodeAggregationKey( keyJson, keyAsStringJson ),
-					convertContext
-			);
-			long documentCount = getBucketDocCount( bucket );
-			result.put( key, documentCount );
-		}
-		return result;
+	protected Extractor<Map<K, Long>> extractor(AggregationRequestContext context) {
+		return new TermsBucketExtractor( nestedPathHierarchy, filter );
 	}
 
 	public static class Factory<F>
@@ -86,7 +74,7 @@ public class ElasticsearchTermsAggregation<F, K>
 		}
 
 		@Override
-		public TypeSelector<?> create(ElasticsearchSearchIndexScope<?> scope,
+		public TermsAggregationBuilder.TypeSelector create(ElasticsearchSearchIndexScope<?> scope,
 				ElasticsearchSearchIndexValueFieldContext<F> field) {
 			return new TypeSelector<>( codec, scope, field );
 		}
@@ -108,6 +96,32 @@ public class ElasticsearchTermsAggregation<F, K>
 		public <T> Builder<F, T> type(Class<T> expectedType, ValueConvert convert) {
 			return new Builder<>( codec, scope, field,
 					field.type().projectionConverter( convert ).withConvertedType( expectedType, field ) );
+		}
+	}
+
+	protected class TermsBucketExtractor extends AbstractBucketExtractor<K, Long> {
+		protected TermsBucketExtractor(List<String> nestedPathHierarchy,
+				ElasticsearchSearchPredicate filter) {
+			super( nestedPathHierarchy, filter );
+		}
+
+		@Override
+		protected Map<K, Long> doExtract(AggregationExtractContext context, JsonElement buckets) {
+			JsonArray bucketArray = buckets.getAsJsonArray();
+			Map<K, Long> result = CollectionHelper.newLinkedHashMap( bucketArray.size() );
+			FromDocumentValueConvertContext convertContext = context.fromDocumentValueConvertContext();
+			for ( JsonElement bucketElement : bucketArray ) {
+				JsonObject bucket = bucketElement.getAsJsonObject();
+				JsonElement keyJson = bucket.get( "key" );
+				JsonElement keyAsStringJson = bucket.get( "key_as_string" );
+				K key = fromFieldValueConverter.fromDocumentValue(
+						codec.decodeAggregationKey( keyJson, keyAsStringJson ),
+						convertContext
+				);
+				long documentCount = getBucketDocCount( bucket );
+				result.put( key, documentCount );
+			}
+			return result;
 		}
 	}
 

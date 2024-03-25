@@ -17,6 +17,7 @@ import org.hibernate.search.backend.elasticsearch.search.common.impl.Elasticsear
 import org.hibernate.search.backend.elasticsearch.search.predicate.impl.ElasticsearchSearchPredicate;
 import org.hibernate.search.backend.elasticsearch.search.predicate.impl.PredicateNestingContext;
 import org.hibernate.search.backend.elasticsearch.search.predicate.impl.PredicateRequestContext;
+import org.hibernate.search.engine.search.aggregation.AggregationKey;
 import org.hibernate.search.engine.search.predicate.SearchPredicate;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
@@ -43,8 +44,8 @@ public abstract class AbstractElasticsearchNestableAggregation<A> extends Abstra
 	private static final JsonAccessor<JsonObject> RESPONSE_FILTERED_ACCESSOR =
 			JsonAccessor.root().property( FILTERED_NAME ).asObject();
 
-	private final List<String> nestedPathHierarchy;
-	private final ElasticsearchSearchPredicate filter;
+	protected final List<String> nestedPathHierarchy;
+	protected final ElasticsearchSearchPredicate filter;
 
 	AbstractElasticsearchNestableAggregation(AbstractBuilder<A> builder) {
 		super( builder );
@@ -53,7 +54,12 @@ public abstract class AbstractElasticsearchNestableAggregation<A> extends Abstra
 	}
 
 	@Override
-	public final JsonObject request(AggregationRequestContext context) {
+	public final Extractor<A> request(AggregationRequestContext context, AggregationKey<?> key, JsonObject jsonAggregations) {
+		jsonAggregations.add( key.name(), request( context ) );
+		return extractor( context );
+	}
+
+	private JsonObject request(AggregationRequestContext context) {
 		JsonObject result = doRequest( context );
 
 		if ( nestedPathHierarchy.isEmpty() ) {
@@ -91,26 +97,40 @@ public abstract class AbstractElasticsearchNestableAggregation<A> extends Abstra
 
 	protected abstract JsonObject doRequest(AggregationRequestContext context);
 
-	@Override
-	public final A extract(JsonObject aggregationResult, AggregationExtractContext context) {
-		int nestedPathHierarchySize = nestedPathHierarchy.size();
+	protected abstract Extractor<A> extractor(AggregationRequestContext context);
 
-		JsonObject actualAggregationResult = aggregationResult;
+	protected abstract static class AbstractExtractor<T> implements Extractor<T> {
 
-		for ( int i = 0; i < nestedPathHierarchySize; ++i ) {
-			actualAggregationResult = RESPONSE_NESTED_ACCESSOR.get( actualAggregationResult )
-					.orElseThrow( log::elasticsearchResponseMissingData );
+		private final List<String> nestedPathHierarchy;
+		private final ElasticsearchSearchPredicate filter;
+
+		protected AbstractExtractor(List<String> nestedPathHierarchy, ElasticsearchSearchPredicate filter) {
+			this.nestedPathHierarchy = nestedPathHierarchy;
+			this.filter = filter;
 		}
 
-		if ( filter != null ) {
-			actualAggregationResult = RESPONSE_FILTERED_ACCESSOR.get( actualAggregationResult )
-					.orElseThrow( log::elasticsearchResponseMissingData );
+		@Override
+		public final T extract(JsonObject aggregationResult, AggregationExtractContext context) {
+			int nestedPathHierarchySize = nestedPathHierarchy.size();
+
+			JsonObject actualAggregationResult = aggregationResult;
+
+			for ( int i = 0; i < nestedPathHierarchySize; ++i ) {
+				actualAggregationResult = RESPONSE_NESTED_ACCESSOR.get( actualAggregationResult )
+						.orElseThrow( log::elasticsearchResponseMissingData );
+			}
+
+			if ( filter != null ) {
+				actualAggregationResult = RESPONSE_FILTERED_ACCESSOR.get( actualAggregationResult )
+						.orElseThrow( log::elasticsearchResponseMissingData );
+			}
+
+			return doExtract( actualAggregationResult, context );
 		}
 
-		return doExtract( actualAggregationResult, context );
+		protected abstract T doExtract(JsonObject aggregationResult, AggregationExtractContext context);
 	}
 
-	protected abstract A doExtract(JsonObject aggregationResult, AggregationExtractContext context);
 
 	protected final boolean isNested() {
 		return !nestedPathHierarchy.isEmpty();

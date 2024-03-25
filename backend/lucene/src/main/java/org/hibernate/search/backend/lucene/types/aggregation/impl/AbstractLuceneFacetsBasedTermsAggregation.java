@@ -54,99 +54,105 @@ public abstract class AbstractLuceneFacetsBasedTermsAggregation<F, T, K>
 	}
 
 	@Override
-	public void request(AggregationRequestContext context) {
+	public Extractor<Map<K, Long>> request(AggregationRequestContext context) {
 		context.requireCollector( FacetsCollectorFactory.INSTANCE );
+
+		return extractor( context );
 	}
 
-	@Override
-	public final Map<K, Long> extract(AggregationExtractContext context) throws IOException {
-		FromDocumentValueConvertContext convertContext = context.fromDocumentValueConvertContext();
+	protected abstract Extractor<Map<K, Long>> extractor(AggregationRequestContext context);
 
-		List<Bucket<T>> buckets = getTopBuckets( context );
+	protected abstract class AbstractExtractor implements Extractor<Map<K, Long>> {
+		@Override
+		public final Map<K, Long> extract(AggregationExtractContext context) throws IOException {
+			FromDocumentValueConvertContext convertContext = context.fromDocumentValueConvertContext();
 
-		if ( BucketOrder.COUNT_DESC.equals( order ) && ( minDocCount > 0 || buckets.size() >= maxTermCount ) ) {
-			/*
-			 * Optimization: in this case, minDocCount and sorting can be safely ignored.
-			 * We already have all the buckets we need, and they are already sorted.
-			 */
+			List<Bucket<T>> buckets = getTopBuckets( context );
+
+			if ( BucketOrder.COUNT_DESC.equals( order ) && ( minDocCount > 0 || buckets.size() >= maxTermCount ) ) {
+				/*
+				 * Optimization: in this case, minDocCount and sorting can be safely ignored.
+				 * We already have all the buckets we need, and they are already sorted.
+				 */
+				return toMap( convertContext, buckets );
+			}
+
+			if ( minDocCount <= 0 ) {
+				Set<T> firstTerms = collectFirstTerms( context.getIndexReader(), order.isTermOrderDescending(), maxTermCount );
+				// If some of the first terms are already in non-zero buckets, ignore them in the next step
+				for ( Bucket<T> bucket : buckets ) {
+					firstTerms.remove( bucket.term );
+				}
+				// Complete the list of buckets with zero-count terms
+				for ( T term : firstTerms ) {
+					buckets.add( new Bucket<>( term, 0L ) );
+				}
+			}
+
+			// Sort the list of buckets and trim it if necessary (there may be more buckets than we want in some cases)
+			buckets.sort( order.toBucketComparator( getAscendingTermComparator() ) );
+			if ( buckets.size() > maxTermCount ) {
+				buckets.subList( maxTermCount, buckets.size() ).clear();
+			}
+
 			return toMap( convertContext, buckets );
 		}
 
-		if ( minDocCount <= 0 ) {
-			Set<T> firstTerms = collectFirstTerms( context.getIndexReader(), order.isTermOrderDescending(), maxTermCount );
-			// If some of the first terms are already in non-zero buckets, ignore them in the next step
-			for ( Bucket<T> bucket : buckets ) {
-				firstTerms.remove( bucket.term );
-			}
-			// Complete the list of buckets with zero-count terms
-			for ( T term : firstTerms ) {
-				buckets.add( new Bucket<>( term, 0L ) );
-			}
-		}
+		abstract FacetResult getTopChildren(IndexReader reader, FacetsCollector facetsCollector,
+				NestedDocsProvider nestedDocsProvider, int limit)
+				throws IOException;
 
-		// Sort the list of buckets and trim it if necessary (there may be more buckets than we want in some cases)
-		buckets.sort( order.toBucketComparator( getAscendingTermComparator() ) );
-		if ( buckets.size() > maxTermCount ) {
-			buckets.subList( maxTermCount, buckets.size() ).clear();
-		}
+		abstract Set<T> collectFirstTerms(IndexReader reader, boolean descending, int limit)
+				throws IOException;
 
-		return toMap( convertContext, buckets );
-	}
+		abstract Comparator<T> getAscendingTermComparator();
 
-	abstract FacetResult getTopChildren(IndexReader reader, FacetsCollector facetsCollector,
-			NestedDocsProvider nestedDocsProvider, int limit)
-			throws IOException;
+		abstract T labelToTerm(String label);
 
-	abstract Set<T> collectFirstTerms(IndexReader reader, boolean descending, int limit)
-			throws IOException;
+		abstract F termToFieldValue(T key);
 
-	abstract Comparator<T> getAscendingTermComparator();
+		private List<Bucket<T>> getTopBuckets(AggregationExtractContext context) throws IOException {
+			FacetsCollector facetsCollector = context.getFacets( FacetsCollectorFactory.KEY );
 
-	abstract T labelToTerm(String label);
+			NestedDocsProvider nestedDocsProvider = createNestedDocsProvider( context );
 
-	abstract F termToFieldValue(T key);
+			/*
+			 * TODO HSEARCH-3666 What if the sort order is by term value?
+			 *  Lucene returns facets in descending count order.
+			 *  If that's what we need, then we can ask Lucene to apply the "maxTermCount" limit directly.
+			 *  This is what we do here.
+			 *  But if we need a different sort, then having to retrieve the "top N" facets by document count
+			 *  becomes clearly sub-optimal: to properly implement this, we would need to retrieve
+			 *  *all* facets, and Lucene would allocate an array of Integer.MAX_VALUE elements.
+			 *  To improve on this, we would need to re-implement the facet collections.
+			 */
+			int limit = maxTermCount;
+			FacetResult facetResult = getTopChildren( context.getIndexReader(), facetsCollector, nestedDocsProvider, limit );
 
-	private List<Bucket<T>> getTopBuckets(AggregationExtractContext context) throws IOException {
-		FacetsCollector facetsCollector = context.getFacets( FacetsCollectorFactory.KEY );
+			List<Bucket<T>> buckets = new ArrayList<>();
 
-		NestedDocsProvider nestedDocsProvider = createNestedDocsProvider( context );
-
-		/*
-		 * TODO HSEARCH-3666 What if the sort order is by term value?
-		 *  Lucene returns facets in descending count order.
-		 *  If that's what we need, then we can ask Lucene to apply the "maxTermCount" limit directly.
-		 *  This is what we do here.
-		 *  But if we need a different sort, then having to retrieve the "top N" facets by document count
-		 *  becomes clearly sub-optimal: to properly implement this, we would need to retrieve
-		 *  *all* facets, and Lucene would allocate an array of Integer.MAX_VALUE elements.
-		 *  To improve on this, we would need to re-implement the facet collections.
-		 */
-		int limit = maxTermCount;
-		FacetResult facetResult = getTopChildren( context.getIndexReader(), facetsCollector, nestedDocsProvider, limit );
-
-		List<Bucket<T>> buckets = new ArrayList<>();
-
-		if ( facetResult != null ) {
-			// Add results for matching documents
-			for ( LabelAndValue labelAndValue : facetResult.labelValues ) {
-				long count = (Integer) labelAndValue.value;
-				if ( count >= minDocCount ) {
-					buckets.add( new Bucket<>( labelToTerm( labelAndValue.label ), count ) );
+			if ( facetResult != null ) {
+				// Add results for matching documents
+				for ( LabelAndValue labelAndValue : facetResult.labelValues ) {
+					long count = (Integer) labelAndValue.value;
+					if ( count >= minDocCount ) {
+						buckets.add( new Bucket<>( labelToTerm( labelAndValue.label ), count ) );
+					}
 				}
 			}
+
+			return buckets;
 		}
 
-		return buckets;
-	}
-
-	private Map<K, Long> toMap(FromDocumentValueConvertContext convertContext, List<Bucket<T>> buckets) {
-		Map<K, Long> result = new LinkedHashMap<>(); // LinkedHashMap to preserve ordering
-		for ( Bucket<T> bucket : buckets ) {
-			F decoded = termToFieldValue( bucket.term );
-			K key = fromFieldValueConverter.fromDocumentValue( decoded, convertContext );
-			result.put( key, bucket.count );
+		private Map<K, Long> toMap(FromDocumentValueConvertContext convertContext, List<Bucket<T>> buckets) {
+			Map<K, Long> result = new LinkedHashMap<>(); // LinkedHashMap to preserve ordering
+			for ( Bucket<T> bucket : buckets ) {
+				F decoded = termToFieldValue( bucket.term );
+				K key = fromFieldValueConverter.fromDocumentValue( decoded, convertContext );
+				result.put( key, bucket.count );
+			}
+			return result;
 		}
-		return result;
 	}
 
 	abstract static class AbstractTypeSelector<F> implements TermsAggregationBuilder.TypeSelector {

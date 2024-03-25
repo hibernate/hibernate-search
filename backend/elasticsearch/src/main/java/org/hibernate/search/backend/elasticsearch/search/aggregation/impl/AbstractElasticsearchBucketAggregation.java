@@ -7,12 +7,14 @@
 package org.hibernate.search.backend.elasticsearch.search.aggregation.impl;
 
 import java.lang.invoke.MethodHandles;
+import java.util.List;
 import java.util.Map;
 
 import org.hibernate.search.backend.elasticsearch.gson.impl.JsonAccessor;
 import org.hibernate.search.backend.elasticsearch.logging.impl.Log;
 import org.hibernate.search.backend.elasticsearch.search.common.impl.ElasticsearchSearchIndexScope;
 import org.hibernate.search.backend.elasticsearch.search.common.impl.ElasticsearchSearchIndexValueFieldContext;
+import org.hibernate.search.backend.elasticsearch.search.predicate.impl.ElasticsearchSearchPredicate;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
 import com.google.gson.JsonElement;
@@ -60,16 +62,7 @@ public abstract class AbstractElasticsearchBucketAggregation<K, V>
 		return outerObject;
 	}
 
-	@Override
-	protected final Map<K, V> doExtract(JsonObject aggregationResult, AggregationExtractContext context) {
-		JsonElement buckets = aggregationResult.get( "buckets" );
-
-		return doExtract( context, buckets );
-	}
-
 	protected abstract void doRequest(JsonObject outerObject, JsonObject innerObject);
-
-	protected abstract Map<K, V> doExtract(AggregationExtractContext context, JsonElement buckets);
 
 	protected final long getBucketDocCount(JsonObject bucket) {
 		if ( isNested() ) {
@@ -84,10 +77,28 @@ public abstract class AbstractElasticsearchBucketAggregation<K, V>
 		}
 	}
 
+	protected abstract class AbstractBucketExtractor<A, B> extends AbstractExtractor<Map<A, B>> {
+
+		protected AbstractBucketExtractor(List<String> nestedPathHierarchy,
+				ElasticsearchSearchPredicate filter) {
+			super( nestedPathHierarchy, filter );
+		}
+
+		@Override
+		protected final Map<A, B> doExtract(JsonObject aggregationResult, AggregationExtractContext context) {
+			JsonElement buckets = aggregationResult.get( "buckets" );
+
+			return doExtract( context, buckets );
+		}
+
+		protected abstract Map<A, B> doExtract(AggregationExtractContext context, JsonElement buckets);
+	}
+
 	public abstract static class AbstractBuilder<K, V>
 			extends AbstractElasticsearchNestableAggregation.AbstractBuilder<Map<K, V>> {
 
-		public AbstractBuilder(ElasticsearchSearchIndexScope<?> scope, ElasticsearchSearchIndexValueFieldContext<?> field) {
+		public AbstractBuilder(ElasticsearchSearchIndexScope<?> scope,
+				ElasticsearchSearchIndexValueFieldContext<?> field) {
 			super( scope, field );
 		}
 
