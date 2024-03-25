@@ -6,6 +6,9 @@
  */
 package org.hibernate.search.engine.search.aggregation.dsl;
 
+import java.util.function.Function;
+
+import org.hibernate.search.engine.search.common.NamedValues;
 import org.hibernate.search.util.common.SearchException;
 import org.hibernate.search.util.common.annotation.Incubating;
 
@@ -59,6 +62,19 @@ public interface SearchAggregationFactory {
 	 * @return The next step.
 	 */
 	TermsAggregationFieldStep<?> terms();
+
+
+	/**
+	 * Delegating aggregation that creates the actual aggregation at query create time and provides access to query parameters.
+	 * <p>
+	 * Which aggregation exactly to create is defined by a function passed to the arguments of this aggregation.
+	 *
+	 * @param aggregationCreator The function creating an actual aggregation.
+	 * @return A final DSL step in a parameterized aggregation definition.
+	 */
+	@Incubating
+	<T> AggregationFinalStep<T> withParameters(
+			Function<? super NamedValues, ? extends AggregationFinalStep<T>> aggregationCreator);
 
 	/**
 	 * Extend the current factory with the given extension,

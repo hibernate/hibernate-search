@@ -6,9 +6,6 @@
  */
 package org.hibernate.search.backend.elasticsearch.search.query.impl;
 
-import static org.hibernate.search.util.common.impl.CollectionHelper.isSubset;
-import static org.hibernate.search.util.common.impl.CollectionHelper.notInTheOtherSet;
-
 import java.lang.invoke.MethodHandles;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -129,17 +126,8 @@ public class ElasticsearchSearchQueryBuilder<H>
 
 	@Override
 	public <A> void aggregation(AggregationKey<A> key, SearchAggregation<A> aggregation) {
-		if ( !( aggregation instanceof ElasticsearchSearchAggregation ) ) {
-			throw log.cannotMixElasticsearchSearchQueryWithOtherAggregations( aggregation );
-		}
-
-		ElasticsearchSearchAggregation<A> casted = (ElasticsearchSearchAggregation<A>) aggregation;
-		if ( !isSubset( scope.hibernateSearchIndexNames(), casted.indexNames() ) ) {
-			throw log.aggregationDefinedOnDifferentIndexes(
-					aggregation, casted.indexNames(), scope.hibernateSearchIndexNames(),
-					notInTheOtherSet( scope.hibernateSearchIndexNames(), casted.indexNames() )
-			);
-		}
+		ElasticsearchSearchAggregation<A> casted = ElasticsearchSearchAggregation.from(
+				scope, aggregation );
 
 		if ( aggregations == null ) {
 			aggregations = new LinkedHashMap<>();
