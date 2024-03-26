@@ -25,7 +25,6 @@ public class QueryParameters implements NamedValues {
 
 	public void add(String parameter, Object value) {
 		Contracts.assertNotNullNorEmpty( parameter, "parameter" );
-		// TODO: does null parameter values make any sense? seems no, but ...
 		parameters.put( parameter, value );
 	}
 
@@ -43,7 +42,6 @@ public class QueryParameters implements NamedValues {
 
 	private Object parameter(String parameterName) {
 		if ( !parameters.containsKey( parameterName ) ) {
-			// TODO: if a value is null ^. see add(..)
 			throw log.cannotFindQueryParameter( parameterName );
 		}
 		return parameters.get( parameterName );

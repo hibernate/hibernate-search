@@ -583,13 +583,13 @@ public interface Log extends BasicLogger {
 	SearchException nonParameterizedRewriteMethodWithParameter(RewriteMethod rewriteMethod);
 
 	@Message(id = ID_OFFSET + 123,
-			value = "Query parameter '%1$s' value is not set."
-					+ " Use `.param(..)` methods on the query to set any parameters that the query requires'.")
+			value = "Query parameter '%1$s' is not set."
+					+ " Use `.param(..)` methods on the query to set any parameters that the query requires.")
 	SearchException cannotFindQueryParameter(String parameter);
 
 	@Message(id = ID_OFFSET + 124,
-			value = "Expecting query parameter '%1$s' value to be of %2$s type,"
-					+ " but instead got value of %3$s type.")
+			value = "Expecting value of query parameter '%1$s' to be of type %2$s,"
+					+ " but instead got a value of type %3$s.")
 	SearchException unexpectedQueryParameterType(String name, @FormatWith(ClassFormatter.class) Class<?> expected,
 			@FormatWith(ClassFormatter.class) Class<?> actual);
 }
