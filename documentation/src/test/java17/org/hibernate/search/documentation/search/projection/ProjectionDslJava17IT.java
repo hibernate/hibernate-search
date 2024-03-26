@@ -22,12 +22,14 @@ import org.hibernate.search.documentation.testsupport.BackendConfigurations;
 import org.hibernate.search.documentation.testsupport.DocumentationSetupHelper;
 import org.hibernate.search.engine.backend.types.ObjectStructure;
 import org.hibernate.search.engine.backend.types.Projectable;
+import org.hibernate.search.engine.spatial.GeoPoint;
 import org.hibernate.search.mapper.orm.Search;
 import org.hibernate.search.mapper.orm.session.SearchSession;
 import org.hibernate.search.mapper.pojo.common.spi.PojoEntityReference;
 import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.TypeMappingStep;
 import org.hibernate.search.mapper.pojo.model.path.PojoModelPath;
 import org.hibernate.search.mapper.pojo.search.definition.binding.builtin.CompositeProjectionBinder;
+import org.hibernate.search.mapper.pojo.search.definition.binding.builtin.DistanceProjectionBinder;
 import org.hibernate.search.mapper.pojo.search.definition.binding.builtin.DocumentReferenceProjectionBinder;
 import org.hibernate.search.mapper.pojo.search.definition.binding.builtin.EntityProjectionBinder;
 import org.hibernate.search.mapper.pojo.search.definition.binding.builtin.EntityReferenceProjectionBinder;
@@ -70,7 +72,8 @@ class ProjectionDslJava17IT {
 						MyBookEntityRefAndTitleProjection.class,
 						MyBookMiscInfoAndTitleProjection.class, MyBookMiscInfoAndTitleProjection.MiscInfo.class,
 						MyBookTitleAndHighlightedDescriptionProjection.class,
-						MyBookHighlightedTitleProjection.class ),
+						MyBookHighlightedTitleProjection.class,
+						MyAuthorPlaceProjection.class ),
 				mapping -> {
 					var bookMapping = mapping.type( Book.class );
 					bookMapping.indexed();
@@ -100,6 +103,8 @@ class ProjectionDslJava17IT {
 					authorMapping.property( "lastName" )
 							.fullTextField()
 							.analyzer( "name" ).projectable( Projectable.YES );
+					authorMapping.property( "placeOfBirth" )
+							.genericField().projectable( Projectable.YES );
 
 					var myBookProjectionMapping = mapping.type( MyBookProjection.class );
 					myBookProjectionMapping.mainConstructor()
@@ -207,6 +212,15 @@ class ProjectionDslJava17IT {
 							.projectionConstructor();
 					myBookHighlightedTitleProjection.mainConstructor().parameter( 0 )
 							.projection( HighlightProjectionBinder.create() );
+
+					//tag::programmatic-distance-projection[]
+					TypeMappingStep myAuthorPlaceProjection =
+							mapping.type( MyAuthorPlaceProjection.class );
+					myAuthorPlaceProjection.mainConstructor()
+							.projectionConstructor();
+					myAuthorPlaceProjection.mainConstructor().parameter( 0 )
+							.projection( DistanceProjectionBinder.create( "placeOfBirth", "point-param" ) );
+					//end::programmatic-distance-projection[]
 				}
 		);
 	}
@@ -554,6 +568,26 @@ class ProjectionDslJava17IT {
 							"A crime story about the first \"roboticide\"."
 					)
 			);
+		} );
+	}
+
+	@ParameterizedTest(name = "{0}")
+	@MethodSource("params")
+	void projectionConstructor_distance(DocumentationSetupHelper.SetupVariant variant) {
+		init( variant );
+		double latitude = 0.0;
+		double longitude = 0.0;
+		with( entityManagerFactory ).runInTransaction( entityManager -> {
+			SearchSession searchSession = Search.session( entityManager );
+
+			// tag::projection-constructor-distance[]
+			List<MyAuthorPlaceProjection> hits = searchSession.search( Author.class )
+					.select( MyAuthorPlaceProjection.class )// <1>
+					.where( f -> f.matchAll() )
+					.param( "point-param", GeoPoint.of( latitude, longitude ) ) // <2>
+					.fetchHits( 20 ); // <3>
+			// end::projection-constructor-distance[]
+			assertThat( hits ).hasSize( 2 );
 		} );
 	}
 
