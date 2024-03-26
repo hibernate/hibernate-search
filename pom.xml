@@ -274,12 +274,12 @@
         <version.buildhelper.plugin>3.5.0</version.buildhelper.plugin>
         <version.checkstyle.plugin>3.3.1</version.checkstyle.plugin>
         <version.bundle.plugin>5.1.9</version.bundle.plugin>
-        <version.compiler.plugin>3.12.1</version.compiler.plugin>
+        <version.compiler.plugin>3.13.0</version.compiler.plugin>
         <version.dependency.plugin>3.6.1</version.dependency.plugin>
         <!-- Check dependencies for security vulnerabilities -->
         <version.dependency-check.plugin>9.0.10</version.dependency-check.plugin>
         <version.exec.plugin>3.2.0</version.exec.plugin>
-        <version.forbiddenapis.plugin>3.6</version.forbiddenapis.plugin>
+        <version.forbiddenapis.plugin>3.7</version.forbiddenapis.plugin>
         <version.jandex.plugin>3.1.7</version.jandex.plugin>
         <version.maven.injection.plugin>1.0.2</version.maven.injection.plugin>
         <version.jar.plugin>3.3.0</version.jar.plugin>
@@ -291,7 +291,7 @@
         <version.source.plugin>3.3.0</version.source.plugin>
         <!-- Surefire versions are a minefield of bugs: be careful with upgrades -->
         <version.surefire.plugin>3.2.5</version.surefire.plugin>
-        <version.surefire.plugin.java-version.asm>9.6</version.surefire.plugin.java-version.asm>
+        <version.surefire.plugin.java-version.asm>9.7</version.surefire.plugin.java-version.asm>
         <version.jacoco.plugin>0.8.11</version.jacoco.plugin>
         <version.com.buschmais.jqassistant.plugin>2.1.0</version.com.buschmais.jqassistant.plugin>
         <version.moditect.plugin>1.2.0.Final</version.moditect.plugin>
