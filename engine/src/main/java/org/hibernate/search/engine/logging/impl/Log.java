@@ -589,13 +589,22 @@ public interface Log extends BasicLogger {
 	SearchException parseConverterNotAllowed(String enumName, ValueConvert parse, List<ValueConvert> allowed);
 
 	@Message(id = ID_OFFSET + 124,
-			value = "Query parameter '%1$s' value is not set."
-					+ " Use `.param(..)` methods on the query to set any parameters that the query requires'.")
+			value = "Query parameter '%1$s' is not set."
+					+ " Use `.param(..)` methods on the query to set any parameters that the query requires.")
 	SearchException cannotFindQueryParameter(String parameter);
 
 	@Message(id = ID_OFFSET + 125,
-			value = "Expecting query parameter '%1$s' value to be of %2$s type,"
-					+ " but instead got value of %3$s type.")
+			value = "Expecting value of query parameter '%1$s' to be of type %2$s,"
+					+ " but instead got a value of type %3$s.")
 	SearchException unexpectedQueryParameterType(String name, @FormatWith(ClassFormatter.class) Class<?> expected,
+			@FormatWith(ClassFormatter.class) Class<?> actual);
+
+	@Message(id = ID_OFFSET + 126, value = "Named value '%1$s' has not been defined.")
+	SearchException namedValuesParameterNotDefined(String name);
+
+	@Message(id = ID_OFFSET + 127,
+			value = "Expecting value of named value '%1$s' to be of type %2$s,"
+					+ " but instead got a value of type %3$s.")
+	SearchException namedValuesParameterIncorrectType(String name, @FormatWith(ClassFormatter.class) Class<?> expected,
 			@FormatWith(ClassFormatter.class) Class<?> actual);
 }
