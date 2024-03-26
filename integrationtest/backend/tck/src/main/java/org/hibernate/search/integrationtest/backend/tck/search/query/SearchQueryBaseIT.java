@@ -7,22 +7,30 @@
 package org.hibernate.search.integrationtest.backend.tck.search.query;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatCode;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.hibernate.search.util.impl.integrationtest.common.assertion.SearchResultAssert.assertThatQuery;
 import static org.hibernate.search.util.impl.integrationtest.common.assertion.SearchResultAssert.assertThatResult;
 import static org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMapperUtils.documentProvider;
 
 import java.time.Duration;
+import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
 import java.util.Optional;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import org.hibernate.search.engine.backend.common.DocumentReference;
 import org.hibernate.search.engine.backend.document.IndexFieldReference;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaElement;
 import org.hibernate.search.engine.backend.session.spi.BackendSessionContext;
+import org.hibernate.search.engine.backend.types.Aggregable;
+import org.hibernate.search.engine.backend.types.Projectable;
 import org.hibernate.search.engine.backend.types.Sortable;
+import org.hibernate.search.engine.search.aggregation.AggregationKey;
+import org.hibernate.search.engine.search.common.NamedValues;
 import org.hibernate.search.engine.search.loading.spi.SearchLoadingContext;
 import org.hibernate.search.engine.search.loading.spi.SearchLoadingContextBuilder;
+import org.hibernate.search.engine.search.predicate.dsl.SearchPredicateFactory;
 import org.hibernate.search.engine.search.query.SearchQuery;
 import org.hibernate.search.engine.search.query.SearchQueryExtension;
 import org.hibernate.search.engine.search.query.SearchResult;
@@ -171,6 +179,98 @@ class SearchQueryBaseIT {
 				.isInstanceOf( SearchException.class );
 	}
 
+	@Test
+	void queryParameters_nulls() {
+		StubMappingScope scope = index.createScope();
+		assertThatCode( () -> scope.query()
+				.where( SearchPredicateFactory::matchAll )
+				.param( "some name", null )
+				.toQuery() )
+				.doesNotThrowAnyException();
+
+		assertThatThrownBy( () -> scope.query()
+				.where( SearchPredicateFactory::matchAll )
+				.param( "", 1 )
+				.toQuery() )
+				.isInstanceOf( IllegalArgumentException.class )
+				.hasMessageContainingAll( "'parameter' must not be null or empty" );
+
+		assertThatThrownBy( () -> scope.query()
+				.where( SearchPredicateFactory::matchAll )
+				.param( null, 1 )
+				.toQuery() )
+				.isInstanceOf( IllegalArgumentException.class )
+				.hasMessageContainingAll( "'parameter' must not be null or empty" );
+	}
+
+	@Test
+	void queryParameters_access() {
+		StubMappingScope scope = index.createScope();
+		AtomicInteger counter = new AtomicInteger( 0 );
+		scope.query()
+				.select( f -> f.withParameters( params -> assertParameters( params, f, counter )
+						.field( "string" ) ) )
+				.where( f -> f.withParameters( ctx -> assertParameters( ctx, f, counter ).matchAll() ) )
+				.sort( f -> f.withParameters( ctx -> assertParameters( ctx, f, counter ).score() ) )
+				.aggregation( AggregationKey.of( "key" ), f -> f.withParameters(
+						ctx -> assertParameters( ctx, f, counter ).terms().field( "string", String.class ) ) )
+				.param( "p1", null )
+				.param( "p2", 1 )
+				.param( "p3", 2.0f )
+				.param( "p4", "text" )
+				.param( "p5", LocalDate.of( 2002, 02, 20 ) )
+				.param( "p6", new byte[] { 1, 2, 3 } )
+				.toQuery();
+		assertThat( counter ).hasValue( 4 );
+	}
+
+	@Test
+	void queryParameters_wrongType() {
+		StubMappingScope scope = index.createScope();
+		assertThatThrownBy(
+				() -> scope.query().select( f -> f.withParameters( params -> {
+					params.get( "p1", Double.class );
+					return f.field( "string" );
+				} ) )
+						.where( SearchPredicateFactory::matchAll )
+						.param( "p1", "string" )
+						.toQuery() )
+				.isInstanceOf( SearchException.class )
+				.hasMessageContainingAll( "Expecting value of query parameter 'p1' to be of type ",
+						java.lang.Double.class.getName(),
+						", but instead got a value of type ",
+						java.lang.String.class.getName() );
+	}
+
+	@Test
+	void queryParameters_missing() {
+		StubMappingScope scope = index.createScope();
+		assertThatThrownBy(
+				() -> scope.query().select( f -> f.withParameters( params -> {
+					params.get( "no-such-parameter", Double.class );
+					return f.field( "string" );
+				} ) )
+						.where( SearchPredicateFactory::matchAll )
+						.param( "p1", "string" )
+						.toQuery() )
+				.isInstanceOf( SearchException.class )
+				.hasMessageContainingAll(
+						"Query parameter 'no-such-parameter' is not set. Use `.param(..)` methods on the query to set any parameters that the query requires" );
+
+	}
+
+	private static <T> T assertParameters(NamedValues params, T factory, AtomicInteger counter) {
+		counter.incrementAndGet();
+		assertThat( params.get( "p1", Object.class ) ).isNull();
+		assertThat( params.get( "p2", Integer.class ) ).isEqualTo( 1 );
+		assertThat( params.get( "p3", Float.class ) ).isEqualTo( 2.0f );
+		assertThat( params.get( "p4", String.class ) ).isEqualTo( "text" );
+		assertThat( params.get( "p5", LocalDate.class ) ).isEqualTo( LocalDate.of( 2002, 02, 20 ) );
+		assertThat( params.get( "p6", byte[].class ) ).containsExactly( 1, 2, 3 );
+
+		return factory;
+	}
+
 	private SearchQueryOptionsStep<?, DocumentReference, ?, ?, ?> matchAllSortedByScoreQuery() {
 		return index.query()
 				.where( f -> f.matchAll() );
@@ -200,7 +300,10 @@ class SearchQueryBaseIT {
 		final IndexFieldReference<String> string;
 
 		IndexBinding(IndexSchemaElement root) {
-			string = root.field( "string", f -> f.asString().sortable( Sortable.YES ) )
+			string = root
+					.field( "string",
+							f -> f.asString().projectable( Projectable.YES ).aggregable( Aggregable.YES )
+									.sortable( Sortable.YES ) )
 					.toReference();
 		}
 	}
