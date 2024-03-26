@@ -1588,6 +1588,32 @@ Trying to apply such projection *will* result in an *exception* being thrown.
 
 These limitations should be addressed by link:{hibernateSearchJiraUrl}/HSEARCH-4841[HSEARCH-4841].
 
+[[search-dsl-projection-withparameters]]
+== `withParameters`: create projections using query parameters
+
+include::../components/_incubating-warning.adoc[]
+
+The `withParameters` projection allows building projections using <<search-dsl-query-parameters,query parameters>>.
+
+This type of projection requires a function that accepts query parameters and returns a projection.
+That function will get called at query building time.
+
+[[search-dsl-projection-withparameters-syntax]]
+=== Syntax
+
+The `withParameters` projection return type depends on the projection type configured within the `.withParameters(..)`:
+
+.Creating a projection with query parameters
+====
+[source, JAVA, indent=0, subs="+callouts"]
+----
+include::{sourcedir}/org/hibernate/search/documentation/search/projection/ProjectionDslIT.java[tags=with-parameters]
+----
+<1> Start creating the `.withParameters()` projection.
+<2> Access the query parameter `center` of `GeoPoint` type when constructing the projection.
+<3> Set parameters required by the projection at the query level.
+====
+
 [[search-dsl-projection-extensions]]
 == Backend-specific extensions
 

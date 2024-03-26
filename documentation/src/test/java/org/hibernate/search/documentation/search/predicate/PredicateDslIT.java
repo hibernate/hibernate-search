@@ -1356,6 +1356,27 @@ class PredicateDslIT {
 		}
 	}
 
+	@Test
+	void withParameters() {
+		withinSearchSession( searchSession -> {
+			// tag::with-parameters[]
+			List<Book> hits = searchSession.search( Book.class )
+					.where( f -> f.withParameters( params -> f.bool() // <1>
+							.should( f.match().field( "title" )
+									.matching( params.get( "title-param", String.class ) ) ) // <2>
+							.filter( f.match().field( "genre" )
+									.matching( params.get( "genre-param", Genre.class ) ) ) // <3>
+					) )
+					.param( "title-param", "robot" ) // <4>
+					.param( "genre-param", Genre.CRIME_FICTION )
+					.fetchHits( 20 );
+			// end::with-parameters[]
+			assertThat( hits )
+					.extracting( Book::getId )
+					.containsExactlyInAnyOrder( BOOK4_ID );
+		} );
+	}
+
 	private MySearchParameters getSearchParameters() {
 		return new MySearchParameters() {
 			@Override
