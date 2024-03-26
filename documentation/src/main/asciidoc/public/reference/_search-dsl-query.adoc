@@ -622,6 +622,28 @@ The former is used for debugging purposes and in particular to find out why a qu
 For the latter it does not make sense to return a _partial_ result.
 ====
 
+[[search-dsl-query-parameters]]
+== Setting query parameters
+
+include::../components/_incubating-warning.adoc[]
+
+Some query elements may leverage the use of query parameters. Call `.param(..)` at the query level to set these:
+
+.Setting query parameters
+====
+[source, JAVA, indent=0, subs="+callouts"]
+----
+include::{sourcedir}/org/hibernate/search/documentation/search/query/QueryDslIT.java[tags=parameters]
+----
+====
+
+See also:
+
+* <<search-dsl-projection-withparameters,Creating projections with parameters>>
+* <<search-dsl-predicate-withparameters,Creating predicates with parameters>>
+* <<search-dsl-aggregation-withparameters,Creating aggregations with parameters>>
+* <<search-dsl-sort-withparameters,Creating sorts with parameters>>
+
 [[search-dsl-query-object]]
 == Obtaining a query object
 

@@ -11,6 +11,7 @@ import static org.hibernate.search.util.impl.integrationtest.mapper.orm.ManagedA
 import static org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmUtils.with;
 
 import java.time.Duration;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -525,6 +526,27 @@ class QueryDslIT {
 			assertThat( result.hits() )
 					.isNotEmpty()
 					.allSatisfy( manager -> assertThatManaged( manager.getAssociates() ).isInitialized() );
+		} );
+	}
+
+	@Test
+	void parameters() {
+		with( entityManagerFactory ).runInTransaction( entityManager -> {
+			SearchSession searchSession = Search.session( entityManager );
+			// tag::parameters[]
+			List<Manager> managers = searchSession.search( Manager.class )
+					.where(
+							//...
+							// end::parameters[]
+							f -> f.matchAll()
+			// tag::parameters[]
+					)
+					.param( "param1", "name" )
+					.param( "param2", 10 )
+					.param( "param3", LocalDate.of( 2002, 02, 20 ) )
+					.fetchAllHits();
+			// end::parameters[]
+			assertThat( managers ).isNotEmpty();
 		} );
 	}
 

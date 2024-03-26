@@ -181,6 +181,27 @@ can be <<search-dsl-sort-common-multi-value-mode,controlled explicitly with `.mo
 * For fields in nested objects, all nested objects are considered by default,
 but that can be <<search-dsl-sort-common-filter,controlled explicitly with `.filter(...)`>>.
 
+[[search-dsl-sort-withparameters]]
+== `withParameters`: create sorts using query parameters
+
+include::../components/_incubating-warning.adoc[]
+
+The `withParameters` sort allows building sorts using <<search-dsl-query-parameters,query parameters>>.
+
+This type of sort requires a function that accepts query parameters and returns a sort.
+That function will get called at query building time.
+
+.Creating a sort with query parameters
+====
+[source, JAVA, indent=0, subs="+callouts"]
+----
+include::{sourcedir}/org/hibernate/search/documentation/search/sort/SortDslIT.java[tags=with-parameters]
+----
+<1> Start creating the `.withParameters()` sort.
+<2> Access the query parameter `center` of `GeoPoint` type when constructing the sort.
+<3> Set parameters required by the sort at the query level.
+====
+
 [[search-dsl-sort-composite]]
 == `composite`: combine sorts
 

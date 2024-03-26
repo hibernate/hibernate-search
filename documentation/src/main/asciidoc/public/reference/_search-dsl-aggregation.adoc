@@ -339,6 +339,27 @@ include::{sourcedir}/org/hibernate/search/documentation/search/aggregation/Aggre
 * For fields in nested objects, all nested objects are considered by default,
 but that can be <<search-dsl-aggregation-common-filter,controlled explicitly with `.filter(...)`>>.
 
+[[search-dsl-aggregation-withparameters]]
+== `withParameters`: create aggregations using query parameters
+
+include::../components/_incubating-warning.adoc[]
+
+The `withParameters` aggregation allows building aggregations using <<search-dsl-query-parameters,query parameters>>.
+
+This type of aggregation requires a function that accepts query parameters and returns an aggregation.
+That function will get called at query building time.
+
+.Creating an aggregation with query parameters
+====
+[source, JAVA, indent=0, subs="+callouts"]
+----
+include::{sourcedir}/org/hibernate/search/documentation/search/aggregation/AggregationDslIT.java[tags=with-parameters]
+----
+<1> Start creating the `.withParameters()` aggregation.
+<2> Access the query parameters of `Double` type, defining range bounds, when constructing the aggregation.
+<3> Set parameters required by the aggregation at the query level.
+====
+
 [[search-dsl-aggregation-extensions]]
 == Backend-specific extensions
 

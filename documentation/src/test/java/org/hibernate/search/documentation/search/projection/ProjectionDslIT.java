@@ -947,6 +947,26 @@ class ProjectionDslIT {
 		} ).isInstanceOf( SearchException.class ) );
 	}
 
+	@Test
+	void withParameters() {
+		withinSearchSession( searchSession -> {
+			// tag::with-parameters[]
+			GeoPoint center = GeoPoint.of( 47.506060, 2.473916 );
+			SearchResult<Double> result = searchSession.search( Author.class )
+					.select( f -> f.withParameters( params -> f // <1>
+							.distance( "placeOfBirth", params.get( "center", GeoPoint.class ) ) ) ) // <2>
+					.where( f -> f.matchAll() )
+					.param( "center", center ) // <3>
+					.fetch( 20 );
+			// end::with-parameters[]
+			assertThat( result.hits() )
+					.hasSize( 2 )
+					.allSatisfy(
+							distance -> assertThat( distance ).isBetween( 1_000_000.0, 10_000_000.0 )
+					);
+		} );
+	}
+
 	private void withinSearchSession(Consumer<SearchSession> action) {
 		with( entityManagerFactory ).runInTransaction( entityManager -> {
 			SearchSession searchSession = Search.session( entityManager );

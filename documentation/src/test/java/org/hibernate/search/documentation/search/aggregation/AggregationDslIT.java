@@ -438,6 +438,35 @@ class AggregationDslIT {
 		} );
 	}
 
+	@Test
+	void withParameters() {
+		withinSearchSession( searchSession -> {
+			// tag::with-parameters[]
+			AggregationKey<Map<Range<Double>, Long>> countsByPriceKey = AggregationKey.of( "countsByPrice" );
+			SearchResult<Book> result = searchSession.search( Book.class )
+					.where( f -> f.matchAll() )
+					.aggregation( countsByPriceKey, f -> f.withParameters( params -> f.range() // <1>
+							.field( "price", Double.class )
+							.range( params.get( "bound0", Double.class ), params.get( "bound1", Double.class ) ) // <2>
+							.range( params.get( "bound1", Double.class ), params.get( "bound2", Double.class ) )
+							.range( params.get( "bound2", Double.class ), params.get( "bound3", Double.class ) )
+					) )
+					.param( "bound0", 0.0 ) // <3>
+					.param( "bound1", 10.0 )
+					.param( "bound2", 20.0 )
+					.param( "bound3", null )
+					.fetch( 20 );
+			Map<Range<Double>, Long> countsByPrice = result.aggregation( countsByPriceKey );
+			// end::with-parameters[]
+			assertThat( countsByPrice )
+					.containsExactly(
+							entry( Range.canonical( 0.0, 10.0 ), 1L ),
+							entry( Range.canonical( 10.0, 20.0 ), 2L ),
+							entry( Range.canonical( 20.0, null ), 1L )
+					);
+		} );
+	}
+
 	private void withinSearchSession(Consumer<SearchSession> action) {
 		with( entityManagerFactory ).runInTransaction( entityManager -> {
 			SearchSession searchSession = Search.session( entityManager );

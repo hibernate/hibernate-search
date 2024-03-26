@@ -1841,6 +1841,30 @@ you can pass the predicate name directly, without any prefix.
 which will be handled as explained in <<binding-named-predicate>>.
 ====
 
+[[search-dsl-predicate-withparameters]]
+== `withParameters`: create predicates accessing query parameters
+
+include::../components/_incubating-warning.adoc[]
+
+The `withParameters` predicate allows building predicates using <<search-dsl-query-parameters,query parameters>>.
+This predicate can be helpful when there is a need to execute a query with the same predicate but different input values,
+or when the same input value, passed as a query parameter, is used in multiple parts of a query, e.g. in a predicate, projection, sort, aggregation.
+
+This type of predicate requires a function that accepts query parameters and returns a predicate.
+That function will get called at query building time.
+
+.Creating a predicate with query parameters
+====
+[source, JAVA, indent=0, subs="+callouts"]
+----
+include::{sourcedir}/org/hibernate/search/documentation/search/predicate/PredicateDslIT.java[tags=with-parameters]
+----
+<1> Start creating the `.withParameters()` predicate.
+<2> Access the query parameter `title-param` of `String` type when constructing the predicate.
+<3> Access the query parameter `genre-param` of `Genre` enum type when constructing the predicate.
+<4> Set parameters required by the predicate at the query level.
+====
+
 [[search-dsl-predicate-extensions]]
 == Backend-specific extensions
 
