@@ -620,16 +620,69 @@ include::{sourcedir}/org/hibernate/search/documentation/search/projection/Projec
 ====
 
 [[search-dsl-projection-distance-mapping]]
-=== In projections to custom types
+=== `@DistanceProjection` in projections to custom types
 
-There is no built-in annotation to use the `distance` projection
-inside a <<search-dsl-projection-mapped,projection to an annotated custom type>>
-https://hibernate.atlassian.net/browse/HSEARCH-4807[at the moment].
+To achieve a `distance` projection inside a <<search-dsl-projection-mapped,projection to an annotated custom type>>,
+use the `@DistanceProjection` annotation on the constructor parameter:
 
-You can <<binding-projection-parameters-custom-annotation,create your own annotation>> if you need one,
-backed by a <<binding-projection,custom projection binder>>,
-but the center of the distance projection won't be able to change from query to query,
-which limits its usefulness drastically at the moment.
+.Returning distance from a center point defined as a parameter to the field value in matched documents within a projection constructor
+====
+[source, JAVA, indent=0, subs="+callouts"]
+----
+include::{sourcedirJava17}/org/hibernate/search/documentation/search/projection/MyAuthorPlaceProjection.java[tags=include]
+----
+<1> Annotate the record type with <<mapping-projection-basics,`@ProjectionConstructor`>>.
+<2> Annotate the parameter that should receive the distance value with `@DistanceProjection`.
+<3> Specify the <<search-dsl-query-parameters, query parameter>> that will be used to calculate the distance from.
+<4> Optionally, customize the path, since most likely the `GeoPoint` property of the entity will have a different name from the
+distance property in a projection.
+<5> For single-valued projections,
+the type of the constructor parameter must be assignable from `Double`.
++
+For multi-valued projections,
+the type of the constructor parameter must be assignable from `List<T>`,
+where `T` is `Double` or a supertype.
+
+[source, JAVA, indent=0, subs="+callouts"]
+----
+include::{sourcedirJava17}/org/hibernate/search/documentation/search/projection/ProjectionDslJava17IT.java[tags=projection-constructor-distance]
+----
+<1> Pass the custom projection type to `.select(...)`.
+<2> Pass a query parameter value, with the same name `point-param` as in the `@DistanceProjection` `fromParam` of a projection constructor.
+<3> Each hit will be an instance of the custom projection type,
+populated with the requested fields.
+====
+
+The annotation exposes the following attributes:
+
+`fromParam`::
+The name of a <<search-dsl-query-parameters,query parameter>> that will represent a point,
+from which the distance to the field value will be calculated.
++
+This is a required attribute.
++
+`path`::
+The path to the projected field.
++
+If not set, it is inferred from the constructor parameter name.
++
+[WARNING]
+====
+Field path inference will <<mapping-projection-inner-inference-fieldpath,fail if constructor parameter names are not included in the Java bytecode>>.
+====
+`unit`::
+The unit of the computed distance (default is meters).
+
+For <<mapping-projection-programmatic,programmatic mapping>>, use `DistanceProjectionBinder.create(..)`.
+
+.Programmatic mapping of a `distance` projection within a projection constructor
+====
+[source, JAVA, indent=0, subs="+callouts"]
+----
+include::{sourcedirJava17}/org/hibernate/search/documentation/search/projection/ProjectionDslJava17IT.java[tags=programmatic-distance-projection]
+----
+====
+
 
 [[search-dsl-projection-composite]]
 == `composite`: combine projections

@@ -1002,4 +1002,9 @@ public interface Log extends BasicLogger {
 			value = "A non-string tenant ID '%1$s' cannot be used with a default TenantIdentifierConverter. "
 					+ "Provide your custom implementation of TenantIdentifierConverter to use non-string tenant identifiers.")
 	SearchException nonStringTenantId(Object tenantId);
+
+	@Message(id = ID_OFFSET + 159,
+			value = "Invalid constructor parameter type: '%1$s'. The distance projection results in values of type '%2$s'.")
+	SearchException invalidParameterTypeForDistanceProjectionInProjectionConstructor(
+			@FormatWith(ClassFormatter.class) Class<?> rawClass, String expectedClass);
 }
