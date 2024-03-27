@@ -190,7 +190,7 @@ public class ElasticsearchDialectFactory {
 	}
 
 	private ElasticsearchProtocolDialect createProtocolDialectElasticV8(ElasticsearchVersion version, int minor) {
-		if ( minor > 12 ) {
+		if ( minor > 13 ) {
 			log.unknownElasticsearchVersion( version );
 		}
 		else if ( minor == 0 ) {
