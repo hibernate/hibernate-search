@@ -1,3 +1,5 @@
+// SPDX-License-Identifier: Apache-2.0
+// Copyright Red Hat Inc. and Hibernate Authors
 [IMPORTANT]
 ====
 There are a few constraints to keep in mind when annotating a custom projection type:

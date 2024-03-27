@@ -1,3 +1,5 @@
+// SPDX-License-Identifier: Apache-2.0
+// Copyright Red Hat Inc. and Hibernate Authors
 [[mapping-configuration]]
 = [[mapper-orm-mapping-configuration-mapping]] [[_configuring_the_mapping]] Configuring the mapping
 

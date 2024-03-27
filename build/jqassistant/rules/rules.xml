@@ -1,10 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
- ~ Hibernate Search, full-text search for your domain model
- ~
- ~ License: GNU Lesser General Public License (LGPL), version 2.1 or later
- ~ See the lgpl.txt file in the root directory or <http://www.gnu.org/licenses/lgpl-2.1.html>.
-  -->
+    SPDX-License-Identifier: Apache-2.0
+    Copyright Red Hat Inc. and Hibernate Authors
+-->
 <jqassistant-rules xmlns="http://schema.jqassistant.org/rule/v1.10"
                    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
                    xsi:schemaLocation="http://schema.jqassistant.org/rule/v1.10 https://schema.jqassistant.org/rule/jqassistant-rule-v1.10.xsd">

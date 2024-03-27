@@ -1,3 +1,5 @@
+// SPDX-License-Identifier: Apache-2.0
+// Copyright Red Hat Inc. and Hibernate Authors
 [[configuration]]
 = [[search-configuration]] Configuration
 
@@ -432,7 +434,7 @@ the context also lists references to entities that could not be indexed correctl
 
 [source, XML, indent=0, subs="+callouts"]
 ----
-include::{resourcesdir}/reporting/failurehandler.properties[]
+include::{resourcesdir}/reporting/failurehandler.properties[tags=include]
 ----
 Assign the background failure handler using a Hibernate Search configuration property.
 ====

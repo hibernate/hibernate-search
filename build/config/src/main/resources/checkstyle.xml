@@ -1,10 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
- ~ Hibernate Search, full-text search for your domain model
- ~
- ~ License: GNU Lesser General Public License (LGPL), version 2.1 or later
- ~ See the lgpl.txt file in the root directory or <http://www.gnu.org/licenses/lgpl-2.1.html>.
-  -->
+    SPDX-License-Identifier: Apache-2.0
+    Copyright Red Hat Inc. and Hibernate Authors
+-->
+
 <!DOCTYPE module PUBLIC "-//Puppy Crawl//DTD Check Configuration 1.2//EN"
         "http://www.puppycrawl.com/dtds/configuration_1_2.dtd">
 
@@ -13,13 +12,23 @@
     <property name="cacheFile" value="${checkstyle.cache.file}" />
 
     <module name="Header">
-        <property name="header" value="/*\n * Hibernate Search, full-text search for your domain model\n *\n * License: GNU Lesser General Public License (LGPL), version 2.1 or later\n * See the lgpl.txt file in the root directory or &lt;http://www.gnu.org/licenses/lgpl-2.1.html&gt;.\n */"/>
+        <property name="headerFile" value="classpath:/org/hibernate/search/headers/java.header"/>
         <property name="fileExtensions" value="java"/>
     </module>
 
     <module name="Header">
-        <property name="header" value="&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt;\n&lt;!--\n ~ Hibernate Search, full-text search for your domain model\n ~\n ~ License: GNU Lesser General Public License (LGPL), version 2.1 or later\n ~ See the lgpl.txt file in the root directory or &lt;http://www.gnu.org/licenses/lgpl-2.1.html&gt;.\n  --&gt;"/>
+        <property name="headerFile" value="classpath:/org/hibernate/search/headers/xml.header"/>
         <property name="fileExtensions" value="xml"/>
+    </module>
+
+    <module name="Header">
+        <property name="headerFile" value="classpath:/org/hibernate/search/headers/properties.header"/>
+        <property name="fileExtensions" value="properties"/>
+    </module>
+
+    <module name="Header">
+        <property name="headerFile" value="classpath:/org/hibernate/search/headers/adoc.header"/>
+        <property name="fileExtensions" value="adoc,asciidoc"/>
     </module>
 
     <module name="TreeWalker">

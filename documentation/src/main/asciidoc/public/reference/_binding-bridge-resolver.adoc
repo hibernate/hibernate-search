@@ -1,3 +1,5 @@
+// SPDX-License-Identifier: Apache-2.0
+// Copyright Red Hat Inc. and Hibernate Authors
 [[binding-bridge-resolver]]
 = [[mapper-orm-bridge-resolver]] [[_bridgeprovider_associate_a_bridge_to_a_given_return_type]] Assigning default bridges with the bridge resolver
 

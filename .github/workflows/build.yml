@@ -1,3 +1,6 @@
+# SPDX-License-Identifier: Apache-2.0
+# Copyright Red Hat Inc. and Hibernate Authors
+
 # The main CI of Hibernate Search is https://ci.hibernate.org/job/hibernate-search/.
 # However, Hibernate Search builds run on GitHub actions regularly
 # to build on Windows

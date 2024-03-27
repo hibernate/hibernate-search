@@ -1,3 +1,5 @@
+// SPDX-License-Identifier: Apache-2.0
+// Copyright Red Hat Inc. and Hibernate Authors
 [[mapping-inspect]]
 = [[mapper-orm-mapping-inspect]] [[_metadata_api]] Inspecting the mapping
 

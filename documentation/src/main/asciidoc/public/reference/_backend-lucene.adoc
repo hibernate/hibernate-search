@@ -1,3 +1,5 @@
+// SPDX-License-Identifier: Apache-2.0
+// Copyright Red Hat Inc. and Hibernate Authors
 [[backend-lucene]]
 = [[search-lucene-native]] Lucene backend
 
@@ -660,7 +662,7 @@ include::{sourcedir}/org/hibernate/search/documentation/analysis/MyLuceneAnalysi
 
 [source, XML, indent=0, subs="+callouts"]
 ----
-include::{resourcesdir}/analysis/lucene-simple.properties[]
+include::{resourcesdir}/analysis/lucene-simple.properties[tags=include]
 ----
 <1> Assign the configurer to the backend using a Hibernate Search configuration property.
 ====
@@ -742,7 +744,7 @@ but hardcoding `"default"` would work just as well.
 
 [source, XML, indent=0, subs="+callouts"]
 ----
-include::{resourcesdir}/analysis/lucene-default-override.properties[]
+include::{resourcesdir}/analysis/lucene-default-override.properties[tags=include]
 ----
 <1> Assign the configurer to the backend using a Hibernate Search configuration property.
 ====

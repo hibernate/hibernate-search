@@ -1,3 +1,5 @@
+// SPDX-License-Identifier: Apache-2.0
+// Copyright Red Hat Inc. and Hibernate Authors
 [[backend-elasticsearch]]
 = [[elasticsearch-integration]] Elasticsearch backend
 
@@ -428,7 +430,7 @@ include::{sourcedir}/org/hibernate/search/documentation/backend/elasticsearch/cl
 ====
 [source, XML, indent=0, subs="+callouts"]
 ----
-include::{resourcesdir}/configuration/http-client-configurer.properties[]
+include::{resourcesdir}/configuration/http-client-configurer.properties[tags=include]
 ----
 <1> Specify the HTTP client configurer.
 ====
@@ -1183,7 +1185,7 @@ must be defined separately and assigned a name.
 
 [source, XML, indent=0, subs="+callouts"]
 ----
-include::{resourcesdir}/analysis/elasticsearch-simple.properties[]
+include::{resourcesdir}/analysis/elasticsearch-simple.properties[tags=include]
 ----
 <1> Assign the configurer to the backend using a Hibernate Search configuration property.
 ====
@@ -1232,7 +1234,7 @@ but hardcoding `"default"` would work just as well.
 
 [source, XML, indent=0, subs="+callouts"]
 ----
-include::{resourcesdir}/analysis/elasticsearch-default-override.properties[]
+include::{resourcesdir}/analysis/elasticsearch-default-override.properties[tags=include]
 ----
 <1> Assign the configurer to the backend using a Hibernate Search configuration property.
 ====

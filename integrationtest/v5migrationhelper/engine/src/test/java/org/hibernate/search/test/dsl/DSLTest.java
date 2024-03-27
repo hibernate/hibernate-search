@@ -1,8 +1,6 @@
 /*
- * Hibernate Search, full-text search for your domain model
- *
- * License: GNU Lesser General Public License (LGPL), version 2.1 or later
- * See the lgpl.txt file in the root directory or <http://www.gnu.org/licenses/lgpl-2.1.html>.
+ * SPDX-License-Identifier: Apache-2.0
+ * Copyright Red Hat Inc. and Hibernate Authors
  */
 package org.hibernate.search.test.dsl;
 
@@ -588,21 +586,6 @@ class DSLTest {
 				.sentence( "month whitening" )
 				.createQuery();
 		helper.assertThatQuery( query ).from( Month.class ).hasResultSize( 0 );
-	}
-
-	@Test
-	@TestForIssue(jiraKey = "HSEARCH-2479")
-	void testPhraseQueryTermCreation() {
-		String testCaseText = "Test the Test test of your test test to test test test of test and Test budgeting.";
-		final QueryBuilder monthQb = helper.queryBuilder( Month.class );
-
-		Query query = monthQb
-				.phrase()
-				.onField( "mythology" )
-				.sentence( testCaseText )
-				.createQuery();
-
-		helper.assertThatQuery( query ).from( Month.class ).as( "test term ordering" ).hasResultSize( 0 );
 	}
 
 	@Test

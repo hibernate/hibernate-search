@@ -122,9 +122,14 @@ long totalHitCount = result.total().hitCount();
 ## License
 
 This software and its documentation are distributed under the terms of
-the GNU Lesser General Public License (LGPL), version 2.1 or later.
+the [Apache License version 2.0 (Apache-2.0)](https://www.apache.org/licenses/LICENSE-2.0.txt).
 
-See the `lgpl.txt` file in the root directory or <http://www.gnu.org/licenses/lgpl-2.1.html>.
+The Apache-2.0 license text is included verbatim in the [`LICENSE.txt`](LICENSE.txt) file
+in the root directory of the repository.
+
+Note that Hibernate Search 7.1 and older are distributed under a different license;
+for more information, check the licensing information provided alongside published binaries,
+or the [corresponding branch in the source repository](https://github.com/hibernate/hibernate-search/tree/7.1#license).
 
 ## Getting started
 
