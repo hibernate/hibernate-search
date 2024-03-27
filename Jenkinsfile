@@ -10,7 +10,7 @@ import groovy.transform.Field
 /*
  * See https://github.com/hibernate/hibernate-jenkins-pipeline-helpers
  */
-@Library('hibernate-jenkins-pipeline-helpers@1.4')
+@Library('hibernate-jenkins-pipeline-helpers@1.9')
 import org.hibernate.jenkins.pipeline.helpers.job.JobHelper
 import org.hibernate.jenkins.pipeline.helpers.alternative.AlternativeMultiMap
 
@@ -181,6 +181,9 @@ stage('Configure') {
 											 Change the branch name and open a new Pull Request.
 										   """)
 	}
+
+	requireApprovalForPullRequest 'hibernate'
+
 	this.environments = AlternativeMultiMap.create([
 			jdk: [
 					// This should not include every JDK; in particular let's not care too much about EOL'd JDKs like version 9
