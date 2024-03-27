@@ -341,6 +341,24 @@ class SortDslIT {
 		} );
 	}
 
+	@Test
+	void withParameters() {
+		withinSearchSession( searchSession -> {
+			// tag::with-parameters[]
+			GeoPoint center = GeoPoint.of( 47.506060, 2.473916 );
+			List<Author> hits = searchSession.search( Author.class )
+					.where( f -> f.matchAll() )
+					.sort( f -> f.withParameters( params -> f // <1>
+							.distance( "placeOfBirth", params.get( "center", GeoPoint.class ) ) ) ) // <2>
+					.param( "center", center ) // <3>
+					.fetchHits( 20 );
+			// end::with-parameters[]
+			assertThat( hits )
+					.extracting( Author::getId )
+					.containsExactly( ASIMOV_ID, MARTINEZ_ID );
+		} );
+	}
+
 	private MySearchParameters getSearchParameters() {
 		return () -> Arrays.asList(
 				new MySort( MySortType.GENRE, SortOrder.ASC ),

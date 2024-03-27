@@ -14,6 +14,7 @@ import org.hibernate.search.backend.elasticsearch.search.common.impl.Elasticsear
 import org.hibernate.search.backend.elasticsearch.search.common.impl.ElasticsearchSearchIndexScope;
 import org.hibernate.search.backend.elasticsearch.search.predicate.impl.ElasticsearchExistsPredicate;
 import org.hibernate.search.backend.elasticsearch.search.predicate.impl.ElasticsearchNestedPredicate;
+import org.hibernate.search.backend.elasticsearch.search.predicate.impl.ElasticsearchWithParametersPredicate;
 import org.hibernate.search.backend.elasticsearch.search.projection.impl.ElasticsearchObjectProjection;
 import org.hibernate.search.engine.backend.types.ObjectStructure;
 import org.hibernate.search.engine.backend.types.spi.AbstractIndexCompositeNodeType;
@@ -44,6 +45,7 @@ public class ElasticsearchIndexCompositeNodeType
 		public Builder(ObjectStructure objectStructure) {
 			super( objectStructure );
 			queryElementFactory( PredicateTypeKeys.EXISTS, new ElasticsearchExistsPredicate.ObjectFieldFactory() );
+			queryElementFactory( PredicateTypeKeys.WITH_PARAMETERS, ElasticsearchWithParametersPredicate.Factory.INSTANCE );
 			queryElementFactory( ProjectionTypeKeys.OBJECT, new ElasticsearchObjectProjection.Factory() );
 			if ( ObjectStructure.NESTED.equals( objectStructure ) ) {
 				queryElementFactory( PredicateTypeKeys.NESTED, new ElasticsearchNestedPredicate.Factory() );

@@ -58,31 +58,10 @@ public class LuceneNumericRangeAggregation<F, E extends Number, K>
 	}
 
 	@Override
-	public void request(AggregationRequestContext context) {
+	public Extractor<Map<Range<K>, Long>> request(AggregationRequestContext context) {
 		context.requireCollector( FacetsCollectorFactory.INSTANCE );
-	}
 
-	@Override
-	public Map<Range<K>, Long> extract(AggregationExtractContext context) throws IOException {
-		LuceneNumericDomain<E> numericDomain = codec.getDomain();
-
-		FacetsCollector facetsCollector = context.getFacets( FacetsCollectorFactory.KEY );
-
-		NestedDocsProvider nestedDocsProvider = createNestedDocsProvider( context );
-
-		Facets facetsCount = numericDomain.createRangeFacetCounts(
-				absoluteFieldPath, facetsCollector, encodedRangesInOrder,
-				nestedDocsProvider
-		);
-
-		FacetResult facetResult = facetsCount.getTopChildren( rangesInOrder.size(), absoluteFieldPath );
-
-		Map<Range<K>, Long> result = new LinkedHashMap<>();
-		for ( int i = 0; i < rangesInOrder.size(); i++ ) {
-			result.put( rangesInOrder.get( i ), (long) (Integer) facetResult.labelValues[i].value );
-		}
-
-		return result;
+		return new LuceneNumericRangeAggregationExtractor();
 	}
 
 	public static class Factory<F>
@@ -97,6 +76,32 @@ public class LuceneNumericRangeAggregation<F, E extends Number, K>
 		@Override
 		public TypeSelector<?> create(LuceneSearchIndexScope<?> scope, LuceneSearchIndexValueFieldContext<F> field) {
 			return new TypeSelector<>( codec, scope, field );
+		}
+	}
+
+	private class LuceneNumericRangeAggregationExtractor implements Extractor<Map<Range<K>, Long>> {
+
+		@Override
+		public Map<Range<K>, Long> extract(AggregationExtractContext context) throws IOException {
+			LuceneNumericDomain<E> numericDomain = codec.getDomain();
+
+			FacetsCollector facetsCollector = context.getFacets( FacetsCollectorFactory.KEY );
+
+			NestedDocsProvider nestedDocsProvider = createNestedDocsProvider( context );
+
+			Facets facetsCount = numericDomain.createRangeFacetCounts(
+					absoluteFieldPath, facetsCollector, encodedRangesInOrder,
+					nestedDocsProvider
+			);
+
+			FacetResult facetResult = facetsCount.getTopChildren( rangesInOrder.size(), absoluteFieldPath );
+
+			Map<Range<K>, Long> result = new LinkedHashMap<>();
+			for ( int i = 0; i < rangesInOrder.size(); i++ ) {
+				result.put( rangesInOrder.get( i ), (long) (Integer) facetResult.labelValues[i].value );
+			}
+
+			return result;
 		}
 	}
 
@@ -115,7 +120,8 @@ public class LuceneNumericRangeAggregation<F, E extends Number, K>
 		@Override
 		public <K> Builder<F, ?, K> type(Class<K> expectedType, ValueConvert convert) {
 			return new Builder<>( codec, scope, field,
-					field.type().dslConverter( convert ).withInputType( expectedType, field ) );
+					field.type().dslConverter( convert ).withInputType( expectedType, field )
+			);
 		}
 	}
 

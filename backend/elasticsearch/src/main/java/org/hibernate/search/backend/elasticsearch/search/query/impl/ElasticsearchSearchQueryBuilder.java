@@ -6,14 +6,13 @@
  */
 package org.hibernate.search.backend.elasticsearch.search.query.impl;
 
-import static org.hibernate.search.util.common.impl.CollectionHelper.isSubset;
-import static org.hibernate.search.util.common.impl.CollectionHelper.notInTheOtherSet;
-
 import java.lang.invoke.MethodHandles;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
@@ -42,6 +41,7 @@ import org.hibernate.search.engine.search.highlighter.SearchHighlighter;
 import org.hibernate.search.engine.search.loading.spi.SearchLoadingContext;
 import org.hibernate.search.engine.search.loading.spi.SearchLoadingContextBuilder;
 import org.hibernate.search.engine.search.predicate.SearchPredicate;
+import org.hibernate.search.engine.search.query.spi.QueryParameters;
 import org.hibernate.search.engine.search.query.spi.SearchQueryBuilder;
 import org.hibernate.search.engine.search.sort.SearchSort;
 import org.hibernate.search.engine.search.timeout.spi.TimeoutManager;
@@ -73,10 +73,10 @@ public class ElasticsearchSearchQueryBuilder<H>
 	private final SearchLoadingContextBuilder<?, ?> loadingContextBuilder;
 	private final ElasticsearchSearchProjection<H> rootProjection;
 	private final Integer scrollTimeout;
-
 	private final Set<String> routingKeys;
 	private ElasticsearchSearchPredicate elasticsearchPredicate;
 	private JsonArray jsonSort;
+	private List<ElasticsearchSearchSort> elasticsearchSearchSorts;
 	private Map<DistanceSortKey, Integer> distanceSorts;
 	private Map<AggregationKey<?>, ElasticsearchSearchAggregation<?>> aggregations;
 	private Long timeoutValue;
@@ -85,6 +85,7 @@ public class ElasticsearchSearchQueryBuilder<H>
 	private Long totalHitCountThreshold;
 	private ElasticsearchSearchHighlighter queryHighlighter;
 	private final Map<String, ElasticsearchSearchHighlighter> namedHighlighters = new HashMap<>();
+	private final QueryParameters parameters = new QueryParameters();
 	private ElasticsearchSearchRequestTransformer requestTransformer;
 
 	public ElasticsearchSearchQueryBuilder(
@@ -104,7 +105,7 @@ public class ElasticsearchSearchQueryBuilder<H>
 		this.sessionContext = sessionContext;
 		this.routingKeys = new HashSet<>();
 
-		this.rootPredicateContext = new PredicateRequestContext( sessionContext, scope, routingKeys );
+		this.rootPredicateContext = new PredicateRequestContext( sessionContext, scope, routingKeys, parameters );
 		this.loadingContextBuilder = loadingContextBuilder;
 		this.rootProjection = rootProjection;
 		this.scrollTimeout = scrollTimeout;
@@ -112,29 +113,21 @@ public class ElasticsearchSearchQueryBuilder<H>
 
 	@Override
 	public void predicate(SearchPredicate predicate) {
-		ElasticsearchSearchPredicate elasticsearchPredicate = ElasticsearchSearchPredicate.from( scope, predicate );
-		this.elasticsearchPredicate = elasticsearchPredicate;
+		this.elasticsearchPredicate = ElasticsearchSearchPredicate.from( scope, predicate );
 	}
 
 	@Override
 	public void sort(SearchSort sort) {
-		ElasticsearchSearchSort elasticsearchSort = ElasticsearchSearchSort.from( scope, sort );
-		elasticsearchSort.toJsonSorts( this );
+		if ( elasticsearchSearchSorts == null ) {
+			elasticsearchSearchSorts = new ArrayList<>();
+		}
+		elasticsearchSearchSorts.add( ElasticsearchSearchSort.from( scope, sort ) );
 	}
 
 	@Override
 	public <A> void aggregation(AggregationKey<A> key, SearchAggregation<A> aggregation) {
-		if ( !( aggregation instanceof ElasticsearchSearchAggregation ) ) {
-			throw log.cannotMixElasticsearchSearchQueryWithOtherAggregations( aggregation );
-		}
-
-		ElasticsearchSearchAggregation<A> casted = (ElasticsearchSearchAggregation<A>) aggregation;
-		if ( !isSubset( scope.hibernateSearchIndexNames(), casted.indexNames() ) ) {
-			throw log.aggregationDefinedOnDifferentIndexes(
-					aggregation, casted.indexNames(), scope.hibernateSearchIndexNames(),
-					notInTheOtherSet( scope.hibernateSearchIndexNames(), casted.indexNames() )
-			);
-		}
+		ElasticsearchSearchAggregation<A> casted = ElasticsearchSearchAggregation.from(
+				scope, aggregation );
 
 		if ( aggregations == null ) {
 			aggregations = new LinkedHashMap<>();
@@ -194,6 +187,11 @@ public class ElasticsearchSearchQueryBuilder<H>
 	}
 
 	@Override
+	public void param(String parameterName, Object value) {
+		parameters.add( parameterName, value );
+	}
+
+	@Override
 	public PredicateRequestContext getRootPredicateContext() {
 		return rootPredicateContext;
 	}
@@ -231,7 +229,7 @@ public class ElasticsearchSearchQueryBuilder<H>
 
 		ElasticsearchSearchQueryRequestContext requestContext = new ElasticsearchSearchQueryRequestContext(
 				scope, sessionContext, loadingContext, rootPredicateContext, distanceSorts,
-				namedHighlighters, queryHighlighter
+				namedHighlighters, queryHighlighter, parameters
 		);
 
 		JsonArray filters = rootPredicateContext.tenantAndRoutingFilters();
@@ -243,20 +241,32 @@ public class ElasticsearchSearchQueryBuilder<H>
 			payload.add( "query", jsonQuery );
 		}
 
+		if ( elasticsearchSearchSorts != null ) {
+			for ( ElasticsearchSearchSort elasticsearchSearchSort : elasticsearchSearchSorts ) {
+				elasticsearchSearchSort.toJsonSorts( this );
+			}
+		}
+
 		if ( jsonSort != null ) {
 			payload.add( "sort", jsonSort );
 		}
 
 		ElasticsearchSearchProjection.Extractor<?, H> rootExtractor = rootProjection.request( payload, requestContext );
 
+		Map<AggregationKey<?>, ElasticsearchSearchAggregation.Extractor<?>> aggregationExtractors;
 		if ( aggregations != null ) {
+			aggregationExtractors = new LinkedHashMap<>();
 			JsonObject jsonAggregations = new JsonObject();
 
 			for ( Map.Entry<AggregationKey<?>, ElasticsearchSearchAggregation<?>> entry : aggregations.entrySet() ) {
-				jsonAggregations.add( entry.getKey().name(), entry.getValue().request( requestContext ) );
+				aggregationExtractors.put( entry.getKey(),
+						entry.getValue().request( requestContext, entry.getKey(), jsonAggregations ) );
 			}
 
 			payload.add( "aggregations", jsonAggregations );
+		}
+		else {
+			aggregationExtractors = Collections.emptyMap();
 		}
 
 		if ( queryHighlighter != null ) {
@@ -274,7 +284,7 @@ public class ElasticsearchSearchQueryBuilder<H>
 				searchResultExtractorFactory.createResultExtractor(
 						requestContext,
 						rootExtractor,
-						aggregations == null ? Collections.emptyMap() : aggregations
+						aggregationExtractors
 				);
 
 		return new ElasticsearchSearchQueryImpl<>(

@@ -6,14 +6,19 @@
  */
 package org.hibernate.search.engine.search.aggregation.dsl.spi;
 
+import java.util.function.Function;
+
 import org.hibernate.search.engine.common.dsl.spi.DslExtensionState;
+import org.hibernate.search.engine.search.aggregation.dsl.AggregationFinalStep;
 import org.hibernate.search.engine.search.aggregation.dsl.ExtendedSearchAggregationFactory;
 import org.hibernate.search.engine.search.aggregation.dsl.RangeAggregationFieldStep;
 import org.hibernate.search.engine.search.aggregation.dsl.SearchAggregationFactoryExtension;
 import org.hibernate.search.engine.search.aggregation.dsl.TermsAggregationFieldStep;
 import org.hibernate.search.engine.search.aggregation.dsl.impl.RangeAggregationFieldStepImpl;
 import org.hibernate.search.engine.search.aggregation.dsl.impl.TermsAggregationFieldStepImpl;
+import org.hibernate.search.engine.search.aggregation.dsl.impl.WithParametersAggregationFinalStep;
 import org.hibernate.search.engine.search.aggregation.spi.SearchAggregationIndexScope;
+import org.hibernate.search.engine.search.common.NamedValues;
 import org.hibernate.search.engine.search.predicate.dsl.SearchPredicateFactory;
 
 public abstract class AbstractSearchAggregationFactory<
@@ -36,6 +41,12 @@ public abstract class AbstractSearchAggregationFactory<
 	@Override
 	public TermsAggregationFieldStep<PDF> terms() {
 		return new TermsAggregationFieldStepImpl<>( dslContext );
+	}
+
+	@Override
+	public <T> AggregationFinalStep<T> withParameters(
+			Function<? super NamedValues, ? extends AggregationFinalStep<T>> aggregationCreator) {
+		return new WithParametersAggregationFinalStep<>( dslContext, aggregationCreator );
 	}
 
 	@Override

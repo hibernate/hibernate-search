@@ -21,7 +21,7 @@ public class Elasticsearch7SearchResultExtractorFactory implements Elasticsearch
 	public <H> ElasticsearchSearchResultExtractor<ElasticsearchLoadableSearchResult<H>> createResultExtractor(
 			ElasticsearchSearchQueryRequestContext requestContext,
 			ElasticsearchSearchProjection.Extractor<?, H> rootExtractor,
-			Map<AggregationKey<?>, ElasticsearchSearchAggregation<?>> aggregations) {
+			Map<AggregationKey<?>, ElasticsearchSearchAggregation.Extractor<?>> aggregations) {
 		return new Elasticsearch7SearchResultExtractor<>(
 				requestContext,
 				rootExtractor, aggregations

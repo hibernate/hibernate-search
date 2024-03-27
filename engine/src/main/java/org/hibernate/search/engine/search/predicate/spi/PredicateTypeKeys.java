@@ -28,6 +28,8 @@ public final class PredicateTypeKeys {
 	public static final SearchQueryElementTypeKey<MatchPredicateBuilder> MATCH = of( IndexFieldTraits.Predicates.MATCH );
 	public static final SearchQueryElementTypeKey<RangePredicateBuilder> RANGE = of( IndexFieldTraits.Predicates.RANGE );
 	public static final SearchQueryElementTypeKey<ExistsPredicateBuilder> EXISTS = of( IndexFieldTraits.Predicates.EXISTS );
+	public static final SearchQueryElementTypeKey<WithParametersPredicateBuilder> WITH_PARAMETERS =
+			of( IndexFieldTraits.Predicates.WITH_PARAMETERS );
 	public static final SearchQueryElementTypeKey<PhrasePredicateBuilder> PHRASE = of( IndexFieldTraits.Predicates.PHRASE );
 	public static final SearchQueryElementTypeKey<WildcardPredicateBuilder> WILDCARD =
 			of( IndexFieldTraits.Predicates.WILDCARD );

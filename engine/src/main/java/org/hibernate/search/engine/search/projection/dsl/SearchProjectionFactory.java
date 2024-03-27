@@ -12,6 +12,7 @@ import java.util.function.Function;
 
 import org.hibernate.search.engine.backend.common.DocumentReference;
 import org.hibernate.search.engine.common.EntityReference;
+import org.hibernate.search.engine.search.common.NamedValues;
 import org.hibernate.search.engine.search.common.ValueConvert;
 import org.hibernate.search.engine.search.projection.SearchProjection;
 import org.hibernate.search.engine.spatial.GeoPoint;
@@ -385,6 +386,18 @@ public interface SearchProjectionFactory<R, E> {
 	 * @return A DSL step where the "entity reference" projection can be defined in more details.
 	 */
 	<T> ProjectionFinalStep<T> constant(T value);
+
+	/**
+	 * Delegating projection that creates the actual projection at query create time and provides access to query parameters.
+	 * <p>
+	 * Which projection exactly to create is defined by a function passed to the arguments of this projection.
+	 *
+	 * @param projectionCreator The function creating an actual projection.
+	 * @return A final DSL step in a parameterized projection definition.
+	 */
+	@Incubating
+	<T> ProjectionFinalStep<T> withParameters(
+			Function<? super NamedValues, ? extends ProjectionFinalStep<T>> projectionCreator);
 
 	/**
 	 * Extend the current factory with the given extension,

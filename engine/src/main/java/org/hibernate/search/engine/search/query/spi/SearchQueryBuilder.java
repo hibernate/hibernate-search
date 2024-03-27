@@ -43,6 +43,9 @@ public interface SearchQueryBuilder<H> {
 	@Incubating
 	void highlighter(String highlighterName, SearchHighlighter highlighter);
 
+	@Incubating
+	void param(String parameterName, Object value);
+
 	SearchQuery<H> build();
 
 }
