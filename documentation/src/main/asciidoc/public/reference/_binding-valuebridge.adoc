@@ -159,16 +159,21 @@ but necessary in order for Hibernate ORM to store the data correctly in the data
 <4> Do not forget to configure the field as projectable.
 ====
 
-[[binding-valuebridge-indexnullas]]
-== [[mapper-orm-bridge-valuebridge-indexnullas]] Supporting `indexNullAs` with `parse()`
+[[binding-valuebridge-parse]]
+== [[binding-valuebridge-indexnullas]] [[mapper-orm-bridge-valuebridge-indexnullas]] Parsing the string representation to an index field type with `parse()`
 
-By default, the `indexNullAs` attribute of `@*Field` annotations cannot be used together with a custom bridge.
+By default, when a custom bridge is used, some Hibernate Search features like
+specifying the `indexNullAs` attribute of `@*Field` annotations,
+or using a field with such a custom bridge in query string predicates
+(<<search-dsl-predicate-simple-query-string,`simpleQueryString()`>>/<<search-dsl-predicate-query-string,`queryString()`>>)
+with local backends (e.g. Lucene),
+will not work out of the box.
 
 In order to make it work, the bridge needs to implement the `parse` method
-so that Hibernate Search can convert the string assigned to `indexNullAs`
+so that Hibernate Search can convert the string representation
 to a value of the correct type for the index field.
 
-.Implementing `parse` to support `indexNullAs`
+.Implementing `parse`
 ====
 [source, JAVA, indent=0, subs="+callouts"]
 ----
@@ -186,6 +191,12 @@ but necessary in order for Hibernate ORM to store the data correctly in the data
 <2> Map the property to an index field.
 <3> Instruct Hibernate Search to use our custom value bridge.
 <4> Set `indexNullAs` to a valid value.
+
+[source, JAVA, indent=0, subs="+callouts"]
+----
+include::{sourcedir}/org/hibernate/search/documentation/mapper/orm/binding/valuebridge/indexnullas/ValueBridgeIndexNullAsIT.java[tags=string-query]
+----
+<1> Use a string representation of an ISBN in a query string predicate.
 ====
 
 [[binding-valuebridge-iscompatiblewith]]

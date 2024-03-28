@@ -480,6 +480,7 @@ see <<backend-lucene-field-types,Lucene field types>>
 or <<backend-elasticsearch-field-types,Elasticsearch field types>> depending on your backend.
 ====
 
+[[mapping-directfieldmapping-supported-types-table]]
 [cols="m,1,1,1",options="header"]
 .Property types with built-in value bridges
 |===

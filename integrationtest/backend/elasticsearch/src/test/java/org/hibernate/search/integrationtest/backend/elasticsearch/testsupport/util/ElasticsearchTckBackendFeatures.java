@@ -316,6 +316,7 @@ public class ElasticsearchTckBackendFeatures extends TckBackendFeatures {
 	public <F> String formatForQueryStringPredicate(FieldTypeDescriptor<F, ?> descriptor, F value) {
 		ElasticsearchDefaultFieldFormatProvider formatProvider = ElasticsearchTestDialect.get().getDefaultFieldFormatProvider();
 		if ( TemporalAccessor.class.isAssignableFrom( descriptor.getJavaType() ) ) {
+			@SuppressWarnings("unchecked")
 			var formatter = formatProvider
 					.getDefaultDateTimeFormatter( ( (Class<? extends TemporalAccessor>) descriptor.getJavaType() ) )
 					.withLocale( Locale.ROOT );

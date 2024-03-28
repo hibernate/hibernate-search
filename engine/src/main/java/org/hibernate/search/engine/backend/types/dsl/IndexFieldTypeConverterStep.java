@@ -46,7 +46,8 @@ public interface IndexFieldTypeConverterStep<S extends IndexFieldTypeConverterSt
 
 	/**
 	 * Define how string values passed to the predicate and sort DSL should be converted to the type of field values,
-	 * when {@link org.hibernate.search.engine.search.common.ValueConvert#PARSE} converter is used.
+	 * when {@link org.hibernate.search.engine.search.common.ValueConvert#PARSE} is used,
+	 * or when parsing query strings (local backends only, e.g. Lucene).
 	 *
 	 * @param parser A converter to parse string values.
 	 * @return {@code this}, for method chaining.

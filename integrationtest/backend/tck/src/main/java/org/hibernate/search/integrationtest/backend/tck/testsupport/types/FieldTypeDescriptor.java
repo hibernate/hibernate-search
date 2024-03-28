@@ -64,7 +64,6 @@ public abstract class FieldTypeDescriptor<F, S extends SearchableProjectableInde
 					BigDecimalFieldTypeDescriptor.INSTANCE,
 					BigIntegerFieldTypeDescriptor.INSTANCE
 			);
-			Collections.addAll( VectorFieldTypeDescriptor.getAllVector() );
 			if ( TckConfiguration.get().getBackendFeatures().supportsYearType() ) {
 				list.add( YearFieldTypeDescriptor.INSTANCE );
 			}

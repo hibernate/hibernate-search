@@ -30,7 +30,8 @@ public class ElasticsearchTestDialect {
 
 	private static final ElasticsearchTestDialect INSTANCE = new ElasticsearchTestDialect();
 	private static final String LOCAL_DATE_DEFAULT_FORMAT = "uuuu-MM-dd";
-	private static final Elasticsearch7DefaultFieldFormatProvider DEFAULT_FIELD_FORMAT_PROVIDER = new Elasticsearch7DefaultFieldFormatProvider();
+	private static final Elasticsearch7DefaultFieldFormatProvider DEFAULT_FIELD_FORMAT_PROVIDER =
+			new Elasticsearch7DefaultFieldFormatProvider();
 
 	public static ElasticsearchTestDialect get() {
 		return INSTANCE;

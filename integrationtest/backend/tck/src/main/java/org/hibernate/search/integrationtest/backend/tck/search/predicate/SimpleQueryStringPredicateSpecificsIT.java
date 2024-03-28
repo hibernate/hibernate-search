@@ -11,6 +11,7 @@ import static org.hibernate.search.util.impl.integrationtest.common.assertion.Se
 import static org.hibernate.search.util.impl.integrationtest.common.assertion.SearchResultAssert.assertThatQuery;
 
 import java.time.Instant;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.EnumSet;
 import java.util.List;
@@ -24,6 +25,7 @@ import org.hibernate.search.engine.search.predicate.dsl.SimpleQueryFlag;
 import org.hibernate.search.engine.search.predicate.dsl.SimpleQueryStringPredicateFieldStep;
 import org.hibernate.search.engine.search.query.SearchQuery;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.InstantFieldTypeDescriptor;
+import org.hibernate.search.integrationtest.backend.tck.testsupport.types.StandardFieldTypeDescriptor;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.TckBackendFeatures;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.TckConfiguration;
 import org.hibernate.search.util.common.SearchException;
@@ -322,14 +324,14 @@ class SimpleQueryStringPredicateSpecificsIT
 				scope.query()
 						.where( f -> f.simpleQueryString().field( field ).matching( value1 ) )
 						.fetchAllHits()
-		).hasDocRefHitsAnyOrder( indexForSyntaxParsingCheck.typeName(), "1" );
+		).hasDocRefHitsAnyOrder( indexForSyntaxParsingCheck.typeName(), syntaxDataSet.docId( 1 ) );
 
 		assertThatHits(
 				scope.query()
 						.where( f -> f.simpleQueryString().field( field ).matching( value1 + " | " + value2 )
 								.defaultOperator( BooleanOperator.AND ) )
 						.fetchAllHits()
-		).hasDocRefHitsAnyOrder( indexForSyntaxParsingCheck.typeName(), "1", "2" );
+		).hasDocRefHitsAnyOrder( indexForSyntaxParsingCheck.typeName(), syntaxDataSet.docId( 1 ), syntaxDataSet.docId( 2 ) );
 
 		assertThatHits(
 				scope.query()
@@ -337,33 +339,37 @@ class SimpleQueryStringPredicateSpecificsIT
 								String.format( Locale.ROOT, "(%s | %s) + -%s", value1, value2, value1 ) )
 								.defaultOperator( BooleanOperator.AND ) )
 						.fetchAllHits()
-		).hasDocRefHitsAnyOrder( indexForSyntaxParsingCheck.typeName(), "2" );
+		).hasDocRefHitsAnyOrder( indexForSyntaxParsingCheck.typeName(), syntaxDataSet.docId( 2 ) );
 
-		assertThatHits(
-				scope.query()
-						.where( f -> f.simpleQueryString().field( field ).matching( "-" + noMatch ) )
-						.fetchAllHits()
-		).hasDocRefHitsAnyOrder( indexForSyntaxParsingCheck.typeName(), "1", "2", "3" );
+		if ( noMatch != null ) {
 
-		assertThatHits(
-				scope.query()
-						.where( f -> f.simpleQueryString().field( field ).matching( noMatch ) )
-						.fetchAllHits()
-		).isEmpty();
+			assertThatHits(
+					scope.query()
+							.where( f -> f.simpleQueryString().field( field ).matching( "-" + noMatch ) )
+							.fetchAllHits()
+			).hasDocRefHitsAnyOrder( indexForSyntaxParsingCheck.typeName(), syntaxDataSet.docId( 1 ), syntaxDataSet.docId( 2 ),
+					syntaxDataSet.docId( 3 ) );
+
+			assertThatHits(
+					scope.query()
+							.where( f -> f.simpleQueryString().field( field ).matching( noMatch ) )
+							.fetchAllHits()
+			).isEmpty();
+		}
 
 		assertThatHits(
 				scope.query()
 						.where( f -> f.simpleQueryString().field( field ).matching(
 								String.format( Locale.ROOT, "\"%s\"", value1 ) ) )
 						.fetchAllHits()
-		).hasDocRefHitsAnyOrder( indexForSyntaxParsingCheck.typeName(), "1" );
+		).hasDocRefHitsAnyOrder( indexForSyntaxParsingCheck.typeName(), syntaxDataSet.docId( 1 ) );
 
 		assertThatHits(
 				scope.query()
 						.where( f -> f.simpleQueryString().fields( field, field + "2" ).matching(
 								String.format( Locale.ROOT, "\"%s\"", value1 ) ) )
 						.fetchAllHits()
-		).hasDocRefHitsAnyOrder( indexForSyntaxParsingCheck.typeName(), "1" );
+		).hasDocRefHitsAnyOrder( indexForSyntaxParsingCheck.typeName(), syntaxDataSet.docId( 1 ) );
 
 		assertThatThrownBy( () -> scope.query()
 				.where( f -> f.simpleQueryString().field( field ).matching(
@@ -398,7 +404,7 @@ class SimpleQueryStringPredicateSpecificsIT
 
 	}
 
-	public static List<? extends Arguments> simpleQueryStringSyntax() {
+	public static List<? extends Arguments> simpleQueryStringSyntax1() {
 		// String field, String value1, String value2, String noMatch, String unParsableValue
 		TckBackendFeatures backendFeatures = TckConfiguration.get().getBackendFeatures();
 		return List.of(
@@ -413,6 +419,18 @@ class SimpleQueryStringPredicateSpecificsIT
 						"not-an-instant" ),
 				Arguments.of( "localDate", "2000-01-01", "2000-02-02", "2222-02-02", "not-an-localDate" )
 		);
+	}
+
+	public static List<? extends Arguments> simpleQueryStringSyntax() {
+		// String field, String value1, String value2, String noMatch, String unParsableValue
+		TckBackendFeatures backendFeatures = TckConfiguration.get().getBackendFeatures();
+		List<Arguments> parameters = new ArrayList<>();
+
+		for ( StandardFieldTypeDescriptor<?> typeDescriptor : supported ) {
+			parameters.add( arguments( backendFeatures, typeDescriptor ) );
+		}
+
+		return parameters;
 	}
 
 	@Override

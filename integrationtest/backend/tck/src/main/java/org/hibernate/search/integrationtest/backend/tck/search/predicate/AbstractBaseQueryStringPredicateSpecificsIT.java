@@ -9,14 +9,12 @@ package org.hibernate.search.integrationtest.backend.tck.search.predicate;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.hibernate.search.util.impl.integrationtest.common.assertion.SearchResultAssert.assertThatQuery;
 
-import java.time.Instant;
-import java.time.LocalDate;
 import java.util.List;
 import java.util.function.Function;
+import java.util.function.Predicate;
+import java.util.stream.Collectors;
 
-import org.hibernate.search.engine.backend.analysis.AnalyzerNames;
 import org.hibernate.search.engine.backend.common.DocumentReference;
-import org.hibernate.search.engine.backend.document.IndexFieldReference;
 import org.hibernate.search.engine.backend.document.IndexObjectFieldReference;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaElement;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaObjectField;
@@ -27,8 +25,12 @@ import org.hibernate.search.engine.search.predicate.dsl.SearchPredicateFactory;
 import org.hibernate.search.engine.search.query.SearchQuery;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.configuration.DefaultAnalysisDefinitions;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.AnalyzedStringFieldTypeDescriptor;
+import org.hibernate.search.integrationtest.backend.tck.testsupport.types.FieldTypeDescriptor;
+import org.hibernate.search.integrationtest.backend.tck.testsupport.types.GeoPointFieldTypeDescriptor;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.KeywordStringFieldTypeDescriptor;
+import org.hibernate.search.integrationtest.backend.tck.testsupport.types.StandardFieldTypeDescriptor;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.SimpleFieldModel;
+import org.hibernate.search.integrationtest.backend.tck.testsupport.util.TckBackendFeatures;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.extension.SearchSetupHelper;
 import org.hibernate.search.util.common.SearchException;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.BulkIndexer;
@@ -77,6 +79,15 @@ abstract class AbstractBaseQueryStringPredicateSpecificsIT<P extends CommonQuery
 					.name( "indexForSyntaxParsingCheck" );
 
 	private static final DataSet dataSet = new DataSet();
+	protected static final List<StandardFieldTypeDescriptor<?>> supported =
+			FieldTypeDescriptor.getAllStandard().stream()
+					// geo point is not supported:
+					.filter( Predicate.not( GeoPointFieldTypeDescriptor.INSTANCE::equals ) )
+					// strings are tested elsewhere:
+					.filter( descriptor -> !String.class.isAssignableFrom( descriptor.getJavaType() ) )
+					.collect( Collectors.toList() );
+	protected static final SyntaxDataSet syntaxDataSet = new SyntaxDataSet( supported );
+
 
 	@BeforeAll
 	static void setup() {
@@ -86,37 +97,11 @@ abstract class AbstractBaseQueryStringPredicateSpecificsIT<P extends CommonQuery
 
 		BulkIndexer indexer = index.bulkIndexer();
 		dataSet.contribute( indexer );
-		indexer.join();
 
-		indexForSyntaxParsingCheck.bulkIndexer()
-				.add( "1", doc -> {
-					doc.addValue( "string", "1" );
-					doc.addValue( "integer", 1 );
-					doc.addValue( "integer2", 1 );
-					doc.addValue( "instant", Instant.parse( "2000-01-01T01:01:01Z" ) );
-					doc.addValue( "instant2", Instant.parse( "2000-01-01T01:01:01Z" ) );
-					doc.addValue( "localDate", LocalDate.of( 2000, 1, 1 ) );
-					doc.addValue( "localDate2", LocalDate.of( 2000, 1, 1 ) );
-				} )
-				.add( "2", doc -> {
-					doc.addValue( "string", "2" );
-					doc.addValue( "integer", 2 );
-					doc.addValue( "integer2", 2 );
-					doc.addValue( "instant", Instant.parse( "2000-02-02T02:02:02Z" ) );
-					doc.addValue( "instant2", Instant.parse( "2000-02-02T02:02:02Z" ) );
-					doc.addValue( "localDate", LocalDate.of( 2000, 2, 2 ) );
-					doc.addValue( "localDate2", LocalDate.of( 2000, 2, 2 ) );
-				} )
-				.add( "3", doc -> {
-					doc.addValue( "string", "3" );
-					doc.addValue( "integer", 3 );
-					doc.addValue( "integer2", 3 );
-					doc.addValue( "instant", Instant.parse( "2000-03-03T03:03:03Z" ) );
-					doc.addValue( "instant2", Instant.parse( "2000-03-03T03:03:03Z" ) );
-					doc.addValue( "localDate", LocalDate.of( 2000, 3, 3 ) );
-					doc.addValue( "localDate2", LocalDate.of( 2000, 3, 3 ) );
-				} )
-				.join();
+		BulkIndexer syntaxIndexer = indexForSyntaxParsingCheck.bulkIndexer();
+		syntaxDataSet.contribute( syntaxIndexer );
+
+		indexer.join( syntaxIndexer );
 	}
 
 	@Test
@@ -452,24 +437,74 @@ abstract class AbstractBaseQueryStringPredicateSpecificsIT<P extends CommonQuery
 		}
 	}
 
-	protected static class IndexSyntaxParsingBinding {
-		final IndexFieldReference<Integer> integer;
-		final IndexFieldReference<Integer> integer2;
-		final IndexFieldReference<String> string;
-		final IndexFieldReference<Instant> instant;
-		final IndexFieldReference<Instant> instant2;
-		final IndexFieldReference<LocalDate> localDate;
-		final IndexFieldReference<LocalDate> localDate2;
+	protected static final class SyntaxDataSet extends AbstractPredicateDataSet {
 
-		IndexSyntaxParsingBinding(IndexSchemaElement root) {
-			this.integer = root.field( "integer", c -> c.asInteger() ).toReference();
-			this.integer2 = root.field( "integer2", c -> c.asInteger() ).toReference();
-			this.string = root.field( "string", c -> c.asString().analyzer( AnalyzerNames.DEFAULT ) ).toReference();
-			this.instant = root.field( "instant", c -> c.asInstant() ).toReference();
-			this.instant2 = root.field( "instant2", c -> c.asInstant() ).toReference();
-			this.localDate = root.field( "localDate", c -> c.asLocalDate() ).toReference();
-			this.localDate2 = root.field( "localDate2", c -> c.asLocalDate() ).toReference();
+		private final List<StandardFieldTypeDescriptor<?>> descriptors;
+
+		public SyntaxDataSet(List<StandardFieldTypeDescriptor<?>> descriptors) {
+			super( "" );
+			this.descriptors = descriptors;
 		}
+
+		public void contribute(BulkIndexer indexer) {
+			indexer.add( docId( 1 ), document -> {
+				for ( StandardFieldTypeDescriptor<?> descriptor : descriptors ) {
+					document.addValue( descriptor.getUniqueName(),
+							descriptor.getAscendingUniqueTermValues().getSingle().get( 0 ) );
+				}
+			} ).add( docId( 2 ), document -> {
+				for ( StandardFieldTypeDescriptor<?> descriptor : descriptors ) {
+					document.addValue( descriptor.getUniqueName(),
+							descriptor.getAscendingUniqueTermValues().getSingle().get( 1 ) );
+				}
+			} ).add( docId( 3 ), document -> {
+				for ( StandardFieldTypeDescriptor<?> descriptor : descriptors ) {
+					List<?> single = descriptor.getAscendingUniqueTermValues().getSingle();
+					document.addValue(
+							descriptor.getUniqueName(),
+							single.size() < 3 ? null : single.get( 2 )
+					);
+				}
+			} );
+		}
+	}
+
+	protected static class IndexSyntaxParsingBinding {
+		IndexSyntaxParsingBinding(IndexSchemaElement root) {
+			for ( StandardFieldTypeDescriptor<?> descriptor : supported ) {
+				root.field( descriptor.getUniqueName(), descriptor::configure ).toReference();
+				root.field( descriptor.getUniqueName() + 2, descriptor::configure ).toReference();
+			}
+		}
+	}
+
+	protected static <T> Arguments arguments(TckBackendFeatures backendFeatures,
+			StandardFieldTypeDescriptor<T> typeDescriptor) {
+		List<T> single = typeDescriptor.getAscendingUniqueTermValues().getSingle();
+		return Arguments.of(
+				typeDescriptor.getUniqueName(),
+				escape( backendFeatures.formatForQueryStringPredicate( typeDescriptor, single.get( 0 ) ) ),
+				escape( backendFeatures.formatForQueryStringPredicate( typeDescriptor, single.get( 1 ) ) ),
+				escape( backendFeatures.formatForQueryStringPredicate( typeDescriptor,
+						single.size() < 4 ? null : single.get( 3 ) ) ),
+				"not-an-" + typeDescriptor.getUniqueName()
+		);
+	}
+
+	private static String escape(String value) {
+		if ( value == null ) {
+			return null;
+		}
+		value = value.replace( ":", "\\:" );
+		value = value.replace( "[", "\\[" );
+		value = value.replace( "]", "\\]" );
+		value = value.replace( "/", "\\/" );
+		value = value.replace( "+", "\\+" );
+		value = value.replace( "-", "\\-" );
+		if ( value.startsWith( "-" ) || value.startsWith( "+" ) ) {
+			value = "\\" + value;
+		}
+		return value;
 	}
 
 	abstract P predicate(SearchPredicateFactory f);

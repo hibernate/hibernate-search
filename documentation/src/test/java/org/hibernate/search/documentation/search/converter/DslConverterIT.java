@@ -9,6 +9,7 @@ package org.hibernate.search.documentation.search.converter;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmUtils.with;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 import jakarta.persistence.Basic;
@@ -26,6 +27,7 @@ import org.hibernate.search.mapper.pojo.bridge.ValueBridge;
 import org.hibernate.search.mapper.pojo.bridge.mapping.annotation.ValueBridgeRef;
 import org.hibernate.search.mapper.pojo.bridge.runtime.ValueBridgeToIndexedValueContext;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.FullTextField;
+import org.hibernate.search.mapper.pojo.mapping.definition.annotation.GenericField;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
 
 import org.junit.jupiter.api.BeforeEach;
@@ -87,8 +89,8 @@ class DslConverterIT {
 
 			// tag::dsl-converter-parse[]
 			List<AuthenticationEvent> result = searchSession.search( AuthenticationEvent.class )
-					.where( f -> f.match().field( "outcome" )
-							.matching( "INVALID_PASSWORD", ValueConvert.PARSE ) )
+					.where( f -> f.match().field( "time" )
+							.matching( "2002-02-20T20:02:22", ValueConvert.PARSE ) )
 					.fetchHits( 20 );
 			// end::dsl-converter-parse[]
 
@@ -102,8 +104,10 @@ class DslConverterIT {
 		with( entityManagerFactory ).runInTransaction( entityManager -> {
 			AuthenticationEvent event1 = new AuthenticationEvent( 1 );
 			event1.setOutcome( AuthenticationOutcome.USER_NOT_FOUND );
+			event1.setTime( LocalDateTime.of( 2024, 1, 1, 10, 10 ) );
 			AuthenticationEvent event2 = new AuthenticationEvent( 2 );
 			event2.setOutcome( AuthenticationOutcome.INVALID_PASSWORD );
+			event2.setTime( LocalDateTime.of( 2002, 02, 20, 20, 02, 22 ) );
 
 			entityManager.persist( event1 );
 			entityManager.persist( event2 );
@@ -115,6 +119,10 @@ class DslConverterIT {
 	public static class AuthenticationEvent {
 		@Id
 		private Integer id;
+
+		@GenericField
+		private LocalDateTime time;
+
 		@Basic
 		@Enumerated
 		@FullTextField(
@@ -145,6 +153,14 @@ class DslConverterIT {
 
 		public void setOutcome(AuthenticationOutcome outcome) {
 			this.outcome = outcome;
+		}
+
+		public LocalDateTime getTime() {
+			return time;
+		}
+
+		public void setTime(LocalDateTime time) {
+			this.time = time;
 		}
 	}
 

@@ -6,7 +6,6 @@
  */
 package org.hibernate.search.integrationtest.backend.tck.testsupport.types;
 
-import java.util.Arrays;
 import java.util.List;
 
 import org.hibernate.search.engine.backend.types.dsl.IndexFieldTypeFactory;

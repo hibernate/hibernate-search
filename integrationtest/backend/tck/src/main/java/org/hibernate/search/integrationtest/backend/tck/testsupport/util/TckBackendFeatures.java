@@ -6,8 +6,6 @@
  */
 package org.hibernate.search.integrationtest.backend.tck.testsupport.util;
 
-import java.util.Objects;
-
 import org.hibernate.search.engine.backend.types.ObjectStructure;
 import org.hibernate.search.engine.backend.types.VectorSimilarity;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.FieldTypeDescriptor;
@@ -161,7 +159,7 @@ public abstract class TckBackendFeatures implements StubMappingBackendFeatures {
 	}
 
 	public <F> String formatForQueryStringPredicate(FieldTypeDescriptor<F, ?> descriptor, F value) {
-		return descriptor.format(value);
+		return descriptor.format( value );
 	}
 
 	public boolean queryStringFailOnPatternQueries() {
