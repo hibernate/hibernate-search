@@ -10,6 +10,7 @@ import org.hibernate.search.backend.lucene.search.common.impl.AbstractLuceneValu
 import org.hibernate.search.backend.lucene.search.common.impl.LuceneSearchIndexScope;
 import org.hibernate.search.backend.lucene.search.common.impl.LuceneSearchIndexValueFieldContext;
 import org.hibernate.search.backend.lucene.search.predicate.impl.AbstractLuceneLeafSingleFieldPredicate;
+import org.hibernate.search.backend.lucene.search.predicate.impl.PredicateRequestContext;
 import org.hibernate.search.engine.search.predicate.SearchPredicate;
 import org.hibernate.search.engine.search.predicate.spi.SpatialWithinCirclePredicateBuilder;
 import org.hibernate.search.engine.spatial.DistanceUnit;
@@ -52,7 +53,7 @@ public class LuceneGeoPointSpatialWithinCirclePredicate extends AbstractLuceneLe
 		}
 
 		@Override
-		protected Query buildQuery() {
+		protected Query buildQuery(PredicateRequestContext context) {
 			return LatLonPoint.newDistanceQuery( absoluteFieldPath, center.latitude(), center.longitude(), radiusInMeters );
 		}
 	}

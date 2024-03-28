@@ -8,6 +8,7 @@ package org.hibernate.search.integrationtest.backend.tck.search.predicate;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import org.hibernate.search.engine.backend.types.dsl.SearchableProjectableIndexFieldTypeOptionsStep;
 import org.hibernate.search.engine.search.predicate.dsl.PredicateFinalStep;
@@ -133,6 +134,19 @@ class WildcardPredicateBaseIT {
 		protected PredicateFinalStep predicate(SearchPredicateFactory f, String fieldPath, int matchingDocOrdinal,
 				DataSet<?, WildcardPredicateTestValues> dataSet) {
 			return f.wildcard().field( fieldPath ).matching( dataSet.values.matchingArg( matchingDocOrdinal ) );
+		}
+
+		@Override
+		protected PredicateFinalStep predicate(SearchPredicateFactory f, String fieldPath, String paramName,
+				DataSet<?, WildcardPredicateTestValues> dataSet) {
+			return f.withParameters( params -> f.wildcard().field( fieldPath )
+					.matching( params.get( paramName, String.class ) ) );
+		}
+
+		@Override
+		protected Map<String, Object> parameterValues(int matchingDocOrdinal, DataSet<?, WildcardPredicateTestValues> dataSet,
+				String paramName) {
+			return Map.of( paramName, dataSet.values.matchingArg( matchingDocOrdinal ) );
 		}
 	}
 

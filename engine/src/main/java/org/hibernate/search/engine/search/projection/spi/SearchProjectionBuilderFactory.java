@@ -7,10 +7,13 @@
 package org.hibernate.search.engine.search.projection.spi;
 
 import java.util.Map;
+import java.util.function.Function;
 import java.util.function.Supplier;
 
 import org.hibernate.search.engine.backend.common.DocumentReference;
+import org.hibernate.search.engine.search.common.NamedValues;
 import org.hibernate.search.engine.search.projection.SearchProjection;
+import org.hibernate.search.engine.search.projection.dsl.ProjectionFinalStep;
 import org.hibernate.search.util.common.SearchException;
 
 /**
@@ -51,5 +54,8 @@ public interface SearchProjectionBuilderFactory {
 	 * @param <T> The type of projected values.
 	 */
 	<T> SearchProjection<T> byTypeName(Map<String, ? extends SearchProjection<? extends T>> inners);
+
+	<T> SearchProjection<T> withParameters(
+			Function<? super NamedValues, ? extends ProjectionFinalStep<T>> projectionCreator);
 
 }

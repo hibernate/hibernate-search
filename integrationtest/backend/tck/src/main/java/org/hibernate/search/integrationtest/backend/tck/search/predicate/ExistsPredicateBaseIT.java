@@ -7,9 +7,11 @@
 package org.hibernate.search.integrationtest.backend.tck.search.predicate;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assumptions.assumeTrue;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaElement;
 import org.hibernate.search.engine.backend.types.dsl.SearchableProjectableIndexFieldTypeOptionsStep;
@@ -18,6 +20,7 @@ import org.hibernate.search.engine.search.predicate.dsl.SearchPredicateFactory;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.FieldTypeDescriptor;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.SimpleFieldModelsByType;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.extension.SearchSetupHelper;
+import org.hibernate.search.util.common.AssertionFailure;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.BulkIndexer;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.SimpleMappedIndex;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappedIndex;
@@ -126,6 +129,20 @@ class ExistsPredicateBaseIT {
 		protected PredicateFinalStep predicate(SearchPredicateFactory f, String fieldPath, int matchingDocOrdinal,
 				DataSet<?, ExistsPredicateTestValues<F>> dataSet) {
 			return f.exists().field( fieldPath );
+		}
+
+		@Override
+		protected PredicateFinalStep predicate(SearchPredicateFactory f, String fieldPath, String paramName,
+				DataSet<?, ExistsPredicateTestValues<F>> dataSet) {
+			assumeTrue( false, "Exists predicate does not have parameters" );
+			throw new AssertionFailure( "shouldn't reach this far" );
+		}
+
+		@Override
+		protected Map<String, Object> parameterValues(int matchingDocOrdinal, DataSet<?, ExistsPredicateTestValues<F>> dataSet,
+				String paramName) {
+			assumeTrue( false, "Exists predicate does not have parameters" );
+			throw new AssertionFailure( "shouldn't reach this far" );
 		}
 	}
 

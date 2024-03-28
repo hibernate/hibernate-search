@@ -4,7 +4,7 @@
  * License: GNU Lesser General Public License (LGPL), version 2.1 or later
  * See the lgpl.txt file in the root directory or <http://www.gnu.org/licenses/lgpl-2.1.html>.
  */
-package org.hibernate.search.engine.search.predicate.dsl.spi;
+package org.hibernate.search.engine.search.predicate.dsl.impl;
 
 import java.util.function.Function;
 
@@ -14,6 +14,8 @@ import org.hibernate.search.engine.search.predicate.dsl.KnnPredicateOptionsStep;
 import org.hibernate.search.engine.search.predicate.dsl.KnnPredicateVectorStep;
 import org.hibernate.search.engine.search.predicate.dsl.PredicateFinalStep;
 import org.hibernate.search.engine.search.predicate.dsl.SearchPredicateFactory;
+import org.hibernate.search.engine.search.predicate.dsl.spi.AbstractPredicateFinalStep;
+import org.hibernate.search.engine.search.predicate.dsl.spi.SearchPredicateDslContext;
 import org.hibernate.search.engine.search.predicate.spi.BooleanPredicateBuilder;
 import org.hibernate.search.engine.search.predicate.spi.KnnPredicateBuilder;
 import org.hibernate.search.engine.search.predicate.spi.PredicateTypeKeys;

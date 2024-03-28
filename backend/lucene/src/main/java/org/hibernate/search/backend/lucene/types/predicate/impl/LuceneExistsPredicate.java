@@ -11,6 +11,7 @@ import org.hibernate.search.backend.lucene.search.common.impl.AbstractLuceneValu
 import org.hibernate.search.backend.lucene.search.common.impl.LuceneSearchIndexScope;
 import org.hibernate.search.backend.lucene.search.common.impl.LuceneSearchIndexValueFieldContext;
 import org.hibernate.search.backend.lucene.search.predicate.impl.AbstractLuceneLeafSingleFieldPredicate;
+import org.hibernate.search.backend.lucene.search.predicate.impl.PredicateRequestContext;
 import org.hibernate.search.engine.search.predicate.SearchPredicate;
 import org.hibernate.search.engine.search.predicate.spi.ExistsPredicateBuilder;
 
@@ -39,7 +40,7 @@ public class LuceneExistsPredicate extends AbstractLuceneLeafSingleFieldPredicat
 		}
 
 		@Override
-		protected abstract Query buildQuery();
+		protected abstract Query buildQuery(PredicateRequestContext context);
 	}
 
 	public static class DocValuesOrNormsBasedFactory<F>
@@ -57,7 +58,7 @@ public class LuceneExistsPredicate extends AbstractLuceneLeafSingleFieldPredicat
 		}
 
 		@Override
-		protected Query buildQuery() {
+		protected Query buildQuery(PredicateRequestContext context) {
 			return new FieldExistsQuery( absoluteFieldPath );
 		}
 	}
@@ -76,7 +77,7 @@ public class LuceneExistsPredicate extends AbstractLuceneLeafSingleFieldPredicat
 		}
 
 		@Override
-		protected Query buildQuery() {
+		protected Query buildQuery(PredicateRequestContext context) {
 			return new TermQuery( new Term( MetadataFields.fieldNamesFieldName(), absoluteFieldPath ) );
 		}
 	}

@@ -6,9 +6,6 @@
  */
 package org.hibernate.search.backend.lucene.search.query.impl;
 
-import static org.hibernate.search.util.common.impl.CollectionHelper.isSubset;
-import static org.hibernate.search.util.common.impl.CollectionHelper.notInTheOtherSet;
-
 import java.lang.invoke.MethodHandles;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -43,6 +40,7 @@ import org.hibernate.search.engine.search.highlighter.SearchHighlighter;
 import org.hibernate.search.engine.search.loading.spi.SearchLoadingContext;
 import org.hibernate.search.engine.search.loading.spi.SearchLoadingContextBuilder;
 import org.hibernate.search.engine.search.predicate.SearchPredicate;
+import org.hibernate.search.engine.search.query.spi.QueryParameters;
 import org.hibernate.search.engine.search.query.spi.SearchQueryBuilder;
 import org.hibernate.search.engine.search.sort.SearchSort;
 import org.hibernate.search.engine.search.timeout.spi.TimeoutManager;
@@ -71,6 +69,7 @@ public class LuceneSearchQueryBuilder<H> implements SearchQueryBuilder<H>, Lucen
 
 	private LuceneSearchPredicate lucenePredicate;
 	private List<SortField> sortFields;
+	private List<LuceneSearchSort> luceneSearchSorts;
 	private Map<AggregationKey<?>, LuceneSearchAggregation<?>> aggregations;
 	private Long timeout;
 	private TimeUnit timeUnit;
@@ -78,6 +77,7 @@ public class LuceneSearchQueryBuilder<H> implements SearchQueryBuilder<H>, Lucen
 	private Long totalHitCountThreshold;
 	private LuceneAbstractSearchHighlighter globalHighlighter;
 	private final Map<String, LuceneAbstractSearchHighlighter> namedHighlighters = new HashMap<>();
+	private final QueryParameters parameters = new QueryParameters();
 
 	public LuceneSearchQueryBuilder(
 			LuceneWorkFactory workFactory,
@@ -104,23 +104,15 @@ public class LuceneSearchQueryBuilder<H> implements SearchQueryBuilder<H>, Lucen
 
 	@Override
 	public void sort(SearchSort sort) {
-		LuceneSearchSort luceneSort = LuceneSearchSort.from( scope, sort );
-		luceneSort.toSortFields( this );
+		if ( luceneSearchSorts == null ) {
+			luceneSearchSorts = new ArrayList<>();
+		}
+		luceneSearchSorts.add( LuceneSearchSort.from( scope, sort ) );
 	}
 
 	@Override
 	public <A> void aggregation(AggregationKey<A> key, SearchAggregation<A> aggregation) {
-		if ( !( aggregation instanceof LuceneSearchAggregation ) ) {
-			throw log.cannotMixLuceneSearchQueryWithOtherAggregations( aggregation );
-		}
-
-		LuceneSearchAggregation<A> casted = (LuceneSearchAggregation<A>) aggregation;
-		if ( !isSubset( scope.hibernateSearchIndexNames(), casted.indexNames() ) ) {
-			throw log.aggregationDefinedOnDifferentIndexes(
-					aggregation, casted.indexNames(), scope.hibernateSearchIndexNames(),
-					notInTheOtherSet( scope.hibernateSearchIndexNames(), casted.indexNames() )
-			);
-		}
+		LuceneSearchAggregation<A> casted = LuceneSearchAggregation.from( scope, aggregation );
 
 		if ( aggregations == null ) {
 			aggregations = new LinkedHashMap<>();
@@ -178,6 +170,11 @@ public class LuceneSearchQueryBuilder<H> implements SearchQueryBuilder<H>, Lucen
 	}
 
 	@Override
+	public void param(String parameterName, Object value) {
+		parameters.add( parameterName, value );
+	}
+
+	@Override
 	public void collectSortField(SortField sortField) {
 		if ( sortFields == null ) {
 			sortFields = new ArrayList<>( 5 );
@@ -199,13 +196,14 @@ public class LuceneSearchQueryBuilder<H> implements SearchQueryBuilder<H>, Lucen
 
 	@Override
 	public PredicateRequestContext toPredicateRequestContext(String absoluteNestedPath) {
-		return PredicateRequestContext.withSession( scope, sessionContext, routingKeys ).withNestedPath( absoluteNestedPath );
+		return PredicateRequestContext.withSession( scope, sessionContext, routingKeys, parameters )
+				.withNestedPath( absoluteNestedPath );
 	}
 
 	@Override
 	public LuceneSearchQuery<H> build() {
 		Query luceneQuery = lucenePredicate.toQuery(
-				PredicateRequestContext.withSession( scope, sessionContext, routingKeys ) );
+				PredicateRequestContext.withSession( scope, sessionContext, routingKeys, parameters ) );
 
 		SearchLoadingContext<?> loadingContext = loadingContextBuilder.build();
 
@@ -227,13 +225,19 @@ public class LuceneSearchQueryBuilder<H> implements SearchQueryBuilder<H>, Lucen
 
 		Query definitiveLuceneQuery = luceneQueryBuilder.build();
 
+		if ( luceneSearchSorts != null ) {
+			for ( LuceneSearchSort luceneSearchSort : luceneSearchSorts ) {
+				luceneSearchSort.toSortFields( this );
+			}
+		}
+
 		Sort luceneSort = null;
 		if ( sortFields != null && !sortFields.isEmpty() ) {
 			luceneSort = new Sort( sortFields.toArray( new SortField[0] ) );
 		}
 
 		LuceneSearchQueryRequestContext requestContext = new LuceneSearchQueryRequestContext(
-				scope, sessionContext, loadingContext, definitiveLuceneQuery, luceneSort, routingKeys
+				scope, sessionContext, loadingContext, definitiveLuceneQuery, luceneSort, routingKeys, parameters
 		);
 
 		LuceneAbstractSearchHighlighter resolvedGlobalHighlighter =
@@ -260,16 +264,21 @@ public class LuceneSearchQueryBuilder<H> implements SearchQueryBuilder<H>, Lucen
 		ProjectionRequestContext projectionRequestContext = new ProjectionRequestContext(
 				extractionRequirementsBuilder,
 				resolvedGlobalHighlighter,
-				resolvedNamedHighlighters
+				resolvedNamedHighlighters,
+				parameters
 		);
-		LuceneSearchProjection.Extractor<?, H> rootExtractor =
-				rootProjection.request( projectionRequestContext );
+		LuceneSearchProjection.Extractor<?, H> rootExtractor = rootProjection.request( projectionRequestContext );
+		Map<AggregationKey<?>, LuceneSearchAggregation.Extractor<?>> aggregationExtractors;
 		if ( aggregations != null ) {
+			aggregationExtractors = new LinkedHashMap<>();
 			AggregationRequestContext aggregationRequestContext =
-					new AggregationRequestContext( extractionRequirementsBuilder );
-			for ( LuceneSearchAggregation<?> aggregation : aggregations.values() ) {
-				aggregation.request( aggregationRequestContext );
+					new AggregationRequestContext( extractionRequirementsBuilder, parameters );
+			for ( Map.Entry<AggregationKey<?>, LuceneSearchAggregation<?>> entry : aggregations.entrySet() ) {
+				aggregationExtractors.put( entry.getKey(), entry.getValue().request( aggregationRequestContext ) );
 			}
+		}
+		else {
+			aggregationExtractors = Collections.emptyMap();
 		}
 		ExtractionRequirements extractionRequirements = extractionRequirementsBuilder.build();
 
@@ -278,7 +287,7 @@ public class LuceneSearchQueryBuilder<H> implements SearchQueryBuilder<H>, Lucen
 		LuceneSearcherImpl<H> searcher = new LuceneSearcherImpl<>(
 				requestContext,
 				rootExtractor,
-				aggregations == null ? Collections.emptyMap() : aggregations,
+				aggregationExtractors,
 				extractionRequirements,
 				timeoutManager
 		);
