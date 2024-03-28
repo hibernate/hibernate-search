@@ -10,11 +10,20 @@ import static org.hibernate.search.util.impl.integrationtest.backend.elasticsear
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
+import java.time.Instant;
+import java.time.LocalDate;
+import java.time.MonthDay;
+import java.time.ZoneOffset;
+import java.time.temporal.TemporalAccessor;
+import java.util.Locale;
 
+import org.hibernate.search.backend.elasticsearch.types.format.impl.ElasticsearchDefaultFieldFormatProvider;
 import org.hibernate.search.engine.backend.types.VectorSimilarity;
 import org.hibernate.search.engine.spatial.GeoPoint;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.FieldTypeDescriptor;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.FloatFieldTypeDescriptor;
+import org.hibernate.search.integrationtest.backend.tck.testsupport.types.InstantFieldTypeDescriptor;
+import org.hibernate.search.integrationtest.backend.tck.testsupport.types.MonthDayFieldTypeDescriptor;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.TckBackendFeatures;
 import org.hibernate.search.util.impl.integrationtest.backend.elasticsearch.dialect.ElasticsearchTestDialect;
 
@@ -301,5 +310,37 @@ public class ElasticsearchTckBackendFeatures extends TckBackendFeatures {
 	@Override
 	public boolean knnWorksInsideNestedPredicateWithImplicitFilters() {
 		return false;
+	}
+
+	@Override
+	public <F> String formatForQueryStringPredicate(FieldTypeDescriptor<F, ?> descriptor, F value) {
+		ElasticsearchDefaultFieldFormatProvider formatProvider = ElasticsearchTestDialect.get().getDefaultFieldFormatProvider();
+		if ( TemporalAccessor.class.isAssignableFrom( descriptor.getJavaType() ) ) {
+			@SuppressWarnings("unchecked")
+			var formatter = formatProvider
+					.getDefaultDateTimeFormatter( ( (Class<? extends TemporalAccessor>) descriptor.getJavaType() ) )
+					.withLocale( Locale.ROOT );
+			if ( InstantFieldTypeDescriptor.INSTANCE.equals( descriptor ) ) {
+				return formatter
+						.withZone( ZoneOffset.UTC )
+						.format( (Instant) value );
+			}
+			if ( MonthDayFieldTypeDescriptor.INSTANCE.equals( descriptor ) ) {
+				return formatter
+						.format( LocalDate.of( 0, ( (MonthDay) value ).getMonth(), ( (MonthDay) value ).getDayOfMonth() ) );
+			}
+			return formatter.format( (TemporalAccessor) value );
+		}
+
+		return super.formatForQueryStringPredicate( descriptor, value );
+	}
+
+	@Override
+	public boolean queryStringFailOnPatternQueries() {
+		return isActualVersion(
+				es -> true,
+				os -> false,
+				aoss -> false
+		);
 	}
 }

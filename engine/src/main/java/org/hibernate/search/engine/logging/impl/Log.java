@@ -23,6 +23,7 @@ import org.hibernate.search.engine.environment.classpath.spi.ClassLoadingExcepti
 import org.hibernate.search.engine.mapper.model.spi.MappingElement;
 import org.hibernate.search.engine.search.aggregation.AggregationKey;
 import org.hibernate.search.engine.search.common.RewriteMethod;
+import org.hibernate.search.engine.search.common.ValueConvert;
 import org.hibernate.search.engine.search.common.spi.SearchQueryElementTypeKey;
 import org.hibernate.search.engine.search.projection.definition.ProjectionDefinition;
 import org.hibernate.search.engine.spatial.GeoPoint;
@@ -581,4 +582,9 @@ public interface Log extends BasicLogger {
 			value = "Cannot use rewrite method '%1$s': this method does not accept parameter 'n', but it was specified."
 					+ " Use another version of the rewrite(...) method that does not accept parameter 'n'.")
 	SearchException nonParameterizedRewriteMethodWithParameter(RewriteMethod rewriteMethod);
+
+	@Message(id = ID_OFFSET + 123,
+			value = "Cannot use %1$s.%2$s as a converter."
+					+ " Use one of the allowed values %3$s instead.")
+	SearchException parseConverterNotAllowed(String enumName, ValueConvert parse, List<ValueConvert> allowed);
 }

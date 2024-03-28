@@ -9,12 +9,15 @@ package org.hibernate.search.backend.elasticsearch.types.dsl.impl;
 import org.hibernate.search.backend.elasticsearch.search.aggregation.impl.ElasticsearchRangeAggregation;
 import org.hibernate.search.backend.elasticsearch.search.aggregation.impl.ElasticsearchTermsAggregation;
 import org.hibernate.search.backend.elasticsearch.search.predicate.impl.ElasticsearchExistsPredicate;
+import org.hibernate.search.backend.elasticsearch.search.predicate.impl.ElasticsearchPredicateTypeKeys;
 import org.hibernate.search.backend.elasticsearch.search.predicate.impl.ElasticsearchRangePredicate;
 import org.hibernate.search.backend.elasticsearch.search.projection.impl.ElasticsearchFieldProjection;
 import org.hibernate.search.backend.elasticsearch.types.codec.impl.ElasticsearchFieldCodec;
+import org.hibernate.search.backend.elasticsearch.types.predicate.impl.ElasticsearchCommonQueryStringPredicateBuilderFieldState;
 import org.hibernate.search.backend.elasticsearch.types.predicate.impl.ElasticsearchStandardMatchPredicate;
 import org.hibernate.search.backend.elasticsearch.types.predicate.impl.ElasticsearchTermsPredicate;
 import org.hibernate.search.backend.elasticsearch.types.sort.impl.ElasticsearchStandardFieldSort;
+import org.hibernate.search.engine.backend.types.converter.ToDocumentValueConverter;
 import org.hibernate.search.engine.search.aggregation.spi.AggregationTypeKeys;
 import org.hibernate.search.engine.search.predicate.spi.PredicateTypeKeys;
 import org.hibernate.search.engine.search.projection.spi.ProjectionTypeKeys;
@@ -26,8 +29,8 @@ abstract class AbstractElasticsearchNumericFieldTypeOptionsStep<
 		extends AbstractElasticsearchSimpleStandardFieldTypeOptionsStep<S, F> {
 
 	AbstractElasticsearchNumericFieldTypeOptionsStep(ElasticsearchIndexFieldTypeBuildContext buildContext,
-			Class<F> fieldType, String dataType) {
-		super( buildContext, fieldType, dataType );
+			Class<F> fieldType, String dataType, ToDocumentValueConverter<String, F> defaultParseConverter) {
+		super( buildContext, fieldType, dataType, defaultParseConverter );
 	}
 
 	@Override
@@ -42,6 +45,10 @@ abstract class AbstractElasticsearchNumericFieldTypeOptionsStep<
 			builder.queryElementFactory( PredicateTypeKeys.RANGE, new ElasticsearchRangePredicate.Factory<>( codec ) );
 			builder.queryElementFactory( PredicateTypeKeys.EXISTS, new ElasticsearchExistsPredicate.Factory<>() );
 			builder.queryElementFactory( PredicateTypeKeys.TERMS, new ElasticsearchTermsPredicate.Factory<>( codec ) );
+			builder.queryElementFactory( ElasticsearchPredicateTypeKeys.SIMPLE_QUERY_STRING,
+					new ElasticsearchCommonQueryStringPredicateBuilderFieldState.Factory<>( codec ) );
+			builder.queryElementFactory( ElasticsearchPredicateTypeKeys.QUERY_STRING,
+					new ElasticsearchCommonQueryStringPredicateBuilderFieldState.Factory<>( codec ) );
 		}
 
 		if ( resolvedSortable ) {

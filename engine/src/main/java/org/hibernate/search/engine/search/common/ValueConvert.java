@@ -9,6 +9,7 @@ package org.hibernate.search.engine.search.common;
 import org.hibernate.search.engine.backend.types.converter.FromDocumentValueConverter;
 import org.hibernate.search.engine.backend.types.converter.ToDocumentValueConverter;
 import org.hibernate.search.engine.backend.types.dsl.IndexFieldTypeConverterStep;
+import org.hibernate.search.util.common.annotation.Incubating;
 
 /**
  * Specifies whether values should be converted during search queries.
@@ -57,6 +58,29 @@ public enum ValueConvert {
 	 * <p>
 	 * Please refer to the reference documentation for more information.
 	 */
-	NO
+	NO,
+
+	/**
+	 * Enables value conversion from a string.
+	 * <p>
+	 * For string values passed to the DSL (for example the parameter of a match predicate),
+	 * the {@link IndexFieldTypeConverterStep#parser(ToDocumentValueConverter) parser converter}
+	 * defined in the mapping will be used.
+	 * This generally means strings passed to the DSL will be expected to be formatted in a way that
+	 * parsing of them can be done in the same way as {@link org.hibernate.search.engine.backend.types.dsl.SearchableProjectableIndexFieldTypeOptionsStep#indexNullAs(Object) indexing-null-as}
+	 * parsing is performed.
+	 * <p>
+	 * For identifier values passed to the DSL (for example the parameter of an ID predicate),
+	 * the identifier parser converter defined in the mapping will be used.
+	 * <p>
+	 * This converter type cannot be used for fields values returned by the backend (for example in projections),
+	 * resulting in an exception if such attempt is made.
+	 * <p>
+	 * If no converter was defined in the mapping, this option won't have any effect.
+	 * <p>
+	 * Please refer to the reference documentation for more information.
+	 */
+	@Incubating
+	PARSE
 
 }

@@ -6,21 +6,11 @@
  */
 package org.hibernate.search.mapper.pojo.bridge.runtime.impl;
 
-import java.util.Optional;
-
-import org.hibernate.search.engine.backend.mapping.spi.BackendMappingContext;
-import org.hibernate.search.engine.backend.session.spi.BackendSessionContext;
 import org.hibernate.search.engine.backend.types.converter.FromDocumentValueConverter;
 import org.hibernate.search.engine.backend.types.converter.ToDocumentValueConverter;
 import org.hibernate.search.engine.backend.types.converter.runtime.FromDocumentValueConvertContext;
-import org.hibernate.search.engine.backend.types.converter.runtime.FromDocumentValueConvertContextExtension;
 import org.hibernate.search.engine.backend.types.converter.runtime.ToDocumentValueConvertContext;
-import org.hibernate.search.engine.backend.types.converter.runtime.ToDocumentValueConvertContextExtension;
 import org.hibernate.search.mapper.pojo.bridge.IdentifierBridge;
-import org.hibernate.search.mapper.pojo.bridge.runtime.IdentifierBridgeFromDocumentIdentifierContext;
-import org.hibernate.search.mapper.pojo.bridge.runtime.IdentifierBridgeToDocumentIdentifierContext;
-import org.hibernate.search.mapper.pojo.bridge.runtime.spi.BridgeMappingContext;
-import org.hibernate.search.mapper.pojo.bridge.runtime.spi.BridgeSessionContext;
 
 public final class PojoIdentifierBridgeDocumentValueConverter<I>
 		implements ToDocumentValueConverter<I, String>, FromDocumentValueConverter<String, I> {
@@ -38,12 +28,12 @@ public final class PojoIdentifierBridgeDocumentValueConverter<I>
 
 	@Override
 	public String toDocumentValue(I value, ToDocumentValueConvertContext context) {
-		return bridge.toDocumentIdentifier( value, context.extension( ContextExtension.INSTANCE ) );
+		return bridge.toDocumentIdentifier( value, context.extension( PojoIdentifierBridgeContextExtension.INSTANCE ) );
 	}
 
 	@Override
 	public I fromDocumentValue(String value, FromDocumentValueConvertContext context) {
-		return bridge.fromDocumentIdentifier( value, context.extension( ContextExtension.INSTANCE ) );
+		return bridge.fromDocumentIdentifier( value, context.extension( PojoIdentifierBridgeContextExtension.INSTANCE ) );
 	}
 
 	@Override
@@ -66,31 +56,4 @@ public final class PojoIdentifierBridgeDocumentValueConverter<I>
 		return bridge.isCompatibleWith( castedOther.bridge );
 	}
 
-	private static class ContextExtension
-			implements ToDocumentValueConvertContextExtension<IdentifierBridgeToDocumentIdentifierContext>,
-			FromDocumentValueConvertContextExtension<IdentifierBridgeFromDocumentIdentifierContext> {
-		private static final ContextExtension INSTANCE = new ContextExtension();
-
-		@Override
-		public Optional<IdentifierBridgeToDocumentIdentifierContext> extendOptional(
-				ToDocumentValueConvertContext original, BackendMappingContext mappingContext) {
-			if ( mappingContext instanceof BridgeMappingContext ) {
-				BridgeMappingContext pojoMappingContext = (BridgeMappingContext) mappingContext;
-				return Optional.of( pojoMappingContext.identifierBridgeToDocumentIdentifierContext() );
-			}
-			else {
-				return Optional.empty();
-			}
-		}
-
-		@Override
-		public Optional<IdentifierBridgeFromDocumentIdentifierContext> extendOptional(
-				FromDocumentValueConvertContext original, BackendSessionContext sessionContext) {
-			if ( sessionContext instanceof BridgeSessionContext ) {
-				BridgeSessionContext pojoSessionContext = (BridgeSessionContext) sessionContext;
-				return Optional.of( pojoSessionContext.identifierBridgeFromDocumentIdentifierContext() );
-			}
-			return Optional.empty();
-		}
-	}
 }

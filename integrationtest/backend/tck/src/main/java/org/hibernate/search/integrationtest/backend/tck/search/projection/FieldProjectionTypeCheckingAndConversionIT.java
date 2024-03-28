@@ -457,6 +457,21 @@ class FieldProjectionTypeCheckingAndConversionIT<F> {
 				);
 	}
 
+	@ParameterizedTest(name = "{0}")
+	@MethodSource("params")
+	void parseNotAllowed(FieldTypeDescriptor<F, ?> fieldType) {
+		StubMappingScope scope = mainIndex.createScope();
+
+		String fieldPath = getFieldPath( fieldType );
+
+		assertThatThrownBy( () -> scope.projection()
+				.field( fieldPath, fieldType.getJavaType(), ValueConvert.PARSE ).toProjection() )
+				.isInstanceOf( SearchException.class )
+				.hasMessageContainingAll(
+						"Cannot use ValueConvert.PARSE as a converter. Use one of the allowed values [YES, NO] instead"
+				);
+	}
+
 	private String getFieldPath(FieldTypeDescriptor<F, ?> fieldType) {
 		return mainIndex.binding().fieldModels.get( fieldType ).relativeFieldName;
 	}

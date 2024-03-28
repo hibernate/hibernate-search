@@ -72,6 +72,18 @@ include::{sourcedir}/org/hibernate/search/documentation/search/converter/DslConv
 All methods that apply DSL converters offer a variant that accepts a `ValueConvert` parameter:
 `matching`, `between`, `atLeast`, `atMost`, `greaterThan`, `lessThan`, `range`, ...
 
+In some cases, it may be helpful to pass string values to these DSL steps. `ValueConvert.PARSE` can be used to address that.
+By default, the string format should be compatible with the parsing logic defined in <<mapping-directfieldmapping-supported-types-table>>,
+alternatively see how it can be <<binding-valuebridge-parse,customized with bridges>>.
+
+.Using the `PARSE` DSL converter to work with string arguments
+====
+[source, JAVA, indent=0]
+----
+include::{sourcedir}/org/hibernate/search/documentation/search/converter/DslConverterIT.java[tags=dsl-converter-parse]
+----
+====
+
 [NOTE]
 ====
 A DSL converter is always automatically generated for value bridges.

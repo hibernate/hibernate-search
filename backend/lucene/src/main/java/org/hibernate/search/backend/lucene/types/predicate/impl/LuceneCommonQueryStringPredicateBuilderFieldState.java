@@ -6,9 +6,10 @@
  */
 package org.hibernate.search.backend.lucene.types.predicate.impl;
 
-import org.hibernate.search.backend.lucene.search.common.impl.AbstractLuceneValueFieldSearchQueryElementFactory;
+import org.hibernate.search.backend.lucene.search.common.impl.AbstractLuceneCodecAwareSearchQueryElementFactory;
 import org.hibernate.search.backend.lucene.search.common.impl.LuceneSearchIndexScope;
 import org.hibernate.search.backend.lucene.search.common.impl.LuceneSearchIndexValueFieldContext;
+import org.hibernate.search.backend.lucene.types.codec.impl.LuceneFieldCodec;
 import org.hibernate.search.engine.search.predicate.spi.CommonQueryStringPredicateBuilder;
 
 public final class LuceneCommonQueryStringPredicateBuilderFieldState
@@ -34,12 +35,15 @@ public final class LuceneCommonQueryStringPredicateBuilderFieldState
 		return boost;
 	}
 
-	public static class Factory
-			extends
-			AbstractLuceneValueFieldSearchQueryElementFactory<LuceneCommonQueryStringPredicateBuilderFieldState, String> {
+	public static class Factory<T, C extends LuceneFieldCodec<T>>
+			extends AbstractLuceneCodecAwareSearchQueryElementFactory<LuceneCommonQueryStringPredicateBuilderFieldState, T, C> {
+		public Factory(C codec) {
+			super( codec );
+		}
+
 		@Override
 		public LuceneCommonQueryStringPredicateBuilderFieldState create(LuceneSearchIndexScope<?> scope,
-				LuceneSearchIndexValueFieldContext<String> field) {
+				LuceneSearchIndexValueFieldContext<T> field) {
 			return new LuceneCommonQueryStringPredicateBuilderFieldState( field );
 		}
 	}

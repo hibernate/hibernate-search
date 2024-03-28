@@ -67,6 +67,7 @@ public class ElasticsearchIndexRootBuilder extends AbstractElasticsearchIndexCom
 
 	private RoutingType routing = null;
 	private DslConverter<?, String> idDslConverter;
+	private DslConverter<String, String> idParser;
 	private ProjectionConverter<String, ?> idProjectionConverter;
 
 	public ElasticsearchIndexRootBuilder(ElasticsearchIndexFieldTypeFactoryProvider typeFactoryProvider,
@@ -111,6 +112,11 @@ public class ElasticsearchIndexRootBuilder extends AbstractElasticsearchIndexCom
 	}
 
 	@Override
+	public void idParser(ToDocumentValueConverter<String, String> converter) {
+		this.idParser = new DslConverter<>( String.class, converter );
+	}
+
+	@Override
 	public <I> void idProjectionConverter(Class<I> valueType, FromDocumentValueConverter<String, I> converter) {
 		this.idProjectionConverter = new ProjectionConverter<>( valueType, converter );
 	}
@@ -124,7 +130,7 @@ public class ElasticsearchIndexRootBuilder extends AbstractElasticsearchIndexCom
 	}
 
 	public ElasticsearchIndexModel build() {
-		IndexIdentifier identifier = new IndexIdentifier( idDslConverter, idProjectionConverter );
+		IndexIdentifier identifier = new IndexIdentifier( idDslConverter, idParser, idProjectionConverter );
 
 		RootTypeMapping mapping = new RootTypeMapping();
 		if ( routing != null ) {

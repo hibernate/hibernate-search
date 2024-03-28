@@ -50,6 +50,12 @@ public class MultiIndexSearchIndexIdentifierContext
 	}
 
 	@Override
+	public DslConverter<?, String> parser() {
+		return fromContextsIfCompatible( SearchIndexIdentifierContext::parser, DslConverter::isCompatibleWith,
+				"parser" );
+	}
+
+	@Override
 	public ProjectionConverter<String, ?> projectionConverter() {
 		return fromContextsIfCompatible( SearchIndexIdentifierContext::projectionConverter,
 				ProjectionConverter::isCompatibleWith, "projectionConverter" );

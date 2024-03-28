@@ -37,6 +37,11 @@ public class IndexedEntityBindingContextImpl extends AbstractIndexBindingContext
 	}
 
 	@Override
+	public void idParser(ToDocumentValueConverter<String, String> parser) {
+		indexSchemaObjectNodeBuilder.idParser( parser );
+	}
+
+	@Override
 	boolean isParentMultivaluedAndWithoutObjectField() {
 		// The root has no parent
 		return false;

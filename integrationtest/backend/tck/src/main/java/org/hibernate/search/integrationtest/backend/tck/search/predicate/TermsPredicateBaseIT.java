@@ -11,12 +11,16 @@ import static org.junit.jupiter.api.Assumptions.assumeTrue;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 import org.hibernate.search.engine.search.common.ValueConvert;
 import org.hibernate.search.engine.search.predicate.dsl.PredicateFinalStep;
 import org.hibernate.search.engine.search.predicate.dsl.SearchPredicateFactory;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.FieldTypeDescriptor;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.GeoPointFieldTypeDescriptor;
+import org.hibernate.search.integrationtest.backend.tck.testsupport.types.IntegerFieldTypeDescriptor;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.InvalidType;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.TckConfiguration;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.ValueWrapper;
@@ -68,6 +72,7 @@ class TermsPredicateBaseIT {
 						TypeCheckingAndConversionConfigured.rawFieldCompatibleIndex,
 						TypeCheckingAndConversionConfigured.missingFieldIndex,
 						TypeCheckingAndConversionConfigured.incompatibleIndex,
+						TypeCheckingAndConversionConfigured.integerIndex,
 						ScaleCheckingConfigured.index, ScaleCheckingConfigured.compatibleIndex,
 						ScaleCheckingConfigured.incompatibleIndex
 				)
@@ -104,6 +109,8 @@ class TermsPredicateBaseIT {
 						TypeCheckingAndConversionConfigured.rawFieldCompatibleIndex, typeCheckingRawFieldCompatibleIndexer,
 						TypeCheckingAndConversionConfigured.missingFieldIndex, typeCheckingMissingFieldIndexer
 				) );
+		BulkIndexer typeCheckingIntegerIndexer = AbstractPredicateTypeCheckingAndConversionIT.IndexIntegerBinding.contribute(
+				TypeCheckingAndConversionConfigured.integerIndex );
 
 		final BulkIndexer scaleCheckingMainIndexer = ScaleCheckingConfigured.index.bulkIndexer();
 		final BulkIndexer scaleCheckingCompatibleIndexer = ScaleCheckingConfigured.compatibleIndex.bulkIndexer();
@@ -115,7 +122,7 @@ class TermsPredicateBaseIT {
 				multiFieldIndexer, multipleArgumentIndexer, inObjectFieldMainIndexer, inObjectFieldMissingFieldIndexer,
 				scoreIndexer,
 				typeCheckingMainIndexer, typeCheckingCompatibleIndexer,
-				typeCheckingRawFieldCompatibleIndexer, typeCheckingMissingFieldIndexer,
+				typeCheckingRawFieldCompatibleIndexer, typeCheckingMissingFieldIndexer, typeCheckingIntegerIndexer,
 				scaleCheckingMainIndexer, scaleCheckingCompatibleIndexer
 		);
 	}
@@ -504,9 +511,12 @@ class TermsPredicateBaseIT {
 		private static final SimpleMappedIndex<IncompatibleIndexBinding> incompatibleIndex =
 				SimpleMappedIndex.of( root -> new IncompatibleIndexBinding( root, supportedFieldTypes ) )
 						.name( "typeChecking_incompatible" );
+		private static final SimpleMappedIndex<IndexIntegerBinding> integerIndex =
+				SimpleMappedIndex.of( IndexIntegerBinding::new ).name( "integer_index" );
 
 		private static final List<DataSet<?, ?>> dataSets = new ArrayList<>();
 		private static final List<Arguments> parameters = new ArrayList<>();
+		private static final List<Arguments> integerIndexParams = new ArrayList<>();
 
 		static {
 			for ( FieldTypeDescriptor<?, ?> fieldType : supportedFieldTypes ) {
@@ -515,11 +525,19 @@ class TermsPredicateBaseIT {
 				parameters.add( Arguments.of( index, compatibleIndex, rawFieldCompatibleIndex, missingFieldIndex,
 						incompatibleIndex, dataSet ) );
 			}
+			integerIndexParams.add( Arguments.of( integerIndex, new DataSet<>(
+					new TermsPredicateTestValues<>( IntegerFieldTypeDescriptor.INSTANCE,
+							IntStream.range( 0, 10 ).boxed().collect( Collectors.toList() ) ) ) ) );
 		}
 
 		public static List<? extends Arguments> params() {
 			return parameters;
 		}
+
+		public static List<? extends Arguments> integerIndexParams() {
+			return integerIndexParams;
+		}
+
 
 		@Override
 		protected PredicateFinalStep predicate(SearchPredicateFactory f, String fieldPath, Object matchingParam) {
@@ -552,6 +570,17 @@ class TermsPredicateBaseIT {
 		@Override
 		protected Object wrappedMatchingParam(int matchingDocOrdinal, DataSet<?, TermsPredicateTestValues<F>> dataSet) {
 			return new ValueWrapper<>( dataSet.values.matchingArg( matchingDocOrdinal ) );
+		}
+
+		@Override
+		protected String stringMatchingParam(int matchingDocOrdinal, DataSet<?, TermsPredicateTestValues<F>> dataSet) {
+			return Objects.toString( dataSet.values.matchingArg( matchingDocOrdinal ), null );
+		}
+
+		@Override
+		protected Object stringMatchingParamCustomParser(int matchingDocOrdinal,
+				DataSet<?, TermsPredicateTestValues<F>> dataSet) {
+			return IndexIntegerBinding.Converter.string( dataSet.values.matchingArg( matchingDocOrdinal ) );
 		}
 
 		@Override

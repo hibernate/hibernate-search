@@ -213,9 +213,9 @@ class ElasticsearchStringIndexFieldTypeOptionsStep
 			builder.queryElementFactory( PredicateTypeKeys.REGEXP, new ElasticsearchTextRegexpPredicate.Factory() );
 			builder.queryElementFactory( PredicateTypeKeys.TERMS, new ElasticsearchTermsPredicate.Factory<>( codec ) );
 			builder.queryElementFactory( ElasticsearchPredicateTypeKeys.SIMPLE_QUERY_STRING,
-					new ElasticsearchCommonQueryStringPredicateBuilderFieldState.Factory() );
+					new ElasticsearchCommonQueryStringPredicateBuilderFieldState.Factory<>( codec ) );
 			builder.queryElementFactory( ElasticsearchPredicateTypeKeys.QUERY_STRING,
-					new ElasticsearchCommonQueryStringPredicateBuilderFieldState.Factory() );
+					new ElasticsearchCommonQueryStringPredicateBuilderFieldState.Factory<>( codec ) );
 		}
 
 		if ( resolvedSortable ) {

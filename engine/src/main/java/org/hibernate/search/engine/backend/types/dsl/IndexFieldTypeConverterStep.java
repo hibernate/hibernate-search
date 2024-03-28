@@ -8,6 +8,7 @@ package org.hibernate.search.engine.backend.types.dsl;
 
 import org.hibernate.search.engine.backend.types.converter.FromDocumentValueConverter;
 import org.hibernate.search.engine.backend.types.converter.ToDocumentValueConverter;
+import org.hibernate.search.util.common.annotation.Incubating;
 
 /**
  * The step in an index field type definition where DSL converters (applied when using the search DSL)
@@ -42,5 +43,16 @@ public interface IndexFieldTypeConverterStep<S extends IndexFieldTypeConverterSt
 	 * @return {@code this}, for method chaining.
 	 */
 	<V> S projectionConverter(Class<V> valueType, FromDocumentValueConverter<? super F, V> fromIndexConverter);
+
+	/**
+	 * Define how string values passed to the predicate and sort DSL should be converted to the type of field values,
+	 * when {@link org.hibernate.search.engine.search.common.ValueConvert#PARSE} is used,
+	 * or when parsing query strings (local backends only, e.g. Lucene).
+	 *
+	 * @param parser A converter to parse string values.
+	 * @return {@code this}, for method chaining.
+	 */
+	@Incubating
+	S parser(ToDocumentValueConverter<String, ? extends F> parser);
 
 }

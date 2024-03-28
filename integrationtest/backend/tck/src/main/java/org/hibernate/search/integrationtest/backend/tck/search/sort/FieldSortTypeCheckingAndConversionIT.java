@@ -13,6 +13,7 @@ import static org.junit.jupiter.api.Assumptions.assumeTrue;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
+import java.util.Objects;
 import java.util.function.Consumer;
 import java.util.function.Function;
 
@@ -166,6 +167,33 @@ class FieldSortTypeCheckingAndConversionIT<F> {
 				.hasDocRefHitsExactOrder( mainIndex.typeName(), DOCUMENT_1, DOCUMENT_2, EMPTY, DOCUMENT_3 );
 		query = matchAllQuery( f -> f.field( fieldPath ).asc().missing()
 				.use( getSingleValueForMissingUse( AFTER_DOCUMENT_3_ORDINAL, fieldTypeDescriptor ), ValueConvert.NO ) );
+		assertThatQuery( query )
+				.hasDocRefHitsExactOrder( mainIndex.typeName(), DOCUMENT_1, DOCUMENT_2, DOCUMENT_3, EMPTY );
+	}
+
+	@ParameterizedTest(name = "{0}")
+	@MethodSource("params")
+	void withDslConverters_parse(StandardFieldTypeDescriptor<F> fieldTypeDescriptor) {
+		SearchQuery<DocumentReference> query;
+		String fieldPath = getFieldWithDslConverterPath( fieldTypeDescriptor );
+
+		query = matchAllQuery( f -> f.field( fieldPath ).asc().missing()
+				.use( getSingleValueForMissingUseParse( BEFORE_DOCUMENT_1_ORDINAL, fieldTypeDescriptor ),
+						ValueConvert.PARSE ) );
+		assertThatQuery( query )
+				.hasDocRefHitsExactOrder( mainIndex.typeName(), EMPTY, DOCUMENT_1, DOCUMENT_2, DOCUMENT_3 );
+		query = matchAllQuery( f -> f.field( fieldPath ).asc().missing()
+				.use( getSingleValueForMissingUseParse( BETWEEN_DOCUMENT_1_AND_2_ORDINAL, fieldTypeDescriptor ),
+						ValueConvert.PARSE ) );
+		assertThatQuery( query )
+				.hasDocRefHitsExactOrder( mainIndex.typeName(), DOCUMENT_1, EMPTY, DOCUMENT_2, DOCUMENT_3 );
+		query = matchAllQuery( f -> f.field( fieldPath ).asc().missing()
+				.use( getSingleValueForMissingUseParse( BETWEEN_DOCUMENT_2_AND_3_ORDINAL, fieldTypeDescriptor ),
+						ValueConvert.PARSE ) );
+		assertThatQuery( query )
+				.hasDocRefHitsExactOrder( mainIndex.typeName(), DOCUMENT_1, DOCUMENT_2, EMPTY, DOCUMENT_3 );
+		query = matchAllQuery( f -> f.field( fieldPath ).asc().missing()
+				.use( getSingleValueForMissingUseParse( AFTER_DOCUMENT_3_ORDINAL, fieldTypeDescriptor ), ValueConvert.PARSE ) );
 		assertThatQuery( query )
 				.hasDocRefHitsExactOrder( mainIndex.typeName(), DOCUMENT_1, DOCUMENT_2, DOCUMENT_3, EMPTY );
 	}
@@ -491,6 +519,10 @@ class FieldSortTypeCheckingAndConversionIT<F> {
 		}
 
 		return value;
+	}
+
+	private String getSingleValueForMissingUseParse(int ordinal, StandardFieldTypeDescriptor<F> fieldTypeDescriptor) {
+		return Objects.toString( getSingleValueForMissingUse( ordinal, fieldTypeDescriptor ) );
 	}
 
 	private static <F> void addValue(SimpleFieldModel<F> fieldModel, DocumentElement documentElement, Integer ordinal) {

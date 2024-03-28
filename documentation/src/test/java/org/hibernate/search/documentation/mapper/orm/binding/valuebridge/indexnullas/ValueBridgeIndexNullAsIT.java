@@ -54,4 +54,23 @@ class ValueBridgeIndexNullAsIT {
 		} );
 	}
 
+	@Test
+	void queryString() {
+		with( entityManagerFactory ).runInTransaction( entityManager -> {
+			Book book = new Book();
+			book.setIsbn( ISBN.parse( "978-0-13-468599-1" ) );
+			entityManager.persist( book );
+		} );
+
+		with( entityManagerFactory ).runInTransaction( entityManager -> {
+			SearchSession searchSession = Search.session( entityManager );
+			//tag::string-query[]
+			List<Book> result = searchSession.search( Book.class )
+					.where( f -> f.queryString().field( "isbn" )
+							.matching( "978-0-13-468599-1" ) ) // <1>
+					.fetchHits( 20 );
+			//end::string-query[]
+			assertThat( result ).hasSize( 1 );
+		} );
+	}
 }

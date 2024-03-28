@@ -52,12 +52,18 @@ class MatchIdPredicateSpecificsIT {
 					.idDslConverter( Object.class, new IncompatibleIdConverter() ) )
 					.name( "incompatibleIdConverter" );
 
+	private static final StubMappedIndex parseIndex =
+			StubMappedIndex.ofAdvancedNonRetrievable( ctx -> ctx
+					.idParser( new ParseIdConverter() )
+			).name( "parse" );
+
 	// only one of which is matching
 	private static final List<String> lotsOfTerms = new ArrayList<>();
 
 	@BeforeAll
 	static void setup() {
-		setupHelper.start().withIndexes( mainIndex, compatibleIdConverterIndex, incompatibleIdConverterIndex ).setup();
+		setupHelper.start().withIndexes( mainIndex, compatibleIdConverterIndex, incompatibleIdConverterIndex,
+				parseIndex ).setup();
 
 		for ( int i = 1; i <= LOT_OF_TERMS_SIZE; i++ ) {
 			if ( i == 3 ) {
@@ -158,6 +164,36 @@ class MatchIdPredicateSpecificsIT {
 				} );
 	}
 
+	@Test
+	void parse_unConfigured() {
+		StubMappingScope scope = mainIndex.createScope();
+
+		assertThatQuery( scope.query()
+				.where( f -> f.id().matching( DOCUMENT_1, ValueConvert.PARSE ) )
+				.toQuery() )
+				.hasDocRefHitsAnyOrder( mainIndex.typeName(), DOCUMENT_1 );
+	}
+
+	@Test
+	void parse_configured() {
+		StubMappingScope scope = parseIndex.createScope();
+
+		assertThatQuery( scope.query()
+				.where( f -> f.id().matching( DOCUMENT_1, ValueConvert.PARSE ) )
+				.toQuery() )
+				.hasDocRefHitsAnyOrder( parseIndex.typeName(), ( ParseIdConverter.id( DOCUMENT_1 ) ) );
+
+		assertThatQuery( scope.query()
+				.where( f -> f.id().matching( ParseIdConverter.id( DOCUMENT_1 ), ValueConvert.NO ) )
+				.toQuery() )
+				.hasDocRefHitsAnyOrder( parseIndex.typeName(), ( ParseIdConverter.id( DOCUMENT_1 ) ) );
+
+		assertThatQuery( scope.query()
+				.where( f -> f.id().matching( ParseIdConverter.id( DOCUMENT_1 ), ValueConvert.YES ) )
+				.toQuery() )
+				.hasDocRefHitsAnyOrder( parseIndex.typeName(), ( ParseIdConverter.id( DOCUMENT_1 ) ) );
+	}
+
 	private static void initData() {
 		BulkIndexer mainIndexer = mainIndex.bulkIndexer()
 				.add( DOCUMENT_1, document -> {} )
@@ -167,13 +203,28 @@ class MatchIdPredicateSpecificsIT {
 				.add( COMPATIBLE_ID_CONVERTER_DOCUMENT_1, document -> {} );
 		BulkIndexer incompatibleIdConverterIndexer = incompatibleIdConverterIndex.bulkIndexer()
 				.add( INCOMPATIBLE_ID_CONVERTER_DOCUMENT_1, document -> {} );
-		mainIndexer.join( compatibleIdConverterIndexer, incompatibleIdConverterIndexer );
+		BulkIndexer parseIndexer = parseIndex.bulkIndexer()
+				.add( ParseIdConverter.id( DOCUMENT_1 ), document -> {} )
+				.add( ParseIdConverter.id( DOCUMENT_2 ), document -> {} )
+				.add( ParseIdConverter.id( DOCUMENT_3 ), document -> {} );
+		mainIndexer.join( compatibleIdConverterIndexer, incompatibleIdConverterIndexer, parseIndexer );
 	}
 
 	private static class IncompatibleIdConverter implements ToDocumentValueConverter<Object, String> {
 		@Override
 		public String toDocumentValue(Object value, ToDocumentValueConvertContext context) {
 			throw new UnsupportedOperationException( "Should not be called" );
+		}
+	}
+
+	private static class ParseIdConverter implements ToDocumentValueConverter<String, String> {
+		@Override
+		public String toDocumentValue(String value, ToDocumentValueConvertContext context) {
+			return id( value );
+		}
+
+		public static String id(String id) {
+			return id == null ? null : "document_id_parsed_" + id;
 		}
 	}
 }

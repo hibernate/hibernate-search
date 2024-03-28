@@ -14,10 +14,13 @@ import org.hibernate.search.backend.lucene.search.common.impl.LuceneSearchIndexS
 import org.hibernate.search.backend.lucene.types.predicate.impl.LuceneCommonQueryStringPredicateBuilderFieldState;
 import org.hibernate.search.engine.search.common.BooleanOperator;
 import org.hibernate.search.engine.search.common.RewriteMethod;
+import org.hibernate.search.engine.search.common.ValueConvert;
 import org.hibernate.search.engine.search.common.spi.SearchQueryElementTypeKey;
 import org.hibernate.search.engine.search.predicate.SearchPredicate;
+import org.hibernate.search.engine.search.predicate.spi.PredicateTypeKeys;
 import org.hibernate.search.engine.search.predicate.spi.QueryStringPredicateBuilder;
 import org.hibernate.search.util.common.AssertionFailure;
+import org.hibernate.search.util.common.data.RangeBoundInclusion;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
 import org.apache.lucene.analysis.Analyzer;
@@ -86,7 +89,7 @@ public class LuceneQueryStringPredicate extends LuceneCommonQueryStringPredicate
 				return new MatchNoDocsQuery();
 			}
 
-			MultiFieldQueryParser queryParser = create( buildWeights(), buildAnalyzer() );
+			MultiFieldQueryParser queryParser = create( buildWeights(), buildAnalyzer(), fieldStateLookup() );
 
 			queryParser.setDefaultOperator( toOperator( defaultOperator ) );
 			if ( rewriteMethod != null ) {
@@ -104,16 +107,16 @@ public class LuceneQueryStringPredicate extends LuceneCommonQueryStringPredicate
 			}
 
 			try {
-				return applyMinimumShouldMatch( queryParser.parse( queryString ) );
+				return addMatchAllForBoolMustNotOnly( applyMinimumShouldMatch( queryParser.parse( queryString ) ) );
 			}
 			catch (ParseException e) {
 				throw log.queryStringParseException( queryString, e.getMessage(), e );
 			}
 		}
 
-		private MultiFieldQueryParser create(Map<String, Float> weights, Analyzer analyzer) {
-			String[] fields = weights.keySet().toArray( String[]::new );
-			return new MultiFieldQueryParser( fields, analyzer, weights );
+		private MultiFieldQueryParser create(Map<String, Float> weights, Analyzer analyzer,
+				Map<String, LuceneCommonQueryStringPredicateBuilderFieldState> fieldStateMap) {
+			return new HibernateSearchMultiFieldQueryParser( analyzer, weights, fieldStateMap, scope );
 		}
 
 		private MultiTermQuery.RewriteMethod toRewriteMethod(RewriteMethod rewriteMethod, Integer n) {
@@ -145,6 +148,74 @@ public class LuceneQueryStringPredicate extends LuceneCommonQueryStringPredicate
 					throw new AssertionFailure( "Unknown boolean operator: " + operator );
 			}
 		}
+	}
 
+	private static class HibernateSearchMultiFieldQueryParser extends MultiFieldQueryParser {
+		private final Map<String, LuceneCommonQueryStringPredicateBuilderFieldState> fieldStates;
+		private final LuceneSearchIndexScope<?> scope;
+
+		public HibernateSearchMultiFieldQueryParser(Analyzer analyzer, Map<String, Float> boosts,
+				Map<String, LuceneCommonQueryStringPredicateBuilderFieldState> fieldStates, LuceneSearchIndexScope<?> scope) {
+			super( boosts.keySet().toArray( String[]::new ), analyzer, boosts );
+			this.fieldStates = fieldStates;
+			this.scope = scope;
+		}
+
+		@Override
+		protected Query newFieldQuery(Analyzer analyzer, String field, String queryText, boolean quoted)
+				throws ParseException {
+			var state = fieldStates.get( field );
+
+			if ( !state.field().type().valueClass().isAssignableFrom( String.class ) ) {
+				var builder = state.field().queryElement( PredicateTypeKeys.MATCH, scope );
+				builder.value( queryText, ValueConvert.PARSE );
+
+				return LuceneSearchPredicate.from( scope, builder.build() ).toQuery( contextForField( state ) );
+			}
+
+			return super.newFieldQuery( analyzer, field, queryText, quoted );
+		}
+
+		@Override
+		protected Query getFuzzyQuery(String field, String termStr, float minSimilarity) throws ParseException {
+			checkFieldsAreAcceptable( "Fuzzy", fieldStates );
+			return super.getFuzzyQuery( field, termStr, minSimilarity );
+		}
+
+		@Override
+		protected Query getPrefixQuery(String field, String termStr) throws ParseException {
+			checkFieldsAreAcceptable( "Prefix", fieldStates );
+			return super.getPrefixQuery( field, termStr );
+		}
+
+		@Override
+		protected Query getRegexpQuery(String field, String termStr) throws ParseException {
+			checkFieldsAreAcceptable( "Regexp", fieldStates );
+			return super.getRegexpQuery( field, termStr );
+		}
+
+		@Override
+		protected Query getWildcardQuery(String field, String termStr) throws ParseException {
+			checkFieldsAreAcceptable( "Wildcard", fieldStates );
+			return super.getWildcardQuery( field, termStr );
+		}
+
+		@Override
+		protected Query newRangeQuery(String field, String part1, String part2, boolean startInclusive, boolean endInclusive) {
+			var state = fieldStates.get( field );
+
+			if ( !state.field().type().valueClass().isAssignableFrom( String.class ) ) {
+				var builder = state.field().queryElement( PredicateTypeKeys.RANGE, scope );
+				builder.range(
+						org.hibernate.search.util.common.data.Range.between(
+								part1, startInclusive ? RangeBoundInclusion.INCLUDED : RangeBoundInclusion.EXCLUDED,
+								part2, endInclusive ? RangeBoundInclusion.INCLUDED : RangeBoundInclusion.EXCLUDED
+						),
+						ValueConvert.PARSE, ValueConvert.PARSE );
+				return LuceneSearchPredicate.from( scope, builder.build() ).toQuery( contextForField( state ) );
+			}
+
+			return super.newRangeQuery( field, part1, part2, startInclusive, endInclusive );
+		}
 	}
 }

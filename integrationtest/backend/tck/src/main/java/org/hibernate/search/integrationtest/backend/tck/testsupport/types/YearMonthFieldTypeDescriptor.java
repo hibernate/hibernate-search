@@ -9,10 +9,12 @@ package org.hibernate.search.integrationtest.backend.tck.testsupport.types;
 import java.time.Month;
 import java.time.Year;
 import java.time.YearMonth;
+import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Locale;
 import java.util.Optional;
 
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.expectations.IndexNullAsMatchPredicateExpectactions;
@@ -22,6 +24,7 @@ import org.hibernate.search.integrationtest.backend.tck.testsupport.types.values
 public class YearMonthFieldTypeDescriptor extends StandardFieldTypeDescriptor<YearMonth> {
 
 	public static final YearMonthFieldTypeDescriptor INSTANCE = new YearMonthFieldTypeDescriptor();
+	private static final DateTimeFormatter FORMATTER = DateTimeFormatter.ofPattern( "uuuu-MM", Locale.ROOT );
 
 	private YearMonthFieldTypeDescriptor() {
 		super( YearMonth.class );
@@ -99,5 +102,10 @@ public class YearMonthFieldTypeDescriptor extends StandardFieldTypeDescriptor<Ye
 				YearMonth.of( 0, Month.JANUARY ),
 				YearMonth.of( 2017, Month.NOVEMBER )
 		) );
+	}
+
+	@Override
+	public String format(YearMonth value) {
+		return FORMATTER.format( value );
 	}
 }

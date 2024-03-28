@@ -15,10 +15,13 @@ import org.hibernate.search.util.common.reporting.EventContext;
 public final class IndexIdentifier implements SearchIndexIdentifierContext {
 
 	private final DslConverter<?, String> dslConverter;
+	private final DslConverter<?, String> parser;
 	private final ProjectionConverter<String, ?> projectionConverter;
 
-	public IndexIdentifier(DslConverter<?, String> dslConverter, ProjectionConverter<String, ?> projectionConverter) {
+	public IndexIdentifier(DslConverter<?, String> dslConverter, DslConverter<?, String> parser,
+			ProjectionConverter<String, ?> projectionConverter) {
 		this.dslConverter = dslConverter != null ? dslConverter : RAW_DSL_CONVERTER;
+		this.parser = parser != null ? parser : RAW_DSL_CONVERTER;
 		this.projectionConverter = projectionConverter != null ? projectionConverter : RAW_PROJECTION_CONVERTER;
 	}
 
@@ -35,6 +38,11 @@ public final class IndexIdentifier implements SearchIndexIdentifierContext {
 	@Override
 	public DslConverter<?, String> dslConverter() {
 		return dslConverter;
+	}
+
+	@Override
+	public DslConverter<?, String> parser() {
+		return parser;
 	}
 
 	@Override

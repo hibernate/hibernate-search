@@ -19,6 +19,7 @@ import org.hibernate.search.backend.lucene.types.predicate.impl.LuceneGeoPointSp
 import org.hibernate.search.backend.lucene.types.predicate.impl.LuceneGeoPointSpatialWithinPolygonPredicate;
 import org.hibernate.search.backend.lucene.types.sort.impl.LuceneGeoPointDistanceSort;
 import org.hibernate.search.engine.backend.types.Sortable;
+import org.hibernate.search.engine.backend.types.converter.spi.DefaultParseConverters;
 import org.hibernate.search.engine.search.predicate.spi.PredicateTypeKeys;
 import org.hibernate.search.engine.search.projection.spi.ProjectionTypeKeys;
 import org.hibernate.search.engine.search.sort.spi.SortTypeKeys;
@@ -30,7 +31,7 @@ class LuceneGeoPointIndexFieldTypeOptionsStep
 	private Sortable sortable = Sortable.DEFAULT;
 
 	LuceneGeoPointIndexFieldTypeOptionsStep(LuceneIndexFieldTypeBuildContext buildContext) {
-		super( buildContext, GeoPoint.class );
+		super( buildContext, GeoPoint.class, DefaultParseConverters.GEO_POINT );
 	}
 
 	@Override

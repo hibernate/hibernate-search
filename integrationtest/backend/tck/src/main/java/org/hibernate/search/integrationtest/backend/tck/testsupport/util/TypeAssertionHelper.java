@@ -6,6 +6,8 @@
  */
 package org.hibernate.search.integrationtest.backend.tck.testsupport.util;
 
+import java.util.Objects;
+
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.FieldTypeDescriptor;
 
 public abstract class TypeAssertionHelper<F, T> {
@@ -70,6 +72,20 @@ public abstract class TypeAssertionHelper<F, T> {
 			@Override
 			public T create(F fieldValue) {
 				return neverCalled( fieldValue );
+			}
+		};
+	}
+
+	public static <F> TypeAssertionHelper<F, String> parser(FieldTypeDescriptor<F, ?> typeDescriptor) {
+		return new TypeAssertionHelper<F, String>() {
+			@Override
+			public Class<String> getJavaClass() {
+				return String.class;
+			}
+
+			@Override
+			public String create(F fieldValue) {
+				return Objects.toString( fieldValue, null );
 			}
 		};
 	}

@@ -6,17 +6,21 @@
  */
 package org.hibernate.search.backend.lucene.search.predicate.impl;
 
+import java.util.Map;
 import java.util.Set;
 
 import org.hibernate.search.backend.lucene.search.common.impl.LuceneSearchIndexScope;
 import org.hibernate.search.backend.lucene.types.predicate.impl.LuceneCommonQueryStringPredicateBuilderFieldState;
 import org.hibernate.search.engine.search.common.BooleanOperator;
+import org.hibernate.search.engine.search.common.ValueConvert;
 import org.hibernate.search.engine.search.common.spi.SearchQueryElementTypeKey;
 import org.hibernate.search.engine.search.predicate.SearchPredicate;
 import org.hibernate.search.engine.search.predicate.dsl.SimpleQueryFlag;
+import org.hibernate.search.engine.search.predicate.spi.PredicateTypeKeys;
 import org.hibernate.search.engine.search.predicate.spi.SimpleQueryStringPredicateBuilder;
 import org.hibernate.search.util.common.AssertionFailure;
 
+import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.queryparser.simple.SimpleQueryParser;
 import org.apache.lucene.search.BooleanClause;
 import org.apache.lucene.search.Query;
@@ -47,7 +51,8 @@ public class LuceneSimpleQueryStringPredicate extends LuceneCommonQueryStringPre
 
 		@Override
 		protected Query buildQuery() {
-			SimpleQueryParser queryParser = new SimpleQueryParser( buildAnalyzer(), buildWeights(), flags );
+			SimpleQueryParser queryParser =
+					new HibernateSearchSimpleQueryParser( buildAnalyzer(), buildWeights(), fieldStateLookup(), flags, scope );
 			queryParser.setDefaultOperator( toOccur( defaultOperator ) );
 			return applyMinimumShouldMatch( queryParser.parse( queryString ) );
 		}
@@ -108,6 +113,45 @@ public class LuceneSimpleQueryStringPredicate extends LuceneCommonQueryStringPre
 				}
 			}
 			return flag;
+		}
+	}
+
+	private static class HibernateSearchSimpleQueryParser extends SimpleQueryParser {
+
+		private final Map<String, LuceneCommonQueryStringPredicateBuilderFieldState> fieldStates;
+		private final LuceneSearchIndexScope<?> scope;
+
+		public HibernateSearchSimpleQueryParser(Analyzer analyzer, Map<String, Float> weights,
+				Map<String, LuceneCommonQueryStringPredicateBuilderFieldState> fieldStates, int flags,
+				LuceneSearchIndexScope<?> scope) {
+			super( analyzer, weights, flags );
+			this.fieldStates = fieldStates;
+			this.scope = scope;
+		}
+
+		@Override
+		protected Query createFieldQuery(Analyzer analyzer, BooleanClause.Occur operator, String field,
+				String queryText, boolean quoted, int phraseSlop) {
+			var state = fieldStates.get( field );
+
+			if ( !state.field().type().valueClass().isAssignableFrom( String.class ) ) {
+				var builder = state.field().queryElement( PredicateTypeKeys.MATCH, scope );
+				builder.value( queryText, ValueConvert.PARSE );
+				return LuceneSearchPredicate.from( scope, builder.build() ).toQuery( contextForField( state ) );
+			}
+			return super.createFieldQuery( analyzer, operator, field, queryText, quoted, phraseSlop );
+		}
+
+		@Override
+		protected Query newPrefixQuery(String text) {
+			checkFieldsAreAcceptable( "Prefix", fieldStates );
+			return super.newPrefixQuery( text );
+		}
+
+		@Override
+		protected Query newFuzzyQuery(String text, int fuzziness) {
+			checkFieldsAreAcceptable( "Fuzzy", fieldStates );
+			return super.newFuzzyQuery( text, fuzziness );
 		}
 	}
 }

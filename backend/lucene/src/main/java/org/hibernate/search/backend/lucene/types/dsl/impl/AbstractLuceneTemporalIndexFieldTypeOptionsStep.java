@@ -8,6 +8,7 @@ package org.hibernate.search.backend.lucene.types.dsl.impl;
 
 import java.time.temporal.TemporalAccessor;
 
+import org.hibernate.search.backend.lucene.search.predicate.impl.LucenePredicateTypeKeys;
 import org.hibernate.search.backend.lucene.search.projection.impl.LuceneFieldProjection;
 import org.hibernate.search.backend.lucene.types.aggregation.impl.LuceneNumericRangeAggregation;
 import org.hibernate.search.backend.lucene.types.aggregation.impl.LuceneNumericTermsAggregation;
@@ -16,12 +17,14 @@ import org.hibernate.search.backend.lucene.types.codec.impl.DocValues;
 import org.hibernate.search.backend.lucene.types.codec.impl.Indexing;
 import org.hibernate.search.backend.lucene.types.codec.impl.Storage;
 import org.hibernate.search.backend.lucene.types.impl.LuceneIndexValueFieldType;
+import org.hibernate.search.backend.lucene.types.predicate.impl.LuceneCommonQueryStringPredicateBuilderFieldState;
 import org.hibernate.search.backend.lucene.types.predicate.impl.LuceneExistsPredicate;
 import org.hibernate.search.backend.lucene.types.predicate.impl.LuceneNumericMatchPredicate;
 import org.hibernate.search.backend.lucene.types.predicate.impl.LuceneNumericRangePredicate;
 import org.hibernate.search.backend.lucene.types.predicate.impl.LuceneNumericTermsPredicate;
 import org.hibernate.search.backend.lucene.types.sort.impl.LuceneStandardFieldSort;
 import org.hibernate.search.engine.backend.types.Sortable;
+import org.hibernate.search.engine.backend.types.converter.ToDocumentValueConverter;
 import org.hibernate.search.engine.search.aggregation.spi.AggregationTypeKeys;
 import org.hibernate.search.engine.search.predicate.spi.PredicateTypeKeys;
 import org.hibernate.search.engine.search.projection.spi.ProjectionTypeKeys;
@@ -34,8 +37,9 @@ abstract class AbstractLuceneTemporalIndexFieldTypeOptionsStep<
 
 	private Sortable sortable = Sortable.DEFAULT;
 
-	AbstractLuceneTemporalIndexFieldTypeOptionsStep(LuceneIndexFieldTypeBuildContext buildContext, Class<F> fieldType) {
-		super( buildContext, fieldType );
+	AbstractLuceneTemporalIndexFieldTypeOptionsStep(LuceneIndexFieldTypeBuildContext buildContext, Class<F> fieldType,
+			ToDocumentValueConverter<String, F> defaultParseConverter) {
+		super( buildContext, fieldType, defaultParseConverter );
 	}
 
 	@Override
@@ -67,6 +71,10 @@ abstract class AbstractLuceneTemporalIndexFieldTypeOptionsStep<
 					DocValues.ENABLED.equals( docValues )
 							? new LuceneExistsPredicate.DocValuesOrNormsBasedFactory<>()
 							: new LuceneExistsPredicate.DefaultFactory<>() );
+			builder.queryElementFactory( LucenePredicateTypeKeys.SIMPLE_QUERY_STRING,
+					new LuceneCommonQueryStringPredicateBuilderFieldState.Factory<>( codec ) );
+			builder.queryElementFactory( LucenePredicateTypeKeys.QUERY_STRING,
+					new LuceneCommonQueryStringPredicateBuilderFieldState.Factory<>( codec ) );
 		}
 
 		if ( resolvedSortable ) {

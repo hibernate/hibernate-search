@@ -15,6 +15,7 @@ import org.hibernate.search.backend.elasticsearch.types.predicate.impl.Elasticse
 import org.hibernate.search.backend.elasticsearch.types.predicate.impl.ElasticsearchGeoPointSpatialWithinCirclePredicate;
 import org.hibernate.search.backend.elasticsearch.types.predicate.impl.ElasticsearchGeoPointSpatialWithinPolygonPredicate;
 import org.hibernate.search.backend.elasticsearch.types.sort.impl.ElasticsearchDistanceSort;
+import org.hibernate.search.engine.backend.types.converter.spi.DefaultParseConverters;
 import org.hibernate.search.engine.search.predicate.spi.PredicateTypeKeys;
 import org.hibernate.search.engine.search.projection.spi.ProjectionTypeKeys;
 import org.hibernate.search.engine.search.sort.spi.SortTypeKeys;
@@ -25,7 +26,7 @@ class ElasticsearchGeoPointIndexFieldTypeOptionsStep
 		AbstractElasticsearchSimpleStandardFieldTypeOptionsStep<ElasticsearchGeoPointIndexFieldTypeOptionsStep, GeoPoint> {
 
 	ElasticsearchGeoPointIndexFieldTypeOptionsStep(ElasticsearchIndexFieldTypeBuildContext buildContext) {
-		super( buildContext, GeoPoint.class, DataTypes.GEO_POINT );
+		super( buildContext, GeoPoint.class, DataTypes.GEO_POINT, DefaultParseConverters.GEO_POINT );
 	}
 
 	@Override
