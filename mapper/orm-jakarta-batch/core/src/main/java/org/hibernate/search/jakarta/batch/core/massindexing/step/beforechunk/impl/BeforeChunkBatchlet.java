@@ -6,6 +6,7 @@
  */
 package org.hibernate.search.jakarta.batch.core.massindexing.step.beforechunk.impl;
 
+import java.lang.invoke.MethodHandles;
 import java.util.Collections;
 import java.util.Objects;
 
@@ -17,6 +18,7 @@ import jakarta.persistence.EntityManagerFactory;
 
 import org.hibernate.search.engine.backend.work.execution.OperationSubmitter;
 import org.hibernate.search.engine.backend.work.execution.spi.UnsupportedOperationBehavior;
+import org.hibernate.search.jakarta.batch.core.logging.impl.Log;
 import org.hibernate.search.jakarta.batch.core.massindexing.MassIndexingJobParameters;
 import org.hibernate.search.jakarta.batch.core.massindexing.impl.JobContextData;
 import org.hibernate.search.jakarta.batch.core.massindexing.util.impl.SerializationUtil;
@@ -24,6 +26,7 @@ import org.hibernate.search.mapper.orm.Search;
 import org.hibernate.search.mapper.orm.spi.BatchMappingContext;
 import org.hibernate.search.mapper.pojo.work.spi.PojoScopeWorkspace;
 import org.hibernate.search.util.common.impl.Futures;
+import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
 /**
  * Enhancements before the chunk step {@code produceLuceneDoc} (lucene document production)
@@ -32,12 +35,18 @@ import org.hibernate.search.util.common.impl.Futures;
  */
 public class BeforeChunkBatchlet extends AbstractBatchlet {
 
+	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
+
 	@Inject
 	private JobContext jobContext;
 
 	@Inject
 	@BatchProperty(name = MassIndexingJobParameters.PURGE_ALL_ON_START)
 	private String serializedPurgeAllOnStart;
+
+	@Inject
+	@BatchProperty(name = MassIndexingJobParameters.DROP_AND_CREATE_SCHEMA_ON_START)
+	private String serializedDropAndCreateSchemaOnStart;
 
 	@Inject
 	@BatchProperty(name = MassIndexingJobParameters.MERGE_SEGMENTS_AFTER_PURGE)
@@ -53,12 +62,36 @@ public class BeforeChunkBatchlet extends AbstractBatchlet {
 				MassIndexingJobParameters.PURGE_ALL_ON_START, serializedPurgeAllOnStart,
 				MassIndexingJobParameters.Defaults.PURGE_ALL_ON_START
 		);
+		boolean dropAndCreateSchemaOnStart = SerializationUtil.parseBooleanParameterOptional(
+				MassIndexingJobParameters.DROP_AND_CREATE_SCHEMA_ON_START,
+				serializedDropAndCreateSchemaOnStart,
+				MassIndexingJobParameters.Defaults.DROP_AND_CREATE_SCHEMA_ON_START
+		);
 		boolean mergeSegmentsAfterPurge = SerializationUtil.parseBooleanParameterOptional(
 				MassIndexingJobParameters.MERGE_SEGMENTS_AFTER_PURGE, serializedMergeSegmentsAfterPurge,
 				MassIndexingJobParameters.Defaults.MERGE_SEGMENTS_AFTER_PURGE
 		);
 
-		if ( purgeAllOnStart ) {
+		if ( dropAndCreateSchemaOnStart ) {
+			if ( tenantId != null ) {
+				// If we have a tenant id here, there most likely are other tenants,
+				//   and if we drop-create the schema then we'd lose the indexed docs for other tenants.
+				//   let the user decide what they want to do here, and either remove the tenant filter,
+				//   or do the schema drop through a schema manager.
+				throw log.tenantIdProvidedWithSchemaDrop( tenantId );
+			}
+			JobContextData jobData = (JobContextData) jobContext.getTransientUserData();
+			EntityManagerFactory emf = jobData.getEntityManagerFactory();
+			Search.mapping( emf ).scope( jobData.getEntityTypes() ).schemaManager().dropAndCreate();
+		}
+
+		if ( Boolean.TRUE.equals( dropAndCreateSchemaOnStart )
+				&& ( serializedPurgeAllOnStart != null && Boolean.TRUE.equals( purgeAllOnStart ) ) ) {
+			log.redundantPurgeAfterDrop();
+		}
+
+		// No need to purge if we've dropped-created the schema already
+		if ( purgeAllOnStart && !dropAndCreateSchemaOnStart ) {
 			JobContextData jobData = (JobContextData) jobContext.getTransientUserData();
 			EntityManagerFactory emf = jobData.getEntityManagerFactory();
 			BatchMappingContext mappingContext = (BatchMappingContext) Search.mapping( emf );

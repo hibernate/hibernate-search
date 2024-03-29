@@ -38,6 +38,7 @@ public final class MassIndexingJobParameters {
 	public static final String MERGE_SEGMENTS_AFTER_PURGE = "mergeSegmentsAfterPurge";
 
 	public static final String PURGE_ALL_ON_START = "purgeAllOnStart";
+	public static final String DROP_AND_CREATE_SCHEMA_ON_START = "dropAndCreateSchemaOnStart";
 
 	public static final String ROWS_PER_PARTITION = "rowsPerPartition";
 
@@ -59,6 +60,7 @@ public final class MassIndexingJobParameters {
 		public static final boolean MERGE_SEGMENTS_ON_FINISH = true;
 		public static final boolean MERGE_SEGMENTS_AFTER_PURGE = true;
 		public static final boolean PURGE_ALL_ON_START = true;
+		public static final boolean DROP_AND_CREATE_SCHEMA_ON_START = false;
 
 		public static final int ROWS_PER_PARTITION = 20_000;
 

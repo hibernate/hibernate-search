@@ -74,8 +74,17 @@ The entity types to index in this job execution, comma-separated.
 
 |`purgeAllOnStart` / `.purgeAllOnStart(boolean)`
 |True
-|Specify whether the existing index should be purged at the beginning of the job. This operation
-takes place before indexing.
+|Specify whether the existing index should be purged at the beginning of the job.
+This operation takes place before indexing.
+
+NOTE: Only affects the indexes targeted by the `entityTypes` parameter.
+
+|`dropAndCreateSchemaOnStart` / `.dropAndCreateSchemaOnStart(boolean)`
+|False
+|Specify whether the existing schema should be dropped and created at the beginning of the job.
+This operation takes place before indexing.
+
+NOTE: Only affects the indexes targeted by the `entityTypes` parameter.
 
 |`mergeSegmentsAfterPurge` / `.mergeSegmentsAfterPurge(boolean)`
 |True

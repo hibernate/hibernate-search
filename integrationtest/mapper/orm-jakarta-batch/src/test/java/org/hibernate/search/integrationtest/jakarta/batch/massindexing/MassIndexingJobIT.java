@@ -293,6 +293,54 @@ class MassIndexingJobIT {
 	}
 
 	@Test
+	void drop() throws InterruptedException {
+		int expectedCount = 10;
+
+		assertThat( JobTestUtil.nbDocumentsInIndex( emf, Company.class ) ).isZero();
+		indexSomeCompanies( expectedCount );
+		assertThat( JobTestUtil.nbDocumentsInIndex( emf, Company.class ) ).isEqualTo( expectedCount );
+
+		/*
+		 * Request a mass indexing with a filter matching nothing,
+		 * which should effectively amount to only drop-create the schema.
+		 */
+		JobTestUtil.startJobAndWaitForSuccessNoRetry(
+				MassIndexingJob.parameters()
+						.forEntity( Company.class )
+						.purgeAllOnStart( false ) // disable purge so it won't get in a way
+						.dropAndCreateSchemaOnStart( true )
+						.reindexOnly( "name like :name", Map.of( "name", "NEVER_MATCH" ) )
+						.build()
+		);
+
+		assertThat( JobTestUtil.nbDocumentsInIndex( emf, Company.class ) ).isZero();
+	}
+
+	@Test
+	void noDrop() throws InterruptedException {
+		int expectedCount = 10;
+
+		assertThat( JobTestUtil.nbDocumentsInIndex( emf, Company.class ) ).isZero();
+		indexSomeCompanies( expectedCount );
+		assertThat( JobTestUtil.nbDocumentsInIndex( emf, Company.class ) ).isEqualTo( expectedCount );
+
+		/*
+		 * Request a mass indexing with a filter matching nothing, and requesting no purge and no drop at all,
+		 * which should effectively amount to a no-op.
+		 */
+		JobTestUtil.startJobAndWaitForSuccessNoRetry(
+				MassIndexingJob.parameters()
+						.forEntity( Company.class )
+						.purgeAllOnStart( false )
+						.dropAndCreateSchemaOnStart( false )
+						.reindexOnly( "name like :name", Map.of( "name", "NEVER_MATCH" ) )
+						.build()
+		);
+
+		assertThat( JobTestUtil.nbDocumentsInIndex( emf, Company.class ) ).isEqualTo( expectedCount );
+	}
+
+	@Test
 	void reindexOnly() throws InterruptedException {
 		// searches before mass index,
 		// expected no results for each search

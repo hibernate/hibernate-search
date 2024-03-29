@@ -85,6 +85,10 @@ public class JobContextSetupListener extends AbstractJobListener {
 	private String serializedPurgeAllOnStart;
 
 	@Inject
+	@BatchProperty(name = MassIndexingJobParameters.DROP_AND_CREATE_SCHEMA_ON_START)
+	private String serializedDropAndCreateSchemaOnStart;
+
+	@Inject
 	@BatchProperty(name = MassIndexingJobParameters.CHECKPOINT_INTERVAL)
 	private String serializedCheckpointInterval;
 
@@ -164,6 +168,9 @@ public class JobContextSetupListener extends AbstractJobListener {
 		SerializationUtil.parseBooleanParameterOptional( MassIndexingJobParameters.PURGE_ALL_ON_START,
 				serializedPurgeAllOnStart,
 				MassIndexingJobParameters.Defaults.PURGE_ALL_ON_START );
+		SerializationUtil.parseBooleanParameterOptional( MassIndexingJobParameters.DROP_AND_CREATE_SCHEMA_ON_START,
+				serializedDropAndCreateSchemaOnStart,
+				MassIndexingJobParameters.Defaults.DROP_AND_CREATE_SCHEMA_ON_START );
 	}
 
 	private void validateQuerying() {
