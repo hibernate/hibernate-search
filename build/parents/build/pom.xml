@@ -430,13 +430,6 @@
                 <groupId>org.apache.lucene</groupId>
                 <artifactId>lucene-queryparser</artifactId>
                 <version>${version.org.apache.lucene}</version>
-                <exclusions>
-                    <!-- This artifact contains unstable, experimental code that we cannot reasonably rely on. -->
-                    <exclusion>
-                        <groupId>org.apache.lucene</groupId>
-                        <artifactId>lucene-sandbox</artifactId>
-                    </exclusion>
-                </exclusions>
             </dependency>
             <dependency>
                 <groupId>org.apache.lucene</groupId>
