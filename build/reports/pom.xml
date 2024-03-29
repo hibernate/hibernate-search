@@ -236,6 +236,11 @@
                                 <goals>
                                     <goal>report-aggregate</goal>
                                 </goals>
+                                <configuration>
+                                    <dataFileIncludes>
+                                        <include>**/*.exec</include>
+                                    </dataFileIncludes>
+                                </configuration>
                             </execution>
                         </executions>
                     </plugin>
