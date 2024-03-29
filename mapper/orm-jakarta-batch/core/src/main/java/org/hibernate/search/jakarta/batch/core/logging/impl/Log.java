@@ -12,6 +12,7 @@ import org.hibernate.search.util.common.SearchException;
 import org.hibernate.search.util.common.logging.impl.MessageConstants;
 
 import org.jboss.logging.BasicLogger;
+import org.jboss.logging.Logger;
 import org.jboss.logging.Logger.Level;
 import org.jboss.logging.annotations.Cause;
 import org.jboss.logging.annotations.LogMessage;
@@ -175,4 +176,15 @@ public interface Log extends BasicLogger {
 			value = "Closing EntityWriter of partitionId='%1$s', entity='%2$s'.")
 	void closingEntityWriter(String partitionId, String entityName);
 
+	@Message(id = ID_OFFSET + 36,
+			value = "A tenant id '%1$s' was provided, while requesting a schema drop-create on start. " +
+					"Schema is going to be dropped for all tenants. " +
+					"Either do not use the schema drop-create on start or do not provide the tenant id.")
+	SearchException tenantIdProvidedWithSchemaDrop(String tenantId);
+
+	@LogMessage(level = Logger.Level.WARN)
+	@Message(id = ID_OFFSET + 37,
+			value = "Both \"dropAndCreateSchemaOnStart\" and \"purgeAllOnStart\" are enabled. " +
+					"Consider having just one setting enabled as after the index is recreated there is nothing to purge.")
+	void redundantPurgeAfterDrop();
 }

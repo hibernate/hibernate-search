@@ -97,6 +97,7 @@ public final class MassIndexingJob {
 		private Boolean mergeSegmentsAfterPurge;
 		private Boolean mergeSegmentsOnFinish;
 		private Boolean purgeAllOnStart;
+		private Boolean dropAndCreateSchemaOnStart;
 		private Integer idFetchSize;
 		private Integer entityFetchSize;
 		private Integer checkpointInterval;
@@ -294,7 +295,7 @@ public final class MassIndexingJob {
 		}
 
 		/**
-		 * Specify whether the existing lucene index should be purged at the beginning of the job. This operation takes
+		 * Specify whether the existing index should be purged at the beginning of the job. This operation takes
 		 * place before indexing.
 		 * <p>
 		 * This is an optional parameter, its default value is
@@ -306,6 +307,22 @@ public final class MassIndexingJob {
 		 */
 		public ParametersBuilder purgeAllOnStart(boolean purgeAllOnStart) {
 			this.purgeAllOnStart = purgeAllOnStart;
+			return this;
+		}
+
+		/**
+		 * Specify whether the existing schema should be dropped and created at the beginning of the job.
+		 * This operation takes place before indexing.
+		 * <p>
+		 * This is an optional parameter, its default value is
+		 * {@link MassIndexingJobParameters.Defaults#DROP_AND_CREATE_SCHEMA_ON_START}.
+		 *
+		 * @param dropAndCreateSchemaOnStart whether to drop and crate the schema on start.
+		 *
+		 * @return itself
+		 */
+		public ParametersBuilder dropAndCreateSchemaOnStart(boolean dropAndCreateSchemaOnStart) {
+			this.dropAndCreateSchemaOnStart = dropAndCreateSchemaOnStart;
 			return this;
 		}
 
@@ -439,6 +456,7 @@ public final class MassIndexingJob {
 			addIfNotNull( jobParams, MassIndexingJobParameters.MERGE_SEGMENTS_AFTER_PURGE, mergeSegmentsAfterPurge );
 			addIfNotNull( jobParams, MassIndexingJobParameters.MERGE_SEGMENTS_ON_FINISH, mergeSegmentsOnFinish );
 			addIfNotNull( jobParams, MassIndexingJobParameters.PURGE_ALL_ON_START, purgeAllOnStart );
+			addIfNotNull( jobParams, MassIndexingJobParameters.DROP_AND_CREATE_SCHEMA_ON_START, dropAndCreateSchemaOnStart );
 			addIfNotNull( jobParams, MassIndexingJobParameters.ENTITY_TYPES, getEntityTypesAsString() );
 			addIfNotNull( jobParams, MassIndexingJobParameters.ROWS_PER_PARTITION, rowsPerPartition );
 			addIfNotNull( jobParams, MassIndexingJobParameters.TENANT_ID, tenantId );

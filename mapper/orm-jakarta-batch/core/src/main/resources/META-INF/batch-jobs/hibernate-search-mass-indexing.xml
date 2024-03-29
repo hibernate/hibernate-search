@@ -23,6 +23,7 @@
                 <property name="mergeSegmentsOnFinish" value="#{jobParameters['mergeSegmentsOnFinish']}" />
                 <property name="mergeSegmentsAfterPurge" value="#{jobParameters['mergeSegmentsAfterPurge']}" />
                 <property name="purgeAllOnStart" value="#{jobParameters['purgeAllOnStart']}" />
+                <property name="dropAndCreateSchemaOnStart" value="#{jobParameters['dropAndCreateSchemaOnStart']}" />
                 <property name="sessionClearInterval" value="#{jobParameters['sessionClearInterval']}" />
                 <property name="checkpointInterval" value="#{jobParameters['checkpointInterval']}" />
                 <property name="rowsPerPartition" value="#{jobParameters['rowsPerPartition']}" />
@@ -37,6 +38,7 @@
             <properties>
                 <property name="optimizeAfterPurge" value="#{jobParameters['optimizeAfterPurge']}" />
                 <property name="purgeAllOnStart" value="#{jobParameters['purgeAllOnStart']}" />
+                <property name="dropAndCreateSchemaOnStart" value="#{jobParameters['dropAndCreateSchemaOnStart']}" />
                 <property name="tenantId" value="#{jobParameters['tenantId']}" />
             </properties>
         </batchlet>

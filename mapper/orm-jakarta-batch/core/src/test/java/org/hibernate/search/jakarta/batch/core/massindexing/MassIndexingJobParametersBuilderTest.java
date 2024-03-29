@@ -33,6 +33,7 @@ class MassIndexingJobParametersBuilderTest {
 	private static final boolean MERGE_SEGMENTS_AFTER_PURGE = true;
 	private static final boolean MERGE_SEGMENTS_ON_FINISH = true;
 	private static final boolean PURGE_ALL_ON_START = true;
+	private static final boolean DROP_AND_CREATE_SCHEMA_ON_START = false;
 	private static final int ID_FETCH_SIZE = Integer.MIN_VALUE;
 	private static final int ENTITY_FETCH_SIZE = 12;
 	private static final int MAX_RESULTS_PER_ENTITY = 10_000;
@@ -55,6 +56,7 @@ class MassIndexingJobParametersBuilderTest {
 				.rowsPerPartition( ROWS_PER_PARTITION )
 				.checkpointInterval( CHECKPOINT_INTERVAL )
 				.purgeAllOnStart( PURGE_ALL_ON_START )
+				.dropAndCreateSchemaOnStart( DROP_AND_CREATE_SCHEMA_ON_START )
 				.cacheMode( CACHE_MODE )
 				.tenantId( TENANT_ID )
 				.build();
@@ -77,6 +79,8 @@ class MassIndexingJobParametersBuilderTest {
 				.isEqualTo( CHECKPOINT_INTERVAL );
 		assertThat( Boolean.parseBoolean( props.getProperty( MassIndexingJobParameters.PURGE_ALL_ON_START ) ) )
 				.isEqualTo( PURGE_ALL_ON_START );
+		assertThat( Boolean.parseBoolean( props.getProperty( MassIndexingJobParameters.DROP_AND_CREATE_SCHEMA_ON_START ) ) )
+				.isEqualTo( DROP_AND_CREATE_SCHEMA_ON_START );
 		assertThat( Integer.parseInt( props.getProperty( MassIndexingJobParameters.MAX_THREADS ) ) ).isEqualTo( MAX_THREADS );
 		assertThat( CacheMode.valueOf( props.getProperty( MassIndexingJobParameters.CACHE_MODE ) ) ).isEqualTo( CACHE_MODE );
 		assertThat( props.getProperty( MassIndexingJobParameters.TENANT_ID ) ).isEqualTo( TENANT_ID );
