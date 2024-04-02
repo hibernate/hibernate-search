@@ -23,10 +23,10 @@ import org.hibernate.search.backend.lucene.search.timeout.impl.LuceneCounterAdap
 import org.hibernate.search.engine.common.timing.Deadline;
 import org.hibernate.search.engine.search.timeout.spi.TimeoutManager;
 
+import org.apache.lucene.index.QueryTimeout;
 import org.apache.lucene.search.Collector;
 import org.apache.lucene.search.CollectorManager;
 import org.apache.lucene.search.MultiCollector;
-import org.apache.lucene.search.TimeLimitingCollector;
 import org.apache.lucene.util.Counter;
 
 public abstract class HibernateSearchMultiCollectorManager
@@ -52,32 +52,12 @@ public abstract class HibernateSearchMultiCollectorManager
 
 	private final TimeoutManager timeoutManager;
 
-	@Override
-	public final Collector newCollector() throws IOException {
-		return wrapTimeLimitingCollectorIfNecessary( actualNewCollector() );
-	}
-
-	protected abstract Collector actualNewCollector() throws IOException;
-
-	private Collector wrapTimeLimitingCollectorIfNecessary(Collector collector) {
-		final Deadline deadline = timeoutManager.deadlineOrNull();
+	public HibernateSearchQueryTimeout queryTimeout() {
+		Deadline deadline = timeoutManager.deadlineOrNull();
 		if ( deadline != null ) {
-			TimeLimitingCollector wrapped = new HibernateSearchTimeLimitingCollector( collector,
-					new LuceneCounterAdapter( timeoutManager.timingSource() ),
-					deadline.checkRemainingTimeMillis() );
-			// The timeout starts from the given baseline, not from when the collector is first used.
-			// This is important because some collectors are applied during a second search.
-			wrapped.setBaseline( timeoutManager.timeoutBaseline() );
-			return wrapped;
+			return new HibernateSearchQueryTimeout( timeoutManager, deadline );
 		}
-		return collector;
-	}
-
-	private static Collector unwrapTimeLimitingCollectorIfNecessary(Collector collector) {
-		if ( collector instanceof HibernateSearchTimeLimitingCollector ) {
-			return ( (HibernateSearchTimeLimitingCollector) collector ).originalCollector();
-		}
-		return collector;
+		return null;
 	}
 
 
@@ -91,7 +71,7 @@ public abstract class HibernateSearchMultiCollectorManager
 		}
 
 		@Override
-		protected Collector actualNewCollector() throws IOException {
+		public Collector newCollector() throws IOException {
 			Collector[] collectors = new Collector[collectorManagers.size()];
 			int i = 0;
 			for ( CollectorManager<? extends Collector, ?> collectorManager : collectorManagers.values() ) {
@@ -109,8 +89,7 @@ public abstract class HibernateSearchMultiCollectorManager
 			int i = 0;
 			for ( Map.Entry<CollectorKey<?, ?>, CollectorManager<Collector, ?>> entry : collectorManagers.entrySet() ) {
 				List<Collector> toReduce = new ArrayList<>( size );
-				for ( Collector possiblyWrappedCollector : collectors ) {
-					Collector collector = unwrapTimeLimitingCollectorIfNecessary( possiblyWrappedCollector );
+				for ( Collector collector : collectors ) {
 					toReduce.add( ( (MultiCollector) collector ).getCollectors()[i] );
 				}
 				results.put( entry.getKey(), entry.getValue().reduce( toReduce ) );
@@ -134,17 +113,13 @@ public abstract class HibernateSearchMultiCollectorManager
 		}
 
 		@Override
-		protected Collector actualNewCollector() throws IOException {
+		public Collector newCollector() throws IOException {
 			return collectorManager.newCollector();
 		}
 
 		@Override
 		public MultiCollectedResults reduce(Collection<Collector> collectors) throws IOException {
-			Collection<Collector> unwrapped = new ArrayList<>();
-			for ( Collector collector : collectors ) {
-				unwrapped.add( unwrapTimeLimitingCollectorIfNecessary( collector ) );
-			}
-			return new MultiCollectedResults( Collections.singletonMap( key, collectorManager.reduce( unwrapped ) ) );
+			return new MultiCollectedResults( Collections.singletonMap( key, collectorManager.reduce( collectors ) ) );
 		}
 	}
 
@@ -203,24 +178,36 @@ public abstract class HibernateSearchMultiCollectorManager
 		}
 	}
 
-	private static final class HibernateSearchTimeLimitingCollector extends TimeLimitingCollector {
+	public static final class HibernateSearchQueryTimeout implements QueryTimeout {
+		private final Deadline deadline;
+		private final Counter clock;
+		private final long baseline;
+		private final long timeout;
 
-		private final Collector collector;
+		private boolean reached = false;
 
-		/**
-		 * Create a TimeLimitedCollector wrapper over another {@link Collector} with a specified timeout.
-		 *
-		 * @param collector the wrapped {@link Collector}
-		 * @param clock the timer clock
-		 * @param ticksAllowed max time allowed for collecting hits after which {@link TimeExceededException} is thrown
-		 */
-		public HibernateSearchTimeLimitingCollector(Collector collector, Counter clock, long ticksAllowed) {
-			super( collector, clock, ticksAllowed );
-			this.collector = collector;
+		public HibernateSearchQueryTimeout(TimeoutManager timeoutManager, Deadline deadline) {
+			this.deadline = deadline;
+			this.clock = new LuceneCounterAdapter( timeoutManager.timingSource() );
+			this.baseline = timeoutManager.timeoutBaseline();
+			// The timeout starts from the given baseline, not from when the collector is first used.
+			// This is important because some collectors are applied during a second search.
+			this.timeout = baseline + deadline.checkRemainingTimeMillis();
+
 		}
 
-		public Collector originalCollector() {
-			return collector;
+		public boolean isReached() {
+			return reached;
+		}
+
+		@Override
+		public boolean shouldExit() {
+			if ( clock.get() > timeout ) {
+				reached = true;
+				deadline.forceTimeout( null );
+				return true;
+			}
+			return false;
 		}
 	}
 }
