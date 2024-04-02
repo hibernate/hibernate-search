@@ -40,7 +40,8 @@ class SearchQueryTimeoutIT {
 	private static final int NON_MATCHING_INTEGER = 739;
 
 	// Increasing this will increase query execution time.
-	private static final int DOCUMENT_COUNT = 100;
+	// Should be more than TimeLimitingBulkScorer#INTERVAL
+	private static final int DOCUMENT_COUNT = 1000;
 
 	@RegisterExtension
 	public static SearchSetupHelper setupHelper = SearchSetupHelper.create();
@@ -122,14 +123,15 @@ class SearchQueryTimeoutIT {
 				.truncateAfter( 1, TimeUnit.NANOSECONDS )
 				.toQuery();
 
-		try ( SearchScroll<DocumentReference> scroll = query.scroll( 5 ) ) {
+		// see TimeLimitingBulkScorer#INTERVAL
+		try ( SearchScroll<DocumentReference> scroll = query.scroll( 110 ) ) {
 			SearchScrollResult<DocumentReference> result = scroll.next();
 			assertThat( result.took() ).isNotNull(); // May be 0 due to low resolution
 			assertThat( result.timedOut() ).isTrue();
 
-			assertThat( result.hits() ).hasSizeLessThan( 5 );
+			assertThat( result.hits() ).hasSizeLessThan( 110 );
 			assertThat( result.total().isHitCountLowerBound() ).isTrue();
-			assertThat( result.total().hitCountLowerBound() ).isLessThanOrEqualTo( 5 );
+			assertThat( result.total().hitCountLowerBound() ).isLessThanOrEqualTo( 110 );
 		}
 	}
 

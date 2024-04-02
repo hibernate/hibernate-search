@@ -18,11 +18,9 @@ import org.hibernate.search.backend.lucene.lowlevel.collector.impl.TopDocsDataCo
 import org.hibernate.search.backend.lucene.lowlevel.collector.impl.TopDocsDataCollectorExecutionContext;
 import org.hibernate.search.backend.lucene.lowlevel.query.impl.ExplicitDocIdsQuery;
 import org.hibernate.search.backend.lucene.lowlevel.reader.impl.IndexReaderMetadataResolver;
-import org.hibernate.search.engine.common.timing.Deadline;
 import org.hibernate.search.engine.search.query.SearchResultTotal;
 import org.hibernate.search.engine.search.query.spi.SimpleSearchResultTotal;
 import org.hibernate.search.engine.search.timeout.spi.TimeoutManager;
-import org.hibernate.search.util.common.AssertionFailure;
 
 import com.carrotsearch.hppc.IntObjectMap;
 
@@ -31,7 +29,6 @@ import org.apache.lucene.search.IndexSearcher;
 import org.apache.lucene.search.MatchAllDocsQuery;
 import org.apache.lucene.search.Query;
 import org.apache.lucene.search.ScoreDoc;
-import org.apache.lucene.search.TimeLimitingCollector;
 import org.apache.lucene.search.TopDocs;
 import org.apache.lucene.search.TopDocsCollector;
 import org.apache.lucene.search.TopFieldCollector;
@@ -90,18 +87,13 @@ public class LuceneCollectors {
 			// in case of timeout before the query execution, skip the query
 			return;
 		}
-		try {
-			if ( collectorsForAllMatchingDocs != null ) {
-				results = indexSearcher.search(
-						rewrittenLuceneQuery, collectorsForAllMatchingDocs );
+		if ( collectorsForAllMatchingDocs != null ) {
+			var timeout = collectorsForAllMatchingDocs.queryTimeout();
+			indexSearcher.setTimeout( timeout );
+			MultiCollectedResults collectedResults = indexSearcher.search( rewrittenLuceneQuery, collectorsForAllMatchingDocs );
+			if ( canSafelyCollectResults( timeout ) ) {
+				results = collectedResults;
 			}
-		}
-		catch (TimeLimitingCollector.TimeExceededException e) {
-			Deadline deadline = timeoutManager.deadlineOrNull();
-			if ( deadline == null ) {
-				throw new AssertionFailure( "Timeout reached, but no timeout was defined", e );
-			}
-			deadline.forceTimeout( e );
 		}
 
 		processCollectedMatchingDocs();
@@ -163,22 +155,21 @@ public class LuceneCollectors {
 			int startInclusive, int endExclusive)
 			throws IOException {
 		List<T> extractedData = new ArrayList<>( endExclusive - startInclusive );
-		try {
-			ScoreDoc[] scoreDocs = topDocs.scoreDocs;
-			ExplicitDocIdsQuery topDocsQuery = new ExplicitDocIdsQuery( scoreDocs, startInclusive, endExclusive );
-			HibernateSearchMultiCollectorManager collectorManager = buildTopDocsDataCollectors( collectorFactory );
-			MultiCollectedResults collectedResults = indexSearcher.search( topDocsQuery, collectorManager );
+		ScoreDoc[] scoreDocs = topDocs.scoreDocs;
+		ExplicitDocIdsQuery topDocsQuery = new ExplicitDocIdsQuery( scoreDocs, startInclusive, endExclusive );
+		HibernateSearchMultiCollectorManager collectorManager = buildTopDocsDataCollectors( collectorFactory );
+		var timeout = collectorManager.queryTimeout();
+		indexSearcher.setTimeout( timeout );
+		MultiCollectedResults collectedResults = indexSearcher.search( topDocsQuery, collectorManager );
+
+		// If we had a timeout set, and we've reached it while collecting the data
+		//   then the collector state will be unpredictable
+		//   hence we just skip filling out the extracted data
+		if ( canSafelyCollectResults( timeout ) ) {
 			IntObjectMap<T> collected = collectedResults.get( collectorFactory );
 			for ( int i = startInclusive; i < endExclusive; i++ ) {
 				extractedData.add( collected.get( scoreDocs[i].doc ) );
 			}
-		}
-		catch (TimeLimitingCollector.TimeExceededException e) {
-			Deadline deadline = timeoutManager.deadlineOrNull();
-			if ( deadline == null ) {
-				throw new AssertionFailure( "Timeout reached, but no timeout was defined", e );
-			}
-			deadline.forceTimeout( e );
 		}
 		return extractedData;
 	}
@@ -221,5 +212,9 @@ public class LuceneCollectors {
 				new HibernateSearchMultiCollectorManager.Builder( executionContext, timeoutManager );
 		collectorForTopDocsBuilder.add( collectorManagerFactory, collectorManagerFactory.create( executionContext ) );
 		return collectorForTopDocsBuilder.build();
+	}
+
+	private static boolean canSafelyCollectResults(HibernateSearchMultiCollectorManager.HibernateSearchQueryTimeout timeout) {
+		return timeout == null || !timeout.isReached();
 	}
 }
