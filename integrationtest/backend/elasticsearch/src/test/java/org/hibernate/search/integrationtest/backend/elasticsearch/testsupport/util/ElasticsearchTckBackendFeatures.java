@@ -293,8 +293,8 @@ public class ElasticsearchTckBackendFeatures extends TckBackendFeatures {
 		return isActualVersion(
 				es -> true,
 				// https://github.com/opensearch-project/OpenSearch/issues/12432
-				os -> os.isLessThan( "2.12.0" ) || !FloatFieldTypeDescriptor.INSTANCE.equals( fieldType ),
-				aoss -> false
+				os -> !os.isMatching( "2.12.0" ) || !FloatFieldTypeDescriptor.INSTANCE.equals( fieldType ),
+				aoss -> true
 		);
 	}
 
