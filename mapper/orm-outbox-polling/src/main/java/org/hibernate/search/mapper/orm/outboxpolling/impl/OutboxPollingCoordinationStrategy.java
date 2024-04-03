@@ -32,14 +32,14 @@ import org.hibernate.search.mapper.orm.outboxpolling.cfg.UuidGenerationStrategy;
 import org.hibernate.search.mapper.orm.outboxpolling.cfg.impl.HibernateOrmMapperOutboxPollingImplSettings;
 import org.hibernate.search.mapper.orm.outboxpolling.cluster.impl.AgentRepositoryProvider;
 import org.hibernate.search.mapper.orm.outboxpolling.cluster.impl.DefaultAgentRepository;
-import org.hibernate.search.mapper.orm.outboxpolling.cluster.impl.OutboxPollingAgentAdditionalJaxbMappingProducer;
+import org.hibernate.search.mapper.orm.outboxpolling.cluster.impl.OutboxPollingAgentAdditionalMappingProducer;
 import org.hibernate.search.mapper.orm.outboxpolling.cluster.impl.ShardAssignmentDescriptor;
 import org.hibernate.search.mapper.orm.outboxpolling.event.impl.DefaultOutboxEventFinder;
 import org.hibernate.search.mapper.orm.outboxpolling.event.impl.OutboxEventFinderProvider;
 import org.hibernate.search.mapper.orm.outboxpolling.event.impl.OutboxEventOrder;
 import org.hibernate.search.mapper.orm.outboxpolling.event.impl.OutboxPollingEventProcessor;
 import org.hibernate.search.mapper.orm.outboxpolling.event.impl.OutboxPollingMassIndexerAgent;
-import org.hibernate.search.mapper.orm.outboxpolling.event.impl.OutboxPollingOutboxEventAdditionalJaxbMappingProducer;
+import org.hibernate.search.mapper.orm.outboxpolling.event.impl.OutboxPollingOutboxEventAdditionalMappingProducer;
 import org.hibernate.search.mapper.orm.outboxpolling.event.impl.OutboxPollingOutboxEventSendingPlan;
 import org.hibernate.search.mapper.orm.outboxpolling.logging.impl.Log;
 import org.hibernate.search.mapper.orm.outboxpolling.mapping.impl.OutboxPollingSearchMappingImpl;
@@ -93,8 +93,8 @@ public class OutboxPollingCoordinationStrategy implements CoordinationStrategy {
 
 	@Override
 	public void configure(CoordinationConfigurationContext context) {
-		context.mappingProducer( new OutboxPollingOutboxEventAdditionalJaxbMappingProducer() );
-		context.mappingProducer( new OutboxPollingAgentAdditionalJaxbMappingProducer() );
+		context.mappingProducer( new OutboxPollingOutboxEventAdditionalMappingProducer() );
+		context.mappingProducer( new OutboxPollingAgentAdditionalMappingProducer() );
 		context.sendIndexingEventsTo(
 				ctx -> new OutboxPollingOutboxEventSendingPlan( ctx.entityReferenceFactory(), ctx.session() ), true );
 	}
@@ -105,7 +105,7 @@ public class OutboxPollingCoordinationStrategy implements CoordinationStrategy {
 
 		OutboxEventOrder processingOrder = OutboxEventOrder.of(
 				EVENT_PROCESSOR_ORDER.get( configurationSource ),
-				OutboxPollingOutboxEventAdditionalJaxbMappingProducer.ENTITY_MAPPING_OUTBOXEVENT_UUID_GEN_STRATEGY
+				OutboxPollingOutboxEventAdditionalMappingProducer.ENTITY_MAPPING_OUTBOXEVENT_UUID_GEN_STRATEGY
 						.get( configurationSource )
 						.orElse( UuidGenerationStrategy.AUTO ),
 				context.mapping().sessionFactory().getJdbcServices().getDialect()

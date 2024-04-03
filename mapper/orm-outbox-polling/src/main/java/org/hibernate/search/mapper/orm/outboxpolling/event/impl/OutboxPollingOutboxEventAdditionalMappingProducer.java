@@ -7,12 +7,14 @@
 package org.hibernate.search.mapper.orm.outboxpolling.event.impl;
 
 import java.lang.invoke.MethodHandles;
-import java.util.Map;
 import java.util.Optional;
+import java.util.function.Consumer;
 
 import org.hibernate.Length;
 import org.hibernate.boot.jaxb.mapping.spi.JaxbEntityMappingsImpl;
+import org.hibernate.boot.spi.AdditionalMappingContributions;
 import org.hibernate.boot.spi.MetadataBuildingContext;
+import org.hibernate.models.spi.ClassDetails;
 import org.hibernate.search.engine.cfg.ConfigurationPropertySource;
 import org.hibernate.search.engine.cfg.spi.ConfigurationProperty;
 import org.hibernate.search.engine.cfg.spi.OptionalConfigurationProperty;
@@ -21,14 +23,14 @@ import org.hibernate.search.mapper.orm.outboxpolling.cfg.HibernateOrmMapperOutbo
 import org.hibernate.search.mapper.orm.outboxpolling.cfg.UuidGenerationStrategy;
 import org.hibernate.search.mapper.orm.outboxpolling.cfg.impl.UuidDataTypeUtils;
 import org.hibernate.search.mapper.orm.outboxpolling.cfg.spi.HibernateOrmMapperOutboxPollingSpiSettings;
+import org.hibernate.search.mapper.orm.outboxpolling.cluster.impl.Agent;
 import org.hibernate.search.mapper.orm.outboxpolling.impl.HibernateOrmUtils;
 import org.hibernate.search.mapper.orm.outboxpolling.logging.impl.Log;
 import org.hibernate.search.mapper.orm.outboxpolling.mapping.impl.AdditionalMappingBuilder;
 import org.hibernate.search.mapper.orm.outboxpolling.mapping.impl.JaxbMappingHelper;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
-import org.hibernate.type.SqlTypes;
 
-public final class OutboxPollingOutboxEventAdditionalJaxbMappingProducer
+public final class OutboxPollingOutboxEventAdditionalMappingProducer
 		implements HibernateSearchOrmMappingProducer {
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
@@ -42,13 +44,42 @@ public final class OutboxPollingOutboxEventAdditionalJaxbMappingProducer
 	// because our override actually matches the default for the native entity name.
 	public static final String ENTITY_NAME = CLASS_NAME;
 
-	public static final String ENTITY_DEFINITION = JaxbMappingHelper.marshall( createMappings( "", "",
-			HibernateOrmMapperOutboxPollingSettings.Defaults.COORDINATION_ENTITY_MAPPING_OUTBOX_EVENT_TABLE,
-			SqlTypes.CHAR,
-			HibernateOrmMapperOutboxPollingSettings.Defaults.COORDINATION_ENTITY_MAPPING_OUTBOX_EVENT_UUID_GEN_STRATEGY
-					.strategy(),
-			false
-	) );
+	public static final String ENTITY_DEFINITION = "<entity-mappings xmlns=\"http://www.hibernate.org/xsd/orm/mapping\">\n"
+			+ "    <entity name=\"org.hibernate.search.mapper.orm.outboxpolling.event.impl.OutboxEvent\" class=\"org.hibernate.search.mapper.orm.outboxpolling.event.impl.OutboxEvent\" access=\"FIELD\">\n"
+			+ "        <table name=\"HSEARCH_OUTBOX_EVENT\" catalog=\"\" schema=\"\">\n"
+			+ "            <index name=\"entityIdHash\" column-list=\"entityIdHash\"/>\n"
+			+ "            <index name=\"status\" column-list=\"status\"/>\n"
+			+ "            <index name=\"processAfter\" column-list=\"processAfter\"/>\n"
+			+ "        </table>\n"
+			+ "        <attributes>\n"
+			+ "            <id name=\"id\">\n"
+			+ "                <uuid-generator style=\"random\"/>\n"
+			+ "            </id>\n"
+			+ "            <basic name=\"entityName\">\n"
+			+ "                <column name=\"entityName\" nullable=\"false\" length=\"256\"/>\n"
+			+ "            </basic>\n"
+			+ "            <basic name=\"entityId\">\n"
+			+ "                <column name=\"entityId\" nullable=\"false\" length=\"256\"/>\n"
+			+ "            </basic>\n"
+			+ "            <basic name=\"entityIdHash\">\n"
+			+ "                <column name=\"entityIdHash\" nullable=\"false\"/>\n"
+			+ "            </basic>\n"
+			+ "            <basic name=\"payload\">\n"
+			+ "                <column name=\"payload\" nullable=\"false\" length=\"2147483647\"/>\n"
+			+ "            </basic>\n"
+			+ "            <basic name=\"retries\">\n"
+			+ "                <column name=\"retries\" nullable=\"false\"/>\n"
+			+ "            </basic>\n"
+			+ "            <basic name=\"processAfter\">\n"
+			+ "                <column name=\"processAfter\" nullable=\"false\"/>\n"
+			+ "            </basic>\n"
+			+ "            <basic name=\"status\">\n"
+			+ "                <column name=\"status\" nullable=\"false\"/>\n"
+			+ "                <enumerated>STRING</enumerated>\n"
+			+ "            </basic>\n"
+			+ "        </attributes>\n"
+			+ "    </entity>\n"
+			+ "</entity-mappings>";
 
 	private static final OptionalConfigurationProperty<String> OUTBOXEVENT_ENTITY_MAPPING =
 			ConfigurationProperty.forKey(
@@ -88,7 +119,7 @@ public final class OutboxPollingOutboxEventAdditionalJaxbMappingProducer
 
 
 	@Override
-	public Map<Class<?>, JaxbEntityMappingsImpl> produceMappings(ConfigurationPropertySource propertySource,
+	public Consumer<AdditionalMappingContributions> produceMappingContributor(ConfigurationPropertySource propertySource,
 			MetadataBuildingContext buildingContext) {
 		Optional<String> mapping = OUTBOXEVENT_ENTITY_MAPPING.get( propertySource );
 		Optional<String> schema = ENTITY_MAPPING_OUTBOXEVENT_SCHEMA.get( propertySource );
@@ -119,16 +150,21 @@ public final class OutboxPollingOutboxEventAdditionalJaxbMappingProducer
 			);
 		}
 
-		JaxbEntityMappingsImpl mappings;
 		if ( mapping.isPresent() ) {
-			mappings = JaxbMappingHelper.unmarshall( mapping.get() );
+			JaxbEntityMappingsImpl mappings = JaxbMappingHelper.unmarshall( mapping.get() );
+			log.outboxEventGeneratedEntityMapping( mappings );
+			return contributions -> {
+				contributions.contributeEntity( Agent.class );
+				contributions.contributeBinding( mappings );
+			};
 		}
 		else {
 			Integer resolvedUuidType = uuidType.orElse( null );
 			String resolvedUuidStrategy = uuidStrategy.orElse(
 					HibernateOrmMapperOutboxPollingSettings.Defaults.COORDINATION_ENTITY_MAPPING_OUTBOX_EVENT_UUID_GEN_STRATEGY )
 					.strategy();
-			mappings = createMappings(
+			ClassDetails mappings = createMappings(
+					buildingContext,
 					schema.orElse( "" ),
 					catalog.orElse( "" ),
 					table.orElse(
@@ -136,18 +172,21 @@ public final class OutboxPollingOutboxEventAdditionalJaxbMappingProducer
 					resolvedUuidType, resolvedUuidStrategy,
 					HibernateOrmUtils.isDiscriminatorMultiTenancyEnabled( buildingContext )
 			);
+
+			log.outboxEventGeneratedEntityMappingClassDetails( mappings );
+
+			return contributions -> {
+				contributions.contributeEntity( Agent.class );
+				contributions.contributeManagedClass( mappings );
+			};
 		}
-
-		log.outboxEventGeneratedEntityMapping( mappings );
-
-		return Map.of( OutboxEvent.class, mappings );
 	}
 
-	private static JaxbEntityMappingsImpl createMappings(String schema, String catalog,
+	private static ClassDetails createMappings(MetadataBuildingContext buildingContext, String schema, String catalog,
 			String table, Integer resolvedUuidType, String resolvedUuidStrategy,
 			boolean tenantIdRequired) {
 		AdditionalMappingBuilder builder = new AdditionalMappingBuilder(
-				OutboxEvent.class, ENTITY_NAME )
+				buildingContext, OutboxEvent.class, ENTITY_NAME )
 				.id( resolvedUuidType, resolvedUuidStrategy )
 				.index( "entityIdHash" )
 				.index( "status" )

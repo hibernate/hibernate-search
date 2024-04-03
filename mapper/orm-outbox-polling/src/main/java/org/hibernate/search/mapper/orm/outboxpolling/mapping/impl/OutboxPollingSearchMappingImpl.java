@@ -6,7 +6,7 @@
  */
 package org.hibernate.search.mapper.orm.outboxpolling.mapping.impl;
 
-import static org.hibernate.search.mapper.orm.outboxpolling.event.impl.OutboxPollingOutboxEventAdditionalJaxbMappingProducer.ENTITY_NAME;
+import static org.hibernate.search.mapper.orm.outboxpolling.event.impl.OutboxPollingOutboxEventAdditionalMappingProducer.ENTITY_NAME;
 
 import java.lang.invoke.MethodHandles;
 import java.util.Set;

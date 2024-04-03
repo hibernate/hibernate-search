@@ -8,8 +8,8 @@ package org.hibernate.search.mapper.orm.outboxpolling.cfg.spi;
 
 import org.hibernate.search.mapper.orm.cfg.HibernateOrmMapperSettings;
 import org.hibernate.search.mapper.orm.outboxpolling.cfg.HibernateOrmMapperOutboxPollingSettings;
-import org.hibernate.search.mapper.orm.outboxpolling.cluster.impl.OutboxPollingAgentAdditionalJaxbMappingProducer;
-import org.hibernate.search.mapper.orm.outboxpolling.event.impl.OutboxPollingOutboxEventAdditionalJaxbMappingProducer;
+import org.hibernate.search.mapper.orm.outboxpolling.cluster.impl.OutboxPollingAgentAdditionalMappingProducer;
+import org.hibernate.search.mapper.orm.outboxpolling.event.impl.OutboxPollingOutboxEventAdditionalMappingProducer;
 import org.hibernate.search.util.common.annotation.Incubating;
 
 /**
@@ -35,7 +35,7 @@ public final class HibernateOrmMapperOutboxPollingSpiSettings {
 	 * <p>
 	 * Expects a String value containing the xml expressing the Hibernate mapping for the entity.
 	 * <p>
-	 * The default for this value is {@link OutboxPollingOutboxEventAdditionalJaxbMappingProducer#ENTITY_DEFINITION}
+	 * The default for this value is {@link OutboxPollingOutboxEventAdditionalMappingProducer#ENTITY_DEFINITION}
 	 * <p>
 	 * As this configuration entirely overrides the entity mapping it cannot be used in combination with any properties
 	 * that define names of catalog/schema/table/identity generator for the outbox event table (
@@ -56,7 +56,7 @@ public final class HibernateOrmMapperOutboxPollingSpiSettings {
 	 * <p>
 	 * Expects a String value containing the xml expressing the Hibernate mapping for the entity.
 	 * <p>
-	 * The default for this value is {@link OutboxPollingAgentAdditionalJaxbMappingProducer#ENTITY_DEFINITION}
+	 * The default for this value is {@link OutboxPollingAgentAdditionalMappingProducer#ENTITY_DEFINITION}
 	 * <p>
 	 * As this configuration entirely overrides the entity mapping it cannot be used in combination with any properties
 	 * that define names of catalog/schema/table/identity generator for the agent table (

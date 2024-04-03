@@ -18,6 +18,7 @@ import java.util.UUID;
 import jakarta.persistence.PersistenceException;
 
 import org.hibernate.boot.jaxb.mapping.spi.JaxbEntityMappingsImpl;
+import org.hibernate.models.spi.ClassDetails;
 import org.hibernate.search.mapper.orm.outboxpolling.cluster.impl.Agent;
 import org.hibernate.search.mapper.orm.outboxpolling.cluster.impl.AgentReference;
 import org.hibernate.search.mapper.orm.outboxpolling.cluster.impl.ShardAssignmentDescriptor;
@@ -220,4 +221,14 @@ public interface Log extends BasicLogger {
 			value = "Configuration property '%1$s' is configured with a deprecated value '%2$s'. "
 					+ "Use '%3$s' instead.")
 	void usingDeprecatedPropertyValue(String property, String value, String correctValue);
+
+	@LogMessage(level = DEBUG)
+	@Message(id = ID_OFFSET + 38,
+			value = "Generated entity mapping for outbox events used in the outbox-polling coordination strategy: %1$s")
+	void outboxEventGeneratedEntityMappingClassDetails(@FormatWith(ClassDetailsMappingsFormatter.class) ClassDetails mappings);
+
+	@LogMessage(level = DEBUG)
+	@Message(id = ID_OFFSET + 39,
+			value = "Generated entity mapping for agents used in the outbox-polling coordination strategy: %1$s")
+	void agentGeneratedEntityMappingClassDetails(@FormatWith(ClassDetailsMappingsFormatter.class) ClassDetails mappings);
 }

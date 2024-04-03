@@ -6,11 +6,9 @@
  */
 package org.hibernate.search.mapper.orm.bootstrap.impl;
 
-import java.util.Map;
 import java.util.Optional;
 
 import org.hibernate.boot.ResourceStreamLocator;
-import org.hibernate.boot.jaxb.mapping.spi.JaxbEntityMappingsImpl;
 import org.hibernate.boot.spi.AdditionalMappingContributions;
 import org.hibernate.boot.spi.AdditionalMappingContributor;
 import org.hibernate.boot.spi.InFlightMetadataCollector;
@@ -43,13 +41,8 @@ public class HibernateSearchCompositeMappingProducer implements AdditionalMappin
 
 		for ( HibernateSearchOrmMappingProducer mappingProducer : preIntegrationService
 				.coordinationStrategyConfiguration().mappingProducers() ) {
-			for ( Map.Entry<Class<?>, JaxbEntityMappingsImpl> entry : mappingProducer.produceMappings(
-					propertySource,
-					buildingContext
-			).entrySet() ) {
-				contributions.contributeEntity( entry.getKey() );
-				contributions.contributeBinding( entry.getValue() );
-			}
+
+			mappingProducer.produceMappingContributor( propertySource, buildingContext ).accept( contributions );
 		}
 	}
 }

@@ -266,6 +266,8 @@
                                 <!-- The base package to start from: -->
                                 <argument>org.hibernate</argument>
                                 <!-- Ignore rules: -->
+                                <argument>^org\.hibernate\.models\.internal\.jdk$</argument>
+                                <argument>^org\.hibernate\.models\.internal\.jdk\.AnnotationHelper$</argument>
                             </arguments>
                             <!--
                                 While this will include more than we really need, it is easier to do so.
