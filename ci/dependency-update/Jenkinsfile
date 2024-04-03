@@ -25,6 +25,8 @@ Map settings() {
 			return [
 					updateProperties: ['version.org.hibernate.orm'],
 					onlyRunTestDependingOn: ['hibernate-search-mapper-orm'],
+					// just rebuild all dependants since ORM7 upgrade will affect all mappers
+					additionalMavenArgs: '-am'
 			]
 		case 'lucene9.10':
 			return [
