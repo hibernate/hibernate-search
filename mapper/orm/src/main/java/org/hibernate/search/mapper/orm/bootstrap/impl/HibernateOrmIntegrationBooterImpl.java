@@ -4,18 +4,20 @@
  */
 package org.hibernate.search.mapper.orm.bootstrap.impl;
 
+import static org.hibernate.search.mapper.orm.common.impl.HibernateOrmUtils.createModelBuildingContext;
+
 import java.lang.invoke.MethodHandles;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionStage;
 import java.util.function.BiConsumer;
 
-import org.hibernate.annotations.common.reflection.ReflectionManager;
 import org.hibernate.boot.Metadata;
 import org.hibernate.boot.spi.BootstrapContext;
 import org.hibernate.cfg.AvailableSettings;
 import org.hibernate.engine.config.spi.ConfigurationService;
 import org.hibernate.engine.spi.SessionFactoryImplementor;
+import org.hibernate.models.spi.ClassDetailsRegistry;
 import org.hibernate.resource.beans.container.spi.ExtendedBeanManager;
 import org.hibernate.search.mapper.orm.bootstrap.spi.HibernateOrmIntegrationBooter;
 import org.hibernate.search.mapper.orm.common.impl.HibernateOrmUtils;
@@ -37,17 +39,16 @@ public class HibernateOrmIntegrationBooterImpl implements HibernateOrmIntegratio
 
 	private final Metadata metadata;
 	private final IndexView jandexIndex;
-	private final ReflectionManager reflectionManager;
 	private final ValueHandleFactory valueHandleFactory;
 	private final HibernateSearchPreIntegrationService preIntegrationService;
 	private final Optional<EnvironmentSynchronizer> environmentSynchronizer;
+	private final ClassDetailsRegistry classDetailsRegistry;
 
 	@SuppressWarnings("deprecation") // There is no alternative to getReflectionManager() at the moment.
 	private HibernateOrmIntegrationBooterImpl(BuilderImpl builder) {
 		this.metadata = builder.metadata;
 		ServiceRegistry serviceRegistry = builder.bootstrapContext.getServiceRegistry();
 		this.jandexIndex = builder.bootstrapContext.getJandexView();
-		this.reflectionManager = builder.bootstrapContext.getReflectionManager();
 		this.valueHandleFactory = builder.valueHandleFactory != null
 				? builder.valueHandleFactory
 				: ValueHandleFactory.usingMethodHandle( MethodHandles.publicLookup() );
@@ -79,6 +80,7 @@ public class HibernateOrmIntegrationBooterImpl implements HibernateOrmIntegratio
 				this.environmentSynchronizer = Optional.empty();
 			}
 		}
+		this.classDetailsRegistry = createModelBuildingContext( builder.bootstrapContext ).getClassDetailsRegistry();
 	}
 
 	@Override
@@ -90,7 +92,7 @@ public class HibernateOrmIntegrationBooterImpl implements HibernateOrmIntegratio
 			);
 		}
 
-		preIntegrationService.doBootFirstPhase( metadata, jandexIndex, reflectionManager, valueHandleFactory )
+		preIntegrationService.doBootFirstPhase( metadata, jandexIndex, classDetailsRegistry, valueHandleFactory )
 				.set( propertyCollector );
 	}
 
@@ -174,7 +176,7 @@ public class HibernateOrmIntegrationBooterImpl implements HibernateOrmIntegratio
 
 	private HibernateSearchContextProviderService bootNow(SessionFactoryImplementor sessionFactoryImplementor) {
 		HibernateOrmIntegrationPartialBuildState partialBuildState =
-				preIntegrationService.doBootFirstPhase( metadata, jandexIndex, reflectionManager, valueHandleFactory );
+				preIntegrationService.doBootFirstPhase( metadata, jandexIndex, classDetailsRegistry, valueHandleFactory );
 
 		try {
 			return partialBuildState.doBootSecondPhase( sessionFactoryImplementor,

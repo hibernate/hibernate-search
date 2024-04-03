@@ -8,12 +8,12 @@ import java.lang.invoke.MethodHandles;
 import java.util.Map;
 import java.util.Optional;
 
-import org.hibernate.annotations.common.reflection.ReflectionManager;
 import org.hibernate.boot.Metadata;
 import org.hibernate.boot.registry.StandardServiceInitiator;
 import org.hibernate.boot.registry.StandardServiceRegistryBuilder;
 import org.hibernate.boot.registry.classloading.spi.ClassLoaderService;
 import org.hibernate.engine.config.spi.ConfigurationService;
+import org.hibernate.models.spi.ClassDetailsRegistry;
 import org.hibernate.resource.beans.container.spi.BeanContainer;
 import org.hibernate.resource.beans.spi.ManagedBeanRegistry;
 import org.hibernate.search.engine.Version;
@@ -227,7 +227,7 @@ public abstract class HibernateSearchPreIntegrationService implements Service, A
 	abstract BeanResolver beanResolver();
 
 	abstract HibernateOrmIntegrationPartialBuildState doBootFirstPhase(Metadata metadata,
-			IndexView jandexIndex, ReflectionManager reflectionManager,
+			IndexView jandexIndex, ClassDetailsRegistry classDetailsRegistry,
 			ValueHandleFactory valueHandleFactory);
 
 	static class NotBooted extends HibernateSearchPreIntegrationService {
@@ -262,7 +262,7 @@ public abstract class HibernateSearchPreIntegrationService implements Service, A
 
 		@Override
 		HibernateOrmIntegrationPartialBuildState doBootFirstPhase(Metadata metadata,
-				IndexView jandexIndex, ReflectionManager reflectionManager,
+				IndexView jandexIndex, ClassDetailsRegistry classDetailsRegistry,
 				ValueHandleFactory valueHandleFactory) {
 			HibernateOrmMappingInitiator mappingInitiator = null;
 			SearchIntegrationPartialBuildState searchIntegrationPartialBuildState = null;
@@ -270,7 +270,7 @@ public abstract class HibernateSearchPreIntegrationService implements Service, A
 				SearchIntegration.Builder builder = SearchIntegration.builder( environment );
 
 				HibernateOrmMappingKey mappingKey = new HibernateOrmMappingKey();
-				mappingInitiator = HibernateOrmMappingInitiator.create( metadata, jandexIndex, reflectionManager,
+				mappingInitiator = HibernateOrmMappingInitiator.create( metadata, jandexIndex, classDetailsRegistry,
 						valueHandleFactory, serviceRegistry );
 				builder.addMappingInitiator( mappingKey, mappingInitiator );
 
@@ -322,7 +322,7 @@ public abstract class HibernateSearchPreIntegrationService implements Service, A
 
 		@Override
 		HibernateOrmIntegrationPartialBuildState doBootFirstPhase(Metadata metadata, IndexView jandexIndex,
-				ReflectionManager reflectionManager, ValueHandleFactory valueHandleFactory) {
+				ClassDetailsRegistry classDetailsRegistry, ValueHandleFactory valueHandleFactory) {
 			return partialBuildState;
 		}
 	}
