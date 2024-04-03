@@ -31,7 +31,7 @@ public class DefaultAgentRepository implements AgentRepository {
 	@Override
 	public List<Agent> findAllOrderById() {
 		return session
-				.createQuery( "select a from " + OutboxPollingAgentAdditionalJaxbMappingProducer.ENTITY_NAME + " a order by id",
+				.createQuery( "select a from " + OutboxPollingAgentAdditionalMappingProducer.ENTITY_NAME + " a order by id",
 						Agent.class )
 				.list();
 	}

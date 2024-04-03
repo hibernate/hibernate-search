@@ -83,7 +83,7 @@ public final class DefaultOutboxEventFinder implements OutboxEventFinder {
 	private String createQueryString(Optional<OutboxEventPredicate> predicate, Function<String, String> selectClauseFunction,
 			OutboxEventOrder order) {
 		return "select " + selectClauseFunction.apply( "e" )
-				+ " from " + OutboxPollingOutboxEventAdditionalJaxbMappingProducer.ENTITY_NAME + " e "
+				+ " from " + OutboxPollingOutboxEventAdditionalMappingProducer.ENTITY_NAME + " e "
 				+ ( predicate.isPresent() ? " where " + predicate.get().queryPart( "e" ) : "" )
 				+ order.queryPart( "e" );
 	}

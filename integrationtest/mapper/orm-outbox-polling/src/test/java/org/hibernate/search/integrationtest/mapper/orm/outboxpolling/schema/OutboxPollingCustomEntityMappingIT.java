@@ -35,9 +35,9 @@ import org.hibernate.search.mapper.orm.outboxpolling.avro.impl.EventPayloadSeria
 import org.hibernate.search.mapper.orm.outboxpolling.cfg.HibernateOrmMapperOutboxPollingSettings;
 import org.hibernate.search.mapper.orm.outboxpolling.cfg.impl.HibernateOrmMapperOutboxPollingImplSettings;
 import org.hibernate.search.mapper.orm.outboxpolling.cluster.impl.Agent;
-import org.hibernate.search.mapper.orm.outboxpolling.cluster.impl.OutboxPollingAgentAdditionalJaxbMappingProducer;
+import org.hibernate.search.mapper.orm.outboxpolling.cluster.impl.OutboxPollingAgentAdditionalMappingProducer;
 import org.hibernate.search.mapper.orm.outboxpolling.event.impl.OutboxEvent;
-import org.hibernate.search.mapper.orm.outboxpolling.event.impl.OutboxPollingOutboxEventAdditionalJaxbMappingProducer;
+import org.hibernate.search.mapper.orm.outboxpolling.event.impl.OutboxPollingOutboxEventAdditionalMappingProducer;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.GenericField;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
 import org.hibernate.search.mapper.pojo.work.spi.PojoIndexingQueueEventPayload;
@@ -72,10 +72,10 @@ class OutboxPollingCustomEntityMappingIT {
 	private static final String[] SQL_KEYS;
 
 	static {
-		VALID_OUTBOX_EVENT_MAPPING = OutboxPollingOutboxEventAdditionalJaxbMappingProducer.ENTITY_DEFINITION
+		VALID_OUTBOX_EVENT_MAPPING = OutboxPollingOutboxEventAdditionalMappingProducer.ENTITY_DEFINITION
 				.replace( ORIGINAL_OUTBOX_EVENT_TABLE_NAME, CUSTOM_OUTBOX_EVENT_TABLE_NAME );
 
-		VALID_AGENT_EVENT_MAPPING = OutboxPollingAgentAdditionalJaxbMappingProducer.ENTITY_DEFINITION
+		VALID_AGENT_EVENT_MAPPING = OutboxPollingAgentAdditionalMappingProducer.ENTITY_DEFINITION
 				.replace( ORIGINAL_AGENT_TABLE_NAME, CUSTOM_AGENT_TABLE_NAME );
 
 		SQL_KEYS = new String[] {
@@ -451,7 +451,7 @@ class OutboxPollingCustomEntityMappingIT {
 	private void assertAgentUUIDVersion(Session session, int expectedVersion) {
 		assertThat(
 				session.createQuery(
-						"select a from " + OutboxPollingAgentAdditionalJaxbMappingProducer.ENTITY_NAME + " a ",
+						"select a from " + OutboxPollingAgentAdditionalMappingProducer.ENTITY_NAME + " a ",
 						Agent.class
 				)
 						.getResultList()
@@ -473,7 +473,7 @@ class OutboxPollingCustomEntityMappingIT {
 
 	private void assertAgentPayload(Session session) {
 		List<Agent> agents = session.createQuery(
-				"select a from " + OutboxPollingAgentAdditionalJaxbMappingProducer.ENTITY_NAME + " a ",
+				"select a from " + OutboxPollingAgentAdditionalMappingProducer.ENTITY_NAME + " a ",
 				Agent.class
 		)
 				.getResultList();
