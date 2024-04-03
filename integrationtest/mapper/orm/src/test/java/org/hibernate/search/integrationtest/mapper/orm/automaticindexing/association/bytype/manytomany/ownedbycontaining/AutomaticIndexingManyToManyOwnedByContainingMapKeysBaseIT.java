@@ -212,7 +212,7 @@ public class AutomaticIndexingManyToManyOwnedByContainingMapKeysBaseIT
 				extraction = @ContainerExtraction(BuiltinContainerExtractors.MAP_KEY),
 				targetType = ContainedEntity.class
 		)
-		private Map<Object, String> containedIndexedEmbeddedWithCast = new LinkedHashMap<>();
+		private Map<ContainedEntity, String> containedIndexedEmbeddedWithCast = new LinkedHashMap<>();
 
 		@IndexedEmbedded
 		@Embedded
@@ -288,7 +288,7 @@ public class AutomaticIndexingManyToManyOwnedByContainingMapKeysBaseIT
 			return containedUsedInCrossEntityDerivedProperty;
 		}
 
-		public Map<Object, String> getContainedIndexedEmbeddedWithCast() {
+		public Map<ContainedEntity, String> getContainedIndexedEmbeddedWithCast() {
 			return containedIndexedEmbeddedWithCast;
 		}
 
