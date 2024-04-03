@@ -8,10 +8,10 @@ import static org.hibernate.search.mapper.orm.common.impl.HibernateOrmUtils.isDi
 
 import java.util.List;
 
-import org.hibernate.annotations.common.reflection.ReflectionManager;
 import org.hibernate.boot.Metadata;
 import org.hibernate.boot.spi.MetadataImplementor;
 import org.hibernate.mapping.PersistentClass;
+import org.hibernate.models.spi.ClassDetailsRegistry;
 import org.hibernate.search.engine.cfg.ConfigurationPropertySource;
 import org.hibernate.search.engine.cfg.spi.ConfigurationProperty;
 import org.hibernate.search.engine.cfg.spi.OptionalConfigurationProperty;
@@ -73,12 +73,12 @@ public class HibernateOrmMappingInitiator extends AbstractPojoMappingInitiator<H
 							.build();
 
 	public static HibernateOrmMappingInitiator create(Metadata metadata, IndexView jandexIndex,
-			ReflectionManager reflectionManager,
+			ClassDetailsRegistry classDetailsRegistry,
 			ValueHandleFactory valueHandleFactory, ServiceRegistry serviceRegistry) {
 		HibernateOrmBasicTypeMetadataProvider basicTypeMetadataProvider =
 				HibernateOrmBasicTypeMetadataProvider.create( metadata );
 		HibernateOrmBootstrapIntrospector introspector = HibernateOrmBootstrapIntrospector.create(
-				basicTypeMetadataProvider, reflectionManager, valueHandleFactory );
+				basicTypeMetadataProvider, classDetailsRegistry, valueHandleFactory );
 		HibernateSearchPreIntegrationService preIntegrationService =
 				HibernateOrmUtils.getServiceOrFail( serviceRegistry, HibernateSearchPreIntegrationService.class );
 

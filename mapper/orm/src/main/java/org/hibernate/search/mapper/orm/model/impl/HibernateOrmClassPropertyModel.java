@@ -7,21 +7,21 @@ package org.hibernate.search.mapper.orm.model.impl;
 import java.lang.reflect.Member;
 import java.util.List;
 
-import org.hibernate.annotations.common.reflection.XProperty;
-import org.hibernate.search.mapper.pojo.model.hcann.spi.AbstractPojoHCAnnPropertyModel;
+import org.hibernate.models.spi.MemberDetails;
+import org.hibernate.search.mapper.pojo.model.models.spi.AbstractPojoModelsPropertyModel;
 import org.hibernate.search.util.common.reflect.spi.ValueReadHandle;
 
 class HibernateOrmClassPropertyModel<T>
-		extends AbstractPojoHCAnnPropertyModel<T, HibernateOrmBootstrapIntrospector> {
+		extends AbstractPojoModelsPropertyModel<T, HibernateOrmBootstrapIntrospector> {
 
 	private final HibernateOrmBasicClassPropertyMetadata ormPropertyMetadata;
 
 	HibernateOrmClassPropertyModel(HibernateOrmBootstrapIntrospector introspector,
 			HibernateOrmClassRawTypeModel<?> holderTypeModel,
-			String name, List<XProperty> declaredXProperties,
+			String name, List<MemberDetails> declaredProperties,
 			HibernateOrmBasicClassPropertyMetadata ormPropertyMetadata,
 			List<Member> members) {
-		super( introspector, holderTypeModel, name, declaredXProperties, members );
+		super( introspector, holderTypeModel, name, declaredProperties, members );
 		this.ormPropertyMetadata = ormPropertyMetadata;
 	}
 
