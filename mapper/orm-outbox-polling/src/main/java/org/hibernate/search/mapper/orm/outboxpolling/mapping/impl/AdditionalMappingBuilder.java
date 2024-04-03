@@ -54,7 +54,7 @@ public class AdditionalMappingBuilder {
 		index.setColumnList( columns );
 
 		entity.getTable()
-				.getIndex()
+				.getIndexes()
 				.add( index );
 		return this;
 	}
