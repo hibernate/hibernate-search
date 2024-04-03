@@ -19,12 +19,18 @@ import jakarta.persistence.EntityManagerFactory;
 import org.hibernate.Session;
 import org.hibernate.binder.internal.TenantIdBinder;
 import org.hibernate.boot.Metadata;
+import org.hibernate.boot.models.categorize.internal.ClassLoaderServiceLoading;
+import org.hibernate.boot.models.categorize.spi.ManagedResourcesProcessor;
+import org.hibernate.boot.registry.classloading.spi.ClassLoaderService;
+import org.hibernate.boot.spi.BootstrapContext;
 import org.hibernate.engine.spi.SessionFactoryImplementor;
 import org.hibernate.engine.spi.SessionImplementor;
 import org.hibernate.mapping.PersistentClass;
 import org.hibernate.mapping.Property;
 import org.hibernate.metamodel.MappingMetamodel;
 import org.hibernate.metamodel.mapping.EntityMappingType;
+import org.hibernate.models.internal.SourceModelBuildingContextImpl;
+import org.hibernate.models.spi.SourceModelBuildingContext;
 import org.hibernate.metamodel.model.domain.EntityDomainType;
 import org.hibernate.search.mapper.orm.logging.impl.Log;
 import org.hibernate.search.mapper.pojo.loading.spi.PojoLoadingTypeContext;
@@ -183,6 +189,18 @@ public final class HibernateOrmUtils {
 
 	public static boolean isDiscriminatorMultiTenancyEnabled(Metadata metadata) {
 		return metadata.getFilterDefinition( TenantIdBinder.FILTER_NAME ) != null;
+	}
+
+	public static SourceModelBuildingContext createModelBuildingContext(BootstrapContext bootstrapContext) {
+		ClassLoaderService classLoaderService =
+				getServiceOrEmpty( bootstrapContext.getServiceRegistry(), ClassLoaderService.class )
+						.orElseThrow();
+		ClassLoaderServiceLoading classLoading = new ClassLoaderServiceLoading( classLoaderService );
+		return new SourceModelBuildingContextImpl(
+				classLoading,
+				bootstrapContext.getJandexView(),
+				ManagedResourcesProcessor::preFillRegistries
+		);
 	}
 
 }

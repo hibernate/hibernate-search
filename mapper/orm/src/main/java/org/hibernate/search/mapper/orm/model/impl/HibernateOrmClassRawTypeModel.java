@@ -15,13 +15,13 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import org.hibernate.annotations.common.reflection.XProperty;
-import org.hibernate.search.mapper.pojo.model.hcann.spi.AbstractPojoHCAnnRawTypeModel;
+import org.hibernate.models.spi.MemberDetails;
+import org.hibernate.search.mapper.pojo.model.models.spi.AbstractPojoModelsRawTypeModel;
 import org.hibernate.search.mapper.pojo.model.spi.GenericContextAwarePojoGenericTypeModel.RawTypeDeclaringContext;
 import org.hibernate.search.mapper.pojo.model.spi.PojoRawTypeIdentifier;
 
 public class HibernateOrmClassRawTypeModel<T>
-		extends AbstractPojoHCAnnRawTypeModel<T, HibernateOrmBootstrapIntrospector> {
+		extends AbstractPojoModelsRawTypeModel<T, HibernateOrmBootstrapIntrospector> {
 
 	private final HibernateOrmBasicClassTypeMetadata ormTypeMetadata;
 
@@ -39,7 +39,7 @@ public class HibernateOrmClassRawTypeModel<T>
 	@SuppressWarnings("unchecked") // xClass represents T, so its supertypes represent ? super T
 	public Stream<HibernateOrmClassRawTypeModel<? super T>> ascendingSuperTypes() {
 		if ( ascendingSuperTypesCache == null ) {
-			ascendingSuperTypesCache = introspector.ascendingSuperClasses( xClass )
+			ascendingSuperTypesCache = introspector.ascendingSuperClasses( classDetails )
 					.map( xc -> (HibernateOrmClassRawTypeModel<? super T>) introspector.typeModel( xc ) )
 					.collect( Collectors.toList() );
 		}
@@ -50,7 +50,7 @@ public class HibernateOrmClassRawTypeModel<T>
 	@SuppressWarnings("unchecked") // xClass represents T, so its supertypes represent ? super T
 	public Stream<HibernateOrmClassRawTypeModel<? super T>> descendingSuperTypes() {
 		if ( descendingSuperTypesCache == null ) {
-			descendingSuperTypesCache = introspector.descendingSuperClasses( xClass )
+			descendingSuperTypesCache = introspector.descendingSuperClasses( classDetails )
 					.map( xc -> (HibernateOrmClassRawTypeModel<? super T>) introspector.typeModel( xc ) )
 					.collect( Collectors.toList() );
 		}
@@ -59,14 +59,14 @@ public class HibernateOrmClassRawTypeModel<T>
 
 	@Override
 	protected HibernateOrmClassPropertyModel<?> createPropertyModel(String propertyName) {
-		List<XProperty> declaredXProperties = new ArrayList<>( 2 );
-		List<XProperty> methodAccessXProperties = declaredMethodAccessXPropertiesByName().get( propertyName );
+		List<MemberDetails> declaredProperties = new ArrayList<>( 2 );
+		List<MemberDetails> methodAccessXProperties = declaredMethodAccessPropertiesByName().get( propertyName );
 		if ( methodAccessXProperties != null ) {
-			declaredXProperties.addAll( methodAccessXProperties );
+			declaredProperties.addAll( methodAccessXProperties );
 		}
-		XProperty fieldAccessXProperty = declaredFieldAccessXPropertiesByName().get( propertyName );
-		if ( fieldAccessXProperty != null ) {
-			declaredXProperties.add( fieldAccessXProperty );
+		MemberDetails fieldAccessProperty = declaredFieldAccessPropertiesByName().get( propertyName );
+		if ( fieldAccessProperty != null ) {
+			declaredProperties.add( fieldAccessProperty );
 		}
 
 		HibernateOrmBasicClassPropertyMetadata ormPropertyMetadata = findOrmPropertyMetadata( propertyName );
@@ -77,7 +77,7 @@ public class HibernateOrmClassRawTypeModel<T>
 		}
 
 		return new HibernateOrmClassPropertyModel<>( introspector, this, propertyName,
-				declaredXProperties, ormPropertyMetadata, members );
+				declaredProperties, ormPropertyMetadata, members );
 	}
 
 	private HibernateOrmBasicClassPropertyMetadata findOrmPropertyMetadata(String propertyName) {
