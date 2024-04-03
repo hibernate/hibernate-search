@@ -98,6 +98,7 @@
             `net.bytebuddy.experimental` property can be removed.
          -->
         <version.org.hibernate.orm>7.0.0-SNAPSHOT</version.org.hibernate.orm>
+        <version.org.hibernate.models>0.7.6</version.org.hibernate.models>
 
         <javadoc.org.hibernate.orm.url>https://docs.jboss.org/hibernate/orm/${parsed-version.org.hibernate.orm.majorVersion}.${parsed-version.org.hibernate.orm.minorVersion}/javadocs/</javadoc.org.hibernate.orm.url>
         <documentation.org.hibernate.orm.url>https://docs.jboss.org/hibernate/orm/${parsed-version.org.hibernate.orm.majorVersion}.${parsed-version.org.hibernate.orm.minorVersion}/userguide/html_single/Hibernate_User_Guide.html</documentation.org.hibernate.orm.url>
@@ -384,6 +385,12 @@
                 <version>${version.org.hibernate.orm}</version>
                 <type>pom</type>
                 <scope>import</scope>
+            </dependency>
+            <dependency>
+                <groupId>org.hibernate.models</groupId>
+                <artifactId>hibernate-models</artifactId>
+                <!-- TODO: should this be managed by the ORM's BOM ? -->
+                <version>${version.org.hibernate.models}</version>
             </dependency>
             <!-- Imported dependencies that we want to override -->
             <dependency>

@@ -19,13 +19,13 @@ import java.util.Map;
 import java.util.Set;
 
 import org.hibernate.AssertionFailure;
-import org.hibernate.annotations.common.reflection.ReflectionManager;
 import org.hibernate.bytecode.enhance.spi.EnhancerConstants;
 import org.hibernate.engine.spi.PersistentAttributeInterceptable;
 import org.hibernate.mapping.PersistentClass;
+import org.hibernate.models.spi.ClassDetailsRegistry;
 import org.hibernate.search.mapper.orm.logging.impl.Log;
-import org.hibernate.search.mapper.pojo.model.hcann.spi.AbstractPojoHCAnnBootstrapIntrospector;
-import org.hibernate.search.mapper.pojo.model.hcann.spi.PojoHCannOrmGenericContextHelper;
+import org.hibernate.search.mapper.pojo.model.models.spi.AbstractPojoModelsBootstrapIntrospector;
+import org.hibernate.search.mapper.pojo.model.models.spi.PojoModelsGenericContextHelper;
 import org.hibernate.search.mapper.pojo.model.spi.AbstractPojoRawTypeModel;
 import org.hibernate.search.mapper.pojo.model.spi.GenericContextAwarePojoGenericTypeModel.RawTypeDeclaringContext;
 import org.hibernate.search.mapper.pojo.model.spi.PojoBootstrapIntrospector;
@@ -36,22 +36,22 @@ import org.hibernate.search.util.common.reflect.spi.ValueCreateHandle;
 import org.hibernate.search.util.common.reflect.spi.ValueHandleFactory;
 import org.hibernate.search.util.common.reflect.spi.ValueReadHandle;
 
-public class HibernateOrmBootstrapIntrospector extends AbstractPojoHCAnnBootstrapIntrospector
+public class HibernateOrmBootstrapIntrospector extends AbstractPojoModelsBootstrapIntrospector
 		implements PojoBootstrapIntrospector {
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	public static HibernateOrmBootstrapIntrospector create(
 			HibernateOrmBasicTypeMetadataProvider basicTypeMetadataProvider,
-			ReflectionManager ormReflectionManager,
+			ClassDetailsRegistry classDetailsRegistry,
 			ValueHandleFactory valueHandleFactory) {
 		return new HibernateOrmBootstrapIntrospector(
-				basicTypeMetadataProvider, ormReflectionManager, valueHandleFactory
+				basicTypeMetadataProvider, classDetailsRegistry, valueHandleFactory
 		);
 	}
 
 	private final HibernateOrmBasicTypeMetadataProvider basicTypeMetadataProvider;
-	private final PojoHCannOrmGenericContextHelper genericContextHelper;
+	private final PojoModelsGenericContextHelper genericContextHelper;
 
 	/*
 	 * Note: the main purpose of these caches is not to improve performance,
@@ -67,11 +67,11 @@ public class HibernateOrmBootstrapIntrospector extends AbstractPojoHCAnnBootstra
 
 	private HibernateOrmBootstrapIntrospector(
 			HibernateOrmBasicTypeMetadataProvider basicTypeMetadataProvider,
-			ReflectionManager reflectionManager,
+			ClassDetailsRegistry classDetailsRegistry,
 			ValueHandleFactory valueHandleFactory) {
-		super( reflectionManager, valueHandleFactory );
+		super( classDetailsRegistry, valueHandleFactory );
 		this.basicTypeMetadataProvider = basicTypeMetadataProvider;
-		this.genericContextHelper = new PojoHCannOrmGenericContextHelper( this );
+		this.genericContextHelper = new PojoModelsGenericContextHelper( this );
 	}
 
 	@Override

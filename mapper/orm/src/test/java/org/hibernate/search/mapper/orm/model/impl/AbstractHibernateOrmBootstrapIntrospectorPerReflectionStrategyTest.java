@@ -6,12 +6,13 @@
  */
 package org.hibernate.search.mapper.orm.model.impl;
 
+import static org.hibernate.search.mapper.orm.common.impl.HibernateOrmUtils.createModelBuildingContext;
+
 import java.lang.invoke.MethodHandles;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import org.hibernate.annotations.common.reflection.ReflectionManager;
 import org.hibernate.boot.Metadata;
 import org.hibernate.boot.MetadataSources;
 import org.hibernate.boot.registry.StandardServiceRegistry;
@@ -59,15 +60,15 @@ public abstract class AbstractHibernateOrmBootstrapIntrospectorPerReflectionStra
 		Metadata metadata = metadataSources.buildMetadata();
 
 		MetadataImplementor metadataImplementor = (MetadataImplementor) metadata;
-		ReflectionManager reflectionManager = metadataImplementor.getTypeConfiguration()
-				.getMetadataBuildingContext().getBootstrapContext().getReflectionManager();
-
+		var context = createModelBuildingContext( metadataImplementor.getTypeConfiguration()
+				.getMetadataBuildingContext().getBootstrapContext() );
 		HibernateOrmBasicTypeMetadataProvider basicTypeMetadataProvider =
 				HibernateOrmBasicTypeMetadataProvider.create( metadata );
 
-		return HibernateOrmBootstrapIntrospector.create( basicTypeMetadataProvider, reflectionManager,
+		return HibernateOrmBootstrapIntrospector.create( basicTypeMetadataProvider, context.getClassDetailsRegistry(),
 				valueHandleFactory
 		);
 	}
+
 
 }
