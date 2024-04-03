@@ -140,6 +140,9 @@ public final class HibernateOrmSearchQueryAdapter<R> extends AbstractQuery<R> {
 
 	@Override
 	public HibernateOrmSearchQueryAdapter<R> setTimeout(Integer timeout) {
+		// TODO: this method comes from JPA and there timeout is in ms ?
+		//  https://jakarta.ee/specifications/persistence/3.2/jakarta-persistence-spec-3.2-m2 ctrl+f "Set the query timeout, in milliseconds"
+		// 	but the one above is in sec from ORM itself (CommonQueryContract)
 		delegate.failAfter( timeout == null ? null : timeout.longValue(), TimeUnit.SECONDS );
 		return this;
 	}
