@@ -17,6 +17,8 @@ import java.util.stream.Collector;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import org.hibernate.models.internal.SimpleClassLoading;
+import org.hibernate.models.internal.SourceModelBuildingContextImpl;
 import org.hibernate.models.spi.AnnotationTarget;
 import org.hibernate.models.spi.AnnotationUsage;
 import org.hibernate.models.spi.ClassDetails;
@@ -30,17 +32,30 @@ import org.hibernate.search.util.common.reflect.spi.ValueCreateHandle;
 import org.hibernate.search.util.common.reflect.spi.ValueHandleFactory;
 import org.hibernate.search.util.common.reflect.spi.ValueReadHandle;
 
+import org.jboss.jandex.IndexView;
+
 public abstract class AbstractPojoModelsBootstrapIntrospector implements PojoBootstrapIntrospector {
 
 	private final PojoModelsClassOrdering typeOrdering;
 	protected final ValueHandleFactory valueHandleFactory;
 	private final ClassDetailsRegistry classDetailsRegistry;
 
+	public AbstractPojoModelsBootstrapIntrospector(ValueHandleFactory valueHandleFactory) {
+		this( simpleClassDetailsRegistry( null ), valueHandleFactory );
+	}
+
 	public AbstractPojoModelsBootstrapIntrospector(ClassDetailsRegistry classDetailsRegistry,
 			ValueHandleFactory valueHandleFactory) {
 		this.classDetailsRegistry = classDetailsRegistry;
 		this.typeOrdering = new PojoModelsClassOrdering( classDetailsRegistry );
 		this.valueHandleFactory = valueHandleFactory;
+	}
+
+	protected static ClassDetailsRegistry simpleClassDetailsRegistry(IndexView indexView) {
+		return new SourceModelBuildingContextImpl(
+				SimpleClassLoading.SIMPLE_CLASS_LOADING,
+				indexView
+		).getClassDetailsRegistry();
 	}
 
 	@Override
