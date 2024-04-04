@@ -11,10 +11,9 @@ import java.lang.reflect.Member;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.hibernate.annotations.common.reflection.java.JavaReflectionManager;
-import org.hibernate.search.mapper.pojo.model.hcann.spi.AbstractPojoHCAnnBootstrapIntrospector;
-import org.hibernate.search.mapper.pojo.model.hcann.spi.PojoHCannOrmGenericContextHelper;
-import org.hibernate.search.mapper.pojo.model.hcann.spi.PojoSimpleHCAnnRawTypeModel;
+import org.hibernate.search.mapper.pojo.model.models.spi.AbstractPojoModelsBootstrapIntrospector;
+import org.hibernate.search.mapper.pojo.model.models.spi.PojoModelsGenericContextHelper;
+import org.hibernate.search.mapper.pojo.model.models.spi.PojoSimpleModelsRawTypeModel;
 import org.hibernate.search.mapper.pojo.model.spi.GenericContextAwarePojoGenericTypeModel.RawTypeDeclaringContext;
 import org.hibernate.search.mapper.pojo.model.spi.PojoBootstrapIntrospector;
 import org.hibernate.search.mapper.pojo.model.spi.PojoRawTypeIdentifier;
@@ -26,30 +25,32 @@ import org.hibernate.search.util.common.reflect.spi.ValueCreateHandle;
 import org.hibernate.search.util.common.reflect.spi.ValueHandleFactory;
 import org.hibernate.search.util.common.reflect.spi.ValueReadHandle;
 
+import org.jboss.jandex.IndexView;
+
 /**
  * A very simple introspector for Pojo mapping in standalone mode (without Hibernate ORM).
  */
-public class StandalonePojoBootstrapIntrospector extends AbstractPojoHCAnnBootstrapIntrospector
+public class StandalonePojoBootstrapIntrospector extends AbstractPojoModelsBootstrapIntrospector
 		implements PojoBootstrapIntrospector {
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
-	public static StandalonePojoBootstrapIntrospector create(ValueHandleFactory valueHandleFactory) {
-		return new StandalonePojoBootstrapIntrospector( valueHandleFactory );
+	public static StandalonePojoBootstrapIntrospector create(IndexView indexView, ValueHandleFactory valueHandleFactory) {
+		return new StandalonePojoBootstrapIntrospector( indexView, valueHandleFactory );
 	}
 
-	private final PojoHCannOrmGenericContextHelper genericContextHelper;
+	private final PojoModelsGenericContextHelper genericContextHelper;
 
 	private final Map<Class<?>, PojoRawTypeModel<?>> typeModelCache = new HashMap<>();
 
-	private StandalonePojoBootstrapIntrospector(ValueHandleFactory valueHandleFactory) {
-		super( new JavaReflectionManager(), valueHandleFactory );
-		this.genericContextHelper = new PojoHCannOrmGenericContextHelper( this );
+	private StandalonePojoBootstrapIntrospector(IndexView indexView, ValueHandleFactory valueHandleFactory) {
+		super( simpleClassDetailsRegistry( indexView ), valueHandleFactory );
+		this.genericContextHelper = new PojoModelsGenericContextHelper( this );
 	}
 
 	@Override
 	@SuppressWarnings("unchecked")
-	public <T> PojoSimpleHCAnnRawTypeModel<T> typeModel(Class<T> clazz) {
+	public <T> PojoRawTypeModel<T> typeModel(Class<T> clazz) {
 		if ( clazz.isPrimitive() ) {
 			/*
 			 * We'll never manipulate the primitive type, as we're using generics everywhere,
@@ -57,7 +58,7 @@ public class StandalonePojoBootstrapIntrospector extends AbstractPojoHCAnnBootst
 			 */
 			clazz = (Class<T>) ReflectionHelper.getPrimitiveWrapperType( clazz );
 		}
-		return (PojoSimpleHCAnnRawTypeModel<T>) typeModelCache.computeIfAbsent( clazz, this::createTypeModel );
+		return (PojoSimpleModelsRawTypeModel<T>) typeModelCache.computeIfAbsent( clazz, this::createTypeModel );
 	}
 
 	@Override
@@ -80,7 +81,7 @@ public class StandalonePojoBootstrapIntrospector extends AbstractPojoHCAnnBootst
 	private <T> PojoRawTypeModel<T> createTypeModel(Class<T> clazz) {
 		PojoRawTypeIdentifier<T> typeIdentifier = PojoRawTypeIdentifier.of( clazz );
 		try {
-			return new PojoSimpleHCAnnRawTypeModel<>(
+			return new PojoSimpleModelsRawTypeModel<>(
 					this, typeIdentifier,
 					new RawTypeDeclaringContext<>( genericContextHelper, clazz )
 			);
