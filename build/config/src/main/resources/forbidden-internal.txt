@@ -80,8 +80,8 @@ org.jgroups.util.Util @ Use AssertJ or non-deprecated JUnit assertions instead
 junit.framework.Assert @ Use AssertJ or non-deprecated JUnit assertions instead
 
 ################################################################################################################
-# Nobody should be using the StringHelper from commons-annotations: use org.hibernate.search.util.StringHelper.
-org.hibernate.annotations.common.util.StringHelper @ Use org.hibernate.search.util.StringHelper instead.
+# Nobody should be using the commons-annotations anymore.
+org.hibernate.annotations.common.* @ Use org.hibernate.models instead.
 
 ################################################################################################################
 # Nobody should be using the unstable, experimental code from org.apache.lucene.sandbox that cannot reasonably be relied on.
