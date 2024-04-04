@@ -273,7 +273,8 @@ class CustomPropertyMappingAnnotationBaseIT {
 
 	@Retention(RetentionPolicy.RUNTIME)
 	@Target({ ElementType.FIELD, ElementType.METHOD })
-	private @interface AnalyzerAnnotation {
+	// must be public for Hibernate Models to access #name() :
+	public @interface AnalyzerAnnotation {
 
 		String name();
 
