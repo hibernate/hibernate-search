@@ -8,10 +8,9 @@ package org.hibernate.search.mapper.pojo.testsupport;
 
 import java.lang.reflect.Type;
 
-import org.hibernate.annotations.common.reflection.java.JavaReflectionManager;
-import org.hibernate.search.mapper.pojo.model.hcann.spi.AbstractPojoHCAnnBootstrapIntrospector;
-import org.hibernate.search.mapper.pojo.model.hcann.spi.PojoHCannOrmGenericContextHelper;
-import org.hibernate.search.mapper.pojo.model.hcann.spi.PojoSimpleHCAnnRawTypeModel;
+import org.hibernate.search.mapper.pojo.model.models.spi.AbstractPojoModelsBootstrapIntrospector;
+import org.hibernate.search.mapper.pojo.model.models.spi.PojoModelsGenericContextHelper;
+import org.hibernate.search.mapper.pojo.model.models.spi.PojoSimpleModelsRawTypeModel;
 import org.hibernate.search.mapper.pojo.model.spi.GenericContextAwarePojoGenericTypeModel.RawTypeDeclaringContext;
 import org.hibernate.search.mapper.pojo.model.spi.PojoRawTypeIdentifier;
 import org.hibernate.search.mapper.pojo.model.spi.PojoRawTypeModel;
@@ -20,16 +19,16 @@ import org.hibernate.search.util.common.AssertionFailure;
 import org.hibernate.search.util.common.reflect.spi.ValueHandleFactory;
 import org.hibernate.search.util.impl.test.reflect.TypeCapture;
 
-public class TestIntrospector extends AbstractPojoHCAnnBootstrapIntrospector {
-	private final PojoHCannOrmGenericContextHelper genericContextHelper = new PojoHCannOrmGenericContextHelper( this );
+public class TestIntrospector extends AbstractPojoModelsBootstrapIntrospector {
+	private final PojoModelsGenericContextHelper genericContextHelper = new PojoModelsGenericContextHelper( this );
 
 	public TestIntrospector(ValueHandleFactory valueHandleFactory) {
-		super( new JavaReflectionManager(), valueHandleFactory );
+		super( valueHandleFactory );
 	}
 
 	@Override
 	public <T> PojoRawTypeModel<T> typeModel(Class<T> clazz) {
-		return new PojoSimpleHCAnnRawTypeModel<>( this, PojoRawTypeIdentifier.of( clazz ),
+		return new PojoSimpleModelsRawTypeModel<>( this, PojoRawTypeIdentifier.of( clazz ),
 				new RawTypeDeclaringContext<>( genericContextHelper, clazz ) );
 	}
 

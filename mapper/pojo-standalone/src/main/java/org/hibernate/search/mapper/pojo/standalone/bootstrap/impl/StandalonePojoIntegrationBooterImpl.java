@@ -87,7 +87,7 @@ public class StandalonePojoIntegrationBooterImpl implements StandalonePojoIntegr
 
 	private StandalonePojoIntegrationPartialBuildState doBootFirstPhase() {
 		StandalonePojoBootstrapIntrospector introspector =
-				StandalonePojoBootstrapIntrospector.create( valueHandleFactory != null
+				StandalonePojoBootstrapIntrospector.create( null, valueHandleFactory != null
 						? valueHandleFactory
 						: ValueHandleFactory.usingMethodHandle( MethodHandles.publicLookup() ) );
 		StandalonePojoMappingKey mappingKey = new StandalonePojoMappingKey();

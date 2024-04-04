@@ -269,7 +269,8 @@ class CustomTypeMappingAnnotationBaseIT {
 
 	@Retention(RetentionPolicy.RUNTIME)
 	@Target({ ElementType.TYPE })
-	private @interface AnalyzerAnnotation {
+	// must be public for Hibernate Models to access #name() :
+	public @interface AnalyzerAnnotation {
 
 		String name();
 
