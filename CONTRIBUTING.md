@@ -69,7 +69,7 @@ To publish build scans for your local builds,
 and once you have one, run this from the root of your local clone of Hibernate Search:
 
 ```shell
-./mvnw gradle-enterprise:provision-access-key
+./mvnw com.gradle:develocity-maven-extension:provision-access-key
 ```
 
 To opt out from build scans for a particular build (e.g. when working on a security vulnerability),
