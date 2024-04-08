@@ -8,6 +8,9 @@
 :docinfodir: {docinfodir}
 :docinfo: shared,private
 :title-logo-image: image:hibernate_logo_a.png[align=left,pdfwidth=33%]
+:html-meta-description: Hibernate Search, full text search for your entities - Migration Guide
+:html-meta-keywords: hibernate, search, hibernate search, full text, lucene, elasticsearch, opensearch
+:html-meta-canonical-link: https://docs.jboss.org/hibernate/search/{hibernateSearchVersionShort}/migration/html_single/
 
 [[introduction]]
 == [[_introduction]] Introduction
