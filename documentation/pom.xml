@@ -32,8 +32,6 @@
         <asciidoctor.examples-source-dir.java17>${basedir}/src/test/java17</asciidoctor.examples-source-dir.java17>
         <asciidoctor.examples-resources-dir>${basedir}/src/test/resources</asciidoctor.examples-resources-dir>
 
-        <html.meta.description>Hibernate Search, full text search for your entities - Reference Documentation</html.meta.description>
-        <html.meta.keywords>hibernate, search, hibernate search, full text, lucene, elasticsearch</html.meta.keywords>
         <html.meta.project-key>search</html.meta.project-key>
         <html.google-analytics.id>G-282CVRCQHZ</html.google-analytics.id>
         <html.outdated-content.project-key>${html.meta.project-key}</html.outdated-content.project-key>
