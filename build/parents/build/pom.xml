@@ -141,6 +141,7 @@
         <version.org.hamcrest>2.2</version.org.hamcrest>
         <version.org.mockito>5.11.0</version.org.mockito>
         <version.org.assertj.assertj-core>3.25.3</version.org.assertj.assertj-core>
+        <!-- NOTE: Remove a Dependabot rule for 4.2.1 once the upgrade can be applied -->
         <version.org.awaitily>4.2.0</version.org.awaitily>
         <version.org.skyscreamer.jsonassert>1.5.1</version.org.skyscreamer.jsonassert>
         <version.io.takari.junit>1.2.7</version.io.takari.junit>
