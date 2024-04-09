@@ -291,6 +291,7 @@
                         <jpaVersion>${parsed-version.javax.persistence.majorVersion}.${parsed-version.javax.persistence.minorVersion}</jpaVersion>
                         <hibernateOrm6DocUrl>${documentation.org.hibernate.orm.url}</hibernateOrm6DocUrl>
                         <hibernateOrm6Version>${version.org.hibernate.orm}</hibernateOrm6Version>
+                        <javaCompatibleVersions>${java-version.main.compatible.expected.text}</javaCompatibleVersions>
                         <jakartaUrl>https://jakarta.ee/</jakartaUrl>
                         <jakartaPersistenceVersion>${parsed-version.jakarta.persistence.majorVersion}.${parsed-version.jakarta.persistence.minorVersion}</jakartaPersistenceVersion>
                         <luceneVersion>${version.org.apache.lucene}</luceneVersion>
