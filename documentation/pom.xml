@@ -284,6 +284,7 @@
                         <hibernateVersion>${version.org.hibernate.orm}</hibernateVersion>
                         <hibernateDocUrl>${documentation.org.hibernate.orm.url}</hibernateDocUrl>
                         <hibernateJavadocUrl>${javadoc.org.hibernate.orm.url}</hibernateJavadocUrl>
+                        <javaCompatibleVersions>${java-version.main.compatible.expected.text}</javaCompatibleVersions>
                         <javaeeUrl>https://www.oracle.com/java/technologies/java-ee-glance.html</javaeeUrl>
                         <jakartaUrl>https://jakarta.ee/</jakartaUrl>
                         <jakartaPersistenceVersion>${parsed-version.jakarta.persistence.majorVersion}.${parsed-version.jakarta.persistence.minorVersion}</jakartaPersistenceVersion>
