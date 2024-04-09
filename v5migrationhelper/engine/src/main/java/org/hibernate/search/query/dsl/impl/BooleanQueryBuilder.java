@@ -59,11 +59,11 @@ class BooleanQueryBuilder implements MustJunction {
 		if ( lastClause == null ) {
 			return;
 		}
-		if ( !lastClause.getOccur().equals( Occur.MUST ) ) {
-			throw new AssertionFailure( "Cannot negate or disable scoring on class: " + lastClause.getOccur() );
+		if ( !lastClause.occur().equals( Occur.MUST ) ) {
+			throw new AssertionFailure( "Cannot negate or disable scoring on class: " + lastClause.occur() );
 		}
 		final int lastIndex = clauses.size() - 1;
-		clauses.set( lastIndex, new BooleanClause( lastClause.getQuery(), replacementOccur ) );
+		clauses.set( lastIndex, new BooleanClause( lastClause.query(), replacementOccur ) );
 	}
 
 	@Override
@@ -123,8 +123,8 @@ class BooleanQueryBuilder implements MustJunction {
 		BooleanPredicateClausesStep<?> step = factory.bool();
 		for ( BooleanClause clause : clauses ) {
 			SearchPredicate predicate = factory.extension( LuceneExtension.get() )
-					.fromLuceneQuery( clause.getQuery() ).toPredicate();
-			switch ( clause.getOccur() ) {
+					.fromLuceneQuery( clause.query() ).toPredicate();
+			switch ( clause.occur() ) {
 				case MUST:
 					step = step.must( predicate );
 					break;
