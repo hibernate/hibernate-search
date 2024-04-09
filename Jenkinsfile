@@ -190,6 +190,8 @@ stage('Configure') {
 					new JdkBuildEnvironment(version: '23', testCompilerTool: 'OpenJDK 23 Latest',
 							testLauncherArgs: '--enable-preview -Dnet.bytebuddy.experimental=true',
 							condition: TestCondition.AFTER_MERGE)
+					// IMPORTANT: Make sure to update the documentation for any newly supported Java versions
+					//            See java-version.main.compatible.expected.text in POMs.
 			],
 			compiler: [
 					new CompilerBuildEnvironment(name: 'eclipse', mavenProfile: 'compiler-eclipse',
