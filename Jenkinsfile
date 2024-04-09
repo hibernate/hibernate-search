@@ -257,6 +257,9 @@ stage('Configure') {
 					new EsLocalBuildEnvironment(version: '8.8.2', condition: TestCondition.ON_DEMAND),
 					new EsLocalBuildEnvironment(version: '8.9.2', condition: TestCondition.ON_DEMAND),
 					new EsLocalBuildEnvironment(version: '8.10.4', condition: TestCondition.BEFORE_MERGE, isDefault: true),
+					// IMPORTANT: Make sure to update the documentation for any newly supported Elasticsearch versions
+					//            See version.org.elasticsearch.compatible.expected.text
+					//            and version.org.elasticsearch.compatible.regularly-tested.text in POMs.
 
 					// --------------------------------------------
 					// OpenSearch
@@ -276,6 +279,9 @@ stage('Configure') {
 					new OpenSearchLocalBuildEnvironment(version: '2.10.0', condition: TestCondition.ON_DEMAND),
 					new OpenSearchLocalBuildEnvironment(version: '2.11.0', condition: TestCondition.AFTER_MERGE)
 					// See https://opensearch.org/lines/2x.html for a list of all 2.x versions
+					// IMPORTANT: Make sure to update the documentation for any newly supported OpenSearch versions
+					//            See version.org.opensearch.compatible.expected.text
+					//            and version.org.opensearch.compatible.regularly-tested.text in POMs.
 			],
 			esAws: [
 					// --------------------------------------------
