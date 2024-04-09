@@ -62,9 +62,8 @@ public class BeforeChunkBatchlet extends AbstractBatchlet {
 			JobContextData jobData = (JobContextData) jobContext.getTransientUserData();
 			EntityManagerFactory emf = jobData.getEntityManagerFactory();
 			BatchMappingContext mappingContext = (BatchMappingContext) Search.mapping( emf );
-			// TODO : .........
 			PojoScopeWorkspace workspace =
-					mappingContext.scope( Object.class ).pojoWorkspace( Objects.toString( tenantId, null ) );
+					mappingContext.scope( jobData.getEntityTypes() ).pojoWorkspace( Objects.toString( tenantId, null ) );
 			Futures.unwrappedExceptionJoin( workspace.purge( Collections.emptySet(), OperationSubmitter.blocking(),
 					UnsupportedOperationBehavior.FAIL ) );
 

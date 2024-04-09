@@ -248,7 +248,9 @@ class MassIndexingJobIT {
 
 		assertThat( JobTestUtil.nbDocumentsInIndex( emf, Company.class ) ).isZero();
 		indexSomeCompanies( expectedCount );
+		indexSomePeople( expectedCount );
 		assertThat( JobTestUtil.nbDocumentsInIndex( emf, Company.class ) ).isEqualTo( expectedCount );
+		assertThat( JobTestUtil.nbDocumentsInIndex( emf, Person.class ) ).isEqualTo( expectedCount );
 
 		/*
 		 * Request a mass indexing with a filter matching nothing,
@@ -263,6 +265,8 @@ class MassIndexingJobIT {
 		);
 
 		assertThat( JobTestUtil.nbDocumentsInIndex( emf, Company.class ) ).isZero();
+		// make sure that purge affects only those entities that are specified through the parameters:
+		assertThat( JobTestUtil.nbDocumentsInIndex( emf, Person.class ) ).isEqualTo( expectedCount );
 	}
 
 	@Test
@@ -418,6 +422,23 @@ class MassIndexingJobIT {
 			SearchIndexingPlan indexingPlan = session.indexingPlan();
 			for ( Company company : companies ) {
 				indexingPlan.addOrUpdate( company );
+			}
+		} );
+	}
+
+	protected final void indexSomePeople(int count) {
+		with( emf ).runInTransaction( em -> {
+			CriteriaBuilder criteriaBuilder = em.getCriteriaBuilder();
+			CriteriaQuery<Person> criteria = criteriaBuilder.createQuery( Person.class );
+			Root<Person> root = criteria.from( Person.class );
+			Path<String> id = root.get( root.getModel().getId( String.class ) );
+			criteria.orderBy( criteriaBuilder.asc( id ) );
+			List<Person> people = em.createQuery( criteria ).setMaxResults( count ).getResultList();
+			SearchSession session = Search.session( em );
+
+			SearchIndexingPlan indexingPlan = session.indexingPlan();
+			for ( Person person : people ) {
+				indexingPlan.addOrUpdate( person );
 			}
 		} );
 	}
