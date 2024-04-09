@@ -126,6 +126,9 @@ updates:
       #  with which jboss-logging annotation processor can still work.
       #  To be removed once we update the AP to the one with a fix.
       - dependency-name: "org.codehaus.plexus:*"
+      # Because of https://github.com/awaitility/awaitility/issues/277 :
+      - dependency-name: "org.awaitility:awaitility"
+        versions: [ "4.2.1" ]
   - package-ecosystem: "docker"
     registries:
       - dockerhub
