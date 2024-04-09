@@ -268,6 +268,9 @@ stage('Configure') {
 					new LocalElasticsearchBuildEnvironment(version: '8.11.4', condition: TestCondition.ON_DEMAND),
 					new LocalElasticsearchBuildEnvironment(version: '8.12.2', condition: TestCondition.ON_DEMAND),
 					new LocalElasticsearchBuildEnvironment(version: '8.13.2', condition: TestCondition.BEFORE_MERGE, isDefault: true),
+					// IMPORTANT: Make sure to update the documentation for any newly supported Elasticsearch versions
+					//            See version.org.elasticsearch.compatible.expected.text
+					//            and version.org.elasticsearch.compatible.regularly-tested.text in POMs.
 
 					// --------------------------------------------
 					// OpenSearch
@@ -289,6 +292,9 @@ stage('Configure') {
 					new LocalOpenSearchBuildEnvironment(version: '2.12.0', condition: TestCondition.ON_DEMAND),
 					new LocalOpenSearchBuildEnvironment(version: '2.13.0', condition: TestCondition.BEFORE_MERGE),
 					// See https://opensearch.org/lines/2x.html for a list of all 2.x versions
+					// IMPORTANT: Make sure to update the documentation for any newly supported OpenSearch versions
+					//            See version.org.opensearch.compatible.expected.text
+					//            and version.org.opensearch.compatible.regularly-tested.text in POMs.
 
 					// --------------------------------------------
 					// Amazon OpenSearch Serverless dialect running against a local OpenSearch instance
