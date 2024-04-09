@@ -9,7 +9,7 @@
 |===============
 | h|Version h|Note
 |Java Runtime
-|8, 11 or 17
+|{javaCompatibleVersions}
 |
 |Hibernate ORM (for the <<mapper-orm,Hibernate ORM mapper>>
 |{hibernateVersion}
