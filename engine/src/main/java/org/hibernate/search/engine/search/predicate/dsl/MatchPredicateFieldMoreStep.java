@@ -18,36 +18,6 @@ package org.hibernate.search.engine.search.predicate.dsl;
 public interface MatchPredicateFieldMoreStep<
 		S extends MatchPredicateFieldMoreStep<?, N>,
 		N extends MatchPredicateOptionsStep<?>>
-		extends MatchPredicateMatchingStep<N>, MultiFieldPredicateFieldBoostStep<S> {
-
-	/**
-	 * Target the given field in the match predicate,
-	 * as an alternative to the already-targeted fields.
-	 * <p>
-	 * See {@link MatchPredicateFieldStep#field(String)} for more information about targeting fields.
-	 *
-	 * @param fieldPath The <a href="SearchPredicateFactory.html#field-paths">path</a> to the index field
-	 * to apply the predicate on.
-	 * @return The next step.
-	 *
-	 * @see MatchPredicateFieldStep#field(String)
-	 */
-	default S field(String fieldPath) {
-		return fields( fieldPath );
-	}
-
-	/**
-	 * Target the given fields in the match predicate,
-	 * as an alternative to the already-targeted fields.
-	 * <p>
-	 * See {@link MatchPredicateFieldStep#fields(String...)} for more information about targeting fields.
-	 *
-	 * @param fieldPaths The <a href="SearchPredicateFactory.html#field-paths">paths</a> to the index fields
-	 * to apply the predicate on.
-	 * @return The next step.
-	 *
-	 * @see MatchPredicateFieldStep#fields(String...)
-	 */
-	S fields(String... fieldPaths);
+		extends MatchPredicateMatchingStep<N>, MatchPredicateFieldMoreGenericStep<S, N, Object, String> {
 
 }

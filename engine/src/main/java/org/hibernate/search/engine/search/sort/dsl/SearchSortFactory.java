@@ -11,6 +11,7 @@ import java.util.function.Function;
 
 import org.hibernate.search.engine.search.common.NamedValues;
 import org.hibernate.search.engine.search.predicate.dsl.SearchPredicateFactory;
+import org.hibernate.search.engine.search.reference.TypedFieldReference;
 import org.hibernate.search.engine.spatial.GeoPoint;
 import org.hibernate.search.util.common.SearchException;
 import org.hibernate.search.util.common.annotation.Incubating;
@@ -64,6 +65,20 @@ public interface SearchSortFactory {
 	FieldSortOptionsStep<?, ? extends SearchPredicateFactory> field(String fieldPath);
 
 	/**
+	 * Order elements by the value of a specific field.
+	 * <p>
+	 * The default order is <strong>ascending</strong>.
+	 *
+	 * @param field The field reference representing a <a href="#field-paths">path</a> to the index field to sort by.
+	 * @return A DSL step where the "field" sort can be defined in more details.
+	 * @throws SearchException If the field doesn't exist or cannot be sorted on.
+	 */
+	@Incubating
+	default FieldSortOptionsStep<?, ? extends SearchPredicateFactory> field(TypedFieldReference<?> field) {
+		return field( field.absolutePath() );
+	}
+
+	/**
 	 * Order elements by the distance from the location stored in the specified field to the location specified.
 	 * <p>
 	 * The default order is <strong>ascending</strong>.
@@ -75,6 +90,22 @@ public interface SearchSortFactory {
 	 * @throws SearchException If the field type does not constitute a valid location.
 	 */
 	DistanceSortOptionsStep<?, ? extends SearchPredicateFactory> distance(String fieldPath, GeoPoint location);
+
+	/**
+	 * Order elements by the distance from the location stored in the specified field to the location specified.
+	 * <p>
+	 * The default order is <strong>ascending</strong>.
+	 *
+	 * @param field The field reference representing a <a href="#field-paths">path</a> to the index field
+	 * containing the location to compute the distance from.
+	 * @param location The location to which we want to compute the distance.
+	 * @return A DSL step where the "distance" sort can be defined in more details.
+	 * @throws SearchException If the field type does not constitute a valid location.
+	 */
+	default DistanceSortOptionsStep<?, ? extends SearchPredicateFactory> distance(TypedFieldReference<? extends GeoPoint> field,
+			GeoPoint location) {
+		return distance( field.absolutePath(), location );
+	}
 
 	/**
 	 * Order elements by the distance from the location stored in the specified field to the location specified.

@@ -6,6 +6,8 @@
  */
 package org.hibernate.search.engine.search.predicate.dsl;
 
+import org.hibernate.search.engine.search.reference.TypedFieldReference;
+
 /**
  * The initial step in a "knn" predicate definition, where the target field can be set.
  */
@@ -18,4 +20,6 @@ public interface KnnPredicateFieldStep {
 	 * @return The next step in the knn predicate DSL.
 	 */
 	KnnPredicateVectorStep field(String fieldPath);
+
+	<T> KnnPredicateVectorGenericStep<T> field(TypedFieldReference<T> field);
 }

@@ -15,6 +15,8 @@ import org.hibernate.search.engine.common.EntityReference;
 import org.hibernate.search.engine.search.common.NamedValues;
 import org.hibernate.search.engine.search.common.ValueConvert;
 import org.hibernate.search.engine.search.projection.SearchProjection;
+import org.hibernate.search.engine.search.reference.ObjectFieldReference;
+import org.hibernate.search.engine.search.reference.ProjectionTypedFieldReference;
 import org.hibernate.search.engine.spatial.GeoPoint;
 import org.hibernate.search.util.common.SearchException;
 import org.hibernate.search.util.common.annotation.Incubating;
@@ -160,6 +162,11 @@ public interface SearchProjectionFactory<R, E> {
 	 */
 	FieldProjectionValueStep<?, Object> field(String fieldPath, ValueConvert convert);
 
+	@Incubating
+	default <T> FieldProjectionValueStep<?, T> field(ProjectionTypedFieldReference<T> fieldReference) {
+		return field( fieldReference.absolutePath(), fieldReference.projectionType(), fieldReference.valueConvert() );
+	}
+
 	/**
 	 * Project on the score of the hit.
 	 *
@@ -178,6 +185,16 @@ public interface SearchProjectionFactory<R, E> {
 	DistanceToFieldProjectionValueStep<?, Double> distance(String fieldPath, GeoPoint center);
 
 	/**
+	 * TODO
+	 */
+	@Incubating
+	default DistanceToFieldProjectionValueStep<?, Double> distance(
+			ProjectionTypedFieldReference<? extends GeoPoint> fieldReference,
+			GeoPoint center) {
+		return distance( fieldReference.absolutePath(), center );
+	}
+
+	/**
 	 * Starts the definition of an object projection,
 	 * which will yield one value per object in a given object field,
 	 * the value being the result of combining multiple given projections
@@ -193,6 +210,13 @@ public interface SearchProjectionFactory<R, E> {
 	 * @return A DSL step where the "composite" projection can be defined in more details.
 	 */
 	CompositeProjectionInnerStep object(String objectFieldPath);
+
+	/**
+	 * TODO
+	 */
+	default CompositeProjectionInnerStep object(ObjectFieldReference objectField) {
+		return object( objectField.absolutePath() );
+	}
 
 	/**
 	 * Starts the definition of a composite projection,

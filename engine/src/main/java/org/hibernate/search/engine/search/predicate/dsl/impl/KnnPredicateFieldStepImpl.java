@@ -11,6 +11,7 @@ import java.util.function.Function;
 import org.hibernate.search.engine.search.predicate.SearchPredicate;
 import org.hibernate.search.engine.search.predicate.dsl.KnnPredicateFieldStep;
 import org.hibernate.search.engine.search.predicate.dsl.KnnPredicateOptionsStep;
+import org.hibernate.search.engine.search.predicate.dsl.KnnPredicateVectorGenericStep;
 import org.hibernate.search.engine.search.predicate.dsl.KnnPredicateVectorStep;
 import org.hibernate.search.engine.search.predicate.dsl.PredicateFinalStep;
 import org.hibernate.search.engine.search.predicate.dsl.SearchPredicateFactory;
@@ -19,6 +20,7 @@ import org.hibernate.search.engine.search.predicate.dsl.spi.SearchPredicateDslCo
 import org.hibernate.search.engine.search.predicate.spi.BooleanPredicateBuilder;
 import org.hibernate.search.engine.search.predicate.spi.KnnPredicateBuilder;
 import org.hibernate.search.engine.search.predicate.spi.PredicateTypeKeys;
+import org.hibernate.search.engine.search.reference.TypedFieldReference;
 
 public class KnnPredicateFieldStepImpl
 		extends AbstractPredicateFinalStep
@@ -43,11 +45,9 @@ public class KnnPredicateFieldStepImpl
 	}
 
 	@Override
-	protected SearchPredicate build() {
-		if ( this.booleanBuilder != null ) {
-			builder.filter( booleanBuilder.build() );
-		}
-		return builder.build();
+	public <T> KnnPredicateVectorGenericStep<T> field(TypedFieldReference<T> field) {
+		this.field( field.absolutePath() );
+		return new KnnPredicateVectorGenericStepImpl<>();
 	}
 
 	@Override
@@ -93,11 +93,28 @@ public class KnnPredicateFieldStepImpl
 		return this;
 	}
 
+	@Override
+	protected SearchPredicate build() {
+		if ( this.booleanBuilder != null ) {
+			builder.filter( booleanBuilder.build() );
+		}
+		return builder.build();
+	}
+
 	private BooleanPredicateBuilder booleanPredicateBuilder() {
 		if ( this.booleanBuilder == null ) {
 			this.booleanBuilder = dslContext.scope().predicateBuilders().bool();
 		}
 		return this.booleanBuilder;
+	}
+
+	private class KnnPredicateVectorGenericStepImpl<T> implements KnnPredicateVectorGenericStep<T> {
+
+		@Override
+		public KnnPredicateOptionsStep matching(T vector) {
+			KnnPredicateFieldStepImpl.this.builder.vector( vector );
+			return KnnPredicateFieldStepImpl.this;
+		}
 	}
 
 }

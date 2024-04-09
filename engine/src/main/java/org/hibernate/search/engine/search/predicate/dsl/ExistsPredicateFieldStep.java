@@ -6,6 +6,7 @@
  */
 package org.hibernate.search.engine.search.predicate.dsl;
 
+import org.hibernate.search.engine.search.reference.TypedFieldReference;
 
 /**
  * The initial step in an "exists" predicate definition, where the target field can be set.
@@ -22,5 +23,16 @@ public interface ExistsPredicateFieldStep<N extends ExistsPredicateOptionsStep<?
 	 * @return The next step.
 	 */
 	N field(String fieldPath);
+
+	/**
+	 * Target the given field in the "exists" predicate.
+	 *
+	 * @param field The field reference representing a <a href="SearchPredicateFactory.html#field-paths">path</a> to the index field
+	 * to apply the predicate on.
+	 * @return The next step.
+	 */
+	default N field(TypedFieldReference<?> field) {
+		return field( field.absolutePath() );
+	}
 
 }

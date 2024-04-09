@@ -13,7 +13,8 @@ import org.hibernate.search.engine.search.common.ValueConvert;
  *
  * @param <N> The type of the next step.
  */
-public interface MatchPredicateMatchingStep<N extends MatchPredicateOptionsStep<?>> {
+public interface MatchPredicateMatchingStep<N extends MatchPredicateOptionsStep<?>>
+		extends MatchPredicateMatchingGenericStep<N, Object> {
 
 	/**
 	 * Require at least one of the targeted fields to match the given value.
@@ -22,7 +23,7 @@ public interface MatchPredicateMatchingStep<N extends MatchPredicateOptionsStep<
 	 * See {@link ValueConvert#YES}.
 	 *
 	 * @param value The value to match.
-	 * The signature of this method defines this parameter as an {@link Object},
+	 * The signature of this method defines this parameter as an {@code T},
 	 * but a specific type is expected depending on the targeted field.
 	 * See {@link ValueConvert#YES} for more information.
 	 * @return The next step.
@@ -47,5 +48,4 @@ public interface MatchPredicateMatchingStep<N extends MatchPredicateOptionsStep<
 	 * @see ValueConvert
 	 */
 	N matching(Object value, ValueConvert convert);
-
 }

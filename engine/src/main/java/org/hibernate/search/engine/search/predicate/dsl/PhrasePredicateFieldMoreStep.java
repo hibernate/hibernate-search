@@ -6,6 +6,8 @@
  */
 package org.hibernate.search.engine.search.predicate.dsl;
 
+import org.hibernate.search.engine.search.reference.TypedFieldReference;
+
 /**
  * The step in a "phrase" predicate definition where the phrase to match can be set
  * (see the superinterface {@link PhrasePredicateMatchingStep}),
@@ -53,5 +55,45 @@ public interface PhrasePredicateFieldMoreStep<
 	 * @see PhrasePredicateFieldStep#fields(String...)
 	 */
 	S fields(String... fieldPaths);
+
+	/**
+	 * Target the given field in the phrase predicate,
+	 * as an alternative to the already-targeted fields.
+	 * <p>
+	 * Only text fields are supported.
+	 * <p>
+	 * See {@link PhrasePredicateFieldStep#field(TypedFieldReference)} for more information on targeted fields.
+	 *
+	 * @param field The field reference representing a <a href="SearchPredicateFactory.html#field-paths">path</a> to the index field
+	 * to apply the predicate on.
+	 * @return The next step.
+	 *
+	 * @see PhrasePredicateFieldStep#field(TypedFieldReference)
+	 */
+	default S field(TypedFieldReference<?> field) {
+		return fields( field );
+	}
+
+	/**
+	 * Target the given fields in the phrase predicate,
+	 * as an alternative to the already-targeted fields.
+	 * <p>
+	 * Only text fields are supported.
+	 * <p>
+	 * See {@link PhrasePredicateFieldStep#fields(TypedFieldReference...)} for more information on targeted fields.
+	 *
+	 * @param fields The field references representing <a href="SearchPredicateFactory.html#field-paths">paths</a> to the index fields
+	 * to apply the predicate on.
+	 * @return The next step.
+	 *
+	 * @see PhrasePredicateFieldStep#fields(TypedFieldReference...)
+	 */
+	default S fields(TypedFieldReference<?>... fields) {
+		String[] paths = new String[fields.length];
+		for ( int i = 0; i < fields.length; i++ ) {
+			paths[i] = fields[i].absolutePath();
+		}
+		return fields( paths );
+	}
 
 }

@@ -9,6 +9,7 @@ package org.hibernate.search.engine.search.sort.dsl;
 import java.util.function.Function;
 
 import org.hibernate.search.engine.search.predicate.dsl.SearchPredicateFactory;
+import org.hibernate.search.engine.search.reference.TypedFieldReference;
 import org.hibernate.search.engine.spatial.GeoPoint;
 
 /**
@@ -31,7 +32,17 @@ public interface ExtendedSearchSortFactory<S extends ExtendedSearchSortFactory<?
 	FieldSortOptionsStep<?, PDF> field(String fieldPath);
 
 	@Override
+	default FieldSortOptionsStep<?, PDF> field(TypedFieldReference<?> field) {
+		return field( field.absolutePath() );
+	}
+
+	@Override
 	DistanceSortOptionsStep<?, PDF> distance(String fieldPath, GeoPoint location);
+
+	@Override
+	default DistanceSortOptionsStep<?, PDF> distance(TypedFieldReference<? extends GeoPoint> field, GeoPoint location) {
+		return distance( field.absolutePath(), location );
+	}
 
 	@Override
 	default DistanceSortOptionsStep<?, PDF> distance(String fieldPath, double latitude, double longitude) {
