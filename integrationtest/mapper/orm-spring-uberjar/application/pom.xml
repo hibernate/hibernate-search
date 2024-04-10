@@ -4,7 +4,7 @@
     <parent>
         <groupId>org.hibernate.search</groupId>
         <artifactId>hibernate-search-integrationtest-spring-repackaged</artifactId>
-        <version>6.2.4.Final</version>
+        <version>6.2.5-SNAPSHOT</version>
         <relativePath>..</relativePath>
     </parent>
     <artifactId>hibernate-search-integrationtest-spring-repackaged-application</artifactId>

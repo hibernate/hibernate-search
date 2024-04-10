@@ -11,7 +11,7 @@
     <parent>
         <groupId>org.hibernate.search</groupId>
         <artifactId>hibernate-search-util-internal-integrationtest-jakarta</artifactId>
-        <version>6.2.4.Final</version>
+        <version>6.2.5-SNAPSHOT</version>
         <relativePath>../..</relativePath>
     </parent>
     <artifactId>hibernate-search-util-internal-integrationtest-mapper-orm-jakarta</artifactId>
