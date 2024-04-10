@@ -1,6 +1,21 @@
 Hibernate Search Changelog
 ==========================
 
+6.2.4.Final (2024-04-10)
+-------------------------
+
+** Improvement
+    * HSEARCH-5117 Upgrade -orm6 artifacts to Hibernate ORM 6.2.24.Final
+    * HSEARCH-5115 Upgrade -orm6 artifacts to Hibernate ORM 6.2.23.Final
+    * HSEARCH-5066 Upgrade -orm6 artifacts to Hibernate ORM 6.2.22.Final
+    * HSEARCH-5063 Upgrade -orm6 artifacts to Hibernate ORM 6.2.21.Final
+    * HSEARCH-5058 Upgrade -orm6 artifacts to Hibernate ORM 6.2.20.Final
+    * HSEARCH-5054 Upgrade -orm6 artifacts to Hibernate ORM 6.2.19.Final
+    * HSEARCH-5053 Upgrade -orm6 artifacts to Hibernate ORM 6.2.18.Final
+
+** Task
+    * HSEARCH-5128 Update the supported versions of Java in the documentation
+
 6.2.3.Final (2023-12-21)
 -------------------------
 
