@@ -7,7 +7,7 @@
     <parent>
         <groupId>org.hibernate.search</groupId>
         <artifactId>hibernate-search-integrationtest-orm6</artifactId>
-        <version>6.2.4-SNAPSHOT</version>
+        <version>6.2.4.Final</version>
         <relativePath>../../..</relativePath>
     </parent>
     <artifactId>hibernate-search-integrationtest-java-modules-orm-coordination-outbox-polling-elasticsearch-orm6</artifactId>
