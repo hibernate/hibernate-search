@@ -4,7 +4,7 @@
     <parent>
         <groupId>org.hibernate.search</groupId>
         <artifactId>hibernate-search-parent-internal</artifactId>
-        <version>7.0.1-SNAPSHOT</version>
+        <version>7.0.1.Final</version>
         <relativePath>../../../build/parents/internal</relativePath>
     </parent>
     <artifactId>hibernate-search-util-internal-integrationtest</artifactId>
