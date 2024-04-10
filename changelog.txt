@@ -1,6 +1,22 @@
 Hibernate Search Changelog
 ==========================
 
+7.1.1.Final (2024-04-10)
+-------------------------
+
+** Bug
+    * HSEARCH-5110 Error message when the version of Elasticsearch/Opensearch is too old for vector search states wrong requirements
+
+** Improvement
+    * HSEARCH-5127 Add Elasticsearch 8.13.0 compatibility
+    * HSEARCH-5122 Add compatibility with OpenSearch 2.13.0
+    * HSEARCH-5112 Make `hibernate-search-v5migrationhelper-orm` compatible with ORM 6.5
+
+** Task
+    * HSEARCH-5128 Update the supported versions of Java in the documentation
+    * HSEARCH-5126 Test Elasticsearch 8.13.2 compatibility
+    * HSEARCH-5113 Fix flaky knn test : KnnPredicateSpecificsIT$ExampleKnnSearchIT.multipleKnn_shouldClauses
+
 7.1.0.Final (2024-02-28)
 -------------------------
 
