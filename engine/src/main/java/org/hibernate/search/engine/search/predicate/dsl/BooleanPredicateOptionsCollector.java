@@ -62,7 +62,8 @@ import org.hibernate.search.engine.search.predicate.SearchPredicate;
  *
  * @param <S> The "self" type (the actual exposed type of this collector).
  */
-public interface BooleanPredicateOptionsCollector<S extends BooleanPredicateOptionsCollector<?>> {
+public interface BooleanPredicateOptionsCollector<S extends BooleanPredicateOptionsCollector<?>>
+		extends CommonMinimumShouldMatchOptionsStep<S> {
 
 	/**
 	 * Delegates setting clauses and options to a given consumer.
@@ -205,58 +206,6 @@ public interface BooleanPredicateOptionsCollector<S extends BooleanPredicateOpti
 	 * @return {@code this}, for method chaining.
 	 */
 	S filter(Function<? super SearchPredicateFactory, ? extends PredicateFinalStep> clauseContributor);
-
-	/**
-	 * Add a default <a href="MinimumShouldMatchConditionStep.html#minimumshouldmatch">"minimumShouldMatch" constraint</a>.
-	 *
-	 * @param matchingClausesNumber A definition of the number of "should" clauses that have to match.
-	 * If positive, it is the number of clauses that have to match.
-	 * See <a href="MinimumShouldMatchConditionStep.html#minimumshouldmatch-minimum">Definition of the minimum</a>
-	 * for details and possible values, in particular negative values.
-	 * @return {@code this}, for method chaining.
-	 */
-	default S minimumShouldMatchNumber(int matchingClausesNumber) {
-		return minimumShouldMatch()
-				.ifMoreThan( 0 ).thenRequireNumber( matchingClausesNumber )
-				.end();
-	}
-
-	/**
-	 * Add a default <a href="MinimumShouldMatchConditionStep.html#minimumshouldmatch">"minimumShouldMatch" constraint</a>.
-	 *
-	 * @param matchingClausesPercent A definition of the number of "should" clauses that have to match, as a percentage.
-	 * If positive, it is the percentage of the total number of "should" clauses that have to match.
-	 * See <a href="MinimumShouldMatchConditionStep.html#minimumshouldmatch-minimum">Definition of the minimum</a>
-	 * for details and possible values, in particular negative values.
-	 * @return {@code this}, for method chaining.
-	 */
-	default S minimumShouldMatchPercent(int matchingClausesPercent) {
-		return minimumShouldMatch()
-				.ifMoreThan( 0 ).thenRequirePercent( matchingClausesPercent )
-				.end();
-	}
-
-	/**
-	 * Start defining the minimum number of "should" constraints that have to match
-	 * in order for the boolean predicate to match.
-	 * <p>
-	 * See {@link MinimumShouldMatchConditionStep}.
-	 *
-	 * @return A {@link MinimumShouldMatchConditionStep} where constraints can be defined.
-	 */
-	MinimumShouldMatchConditionStep<? extends S> minimumShouldMatch();
-
-	/**
-	 * Start defining the minimum number of "should" constraints that have to match
-	 * in order for the boolean predicate to match.
-	 * <p>
-	 * See {@link MinimumShouldMatchConditionStep}.
-	 *
-	 * @param constraintContributor A consumer that will add constraints to the DSL step passed in parameter.
-	 * Should generally be a lambda expression.
-	 * @return {@code this}, for method chaining.
-	 */
-	S minimumShouldMatch(Consumer<? super MinimumShouldMatchConditionStep<?>> constraintContributor);
 
 	/**
 	 * Checks if this predicate contains at least one clause.
