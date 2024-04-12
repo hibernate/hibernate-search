@@ -75,13 +75,23 @@ public class LuceneNumericMatchPredicate extends AbstractLuceneLeafSingleFieldPr
 		}
 
 		@Override
-		public SearchPredicate build() {
-			return new LuceneNumericMatchPredicate( this );
+		public void minimumShouldMatchNumber(int ignoreConstraintCeiling, int matchingClausesNumber) {
+			throw log.fullTextFeaturesNotSupportedByFieldType( field.eventContext() );
+		}
+
+		@Override
+		public void minimumShouldMatchPercent(int ignoreConstraintCeiling, int matchingClausesPercent) {
+			throw log.fullTextFeaturesNotSupportedByFieldType( field.eventContext() );
 		}
 
 		@Override
 		protected Query buildQuery(PredicateRequestContext context) {
 			return codec.getDomain().createExactQuery( absoluteFieldPath, value );
+		}
+
+		@Override
+		public SearchPredicate build() {
+			return new LuceneNumericMatchPredicate( this );
 		}
 	}
 }

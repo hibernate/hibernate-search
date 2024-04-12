@@ -317,7 +317,7 @@ public interface Log extends BasicLogger {
 			@Cause Exception cause);
 
 	@Message(id = ID_OFFSET + 70,
-			value = "Full-text features (analysis, fuzziness) are not supported for fields of this type.")
+			value = "Full-text features (analysis, fuzziness, minimum should match) are not supported for fields of this type.")
 	SearchException fullTextFeaturesNotSupportedByFieldType(@Param EventContext context);
 
 	@Message(id = ID_OFFSET + 71,

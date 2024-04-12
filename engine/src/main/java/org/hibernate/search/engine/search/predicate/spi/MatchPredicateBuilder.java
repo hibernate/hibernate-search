@@ -8,7 +8,7 @@ package org.hibernate.search.engine.search.predicate.spi;
 
 import org.hibernate.search.engine.search.common.ValueConvert;
 
-public interface MatchPredicateBuilder extends SearchPredicateBuilder {
+public interface MatchPredicateBuilder extends SearchPredicateBuilder, MinimumShouldMatchBuilder {
 
 	void fuzzy(int maxEditDistance, int exactPrefixLength);
 

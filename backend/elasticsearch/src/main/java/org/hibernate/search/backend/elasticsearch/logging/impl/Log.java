@@ -354,7 +354,7 @@ public interface Log extends BasicLogger {
 	SearchException cannotGuessFieldType(@FormatWith(ClassFormatter.class) Class<?> inputType, @Param EventContext context);
 
 	@Message(id = ID_OFFSET + 53,
-			value = "Full-text features (analysis, fuzziness) are not supported for fields of this type.")
+			value = "Full-text features (analysis, fuzziness, minimum should match) are not supported for fields of this type.")
 	SearchException fullTextFeaturesNotSupportedByFieldType(@Param EventContext context);
 
 	@Message(id = ID_OFFSET + 54,
