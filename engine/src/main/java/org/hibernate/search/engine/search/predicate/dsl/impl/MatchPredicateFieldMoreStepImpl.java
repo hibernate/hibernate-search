@@ -18,8 +18,10 @@ import org.hibernate.search.engine.search.common.spi.SearchIndexScope;
 import org.hibernate.search.engine.search.predicate.SearchPredicate;
 import org.hibernate.search.engine.search.predicate.dsl.MatchPredicateFieldMoreStep;
 import org.hibernate.search.engine.search.predicate.dsl.MatchPredicateOptionsStep;
+import org.hibernate.search.engine.search.predicate.dsl.MinimumShouldMatchConditionStep;
 import org.hibernate.search.engine.search.predicate.dsl.spi.SearchPredicateDslContext;
 import org.hibernate.search.engine.search.predicate.spi.MatchPredicateBuilder;
+import org.hibernate.search.engine.search.predicate.spi.MinimumShouldMatchBuilder;
 import org.hibernate.search.engine.search.predicate.spi.PredicateTypeKeys;
 import org.hibernate.search.util.common.impl.Contracts;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
@@ -73,9 +75,11 @@ class MatchPredicateFieldMoreStepImpl
 
 	static class CommonState extends AbstractBooleanMultiFieldPredicateCommonState<CommonState, MatchPredicateFieldMoreStepImpl>
 			implements MatchPredicateOptionsStep<CommonState> {
+		private final MinimumShouldMatchConditionStepImpl<CommonState> minimumShouldMatchStep;
 
 		CommonState(SearchPredicateDslContext<?> dslContext) {
 			super( dslContext );
+			minimumShouldMatchStep = new MinimumShouldMatchConditionStepImpl<>( new MatchMinimumShouldMatchBuilder(), this );
 		}
 
 		MatchPredicateOptionsStep<?> matching(Object value, ValueConvert convert) {
@@ -130,6 +134,37 @@ class MatchPredicateFieldMoreStepImpl
 		@Override
 		protected CommonState thisAsS() {
 			return this;
+		}
+
+		@Override
+		public MinimumShouldMatchConditionStep<? extends CommonState> minimumShouldMatch() {
+			return minimumShouldMatchStep;
+		}
+
+		@Override
+		public CommonState minimumShouldMatch(Consumer<? super MinimumShouldMatchConditionStep<?>> constraintContributor) {
+			constraintContributor.accept( minimumShouldMatchStep );
+			return this;
+		}
+
+		private class MatchMinimumShouldMatchBuilder implements MinimumShouldMatchBuilder {
+			@Override
+			public void minimumShouldMatchNumber(int ignoreConstraintCeiling, int matchingClausesNumber) {
+				for ( MatchPredicateFieldMoreStepImpl fieldSetState : getFieldSetStates() ) {
+					for ( MatchPredicateBuilder predicateBuilder : fieldSetState.predicateBuilders ) {
+						predicateBuilder.minimumShouldMatchNumber( ignoreConstraintCeiling, matchingClausesNumber );
+					}
+				}
+			}
+
+			@Override
+			public void minimumShouldMatchPercent(int ignoreConstraintCeiling, int matchingClausesPercent) {
+				for ( MatchPredicateFieldMoreStepImpl fieldSetState : getFieldSetStates() ) {
+					for ( MatchPredicateBuilder predicateBuilder : fieldSetState.predicateBuilders ) {
+						predicateBuilder.minimumShouldMatchPercent( ignoreConstraintCeiling, matchingClausesPercent );
+					}
+				}
+			}
 		}
 	}
 

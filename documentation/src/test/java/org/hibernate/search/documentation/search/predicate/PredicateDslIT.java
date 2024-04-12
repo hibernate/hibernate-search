@@ -656,6 +656,23 @@ class PredicateDslIT {
 	}
 
 	@Test
+	void match_minimumShouldMatch() {
+		withinSearchSession( searchSession -> {
+			// tag::match-minimumShouldMatchNumber[]
+			List<Book> hits = searchSession.search( Book.class )
+					.where( f -> f.match()
+							.field( "title" )
+							.matching( "investigation detective automatic" )
+							.minimumShouldMatchNumber( 2 ) ) // <1>
+					.fetchHits( 20 ); // <2>
+			// end::match-minimumShouldMatchNumber[]
+			assertThat( hits )
+					.extracting( Book::getId )
+					.containsExactlyInAnyOrder( BOOK4_ID );
+		} );
+	}
+
+	@Test
 	void range() {
 		withinSearchSession( searchSession -> {
 			// tag::range-between[]

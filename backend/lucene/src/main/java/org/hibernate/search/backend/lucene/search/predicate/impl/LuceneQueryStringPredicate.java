@@ -107,7 +107,7 @@ public class LuceneQueryStringPredicate extends LuceneCommonQueryStringPredicate
 			}
 
 			try {
-				return addMatchAllForBoolMustNotOnly( applyMinimumShouldMatch( queryParser.parse( queryString ) ) );
+				return addMatchAllForBoolMustNotOnly( minimumShouldMatchConstraints.apply( queryParser.parse( queryString ) ) );
 			}
 			catch (ParseException e) {
 				throw log.queryStringParseException( queryString, e.getMessage(), e );

@@ -268,6 +268,26 @@ include::{sourcedir}/org/hibernate/search/documentation/search/predicate/Predica
 ----
 ====
 
+[[search-dsl-predicate-match-minimumshouldmatch]]
+=== `minimumShouldMatch`: fine-tuning how many terms are required to match
+
+It is possible to require that an arbitrary number of terms from the match string to be present in the document
+in order for the `match` predicate to match.
+This is the purpose of the `minimumShouldMatch*` methods,
+as demonstrated below.
+
+.Fine-tuning matching requirements with `minimumShouldMatch`
+====
+[source, JAVA, indent=0, subs="+callouts"]
+----
+include::{sourcedir}/org/hibernate/search/documentation/search/predicate/PredicateDslIT.java[tags=match-minimumShouldMatchNumber]
+----
+<1> At least two terms must match for this predicate to match.
+<2> All returned hits will match at least two of the terms:
+their titles will match either `investigation` and `detective`,
+`investigation` and `automatic`, `detective` and `automatic`, or all three of these terms.
+====
+
 [[search-dsl-predicate-match-other]]
 === Other options
 

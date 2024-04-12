@@ -40,7 +40,7 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
 
-class MatchPredicateFuzzyIT {
+class MatchPredicateSpecificsIT {
 
 	private static final List<StandardFieldTypeDescriptor<?>> unsupportedFieldTypes =
 			FieldTypeDescriptor.getAllStandard().stream()
@@ -232,7 +232,7 @@ class MatchPredicateFuzzyIT {
 					"match() predicate with fuzzy() and unsupported type on field " + absoluteFieldPath )
 					.isInstanceOf( SearchException.class )
 					.hasMessageContaining(
-							"Full-text features (analysis, fuzziness) are not supported for fields of this type" )
+							"Full-text features (analysis, fuzziness, minimum should match) are not supported for fields of this type" )
 					.satisfies( FailureReportUtils.hasContext(
 							EventContexts.fromIndexFieldAbsolutePath( absoluteFieldPath )
 					) );
@@ -241,7 +241,7 @@ class MatchPredicateFuzzyIT {
 					"match() predicate with fuzzy(int) and unsupported type on field " + absoluteFieldPath )
 					.isInstanceOf( SearchException.class )
 					.hasMessageContaining(
-							"Full-text features (analysis, fuzziness) are not supported for fields of this type" )
+							"Full-text features (analysis, fuzziness, minimum should match) are not supported for fields of this type" )
 					.satisfies( FailureReportUtils.hasContext(
 							EventContexts.fromIndexFieldAbsolutePath( absoluteFieldPath )
 					) );
@@ -250,7 +250,7 @@ class MatchPredicateFuzzyIT {
 					"match() predicate with fuzzy(int, int) and unsupported type on field " + absoluteFieldPath )
 					.isInstanceOf( SearchException.class )
 					.hasMessageContaining(
-							"Full-text features (analysis, fuzziness) are not supported for fields of this type" )
+							"Full-text features (analysis, fuzziness, minimum should match) are not supported for fields of this type" )
 					.satisfies( FailureReportUtils.hasContext(
 							EventContexts.fromIndexFieldAbsolutePath( absoluteFieldPath )
 					) );
@@ -342,6 +342,30 @@ class MatchPredicateFuzzyIT {
 		assertThatQuery( index.query()
 				.where( f -> f.match().field( absoluteFieldPath ).matching( "word" ).fuzzy().skipAnalysis() ) )
 				.hasDocRefHitsAnyOrder( index.typeName(), dataSet.docId( 0 ), dataSet.docId( 1 ), dataSet.docId( 2 ) );
+	}
+
+	@Test
+	void minimumShouldMatch() {
+		String absoluteFieldPath = index.binding().analyzedStringField.relativeFieldName;
+
+		assertThatQuery( index.query()
+				.where( f -> f.match().field( absoluteFieldPath )
+						.matching( "quick yellow fox" )
+						.minimumShouldMatchNumber( 2 ) )
+		).hasDocRefHitsAnyOrder( index.typeName(), dataSet.docId( 0 ) );
+
+		assertThatQuery( index.query()
+				.where( f -> f.match().field( absoluteFieldPath )
+						.matching( "quick yellow fox" )
+						.minimumShouldMatchNumber( 3 ) )
+		).hasNoHits();
+
+		assertThatQuery( index.query()
+				.where( f -> f.match().field( absoluteFieldPath )
+						.matching( "slow yellow fox" )
+						.minimumShouldMatchNumber( 1 ) )
+		).hasDocRefHitsAnyOrder( index.typeName(), dataSet.docId( 0 ) );
+
 	}
 
 	private static class IndexBinding {

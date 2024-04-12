@@ -6,21 +6,14 @@
  */
 package org.hibernate.search.backend.lucene.search.predicate.impl;
 
-import static org.hibernate.search.backend.lucene.search.predicate.impl.LuceneCommonMinimumShouldMatchConstraint.minimumShouldMatch;
-
-import java.lang.invoke.MethodHandles;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
-import java.util.NavigableMap;
-import java.util.TreeMap;
 import java.util.function.Consumer;
 
-import org.hibernate.search.backend.lucene.logging.impl.Log;
 import org.hibernate.search.backend.lucene.search.common.impl.LuceneSearchIndexScope;
 import org.hibernate.search.engine.search.predicate.SearchPredicate;
 import org.hibernate.search.engine.search.predicate.spi.BooleanPredicateBuilder;
-import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
 import org.apache.lucene.search.BooleanClause.Occur;
 import org.apache.lucene.search.BooleanQuery;
@@ -28,8 +21,6 @@ import org.apache.lucene.search.MatchAllDocsQuery;
 import org.apache.lucene.search.Query;
 
 class LuceneBooleanPredicate extends AbstractLuceneSearchPredicate {
-
-	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	private final List<LuceneSearchPredicate> mustClauses;
 	private final List<LuceneSearchPredicate> mustNotClauses;
@@ -39,7 +30,7 @@ class LuceneBooleanPredicate extends AbstractLuceneSearchPredicate {
 	// NOTE: below modifiers (minimumShouldMatchConstraints) are used to implement hasNoModifiers() which is based on a
 	// parent implementation.
 	// IMPORTANT: Review where current modifiers are used and how the new modifier affects that logic, when adding a new modifier.
-	private final NavigableMap<Integer, LuceneCommonMinimumShouldMatchConstraint> minimumShouldMatchConstraints;
+	private final LuceneCommonMinimumShouldMatchConstraints minimumShouldMatchConstraint;
 
 	private LuceneBooleanPredicate(Builder builder) {
 		super( builder );
@@ -47,13 +38,13 @@ class LuceneBooleanPredicate extends AbstractLuceneSearchPredicate {
 		mustNotClauses = builder.mustNotClauses;
 		shouldClauses = builder.shouldClauses;
 		filterClauses = builder.filterClauses;
-		minimumShouldMatchConstraints = builder.minimumShouldMatchConstraints;
+		minimumShouldMatchConstraint = builder.minimumShouldMatchBuilder;
 		// Ensure illegal attempts to mutate the predicate will fail
 		builder.mustClauses = null;
 		builder.shouldClauses = null;
 		builder.mustNotClauses = null;
 		builder.filterClauses = null;
-		builder.minimumShouldMatchConstraints = null;
+		builder.minimumShouldMatchBuilder = null;
 	}
 
 	@Override
@@ -77,8 +68,8 @@ class LuceneBooleanPredicate extends AbstractLuceneSearchPredicate {
 			booleanQueryBuilder.add( new MatchAllDocsQuery(), super.hasNoModifiers() ? Occur.FILTER : Occur.MUST );
 		}
 
-		if ( minimumShouldMatchConstraints != null && shouldClauses != null ) {
-			int minimumShouldMatch = minimumShouldMatch( minimumShouldMatchConstraints, shouldClauses );
+		if ( !minimumShouldMatchConstraint.isEmpty() && shouldClauses != null ) {
+			int minimumShouldMatch = minimumShouldMatchConstraint.minimumShouldMatch( shouldClauses );
 			booleanQueryBuilder.setMinimumNumberShouldMatch( minimumShouldMatch );
 		}
 
@@ -119,7 +110,7 @@ class LuceneBooleanPredicate extends AbstractLuceneSearchPredicate {
 
 	@Override
 	protected boolean hasNoModifiers() {
-		return minimumShouldMatchConstraints == null
+		return minimumShouldMatchConstraint.isEmpty()
 				&& super.hasNoModifiers();
 	}
 
@@ -132,10 +123,11 @@ class LuceneBooleanPredicate extends AbstractLuceneSearchPredicate {
 		// NOTE: below modifiers (minimumShouldMatchConstraints) are used to implement hasNoModifiers() which is based on a
 		// parent implementation.
 		// IMPORTANT: Review where current modifiers are used and how the new modifier affects that logic, when adding a new modifier.
-		private NavigableMap<Integer, LuceneCommonMinimumShouldMatchConstraint> minimumShouldMatchConstraints;
+		private LuceneCommonMinimumShouldMatchConstraints minimumShouldMatchBuilder;
 
 		Builder(LuceneSearchIndexScope<?> scope) {
 			super( scope );
+			minimumShouldMatchBuilder = new LuceneCommonMinimumShouldMatchConstraints();
 		}
 
 		@Override
@@ -172,18 +164,12 @@ class LuceneBooleanPredicate extends AbstractLuceneSearchPredicate {
 
 		@Override
 		public void minimumShouldMatchNumber(int ignoreConstraintCeiling, int matchingClausesNumber) {
-			addMinimumShouldMatchConstraint(
-					ignoreConstraintCeiling,
-					new LuceneCommonMinimumShouldMatchConstraint( matchingClausesNumber, null )
-			);
+			minimumShouldMatchBuilder.minimumShouldMatchNumber( ignoreConstraintCeiling, matchingClausesNumber );
 		}
 
 		@Override
 		public void minimumShouldMatchPercent(int ignoreConstraintCeiling, int matchingClausesPercent) {
-			addMinimumShouldMatchConstraint(
-					ignoreConstraintCeiling,
-					new LuceneCommonMinimumShouldMatchConstraint( null, matchingClausesPercent )
-			);
+			minimumShouldMatchBuilder.minimumShouldMatchPercent( ignoreConstraintCeiling, matchingClausesPercent );
 		}
 
 		@Override
@@ -261,19 +247,7 @@ class LuceneBooleanPredicate extends AbstractLuceneSearchPredicate {
 
 		@Override
 		protected boolean hasNoModifiers() {
-			return minimumShouldMatchConstraints == null && super.hasNoModifiers();
-		}
-
-		private void addMinimumShouldMatchConstraint(int ignoreConstraintCeiling,
-				LuceneCommonMinimumShouldMatchConstraint constraint) {
-			if ( minimumShouldMatchConstraints == null ) {
-				// We'll need to go through the data in ascending order, so use a TreeMap
-				minimumShouldMatchConstraints = new TreeMap<>();
-			}
-			Object previous = minimumShouldMatchConstraints.put( ignoreConstraintCeiling, constraint );
-			if ( previous != null ) {
-				throw log.minimumShouldMatchConflictingConstraints( ignoreConstraintCeiling );
-			}
+			return minimumShouldMatchBuilder.isEmpty() && super.hasNoModifiers();
 		}
 	}
 

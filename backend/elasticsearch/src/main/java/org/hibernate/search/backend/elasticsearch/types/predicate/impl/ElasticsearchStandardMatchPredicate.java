@@ -111,6 +111,16 @@ public class ElasticsearchStandardMatchPredicate extends AbstractElasticsearchSi
 		}
 
 		@Override
+		public void minimumShouldMatchNumber(int ignoreConstraintCeiling, int matchingClausesNumber) {
+			throw log.fullTextFeaturesNotSupportedByFieldType( EventContexts.fromIndexFieldAbsolutePath( absoluteFieldPath ) );
+		}
+
+		@Override
+		public void minimumShouldMatchPercent(int ignoreConstraintCeiling, int matchingClausesPercent) {
+			throw log.fullTextFeaturesNotSupportedByFieldType( EventContexts.fromIndexFieldAbsolutePath( absoluteFieldPath ) );
+		}
+
+		@Override
 		public SearchPredicate build() {
 			return new ElasticsearchStandardMatchPredicate( this );
 		}

@@ -8,27 +8,20 @@ package org.hibernate.search.backend.elasticsearch.search.predicate.impl;
 
 import static org.hibernate.search.backend.elasticsearch.search.predicate.impl.ElasticsearchMatchAllPredicate.MATCH_ALL_ACCESSOR;
 
-import java.lang.invoke.MethodHandles;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
-import java.util.TreeMap;
 import java.util.function.Consumer;
 
 import org.hibernate.search.backend.elasticsearch.gson.impl.GsonUtils;
 import org.hibernate.search.backend.elasticsearch.gson.impl.JsonAccessor;
-import org.hibernate.search.backend.elasticsearch.logging.impl.Log;
 import org.hibernate.search.backend.elasticsearch.search.common.impl.ElasticsearchSearchIndexScope;
 import org.hibernate.search.engine.search.predicate.SearchPredicate;
 import org.hibernate.search.engine.search.predicate.spi.BooleanPredicateBuilder;
-import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
 import com.google.gson.JsonObject;
 
 class ElasticsearchBooleanPredicate extends AbstractElasticsearchPredicate {
-
-	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	private static final String MUST_PROPERTY_NAME = "must";
 	private static final String MUST_NOT_PROPERTY_NAME = "must_not";
@@ -46,7 +39,7 @@ class ElasticsearchBooleanPredicate extends AbstractElasticsearchPredicate {
 	// NOTE: below modifiers (minimumShouldMatchConstraints) are used to implement hasNoModifiers() which is based on a
 	// parent implementation.
 	// IMPORTANT: Review where current modifiers are used and how the new modifier affects that logic, when adding a new modifier.
-	private final Map<Integer, ElasticsearchCommonMinimumShouldMatchConstraint> minimumShouldMatchConstraints;
+	private final ElasticsearchCommonMinimumShouldMatchConstraints minimumShouldMatchConstraints;
 
 	private ElasticsearchBooleanPredicate(Builder builder) {
 		super( builder );
@@ -91,11 +84,10 @@ class ElasticsearchBooleanPredicate extends AbstractElasticsearchPredicate {
 			GsonUtils.setOrAppendToArray( innerObject, MUST_PROPERTY_NAME, matchAllClause );
 		}
 
-		if ( minimumShouldMatchConstraints != null ) {
+		if ( !minimumShouldMatchConstraints.isEmpty() ) {
 			MINIMUM_SHOULD_MATCH_ACCESSOR.set(
 					innerObject,
-					ElasticsearchCommonMinimumShouldMatchConstraint
-							.formatMinimumShouldMatchConstraints( minimumShouldMatchConstraints )
+					minimumShouldMatchConstraints.formatMinimumShouldMatchConstraints()
 			);
 		}
 
@@ -152,7 +144,7 @@ class ElasticsearchBooleanPredicate extends AbstractElasticsearchPredicate {
 
 	@Override
 	protected boolean hasNoModifiers() {
-		return minimumShouldMatchConstraints == null
+		return minimumShouldMatchConstraints.isEmpty()
 				&& super.hasNoModifiers();
 	}
 
@@ -165,10 +157,11 @@ class ElasticsearchBooleanPredicate extends AbstractElasticsearchPredicate {
 		// NOTE: below modifiers (minimumShouldMatchConstraints) are used to implement hasNoModifiers() which is based on a
 		// parent implementation.
 		// IMPORTANT: Review where current modifiers are used and how the new modifier affects that logic, when adding a new modifier.
-		private Map<Integer, ElasticsearchCommonMinimumShouldMatchConstraint> minimumShouldMatchConstraints;
+		private ElasticsearchCommonMinimumShouldMatchConstraints minimumShouldMatchConstraints;
 
 		Builder(ElasticsearchSearchIndexScope<?> scope) {
 			super( scope );
+			this.minimumShouldMatchConstraints = new ElasticsearchCommonMinimumShouldMatchConstraints();
 		}
 
 		@Override
@@ -213,35 +206,17 @@ class ElasticsearchBooleanPredicate extends AbstractElasticsearchPredicate {
 
 		@Override
 		public void minimumShouldMatchNumber(int ignoreConstraintCeiling, int matchingClausesNumber) {
-			addMinimumShouldMatchConstraint(
-					ignoreConstraintCeiling,
-					new ElasticsearchCommonMinimumShouldMatchConstraint( matchingClausesNumber, null )
-			);
+			minimumShouldMatchConstraints.minimumShouldMatchNumber( ignoreConstraintCeiling, matchingClausesNumber );
 		}
 
 		@Override
 		public void minimumShouldMatchPercent(int ignoreConstraintCeiling, int matchingClausesPercent) {
-			addMinimumShouldMatchConstraint(
-					ignoreConstraintCeiling,
-					new ElasticsearchCommonMinimumShouldMatchConstraint( null, matchingClausesPercent )
-			);
+			minimumShouldMatchConstraints.minimumShouldMatchPercent( ignoreConstraintCeiling, matchingClausesPercent );
 		}
 
 		@Override
 		public boolean hasClause() {
 			return mustClauses != null || shouldClauses != null || mustNotClauses != null || filterClauses != null;
-		}
-
-		private void addMinimumShouldMatchConstraint(int ignoreConstraintCeiling,
-				ElasticsearchCommonMinimumShouldMatchConstraint constraint) {
-			if ( minimumShouldMatchConstraints == null ) {
-				// We'll need to go through the data in ascending order, so use a TreeMap
-				minimumShouldMatchConstraints = new TreeMap<>();
-			}
-			Object previous = minimumShouldMatchConstraints.put( ignoreConstraintCeiling, constraint );
-			if ( previous != null ) {
-				throw log.minimumShouldMatchConflictingConstraints( ignoreConstraintCeiling );
-			}
 		}
 
 		@Override
@@ -273,7 +248,7 @@ class ElasticsearchBooleanPredicate extends AbstractElasticsearchPredicate {
 			}
 
 			// Forcing to Lucene's defaults. See HSEARCH-3534
-			if ( minimumShouldMatchConstraints == null && hasAtLeastOneMustOrFilterPredicate() ) {
+			if ( minimumShouldMatchConstraints.isEmpty() && hasAtLeastOneMustOrFilterPredicate() ) {
 				minimumShouldMatchNumber( 0, 0 );
 			}
 
@@ -328,7 +303,7 @@ class ElasticsearchBooleanPredicate extends AbstractElasticsearchPredicate {
 
 		@Override
 		protected boolean hasNoModifiers() {
-			return minimumShouldMatchConstraints == null && super.hasNoModifiers();
+			return minimumShouldMatchConstraints.isEmpty() && super.hasNoModifiers();
 		}
 	}
 

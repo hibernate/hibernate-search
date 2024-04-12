@@ -8,8 +8,6 @@ package org.hibernate.search.engine.search.predicate.dsl;
 
 import java.util.function.Consumer;
 
-import org.hibernate.search.engine.search.common.BooleanOperator;
-
 /**
  * The step in a predicate definition, where optional minimum should match parameters can be set.
  *

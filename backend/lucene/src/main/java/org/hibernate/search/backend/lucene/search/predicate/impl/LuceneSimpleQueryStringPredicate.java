@@ -54,7 +54,7 @@ public class LuceneSimpleQueryStringPredicate extends LuceneCommonQueryStringPre
 			SimpleQueryParser queryParser =
 					new HibernateSearchSimpleQueryParser( buildAnalyzer(), buildWeights(), fieldStateLookup(), flags, scope );
 			queryParser.setDefaultOperator( toOccur( defaultOperator ) );
-			return applyMinimumShouldMatch( queryParser.parse( queryString ) );
+			return minimumShouldMatchConstraints.apply( queryParser.parse( queryString ) );
 		}
 
 		@Override

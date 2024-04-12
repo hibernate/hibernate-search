@@ -14,6 +14,7 @@ import org.hibernate.search.backend.elasticsearch.lowlevel.index.analysis.impl.A
 import org.hibernate.search.backend.elasticsearch.search.common.impl.AbstractElasticsearchCodecAwareSearchQueryElementFactory;
 import org.hibernate.search.backend.elasticsearch.search.common.impl.ElasticsearchSearchIndexScope;
 import org.hibernate.search.backend.elasticsearch.search.common.impl.ElasticsearchSearchIndexValueFieldContext;
+import org.hibernate.search.backend.elasticsearch.search.predicate.impl.ElasticsearchCommonMinimumShouldMatchConstraints;
 import org.hibernate.search.backend.elasticsearch.search.predicate.impl.PredicateRequestContext;
 import org.hibernate.search.backend.elasticsearch.types.codec.impl.ElasticsearchFieldCodec;
 import org.hibernate.search.engine.reporting.spi.EventContexts;
@@ -31,16 +32,21 @@ public class ElasticsearchTextMatchPredicate extends ElasticsearchStandardMatchP
 	private static final JsonAccessor<Integer> PREFIX_LENGTH_ACCESSOR =
 			JsonAccessor.root().property( "prefix_length" ).asInteger();
 	private static final JsonAccessor<String> ANALYZER_ACCESSOR = JsonAccessor.root().property( "analyzer" ).asString();
+	private static final JsonAccessor<String> MINIMUM_SHOULD_MATCH_ACCESSOR = JsonAccessor.root()
+			.property( "minimum_should_match" ).asString();
 
 	private final Integer fuzziness;
 	private final Integer prefixLength;
 	private final String analyzer;
+	private final ElasticsearchCommonMinimumShouldMatchConstraints minimumShouldMatchConstraints;
 
 	private ElasticsearchTextMatchPredicate(Builder builder) {
 		super( builder );
 		fuzziness = builder.fuzziness;
 		prefixLength = builder.prefixLength;
 		analyzer = builder.analyzer;
+		minimumShouldMatchConstraints = builder.minimumShouldMatchConstraints;
+		builder.minimumShouldMatchConstraints = null;
 	}
 
 	@Override
@@ -54,6 +60,12 @@ public class ElasticsearchTextMatchPredicate extends ElasticsearchStandardMatchP
 		}
 		if ( prefixLength != null ) {
 			PREFIX_LENGTH_ACCESSOR.set( innerObject, prefixLength );
+		}
+		if ( !minimumShouldMatchConstraints.isEmpty() ) {
+			MINIMUM_SHOULD_MATCH_ACCESSOR.set(
+					innerObject,
+					minimumShouldMatchConstraints.formatMinimumShouldMatchConstraints()
+			);
 		}
 		return super.doToJsonQuery( context, outerObject, innerObject );
 	}
@@ -75,10 +87,12 @@ public class ElasticsearchTextMatchPredicate extends ElasticsearchStandardMatchP
 		private Integer fuzziness;
 		private Integer prefixLength;
 		private String analyzer;
+		private ElasticsearchCommonMinimumShouldMatchConstraints minimumShouldMatchConstraints;
 
 		private Builder(ElasticsearchFieldCodec<String> codec, ElasticsearchSearchIndexScope<?> scope,
 				ElasticsearchSearchIndexValueFieldContext<String> field) {
 			super( codec, scope, field );
+			this.minimumShouldMatchConstraints = new ElasticsearchCommonMinimumShouldMatchConstraints();
 		}
 
 		@Override
@@ -100,6 +114,16 @@ public class ElasticsearchTextMatchPredicate extends ElasticsearchStandardMatchP
 			}
 
 			analyzer( AnalyzerConstants.KEYWORD_ANALYZER );
+		}
+
+		@Override
+		public void minimumShouldMatchNumber(int ignoreConstraintCeiling, int matchingClausesNumber) {
+			minimumShouldMatchConstraints.minimumShouldMatchNumber( ignoreConstraintCeiling, matchingClausesNumber );
+		}
+
+		@Override
+		public void minimumShouldMatchPercent(int ignoreConstraintCeiling, int matchingClausesPercent) {
+			minimumShouldMatchConstraints.minimumShouldMatchPercent( ignoreConstraintCeiling, matchingClausesPercent );
 		}
 
 		@Override

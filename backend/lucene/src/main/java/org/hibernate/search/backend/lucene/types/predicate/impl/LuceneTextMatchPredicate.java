@@ -16,6 +16,7 @@ import org.hibernate.search.backend.lucene.search.common.impl.AbstractLuceneCode
 import org.hibernate.search.backend.lucene.search.common.impl.LuceneSearchIndexScope;
 import org.hibernate.search.backend.lucene.search.common.impl.LuceneSearchIndexValueFieldContext;
 import org.hibernate.search.backend.lucene.search.predicate.impl.AbstractLuceneLeafSingleFieldPredicate;
+import org.hibernate.search.backend.lucene.search.predicate.impl.LuceneCommonMinimumShouldMatchConstraints;
 import org.hibernate.search.backend.lucene.search.predicate.impl.PredicateRequestContext;
 import org.hibernate.search.backend.lucene.types.codec.impl.LuceneStandardFieldCodec;
 import org.hibernate.search.engine.search.common.ValueConvert;
@@ -55,6 +56,7 @@ public class LuceneTextMatchPredicate extends AbstractLuceneLeafSingleFieldPredi
 	private static class Builder<F> extends AbstractBuilder<F> implements MatchPredicateBuilder {
 		private final LuceneStandardFieldCodec<F, String> codec;
 		private final LuceneAnalysisDefinitionRegistry analysisDefinitionRegistry;
+		private final LuceneCommonMinimumShouldMatchConstraints minimumShouldMatchConstraints;
 
 		private String value;
 
@@ -68,6 +70,7 @@ public class LuceneTextMatchPredicate extends AbstractLuceneLeafSingleFieldPredi
 			super( scope, field );
 			this.codec = codec;
 			this.analysisDefinitionRegistry = scope.analysisDefinitionRegistry();
+			this.minimumShouldMatchConstraints = new LuceneCommonMinimumShouldMatchConstraints();
 		}
 
 		@Override
@@ -92,6 +95,16 @@ public class LuceneTextMatchPredicate extends AbstractLuceneLeafSingleFieldPredi
 		@Override
 		public void skipAnalysis() {
 			this.overrideAnalyzerOrNormalizer = AnalyzerConstants.KEYWORD_ANALYZER;
+		}
+
+		@Override
+		public void minimumShouldMatchNumber(int ignoreConstraintCeiling, int matchingClausesNumber) {
+			minimumShouldMatchConstraints.minimumShouldMatchNumber( ignoreConstraintCeiling, matchingClausesNumber );
+		}
+
+		@Override
+		public void minimumShouldMatchPercent(int ignoreConstraintCeiling, int matchingClausesPercent) {
+			minimumShouldMatchConstraints.minimumShouldMatchPercent( ignoreConstraintCeiling, matchingClausesPercent );
 		}
 
 		@Override
@@ -133,7 +146,7 @@ public class LuceneTextMatchPredicate extends AbstractLuceneLeafSingleFieldPredi
 				// In any case, use the same behavior as Elasticsearch: don't match anything
 				analyzed = new MatchNoDocsQuery( "No tokens after analysis of the value to match" );
 			}
-			return analyzed;
+			return minimumShouldMatchConstraints.apply( analyzed );
 		}
 	}
 }
