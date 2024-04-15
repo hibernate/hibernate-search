@@ -8,6 +8,7 @@ package org.hibernate.search.engine.search.predicate.definition;
 
 import java.util.Optional;
 
+import org.hibernate.search.engine.search.common.NamedValues;
 import org.hibernate.search.engine.search.predicate.dsl.NamedPredicateOptionsStep;
 import org.hibernate.search.engine.search.predicate.dsl.SearchPredicateFactory;
 import org.hibernate.search.util.common.SearchException;
@@ -35,11 +36,11 @@ public interface PredicateDefinitionContext {
 	 * @return The value provided to {@link NamedPredicateOptionsStep#param(String, Object)} for this parameter.
 	 * @throws SearchException If no value was provided for this parameter.
 	 * @see NamedPredicateOptionsStep#param(String, Object)
-	 * @deprecated Use {@link #param(String, Class)} instead.
+	 * @deprecated Use {@link #params()} instead.
 	 */
 	@Deprecated
 	default Object param(String name) {
-		return param( name, Object.class );
+		return params().get( name, Object.class );
 	}
 
 	/**
@@ -49,19 +50,23 @@ public interface PredicateDefinitionContext {
 	 * @return The value provided to {@link NamedPredicateOptionsStep#param(String, Object)} for this parameter.
 	 * @throws SearchException If no value was provided for this parameter.
 	 * @see NamedPredicateOptionsStep#param(String, Object)
+	 * @deprecated Use {@link #params()} instead.
 	 */
-	<T> T param(String name, Class<T> paramType);
+	@Deprecated
+	default <T> T param(String name, Class<T> paramType) {
+		return params().get( name, paramType );
+	}
 
 	/**
 	 * @param name The name of the parameter.
 	 * @return An optional containing the value provided to {@link NamedPredicateOptionsStep#param(String, Object)}
 	 * for this parameter, or {@code Optional.empty()} if no value was provided for this parameter.
 	 * @see NamedPredicateOptionsStep#param(String, Object)
-	 * @deprecated Use {@link #paramOptional(String, Class)} instead.
+	 * @deprecated Use {@link #params()} instead.
 	 */
 	@Deprecated
 	default Optional<Object> paramOptional(String name) {
-		return paramOptional( name, Object.class );
+		return params().getOptional( name, Object.class );
 	}
 
 	/**
@@ -71,7 +76,19 @@ public interface PredicateDefinitionContext {
 	 * @return An optional containing the value provided to {@link NamedPredicateOptionsStep#param(String, Object)}
 	 * for this parameter, or {@code Optional.empty()} if no value was provided for this parameter.
 	 * @see NamedPredicateOptionsStep#param(String, Object)
+	 * @deprecated Use {@link #params()} instead.
 	 */
-	<T> Optional<T> paramOptional(String name, Class<T> paramType);
+	@Deprecated
+	default <T> Optional<T> paramOptional(String name, Class<T> paramType) {
+		return params().getOptional( name, paramType );
+	}
+
+	/**
+	 * @return Predicate definition context parameters provided through {@link NamedPredicateOptionsStep#param(String, Object)}.
+	 *
+	 * @see NamedValues#get(String, Class)
+	 * @see NamedValues#getOptional(String, Class)
+	 */
+	NamedValues params();
 
 }

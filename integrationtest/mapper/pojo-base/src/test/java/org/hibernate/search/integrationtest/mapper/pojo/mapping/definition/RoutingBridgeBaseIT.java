@@ -764,12 +764,12 @@ class RoutingBridgeBaseIT {
 		}
 
 		private static int modulus(RoutingBindingContext context) {
-			Optional<Integer> optionalModulus = context.paramOptional( "modulus", Integer.class );
+			Optional<Integer> optionalModulus = context.params().getOptional( "modulus", Integer.class );
 			if ( optionalModulus.isPresent() ) {
 				return optionalModulus.get();
 			}
 
-			String stringModulus = context.param( "stringModulus", String.class );
+			String stringModulus = context.params().get( "stringModulus", String.class );
 			return Integer.parseInt( stringModulus );
 		}
 	}

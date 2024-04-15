@@ -60,10 +60,10 @@ class PredicateDefinitionContextIT {
 						.param( "param3", givenParams[2] )
 						.param( "param4", givenParams[3] )
 						.param( "impl", (PredicateDefinition) context -> {
-							receivedParams[0] = context.param( "param1", String.class );
-							receivedParams[1] = context.param( "param2", Object.class );
-							receivedParams[2] = context.param( "param3", Long.class );
-							receivedParams[3] = context.paramOptional( "param5", Optional.class );
+							receivedParams[0] = context.params().get( "param1", String.class );
+							receivedParams[1] = context.params().get( "param2", Object.class );
+							receivedParams[2] = context.params().get( "param3", Long.class );
+							receivedParams[3] = context.params().getOptional( "param5", Optional.class );
 							return context.predicate().matchAll().toPredicate();
 						} ) ) )
 				.hasDocRefHitsAnyOrder( index.typeName(), DOCUMENT_1 );
@@ -79,7 +79,7 @@ class PredicateDefinitionContextIT {
 		assertThatQuery( index.query()
 				.where( f -> f.named( "stub-predicate" )
 						.param( "impl", (PredicateDefinition) context -> {
-							actualParams[0] = context.paramOptional( "absent", Optional.class );
+							actualParams[0] = context.params().getOptional( "absent", Optional.class );
 							return context.predicate().matchAll().toPredicate();
 						} ) ) )
 				.hasDocRefHitsAnyOrder( index.typeName(), DOCUMENT_1 );
@@ -91,7 +91,7 @@ class PredicateDefinitionContextIT {
 	void param_nullName() {
 		assertThatThrownBy( () -> index.createScope().predicate().named( "stub-predicate" )
 				.param( "impl", (PredicateDefinition) context -> {
-					context.param( null, String.class );
+					context.params().get( null, String.class );
 					return context.predicate().matchAll().toPredicate();
 				} )
 				.toPredicate() )
@@ -103,7 +103,7 @@ class PredicateDefinitionContextIT {
 	void missingParam() {
 		assertThatThrownBy( () -> index.createScope().predicate().named( "stub-predicate" )
 				.param( "impl", (PredicateDefinition) context -> {
-					context.param( "missing", String.class );
+					context.params().get( "missing", String.class );
 					return context.predicate().matchAll().toPredicate();
 				} )
 				.toPredicate() )
@@ -148,7 +148,7 @@ class PredicateDefinitionContextIT {
 	public static class StubPredicateDefinition implements PredicateDefinition {
 		@Override
 		public SearchPredicate create(PredicateDefinitionContext context) {
-			PredicateDefinition impl = context.param( "impl", PredicateDefinition.class );
+			PredicateDefinition impl = context.params().get( "impl", PredicateDefinition.class );
 			return impl.create( context );
 		}
 	}

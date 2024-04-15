@@ -29,7 +29,7 @@ public class InvoiceLineItemsSummaryBinder implements PropertyBinder {
 				.use( "category" )
 				.use( "amount" );
 
-		String fieldName = context.param( "fieldName", String.class ); // <1>
+		String fieldName = context.params().get( "fieldName", String.class ); // <1>
 		IndexSchemaObjectField summaryField = context.indexSchemaElement()
 				.objectField( fieldName ); // <2>
 

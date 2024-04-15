@@ -248,8 +248,8 @@ class NamedPredicateBaseIT {
 
 		@Override
 		public SearchPredicate create(PredicateDefinitionContext context) {
-			String word1 = context.param( "value1", String.class );
-			String word2 = context.param( "value2", String.class );
+			String word1 = context.params().get( "value1", String.class );
+			String word2 = context.params().get( "value2", String.class );
 			SearchPredicateFactory f = context.predicate();
 			return f.and(
 					f.match().field( field1Name ).matching( word1 ),

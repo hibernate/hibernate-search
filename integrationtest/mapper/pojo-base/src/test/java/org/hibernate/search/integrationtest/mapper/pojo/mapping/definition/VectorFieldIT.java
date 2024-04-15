@@ -580,7 +580,7 @@ class VectorFieldIT {
 		}
 
 		private static int extractDimension(ValueBindingContext<?> context) {
-			return Integer.parseInt( context.param( "dimension", String.class ) );
+			return Integer.parseInt( context.params().get( "dimension", String.class ) );
 		}
 	}
 
