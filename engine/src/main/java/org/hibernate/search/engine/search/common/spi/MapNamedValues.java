@@ -9,6 +9,7 @@ package org.hibernate.search.engine.search.common.spi;
 import java.lang.invoke.MethodHandles;
 import java.util.Map;
 import java.util.Optional;
+import java.util.function.Function;
 
 import org.hibernate.search.engine.logging.impl.Log;
 import org.hibernate.search.engine.search.common.NamedValues;
@@ -29,6 +30,16 @@ public class MapNamedValues implements NamedValues {
 	 */
 	static NamedValues fromMap(Map<String, Object> map) {
 		return new MapNamedValues( map );
+	}
+
+	/**
+	 * Create a simple instance of {@link NamedValues} backed by a {@link Map map}.
+	 *
+	 * @param map The map with values.
+	 * @param namedValueMissing A function that returns an exception for the name if the value is missing.
+	 */
+	public static NamedValues fromMap(Map<String, Object> map, Function<String, SearchException> namedValueMissing) {
+		return new MapNamedValues( map, namedValueMissing::apply );
 	}
 
 	/**
@@ -62,6 +73,10 @@ public class MapNamedValues implements NamedValues {
 
 	private MapNamedValues(Map<String, Object> values) {
 		this( values, log::namedValuesParameterNotDefined, log::namedValuesParameterIncorrectType );
+	}
+
+	protected MapNamedValues(Map<String, Object> values, NamedValueMissing namedValueMissing) {
+		this( values, namedValueMissing, log::namedValuesParameterIncorrectType );
 	}
 
 	protected MapNamedValues(Map<String, Object> values,

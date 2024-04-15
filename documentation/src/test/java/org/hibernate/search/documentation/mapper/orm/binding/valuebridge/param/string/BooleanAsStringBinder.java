@@ -15,8 +15,8 @@ public class BooleanAsStringBinder implements ValueBinder {
 
 	@Override
 	public void bind(ValueBindingContext<?> context) {
-		String trueAsString = context.param( "trueAsString", String.class ); // <1>
-		String falseAsString = context.param( "falseAsString", String.class );
+		String trueAsString = context.params().get( "trueAsString", String.class ); // <1>
+		String falseAsString = context.params().get( "falseAsString", String.class );
 
 		context.bridge( Boolean.class, // <2>
 				new BooleanAsStringBridge( trueAsString, falseAsString ) );

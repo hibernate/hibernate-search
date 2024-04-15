@@ -93,7 +93,7 @@ public class SkuIdentifierBinder implements PropertyBinder {
 		public SearchPredicate create(PredicateDefinitionContext context) {
 			SearchPredicateFactory f = context.predicate(); // <2>
 
-			String pattern = context.param( "pattern", String.class ); // <3>
+			String pattern = context.params().get( "pattern", String.class ); // <3>
 
 			return f.and().with( and -> { // <4>
 				// An SKU identifier pattern is formatted this way: "<department code>.<collection code>.<item code>".

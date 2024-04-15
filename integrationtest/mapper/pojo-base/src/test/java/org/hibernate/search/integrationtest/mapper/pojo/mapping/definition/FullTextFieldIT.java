@@ -602,7 +602,7 @@ class FullTextFieldIT {
 		}
 
 		private static String extractFixedPrefix(ValueBindingContext<?> context) {
-			return context.param( "fixedPrefix", String.class );
+			return context.params().get( "fixedPrefix", String.class );
 		}
 	}
 

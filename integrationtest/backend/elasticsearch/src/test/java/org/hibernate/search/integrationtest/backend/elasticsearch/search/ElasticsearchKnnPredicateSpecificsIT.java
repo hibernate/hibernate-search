@@ -264,8 +264,8 @@ class ElasticsearchKnnPredicateSpecificsIT {
 					.m( 16 ).efConstruction( 100 ).vectorSimilarity( VectorSimilarity.L2 ) ).toReference();
 
 			root.namedPredicate( "knn-named", context -> {
-				int k = context.param( "k", Integer.class );
-				float[] vector = context.param( "vector", float[].class );
+				int k = context.params().get( "k", Integer.class );
+				float[] vector = context.params().get( "vector", float[].class );
 
 				return context.predicate().knn( k ).field( "location" )
 						.matching( vector )
@@ -273,7 +273,7 @@ class ElasticsearchKnnPredicateSpecificsIT {
 			} );
 
 			root.namedPredicate( "bool-knn-in-should-named", context -> {
-				SearchPredicate knn = context.param( "knn", SearchPredicate.class );
+				SearchPredicate knn = context.params().get( "knn", SearchPredicate.class );
 
 				return context.predicate().bool().should( knn )
 						.should( context.predicate().match().field( "parking" ).matching( Boolean.TRUE ) ).toPredicate();

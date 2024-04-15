@@ -9,6 +9,7 @@ package org.hibernate.search.mapper.pojo.bridge.binding;
 import java.util.Optional;
 
 import org.hibernate.search.engine.environment.bean.BeanResolver;
+import org.hibernate.search.engine.search.common.NamedValues;
 import org.hibernate.search.util.common.SearchException;
 
 public interface BindingContext {
@@ -23,11 +24,11 @@ public interface BindingContext {
 	 * @param name The name of the param
 	 * @return Get a param defined for the binder by the given name
 	 * @throws SearchException if it does not exist a param having such name
-	 * @deprecated Use {@link #param(String, Class)} instead.
+	 * @deprecated Use {@link #params()} instead.
 	 */
 	@Deprecated
 	default Object param(String name) {
-		return param( name, Object.class );
+		return params().get( name, Object.class );
 	}
 
 	/**
@@ -36,18 +37,22 @@ public interface BindingContext {
 	 * @param <T> The type of the parameter.
 	 * @return Get a param defined for the binder by the given name
 	 * @throws SearchException if it does not exist a param having such name
+	 * @deprecated Use {@link #params()} instead.
 	 */
-	<T> T param(String name, Class<T> paramType);
+	@Deprecated
+	default <T> T param(String name, Class<T> paramType) {
+		return params().get( name, paramType );
+	}
 
 	/**
 	 * @param name The name of the param
 	 * @return Get an optional param defined for the binder by the given name,
 	 * a param having such name may either exist or not.
-	 * @deprecated Use {@link #paramOptional(String, Class)} instead.
+	 * @deprecated Use {@link #params()} instead.
 	 */
 	@Deprecated
 	default Optional<Object> paramOptional(String name) {
-		return paramOptional( name, Object.class );
+		return params().getOptional( name, Object.class );
 	}
 
 	/**
@@ -56,7 +61,19 @@ public interface BindingContext {
 	 * @param <T> The type of the parameter.
 	 * @return Get an optional param defined for the binder by the given name,
 	 * a param having such name may either exist or not.
+	 * @deprecated Use {@link #params()} instead.
 	 */
-	<T> Optional<T> paramOptional(String name, Class<T> paramType);
+	@Deprecated
+	default <T> Optional<T> paramOptional(String name, Class<T> paramType) {
+		return params().getOptional( name, paramType );
+	}
+
+	/**
+	 * @return Parameters defined for the binder.
+	 *
+	 * @see NamedValues#get(String, Class)
+	 * @see NamedValues#getOptional(String, Class)
+	 */
+	NamedValues params();
 
 }

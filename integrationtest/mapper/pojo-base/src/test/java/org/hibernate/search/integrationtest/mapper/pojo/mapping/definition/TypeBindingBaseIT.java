@@ -227,12 +227,12 @@ class TypeBindingBaseIT {
 	}
 
 	private static Integer extractBase(TypeBindingContext context) {
-		Optional<Integer> optionalBase = context.paramOptional( "base", Integer.class );
+		Optional<Integer> optionalBase = context.params().getOptional( "base", Integer.class );
 		if ( optionalBase.isPresent() ) {
 			return optionalBase.get();
 		}
 
-		String stringBase = context.param( "stringBase", String.class );
+		String stringBase = context.params().get( "stringBase", String.class );
 		return Integer.parseInt( stringBase );
 	}
 

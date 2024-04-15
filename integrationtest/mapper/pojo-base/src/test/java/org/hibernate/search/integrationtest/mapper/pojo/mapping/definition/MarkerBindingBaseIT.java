@@ -83,12 +83,12 @@ class MarkerBindingBaseIT {
 		}
 
 		private static int extractScale(BindingContext context) {
-			Optional<Integer> optionalScale = context.paramOptional( "scale", Integer.class );
+			Optional<Integer> optionalScale = context.params().getOptional( "scale", Integer.class );
 			if ( optionalScale.isPresent() ) {
 				return optionalScale.get();
 			}
 
-			String stringScale = context.param( "stringScale", String.class );
+			String stringScale = context.params().get( "stringScale", String.class );
 			return Integer.parseInt( stringScale );
 		}
 	}

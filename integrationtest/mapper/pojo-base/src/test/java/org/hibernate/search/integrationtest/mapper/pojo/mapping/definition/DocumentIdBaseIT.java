@@ -517,7 +517,7 @@ class DocumentIdBaseIT {
 		}
 
 		private static String extractFixedPrefix(IdentifierBindingContext<?> context) {
-			return context.param( "fixedPrefix", String.class );
+			return context.params().get( "fixedPrefix", String.class );
 		}
 	}
 }

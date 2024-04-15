@@ -15,7 +15,7 @@ public class OffsetIdentifierBinder implements IdentifierBinder {
 
 	@Override
 	public void bind(IdentifierBindingContext<?> context) {
-		String offset = context.param( "offset", String.class ); // <1>
+		String offset = context.params().get( "offset", String.class ); // <1>
 		context.bridge(
 				Integer.class,
 				new OffsetIdentifierBridge( Integer.parseInt( offset ) ) // <2>

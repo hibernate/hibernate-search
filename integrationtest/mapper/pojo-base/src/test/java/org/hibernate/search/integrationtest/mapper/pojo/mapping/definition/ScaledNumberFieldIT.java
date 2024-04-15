@@ -509,13 +509,13 @@ class ScaledNumberFieldIT {
 		}
 
 		private static BigDecimal extractBaseDecimal(ValueBindingContext<?> context) {
-			Optional<BigDecimal> optionalBaseDecimal = context.paramOptional( "baseDecimal", BigDecimal.class );
+			Optional<BigDecimal> optionalBaseDecimal = context.params().getOptional( "baseDecimal", BigDecimal.class );
 			if ( optionalBaseDecimal.isPresent() ) {
 				return optionalBaseDecimal.get();
 			}
 
-			String unscaledValParam = context.param( "unscaledVal", String.class );
-			String scaleParam = context.param( "scale", String.class );
+			String unscaledValParam = context.params().get( "unscaledVal", String.class );
+			String scaleParam = context.params().get( "scale", String.class );
 			BigInteger unscaledVal = new BigInteger( unscaledValParam );
 			int scale = Integer.parseInt( scaleParam );
 			return new BigDecimal( unscaledVal, scale );
