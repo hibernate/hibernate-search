@@ -284,7 +284,7 @@ public final class DatabaseContainer {
 								.forPort( 8080 )
 								.forStatusCode( 200 ),
 						8080
-				).withCommand( "start-single-node --insecure" )
+				).withCommand( "start-single-node --insecure --store=type=mem,size=0.25 --advertise-addr=localhost" )
 						.withStartupTimeout( EXTENDED_TIMEOUT )
 						.withCreateContainerCmdModifier( cmd -> {
 							HostConfig hostConfig = cmd.getHostConfig();
