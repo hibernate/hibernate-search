@@ -32,6 +32,7 @@ import org.hibernate.search.mapper.orm.mapping.HibernateOrmMappingConfigurationC
 import org.hibernate.search.mapper.orm.mapping.HibernateOrmSearchMappingConfigurer;
 import org.hibernate.search.mapper.orm.model.impl.HibernateOrmBasicTypeMetadataProvider;
 import org.hibernate.search.mapper.orm.model.impl.HibernateOrmBootstrapIntrospector;
+import org.hibernate.search.mapper.orm.reporting.impl.HibernateOrmMapperHints;
 import org.hibernate.search.mapper.orm.session.impl.ConfiguredAutomaticIndexingStrategy;
 import org.hibernate.search.mapper.pojo.mapping.building.spi.PojoMapperDelegate;
 import org.hibernate.search.mapper.pojo.mapping.building.spi.PojoTypeMetadataContributor;
@@ -101,7 +102,7 @@ public class HibernateOrmMappingInitiator extends AbstractPojoMappingInitiator<H
 			HibernateOrmBasicTypeMetadataProvider basicTypeMetadataProvider,
 			IndexView jandexIndex, HibernateOrmBootstrapIntrospector introspector,
 			HibernateSearchPreIntegrationService preIntegrationService, boolean multiTenancyEnabled) {
-		super( introspector );
+		super( introspector, HibernateOrmMapperHints.INSTANCE );
 
 		this.basicTypeMetadataProvider = basicTypeMetadataProvider;
 		if ( jandexIndex != null ) {

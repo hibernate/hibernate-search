@@ -30,6 +30,7 @@ import org.hibernate.search.mapper.pojo.mapping.spi.PojoMappingConfigurationCont
 import org.hibernate.search.mapper.pojo.mapping.spi.PojoMappingConfigurationContributor;
 import org.hibernate.search.mapper.pojo.model.spi.PojoBootstrapIntrospector;
 import org.hibernate.search.mapper.pojo.model.spi.PojoRawTypeModel;
+import org.hibernate.search.mapper.pojo.reporting.spi.MapperHints;
 import org.hibernate.search.util.common.jar.impl.JandexUtils;
 import org.hibernate.search.util.common.jar.impl.JarUtils;
 import org.hibernate.search.util.common.jar.spi.JandexBehavior;
@@ -49,6 +50,7 @@ public class AnnotationMappingConfigurationContextImpl
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	private final PojoBootstrapIntrospector introspector;
+	private final MapperHints mapperHints;
 
 	private boolean discoverAnnotatedTypesFromRootMappingAnnotations = false;
 	private boolean discoverJandexIndexesFromAddedTypes = false;
@@ -59,8 +61,10 @@ public class AnnotationMappingConfigurationContextImpl
 	private final Set<Class<?>> explicitAnnotatedTypes = new LinkedHashSet<>();
 	private final List<IndexView> explicitJandexIndexes = new ArrayList<>();
 
-	public AnnotationMappingConfigurationContextImpl(PojoBootstrapIntrospector introspector) {
+	public AnnotationMappingConfigurationContextImpl(PojoBootstrapIntrospector introspector,
+			MapperHints mapperHints) {
 		this.introspector = introspector;
+		this.mapperHints = mapperHints;
 	}
 
 	@Override
@@ -221,7 +225,7 @@ public class AnnotationMappingConfigurationContextImpl
 		}
 	}
 
-	private static Optional<Index> jandexIndexForCodeSourceLocation(URL codeSourceLocation, boolean buildIfMissing) {
+	private Optional<Index> jandexIndexForCodeSourceLocation(URL codeSourceLocation, boolean buildIfMissing) {
 		try {
 			if ( buildIfMissing ) {
 				return Optional.of( JandexUtils.readOrBuildIndex( codeSourceLocation ) );
@@ -231,7 +235,8 @@ public class AnnotationMappingConfigurationContextImpl
 			}
 		}
 		catch (RuntimeException e) {
-			throw log.errorDiscoveringJandexIndex( codeSourceLocation, e.getMessage(), e );
+			throw log.errorDiscoveringJandexIndex( codeSourceLocation, e.getMessage(),
+					mapperHints.cannotReadJandexRootMapping(), e );
 		}
 	}
 

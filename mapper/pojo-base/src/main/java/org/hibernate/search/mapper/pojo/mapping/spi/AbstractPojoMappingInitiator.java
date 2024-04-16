@@ -36,6 +36,7 @@ import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.impl.Pro
 import org.hibernate.search.mapper.pojo.mapping.impl.PojoMappingConfigurationContextImpl;
 import org.hibernate.search.mapper.pojo.model.spi.PojoBootstrapIntrospector;
 import org.hibernate.search.mapper.pojo.model.typepattern.impl.TypePatternMatcherFactory;
+import org.hibernate.search.mapper.pojo.reporting.spi.MapperHints;
 
 public abstract class AbstractPojoMappingInitiator<MPBS extends MappingPartialBuildState>
 		implements MappingInitiator<PojoTypeMetadataContributor, MPBS> {
@@ -58,7 +59,7 @@ public abstract class AbstractPojoMappingInitiator<MPBS extends MappingPartialBu
 	private ContainerExtractorBinder extractorBinder;
 	private BridgeResolver bridgeResolver;
 
-	protected AbstractPojoMappingInitiator(PojoBootstrapIntrospector introspector) {
+	protected AbstractPojoMappingInitiator(PojoBootstrapIntrospector introspector, MapperHints mapperHints) {
 		this.introspector = introspector;
 
 		/*
@@ -66,7 +67,7 @@ public abstract class AbstractPojoMappingInitiator<MPBS extends MappingPartialBu
 		 * annotationMapping() method to register annotated types explicitly,
 		 * in case annotated type discovery is enabled.
 		 */
-		annotationMappingConfiguration = new AnnotationMappingConfigurationContextImpl( introspector );
+		annotationMappingConfiguration = new AnnotationMappingConfigurationContextImpl( introspector, mapperHints );
 		addConfigurationContributor( annotationMappingConfiguration );
 
 		typePatternMatcherFactory = new TypePatternMatcherFactory( introspector );
