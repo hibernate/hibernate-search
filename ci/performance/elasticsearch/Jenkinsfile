@@ -5,12 +5,12 @@
  * See the lgpl.txt file in the root directory or <http://www.gnu.org/licenses/lgpl-2.1.html>.
  */
 
-import groovy.transform.Field
-
 /*
  * See https://github.com/hibernate/hibernate-jenkins-pipeline-helpers
  */
-@Library('hibernate-jenkins-pipeline-helpers@1.10')
+@Library('hibernate-jenkins-pipeline-helpers@1.10') _
+
+import groovy.transform.Field
 import org.hibernate.jenkins.pipeline.helpers.job.JobHelper
 
 @Field final String MAVEN_TOOL = 'Apache Maven 3.9'
