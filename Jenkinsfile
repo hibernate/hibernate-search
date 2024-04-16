@@ -134,11 +134,11 @@ import org.hibernate.jenkins.pipeline.helpers.alternative.AlternativeMultiMap
  *     develocity:
  *       credentials:
  *         # String containing the ID of Develocity credentials used on "main" (non-PR) builds. Optional.
- *         # Expects something valid for the GRADLE_ENTERPRISE_ACCESS_KEY environment variable.
+ *         # Expects something valid for the DEVELOCITY_ACCESS_KEY environment variable.
  *         # See https://docs.gradle.com/enterprise/gradle-plugin/#via_environment_variable
  *         main: ...
  *         # String containing the ID of Develocity credentials used on PR builds. Optional.
- *         # Expects something valid for the GRADLE_ENTERPRISE_ACCESS_KEY environment variable.
+ *         # Expects something valid for the DEVELOCITY_ACCESS_KEY environment variable.
  *         # See https://docs.gradle.com/enterprise/gradle-plugin/#via_environment_variable
  *         # WARNING: These credentials should not give write access to the build cache!
  *         pr: ...
@@ -931,7 +931,7 @@ void mvn(String args) {
 		// Not a PR: we can pass credentials to the build, allowing it to populate the build cache
 		// and to publish build scans directly.
 		withCredentials([string(credentialsId: develocityMainCredentialsId,
-				variable: 'GRADLE_ENTERPRISE_ACCESS_KEY')]) {
+				variable: 'DEVELOCITY_ACCESS_KEY')]) {
 			withGradle { // withDevelocity, actually: https://plugins.jenkins.io/gradle/#plugin-content-capturing-build-scans-from-jenkins-pipeline
 				sh "mvn $args"
 			}
@@ -944,7 +944,7 @@ void mvn(String args) {
 			sh "mvn $args"
 		}, { // Finally
 			withCredentials([string(credentialsId: develocityPrCredentialsId,
-					variable: 'GRADLE_ENTERPRISE_ACCESS_KEY')]) {
+					variable: 'DEVELOCITY_ACCESS_KEY')]) {
 				withGradle { // withDevelocity, actually: https://plugins.jenkins.io/gradle/#plugin-content-capturing-build-scans-from-jenkins-pipeline
 					sh 'mvn gradle-enterprise:build-scan-publish-previous'
 				}
