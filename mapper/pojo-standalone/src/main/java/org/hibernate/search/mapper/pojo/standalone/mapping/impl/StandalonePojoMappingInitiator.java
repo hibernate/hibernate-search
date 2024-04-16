@@ -22,6 +22,7 @@ import org.hibernate.search.mapper.pojo.standalone.cfg.StandalonePojoMapperSetti
 import org.hibernate.search.mapper.pojo.standalone.mapping.StandalonePojoMappingConfigurationContext;
 import org.hibernate.search.mapper.pojo.standalone.mapping.StandalonePojoMappingConfigurer;
 import org.hibernate.search.mapper.pojo.standalone.model.impl.StandalonePojoBootstrapIntrospector;
+import org.hibernate.search.mapper.pojo.standalone.reporting.impl.StandalonePojoMapperHints;
 
 public class StandalonePojoMappingInitiator extends AbstractPojoMappingInitiator<StandalonePojoMappingPartialBuildState>
 		implements StandalonePojoMappingConfigurationContext {
@@ -40,7 +41,7 @@ public class StandalonePojoMappingInitiator extends AbstractPojoMappingInitiator
 					.build();
 
 	public StandalonePojoMappingInitiator(StandalonePojoBootstrapIntrospector introspector) {
-		super( introspector );
+		super( introspector, StandalonePojoMapperHints.INSTANCE );
 		// Enable annotated type discovery by default
 		annotationMapping()
 				.discoverAnnotatedTypesFromRootMappingAnnotations( true )

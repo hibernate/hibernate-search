@@ -743,8 +743,9 @@ public interface Log extends BasicLogger {
 			String cyclicRecursionIndexFieldPath);
 
 	@Message(id = ID_OFFSET + 119,
-			value = "Exception while retrieving the Jandex index for code source location '%1$s': %2$s")
-	SearchException errorDiscoveringJandexIndex(URL codeSourceLocation, String causeMessage, @Cause Exception cause);
+			value = "Exception while retrieving the Jandex index for code source location '%1$s': %2$s; %3$s")
+	SearchException errorDiscoveringJandexIndex(URL codeSourceLocation, String causeMessage, String hint,
+			@Cause Exception cause);
 
 	@LogMessage(level = Logger.Level.WARN)
 	@Message(id = ID_OFFSET + 120,
