@@ -305,6 +305,7 @@
                         <javaeeUrl>https://www.oracle.com/java/technologies/java-ee-glance.html</javaeeUrl>
                         <jakartaUrl>https://jakarta.ee/</jakartaUrl>
                         <jakartaPersistenceVersion>${parsed-version.jakarta.persistence.majorVersion}.${parsed-version.jakarta.persistence.minorVersion}</jakartaPersistenceVersion>
+                        <jandexPluginVersion>${version.jandex.plugin}</jandexPluginVersion>
                         <luceneVersion>${version.org.apache.lucene}</luceneVersion>
                         <luceneUrl>https://lucene.apache.org</luceneUrl>
                         <luceneJavadocUrl>${javadoc.org.apache.lucene.core.url}</luceneJavadocUrl>
