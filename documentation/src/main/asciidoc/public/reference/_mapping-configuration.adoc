@@ -67,24 +67,44 @@ to look for types annotated with
 <<mapping-classpath-scanning-basics,root mapping annotations>> in the given Jandex index.
 
 [[mapping-classpath-scanning-faster]]
-=== [[mapper-orm-mapping-configuration-scanning-faster]] Faster scanning
+=== [[mapper-orm-mapping-configuration-scanning-faster]] Configuring scanning
 
-Hibernate Search's scanning may trigger the indexing of JARs through Jandex on application startup.
-This indexing should be reasonably short, but if it causes performance issues, you can:
+Hibernate Search’s scanning may trigger the indexing of JARs through Jandex on application startup.
+In some of the more complicated environments,
+this indexing may not be able to get access to classes to index,
+or may unnecessarily slow down startup.
 
-* Migrate your application to the <<compatibility-framework-quarkus,Quarkus>> framework,
-which among other things executes this part of Hibernate Search's startup at build time.
-* OR migrate your application to the <<compatibility-framework-wildfly,WildFly>> application server,
-which among other things executes this part of Hibernate Search's startup in a more optimized way.
-* OR execute the https://smallrye.io/jandex/[Jandex] Maven Plugin
-during the build of your application, so that indexes are already built when the application starts.
-* OR instruct Hibernate Search to never build Jandex indexes on startup,
-by setting the configuration property
-`hibernate.search.mapping.build_missing_discovered_jandex_indexes` to `false`.
-**This is not recommended as it may lead to bootstrap failures or ignored mapping annotations**
+Running Hibernate Search within Quarkus or Wildfly has its benefits as:
+
+* With the <<compatibility-framework-quarkus,Quarkus>> framework,
+scanning part of the Hibernate Search's startup is executed at build time and the indexes are provided to it automatically.
+* With the <<compatibility-framework-wildfly,WildFly>> application server,
+this part of Hibernate Search's startup is executed in an optimized way and the indexes are provided to it automatically as well.
+
+In other cases, depending on the application needs, the https://smallrye.io/jandex/jandex/{jandexPluginVersion}/maven/basic.html[Jandex] Maven Plugin
+can be used during the building stage of the application, so that indexes are already built and ready when the application starts.
+
+Alternatively, If your application does not use `@ProjectionConstructor` or <<mapping-custom-annotations-root,custom root mapping annotations>>,
+you may want to disable this feature entirely or partially.
+
+**This is not recommended in general as it may lead to bootstrap failures or ignored mapping annotations**
 because Hibernate Search will no longer be able to automatically discover types annotated with
 <<mapping-classpath-scanning-basics,root annotations>>
 in JARs that do not have an embedded Jandex index.
+
+Two options are available for this:
+
+* Setting `hibernate.search.mapping.discover_annotated_types_from_root_mapping_annotations` to `false`
+will disable any attempts of automatic discovery, even if there is a Jandex index available, partial or full,
+which may help if there are no types annotated with root mapping annotations at all,
+or if they are listed explicitly through a <<mapping-configurer,mapping configurer>>
+or through an <<mapper-pojo-standalone-startup,`AnnotatedTypeSource`>>.
+* Setting `hibernate.search.mapping.build_missing_discovered_jandex_indexes` to `false`
+will disable Jandex index building on startup, but will still use any pre-built Jandex indexes available.
+This may help if partial automatic discovery is required, i.e. available indexes will be used for discovery,
+but sources that do not have an index available will be ignored unless their `@ProjectionConstructor`-annotated types
+are listed explicitly through a <<mapping-configurer,mapping configurer>>
+or through an <<mapper-pojo-standalone-startup,`AnnotatedTypeSource`>>.
 
 [[mapping-programmatic]]
 == [[mapper-orm-programmatic-mapping]] [[mapper-orm-programmatic-mapping-basics]] [[hsearch-mapping-programmaticapi]] Programmatic mapping
