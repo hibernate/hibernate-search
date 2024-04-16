@@ -5,7 +5,7 @@
  * See the lgpl.txt file in the root directory or <http://www.gnu.org/licenses/lgpl-2.1.html>.
  */
 
-@Library('hibernate-jenkins-pipeline-helpers@1.10') _
+@Library('hibernate-jenkins-pipeline-helpers@1.11') _
 
 import org.hibernate.jenkins.pipeline.helpers.version.Version
 
