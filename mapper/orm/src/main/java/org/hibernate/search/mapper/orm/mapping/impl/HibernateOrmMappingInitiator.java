@@ -58,6 +58,14 @@ public class HibernateOrmMappingInitiator extends AbstractPojoMappingInitiator<H
 					.withDefault( HibernateOrmMapperSettings.Defaults.MAPPING_BUILD_MISSING_DISCOVERED_JANDEX_INDEXES )
 					.build();
 
+	private static final ConfigurationProperty<Boolean> MAPPING_DISCOVER_ANNOTATED_TYPES_FROM_ROOT_MAPPING_ANNOTATIONS =
+			ConfigurationProperty.forKey(
+					HibernateOrmMapperSettings.Radicals.MAPPING_DISCOVER_ANNOTATED_TYPES_FROM_ROOT_MAPPING_ANNOTATIONS )
+					.asBoolean()
+					.withDefault(
+							HibernateOrmMapperSettings.Defaults.MAPPING_DISCOVER_ANNOTATED_TYPES_FROM_ROOT_MAPPING_ANNOTATIONS )
+					.build();
+
 	private static final OptionalConfigurationProperty<
 			List<BeanReference<? extends HibernateOrmSearchMappingConfigurer>>> MAPPING_CONFIGURER =
 					ConfigurationProperty.forKey( HibernateOrmMapperSettings.Radicals.MAPPING_CONFIGURER )
@@ -138,7 +146,8 @@ public class HibernateOrmMappingInitiator extends AbstractPojoMappingInitiator<H
 		boolean processAnnotations = MAPPING_PROCESS_ANNOTATIONS.get( propertySource );
 		if ( processAnnotations ) {
 			annotationMapping()
-					.discoverAnnotatedTypesFromRootMappingAnnotations( true )
+					.discoverAnnotatedTypesFromRootMappingAnnotations(
+							MAPPING_DISCOVER_ANNOTATED_TYPES_FROM_ROOT_MAPPING_ANNOTATIONS.get( propertySource ) )
 					.discoverJandexIndexesFromAddedTypes( true )
 					.buildMissingDiscoveredJandexIndexes(
 							MAPPING_BUILD_MISSING_DISCOVERED_JANDEX_INDEXES.get( propertySource ) )

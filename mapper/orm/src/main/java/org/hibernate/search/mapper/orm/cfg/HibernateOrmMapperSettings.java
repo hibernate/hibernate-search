@@ -13,6 +13,9 @@ import org.hibernate.search.mapper.orm.coordination.impl.NoCoordinationStrategy;
 import org.hibernate.search.mapper.orm.mapping.HibernateOrmSearchMappingConfigurer;
 import org.hibernate.search.mapper.orm.schema.management.SchemaManagementStrategyName;
 import org.hibernate.search.mapper.orm.search.loading.EntityLoadingCacheLookupStrategy;
+import org.hibernate.search.mapper.pojo.mapping.definition.annotation.ProjectionConstructor;
+import org.hibernate.search.mapper.pojo.mapping.definition.annotation.SearchEntity;
+import org.hibernate.search.mapper.pojo.mapping.definition.annotation.processing.RootMapping;
 import org.hibernate.search.mapper.pojo.tenancy.TenantIdentifierConverter;
 import org.hibernate.search.mapper.pojo.tenancy.spi.StringTenantIdentifierConverter;
 import org.hibernate.search.mapper.pojo.work.IndexingPlanSynchronizationStrategy;
@@ -152,9 +155,33 @@ public final class HibernateOrmMapperSettings {
 	 * or a string that can be parsed into a Boolean value.
 	 * <p>
 	 * Defaults to {@link Defaults#MAPPING_BUILD_MISSING_DISCOVERED_JANDEX_INDEXES}.
+	 *
+	 * @see org.hibernate.search.mapper.pojo.mapping.definition.annotation.AnnotationMappingConfigurationContext#buildMissingDiscoveredJandexIndexes(boolean)
 	 */
 	public static final String MAPPING_BUILD_MISSING_DISCOVERED_JANDEX_INDEXES =
 			PREFIX + Radicals.MAPPING_BUILD_MISSING_DISCOVERED_JANDEX_INDEXES;
+
+	/**
+	 * When {@link #MAPPING_PROCESS_ANNOTATIONS annotation processing is enabled} (the default),
+	 * whether Hibernate Search should automatically discover annotated types
+	 * present in the Jandex index that are also annotated
+	 * with {@link RootMapping root mapping annotations}.
+	 * <p>
+	 * When enabled, if an annotation meta-annotated with {@link RootMapping}
+	 * is found in the Jandex index,
+	 * and a type annotated with that annotation (e.g. {@link SearchEntity} or {@link ProjectionConstructor}) is found in the Jandex index,
+	 * then that type will automatically be scanned for mapping annotations,
+	 * even if the type wasn't explicitly added.
+	 * <p>
+	 * Expects a Boolean value such as {@code true} or {@code false},
+	 * or a string that can be parsed into a Boolean value.
+	 * <p>
+	 * Defaults to {@link Defaults#MAPPING_DISCOVER_ANNOTATED_TYPES_FROM_ROOT_MAPPING_ANNOTATIONS}.
+	 *
+	 * @see org.hibernate.search.mapper.pojo.mapping.definition.annotation.AnnotationMappingConfigurationContext#discoverAnnotatedTypesFromRootMappingAnnotations(boolean)
+	 */
+	public static final String MAPPING_DISCOVER_ANNOTATED_TYPES_FROM_ROOT_MAPPING_ANNOTATIONS =
+			PREFIX + Radicals.MAPPING_DISCOVER_ANNOTATED_TYPES_FROM_ROOT_MAPPING_ANNOTATIONS;
 
 	/**
 	 * A configurer for the Hibernate Search mapping.
@@ -287,10 +314,13 @@ public final class HibernateOrmMapperSettings {
 				AUTOMATIC_INDEXING_PREFIX + AutomaticIndexingRadicals.ENABLE_DIRTY_CHECK;
 		public static final String QUERY_LOADING_CACHE_LOOKUP_STRATEGY = "query.loading.cache_lookup.strategy";
 		public static final String QUERY_LOADING_FETCH_SIZE = "query.loading.fetch_size";
-		public static final String MAPPING_PROCESS_ANNOTATIONS = "mapping.process_annotations";
+		public static final String MAPPING_PREFIX = "mapping.";
+		public static final String MAPPING_PROCESS_ANNOTATIONS = MAPPING_PREFIX + "process_annotations";
 		public static final String MAPPING_BUILD_MISSING_DISCOVERED_JANDEX_INDEXES =
-				"mapping.build_missing_discovered_jandex_indexes";
-		public static final String MAPPING_CONFIGURER = "mapping.configurer";
+				MAPPING_PREFIX + "build_missing_discovered_jandex_indexes";
+		public static final String MAPPING_DISCOVER_ANNOTATED_TYPES_FROM_ROOT_MAPPING_ANNOTATIONS =
+				MAPPING_PREFIX + "discover_annotated_types_from_root_mapping_annotations";
+		public static final String MAPPING_CONFIGURER = MAPPING_PREFIX + "configurer";
 		public static final String SCHEMA_MANAGEMENT_STRATEGY = "schema_management.strategy";
 		public static final String COORDINATION = "coordination";
 		public static final String COORDINATION_PREFIX = COORDINATION + ".";
@@ -415,6 +445,7 @@ public final class HibernateOrmMapperSettings {
 		public static final int QUERY_LOADING_FETCH_SIZE = 100;
 		public static final boolean MAPPING_PROCESS_ANNOTATIONS = true;
 		public static final boolean MAPPING_BUILD_MISSING_DISCOVERED_JANDEX_INDEXES = true;
+		public static final boolean MAPPING_DISCOVER_ANNOTATED_TYPES_FROM_ROOT_MAPPING_ANNOTATIONS = true;
 		public static final SchemaManagementStrategyName SCHEMA_MANAGEMENT_STRATEGY =
 				SchemaManagementStrategyName.CREATE_OR_VALIDATE;
 		public static final BeanReference<CoordinationStrategy> COORDINATION_STRATEGY =
