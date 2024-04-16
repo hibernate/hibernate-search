@@ -93,7 +93,7 @@ def withMavenWorkspace(Closure body) {
 					junitPublisher(disabled: true)
 			]) {
 		withCredentials([string(credentialsId: 'ge.hibernate.org-access-key',
-				variable: 'GRADLE_ENTERPRISE_ACCESS_KEY')]) {
+				variable: 'DEVELOCITY_ACCESS_KEY')]) {
 			withGradle { // withDevelocity, actually: https://plugins.jenkins.io/gradle/#plugin-content-capturing-build-scans-from-jenkins-pipeline
 				body()
 			}
