@@ -8,6 +8,7 @@ package org.hibernate.search.mapper.pojo.standalone.mapping.impl;
 
 import java.util.List;
 
+import org.hibernate.search.engine.cfg.ConfigurationPropertySource;
 import org.hibernate.search.engine.cfg.spi.ConfigurationProperty;
 import org.hibernate.search.engine.cfg.spi.OptionalConfigurationProperty;
 import org.hibernate.search.engine.environment.bean.BeanHolder;
@@ -27,6 +28,21 @@ import org.hibernate.search.mapper.pojo.standalone.reporting.impl.StandalonePojo
 public class StandalonePojoMappingInitiator extends AbstractPojoMappingInitiator<StandalonePojoMappingPartialBuildState>
 		implements StandalonePojoMappingConfigurationContext {
 
+	private static final ConfigurationProperty<Boolean> MAPPING_BUILD_MISSING_DISCOVERED_JANDEX_INDEXES =
+			ConfigurationProperty
+					.forKey( StandalonePojoMapperSettings.Radicals.MAPPING_BUILD_MISSING_DISCOVERED_JANDEX_INDEXES )
+					.asBoolean()
+					.withDefault( StandalonePojoMapperSettings.Defaults.MAPPING_BUILD_MISSING_DISCOVERED_JANDEX_INDEXES )
+					.build();
+
+	private static final ConfigurationProperty<Boolean> MAPPING_DISCOVER_ANNOTATED_TYPES_FROM_ROOT_MAPPING_ANNOTATIONS =
+			ConfigurationProperty.forKey(
+					StandalonePojoMapperSettings.Radicals.MAPPING_DISCOVER_ANNOTATED_TYPES_FROM_ROOT_MAPPING_ANNOTATIONS )
+					.asBoolean()
+					.withDefault(
+							StandalonePojoMapperSettings.Defaults.MAPPING_DISCOVER_ANNOTATED_TYPES_FROM_ROOT_MAPPING_ANNOTATIONS )
+					.build();
+
 	private static final OptionalConfigurationProperty<
 			List<BeanReference<? extends StandalonePojoMappingConfigurer>>> MAPPING_CONFIGURER =
 					ConfigurationProperty.forKey( StandalonePojoMapperSettings.Radicals.MAPPING_CONFIGURER )
@@ -42,24 +58,30 @@ public class StandalonePojoMappingInitiator extends AbstractPojoMappingInitiator
 
 	public StandalonePojoMappingInitiator(StandalonePojoBootstrapIntrospector introspector) {
 		super( introspector, StandalonePojoMapperHints.INSTANCE );
-		// Enable annotated type discovery by default
-		annotationMapping()
-				.discoverAnnotatedTypesFromRootMappingAnnotations( true )
-				.discoverJandexIndexesFromAddedTypes( true )
-				.discoverAnnotationsFromReferencedTypes( true );
 	}
 
 	@Override
 	public void configure(MappingBuildContext buildContext,
 			MappingConfigurationCollector<PojoTypeMetadataContributor> configurationCollector) {
+		ConfigurationPropertySource propertySource = buildContext.configurationPropertySource();
 		this.tenancyMode(
-				MULTI_TENANCY_ENABLED.get( buildContext.configurationPropertySource() )
+				MULTI_TENANCY_ENABLED.get( propertySource )
 						? TenancyMode.MULTI_TENANCY
 						: TenancyMode.SINGLE_TENANCY
 		);
+
+		// Enable annotated type discovery by default
+		annotationMapping()
+				.discoverAnnotatedTypesFromRootMappingAnnotations(
+						MAPPING_DISCOVER_ANNOTATED_TYPES_FROM_ROOT_MAPPING_ANNOTATIONS.get( propertySource ) )
+				.discoverJandexIndexesFromAddedTypes( true )
+				.buildMissingDiscoveredJandexIndexes(
+						MAPPING_BUILD_MISSING_DISCOVERED_JANDEX_INDEXES.get( propertySource ) )
+				.discoverAnnotationsFromReferencedTypes( true );
+
 		// Apply the user-provided mapping configurer if necessary.
 		// Has to happen before building entityTypeMetadataProvider as configurers can add more entities.
-		MAPPING_CONFIGURER.getAndMap( buildContext.configurationPropertySource(), buildContext.beanResolver()::resolve )
+		MAPPING_CONFIGURER.getAndMap( propertySource, buildContext.beanResolver()::resolve )
 				.ifPresent( holder -> {
 					try ( BeanHolder<List<StandalonePojoMappingConfigurer>> configurerHolder = holder ) {
 						for ( StandalonePojoMappingConfigurer configurer : configurerHolder.get() ) {
