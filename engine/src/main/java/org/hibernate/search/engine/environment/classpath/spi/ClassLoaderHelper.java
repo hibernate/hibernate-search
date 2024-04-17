@@ -71,7 +71,7 @@ public class ClassLoaderHelper {
 	 * @return a new instance of classToLoad
 	 *
 	 * @throws SearchException wrapping other error types with a proper error message for all kind of problems, like
-	 * missing proper constructor, securitymanager errors.
+	 * missing proper constructor errors.
 	 */
 	public static <T> T untypedInstanceFromClass(final Class<T> classToLoad) {
 		try {
@@ -140,9 +140,6 @@ public class ClassLoaderHelper {
 			Constructor<T> constructor = classToLoad.getConstructor();
 			return constructor.newInstance();
 		}
-		catch (SecurityException e) {
-			throw log.securityManagerLoadingError( classToLoad, e.getMessage(), e );
-		}
 		catch (NoSuchMethodException e) {
 			throw log.noPublicNoArgConstructor( classToLoad );
 		}
@@ -157,9 +154,6 @@ public class ClassLoaderHelper {
 		try {
 			Constructor<T> singleMapConstructor = classToLoad.getConstructor( Map.class );
 			return singleMapConstructor.newInstance( constructorParameter );
-		}
-		catch (SecurityException e) {
-			throw log.securityManagerLoadingError( classToLoad, e.getMessage(), e );
 		}
 		catch (NoSuchMethodException e) {
 			throw log.noPublicMapArgConstructor( classToLoad );

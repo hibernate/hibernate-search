@@ -169,10 +169,6 @@ public interface Log extends BasicLogger {
 	)
 	SearchException dslExtensionNoMatch(List<?> attemptedExtensions);
 
-	@Message(id = ID_OFFSET + 28, value = "Security manager does not allow access to the constructor of type '%1$s': %2$s")
-	SearchException securityManagerLoadingError(@FormatWith(ClassFormatter.class) Class<?> classToLoad,
-			String causeMessage, @Cause Exception cause);
-
 	@Message(id = ID_OFFSET + 30, value = "Unable to load class '%1$s': %2$s")
 	ClassLoadingException unableToLoadTheClass(String className, String causeMessage, @Cause Throwable cause);
 

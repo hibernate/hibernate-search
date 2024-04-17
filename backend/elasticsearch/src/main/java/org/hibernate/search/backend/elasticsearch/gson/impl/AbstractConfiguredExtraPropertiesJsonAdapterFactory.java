@@ -113,7 +113,7 @@ public abstract class AbstractConfiguredExtraPropertiesJsonAdapterFactory implem
 		try {
 			return (Constructor<T>) type.getRawType().getConstructor();
 		}
-		catch (NoSuchMethodException | SecurityException e) {
+		catch (NoSuchMethodException e) {
 			throw new AssertionFailure( "Missing or inaccessible no-arg constructor on type " + type );
 		}
 	}

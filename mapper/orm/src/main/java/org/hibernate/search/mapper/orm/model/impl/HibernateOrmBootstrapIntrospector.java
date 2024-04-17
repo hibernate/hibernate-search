@@ -10,7 +10,6 @@ import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.Member;
 import java.lang.reflect.Method;
-import java.lang.reflect.Modifier;
 import java.util.HashMap;
 import java.util.LinkedHashSet;
 import java.util.Map;
@@ -152,17 +151,10 @@ public class HibernateOrmBootstrapIntrospector extends AbstractPojoHCAnnBootstra
 	}
 
 	private static void setAccessible(Member member) {
-		try {
-			// always try to set accessible to true regardless of visibility
-			// as it's faster even for public fields:
-			// it bypasses the security model checks at execution time.
-			( (AccessibleObject) member ).setAccessible( true );
-		}
-		catch (SecurityException se) {
-			if ( !Modifier.isPublic( member.getModifiers() ) ) {
-				throw se;
-			}
-		}
+		// always try to set accessible to true regardless of visibility
+		// as it's faster even for public fields:
+		// it bypasses the security model checks at execution time.
+		( (AccessibleObject) member ).setAccessible( true );
 	}
 
 	/**
