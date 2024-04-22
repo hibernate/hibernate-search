@@ -607,4 +607,7 @@ public interface Log extends BasicLogger {
 					+ " but instead got a value of type %3$s.")
 	SearchException namedValuesParameterIncorrectType(String name, @FormatWith(ClassFormatter.class) Class<?> expected,
 			@FormatWith(ClassFormatter.class) Class<?> actual);
+
+	@Message(id = ID_OFFSET + 128, value = "Unable to get a thread group from the SecurityManager: %1$s")
+	SearchException securityManagerInvocationProblem(String causeMessage, @Cause Exception cause);
 }
