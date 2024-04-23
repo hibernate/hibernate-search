@@ -444,6 +444,7 @@ stage('Default build') {
 			"""
 			dir(helper.configuration.maven.localRepositoryPath) {
 				stash name:'default-build-result', includes:"org/hibernate/search/**"
+				stash name:'default-build-cache', includes:".develocity/**"
 			}
 
 			if (!enableDefaultBuildIT) {
@@ -476,41 +477,7 @@ stage('Default build') {
 					clean verify \
 			"""
 
-			def sonarCredentialsId = helper.configuration.file?.sonar?.credentials
-			if (sonarCredentialsId) {
-				// WARNING: Make sure credentials are evaluated by sh, not Groovy.
-				// To that end, escape the '$' when referencing the variables.
-				// See https://www.jenkins.io/doc/book/pipeline/jenkinsfile/#string-interpolation
-				withCredentials([usernamePassword(
-								credentialsId: sonarCredentialsId,
-								usernameVariable: 'SONARCLOUD_ORGANIZATION',
-								// https://docs.sonarsource.com/sonarqube/latest/analyzing-source-code/scanners/sonarscanner-for-maven/#analyzing
-								passwordVariable: 'SONAR_TOKEN'
-				)]) {
-					// We don't want to use the build cache or build scans for this execution
-					def miscMavenArgs = '-Dscan=false -Dno-build-cache'
-					sh """ \
-							mvn sonar:sonar \
-							${miscMavenArgs} \
-							-Dsonar.organization=\${SONARCLOUD_ORGANIZATION} \
-							-Dsonar.host.url=https://sonarcloud.io \
-							${helper.scmSource.pullRequest ? """ \
-									-Dsonar.pullrequest.branch=${helper.scmSource.branch.name} \
-									-Dsonar.pullrequest.key=${helper.scmSource.pullRequest.id} \
-									-Dsonar.pullrequest.base=${helper.scmSource.pullRequest.target.name} \
-									${helper.scmSource.gitHubRepoId ? """ \
-											-Dsonar.pullrequest.provider=GitHub \
-											-Dsonar.pullrequest.github.repository=${helper.scmSource.gitHubRepoId} \
-									""" : ''} \
-							""" : """ \
-									-Dsonar.branch.name=${helper.scmSource.branch.name} \
-							"""} \
-					"""
-				}
-			}
-			else {
-				echo "Skipping Sonar report: no credentials."
-			}
+			stash name:'default-build-jacoco-reports', includes:"**/jacoco.exec"
 		}
 	}
 }
@@ -716,6 +683,69 @@ stage('Non-default environments') {
 	}
 }
 
+stage('Sonar analysis') {
+	def sonarCredentialsId = helper.configuration.file?.sonar?.credentials
+	if (sonarCredentialsId) {
+		runBuildOnNode {
+			withMavenWorkspace {
+				dir(helper.configuration.maven.localRepositoryPath) {
+					unstash name: "default-build-cache"
+				}
+
+				unstash name: "default-build-jacoco-reports"
+				environments.content.jdk.enabled.each { JdkBuildEnvironment buildEnv ->
+					unstash name: "${buildEnv.tag}-build-jacoco-reports"
+				}
+				environments.content.database.enabled.each { JdkBuildEnvironment buildEnv ->
+					unstash name: "${buildEnv.tag}-build-jacoco-reports"
+				}
+				environments.content.localElasticsearch.enabled.each { JdkBuildEnvironment buildEnv ->
+					unstash name: "${buildEnv.tag}-build-jacoco-reports"
+				}
+				environments.content.amazonElasticsearch.enabled.each { JdkBuildEnvironment buildEnv ->
+					unstash name: "${buildEnv.tag}-build-jacoco-reports"
+				}
+
+				// we don't clean to keep the unstashed jacoco reports:
+				sh "mvn package -Pskip-checks -Pci-build -DskipTests -Pcoverage-report ${toTestEnvironmentArgs(environments.content.jdk.default)}"
+
+
+				// WARNING: Make sure credentials are evaluated by sh, not Groovy.
+				// To that end, escape the '$' when referencing the variables.
+				// See https://www.jenkins.io/doc/book/pipeline/jenkinsfile/#string-interpolation
+				withCredentials([usernamePassword(
+						credentialsId: sonarCredentialsId,
+						usernameVariable: 'SONARCLOUD_ORGANIZATION',
+						// https://docs.sonarsource.com/sonarqube/latest/analyzing-source-code/scanners/sonarscanner-for-maven/#analyzing
+						passwordVariable: 'SONAR_TOKEN'
+				)]) {
+					// We don't want to use the build cache or build scans for this execution
+					def miscMavenArgs = '-Dscan=false -Dno-build-cache'
+					sh """ \
+							mvn sonar:sonar \
+							${miscMavenArgs} \
+							-Dsonar.organization=\${SONARCLOUD_ORGANIZATION} \
+							-Dsonar.host.url=https://sonarcloud.io \
+							${helper.scmSource.pullRequest ? """ \
+									-Dsonar.pullrequest.branch=${helper.scmSource.branch.name} \
+									-Dsonar.pullrequest.key=${helper.scmSource.pullRequest.id} \
+									-Dsonar.pullrequest.base=${helper.scmSource.pullRequest.target.name} \
+									${helper.scmSource.gitHubRepoId ? """ \
+											-Dsonar.pullrequest.provider=GitHub \
+											-Dsonar.pullrequest.github.repository=${helper.scmSource.gitHubRepoId} \
+									""" : ''} \
+							""" : """ \
+									-Dsonar.branch.name=${helper.scmSource.branch.name} \
+							"""} \
+					"""
+				}
+			}
+		}
+	} else {
+		echo "Skipping Sonar report: no credentials."
+	}
+}
+
 } // End of helper.runWithNotification
 
 // Job-specific helpers
@@ -746,6 +776,7 @@ abstract class BuildEnvironment {
 	abstract String getTag()
 	boolean isDefault() { isDefault }
 	boolean requiresDefaultBuildArtifacts() { true }
+	boolean generatesCoverage() { true }
 }
 
 class JdkBuildEnvironment extends BuildEnvironment {
@@ -763,6 +794,11 @@ class CompilerBuildEnvironment extends BuildEnvironment {
 	String getTag() { "compiler-$name" }
 	@Override
 	boolean requiresDefaultBuildArtifacts() { false }
+
+	@Override
+	boolean generatesCoverage() {
+		return false
+	}
 }
 
 class DatabaseBuildEnvironment extends BuildEnvironment {
@@ -981,6 +1017,9 @@ void mavenNonDefaultBuild(BuildEnvironment buildEnv, String args, List<String> a
 			unstash name:'default-build-result'
 		}
 	}
+	dir(helper.configuration.maven.localRepositoryPath) {
+		unstash name: "default-build-cache"
+	}
 
 	// We want to run relevant integration test modules only (see array of module names)
 	// and in PRs we want to run only those affected by changes
@@ -1003,6 +1042,9 @@ void mavenNonDefaultBuild(BuildEnvironment buildEnv, String args, List<String> a
 	if ( artifactsToTest ) {
 		args += ' -pl ' + sh(script: "./ci/list-dependent-integration-tests.sh ${artifactsToTest.join(',')}", returnStdout: true).trim()
 	}
+	if ( buildEnv.generatesCoverage() ) {
+		args += ' -Pcoverage'
+	}
 
 	pullContainerImages( args )
 
@@ -1013,6 +1055,10 @@ void mavenNonDefaultBuild(BuildEnvironment buildEnv, String args, List<String> a
 					--fail-at-end \
 					$args \
 	"""
+
+	if ( buildEnv.generatesCoverage() ) {
+		stash name: "${buildEnv.tag}-build-jacoco-reports", includes:"**/jacoco.exec"
+	}
 
 	// In incremental builds, the Maven execution above
 	// created a file listing projects relevant to the incremental build.
@@ -1034,6 +1080,10 @@ String toTestEnvironmentArgs(BuildEnvironment buildEnv) {
 	// The behavior is implemented in our Maven extension, see:
 	// https://github.com/hibernate/hibernate-search-develocity-extension
 	args +=  " -Dbuild-cache.java-version.exact"
+
+	// https://docs.gradle.com/develocity/maven-extension/current/#changing_the_local_cache_directory
+	// The local Build Cache is located at ${user.home}/.m2/.develocity/build-cache by default
+	args += " -Ddevelocity.cache.local.directory=${helper.configuration.maven.localRepositoryPath}/.develocity/build-cache"
 
 	// Add a suffix to tests to distinguish between different executions
 	// of the same test in different environments in reports
