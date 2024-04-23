@@ -22,5 +22,15 @@ public interface DataClearConfig {
 
 	DataClearConfig clearIndexData(boolean clear);
 
-	DataClearConfig clearDatabaseData(boolean clear);
+	default DataClearConfig clearDatabaseData(boolean clear) {
+		return clearDatabaseData( clear ? ClearDatabaseData.AUTOMATIC : ClearDatabaseData.DISABLED );
+	}
+
+	DataClearConfig clearDatabaseData(ClearDatabaseData clear);
+
+	DataClearConfig manualDatabaseCleanup(Consumer<Session> cleanupAction);
+
+	enum ClearDatabaseData {
+		DISABLED, MANUAL, AUTOMATIC
+	}
 }

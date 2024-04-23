@@ -80,12 +80,6 @@ public class AutomaticIndexingOneToOneOwnedByContainingEagerOnBothSidesIT
 		// See https://hibernate.zulipchat.com/#narrow/stream/132094-hibernate-orm-dev/topic/lazy.20associations.20with.20ORM.206
 		setupContext.withProperty( AvailableSettings.MAX_FETCH_DEPTH, 1 );
 
-		// We're simulating a mappedBy with two associations (see comments in annotation mapping),
-		// so we need to clear one side before we can delete entities.
-		setupContext.dataClearing( config -> config.preClear( ContainedEntity.class, contained -> {
-			contained.setContainingAsElementCollectionAssociationsIndexedEmbedded( null );
-			contained.setContainingAsElementCollectionAssociationsNonIndexedEmbedded( null );
-		} ) );
 		return setupContext;
 	}
 

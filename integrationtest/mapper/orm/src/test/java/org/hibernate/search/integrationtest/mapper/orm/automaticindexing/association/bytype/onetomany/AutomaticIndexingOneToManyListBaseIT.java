@@ -39,7 +39,6 @@ import org.hibernate.search.mapper.pojo.mapping.definition.annotation.IndexedEmb
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.IndexingDependency;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.ObjectPath;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.PropertyValue;
-import org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmSetupHelper;
 
 /**
  * Test automatic indexing caused by multi-valued association updates
@@ -68,18 +67,6 @@ public class AutomaticIndexingOneToManyListBaseIT
 	@Override
 	protected boolean isAssociationOwnedByContainedSide() {
 		return true;
-	}
-
-	@Override
-	protected OrmSetupHelper.SetupContext additionalSetup(OrmSetupHelper.SetupContext setupContext) {
-
-		// We're simulating a mappedBy with two associations (see comments in annotation mapping),
-		// so we need to clear one side before we can delete entities.
-		setupContext.dataClearing( config -> config.preClear( ContainingEntity.class, containing -> {
-			containing.getContainedElementCollectionAssociationsIndexedEmbedded().clear();
-			containing.getContainedElementCollectionAssociationsNonIndexedEmbedded().clear();
-		} ) );
-		return setupContext;
 	}
 
 	@Entity(name = "containing")

@@ -65,7 +65,7 @@ class OrmSetupHelperCleaner {
 	}
 
 	void cleanupData() {
-		if ( !( config.clearDatabaseData || config.clearIndexData ) ) {
+		if ( !( !DataClearConfig.ClearDatabaseData.DISABLED.equals( config.clearDatabaseData ) || config.clearIndexData ) ) {
 			return;
 		}
 		log.info( "Clearing data and reusing the same session factory." );
@@ -102,14 +102,19 @@ class OrmSetupHelperCleaner {
 			}
 		}
 
-		if ( this.config.clearDatabaseData ) {
-			sessionFactory.getCache().evictAllRegions();
+		if ( !DataClearConfig.ClearDatabaseData.DISABLED.equals( this.config.clearDatabaseData ) ) {
+			if ( DataClearConfig.ClearDatabaseData.AUTOMATIC.equals( this.config.clearDatabaseData ) ) {
+				sessionFactory.getCache().evictAllRegions();
 
-			clearDatabase( sessionFactory, mapping );
+				clearDatabase( sessionFactory, mapping );
 
-			// Must re-clear the caches as they may have been re-populated
-			// while executing queries in clearDatabase().
-			sessionFactory.getCache().evictAllRegions();
+				// Must re-clear the caches as they may have been re-populated
+				// while executing queries in clearDatabase().
+				sessionFactory.getCache().evictAllRegions();
+			}
+			else {
+				manualClearDatabase( sessionFactory, mapping );
+			}
 		}
 
 		if ( mapping != null && this.config.clearIndexData ) {
@@ -128,19 +133,35 @@ class OrmSetupHelperCleaner {
 		}
 	}
 
-
-	private void clearDatabase(SessionFactoryImplementor sessionFactory, HibernateOrmMapping mapping, Object tenantId) {
-		for ( ThrowingConsumer<Session, RuntimeException> preClear : config.preClear ) {
-			if ( mapping != null ) {
-				mapping.listenerEnabled( false );
-			}
-			//CHECKSTYLE:OFF: RegexpSinglelineJava - cannot use static import as that would clash with method of this class
-			OrmUtils.with( sessionFactory, tenantId ).runInTransaction( preClear );
-			//CHECKSTYLE:ON
-			if ( mapping != null ) {
-				mapping.listenerEnabled( true );
+	private void manualClearDatabase(SessionFactoryImplementor sessionFactory, HibernateOrmMapping mapping) {
+		if ( config.tenantsIds.isEmpty() ) {
+			executeActions( config.manual, sessionFactory, mapping, null );
+		}
+		else {
+			for ( Object tenantsId : config.tenantsIds ) {
+				executeActions( config.manual, sessionFactory, mapping, tenantsId );
 			}
 		}
+	}
+
+	private void executeActions(List<ThrowingConsumer<Session, RuntimeException>> actions,
+			SessionFactoryImplementor sessionFactory, HibernateOrmMapping mapping, Object tenantId) {
+		if ( mapping != null ) {
+			mapping.listenerEnabled( false );
+		}
+		for ( ThrowingConsumer<Session, RuntimeException> action : actions ) {
+			//CHECKSTYLE:OFF: RegexpSinglelineJava - cannot use static import as that would clash with method of this class
+			OrmUtils.with( sessionFactory, tenantId ).runInTransaction( action );
+			//CHECKSTYLE:ON
+		}
+		if ( mapping != null ) {
+			mapping.listenerEnabled( true );
+		}
+	}
+
+
+	private void clearDatabase(SessionFactoryImplementor sessionFactory, HibernateOrmMapping mapping, Object tenantId) {
+		executeActions( config.preClear, sessionFactory, mapping, tenantId );
 
 		Set<String> clearedEntityNames = new HashSet<>();
 		for ( Class<?> entityClass : config.entityClearOrder ) {
@@ -308,12 +329,13 @@ class OrmSetupHelperCleaner {
 		private final List<Class<?>> entityClearOrder = new ArrayList<>();
 
 		private final List<ThrowingConsumer<Session, RuntimeException>> preClear = new ArrayList<>();
+		private final List<ThrowingConsumer<Session, RuntimeException>> manual = new ArrayList<>();
 
 		private boolean clearIndexData = false;
-		private boolean clearDatabaseData = false;
+		private ClearDatabaseData clearDatabaseData = ClearDatabaseData.DISABLED;
 
 		@Override
-		public DataClearConfig clearDatabaseData(boolean clear) {
+		public DataClearConfig clearDatabaseData(ClearDatabaseData clear) {
 			this.clearDatabaseData = clear;
 			return this;
 		}
@@ -357,6 +379,12 @@ class OrmSetupHelperCleaner {
 		@Override
 		public DataClearConfig clearIndexData(boolean clear) {
 			this.clearIndexData = clear;
+			return this;
+		}
+
+		@Override
+		public DataClearConfig manualDatabaseCleanup(Consumer<Session> cleanupAction) {
+			this.manual.add( cleanupAction::accept );
 			return this;
 		}
 	}
