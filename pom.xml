@@ -423,7 +423,9 @@
         <surefire.jvm.args>${surefire.jvm.args.no-jacoco} @{surefire.jvm.args.jacoco}</surefire.jvm.args>
         <failsafe.jvm.args>${surefire.jvm.args.no-jacoco} @{failsafe.jvm.args.jacoco}</failsafe.jvm.args>
 
-<!-- Disable integration tests selectively. To be set in specific profile, e.g. for a specific JDK version. -->
+        <jacoco.environment.sub-directory>${surefire.environment}</jacoco.environment.sub-directory>
+
+        <!-- Disable integration tests selectively. To be set in specific profile, e.g. for a specific JDK version. -->
         <failsafe.spring.skip>false</failsafe.spring.skip>
 
         <!-- This allows us to distinguish between multiple executions of the same test in test reports. -->
@@ -1520,6 +1522,7 @@
                                 </goals>
                                 <configuration>
                                     <propertyName>failsafe.jvm.args.jacoco</propertyName>
+                                    <destFile>${project.build.directory}/${jacoco.environment.sub-directory}/jacoco.exec</destFile>
                                 </configuration>
                             </execution>
                         </executions>
