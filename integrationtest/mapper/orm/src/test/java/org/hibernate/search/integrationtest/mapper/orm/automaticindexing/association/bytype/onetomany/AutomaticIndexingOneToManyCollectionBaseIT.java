@@ -72,14 +72,19 @@ public class AutomaticIndexingOneToManyCollectionBaseIT
 	}
 
 	@Override
-	protected OrmSetupHelper.SetupContext additionalSetup(OrmSetupHelper.SetupContext setupContext) {
+	protected void preDelete(OrmSetupHelper.SetupContext setupContext) {
 		// We're simulating a mappedBy with two associations (see comments in annotation mapping),
 		// so we need to clear one side before we can delete entities.
-		setupContext.dataClearing( config -> config.preClear( ContainingEntity.class, containing -> {
-			containing.getContainedElementCollectionAssociationsIndexedEmbedded().clear();
-			containing.getContainedElementCollectionAssociationsNonIndexedEmbedded().clear();
+		setupContext.dataClearing( config -> config.manualDatabaseCleanup( session -> {
+			session.createQuery(
+					"select c from containing c where size(c.containedElementCollectionAssociationsIndexedEmbedded) > 0 or size(c.containedElementCollectionAssociationsNonIndexedEmbedded) > 0 ",
+					ContainingEntity.class
+			).getResultList()
+					.forEach( containing -> {
+						containing.getContainedElementCollectionAssociationsIndexedEmbedded().clear();
+						containing.getContainedElementCollectionAssociationsNonIndexedEmbedded().clear();
+					} );
 		} ) );
-		return setupContext;
 	}
 
 	@Entity(name = "containing")

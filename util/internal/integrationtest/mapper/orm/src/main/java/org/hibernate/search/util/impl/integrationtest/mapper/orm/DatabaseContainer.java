@@ -84,7 +84,7 @@ public final class DatabaseContainer {
 		}
 	}
 
-	private enum SupportedDatabase {
+	public enum SupportedDatabase {
 		H2 {
 			@Override
 			String dialect() {
@@ -458,6 +458,19 @@ public final class DatabaseContainer {
 
 		public String isolation() {
 			return isolation;
+		}
+
+		public boolean is(DatabaseContainer.SupportedDatabase database) {
+			return database.dialect().equals( dialect );
+		}
+
+		public boolean is(DatabaseContainer.SupportedDatabase... databases) {
+			for ( SupportedDatabase database : databases ) {
+				if ( database.dialect().equals( dialect ) ) {
+					return true;
+				}
+			}
+			return false;
 		}
 
 		@SuppressWarnings("deprecation") // since DialectContext is using the deprecated properties we cannot switch to JAKARTA_* for now...

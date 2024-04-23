@@ -26,6 +26,8 @@ import org.hibernate.search.util.impl.integrationtest.common.extension.BackendMo
 import org.hibernate.search.util.impl.integrationtest.common.stub.StubTreeNodeDiffer;
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.document.StubDocumentNode;
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.document.model.StubIndexSchemaDataNode;
+import org.hibernate.search.util.impl.integrationtest.mapper.orm.DataClearConfig;
+import org.hibernate.search.util.impl.integrationtest.mapper.orm.DatabaseContainer;
 import org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmSetupHelper;
 import org.hibernate.search.util.impl.test.annotation.TestForIssue;
 
@@ -415,21 +417,37 @@ public abstract class AbstractAutomaticIndexingAssociationBaseIT<
 				_contained().entityClass()
 		);
 
+		setupContext.dataClearing( config -> config.clearDatabaseData( DataClearConfig.ClearDatabaseData.MANUAL ) );
+		preDelete( setupContext );
+
+		if ( DatabaseContainer.configuration().is( DatabaseContainer.SupportedDatabase.MARIADB,
+				DatabaseContainer.SupportedDatabase.MYSQL ) ) {
+			setupContext.dataClearing( config -> config.manualDatabaseCleanup( session -> {
+				session.createMutationQuery( "update containing c set c.parent = null" ).executeUpdate();
+			} ) );
+		}
 		if ( isAssociationOwnedByContainedSide() ) {
-			setupContext.dataClearing( config -> config.clearOrder( _contained().entityClass(), _containing().entityClass(),
-					_indexed().entityClass() ) );
+			setupContext.dataClearing( config -> config.manualDatabaseCleanup( session -> {
+				session.createMutationQuery( "delete from contained" ).executeUpdate();
+				session.createMutationQuery( "delete from containing" ).executeUpdate();
+				session.createMutationQuery( "delete from indexed" ).executeUpdate();
+			} ) );
 		}
 		else {
-			setupContext.dataClearing(
-					config -> config.clearOrder( _containing().entityClass(), _indexed().entityClass(),
-							_contained().entityClass()
-					) );
+			setupContext.dataClearing( config -> config.manualDatabaseCleanup( session -> {
+				session.createMutationQuery( "delete from containing" ).executeUpdate();
+				session.createMutationQuery( "delete from indexed" ).executeUpdate();
+				session.createMutationQuery( "delete from contained" ).executeUpdate();
+			} ) );
 		}
 		sessionFactory = additionalSetup( setupContext ).setup();
 	}
 
 	protected OrmSetupHelper.SetupContext additionalSetup(OrmSetupHelper.SetupContext setupContext) {
 		return setupContext;
+	}
+
+	protected void preDelete(OrmSetupHelper.SetupContext setupContext) {
 	}
 
 	@Test

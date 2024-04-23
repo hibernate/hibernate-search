@@ -96,12 +96,6 @@ class AutomaticIndexingOneToOneOwnedByContainedLazyOnContainedSideIT
 		// Necessary for BytecodeEnhancerRunner, see BytecodeEnhancementIT.setup
 		setupContext.withTcclLookupPrecedenceBefore();
 
-		// We're simulating a mappedBy with two associations (see comments in annotation mapping),
-		// so we need to clear one side before we can delete entities.
-		setupContext.dataClearing( config -> config.preClear( ContainingEntity.class, containing -> {
-			containing.setContainedElementCollectionAssociationsIndexedEmbedded( null );
-			containing.setContainedElementCollectionAssociationsNonIndexedEmbedded( null );
-		} ) );
 		return setupContext;
 	}
 

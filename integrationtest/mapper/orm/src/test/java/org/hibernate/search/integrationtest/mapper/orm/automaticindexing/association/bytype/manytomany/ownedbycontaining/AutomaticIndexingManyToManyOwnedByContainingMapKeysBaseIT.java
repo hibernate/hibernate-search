@@ -81,21 +81,23 @@ public class AutomaticIndexingManyToManyOwnedByContainingMapKeysBaseIT
 	}
 
 	@Override
-	protected OrmSetupHelper.SetupContext additionalSetup(OrmSetupHelper.SetupContext setupContext) {
-		setupContext.dataClearing( config -> config.preClear( ContainedEntity.class, contained -> {
-			contained.getContainingAsIndexedEmbedded().clear();
-			contained.getContainingAsNonIndexedEmbedded().clear();
-			contained.getContainingAsIndexedEmbeddedShallowReindexOnUpdate().clear();
-			contained.getContainingAsIndexedEmbeddedNoReindexOnUpdate().clear();
-			contained.getContainingAsUsedInCrossEntityDerivedProperty().clear();
-			contained.getContainingAsIndexedEmbeddedWithCast().clear();
-			ContainedEmbeddable embeddedAssociations = contained.getEmbeddedAssociations();
-			if ( embeddedAssociations != null ) {
-				embeddedAssociations.getContainingAsIndexedEmbedded().clear();
-				embeddedAssociations.getContainingAsNonIndexedEmbedded().clear();
-			}
+	protected void preDelete(OrmSetupHelper.SetupContext setupContext) {
+		setupContext.dataClearing( config -> config.manualDatabaseCleanup( session -> {
+			session.createQuery( "select c from contained c", ContainedEntity.class ).getResultList()
+					.forEach( contained -> {
+						contained.getContainingAsIndexedEmbedded().clear();
+						contained.getContainingAsNonIndexedEmbedded().clear();
+						contained.getContainingAsIndexedEmbeddedShallowReindexOnUpdate().clear();
+						contained.getContainingAsIndexedEmbeddedNoReindexOnUpdate().clear();
+						contained.getContainingAsUsedInCrossEntityDerivedProperty().clear();
+						contained.getContainingAsIndexedEmbeddedWithCast().clear();
+						ContainedEmbeddable embeddedAssociations = contained.getEmbeddedAssociations();
+						if ( embeddedAssociations != null ) {
+							embeddedAssociations.getContainingAsIndexedEmbedded().clear();
+							embeddedAssociations.getContainingAsNonIndexedEmbedded().clear();
+						}
+					} );
 		} ) );
-		return setupContext;
 	}
 
 	@Entity(name = "containing")
