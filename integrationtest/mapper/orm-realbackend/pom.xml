@@ -22,6 +22,9 @@
         <failsafe.elasticsearch.summaryFile>${failsafe.elasticsearch.reportsDirectory}/failsafe-summary.xml</failsafe.elasticsearch.summaryFile>
         <failsafe.multiplebackends.reportsDirectory>${project.build.directory}/failsafe-reports/multiplebackends</failsafe.multiplebackends.reportsDirectory>
         <failsafe.multiplebackends.summaryFile>${failsafe.multiplebackends.reportsDirectory}/failsafe-summary.xml</failsafe.multiplebackends.summaryFile>
+        <failsafe.jvm.args.jacoco.lucene></failsafe.jvm.args.jacoco.lucene>
+        <failsafe.jvm.args.jacoco.elasticsearch></failsafe.jvm.args.jacoco.elasticsearch>
+        <failsafe.jvm.args.jacoco.multiplebackends></failsafe.jvm.args.jacoco.multiplebackends>
     </properties>
 
     <dependencies>
@@ -74,53 +77,6 @@
 
     <build>
         <plugins>
-            <!-- We need to send the jacoco report of each test execution to a different file,
-                 otherwise Develocity won't be able to cache test executions. -->
-            <plugin>
-                <groupId>org.jacoco</groupId>
-                <artifactId>jacoco-maven-plugin</artifactId>
-                <executions>
-                    <execution>
-                        <id>jacoco-prepare-agent-integration</id>
-                        <configuration>
-                            <skip>true</skip>
-                        </configuration>
-                    </execution>
-                    <execution>
-                        <id>jacoco-prepare-agent-integration-lucene</id>
-                        <phase>initialize</phase>
-                        <goals>
-                            <goal>prepare-agent-integration</goal>
-                        </goals>
-                        <configuration>
-                            <propertyName>failsafe.jvm.args.jacoco.lucene</propertyName>
-                            <destFile>${project.build.directory}/${jacoco.environment.sub-directory}/lucene/jacoco.exec</destFile>
-                        </configuration>
-                    </execution>
-                    <execution>
-                        <id>jacoco-prepare-agent-integration-elasticsearch</id>
-                        <phase>initialize</phase>
-                        <goals>
-                            <goal>prepare-agent-integration</goal>
-                        </goals>
-                        <configuration>
-                            <propertyName>failsafe.jvm.args.jacoco.elasticsearch</propertyName>
-                            <destFile>${project.build.directory}/${jacoco.environment.sub-directory}/elasticsearch/jacoco.exec</destFile>
-                        </configuration>
-                    </execution>
-                    <execution>
-                        <id>jacoco-prepare-agent-integration-multiplebackends</id>
-                        <phase>initialize</phase>
-                        <goals>
-                            <goal>prepare-agent-integration</goal>
-                        </goals>
-                        <configuration>
-                            <propertyName>failsafe.jvm.args.jacoco.multiplebackends</propertyName>
-                            <destFile>${project.build.directory}/${jacoco.environment.sub-directory}/multiplebackends/jacoco.exec</destFile>
-                        </configuration>
-                    </execution>
-                </executions>
-            </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-failsafe-plugin</artifactId>
@@ -241,6 +197,60 @@
                 <test.multiplebackends.skip>true</test.multiplebackends.skip>
                 <failsafe.multiplebackends.summaryFile>${rootProject.empty.failsafe.summaryFile}</failsafe.multiplebackends.summaryFile>
             </properties>
+        </profile>
+        <profile>
+            <id>coverage</id>
+            <build>
+                <plugins>
+                    <!-- We need to send the jacoco report of each test execution to a different file,
+                         otherwise Develocity won't be able to cache test executions. -->
+                    <plugin>
+                        <groupId>org.jacoco</groupId>
+                        <artifactId>jacoco-maven-plugin</artifactId>
+                        <executions>
+                            <execution>
+                                <id>jacoco-prepare-agent-integration</id>
+                                <configuration>
+                                    <skip>true</skip>
+                                </configuration>
+                            </execution>
+                            <execution>
+                                <id>jacoco-prepare-agent-integration-lucene</id>
+                                <phase>initialize</phase>
+                                <goals>
+                                    <goal>prepare-agent-integration</goal>
+                                </goals>
+                                <configuration>
+                                    <propertyName>failsafe.jvm.args.jacoco.lucene</propertyName>
+                                    <destFile>${project.build.directory}/${jacoco.environment.sub-directory}/lucene/jacoco.exec</destFile>
+                                </configuration>
+                            </execution>
+                            <execution>
+                                <id>jacoco-prepare-agent-integration-elasticsearch</id>
+                                <phase>initialize</phase>
+                                <goals>
+                                    <goal>prepare-agent-integration</goal>
+                                </goals>
+                                <configuration>
+                                    <propertyName>failsafe.jvm.args.jacoco.elasticsearch</propertyName>
+                                    <destFile>${project.build.directory}/${jacoco.environment.sub-directory}/elasticsearch/jacoco.exec</destFile>
+                                </configuration>
+                            </execution>
+                            <execution>
+                                <id>jacoco-prepare-agent-integration-multiplebackends</id>
+                                <phase>initialize</phase>
+                                <goals>
+                                    <goal>prepare-agent-integration</goal>
+                                </goals>
+                                <configuration>
+                                    <propertyName>failsafe.jvm.args.jacoco.multiplebackends</propertyName>
+                                    <destFile>${project.build.directory}/${jacoco.environment.sub-directory}/multiplebackends/jacoco.exec</destFile>
+                                </configuration>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
         </profile>
     </profiles>
 </project>

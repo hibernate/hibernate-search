@@ -24,6 +24,8 @@
         <failsafe.lucene.summaryFile>${failsafe.lucene.reportsDirectory}/failsafe-summary.xml</failsafe.lucene.summaryFile>
         <failsafe.elasticsearch.reportsDirectory>${project.build.directory}/failsafe-reports/elasticsearch</failsafe.elasticsearch.reportsDirectory>
         <failsafe.elasticsearch.summaryFile>${failsafe.elasticsearch.reportsDirectory}/failsafe-summary.xml</failsafe.elasticsearch.summaryFile>
+        <failsafe.jvm.args.jacoco.lucene></failsafe.jvm.args.jacoco.lucene>
+        <failsafe.jvm.args.jacoco.elasticsearch></failsafe.jvm.args.jacoco.elasticsearch>
 
         <asciidoctor.base-output-dir>${project.build.directory}/asciidoctor/</asciidoctor.base-output-dir>
         <asciidoctor.theme-dir>${project.build.directory}/hibernate-asciidoctor-theme</asciidoctor.theme-dir>
@@ -113,42 +115,6 @@
                          This is probably a compiler bug, so here we need to work around it. -->
                     <showDeprecation>false</showDeprecation>
                 </configuration>
-            </plugin>
-            <!-- We need to send the jacoco report of each test execution to a different file,
-                 otherwise Develocity won't be able to cache test executions. -->
-            <plugin>
-                <groupId>org.jacoco</groupId>
-                <artifactId>jacoco-maven-plugin</artifactId>
-                <executions>
-                    <execution>
-                        <id>jacoco-prepare-agent-integration</id>
-                        <configuration>
-                            <skip>true</skip>
-                        </configuration>
-                    </execution>
-                    <execution>
-                        <id>jacoco-prepare-agent-integration-lucene</id>
-                        <phase>initialize</phase>
-                        <goals>
-                            <goal>prepare-agent-integration</goal>
-                        </goals>
-                        <configuration>
-                            <propertyName>failsafe.jvm.args.jacoco.lucene</propertyName>
-                            <destFile>${project.build.directory}/${jacoco.environment.sub-directory}/lucene/jacoco.exec</destFile>
-                        </configuration>
-                    </execution>
-                    <execution>
-                        <id>jacoco-prepare-agent-integration-elasticsearch</id>
-                        <phase>initialize</phase>
-                        <goals>
-                            <goal>prepare-agent-integration</goal>
-                        </goals>
-                        <configuration>
-                            <propertyName>failsafe.jvm.args.jacoco.elasticsearch</propertyName>
-                            <destFile>${project.build.directory}/${jacoco.environment.sub-directory}/elasticsearch/jacoco.exec</destFile>
-                        </configuration>
-                    </execution>
-                </executions>
             </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
@@ -462,6 +428,49 @@
             <properties>
                 <failsafe.elasticsearch.summaryFile>${rootProject.empty.failsafe.summaryFile}</failsafe.elasticsearch.summaryFile>
             </properties>
+        </profile>
+        <profile>
+            <id>coverage</id>
+            <build>
+                <plugins>
+                    <!-- We need to send the jacoco report of each test execution to a different file,
+                        otherwise Develocity won't be able to cache test executions. -->
+                    <plugin>
+                        <groupId>org.jacoco</groupId>
+                        <artifactId>jacoco-maven-plugin</artifactId>
+                        <executions>
+                            <execution>
+                                <id>jacoco-prepare-agent-integration</id>
+                                <configuration>
+                                    <skip>true</skip>
+                                </configuration>
+                            </execution>
+                            <execution>
+                                <id>jacoco-prepare-agent-integration-lucene</id>
+                                <phase>initialize</phase>
+                                <goals>
+                                    <goal>prepare-agent-integration</goal>
+                                </goals>
+                                <configuration>
+                                    <propertyName>failsafe.jvm.args.jacoco.lucene</propertyName>
+                                    <destFile>${project.build.directory}/${jacoco.environment.sub-directory}/lucene/jacoco.exec</destFile>
+                                </configuration>
+                            </execution>
+                            <execution>
+                                <id>jacoco-prepare-agent-integration-elasticsearch</id>
+                                <phase>initialize</phase>
+                                <goals>
+                                    <goal>prepare-agent-integration</goal>
+                                </goals>
+                                <configuration>
+                                    <propertyName>failsafe.jvm.args.jacoco.elasticsearch</propertyName>
+                                    <destFile>${project.build.directory}/${jacoco.environment.sub-directory}/elasticsearch/jacoco.exec</destFile>
+                                </configuration>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
         </profile>
     </profiles>
 </project>
