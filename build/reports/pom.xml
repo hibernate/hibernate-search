@@ -223,7 +223,7 @@
 
     <profiles>
         <profile>
-            <id>coverage</id>
+            <id>coverage-report</id>
             <build>
                 <plugins>
                     <plugin>
@@ -232,7 +232,7 @@
                         <executions>
                             <execution>
                                 <id>jacoco-report-aggregate</id>
-                                <phase>verify</phase>
+                                <phase>package</phase>
                                 <goals>
                                     <goal>report-aggregate</goal>
                                 </goals>
