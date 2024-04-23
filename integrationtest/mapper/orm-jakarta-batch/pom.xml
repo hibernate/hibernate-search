@@ -26,6 +26,10 @@
         <failsafe.elasticsearch-jbatch.summaryFile>${failsafe.elasticsearch-jbatch.reportsDirectory}/failsafe-summary.xml</failsafe.elasticsearch-jbatch.summaryFile>
         <failsafe.elasticsearch-jberet.reportsDirectory>${project.build.directory}/failsafe-reports/elasticsearch-jberet</failsafe.elasticsearch-jberet.reportsDirectory>
         <failsafe.elasticsearch-jberet.summaryFile>${failsafe.elasticsearch-jberet.reportsDirectory}/failsafe-summary.xml</failsafe.elasticsearch-jberet.summaryFile>
+        <failsafe.jvm.args.jacoco.lucene-jbatch></failsafe.jvm.args.jacoco.lucene-jbatch>
+        <failsafe.jvm.args.jacoco.lucene-jberet></failsafe.jvm.args.jacoco.lucene-jberet>
+        <failsafe.jvm.args.jacoco.elasticsearch-jbatch></failsafe.jvm.args.jacoco.elasticsearch-jbatch>
+        <failsafe.jvm.args.jacoco.elasticsearch-jberet></failsafe.jvm.args.jacoco.elasticsearch-jberet>
     </properties>
 
     <dependencies>
@@ -91,64 +95,6 @@
 
     <build>
         <plugins>
-            <!-- We need to send the jacoco report of each test execution to a different file,
-                 otherwise Develocity won't be able to cache test executions. -->
-            <plugin>
-                <groupId>org.jacoco</groupId>
-                <artifactId>jacoco-maven-plugin</artifactId>
-                <executions>
-                    <execution>
-                        <id>jacoco-prepare-agent-integration</id>
-                        <configuration>
-                            <skip>true</skip>
-                        </configuration>
-                    </execution>
-                    <execution>
-                        <id>jacoco-prepare-agent-integration-lucene-jbatch</id>
-                        <phase>initialize</phase>
-                        <goals>
-                            <goal>prepare-agent-integration</goal>
-                        </goals>
-                        <configuration>
-                            <propertyName>failsafe.jvm.args.jacoco.lucene-jbatch</propertyName>
-                            <destFile>${project.build.directory}/${jacoco.environment.sub-directory}/lucene-jbatch/jacoco.exec</destFile>
-                        </configuration>
-                    </execution>
-                    <execution>
-                        <id>jacoco-prepare-agent-integration-lucene-jberet</id>
-                        <phase>initialize</phase>
-                        <goals>
-                            <goal>prepare-agent-integration</goal>
-                        </goals>
-                        <configuration>
-                            <propertyName>failsafe.jvm.args.jacoco.lucene-jberet</propertyName>
-                            <destFile>${project.build.directory}/${jacoco.environment.sub-directory}/lucene-jberet/jacoco.exec</destFile>
-                        </configuration>
-                    </execution>
-                    <execution>
-                        <id>jacoco-prepare-agent-integration-elasticsearch-jbatch</id>
-                        <phase>initialize</phase>
-                        <goals>
-                            <goal>prepare-agent-integration</goal>
-                        </goals>
-                        <configuration>
-                            <propertyName>failsafe.jvm.args.jacoco.elasticsearch-jbatch</propertyName>
-                            <destFile>${project.build.directory}/${jacoco.environment.sub-directory}/elasticsearch-jbatch/jacoco.exec</destFile>
-                        </configuration>
-                    </execution>
-                    <execution>
-                        <id>jacoco-prepare-agent-integration-elasticsearch-jberet</id>
-                        <phase>initialize</phase>
-                        <goals>
-                            <goal>prepare-agent-integration</goal>
-                        </goals>
-                        <configuration>
-                            <propertyName>failsafe.jvm.args.jacoco.elasticsearch-jberet</propertyName>
-                            <destFile>${project.build.directory}/${jacoco.environment.sub-directory}/elasticsearch-jberet/jacoco.exec</destFile>
-                        </configuration>
-                    </execution>
-                </executions>
-            </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-failsafe-plugin</artifactId>
@@ -310,6 +256,71 @@
                 <failsafe.elasticsearch-jbatch.summaryFile>${rootProject.empty.failsafe.summaryFile}</failsafe.elasticsearch-jbatch.summaryFile>
                 <failsafe.elasticsearch-jberet.summaryFile>${rootProject.empty.failsafe.summaryFile}</failsafe.elasticsearch-jberet.summaryFile>
             </properties>
+        </profile>
+        <profile>
+            <id>coverage</id>
+            <build>
+                <plugins>
+                    <!-- We need to send the jacoco report of each test execution to a different file,
+                        otherwise Develocity won't be able to cache test executions. -->
+                    <plugin>
+                        <groupId>org.jacoco</groupId>
+                        <artifactId>jacoco-maven-plugin</artifactId>
+                        <executions>
+                            <execution>
+                                <id>jacoco-prepare-agent-integration</id>
+                                <configuration>
+                                    <skip>true</skip>
+                                </configuration>
+                            </execution>
+                            <execution>
+                                <id>jacoco-prepare-agent-integration-lucene-jbatch</id>
+                                <phase>initialize</phase>
+                                <goals>
+                                    <goal>prepare-agent-integration</goal>
+                                </goals>
+                                <configuration>
+                                    <propertyName>failsafe.jvm.args.jacoco.lucene-jbatch</propertyName>
+                                    <destFile>${project.build.directory}/${jacoco.environment.sub-directory}/lucene-jbatch/jacoco.exec</destFile>
+                                </configuration>
+                            </execution>
+                            <execution>
+                                <id>jacoco-prepare-agent-integration-lucene-jberet</id>
+                                <phase>initialize</phase>
+                                <goals>
+                                    <goal>prepare-agent-integration</goal>
+                                </goals>
+                                <configuration>
+                                    <propertyName>failsafe.jvm.args.jacoco.lucene-jberet</propertyName>
+                                    <destFile>${project.build.directory}/${jacoco.environment.sub-directory}/lucene-jberet/jacoco.exec</destFile>
+                                </configuration>
+                            </execution>
+                            <execution>
+                                <id>jacoco-prepare-agent-integration-elasticsearch-jbatch</id>
+                                <phase>initialize</phase>
+                                <goals>
+                                    <goal>prepare-agent-integration</goal>
+                                </goals>
+                                <configuration>
+                                    <propertyName>failsafe.jvm.args.jacoco.elasticsearch-jbatch</propertyName>
+                                    <destFile>${project.build.directory}/${jacoco.environment.sub-directory}/elasticsearch-jbatch/jacoco.exec</destFile>
+                                </configuration>
+                            </execution>
+                            <execution>
+                                <id>jacoco-prepare-agent-integration-elasticsearch-jberet</id>
+                                <phase>initialize</phase>
+                                <goals>
+                                    <goal>prepare-agent-integration</goal>
+                                </goals>
+                                <configuration>
+                                    <propertyName>failsafe.jvm.args.jacoco.elasticsearch-jberet</propertyName>
+                                    <destFile>${project.build.directory}/${jacoco.environment.sub-directory}/elasticsearch-jberet/jacoco.exec</destFile>
+                                </configuration>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
         </profile>
     </profiles>
 
