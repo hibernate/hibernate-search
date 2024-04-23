@@ -267,10 +267,10 @@
         <version.install.plugin>3.1.1</version.install.plugin>
         <version.enforcer.plugin>3.4.1</version.enforcer.plugin>
         <version.project-info.plugin>3.5.0</version.project-info.plugin>
-        <version.japicmp.plugin>0.20.0</version.japicmp.plugin>
+        <version.japicmp.plugin>0.21.0</version.japicmp.plugin>
         <version.nexus-staging.plugin>1.6.13</version.nexus-staging.plugin>
         <version.deploy.plugin>3.1.1</version.deploy.plugin>
-        <version.gpg.plugin>3.2.3</version.gpg.plugin>
+        <version.gpg.plugin>3.2.4</version.gpg.plugin>
         <version.flatten-maven-plugin>1.6.0</version.flatten-maven-plugin>
         <version.assembly.plugin>3.7.1</version.assembly.plugin>
         <version.buildhelper.plugin>3.5.0</version.buildhelper.plugin>
@@ -284,7 +284,7 @@
         <version.forbiddenapis.plugin>3.7</version.forbiddenapis.plugin>
         <version.jandex.plugin>3.1.7</version.jandex.plugin>
         <version.maven.injection.plugin>1.0.2</version.maven.injection.plugin>
-        <version.jar.plugin>3.4.0</version.jar.plugin>
+        <version.jar.plugin>3.4.1</version.jar.plugin>
         <version.javadoc.plugin>3.6.3</version.javadoc.plugin>
         <version.jdeps.plugin>0.5.1</version.jdeps.plugin>
         <version.processor.plugin>5.1</version.processor.plugin>
@@ -302,7 +302,7 @@
         <version.org.apache.groovy.groovy-jsr223>4.0.13</version.org.apache.groovy.groovy-jsr223>
         <version.com.puppycrawl.tools.checkstyle>10.15.0</version.com.puppycrawl.tools.checkstyle>
         <version.versions.plugin>2.16.2</version.versions.plugin>
-        <version.maven-wrapper-plugin>3.2.0</version.maven-wrapper-plugin>
+        <version.maven-wrapper-plugin>3.3.0</version.maven-wrapper-plugin>
         <version.impsort-maven-plugin>1.9.0</version.impsort-maven-plugin>
         <version.formatter-maven-plugin>2.23.0</version.formatter-maven-plugin>
         <version.org.eclipse.m2e.lifecycle-mapping>1.0.0</version.org.eclipse.m2e.lifecycle-mapping>
