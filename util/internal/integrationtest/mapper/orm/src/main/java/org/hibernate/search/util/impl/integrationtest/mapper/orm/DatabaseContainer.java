@@ -16,8 +16,12 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.function.BiConsumer;
 
-import org.hibernate.cfg.JdbcSettings;
+import javax.script.ScriptException;
 
+import org.hibernate.cfg.JdbcSettings;
+import org.hibernate.search.util.common.AssertionFailure;
+
+import com.github.dockerjava.api.command.InspectContainerResponse;
 import com.github.dockerjava.api.model.HostConfig;
 import com.github.dockerjava.api.model.Ulimit;
 
@@ -25,6 +29,7 @@ import org.testcontainers.containers.JdbcDatabaseContainer;
 import org.testcontainers.containers.wait.strategy.HttpWaitStrategy;
 import org.testcontainers.containers.wait.strategy.LogMessageWaitStrategy;
 import org.testcontainers.containers.wait.strategy.WaitStrategy;
+import org.testcontainers.ext.ScriptUtils;
 import org.testcontainers.images.builder.ImageFromDockerfile;
 
 /*
@@ -284,7 +289,23 @@ public final class DatabaseContainer {
 								.forPort( 8080 )
 								.forStatusCode( 200 ),
 						8080
-				).withCommand( "start-single-node --insecure --store=type=mem,size=0.25 --advertise-addr=localhost" )
+				) {
+					@Override
+					protected void containerIsStarted(InspectContainerResponse containerInfo) {
+						super.containerIsStarted( containerInfo );
+						try {
+							// see https://www.cockroachlabs.com/docs/stable/configure-replication-zones#replication-zone-variables
+							// Smaller values can save disk space and improve performance if values are frequently overwritten or for queue-like workloads
+							ScriptUtils.executeDatabaseScript( getDatabaseDelegate(), null,
+									"ALTER DATABASE defaultdb CONFIGURE ZONE USING gc.ttlseconds = 60;\n"
+											+ "ALTER RANGE default CONFIGURE ZONE USING gc.ttlseconds = 60;"
+							);
+						}
+						catch (ScriptException e) {
+							throw new AssertionFailure( "Cannot start an instance of CockroachDB", e );
+						}
+					}
+				}.withCommand( "start-single-node --insecure --store=type=mem,size=0.25 --advertise-addr=localhost" )
 						.withStartupTimeout( EXTENDED_TIMEOUT )
 						.withCreateContainerCmdModifier( cmd -> {
 							HostConfig hostConfig = cmd.getHostConfig();
