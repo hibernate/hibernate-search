@@ -275,7 +275,7 @@ stage('Configure') {
 					// --------------------------------------------
 					// OpenSearch
 					// Not testing 1.0 - 1.2 as these versions are EOL'ed.
-					new LocalOpenSearchBuildEnvironment(version: '1.3.15', condition: TestCondition.AFTER_MERGE),
+					new LocalOpenSearchBuildEnvironment(version: '1.3.16', condition: TestCondition.AFTER_MERGE),
 					// See https://opensearch.org/lines/1x.html for a list of all 1.x versions
 					new LocalOpenSearchBuildEnvironment(version: '2.0.1', condition: TestCondition.ON_DEMAND),
 					new LocalOpenSearchBuildEnvironment(version: '2.1.0', condition: TestCondition.ON_DEMAND),
