@@ -10,7 +10,6 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.hibernate.search.util.impl.integrationtest.common.assertion.SearchHitsAssert.assertThatHits;
 import static org.hibernate.search.util.impl.integrationtest.common.assertion.SearchResultAssert.assertThatQuery;
 
-import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.EnumSet;
@@ -24,7 +23,6 @@ import org.hibernate.search.engine.search.predicate.dsl.SearchPredicateFactory;
 import org.hibernate.search.engine.search.predicate.dsl.SimpleQueryFlag;
 import org.hibernate.search.engine.search.predicate.dsl.SimpleQueryStringPredicateFieldStep;
 import org.hibernate.search.engine.search.query.SearchQuery;
-import org.hibernate.search.integrationtest.backend.tck.testsupport.types.InstantFieldTypeDescriptor;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.StandardFieldTypeDescriptor;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.TckBackendFeatures;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.TckConfiguration;
@@ -402,23 +400,6 @@ class SimpleQueryStringPredicateSpecificsIT
 				.fetchAllHits()
 		).isInstanceOf( SearchException.class );
 
-	}
-
-	public static List<? extends Arguments> simpleQueryStringSyntax1() {
-		// String field, String value1, String value2, String noMatch, String unParsableValue
-		TckBackendFeatures backendFeatures = TckConfiguration.get().getBackendFeatures();
-		return List.of(
-				Arguments.of( "integer", "1", "2", "100", "not-an-int" ),
-				Arguments.of( "instant",
-						backendFeatures.formatForQueryStringPredicate( InstantFieldTypeDescriptor.INSTANCE,
-								Instant.parse( "2000-01-01T01:01:01Z" ) ),
-						backendFeatures.formatForQueryStringPredicate( InstantFieldTypeDescriptor.INSTANCE,
-								Instant.parse( "2000-02-02T02:02:02Z" ) ),
-						backendFeatures.formatForQueryStringPredicate( InstantFieldTypeDescriptor.INSTANCE,
-								Instant.parse( "2222-02-02T02:02:02Z" ) ),
-						"not-an-instant" ),
-				Arguments.of( "localDate", "2000-01-01", "2000-02-02", "2222-02-02", "not-an-localDate" )
-		);
 	}
 
 	public static List<? extends Arguments> simpleQueryStringSyntax() {

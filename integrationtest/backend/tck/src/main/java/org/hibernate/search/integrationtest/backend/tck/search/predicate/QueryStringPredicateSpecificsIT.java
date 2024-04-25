@@ -284,114 +284,126 @@ class QueryStringPredicateSpecificsIT extends AbstractBaseQueryStringPredicateSp
 		).hasDocRefHitsAnyOrder( indexForSyntaxParsingCheck.typeName(), syntaxDataSet.docId( 2 ) );
 
 		// ranges:
-		//   We are not running these range tests if the value contains square brackets [] because there is a problem in a Lucene query parser
-		//   and even if the query is escaped as `[2018\-01\-01T12\:58\:30.000000000\+02\:00\[Africa\/Cairo\] TO 2018\-02\-01T08\:15\:30.000000000\-02\:00\[\-02\:00\]]`
-		//   Fails for both Lucene and Elasticsearch backends...
-		if ( !( value1.contains( "]" ) || value2.contains( "]" ) ) ) {
+		//   for ZDT we have an additional "escape" by wrapping the values in quotes.
+		//   See https://github.com/apache/lucene/issues/13234#issuecomment-2076083215
+		String value1RangeEscaped;
+		String value2RangeEscaped;
+		if ( ( value1.contains( "]" ) || value2.contains( "]" ) ) ) {
+			value1RangeEscaped = "\"" + value1 + "\"";
+			value2RangeEscaped = "\"" + value2 + "\"";
+		}
+		else {
+			value1RangeEscaped = value1;
+			value2RangeEscaped = value2;
+		}
+
+		assertThatHits(
+				scope.query()
+						.where( f -> f.queryString().field( field )
+								.matching(
+										String.format( Locale.ROOT, "[%s TO %s]", value1RangeEscaped, value2RangeEscaped ) ) )
+						.fetchAllHits()
+		).hasDocRefHitsAnyOrder(
+				indexForSyntaxParsingCheck.typeName(), syntaxDataSet.docId( 1 ), syntaxDataSet.docId( 2 ) );
+
+		assertThatHits(
+				scope.query()
+						.where( f -> f.queryString().field( field )
+								.matching(
+										String.format( Locale.ROOT, "{%s TO %s}", value1RangeEscaped, value2RangeEscaped ) ) )
+						.fetchAllHits()
+		).isEmpty();
+
+		assertThatHits(
+				scope.query()
+						.where( f -> f.queryString().field( field )
+								.matching(
+										String.format( Locale.ROOT, "[%s TO %s}", value1RangeEscaped, value2RangeEscaped ) ) )
+						.fetchAllHits()
+		).hasDocRefHitsAnyOrder( indexForSyntaxParsingCheck.typeName(), syntaxDataSet.docId( 1 ) );
+
+		assertThatHits(
+				scope.query()
+						.where( f -> f.queryString().field( field )
+								.matching(
+										String.format( Locale.ROOT, "{%s TO %s]", value1RangeEscaped, value2RangeEscaped ) ) )
+						.fetchAllHits()
+		).hasDocRefHitsAnyOrder( indexForSyntaxParsingCheck.typeName(), syntaxDataSet.docId( 2 ) );
+
+		if ( noMatch != null ) {
 			assertThatHits(
 					scope.query()
 							.where( f -> f.queryString().field( field )
-									.matching( String.format( Locale.ROOT, "[%s TO %s]", value1, value2 ) ) )
+									.matching( String.format( Locale.ROOT, "[%s TO *]", value1RangeEscaped ) ) )
 							.fetchAllHits()
 			).hasDocRefHitsAnyOrder(
-					indexForSyntaxParsingCheck.typeName(), syntaxDataSet.docId( 1 ), syntaxDataSet.docId( 2 ) );
+					indexForSyntaxParsingCheck.typeName(), syntaxDataSet.docId( 1 ), syntaxDataSet.docId( 2 ),
+					syntaxDataSet.docId( 3 )
+			);
+			assertThatHits(
+					scope.query()
+							.where( f -> f.queryString().field( field )
+									.matching( String.format( Locale.ROOT, "{%s TO *]", value1RangeEscaped ) ) )
+							.fetchAllHits()
+			).hasDocRefHitsAnyOrder( indexForSyntaxParsingCheck.typeName(), syntaxDataSet.docId( 2 ),
+					syntaxDataSet.docId( 3 )
+			);
 
 			assertThatHits(
 					scope.query()
-							.where( f -> f.queryString().field( field )
-									.matching( String.format( Locale.ROOT, "{%s TO %s}", value1, value2 ) ) )
+							.where( f -> f.queryString().field( field ).matching( "-" + noMatch ) )
+							.fetchAllHits()
+			).hasDocRefHitsAnyOrder( indexForSyntaxParsingCheck.typeName(), syntaxDataSet.docId( 1 ),
+					syntaxDataSet.docId( 2 ),
+					syntaxDataSet.docId( 3 )
+			);
+			assertThatHits(
+					scope.query()
+							.where( f -> f.queryString().field( field ).matching( "!" + noMatch ) )
+							.fetchAllHits()
+			).hasDocRefHitsAnyOrder( indexForSyntaxParsingCheck.typeName(), syntaxDataSet.docId( 1 ),
+					syntaxDataSet.docId( 2 ),
+					syntaxDataSet.docId( 3 )
+			);
+
+			assertThatHits(
+					scope.query()
+							.where( f -> f.queryString().field( field ).matching( noMatch ) )
 							.fetchAllHits()
 			).isEmpty();
-
+		}
+		else {
 			assertThatHits(
 					scope.query()
 							.where( f -> f.queryString().field( field )
-									.matching( String.format( Locale.ROOT, "[%s TO %s}", value1, value2 ) ) )
+									.matching( String.format( Locale.ROOT, "[%s TO *]", value1RangeEscaped ) ) )
 							.fetchAllHits()
-			).hasDocRefHitsAnyOrder( indexForSyntaxParsingCheck.typeName(), syntaxDataSet.docId( 1 ) );
+			).hasDocRefHitsAnyOrder( indexForSyntaxParsingCheck.typeName(), syntaxDataSet.docId( 1 ),
+					syntaxDataSet.docId( 2 )
+			);
 
 			assertThatHits(
 					scope.query()
 							.where( f -> f.queryString().field( field )
-									.matching( String.format( Locale.ROOT, "{%s TO %s]", value1, value2 ) ) )
+									.matching( String.format( Locale.ROOT, "{%s TO *]", value1RangeEscaped ) ) )
 							.fetchAllHits()
 			).hasDocRefHitsAnyOrder( indexForSyntaxParsingCheck.typeName(), syntaxDataSet.docId( 2 ) );
-
-			if ( noMatch != null ) {
-				assertThatHits(
-						scope.query()
-								.where( f -> f.queryString().field( field )
-										.matching( String.format( Locale.ROOT, "[%s TO *]", value1 ) ) )
-								.fetchAllHits()
-				).hasDocRefHitsAnyOrder(
-						indexForSyntaxParsingCheck.typeName(), syntaxDataSet.docId( 1 ), syntaxDataSet.docId( 2 ),
-						syntaxDataSet.docId( 3 )
-				);
-				assertThatHits(
-						scope.query()
-								.where( f -> f.queryString().field( field )
-										.matching( String.format( Locale.ROOT, "{%s TO *]", value1 ) ) )
-								.fetchAllHits()
-				).hasDocRefHitsAnyOrder( indexForSyntaxParsingCheck.typeName(), syntaxDataSet.docId( 2 ),
-						syntaxDataSet.docId( 3 )
-				);
-
-				assertThatHits(
-						scope.query()
-								.where( f -> f.queryString().field( field ).matching( "-" + noMatch ) )
-								.fetchAllHits()
-				).hasDocRefHitsAnyOrder( indexForSyntaxParsingCheck.typeName(), syntaxDataSet.docId( 1 ),
-						syntaxDataSet.docId( 2 ),
-						syntaxDataSet.docId( 3 )
-				);
-				assertThatHits(
-						scope.query()
-								.where( f -> f.queryString().field( field ).matching( "!" + noMatch ) )
-								.fetchAllHits()
-				).hasDocRefHitsAnyOrder( indexForSyntaxParsingCheck.typeName(), syntaxDataSet.docId( 1 ),
-						syntaxDataSet.docId( 2 ),
-						syntaxDataSet.docId( 3 )
-				);
-
-				assertThatHits(
-						scope.query()
-								.where( f -> f.queryString().field( field ).matching( noMatch ) )
-								.fetchAllHits()
-				).isEmpty();
-			}
-			else {
-				assertThatHits(
-						scope.query()
-								.where( f -> f.queryString().field( field )
-										.matching( String.format( Locale.ROOT, "[%s TO *]", value1 ) ) )
-								.fetchAllHits()
-				).hasDocRefHitsAnyOrder( indexForSyntaxParsingCheck.typeName(), syntaxDataSet.docId( 1 ),
-						syntaxDataSet.docId( 2 )
-				);
-
-				assertThatHits(
-						scope.query()
-								.where( f -> f.queryString().field( field )
-										.matching( String.format( Locale.ROOT, "{%s TO *]", value1 ) ) )
-								.fetchAllHits()
-				).hasDocRefHitsAnyOrder( indexForSyntaxParsingCheck.typeName(), syntaxDataSet.docId( 2 ) );
-			}
-
-			assertThatHits(
-					scope.query()
-							.where( f -> f.queryString().field( field )
-									.matching( String.format( Locale.ROOT, "[* TO %s]", value2 ) ) )
-							.fetchAllHits()
-			).hasDocRefHitsAnyOrder(
-					indexForSyntaxParsingCheck.typeName(), syntaxDataSet.docId( 1 ), syntaxDataSet.docId( 2 ) );
-
-			assertThatHits(
-					scope.query()
-							.where( f -> f.queryString().field( field )
-									.matching( String.format( Locale.ROOT, "[* TO %s}", value2 ) ) )
-							.fetchAllHits()
-			).hasDocRefHitsAnyOrder( indexForSyntaxParsingCheck.typeName(), syntaxDataSet.docId( 1 ) );
 		}
+
+		assertThatHits(
+				scope.query()
+						.where( f -> f.queryString().field( field )
+								.matching( String.format( Locale.ROOT, "[* TO %s]", value2RangeEscaped ) ) )
+						.fetchAllHits()
+		).hasDocRefHitsAnyOrder(
+				indexForSyntaxParsingCheck.typeName(), syntaxDataSet.docId( 1 ), syntaxDataSet.docId( 2 ) );
+
+		assertThatHits(
+				scope.query()
+						.where( f -> f.queryString().field( field )
+								.matching( String.format( Locale.ROOT, "[* TO %s}", value2RangeEscaped ) ) )
+						.fetchAllHits()
+		).hasDocRefHitsAnyOrder( indexForSyntaxParsingCheck.typeName(), syntaxDataSet.docId( 1 ) );
 
 		assertThatHits(
 				scope.query()
