@@ -1057,7 +1057,9 @@ void mavenNonDefaultBuild(BuildEnvironment buildEnv, String args, List<String> a
 	"""
 
 	if ( buildEnv.generatesCoverage() ) {
-		stash name: "${buildEnv.tag}-build-jacoco-reports", includes:"**/jacoco.exec"
+		// We allow an empty stash here since it can happen that a PR build is triggered
+		// but because of incremental build there will be no tests executed and no jacoco files generated:
+		stash name: "${buildEnv.tag}-build-jacoco-reports", includes:"**/jacoco.exec", allowEmpty: true
 	}
 
 	// In incremental builds, the Maven execution above
