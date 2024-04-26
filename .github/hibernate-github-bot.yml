@@ -51,7 +51,7 @@ develocity:
         pattern: "elasticsearch-(.*)"
         replacement: "es-$1"
       - column: "Backend"
-        pattern: "amazon-opensearch-serverless(-[\d\.]+)?"
+        pattern: "amazon-opensearch-serverless(-[\\d\\.]+)?"
         replacement: "amzn-os-svrless"
       - column: "Backend"
         pattern: "(.*-)?opensearch-(.*)"
