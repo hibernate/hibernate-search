@@ -691,7 +691,7 @@ stage('Sonar analysis') {
 				dir(helper.configuration.maven.localRepositoryPath) {
 					unstash name: "default-build-cache"
 				}
-				if (enableDefaultBuild) {
+				if (enableDefaultBuild && enableDefaultBuildIT) {
 					unstash name: "default-build-jacoco-reports"
 				}
 				environments.content.jdk.enabled.each { JdkBuildEnvironment buildEnv ->
