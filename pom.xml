@@ -441,6 +441,9 @@
         <goal.impsort-maven-plugin>sort</goal.impsort-maven-plugin>
         <goal.formatter-maven-plugin>format</goal.formatter-maven-plugin>
 
+        <!-- For Reproducible Builds -->
+        <project.build.outputTimestamp>2024-05-01T00:00:00Z</project.build.outputTimestamp>
+
         <!-- Sonar options -->
         <!--
             We want to take into account coverage data from integration tests from other projects as well.
