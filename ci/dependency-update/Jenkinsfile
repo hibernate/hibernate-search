@@ -5,7 +5,7 @@
  * See the lgpl.txt file in the root directory or <http://www.gnu.org/licenses/lgpl-2.1.html>.
  */
 
-@Library('hibernate-jenkins-pipeline-helpers@1.11') _
+@Library('hibernate-jenkins-pipeline-helpers@1.13') _
 
 // NOTE: Remember to update the matrix axes below when adding/removing entries here.
 // Also make sure to update the parameters in the parameters {} section of the pipeline.
