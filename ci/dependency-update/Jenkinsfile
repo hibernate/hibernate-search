@@ -20,6 +20,8 @@ Map settings() {
 			return [
 					updateProperties: ['version.org.hibernate.orm'],
 					onlyRunTestDependingOn: ['hibernate-search-mapper-orm'],
+					// rebuild orm utils to address removal of the bytecode enhanced engine
+					additionalMavenArgs: '-pl :hibernate-search-util-internal-integrationtest-mapper-orm'
 			]
 		case 'orm7':
 			return [
