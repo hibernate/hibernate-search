@@ -11,10 +11,16 @@ import java.util.List;
 import java.util.Locale;
 import java.util.function.BiConsumer;
 
+import jakarta.persistence.Access;
 import jakarta.persistence.AccessType;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.Index;
+import jakarta.persistence.Table;
 
+import org.hibernate.annotations.JdbcTypeCode;
 import org.hibernate.annotations.TenantId;
 import org.hibernate.annotations.UuidGenerator;
 import org.hibernate.boot.models.HibernateAnnotations;
@@ -46,15 +52,13 @@ public class AdditionalMappingBuilder {
 
 	public AdditionalMappingBuilder table(String schema, String catalog, String table) {
 		contributors.add( (context, classDetails) -> {
-			classDetails.applyAnnotationUsage(
+			MutableAnnotationUsage<Table> tableUsage = classDetails.applyAnnotationUsage(
 					JpaAnnotations.TABLE,
-					(tableUsage) -> {
-						tableUsage.setAttributeValue( "schema", schema );
-						tableUsage.setAttributeValue( "catalog", catalog );
-						tableUsage.setAttributeValue( "name", table );
-					},
 					context
 			);
+			tableUsage.setAttributeValue( "schema", schema );
+			tableUsage.setAttributeValue( "catalog", catalog );
+			tableUsage.setAttributeValue( "name", table );
 		} );
 		return this;
 	}
@@ -65,17 +69,16 @@ public class AdditionalMappingBuilder {
 
 	public AdditionalMappingBuilder index(String name, String columns) {
 		contributors.add( (context, classDetails) -> {
-			classDetails.applyAnnotationUsage(
+			MutableAnnotationUsage<Table> tableUsage = classDetails.applyAnnotationUsage(
 					JpaAnnotations.TABLE,
-					(tableUsage) -> {
-						MutableAnnotationUsage<Index> indexUsage = JpaAnnotations.INDEX.createUsage( null, context );
-						indexUsage.setAttributeValue( "name", name );
-						indexUsage.setAttributeValue( "columnList", columns );
-
-						tableUsage.setAttributeValue( "indexes", List.of( indexUsage ) );
-					},
 					context
 			);
+
+			MutableAnnotationUsage<Index> indexUsage = JpaAnnotations.INDEX.createUsage( context );
+			indexUsage.setAttributeValue( "name", name );
+			indexUsage.setAttributeValue( "columnList", columns );
+
+			tableUsage.setAttributeValue( "indexes", List.of( indexUsage ) );
 		} );
 		return this;
 	}
@@ -101,11 +104,11 @@ public class AdditionalMappingBuilder {
 		createAttribute( name, length, nullable );
 		contributors.add( (context, classDetails) -> {
 			final MutableMemberDetails field = (MutableMemberDetails) classDetails.findFieldByName( name );
-			field.applyAnnotationUsage(
+			MutableAnnotationUsage<Enumerated> entityUsage = field.applyAnnotationUsage(
 					JpaAnnotations.ENUMERATED,
-					(entityUsage) -> entityUsage.setAttributeValue( "value", EnumType.STRING ),
 					context
 			);
+			entityUsage.setAttributeValue( "value", EnumType.STRING );
 		} );
 		return this;
 	}
@@ -116,18 +119,20 @@ public class AdditionalMappingBuilder {
 
 			field.applyAnnotationUsage( JpaAnnotations.ID, context );
 
-			field.applyAnnotationUsage(
+			MutableAnnotationUsage<UuidGenerator> uuidGeneratorUsage = field.applyAnnotationUsage(
 					UUID_GENERATOR,
-					(uuidGeneratorUsage) -> uuidGeneratorUsage.setAttributeValue( "style",
-							UuidGenerator.Style.valueOf( strategy.toUpperCase( Locale.ROOT ) ) ),
 					context
 			);
+			uuidGeneratorUsage.setAttributeValue(
+					"style",
+					UuidGenerator.Style.valueOf( strategy.toUpperCase( Locale.ROOT ) )
+			);
 			if ( type != null ) {
-				field.applyAnnotationUsage(
+				MutableAnnotationUsage<JdbcTypeCode> jdbcTypeCodeUsage = field.applyAnnotationUsage(
 						HibernateAnnotations.JDBC_TYPE_CODE,
-						(jdbcTypeCodeUsage) -> jdbcTypeCodeUsage.setAttributeValue( "value", type ),
 						context
 				);
+				jdbcTypeCodeUsage.setAttributeValue( "value", type );
 			}
 		} );
 
@@ -144,16 +149,16 @@ public class AdditionalMappingBuilder {
 							context
 					);
 
-					classDetails.applyAnnotationUsage(
+					MutableAnnotationUsage<Entity> entityUsage = classDetails.applyAnnotationUsage(
 							JpaAnnotations.ENTITY,
-							(entityUsage) -> entityUsage.setAttributeValue( "name", name ),
 							context
 					);
-					classDetails.applyAnnotationUsage(
+					entityUsage.setAttributeValue( "name", name );
+					MutableAnnotationUsage<Access> accessUsage = classDetails.applyAnnotationUsage(
 							JpaAnnotations.ACCESS,
-							(accessUsage) -> accessUsage.setAttributeValue( "value", AccessType.FIELD ),
 							context
 					);
+					accessUsage.setAttributeValue( "value", AccessType.FIELD );
 
 					for ( BiConsumer<SourceModelBuildingContext, MutableClassDetails> contributor : contributors ) {
 						contributor.accept( context, classDetails );
@@ -170,23 +175,21 @@ public class AdditionalMappingBuilder {
 	private void createAttribute(String name, Integer length, boolean nullable, Integer type) {
 		contributors.add( (context, classDetails) -> {
 			final MutableMemberDetails field = (MutableMemberDetails) classDetails.findFieldByName( name );
-			field.applyAnnotationUsage(
+			MutableAnnotationUsage<Column> columnUsage = field.applyAnnotationUsage(
 					JpaAnnotations.COLUMN,
-					(columnUsage) -> {
-						columnUsage.setAttributeValue( "name", name );
-						columnUsage.setAttributeValue( "nullable", nullable );
-						if ( length != null ) {
-							columnUsage.setAttributeValue( "length", length );
-						}
-					},
 					context
 			);
+
+			columnUsage.setAttributeValue( "name", name );
+			columnUsage.setAttributeValue( "nullable", nullable );
+			if ( length != null ) {
+				columnUsage.setAttributeValue( "length", length );
+			}
+
 			if ( type != null ) {
-				field.applyAnnotationUsage(
-						HibernateAnnotations.JDBC_TYPE_CODE,
-						(jdbcTypeCodeUsage) -> jdbcTypeCodeUsage.setAttributeValue( "value", type ),
-						context
-				);
+				MutableAnnotationUsage<JdbcTypeCode> jdbcTypeCodeUsage =
+						field.applyAnnotationUsage( HibernateAnnotations.JDBC_TYPE_CODE, context );
+				jdbcTypeCodeUsage.setAttributeValue( "value", type );
 			}
 		} );
 	}
