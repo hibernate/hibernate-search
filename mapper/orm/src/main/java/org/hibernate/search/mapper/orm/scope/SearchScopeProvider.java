@@ -7,6 +7,8 @@ package org.hibernate.search.mapper.orm.scope;
 import java.util.Collection;
 import java.util.Collections;
 
+import org.hibernate.search.engine.common.EntityReference;
+
 import jakarta.persistence.Entity;
 
 /**
@@ -15,7 +17,8 @@ import jakarta.persistence.Entity;
  * @see org.hibernate.search.mapper.orm.mapping.SearchMapping
  * @see org.hibernate.search.mapper.orm.session.SearchSession
  */
-public interface SearchScopeProvider {
+@SuppressWarnings( "deprecation" )
+public interface SearchScopeProvider extends org.hibernate.search.engine.mapper.scope.SearchScopeProvider<org.hibernate.search.mapper.orm.common.EntityReference>{
 
 	/**
 	 * Creates a {@link SearchScope} limited to
