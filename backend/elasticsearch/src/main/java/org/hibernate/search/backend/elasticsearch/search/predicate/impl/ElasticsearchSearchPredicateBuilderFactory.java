@@ -14,6 +14,7 @@ import org.hibernate.search.engine.search.predicate.spi.MatchNonePredicateBuilde
 import org.hibernate.search.engine.search.predicate.spi.QueryStringPredicateBuilder;
 import org.hibernate.search.engine.search.predicate.spi.SearchPredicateBuilderFactory;
 import org.hibernate.search.engine.search.predicate.spi.SimpleQueryStringPredicateBuilder;
+import org.hibernate.search.engine.search.predicate.spi.WithParametersPredicateBuilder;
 
 import com.google.gson.JsonObject;
 
@@ -53,6 +54,11 @@ public class ElasticsearchSearchPredicateBuilderFactory implements SearchPredica
 	@Override
 	public QueryStringPredicateBuilder queryString() {
 		return new ElasticsearchQueryStringPredicate.Builder( scope );
+	}
+
+	@Override
+	public WithParametersPredicateBuilder withParameters() {
+		return new ElasticsearchWithParametersPredicate.Builder( scope );
 	}
 
 	public ElasticsearchSearchPredicate fromJson(JsonObject jsonObject) {

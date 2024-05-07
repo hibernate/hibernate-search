@@ -14,6 +14,7 @@ import org.hibernate.search.engine.search.predicate.spi.MatchNonePredicateBuilde
 import org.hibernate.search.engine.search.predicate.spi.QueryStringPredicateBuilder;
 import org.hibernate.search.engine.search.predicate.spi.SearchPredicateBuilderFactory;
 import org.hibernate.search.engine.search.predicate.spi.SimpleQueryStringPredicateBuilder;
+import org.hibernate.search.engine.search.predicate.spi.WithParametersPredicateBuilder;
 
 import org.apache.lucene.search.Query;
 
@@ -53,6 +54,11 @@ public class LuceneSearchPredicateBuilderFactory implements SearchPredicateBuild
 	@Override
 	public QueryStringPredicateBuilder queryString() {
 		return new LuceneQueryStringPredicate.Builder( scope );
+	}
+
+	@Override
+	public WithParametersPredicateBuilder withParameters() {
+		return new LuceneWithParametersPredicate.Builder( scope );
 	}
 
 	public LuceneSearchPredicate fromLuceneQuery(Query query) {

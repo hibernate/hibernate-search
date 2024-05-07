@@ -25,4 +25,6 @@ public interface SearchPredicateBuilderFactory {
 	SimpleQueryStringPredicateBuilder simpleQueryString();
 
 	QueryStringPredicateBuilder queryString();
+
+	WithParametersPredicateBuilder withParameters();
 }

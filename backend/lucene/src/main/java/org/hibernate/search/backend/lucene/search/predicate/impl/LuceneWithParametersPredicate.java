@@ -8,8 +8,6 @@ package org.hibernate.search.backend.lucene.search.predicate.impl;
 
 import java.util.function.Function;
 
-import org.hibernate.search.backend.lucene.search.common.impl.AbstractLuceneCompositeNodeSearchQueryElementFactory;
-import org.hibernate.search.backend.lucene.search.common.impl.LuceneSearchIndexCompositeNodeContext;
 import org.hibernate.search.backend.lucene.search.common.impl.LuceneSearchIndexScope;
 import org.hibernate.search.engine.search.common.NamedValues;
 import org.hibernate.search.engine.search.predicate.SearchPredicate;
@@ -18,7 +16,7 @@ import org.hibernate.search.engine.search.predicate.spi.WithParametersPredicateB
 
 import org.apache.lucene.search.Query;
 
-public class LuceneWithParametersPredicate extends AbstractLuceneSingleFieldPredicate {
+public class LuceneWithParametersPredicate extends AbstractLuceneSearchPredicate {
 
 	private final LuceneSearchIndexScope<?> scope;
 	private final Function<? super NamedValues, ? extends PredicateFinalStep> predicateCreator;
@@ -38,22 +36,16 @@ public class LuceneWithParametersPredicate extends AbstractLuceneSingleFieldPred
 		return providedPredicate.toQuery( context );
 	}
 
-	public static class Factory extends AbstractLuceneCompositeNodeSearchQueryElementFactory<WithParametersPredicateBuilder> {
-
-		public static final Factory INSTANCE = new Factory();
-
-		@Override
-		public WithParametersPredicateBuilder create(LuceneSearchIndexScope<?> scope,
-				LuceneSearchIndexCompositeNodeContext node) {
-			return new Builder( scope, node );
-		}
+	@Override
+	public void checkNestableWithin(String expectedParentNestedPath) {
+		// do nothing; We'll check it in to-query method.
 	}
 
-	private static class Builder extends AbstractBuilder implements WithParametersPredicateBuilder {
+	public static class Builder extends AbstractBuilder implements WithParametersPredicateBuilder {
 		private Function<? super NamedValues, ? extends PredicateFinalStep> predicateCreator;
 
-		Builder(LuceneSearchIndexScope<?> scope, LuceneSearchIndexCompositeNodeContext node) {
-			super( scope, node );
+		Builder(LuceneSearchIndexScope<?> scope) {
+			super( scope );
 		}
 
 		@Override
