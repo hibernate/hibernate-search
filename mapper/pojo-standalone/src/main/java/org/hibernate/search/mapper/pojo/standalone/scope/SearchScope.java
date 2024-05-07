@@ -40,7 +40,7 @@ import org.hibernate.search.util.common.annotation.Incubating;
  * @param <E> A supertype of all types in this scope.
  */
 @Incubating
-public interface SearchScope<E> {
+public interface SearchScope<E> extends org.hibernate.search.engine.mapper.scope.SearchScope<E, EntityReference> {
 
 	/**
 	 * Initiate the building of a search predicate.
@@ -88,7 +88,7 @@ public interface SearchScope<E> {
 	 * @return A projection factory.
 	 * @see SearchProjectionFactory
 	 */
-	SearchProjectionFactory<EntityReference, ?> projection();
+	SearchProjectionFactory<EntityReference, E> projection();
 
 	/**
 	 * Initiate the building of a search aggregation that will be valid for the indexes in this scope.

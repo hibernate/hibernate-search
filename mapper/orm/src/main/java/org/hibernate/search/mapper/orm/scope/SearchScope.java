@@ -36,7 +36,8 @@ import org.hibernate.search.util.common.SearchException;
  *
  * @param <E> A supertype of all types in this scope.
  */
-public interface SearchScope<E> {
+@SuppressWarnings("deprecation")
+public interface SearchScope<E> extends org.hibernate.search.engine.mapper.scope.SearchScope<E, org.hibernate.search.mapper.orm.common.EntityReference> {
 
 	/**
 	 * Initiate the building of a search predicate.
