@@ -6,6 +6,8 @@
  */
 package org.hibernate.search.mapper.pojo.standalone.reporting.impl;
 
+import java.lang.invoke.MethodHandles;
+
 import org.hibernate.search.engine.backend.reporting.spi.BackendMappingHints;
 import org.hibernate.search.util.common.logging.impl.MessageConstants;
 
@@ -16,7 +18,7 @@ import org.jboss.logging.annotations.MessageBundle;
 @MessageBundle(projectCode = MessageConstants.PROJECT_CODE)
 public interface StandalonePojoMappingHints extends BackendMappingHints {
 
-	StandalonePojoMappingHints INSTANCE = Messages.getBundle( StandalonePojoMappingHints.class );
+	StandalonePojoMappingHints INSTANCE = Messages.getBundle( MethodHandles.lookup(), StandalonePojoMappingHints.class );
 
 	@Message("To enable loading of entity instances from an external source, provide a SelectionLoadingStrategy"
 			+ " when registering the entity type to the mapping builder."

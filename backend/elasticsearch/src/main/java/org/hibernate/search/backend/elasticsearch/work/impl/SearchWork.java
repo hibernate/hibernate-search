@@ -6,6 +6,7 @@
  */
 package org.hibernate.search.backend.elasticsearch.work.impl;
 
+import java.lang.invoke.MethodHandles;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.concurrent.CompletableFuture;
@@ -23,7 +24,7 @@ import com.google.gson.JsonObject;
 
 public class SearchWork<R> extends AbstractNonBulkableWork<R> {
 
-	private static final Log queryLog = LoggerFactory.make( Log.class, DefaultLogCategories.QUERY );
+	private static final Log queryLog = LoggerFactory.make( Log.class, DefaultLogCategories.QUERY, MethodHandles.lookup() );
 
 	private final ElasticsearchSearchResultExtractor<R> resultExtractor;
 	private final Deadline deadline;

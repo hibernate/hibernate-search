@@ -10,7 +10,7 @@ import org.hibernate.search.util.common.logging.impl.LogCategory;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
 /**
- * Log categories to be used with {@link LoggerFactory#make(Class, LogCategory)}.
+ * Log categories to be used with {@link LoggerFactory#make(Class, LogCategory, java.lang.invoke.MethodHandles.Lookup)}.
  *
  */
 public final class ElasticsearchLogCategories {

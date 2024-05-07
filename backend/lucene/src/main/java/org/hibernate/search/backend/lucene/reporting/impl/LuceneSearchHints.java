@@ -6,6 +6,8 @@
  */
 package org.hibernate.search.backend.lucene.reporting.impl;
 
+import java.lang.invoke.MethodHandles;
+
 import org.hibernate.search.engine.backend.reporting.spi.BackendSearchHints;
 import org.hibernate.search.util.common.logging.impl.MessageConstants;
 
@@ -16,7 +18,7 @@ import org.jboss.logging.annotations.MessageBundle;
 @MessageBundle(projectCode = MessageConstants.PROJECT_CODE)
 public interface LuceneSearchHints extends BackendSearchHints {
 
-	LuceneSearchHints INSTANCE = Messages.getBundle( LuceneSearchHints.class );
+	LuceneSearchHints INSTANCE = Messages.getBundle( MethodHandles.lookup(), LuceneSearchHints.class );
 
 	@Message("A document projection represents a root document and adding it as a part of the nested object projection might produce misleading results.")
 	String documentProjectionNestingNotSupportedHint();

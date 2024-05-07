@@ -6,6 +6,8 @@
  */
 package org.hibernate.search.backend.elasticsearch.reporting.impl;
 
+import java.lang.invoke.MethodHandles;
+
 import org.hibernate.search.util.common.logging.impl.MessageConstants;
 
 import org.jboss.logging.Messages;
@@ -18,7 +20,8 @@ import org.jboss.logging.annotations.MessageBundle;
 @MessageBundle(projectCode = MessageConstants.PROJECT_CODE)
 public interface ElasticsearchEventContextMessages {
 
-	ElasticsearchEventContextMessages INSTANCE = Messages.getBundle( ElasticsearchEventContextMessages.class );
+	ElasticsearchEventContextMessages INSTANCE =
+			Messages.getBundle( MethodHandles.lookup(), ElasticsearchEventContextMessages.class );
 
 	@Message(value = "attribute '%1$s'")
 	String mappingAttribute(String name);

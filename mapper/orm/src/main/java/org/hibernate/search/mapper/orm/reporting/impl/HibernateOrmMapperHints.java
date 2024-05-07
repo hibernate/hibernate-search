@@ -6,6 +6,8 @@
  */
 package org.hibernate.search.mapper.orm.reporting.impl;
 
+import java.lang.invoke.MethodHandles;
+
 import org.hibernate.search.mapper.orm.cfg.HibernateOrmMapperSettings;
 import org.hibernate.search.mapper.pojo.reporting.spi.MapperHints;
 import org.hibernate.search.util.common.logging.impl.MessageConstants;
@@ -17,7 +19,7 @@ import org.jboss.logging.annotations.MessageBundle;
 @MessageBundle(projectCode = MessageConstants.PROJECT_CODE)
 public interface HibernateOrmMapperHints extends MapperHints {
 
-	HibernateOrmMapperHints INSTANCE = Messages.getBundle( HibernateOrmMapperHints.class );
+	HibernateOrmMapperHints INSTANCE = Messages.getBundle( MethodHandles.lookup(), HibernateOrmMapperHints.class );
 
 	@Message("Prebuild the missing Jandex indexes and make them available to Hibernate Search"
 			+ " or use a combination of configuration properties ("

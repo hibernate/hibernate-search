@@ -6,6 +6,8 @@
  */
 package org.hibernate.search.mapper.pojo.standalone.reporting.impl;
 
+import java.lang.invoke.MethodHandles;
+
 import org.hibernate.search.mapper.pojo.reporting.spi.MapperHints;
 import org.hibernate.search.mapper.pojo.standalone.cfg.StandalonePojoMapperSettings;
 import org.hibernate.search.util.common.logging.impl.MessageConstants;
@@ -17,7 +19,7 @@ import org.jboss.logging.annotations.MessageBundle;
 @MessageBundle(projectCode = MessageConstants.PROJECT_CODE)
 public interface StandalonePojoMapperHints extends MapperHints {
 
-	StandalonePojoMapperHints INSTANCE = Messages.getBundle( StandalonePojoMapperHints.class );
+	StandalonePojoMapperHints INSTANCE = Messages.getBundle( MethodHandles.lookup(), StandalonePojoMapperHints.class );
 
 	@Message("Prebuild the missing Jandex indexes and make them available to Hibernate Search"
 			+ " or use a combination of configuration properties ("

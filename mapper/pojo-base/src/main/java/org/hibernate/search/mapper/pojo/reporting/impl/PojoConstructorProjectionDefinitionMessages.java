@@ -6,6 +6,8 @@
  */
 package org.hibernate.search.mapper.pojo.reporting.impl;
 
+import java.lang.invoke.MethodHandles;
+
 import org.hibernate.search.util.common.logging.impl.MessageConstants;
 
 import org.jboss.logging.Messages;
@@ -19,7 +21,7 @@ import org.jboss.logging.annotations.MessageBundle;
 public interface PojoConstructorProjectionDefinitionMessages {
 
 	PojoConstructorProjectionDefinitionMessages INSTANCE = Messages.getBundle(
-			PojoConstructorProjectionDefinitionMessages.class
+			MethodHandles.lookup(), PojoConstructorProjectionDefinitionMessages.class
 	);
 
 	@Message(value = "Executed constructor path:")

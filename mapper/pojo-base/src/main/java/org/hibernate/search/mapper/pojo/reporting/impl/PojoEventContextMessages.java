@@ -7,6 +7,7 @@
 package org.hibernate.search.mapper.pojo.reporting.impl;
 
 import java.lang.annotation.Annotation;
+import java.lang.invoke.MethodHandles;
 
 import org.hibernate.search.util.common.logging.impl.ClassFormatter;
 import org.hibernate.search.util.common.logging.impl.CommaSeparatedClassesFormatter;
@@ -23,7 +24,7 @@ import org.jboss.logging.annotations.MessageBundle;
 @MessageBundle(projectCode = MessageConstants.PROJECT_CODE)
 public interface PojoEventContextMessages {
 
-	PojoEventContextMessages INSTANCE = Messages.getBundle( PojoEventContextMessages.class );
+	PojoEventContextMessages INSTANCE = Messages.getBundle( MethodHandles.lookup(), PojoEventContextMessages.class );
 
 	@Message(value = "Schema management")
 	String schemaManagement();

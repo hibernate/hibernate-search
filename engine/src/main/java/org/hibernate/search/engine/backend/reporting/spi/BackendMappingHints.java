@@ -6,6 +6,8 @@
  */
 package org.hibernate.search.engine.backend.reporting.spi;
 
+import java.lang.invoke.MethodHandles;
+
 import org.hibernate.search.util.common.logging.impl.MessageConstants;
 
 import org.jboss.logging.Messages;
@@ -15,7 +17,7 @@ import org.jboss.logging.annotations.MessageBundle;
 @MessageBundle(projectCode = MessageConstants.PROJECT_CODE)
 public interface BackendMappingHints {
 
-	BackendMappingHints NONE = Messages.getBundle( BackendMappingHints.class );
+	BackendMappingHints NONE = Messages.getBundle( MethodHandles.lookup(), BackendMappingHints.class );
 
 	@Message(value = "")
 	String noEntityProjectionAvailable();

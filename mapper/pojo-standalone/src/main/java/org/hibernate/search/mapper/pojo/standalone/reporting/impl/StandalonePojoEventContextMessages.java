@@ -6,6 +6,8 @@
  */
 package org.hibernate.search.mapper.pojo.standalone.reporting.impl;
 
+import java.lang.invoke.MethodHandles;
+
 import org.hibernate.search.util.common.logging.impl.MessageConstants;
 
 import org.jboss.logging.Messages;
@@ -18,7 +20,8 @@ import org.jboss.logging.annotations.MessageBundle;
 @MessageBundle(projectCode = MessageConstants.PROJECT_CODE)
 public interface StandalonePojoEventContextMessages {
 
-	StandalonePojoEventContextMessages INSTANCE = Messages.getBundle( StandalonePojoEventContextMessages.class );
+	StandalonePojoEventContextMessages INSTANCE =
+			Messages.getBundle( MethodHandles.lookup(), StandalonePojoEventContextMessages.class );
 
 	@Message(value = "Standalone POJO mapping")
 	String mapping();
