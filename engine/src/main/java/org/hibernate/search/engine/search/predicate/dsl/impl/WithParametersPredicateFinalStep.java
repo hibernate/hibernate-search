@@ -9,12 +9,11 @@ package org.hibernate.search.engine.search.predicate.dsl.impl;
 import java.util.function.Function;
 
 import org.hibernate.search.engine.search.common.NamedValues;
-import org.hibernate.search.engine.search.common.spi.SearchIndexScope;
 import org.hibernate.search.engine.search.predicate.SearchPredicate;
 import org.hibernate.search.engine.search.predicate.dsl.PredicateFinalStep;
 import org.hibernate.search.engine.search.predicate.dsl.spi.AbstractPredicateFinalStep;
 import org.hibernate.search.engine.search.predicate.dsl.spi.SearchPredicateDslContext;
-import org.hibernate.search.engine.search.predicate.spi.PredicateTypeKeys;
+import org.hibernate.search.engine.search.predicate.spi.SearchPredicateIndexScope;
 import org.hibernate.search.engine.search.predicate.spi.WithParametersPredicateBuilder;
 
 public class WithParametersPredicateFinalStep extends AbstractPredicateFinalStep {
@@ -24,8 +23,8 @@ public class WithParametersPredicateFinalStep extends AbstractPredicateFinalStep
 	public WithParametersPredicateFinalStep(SearchPredicateDslContext<?> dslContext,
 			Function<? super NamedValues, ? extends PredicateFinalStep> predicateCreator) {
 		super( dslContext );
-		SearchIndexScope<?> scope = dslContext.scope();
-		this.builder = scope.rootQueryElement( PredicateTypeKeys.WITH_PARAMETERS );
+		SearchPredicateIndexScope<?> scope = dslContext.scope();
+		this.builder = scope.predicateBuilders().withParameters();
 		builder.creator( predicateCreator );
 	}
 

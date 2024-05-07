@@ -13,6 +13,7 @@ import org.hibernate.search.engine.search.predicate.spi.MatchNonePredicateBuilde
 import org.hibernate.search.engine.search.predicate.spi.QueryStringPredicateBuilder;
 import org.hibernate.search.engine.search.predicate.spi.SearchPredicateBuilderFactory;
 import org.hibernate.search.engine.search.predicate.spi.SimpleQueryStringPredicateBuilder;
+import org.hibernate.search.engine.search.predicate.spi.WithParametersPredicateBuilder;
 
 public class StubSearchPredicateBuilderFactory
 		implements SearchPredicateBuilderFactory {
@@ -45,6 +46,11 @@ public class StubSearchPredicateBuilderFactory
 	@Override
 	public QueryStringPredicateBuilder queryString() {
 		return new StubSearchPredicate.QueryStringBuilder();
+	}
+
+	@Override
+	public WithParametersPredicateBuilder withParameters() {
+		return new StubSearchPredicate.WithParametersBuilder();
 	}
 
 }

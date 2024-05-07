@@ -8,8 +8,6 @@ package org.hibernate.search.backend.elasticsearch.search.predicate.impl;
 
 import java.util.function.Function;
 
-import org.hibernate.search.backend.elasticsearch.search.common.impl.AbstractElasticsearchCompositeNodeSearchQueryElementFactory;
-import org.hibernate.search.backend.elasticsearch.search.common.impl.ElasticsearchSearchIndexCompositeNodeContext;
 import org.hibernate.search.backend.elasticsearch.search.common.impl.ElasticsearchSearchIndexScope;
 import org.hibernate.search.engine.search.common.NamedValues;
 import org.hibernate.search.engine.search.predicate.SearchPredicate;
@@ -18,7 +16,7 @@ import org.hibernate.search.engine.search.predicate.spi.WithParametersPredicateB
 
 import com.google.gson.JsonObject;
 
-public class ElasticsearchWithParametersPredicate extends AbstractElasticsearchSingleFieldPredicate {
+public class ElasticsearchWithParametersPredicate extends AbstractElasticsearchPredicate {
 
 	private final ElasticsearchSearchIndexScope<?> scope;
 	private final Function<? super NamedValues, ? extends PredicateFinalStep> predicateCreator;
@@ -39,22 +37,16 @@ public class ElasticsearchWithParametersPredicate extends AbstractElasticsearchS
 		return providedPredicate.toJsonQuery( context );
 	}
 
-	public static class Factory
-			extends AbstractElasticsearchCompositeNodeSearchQueryElementFactory<WithParametersPredicateBuilder> {
-		public static final Factory INSTANCE = new Factory();
-
-		@Override
-		public WithParametersPredicateBuilder create(ElasticsearchSearchIndexScope<?> scope,
-				ElasticsearchSearchIndexCompositeNodeContext node) {
-			return new Builder( scope, node );
-		}
+	@Override
+	public void checkNestableWithin(PredicateNestingContext context) {
+		// do nothing; We'll check it in to-query method.
 	}
 
-	private static class Builder extends AbstractBuilder implements WithParametersPredicateBuilder {
+	public static class Builder extends AbstractBuilder implements WithParametersPredicateBuilder {
 		private Function<? super NamedValues, ? extends PredicateFinalStep> predicateCreator;
 
-		Builder(ElasticsearchSearchIndexScope<?> scope, ElasticsearchSearchIndexCompositeNodeContext node) {
-			super( scope, node );
+		Builder(ElasticsearchSearchIndexScope<?> scope) {
+			super( scope );
 		}
 
 		@Override

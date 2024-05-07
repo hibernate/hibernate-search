@@ -10,7 +10,6 @@ import org.hibernate.search.backend.lucene.search.common.impl.LuceneSearchIndexC
 import org.hibernate.search.backend.lucene.search.common.impl.LuceneSearchIndexCompositeNodeTypeContext;
 import org.hibernate.search.backend.lucene.search.common.impl.LuceneSearchIndexScope;
 import org.hibernate.search.backend.lucene.search.predicate.impl.LuceneNestedPredicate;
-import org.hibernate.search.backend.lucene.search.predicate.impl.LuceneWithParametersPredicate;
 import org.hibernate.search.backend.lucene.search.projection.impl.LuceneObjectProjection;
 import org.hibernate.search.backend.lucene.types.predicate.impl.LuceneObjectExistsPredicate;
 import org.hibernate.search.engine.backend.types.ObjectStructure;
@@ -36,7 +35,6 @@ public class LuceneIndexCompositeNodeType
 			super( objectStructure );
 			queryElementFactory( PredicateTypeKeys.EXISTS, LuceneObjectExistsPredicate.Factory.INSTANCE );
 			queryElementFactory( ProjectionTypeKeys.OBJECT, new LuceneObjectProjection.Factory() );
-			queryElementFactory( PredicateTypeKeys.WITH_PARAMETERS, LuceneWithParametersPredicate.Factory.INSTANCE );
 			if ( ObjectStructure.NESTED.equals( objectStructure ) ) {
 				queryElementFactory( PredicateTypeKeys.NESTED, LuceneNestedPredicate.Factory.INSTANCE );
 			}

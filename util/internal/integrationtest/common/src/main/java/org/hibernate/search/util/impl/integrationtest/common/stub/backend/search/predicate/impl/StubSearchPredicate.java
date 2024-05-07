@@ -8,11 +8,14 @@ package org.hibernate.search.util.impl.integrationtest.common.stub.backend.searc
 
 import java.util.Collection;
 import java.util.Set;
+import java.util.function.Function;
 
 import org.hibernate.search.engine.search.common.BooleanOperator;
+import org.hibernate.search.engine.search.common.NamedValues;
 import org.hibernate.search.engine.search.common.RewriteMethod;
 import org.hibernate.search.engine.search.common.ValueConvert;
 import org.hibernate.search.engine.search.predicate.SearchPredicate;
+import org.hibernate.search.engine.search.predicate.dsl.PredicateFinalStep;
 import org.hibernate.search.engine.search.predicate.dsl.RegexpQueryFlag;
 import org.hibernate.search.engine.search.predicate.dsl.SearchPredicateFactory;
 import org.hibernate.search.engine.search.predicate.dsl.SimpleQueryFlag;
@@ -35,6 +38,7 @@ import org.hibernate.search.engine.search.predicate.spi.SpatialWithinCirclePredi
 import org.hibernate.search.engine.search.predicate.spi.SpatialWithinPolygonPredicateBuilder;
 import org.hibernate.search.engine.search.predicate.spi.TermsPredicateBuilder;
 import org.hibernate.search.engine.search.predicate.spi.WildcardPredicateBuilder;
+import org.hibernate.search.engine.search.predicate.spi.WithParametersPredicateBuilder;
 import org.hibernate.search.engine.spatial.DistanceUnit;
 import org.hibernate.search.engine.spatial.GeoBoundingBox;
 import org.hibernate.search.engine.spatial.GeoPoint;
@@ -306,6 +310,13 @@ public class StubSearchPredicate implements SearchPredicate {
 
 		@Override
 		public void boost(float boost) {
+			// No-op
+		}
+	}
+
+	public static class WithParametersBuilder extends Builder implements WithParametersPredicateBuilder {
+		@Override
+		public void creator(Function<? super NamedValues, ? extends PredicateFinalStep> predicateDefinition) {
 			// No-op
 		}
 	}
