@@ -8,7 +8,7 @@ package org.hibernate.search.util.common.logging.impl;
 
 
 /**
- * Log category to be used with {@link LoggerFactory#make(Class, LogCategory)}.
+ * Log category to be used with {@link LoggerFactory#make(Class, LogCategory, java.lang.invoke.MethodHandles.Lookup)}.
  *
  * @author Gunnar Morling
  */

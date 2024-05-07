@@ -6,6 +6,8 @@
  */
 package org.hibernate.search.mapper.orm.reporting.impl;
 
+import java.lang.invoke.MethodHandles;
+
 import org.hibernate.search.engine.backend.reporting.spi.BackendMappingHints;
 import org.hibernate.search.util.common.logging.impl.MessageConstants;
 
@@ -16,7 +18,7 @@ import org.jboss.logging.annotations.MessageBundle;
 @MessageBundle(projectCode = MessageConstants.PROJECT_CODE)
 public interface HibernateOrmMappingHints extends BackendMappingHints {
 
-	HibernateOrmMappingHints INSTANCE = Messages.getBundle( HibernateOrmMappingHints.class );
+	HibernateOrmMappingHints INSTANCE = Messages.getBundle( MethodHandles.lookup(), HibernateOrmMappingHints.class );
 
 	@Override
 	@Message(value = "This is likely a bug, as Hibernate ORM entities should always be loadable from the database.")

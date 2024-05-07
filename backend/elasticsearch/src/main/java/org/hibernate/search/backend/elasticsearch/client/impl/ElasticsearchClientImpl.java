@@ -51,7 +51,8 @@ public class ElasticsearchClientImpl implements ElasticsearchClientImplementor {
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
-	private static final Log requestLog = LoggerFactory.make( Log.class, ElasticsearchLogCategories.REQUEST );
+	private static final Log requestLog =
+			LoggerFactory.make( Log.class, ElasticsearchLogCategories.REQUEST, MethodHandles.lookup() );
 
 	private final BeanHolder<? extends RestClient> restClientHolder;
 

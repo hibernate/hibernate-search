@@ -6,6 +6,7 @@
  */
 package org.hibernate.search.backend.elasticsearch.reporting.impl;
 
+import java.lang.invoke.MethodHandles;
 import java.util.List;
 
 import org.jboss.logging.Messages;
@@ -19,7 +20,8 @@ import org.jboss.logging.annotations.MessageBundle;
 @MessageBundle(projectCode = "HSEARCH")
 public interface ElasticsearchValidationMessages {
 
-	ElasticsearchValidationMessages INSTANCE = Messages.getBundle( ElasticsearchValidationMessages.class );
+	ElasticsearchValidationMessages INSTANCE =
+			Messages.getBundle( MethodHandles.lookup(), ElasticsearchValidationMessages.class );
 
 	@Message(
 			value = "Validation of the existing index in the Elasticsearch cluster failed. See below for details."

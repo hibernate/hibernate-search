@@ -6,6 +6,7 @@
  */
 package org.hibernate.search.engine.reporting.impl;
 
+import java.lang.invoke.MethodHandles;
 import java.util.List;
 import java.util.Set;
 
@@ -21,7 +22,7 @@ import org.jboss.logging.annotations.MessageBundle;
 @MessageBundle(projectCode = MessageConstants.PROJECT_CODE)
 public interface EngineEventContextMessages {
 
-	EngineEventContextMessages INSTANCE = Messages.getBundle( EngineEventContextMessages.class );
+	EngineEventContextMessages INSTANCE = Messages.getBundle( MethodHandles.lookup(), EngineEventContextMessages.class );
 
 	@Message(value = "bootstrap")
 	String bootstrap();

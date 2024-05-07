@@ -6,6 +6,8 @@
  */
 package org.hibernate.search.backend.lucene.lowlevel.writer.impl;
 
+import java.lang.invoke.MethodHandles;
+
 import org.hibernate.search.backend.lucene.logging.impl.Log;
 import org.hibernate.search.backend.lucene.logging.impl.LuceneLogCategories;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
@@ -18,7 +20,8 @@ import org.apache.lucene.util.InfoStream;
  */
 public class LoggerInfoStream extends InfoStream {
 
-	private static final Log log = LoggerFactory.make( Log.class, LuceneLogCategories.INFOSTREAM_LOGGER_CATEGORY );
+	private static final Log log =
+			LoggerFactory.make( Log.class, LuceneLogCategories.INFOSTREAM_LOGGER_CATEGORY, MethodHandles.lookup() );
 
 	@Override
 	public void message(String component, String message) {

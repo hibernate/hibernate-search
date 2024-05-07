@@ -35,7 +35,7 @@ class LuceneSearcherImpl<H> implements LuceneSearcher<LuceneLoadableSearchResult
 	private static final int PREFETCH_TOTAL_HIT_COUNT_THRESHOLD = 10_000;
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
-	private static final Log queryLog = LoggerFactory.make( Log.class, DefaultLogCategories.QUERY );
+	private static final Log queryLog = LoggerFactory.make( Log.class, DefaultLogCategories.QUERY, MethodHandles.lookup() );
 
 	private final LuceneSearchQueryRequestContext requestContext;
 
