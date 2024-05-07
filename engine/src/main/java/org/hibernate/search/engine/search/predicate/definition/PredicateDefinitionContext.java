@@ -19,7 +19,7 @@ import org.hibernate.search.util.common.annotation.Incubating;
  * @see PredicateDefinition#create(PredicateDefinitionContext)
  */
 @Incubating
-public interface PredicateDefinitionContext {
+public interface PredicateDefinitionContext<E> {
 
 	/**
 	 * @return A predicate factory.
@@ -29,7 +29,7 @@ public interface PredicateDefinitionContext {
 	 * {@link PredicateDefinition#create(PredicateDefinitionContext)} returns.
 	 * @see SearchPredicateFactory
 	 */
-	SearchPredicateFactory predicate();
+	SearchPredicateFactory<E> predicate();
 
 	/**
 	 * @param name The name of the parameter.

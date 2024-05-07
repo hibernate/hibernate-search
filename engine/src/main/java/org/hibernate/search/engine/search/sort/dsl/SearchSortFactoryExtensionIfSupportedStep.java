@@ -14,7 +14,7 @@ import java.util.function.Function;
  *
  * @see SearchSortFactory#extension()
  */
-public interface SearchSortFactoryExtensionIfSupportedStep {
+public interface SearchSortFactoryExtensionIfSupportedStep<E> {
 
 	/**
 	 * If the given extension is supported, and none of the previous extensions passed to
@@ -33,7 +33,7 @@ public interface SearchSortFactoryExtensionIfSupportedStep {
 	 * @param <T> The type of the extended factory.
 	 * @return {@code this}, for method chaining.
 	 */
-	<T> SearchSortFactoryExtensionIfSupportedMoreStep ifSupported(
+	<T> SearchSortFactoryExtensionIfSupportedMoreStep<E> ifSupported(
 			SearchSortFactoryExtension<T> extension,
 			Function<T, ? extends SortFinalStep> sortContributor
 	);

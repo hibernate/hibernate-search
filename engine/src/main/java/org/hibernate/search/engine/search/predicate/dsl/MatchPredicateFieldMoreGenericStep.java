@@ -18,7 +18,8 @@ package org.hibernate.search.engine.search.predicate.dsl;
  * @param <V> The type representing the fields.
  */
 public interface MatchPredicateFieldMoreGenericStep<
-		S extends MatchPredicateFieldMoreGenericStep<?, N, T, V>,
+		E,
+		S extends MatchPredicateFieldMoreGenericStep<E, ?, N, T, V>,
 		N extends MatchPredicateOptionsStep<?>,
 		T,
 		V>

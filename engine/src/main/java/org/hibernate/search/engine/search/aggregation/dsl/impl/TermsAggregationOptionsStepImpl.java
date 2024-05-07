@@ -18,57 +18,57 @@ import org.hibernate.search.engine.search.predicate.dsl.PredicateFinalStep;
 import org.hibernate.search.engine.search.predicate.dsl.SearchPredicateFactory;
 import org.hibernate.search.util.common.impl.Contracts;
 
-class TermsAggregationOptionsStepImpl<PDF extends SearchPredicateFactory, F>
-		implements TermsAggregationOptionsStep<TermsAggregationOptionsStepImpl<PDF, F>, PDF, F, Map<F, Long>> {
+class TermsAggregationOptionsStepImpl<E, PDF extends SearchPredicateFactory<E>, F>
+		implements TermsAggregationOptionsStep<E, TermsAggregationOptionsStepImpl<E, PDF, F>, PDF, F, Map<F, Long>> {
 	private final TermsAggregationBuilder<F> builder;
-	private final SearchAggregationDslContext<?, ? extends PDF> dslContext;
+	private final SearchAggregationDslContext<E, ?, ? extends PDF> dslContext;
 
 	TermsAggregationOptionsStepImpl(TermsAggregationBuilder<F> builder,
-			SearchAggregationDslContext<?, ? extends PDF> dslContext) {
+			SearchAggregationDslContext<E, ?, ? extends PDF> dslContext) {
 		this.builder = builder;
 		this.dslContext = dslContext;
 	}
 
 	@Override
-	public TermsAggregationOptionsStepImpl<PDF, F> orderByCountDescending() {
+	public TermsAggregationOptionsStepImpl<E, PDF, F> orderByCountDescending() {
 		builder.orderByCountDescending();
 		return this;
 	}
 
 	@Override
-	public TermsAggregationOptionsStepImpl<PDF, F> orderByCountAscending() {
+	public TermsAggregationOptionsStepImpl<E, PDF, F> orderByCountAscending() {
 		builder.orderByCountAscending();
 		return this;
 	}
 
 	@Override
-	public TermsAggregationOptionsStepImpl<PDF, F> orderByTermAscending() {
+	public TermsAggregationOptionsStepImpl<E, PDF, F> orderByTermAscending() {
 		builder.orderByTermAscending();
 		return this;
 	}
 
 	@Override
-	public TermsAggregationOptionsStepImpl<PDF, F> orderByTermDescending() {
+	public TermsAggregationOptionsStepImpl<E, PDF, F> orderByTermDescending() {
 		builder.orderByTermDescending();
 		return this;
 	}
 
 	@Override
-	public TermsAggregationOptionsStepImpl<PDF, F> minDocumentCount(int minDocumentCount) {
+	public TermsAggregationOptionsStepImpl<E, PDF, F> minDocumentCount(int minDocumentCount) {
 		Contracts.assertPositiveOrZero( minDocumentCount, "minDocumentCount" );
 		builder.minDocumentCount( minDocumentCount );
 		return this;
 	}
 
 	@Override
-	public TermsAggregationOptionsStepImpl<PDF, F> maxTermCount(int maxTermCount) {
+	public TermsAggregationOptionsStepImpl<E, PDF, F> maxTermCount(int maxTermCount) {
 		Contracts.assertStrictlyPositive( maxTermCount, "maxTermCount" );
 		builder.maxTermCount( maxTermCount );
 		return this;
 	}
 
 	@Override
-	public TermsAggregationOptionsStepImpl<PDF, F> filter(
+	public TermsAggregationOptionsStepImpl<E, PDF, F> filter(
 			Function<? super PDF, ? extends PredicateFinalStep> clauseContributor) {
 		SearchPredicate predicate = clauseContributor.apply( dslContext.predicateFactory() ).toPredicate();
 
@@ -76,7 +76,7 @@ class TermsAggregationOptionsStepImpl<PDF extends SearchPredicateFactory, F>
 	}
 
 	@Override
-	public TermsAggregationOptionsStepImpl<PDF, F> filter(SearchPredicate searchPredicate) {
+	public TermsAggregationOptionsStepImpl<E, PDF, F> filter(SearchPredicate searchPredicate) {
 		builder.filter( searchPredicate );
 		return this;
 	}

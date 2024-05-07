@@ -116,12 +116,12 @@ class FieldSortDynamicFieldIT<F> {
 	}
 
 	private SearchQuery<DocumentReference> matchNonEmptyQuery(
-			Function<? super SearchSortFactory, ? extends SortFinalStep> sortContributor) {
+			Function<? super SearchSortFactory<?>, ? extends SortFinalStep> sortContributor) {
 		return matchNonEmptyQuery( sortContributor, mainIndex.createScope() );
 	}
 
 	private SearchQuery<DocumentReference> matchNonEmptyQuery(
-			Function<? super SearchSortFactory, ? extends SortFinalStep> sortContributor, StubMappingScope scope) {
+			Function<? super SearchSortFactory<?>, ? extends SortFinalStep> sortContributor, StubMappingScope scope) {
 		return scope.query()
 				.where( f -> f.matchAll().except( f.id().matching( EMPTY ) ) )
 				.sort( sortContributor )

@@ -23,7 +23,7 @@ import org.hibernate.search.util.impl.test.annotation.TestForIssue;
 class DistanceProjectionParameterMultiValuedBaseIT extends AbstractDistanceProjectionMultiValuedBaseIT {
 
 	@Override
-	protected void addParameter(SearchQueryOptionsStep<?, ?, ?, ?, ?> query, String parameterName, Object value) {
+	protected void addParameter(SearchQueryOptionsStep<?, ?, ?, ?, ?, ?> query, String parameterName, Object value) {
 		query.param( parameterName, value );
 	}
 
@@ -45,7 +45,7 @@ class DistanceProjectionParameterMultiValuedBaseIT extends AbstractDistanceProje
 	}
 
 	@Override
-	protected SortFinalStep sort(SearchSortFactory sort, String path, GeoPoint center, String parameterName) {
+	protected SortFinalStep sort(SearchSortFactory<?> sort, String path, GeoPoint center, String parameterName) {
 		return sort.withParameters( param -> sort.distance( path, param.get( parameterName, GeoPoint.class ) ) );
 	}
 }

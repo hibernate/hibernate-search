@@ -41,7 +41,6 @@ import org.hibernate.search.util.impl.integrationtest.mapper.stub.SimpleMappedIn
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappingScope;
 import org.hibernate.search.util.impl.test.annotation.TestForIssue;
 
-import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 
@@ -573,12 +572,12 @@ public abstract class AbstractPredicateTypeCheckingAndConversionIT<V extends Abs
 		}
 	}
 
-	protected abstract PredicateFinalStep predicate(SearchPredicateFactory f, String fieldPath, P matchingParam);
+	protected abstract PredicateFinalStep predicate(SearchPredicateFactory<?> f, String fieldPath, P matchingParam);
 
-	protected abstract PredicateFinalStep predicate(SearchPredicateFactory f, String fieldPath, P matchingParam,
+	protected abstract PredicateFinalStep predicate(SearchPredicateFactory<?> f, String fieldPath, P matchingParam,
 			ValueConvert valueConvert);
 
-	protected abstract PredicateFinalStep predicate(SearchPredicateFactory f, String field0Path, String field1Path,
+	protected abstract PredicateFinalStep predicate(SearchPredicateFactory<?> f, String field0Path, String field1Path,
 			P matchingParam, ValueConvert valueConvert);
 
 	protected abstract P invalidTypeParam();

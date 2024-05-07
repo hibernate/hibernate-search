@@ -22,15 +22,15 @@ import org.hibernate.search.engine.search.sort.spi.DistanceSortBuilder;
 import org.hibernate.search.engine.search.sort.spi.SortTypeKeys;
 import org.hibernate.search.engine.spatial.GeoPoint;
 
-public class DistanceSortOptionsStepImpl<PDF extends SearchPredicateFactory>
-		extends AbstractSortThenStep
-		implements DistanceSortOptionsStep<DistanceSortOptionsStepImpl<PDF>, PDF>,
-		DistanceSortMissingValueBehaviorStep<DistanceSortOptionsStepImpl<PDF>> {
+public class DistanceSortOptionsStepImpl<E, PDF extends SearchPredicateFactory<E>>
+		extends AbstractSortThenStep<E>
+		implements DistanceSortOptionsStep<E, DistanceSortOptionsStepImpl<E, PDF>, PDF>,
+		DistanceSortMissingValueBehaviorStep<DistanceSortOptionsStepImpl<E, PDF>> {
 
 	private final DistanceSortBuilder builder;
-	private final SearchSortDslContext<?, ? extends PDF> dslContext;
+	private final SearchSortDslContext<E, ?, ? extends PDF> dslContext;
 
-	public DistanceSortOptionsStepImpl(SearchSortDslContext<?, ? extends PDF> dslContext,
+	public DistanceSortOptionsStepImpl(SearchSortDslContext<E, ?, ? extends PDF> dslContext,
 			String fieldPath, GeoPoint center) {
 		super( dslContext );
 		this.dslContext = dslContext;
@@ -39,19 +39,19 @@ public class DistanceSortOptionsStepImpl<PDF extends SearchPredicateFactory>
 	}
 
 	@Override
-	public DistanceSortOptionsStepImpl<PDF> order(SortOrder order) {
+	public DistanceSortOptionsStepImpl<E, PDF> order(SortOrder order) {
 		builder.order( order );
 		return this;
 	}
 
 	@Override
-	public DistanceSortOptionsStepImpl<PDF> mode(SortMode mode) {
+	public DistanceSortOptionsStepImpl<E, PDF> mode(SortMode mode) {
 		builder.mode( mode );
 		return this;
 	}
 
 	@Override
-	public DistanceSortOptionsStepImpl<PDF> filter(
+	public DistanceSortOptionsStepImpl<E, PDF> filter(
 			Function<? super PDF, ? extends PredicateFinalStep> clauseContributor) {
 		SearchPredicate predicate = clauseContributor.apply( dslContext.predicateFactory() ).toPredicate();
 
@@ -59,43 +59,43 @@ public class DistanceSortOptionsStepImpl<PDF extends SearchPredicateFactory>
 	}
 
 	@Override
-	public DistanceSortOptionsStepImpl<PDF> filter(SearchPredicate searchPredicate) {
+	public DistanceSortOptionsStepImpl<E, PDF> filter(SearchPredicate searchPredicate) {
 		builder.filter( searchPredicate );
 		return this;
 	}
 
 
 	@Override
-	public DistanceSortMissingValueBehaviorStep<DistanceSortOptionsStepImpl<PDF>> missing() {
+	public DistanceSortMissingValueBehaviorStep<DistanceSortOptionsStepImpl<E, PDF>> missing() {
 		return this;
 	}
 
 	@Override
-	public DistanceSortOptionsStepImpl<PDF> first() {
+	public DistanceSortOptionsStepImpl<E, PDF> first() {
 		builder.missingFirst();
 		return this;
 	}
 
 	@Override
-	public DistanceSortOptionsStepImpl<PDF> last() {
+	public DistanceSortOptionsStepImpl<E, PDF> last() {
 		builder.missingLast();
 		return this;
 	}
 
 	@Override
-	public DistanceSortOptionsStepImpl<PDF> highest() {
+	public DistanceSortOptionsStepImpl<E, PDF> highest() {
 		builder.missingHighest();
 		return this;
 	}
 
 	@Override
-	public DistanceSortOptionsStepImpl<PDF> lowest() {
+	public DistanceSortOptionsStepImpl<E, PDF> lowest() {
 		builder.missingLowest();
 		return this;
 	}
 
 	@Override
-	public DistanceSortOptionsStepImpl<PDF> use(GeoPoint value) {
+	public DistanceSortOptionsStepImpl<E, PDF> use(GeoPoint value) {
 		builder.missingAs( value );
 		return this;
 	}

@@ -17,32 +17,32 @@ import org.hibernate.search.engine.search.query.dsl.SearchQuerySelectStep;
 
 public interface ElasticsearchSearchQuerySelectStep<R, E, LOS>
 		extends SearchQuerySelectStep<
-				ElasticsearchSearchQueryOptionsStep<E, LOS>,
+				ElasticsearchSearchQueryOptionsStep<E, E, LOS>,
 				R,
 				E,
 				LOS,
 				ElasticsearchSearchProjectionFactory<R, E>,
-				ElasticsearchSearchPredicateFactory>,
-		ElasticsearchSearchQueryWhereStep<E, LOS> {
+				ElasticsearchSearchPredicateFactory<E>>,
+		ElasticsearchSearchQueryWhereStep<E, E, LOS> {
 
 	@Override
-	ElasticsearchSearchQueryWhereStep<E, LOS> selectEntity();
+	ElasticsearchSearchQueryWhereStep<E, E, LOS> selectEntity();
 
 	@Override
-	ElasticsearchSearchQueryWhereStep<R, LOS> selectEntityReference();
+	ElasticsearchSearchQueryWhereStep<E, R, LOS> selectEntityReference();
 
 	@Override
-	<P> ElasticsearchSearchQueryWhereStep<P, LOS> select(Class<P> objectClass);
+	<P> ElasticsearchSearchQueryWhereStep<E, P, LOS> select(Class<P> objectClass);
 
 	@Override
-	<P> ElasticsearchSearchQueryWhereStep<P, LOS> select(
+	<P> ElasticsearchSearchQueryWhereStep<E, P, LOS> select(
 			Function<? super ElasticsearchSearchProjectionFactory<R, E>,
 					? extends ProjectionFinalStep<P>> projectionContributor);
 
 	@Override
-	<P> ElasticsearchSearchQueryWhereStep<P, LOS> select(SearchProjection<P> projection);
+	<P> ElasticsearchSearchQueryWhereStep<E, P, LOS> select(SearchProjection<P> projection);
 
 	@Override
-	ElasticsearchSearchQueryWhereStep<List<?>, LOS> select(SearchProjection<?>... projections);
+	ElasticsearchSearchQueryWhereStep<E, List<?>, LOS> select(SearchProjection<?>... projections);
 
 }

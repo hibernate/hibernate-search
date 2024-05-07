@@ -173,13 +173,13 @@ public final class ElasticsearchSearchIndexScopeImpl
 	}
 
 	@Override
-	public ElasticsearchSearchPredicateFactory predicateFactory() {
-		return new ElasticsearchSearchPredicateFactoryImpl( SearchPredicateDslContext.root( this ) );
+	public <E> ElasticsearchSearchPredicateFactory<E> predicateFactory() {
+		return new ElasticsearchSearchPredicateFactoryImpl<>( SearchPredicateDslContext.root( this ) );
 	}
 
 	@Override
-	public ElasticsearchSearchSortFactory sortFactory() {
-		return new ElasticsearchSearchSortFactoryImpl( SearchSortDslContext
+	public <E> ElasticsearchSearchSortFactory<E>  sortFactory() {
+		return new ElasticsearchSearchSortFactoryImpl<>( SearchSortDslContext
 				.root( this, ElasticsearchSearchSortFactoryImpl::new, predicateFactory() ) );
 	}
 
@@ -189,8 +189,8 @@ public final class ElasticsearchSearchIndexScopeImpl
 	}
 
 	@Override
-	public ElasticsearchSearchAggregationFactory aggregationFactory() {
-		return new ElasticsearchSearchAggregationFactoryImpl( SearchAggregationDslContext.root( this, predicateFactory() ) );
+	public <E> ElasticsearchSearchAggregationFactory<E>  aggregationFactory() {
+		return new ElasticsearchSearchAggregationFactoryImpl<>( SearchAggregationDslContext.root( this, predicateFactory() ) );
 	}
 
 	@Override

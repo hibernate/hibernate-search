@@ -70,10 +70,10 @@ import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 public final class LuceneExtension<H, R, E, LOS>
 		implements SearchQueryDslExtension<LuceneSearchQuerySelectStep<R, E, LOS>, R, E, LOS>,
 		SearchQueryExtension<LuceneSearchQuery<H>, H>,
-		SearchPredicateFactoryExtension<LuceneSearchPredicateFactory>,
-		SearchSortFactoryExtension<LuceneSearchSortFactory>,
+		SearchPredicateFactoryExtension<LuceneSearchPredicateFactory<E>>,
+		SearchSortFactoryExtension<LuceneSearchSortFactory<E>>,
 		SearchProjectionFactoryExtension<LuceneSearchProjectionFactory<R, E>, R, E>,
-		SearchAggregationFactoryExtension<LuceneSearchAggregationFactory>,
+		SearchAggregationFactoryExtension<LuceneSearchAggregationFactory<E>>,
 		IndexFieldTypeFactoryExtension<LuceneIndexFieldTypeFactory>,
 		IndexScopeExtension<LuceneIndexScope>,
 		SchemaExportExtension<LuceneIndexSchemaExport> {
@@ -145,7 +145,7 @@ public final class LuceneExtension<H, R, E, LOS>
 	 * {@inheritDoc}
 	 */
 	@Override
-	public Optional<LuceneSearchPredicateFactory> extendOptional(SearchPredicateFactory original) {
+	public Optional<LuceneSearchPredicateFactory<E>> extendOptional(SearchPredicateFactory<?> original) {
 		if ( original instanceof LuceneSearchPredicateFactory ) {
 			return Optional.of( (LuceneSearchPredicateFactory) original );
 		}
@@ -158,8 +158,8 @@ public final class LuceneExtension<H, R, E, LOS>
 	 * {@inheritDoc}
 	 */
 	@Override
-	public Optional<LuceneSearchSortFactory> extendOptional(
-			SearchSortFactory original) {
+	public Optional<LuceneSearchSortFactory<E>> extendOptional(
+			SearchSortFactory<?> original) {
 		if ( original instanceof LuceneSearchSortFactory ) {
 			return Optional.of( (LuceneSearchSortFactory) original );
 		}
@@ -185,7 +185,7 @@ public final class LuceneExtension<H, R, E, LOS>
 	 * {@inheritDoc}
 	 */
 	@Override
-	public Optional<LuceneSearchAggregationFactory> extendOptional(SearchAggregationFactory original) {
+	public Optional<LuceneSearchAggregationFactory<E>> extendOptional(SearchAggregationFactory<?> original) {
 		if ( original instanceof LuceneSearchAggregationFactory ) {
 			return Optional.of( (LuceneSearchAggregationFactory) original );
 		}

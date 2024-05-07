@@ -14,12 +14,12 @@ import org.hibernate.search.engine.search.aggregation.dsl.spi.SearchAggregationD
 import org.hibernate.search.engine.search.aggregation.spi.WithParametersAggregationBuilder;
 import org.hibernate.search.engine.search.common.NamedValues;
 
-public class WithParametersAggregationFinalStep<A> implements AggregationFinalStep<A> {
+public class WithParametersAggregationFinalStep<E, A> implements AggregationFinalStep<A> {
 
 	private final WithParametersAggregationBuilder<A> builder;
 
 	public WithParametersAggregationFinalStep(
-			SearchAggregationDslContext<?, ?> dslContext,
+			SearchAggregationDslContext<E, ?, ?> dslContext,
 			Function<? super NamedValues, ? extends AggregationFinalStep<A>> aggregationCreator) {
 		builder = dslContext.scope().aggregationBuilders().withParameters();
 		builder.creator( aggregationCreator );

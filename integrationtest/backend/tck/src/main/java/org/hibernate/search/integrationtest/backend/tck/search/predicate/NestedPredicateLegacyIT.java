@@ -9,6 +9,7 @@ package org.hibernate.search.integrationtest.backend.tck.search.predicate;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.hibernate.search.util.impl.integrationtest.common.assertion.SearchResultAssert.assertThatQuery;
 
+import org.hibernate.search.engine.backend.common.DocumentReference;
 import org.hibernate.search.engine.backend.document.DocumentElement;
 import org.hibernate.search.engine.backend.document.IndexFieldReference;
 import org.hibernate.search.engine.backend.document.IndexObjectFieldReference;
@@ -245,7 +246,7 @@ class NestedPredicateLegacyIT {
 	@TestForIssue(jiraKey = "HSEARCH-4173")
 	void multiIndex_missingNestedField() {
 		StubMappingScope scope = mainIndex.createScope( missingFieldIndex );
-		SearchPredicateFactory f = scope.predicate();
+		SearchPredicateFactory<DocumentReference> f = scope.predicate();
 		SearchPredicate nestedPredicate = f.nested().objectField( "nestedObject" )
 				.nest( f.and(
 						// This is referred to as "condition 1" in the data initialization method

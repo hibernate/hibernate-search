@@ -12,6 +12,7 @@ import java.nio.charset.StandardCharsets;
 import java.time.LocalDate;
 import java.util.List;
 
+import org.hibernate.search.engine.backend.common.DocumentReference;
 import org.hibernate.search.engine.backend.document.DocumentElement;
 import org.hibernate.search.engine.backend.document.IndexFieldReference;
 import org.hibernate.search.engine.backend.document.IndexObjectFieldReference;
@@ -24,9 +25,13 @@ import org.hibernate.search.engine.backend.types.converter.FromDocumentValueConv
 import org.hibernate.search.engine.backend.types.converter.ToDocumentValueConverter;
 import org.hibernate.search.engine.backend.types.converter.runtime.FromDocumentValueConvertContext;
 import org.hibernate.search.engine.backend.types.converter.runtime.ToDocumentValueConvertContext;
+import org.hibernate.search.engine.search.common.ValueConvert;
 import org.hibernate.search.engine.search.reference.NestedObjectFieldReference;
 import org.hibernate.search.engine.search.reference.ValueFieldReference;
 import org.hibernate.search.engine.search.reference.impl.ObjectFieldReferenceImpl;
+import org.hibernate.search.engine.search.reference.traits.predicate.KnnPredicateFieldReference;
+import org.hibernate.search.engine.search.reference.traits.predicate.MatchPredicateFieldReference;
+import org.hibernate.search.engine.search.reference.traits.projection.FieldProjectionFieldReference;
 import org.hibernate.search.integrationtest.backend.tck.search.predicate.AbstractPredicateDataSet;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.extension.SearchSetupHelper;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.BulkIndexer;
@@ -163,14 +168,14 @@ class FieldReferenceIT {
 	}
 
 	public static class IndexedEntity_ {
-		public static ValueFieldReference<Integer, Integer, Integer> primitiveInteger;
-		public static ValueFieldReference<Double, Double, Double> wrapperDouble;
-		public static ValueFieldReference<String, String, String> string;
-		public static ValueFieldReference<String, String, byte[]> stringProjectedAsBytes;
-		public static ValueFieldReference<LocalDate, LocalDate, LocalDate> localDate;
-		public static ValueFieldReference<float[], float[], float[]> vector;
+		public static ValueFieldReference1<DocumentReference, Integer, Integer, Integer> primitiveInteger;
+		public static ValueFieldReference1<DocumentReference, Double, Double, Double> wrapperDouble;
+		public static ValueFieldReference1<DocumentReference, String, String, String> string;
+		public static ValueFieldReference1<DocumentReference, String, String, byte[]> stringProjectedAsBytes;
+		public static ValueFieldReference1<DocumentReference, LocalDate, LocalDate, LocalDate> localDate;
+		public static ValueFieldReference2<DocumentReference, float[], float[], float[]> vector;
 
-		public static ValueFieldReference<String, String, String> stringList;
+		public static ValueFieldReference1<DocumentReference, String, String, String> stringList;
 		public static NestedEmbeddedEntity_ nestedEmbeddedEntity;
 		public static EmbeddedEntityList_ embeddedEntityList;
 
@@ -179,14 +184,19 @@ class FieldReferenceIT {
 		public static Parent_ parent;
 
 		static {
-			primitiveInteger = ValueFieldReference.of( "primitiveInteger", Integer.class, Integer.class, Integer.class );
-			wrapperDouble = ValueFieldReference.of( "wrapperDouble", Double.class, Double.class, Double.class );
-			string = ValueFieldReference.of( "string", String.class, String.class, String.class );
+			primitiveInteger = ValueFieldReference1.of( "primitiveInteger", DocumentReference.class, Integer.class,
+					Integer.class, Integer.class );
+			wrapperDouble = ValueFieldReference1.of( "wrapperDouble", DocumentReference.class, Double.class, Double.class,
+					Double.class );
+			string = ValueFieldReference1.of( "string", DocumentReference.class, String.class, String.class, String.class );
 			stringProjectedAsBytes =
-					ValueFieldReference.of( "stringProjectedAsBytes", String.class, String.class, byte[].class );
-			localDate = ValueFieldReference.of( "localDate", LocalDate.class, LocalDate.class, LocalDate.class );
-			vector = ValueFieldReference.of( "vector", float[].class, float[].class, float[].class );
-			stringList = ValueFieldReference.of( "stringList", String.class, String.class, String.class );
+					ValueFieldReference1.of( "stringProjectedAsBytes", DocumentReference.class, String.class, String.class,
+							byte[].class );
+			localDate = ValueFieldReference1.of( "localDate", DocumentReference.class, LocalDate.class, LocalDate.class,
+					LocalDate.class );
+			vector = ValueFieldReference2.of( "vector", DocumentReference.class, float[].class, float[].class, float[].class );
+			stringList =
+					ValueFieldReference1.of( "stringList", DocumentReference.class, String.class, String.class, String.class );
 
 			flattenedEmbeddedEntity = new FlattenedEmbeddedEntity_( "flattenedEmbeddedEntity" );
 			nestedEmbeddedEntity = new NestedEmbeddedEntity_( "nestedEmbeddedEntity" );
@@ -196,14 +206,16 @@ class FieldReferenceIT {
 
 		public static class NestedEmbeddedEntity_ extends ObjectFieldReferenceImpl implements NestedObjectFieldReference {
 
-			public ValueFieldReference<String, String, String> string;
-			public ValueFieldReference<SomeEnum, String, SomeEnum> someEnum;
+			public ValueFieldReference1<DocumentReference, String, String, String> string;
+			public ValueFieldReference1<DocumentReference, SomeEnum, String, SomeEnum> someEnum;
 
 			private NestedEmbeddedEntity_(String absolutePath) {
 				super( absolutePath );
-				this.string = ValueFieldReference.of( absolutePath + ".string", String.class, String.class, String.class );
+				this.string = ValueFieldReference1.of( absolutePath + ".string", DocumentReference.class, String.class,
+						String.class, String.class );
 				this.someEnum =
-						ValueFieldReference.of( absolutePath + ".someEnum", SomeEnum.class, String.class, SomeEnum.class );
+						ValueFieldReference1.of( absolutePath + ".someEnum", DocumentReference.class, SomeEnum.class,
+								String.class, SomeEnum.class );
 			}
 		}
 
@@ -384,7 +396,10 @@ class FieldReferenceIT {
 			fields.localDate = element.field( "localDate", f -> f.asLocalDate().projectable( Projectable.YES ) ).toReference();
 			fields.stringList =
 					element.field( "stringList", f -> f.asString().projectable( Projectable.YES ) ).multiValued().toReference();
-			fields.vector = element.field( "vector", f -> f.asFloatVector().dimension( 3 ).vectorSimilarity( VectorSimilarity.L2 ).projectable( Projectable.YES ) )
+			fields.vector = element
+					.field( "vector",
+							f -> f.asFloatVector().dimension( 3 ).vectorSimilarity( VectorSimilarity.L2 )
+									.projectable( Projectable.YES ) )
 					.toReference();
 
 
@@ -433,7 +448,10 @@ class FieldReferenceIT {
 		IndexBindingFields indexedEntityWithExcludes(IndexSchemaElement element) {
 			IndexBindingFields fields = new IndexBindingFields();
 			fields.string = element.field( "string", f -> f.asString().projectable( Projectable.YES ) ).toReference();
-			fields.vector = element.field( "vector", f -> f.asFloatVector().dimension( 3 ).vectorSimilarity( VectorSimilarity.L2 ).projectable( Projectable.YES ) )
+			fields.vector = element
+					.field( "vector",
+							f -> f.asFloatVector().dimension( 3 ).vectorSimilarity( VectorSimilarity.L2 )
+									.projectable( Projectable.YES ) )
 					.toReference();
 			return fields;
 		}
@@ -522,4 +540,163 @@ class FieldReferenceIT {
 			return value == null ? null : SomeEnum.valueOf( value );
 		}
 	}
+
+	public static class ValueFieldReference1<E, T, V, P> extends TypedFieldReference1<E, T, P> {
+
+		public static <E, T, V, P> ValueFieldReference1<E, T, V, P> of(
+				String path,
+				Class<E> documentReferenceClass,
+				Class<T> t,
+				Class<V> v,
+				Class<P> p) {
+			return new ValueFieldReference1<>( path, documentReferenceClass, t, v, p );
+		}
+
+		private final TypedFieldReference1<E, V, V> noConverter;
+		private final TypedFieldReference1<E, String, String> string;
+
+		public ValueFieldReference1(String absolutePath, Class<E> containing, Class<T> inputType, Class<V> indexType,
+				Class<P> projectionType) {
+			super( absolutePath, ValueConvert.YES, containing, inputType, projectionType );
+			this.noConverter = new TypedFieldReference1<>( absolutePath, ValueConvert.NO, containing, indexType, indexType );
+			this.string =
+					new TypedFieldReference1<>( absolutePath, ValueConvert.PARSE, containing, String.class, String.class );
+		}
+
+		public TypedFieldReference1<E, V, V> noConverter() {
+			return noConverter;
+		}
+
+
+		public TypedFieldReference1<E, String, String> asString() {
+			return string;
+		}
+
+	}
+
+	public static class TypedFieldReference1<E, T, P>
+			implements FieldProjectionFieldReference<E, P>,
+			MatchPredicateFieldReference<E, T> {
+
+		private final String absolutePath;
+		private final ValueConvert valueConvert;
+		private final Class<E> containing;
+		private final Class<T> input;
+		private final Class<P> projection;
+
+		public TypedFieldReference1(String absolutePath, ValueConvert valueConvert, Class<E> containing, Class<T> input,
+				Class<P> projection) {
+			this.absolutePath = absolutePath;
+			this.valueConvert = valueConvert;
+			this.containing = containing;
+			this.input = input;
+			this.projection = projection;
+		}
+
+		@Override
+		public String absolutePath() {
+			return absolutePath;
+		}
+
+		@Override
+		public Class<T> predicateType() {
+			return input;
+		}
+
+		@Override
+		public ValueConvert valueConvert() {
+			return valueConvert;
+		}
+
+		@Override
+		public Class<P> projectionType() {
+			return projection;
+		}
+
+		@Override
+		public Class<E> containing() {
+			return containing;
+		}
+	}
+
+
+
+	public static class ValueFieldReference2<E, T, V, P> extends TypedFieldReference2<E, T, P> {
+
+		public static <E, T, V, P> ValueFieldReference2<E, T, V, P> of(
+				String path,
+				Class<E> documentReferenceClass,
+				Class<T> t,
+				Class<V> v,
+				Class<P> p) {
+			return new ValueFieldReference2<>( path, documentReferenceClass, t, v, p );
+		}
+
+		private final TypedFieldReference2<E, V, V> noConverter;
+		private final TypedFieldReference2<E, String, String> string;
+
+		public ValueFieldReference2(String absolutePath, Class<E> containing, Class<T> inputType, Class<V> indexType,
+				Class<P> projectionType) {
+			super( absolutePath, ValueConvert.YES, containing, inputType, projectionType );
+			this.noConverter = new TypedFieldReference2<>( absolutePath, ValueConvert.NO, containing, indexType, indexType );
+			this.string =
+					new TypedFieldReference2<>( absolutePath, ValueConvert.PARSE, containing, String.class, String.class );
+		}
+
+		public TypedFieldReference2<E, V, V> noConverter() {
+			return noConverter;
+		}
+
+
+		public TypedFieldReference2<E, String, String> asString() {
+			return string;
+		}
+
+	}
+
+	public static class TypedFieldReference2<E, T, P>
+			implements FieldProjectionFieldReference<E, P>,
+			KnnPredicateFieldReference<E, T> {
+
+		private final String absolutePath;
+		private final ValueConvert valueConvert;
+		private final Class<E> containing;
+		private final Class<T> input;
+		private final Class<P> projection;
+
+		public TypedFieldReference2(String absolutePath, ValueConvert valueConvert, Class<E> containing, Class<T> input,
+				Class<P> projection) {
+			this.absolutePath = absolutePath;
+			this.valueConvert = valueConvert;
+			this.containing = containing;
+			this.input = input;
+			this.projection = projection;
+		}
+
+		@Override
+		public String absolutePath() {
+			return absolutePath;
+		}
+
+		@Override
+		public Class<T> predicateType() {
+			return input;
+		}
+
+		@Override
+		public ValueConvert valueConvert() {
+			return valueConvert;
+		}
+
+		@Override
+		public Class<P> projectionType() {
+			return projection;
+		}
+
+		@Override
+		public Class<E> containing() {
+			return containing;
+		}
+	}
+
 }

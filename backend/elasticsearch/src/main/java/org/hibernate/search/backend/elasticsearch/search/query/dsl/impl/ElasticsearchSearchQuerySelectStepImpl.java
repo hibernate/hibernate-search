@@ -31,12 +31,12 @@ import org.hibernate.search.engine.search.query.spi.SearchQueryIndexScope;
 
 public class ElasticsearchSearchQuerySelectStepImpl<R, E, LOS>
 		extends AbstractSearchQuerySelectStep<
-				ElasticsearchSearchQueryOptionsStep<E, LOS>,
+				ElasticsearchSearchQueryOptionsStep<E, E, LOS>,
 				R,
 				E,
 				LOS,
 				ElasticsearchSearchProjectionFactory<R, E>,
-				ElasticsearchSearchPredicateFactory>
+				ElasticsearchSearchPredicateFactory<E>>
 		implements ElasticsearchSearchQuerySelectStep<R, E, LOS> {
 
 	private final ElasticsearchSearchQueryIndexScope<?> scope;
@@ -52,22 +52,22 @@ public class ElasticsearchSearchQuerySelectStepImpl<R, E, LOS>
 	}
 
 	@Override
-	public ElasticsearchSearchQueryWhereStep<E, LOS> selectEntity() {
+	public ElasticsearchSearchQueryWhereStep<E, E, LOS> selectEntity() {
 		return select( scope.<R, E>projectionFactory().entity().toProjection() );
 	}
 
 	@Override
-	public ElasticsearchSearchQueryWhereStep<R, LOS> selectEntityReference() {
+	public ElasticsearchSearchQueryWhereStep<E, R, LOS> selectEntityReference() {
 		return select( scope.projectionBuilders().entityReference() );
 	}
 
 	@Override
-	public <P> ElasticsearchSearchQueryWhereStep<P, LOS> select(Class<P> objectClass) {
+	public <P> ElasticsearchSearchQueryWhereStep<E, P, LOS> select(Class<P> objectClass) {
 		return select( scope.projectionFactory().composite().as( objectClass ).toProjection() );
 	}
 
 	@Override
-	public <P> ElasticsearchSearchQueryWhereStep<P, LOS> select(
+	public <P> ElasticsearchSearchQueryWhereStep<E, P, LOS> select(
 			Function<? super ElasticsearchSearchProjectionFactory<R, E>,
 					? extends ProjectionFinalStep<P>> projectionContributor) {
 		SearchProjection<P> projection = projectionContributor.apply( scope.projectionFactory() ).toProjection();
@@ -75,34 +75,33 @@ public class ElasticsearchSearchQuerySelectStepImpl<R, E, LOS>
 	}
 
 	@Override
-	public <P> ElasticsearchSearchQueryWhereStep<P, LOS> select(SearchProjection<P> projection) {
+	public <P> ElasticsearchSearchQueryWhereStep<E, P, LOS> select(SearchProjection<P> projection) {
 		ElasticsearchSearchQueryBuilder<P> builder =
 				scope.select( sessionContext, loadingContextBuilder, projection );
 		return new ElasticsearchSearchQueryOptionsStepImpl<>( scope, builder, loadingContextBuilder );
 	}
 
 	@Override
-	public ElasticsearchSearchQueryWhereStep<List<?>, LOS> select(SearchProjection<?>... projections) {
+	public ElasticsearchSearchQueryWhereStep<E, List<?>, LOS> select(SearchProjection<?>... projections) {
 		return select( scope.projectionBuilders().composite()
 				.build( projections, ProjectionCompositor.fromList( projections.length ),
 						ProjectionAccumulator.single() ) );
 	}
 
 	@Override
-	public ElasticsearchSearchQueryOptionsStep<E, LOS> where(SearchPredicate predicate) {
+	public ElasticsearchSearchQueryOptionsStep<E, E, LOS> where(SearchPredicate predicate) {
 		return selectEntity().where( predicate );
 	}
 
 	@Override
-	public ElasticsearchSearchQueryOptionsStep<E, LOS> where(
-			Function<? super ElasticsearchSearchPredicateFactory, ? extends PredicateFinalStep> predicateContributor) {
+	public ElasticsearchSearchQueryOptionsStep<E, E, LOS> where(
+			Function<? super ElasticsearchSearchPredicateFactory<E>, ? extends PredicateFinalStep> predicateContributor) {
 		return selectEntity().where( predicateContributor );
 	}
 
 	@Override
-	public ElasticsearchSearchQueryOptionsStep<E, LOS> where(
-			BiConsumer<? super ElasticsearchSearchPredicateFactory,
-					? super SimpleBooleanPredicateClausesCollector<?>> predicateContributor) {
+	public ElasticsearchSearchQueryOptionsStep<E, E, LOS> where(BiConsumer<? super ElasticsearchSearchPredicateFactory<E>,
+			? super SimpleBooleanPredicateClausesCollector<?>> predicateContributor) {
 		return selectEntity().where( predicateContributor );
 	}
 

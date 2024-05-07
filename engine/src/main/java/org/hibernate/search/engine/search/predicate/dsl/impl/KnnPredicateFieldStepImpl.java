@@ -20,18 +20,18 @@ import org.hibernate.search.engine.search.predicate.dsl.spi.SearchPredicateDslCo
 import org.hibernate.search.engine.search.predicate.spi.BooleanPredicateBuilder;
 import org.hibernate.search.engine.search.predicate.spi.KnnPredicateBuilder;
 import org.hibernate.search.engine.search.predicate.spi.PredicateTypeKeys;
-import org.hibernate.search.engine.search.reference.TypedFieldReference;
+import org.hibernate.search.engine.search.reference.traits.predicate.KnnPredicateFieldReference;
 
-public class KnnPredicateFieldStepImpl
+public class KnnPredicateFieldStepImpl<E>
 		extends AbstractPredicateFinalStep
-		implements KnnPredicateFieldStep, KnnPredicateVectorStep, KnnPredicateOptionsStep {
+		implements KnnPredicateFieldStep<E>, KnnPredicateVectorStep, KnnPredicateOptionsStep<E> {
 
-	private final SearchPredicateFactory factory;
+	private final SearchPredicateFactory<E> factory;
 	private final int k;
 	private BooleanPredicateBuilder booleanBuilder;
 	protected KnnPredicateBuilder builder;
 
-	public KnnPredicateFieldStepImpl(SearchPredicateFactory factory, SearchPredicateDslContext<?> dslContext, int k) {
+	public KnnPredicateFieldStepImpl(SearchPredicateFactory<E> factory, SearchPredicateDslContext<?> dslContext, int k) {
 		super( dslContext );
 		this.factory = factory;
 		this.k = k;
@@ -45,50 +45,50 @@ public class KnnPredicateFieldStepImpl
 	}
 
 	@Override
-	public <T> KnnPredicateVectorGenericStep<T> field(TypedFieldReference<T> field) {
+	public <T> KnnPredicateVectorGenericStep<T> field(KnnPredicateFieldReference<E, T> field) {
 		this.field( field.absolutePath() );
 		return new KnnPredicateVectorGenericStepImpl<>();
 	}
 
 	@Override
-	public KnnPredicateOptionsStep filter(SearchPredicate searchPredicate) {
+	public KnnPredicateOptionsStep<E> filter(SearchPredicate searchPredicate) {
 		this.booleanPredicateBuilder().must( searchPredicate );
 		return this;
 	}
 
 	@Override
-	public KnnPredicateOptionsStep filter(
-			Function<? super SearchPredicateFactory, ? extends PredicateFinalStep> clauseContributor) {
+	public KnnPredicateOptionsStep<E> filter(
+			Function<? super SearchPredicateFactory<E>, ? extends PredicateFinalStep> clauseContributor) {
 		this.booleanPredicateBuilder().must( clauseContributor.apply( factory ).toPredicate() );
 		return this;
 	}
 
 	@Override
-	public KnnPredicateOptionsStep matching(byte... vector) {
+	public KnnPredicateOptionsStep<E> matching(byte... vector) {
 		this.builder.vector( vector );
 		return this;
 	}
 
 	@Override
-	public KnnPredicateOptionsStep matching(float... vector) {
+	public KnnPredicateOptionsStep<E> matching(float... vector) {
 		this.builder.vector( vector );
 		return this;
 	}
 
 	@Override
-	public KnnPredicateOptionsStep requiredMinimumSimilarity(float similarity) {
+	public KnnPredicateOptionsStep<E> requiredMinimumSimilarity(float similarity) {
 		this.builder.requiredMinimumSimilarity( similarity );
 		return this;
 	}
 
 	@Override
-	public KnnPredicateOptionsStep boost(float boost) {
+	public KnnPredicateOptionsStep<E> boost(float boost) {
 		this.builder.boost( boost );
 		return this;
 	}
 
 	@Override
-	public KnnPredicateOptionsStep constantScore() {
+	public KnnPredicateOptionsStep<E> constantScore() {
 		this.builder.constantScore();
 		return this;
 	}
@@ -111,7 +111,7 @@ public class KnnPredicateFieldStepImpl
 	private class KnnPredicateVectorGenericStepImpl<T> implements KnnPredicateVectorGenericStep<T> {
 
 		@Override
-		public KnnPredicateOptionsStep matching(T vector) {
+		public KnnPredicateOptionsStep<E> matching(T vector) {
 			KnnPredicateFieldStepImpl.this.builder.vector( vector );
 			return KnnPredicateFieldStepImpl.this;
 		}

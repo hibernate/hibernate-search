@@ -36,7 +36,7 @@ import org.hibernate.search.util.common.annotation.Incubating;
  * Such a factory can also transform relative paths into absolute paths using {@link #toAbsolutePath(String)};
  * this can be useful for native predicates in particular.
  */
-public interface SearchPredicateFactory {
+public interface SearchPredicateFactory<E> {
 
 	/**
 	 * Match all documents.
@@ -164,7 +164,7 @@ public interface SearchPredicateFactory {
 	 * @return The initial step of a DSL where the "match" predicate can be defined.
 	 * @see MatchPredicateFieldStep
 	 */
-	MatchPredicateFieldStep<?> match();
+	MatchPredicateFieldStep<E, ?> match();
 
 	/**
 	 * Match documents where targeted fields have a value within lower and upper bounds.
@@ -318,7 +318,7 @@ public interface SearchPredicateFactory {
 	 * @see KnnPredicateVectorStep
 	 * @see KnnPredicateOptionsStep
 	 */
-	KnnPredicateFieldStep knn(int k);
+	KnnPredicateFieldStep<E> knn(int k);
 
 	/**
 	 * Delegating predicate that creates the actual predicate at query create time and provides access to query parameters.

@@ -35,7 +35,7 @@ import org.hibernate.search.util.common.annotation.Incubating;
  *
  * @author Emmanuel Bernard emmanuel@hibernate.org
  */
-public interface SearchSortFactory {
+public interface SearchSortFactory<E> {
 
 	/**
 	 * Order elements by their relevance score.
@@ -44,14 +44,14 @@ public interface SearchSortFactory {
 	 *
 	 * @return A DSL step where the "score" sort can be defined in more details.
 	 */
-	ScoreSortOptionsStep<?> score();
+	ScoreSortOptionsStep<E, ?> score();
 
 	/**
 	 * Order elements by their internal index order.
 	 *
 	 * @return A DSL step where the "index order" sort can be defined in more details.
 	 */
-	SortThenStep indexOrder();
+	SortThenStep<E> indexOrder();
 
 	/**
 	 * Order elements by the value of a specific field.
@@ -62,7 +62,7 @@ public interface SearchSortFactory {
 	 * @return A DSL step where the "field" sort can be defined in more details.
 	 * @throws SearchException If the field doesn't exist or cannot be sorted on.
 	 */
-	FieldSortOptionsStep<?, ? extends SearchPredicateFactory> field(String fieldPath);
+	FieldSortOptionsStep<E, ?, ? extends SearchPredicateFactory<E>> field(String fieldPath);
 
 	/**
 	 * Order elements by the value of a specific field.
@@ -74,7 +74,7 @@ public interface SearchSortFactory {
 	 * @throws SearchException If the field doesn't exist or cannot be sorted on.
 	 */
 	@Incubating
-	default FieldSortOptionsStep<?, ? extends SearchPredicateFactory> field(TypedFieldReference<?> field) {
+	default FieldSortOptionsStep<E, ?, ? extends SearchPredicateFactory<E>> field(TypedFieldReference<?> field) {
 		return field( field.absolutePath() );
 	}
 
@@ -89,7 +89,7 @@ public interface SearchSortFactory {
 	 * @return A DSL step where the "distance" sort can be defined in more details.
 	 * @throws SearchException If the field type does not constitute a valid location.
 	 */
-	DistanceSortOptionsStep<?, ? extends SearchPredicateFactory> distance(String fieldPath, GeoPoint location);
+	DistanceSortOptionsStep<E, ?, ? extends SearchPredicateFactory<E>> distance(String fieldPath, GeoPoint location);
 
 	/**
 	 * Order elements by the distance from the location stored in the specified field to the location specified.
@@ -102,7 +102,8 @@ public interface SearchSortFactory {
 	 * @return A DSL step where the "distance" sort can be defined in more details.
 	 * @throws SearchException If the field type does not constitute a valid location.
 	 */
-	default DistanceSortOptionsStep<?, ? extends SearchPredicateFactory> distance(TypedFieldReference<? extends GeoPoint> field,
+	default DistanceSortOptionsStep<E, ?, ? extends SearchPredicateFactory<E>> distance(
+			TypedFieldReference<? extends GeoPoint> field,
 			GeoPoint location) {
 		return distance( field.absolutePath(), location );
 	}
@@ -119,7 +120,7 @@ public interface SearchSortFactory {
 	 * @return A DSL step where the "distance" sort can be defined in more details.
 	 * @throws SearchException If the field type does not constitute a valid location.
 	 */
-	default DistanceSortOptionsStep<?, ? extends SearchPredicateFactory> distance(String fieldPath, double latitude,
+	default DistanceSortOptionsStep<E, ?, ? extends SearchPredicateFactory<E>> distance(String fieldPath, double latitude,
 			double longitude) {
 		return distance( fieldPath, GeoPoint.of( latitude, longitude ) );
 	}
@@ -134,7 +135,7 @@ public interface SearchSortFactory {
 	 *
 	 * @return A DSL step where the "composite" sort can be defined in more details.
 	 */
-	CompositeSortComponentsStep<?> composite();
+	CompositeSortComponentsStep<E, ?> composite();
 
 	/**
 	 * Order by a sort composed of several elements,
@@ -157,7 +158,7 @@ public interface SearchSortFactory {
 	 * Should generally be a lambda expression.
 	 * @return A DSL step where the "composite" sort can be defined in more details.
 	 */
-	SortThenStep composite(Consumer<? super CompositeSortComponentsStep<?>> elementContributor);
+	SortThenStep<E> composite(Consumer<? super CompositeSortComponentsStep<E, ?>> elementContributor);
 
 	/**
 	 * Delegating sort that creates the actual sort at query create time and provides access to query parameters.
@@ -168,7 +169,7 @@ public interface SearchSortFactory {
 	 * @return A final DSL step in a parameterized sort definition.
 	 */
 	@Incubating
-	SortThenStep withParameters(Function<? super NamedValues, ? extends SortFinalStep> sortCreator);
+	SortThenStep<E> withParameters(Function<? super NamedValues, ? extends SortFinalStep> sortCreator);
 
 	/**
 	 * Extend the current factory with the given extension,
@@ -190,7 +191,7 @@ public interface SearchSortFactory {
 	 *
 	 * @return A DSL step.
 	 */
-	SearchSortFactoryExtensionIfSupportedStep extension();
+	SearchSortFactoryExtensionIfSupportedStep<E> extension();
 
 	/**
 	 * Create a new sort factory whose root for all paths passed to the DSL
@@ -203,7 +204,7 @@ public interface SearchSortFactory {
 	 * @return A new sort factory using the given object field as root.
 	 */
 	@Incubating
-	SearchSortFactory withRoot(String objectFieldPath);
+	SearchSortFactory<E> withRoot(String objectFieldPath);
 
 	/**
 	 * @param relativeFieldPath The path to a field, relative to the {@link #withRoot(String) root} of this factory.

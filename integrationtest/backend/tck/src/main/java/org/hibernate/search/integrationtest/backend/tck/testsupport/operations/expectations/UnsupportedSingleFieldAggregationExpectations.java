@@ -6,12 +6,13 @@
  */
 package org.hibernate.search.integrationtest.backend.tck.testsupport.operations.expectations;
 
+import org.hibernate.search.engine.backend.common.DocumentReference;
 import org.hibernate.search.engine.search.aggregation.dsl.SearchAggregationFactory;
 
 public interface UnsupportedSingleFieldAggregationExpectations {
 
 	String aggregationName();
 
-	void trySetup(SearchAggregationFactory factory, String fieldPath);
+	void trySetup(SearchAggregationFactory<DocumentReference> factory, String fieldPath);
 
 }

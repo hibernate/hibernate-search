@@ -6,12 +6,12 @@
  */
 package org.hibernate.search.engine.search.predicate.dsl;
 
-import org.hibernate.search.engine.search.reference.TypedFieldReference;
+import org.hibernate.search.engine.search.reference.traits.predicate.MatchPredicateFieldReference;
 
 /**
  * The initial step in a "match" predicate definition, where the target field can be set.
  */
-public interface MatchPredicateFieldStep<N extends MatchPredicateFieldMoreStep<?, ?>> {
+public interface MatchPredicateFieldStep<E, N extends MatchPredicateFieldMoreStep<E, ?, ?>> {
 
 	/**
 	 * Target the given field in the match predicate.
@@ -51,7 +51,8 @@ public interface MatchPredicateFieldStep<N extends MatchPredicateFieldMoreStep<?
 	 * TODO
 	 */
 	@SuppressWarnings("unchecked")
-	default <T> MatchPredicateFieldMoreGenericStep<?, ?, T, TypedFieldReference<T>> field(TypedFieldReference<T> field) {
+	default <T> MatchPredicateFieldMoreGenericStep<E, ?, ?, T, MatchPredicateFieldReference<? extends E, T>> field(
+			MatchPredicateFieldReference<? extends E, T> field) {
 		return fields( field );
 	}
 
@@ -59,5 +60,6 @@ public interface MatchPredicateFieldStep<N extends MatchPredicateFieldMoreStep<?
 	 * TODO
 	 */
 	@SuppressWarnings("unchecked")
-	<T> MatchPredicateFieldMoreGenericStep<?, ?, T, TypedFieldReference<T>> fields(TypedFieldReference<T>... fields);
+	<T> MatchPredicateFieldMoreGenericStep<E, ?, ?, T, MatchPredicateFieldReference<? extends E, T>> fields(
+			MatchPredicateFieldReference<? extends E, T>... fields);
 }

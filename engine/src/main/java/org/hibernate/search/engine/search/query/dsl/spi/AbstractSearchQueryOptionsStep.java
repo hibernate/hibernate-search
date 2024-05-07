@@ -39,14 +39,15 @@ import org.hibernate.search.engine.search.sort.dsl.SearchSortFactory;
 import org.hibernate.search.engine.search.sort.dsl.SortFinalStep;
 
 public abstract class AbstractSearchQueryOptionsStep<
-		S extends SearchQueryOptionsStep<S, H, LOS, SF, AF>,
+		E,
+		S extends SearchQueryOptionsStep<E, S, H, LOS, SF, AF>,
 		H,
 		LOS,
-		PDF extends SearchPredicateFactory,
-		SF extends SearchSortFactory,
-		AF extends SearchAggregationFactory,
+		PDF extends SearchPredicateFactory<E>,
+		SF extends SearchSortFactory<E>,
+		AF extends SearchAggregationFactory<E>,
 		SC extends SearchQueryIndexScope<?>>
-		implements SearchQueryWhereStep<S, H, LOS, PDF>, SearchQueryOptionsStep<S, H, LOS, SF, AF> {
+		implements SearchQueryWhereStep<E, S, H, LOS, PDF>, SearchQueryOptionsStep<E, S, H, LOS, SF, AF> {
 
 	protected final SC scope;
 	private final SearchQueryBuilder<H> searchQueryBuilder;

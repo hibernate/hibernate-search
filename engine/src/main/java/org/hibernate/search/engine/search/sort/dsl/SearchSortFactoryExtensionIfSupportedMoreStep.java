@@ -16,7 +16,7 @@ import org.hibernate.search.util.common.SearchException;
  *
  * @see SearchSortFactory#extension()
  */
-public interface SearchSortFactoryExtensionIfSupportedMoreStep extends SearchSortFactoryExtensionIfSupportedStep {
+public interface SearchSortFactoryExtensionIfSupportedMoreStep<E> extends SearchSortFactoryExtensionIfSupportedStep<E> {
 
 	/**
 	 * If no extension passed to {@link #ifSupported(SearchSortFactoryExtension, Function)}
@@ -29,7 +29,7 @@ public interface SearchSortFactoryExtensionIfSupportedMoreStep extends SearchSor
 	 * Should generally be a lambda expression.
 	 * @return The final step in the DSL of the resulting sort.
 	 */
-	SortThenStep orElse(Function<SearchSortFactory, ? extends SortFinalStep> sortContributor);
+	SortThenStep<E> orElse(Function<SearchSortFactory<E>, ? extends SortFinalStep> sortContributor);
 
 	/**
 	 * If no extension passed to {@link #ifSupported(SearchSortFactoryExtension, Function)}
@@ -39,6 +39,6 @@ public interface SearchSortFactoryExtensionIfSupportedMoreStep extends SearchSor
 	 * @return The final step in the DSL of the resulting sort.
 	 * @throws SearchException If none of the previously passed extensions was supported.
 	 */
-	SortThenStep orElseFail();
+	SortThenStep<E> orElseFail();
 
 }

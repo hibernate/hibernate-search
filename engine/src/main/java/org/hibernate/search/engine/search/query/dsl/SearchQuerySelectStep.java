@@ -40,13 +40,13 @@ import org.hibernate.search.util.common.SearchException;
  * @param <PDF> The type of factory used to create predicates in {@link #where(Function)}.
  */
 public interface SearchQuerySelectStep<
-		N extends SearchQueryOptionsStep<?, E, LOS, ?, ?>,
+		N extends SearchQueryOptionsStep<E, ?, E, LOS, ?, ?>,
 		R,
 		E,
 		LOS,
 		PJF extends SearchProjectionFactory<R, E>,
-		PDF extends SearchPredicateFactory>
-		extends SearchQueryWhereStep<N, E, LOS, PDF> {
+		PDF extends SearchPredicateFactory<E>>
+		extends SearchQueryWhereStep<E, N, E, LOS, PDF> {
 
 	/**
 	 * Select the entity was originally indexed
@@ -57,7 +57,7 @@ public interface SearchQuerySelectStep<
 	 * @return The next step.
 	 * @see SearchQueryWhereStep
 	 */
-	SearchQueryWhereStep<?, E, LOS, ?> selectEntity();
+	SearchQueryWhereStep<E, ?, E, LOS, ?> selectEntity();
 
 	/**
 	 * Select a reference to the entity that was originally indexed
@@ -71,7 +71,7 @@ public interface SearchQuerySelectStep<
 	 * @return The next step.
 	 * @see SearchQueryWhereStep
 	 */
-	SearchQueryWhereStep<?, R, LOS, ?> selectEntityReference();
+	SearchQueryWhereStep<E, ?, R, LOS, ?> selectEntityReference();
 
 	/**
 	 * Select an object projection
@@ -84,7 +84,7 @@ public interface SearchQuerySelectStep<
 	 * @return The next step.
 	 * @see SearchQueryWhereStep
 	 */
-	<P> SearchQueryWhereStep<?, P, LOS, ?> select(Class<P> objectClass);
+	<P> SearchQueryWhereStep<E, ?, P, LOS, ?> select(Class<P> objectClass);
 
 	/**
 	 * Select a given projection as a representation of the search hit for each matching document.
@@ -96,7 +96,7 @@ public interface SearchQuerySelectStep<
 	 * @return The next step.
 	 * @see SearchQueryWhereStep
 	 */
-	<P> SearchQueryWhereStep<?, P, LOS, ?> select(
+	<P> SearchQueryWhereStep<E, ?, P, LOS, ?> select(
 			Function<? super PJF, ? extends ProjectionFinalStep<P>> projectionContributor);
 
 	/**
@@ -107,7 +107,7 @@ public interface SearchQuerySelectStep<
 	 * @return The next step.
 	 * @see SearchQueryWhereStep
 	 */
-	<P> SearchQueryWhereStep<?, P, LOS, ?> select(SearchProjection<P> projection);
+	<P> SearchQueryWhereStep<E, ?, P, LOS, ?> select(SearchProjection<P> projection);
 
 	/**
 	 * Select a list of projections as a representation of the search hit for each matching document.
@@ -122,7 +122,7 @@ public interface SearchQuerySelectStep<
 	 * @see SearchProjectionFactory#composite(SearchProjection[])
 	 * @see SearchQueryWhereStep
 	 */
-	SearchQueryWhereStep<?, List<?>, LOS, ?> select(SearchProjection<?>... projections);
+	SearchQueryWhereStep<E, ?, List<?>, LOS, ?> select(SearchProjection<?>... projections);
 
 	/**
 	 * Extend the current DSL step with the given extension,

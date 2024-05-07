@@ -10,9 +10,9 @@ import org.hibernate.search.engine.search.predicate.dsl.MatchPredicateFieldMoreG
 import org.hibernate.search.engine.search.predicate.dsl.MatchPredicateFieldMoreStep;
 import org.hibernate.search.engine.search.predicate.dsl.MatchPredicateFieldStep;
 import org.hibernate.search.engine.search.predicate.dsl.spi.SearchPredicateDslContext;
-import org.hibernate.search.engine.search.reference.TypedFieldReference;
+import org.hibernate.search.engine.search.reference.traits.predicate.MatchPredicateFieldReference;
 
-public final class MatchPredicateFieldStepImpl implements MatchPredicateFieldStep<MatchPredicateFieldMoreStep<?, ?>> {
+public final class MatchPredicateFieldStepImpl<E> implements MatchPredicateFieldStep<E, MatchPredicateFieldMoreStep<E, ?, ?>> {
 
 	private final SearchPredicateDslContext<?> dslContext;
 
@@ -21,13 +21,13 @@ public final class MatchPredicateFieldStepImpl implements MatchPredicateFieldSte
 	}
 
 	@Override
-	public MatchPredicateFieldMoreStep<?, ?> fields(String... fieldPaths) {
+	public MatchPredicateFieldMoreStep<E, ?, ?> fields(String... fieldPaths) {
 		return AbstractMatchPredicateFieldMoreStep.create( dslContext, fieldPaths );
 	}
 
 	@Override
-	@SuppressWarnings("unchecked")
-	public <T> MatchPredicateFieldMoreGenericStep<?, ?, T, TypedFieldReference<T>> fields(TypedFieldReference<T>... fields) {
+	public <T> MatchPredicateFieldMoreGenericStep<E, ?, ?, T, MatchPredicateFieldReference<? extends E, T>> fields(
+			MatchPredicateFieldReference<? extends E, T>... fields) {
 		return AbstractMatchPredicateFieldMoreStep.create( dslContext, fields );
 	}
 }

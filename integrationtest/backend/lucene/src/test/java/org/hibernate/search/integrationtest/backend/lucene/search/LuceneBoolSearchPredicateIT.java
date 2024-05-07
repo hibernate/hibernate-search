@@ -9,6 +9,7 @@ package org.hibernate.search.integrationtest.backend.lucene.search;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
+import org.hibernate.search.engine.backend.common.DocumentReference;
 import org.hibernate.search.engine.backend.document.IndexFieldReference;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaElement;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaObjectField;
@@ -57,7 +58,7 @@ class LuceneBoolSearchPredicateIT {
 
 	@Test
 	void resultingQueryOptimization() {
-		SearchPredicateFactory f = index.createScope().predicate();
+		SearchPredicateFactory<DocumentReference> f = index.createScope().predicate();
 		assertThat(
 				index.query()
 						.where( f.bool()
@@ -95,7 +96,7 @@ class LuceneBoolSearchPredicateIT {
 
 	@Test
 	void resultingQueryOptimizationWithBoost() {
-		SearchPredicateFactory f = index.createScope().predicate();
+		SearchPredicateFactory<DocumentReference> f = index.createScope().predicate();
 		// by default Lucene bool query would have a filter on match all
 		assertThat(
 				index.query()

@@ -17,22 +17,22 @@ import org.hibernate.search.engine.search.sort.dsl.SortThenStep;
 import org.hibernate.search.engine.search.sort.dsl.spi.SearchSortDslContext;
 import org.hibernate.search.engine.search.sort.dsl.spi.StaticSortThenStep;
 
-public final class SearchSortFactoryExtensionStep
-		implements SearchSortFactoryExtensionIfSupportedMoreStep {
+public final class SearchSortFactoryExtensionStep<E>
+		implements SearchSortFactoryExtensionIfSupportedMoreStep<E> {
 
-	private final SearchSortFactory parent;
-	private final SearchSortDslContext<?, ?> dslContext;
+	private final SearchSortFactory<E> parent;
+	private final SearchSortDslContext<E, ?, ?> dslContext;
 
 	private final DslExtensionState<SortFinalStep> state = new DslExtensionState<>();
 
-	public SearchSortFactoryExtensionStep(SearchSortFactory parent,
-			SearchSortDslContext<?, ?> dslContext) {
+	public SearchSortFactoryExtensionStep(SearchSortFactory<E> parent,
+			SearchSortDslContext<E, ?, ?> dslContext) {
 		this.parent = parent;
 		this.dslContext = dslContext;
 	}
 
 	@Override
-	public <T> SearchSortFactoryExtensionIfSupportedMoreStep ifSupported(
+	public <T> SearchSortFactoryExtensionIfSupportedMoreStep<E> ifSupported(
 			SearchSortFactoryExtension<T> extension,
 			Function<T, ? extends SortFinalStep> sortContributor) {
 		state.ifSupported( extension, extension.extendOptional( parent ), sortContributor );
@@ -40,14 +40,14 @@ public final class SearchSortFactoryExtensionStep
 	}
 
 	@Override
-	public SortThenStep orElse(Function<SearchSortFactory, ? extends SortFinalStep> sortContributor) {
+	public SortThenStep<E> orElse(Function<SearchSortFactory<E>, ? extends SortFinalStep> sortContributor) {
 		SortFinalStep result = state.orElse( parent, sortContributor );
-		return new StaticSortThenStep( dslContext, result.toSort() );
+		return new StaticSortThenStep<>( dslContext, result.toSort() );
 	}
 
 	@Override
-	public SortThenStep orElseFail() {
+	public SortThenStep<E> orElseFail() {
 		SortFinalStep result = state.orElseFail();
-		return new StaticSortThenStep( dslContext, result.toSort() );
+		return new StaticSortThenStep<>( dslContext, result.toSort() );
 	}
 }

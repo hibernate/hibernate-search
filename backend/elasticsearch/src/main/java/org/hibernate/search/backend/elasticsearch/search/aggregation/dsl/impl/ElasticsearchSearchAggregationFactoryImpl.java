@@ -15,22 +15,24 @@ import org.hibernate.search.engine.search.aggregation.dsl.spi.SearchAggregationD
 
 import com.google.gson.JsonObject;
 
-public class ElasticsearchSearchAggregationFactoryImpl
+public class ElasticsearchSearchAggregationFactoryImpl<E>
 		extends AbstractSearchAggregationFactory<
-				ElasticsearchSearchAggregationFactory,
+				E,
+				ElasticsearchSearchAggregationFactory<E>,
 				ElasticsearchSearchAggregationIndexScope<?>,
-				ElasticsearchSearchPredicateFactory>
-		implements ElasticsearchSearchAggregationFactory {
+				ElasticsearchSearchPredicateFactory<E>>
+		implements ElasticsearchSearchAggregationFactory<E> {
 
 	public ElasticsearchSearchAggregationFactoryImpl(
-			SearchAggregationDslContext<ElasticsearchSearchAggregationIndexScope<?>,
-					ElasticsearchSearchPredicateFactory> dslContext) {
+			SearchAggregationDslContext<E,
+					ElasticsearchSearchAggregationIndexScope<?>,
+					ElasticsearchSearchPredicateFactory<E>> dslContext) {
 		super( dslContext );
 	}
 
 	@Override
-	public ElasticsearchSearchAggregationFactory withRoot(String objectFieldPath) {
-		return new ElasticsearchSearchAggregationFactoryImpl( dslContext.rescope(
+	public ElasticsearchSearchAggregationFactory<E> withRoot(String objectFieldPath) {
+		return new ElasticsearchSearchAggregationFactoryImpl<>( dslContext.rescope(
 				dslContext.scope().withRoot( objectFieldPath ),
 				dslContext.predicateFactory().withRoot( objectFieldPath ) ) );
 	}

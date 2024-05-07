@@ -24,13 +24,13 @@ import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
 import com.google.gson.JsonObject;
 
-public class ElasticsearchNamedPredicate extends AbstractElasticsearchSingleFieldPredicate {
+public class ElasticsearchNamedPredicate<E> extends AbstractElasticsearchSingleFieldPredicate {
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	private final ElasticsearchSearchPredicate providedPredicate;
 
-	private ElasticsearchNamedPredicate(Builder builder, ElasticsearchSearchPredicate providedPredicate) {
+	private ElasticsearchNamedPredicate(Builder<E> builder, ElasticsearchSearchPredicate providedPredicate) {
 		super( builder );
 		this.providedPredicate = providedPredicate;
 	}
@@ -47,12 +47,12 @@ public class ElasticsearchNamedPredicate extends AbstractElasticsearchSingleFiel
 		return providedPredicate.toJsonQuery( context );
 	}
 
-	public static class Factory
-			extends AbstractElasticsearchCompositeNodeSearchQueryElementFactory<NamedPredicateBuilder> {
-		private final PredicateDefinition definition;
+	public static class Factory<E>
+			extends AbstractElasticsearchCompositeNodeSearchQueryElementFactory<NamedPredicateBuilder<E>> {
+		private final PredicateDefinition<E> definition;
 		private final String predicateName;
 
-		public Factory(PredicateDefinition definition, String predicateName) {
+		public Factory(PredicateDefinition<E> definition, String predicateName) {
 			this.definition = definition;
 			this.predicateName = predicateName;
 		}
@@ -60,27 +60,27 @@ public class ElasticsearchNamedPredicate extends AbstractElasticsearchSingleFiel
 		@Override
 		public void checkCompatibleWith(SearchQueryElementFactory<?, ?, ?> other) {
 			super.checkCompatibleWith( other );
-			Factory castedOther = (Factory) other;
+			Factory<E> castedOther = (Factory<E>) other;
 			if ( !definition.equals( castedOther.definition ) ) {
 				throw log.differentPredicateDefinitionForQueryElement( definition, castedOther.definition );
 			}
 		}
 
 		@Override
-		public NamedPredicateBuilder create(ElasticsearchSearchIndexScope<?> scope,
+		public NamedPredicateBuilder<E> create(ElasticsearchSearchIndexScope<?> scope,
 				ElasticsearchSearchIndexCompositeNodeContext node) {
-			return new Builder( definition, predicateName, scope, node );
+			return new Builder<>( definition, predicateName, scope, node );
 		}
 	}
 
-	private static class Builder extends AbstractBuilder implements NamedPredicateBuilder {
-		private final PredicateDefinition definition;
+	private static class Builder<E> extends AbstractBuilder implements NamedPredicateBuilder<E> {
+		private final PredicateDefinition<E> definition;
 		private final String predicateName;
 		private final ElasticsearchSearchIndexCompositeNodeContext field;
-		private SearchPredicateFactory factory;
+		private SearchPredicateFactory<E> factory;
 		private final Map<String, Object> params = new LinkedHashMap<>();
 
-		Builder(PredicateDefinition definition, String predicateName,
+		Builder(PredicateDefinition<E> definition, String predicateName,
 				ElasticsearchSearchIndexScope<?> scope,
 				ElasticsearchSearchIndexCompositeNodeContext node) {
 			super( scope, node );
@@ -90,7 +90,7 @@ public class ElasticsearchNamedPredicate extends AbstractElasticsearchSingleFiel
 		}
 
 		@Override
-		public void factory(SearchPredicateFactory factory) {
+		public void factory(SearchPredicateFactory<E> factory) {
 			this.factory = factory;
 		}
 
@@ -101,13 +101,14 @@ public class ElasticsearchNamedPredicate extends AbstractElasticsearchSingleFiel
 
 		@Override
 		public SearchPredicate build() {
-			NamedValuesBasedPredicateDefinitionContext ctx = new NamedValuesBasedPredicateDefinitionContext( factory, params,
-					name -> log.paramNotDefined( name, predicateName, field.eventContext() ) );
+			NamedValuesBasedPredicateDefinitionContext<E> ctx =
+					new NamedValuesBasedPredicateDefinitionContext<>( factory, params,
+							name -> log.paramNotDefined( name, predicateName, field.eventContext() ) );
 
 			ElasticsearchSearchPredicate providedPredicate = ElasticsearchSearchPredicate.from(
 					scope, definition.create( ctx ) );
 
-			return new ElasticsearchNamedPredicate( this, providedPredicate );
+			return new ElasticsearchNamedPredicate<>( this, providedPredicate );
 		}
 	}
 }

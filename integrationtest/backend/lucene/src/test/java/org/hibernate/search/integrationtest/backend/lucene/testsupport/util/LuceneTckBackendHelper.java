@@ -7,6 +7,7 @@
 package org.hibernate.search.integrationtest.backend.lucene.testsupport.util;
 
 import org.hibernate.search.backend.lucene.LuceneExtension;
+import org.hibernate.search.engine.backend.common.DocumentReference;
 import org.hibernate.search.engine.search.predicate.dsl.PredicateFinalStep;
 import org.hibernate.search.engine.search.predicate.dsl.SearchPredicateFactory;
 import org.hibernate.search.engine.search.query.dsl.SearchQueryDslExtension;
@@ -84,7 +85,7 @@ public class LuceneTckBackendHelper implements TckBackendHelper {
 	}
 
 	@Override
-	public PredicateFinalStep createSlowPredicate(SearchPredicateFactory f) {
+	public PredicateFinalStep createSlowPredicate(SearchPredicateFactory<DocumentReference> f) {
 		return f.extension( LuceneExtension.get() )
 				.fromLuceneQuery( new SlowQuery( 100 ) );
 	}

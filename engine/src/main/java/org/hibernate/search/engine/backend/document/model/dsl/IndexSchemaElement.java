@@ -73,8 +73,8 @@ public interface IndexSchemaElement {
 	 * @see PredicateDefinition
 	 */
 	@Incubating
-	IndexSchemaNamedPredicateOptionsStep namedPredicate(
-			String relativeNamedPredicateName, PredicateDefinition definition);
+	<E> IndexSchemaNamedPredicateOptionsStep namedPredicate(
+			String relativeNamedPredicateName, PredicateDefinition<E> definition);
 
 	/**
 	 * Add an object field to this index schema element with the default structure.

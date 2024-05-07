@@ -17,6 +17,7 @@ import org.hibernate.search.engine.search.common.ValueConvert;
 import org.hibernate.search.engine.search.projection.SearchProjection;
 import org.hibernate.search.engine.search.reference.ObjectFieldReference;
 import org.hibernate.search.engine.search.reference.ProjectionTypedFieldReference;
+import org.hibernate.search.engine.search.reference.traits.projection.FieldProjectionFieldReference;
 import org.hibernate.search.engine.spatial.GeoPoint;
 import org.hibernate.search.util.common.SearchException;
 import org.hibernate.search.util.common.annotation.Incubating;
@@ -162,8 +163,9 @@ public interface SearchProjectionFactory<R, E> {
 	 */
 	FieldProjectionValueStep<?, Object> field(String fieldPath, ValueConvert convert);
 
+
 	@Incubating
-	default <T> FieldProjectionValueStep<?, T> field(ProjectionTypedFieldReference<T> fieldReference) {
+	default <T> FieldProjectionValueStep<?, T> field(FieldProjectionFieldReference<? extends E, T> fieldReference) {
 		return field( fieldReference.absolutePath(), fieldReference.projectionType(), fieldReference.valueConvert() );
 	}
 

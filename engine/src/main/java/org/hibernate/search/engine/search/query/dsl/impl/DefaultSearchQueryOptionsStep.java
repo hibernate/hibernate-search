@@ -17,17 +17,23 @@ import org.hibernate.search.engine.search.query.spi.SearchQueryBuilder;
 import org.hibernate.search.engine.search.query.spi.SearchQueryIndexScope;
 import org.hibernate.search.engine.search.sort.dsl.SearchSortFactory;
 
-final class DefaultSearchQueryOptionsStep<H, LOS>
+final class DefaultSearchQueryOptionsStep<E, H, LOS>
 		extends AbstractSearchQueryOptionsStep<
-				DefaultSearchQueryOptionsStep<H, LOS>,
+				E,
+				DefaultSearchQueryOptionsStep<E, H, LOS>,
 				H,
 				LOS,
-				SearchPredicateFactory,
-				SearchSortFactory,
-				SearchAggregationFactory,
+				SearchPredicateFactory<E>,
+				SearchSortFactory<E>,
+				SearchAggregationFactory<E>,
 				SearchQueryIndexScope<?>>
-		implements SearchQueryWhereStep<DefaultSearchQueryOptionsStep<H, LOS>, H, LOS, SearchPredicateFactory>,
-		SearchQueryOptionsStep<DefaultSearchQueryOptionsStep<H, LOS>, H, LOS, SearchSortFactory, SearchAggregationFactory> {
+		implements SearchQueryWhereStep<E, DefaultSearchQueryOptionsStep<E, H, LOS>, H, LOS, SearchPredicateFactory<E>>,
+		SearchQueryOptionsStep<E,
+				DefaultSearchQueryOptionsStep<E, H, LOS>,
+				H,
+				LOS,
+				SearchSortFactory<E>,
+				SearchAggregationFactory<E>> {
 
 	DefaultSearchQueryOptionsStep(SearchQueryIndexScope<?> scope, SearchQueryBuilder<H> searchQueryBuilder,
 			SearchLoadingContextBuilder<?, LOS> loadingContextBuilder) {
@@ -35,7 +41,7 @@ final class DefaultSearchQueryOptionsStep<H, LOS>
 	}
 
 	@Override
-	protected SearchPredicateFactory predicateFactory() {
+	protected SearchPredicateFactory<E> predicateFactory() {
 		return scope.predicateFactory();
 	}
 
@@ -55,7 +61,7 @@ final class DefaultSearchQueryOptionsStep<H, LOS>
 	}
 
 	@Override
-	protected DefaultSearchQueryOptionsStep<H, LOS> thisAsS() {
+	protected DefaultSearchQueryOptionsStep<E, H, LOS> thisAsS() {
 		return this;
 	}
 }

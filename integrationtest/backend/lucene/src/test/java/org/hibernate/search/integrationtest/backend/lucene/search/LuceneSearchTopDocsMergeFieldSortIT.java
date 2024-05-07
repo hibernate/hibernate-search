@@ -206,7 +206,7 @@ class LuceneSearchTopDocsMergeFieldSortIT<F> {
 				.toQuery();
 	}
 
-	private FieldSortOptionsStep<?, ?> applySortMode(FieldSortOptionsStep<?, ?> optionsStep, SortMode sortMode) {
+	private FieldSortOptionsStep<DocumentReference, ?, ?> applySortMode(FieldSortOptionsStep<DocumentReference, ?, ?> optionsStep, SortMode sortMode) {
 		if ( sortMode != null ) {
 			return optionsStep.mode( sortMode );
 		}
@@ -215,7 +215,7 @@ class LuceneSearchTopDocsMergeFieldSortIT<F> {
 		}
 	}
 
-	private FieldSortOptionsStep<?, ?> applyFilter(FieldSortOptionsStep<?, ?> optionsStep,
+	private FieldSortOptionsStep<DocumentReference, ?, ?> applyFilter(FieldSortOptionsStep<DocumentReference, ?, ?> optionsStep,
 			TestedFieldStructure fieldStructure) {
 		if ( fieldStructure.isInNested() ) {
 			return optionsStep.filter( f -> f.match()

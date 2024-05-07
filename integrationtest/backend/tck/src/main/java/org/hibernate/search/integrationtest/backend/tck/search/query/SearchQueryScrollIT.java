@@ -258,7 +258,7 @@ class SearchQueryScrollIT {
 		assertThat( scrollResult.hasHits() ).isFalse();
 	}
 
-	private SearchQueryOptionsStep<?, DocumentReference, ?, ?, ?> matchAllQuery() {
+	private SearchQueryOptionsStep<DocumentReference,?, DocumentReference, ?, ?, ?> matchAllQuery() {
 		return index.query()
 				.where( f -> f.matchAll() )
 				.sort( f -> f.field( "integer" ).asc() );
@@ -270,23 +270,23 @@ class SearchQueryScrollIT {
 	 * because optimizations are possible with MatchAllDocsQuery that would allow Hibernate Search
 	 * to return an exact total hit count in constant time, ignoring the total hit count threshold.
 	 */
-	private SearchQueryOptionsStep<?, DocumentReference, ?, ?, ?> matchAllWithConditionSortedByScoreQuery() {
+	private SearchQueryOptionsStep<DocumentReference,?, DocumentReference, ?, ?, ?> matchAllWithConditionSortedByScoreQuery() {
 		return index.query()
 				.where( f -> f.exists().field( "integer" ) );
 	}
 
-	private SearchQueryOptionsStep<?, DocumentReference, ?, ?, ?> matchFirstHalfQuery() {
+	private SearchQueryOptionsStep<DocumentReference,?, DocumentReference, ?, ?, ?> matchFirstHalfQuery() {
 		return index.query()
 				.where( f -> f.range().field( "integer" ).lessThan( DOCUMENT_COUNT / 2 ) )
 				.sort( f -> f.field( "integer" ).asc() );
 	}
 
-	private SearchQueryOptionsStep<?, DocumentReference, ?, ?, ?> matchOneQuery(int id) {
+	private SearchQueryOptionsStep<DocumentReference,?, DocumentReference, ?, ?, ?> matchOneQuery(int id) {
 		return index.query()
 				.where( f -> f.match().field( "integer" ).matching( id ) );
 	}
 
-	private SearchQueryOptionsStep<?, DocumentReference, ?, ?, ?> matchNoneQuery() {
+	private SearchQueryOptionsStep<DocumentReference,?, DocumentReference, ?, ?, ?> matchNoneQuery() {
 		return index.query()
 				.where( f -> f.match().field( "integer" ).matching( DOCUMENT_COUNT + 2 ) );
 	}

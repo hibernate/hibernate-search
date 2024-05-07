@@ -49,7 +49,7 @@ public abstract class AbstractEntityReferenceProjectionIT {
 		this.mainIndex = mainIndex;
 	}
 
-	public abstract <R, E, LOS> SearchQueryWhereStep<?, R, LOS, ?> select(
+	public abstract <R, E, LOS> SearchQueryWhereStep<E, ?, R, LOS, ?> select(
 			SearchQuerySelectStep<?, R, E, LOS, ?, ?> step);
 
 	@Test

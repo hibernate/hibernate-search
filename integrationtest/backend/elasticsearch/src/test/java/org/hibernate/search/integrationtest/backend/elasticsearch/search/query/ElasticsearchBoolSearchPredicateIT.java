@@ -34,7 +34,7 @@ class ElasticsearchBoolSearchPredicateIT {
 
 	@Test
 	void resultingQueryOptimization() {
-		SearchPredicateFactory f = index.createScope().predicate();
+		SearchPredicateFactory<?> f = index.createScope().predicate();
 
 		assertJsonEqualsIgnoringUnknownFields(
 				"{" +

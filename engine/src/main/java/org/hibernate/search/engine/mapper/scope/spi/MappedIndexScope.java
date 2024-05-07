@@ -36,9 +36,9 @@ public interface MappedIndexScope<R, E> {
 			BackendSessionContext sessionContext,
 			SearchLoadingContextBuilder<E, LOS> loadingContextBuilder);
 
-	SearchPredicateFactory predicate();
+	SearchPredicateFactory<E> predicate();
 
-	SearchSortFactory sort();
+	SearchSortFactory<E> sort();
 
 	/*
 	 * IMPLEMENTATION NOTE: we *must* return a factory with the same R/E type arguments as this class,

@@ -32,54 +32,55 @@ import org.hibernate.search.engine.search.sort.spi.SearchSortIndexScope;
 import org.hibernate.search.engine.spatial.GeoPoint;
 
 public abstract class AbstractSearchSortFactory<
-		S extends ExtendedSearchSortFactory<S, PDF>,
+		E,
+		S extends ExtendedSearchSortFactory<E, S, PDF>,
 		SC extends SearchSortIndexScope<?>,
-		PDF extends SearchPredicateFactory>
-		implements ExtendedSearchSortFactory<S, PDF> {
+		PDF extends SearchPredicateFactory<E>>
+		implements ExtendedSearchSortFactory<E, S, PDF> {
 
-	protected final SearchSortDslContext<SC, PDF> dslContext;
+	protected final SearchSortDslContext<E, SC, PDF> dslContext;
 
-	public AbstractSearchSortFactory(SearchSortDslContext<SC, PDF> dslContext) {
+	public AbstractSearchSortFactory(SearchSortDslContext<E, SC, PDF> dslContext) {
 		this.dslContext = dslContext;
 	}
 
 	@Override
-	public ScoreSortOptionsStep<?> score() {
-		return new ScoreSortOptionsStepImpl( dslContext );
+	public ScoreSortOptionsStep<E, ?> score() {
+		return new ScoreSortOptionsStepImpl<>( dslContext );
 	}
 
 	@Override
-	public SortThenStep indexOrder() {
+	public SortThenStep<E> indexOrder() {
 		return staticThenStep( dslContext.scope().sortBuilders().indexOrder() );
 	}
 
 	@Override
-	public FieldSortOptionsStep<?, PDF> field(String fieldPath) {
+	public FieldSortOptionsStep<E, ?, PDF> field(String fieldPath) {
 		return new FieldSortOptionsStepImpl<>( dslContext, fieldPath );
 	}
 
 	@Override
-	public DistanceSortOptionsStep<?, PDF> distance(String fieldPath, GeoPoint location) {
+	public DistanceSortOptionsStep<E, ?, PDF> distance(String fieldPath, GeoPoint location) {
 		return new DistanceSortOptionsStepImpl<>(
 				dslContext, fieldPath, location
 		);
 	}
 
 	@Override
-	public CompositeSortComponentsStep<?> composite() {
+	public CompositeSortComponentsStep<E, ?> composite() {
 		return new CompositeSortComponentsStepImpl( dslContext );
 	}
 
 	@Override
-	public SortThenStep composite(Consumer<? super CompositeSortComponentsStep<?>> elementContributor) {
-		CompositeSortComponentsStep<?> next = composite();
+	public SortThenStep<E> composite(Consumer<? super CompositeSortComponentsStep<E, ?>> elementContributor) {
+		CompositeSortComponentsStep<E, ?> next = composite();
 		elementContributor.accept( next );
 		return next;
 	}
 
 	@Override
-	public SortThenStep withParameters(Function<? super NamedValues, ? extends SortFinalStep> sortCreator) {
-		return new WithParametersSortFinalStep( dslContext, sortCreator );
+	public SortThenStep<E> withParameters(Function<? super NamedValues, ? extends SortFinalStep> sortCreator) {
+		return new WithParametersSortFinalStep<>( dslContext, sortCreator );
 	}
 
 	@Override
@@ -90,8 +91,8 @@ public abstract class AbstractSearchSortFactory<
 	}
 
 	@Override
-	public SearchSortFactoryExtensionIfSupportedStep extension() {
-		return new SearchSortFactoryExtensionStep( this, dslContext );
+	public SearchSortFactoryExtensionIfSupportedStep<E> extension() {
+		return new SearchSortFactoryExtensionStep<>( this, dslContext );
 	}
 
 	@Override
@@ -99,8 +100,8 @@ public abstract class AbstractSearchSortFactory<
 		return dslContext.scope().toAbsolutePath( relativeFieldPath );
 	}
 
-	protected final SortThenStep staticThenStep(SearchSort sort) {
-		return new StaticSortThenStep( dslContext, sort );
+	protected final SortThenStep<E> staticThenStep(SearchSort sort) {
+		return new StaticSortThenStep<>( dslContext, sort );
 	}
 
 }

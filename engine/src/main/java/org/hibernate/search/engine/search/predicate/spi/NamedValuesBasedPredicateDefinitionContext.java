@@ -17,19 +17,19 @@ import org.hibernate.search.util.common.SearchException;
 import org.hibernate.search.util.common.annotation.Incubating;
 
 @Incubating
-public final class NamedValuesBasedPredicateDefinitionContext implements PredicateDefinitionContext {
+public final class NamedValuesBasedPredicateDefinitionContext<E> implements PredicateDefinitionContext<E> {
 
-	private final SearchPredicateFactory factory;
+	private final SearchPredicateFactory<E> factory;
 	private final NamedValues parameters;
 
-	public NamedValuesBasedPredicateDefinitionContext(SearchPredicateFactory factory, Map<String, Object> params,
+	public NamedValuesBasedPredicateDefinitionContext(SearchPredicateFactory<E> factory, Map<String, Object> params,
 			Function<String, SearchException> namedValueMissing) {
 		this.factory = factory;
 		this.parameters = MapNamedValues.fromMap( params, namedValueMissing );
 	}
 
 	@Override
-	public SearchPredicateFactory predicate() {
+	public SearchPredicateFactory<E> predicate() {
 		return factory;
 	}
 

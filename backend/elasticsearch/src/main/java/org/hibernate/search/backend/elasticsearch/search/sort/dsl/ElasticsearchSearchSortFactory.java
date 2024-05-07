@@ -15,8 +15,8 @@ import com.google.gson.JsonObject;
 /**
  * A factory for search sorts with some Elasticsearch-specific methods.
  */
-public interface ElasticsearchSearchSortFactory
-		extends ExtendedSearchSortFactory<ElasticsearchSearchSortFactory, ElasticsearchSearchPredicateFactory> {
+public interface ElasticsearchSearchSortFactory<E>
+		extends ExtendedSearchSortFactory<E, ElasticsearchSearchSortFactory<E>, ElasticsearchSearchPredicateFactory<E>> {
 
 	/**
 	 * Order elements according to a JSON sort definition.
@@ -27,7 +27,7 @@ public interface ElasticsearchSearchSortFactory
 	 * @return A {@link SortThenStep} allowing the retrieval of the sort
 	 * or the chaining of other sorts.
 	 */
-	SortThenStep fromJson(String jsonString);
+	SortThenStep<E> fromJson(String jsonString);
 
 	/**
 	 * Order elements according to a JSON sort definition.
@@ -38,6 +38,6 @@ public interface ElasticsearchSearchSortFactory
 	 * @return A {@link SortThenStep} allowing the retrieval of the sort
 	 * or the chaining of other sorts.
 	 */
-	SortThenStep fromJson(JsonObject jsonObject);
+	SortThenStep<E> fromJson(JsonObject jsonObject);
 
 }

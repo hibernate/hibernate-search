@@ -81,7 +81,7 @@ class EntityProjectionIT extends AbstractEntityProjectionIT {
 	}
 
 	@Override
-	public <R, E, LOS> SearchQueryWhereStep<?, E, LOS, ?> select(SearchQuerySelectStep<?, R, E, LOS, ?, ?> step) {
+	public <R, E, LOS> SearchQueryWhereStep<E, ?, E, LOS, ?> select(SearchQuerySelectStep<?, R, E, LOS, ?, ?> step) {
 		return step.select( f -> f.entity() );
 	}
 

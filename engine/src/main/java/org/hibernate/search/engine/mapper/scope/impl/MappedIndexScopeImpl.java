@@ -40,7 +40,7 @@ class MappedIndexScopeImpl<R, E> implements MappedIndexScope<R, E> {
 	}
 
 	@Override
-	public SearchPredicateFactory predicate() {
+	public SearchPredicateFactory<E> predicate() {
 		return delegate.searchScope().predicateFactory();
 	}
 

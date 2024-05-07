@@ -62,11 +62,11 @@ public class GenericStubMappingScope<R, E> {
 		return delegate.search( sessionContext, loadingContextBuilder );
 	}
 
-	public SearchPredicateFactory predicate() {
+	public SearchPredicateFactory<E> predicate() {
 		return delegate.predicate();
 	}
 
-	public SearchSortFactory sort() {
+	public SearchSortFactory<E> sort() {
 		return delegate.sort();
 	}
 
@@ -74,7 +74,7 @@ public class GenericStubMappingScope<R, E> {
 		return delegate.projection();
 	}
 
-	public SearchAggregationFactory aggregation() {
+	public SearchAggregationFactory<E> aggregation() {
 		return delegate.aggregation();
 	}
 

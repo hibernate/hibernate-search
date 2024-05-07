@@ -16,6 +16,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
 
+import org.hibernate.search.engine.backend.common.DocumentReference;
 import org.hibernate.search.engine.search.aggregation.dsl.AggregationFinalStep;
 import org.hibernate.search.engine.search.aggregation.dsl.RangeAggregationOptionsStep;
 import org.hibernate.search.engine.search.aggregation.dsl.SearchAggregationFactory;
@@ -133,10 +134,10 @@ public class RangeAggregationDescriptor extends AggregationDescriptor {
 					TypeAssertionHelper<F, T> helper) {
 				return new AggregationScenario<Map<Range<T>, Long>>() {
 					@Override
-					public AggregationFinalStep<Map<Range<T>, Long>> setup(SearchAggregationFactory factory,
+					public AggregationFinalStep<Map<Range<T>, Long>> setup(SearchAggregationFactory<DocumentReference> factory,
 							String fieldPath,
-							Function<? super SearchPredicateFactory, ? extends PredicateFinalStep> filterOrNull) {
-						RangeAggregationOptionsStep<?, ?, ?, Map<Range<T>, Long>> optionsStep =
+							Function<? super SearchPredicateFactory<DocumentReference>, ? extends PredicateFinalStep> filterOrNull) {
+						RangeAggregationOptionsStep<DocumentReference, ?, ?, ?, Map<Range<T>, Long>> optionsStep =
 								factory.range().field( fieldPath, helper.getJavaClass() )
 										.range( helper.create( ascendingValues.get( 0 ) ),
 												helper.create( ascendingValues.get( 2 ) ) )
@@ -153,7 +154,7 @@ public class RangeAggregationDescriptor extends AggregationDescriptor {
 					}
 
 					@Override
-					public AggregationFinalStep<Map<Range<T>, Long>> setupWithConverterSetting(SearchAggregationFactory factory,
+					public AggregationFinalStep<Map<Range<T>, Long>> setupWithConverterSetting(SearchAggregationFactory<DocumentReference> factory,
 							String fieldPath, ValueConvert convert) {
 						return factory.range().field( fieldPath, helper.getJavaClass(), convert )
 								.range( helper.create( ascendingValues.get( 0 ) ),
@@ -194,7 +195,7 @@ public class RangeAggregationDescriptor extends AggregationDescriptor {
 			}
 
 			@Override
-			public void trySetup(SearchAggregationFactory factory, String fieldPath) {
+			public void trySetup(SearchAggregationFactory<DocumentReference> factory, String fieldPath) {
 				factory.range().field( fieldPath, typeDescriptor.getJavaType() );
 			}
 

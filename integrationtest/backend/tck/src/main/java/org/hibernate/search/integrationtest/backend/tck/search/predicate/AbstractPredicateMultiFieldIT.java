@@ -89,14 +89,14 @@ public abstract class AbstractPredicateMultiFieldIT<V extends AbstractPredicateT
 		}
 	}
 
-	protected abstract PredicateFinalStep predicateOnFieldAndField(SearchPredicateFactory f, String fieldPath,
+	protected abstract PredicateFinalStep predicateOnFieldAndField(SearchPredicateFactory<?> f, String fieldPath,
 			String otherFieldPath, int matchingDocOrdinal, DataSet<?, V> dataSet);
 
-	protected abstract PredicateFinalStep predicateOnFields(SearchPredicateFactory f, String[] fieldPaths,
+	protected abstract PredicateFinalStep predicateOnFields(SearchPredicateFactory<?> f, String[] fieldPaths,
 			int matchingDocOrdinal,
 			DataSet<?, V> dataSet);
 
-	protected abstract PredicateFinalStep predicateOnFieldAndFields(SearchPredicateFactory f, String fieldPath,
+	protected abstract PredicateFinalStep predicateOnFieldAndFields(SearchPredicateFactory<?> f, String fieldPath,
 			String[] fieldPaths, int matchingDocOrdinal, DataSet<?, V> dataSet);
 
 	private String field0Path(SimpleMappedIndex<IndexBinding> index, DataSet<?, V> dataSet) {

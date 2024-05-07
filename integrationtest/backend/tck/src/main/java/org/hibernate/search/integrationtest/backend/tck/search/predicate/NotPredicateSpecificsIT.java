@@ -94,7 +94,7 @@ class NotPredicateSpecificsIT {
 
 	@Test
 	void manyNestedNot() {
-		SearchPredicateFactory f = index.createScope().predicate();
+		SearchPredicateFactory<?> f = index.createScope().predicate();
 
 		assertThatQuery( index.query()
 				.where( f.bool()

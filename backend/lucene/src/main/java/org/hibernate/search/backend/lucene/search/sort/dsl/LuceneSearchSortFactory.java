@@ -16,8 +16,8 @@ import org.apache.lucene.search.SortField;
 /**
  * A factory for search sorts with some Lucene-specific methods.
  */
-public interface LuceneSearchSortFactory
-		extends ExtendedSearchSortFactory<LuceneSearchSortFactory, LuceneSearchPredicateFactory> {
+public interface LuceneSearchSortFactory<E>
+		extends ExtendedSearchSortFactory<E, LuceneSearchSortFactory<E>, LuceneSearchPredicateFactory<E>> {
 
 	/**
 	 * Order elements by a given Lucene {@link SortField}.
@@ -26,7 +26,7 @@ public interface LuceneSearchSortFactory
 	 * @return A {@link SortThenStep} allowing the retrieval of the sort
 	 * or the chaining of other sorts.
 	 */
-	SortThenStep fromLuceneSortField(SortField luceneSortField);
+	SortThenStep<E> fromLuceneSortField(SortField luceneSortField);
 
 	/**
 	 * Order elements by a given Lucene {@link Sort}.
@@ -35,6 +35,6 @@ public interface LuceneSearchSortFactory
 	 * @return A {@link SortThenStep} allowing the retrieval of the sort
 	 * or the chaining of other sorts.
 	 */
-	SortThenStep fromLuceneSort(Sort luceneSort);
+	SortThenStep<E> fromLuceneSort(Sort luceneSort);
 
 }

@@ -59,27 +59,27 @@ class NotPredicateBaseIT {
 		}
 
 		@Override
-		protected PredicateFinalStep predicate(SearchPredicateFactory f, int matchingDocOrdinal,
+		protected PredicateFinalStep predicate(SearchPredicateFactory<?> f, int matchingDocOrdinal,
 				AbstractPredicateDataSet dataSet, StubMappedIndex index) {
 			return f.not( f.id().matchingAny( ( (DataSet) dataSet ).docsExcept( matchingDocOrdinal ) ) );
 		}
 
 		@Override
-		protected PredicateFinalStep predicateWithBoost(SearchPredicateFactory f, int matchingDocOrdinal, float boost,
+		protected PredicateFinalStep predicateWithBoost(SearchPredicateFactory<?> f, int matchingDocOrdinal, float boost,
 				AbstractPredicateDataSet dataSet, StubMappedIndex index) {
 			return f.not( f.id().matchingAny( ( (DataSet) dataSet ).docsExcept( matchingDocOrdinal ) ) )
 					.boost( boost );
 		}
 
 		@Override
-		protected PredicateFinalStep predicateWithConstantScore(SearchPredicateFactory f, int matchingDocOrdinal,
+		protected PredicateFinalStep predicateWithConstantScore(SearchPredicateFactory<?> f, int matchingDocOrdinal,
 				AbstractPredicateDataSet dataSet, StubMappedIndex index) {
 			return f.not( f.id().matchingAny( ( (DataSet) dataSet ).docsExcept( matchingDocOrdinal ) ) )
 					.constantScore();
 		}
 
 		@Override
-		protected PredicateFinalStep predicateWithConstantScoreAndBoost(SearchPredicateFactory f,
+		protected PredicateFinalStep predicateWithConstantScoreAndBoost(SearchPredicateFactory<?> f,
 				int matchingDocOrdinal, float boost, AbstractPredicateDataSet dataSet, StubMappedIndex index) {
 			return f.not( f.id().matchingAny( ( (DataSet) dataSet ).docsExcept( matchingDocOrdinal ) ) )
 					.constantScore()

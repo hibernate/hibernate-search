@@ -40,11 +40,12 @@ import org.hibernate.search.util.common.annotation.Incubating;
  * @param <AF> The type of factory used to create aggregations in {@link #aggregation(AggregationKey, Function)}.
  */
 public interface SearchQueryOptionsStep<
-		S extends SearchQueryOptionsStep<?, H, LOS, SF, AF>,
+		E,
+		S extends SearchQueryOptionsStep<E, ?, H, LOS, SF, AF>,
 		H,
 		LOS,
-		SF extends SearchSortFactory,
-		AF extends SearchAggregationFactory>
+		SF extends SearchSortFactory<E>,
+		AF extends SearchAggregationFactory<E>>
 		extends SearchQueryFinalStep<H>, SearchFetchable<H> {
 
 	/**

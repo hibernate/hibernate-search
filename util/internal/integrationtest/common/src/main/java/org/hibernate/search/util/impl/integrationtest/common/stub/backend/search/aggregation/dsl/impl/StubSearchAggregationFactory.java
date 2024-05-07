@@ -6,6 +6,7 @@
  */
 package org.hibernate.search.util.impl.integrationtest.common.stub.backend.search.aggregation.dsl.impl;
 
+import org.hibernate.search.engine.backend.common.DocumentReference;
 import org.hibernate.search.engine.search.aggregation.dsl.spi.AbstractSearchAggregationFactory;
 import org.hibernate.search.engine.search.aggregation.dsl.spi.SearchAggregationDslContext;
 import org.hibernate.search.engine.search.aggregation.spi.SearchAggregationIndexScope;
@@ -13,9 +14,9 @@ import org.hibernate.search.engine.search.predicate.dsl.SearchPredicateFactory;
 
 public class StubSearchAggregationFactory
 		extends
-		AbstractSearchAggregationFactory<StubSearchAggregationFactory, SearchAggregationIndexScope<?>, SearchPredicateFactory> {
+		AbstractSearchAggregationFactory<DocumentReference, StubSearchAggregationFactory, SearchAggregationIndexScope<?>, SearchPredicateFactory<DocumentReference>> {
 	public StubSearchAggregationFactory(
-			SearchAggregationDslContext<SearchAggregationIndexScope<?>, SearchPredicateFactory> dslContext) {
+			SearchAggregationDslContext<DocumentReference, SearchAggregationIndexScope<?>, SearchPredicateFactory<DocumentReference>> dslContext) {
 		super( dslContext );
 	}
 
