@@ -366,33 +366,33 @@ class SearchQueryFetchIT {
 				.hasNoHits();
 	}
 
-	private SearchQueryOptionsStep<?, DocumentReference, ?, ?, ?> matchAllQuerySortByField() {
+	private SearchQueryOptionsStep<?, ?, DocumentReference, ?, ?, ?> matchAllQuerySortByField() {
 		StubMappingScope scope = index.createScope();
 		return scope.query()
 				.where( f -> f.matchAll() )
 				.sort( f -> f.field( "integer" ).asc() );
 	}
 
-	private SearchQueryOptionsStep<?, DocumentReference, ?, ?, ?> matchAllQuerySortByDefault() {
+	private SearchQueryOptionsStep<?, ?, DocumentReference, ?, ?, ?> matchAllQuerySortByDefault() {
 		StubMappingScope scope = index.createScope();
 		return scope.query().where( f -> f.simpleQueryString().field( "text" )
 				.matching( "mostimportantword^100 lessimportantword^10 leastimportantword^0.1" ) );
 	}
 
-	private SearchQueryOptionsStep<?, DocumentReference, ?, ?, ?> matchFirstHalfQuery() {
+	private SearchQueryOptionsStep<?, ?, DocumentReference, ?, ?, ?> matchFirstHalfQuery() {
 		StubMappingScope scope = index.createScope();
 		return scope.query()
 				.where( f -> f.range().field( "integer" ).lessThan( DOCUMENT_COUNT / 2 ) )
 				.sort( f -> f.field( "integer" ).asc() );
 	}
 
-	private SearchQueryOptionsStep<?, DocumentReference, ?, ?, ?> matchOneQuery(int id) {
+	private SearchQueryOptionsStep<?, ?, DocumentReference, ?, ?, ?> matchOneQuery(int id) {
 		StubMappingScope scope = index.createScope();
 		return scope.query()
 				.where( f -> f.match().field( "integer" ).matching( id ) );
 	}
 
-	private SearchQueryOptionsStep<?, DocumentReference, ?, ?, ?> matchNoneQuery() {
+	private SearchQueryOptionsStep<?, ?, DocumentReference, ?, ?, ?> matchNoneQuery() {
 		StubMappingScope scope = index.createScope();
 		return scope.query()
 				.where( f -> f.match().field( "integer" ).matching( DOCUMENT_COUNT + 2 ) );

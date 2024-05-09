@@ -19,8 +19,10 @@ import org.hibernate.engine.spi.ActionQueue;
 import org.hibernate.engine.spi.SessionImplementor;
 import org.hibernate.search.engine.backend.common.spi.EntityReferenceFactory;
 import org.hibernate.search.engine.search.query.dsl.SearchQuerySelectStep;
+import org.hibernate.search.engine.search.reference.RootReferenceScope;
 import org.hibernate.search.mapper.orm.automaticindexing.session.impl.DelegatingAutomaticIndexingSynchronizationStrategy;
 import org.hibernate.search.mapper.orm.automaticindexing.spi.AutomaticIndexingEventSendingSessionContext;
+import org.hibernate.search.mapper.orm.common.EntityReference;
 import org.hibernate.search.mapper.orm.loading.impl.HibernateOrmSelectionLoadingContext;
 import org.hibernate.search.mapper.orm.logging.impl.ConfigurationLog;
 import org.hibernate.search.mapper.orm.logging.impl.OrmMiscLog;
@@ -135,34 +137,31 @@ public class HibernateOrmSearchSession extends AbstractPojoSearchSession
 	}
 
 	@Override
-	public <T> SearchQuerySelectStep<?,
-			org.hibernate.search.mapper.orm.common.EntityReference,
-			T,
-			SearchLoadingOptionsStep,
-			?,
-			?> search(
-					Collection<? extends Class<? extends T>> classes) {
+	public <T> SearchQuerySelectStep<T, ?, EntityReference, T, SearchLoadingOptionsStep, ?, ?> search(
+			Collection<? extends Class<? extends T>> classes) {
 		return search( scope( classes ) );
 	}
 
 	@Override
-	public <T> SearchQuerySelectStep<?,
-			org.hibernate.search.mapper.orm.common.EntityReference,
-			T,
-			SearchLoadingOptionsStep,
-			?,
-			?> search(
-					SearchScope<T> scope) {
-		return search( (SearchScopeImpl<T>) scope );
+	public <SR, T> SearchQuerySelectStep<SR, ?, EntityReference, T, SearchLoadingOptionsStep, ?, ?> search(
+			SearchScope<SR, T> scope) {
+		return search( (SearchScopeImpl<SR, T>) scope );
 	}
 
-	public <T> SearchQuerySelectStep<?,
-			org.hibernate.search.mapper.orm.common.EntityReference,
+	@Override
+	public <SR, T> SearchQuerySelectStep<SR, ?, EntityReference, T, SearchLoadingOptionsStep, ?, ?> search(
+			RootReferenceScope<SR, T> scope) {
+		SearchScope<SR, T> scope1 = scope.create( this );
+		return search( (SearchScopeImpl<SR, T>) scope1 );
+	}
+
+	private <SR, T> SearchQuerySelectStep<SR,
+			?,
+			EntityReference,
 			T,
 			SearchLoadingOptionsStep,
 			?,
-			?> search(
-					SearchScopeImpl<T> scope) {
+			?> search(SearchScopeImpl<SR, T> scope) {
 		return scope.search( this, loadingContextBuilder() );
 	}
 
@@ -182,13 +181,13 @@ public class HibernateOrmSearchSession extends AbstractPojoSearchSession
 	}
 
 	@Override
-	public <T> SearchScopeImpl<T> scope(Collection<? extends Class<? extends T>> classes) {
+	public <SR, T> SearchScopeImpl<SR, T> scope(Collection<? extends Class<? extends T>> classes) {
 		checkOpen();
 		return mappingContext.createScope( classes );
 	}
 
 	@Override
-	public <T> SearchScope<T> scope(Class<T> expectedSuperType, Collection<String> entityNames) {
+	public <SR, T> SearchScope<SR, T> scope(Class<T> expectedSuperType, Collection<String> entityNames) {
 		checkOpen();
 		return mappingContext.createScope( expectedSuperType, entityNames );
 	}

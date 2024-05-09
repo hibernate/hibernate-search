@@ -37,14 +37,15 @@ import org.hibernate.search.engine.search.sort.dsl.SearchSortFactory;
 import org.hibernate.search.engine.search.sort.dsl.SortFinalStep;
 
 public abstract class AbstractSearchQueryOptionsStep<
-		S extends SearchQueryOptionsStep<S, H, LOS, SF, AF>,
+		SR,
+		S extends SearchQueryOptionsStep<SR, S, H, LOS, SF, AF>,
 		H,
 		LOS,
-		PDF extends SearchPredicateFactory,
-		SF extends SearchSortFactory,
-		AF extends SearchAggregationFactory,
+		PDF extends SearchPredicateFactory<SR>,
+		SF extends SearchSortFactory<SR>,
+		AF extends SearchAggregationFactory<SR>,
 		SC extends SearchQueryIndexScope<?>>
-		implements SearchQueryWhereStep<S, H, LOS, PDF>, SearchQueryOptionsStep<S, H, LOS, SF, AF> {
+		implements SearchQueryWhereStep<SR, S, H, LOS, PDF>, SearchQueryOptionsStep<SR, S, H, LOS, SF, AF> {
 
 	protected final SC scope;
 	private final SearchQueryBuilder<H> searchQueryBuilder;
@@ -72,9 +73,9 @@ public abstract class AbstractSearchQueryOptionsStep<
 	}
 
 	@Override
-	public S where(BiConsumer<? super PDF, ? super SimpleBooleanPredicateClausesCollector<?>> predicateContributor) {
+	public S where(BiConsumer<? super PDF, ? super SimpleBooleanPredicateClausesCollector<SR, ?>> predicateContributor) {
 		PDF factory = predicateFactory();
-		SimpleBooleanPredicateClausesStep<?> andStep = factory.and();
+		SimpleBooleanPredicateClausesStep<SR, ?> andStep = factory.and();
 		predicateContributor.accept( factory, andStep );
 		searchQueryBuilder.predicate( andStep.toPredicate() );
 		return thisAsS();

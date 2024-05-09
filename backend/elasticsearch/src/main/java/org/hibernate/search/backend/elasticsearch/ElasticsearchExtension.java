@@ -60,21 +60,23 @@ import org.hibernate.search.engine.search.sort.dsl.SearchSortFactoryExtension;
  *
  * @see #get()
  */
-public final class ElasticsearchExtension<H, R, E, LOS>
-		implements SearchQueryDslExtension<ElasticsearchSearchQuerySelectStep<R, E, LOS>, R, E, LOS>,
+public final class ElasticsearchExtension<SR, H, R, E, LOS>
+		implements SearchQueryDslExtension<SR, ElasticsearchSearchQuerySelectStep<SR, R, E, LOS>, R, E, LOS>,
 		SearchQueryExtension<ElasticsearchSearchQuery<H>, H>,
-		SearchPredicateFactoryExtension<ElasticsearchSearchPredicateFactory>,
-		SearchSortFactoryExtension<ElasticsearchSearchSortFactory>,
-		SearchProjectionFactoryExtension<ElasticsearchSearchProjectionFactory<R, E>, R, E>,
-		SearchAggregationFactoryExtension<ElasticsearchSearchAggregationFactory>,
+		SearchPredicateFactoryExtension<SR, ElasticsearchSearchPredicateFactory<SR>>,
+		SearchSortFactoryExtension<SR, ElasticsearchSearchSortFactory<SR>>,
+		SearchProjectionFactoryExtension<SR, ElasticsearchSearchProjectionFactory<SR, R, E>, R, E>,
+		SearchAggregationFactoryExtension<SR, ElasticsearchSearchAggregationFactory<SR>>,
 		IndexFieldTypeFactoryExtension<ElasticsearchIndexFieldTypeFactory>,
 		SchemaExportExtension<ElasticsearchIndexSchemaExport> {
 
-	private static final ElasticsearchExtension<Object, Object, Object, Object> INSTANCE = new ElasticsearchExtension<>();
+	private static final ElasticsearchExtension<Object, Object, Object, Object, Object> INSTANCE =
+			new ElasticsearchExtension<>();
 
 	/**
 	 * Get the extension with generic parameters automatically set as appropriate for the context in which it's used.
 	 *
+	 * @param <SR> Scope root type.
 	 * @param <H> The type of query hits.
 	 * Users should not have to care about this, as the parameter will automatically take the appropriate value when calling
 	 * {@code .extension( ElasticsearchExtension.get() )}.
@@ -90,8 +92,8 @@ public final class ElasticsearchExtension<H, R, E, LOS>
 	 * @return The extension.
 	 */
 	@SuppressWarnings("unchecked") // The instance works for any H, R, E and LOS
-	public static <H, R, E, LOS> ElasticsearchExtension<H, R, E, LOS> get() {
-		return (ElasticsearchExtension<H, R, E, LOS>) INSTANCE;
+	public static <SR, H, R, E, LOS> ElasticsearchExtension<SR, H, R, E, LOS> get() {
+		return (ElasticsearchExtension<SR, H, R, E, LOS>) INSTANCE;
 	}
 
 	private ElasticsearchExtension() {
@@ -102,8 +104,8 @@ public final class ElasticsearchExtension<H, R, E, LOS>
 	 * {@inheritDoc}
 	 */
 	@Override
-	public Optional<ElasticsearchSearchQuerySelectStep<R, E, LOS>> extendOptional(
-			SearchQuerySelectStep<?, R, E, LOS, ?, ?> original,
+	public Optional<ElasticsearchSearchQuerySelectStep<SR, R, E, LOS>> extendOptional(
+			SearchQuerySelectStep<SR, ?, R, E, LOS, ?, ?> original,
 			SearchQueryIndexScope<?> scope,
 			BackendSessionContext sessionContext,
 			SearchLoadingContextBuilder<E, LOS> loadingContextBuilder) {
@@ -135,9 +137,9 @@ public final class ElasticsearchExtension<H, R, E, LOS>
 	 * {@inheritDoc}
 	 */
 	@Override
-	public Optional<ElasticsearchSearchPredicateFactory> extendOptional(SearchPredicateFactory original) {
+	public Optional<ElasticsearchSearchPredicateFactory<SR>> extendOptional(SearchPredicateFactory<SR> original) {
 		if ( original instanceof ElasticsearchSearchPredicateFactory ) {
-			return Optional.of( (ElasticsearchSearchPredicateFactory) original );
+			return Optional.of( (ElasticsearchSearchPredicateFactory<SR>) original );
 		}
 		else {
 			return Optional.empty();
@@ -148,10 +150,10 @@ public final class ElasticsearchExtension<H, R, E, LOS>
 	 * {@inheritDoc}
 	 */
 	@Override
-	public Optional<ElasticsearchSearchSortFactory> extendOptional(
-			SearchSortFactory original) {
+	public Optional<ElasticsearchSearchSortFactory<SR>> extendOptional(
+			SearchSortFactory<SR> original) {
 		if ( original instanceof ElasticsearchSearchSortFactory ) {
-			return Optional.of( (ElasticsearchSearchSortFactory) original );
+			return Optional.of( (ElasticsearchSearchSortFactory<SR>) original );
 		}
 		else {
 			return Optional.empty();
@@ -162,9 +164,9 @@ public final class ElasticsearchExtension<H, R, E, LOS>
 	 * {@inheritDoc}
 	 */
 	@Override
-	public Optional<ElasticsearchSearchProjectionFactory<R, E>> extendOptional(SearchProjectionFactory<R, E> original) {
+	public Optional<ElasticsearchSearchProjectionFactory<SR, R, E>> extendOptional(SearchProjectionFactory<SR, R, E> original) {
 		if ( original instanceof ElasticsearchSearchProjectionFactory ) {
-			return Optional.of( (ElasticsearchSearchProjectionFactory<R, E>) original );
+			return Optional.of( (ElasticsearchSearchProjectionFactory<SR, R, E>) original );
 		}
 		else {
 			return Optional.empty();
@@ -175,10 +177,10 @@ public final class ElasticsearchExtension<H, R, E, LOS>
 	 * {@inheritDoc}
 	 */
 	@Override
-	public Optional<ElasticsearchSearchAggregationFactory> extendOptional(
-			SearchAggregationFactory original) {
+	public Optional<ElasticsearchSearchAggregationFactory<SR>> extendOptional(
+			SearchAggregationFactory<SR> original) {
 		if ( original instanceof ElasticsearchSearchAggregationFactory ) {
-			return Optional.of( (ElasticsearchSearchAggregationFactory) original );
+			return Optional.of( (ElasticsearchSearchAggregationFactory<SR>) original );
 		}
 		else {
 			return Optional.empty();

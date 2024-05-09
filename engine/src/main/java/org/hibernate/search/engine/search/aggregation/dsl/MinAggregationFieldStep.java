@@ -13,10 +13,11 @@ import org.hibernate.search.util.common.annotation.Incubating;
 /**
  * The initial step in a "min" aggregation definition, where the target field can be set.
  *
+ * @param <SR> Scope root type.
  * @param <PDF> The type of factory used to create predicates in {@link AggregationFilterStep#filter(Function)}.
  */
 @Incubating
-public interface MinAggregationFieldStep<PDF extends SearchPredicateFactory> {
+public interface MinAggregationFieldStep<SR, PDF extends SearchPredicateFactory<SR>> {
 
 	/**
 	 * Target the given field in the min aggregation.
@@ -26,7 +27,7 @@ public interface MinAggregationFieldStep<PDF extends SearchPredicateFactory> {
 	 * @param <F> The type of field values.
 	 * @return The next step.
 	 */
-	default <F> MinAggregationOptionsStep<?, PDF, F> field(String fieldPath, Class<F> type) {
+	default <F> MinAggregationOptionsStep<SR, ?, PDF, F> field(String fieldPath, Class<F> type) {
 		return field( fieldPath, type, ValueModel.MAPPING );
 	}
 
@@ -40,6 +41,6 @@ public interface MinAggregationFieldStep<PDF extends SearchPredicateFactory> {
 	 * See {@link ValueModel}.
 	 * @return The next step.
 	 */
-	<F> MinAggregationOptionsStep<?, PDF, F> field(String fieldPath, Class<F> type, ValueModel valueModel);
+	<F> MinAggregationOptionsStep<SR, ?, PDF, F> field(String fieldPath, Class<F> type, ValueModel valueModel);
 
 }

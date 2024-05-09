@@ -56,7 +56,7 @@ class BooleanSortAndRangePredicateIT {
 	}
 
 	private SearchQuery<DocumentReference> sortQuery(
-			Function<? super SearchSortFactory, ? extends SortFinalStep> sortContributor) {
+			Function<? super SearchSortFactory<?>, ? extends SortFinalStep> sortContributor) {
 		StubMappingScope scope = index.createScope();
 		return scope.query()
 				.where( f -> f.matchAll() )
@@ -64,7 +64,7 @@ class BooleanSortAndRangePredicateIT {
 				.toQuery();
 	}
 
-	private SearchQuery<DocumentReference> rangeQuery(Function<SearchPredicateFactory, PredicateFinalStep> rangePredicate) {
+	private SearchQuery<DocumentReference> rangeQuery(Function<SearchPredicateFactory<?>, PredicateFinalStep> rangePredicate) {
 		StubMappingScope scope = index.createScope();
 		return scope.query()
 				.where( rangePredicate )
