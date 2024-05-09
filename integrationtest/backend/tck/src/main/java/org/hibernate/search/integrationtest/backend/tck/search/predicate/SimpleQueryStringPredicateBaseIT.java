@@ -12,7 +12,7 @@ import org.hibernate.search.engine.search.predicate.dsl.SimpleQueryStringPredica
 class SimpleQueryStringPredicateBaseIT extends AbstractBaseQueryStringPredicateBaseIT<SimpleQueryStringPredicateFieldStep<?>> {
 	//CHECKSTYLE:ON
 	@Override
-	SimpleQueryStringPredicateFieldStep<?> predicate(SearchPredicateFactory f) {
+	SimpleQueryStringPredicateFieldStep<?> predicate(SearchPredicateFactory<?> f) {
 		return f.simpleQueryString();
 	}
 

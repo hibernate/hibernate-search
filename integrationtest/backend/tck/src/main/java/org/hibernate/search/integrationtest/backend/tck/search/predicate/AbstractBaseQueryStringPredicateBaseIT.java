@@ -119,7 +119,7 @@ abstract class AbstractBaseQueryStringPredicateBaseIT<P extends CommonQueryStrin
 	class SingleFieldIT extends SingleFieldConfigured {
 		// JDK 11 does not allow static fields in non-static inner class and JUnit does not allow running @Nested tests in static inner classes...
 		@Override
-		CommonQueryStringPredicateFieldStep<?> predicate(SearchPredicateFactory f) {
+		CommonQueryStringPredicateFieldStep<?> predicate(SearchPredicateFactory<?> f) {
 			return AbstractBaseQueryStringPredicateBaseIT.this.predicate( f );
 		}
 	}
@@ -145,13 +145,13 @@ abstract class AbstractBaseQueryStringPredicateBaseIT<P extends CommonQueryStrin
 		}
 
 		@Override
-		protected PredicateFinalStep predicate(SearchPredicateFactory f, String fieldPath, int matchingDocOrdinal,
+		protected PredicateFinalStep predicate(SearchPredicateFactory<?> f, String fieldPath, int matchingDocOrdinal,
 				DataSet<?, CommonQueryStringPredicateTestValues<?>> dataSet) {
 			return predicate( f ).field( fieldPath ).matching( dataSet.values.matchingArg( matchingDocOrdinal ) );
 		}
 
 		@Override
-		protected PredicateFinalStep predicate(SearchPredicateFactory f, String fieldPath, String paramName,
+		protected PredicateFinalStep predicate(SearchPredicateFactory<?> f, String fieldPath, String paramName,
 				DataSet<?, CommonQueryStringPredicateTestValues<?>> dataSet) {
 			return f.withParameters( params -> predicate( f ).field( fieldPath )
 					.matching( params.get( paramName, String.class ) ) );
@@ -163,14 +163,14 @@ abstract class AbstractBaseQueryStringPredicateBaseIT<P extends CommonQueryStrin
 			return Map.of( paramName, dataSet.values.matchingArg( matchingDocOrdinal ) );
 		}
 
-		abstract CommonQueryStringPredicateFieldStep<?> predicate(SearchPredicateFactory f);
+		abstract CommonQueryStringPredicateFieldStep<?> predicate(SearchPredicateFactory<?> f);
 	}
 
 	@Nested
 	class MultiFieldIT extends MultiFieldConfigured {
 		// JDK 11 does not allow static fields in non-static inner class and JUnit does not allow running @Nested tests in static inner classes...
 		@Override
-		CommonQueryStringPredicateFieldStep<?> predicate(SearchPredicateFactory f) {
+		CommonQueryStringPredicateFieldStep<?> predicate(SearchPredicateFactory<?> f) {
 			return AbstractBaseQueryStringPredicateBaseIT.this.predicate( f );
 		}
 	}
@@ -195,33 +195,33 @@ abstract class AbstractBaseQueryStringPredicateBaseIT<P extends CommonQueryStrin
 		}
 
 		@Override
-		protected PredicateFinalStep predicateOnFieldAndField(SearchPredicateFactory f, String fieldPath,
+		protected PredicateFinalStep predicateOnFieldAndField(SearchPredicateFactory<?> f, String fieldPath,
 				String otherFieldPath, int matchingDocOrdinal, DataSet<?, CommonQueryStringPredicateTestValues<?>> dataSet) {
 			return predicate( f ).field( fieldPath ).field( otherFieldPath )
 					.matching( dataSet.values.matchingArg( matchingDocOrdinal ) );
 		}
 
 		@Override
-		protected PredicateFinalStep predicateOnFields(SearchPredicateFactory f, String[] fieldPaths, int matchingDocOrdinal,
+		protected PredicateFinalStep predicateOnFields(SearchPredicateFactory<?> f, String[] fieldPaths, int matchingDocOrdinal,
 				DataSet<?, CommonQueryStringPredicateTestValues<?>> dataSet) {
 			return predicate( f ).fields( fieldPaths ).matching( dataSet.values.matchingArg( matchingDocOrdinal ) );
 		}
 
 		@Override
-		protected PredicateFinalStep predicateOnFieldAndFields(SearchPredicateFactory f, String fieldPath,
+		protected PredicateFinalStep predicateOnFieldAndFields(SearchPredicateFactory<?> f, String fieldPath,
 				String[] fieldPaths, int matchingDocOrdinal, DataSet<?, CommonQueryStringPredicateTestValues<?>> dataSet) {
 			return predicate( f ).field( fieldPath ).fields( fieldPaths )
 					.matching( dataSet.values.matchingArg( matchingDocOrdinal ) );
 		}
 
-		abstract CommonQueryStringPredicateFieldStep<?> predicate(SearchPredicateFactory f);
+		abstract CommonQueryStringPredicateFieldStep<?> predicate(SearchPredicateFactory<?> f);
 	}
 
 	@Nested
 	class InObjectFieldIT extends InObjectFieldConfigured {
 		// JDK 11 does not allow static fields in non-static inner class and JUnit does not allow running @Nested tests in static inner classes...
 		@Override
-		CommonQueryStringPredicateFieldStep<?> predicate(SearchPredicateFactory f) {
+		CommonQueryStringPredicateFieldStep<?> predicate(SearchPredicateFactory<?> f) {
 			return AbstractBaseQueryStringPredicateBaseIT.this.predicate( f );
 		}
 	}
@@ -251,19 +251,19 @@ abstract class AbstractBaseQueryStringPredicateBaseIT<P extends CommonQueryStrin
 		}
 
 		@Override
-		protected PredicateFinalStep predicate(SearchPredicateFactory f, String fieldPath, int matchingDocOrdinal,
+		protected PredicateFinalStep predicate(SearchPredicateFactory<?> f, String fieldPath, int matchingDocOrdinal,
 				DataSet<?, CommonQueryStringPredicateTestValues<?>> dataSet) {
 			return predicate( f ).field( fieldPath ).matching( dataSet.values.matchingArg( matchingDocOrdinal ) );
 		}
 
-		abstract CommonQueryStringPredicateFieldStep<?> predicate(SearchPredicateFactory f);
+		abstract CommonQueryStringPredicateFieldStep<?> predicate(SearchPredicateFactory<?> f);
 	}
 
 	@Nested
 	class AnalysisIT extends AnalysisConfigured {
 		// JDK 11 does not allow static fields in non-static inner class and JUnit does not allow running @Nested tests in static inner classes...
 		@Override
-		CommonQueryStringPredicateFieldStep<?> predicate(SearchPredicateFactory f) {
+		CommonQueryStringPredicateFieldStep<?> predicate(SearchPredicateFactory<?> f) {
 			return AbstractBaseQueryStringPredicateBaseIT.this.predicate( f );
 		}
 	}
@@ -283,30 +283,30 @@ abstract class AbstractBaseQueryStringPredicateBaseIT<P extends CommonQueryStrin
 		}
 
 		@Override
-		protected PredicateFinalStep predicate(SearchPredicateFactory f, String fieldPath, String matchingParam) {
+		protected PredicateFinalStep predicate(SearchPredicateFactory<?> f, String fieldPath, String matchingParam) {
 			return predicate( f ).field( fieldPath ).matching( matchingParam );
 		}
 
 		@Override
-		protected PredicateFinalStep predicateWithAnalyzerOverride(SearchPredicateFactory f, String fieldPath,
+		protected PredicateFinalStep predicateWithAnalyzerOverride(SearchPredicateFactory<?> f, String fieldPath,
 				String matchingParam, String analyzerName) {
 			return predicate( f ).field( fieldPath ).matching( matchingParam ).analyzer( analyzerName );
 		}
 
 		@Override
-		protected PredicateFinalStep predicateWithSkipAnalysis(SearchPredicateFactory f, String fieldPath,
+		protected PredicateFinalStep predicateWithSkipAnalysis(SearchPredicateFactory<?> f, String fieldPath,
 				String matchingParam) {
 			return predicate( f ).field( fieldPath ).matching( matchingParam ).skipAnalysis();
 		}
 
-		abstract CommonQueryStringPredicateFieldStep<?> predicate(SearchPredicateFactory f);
+		abstract CommonQueryStringPredicateFieldStep<?> predicate(SearchPredicateFactory<?> f);
 	}
 
 	@Nested
 	class ScoreIT extends ScoreConfigured {
 		// JDK 11 does not allow static fields in non-static inner class and JUnit does not allow running @Nested tests in static inner classes...
 		@Override
-		CommonQueryStringPredicateFieldStep<?> predicate(SearchPredicateFactory f) {
+		CommonQueryStringPredicateFieldStep<?> predicate(SearchPredicateFactory<?> f) {
 			return AbstractBaseQueryStringPredicateBaseIT.this.predicate( f );
 		}
 	}
@@ -338,14 +338,14 @@ abstract class AbstractBaseQueryStringPredicateBaseIT<P extends CommonQueryStrin
 		}
 
 		@Override
-		protected PredicateFinalStep predicate(SearchPredicateFactory f, String fieldPath, int matchingDocOrdinal,
+		protected PredicateFinalStep predicate(SearchPredicateFactory<?> f, String fieldPath, int matchingDocOrdinal,
 				DataSet<?, CommonQueryStringPredicateTestValues<?>> dataSet) {
 			return predicate( f ).field( fieldPath )
 					.matching( dataSet.values.matchingArg( matchingDocOrdinal ) );
 		}
 
 		@Override
-		protected PredicateFinalStep predicateWithConstantScore(SearchPredicateFactory f, String[] fieldPaths,
+		protected PredicateFinalStep predicateWithConstantScore(SearchPredicateFactory<?> f, String[] fieldPaths,
 				int matchingDocOrdinal, DataSet<?, CommonQueryStringPredicateTestValues<?>> dataSet) {
 			return predicate( f ).fields( fieldPaths )
 					.matching( dataSet.values.matchingArg( matchingDocOrdinal ) )
@@ -353,7 +353,7 @@ abstract class AbstractBaseQueryStringPredicateBaseIT<P extends CommonQueryStrin
 		}
 
 		@Override
-		protected PredicateFinalStep predicateWithPredicateLevelBoost(SearchPredicateFactory f, String[] fieldPaths,
+		protected PredicateFinalStep predicateWithPredicateLevelBoost(SearchPredicateFactory<?> f, String[] fieldPaths,
 				int matchingDocOrdinal, float predicateBoost, DataSet<?, CommonQueryStringPredicateTestValues<?>> dataSet) {
 			return predicate( f ).fields( fieldPaths )
 					.matching( dataSet.values.matchingArg( matchingDocOrdinal ) )
@@ -361,7 +361,7 @@ abstract class AbstractBaseQueryStringPredicateBaseIT<P extends CommonQueryStrin
 		}
 
 		@Override
-		protected PredicateFinalStep predicateWithConstantScoreAndPredicateLevelBoost(SearchPredicateFactory f,
+		protected PredicateFinalStep predicateWithConstantScoreAndPredicateLevelBoost(SearchPredicateFactory<?> f,
 				String[] fieldPaths, int matchingDocOrdinal, float predicateBoost,
 				DataSet<?, CommonQueryStringPredicateTestValues<?>> dataSet) {
 			return predicate( f ).fields( fieldPaths )
@@ -370,14 +370,14 @@ abstract class AbstractBaseQueryStringPredicateBaseIT<P extends CommonQueryStrin
 		}
 
 		@Override
-		protected PredicateFinalStep predicateWithFieldLevelBoost(SearchPredicateFactory f, String fieldPath,
+		protected PredicateFinalStep predicateWithFieldLevelBoost(SearchPredicateFactory<?> f, String fieldPath,
 				float fieldBoost, int matchingDocOrdinal, DataSet<?, CommonQueryStringPredicateTestValues<?>> dataSet) {
 			return predicate( f ).field( fieldPath ).boost( fieldBoost )
 					.matching( dataSet.values.matchingArg( matchingDocOrdinal ) );
 		}
 
 		@Override
-		protected PredicateFinalStep predicateWithFieldLevelBoostAndConstantScore(SearchPredicateFactory f,
+		protected PredicateFinalStep predicateWithFieldLevelBoostAndConstantScore(SearchPredicateFactory<?> f,
 				String fieldPath, float fieldBoost, int matchingDocOrdinal,
 				DataSet<?, CommonQueryStringPredicateTestValues<?>> dataSet) {
 			return predicate( f ).field( fieldPath ).boost( fieldBoost )
@@ -386,7 +386,7 @@ abstract class AbstractBaseQueryStringPredicateBaseIT<P extends CommonQueryStrin
 		}
 
 		@Override
-		protected PredicateFinalStep predicateWithFieldLevelBoostAndPredicateLevelBoost(SearchPredicateFactory f,
+		protected PredicateFinalStep predicateWithFieldLevelBoostAndPredicateLevelBoost(SearchPredicateFactory<?> f,
 				String fieldPath, float fieldBoost, int matchingDocOrdinal, float predicateBoost,
 				DataSet<?, CommonQueryStringPredicateTestValues<?>> dataSet) {
 			return predicate( f ).field( fieldPath ).boost( fieldBoost )
@@ -394,14 +394,14 @@ abstract class AbstractBaseQueryStringPredicateBaseIT<P extends CommonQueryStrin
 					.boost( predicateBoost );
 		}
 
-		abstract CommonQueryStringPredicateFieldStep<?> predicate(SearchPredicateFactory f);
+		abstract CommonQueryStringPredicateFieldStep<?> predicate(SearchPredicateFactory<?> f);
 	}
 
 	@Nested
 	class InvalidFieldIT extends InvalidFieldConfigured {
 		// JDK 11 does not allow static fields in non-static inner class and JUnit does not allow running @Nested tests in static inner classes...
 		@Override
-		CommonQueryStringPredicateFieldStep<?> predicate(SearchPredicateFactory f) {
+		CommonQueryStringPredicateFieldStep<?> predicate(SearchPredicateFactory<?> f) {
 			return AbstractBaseQueryStringPredicateBaseIT.this.predicate( f );
 		}
 
@@ -421,20 +421,20 @@ abstract class AbstractBaseQueryStringPredicateBaseIT<P extends CommonQueryStrin
 		}
 
 		@Override
-		protected void tryPredicate(SearchPredicateFactory f, String fieldPath) {
+		protected void tryPredicate(SearchPredicateFactory<?> f, String fieldPath) {
 			predicate( f ).field( fieldPath );
 		}
 
 		protected abstract String predicateTrait();
 
-		abstract CommonQueryStringPredicateFieldStep<?> predicate(SearchPredicateFactory f);
+		abstract CommonQueryStringPredicateFieldStep<?> predicate(SearchPredicateFactory<?> f);
 	}
 
 	@Nested
 	class UnsupportedTypeIT extends UnsupportedTypeConfigured {
 		// JDK 11 does not allow static fields in non-static inner class and JUnit does not allow running @Nested tests in static inner classes...
 		@Override
-		CommonQueryStringPredicateFieldStep<?> predicate(SearchPredicateFactory f) {
+		CommonQueryStringPredicateFieldStep<?> predicate(SearchPredicateFactory<?> f) {
 			return AbstractBaseQueryStringPredicateBaseIT.this.predicate( f );
 		}
 
@@ -461,13 +461,13 @@ abstract class AbstractBaseQueryStringPredicateBaseIT<P extends CommonQueryStrin
 		}
 
 		@Override
-		protected void tryPredicate(SearchPredicateFactory f, String fieldPath) {
+		protected void tryPredicate(SearchPredicateFactory<?> f, String fieldPath) {
 			predicate( f ).field( fieldPath );
 		}
 
 		protected abstract String predicateTrait();
 
-		abstract CommonQueryStringPredicateFieldStep<?> predicate(SearchPredicateFactory f);
+		abstract CommonQueryStringPredicateFieldStep<?> predicate(SearchPredicateFactory<?> f);
 	}
 
 	@Nested
@@ -475,7 +475,7 @@ abstract class AbstractBaseQueryStringPredicateBaseIT<P extends CommonQueryStrin
 		// JDK 11 does not allow static fields in non-static inner class and JUnit does not allow running @Nested tests in static inner classes...
 
 		@Override
-		CommonQueryStringPredicateFieldStep<?> predicate(SearchPredicateFactory f) {
+		CommonQueryStringPredicateFieldStep<?> predicate(SearchPredicateFactory<?> f) {
 			return AbstractBaseQueryStringPredicateBaseIT.this.predicate( f );
 		}
 
@@ -509,20 +509,20 @@ abstract class AbstractBaseQueryStringPredicateBaseIT<P extends CommonQueryStrin
 		}
 
 		@Override
-		protected void tryPredicate(SearchPredicateFactory f, String fieldPath, FieldTypeDescriptor<?, ?> fieldType) {
+		protected void tryPredicate(SearchPredicateFactory<?> f, String fieldPath, FieldTypeDescriptor<?, ?> fieldType) {
 			predicate( f ).field( fieldPath );
 		}
 
 		protected abstract String predicateTrait();
 
-		abstract CommonQueryStringPredicateFieldStep<?> predicate(SearchPredicateFactory f);
+		abstract CommonQueryStringPredicateFieldStep<?> predicate(SearchPredicateFactory<?> f);
 	}
 
 	@Nested
 	class ArgumentCheckingIT extends ArgumentCheckingConfigured {
 		// JDK 11 does not allow static fields in non-static inner class and JUnit does not allow running @Nested tests in static inner classes...
 		@Override
-		CommonQueryStringPredicateFieldStep<?> predicate(SearchPredicateFactory f) {
+		CommonQueryStringPredicateFieldStep<?> predicate(SearchPredicateFactory<?> f) {
 			return AbstractBaseQueryStringPredicateBaseIT.this.predicate( f );
 		}
 	}
@@ -544,18 +544,18 @@ abstract class AbstractBaseQueryStringPredicateBaseIT<P extends CommonQueryStrin
 		}
 
 		@Override
-		protected void tryPredicateWithNullMatchingParam(SearchPredicateFactory f, String fieldPath) {
+		protected void tryPredicateWithNullMatchingParam(SearchPredicateFactory<?> f, String fieldPath) {
 			predicate( f ).field( fieldPath ).matching( null );
 		}
 
-		abstract CommonQueryStringPredicateFieldStep<?> predicate(SearchPredicateFactory f);
+		abstract CommonQueryStringPredicateFieldStep<?> predicate(SearchPredicateFactory<?> f);
 	}
 
 	@Nested
 	class TypeCheckingNoConversionIT extends TypeCheckingNoConversionConfigured {
 		// JDK 11 does not allow static fields in non-static inner class and JUnit does not allow running @Nested tests in static inner classes...
 		@Override
-		CommonQueryStringPredicateFieldStep<?> predicate(SearchPredicateFactory f) {
+		CommonQueryStringPredicateFieldStep<?> predicate(SearchPredicateFactory<?> f) {
 			return AbstractBaseQueryStringPredicateBaseIT.this.predicate( f );
 		}
 
@@ -599,13 +599,13 @@ abstract class AbstractBaseQueryStringPredicateBaseIT<P extends CommonQueryStrin
 		}
 
 		@Override
-		protected PredicateFinalStep predicate(SearchPredicateFactory f, String fieldPath, int matchingDocOrdinal,
+		protected PredicateFinalStep predicate(SearchPredicateFactory<?> f, String fieldPath, int matchingDocOrdinal,
 				DataSet<?, CommonQueryStringPredicateTestValues<?>> dataSet) {
 			return predicate( f ).field( fieldPath ).matching( dataSet.values.matchingArg( matchingDocOrdinal ) );
 		}
 
 		@Override
-		protected PredicateFinalStep predicate(SearchPredicateFactory f, String field0Path, String field1Path,
+		protected PredicateFinalStep predicate(SearchPredicateFactory<?> f, String field0Path, String field1Path,
 				int matchingDocOrdinal, DataSet<?, CommonQueryStringPredicateTestValues<?>> dataSet) {
 			return predicate( f ).field( field0Path ).field( field1Path )
 					.matching( dataSet.values.matchingArg( matchingDocOrdinal ) );
@@ -613,10 +613,10 @@ abstract class AbstractBaseQueryStringPredicateBaseIT<P extends CommonQueryStrin
 
 		protected abstract String predicateTrait();
 
-		abstract CommonQueryStringPredicateFieldStep<?> predicate(SearchPredicateFactory f);
+		abstract CommonQueryStringPredicateFieldStep<?> predicate(SearchPredicateFactory<?> f);
 	}
 
-	abstract P predicate(SearchPredicateFactory f);
+	abstract P predicate(SearchPredicateFactory<?> f);
 
 	protected abstract String predicateTrait();
 }

@@ -34,7 +34,7 @@ abstract class AbstractConnectedMultiFieldsQueryBuilder<T, F extends PredicateSc
 	}
 
 	private SearchPredicate createPredicate() {
-		SearchPredicateFactory factory = queryContext.getScope().predicate();
+		SearchPredicateFactory<?> factory = queryContext.getScope().predicate();
 		if ( fieldsContext.size() == 1 ) {
 			F finalStep = createPredicate( factory, fieldsContext.getFirst() );
 			queryCustomizer.applyScoreOptions( finalStep );
@@ -42,7 +42,7 @@ abstract class AbstractConnectedMultiFieldsQueryBuilder<T, F extends PredicateSc
 			return queryCustomizer.applyFilter( factory, predicate );
 		}
 		else {
-			BooleanPredicateClausesStep<?> boolStep = factory.bool().with( b -> {
+			BooleanPredicateClausesStep<?, ?> boolStep = factory.bool().with( b -> {
 				for ( FieldContext fieldContext : fieldsContext ) {
 					b.should( createPredicate( factory, fieldContext ) );
 				}
@@ -53,5 +53,5 @@ abstract class AbstractConnectedMultiFieldsQueryBuilder<T, F extends PredicateSc
 		}
 	}
 
-	protected abstract F createPredicate(SearchPredicateFactory factory, FieldContext fieldContext);
+	protected abstract F createPredicate(SearchPredicateFactory<?> factory, FieldContext fieldContext);
 }

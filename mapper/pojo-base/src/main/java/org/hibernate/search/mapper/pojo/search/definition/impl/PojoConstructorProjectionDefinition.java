@@ -63,7 +63,7 @@ public final class PojoConstructorProjectionDefinition<T>
 	}
 
 	@Override
-	public CompositeProjectionValueStep<?, T> apply(SearchProjectionFactory<?, ?> projectionFactory,
+	public CompositeProjectionValueStep<?, T> apply(SearchProjectionFactory<?, ?, ?> projectionFactory,
 			CompositeProjectionInnerStep initialStep, ProjectionDefinitionContext context) {
 		int i = -1;
 		try {

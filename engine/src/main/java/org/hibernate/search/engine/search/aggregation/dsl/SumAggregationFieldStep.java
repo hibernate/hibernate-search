@@ -13,10 +13,11 @@ import org.hibernate.search.util.common.annotation.Incubating;
 /**
  * The initial step in a "sum" aggregation definition, where the target field can be set.
  *
+ * @param <SR> Scope root type.
  * @param <PDF> The type of factory used to create predicates in {@link AggregationFilterStep#filter(Function)}.
  */
 @Incubating
-public interface SumAggregationFieldStep<PDF extends SearchPredicateFactory> {
+public interface SumAggregationFieldStep<SR, PDF extends SearchPredicateFactory<SR>> {
 
 	/**
 	 * Target the given field in the sum aggregation.
@@ -26,7 +27,7 @@ public interface SumAggregationFieldStep<PDF extends SearchPredicateFactory> {
 	 * @param <F> The type of field values.
 	 * @return The next step.
 	 */
-	default <F> SumAggregationOptionsStep<?, PDF, F> field(String fieldPath, Class<F> type) {
+	default <F> SumAggregationOptionsStep<SR, ?, PDF, F> field(String fieldPath, Class<F> type) {
 		return field( fieldPath, type, ValueModel.MAPPING );
 	}
 
@@ -40,6 +41,6 @@ public interface SumAggregationFieldStep<PDF extends SearchPredicateFactory> {
 	 * See {@link ValueModel}.
 	 * @return The next step.
 	 */
-	<F> SumAggregationOptionsStep<?, PDF, F> field(String fieldPath, Class<F> type, ValueModel valueModel);
+	<F> SumAggregationOptionsStep<SR, ?, PDF, F> field(String fieldPath, Class<F> type, ValueModel valueModel);
 
 }
