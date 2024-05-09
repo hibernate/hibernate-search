@@ -75,7 +75,7 @@ public class MetricAggregationsTestCase<F> {
 				TestedFieldStructure.of( IndexFieldLocation.ROOT, IndexFieldValueCardinality.SINGLE_VALUED ), typeDescriptor );
 		Class<T> javaClass = typeAssertionHelper.getJavaClass();
 
-		SearchQueryOptionsStep<?, DocumentReference, StubLoadingOptionsStep, ?, ?> step = scope.query()
+		SearchQueryOptionsStep<?, ?, DocumentReference, StubLoadingOptionsStep, ?, ?> step = scope.query()
 				.where( SearchPredicateFactory::matchAll )
 				.aggregation( result.minKey, f -> f.min().field( fieldPath, javaClass, valueModel ) )
 				.aggregation( result.maxKey, f -> f.max().field( fieldPath, javaClass, valueModel ) )
