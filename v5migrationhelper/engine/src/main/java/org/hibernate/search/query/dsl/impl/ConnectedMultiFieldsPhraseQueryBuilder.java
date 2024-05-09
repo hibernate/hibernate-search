@@ -24,7 +24,7 @@ public class ConnectedMultiFieldsPhraseQueryBuilder
 	}
 
 	@Override
-	protected PhrasePredicateOptionsStep<?> createPredicate(SearchPredicateFactory factory, FieldContext fieldContext) {
+	protected PhrasePredicateOptionsStep<?> createPredicate(SearchPredicateFactory<?> factory, FieldContext fieldContext) {
 		PhrasePredicateOptionsStep<?> optionsStep =
 				fieldContext.applyBoost( factory.phrase().field( fieldContext.getField() ) )
 						.matching( phraseContext.getSentence() );

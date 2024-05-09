@@ -13,15 +13,16 @@ import org.hibernate.search.engine.search.common.ValueModel;
 import org.hibernate.search.engine.search.predicate.dsl.SearchPredicateFactory;
 import org.hibernate.search.util.common.impl.Contracts;
 
-public class RangeAggregationFieldStepImpl<PDF extends SearchPredicateFactory> implements RangeAggregationFieldStep<PDF> {
-	private final SearchAggregationDslContext<?, ? extends PDF> dslContext;
+public class RangeAggregationFieldStepImpl<SR, PDF extends SearchPredicateFactory<SR>>
+		implements RangeAggregationFieldStep<SR, PDF> {
+	private final SearchAggregationDslContext<SR, ?, ? extends PDF> dslContext;
 
-	public RangeAggregationFieldStepImpl(SearchAggregationDslContext<?, ? extends PDF> dslContext) {
+	public RangeAggregationFieldStepImpl(SearchAggregationDslContext<SR, ?, ? extends PDF> dslContext) {
 		this.dslContext = dslContext;
 	}
 
 	@Override
-	public <F> RangeAggregationRangeStep<?, PDF, F> field(String fieldPath, Class<F> type,
+	public <F> RangeAggregationRangeStep<SR, ?, PDF, F> field(String fieldPath, Class<F> type,
 			ValueModel valueModel) {
 		Contracts.assertNotNull( fieldPath, "fieldPath" );
 		Contracts.assertNotNull( type, "type" );

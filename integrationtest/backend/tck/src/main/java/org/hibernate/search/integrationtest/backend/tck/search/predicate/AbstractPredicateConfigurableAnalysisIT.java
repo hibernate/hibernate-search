@@ -178,9 +178,9 @@ public abstract class AbstractPredicateConfigurableAnalysisIT extends AbstractPr
 				} );
 	}
 
-	protected abstract PredicateFinalStep predicateWithAnalyzerOverride(SearchPredicateFactory f, String fieldPath,
+	protected abstract PredicateFinalStep predicateWithAnalyzerOverride(SearchPredicateFactory<?> f, String fieldPath,
 			String matchingParam, String analyzerName);
 
-	protected abstract PredicateFinalStep predicateWithSkipAnalysis(SearchPredicateFactory f, String fieldPath,
+	protected abstract PredicateFinalStep predicateWithSkipAnalysis(SearchPredicateFactory<?> f, String fieldPath,
 			String matchingParam);
 }

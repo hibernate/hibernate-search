@@ -17,11 +17,12 @@ import org.hibernate.search.engine.search.predicate.dsl.SearchPredicateFactory;
  * @param <A> The type of result for this aggregation.
  */
 public interface TermsAggregationOptionsStep<
-		S extends TermsAggregationOptionsStep<?, PDF, F, A>,
-		PDF extends SearchPredicateFactory,
+		SR,
+		S extends TermsAggregationOptionsStep<SR, ?, PDF, F, A>,
+		PDF extends SearchPredicateFactory<SR>,
 		F,
 		A>
-		extends AggregationFinalStep<A>, AggregationFilterStep<S, PDF> {
+		extends AggregationFinalStep<A>, AggregationFilterStep<SR, S, PDF> {
 
 	/**
 	 * Order buckets by descending document count in the aggregation result.

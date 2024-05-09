@@ -56,7 +56,7 @@ public abstract class DistanceProjectionDefinition<F> extends AbstractProjection
 		}
 
 		@Override
-		public SearchProjection<Double> create(SearchProjectionFactory<?, ?> factory, ProjectionDefinitionContext context) {
+		public SearchProjection<Double> create(SearchProjectionFactory<?, ?, ?> factory, ProjectionDefinitionContext context) {
 			return factory.withParameters( params -> factory
 					.distance( fieldPath, params.get( parameterName, GeoPoint.class ) )
 					.unit( unit )
@@ -78,7 +78,7 @@ public abstract class DistanceProjectionDefinition<F> extends AbstractProjection
 		}
 
 		@Override
-		public SearchProjection<List<Double>> create(SearchProjectionFactory<?, ?> factory,
+		public SearchProjection<List<Double>> create(SearchProjectionFactory<?, ?, ?> factory,
 				ProjectionDefinitionContext context) {
 			return factory.withParameters( params -> factory
 					.distance( fieldPath, params.get( parameterName, GeoPoint.class ) )
@@ -104,7 +104,7 @@ public abstract class DistanceProjectionDefinition<F> extends AbstractProjection
 		}
 
 		@Override
-		public SearchProjection<C> create(SearchProjectionFactory<?, ?> factory,
+		public SearchProjection<C> create(SearchProjectionFactory<?, ?, ?> factory,
 				ProjectionDefinitionContext context) {
 			return factory.withParameters( params -> factory
 					.distance( fieldPath, params.get( parameterName, GeoPoint.class ) )
