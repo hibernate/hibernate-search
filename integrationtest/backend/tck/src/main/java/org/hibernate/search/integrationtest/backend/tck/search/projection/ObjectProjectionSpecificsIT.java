@@ -44,7 +44,7 @@ class ObjectProjectionSpecificsIT {
 
 	@Test
 	void nullFieldPath() {
-		assertThatThrownBy( () -> index.createScope().projection().object( null ) )
+		assertThatThrownBy( () -> index.createScope().projection().object( (String) null ) )
 				.isInstanceOf( IllegalArgumentException.class )
 				.hasMessageContaining( "'objectFieldPath' must not be null" );
 	}

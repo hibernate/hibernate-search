@@ -22,9 +22,9 @@ import org.hibernate.search.engine.search.predicate.spi.CommonQueryStringPredica
 import org.hibernate.search.engine.search.predicate.spi.QueryStringPredicateBuilder;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
-class QueryStringPredicateFieldMoreStepImpl
+class QueryStringPredicateFieldMoreStepImpl<SR>
 		implements
-		QueryStringPredicateFieldMoreStep<QueryStringPredicateFieldMoreStepImpl, QueryStringPredicateOptionsStep<?>> {
+		QueryStringPredicateFieldMoreStep<SR, QueryStringPredicateFieldMoreStepImpl<SR>, QueryStringPredicateOptionsStep<?>> {
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
@@ -40,12 +40,12 @@ class QueryStringPredicateFieldMoreStepImpl
 	}
 
 	@Override
-	public QueryStringPredicateFieldMoreStepImpl fields(String... fieldPaths) {
-		return new QueryStringPredicateFieldMoreStepImpl( commonState, Arrays.asList( fieldPaths ) );
+	public QueryStringPredicateFieldMoreStepImpl<SR> fields(String... fieldPaths) {
+		return new QueryStringPredicateFieldMoreStepImpl<SR>( commonState, Arrays.asList( fieldPaths ) );
 	}
 
 	@Override
-	public QueryStringPredicateFieldMoreStepImpl boost(float boost) {
+	public QueryStringPredicateFieldMoreStepImpl<SR> boost(float boost) {
 		fieldStates.forEach( c -> c.boost( boost ) );
 		return this;
 	}

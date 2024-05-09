@@ -154,18 +154,18 @@ public abstract class AbstractSearchPredicateFactory<
 	}
 
 	@Override
-	public MatchPredicateFieldStep<?> match() {
-		return new MatchPredicateFieldStepImpl( dslContext );
+	public MatchPredicateFieldStep<SR, ?> match() {
+		return new MatchPredicateFieldStepImpl<SR>( dslContext );
 	}
 
 	@Override
-	public RangePredicateFieldStep<?> range() {
-		return new RangePredicateFieldStepImpl( dslContext );
+	public RangePredicateFieldStep<SR, ?> range() {
+		return new RangePredicateFieldStepImpl<>( dslContext );
 	}
 
 	@Override
-	public PhrasePredicateFieldStep<?> phrase() {
-		return new PhrasePredicateFieldStepImpl( dslContext );
+	public PhrasePredicateFieldStep<SR, ?> phrase() {
+		return new PhrasePredicateFieldStepImpl<SR>( dslContext );
 	}
 
 	@Override
@@ -195,18 +195,18 @@ public abstract class AbstractSearchPredicateFactory<
 	}
 
 	@Override
-	public SimpleQueryStringPredicateFieldStep<?> simpleQueryString() {
-		return new SimpleQueryStringPredicateFieldStepImpl( dslContext );
+	public SimpleQueryStringPredicateFieldStep<SR, ?> simpleQueryString() {
+		return new SimpleQueryStringPredicateFieldStepImpl<SR>( dslContext );
 	}
 
 	@Override
-	public QueryStringPredicateFieldStep<?> queryString() {
-		return new QueryStringPredicateFieldStepImpl( dslContext );
+	public QueryStringPredicateFieldStep<SR, ?> queryString() {
+		return new QueryStringPredicateFieldStepImpl<SR>( dslContext );
 	}
 
 	@Override
-	public ExistsPredicateFieldStep<?> exists() {
-		return new ExistsPredicateFieldStepImpl( dslContext );
+	public ExistsPredicateFieldStep<SR, ?> exists() {
+		return new ExistsPredicateFieldStepImpl<SR>( dslContext );
 	}
 
 	@Override

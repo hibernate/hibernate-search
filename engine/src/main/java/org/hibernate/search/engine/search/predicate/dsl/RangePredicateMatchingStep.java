@@ -6,9 +6,6 @@
  */
 package org.hibernate.search.engine.search.predicate.dsl;
 
-import java.util.Arrays;
-import java.util.Collection;
-
 import org.hibernate.search.engine.search.common.ValueConvert;
 import org.hibernate.search.util.common.data.Range;
 import org.hibernate.search.util.common.data.RangeBoundInclusion;
@@ -18,7 +15,8 @@ import org.hibernate.search.util.common.data.RangeBoundInclusion;
  *
  * @param <N> The type of the next step.
  */
-public interface RangePredicateMatchingStep<N extends RangePredicateOptionsStep<?>> {
+public interface RangePredicateMatchingStep<N extends RangePredicateOptionsStep<?>>
+		extends RangePredicateMatchingGenericStep<Object, N> {
 
 	/**
 	 * Require at least one of the targeted fields to be in the range
@@ -264,43 +262,4 @@ public interface RangePredicateMatchingStep<N extends RangePredicateOptionsStep<
 	 */
 	N within(Range<?> range, ValueConvert convert);
 
-	/**
-	 * Require at least one of the targeted fields to be in any of the given ranges.
-	 *
-	 * @param ranges The ranges to match.
-	 * The signature of this method defines this parameter as a range with bounds of any type,
-	 * but a specific type is expected depending on the targeted field.
-	 * See {@link ValueConvert#YES} for more information.
-	 * @return The next step.
-	 */
-	default N withinAny(Range<?>... ranges) {
-		return withinAny( Arrays.asList( ranges ) );
-	}
-
-	/**
-	 * Require at least one of the targeted fields to be in any of the given ranges.
-	 *
-	 * @param ranges The ranges to match.
-	 * The signature of this method defines this parameter as a range with bounds of any type,
-	 * but a specific type is expected depending on the targeted field.
-	 * See {@link ValueConvert#YES} for more information.
-	 * @return The next step.
-	 */
-	default N withinAny(Collection<? extends Range<?>> ranges) {
-		return withinAny( ranges, ValueConvert.YES );
-	}
-
-	/**
-	 * Require at least one of the targeted fields to be in any of the given ranges.
-	 *
-	 * @param ranges The ranges to match.
-	 * The signature of this method defines this parameter as a range with bounds of any type,
-	 * but a specific type is expected depending on the targeted field and on the {@code convert} parameter.
-	 * See {@link ValueConvert} for more information.
-	 * @param convert Controls how the range bounds should be converted
-	 * before Hibernate Search attempts to interpret them as a field value.
-	 * See {@link ValueConvert} for more information.
-	 * @return The next step.
-	 */
-	N withinAny(Collection<? extends Range<?>> ranges, ValueConvert convert);
 }

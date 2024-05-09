@@ -6,6 +6,8 @@
  */
 package org.hibernate.search.engine.search.projection.dsl;
 
+import org.hibernate.search.engine.search.reference.object.ObjectFieldReference;
+
 /**
  * A base interface for subtypes of {@link SearchProjectionFactory} allowing to
  * easily override the self type for all relevant methods.
@@ -22,4 +24,9 @@ public interface ExtendedSearchProjectionFactory<SR, S extends ExtendedSearchPro
 	@Override
 	S withRoot(String objectFieldPath);
 
+
+	@Override
+	default S withRoot(ObjectFieldReference<SR> objectFieldReference) {
+		return withRoot( objectFieldReference.absolutePath() );
+	}
 }
