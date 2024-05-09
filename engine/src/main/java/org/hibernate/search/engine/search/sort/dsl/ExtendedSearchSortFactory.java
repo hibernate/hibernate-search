@@ -16,23 +16,27 @@ import org.hibernate.search.engine.spatial.GeoPoint;
  * <strong>Warning:</strong> Generic parameters of this type are subject to change,
  * so this type should not be referenced directly in user code.
  *
+ * @param <SR> Scope root type.
  * @param <S> The self type, i.e. the exposed type of this factory.
  * @param <PDF> The type of factory used to create predicates in {@link FieldSortOptionsStep#filter(Function)}.
  */
-public interface ExtendedSearchSortFactory<S extends ExtendedSearchSortFactory<?, PDF>, PDF extends SearchPredicateFactory>
-		extends SearchSortFactory {
+public interface ExtendedSearchSortFactory<
+		SR,
+		S extends ExtendedSearchSortFactory<SR, ?, PDF>,
+		PDF extends SearchPredicateFactory<SR>>
+		extends SearchSortFactory<SR> {
 
 	@Override
 	S withRoot(String objectFieldPath);
 
 	@Override
-	FieldSortOptionsStep<?, PDF> field(String fieldPath);
+	FieldSortOptionsStep<SR, ?, PDF> field(String fieldPath);
 
 	@Override
-	DistanceSortOptionsStep<?, PDF> distance(String fieldPath, GeoPoint location);
+	DistanceSortOptionsStep<SR, ?, PDF> distance(String fieldPath, GeoPoint location);
 
 	@Override
-	default DistanceSortOptionsStep<?, PDF> distance(String fieldPath, double latitude, double longitude) {
+	default DistanceSortOptionsStep<SR, ?, PDF> distance(String fieldPath, double latitude, double longitude) {
 		return distance( fieldPath, GeoPoint.of( latitude, longitude ) );
 	}
 }

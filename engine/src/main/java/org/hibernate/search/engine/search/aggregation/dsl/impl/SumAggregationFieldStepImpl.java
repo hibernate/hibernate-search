@@ -13,15 +13,16 @@ import org.hibernate.search.engine.search.common.ValueModel;
 import org.hibernate.search.engine.search.predicate.dsl.SearchPredicateFactory;
 import org.hibernate.search.util.common.impl.Contracts;
 
-public class SumAggregationFieldStepImpl<PDF extends SearchPredicateFactory> implements SumAggregationFieldStep<PDF> {
-	private final SearchAggregationDslContext<?, ? extends PDF> dslContext;
+public class SumAggregationFieldStepImpl<SR, PDF extends SearchPredicateFactory<SR>>
+		implements SumAggregationFieldStep<SR, PDF> {
+	private final SearchAggregationDslContext<SR, ?, ? extends PDF> dslContext;
 
-	public SumAggregationFieldStepImpl(SearchAggregationDslContext<?, ? extends PDF> dslContext) {
+	public SumAggregationFieldStepImpl(SearchAggregationDslContext<SR, ?, ? extends PDF> dslContext) {
 		this.dslContext = dslContext;
 	}
 
 	@Override
-	public <F> SumAggregationOptionsStep<?, PDF, F> field(String fieldPath, Class<F> type, ValueModel valueModel) {
+	public <F> SumAggregationOptionsStep<SR, ?, PDF, F> field(String fieldPath, Class<F> type, ValueModel valueModel) {
 		Contracts.assertNotNull( fieldPath, "fieldPath" );
 		Contracts.assertNotNull( type, "type" );
 		FieldMetricAggregationBuilder<F> builder = dslContext.scope()

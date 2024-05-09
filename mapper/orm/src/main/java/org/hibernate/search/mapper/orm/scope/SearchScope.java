@@ -18,6 +18,7 @@ import org.hibernate.search.engine.search.query.dsl.SearchQueryOptionsStep;
 import org.hibernate.search.engine.search.query.dsl.SearchQuerySelectStep;
 import org.hibernate.search.engine.search.query.dsl.SearchQueryWhereStep;
 import org.hibernate.search.engine.search.sort.dsl.SearchSortFactory;
+import org.hibernate.search.mapper.orm.common.EntityReference;
 import org.hibernate.search.mapper.orm.entity.SearchIndexedEntity;
 import org.hibernate.search.mapper.orm.massindexing.MassIndexer;
 import org.hibernate.search.mapper.orm.schema.management.SearchSchemaManager;
@@ -37,7 +38,7 @@ import org.hibernate.search.util.common.SearchException;
  * @param <E> A supertype of all types in this scope.
  */
 @SuppressWarnings("deprecation")
-public interface SearchScope<E> extends org.hibernate.search.engine.mapper.scope.SearchScope<E, org.hibernate.search.mapper.orm.common.EntityReference> {
+public interface SearchScope<SR, E> extends org.hibernate.search.engine.mapper.scope.SearchScope<SR, E, EntityReference> {
 
 	/**
 	 * Initiate the building of a search predicate.
@@ -53,7 +54,7 @@ public interface SearchScope<E> extends org.hibernate.search.engine.mapper.scope
 	 * @return A predicate factory.
 	 * @see SearchPredicateFactory
 	 */
-	SearchPredicateFactory predicate();
+	SearchPredicateFactory<SR> predicate();
 
 	/**
 	 * Initiate the building of a search sort.
@@ -70,7 +71,7 @@ public interface SearchScope<E> extends org.hibernate.search.engine.mapper.scope
 	 * @return A sort factory.
 	 * @see SearchSortFactory
 	 */
-	SearchSortFactory sort();
+	SearchSortFactory<SR> sort();
 
 	/**
 	 * Initiate the building of a search projection that will be valid for the indexes in this scope.
@@ -87,7 +88,7 @@ public interface SearchScope<E> extends org.hibernate.search.engine.mapper.scope
 	 * @see SearchProjectionFactory
 	 */
 	@SuppressWarnings("deprecation")
-	SearchProjectionFactory<org.hibernate.search.mapper.orm.common.EntityReference, E> projection();
+	SearchProjectionFactory<SR, EntityReference, E> projection();
 
 	/**
 	 * Initiate the building of a search aggregation that will be valid for the indexes in this scope.
@@ -103,7 +104,7 @@ public interface SearchScope<E> extends org.hibernate.search.engine.mapper.scope
 	 * @return An aggregation factory.
 	 * @see SearchAggregationFactory
 	 */
-	SearchAggregationFactory aggregation();
+	SearchAggregationFactory<SR> aggregation();
 
 	/**
 	 * Create a {@link SearchSchemaManager} for the indexes mapped to types in this scope, or to any of their sub-types.

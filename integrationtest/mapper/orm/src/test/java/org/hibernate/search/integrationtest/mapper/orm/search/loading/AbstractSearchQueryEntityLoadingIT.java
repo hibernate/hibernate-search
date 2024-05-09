@@ -66,7 +66,7 @@ public abstract class AbstractSearchQueryEntityLoadingIT {
 
 			SearchSession searchSession = Search.session( session );
 
-			SearchQueryOptionsStep<?, T, SearchLoadingOptionsStep, ?, ?> optionsStep = searchSession.search( targetClasses )
+			SearchQueryOptionsStep<?, ?, T, SearchLoadingOptionsStep, ?, ?> optionsStep = searchSession.search( targetClasses )
 					.where( f -> f.matchAll() )
 					.loading( loadingOptionsContributor );
 
