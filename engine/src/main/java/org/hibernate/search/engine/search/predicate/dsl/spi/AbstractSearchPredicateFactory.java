@@ -78,7 +78,7 @@ public abstract class AbstractSearchPredicateFactory<
 
 	@Override
 	public MatchAllPredicateOptionsStep<SR, ?> matchAll() {
-		return new MatchAllPredicateOptionsStepImpl<SR>( dslContext, this );
+		return new MatchAllPredicateOptionsStepImpl<>( dslContext, this );
 	}
 
 	@Override
@@ -93,45 +93,45 @@ public abstract class AbstractSearchPredicateFactory<
 
 	@Override
 	public BooleanPredicateClausesStep<SR, ?> bool() {
-		return new BooleanPredicateClausesStepImpl<SR>( dslContext, this );
+		return new BooleanPredicateClausesStepImpl<>( dslContext, this );
 	}
 
 	@Override
 	public SimpleBooleanPredicateClausesStep<SR, ?> and() {
-		return new SimpleBooleanPredicateClausesStepImpl<SR>( AND, dslContext, this );
+		return new SimpleBooleanPredicateClausesStepImpl<>( AND, dslContext, this );
 	}
 
 	@Override
 	public SimpleBooleanPredicateOptionsStep<?> and(
 			SearchPredicate firstSearchPredicate,
 			SearchPredicate... otherSearchPredicates) {
-		return new SimpleBooleanPredicateClausesStepImpl<SR>( AND, dslContext, this, firstSearchPredicate,
+		return new SimpleBooleanPredicateClausesStepImpl<>( AND, dslContext, this, firstSearchPredicate,
 				otherSearchPredicates );
 	}
 
 	@Override
 	public SimpleBooleanPredicateOptionsStep<?> and(PredicateFinalStep firstSearchPredicate,
 			PredicateFinalStep... otherSearchPredicate) {
-		return new SimpleBooleanPredicateClausesStepImpl<SR>( AND, dslContext, this, firstSearchPredicate,
+		return new SimpleBooleanPredicateClausesStepImpl<>( AND, dslContext, this, firstSearchPredicate,
 				otherSearchPredicate );
 	}
 
 	@Override
 	public SimpleBooleanPredicateClausesStep<SR, ?> or() {
-		return new SimpleBooleanPredicateClausesStepImpl<SR>( OR, dslContext, this );
+		return new SimpleBooleanPredicateClausesStepImpl<>( OR, dslContext, this );
 	}
 
 	@Override
 	public SimpleBooleanPredicateOptionsStep<?> or(SearchPredicate firstSearchPredicate,
 			SearchPredicate... otherSearchPredicate) {
-		return new SimpleBooleanPredicateClausesStepImpl<SR>( OR, dslContext, this, firstSearchPredicate,
+		return new SimpleBooleanPredicateClausesStepImpl<>( OR, dslContext, this, firstSearchPredicate,
 				otherSearchPredicate );
 	}
 
 	@Override
 	public SimpleBooleanPredicateOptionsStep<?> or(PredicateFinalStep firstSearchPredicate,
 			PredicateFinalStep... otherSearchPredicate) {
-		return new SimpleBooleanPredicateClausesStepImpl<SR>( OR, dslContext, this, firstSearchPredicate,
+		return new SimpleBooleanPredicateClausesStepImpl<>( OR, dslContext, this, firstSearchPredicate,
 				otherSearchPredicate );
 	}
 
@@ -154,64 +154,64 @@ public abstract class AbstractSearchPredicateFactory<
 	}
 
 	@Override
-	public MatchPredicateFieldStep<?> match() {
-		return new MatchPredicateFieldStepImpl( dslContext );
+	public MatchPredicateFieldStep<SR, ?> match() {
+		return new MatchPredicateFieldStepImpl<>( dslContext );
 	}
 
 	@Override
-	public RangePredicateFieldStep<?> range() {
-		return new RangePredicateFieldStepImpl( dslContext );
+	public RangePredicateFieldStep<SR, ?> range() {
+		return new RangePredicateFieldStepImpl<>( dslContext );
 	}
 
 	@Override
-	public PhrasePredicateFieldStep<?> phrase() {
-		return new PhrasePredicateFieldStepImpl( dslContext );
+	public PhrasePredicateFieldStep<SR, ?> phrase() {
+		return new PhrasePredicateFieldStepImpl<>( dslContext );
 	}
 
 	@Override
-	public WildcardPredicateFieldStep<?> wildcard() {
-		return new WildcardPredicateFieldStepImpl( dslContext );
+	public WildcardPredicateFieldStep<SR, ?> wildcard() {
+		return new WildcardPredicateFieldStepImpl<>( dslContext );
 	}
 
 	@Override
-	public PrefixPredicateFieldStep<?> prefix() {
-		return new PrefixPredicateFieldStepImpl( dslContext );
+	public PrefixPredicateFieldStep<SR, ?> prefix() {
+		return new PrefixPredicateFieldStepImpl<>( dslContext );
 	}
 
 	@Override
-	public RegexpPredicateFieldStep<?> regexp() {
-		return new RegexpPredicateFieldStepImpl( dslContext );
+	public RegexpPredicateFieldStep<SR, ?> regexp() {
+		return new RegexpPredicateFieldStepImpl<>( dslContext );
 	}
 
 	@Override
-	public TermsPredicateFieldStep<?> terms() {
-		return new TermsPredicateFieldStepImpl( dslContext );
+	public TermsPredicateFieldStep<SR, ?> terms() {
+		return new TermsPredicateFieldStepImpl<>( dslContext );
 	}
 
 	@Override
 	@Deprecated(since = "6.2")
 	public org.hibernate.search.engine.search.predicate.dsl.NestedPredicateFieldStep<SR, ?> nested() {
-		return new org.hibernate.search.engine.search.predicate.dsl.impl.NestedPredicateFieldStepImpl<SR>( dslContext, this );
+		return new org.hibernate.search.engine.search.predicate.dsl.impl.NestedPredicateFieldStepImpl<>( dslContext, this );
 	}
 
 	@Override
 	public NestedPredicateClausesStep<SR, ?> nested(String objectFieldPath) {
-		return new NestedPredicateClausesStepImpl<SR>( dslContext, objectFieldPath, this );
+		return new NestedPredicateClausesStepImpl<>( dslContext, objectFieldPath, this );
 	}
 
 	@Override
-	public SimpleQueryStringPredicateFieldStep<?> simpleQueryString() {
-		return new SimpleQueryStringPredicateFieldStepImpl( dslContext );
+	public SimpleQueryStringPredicateFieldStep<SR, ?> simpleQueryString() {
+		return new SimpleQueryStringPredicateFieldStepImpl<>( dslContext );
 	}
 
 	@Override
-	public QueryStringPredicateFieldStep<?> queryString() {
-		return new QueryStringPredicateFieldStepImpl( dslContext );
+	public QueryStringPredicateFieldStep<SR, ?> queryString() {
+		return new QueryStringPredicateFieldStepImpl<>( dslContext );
 	}
 
 	@Override
-	public ExistsPredicateFieldStep<?> exists() {
-		return new ExistsPredicateFieldStepImpl( dslContext );
+	public ExistsPredicateFieldStep<SR, ?> exists() {
+		return new ExistsPredicateFieldStepImpl<>( dslContext );
 	}
 
 	@Override

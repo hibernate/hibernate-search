@@ -17,7 +17,20 @@ import org.hibernate.search.engine.search.predicate.dsl.SearchPredicateFactory;
  *
  * @author Emmanuel Bernard emmanuel@hibernate.org
  */
-public interface FieldSortOptionsStep<SR, S extends FieldSortOptionsStep<SR, ?, PDF>, PDF extends SearchPredicateFactory<SR>>
-		extends FieldSortOptionsGenericStep<SR, Object, S, FieldSortMissingValueBehaviorStep<S>, PDF> {
+public interface FieldSortOptionsGenericStep<
+		SR,
+		T,
+		S extends FieldSortOptionsGenericStep<SR, T, ?, ?, PDF>,
+		N extends FieldSortMissingValueBehaviorGenericStep<T, S>,
+		PDF extends SearchPredicateFactory<SR>>
+		extends SortFinalStep, SortThenStep<SR>, SortOrderStep<S>, SortModeStep<S>, SortFilterStep<SR, S, PDF> {
+
+	/**
+	 * Start describing the behavior of this sort when a document doesn't
+	 * have any value for the targeted field.
+	 *
+	 * @return The next step.
+	 */
+	N missing();
 
 }

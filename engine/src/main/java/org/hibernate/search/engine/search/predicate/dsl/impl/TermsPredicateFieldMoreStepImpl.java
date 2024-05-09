@@ -20,17 +20,17 @@ import org.hibernate.search.engine.search.predicate.spi.PredicateTypeKeys;
 import org.hibernate.search.engine.search.predicate.spi.TermsPredicateBuilder;
 import org.hibernate.search.util.common.impl.Contracts;
 
-class TermsPredicateFieldMoreStepImpl
-		implements TermsPredicateFieldMoreStep<TermsPredicateFieldMoreStepImpl, TermsPredicateOptionsStep<?>>,
+class TermsPredicateFieldMoreStepImpl<SR>
+		implements TermsPredicateFieldMoreStep<SR, TermsPredicateFieldMoreStepImpl<SR>, TermsPredicateOptionsStep<?>>,
 		AbstractBooleanMultiFieldPredicateCommonState.FieldSetState {
 
-	private final CommonState commonState;
+	private final CommonState<SR> commonState;
 
 	private final List<TermsPredicateBuilder> predicateBuilders = new ArrayList<>();
 
 	private Float fieldSetBoost;
 
-	TermsPredicateFieldMoreStepImpl(CommonState commonState, List<String> fieldPaths) {
+	TermsPredicateFieldMoreStepImpl(CommonState<SR> commonState, List<String> fieldPaths) {
 		this.commonState = commonState;
 		this.commonState.add( this );
 		SearchIndexScope<?> scope = commonState.scope();
@@ -40,12 +40,12 @@ class TermsPredicateFieldMoreStepImpl
 	}
 
 	@Override
-	public TermsPredicateFieldMoreStepImpl fields(String... fieldPaths) {
-		return new TermsPredicateFieldMoreStepImpl( commonState, Arrays.asList( fieldPaths ) );
+	public TermsPredicateFieldMoreStepImpl<SR> fields(String... fieldPaths) {
+		return new TermsPredicateFieldMoreStepImpl<>( commonState, Arrays.asList( fieldPaths ) );
 	}
 
 	@Override
-	public TermsPredicateFieldMoreStepImpl boost(float boost) {
+	public TermsPredicateFieldMoreStepImpl<SR> boost(float boost) {
 		this.fieldSetBoost = boost;
 		return this;
 	}
@@ -70,9 +70,9 @@ class TermsPredicateFieldMoreStepImpl
 		}
 	}
 
-	static class CommonState
-			extends AbstractBooleanMultiFieldPredicateCommonState<CommonState, TermsPredicateFieldMoreStepImpl>
-			implements TermsPredicateOptionsStep<CommonState> {
+	static class CommonState<SR>
+			extends AbstractBooleanMultiFieldPredicateCommonState<CommonState<SR>, TermsPredicateFieldMoreStepImpl<SR>>
+			implements TermsPredicateOptionsStep<CommonState<SR>> {
 
 		CommonState(SearchPredicateDslContext<?> dslContext) {
 			super( dslContext );
@@ -82,7 +82,7 @@ class TermsPredicateFieldMoreStepImpl
 			Contracts.assertNotNullNorEmpty( terms, "terms" );
 			Contracts.assertNotNull( valueModel, "valueModel" );
 
-			for ( TermsPredicateFieldMoreStepImpl fieldSetState : getFieldSetStates() ) {
+			for ( TermsPredicateFieldMoreStepImpl<SR> fieldSetState : getFieldSetStates() ) {
 				for ( TermsPredicateBuilder predicateBuilder : fieldSetState.predicateBuilders ) {
 					predicateBuilder.matchingAny( terms, valueModel );
 				}
@@ -94,7 +94,7 @@ class TermsPredicateFieldMoreStepImpl
 			Contracts.assertNotNullNorEmpty( terms, "terms" );
 			Contracts.assertNotNull( valueModel, "valueModel" );
 
-			for ( TermsPredicateFieldMoreStepImpl fieldSetState : getFieldSetStates() ) {
+			for ( TermsPredicateFieldMoreStepImpl<SR> fieldSetState : getFieldSetStates() ) {
 				for ( TermsPredicateBuilder predicateBuilder : fieldSetState.predicateBuilders ) {
 					predicateBuilder.matchingAll( terms, valueModel );
 				}
@@ -103,7 +103,7 @@ class TermsPredicateFieldMoreStepImpl
 		}
 
 		@Override
-		protected CommonState thisAsS() {
+		protected CommonState<SR> thisAsS() {
 			return this;
 		}
 	}

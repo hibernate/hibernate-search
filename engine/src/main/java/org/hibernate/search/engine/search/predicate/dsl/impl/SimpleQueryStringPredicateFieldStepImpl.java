@@ -10,8 +10,8 @@ import org.hibernate.search.engine.search.predicate.dsl.SimpleQueryStringPredica
 import org.hibernate.search.engine.search.predicate.dsl.SimpleQueryStringPredicateFieldStep;
 import org.hibernate.search.engine.search.predicate.dsl.spi.SearchPredicateDslContext;
 
-public final class SimpleQueryStringPredicateFieldStepImpl
-		implements SimpleQueryStringPredicateFieldStep<SimpleQueryStringPredicateFieldMoreStep<?, ?>> {
+public final class SimpleQueryStringPredicateFieldStepImpl<SR>
+		implements SimpleQueryStringPredicateFieldStep<SR, SimpleQueryStringPredicateFieldMoreStep<SR, ?, ?>> {
 
 	private final SimpleQueryStringPredicateFieldMoreStepImpl.CommonState commonState;
 
@@ -20,7 +20,7 @@ public final class SimpleQueryStringPredicateFieldStepImpl
 	}
 
 	@Override
-	public SimpleQueryStringPredicateFieldMoreStep<?, ?> fields(String... fieldPaths) {
-		return new SimpleQueryStringPredicateFieldMoreStepImpl( commonState, Arrays.asList( fieldPaths ) );
+	public SimpleQueryStringPredicateFieldMoreStep<SR, ?, ?> fields(String... fieldPaths) {
+		return new SimpleQueryStringPredicateFieldMoreStepImpl<SR>( commonState, Arrays.asList( fieldPaths ) );
 	}
 }

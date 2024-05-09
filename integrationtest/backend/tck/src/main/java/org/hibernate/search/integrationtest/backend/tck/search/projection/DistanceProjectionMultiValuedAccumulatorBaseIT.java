@@ -20,26 +20,26 @@ import org.hibernate.search.engine.spatial.GeoPoint;
 class DistanceProjectionMultiValuedAccumulatorBaseIT extends AbstractDistanceProjectionMultiValuedBaseIT {
 
 	@Override
-	protected void addParameter(SearchQueryOptionsStep<?, ?, ?, ?, ?> query, String parameterName, Object value) {
+	protected void addParameter(SearchQueryOptionsStep<?, ?, ?, ?, ?, ?> query, String parameterName, Object value) {
 		// do nothing
 	}
 
 	@Override
 	protected ProjectionFinalStep<List<Double>> distance(
-			SearchProjectionFactory<EntityReference, DocumentReference> projection, String path, GeoPoint center,
+			SearchProjectionFactory<?, EntityReference, DocumentReference> projection, String path, GeoPoint center,
 			String parameterName) {
 		return projection.distance( path, center ).collector( ProjectionCollector.list() );
 	}
 
 	@Override
 	protected ProjectionFinalStep<List<Double>> distance(
-			SearchProjectionFactory<EntityReference, DocumentReference> projection, String path, GeoPoint center,
+			SearchProjectionFactory<?, EntityReference, DocumentReference> projection, String path, GeoPoint center,
 			DistanceUnit unit, String centerParam, String unitParam) {
 		return projection.distance( path, center ).collector( ProjectionCollector.list() ).unit( unit );
 	}
 
 	@Override
-	protected SortFinalStep sort(SearchSortFactory sort, String path, GeoPoint center,
+	protected SortFinalStep sort(SearchSortFactory<?> sort, String path, GeoPoint center,
 			String parameterName) {
 		return sort.distance( path, center );
 	}

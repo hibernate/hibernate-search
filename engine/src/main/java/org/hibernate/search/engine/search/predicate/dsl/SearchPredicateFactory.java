@@ -11,6 +11,7 @@ import org.hibernate.search.engine.backend.types.ObjectStructure;
 import org.hibernate.search.engine.search.common.BooleanOperator;
 import org.hibernate.search.engine.search.common.NamedValues;
 import org.hibernate.search.engine.search.predicate.SearchPredicate;
+import org.hibernate.search.engine.search.reference.predicate.NestedPredicateFieldReference;
 import org.hibernate.search.util.common.SearchException;
 import org.hibernate.search.util.common.annotation.Incubating;
 
@@ -163,7 +164,7 @@ public interface SearchPredicateFactory<SR> {
 	 * @return The initial step of a DSL where the "match" predicate can be defined.
 	 * @see MatchPredicateFieldStep
 	 */
-	MatchPredicateFieldStep<?> match();
+	MatchPredicateFieldStep<SR, ?> match();
 
 	/**
 	 * Match documents where targeted fields have a value within lower and upper bounds.
@@ -171,7 +172,7 @@ public interface SearchPredicateFactory<SR> {
 	 * @return The initial step of a DSL where the "range" predicate can be defined.
 	 * @see RangePredicateFieldStep
 	 */
-	RangePredicateFieldStep<?> range();
+	RangePredicateFieldStep<SR, ?> range();
 
 	/**
 	 * Match documents where targeted fields have a value that contains a given phrase.
@@ -179,7 +180,7 @@ public interface SearchPredicateFactory<SR> {
 	 * @return The initial step of a DSL where the "phrase" predicate can be defined.
 	 * @see PhrasePredicateFieldStep
 	 */
-	PhrasePredicateFieldStep<?> phrase();
+	PhrasePredicateFieldStep<SR, ?> phrase();
 
 	/**
 	 * Match documents where targeted fields contain a term that matches a given pattern,
@@ -192,7 +193,7 @@ public interface SearchPredicateFactory<SR> {
 	 * @return The initial step of a DSL where the "wildcard" predicate can be defined.
 	 * @see WildcardPredicateFieldStep
 	 */
-	WildcardPredicateFieldStep<?> wildcard();
+	WildcardPredicateFieldStep<SR, ?> wildcard();
 
 	/**
 	 * Match documents where targeted fields have a value that starts with a given string.
@@ -200,7 +201,7 @@ public interface SearchPredicateFactory<SR> {
 	 * @return The initial step of a DSL where the "prefix" predicate can be defined.
 	 * @see PrefixPredicateFieldStep
 	 */
-	PrefixPredicateFieldStep<?> prefix();
+	PrefixPredicateFieldStep<SR, ?> prefix();
 
 	/**
 	 * Match documents where targeted fields contain a term that matches a given regular expression.
@@ -208,7 +209,7 @@ public interface SearchPredicateFactory<SR> {
 	 * @return The initial step of a DSL where the "regexp" predicate can be defined.
 	 * @see RegexpPredicateFieldStep
 	 */
-	RegexpPredicateFieldStep<?> regexp();
+	RegexpPredicateFieldStep<SR, ?> regexp();
 
 	/**
 	 * Match documents where targeted fields contain a term that matches some terms of a given series of terms.
@@ -216,7 +217,7 @@ public interface SearchPredicateFactory<SR> {
 	 * @return The initial step of a DSL where the "terms" predicate can be defined.
 	 * @see TermsPredicateFieldStep
 	 */
-	TermsPredicateFieldStep<?> terms();
+	TermsPredicateFieldStep<SR, ?> terms();
 
 	/**
 	 * Match documents where a {@link ObjectStructure#NESTED nested object} matches a given predicate.
@@ -242,6 +243,22 @@ public interface SearchPredicateFactory<SR> {
 	NestedPredicateClausesStep<SR, ?> nested(String objectFieldPath);
 
 	/**
+	 * Match documents where a {@link ObjectStructure#NESTED nested object} matches inner predicates
+	 * to be defined in the next steps.
+	 * <p>
+	 * The resulting nested predicate must match <em>all</em> inner clauses,
+	 * similarly to an {@link #and() "and" predicate}.
+	 *
+	 * @param field The field reference representing a <a href="SearchPredicateFactory.html#field-paths">path</a> to the object field
+	 * to apply the predicate on.
+	 * @return The initial step of a DSL where the "nested" predicate can be defined.
+	 * @see NestedPredicateFieldStep
+	 */
+	default NestedPredicateClausesStep<SR, ?> nested(NestedPredicateFieldReference<SR> field) {
+		return nested( field.absolutePath() );
+	}
+
+	/**
 	 * Match documents according to a given query string,
 	 * with a simple query language adapted to end users.
 	 * <p>
@@ -253,7 +270,7 @@ public interface SearchPredicateFactory<SR> {
 	 * @return The initial step of a DSL where the "simple query string" predicate can be defined.
 	 * @see SimpleQueryStringPredicateFieldStep
 	 */
-	SimpleQueryStringPredicateFieldStep<?> simpleQueryString();
+	SimpleQueryStringPredicateFieldStep<SR, ?> simpleQueryString();
 
 	/**
 	 * Match documents according to a given query string,
@@ -267,7 +284,7 @@ public interface SearchPredicateFactory<SR> {
 	 * @return The initial step of a DSL where the "query string" predicate can be defined.
 	 * @see QueryStringPredicateFieldStep
 	 */
-	QueryStringPredicateFieldStep<?> queryString();
+	QueryStringPredicateFieldStep<SR, ?> queryString();
 
 	/**
 	 * Match documents where a given field exists.
@@ -277,7 +294,7 @@ public interface SearchPredicateFactory<SR> {
 	 * @return The initial step of a DSL where the "exists" predicate can be defined.
 	 * @see ExistsPredicateFieldStep
 	 */
-	ExistsPredicateFieldStep<?> exists();
+	ExistsPredicateFieldStep<SR, ?> exists();
 
 	/**
 	 * Access the different types of spatial predicates.
