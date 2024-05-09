@@ -32,7 +32,8 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 
-class QueryStringPredicateSpecificsIT extends AbstractBaseQueryStringPredicateSpecificsIT<QueryStringPredicateFieldStep<?>> {
+class QueryStringPredicateSpecificsIT
+		extends AbstractBaseQueryStringPredicateSpecificsIT<QueryStringPredicateFieldStep<?, ?>> {
 
 	@ParameterizedTest
 	@MethodSource("rewriteMethodOptions")
@@ -472,7 +473,7 @@ class QueryStringPredicateSpecificsIT extends AbstractBaseQueryStringPredicateSp
 	}
 
 	@Override
-	QueryStringPredicateFieldStep<?> predicate(SearchPredicateFactory<?> f) {
+	QueryStringPredicateFieldStep<?, ?> predicate(SearchPredicateFactory<?> f) {
 		return f.queryString();
 	}
 }
