@@ -10,10 +10,12 @@ import java.util.function.Function;
 import org.hibernate.search.engine.common.dsl.spi.DslExtensionState;
 import org.hibernate.search.engine.search.common.NamedValues;
 import org.hibernate.search.engine.search.predicate.dsl.SearchPredicateFactory;
+import org.hibernate.search.engine.search.reference.sort.FieldSortFieldReference;
 import org.hibernate.search.engine.search.sort.SearchSort;
 import org.hibernate.search.engine.search.sort.dsl.CompositeSortComponentsStep;
 import org.hibernate.search.engine.search.sort.dsl.DistanceSortOptionsStep;
 import org.hibernate.search.engine.search.sort.dsl.ExtendedSearchSortFactory;
+import org.hibernate.search.engine.search.sort.dsl.FieldSortOptionsGenericStep;
 import org.hibernate.search.engine.search.sort.dsl.FieldSortOptionsStep;
 import org.hibernate.search.engine.search.sort.dsl.ScoreSortOptionsStep;
 import org.hibernate.search.engine.search.sort.dsl.SearchSortFactoryExtension;
@@ -22,6 +24,7 @@ import org.hibernate.search.engine.search.sort.dsl.SortFinalStep;
 import org.hibernate.search.engine.search.sort.dsl.SortThenStep;
 import org.hibernate.search.engine.search.sort.dsl.impl.CompositeSortComponentsStepImpl;
 import org.hibernate.search.engine.search.sort.dsl.impl.DistanceSortOptionsStepImpl;
+import org.hibernate.search.engine.search.sort.dsl.impl.FieldSortOptionsGenericStepImpl;
 import org.hibernate.search.engine.search.sort.dsl.impl.FieldSortOptionsStepImpl;
 import org.hibernate.search.engine.search.sort.dsl.impl.ScoreSortOptionsStepImpl;
 import org.hibernate.search.engine.search.sort.dsl.impl.SearchSortFactoryExtensionStep;
@@ -55,6 +58,12 @@ public abstract class AbstractSearchSortFactory<
 	@Override
 	public FieldSortOptionsStep<SR, ?, PDF> field(String fieldPath) {
 		return new FieldSortOptionsStepImpl<>( dslContext, fieldPath );
+	}
+
+	@Override
+	public <T> FieldSortOptionsGenericStep<SR, T, ?, ?, ? extends SearchPredicateFactory<SR>> field(
+			FieldSortFieldReference<SR, T> fieldReference) {
+		return new FieldSortOptionsGenericStepImpl<>( dslContext, fieldReference );
 	}
 
 	@Override
