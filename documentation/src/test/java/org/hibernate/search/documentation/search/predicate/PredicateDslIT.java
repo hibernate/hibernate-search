@@ -118,7 +118,7 @@ class PredicateDslIT {
 					Search.session( entityManager );
 			// tag::entryPoint-objects[]
 
-			SearchScope<Book> scope = searchSession.scope( Book.class );
+			SearchScope<?, Book> scope = searchSession.scope( Book.class );
 
 			List<Book> result = searchSession.search( scope )
 					.where( scope.predicate().match().field( "title" )

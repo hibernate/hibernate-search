@@ -27,9 +27,11 @@ import org.hibernate.search.util.common.annotation.Incubating;
  * Such a factory can also transform relative paths into absolute paths using {@link #toAbsolutePath(String)};
  * this can be useful for native aggregations in particular.
  *
+ * @param <SR> Scope root type.
+ *
  * @author Emmanuel Bernard emmanuel@hibernate.org
  */
-public interface SearchAggregationFactory {
+public interface SearchAggregationFactory<SR> {
 
 	/**
 	 * Perform aggregation in range buckets.
@@ -44,7 +46,7 @@ public interface SearchAggregationFactory {
 	 *
 	 * @return The next step.
 	 */
-	RangeAggregationFieldStep<?> range();
+	RangeAggregationFieldStep<SR, ?> range();
 
 	/**
 	 * Perform aggregation in term buckets.
@@ -59,7 +61,7 @@ public interface SearchAggregationFactory {
 	 *
 	 * @return The next step.
 	 */
-	TermsAggregationFieldStep<?> terms();
+	TermsAggregationFieldStep<SR, ?> terms();
 
 	/**
 	 * Perform the sum metric aggregation.
@@ -67,7 +69,7 @@ public interface SearchAggregationFactory {
 	 * @return The next step.
 	 */
 	@Incubating
-	SumAggregationFieldStep<?> sum();
+	SumAggregationFieldStep<SR, ?> sum();
 
 	/**
 	 * Perform the min metric aggregation.
@@ -75,7 +77,7 @@ public interface SearchAggregationFactory {
 	 * @return The next step.
 	 */
 	@Incubating
-	MinAggregationFieldStep<?> min();
+	MinAggregationFieldStep<SR, ?> min();
 
 	/**
 	 * Perform the max metric aggregation.
@@ -83,7 +85,7 @@ public interface SearchAggregationFactory {
 	 * @return The next step.
 	 */
 	@Incubating
-	MaxAggregationFieldStep<?> max();
+	MaxAggregationFieldStep<SR, ?> max();
 
 	/**
 	 * Perform the count metric aggregation.
@@ -91,7 +93,7 @@ public interface SearchAggregationFactory {
 	 * @return The next step.
 	 */
 	@Incubating
-	CountAggregationFieldStep<?> count();
+	CountAggregationFieldStep<SR, ?> count();
 
 	/**
 	 * Perform the count distinct metric aggregation.
@@ -99,7 +101,7 @@ public interface SearchAggregationFactory {
 	 * @return The next step.
 	 */
 	@Incubating
-	CountDistinctAggregationFieldStep<?> countDistinct();
+	CountDistinctAggregationFieldStep<SR, ?> countDistinct();
 
 	/**
 	 * Perform the avg metric aggregation.
@@ -107,7 +109,7 @@ public interface SearchAggregationFactory {
 	 * @return the next step.
 	 */
 	@Incubating
-	AvgAggregationFieldStep<?> avg();
+	AvgAggregationFieldStep<SR, ?> avg();
 
 	/**
 	 * Delegating aggregation that creates the actual aggregation at query create time and provides access to query parameters.
@@ -130,7 +132,7 @@ public interface SearchAggregationFactory {
 	 * @return The extended factory.
 	 * @throws SearchException If the extension cannot be applied (wrong underlying backend, ...).
 	 */
-	<T> T extension(SearchAggregationFactoryExtension<T> extension);
+	<T> T extension(SearchAggregationFactoryExtension<SR, T> extension);
 
 	/**
 	 * Create a new aggregation factory whose root for all paths passed to the DSL
@@ -142,7 +144,7 @@ public interface SearchAggregationFactory {
 	 * @return A new aggregation factory using the given object field as root.
 	 */
 	@Incubating
-	SearchAggregationFactory withRoot(String objectFieldPath);
+	SearchAggregationFactory<SR> withRoot(String objectFieldPath);
 
 	/**
 	 * @param relativeFieldPath The path to a field, relative to the {@link #withRoot(String) root} of this factory.

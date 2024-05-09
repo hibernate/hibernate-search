@@ -30,9 +30,10 @@ import org.hibernate.search.util.common.annotation.Incubating;
  * Such a factory can also transform relative paths into absolute paths using {@link #toAbsolutePath(String)};
  * this can be useful for native sorts in particular.
  *
+ * @param <SR> Scope root type.
  * @author Emmanuel Bernard emmanuel@hibernate.org
  */
-public interface SearchSortFactory {
+public interface SearchSortFactory<SR> {
 
 	/**
 	 * Order elements by their relevance score.
@@ -41,14 +42,14 @@ public interface SearchSortFactory {
 	 *
 	 * @return A DSL step where the "score" sort can be defined in more details.
 	 */
-	ScoreSortOptionsStep<?> score();
+	ScoreSortOptionsStep<SR, ?> score();
 
 	/**
 	 * Order elements by their internal index order.
 	 *
 	 * @return A DSL step where the "index order" sort can be defined in more details.
 	 */
-	SortThenStep indexOrder();
+	SortThenStep<SR> indexOrder();
 
 	/**
 	 * Order elements by the value of a specific field.
@@ -59,7 +60,7 @@ public interface SearchSortFactory {
 	 * @return A DSL step where the "field" sort can be defined in more details.
 	 * @throws SearchException If the field doesn't exist or cannot be sorted on.
 	 */
-	FieldSortOptionsStep<?, ? extends SearchPredicateFactory> field(String fieldPath);
+	FieldSortOptionsStep<SR, ?, ? extends SearchPredicateFactory<SR>> field(String fieldPath);
 
 	/**
 	 * Order elements by the distance from the location stored in the specified field to the location specified.
@@ -72,7 +73,7 @@ public interface SearchSortFactory {
 	 * @return A DSL step where the "distance" sort can be defined in more details.
 	 * @throws SearchException If the field type does not constitute a valid location.
 	 */
-	DistanceSortOptionsStep<?, ? extends SearchPredicateFactory> distance(String fieldPath, GeoPoint location);
+	DistanceSortOptionsStep<SR, ?, ? extends SearchPredicateFactory<SR>> distance(String fieldPath, GeoPoint location);
 
 	/**
 	 * Order elements by the distance from the location stored in the specified field to the location specified.
@@ -86,7 +87,7 @@ public interface SearchSortFactory {
 	 * @return A DSL step where the "distance" sort can be defined in more details.
 	 * @throws SearchException If the field type does not constitute a valid location.
 	 */
-	default DistanceSortOptionsStep<?, ? extends SearchPredicateFactory> distance(String fieldPath, double latitude,
+	default DistanceSortOptionsStep<SR, ?, ? extends SearchPredicateFactory<SR>> distance(String fieldPath, double latitude,
 			double longitude) {
 		return distance( fieldPath, GeoPoint.of( latitude, longitude ) );
 	}
@@ -101,7 +102,7 @@ public interface SearchSortFactory {
 	 *
 	 * @return A DSL step where the "composite" sort can be defined in more details.
 	 */
-	CompositeSortComponentsStep<?> composite();
+	CompositeSortComponentsStep<SR, ?> composite();
 
 	/**
 	 * Order by a sort composed of several elements,
@@ -124,7 +125,7 @@ public interface SearchSortFactory {
 	 * Should generally be a lambda expression.
 	 * @return A DSL step where the "composite" sort can be defined in more details.
 	 */
-	SortThenStep composite(Consumer<? super CompositeSortComponentsStep<?>> elementContributor);
+	SortThenStep<SR> composite(Consumer<? super CompositeSortComponentsStep<SR, ?>> elementContributor);
 
 	/**
 	 * Delegating sort that creates the actual sort at query create time and provides access to query parameters.
@@ -135,7 +136,7 @@ public interface SearchSortFactory {
 	 * @return A final DSL step in a parameterized sort definition.
 	 */
 	@Incubating
-	SortThenStep withParameters(Function<? super NamedValues, ? extends SortFinalStep> sortCreator);
+	SortThenStep<SR> withParameters(Function<? super NamedValues, ? extends SortFinalStep> sortCreator);
 
 	/**
 	 * Extend the current factory with the given extension,
@@ -146,7 +147,7 @@ public interface SearchSortFactory {
 	 * @return The extended factory.
 	 * @throws SearchException If the extension cannot be applied (wrong underlying backend, ...).
 	 */
-	<T> T extension(SearchSortFactoryExtension<T> extension);
+	<T> T extension(SearchSortFactoryExtension<SR, T> extension);
 
 	/**
 	 * Create a DSL step allowing multiple attempts to apply extensions one after the other,
@@ -157,7 +158,7 @@ public interface SearchSortFactory {
 	 *
 	 * @return A DSL step.
 	 */
-	SearchSortFactoryExtensionIfSupportedStep extension();
+	SearchSortFactoryExtensionIfSupportedStep<SR> extension();
 
 	/**
 	 * Create a new sort factory whose root for all paths passed to the DSL
@@ -170,7 +171,7 @@ public interface SearchSortFactory {
 	 * @return A new sort factory using the given object field as root.
 	 */
 	@Incubating
-	SearchSortFactory withRoot(String objectFieldPath);
+	SearchSortFactory<SR> withRoot(String objectFieldPath);
 
 	/**
 	 * @param relativeFieldPath The path to a field, relative to the {@link #withRoot(String) root} of this factory.

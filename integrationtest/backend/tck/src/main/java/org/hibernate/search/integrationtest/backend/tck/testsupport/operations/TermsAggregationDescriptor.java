@@ -137,9 +137,9 @@ public class TermsAggregationDescriptor extends AggregationDescriptor {
 					TypeAssertionHelper<F, T> helper) {
 				return new AggregationScenario<Map<T, Long>>() {
 					@Override
-					public AggregationFinalStep<Map<T, Long>> setup(SearchAggregationFactory factory, String fieldPath,
-							Function<? super SearchPredicateFactory, ? extends PredicateFinalStep> filterOrNull) {
-						TermsAggregationOptionsStep<?, ?, ?, Map<T, Long>> optionsStep =
+					public AggregationFinalStep<Map<T, Long>> setup(SearchAggregationFactory<?> factory, String fieldPath,
+							Function<? super SearchPredicateFactory<?>, ? extends PredicateFinalStep> filterOrNull) {
+						TermsAggregationOptionsStep<?, ?, ?, ?, Map<T, Long>> optionsStep =
 								factory.terms().field( fieldPath, helper.getJavaClass() );
 						if ( filterOrNull == null ) {
 							return optionsStep;
@@ -150,7 +150,7 @@ public class TermsAggregationDescriptor extends AggregationDescriptor {
 					}
 
 					@Override
-					public AggregationFinalStep<Map<T, Long>> setupWithConverterSetting(SearchAggregationFactory factory,
+					public AggregationFinalStep<Map<T, Long>> setupWithConverterSetting(SearchAggregationFactory<?> factory,
 							String fieldPath, ValueModel valueModel) {
 						return factory.terms().field( fieldPath, helper.getJavaClass(), valueModel );
 					}
@@ -199,7 +199,7 @@ public class TermsAggregationDescriptor extends AggregationDescriptor {
 			}
 
 			@Override
-			public void trySetup(SearchAggregationFactory factory, String fieldPath) {
+			public void trySetup(SearchAggregationFactory<?> factory, String fieldPath) {
 				factory.terms().field( fieldPath, typeDescriptor.getJavaType() );
 			}
 

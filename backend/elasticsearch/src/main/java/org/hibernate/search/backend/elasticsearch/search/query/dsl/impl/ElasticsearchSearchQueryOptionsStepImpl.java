@@ -19,18 +19,19 @@ import org.hibernate.search.engine.search.highlighter.dsl.SearchHighlighterFacto
 import org.hibernate.search.engine.search.loading.spi.SearchLoadingContextBuilder;
 import org.hibernate.search.engine.search.query.dsl.spi.AbstractExtendedSearchQueryOptionsStep;
 
-class ElasticsearchSearchQueryOptionsStepImpl<H, LOS>
+class ElasticsearchSearchQueryOptionsStepImpl<SR, H, LOS>
 		extends AbstractExtendedSearchQueryOptionsStep<
-				ElasticsearchSearchQueryOptionsStep<H, LOS>,
+				SR,
+				ElasticsearchSearchQueryOptionsStep<SR, H, LOS>,
 				H,
 				ElasticsearchSearchResult<H>,
 				ElasticsearchSearchScroll<H>,
 				LOS,
-				ElasticsearchSearchPredicateFactory,
-				ElasticsearchSearchSortFactory,
-				ElasticsearchSearchAggregationFactory,
+				ElasticsearchSearchPredicateFactory<SR>,
+				ElasticsearchSearchSortFactory<SR>,
+				ElasticsearchSearchAggregationFactory<SR>,
 				ElasticsearchSearchQueryIndexScope<?>>
-		implements ElasticsearchSearchQueryWhereStep<H, LOS>, ElasticsearchSearchQueryOptionsStep<H, LOS> {
+		implements ElasticsearchSearchQueryWhereStep<SR, H, LOS>, ElasticsearchSearchQueryOptionsStep<SR, H, LOS> {
 
 	private final ElasticsearchSearchQueryBuilder<H> searchQueryBuilder;
 
@@ -42,7 +43,8 @@ class ElasticsearchSearchQueryOptionsStepImpl<H, LOS>
 	}
 
 	@Override
-	public ElasticsearchSearchQueryOptionsStep<H, LOS> requestTransformer(ElasticsearchSearchRequestTransformer transformer) {
+	public ElasticsearchSearchQueryOptionsStep<SR, H, LOS> requestTransformer(
+			ElasticsearchSearchRequestTransformer transformer) {
 		searchQueryBuilder.requestTransformer( transformer );
 		return thisAsS();
 	}
@@ -53,22 +55,22 @@ class ElasticsearchSearchQueryOptionsStepImpl<H, LOS>
 	}
 
 	@Override
-	protected ElasticsearchSearchQueryOptionsStepImpl<H, LOS> thisAsS() {
+	protected ElasticsearchSearchQueryOptionsStepImpl<SR, H, LOS> thisAsS() {
 		return this;
 	}
 
 	@Override
-	protected ElasticsearchSearchPredicateFactory predicateFactory() {
+	protected ElasticsearchSearchPredicateFactory<SR> predicateFactory() {
 		return scope.predicateFactory();
 	}
 
 	@Override
-	protected ElasticsearchSearchSortFactory sortFactory() {
+	protected ElasticsearchSearchSortFactory<SR> sortFactory() {
 		return scope.sortFactory();
 	}
 
 	@Override
-	protected ElasticsearchSearchAggregationFactory aggregationFactory() {
+	protected ElasticsearchSearchAggregationFactory<SR> aggregationFactory() {
 		return scope.aggregationFactory();
 	}
 

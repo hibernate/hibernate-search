@@ -17,7 +17,7 @@ public class WithParametersAggregationFinalStep<A> implements AggregationFinalSt
 	private final WithParametersAggregationBuilder<A> builder;
 
 	public WithParametersAggregationFinalStep(
-			SearchAggregationDslContext<?, ?> dslContext,
+			SearchAggregationDslContext<?, ?, ?> dslContext,
 			Function<? super NamedValues, ? extends AggregationFinalStep<A>> aggregationCreator) {
 		builder = dslContext.scope().aggregationBuilders().withParameters();
 		builder.creator( aggregationCreator );

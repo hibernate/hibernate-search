@@ -472,7 +472,7 @@ class QueryStringPredicateSpecificsIT extends AbstractBaseQueryStringPredicateSp
 	}
 
 	@Override
-	QueryStringPredicateFieldStep<?> predicate(SearchPredicateFactory f) {
+	QueryStringPredicateFieldStep<?> predicate(SearchPredicateFactory<?> f) {
 		return f.queryString();
 	}
 }

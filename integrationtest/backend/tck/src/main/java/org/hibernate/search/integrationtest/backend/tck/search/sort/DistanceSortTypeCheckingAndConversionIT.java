@@ -208,7 +208,7 @@ class DistanceSortTypeCheckingAndConversionIT {
 	}
 
 	private SearchQuery<DocumentReference> matchAllQuery(
-			Function<? super SearchSortFactory, ? extends SortFinalStep> sortContributor, StubMappingScope scope) {
+			Function<? super SearchSortFactory<?>, ? extends SortFinalStep> sortContributor, StubMappingScope scope) {
 		return scope.query()
 				.where( f -> f.matchAll() )
 				.sort( sortContributor )
@@ -216,7 +216,7 @@ class DistanceSortTypeCheckingAndConversionIT {
 	}
 
 	private SearchQuery<DocumentReference> matchNonEmptyQuery(
-			Function<? super SearchSortFactory, ? extends SortFinalStep> sortContributor, StubMappingScope scope) {
+			Function<? super SearchSortFactory<?>, ? extends SortFinalStep> sortContributor, StubMappingScope scope) {
 		return scope.query()
 				.where( f -> f.matchAll().except( f.id().matching( EMPTY ) ) )
 				.sort( sortContributor )

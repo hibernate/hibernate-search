@@ -13,15 +13,16 @@ import org.hibernate.search.engine.search.common.ValueModel;
 import org.hibernate.search.engine.search.predicate.dsl.SearchPredicateFactory;
 import org.hibernate.search.util.common.impl.Contracts;
 
-public class MaxAggregationFieldStepImpl<PDF extends SearchPredicateFactory> implements MaxAggregationFieldStep<PDF> {
-	private final SearchAggregationDslContext<?, ? extends PDF> dslContext;
+public class MaxAggregationFieldStepImpl<SR, PDF extends SearchPredicateFactory<SR>>
+		implements MaxAggregationFieldStep<SR, PDF> {
+	private final SearchAggregationDslContext<SR, ?, ? extends PDF> dslContext;
 
-	public MaxAggregationFieldStepImpl(SearchAggregationDslContext<?, ? extends PDF> dslContext) {
+	public MaxAggregationFieldStepImpl(SearchAggregationDslContext<SR, ?, ? extends PDF> dslContext) {
 		this.dslContext = dslContext;
 	}
 
 	@Override
-	public <F> MaxAggregationOptionsStep<?, PDF, F> field(String fieldPath, Class<F> type, ValueModel valueModel) {
+	public <F> MaxAggregationOptionsStep<SR, ?, PDF, F> field(String fieldPath, Class<F> type, ValueModel valueModel) {
 		Contracts.assertNotNull( fieldPath, "fieldPath" );
 		Contracts.assertNotNull( type, "type" );
 		FieldMetricAggregationBuilder<F> builder = dslContext.scope()

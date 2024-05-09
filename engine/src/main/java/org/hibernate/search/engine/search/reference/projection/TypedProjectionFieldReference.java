@@ -4,7 +4,6 @@
  */
 package org.hibernate.search.engine.search.reference.projection;
 
-import org.hibernate.search.engine.search.common.ValueConvert;
 import org.hibernate.search.engine.search.common.ValueModel;
 
 public interface TypedProjectionFieldReference<SR, T> extends ProjectionFieldReference<SR> {

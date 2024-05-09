@@ -22,13 +22,13 @@ import org.hibernate.search.util.impl.test.annotation.TestForIssue;
 class DistanceProjectionParameterMultiValuedBaseIT extends AbstractDistanceProjectionMultiValuedBaseIT {
 
 	@Override
-	protected void addParameter(SearchQueryOptionsStep<?, ?, ?, ?, ?> query, String parameterName, Object value) {
+	protected void addParameter(SearchQueryOptionsStep<?, ?, ?, ?, ?, ?> query, String parameterName, Object value) {
 		query.param( parameterName, value );
 	}
 
 	@Override
 	protected ProjectionFinalStep<List<Double>> distance(
-			SearchProjectionFactory<EntityReference, DocumentReference> projection, String path, GeoPoint center,
+			SearchProjectionFactory<?, EntityReference, DocumentReference> projection, String path, GeoPoint center,
 			String parameterName) {
 		return projection.withParameters(
 				params -> projection.distance( path, params.get( parameterName, GeoPoint.class ) )
@@ -37,7 +37,7 @@ class DistanceProjectionParameterMultiValuedBaseIT extends AbstractDistanceProje
 
 	@Override
 	protected ProjectionFinalStep<List<Double>> distance(
-			SearchProjectionFactory<EntityReference, DocumentReference> projection, String path, GeoPoint center,
+			SearchProjectionFactory<?, EntityReference, DocumentReference> projection, String path, GeoPoint center,
 			DistanceUnit unit, String centerParam, String unitParam) {
 		return projection.withParameters(
 				params -> projection.distance( path, params.get( centerParam, GeoPoint.class ) )
@@ -46,7 +46,7 @@ class DistanceProjectionParameterMultiValuedBaseIT extends AbstractDistanceProje
 	}
 
 	@Override
-	protected SortFinalStep sort(SearchSortFactory sort, String path, GeoPoint center, String parameterName) {
+	protected SortFinalStep sort(SearchSortFactory<?> sort, String path, GeoPoint center, String parameterName) {
 		return sort.withParameters( param -> sort.distance( path, param.get( parameterName, GeoPoint.class ) ) );
 	}
 }

@@ -15,12 +15,13 @@ import org.apache.lucene.search.Explanation;
 /**
  * A factory for search projections with some Lucene-specific methods.
  *
+ * @param <SR> Scope root type.
  * @param <R> The type of entity references.
  * @param <E> The type of entities.
  * @see SearchProjectionFactory
  */
-public interface LuceneSearchProjectionFactory<R, E>
-		extends ExtendedSearchProjectionFactory<LuceneSearchProjectionFactory<R, E>, R, E> {
+public interface LuceneSearchProjectionFactory<SR, R, E>
+		extends ExtendedSearchProjectionFactory<SR, LuceneSearchProjectionFactory<SR, R, E>, R, E> {
 
 	/**
 	 * Project to a Lucene {@link Document} containing all the stored fields.

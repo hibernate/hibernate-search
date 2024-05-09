@@ -15,15 +15,16 @@ import org.hibernate.search.engine.search.common.ValueModel;
 import org.hibernate.search.engine.search.predicate.dsl.SearchPredicateFactory;
 import org.hibernate.search.util.common.impl.Contracts;
 
-public class TermsAggregationFieldStepImpl<PDF extends SearchPredicateFactory> implements TermsAggregationFieldStep<PDF> {
-	private final SearchAggregationDslContext<?, ? extends PDF> dslContext;
+public class TermsAggregationFieldStepImpl<SR, PDF extends SearchPredicateFactory<SR>>
+		implements TermsAggregationFieldStep<SR, PDF> {
+	private final SearchAggregationDslContext<SR, ?, ? extends PDF> dslContext;
 
-	public TermsAggregationFieldStepImpl(SearchAggregationDslContext<?, ? extends PDF> dslContext) {
+	public TermsAggregationFieldStepImpl(SearchAggregationDslContext<SR, ?, ? extends PDF> dslContext) {
 		this.dslContext = dslContext;
 	}
 
 	@Override
-	public <F> TermsAggregationOptionsStep<?, PDF, F, Map<F, Long>> field(String fieldPath, Class<F> type,
+	public <F> TermsAggregationOptionsStep<SR, ?, PDF, F, Map<F, Long>> field(String fieldPath, Class<F> type,
 			ValueModel valueModel) {
 		Contracts.assertNotNull( fieldPath, "fieldPath" );
 		Contracts.assertNotNull( type, "type" );

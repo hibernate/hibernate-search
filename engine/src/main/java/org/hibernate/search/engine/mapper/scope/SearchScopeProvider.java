@@ -1,8 +1,6 @@
 /*
- * Hibernate Search, full-text search for your domain model
- *
- * License: GNU Lesser General Public License (LGPL), version 2.1 or later
- * See the lgpl.txt file in the root directory or <http://www.gnu.org/licenses/lgpl-2.1.html>.
+ * SPDX-License-Identifier: Apache-2.0
+ * Copyright Red Hat Inc. and Hibernate Authors
  */
 package org.hibernate.search.engine.mapper.scope;
 
@@ -21,11 +19,12 @@ public interface SearchScopeProvider<ER extends EntityReference> {
 	 * indexed entity types among the given class and its subtypes.
 	 *
 	 * @param clazz A class that must be an indexed entity type or a supertype of such type.
+	 * @param <SR> Scope root type.
 	 * @param <T> A supertype of all indexed entity types to include in the scope.
 	 * @return The created scope.
 	 * @see SearchScope
 	 */
-	default <T> SearchScope<T, ER> scope(Class<T> clazz) {
+	default <SR, T> SearchScope<SR, T, ER> scope(Class<T> clazz) {
 		return scope( Collections.singleton( clazz ) );
 	}
 
@@ -35,11 +34,12 @@ public interface SearchScopeProvider<ER extends EntityReference> {
 	 *
 	 * @param classes A collection of classes.
 	 * Each must be an indexed entity type or a supertype of such type.
+	 * @param <SR> Scope root type.
 	 * @param <T> A supertype of all indexed entity types to include in the scope.
 	 * @return The created scope.
 	 * @see SearchScope
 	 */
-	<T> SearchScope<T, ER> scope(Collection<? extends Class<? extends T>> classes);
+	<SR, T> SearchScope<SR, T, ER> scope(Collection<? extends Class<? extends T>> classes);
 
 	/**
 	 * Creates a {@link SearchScope} limited to
@@ -48,11 +48,12 @@ public interface SearchScopeProvider<ER extends EntityReference> {
 	 * @param expectedSuperType A supertype of all entity types to include in the scope.
 	 * @param entityName An entity name.
 	 * The referenced entity type must be an indexed entity type or a supertype of such type.
+	 * @param <SR> Scope root type.
 	 * @param <T> A supertype of all indexed entity types to include in the scope.
 	 * @return The created scope.
 	 * @see SearchScope
 	 */
-	default <T> SearchScope<T, ER> scope(Class<T> expectedSuperType, String entityName) {
+	default <SR, T> SearchScope<SR, T, ER> scope(Class<T> expectedSuperType, String entityName) {
 		return scope( expectedSuperType, Collections.singleton( entityName ) );
 	}
 
@@ -63,10 +64,11 @@ public interface SearchScopeProvider<ER extends EntityReference> {
 	 * @param expectedSuperType A supertype of all indexed entity types to include in the scope.
 	 * @param entityNames A collection of entity names.
 	 * Each entity type referenced in the collection must be an indexed entity type or a supertype of such type.
+	 * @param <SR> Scope root type.
 	 * @param <T> A supertype of all indexed entity types to include in the scope.
 	 * @return The created scope.
 	 * @see SearchScope
 	 */
-	<T> SearchScope<T, ER> scope(Class<T> expectedSuperType, Collection<String> entityNames);
+	<SR, T> SearchScope<SR, T, ER> scope(Class<T> expectedSuperType, Collection<String> entityNames);
 
 }

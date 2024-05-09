@@ -19,6 +19,7 @@ import org.hibernate.search.engine.search.query.spi.SearchQueryIndexScope;
  * In short, users are only expected to get instances of this type from an API ({@code SomeExtension.get()})
  * and pass it to another API.
  *
+ * @param <SR> Scope root type.
  * @param <T> The type of extended steps in the search query definition DSL. Should generally extend
  * {@link SearchQuerySelectStep}.
  * @param <R> The reference type.
@@ -28,7 +29,7 @@ import org.hibernate.search.engine.search.query.spi.SearchQueryIndexScope;
  * @see SearchQuerySelectStep#extension(SearchQueryDslExtension)
  * @see AbstractSearchQueryOptionsStep
  */
-public interface SearchQueryDslExtension<T, R, E, LOS> {
+public interface SearchQueryDslExtension<SR, T, R, E, LOS> {
 
 	/**
 	 * Attempt to extend a given DSL step, returning an empty {@link Optional} in case of failure.
@@ -42,7 +43,7 @@ public interface SearchQueryDslExtension<T, R, E, LOS> {
 	 * @return An optional containing the extended search query DSL step ({@link T}) in case
 	 * of success, or an empty optional otherwise.
 	 */
-	Optional<T> extendOptional(SearchQuerySelectStep<?, R, E, LOS, ?, ?> original,
+	Optional<T> extendOptional(SearchQuerySelectStep<SR, ?, R, E, LOS, ?, ?> original,
 			SearchQueryIndexScope<?> scope,
 			BackendSessionContext sessionContext,
 			SearchLoadingContextBuilder<E, LOS> loadingContextBuilder);

@@ -122,7 +122,7 @@ class ExistsPredicateObjectsSpecificsIT {
 
 	@Test
 	void nested_multiIndexes_incompatibleIndexBinding() {
-		SearchPredicateFactory f = mainIndex.createScope( incompatibleIndex ).predicate();
+		SearchPredicateFactory<?> f = mainIndex.createScope( incompatibleIndex ).predicate();
 		String fieldPath = "nested";
 
 		assertThatThrownBy( () -> f.exists().field( fieldPath ) )
@@ -148,7 +148,7 @@ class ExistsPredicateObjectsSpecificsIT {
 
 	@Test
 	void nested_multiIndexes_wrongStructure() {
-		SearchPredicateFactory f = mainIndex.createScope( invertedIndex ).predicate();
+		SearchPredicateFactory<?> f = mainIndex.createScope( invertedIndex ).predicate();
 
 		String fieldPath = "nested";
 
@@ -218,7 +218,7 @@ class ExistsPredicateObjectsSpecificsIT {
 
 	@Test
 	void flattened_multiIndexes_incompatibleIndexBinding() {
-		SearchPredicateFactory f = incompatibleIndex.createScope( mainIndex ).predicate();
+		SearchPredicateFactory<?> f = incompatibleIndex.createScope( mainIndex ).predicate();
 		String fieldPath = "flattened";
 
 		assertThatThrownBy( () -> f.exists().field( fieldPath ) )
@@ -244,7 +244,7 @@ class ExistsPredicateObjectsSpecificsIT {
 
 	@Test
 	void flattened_multiIndexes_wrongStructure() {
-		SearchPredicateFactory f = invertedIndex.createScope( mainIndex ).predicate();
+		SearchPredicateFactory<?> f = invertedIndex.createScope( mainIndex ).predicate();
 
 		String fieldPath = "flattened";
 

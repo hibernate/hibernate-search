@@ -152,13 +152,13 @@ class FieldProjectionBaseIT {
 		}
 
 		@Override
-		protected ProjectionFinalStep<F> singleValuedProjection(SearchProjectionFactory<?, ?> f,
+		protected ProjectionFinalStep<F> singleValuedProjection(SearchProjectionFactory<?, ?, ?> f,
 				String absoluteFieldPath, DataSet<F, F, FieldProjectionTestValues<F>> dataSet) {
 			return f.field( absoluteFieldPath, dataSet.fieldType.getJavaType() );
 		}
 
 		@Override
-		protected ProjectionFinalStep<List<F>> multiValuedProjection(SearchProjectionFactory<?, ?> f,
+		protected ProjectionFinalStep<List<F>> multiValuedProjection(SearchProjectionFactory<?, ?, ?> f,
 				String absoluteFieldPath, DataSet<F, F, FieldProjectionTestValues<F>> dataSet) {
 			return f.field( absoluteFieldPath, dataSet.fieldType.getJavaType() ).collector( ProjectionCollector.list() );
 		}
@@ -179,7 +179,7 @@ class FieldProjectionBaseIT {
 		}
 
 		@Override
-		protected void tryProjection(SearchProjectionFactory<?, ?> f, String fieldPath) {
+		protected void tryProjection(SearchProjectionFactory<?, ?, ?> f, String fieldPath) {
 			f.field( fieldPath );
 		}
 
@@ -218,7 +218,8 @@ class FieldProjectionBaseIT {
 		}
 
 		@Override
-		protected void tryProjection(SearchProjectionFactory<?, ?> f, String fieldPath, FieldTypeDescriptor<?, ?> fieldType) {
+		protected void tryProjection(SearchProjectionFactory<?, ?, ?> f, String fieldPath,
+				FieldTypeDescriptor<?, ?> fieldType) {
 			f.field( fieldPath );
 		}
 

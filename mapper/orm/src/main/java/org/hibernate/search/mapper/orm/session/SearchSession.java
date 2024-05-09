@@ -12,6 +12,7 @@ import jakarta.persistence.EntityManager;
 
 import org.hibernate.Session;
 import org.hibernate.search.engine.search.query.dsl.SearchQuerySelectStep;
+import org.hibernate.search.engine.search.reference.RootReferenceScope;
 import org.hibernate.search.mapper.orm.mapping.SearchMapping;
 import org.hibernate.search.mapper.orm.massindexing.MassIndexer;
 import org.hibernate.search.mapper.orm.schema.management.SearchSchemaManager;
@@ -44,7 +45,8 @@ public interface SearchSession extends SearchScopeProvider {
 	 * @see SearchQuerySelectStep
 	 */
 	@SuppressWarnings("deprecation")
-	default <T> SearchQuerySelectStep<?,
+	default <T> SearchQuerySelectStep<T,
+			?,
 			org.hibernate.search.mapper.orm.common.EntityReference,
 			T,
 			SearchLoadingOptionsStep,
@@ -66,7 +68,8 @@ public interface SearchSession extends SearchScopeProvider {
 	 * @see SearchQuerySelectStep
 	 */
 	@SuppressWarnings("deprecation")
-	<T> SearchQuerySelectStep<?,
+	<T> SearchQuerySelectStep<T,
+			?,
 			org.hibernate.search.mapper.orm.common.EntityReference,
 			T,
 			SearchLoadingOptionsStep,
@@ -84,12 +87,33 @@ public interface SearchSession extends SearchScopeProvider {
 	 * @see SearchQuerySelectStep
 	 */
 	@SuppressWarnings("deprecation")
-	<T> SearchQuerySelectStep<?,
+	<SR, T> SearchQuerySelectStep<SR,
+			?,
 			org.hibernate.search.mapper.orm.common.EntityReference,
 			T,
 			SearchLoadingOptionsStep,
 			?,
-			?> search(SearchScope<T> scope);
+			?> search(SearchScope<SR, T> scope);
+
+	/**
+	 * Initiate the building of a search query.
+	 * <p>
+	 * The query will target the indexes in the given scope.
+	 *
+	 * @param scope A scope representing all indexed types that will be targeted by the search query.
+	 * @param <T> A supertype of all types in the given scope.
+	 * @return The initial step of a DSL where the search query can be defined.
+	 * @see SearchQuerySelectStep
+	 */
+	@SuppressWarnings("deprecation")
+	@Incubating
+	<SR, T> SearchQuerySelectStep<SR,
+			?,
+			org.hibernate.search.mapper.orm.common.EntityReference,
+			T,
+			SearchLoadingOptionsStep,
+			?,
+			?> search(RootReferenceScope<SR, T> scope);
 
 	/**
 	 * Create a {@link SearchSchemaManager} for all indexes.

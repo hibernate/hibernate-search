@@ -13,12 +13,13 @@ import com.google.gson.JsonObject;
 /**
  * A factory for search projections with some Elasticsearch-specific methods.
  *
+ * @param <SR> Scope root type.
  * @param <R> The type of entity references.
  * @param <E> The type of entities.
  * @see SearchProjectionFactory
  */
-public interface ElasticsearchSearchProjectionFactory<R, E>
-		extends ExtendedSearchProjectionFactory<ElasticsearchSearchProjectionFactory<R, E>, R, E> {
+public interface ElasticsearchSearchProjectionFactory<SR, R, E>
+		extends ExtendedSearchProjectionFactory<SR, ElasticsearchSearchProjectionFactory<SR, R, E>, R, E> {
 
 	/**
 	 * Project to a {@link JsonObject} representing the document as stored in Elasticsearch.

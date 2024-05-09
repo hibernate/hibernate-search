@@ -15,17 +15,23 @@ import org.hibernate.search.engine.search.query.spi.SearchQueryBuilder;
 import org.hibernate.search.engine.search.query.spi.SearchQueryIndexScope;
 import org.hibernate.search.engine.search.sort.dsl.SearchSortFactory;
 
-final class DefaultSearchQueryOptionsStep<H, LOS>
+final class DefaultSearchQueryOptionsStep<SR, H, LOS>
 		extends AbstractSearchQueryOptionsStep<
-				DefaultSearchQueryOptionsStep<H, LOS>,
+				SR,
+				DefaultSearchQueryOptionsStep<SR, H, LOS>,
 				H,
 				LOS,
-				SearchPredicateFactory,
-				SearchSortFactory,
-				SearchAggregationFactory,
+				SearchPredicateFactory<SR>,
+				SearchSortFactory<SR>,
+				SearchAggregationFactory<SR>,
 				SearchQueryIndexScope<?>>
-		implements SearchQueryWhereStep<DefaultSearchQueryOptionsStep<H, LOS>, H, LOS, SearchPredicateFactory>,
-		SearchQueryOptionsStep<DefaultSearchQueryOptionsStep<H, LOS>, H, LOS, SearchSortFactory, SearchAggregationFactory> {
+		implements SearchQueryWhereStep<SR, DefaultSearchQueryOptionsStep<SR, H, LOS>, H, LOS, SearchPredicateFactory<SR>>,
+		SearchQueryOptionsStep<SR,
+				DefaultSearchQueryOptionsStep<SR, H, LOS>,
+				H,
+				LOS,
+				SearchSortFactory<SR>,
+				SearchAggregationFactory<SR>> {
 
 	DefaultSearchQueryOptionsStep(SearchQueryIndexScope<?> scope, SearchQueryBuilder<H> searchQueryBuilder,
 			SearchLoadingContextBuilder<?, LOS> loadingContextBuilder) {
@@ -33,17 +39,17 @@ final class DefaultSearchQueryOptionsStep<H, LOS>
 	}
 
 	@Override
-	protected SearchPredicateFactory predicateFactory() {
+	protected SearchPredicateFactory<SR> predicateFactory() {
 		return scope.predicateFactory();
 	}
 
 	@Override
-	protected SearchSortFactory sortFactory() {
+	protected SearchSortFactory<SR> sortFactory() {
 		return scope.sortFactory();
 	}
 
 	@Override
-	protected SearchAggregationFactory aggregationFactory() {
+	protected SearchAggregationFactory<SR> aggregationFactory() {
 		return scope.aggregationFactory();
 	}
 
@@ -53,7 +59,7 @@ final class DefaultSearchQueryOptionsStep<H, LOS>
 	}
 
 	@Override
-	protected DefaultSearchQueryOptionsStep<H, LOS> thisAsS() {
+	protected DefaultSearchQueryOptionsStep<SR, H, LOS> thisAsS() {
 		return this;
 	}
 }

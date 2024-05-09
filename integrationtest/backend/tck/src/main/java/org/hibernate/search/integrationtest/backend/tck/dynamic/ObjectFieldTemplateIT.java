@@ -480,7 +480,7 @@ class ObjectFieldTemplateIT {
 	}
 
 	private SearchQuery<DocumentReference> query(
-			Function<? super SearchPredicateFactory, ? extends PredicateFinalStep> predicateContributor) {
+			Function<? super SearchPredicateFactory<?>, ? extends PredicateFinalStep> predicateContributor) {
 		return index.createScope().query()
 				.where( predicateContributor )
 				.toQuery();

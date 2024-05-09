@@ -126,7 +126,7 @@ class SpatialWithinCirclePredicateBaseIT {
 		}
 
 		@Override
-		protected PredicateFinalStep predicate(SearchPredicateFactory f, String fieldPath, int matchingDocOrdinal,
+		protected PredicateFinalStep predicate(SearchPredicateFactory<?> f, String fieldPath, int matchingDocOrdinal,
 				DataSet<?, SpatialWithinCirclePredicateTestValues> dataSet) {
 			return f.spatial().within().field( fieldPath )
 					.circle( SingleFieldConfigured.dataSet.values.matchingCenter( matchingDocOrdinal ),
@@ -134,7 +134,7 @@ class SpatialWithinCirclePredicateBaseIT {
 		}
 
 		@Override
-		protected PredicateFinalStep predicate(SearchPredicateFactory f, String fieldPath, String paramName,
+		protected PredicateFinalStep predicate(SearchPredicateFactory<?> f, String fieldPath, String paramName,
 				DataSet<?, SpatialWithinCirclePredicateTestValues> dataSet) {
 			return f.withParameters( params -> f.spatial().within().field( fieldPath )
 					.circle( params.get( paramName + "_center", GeoPoint.class ),
@@ -171,7 +171,7 @@ class SpatialWithinCirclePredicateBaseIT {
 		}
 
 		@Override
-		protected PredicateFinalStep predicateOnFieldAndField(SearchPredicateFactory f, String fieldPath,
+		protected PredicateFinalStep predicateOnFieldAndField(SearchPredicateFactory<?> f, String fieldPath,
 				String otherFieldPath, int matchingDocOrdinal, DataSet<?, SpatialWithinCirclePredicateTestValues> dataSet) {
 			return f.spatial().within().field( fieldPath ).field( otherFieldPath )
 					.circle( MultiFieldConfigured.dataSet.values.matchingCenter( matchingDocOrdinal ),
@@ -179,7 +179,7 @@ class SpatialWithinCirclePredicateBaseIT {
 		}
 
 		@Override
-		protected PredicateFinalStep predicateOnFields(SearchPredicateFactory f, String[] fieldPaths, int matchingDocOrdinal,
+		protected PredicateFinalStep predicateOnFields(SearchPredicateFactory<?> f, String[] fieldPaths, int matchingDocOrdinal,
 				DataSet<?, SpatialWithinCirclePredicateTestValues> dataSet) {
 			return f.spatial().within().fields( fieldPaths )
 					.circle( MultiFieldConfigured.dataSet.values.matchingCenter( matchingDocOrdinal ),
@@ -187,7 +187,7 @@ class SpatialWithinCirclePredicateBaseIT {
 		}
 
 		@Override
-		protected PredicateFinalStep predicateOnFieldAndFields(SearchPredicateFactory f, String fieldPath,
+		protected PredicateFinalStep predicateOnFieldAndFields(SearchPredicateFactory<?> f, String fieldPath,
 				String[] fieldPaths, int matchingDocOrdinal, DataSet<?, SpatialWithinCirclePredicateTestValues> dataSet) {
 			return f.spatial().within().field( fieldPath ).fields( fieldPaths )
 					.circle( MultiFieldConfigured.dataSet.values.matchingCenter( matchingDocOrdinal ),
@@ -218,7 +218,7 @@ class SpatialWithinCirclePredicateBaseIT {
 		}
 
 		@Override
-		protected PredicateFinalStep predicate(SearchPredicateFactory f, String fieldPath, int matchingDocOrdinal,
+		protected PredicateFinalStep predicate(SearchPredicateFactory<?> f, String fieldPath, int matchingDocOrdinal,
 				DataSet<?, SpatialWithinCirclePredicateTestValues> dataSet) {
 			return f.spatial().within().field( fieldPath )
 					.circle( InObjectFieldConfigured.dataSet.values.matchingCenter( matchingDocOrdinal ),
@@ -243,7 +243,7 @@ class SpatialWithinCirclePredicateBaseIT {
 		}
 
 		@Override
-		protected PredicateFinalStep predicate(SearchPredicateFactory f, String fieldPath, int matchingDocOrdinal,
+		protected PredicateFinalStep predicate(SearchPredicateFactory<?> f, String fieldPath, int matchingDocOrdinal,
 				DataSet<?, SpatialWithinCirclePredicateTestValues> dataSet) {
 			return f.spatial().within().field( fieldPath )
 					.circle( ScoreConfigured.dataSet.values.matchingCenter( matchingDocOrdinal ),
@@ -251,7 +251,7 @@ class SpatialWithinCirclePredicateBaseIT {
 		}
 
 		@Override
-		protected PredicateFinalStep predicateWithConstantScore(SearchPredicateFactory f, String[] fieldPaths,
+		protected PredicateFinalStep predicateWithConstantScore(SearchPredicateFactory<?> f, String[] fieldPaths,
 				int matchingDocOrdinal, DataSet<?, SpatialWithinCirclePredicateTestValues> dataSet) {
 			return f.spatial().within().fields( fieldPaths )
 					.circle( ScoreConfigured.dataSet.values.matchingCenter( matchingDocOrdinal ),
@@ -260,7 +260,7 @@ class SpatialWithinCirclePredicateBaseIT {
 		}
 
 		@Override
-		protected PredicateFinalStep predicateWithPredicateLevelBoost(SearchPredicateFactory f, String[] fieldPaths,
+		protected PredicateFinalStep predicateWithPredicateLevelBoost(SearchPredicateFactory<?> f, String[] fieldPaths,
 				int matchingDocOrdinal, float predicateBoost, DataSet<?, SpatialWithinCirclePredicateTestValues> dataSet) {
 			return f.spatial().within().fields( fieldPaths )
 					.circle( ScoreConfigured.dataSet.values.matchingCenter( matchingDocOrdinal ),
@@ -269,7 +269,7 @@ class SpatialWithinCirclePredicateBaseIT {
 		}
 
 		@Override
-		protected PredicateFinalStep predicateWithConstantScoreAndPredicateLevelBoost(SearchPredicateFactory f,
+		protected PredicateFinalStep predicateWithConstantScoreAndPredicateLevelBoost(SearchPredicateFactory<?> f,
 				String[] fieldPaths, int matchingDocOrdinal, float predicateBoost,
 				DataSet<?, SpatialWithinCirclePredicateTestValues> dataSet) {
 			return f.spatial().within().fields( fieldPaths )
@@ -279,7 +279,7 @@ class SpatialWithinCirclePredicateBaseIT {
 		}
 
 		@Override
-		protected PredicateFinalStep predicateWithFieldLevelBoost(SearchPredicateFactory f, String fieldPath,
+		protected PredicateFinalStep predicateWithFieldLevelBoost(SearchPredicateFactory<?> f, String fieldPath,
 				float fieldBoost, int matchingDocOrdinal, DataSet<?, SpatialWithinCirclePredicateTestValues> dataSet) {
 			return f.spatial().within().field( fieldPath ).boost( fieldBoost )
 					.circle( ScoreConfigured.dataSet.values.matchingCenter( matchingDocOrdinal ),
@@ -287,7 +287,7 @@ class SpatialWithinCirclePredicateBaseIT {
 		}
 
 		@Override
-		protected PredicateFinalStep predicateWithFieldLevelBoostAndConstantScore(SearchPredicateFactory f,
+		protected PredicateFinalStep predicateWithFieldLevelBoostAndConstantScore(SearchPredicateFactory<?> f,
 				String fieldPath, float fieldBoost, int matchingDocOrdinal,
 				DataSet<?, SpatialWithinCirclePredicateTestValues> dataSet) {
 			return f.spatial().within().field( fieldPath ).boost( fieldBoost )
@@ -297,7 +297,7 @@ class SpatialWithinCirclePredicateBaseIT {
 		}
 
 		@Override
-		protected PredicateFinalStep predicateWithFieldLevelBoostAndPredicateLevelBoost(SearchPredicateFactory f,
+		protected PredicateFinalStep predicateWithFieldLevelBoostAndPredicateLevelBoost(SearchPredicateFactory<?> f,
 				String fieldPath, float fieldBoost, int matchingDocOrdinal, float predicateBoost,
 				DataSet<?, SpatialWithinCirclePredicateTestValues> dataSet) {
 			return f.spatial().within().field( fieldPath ).boost( fieldBoost )
@@ -321,7 +321,7 @@ class SpatialWithinCirclePredicateBaseIT {
 		}
 
 		@Override
-		protected void tryPredicate(SearchPredicateFactory f, String fieldPath) {
+		protected void tryPredicate(SearchPredicateFactory<?> f, String fieldPath) {
 			f.spatial().within().field( fieldPath )
 					// We need this because the backend is not involved before the call to circle()
 					.circle( GeoPoint.of( 0, 0 ), 1 );
@@ -355,7 +355,7 @@ class SpatialWithinCirclePredicateBaseIT {
 		}
 
 		@Override
-		protected void tryPredicate(SearchPredicateFactory f, String fieldPath) {
+		protected void tryPredicate(SearchPredicateFactory<?> f, String fieldPath) {
 			f.spatial().within().field( fieldPath )
 					// We need this because the backend is not involved before the call to circle()
 					.circle( GeoPoint.of( 0, 0 ), 1 );
@@ -390,7 +390,7 @@ class SpatialWithinCirclePredicateBaseIT {
 		}
 
 		@Override
-		protected void tryPredicate(SearchPredicateFactory f, String fieldPath, FieldTypeDescriptor<?, ?> fieldType) {
+		protected void tryPredicate(SearchPredicateFactory<?> f, String fieldPath, FieldTypeDescriptor<?, ?> fieldType) {
 			f.spatial().within().field( fieldPath )
 					// We need this because the backend is not involved before the call to circle()
 					.circle( GeoPoint.of( 0, 0 ), 1 );
@@ -419,7 +419,7 @@ class SpatialWithinCirclePredicateBaseIT {
 		@ParameterizedTest(name = "{1}")
 		@MethodSource("params")
 		void nullUnit(SimpleMappedIndex<IndexBinding> index, FieldTypeDescriptor<?, ?> fieldType) {
-			SearchPredicateFactory f = index.createScope().predicate();
+			SearchPredicateFactory<?> f = index.createScope().predicate();
 
 			assertThatThrownBy(
 					() -> f.spatial().within().field( fieldPath( index, fieldType ) ).circle( 0.0, 0.0, 10.0, null ) )
@@ -428,7 +428,7 @@ class SpatialWithinCirclePredicateBaseIT {
 		}
 
 		@Override
-		protected void tryPredicateWithNullMatchingParam(SearchPredicateFactory f, String fieldPath) {
+		protected void tryPredicateWithNullMatchingParam(SearchPredicateFactory<?> f, String fieldPath) {
 			f.spatial().within().field( fieldPath ).circle( null, 10.0 );
 		}
 	}
@@ -466,7 +466,7 @@ class SpatialWithinCirclePredicateBaseIT {
 		}
 
 		@Override
-		protected PredicateFinalStep predicate(SearchPredicateFactory f, String fieldPath, int matchingDocOrdinal,
+		protected PredicateFinalStep predicate(SearchPredicateFactory<?> f, String fieldPath, int matchingDocOrdinal,
 				DataSet<?, SpatialWithinCirclePredicateTestValues> dataSet) {
 			return f.spatial().within().field( fieldPath )
 					.circle( TypeCheckingNoConversionConfigured.dataSet.values.matchingCenter( matchingDocOrdinal ),
@@ -474,7 +474,7 @@ class SpatialWithinCirclePredicateBaseIT {
 		}
 
 		@Override
-		protected PredicateFinalStep predicate(SearchPredicateFactory f, String field0Path, String field1Path,
+		protected PredicateFinalStep predicate(SearchPredicateFactory<?> f, String field0Path, String field1Path,
 				int matchingDocOrdinal, DataSet<?, SpatialWithinCirclePredicateTestValues> dataSet) {
 			return f.spatial().within().field( field0Path ).field( field1Path )
 					.circle( TypeCheckingNoConversionConfigured.dataSet.values.matchingCenter( matchingDocOrdinal ),

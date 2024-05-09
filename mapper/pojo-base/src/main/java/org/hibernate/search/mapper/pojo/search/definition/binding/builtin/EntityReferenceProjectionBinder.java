@@ -53,7 +53,7 @@ public final class EntityReferenceProjectionBinder implements ProjectionBinder {
 		// Mappers are required to have their entity reference type extend EntityReference.
 		// The generic parameter R in SearchProjectionFactory is only there for backwards compatibility.
 		@SuppressWarnings("unchecked")
-		public SearchProjection<? extends EntityReference> create(SearchProjectionFactory<?, ?> factory,
+		public SearchProjection<? extends EntityReference> create(SearchProjectionFactory<?, ?, ?> factory,
 				ProjectionDefinitionContext context) {
 			return (SearchProjection<? extends EntityReference>) factory.entityReference().toProjection();
 		}

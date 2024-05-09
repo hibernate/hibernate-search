@@ -89,7 +89,7 @@ public abstract class AbstractPredicateScaleCheckingIT {
 				) );
 	}
 
-	protected abstract PredicateFinalStep predicate(SearchPredicateFactory f, String fieldPath, Object matchingParam);
+	protected abstract PredicateFinalStep predicate(SearchPredicateFactory<?> f, String fieldPath, Object matchingParam);
 
 	protected abstract String predicateTrait();
 

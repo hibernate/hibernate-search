@@ -15,13 +15,15 @@ import org.hibernate.search.engine.search.predicate.SearchPredicate;
  * <p>
  * See also {@link PredicateScoreStep} or {@link PredicateFinalStep}.
  *
+ * @param <SR> Scope root type.
  * @param <S> The "self" type (the actual exposed type of this collector).
  * @param <C> The "collector" type (the type of collector passed to the consumer in {@link #with(Consumer)}).
  */
 public interface GenericSimpleBooleanPredicateClausesStep<
+		SR,
 		S extends C,
-		C extends SimpleBooleanPredicateClausesCollector<?>>
-		extends SimpleBooleanPredicateClausesCollector<C>, PredicateFinalStep {
+		C extends SimpleBooleanPredicateClausesCollector<SR, ?>>
+		extends SimpleBooleanPredicateClausesCollector<SR, C>, PredicateFinalStep {
 	@Override
 	default S add(PredicateFinalStep searchPredicate) {
 		return add( searchPredicate.toPredicate() );
@@ -31,7 +33,7 @@ public interface GenericSimpleBooleanPredicateClausesStep<
 	S add(SearchPredicate searchPredicate);
 
 	@Override
-	S add(Function<? super SearchPredicateFactory, ? extends PredicateFinalStep> clauseContributor);
+	S add(Function<? super SearchPredicateFactory<SR>, ? extends PredicateFinalStep> clauseContributor);
 
 	@Override
 	S with(Consumer<? super C> contributor);

@@ -36,12 +36,13 @@ import org.hibernate.search.util.common.function.TriFunction;
  * Such a factory can also transform relative paths into absolute paths using {@link #toAbsolutePath(String)};
  * this can be useful for native projections in particular.
  *
+ * @param <SR> Scope root type.
  * @param <R> The type of entity references, i.e. the type of objects returned for
  * {@link #entityReference() entity reference projections}.
  * @param <E> The type of entities, i.e. the type of objects returned for
  * {@link #entity() entity projections}.
  */
-public interface SearchProjectionFactory<R, E> {
+public interface SearchProjectionFactory<SR, R, E> {
 
 	/**
 	 * Project the match to a {@link DocumentReference}.
@@ -440,7 +441,7 @@ public interface SearchProjectionFactory<R, E> {
 	 * @return The extended factory.
 	 * @throws SearchException If the extension cannot be applied (wrong underlying backend, ...).
 	 */
-	<T> T extension(SearchProjectionFactoryExtension<T, R, E> extension);
+	<T> T extension(SearchProjectionFactoryExtension<SR, T, R, E> extension);
 
 	/**
 	 * Create a DSL step allowing multiple attempts to apply extensions one after the other,
@@ -455,7 +456,7 @@ public interface SearchProjectionFactory<R, E> {
 	 * @param <T> The expected projected type.
 	 * @return A DSL step.
 	 */
-	<T> SearchProjectionFactoryExtensionIfSupportedStep<T, R, E> extension();
+	<T> SearchProjectionFactoryExtensionIfSupportedStep<SR, T, R, E> extension();
 
 	/**
 	 * Create a new projection factory whose root for all paths passed to the DSL
@@ -468,7 +469,7 @@ public interface SearchProjectionFactory<R, E> {
 	 * @return A new projection factory using the given object field as root.
 	 */
 	@Incubating
-	SearchProjectionFactory<R, E> withRoot(String objectFieldPath);
+	SearchProjectionFactory<SR, R, E> withRoot(String objectFieldPath);
 
 	/**
 	 * @param relativeFieldPath The path to a field, relative to the {@link #withRoot(String) root} of this factory.

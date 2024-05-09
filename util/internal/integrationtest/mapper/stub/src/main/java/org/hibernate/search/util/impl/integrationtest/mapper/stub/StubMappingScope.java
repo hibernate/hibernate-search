@@ -14,9 +14,9 @@ import org.hibernate.search.engine.mapper.scope.spi.MappedIndexScope;
  * <p>
  * This is a simpler version of {@link GenericStubMappingScope} that allows user to skip the generic parameters.
  */
-public class StubMappingScope extends GenericStubMappingScope<EntityReference, DocumentReference> {
+public class StubMappingScope extends GenericStubMappingScope<Object, EntityReference, DocumentReference> {
 
-	StubMappingScope(StubMapping mapping, MappedIndexScope<EntityReference, DocumentReference> delegate) {
+	StubMappingScope(StubMapping mapping, MappedIndexScope<Object, EntityReference, DocumentReference> delegate) {
 		super( mapping, delegate, new StubSearchLoadingContext() );
 	}
 }

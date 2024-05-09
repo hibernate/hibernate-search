@@ -32,53 +32,54 @@ import org.hibernate.search.engine.search.common.NamedValues;
 import org.hibernate.search.engine.search.predicate.dsl.SearchPredicateFactory;
 
 public abstract class AbstractSearchAggregationFactory<
-		S extends ExtendedSearchAggregationFactory<S, PDF>,
+		SR,
+		S extends ExtendedSearchAggregationFactory<SR, S, PDF>,
 		SC extends SearchAggregationIndexScope<?>,
-		PDF extends SearchPredicateFactory>
-		implements ExtendedSearchAggregationFactory<S, PDF> {
+		PDF extends SearchPredicateFactory<SR>>
+		implements ExtendedSearchAggregationFactory<SR, S, PDF> {
 
-	protected final SearchAggregationDslContext<SC, PDF> dslContext;
+	protected final SearchAggregationDslContext<SR, SC, PDF> dslContext;
 
-	public AbstractSearchAggregationFactory(SearchAggregationDslContext<SC, PDF> dslContext) {
+	public AbstractSearchAggregationFactory(SearchAggregationDslContext<SR, SC, PDF> dslContext) {
 		this.dslContext = dslContext;
 	}
 
 	@Override
-	public RangeAggregationFieldStep<PDF> range() {
+	public RangeAggregationFieldStep<SR, PDF> range() {
 		return new RangeAggregationFieldStepImpl<>( dslContext );
 	}
 
 	@Override
-	public TermsAggregationFieldStep<PDF> terms() {
+	public TermsAggregationFieldStep<SR, PDF> terms() {
 		return new TermsAggregationFieldStepImpl<>( dslContext );
 	}
 
 	@Override
-	public SumAggregationFieldStep<PDF> sum() {
+	public SumAggregationFieldStep<SR, PDF> sum() {
 		return new SumAggregationFieldStepImpl<>( dslContext );
 	}
 
 	@Override
-	public MinAggregationFieldStep<PDF> min() {
+	public MinAggregationFieldStep<SR, PDF> min() {
 		return new MinAggregationFieldStepImpl<>( dslContext );
 	}
 
 	@Override
-	public MaxAggregationFieldStep<PDF> max() {
+	public MaxAggregationFieldStep<SR, PDF> max() {
 		return new MaxAggregationFieldStepImpl<>( dslContext );
 	}
 
 	@Override
-	public CountAggregationFieldStep<PDF> count() {
+	public CountAggregationFieldStep<SR, PDF> count() {
 		return new CountAggregationFieldStepImpl<>( dslContext );
 	}
 
 	@Override
-	public CountDistinctAggregationFieldStep<PDF> countDistinct() {
+	public CountDistinctAggregationFieldStep<SR, PDF> countDistinct() {
 		return new CountDistinctAggregationFieldStepImpl<>( dslContext );
 	}
 
-	public AvgAggregationFieldStep<PDF> avg() {
+	public AvgAggregationFieldStep<SR, PDF> avg() {
 		return new AvgAggregationFieldStepImpl<>( dslContext );
 	}
 
@@ -89,7 +90,7 @@ public abstract class AbstractSearchAggregationFactory<
 	}
 
 	@Override
-	public <T> T extension(SearchAggregationFactoryExtension<T> extension) {
+	public <T> T extension(SearchAggregationFactoryExtension<SR, T> extension) {
 		return DslExtensionState.returnIfSupported( extension, extension.extendOptional( this ) );
 	}
 

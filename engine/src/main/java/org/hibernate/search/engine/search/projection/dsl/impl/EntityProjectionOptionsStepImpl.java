@@ -17,15 +17,15 @@ import org.hibernate.search.engine.search.projection.dsl.spi.SearchProjectionDsl
 import org.hibernate.search.engine.search.projection.spi.ProjectionMappedTypeContext;
 import org.hibernate.search.engine.search.projection.spi.SearchProjectionIndexScope;
 
-public final class EntityProjectionOptionsStepImpl<E>
-		implements EntityProjectionOptionsStep<EntityProjectionOptionsStepImpl<E>, E> {
+public final class EntityProjectionOptionsStepImpl<SR, E>
+		implements EntityProjectionOptionsStep<EntityProjectionOptionsStepImpl<SR, E>, E> {
 
 	private final SearchProjectionIndexScope<?> scope;
-	private final SearchProjectionFactory<?, ?> projectionFactory;
+	private final SearchProjectionFactory<SR, ?, ?> projectionFactory;
 	private final Class<E> requestedEntityType;
 
 	public EntityProjectionOptionsStepImpl(SearchProjectionDslContext<?> dslContext,
-			SearchProjectionFactory<?, ?> projectionFactory, Class<E> requestedEntityType) {
+			SearchProjectionFactory<SR, ?, ?> projectionFactory, Class<E> requestedEntityType) {
 		this.scope = dslContext.scope();
 		this.projectionFactory = projectionFactory;
 		this.requestedEntityType = requestedEntityType;

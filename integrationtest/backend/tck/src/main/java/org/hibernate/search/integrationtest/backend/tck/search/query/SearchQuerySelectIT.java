@@ -74,7 +74,8 @@ class SearchQuerySelectIT {
 		}
 
 		@Override
-		public <R, E, LOS> SearchQueryWhereStep<?, E, LOS, ?> select(SearchQuerySelectStep<?, R, E, LOS, ?, ?> step) {
+		public <SR, R, E, LOS> SearchQueryWhereStep<SR, ?, E, LOS, ?> select(
+				SearchQuerySelectStep<SR, ?, R, E, LOS, ?, ?> step) {
 			return step;
 		}
 	}
@@ -88,7 +89,8 @@ class SearchQuerySelectIT {
 		}
 
 		@Override
-		public <R, E, LOS> SearchQueryWhereStep<?, E, LOS, ?> select(SearchQuerySelectStep<?, R, E, LOS, ?, ?> step) {
+		public <SR, R, E, LOS> SearchQueryWhereStep<SR, ?, E, LOS, ?> select(
+				SearchQuerySelectStep<SR, ?, R, E, LOS, ?, ?> step) {
 			return step.selectEntity();
 		}
 	}
@@ -100,7 +102,8 @@ class SearchQuerySelectIT {
 		}
 
 		@Override
-		public <R, E, LOS> SearchQueryWhereStep<?, R, LOS, ?> select(SearchQuerySelectStep<?, R, E, LOS, ?, ?> step) {
+		public <SR, R, E, LOS> SearchQueryWhereStep<SR, ?, R, LOS, ?> select(
+				SearchQuerySelectStep<SR, ?, R, E, LOS, ?, ?> step) {
 			return step.selectEntityReference();
 		}
 	}
@@ -118,7 +121,8 @@ class SearchQuerySelectIT {
 		}
 
 		@Override
-		public <R, E, LOS> SearchQueryWhereStep<?, E, LOS, ?> select(SearchQuerySelectStep<?, R, E, LOS, ?, ?> step) {
+		public <SR, R, E, LOS> SearchQueryWhereStep<SR, ?, E, LOS, ?> select(
+				SearchQuerySelectStep<SR, ?, R, E, LOS, ?, ?> step) {
 			return step.extension( TckConfiguration.get().getBackendHelper().queryDslExtension() );
 		}
 	}
@@ -132,8 +136,9 @@ class SearchQuerySelectIT {
 		}
 
 		@Override
-		public <R, E, LOS> SearchQueryWhereStep<?, E, LOS, ?> select(SearchQuerySelectStep<?, R, E, LOS, ?, ?> step) {
-			return step.extension( TckConfiguration.get().getBackendHelper().<R, E, LOS>queryDslExtension() )
+		public <SR, R, E, LOS> SearchQueryWhereStep<SR, ?, E, LOS, ?> select(
+				SearchQuerySelectStep<SR, ?, R, E, LOS, ?, ?> step) {
+			return step.extension( TckConfiguration.get().getBackendHelper().<SR, R, E, LOS>queryDslExtension() )
 					.selectEntity();
 		}
 	}
@@ -145,8 +150,9 @@ class SearchQuerySelectIT {
 		}
 
 		@Override
-		public <R, E, LOS> SearchQueryWhereStep<?, R, LOS, ?> select(SearchQuerySelectStep<?, R, E, LOS, ?, ?> step) {
-			return step.extension( TckConfiguration.get().getBackendHelper().<R, E, LOS>queryDslExtension() )
+		public <SR, R, E, LOS> SearchQueryWhereStep<SR, ?, R, LOS, ?> select(
+				SearchQuerySelectStep<SR, ?, R, E, LOS, ?, ?> step) {
+			return step.extension( TckConfiguration.get().getBackendHelper().<SR, R, E, LOS>queryDslExtension() )
 					.selectEntityReference();
 		}
 	}

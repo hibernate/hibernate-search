@@ -180,7 +180,7 @@ class SearchMappingIT {
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-3994")
 	void scope_indexedEntities() {
-		SearchScope<Object> objectScope = mapping.scope( Object.class );
+		SearchScope<?, Object> objectScope = mapping.scope( Object.class );
 		Set<? extends SearchIndexedEntity<?>> objectEntities = objectScope.includedTypes();
 		assertThat( objectEntities )
 				.extracting( SearchIndexedEntity::jpaName )
@@ -189,7 +189,7 @@ class SearchMappingIT {
 						Pet.JPA_ENTITY_NAME
 				);
 
-		SearchScope<Person> personScope = mapping.scope( Person.class );
+		SearchScope<?, Person> personScope = mapping.scope( Person.class );
 		Set<? extends SearchIndexedEntity<? extends Person>> personEntities = personScope.includedTypes();
 		assertThat( personEntities )
 				.extracting( SearchIndexedEntity::jpaName )
@@ -197,7 +197,7 @@ class SearchMappingIT {
 						Person.JPA_ENTITY_NAME
 				);
 
-		SearchScope<Pet> petScope = mapping.scope( Pet.class );
+		SearchScope<?, Pet> petScope = mapping.scope( Pet.class );
 		Set<? extends SearchIndexedEntity<? extends Pet>> petEntities = petScope.includedTypes();
 		assertThat( petEntities )
 				.extracting( SearchIndexedEntity::jpaName )

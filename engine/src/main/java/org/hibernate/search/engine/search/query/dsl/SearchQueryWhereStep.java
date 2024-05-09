@@ -16,16 +16,18 @@ import org.hibernate.search.engine.search.predicate.dsl.SimpleBooleanPredicateCl
 /**
  * The step in a query definition where the predicate, i.e. the "WHERE" clause, can be set.
  *
+ * @param <SR> Scope root type.
  * @param <N> The type of the next step, returned after a predicate is defined.
  * @param <H> The type of hits for the created query.
  * @param <PDF> The type of factory used to create predicates in {@link #where(Function)}.
  * @param <LOS> The type of the initial step of the loading options definition DSL accessible through {@link SearchQueryOptionsStep#loading(Consumer)}.
  */
 public interface SearchQueryWhereStep<
-		N extends SearchQueryOptionsStep<?, H, LOS, ?, ?>,
+		SR,
+		N extends SearchQueryOptionsStep<SR, ?, H, LOS, ?, ?>,
 		H,
 		LOS,
-		PDF extends SearchPredicateFactory> {
+		PDF extends SearchPredicateFactory<SR>> {
 
 	/**
 	 * Set the predicate for this query.
@@ -52,6 +54,6 @@ public interface SearchQueryWhereStep<
 	 * @return The next step.
 	 * @see SimpleBooleanPredicateClausesCollector
 	 */
-	N where(BiConsumer<? super PDF, ? super SimpleBooleanPredicateClausesCollector<?>> predicateContributor);
+	N where(BiConsumer<? super PDF, ? super SimpleBooleanPredicateClausesCollector<SR, ?>> predicateContributor);
 
 }

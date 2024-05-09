@@ -10,6 +10,7 @@ import java.util.Collections;
 
 import org.hibernate.search.engine.common.EntityReference;
 import org.hibernate.search.engine.search.query.dsl.SearchQuerySelectStep;
+import org.hibernate.search.engine.search.reference.RootReferenceScope;
 import org.hibernate.search.mapper.pojo.standalone.massindexing.MassIndexer;
 import org.hibernate.search.mapper.pojo.standalone.schema.management.SearchSchemaManager;
 import org.hibernate.search.mapper.pojo.standalone.scope.SearchScope;
@@ -87,7 +88,7 @@ public interface SearchSession extends SearchScopeProvider, AutoCloseable {
 	 * @return The initial step of a DSL where the search query can be defined.
 	 * @see SearchQuerySelectStep
 	 */
-	default <T> SearchQuerySelectStep<?, EntityReference, T, ?, ?, ?> search(Class<T> clazz) {
+	default <T> SearchQuerySelectStep<T, ?, EntityReference, T, ?, ?, ?> search(Class<T> clazz) {
 		return search( Collections.singleton( clazz ) );
 	}
 
@@ -103,7 +104,7 @@ public interface SearchSession extends SearchScopeProvider, AutoCloseable {
 	 * @return The initial step of a DSL where the search query can be defined.
 	 * @see SearchQuerySelectStep
 	 */
-	<T> SearchQuerySelectStep<?, EntityReference, T, ?, ?, ?> search(Collection<? extends Class<? extends T>> classes);
+	<T> SearchQuerySelectStep<T, ?, EntityReference, T, ?, ?, ?> search(Collection<? extends Class<? extends T>> classes);
 
 	/**
 	 * Initiate the building of a search query.
@@ -115,7 +116,27 @@ public interface SearchSession extends SearchScopeProvider, AutoCloseable {
 	 * @return The initial step of a DSL where the search query can be defined.
 	 * @see SearchQuerySelectStep
 	 */
-	<T> SearchQuerySelectStep<?, EntityReference, T, ?, ?, ?> search(SearchScope<T> scope);
+	<SR, T> SearchQuerySelectStep<SR, ?, EntityReference, T, ?, ?, ?> search(SearchScope<SR, T> scope);
+
+	/**
+	 * Initiate the building of a search query.
+	 * <p>
+	 * The query will target the indexes in the given scope.
+	 *
+	 * @param scope A scope representing all indexed types that will be targeted by the search query.
+	 * @param <SR> Scope root type.
+	 * @param <T> A supertype of all types in the given scope.
+	 * @return The initial step of a DSL where the search query can be defined.
+	 * @see SearchQuerySelectStep
+	 */
+	@Incubating
+	<SR, T> SearchQuerySelectStep<SR,
+			?,
+			EntityReference,
+			T,
+			?,
+			?,
+			?> search(RootReferenceScope<SR, T> scope);
 
 	/**
 	 * Create a {@link SearchSchemaManager} for all indexes.

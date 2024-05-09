@@ -34,37 +34,37 @@ import org.hibernate.search.mapper.pojo.standalone.tenancy.impl.TenancyConfigura
 import org.hibernate.search.mapper.pojo.standalone.work.SearchWorkspace;
 import org.hibernate.search.mapper.pojo.standalone.work.impl.SearchWorkspaceImpl;
 
-public class SearchScopeImpl<E> implements SearchScope<E> {
+public class SearchScopeImpl<SR, E> implements SearchScope<SR, E> {
 
 	private final StandalonePojoScopeMappingContext mappingContext;
-	private final PojoScopeDelegate<EntityReference, E, SearchIndexedEntity<? extends E>> delegate;
+	private final PojoScopeDelegate<SR, EntityReference, E, SearchIndexedEntity<? extends E>> delegate;
 	private final TenancyConfiguration tenancyConfiguration;
 
 	public SearchScopeImpl(StandalonePojoScopeMappingContext mappingContext,
 			TenancyConfiguration tenancyConfiguration,
-			PojoScopeDelegate<EntityReference, E, SearchIndexedEntity<? extends E>> delegate) {
+			PojoScopeDelegate<SR, EntityReference, E, SearchIndexedEntity<? extends E>> delegate) {
 		this.mappingContext = mappingContext;
 		this.tenancyConfiguration = tenancyConfiguration;
 		this.delegate = delegate;
 	}
 
 	@Override
-	public SearchPredicateFactory predicate() {
+	public SearchPredicateFactory<SR> predicate() {
 		return delegate.predicate();
 	}
 
 	@Override
-	public SearchSortFactory sort() {
+	public SearchSortFactory<SR> sort() {
 		return delegate.sort();
 	}
 
 	@Override
-	public SearchProjectionFactory<EntityReference, ?> projection() {
+	public SearchProjectionFactory<SR, EntityReference, E> projection() {
 		return delegate.projection();
 	}
 
 	@Override
-	public SearchAggregationFactory aggregation() {
+	public SearchAggregationFactory<SR> aggregation() {
 		return delegate.aggregation();
 	}
 
@@ -104,7 +104,7 @@ public class SearchScopeImpl<E> implements SearchScope<E> {
 		return delegate.extension( extension );
 	}
 
-	public SearchQuerySelectStep<?, EntityReference, E, ?, ?, ?> search(PojoScopeSessionContext sessionContext,
+	public SearchQuerySelectStep<SR, ?, EntityReference, E, ?, ?, ?> search(PojoScopeSessionContext sessionContext,
 			PojoSelectionLoadingContextBuilder<?> loadingContextBuilder) {
 		return delegate.search( sessionContext, loadingContextBuilder );
 	}

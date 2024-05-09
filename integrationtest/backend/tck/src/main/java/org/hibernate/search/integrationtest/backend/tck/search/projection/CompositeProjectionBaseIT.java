@@ -62,12 +62,12 @@ class CompositeProjectionBaseIT {
 		}
 
 		@Override
-		protected CompositeProjectionInnerStep startProjection(SearchProjectionFactory<?, ?> f) {
+		protected CompositeProjectionInnerStep startProjection(SearchProjectionFactory<?, ?, ?> f) {
 			return f.composite();
 		}
 
 		@Override
-		protected CompositeProjectionInnerStep startProjectionForMulti(SearchProjectionFactory<?, ?> f) {
+		protected CompositeProjectionInnerStep startProjectionForMulti(SearchProjectionFactory<?, ?, ?> f) {
 			return f.composite();
 		}
 

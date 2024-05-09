@@ -50,7 +50,7 @@ public abstract class AbstractProjectionConstructorIT {
 
 	protected final <P> void testSuccessfulRootProjection(SearchMapping mapping, Class<?> indexedType, Class<P> projectionType,
 			List<?> rawProjectionResults,
-			Function<SearchProjectionFactory<?, ?>, ProjectionFinalStep<?>> expectedProjection,
+			Function<SearchProjectionFactory<?, ?, ?>, ProjectionFinalStep<?>> expectedProjection,
 			List<P> expectedProjectionResults) {
 		try ( SearchSession session = createSession( mapping ) ) {
 			backendMock.expectSearchProjection(

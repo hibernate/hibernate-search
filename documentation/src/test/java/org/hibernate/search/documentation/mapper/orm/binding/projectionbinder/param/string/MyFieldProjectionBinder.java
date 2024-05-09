@@ -32,7 +32,7 @@ public class MyFieldProjectionBinder implements ProjectionBinder {
 		}
 
 		@Override
-		public SearchProjection<String> create(SearchProjectionFactory<?, ?> factory,
+		public SearchProjection<String> create(SearchProjectionFactory<?, ?, ?> factory,
 				ProjectionDefinitionContext context) {
 			return factory.field( fieldName, String.class ) // <3>
 					.toProjection();

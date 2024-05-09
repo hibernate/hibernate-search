@@ -18,10 +18,11 @@ import org.hibernate.search.engine.search.predicate.dsl.spi.SearchPredicateDslCo
 import org.hibernate.search.engine.search.predicate.spi.BooleanPredicateBuilder;
 
 public abstract class AbstractSimpleBooleanPredicateClausesStep<
+		SR,
 		S extends C,
-		C extends SimpleBooleanPredicateClausesCollector<?>>
+		C extends SimpleBooleanPredicateClausesCollector<SR, ?>>
 		extends AbstractPredicateFinalStep
-		implements GenericSimpleBooleanPredicateClausesStep<S, C> {
+		implements GenericSimpleBooleanPredicateClausesStep<SR, S, C> {
 
 	public enum SimpleBooleanPredicateOperator
 			implements BiConsumer<BooleanPredicateBuilder, SearchPredicate> {
@@ -45,11 +46,11 @@ public abstract class AbstractSimpleBooleanPredicateClausesStep<
 
 	private final BooleanPredicateBuilder builder;
 
-	private final SearchPredicateFactory factory;
+	private final SearchPredicateFactory<SR> factory;
 
 	AbstractSimpleBooleanPredicateClausesStep(SimpleBooleanPredicateOperator operator,
 			SearchPredicateDslContext<?> dslContext,
-			SearchPredicateFactory factory) {
+			SearchPredicateFactory<SR> factory) {
 		super( dslContext );
 		this.operator = operator;
 		this.builder = dslContext.scope().predicateBuilders().bool();
@@ -65,7 +66,7 @@ public abstract class AbstractSimpleBooleanPredicateClausesStep<
 	}
 
 	@Override
-	public S add(Function<? super SearchPredicateFactory, ? extends PredicateFinalStep> clauseContributor) {
+	public S add(Function<? super SearchPredicateFactory<SR>, ? extends PredicateFinalStep> clauseContributor) {
 		return add( clauseContributor.apply( factory ) );
 	}
 

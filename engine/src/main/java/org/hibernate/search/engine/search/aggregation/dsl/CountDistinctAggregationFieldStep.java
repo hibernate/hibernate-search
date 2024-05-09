@@ -12,10 +12,11 @@ import org.hibernate.search.util.common.annotation.Incubating;
 /**
  * The initial step in a "count distinct" aggregation definition, where the target field can be set.
  *
+ * @param <SR> Scope root type.
  * @param <PDF> The type of factory used to create predicates in {@link AggregationFilterStep#filter(Function)}.
  */
 @Incubating
-public interface CountDistinctAggregationFieldStep<PDF extends SearchPredicateFactory> {
+public interface CountDistinctAggregationFieldStep<SR, PDF extends SearchPredicateFactory<SR>> {
 
 	/**
 	 * Target the given field in the count distinct aggregation.
@@ -23,6 +24,6 @@ public interface CountDistinctAggregationFieldStep<PDF extends SearchPredicateFa
 	 * @param fieldPath The <a href="SearchAggregationFactory.html#field-paths">path</a> to the index field to aggregate.
 	 * @return The next step.
 	 */
-	CountDistinctAggregationOptionsStep<?, PDF> field(String fieldPath);
+	CountDistinctAggregationOptionsStep<SR, ?, PDF> field(String fieldPath);
 
 }

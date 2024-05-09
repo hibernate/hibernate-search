@@ -40,7 +40,7 @@ import org.hibernate.search.util.common.annotation.Incubating;
  * @param <E> A supertype of all types in this scope.
  */
 @Incubating
-public interface SearchScope<E> extends org.hibernate.search.engine.mapper.scope.SearchScope<E, EntityReference> {
+public interface SearchScope<SR, E> extends org.hibernate.search.engine.mapper.scope.SearchScope<SR, E, EntityReference> {
 
 	/**
 	 * Initiate the building of a search predicate.
@@ -56,7 +56,7 @@ public interface SearchScope<E> extends org.hibernate.search.engine.mapper.scope
 	 * @return A predicate factory.
 	 * @see SearchPredicateFactory
 	 */
-	SearchPredicateFactory predicate();
+	SearchPredicateFactory<SR> predicate();
 
 	/**
 	 * Initiate the building of a search sort.
@@ -72,7 +72,7 @@ public interface SearchScope<E> extends org.hibernate.search.engine.mapper.scope
 	 * @return A sort factory.
 	 * @see SearchSortFactory
 	 */
-	SearchSortFactory sort();
+	SearchSortFactory<SR> sort();
 
 	/**
 	 * Initiate the building of a search projection that will be valid for the indexes in this scope.
@@ -88,7 +88,7 @@ public interface SearchScope<E> extends org.hibernate.search.engine.mapper.scope
 	 * @return A projection factory.
 	 * @see SearchProjectionFactory
 	 */
-	SearchProjectionFactory<EntityReference, E> projection();
+	SearchProjectionFactory<SR, EntityReference, E> projection();
 
 	/**
 	 * Initiate the building of a search aggregation that will be valid for the indexes in this scope.
@@ -104,7 +104,7 @@ public interface SearchScope<E> extends org.hibernate.search.engine.mapper.scope
 	 * @return An aggregation factory.
 	 * @see SearchAggregationFactory
 	 */
-	SearchAggregationFactory aggregation();
+	SearchAggregationFactory<SR> aggregation();
 
 	/**
 	 * Initiate the building of a highlighter that will be valid for the indexes in this scope.

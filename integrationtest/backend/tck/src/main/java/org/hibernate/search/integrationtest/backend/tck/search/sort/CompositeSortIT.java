@@ -270,12 +270,12 @@ class CompositeSortIT {
 	}
 
 	private SearchQuery<DocumentReference> simpleQuery(
-			Function<? super SearchSortFactory, ? extends SortFinalStep> sortContributor) {
+			Function<? super SearchSortFactory<?>, ? extends SortFinalStep> sortContributor) {
 		return simpleQuery( index.createScope(), sortContributor );
 	}
 
 	private SearchQuery<DocumentReference> simpleQuery(StubMappingScope scope,
-			Function<? super SearchSortFactory, ? extends SortFinalStep> sortContributor) {
+			Function<? super SearchSortFactory<?>, ? extends SortFinalStep> sortContributor) {
 		return scope.query()
 				.where( f -> f.matchAll() )
 				.sort( sortContributor )

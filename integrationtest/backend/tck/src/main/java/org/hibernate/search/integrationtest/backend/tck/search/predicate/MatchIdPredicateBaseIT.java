@@ -69,7 +69,7 @@ class MatchIdPredicateBaseIT {
 		}
 
 		@Override
-		protected PredicateFinalStep predicate(SearchPredicateFactory f, ObjectFieldBinding objectFieldBinding,
+		protected PredicateFinalStep predicate(SearchPredicateFactory<?> f, ObjectFieldBinding objectFieldBinding,
 				int matchingDocOrdinal, AbstractPredicateDataSet dataSet) {
 			return f.id().matching( InObjectFieldConfigured.dataSet.docId( matchingDocOrdinal ) );
 		}
@@ -105,26 +105,26 @@ class MatchIdPredicateBaseIT {
 		}
 
 		@Override
-		protected PredicateFinalStep predicate(SearchPredicateFactory f, int matchingDocOrdinal,
+		protected PredicateFinalStep predicate(SearchPredicateFactory<?> f, int matchingDocOrdinal,
 				AbstractPredicateDataSet dataSet, StubMappedIndex index) {
 			return f.id().matching( ScoreConfigured.dataSet.docId( matchingDocOrdinal ) );
 		}
 
 		@Override
-		protected PredicateFinalStep predicateWithBoost(SearchPredicateFactory f, int matchingDocOrdinal,
+		protected PredicateFinalStep predicateWithBoost(SearchPredicateFactory<?> f, int matchingDocOrdinal,
 				float boost, AbstractPredicateDataSet dataSet,
 				StubMappedIndex index) {
 			return f.id().matching( ScoreConfigured.dataSet.docId( matchingDocOrdinal ) ).boost( boost );
 		}
 
 		@Override
-		protected PredicateFinalStep predicateWithConstantScore(SearchPredicateFactory f, int matchingDocOrdinal,
+		protected PredicateFinalStep predicateWithConstantScore(SearchPredicateFactory<?> f, int matchingDocOrdinal,
 				AbstractPredicateDataSet dataSet, StubMappedIndex index) {
 			return f.id().matching( ScoreConfigured.dataSet.docId( matchingDocOrdinal ) ).constantScore();
 		}
 
 		@Override
-		protected PredicateFinalStep predicateWithConstantScoreAndBoost(SearchPredicateFactory f,
+		protected PredicateFinalStep predicateWithConstantScoreAndBoost(SearchPredicateFactory<?> f,
 				int matchingDocOrdinal, float boost, AbstractPredicateDataSet dataSet,
 				StubMappedIndex index) {
 			return f.id().matching( ScoreConfigured.dataSet.docId( matchingDocOrdinal ) ).constantScore().boost( boost );

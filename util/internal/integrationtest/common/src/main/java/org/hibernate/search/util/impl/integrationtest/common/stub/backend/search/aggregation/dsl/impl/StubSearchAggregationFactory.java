@@ -9,17 +9,20 @@ import org.hibernate.search.engine.search.aggregation.dsl.spi.SearchAggregationD
 import org.hibernate.search.engine.search.aggregation.spi.SearchAggregationIndexScope;
 import org.hibernate.search.engine.search.predicate.dsl.SearchPredicateFactory;
 
-public class StubSearchAggregationFactory
+public class StubSearchAggregationFactory<SR>
 		extends
-		AbstractSearchAggregationFactory<StubSearchAggregationFactory, SearchAggregationIndexScope<?>, SearchPredicateFactory> {
+		AbstractSearchAggregationFactory<SR,
+				StubSearchAggregationFactory<SR>,
+				SearchAggregationIndexScope<?>,
+				SearchPredicateFactory<SR>> {
 	public StubSearchAggregationFactory(
-			SearchAggregationDslContext<SearchAggregationIndexScope<?>, SearchPredicateFactory> dslContext) {
+			SearchAggregationDslContext<SR, SearchAggregationIndexScope<?>, SearchPredicateFactory<SR>> dslContext) {
 		super( dslContext );
 	}
 
 	@Override
-	public StubSearchAggregationFactory withRoot(String objectFieldPath) {
-		return new StubSearchAggregationFactory( dslContext.rescope( dslContext.scope().withRoot( objectFieldPath ),
+	public StubSearchAggregationFactory<SR> withRoot(String objectFieldPath) {
+		return new StubSearchAggregationFactory<>( dslContext.rescope( dslContext.scope().withRoot( objectFieldPath ),
 				dslContext.predicateFactory().withRoot( objectFieldPath ) ) );
 	}
 }

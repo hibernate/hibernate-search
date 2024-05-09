@@ -114,12 +114,13 @@ class StandalonePojoEntryPointsIT {
 	@Test
 	void searchScope_fromSearchMapping() {
 		SearchMapping searchMapping = theSearchMapping;
-		SearchScope<Book> bookScope = searchMapping.scope( Book.class );
-		SearchScope<Person> associateAndManagerScope = searchMapping.scope( Arrays.asList( Associate.class, Manager.class ) );
-		SearchScope<Person> personScope = searchMapping.scope( Person.class );
-		SearchScope<Person> personSubTypesScope = searchMapping.scope( Person.class,
+		SearchScope<?, Book> bookScope = searchMapping.scope( Book.class );
+		SearchScope<?, Person> associateAndManagerScope =
+				searchMapping.scope( Arrays.asList( Associate.class, Manager.class ) );
+		SearchScope<?, Person> personScope = searchMapping.scope( Person.class );
+		SearchScope<?, Person> personSubTypesScope = searchMapping.scope( Person.class,
 				Arrays.asList( "Manager", "Associate" ) );
-		SearchScope<Object> allScope = searchMapping.scope( Object.class );
+		SearchScope<?, Object> allScope = searchMapping.scope( Object.class );
 		assertThat( bookScope.includedTypes() )
 				.extracting( SearchIndexedEntity::name )
 				.containsExactlyInAnyOrder( "Book" );
@@ -141,13 +142,13 @@ class StandalonePojoEntryPointsIT {
 	void searchScope_fromSearchSession() {
 		SearchMapping searchMapping = theSearchMapping;
 		try ( SearchSession searchSession = searchMapping.createSession() ) {
-			SearchScope<Book> bookScope = searchSession.scope( Book.class );
-			SearchScope<Person> associateAndManagerScope =
+			SearchScope<?, Book> bookScope = searchSession.scope( Book.class );
+			SearchScope<?, Person> associateAndManagerScope =
 					searchSession.scope( Arrays.asList( Associate.class, Manager.class ) );
-			SearchScope<Person> personScope = searchSession.scope( Person.class );
-			SearchScope<Person> personSubTypesScope = searchSession.scope( Person.class,
+			SearchScope<?, Person> personScope = searchSession.scope( Person.class );
+			SearchScope<?, Person> personSubTypesScope = searchSession.scope( Person.class,
 					Arrays.asList( "Manager", "Associate" ) );
-			SearchScope<Object> allScope = searchSession.scope( Object.class );
+			SearchScope<?, Object> allScope = searchSession.scope( Object.class );
 			assertThat( bookScope.includedTypes() )
 					.extracting( SearchIndexedEntity::name )
 					.containsExactlyInAnyOrder( "Book" );

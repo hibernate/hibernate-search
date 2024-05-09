@@ -17,6 +17,7 @@ import org.hibernate.search.engine.search.predicate.dsl.SearchPredicateFactory;
 import org.hibernate.search.engine.search.projection.dsl.SearchProjectionFactory;
 import org.hibernate.search.engine.search.query.dsl.SearchQuerySelectStep;
 import org.hibernate.search.engine.search.sort.dsl.SearchSortFactory;
+import org.hibernate.search.mapper.orm.common.EntityReference;
 import org.hibernate.search.mapper.orm.entity.SearchIndexedEntity;
 import org.hibernate.search.mapper.orm.loading.impl.HibernateOrmSelectionLoadingContext;
 import org.hibernate.search.mapper.orm.massindexing.MassIndexer;
@@ -36,17 +37,19 @@ import org.hibernate.search.mapper.pojo.scope.spi.PojoScopeDelegate;
 import org.hibernate.search.mapper.pojo.work.spi.PojoScopeWorkspace;
 
 @SuppressWarnings("deprecation")
-public class SearchScopeImpl<E> implements SearchScope<E>, BatchScopeContext<E> {
+public class SearchScopeImpl<SR, E> implements SearchScope<SR, E>, BatchScopeContext<E> {
 
 	private final HibernateOrmScopeMappingContext mappingContext;
 	private final TenancyConfiguration tenancyConfiguration;
-	private final PojoScopeDelegate<org.hibernate.search.mapper.orm.common.EntityReference,
+	private final PojoScopeDelegate<SR,
+			EntityReference,
 			E,
 			SearchIndexedEntity<? extends E>> delegate;
 
 	public SearchScopeImpl(HibernateOrmScopeMappingContext mappingContext,
 			TenancyConfiguration tenancyConfiguration,
-			PojoScopeDelegate<org.hibernate.search.mapper.orm.common.EntityReference,
+			PojoScopeDelegate<SR,
+					EntityReference,
 					E,
 					SearchIndexedEntity<? extends E>> delegate) {
 		this.mappingContext = mappingContext;
@@ -54,8 +57,9 @@ public class SearchScopeImpl<E> implements SearchScope<E>, BatchScopeContext<E> 
 		this.delegate = delegate;
 	}
 
-	public SearchQuerySelectStep<?,
-			org.hibernate.search.mapper.orm.common.EntityReference,
+	public SearchQuerySelectStep<SR,
+			?,
+			EntityReference,
 			E,
 			SearchLoadingOptionsStep,
 			?,
@@ -66,22 +70,22 @@ public class SearchScopeImpl<E> implements SearchScope<E>, BatchScopeContext<E> 
 	}
 
 	@Override
-	public SearchPredicateFactory predicate() {
+	public SearchPredicateFactory<SR> predicate() {
 		return delegate.predicate();
 	}
 
 	@Override
-	public SearchSortFactory sort() {
+	public SearchSortFactory<SR> sort() {
 		return delegate.sort();
 	}
 
 	@Override
-	public SearchProjectionFactory<org.hibernate.search.mapper.orm.common.EntityReference, E> projection() {
+	public SearchProjectionFactory<SR, EntityReference, E> projection() {
 		return delegate.projection();
 	}
 
 	@Override
-	public SearchAggregationFactory aggregation() {
+	public SearchAggregationFactory<SR> aggregation() {
 		return delegate.aggregation();
 	}
 

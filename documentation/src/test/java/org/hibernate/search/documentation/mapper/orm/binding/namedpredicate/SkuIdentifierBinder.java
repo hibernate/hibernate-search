@@ -88,8 +88,8 @@ public class SkuIdentifierBinder implements PropertyBinder {
 
 	private static class SkuIdentifierMatchPredicateDefinition implements PredicateDefinition { // <1>
 		@Override
-		public SearchPredicate create(PredicateDefinitionContext context) {
-			SearchPredicateFactory f = context.predicate(); // <2>
+		public SearchPredicate create(PredicateDefinitionContext<?> context) {
+			SearchPredicateFactory<?> f = context.predicate(); // <2>
 
 			String pattern = context.params().get( "pattern", String.class ); // <3>
 

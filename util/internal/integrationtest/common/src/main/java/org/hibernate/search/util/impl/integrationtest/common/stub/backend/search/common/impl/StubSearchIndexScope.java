@@ -108,23 +108,23 @@ public class StubSearchIndexScope
 	}
 
 	@Override
-	public SearchPredicateFactory predicateFactory() {
-		return new StubSearchPredicateFactory( SearchPredicateDslContext.root( this ) );
+	public <SR> SearchPredicateFactory<SR> predicateFactory() {
+		return new StubSearchPredicateFactory<>( SearchPredicateDslContext.root( this ) );
 	}
 
 	@Override
-	public SearchSortFactory sortFactory() {
-		return new StubSearchSortFactory( SearchSortDslContext.root( this, StubSearchSortFactory::new, predicateFactory() ) );
+	public <SR> SearchSortFactory<SR> sortFactory() {
+		return new StubSearchSortFactory<>( SearchSortDslContext.root( this, StubSearchSortFactory::new, predicateFactory() ) );
 	}
 
 	@Override
-	public <R, E> SearchProjectionFactory<R, E> projectionFactory() {
+	public <SR, R, E> SearchProjectionFactory<SR, R, E> projectionFactory() {
 		return new StubSearchProjectionFactory<>( SearchProjectionDslContext.root( this ) );
 	}
 
 	@Override
-	public SearchAggregationFactory aggregationFactory() {
-		return new StubSearchAggregationFactory( SearchAggregationDslContext.root( this, predicateFactory() ) );
+	public <SR> SearchAggregationFactory<SR> aggregationFactory() {
+		return new StubSearchAggregationFactory<SR>( SearchAggregationDslContext.root( this, predicateFactory() ) );
 	}
 
 	@Override

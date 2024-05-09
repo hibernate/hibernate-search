@@ -8,7 +8,7 @@ import org.hibernate.search.engine.search.predicate.dsl.SearchPredicateFactory;
 
 public interface NamedPredicateBuilder extends SearchPredicateBuilder {
 
-	void factory(SearchPredicateFactory factory);
+	void factory(SearchPredicateFactory<?> factory);
 
 	void param(String name, Object value);
 

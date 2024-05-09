@@ -55,7 +55,7 @@ class LuceneBoolSearchPredicateIT {
 
 	@Test
 	void resultingQueryOptimization() {
-		SearchPredicateFactory f = index.createScope().predicate();
+		SearchPredicateFactory<?> f = index.createScope().predicate();
 		assertThat(
 				index.query()
 						.where( f.bool()
@@ -93,7 +93,7 @@ class LuceneBoolSearchPredicateIT {
 
 	@Test
 	void resultingQueryOptimizationWithBoost() {
-		SearchPredicateFactory f = index.createScope().predicate();
+		SearchPredicateFactory<?> f = index.createScope().predicate();
 		// by default Lucene bool query would have a filter on match all
 		assertThat(
 				index.query()

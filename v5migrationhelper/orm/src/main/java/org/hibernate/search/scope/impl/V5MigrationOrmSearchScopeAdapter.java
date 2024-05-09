@@ -20,9 +20,9 @@ import org.hibernate.search.scope.spi.V5MigrationSearchScope;
 
 public class V5MigrationOrmSearchScopeAdapter implements V5MigrationSearchScope {
 
-	private final SearchScope<?> delegate;
+	private final SearchScope<?, ?> delegate;
 
-	public V5MigrationOrmSearchScopeAdapter(SearchScope<?> delegate) {
+	public V5MigrationOrmSearchScopeAdapter(SearchScope<?, ?> delegate) {
 		this.delegate = delegate;
 	}
 
@@ -37,23 +37,23 @@ public class V5MigrationOrmSearchScopeAdapter implements V5MigrationSearchScope 
 	}
 
 	@Override
-	public SearchPredicateFactory predicate() {
+	public SearchPredicateFactory<?> predicate() {
 		return delegate.predicate();
 	}
 
 	@Override
-	public SearchSortFactory sort() {
+	public SearchSortFactory<?> sort() {
 		return delegate.sort();
 	}
 
 	@Override
-	public SearchProjectionFactory<?, ?> projection() {
+	public SearchProjectionFactory<?, ?, ?> projection() {
 		return delegate.projection();
 	}
 
 	@Override
 	public SearchProjection<Object> idProjection() {
-		SearchProjectionFactory<? extends EntityReference, ?> factory = delegate.projection();
+		SearchProjectionFactory<?, ? extends EntityReference, ?> factory = delegate.projection();
 		// Not using factory.id() because that one throws an exception if IDs have inconsistent types.
 		return factory.composite().from( factory.entityReference() )
 				.as( EntityReference::id ).toProjection();
@@ -61,17 +61,17 @@ public class V5MigrationOrmSearchScopeAdapter implements V5MigrationSearchScope 
 
 	@Override
 	public SearchProjection<? extends Class<?>> objectClassProjection() {
-		SearchProjectionFactory<? extends EntityReference, ?> factory = delegate.projection();
+		SearchProjectionFactory<?, ? extends EntityReference, ?> factory = delegate.projection();
 		return factory.composite().from( factory.entityReference() )
 				.as( EntityReference::type ).toProjection();
 	}
 
 	@Override
-	public SearchAggregationFactory aggregation() {
+	public SearchAggregationFactory<?> aggregation() {
 		return delegate.aggregation();
 	}
 
-	public SearchScope<?> toSearchScope() {
+	public SearchScope<?, ?> toSearchScope() {
 		return delegate;
 	}
 }

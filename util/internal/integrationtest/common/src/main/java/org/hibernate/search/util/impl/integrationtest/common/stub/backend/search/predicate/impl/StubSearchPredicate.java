@@ -296,7 +296,7 @@ public class StubSearchPredicate implements SearchPredicate {
 		}
 
 		@Override
-		public void factory(SearchPredicateFactory factory) {
+		public void factory(SearchPredicateFactory<?> factory) {
 			// No-op, just simulates a call on this object
 		}
 

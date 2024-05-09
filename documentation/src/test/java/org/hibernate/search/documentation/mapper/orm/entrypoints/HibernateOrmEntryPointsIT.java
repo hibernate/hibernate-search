@@ -102,12 +102,13 @@ class HibernateOrmEntryPointsIT {
 				// end::searchScope-fromSearchMapping[]
 				Search.mapping( theSessionFactory );
 		// tag::searchScope-fromSearchMapping[]
-		SearchScope<Book> bookScope = searchMapping.scope( Book.class ); // <2>
-		SearchScope<Person> associateAndManagerScope = searchMapping.scope( Arrays.asList( Associate.class, Manager.class ) ); // <3>
-		SearchScope<Person> personScope = searchMapping.scope( Person.class ); // <4>
-		SearchScope<Person> personSubTypesScope = searchMapping.scope( Person.class,
+		SearchScope<?, Book> bookScope = searchMapping.scope( Book.class ); // <2>
+		SearchScope<?, Person> associateAndManagerScope =
+				searchMapping.scope( Arrays.asList( Associate.class, Manager.class ) ); // <3>
+		SearchScope<?, Person> personScope = searchMapping.scope( Person.class ); // <4>
+		SearchScope<?, Person> personSubTypesScope = searchMapping.scope( Person.class,
 				Arrays.asList( "Manager", "Associate" ) ); // <5>
-		SearchScope<Object> allScope = searchMapping.scope( Object.class ); // <6>
+		SearchScope<?, Object> allScope = searchMapping.scope( Object.class ); // <6>
 		// end::searchScope-fromSearchMapping[]
 		assertThat( bookScope.includedTypes() )
 				.extracting( SearchIndexedEntity::jpaName )
@@ -134,13 +135,13 @@ class HibernateOrmEntryPointsIT {
 					// end::searchScope-fromSearchSession[]
 					Search.session( theSession );
 			// tag::searchScope-fromSearchSession[]
-			SearchScope<Book> bookScope = searchSession.scope( Book.class ); // <2>
-			SearchScope<Person> associateAndManagerScope =
+			SearchScope<?, Book> bookScope = searchSession.scope( Book.class ); // <2>
+			SearchScope<?, Person> associateAndManagerScope =
 					searchSession.scope( Arrays.asList( Associate.class, Manager.class ) ); // <3>
-			SearchScope<Person> personScope = searchSession.scope( Person.class ); // <4>
-			SearchScope<Person> personSubTypesScope = searchSession.scope( Person.class,
+			SearchScope<?, Person> personScope = searchSession.scope( Person.class ); // <4>
+			SearchScope<?, Person> personSubTypesScope = searchSession.scope( Person.class,
 					Arrays.asList( "Manager", "Associate" ) ); // <5>
-			SearchScope<Object> allScope = searchSession.scope( Object.class ); // <6>
+			SearchScope<?, Object> allScope = searchSession.scope( Object.class ); // <6>
 			// end::searchScope-fromSearchSession[]
 			assertThat( bookScope.includedTypes() )
 					.extracting( SearchIndexedEntity::jpaName )
