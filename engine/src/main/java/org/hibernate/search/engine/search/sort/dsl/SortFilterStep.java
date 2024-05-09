@@ -17,7 +17,7 @@ import org.hibernate.search.engine.search.predicate.dsl.SearchPredicateFactory;
  * @param <S> The "self" type (the actual exposed type of this step)
  * @param <PDF> The type of factory used to create predicates in {@link #filter(Function)}.
  */
-public interface SortFilterStep<S, PDF extends SearchPredicateFactory> {
+public interface SortFilterStep<SR, S, PDF extends SearchPredicateFactory<SR>> {
 
 	/**
 	 * Filter nested objects from which values will be extracted for this sort.

@@ -40,9 +40,10 @@ import org.hibernate.search.engine.search.predicate.SearchPredicate;
  * </li>
  * </ul>
  *
+ * @param <SR> Scope root type.
  * @param <S> The "self" type (the actual exposed type of this collector).
  */
-public interface SimpleBooleanPredicateClausesCollector<S extends SimpleBooleanPredicateClausesCollector<?>> {
+public interface SimpleBooleanPredicateClausesCollector<SR, S extends SimpleBooleanPredicateClausesCollector<SR, ?>> {
 	/**
 	 * Adds the specified predicate to the list of <a href="#clauses">clauses</a>.
 	 *
@@ -68,7 +69,7 @@ public interface SimpleBooleanPredicateClausesCollector<S extends SimpleBooleanP
 	 *
 	 * @return {@code this}, for method chaining.
 	 */
-	S add(Function<? super SearchPredicateFactory, ? extends PredicateFinalStep> clauseContributor);
+	S add(Function<? super SearchPredicateFactory<SR>, ? extends PredicateFinalStep> clauseContributor);
 
 	/**
 	 * Delegates setting <a href="#clauses">clauses</a> and options to a given consumer.

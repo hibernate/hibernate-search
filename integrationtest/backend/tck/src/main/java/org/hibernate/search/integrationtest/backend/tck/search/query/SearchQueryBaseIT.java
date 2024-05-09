@@ -14,6 +14,7 @@ import static org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMap
 import java.time.Duration;
 import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
+import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -205,12 +206,13 @@ class SearchQueryBaseIT {
 	void queryParameters_access() {
 		StubMappingScope scope = index.createScope();
 		AtomicInteger counter = new AtomicInteger( 0 );
+		AggregationKey<Map<String, Long>> key = AggregationKey.of( "key" );
 		scope.query()
 				.select( f -> f.withParameters( params -> assertParameters( params, f, counter )
 						.field( "string" ) ) )
 				.where( f -> f.withParameters( ctx -> assertParameters( ctx, f, counter ).matchAll() ) )
 				.sort( f -> f.withParameters( ctx -> assertParameters( ctx, f, counter ).score() ) )
-				.aggregation( AggregationKey.of( "key" ), f -> f.withParameters(
+				.aggregation( key, f -> f.withParameters(
 						ctx -> assertParameters( ctx, f, counter ).terms().field( "string", String.class ) ) )
 				.param( "p1", null )
 				.param( "p2", 1 )
@@ -269,7 +271,7 @@ class SearchQueryBaseIT {
 		return factory;
 	}
 
-	private SearchQueryOptionsStep<?, DocumentReference, ?, ?, ?> matchAllSortedByScoreQuery() {
+	private SearchQueryOptionsStep<?, ?, DocumentReference, ?, ?, ?> matchAllSortedByScoreQuery() {
 		return index.query()
 				.where( f -> f.matchAll() );
 	}
@@ -280,7 +282,7 @@ class SearchQueryBaseIT {
 	 * because optimizations are possible with MatchAllDocsQuery that would allow Hibernate Search
 	 * to return an exact total hit count in constant time, ignoring the total hit count threshold.
 	 */
-	private SearchQueryOptionsStep<?, DocumentReference, ?, ?, ?> matchAllWithConditionSortedByScoreQuery() {
+	private SearchQueryOptionsStep<?, ?, DocumentReference, ?, ?, ?> matchAllWithConditionSortedByScoreQuery() {
 		return index.query()
 				.where( f -> f.exists().field( "string" ) );
 	}
@@ -338,26 +340,26 @@ class SearchQueryBaseIT {
 		}
 	}
 
-	private static class SupportedQueryDslExtension<R, E, LOS>
+	private static class SupportedQueryDslExtension<SR, R, E, LOS>
 			implements
-			SearchQueryDslExtension<MyExtendedDslContext<E>, R, E, LOS> {
+			SearchQueryDslExtension<SR, MyExtendedDslContext<SR, E>, R, E, LOS> {
 		@Override
-		public Optional<MyExtendedDslContext<E>> extendOptional(SearchQuerySelectStep<?, R, E, LOS, ?, ?> original,
+		public Optional<MyExtendedDslContext<SR, E>> extendOptional(SearchQuerySelectStep<SR, ?, R, E, LOS, ?, ?> original,
 				SearchQueryIndexScope<?> scope, BackendSessionContext sessionContext,
 				SearchLoadingContextBuilder<E, LOS> loadingContextBuilder) {
 			assertThat( original ).isNotNull();
 			assertThat( scope ).isNotNull();
 			assertThat( sessionContext ).isNotNull();
 			assertThat( loadingContextBuilder ).isNotNull();
-			return Optional.of( new MyExtendedDslContext<E>( original.selectEntity() ) );
+			return Optional.of( new MyExtendedDslContext<SR, E>( original.selectEntity() ) );
 		}
 	}
 
-	private static class UnSupportedQueryDslExtension<R, E, LOS>
+	private static class UnSupportedQueryDslExtension<SR, R, E, LOS>
 			implements
-			SearchQueryDslExtension<MyExtendedDslContext<E>, R, E, LOS> {
+			SearchQueryDslExtension<SR, MyExtendedDslContext<SR, E>, R, E, LOS> {
 		@Override
-		public Optional<MyExtendedDslContext<E>> extendOptional(SearchQuerySelectStep<?, R, E, LOS, ?, ?> original,
+		public Optional<MyExtendedDslContext<SR, E>> extendOptional(SearchQuerySelectStep<SR, ?, R, E, LOS, ?, ?> original,
 				SearchQueryIndexScope<?> scope, BackendSessionContext sessionContext,
 				SearchLoadingContextBuilder<E, LOS> loadingContextBuilder) {
 			assertThat( original ).isNotNull();
@@ -368,10 +370,10 @@ class SearchQueryBaseIT {
 		}
 	}
 
-	private static class MyExtendedDslContext<T> {
-		private final SearchQueryWhereStep<?, T, ?, ?> delegate;
+	private static class MyExtendedDslContext<SR, T> {
+		private final SearchQueryWhereStep<SR, ?, T, ?, ?> delegate;
 
-		MyExtendedDslContext(SearchQueryWhereStep<?, T, ?, ?> delegate) {
+		MyExtendedDslContext(SearchQueryWhereStep<SR, ?, T, ?, ?> delegate) {
 			this.delegate = delegate;
 		}
 

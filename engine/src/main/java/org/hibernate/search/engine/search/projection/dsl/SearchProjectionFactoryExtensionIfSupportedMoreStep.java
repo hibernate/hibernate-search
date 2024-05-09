@@ -12,14 +12,15 @@ import org.hibernate.search.util.common.SearchException;
  * The second and later step when attempting to apply multiple extensions
  * to a {@link SearchProjectionFactory}.
  *
+ * @param <SR> Scope root type.
  * @param <R> The type of entity references in the parent {@link SearchProjectionFactory}.
  * @param <E> The type of entities in the parent {@link SearchProjectionFactory}.
  * @param <P> The resulting projection type.
  *
  * @see SearchProjectionFactory#extension()
  */
-public interface SearchProjectionFactoryExtensionIfSupportedMoreStep<P, R, E>
-		extends SearchProjectionFactoryExtensionIfSupportedStep<P, R, E> {
+public interface SearchProjectionFactoryExtensionIfSupportedMoreStep<SR, P, R, E>
+		extends SearchProjectionFactoryExtensionIfSupportedStep<SR, P, R, E> {
 
 	/**
 	 * If no extension passed to {@link #ifSupported(SearchProjectionFactoryExtension, Function)}
@@ -33,7 +34,7 @@ public interface SearchProjectionFactoryExtensionIfSupportedMoreStep<P, R, E>
 	 * @return The created projection.
 	 */
 	ProjectionFinalStep<P> orElse(
-			Function<SearchProjectionFactory<R, E>, ? extends ProjectionFinalStep<P>> projectionContributor);
+			Function<SearchProjectionFactory<SR, R, E>, ? extends ProjectionFinalStep<P>> projectionContributor);
 
 	/**
 	 * If no extension passed to {@link #ifSupported(SearchProjectionFactoryExtension, Function)}

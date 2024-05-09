@@ -8,14 +8,15 @@ import org.hibernate.search.engine.search.projection.dsl.spi.AbstractSearchProje
 import org.hibernate.search.engine.search.projection.dsl.spi.SearchProjectionDslContext;
 import org.hibernate.search.engine.search.projection.spi.SearchProjectionIndexScope;
 
-public class StubSearchProjectionFactory<R, E>
-		extends AbstractSearchProjectionFactory<StubSearchProjectionFactory<R, E>, SearchProjectionIndexScope<?>, R, E> {
+public class StubSearchProjectionFactory<SR, R, E>
+		extends
+		AbstractSearchProjectionFactory<SR, StubSearchProjectionFactory<SR, R, E>, SearchProjectionIndexScope<?>, R, E> {
 	public StubSearchProjectionFactory(SearchProjectionDslContext<SearchProjectionIndexScope<?>> dslContext) {
 		super( dslContext );
 	}
 
 	@Override
-	public StubSearchProjectionFactory<R, E> withRoot(String objectFieldPath) {
+	public StubSearchProjectionFactory<SR, R, E> withRoot(String objectFieldPath) {
 		return new StubSearchProjectionFactory<>( dslContext.rescope( dslContext.scope().withRoot( objectFieldPath ) ) );
 	}
 }

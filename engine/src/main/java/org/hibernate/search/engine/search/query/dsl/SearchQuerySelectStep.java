@@ -23,6 +23,7 @@ import org.hibernate.search.util.common.SearchException;
  * The "SELECT" clause may be omitted by setting the {@link #where(Function) "WHERE" clause} directly,
  * in which case {@link #selectEntity()} will be assumed.
  *
+ * @param <SR> Scope root type.
  * @param <N> The next step if no type of hits is explicitly selected,
  * i.e. if {@link #where(SearchPredicate)} or {@link #where(Function)} is called directly
  * without calling {@link #selectEntity()}, or {@link #selectEntityReference()}, {@link #select(SearchProjection)}
@@ -38,13 +39,14 @@ import org.hibernate.search.util.common.SearchException;
  * @param <PDF> The type of factory used to create predicates in {@link #where(Function)}.
  */
 public interface SearchQuerySelectStep<
-		N extends SearchQueryOptionsStep<?, E, LOS, ?, ?>,
+		SR,
+		N extends SearchQueryOptionsStep<SR, ?, E, LOS, ?, ?>,
 		R,
 		E,
 		LOS,
-		PJF extends SearchProjectionFactory<R, E>,
-		PDF extends SearchPredicateFactory>
-		extends SearchQueryWhereStep<N, E, LOS, PDF> {
+		PJF extends SearchProjectionFactory<SR, R, E>,
+		PDF extends SearchPredicateFactory<SR>>
+		extends SearchQueryWhereStep<SR, N, E, LOS, PDF> {
 
 	/**
 	 * Select the entity was originally indexed
@@ -55,7 +57,7 @@ public interface SearchQuerySelectStep<
 	 * @return The next step.
 	 * @see SearchQueryWhereStep
 	 */
-	SearchQueryWhereStep<?, E, LOS, ?> selectEntity();
+	SearchQueryWhereStep<SR, ?, E, LOS, ?> selectEntity();
 
 	/**
 	 * Select a reference to the entity that was originally indexed
@@ -69,7 +71,7 @@ public interface SearchQuerySelectStep<
 	 * @return The next step.
 	 * @see SearchQueryWhereStep
 	 */
-	SearchQueryWhereStep<?, R, LOS, ?> selectEntityReference();
+	SearchQueryWhereStep<SR, ?, R, LOS, ?> selectEntityReference();
 
 	/**
 	 * Select an object projection
@@ -82,7 +84,7 @@ public interface SearchQuerySelectStep<
 	 * @return The next step.
 	 * @see SearchQueryWhereStep
 	 */
-	<P> SearchQueryWhereStep<?, P, LOS, ?> select(Class<P> objectClass);
+	<P> SearchQueryWhereStep<SR, ?, P, LOS, ?> select(Class<P> objectClass);
 
 	/**
 	 * Select a given projection as a representation of the search hit for each matching document.
@@ -94,7 +96,7 @@ public interface SearchQuerySelectStep<
 	 * @return The next step.
 	 * @see SearchQueryWhereStep
 	 */
-	<P> SearchQueryWhereStep<?, P, LOS, ?> select(
+	<P> SearchQueryWhereStep<SR, ?, P, LOS, ?> select(
 			Function<? super PJF, ? extends ProjectionFinalStep<P>> projectionContributor);
 
 	/**
@@ -105,7 +107,7 @@ public interface SearchQuerySelectStep<
 	 * @return The next step.
 	 * @see SearchQueryWhereStep
 	 */
-	<P> SearchQueryWhereStep<?, P, LOS, ?> select(SearchProjection<P> projection);
+	<P> SearchQueryWhereStep<SR, ?, P, LOS, ?> select(SearchProjection<P> projection);
 
 	/**
 	 * Select a list of projections as a representation of the search hit for each matching document.
@@ -120,7 +122,7 @@ public interface SearchQuerySelectStep<
 	 * @see SearchProjectionFactory#composite(SearchProjection[])
 	 * @see SearchQueryWhereStep
 	 */
-	SearchQueryWhereStep<?, List<?>, LOS, ?> select(SearchProjection<?>... projections);
+	SearchQueryWhereStep<SR, ?, List<?>, LOS, ?> select(SearchProjection<?>... projections);
 
 	/**
 	 * Extend the current DSL step with the given extension,
@@ -131,6 +133,6 @@ public interface SearchQuerySelectStep<
 	 * @return The extended DSL step.
 	 * @throws SearchException If the extension cannot be applied (wrong underlying backend, ...).
 	 */
-	<T> T extension(SearchQueryDslExtension<T, R, E, LOS> extension);
+	<T> T extension(SearchQueryDslExtension<SR, T, R, E, LOS> extension);
 
 }
