@@ -55,8 +55,8 @@ public class ConnectedMultiFieldsSimpleQueryStringQueryBuilder implements Simple
 	private SearchPredicate createPredicate() {
 		SearchPredicateFactory<?> factory = queryContext.getScope().predicate();
 
-		SimpleQueryStringPredicateFieldStep<SR, ?> fieldStep = factory.simpleQueryString();
-		SimpleQueryStringPredicateFieldMoreStep<SR, ?, ?> fieldMoreStep = null;
+		SimpleQueryStringPredicateFieldStep<?, ?> fieldStep = factory.simpleQueryString();
+		SimpleQueryStringPredicateFieldMoreStep<?, ?, ?> fieldMoreStep = null;
 		for ( FieldContext fieldContext : fieldsContext ) {
 			fieldMoreStep = fieldContext.applyBoost( fieldStep.field( fieldContext.getField() ) );
 		}

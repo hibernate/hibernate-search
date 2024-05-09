@@ -9,11 +9,11 @@ import org.hibernate.search.engine.search.predicate.dsl.SearchPredicateFactory;
 
 //CHECKSTYLE:OFF HideUtilityClassConstructor ignore the rule since it is a class with nested test classes.
 // cannot make a private constructor.
-class QueryStringPredicateBaseIT extends AbstractBaseQueryStringPredicateBaseIT<QueryStringPredicateFieldStep<?>> {
+class QueryStringPredicateBaseIT extends AbstractBaseQueryStringPredicateBaseIT<QueryStringPredicateFieldStep<?, ?>> {
 	//CHECKSTYLE:ON
 
 	@Override
-	QueryStringPredicateFieldStep<?> predicate(SearchPredicateFactory<?> f) {
+	QueryStringPredicateFieldStep<?, ?> predicate(SearchPredicateFactory<?> f) {
 		return f.queryString();
 	}
 
