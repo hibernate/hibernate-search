@@ -52,7 +52,7 @@ abstract class AbstractProjectionUnsupportedTypesIT {
 				);
 	}
 
-	protected abstract void tryProjection(SearchProjectionFactory<?, ?> f, String fieldPath);
+	protected abstract void tryProjection(SearchProjectionFactory<?, ?, ?> f, String fieldPath);
 
 	protected abstract String projectionTrait();
 

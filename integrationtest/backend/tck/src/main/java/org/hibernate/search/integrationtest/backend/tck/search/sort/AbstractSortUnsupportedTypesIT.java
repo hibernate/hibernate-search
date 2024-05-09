@@ -52,7 +52,7 @@ abstract class AbstractSortUnsupportedTypesIT {
 				);
 	}
 
-	protected abstract void trySort(SearchSortFactory f, String fieldPath);
+	protected abstract void trySort(SearchSortFactory<?> f, String fieldPath);
 
 	protected abstract String sortTrait();
 

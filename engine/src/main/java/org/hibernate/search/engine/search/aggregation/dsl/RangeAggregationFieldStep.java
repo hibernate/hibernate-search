@@ -14,9 +14,10 @@ import org.hibernate.search.engine.search.predicate.dsl.SearchPredicateFactory;
 /**
  * The initial step in a "range" aggregation definition, where the target field can be set.
  *
+ * @param <SR> Scope root type.
  * @param <PDF> The type of factory used to create predicates in {@link AggregationFilterStep#filter(Function)}.
  */
-public interface RangeAggregationFieldStep<PDF extends SearchPredicateFactory> {
+public interface RangeAggregationFieldStep<SR, PDF extends SearchPredicateFactory<SR>> {
 
 	/**
 	 * Target the given field in the range aggregation.
@@ -26,7 +27,7 @@ public interface RangeAggregationFieldStep<PDF extends SearchPredicateFactory> {
 	 * @param <F> The type of field values.
 	 * @return The next step.
 	 */
-	default <F> RangeAggregationRangeStep<?, PDF, F> field(String fieldPath, Class<F> type) {
+	default <F> RangeAggregationRangeStep<SR, ?, PDF, F> field(String fieldPath, Class<F> type) {
 		return field( fieldPath, type, ValueConvert.YES );
 	}
 
@@ -40,6 +41,6 @@ public interface RangeAggregationFieldStep<PDF extends SearchPredicateFactory> {
 	 * See {@link ValueConvert}.
 	 * @return The next step.
 	 */
-	<F> RangeAggregationRangeStep<?, PDF, F> field(String fieldPath, Class<F> type, ValueConvert convert);
+	<F> RangeAggregationRangeStep<SR, ?, PDF, F> field(String fieldPath, Class<F> type, ValueConvert convert);
 
 }

@@ -9,8 +9,6 @@ package org.hibernate.search.mapper.orm.scope;
 import java.util.Collection;
 import java.util.Collections;
 
-import org.hibernate.search.engine.common.EntityReference;
-
 import jakarta.persistence.Entity;
 
 /**
@@ -19,19 +17,22 @@ import jakarta.persistence.Entity;
  * @see org.hibernate.search.mapper.orm.mapping.SearchMapping
  * @see org.hibernate.search.mapper.orm.session.SearchSession
  */
-@SuppressWarnings( "deprecation" )
-public interface SearchScopeProvider extends org.hibernate.search.engine.mapper.scope.SearchScopeProvider<org.hibernate.search.mapper.orm.common.EntityReference>{
+@SuppressWarnings("deprecation")
+public interface SearchScopeProvider
+		extends
+		org.hibernate.search.engine.mapper.scope.SearchScopeProvider<org.hibernate.search.mapper.orm.common.EntityReference> {
 
 	/**
 	 * Creates a {@link SearchScope} limited to
 	 * indexed entity types among the given class and its subtypes.
 	 *
 	 * @param clazz A class that must be an indexed entity type or a supertype of such type.
+	 * @param <SR> Scope root type.
 	 * @param <T> A supertype of all indexed entity types to include in the scope.
 	 * @return The created scope.
 	 * @see SearchScope
 	 */
-	default <T> SearchScope<T> scope(Class<T> clazz) {
+	default <SR, T> SearchScope<SR, T> scope(Class<T> clazz) {
 		return scope( Collections.singleton( clazz ) );
 	}
 
@@ -41,11 +42,12 @@ public interface SearchScopeProvider extends org.hibernate.search.engine.mapper.
 	 *
 	 * @param classes A collection of classes.
 	 * Each must be an indexed entity type or a supertype of such type.
+	 * @param <SR> Scope root type.
 	 * @param <T> A supertype of all indexed entity types to include in the scope.
 	 * @return The created scope.
 	 * @see SearchScope
 	 */
-	<T> SearchScope<T> scope(Collection<? extends Class<? extends T>> classes);
+	<SR, T> SearchScope<SR, T> scope(Collection<? extends Class<? extends T>> classes);
 
 	/**
 	 * Creates a {@link SearchScope} limited to
@@ -54,11 +56,12 @@ public interface SearchScopeProvider extends org.hibernate.search.engine.mapper.
 	 * @param expectedSuperType A supertype of all entity types to include in the scope.
 	 * @param entityName An entity name. See {@link Entity#name()}.
 	 * The referenced entity type must be an indexed entity type or a supertype of such type.
+	 * @param <SR> Scope root type.
 	 * @param <T> A supertype of all indexed entity types to include in the scope.
 	 * @return The created scope.
 	 * @see SearchScope
 	 */
-	default <T> SearchScope<T> scope(Class<T> expectedSuperType, String entityName) {
+	default <SR, T> SearchScope<SR, T> scope(Class<T> expectedSuperType, String entityName) {
 		return scope( expectedSuperType, Collections.singleton( entityName ) );
 	}
 
@@ -69,10 +72,11 @@ public interface SearchScopeProvider extends org.hibernate.search.engine.mapper.
 	 * @param expectedSuperType A supertype of all indexed entity types to include in the scope.
 	 * @param entityNames A collection of entity names. See {@link Entity#name()}.
 	 * Each entity type referenced in the collection must be an indexed entity type or a supertype of such type.
+	 * @param <SR> Scope root type.
 	 * @param <T> A supertype of all indexed entity types to include in the scope.
 	 * @return The created scope.
 	 * @see SearchScope
 	 */
-	<T> SearchScope<T> scope(Class<T> expectedSuperType, Collection<String> entityNames);
+	<SR, T> SearchScope<SR, T> scope(Class<T> expectedSuperType, Collection<String> entityNames);
 
 }

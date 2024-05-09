@@ -101,7 +101,7 @@ public class ElasticsearchTckBackendHelper implements TckBackendHelper {
 	}
 
 	@Override
-	public PredicateFinalStep createSlowPredicate(SearchPredicateFactory f) {
+	public PredicateFinalStep createSlowPredicate(SearchPredicateFactory<?> f) {
 		return f.extension( ElasticsearchExtension.get() )
 				.fromJson( "{\"script\": {"
 						+ "  \"script\": \""
@@ -118,9 +118,14 @@ public class ElasticsearchTckBackendHelper implements TckBackendHelper {
 
 	@Override
 	public <
+			SR,
 			R,
 			E,
-			LOS> SearchQueryDslExtension<? extends SearchQuerySelectStep<?, R, E, LOS, ?, ?>, R, E, LOS> queryDslExtension() {
+			LOS> SearchQueryDslExtension<SR,
+					? extends SearchQuerySelectStep<SR, ?, R, E, LOS, ?, ?>,
+					R,
+					E,
+					LOS> queryDslExtension() {
 		return ElasticsearchExtension.get();
 	}
 }

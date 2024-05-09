@@ -77,7 +77,8 @@ class SearchQueryScrollResultLoadingIT {
 		index.mapping().with()
 				.typeContext( index.typeName(), typeContextMock )
 				.run( () -> {
-					GenericStubMappingScope<EntityReference, StubEntity> scope = index.createGenericScope( loadingContextMock );
+					GenericStubMappingScope<?, EntityReference, StubEntity> scope =
+							index.createGenericScope( loadingContextMock );
 					SearchQuery<StubEntity> query = scope.query()
 							.where( f -> f.matchAll() )
 							.sort( f -> f.field( "integer" ) )
@@ -99,7 +100,7 @@ class SearchQueryScrollResultLoadingIT {
 		index.mapping().with()
 				.typeContext( index.typeName(), typeContextMock )
 				.run( () -> {
-					GenericStubMappingScope<EntityReference, StubEntity> scope =
+					GenericStubMappingScope<?, EntityReference, StubEntity> scope =
 							index.createGenericScope( loadingContextMock );
 					SearchQuery<StubEntity> query = scope.query()
 							.where( f -> f.matchAll() )
@@ -123,7 +124,7 @@ class SearchQueryScrollResultLoadingIT {
 		index.mapping().with()
 				.typeContext( index.typeName(), typeContextMock )
 				.run( () -> {
-					GenericStubMappingScope<EntityReference, StubEntity> scope =
+					GenericStubMappingScope<?, EntityReference, StubEntity> scope =
 							index.createGenericScope( loadingContextMock );
 					SearchQuery<StubEntity> query = scope.query()
 							.where( f -> f.matchAll() )

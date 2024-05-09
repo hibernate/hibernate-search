@@ -92,7 +92,7 @@ public abstract class FacetingRequestImpl<A> implements FacetingRequest {
 		this.maxNumberOfFacets = maxNumberOfFacets;
 	}
 
-	public abstract AggregationFinalStep<A> requestAggregation(SearchAggregationFactory factory);
+	public abstract AggregationFinalStep<A> requestAggregation(SearchAggregationFactory<?> factory);
 
 	public abstract List<Facet> toFacets(A aggregation);
 

@@ -124,7 +124,7 @@ class NamedPredicateBaseIT {
 
 	@Test
 	void nullPath() {
-		SearchPredicateFactory f = index.createScope().predicate();
+		SearchPredicateFactory<?> f = index.createScope().predicate();
 		assertThatThrownBy( () -> f.named( null ) )
 				.isInstanceOf( IllegalArgumentException.class )
 				.hasMessageContainingAll( "must not be null" );
@@ -132,7 +132,7 @@ class NamedPredicateBaseIT {
 
 	@Test
 	void unknownField() {
-		SearchPredicateFactory f = index.createScope().predicate();
+		SearchPredicateFactory<?> f = index.createScope().predicate();
 		assertThatThrownBy( () -> f.named( "unknown_field.my-predicate" ) )
 				.isInstanceOf( SearchException.class )
 				.hasMessageContainingAll( "Unknown field", "'unknown_field'" );
@@ -140,7 +140,7 @@ class NamedPredicateBaseIT {
 
 	@Test
 	void unknownPredicate_root() {
-		SearchPredicateFactory f = index.createScope().predicate();
+		SearchPredicateFactory<?> f = index.createScope().predicate();
 		assertThatThrownBy( () -> f.named( "unknown-predicate" ) )
 				.isInstanceOf( SearchException.class )
 				.hasMessageContainingAll( "Cannot use 'predicate:named:unknown-predicate' on index schema root" );
@@ -148,7 +148,7 @@ class NamedPredicateBaseIT {
 
 	@Test
 	void unknownPredicate_objectField() {
-		SearchPredicateFactory f = index.createScope().predicate();
+		SearchPredicateFactory<?> f = index.createScope().predicate();
 		assertThatThrownBy( () -> f.named( "nested.unknown-predicate" ) )
 				.isInstanceOf( SearchException.class )
 				.hasMessageContainingAll( "Cannot use 'predicate:named:unknown-predicate' on field 'nested'" );
@@ -156,7 +156,7 @@ class NamedPredicateBaseIT {
 
 	@Test
 	void unknownPredicate_valueField() {
-		SearchPredicateFactory f = index.createScope().predicate();
+		SearchPredicateFactory<?> f = index.createScope().predicate();
 		assertThatThrownBy( () -> f.named( "field1.unknown-predicate" ) )
 				.isInstanceOf( SearchException.class )
 				.hasMessageContainingAll( "Cannot use 'predicate:named:unknown-predicate' on field 'field1'" );
@@ -247,10 +247,10 @@ class NamedPredicateBaseIT {
 		}
 
 		@Override
-		public SearchPredicate create(PredicateDefinitionContext context) {
+		public SearchPredicate create(PredicateDefinitionContext<?> context) {
 			String word1 = context.params().get( "value1", String.class );
 			String word2 = context.params().get( "value2", String.class );
-			SearchPredicateFactory f = context.predicate();
+			SearchPredicateFactory<?> f = context.predicate();
 			return f.and(
 					f.match().field( field1Name ).matching( word1 ),
 					f.match().field( field2Name ).matching( word2 )

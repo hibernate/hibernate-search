@@ -17,7 +17,7 @@ import org.hibernate.search.engine.search.predicate.SearchPredicate;
  * @deprecated Use {@link SearchPredicateFactory#nested(String)} instead.
  */
 @Deprecated
-public interface NestedPredicateNestStep<N extends NestedPredicateOptionsStep<?>> {
+public interface NestedPredicateNestStep<SR, N extends NestedPredicateOptionsStep<?>> {
 
 	/**
 	 * Set the inner predicate to a previously-built {@link SearchPredicate}.
@@ -67,6 +67,6 @@ public interface NestedPredicateNestStep<N extends NestedPredicateOptionsStep<?>
 	 * Should generally be a lambda expression.
 	 * @return The next step.
 	 */
-	N nest(Function<? super SearchPredicateFactory, ? extends PredicateFinalStep> predicateContributor);
+	N nest(Function<? super SearchPredicateFactory<SR>, ? extends PredicateFinalStep> predicateContributor);
 
 }

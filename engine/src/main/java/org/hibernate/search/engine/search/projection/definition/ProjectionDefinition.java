@@ -40,6 +40,6 @@ public interface ProjectionDefinition<P> {
 	 * @see SearchPredicateFactory
 	 * @see ProjectionDefinitionContext
 	 */
-	SearchProjection<? extends P> create(SearchProjectionFactory<?, ?> factory, ProjectionDefinitionContext context);
+	SearchProjection<? extends P> create(SearchProjectionFactory<?, ?, ?> factory, ProjectionDefinitionContext context);
 
 }

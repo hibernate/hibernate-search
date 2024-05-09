@@ -415,7 +415,7 @@ class SimpleQueryStringPredicateSpecificsIT
 	}
 
 	@Override
-	SimpleQueryStringPredicateFieldStep<?> predicate(SearchPredicateFactory f) {
+	SimpleQueryStringPredicateFieldStep<?> predicate(SearchPredicateFactory<?> f) {
 		return f.simpleQueryString();
 	}
 }

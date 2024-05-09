@@ -68,12 +68,12 @@ class ObjectProjectionBaseIT {
 		}
 
 		@Override
-		protected CompositeProjectionInnerStep startProjection(SearchProjectionFactory<?, ?> f) {
+		protected CompositeProjectionInnerStep startProjection(SearchProjectionFactory<?, ?, ?> f) {
 			return f.object( index.binding().objectField.relativeName );
 		}
 
 		@Override
-		protected CompositeProjectionInnerStep startProjectionForMulti(SearchProjectionFactory<?, ?> f) {
+		protected CompositeProjectionInnerStep startProjectionForMulti(SearchProjectionFactory<?, ?, ?> f) {
 			return f.object( index.binding().objectField_multi.relativeName );
 		}
 

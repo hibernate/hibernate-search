@@ -52,7 +52,7 @@ class ProjectionConstructorProjectionBindingIT {
 	public StandalonePojoMappingSetupHelper setupHelper =
 			StandalonePojoMappingSetupHelper.withBackendMock( MethodHandles.lookup(), backendMock );
 
-	protected final ProjectionFinalStep<?> dummyProjectionForEnclosingClassInstance(SearchProjectionFactory<?, ?> f) {
+	protected final ProjectionFinalStep<?> dummyProjectionForEnclosingClassInstance(SearchProjectionFactory<?, ?, ?> f) {
 		return f.constant( null );
 	}
 
@@ -87,7 +87,7 @@ class ProjectionConstructorProjectionBindingIT {
 			backendMock.expectSearchProjection(
 					INDEX_NAME,
 					b -> {
-						SearchProjectionFactory<?, ?> f = mapping.scope( IndexedEntity.class ).projection();
+						SearchProjectionFactory<?, ?, ?> f = mapping.scope( IndexedEntity.class ).projection();
 						b.projection( f.composite()
 								.from(
 										dummyProjectionForEnclosingClassInstance( f ),
@@ -184,7 +184,7 @@ class ProjectionConstructorProjectionBindingIT {
 			backendMock.expectSearchProjection(
 					INDEX_NAME,
 					b -> {
-						SearchProjectionFactory<?, ?> f = mapping.scope( IndexedEntity.class ).projection();
+						SearchProjectionFactory<?, ?, ?> f = mapping.scope( IndexedEntity.class ).projection();
 						b.projection( f.composite()
 								.from(
 										dummyProjectionForEnclosingClassInstance( f ),
@@ -315,7 +315,7 @@ class ProjectionConstructorProjectionBindingIT {
 			backendMock.expectSearchProjection(
 					INDEX_NAME,
 					b -> {
-						SearchProjectionFactory<?, ?> f = mapping.scope( IndexedEntity.class ).projection();
+						SearchProjectionFactory<?, ?, ?> f = mapping.scope( IndexedEntity.class ).projection();
 						b.projection( f.composite()
 								.from(
 										dummyProjectionForEnclosingClassInstance( f ),

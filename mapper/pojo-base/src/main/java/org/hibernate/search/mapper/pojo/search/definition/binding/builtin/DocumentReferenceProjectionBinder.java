@@ -51,7 +51,7 @@ public final class DocumentReferenceProjectionBinder implements ProjectionBinder
 		}
 
 		@Override
-		public SearchProjection<DocumentReference> create(SearchProjectionFactory<?, ?> factory,
+		public SearchProjection<DocumentReference> create(SearchProjectionFactory<?, ?, ?> factory,
 				ProjectionDefinitionContext context) {
 			return factory.documentReference().toProjection();
 		}

@@ -72,7 +72,7 @@ class DistanceSortBaseIT {
 		}
 
 		@Override
-		protected void trySort(SearchSortFactory f, String fieldPath) {
+		protected void trySort(SearchSortFactory<?> f, String fieldPath) {
 			f.distance( fieldPath, GeoPoint.of( 0.0, 0.0 ) );
 		}
 
@@ -104,7 +104,7 @@ class DistanceSortBaseIT {
 		}
 
 		@Override
-		protected void trySort(SearchSortFactory f, String fieldPath) {
+		protected void trySort(SearchSortFactory<?> f, String fieldPath) {
 			f.distance( fieldPath, GeoPoint.of( 0.0, 0.0 ) );
 		}
 
@@ -212,7 +212,7 @@ class DistanceSortBaseIT {
 		}
 
 		@Override
-		protected void trySort(SearchSortFactory f, String fieldPath, FieldTypeDescriptor<?, ?> fieldType) {
+		protected void trySort(SearchSortFactory<?> f, String fieldPath, FieldTypeDescriptor<?, ?> fieldType) {
 			f.distance( fieldPath, GeoPoint.of( 0.0, 0.0 ) );
 		}
 

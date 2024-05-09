@@ -507,5 +507,5 @@ abstract class AbstractBaseQueryStringPredicateSpecificsIT<P extends CommonQuery
 		return value;
 	}
 
-	abstract P predicate(SearchPredicateFactory f);
+	abstract P predicate(SearchPredicateFactory<?> f);
 }

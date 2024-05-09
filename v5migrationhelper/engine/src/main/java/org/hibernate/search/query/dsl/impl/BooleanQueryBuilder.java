@@ -121,8 +121,8 @@ class BooleanQueryBuilder implements MustJunction {
 			throw log.booleanQueryWithoutClauses();
 		}
 
-		SearchPredicateFactory factory = queryContext.getScope().predicate();
-		BooleanPredicateClausesStep<?> step = factory.bool();
+		SearchPredicateFactory<?> factory = queryContext.getScope().predicate();
+		BooleanPredicateClausesStep<?, ?> step = factory.bool();
 		for ( BooleanClause clause : clauses ) {
 			SearchPredicate predicate = factory.extension( LuceneExtension.get() )
 					.fromLuceneQuery( clause.getQuery() ).toPredicate();

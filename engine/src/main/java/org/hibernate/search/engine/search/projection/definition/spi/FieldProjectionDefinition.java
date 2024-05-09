@@ -56,7 +56,7 @@ public abstract class FieldProjectionDefinition<P, F> extends AbstractProjection
 		}
 
 		@Override
-		public SearchProjection<F> create(SearchProjectionFactory<?, ?> factory,
+		public SearchProjection<F> create(SearchProjectionFactory<?, ?, ?> factory,
 				ProjectionDefinitionContext context) {
 			return factory.field( fieldPath, fieldType, valueConvert ).toProjection();
 		}
@@ -74,7 +74,7 @@ public abstract class FieldProjectionDefinition<P, F> extends AbstractProjection
 		}
 
 		@Override
-		public SearchProjection<List<F>> create(SearchProjectionFactory<?, ?> factory,
+		public SearchProjection<List<F>> create(SearchProjectionFactory<?, ?, ?> factory,
 				ProjectionDefinitionContext context) {
 			return factory.field( fieldPath, fieldType, valueConvert ).multi().toProjection();
 		}

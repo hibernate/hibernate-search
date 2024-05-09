@@ -60,10 +60,10 @@ public abstract class AbstractPredicateSingleFieldIT<V extends AbstractPredicate
 		}
 	}
 
-	protected abstract PredicateFinalStep predicate(SearchPredicateFactory f, String fieldPath, int matchingDocOrdinal,
+	protected abstract PredicateFinalStep predicate(SearchPredicateFactory<?> f, String fieldPath, int matchingDocOrdinal,
 			DataSet<?, V> dataSet);
 
-	protected abstract PredicateFinalStep predicate(SearchPredicateFactory f, String fieldPath, String paramName,
+	protected abstract PredicateFinalStep predicate(SearchPredicateFactory<?> f, String fieldPath, String paramName,
 			DataSet<?, V> dataSet);
 
 	protected abstract Map<String, Object> parameterValues(int matchingDocOrdinal, DataSet<?, V> dataSet, String paramName);

@@ -15,9 +15,10 @@ import org.hibernate.search.engine.search.predicate.dsl.SearchPredicateFactory;
 /**
  * The initial step in a "terms" aggregation definition, where the target field can be set.
  *
+ * @param <SR> Scope root type.
  * @param <PDF> The type of factory used to create predicates in {@link AggregationFilterStep#filter(Function)}.
  */
-public interface TermsAggregationFieldStep<PDF extends SearchPredicateFactory> {
+public interface TermsAggregationFieldStep<SR, PDF extends SearchPredicateFactory<SR>> {
 
 	/**
 	 * Target the given field in the terms aggregation.
@@ -27,7 +28,7 @@ public interface TermsAggregationFieldStep<PDF extends SearchPredicateFactory> {
 	 * @param <F> The type of field values.
 	 * @return The next step.
 	 */
-	default <F> TermsAggregationOptionsStep<?, PDF, F, Map<F, Long>> field(String fieldPath, Class<F> type) {
+	default <F> TermsAggregationOptionsStep<SR, ?, PDF, F, Map<F, Long>> field(String fieldPath, Class<F> type) {
 		return field( fieldPath, type, ValueConvert.YES );
 	}
 
@@ -41,7 +42,7 @@ public interface TermsAggregationFieldStep<PDF extends SearchPredicateFactory> {
 	 * See {@link ValueConvert}.
 	 * @return The next step.
 	 */
-	<F> TermsAggregationOptionsStep<?, PDF, F, Map<F, Long>> field(String fieldPath, Class<F> type,
+	<F> TermsAggregationOptionsStep<SR, ?, PDF, F, Map<F, Long>> field(String fieldPath, Class<F> type,
 			ValueConvert convert);
 
 }

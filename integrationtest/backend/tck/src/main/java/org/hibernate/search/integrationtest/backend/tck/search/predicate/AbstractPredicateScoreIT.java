@@ -79,18 +79,18 @@ public abstract class AbstractPredicateScoreIT {
 				.hasDocRefHitsExactOrder( index.typeName(), dataSet.docId( 0 ), dataSet.docId( 1 ) );
 	}
 
-	protected abstract PredicateFinalStep predicate(SearchPredicateFactory f, int matchingDocOrdinal,
+	protected abstract PredicateFinalStep predicate(SearchPredicateFactory<?> f, int matchingDocOrdinal,
 			AbstractPredicateDataSet dataSet, StubMappedIndex index);
 
-	protected abstract PredicateFinalStep predicateWithBoost(SearchPredicateFactory f, int matchingDocOrdinal,
+	protected abstract PredicateFinalStep predicateWithBoost(SearchPredicateFactory<?> f, int matchingDocOrdinal,
 			float boost, AbstractPredicateDataSet dataSet,
 			StubMappedIndex index);
 
-	protected abstract PredicateFinalStep predicateWithConstantScore(SearchPredicateFactory f,
+	protected abstract PredicateFinalStep predicateWithConstantScore(SearchPredicateFactory<?> f,
 			int matchingDocOrdinal, AbstractPredicateDataSet dataSet,
 			StubMappedIndex index);
 
-	protected abstract PredicateFinalStep predicateWithConstantScoreAndBoost(SearchPredicateFactory f,
+	protected abstract PredicateFinalStep predicateWithConstantScoreAndBoost(SearchPredicateFactory<?> f,
 			int matchingDocOrdinal, float boost, AbstractPredicateDataSet dataSet,
 			StubMappedIndex index);
 

@@ -15,7 +15,7 @@ class QueryStringPredicateBaseIT extends AbstractBaseQueryStringPredicateBaseIT<
 	//CHECKSTYLE:ON
 
 	@Override
-	QueryStringPredicateFieldStep<?> predicate(SearchPredicateFactory f) {
+	QueryStringPredicateFieldStep<?> predicate(SearchPredicateFactory<?> f) {
 		return f.queryString();
 	}
 

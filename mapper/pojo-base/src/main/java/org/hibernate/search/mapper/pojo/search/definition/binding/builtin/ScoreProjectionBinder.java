@@ -49,7 +49,7 @@ public final class ScoreProjectionBinder implements ProjectionBinder {
 		}
 
 		@Override
-		public SearchProjection<Float> create(SearchProjectionFactory<?, ?> factory,
+		public SearchProjection<Float> create(SearchProjectionFactory<?, ?, ?> factory,
 				ProjectionDefinitionContext context) {
 			return factory.score().toProjection();
 		}
