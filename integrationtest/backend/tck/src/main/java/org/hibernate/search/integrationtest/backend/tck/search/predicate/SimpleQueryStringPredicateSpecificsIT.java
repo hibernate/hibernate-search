@@ -35,7 +35,7 @@ import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 
 class SimpleQueryStringPredicateSpecificsIT
-		extends AbstractBaseQueryStringPredicateSpecificsIT<SimpleQueryStringPredicateFieldStep<?>> {
+		extends AbstractBaseQueryStringPredicateSpecificsIT<SimpleQueryStringPredicateFieldStep<?, ?>> {
 
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-2678")
@@ -413,7 +413,7 @@ class SimpleQueryStringPredicateSpecificsIT
 	}
 
 	@Override
-	SimpleQueryStringPredicateFieldStep<?> predicate(SearchPredicateFactory<?> f) {
+	SimpleQueryStringPredicateFieldStep<?, ?> predicate(SearchPredicateFactory<?> f) {
 		return f.simpleQueryString();
 	}
 }

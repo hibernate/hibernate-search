@@ -44,7 +44,7 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 
-abstract class AbstractBaseQueryStringPredicateSpecificsIT<P extends CommonQueryStringPredicateFieldStep<?>> {
+abstract class AbstractBaseQueryStringPredicateSpecificsIT<P extends CommonQueryStringPredicateFieldStep<?, ?, ?>> {
 
 	protected static final String DOCUMENT_1 = "document1";
 	protected static final String DOCUMENT_2 = "document2";
