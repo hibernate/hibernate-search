@@ -136,7 +136,7 @@ class MatchIdPredicateSpecificsIT {
 
 	@Test
 	void multiIndex_withIncompatibleIdConverterIndex_dslConverterEnabled() {
-		SearchPredicateFactory f = mainIndex.createScope( incompatibleIdConverterIndex ).predicate();
+		SearchPredicateFactory<?> f = mainIndex.createScope( incompatibleIdConverterIndex ).predicate();
 
 		assertThatThrownBy( () -> f.id().matching( new Object() /* Value does not matter */ ) )
 				.isInstanceOf( SearchException.class )

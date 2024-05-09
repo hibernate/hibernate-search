@@ -209,7 +209,7 @@ class KnnPredicateSpecificsIT {
 		@ParameterizedTest(name = "{1}")
 		@MethodSource("params")
 		void wrongVectorValuesType(SimpleMappedIndex<IndexBinding> index, VectorFieldTypeDescriptor<?> fieldType) {
-			SearchPredicateFactory f = index.createScope( index ).predicate();
+			SearchPredicateFactory<?> f = index.createScope( index ).predicate();
 
 			String fieldPath = index.binding().field.get( fieldType ).relativeFieldName;
 
@@ -238,7 +238,7 @@ class KnnPredicateSpecificsIT {
 					);
 		}
 
-		protected void tryPredicateWrongType(SearchPredicateFactory f, String fieldPath,
+		protected void tryPredicateWrongType(SearchPredicateFactory<?> f, String fieldPath,
 				VectorFieldTypeDescriptor<?> fieldType) {
 			if ( fieldType.getJavaType() == byte[].class ) {
 				f.knn( 1 ).field( fieldPath ).matching( 1.0f, 1.0f );
@@ -248,7 +248,7 @@ class KnnPredicateSpecificsIT {
 			}
 		}
 
-		protected KnnPredicateOptionsStep tryPredicateWrongLength(SearchPredicateFactory f, String fieldPath,
+		protected KnnPredicateOptionsStep<?> tryPredicateWrongLength(SearchPredicateFactory<?> f, String fieldPath,
 				VectorFieldTypeDescriptor<?> fieldType) {
 			if ( fieldType.getJavaType() == byte[].class ) {
 				return f.knn( 1 ).field( fieldPath ).matching( new byte[fieldType.vectorSize() * 2] );
@@ -328,7 +328,7 @@ class KnnPredicateSpecificsIT {
 				SimpleMappedIndex<IndexBinding> indexDifferentEfConstruction,
 				SimpleMappedIndex<IndexBinding> indexDifferentM,
 				SimpleMappedIndex<IndexBinding> indexDifferentSimilarity) {
-			SearchPredicateFactory f = index.createScope( indexDifferentDimension ).predicate();
+			SearchPredicateFactory<?> f = index.createScope( indexDifferentDimension ).predicate();
 
 			String fieldPath = index.binding().field.get( fieldType ).relativeFieldName;
 
@@ -351,7 +351,7 @@ class KnnPredicateSpecificsIT {
 				SimpleMappedIndex<IndexBinding> indexDifferentEfConstruction,
 				SimpleMappedIndex<IndexBinding> indexDifferentM,
 				SimpleMappedIndex<IndexBinding> indexDifferentSimilarity) {
-			SearchPredicateFactory f = index.createScope( indexDifferentSimilarity ).predicate();
+			SearchPredicateFactory<?> f = index.createScope( indexDifferentSimilarity ).predicate();
 
 			String fieldPath = index.binding().field.get( fieldType ).relativeFieldName;
 
@@ -375,7 +375,7 @@ class KnnPredicateSpecificsIT {
 				SimpleMappedIndex<IndexBinding> indexDifferentM,
 				SimpleMappedIndex<IndexBinding> indexDifferentSimilarity) {
 			StubMappingScope scope = index.createScope( indexDifferentEfConstruction );
-			SearchPredicateFactory f = scope.predicate();
+			SearchPredicateFactory<?> f = scope.predicate();
 
 			String fieldPath = index.binding().field.get( fieldType ).relativeFieldName;
 
@@ -399,7 +399,7 @@ class KnnPredicateSpecificsIT {
 				SimpleMappedIndex<IndexBinding> indexDifferentM,
 				SimpleMappedIndex<IndexBinding> indexDifferentSimilarity) {
 			StubMappingScope scope = index.createScope( indexDifferentM );
-			SearchPredicateFactory f = scope.predicate();
+			SearchPredicateFactory<?> f = scope.predicate();
 
 			String fieldPath = index.binding().field.get( fieldType ).relativeFieldName;
 
@@ -414,7 +414,7 @@ class KnnPredicateSpecificsIT {
 					);
 		}
 
-		protected KnnPredicateOptionsStep predicate(SearchPredicateFactory f, String fieldPath,
+		protected KnnPredicateOptionsStep<?> predicate(SearchPredicateFactory<?> f, String fieldPath,
 				VectorFieldTypeDescriptor<?> fieldType) {
 			if ( fieldType.getJavaType() == byte[].class ) {
 				return f.knn( 1 ).field( fieldPath ).matching( (byte) 1, (byte) 1 );
@@ -527,7 +527,7 @@ class KnnPredicateSpecificsIT {
 		void similarity(VectorFieldTypeDescriptor<?> fieldType,
 				SimpleMappedIndex<IndexBinding> index) {
 			StubMappingScope scope = index.createScope();
-			SearchPredicateFactory f = scope.predicate();
+			SearchPredicateFactory<?> f = scope.predicate();
 
 			String fieldPath = index.binding().field.get( fieldType ).relativeFieldName;
 
@@ -537,7 +537,7 @@ class KnnPredicateSpecificsIT {
 					.hasSize( 2 );
 		}
 
-		protected KnnPredicateOptionsStep predicate(SearchPredicateFactory f, String fieldPath,
+		protected KnnPredicateOptionsStep<?> predicate(SearchPredicateFactory<?> f, String fieldPath,
 				VectorFieldTypeDescriptor<?> fieldType) {
 			if ( fieldType.getJavaType() == byte[].class ) {
 				return f.knn( 2 ).field( fieldPath ).matching( (byte) 1, (byte) 0, (byte) 0, (byte) 0 );

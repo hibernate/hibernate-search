@@ -15,20 +15,21 @@ import org.hibernate.search.engine.search.projection.dsl.spi.StaticProjectionFin
 import org.apache.lucene.document.Document;
 import org.apache.lucene.search.Explanation;
 
-public class LuceneSearchProjectionFactoryImpl<R, E>
+public class LuceneSearchProjectionFactoryImpl<SR, R, E>
 		extends AbstractSearchProjectionFactory<
-				LuceneSearchProjectionFactory<R, E>,
+				SR,
+				LuceneSearchProjectionFactory<SR, R, E>,
 				LuceneSearchProjectionIndexScope<?>,
 				R,
 				E>
-		implements LuceneSearchProjectionFactory<R, E> {
+		implements LuceneSearchProjectionFactory<SR, R, E> {
 
 	public LuceneSearchProjectionFactoryImpl(SearchProjectionDslContext<LuceneSearchProjectionIndexScope<?>> dslContext) {
 		super( dslContext );
 	}
 
 	@Override
-	public LuceneSearchProjectionFactory<R, E> withRoot(String objectFieldPath) {
+	public LuceneSearchProjectionFactory<SR, R, E> withRoot(String objectFieldPath) {
 		return new LuceneSearchProjectionFactoryImpl<>( dslContext.rescope(
 				dslContext.scope().withRoot( objectFieldPath ) ) );
 	}

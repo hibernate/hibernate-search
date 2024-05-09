@@ -171,24 +171,25 @@ public final class ElasticsearchSearchIndexScopeImpl
 	}
 
 	@Override
-	public ElasticsearchSearchPredicateFactory predicateFactory() {
-		return new ElasticsearchSearchPredicateFactoryImpl( SearchPredicateDslContext.root( this ) );
+	public <SR> ElasticsearchSearchPredicateFactory<SR> predicateFactory() {
+		return new ElasticsearchSearchPredicateFactoryImpl<SR>( SearchPredicateDslContext.root( this ) );
 	}
 
 	@Override
-	public ElasticsearchSearchSortFactory sortFactory() {
-		return new ElasticsearchSearchSortFactoryImpl( SearchSortDslContext
+	public <SR> ElasticsearchSearchSortFactory<SR> sortFactory() {
+		return new ElasticsearchSearchSortFactoryImpl<SR>( SearchSortDslContext
 				.root( this, ElasticsearchSearchSortFactoryImpl::new, predicateFactory() ) );
 	}
 
 	@Override
-	public <R, E> ElasticsearchSearchProjectionFactory<R, E> projectionFactory() {
+	public <SR, R, E> ElasticsearchSearchProjectionFactory<SR, R, E> projectionFactory() {
 		return new ElasticsearchSearchProjectionFactoryImpl<>( SearchProjectionDslContext.root( this ) );
 	}
 
 	@Override
-	public ElasticsearchSearchAggregationFactory aggregationFactory() {
-		return new ElasticsearchSearchAggregationFactoryImpl( SearchAggregationDslContext.root( this, predicateFactory() ) );
+	public <SR> ElasticsearchSearchAggregationFactory<SR> aggregationFactory() {
+		return new ElasticsearchSearchAggregationFactoryImpl<SR>(
+				SearchAggregationDslContext.root( this, predicateFactory() ) );
 	}
 
 	@Override

@@ -27,15 +27,15 @@ public interface ElasticsearchSearchQueryIndexScope<S extends ElasticsearchSearc
 			SearchLoadingContextBuilder<?, ?> loadingContextBuilder, SearchProjection<P> projection);
 
 	@Override
-	ElasticsearchSearchPredicateFactory predicateFactory();
+	<SR> ElasticsearchSearchPredicateFactory<SR> predicateFactory();
 
 	@Override
-	ElasticsearchSearchSortFactory sortFactory();
+	<SR> ElasticsearchSearchSortFactory<SR> sortFactory();
 
 	@Override
-	<R, E> ElasticsearchSearchProjectionFactory<R, E> projectionFactory();
+	<SR, R, E> ElasticsearchSearchProjectionFactory<SR, R, E> projectionFactory();
 
 	@Override
-	ElasticsearchSearchAggregationFactory aggregationFactory();
+	<SR> ElasticsearchSearchAggregationFactory<SR> aggregationFactory();
 
 }

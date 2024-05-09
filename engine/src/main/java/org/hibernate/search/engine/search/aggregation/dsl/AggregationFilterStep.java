@@ -14,10 +14,11 @@ import org.hibernate.search.engine.search.predicate.dsl.SearchPredicateFactory;
  * The step in an aggregation definition where a filter can be set
  * to select nested objects from which values will be extracted for this aggregation.
  *
+ * @param <SR> Scope root type.
  * @param <S> The "self" type (the actual exposed type of this step)
  * @param <PDF> The type of factory used to create predicates in {@link #filter(Function)}.
  */
-public interface AggregationFilterStep<S, PDF extends SearchPredicateFactory> {
+public interface AggregationFilterStep<SR, S, PDF extends SearchPredicateFactory<SR>> {
 
 	/**
 	 * Filter nested objects from which values will be extracted for this aggregation.

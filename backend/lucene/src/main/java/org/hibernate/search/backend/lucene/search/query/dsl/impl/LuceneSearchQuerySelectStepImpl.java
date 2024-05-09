@@ -26,15 +26,16 @@ import org.hibernate.search.engine.search.projection.dsl.ProjectionFinalStep;
 import org.hibernate.search.engine.search.projection.spi.ProjectionCompositor;
 import org.hibernate.search.engine.search.query.dsl.spi.AbstractSearchQuerySelectStep;
 
-public class LuceneSearchQuerySelectStepImpl<R, E, LOS>
+public class LuceneSearchQuerySelectStepImpl<SR, R, E, LOS>
 		extends AbstractSearchQuerySelectStep<
-				LuceneSearchQueryOptionsStep<E, LOS>,
+				SR,
+				LuceneSearchQueryOptionsStep<SR, E, LOS>,
 				R,
 				E,
 				LOS,
-				LuceneSearchProjectionFactory<R, E>,
-				LuceneSearchPredicateFactory>
-		implements LuceneSearchQuerySelectStep<R, E, LOS> {
+				LuceneSearchProjectionFactory<SR, R, E>,
+				LuceneSearchPredicateFactory<SR>>
+		implements LuceneSearchQuerySelectStep<SR, R, E, LOS> {
 
 	private final LuceneSearchQueryIndexScope<?> scope;
 	private final BackendSessionContext sessionContext;
@@ -49,56 +50,56 @@ public class LuceneSearchQuerySelectStepImpl<R, E, LOS>
 	}
 
 	@Override
-	public LuceneSearchQueryWhereStep<E, LOS> selectEntity() {
-		return select( scope.<R, E>projectionFactory().entity().toProjection() );
+	public LuceneSearchQueryWhereStep<SR, E, LOS> selectEntity() {
+		return select( scope.<SR, R, E>projectionFactory().entity().toProjection() );
 	}
 
 	@Override
-	public LuceneSearchQueryWhereStep<R, LOS> selectEntityReference() {
+	public LuceneSearchQueryWhereStep<SR, R, LOS> selectEntityReference() {
 		return select( scope.projectionBuilders().entityReference() );
 	}
 
 	@Override
-	public <P> LuceneSearchQueryWhereStep<P, LOS> select(Class<P> objectClass) {
+	public <P> LuceneSearchQueryWhereStep<SR, P, LOS> select(Class<P> objectClass) {
 		return select( scope.projectionFactory().composite().as( objectClass ).toProjection() );
 	}
 
 	@Override
-	public <P> LuceneSearchQueryWhereStep<P, LOS> select(
-			Function<? super LuceneSearchProjectionFactory<R, E>, ? extends ProjectionFinalStep<P>> projectionContributor) {
+	public <P> LuceneSearchQueryWhereStep<SR, P, LOS> select(
+			Function<? super LuceneSearchProjectionFactory<SR, R, E>, ? extends ProjectionFinalStep<P>> projectionContributor) {
 		SearchProjection<P> projection = projectionContributor.apply( scope.projectionFactory() ).toProjection();
 		return select( projection );
 	}
 
 	@Override
-	public <P> LuceneSearchQueryWhereStep<P, LOS> select(SearchProjection<P> projection) {
+	public <P> LuceneSearchQueryWhereStep<SR, P, LOS> select(SearchProjection<P> projection) {
 		LuceneSearchQueryBuilder<P> builder =
 				scope.select( sessionContext, loadingContextBuilder, projection );
 		return new LuceneSearchQueryOptionsStepImpl<>( scope, builder, loadingContextBuilder );
 	}
 
 	@Override
-	public LuceneSearchQueryWhereStep<List<?>, LOS> select(SearchProjection<?>... projections) {
+	public LuceneSearchQueryWhereStep<SR, List<?>, LOS> select(SearchProjection<?>... projections) {
 		return select( scope.projectionBuilders().composite()
 				.build( projections, ProjectionCompositor.fromList( projections.length ),
 						ProjectionCollector.nullable() ) );
 	}
 
 	@Override
-	public LuceneSearchQueryOptionsStep<E, LOS> where(SearchPredicate predicate) {
+	public LuceneSearchQueryOptionsStep<SR, E, LOS> where(SearchPredicate predicate) {
 		return selectEntity().where( predicate );
 	}
 
 	@Override
-	public LuceneSearchQueryOptionsStep<E, LOS> where(
-			Function<? super LuceneSearchPredicateFactory, ? extends PredicateFinalStep> predicateContributor) {
+	public LuceneSearchQueryOptionsStep<SR, E, LOS> where(
+			Function<? super LuceneSearchPredicateFactory<SR>, ? extends PredicateFinalStep> predicateContributor) {
 		return selectEntity().where( predicateContributor );
 	}
 
 	@Override
-	public LuceneSearchQueryOptionsStep<E, LOS> where(
-			BiConsumer<? super LuceneSearchPredicateFactory,
-					? super SimpleBooleanPredicateClausesCollector<?>> predicateContributor) {
+	public LuceneSearchQueryOptionsStep<SR, E, LOS> where(
+			BiConsumer<? super LuceneSearchPredicateFactory<SR>,
+					? super SimpleBooleanPredicateClausesCollector<SR, ?>> predicateContributor) {
 		return selectEntity().where( predicateContributor );
 	}
 

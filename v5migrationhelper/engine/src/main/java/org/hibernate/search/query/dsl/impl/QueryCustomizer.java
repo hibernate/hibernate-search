@@ -55,16 +55,16 @@ class QueryCustomizer implements QueryCustomization<QueryCustomizer> {
 		}
 	}
 
-	public SearchPredicate applyFilter(SearchPredicateFactory factory, SearchPredicate predicate) {
+	public SearchPredicate applyFilter(SearchPredicateFactory<?> factory, SearchPredicate predicate) {
 		if ( filter == null ) {
 			return predicate;
 		}
-		BooleanPredicateClausesStep<?> step = factory.bool().must( predicate );
+		BooleanPredicateClausesStep<?, ?> step = factory.bool().must( predicate );
 		applyFilter( factory, step );
 		return step.toPredicate();
 	}
 
-	public void applyFilter(SearchPredicateFactory factory, BooleanPredicateOptionsCollector<?> collector) {
+	public void applyFilter(SearchPredicateFactory<?> factory, BooleanPredicateOptionsCollector<?, ?> collector) {
 		if ( filter == null ) {
 			return;
 		}

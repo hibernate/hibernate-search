@@ -19,29 +19,33 @@ import org.hibernate.search.engine.search.sort.spi.SearchSortIndexScope;
  * including in particular the search scope, the sort builder factory
  * and the knowledge of previous sorts chained using {@link SortThenStep#then()}.
  *
+ * @param <SR> Scope root type.
  * @param <SC> The type of the backend-specific search scope.
  * @param <PDF> The type of factory used to create predicates in {@link FieldSortOptionsStep#filter(Function)}.
  */
-public final class SearchSortDslContext<SC extends SearchSortIndexScope<?>, PDF extends SearchPredicateFactory> {
+public final class SearchSortDslContext<SR, SC extends SearchSortIndexScope<?>, PDF extends SearchPredicateFactory<SR>> {
 
-	public static <SC extends SearchSortIndexScope<?>, PDF extends SearchPredicateFactory> SearchSortDslContext<SC, PDF> root(
-			SC scope,
-			Function<SearchSortDslContext<SC, PDF>, SearchSortFactory> factoryProvider,
-			PDF predicateFactory) {
+	public static <
+			SR,
+			SC extends SearchSortIndexScope<?>,
+			PDF extends SearchPredicateFactory<SR>> SearchSortDslContext<SR, SC, PDF> root(
+					SC scope,
+					Function<SearchSortDslContext<SR, SC, PDF>, SearchSortFactory<SR>> factoryProvider,
+					PDF predicateFactory) {
 		return new SearchSortDslContext<>( scope, factoryProvider, null, null, predicateFactory );
 	}
 
 	private final SC scope;
-	private final Function<SearchSortDslContext<SC, PDF>, SearchSortFactory> factoryProvider;
-	private final SearchSortDslContext<?, ?> parent;
+	private final Function<SearchSortDslContext<SR, SC, PDF>, SearchSortFactory<SR>> factoryProvider;
+	private final SearchSortDslContext<SR, ?, ?> parent;
 	private final SearchSort sort;
 	private final PDF predicateFactory;
 
 	private SearchSort compositeSort;
 
 	private SearchSortDslContext(SC scope,
-			Function<SearchSortDslContext<SC, PDF>, SearchSortFactory> factoryProvider,
-			SearchSortDslContext<?, ?> parent, SearchSort sort,
+			Function<SearchSortDslContext<SR, SC, PDF>, SearchSortFactory<SR>> factoryProvider,
+			SearchSortDslContext<SR, ?, ?> parent, SearchSort sort,
 			PDF predicateFactory) {
 		this.scope = scope;
 		this.factoryProvider = factoryProvider;
@@ -60,7 +64,7 @@ public final class SearchSortDslContext<SC extends SearchSortIndexScope<?>, PDF 
 	/**
 	 * @return A new factory to be returned by {@link SortThenStep#then()}.
 	 */
-	public SearchSortFactory then() {
+	public SearchSortFactory<SR> then() {
 		return factoryProvider.apply( this );
 	}
 
@@ -69,7 +73,7 @@ public final class SearchSortDslContext<SC extends SearchSortIndexScope<?>, PDF 
 	 * @param newPredicateFactory The new predicate factory for the new DSL context.
 	 * @return A copy of this DSL context with its scope and predicate factory replaced with the given ones.
 	 */
-	public SearchSortDslContext<SC, PDF> rescope(SC newScope, PDF newPredicateFactory) {
+	public SearchSortDslContext<SR, SC, PDF> rescope(SC newScope, PDF newPredicateFactory) {
 		return new SearchSortDslContext<>( newScope, factoryProvider, parent, sort, newPredicateFactory );
 	}
 
@@ -79,7 +83,7 @@ public final class SearchSortDslContext<SC extends SearchSortIndexScope<?>, PDF 
 	 * @param sort The sort to add.
 	 * @return A new DSL context, with the given builder appended.
 	 */
-	public SearchSortDslContext<SC, PDF> append(SearchSort sort) {
+	public SearchSortDslContext<SR, SC, PDF> append(SearchSort sort) {
 		return new SearchSortDslContext<>( scope, factoryProvider, this, sort, predicateFactory );
 	}
 

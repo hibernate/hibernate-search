@@ -13,21 +13,22 @@ import org.hibernate.search.util.common.SearchException;
 import org.hibernate.search.util.common.annotation.Incubating;
 
 /**
- * The context passed to {@link PredicateDefinition#create(PredicateDefinitionContext)}.
+ * The context passed to {@link PredicateDefinition#create(PredicateDefinitionContext<SR>)}.
+ * @param <SR> Scope root type.
  * @see PredicateDefinition#create(PredicateDefinitionContext)
  */
 @Incubating
-public interface PredicateDefinitionContext {
+public interface PredicateDefinitionContext<SR> {
 
 	/**
 	 * @return A predicate factory.
 	 * If the named predicate was registered on an object field,
 	 * this factory expects field paths to be provided relative to that same object field.
 	 * This factory is only valid in the present context and must not be used after
-	 * {@link PredicateDefinition#create(PredicateDefinitionContext)} returns.
+	 * {@link PredicateDefinition#create(PredicateDefinitionContext<SR>)} returns.
 	 * @see SearchPredicateFactory
 	 */
-	SearchPredicateFactory predicate();
+	SearchPredicateFactory<SR> predicate();
 
 	/**
 	 * @param name The name of the parameter.

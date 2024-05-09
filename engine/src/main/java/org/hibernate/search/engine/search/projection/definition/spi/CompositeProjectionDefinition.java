@@ -14,12 +14,12 @@ import org.hibernate.search.engine.search.projection.dsl.SearchProjectionFactory
 public interface CompositeProjectionDefinition<T> extends ProjectionDefinition<T>, AutoCloseable {
 
 	@Override
-	default SearchProjection<? extends T> create(SearchProjectionFactory<?, ?> factory,
+	default SearchProjection<? extends T> create(SearchProjectionFactory<?, ?, ?> factory,
 			ProjectionDefinitionContext context) {
 		return apply( factory, factory.composite(), context ).toProjection();
 	}
 
-	CompositeProjectionValueStep<?, T> apply(SearchProjectionFactory<?, ?> projectionFactory,
+	CompositeProjectionValueStep<?, T> apply(SearchProjectionFactory<?, ?, ?> projectionFactory,
 			CompositeProjectionInnerStep initialStep,
 			ProjectionDefinitionContext context);
 

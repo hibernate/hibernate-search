@@ -1036,10 +1036,11 @@ public abstract class AbstractProjectionInObjectProjectionIT<F, P, V extends Abs
 				.multiValuedFieldAbsolutePath( dataSet.fieldType );
 	}
 
-	protected abstract ProjectionFinalStep<P> singleValuedProjection(SearchProjectionFactory<?, ?> f, String absoluteFieldPath,
+	protected abstract ProjectionFinalStep<P> singleValuedProjection(SearchProjectionFactory<?, ?, ?> f,
+			String absoluteFieldPath,
 			DataSet<F, P, V> dataSet);
 
-	protected abstract ProjectionFinalStep<List<P>> multiValuedProjection(SearchProjectionFactory<?, ?> f,
+	protected abstract ProjectionFinalStep<List<P>> multiValuedProjection(SearchProjectionFactory<?, ?, ?> f,
 			String absoluteFieldPath,
 			DataSet<F, P, V> dataSet);
 

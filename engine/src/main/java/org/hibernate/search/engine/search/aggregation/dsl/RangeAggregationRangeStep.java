@@ -13,13 +13,15 @@ import org.hibernate.search.util.common.data.Range;
 /**
  * The step in a "range" aggregation definition where the ranges can be set.
  *
+ * @param <SR> Scope root type.
  * @param <N> The type of the next step.
  * @param <PDF> The type of factory used to create predicates in {@link AggregationFilterStep#filter(Function)}.
  * @param <F> The type of the targeted field.
  */
 public interface RangeAggregationRangeStep<
-		N extends RangeAggregationRangeMoreStep<?, ?, PDF, F>,
-		PDF extends SearchPredicateFactory,
+		SR,
+		N extends RangeAggregationRangeMoreStep<SR, ?, ?, PDF, F>,
+		PDF extends SearchPredicateFactory<SR>,
 		F> {
 
 	/**

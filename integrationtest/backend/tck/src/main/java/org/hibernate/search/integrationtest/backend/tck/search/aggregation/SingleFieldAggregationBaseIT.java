@@ -258,7 +258,7 @@ class SingleFieldAggregationBaseIT<F> {
 	}
 
 	private <A> void testValidAggregation(AggregationScenario<A> scenario, StubMappingScope scope,
-			String fieldPath, Function<? super SearchPredicateFactory, ? extends PredicateFinalStep> filterOrNull,
+			String fieldPath, Function<? super SearchPredicateFactory<?>, ? extends PredicateFinalStep> filterOrNull,
 			DataSet<F> dataSet) {
 		testValidAggregation(
 				scenario, scope,
@@ -269,8 +269,8 @@ class SingleFieldAggregationBaseIT<F> {
 	}
 
 	private <A> void testValidAggregation(AggregationScenario<A> scenario, StubMappingScope scope,
-			Function<SearchPredicateFactory, ? extends PredicateFinalStep> predicateContributor,
-			BiFunction<SearchAggregationFactory, AggregationScenario<A>, AggregationFinalStep<A>> aggregationContributor,
+			Function<SearchPredicateFactory<?>, ? extends PredicateFinalStep> predicateContributor,
+			BiFunction<SearchAggregationFactory<?>, AggregationScenario<A>, AggregationFinalStep<A>> aggregationContributor,
 			DataSet<F> dataSet) {
 		AggregationKey<A> aggregationKey = AggregationKey.of( AGGREGATION_NAME );
 		assertThatQuery(
@@ -303,12 +303,12 @@ class SingleFieldAggregationBaseIT<F> {
 		return indexBinding.getFieldPath( fieldStructure, fieldType );
 	}
 
-	private Function<? super SearchPredicateFactory, ? extends PredicateFinalStep> getFilterOrNull(
+	private Function<? super SearchPredicateFactory<?>, ? extends PredicateFinalStep> getFilterOrNull(
 			SingleFieldIndexBinding binding, TestedFieldStructure fieldStructure) {
 		return getFilterOrNull( binding.getDiscriminatorFieldPath( fieldStructure ), fieldStructure );
 	}
 
-	private Function<? super SearchPredicateFactory, ? extends PredicateFinalStep> getFilterOrNull(
+	private Function<? super SearchPredicateFactory<?>, ? extends PredicateFinalStep> getFilterOrNull(
 			String discriminatorPath, TestedFieldStructure fieldStructure) {
 		if ( fieldStructure.isInNested() ) {
 			return pf -> pf.match()

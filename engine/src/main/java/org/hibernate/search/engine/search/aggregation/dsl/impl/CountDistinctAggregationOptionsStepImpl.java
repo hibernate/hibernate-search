@@ -14,26 +14,26 @@ import org.hibernate.search.engine.search.predicate.SearchPredicate;
 import org.hibernate.search.engine.search.predicate.dsl.PredicateFinalStep;
 import org.hibernate.search.engine.search.predicate.dsl.SearchPredicateFactory;
 
-class CountDistinctAggregationOptionsStepImpl<PDF extends SearchPredicateFactory>
-		implements CountDistinctAggregationOptionsStep<CountDistinctAggregationOptionsStepImpl<PDF>, PDF> {
+class CountDistinctAggregationOptionsStepImpl<SR, PDF extends SearchPredicateFactory<SR>>
+		implements CountDistinctAggregationOptionsStep<SR, CountDistinctAggregationOptionsStepImpl<SR, PDF>, PDF> {
 	private final SearchFilterableAggregationBuilder<Long> builder;
-	private final SearchAggregationDslContext<?, ? extends PDF> dslContext;
+	private final SearchAggregationDslContext<SR, ?, ? extends PDF> dslContext;
 
 	CountDistinctAggregationOptionsStepImpl(SearchFilterableAggregationBuilder<Long> builder,
-			SearchAggregationDslContext<?, ? extends PDF> dslContext) {
+			SearchAggregationDslContext<SR, ?, ? extends PDF> dslContext) {
 		this.builder = builder;
 		this.dslContext = dslContext;
 	}
 
 	@Override
-	public CountDistinctAggregationOptionsStepImpl<PDF> filter(
+	public CountDistinctAggregationOptionsStepImpl<SR, PDF> filter(
 			Function<? super PDF, ? extends PredicateFinalStep> clauseContributor) {
 		SearchPredicate predicate = clauseContributor.apply( dslContext.predicateFactory() ).toPredicate();
 		return filter( predicate );
 	}
 
 	@Override
-	public CountDistinctAggregationOptionsStepImpl<PDF> filter(SearchPredicate searchPredicate) {
+	public CountDistinctAggregationOptionsStepImpl<SR, PDF> filter(SearchPredicate searchPredicate) {
 		builder.filter( searchPredicate );
 		return this;
 	}

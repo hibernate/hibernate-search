@@ -35,7 +35,7 @@ public interface MappedIndexManager {
 
 	IndexWorkspace createWorkspace(BackendMappingContext mappingContext, Set<String> tenantId);
 
-	<R, E> MappedIndexScopeBuilder<R, E> createScopeBuilder(BackendMappingContext mappingContext);
+	<SR, R, E> MappedIndexScopeBuilder<SR, R, E> createScopeBuilder(BackendMappingContext mappingContext);
 
-	void addTo(MappedIndexScopeBuilder<?, ?> builder);
+	void addTo(MappedIndexScopeBuilder<?, ?, ?> builder);
 }

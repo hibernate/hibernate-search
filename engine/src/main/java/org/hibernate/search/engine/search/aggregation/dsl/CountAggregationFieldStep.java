@@ -12,10 +12,11 @@ import org.hibernate.search.util.common.annotation.Incubating;
 /**
  * The initial step in a "count" aggregation definition, where the target field can be set.
  *
+ * @param <SR> Scope root type.
  * @param <PDF> The type of factory used to create predicates in {@link AggregationFilterStep#filter(Function)}.
  */
 @Incubating
-public interface CountAggregationFieldStep<PDF extends SearchPredicateFactory> {
+public interface CountAggregationFieldStep<SR, PDF extends SearchPredicateFactory<SR>> {
 
 	/**
 	 * Target the given field in the count aggregation.
@@ -23,6 +24,6 @@ public interface CountAggregationFieldStep<PDF extends SearchPredicateFactory> {
 	 * @param fieldPath The <a href="SearchAggregationFactory.html#field-paths">path</a> to the index field to aggregate.
 	 * @return The next step.
 	 */
-	CountAggregationOptionsStep<?, PDF> field(String fieldPath);
+	CountAggregationOptionsStep<SR, ?, PDF> field(String fieldPath);
 
 }

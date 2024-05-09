@@ -9,11 +9,12 @@ import org.hibernate.search.engine.backend.types.ObjectStructure;
 /**
  * The initial step in a "nested" predicate definition, where the target field can be set.
  *
+ * @param <SR> Scope root type.
  * @param <N> The type of the next step.
  * @deprecated Use {@link SearchPredicateFactory#nested(String)} instead.
  */
 @Deprecated(since = "6.2")
-public interface NestedPredicateFieldStep<N extends NestedPredicateNestStep<?>> {
+public interface NestedPredicateFieldStep<SR, N extends NestedPredicateNestStep<SR, ?>> {
 
 	/**
 	 * Set the object field to "nest" on.

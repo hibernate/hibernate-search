@@ -17,6 +17,6 @@ import org.hibernate.search.scope.spi.V5MigrationSearchScope;
 @Deprecated
 public interface V5MigrationSearchSession<LOS> {
 
-	SearchQuerySelectStep<?, ?, ?, LOS, ?, ?> search(V5MigrationSearchScope scope);
+	SearchQuerySelectStep<?, ?, ?, ?, LOS, ?, ?> search(V5MigrationSearchScope scope);
 
 }

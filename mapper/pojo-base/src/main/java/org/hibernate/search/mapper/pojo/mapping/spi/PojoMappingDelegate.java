@@ -61,11 +61,12 @@ public interface PojoMappingDelegate extends AutoCloseable {
 	 * @param indexedTypeExtendedContextProvider A provider of extended, mapper-specific type contexts.
 	 * that will be made available through {@link PojoScopeDelegate#includedIndexedTypes()}.
 	 * @return A {@link PojoScopeDelegate}
+	 * @param <SR> Scope root type.
 	 * @param <R> The type of entity references.
 	 * @param <E> A supertype of all indexed entity types to include in the scope.
 	 * @param <C> The type of extended, mapper-specific type contexts.
 	 */
-	<R extends EntityReference, E, C> PojoScopeDelegate<R, E, C> createPojoScopeForClasses(
+	<SR, R extends EntityReference, E, C> PojoScopeDelegate<SR, R, E, C> createPojoScopeForClasses(
 			PojoScopeMappingContext mappingContext,
 			Collection<? extends Class<? extends E>> classes,
 			PojoScopeTypeExtendedContextProvider<E, C> indexedTypeExtendedContextProvider);
@@ -81,11 +82,12 @@ public interface PojoMappingDelegate extends AutoCloseable {
 	 * @param indexedTypeExtendedContextProvider A provider of extended, mapper-specific type contexts.
 	 * that will be made available through {@link PojoScopeDelegate#includedIndexedTypes()}.
 	 * @return A {@link PojoScopeDelegate}
+	 * @param <SR> Scope root type.
 	 * @param <R> The type of entity references.
 	 * @param <E> A supertype of all indexed entity types to include in the scope.
 	 * @param <C> The type of extended, mapper-specific type contexts.
 	 */
-	<R extends EntityReference, E, C> PojoScopeDelegate<R, E, C> createPojoScopeForEntityNames(
+	<SR, R extends EntityReference, E, C> PojoScopeDelegate<SR, R, E, C> createPojoScopeForEntityNames(
 			PojoScopeMappingContext mappingContext,
 			Class<E> expectedSuperType, Collection<String> entityNames,
 			PojoScopeTypeExtendedContextProvider<E, C> indexedTypeExtendedContextProvider);
@@ -100,6 +102,7 @@ public interface PojoMappingDelegate extends AutoCloseable {
 	 * @param indexedTypeExtendedContextProvider A provider of extended, mapper-specific type contexts.
 	 * that will be made available through {@link PojoScopeDelegate#includedIndexedTypes()}.
 	 * @return A {@link PojoScopeDelegate}
+	 * @param <SR> Scope root type.
 	 * @param <R> The type of entity references.
 	 * @param <E> A supertype of all indexed entity types to include in the scope.
 	 * @param <C> The type of extended, mapper-specific type contexts.
@@ -110,12 +113,12 @@ public interface PojoMappingDelegate extends AutoCloseable {
 	 * instead.
 	 */
 	@Deprecated(since = "7.1")
-	<R extends EntityReference, E, C> PojoScopeDelegate<R, E, C> createPojoScope(
+	<SR, R extends EntityReference, E, C> PojoScopeDelegate<SR, R, E, C> createPojoScope(
 			PojoScopeMappingContext mappingContext,
 			Collection<? extends PojoRawTypeIdentifier<? extends E>> targetedTypes,
 			PojoScopeTypeExtendedContextProvider<E, C> indexedTypeExtendedContextProvider);
 
-	<R extends EntityReference, C> Optional<PojoScopeDelegate<R, Object, C>> createPojoAllScope(
+	<SR, R extends EntityReference, C> Optional<PojoScopeDelegate<SR, R, Object, C>> createPojoAllScope(
 			PojoScopeMappingContext mappingContext,
 			PojoScopeTypeExtendedContextProvider<Object, C> indexedTypeExtendedContextProvider);
 

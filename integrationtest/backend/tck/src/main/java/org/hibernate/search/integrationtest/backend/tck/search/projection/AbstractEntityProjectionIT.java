@@ -85,8 +85,8 @@ public abstract class AbstractEntityProjectionIT {
 		this.multiIndex4 = multiIndex4;
 	}
 
-	public abstract <R, E, LOS> SearchQueryWhereStep<?, E, LOS, ?> select(
-			SearchQuerySelectStep<?, R, E, LOS, ?, ?> step);
+	public abstract <SR, R, E, LOS> SearchQueryWhereStep<SR, ?, E, LOS, ?> select(
+			SearchQuerySelectStep<SR, ?, R, E, LOS, ?, ?> step);
 
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-3578")
@@ -104,7 +104,7 @@ public abstract class AbstractEntityProjectionIT {
 		mainIndex.mapping().with()
 				.typeContext( mainIndex.typeName(), mainTypeContextMock )
 				.run( () -> {
-					GenericStubMappingScope<EntityReference, StubEntity> scope =
+					GenericStubMappingScope<Object, EntityReference, StubEntity> scope =
 							mainIndex.createGenericScope( loadingContextMock );
 					SearchQuery<StubEntity> query = select( scope.query() )
 							.where( f -> f.matchAll() )
@@ -149,7 +149,7 @@ public abstract class AbstractEntityProjectionIT {
 		mainIndex.mapping().with()
 				.typeContext( mainIndex.typeName(), mainTypeContextMock )
 				.run( () -> {
-					GenericStubMappingScope<EntityReference, StubEntity> scope =
+					GenericStubMappingScope<Object, EntityReference, StubEntity> scope =
 							mainIndex.createGenericScope( loadingContextMock );
 					SearchQuery<StubEntity> query = select( scope.query() )
 							.where( f -> f.matchAll() )
@@ -208,7 +208,7 @@ public abstract class AbstractEntityProjectionIT {
 		mainIndex.mapping().with()
 				.typeContext( mainIndex.typeName(), mainTypeContextMock )
 				.run( () -> {
-					GenericStubMappingScope<DocumentReference, DocumentReference> scope =
+					GenericStubMappingScope<Object, DocumentReference, DocumentReference> scope =
 							mainIndex.createGenericScope( loadingContextMock );
 					SearchQuery<DocumentReference> query = select( scope.query() )
 							.where( f -> f.matchAll() )
@@ -254,7 +254,7 @@ public abstract class AbstractEntityProjectionIT {
 		mainIndex.mapping().with()
 				.typeContext( mainIndex.typeName(), mainTypeContextMock )
 				.run( () -> {
-					GenericStubMappingScope<EntityReference, StubEntity> scope =
+					GenericStubMappingScope<Object, EntityReference, StubEntity> scope =
 							mainIndex.createGenericScope( loadingContextMock );
 					SearchQuery<StubEntity> query = select( scope.query() )
 							.where( f -> f.matchAll() )
@@ -291,7 +291,7 @@ public abstract class AbstractEntityProjectionIT {
 				.typeContext( mainIndex.typeName(), mainTypeContextMock )
 				.projectionRegistry( projectionRegistryMock )
 				.run( () -> {
-					GenericStubMappingScope<DocumentReference, DocumentReference> scope =
+					GenericStubMappingScope<?, DocumentReference, DocumentReference> scope =
 							mainIndex.createGenericScope( loadingContextMock );
 					SearchQuery<DocumentReference> query = select( scope.query( loadingContextMock ) )
 							.where( f -> f.matchAll() )
@@ -334,7 +334,7 @@ public abstract class AbstractEntityProjectionIT {
 				.typeContext( mainIndex.typeName(), mainTypeContextMock )
 				.projectionRegistry( projectionRegistryMock )
 				.run( () -> {
-					GenericStubMappingScope<EntityReference, StubEntity> scope =
+					GenericStubMappingScope<?, EntityReference, StubEntity> scope =
 							mainIndex.createGenericScope( loadingContextMock );
 
 					expectHitMapping(
@@ -383,7 +383,7 @@ public abstract class AbstractEntityProjectionIT {
 				.typeContext( mainIndex.typeName(), mainTypeContextMock )
 				.projectionRegistry( projectionRegistryMock )
 				.run( () -> {
-					GenericStubMappingScope<EntityReference, StubEntity> scope =
+					GenericStubMappingScope<?, EntityReference, StubEntity> scope =
 							mainIndex.createGenericScope( loadingContextMock );
 
 					SearchQuery<StubEntity> query = select( scope.query( loadingContextMock ) )
@@ -472,7 +472,7 @@ public abstract class AbstractEntityProjectionIT {
 				.typeContext( multiIndex4.typeName(), type4ContextMock )
 				.projectionRegistry( projectionRegistryMock )
 				.run( () -> {
-					GenericStubMappingScope<EntityReference, StubEntity> scope =
+					GenericStubMappingScope<?, EntityReference, StubEntity> scope =
 							multiIndex1.createGenericScope( loadingContextMock, multiIndex2, multiIndex3, multiIndex4 );
 
 					SearchQuery<StubEntity> query = select( scope.query( loadingContextMock ) )

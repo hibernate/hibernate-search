@@ -657,7 +657,7 @@ class BoolPredicateSpecificsIT {
 
 	@Test
 	void minimumShouldMatch_error_negativeCeiling() {
-		SearchPredicateFactory f = index.createScope().predicate();
+		SearchPredicateFactory<?> f = index.createScope().predicate();
 
 		assertThatThrownBy( () -> f.bool().minimumShouldMatch()
 				.ifMoreThan( -1 ).thenRequireNumber( 1 ) )
@@ -674,7 +674,7 @@ class BoolPredicateSpecificsIT {
 
 	@Test
 	void minimumShouldMatch_error_multipleConflictingCeilings() {
-		SearchPredicateFactory f = index.createScope().predicate();
+		SearchPredicateFactory<?> f = index.createScope().predicate();
 
 		assertThatThrownBy( () -> f.bool().minimumShouldMatch()
 				.ifMoreThan( 2 ).thenRequireNumber( -1 )

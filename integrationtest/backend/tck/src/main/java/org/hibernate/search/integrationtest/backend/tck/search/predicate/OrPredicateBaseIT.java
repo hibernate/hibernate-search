@@ -60,13 +60,13 @@ class OrPredicateBaseIT {
 		}
 
 		@Override
-		protected PredicateFinalStep predicate(SearchPredicateFactory f, int matchingDocOrdinal,
+		protected PredicateFinalStep predicate(SearchPredicateFactory<?> f, int matchingDocOrdinal,
 				AbstractPredicateDataSet dataSet, StubMappedIndex index) {
 			return f.or( f.id().matching( ScoreConfigured.dataSet.docId( matchingDocOrdinal ) ) );
 		}
 
 		@Override
-		protected PredicateFinalStep predicateWithBoost(SearchPredicateFactory f, int matchingDocOrdinal,
+		protected PredicateFinalStep predicateWithBoost(SearchPredicateFactory<?> f, int matchingDocOrdinal,
 				float boost, AbstractPredicateDataSet dataSet,
 				StubMappedIndex index) {
 			return f.or( f.id().matching( ScoreConfigured.dataSet.docId( matchingDocOrdinal ) ) )
@@ -74,14 +74,14 @@ class OrPredicateBaseIT {
 		}
 
 		@Override
-		protected PredicateFinalStep predicateWithConstantScore(SearchPredicateFactory f, int matchingDocOrdinal,
+		protected PredicateFinalStep predicateWithConstantScore(SearchPredicateFactory<?> f, int matchingDocOrdinal,
 				AbstractPredicateDataSet dataSet, StubMappedIndex index) {
 			return f.or( f.id().matching( ScoreConfigured.dataSet.docId( matchingDocOrdinal ) ) )
 					.constantScore();
 		}
 
 		@Override
-		protected PredicateFinalStep predicateWithConstantScoreAndBoost(SearchPredicateFactory f,
+		protected PredicateFinalStep predicateWithConstantScoreAndBoost(SearchPredicateFactory<?> f,
 				int matchingDocOrdinal, float boost, AbstractPredicateDataSet dataSet,
 				StubMappedIndex index) {
 			return f.or( f.id().matching( ScoreConfigured.dataSet.docId( matchingDocOrdinal ) ) )
@@ -117,14 +117,14 @@ class OrPredicateBaseIT {
 		}
 
 		@Override
-		protected PredicateFinalStep predicate(SearchPredicateFactory f, int matchingDocOrdinal,
+		protected PredicateFinalStep predicate(SearchPredicateFactory<?> f, int matchingDocOrdinal,
 				AbstractPredicateDataSet dataSet, StubMappedIndex index) {
 			return f.or()
 					.add( f.id().matching( AddScoreConfigured.dataSet.docId( matchingDocOrdinal ) ) );
 		}
 
 		@Override
-		protected PredicateFinalStep predicateWithBoost(SearchPredicateFactory f, int matchingDocOrdinal,
+		protected PredicateFinalStep predicateWithBoost(SearchPredicateFactory<?> f, int matchingDocOrdinal,
 				float boost, AbstractPredicateDataSet dataSet,
 				StubMappedIndex index) {
 			return f.or()
@@ -133,7 +133,7 @@ class OrPredicateBaseIT {
 		}
 
 		@Override
-		protected PredicateFinalStep predicateWithConstantScore(SearchPredicateFactory f, int matchingDocOrdinal,
+		protected PredicateFinalStep predicateWithConstantScore(SearchPredicateFactory<?> f, int matchingDocOrdinal,
 				AbstractPredicateDataSet dataSet, StubMappedIndex index) {
 			return f.or()
 					.add( f.id().matching( AddScoreConfigured.dataSet.docId( matchingDocOrdinal ) ) )
@@ -141,7 +141,7 @@ class OrPredicateBaseIT {
 		}
 
 		@Override
-		protected PredicateFinalStep predicateWithConstantScoreAndBoost(SearchPredicateFactory f,
+		protected PredicateFinalStep predicateWithConstantScoreAndBoost(SearchPredicateFactory<?> f,
 				int matchingDocOrdinal, float boost, AbstractPredicateDataSet dataSet,
 				StubMappedIndex index) {
 			return f.or()

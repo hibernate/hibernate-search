@@ -70,12 +70,12 @@ public class StandalonePojoMapping extends AbstractPojoMappingImplementor<Standa
 
 		configuredIndexingPlanSynchronizationStrategyHolder.start( context );
 
-		Optional<SearchScopeImpl<Object>> scopeOptional = createAllScope();
+		Optional<SearchScopeImpl<Object, Object>> scopeOptional = createAllScope();
 		if ( !scopeOptional.isPresent() ) {
 			// No indexed type
 			return CompletableFuture.completedFuture( null );
 		}
-		SearchScopeImpl<Object> scope = scopeOptional.get();
+		SearchScopeImpl<Object, Object> scope = scopeOptional.get();
 
 		// Schema management
 		PojoScopeSchemaManager schemaManager = scope.schemaManagerDelegate();
@@ -88,7 +88,7 @@ public class StandalonePojoMapping extends AbstractPojoMappingImplementor<Standa
 
 	@Override
 	public CompletableFuture<?> preStop(MappingPreStopContext context) {
-		Optional<SearchScopeImpl<Object>> scope = createAllScope();
+		Optional<SearchScopeImpl<Object, Object>> scope = createAllScope();
 		if ( !scope.isPresent() ) {
 			// No indexed type
 			return CompletableFuture.completedFuture( null );
@@ -130,12 +130,12 @@ public class StandalonePojoMapping extends AbstractPojoMappingImplementor<Standa
 	}
 
 	@Override
-	public <T> SearchScope<T> scope(Collection<? extends Class<? extends T>> targetedTypes) {
+	public <SR, T> SearchScope<SR, T> scope(Collection<? extends Class<? extends T>> targetedTypes) {
 		return createScope( targetedTypes );
 	}
 
 	@Override
-	public <T> SearchScope<T> scope(Class<T> expectedSuperType, Collection<String> entityNames) {
+	public <SR, T> SearchScope<SR, T> scope(Class<T> expectedSuperType, Collection<String> entityNames) {
 		return createScope( expectedSuperType, entityNames );
 	}
 
@@ -155,8 +155,8 @@ public class StandalonePojoMapping extends AbstractPojoMappingImplementor<Standa
 	}
 
 	@Override
-	public <T> SearchScopeImpl<T> createScope(Collection<? extends Class<? extends T>> classes) {
-		PojoScopeDelegate<EntityReference, T, SearchIndexedEntity<? extends T>> scopeDelegate =
+	public <SR, T> SearchScopeImpl<SR, T> createScope(Collection<? extends Class<? extends T>> classes) {
+		PojoScopeDelegate<SR, EntityReference, T, SearchIndexedEntity<? extends T>> scopeDelegate =
 				delegate().createPojoScopeForClasses(
 						this,
 						classes,
@@ -164,12 +164,12 @@ public class StandalonePojoMapping extends AbstractPojoMappingImplementor<Standa
 				);
 
 		// Explicit type parameter is necessary here for ECJ (Eclipse compiler)
-		return new SearchScopeImpl<T>( this, tenancyConfiguration, scopeDelegate );
+		return new SearchScopeImpl<SR, T>( this, tenancyConfiguration, scopeDelegate );
 	}
 
 	@Override
-	public <T> SearchScopeImpl<T> createScope(Class<T> expectedSuperType, Collection<String> entityNames) {
-		PojoScopeDelegate<EntityReference, T, SearchIndexedEntity<? extends T>> scopeDelegate =
+	public <SR, T> SearchScopeImpl<SR, T> createScope(Class<T> expectedSuperType, Collection<String> entityNames) {
+		PojoScopeDelegate<SR, EntityReference, T, SearchIndexedEntity<? extends T>> scopeDelegate =
 				delegate().createPojoScopeForEntityNames(
 						this,
 						expectedSuperType, entityNames,
@@ -177,7 +177,7 @@ public class StandalonePojoMapping extends AbstractPojoMappingImplementor<Standa
 				);
 
 		// Explicit type parameter is necessary here for ECJ (Eclipse compiler)
-		return new SearchScopeImpl<T>( this, tenancyConfiguration, scopeDelegate );
+		return new SearchScopeImpl<SR, T>( this, tenancyConfiguration, scopeDelegate );
 	}
 
 	@Override
@@ -235,9 +235,9 @@ public class StandalonePojoMapping extends AbstractPojoMappingImplementor<Standa
 		return integrationHandle.getOrFail();
 	}
 
-	private Optional<SearchScopeImpl<Object>> createAllScope() {
+	private Optional<SearchScopeImpl<Object, Object>> createAllScope() {
 		return delegate()
-				.<EntityReference, SearchIndexedEntity<?>>createPojoAllScope(
+				.<Object, EntityReference, SearchIndexedEntity<?>>createPojoAllScope(
 						this,
 						typeContextContainer::indexedForExactType
 				)

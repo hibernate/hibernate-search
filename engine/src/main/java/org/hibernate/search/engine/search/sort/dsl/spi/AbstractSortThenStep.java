@@ -8,17 +8,17 @@ import org.hibernate.search.engine.search.sort.SearchSort;
 import org.hibernate.search.engine.search.sort.dsl.SearchSortFactory;
 import org.hibernate.search.engine.search.sort.dsl.SortThenStep;
 
-public abstract class AbstractSortThenStep implements SortThenStep {
-	private final SearchSortDslContext<?, ?> parentDslContext;
+public abstract class AbstractSortThenStep<SR> implements SortThenStep<SR> {
+	private final SearchSortDslContext<SR, ?, ?> parentDslContext;
 
-	private SearchSortDslContext<?, ?> selfDslContext;
+	private SearchSortDslContext<SR, ?, ?> selfDslContext;
 
-	public AbstractSortThenStep(SearchSortDslContext<?, ?> parentDslContext) {
+	public AbstractSortThenStep(SearchSortDslContext<SR, ?, ?> parentDslContext) {
 		this.parentDslContext = parentDslContext;
 	}
 
 	@Override
-	public final SearchSortFactory then() {
+	public final SearchSortFactory<SR> then() {
 		return selfDslContext().then();
 	}
 
@@ -27,7 +27,7 @@ public abstract class AbstractSortThenStep implements SortThenStep {
 		return selfDslContext().toSort();
 	}
 
-	private SearchSortDslContext<?, ?> selfDslContext() {
+	private SearchSortDslContext<SR, ?, ?> selfDslContext() {
 		/*
 		 * Postpone the call of build() as long as possible,
 		 * and make sure to only call it once,

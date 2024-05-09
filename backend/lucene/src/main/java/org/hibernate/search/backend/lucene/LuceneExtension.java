@@ -63,22 +63,23 @@ import org.hibernate.search.engine.search.sort.dsl.SearchSortFactoryExtension;
  *
  * @see #get()
  */
-public final class LuceneExtension<H, R, E, LOS>
-		implements SearchQueryDslExtension<LuceneSearchQuerySelectStep<R, E, LOS>, R, E, LOS>,
+public final class LuceneExtension<SR, H, R, E, LOS>
+		implements SearchQueryDslExtension<SR, LuceneSearchQuerySelectStep<SR, R, E, LOS>, R, E, LOS>,
 		SearchQueryExtension<LuceneSearchQuery<H>, H>,
-		SearchPredicateFactoryExtension<LuceneSearchPredicateFactory>,
-		SearchSortFactoryExtension<LuceneSearchSortFactory>,
-		SearchProjectionFactoryExtension<LuceneSearchProjectionFactory<R, E>, R, E>,
-		SearchAggregationFactoryExtension<LuceneSearchAggregationFactory>,
+		SearchPredicateFactoryExtension<SR, LuceneSearchPredicateFactory<SR>>,
+		SearchSortFactoryExtension<SR, LuceneSearchSortFactory<SR>>,
+		SearchProjectionFactoryExtension<SR, LuceneSearchProjectionFactory<SR, R, E>, R, E>,
+		SearchAggregationFactoryExtension<SR, LuceneSearchAggregationFactory<SR>>,
 		IndexFieldTypeFactoryExtension<LuceneIndexFieldTypeFactory>,
 		IndexScopeExtension<LuceneIndexScope>,
 		SchemaExportExtension<LuceneIndexSchemaExport> {
 
-	private static final LuceneExtension<Object, Object, Object, Object> INSTANCE = new LuceneExtension<>();
+	private static final LuceneExtension<Object, Object, Object, Object, Object> INSTANCE = new LuceneExtension<>();
 
 	/**
 	 * Get the extension with generic parameters automatically set as appropriate for the context in which it's used.
 	 *
+	 * @param <SR> Scope root type.
 	 * @param <H> The type of query hits.
 	 * Users should not have to care about this, as the parameter will automatically take the appropriate value when calling
 	 * {@code .extension( LuceneExtension.get() }.
@@ -94,8 +95,8 @@ public final class LuceneExtension<H, R, E, LOS>
 	 * @return The extension.
 	 */
 	@SuppressWarnings("unchecked") // The instance works for any H, R and E
-	public static <H, R, E, LOS> LuceneExtension<H, R, E, LOS> get() {
-		return (LuceneExtension<H, R, E, LOS>) INSTANCE;
+	public static <SR, H, R, E, LOS> LuceneExtension<SR, H, R, E, LOS> get() {
+		return (LuceneExtension<SR, H, R, E, LOS>) INSTANCE;
 	}
 
 	private LuceneExtension() {
@@ -106,8 +107,8 @@ public final class LuceneExtension<H, R, E, LOS>
 	 * {@inheritDoc}
 	 */
 	@Override
-	public Optional<LuceneSearchQuerySelectStep<R, E, LOS>> extendOptional(
-			SearchQuerySelectStep<?, R, E, LOS, ?, ?> original,
+	public Optional<LuceneSearchQuerySelectStep<SR, R, E, LOS>> extendOptional(
+			SearchQuerySelectStep<SR, ?, R, E, LOS, ?, ?> original,
 			SearchQueryIndexScope<?> scope,
 			BackendSessionContext sessionContext,
 			SearchLoadingContextBuilder<E, LOS> loadingContextBuilder) {
@@ -139,9 +140,9 @@ public final class LuceneExtension<H, R, E, LOS>
 	 * {@inheritDoc}
 	 */
 	@Override
-	public Optional<LuceneSearchPredicateFactory> extendOptional(SearchPredicateFactory original) {
+	public Optional<LuceneSearchPredicateFactory<SR>> extendOptional(SearchPredicateFactory<SR> original) {
 		if ( original instanceof LuceneSearchPredicateFactory ) {
-			return Optional.of( (LuceneSearchPredicateFactory) original );
+			return Optional.of( (LuceneSearchPredicateFactory<SR>) original );
 		}
 		else {
 			return Optional.empty();
@@ -152,10 +153,10 @@ public final class LuceneExtension<H, R, E, LOS>
 	 * {@inheritDoc}
 	 */
 	@Override
-	public Optional<LuceneSearchSortFactory> extendOptional(
-			SearchSortFactory original) {
+	public Optional<LuceneSearchSortFactory<SR>> extendOptional(
+			SearchSortFactory<SR> original) {
 		if ( original instanceof LuceneSearchSortFactory ) {
-			return Optional.of( (LuceneSearchSortFactory) original );
+			return Optional.of( (LuceneSearchSortFactory<SR>) original );
 		}
 		else {
 			return Optional.empty();
@@ -166,9 +167,9 @@ public final class LuceneExtension<H, R, E, LOS>
 	 * {@inheritDoc}
 	 */
 	@Override
-	public Optional<LuceneSearchProjectionFactory<R, E>> extendOptional(SearchProjectionFactory<R, E> original) {
+	public Optional<LuceneSearchProjectionFactory<SR, R, E>> extendOptional(SearchProjectionFactory<SR, R, E> original) {
 		if ( original instanceof LuceneSearchProjectionFactory ) {
-			return Optional.of( (LuceneSearchProjectionFactory<R, E>) original );
+			return Optional.of( (LuceneSearchProjectionFactory<SR, R, E>) original );
 		}
 		else {
 			return Optional.empty();
@@ -179,9 +180,9 @@ public final class LuceneExtension<H, R, E, LOS>
 	 * {@inheritDoc}
 	 */
 	@Override
-	public Optional<LuceneSearchAggregationFactory> extendOptional(SearchAggregationFactory original) {
+	public Optional<LuceneSearchAggregationFactory<SR>> extendOptional(SearchAggregationFactory<SR> original) {
 		if ( original instanceof LuceneSearchAggregationFactory ) {
-			return Optional.of( (LuceneSearchAggregationFactory) original );
+			return Optional.of( (LuceneSearchAggregationFactory<SR>) original );
 		}
 		else {
 			return Optional.empty();

@@ -18,7 +18,7 @@ public class V5MigrationStandalonePojoSearchSessionAdapter implements V5Migratio
 	}
 
 	@Override
-	public SearchQuerySelectStep<?, ?, ?, ?, ?, ?> search(V5MigrationSearchScope scope) {
+	public SearchQuerySelectStep<?, ?, ?, ?, ?, ?, ?> search(V5MigrationSearchScope scope) {
 		return delegate.search( ( (V5MigrationStandalonePojoSearchScopeAdapter) scope ).toSearchScope() );
 	}
 }

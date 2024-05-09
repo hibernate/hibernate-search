@@ -20,7 +20,7 @@ public class NamedPredicateOptionsStepImpl
 
 	private final NamedPredicateBuilder builder;
 
-	public NamedPredicateOptionsStepImpl(SearchPredicateFactory predicateFactory,
+	public NamedPredicateOptionsStepImpl(SearchPredicateFactory<?> predicateFactory,
 			SearchPredicateDslContext<?> dslContext, String fieldPath, String predicateName) {
 		super( dslContext );
 		SearchIndexScope<?> scope = dslContext.scope();

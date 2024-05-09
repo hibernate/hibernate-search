@@ -17,7 +17,7 @@ import org.hibernate.search.engine.search.query.dsl.SearchQuerySelectStep;
 import org.hibernate.search.engine.search.query.dsl.impl.DefaultSearchQuerySelectStep;
 import org.hibernate.search.engine.search.sort.dsl.SearchSortFactory;
 
-class MappedIndexScopeImpl<R, E> implements MappedIndexScope<R, E> {
+class MappedIndexScopeImpl<SR, R, E> implements MappedIndexScope<SR, R, E> {
 
 	private final IndexScope delegate;
 
@@ -31,29 +31,29 @@ class MappedIndexScopeImpl<R, E> implements MappedIndexScope<R, E> {
 	}
 
 	@Override
-	public <LOS> SearchQuerySelectStep<?, R, E, LOS, SearchProjectionFactory<R, E>, ?> search(
+	public <LOS> SearchQuerySelectStep<SR, ?, R, E, LOS, SearchProjectionFactory<SR, R, E>, ?> search(
 			BackendSessionContext sessionContext,
 			SearchLoadingContextBuilder<E, LOS> loadingContextBuilder) {
 		return new DefaultSearchQuerySelectStep<>( delegate.searchScope(), sessionContext, loadingContextBuilder );
 	}
 
 	@Override
-	public SearchPredicateFactory predicate() {
+	public SearchPredicateFactory<SR> predicate() {
 		return delegate.searchScope().predicateFactory();
 	}
 
 	@Override
-	public SearchSortFactory sort() {
+	public SearchSortFactory<SR> sort() {
 		return delegate.searchScope().sortFactory();
 	}
 
 	@Override
-	public SearchProjectionFactory<R, E> projection() {
+	public SearchProjectionFactory<SR, R, E> projection() {
 		return delegate.searchScope().projectionFactory();
 	}
 
 	@Override
-	public SearchAggregationFactory aggregation() {
+	public SearchAggregationFactory<SR> aggregation() {
 		return delegate.searchScope().aggregationFactory();
 	}
 

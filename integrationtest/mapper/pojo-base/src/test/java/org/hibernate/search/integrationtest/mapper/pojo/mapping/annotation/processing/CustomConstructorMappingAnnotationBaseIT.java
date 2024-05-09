@@ -83,7 +83,7 @@ class CustomConstructorMappingAnnotationBaseIT {
 			backendMock.expectSearchProjection(
 					INDEX_NAME,
 					b -> {
-						SearchProjectionFactory<?, ?> f = mapping.scope( IndexedEntity.class ).projection();
+						SearchProjectionFactory<?, ?, ?> f = mapping.scope( IndexedEntity.class ).projection();
 						b.projection( f.composite()
 								.from(
 										f.field( "text", String.class )

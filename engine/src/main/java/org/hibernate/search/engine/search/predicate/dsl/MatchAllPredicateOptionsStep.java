@@ -13,7 +13,7 @@ import org.hibernate.search.engine.search.predicate.SearchPredicate;
  *
  * @param <S> The "self" type (the actual exposed type of this step).
  */
-public interface MatchAllPredicateOptionsStep<S extends MatchAllPredicateOptionsStep<?>>
+public interface MatchAllPredicateOptionsStep<SR, S extends MatchAllPredicateOptionsStep<SR, ?>>
 		extends PredicateFinalStep, PredicateScoreStep<S> {
 
 	/**
@@ -61,6 +61,6 @@ public interface MatchAllPredicateOptionsStep<S extends MatchAllPredicateOptions
 	 * Should generally be a lambda expression.
 	 * @return {@code this}, for method chaining.
 	 */
-	S except(Function<? super SearchPredicateFactory, ? extends PredicateFinalStep> clauseContributor);
+	S except(Function<? super SearchPredicateFactory<SR>, ? extends PredicateFinalStep> clauseContributor);
 
 }

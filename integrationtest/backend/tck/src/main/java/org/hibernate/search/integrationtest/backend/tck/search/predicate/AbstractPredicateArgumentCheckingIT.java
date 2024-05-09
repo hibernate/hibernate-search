@@ -23,14 +23,14 @@ public abstract class AbstractPredicateArgumentCheckingIT {
 	@ParameterizedTest(name = "{1}")
 	@MethodSource("params")
 	void nullMatchingParam(SimpleMappedIndex<IndexBinding> index, FieldTypeDescriptor<?, ?> fieldType) {
-		SearchPredicateFactory f = index.createScope().predicate();
+		SearchPredicateFactory<?> f = index.createScope().predicate();
 
 		assertThatThrownBy( () -> tryPredicateWithNullMatchingParam( f, fieldPath( index, fieldType ) ) )
 				.isInstanceOf( IllegalArgumentException.class )
 				.hasMessageContainingAll( "must not be null" );
 	}
 
-	protected abstract void tryPredicateWithNullMatchingParam(SearchPredicateFactory f, String fieldPath);
+	protected abstract void tryPredicateWithNullMatchingParam(SearchPredicateFactory<?> f, String fieldPath);
 
 	protected String fieldPath(SimpleMappedIndex<IndexBinding> index, FieldTypeDescriptor<?, ?> fieldType) {
 		return index.binding().field.get( fieldType ).relativeFieldName;

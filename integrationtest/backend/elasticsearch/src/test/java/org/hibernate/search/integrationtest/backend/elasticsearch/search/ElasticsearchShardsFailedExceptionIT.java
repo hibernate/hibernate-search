@@ -87,7 +87,7 @@ class ElasticsearchShardsFailedExceptionIT {
 	private SearchQuery<DocumentReference> createQuery() {
 		StubMappingScope scope = index.createScope( index2 );
 
-		SearchPredicateFactory factory = scope.predicate();
+		SearchPredicateFactory<?> factory = scope.predicate();
 		SearchPredicate predicate = factory.range().field( "field" ).greaterThan( "tex" ).toPredicate();
 
 		return scope.query().where( predicate ).toQuery();

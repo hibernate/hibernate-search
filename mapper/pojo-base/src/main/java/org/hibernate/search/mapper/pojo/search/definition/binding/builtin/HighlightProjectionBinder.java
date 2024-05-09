@@ -121,7 +121,7 @@ public final class HighlightProjectionBinder implements ProjectionBinder {
 		}
 
 		@Override
-		public SearchProjection<T> create(SearchProjectionFactory<?, ?> factory, ProjectionDefinitionContext context) {
+		public SearchProjection<T> create(SearchProjectionFactory<?, ?, ?> factory, ProjectionDefinitionContext context) {
 			return factory.highlight( fieldPath )
 					.highlighter( highlighterName )
 					.collector( collector )

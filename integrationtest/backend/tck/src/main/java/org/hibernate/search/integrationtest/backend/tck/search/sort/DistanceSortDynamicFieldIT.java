@@ -123,17 +123,17 @@ class DistanceSortDynamicFieldIT {
 	}
 
 	private SearchQuery<DocumentReference> matchNonEmptyQuery(
-			Function<? super SearchSortFactory, ? extends SortFinalStep> sortContributor) {
+			Function<? super SearchSortFactory<?>, ? extends SortFinalStep> sortContributor) {
 		return matchNonEmptyQuery( sortContributor, mainIndex.createScope(), null, null );
 	}
 
 	private SearchQuery<DocumentReference> matchNonEmptyQuery(
-			Function<? super SearchSortFactory, ? extends SortFinalStep> sortContributor, String parameter, Object value) {
+			Function<? super SearchSortFactory<?>, ? extends SortFinalStep> sortContributor, String parameter, Object value) {
 		return matchNonEmptyQuery( sortContributor, mainIndex.createScope(), parameter, value );
 	}
 
 	private SearchQuery<DocumentReference> matchNonEmptyQuery(
-			Function<? super SearchSortFactory, ? extends SortFinalStep> sortContributor, StubMappingScope scope,
+			Function<? super SearchSortFactory<?>, ? extends SortFinalStep> sortContributor, StubMappingScope scope,
 			String parameter, Object value) {
 		if ( parameter == null ) {
 			return scope.query()

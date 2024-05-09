@@ -20,9 +20,9 @@ public interface HibernateOrmSearchSessionMappingContext
 	@Override
 	FailureHandler failureHandler();
 
-	<T> SearchScopeImpl<T> createScope(Collection<? extends Class<? extends T>> types);
+	<SR, T> SearchScopeImpl<SR, T> createScope(Collection<? extends Class<? extends T>> types);
 
-	<T> SearchScopeImpl<T> createScope(Class<T> expectedSuperType, Collection<String> entityNames);
+	<SR, T> SearchScopeImpl<SR, T> createScope(Class<T> expectedSuperType, Collection<String> entityNames);
 
 	HibernateOrmSearchSession.Builder createSessionBuilder(
 			SessionImplementor sessionImplementor);

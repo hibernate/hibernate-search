@@ -39,9 +39,9 @@ import org.hibernate.search.mapper.pojo.search.loading.impl.PojoSearchLoadingInd
 import org.hibernate.search.mapper.pojo.work.impl.PojoScopeWorkspaceImpl;
 import org.hibernate.search.mapper.pojo.work.spi.PojoScopeWorkspace;
 
-public final class PojoScopeDelegateImpl<R extends EntityReference, E, C> implements PojoScopeDelegate<R, E, C> {
+public final class PojoScopeDelegateImpl<SR, R extends EntityReference, E, C> implements PojoScopeDelegate<SR, R, E, C> {
 
-	public static <R extends EntityReference, E, C> PojoScopeDelegate<R, E, C> create(
+	public static <SR, R extends EntityReference, E, C> PojoScopeDelegate<SR, R, E, C> create(
 			PojoScopeMappingContext mappingContext,
 			PojoScopeTypeContextProvider typeContextProvider,
 			Set<? extends PojoScopeIndexedTypeContext<?, ? extends E>> targetedTypeContexts,
@@ -62,7 +62,7 @@ public final class PojoScopeDelegateImpl<R extends EntityReference, E, C> implem
 	private final PojoScopeTypeContextProvider indexedTypeContextProvider;
 	private final Set<? extends PojoScopeIndexedTypeContext<?, ? extends E>> targetedTypeContexts;
 	private final Set<C> targetedTypeExtendedContexts;
-	private MappedIndexScope<R, E> delegate;
+	private MappedIndexScope<SR, R, E> delegate;
 
 	private PojoScopeDelegateImpl(PojoScopeMappingContext mappingContext,
 			PojoScopeTypeContextProvider indexedTypeContextProvider,
@@ -80,7 +80,7 @@ public final class PojoScopeDelegateImpl<R extends EntityReference, E, C> implem
 	}
 
 	@Override
-	public <LOS> SearchQuerySelectStep<?, R, E, LOS, SearchProjectionFactory<R, E>, ?> search(
+	public <LOS> SearchQuerySelectStep<SR, ?, R, E, LOS, SearchProjectionFactory<SR, R, E>, ?> search(
 			PojoScopeSessionContext sessionContext,
 			PojoSelectionLoadingContextBuilder<LOS> loadingContextBuilder) {
 		Map<String, PojoSearchLoadingIndexedTypeContext<? extends E>> targetTypesByEntityName = new LinkedHashMap<>();
@@ -93,22 +93,22 @@ public final class PojoScopeDelegateImpl<R extends EntityReference, E, C> implem
 	}
 
 	@Override
-	public SearchPredicateFactory predicate() {
+	public SearchPredicateFactory<SR> predicate() {
 		return getIndexScope().predicate();
 	}
 
 	@Override
-	public SearchSortFactory sort() {
+	public SearchSortFactory<SR> sort() {
 		return getIndexScope().sort();
 	}
 
 	@Override
-	public SearchProjectionFactory<R, E> projection() {
+	public SearchProjectionFactory<SR, R, E> projection() {
 		return getIndexScope().projection();
 	}
 
 	@Override
-	public SearchAggregationFactory aggregation() {
+	public SearchAggregationFactory<SR> aggregation() {
 		return getIndexScope().aggregation();
 	}
 
@@ -143,10 +143,10 @@ public final class PojoScopeDelegateImpl<R extends EntityReference, E, C> implem
 		return getIndexScope().extension( extension );
 	}
 
-	private MappedIndexScope<R, E> getIndexScope() {
+	private MappedIndexScope<SR, R, E> getIndexScope() {
 		if ( delegate == null ) {
 			Iterator<? extends PojoScopeIndexedTypeContext<?, ? extends E>> iterator = targetedTypeContexts.iterator();
-			MappedIndexScopeBuilder<R, E> builder = iterator.next().createScopeBuilder( mappingContext );
+			MappedIndexScopeBuilder<SR, R, E> builder = iterator.next().createScopeBuilder( mappingContext );
 			while ( iterator.hasNext() ) {
 				iterator.next().addTo( builder );
 			}

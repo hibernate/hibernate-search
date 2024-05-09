@@ -7,6 +7,8 @@ package org.hibernate.search.engine.search.predicate.dsl.impl;
 import java.util.function.Function;
 
 import org.hibernate.search.engine.search.predicate.SearchPredicate;
+import org.hibernate.search.engine.search.predicate.dsl.NestedPredicateNestStep;
+import org.hibernate.search.engine.search.predicate.dsl.NestedPredicateOptionsStep;
 import org.hibernate.search.engine.search.predicate.dsl.PredicateFinalStep;
 import org.hibernate.search.engine.search.predicate.dsl.SearchPredicateFactory;
 import org.hibernate.search.engine.search.predicate.dsl.spi.AbstractPredicateFinalStep;
@@ -15,25 +17,27 @@ import org.hibernate.search.engine.search.predicate.spi.NestedPredicateBuilder;
 import org.hibernate.search.engine.search.predicate.spi.PredicateTypeKeys;
 
 @Deprecated(since = "6.2")
-public final class NestedPredicateFieldStepImpl
+public final class NestedPredicateFieldStepImpl<SR>
 		extends AbstractPredicateFinalStep
 		implements org.hibernate.search.engine.search.predicate.dsl.NestedPredicateFieldStep<
-				org.hibernate.search.engine.search.predicate.dsl.NestedPredicateNestStep<?>>,
+				SR,
+				NestedPredicateNestStep<SR, ?>>,
 		org.hibernate.search.engine.search.predicate.dsl.NestedPredicateNestStep<
-				org.hibernate.search.engine.search.predicate.dsl.NestedPredicateOptionsStep<?>>,
+				SR,
+				NestedPredicateOptionsStep<?>>,
 		org.hibernate.search.engine.search.predicate.dsl.NestedPredicateOptionsStep<
 				org.hibernate.search.engine.search.predicate.dsl.NestedPredicateOptionsStep<?>> {
 
-	private final SearchPredicateFactory factory;
+	private final SearchPredicateFactory<SR> factory;
 	private NestedPredicateBuilder builder;
 
-	public NestedPredicateFieldStepImpl(SearchPredicateDslContext<?> dslContext, SearchPredicateFactory factory) {
+	public NestedPredicateFieldStepImpl(SearchPredicateDslContext<?> dslContext, SearchPredicateFactory<SR> factory) {
 		super( dslContext );
 		this.factory = factory;
 	}
 
 	@Override
-	public org.hibernate.search.engine.search.predicate.dsl.NestedPredicateNestStep<?> objectField(String fieldPath) {
+	public org.hibernate.search.engine.search.predicate.dsl.NestedPredicateNestStep<SR, ?> objectField(String fieldPath) {
 		this.builder = dslContext.scope().fieldQueryElement( fieldPath, PredicateTypeKeys.NESTED );
 		return this;
 	}
@@ -47,7 +51,7 @@ public final class NestedPredicateFieldStepImpl
 
 	@Override
 	public org.hibernate.search.engine.search.predicate.dsl.NestedPredicateOptionsStep<?> nest(
-			Function<? super SearchPredicateFactory, ? extends PredicateFinalStep> predicateContributor) {
+			Function<? super SearchPredicateFactory<SR>, ? extends PredicateFinalStep> predicateContributor) {
 		return nest( predicateContributor.apply( factory ) );
 	}
 

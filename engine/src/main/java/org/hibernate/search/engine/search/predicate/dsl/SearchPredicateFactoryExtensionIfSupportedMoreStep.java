@@ -14,8 +14,8 @@ import org.hibernate.search.util.common.SearchException;
  *
  * @see SearchPredicateFactory#extension()
  */
-public interface SearchPredicateFactoryExtensionIfSupportedMoreStep
-		extends SearchPredicateFactoryExtensionIfSupportedStep {
+public interface SearchPredicateFactoryExtensionIfSupportedMoreStep<SR>
+		extends SearchPredicateFactoryExtensionIfSupportedStep<SR> {
 
 	/**
 	 * If no extension passed to {@link #ifSupported(SearchPredicateFactoryExtension, Function)}
@@ -29,7 +29,7 @@ public interface SearchPredicateFactoryExtensionIfSupportedMoreStep
 	 * @return The final step in the DSL of the resulting predicate.
 	 */
 	PredicateFinalStep orElse(
-			Function<SearchPredicateFactory, ? extends PredicateFinalStep> predicateContributor);
+			Function<SearchPredicateFactory<SR>, ? extends PredicateFinalStep> predicateContributor);
 
 	/**
 	 * If no extension passed to {@link #ifSupported(SearchPredicateFactoryExtension, Function)}

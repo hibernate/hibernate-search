@@ -11,11 +11,12 @@ package org.hibernate.search.engine.search.predicate.dsl;
  * The resulting nested predicate must match <em>all</em> inner clauses,
  * similarly to an {@link SearchPredicateFactory#and() "and" predicate}.
  *
+ * @param <SR> Scope root type.
  * @param <S> The "self" type (the actual exposed type of this step).
  */
-public interface NestedPredicateClausesStep<S extends NestedPredicateClausesStep<?>>
-		extends GenericSimpleBooleanPredicateClausesStep<S, NestedPredicateClausesCollector<?>>,
-		NestedPredicateClausesCollector<NestedPredicateClausesCollector<?>> {
+public interface NestedPredicateClausesStep<SR, S extends NestedPredicateClausesStep<SR, ?>>
+		extends GenericSimpleBooleanPredicateClausesStep<SR, S, NestedPredicateClausesCollector<SR, ?>>,
+		NestedPredicateClausesCollector<SR, NestedPredicateClausesCollector<SR, ?>> {
 
 	// TODO HSEARCH-3090 add tuning methods, like the "score_mode" in Elasticsearch (avg, min, ...)
 
