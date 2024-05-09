@@ -14,6 +14,10 @@ import org.hibernate.search.engine.search.common.NamedValues;
 import org.hibernate.search.engine.search.common.ValueModel;
 import org.hibernate.search.engine.search.projection.ProjectionCollector;
 import org.hibernate.search.engine.search.projection.SearchProjection;
+import org.hibernate.search.engine.search.reference.object.ObjectFieldReference;
+import org.hibernate.search.engine.search.reference.projection.DistanceProjectionFieldReference;
+import org.hibernate.search.engine.search.reference.projection.FieldProjectionFieldReference;
+import org.hibernate.search.engine.search.reference.projection.HighlightProjectionFieldReference;
 import org.hibernate.search.engine.spatial.GeoPoint;
 import org.hibernate.search.util.common.SearchException;
 import org.hibernate.search.util.common.annotation.Incubating;
@@ -194,6 +198,18 @@ public interface SearchProjectionFactory<SR, R, E> {
 	FieldProjectionValueStep<?, Object> field(String fieldPath, ValueModel valueModel);
 
 	/**
+	 * Project to the value of a field in the indexed document.
+	 *
+	 * @param fieldReference The reference representing the <a href="#field-paths">path</a> to the index field whose value will be extracted.
+	 * @param <T> The resulting type of the projection.
+	 * @return A DSL step where the "field" projection can be defined in more details.
+	 */
+	@Incubating
+	default <T> FieldProjectionValueStep<?, T> field(FieldProjectionFieldReference<SR, T> fieldReference) {
+		return field( fieldReference.absolutePath(), fieldReference.projectionType(), fieldReference.valueModel() );
+	}
+
+	/**
 	 * Project on the score of the hit.
 	 *
 	 * @return A DSL step where the "score" projection can be defined in more details.
@@ -211,6 +227,20 @@ public interface SearchProjectionFactory<SR, R, E> {
 	DistanceToFieldProjectionValueStep<?, Double> distance(String fieldPath, GeoPoint center);
 
 	/**
+	 * Project on the distance from the center to a {@link GeoPoint} field.
+	 *
+	 * @param fieldReference The reference representing the <a href="#field-paths">path</a> to the index field containing the location
+	 * to compute the distance from.
+	 * @param center The center to compute the distance from.
+	 * @return A DSL step where the "distance" projection can be defined in more details.
+	 */
+	@Incubating
+	default DistanceToFieldProjectionValueStep<?, Double> distance(DistanceProjectionFieldReference<SR, ?> fieldReference,
+			GeoPoint center) {
+		return distance( fieldReference.absolutePath(), center );
+	}
+
+	/**
 	 * Starts the definition of an object projection,
 	 * which will yield one value per object in a given object field,
 	 * the value being the result of combining multiple given projections
@@ -226,6 +256,26 @@ public interface SearchProjectionFactory<SR, R, E> {
 	 * @return A DSL step where the "composite" projection can be defined in more details.
 	 */
 	CompositeProjectionInnerStep object(String objectFieldPath);
+
+	/**
+	 * Starts the definition of an object projection,
+	 * which will yield one value per object in a given object field,
+	 * the value being the result of combining multiple given projections
+	 * (usually on fields within the object field).
+	 * <p>
+	 * Compared to the basic {@link #composite() composite projection},
+	 * an object projection is bound to a specific object field,
+	 * and thus it yields zero, one or many values, as many as there are objects in the targeted object field.
+	 * Therefore, you must take care of calling {@link CompositeProjectionValueStep#multi()}
+	 * if the object field is multi-valued.
+	 *
+	 * @param objectFieldReference The reference representing the <a href="#field-paths">path</a> to the object field whose object(s) will be extracted.
+	 * @return A DSL step where the "composite" projection can be defined in more details.
+	 */
+	@Incubating
+	default CompositeProjectionInnerStep object(ObjectFieldReference<SR> objectFieldReference) {
+		return object( objectFieldReference.absolutePath() );
+	}
 
 	/**
 	 * Starts the definition of a composite projection,
@@ -472,6 +522,21 @@ public interface SearchProjectionFactory<SR, R, E> {
 	SearchProjectionFactory<SR, R, E> withRoot(String objectFieldPath);
 
 	/**
+	 * Create a new projection factory whose root for all paths passed to the DSL
+	 * will be the given object field.
+	 * <p>
+	 * This is used to call reusable methods that can apply the same projection
+	 * on different object fields that have same structure (same sub-fields).
+	 *
+	 * @param objectFieldReference The reference representing the path from the current root to an object field that will become the new root.
+	 * @return A new projection factory using the given object field as root.
+	 */
+	@Incubating
+	default SearchProjectionFactory<SR, R, E> withRoot(ObjectFieldReference<SR> objectFieldReference) {
+		return withRoot( objectFieldReference.absolutePath() );
+	}
+
+	/**
 	 * @param relativeFieldPath The path to a field, relative to the {@link #withRoot(String) root} of this factory.
 	 * @return The absolute path of the field, for use in native projections for example.
 	 * Note the path is returned even if the field doesn't exist.
@@ -487,4 +552,15 @@ public interface SearchProjectionFactory<SR, R, E> {
 	 */
 	@Incubating
 	HighlightProjectionOptionsStep highlight(String fieldPath);
+
+	/**
+	 * Project to highlights, i.e. sequences of text that matched the query, extracted from the given field's value.
+	 *
+	 * @param fieldReference The reference representing the <a href="#field-paths">path</a> to the index field whose highlights will be extracted.
+	 * @return A DSL step where the "highlight" projection can be defined in more details.
+	 */
+	@Incubating
+	default HighlightProjectionOptionsStep highlight(HighlightProjectionFieldReference<SR> fieldReference) {
+		return highlight( fieldReference.absolutePath() );
+	}
 }

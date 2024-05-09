@@ -10,13 +10,16 @@ package org.hibernate.search.engine.search.predicate.dsl;
  * or optional parameters for the last targeted field(s) can be set,
  * or more target fields can be added.
  *
+ * @param <SR> Scope root type.
  * @param <S> The "self" type (the actual exposed type of this step).
  * @param <N> The type of the next step.
  */
 public interface RangePredicateFieldMoreStep<
-		S extends RangePredicateFieldMoreStep<?, N>,
+		SR,
+		S extends RangePredicateFieldMoreStep<SR, ?, N>,
 		N extends RangePredicateOptionsStep<?>>
-		extends RangePredicateMatchingStep<N>, MultiFieldPredicateFieldBoostStep<S> {
+		extends RangePredicateFieldMoreGenericStep<SR, S, N, String, Object>,
+		RangePredicateMatchingStep<N> {
 
 	/**
 	 * Target the given field in the range predicate,
@@ -47,5 +50,4 @@ public interface RangePredicateFieldMoreStep<
 	 * @see RangePredicateFieldStep#fields(String...)
 	 */
 	S fields(String... fieldPaths);
-
 }

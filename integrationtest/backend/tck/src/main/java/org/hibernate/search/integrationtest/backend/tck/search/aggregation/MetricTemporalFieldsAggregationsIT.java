@@ -62,7 +62,7 @@ class MetricTemporalFieldsAggregationsIT {
 	@Test
 	void test_filteringResults() {
 		StubMappingScope scope = mainIndex.createScope();
-		SearchQueryOptionsStep<?, DocumentReference, StubLoadingOptionsStep, ?, ?> options = scope.query()
+		SearchQueryOptionsStep<?, ?, DocumentReference, StubLoadingOptionsStep, ?, ?> options = scope.query()
 				.where( f -> f.match().field( "style" ).matching( "bla" ) );
 		SearchQuery<DocumentReference> query = defineAggregations( options );
 
@@ -86,7 +86,7 @@ class MetricTemporalFieldsAggregationsIT {
 	@Test
 	void test_allResults() {
 		StubMappingScope scope = mainIndex.createScope();
-		SearchQueryOptionsStep<?, DocumentReference, StubLoadingOptionsStep, ?, ?> options = scope.query()
+		SearchQueryOptionsStep<?, ?, DocumentReference, StubLoadingOptionsStep, ?, ?> options = scope.query()
 				.where( f -> f.matchAll() );
 		SearchQuery<DocumentReference> query = defineAggregations( options );
 
@@ -108,7 +108,7 @@ class MetricTemporalFieldsAggregationsIT {
 	}
 
 	private SearchQuery<DocumentReference> defineAggregations(
-			SearchQueryOptionsStep<?, DocumentReference, StubLoadingOptionsStep, ?, ?> options) {
+			SearchQueryOptionsStep<?, ?, DocumentReference, StubLoadingOptionsStep, ?, ?> options) {
 		return options
 				.aggregation( sumDates, f -> f.sum().field( "date", LocalDate.class ) )
 				.aggregation( sumConverted, f -> f.sum().field( "converted", String.class ) )

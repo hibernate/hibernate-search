@@ -16,7 +16,8 @@ import org.hibernate.search.util.common.data.RangeBoundInclusion;
  *
  * @param <N> The type of the next step.
  */
-public interface RangePredicateMatchingStep<N extends RangePredicateOptionsStep<?>> {
+public interface RangePredicateMatchingStep<N extends RangePredicateOptionsStep<?>>
+		extends RangePredicateMatchingGenericStep<Object, N> {
 
 	/**
 	 * Require at least one of the targeted fields to be in the range

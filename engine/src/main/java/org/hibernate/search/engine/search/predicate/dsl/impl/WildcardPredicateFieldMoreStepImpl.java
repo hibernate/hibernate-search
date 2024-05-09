@@ -18,17 +18,17 @@ import org.hibernate.search.engine.search.predicate.spi.PredicateTypeKeys;
 import org.hibernate.search.engine.search.predicate.spi.WildcardPredicateBuilder;
 import org.hibernate.search.util.common.impl.Contracts;
 
-class WildcardPredicateFieldMoreStepImpl
-		implements WildcardPredicateFieldMoreStep<WildcardPredicateFieldMoreStepImpl, WildcardPredicateOptionsStep<?>>,
+class WildcardPredicateFieldMoreStepImpl<SR>
+		implements WildcardPredicateFieldMoreStep<SR, WildcardPredicateFieldMoreStepImpl<SR>, WildcardPredicateOptionsStep<?>>,
 		AbstractBooleanMultiFieldPredicateCommonState.FieldSetState {
 
-	private final CommonState commonState;
+	private final CommonState<SR> commonState;
 
 	private final List<WildcardPredicateBuilder> predicateBuilders = new ArrayList<>();
 
 	private Float fieldSetBoost;
 
-	WildcardPredicateFieldMoreStepImpl(CommonState commonState, List<String> fieldPaths) {
+	WildcardPredicateFieldMoreStepImpl(CommonState<SR> commonState, List<String> fieldPaths) {
 		this.commonState = commonState;
 		this.commonState.add( this );
 		SearchIndexScope<?> scope = commonState.scope();
@@ -38,12 +38,12 @@ class WildcardPredicateFieldMoreStepImpl
 	}
 
 	@Override
-	public WildcardPredicateFieldMoreStepImpl fields(String... fieldPaths) {
-		return new WildcardPredicateFieldMoreStepImpl( commonState, Arrays.asList( fieldPaths ) );
+	public WildcardPredicateFieldMoreStepImpl<SR> fields(String... fieldPaths) {
+		return new WildcardPredicateFieldMoreStepImpl<>( commonState, Arrays.asList( fieldPaths ) );
 	}
 
 	@Override
-	public WildcardPredicateFieldMoreStepImpl boost(float boost) {
+	public WildcardPredicateFieldMoreStepImpl<SR> boost(float boost) {
 		this.fieldSetBoost = boost;
 		return this;
 	}
@@ -63,9 +63,9 @@ class WildcardPredicateFieldMoreStepImpl
 		}
 	}
 
-	static class CommonState
-			extends AbstractBooleanMultiFieldPredicateCommonState<CommonState, WildcardPredicateFieldMoreStepImpl>
-			implements WildcardPredicateOptionsStep<CommonState> {
+	static class CommonState<SR>
+			extends AbstractBooleanMultiFieldPredicateCommonState<CommonState<SR>, WildcardPredicateFieldMoreStepImpl<SR>>
+			implements WildcardPredicateOptionsStep<CommonState<SR>> {
 
 		CommonState(SearchPredicateDslContext<?> dslContext) {
 			super( dslContext );
@@ -73,7 +73,7 @@ class WildcardPredicateFieldMoreStepImpl
 
 		private WildcardPredicateOptionsStep<?> matching(String wildcardPattern) {
 			Contracts.assertNotNull( wildcardPattern, "wildcardPattern" );
-			for ( WildcardPredicateFieldMoreStepImpl fieldSetState : getFieldSetStates() ) {
+			for ( WildcardPredicateFieldMoreStepImpl<SR> fieldSetState : getFieldSetStates() ) {
 				for ( WildcardPredicateBuilder predicateBuilder : fieldSetState.predicateBuilders ) {
 					predicateBuilder.pattern( wildcardPattern );
 				}
@@ -82,7 +82,7 @@ class WildcardPredicateFieldMoreStepImpl
 		}
 
 		@Override
-		protected CommonState thisAsS() {
+		protected CommonState<SR> thisAsS() {
 			return this;
 		}
 	}

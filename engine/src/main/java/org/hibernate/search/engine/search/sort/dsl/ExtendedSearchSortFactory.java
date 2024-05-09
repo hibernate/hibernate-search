@@ -7,6 +7,8 @@ package org.hibernate.search.engine.search.sort.dsl;
 import java.util.function.Function;
 
 import org.hibernate.search.engine.search.predicate.dsl.SearchPredicateFactory;
+import org.hibernate.search.engine.search.reference.object.ObjectFieldReference;
+import org.hibernate.search.engine.search.reference.sort.FieldSortFieldReference;
 import org.hibernate.search.engine.spatial.GeoPoint;
 
 /**
@@ -30,6 +32,11 @@ public interface ExtendedSearchSortFactory<
 	S withRoot(String objectFieldPath);
 
 	@Override
+	default S withRoot(ObjectFieldReference<SR> objectFieldReference) {
+		return withRoot( objectFieldReference.absolutePath() );
+	}
+
+	@Override
 	FieldSortOptionsStep<SR, ?, PDF> field(String fieldPath);
 
 	@Override
@@ -38,5 +45,16 @@ public interface ExtendedSearchSortFactory<
 	@Override
 	default DistanceSortOptionsStep<SR, ?, PDF> distance(String fieldPath, double latitude, double longitude) {
 		return distance( fieldPath, GeoPoint.of( latitude, longitude ) );
+	}
+
+	@Override
+	default DistanceSortOptionsStep<SR, ?, PDF> distance(FieldSortFieldReference<SR, ?> fieldReference, GeoPoint location) {
+		return distance( fieldReference.absolutePath(), location );
+	}
+
+	@Override
+	default DistanceSortOptionsStep<SR, ?, PDF> distance(FieldSortFieldReference<SR, ?> fieldReference, double latitude,
+			double longitude) {
+		return distance( fieldReference, GeoPoint.of( latitude, longitude ) );
 	}
 }

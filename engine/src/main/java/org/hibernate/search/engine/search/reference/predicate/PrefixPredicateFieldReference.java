@@ -4,5 +4,5 @@
  */
 package org.hibernate.search.engine.search.reference.predicate;
 
-public interface PrefixPredicateFieldReference<SR, T> extends TypedPredicateFieldReference<SR, T> {
+public interface PrefixPredicateFieldReference<SR> extends PredicateFieldReference<SR> {
 }

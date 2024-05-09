@@ -16,9 +16,10 @@ import org.hibernate.search.engine.search.predicate.dsl.spi.SearchPredicateDslCo
 import org.hibernate.search.engine.search.predicate.spi.CommonQueryStringPredicateBuilder;
 import org.hibernate.search.engine.search.predicate.spi.SimpleQueryStringPredicateBuilder;
 
-class SimpleQueryStringPredicateFieldMoreStepImpl
+class SimpleQueryStringPredicateFieldMoreStepImpl<SR>
 		implements SimpleQueryStringPredicateFieldMoreStep<
-				SimpleQueryStringPredicateFieldMoreStepImpl,
+				SR,
+				SimpleQueryStringPredicateFieldMoreStepImpl<SR>,
 				SimpleQueryStringPredicateOptionsStep<?>> {
 
 	private final CommonState commonState;
@@ -33,12 +34,12 @@ class SimpleQueryStringPredicateFieldMoreStepImpl
 	}
 
 	@Override
-	public SimpleQueryStringPredicateFieldMoreStepImpl fields(String... fieldPaths) {
-		return new SimpleQueryStringPredicateFieldMoreStepImpl( commonState, Arrays.asList( fieldPaths ) );
+	public SimpleQueryStringPredicateFieldMoreStepImpl<SR> fields(String... fieldPaths) {
+		return new SimpleQueryStringPredicateFieldMoreStepImpl<SR>( commonState, Arrays.asList( fieldPaths ) );
 	}
 
 	@Override
-	public SimpleQueryStringPredicateFieldMoreStepImpl boost(float boost) {
+	public SimpleQueryStringPredicateFieldMoreStepImpl<SR> boost(float boost) {
 		fieldStates.forEach( c -> c.boost( boost ) );
 		return this;
 	}
