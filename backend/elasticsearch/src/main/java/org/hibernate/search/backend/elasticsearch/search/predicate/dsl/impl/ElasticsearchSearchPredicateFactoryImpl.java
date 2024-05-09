@@ -13,11 +13,12 @@ import org.hibernate.search.engine.search.predicate.dsl.spi.StaticPredicateFinal
 
 import com.google.gson.JsonObject;
 
-public class ElasticsearchSearchPredicateFactoryImpl
+public class ElasticsearchSearchPredicateFactoryImpl<SR>
 		extends AbstractSearchPredicateFactory<
-				ElasticsearchSearchPredicateFactory,
+				SR,
+				ElasticsearchSearchPredicateFactory<SR>,
 				ElasticsearchSearchPredicateIndexScope<?>>
-		implements ElasticsearchSearchPredicateFactory {
+		implements ElasticsearchSearchPredicateFactory<SR> {
 
 	public ElasticsearchSearchPredicateFactoryImpl(
 			SearchPredicateDslContext<ElasticsearchSearchPredicateIndexScope<?>> dslContext) {
@@ -25,8 +26,8 @@ public class ElasticsearchSearchPredicateFactoryImpl
 	}
 
 	@Override
-	public ElasticsearchSearchPredicateFactory withRoot(String objectFieldPath) {
-		return new ElasticsearchSearchPredicateFactoryImpl( dslContext.rescope(
+	public ElasticsearchSearchPredicateFactory<SR> withRoot(String objectFieldPath) {
+		return new ElasticsearchSearchPredicateFactoryImpl<SR>( dslContext.rescope(
 				dslContext.scope().withRoot( objectFieldPath ) ) );
 	}
 

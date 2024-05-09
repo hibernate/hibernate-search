@@ -13,13 +13,14 @@ import org.hibernate.search.engine.search.projection.dsl.spi.StaticProjectionFin
 
 import com.google.gson.JsonObject;
 
-public class ElasticsearchSearchProjectionFactoryImpl<R, E>
+public class ElasticsearchSearchProjectionFactoryImpl<SR, R, E>
 		extends AbstractSearchProjectionFactory<
-				ElasticsearchSearchProjectionFactory<R, E>,
+				SR,
+				ElasticsearchSearchProjectionFactory<SR, R, E>,
 				ElasticsearchSearchProjectionIndexScope<?>,
 				R,
 				E>
-		implements ElasticsearchSearchProjectionFactory<R, E> {
+		implements ElasticsearchSearchProjectionFactory<SR, R, E> {
 
 	public ElasticsearchSearchProjectionFactoryImpl(
 			SearchProjectionDslContext<ElasticsearchSearchProjectionIndexScope<?>> dslContext) {
@@ -27,7 +28,7 @@ public class ElasticsearchSearchProjectionFactoryImpl<R, E>
 	}
 
 	@Override
-	public ElasticsearchSearchProjectionFactory<R, E> withRoot(String objectFieldPath) {
+	public ElasticsearchSearchProjectionFactory<SR, R, E> withRoot(String objectFieldPath) {
 		return new ElasticsearchSearchProjectionFactoryImpl<>( dslContext.rescope(
 				dslContext.scope().withRoot( objectFieldPath ) ) );
 	}
