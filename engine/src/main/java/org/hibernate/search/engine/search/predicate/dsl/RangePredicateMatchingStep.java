@@ -6,6 +6,9 @@
  */
 package org.hibernate.search.engine.search.predicate.dsl;
 
+import java.util.Arrays;
+import java.util.Collection;
+
 import org.hibernate.search.engine.search.common.ValueConvert;
 import org.hibernate.search.util.common.data.Range;
 import org.hibernate.search.util.common.data.RangeBoundInclusion;
@@ -53,7 +56,7 @@ public interface RangePredicateMatchingStep<N extends RangePredicateOptionsStep<
 	 * @return The next step.
 	 */
 	default N between(Object lowerBound, Object upperBound, ValueConvert convert) {
-		return range( Range.between( lowerBound, upperBound ), convert );
+		return within( Range.between( lowerBound, upperBound ), convert );
 	}
 
 	/**
@@ -74,7 +77,7 @@ public interface RangePredicateMatchingStep<N extends RangePredicateOptionsStep<
 	 */
 	default N between(Object lowerBound, RangeBoundInclusion lowerBoundInclusion,
 			Object upperBound, RangeBoundInclusion upperBoundInclusion) {
-		return range( Range.between( lowerBound, lowerBoundInclusion, upperBound, upperBoundInclusion ) );
+		return within( Range.between( lowerBound, lowerBoundInclusion, upperBound, upperBoundInclusion ) );
 	}
 
 	/**
@@ -105,7 +108,7 @@ public interface RangePredicateMatchingStep<N extends RangePredicateOptionsStep<
 	 * @return The next step.
 	 */
 	default N atLeast(Object lowerBoundValue, ValueConvert convert) {
-		return range( Range.atLeast( lowerBoundValue ), convert );
+		return within( Range.atLeast( lowerBoundValue ), convert );
 	}
 
 	/**
@@ -136,7 +139,7 @@ public interface RangePredicateMatchingStep<N extends RangePredicateOptionsStep<
 	 * @return The next step.
 	 */
 	default N greaterThan(Object lowerBoundValue, ValueConvert convert) {
-		return range( Range.greaterThan( lowerBoundValue ), convert );
+		return within( Range.greaterThan( lowerBoundValue ), convert );
 	}
 
 	/**
@@ -167,7 +170,7 @@ public interface RangePredicateMatchingStep<N extends RangePredicateOptionsStep<
 	 * @return The next step.
 	 */
 	default N atMost(Object upperBoundValue, ValueConvert convert) {
-		return range( Range.atMost( upperBoundValue ), convert );
+		return within( Range.atMost( upperBoundValue ), convert );
 	}
 
 	/**
@@ -198,7 +201,40 @@ public interface RangePredicateMatchingStep<N extends RangePredicateOptionsStep<
 	 * @return The next step.
 	 */
 	default N lessThan(Object upperBoundValue, ValueConvert convert) {
-		return range( Range.lessThan( upperBoundValue ), convert );
+		return within( Range.lessThan( upperBoundValue ), convert );
+	}
+
+	/**
+	 * Require at least one of the targeted fields to be in the given range.
+	 *
+	 * @param range The range to match.
+	 * The signature of this method defines this parameter as a range with bounds of any type,
+	 * but a specific type is expected depending on the targeted field.
+	 * See {@link ValueConvert#YES} for more information.
+	 * @return The next step.
+	 * @deprecated Use {@link #within(Range)} instead.
+	 */
+	@Deprecated
+	default N range(Range<?> range) {
+		return within( range, ValueConvert.YES );
+	}
+
+	/**
+	 * Require at least one of the targeted fields to be in the given range.
+	 *
+	 * @param range The range to match.
+	 * The signature of this method defines this parameter as a range with bounds of any type,
+	 * but a specific type is expected depending on the targeted field and on the {@code convert} parameter.
+	 * See {@link ValueConvert} for more information.
+	 * @param convert Controls how the range bounds should be converted
+	 * before Hibernate Search attempts to interpret them as a field value.
+	 * See {@link ValueConvert} for more information.
+	 * @return The next step.
+	 * @deprecated Use {@link #within(Range, ValueConvert)} instead.
+	 */
+	@Deprecated
+	default N range(Range<?> range, ValueConvert convert) {
+		return within( range, convert );
 	}
 
 	/**
@@ -210,8 +246,8 @@ public interface RangePredicateMatchingStep<N extends RangePredicateOptionsStep<
 	 * See {@link ValueConvert#YES} for more information.
 	 * @return The next step.
 	 */
-	default N range(Range<?> range) {
-		return range( range, ValueConvert.YES );
+	default N within(Range<?> range) {
+		return within( range, ValueConvert.YES );
 	}
 
 	/**
@@ -226,6 +262,45 @@ public interface RangePredicateMatchingStep<N extends RangePredicateOptionsStep<
 	 * See {@link ValueConvert} for more information.
 	 * @return The next step.
 	 */
-	N range(Range<?> range, ValueConvert convert);
+	N within(Range<?> range, ValueConvert convert);
 
+	/**
+	 * Require at least one of the targeted fields to be in any of the given ranges.
+	 *
+	 * @param ranges The ranges to match.
+	 * The signature of this method defines this parameter as a range with bounds of any type,
+	 * but a specific type is expected depending on the targeted field.
+	 * See {@link ValueConvert#YES} for more information.
+	 * @return The next step.
+	 */
+	default N withinAny(Range<?>... ranges) {
+		return withinAny( Arrays.asList( ranges ) );
+	}
+
+	/**
+	 * Require at least one of the targeted fields to be in any of the given ranges.
+	 *
+	 * @param ranges The ranges to match.
+	 * The signature of this method defines this parameter as a range with bounds of any type,
+	 * but a specific type is expected depending on the targeted field.
+	 * See {@link ValueConvert#YES} for more information.
+	 * @return The next step.
+	 */
+	default N withinAny(Collection<? extends Range<?>> ranges) {
+		return withinAny( ranges, ValueConvert.YES );
+	}
+
+	/**
+	 * Require at least one of the targeted fields to be in any of the given ranges.
+	 *
+	 * @param ranges The ranges to match.
+	 * The signature of this method defines this parameter as a range with bounds of any type,
+	 * but a specific type is expected depending on the targeted field and on the {@code convert} parameter.
+	 * See {@link ValueConvert} for more information.
+	 * @param convert Controls how the range bounds should be converted
+	 * before Hibernate Search attempts to interpret them as a field value.
+	 * See {@link ValueConvert} for more information.
+	 * @return The next step.
+	 */
+	N withinAny(Collection<? extends Range<?>> ranges, ValueConvert convert);
 }

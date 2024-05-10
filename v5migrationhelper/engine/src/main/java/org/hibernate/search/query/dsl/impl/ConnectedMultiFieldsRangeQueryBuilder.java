@@ -49,7 +49,7 @@ public class ConnectedMultiFieldsRangeQueryBuilder
 	@Override
 	protected RangePredicateOptionsStep<?> createPredicate(SearchPredicateFactory factory, FieldContext fieldContext) {
 		return fieldContext.applyBoost( factory.range().field( fieldContext.getField() ) )
-				.range(
+				.within(
 						Range.between(
 								rangeContext.getFrom(),
 								rangeContext.isExcludeFrom() ? RangeBoundInclusion.EXCLUDED : RangeBoundInclusion.INCLUDED,

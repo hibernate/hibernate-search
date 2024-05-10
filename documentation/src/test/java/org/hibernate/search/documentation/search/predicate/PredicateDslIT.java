@@ -35,6 +35,7 @@ import org.hibernate.search.mapper.orm.mapping.HibernateOrmSearchMappingConfigur
 import org.hibernate.search.mapper.orm.scope.SearchScope;
 import org.hibernate.search.mapper.orm.session.SearchSession;
 import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.TypeMappingStep;
+import org.hibernate.search.util.common.data.Range;
 import org.hibernate.search.util.common.data.RangeBoundInclusion;
 import org.hibernate.search.util.impl.integrationtest.backend.elasticsearch.dialect.ElasticsearchTestDialect;
 import org.hibernate.search.util.impl.integrationtest.common.extension.BackendConfiguration;
@@ -747,6 +748,21 @@ class PredicateDslIT {
 			assertThat( hits )
 					.extracting( Book::getId )
 					.containsExactlyInAnyOrder( BOOK2_ID, BOOK4_ID );
+		} );
+
+		withinSearchSession( searchSession -> {
+			// tag::range-within-any[]
+			List<Book> hits = searchSession.search( Book.class )
+					.where( f -> f.range().field( "pageCount" )
+							.withinAny(
+									Range.between( 200, 250 ),
+									Range.between( 500, 800 )
+							) )
+					.fetchHits( 20 );
+			// end::range-within-any[]
+			assertThat( hits )
+					.extracting( Book::getId )
+					.containsExactlyInAnyOrder( BOOK1_ID, BOOK2_ID, BOOK4_ID );
 		} );
 	}
 

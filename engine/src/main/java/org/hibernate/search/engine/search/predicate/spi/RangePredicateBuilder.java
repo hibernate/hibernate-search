@@ -11,6 +11,6 @@ import org.hibernate.search.util.common.data.Range;
 
 public interface RangePredicateBuilder extends SearchPredicateBuilder {
 
-	void range(Range<?> range, ValueConvert convertLowerBound, ValueConvert convertUpperBound);
+	void within(Range<?> range, ValueConvert convertLowerBound, ValueConvert convertUpperBound);
 
 }

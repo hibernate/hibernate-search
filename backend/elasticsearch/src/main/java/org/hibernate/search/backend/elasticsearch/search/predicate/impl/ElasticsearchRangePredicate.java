@@ -96,7 +96,7 @@ public class ElasticsearchRangePredicate extends AbstractElasticsearchSingleFiel
 		}
 
 		@Override
-		public void range(Range<?> range, ValueConvert convertLowerBound, ValueConvert convertUpperBound) {
+		public void within(Range<?> range, ValueConvert convertLowerBound, ValueConvert convertUpperBound) {
 			this.range = Range.between(
 					convertToFieldValue( range.lowerBoundValue(), convertLowerBound ),
 					range.lowerBoundInclusion(),

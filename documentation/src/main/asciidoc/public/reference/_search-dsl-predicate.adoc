@@ -369,6 +369,18 @@ include::{sourcedir}/org/hibernate/search/documentation/search/predicate/Predica
 ----
 ====
 
+Sometimes it may be needed to match the value that is in one of the ranges. While it is possible to create an
+<<search-dsl-predicate-or,`or` predicate>> and add a <<search-dsl-predicate-range,`range` predicate>> for each of the ranges,
+there is a simpler way to do that:
+
+.Matching values that are within any of the provided ranges
+====
+[source, JAVA, indent=0, subs="+callouts"]
+----
+include::{sourcedir}/org/hibernate/search/documentation/search/predicate/PredicateDslIT.java[tags=range-within-any]
+----
+====
+
 [[search-dsl-predicate-range-argument-type]]
 === Expected type of arguments
 
