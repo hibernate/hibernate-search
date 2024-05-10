@@ -1639,7 +1639,7 @@ It allows building more advanced query strings and has more configuration option
 
 We will not go much into details of a query syntax in this guide
 To familiarize yourself with it, please refer to your backend
-(link:{elasticsearchDocUrl}/query-dsl-query-string-query.html#query-string-syntax[Elasticsearch]/link:{openSearchDocUrl}/query-dsl/full-text/query-string/[OpenSearch]/link:{luceneJavadocUrl}../queryparser/org/apache/lucene/queryparser/classic/package-summary.html#package.description/[Lucene])
+(link:{elasticsearchDocUrl}/query-dsl-query-string-query.html#query-string-syntax[Elasticsearch]/link:{openSearchDocUrl}/query-dsl/full-text/query-string/[OpenSearch]/link:{luceneQueryparserJavadocUrl}org/apache/lucene/queryparser/classic/package-summary.html#package.description/[Lucene])
 guides.
 
 .Matching a query string

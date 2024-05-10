@@ -40,7 +40,7 @@
         <version.org.apache.lucene>9.10.0</version.org.apache.lucene>
         <javadoc.org.apache.lucene.tag>${parsed-version.org.apache.lucene.majorVersion}_${parsed-version.org.apache.lucene.minorVersion}_${parsed-version.org.apache.lucene.incrementalVersion}</javadoc.org.apache.lucene.tag>
         <javadoc.org.apache.lucene.core.url>https://lucene.apache.org/core/${javadoc.org.apache.lucene.tag}/core/</javadoc.org.apache.lucene.core.url>
-        <javadoc.org.apache.lucene.analyzers-common.url>https://lucene.apache.org/core/${javadoc.org.apache.lucene.tag}/analyzers-common/</javadoc.org.apache.lucene.analyzers-common.url>
+        <javadoc.org.apache.lucene.analysis.common.url>https://lucene.apache.org/core/${javadoc.org.apache.lucene.tag}/analysis/common/</javadoc.org.apache.lucene.analysis.common.url>
         <javadoc.org.apache.lucene.queryparser.url>https://lucene.apache.org/core/${javadoc.org.apache.lucene.tag}/queryparser/</javadoc.org.apache.lucene.queryparser.url>
         <!-- These version must be kept in sync with the version of the dependency in Lucene.
             This dependency has a runtime scope in the lucene-facet lib,
