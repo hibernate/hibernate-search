@@ -9,6 +9,7 @@ package org.hibernate.search.engine.search.predicate.dsl.impl;
 import java.lang.invoke.MethodHandles;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.List;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
@@ -16,7 +17,6 @@ import java.util.stream.Collectors;
 import org.hibernate.search.engine.logging.impl.Log;
 import org.hibernate.search.engine.reporting.spi.EventContexts;
 import org.hibernate.search.engine.search.common.ValueConvert;
-import org.hibernate.search.engine.search.common.spi.SearchIndexScope;
 import org.hibernate.search.engine.search.predicate.SearchPredicate;
 import org.hibernate.search.engine.search.predicate.dsl.RangePredicateFieldMoreStep;
 import org.hibernate.search.engine.search.predicate.dsl.RangePredicateOptionsStep;
@@ -45,9 +45,9 @@ class RangePredicateFieldMoreStepImpl
 		this.commonState = commonState;
 		this.commonState.add( this );
 		this.fieldPaths = fieldPaths;
-		SearchIndexScope<?> scope = commonState.scope();
-		for ( String fieldPath : fieldPaths ) {
-			predicateBuilders.add( scope.fieldQueryElement( fieldPath, PredicateTypeKeys.RANGE ) );
+		for ( String path : fieldPaths ) {
+			// only check that the range predicate can be applied to the requested field:
+			commonState.scope().fieldQueryElement( path, PredicateTypeKeys.RANGE );
 		}
 	}
 
@@ -63,8 +63,13 @@ class RangePredicateFieldMoreStepImpl
 	}
 
 	@Override
-	public RangePredicateOptionsStep<?> range(Range<?> range, ValueConvert convert) {
-		return commonState.range( range, convert, convert );
+	public RangePredicateOptionsStep<?> within(Range<?> range, ValueConvert convert) {
+		return commonState.within( range, convert, convert );
+	}
+
+	@Override
+	public RangePredicateOptionsStep<?> withinAny(Collection<? extends Range<?>> ranges, ValueConvert convert) {
+		return commonState.withinAny( ranges, convert );
 	}
 
 	@Override
@@ -85,18 +90,39 @@ class RangePredicateFieldMoreStepImpl
 			super( dslContext );
 		}
 
-		CommonState range(Range<?> range, ValueConvert lowerBoundConvert, ValueConvert upperBoundConvert) {
+		CommonState within(Range<?> range, ValueConvert lowerBoundConvert, ValueConvert upperBoundConvert) {
 			Contracts.assertNotNull( range, "range" );
 			Contracts.assertNotNull( lowerBoundConvert, "lowerBoundConvert" );
 			Contracts.assertNotNull( upperBoundConvert, "upperBoundConvert" );
-			if ( !range.lowerBoundValue().isPresent() && !range.upperBoundValue().isPresent() ) {
+			if ( range.lowerBoundValue().isEmpty() && range.upperBoundValue().isEmpty() ) {
 				throw log.rangePredicateCannotMatchNullValue( getEventContext() );
 			}
 			for ( RangePredicateFieldMoreStepImpl fieldSetState : getFieldSetStates() ) {
-				for ( RangePredicateBuilder predicateBuilder : fieldSetState.predicateBuilders ) {
-					predicateBuilder.range( range, lowerBoundConvert, upperBoundConvert );
+				for ( String path : fieldSetState.fieldPaths ) {
+					RangePredicateBuilder builder = scope().fieldQueryElement( path, PredicateTypeKeys.RANGE );
+					builder.within( range, lowerBoundConvert, upperBoundConvert );
+					fieldSetState.predicateBuilders.add( builder );
 				}
 			}
+			return this;
+		}
+
+		public CommonState withinAny(Collection<? extends Range<?>> ranges, ValueConvert valueConvert) {
+			Contracts.assertNotNull( valueConvert, "valueConvert" );
+			for ( RangePredicateFieldMoreStepImpl fieldSetState : getFieldSetStates() ) {
+				for ( String path : fieldSetState.fieldPaths ) {
+					for ( var range : ranges ) {
+						Contracts.assertNotNull( range, "range" );
+						if ( range.lowerBoundValue().isEmpty() && range.upperBoundValue().isEmpty() ) {
+							throw log.rangePredicateCannotMatchNullValue( getEventContext() );
+						}
+						RangePredicateBuilder builder = scope().fieldQueryElement( path, PredicateTypeKeys.RANGE );
+						builder.within( range, valueConvert, valueConvert );
+						fieldSetState.predicateBuilders.add( builder );
+					}
+				}
+			}
+
 			return this;
 		}
 

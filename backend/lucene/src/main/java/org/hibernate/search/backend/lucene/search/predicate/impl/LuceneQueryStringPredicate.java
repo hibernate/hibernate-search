@@ -206,7 +206,7 @@ public class LuceneQueryStringPredicate extends LuceneCommonQueryStringPredicate
 
 			if ( !state.field().type().valueClass().isAssignableFrom( String.class ) ) {
 				var builder = state.field().queryElement( PredicateTypeKeys.RANGE, scope );
-				builder.range(
+				builder.within(
 						org.hibernate.search.util.common.data.Range.between(
 								part1, startInclusive ? RangeBoundInclusion.INCLUDED : RangeBoundInclusion.EXCLUDED,
 								part2, endInclusive ? RangeBoundInclusion.INCLUDED : RangeBoundInclusion.EXCLUDED

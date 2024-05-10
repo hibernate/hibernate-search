@@ -55,7 +55,7 @@ public class LuceneNumericRangePredicate extends AbstractLuceneLeafSingleFieldPr
 		}
 
 		@Override
-		public void range(Range<?> range, ValueConvert convertLowerBound, ValueConvert convertUpperBound) {
+		public void within(Range<?> range, ValueConvert convertLowerBound, ValueConvert convertUpperBound) {
 			this.range = convertAndEncode( codec, range, convertLowerBound, convertUpperBound );
 		}
 

@@ -22,6 +22,7 @@ import org.hibernate.search.integrationtest.backend.tck.testsupport.types.Standa
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.SimpleFieldModelsByType;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.ValueWrapper;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.extension.SearchSetupHelper;
+import org.hibernate.search.util.common.data.Range;
 import org.hibernate.search.util.common.data.RangeBoundInclusion;
 import org.hibernate.search.util.impl.integrationtest.common.assertion.NormalizedDocRefHit;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.BulkIndexer;
@@ -280,6 +281,59 @@ class RangePredicateSpecificsIT<F> {
 				.where( f -> f.range().field( defaultDslConverterFieldPath( dataSet ) )
 						.between( null, value( upperDocOrdinal, dataSet ) ) ) )
 				.hasDocRefHitsAnyOrder( docIdRange( null, upperDocOrdinal, dataSet ) );
+	}
+
+	@ParameterizedTest(name = "{0}")
+	@MethodSource("params")
+	void withinAny(DataSet<F> dataSet) {
+		int lowerValueNumber1 = 1;
+		int upperValueNumber1 = docCount( dataSet ) - 3;
+
+		int lowerValueNumber2 = 2;
+		int upperValueNumber2 = docCount( dataSet ) - 2;
+
+		assertThatQuery( index.query()
+				.where( f -> f.range().field( defaultDslConverterFieldPath( dataSet ) )
+						.withinAny( Range.between( value( lowerValueNumber1, dataSet ), value( upperValueNumber1, dataSet ) ),
+								Range.between( value( lowerValueNumber2, dataSet ), value( upperValueNumber2, dataSet ) ) ) ) )
+				.hasDocRefHitsAnyOrder( docIdRange( lowerValueNumber1, upperValueNumber2, dataSet ) );
+	}
+
+	@ParameterizedTest(name = "{0}")
+	@MethodSource("params")
+	void withinAny_withDslConverter_valueConvertDefault(DataSet<F> dataSet) {
+		int lowerValueNumber1 = 1;
+		int upperValueNumber1 = docCount( dataSet ) - 3;
+
+		int lowerValueNumber2 = 2;
+		int upperValueNumber2 = docCount( dataSet ) - 2;
+
+		assertThatQuery( index.query()
+				.where( f -> f.range().field( customDslConverterFieldPath( dataSet ) )
+						.withinAny( List.of(
+								Range.between( wrappedValue( lowerValueNumber1, dataSet ),
+										wrappedValue( upperValueNumber1, dataSet ) ),
+								Range.between( wrappedValue( lowerValueNumber2, dataSet ),
+										wrappedValue( upperValueNumber2, dataSet ) ) ) ) ) )
+				.hasDocRefHitsAnyOrder( docIdRange( lowerValueNumber1, upperValueNumber2, dataSet ) );
+	}
+
+	@ParameterizedTest(name = "{0}")
+	@MethodSource("params")
+	void withinAny_withDslConverter_valueConvertNo(DataSet<F> dataSet) {
+		int lowerValueNumber1 = 1;
+		int upperValueNumber1 = docCount( dataSet ) - 3;
+
+		int lowerValueNumber2 = 2;
+		int upperValueNumber2 = docCount( dataSet ) - 2;
+		assertThatQuery( index.query()
+				.where( f -> f.range().field( customDslConverterFieldPath( dataSet ) )
+						.withinAny( List.of(
+								Range.between( value( lowerValueNumber1, dataSet ), value( upperValueNumber1, dataSet ) ),
+								Range.between( value( lowerValueNumber2, dataSet ), value( upperValueNumber2, dataSet ) )
+						), ValueConvert.NO )
+				) )
+				.hasDocRefHitsAnyOrder( docIdRange( lowerValueNumber1, upperValueNumber2, dataSet ) );
 	}
 
 	private String defaultDslConverterFieldPath(DataSet<F> dataSet) {

@@ -234,7 +234,7 @@ public class StubSearchPredicate implements SearchPredicate {
 		}
 
 		@Override
-		public void range(Range<?> range, ValueConvert convertLowerBound, ValueConvert convertUpperBound) {
+		public void within(Range<?> range, ValueConvert convertLowerBound, ValueConvert convertUpperBound) {
 			// No-op
 		}
 
