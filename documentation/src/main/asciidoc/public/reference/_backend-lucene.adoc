@@ -670,8 +670,10 @@ you can call `context.availableTokenizers()`, `context.availableTokenizers()`
 and `context.availableTokenFilters()` on the context passed to your analysis configurer;
 this will return a set of all valid names.
 
-To know more about the behavior of these character filters, tokenizers and token filters,
-either browse the link:{luceneJavadocUrl}[Lucene Javadoc] or read the corresponding section on the
+To learn more about the behavior of these character filters, tokenizers and token filters,
+either browse the link:{luceneJavadocUrl}[Lucene Javadoc],
+in particular, look through various packages of link:{luceneAnalysisCommonJavadocUrl}[common analysis components],
+or read the corresponding section on the
 link:http://wiki.apache.org/solr/AnalyzersTokenizersTokenFilters[Solr Wiki]
 (you don't need Solr to use these analyzers,
 it's just that there is no documentation page for Lucene proper).
@@ -702,7 +704,9 @@ include::{sourcedir}/org/hibernate/search/documentation/analysis/LuceneClassesAn
 ====
 
 To know which character filters, tokenizers and token filters are available,
-either browse the link:{luceneJavadocUrl}[Lucene Javadoc] or read the corresponding section on the
+either browse the link:{luceneJavadocUrl}[Lucene Javadoc],
+in particular, look through various packages of link:{luceneAnalysisCommonJavadocUrl}[common analysis components],
+or read the corresponding section on the
 link:http://wiki.apache.org/solr/AnalyzersTokenizersTokenFilters[Solr Wiki]
 (you don't need Solr to use these analyzers,
 it's just that there is no documentation page for Lucene proper).

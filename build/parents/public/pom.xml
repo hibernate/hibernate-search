@@ -94,7 +94,7 @@
                                 <location>${javadoc.packagelists.directory}/lucene-core</location>
                             </offlineLink>
                             <offlineLink>
-                                <url>${javadoc.org.apache.lucene.analyzers-common.url}</url>
+                                <url>${javadoc.org.apache.lucene.analysis.common.url}</url>
                                 <location>${javadoc.packagelists.directory}/lucene-analyzers-common</location>
                             </offlineLink>
                             <offlineLink>

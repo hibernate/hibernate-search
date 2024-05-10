@@ -309,6 +309,8 @@
                         <luceneVersion>${version.org.apache.lucene}</luceneVersion>
                         <luceneUrl>https://lucene.apache.org</luceneUrl>
                         <luceneJavadocUrl>${javadoc.org.apache.lucene.core.url}</luceneJavadocUrl>
+                        <luceneAnalysisCommonJavadocUrl>${javadoc.org.apache.lucene.analysis.common.url}</luceneAnalysisCommonJavadocUrl>
+                        <luceneQueryparserJavadocUrl>${javadoc.org.apache.lucene.queryparser.url}</luceneQueryparserJavadocUrl>
                         <elasticsearchUrl>https://www.elastic.co/elasticsearch</elasticsearchUrl>
                         <elasticsearchDocUrl>${documentation.org.elasticsearch.url}</elasticsearchDocUrl>
                         <elasticsearchClientVersions>${version.org.elasticsearch.client}</elasticsearchClientVersions>
