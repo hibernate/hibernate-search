@@ -28,4 +28,7 @@ public interface IndexReaderProvider {
 	 */
 	DirectoryReader getOrCreate() throws IOException;
 
+	default DirectoryReader getCurrentForTests() throws IOException {
+		return getOrCreate();
+	}
 }

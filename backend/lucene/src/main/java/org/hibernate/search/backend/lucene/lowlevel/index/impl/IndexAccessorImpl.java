@@ -23,6 +23,7 @@ import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 import org.hibernate.search.util.common.reporting.EventContext;
 
 import org.apache.lucene.index.DirectoryReader;
+import org.apache.lucene.index.IndexReader;
 import org.apache.lucene.index.IndexWriter;
 import org.apache.lucene.index.IndexWriterConfig;
 import org.apache.lucene.store.Directory;
@@ -214,6 +215,10 @@ public class IndexAccessorImpl implements AutoCloseable, IndexAccessor {
 
 	public IndexWriter getWriterForTests() throws IOException {
 		return indexWriterProvider.getOrCreate().getDelegateForTests();
+	}
+
+	public IndexReader getCurrentReaderForTests() throws IOException {
+		return indexReaderProvider.getCurrentForTests();
 	}
 
 	private void initializeDirectory(Directory directory) throws IOException {
