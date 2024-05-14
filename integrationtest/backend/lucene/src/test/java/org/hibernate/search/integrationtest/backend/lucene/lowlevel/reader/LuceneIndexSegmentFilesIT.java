@@ -14,9 +14,12 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
+import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
 import org.hibernate.search.backend.lucene.LuceneExtension;
+import org.hibernate.search.backend.lucene.index.impl.LuceneIndexManagerImpl;
+import org.hibernate.search.backend.lucene.index.impl.Shard;
 import org.hibernate.search.engine.backend.common.DocumentReference;
 import org.hibernate.search.engine.backend.document.IndexFieldReference;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaElement;
@@ -108,6 +111,41 @@ class LuceneIndexSegmentFilesIT {
 		} );
 	}
 
+	@Test
+	void noReaderMerge() throws Exception {
+		noReader( workspace -> workspace.mergeSegments( OperationSubmitter.blocking(), UnsupportedOperationBehavior.FAIL )
+				.join() );
+	}
+
+	@Test
+	void noReaderRefresh() throws Exception {
+		noReader( workspace -> workspace.refresh( OperationSubmitter.blocking(), UnsupportedOperationBehavior.FAIL ).join() );
+	}
+
+	void noReader(Consumer<IndexWorkspace> operation) throws Exception {
+		basicTestSteps( () -> {
+			LuceneIndexManagerImpl luceneIndexManager = index.unwrapForTests( LuceneIndexManagerImpl.class );
+			assertThat( luceneIndexManager.getShardsForTests() ).hasSize( 1 );
+			Shard shard = luceneIndexManager.getShardsForTests().get( 0 );
+
+			IndexReader indexReaderBefore = shard.indexAccessorForTests().getCurrentReaderForTests();
+			assertThat( indexReaderBefore ).isNotNull();
+			assertThat( indexReaderBefore.getRefCount() ).isPositive();
+			IndexWorkspace workspace = index.createWorkspace();
+			operation.accept( workspace );
+			// reader has no references, closed essentially:
+			assertThat( indexReaderBefore.getRefCount() ).isZero();
+
+			assertThat( shard.indexAccessorForTests().getCurrentReaderForTests() ).isNull();
+			assertThat( index.query().select().where( f -> f.matchAll() ).fetchTotalHitCount() ).isPositive();
+
+			assertThat( shard.indexAccessorForTests().getCurrentReaderForTests() ).isNotNull().isNotSameAs( indexReaderBefore );
+			// reader still has no references, closed essentially
+			// (we've checked it before so the count couldn't be inc-ed anyway but ... let's double-check):
+			assertThat( indexReaderBefore.getRefCount() ).isZero();
+		} );
+
+	}
 
 	private void basicTestSteps(ThrowingRunnable action) throws Exception {
 

@@ -71,6 +71,11 @@ public class NearRealTimeIndexReaderProvider implements IndexReaderProvider {
 		return getFreshIndexReader().reader;
 	}
 
+	@Override
+	public synchronized DirectoryReader getCurrentForTests() throws IOException {
+		return currentReaderEntry == null ? null : currentReaderEntry.reader;
+	}
+
 	private synchronized IndexReaderEntry getFreshIndexReader() throws IOException {
 		IndexReaderEntry oldEntry = currentReaderEntry;
 		IndexReaderEntry freshEntry;
