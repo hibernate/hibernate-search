@@ -30,11 +30,6 @@ public class NotSharedIndexReaderProvider implements IndexReaderProvider {
 	}
 
 	@Override
-	public void refresh() {
-		// Nothing to do
-	}
-
-	@Override
 	public DirectoryReader getOrCreate() throws IOException {
 		return DirectoryReader.open( directoryHolder.get() );
 	}

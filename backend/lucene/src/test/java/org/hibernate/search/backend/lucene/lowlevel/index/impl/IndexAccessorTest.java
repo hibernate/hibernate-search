@@ -8,6 +8,7 @@ package org.hibernate.search.backend.lucene.lowlevel.index.impl;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
@@ -132,21 +133,23 @@ class IndexAccessorTest {
 	}
 
 	@Test
-	void refresh() {
+	void refresh() throws IOException {
 		accessor.refresh();
 
-		verify( indexReaderProviderMock ).refresh();
+		verify( indexReaderProviderMock ).clear();
 		verifyNoOtherIndexInteractions();
 	}
 
 	@Test
-	void refresh_runtimeException() {
+	void refresh_runtimeException() throws IOException {
 		RuntimeException exception = new RuntimeException( "Some message" );
 
-		doThrow( exception ).when( indexReaderProviderMock ).refresh();
+		doThrow( exception ).when( indexReaderProviderMock ).clear();
 
 		assertThatThrownBy( () -> accessor.refresh() )
 				.isSameAs( exception );
+		doNothing().when( indexReaderProviderMock ).clear();
+
 		verifyNoOtherIndexInteractions();
 	}
 
@@ -157,6 +160,7 @@ class IndexAccessorTest {
 		accessor.mergeSegments();
 
 		verify( indexWriterDelegatorMock ).mergeSegments();
+		verify( indexReaderProviderMock ).clear();
 		verifyNoOtherIndexInteractions();
 	}
 

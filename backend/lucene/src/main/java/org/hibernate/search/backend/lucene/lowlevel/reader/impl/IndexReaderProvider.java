@@ -15,15 +15,10 @@ public interface IndexReaderProvider {
 	/**
 	 * Closes and drops any cached resources (index readers in particular).
 	 * <p>
-	 * Should be used when stopping the index or to clean up upon error.
+	 * Should be used when stopping the index, to clean up upon error,
+	 * or simply to force the creation of a new reader (refresh) on the next call to {@link #getOrCreate()}.
 	 */
 	void clear() throws IOException;
-
-	/**
-	 * Make sure the index reader returned by the next call to {@link #getOrCreate()}
-	 * will return an up-to-date view of the index.
-	 */
-	void refresh();
 
 	/**
 	 * @return A ready-to-use index reader, with its reference count already increased.
