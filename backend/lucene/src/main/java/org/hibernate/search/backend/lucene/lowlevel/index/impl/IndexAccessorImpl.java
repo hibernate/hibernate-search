@@ -142,7 +142,12 @@ public class IndexAccessorImpl implements AutoCloseable, IndexAccessor {
 
 	@Override
 	public void refresh() {
-		indexReaderProvider.refresh();
+		try {
+			indexReaderProvider.clear();
+		}
+		catch (IOException e) {
+			throw log.unableToRefresh( e.getMessage(), eventContext, e );
+		}
 	}
 
 	@Override

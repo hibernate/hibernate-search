@@ -757,4 +757,8 @@ public interface Log extends BasicLogger {
 	@Message(id = ID_OFFSET + 186, value = "A single-valued highlight projection requested, "
 			+ "but the corresponding highlighter does not set number of fragments to 1.")
 	SearchException highlighterIncompatibleCardinality();
+
+	@Message(id = ID_OFFSET + 187,
+			value = "Unable to refresh an index reader: %1$s")
+	SearchException unableToRefresh(String causeMessage, @Param EventContext context, @Cause Exception cause);
 }
