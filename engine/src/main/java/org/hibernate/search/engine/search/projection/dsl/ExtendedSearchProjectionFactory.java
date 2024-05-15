@@ -24,7 +24,7 @@ public interface ExtendedSearchProjectionFactory<SR, S extends ExtendedSearchPro
 
 
 	@Override
-	default S withRoot(ObjectFieldReference<SR> objectFieldReference) {
+	default S withRoot(ObjectFieldReference<? super SR> objectFieldReference) {
 		return withRoot( objectFieldReference.absolutePath() );
 	}
 }

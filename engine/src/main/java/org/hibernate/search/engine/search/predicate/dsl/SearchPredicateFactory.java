@@ -11,6 +11,7 @@ import org.hibernate.search.engine.backend.types.ObjectStructure;
 import org.hibernate.search.engine.search.common.BooleanOperator;
 import org.hibernate.search.engine.search.common.NamedValues;
 import org.hibernate.search.engine.search.predicate.SearchPredicate;
+import org.hibernate.search.engine.search.reference.object.ObjectFieldReference;
 import org.hibernate.search.engine.search.reference.predicate.NestedPredicateFieldReference;
 import org.hibernate.search.util.common.SearchException;
 import org.hibernate.search.util.common.annotation.Incubating;
@@ -254,7 +255,7 @@ public interface SearchPredicateFactory<SR> {
 	 * @return The initial step of a DSL where the "nested" predicate can be defined.
 	 * @see NestedPredicateFieldStep
 	 */
-	default NestedPredicateClausesStep<SR, ?> nested(NestedPredicateFieldReference<SR> field) {
+	default NestedPredicateClausesStep<SR, ?> nested(NestedPredicateFieldReference<? super SR> field) {
 		return nested( field.absolutePath() );
 	}
 
@@ -374,6 +375,21 @@ public interface SearchPredicateFactory<SR> {
 	 */
 	@Incubating
 	SearchPredicateFactory<SR> withRoot(String objectFieldPath);
+
+	/**
+	 * Create a new predicate factory whose root for all paths passed to the DSL
+	 * will be the given object field.
+	 * <p>
+	 * This is used to call reusable methods that apply the same predicate
+	 * on different object fields that have same structure (same sub-fields).
+	 *
+	 * @param objectFieldReference The reference representing the path from the current root to an object field that will become the new root.
+	 * @return A new predicate factory using the given object field as root.
+	 */
+	@Incubating
+	default SearchPredicateFactory<SR> withRoot(ObjectFieldReference<? super SR> objectFieldReference) {
+		return withRoot( objectFieldReference.absolutePath() );
+	}
 
 	/**
 	 * @param relativeFieldPath The path to a field, relative to the {@link #withRoot(String) root} of this factory.
