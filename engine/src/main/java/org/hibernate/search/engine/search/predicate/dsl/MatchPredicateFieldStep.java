@@ -59,8 +59,8 @@ public interface MatchPredicateFieldStep<SR, N extends MatchPredicateFieldMoreSt
 	 * @return The next step.
 	 */
 	@SuppressWarnings("unchecked")
-	default <T> MatchPredicateFieldMoreGenericStep<?, ?, T, MatchPredicateFieldReference<SR, T>> field(
-			MatchPredicateFieldReference<SR, T> fieldReference) {
+	default <T> MatchPredicateFieldMoreGenericStep<?, ?, T, MatchPredicateFieldReference<? super SR, T>> field(
+			MatchPredicateFieldReference<? super SR, T> fieldReference) {
 		return fields( fieldReference );
 	}
 
@@ -80,6 +80,6 @@ public interface MatchPredicateFieldStep<SR, N extends MatchPredicateFieldMoreSt
 	 * @see #field(MatchPredicateFieldReference)
 	 */
 	@SuppressWarnings("unchecked")
-	<T> MatchPredicateFieldMoreGenericStep<?, ?, T, MatchPredicateFieldReference<SR, T>> fields(
-			MatchPredicateFieldReference<SR, T>... fieldReferences);
+	<T> MatchPredicateFieldMoreGenericStep<?, ?, T, MatchPredicateFieldReference<? super SR, T>> fields(
+			MatchPredicateFieldReference<? super SR, T>... fieldReferences);
 }

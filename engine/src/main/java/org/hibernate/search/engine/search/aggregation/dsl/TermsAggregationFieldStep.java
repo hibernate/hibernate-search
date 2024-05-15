@@ -9,6 +9,7 @@ import java.util.function.Function;
 
 import org.hibernate.search.engine.search.common.ValueModel;
 import org.hibernate.search.engine.search.predicate.dsl.SearchPredicateFactory;
+import org.hibernate.search.engine.search.reference.aggregation.TermsAggregationFieldReference;
 
 /**
  * The initial step in a "terms" aggregation definition, where the target field can be set.
@@ -60,5 +61,17 @@ public interface TermsAggregationFieldStep<SR, PDF extends SearchPredicateFactor
 	 */
 	<F> TermsAggregationOptionsStep<SR, ?, PDF, F, Map<F, Long>> field(String fieldPath, Class<F> type,
 			ValueModel valueModel);
+
+	/**
+	 * Target the given field in the terms aggregation.
+	 *
+	 * @param fieldReference The field reference representing a <a href="SearchAggregationFactory.html#field-paths">path</a> to the index field to aggregate.
+	 * @param <F> The type of field values.
+	 * @return The next step.
+	 */
+	default <F> TermsAggregationOptionsStep<SR, ?, PDF, F, Map<F, Long>> field(
+			TermsAggregationFieldReference<? super SR, F> fieldReference) {
+		return field( fieldReference.absolutePath(), fieldReference.aggregationType(), fieldReference.valueModel() );
+	}
 
 }

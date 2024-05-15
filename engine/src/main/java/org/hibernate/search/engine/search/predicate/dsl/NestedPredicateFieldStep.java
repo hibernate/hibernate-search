@@ -36,7 +36,7 @@ public interface NestedPredicateFieldStep<SR, N extends NestedPredicateNestStep<
 	 * to apply the predicate on.
 	 * @return The next step.
 	 */
-	default N objectField(NestedPredicateFieldReference<SR> field) {
+	default N objectField(NestedPredicateFieldReference<? super SR> field) {
 		return objectField( field.absolutePath() );
 	}
 

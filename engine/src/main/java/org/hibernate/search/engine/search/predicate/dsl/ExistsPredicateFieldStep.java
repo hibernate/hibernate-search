@@ -31,7 +31,7 @@ public interface ExistsPredicateFieldStep<SR, N extends ExistsPredicateOptionsSt
 	 * @return The next step.
 	 */
 	@Incubating
-	default N field(ExistsPredicateFieldReference<SR> field) {
+	default N field(ExistsPredicateFieldReference<? super SR> field) {
 		return field( field.absolutePath() );
 	}
 

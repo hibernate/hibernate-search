@@ -75,7 +75,7 @@ public interface SearchSortFactory<SR> {
 	 */
 	@Incubating
 	<T> FieldSortOptionsGenericStep<SR, T, ?, ?, ? extends SearchPredicateFactory<SR>> field(
-			FieldSortFieldReference<SR, T> fieldReference);
+			FieldSortFieldReference<? super SR, T> fieldReference);
 
 	/**
 	 * Order elements by the distance from the location stored in the specified field to the location specified.
@@ -103,7 +103,7 @@ public interface SearchSortFactory<SR> {
 	 */
 	@Incubating
 	default DistanceSortOptionsStep<SR, ?, ? extends SearchPredicateFactory<SR>> distance(
-			FieldSortFieldReference<SR, ?> fieldReference, GeoPoint location) {
+			FieldSortFieldReference<? super SR, ?> fieldReference, GeoPoint location) {
 		return distance( fieldReference.absolutePath(), location );
 	}
 
@@ -138,7 +138,7 @@ public interface SearchSortFactory<SR> {
 	 */
 	@Incubating
 	default DistanceSortOptionsStep<SR, ?, ? extends SearchPredicateFactory<SR>> distance(
-			FieldSortFieldReference<SR, ?> fieldReference, double latitude,
+			FieldSortFieldReference<? super SR, ?> fieldReference, double latitude,
 			double longitude) {
 		return distance( fieldReference, GeoPoint.of( latitude, longitude ) );
 	}
@@ -235,7 +235,7 @@ public interface SearchSortFactory<SR> {
 	 * @return A new sort factory using the given object field as root.
 	 */
 	@Incubating
-	default SearchSortFactory<SR> withRoot(ObjectFieldReference<SR> objectFieldReference) {
+	default SearchSortFactory<SR> withRoot(ObjectFieldReference<? super SR> objectFieldReference) {
 		return withRoot( objectFieldReference.absolutePath() );
 	}
 

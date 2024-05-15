@@ -205,7 +205,7 @@ public interface SearchProjectionFactory<SR, R, E> {
 	 * @return A DSL step where the "field" projection can be defined in more details.
 	 */
 	@Incubating
-	default <T> FieldProjectionValueStep<?, T> field(FieldProjectionFieldReference<SR, T> fieldReference) {
+	default <T> FieldProjectionValueStep<?, T> field(FieldProjectionFieldReference<? super SR, T> fieldReference) {
 		return field( fieldReference.absolutePath(), fieldReference.projectionType(), fieldReference.valueModel() );
 	}
 
@@ -235,7 +235,8 @@ public interface SearchProjectionFactory<SR, R, E> {
 	 * @return A DSL step where the "distance" projection can be defined in more details.
 	 */
 	@Incubating
-	default DistanceToFieldProjectionValueStep<?, Double> distance(DistanceProjectionFieldReference<SR, ?> fieldReference,
+	default DistanceToFieldProjectionValueStep<?, Double> distance(
+			DistanceProjectionFieldReference<? super SR, ?> fieldReference,
 			GeoPoint center) {
 		return distance( fieldReference.absolutePath(), center );
 	}
@@ -273,7 +274,7 @@ public interface SearchProjectionFactory<SR, R, E> {
 	 * @return A DSL step where the "composite" projection can be defined in more details.
 	 */
 	@Incubating
-	default CompositeProjectionInnerStep object(ObjectFieldReference<SR> objectFieldReference) {
+	default CompositeProjectionInnerStep object(ObjectFieldReference<? super SR> objectFieldReference) {
 		return object( objectFieldReference.absolutePath() );
 	}
 
@@ -532,7 +533,7 @@ public interface SearchProjectionFactory<SR, R, E> {
 	 * @return A new projection factory using the given object field as root.
 	 */
 	@Incubating
-	default SearchProjectionFactory<SR, R, E> withRoot(ObjectFieldReference<SR> objectFieldReference) {
+	default SearchProjectionFactory<SR, R, E> withRoot(ObjectFieldReference<? super SR> objectFieldReference) {
 		return withRoot( objectFieldReference.absolutePath() );
 	}
 
@@ -560,7 +561,7 @@ public interface SearchProjectionFactory<SR, R, E> {
 	 * @return A DSL step where the "highlight" projection can be defined in more details.
 	 */
 	@Incubating
-	default HighlightProjectionOptionsStep highlight(HighlightProjectionFieldReference<SR> fieldReference) {
+	default HighlightProjectionOptionsStep highlight(HighlightProjectionFieldReference<? super SR> fieldReference) {
 		return highlight( fieldReference.absolutePath() );
 	}
 }

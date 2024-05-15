@@ -65,6 +65,13 @@ class FieldReferenceIT {
 							.fetchHits( 20 )
 			).containsOnly( "c" );
 
+			assertThat(
+					searchSession.search( EntityC_.scope )
+							.select( f -> f.field( EntityC_.stringA ) )
+							.where( f -> f.match().field( EntityC_.stringA ).matching( "c" ) )
+							.fetchHits( 20 )
+			).containsOnly( "c" );
+
 			SearchScope<EntityB_union_EntityC_, EntityB> scope = EntityB_union_EntityC_.scope.create( searchSession );
 
 			SearchPredicate searchPredicate =
@@ -198,30 +205,24 @@ class FieldReferenceIT {
 		}
 	}
 
-	public static class EntityB_ {
-		public static ValueFieldReference1<EntityB_, String, String, String> stringA;
+	public static class EntityB_ extends EntityA_ {
 		public static ValueFieldReference1<EntityB_, String, String, String> stringB;
 
 		public static RootReferenceScope<EntityB_, EntityB> scope;
 
 		static {
-			stringA = ValueFieldReference1.of( "stringA", EntityB_.class, String.class, String.class, String.class );
 			stringB = ValueFieldReference1.of( "stringB", EntityB_.class, String.class, String.class, String.class );
 
 			scope = RootReferenceScopeImpl.of( EntityB_.class, EntityB.class );
 		}
 	}
 
-	public static class EntityC_ {
-		public static ValueFieldReference1<EntityC_, String, String, String> stringA;
-		public static ValueFieldReference1<EntityC_, String, String, String> stringB;
+	public static class EntityC_ extends EntityB_ {
 		public static ValueFieldReference1<EntityC_, String, String, String> stringC;
 
 		public static RootReferenceScope<EntityC_, EntityC> scope;
 
 		static {
-			stringA = ValueFieldReference1.of( "stringA", EntityC_.class, String.class, String.class, String.class );
-			stringB = ValueFieldReference1.of( "stringB", EntityC_.class, String.class, String.class, String.class );
 			stringC = ValueFieldReference1.of( "stringC", EntityC_.class, String.class, String.class, String.class );
 
 			scope = RootReferenceScopeImpl.of( EntityC_.class, EntityC.class );
