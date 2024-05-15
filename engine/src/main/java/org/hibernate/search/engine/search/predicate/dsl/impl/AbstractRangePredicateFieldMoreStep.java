@@ -52,10 +52,11 @@ abstract class AbstractRangePredicateFieldMoreStep<
 	}
 
 	public static <SR, T> RangePredicateFieldMoreStepReference<SR, T> create(
-			SearchPredicateDslContext<?> dslContext, RangePredicateFieldReference<SR, T>[] fields) {
+			SearchPredicateDslContext<?> dslContext, RangePredicateFieldReference<? super SR, T>[] fields) {
+		List<RangePredicateFieldReference<? super SR, T>> fieldsList = Arrays.asList( fields );
 		return new RangePredicateFieldMoreStepReference<>(
 				dslContext,
-				Arrays.asList( fields )
+				fieldsList
 		);
 	}
 
@@ -156,26 +157,26 @@ abstract class AbstractRangePredicateFieldMoreStep<
 					RangePredicateFieldMoreStepReference.CommonState<SR, T>,
 					RangePredicateFieldMoreStepReference<SR, T>,
 					T,
-					RangePredicateFieldReference<SR, T>>
+					RangePredicateFieldReference<? super SR, T>>
 			implements
 			RangePredicateFieldMoreGenericStep<SR,
 					RangePredicateFieldMoreStepReference<SR, T>,
 					RangePredicateFieldMoreStepReference.CommonState<SR, T>,
-					RangePredicateFieldReference<SR, T>,
+					RangePredicateFieldReference<? super SR, T>,
 					T> {
 
 		private RangePredicateFieldMoreStepReference(SearchPredicateDslContext<?> dslContext,
-				List<RangePredicateFieldReference<SR, T>> fields) {
+				List<RangePredicateFieldReference<? super SR, T>> fields) {
 			this( new CommonState<>( dslContext ), fields );
 		}
 
 		private RangePredicateFieldMoreStepReference(CommonState<SR, T> commonState,
-				List<RangePredicateFieldReference<SR, T>> fields) {
+				List<RangePredicateFieldReference<? super SR, T>> fields) {
 			super( commonState, fields );
 		}
 
 		@Override
-		protected String fieldPath(RangePredicateFieldReference<SR, T> field) {
+		protected String fieldPath(RangePredicateFieldReference<? super SR, T> field) {
 			return field.absolutePath();
 		}
 
@@ -185,13 +186,13 @@ abstract class AbstractRangePredicateFieldMoreStep<
 		}
 
 		@Override
-		public RangePredicateFieldMoreStepReference<SR, T> field(RangePredicateFieldReference<SR, T> field) {
+		public RangePredicateFieldMoreStepReference<SR, T> field(RangePredicateFieldReference<? super SR, T> field) {
 			return new RangePredicateFieldMoreStepReference<>( commonState, List.of( field ) );
 		}
 
 		@Override
 		@SuppressWarnings("unchecked")
-		public RangePredicateFieldMoreStepReference<SR, T> fields(RangePredicateFieldReference<SR, T>... fields) {
+		public RangePredicateFieldMoreStepReference<SR, T> fields(RangePredicateFieldReference<? super SR, T>... fields) {
 			return new RangePredicateFieldMoreStepReference<>( commonState, Arrays.asList( fields ) );
 		}
 
@@ -208,13 +209,16 @@ abstract class AbstractRangePredicateFieldMoreStep<
 
 		public static class CommonState<SR, T>
 				extends
-				GenericCommonState<SR, T, RangePredicateFieldReference<SR, T>, RangePredicateFieldMoreStepReference<SR, T>> {
+				GenericCommonState<SR,
+						T,
+						RangePredicateFieldReference<? super SR, T>,
+						RangePredicateFieldMoreStepReference<SR, T>> {
 			CommonState(SearchPredicateDslContext<?> dslContext) {
 				super( dslContext );
 			}
 
 			@Override
-			protected String fieldPath(RangePredicateFieldReference<SR, T> field) {
+			protected String fieldPath(RangePredicateFieldReference<? super SR, T> field) {
 				return field.absolutePath();
 			}
 		}

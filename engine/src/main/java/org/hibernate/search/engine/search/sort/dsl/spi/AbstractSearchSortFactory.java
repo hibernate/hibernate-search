@@ -62,7 +62,7 @@ public abstract class AbstractSearchSortFactory<
 
 	@Override
 	public <T> FieldSortOptionsGenericStep<SR, T, ?, ?, ? extends SearchPredicateFactory<SR>> field(
-			FieldSortFieldReference<SR, T> fieldReference) {
+			FieldSortFieldReference<? super SR, T> fieldReference) {
 		return new FieldSortOptionsGenericStepImpl<>( dslContext, fieldReference );
 	}
 

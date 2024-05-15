@@ -20,5 +20,5 @@ public interface KnnPredicateFieldStep<SR> {
 	 */
 	KnnPredicateVectorStep<SR> field(String fieldPath);
 
-	<T> KnnPredicateVectorGenericStep<SR, T> field(KnnPredicateFieldReference<SR, T> field);
+	<T> KnnPredicateVectorGenericStep<SR, T> field(KnnPredicateFieldReference<? super SR, T> field);
 }
