@@ -7,6 +7,7 @@ package org.hibernate.search.engine.search.aggregation.dsl;
 import java.util.function.Function;
 
 import org.hibernate.search.engine.search.common.NamedValues;
+import org.hibernate.search.engine.search.reference.object.ObjectFieldReference;
 import org.hibernate.search.util.common.SearchException;
 import org.hibernate.search.util.common.annotation.Incubating;
 
@@ -145,6 +146,20 @@ public interface SearchAggregationFactory<SR> {
 	 */
 	@Incubating
 	SearchAggregationFactory<SR> withRoot(String objectFieldPath);
+
+	/**
+	 * Create a new aggregation factory whose root for all paths passed to the DSL
+	 * will be the given object field.
+	 * <p>
+	 * See <a href="#field-paths">here</a> for more information.
+	 *
+	 * @param objectFieldReference The reference representing the path from the current root to an object field that will become the new root.
+	 * @return A new aggregation factory using the given object field as root.
+	 */
+	@Incubating
+	default SearchAggregationFactory<SR> withRoot(ObjectFieldReference<? super SR> objectFieldReference) {
+		return withRoot( objectFieldReference.absolutePath() );
+	}
 
 	/**
 	 * @param relativeFieldPath The path to a field, relative to the {@link #withRoot(String) root} of this factory.

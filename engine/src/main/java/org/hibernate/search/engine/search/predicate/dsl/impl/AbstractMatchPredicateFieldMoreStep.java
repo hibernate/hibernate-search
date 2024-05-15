@@ -47,11 +47,12 @@ abstract class AbstractMatchPredicateFieldMoreStep<
 		);
 	}
 
-	public static <SR, T> MatchPredicateFieldMoreGenericStep<?, ?, T, MatchPredicateFieldReference<SR, T>> create(
-			SearchPredicateDslContext<?> dslContext, MatchPredicateFieldReference<SR, T>[] fields) {
+	public static <SR, T> MatchPredicateFieldMoreGenericStep<?, ?, T, MatchPredicateFieldReference<? super SR, T>> create(
+			SearchPredicateDslContext<?> dslContext, MatchPredicateFieldReference<? super SR, T>[] fields) {
+		List<MatchPredicateFieldReference<? super SR, T>> fieldList = Arrays.asList( fields );
 		return new MatchPredicateFieldMoreStepFieldReference<>(
 				dslContext,
-				Arrays.asList( fields )
+				fieldList
 		);
 	}
 
@@ -152,31 +153,32 @@ abstract class AbstractMatchPredicateFieldMoreStep<
 			AbstractMatchPredicateFieldMoreStep<MatchPredicateFieldMoreStepFieldReference.CommonState<SR, T>,
 					MatchPredicateFieldMoreStepFieldReference<SR, T>,
 					T,
-					MatchPredicateFieldReference<SR, T>>
+					MatchPredicateFieldReference<? super SR, T>>
 			implements
 			MatchPredicateFieldMoreGenericStep<MatchPredicateFieldMoreStepFieldReference<SR, T>,
 					MatchPredicateFieldMoreStepFieldReference.CommonState<SR, T>,
 					T,
-					MatchPredicateFieldReference<SR, T>> {
+					MatchPredicateFieldReference<? super SR, T>> {
 
 		MatchPredicateFieldMoreStepFieldReference(SearchPredicateDslContext<?> dslContext,
-				List<MatchPredicateFieldReference<SR, T>> fieldPaths) {
+				List<MatchPredicateFieldReference<? super SR, T>> fieldPaths) {
 			super( new CommonState<>( dslContext ), fieldPaths );
 		}
 
 		private MatchPredicateFieldMoreStepFieldReference(CommonState<SR, T> commonState,
-				List<MatchPredicateFieldReference<SR, T>> fieldPaths) {
+				List<MatchPredicateFieldReference<? super SR, T>> fieldPaths) {
 			super( commonState, fieldPaths );
 		}
 
 		@Override
-		public MatchPredicateFieldMoreStepFieldReference<SR, T> field(MatchPredicateFieldReference<SR, T> field) {
+		public MatchPredicateFieldMoreStepFieldReference<SR, T> field(MatchPredicateFieldReference<? super SR, T> field) {
 			return new MatchPredicateFieldMoreStepFieldReference<>( commonState, Collections.singletonList( field ) );
 		}
 
 		@Override
 		@SuppressWarnings("unchecked")
-		public MatchPredicateFieldMoreStepFieldReference<SR, T> fields(MatchPredicateFieldReference<SR, T>... fieldPaths) {
+		public MatchPredicateFieldMoreStepFieldReference<SR, T> fields(
+				MatchPredicateFieldReference<? super SR, T>... fieldPaths) {
 			return new MatchPredicateFieldMoreStepFieldReference<>( commonState, Arrays.asList( fieldPaths ) );
 		}
 
@@ -191,13 +193,15 @@ abstract class AbstractMatchPredicateFieldMoreStep<
 		}
 
 		@Override
-		protected String fieldPath(MatchPredicateFieldReference<SR, T> field) {
+		protected String fieldPath(MatchPredicateFieldReference<? super SR, T> field) {
 			return field.absolutePath();
 		}
 
 		private static class CommonState<SR, T>
 				extends
-				GenericCommonState<T, MatchPredicateFieldReference<SR, T>, MatchPredicateFieldMoreStepFieldReference<SR, T>> {
+				GenericCommonState<T,
+						MatchPredicateFieldReference<? super SR, T>,
+						MatchPredicateFieldMoreStepFieldReference<SR, T>> {
 			CommonState(SearchPredicateDslContext<?> dslContext) {
 				super( dslContext );
 			}
@@ -206,7 +210,7 @@ abstract class AbstractMatchPredicateFieldMoreStep<
 				Contracts.assertNotNull( value, "value" );
 
 				for ( MatchPredicateFieldMoreStepFieldReference<SR, T> fieldSetState : getFieldSetStates() ) {
-					for ( Map.Entry<MatchPredicateFieldReference<SR, T>,
+					for ( Map.Entry<MatchPredicateFieldReference<? super SR, T>,
 							MatchPredicateBuilder> entry : fieldSetState.predicateBuilders
 									.entrySet() ) {
 						entry.getValue().value( value, entry.getKey().valueModel() );
