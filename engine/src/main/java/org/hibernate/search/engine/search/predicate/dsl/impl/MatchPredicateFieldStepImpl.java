@@ -25,8 +25,8 @@ public final class MatchPredicateFieldStepImpl<SR> implements MatchPredicateFiel
 
 	@Override
 	@SuppressWarnings("unchecked")
-	public <T> MatchPredicateFieldMoreGenericStep<?, ?, T, MatchPredicateFieldReference<SR, T>> fields(
-			MatchPredicateFieldReference<SR, T>... fields) {
+	public <T> MatchPredicateFieldMoreGenericStep<?, ?, T, MatchPredicateFieldReference<? super SR, T>> fields(
+			MatchPredicateFieldReference<? super SR, T>... fields) {
 		return AbstractMatchPredicateFieldMoreStep.create( dslContext, fields );
 	}
 }

@@ -73,7 +73,7 @@ public interface PhrasePredicateFieldMoreStep<
 	 */
 	@Incubating
 	@SuppressWarnings("unchecked")
-	default S field(PhrasePredicateFieldReference<SR, ?> field) {
+	default S field(PhrasePredicateFieldReference<? super SR, ?> field) {
 		return fields( field );
 	}
 
@@ -93,7 +93,7 @@ public interface PhrasePredicateFieldMoreStep<
 	 */
 	@Incubating
 	@SuppressWarnings("unchecked")
-	default S fields(PhrasePredicateFieldReference<SR, ?>... fields) {
+	default S fields(PhrasePredicateFieldReference<? super SR, ?>... fields) {
 		String[] paths = new String[fields.length];
 		for ( int i = 0; i < fields.length; i++ ) {
 			paths[i] = fields[i].absolutePath();

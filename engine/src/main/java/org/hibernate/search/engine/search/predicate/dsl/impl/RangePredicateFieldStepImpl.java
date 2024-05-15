@@ -27,8 +27,8 @@ public final class RangePredicateFieldStepImpl<SR>
 
 	@Override
 	@SuppressWarnings("unchecked")
-	public <T> RangePredicateFieldMoreGenericStep<SR, ?, ?, RangePredicateFieldReference<SR, T>, T> fields(
-			RangePredicateFieldReference<SR, T>... fields) {
+	public <T> RangePredicateFieldMoreGenericStep<SR, ?, ?, RangePredicateFieldReference<? super SR, T>, T> fields(
+			RangePredicateFieldReference<? super SR, T>... fields) {
 		return AbstractRangePredicateFieldMoreStep.create( dslContext, fields );
 	}
 
