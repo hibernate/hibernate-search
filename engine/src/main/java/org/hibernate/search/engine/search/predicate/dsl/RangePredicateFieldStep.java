@@ -64,8 +64,8 @@ public interface RangePredicateFieldStep<
 	 * @return The next step.
 	 */
 	@SuppressWarnings("unchecked")
-	default <T> RangePredicateFieldMoreGenericStep<SR, ?, ?, RangePredicateFieldReference<SR, T>, T> field(
-			RangePredicateFieldReference<SR, T> field) {
+	default <T> RangePredicateFieldMoreGenericStep<SR, ?, ?, RangePredicateFieldReference<? super SR, T>, T> field(
+			RangePredicateFieldReference<? super SR, T> field) {
 		return fields( field );
 	}
 
@@ -85,7 +85,7 @@ public interface RangePredicateFieldStep<
 	 * @see #field(RangePredicateFieldReference)
 	 */
 	@SuppressWarnings("unchecked")
-	<T> RangePredicateFieldMoreGenericStep<SR, ?, ?, RangePredicateFieldReference<SR, T>, T> fields(
-			RangePredicateFieldReference<SR, T>... fields);
+	<T> RangePredicateFieldMoreGenericStep<SR, ?, ?, RangePredicateFieldReference<? super SR, T>, T> fields(
+			RangePredicateFieldReference<? super SR, T>... fields);
 
 }
