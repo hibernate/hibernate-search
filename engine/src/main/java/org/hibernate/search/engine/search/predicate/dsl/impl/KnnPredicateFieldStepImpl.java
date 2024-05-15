@@ -43,7 +43,7 @@ public class KnnPredicateFieldStepImpl<SR>
 	}
 
 	@Override
-	public <T> KnnPredicateVectorGenericStep<SR, T> field(KnnPredicateFieldReference<SR, T> field) {
+	public <T> KnnPredicateVectorGenericStep<SR, T> field(KnnPredicateFieldReference<? super SR, T> field) {
 		this.field( field.absolutePath() );
 		return new KnnPredicateVectorGenericStepImpl<>();
 	}
