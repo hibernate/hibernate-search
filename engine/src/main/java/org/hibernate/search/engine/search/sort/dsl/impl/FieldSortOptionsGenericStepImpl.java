@@ -38,7 +38,7 @@ public class FieldSortOptionsGenericStepImpl<SR, T, PDF extends SearchPredicateF
 	private final ValueConvert valueConvert;
 
 	public FieldSortOptionsGenericStepImpl(SearchSortDslContext<SR, ?, ? extends PDF> dslContext,
-			FieldSortFieldReference<SR, ?> fieldReference) {
+			FieldSortFieldReference<? super SR, ?> fieldReference) {
 		super( dslContext );
 		this.dslContext = dslContext;
 		this.builder = dslContext.scope().fieldQueryElement( fieldReference.absolutePath(), SortTypeKeys.FIELD );

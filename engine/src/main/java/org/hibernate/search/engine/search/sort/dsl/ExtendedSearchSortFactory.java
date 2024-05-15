@@ -34,7 +34,7 @@ public interface ExtendedSearchSortFactory<
 	S withRoot(String objectFieldPath);
 
 	@Override
-	default S withRoot(ObjectFieldReference<SR> objectFieldReference) {
+	default S withRoot(ObjectFieldReference<? super SR> objectFieldReference) {
 		return withRoot( objectFieldReference.absolutePath() );
 	}
 
@@ -50,12 +50,13 @@ public interface ExtendedSearchSortFactory<
 	}
 
 	@Override
-	default DistanceSortOptionsStep<SR, ?, PDF> distance(FieldSortFieldReference<SR, ?> fieldReference, GeoPoint location) {
+	default DistanceSortOptionsStep<SR, ?, PDF> distance(FieldSortFieldReference<? super SR, ?> fieldReference,
+			GeoPoint location) {
 		return distance( fieldReference.absolutePath(), location );
 	}
 
 	@Override
-	default DistanceSortOptionsStep<SR, ?, PDF> distance(FieldSortFieldReference<SR, ?> fieldReference, double latitude,
+	default DistanceSortOptionsStep<SR, ?, PDF> distance(FieldSortFieldReference<? super SR, ?> fieldReference, double latitude,
 			double longitude) {
 		return distance( fieldReference, GeoPoint.of( latitude, longitude ) );
 	}
