@@ -17,15 +17,14 @@ import jakarta.persistence.Id;
 import org.hibernate.search.documentation.testsupport.BackendConfigurations;
 import org.hibernate.search.documentation.testsupport.DocumentationSetupHelper;
 import org.hibernate.search.engine.backend.types.Projectable;
-import org.hibernate.search.engine.common.EntityReference;
-import org.hibernate.search.engine.mapper.scope.SearchScopeProvider;
 import org.hibernate.search.engine.search.common.ValueConvert;
 import org.hibernate.search.engine.search.predicate.SearchPredicate;
-import org.hibernate.search.engine.search.reference.RootReferenceScope;
 import org.hibernate.search.engine.search.reference.predicate.MatchPredicateFieldReference;
 import org.hibernate.search.engine.search.reference.projection.FieldProjectionFieldReference;
 import org.hibernate.search.mapper.orm.Search;
+import org.hibernate.search.mapper.orm.scope.HibernateOrmRootReferenceScope;
 import org.hibernate.search.mapper.orm.scope.SearchScope;
+import org.hibernate.search.mapper.orm.scope.SearchScopeProvider;
 import org.hibernate.search.mapper.orm.session.SearchSession;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.FullTextField;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
@@ -196,7 +195,7 @@ class FieldReferenceIT {
 	public static class EntityA_ {
 		public static ValueFieldReference1<EntityA_, String, String, String> stringA;
 
-		public static RootReferenceScope<EntityA_, EntityA> scope;
+		public static HibernateOrmRootReferenceScope<EntityA_, EntityA> scope;
 
 		static {
 			stringA = ValueFieldReference1.of( "stringA", EntityA_.class, String.class, String.class, String.class );
@@ -208,7 +207,7 @@ class FieldReferenceIT {
 	public static class EntityB_ extends EntityA_ {
 		public static ValueFieldReference1<EntityB_, String, String, String> stringB;
 
-		public static RootReferenceScope<EntityB_, EntityB> scope;
+		public static HibernateOrmRootReferenceScope<EntityB_, EntityB> scope;
 
 		static {
 			stringB = ValueFieldReference1.of( "stringB", EntityB_.class, String.class, String.class, String.class );
@@ -220,7 +219,7 @@ class FieldReferenceIT {
 	public static class EntityC_ extends EntityB_ {
 		public static ValueFieldReference1<EntityC_, String, String, String> stringC;
 
-		public static RootReferenceScope<EntityC_, EntityC> scope;
+		public static HibernateOrmRootReferenceScope<EntityC_, EntityC> scope;
 
 		static {
 			stringC = ValueFieldReference1.of( "stringC", EntityC_.class, String.class, String.class, String.class );
@@ -233,7 +232,7 @@ class FieldReferenceIT {
 		public static ValueFieldReference1<EntityB_union_EntityC_, String, String, String> stringA;
 		public static ValueFieldReference1<EntityB_union_EntityC_, String, String, String> stringB;
 
-		public static RootReferenceScope<EntityB_union_EntityC_, EntityB> scope;
+		public static HibernateOrmRootReferenceScope<EntityB_union_EntityC_, EntityB> scope;
 
 		static {
 			stringA = ValueFieldReference1.of( "stringA", EntityB_union_EntityC_.class, String.class, String.class,
@@ -284,7 +283,7 @@ class FieldReferenceIT {
 	public static class Entity2A_union_Entity2B_ {
 		public static ValueFieldReference1<Entity2A_union_Entity2B_, String, String, String> stringA;
 
-		public static RootReferenceScope<Entity2A_union_Entity2B_, Object> scope;
+		public static HibernateOrmRootReferenceScope<Entity2A_union_Entity2B_, Object> scope;
 
 		static {
 			stringA = ValueFieldReference1.of( "stringA", Entity2A_union_Entity2B_.class, String.class, String.class,
@@ -296,7 +295,7 @@ class FieldReferenceIT {
 	public static class Entity2A_ {
 		public static ValueFieldReference1<Entity2A_, String, String, String> stringA;
 
-		public static RootReferenceScope<Entity2A_, Entity2A> scope;
+		public static HibernateOrmRootReferenceScope<Entity2A_, Entity2A> scope;
 
 		static {
 			stringA = ValueFieldReference1.of( "stringA", Entity2A_.class, String.class, String.class, String.class );
@@ -309,7 +308,7 @@ class FieldReferenceIT {
 		public static ValueFieldReference1<Entity2B_, String, String, String> stringA;
 		public static ValueFieldReference1<Entity2B_, String, String, String> stringB;
 
-		public static RootReferenceScope<Entity2B_, Entity2B> scope;
+		public static HibernateOrmRootReferenceScope<Entity2B_, Entity2B> scope;
 
 		static {
 			stringA = ValueFieldReference1.of( "stringA", Entity2B_.class, String.class, String.class, String.class );
@@ -323,7 +322,7 @@ class FieldReferenceIT {
 		public static ValueFieldReference1<Entity2C_, String, String, String> stringA;
 		public static ValueFieldReference1<Entity2C_, String, String, String> stringC;
 
-		public static RootReferenceScope<Entity2C_, Entity2C> scope;
+		public static HibernateOrmRootReferenceScope<Entity2C_, Entity2C> scope;
 
 		static {
 			stringA = ValueFieldReference1.of( "stringA", Entity2C_.class, String.class, String.class, String.class );
@@ -413,12 +412,13 @@ class FieldReferenceIT {
 
 	}
 
-	private static class RootReferenceScopeImpl<SR, E> implements RootReferenceScope<SR, E> {
+	private static class RootReferenceScopeImpl<SR, E> implements HibernateOrmRootReferenceScope<SR, E> {
 
 		private final Class<SR> rootReferenceType;
 		private final Class<? extends E>[] entityClass;
 
-		static <SR, E> RootReferenceScope<SR, E> of(Class<SR> rootReferenceType, Class<? extends E>... entityClass) {
+		static <SR, E> HibernateOrmRootReferenceScope<SR, E> of(Class<SR> rootReferenceType,
+				Class<? extends E>... entityClass) {
 			return new RootReferenceScopeImpl<>( rootReferenceType, entityClass );
 		}
 
@@ -433,11 +433,8 @@ class FieldReferenceIT {
 		}
 
 		@Override
-		public <
-				ER extends EntityReference,
-				S extends org.hibernate.search.engine.mapper.scope.SearchScope<SR, E, ER>,
-				P extends SearchScopeProvider<ER>> S create(P scopeProvider) {
-			return (S) scopeProvider.scope( Arrays.asList( entityClass ) );
+		public SearchScope<SR, E> create(SearchScopeProvider scopeProvider) {
+			return scopeProvider.scope( Arrays.asList( entityClass ) );
 		}
 	}
 

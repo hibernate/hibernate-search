@@ -7,7 +7,6 @@ package org.hibernate.search.mapper.pojo.standalone.scope;
 import java.util.Collection;
 import java.util.Collections;
 
-import org.hibernate.search.engine.common.EntityReference;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.SearchEntity;
 import org.hibernate.search.util.common.annotation.Incubating;
 
@@ -18,7 +17,7 @@ import org.hibernate.search.util.common.annotation.Incubating;
  * @see org.hibernate.search.mapper.pojo.standalone.session.SearchSession
  */
 @Incubating
-public interface SearchScopeProvider extends org.hibernate.search.engine.mapper.scope.SearchScopeProvider<EntityReference> {
+public interface SearchScopeProvider {
 
 	/**
 	 * Creates a {@link SearchScope} limited to
