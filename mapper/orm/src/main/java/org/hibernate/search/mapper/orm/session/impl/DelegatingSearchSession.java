@@ -12,10 +12,10 @@ import jakarta.persistence.EntityManager;
 import org.hibernate.Session;
 import org.hibernate.engine.spi.SessionImplementor;
 import org.hibernate.search.engine.search.query.dsl.SearchQuerySelectStep;
-import org.hibernate.search.engine.search.reference.RootReferenceScope;
 import org.hibernate.search.mapper.orm.common.impl.HibernateOrmUtils;
 import org.hibernate.search.mapper.orm.massindexing.MassIndexer;
 import org.hibernate.search.mapper.orm.schema.management.SearchSchemaManager;
+import org.hibernate.search.mapper.orm.scope.HibernateOrmRootReferenceScope;
 import org.hibernate.search.mapper.orm.scope.SearchScope;
 import org.hibernate.search.mapper.orm.search.loading.dsl.SearchLoadingOptionsStep;
 import org.hibernate.search.mapper.orm.session.SearchSession;
@@ -77,7 +77,7 @@ public class DelegatingSearchSession implements SearchSession {
 					SearchLoadingOptionsStep,
 					?,
 					?> search(
-							RootReferenceScope<SR, T> scope) {
+							HibernateOrmRootReferenceScope<SR, T> scope) {
 		return getDelegate().search( scope );
 	}
 
