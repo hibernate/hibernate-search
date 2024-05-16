@@ -14,10 +14,10 @@ import jakarta.persistence.EntityManager;
 
 import org.hibernate.Session;
 import org.hibernate.search.engine.search.query.dsl.SearchQuerySelectStep;
-import org.hibernate.search.engine.search.reference.RootReferenceScope;
 import org.hibernate.search.mapper.orm.mapping.SearchMapping;
 import org.hibernate.search.mapper.orm.massindexing.MassIndexer;
 import org.hibernate.search.mapper.orm.schema.management.SearchSchemaManager;
+import org.hibernate.search.mapper.orm.scope.HibernateOrmRootReferenceScope;
 import org.hibernate.search.mapper.orm.scope.SearchScope;
 import org.hibernate.search.mapper.orm.scope.SearchScopeProvider;
 import org.hibernate.search.mapper.orm.search.loading.dsl.SearchLoadingOptionsStep;
@@ -115,7 +115,7 @@ public interface SearchSession extends SearchScopeProvider {
 			T,
 			SearchLoadingOptionsStep,
 			?,
-			?> search(RootReferenceScope<SR, T> scope);
+			?> search(HibernateOrmRootReferenceScope<SR, T> scope);
 
 	/**
 	 * Create a {@link SearchSchemaManager} for all indexes.
