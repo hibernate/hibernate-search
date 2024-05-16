@@ -4,6 +4,8 @@
  */
 package org.hibernate.search.util.impl.integrationtest.backend.lucene.query;
 
+import java.io.IOException;
+
 import org.apache.lucene.index.LeafReaderContext;
 import org.apache.lucene.search.ConstantScoreScorer;
 import org.apache.lucene.search.ConstantScoreWeight;
@@ -14,6 +16,7 @@ import org.apache.lucene.search.Query;
 import org.apache.lucene.search.QueryVisitor;
 import org.apache.lucene.search.ScoreMode;
 import org.apache.lucene.search.Scorer;
+import org.apache.lucene.search.ScorerSupplier;
 import org.apache.lucene.search.Weight;
 
 /**
@@ -53,11 +56,21 @@ public class SlowQuery extends Query {
 			}
 
 			@Override
-			public Scorer scorer(LeafReaderContext context) {
-				return new ConstantScoreScorer(
-						this, score(), scoreMode,
-						new SlowDocIdSetIterator( DocIdSetIterator.all( context.reader().maxDoc() ) )
-				);
+			public ScorerSupplier scorerSupplier(LeafReaderContext context) {
+				Weight weight = this;
+				float score = score();
+				SlowDocIdSetIterator iterator = new SlowDocIdSetIterator( DocIdSetIterator.all( context.reader().maxDoc() ) );
+				return new ScorerSupplier() {
+					@Override
+					public Scorer get(long leadCost) throws IOException {
+						return new ConstantScoreScorer( weight, score, scoreMode, iterator );
+					}
+
+					@Override
+					public long cost() {
+						return iterator.cost();
+					}
+				};
 			}
 
 			@Override
