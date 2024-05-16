@@ -18,6 +18,7 @@ import org.apache.lucene.search.Query;
 import org.apache.lucene.search.QueryVisitor;
 import org.apache.lucene.search.ScoreMode;
 import org.apache.lucene.search.Scorer;
+import org.apache.lucene.search.ScorerSupplier;
 import org.apache.lucene.search.TwoPhaseIterator;
 import org.apache.lucene.search.Weight;
 
@@ -104,12 +105,39 @@ public class VectorSimilarityFilterQuery extends Query {
 		}
 
 		@Override
-		public Scorer scorer(LeafReaderContext context) throws IOException {
-			Scorer scorer = super.scorer( context );
+		public ScorerSupplier scorerSupplier(LeafReaderContext context) throws IOException {
+			ScorerSupplier scorerSupplier = super.scorerSupplier( context );
+			if ( scorerSupplier == null ) {
+				return null;
+			}
+			return new MinScoreScorerSupplier( this, scorerSupplier, similarityAsScore );
+		}
+	}
+
+	private static class MinScoreScorerSupplier extends ScorerSupplier {
+
+		private final Weight weight;
+		private final ScorerSupplier delegate;
+		private final float similarityAsScore;
+
+		private MinScoreScorerSupplier(Weight weight, ScorerSupplier delegate, float similarityAsScore) {
+			this.weight = weight;
+			this.delegate = delegate;
+			this.similarityAsScore = similarityAsScore;
+		}
+
+		@Override
+		public Scorer get(long leadCost) throws IOException {
+			Scorer scorer = delegate.get( leadCost );
 			if ( scorer == null ) {
 				return null;
 			}
-			return new MinScoreScorer( this, scorer, similarityAsScore );
+			return new MinScoreScorer( weight, scorer, similarityAsScore );
+		}
+
+		@Override
+		public long cost() {
+			return delegate.cost();
 		}
 	}
 
