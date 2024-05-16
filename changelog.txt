@@ -1,6 +1,88 @@
 Hibernate Search Changelog
 ==========================
 
+7.2.0.Alpha1 (2024-05-16)
+-------------------------
+
+** Bug
+    * HSEARCH-5124 Jakarta Batch Job parameter `purgeAllOnStart` will purge all documents instead of just the ones specified in `entityTypes`
+    * HSEARCH-5110 Error message when the version of Elasticsearch/Opensearch is too old for vector search states wrong requirements
+    * HSEARCH-5089 Retrieve the schema management strategy on start for the Standalone Pojo Mapper
+    * HSEARCH-5039 Tenant filter should be a pre-filter for knn predicates
+
+** Epic
+    * HSEARCH-4962 APIs to support Hibernate Search Tools
+
+** Improvement
+    * HSEARCH-5151 Add compatibility with OpenSearch 2.14.0
+    * HSEARCH-5150 Upgrade to Hibernate ORM 6.5.1.Final
+    * HSEARCH-5146 Upgrade to Elasticsearch 8.13.4 client
+    * HSEARCH-5145 Upgrade Jackson to 2.17.1
+    * HSEARCH-5144 Upgrade to JBoss logging 3.6.0.Final
+    * HSEARCH-5142 Upgrade to Elasticsearch 8.13.3 client
+    * HSEARCH-5139 Upgrade to Hibernate ORM 6.5.0.Final
+    * HSEARCH-5138 Test against latest OpenSearch 1.3.16
+    * HSEARCH-5132 Do not directly rely on the Security Manager in EmbeddedThreadProvider
+    * HSEARCH-5130 Upgrade to Hibernate ORM 6.5.0.CR2
+    * HSEARCH-5127 Add Elasticsearch 8.13.0 compatibility
+    * HSEARCH-5125 Upgrade to Elasticsearch client 8.13.2
+    * HSEARCH-5122 Add compatibility with OpenSearch 2.13.0
+    * HSEARCH-5121 Upgrade to Elasticsearch client 8.13.1 and test against Elasticsearch 8.13.1
+    * HSEARCH-5119 Use `IndexSearcher#setTimeout` instead of a TimeLimitingCollector
+    * HSEARCH-5118 Generate module-info for `hibernate-search-backend-lucene`
+    * HSEARCH-5114 Upgrade to Elasticsearch client 8.13.0
+    * HSEARCH-5111 Upgrade to Hibernate ORM 6.5.0.CR1
+    * HSEARCH-5109 Introduce `ValueConvert.PARSE` to provide built-in converters for string values
+    * HSEARCH-5106 Upgrade Jackson to 2.17.0
+    * HSEARCH-5104 Upgrade Jackson to 2.15.4
+    * HSEARCH-5100 Upgrade to GSON 2.10.1
+    * HSEARCH-5098 Upgrade to AWS SDK 2.25.2
+    * HSEARCH-5096 Reproducible builds
+    * HSEARCH-5092 Make `HibernateOrmSearchQueryAdapter` compatible with a future ORM 6.5 release
+    * HSEARCH-5091 Upgrade to Elasticsearch client 8.12.2 and test against Elasticsearch 8.12.2
+    * HSEARCH-5088 Limit OpenSearch vector search capabilities to 2.9+ versions
+    * HSEARCH-5087 Add compatibility with OpenSearch 2.12.0
+    * HSEARCH-5086 Upgrade to Lucene 9.10
+    * HSEARCH-5084 Switch to IndexSearcher#search(Query, CollectorManager) for the Lucene backend
+    * HSEARCH-5083 Upgrade to AWS SDK 2.24.1
+    * HSEARCH-5062 Target types as precise as possible for entity loading
+    * HSEARCH-5048 Check that index/search vectors meet the requirements of a configured similarity function
+    * HSEARCH-5018 Better guidance for applications where classpath scanning does not work
+    * HSEARCH-5016 Allow binding a @HighlightProjection to a single-valued String (instead of List<String>) when using numberOfFragments(1)
+    * HSEARCH-5006 Non-string tenant identifiers
+    * HSEARCH-4572 Using SearchPredicate/SearchProjection/SearchSort with broader scope than the search query
+
+** New Feature
+    * HSEARCH-4964 Projection on the document tree for the Lucene backend
+    * HSEARCH-4963 API to run analysis on a given String
+    * HSEARCH-4961 API to list all analyzer names
+    * HSEARCH-4929 Support dropAndCreateSchemaOnStart in JSR-352 integration
+    * HSEARCH-4807 @DistanceProjection to map a constructor parameter to a distance projection
+    * HSEARCH-4806 Basic support for parameters at the query level
+    * HSEARCH-4558 simpleQueryString for numeric/date fields
+    * HSEARCH-3200 Allow setting the minimum number of should clauses required to match for full-text predicates in the query DSL
+
+** Task
+    * HSEARCH-5147 Test Elasticsearch 8.13.4 compatibility
+    * HSEARCH-5143 Test against latest Elasticsearch 7.17.21
+    * HSEARCH-5141 Test Elasticsearch 8.13.3 compatibility
+    * HSEARCH-5135 Improve test execution time for some of the orm-based tests
+    * HSEARCH-5129 Test against latest Elasticsearch 7.17.20
+    * HSEARCH-5128 Update the supported versions of Java in the documentation
+    * HSEARCH-5126 Test Elasticsearch 8.13.2 compatibility
+    * HSEARCH-5116 Test against latest Elasticsearch 7.17.19
+    * HSEARCH-5113 Fix flaky knn test : KnnPredicateSpecificsIT$ExampleKnnSearchIT.multipleKnn_shouldClauses
+    * HSEARCH-5101 Test against latest Elasticsearch 7.17.18
+    * HSEARCH-5099 Test against latest OpenSearch 1.3.15
+    * HSEARCH-5094 Integrate with Develocity build scans/build cache
+    * HSEARCH-5093 Fix flaky test TransactionTimeoutJtaAndSpringOutboxIT
+    * HSEARCH-5081 Fix very slow unit tests
+    * HSEARCH-5075 Refactor parameter handling during binding
+    * HSEARCH-5009 Re-enable some tests when HHH-17408 gets fixed
+    * HSEARCH-4981 Fix flaky test with CockroachDB: OutboxPollingAutomaticIndexingLifecycleIT.stopWhileOutboxEventsIsBeingProcessed
+    * HSEARCH-4965 Fix outbox-polling integration tests on Windows
+    * HSEARCH-4927 Take into account all integration tests in Sonar reports
+
 7.1.0.CR1 (2024-02-12)
 -------------------------
 
