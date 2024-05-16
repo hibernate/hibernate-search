@@ -10,11 +10,11 @@ import java.util.Collections;
 
 import org.hibernate.search.engine.common.EntityReference;
 import org.hibernate.search.engine.search.query.dsl.SearchQuerySelectStep;
-import org.hibernate.search.engine.search.reference.RootReferenceScope;
 import org.hibernate.search.mapper.pojo.standalone.massindexing.MassIndexer;
 import org.hibernate.search.mapper.pojo.standalone.schema.management.SearchSchemaManager;
 import org.hibernate.search.mapper.pojo.standalone.scope.SearchScope;
 import org.hibernate.search.mapper.pojo.standalone.scope.SearchScopeProvider;
+import org.hibernate.search.mapper.pojo.standalone.scope.StandalonePojoRootReferenceScope;
 import org.hibernate.search.mapper.pojo.standalone.work.SearchIndexer;
 import org.hibernate.search.mapper.pojo.standalone.work.SearchIndexingPlan;
 import org.hibernate.search.mapper.pojo.standalone.work.SearchWorkspace;
@@ -136,7 +136,7 @@ public interface SearchSession extends SearchScopeProvider, AutoCloseable {
 			T,
 			?,
 			?,
-			?> search(RootReferenceScope<SR, T> scope);
+			?> search(StandalonePojoRootReferenceScope<SR, T> scope);
 
 	/**
 	 * Create a {@link SearchSchemaManager} for all indexes.

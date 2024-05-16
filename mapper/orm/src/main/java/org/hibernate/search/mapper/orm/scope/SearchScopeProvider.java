@@ -16,9 +16,7 @@ import jakarta.persistence.Entity;
  * @see org.hibernate.search.mapper.orm.session.SearchSession
  */
 @SuppressWarnings("deprecation")
-public interface SearchScopeProvider
-		extends
-		org.hibernate.search.engine.mapper.scope.SearchScopeProvider<org.hibernate.search.mapper.orm.common.EntityReference> {
+public interface SearchScopeProvider {
 
 	/**
 	 * Creates a {@link SearchScope} limited to
