@@ -6,22 +6,28 @@
  */
 package org.hibernate.search.engine.search.predicate.dsl.impl;
 
-import java.util.Arrays;
-
+import org.hibernate.search.engine.search.predicate.dsl.MatchPredicateFieldMoreGenericStep;
 import org.hibernate.search.engine.search.predicate.dsl.MatchPredicateFieldMoreStep;
 import org.hibernate.search.engine.search.predicate.dsl.MatchPredicateFieldStep;
 import org.hibernate.search.engine.search.predicate.dsl.spi.SearchPredicateDslContext;
+import org.hibernate.search.engine.search.reference.traits.predicate.MatchPredicateFieldReference;
 
-public final class MatchPredicateFieldStepImpl implements MatchPredicateFieldStep<MatchPredicateFieldMoreStep<?, ?>> {
+public final class MatchPredicateFieldStepImpl<E> implements MatchPredicateFieldStep<E, MatchPredicateFieldMoreStep<E, ?, ?>> {
 
-	private final MatchPredicateFieldMoreStepImpl.CommonState commonState;
+	private final SearchPredicateDslContext<?> dslContext;
 
 	public MatchPredicateFieldStepImpl(SearchPredicateDslContext<?> dslContext) {
-		this.commonState = new MatchPredicateFieldMoreStepImpl.CommonState( dslContext );
+		this.dslContext = dslContext;
 	}
 
 	@Override
-	public MatchPredicateFieldMoreStep<?, ?> fields(String... fieldPaths) {
-		return new MatchPredicateFieldMoreStepImpl( commonState, Arrays.asList( fieldPaths ) );
+	public MatchPredicateFieldMoreStep<E, ?, ?> fields(String... fieldPaths) {
+		return AbstractMatchPredicateFieldMoreStep.create( dslContext, fieldPaths );
+	}
+
+	@Override
+	public <T> MatchPredicateFieldMoreGenericStep<E, ?, ?, T, MatchPredicateFieldReference<? extends E, T>> fields(
+			MatchPredicateFieldReference<? extends E, T>... fields) {
+		return AbstractMatchPredicateFieldMoreStep.create( dslContext, fields );
 	}
 }

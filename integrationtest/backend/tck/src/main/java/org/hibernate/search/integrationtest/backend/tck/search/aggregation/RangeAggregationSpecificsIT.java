@@ -518,7 +518,7 @@ class RangeAggregationSpecificsIT<F> {
 
 		AggregationKey<Map<Range<F>, Long>> aggregationKey = AggregationKey.of( AGGREGATION_NAME );
 
-		SearchAggregationFactory af = index.createScope().aggregation();
+		SearchAggregationFactory<DocumentReference> af = index.createScope().aggregation();
 		var aggregation = af.withParameters( param -> af.range().field(
 				fieldPath, fieldType.getJavaType() )
 				.range( param.get( "range1", Range.class ) )
@@ -567,7 +567,7 @@ class RangeAggregationSpecificsIT<F> {
 		);
 	}
 
-	private SearchQueryOptionsStep<?, DocumentReference, ?, ?, ?> matchAllQuery() {
+	private SearchQueryOptionsStep<DocumentReference,?, DocumentReference, ?, ?, ?> matchAllQuery() {
 		return index.createScope().query().where( f -> f.matchAll() );
 	}
 

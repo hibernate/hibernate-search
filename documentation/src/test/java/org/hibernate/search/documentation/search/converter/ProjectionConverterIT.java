@@ -34,7 +34,8 @@ import org.junit.jupiter.api.extension.RegisterExtension;
 
 class ProjectionConverterIT {
 	@RegisterExtension
-	public DocumentationSetupHelper setupHelper = DocumentationSetupHelper.withSingleBackend( BackendConfigurations.simple() );
+	public DocumentationSetupHelper setupHelper = DocumentationSetupHelper.withSingleBackend(
+			BackendConfigurations.simple() );
 
 	private EntityManagerFactory entityManagerFactory;
 

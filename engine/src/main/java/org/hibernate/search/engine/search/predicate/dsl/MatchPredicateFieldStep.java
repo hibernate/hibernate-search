@@ -6,11 +6,12 @@
  */
 package org.hibernate.search.engine.search.predicate.dsl;
 
+import org.hibernate.search.engine.search.reference.traits.predicate.MatchPredicateFieldReference;
 
 /**
  * The initial step in a "match" predicate definition, where the target field can be set.
  */
-public interface MatchPredicateFieldStep<N extends MatchPredicateFieldMoreStep<?, ?>> {
+public interface MatchPredicateFieldStep<E, N extends MatchPredicateFieldMoreStep<E, ?, ?>> {
 
 	/**
 	 * Target the given field in the match predicate.
@@ -33,7 +34,7 @@ public interface MatchPredicateFieldStep<N extends MatchPredicateFieldMoreStep<?
 	 * Target the given fields in the match predicate.
 	 * <p>
 	 * Equivalent to {@link #field(String)} followed by multiple calls to
-	 * {@link MatchPredicateFieldMoreStep#field(String)},
+	 * {@link MatchPredicateFieldMoreStep#field(Object)},
 	 * the only difference being that calls to {@link MatchPredicateFieldMoreStep#boost(float)}
 	 * and other field-specific settings on the returned step will only need to be done once
 	 * and will apply to all the fields passed to this method.
@@ -45,4 +46,20 @@ public interface MatchPredicateFieldStep<N extends MatchPredicateFieldMoreStep<?
 	 * @see #field(String)
 	 */
 	N fields(String... fieldPaths);
+
+	/**
+	 * TODO
+	 */
+	@SuppressWarnings("unchecked")
+	default <T> MatchPredicateFieldMoreGenericStep<E, ?, ?, T, MatchPredicateFieldReference<? extends E, T>> field(
+			MatchPredicateFieldReference<? extends E, T> field) {
+		return fields( field );
+	}
+
+	/**
+	 * TODO
+	 */
+	@SuppressWarnings("unchecked")
+	<T> MatchPredicateFieldMoreGenericStep<E, ?, ?, T, MatchPredicateFieldReference<? extends E, T>> fields(
+			MatchPredicateFieldReference<? extends E, T>... fields);
 }

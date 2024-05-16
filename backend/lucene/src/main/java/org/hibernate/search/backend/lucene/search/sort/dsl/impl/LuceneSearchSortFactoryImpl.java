@@ -16,32 +16,33 @@ import org.hibernate.search.engine.search.sort.dsl.spi.SearchSortDslContext;
 import org.apache.lucene.search.Sort;
 import org.apache.lucene.search.SortField;
 
-public class LuceneSearchSortFactoryImpl
+public class LuceneSearchSortFactoryImpl<E>
 		extends AbstractSearchSortFactory<
-				LuceneSearchSortFactory,
+				E,
+				LuceneSearchSortFactory<E>,
 				LuceneSearchSortIndexScope<?>,
-				LuceneSearchPredicateFactory>
-		implements LuceneSearchSortFactory {
+				LuceneSearchPredicateFactory<E>>
+		implements LuceneSearchSortFactory<E> {
 
 	public LuceneSearchSortFactoryImpl(
-			SearchSortDslContext<LuceneSearchSortIndexScope<?>, LuceneSearchPredicateFactory> dslContext) {
+			SearchSortDslContext<E, LuceneSearchSortIndexScope<?>, LuceneSearchPredicateFactory<E>> dslContext) {
 		super( dslContext );
 	}
 
 	@Override
-	public LuceneSearchSortFactory withRoot(String objectFieldPath) {
-		return new LuceneSearchSortFactoryImpl( dslContext.rescope(
+	public LuceneSearchSortFactory<E> withRoot(String objectFieldPath) {
+		return new LuceneSearchSortFactoryImpl<>( dslContext.rescope(
 				dslContext.scope().withRoot( objectFieldPath ),
 				dslContext.predicateFactory().withRoot( objectFieldPath ) ) );
 	}
 
 	@Override
-	public SortThenStep fromLuceneSortField(SortField luceneSortField) {
+	public SortThenStep<E> fromLuceneSortField(SortField luceneSortField) {
 		return staticThenStep( dslContext.scope().sortBuilders().fromLuceneSortField( luceneSortField ) );
 	}
 
 	@Override
-	public SortThenStep fromLuceneSort(Sort luceneSort) {
+	public SortThenStep<E> fromLuceneSort(Sort luceneSort) {
 		return staticThenStep( dslContext.scope().sortBuilders().fromLuceneSort( luceneSort ) );
 	}
 

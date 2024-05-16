@@ -480,11 +480,11 @@ class DistanceSortSpecificsIT {
 		assertThatQuery( index.query()
 				.where( f -> f.matchAll() )
 				.routing( dataSet.routingKey )
-				.sort( ( (Function<SearchSortFactory,
-						DistanceSortOptionsStep<?, ?>>) f -> f.withRoot( parentObjectBinding.absolutePath )
+				.sort( ( (Function<SearchSortFactory<DocumentReference>,
+						DistanceSortOptionsStep<DocumentReference, ?, ?>>) f -> f.withRoot( parentObjectBinding.absolutePath )
 								.distance( parentObjectBinding.getRelativeFieldName( fieldStructure, fieldType ),
 										CENTER_POINT ) )
-						.andThen( (DistanceSortOptionsStep<?, ?> optionsStep1) -> applySortMode( optionsStep1, sortMode
+						.andThen( (DistanceSortOptionsStep<DocumentReference, ?, ?> optionsStep1) -> applySortMode( optionsStep1, sortMode
 						) )
 						// Don't call this.applyFilter: we need to use the relative name of the discriminator field.
 						.andThen( optionsStep -> {
@@ -552,7 +552,7 @@ class DistanceSortSpecificsIT {
 	}
 
 	private SearchQuery<DocumentReference> simpleQuery(DataSet dataSet,
-			Function<? super SearchSortFactory, ? extends DistanceSortOptionsStep<?, ?>> sortContributor,
+			Function<? super SearchSortFactory<DocumentReference>, ? extends DistanceSortOptionsStep<DocumentReference, ?, ?>> sortContributor,
 			SortMode sortMode, TestedFieldStructure fieldStructure) {
 		return index.query()
 				.where( f -> f.matchAll() )
@@ -562,7 +562,7 @@ class DistanceSortSpecificsIT {
 				.toQuery();
 	}
 
-	private DistanceSortOptionsStep<?, ?> applySortMode(DistanceSortOptionsStep<?, ?> optionsStep, SortMode sortMode) {
+	private DistanceSortOptionsStep<DocumentReference, ?, ?> applySortMode(DistanceSortOptionsStep<DocumentReference, ?, ?> optionsStep, SortMode sortMode) {
 		if ( sortMode != null ) {
 			return optionsStep.mode( sortMode );
 		}
@@ -571,7 +571,7 @@ class DistanceSortSpecificsIT {
 		}
 	}
 
-	private DistanceSortOptionsStep<?, ?> applyFilter(DistanceSortOptionsStep<?, ?> optionsStep,
+	private DistanceSortOptionsStep<DocumentReference, ?, ?> applyFilter(DistanceSortOptionsStep<DocumentReference, ?, ?> optionsStep,
 			TestedFieldStructure fieldStructure) {
 		if ( fieldStructure.isInNested() ) {
 			return optionsStep.filter( f -> f.match()

@@ -31,7 +31,7 @@ import org.hibernate.search.util.common.annotation.Incubating;
  *
  * @author Emmanuel Bernard emmanuel@hibernate.org
  */
-public interface SearchAggregationFactory {
+public interface SearchAggregationFactory<E> {
 
 	/**
 	 * Perform aggregation in range buckets.
@@ -46,7 +46,7 @@ public interface SearchAggregationFactory {
 	 *
 	 * @return The next step.
 	 */
-	RangeAggregationFieldStep<?> range();
+	RangeAggregationFieldStep<E, ?> range();
 
 	/**
 	 * Perform aggregation in term buckets.
@@ -61,7 +61,7 @@ public interface SearchAggregationFactory {
 	 *
 	 * @return The next step.
 	 */
-	TermsAggregationFieldStep<?> terms();
+	TermsAggregationFieldStep<E, ?> terms();
 
 
 	/**
@@ -97,7 +97,7 @@ public interface SearchAggregationFactory {
 	 * @return A new aggregation factory using the given object field as root.
 	 */
 	@Incubating
-	SearchAggregationFactory withRoot(String objectFieldPath);
+	SearchAggregationFactory<E> withRoot(String objectFieldPath);
 
 	/**
 	 * @param relativeFieldPath The path to a field, relative to the {@link #withRoot(String) root} of this factory.

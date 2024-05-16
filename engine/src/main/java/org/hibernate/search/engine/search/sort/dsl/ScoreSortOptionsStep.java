@@ -13,6 +13,6 @@ package org.hibernate.search.engine.search.sort.dsl;
  *
  * @author Emmanuel Bernard emmanuel@hibernate.org
  */
-public interface ScoreSortOptionsStep<S extends ScoreSortOptionsStep<?>>
-		extends SortFinalStep, SortThenStep, SortOrderStep<S> {
+public interface ScoreSortOptionsStep<E, S extends ScoreSortOptionsStep<E, ?>>
+		extends SortFinalStep, SortThenStep<E>, SortOrderStep<S> {
 }

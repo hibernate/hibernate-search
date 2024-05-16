@@ -14,8 +14,8 @@ import com.google.gson.JsonObject;
 /**
  * A factory for search predicates with some Elasticsearch-specific methods.
  */
-public interface ElasticsearchSearchPredicateFactory
-		extends ExtendedSearchPredicateFactory<ElasticsearchSearchPredicateFactory> {
+public interface ElasticsearchSearchPredicateFactory<E>
+		extends ExtendedSearchPredicateFactory<E, ElasticsearchSearchPredicateFactory<E>> {
 
 	/**
 	 * Create a predicate from JSON.

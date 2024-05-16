@@ -29,12 +29,12 @@ import org.hibernate.search.engine.search.query.spi.SearchQueryIndexScope;
 
 public final class DefaultSearchQuerySelectStep<R, E, LOS>
 		extends AbstractSearchQuerySelectStep<
-				SearchQueryOptionsStep<?, E, LOS, ?, ?>,
+				SearchQueryOptionsStep<E, ?, E, LOS, ?, ?>,
 				R,
 				E,
 				LOS,
 				SearchProjectionFactory<R, E>,
-				SearchPredicateFactory> {
+				SearchPredicateFactory<E>> {
 
 	private final SearchQueryIndexScope<?> scope;
 	private final BackendSessionContext sessionContext;
@@ -48,54 +48,54 @@ public final class DefaultSearchQuerySelectStep<R, E, LOS>
 	}
 
 	@Override
-	public DefaultSearchQueryOptionsStep<E, LOS> selectEntity() {
+	public DefaultSearchQueryOptionsStep<E, E, LOS> selectEntity() {
 		return select( scope.<R, E>projectionFactory().entity().toProjection() );
 	}
 
 	@Override
-	public DefaultSearchQueryOptionsStep<R, LOS> selectEntityReference() {
+	public DefaultSearchQueryOptionsStep<E, R, LOS> selectEntityReference() {
 		return select( scope.projectionBuilders().entityReference() );
 	}
 
 	@Override
-	public <P> SearchQueryWhereStep<?, P, LOS, ?> select(Class<P> objectClass) {
+	public <P> SearchQueryWhereStep<E, ?, P, LOS, ?> select(Class<P> objectClass) {
 		return select( scope.projectionFactory().composite().as( objectClass ).toProjection() );
 	}
 
 	@Override
-	public <P> DefaultSearchQueryOptionsStep<P, LOS> select(
+	public <P> DefaultSearchQueryOptionsStep<E, P, LOS> select(
 			Function<? super SearchProjectionFactory<R, E>, ? extends ProjectionFinalStep<P>> projectionContributor) {
 		SearchProjection<P> projection = projectionContributor.apply( scope.projectionFactory() ).toProjection();
 		return select( projection );
 	}
 
 	@Override
-	public <P> DefaultSearchQueryOptionsStep<P, LOS> select(SearchProjection<P> projection) {
+	public <P> DefaultSearchQueryOptionsStep<E, P, LOS> select(SearchProjection<P> projection) {
 		SearchQueryBuilder<P> builder = scope.select( sessionContext, loadingContextBuilder, projection );
 		return new DefaultSearchQueryOptionsStep<>( scope, builder, loadingContextBuilder );
 	}
 
 	@Override
-	public DefaultSearchQueryOptionsStep<List<?>, LOS> select(SearchProjection<?>... projections) {
+	public DefaultSearchQueryOptionsStep<E, List<?>, LOS> select(SearchProjection<?>... projections) {
 		return select( scope.projectionBuilders().composite()
 				.build( projections, ProjectionCompositor.fromList( projections.length ),
 						ProjectionAccumulator.single() ) );
 	}
 
 	@Override
-	public SearchQueryOptionsStep<?, E, LOS, ?, ?> where(
-			Function<? super SearchPredicateFactory, ? extends PredicateFinalStep> predicateContributor) {
+	public SearchQueryOptionsStep<E, ?, E, LOS, ?, ?> where(
+			Function<? super SearchPredicateFactory<E>, ? extends PredicateFinalStep> predicateContributor) {
 		return selectEntity().where( predicateContributor );
 	}
 
 	@Override
-	public SearchQueryOptionsStep<?, E, LOS, ?, ?> where(SearchPredicate predicate) {
+	public SearchQueryOptionsStep<E, ?, E, LOS, ?, ?> where(SearchPredicate predicate) {
 		return selectEntity().where( predicate );
 	}
 
 	@Override
-	public SearchQueryOptionsStep<?, E, LOS, ?, ?> where(
-			BiConsumer<? super SearchPredicateFactory,
+	public SearchQueryOptionsStep<E, ?, E, LOS, ?, ?> where(
+			BiConsumer<? super SearchPredicateFactory<E>,
 					? super SimpleBooleanPredicateClausesCollector<?>> predicateContributor) {
 		return selectEntity().where( predicateContributor );
 	}

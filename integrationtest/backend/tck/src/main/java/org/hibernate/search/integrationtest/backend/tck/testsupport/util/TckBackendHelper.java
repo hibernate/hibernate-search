@@ -6,6 +6,7 @@
  */
 package org.hibernate.search.integrationtest.backend.tck.testsupport.util;
 
+import org.hibernate.search.engine.backend.common.DocumentReference;
 import org.hibernate.search.engine.search.predicate.dsl.PredicateFinalStep;
 import org.hibernate.search.engine.search.predicate.dsl.SearchPredicateFactory;
 import org.hibernate.search.engine.search.query.dsl.SearchQueryDslExtension;
@@ -46,7 +47,7 @@ public interface TckBackendHelper {
 	 * @param f A {@link SearchPredicateFactory}
 	 * @return A slow predicate, i.e. a predicate whose execution will take more than 10 milliseconds per document.
 	 */
-	PredicateFinalStep createSlowPredicate(SearchPredicateFactory f);
+	PredicateFinalStep createSlowPredicate(SearchPredicateFactory<DocumentReference> f);
 
 	<R, E, LOS> SearchQueryDslExtension<? extends SearchQuerySelectStep<?, R, E, LOS, ?, ?>, R, E, LOS> queryDslExtension();
 

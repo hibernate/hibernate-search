@@ -33,6 +33,6 @@ public interface SearchPredicateFactoryExtension<T> {
 	 * @return An optional containing the extended search predicate factory ({@link T}) in case
 	 * of success, or an empty optional otherwise.
 	 */
-	Optional<T> extendOptional(SearchPredicateFactory original);
+	Optional<T> extendOptional(SearchPredicateFactory<?> original);
 
 }

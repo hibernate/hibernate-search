@@ -9,6 +9,7 @@ package org.hibernate.search.engine.search.sort.dsl;
 import java.util.function.Function;
 
 import org.hibernate.search.engine.search.predicate.dsl.SearchPredicateFactory;
+import org.hibernate.search.engine.search.reference.TypedFieldReference;
 import org.hibernate.search.engine.spatial.GeoPoint;
 
 /**
@@ -21,20 +22,33 @@ import org.hibernate.search.engine.spatial.GeoPoint;
  * @param <S> The self type, i.e. the exposed type of this factory.
  * @param <PDF> The type of factory used to create predicates in {@link FieldSortOptionsStep#filter(Function)}.
  */
-public interface ExtendedSearchSortFactory<S extends ExtendedSearchSortFactory<?, PDF>, PDF extends SearchPredicateFactory>
-		extends SearchSortFactory {
+public interface ExtendedSearchSortFactory<
+		E,
+		S extends ExtendedSearchSortFactory<E, ?, PDF>,
+		PDF extends SearchPredicateFactory<E>>
+		extends SearchSortFactory<E> {
 
 	@Override
 	S withRoot(String objectFieldPath);
 
 	@Override
-	FieldSortOptionsStep<?, PDF> field(String fieldPath);
+	FieldSortOptionsStep<E, ?, PDF> field(String fieldPath);
 
 	@Override
-	DistanceSortOptionsStep<?, PDF> distance(String fieldPath, GeoPoint location);
+	default FieldSortOptionsStep<E, ?, PDF> field(TypedFieldReference<?> field) {
+		return field( field.absolutePath() );
+	}
 
 	@Override
-	default DistanceSortOptionsStep<?, PDF> distance(String fieldPath, double latitude, double longitude) {
+	DistanceSortOptionsStep<E, ?, PDF> distance(String fieldPath, GeoPoint location);
+
+	@Override
+	default DistanceSortOptionsStep<E, ?, PDF> distance(TypedFieldReference<? extends GeoPoint> field, GeoPoint location) {
+		return distance( field.absolutePath(), location );
+	}
+
+	@Override
+	default DistanceSortOptionsStep<E, ?, PDF> distance(String fieldPath, double latitude, double longitude) {
 		return distance( fieldPath, GeoPoint.of( latitude, longitude ) );
 	}
 }

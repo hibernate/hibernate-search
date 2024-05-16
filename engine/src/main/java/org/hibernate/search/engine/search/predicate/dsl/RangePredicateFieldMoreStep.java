@@ -6,6 +6,8 @@
  */
 package org.hibernate.search.engine.search.predicate.dsl;
 
+import org.hibernate.search.engine.search.reference.TypedFieldReference;
+
 /**
  * The step in a "range" predicate definition where the limits of the range to match can be set
  * (see the superinterface {@link RangePredicateMatchingStep}),
@@ -49,5 +51,41 @@ public interface RangePredicateFieldMoreStep<
 	 * @see RangePredicateFieldStep#fields(String...)
 	 */
 	S fields(String... fieldPaths);
+
+	/**
+	 * Target the given field in the range predicate,
+	 * as an alternative to the already-targeted fields.
+	 * <p>
+	 * See {@link RangePredicateFieldStep#field(TypedFieldReference)} for more information about targeting fields.
+	 *
+	 * @param field The field reference representing a <a href="SearchPredicateFactory.html#field-paths">path</a> to the index field
+	 * to apply the predicate on.
+	 * @return The next step.
+	 *
+	 * @see RangePredicateFieldStep#field(TypedFieldReference)
+	 */
+	default S field(TypedFieldReference<?> field) {
+		return fields( field );
+	}
+
+	/**
+	 * Target the given fields in the range predicate,
+	 * as an alternative to the already-targeted fields.
+	 * <p>
+	 * See {@link RangePredicateFieldStep#fields(TypedFieldReference...)} for more information about targeting fields.
+	 *
+	 * @param fields The field references representing <a href="SearchPredicateFactory.html#field-paths">paths</a> to the index fields
+	 * to apply the predicate on.
+	 * @return The next step.
+	 *
+	 * @see RangePredicateFieldStep#fields(TypedFieldReference...)
+	 */
+	default S fields(TypedFieldReference<?>... fields) {
+		String[] paths = new String[fields.length];
+		for ( int i = 0; i < fields.length; i++ ) {
+			paths[i] = fields[i].absolutePath();
+		}
+		return fields( paths );
+	}
 
 }

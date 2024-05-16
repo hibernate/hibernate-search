@@ -386,7 +386,7 @@ abstract class AbstractDistanceProjectionMultiValuedBaseIT {
 		return distances.stream().map( v -> v / denominator ).collect( Collectors.toList() );
 	}
 
-	protected abstract void addParameter(SearchQueryOptionsStep<?, ?, ?, ?, ?> query, String parameterName, Object value);
+	protected abstract void addParameter(SearchQueryOptionsStep<?, ?, ?, ?, ?, ?> query, String parameterName, Object value);
 
 	protected abstract ProjectionFinalStep<List<Double>> distance(
 			SearchProjectionFactory<EntityReference, DocumentReference> projection, String path, GeoPoint center,
@@ -396,7 +396,7 @@ abstract class AbstractDistanceProjectionMultiValuedBaseIT {
 			SearchProjectionFactory<EntityReference, DocumentReference> projection, String path, GeoPoint center,
 			DistanceUnit unit, String centerParam, String unitParam);
 
-	protected abstract SortFinalStep sort(SearchSortFactory sort, String path, GeoPoint center,
+	protected abstract SortFinalStep sort(SearchSortFactory<?> sort, String path, GeoPoint center,
 			String parameterName);
 
 	private static class DataSet {

@@ -12,13 +12,14 @@ import org.hibernate.search.backend.lucene.search.query.LuceneSearchQuery;
 import org.hibernate.search.backend.lucene.search.sort.dsl.LuceneSearchSortFactory;
 import org.hibernate.search.engine.search.query.dsl.SearchQueryOptionsStep;
 
-public interface LuceneSearchQueryOptionsStep<H, LOS>
+public interface LuceneSearchQueryOptionsStep<E, H, LOS>
 		extends SearchQueryOptionsStep<
-				LuceneSearchQueryOptionsStep<H, LOS>,
+				E,
+				LuceneSearchQueryOptionsStep<E, H, LOS>,
 				H,
 				LOS,
-				LuceneSearchSortFactory,
-				LuceneSearchAggregationFactory>,
+				LuceneSearchSortFactory<E>,
+				LuceneSearchAggregationFactory<E>>,
 		LuceneSearchFetchable<H> {
 
 	@Override

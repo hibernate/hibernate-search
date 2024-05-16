@@ -13,6 +13,7 @@ import org.hibernate.search.engine.backend.types.ObjectStructure;
 import org.hibernate.search.engine.search.common.BooleanOperator;
 import org.hibernate.search.engine.search.common.NamedValues;
 import org.hibernate.search.engine.search.predicate.SearchPredicate;
+import org.hibernate.search.engine.search.reference.NestedObjectFieldReference;
 import org.hibernate.search.util.common.SearchException;
 import org.hibernate.search.util.common.annotation.Incubating;
 
@@ -35,7 +36,7 @@ import org.hibernate.search.util.common.annotation.Incubating;
  * Such a factory can also transform relative paths into absolute paths using {@link #toAbsolutePath(String)};
  * this can be useful for native predicates in particular.
  */
-public interface SearchPredicateFactory {
+public interface SearchPredicateFactory<E> {
 
 	/**
 	 * Match all documents.
@@ -163,7 +164,7 @@ public interface SearchPredicateFactory {
 	 * @return The initial step of a DSL where the "match" predicate can be defined.
 	 * @see MatchPredicateFieldStep
 	 */
-	MatchPredicateFieldStep<?> match();
+	MatchPredicateFieldStep<E, ?> match();
 
 	/**
 	 * Match documents where targeted fields have a value within lower and upper bounds.
@@ -234,6 +235,22 @@ public interface SearchPredicateFactory {
 	NestedPredicateClausesStep<?> nested(String objectFieldPath);
 
 	/**
+	 * Match documents where a {@link ObjectStructure#NESTED nested object} matches inner predicates
+	 * to be defined in the next steps.
+	 * <p>
+	 * The resulting nested predicate must match <em>all</em> inner clauses,
+	 * similarly to an {@link #and() "and" predicate}.
+	 *
+	 * @param field The field reference representing a <a href="SearchPredicateFactory.html#field-paths">path</a> to the object field
+	 * to apply the predicate on.
+	 * @return The initial step of a DSL where the "nested" predicate can be defined.
+	 * @see NestedPredicateFieldStep
+	 */
+	default NestedPredicateClausesStep<?> nested(NestedObjectFieldReference field) {
+		return nested( field.absolutePath() );
+	}
+
+	/**
 	 * Match documents according to a given query string,
 	 * with a simple query language adapted to end users.
 	 * <p>
@@ -301,7 +318,7 @@ public interface SearchPredicateFactory {
 	 * @see KnnPredicateVectorStep
 	 * @see KnnPredicateOptionsStep
 	 */
-	KnnPredicateFieldStep knn(int k);
+	KnnPredicateFieldStep<E> knn(int k);
 
 	/**
 	 * Delegating predicate that creates the actual predicate at query create time and provides access to query parameters.

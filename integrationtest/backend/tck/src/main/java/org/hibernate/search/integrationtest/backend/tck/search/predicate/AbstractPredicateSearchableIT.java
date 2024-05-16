@@ -103,7 +103,7 @@ public abstract class AbstractPredicateSearchableIT {
 				);
 	}
 
-	protected abstract void tryPredicate(SearchPredicateFactory f, String fieldPath,
+	protected abstract void tryPredicate(SearchPredicateFactory<?> f, String fieldPath,
 			FieldTypeDescriptor<?, ?> fieldType);
 
 	protected abstract String predicateTrait();

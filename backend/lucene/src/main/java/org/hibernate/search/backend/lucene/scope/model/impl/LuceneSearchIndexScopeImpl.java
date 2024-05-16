@@ -164,13 +164,13 @@ public final class LuceneSearchIndexScopeImpl
 	}
 
 	@Override
-	public LuceneSearchPredicateFactory predicateFactory() {
-		return new LuceneSearchPredicateFactoryImpl( SearchPredicateDslContext.root( this ) );
+	public <E> LuceneSearchPredicateFactory<E> predicateFactory() {
+		return new LuceneSearchPredicateFactoryImpl<>( SearchPredicateDslContext.root( this ) );
 	}
 
 	@Override
-	public LuceneSearchSortFactory sortFactory() {
-		return new LuceneSearchSortFactoryImpl( SearchSortDslContext
+	public <E> LuceneSearchSortFactory<E> sortFactory() {
+		return new LuceneSearchSortFactoryImpl<>( SearchSortDslContext
 				.root( this, LuceneSearchSortFactoryImpl::new, predicateFactory() ) );
 	}
 
@@ -180,8 +180,8 @@ public final class LuceneSearchIndexScopeImpl
 	}
 
 	@Override
-	public LuceneSearchAggregationFactory aggregationFactory() {
-		return new LuceneSearchAggregationFactoryImpl( SearchAggregationDslContext.root( this, predicateFactory() ) );
+	public <E> LuceneSearchAggregationFactory<E> aggregationFactory() {
+		return new LuceneSearchAggregationFactoryImpl<>( SearchAggregationDslContext.root( this, predicateFactory() ) );
 	}
 
 	@Override

@@ -83,7 +83,7 @@ class SearchSortIT {
 	}
 
 	private SearchQuery<DocumentReference> simpleQuery(
-			Function<? super SearchSortFactory, ? extends SortFinalStep> sortContributor) {
+			Function<? super SearchSortFactory<DocumentReference>, ? extends SortFinalStep> sortContributor) {
 		StubMappingScope scope = mainIndex.createScope();
 		return scope.query()
 				.where( f -> f.matchAll() )
@@ -558,28 +558,28 @@ class SearchSortIT {
 
 	private static class SupportedExtension implements SearchSortFactoryExtension<MyExtendedFactory> {
 		@Override
-		public Optional<MyExtendedFactory> extendOptional(SearchSortFactory original) {
+		public Optional<MyExtendedFactory> extendOptional(SearchSortFactory<?> original) {
 			assertThat( original ).isNotNull();
-			return Optional.of( new MyExtendedFactory( original ) );
+			return Optional.of( new MyExtendedFactory( (SearchSortFactory<DocumentReference>) original ) );
 		}
 	}
 
 	private static class UnSupportedExtension implements SearchSortFactoryExtension<MyExtendedFactory> {
 		@Override
-		public Optional<MyExtendedFactory> extendOptional(SearchSortFactory original) {
+		public Optional<MyExtendedFactory> extendOptional(SearchSortFactory<?> original) {
 			assertThat( original ).isNotNull();
 			return Optional.empty();
 		}
 	}
 
 	private static class MyExtendedFactory {
-		private final SearchSortFactory delegate;
+		private final SearchSortFactory<DocumentReference> delegate;
 
-		MyExtendedFactory(SearchSortFactory delegate) {
+		MyExtendedFactory(SearchSortFactory<DocumentReference> delegate) {
 			this.delegate = delegate;
 		}
 
-		public FieldSortOptionsStep<?, ? extends SearchPredicateFactory> extendedSort(String absoluteFieldPath) {
+		public FieldSortOptionsStep<DocumentReference, ?, ? extends SearchPredicateFactory<DocumentReference>> extendedSort(String absoluteFieldPath) {
 			return delegate.field( absoluteFieldPath );
 		}
 	}

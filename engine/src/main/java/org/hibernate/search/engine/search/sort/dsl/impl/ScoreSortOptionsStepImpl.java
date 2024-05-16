@@ -13,19 +13,19 @@ import org.hibernate.search.engine.search.sort.dsl.spi.AbstractSortThenStep;
 import org.hibernate.search.engine.search.sort.dsl.spi.SearchSortDslContext;
 import org.hibernate.search.engine.search.sort.spi.ScoreSortBuilder;
 
-public final class ScoreSortOptionsStepImpl
-		extends AbstractSortThenStep
-		implements ScoreSortOptionsStep<ScoreSortOptionsStepImpl> {
+public final class ScoreSortOptionsStepImpl<E>
+		extends AbstractSortThenStep<E>
+		implements ScoreSortOptionsStep<E, ScoreSortOptionsStepImpl<E>> {
 
 	private final ScoreSortBuilder builder;
 
-	public ScoreSortOptionsStepImpl(SearchSortDslContext<?, ?> dslContext) {
+	public ScoreSortOptionsStepImpl(SearchSortDslContext<E, ?, ?> dslContext) {
 		super( dslContext );
 		this.builder = dslContext.scope().sortBuilders().score();
 	}
 
 	@Override
-	public ScoreSortOptionsStepImpl order(SortOrder order) {
+	public ScoreSortOptionsStepImpl<E> order(SortOrder order) {
 		builder.order( order );
 		return this;
 	}

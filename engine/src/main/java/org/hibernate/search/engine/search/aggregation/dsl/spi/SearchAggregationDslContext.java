@@ -19,10 +19,12 @@ import org.hibernate.search.engine.search.sort.dsl.FieldSortOptionsStep;
  * @param <SC> The type of the backend-specific search scope.
  * @param <PDF> The type of factory used to create predicates in {@link FieldSortOptionsStep#filter(Function)}.
  */
-public class SearchAggregationDslContext<SC extends SearchAggregationIndexScope<?>, PDF extends SearchPredicateFactory> {
+public class SearchAggregationDslContext<E, SC extends SearchAggregationIndexScope<?>, PDF extends SearchPredicateFactory<E>> {
 	public static <
+			E,
 			SC extends SearchAggregationIndexScope<?>,
-			PDF extends SearchPredicateFactory> SearchAggregationDslContext<SC, PDF> root(SC scope, PDF predicateFactory) {
+			PDF extends SearchPredicateFactory<E>> SearchAggregationDslContext<E, SC, PDF> root(SC scope,
+					PDF predicateFactory) {
 		return new SearchAggregationDslContext<>( scope, predicateFactory );
 	}
 
@@ -46,7 +48,7 @@ public class SearchAggregationDslContext<SC extends SearchAggregationIndexScope<
 	 * @param newPredicateFactory The new predicate factory for the new DSL context.
 	 * @return A copy of this DSL context with its scope and predicate factory replaced with the given ones.
 	 */
-	public SearchAggregationDslContext<SC, PDF> rescope(SC newScope, PDF newPredicateFactory) {
+	public SearchAggregationDslContext<E, SC, PDF> rescope(SC newScope, PDF newPredicateFactory) {
 		return new SearchAggregationDslContext<>( newScope, newPredicateFactory );
 	}
 

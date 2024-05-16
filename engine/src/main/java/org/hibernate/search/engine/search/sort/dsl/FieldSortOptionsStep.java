@@ -18,8 +18,8 @@ import org.hibernate.search.engine.search.predicate.dsl.SearchPredicateFactory;
  *
  * @author Emmanuel Bernard emmanuel@hibernate.org
  */
-public interface FieldSortOptionsStep<S extends FieldSortOptionsStep<?, PDF>, PDF extends SearchPredicateFactory>
-		extends SortFinalStep, SortThenStep, SortOrderStep<S>, SortModeStep<S>, SortFilterStep<S, PDF> {
+public interface FieldSortOptionsStep<E, S extends FieldSortOptionsStep<E, ?, PDF>, PDF extends SearchPredicateFactory<E>>
+		extends SortFinalStep, SortThenStep<E>, SortOrderStep<S>, SortModeStep<S>, SortFilterStep<E, S, PDF> {
 
 	/**
 	 * Start describing the behavior of this sort when a document doesn't

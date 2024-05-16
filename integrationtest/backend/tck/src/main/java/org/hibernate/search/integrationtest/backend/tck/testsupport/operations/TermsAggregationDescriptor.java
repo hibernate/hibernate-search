@@ -17,6 +17,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
 
+import org.hibernate.search.engine.backend.common.DocumentReference;
 import org.hibernate.search.engine.search.aggregation.dsl.AggregationFinalStep;
 import org.hibernate.search.engine.search.aggregation.dsl.SearchAggregationFactory;
 import org.hibernate.search.engine.search.aggregation.dsl.TermsAggregationOptionsStep;
@@ -140,9 +141,9 @@ public class TermsAggregationDescriptor extends AggregationDescriptor {
 					TypeAssertionHelper<F, T> helper) {
 				return new AggregationScenario<Map<T, Long>>() {
 					@Override
-					public AggregationFinalStep<Map<T, Long>> setup(SearchAggregationFactory factory, String fieldPath,
-							Function<? super SearchPredicateFactory, ? extends PredicateFinalStep> filterOrNull) {
-						TermsAggregationOptionsStep<?, ?, ?, Map<T, Long>> optionsStep =
+					public AggregationFinalStep<Map<T, Long>> setup(SearchAggregationFactory<DocumentReference> factory, String fieldPath,
+							Function<? super SearchPredicateFactory<DocumentReference>, ? extends PredicateFinalStep> filterOrNull) {
+						TermsAggregationOptionsStep<DocumentReference, ?, ?, ?, Map<T, Long>> optionsStep =
 								factory.terms().field( fieldPath, helper.getJavaClass() );
 						if ( filterOrNull == null ) {
 							return optionsStep;
@@ -153,7 +154,7 @@ public class TermsAggregationDescriptor extends AggregationDescriptor {
 					}
 
 					@Override
-					public AggregationFinalStep<Map<T, Long>> setupWithConverterSetting(SearchAggregationFactory factory,
+					public AggregationFinalStep<Map<T, Long>> setupWithConverterSetting(SearchAggregationFactory<DocumentReference> factory,
 							String fieldPath, ValueConvert convert) {
 						return factory.terms().field( fieldPath, helper.getJavaClass(), convert );
 					}
@@ -188,7 +189,7 @@ public class TermsAggregationDescriptor extends AggregationDescriptor {
 			}
 
 			@Override
-			public void trySetup(SearchAggregationFactory factory, String fieldPath) {
+			public void trySetup(SearchAggregationFactory<DocumentReference> factory, String fieldPath) {
 				factory.terms().field( fieldPath, typeDescriptor.getJavaType() );
 			}
 

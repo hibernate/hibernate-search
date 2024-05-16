@@ -15,11 +15,11 @@ import org.hibernate.search.engine.search.sort.dsl.spi.AbstractSortThenStep;
 import org.hibernate.search.engine.search.sort.dsl.spi.SearchSortDslContext;
 import org.hibernate.search.engine.search.sort.spi.WithParametersSortBuilder;
 
-public class WithParametersSortFinalStep extends AbstractSortThenStep {
+public class WithParametersSortFinalStep<E> extends AbstractSortThenStep<E> {
 
 	private final WithParametersSortBuilder builder;
 
-	public WithParametersSortFinalStep(SearchSortDslContext<?, ?> dslContext,
+	public WithParametersSortFinalStep(SearchSortDslContext<E, ?, ?> dslContext,
 			Function<? super NamedValues, ? extends SortFinalStep> sortCreator) {
 		super( dslContext );
 		builder = dslContext.scope().sortBuilders().withParameters();

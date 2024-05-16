@@ -132,7 +132,7 @@ public abstract class AbstractPredicateFieldScoreIT<V extends AbstractPredicateT
 
 	@SuppressWarnings("unchecked")
 	@Override
-	protected final PredicateFinalStep predicate(SearchPredicateFactory f, int matchingDocOrdinal,
+	protected final PredicateFinalStep predicate(SearchPredicateFactory<?> f, int matchingDocOrdinal,
 			AbstractPredicateDataSet dataSet, StubMappedIndex index) {
 		return predicate(
 				f, field0Path( (SimpleMappedIndex<IndexBinding>) index, (DataSet<?, V>) dataSet ), matchingDocOrdinal,
@@ -142,7 +142,7 @@ public abstract class AbstractPredicateFieldScoreIT<V extends AbstractPredicateT
 
 	@SuppressWarnings("unchecked")
 	@Override
-	protected final PredicateFinalStep predicateWithBoost(SearchPredicateFactory f, int matchingDocOrdinal, float boost,
+	protected final PredicateFinalStep predicateWithBoost(SearchPredicateFactory<?> f, int matchingDocOrdinal, float boost,
 			AbstractPredicateDataSet dataSet, StubMappedIndex index) {
 		return predicateWithPredicateLevelBoost( f, new String[] {
 				field0Path(
@@ -156,7 +156,7 @@ public abstract class AbstractPredicateFieldScoreIT<V extends AbstractPredicateT
 
 	@SuppressWarnings("unchecked")
 	@Override
-	protected final PredicateFinalStep predicateWithConstantScore(SearchPredicateFactory f, int matchingDocOrdinal,
+	protected final PredicateFinalStep predicateWithConstantScore(SearchPredicateFactory<?> f, int matchingDocOrdinal,
 			AbstractPredicateDataSet dataSet, StubMappedIndex index) {
 		return predicateWithConstantScore( f,
 				new String[] { field0Path( (SimpleMappedIndex<IndexBinding>) index, (DataSet<?, V>) dataSet ) },
@@ -166,7 +166,7 @@ public abstract class AbstractPredicateFieldScoreIT<V extends AbstractPredicateT
 
 	@SuppressWarnings("unchecked")
 	@Override
-	protected final PredicateFinalStep predicateWithConstantScoreAndBoost(SearchPredicateFactory f,
+	protected final PredicateFinalStep predicateWithConstantScoreAndBoost(SearchPredicateFactory<?> f,
 			int matchingDocOrdinal, float boost, AbstractPredicateDataSet dataSet,
 			StubMappedIndex index) {
 		return predicateWithConstantScoreAndPredicateLevelBoost( f,
@@ -175,28 +175,28 @@ public abstract class AbstractPredicateFieldScoreIT<V extends AbstractPredicateT
 		);
 	}
 
-	protected abstract PredicateFinalStep predicate(SearchPredicateFactory f, String fieldPath,
+	protected abstract PredicateFinalStep predicate(SearchPredicateFactory<?> f, String fieldPath,
 			int matchingDocOrdinal, DataSet<?, V> dataSet);
 
-	protected abstract PredicateFinalStep predicateWithConstantScore(SearchPredicateFactory f,
+	protected abstract PredicateFinalStep predicateWithConstantScore(SearchPredicateFactory<?> f,
 			String[] fieldPaths, int matchingDocOrdinal, DataSet<?, V> dataSet);
 
-	protected abstract PredicateFinalStep predicateWithPredicateLevelBoost(SearchPredicateFactory f,
+	protected abstract PredicateFinalStep predicateWithPredicateLevelBoost(SearchPredicateFactory<?> f,
 			String[] fieldPaths, int matchingDocOrdinal, float predicateBoost,
 			DataSet<?, V> dataSet);
 
-	protected abstract PredicateFinalStep predicateWithConstantScoreAndPredicateLevelBoost(SearchPredicateFactory f,
+	protected abstract PredicateFinalStep predicateWithConstantScoreAndPredicateLevelBoost(SearchPredicateFactory<?> f,
 			String[] fieldPaths, int matchingDocOrdinal, float predicateBoost,
 			DataSet<?, V> dataSet);
 
-	protected abstract PredicateFinalStep predicateWithFieldLevelBoost(SearchPredicateFactory f,
+	protected abstract PredicateFinalStep predicateWithFieldLevelBoost(SearchPredicateFactory<?> f,
 			String fieldPath, float fieldBoost, int matchingDocOrdinal, DataSet<?, V> dataSet);
 
-	protected abstract PredicateFinalStep predicateWithFieldLevelBoostAndPredicateLevelBoost(SearchPredicateFactory f,
+	protected abstract PredicateFinalStep predicateWithFieldLevelBoostAndPredicateLevelBoost(SearchPredicateFactory<?> f,
 			String fieldPath, float fieldBoost, int matchingDocOrdinal, float predicateBoost,
 			DataSet<?, V> dataSet);
 
-	protected abstract PredicateFinalStep predicateWithFieldLevelBoostAndConstantScore(SearchPredicateFactory f,
+	protected abstract PredicateFinalStep predicateWithFieldLevelBoostAndConstantScore(SearchPredicateFactory<?> f,
 			String fieldPath, float fieldBoost, int matchingDocOrdinal, DataSet<?, V> dataSet);
 
 	private String field0Path(SimpleMappedIndex<IndexBinding> index, DataSet<?, V> dataSet) {

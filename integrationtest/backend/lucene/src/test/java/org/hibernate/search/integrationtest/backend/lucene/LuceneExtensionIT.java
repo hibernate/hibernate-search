@@ -128,17 +128,17 @@ class LuceneExtensionIT {
 		// Put intermediary contexts into variables to check they have the right type
 		LuceneSearchQuerySelectStep<EntityReference, DocumentReference, StubLoadingOptionsStep> context1 =
 				scope.query().extension( LuceneExtension.get() );
-		LuceneSearchQueryWhereStep<DocumentReference, StubLoadingOptionsStep> context2 = context1.select(
+		LuceneSearchQueryWhereStep<DocumentReference, DocumentReference, StubLoadingOptionsStep> context2 = context1.select(
 				f -> f.composite()
 						.from( f.documentReference(), f.document() )
 						// We don't care about the document, it's just to test that the factory context allows Lucene-specific projection
 						.as( (docRef, document) -> docRef )
 		);
 		// Note we can use Lucene-specific predicates immediately
-		LuceneSearchQueryOptionsStep<DocumentReference, StubLoadingOptionsStep> context3 =
+		LuceneSearchQueryOptionsStep<DocumentReference, DocumentReference, StubLoadingOptionsStep> context3 =
 				context2.where( f -> f.fromLuceneQuery( new MatchAllDocsQuery() ) );
 		// Note we can use Lucene-specific sorts immediately
-		LuceneSearchQueryOptionsStep<DocumentReference, StubLoadingOptionsStep> context4 =
+		LuceneSearchQueryOptionsStep<DocumentReference, DocumentReference, StubLoadingOptionsStep> context4 =
 				context3.sort( f -> f.fromLuceneSortField( new SortedSetSortField( "sort1", false ) ) );
 
 		// Put the query and result into variables to check they have the right type
@@ -150,16 +150,16 @@ class LuceneExtensionIT {
 				.hasTotalHitCount( 5 );
 
 		// Also check (at compile time) the context type for other asXXX() methods, since we need to override each method explicitly
-		LuceneSearchQueryWhereStep<EntityReference, StubLoadingOptionsStep> selectEntityReferenceContext =
+		LuceneSearchQueryWhereStep<DocumentReference,  EntityReference, StubLoadingOptionsStep> selectEntityReferenceContext =
 				scope.query().extension( LuceneExtension.get() ).selectEntityReference();
-		LuceneSearchQueryWhereStep<DocumentReference, StubLoadingOptionsStep> selectEntityContext =
+		LuceneSearchQueryWhereStep<DocumentReference, DocumentReference, StubLoadingOptionsStep> selectEntityContext =
 				scope.query().extension( LuceneExtension.get() ).selectEntity();
 		SearchProjection<DocumentReference> projection = scope.projection().documentReference().toProjection();
-		LuceneSearchQueryWhereStep<DocumentReference, StubLoadingOptionsStep> selectProjectionContext =
+		LuceneSearchQueryWhereStep<DocumentReference, DocumentReference, StubLoadingOptionsStep> selectProjectionContext =
 				scope.query().extension( LuceneExtension.get() ).select( projection );
-		LuceneSearchQueryWhereStep<List<?>, ?> selectProjectionsContext =
+		LuceneSearchQueryWhereStep<DocumentReference, List<?>, ?> selectProjectionsContext =
 				scope.query().extension( LuceneExtension.get() ).select( projection, projection );
-		LuceneSearchQueryOptionsStep<DocumentReference, StubLoadingOptionsStep> defaultResultContext =
+		LuceneSearchQueryOptionsStep<DocumentReference, DocumentReference, StubLoadingOptionsStep> defaultResultContext =
 				scope.query().extension( LuceneExtension.get() )
 						.where( f -> f.fromLuceneQuery( new MatchAllDocsQuery() ) );
 	}
@@ -375,7 +375,7 @@ class LuceneExtensionIT {
 	void predicate_fromLuceneQuery_withRoot() {
 		SearchQuery<DocumentReference> query = mainIndex.query()
 				.where( f -> {
-					LuceneSearchPredicateFactory f2 = f.extension( LuceneExtension.get() ).withRoot( "flattenedObject" );
+					LuceneSearchPredicateFactory<?> f2 = f.extension( LuceneExtension.get() ).withRoot( "flattenedObject" );
 					return f2.or(
 							f2.fromLuceneQuery( new TermQuery( new Term( f2.toAbsolutePath( "stringInObject" ), "text 2" ) ) ),
 							f2.fromLuceneQuery( IntPoint.newExactQuery( f2.toAbsolutePath( "integerInObject" ), 3 ) ) );
@@ -479,7 +479,7 @@ class LuceneExtensionIT {
 		assertThatQuery( mainIndex.query()
 				.where( f -> f.matchAll() )
 				.sort( f -> {
-					LuceneSearchSortFactory f2 = f.extension( LuceneExtension.get() ).withRoot( "flattenedObject" );
+					LuceneSearchSortFactory<?> f2 = f.extension( LuceneExtension.get() ).withRoot( "flattenedObject" );
 					return f2.fromLuceneSortField( new SortedSetSortField( f2.toAbsolutePath( "sortInObject" ), false ) );
 				} ) )
 				.hasDocRefHitsExactOrder( mainIndex.typeName(),
@@ -488,7 +488,7 @@ class LuceneExtensionIT {
 		assertThatQuery( mainIndex.query()
 				.where( f -> f.matchAll() )
 				.sort( f -> {
-					LuceneSearchSortFactory f2 = f.extension( LuceneExtension.get() ).withRoot( "flattenedObject" );
+					LuceneSearchSortFactory<?> f2 = f.extension( LuceneExtension.get() ).withRoot( "flattenedObject" );
 					return f2.fromLuceneSortField( new SortedSetSortField( f2.toAbsolutePath( "sortInObject" ), true ) );
 				} ) )
 				.hasDocRefHitsExactOrder( mainIndex.typeName(),

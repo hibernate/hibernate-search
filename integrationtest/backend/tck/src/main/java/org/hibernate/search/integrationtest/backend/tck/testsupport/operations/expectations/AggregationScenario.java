@@ -8,6 +8,7 @@ package org.hibernate.search.integrationtest.backend.tck.testsupport.operations.
 
 import java.util.function.Function;
 
+import org.hibernate.search.engine.backend.common.DocumentReference;
 import org.hibernate.search.engine.search.aggregation.dsl.AggregationFinalStep;
 import org.hibernate.search.engine.search.aggregation.dsl.SearchAggregationFactory;
 import org.hibernate.search.engine.search.common.ValueConvert;
@@ -16,14 +17,14 @@ import org.hibernate.search.engine.search.predicate.dsl.SearchPredicateFactory;
 
 public interface AggregationScenario<A> {
 
-	default AggregationFinalStep<A> setup(SearchAggregationFactory factory, String fieldPath) {
+	default AggregationFinalStep<A> setup(SearchAggregationFactory<DocumentReference> factory, String fieldPath) {
 		return setup( factory, fieldPath, null );
 	}
 
-	AggregationFinalStep<A> setup(SearchAggregationFactory factory, String fieldPath,
-			Function<? super SearchPredicateFactory, ? extends PredicateFinalStep> filterOrNull);
+	AggregationFinalStep<A> setup(SearchAggregationFactory<DocumentReference> factory, String fieldPath,
+			Function<? super SearchPredicateFactory<DocumentReference>, ? extends PredicateFinalStep> filterOrNull);
 
-	AggregationFinalStep<A> setupWithConverterSetting(SearchAggregationFactory factory, String fieldPath,
+	AggregationFinalStep<A> setupWithConverterSetting(SearchAggregationFactory<DocumentReference> factory, String fieldPath,
 			ValueConvert convert);
 
 	void check(A aggregationResult);

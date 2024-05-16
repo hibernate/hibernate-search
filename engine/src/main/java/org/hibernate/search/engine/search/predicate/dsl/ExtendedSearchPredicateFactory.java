@@ -15,8 +15,8 @@ package org.hibernate.search.engine.search.predicate.dsl;
  *
  * @param <S> The self type, i.e. the exposed type of this factory.
  */
-public interface ExtendedSearchPredicateFactory<S extends ExtendedSearchPredicateFactory<?>>
-		extends SearchPredicateFactory {
+public interface ExtendedSearchPredicateFactory<E, S extends ExtendedSearchPredicateFactory<E, ?>>
+		extends SearchPredicateFactory<E> {
 
 	@Override
 	S withRoot(String objectFieldPath);

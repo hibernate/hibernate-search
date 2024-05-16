@@ -147,13 +147,13 @@ abstract class AbstractBaseQueryStringPredicateBaseIT<P extends CommonQueryStrin
 		}
 
 		@Override
-		protected PredicateFinalStep predicate(SearchPredicateFactory f, String fieldPath, int matchingDocOrdinal,
+		protected PredicateFinalStep predicate(SearchPredicateFactory<?> f, String fieldPath, int matchingDocOrdinal,
 				DataSet<?, CommonQueryStringPredicateTestValues<?>> dataSet) {
 			return predicate( f ).field( fieldPath ).matching( dataSet.values.matchingArg( matchingDocOrdinal ) );
 		}
 
 		@Override
-		protected PredicateFinalStep predicate(SearchPredicateFactory f, String fieldPath, String paramName,
+		protected PredicateFinalStep predicate(SearchPredicateFactory<?> f, String fieldPath, String paramName,
 				DataSet<?, CommonQueryStringPredicateTestValues<?>> dataSet) {
 			return f.withParameters( params -> predicate( f ).field( fieldPath )
 					.matching( params.get( paramName, String.class ) ) );
@@ -197,20 +197,20 @@ abstract class AbstractBaseQueryStringPredicateBaseIT<P extends CommonQueryStrin
 		}
 
 		@Override
-		protected PredicateFinalStep predicateOnFieldAndField(SearchPredicateFactory f, String fieldPath,
+		protected PredicateFinalStep predicateOnFieldAndField(SearchPredicateFactory<?> f, String fieldPath,
 				String otherFieldPath, int matchingDocOrdinal, DataSet<?, CommonQueryStringPredicateTestValues<?>> dataSet) {
 			return predicate( f ).field( fieldPath ).field( otherFieldPath )
 					.matching( dataSet.values.matchingArg( matchingDocOrdinal ) );
 		}
 
 		@Override
-		protected PredicateFinalStep predicateOnFields(SearchPredicateFactory f, String[] fieldPaths, int matchingDocOrdinal,
+		protected PredicateFinalStep predicateOnFields(SearchPredicateFactory<?> f, String[] fieldPaths, int matchingDocOrdinal,
 				DataSet<?, CommonQueryStringPredicateTestValues<?>> dataSet) {
 			return predicate( f ).fields( fieldPaths ).matching( dataSet.values.matchingArg( matchingDocOrdinal ) );
 		}
 
 		@Override
-		protected PredicateFinalStep predicateOnFieldAndFields(SearchPredicateFactory f, String fieldPath,
+		protected PredicateFinalStep predicateOnFieldAndFields(SearchPredicateFactory<?> f, String fieldPath,
 				String[] fieldPaths, int matchingDocOrdinal, DataSet<?, CommonQueryStringPredicateTestValues<?>> dataSet) {
 			return predicate( f ).field( fieldPath ).fields( fieldPaths )
 					.matching( dataSet.values.matchingArg( matchingDocOrdinal ) );
@@ -340,14 +340,14 @@ abstract class AbstractBaseQueryStringPredicateBaseIT<P extends CommonQueryStrin
 		}
 
 		@Override
-		protected PredicateFinalStep predicate(SearchPredicateFactory f, String fieldPath, int matchingDocOrdinal,
+		protected PredicateFinalStep predicate(SearchPredicateFactory<?> f, String fieldPath, int matchingDocOrdinal,
 				DataSet<?, CommonQueryStringPredicateTestValues<?>> dataSet) {
 			return predicate( f ).field( fieldPath )
 					.matching( dataSet.values.matchingArg( matchingDocOrdinal ) );
 		}
 
 		@Override
-		protected PredicateFinalStep predicateWithConstantScore(SearchPredicateFactory f, String[] fieldPaths,
+		protected PredicateFinalStep predicateWithConstantScore(SearchPredicateFactory<?> f, String[] fieldPaths,
 				int matchingDocOrdinal, DataSet<?, CommonQueryStringPredicateTestValues<?>> dataSet) {
 			return predicate( f ).fields( fieldPaths )
 					.matching( dataSet.values.matchingArg( matchingDocOrdinal ) )
@@ -355,7 +355,7 @@ abstract class AbstractBaseQueryStringPredicateBaseIT<P extends CommonQueryStrin
 		}
 
 		@Override
-		protected PredicateFinalStep predicateWithPredicateLevelBoost(SearchPredicateFactory f, String[] fieldPaths,
+		protected PredicateFinalStep predicateWithPredicateLevelBoost(SearchPredicateFactory<?> f, String[] fieldPaths,
 				int matchingDocOrdinal, float predicateBoost, DataSet<?, CommonQueryStringPredicateTestValues<?>> dataSet) {
 			return predicate( f ).fields( fieldPaths )
 					.matching( dataSet.values.matchingArg( matchingDocOrdinal ) )
@@ -363,7 +363,7 @@ abstract class AbstractBaseQueryStringPredicateBaseIT<P extends CommonQueryStrin
 		}
 
 		@Override
-		protected PredicateFinalStep predicateWithConstantScoreAndPredicateLevelBoost(SearchPredicateFactory f,
+		protected PredicateFinalStep predicateWithConstantScoreAndPredicateLevelBoost(SearchPredicateFactory<?> f,
 				String[] fieldPaths, int matchingDocOrdinal, float predicateBoost,
 				DataSet<?, CommonQueryStringPredicateTestValues<?>> dataSet) {
 			return predicate( f ).fields( fieldPaths )
@@ -372,14 +372,14 @@ abstract class AbstractBaseQueryStringPredicateBaseIT<P extends CommonQueryStrin
 		}
 
 		@Override
-		protected PredicateFinalStep predicateWithFieldLevelBoost(SearchPredicateFactory f, String fieldPath,
+		protected PredicateFinalStep predicateWithFieldLevelBoost(SearchPredicateFactory<?> f, String fieldPath,
 				float fieldBoost, int matchingDocOrdinal, DataSet<?, CommonQueryStringPredicateTestValues<?>> dataSet) {
 			return predicate( f ).field( fieldPath ).boost( fieldBoost )
 					.matching( dataSet.values.matchingArg( matchingDocOrdinal ) );
 		}
 
 		@Override
-		protected PredicateFinalStep predicateWithFieldLevelBoostAndConstantScore(SearchPredicateFactory f,
+		protected PredicateFinalStep predicateWithFieldLevelBoostAndConstantScore(SearchPredicateFactory<?> f,
 				String fieldPath, float fieldBoost, int matchingDocOrdinal,
 				DataSet<?, CommonQueryStringPredicateTestValues<?>> dataSet) {
 			return predicate( f ).field( fieldPath ).boost( fieldBoost )
@@ -388,7 +388,7 @@ abstract class AbstractBaseQueryStringPredicateBaseIT<P extends CommonQueryStrin
 		}
 
 		@Override
-		protected PredicateFinalStep predicateWithFieldLevelBoostAndPredicateLevelBoost(SearchPredicateFactory f,
+		protected PredicateFinalStep predicateWithFieldLevelBoostAndPredicateLevelBoost(SearchPredicateFactory<?> f,
 				String fieldPath, float fieldBoost, int matchingDocOrdinal, float predicateBoost,
 				DataSet<?, CommonQueryStringPredicateTestValues<?>> dataSet) {
 			return predicate( f ).field( fieldPath ).boost( fieldBoost )
@@ -463,7 +463,7 @@ abstract class AbstractBaseQueryStringPredicateBaseIT<P extends CommonQueryStrin
 		}
 
 		@Override
-		protected void tryPredicate(SearchPredicateFactory f, String fieldPath) {
+		protected void tryPredicate(SearchPredicateFactory<?> f, String fieldPath) {
 			predicate( f ).field( fieldPath );
 		}
 
@@ -511,7 +511,7 @@ abstract class AbstractBaseQueryStringPredicateBaseIT<P extends CommonQueryStrin
 		}
 
 		@Override
-		protected void tryPredicate(SearchPredicateFactory f, String fieldPath, FieldTypeDescriptor<?, ?> fieldType) {
+		protected void tryPredicate(SearchPredicateFactory<?> f, String fieldPath, FieldTypeDescriptor<?, ?> fieldType) {
 			predicate( f ).field( fieldPath );
 		}
 

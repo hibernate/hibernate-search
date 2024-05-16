@@ -16,8 +16,8 @@ import org.hibernate.search.engine.search.predicate.dsl.SearchPredicateFactory;
  * @param <S> The "self" type (the actual exposed type of this step).
  * @param <PDF> The type of factory used to create predicates in {@link #filter(Function)}.
  */
-public interface DistanceSortOptionsStep<S extends DistanceSortOptionsStep<?, PDF>, PDF extends SearchPredicateFactory>
-		extends SortFinalStep, SortThenStep, SortOrderStep<S>, SortModeStep<S>, SortFilterStep<S, PDF> {
+public interface DistanceSortOptionsStep<E, S extends DistanceSortOptionsStep<E, ?, PDF>, PDF extends SearchPredicateFactory<E>>
+		extends SortFinalStep, SortThenStep<E>, SortOrderStep<S>, SortModeStep<S>, SortFilterStep<E, S, PDF> {
 
 	/**
 	 * Start describing the behavior of this sort when a document doesn't

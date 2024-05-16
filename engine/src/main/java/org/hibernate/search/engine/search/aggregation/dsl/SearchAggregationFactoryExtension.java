@@ -33,6 +33,6 @@ public interface SearchAggregationFactoryExtension<T> {
 	 * @return An optional containing the extended aggregation factory ({@link T}) in case
 	 * of success, or an empty optional otherwise.
 	 */
-	Optional<T> extendOptional(SearchAggregationFactory original);
+	Optional<T> extendOptional(SearchAggregationFactory<?> original);
 
 }

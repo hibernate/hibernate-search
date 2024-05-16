@@ -11,13 +11,13 @@ package org.hibernate.search.engine.search.sort.dsl;
  *
  * @author Emmanuel Bernard emmanuel@hibernate.org
  */
-public interface SortThenStep extends SortFinalStep {
+public interface SortThenStep<E> extends SortFinalStep {
 
 	/**
 	 * Start defining another sort, to be applied after the current one.
 	 *
 	 * @return The next step.
 	 */
-	SearchSortFactory then();
+	SearchSortFactory<E> then();
 
 }

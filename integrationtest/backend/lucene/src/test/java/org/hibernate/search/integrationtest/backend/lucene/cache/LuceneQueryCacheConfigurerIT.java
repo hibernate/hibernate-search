@@ -105,7 +105,7 @@ class LuceneQueryCacheConfigurerIT {
 				.setup();
 	}
 
-	private SearchQueryOptionsStep<?, DocumentReference, ?, ?, ?> matchAllQuery() {
+	private SearchQueryOptionsStep<DocumentReference, ?, DocumentReference, ?, ?, ?> matchAllQuery() {
 		return index.query()
 				.where( f -> f.matchAll() );
 	}

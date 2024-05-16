@@ -88,10 +88,10 @@ public class SkuIdentifierBinder implements PropertyBinder {
 	//tag::predicate-definition[]
 	// ... class SkuIdentifierBinder (continued)
 
-	private static class SkuIdentifierMatchPredicateDefinition implements PredicateDefinition { // <1>
+	private static class SkuIdentifierMatchPredicateDefinition implements PredicateDefinition<Object> { // <1>
 		@Override
-		public SearchPredicate create(PredicateDefinitionContext context) {
-			SearchPredicateFactory f = context.predicate(); // <2>
+		public SearchPredicate create(PredicateDefinitionContext<Object> context) {
+			SearchPredicateFactory<Object> f = context.predicate(); // <2>
 
 			String pattern = context.params().get( "pattern", String.class ); // <3>
 

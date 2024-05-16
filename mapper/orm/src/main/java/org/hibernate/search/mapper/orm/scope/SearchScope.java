@@ -54,7 +54,7 @@ public interface SearchScope<E> {
 	 * @return A predicate factory.
 	 * @see SearchPredicateFactory
 	 */
-	SearchPredicateFactory predicate();
+	SearchPredicateFactory<E> predicate();
 
 	/**
 	 * Initiate the building of a search sort.
@@ -71,7 +71,7 @@ public interface SearchScope<E> {
 	 * @return A sort factory.
 	 * @see SearchSortFactory
 	 */
-	SearchSortFactory sort();
+	SearchSortFactory<E> sort();
 
 	/**
 	 * Initiate the building of a search projection that will be valid for the indexes in this scope.
@@ -104,7 +104,7 @@ public interface SearchScope<E> {
 	 * @return An aggregation factory.
 	 * @see SearchAggregationFactory
 	 */
-	SearchAggregationFactory aggregation();
+	SearchAggregationFactory<E> aggregation();
 
 	/**
 	 * Create a {@link SearchSchemaManager} for the indexes mapped to types in this scope, or to any of their sub-types.

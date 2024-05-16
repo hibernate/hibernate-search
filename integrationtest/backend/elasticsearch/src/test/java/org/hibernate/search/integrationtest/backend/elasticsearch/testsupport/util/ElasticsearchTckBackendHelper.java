@@ -8,6 +8,7 @@ package org.hibernate.search.integrationtest.backend.elasticsearch.testsupport.u
 
 import org.hibernate.search.backend.elasticsearch.ElasticsearchExtension;
 import org.hibernate.search.backend.elasticsearch.cfg.ElasticsearchIndexSettings;
+import org.hibernate.search.engine.backend.common.DocumentReference;
 import org.hibernate.search.engine.search.predicate.dsl.PredicateFinalStep;
 import org.hibernate.search.engine.search.predicate.dsl.SearchPredicateFactory;
 import org.hibernate.search.engine.search.query.dsl.SearchQueryDslExtension;
@@ -101,7 +102,7 @@ public class ElasticsearchTckBackendHelper implements TckBackendHelper {
 	}
 
 	@Override
-	public PredicateFinalStep createSlowPredicate(SearchPredicateFactory f) {
+	public PredicateFinalStep createSlowPredicate(SearchPredicateFactory<DocumentReference> f) {
 		return f.extension( ElasticsearchExtension.get() )
 				.fromJson( "{\"script\": {"
 						+ "  \"script\": \""

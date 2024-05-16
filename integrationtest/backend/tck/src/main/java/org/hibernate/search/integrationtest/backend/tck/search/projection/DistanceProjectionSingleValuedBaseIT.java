@@ -24,7 +24,7 @@ class DistanceProjectionSingleValuedBaseIT extends AbstractDistanceProjectionSin
 
 
 	@Override
-	protected void addParameter(SearchQueryOptionsStep<?, ?, ?, ?, ?> query, String parameterName, Object value) {
+	protected void addParameter(SearchQueryOptionsStep<?, ?, ?, ?, ?, ?> query, String parameterName, Object value) {
 		// do nothing
 	}
 
@@ -50,7 +50,7 @@ class DistanceProjectionSingleValuedBaseIT extends AbstractDistanceProjectionSin
 	}
 
 	@Override
-	protected SortFinalStep sort(SearchSortFactory sort, String path, GeoPoint center, String parameterName) {
+	protected SortFinalStep sort(SearchSortFactory<?> sort, String path, GeoPoint center, String parameterName) {
 		return sort.distance( path, center );
 	}
 }

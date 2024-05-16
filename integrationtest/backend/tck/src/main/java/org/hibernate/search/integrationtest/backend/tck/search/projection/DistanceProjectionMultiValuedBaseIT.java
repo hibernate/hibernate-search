@@ -21,7 +21,7 @@ import org.hibernate.search.engine.spatial.GeoPoint;
 class DistanceProjectionMultiValuedBaseIT extends AbstractDistanceProjectionMultiValuedBaseIT {
 
 	@Override
-	protected void addParameter(SearchQueryOptionsStep<?, ?, ?, ?, ?> query, String parameterName, Object value) {
+	protected void addParameter(SearchQueryOptionsStep<?, ?, ?, ?, ?, ?> query, String parameterName, Object value) {
 		// do nothing
 	}
 
@@ -40,7 +40,7 @@ class DistanceProjectionMultiValuedBaseIT extends AbstractDistanceProjectionMult
 	}
 
 	@Override
-	protected SortFinalStep sort(SearchSortFactory sort, String path, GeoPoint center,
+	protected SortFinalStep sort(SearchSortFactory<?> sort, String path, GeoPoint center,
 			String parameterName) {
 		return sort.distance( path, center );
 	}

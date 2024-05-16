@@ -271,7 +271,7 @@ class SearchQueryBaseIT {
 		return factory;
 	}
 
-	private SearchQueryOptionsStep<?, DocumentReference, ?, ?, ?> matchAllSortedByScoreQuery() {
+	private SearchQueryOptionsStep<DocumentReference,?, DocumentReference, ?, ?, ?> matchAllSortedByScoreQuery() {
 		return index.query()
 				.where( f -> f.matchAll() );
 	}
@@ -282,7 +282,7 @@ class SearchQueryBaseIT {
 	 * because optimizations are possible with MatchAllDocsQuery that would allow Hibernate Search
 	 * to return an exact total hit count in constant time, ignoring the total hit count threshold.
 	 */
-	private SearchQueryOptionsStep<?, DocumentReference, ?, ?, ?> matchAllWithConditionSortedByScoreQuery() {
+	private SearchQueryOptionsStep<DocumentReference,?, DocumentReference, ?, ?, ?> matchAllWithConditionSortedByScoreQuery() {
 		return index.query()
 				.where( f -> f.exists().field( "string" ) );
 	}
@@ -371,9 +371,9 @@ class SearchQueryBaseIT {
 	}
 
 	private static class MyExtendedDslContext<T> {
-		private final SearchQueryWhereStep<?, T, ?, ?> delegate;
+		private final SearchQueryWhereStep<T, ?, T, ?, ?> delegate;
 
-		MyExtendedDslContext(SearchQueryWhereStep<?, T, ?, ?> delegate) {
+		MyExtendedDslContext(SearchQueryWhereStep<T, ?, T, ?, ?> delegate) {
 			this.delegate = delegate;
 		}
 

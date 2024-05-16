@@ -20,18 +20,19 @@ import org.hibernate.search.engine.search.highlighter.dsl.SearchHighlighterFacto
 import org.hibernate.search.engine.search.loading.spi.SearchLoadingContextBuilder;
 import org.hibernate.search.engine.search.query.dsl.spi.AbstractExtendedSearchQueryOptionsStep;
 
-class LuceneSearchQueryOptionsStepImpl<H, LOS>
+class LuceneSearchQueryOptionsStepImpl<E, H, LOS>
 		extends AbstractExtendedSearchQueryOptionsStep<
-				LuceneSearchQueryOptionsStep<H, LOS>,
+				E,
+				LuceneSearchQueryOptionsStep<E, H, LOS>,
 				H,
 				LuceneSearchResult<H>,
 				LuceneSearchScroll<H>,
 				LOS,
-				LuceneSearchPredicateFactory,
-				LuceneSearchSortFactory,
-				LuceneSearchAggregationFactory,
+				LuceneSearchPredicateFactory<E>,
+				LuceneSearchSortFactory<E>,
+				LuceneSearchAggregationFactory<E>,
 				LuceneSearchQueryIndexScope<?>>
-		implements LuceneSearchQueryWhereStep<H, LOS>, LuceneSearchQueryOptionsStep<H, LOS> {
+		implements LuceneSearchQueryWhereStep<E, H, LOS>, LuceneSearchQueryOptionsStep<E, H, LOS> {
 
 	private final LuceneSearchQueryBuilder<H> searchQueryBuilder;
 
@@ -48,13 +49,13 @@ class LuceneSearchQueryOptionsStepImpl<H, LOS>
 	}
 
 	@Override
-	protected LuceneSearchQueryOptionsStepImpl<H, LOS> thisAsS() {
+	protected LuceneSearchQueryOptionsStepImpl<E, H, LOS> thisAsS() {
 		return this;
 	}
 
 	@Override
-	protected LuceneSearchPredicateFactory predicateFactory() {
-		return scope.predicateFactory();
+	protected LuceneSearchPredicateFactory<E> predicateFactory() {
+		return scope.<E>predicateFactory();
 	}
 
 	@Override

@@ -30,12 +30,12 @@ import org.hibernate.search.engine.search.query.dsl.spi.AbstractSearchQuerySelec
 
 public class LuceneSearchQuerySelectStepImpl<R, E, LOS>
 		extends AbstractSearchQuerySelectStep<
-				LuceneSearchQueryOptionsStep<E, LOS>,
+				LuceneSearchQueryOptionsStep<E, E, LOS>,
 				R,
 				E,
 				LOS,
 				LuceneSearchProjectionFactory<R, E>,
-				LuceneSearchPredicateFactory>
+				LuceneSearchPredicateFactory<E>>
 		implements LuceneSearchQuerySelectStep<R, E, LOS> {
 
 	private final LuceneSearchQueryIndexScope<?> scope;
@@ -51,55 +51,55 @@ public class LuceneSearchQuerySelectStepImpl<R, E, LOS>
 	}
 
 	@Override
-	public LuceneSearchQueryWhereStep<E, LOS> selectEntity() {
+	public LuceneSearchQueryWhereStep<E, E, LOS> selectEntity() {
 		return select( scope.<R, E>projectionFactory().entity().toProjection() );
 	}
 
 	@Override
-	public LuceneSearchQueryWhereStep<R, LOS> selectEntityReference() {
+	public LuceneSearchQueryWhereStep<E, R, LOS> selectEntityReference() {
 		return select( scope.projectionBuilders().entityReference() );
 	}
 
 	@Override
-	public <P> LuceneSearchQueryWhereStep<P, LOS> select(Class<P> objectClass) {
+	public <P> LuceneSearchQueryWhereStep<E, P, LOS> select(Class<P> objectClass) {
 		return select( scope.projectionFactory().composite().as( objectClass ).toProjection() );
 	}
 
 	@Override
-	public <P> LuceneSearchQueryWhereStep<P, LOS> select(
+	public <P> LuceneSearchQueryWhereStep<E, P, LOS> select(
 			Function<? super LuceneSearchProjectionFactory<R, E>, ? extends ProjectionFinalStep<P>> projectionContributor) {
 		SearchProjection<P> projection = projectionContributor.apply( scope.projectionFactory() ).toProjection();
 		return select( projection );
 	}
 
 	@Override
-	public <P> LuceneSearchQueryWhereStep<P, LOS> select(SearchProjection<P> projection) {
+	public <P> LuceneSearchQueryWhereStep<E, P, LOS> select(SearchProjection<P> projection) {
 		LuceneSearchQueryBuilder<P> builder =
 				scope.select( sessionContext, loadingContextBuilder, projection );
 		return new LuceneSearchQueryOptionsStepImpl<>( scope, builder, loadingContextBuilder );
 	}
 
 	@Override
-	public LuceneSearchQueryWhereStep<List<?>, LOS> select(SearchProjection<?>... projections) {
+	public LuceneSearchQueryWhereStep<E, List<?>, LOS> select(SearchProjection<?>... projections) {
 		return select( scope.projectionBuilders().composite()
 				.build( projections, ProjectionCompositor.fromList( projections.length ),
 						ProjectionAccumulator.single() ) );
 	}
 
 	@Override
-	public LuceneSearchQueryOptionsStep<E, LOS> where(SearchPredicate predicate) {
+	public LuceneSearchQueryOptionsStep<E, E, LOS> where(SearchPredicate predicate) {
 		return selectEntity().where( predicate );
 	}
 
 	@Override
-	public LuceneSearchQueryOptionsStep<E, LOS> where(
-			Function<? super LuceneSearchPredicateFactory, ? extends PredicateFinalStep> predicateContributor) {
+	public LuceneSearchQueryOptionsStep<E, E, LOS> where(
+			Function<? super LuceneSearchPredicateFactory<E>, ? extends PredicateFinalStep> predicateContributor) {
 		return selectEntity().where( predicateContributor );
 	}
 
 	@Override
-	public LuceneSearchQueryOptionsStep<E, LOS> where(
-			BiConsumer<? super LuceneSearchPredicateFactory,
+	public LuceneSearchQueryOptionsStep<E, E, LOS> where(
+			BiConsumer<? super LuceneSearchPredicateFactory<E>,
 					? super SimpleBooleanPredicateClausesCollector<?>> predicateContributor) {
 		return selectEntity().where( predicateContributor );
 	}

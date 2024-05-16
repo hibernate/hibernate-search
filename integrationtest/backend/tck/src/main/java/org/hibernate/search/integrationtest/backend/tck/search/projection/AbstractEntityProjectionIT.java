@@ -87,7 +87,7 @@ public abstract class AbstractEntityProjectionIT {
 		this.multiIndex4 = multiIndex4;
 	}
 
-	public abstract <R, E, LOS> SearchQueryWhereStep<?, E, LOS, ?> select(
+	public abstract <R, E, LOS> SearchQueryWhereStep<E, ?, E, LOS, ?> select(
 			SearchQuerySelectStep<?, R, E, LOS, ?, ?> step);
 
 	@Test

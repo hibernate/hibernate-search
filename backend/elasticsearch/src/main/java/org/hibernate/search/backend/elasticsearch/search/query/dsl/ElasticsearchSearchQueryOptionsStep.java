@@ -14,13 +14,14 @@ import org.hibernate.search.backend.elasticsearch.search.sort.dsl.ElasticsearchS
 import org.hibernate.search.engine.search.query.dsl.SearchQueryOptionsStep;
 import org.hibernate.search.util.common.annotation.Incubating;
 
-public interface ElasticsearchSearchQueryOptionsStep<H, LOS>
+public interface ElasticsearchSearchQueryOptionsStep<E, H, LOS>
 		extends SearchQueryOptionsStep<
-				ElasticsearchSearchQueryOptionsStep<H, LOS>,
+				E,
+				ElasticsearchSearchQueryOptionsStep<E, H, LOS>,
 				H,
 				LOS,
-				ElasticsearchSearchSortFactory,
-				ElasticsearchSearchAggregationFactory>,
+				ElasticsearchSearchSortFactory<E>,
+				ElasticsearchSearchAggregationFactory<E>>,
 		ElasticsearchSearchFetchable<H> {
 
 	/**
@@ -36,7 +37,7 @@ public interface ElasticsearchSearchQueryOptionsStep<H, LOS>
 	 * @return {@code this}, for method chaining.
 	 */
 	@Incubating
-	ElasticsearchSearchQueryOptionsStep<H, LOS> requestTransformer(ElasticsearchSearchRequestTransformer transformer);
+	ElasticsearchSearchQueryOptionsStep<E, H, LOS> requestTransformer(ElasticsearchSearchRequestTransformer transformer);
 
 	@Override
 	ElasticsearchSearchQuery<H> toQuery();

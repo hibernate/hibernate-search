@@ -22,24 +22,25 @@ import org.hibernate.search.engine.search.common.NamedValues;
 import org.hibernate.search.engine.search.predicate.dsl.SearchPredicateFactory;
 
 public abstract class AbstractSearchAggregationFactory<
-		S extends ExtendedSearchAggregationFactory<S, PDF>,
+		E,
+		S extends ExtendedSearchAggregationFactory<E, S, PDF>,
 		SC extends SearchAggregationIndexScope<?>,
-		PDF extends SearchPredicateFactory>
-		implements ExtendedSearchAggregationFactory<S, PDF> {
+		PDF extends SearchPredicateFactory<E>>
+		implements ExtendedSearchAggregationFactory<E, S, PDF> {
 
-	protected final SearchAggregationDslContext<SC, PDF> dslContext;
+	protected final SearchAggregationDslContext<E, SC, PDF> dslContext;
 
-	public AbstractSearchAggregationFactory(SearchAggregationDslContext<SC, PDF> dslContext) {
+	public AbstractSearchAggregationFactory(SearchAggregationDslContext<E, SC, PDF> dslContext) {
 		this.dslContext = dslContext;
 	}
 
 	@Override
-	public RangeAggregationFieldStep<PDF> range() {
+	public RangeAggregationFieldStep<E, PDF> range() {
 		return new RangeAggregationFieldStepImpl<>( dslContext );
 	}
 
 	@Override
-	public TermsAggregationFieldStep<PDF> terms() {
+	public TermsAggregationFieldStep<E, PDF> terms() {
 		return new TermsAggregationFieldStepImpl<>( dslContext );
 	}
 

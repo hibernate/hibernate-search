@@ -65,9 +65,10 @@ import org.hibernate.search.engine.search.predicate.spi.SearchPredicateIndexScop
 import org.hibernate.search.util.common.impl.Contracts;
 
 public abstract class AbstractSearchPredicateFactory<
-		S extends ExtendedSearchPredicateFactory<S>,
+		E,
+		S extends ExtendedSearchPredicateFactory<E, S>,
 		SC extends SearchPredicateIndexScope<?>>
-		implements ExtendedSearchPredicateFactory<S> {
+		implements ExtendedSearchPredicateFactory<E, S> {
 
 	protected final SearchPredicateDslContext<SC> dslContext;
 
@@ -149,8 +150,8 @@ public abstract class AbstractSearchPredicateFactory<
 	}
 
 	@Override
-	public MatchPredicateFieldStep<?> match() {
-		return new MatchPredicateFieldStepImpl( dslContext );
+	public MatchPredicateFieldStep<E, ?> match() {
+		return new MatchPredicateFieldStepImpl<>( dslContext );
 	}
 
 	@Override
@@ -227,9 +228,9 @@ public abstract class AbstractSearchPredicateFactory<
 	}
 
 	@Override
-	public KnnPredicateFieldStep knn(int k) {
+	public KnnPredicateFieldStep<E> knn(int k) {
 		Contracts.assertStrictlyPositive( k, "k" );
-		return new KnnPredicateFieldStepImpl( this, dslContext, k );
+		return new KnnPredicateFieldStepImpl<>( this, dslContext, k );
 	}
 
 	@Override

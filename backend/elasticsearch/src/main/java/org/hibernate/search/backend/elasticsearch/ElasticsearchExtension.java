@@ -67,10 +67,10 @@ import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 public final class ElasticsearchExtension<H, R, E, LOS>
 		implements SearchQueryDslExtension<ElasticsearchSearchQuerySelectStep<R, E, LOS>, R, E, LOS>,
 		SearchQueryExtension<ElasticsearchSearchQuery<H>, H>,
-		SearchPredicateFactoryExtension<ElasticsearchSearchPredicateFactory>,
-		SearchSortFactoryExtension<ElasticsearchSearchSortFactory>,
+		SearchPredicateFactoryExtension<ElasticsearchSearchPredicateFactory<E>>,
+		SearchSortFactoryExtension<ElasticsearchSearchSortFactory<E>>,
 		SearchProjectionFactoryExtension<ElasticsearchSearchProjectionFactory<R, E>, R, E>,
-		SearchAggregationFactoryExtension<ElasticsearchSearchAggregationFactory>,
+		SearchAggregationFactoryExtension<ElasticsearchSearchAggregationFactory<E>>,
 		IndexFieldTypeFactoryExtension<ElasticsearchIndexFieldTypeFactory>,
 		SchemaExportExtension<ElasticsearchIndexSchemaExport> {
 
@@ -181,8 +181,8 @@ public final class ElasticsearchExtension<H, R, E, LOS>
 	 * {@inheritDoc}
 	 */
 	@Override
-	public Optional<ElasticsearchSearchAggregationFactory> extendOptional(
-			SearchAggregationFactory original) {
+	public Optional<ElasticsearchSearchAggregationFactory<E>> extendOptional(
+			SearchAggregationFactory<?> original) {
 		if ( original instanceof ElasticsearchSearchAggregationFactory ) {
 			return Optional.of( (ElasticsearchSearchAggregationFactory) original );
 		}

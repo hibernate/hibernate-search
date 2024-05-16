@@ -23,11 +23,12 @@ import org.hibernate.search.util.common.data.Range;
  * @param <F> The type of the targeted field.
  */
 public interface RangeAggregationRangeMoreStep<
-		S extends RangeAggregationRangeMoreStep<?, ?, PDF, F>,
-		N extends RangeAggregationOptionsStep<?, PDF, F, Map<Range<F>, Long>>,
-		PDF extends SearchPredicateFactory,
+		E,
+		S extends RangeAggregationRangeMoreStep<E, ?, ?, PDF, F>,
+		N extends RangeAggregationOptionsStep<E, ?, PDF, F, Map<Range<F>, Long>>,
+		PDF extends SearchPredicateFactory<E>,
 		F>
-		extends RangeAggregationOptionsStep<N, PDF, F, Map<Range<F>, Long>>,
-		RangeAggregationRangeStep<S, PDF, F> {
+		extends RangeAggregationOptionsStep<E, N, PDF, F, Map<Range<F>, Long>>,
+		RangeAggregationRangeStep<E, S, PDF, F> {
 
 }
