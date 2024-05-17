@@ -7,7 +7,6 @@ package org.hibernate.search.engine.search.sort.dsl;
 import java.util.function.Function;
 
 import org.hibernate.search.engine.search.predicate.dsl.SearchPredicateFactory;
-import org.hibernate.search.engine.search.reference.object.ObjectFieldReference;
 import org.hibernate.search.engine.search.reference.sort.FieldSortFieldReference;
 import org.hibernate.search.engine.spatial.GeoPoint;
 
@@ -30,11 +29,6 @@ public interface ExtendedSearchSortFactory<
 
 	@Override
 	S withRoot(String objectFieldPath);
-
-	@Override
-	default S withRoot(ObjectFieldReference<? super SR> objectFieldReference) {
-		return withRoot( objectFieldReference.absolutePath() );
-	}
 
 	@Override
 	FieldSortOptionsStep<SR, ?, PDF> field(String fieldPath);

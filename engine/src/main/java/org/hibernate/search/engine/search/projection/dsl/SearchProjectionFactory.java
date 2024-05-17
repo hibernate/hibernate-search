@@ -523,21 +523,6 @@ public interface SearchProjectionFactory<SR, R, E> {
 	SearchProjectionFactory<SR, R, E> withRoot(String objectFieldPath);
 
 	/**
-	 * Create a new projection factory whose root for all paths passed to the DSL
-	 * will be the given object field.
-	 * <p>
-	 * This is used to call reusable methods that can apply the same projection
-	 * on different object fields that have same structure (same sub-fields).
-	 *
-	 * @param objectFieldReference The reference representing the path from the current root to an object field that will become the new root.
-	 * @return A new projection factory using the given object field as root.
-	 */
-	@Incubating
-	default SearchProjectionFactory<SR, R, E> withRoot(ObjectFieldReference<? super SR> objectFieldReference) {
-		return withRoot( objectFieldReference.absolutePath() );
-	}
-
-	/**
 	 * @param relativeFieldPath The path to a field, relative to the {@link #withRoot(String) root} of this factory.
 	 * @return The absolute path of the field, for use in native projections for example.
 	 * Note the path is returned even if the field doesn't exist.
