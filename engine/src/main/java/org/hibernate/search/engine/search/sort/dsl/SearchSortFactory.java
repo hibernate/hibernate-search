@@ -9,7 +9,6 @@ import java.util.function.Function;
 
 import org.hibernate.search.engine.search.common.NamedValues;
 import org.hibernate.search.engine.search.predicate.dsl.SearchPredicateFactory;
-import org.hibernate.search.engine.search.reference.object.ObjectFieldReference;
 import org.hibernate.search.engine.search.reference.sort.FieldSortFieldReference;
 import org.hibernate.search.engine.spatial.GeoPoint;
 import org.hibernate.search.util.common.SearchException;
@@ -223,21 +222,6 @@ public interface SearchSortFactory<SR> {
 	 */
 	@Incubating
 	SearchSortFactory<SR> withRoot(String objectFieldPath);
-
-	/**
-	 * Create a new sort factory whose root for all paths passed to the DSL
-	 * will be the given object field.
-	 * <p>
-	 * This is used to call reusable methods that can apply the same sort
-	 * on different object fields that have same structure (same sub-fields).
-	 *
-	 * @param objectFieldReference The reference representing the path from the current root to an object field that will become the new root.
-	 * @return A new sort factory using the given object field as root.
-	 */
-	@Incubating
-	default SearchSortFactory<SR> withRoot(ObjectFieldReference<? super SR> objectFieldReference) {
-		return withRoot( objectFieldReference.absolutePath() );
-	}
 
 	/**
 	 * @param relativeFieldPath The path to a field, relative to the {@link #withRoot(String) root} of this factory.
