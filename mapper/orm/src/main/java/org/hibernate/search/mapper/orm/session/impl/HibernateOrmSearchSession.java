@@ -156,7 +156,7 @@ public class HibernateOrmSearchSession extends AbstractPojoSearchSession
 	@Override
 	public <SR, T> SearchQuerySelectStep<SR, ?, EntityReference, T, SearchLoadingOptionsStep, ?, ?> search(
 			HibernateOrmRootReferenceScope<SR, T> scope) {
-		return search( ( scope.create( this ) ) );
+		return search( ( scope.scope( this ) ) );
 	}
 
 	private <SR, T> SearchQuerySelectStep<SR,
