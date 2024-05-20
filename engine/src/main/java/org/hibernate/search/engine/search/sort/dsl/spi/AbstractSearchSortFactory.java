@@ -22,10 +22,9 @@ import org.hibernate.search.engine.search.sort.dsl.SearchSortFactoryExtension;
 import org.hibernate.search.engine.search.sort.dsl.SearchSortFactoryExtensionIfSupportedStep;
 import org.hibernate.search.engine.search.sort.dsl.SortFinalStep;
 import org.hibernate.search.engine.search.sort.dsl.SortThenStep;
+import org.hibernate.search.engine.search.sort.dsl.impl.AbstractFieldSortOptionsGenericStep;
 import org.hibernate.search.engine.search.sort.dsl.impl.CompositeSortComponentsStepImpl;
 import org.hibernate.search.engine.search.sort.dsl.impl.DistanceSortOptionsStepImpl;
-import org.hibernate.search.engine.search.sort.dsl.impl.FieldSortOptionsGenericStepImpl;
-import org.hibernate.search.engine.search.sort.dsl.impl.FieldSortOptionsStepImpl;
 import org.hibernate.search.engine.search.sort.dsl.impl.ScoreSortOptionsStepImpl;
 import org.hibernate.search.engine.search.sort.dsl.impl.SearchSortFactoryExtensionStep;
 import org.hibernate.search.engine.search.sort.dsl.impl.WithParametersSortFinalStep;
@@ -57,13 +56,13 @@ public abstract class AbstractSearchSortFactory<
 
 	@Override
 	public FieldSortOptionsStep<SR, ?, PDF> field(String fieldPath) {
-		return new FieldSortOptionsStepImpl<>( dslContext, fieldPath );
+		return AbstractFieldSortOptionsGenericStep.create( dslContext, fieldPath );
 	}
 
 	@Override
 	public <T> FieldSortOptionsGenericStep<SR, T, ?, ?, ? extends SearchPredicateFactory<SR>> field(
 			FieldSortFieldReference<? super SR, T> fieldReference) {
-		return new FieldSortOptionsGenericStepImpl<>( dslContext, fieldReference );
+		return AbstractFieldSortOptionsGenericStep.create( dslContext, fieldReference );
 	}
 
 	@Override
@@ -87,7 +86,7 @@ public abstract class AbstractSearchSortFactory<
 
 	@Override
 	public SortThenStep<SR> withParameters(Function<? super NamedValues, ? extends SortFinalStep> sortCreator) {
-		return new WithParametersSortFinalStep<SR>( dslContext, sortCreator );
+		return new WithParametersSortFinalStep<>( dslContext, sortCreator );
 	}
 
 	@Override
