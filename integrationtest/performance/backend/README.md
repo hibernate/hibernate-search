@@ -23,6 +23,9 @@ java -jar integrationtest/performance/backend/elasticsearch/target/benchmarks.ja
 java -jar integrationtest/performance/backend/lucene/target/benchmarks.jar
 ```
 
+You may pass arguments, which will be interpreted as regexps. Any benchmark matching a regexp will be run.
+By default all benchmarks get run, one after the other.
+
 You may set parameters:
 
 ```
@@ -34,40 +37,60 @@ java -jar integrationtest/performance/backend/elasticsearch/benchmarks.jar \
 
 * `jvmArgsPrepend`: add additional JVM properties to the forked process which runs the benchmark.
 Note that this can be used to override backend properties, such as the Elasticsearch hosts in this example.
-* `e`: excludes running all benchmarks matching this name.
-* `w`: sets the number of warm-up iterations.
+* `e`: excludes running all benchmarks matching this regexp pattern.
+* `wi`: sets the number of warm-up iterations.
+* `w`: sets the minimum time to spend at each warmup iteration.
 * `i`: sets the number of measurement iterations.
+* `r`: sets the minimum time to spend at each measurement iteration.
 * `p`: set testing parameters (`@Param` in the code).
 
 ## Run it from your IDE
 
 Within your IDE, run the test `SmokeIT` located in the project you're interested in.
 
-## Run flight recorder: long runs on a specific test
+## Run a profiler
 
-```
-java -jar integrationtest/performance/backend/elasticsearch/benchmarks.jar \
-    -jvmArgsPrepend -XX:+FlightRecorder \
-    -i 30000
-```
+Use the built-in profiler integrations, in particular the [AsyncProfiler integration](https://github.com/openjdk/jmh/blob/6d6ce6315dc39d1d3abd0e3ac9eca9c38f767112/jmh-core/src/main/java/org/openjdk/jmh/profile/AsyncProfiler.java)
 
-We're setting it a very high number of iterations here to have time to play with
-Flight Recorder before it shuts down.
+You will need to [download/install AsyncProfiler](https://github.com/async-profiler/async-profiler?tab=readme-ov-file#download) first.
+The following examples assume you set the async profiler home this way:
 
-You can also dump the result to a .jfr file and study it later (useful to run it on a remote server):
-
-```
-java -jar integrationtest/performance/backend/elasticsearch/benchmarks.jar \
-    -jvmArgsPrepend -XX:+FlightRecorder \
-    -jvmArgsPrepend -XX:StartFlightRecording=filename=output/profile.jfr,settings=profile
+```shell
+ASYNC_PROFILER_HOME=...
 ```
 
-## Produce GC logs suited for tools
+To profile GC, perfnorm, CPU, wall-clock and memory allocation (on Linux):
+
+```shell
+BACKEND=lucene
+java -jar integrationtest/performance/backend/$BACKEND/target/benchmarks.jar \
+    -prof gc -prof perfnorm \
+    -prof="async:rawCommand=alloc,wall;event=cpu;output=jfr;dir=/tmp;libPath=${ASYNC_PROFILER_HOME}/lib/libasyncProfiler.so"
+```
+
+This will create directories with JFR recordings (`jfr-cpu.jfr`) in `/tmp`.
+
+To convert the JFR recording to a wall clock flamegraph (most useful if you want to consider I/O):
 
 ```
-java -jar target/benchmarks.jar \
-    -jvmArgsPrepend "-Xloggc:lognameHere.log -XX:+PrintGCDetails -XX:+PrintTenuringDistribution -XX:+PrintGCApplicationStoppedTime -XX:+PrintGCCause" \
-    -i 30000
+JFR_RECORDING_PATH=...
+java -cp $ASYNC_PROFILER_HOME/lib/converter.jar jfr2flame --state runnable,sleeping $JFR_RECORDING_PATH wall.html
+```
+
+To convert the JFR recording to a CPU flamegraph (only useful if you want to ignore I/O):
+
+```
+JFR_RECORDING_PATH=...
+java -cp $ASYNC_PROFILER_HOME/lib/converter.jar jfr2flame --state default $JFR_RECORDING_PATH cpu.html
+```
+
+See https://github.com/async-profiler/async-profiler/issues/740#issue-1650739133 for information on why we're using `--state`.
+
+To convert the JFR recording to a memory allocation flamegraph:
+
+```
+JFR_RECORDING_PATH=...
+java -cp $ASYNC_PROFILER_HOME/lib/converter.jar jfr2flame --alloc --total $JFR_RECORDING_PATH alloc.html
 ```
 
 # Notes
@@ -76,8 +99,3 @@ For best results disable features such as power management, dynamic CPU scaling,
 and run it on a dedicated box which has no other significant services running.
 
 In particular the "run it from your IDE" approach is just meant for development of new tests.
-
-## TODO
-
-- add more tests, especially those focusing on backend performance
-- add search tests
