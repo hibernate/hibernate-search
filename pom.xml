@@ -273,15 +273,16 @@
         <version.gpg.plugin>3.2.4</version.gpg.plugin>
         <version.flatten-maven-plugin>1.6.0</version.flatten-maven-plugin>
         <version.assembly.plugin>3.7.1</version.assembly.plugin>
-        <version.buildhelper.plugin>3.5.0</version.buildhelper.plugin>
+        <version.buildhelper.plugin>3.6.0</version.buildhelper.plugin>
         <version.checkstyle.plugin>3.3.1</version.checkstyle.plugin>
         <version.bundle.plugin>5.1.9</version.bundle.plugin>
         <version.compiler.plugin>3.13.0</version.compiler.plugin>
         <version.dependency.plugin>3.6.1</version.dependency.plugin>
         <!-- Check dependencies for security vulnerabilities -->
-        <version.dependency-check.plugin>9.1.0</version.dependency-check.plugin>
+        <version.dependency-check.plugin>9.2.0</version.dependency-check.plugin>
         <version.exec.plugin>3.2.0</version.exec.plugin>
         <version.forbiddenapis.plugin>3.7</version.forbiddenapis.plugin>
+        <!-- Make sure that upgraded Jandex plugin aligns with the Jandex version imported from the ORM platform pom -->
         <version.jandex.plugin>3.1.7</version.jandex.plugin>
         <version.maven.injection.plugin>1.0.2</version.maven.injection.plugin>
         <version.jar.plugin>3.4.1</version.jar.plugin>
@@ -347,7 +348,7 @@
 
         <version.asciidoctor.plugin>3.0.0</version.asciidoctor.plugin>
         <version.org.hibernate.infra.hibernate-asciidoctor-theme>4.0.0.Final</version.org.hibernate.infra.hibernate-asciidoctor-theme>
-        <version.org.asciidoctor.asciidoctorj>2.5.12</version.org.asciidoctor.asciidoctorj>
+        <version.org.asciidoctor.asciidoctorj>2.5.13</version.org.asciidoctor.asciidoctorj>
         <version.org.asciidoctor.asciidoctorj-pdf>2.3.15</version.org.asciidoctor.asciidoctorj-pdf>
 
         <!--
