@@ -202,7 +202,7 @@
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
 
         <!-- JDK version required for the build; we target 11 but require at least 17 for the build -->
-        <jdk.min.version>17</jdk.min.version>
+        <jdk.min.version>21</jdk.min.version>
         <!-- The lowest supported version of Java for applications using Hibernate Search -->
         <!-- Set statically, independently from the current JDK: we want our code to comply with this version -->
         <java-version.main.release>11</java-version.main.release>

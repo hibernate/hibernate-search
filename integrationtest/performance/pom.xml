@@ -12,14 +12,6 @@
     <name>Hibernate Search ITs - Performance - Parent POM</name>
     <description>Parent POM of Hibernate Search performance tests</description>
 
-    <properties>
-        <!-- JMH or the annotation processor plugin has some trouble with newer JDKs.
-             Let's not bother, and use the same JDK as Maven, unlike other integration tests. -->
-        <java-version.main.release>8</java-version.main.release>
-        <java-version.main.compiler.java_home>${java.home}</java-version.main.compiler.java_home>
-        <java-version.main.compiler>${java-version.main.compiler.java_home}/bin/javac</java-version.main.compiler>
-    </properties>
-
     <modules>
         <module>backend/base</module>
         <module>backend/lucene</module>
