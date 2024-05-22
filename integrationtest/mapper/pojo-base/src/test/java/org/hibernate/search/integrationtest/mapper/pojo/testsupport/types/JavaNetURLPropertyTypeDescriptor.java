@@ -17,6 +17,7 @@ import org.hibernate.search.integrationtest.mapper.pojo.testsupport.types.values
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.DocumentId;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.GenericField;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
+import org.hibernate.search.util.impl.test.annotation.SuppressForbiddenApis;
 
 public class JavaNetURLPropertyTypeDescriptor extends PropertyTypeDescriptor<URL, String> {
 
@@ -154,11 +155,10 @@ public class JavaNetURLPropertyTypeDescriptor extends PropertyTypeDescriptor<URL
 		}
 	}
 
-	// TODO: HSEARCH-4765 To be removed when URL constructor is removed (JDK 20+). We keep it for now as users might still be using
-	// this constructor and we want to test such scenario
+	@SuppressForbiddenApis(reason = "We want to test 'new URL(...)' even in JDK 20+ where it's deprecated")
 	private static URL urlAsNewUrl(String spec) {
 		try {
-			@SuppressWarnings("deprecation")
+			@SuppressWarnings("deprecation") // We want to test 'new URL(...)' even in JDK 20+ where it's deprecated
 			URL url = new URL( spec );
 			return url;
 		}
