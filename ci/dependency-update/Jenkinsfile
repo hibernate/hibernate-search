@@ -37,7 +37,6 @@ Map settings() {
 			]
 		case 'lucene10':
 			return [
-					testCompilerTool: 'OpenJDK 21 Latest',
 					updateProperties: ['version.org.apache.lucene'],
 					onlyRunTestDependingOn: ['hibernate-search-backend-lucene'],
 					additionalMavenArgs: '-Dtest.elasticsearch.skip=true -pl :hibernate-search-engine,:hibernate-search-backend-lucene,:hibernate-search-util-internal-integrationtest-backend-lucene,:hibernate-search-v5migrationhelper-engine'
@@ -76,7 +75,7 @@ def pullContainerImages() {
 }
 
 def withMavenWorkspace(Closure body) {
-	def actualJdk = settings().testCompilerTool == null ? 'OpenJDK 17 Latest' : settings().testCompilerTool
+	def actualJdk = settings().testCompilerTool == null ? 'OpenJDK 21 Latest' : settings().testCompilerTool
 	withMaven(jdk: actualJdk, maven: 'Apache Maven 3.9',
 			mavenLocalRepo: env.WORKSPACE_TMP + '/.m2repository',
 			options: [
