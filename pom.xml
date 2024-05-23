@@ -187,6 +187,8 @@
         <module>build/parents/integrationtest</module>
         <module>build/parents/springtest</module>
         <module>integrationtest</module>
+        <module>metamodel/generator-test</module>
+        <module>metamodel/generator-plugin</module>
         <module>documentation</module>
     </modules>
 
