@@ -98,4 +98,9 @@ public class AmazonOpenSearchServerlessWorkFactory extends Elasticsearch7WorkFac
 	public boolean isWaitForIndexStatusSupported() {
 		return false;
 	}
+
+	@Override
+	public boolean isPurgeSupported() {
+		return false;
+	}
 }

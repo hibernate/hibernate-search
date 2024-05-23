@@ -61,4 +61,22 @@ public interface IndexWorkspace {
 	CompletableFuture<?> refresh(OperationSubmitter operationSubmitter,
 			UnsupportedOperationBehavior unsupportedOperationBehavior);
 
+	/**
+	 * Depending on which operation is available for the underlying backend either purge or schema drop/create will be performed to clear out the index.
+	 *
+	 * @param operationSubmitter The behavior to adopt when submitting the operation to a full queue/executor.
+	 * @param unsupportedOperationBehavior The behavior to adopt if the operation is not supported in this index.
+	 * @param mergeSegmentsAfterPurge Defines whether to {@link #mergeSegments(OperationSubmitter, UnsupportedOperationBehavior) merge the segments}
+	 * if the purge was executed.
+	 * @return A completion stage for the executed operation, or a completed stage if the operation is not supported.
+	 */
+	default CompletableFuture<?> purgeOrDrop(OperationSubmitter operationSubmitter,
+			UnsupportedOperationBehavior unsupportedOperationBehavior, boolean mergeSegmentsAfterPurge) {
+		CompletableFuture<?> completableFuture = purge( Set.of(), operationSubmitter, unsupportedOperationBehavior );
+		if ( mergeSegmentsAfterPurge ) {
+			return completableFuture
+					.thenComposeAsync( ignore -> mergeSegments( operationSubmitter, unsupportedOperationBehavior ) );
+		}
+		return completableFuture;
+	}
 }

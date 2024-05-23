@@ -23,6 +23,7 @@ import org.hibernate.search.jakarta.batch.core.massindexing.MassIndexingJobParam
 import org.hibernate.search.jakarta.batch.core.massindexing.impl.JobContextData;
 import org.hibernate.search.jakarta.batch.core.massindexing.util.impl.SerializationUtil;
 import org.hibernate.search.mapper.orm.Search;
+import org.hibernate.search.mapper.orm.mapping.SearchMapping;
 import org.hibernate.search.mapper.orm.spi.BatchMappingContext;
 import org.hibernate.search.mapper.pojo.work.spi.PojoScopeWorkspace;
 import org.hibernate.search.util.common.impl.Futures;
@@ -72,49 +73,58 @@ public class BeforeChunkBatchlet extends AbstractBatchlet {
 				MassIndexingJobParameters.Defaults.MERGE_SEGMENTS_AFTER_PURGE
 		);
 
-		if ( dropAndCreateSchemaOnStart ) {
-			if ( tenantId != null ) {
-				// If we have a tenant id here, there most likely are other tenants,
-				//   and if we drop-create the schema then we'd lose the indexed docs for other tenants.
-				//   let the user decide what they want to do here, and either remove the tenant filter,
-				//   or do the schema drop through a schema manager.
-				throw log.tenantIdProvidedWithSchemaDrop( tenantId );
-			}
-			JobContextData jobData = (JobContextData) jobContext.getTransientUserData();
-			EntityManagerFactory emf = jobData.getEntityManagerFactory();
-			Search.mapping( emf ).scope( jobData.getEntityTypes() ).schemaManager().dropAndCreate();
-		}
+		JobContextData jobData = (JobContextData) jobContext.getTransientUserData();
+		EntityManagerFactory emf = jobData.getEntityManagerFactory();
+		SearchMapping mapping = Search.mapping( emf );
+		BatchMappingContext mappingContext = (BatchMappingContext) mapping;
 
-		if ( Boolean.TRUE.equals( dropAndCreateSchemaOnStart )
-				&& ( serializedPurgeAllOnStart != null && Boolean.TRUE.equals( purgeAllOnStart ) ) ) {
-			log.redundantPurgeAfterDrop();
-		}
-
-		// No need to purge if we've dropped-created the schema already
-		if ( purgeAllOnStart && !dropAndCreateSchemaOnStart ) {
-			JobContextData jobData = (JobContextData) jobContext.getTransientUserData();
-			EntityManagerFactory emf = jobData.getEntityManagerFactory();
-			BatchMappingContext mappingContext = (BatchMappingContext) Search.mapping( emf );
+		if ( serializedPurgeAllOnStart == null && serializedDropAndCreateSchemaOnStart == null ) {
 			PojoScopeWorkspace workspace =
 					mappingContext.scope( jobData.getEntityTypes() ).pojoWorkspace( Objects.toString( tenantId, null ) );
-			Futures.unwrappedExceptionJoin( workspace.purge( Collections.emptySet(), OperationSubmitter.blocking(),
-					UnsupportedOperationBehavior.FAIL ) );
+			Futures.unwrappedExceptionJoin( workspace.purgeOrDrop( OperationSubmitter.blocking(),
+					UnsupportedOperationBehavior.FAIL, mergeSegmentsAfterPurge ) );
+		}
+		else {
+			if ( dropAndCreateSchemaOnStart ) {
+				if ( tenantId != null ) {
+					// If we have a tenant id here, there most likely are other tenants,
+					//   and if we drop-create the schema then we'd lose the indexed docs for other tenants.
+					//   let the user decide what they want to do here, and either remove the tenant filter,
+					//   or do the schema drop through a schema manager.
+					throw log.tenantIdProvidedWithSchemaDrop( tenantId );
+				}
+				mapping.scope( jobData.getEntityTypes() ).schemaManager().dropAndCreate();
+			}
 
-			// This does not look necessary as (in Hibernate Search 6+) the purge should already commit
-			// its changes, even on Lucene.
-			// TODO HSEARCH-4487 remove this while we're refactoring?
-			Futures.unwrappedExceptionJoin( workspace.flush( OperationSubmitter.blocking(),
-					// If not supported, we're on Amazon OpenSearch Serverless,
-					// and in this case purge writes are safe even without a flush.
-					UnsupportedOperationBehavior.IGNORE ) );
+			if ( Boolean.TRUE.equals( dropAndCreateSchemaOnStart )
+					&& ( serializedPurgeAllOnStart != null && Boolean.TRUE.equals( purgeAllOnStart ) ) ) {
+				log.redundantPurgeAfterDrop();
+			}
 
-			if ( mergeSegmentsAfterPurge ) {
-				Futures.unwrappedExceptionJoin( workspace.mergeSegments( OperationSubmitter.blocking(),
-						serializedMergeSegmentsAfterPurge != null
-								? UnsupportedOperationBehavior.FAIL
-								: UnsupportedOperationBehavior.IGNORE ) );
+			// No need to purge if we've dropped-created the schema already
+			if ( purgeAllOnStart && !dropAndCreateSchemaOnStart ) {
+				PojoScopeWorkspace workspace =
+						mappingContext.scope( jobData.getEntityTypes() ).pojoWorkspace( Objects.toString( tenantId, null ) );
+				Futures.unwrappedExceptionJoin( workspace.purge( Collections.emptySet(), OperationSubmitter.blocking(),
+						UnsupportedOperationBehavior.FAIL ) );
+
+				// This does not look necessary as (in Hibernate Search 6+) the purge should already commit
+				// its changes, even on Lucene.
+				// TODO HSEARCH-4487 remove this while we're refactoring?
+				Futures.unwrappedExceptionJoin( workspace.flush( OperationSubmitter.blocking(),
+						// If not supported, we're on Amazon OpenSearch Serverless,
+						// and in this case purge writes are safe even without a flush.
+						UnsupportedOperationBehavior.IGNORE ) );
+
+				if ( mergeSegmentsAfterPurge ) {
+					Futures.unwrappedExceptionJoin( workspace.mergeSegments( OperationSubmitter.blocking(),
+							serializedMergeSegmentsAfterPurge != null
+									? UnsupportedOperationBehavior.FAIL
+									: UnsupportedOperationBehavior.IGNORE ) );
+				}
 			}
 		}
+
 		return null;
 	}
 }

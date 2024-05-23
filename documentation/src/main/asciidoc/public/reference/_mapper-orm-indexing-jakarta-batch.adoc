@@ -73,14 +73,15 @@ The following table contains all the job parameters you can use to customize the
 The entity types to index in this job execution, comma-separated.
 
 |`purgeAllOnStart` / `.purgeAllOnStart(boolean)`
-|True
+|Default value depends on <<jakarta-batch-parameters-drop-and-create-schema,`dropAndCreateSchemaOnStart(boolean)`>>.
+Defaults to `False` if the mass indexer is configured to drop and create the schema on start, to `True` otherwise.
 |Specify whether the existing index should be purged at the beginning of the job.
 This operation takes place before indexing.
 
 NOTE: Only affects the indexes targeted by the `entityTypes` parameter.
 
-|`dropAndCreateSchemaOnStart` / `.dropAndCreateSchemaOnStart(boolean)`
-|False
+|[[jakarta-batch-parameters-drop-and-create-schema]]`dropAndCreateSchemaOnStart` / `.dropAndCreateSchemaOnStart(boolean)`
+|`False` in general, `True` on <<backend-elasticsearch-compatibility-amazon-opensearch-serverless,Amazon OpenSearch Serverless>>
 |Specify whether the existing schema should be dropped and created at the beginning of the job.
 This operation takes place before indexing.
 

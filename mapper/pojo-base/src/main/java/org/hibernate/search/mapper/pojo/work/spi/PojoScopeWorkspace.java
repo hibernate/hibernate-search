@@ -66,4 +66,7 @@ public interface PojoScopeWorkspace {
 	CompletableFuture<?> refresh(OperationSubmitter operationSubmitter,
 			UnsupportedOperationBehavior unsupportedOperationBehavior);
 
+	CompletableFuture<?> purgeOrDrop(OperationSubmitter operationSubmitter,
+			UnsupportedOperationBehavior unsupportedOperationBehavior, boolean mergeSegmentsAfterPurge);
+
 }

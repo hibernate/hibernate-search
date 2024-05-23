@@ -108,10 +108,12 @@ is not possible, so it is disabled by default and cannot be enabled explicitly.
 * <<indexing-workspace-purge,Purging>>, <<indexing-workspace-flush,flushing>>, <<indexing-workspace-refresh,refreshing>>, or <<indexing-workspace-merge-segments,merging segments>>
 link:{amazonOpenSearchServiceUrl}/serverless-genref.html#serverless-operations[is not possible],
 so attempts to <<indexing-workspace,perform these operations explicitly>> will always fail.
-* The <<indexing-massindexer,mass indexer>> will fail if you attempt a purge on start (the default),
+* The <<indexing-massindexer,mass indexer>> will fail if you attempt a purge on start (explicitly),
 because Amazon OpenSearch Serverless link:{amazonOpenSearchServiceUrl}/serverless-genref.html#serverless-operations[doesn’t support it].
 Use <<indexing-massindexer-parameters-drop-and-create-schema,`.dropAndCreateSchemaOnStart(...)`>>
 to drop the indexes on start instead.
+Or rely on the <<indexing-massindexer-parameters-purge-all-on-start,`purgeAllOnStart`>>/ <<indexing-massindexer-parameters-drop-and-create-schema,`dropAndCreateSchemaOnStart`>>
+defaults to pick the operation available for a particular backend.
 See https://hibernate.atlassian.net/browse/HSEARCH-4930[HSEARCH-4930].
 * The <<indexing-massindexer,mass indexer>> will skip the flush, refresh and merge-segments operations by default,
 and attempting to enable them explicitly will result in failures,

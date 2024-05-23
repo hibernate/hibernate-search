@@ -103,4 +103,6 @@ public interface ElasticsearchWorkFactory {
 
 	AnalyzeWork.Builder analyze(URLEncodedString indexName, String text, String analyzer,
 			String normalizer);
+
+	boolean isPurgeSupported();
 }

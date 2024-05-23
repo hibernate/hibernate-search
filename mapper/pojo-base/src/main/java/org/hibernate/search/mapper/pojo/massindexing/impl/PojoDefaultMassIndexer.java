@@ -179,6 +179,13 @@ public class PojoDefaultMassIndexer implements PojoMassIndexer {
 			log.redundantPurgeAfterDrop();
 		}
 
+		if ( dropAndCreateSchemaOnStart != null || purgeAtStart != null ) {
+			// false by default:
+			dropAndCreateSchemaOnStart = Boolean.TRUE.equals( dropAndCreateSchemaOnStart );
+			// false if not set explicitly and dropAndCreateSchemaOnStart is set to true, otherwise true by default:
+			purgeAtStart = purgeAtStart == null ? !Boolean.TRUE.equals( dropAndCreateSchemaOnStart ) : purgeAtStart;
+		}
+
 		return new PojoMassIndexingBatchCoordinator(
 				mappingContext,
 				notifier,
@@ -188,10 +195,8 @@ public class PojoDefaultMassIndexer implements PojoMassIndexer {
 				resolvedMassIndexingEnvironment(),
 				typesToIndexInParallel, documentBuilderThreads,
 				mergeSegmentsOnFinish,
-				// false by default:
-				Boolean.TRUE.equals( dropAndCreateSchemaOnStart ),
-				// false if not set explicitly and dropAndCreateSchemaOnStart is set to true, otherwise true by default:
-				purgeAtStart == null ? !Boolean.TRUE.equals( dropAndCreateSchemaOnStart ) : purgeAtStart,
+				dropAndCreateSchemaOnStart,
+				purgeAtStart,
 				mergeSegmentsAfterPurge
 		);
 	}

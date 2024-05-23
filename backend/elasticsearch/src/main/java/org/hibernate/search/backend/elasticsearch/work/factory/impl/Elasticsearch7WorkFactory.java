@@ -201,4 +201,9 @@ public class Elasticsearch7WorkFactory implements ElasticsearchWorkFactory {
 	public AnalyzeWork.Builder analyze(URLEncodedString indexName, String text, String analyzer, String normalizer) {
 		return AnalyzeWork.Builder.create( indexName, text, analyzer, normalizer );
 	}
+
+	@Override
+	public boolean isPurgeSupported() {
+		return true;
+	}
 }

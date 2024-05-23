@@ -245,7 +245,7 @@ accept special values, for example MySQL might benefit from using `Integer#MIN_V
 will attempt to preload everything in memory.
 
 |[[indexing-massindexer-parameters-drop-and-create-schema]]`dropAndCreateSchemaOnStart(boolean)`
-|`false`
+|`false` in general, `true` on <<backend-elasticsearch-compatibility-amazon-opensearch-serverless,Amazon OpenSearch Serverless>>
 |[[mapper-orm-indexing-massindexer-parameters-drop-and-create-schema]]Drops the indexes and their schema (if they exist) and re-creates them before indexing.
 
 Indexes will be unavailable for a short time during the dropping and re-creation,
@@ -264,7 +264,7 @@ As an alternative to this parameter,
 you can also use a schema manager to manage schemas manually at the time of your choosing:
 <<schema-management-manager>>.
 
-|`purgeAllOnStart(boolean)`
+|[[indexing-massindexer-parameters-purge-all-on-start]]`purgeAllOnStart(boolean)`
 |Default value depends on <<indexing-massindexer-parameters-drop-and-create-schema,`dropAndCreateSchemaOnStart(boolean)`>>.
 Defaults to `false` if the mass indexer is configured to drop and create the schema on start, to `true` otherwise.
 |Removes all entities from the indexes before indexing.

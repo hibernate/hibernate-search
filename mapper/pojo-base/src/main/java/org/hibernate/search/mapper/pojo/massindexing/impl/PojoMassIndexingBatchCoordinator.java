@@ -51,8 +51,8 @@ public class PojoMassIndexingBatchCoordinator extends PojoMassIndexingFailureHan
 	private final int typesToIndexInParallel;
 	private final int documentBuilderThreads;
 	private final Boolean mergeSegmentsOnFinish;
-	private final boolean dropAndCreateSchemaOnStart;
-	private final boolean purgeAtStart;
+	private final Boolean dropAndCreateSchemaOnStart;
+	private final Boolean purgeAtStart;
 	private final Boolean mergeSegmentsAfterPurge;
 
 	private final List<CompletableFuture<?>> indexingFutures = new ArrayList<>();
@@ -69,7 +69,7 @@ public class PojoMassIndexingBatchCoordinator extends PojoMassIndexingFailureHan
 			PojoScopeDelegate<?, ?, ?> pojoScopeDelegate,
 			MassIndexingEnvironment environment,
 			int typesToIndexInParallel, int documentBuilderThreads, Boolean mergeSegmentsOnFinish,
-			boolean dropAndCreateSchemaOnStart, Boolean purgeAtStart, Boolean mergeSegmentsAfterPurge) {
+			Boolean dropAndCreateSchemaOnStart, Boolean purgeAtStart, Boolean mergeSegmentsAfterPurge) {
 		super( notifier, environment );
 		this.mappingContext = mappingContext;
 		this.typeGroupsToIndex = typeGroupsToIndex;
@@ -126,27 +126,35 @@ public class PojoMassIndexingBatchCoordinator extends PojoMassIndexingFailureHan
 		// Start the agent and wait until concurrent indexing actually gets suspended
 		applyToAllContexts( c -> c.agent().start( agentStartContext ) );
 
-
-		if ( dropAndCreateSchemaOnStart ) {
-			RootFailureCollector failureCollector = new RootFailureCollector(
-					PojoEventContextMessages.INSTANCE.schemaManagement()
-			);
+		if ( dropAndCreateSchemaOnStart == null && purgeAtStart == null ) {
+			// means we have the defaults and should let backend decide which of the "cleanup" operations to perform
 			Futures.unwrappedExceptionGet(
-					scopeSchemaManager.dropAndCreate( failureCollector, OperationSubmitter.blocking() ) );
-			failureCollector.checkNoFailure();
+					allTenantsWorkspace.purgeOrDrop( OperationSubmitter.blocking(), UnsupportedOperationBehavior.FAIL,
+							isEnabledWithDefault( mergeSegmentsAfterPurge, true ) )
+			);
 		}
-
-		if ( purgeAtStart ) {
-			Futures.unwrappedExceptionGet(
-					allTenantsWorkspace.purge( Collections.emptySet(), OperationSubmitter.blocking(),
-							UnsupportedOperationBehavior.FAIL )
-			);
-
-			if ( isEnabledWithDefault( mergeSegmentsAfterPurge, true ) ) {
-				Futures.unwrappedExceptionGet(
-						allTenantsWorkspace.mergeSegments( OperationSubmitter.blocking(),
-								failIfUnsupportedAndExplicitlyEnabled( mergeSegmentsAfterPurge ) )
+		else {
+			if ( dropAndCreateSchemaOnStart ) {
+				RootFailureCollector failureCollector = new RootFailureCollector(
+						PojoEventContextMessages.INSTANCE.schemaManagement()
 				);
+				Futures.unwrappedExceptionGet(
+						scopeSchemaManager.dropAndCreate( failureCollector, OperationSubmitter.blocking() ) );
+				failureCollector.checkNoFailure();
+			}
+
+			if ( purgeAtStart ) {
+				Futures.unwrappedExceptionGet(
+						allTenantsWorkspace.purge( Collections.emptySet(), OperationSubmitter.blocking(),
+								UnsupportedOperationBehavior.FAIL )
+				);
+
+				if ( isEnabledWithDefault( mergeSegmentsAfterPurge, true ) ) {
+					Futures.unwrappedExceptionGet(
+							allTenantsWorkspace.mergeSegments( OperationSubmitter.blocking(),
+									failIfUnsupportedAndExplicitlyEnabled( mergeSegmentsAfterPurge ) )
+					);
+				}
 			}
 		}
 	}

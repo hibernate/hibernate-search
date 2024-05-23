@@ -57,6 +57,13 @@ public class PojoScopeWorkspaceImpl implements PojoScopeWorkspace {
 		return doOperationOnTypes( IndexWorkspace::refresh, operationSubmitter, unsupportedOperationBehavior );
 	}
 
+	@Override
+	public CompletableFuture<?> purgeOrDrop(OperationSubmitter operationSubmitter,
+			UnsupportedOperationBehavior unsupportedOperationBehavior, boolean mergeSegmentsAfterPurge) {
+		return doOperationOnTypes( (indexWorkspace, submitter, unsupportedBehavior) -> indexWorkspace.purgeOrDrop( submitter,
+				unsupportedBehavior, mergeSegmentsAfterPurge ), operationSubmitter, UnsupportedOperationBehavior.FAIL );
+	}
+
 	private CompletableFuture<?> doOperationOnTypes(
 			TriFunction<IndexWorkspace, OperationSubmitter, UnsupportedOperationBehavior, CompletableFuture<?>> operation,
 			OperationSubmitter operationSubmitter,
