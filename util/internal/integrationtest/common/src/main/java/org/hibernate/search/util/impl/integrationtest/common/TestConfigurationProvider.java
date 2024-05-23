@@ -36,7 +36,7 @@ public final class TestConfigurationProvider
 	private static final String STARTUP_TIMESTAMP = new SimpleDateFormat( "yyyy-MM-dd-HH-mm-ss.SSS", Locale.ROOT )
 			.format( new Date() );
 
-	private String testId;
+	private String testId = UUID.randomUUID().toString();
 
 	@Override
 	public void afterAll(ExtensionContext context) {

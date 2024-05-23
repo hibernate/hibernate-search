@@ -48,7 +48,7 @@ public final class DatabaseContainer {
 
 
 	static {
-		String name = System.getProperty( "org.hibernate.search.integrationtest.orm.database.kind", "" );
+		String name = System.getProperty( "org.hibernate.search.integrationtest.orm.database.kind", "h2" );
 		Path containers = Path.of( System.getProperty( "org.hibernate.search.integrationtest.container.directory", "" ) );
 		DATABASE = SupportedDatabase.from( name );
 
