@@ -48,6 +48,22 @@ public interface HighlighterBoundaryScannerFastVectorHighlighterOptionsStep<T ex
 	 * each character in the string will be considered as a boundary character.
 	 * @return The next step in a highlighter definition.
 	 */
-	HighlighterBoundaryScannerFastVectorHighlighterOptionsStep<T> boundaryChars(Character[] boundaryChars);
+	default HighlighterBoundaryScannerFastVectorHighlighterOptionsStep<T> boundaryChars(Character[] boundaryChars) {
+		char[] chars = new char[boundaryChars.length];
+		for ( int i = 0; i < boundaryChars.length; i++ ) {
+			chars[i] = boundaryChars[i];
+		}
+		return boundaryChars( chars );
+	}
+
+	/**
+	 * Specify a set of characters to look for when scanning for boundaries when
+	 * a {@link HighlighterBoundaryScannerTypeFastVectorHighlighterStep#chars() characters boundary scanner} is used.
+	 *
+	 * @param boundaryChars An array containing all boundary characters. The order doesn't matter:
+	 * each character in the string will be considered as a boundary character.
+	 * @return The next step in a highlighter definition.
+	 */
+	HighlighterBoundaryScannerFastVectorHighlighterOptionsStep<T> boundaryChars(char... boundaryChars);
 
 }

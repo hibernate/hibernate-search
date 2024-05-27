@@ -20,7 +20,7 @@ import org.hibernate.search.engine.search.highlighter.dsl.HighlighterTagSchema;
 public abstract class SearchHighlighterBuilder {
 
 	protected SearchHighlighterType type;
-	protected Character[] boundaryChars;
+	protected char[] boundaryChars;
 	protected Integer boundaryMaxScan;
 	protected Integer fragmentSize;
 	protected Integer noMatchSize;
@@ -45,16 +45,16 @@ public abstract class SearchHighlighterBuilder {
 			this.boundaryChars = null;
 		}
 		else {
-			this.boundaryChars = new Character[boundaryChars.length()];
+			this.boundaryChars = new char[boundaryChars.length()];
 			for ( int i = 0; i < boundaryChars.length(); i++ ) {
-				this.boundaryChars[i] = Character.valueOf( boundaryChars.charAt( i ) );
+				this.boundaryChars[i] = boundaryChars.charAt( i );
 			}
 		}
 
 		return this;
 	}
 
-	public SearchHighlighterBuilder boundaryChars(Character[] boundaryChars) {
+	public SearchHighlighterBuilder boundaryChars(char[] boundaryChars) {
 		this.boundaryChars = boundaryChars;
 		return this;
 	}
@@ -159,7 +159,7 @@ public abstract class SearchHighlighterBuilder {
 		return type;
 	}
 
-	public Character[] boundaryChars() {
+	public char[] boundaryChars() {
 		return boundaryChars;
 	}
 

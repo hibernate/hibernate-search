@@ -118,7 +118,7 @@ public class HighlighterFastVectorHighlighterOptionsStepImpl
 
 		@Override
 		public HighlighterBoundaryScannerFastVectorHighlighterOptionsStep<
-				HighlighterFastVectorHighlighterOptionsStep> boundaryChars(Character[] boundaryChars) {
+				HighlighterFastVectorHighlighterOptionsStep> boundaryChars(char... boundaryChars) {
 			HighlighterFastVectorHighlighterOptionsStepImpl.this.highlighterBuilder.boundaryChars( boundaryChars );
 			return this;
 		}
