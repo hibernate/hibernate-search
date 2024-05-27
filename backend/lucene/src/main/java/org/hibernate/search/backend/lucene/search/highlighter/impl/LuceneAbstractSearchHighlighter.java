@@ -59,9 +59,11 @@ public abstract class LuceneAbstractSearchHighlighter implements SearchHighlight
 			"<em class=\"hlt10\">"
 	);
 	private static final List<String> STYLED_SCHEMA_POST_TAGS = DEFAULT_POST_TAGS;
+	private static final char[] DEFAULT_BOUNDARY_CHARS = { '.', ',', '!', '?', ' ', '\t', '\n' };
+	private static final int DEFAULT_MAX_SCAN = SimpleBoundaryScanner.DEFAULT_MAX_SCAN;
 
 	protected final Set<String> indexNames;
-	protected final Character[] boundaryChars;
+	protected final char[] boundaryChars;
 	protected final Integer boundaryMaxScan;
 	protected final Integer fragmentSize;
 	protected final Integer noMatchSize;
@@ -93,8 +95,8 @@ public abstract class LuceneAbstractSearchHighlighter implements SearchHighlight
 	protected LuceneAbstractSearchHighlighter(BoundaryScannerType scannerType) {
 		this(
 				Collections.emptySet(),
-				SimpleBoundaryScanner.DEFAULT_BOUNDARY_CHARS,
-				SimpleBoundaryScanner.DEFAULT_MAX_SCAN,
+				DEFAULT_BOUNDARY_CHARS,
+				DEFAULT_MAX_SCAN,
 				100,
 				0,
 				5,
@@ -110,7 +112,7 @@ public abstract class LuceneAbstractSearchHighlighter implements SearchHighlight
 	}
 
 	protected LuceneAbstractSearchHighlighter(Set<String> indexNames,
-			Character[] boundaryChars,
+			char[] boundaryChars,
 			Integer boundaryMaxScan,
 			Integer fragmentSize, Integer noMatchSize, Integer numberOfFragments, Boolean orderByScore,
 			List<String> preTags, List<String> postTags, BoundaryScannerType boundaryScannerType,
@@ -176,7 +178,7 @@ public abstract class LuceneAbstractSearchHighlighter implements SearchHighlight
 	}
 
 	protected abstract LuceneAbstractSearchHighlighter createHighlighterSameType(Set<String> indexNames,
-			Character[] boundaryChars,
+			char[] boundaryChars,
 			Integer boundaryMaxScan,
 			Integer fragmentSize, Integer noMatchSize, Integer numberOfFragments, Boolean orderByScore,
 			List<String> preTags, List<String> postTags, BoundaryScannerType boundaryScannerType,

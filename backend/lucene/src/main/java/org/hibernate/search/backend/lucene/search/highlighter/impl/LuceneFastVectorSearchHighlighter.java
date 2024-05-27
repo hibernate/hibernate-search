@@ -55,7 +55,7 @@ class LuceneFastVectorSearchHighlighter extends LuceneAbstractSearchHighlighter 
 	}
 
 	private LuceneFastVectorSearchHighlighter(Set<String> indexNames,
-			Character[] boundaryChars, Integer boundaryMaxScan, Integer fragmentSize, Integer noMatchSize,
+			char[] boundaryChars, Integer boundaryMaxScan, Integer fragmentSize, Integer noMatchSize,
 			Integer numberOfFragments, Boolean orderByScore, List<String> preTags,
 			List<String> postTags, BoundaryScannerType boundaryScannerType, Locale boundaryScannerLocale,
 			HighlighterFragmenter fragmenterType,
@@ -69,7 +69,7 @@ class LuceneFastVectorSearchHighlighter extends LuceneAbstractSearchHighlighter 
 
 	@Override
 	protected LuceneAbstractSearchHighlighter createHighlighterSameType(Set<String> indexNames,
-			Character[] boundaryChars, Integer boundaryMaxScan, Integer fragmentSize, Integer noMatchSize,
+			char[] boundaryChars, Integer boundaryMaxScan, Integer fragmentSize, Integer noMatchSize,
 			Integer numberOfFragments, Boolean orderByScore, List<String> preTags,
 			List<String> postTags, BoundaryScannerType boundaryScannerType, Locale boundaryScannerLocale,
 			HighlighterFragmenter fragmenterType, Integer phraseLimit, Encoder encoder) {
@@ -146,7 +146,7 @@ class LuceneFastVectorSearchHighlighter extends LuceneAbstractSearchHighlighter 
 		private BoundaryScanner boundaryScanner() {
 			switch ( LuceneFastVectorSearchHighlighter.this.boundaryScannerType ) {
 				case CHARS:
-					return new SimpleBoundaryScanner(
+					return new HibernateSearchSimpleBoundaryScanner(
 							LuceneFastVectorSearchHighlighter.this.boundaryMaxScan,
 							LuceneFastVectorSearchHighlighter.this.boundaryChars
 					);
@@ -234,6 +234,22 @@ class LuceneFastVectorSearchHighlighter extends LuceneAbstractSearchHighlighter 
 		public List<FieldFragList.WeightedFragInfo> getWeightedFragInfoList(List<FieldFragList.WeightedFragInfo> src) {
 			Collections.sort( src, SCORE_COMPARATOR );
 			return src;
+		}
+	}
+
+	// TODO: HSEARCH-5160 remove this "custom" class and use the Lucene's constructor for the char[]
+	private static class HibernateSearchSimpleBoundaryScanner extends SimpleBoundaryScanner {
+
+		public HibernateSearchSimpleBoundaryScanner(int boundaryMaxScan, char[] boundaryChars) {
+			super( boundaryMaxScan, characters( boundaryChars ) );
+		}
+
+		private static Character[] characters(char[] chars) {
+			Character[] result = new Character[chars.length];
+			for ( int i = 0; i < chars.length; i++ ) {
+				result[i] = chars[i];
+			}
+			return result;
 		}
 	}
 

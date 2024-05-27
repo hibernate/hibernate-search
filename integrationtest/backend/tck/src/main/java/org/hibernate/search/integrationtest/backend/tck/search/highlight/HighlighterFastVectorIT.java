@@ -277,6 +277,31 @@ class HighlighterFastVectorIT extends AbstractHighlighterIT {
 	}
 
 	@Test
+	void boundaryCharactersAsCharArray() {
+		StubMappingScope scope = index.createScope();
+
+		SearchQuery<List<String>> highlights = scope.query().select(
+				f -> f.highlight( "string" )
+		)
+				.where( f -> f.match().field( "string" ).matching( "useless" ) )
+				.highlighter( h2 -> h2.fastVector()
+						.fragmentSize( 20 )
+						.boundaryScanner()
+						.chars()
+						.locale( Locale.ENGLISH )
+						.boundaryChars( '-' )
+						.boundaryMaxScan( 25 )
+						.end()
+				)
+				.toQuery();
+
+		assertThatHits( highlights.fetchAllHits() )
+				.hasHitsAnyOrder(
+						Arrays.asList( " to some <em>useless</em> text in between time to see " )
+				);
+	}
+
+	@Test
 	void boundaryCharactersAsArray() {
 		StubMappingScope scope = index.createScope();
 

@@ -56,7 +56,7 @@ class LucenePlainSearchHighlighter extends LuceneAbstractSearchHighlighter {
 	}
 
 	private LucenePlainSearchHighlighter(Set<String> indexNames,
-			Character[] boundaryChars, Integer boundaryMaxScan, Integer fragmentSize, Integer noMatchSize,
+			char[] boundaryChars, Integer boundaryMaxScan, Integer fragmentSize, Integer noMatchSize,
 			Integer numberOfFragments, Boolean orderByScore, List<String> preTags,
 			List<String> postTags, BoundaryScannerType boundaryScannerType, Locale boundaryScannerLocale,
 			HighlighterFragmenter fragmenterType, Integer phraseLimit,
@@ -70,7 +70,7 @@ class LucenePlainSearchHighlighter extends LuceneAbstractSearchHighlighter {
 
 	@Override
 	protected LuceneAbstractSearchHighlighter createHighlighterSameType(Set<String> indexNames,
-			Character[] boundaryChars, Integer boundaryMaxScan, Integer fragmentSize, Integer noMatchSize,
+			char[] boundaryChars, Integer boundaryMaxScan, Integer fragmentSize, Integer noMatchSize,
 			Integer numberOfFragments, Boolean orderByScore, List<String> preTags,
 			List<String> postTags, BoundaryScannerType boundaryScannerType, Locale boundaryScannerLocale,
 			HighlighterFragmenter fragmenterType, Integer phraseLimit, Encoder encoder) {
