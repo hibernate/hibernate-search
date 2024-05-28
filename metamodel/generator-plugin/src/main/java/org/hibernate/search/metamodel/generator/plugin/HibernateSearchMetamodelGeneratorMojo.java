@@ -6,15 +6,28 @@
  */
 package org.hibernate.search.metamodel.generator.plugin;
 
+import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.net.URL;
+import java.net.URLClassLoader;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.FileSystems;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Objects;
 import java.util.Properties;
+import java.util.stream.Collectors;
+
+import javax.tools.DiagnosticCollector;
+import javax.tools.JavaCompiler;
+import javax.tools.JavaFileObject;
+import javax.tools.StandardJavaFileManager;
+import javax.tools.StandardLocation;
+import javax.tools.ToolProvider;
 
 import org.hibernate.SessionFactory;
 import org.hibernate.search.engine.backend.metamodel.IndexDescriptor;
@@ -25,6 +38,7 @@ import org.hibernate.search.mapper.orm.mapping.SearchMapping;
 import org.hibernate.search.util.impl.integrationtest.backend.lucene.LuceneBackendConfiguration;
 import org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmSetupHelper;
 
+import org.apache.maven.artifact.Artifact;
 import org.apache.maven.model.Dependency;
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
@@ -43,8 +57,16 @@ public class HibernateSearchMetamodelGeneratorMojo extends AbstractMojo {
 	@Parameter(property = "annotatedTypes")
 	List<String> annotatedTypes;
 
+	@Parameter(property = "packagesToCompile")
+	List<String> packagesToCompile;
+
 	@Parameter(property = "properties")
 	Properties properties;
+
+	@Parameter(property = "sameModuleCompile", defaultValue = "false")
+	boolean sameModuleCompile;
+
+	private URLClassLoader classLoader;
 
 	@Override
 	public void execute() throws MojoExecutionException, MojoFailureException {
@@ -60,8 +82,6 @@ public class HibernateSearchMetamodelGeneratorMojo extends AbstractMojo {
 
 			Path generatedMetamodelLocation =
 					Path.of( project.getBuild().getOutputDirectory() ).resolveSibling( "generated-metamodel-sources" );
-			project.addCompileSourceRoot( generatedMetamodelLocation.toString() );
-
 
 			try ( SessionFactory sessionFactory = setupContext.setup( annotatedTypes() ) ) {
 				SearchMapping mapping = Search.mapping( sessionFactory );
@@ -75,7 +95,7 @@ public class HibernateSearchMetamodelGeneratorMojo extends AbstractMojo {
 				getLog().info( "Indexed entities: " + indexedEntities );
 
 			}
-
+			project.addCompileSourceRoot( generatedMetamodelLocation.toString() );
 		}
 	}
 
@@ -112,16 +132,77 @@ public class HibernateSearchMetamodelGeneratorMojo extends AbstractMojo {
 	}
 
 	private Class<?>[] annotatedTypes() {
-		try {
-			Class<?>[] types = new Class<?>[annotatedTypes.size()];
-			for ( int i = 0; i < annotatedTypes.size(); i++ ) {
-				types[i] = Class.forName( annotatedTypes.get( i ) );
+		if ( sameModuleCompile ) {
+			try {
+				List<Path> roots = new ArrayList<>();
+				List<Path> classes = new ArrayList<>();
+				for ( String compileSourceRoot : this.project.getCompileSourceRoots() ) {
+					Path root = Path.of( compileSourceRoot );
+					roots.add( root );
+
+					for ( String pkg : packagesToCompile ) {
+						Path path = root.resolve( Path.of( pkg.replace( ".", FileSystems.getDefault().getSeparator() ) ) );
+						if ( Files.exists( path ) ) {
+							Files.list( path ).filter( f -> f.getFileName().toString().endsWith( ".java" ) )
+									.forEach( classes::add );
+						}
+					}
+				}
+
+				Path output = Path.of( project.getBuild().getOutputDirectory() )
+						.resolveSibling( "generated-metamodel-pre-compiled-classes" );
+				Files.createDirectories( output );
+
+				JavaCompiler compiler = ToolProvider.getSystemJavaCompiler();
+				StandardJavaFileManager fileManager = compiler.getStandardFileManager( null, null, null );
+				fileManager.setLocationFromPaths( StandardLocation.SOURCE_PATH, roots );
+				fileManager.setLocation( StandardLocation.CLASS_PATH, getDependenciesAsFiles() );
+				fileManager.setLocationFromPaths( StandardLocation.CLASS_OUTPUT, List.of( output ) );
+
+				Iterable<? extends JavaFileObject> toCompile = fileManager.getJavaFileObjectsFromPaths( classes );
+
+				DiagnosticCollector<JavaFileObject> diagnostic = new DiagnosticCollector<>();
+				JavaCompiler.CompilationTask task =
+						compiler.getTask( null, fileManager, diagnostic, List.of(), null, toCompile );
+
+				task.call();
+
+				classLoader = new URLClassLoader( "hibernate-search-generator",
+						new URL[] { output.toUri().toURL() }, this.getClass().getClassLoader() );
+				Thread.currentThread().setContextClassLoader( classLoader );
+
+				Class<?>[] types = new Class<?>[annotatedTypes.size()];
+				for ( int i = 0; i < annotatedTypes.size(); i++ ) {
+					types[i] = classLoader.loadClass( annotatedTypes.get( i ) );
+				}
+				return types;
+
 			}
-			return types;
+			catch (IOException | ClassNotFoundException e) {
+				throw new RuntimeException( e );
+			}
 		}
-		catch (ClassNotFoundException e) {
-			throw new RuntimeException( e );
+		else {
+			try {
+				Class<?>[] types = new Class<?>[annotatedTypes.size()];
+				for ( int i = 0; i < annotatedTypes.size(); i++ ) {
+					types[i] = Class.forName( annotatedTypes.get( i ) );
+				}
+				return types;
+			}
+			catch (ClassNotFoundException e) {
+				throw new RuntimeException( e );
+			}
 		}
+	}
+
+	private Collection<File> getDependenciesAsFiles() {
+		project.setArtifactFilter( artifact -> true );
+		project.setArtifacts( null );
+		return project.getArtifacts()
+				.stream()
+				.map( Artifact::getFile )
+				.collect( Collectors.toList() );
 	}
 
 	private boolean hasOrmMapper(List<Dependency> dependencies) {

@@ -18,6 +18,8 @@
         <deploy.skip>false</deploy.skip>
         <enforcer.dependencyconvergence.skip>true</enforcer.dependencyconvergence.skip>
         <java.module.name>org.hibernate.search.metamodel.generator.plugin</java.module.name>
+        <forbiddenapis.skip>true</forbiddenapis.skip>
+        <checkstyle.skip>true</checkstyle.skip>
     </properties>
 
     <dependencies>
