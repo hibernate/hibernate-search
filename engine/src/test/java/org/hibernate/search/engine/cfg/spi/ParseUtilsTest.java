@@ -10,6 +10,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import java.time.Year;
+import java.time.temporal.Temporal;
 
 import org.hibernate.search.engine.spatial.GeoPoint;
 
@@ -19,18 +20,18 @@ class ParseUtilsTest {
 
 	@Test
 	void parseYear() {
-		assertThat( ParseUtils.parseYear( "2001" ) ).isEqualTo( Year.of( 2001 ) );
-		assertThat( ParseUtils.parseYear( "1999" ) ).isEqualTo( Year.of( 1999 ) );
-		assertThat( ParseUtils.parseYear( "1769" ) ).isEqualTo( Year.of( 1769 ) );
-		assertThat( ParseUtils.parseYear( "-0001" ) ).isEqualTo( Year.of( -1 ) );
-		assertThat( ParseUtils.parseYear( "-2001" ) ).isEqualTo( Year.of( -2001 ) );
-		assertThat( ParseUtils.parseYear( "+454654554" ) ).isEqualTo( Year.of( 454654554 ) );
-		assertThat( ParseUtils.parseYear( "-454654554" ) ).isEqualTo( Year.of( -454654554 ) );
+		assertThat( (Temporal) ParseUtils.parseYear( "2001" ) ).isEqualTo( Year.of( 2001 ) );
+		assertThat( (Temporal) ParseUtils.parseYear( "1999" ) ).isEqualTo( Year.of( 1999 ) );
+		assertThat( (Temporal) ParseUtils.parseYear( "1769" ) ).isEqualTo( Year.of( 1769 ) );
+		assertThat( (Temporal) ParseUtils.parseYear( "-0001" ) ).isEqualTo( Year.of( -1 ) );
+		assertThat( (Temporal) ParseUtils.parseYear( "-2001" ) ).isEqualTo( Year.of( -2001 ) );
+		assertThat( (Temporal) ParseUtils.parseYear( "+454654554" ) ).isEqualTo( Year.of( 454654554 ) );
+		assertThat( (Temporal) ParseUtils.parseYear( "-454654554" ) ).isEqualTo( Year.of( -454654554 ) );
 
 		// Lenient parsing
-		assertThat( ParseUtils.parseYear( "+2001" ) ).isEqualTo( Year.of( 2001 ) );
-		assertThat( ParseUtils.parseYear( "454654554" ) ).isEqualTo( Year.of( 454654554 ) );
-		assertThat( ParseUtils.parseYear( "-1" ) ).isEqualTo( Year.of( -1 ) );
+		assertThat( (Temporal) ParseUtils.parseYear( "+2001" ) ).isEqualTo( Year.of( 2001 ) );
+		assertThat( (Temporal) ParseUtils.parseYear( "454654554" ) ).isEqualTo( Year.of( 454654554 ) );
+		assertThat( (Temporal) ParseUtils.parseYear( "-1" ) ).isEqualTo( Year.of( -1 ) );
 	}
 
 	@Test
