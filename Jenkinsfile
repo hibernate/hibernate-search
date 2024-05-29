@@ -984,7 +984,7 @@ void mvn(String args) {
 			withCredentials([string(credentialsId: develocityPrCredentialsId,
 					variable: 'DEVELOCITY_ACCESS_KEY')]) {
 				withGradle { // withDevelocity, actually: https://plugins.jenkins.io/gradle/#plugin-content-capturing-build-scans-from-jenkins-pipeline
-					sh 'mvn gradle-enterprise:build-scan-publish-previous'
+					sh 'mvn gradle-enterprise:build-scan-publish-previous || true'
 				}
 			}
 		})
