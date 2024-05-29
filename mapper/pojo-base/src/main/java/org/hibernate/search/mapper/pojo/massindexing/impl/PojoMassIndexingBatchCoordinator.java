@@ -10,7 +10,6 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
-import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Future;
@@ -46,7 +45,6 @@ public class PojoMassIndexingBatchCoordinator extends PojoMassIndexingFailureHan
 	private final PojoMassIndexingContext massIndexingContext;
 
 	private final PojoScopeSchemaManager scopeSchemaManager;
-	private final Set<String> tenantIds;
 	private final PojoScopeDelegate<?, ?, ?> pojoScopeDelegate;
 	private final int typesToIndexInParallel;
 	private final int documentBuilderThreads;
@@ -65,7 +63,6 @@ public class PojoMassIndexingBatchCoordinator extends PojoMassIndexingFailureHan
 			List<PojoMassIndexingIndexedTypeGroup<?>> typeGroupsToIndex,
 			PojoMassIndexingContext massIndexingContext,
 			PojoScopeSchemaManager scopeSchemaManager,
-			Set<String> tenantIds,
 			PojoScopeDelegate<?, ?, ?> pojoScopeDelegate,
 			MassIndexingEnvironment environment,
 			int typesToIndexInParallel, int documentBuilderThreads, Boolean mergeSegmentsOnFinish,
@@ -75,7 +72,6 @@ public class PojoMassIndexingBatchCoordinator extends PojoMassIndexingFailureHan
 		this.typeGroupsToIndex = typeGroupsToIndex;
 
 		this.scopeSchemaManager = scopeSchemaManager;
-		this.tenantIds = tenantIds;
 		this.pojoScopeDelegate = pojoScopeDelegate;
 		this.massIndexingContext = massIndexingContext;
 		this.typesToIndexInParallel = typesToIndexInParallel;
@@ -113,9 +109,9 @@ public class PojoMassIndexingBatchCoordinator extends PojoMassIndexingFailureHan
 	 * Operations to do before the multiple-threads start indexing
 	 */
 	private void beforeBatch() throws InterruptedException {
-		allTenantsWorkspace = pojoScopeDelegate.workspace( tenantIds );
+		allTenantsWorkspace = pojoScopeDelegate.workspace( massIndexingContext.tenantIds() );
 		// Prepare the contexts first. These will be used for all batch related work:
-		for ( String tenantId : tenantIds ) {
+		for ( String tenantId : massIndexingContext.tenantIds() ) {
 			sessionContexts.add( createSessionContext( tenantId ) );
 		}
 		// means we are in a single tenant:

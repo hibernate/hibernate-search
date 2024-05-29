@@ -1008,4 +1008,12 @@ public interface Log extends BasicLogger {
 			value = "Invalid constructor parameter type: '%1$s'. The distance projection results in values of type '%2$s'.")
 	SearchException invalidParameterTypeForDistanceProjectionInProjectionConstructor(
 			@FormatWith(ClassFormatter.class) Class<?> rawClass, String expectedClass);
+
+	@Message(id = ID_OFFSET + 160,
+			value = "Requesting a schema drop-create on start is not allowed when multitenancy is enabled. "
+					+ "Schema would be dropped for all tenants, but data will only be indexed for tenant ids '%1$s'. "
+					+ "Do not use the schema drop-create on start when providing tenant ids. "
+					+ "If schema drop is actually required, do it through an SearchSchemaManager.")
+	SearchException schemaDropNotAllowedWithMultitenancy(Set<String> tenantIds);
+
 }

@@ -6,6 +6,8 @@
  */
 package org.hibernate.search.mapper.pojo.massindexing.spi;
 
+import java.util.Set;
+
 import org.hibernate.search.mapper.pojo.loading.spi.PojoMassLoadingContext;
 
 /**
@@ -13,4 +15,7 @@ import org.hibernate.search.mapper.pojo.loading.spi.PojoMassLoadingContext;
  */
 public interface PojoMassIndexingContext extends PojoMassLoadingContext {
 
+	Set<String> tenantIds();
+
+	boolean allTenantIdsIncluded();
 }
