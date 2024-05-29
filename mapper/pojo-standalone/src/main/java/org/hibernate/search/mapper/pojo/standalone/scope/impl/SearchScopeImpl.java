@@ -129,9 +129,10 @@ public class SearchScopeImpl<E> implements SearchScope<E> {
 
 	@Override
 	public MassIndexer massIndexer(Set<?> tenantIds) {
-		StandalonePojoLoadingContext context = mappingContext.loadingContextBuilder().build();
-		PojoMassIndexer massIndexerDelegate = delegate.massIndexer( context,
-				tenantIds.stream().map( tenancyConfiguration::convert ).collect( Collectors.toUnmodifiableSet() ) );
+		StandalonePojoLoadingContext context = mappingContext.loadingContextBuilder()
+				.tenantIds( tenantIds.stream().map( tenancyConfiguration::convert ).collect( Collectors.toUnmodifiableSet() ) )
+				.build();
+		PojoMassIndexer massIndexerDelegate = delegate.massIndexer( context );
 		return new StandalonePojoMassIndexer( massIndexerDelegate, context );
 	}
 

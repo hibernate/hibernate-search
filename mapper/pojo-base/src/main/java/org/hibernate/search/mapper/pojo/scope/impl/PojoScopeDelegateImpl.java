@@ -135,9 +135,9 @@ public final class PojoScopeDelegateImpl<R extends EntityReference, E, C> implem
 	}
 
 	@Override
-	public PojoMassIndexer massIndexer(PojoMassIndexingContext context, Set<String> tenantIds) {
+	public PojoMassIndexer massIndexer(PojoMassIndexingContext context) {
 		return new PojoDefaultMassIndexer( context, mappingContext, indexedTypeContextProvider, targetedTypeContexts,
-				schemaManager(), tenantIds, this );
+				schemaManager(), this );
 	}
 
 	@Override

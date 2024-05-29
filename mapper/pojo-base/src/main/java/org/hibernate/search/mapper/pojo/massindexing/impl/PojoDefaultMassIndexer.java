@@ -51,7 +51,6 @@ public class PojoDefaultMassIndexer implements PojoMassIndexer {
 	private final PojoMassIndexingTypeContextProvider typeContextProvider;
 	private final Set<? extends PojoMassIndexingIndexedTypeContext<?>> targetedIndexedTypes;
 	private final PojoScopeSchemaManager scopeSchemaManager;
-	private final Set<String> tenantIds;
 	private final PojoScopeDelegate<?, ?, ?> pojoScopeDelegate;
 
 	// default settings defined here:
@@ -72,14 +71,12 @@ public class PojoDefaultMassIndexer implements PojoMassIndexer {
 			PojoMassIndexingTypeContextProvider typeContextProvider,
 			Set<? extends PojoMassIndexingIndexedTypeContext<?>> targetedIndexedTypes,
 			PojoScopeSchemaManager scopeSchemaManager,
-			Set<String> tenantIds,
 			PojoScopeDelegate<?, ?, ?> pojoScopeDelegate) {
 		this.massIndexingContext = massIndexingContext;
 		this.mappingContext = mappingContext;
 		this.typeContextProvider = typeContextProvider;
 		this.targetedIndexedTypes = targetedIndexedTypes;
 		this.scopeSchemaManager = scopeSchemaManager;
-		this.tenantIds = tenantIds;
 		this.pojoScopeDelegate = pojoScopeDelegate;
 	}
 
@@ -175,8 +172,14 @@ public class PojoDefaultMassIndexer implements PojoMassIndexer {
 				failureFloodingThreshold
 		);
 
-		if ( Boolean.TRUE.equals( dropAndCreateSchemaOnStart ) && Boolean.TRUE.equals( purgeAtStart ) ) {
-			log.redundantPurgeAfterDrop();
+		boolean actualDropAndCreateSchemaOnStart = Boolean.TRUE.equals( dropAndCreateSchemaOnStart );
+		if ( actualDropAndCreateSchemaOnStart ) {
+			if ( Boolean.TRUE.equals( purgeAtStart ) ) {
+				log.redundantPurgeAfterDrop();
+			}
+			if ( !massIndexingContext.allTenantIdsIncluded() ) {
+				throw log.schemaDropNotAllowedWithMultitenancy( massIndexingContext.tenantIds() );
+			}
 		}
 
 		return new PojoMassIndexingBatchCoordinator(
@@ -184,14 +187,14 @@ public class PojoDefaultMassIndexer implements PojoMassIndexer {
 				notifier,
 				typeGroupsToIndex, massIndexingContext,
 				scopeSchemaManager,
-				tenantIds, pojoScopeDelegate,
+				pojoScopeDelegate,
 				resolvedMassIndexingEnvironment(),
 				typesToIndexInParallel, documentBuilderThreads,
 				mergeSegmentsOnFinish,
 				// false by default:
-				Boolean.TRUE.equals( dropAndCreateSchemaOnStart ),
+				actualDropAndCreateSchemaOnStart,
 				// false if not set explicitly and dropAndCreateSchemaOnStart is set to true, otherwise true by default:
-				purgeAtStart == null ? !Boolean.TRUE.equals( dropAndCreateSchemaOnStart ) : purgeAtStart,
+				purgeAtStart == null ? !actualDropAndCreateSchemaOnStart : purgeAtStart,
 				mergeSegmentsAfterPurge
 		);
 	}

@@ -178,7 +178,7 @@ public interface Log extends BasicLogger {
 
 	@Message(id = ID_OFFSET + 36,
 			value = "A tenant id '%1$s' was provided, while requesting a schema drop-create on start. " +
-					"Schema is going to be dropped for all tenants. " +
+					"Schema would be dropped for all tenants. " +
 					"Either do not use the schema drop-create on start or do not provide the tenant id.")
 	SearchException tenantIdProvidedWithSchemaDrop(String tenantId);
 

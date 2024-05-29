@@ -10,6 +10,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.Set;
 
 import org.hibernate.CacheMode;
 import org.hibernate.search.mapper.orm.loading.impl.HibernateOrmMassLoadingContext;
@@ -23,14 +24,19 @@ public final class HibernateOrmMassIndexingContext
 
 	private final HibernateOrmMassIndexingMappingContext mapping;
 	private final Map<Class<?>, ConditionalExpression> conditionalExpressions = new HashMap<>();
+	private final Set<String> actualTenantIds;
+	private final boolean allTenantIdsIncluded;
 	private CacheMode cacheMode = CacheMode.IGNORE;
 	private Integer idLoadingTransactionTimeout;
 	private int idFetchSize = 100; //reasonable default as we only load IDs
 	private int objectLoadingBatchSize = 10;
 	private long objectsLimit = 0; //means no limit at all
 
-	public HibernateOrmMassIndexingContext(HibernateOrmMassIndexingMappingContext mapping) {
+	public HibernateOrmMassIndexingContext(HibernateOrmMassIndexingMappingContext mapping, Set<String> actualTenantIds,
+			Set<String> allTenantIds) {
 		this.mapping = mapping;
+		this.actualTenantIds = actualTenantIds;
+		this.allTenantIdsIncluded = actualTenantIds.containsAll( allTenantIds );
 	}
 
 	@Override
@@ -111,4 +117,13 @@ public final class HibernateOrmMassIndexingContext
 		return mapping.tenancyConfiguration();
 	}
 
+	@Override
+	public Set<String> tenantIds() {
+		return actualTenantIds;
+	}
+
+	@Override
+	public boolean allTenantIdsIncluded() {
+		return allTenantIdsIncluded;
+	}
 }

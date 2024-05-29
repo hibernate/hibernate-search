@@ -56,7 +56,7 @@ public interface PojoScopeDelegate<R extends EntityReference, E, C> {
 
 	PojoScopeSchemaManager schemaManager();
 
-	PojoMassIndexer massIndexer(PojoMassIndexingContext context, Set<String> tenantIds);
+	PojoMassIndexer massIndexer(PojoMassIndexingContext context);
 
 	<T> T extension(IndexScopeExtension<T> extension);
 }

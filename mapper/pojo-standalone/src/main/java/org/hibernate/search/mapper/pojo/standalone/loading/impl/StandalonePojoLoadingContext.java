@@ -8,6 +8,7 @@ package org.hibernate.search.mapper.pojo.standalone.loading.impl;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
 
 import org.hibernate.search.mapper.pojo.loading.spi.PojoSelectionLoadingContext;
 import org.hibernate.search.mapper.pojo.massindexing.spi.PojoMassIndexingContext;
@@ -21,6 +22,7 @@ public final class StandalonePojoLoadingContext
 		implements PojoSelectionLoadingContext, PojoMassIndexingContext, MassLoadingOptions, SelectionLoadingOptions {
 
 	private final StandalonePojoMassIndexingMappingContext mappingContext;
+	private final Set<String> tenantIds;
 
 	private int batchSize = 10;
 	private final Map<Class<?>, Object> contextData;
@@ -28,6 +30,7 @@ public final class StandalonePojoLoadingContext
 	private StandalonePojoLoadingContext(Builder builder) {
 		this.mappingContext = builder.mappingContext;
 		this.contextData = builder.contextData;
+		this.tenantIds = builder.tenantIds == null ? Set.of() : builder.tenantIds;
 	}
 
 	public void batchSize(int batchSize) {
@@ -67,9 +70,20 @@ public final class StandalonePojoLoadingContext
 		return mappingContext;
 	}
 
+	@Override
+	public Set<String> tenantIds() {
+		return tenantIds;
+	}
+
+	@Override
+	public boolean allTenantIdsIncluded() {
+		return tenantIds.isEmpty();
+	}
+
 	public static final class Builder implements StandalonePojoSelectionLoadingContextBuilder, SelectionLoadingOptionsStep {
 		private final StandalonePojoMassIndexingMappingContext mappingContext;
 		private final Map<Class<?>, Object> contextData = new HashMap<>();
+		private Set<String> tenantIds;
 
 		public Builder(StandalonePojoMassIndexingMappingContext mappingContext) {
 			this.mappingContext = mappingContext;
@@ -83,6 +97,11 @@ public final class StandalonePojoLoadingContext
 		@Override
 		public <T> void context(Class<T> contextType, T context) {
 			contextData.put( contextType, context );
+		}
+
+		public Builder tenantIds(Set<String> tenantIds) {
+			this.tenantIds = tenantIds;
+			return this;
 		}
 
 		@Override
