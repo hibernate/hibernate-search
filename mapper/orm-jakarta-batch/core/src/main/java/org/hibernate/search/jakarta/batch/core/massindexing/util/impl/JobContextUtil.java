@@ -98,6 +98,7 @@ public final class JobContextUtil {
 		jobContextData.setEntityManagerFactory( emf );
 		jobContextData.setEntityTypeDescriptors( descriptors );
 		jobContextData.setTenancyConfiguration( mapping.tenancyConfiguration() );
+		jobContextData.setMassIndexingDefaultCleanOperation( mapping.massIndexingDefaultCleanOperation() );
 		return jobContextData;
 	}
 

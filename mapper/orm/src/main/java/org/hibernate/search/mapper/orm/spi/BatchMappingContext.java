@@ -11,6 +11,7 @@ import java.util.Collection;
 import jakarta.persistence.EntityManager;
 
 import org.hibernate.search.mapper.orm.tenancy.spi.TenancyConfiguration;
+import org.hibernate.search.mapper.pojo.massindexing.MassIndexingDefaultCleanOperation;
 
 public interface BatchMappingContext {
 
@@ -26,4 +27,5 @@ public interface BatchMappingContext {
 
 	TenancyConfiguration tenancyConfiguration();
 
+	MassIndexingDefaultCleanOperation massIndexingDefaultCleanOperation();
 }

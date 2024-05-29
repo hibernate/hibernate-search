@@ -55,6 +55,7 @@ import org.hibernate.search.mapper.orm.spi.BatchMappingContext;
 import org.hibernate.search.mapper.orm.tenancy.spi.TenancyConfiguration;
 import org.hibernate.search.mapper.pojo.mapping.spi.AbstractPojoMappingImplementor;
 import org.hibernate.search.mapper.pojo.mapping.spi.PojoMappingDelegate;
+import org.hibernate.search.mapper.pojo.massindexing.MassIndexingDefaultCleanOperation;
 import org.hibernate.search.mapper.pojo.massindexing.spi.PojoMassIndexerAgent;
 import org.hibernate.search.mapper.pojo.massindexing.spi.PojoMassIndexerAgentCreateContext;
 import org.hibernate.search.mapper.pojo.model.spi.PojoRawTypeIdentifier;
@@ -95,6 +96,12 @@ public class HibernateOrmMapping extends AbstractPojoMappingImplementor<Hibernat
 					.withDefault( HibernateOrmMapperSettings.Defaults.SCHEMA_MANAGEMENT_STRATEGY )
 					.build();
 
+	private static final ConfigurationProperty<MassIndexingDefaultCleanOperation> INDEXING_MASS_DEFAULT_CLEAN_OPERATION =
+			ConfigurationProperty.forKey( HibernateOrmMapperSettings.Radicals.INDEXING_MASS_DEFAULT_CLEAN_OPERATION )
+					.as( MassIndexingDefaultCleanOperation.class, MassIndexingDefaultCleanOperation::of )
+					.withDefault( HibernateOrmMapperSettings.Defaults.INDEXING_MASS_DEFAULT_CLEAN_OPERATION )
+					.build();
+
 	public static MappingImplementor<HibernateOrmMapping> create(
 			PojoMappingDelegate mappingDelegate, HibernateOrmTypeContextContainer typeContextContainer,
 			BeanHolder<? extends CoordinationStrategy> coordinationStrategyHolder,
@@ -108,13 +115,17 @@ public class HibernateOrmMapping extends AbstractPojoMappingImplementor<Hibernat
 		SchemaManagementStrategyName schemaManagementStrategyName = SCHEMA_MANAGEMENT_STRATEGY.get( propertySource );
 		SchemaManagementListener schemaManagementListener = new SchemaManagementListener( schemaManagementStrategyName );
 
+		MassIndexingDefaultCleanOperation massIndexingDefaultCleanOperation =
+				INDEXING_MASS_DEFAULT_CLEAN_OPERATION.get( propertySource );
+
 		return new HibernateOrmMapping(
 				mappingDelegate,
 				typeContextContainer, sessionFactory,
 				coordinationStrategyHolder,
 				configuredAutomaticIndexingStrategy,
 				cacheLookupStrategy, fetchSize,
-				schemaManagementListener
+				schemaManagementListener,
+				massIndexingDefaultCleanOperation
 		);
 	}
 
@@ -126,6 +137,8 @@ public class HibernateOrmMapping extends AbstractPojoMappingImplementor<Hibernat
 	private final int fetchSize;
 
 	private final SchemaManagementListener schemaManagementListener;
+	private final MassIndexingDefaultCleanOperation massIndexingDefaultCleanOperation;
+
 	private volatile ConfiguredSearchIndexingPlanFilter applicationIndexingPlanFilter =
 			ConfiguredSearchIndexingPlanFilter.IncludeAll.INSTANCE;
 
@@ -142,7 +155,8 @@ public class HibernateOrmMapping extends AbstractPojoMappingImplementor<Hibernat
 			ConfiguredAutomaticIndexingStrategy configuredAutomaticIndexingStrategy,
 			EntityLoadingCacheLookupStrategy cacheLookupStrategy,
 			int fetchSize,
-			SchemaManagementListener schemaManagementListener) {
+			SchemaManagementListener schemaManagementListener,
+			MassIndexingDefaultCleanOperation massIndexingDefaultCleanOperation) {
 		super( mappingDelegate, org.hibernate.search.mapper.orm.common.impl.HibernateOrmEntityReference::new );
 		this.typeContextContainer = typeContextContainer;
 		this.sessionFactory = sessionFactory;
@@ -151,6 +165,7 @@ public class HibernateOrmMapping extends AbstractPojoMappingImplementor<Hibernat
 		this.cacheLookupStrategy = cacheLookupStrategy;
 		this.fetchSize = fetchSize;
 		this.schemaManagementListener = schemaManagementListener;
+		this.massIndexingDefaultCleanOperation = massIndexingDefaultCleanOperation;
 	}
 
 	@Override
@@ -314,6 +329,11 @@ public class HibernateOrmMapping extends AbstractPojoMappingImplementor<Hibernat
 	@Override
 	public TenancyConfiguration tenancyConfiguration() {
 		return tenancyConfiguration;
+	}
+
+	@Override
+	public MassIndexingDefaultCleanOperation massIndexingDefaultCleanOperation() {
+		return massIndexingDefaultCleanOperation;
 	}
 
 	@Override

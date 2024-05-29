@@ -10,7 +10,9 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
+import org.hibernate.search.engine.tenancy.spi.TenancyMode;
 import org.hibernate.search.mapper.pojo.loading.spi.PojoSelectionLoadingContext;
+import org.hibernate.search.mapper.pojo.massindexing.MassIndexingDefaultCleanOperation;
 import org.hibernate.search.mapper.pojo.massindexing.spi.PojoMassIndexingContext;
 import org.hibernate.search.mapper.pojo.model.spi.PojoRuntimeIntrospector;
 import org.hibernate.search.mapper.pojo.standalone.loading.MassLoadingOptions;
@@ -23,6 +25,7 @@ public final class StandalonePojoLoadingContext
 
 	private final StandalonePojoMassIndexingMappingContext mappingContext;
 	private final Set<String> tenantIds;
+	private final TenancyMode tenancyMode;
 
 	private int batchSize = 10;
 	private final Map<Class<?>, Object> contextData;
@@ -31,6 +34,7 @@ public final class StandalonePojoLoadingContext
 		this.mappingContext = builder.mappingContext;
 		this.contextData = builder.contextData;
 		this.tenantIds = builder.tenantIds == null ? Set.of() : builder.tenantIds;
+		this.tenancyMode = builder.tenancyMode;
 	}
 
 	public void batchSize(int batchSize) {
@@ -76,14 +80,20 @@ public final class StandalonePojoLoadingContext
 	}
 
 	@Override
-	public boolean allTenantIdsIncluded() {
-		return tenantIds.isEmpty();
+	public TenancyMode tenancyMode() {
+		return tenancyMode;
+	}
+
+	@Override
+	public MassIndexingDefaultCleanOperation massIndexingDefaultCleanOperation() {
+		return mappingContext.massIndexingDefaultCleanOperation();
 	}
 
 	public static final class Builder implements StandalonePojoSelectionLoadingContextBuilder, SelectionLoadingOptionsStep {
 		private final StandalonePojoMassIndexingMappingContext mappingContext;
 		private final Map<Class<?>, Object> contextData = new HashMap<>();
 		private Set<String> tenantIds;
+		private TenancyMode tenancyMode;
 
 		public Builder(StandalonePojoMassIndexingMappingContext mappingContext) {
 			this.mappingContext = mappingContext;
@@ -101,6 +111,11 @@ public final class StandalonePojoLoadingContext
 
 		public Builder tenantIds(Set<String> tenantIds) {
 			this.tenantIds = tenantIds;
+			return this;
+		}
+
+		public Builder tenancyMode(TenancyMode tenancyMode) {
+			this.tenancyMode = tenancyMode;
 			return this;
 		}
 

@@ -55,10 +55,11 @@ public class TenancyConfiguration implements AutoCloseable {
 						configurationPropertySource, beanResolver::resolve );
 		switch ( tenancyMode ) {
 			case SINGLE_TENANCY:
-				return new TenancyConfiguration( tenantIdentifierConverter, Optional.of( Collections.emptySet() ),
+				return new TenancyConfiguration( tenancyMode, tenantIdentifierConverter, Optional.of( Collections.emptySet() ),
 						tenantIdsConfigurationPropertyKey );
 			case MULTI_TENANCY:
 				return new TenancyConfiguration(
+						tenancyMode,
 						tenantIdentifierConverter,
 						MULTI_TENANCY_TENANT_IDS.getAndMap( configurationPropertySource, LinkedHashSet::new ),
 						tenantIdsConfigurationPropertyKey );
@@ -67,19 +68,23 @@ public class TenancyConfiguration implements AutoCloseable {
 	}
 
 	// for tests:
-	public static TenancyConfiguration create(BeanHolder<? extends TenantIdentifierConverter> tenantIdentifierConverter,
+	public static TenancyConfiguration create(TenancyMode tenancyMode,
+			BeanHolder<? extends TenantIdentifierConverter> tenantIdentifierConverter,
 			Optional<Set<String>> tenantIds,
 			String tenantIdsConfigurationPropertyKey) {
-		return new TenancyConfiguration( tenantIdentifierConverter, tenantIds, tenantIdsConfigurationPropertyKey );
+		return new TenancyConfiguration( tenancyMode, tenantIdentifierConverter, tenantIds, tenantIdsConfigurationPropertyKey );
 	}
 
+	private final TenancyMode tenancyMode;
 	private final Optional<Set<String>> tenantIds;
 	private final String tenantIdsConfigurationPropertyKey;
 	private final BeanHolder<? extends TenantIdentifierConverter> tenantIdentifierConverter;
 
-	private TenancyConfiguration(BeanHolder<? extends TenantIdentifierConverter> tenantIdentifierConverter,
+	private TenancyConfiguration(TenancyMode tenancyMode,
+			BeanHolder<? extends TenantIdentifierConverter> tenantIdentifierConverter,
 			Optional<Set<String>> tenantIds,
 			String tenantIdsConfigurationPropertyKey) {
+		this.tenancyMode = tenancyMode;
 		this.tenantIdentifierConverter = tenantIdentifierConverter;
 		this.tenantIds = tenantIds;
 		this.tenantIdsConfigurationPropertyKey = tenantIdsConfigurationPropertyKey;
@@ -113,5 +118,9 @@ public class TenancyConfiguration implements AutoCloseable {
 		if ( tenantIdentifierConverter != null ) {
 			tenantIdentifierConverter.close();
 		}
+	}
+
+	public TenancyMode tenancyMode() {
+		return tenancyMode;
 	}
 }

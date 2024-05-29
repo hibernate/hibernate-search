@@ -16,6 +16,7 @@ import org.hibernate.search.mapper.orm.search.loading.EntityLoadingCacheLookupSt
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.ProjectionConstructor;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.SearchEntity;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.processing.RootMapping;
+import org.hibernate.search.mapper.pojo.massindexing.MassIndexingDefaultCleanOperation;
 import org.hibernate.search.mapper.pojo.tenancy.TenantIdentifierConverter;
 import org.hibernate.search.mapper.pojo.tenancy.spi.StringTenantIdentifierConverter;
 import org.hibernate.search.mapper.pojo.work.IndexingPlanSynchronizationStrategy;
@@ -276,6 +277,16 @@ public final class HibernateOrmMapperSettings {
 	public static final String INDEXING_LISTENERS_ENABLED = PREFIX + Radicals.INDEXING_LISTENERS_ENABLED;
 
 	/**
+	 * The default index cleaning operation to apply during mass indexing,
+	 * unless configured explicitly.
+	 * <p>
+	 * Expects a {@link MassIndexingDefaultCleanOperation} value, or a String representation of such value.
+	 * <p>
+	 * Defaults to {@link Defaults#INDEXING_MASS_DEFAULT_CLEAN_OPERATION}.
+	 */
+	public static final String INDEXING_MASS_DEFAULT_CLEAN_OPERATION = PREFIX + Radicals.INDEXING_MASS_DEFAULT_CLEAN_OPERATION;
+
+	/**
 	 * Configuration property keys without the {@link #PREFIX prefix}.
 	 */
 	public static final class Radicals {
@@ -334,6 +345,8 @@ public final class HibernateOrmMapperSettings {
 		public static final String INDEXING_PLAN_SYNCHRONIZATION_STRATEGY =
 				INDEXING_PREFIX + IndexingRadicals.PLAN_SYNCHRONIZATION_STRATEGY;
 		public static final String INDEXING_LISTENERS_ENABLED = INDEXING_PREFIX + IndexingRadicals.LISTENERS_ENABLED;
+		public static final String INDEXING_MASS_DEFAULT_CLEAN_OPERATION =
+				INDEXING_PREFIX + IndexingRadicals.MASS_DEFAULT_CLEAN_OPERATION;
 	}
 
 	/**
@@ -381,6 +394,8 @@ public final class HibernateOrmMapperSettings {
 		public static final String PLAN_SYNCHRONIZATION_STRATEGY = PLAN_PREFIX + "synchronization.strategy";
 		public static final String LISTENERS_PREFIX = "listeners.";
 		public static final String LISTENERS_ENABLED = LISTENERS_PREFIX + "enabled";
+		public static final String MASS_PREFIX = "mass.";
+		public static final String MASS_DEFAULT_CLEAN_OPERATION = MASS_PREFIX + "default_clean_operation";
 	}
 
 	/**
@@ -455,6 +470,8 @@ public final class HibernateOrmMapperSettings {
 		public static final boolean INDEXING_LISTENERS_ENABLED = true;
 		public static final BeanReference<TenantIdentifierConverter> MULTI_TENANCY_TENANT_IDENTIFIER_CONVERTER =
 				BeanReference.of( TenantIdentifierConverter.class, StringTenantIdentifierConverter.NAME );
+		public static final MassIndexingDefaultCleanOperation INDEXING_MASS_DEFAULT_CLEAN_OPERATION =
+				MassIndexingDefaultCleanOperation.PURGE;
 	}
 
 }

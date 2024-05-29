@@ -30,12 +30,15 @@ public class TenancyConfiguration implements AutoCloseable {
 
 		BeanHolder<? extends TenantIdentifierConverter> tenantIdentifierConverter =
 				MULTI_TENANCY_TENANT_IDENTIFIER_CONVERTER.getAndTransform( configurationPropertySource, beanResolver::resolve );
-		return new TenancyConfiguration( tenantIdentifierConverter );
+		return new TenancyConfiguration( tenancyMode, tenantIdentifierConverter );
 	}
 
+	private final TenancyMode tenancyMode;
 	private final BeanHolder<? extends TenantIdentifierConverter> tenantIdentifierConverter;
 
-	private TenancyConfiguration(BeanHolder<? extends TenantIdentifierConverter> tenantIdentifierConverter) {
+	private TenancyConfiguration(TenancyMode tenancyMode,
+			BeanHolder<? extends TenantIdentifierConverter> tenantIdentifierConverter) {
+		this.tenancyMode = tenancyMode;
 		this.tenantIdentifierConverter = tenantIdentifierConverter;
 	}
 
@@ -45,6 +48,10 @@ public class TenancyConfiguration implements AutoCloseable {
 
 	public String convert(Object tenantIdentifier) {
 		return tenantIdentifierConverter.get().toStringValue( tenantIdentifier );
+	}
+
+	public TenancyMode tenancyMode() {
+		return tenancyMode;
 	}
 
 	@Override

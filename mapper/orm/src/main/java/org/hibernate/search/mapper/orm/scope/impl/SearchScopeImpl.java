@@ -137,17 +137,16 @@ public class SearchScopeImpl<E> implements SearchScope<E>, BatchScopeContext<E> 
 	@Override
 	public MassIndexer massIndexer(Set<?> tenantIds) {
 		Set<String> actualTenantIds;
-		Set<String> allTenantIds = tenancyConfiguration.tenantIdsOrFail();
 		if ( tenantIds.isEmpty() ) {
 			// Let's see if we are in multi-tenant environment and try to get the tenant ids
-			actualTenantIds = allTenantIds;
+			actualTenantIds = tenancyConfiguration.tenantIdsOrFail();
 		}
 		else {
 			actualTenantIds = tenantIds.stream().map( tenancyConfiguration::convert ).collect( Collectors.toUnmodifiableSet() );
 		}
 
 		HibernateOrmMassIndexingContext massIndexingContext =
-				new HibernateOrmMassIndexingContext( mappingContext, actualTenantIds, allTenantIds );
+				new HibernateOrmMassIndexingContext( mappingContext, actualTenantIds );
 
 		PojoMassIndexer massIndexerDelegate = delegate.massIndexer( massIndexingContext );
 
