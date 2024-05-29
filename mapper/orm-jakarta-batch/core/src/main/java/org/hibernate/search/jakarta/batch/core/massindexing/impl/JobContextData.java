@@ -19,6 +19,7 @@ import jakarta.persistence.EntityManagerFactory;
 
 import org.hibernate.search.jakarta.batch.core.massindexing.util.impl.EntityTypeDescriptor;
 import org.hibernate.search.mapper.orm.tenancy.spi.TenancyConfiguration;
+import org.hibernate.search.mapper.pojo.massindexing.MassIndexingDefaultCleanOperation;
 
 /**
  * Container for data shared across the entire batch job.
@@ -37,6 +38,7 @@ public class JobContextData {
 	private Map<String, EntityTypeDescriptor<?, ?>> entityTypeDescriptorMap;
 
 	private TenancyConfiguration tenancyConfiguration;
+	private MassIndexingDefaultCleanOperation massIndexingDefaultCleanOperation;
 
 	public JobContextData() {
 		entityTypeDescriptorMap = new HashMap<>();
@@ -62,6 +64,14 @@ public class JobContextData {
 
 	public TenancyConfiguration getTenancyConfiguration() {
 		return tenancyConfiguration;
+	}
+
+	public MassIndexingDefaultCleanOperation getMassIndexingDefaultCleanOperation() {
+		return massIndexingDefaultCleanOperation;
+	}
+
+	public void setMassIndexingDefaultCleanOperation(MassIndexingDefaultCleanOperation massIndexingDefaultCleanOperation) {
+		this.massIndexingDefaultCleanOperation = massIndexingDefaultCleanOperation;
 	}
 
 	public EntityTypeDescriptor<?, ?> getEntityTypeDescriptor(String entityName) {

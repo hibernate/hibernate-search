@@ -10,6 +10,7 @@ import org.hibernate.search.engine.environment.bean.BeanReference;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.ProjectionConstructor;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.SearchEntity;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.processing.RootMapping;
+import org.hibernate.search.mapper.pojo.massindexing.MassIndexingDefaultCleanOperation;
 import org.hibernate.search.mapper.pojo.standalone.mapping.SearchMapping;
 import org.hibernate.search.mapper.pojo.standalone.mapping.StandalonePojoMappingConfigurer;
 import org.hibernate.search.mapper.pojo.standalone.schema.management.SchemaManagementStrategyName;
@@ -129,6 +130,16 @@ public final class StandalonePojoMapperSettings {
 	public static final String INDEXING_PLAN_SYNCHRONIZATION_STRATEGY =
 			PREFIX + Radicals.INDEXING_PLAN_SYNCHRONIZATION_STRATEGY;
 
+	/**
+	 * The default index cleaning operation to apply during mass indexing,
+	 * unless configured explicitly.
+	 * <p>
+	 * Expects a {@link MassIndexingDefaultCleanOperation} value, or a String representation of such value.
+	 * <p>
+	 * Defaults to {@link Defaults#INDEXING_MASS_DEFAULT_CLEAN_OPERATION}.
+	 */
+	public static final String INDEXING_MASS_DEFAULT_CLEAN_OPERATION = PREFIX + Radicals.INDEXING_MASS_DEFAULT_CLEAN_OPERATION;
+
 	public static class Radicals {
 
 		private Radicals() {
@@ -146,6 +157,7 @@ public final class StandalonePojoMapperSettings {
 				MAPPING_PREFIX + "multi_tenancy.tenant_identifier_converter";
 		public static final String INDEXING_PLAN_SYNCHRONIZATION_PREFIX = "indexing.plan.synchronization.";
 		public static final String INDEXING_PLAN_SYNCHRONIZATION_STRATEGY = INDEXING_PLAN_SYNCHRONIZATION_PREFIX + "strategy";
+		public static final String INDEXING_MASS_DEFAULT_CLEAN_OPERATION = "indexing.mass.default_clean_operation";
 
 	}
 
@@ -168,6 +180,8 @@ public final class StandalonePojoMapperSettings {
 
 		public static final BeanReference<TenantIdentifierConverter> MULTI_TENANCY_TENANT_IDENTIFIER_CONVERTER =
 				BeanReference.of( TenantIdentifierConverter.class, StringTenantIdentifierConverter.NAME );
+		public static final MassIndexingDefaultCleanOperation INDEXING_MASS_DEFAULT_CLEAN_OPERATION =
+				MassIndexingDefaultCleanOperation.PURGE;
 	}
 
 }

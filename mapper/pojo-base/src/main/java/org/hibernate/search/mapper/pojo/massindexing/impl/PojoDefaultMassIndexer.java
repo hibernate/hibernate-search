@@ -12,7 +12,9 @@ import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutorService;
 
+import org.hibernate.search.engine.tenancy.spi.TenancyMode;
 import org.hibernate.search.mapper.pojo.logging.impl.Log;
+import org.hibernate.search.mapper.pojo.massindexing.MassIndexingDefaultCleanOperation;
 import org.hibernate.search.mapper.pojo.massindexing.MassIndexingEnvironment;
 import org.hibernate.search.mapper.pojo.massindexing.MassIndexingFailureHandler;
 import org.hibernate.search.mapper.pojo.massindexing.MassIndexingMonitor;
@@ -172,12 +174,21 @@ public class PojoDefaultMassIndexer implements PojoMassIndexer {
 				failureFloodingThreshold
 		);
 
+		if ( dropAndCreateSchemaOnStart == null && purgeAtStart == null ) {
+			// we should decide the defaults:
+			MassIndexingDefaultCleanOperation operation = massIndexingContext.massIndexingDefaultCleanOperation();
+			purgeAtStart = MassIndexingDefaultCleanOperation.PURGE.equals( operation );
+			dropAndCreateSchemaOnStart = MassIndexingDefaultCleanOperation.DROP_AND_CREATE.equals( operation );
+		}
+
 		boolean actualDropAndCreateSchemaOnStart = Boolean.TRUE.equals( dropAndCreateSchemaOnStart );
 		if ( actualDropAndCreateSchemaOnStart ) {
 			if ( Boolean.TRUE.equals( purgeAtStart ) ) {
 				log.redundantPurgeAfterDrop();
 			}
-			if ( !massIndexingContext.allTenantIdsIncluded() ) {
+			if ( TenancyMode.MULTI_TENANCY.equals( massIndexingContext.tenancyMode() ) ) {
+				// Users are not setting the tenants explicitly,
+				//  hence if multitenancy is enabled we cannot  drop the schema:
 				throw log.schemaDropNotAllowedWithMultitenancy( massIndexingContext.tenantIds() );
 			}
 		}

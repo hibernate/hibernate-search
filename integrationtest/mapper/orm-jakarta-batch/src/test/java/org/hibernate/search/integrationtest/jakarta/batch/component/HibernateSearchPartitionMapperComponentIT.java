@@ -21,6 +21,7 @@ import jakarta.batch.runtime.context.JobContext;
 import jakarta.persistence.EntityManagerFactory;
 
 import org.hibernate.search.engine.environment.bean.BeanHolder;
+import org.hibernate.search.engine.tenancy.spi.TenancyMode;
 import org.hibernate.search.integrationtest.jakarta.batch.massindexing.entity.Company;
 import org.hibernate.search.integrationtest.jakarta.batch.massindexing.entity.CompanyGroup;
 import org.hibernate.search.integrationtest.jakarta.batch.massindexing.entity.Person;
@@ -102,6 +103,7 @@ class HibernateSearchPartitionMapperComponentIT {
 		var personType = JobTestUtil.createEntityTypeDescriptor( emf, Person.class );
 		jobData.setEntityTypeDescriptors( Arrays.asList( companyType, personType ) );
 		jobData.setTenancyConfiguration( TenancyConfiguration.create(
+				TenancyMode.SINGLE_TENANCY,
 				BeanHolder.of( StringTenantIdentifierConverter.INSTANCE ),
 				Optional.empty(),
 				""
@@ -141,6 +143,7 @@ class HibernateSearchPartitionMapperComponentIT {
 		var companyGroupType = JobTestUtil.createEntityTypeDescriptor( emf, CompanyGroup.class );
 		jobData.setEntityTypeDescriptors( Collections.singletonList( companyGroupType ) );
 		jobData.setTenancyConfiguration( TenancyConfiguration.create(
+				TenancyMode.SINGLE_TENANCY,
 				BeanHolder.of( StringTenantIdentifierConverter.INSTANCE ),
 				Optional.empty(),
 				""
