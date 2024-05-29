@@ -6,6 +6,8 @@
  */
 package org.hibernate.search.mapper.pojo.standalone.scope.impl;
 
+import static org.hibernate.search.util.common.impl.CollectionHelper.asSetIgnoreNull;
+
 import java.util.Collections;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -33,7 +35,6 @@ import org.hibernate.search.mapper.pojo.standalone.scope.SearchScope;
 import org.hibernate.search.mapper.pojo.standalone.tenancy.impl.TenancyConfiguration;
 import org.hibernate.search.mapper.pojo.standalone.work.SearchWorkspace;
 import org.hibernate.search.mapper.pojo.standalone.work.impl.SearchWorkspaceImpl;
-import org.hibernate.search.util.common.impl.Contracts;
 
 public class SearchScopeImpl<E> implements SearchScope<E> {
 
@@ -118,13 +119,12 @@ public class SearchScopeImpl<E> implements SearchScope<E> {
 	@Override
 	@SuppressWarnings("removal")
 	public MassIndexer massIndexer(String tenantId) {
-		Contracts.assertNotNull( tenantId, "tenant identifier" );
-		return massIndexer( Collections.singleton( tenantId ) );
+		return massIndexer( (Object) tenantId );
 	}
 
 	@Override
 	public MassIndexer massIndexer(Object tenantId) {
-		return null;
+		return massIndexer( asSetIgnoreNull( tenantId ) );
 	}
 
 	@Override

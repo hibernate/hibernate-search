@@ -115,6 +115,51 @@ class MassIndexingBaseIT {
 	}
 
 	@Test
+	void defaultMassIndexerFromScopeStartAndWait() throws Exception {
+		try ( SearchSession searchSession = mapping.createSession() ) {
+			MassIndexer indexer = searchSession.scope( Book.class ).massIndexer( (Object) null )
+					// Simulate passing information to connect to a DB, ...
+					.context( StubLoadingContext.class, loadingContext );
+
+			// add operations on indexes can follow any random order,
+			// since they are executed by different threads
+			backendMock.expectWorks(
+					Book.NAME, DocumentCommitStrategy.NONE, DocumentRefreshStrategy.NONE
+			)
+					.add( "1", b -> b
+							.field( "title", TITLE_1 )
+							.field( "author", AUTHOR_1 )
+					)
+					.add( "2", b -> b
+							.field( "title", TITLE_2 )
+							.field( "author", AUTHOR_2 )
+					)
+					.add( "3", b -> b
+							.field( "title", TITLE_3 )
+							.field( "author", AUTHOR_3 )
+					);
+
+			// purgeAtStart and mergeSegmentsAfterPurge are enabled by default,
+			// so we expect 1 purge, 1 mergeSegments and 1 flush calls in this order:
+			backendMock.expectIndexScaleWorks( Book.NAME, searchSession.tenantIdentifierValue() )
+					.purge()
+					.mergeSegments()
+					.flush()
+					.refresh();
+
+			try {
+				indexer.startAndWait();
+			}
+			catch (InterruptedException e) {
+				fail( "Unexpected InterruptedException: " + e.getMessage() );
+			}
+
+		}
+
+		backendMock.verifyExpectationsMet();
+	}
+
+	@Test
 	void dropAndCreateSchemaOnStart() {
 		try ( SearchSession searchSession = mapping.createSession() ) {
 			MassIndexer indexer = searchSession.massIndexer()
