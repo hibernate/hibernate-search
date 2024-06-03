@@ -69,7 +69,7 @@ public class HibernateOrmDynamicMapRawTypeModel
 	}
 
 	@Override
-	public Stream<Annotation> annotations() {
+	public Stream<? extends Annotation> annotations() {
 		return Stream.empty();
 	}
 

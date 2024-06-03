@@ -53,7 +53,7 @@ public interface PojoRawTypeModel<T> extends PojoTypeModel<T>, MappableTypeModel
 	/**
 	 * @return All annotations on this specific type (non-inherited annotations from supertype are excluded).
 	 */
-	Stream<Annotation> annotations();
+	Stream<? extends Annotation> annotations();
 
 	/**
 	 * @return The main constructor of this type.
