@@ -13,7 +13,6 @@ import java.lang.reflect.Type;
 import java.util.List;
 import java.util.stream.Stream;
 
-import org.hibernate.models.spi.AnnotationUsage;
 import org.hibernate.models.spi.MemberDetails;
 import org.hibernate.search.mapper.pojo.logging.impl.Log;
 import org.hibernate.search.mapper.pojo.model.spi.PojoPropertyModel;
@@ -61,8 +60,7 @@ public abstract class AbstractPojoModelsPropertyModel<T, I extends AbstractPojoM
 
 	@Override
 	public final Stream<Annotation> annotations() {
-		return declaredProperties.stream().flatMap( introspector::annotations )
-				.map( AnnotationUsage::toAnnotation );
+		return declaredProperties.stream().flatMap( introspector::annotations );
 	}
 
 	@Override

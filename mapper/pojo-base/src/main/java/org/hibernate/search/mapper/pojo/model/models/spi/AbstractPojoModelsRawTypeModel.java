@@ -14,7 +14,6 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import org.hibernate.models.spi.AnnotationUsage;
 import org.hibernate.models.spi.ClassDetails;
 import org.hibernate.models.spi.MemberDetails;
 import org.hibernate.search.engine.mapper.model.spi.MappableTypeModel;
@@ -63,9 +62,8 @@ public abstract class AbstractPojoModelsRawTypeModel<T, I extends AbstractPojoMo
 	}
 
 	@Override
-	public Stream<Annotation> annotations() {
-		return introspector.annotations( classDetails )
-				.map( AnnotationUsage::toAnnotation );
+	public Stream<? extends Annotation> annotations() {
+		return introspector.annotations( classDetails );
 	}
 
 	@Override
