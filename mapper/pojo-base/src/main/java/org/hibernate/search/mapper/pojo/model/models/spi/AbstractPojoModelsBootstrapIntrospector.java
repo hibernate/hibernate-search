@@ -4,6 +4,7 @@
  */
 package org.hibernate.search.mapper.pojo.model.models.spi;
 
+import java.lang.annotation.Annotation;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.Member;
@@ -20,7 +21,6 @@ import java.util.stream.Stream;
 import org.hibernate.models.internal.SimpleClassLoading;
 import org.hibernate.models.internal.SourceModelBuildingContextImpl;
 import org.hibernate.models.spi.AnnotationTarget;
-import org.hibernate.models.spi.AnnotationUsage;
 import org.hibernate.models.spi.ClassDetails;
 import org.hibernate.models.spi.ClassDetailsRegistry;
 import org.hibernate.models.spi.MemberDetails;
@@ -63,8 +63,8 @@ public abstract class AbstractPojoModelsBootstrapIntrospector implements PojoBoo
 		return valueHandleFactory;
 	}
 
-	public Stream<AnnotationUsage<?>> annotations(AnnotationTarget annotationTarget) {
-		return annotationTarget.getAllAnnotationUsages().stream();
+	public Stream<? extends Annotation> annotations(AnnotationTarget annotationTarget) {
+		return annotationTarget.getDirectAnnotationUsages().stream();
 	}
 
 	public ClassDetails toModelsClass(Class<?> type) {
