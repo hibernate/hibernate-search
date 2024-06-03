@@ -20,7 +20,7 @@ import org.hibernate.Session;
 import org.hibernate.binder.internal.TenantIdBinder;
 import org.hibernate.boot.Metadata;
 import org.hibernate.boot.models.categorize.internal.ClassLoaderServiceLoading;
-import org.hibernate.boot.models.categorize.spi.ManagedResourcesProcessor;
+import org.hibernate.boot.models.internal.ModelsHelper;
 import org.hibernate.boot.registry.classloading.spi.ClassLoaderService;
 import org.hibernate.boot.spi.BootstrapContext;
 import org.hibernate.engine.spi.SessionFactoryImplementor;
@@ -199,7 +199,7 @@ public final class HibernateOrmUtils {
 		return new SourceModelBuildingContextImpl(
 				classLoading,
 				bootstrapContext.getJandexView(),
-				ManagedResourcesProcessor::preFillRegistries
+				ModelsHelper::preFillRegistries
 		);
 	}
 
