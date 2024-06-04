@@ -11,7 +11,7 @@ import java.util.List;
 import java.util.Set;
 
 import org.hibernate.engine.spi.SharedSessionContractImplementor;
-import org.hibernate.metamodel.mapping.EntityMappingType;
+import org.hibernate.metamodel.model.domain.EntityDomainType;
 import org.hibernate.query.Query;
 import org.hibernate.search.mapper.orm.loading.spi.ConditionalExpression;
 
@@ -35,22 +35,22 @@ public abstract class ConditionalExpressionQueryFactory<E, I> implements TypeQue
 	}
 
 	@Override
-	public Query<Long> createQueryForCount(SharedSessionContractImplementor session, EntityMappingType entityMappingType,
+	public Query<Long> createQueryForCount(SharedSessionContractImplementor session, EntityDomainType<?> entityDomainType,
 			Set<? extends Class<? extends E>> includedTypesFilter,
 			List<ConditionalExpression> conditionalExpressions) {
 		return createQueryWithConditionalExpressionsOrOrder( session,
-				"select count(e) from " + entityMappingType.getEntityName() + " e",
+				"select count(e) from " + entityDomainType.getName() + " e",
 				Long.class, "e", includedTypesFilter, conditionalExpressions, null
 		);
 	}
 
 	@Override
 	public Query<I> createQueryForIdentifierListing(SharedSessionContractImplementor session,
-			EntityMappingType entityMappingType,
+			EntityDomainType<?> entityDomainType,
 			Set<? extends Class<? extends E>> includedTypesFilter,
 			List<ConditionalExpression> conditionalExpressions, String order) {
 		return createQueryWithConditionalExpressionsOrOrder( session,
-				"select e." + uniquePropertyName + " from " + entityMappingType.getEntityName() + " e",
+				"select e." + uniquePropertyName + " from " + entityDomainType.getName() + " e",
 				uniquePropertyType, "e",
 				includedTypesFilter, conditionalExpressions, order
 		);
