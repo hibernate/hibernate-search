@@ -27,6 +27,7 @@ import org.hibernate.mapping.PersistentClass;
 import org.hibernate.mapping.Property;
 import org.hibernate.metamodel.MappingMetamodel;
 import org.hibernate.metamodel.mapping.EntityMappingType;
+import org.hibernate.metamodel.model.domain.EntityDomainType;
 import org.hibernate.search.mapper.orm.logging.impl.Log;
 import org.hibernate.search.mapper.pojo.loading.spi.PojoLoadingTypeContext;
 import org.hibernate.search.util.common.AssertionFailure;
@@ -78,6 +79,11 @@ public final class HibernateOrmUtils {
 	public static EntityMappingType entityMappingType(SessionFactoryImplementor sessionFactory, String entityName) {
 		MappingMetamodel metamodel = sessionFactory.getMappingMetamodel();
 		return metamodel.getEntityDescriptor( entityName );
+	}
+
+	public static EntityDomainType<?> entityDomainType(SessionFactoryImplementor sessionFactory, String entityName) {
+		var metamodel = sessionFactory.getJpaMetamodel();
+		return metamodel.entity( entityName );
 	}
 
 	public static Class<?> entityClass(PersistentClass persistentClass) {

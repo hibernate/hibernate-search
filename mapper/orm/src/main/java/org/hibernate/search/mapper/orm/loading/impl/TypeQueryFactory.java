@@ -13,7 +13,7 @@ import java.util.Set;
 import org.hibernate.MultiIdentifierLoadAccess;
 import org.hibernate.engine.spi.SessionImplementor;
 import org.hibernate.engine.spi.SharedSessionContractImplementor;
-import org.hibernate.metamodel.mapping.EntityMappingType;
+import org.hibernate.metamodel.model.domain.EntityDomainType;
 import org.hibernate.query.Query;
 import org.hibernate.search.mapper.orm.loading.spi.ConditionalExpression;
 
@@ -43,11 +43,11 @@ public interface TypeQueryFactory<E, I> {
 	Query<I> createQueryForIdentifierListing(SharedSessionContractImplementor session,
 			Set<? extends Class<? extends E>> includedTypesFilter);
 
-	Query<Long> createQueryForCount(SharedSessionContractImplementor session, EntityMappingType entityMappingType,
+	Query<Long> createQueryForCount(SharedSessionContractImplementor session, EntityDomainType<?> entityDomainType,
 			Set<? extends Class<? extends E>> includedTypesFilter,
 			List<ConditionalExpression> conditionalExpressions);
 
-	Query<I> createQueryForIdentifierListing(SharedSessionContractImplementor session, EntityMappingType entityMappingType,
+	Query<I> createQueryForIdentifierListing(SharedSessionContractImplementor session, EntityDomainType<?> entityDomainType,
 			Set<? extends Class<? extends E>> includedTypesFilter,
 			List<ConditionalExpression> conditionalExpressions, String order);
 

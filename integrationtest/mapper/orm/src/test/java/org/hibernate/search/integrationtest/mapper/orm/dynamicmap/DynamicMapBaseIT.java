@@ -46,6 +46,8 @@ import org.hibernate.search.util.impl.test.annotation.TestForIssue;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
 
 /**
  * Test basic features when mapping a Hibernate ORM "dynamic-map" entity.
@@ -65,8 +67,9 @@ class DynamicMapBaseIT {
 	@RegisterExtension
 	public OrmSetupHelper ormSetupHelper = OrmSetupHelper.withBackendMock( backendMock );
 
-	@Test
-	void simple() {
+	@ParameterizedTest
+	@ValueSource(booleans = { true, false })
+	void simple(boolean jpaCompliance) {
 		String hbmPath = "/DynamicMapBaseIT/simple.hbm.xml";
 		String entityTypeName = "Book";
 
@@ -77,6 +80,7 @@ class DynamicMapBaseIT {
 		);
 		SessionFactory sessionFactory = ormSetupHelper.start()
 				.withConfiguration( builder -> builder.addHbmFromClassPath( hbmPath ) )
+				.withProperty( "hibernate.jpa.compliance.query", jpaCompliance )
 				.withProperty(
 						HibernateOrmMapperSettings.MAPPING_CONFIGURER,
 						(HibernateOrmSearchMappingConfigurer) context -> {
@@ -157,9 +161,10 @@ class DynamicMapBaseIT {
 						"e.g. 'MyEntity.myEmbedded' or 'MyEntity.myEmbedded.myNestedEmbedded'." );
 	}
 
-	@Test
 	@TestForIssue(jiraKey = "HSEARCH-3848")
-	void searchObject() {
+	@ParameterizedTest
+	@ValueSource(booleans = { true, false })
+	void searchObject(boolean jpaCompliance) {
 		String hbmPath = "/DynamicMapBaseIT/simple.hbm.xml";
 		String entityTypeName = "Book";
 
@@ -168,6 +173,7 @@ class DynamicMapBaseIT {
 		);
 		SessionFactory sessionFactory = ormSetupHelper.start()
 				.withConfiguration( builder -> builder.addHbmFromClassPath( hbmPath ) )
+				.withProperty( "hibernate.jpa.compliance.query", jpaCompliance )
 				.withProperty(
 						HibernateOrmMapperSettings.MAPPING_CONFIGURER,
 						(HibernateOrmSearchMappingConfigurer) context -> {
@@ -217,8 +223,9 @@ class DynamicMapBaseIT {
 		} );
 	}
 
-	@Test
-	void massIndexing() {
+	@ParameterizedTest
+	@ValueSource(booleans = { true, false })
+	void massIndexing(boolean jpaCompliance) {
 		String hbmPath = "/DynamicMapBaseIT/simple.hbm.xml";
 		String entityTypeName = "Book";
 
@@ -228,6 +235,7 @@ class DynamicMapBaseIT {
 		SessionFactory sessionFactory = ormSetupHelper.start()
 				.withConfiguration( builder -> builder.addHbmFromClassPath( hbmPath ) )
 				.withProperty( HibernateOrmMapperSettings.INDEXING_LISTENERS_ENABLED, false )
+				.withProperty( "hibernate.jpa.compliance.query", jpaCompliance )
 				.withProperty(
 						HibernateOrmMapperSettings.MAPPING_CONFIGURER,
 						(HibernateOrmSearchMappingConfigurer) context -> {
