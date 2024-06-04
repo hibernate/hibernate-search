@@ -42,18 +42,24 @@ import org.hibernate.search.mapper.orm.work.SearchIndexingPlan;
 import org.hibernate.search.util.common.AssertionFailure;
 import org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmSetupHelper;
 import org.hibernate.search.util.impl.test.annotation.TestForIssue;
+import org.hibernate.search.util.impl.test.extension.parameterized.ParameterizedPerMethod;
+import org.hibernate.search.util.impl.test.extension.parameterized.ParameterizedSetup;
+import org.hibernate.search.util.impl.test.extension.parameterized.ParameterizedSetupBeforeTest;
 
-import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.TestInstance;
 import org.junit.jupiter.api.extension.RegisterExtension;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 
 /**
  * @author Mincong Huang
  */
-@TestInstance(TestInstance.Lifecycle.PER_CLASS)
+@ParameterizedPerMethod
 class MassIndexingJobIT {
+
+	public static List<? extends Arguments> params() {
+		return List.of( Arguments.of( true ), Arguments.of( false ) );
+	}
 
 	protected static final int INSTANCES_PER_DATA_TEMPLATE = 100;
 
@@ -73,16 +79,18 @@ class MassIndexingJobIT {
 
 	private EntityManagerFactory emf;
 
-	@BeforeAll
-	void setup() {
-		emf = ormSetupHelper.start().withAnnotatedTypes(
-				Company.class, Person.class, WhoAmI.class, CompanyGroup.class )
+	@ParameterizedSetup
+	@MethodSource("params")
+	void setup(boolean jpaCompliance) {
+		emf = ormSetupHelper.start()
+				.withAnnotatedTypes( Company.class, Person.class, WhoAmI.class, CompanyGroup.class )
+				.withProperty( "hibernate.jpa.compliance.query", jpaCompliance )
 				.withProperty( HibernateOrmMapperSettings.INDEXING_LISTENERS_ENABLED, false )
 				.dataClearing( config -> config.clearOrder( CompanyGroup.class, Company.class ) )
 				.setup();
 	}
 
-	@BeforeEach
+	@ParameterizedSetupBeforeTest
 	void initData() {
 		List<Company> companies = new ArrayList<>();
 		List<Person> people = new ArrayList<>();

@@ -10,6 +10,7 @@ import static org.assertj.core.api.Assertions.fail;
 import static org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmUtils.with;
 
 import java.time.Instant;
+import java.util.List;
 
 import jakarta.persistence.Access;
 import jakarta.persistence.AccessType;
@@ -30,15 +31,21 @@ import org.hibernate.search.mapper.pojo.mapping.definition.annotation.KeywordFie
 import org.hibernate.search.util.impl.integrationtest.common.extension.BackendMock;
 import org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmSetupHelper;
 import org.hibernate.search.util.impl.test.annotation.TestForIssue;
+import org.hibernate.search.util.impl.test.extension.parameterized.ParameterizedPerMethod;
+import org.hibernate.search.util.impl.test.extension.parameterized.ParameterizedSetup;
+import org.hibernate.search.util.impl.test.extension.parameterized.ParameterizedSetupBeforeTest;
 
-import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.TestInstance;
 import org.junit.jupiter.api.extension.RegisterExtension;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 
-@TestInstance(TestInstance.Lifecycle.PER_CLASS)
+@ParameterizedPerMethod
 class MassIndexingConditionalExpressionsIT {
+
+	public static List<? extends Arguments> params() {
+		return List.of( Arguments.of( true ), Arguments.of( false ) );
+	}
 
 	// where INSTANT_0 < INSTANT_1 < INSTANT_2
 	private static final Instant INSTANT_0 = Instant.ofEpochMilli( 1_000_000 );
@@ -62,8 +69,9 @@ class MassIndexingConditionalExpressionsIT {
 	public static OrmSetupHelper ormSetupHelper = OrmSetupHelper.withBackendMock( backendMock );
 	private SessionFactory sessionFactory;
 
-	@BeforeAll
-	void setup() {
+	@ParameterizedSetup
+	@MethodSource("params")
+	void setup(boolean jpaCompliance) {
 		backendMock.expectAnySchema( H0_Indexed.NAME );
 		backendMock.expectAnySchema( H1_B_Indexed.NAME );
 		backendMock.expectAnySchema( H2_Root_Indexed.NAME );
@@ -72,8 +80,9 @@ class MassIndexingConditionalExpressionsIT {
 		backendMock.expectAnySchema( H3_A_Indexed.NAME );
 		backendMock.expectAnySchema( H3_B_Indexed.NAME );
 
-		sessionFactory = ormSetupHelper.start().withPropertyRadical(
-				HibernateOrmMapperSettings.Radicals.INDEXING_LISTENERS_ENABLED, false )
+		sessionFactory = ormSetupHelper.start()
+				.withPropertyRadical( HibernateOrmMapperSettings.Radicals.INDEXING_LISTENERS_ENABLED, false )
+				.withProperty( "hibernate.jpa.compliance.query", jpaCompliance )
 				.withAnnotatedTypes(
 						H0_Indexed.class,
 						H1_Root_NotIndexed.class, H1_A_NotIndexed.class, H1_B_Indexed.class,
@@ -84,7 +93,7 @@ class MassIndexingConditionalExpressionsIT {
 				).setup();
 	}
 
-	@BeforeEach
+	@ParameterizedSetupBeforeTest
 	void initData() {
 		with( sessionFactory ).runInTransaction( session -> {
 			session.persist( new H0_Indexed( 1, INSTANT_0, INT_0 ) );
