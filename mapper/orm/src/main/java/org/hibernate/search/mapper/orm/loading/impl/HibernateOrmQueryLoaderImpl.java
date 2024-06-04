@@ -12,7 +12,7 @@ import java.util.Set;
 import org.hibernate.MultiIdentifierLoadAccess;
 import org.hibernate.engine.spi.SessionImplementor;
 import org.hibernate.engine.spi.SharedSessionContractImplementor;
-import org.hibernate.metamodel.mapping.EntityMappingType;
+import org.hibernate.metamodel.model.domain.EntityDomainType;
 import org.hibernate.query.Query;
 import org.hibernate.search.mapper.orm.loading.spi.ConditionalExpression;
 import org.hibernate.search.mapper.orm.loading.spi.HibernateOrmQueryLoader;
@@ -20,7 +20,7 @@ import org.hibernate.search.mapper.orm.loading.spi.HibernateOrmQueryLoader;
 class HibernateOrmQueryLoaderImpl<E, I> implements HibernateOrmQueryLoader<E, I> {
 	private final TypeQueryFactory<E, I> queryFactory;
 	private final Set<Class<? extends E>> includedTypesFilter;
-	private final EntityMappingType entityMappingType;
+	private final EntityDomainType<?> entityDomainType;
 	private final List<ConditionalExpression> conditionalExpressions;
 	private final String order;
 
@@ -28,17 +28,17 @@ class HibernateOrmQueryLoaderImpl<E, I> implements HibernateOrmQueryLoader<E, I>
 			Set<Class<? extends E>> includedTypesFilter) {
 		this.queryFactory = queryFactory;
 		this.includedTypesFilter = includedTypesFilter;
-		this.entityMappingType = null;
+		this.entityDomainType = null;
 		this.conditionalExpressions = List.of();
 		this.order = null;
 	}
 
 	public HibernateOrmQueryLoaderImpl(TypeQueryFactory<E, I> queryFactory,
-			EntityMappingType entityMappingType, Set<Class<? extends E>> includedTypesFilter,
+			EntityDomainType<?> entityDomainType, Set<Class<? extends E>> includedTypesFilter,
 			List<ConditionalExpression> conditionalExpressions, String order) {
 		this.queryFactory = queryFactory;
 		this.includedTypesFilter = includedTypesFilter;
-		this.entityMappingType = entityMappingType;
+		this.entityDomainType = entityDomainType;
 		this.conditionalExpressions = conditionalExpressions;
 		this.order = order;
 	}
@@ -47,15 +47,14 @@ class HibernateOrmQueryLoaderImpl<E, I> implements HibernateOrmQueryLoader<E, I>
 	public Query<Long> createCountQuery(SharedSessionContractImplementor session) {
 		return conditionalExpressions.isEmpty()
 				? queryFactory.createQueryForCount( session, includedTypesFilter )
-				: queryFactory.createQueryForCount( session, entityMappingType, includedTypesFilter,
-						conditionalExpressions );
+				: queryFactory.createQueryForCount( session, entityDomainType, includedTypesFilter, conditionalExpressions );
 	}
 
 	@Override
 	public Query<I> createIdentifiersQuery(SharedSessionContractImplementor session) {
 		return conditionalExpressions.isEmpty() && order == null
 				? queryFactory.createQueryForIdentifierListing( session, includedTypesFilter )
-				: queryFactory.createQueryForIdentifierListing( session, entityMappingType, includedTypesFilter,
+				: queryFactory.createQueryForIdentifierListing( session, entityDomainType, includedTypesFilter,
 						conditionalExpressions, order );
 	}
 

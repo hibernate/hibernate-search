@@ -15,7 +15,7 @@ import org.hibernate.FlushMode;
 import org.hibernate.engine.spi.SessionFactoryImplementor;
 import org.hibernate.engine.spi.SessionImplementor;
 import org.hibernate.engine.spi.SharedSessionContractImplementor;
-import org.hibernate.metamodel.mapping.EntityMappingType;
+import org.hibernate.metamodel.model.domain.EntityDomainType;
 import org.hibernate.search.mapper.orm.common.impl.HibernateOrmUtils;
 import org.hibernate.search.mapper.orm.loading.spi.ConditionalExpression;
 import org.hibernate.search.mapper.orm.loading.spi.HibernateOrmEntityLoadingStrategy;
@@ -154,9 +154,9 @@ public abstract class AbstractHibernateOrmLoadingStrategy<E, I>
 				throw new AssertionFailure( "conditional/order expression is always defined on a single type" );
 			}
 
-			EntityMappingType entityMappingType = HibernateOrmUtils.entityMappingType( sessionFactory,
+			EntityDomainType<?> entityDomainType = HibernateOrmUtils.entityDomainType( sessionFactory,
 					typeContexts.iterator().next().secondaryEntityName() );
-			return new HibernateOrmQueryLoaderImpl<>( queryFactory, entityMappingType,
+			return new HibernateOrmQueryLoaderImpl<>( queryFactory, entityDomainType,
 					includedTypesFilter, conditionalExpressions, order );
 		}
 		return new HibernateOrmQueryLoaderImpl<>( queryFactory, includedTypesFilter );
