@@ -10,6 +10,7 @@ import static org.hibernate.search.util.impl.integrationtest.common.assertion.Se
 
 import java.util.Collection;
 import java.util.Map;
+import java.util.function.Consumer;
 
 import org.hibernate.search.engine.backend.document.DocumentElement;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaElement;
@@ -75,8 +76,16 @@ public abstract class AbstractPredicateSingleFieldIT<V extends AbstractPredicate
 	public static final class IndexBinding {
 		private final SimpleFieldModelsByType field;
 
-		public IndexBinding(IndexSchemaElement root, Collection<
-				? extends FieldTypeDescriptor<?, ? extends SearchableProjectableIndexFieldTypeOptionsStep<?, ?>>> fieldTypes) {
+		public IndexBinding(IndexSchemaElement root,
+				Collection<? extends FieldTypeDescriptor<?,
+						? extends SearchableProjectableIndexFieldTypeOptionsStep<?, ?>>> fieldTypes,
+				Consumer<? super SearchableProjectableIndexFieldTypeOptionsStep<?, ?>> additionalConfiguration) {
+			field = SimpleFieldModelsByType.mapAll( fieldTypes, root, "field0_", additionalConfiguration );
+		}
+
+		public IndexBinding(IndexSchemaElement root,
+				Collection<? extends FieldTypeDescriptor<?,
+						? extends SearchableProjectableIndexFieldTypeOptionsStep<?, ?>>> fieldTypes) {
 			field = SimpleFieldModelsByType.mapAll( fieldTypes, root, "field0_" );
 		}
 	}
