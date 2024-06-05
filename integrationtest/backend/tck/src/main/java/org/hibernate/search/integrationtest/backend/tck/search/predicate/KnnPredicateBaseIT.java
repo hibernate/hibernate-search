@@ -12,6 +12,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import org.hibernate.search.engine.backend.types.VectorSimilarity;
+import org.hibernate.search.engine.backend.types.dsl.VectorFieldTypeOptionsStep;
 import org.hibernate.search.engine.search.predicate.dsl.KnnPredicateOptionsStep;
 import org.hibernate.search.engine.search.predicate.dsl.PredicateFinalStep;
 import org.hibernate.search.engine.search.predicate.dsl.SearchPredicateFactory;
@@ -80,7 +82,9 @@ class KnnPredicateBaseIT {
 
 	abstract static class SingleFieldConfigured<F> extends AbstractPredicateSingleFieldIT<KnnPredicateTestValues<F>> {
 		private static final SimpleMappedIndex<IndexBinding> index =
-				SimpleMappedIndex.of( root -> new IndexBinding( root, supportedFieldTypes ) )
+				SimpleMappedIndex.of(
+						root -> new IndexBinding( root, supportedFieldTypes,
+								c -> ( (VectorFieldTypeOptionsStep<?, ?>) c ).vectorSimilarity( VectorSimilarity.L2 ) ) )
 						.name( "singleField" );
 
 		private static final List<DataSet<?, ?>> dataSets = new ArrayList<>();
