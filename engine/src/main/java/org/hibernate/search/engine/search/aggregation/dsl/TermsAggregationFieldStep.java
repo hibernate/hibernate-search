@@ -11,13 +11,15 @@ import java.util.function.Function;
 
 import org.hibernate.search.engine.search.common.ValueConvert;
 import org.hibernate.search.engine.search.predicate.dsl.SearchPredicateFactory;
+import org.hibernate.search.engine.search.reference.aggregation.TermsAggregationFieldReference;
 
 /**
  * The initial step in a "terms" aggregation definition, where the target field can be set.
  *
+ * @param <SR> Scope root type.
  * @param <PDF> The type of factory used to create predicates in {@link AggregationFilterStep#filter(Function)}.
  */
-public interface TermsAggregationFieldStep<PDF extends SearchPredicateFactory> {
+public interface TermsAggregationFieldStep<SR, PDF extends SearchPredicateFactory<SR>> {
 
 	/**
 	 * Target the given field in the terms aggregation.
@@ -27,7 +29,7 @@ public interface TermsAggregationFieldStep<PDF extends SearchPredicateFactory> {
 	 * @param <F> The type of field values.
 	 * @return The next step.
 	 */
-	default <F> TermsAggregationOptionsStep<?, PDF, F, Map<F, Long>> field(String fieldPath, Class<F> type) {
+	default <F> TermsAggregationOptionsStep<SR, ?, PDF, F, Map<F, Long>> field(String fieldPath, Class<F> type) {
 		return field( fieldPath, type, ValueConvert.YES );
 	}
 
@@ -41,7 +43,19 @@ public interface TermsAggregationFieldStep<PDF extends SearchPredicateFactory> {
 	 * See {@link ValueConvert}.
 	 * @return The next step.
 	 */
-	<F> TermsAggregationOptionsStep<?, PDF, F, Map<F, Long>> field(String fieldPath, Class<F> type,
+	<F> TermsAggregationOptionsStep<SR, ?, PDF, F, Map<F, Long>> field(String fieldPath, Class<F> type,
 			ValueConvert convert);
+
+	/**
+	 * Target the given field in the terms aggregation.
+	 *
+	 * @param fieldReference The field reference representing a <a href="SearchAggregationFactory.html#field-paths">path</a> to the index field to aggregate.
+	 * @param <F> The type of field values.
+	 * @return The next step.
+	 */
+	default <F> TermsAggregationOptionsStep<SR, ?, PDF, F, Map<F, Long>> field(
+			TermsAggregationFieldReference<? super SR, F> fieldReference) {
+		return field( fieldReference.absolutePath(), fieldReference.aggregationType(), fieldReference.valueConvert() );
+	}
 
 }

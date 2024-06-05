@@ -61,7 +61,7 @@ class SearchQueryLoadingOptionsIT {
 		index.mapping().with()
 				.typeContext( index.typeName(), typeContextMock )
 				.run( () -> {
-					GenericStubMappingScope<EntityReference, StubEntity> scope =
+					GenericStubMappingScope<?, EntityReference, StubEntity> scope =
 							index.createGenericScope( loadingContextMock );
 					scope.query( loadingOptionsStepMock )
 							.where( f -> f.matchAll() )
@@ -84,7 +84,7 @@ class SearchQueryLoadingOptionsIT {
 		index.mapping().with()
 				.typeContext( index.typeName(), typeContextMock )
 				.run( () -> {
-					GenericStubMappingScope<EntityReference, StubEntity> scope =
+					GenericStubMappingScope<?, EntityReference, StubEntity> scope =
 							index.createGenericScope( loadingContextMock );
 					scope.query( loadingOptionsStepMock )
 							.selectEntity()
@@ -106,7 +106,7 @@ class SearchQueryLoadingOptionsIT {
 		index.mapping().with()
 				.typeContext( index.typeName(), typeContextMock )
 				.run( () -> {
-					GenericStubMappingScope<EntityReference, StubEntity> scope =
+					GenericStubMappingScope<?, EntityReference, StubEntity> scope =
 							index.createGenericScope( loadingContextMock );
 					scope.query( loadingOptionsStepMock )
 							.selectEntityReference()
@@ -131,7 +131,7 @@ class SearchQueryLoadingOptionsIT {
 		index.mapping().with()
 				.typeContext( index.typeName(), typeContextMock )
 				.run( () -> {
-					GenericStubMappingScope<EntityReference, StubEntity> scope =
+					GenericStubMappingScope<?, EntityReference, StubEntity> scope =
 							index.createGenericScope( loadingContextMock );
 					scope.query( loadingOptionsStepMock )
 							.select( f -> f.composite( f.entity(), f.field( "string" ) ) )

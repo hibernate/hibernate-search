@@ -13,6 +13,7 @@ import org.hibernate.search.engine.backend.types.ObjectStructure;
 import org.hibernate.search.engine.search.common.BooleanOperator;
 import org.hibernate.search.engine.search.common.NamedValues;
 import org.hibernate.search.engine.search.predicate.SearchPredicate;
+import org.hibernate.search.engine.search.reference.predicate.NestedPredicateFieldReference;
 import org.hibernate.search.util.common.SearchException;
 import org.hibernate.search.util.common.annotation.Incubating;
 
@@ -34,8 +35,10 @@ import org.hibernate.search.util.common.annotation.Incubating;
  * <p>
  * Such a factory can also transform relative paths into absolute paths using {@link #toAbsolutePath(String)};
  * this can be useful for native predicates in particular.
+ *
+ * @param <SR> Scope root type.
  */
-public interface SearchPredicateFactory {
+public interface SearchPredicateFactory<SR> {
 
 	/**
 	 * Match all documents.
@@ -43,7 +46,7 @@ public interface SearchPredicateFactory {
 	 * @return The initial step of a DSL where the "match all" predicate can be defined.
 	 * @see MatchAllPredicateOptionsStep
 	 */
-	MatchAllPredicateOptionsStep<?> matchAll();
+	MatchAllPredicateOptionsStep<SR, ?> matchAll();
 
 	/**
 	 * Match none of the documents.
@@ -67,7 +70,7 @@ public interface SearchPredicateFactory {
 	 * @return The initial step of a DSL where the "boolean" predicate can be defined.
 	 * @see BooleanPredicateClausesStep
 	 */
-	BooleanPredicateClausesStep<?> bool();
+	BooleanPredicateClausesStep<SR, ?> bool();
 
 	/**
 	 * Match documents if they match a combination of boolean clauses,
@@ -82,7 +85,7 @@ public interface SearchPredicateFactory {
 	 * @see BooleanPredicateClausesStep#with(Consumer)
 	 */
 	@Deprecated
-	PredicateFinalStep bool(Consumer<? super BooleanPredicateClausesStep<?>> clauseContributor);
+	PredicateFinalStep bool(Consumer<? super BooleanPredicateClausesStep<SR, ?>> clauseContributor);
 
 	/**
 	 * Match documents if they match all inner clauses.
@@ -90,7 +93,7 @@ public interface SearchPredicateFactory {
 	 * @return The initial step of a DSL where predicates that must match can be added and options can be set.
 	 * @see GenericSimpleBooleanPredicateClausesStep
 	 */
-	SimpleBooleanPredicateClausesStep<?> and();
+	SimpleBooleanPredicateClausesStep<SR, ?> and();
 
 	/**
 	 * Match documents if they match all previously-built {@link SearchPredicate}.
@@ -115,7 +118,7 @@ public interface SearchPredicateFactory {
 	 * @return The initial step of a DSL where predicates that should match can be added and options can be set.
 	 * @see GenericSimpleBooleanPredicateClausesStep
 	 */
-	SimpleBooleanPredicateClausesStep<?> or();
+	SimpleBooleanPredicateClausesStep<SR, ?> or();
 
 	/**
 	 * Match documents if they match any previously-built {@link SearchPredicate}.
@@ -163,7 +166,7 @@ public interface SearchPredicateFactory {
 	 * @return The initial step of a DSL where the "match" predicate can be defined.
 	 * @see MatchPredicateFieldStep
 	 */
-	MatchPredicateFieldStep<?> match();
+	MatchPredicateFieldStep<SR, ?> match();
 
 	/**
 	 * Match documents where targeted fields have a value within lower and upper bounds.
@@ -171,7 +174,7 @@ public interface SearchPredicateFactory {
 	 * @return The initial step of a DSL where the "range" predicate can be defined.
 	 * @see RangePredicateFieldStep
 	 */
-	RangePredicateFieldStep<?> range();
+	RangePredicateFieldStep<SR, ?> range();
 
 	/**
 	 * Match documents where targeted fields have a value that contains a given phrase.
@@ -179,7 +182,7 @@ public interface SearchPredicateFactory {
 	 * @return The initial step of a DSL where the "phrase" predicate can be defined.
 	 * @see PhrasePredicateFieldStep
 	 */
-	PhrasePredicateFieldStep<?> phrase();
+	PhrasePredicateFieldStep<SR, ?> phrase();
 
 	/**
 	 * Match documents where targeted fields contain a term that matches a given pattern,
@@ -218,7 +221,7 @@ public interface SearchPredicateFactory {
 	 * @deprecated Use {@link #nested(String)} instead.
 	 */
 	@Deprecated
-	NestedPredicateFieldStep<?> nested();
+	NestedPredicateFieldStep<SR, ?> nested();
 
 	/**
 	 * Match documents where a {@link ObjectStructure#NESTED nested object} matches inner predicates
@@ -231,7 +234,23 @@ public interface SearchPredicateFactory {
 	 * @return The initial step of a DSL where the "nested" predicate can be defined.
 	 * @see NestedPredicateFieldStep
 	 */
-	NestedPredicateClausesStep<?> nested(String objectFieldPath);
+	NestedPredicateClausesStep<SR, ?> nested(String objectFieldPath);
+
+	/**
+	 * Match documents where a {@link ObjectStructure#NESTED nested object} matches inner predicates
+	 * to be defined in the next steps.
+	 * <p>
+	 * The resulting nested predicate must match <em>all</em> inner clauses,
+	 * similarly to an {@link #and() "and" predicate}.
+	 *
+	 * @param field The field reference representing a <a href="SearchPredicateFactory.html#field-paths">path</a> to the object field
+	 * to apply the predicate on.
+	 * @return The initial step of a DSL where the "nested" predicate can be defined.
+	 * @see NestedPredicateFieldStep
+	 */
+	default NestedPredicateClausesStep<SR, ?> nested(NestedPredicateFieldReference<? super SR> field) {
+		return nested( field.absolutePath() );
+	}
 
 	/**
 	 * Match documents according to a given query string,
@@ -245,7 +264,7 @@ public interface SearchPredicateFactory {
 	 * @return The initial step of a DSL where the "simple query string" predicate can be defined.
 	 * @see SimpleQueryStringPredicateFieldStep
 	 */
-	SimpleQueryStringPredicateFieldStep<?> simpleQueryString();
+	SimpleQueryStringPredicateFieldStep<SR, ?> simpleQueryString();
 
 	/**
 	 * Match documents according to a given query string,
@@ -259,7 +278,7 @@ public interface SearchPredicateFactory {
 	 * @return The initial step of a DSL where the "query string" predicate can be defined.
 	 * @see QueryStringPredicateFieldStep
 	 */
-	QueryStringPredicateFieldStep<?> queryString();
+	QueryStringPredicateFieldStep<SR, ?> queryString();
 
 	/**
 	 * Match documents where a given field exists.
@@ -269,7 +288,7 @@ public interface SearchPredicateFactory {
 	 * @return The initial step of a DSL where the "exists" predicate can be defined.
 	 * @see ExistsPredicateFieldStep
 	 */
-	ExistsPredicateFieldStep<?> exists();
+	ExistsPredicateFieldStep<SR, ?> exists();
 
 	/**
 	 * Access the different types of spatial predicates.
@@ -301,7 +320,7 @@ public interface SearchPredicateFactory {
 	 * @see KnnPredicateVectorStep
 	 * @see KnnPredicateOptionsStep
 	 */
-	KnnPredicateFieldStep knn(int k);
+	KnnPredicateFieldStep<SR> knn(int k);
 
 	/**
 	 * Delegating predicate that creates the actual predicate at query create time and provides access to query parameters.
@@ -324,7 +343,7 @@ public interface SearchPredicateFactory {
 	 * @return The extended factory.
 	 * @throws SearchException If the extension cannot be applied (wrong underlying backend, ...).
 	 */
-	<T> T extension(SearchPredicateFactoryExtension<T> extension);
+	<T> T extension(SearchPredicateFactoryExtension<SR, T> extension);
 
 	/**
 	 * Create a DSL step allowing multiple attempts to apply extensions one after the other,
@@ -335,7 +354,7 @@ public interface SearchPredicateFactory {
 	 *
 	 * @return A DSL step.
 	 */
-	SearchPredicateFactoryExtensionIfSupportedStep extension();
+	SearchPredicateFactoryExtensionIfSupportedStep<SR> extension();
 
 	/**
 	 * Create a new predicate factory whose root for all paths passed to the DSL
@@ -348,7 +367,7 @@ public interface SearchPredicateFactory {
 	 * @return A new predicate factory using the given object field as root.
 	 */
 	@Incubating
-	SearchPredicateFactory withRoot(String objectFieldPath);
+	SearchPredicateFactory<SR> withRoot(String objectFieldPath);
 
 	/**
 	 * @param relativeFieldPath The path to a field, relative to the {@link #withRoot(String) root} of this factory.

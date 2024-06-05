@@ -73,7 +73,7 @@ public abstract class AbstractPredicateSearchableIT {
 			SimpleMappedIndex<SearchableYesIndexBinding> searchableYesIndex,
 			SimpleMappedIndex<SearchableNoIndexBinding> searchableNoIndex,
 			FieldTypeDescriptor<?, ?> fieldType) {
-		SearchPredicateFactory f = searchableNoIndex.createScope().predicate();
+		SearchPredicateFactory<?> f = searchableNoIndex.createScope().predicate();
 
 		String fieldPath = searchableNoIndex.binding().field.get( fieldType ).relativeFieldName;
 
@@ -91,7 +91,7 @@ public abstract class AbstractPredicateSearchableIT {
 			SimpleMappedIndex<SearchableYesIndexBinding> searchableYesIndex,
 			SimpleMappedIndex<SearchableNoIndexBinding> searchableNoIndex,
 			FieldTypeDescriptor<?, ?> fieldType) {
-		SearchPredicateFactory f = searchableYesIndex.createScope( searchableNoIndex ).predicate();
+		SearchPredicateFactory<?> f = searchableYesIndex.createScope( searchableNoIndex ).predicate();
 
 		String fieldPath = searchableYesIndex.binding().field.get( fieldType ).relativeFieldName;
 
@@ -103,7 +103,7 @@ public abstract class AbstractPredicateSearchableIT {
 				);
 	}
 
-	protected abstract void tryPredicate(SearchPredicateFactory f, String fieldPath,
+	protected abstract void tryPredicate(SearchPredicateFactory<?> f, String fieldPath,
 			FieldTypeDescriptor<?, ?> fieldType);
 
 	protected abstract String predicateTrait();

@@ -29,7 +29,7 @@ public abstract class AbstractProjectionInvalidFieldIT {
 
 	@Test
 	void use_unknownField() {
-		SearchProjectionFactory<?, ?> f = index.createScope().projection();
+		SearchProjectionFactory<?, ?, ?> f = index.createScope().projection();
 
 		assertThatThrownBy( () -> tryProjection( f, "unknown_field" ) )
 				.isInstanceOf( SearchException.class )
@@ -59,7 +59,7 @@ public abstract class AbstractProjectionInvalidFieldIT {
 
 	@Test
 	void use_objectField_nested() {
-		SearchProjectionFactory<?, ?> f = index.createScope().projection();
+		SearchProjectionFactory<?, ?, ?> f = index.createScope().projection();
 
 		String fieldPath = index.binding().nested.relativeFieldName;
 
@@ -70,7 +70,7 @@ public abstract class AbstractProjectionInvalidFieldIT {
 
 	@Test
 	void use_objectField_flattened() {
-		SearchProjectionFactory<?, ?> f = index.createScope().projection();
+		SearchProjectionFactory<?, ?, ?> f = index.createScope().projection();
 
 		String fieldPath = index.binding().flattened.relativeFieldName;
 
@@ -79,7 +79,7 @@ public abstract class AbstractProjectionInvalidFieldIT {
 				.hasMessageContaining( "Cannot use '" + projectionTrait() + "' on field '" + fieldPath + "'" );
 	}
 
-	protected abstract void tryProjection(SearchProjectionFactory<?, ?> f, String fieldPath);
+	protected abstract void tryProjection(SearchProjectionFactory<?, ?, ?> f, String fieldPath);
 
 	protected abstract String projectionTrait();
 

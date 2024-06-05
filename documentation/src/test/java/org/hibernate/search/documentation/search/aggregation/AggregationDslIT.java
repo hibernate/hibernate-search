@@ -87,7 +87,7 @@ class AggregationDslIT {
 					Search.session( entityManager );
 			// tag::entryPoint-objects[]
 
-			SearchScope<Book> scope = searchSession.scope( Book.class );
+			SearchScope<?, Book> scope = searchSession.scope( Book.class );
 
 			AggregationKey<Map<Genre, Long>> countsByGenreKey = AggregationKey.of( "countsByGenre" );
 

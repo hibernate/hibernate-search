@@ -409,7 +409,7 @@ class AnnotationMappingSmokeIT {
 
 	@Test
 	void search_multipleElementsProjection() {
-		SearchScope<ParentIndexedEntity> scope = mapping.scope(
+		SearchScope<?, ParentIndexedEntity> scope = mapping.scope(
 				Arrays.asList( IndexedEntity.class, YetAnotherIndexedEntity.class )
 		);
 

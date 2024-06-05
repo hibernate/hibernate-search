@@ -77,7 +77,7 @@ abstract class AbstractSortSortableIT {
 			SimpleMappedIndex<SortableYesIndexBinding> sortableYesIndex,
 			SimpleMappedIndex<SortableNoIndexBinding> sortableNoIndex,
 			FieldTypeDescriptor<?, ?> fieldType) {
-		SearchSortFactory f = sortableDefaultIndex.createScope().sort();
+		SearchSortFactory<?> f = sortableDefaultIndex.createScope().sort();
 
 		String fieldPath = sortableDefaultIndex.binding().field.get( fieldType ).relativeFieldName;
 
@@ -96,7 +96,7 @@ abstract class AbstractSortSortableIT {
 			SimpleMappedIndex<SortableYesIndexBinding> sortableYesIndex,
 			SimpleMappedIndex<SortableNoIndexBinding> sortableNoIndex,
 			FieldTypeDescriptor<?, ?> fieldType) {
-		SearchSortFactory f = sortableNoIndex.createScope().sort();
+		SearchSortFactory<?> f = sortableNoIndex.createScope().sort();
 
 		String fieldPath = sortableNoIndex.binding().field.get( fieldType ).relativeFieldName;
 
@@ -116,7 +116,7 @@ abstract class AbstractSortSortableIT {
 			SimpleMappedIndex<SortableYesIndexBinding> sortableYesIndex,
 			SimpleMappedIndex<SortableNoIndexBinding> sortableNoIndex,
 			FieldTypeDescriptor<?, ?> fieldType) {
-		SearchSortFactory f = sortableYesIndex.createScope( sortableNoIndex ).sort();
+		SearchSortFactory<?> f = sortableYesIndex.createScope( sortableNoIndex ).sort();
 
 		String fieldPath = sortableYesIndex.binding().field.get( fieldType ).relativeFieldName;
 
@@ -128,7 +128,7 @@ abstract class AbstractSortSortableIT {
 				);
 	}
 
-	protected abstract void trySort(SearchSortFactory f, String fieldPath,
+	protected abstract void trySort(SearchSortFactory<?> f, String fieldPath,
 			FieldTypeDescriptor<?, ?> fieldType);
 
 	protected abstract String sortTrait();

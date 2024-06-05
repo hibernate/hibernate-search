@@ -29,7 +29,7 @@ public abstract class AbstractSortInvalidFieldIT {
 
 	@Test
 	void use_unknownField() {
-		SearchSortFactory f = index.createScope().sort();
+		SearchSortFactory<?> f = index.createScope().sort();
 
 		assertThatThrownBy( () -> trySort( f, "unknown_field" ) )
 				.isInstanceOf( SearchException.class )
@@ -59,7 +59,7 @@ public abstract class AbstractSortInvalidFieldIT {
 
 	@Test
 	void use_objectField_nested() {
-		SearchSortFactory f = index.createScope().sort();
+		SearchSortFactory<?> f = index.createScope().sort();
 
 		String fieldPath = index.binding().nested.relativeFieldName;
 
@@ -70,7 +70,7 @@ public abstract class AbstractSortInvalidFieldIT {
 
 	@Test
 	void use_objectField_flattened() {
-		SearchSortFactory f = index.createScope().sort();
+		SearchSortFactory<?> f = index.createScope().sort();
 
 		String fieldPath = index.binding().flattened.relativeFieldName;
 
@@ -79,7 +79,7 @@ public abstract class AbstractSortInvalidFieldIT {
 				.hasMessageContaining( "Cannot use '" + sortTrait() + "' on field '" + fieldPath + "'" );
 	}
 
-	protected abstract void trySort(SearchSortFactory f, String fieldPath);
+	protected abstract void trySort(SearchSortFactory<?> f, String fieldPath);
 
 	protected abstract String sortTrait();
 

@@ -52,7 +52,7 @@ public class PojoDefaultMassIndexer implements PojoMassIndexer {
 	private final Set<? extends PojoMassIndexingIndexedTypeContext<?>> targetedIndexedTypes;
 	private final PojoScopeSchemaManager scopeSchemaManager;
 	private final Set<String> tenantIds;
-	private final PojoScopeDelegate<?, ?, ?> pojoScopeDelegate;
+	private final PojoScopeDelegate<?, ?, ?, ?> pojoScopeDelegate;
 
 	// default settings defined here:
 	private int typesToIndexInParallel = 1;
@@ -73,7 +73,7 @@ public class PojoDefaultMassIndexer implements PojoMassIndexer {
 			Set<? extends PojoMassIndexingIndexedTypeContext<?>> targetedIndexedTypes,
 			PojoScopeSchemaManager scopeSchemaManager,
 			Set<String> tenantIds,
-			PojoScopeDelegate<?, ?, ?> pojoScopeDelegate) {
+			PojoScopeDelegate<?, ?, ?, ?> pojoScopeDelegate) {
 		this.massIndexingContext = massIndexingContext;
 		this.mappingContext = mappingContext;
 		this.typeContextProvider = typeContextProvider;

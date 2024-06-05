@@ -93,7 +93,7 @@ abstract class AbstractProjectionProjectableIT {
 				"Skipping this test as the backend makes fields projectable by default."
 		);
 
-		SearchProjectionFactory<?, ?> f = projectableDefaultIndex.createScope().projection();
+		SearchProjectionFactory<?, ?, ?> f = projectableDefaultIndex.createScope().projection();
 
 		String fieldPath = projectableDefaultIndex.binding().field.get( fieldType ).relativeFieldName;
 
@@ -112,7 +112,7 @@ abstract class AbstractProjectionProjectableIT {
 			SimpleMappedIndex<AbstractProjectionProjectableIT.ProjectableYesIndexBinding> projectableYesIndex,
 			SimpleMappedIndex<AbstractProjectionProjectableIT.ProjectableNoIndexBinding> projectableNoIndex,
 			FieldTypeDescriptor<?, ?> fieldType) {
-		SearchProjectionFactory<?, ?> f = projectableNoIndex.createScope().projection();
+		SearchProjectionFactory<?, ?, ?> f = projectableNoIndex.createScope().projection();
 
 		String fieldPath = projectableNoIndex.binding().field.get( fieldType ).relativeFieldName;
 
@@ -132,7 +132,7 @@ abstract class AbstractProjectionProjectableIT {
 			SimpleMappedIndex<AbstractProjectionProjectableIT.ProjectableYesIndexBinding> projectableYesIndex,
 			SimpleMappedIndex<AbstractProjectionProjectableIT.ProjectableNoIndexBinding> projectableNoIndex,
 			FieldTypeDescriptor<?, ?> fieldType) {
-		SearchProjectionFactory<?, ?> f = projectableYesIndex.createScope( projectableNoIndex ).projection();
+		SearchProjectionFactory<?, ?, ?> f = projectableYesIndex.createScope( projectableNoIndex ).projection();
 
 		String fieldPath = projectableYesIndex.binding().field.get( fieldType ).relativeFieldName;
 
@@ -144,7 +144,7 @@ abstract class AbstractProjectionProjectableIT {
 				);
 	}
 
-	protected abstract void tryProjection(SearchProjectionFactory<?, ?> f, String fieldPath,
+	protected abstract void tryProjection(SearchProjectionFactory<?, ?, ?> f, String fieldPath,
 			FieldTypeDescriptor<?, ?> fieldType);
 
 	protected abstract String projectionTrait();

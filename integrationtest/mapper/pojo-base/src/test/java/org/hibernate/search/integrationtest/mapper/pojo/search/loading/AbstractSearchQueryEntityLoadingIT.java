@@ -52,7 +52,7 @@ public abstract class AbstractSearchQueryEntityLoadingIT {
 		try ( SearchSession searchSession = mapping().createSessionWithOptions()
 				.loading( o -> o.context( StubLoadingContext.class, loadingContext ) )
 				.build() ) {
-			SearchQueryOptionsStep<?, T, ?, ?, ?> optionsStep = searchSession.search( targetClasses )
+			SearchQueryOptionsStep<?, ?, T, ?, ?, ?> optionsStep = searchSession.search( targetClasses )
 					.where( f -> f.matchAll() );
 
 			SearchQuery<T> query = optionsStep

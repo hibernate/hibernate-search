@@ -116,7 +116,7 @@ class FieldPathsIT {
 	}
 
 	// tag::withRoot_method[]
-	private SearchPredicate matchFirstAndLastName(SearchPredicateFactory f,
+	private SearchPredicate matchFirstAndLastName(SearchPredicateFactory<?> f,
 			String firstName, String lastName) {
 		return f.and(
 				f.match().field( "firstName" ) // <1>

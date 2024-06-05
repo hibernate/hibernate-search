@@ -15,22 +15,24 @@ import org.hibernate.search.engine.search.predicate.dsl.SearchPredicateFactory;
  * easily override the self type and predicate factory type for all relevant methods.
  * <p>
  * <strong>Warning:</strong> Generic parameters of this type are subject to change,
- * so this type should not be referenced directtly in user code.
+ * so this type should not be referenced directly in user code.
  *
+ * @param <SR> Scope root type.
  * @param <S> The self type, i.e. the exposed type of this factory.
  * @param <PDF> The type of factory used to create predicates in {@link AggregationFilterStep#filter(Function)}.
  */
 public interface ExtendedSearchAggregationFactory<
-		S extends ExtendedSearchAggregationFactory<?, PDF>,
-		PDF extends SearchPredicateFactory>
-		extends SearchAggregationFactory {
+		SR,
+		S extends ExtendedSearchAggregationFactory<SR, ?, PDF>,
+		PDF extends SearchPredicateFactory<SR>>
+		extends SearchAggregationFactory<SR> {
 
 	@Override
 	S withRoot(String objectFieldPath);
 
 	@Override
-	RangeAggregationFieldStep<PDF> range();
+	RangeAggregationFieldStep<SR, PDF> range();
 
 	@Override
-	TermsAggregationFieldStep<PDF> terms();
+	TermsAggregationFieldStep<SR, PDF> terms();
 }

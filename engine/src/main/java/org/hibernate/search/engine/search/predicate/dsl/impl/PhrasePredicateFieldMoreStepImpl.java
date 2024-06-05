@@ -23,19 +23,19 @@ import org.hibernate.search.engine.search.predicate.spi.PredicateTypeKeys;
 import org.hibernate.search.util.common.impl.Contracts;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
-class PhrasePredicateFieldMoreStepImpl
-		implements PhrasePredicateFieldMoreStep<PhrasePredicateFieldMoreStepImpl, PhrasePredicateOptionsStep<?>>,
+class PhrasePredicateFieldMoreStepImpl<SR>
+		implements PhrasePredicateFieldMoreStep<SR, PhrasePredicateFieldMoreStepImpl<SR>, PhrasePredicateOptionsStep<?>>,
 		AbstractBooleanMultiFieldPredicateCommonState.FieldSetState {
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
-	private final CommonState commonState;
+	private final CommonState<SR> commonState;
 
 	private final List<PhrasePredicateBuilder> predicateBuilders = new ArrayList<>();
 
 	private Float fieldSetBoost;
 
-	PhrasePredicateFieldMoreStepImpl(CommonState commonState, List<String> fieldPaths) {
+	PhrasePredicateFieldMoreStepImpl(CommonState<SR> commonState, List<String> fieldPaths) {
 		this.commonState = commonState;
 		this.commonState.add( this );
 		SearchIndexScope<?> scope = commonState.scope();
@@ -45,12 +45,12 @@ class PhrasePredicateFieldMoreStepImpl
 	}
 
 	@Override
-	public PhrasePredicateFieldMoreStepImpl fields(String... fieldPaths) {
-		return new PhrasePredicateFieldMoreStepImpl( commonState, Arrays.asList( fieldPaths ) );
+	public PhrasePredicateFieldMoreStepImpl<SR> fields(String... fieldPaths) {
+		return new PhrasePredicateFieldMoreStepImpl<SR>( commonState, Arrays.asList( fieldPaths ) );
 	}
 
 	@Override
-	public PhrasePredicateFieldMoreStepImpl boost(float boost) {
+	public PhrasePredicateFieldMoreStepImpl<SR> boost(float boost) {
 		this.fieldSetBoost = boost;
 		return this;
 	}
@@ -70,9 +70,9 @@ class PhrasePredicateFieldMoreStepImpl
 		}
 	}
 
-	static class CommonState
-			extends AbstractBooleanMultiFieldPredicateCommonState<CommonState, PhrasePredicateFieldMoreStepImpl>
-			implements PhrasePredicateOptionsStep<CommonState> {
+	static class CommonState<SR>
+			extends AbstractBooleanMultiFieldPredicateCommonState<CommonState<SR>, PhrasePredicateFieldMoreStepImpl<SR>>
+			implements PhrasePredicateOptionsStep<CommonState<SR>> {
 
 		CommonState(SearchPredicateDslContext<?> dslContext) {
 			super( dslContext );
@@ -80,7 +80,7 @@ class PhrasePredicateFieldMoreStepImpl
 
 		private PhrasePredicateOptionsStep<?> matching(String phrase) {
 			Contracts.assertNotNull( phrase, "phrase" );
-			for ( PhrasePredicateFieldMoreStepImpl fieldSetState : getFieldSetStates() ) {
+			for ( PhrasePredicateFieldMoreStepImpl<SR> fieldSetState : getFieldSetStates() ) {
 				for ( PhrasePredicateBuilder predicateBuilder : fieldSetState.predicateBuilders ) {
 					predicateBuilder.phrase( phrase );
 				}
@@ -89,12 +89,12 @@ class PhrasePredicateFieldMoreStepImpl
 		}
 
 		@Override
-		public CommonState slop(int slop) {
+		public CommonState<SR> slop(int slop) {
 			if ( slop < 0 ) {
 				throw log.invalidPhrasePredicateSlop( slop );
 			}
 
-			for ( PhrasePredicateFieldMoreStepImpl fieldSetState : getFieldSetStates() ) {
+			for ( PhrasePredicateFieldMoreStepImpl<SR> fieldSetState : getFieldSetStates() ) {
 				for ( PhrasePredicateBuilder predicateBuilder : fieldSetState.predicateBuilders ) {
 					predicateBuilder.slop( slop );
 				}
@@ -103,8 +103,8 @@ class PhrasePredicateFieldMoreStepImpl
 		}
 
 		@Override
-		public CommonState analyzer(String analyzerName) {
-			for ( PhrasePredicateFieldMoreStepImpl fieldSetState : getFieldSetStates() ) {
+		public CommonState<SR> analyzer(String analyzerName) {
+			for ( PhrasePredicateFieldMoreStepImpl<SR> fieldSetState : getFieldSetStates() ) {
 				for ( PhrasePredicateBuilder predicateBuilder : fieldSetState.predicateBuilders ) {
 					predicateBuilder.analyzer( analyzerName );
 				}
@@ -113,8 +113,8 @@ class PhrasePredicateFieldMoreStepImpl
 		}
 
 		@Override
-		public CommonState skipAnalysis() {
-			for ( PhrasePredicateFieldMoreStepImpl fieldSetState : getFieldSetStates() ) {
+		public CommonState<SR> skipAnalysis() {
+			for ( PhrasePredicateFieldMoreStepImpl<SR> fieldSetState : getFieldSetStates() ) {
 				for ( PhrasePredicateBuilder predicateBuilder : fieldSetState.predicateBuilders ) {
 					predicateBuilder.skipAnalysis();
 				}
@@ -123,7 +123,7 @@ class PhrasePredicateFieldMoreStepImpl
 		}
 
 		@Override
-		protected CommonState thisAsS() {
+		protected CommonState<SR> thisAsS() {
 			return this;
 		}
 	}

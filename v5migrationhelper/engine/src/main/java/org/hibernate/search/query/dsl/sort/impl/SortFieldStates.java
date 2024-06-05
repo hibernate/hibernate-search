@@ -38,8 +38,8 @@ public class SortFieldStates {
 	private static final Object MISSING_VALUE_LAST = new Object();
 	private static final Object MISSING_VALUE_FIRST = new Object();
 
-	private final SearchSortFactory factory;
-	private final CompositeSortComponentsStep<?> delegate;
+	private final SearchSortFactory<?> factory;
+	private final CompositeSortComponentsStep<?, ?> delegate;
 
 	private Type currentType;
 	private String currentName;
@@ -94,7 +94,7 @@ public class SortFieldStates {
 					.fromLuceneSortField( currentSortFieldNativeSortDescription ).toSort();
 		}
 		else if ( currentType == Type.SCORE ) {
-			ScoreSortOptionsStep<?> optionsStep = factory.score();
+			ScoreSortOptionsStep<?, ?> optionsStep = factory.score();
 			applyOrder( optionsStep );
 			sort = optionsStep.toSort();
 		}
@@ -112,12 +112,12 @@ public class SortFieldStates {
 			else {
 				center = GeoPoint.of( currentLatitude, currentLongitude );
 			}
-			DistanceSortOptionsStep<?, ?> optionsStep = factory.distance( currentName, center );
+			DistanceSortOptionsStep<?, ?, ?> optionsStep = factory.distance( currentName, center );
 			applyOrder( optionsStep );
 			sort = optionsStep.toSort();
 		}
 		else {
-			FieldSortOptionsStep<?, ?> optionsStep = factory.field( currentName );
+			FieldSortOptionsStep<?, ?, ?> optionsStep = factory.field( currentName );
 			applyOrder( optionsStep );
 			applyMissing( optionsStep );
 			sort = optionsStep.toSort();
@@ -132,7 +132,7 @@ public class SortFieldStates {
 		}
 	}
 
-	private void applyMissing(FieldSortOptionsStep<?, ?> step) {
+	private void applyMissing(FieldSortOptionsStep<?, ?, ?> step) {
 		if ( currentMissingValue == null ) {
 			return;
 		}

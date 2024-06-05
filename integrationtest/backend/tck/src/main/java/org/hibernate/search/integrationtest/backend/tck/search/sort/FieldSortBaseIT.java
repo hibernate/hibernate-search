@@ -66,7 +66,7 @@ class FieldSortBaseIT {
 		}
 
 		@Override
-		protected void trySort(SearchSortFactory f, String fieldPath) {
+		protected void trySort(SearchSortFactory<?> f, String fieldPath) {
 			f.field( fieldPath );
 		}
 
@@ -98,7 +98,7 @@ class FieldSortBaseIT {
 		}
 
 		@Override
-		protected void trySort(SearchSortFactory f, String fieldPath) {
+		protected void trySort(SearchSortFactory<?> f, String fieldPath) {
 			f.field( fieldPath );
 		}
 
@@ -137,7 +137,7 @@ class FieldSortBaseIT {
 		}
 
 		@Override
-		protected void trySort(SearchSortFactory f, String fieldPath, FieldTypeDescriptor<?, ?> fieldType) {
+		protected void trySort(SearchSortFactory<?> f, String fieldPath, FieldTypeDescriptor<?, ?> fieldType) {
 			f.field( fieldPath );
 		}
 

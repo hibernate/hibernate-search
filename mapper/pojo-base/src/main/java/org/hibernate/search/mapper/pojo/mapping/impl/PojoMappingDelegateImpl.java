@@ -113,7 +113,7 @@ public class PojoMappingDelegateImpl implements PojoMappingDelegate {
 	}
 
 	@Override
-	public <R extends EntityReference, E, C> PojoScopeDelegate<R, E, C> createPojoScopeForClasses(
+	public <SR, R extends EntityReference, E, C> PojoScopeDelegate<SR, R, E, C> createPojoScopeForClasses(
 			PojoScopeMappingContext mappingContext,
 			Collection<? extends Class<? extends E>> classes,
 			PojoScopeTypeExtendedContextProvider<E, C> indexedTypeExtendedContextProvider) {
@@ -130,7 +130,7 @@ public class PojoMappingDelegateImpl implements PojoMappingDelegate {
 
 	@Override
 	@SuppressWarnings("unchecked") // The cast is checked through reflection
-	public <R extends EntityReference, E, C> PojoScopeDelegate<R, E, C> createPojoScopeForEntityNames(
+	public <SR, R extends EntityReference, E, C> PojoScopeDelegate<SR, R, E, C> createPojoScopeForEntityNames(
 			PojoScopeMappingContext mappingContext, Class<E> expectedSuperType, Collection<String> entityNames,
 			PojoScopeTypeExtendedContextProvider<E, C> indexedTypeExtendedContextProvider) {
 		if ( entityNames.isEmpty() ) {
@@ -153,7 +153,7 @@ public class PojoMappingDelegateImpl implements PojoMappingDelegate {
 
 	@Override
 	@Deprecated
-	public <R extends EntityReference, E, C> PojoScopeDelegate<R, E, C> createPojoScope(
+	public <SR, R extends EntityReference, E, C> PojoScopeDelegate<SR, R, E, C> createPojoScope(
 			PojoScopeMappingContext mappingContext,
 			Collection<? extends PojoRawTypeIdentifier<? extends E>> targetedTypes,
 			PojoScopeTypeExtendedContextProvider<E, C> indexedTypeExtendedContextProvider) {
@@ -169,7 +169,7 @@ public class PojoMappingDelegateImpl implements PojoMappingDelegate {
 	}
 
 	@Override
-	public <R extends EntityReference, C> Optional<PojoScopeDelegate<R, Object, C>> createPojoAllScope(
+	public <SR, R extends EntityReference, C> Optional<PojoScopeDelegate<SR, R, Object, C>> createPojoAllScope(
 			PojoScopeMappingContext mappingContext,
 			PojoScopeTypeExtendedContextProvider<Object, C> indexedTypeExtendedContextProvider) {
 		if ( typeManagers.allIndexed().isEmpty() ) {
