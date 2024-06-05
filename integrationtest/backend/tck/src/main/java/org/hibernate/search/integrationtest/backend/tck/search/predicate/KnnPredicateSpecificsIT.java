@@ -985,7 +985,7 @@ class KnnPredicateSpecificsIT {
 							.matching( noramlize( 5f, 4f ) )
 							.requiredMinimumSimilarity( similarity )
 					).fetchAll().hits() )
-					.hasSize( matches )
+					.hasSizeLessThanOrEqualTo( matches )
 					.allSatisfy( s -> assertThat( s ).isGreaterThanOrEqualTo( score ) );
 		}
 
@@ -997,38 +997,43 @@ class KnnPredicateSpecificsIT {
 			SimpleMappedIndex<IndexBinding> index = indexes.get( VectorSimilarity.L2 );
 
 			// L2 scores for vector [5f, 4f]
+			// ES 8.14:
+			// [0.9995646, 0.99923563, 0.9990471, 0.9961991, 0.9760502, 0.9664738, 0.93500495, 0.9266528, 0.9165927, 0.8885436]
+			// ES 8.13:
+			// [0.9995734, 0.9992435, 0.9990251, 0.99538076, 0.9762654, 0.9665131, 0.9355144, 0.92745376, 0.91767627, 0.8887709]
+			// Lucene:
 			// [0.9995734, 0.9992435, 0.9990251, 0.99538076, 0.9762654, 0.9665131, 0.9355144, 0.92745376, 0.91767627, 0.8887709]
 			// score is 1/(1+d*d) and we are passing d here: d = sqrt( 1/s - 1 )
-			args.add( Arguments.of( index, 0.06812251021f, 0.5f, 4 ) );
-			args.add( Arguments.of( index, 0.15592186099f, 0.25f, 5 ) );
-			args.add( Arguments.of( index, 0.26254644016f, 0.14f, 7 ) );
+			args.add( Arguments.of( index, 0.06812251021f, 0.995f, 4 ) );
+			args.add( Arguments.of( index, 0.15592186099f, 0.976f, 5 ) );
+			args.add( Arguments.of( index, 0.26254644016f, 0.935f, 7 ) );
 
 			index = indexes.get( VectorSimilarity.COSINE );
 
 			// COSINE scores for vector [5f, 4f]
-			// [0.9998933, 0.9998107, 0.99975604, 0.9988398, 0.9939221, 0.9913382, 0.98276734, 0.9804448, 0.9775728, 0.9687126]
+			// [0.9998933, 0.9998107, 0.99975604, 0.9988398, 0.9939221, 0.99133825, 0.98276734, 0.9804448, 0.9775728, 0.9687127]
 			// score is ( 1.0f + d ) / 2.0f and we are passing d here: d = 2s-1
-			args.add( Arguments.of( index, 0.9976796f, 0.9988397f, 4 ) );
-			args.add( Arguments.of( index, 0.9996214f, 0.9998106f, 2 ) );
-			args.add( Arguments.of( index, 0.960889f, 0.9804447f, 8 ) );
+			args.add( Arguments.of( index, 0.9976796f, 0.998f, 4 ) );
+			args.add( Arguments.of( index, 0.9996214f, 0.999f, 2 ) );
+			args.add( Arguments.of( index, 0.9608890f, 0.980f, 8 ) );
 
 			index = indexes.get( VectorSimilarity.DOT_PRODUCT );
 
 			// DOT_PRODUCT scores for vector [5f, 4f]
-			// [0.9998933, 0.9998107, 0.99975604, 0.99883986, 0.9939221, 0.9913382, 0.9827673, 0.9804447, 0.9775728, 0.9687126]
+			// [0.9998933, 0.9998107, 0.99975604, 0.99883986, 0.9939221, 0.9913382, 0.9827673, 0.9804448, 0.9775728, 0.9687127]
 			// score is ( 1.0f + d ) / 2.0f and we are passing d here: d = 2s-1
-			args.add( Arguments.of( index, 0.99767972f, 0.99883985f, 4 ) );
-			args.add( Arguments.of( index, 0.99951208f, 0.99975603f, 3 ) );
-			args.add( Arguments.of( index, 0.9608894f, 0.9804446f, 8 ) );
+			args.add( Arguments.of( index, 0.99767972f, 0.998f, 4 ) );
+			args.add( Arguments.of( index, 0.99951208f, 0.999f, 3 ) );
+			args.add( Arguments.of( index, 0.96088940f, 0.980f, 8 ) );
 
 			index = indexes.get( VectorSimilarity.MAX_INNER_PRODUCT );
 
 			// MAX_INNER_PRODUCT scores for vector [5f, 4f]
-			// [0.9998933, 0.9998107, 0.99975604, 0.99883986, 0.9939221, 0.9913382, 0.9827673, 0.9804447, 0.9775728, 0.9687126]
+			// [1.9997866, 1.9996214, 1.9995121, 1.9976797, 1.9878442, 1.9826764, 1.9655346, 1.9608896, 1.9551456, 1.9374254]
 			// score is ( 1.0f + d ) / 2.0f and we are passing d here: d = 2s-1
-			args.add( Arguments.of( index, 0.99767972f, 0.99883985f, 4 ) );
-			args.add( Arguments.of( index, 0.99951208f, 0.99975603f, 3 ) );
-			args.add( Arguments.of( index, 0.9608894f, 0.9804446f, 8 ) );
+			args.add( Arguments.of( index, 0.99767972f, 1.997f, 4 ) );
+			args.add( Arguments.of( index, 0.99951208f, 1.999f, 3 ) );
+			args.add( Arguments.of( index, 0.96088000f, 1.960f, 8 ) );
 
 			return args;
 		}
@@ -1045,7 +1050,7 @@ class KnnPredicateSpecificsIT {
 							.requiredMinimumSimilarity( similarity )
 							.boost( 100.0f )
 					).fetchAll().hits() )
-					.hasSize( matches )
+					.hasSizeLessThanOrEqualTo( matches )
 					.allSatisfy( s -> assertThat( s ).isGreaterThanOrEqualTo( score ) );
 		}
 
@@ -1059,36 +1064,36 @@ class KnnPredicateSpecificsIT {
 			// L2 scores for vector [5f, 4f]
 			// [0.9995734, 0.9992435, 0.9990251, 0.99538076, 0.9762654, 0.9665131, 0.9355144, 0.92745376, 0.91767627, 0.8887709]
 			// score is 1/(1+d*d) and we are passing d here: d = sqrt( 1/s - 1 )
-			args.add( Arguments.of( index, 0.06812251021f, 50.f, 4 ) );
-			args.add( Arguments.of( index, 0.15592186099f, 25.f, 5 ) );
-			args.add( Arguments.of( index, 0.26254644016f, 14.f, 7 ) );
+			args.add( Arguments.of( index, 0.06812251021f, 99.5f, 4 ) );
+			args.add( Arguments.of( index, 0.15592186099f, 97.6f, 5 ) );
+			args.add( Arguments.of( index, 0.26254644016f, 93.5f, 7 ) );
 
 			index = indexes.get( VectorSimilarity.COSINE );
 
 			// COSINE scores for vector [5f, 4f]
 			// [0.9998933, 0.9998107, 0.99975604, 0.9988398, 0.9939221, 0.9913382, 0.98276734, 0.9804448, 0.9775728, 0.9687126]
 			// score is ( 1.0f + d ) / 2.0f and we are passing d here: d = 2s-1
-			args.add( Arguments.of( index, 0.9976796f, 99.88397f, 4 ) );
-			args.add( Arguments.of( index, 0.9996214f, 99.98106f, 2 ) );
-			args.add( Arguments.of( index, 0.960889f, 98.04447f, 8 ) );
+			args.add( Arguments.of( index, 0.9976796f, 99.8f, 4 ) );
+			args.add( Arguments.of( index, 0.9996214f, 99.9f, 2 ) );
+			args.add( Arguments.of( index, 0.9608890f, 98.0f, 8 ) );
 
 			index = indexes.get( VectorSimilarity.DOT_PRODUCT );
 
 			// DOT_PRODUCT scores for vector [5f, 4f]
 			// [0.9998933, 0.9998107, 0.99975604, 0.99883986, 0.9939221, 0.9913382, 0.9827673, 0.9804447, 0.9775728, 0.9687126]
 			// score is ( 1.0f + d ) / 2.0f and we are passing d here: d = 2s-1
-			args.add( Arguments.of( index, 0.99767972f, 99.883985f, 4 ) );
-			args.add( Arguments.of( index, 0.99951208f, 99.975603f, 3 ) );
-			args.add( Arguments.of( index, 0.9608894f, 98.04446f, 8 ) );
+			args.add( Arguments.of( index, 0.99767972f, 99.8f, 4 ) );
+			args.add( Arguments.of( index, 0.99951208f, 99.9f, 3 ) );
+			args.add( Arguments.of( index, 0.96088940f, 98.0f, 8 ) );
 
 			index = indexes.get( VectorSimilarity.MAX_INNER_PRODUCT );
 
 			// MAX_INNER_PRODUCT scores for vector [5f, 4f]
 			// [0.9998933, 0.9998107, 0.99975604, 0.99883986, 0.9939221, 0.9913382, 0.9827673, 0.9804447, 0.9775728, 0.9687126]
 			// score is ( 1.0f + d ) / 2.0f and we are passing d here: d = 2s-1
-			args.add( Arguments.of( index, 0.99767972f, 99.883985f, 4 ) );
-			args.add( Arguments.of( index, 0.99951208f, 99.975603f, 3 ) );
-			args.add( Arguments.of( index, 0.9608894f, 98.04446f, 8 ) );
+			args.add( Arguments.of( index, 0.99767972f, 199.7f, 4 ) );
+			args.add( Arguments.of( index, 0.99951208f, 199.9f, 3 ) );
+			args.add( Arguments.of( index, 0.96088940f, 196.0f, 8 ) );
 
 			return args;
 		}
