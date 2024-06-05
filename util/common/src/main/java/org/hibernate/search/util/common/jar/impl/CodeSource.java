@@ -217,8 +217,7 @@ class CodeSource implements Closeable {
 				afterPathSeparatorIndex = secondPathSeparatorIndex;
 				secondPathSeparatorIndex = spec.indexOf( JAR_URI_PATH_SEPARATOR, afterPathSeparatorIndex );
 			}
-			return classesPathInFileSystem.resolve(
-					spec.substring( afterPathSeparatorIndex, secondPathSeparatorIndex ) );
+			return classesPathInFileSystem.resolve( spec.substring( afterPathSeparatorIndex ) );
 		}
 	}
 
