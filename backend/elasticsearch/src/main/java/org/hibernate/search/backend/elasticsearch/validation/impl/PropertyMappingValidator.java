@@ -136,7 +136,24 @@ abstract class PropertyMappingValidator extends AbstractTypeMappingValidator<Pro
 		}
 	}
 
-	static class Elasticsearch812PropertyMappingValidator extends PropertyMappingValidator {
+	static class Elasticsearch812PropertyMappingValidator extends Elasticsearch8xPropertyMappingValidator {
+	}
+
+	static class Elasticsearch814PropertyMappingValidator extends Elasticsearch8xPropertyMappingValidator {
+		@Override
+		protected boolean indexOptionsRequireValidation(ElasticsearchDenseVectorIndexOptions expected,
+				ElasticsearchDenseVectorIndexOptions actual) {
+			if ( expected != null
+					&& actual == null
+					&& expected.getEfConstruction() == null && expected.getM() == null && expected.getType() != null ) {
+				// if we set type only then ES will not return the index option block ... so we skip
+				return false;
+			}
+			return super.indexOptionsRequireValidation( expected, actual );
+		}
+	}
+
+	static class Elasticsearch8xPropertyMappingValidator extends PropertyMappingValidator {
 
 		private final ElasticsearchDenseVectorIndexOptionsValidator indexOptionsValidator =
 				new ElasticsearchDenseVectorIndexOptionsValidator();
@@ -160,9 +177,15 @@ abstract class PropertyMappingValidator extends AbstractTypeMappingValidator<Pro
 			);
 
 			ElasticsearchDenseVectorIndexOptions indexOptions = expectedMapping.getIndexOptions();
-			if ( indexOptions != null ) {
-				indexOptionsValidator.validate( errorCollector, indexOptions, actualMapping.getIndexOptions() );
+			ElasticsearchDenseVectorIndexOptions actual = actualMapping.getIndexOptions();
+			if ( indexOptionsRequireValidation( indexOptions, actual ) ) {
+				indexOptionsValidator.validate( errorCollector, indexOptions, actual );
 			}
+		}
+
+		protected boolean indexOptionsRequireValidation(ElasticsearchDenseVectorIndexOptions expected,
+				ElasticsearchDenseVectorIndexOptions actual) {
+			return expected != null;
 		}
 	}
 

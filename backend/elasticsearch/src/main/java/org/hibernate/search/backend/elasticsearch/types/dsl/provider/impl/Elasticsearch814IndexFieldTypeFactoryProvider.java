@@ -6,20 +6,20 @@
  */
 package org.hibernate.search.backend.elasticsearch.types.dsl.provider.impl;
 
-import org.hibernate.search.backend.elasticsearch.types.mapping.impl.Elasticsearch812VectorFieldTypeMappingContributor;
+import org.hibernate.search.backend.elasticsearch.types.mapping.impl.Elasticsearch814VectorFieldTypeMappingContributor;
 import org.hibernate.search.backend.elasticsearch.types.mapping.impl.ElasticsearchVectorFieldTypeMappingContributor;
 
 import com.google.gson.Gson;
 
 /**
- * The index field type factory provider for ES8.12-8.13.
+ * The index field type factory provider for ES8.14+.
  */
-public class Elasticsearch812IndexFieldTypeFactoryProvider extends AbstractIndexFieldTypeFactoryProvider {
+public class Elasticsearch814IndexFieldTypeFactoryProvider extends AbstractIndexFieldTypeFactoryProvider {
 
-	private final Elasticsearch812VectorFieldTypeMappingContributor vectorFieldTypeMappingContributor =
-			new Elasticsearch812VectorFieldTypeMappingContributor();
+	private final Elasticsearch814VectorFieldTypeMappingContributor vectorFieldTypeMappingContributor =
+			new Elasticsearch814VectorFieldTypeMappingContributor();
 
-	public Elasticsearch812IndexFieldTypeFactoryProvider(Gson userFacingGson) {
+	public Elasticsearch814IndexFieldTypeFactoryProvider(Gson userFacingGson) {
 		super( userFacingGson );
 	}
 

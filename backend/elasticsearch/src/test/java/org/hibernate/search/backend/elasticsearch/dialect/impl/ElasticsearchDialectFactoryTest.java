@@ -16,6 +16,7 @@ import org.hibernate.search.backend.elasticsearch.ElasticsearchDistributionName;
 import org.hibernate.search.backend.elasticsearch.ElasticsearchVersion;
 import org.hibernate.search.backend.elasticsearch.dialect.model.impl.Elasticsearch7ModelDialect;
 import org.hibernate.search.backend.elasticsearch.dialect.model.impl.Elasticsearch812ModelDialect;
+import org.hibernate.search.backend.elasticsearch.dialect.model.impl.Elasticsearch814ModelDialect;
 import org.hibernate.search.backend.elasticsearch.dialect.model.impl.Elasticsearch8ModelDialect;
 import org.hibernate.search.backend.elasticsearch.dialect.model.impl.ElasticsearchModelDialect;
 import org.hibernate.search.backend.elasticsearch.dialect.model.impl.OpenSearch1ModelDialect;
@@ -259,23 +260,23 @@ class ElasticsearchDialectFactoryTest {
 				),
 				success(
 						ElasticsearchDistributionName.ELASTIC, "8.14", "8.14.0",
-						Elasticsearch812ModelDialect.class, Elasticsearch81ProtocolDialect.class
+						Elasticsearch814ModelDialect.class, Elasticsearch81ProtocolDialect.class
 				),
 				success(
 						ElasticsearchDistributionName.ELASTIC, "8.14.0", "8.14.0",
-						Elasticsearch812ModelDialect.class, Elasticsearch81ProtocolDialect.class
+						Elasticsearch814ModelDialect.class, Elasticsearch81ProtocolDialect.class
 				),
 				successWithWarning(
 						ElasticsearchDistributionName.ELASTIC, "8.15", "8.15.0",
-						Elasticsearch812ModelDialect.class, Elasticsearch81ProtocolDialect.class
+						Elasticsearch814ModelDialect.class, Elasticsearch81ProtocolDialect.class
 				),
 				successWithWarning(
 						ElasticsearchDistributionName.ELASTIC, "8.15.0", "8.15.0",
-						Elasticsearch812ModelDialect.class, Elasticsearch81ProtocolDialect.class
+						Elasticsearch814ModelDialect.class, Elasticsearch81ProtocolDialect.class
 				),
 				successWithWarning(
 						ElasticsearchDistributionName.ELASTIC, "9.0.0", "9.0.0",
-						Elasticsearch812ModelDialect.class, Elasticsearch81ProtocolDialect.class
+						Elasticsearch814ModelDialect.class, Elasticsearch81ProtocolDialect.class
 				),
 				success(
 						ElasticsearchDistributionName.OPENSEARCH, "1", "1.3.1",
