@@ -26,7 +26,7 @@ public class Elasticsearch812VectorFieldTypeMappingContributor implements Elasti
 		if ( resolvedVectorSimilarity != null ) {
 			mapping.setSimilarity( resolvedVectorSimilarity );
 		}
-		if ( context.m() != null || context.efConstruction() != null ) {
+		if ( indexOptionAddCondition( context ) ) {
 			ElasticsearchDenseVectorIndexOptions indexOptions = new ElasticsearchDenseVectorIndexOptions();
 			indexOptions.setType( "hnsw" );
 			if ( context.m() != null ) {
@@ -37,6 +37,10 @@ public class Elasticsearch812VectorFieldTypeMappingContributor implements Elasti
 			}
 			mapping.setIndexOptions( indexOptions );
 		}
+	}
+
+	protected boolean indexOptionAddCondition(Context context) {
+		return context.m() != null || context.efConstruction() != null;
 	}
 
 	@Override

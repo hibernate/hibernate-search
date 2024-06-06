@@ -82,15 +82,23 @@ public class ElasticsearchTestDialect {
 						+ "  'element_type': '" + elementType.getName() + "',"
 						+ "  'dims': " + dim
 						+ similarity.map( s -> ",  'similarity': '" + s + "'" ).orElse( "" )
-						+ ( ( m.isPresent() || efConstruction.isPresent() )
-								? ( ",  'index_options': {"
-										+ ( m.isPresent() ? "    'm': " + m.getAsInt() + "," : "" )
-										+ ( efConstruction.isPresent()
-												? "    'ef_construction': " + efConstruction.getAsInt() + ","
-												: "" )
-										+ "    'type': 'hnsw'"
-										+ "  }" )
-								: "" )
+						+ ( ( m.isPresent()
+								|| efConstruction.isPresent()
+								|| !isActualVersion(
+										esVersion -> esVersion.isLessThan( "8.14.0" ),
+										osVersion -> {
+											throw new AssertionFailure(
+													"OpenSearch cannot be called within this condition block" );
+										}
+								) )
+										? ( ",  'index_options': {"
+												+ ( m.isPresent() ? "    'm': " + m.getAsInt() + "," : "" )
+												+ ( efConstruction.isPresent()
+														? "    'ef_construction': " + efConstruction.getAsInt() + ","
+														: "" )
+												+ "    'type': 'hnsw'"
+												+ "  }" )
+										: "" )
 						+ "}";
 			case OPENSEARCH:
 			case AMAZON_OPENSEARCH_SERVERLESS:
