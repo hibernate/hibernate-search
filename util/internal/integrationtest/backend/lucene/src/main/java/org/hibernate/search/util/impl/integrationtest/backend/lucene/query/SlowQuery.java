@@ -57,13 +57,12 @@ public class SlowQuery extends Query {
 
 			@Override
 			public ScorerSupplier scorerSupplier(LeafReaderContext context) {
-				Weight weight = this;
 				float score = score();
 				SlowDocIdSetIterator iterator = new SlowDocIdSetIterator( DocIdSetIterator.all( context.reader().maxDoc() ) );
 				return new ScorerSupplier() {
 					@Override
 					public Scorer get(long leadCost) throws IOException {
-						return new ConstantScoreScorer( weight, score, scoreMode, iterator );
+						return new ConstantScoreScorer( score, scoreMode, iterator );
 					}
 
 					@Override
