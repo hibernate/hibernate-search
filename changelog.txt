@@ -1,6 +1,34 @@
 Hibernate Search Changelog
 ==========================
 
+7.2.0.Alpha2 (2024-06-10)
+-------------------------
+
+** Bug
+    * HSEARCH-5162 ORM mass indexer fails when JPA compliance is enabled (hibernate.jpa.compliance.query=true)
+    * HSEARCH-5161 Prevent mass indexer from dropping the schema on start when requested but multitenancy is configured
+    * HSEARCH-5158 Standalone mapper's SearchScope#massIndexer(Object tenantId) returns null
+
+** Improvement
+    * HSEARCH-5166 Upgrade to Lucene 9.11
+    * HSEARCH-5165 Upgrade to Elasticsearch client 8.14.0
+    * HSEARCH-5164 Add Elasticsearch 8.14.0 compatibility
+    * HSEARCH-5154 Upgrade to Hibernate ORM 6.5.2.Final
+    * HSEARCH-5153 Upgrade to GSON 2.11.0
+    * HSEARCH-5108 Close unused readers immediately on refresh with the Lucene backend
+    * HSEARCH-5107 Close unused readers before merging segments with the Lucene backend
+    * HSEARCH-4930 Use dropAndCreateSchemaOnStart by default on Amazon OpenSearch Service for MassIndexer and JSR-352 integration
+
+** New Feature
+    * HSEARCH-4542 .within() and .withinAny() for the range predicate
+
+** Task
+    * HSEARCH-5159 Prepare to switch to char[] from Character[] in the Lucene highlighters
+    * HSEARCH-5156 Address Spring Boot 3.3 upgrade nested JARs test failures
+    * HSEARCH-5152 Use env variable for gpg sign plugin configuration
+    * HSEARCH-5148 Update lucene analysis JavaDocs link
+    * HSEARCH-4971 Switch project license to Apache License 2.0
+
 7.2.0.Alpha1 (2024-05-16)
 -------------------------
 
