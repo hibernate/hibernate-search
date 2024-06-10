@@ -211,6 +211,10 @@ class RealBackendDatabaseMultitenancyIT {
 		scope.schemaManager().dropAndCreate();
 
 		scope.massIndexer( asSet( tenant1, tenant2, tenant3 ) )
+				// as we've dropped the schema just above,
+				// we don't want any of these clean-up operations to be applied:
+				.dropAndCreateSchemaOnStart( false )
+				.purgeAllOnStart( false )
 				.startAndWait();
 
 		with( sessionFactory, tenant1 ).runInTransaction( session -> setupHelper.assertions()
