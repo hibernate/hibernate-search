@@ -43,7 +43,8 @@ class LuceneBackendWorkExecutorProviderIT {
 		);
 		setupHelper.start()
 				.withIndex( index )
-				.withBackendProperty( LuceneBackendSpiSettings.Radicals.BACKEND_WORK_EXECUTOR_PROVIDER, backendWorkExecutorProvider )
+				.withBackendProperty( LuceneBackendSpiSettings.Radicals.BACKEND_WORK_EXECUTOR_PROVIDER,
+						backendWorkExecutorProvider )
 				.setup();
 
 		verify( backendWorkExecutorProvider ).writeExecutor( any() );

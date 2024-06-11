@@ -103,9 +103,17 @@ class SearchIntegrationImplTest {
 		searchIntegration.close();
 
 		Object[] mocks = {
-				mapping1Mock, mapping2Mock, indexManager1Mock, indexManager2Mock,
-				backend1Mock, backend2Mock, threadPoolProviderMock, failureHandlerHolderMock, beanProviderMock,
-				engineThreadsMock, timingSourceMock
+				mapping1Mock,
+				mapping2Mock,
+				indexManager1Mock,
+				indexManager2Mock,
+				backend1Mock,
+				backend2Mock,
+				threadPoolProviderMock,
+				failureHandlerHolderMock,
+				beanProviderMock,
+				engineThreadsMock,
+				timingSourceMock
 		};
 
 		InOrder inOrder = Mockito.inOrder( mocks );
@@ -157,12 +165,18 @@ class SearchIntegrationImplTest {
 
 		assertThatThrownBy( searchIntegration::close )
 				.isInstanceOf( SearchException.class )
-				.hasMessageFindingMatch( "mapping 'mapping1':.*\n.*failures:.*\n.*mapping1 preStop failure\n.*mapping1 stop failure" )
-				.hasMessageFindingMatch( "mapping 'mapping2':.*\n.*failures:.*\n.*mapping2 preStop failure\n.*mapping2 stop failure" )
-				.hasMessageFindingMatch( "index 'index1':.*\n.*failures:.*\n.*indexManager1 preStop failure\n.*indexManager1 stop failure" )
-				.hasMessageFindingMatch( "index 'index2':.*\n.*failures:.*\n.*indexManager2 preStop failure\n.*indexManager2 stop failure" )
-				.hasMessageFindingMatch( "backend 'backend1':.*\n.*failures:.*\n.*backend1 preStop failure\n.*backend1 stop failure" )
-				.hasMessageFindingMatch( "backend 'backend2':.*\n.*failures:.*\n.*backend2 preStop failure\n.*backend2 stop failure" );
+				.hasMessageFindingMatch(
+						"mapping 'mapping1':.*\n.*failures:.*\n.*mapping1 preStop failure\n.*mapping1 stop failure" )
+				.hasMessageFindingMatch(
+						"mapping 'mapping2':.*\n.*failures:.*\n.*mapping2 preStop failure\n.*mapping2 stop failure" )
+				.hasMessageFindingMatch(
+						"index 'index1':.*\n.*failures:.*\n.*indexManager1 preStop failure\n.*indexManager1 stop failure" )
+				.hasMessageFindingMatch(
+						"index 'index2':.*\n.*failures:.*\n.*indexManager2 preStop failure\n.*indexManager2 stop failure" )
+				.hasMessageFindingMatch(
+						"backend 'backend1':.*\n.*failures:.*\n.*backend1 preStop failure\n.*backend1 stop failure" )
+				.hasMessageFindingMatch(
+						"backend 'backend2':.*\n.*failures:.*\n.*backend2 preStop failure\n.*backend2 stop failure" );
 	}
 
 	private static MappingKey<?, ?> mappingKey(String name) {
