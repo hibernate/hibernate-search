@@ -1153,6 +1153,8 @@ public abstract class AbstractAutomaticIndexingAssociationBaseIT<
 			// and the deletion even will simply be ignored.
 			containedAssociation.get( containedEntity );
 
+			containedAssociation.set( containedEntity, null );
+			containingAssociation.set( entity1, null );
 			session.remove( containedEntity );
 
 			backendMock.expectWorks( _indexed().indexName() )
@@ -3764,8 +3766,9 @@ public abstract class AbstractAutomaticIndexingAssociationBaseIT<
 			// But DO force loading on contained side:
 			// if the association is lazy and unloaded, it won't be loadable after the deletion
 			// and the deletion even will simply be ignored.
-			containedAssociation.get( containedEntity );
 
+			containedAssociation.set( containedEntity, null );
+			containingAssociation.set( containing, null );
 			session.remove( containedEntity );
 
 			backendMock.expectWorks( _indexed().indexName() )

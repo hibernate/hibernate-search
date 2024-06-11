@@ -106,6 +106,12 @@ public final class HibernateSearchEventListener
 
 		Object providedId = typeContext.toIndexingPlanProvidedId( event.getId() );
 		plan.delete( providedId, null, entity );
+
+		BitSet dirtyAssociationPaths = typeContext.dirtyContainingAssociationFilter().all();
+
+		if ( dirtyAssociationPaths != null ) {
+			plan.updateAssociationInverseSide( dirtyAssociationPaths, null, event.getDeletedState() );
+		}
 	}
 
 	@Override
