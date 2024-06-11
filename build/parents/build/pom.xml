@@ -42,12 +42,8 @@
         <javadoc.org.apache.lucene.core.url>https://lucene.apache.org/core/${javadoc.org.apache.lucene.tag}/core/</javadoc.org.apache.lucene.core.url>
         <javadoc.org.apache.lucene.analysis.common.url>https://lucene.apache.org/core/${javadoc.org.apache.lucene.tag}/analysis/common/</javadoc.org.apache.lucene.analysis.common.url>
         <javadoc.org.apache.lucene.queryparser.url>https://lucene.apache.org/core/${javadoc.org.apache.lucene.tag}/queryparser/</javadoc.org.apache.lucene.queryparser.url>
-        <!-- These version must be kept in sync with the version of the dependency in Lucene.
-            This dependency has a runtime scope in the lucene-facet lib,
-            as a result the maven-enforcer-plugin cannot detect if the version is different from the one we are relying on.
-            So if dependabot reports an update - check if the version would be aligned or not.
-         -->
-        <version.com.carrotsearch.hppc>0.9.1</version.com.carrotsearch.hppc>
+
+        <version.com.carrotsearch.hppc>0.10.0</version.com.carrotsearch.hppc>
 
         <!-- >>> Elasticsearch -->
         <!-- The version of the Elasticsearch client used by Hibernate Search, independently of the version of the remote cluster -->
