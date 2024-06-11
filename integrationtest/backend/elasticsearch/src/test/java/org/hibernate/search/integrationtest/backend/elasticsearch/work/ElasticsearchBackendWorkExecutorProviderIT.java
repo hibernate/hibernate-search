@@ -37,13 +37,14 @@ class ElasticsearchBackendWorkExecutorProviderIT {
 	private final SimpleMappedIndex<IndexBinding> index = SimpleMappedIndex.of( IndexBinding::new );
 
 	@Test
-	 void test() {
+	void test() {
 		when( backendWorkExecutorProvider.workExecutor( any() ) ).thenReturn(
 				new DelegatingSimpleScheduledExecutor( new ScheduledThreadPoolExecutor( 1 ), true )
 		);
 		setupHelper.start()
 				.withIndex( index )
-				.withBackendProperty( ElasticsearchBackendSpiSettings.Radicals.BACKEND_WORK_EXECUTOR_PROVIDER, backendWorkExecutorProvider )
+				.withBackendProperty( ElasticsearchBackendSpiSettings.Radicals.BACKEND_WORK_EXECUTOR_PROVIDER,
+						backendWorkExecutorProvider )
 				.setup();
 
 		verify( backendWorkExecutorProvider ).workExecutor( any() );
