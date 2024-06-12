@@ -106,6 +106,18 @@ public final class HibernateSearchEventListener
 
 		Object providedId = typeContext.toIndexingPlanProvidedId( event.getId() );
 		plan.delete( providedId, null, entity );
+
+		// In case ToOne associations are updated and set to null after which the entity is removed,
+		// we may end up with the `Object entity` from which we cannot derive what other entities are affected
+		// and have to be re-indexed.
+		//
+		// Hence, we will look at the state of the deleted entity when it was loaded
+		// and derive the required information from it:
+		BitSet dirtyAssociationPaths = typeContext.dirtyContainingAssociationFilter().all();
+
+		if ( dirtyAssociationPaths != null ) {
+			plan.updateAssociationInverseSide( dirtyAssociationPaths, null, event.getDeletedState() );
+		}
 	}
 
 	@Override
