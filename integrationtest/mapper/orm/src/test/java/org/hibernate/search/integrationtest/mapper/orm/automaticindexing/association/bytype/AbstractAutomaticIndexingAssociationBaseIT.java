@@ -1161,6 +1161,59 @@ public abstract class AbstractAutomaticIndexingAssociationBaseIT<
 		backendMock.verifyExpectationsMet();
 	}
 
+	/**
+	 * This test attempts to remove the entity after both sides of the association were set to null,
+	 * and we expect that even after such steps we can identify what entities have to be re-indexed.
+	 */
+	@Test
+	@TestForIssue(jiraKey = "HSEARCH-5170")
+	void directAssociationSetNullThenRemoved_indexedEmbedded() {
+		assumeTrue(
+				!( isAssociationMultiValuedOnContainedSide() || isAssociationMultiValuedOnContainingSide() ),
+				"This test only makes sense if there's a one-to-one association."
+		);
+		PropertyAccessor<TContaining, TContained> containingAssociation = _containing().containedIndexedEmbedded();
+		PropertyAccessor<TContained, TContaining> containedAssociation = _contained().containingAsIndexedEmbedded();
+		PropertyAccessor<TContained, String> field = _contained().indexedField();
+
+		with( sessionFactory ).runInTransaction( session -> {
+			TIndexed entity1 = _indexed().newInstance( 1 );
+			TContained containedEntity = _contained().newInstance( 2 );
+			field.set( containedEntity, "initialValue" );
+
+			session.persist( entity1 );
+			session.persist( containedEntity );
+
+			containingAssociation.set( entity1, containedEntity );
+			containedAssociation.set( containedEntity, entity1 );
+
+			backendMock.expectWorks( _indexed().indexName() )
+					.add( "1", b -> b
+							.objectField( "containedIndexedEmbedded", b2 -> b2
+									.field( "indexedField", "initialValue" )
+							) );
+		} );
+		backendMock.verifyExpectationsMet();
+
+		with( sessionFactory ).runInTransaction( session -> {
+			TIndexed entity1 = session.get( _indexed().entityClass(), 1 );
+			// Make sure we initialize the association from indexed to contained;
+			// the magic is in the fact that Hibernate doesn't index the contained entity
+			// even though it's referenced by the Java representation of the association.
+			TContained containedEntity = containingAssociation.get( entity1 );
+
+			// We update both sides of the association which would mean that
+			// the deleted entity has no information to which indexed entity it was associated to.
+			containingAssociation.set( entity1, null );
+			containedAssociation.set( containedEntity, null );
+			session.remove( containedEntity );
+
+			backendMock.expectWorks( _indexed().indexName() )
+					.addOrUpdate( "1", b -> {} );
+		} );
+		backendMock.verifyExpectationsMet();
+	}
+
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-4708")
 	void directEmbeddedAssociationReplace_embeddedAssociationsIndexedEmbedded() {
@@ -3765,6 +3818,66 @@ public abstract class AbstractAutomaticIndexingAssociationBaseIT<
 			// if the association is lazy and unloaded, it won't be loadable after the deletion
 			// and the deletion even will simply be ignored.
 			containedAssociation.get( containedEntity );
+
+			session.remove( containedEntity );
+
+			backendMock.expectWorks( _indexed().indexName() )
+					.addOrUpdate( "1", b -> b
+							.objectField( "child", b2 -> {} ) );
+		} );
+		backendMock.verifyExpectationsMet();
+	}
+
+	/**
+	 * Same as {@link #directAssociationSetNullThenRemoved_indexedEmbedded()} ,
+	 * but with an additional association: indexedEntity -> containingEntity -> containedEntity.
+	 */
+	@Test
+	@TestForIssue(jiraKey = "HSEARCH-5170")
+	void indirectAssociationSetNullThenRemoved_indexedEmbedded() {
+		assumeTrue(
+				!( isAssociationMultiValuedOnContainedSide() || isAssociationMultiValuedOnContainingSide() ),
+				"This test only makes sense if there's a one-to-one association."
+		);
+
+		PropertyAccessor<TContaining, TContained> containingAssociation = _containing().containedIndexedEmbedded();
+		PropertyAccessor<TContained, TContaining> containedAssociation = _contained().containingAsIndexedEmbedded();
+		PropertyAccessor<TContained, String> field = _contained().indexedField();
+
+		with( sessionFactory ).runInTransaction( session -> {
+			TIndexed entity1 = _indexed().newInstance( 1 );
+			TContaining containingEntity1 = _containing().newInstance( 2 );
+			_containing().child().set( entity1, containingEntity1 );
+			_containing().parent().set( containingEntity1, entity1 );
+			TContained containedEntity = _contained().newInstance( 2 );
+			field.set( containedEntity, "initialValue" );
+
+			session.persist( containingEntity1 );
+			session.persist( entity1 );
+			session.persist( containedEntity );
+
+			containingAssociation.set( containingEntity1, containedEntity );
+			containedAssociation.set( containedEntity, containingEntity1 );
+
+			backendMock.expectWorks( _indexed().indexName() )
+					.add( "1", b -> b
+							.objectField( "child", b2 -> b2
+									.objectField( "containedIndexedEmbedded", b3 -> b3
+											.field( "indexedField", "initialValue" )
+									) ) );
+		} );
+		backendMock.verifyExpectationsMet();
+
+		with( sessionFactory ).runInTransaction( session -> {
+			TContaining containing = session.get( _containing().entityClass(), 2 );
+			// Make sure we initialize the association from containing to contained;
+			// the magic is in the fact that Hibernate doesn't index the contained entity
+			// even though it's referenced by the Java representation of the association.
+			TContained containedEntity = containingAssociation.get( containing );
+
+			// Do *update* the association on both side and set them to null; that's on purpose.
+			containedAssociation.set( containedEntity, null );
+			containingAssociation.set( containing, null );
 
 			session.remove( containedEntity );
 
