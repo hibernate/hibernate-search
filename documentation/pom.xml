@@ -280,6 +280,7 @@
                         <hibernateCommunityUrl>https://hibernate.org/community</hibernateCommunityUrl>
                         <hibernateBlogUrl>https://in.relation.to/</hibernateBlogUrl>
                         <hibernateVersion>${version.org.hibernate.orm}</hibernateVersion>
+                        <hibernateAlternativeVersion>${version.alternative.org.hibernate.orm}</hibernateAlternativeVersion>
                         <hibernateDocUrl>${documentation.org.hibernate.orm.url}</hibernateDocUrl>
                         <hibernateJavadocUrl>${javadoc.org.hibernate.orm.url}</hibernateJavadocUrl>
                         <javaCompatibleVersions>${java-version.main.compatible.expected.text}</javaCompatibleVersions>

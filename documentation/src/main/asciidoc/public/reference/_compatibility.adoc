@@ -12,7 +12,7 @@
 |{javaCompatibleVersions}
 |
 |Hibernate ORM (for the <<mapper-orm,Hibernate ORM mapper>>
-|{hibernateVersion}
+|{hibernateVersion}/{hibernateAlternativeVersion}
 |
 |Jakarta Persistence (for the <<mapper-orm,Hibernate ORM mapper>>
 |{jakartaPersistenceVersion}
