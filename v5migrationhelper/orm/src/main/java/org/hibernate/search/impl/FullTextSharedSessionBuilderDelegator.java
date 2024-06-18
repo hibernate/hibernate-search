@@ -9,7 +9,6 @@ import java.util.TimeZone;
 
 import org.hibernate.FlushMode;
 import org.hibernate.Interceptor;
-import org.hibernate.SessionBuilder;
 import org.hibernate.SessionEventListener;
 import org.hibernate.SharedSessionBuilder;
 import org.hibernate.resource.jdbc.spi.PhysicalConnectionHandlingMode;
@@ -158,7 +157,7 @@ class FullTextSharedSessionBuilderDelegator implements FullTextSharedSessionBuil
 	}
 
 	@Override
-	public SessionBuilder jdbcTimeZone(TimeZone timeZone) {
+	public FullTextSharedSessionBuilder jdbcTimeZone(TimeZone timeZone) {
 		builder.jdbcTimeZone( timeZone );
 		return this;
 	}
