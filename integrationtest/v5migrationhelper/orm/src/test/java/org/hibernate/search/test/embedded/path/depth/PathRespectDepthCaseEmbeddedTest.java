@@ -7,16 +7,15 @@ package org.hibernate.search.test.embedded.path.depth;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmUtils.listAll;
+import static org.junit.platform.launcher.core.LauncherFactory.openSession;
 
 import java.util.List;
 
 import org.hibernate.Session;
-import org.hibernate.Transaction;
 import org.hibernate.search.FullTextSession;
 import org.hibernate.search.Search;
 import org.hibernate.search.query.dsl.QueryBuilder;
-import org.hibernate.search.test.SearchTestBase;
+import org.hibernate.search.test.embedded.path.AbstractDepthPathCaseEmbeddedTest;
 import org.hibernate.search.util.common.SearchException;
 
 import org.junit.jupiter.api.AfterEach;
@@ -28,7 +27,7 @@ import org.apache.lucene.search.Query;
 /**
  * @author Davide D'Alto
  */
-class PathRespectDepthCaseEmbeddedTest extends SearchTestBase {
+class PathRespectDepthCaseEmbeddedTest extends AbstractDepthPathCaseEmbeddedTest {
 
 	private Session s = null;
 	private EntityA entityA = null;
@@ -93,25 +92,6 @@ class PathRespectDepthCaseEmbeddedTest extends SearchTestBase {
 		@SuppressWarnings("unchecked")
 		List<EntityA> result = session.createFullTextQuery( query ).list();
 		return result;
-	}
-
-	private void deleteAll(Session s, Class<?>... classes) {
-		Transaction tx = s.beginTransaction();
-		for ( Class<?> each : classes ) {
-			List<?> list = listAll( s, each );
-			for ( Object object : list ) {
-				s.delete( object );
-			}
-		}
-		tx.commit();
-	}
-
-	private void persistEntity(Session s, Object... entities) {
-		Transaction tx = s.beginTransaction();
-		for ( Object entity : entities ) {
-			s.persist( entity );
-		}
-		tx.commit();
 	}
 
 	@Override
