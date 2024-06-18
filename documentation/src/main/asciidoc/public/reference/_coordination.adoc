@@ -18,14 +18,9 @@ in a way that ensures consistency,
 prevents data loss,
 and optimizes performance.
 
-This strategy is set through configuration properties:
-
-[source]
-----
-hibernate.search.coordination.strategy = outbox-polling
-----
-
-The default for this property is `none`.
+The default strategy provides no coordination.
+See the following subsections for details about <<coordination-none,how the default works>>,
+as well as how to use other strategies -- namely <<coordination-outbox-polling,`outbox-polling`>>.
 
 [NOTE]
 ====
@@ -35,15 +30,13 @@ See <<mapper-pojo-standalone-coordination,this section>> for information about
 coordination in the Standalone POJO mapper.
 ====
 
-See the following subsections for details about available strategies.
-
 [[coordination-none]]
 == No coordination
 
 [[coordination-none-basics]]
 === Basics
 
-The default strategy is the simplest and does not involve any additional infrastructure
+The `none` strategy is the simplest and does not involve any additional infrastructure
 for communication between application nodes.
 
 All <<architecture-hsearch-indexing,explicit or listener-triggered indexing>> operations
@@ -53,6 +46,14 @@ at the cost of a few limitations:
 
 * <<limitations-parallel-embedded-update>>
 * <<limitations-backend-indexing-error>>
+
+This strategy is enabled by default,
+but can also be selected explicitly with the following settings:
+
+[source]
+----
+hibernate.search.coordination.strategy = none
+----
 
 include::../components/_coordination-comparison-note.adoc[]
 
