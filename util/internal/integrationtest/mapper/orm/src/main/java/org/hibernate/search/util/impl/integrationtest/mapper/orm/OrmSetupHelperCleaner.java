@@ -86,18 +86,15 @@ class OrmSetupHelperCleaner {
 	}
 
 	private void clearAllData(SessionFactoryImplementor sessionFactory) {
-		HibernateOrmMapping mapping;
+		HibernateOrmMapping mapping = null;
 		try {
 			mapping = ( (HibernateOrmMapping) Search.mapping( sessionFactory ) );
 		}
 		catch (SearchException e) {
-			if ( e.getMessage().contains( "not initialized" ) ) {
-				// Hibernate Search is simply disabled.
-				mapping = null;
-			}
-			else {
+			if ( !e.getMessage().contains( "not initialized" ) ) {
 				throw e;
 			}
+			// Else: Hibernate Search is simply disabled.
 		}
 
 		if ( !DataClearConfig.ClearDatabaseData.DISABLED.equals( this.config.clearDatabaseData ) ) {

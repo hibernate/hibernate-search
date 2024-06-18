@@ -6,10 +6,12 @@ package org.hibernate.search.util.impl.test;
 
 import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
+import java.util.function.Consumer;
 
 import org.hibernate.search.util.impl.test.annotation.SuppressForbiddenApis;
 
@@ -42,19 +44,24 @@ public final class SystemHelper {
 
 		// Drain the output/errors streams
 		ExecutorService service = Executors.newFixedThreadPool( 2 );
-		service.submit( () -> new BufferedReader( new InputStreamReader( process.getInputStream(), Charsets.UTF_8 ) )
-				.lines()
-				.forEach( System.out::println ) );
-		service.submit( () -> new BufferedReader( new InputStreamReader( process.getErrorStream(), Charsets.UTF_8 ) )
-				.lines()
-				.forEach( System.err::println ) );
-		service.shutdown();
+		service.submit( () -> drain( process.getInputStream(), System.out::println ) );
+		service.submit( () -> drain( process.getErrorStream(), System.err::println ) );
 
 		Awaitility.await( process + " termination" )
 				.atMost( 1, TimeUnit.MINUTES )
 				.until( () -> !process.isAlive() );
 
 		return process;
+	}
+
+	private static void drain(InputStream stream, Consumer<String> consumer) {
+		try ( InputStreamReader in = new InputStreamReader( stream, Charsets.UTF_8 );
+				BufferedReader bufferedReader = new BufferedReader( in ); ) {
+			bufferedReader.lines().forEach( System.out::println );
+		}
+		catch (IOException e) {
+			throw new RuntimeException( e );
+		}
 	}
 
 	public interface SystemPropertyRestorer extends AutoCloseable {
