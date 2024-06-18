@@ -27,24 +27,24 @@ import org.apache.http.protocol.HttpContext;
 import org.apache.http.protocol.HttpCoreContext;
 import software.amazon.awssdk.auth.credentials.AwsCredentials;
 import software.amazon.awssdk.auth.credentials.AwsCredentialsProvider;
-import software.amazon.awssdk.auth.signer.Aws4Signer;
-import software.amazon.awssdk.auth.signer.params.Aws4SignerParams;
 import software.amazon.awssdk.http.ContentStreamProvider;
 import software.amazon.awssdk.http.SdkHttpFullRequest;
 import software.amazon.awssdk.http.SdkHttpMethod;
+import software.amazon.awssdk.http.auth.aws.signer.AwsV4HttpSigner;
+import software.amazon.awssdk.http.auth.spi.signer.SignedRequest;
 import software.amazon.awssdk.regions.Region;
 
 class AwsSigningRequestInterceptor implements HttpRequestInterceptor {
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
-	private final Aws4Signer signer;
+	private final AwsV4HttpSigner signer;
 	private final Region region;
 	private final String service;
 	private final AwsCredentialsProvider credentialsProvider;
 
 	AwsSigningRequestInterceptor(Region region, String service, AwsCredentialsProvider credentialsProvider) {
-		this.signer = Aws4Signer.create();
+		this.signer = AwsV4HttpSigner.create();
 		this.region = region;
 		this.service = service;
 		this.credentialsProvider = credentialsProvider;
@@ -68,18 +68,15 @@ class AwsSigningRequestInterceptor implements HttpRequestInterceptor {
 		AwsCredentials credentials = credentialsProvider.resolveCredentials();
 		log.tracef( "AWS credentials: %s", credentials );
 
-		Aws4SignerParams signerParams = Aws4SignerParams.builder()
-				.awsCredentials( credentials )
-				.signingRegion( region )
-				.signingName( service )
-				.build();
-
-		awsRequest = signer.sign( awsRequest, signerParams );
+		SignedRequest signedRequest = signer.sign( r -> r.identity( credentials )
+				.request( awsRequest )
+				.putProperty( AwsV4HttpSigner.SERVICE_SIGNING_NAME, service )
+				.putProperty( AwsV4HttpSigner.REGION_NAME, region.id() ) );
 
 		// The AWS SDK added some headers.
 		// Let's just override the existing headers with whatever the AWS SDK came up with.
 		// We don't expect signing to affect anything else (path, query, content, ...).
-		for ( Map.Entry<String, List<String>> header : awsRequest.headers().entrySet() ) {
+		for ( Map.Entry<String, List<String>> header : signedRequest.request().headers().entrySet() ) {
 			String name = header.getKey();
 			boolean first = true;
 			for ( String value : header.getValue() ) {
@@ -94,7 +91,7 @@ class AwsSigningRequestInterceptor implements HttpRequestInterceptor {
 		}
 
 		if ( log.isTraceEnabled() ) {
-			log.tracef( "AWS request (after signing): %s", awsRequest );
+			log.tracef( "AWS request (after signing): %s", signedRequest );
 			log.tracef( "HTTP request (after signing): %s", request );
 		}
 	}
