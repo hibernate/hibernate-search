@@ -7,9 +7,13 @@ package org.hibernate.search.integrationtest.backend.elasticsearch.tmp;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import org.hibernate.search.engine.backend.common.DocumentReference;
+import org.hibernate.search.engine.backend.document.DocumentElement;
 import org.hibernate.search.engine.backend.document.IndexFieldReference;
+import org.hibernate.search.engine.backend.document.IndexObjectFieldReference;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaElement;
+import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaObjectField;
 import org.hibernate.search.engine.backend.types.Aggregable;
+import org.hibernate.search.engine.backend.types.ObjectStructure;
 import org.hibernate.search.engine.search.aggregation.AggregationKey;
 import org.hibernate.search.engine.search.query.SearchQuery;
 import org.hibernate.search.engine.search.query.SearchResult;
@@ -30,6 +34,7 @@ public class ElasticsearchMetricAggregationsIT {
 	private final SimpleMappedIndex<IndexBinding> mainIndex = SimpleMappedIndex.of( IndexBinding::new ).name( "main" );
 	private final AggregationKey<Integer> sumIntegers = AggregationKey.of( "sumIntegers" );
 	private final AggregationKey<String> sumConverted = AggregationKey.of( "sumConverted" );
+	private final AggregationKey<Integer> sumFiltered = AggregationKey.of( "sumFiltered" );
 	private final AggregationKey<Integer> minIntegers = AggregationKey.of( "minIntegers" );
 	private final AggregationKey<String> minConverted = AggregationKey.of( "minConverted" );
 	private final AggregationKey<Integer> maxIntegers = AggregationKey.of( "maxIntegers" );
@@ -41,6 +46,7 @@ public class ElasticsearchMetricAggregationsIT {
 	private final AggregationKey<Integer> avgIntegers = AggregationKey.of( "avgIntegers" );
 	private final AggregationKey<String> avgConverted = AggregationKey.of( "avgConverted" );
 	private final AggregationKey<Double> avgIntegersAsDouble = AggregationKey.of( "avgIntegersAsDouble" );
+	private final AggregationKey<Double> avgIntegersAsDoubleFiltered = AggregationKey.of( "avgIntegersAsDoubleFiltered" );
 
 	@BeforeEach
 	void setup() {
@@ -55,6 +61,8 @@ public class ElasticsearchMetricAggregationsIT {
 				.where( f -> f.match().field( "style" ).matching( "bla" ) )
 				.aggregation( sumIntegers, f -> f.sum().field( "integer", Integer.class ) )
 				.aggregation( sumConverted, f -> f.sum().field( "converted", String.class ) )
+				.aggregation( sumFiltered, f -> f.sum().field( "object.nestedInteger", Integer.class )
+						.filter( ff -> ff.range().field( "object.nestedInteger" ).atLeast( 5 ) ) )
 				.aggregation( minIntegers, f -> f.min().field( "integer", Integer.class ) )
 				.aggregation( minConverted, f -> f.min().field( "converted", String.class ) )
 				.aggregation( maxIntegers, f -> f.max().field( "integer", Integer.class ) )
@@ -66,11 +74,14 @@ public class ElasticsearchMetricAggregationsIT {
 				.aggregation( avgIntegers, f -> f.avg().field( "integer", Integer.class ) )
 				.aggregation( avgConverted, f -> f.avg().field( "converted", String.class ) )
 				.aggregation( avgIntegersAsDouble, f -> f.avg().field( "integer", Double.class ) )
+				.aggregation( avgIntegersAsDoubleFiltered, f -> f.avg().field( "object.nestedInteger", Double.class )
+						.filter( ff -> ff.range().field( "object.nestedInteger" ).atLeast( 5 ) ) )
 				.toQuery();
 
 		SearchResult<DocumentReference> result = query.fetch( 0 );
 		assertThat( result.aggregation( sumIntegers ) ).isEqualTo( 29 );
 		assertThat( result.aggregation( sumConverted ) ).isEqualTo( "29" );
+		assertThat( result.aggregation( sumFiltered ) ).isEqualTo( 23 );
 		assertThat( result.aggregation( minIntegers ) ).isEqualTo( 3 );
 		assertThat( result.aggregation( minConverted ) ).isEqualTo( "3" );
 		assertThat( result.aggregation( maxIntegers ) ).isEqualTo( 9 );
@@ -82,6 +93,7 @@ public class ElasticsearchMetricAggregationsIT {
 		assertThat( result.aggregation( avgIntegers ) ).isEqualTo( 5 );
 		assertThat( result.aggregation( avgConverted ) ).isEqualTo( "5" );
 		assertThat( result.aggregation( avgIntegersAsDouble ) ).isEqualTo( 5.8 );
+		assertThat( result.aggregation( avgIntegersAsDoubleFiltered ) ).isEqualTo( 7.666666666666667 );
 	}
 
 	@Test
@@ -91,6 +103,8 @@ public class ElasticsearchMetricAggregationsIT {
 				.where( f -> f.matchAll() )
 				.aggregation( sumIntegers, f -> f.sum().field( "integer", Integer.class ) )
 				.aggregation( sumConverted, f -> f.sum().field( "converted", String.class ) )
+				.aggregation( sumFiltered, f -> f.sum().field( "object.nestedInteger", Integer.class )
+						.filter( ff -> ff.range().field( "object.nestedInteger" ).atLeast( 5 ) ) )
 				.aggregation( minIntegers, f -> f.min().field( "integer", Integer.class ) )
 				.aggregation( minConverted, f -> f.min().field( "converted", String.class ) )
 				.aggregation( maxIntegers, f -> f.max().field( "integer", Integer.class ) )
@@ -102,11 +116,14 @@ public class ElasticsearchMetricAggregationsIT {
 				.aggregation( avgIntegers, f -> f.avg().field( "integer", Integer.class ) )
 				.aggregation( avgConverted, f -> f.avg().field( "converted", String.class ) )
 				.aggregation( avgIntegersAsDouble, f -> f.avg().field( "integer", Double.class ) )
+				.aggregation( avgIntegersAsDoubleFiltered, f -> f.avg().field( "object.nestedInteger", Double.class )
+						.filter( ff -> ff.range().field( "object.nestedInteger" ).atLeast( 5 ) ) )
 				.toQuery();
 
 		SearchResult<DocumentReference> result = query.fetch( 0 );
 		assertThat( result.aggregation( sumIntegers ) ).isEqualTo( 55 );
 		assertThat( result.aggregation( sumConverted ) ).isEqualTo( "55" );
+		assertThat( result.aggregation( sumFiltered ) ).isEqualTo( 59 );
 		assertThat( result.aggregation( minIntegers ) ).isEqualTo( -10 );
 		assertThat( result.aggregation( minConverted ) ).isEqualTo( "-10" );
 		assertThat( result.aggregation( maxIntegers ) ).isEqualTo( 18 );
@@ -118,6 +135,7 @@ public class ElasticsearchMetricAggregationsIT {
 		assertThat( result.aggregation( avgIntegers ) ).isEqualTo( 5 );
 		assertThat( result.aggregation( avgConverted ) ).isEqualTo( "5" );
 		assertThat( result.aggregation( avgIntegersAsDouble ) ).isEqualTo( 5.5 );
+		assertThat( result.aggregation( avgIntegersAsDoubleFiltered ) ).isEqualTo( 11.8 );
 	}
 
 	private void initData() {
@@ -134,6 +152,9 @@ public class ElasticsearchMetricAggregationsIT {
 				document.addValue( mainIndex.binding().integer, value );
 				document.addValue( mainIndex.binding().converted, value );
 				document.addValue( mainIndex.binding().style, style );
+
+				DocumentElement object = document.addObject( mainIndex.binding().object );
+				object.addValue( mainIndex.binding().nestedInteger, value );
 			} );
 		}
 		bulkIndexer.add( "empty", document -> {} )
@@ -145,23 +166,18 @@ public class ElasticsearchMetricAggregationsIT {
 		final IndexFieldReference<Integer> integer;
 		final IndexFieldReference<Integer> converted;
 		final IndexFieldReference<String> style;
+		final IndexObjectFieldReference object;
+		final IndexFieldReference<Integer> nestedInteger;
 
 		IndexBinding(IndexSchemaElement root) {
-			integer = root.field(
-					"integer",
-					f -> f.asInteger().aggregable( Aggregable.YES )
-			)
-					.toReference();
-			converted = root.field(
-					"converted",
-					f -> f.asInteger().aggregable( Aggregable.YES )
-							.projectionConverter( String.class, (value, context) -> value.toString() )
-			)
-					.toReference();
-			style = root.field(
-					"style",
-					f -> f.asString()
-			)
+			integer = root.field( "integer", f -> f.asInteger().aggregable( Aggregable.YES ) ).toReference();
+			converted = root.field( "converted", f -> f.asInteger().aggregable( Aggregable.YES )
+					.projectionConverter( String.class, (value, context) -> value.toString() ) ).toReference();
+			style = root.field( "style", f -> f.asString() ).toReference();
+
+			IndexSchemaObjectField nested = root.objectField( "object", ObjectStructure.NESTED );
+			object = nested.toReference();
+			nestedInteger = nested.field( "nestedInteger", f -> f.asInteger().aggregable( Aggregable.YES ) )
 					.toReference();
 		}
 	}

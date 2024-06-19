@@ -4,9 +4,12 @@
  */
 package org.hibernate.search.backend.elasticsearch.search.aggregation.impl;
 
+import java.util.List;
+
 import org.hibernate.search.backend.elasticsearch.search.common.impl.AbstractElasticsearchCodecAwareSearchQueryElementFactory;
 import org.hibernate.search.backend.elasticsearch.search.common.impl.ElasticsearchSearchIndexScope;
 import org.hibernate.search.backend.elasticsearch.search.common.impl.ElasticsearchSearchIndexValueFieldContext;
+import org.hibernate.search.backend.elasticsearch.search.predicate.impl.ElasticsearchSearchPredicate;
 import org.hibernate.search.backend.elasticsearch.types.codec.impl.ElasticsearchFieldCodec;
 import org.hibernate.search.backend.elasticsearch.types.codec.impl.ElasticsearchLongFieldCodec;
 import org.hibernate.search.engine.search.aggregation.spi.SearchFilterableAggregationBuilder;
@@ -37,7 +40,7 @@ public class ElasticsearchMetricLongAggregation extends AbstractElasticsearchNes
 
 	@Override
 	protected Extractor<Long> extractor(AggregationRequestContext context) {
-		return new MetricLongExtractor();
+		return new MetricLongExtractor( nestedPathHierarchy, filter );
 	}
 
 	public static class Factory<F>
@@ -58,9 +61,13 @@ public class ElasticsearchMetricLongAggregation extends AbstractElasticsearchNes
 		}
 	}
 
-	private static class MetricLongExtractor implements Extractor<Long> {
+	private static class MetricLongExtractor extends AbstractExtractor<Long> {
+		protected MetricLongExtractor(List<String> nestedPathHierarchy, ElasticsearchSearchPredicate filter) {
+			super( nestedPathHierarchy, filter );
+		}
+
 		@Override
-		public Long extract(JsonObject aggregationResult, AggregationExtractContext context) {
+		protected Long doExtract(JsonObject aggregationResult, AggregationExtractContext context) {
 			JsonElement value = aggregationResult.get( "value" );
 			return ElasticsearchLongFieldCodec.INSTANCE.decode( value );
 		}

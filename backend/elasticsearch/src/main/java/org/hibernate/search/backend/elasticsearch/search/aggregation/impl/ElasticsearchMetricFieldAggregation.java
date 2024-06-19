@@ -4,9 +4,12 @@
  */
 package org.hibernate.search.backend.elasticsearch.search.aggregation.impl;
 
+import java.util.List;
+
 import org.hibernate.search.backend.elasticsearch.search.common.impl.AbstractElasticsearchCodecAwareSearchQueryElementFactory;
 import org.hibernate.search.backend.elasticsearch.search.common.impl.ElasticsearchSearchIndexScope;
 import org.hibernate.search.backend.elasticsearch.search.common.impl.ElasticsearchSearchIndexValueFieldContext;
+import org.hibernate.search.backend.elasticsearch.search.predicate.impl.ElasticsearchSearchPredicate;
 import org.hibernate.search.backend.elasticsearch.types.codec.impl.ElasticsearchDoubleFieldCodec;
 import org.hibernate.search.backend.elasticsearch.types.codec.impl.ElasticsearchFieldCodec;
 import org.hibernate.search.engine.backend.types.converter.runtime.FromDocumentValueConvertContext;
@@ -49,7 +52,7 @@ public class ElasticsearchMetricFieldAggregation<F, K> extends AbstractElasticse
 
 	@Override
 	protected Extractor<K> extractor(AggregationRequestContext context) {
-		return new MetricFieldExtractor();
+		return new MetricFieldExtractor( nestedPathHierarchy, filter );
 	}
 
 	public static class Factory<F>
@@ -100,10 +103,14 @@ public class ElasticsearchMetricFieldAggregation<F, K> extends AbstractElasticse
 		}
 	}
 
-	@SuppressWarnings("unchecked")
-	private class MetricFieldExtractor implements Extractor<K> {
+	private class MetricFieldExtractor extends AbstractExtractor<K> {
+		protected MetricFieldExtractor(List<String> nestedPathHierarchy, ElasticsearchSearchPredicate filter) {
+			super( nestedPathHierarchy, filter );
+		}
+
 		@Override
-		public K extract(JsonObject aggregationResult, AggregationExtractContext context) {
+		@SuppressWarnings("unchecked")
+		protected K doExtract(JsonObject aggregationResult, AggregationExtractContext context) {
 			FromDocumentValueConvertContext convertContext = context.fromDocumentValueConvertContext();
 			JsonElement value = aggregationResult.get( "value" );
 			JsonElement valueAsString = aggregationResult.get( "value_as_string" );
