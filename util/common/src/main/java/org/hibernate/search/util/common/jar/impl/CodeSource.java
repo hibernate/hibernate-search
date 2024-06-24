@@ -11,6 +11,7 @@ import java.io.InputStream;
 import java.lang.invoke.MethodHandles;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
@@ -25,6 +26,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.function.BiFunction;
 
+import org.hibernate.search.util.common.annotation.impl.SuppressForbiddenApis;
 import org.hibernate.search.util.common.impl.Closer;
 import org.hibernate.search.util.common.impl.SuppressingCloser;
 import org.hibernate.search.util.common.impl.Throwables;
@@ -109,12 +111,7 @@ class CodeSource implements Closeable {
 		// this won't work in most cases, but might save us in some exotic cases
 		// such as a nested JAR.
 		try {
-			@SuppressWarnings("deprecation") // For JDK 20+
-			// TODO: HSEARCH-4765 To be replaced with URL#of(URI, URLStreamHandler) when switching to JDK 20+
-			// see https://download.java.net/java/early_access/jdk20/docs/api/java.base/java/net/URL.html#of(java.net.URI,java.net.URLStreamHandler) for deprecation info
-			// cannot simply change to URI as boot specific Handler is required to make things work.
-			URL resourceUrl = new URL( codeSourceLocation, resourcePathString );
-			return resourceUrl.openStream();
+			return urlForPath( resourcePathString ).openStream();
 		}
 		catch (FileNotFoundException e) {
 			return null;
@@ -127,6 +124,16 @@ class CodeSource implements Closeable {
 				"Could not open '" + resourcePathString + "' within '" + codeSourceLocation + "': " + exception.getMessage(),
 				exception
 		);
+	}
+
+	@SuppressForbiddenApis(reason = "Cannot replace new URL(..) right now. See HSEARCH-4765 and the TODO inline.")
+	@SuppressWarnings("deprecation") // For JDK 20+
+	private URL urlForPath(String resourcePathString) throws MalformedURLException {
+		// TODO: HSEARCH-4765 To be replaced with URL#of(URI, URLStreamHandler) when switching to JDK 20+
+		// see https://download.java.net/java/early_access/jdk20/docs/api/java.base/java/net/URL.html#of(java.net.URI,java.net.URLStreamHandler) for deprecation info
+		// cannot simply change to URI as boot specific Handler is required to make things work.
+		// When updating, remove the @SuppressForbiddenApis ^
+		return new URL( codeSourceLocation, resourcePathString );
 	}
 
 	public Path classesPathOrFail() throws IOException {

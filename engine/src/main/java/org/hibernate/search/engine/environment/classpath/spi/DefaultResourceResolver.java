@@ -4,8 +4,11 @@
  */
 package org.hibernate.search.engine.environment.classpath.spi;
 
+import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
+
+import org.hibernate.search.util.common.annotation.impl.SuppressForbiddenApis;
 
 /**
  * Default implementation of {@code ClassResolver} relying on an {@link AggregatedClassLoader}.
@@ -40,10 +43,7 @@ public final class DefaultResourceResolver implements ResourceResolver {
 
 		if ( stripped != null ) {
 			try {
-				@SuppressWarnings("deprecation")
-				// TODO: HSEARCH-4765 address the URL -> URI constructor change once the URLClassLoader stops using the URL constructor
-				InputStream resourceStream = new URL( stripped ).openStream();
-				return resourceStream;
+				return toInputStream( stripped );
 			}
 			catch (Exception ignore) {
 				// Ignore
@@ -61,6 +61,13 @@ public final class DefaultResourceResolver implements ResourceResolver {
 		}
 
 		return null;
+	}
+
+	@SuppressForbiddenApis(reason = "We don't want to replace the constructor at this point. See HSEARCH-4765")
+	@SuppressWarnings("deprecation")
+	private static InputStream toInputStream(String url) throws IOException {
+		// TODO: HSEARCH-4765 address the URL -> URI constructor change once the URLClassLoader stops using the URL constructor
+		return new URL( url ).openStream();
 	}
 
 }

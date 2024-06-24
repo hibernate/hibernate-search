@@ -203,8 +203,12 @@
 
         <!-- JDK version required for the build; we target 11 but require at least 17 for the build -->
         <jdk.min.version>17</jdk.min.version>
-        <!-- The lowest supported version of Java for applications using Hibernate Search -->
-        <!-- Set statically, independently from the current JDK: we want our code to comply with this version -->
+        <!--
+            The lowest supported version of Java for applications using Hibernate Search
+            Set statically, independently from the current JDK: we want our code to comply with this version
+
+            Note: when updating this version, consider reviewing the list of JDKs the forbidden API plugin is targeting.
+        -->
         <java-version.main.release>11</java-version.main.release>
         <java-version.main.compiler.java_home>${java.home}</java-version.main.compiler.java_home>
         <java-version.main.compiler>${java-version.main.compiler.java_home}/bin/javac</java-version.main.compiler>
@@ -280,6 +284,7 @@
         <!-- Check dependencies for security vulnerabilities -->
         <version.dependency-check.plugin>9.2.0</version.dependency-check.plugin>
         <version.exec.plugin>3.3.0</version.exec.plugin>
+        <!-- Note: when updating this version, consider reviewing the list of JDKs the forbidden API plugin is targeting. -->
         <version.forbiddenapis.plugin>3.7</version.forbiddenapis.plugin>
         <!-- Make sure that upgraded Jandex plugin aligns with the Jandex version imported from the ORM platform pom -->
         <version.jandex.plugin>3.1.7</version.jandex.plugin>
