@@ -1,3 +1,3 @@
 # CockroachDB
 # See https://hub.docker.com/r/cockroachdb/cockroach/tags
-FROM docker.io/cockroachdb/cockroach:v23.2.5
+FROM docker.io/cockroachdb/cockroach:v24.1.1
