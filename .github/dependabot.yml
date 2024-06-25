@@ -129,6 +129,8 @@ updates:
       # Because of https://github.com/awaitility/awaitility/issues/277 :
       - dependency-name: "org.awaitility:awaitility"
         versions: [ "4.2.1" ]
+      # Enable updates after JDK 21 upgrade (as of jsonassert 1.5.2 it requires JDK 21)
+      - dependency-name: "org.skyscreamer:jsonassert"
   - package-ecosystem: "docker"
     registries:
       - dockerhub
