@@ -403,12 +403,20 @@ class ElasticsearchDialectFactoryTest {
 						ElasticsearchDistributionName.OPENSEARCH, "2.14.0", "2.14.0",
 						OpenSearch29ModelDialect.class, Elasticsearch70ProtocolDialect.class
 				),
-				successWithWarning(
+				success(
 						ElasticsearchDistributionName.OPENSEARCH, "2.15", "2.15.0",
 						OpenSearch29ModelDialect.class, Elasticsearch70ProtocolDialect.class
 				),
-				successWithWarning(
+				success(
 						ElasticsearchDistributionName.OPENSEARCH, "2.15.0", "2.15.0",
+						OpenSearch29ModelDialect.class, Elasticsearch70ProtocolDialect.class
+				),
+				successWithWarning(
+						ElasticsearchDistributionName.OPENSEARCH, "2.16", "2.16.0",
+						OpenSearch29ModelDialect.class, Elasticsearch70ProtocolDialect.class
+				),
+				successWithWarning(
+						ElasticsearchDistributionName.OPENSEARCH, "2.16.0", "2.16.0",
 						OpenSearch29ModelDialect.class, Elasticsearch70ProtocolDialect.class
 				),
 				successWithWarning(
