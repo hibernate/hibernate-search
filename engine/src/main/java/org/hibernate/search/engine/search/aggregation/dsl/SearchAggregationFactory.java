@@ -61,6 +61,47 @@ public interface SearchAggregationFactory {
 	 */
 	TermsAggregationFieldStep<?> terms();
 
+	/**
+	 * Perform the sum metrics aggregation.
+	 *
+	 * @return The next step.
+	 */
+	SumAggregationFieldStep<?> sum();
+
+	/**
+	 * Perform the min metrics aggregation.
+	 *
+	 * @return The next step.
+	 */
+	MinAggregationFieldStep<?> min();
+
+	/**
+	 * Perform the max metrics aggregation.
+	 *
+	 * @return The next step.
+	 */
+	MaxAggregationFieldStep<?> max();
+
+	/**
+	 * Perform the count metrics aggregation.
+	 *
+	 * @return The next step.
+	 */
+	CountAggregationFieldStep<?> count();
+
+	/**
+	 * Perform the count distinct metrics aggregation.
+	 *
+	 * @return The next step.
+	 */
+	CountDistinctAggregationFieldStep<?> countDistinct();
+
+	/**
+	 * Perform the avg metrics aggregation.
+	 *
+	 * @return the next step.
+	 */
+	AvgAggregationFieldStep<?> avg();
 
 	/**
 	 * Delegating aggregation that creates the actual aggregation at query create time and provides access to query parameters.

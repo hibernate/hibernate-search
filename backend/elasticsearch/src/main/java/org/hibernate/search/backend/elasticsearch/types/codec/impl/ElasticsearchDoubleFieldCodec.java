@@ -33,6 +33,11 @@ public class ElasticsearchDoubleFieldCodec implements ElasticsearchFieldCodec<Do
 	}
 
 	@Override
+	public Double decode(Double value) {
+		return value;
+	}
+
+	@Override
 	public boolean isCompatibleWith(ElasticsearchFieldCodec<?> other) {
 		return INSTANCE == other;
 	}

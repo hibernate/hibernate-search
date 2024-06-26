@@ -31,4 +31,23 @@ public interface ExtendedSearchAggregationFactory<
 
 	@Override
 	TermsAggregationFieldStep<PDF> terms();
+
+	@Override
+	SumAggregationFieldStep<PDF> sum();
+
+	@Override
+	MinAggregationFieldStep<PDF> min();
+
+	@Override
+	MaxAggregationFieldStep<PDF> max();
+
+	@Override
+	CountAggregationFieldStep<PDF> count();
+
+	@Override
+	CountDistinctAggregationFieldStep<PDF> countDistinct();
+
+	@Override
+	AvgAggregationFieldStep<PDF> avg();
+
 }
