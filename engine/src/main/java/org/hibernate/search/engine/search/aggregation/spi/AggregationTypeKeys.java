@@ -28,7 +28,7 @@ public final class AggregationTypeKeys {
 			of( IndexFieldTraits.Aggregations.COUNT );
 	public static final SearchQueryElementTypeKey<SearchFilterableAggregationBuilder<Long>> COUNT_DISTINCT =
 			of( IndexFieldTraits.Aggregations.COUNT_DISTINCT );
-	public static final SearchQueryElementTypeKey<SearchFilterableAggregationBuilder<Double>> AVG =
+	public static final SearchQueryElementTypeKey<FieldMetricAggregationBuilder.TypeSelector> AVG =
 			of( IndexFieldTraits.Aggregations.AVG );
 
 }

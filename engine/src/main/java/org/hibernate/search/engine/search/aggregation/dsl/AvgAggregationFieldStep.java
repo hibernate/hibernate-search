@@ -20,9 +20,25 @@ public interface AvgAggregationFieldStep<PDF extends SearchPredicateFactory> {
 	 * Target the given field in the avg aggregation.
 	 *
 	 * @param fieldPath The <a href="SearchAggregationFactory.html#field-paths">path</a> to the index field to aggregate.
+	 * @param type The type of field values.
+	 * @param <F> The type of field values or {@link Double} if a double result is required.
+	 * @return The next step.
+	 */
+	default <F> AvgAggregationOptionsStep<?, PDF, F> field(String fieldPath, Class<F> type) {
+		return field( fieldPath, type, ValueConvert.YES );
+	}
+
+	/**
+	 * Target the given field in the avg aggregation.
+	 *
+	 * @param fieldPath The <a href="SearchAggregationFactory.html#field-paths">path</a> to the index field to aggregate.
+	 * @param type The type of field values.
+	 * @param <F> The type of field values or {@link Double} if a double result is required.
+	 * @param convert Controls how the ranges passed to the next steps and fetched from the backend should be converted.
 	 * See {@link ValueConvert}.
 	 * @return The next step.
 	 */
-	AvgAggregationOptionsStep<?, PDF> field(String fieldPath);
+	<F> AvgAggregationOptionsStep<?, PDF, F> field(String fieldPath, Class<F> type,
+			ValueConvert convert);
 
 }

@@ -7,6 +7,7 @@ package org.hibernate.search.backend.elasticsearch.search.aggregation.impl;
 import org.hibernate.search.backend.elasticsearch.search.common.impl.AbstractElasticsearchCodecAwareSearchQueryElementFactory;
 import org.hibernate.search.backend.elasticsearch.search.common.impl.ElasticsearchSearchIndexScope;
 import org.hibernate.search.backend.elasticsearch.search.common.impl.ElasticsearchSearchIndexValueFieldContext;
+import org.hibernate.search.backend.elasticsearch.types.codec.impl.ElasticsearchDoubleFieldCodec;
 import org.hibernate.search.backend.elasticsearch.types.codec.impl.ElasticsearchFieldCodec;
 import org.hibernate.search.engine.backend.types.converter.runtime.FromDocumentValueConvertContext;
 import org.hibernate.search.engine.backend.types.converter.spi.ProjectionConverter;
@@ -85,18 +86,32 @@ public class ElasticsearchMetricFieldAggregation<F, K> extends AbstractElasticse
 
 		@Override
 		public <T> Builder<F, T> type(Class<T> expectedType, ValueConvert convert) {
+			ProjectionConverter<F, ? extends T> projectionConverter = null;
+			if ( !Double.class.isAssignableFrom( expectedType )
+					||
+					field.type().projectionConverter( convert ).valueType().isAssignableFrom( expectedType ) ) {
+				projectionConverter = field.type().projectionConverter( convert )
+						.withConvertedType( expectedType, field );
+			}
 			return new Builder<>( codec, scope, field,
-					field.type().projectionConverter( convert ).withConvertedType( expectedType, field ),
-					operation );
+					projectionConverter,
+					operation
+			);
 		}
 	}
 
+	@SuppressWarnings("unchecked")
 	private class MetricFieldExtractor implements Extractor<K> {
 		@Override
 		public K extract(JsonObject aggregationResult, AggregationExtractContext context) {
 			FromDocumentValueConvertContext convertContext = context.fromDocumentValueConvertContext();
 			JsonElement value = aggregationResult.get( "value" );
 			JsonElement valueAsString = aggregationResult.get( "value_as_string" );
+
+			if ( fromFieldValueConverter == null ) {
+				Double decode = ElasticsearchDoubleFieldCodec.INSTANCE.decode( value );
+				return (K) decode;
+			}
 			return fromFieldValueConverter.fromDocumentValue(
 					codec.decodeAggregationValue( value, valueAsString ),
 					convertContext

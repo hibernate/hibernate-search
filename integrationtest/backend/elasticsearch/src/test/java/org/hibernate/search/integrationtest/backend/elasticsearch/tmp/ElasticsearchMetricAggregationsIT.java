@@ -38,8 +38,9 @@ public class ElasticsearchMetricAggregationsIT {
 	private final AggregationKey<Long> countConverted = AggregationKey.of( "countConverted" );
 	private final AggregationKey<Long> countDistinctIntegers = AggregationKey.of( "countDistinctIntegers" );
 	private final AggregationKey<Long> countDistinctConverted = AggregationKey.of( "countDistinctConverted" );
-	private final AggregationKey<Double> avgIntegers = AggregationKey.of( "avgIntegers" );
-	private final AggregationKey<Double> avgConverted = AggregationKey.of( "avgConverted" );
+	private final AggregationKey<Integer> avgIntegers = AggregationKey.of( "avgIntegers" );
+	private final AggregationKey<String> avgConverted = AggregationKey.of( "avgConverted" );
+	private final AggregationKey<Double> avgIntegersAsDouble = AggregationKey.of( "avgIntegersAsDouble" );
 
 	@BeforeEach
 	void setup() {
@@ -62,8 +63,9 @@ public class ElasticsearchMetricAggregationsIT {
 				.aggregation( countConverted, f -> f.count().field( "converted" ) )
 				.aggregation( countDistinctIntegers, f -> f.countDistinct().field( "integer" ) )
 				.aggregation( countDistinctConverted, f -> f.countDistinct().field( "converted" ) )
-				.aggregation( avgIntegers, f -> f.avg().field( "integer" ) )
-				.aggregation( avgConverted, f -> f.avg().field( "converted" ) )
+				.aggregation( avgIntegers, f -> f.avg().field( "integer", Integer.class ) )
+				.aggregation( avgConverted, f -> f.avg().field( "converted", String.class ) )
+				.aggregation( avgIntegersAsDouble, f -> f.avg().field( "integer", Double.class ) )
 				.toQuery();
 
 		SearchResult<DocumentReference> result = query.fetch( 0 );
@@ -77,8 +79,9 @@ public class ElasticsearchMetricAggregationsIT {
 		assertThat( result.aggregation( countConverted ) ).isEqualTo( 5 );
 		assertThat( result.aggregation( countDistinctIntegers ) ).isEqualTo( 3 );
 		assertThat( result.aggregation( countDistinctConverted ) ).isEqualTo( 3 );
-		assertThat( result.aggregation( avgIntegers ) ).isEqualTo( 5.8 );
-		assertThat( result.aggregation( avgConverted ) ).isEqualTo( 5.8 );
+		assertThat( result.aggregation( avgIntegers ) ).isEqualTo( 5 );
+		assertThat( result.aggregation( avgConverted ) ).isEqualTo( "5" );
+		assertThat( result.aggregation( avgIntegersAsDouble ) ).isEqualTo( 5.8 );
 	}
 
 	@Test
@@ -96,8 +99,9 @@ public class ElasticsearchMetricAggregationsIT {
 				.aggregation( countConverted, f -> f.count().field( "converted" ) )
 				.aggregation( countDistinctIntegers, f -> f.countDistinct().field( "integer" ) )
 				.aggregation( countDistinctConverted, f -> f.countDistinct().field( "converted" ) )
-				.aggregation( avgIntegers, f -> f.avg().field( "integer" ) )
-				.aggregation( avgConverted, f -> f.avg().field( "converted" ) )
+				.aggregation( avgIntegers, f -> f.avg().field( "integer", Integer.class ) )
+				.aggregation( avgConverted, f -> f.avg().field( "converted", String.class ) )
+				.aggregation( avgIntegersAsDouble, f -> f.avg().field( "integer", Double.class ) )
 				.toQuery();
 
 		SearchResult<DocumentReference> result = query.fetch( 0 );
@@ -111,8 +115,9 @@ public class ElasticsearchMetricAggregationsIT {
 		assertThat( result.aggregation( countConverted ) ).isEqualTo( 10 );
 		assertThat( result.aggregation( countDistinctIntegers ) ).isEqualTo( 6 );
 		assertThat( result.aggregation( countDistinctConverted ) ).isEqualTo( 6 );
-		assertThat( result.aggregation( avgIntegers ) ).isEqualTo( 5.5 );
-		assertThat( result.aggregation( avgConverted ) ).isEqualTo( 5.5 );
+		assertThat( result.aggregation( avgIntegers ) ).isEqualTo( 5 );
+		assertThat( result.aggregation( avgConverted ) ).isEqualTo( "5" );
+		assertThat( result.aggregation( avgIntegersAsDouble ) ).isEqualTo( 5.5 );
 	}
 
 	private void initData() {

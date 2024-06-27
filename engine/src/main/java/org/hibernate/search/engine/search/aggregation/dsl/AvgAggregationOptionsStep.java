@@ -13,10 +13,12 @@ import org.hibernate.search.engine.search.predicate.dsl.SearchPredicateFactory;
  *
  * @param <S> The "self" type (the actual exposed type of this step).
  * @param <PDF> The type of factory used to create predicates in {@link #filter(Function)}.
+ * @param <F> The type of the targeted field. The type of result for this aggregation.
  */
 public interface AvgAggregationOptionsStep<
-		S extends AvgAggregationOptionsStep<?, PDF>,
-		PDF extends SearchPredicateFactory>
-		extends AggregationFinalStep<Double>, AggregationFilterStep<S, PDF> {
+		S extends AvgAggregationOptionsStep<?, PDF, F>,
+		PDF extends SearchPredicateFactory,
+		F>
+		extends AggregationFinalStep<F>, AggregationFilterStep<S, PDF> {
 
 }

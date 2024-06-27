@@ -4,7 +4,6 @@
  */
 package org.hibernate.search.backend.elasticsearch.types.dsl.impl;
 
-import org.hibernate.search.backend.elasticsearch.search.aggregation.impl.ElasticsearchMetricDoubleAggregation;
 import org.hibernate.search.backend.elasticsearch.search.aggregation.impl.ElasticsearchMetricFieldAggregation;
 import org.hibernate.search.backend.elasticsearch.search.aggregation.impl.ElasticsearchMetricLongAggregation;
 import org.hibernate.search.backend.elasticsearch.search.aggregation.impl.ElasticsearchRangeAggregation;
@@ -77,7 +76,7 @@ abstract class AbstractElasticsearchNumericFieldTypeOptionsStep<
 			builder.queryElementFactory( AggregationTypeKeys.COUNT_DISTINCT,
 					new ElasticsearchMetricLongAggregation.Factory<>( codec, "cardinality" ) );
 			builder.queryElementFactory( AggregationTypeKeys.AVG,
-					new ElasticsearchMetricDoubleAggregation.Factory<>( codec, "avg" )
+					new ElasticsearchMetricFieldAggregation.Factory<>( codec, "avg" )
 			);
 		}
 	}

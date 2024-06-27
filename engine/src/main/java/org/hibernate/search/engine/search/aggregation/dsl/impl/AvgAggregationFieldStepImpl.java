@@ -8,11 +8,12 @@ import org.hibernate.search.engine.search.aggregation.dsl.AvgAggregationFieldSte
 import org.hibernate.search.engine.search.aggregation.dsl.AvgAggregationOptionsStep;
 import org.hibernate.search.engine.search.aggregation.dsl.spi.SearchAggregationDslContext;
 import org.hibernate.search.engine.search.aggregation.spi.AggregationTypeKeys;
-import org.hibernate.search.engine.search.aggregation.spi.SearchFilterableAggregationBuilder;
+import org.hibernate.search.engine.search.aggregation.spi.FieldMetricAggregationBuilder;
+import org.hibernate.search.engine.search.common.ValueConvert;
 import org.hibernate.search.engine.search.predicate.dsl.SearchPredicateFactory;
+import org.hibernate.search.util.common.impl.Contracts;
 
-public class AvgAggregationFieldStepImpl<PDF extends SearchPredicateFactory>
-		implements AvgAggregationFieldStep<PDF> {
+public class AvgAggregationFieldStepImpl<PDF extends SearchPredicateFactory> implements AvgAggregationFieldStep<PDF> {
 	private final SearchAggregationDslContext<?, ? extends PDF> dslContext;
 
 	public AvgAggregationFieldStepImpl(SearchAggregationDslContext<?, ? extends PDF> dslContext) {
@@ -20,9 +21,12 @@ public class AvgAggregationFieldStepImpl<PDF extends SearchPredicateFactory>
 	}
 
 	@Override
-	public AvgAggregationOptionsStep<?, PDF> field(String fieldPath) {
-		SearchFilterableAggregationBuilder<Double> builder = dslContext.scope()
-				.fieldQueryElement( fieldPath, AggregationTypeKeys.AVG );
+	public <F> AvgAggregationOptionsStep<?, PDF, F> field(String fieldPath, Class<F> type,
+			ValueConvert convert) {
+		Contracts.assertNotNull( fieldPath, "fieldPath" );
+		Contracts.assertNotNull( type, "type" );
+		FieldMetricAggregationBuilder<F> builder = dslContext.scope()
+				.fieldQueryElement( fieldPath, AggregationTypeKeys.AVG ).type( type, convert );
 		return new AvgAggregationOptionsStepImpl<>( builder, dslContext );
 	}
 }
