@@ -15,6 +15,7 @@ import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaObjectF
 import org.hibernate.search.engine.backend.types.Aggregable;
 import org.hibernate.search.engine.backend.types.ObjectStructure;
 import org.hibernate.search.engine.search.aggregation.AggregationKey;
+import org.hibernate.search.engine.search.common.ValueConvert;
 import org.hibernate.search.engine.search.query.SearchQuery;
 import org.hibernate.search.engine.search.query.SearchResult;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.extension.SearchSetupHelper;
@@ -34,6 +35,7 @@ public class ElasticsearchMetricAggregationsIT {
 	private final SimpleMappedIndex<IndexBinding> mainIndex = SimpleMappedIndex.of( IndexBinding::new ).name( "main" );
 	private final AggregationKey<Integer> sumIntegers = AggregationKey.of( "sumIntegers" );
 	private final AggregationKey<String> sumConverted = AggregationKey.of( "sumConverted" );
+	private final AggregationKey<Integer> sumConvertedNoConversion = AggregationKey.of( "sumConvertedNoConversion" );
 	private final AggregationKey<Integer> sumFiltered = AggregationKey.of( "sumFiltered" );
 	private final AggregationKey<Integer> minIntegers = AggregationKey.of( "minIntegers" );
 	private final AggregationKey<String> minConverted = AggregationKey.of( "minConverted" );
@@ -61,6 +63,7 @@ public class ElasticsearchMetricAggregationsIT {
 				.where( f -> f.match().field( "style" ).matching( "bla" ) )
 				.aggregation( sumIntegers, f -> f.sum().field( "integer", Integer.class ) )
 				.aggregation( sumConverted, f -> f.sum().field( "converted", String.class ) )
+				.aggregation( sumConvertedNoConversion, f -> f.sum().field( "converted", Integer.class, ValueConvert.NO ) )
 				.aggregation( sumFiltered, f -> f.sum().field( "object.nestedInteger", Integer.class )
 						.filter( ff -> ff.range().field( "object.nestedInteger" ).atLeast( 5 ) ) )
 				.aggregation( minIntegers, f -> f.min().field( "integer", Integer.class ) )
@@ -81,6 +84,7 @@ public class ElasticsearchMetricAggregationsIT {
 		SearchResult<DocumentReference> result = query.fetch( 0 );
 		assertThat( result.aggregation( sumIntegers ) ).isEqualTo( 29 );
 		assertThat( result.aggregation( sumConverted ) ).isEqualTo( "29" );
+		assertThat( result.aggregation( sumConvertedNoConversion ) ).isEqualTo( 29 );
 		assertThat( result.aggregation( sumFiltered ) ).isEqualTo( 23 );
 		assertThat( result.aggregation( minIntegers ) ).isEqualTo( 3 );
 		assertThat( result.aggregation( minConverted ) ).isEqualTo( "3" );
@@ -103,6 +107,7 @@ public class ElasticsearchMetricAggregationsIT {
 				.where( f -> f.matchAll() )
 				.aggregation( sumIntegers, f -> f.sum().field( "integer", Integer.class ) )
 				.aggregation( sumConverted, f -> f.sum().field( "converted", String.class ) )
+				.aggregation( sumConvertedNoConversion, f -> f.sum().field( "converted", Integer.class, ValueConvert.NO ) )
 				.aggregation( sumFiltered, f -> f.sum().field( "object.nestedInteger", Integer.class )
 						.filter( ff -> ff.range().field( "object.nestedInteger" ).atLeast( 5 ) ) )
 				.aggregation( minIntegers, f -> f.min().field( "integer", Integer.class ) )
@@ -123,6 +128,7 @@ public class ElasticsearchMetricAggregationsIT {
 		SearchResult<DocumentReference> result = query.fetch( 0 );
 		assertThat( result.aggregation( sumIntegers ) ).isEqualTo( 55 );
 		assertThat( result.aggregation( sumConverted ) ).isEqualTo( "55" );
+		assertThat( result.aggregation( sumConvertedNoConversion ) ).isEqualTo( 55 );
 		assertThat( result.aggregation( sumFiltered ) ).isEqualTo( 59 );
 		assertThat( result.aggregation( minIntegers ) ).isEqualTo( -10 );
 		assertThat( result.aggregation( minConverted ) ).isEqualTo( "-10" );
