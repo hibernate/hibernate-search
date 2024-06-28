@@ -6,6 +6,9 @@ package org.hibernate.search.integrationtest.backend.elasticsearch.tmp;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import java.time.LocalDate;
+import java.time.Month;
+
 import org.hibernate.search.engine.backend.common.DocumentReference;
 import org.hibernate.search.engine.backend.document.DocumentElement;
 import org.hibernate.search.engine.backend.document.IndexFieldReference;
@@ -29,28 +32,26 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
 
-public class ElasticsearchMetricAggregationsIT {
+public class ElasticsearchMetricTemporalFieldsAggregationsIT {
 
 	@RegisterExtension
 	public static final SearchSetupHelper setupHelper = SearchSetupHelper.create();
 
 	private final SimpleMappedIndex<IndexBinding> mainIndex = SimpleMappedIndex.of( IndexBinding::new ).name( "main" );
-	private final AggregationKey<Integer> sumIntegers = AggregationKey.of( "sumIntegers" );
+	private final AggregationKey<LocalDate> sumDates = AggregationKey.of( "sumDates" );
 	private final AggregationKey<String> sumConverted = AggregationKey.of( "sumConverted" );
-	private final AggregationKey<Integer> sumConvertedNoConversion = AggregationKey.of( "sumConvertedNoConversion" );
-	private final AggregationKey<Integer> sumFiltered = AggregationKey.of( "sumFiltered" );
-	private final AggregationKey<Integer> minIntegers = AggregationKey.of( "minIntegers" );
+	private final AggregationKey<LocalDate> sumConvertedNoConversion = AggregationKey.of( "sumConvertedNoConversion" );
+	private final AggregationKey<LocalDate> sumFiltered = AggregationKey.of( "sumFiltered" );
+	private final AggregationKey<LocalDate> minDates = AggregationKey.of( "minDates" );
 	private final AggregationKey<String> minConverted = AggregationKey.of( "minConverted" );
-	private final AggregationKey<Integer> maxIntegers = AggregationKey.of( "maxIntegers" );
+	private final AggregationKey<LocalDate> maxDates = AggregationKey.of( "maxDates" );
 	private final AggregationKey<String> maxConverted = AggregationKey.of( "maxConverted" );
-	private final AggregationKey<Long> countIntegers = AggregationKey.of( "countIntegers" );
+	private final AggregationKey<Long> countDates = AggregationKey.of( "countDates" );
 	private final AggregationKey<Long> countConverted = AggregationKey.of( "countConverted" );
-	private final AggregationKey<Long> countDistinctIntegers = AggregationKey.of( "countDistinctIntegers" );
+	private final AggregationKey<Long> countDistinctDates = AggregationKey.of( "countDistinctDates" );
 	private final AggregationKey<Long> countDistinctConverted = AggregationKey.of( "countDistinctConverted" );
-	private final AggregationKey<Integer> avgIntegers = AggregationKey.of( "avgIntegers" );
+	private final AggregationKey<LocalDate> avgDates = AggregationKey.of( "avgDates" );
 	private final AggregationKey<String> avgConverted = AggregationKey.of( "avgConverted" );
-	private final AggregationKey<Double> avgIntegersAsDouble = AggregationKey.of( "avgIntegersAsDouble" );
-	private final AggregationKey<Double> avgIntegersAsDoubleFiltered = AggregationKey.of( "avgIntegersAsDoubleFiltered" );
 
 	@BeforeEach
 	void setup() {
@@ -66,22 +67,20 @@ public class ElasticsearchMetricAggregationsIT {
 		SearchQuery<DocumentReference> query = defineAggregations( options );
 
 		SearchResult<DocumentReference> result = query.fetch( 0 );
-		assertThat( result.aggregation( sumIntegers ) ).isEqualTo( 29 );
-		assertThat( result.aggregation( sumConverted ) ).isEqualTo( "29" );
-		assertThat( result.aggregation( sumConvertedNoConversion ) ).isEqualTo( 29 );
-		assertThat( result.aggregation( sumFiltered ) ).isEqualTo( 23 );
-		assertThat( result.aggregation( minIntegers ) ).isEqualTo( 3 );
-		assertThat( result.aggregation( minConverted ) ).isEqualTo( "3" );
-		assertThat( result.aggregation( maxIntegers ) ).isEqualTo( 9 );
-		assertThat( result.aggregation( maxConverted ) ).isEqualTo( "9" );
-		assertThat( result.aggregation( countIntegers ) ).isEqualTo( 5 );
+		assertThat( result.aggregation( sumDates ) ).isEqualTo( LocalDate.of( 2204, Month.SEPTEMBER, 16 ) );
+		assertThat( result.aggregation( sumConverted ) ).isEqualTo( "2204-09-16" );
+		assertThat( result.aggregation( sumConvertedNoConversion ) ).isEqualTo( LocalDate.of( 2204, Month.SEPTEMBER, 16 ) );
+		assertThat( result.aggregation( sumFiltered ) ).isEqualTo( LocalDate.of( 2063, Month.NOVEMBER, 25 ) );
+		assertThat( result.aggregation( minDates ) ).isEqualTo( LocalDate.of( 2016, Month.DECEMBER, 6 ) );
+		assertThat( result.aggregation( minConverted ) ).isEqualTo( "2016-12-06" );
+		assertThat( result.aggregation( maxDates ) ).isEqualTo( LocalDate.of( 2016, Month.DECEMBER, 14 ) );
+		assertThat( result.aggregation( maxConverted ) ).isEqualTo( "2016-12-14" );
+		assertThat( result.aggregation( countDates ) ).isEqualTo( 5 );
 		assertThat( result.aggregation( countConverted ) ).isEqualTo( 5 );
-		assertThat( result.aggregation( countDistinctIntegers ) ).isEqualTo( 3 );
-		assertThat( result.aggregation( countDistinctConverted ) ).isEqualTo( 3 );
-		assertThat( result.aggregation( avgIntegers ) ).isEqualTo( 5 );
-		assertThat( result.aggregation( avgConverted ) ).isEqualTo( "5" );
-		assertThat( result.aggregation( avgIntegersAsDouble ) ).isEqualTo( 5.8 );
-		assertThat( result.aggregation( avgIntegersAsDoubleFiltered ) ).isEqualTo( 7.666666666666667 );
+		assertThat( result.aggregation( countDistinctDates ) ).isEqualTo( 5 );
+		assertThat( result.aggregation( countDistinctConverted ) ).isEqualTo( 5 );
+		assertThat( result.aggregation( avgDates ) ).isEqualTo( LocalDate.of( 2016, Month.DECEMBER, 10 ) );
+		assertThat( result.aggregation( avgConverted ) ).isEqualTo( "2016-12-10" );
 	}
 
 	@Test
@@ -92,50 +91,47 @@ public class ElasticsearchMetricAggregationsIT {
 		SearchQuery<DocumentReference> query = defineAggregations( options );
 
 		SearchResult<DocumentReference> result = query.fetch( 0 );
-		assertThat( result.aggregation( sumIntegers ) ).isEqualTo( 55 );
-		assertThat( result.aggregation( sumConverted ) ).isEqualTo( "55" );
-		assertThat( result.aggregation( sumConvertedNoConversion ) ).isEqualTo( 55 );
-		assertThat( result.aggregation( sumFiltered ) ).isEqualTo( 59 );
-		assertThat( result.aggregation( minIntegers ) ).isEqualTo( -10 );
-		assertThat( result.aggregation( minConverted ) ).isEqualTo( "-10" );
-		assertThat( result.aggregation( maxIntegers ) ).isEqualTo( 18 );
-		assertThat( result.aggregation( maxConverted ) ).isEqualTo( "18" );
-		assertThat( result.aggregation( countIntegers ) ).isEqualTo( 10 );
+		assertThat( result.aggregation( sumDates ) ).isEqualTo( LocalDate.of( 2439, Month.JUNE, 6 ) );
+		assertThat( result.aggregation( sumConverted ) ).isEqualTo( "2439-06-06" );
+		assertThat( result.aggregation( sumConvertedNoConversion ) ).isEqualTo( LocalDate.of( 2439, Month.JUNE, 6 ) );
+		assertThat( result.aggregation( sumFiltered ) ).isEqualTo( LocalDate.of( 2204, Month.OCTOBER, 1 ) );
+		assertThat( result.aggregation( minDates ) ).isEqualTo( LocalDate.of( 2016, Month.DECEMBER, 6 ) );
+		assertThat( result.aggregation( minConverted ) ).isEqualTo( "2016-12-06" );
+		assertThat( result.aggregation( maxDates ) ).isEqualTo( LocalDate.of( 2016, Month.DECEMBER, 15 ) );
+		assertThat( result.aggregation( maxConverted ) ).isEqualTo( "2016-12-15" );
+		assertThat( result.aggregation( countDates ) ).isEqualTo( 10 );
 		assertThat( result.aggregation( countConverted ) ).isEqualTo( 10 );
-		assertThat( result.aggregation( countDistinctIntegers ) ).isEqualTo( 6 );
-		assertThat( result.aggregation( countDistinctConverted ) ).isEqualTo( 6 );
-		assertThat( result.aggregation( avgIntegers ) ).isEqualTo( 5 );
-		assertThat( result.aggregation( avgConverted ) ).isEqualTo( "5" );
-		assertThat( result.aggregation( avgIntegersAsDouble ) ).isEqualTo( 5.5 );
-		assertThat( result.aggregation( avgIntegersAsDoubleFiltered ) ).isEqualTo( 11.8 );
+		assertThat( result.aggregation( countDistinctDates ) ).isEqualTo( 10 );
+		assertThat( result.aggregation( countDistinctConverted ) ).isEqualTo( 10 );
+		assertThat( result.aggregation( avgDates ) ).isEqualTo( LocalDate.of( 2016, Month.DECEMBER, 10 ) );
+		assertThat( result.aggregation( avgConverted ) ).isEqualTo( "2016-12-10" );
 	}
 
 	private SearchQuery<DocumentReference> defineAggregations(
 			SearchQueryOptionsStep<?, DocumentReference, StubLoadingOptionsStep, ?, ?> options) {
 		return options
-				.aggregation( sumIntegers, f -> f.sum().field( "integer", Integer.class ) )
+				.aggregation( sumDates, f -> f.sum().field( "date", LocalDate.class ) )
 				.aggregation( sumConverted, f -> f.sum().field( "converted", String.class ) )
 				.aggregation(
-						sumConvertedNoConversion, f -> f.sum().field( "converted", Integer.class, ValueConvert.NO ) )
-				.aggregation( sumFiltered, f -> f.sum().field( "object.nestedInteger", Integer.class )
-						.filter( ff -> ff.range().field( "object.nestedInteger" ).atLeast( 5 ) ) )
-				.aggregation( minIntegers, f -> f.min().field( "integer", Integer.class ) )
+						sumConvertedNoConversion, f -> f.sum().field( "converted", LocalDate.class, ValueConvert.NO ) )
+				.aggregation( sumFiltered, f -> f.sum().field( "object.nestedDate", LocalDate.class )
+						.filter( ff -> ff.range().field( "object.nestedDate" )
+								.atLeast( LocalDate.of( 2016, Month.DECEMBER, 11 ) ) ) )
+				.aggregation( minDates, f -> f.min().field( "date", LocalDate.class ) )
 				.aggregation( minConverted, f -> f.min().field( "converted", String.class ) )
-				.aggregation( maxIntegers, f -> f.max().field( "integer", Integer.class ) )
+				.aggregation( maxDates, f -> f.max().field( "date", LocalDate.class ) )
 				.aggregation( maxConverted, f -> f.max().field( "converted", String.class ) )
-				.aggregation( countIntegers, f -> f.count().field( "integer" ) )
+				.aggregation( countDates, f -> f.count().field( "date" ) )
 				.aggregation( countConverted, f -> f.count().field( "converted" ) )
-				.aggregation( countDistinctIntegers, f -> f.countDistinct().field( "integer" ) )
+				.aggregation( countDistinctDates, f -> f.countDistinct().field( "date" ) )
 				.aggregation( countDistinctConverted, f -> f.countDistinct().field( "converted" ) )
-				.aggregation( avgIntegers, f -> f.avg().field( "integer", Integer.class ) )
+				.aggregation( avgDates, f -> f.avg().field( "date", LocalDate.class ) )
 				.aggregation( avgConverted, f -> f.avg().field( "converted", String.class ) )
-				.aggregation( avgIntegersAsDouble, f -> f.avg().field( "integer", Double.class ) )
-				.aggregation( avgIntegersAsDoubleFiltered, f -> f.avg().field( "object.nestedInteger", Double.class )
-						.filter( ff -> ff.range().field( "object.nestedInteger" ).atLeast( 5 ) ) )
 				.toQuery();
 	}
 
 	private void initData() {
+		LocalDate baseDate = LocalDate.of( 2016, Month.DECEMBER, 6 );
 		int[] integers = new int[] { 9, 18, 3, 18, 7, -10, 3, 0, 7, 0 };
 		String[] styles = new String[] { "bla", "aaa" };
 
@@ -144,37 +140,37 @@ public class ElasticsearchMetricAggregationsIT {
 			int value = integers[i];
 			String style = styles[i % 2];
 			String id = i + ":" + value + ":" + style;
+			LocalDate date = baseDate.plusDays( i );
 
 			bulkIndexer.add( id, document -> {
-				document.addValue( mainIndex.binding().integer, value );
-				document.addValue( mainIndex.binding().converted, value );
+				document.addValue( mainIndex.binding().date, date );
+				document.addValue( mainIndex.binding().converted, date );
 				document.addValue( mainIndex.binding().style, style );
 
 				DocumentElement object = document.addObject( mainIndex.binding().object );
-				object.addValue( mainIndex.binding().nestedInteger, value );
+				object.addValue( mainIndex.binding().nestedDate, date );
 			} );
 		}
-		bulkIndexer.add( "empty", document -> {} )
-				.join();
+		bulkIndexer.add( "empty", document -> {} ).join();
 	}
 
 	@SuppressWarnings("unused")
 	private static class IndexBinding {
-		final IndexFieldReference<Integer> integer;
-		final IndexFieldReference<Integer> converted;
+		final IndexFieldReference<LocalDate> date;
+		final IndexFieldReference<LocalDate> converted;
 		final IndexFieldReference<String> style;
 		final IndexObjectFieldReference object;
-		final IndexFieldReference<Integer> nestedInteger;
+		final IndexFieldReference<LocalDate> nestedDate;
 
 		IndexBinding(IndexSchemaElement root) {
-			integer = root.field( "integer", f -> f.asInteger().aggregable( Aggregable.YES ) ).toReference();
-			converted = root.field( "converted", f -> f.asInteger().aggregable( Aggregable.YES )
+			date = root.field( "date", f -> f.asLocalDate().aggregable( Aggregable.YES ) ).toReference();
+			converted = root.field( "converted", f -> f.asLocalDate().aggregable( Aggregable.YES )
 					.projectionConverter( String.class, (value, context) -> value.toString() ) ).toReference();
 			style = root.field( "style", f -> f.asString() ).toReference();
 
 			IndexSchemaObjectField nested = root.objectField( "object", ObjectStructure.NESTED );
 			object = nested.toReference();
-			nestedInteger = nested.field( "nestedInteger", f -> f.asInteger().aggregable( Aggregable.YES ) )
+			nestedDate = nested.field( "nestedDate", f -> f.asLocalDate().aggregable( Aggregable.YES ) )
 					.toReference();
 		}
 	}
