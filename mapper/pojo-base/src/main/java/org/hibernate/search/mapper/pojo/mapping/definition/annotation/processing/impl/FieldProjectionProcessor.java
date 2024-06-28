@@ -14,6 +14,7 @@ public final class FieldProjectionProcessor
 		implements MethodParameterMappingAnnotationProcessor<FieldProjection> {
 
 	@Override
+	@SuppressWarnings("deprecation")
 	public void process(MethodParameterMappingStep mapping, FieldProjection annotation,
 			MethodParameterMappingAnnotationProcessorContext context) {
 		mapping.projection( FieldProjectionBinder.create( context.toNullIfDefault( annotation.path(), "" ) )

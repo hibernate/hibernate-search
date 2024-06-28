@@ -7,7 +7,7 @@ package org.hibernate.search.engine.search.predicate.dsl;
 import java.util.Arrays;
 import java.util.Collection;
 
-import org.hibernate.search.engine.search.common.ValueConvert;
+import org.hibernate.search.engine.search.common.PredicateValueConvert;
 import org.hibernate.search.util.common.data.Range;
 import org.hibernate.search.util.common.data.RangeBoundInclusion;
 
@@ -25,15 +25,15 @@ public interface RangePredicateMatchingStep<N extends RangePredicateOptionsStep<
 	 * @param lowerBound The lower bound of the range. {@code null} means {@code -Infinity} (no lower bound).
 	 * The signature of this method defines this parameter as an {@link Object},
 	 * but a specific type is expected depending on the targeted field.
-	 * See {@link ValueConvert#YES} for more information.
+	 * See {@link PredicateValueConvert#MAPPING} for more information.
 	 * @param upperBound The upper bound of the range. {@code null} means {@code +Infinity} (no upper bound).
 	 * The signature of this method defines this parameter as an {@link Object},
 	 * but a specific type is expected depending on the targeted field.
-	 * See {@link ValueConvert#YES} for more information.
+	 * See {@link PredicateValueConvert#MAPPING} for more information.
 	 * @return The next step.
 	 */
 	default N between(Object lowerBound, Object upperBound) {
-		return between( lowerBound, upperBound, ValueConvert.YES );
+		return between( lowerBound, upperBound, PredicateValueConvert.MAPPING );
 	}
 
 	/**
@@ -43,17 +43,41 @@ public interface RangePredicateMatchingStep<N extends RangePredicateOptionsStep<
 	 * @param lowerBound The lower bound of the range. {@code null} means {@code -Infinity} (no lower bound).
 	 * The signature of this method defines this parameter as an {@link Object},
 	 * but a specific type is expected depending on the targeted field and on the {@code convert} parameter.
-	 * See {@link ValueConvert} for more information.
+	 * See {@link org.hibernate.search.engine.search.common.ValueConvert} for more information.
 	 * @param upperBound The upper bound of the range. {@code null} means {@code +Infinity} (no upper bound).
 	 * The signature of this method defines this parameter as an {@link Object},
 	 * but a specific type is expected depending on the targeted field and on the {@code convert} parameter.
-	 * See {@link ValueConvert} for more information.
+	 * See {@link org.hibernate.search.engine.search.common.ValueConvert} for more information.
 	 * @param convert Controls how {@code lowerBoundValue} should be converted
 	 * before Hibernate Search attempts to interpret it as a field value.
-	 * See {@link ValueConvert} for more information.
+	 * See {@link org.hibernate.search.engine.search.common.ValueConvert} for more information.
+	 * @return The next step.
+	 * @deprecated Use {@link #between(Object, Object, PredicateValueConvert)} instead.
+	 */
+	@Deprecated
+	default N between(Object lowerBound, Object upperBound, org.hibernate.search.engine.search.common.ValueConvert convert) {
+		return between( Range.between( lowerBound, upperBound ),
+				org.hibernate.search.engine.search.common.ValueConvert.toPredicateValueConvert( convert ) );
+	}
+
+	/**
+	 * Require at least one of the targeted fields to be in the range
+	 * defined by the given bounds.
+	 *
+	 * @param lowerBound The lower bound of the range. {@code null} means {@code -Infinity} (no lower bound).
+	 * The signature of this method defines this parameter as an {@link Object},
+	 * but a specific type is expected depending on the targeted field and on the {@code convert} parameter.
+	 * See {@link PredicateValueConvert} for more information.
+	 * @param upperBound The upper bound of the range. {@code null} means {@code +Infinity} (no upper bound).
+	 * The signature of this method defines this parameter as an {@link Object},
+	 * but a specific type is expected depending on the targeted field and on the {@code convert} parameter.
+	 * See {@link PredicateValueConvert} for more information.
+	 * @param convert Controls how {@code lowerBoundValue} should be converted
+	 * before Hibernate Search attempts to interpret it as a field value.
+	 * See {@link PredicateValueConvert} for more information.
 	 * @return The next step.
 	 */
-	default N between(Object lowerBound, Object upperBound, ValueConvert convert) {
+	default N between(Object lowerBound, Object upperBound, PredicateValueConvert convert) {
 		return within( Range.between( lowerBound, upperBound ), convert );
 	}
 
@@ -64,12 +88,12 @@ public interface RangePredicateMatchingStep<N extends RangePredicateOptionsStep<
 	 * @param lowerBound The lower bound of the range. {@code null} means {@code -Infinity} (no lower bound).
 	 * The signature of this method defines this parameter as an {@link Object},
 	 * but a specific type is expected depending on the targeted field.
-	 * See {@link ValueConvert#YES} for more information.
+	 * See {@link PredicateValueConvert#MAPPING} for more information.
 	 * @param lowerBoundInclusion Whether the lower bound is included in the range or excluded.
 	 * @param upperBound The upper bound of the range. {@code null} means {@code +Infinity} (no upper bound).
 	 * The signature of this method defines this parameter as an {@link Object},
 	 * but a specific type is expected depending on the targeted field.
-	 * See {@link ValueConvert#YES} for more information.
+	 * See {@link PredicateValueConvert#MAPPING} for more information.
 	 * @param upperBoundInclusion Whether the upper bound is included in the range or excluded.
 	 * @return The next step.
 	 */
@@ -85,11 +109,11 @@ public interface RangePredicateMatchingStep<N extends RangePredicateOptionsStep<
 	 * @param lowerBoundValue The lower bound of the range, included. Must not be null.
 	 * The signature of this method defines this parameter as an {@link Object},
 	 * but a specific type is expected depending on the targeted field.
-	 * See {@link ValueConvert#YES} for more information.
+	 * See {@link PredicateValueConvert#MAPPING} for more information.
 	 * @return The next step.
 	 */
 	default N atLeast(Object lowerBoundValue) {
-		return atLeast( lowerBoundValue, ValueConvert.YES );
+		return atLeast( lowerBoundValue, PredicateValueConvert.MAPPING );
 	}
 
 	/**
@@ -99,13 +123,33 @@ public interface RangePredicateMatchingStep<N extends RangePredicateOptionsStep<
 	 * @param lowerBoundValue The lower bound of the range, included. Must not be null.
 	 * The signature of this method defines this parameter as an {@link Object},
 	 * but a specific type is expected depending on the targeted field and on the {@code convert} parameter.
-	 * See {@link ValueConvert} for more information.
+	 * See {@link org.hibernate.search.engine.search.common.ValueConvert} for more information.
 	 * @param convert Controls how {@code lowerBoundValue} should be converted
 	 * before Hibernate Search attempts to interpret it as a field value.
-	 * See {@link ValueConvert} for more information.
+	 * See {@link org.hibernate.search.engine.search.common.ValueConvert} for more information.
+	 * @return The next step.
+	 * @deprecated Use {@link #atLeast(Object, PredicateValueConvert)} instead.
+	 */
+	@Deprecated
+	default N atLeast(Object lowerBoundValue, org.hibernate.search.engine.search.common.ValueConvert convert) {
+		return within( Range.atLeast( lowerBoundValue ),
+				org.hibernate.search.engine.search.common.ValueConvert.toPredicateValueConvert( convert ) );
+	}
+
+	/**
+	 * Require at least one of the targeted fields to be "greater than or equal to" the given value,
+	 * with no limit as to how high it can be.
+	 *
+	 * @param lowerBoundValue The lower bound of the range, included. Must not be null.
+	 * The signature of this method defines this parameter as an {@link Object},
+	 * but a specific type is expected depending on the targeted field and on the {@code convert} parameter.
+	 * See {@link PredicateValueConvert} for more information.
+	 * @param convert Controls how {@code lowerBoundValue} should be converted
+	 * before Hibernate Search attempts to interpret it as a field value.
+	 * See {@link PredicateValueConvert} for more information.
 	 * @return The next step.
 	 */
-	default N atLeast(Object lowerBoundValue, ValueConvert convert) {
+	default N atLeast(Object lowerBoundValue, PredicateValueConvert convert) {
 		return within( Range.atLeast( lowerBoundValue ), convert );
 	}
 
@@ -116,11 +160,11 @@ public interface RangePredicateMatchingStep<N extends RangePredicateOptionsStep<
 	 * @param lowerBoundValue The lower bound of the range, excluded. Must not be null.
 	 * The signature of this method defines this parameter as an {@link Object},
 	 * but a specific type is expected depending on the targeted field.
-	 * See {@link ValueConvert#YES} for more information.
+	 * See {@link PredicateValueConvert#MAPPING} for more information.
 	 * @return The next step.
 	 */
 	default N greaterThan(Object lowerBoundValue) {
-		return greaterThan( lowerBoundValue, ValueConvert.YES );
+		return greaterThan( lowerBoundValue, PredicateValueConvert.MAPPING );
 	}
 
 	/**
@@ -130,13 +174,33 @@ public interface RangePredicateMatchingStep<N extends RangePredicateOptionsStep<
 	 * @param lowerBoundValue The lower bound of the range, excluded. Must not be null.
 	 * The signature of this method defines this parameter as an {@link Object},
 	 * but a specific type is expected depending on the targeted field and on the {@code convert} parameter.
-	 * See {@link ValueConvert} for more information.
+	 * See {@link org.hibernate.search.engine.search.common.ValueConvert} for more information.
 	 * @param convert Controls how {@code lowerBoundValue} should be converted
 	 * before Hibernate Search attempts to interpret it as a field value.
-	 * See {@link ValueConvert} for more information.
+	 * See {@link org.hibernate.search.engine.search.common.ValueConvert} for more information.
+	 * @return The next step.
+	 * @deprecated Use {@link #greaterThan(Object, PredicateValueConvert)} instead.
+	 */
+	@Deprecated
+	default N greaterThan(Object lowerBoundValue, org.hibernate.search.engine.search.common.ValueConvert convert) {
+		return within( Range.greaterThan( lowerBoundValue ),
+				org.hibernate.search.engine.search.common.ValueConvert.toPredicateValueConvert( convert ) );
+	}
+
+	/**
+	 * Require at least one of the targeted fields to be "strictly greater than" the given value,
+	 * with no limit as to how high it can be.
+	 *
+	 * @param lowerBoundValue The lower bound of the range, excluded. Must not be null.
+	 * The signature of this method defines this parameter as an {@link Object},
+	 * but a specific type is expected depending on the targeted field and on the {@code convert} parameter.
+	 * See {@link PredicateValueConvert} for more information.
+	 * @param convert Controls how {@code lowerBoundValue} should be converted
+	 * before Hibernate Search attempts to interpret it as a field value.
+	 * See {@link PredicateValueConvert} for more information.
 	 * @return The next step.
 	 */
-	default N greaterThan(Object lowerBoundValue, ValueConvert convert) {
+	default N greaterThan(Object lowerBoundValue, PredicateValueConvert convert) {
 		return within( Range.greaterThan( lowerBoundValue ), convert );
 	}
 
@@ -147,11 +211,11 @@ public interface RangePredicateMatchingStep<N extends RangePredicateOptionsStep<
 	 * @param upperBoundValue The upper bound of the range, included. Must not be null.
 	 * The signature of this method defines this parameter as an {@link Object},
 	 * but a specific type is expected depending on the targeted field.
-	 * See {@link ValueConvert#YES} for more information.
+	 * See {@link PredicateValueConvert#MAPPING} for more information.
 	 * @return The next step.
 	 */
 	default N atMost(Object upperBoundValue) {
-		return atMost( upperBoundValue, ValueConvert.YES );
+		return atMost( upperBoundValue, PredicateValueConvert.MAPPING );
 	}
 
 	/**
@@ -161,13 +225,33 @@ public interface RangePredicateMatchingStep<N extends RangePredicateOptionsStep<
 	 * @param upperBoundValue The upper bound of the range, included. Must not be null.
 	 * The signature of this method defines this parameter as an {@link Object},
 	 * but a specific type is expected depending on the targeted field and on the {@code convert} parameter.
-	 * See {@link ValueConvert} for more information.
+	 * See {@link org.hibernate.search.engine.search.common.ValueConvert} for more information.
 	 * @param convert Controls how {@code upperBoundValue} should be converted
 	 * before Hibernate Search attempts to interpret it as a field value.
-	 * See {@link ValueConvert} for more information.
+	 * See {@link org.hibernate.search.engine.search.common.ValueConvert} for more information.
+	 * @return The next step.
+	 * @deprecated Use {@link #atMost(Object, PredicateValueConvert)} instead.
+	 */
+	@Deprecated
+	default N atMost(Object upperBoundValue, org.hibernate.search.engine.search.common.ValueConvert convert) {
+		return within( Range.atMost( upperBoundValue ),
+				org.hibernate.search.engine.search.common.ValueConvert.toPredicateValueConvert( convert ) );
+	}
+
+	/**
+	 * Require at least one of the targeted fields to be "lesser than or equal to" the given value,
+	 * with no limit as to how low it can be.
+	 *
+	 * @param upperBoundValue The upper bound of the range, included. Must not be null.
+	 * The signature of this method defines this parameter as an {@link Object},
+	 * but a specific type is expected depending on the targeted field and on the {@code convert} parameter.
+	 * See {@link PredicateValueConvert} for more information.
+	 * @param convert Controls how {@code upperBoundValue} should be converted
+	 * before Hibernate Search attempts to interpret it as a field value.
+	 * See {@link PredicateValueConvert} for more information.
 	 * @return The next step.
 	 */
-	default N atMost(Object upperBoundValue, ValueConvert convert) {
+	default N atMost(Object upperBoundValue, PredicateValueConvert convert) {
 		return within( Range.atMost( upperBoundValue ), convert );
 	}
 
@@ -178,11 +262,11 @@ public interface RangePredicateMatchingStep<N extends RangePredicateOptionsStep<
 	 * @param upperBoundValue The upper bound of the range, excluded. Must not be null.
 	 * The signature of this method defines this parameter as an {@link Object},
 	 * but a specific type is expected depending on the targeted field.
-	 * See {@link ValueConvert#YES} for more information.
+	 * See {@link PredicateValueConvert#MAPPING} for more information.
 	 * @return The next step.
 	 */
 	default N lessThan(Object upperBoundValue) {
-		return lessThan( upperBoundValue, ValueConvert.YES );
+		return lessThan( upperBoundValue, PredicateValueConvert.MAPPING );
 	}
 
 	/**
@@ -192,13 +276,32 @@ public interface RangePredicateMatchingStep<N extends RangePredicateOptionsStep<
 	 * @param upperBoundValue The upper bound of the range, excluded. Must not be null.
 	 * The signature of this method defines this parameter as an {@link Object},
 	 * but a specific type is expected depending on the targeted field and on the {@code convert} parameter.
-	 * See {@link ValueConvert} for more information.
+	 * See {@link org.hibernate.search.engine.search.common.ValueConvert} for more information.
 	 * @param convert Controls how {@code upperBoundValue} should be converted
 	 * before Hibernate Search attempts to interpret it as a field value.
-	 * See {@link ValueConvert} for more information.
+	 * See {@link org.hibernate.search.engine.search.common.ValueConvert} for more information.
 	 * @return The next step.
 	 */
-	default N lessThan(Object upperBoundValue, ValueConvert convert) {
+	@Deprecated
+	default N lessThan(Object upperBoundValue, org.hibernate.search.engine.search.common.ValueConvert convert) {
+		return within( Range.lessThan( upperBoundValue ),
+				org.hibernate.search.engine.search.common.ValueConvert.toPredicateValueConvert( convert ) );
+	}
+
+	/**
+	 * Require at least one of the targeted fields to be "lesser than" the given value,
+	 * with no limit as to how low it can be.
+	 *
+	 * @param upperBoundValue The upper bound of the range, excluded. Must not be null.
+	 * The signature of this method defines this parameter as an {@link Object},
+	 * but a specific type is expected depending on the targeted field and on the {@code convert} parameter.
+	 * See {@link PredicateValueConvert} for more information.
+	 * @param convert Controls how {@code upperBoundValue} should be converted
+	 * before Hibernate Search attempts to interpret it as a field value.
+	 * See {@link PredicateValueConvert} for more information.
+	 * @return The next step.
+	 */
+	default N lessThan(Object upperBoundValue, PredicateValueConvert convert) {
 		return within( Range.lessThan( upperBoundValue ), convert );
 	}
 
@@ -208,13 +311,13 @@ public interface RangePredicateMatchingStep<N extends RangePredicateOptionsStep<
 	 * @param range The range to match.
 	 * The signature of this method defines this parameter as a range with bounds of any type,
 	 * but a specific type is expected depending on the targeted field.
-	 * See {@link ValueConvert#YES} for more information.
+	 * See {@link PredicateValueConvert#MAPPING} for more information.
 	 * @return The next step.
 	 * @deprecated Use {@link #within(Range)} instead.
 	 */
 	@Deprecated
 	default N range(Range<?> range) {
-		return within( range, ValueConvert.YES );
+		return within( range, PredicateValueConvert.MAPPING );
 	}
 
 	/**
@@ -223,15 +326,15 @@ public interface RangePredicateMatchingStep<N extends RangePredicateOptionsStep<
 	 * @param range The range to match.
 	 * The signature of this method defines this parameter as a range with bounds of any type,
 	 * but a specific type is expected depending on the targeted field and on the {@code convert} parameter.
-	 * See {@link ValueConvert} for more information.
+	 * See {@link org.hibernate.search.engine.search.common.ValueConvert} for more information.
 	 * @param convert Controls how the range bounds should be converted
 	 * before Hibernate Search attempts to interpret them as a field value.
-	 * See {@link ValueConvert} for more information.
+	 * See {@link org.hibernate.search.engine.search.common.ValueConvert} for more information.
 	 * @return The next step.
-	 * @deprecated Use {@link #within(Range, ValueConvert)} instead.
+	 * @deprecated Use {@link #within(Range, org.hibernate.search.engine.search.common.ValueConvert)} instead.
 	 */
 	@Deprecated
-	default N range(Range<?> range, ValueConvert convert) {
+	default N range(Range<?> range, org.hibernate.search.engine.search.common.ValueConvert convert) {
 		return within( range, convert );
 	}
 
@@ -241,11 +344,11 @@ public interface RangePredicateMatchingStep<N extends RangePredicateOptionsStep<
 	 * @param range The range to match.
 	 * The signature of this method defines this parameter as a range with bounds of any type,
 	 * but a specific type is expected depending on the targeted field.
-	 * See {@link ValueConvert#YES} for more information.
+	 * See {@link PredicateValueConvert#MAPPING} for more information.
 	 * @return The next step.
 	 */
 	default N within(Range<?> range) {
-		return within( range, ValueConvert.YES );
+		return within( range, PredicateValueConvert.MAPPING );
 	}
 
 	/**
@@ -254,13 +357,31 @@ public interface RangePredicateMatchingStep<N extends RangePredicateOptionsStep<
 	 * @param range The range to match.
 	 * The signature of this method defines this parameter as a range with bounds of any type,
 	 * but a specific type is expected depending on the targeted field and on the {@code convert} parameter.
-	 * See {@link ValueConvert} for more information.
+	 * See {@link org.hibernate.search.engine.search.common.ValueConvert} for more information.
 	 * @param convert Controls how the range bounds should be converted
 	 * before Hibernate Search attempts to interpret them as a field value.
-	 * See {@link ValueConvert} for more information.
+	 * See {@link org.hibernate.search.engine.search.common.ValueConvert} for more information.
+	 * @return The next step.
+	 * @deprecated Use {@link #within(Range, PredicateValueConvert)} instead.
+	 */
+	@Deprecated
+	default N within(Range<?> range, org.hibernate.search.engine.search.common.ValueConvert convert) {
+		return within( range, org.hibernate.search.engine.search.common.ValueConvert.toPredicateValueConvert( convert ) );
+	}
+
+	/**
+	 * Require at least one of the targeted fields to be in the given range.
+	 *
+	 * @param range The range to match.
+	 * The signature of this method defines this parameter as a range with bounds of any type,
+	 * but a specific type is expected depending on the targeted field and on the {@code convert} parameter.
+	 * See {@link PredicateValueConvert} for more information.
+	 * @param convert Controls how the range bounds should be converted
+	 * before Hibernate Search attempts to interpret them as a field value.
+	 * See {@link PredicateValueConvert} for more information.
 	 * @return The next step.
 	 */
-	N within(Range<?> range, ValueConvert convert);
+	N within(Range<?> range, PredicateValueConvert convert);
 
 	/**
 	 * Require at least one of the targeted fields to be in any of the given ranges.
@@ -268,7 +389,7 @@ public interface RangePredicateMatchingStep<N extends RangePredicateOptionsStep<
 	 * @param ranges The ranges to match.
 	 * The signature of this method defines this parameter as a range with bounds of any type,
 	 * but a specific type is expected depending on the targeted field.
-	 * See {@link ValueConvert#YES} for more information.
+	 * See {@link PredicateValueConvert#MAPPING} for more information.
 	 * @return The next step.
 	 */
 	default N withinAny(Range<?>... ranges) {
@@ -281,11 +402,11 @@ public interface RangePredicateMatchingStep<N extends RangePredicateOptionsStep<
 	 * @param ranges The ranges to match.
 	 * The signature of this method defines this parameter as a range with bounds of any type,
 	 * but a specific type is expected depending on the targeted field.
-	 * See {@link ValueConvert#YES} for more information.
+	 * See {@link PredicateValueConvert#MAPPING} for more information.
 	 * @return The next step.
 	 */
 	default N withinAny(Collection<? extends Range<?>> ranges) {
-		return withinAny( ranges, ValueConvert.YES );
+		return withinAny( ranges, PredicateValueConvert.MAPPING );
 	}
 
 	/**
@@ -294,11 +415,29 @@ public interface RangePredicateMatchingStep<N extends RangePredicateOptionsStep<
 	 * @param ranges The ranges to match.
 	 * The signature of this method defines this parameter as a range with bounds of any type,
 	 * but a specific type is expected depending on the targeted field and on the {@code convert} parameter.
-	 * See {@link ValueConvert} for more information.
+	 * See {@link org.hibernate.search.engine.search.common.ValueConvert} for more information.
 	 * @param convert Controls how the range bounds should be converted
 	 * before Hibernate Search attempts to interpret them as a field value.
-	 * See {@link ValueConvert} for more information.
+	 * See {@link org.hibernate.search.engine.search.common.ValueConvert} for more information.
+	 * @return The next step.
+	 * @deprecated Use {@link #withinAny(Collection, PredicateValueConvert)} instead.
+	 */
+	@Deprecated
+	default N withinAny(Collection<? extends Range<?>> ranges, org.hibernate.search.engine.search.common.ValueConvert convert) {
+		return withinAny( ranges, org.hibernate.search.engine.search.common.ValueConvert.toPredicateValueConvert( convert ) );
+	}
+
+	/**
+	 * Require at least one of the targeted fields to be in any of the given ranges.
+	 *
+	 * @param ranges The ranges to match.
+	 * The signature of this method defines this parameter as a range with bounds of any type,
+	 * but a specific type is expected depending on the targeted field and on the {@code convert} parameter.
+	 * See {@link PredicateValueConvert} for more information.
+	 * @param convert Controls how the range bounds should be converted
+	 * before Hibernate Search attempts to interpret them as a field value.
+	 * See {@link PredicateValueConvert} for more information.
 	 * @return The next step.
 	 */
-	N withinAny(Collection<? extends Range<?>> ranges, ValueConvert convert);
+	N withinAny(Collection<? extends Range<?>> ranges, PredicateValueConvert convert);
 }

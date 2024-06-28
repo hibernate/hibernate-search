@@ -11,7 +11,7 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 import org.hibernate.search.engine.environment.bean.BeanRetrieval;
-import org.hibernate.search.engine.search.common.ValueConvert;
+import org.hibernate.search.engine.search.common.ProjectionValueConvert;
 import org.hibernate.search.engine.search.projection.dsl.SearchProjectionFactory;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.processing.MethodParameterMapping;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.processing.MethodParameterMappingAnnotationProcessorRef;
@@ -20,7 +20,7 @@ import org.hibernate.search.mapper.pojo.mapping.definition.annotation.processing
 /**
  * Maps a constructor parameter to a projection to the value of a field in the indexed document.
  *
- * @see SearchProjectionFactory#field(String, Class, ValueConvert)
+ * @see SearchProjectionFactory#field(String, Class, org.hibernate.search.engine.search.common.ValueConvert)
  */
 @Documented
 @Target({ ElementType.PARAMETER })
@@ -41,9 +41,9 @@ public @interface FieldProjection {
 
 	/**
 	 * @return A value controlling how the data fetched from the backend should be converted.
-	 * @see ValueConvert
-	 * @see SearchProjectionFactory#field(String, Class, ValueConvert)
+	 * @see ProjectionValueConvert
+	 * @see SearchProjectionFactory#field(String, Class, ProjectionValueConvert)
 	 */
-	ValueConvert convert() default ValueConvert.YES;
+	ProjectionValueConvert convert() default ProjectionValueConvert.MAPPING;
 
 }

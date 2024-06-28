@@ -4,16 +4,10 @@
  */
 package org.hibernate.search.engine.search.common.spi;
 
-import java.lang.invoke.MethodHandles;
-import java.util.List;
-
 import org.hibernate.search.engine.backend.types.converter.spi.DslConverter;
 import org.hibernate.search.engine.backend.types.converter.spi.ProjectionConverter;
-import org.hibernate.search.engine.logging.impl.Log;
-import org.hibernate.search.engine.search.common.ValueConvert;
 import org.hibernate.search.engine.search.highlighter.spi.SearchHighlighterType;
 import org.hibernate.search.util.common.annotation.Incubating;
-import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
 /**
  * Information about the type of a value (non-object) field targeted by search,
@@ -38,13 +32,13 @@ public interface SearchIndexValueFieldTypeContext<
 
 	DslConverter<F, F> rawDslConverter();
 
-	default DslConverter<?, F> dslConverter(ValueConvert convert) {
+	default DslConverter<?, F> dslConverter(InputValueConvert convert) {
 		switch ( convert ) {
-			case NO:
+			case INDEX:
 				return rawDslConverter();
-			case PARSE:
+			case STRING:
 				return parser();
-			case YES:
+			case MAPPING:
 			default:
 				return dslConverter();
 		}
@@ -54,17 +48,12 @@ public interface SearchIndexValueFieldTypeContext<
 
 	ProjectionConverter<F, F> rawProjectionConverter();
 
-	default ProjectionConverter<F, ?> projectionConverter(ValueConvert convert) {
+	default ProjectionConverter<F, ?> projectionConverter(OutputValueConvert convert) {
 		switch ( convert ) {
-			case NO:
+			case INDEX:
+			case RAW:
 				return rawProjectionConverter();
-			case PARSE:
-				throw LoggerFactory.make( Log.class, MethodHandles.lookup() ).parseConverterNotAllowed(
-						ValueConvert.class.getSimpleName(),
-						ValueConvert.PARSE,
-						List.of( ValueConvert.YES, ValueConvert.NO )
-				);
-			case YES:
+			case MAPPING:
 			default:
 				return projectionConverter();
 		}

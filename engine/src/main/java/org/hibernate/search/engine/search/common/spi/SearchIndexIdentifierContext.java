@@ -6,7 +6,6 @@ package org.hibernate.search.engine.search.common.spi;
 
 import org.hibernate.search.engine.backend.types.converter.spi.DslConverter;
 import org.hibernate.search.engine.backend.types.converter.spi.ProjectionConverter;
-import org.hibernate.search.engine.search.common.ValueConvert;
 import org.hibernate.search.util.common.annotation.Incubating;
 import org.hibernate.search.util.common.reporting.EventContext;
 import org.hibernate.search.util.common.reporting.spi.EventContextProvider;
@@ -23,13 +22,13 @@ public interface SearchIndexIdentifierContext extends EventContextProvider {
 
 	EventContext relativeEventContext();
 
-	default DslConverter<?, String> dslConverter(ValueConvert convert) {
+	default DslConverter<?, String> dslConverter(InputValueConvert convert) {
 		switch ( convert ) {
-			case NO:
+			case INDEX:
 				return RAW_DSL_CONVERTER;
-			case PARSE:
+			case STRING:
 				return parser();
-			case YES:
+			case MAPPING:
 			default:
 				return dslConverter();
 		}

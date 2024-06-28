@@ -17,7 +17,7 @@ import org.hibernate.search.backend.elasticsearch.search.predicate.impl.Predicat
 import org.hibernate.search.backend.elasticsearch.types.codec.impl.ElasticsearchFieldCodec;
 import org.hibernate.search.engine.backend.types.converter.spi.DslConverter;
 import org.hibernate.search.engine.reporting.spi.EventContexts;
-import org.hibernate.search.engine.search.common.ValueConvert;
+import org.hibernate.search.engine.search.common.spi.InputValueConvert;
 import org.hibernate.search.engine.search.predicate.SearchPredicate;
 import org.hibernate.search.engine.search.predicate.spi.MatchPredicateBuilder;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
@@ -95,7 +95,7 @@ public class ElasticsearchStandardMatchPredicate extends AbstractElasticsearchSi
 		}
 
 		@Override
-		public void value(Object value, ValueConvert convert) {
+		public void value(Object value, InputValueConvert convert) {
 			DslConverter<?, ? extends F> dslToIndexConverter = field.type().dslConverter( convert );
 			try {
 				F converted = dslToIndexConverter.unknownTypeToDocumentValue( value, scope.toDocumentValueConvertContext() );

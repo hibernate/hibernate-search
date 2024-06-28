@@ -14,7 +14,8 @@ import java.util.stream.Collectors;
 
 import org.hibernate.search.engine.logging.impl.Log;
 import org.hibernate.search.engine.reporting.spi.EventContexts;
-import org.hibernate.search.engine.search.common.ValueConvert;
+import org.hibernate.search.engine.search.common.PredicateValueConvert;
+import org.hibernate.search.engine.search.common.spi.InputValueConvert;
 import org.hibernate.search.engine.search.predicate.SearchPredicate;
 import org.hibernate.search.engine.search.predicate.dsl.RangePredicateFieldMoreStep;
 import org.hibernate.search.engine.search.predicate.dsl.RangePredicateOptionsStep;
@@ -61,13 +62,14 @@ class RangePredicateFieldMoreStepImpl
 	}
 
 	@Override
-	public RangePredicateOptionsStep<?> within(Range<?> range, ValueConvert convert) {
-		return commonState.within( range, convert, convert );
+	public RangePredicateOptionsStep<?> within(Range<?> range, PredicateValueConvert convert) {
+		InputValueConvert valueConvert = InputValueConvert.from( convert );
+		return commonState.within( range, valueConvert, valueConvert );
 	}
 
 	@Override
-	public RangePredicateOptionsStep<?> withinAny(Collection<? extends Range<?>> ranges, ValueConvert convert) {
-		return commonState.withinAny( ranges, convert );
+	public RangePredicateOptionsStep<?> withinAny(Collection<? extends Range<?>> ranges, PredicateValueConvert convert) {
+		return commonState.withinAny( ranges, InputValueConvert.from( convert ) );
 	}
 
 	@Override
@@ -88,7 +90,7 @@ class RangePredicateFieldMoreStepImpl
 			super( dslContext );
 		}
 
-		CommonState within(Range<?> range, ValueConvert lowerBoundConvert, ValueConvert upperBoundConvert) {
+		CommonState within(Range<?> range, InputValueConvert lowerBoundConvert, InputValueConvert upperBoundConvert) {
 			Contracts.assertNotNull( range, "range" );
 			Contracts.assertNotNull( lowerBoundConvert, "lowerBoundConvert" );
 			Contracts.assertNotNull( upperBoundConvert, "upperBoundConvert" );
@@ -105,7 +107,7 @@ class RangePredicateFieldMoreStepImpl
 			return this;
 		}
 
-		public CommonState withinAny(Collection<? extends Range<?>> ranges, ValueConvert valueConvert) {
+		public CommonState withinAny(Collection<? extends Range<?>> ranges, InputValueConvert valueConvert) {
 			Contracts.assertNotNull( valueConvert, "valueConvert" );
 			for ( RangePredicateFieldMoreStepImpl fieldSetState : getFieldSetStates() ) {
 				for ( String path : fieldSetState.fieldPaths ) {

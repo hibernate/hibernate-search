@@ -13,7 +13,8 @@ import org.hibernate.search.engine.search.aggregation.spi.RangeAggregationBuilde
 import org.hibernate.search.engine.search.aggregation.spi.TermsAggregationBuilder;
 import org.hibernate.search.engine.search.aggregation.spi.WithParametersAggregationBuilder;
 import org.hibernate.search.engine.search.common.NamedValues;
-import org.hibernate.search.engine.search.common.ValueConvert;
+import org.hibernate.search.engine.search.common.spi.InputValueConvert;
+import org.hibernate.search.engine.search.common.spi.OutputValueConvert;
 import org.hibernate.search.engine.search.predicate.SearchPredicate;
 import org.hibernate.search.util.common.data.Range;
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.search.common.impl.AbstractStubSearchQueryElementFactory;
@@ -47,14 +48,14 @@ public class StubSearchAggregation<A> implements SearchAggregation<A> {
 
 	public static class TermsTypeSelector implements TermsAggregationBuilder.TypeSelector {
 		@Override
-		public <V> TermsBuilder<V> type(Class<V> expectedType, ValueConvert convert) {
+		public <V> TermsBuilder<V> type(Class<V> expectedType, OutputValueConvert convert) {
 			return new TermsBuilder<>();
 		}
 	}
 
 	public static class RangeTypeSelector implements RangeAggregationBuilder.TypeSelector {
 		@Override
-		public <V> RangeBuilder<V> type(Class<V> expectedType, ValueConvert convert) {
+		public <V> RangeBuilder<V> type(Class<V> expectedType, InputValueConvert convert) {
 			return new RangeBuilder<>();
 		}
 	}

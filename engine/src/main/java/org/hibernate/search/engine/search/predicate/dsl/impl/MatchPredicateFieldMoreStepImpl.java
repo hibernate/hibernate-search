@@ -11,7 +11,8 @@ import java.util.List;
 import java.util.function.Consumer;
 
 import org.hibernate.search.engine.logging.impl.Log;
-import org.hibernate.search.engine.search.common.ValueConvert;
+import org.hibernate.search.engine.search.common.PredicateValueConvert;
+import org.hibernate.search.engine.search.common.spi.InputValueConvert;
 import org.hibernate.search.engine.search.common.spi.SearchIndexScope;
 import org.hibernate.search.engine.search.predicate.SearchPredicate;
 import org.hibernate.search.engine.search.predicate.dsl.MatchPredicateFieldMoreStep;
@@ -57,8 +58,8 @@ class MatchPredicateFieldMoreStepImpl
 	}
 
 	@Override
-	public MatchPredicateOptionsStep<?> matching(Object value, ValueConvert convert) {
-		return commonState.matching( value, convert );
+	public MatchPredicateOptionsStep<?> matching(Object value, PredicateValueConvert convert) {
+		return commonState.matching( value, InputValueConvert.from( convert ) );
 	}
 
 	@Override
@@ -80,7 +81,7 @@ class MatchPredicateFieldMoreStepImpl
 			minimumShouldMatchStep = new MinimumShouldMatchConditionStepImpl<>( new MatchMinimumShouldMatchBuilder(), this );
 		}
 
-		MatchPredicateOptionsStep<?> matching(Object value, ValueConvert convert) {
+		MatchPredicateOptionsStep<?> matching(Object value, InputValueConvert convert) {
 			Contracts.assertNotNull( value, "value" );
 			Contracts.assertNotNull( convert, "convert" );
 

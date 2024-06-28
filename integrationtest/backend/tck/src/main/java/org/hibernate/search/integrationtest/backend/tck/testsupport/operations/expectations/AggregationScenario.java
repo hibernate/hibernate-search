@@ -8,7 +8,8 @@ import java.util.function.Function;
 
 import org.hibernate.search.engine.search.aggregation.dsl.AggregationFinalStep;
 import org.hibernate.search.engine.search.aggregation.dsl.SearchAggregationFactory;
-import org.hibernate.search.engine.search.common.ValueConvert;
+import org.hibernate.search.engine.search.common.AggregationInputValueConvert;
+import org.hibernate.search.engine.search.common.AggregationOutputValueConvert;
 import org.hibernate.search.engine.search.predicate.dsl.PredicateFinalStep;
 import org.hibernate.search.engine.search.predicate.dsl.SearchPredicateFactory;
 
@@ -22,7 +23,7 @@ public interface AggregationScenario<A> {
 			Function<? super SearchPredicateFactory, ? extends PredicateFinalStep> filterOrNull);
 
 	AggregationFinalStep<A> setupWithConverterSetting(SearchAggregationFactory factory, String fieldPath,
-			ValueConvert convert);
+			AggregationOutputValueConvert convert, AggregationInputValueConvert inputValueConvert);
 
 	void check(A aggregationResult);
 

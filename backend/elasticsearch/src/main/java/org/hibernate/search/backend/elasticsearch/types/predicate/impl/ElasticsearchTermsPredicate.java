@@ -19,7 +19,7 @@ import org.hibernate.search.backend.elasticsearch.search.predicate.impl.Predicat
 import org.hibernate.search.backend.elasticsearch.types.codec.impl.ElasticsearchFieldCodec;
 import org.hibernate.search.engine.backend.types.converter.spi.DslConverter;
 import org.hibernate.search.engine.reporting.spi.EventContexts;
-import org.hibernate.search.engine.search.common.ValueConvert;
+import org.hibernate.search.engine.search.common.spi.InputValueConvert;
 import org.hibernate.search.engine.search.predicate.SearchPredicate;
 import org.hibernate.search.engine.search.predicate.spi.TermsPredicateBuilder;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
@@ -127,13 +127,13 @@ public class ElasticsearchTermsPredicate extends AbstractElasticsearchSingleFiel
 		}
 
 		@Override
-		public void matchingAny(Collection<?> terms, ValueConvert convert) {
+		public void matchingAny(Collection<?> terms, InputValueConvert convert) {
 			allMatch = false;
 			fillTerms( terms, convert );
 		}
 
 		@Override
-		public void matchingAll(Collection<?> terms, ValueConvert convert) {
+		public void matchingAll(Collection<?> terms, InputValueConvert convert) {
 			allMatch = true;
 			fillTerms( terms, convert );
 		}
@@ -143,7 +143,7 @@ public class ElasticsearchTermsPredicate extends AbstractElasticsearchSingleFiel
 			return new ElasticsearchTermsPredicate( this );
 		}
 
-		private void fillTerms(Collection<?> terms, ValueConvert convert) {
+		private void fillTerms(Collection<?> terms, InputValueConvert convert) {
 			DslConverter<?, F> dslConverter = field.type().dslConverter( convert );
 
 			if ( terms.size() == 1 ) {

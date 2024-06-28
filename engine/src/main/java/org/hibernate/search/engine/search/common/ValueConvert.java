@@ -7,11 +7,14 @@ package org.hibernate.search.engine.search.common;
 import org.hibernate.search.engine.backend.types.converter.FromDocumentValueConverter;
 import org.hibernate.search.engine.backend.types.converter.ToDocumentValueConverter;
 import org.hibernate.search.engine.backend.types.dsl.IndexFieldTypeConverterStep;
+import org.hibernate.search.util.common.AssertionFailure;
 import org.hibernate.search.util.common.annotation.Incubating;
+import org.hibernate.search.util.common.impl.Contracts;
 
 /**
  * Specifies whether values should be converted during search queries.
  */
+@Deprecated
 public enum ValueConvert {
 
 	/**
@@ -79,6 +82,75 @@ public enum ValueConvert {
 	 * Please refer to the reference documentation for more information.
 	 */
 	@Incubating
-	PARSE
+	PARSE;
 
+	@Deprecated
+	public static SortValueConvert toSortValueConvert(ValueConvert valueConvert) {
+		Contracts.assertNotNull( valueConvert, "valueConvert" );
+		switch ( valueConvert ) {
+			case YES:
+				return SortValueConvert.MAPPING;
+			case NO:
+				return SortValueConvert.INDEX;
+			case PARSE:
+			default:
+				throw new AssertionFailure( "Unsupported value convert: " + valueConvert );
+		}
+	}
+
+	@Deprecated
+	public static ProjectionValueConvert toProjectionValueConvert(ValueConvert valueConvert) {
+		Contracts.assertNotNull( valueConvert, "valueConvert" );
+		switch ( valueConvert ) {
+			case YES:
+				return ProjectionValueConvert.MAPPING;
+			case NO:
+				return ProjectionValueConvert.INDEX;
+			case PARSE:
+			default:
+				throw new AssertionFailure( "Unsupported value convert: " + valueConvert );
+		}
+	}
+
+	@Deprecated
+	public static AggregationOutputValueConvert toAggregationOutputValueConvert(ValueConvert valueConvert) {
+		Contracts.assertNotNull( valueConvert, "valueConvert" );
+		switch ( valueConvert ) {
+			case YES:
+				return AggregationOutputValueConvert.MAPPING;
+			case NO:
+				return AggregationOutputValueConvert.INDEX;
+			case PARSE:
+			default:
+				throw new AssertionFailure( "Unsupported value convert: " + valueConvert );
+		}
+	}
+
+	@Deprecated
+	public static AggregationInputValueConvert toAggregationInputValueConvert(ValueConvert valueConvert) {
+		Contracts.assertNotNull( valueConvert, "valueConvert" );
+		switch ( valueConvert ) {
+			case YES:
+				return AggregationInputValueConvert.MAPPING;
+			case NO:
+				return AggregationInputValueConvert.INDEX;
+			case PARSE:
+			default:
+				throw new AssertionFailure( "Unsupported value convert: " + valueConvert );
+		}
+	}
+
+	public static PredicateValueConvert toPredicateValueConvert(ValueConvert valueConvert) {
+		Contracts.assertNotNull( valueConvert, "valueConvert" );
+		switch ( valueConvert ) {
+			case YES:
+				return PredicateValueConvert.MAPPING;
+			case NO:
+				return PredicateValueConvert.INDEX;
+			case PARSE:
+				return PredicateValueConvert.STRING;
+			default:
+				throw new AssertionFailure( "Unsupported value convert: " + valueConvert );
+		}
+	}
 }

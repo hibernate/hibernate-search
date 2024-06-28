@@ -8,7 +8,7 @@ import java.lang.invoke.MethodHandles;
 import java.util.Optional;
 
 import org.hibernate.search.engine.environment.bean.BeanHolder;
-import org.hibernate.search.engine.search.common.ValueConvert;
+import org.hibernate.search.engine.search.common.ProjectionValueConvert;
 import org.hibernate.search.engine.search.projection.definition.spi.ConstantProjectionDefinition;
 import org.hibernate.search.engine.search.projection.definition.spi.FieldProjectionDefinition;
 import org.hibernate.search.engine.search.projection.dsl.SearchProjectionFactory;
@@ -58,7 +58,7 @@ public final class FieldProjectionBinder implements ProjectionBinder {
 	}
 
 	private final String fieldPathOrNull;
-	private ValueConvert valueConvert = ValueConvert.YES;
+	private ProjectionValueConvert valueConvert = ProjectionValueConvert.MAPPING;
 
 	private FieldProjectionBinder(String fieldPathOrNull) {
 		this.fieldPathOrNull = fieldPathOrNull;
@@ -66,11 +66,23 @@ public final class FieldProjectionBinder implements ProjectionBinder {
 
 	/**
 	 * @param valueConvert Controls how the data fetched from the backend should be converted.
-	 * See {@link ValueConvert}.
+	 * See {@link org.hibernate.search.engine.search.common.ValueConvert}.
 	 * @return {@code this}, for method chaining.
-	 * @see SearchProjectionFactory#field(String, Class, ValueConvert)
+	 * @see SearchProjectionFactory#field(String, Class, org.hibernate.search.engine.search.common.ValueConvert)
+	 * @deprecated Use {@link #valueConvert(ProjectionValueConvert)} instead.
 	 */
-	public FieldProjectionBinder valueConvert(ValueConvert valueConvert) {
+	@Deprecated
+	public FieldProjectionBinder valueConvert(org.hibernate.search.engine.search.common.ValueConvert valueConvert) {
+		return valueConvert( org.hibernate.search.engine.search.common.ValueConvert.toProjectionValueConvert( valueConvert ) );
+	}
+
+	/**
+	 * @param valueConvert Controls how the data fetched from the backend should be converted.
+	 * See {@link ProjectionValueConvert}.
+	 * @return {@code this}, for method chaining.
+	 * @see SearchProjectionFactory#field(String, Class, ProjectionValueConvert)
+	 */
+	public FieldProjectionBinder valueConvert(ProjectionValueConvert valueConvert) {
 		this.valueConvert = valueConvert;
 		return this;
 	}

@@ -10,7 +10,8 @@ import java.util.Collection;
 import java.util.List;
 import java.util.function.Consumer;
 
-import org.hibernate.search.engine.search.common.ValueConvert;
+import org.hibernate.search.engine.search.common.PredicateValueConvert;
+import org.hibernate.search.engine.search.common.spi.InputValueConvert;
 import org.hibernate.search.engine.search.common.spi.SearchIndexScope;
 import org.hibernate.search.engine.search.predicate.SearchPredicate;
 import org.hibernate.search.engine.search.predicate.dsl.TermsPredicateFieldMoreStep;
@@ -51,13 +52,13 @@ class TermsPredicateFieldMoreStepImpl
 	}
 
 	@Override
-	public TermsPredicateOptionsStep<?> matchingAny(Collection<?> terms, ValueConvert convert) {
-		return commonState.matchingAny( terms, convert );
+	public TermsPredicateOptionsStep<?> matchingAny(Collection<?> terms, PredicateValueConvert convert) {
+		return commonState.matchingAny( terms, InputValueConvert.from( convert ) );
 	}
 
 	@Override
-	public TermsPredicateOptionsStep<?> matchingAll(Collection<?> terms, ValueConvert convert) {
-		return commonState.matchingAll( terms, convert );
+	public TermsPredicateOptionsStep<?> matchingAll(Collection<?> terms, PredicateValueConvert convert) {
+		return commonState.matchingAll( terms, InputValueConvert.from( convert ) );
 	}
 
 	@Override
@@ -78,7 +79,7 @@ class TermsPredicateFieldMoreStepImpl
 			super( dslContext );
 		}
 
-		private TermsPredicateOptionsStep<?> matchingAny(Collection<?> terms, ValueConvert convert) {
+		private TermsPredicateOptionsStep<?> matchingAny(Collection<?> terms, InputValueConvert convert) {
 			Contracts.assertNotNullNorEmpty( terms, "terms" );
 			Contracts.assertNotNull( convert, "convert" );
 
@@ -90,7 +91,7 @@ class TermsPredicateFieldMoreStepImpl
 			return this;
 		}
 
-		private TermsPredicateOptionsStep<?> matchingAll(Collection<?> terms, ValueConvert convert) {
+		private TermsPredicateOptionsStep<?> matchingAll(Collection<?> terms, InputValueConvert convert) {
 			Contracts.assertNotNullNorEmpty( terms, "terms" );
 			Contracts.assertNotNull( convert, "convert" );
 

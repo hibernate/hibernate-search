@@ -12,7 +12,7 @@ import org.hibernate.search.backend.lucene.lowlevel.common.impl.MetadataFields;
 import org.hibernate.search.backend.lucene.search.common.impl.LuceneSearchIndexScope;
 import org.hibernate.search.engine.backend.types.converter.runtime.ToDocumentValueConvertContext;
 import org.hibernate.search.engine.backend.types.converter.spi.DslConverter;
-import org.hibernate.search.engine.search.common.ValueConvert;
+import org.hibernate.search.engine.search.common.spi.InputValueConvert;
 import org.hibernate.search.engine.search.predicate.SearchPredicate;
 import org.hibernate.search.engine.search.predicate.spi.MatchIdPredicateBuilder;
 
@@ -50,7 +50,7 @@ public class LuceneMatchIdPredicate extends AbstractLuceneSearchPredicate {
 		}
 
 		@Override
-		public void value(Object value, ValueConvert valueConvert) {
+		public void value(Object value, InputValueConvert valueConvert) {
 			DslConverter<?, String> converter = scope.identifier().dslConverter( valueConvert );
 			ToDocumentValueConvertContext context = scope.toDocumentValueConvertContext();
 			values.add( converter.unknownTypeToDocumentValue( value, context ) );
