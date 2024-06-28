@@ -8,7 +8,7 @@ import java.lang.invoke.MethodHandles;
 import java.util.Optional;
 
 import org.hibernate.search.engine.environment.bean.BeanHolder;
-import org.hibernate.search.engine.search.common.ValueConvert;
+import org.hibernate.search.engine.search.common.ValueModel;
 import org.hibernate.search.engine.search.projection.definition.spi.ConstantProjectionDefinition;
 import org.hibernate.search.engine.search.projection.definition.spi.FieldProjectionDefinition;
 import org.hibernate.search.engine.search.projection.dsl.SearchProjectionFactory;
@@ -58,7 +58,7 @@ public final class FieldProjectionBinder implements ProjectionBinder {
 	}
 
 	private final String fieldPathOrNull;
-	private ValueConvert valueConvert = ValueConvert.YES;
+	private ValueModel valueModel = ValueModel.MAPPING;
 
 	private FieldProjectionBinder(String fieldPathOrNull) {
 		this.fieldPathOrNull = fieldPathOrNull;
@@ -66,12 +66,24 @@ public final class FieldProjectionBinder implements ProjectionBinder {
 
 	/**
 	 * @param valueConvert Controls how the data fetched from the backend should be converted.
-	 * See {@link ValueConvert}.
+	 * See {@link org.hibernate.search.engine.search.common.ValueConvert}.
 	 * @return {@code this}, for method chaining.
-	 * @see SearchProjectionFactory#field(String, Class, ValueConvert)
+	 * @see SearchProjectionFactory#field(String, Class, org.hibernate.search.engine.search.common.ValueConvert)
+	 * @deprecated Use {@link #valueModel(ValueModel)} instead.
 	 */
-	public FieldProjectionBinder valueConvert(ValueConvert valueConvert) {
-		this.valueConvert = valueConvert;
+	@Deprecated
+	public FieldProjectionBinder valueConvert(org.hibernate.search.engine.search.common.ValueConvert valueConvert) {
+		return valueModel( org.hibernate.search.engine.search.common.ValueConvert.toValueModel( valueConvert ) );
+	}
+
+	/**
+	 * @param valueModel Controls how the data fetched from the backend should be converted.
+	 * See {@link ValueModel}.
+	 * @return {@code this}, for method chaining.
+	 * @see SearchProjectionFactory#field(String, Class, ValueModel)
+	 */
+	public FieldProjectionBinder valueModel(ValueModel valueModel) {
+		this.valueModel = valueModel;
 		return this;
 	}
 
@@ -91,14 +103,14 @@ public final class FieldProjectionBinder implements ProjectionBinder {
 	private <T> void bind(ProjectionBindingContext context, String fieldPath, Class<T> constructorParameterType) {
 		context.definition( constructorParameterType, context.isIncluded( fieldPath )
 				? BeanHolder
-						.of( new FieldProjectionDefinition.SingleValued<>( fieldPath, constructorParameterType, valueConvert ) )
+						.of( new FieldProjectionDefinition.SingleValued<>( fieldPath, constructorParameterType, valueModel ) )
 				: ConstantProjectionDefinition.nullValue() );
 	}
 
 	private <T> void bind(ProjectionBindingContext context, ProjectionBindingMultiContext multi, String fieldPath,
 			Class<T> containerElementType) {
 		multi.definition( containerElementType, context.isIncluded( fieldPath )
-				? BeanHolder.of( new FieldProjectionDefinition.MultiValued<>( fieldPath, containerElementType, valueConvert ) )
+				? BeanHolder.of( new FieldProjectionDefinition.MultiValued<>( fieldPath, containerElementType, valueModel ) )
 				: ConstantProjectionDefinition.emptyList() );
 	}
 

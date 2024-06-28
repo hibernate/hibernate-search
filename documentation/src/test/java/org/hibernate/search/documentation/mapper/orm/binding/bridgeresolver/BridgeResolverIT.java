@@ -14,7 +14,7 @@ import jakarta.persistence.EntityManagerFactory;
 import org.hibernate.search.documentation.testsupport.BackendConfigurations;
 import org.hibernate.search.documentation.testsupport.DocumentationSetupHelper;
 import org.hibernate.search.documentation.testsupport.data.ISBN;
-import org.hibernate.search.engine.search.common.ValueConvert;
+import org.hibernate.search.engine.search.common.ValueModel;
 import org.hibernate.search.engine.spatial.DistanceUnit;
 import org.hibernate.search.mapper.orm.Search;
 import org.hibernate.search.mapper.orm.cfg.HibernateOrmMapperSettings;
@@ -69,7 +69,7 @@ class BridgeResolverIT {
 		with( entityManagerFactory ).runInTransaction( entityManager -> {
 			List<ISBN> result = Search.session( entityManager ).search( Book.class )
 					.select( f -> f.field( "isbn", ISBN.class ) )
-					.where( f -> f.match().field( "genre" ).matching( "science", ValueConvert.NO ) )
+					.where( f -> f.match().field( "genre" ).matching( "science", ValueModel.INDEX ) )
 					.fetchHits( 20 );
 			assertThat( result ).hasSize( 1 )
 					.containsExactly( book1Isbn );

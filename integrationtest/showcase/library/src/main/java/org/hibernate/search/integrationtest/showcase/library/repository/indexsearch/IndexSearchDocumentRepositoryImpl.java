@@ -9,7 +9,7 @@ import java.util.Optional;
 
 import jakarta.persistence.EntityManager;
 
-import org.hibernate.search.engine.search.common.ValueConvert;
+import org.hibernate.search.engine.search.common.ValueModel;
 import org.hibernate.search.engine.search.sort.dsl.SortOrder;
 import org.hibernate.search.engine.spatial.DistanceUnit;
 import org.hibernate.search.engine.spatial.GeoPoint;
@@ -53,7 +53,7 @@ public class IndexSearchDocumentRepositoryImpl implements IndexSearchDocumentRep
 
 		return Search.session( entityManager ).search( Book.class )
 				// onRawField option allows to bypass the bridge in the DSL
-				.where( f -> f.match().field( "isbn" ).matching( isbnAsString, ValueConvert.NO ) )
+				.where( f -> f.match().field( "isbn" ).matching( isbnAsString, ValueModel.INDEX ) )
 				.fetchSingleHit();
 	}
 

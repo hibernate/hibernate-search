@@ -9,7 +9,7 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import java.lang.invoke.MethodHandles;
 
-import org.hibernate.search.engine.search.common.ValueConvert;
+import org.hibernate.search.engine.search.common.ValueModel;
 import org.hibernate.search.integrationtest.mapper.pojo.standalone.realbackend.testsupport.BackendConfigurations;
 import org.hibernate.search.mapper.pojo.bridge.IdentifierBridge;
 import org.hibernate.search.mapper.pojo.bridge.mapping.annotation.IdentifierBridgeRef;
@@ -42,7 +42,7 @@ class DocumentIdBaseIT {
 
 		try ( SearchSession session = mapping.createSession() ) {
 			assertThatThrownBy( () -> session.search( IndexedEntity.class )
-					.where( f -> f.id().matching( "anything", ValueConvert.PARSE ) )
+					.where( f -> f.id().matching( "anything", ValueModel.STRING ) )
 					.fetchAllHits()
 			).isInstanceOf( UnsupportedOperationException.class )
 					.hasMessageContainingAll(
@@ -64,7 +64,7 @@ class DocumentIdBaseIT {
 		try ( SearchSession session = mapping.createSession() ) {
 			assertThat(
 					session.search( IndexedEntity.class )
-							.where( f -> f.id().matching( "anything", ValueConvert.PARSE ) )
+							.where( f -> f.id().matching( "anything", ValueModel.STRING ) )
 							.fetchAllHits()
 			).isEmpty();
 		}
@@ -83,7 +83,7 @@ class DocumentIdBaseIT {
 		try ( SearchSession session = mapping.createSession() ) {
 			assertThat(
 					session.search( IndexedEntity.class )
-							.where( f -> f.id().matching( "1", ValueConvert.PARSE ) )
+							.where( f -> f.id().matching( "1", ValueModel.STRING ) )
 							.fetchAllHits()
 			).isEmpty();
 		}

@@ -27,7 +27,7 @@ import org.hibernate.search.engine.backend.types.Searchable;
 import org.hibernate.search.engine.backend.types.Sortable;
 import org.hibernate.search.engine.backend.types.dsl.StandardIndexFieldTypeOptionsStep;
 import org.hibernate.search.engine.reporting.spi.EventContexts;
-import org.hibernate.search.engine.search.common.ValueConvert;
+import org.hibernate.search.engine.search.common.ValueModel;
 import org.hibernate.search.engine.search.query.SearchQuery;
 import org.hibernate.search.engine.search.sort.dsl.SearchSortFactory;
 import org.hibernate.search.engine.search.sort.dsl.SortFinalStep;
@@ -152,46 +152,21 @@ class FieldSortTypeCheckingAndConversionIT<F> {
 		String fieldPath = getFieldWithDslConverterPath( fieldTypeDescriptor );
 
 		query = matchAllQuery( f -> f.field( fieldPath ).asc().missing()
-				.use( getSingleValueForMissingUse( BEFORE_DOCUMENT_1_ORDINAL, fieldTypeDescriptor ), ValueConvert.NO ) );
+				.use( getSingleValueForMissingUse( BEFORE_DOCUMENT_1_ORDINAL, fieldTypeDescriptor ), ValueModel.INDEX ) );
 		assertThatQuery( query )
 				.hasDocRefHitsExactOrder( mainIndex.typeName(), EMPTY, DOCUMENT_1, DOCUMENT_2, DOCUMENT_3 );
 		query = matchAllQuery( f -> f.field( fieldPath ).asc().missing()
-				.use( getSingleValueForMissingUse( BETWEEN_DOCUMENT_1_AND_2_ORDINAL, fieldTypeDescriptor ), ValueConvert.NO ) );
+				.use( getSingleValueForMissingUse( BETWEEN_DOCUMENT_1_AND_2_ORDINAL, fieldTypeDescriptor ),
+						ValueModel.INDEX ) );
 		assertThatQuery( query )
 				.hasDocRefHitsExactOrder( mainIndex.typeName(), DOCUMENT_1, EMPTY, DOCUMENT_2, DOCUMENT_3 );
 		query = matchAllQuery( f -> f.field( fieldPath ).asc().missing()
-				.use( getSingleValueForMissingUse( BETWEEN_DOCUMENT_2_AND_3_ORDINAL, fieldTypeDescriptor ), ValueConvert.NO ) );
+				.use( getSingleValueForMissingUse( BETWEEN_DOCUMENT_2_AND_3_ORDINAL, fieldTypeDescriptor ),
+						ValueModel.INDEX ) );
 		assertThatQuery( query )
 				.hasDocRefHitsExactOrder( mainIndex.typeName(), DOCUMENT_1, DOCUMENT_2, EMPTY, DOCUMENT_3 );
 		query = matchAllQuery( f -> f.field( fieldPath ).asc().missing()
-				.use( getSingleValueForMissingUse( AFTER_DOCUMENT_3_ORDINAL, fieldTypeDescriptor ), ValueConvert.NO ) );
-		assertThatQuery( query )
-				.hasDocRefHitsExactOrder( mainIndex.typeName(), DOCUMENT_1, DOCUMENT_2, DOCUMENT_3, EMPTY );
-	}
-
-	@ParameterizedTest(name = "{0}")
-	@MethodSource("params")
-	void withDslConverters_parse(StandardFieldTypeDescriptor<F> fieldTypeDescriptor) {
-		SearchQuery<DocumentReference> query;
-		String fieldPath = getFieldWithDslConverterPath( fieldTypeDescriptor );
-
-		query = matchAllQuery( f -> f.field( fieldPath ).asc().missing()
-				.use( getSingleValueForMissingUseParse( BEFORE_DOCUMENT_1_ORDINAL, fieldTypeDescriptor ),
-						ValueConvert.PARSE ) );
-		assertThatQuery( query )
-				.hasDocRefHitsExactOrder( mainIndex.typeName(), EMPTY, DOCUMENT_1, DOCUMENT_2, DOCUMENT_3 );
-		query = matchAllQuery( f -> f.field( fieldPath ).asc().missing()
-				.use( getSingleValueForMissingUseParse( BETWEEN_DOCUMENT_1_AND_2_ORDINAL, fieldTypeDescriptor ),
-						ValueConvert.PARSE ) );
-		assertThatQuery( query )
-				.hasDocRefHitsExactOrder( mainIndex.typeName(), DOCUMENT_1, EMPTY, DOCUMENT_2, DOCUMENT_3 );
-		query = matchAllQuery( f -> f.field( fieldPath ).asc().missing()
-				.use( getSingleValueForMissingUseParse( BETWEEN_DOCUMENT_2_AND_3_ORDINAL, fieldTypeDescriptor ),
-						ValueConvert.PARSE ) );
-		assertThatQuery( query )
-				.hasDocRefHitsExactOrder( mainIndex.typeName(), DOCUMENT_1, DOCUMENT_2, EMPTY, DOCUMENT_3 );
-		query = matchAllQuery( f -> f.field( fieldPath ).asc().missing()
-				.use( getSingleValueForMissingUseParse( AFTER_DOCUMENT_3_ORDINAL, fieldTypeDescriptor ), ValueConvert.PARSE ) );
+				.use( getSingleValueForMissingUse( AFTER_DOCUMENT_3_ORDINAL, fieldTypeDescriptor ), ValueModel.INDEX ) );
 		assertThatQuery( query )
 				.hasDocRefHitsExactOrder( mainIndex.typeName(), DOCUMENT_1, DOCUMENT_2, DOCUMENT_3, EMPTY );
 	}
@@ -299,7 +274,8 @@ class FieldSortTypeCheckingAndConversionIT<F> {
 		String fieldPath = getFieldPath( fieldTypeDescriptor );
 
 		query = matchAllQuery( f -> f.field( fieldPath ).asc().missing()
-				.use( getSingleValueForMissingUse( BEFORE_DOCUMENT_1_ORDINAL, fieldTypeDescriptor ), ValueConvert.NO ), scope );
+				.use( getSingleValueForMissingUse( BEFORE_DOCUMENT_1_ORDINAL, fieldTypeDescriptor ), ValueModel.INDEX ),
+				scope );
 
 		/*
 		 * Not testing the ordering of results here because some documents have the same value.
@@ -365,7 +341,8 @@ class FieldSortTypeCheckingAndConversionIT<F> {
 		String fieldPath = getFieldPath( fieldTypeDescriptor );
 
 		query = matchNonEmptyQuery( f -> f.field( fieldPath ).asc().missing()
-				.use( getSingleValueForMissingUse( BEFORE_DOCUMENT_1_ORDINAL, fieldTypeDescriptor ), ValueConvert.NO ), scope );
+				.use( getSingleValueForMissingUse( BEFORE_DOCUMENT_1_ORDINAL, fieldTypeDescriptor ), ValueModel.INDEX ),
+				scope );
 
 		/*
 		 * Not testing the ordering of results here because it's not what we are interested in:

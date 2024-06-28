@@ -12,7 +12,7 @@ import java.util.function.Consumer;
 
 import org.hibernate.search.engine.backend.document.DocumentElement;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaElement;
-import org.hibernate.search.engine.search.common.ValueConvert;
+import org.hibernate.search.engine.search.common.ValueModel;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.BooleanFieldTypeDescriptor;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.FieldTypeDescriptor;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.GeoPointFieldTypeDescriptor;
@@ -95,7 +95,7 @@ class RangePredicateSpecificsIT<F> {
 		int docOrdinal = 1;
 		assertThatQuery( index.query()
 				.where( f -> f.range().field( customDslConverterFieldPath( dataSet ) )
-						.atLeast( value( docOrdinal, dataSet ), ValueConvert.NO ) ) )
+						.atLeast( value( docOrdinal, dataSet ), ValueModel.INDEX ) ) )
 				.hasDocRefHitsAnyOrder( docIdRange( docOrdinal, null, dataSet ) );
 	}
 
@@ -125,7 +125,7 @@ class RangePredicateSpecificsIT<F> {
 		int docOrdinal = 1;
 		assertThatQuery( index.query()
 				.where( f -> f.range().field( customDslConverterFieldPath( dataSet ) )
-						.greaterThan( value( docOrdinal, dataSet ), ValueConvert.NO ) ) )
+						.greaterThan( value( docOrdinal, dataSet ), ValueModel.INDEX ) ) )
 				.hasDocRefHitsAnyOrder( docIdRange( docOrdinal + 1, null, dataSet ) );
 	}
 
@@ -155,7 +155,7 @@ class RangePredicateSpecificsIT<F> {
 		int docOrdinal = docCount( dataSet ) - 2;
 		assertThatQuery( index.query()
 				.where( f -> f.range().field( customDslConverterFieldPath( dataSet ) )
-						.atMost( value( docOrdinal, dataSet ), ValueConvert.NO ) ) )
+						.atMost( value( docOrdinal, dataSet ), ValueModel.INDEX ) ) )
 				.hasDocRefHitsAnyOrder( docIdRange( null, docOrdinal, dataSet ) );
 	}
 
@@ -185,7 +185,7 @@ class RangePredicateSpecificsIT<F> {
 		int docOrdinal = docCount( dataSet ) - 2;
 		assertThatQuery( index.query()
 				.where( f -> f.range().field( customDslConverterFieldPath( dataSet ) )
-						.lessThan( value( docOrdinal, dataSet ), ValueConvert.NO ) ) )
+						.lessThan( value( docOrdinal, dataSet ), ValueModel.INDEX ) ) )
 				.hasDocRefHitsAnyOrder( docIdRange( null, docOrdinal - 1, dataSet ) );
 	}
 
@@ -219,7 +219,7 @@ class RangePredicateSpecificsIT<F> {
 		assertThatQuery( index.query()
 				.where( f -> f.range().field( customDslConverterFieldPath( dataSet ) )
 						.between( value( lowerValueNumber, dataSet ), value( upperValueNumber, dataSet ),
-								ValueConvert.NO ) ) )
+								ValueModel.INDEX ) ) )
 				.hasDocRefHitsAnyOrder( docIdRange( lowerValueNumber, upperValueNumber, dataSet ) );
 	}
 
@@ -329,7 +329,7 @@ class RangePredicateSpecificsIT<F> {
 						.withinAny( List.of(
 								Range.between( value( lowerValueNumber1, dataSet ), value( upperValueNumber1, dataSet ) ),
 								Range.between( value( lowerValueNumber2, dataSet ), value( upperValueNumber2, dataSet ) )
-						), ValueConvert.NO )
+						), ValueModel.INDEX )
 				) )
 				.hasDocRefHitsAnyOrder( docIdRange( lowerValueNumber1, upperValueNumber2, dataSet ) );
 	}

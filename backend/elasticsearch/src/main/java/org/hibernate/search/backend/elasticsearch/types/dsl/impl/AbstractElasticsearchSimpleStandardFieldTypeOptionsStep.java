@@ -10,7 +10,7 @@ import org.hibernate.search.engine.backend.types.IndexFieldType;
 import org.hibernate.search.engine.backend.types.Projectable;
 import org.hibernate.search.engine.backend.types.Searchable;
 import org.hibernate.search.engine.backend.types.Sortable;
-import org.hibernate.search.engine.backend.types.converter.ToDocumentValueConverter;
+import org.hibernate.search.engine.backend.types.converter.spi.DefaultStringConverters;
 
 abstract class AbstractElasticsearchSimpleStandardFieldTypeOptionsStep<
 		S extends AbstractElasticsearchSimpleStandardFieldTypeOptionsStep<?, F>,
@@ -32,10 +32,12 @@ abstract class AbstractElasticsearchSimpleStandardFieldTypeOptionsStep<
 	private F indexNullAs;
 
 	AbstractElasticsearchSimpleStandardFieldTypeOptionsStep(ElasticsearchIndexFieldTypeBuildContext buildContext,
-			Class<F> fieldType, String dataType, ToDocumentValueConverter<String, F> defaultParseConverter) {
+			Class<F> fieldType, String dataType,
+			DefaultStringConverters.Converter<F> defaultConverter) {
 		super( buildContext, fieldType );
 		builder.mapping().setType( dataType );
-		builder.parser( defaultParseConverter );
+		builder.parser( defaultConverter );
+		builder.formatter( defaultConverter );
 	}
 
 	@Override

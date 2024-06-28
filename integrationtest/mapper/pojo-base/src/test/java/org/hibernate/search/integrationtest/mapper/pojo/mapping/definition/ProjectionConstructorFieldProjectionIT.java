@@ -13,7 +13,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 
-import org.hibernate.search.engine.search.common.ValueConvert;
+import org.hibernate.search.engine.search.common.ValueModel;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.DocumentId;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.FieldProjection;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.FullTextField;
@@ -134,8 +134,10 @@ class ProjectionConstructorFieldProjectionIT extends AbstractProjectionConstruct
 		class MyProjection {
 			public final String myEnum;
 
+			@SuppressWarnings("deprecation")
 			@ProjectionConstructor
-			public MyProjection(@FieldProjection(convert = ValueConvert.NO) String myEnum) {
+			public MyProjection(
+					@FieldProjection(valueModel = ValueModel.INDEX) String myEnum) {
 				this.myEnum = myEnum;
 			}
 		}
@@ -154,7 +156,7 @@ class ProjectionConstructorFieldProjectionIT extends AbstractProjectionConstruct
 				f -> f.composite()
 						.from(
 								dummyProjectionForEnclosingClassInstance( f ),
-								f.field( "myEnum", String.class, ValueConvert.NO )
+								f.field( "myEnum", String.class, ValueModel.INDEX )
 						)
 						.asList(),
 				Arrays.asList(

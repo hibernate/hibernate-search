@@ -4,7 +4,7 @@
  */
 package org.hibernate.search.engine.search.sort.dsl;
 
-import org.hibernate.search.engine.search.common.ValueConvert;
+import org.hibernate.search.engine.search.common.ValueModel;
 import org.hibernate.search.util.common.SearchException;
 
 /**
@@ -60,14 +60,14 @@ public interface FieldSortMissingValueBehaviorStep<N> {
 	 * When documents are missing a value on the sort field, use the given value instead.
 	 * <p>
 	 * This method will apply DSL converters to {@code value} before Hibernate Search attempts to interpret it as a field value.
-	 * See {@link ValueConvert#YES}.
+	 * See {@link ValueModel#MAPPING}.
 	 *
 	 * @param value The value to use as a default when a document is missing a value on the sort field.
 	 * @return The next step.
 	 * @throws SearchException If the field is not numeric.
 	 */
 	default N use(Object value) {
-		return use( value, ValueConvert.YES );
+		return use( value, ValueModel.MAPPING );
 	}
 
 	/**
@@ -75,10 +75,26 @@ public interface FieldSortMissingValueBehaviorStep<N> {
 	 *
 	 * @param value The value to use as a default when a document is missing a value on the sort field.
 	 * @param convert Controls how the {@code value} should be converted before Hibernate Search attempts to interpret it as a field value.
-	 * See {@link ValueConvert}.
+	 * See {@link org.hibernate.search.engine.search.common.ValueConvert}.
 	 * @return The next step.
 	 * @throws SearchException If the field is not numeric.
+	 * @deprecated Use {@link #use(Object, ValueModel)} instead.
 	 */
-	N use(Object value, ValueConvert convert);
+	@Deprecated
+	default N use(Object value, org.hibernate.search.engine.search.common.ValueConvert convert) {
+		return use( value, org.hibernate.search.engine.search.common.ValueConvert.toValueModel( convert ) );
+	}
+
+	/**
+	 * When documents are missing a value on the sort field, use the given value instead.
+	 *
+	 * @param value The value to use as a default when a document is missing a value on the sort field.
+	 * @param valueModel The model value, determines how the {@code value} should be converted before Hibernate Search attempts to interpret it as a field value.
+	 * See {@link ValueModel}.
+	 * @return The next step.
+	 *
+	 * @throws SearchException If the field is not numeric.
+	 */
+	N use(Object value, ValueModel valueModel);
 
 }

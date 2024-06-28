@@ -1017,4 +1017,8 @@ public interface Log extends BasicLogger {
 	@Message(id = ID_OFFSET + 161, value = "Invalid mass indexing default clean operation name: '%1$s'."
 			+ " Valid names are: %2$s.")
 	SearchException invalidMassIndexingDefaultCleanOperation(String name, List<String> names);
+
+	@Message(id = ID_OFFSET + 162, value = "Using `convert=ValueConvert.NO` in @FieldProjection is not allowed anymore. "
+			+ "Use `valueModel=ValueModel.INDEX` instead.")
+	SearchException usingNonDefaultValueConvertNotAllowed(@Param EventContext eventContext);
 }

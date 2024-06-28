@@ -15,7 +15,7 @@ import org.hibernate.search.backend.lucene.search.common.impl.LuceneSearchIndexV
 import org.hibernate.search.backend.lucene.search.predicate.impl.AbstractLuceneLeafSingleFieldPredicate;
 import org.hibernate.search.backend.lucene.search.predicate.impl.PredicateRequestContext;
 import org.hibernate.search.backend.lucene.types.codec.impl.LuceneStandardFieldCodec;
-import org.hibernate.search.engine.search.common.ValueConvert;
+import org.hibernate.search.engine.search.common.ValueModel;
 import org.hibernate.search.engine.search.predicate.SearchPredicate;
 import org.hibernate.search.engine.search.predicate.spi.TermsPredicateBuilder;
 
@@ -63,15 +63,15 @@ public class LuceneTextTermsPredicate extends AbstractLuceneLeafSingleFieldPredi
 		}
 
 		@Override
-		public void matchingAny(Collection<?> terms, ValueConvert convert) {
+		public void matchingAny(Collection<?> terms, ValueModel valueModel) {
 			allMatch = false;
-			fillTerms( terms, convert );
+			fillTerms( terms, valueModel );
 		}
 
 		@Override
-		public void matchingAll(Collection<?> terms, ValueConvert convert) {
+		public void matchingAll(Collection<?> terms, ValueModel valueModel) {
 			allMatch = true;
-			fillTerms( terms, convert );
+			fillTerms( terms, valueModel );
 		}
 
 		@Override
@@ -98,9 +98,9 @@ public class LuceneTextTermsPredicate extends AbstractLuceneLeafSingleFieldPredi
 			return builder.build();
 		}
 
-		private void fillTerms(Collection<?> terms, ValueConvert convert) {
+		private void fillTerms(Collection<?> terms, ValueModel valueModel) {
 			if ( terms.size() == 1 ) {
-				this.term = convertAndEncode( codec, terms.iterator().next(), convert );
+				this.term = convertAndEncode( codec, terms.iterator().next(), valueModel );
 				this.terms = null;
 				return;
 			}
@@ -108,7 +108,7 @@ public class LuceneTextTermsPredicate extends AbstractLuceneLeafSingleFieldPredi
 			this.term = null;
 			this.terms = new ArrayList<>( terms.size() );
 			for ( Object termItem : terms ) {
-				this.terms.add( convertAndEncode( codec, termItem, convert ) );
+				this.terms.add( convertAndEncode( codec, termItem, valueModel ) );
 			}
 		}
 	}

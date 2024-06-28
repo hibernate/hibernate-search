@@ -18,7 +18,7 @@ import jakarta.persistence.Id;
 
 import org.hibernate.search.documentation.testsupport.BackendConfigurations;
 import org.hibernate.search.documentation.testsupport.DocumentationSetupHelper;
-import org.hibernate.search.engine.search.common.ValueConvert;
+import org.hibernate.search.engine.search.common.ValueModel;
 import org.hibernate.search.mapper.orm.Search;
 import org.hibernate.search.mapper.orm.session.SearchSession;
 import org.hibernate.search.mapper.pojo.bridge.ValueBridge;
@@ -70,7 +70,7 @@ class DslConverterIT {
 			// tag::dsl-converter-disabled[]
 			List<AuthenticationEvent> result = searchSession.search( AuthenticationEvent.class )
 					.where( f -> f.match().field( "outcome" )
-							.matching( "Invalid password", ValueConvert.NO ) )
+							.matching( "Invalid password", ValueModel.INDEX ) )
 					.fetchHits( 20 );
 			// end::dsl-converter-disabled[]
 
@@ -88,7 +88,7 @@ class DslConverterIT {
 			// tag::dsl-converter-parse[]
 			List<AuthenticationEvent> result = searchSession.search( AuthenticationEvent.class )
 					.where( f -> f.match().field( "time" )
-							.matching( "2002-02-20T20:02:22", ValueConvert.PARSE ) )
+							.matching( "2002-02-20T20:02:22", ValueModel.STRING ) )
 					.fetchHits( 20 );
 			// end::dsl-converter-parse[]
 

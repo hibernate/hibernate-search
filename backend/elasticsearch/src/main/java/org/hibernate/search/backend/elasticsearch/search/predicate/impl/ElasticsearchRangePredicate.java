@@ -16,7 +16,7 @@ import org.hibernate.search.backend.elasticsearch.search.common.impl.Elasticsear
 import org.hibernate.search.backend.elasticsearch.types.codec.impl.ElasticsearchFieldCodec;
 import org.hibernate.search.engine.backend.types.converter.spi.DslConverter;
 import org.hibernate.search.engine.reporting.spi.EventContexts;
-import org.hibernate.search.engine.search.common.ValueConvert;
+import org.hibernate.search.engine.search.common.ValueModel;
 import org.hibernate.search.engine.search.predicate.SearchPredicate;
 import org.hibernate.search.engine.search.predicate.spi.RangePredicateBuilder;
 import org.hibernate.search.util.common.data.Range;
@@ -94,11 +94,11 @@ public class ElasticsearchRangePredicate extends AbstractElasticsearchSingleFiel
 		}
 
 		@Override
-		public void within(Range<?> range, ValueConvert convertLowerBound, ValueConvert convertUpperBound) {
+		public void within(Range<?> range, ValueModel lowerBoundModel, ValueModel upperBoundModel) {
 			this.range = Range.between(
-					convertToFieldValue( range.lowerBoundValue(), convertLowerBound ),
+					convertToFieldValue( range.lowerBoundValue(), lowerBoundModel ),
 					range.lowerBoundInclusion(),
-					convertToFieldValue( range.upperBoundValue(), convertUpperBound ),
+					convertToFieldValue( range.upperBoundValue(), upperBoundModel ),
 					range.upperBoundInclusion()
 			);
 		}
@@ -112,12 +112,12 @@ public class ElasticsearchRangePredicate extends AbstractElasticsearchSingleFiel
 			return new ElasticsearchRangePredicate( this );
 		}
 
-		private JsonElement convertToFieldValue(Optional<?> valueOptional, ValueConvert convert) {
-			if ( !valueOptional.isPresent() ) {
+		private JsonElement convertToFieldValue(Optional<?> valueOptional, ValueModel valueModel) {
+			if ( valueOptional.isEmpty() ) {
 				return null;
 			}
 			Object value = valueOptional.get();
-			DslConverter<?, ? extends F> toFieldValueConverter = field.type().dslConverter( convert );
+			DslConverter<?, ? extends F> toFieldValueConverter = field.type().dslConverter( valueModel );
 			try {
 				F converted = toFieldValueConverter.unknownTypeToDocumentValue(
 						value, scope.toDocumentValueConvertContext()

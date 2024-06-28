@@ -12,7 +12,7 @@ import org.hibernate.search.backend.lucene.search.common.impl.LuceneSearchIndexS
 import org.hibernate.search.backend.lucene.search.common.impl.LuceneSearchIndexValueFieldContext;
 import org.hibernate.search.backend.lucene.types.codec.impl.LuceneStandardFieldCodec;
 import org.hibernate.search.engine.backend.types.converter.spi.DslConverter;
-import org.hibernate.search.engine.search.common.ValueConvert;
+import org.hibernate.search.engine.search.common.ValueModel;
 import org.hibernate.search.util.common.data.Range;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
@@ -45,8 +45,8 @@ public abstract class AbstractLuceneLeafSingleFieldPredicate extends AbstractLuc
 
 		protected abstract Query buildQuery(PredicateRequestContext context);
 
-		protected <E> E convertAndEncode(LuceneStandardFieldCodec<F, E> codec, Object value, ValueConvert convert) {
-			DslConverter<?, ? extends F> toFieldValueConverter = field.type().dslConverter( convert );
+		protected <E> E convertAndEncode(LuceneStandardFieldCodec<F, E> codec, Object value, ValueModel valueModel) {
+			DslConverter<?, ? extends F> toFieldValueConverter = field.type().dslConverter( valueModel );
 			try {
 				F converted = toFieldValueConverter.unknownTypeToDocumentValue( value,
 						scope.toDocumentValueConvertContext() );
@@ -58,23 +58,23 @@ public abstract class AbstractLuceneLeafSingleFieldPredicate extends AbstractLuc
 		}
 
 		protected <E> Range<E> convertAndEncode(LuceneStandardFieldCodec<F, E> codec, Range<?> range,
-				ValueConvert convertLowerBound,
-				ValueConvert convertUpperBound) {
+				ValueModel lowerBoundModel,
+				ValueModel upperBoundModel) {
 			return Range.between(
-					convertAndEncode( codec, range.lowerBoundValue(), convertLowerBound ),
+					convertAndEncode( codec, range.lowerBoundValue(), lowerBoundModel ),
 					range.lowerBoundInclusion(),
-					convertAndEncode( codec, range.upperBoundValue(), convertUpperBound ),
+					convertAndEncode( codec, range.upperBoundValue(), upperBoundModel ),
 					range.upperBoundInclusion()
 			);
 		}
 
 		private <E> E convertAndEncode(LuceneStandardFieldCodec<F, E> codec, Optional<?> valueOptional,
-				ValueConvert convert) {
-			if ( !valueOptional.isPresent() ) {
+				ValueModel valueModel) {
+			if ( valueOptional.isEmpty() ) {
 				return null;
 			}
 			else {
-				return convertAndEncode( codec, valueOptional.get(), convert );
+				return convertAndEncode( codec, valueOptional.get(), valueModel );
 			}
 		}
 	}

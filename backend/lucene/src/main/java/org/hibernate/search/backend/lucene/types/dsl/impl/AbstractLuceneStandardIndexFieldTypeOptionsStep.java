@@ -10,7 +10,7 @@ import org.hibernate.search.engine.backend.types.Aggregable;
 import org.hibernate.search.engine.backend.types.Projectable;
 import org.hibernate.search.engine.backend.types.Searchable;
 import org.hibernate.search.engine.backend.types.Sortable;
-import org.hibernate.search.engine.backend.types.converter.ToDocumentValueConverter;
+import org.hibernate.search.engine.backend.types.converter.spi.DefaultStringConverters;
 import org.hibernate.search.util.common.AssertionFailure;
 
 /**
@@ -29,9 +29,10 @@ abstract class AbstractLuceneStandardIndexFieldTypeOptionsStep<
 	protected F indexNullAsValue = null;
 
 	AbstractLuceneStandardIndexFieldTypeOptionsStep(LuceneIndexFieldTypeBuildContext buildContext, Class<F> valueType,
-			ToDocumentValueConverter<String, F> defaultParseConverter) {
+			DefaultStringConverters.Converter<F> defaultConverter) {
 		super( buildContext, valueType );
-		builder.parser( defaultParseConverter );
+		builder.parser( defaultConverter );
+		builder.formatter( defaultConverter );
 	}
 
 	@Override

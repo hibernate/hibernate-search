@@ -13,7 +13,7 @@ import jakarta.persistence.EntityManagerFactory;
 
 import org.hibernate.search.documentation.testsupport.BackendConfigurations;
 import org.hibernate.search.documentation.testsupport.DocumentationSetupHelper;
-import org.hibernate.search.engine.search.common.ValueConvert;
+import org.hibernate.search.engine.search.common.ValueModel;
 import org.hibernate.search.mapper.orm.Search;
 import org.hibernate.search.mapper.orm.session.SearchSession;
 import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.TypeMappingStep;
@@ -58,7 +58,7 @@ class IdentifierBridgeSimpleIT {
 			SearchSession searchSession = Search.session( entityManager );
 			//tag::include[]
 			List<Book> result = searchSession.search( Book.class )
-					.where( f -> f.id().matching( "1/42", ValueConvert.PARSE ) ) // <1>
+					.where( f -> f.id().matching( "1/42", ValueModel.INDEX ) ) // <1>
 					.fetchHits( 20 );
 			//end::include[]
 			assertThat( result ).hasSize( 1 );

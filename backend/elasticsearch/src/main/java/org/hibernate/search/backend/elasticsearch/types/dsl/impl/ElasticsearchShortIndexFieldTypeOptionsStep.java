@@ -7,13 +7,13 @@ package org.hibernate.search.backend.elasticsearch.types.dsl.impl;
 import org.hibernate.search.backend.elasticsearch.lowlevel.index.mapping.impl.DataTypes;
 import org.hibernate.search.backend.elasticsearch.types.codec.impl.ElasticsearchFieldCodec;
 import org.hibernate.search.backend.elasticsearch.types.codec.impl.ElasticsearchShortFieldCodec;
-import org.hibernate.search.engine.backend.types.converter.spi.DefaultParseConverters;
+import org.hibernate.search.engine.backend.types.converter.spi.DefaultStringConverters;
 
 class ElasticsearchShortIndexFieldTypeOptionsStep
 		extends AbstractElasticsearchNumericFieldTypeOptionsStep<ElasticsearchShortIndexFieldTypeOptionsStep, Short> {
 
 	ElasticsearchShortIndexFieldTypeOptionsStep(ElasticsearchIndexFieldTypeBuildContext buildContext) {
-		super( buildContext, Short.class, DataTypes.SHORT, DefaultParseConverters.SHORT );
+		super( buildContext, Short.class, DataTypes.SHORT, DefaultStringConverters.SHORT );
 	}
 
 	@Override

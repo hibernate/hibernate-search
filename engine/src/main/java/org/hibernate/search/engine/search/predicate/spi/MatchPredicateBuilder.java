@@ -4,13 +4,13 @@
  */
 package org.hibernate.search.engine.search.predicate.spi;
 
-import org.hibernate.search.engine.search.common.ValueConvert;
+import org.hibernate.search.engine.search.common.ValueModel;
 
 public interface MatchPredicateBuilder extends SearchPredicateBuilder, MinimumShouldMatchBuilder {
 
 	void fuzzy(int maxEditDistance, int exactPrefixLength);
 
-	void value(Object value, ValueConvert convert);
+	void value(Object value, ValueModel valueModel);
 
 	void analyzer(String analyzerName);
 

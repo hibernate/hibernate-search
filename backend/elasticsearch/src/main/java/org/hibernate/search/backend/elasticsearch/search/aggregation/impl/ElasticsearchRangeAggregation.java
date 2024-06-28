@@ -19,7 +19,7 @@ import org.hibernate.search.backend.elasticsearch.search.predicate.impl.Elastics
 import org.hibernate.search.backend.elasticsearch.types.codec.impl.ElasticsearchFieldCodec;
 import org.hibernate.search.engine.backend.types.converter.spi.DslConverter;
 import org.hibernate.search.engine.search.aggregation.spi.RangeAggregationBuilder;
-import org.hibernate.search.engine.search.common.ValueConvert;
+import org.hibernate.search.engine.search.common.ValueModel;
 import org.hibernate.search.util.common.data.Range;
 import org.hibernate.search.util.common.data.RangeBoundInclusion;
 import org.hibernate.search.util.common.impl.CollectionHelper;
@@ -90,9 +90,9 @@ public class ElasticsearchRangeAggregation<F, K>
 		}
 
 		@Override
-		public <T> Builder<F, T> type(Class<T> expectedType, ValueConvert convert) {
+		public <T> Builder<F, T> type(Class<T> expectedType, ValueModel valueModel) {
 			return new Builder<>( codec, scope, field,
-					field.type().dslConverter( convert ).withInputType( expectedType, field ) );
+					field.type().dslConverter( valueModel ).withInputType( expectedType, field ) );
 		}
 	}
 

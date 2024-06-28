@@ -9,7 +9,7 @@ import java.util.function.Function;
 
 import org.hibernate.search.engine.common.dsl.spi.DslExtensionState;
 import org.hibernate.search.engine.search.common.NamedValues;
-import org.hibernate.search.engine.search.common.ValueConvert;
+import org.hibernate.search.engine.search.common.ValueModel;
 import org.hibernate.search.engine.search.projection.SearchProjection;
 import org.hibernate.search.engine.search.projection.dsl.CompositeProjectionInnerStep;
 import org.hibernate.search.engine.search.projection.dsl.CompositeProjectionValueStep;
@@ -60,14 +60,14 @@ public abstract class AbstractSearchProjectionFactory<
 	}
 
 	@Override
-	public <T> FieldProjectionValueStep<?, T> field(String fieldPath, Class<T> clazz, ValueConvert convert) {
+	public <T> FieldProjectionValueStep<?, T> field(String fieldPath, Class<T> clazz, ValueModel valueModel) {
 		Contracts.assertNotNull( clazz, "clazz" );
-		return new FieldProjectionValueStepImpl<>( dslContext, fieldPath, clazz, convert );
+		return new FieldProjectionValueStepImpl<>( dslContext, fieldPath, clazz, valueModel );
 	}
 
 	@Override
-	public FieldProjectionValueStep<?, Object> field(String fieldPath, ValueConvert convert) {
-		return field( fieldPath, Object.class, convert );
+	public FieldProjectionValueStep<?, Object> field(String fieldPath, ValueModel valueModel) {
+		return field( fieldPath, Object.class, valueModel );
 	}
 
 	@Override

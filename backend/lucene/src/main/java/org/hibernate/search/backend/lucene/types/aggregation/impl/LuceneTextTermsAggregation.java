@@ -19,7 +19,7 @@ import org.hibernate.search.backend.lucene.search.common.impl.LuceneSearchIndexS
 import org.hibernate.search.backend.lucene.search.common.impl.LuceneSearchIndexValueFieldContext;
 import org.hibernate.search.engine.backend.types.converter.spi.ProjectionConverter;
 import org.hibernate.search.engine.search.aggregation.spi.TermsAggregationBuilder;
-import org.hibernate.search.engine.search.common.ValueConvert;
+import org.hibernate.search.engine.search.common.ValueModel;
 
 import org.apache.lucene.facet.FacetResult;
 import org.apache.lucene.facet.FacetsCollector;
@@ -119,9 +119,10 @@ public class LuceneTextTermsAggregation<K>
 		}
 
 		@Override
-		public <K> Builder<K> type(Class<K> expectedType, ValueConvert convert) {
+		public <K> Builder<K> type(Class<K> expectedType, ValueModel valueModel) {
 			return new Builder<>( scope, field,
-					field.type().projectionConverter( convert ).withConvertedType( expectedType, field ) );
+					field.type().projectionConverter( valueModel ).withConvertedType( expectedType,
+							field ) );
 		}
 	}
 

@@ -17,7 +17,7 @@ import java.util.function.Function;
 import org.hibernate.search.engine.search.aggregation.dsl.AggregationFinalStep;
 import org.hibernate.search.engine.search.aggregation.dsl.RangeAggregationOptionsStep;
 import org.hibernate.search.engine.search.aggregation.dsl.SearchAggregationFactory;
-import org.hibernate.search.engine.search.common.ValueConvert;
+import org.hibernate.search.engine.search.common.ValueModel;
 import org.hibernate.search.engine.search.predicate.dsl.PredicateFinalStep;
 import org.hibernate.search.engine.search.predicate.dsl.SearchPredicateFactory;
 import org.hibernate.search.engine.spatial.GeoPoint;
@@ -152,8 +152,8 @@ public class RangeAggregationDescriptor extends AggregationDescriptor {
 
 					@Override
 					public AggregationFinalStep<Map<Range<T>, Long>> setupWithConverterSetting(SearchAggregationFactory factory,
-							String fieldPath, ValueConvert convert) {
-						return factory.range().field( fieldPath, helper.getJavaClass(), convert )
+							String fieldPath, ValueModel valueModel) {
+						return factory.range().field( fieldPath, helper.getJavaClass(), valueModel )
 								.range( helper.create( ascendingValues.get( 0 ) ),
 										helper.create( ascendingValues.get( 2 ) ) )
 								.range( helper.create( ascendingValues.get( 2 ) ),

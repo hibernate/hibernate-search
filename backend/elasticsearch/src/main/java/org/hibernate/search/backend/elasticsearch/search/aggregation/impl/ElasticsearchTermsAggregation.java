@@ -15,7 +15,7 @@ import org.hibernate.search.backend.elasticsearch.types.codec.impl.Elasticsearch
 import org.hibernate.search.engine.backend.types.converter.runtime.FromDocumentValueConvertContext;
 import org.hibernate.search.engine.backend.types.converter.spi.ProjectionConverter;
 import org.hibernate.search.engine.search.aggregation.spi.TermsAggregationBuilder;
-import org.hibernate.search.engine.search.common.ValueConvert;
+import org.hibernate.search.engine.search.common.ValueModel;
 import org.hibernate.search.util.common.impl.CollectionHelper;
 
 import com.google.gson.JsonArray;
@@ -91,9 +91,9 @@ public class ElasticsearchTermsAggregation<F, K>
 		}
 
 		@Override
-		public <T> Builder<F, T> type(Class<T> expectedType, ValueConvert convert) {
+		public <T> Builder<F, T> type(Class<T> expectedType, ValueModel valueModel) {
 			return new Builder<>( codec, scope, field,
-					field.type().projectionConverter( convert ).withConvertedType( expectedType, field ) );
+					field.type().projectionConverter( valueModel ).withConvertedType( expectedType, field ) );
 		}
 	}
 

@@ -10,7 +10,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.function.Consumer;
 
-import org.hibernate.search.engine.search.common.ValueConvert;
+import org.hibernate.search.engine.search.common.ValueModel;
 import org.hibernate.search.engine.search.common.spi.SearchIndexScope;
 import org.hibernate.search.engine.search.predicate.SearchPredicate;
 import org.hibernate.search.engine.search.predicate.dsl.TermsPredicateFieldMoreStep;
@@ -51,13 +51,13 @@ class TermsPredicateFieldMoreStepImpl
 	}
 
 	@Override
-	public TermsPredicateOptionsStep<?> matchingAny(Collection<?> terms, ValueConvert convert) {
-		return commonState.matchingAny( terms, convert );
+	public TermsPredicateOptionsStep<?> matchingAny(Collection<?> terms, ValueModel valueModel) {
+		return commonState.matchingAny( terms, valueModel );
 	}
 
 	@Override
-	public TermsPredicateOptionsStep<?> matchingAll(Collection<?> terms, ValueConvert convert) {
-		return commonState.matchingAll( terms, convert );
+	public TermsPredicateOptionsStep<?> matchingAll(Collection<?> terms, ValueModel valueModel) {
+		return commonState.matchingAll( terms, valueModel );
 	}
 
 	@Override
@@ -78,25 +78,25 @@ class TermsPredicateFieldMoreStepImpl
 			super( dslContext );
 		}
 
-		private TermsPredicateOptionsStep<?> matchingAny(Collection<?> terms, ValueConvert convert) {
+		private TermsPredicateOptionsStep<?> matchingAny(Collection<?> terms, ValueModel valueModel) {
 			Contracts.assertNotNullNorEmpty( terms, "terms" );
-			Contracts.assertNotNull( convert, "convert" );
+			Contracts.assertNotNull( valueModel, "valueModel" );
 
 			for ( TermsPredicateFieldMoreStepImpl fieldSetState : getFieldSetStates() ) {
 				for ( TermsPredicateBuilder predicateBuilder : fieldSetState.predicateBuilders ) {
-					predicateBuilder.matchingAny( terms, convert );
+					predicateBuilder.matchingAny( terms, valueModel );
 				}
 			}
 			return this;
 		}
 
-		private TermsPredicateOptionsStep<?> matchingAll(Collection<?> terms, ValueConvert convert) {
+		private TermsPredicateOptionsStep<?> matchingAll(Collection<?> terms, ValueModel valueModel) {
 			Contracts.assertNotNullNorEmpty( terms, "terms" );
-			Contracts.assertNotNull( convert, "convert" );
+			Contracts.assertNotNull( valueModel, "valueModel" );
 
 			for ( TermsPredicateFieldMoreStepImpl fieldSetState : getFieldSetStates() ) {
 				for ( TermsPredicateBuilder predicateBuilder : fieldSetState.predicateBuilders ) {
-					predicateBuilder.matchingAll( terms, convert );
+					predicateBuilder.matchingAll( terms, valueModel );
 				}
 			}
 			return this;

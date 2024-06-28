@@ -10,7 +10,7 @@ import java.util.Iterator;
 import java.util.List;
 
 import org.hibernate.search.engine.backend.types.converter.spi.ProjectionConverter;
-import org.hibernate.search.engine.search.common.ValueConvert;
+import org.hibernate.search.engine.search.common.ValueModel;
 import org.hibernate.search.engine.search.loading.spi.LoadingResult;
 import org.hibernate.search.engine.search.loading.spi.ProjectionHitMapper;
 import org.hibernate.search.engine.search.projection.SearchProjection;
@@ -98,8 +98,8 @@ public class StubFieldProjection<F, V, A, P> extends StubSearchProjection<P> {
 		}
 
 		@Override
-		public <V> Builder<F, V> type(Class<V> expectedType, ValueConvert convert) {
-			ProjectionConverter<F, ? extends V> converter = field.type().projectionConverter( convert )
+		public <V> Builder<F, V> type(Class<V> expectedType, ValueModel valueModel) {
+			ProjectionConverter<F, ? extends V> converter = field.type().projectionConverter( valueModel )
 					.withConvertedType( expectedType, field );
 			return new Builder<>( field.absolutePath(), field.type().valueClass(), expectedType, converter );
 		}

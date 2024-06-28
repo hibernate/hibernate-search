@@ -24,7 +24,7 @@ import org.hibernate.search.engine.backend.types.converter.FromDocumentValueConv
 import org.hibernate.search.engine.backend.types.converter.runtime.FromDocumentValueConvertContext;
 import org.hibernate.search.engine.backend.types.dsl.SearchableProjectableIndexFieldTypeOptionsStep;
 import org.hibernate.search.engine.backend.types.dsl.StandardIndexFieldTypeOptionsStep;
-import org.hibernate.search.engine.search.common.ValueConvert;
+import org.hibernate.search.engine.search.common.ValueModel;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.FieldTypeDescriptor;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.SimpleFieldModel;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.SimpleFieldModelsByType;
@@ -150,7 +150,7 @@ class FieldProjectionTypeCheckingAndConversionIT<F> {
 		Class<?> wrongType = FieldTypeDescriptor.getIncompatible( fieldType ).getJavaType();
 
 		assertThatThrownBy( () -> scope.projection()
-				.field( fieldPath, wrongType, ValueConvert.NO ).toProjection() )
+				.field( fieldPath, wrongType, ValueModel.INDEX ).toProjection() )
 				.isInstanceOf( SearchException.class )
 				.hasMessageContainingAll(
 						"Invalid type for returned values: '" + wrongType.getName() + "'",
@@ -246,7 +246,7 @@ class FieldProjectionTypeCheckingAndConversionIT<F> {
 		String fieldPath = getFieldWithConverterPath( fieldType );
 
 		assertThatQuery( scope.query()
-				.select( f -> f.field( fieldPath, fieldType.getJavaType(), ValueConvert.NO ) )
+				.select( f -> f.field( fieldPath, fieldType.getJavaType(), ValueModel.INDEX ) )
 				.where( f -> f.matchAll() )
 				.toQuery() )
 				.hasHitsAnyOrder(
@@ -265,7 +265,7 @@ class FieldProjectionTypeCheckingAndConversionIT<F> {
 		String fieldPath = getFieldWithConverterPath( fieldType );
 
 		assertThatQuery( scope.query()
-				.select( f -> f.field( fieldPath, ValueConvert.NO ) )
+				.select( f -> f.field( fieldPath, ValueModel.INDEX ) )
 				.where( f -> f.matchAll() )
 				.toQuery() )
 				.hasHitsAnyOrder(
@@ -355,7 +355,7 @@ class FieldProjectionTypeCheckingAndConversionIT<F> {
 		String fieldPath = getFieldWithConverterPath( fieldType );
 
 		assertThatQuery( scope.query()
-				.select( f -> f.field( fieldPath, fieldType.getJavaType(), ValueConvert.NO ) )
+				.select( f -> f.field( fieldPath, fieldType.getJavaType(), ValueModel.INDEX ) )
 				.where( f -> f.matchAll() )
 				.toQuery() )
 				.hasHitsAnyOrder(
@@ -397,7 +397,7 @@ class FieldProjectionTypeCheckingAndConversionIT<F> {
 		String fieldPath = getFieldWithConverterPath( fieldType );
 
 		assertThatQuery( scope.query()
-				.select( f -> f.field( fieldPath, fieldType.getJavaType(), ValueConvert.NO ) )
+				.select( f -> f.field( fieldPath, fieldType.getJavaType(), ValueModel.INDEX ) )
 				.where( f -> f.matchAll() )
 				.toQuery() )
 				.hasHitsAnyOrder(
@@ -431,7 +431,7 @@ class FieldProjectionTypeCheckingAndConversionIT<F> {
 
 		String fieldPath = getFieldPath( fieldType );
 
-		assertThatThrownBy( () -> scope.projection().field( fieldPath, ValueConvert.NO ) )
+		assertThatThrownBy( () -> scope.projection().field( fieldPath, ValueModel.INDEX ) )
 				.isInstanceOf( SearchException.class )
 				.hasMessageContainingAll(
 						"Inconsistent configuration for field '" + fieldPath + "' in a search query across multiple indexes",
@@ -447,26 +447,11 @@ class FieldProjectionTypeCheckingAndConversionIT<F> {
 		String fieldPath = mainIndex.binding().nestedObject.relativeFieldName + "."
 				+ mainIndex.binding().nestedObject.fieldModels.get( fieldType ).relativeFieldName;
 
-		assertThatThrownBy( () -> scope.projection().field( fieldPath, ValueConvert.NO ) )
+		assertThatThrownBy( () -> scope.projection().field( fieldPath, ValueModel.INDEX ) )
 				.isInstanceOf( SearchException.class )
 				.hasMessageContainingAll(
 						"Inconsistent configuration for field '" + fieldPath + "' in a search query across multiple indexes",
 						"Attribute 'nested", "' differs:"
-				);
-	}
-
-	@ParameterizedTest(name = "{0}")
-	@MethodSource("params")
-	void parseNotAllowed(FieldTypeDescriptor<F, ?> fieldType) {
-		StubMappingScope scope = mainIndex.createScope();
-
-		String fieldPath = getFieldPath( fieldType );
-
-		assertThatThrownBy( () -> scope.projection()
-				.field( fieldPath, fieldType.getJavaType(), ValueConvert.PARSE ).toProjection() )
-				.isInstanceOf( SearchException.class )
-				.hasMessageContainingAll(
-						"Cannot use ValueConvert.PARSE as a converter. Use one of the allowed values [YES, NO] instead"
 				);
 	}
 

@@ -54,7 +54,7 @@ public class ConnectedMultiFieldsRangeQueryBuilder
 								rangeContext.getTo(),
 								rangeContext.isExcludeTo() ? RangeBoundInclusion.EXCLUDED : RangeBoundInclusion.INCLUDED
 						),
-						fieldContext.getValueConvert()
+						fieldContext.getValueModel()
 				);
 	}
 

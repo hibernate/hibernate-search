@@ -6,7 +6,7 @@ package org.hibernate.search.engine.search.predicate.dsl;
 
 import java.util.Collection;
 
-import org.hibernate.search.engine.search.common.ValueConvert;
+import org.hibernate.search.engine.search.common.ValueModel;
 
 /**
  * The step in a "match id" predicate definition where the IDs to match can be set.
@@ -24,7 +24,7 @@ public interface MatchIdPredicateMatchingStep<N extends MatchIdPredicateMatching
 	 * @return The next step.
 	 */
 	default N matching(Object value) {
-		return matching( value, ValueConvert.YES );
+		return matching( value, ValueModel.MAPPING );
 	}
 
 	/**
@@ -35,10 +35,27 @@ public interface MatchIdPredicateMatchingStep<N extends MatchIdPredicateMatching
 	 * @param value the value of the id we want to match.
 	 * @param convert Controls how the {@code value} should be converted
 	 * before Hibernate Search attempts to interpret it as an identifier value.
-	 * See {@link ValueConvert} for more information.
+	 * See {@link org.hibernate.search.engine.search.common.ValueConvert} for more information.
+	 * @return The next step.
+	 * @deprecated Use {@link #matching(Object, ValueModel)} instead.
+	 */
+	@Deprecated
+	default N matching(Object value, org.hibernate.search.engine.search.common.ValueConvert convert) {
+		return matching( value, org.hibernate.search.engine.search.common.ValueConvert.toValueModel( convert ) );
+	}
+
+	/**
+	 * Target the identifier with the given id.
+	 * <p>
+	 * If used multiple times, it will target any of the specified values.
+	 * @see #matchingAny(Collection)
+	 * @param value the value of the id we want to match.
+	 * @param valueModel The model value, determines how the {@code value} should be converted
+	 * before Hibernate Search attempts to interpret it as an identifier value.
+	 * See {@link ValueModel} for more information.
 	 * @return The next step.
 	 */
-	N matching(Object value, ValueConvert convert);
+	N matching(Object value, ValueModel valueModel);
 
 	/**
 	 * Target the identifiers matching any of the values in a collection.
@@ -46,7 +63,7 @@ public interface MatchIdPredicateMatchingStep<N extends MatchIdPredicateMatching
 	 * @return The next step.
 	 */
 	default N matchingAny(Collection<?> values) {
-		return matchingAny( values, ValueConvert.YES );
+		return matchingAny( values, ValueModel.MAPPING );
 	}
 
 	/**
@@ -54,13 +71,27 @@ public interface MatchIdPredicateMatchingStep<N extends MatchIdPredicateMatching
 	 * @param values the collection of identifiers to match.
 	 * @param convert Controls how the {@code value} should be converted
 	 * before Hibernate Search attempts to interpret it as an identifier value.
-	 * See {@link ValueConvert} for more information.
+	 * See {@link org.hibernate.search.engine.search.common.ValueConvert} for more information.
+	 * @return The next step.
+	 * @deprecated Use {@link #matchingAny(Collection, ValueModel)} instead.
+	 */
+	@Deprecated
+	default N matchingAny(Collection<?> values, org.hibernate.search.engine.search.common.ValueConvert convert) {
+		return matching( values, org.hibernate.search.engine.search.common.ValueConvert.toValueModel( convert ) );
+	}
+
+	/**
+	 * Target the identifiers matching any of the values in a collection.
+	 * @param values the collection of identifiers to match.
+	 * @param valueModel The model value, determines how the {@code value} should be converted
+	 * before Hibernate Search attempts to interpret it as an identifier value.
+	 * See {@link ValueModel} for more information.
 	 * @return The next step.
 	 */
-	default N matchingAny(Collection<?> values, ValueConvert convert) {
+	default N matchingAny(Collection<?> values, ValueModel valueModel) {
 		N next = null;
 		for ( Object value : values ) {
-			next = matching( value, convert );
+			next = matching( value, valueModel );
 		}
 		return next;
 	}
