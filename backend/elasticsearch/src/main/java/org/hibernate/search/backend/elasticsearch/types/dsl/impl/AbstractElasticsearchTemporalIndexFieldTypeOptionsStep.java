@@ -20,7 +20,7 @@ import org.hibernate.search.backend.elasticsearch.types.predicate.impl.Elasticse
 import org.hibernate.search.backend.elasticsearch.types.predicate.impl.ElasticsearchStandardMatchPredicate;
 import org.hibernate.search.backend.elasticsearch.types.predicate.impl.ElasticsearchTermsPredicate;
 import org.hibernate.search.backend.elasticsearch.types.sort.impl.ElasticsearchStandardFieldSort;
-import org.hibernate.search.engine.backend.types.converter.ToDocumentValueConverter;
+import org.hibernate.search.engine.backend.types.converter.spi.DefaultStringConverters;
 import org.hibernate.search.engine.search.aggregation.spi.AggregationTypeKeys;
 import org.hibernate.search.engine.search.predicate.spi.PredicateTypeKeys;
 import org.hibernate.search.engine.search.projection.spi.ProjectionTypeKeys;
@@ -32,8 +32,8 @@ abstract class AbstractElasticsearchTemporalIndexFieldTypeOptionsStep<
 		extends AbstractElasticsearchSimpleStandardFieldTypeOptionsStep<S, F> {
 
 	AbstractElasticsearchTemporalIndexFieldTypeOptionsStep(ElasticsearchIndexFieldTypeBuildContext buildContext,
-			Class<F> fieldType, ToDocumentValueConverter<String, F> defaultParseConverter) {
-		super( buildContext, fieldType, DataTypes.DATE, defaultParseConverter );
+			Class<F> fieldType, DefaultStringConverters.Converter<F> defaultConverter) {
+		super( buildContext, fieldType, DataTypes.DATE, defaultConverter );
 	}
 
 	@Override

@@ -11,7 +11,7 @@ import org.hibernate.search.engine.search.aggregation.dsl.TermsAggregationOption
 import org.hibernate.search.engine.search.aggregation.dsl.spi.SearchAggregationDslContext;
 import org.hibernate.search.engine.search.aggregation.spi.AggregationTypeKeys;
 import org.hibernate.search.engine.search.aggregation.spi.TermsAggregationBuilder;
-import org.hibernate.search.engine.search.common.ValueConvert;
+import org.hibernate.search.engine.search.common.ValueModel;
 import org.hibernate.search.engine.search.predicate.dsl.SearchPredicateFactory;
 import org.hibernate.search.util.common.impl.Contracts;
 
@@ -24,11 +24,11 @@ public class TermsAggregationFieldStepImpl<PDF extends SearchPredicateFactory> i
 
 	@Override
 	public <F> TermsAggregationOptionsStep<?, PDF, F, Map<F, Long>> field(String fieldPath, Class<F> type,
-			ValueConvert convert) {
+			ValueModel valueModel) {
 		Contracts.assertNotNull( fieldPath, "fieldPath" );
 		Contracts.assertNotNull( type, "type" );
 		TermsAggregationBuilder<F> builder = dslContext.scope()
-				.fieldQueryElement( fieldPath, AggregationTypeKeys.TERMS ).type( type, convert );
+				.fieldQueryElement( fieldPath, AggregationTypeKeys.TERMS ).type( type, valueModel );
 		return new TermsAggregationOptionsStepImpl<>( builder, dslContext );
 	}
 }

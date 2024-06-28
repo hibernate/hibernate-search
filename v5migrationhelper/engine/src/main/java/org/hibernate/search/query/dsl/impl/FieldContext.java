@@ -5,7 +5,7 @@
 
 package org.hibernate.search.query.dsl.impl;
 
-import org.hibernate.search.engine.search.common.ValueConvert;
+import org.hibernate.search.engine.search.common.ValueModel;
 import org.hibernate.search.engine.search.predicate.dsl.MultiFieldPredicateFieldBoostStep;
 
 /**
@@ -41,8 +41,8 @@ public class FieldContext {
 		fieldBoost *= boost;
 	}
 
-	public ValueConvert getValueConvert() {
-		return ignoreFieldBridge ? ValueConvert.NO : ValueConvert.YES;
+	public ValueModel getValueModel() {
+		return ignoreFieldBridge ? ValueModel.INDEX : ValueModel.MAPPING;
 	}
 
 	public void setIgnoreFieldBridge(boolean ignoreFieldBridge) {

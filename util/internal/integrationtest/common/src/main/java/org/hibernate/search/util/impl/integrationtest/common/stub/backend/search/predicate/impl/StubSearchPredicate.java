@@ -11,7 +11,7 @@ import java.util.function.Function;
 import org.hibernate.search.engine.search.common.BooleanOperator;
 import org.hibernate.search.engine.search.common.NamedValues;
 import org.hibernate.search.engine.search.common.RewriteMethod;
-import org.hibernate.search.engine.search.common.ValueConvert;
+import org.hibernate.search.engine.search.common.ValueModel;
 import org.hibernate.search.engine.search.predicate.SearchPredicate;
 import org.hibernate.search.engine.search.predicate.dsl.PredicateFinalStep;
 import org.hibernate.search.engine.search.predicate.dsl.RegexpQueryFlag;
@@ -217,7 +217,7 @@ public class StubSearchPredicate implements SearchPredicate {
 		}
 
 		@Override
-		public void value(Object value, ValueConvert convert) {
+		public void value(Object value, ValueModel valueModel) {
 			// No-op
 		}
 
@@ -232,7 +232,7 @@ public class StubSearchPredicate implements SearchPredicate {
 		}
 
 		@Override
-		public void within(Range<?> range, ValueConvert convertLowerBound, ValueConvert convertUpperBound) {
+		public void within(Range<?> range, ValueModel lowerBoundModel, ValueModel upperBoundModel) {
 			// No-op
 		}
 
@@ -253,12 +253,12 @@ public class StubSearchPredicate implements SearchPredicate {
 		}
 
 		@Override
-		public void matchingAny(Collection<?> terms, ValueConvert convert) {
+		public void matchingAny(Collection<?> terms, ValueModel valueModel) {
 			// No-op
 		}
 
 		@Override
-		public void matchingAll(Collection<?> terms, ValueConvert convert) {
+		public void matchingAll(Collection<?> terms, ValueModel valueModel) {
 			// No-op
 		}
 

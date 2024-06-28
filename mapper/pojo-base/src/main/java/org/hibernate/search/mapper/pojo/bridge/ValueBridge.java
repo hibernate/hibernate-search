@@ -4,6 +4,8 @@
  */
 package org.hibernate.search.mapper.pojo.bridge;
 
+import java.util.Objects;
+
 import org.hibernate.search.mapper.pojo.bridge.runtime.ValueBridgeFromIndexedValueContext;
 import org.hibernate.search.mapper.pojo.bridge.runtime.ValueBridgeToIndexedValueContext;
 import org.hibernate.search.mapper.pojo.bridge.runtime.ValueBridgeToIndexedValueContextExtension;
@@ -55,6 +57,10 @@ public interface ValueBridge<V, F> extends AutoCloseable {
 	default F parse(String value) {
 		throw new UnsupportedOperationException( "Bridge " + toString()
 				+ " does not support parsing a value from a String. Trying to parse the value: " + value + "." );
+	}
+
+	default String format(F value) {
+		return Objects.toString( value, null );
 	}
 
 	/**

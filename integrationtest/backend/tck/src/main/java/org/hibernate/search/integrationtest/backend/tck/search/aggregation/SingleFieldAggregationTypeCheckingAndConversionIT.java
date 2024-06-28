@@ -34,7 +34,7 @@ import org.hibernate.search.engine.search.aggregation.AggregationKey;
 import org.hibernate.search.engine.search.aggregation.SearchAggregation;
 import org.hibernate.search.engine.search.aggregation.dsl.AggregationFinalStep;
 import org.hibernate.search.engine.search.aggregation.dsl.SearchAggregationFactory;
-import org.hibernate.search.engine.search.common.ValueConvert;
+import org.hibernate.search.engine.search.common.ValueModel;
 import org.hibernate.search.engine.search.predicate.dsl.PredicateFinalStep;
 import org.hibernate.search.engine.search.predicate.dsl.SearchPredicateFactory;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.operations.AggregationDescriptor;
@@ -313,7 +313,7 @@ class SingleFieldAggregationTypeCheckingAndConversionIT<F> {
 		AggregationScenario<?> scenario = expectations.withFieldType( TypeAssertionHelper.wrongType( wrongType ) );
 
 		assertThatThrownBy( () -> scenario.setupWithConverterSetting(
-				mainIndex.createScope().aggregation(), fieldPath, ValueConvert.NO
+				mainIndex.createScope().aggregation(), fieldPath, ValueModel.INDEX
 		) )
 				.isInstanceOf( SearchException.class )
 				.hasMessageContainingAll(
@@ -492,31 +492,9 @@ class SingleFieldAggregationTypeCheckingAndConversionIT<F> {
 
 		AggregationScenario<?> scenario = expectations.simple();
 		testValidAggregationWithConverterSetting(
-				scenario, mainIndex.createScope(), fieldPath, ValueConvert.NO,
+				scenario, mainIndex.createScope(), fieldPath, ValueModel.INDEX,
 				dataSet
 		);
-	}
-
-	@ParameterizedTest(name = "{0}")
-	@MethodSource("params")
-	void withConverter_conversionParser(SupportedSingleFieldAggregationExpectations<F> expectations,
-			DataSet<F> dataSet) {
-		String fieldPath = mainIndex.binding().fieldModels.get( expectations.fieldType() ).relativeFieldName;
-		AggregationScenario<?> scenario = expectations.withFieldType(
-				TypeAssertionHelper.parser( expectations.fieldType() ) );
-		if ( "range".equalsIgnoreCase( expectations.aggregationName() ) ) {
-			testValidAggregationWithConverterSetting(
-					scenario, mainIndex.createScope(), fieldPath, ValueConvert.PARSE,
-					dataSet
-			);
-		}
-		else {
-			assertThatThrownBy( () -> scenario.setupWithConverterSetting( mainIndex.createScope().aggregation(), fieldPath,
-					ValueConvert.PARSE ) )
-					.isInstanceOf( SearchException.class )
-					.hasMessageContainingAll(
-							"Cannot use ValueConvert.PARSE as a converter. Use one of the allowed values [YES, NO] instead" );
-		}
 	}
 
 	@ParameterizedTest(name = "{0}")
@@ -598,7 +576,7 @@ class SingleFieldAggregationTypeCheckingAndConversionIT<F> {
 
 		AggregationScenario<?> scenario = expectations.onMainAndOtherIndex();
 		testValidAggregationWithConverterSetting(
-				scenario, scope, fieldPath, ValueConvert.NO,
+				scenario, scope, fieldPath, ValueModel.INDEX,
 				dataSet
 		);
 	}
@@ -632,7 +610,7 @@ class SingleFieldAggregationTypeCheckingAndConversionIT<F> {
 		AggregationScenario<?> scenario = expectations.simple();
 
 		assertThatThrownBy( () -> scenario.setupWithConverterSetting(
-				scope.aggregation(), fieldPath, ValueConvert.NO
+				scope.aggregation(), fieldPath, ValueModel.INDEX
 		) )
 				.isInstanceOf( SearchException.class )
 				.hasMessageContainingAll(
@@ -652,11 +630,12 @@ class SingleFieldAggregationTypeCheckingAndConversionIT<F> {
 	}
 
 	private <A> void testValidAggregationWithConverterSetting(AggregationScenario<A> scenario,
-			StubMappingScope scope, String fieldPath, ValueConvert convert, DataSet<F> dataSet) {
+			StubMappingScope scope, String fieldPath, ValueModel valueModel,
+			DataSet<F> dataSet) {
 		testValidAggregation(
 				scenario, scope,
 				f -> f.matchAll(),
-				(f, e) -> e.setupWithConverterSetting( f, fieldPath, convert ),
+				(f, e) -> e.setupWithConverterSetting( f, fieldPath, valueModel ),
 				dataSet
 		);
 	}

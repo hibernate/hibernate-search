@@ -44,7 +44,7 @@ public interface IndexFieldTypeConverterStep<S extends IndexFieldTypeConverterSt
 
 	/**
 	 * Define how string values passed to the predicate and sort DSL should be converted to the type of field values,
-	 * when {@link org.hibernate.search.engine.search.common.ValueConvert#PARSE} is used,
+	 * when {@link org.hibernate.search.engine.search.common.ValueModel#STRING} is used,
 	 * or when parsing query strings (local backends only, e.g. Lucene).
 	 *
 	 * @param parser A converter to parse string values.
@@ -52,5 +52,16 @@ public interface IndexFieldTypeConverterStep<S extends IndexFieldTypeConverterSt
 	 */
 	@Incubating
 	S parser(ToDocumentValueConverter<String, ? extends F> parser);
+
+	/**
+	 * Define how values returned when projecting on fields of this type
+	 * should be formatted to string before being returned to the user,
+	 * when {@link org.hibernate.search.engine.search.common.ValueModel#STRING} is used.
+	 *
+	 * @param formatter A converter to format value to string.
+	 * @return {@code this}, for method chaining.
+	 */
+	@Incubating
+	S formatter(FromDocumentValueConverter<? super F, String> formatter);
 
 }

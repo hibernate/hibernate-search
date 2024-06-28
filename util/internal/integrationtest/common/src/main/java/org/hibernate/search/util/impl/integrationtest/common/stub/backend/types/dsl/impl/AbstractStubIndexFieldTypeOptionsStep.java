@@ -40,6 +40,12 @@ abstract class AbstractStubIndexFieldTypeOptionsStep<S extends AbstractStubIndex
 	}
 
 	@Override
+	public S formatter(FromDocumentValueConverter<? super F, String> formatter) {
+		builder.formatter( formatter );
+		return thisAsS();
+	}
+
+	@Override
 	public IndexFieldType<F> toIndexFieldType() {
 		return builder.build();
 	}

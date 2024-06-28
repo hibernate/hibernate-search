@@ -14,7 +14,7 @@ import org.hibernate.search.backend.elasticsearch.search.common.impl.Elasticsear
 import org.hibernate.search.backend.elasticsearch.types.codec.impl.ElasticsearchFieldCodec;
 import org.hibernate.search.engine.backend.types.converter.runtime.FromDocumentValueConvertContext;
 import org.hibernate.search.engine.backend.types.converter.spi.ProjectionConverter;
-import org.hibernate.search.engine.search.common.ValueConvert;
+import org.hibernate.search.engine.search.common.ValueModel;
 import org.hibernate.search.engine.search.loading.spi.LoadingResult;
 import org.hibernate.search.engine.search.loading.spi.ProjectionHitMapper;
 import org.hibernate.search.engine.search.projection.SearchProjection;
@@ -154,9 +154,9 @@ public class ElasticsearchFieldProjection<F, V, P> extends AbstractElasticsearch
 		}
 
 		@Override
-		public <V> Builder<F, V> type(Class<V> expectedType, ValueConvert convert) {
+		public <V> Builder<F, V> type(Class<V> expectedType, ValueModel valueModel) {
 			return new Builder<>( codec, scope, field,
-					field.type().projectionConverter( convert ).withConvertedType( expectedType, field ) );
+					field.type().projectionConverter( valueModel ).withConvertedType( expectedType, field ) );
 		}
 	}
 

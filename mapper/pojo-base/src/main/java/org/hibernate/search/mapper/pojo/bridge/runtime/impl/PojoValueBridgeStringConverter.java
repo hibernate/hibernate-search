@@ -4,16 +4,18 @@
  */
 package org.hibernate.search.mapper.pojo.bridge.runtime.impl;
 
+import org.hibernate.search.engine.backend.types.converter.FromDocumentValueConverter;
 import org.hibernate.search.engine.backend.types.converter.ToDocumentValueConverter;
+import org.hibernate.search.engine.backend.types.converter.runtime.FromDocumentValueConvertContext;
 import org.hibernate.search.engine.backend.types.converter.runtime.ToDocumentValueConvertContext;
 import org.hibernate.search.mapper.pojo.bridge.ValueBridge;
 
-public final class PojoValueBridgeParseConverter<F>
-		implements ToDocumentValueConverter<String, F> {
+public final class PojoValueBridgeStringConverter<F>
+		implements ToDocumentValueConverter<String, F>, FromDocumentValueConverter<F, String> {
 
 	private final ValueBridge<?, F> bridge;
 
-	public PojoValueBridgeParseConverter(ValueBridge<?, F> bridge) {
+	public PojoValueBridgeStringConverter(ValueBridge<?, F> bridge) {
 		this.bridge = bridge;
 	}
 
@@ -28,11 +30,16 @@ public final class PojoValueBridgeParseConverter<F>
 	}
 
 	@Override
+	public String fromDocumentValue(F value, FromDocumentValueConvertContext context) {
+		return bridge.format( value );
+	}
+
+	@Override
 	public boolean isCompatibleWith(ToDocumentValueConverter<?, ?> other) {
 		if ( other == null || !getClass().equals( other.getClass() ) ) {
 			return false;
 		}
-		PojoValueBridgeParseConverter<?> castedOther = (PojoValueBridgeParseConverter<?>) other;
+		PojoValueBridgeStringConverter<?> castedOther = (PojoValueBridgeStringConverter<?>) other;
 		return bridge.isCompatibleWith( castedOther.bridge );
 	}
 }

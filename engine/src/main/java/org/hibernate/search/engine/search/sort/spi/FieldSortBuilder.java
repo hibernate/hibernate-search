@@ -5,7 +5,7 @@
 package org.hibernate.search.engine.search.sort.spi;
 
 import org.hibernate.search.engine.search.common.SortMode;
-import org.hibernate.search.engine.search.common.ValueConvert;
+import org.hibernate.search.engine.search.common.ValueModel;
 import org.hibernate.search.engine.search.predicate.SearchPredicate;
 import org.hibernate.search.engine.search.sort.dsl.SortOrder;
 
@@ -21,7 +21,7 @@ public interface FieldSortBuilder extends SearchSortBuilder {
 
 	void missingLowest();
 
-	void missingAs(Object value, ValueConvert convert);
+	void missingAs(Object value, ValueModel valueModel);
 
 	void mode(SortMode mode);
 

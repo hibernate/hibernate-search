@@ -13,7 +13,7 @@ import jakarta.persistence.EntityManagerFactory;
 
 import org.hibernate.search.documentation.testsupport.BackendConfigurations;
 import org.hibernate.search.documentation.testsupport.DocumentationSetupHelper;
-import org.hibernate.search.engine.search.common.ValueConvert;
+import org.hibernate.search.engine.search.common.ValueModel;
 import org.hibernate.search.mapper.orm.Search;
 import org.hibernate.search.mapper.orm.session.SearchSession;
 
@@ -45,7 +45,7 @@ class IdentifierBridgeParamStringIT {
 			SearchSession searchSession = Search.session( entityManager );
 
 			List<Book> result = searchSession.search( Book.class )
-					.where( f -> f.id().matching( "1", ValueConvert.NO ) )
+					.where( f -> f.id().matching( "1", ValueModel.INDEX ) )
 					.fetchHits( 20 );
 
 			assertThat( result ).hasSize( 1 );

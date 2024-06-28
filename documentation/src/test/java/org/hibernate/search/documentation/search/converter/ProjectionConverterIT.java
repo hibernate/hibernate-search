@@ -20,7 +20,7 @@ import jakarta.persistence.Table;
 import org.hibernate.search.documentation.testsupport.BackendConfigurations;
 import org.hibernate.search.documentation.testsupport.DocumentationSetupHelper;
 import org.hibernate.search.engine.backend.types.Projectable;
-import org.hibernate.search.engine.search.common.ValueConvert;
+import org.hibernate.search.engine.search.common.ValueModel;
 import org.hibernate.search.mapper.orm.Search;
 import org.hibernate.search.mapper.orm.session.SearchSession;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
@@ -66,7 +66,7 @@ class ProjectionConverterIT {
 
 			// tag::projection-converter-disabled[]
 			List<String> result = searchSession.search( Order.class )
-					.select( f -> f.field( "status", String.class, ValueConvert.NO ) )
+					.select( f -> f.field( "status", String.class, ValueModel.INDEX ) )
 					.where( f -> f.matchAll() )
 					.fetchHits( 20 );
 			// end::projection-converter-disabled[]

@@ -11,7 +11,7 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 import org.hibernate.search.engine.environment.bean.BeanRetrieval;
-import org.hibernate.search.engine.search.common.ValueConvert;
+import org.hibernate.search.engine.search.common.ValueModel;
 import org.hibernate.search.engine.search.projection.dsl.SearchProjectionFactory;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.processing.MethodParameterMapping;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.processing.MethodParameterMappingAnnotationProcessorRef;
@@ -20,7 +20,7 @@ import org.hibernate.search.mapper.pojo.mapping.definition.annotation.processing
 /**
  * Maps a constructor parameter to a projection to the value of a field in the indexed document.
  *
- * @see SearchProjectionFactory#field(String, Class, ValueConvert)
+ * @see SearchProjectionFactory#field(String, Class, ValueModel)
  */
 @Documented
 @Target({ ElementType.PARAMETER })
@@ -41,9 +41,22 @@ public @interface FieldProjection {
 
 	/**
 	 * @return A value controlling how the data fetched from the backend should be converted.
-	 * @see ValueConvert
-	 * @see SearchProjectionFactory#field(String, Class, ValueConvert)
+	 * @see org.hibernate.search.engine.search.common.ValueConvert
+	 * @see SearchProjectionFactory#field(String, Class, org.hibernate.search.engine.search.common.ValueConvert)
+	 * @deprecated Use {@link #valueModel()} instead.
+	 * Note, setting {@link #convert()} to non-default {@link org.hibernate.search.engine.search.common.ValueConvert#NO}
+	 * will result in an exception at runtime, use {@link #valueModel()} with {@link ValueModel#INDEX} instead.
+	 * <p>
+	 * Setting {@link #valueModel()} to any non-default value will take precedence over {@link #convert()} default {@link org.hibernate.search.engine.search.common.ValueConvert#YES} value.
 	 */
-	ValueConvert convert() default ValueConvert.YES;
+	@Deprecated
+	org.hibernate.search.engine.search.common.ValueConvert convert() default org.hibernate.search.engine.search.common.ValueConvert.YES;
+
+	/**
+	 * @return The model value, determines how the data fetched from the backend should be converted.
+	 * @see ValueModel
+	 * @see SearchProjectionFactory#field(String, Class, ValueModel)
+	 */
+	ValueModel valueModel() default ValueModel.MAPPING;
 
 }

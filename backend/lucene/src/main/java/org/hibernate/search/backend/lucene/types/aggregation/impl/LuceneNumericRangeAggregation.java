@@ -24,7 +24,7 @@ import org.hibernate.search.backend.lucene.types.codec.impl.AbstractLuceneNumeri
 import org.hibernate.search.backend.lucene.types.lowlevel.impl.LuceneNumericDomain;
 import org.hibernate.search.engine.backend.types.converter.spi.DslConverter;
 import org.hibernate.search.engine.search.aggregation.spi.RangeAggregationBuilder;
-import org.hibernate.search.engine.search.common.ValueConvert;
+import org.hibernate.search.engine.search.common.ValueModel;
 import org.hibernate.search.util.common.data.Range;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
@@ -116,9 +116,9 @@ public class LuceneNumericRangeAggregation<F, E extends Number, K>
 		}
 
 		@Override
-		public <K> Builder<F, ?, K> type(Class<K> expectedType, ValueConvert convert) {
+		public <K> Builder<F, ?, K> type(Class<K> expectedType, ValueModel valueModel) {
 			return new Builder<>( codec, scope, field,
-					field.type().dslConverter( convert ).withInputType( expectedType, field )
+					field.type().dslConverter( valueModel ).withInputType( expectedType, field )
 			);
 		}
 	}

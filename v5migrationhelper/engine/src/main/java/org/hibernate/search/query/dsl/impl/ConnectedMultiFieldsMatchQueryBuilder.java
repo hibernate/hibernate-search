@@ -30,7 +30,7 @@ public class ConnectedMultiFieldsMatchQueryBuilder
 	protected MatchPredicateOptionsStep<?> createPredicate(SearchPredicateFactory factory, FieldContext fieldContext) {
 		MatchPredicateOptionsStep<?> optionsStep =
 				fieldContext.applyBoost( factory.match().field( fieldContext.getField() ) )
-						.matching( value, fieldContext.getValueConvert() );
+						.matching( value, fieldContext.getValueModel() );
 
 		if ( TermQueryContext.Approximation.FUZZY.equals( termContext.getApproximation() ) ) {
 			optionsStep.fuzzy( termContext.getMaxEditDistance(), termContext.getPrefixLength() );

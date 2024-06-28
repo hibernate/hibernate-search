@@ -10,7 +10,7 @@ import java.util.Set;
 import org.hibernate.search.backend.lucene.search.common.impl.LuceneSearchIndexScope;
 import org.hibernate.search.backend.lucene.types.predicate.impl.LuceneCommonQueryStringPredicateBuilderFieldState;
 import org.hibernate.search.engine.search.common.BooleanOperator;
-import org.hibernate.search.engine.search.common.ValueConvert;
+import org.hibernate.search.engine.search.common.ValueModel;
 import org.hibernate.search.engine.search.common.spi.SearchQueryElementTypeKey;
 import org.hibernate.search.engine.search.predicate.SearchPredicate;
 import org.hibernate.search.engine.search.predicate.dsl.SimpleQueryFlag;
@@ -134,7 +134,7 @@ public class LuceneSimpleQueryStringPredicate extends LuceneCommonQueryStringPre
 
 			if ( !state.field().type().valueClass().isAssignableFrom( String.class ) ) {
 				var builder = state.field().queryElement( PredicateTypeKeys.MATCH, scope );
-				builder.value( queryText, ValueConvert.PARSE );
+				builder.value( queryText, ValueModel.STRING );
 				return LuceneSearchPredicate.from( scope, builder.build() ).toQuery( contextForField( state ) );
 			}
 			return super.createFieldQuery( analyzer, operator, field, queryText, quoted, phraseSlop );

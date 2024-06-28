@@ -16,7 +16,7 @@ import org.hibernate.search.backend.elasticsearch.types.predicate.impl.Elasticse
 import org.hibernate.search.backend.elasticsearch.types.predicate.impl.ElasticsearchStandardMatchPredicate;
 import org.hibernate.search.backend.elasticsearch.types.predicate.impl.ElasticsearchTermsPredicate;
 import org.hibernate.search.backend.elasticsearch.types.sort.impl.ElasticsearchStandardFieldSort;
-import org.hibernate.search.engine.backend.types.converter.spi.DefaultParseConverters;
+import org.hibernate.search.engine.backend.types.converter.spi.DefaultStringConverters;
 import org.hibernate.search.engine.search.aggregation.spi.AggregationTypeKeys;
 import org.hibernate.search.engine.search.predicate.spi.PredicateTypeKeys;
 import org.hibernate.search.engine.search.projection.spi.ProjectionTypeKeys;
@@ -27,7 +27,7 @@ class ElasticsearchBooleanIndexFieldTypeOptionsStep
 		AbstractElasticsearchSimpleStandardFieldTypeOptionsStep<ElasticsearchBooleanIndexFieldTypeOptionsStep, Boolean> {
 
 	ElasticsearchBooleanIndexFieldTypeOptionsStep(ElasticsearchIndexFieldTypeBuildContext buildContext) {
-		super( buildContext, Boolean.class, DataTypes.BOOLEAN, DefaultParseConverters.BOOLEAN );
+		super( buildContext, Boolean.class, DataTypes.BOOLEAN, DefaultStringConverters.BOOLEAN );
 	}
 
 	@Override

@@ -14,7 +14,7 @@ import java.util.List;
 import org.hibernate.search.engine.backend.types.converter.ToDocumentValueConverter;
 import org.hibernate.search.engine.backend.types.converter.runtime.ToDocumentValueConvertContext;
 import org.hibernate.search.engine.reporting.spi.EventContexts;
-import org.hibernate.search.engine.search.common.ValueConvert;
+import org.hibernate.search.engine.search.common.ValueModel;
 import org.hibernate.search.engine.search.predicate.dsl.SearchPredicateFactory;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.extension.SearchSetupHelper;
 import org.hibernate.search.util.common.SearchException;
@@ -154,8 +154,8 @@ class MatchIdPredicateSpecificsIT {
 		StubMappingScope scope = mainIndex.createScope( incompatibleIdConverterIndex );
 
 		assertThatQuery( scope.query()
-				.where( f -> f.id().matching( DOCUMENT_1, ValueConvert.NO )
-						.matching( INCOMPATIBLE_ID_CONVERTER_DOCUMENT_1, ValueConvert.NO ) ) )
+				.where( f -> f.id().matching( DOCUMENT_1, ValueModel.INDEX )
+						.matching( INCOMPATIBLE_ID_CONVERTER_DOCUMENT_1, ValueModel.INDEX ) ) )
 				.hasDocRefHitsAnyOrder( b -> {
 					b.doc( mainIndex.typeName(), DOCUMENT_1 );
 					b.doc( incompatibleIdConverterIndex.typeName(), INCOMPATIBLE_ID_CONVERTER_DOCUMENT_1 );
@@ -167,7 +167,7 @@ class MatchIdPredicateSpecificsIT {
 		StubMappingScope scope = mainIndex.createScope();
 
 		assertThatQuery( scope.query()
-				.where( f -> f.id().matching( DOCUMENT_1, ValueConvert.PARSE ) )
+				.where( f -> f.id().matching( DOCUMENT_1, ValueModel.STRING ) )
 				.toQuery() )
 				.hasDocRefHitsAnyOrder( mainIndex.typeName(), DOCUMENT_1 );
 	}
@@ -177,17 +177,17 @@ class MatchIdPredicateSpecificsIT {
 		StubMappingScope scope = parseIndex.createScope();
 
 		assertThatQuery( scope.query()
-				.where( f -> f.id().matching( DOCUMENT_1, ValueConvert.PARSE ) )
+				.where( f -> f.id().matching( DOCUMENT_1, ValueModel.STRING ) )
 				.toQuery() )
 				.hasDocRefHitsAnyOrder( parseIndex.typeName(), ( ParseIdConverter.id( DOCUMENT_1 ) ) );
 
 		assertThatQuery( scope.query()
-				.where( f -> f.id().matching( ParseIdConverter.id( DOCUMENT_1 ), ValueConvert.NO ) )
+				.where( f -> f.id().matching( ParseIdConverter.id( DOCUMENT_1 ), ValueModel.INDEX ) )
 				.toQuery() )
 				.hasDocRefHitsAnyOrder( parseIndex.typeName(), ( ParseIdConverter.id( DOCUMENT_1 ) ) );
 
 		assertThatQuery( scope.query()
-				.where( f -> f.id().matching( ParseIdConverter.id( DOCUMENT_1 ), ValueConvert.YES ) )
+				.where( f -> f.id().matching( ParseIdConverter.id( DOCUMENT_1 ), ValueModel.MAPPING ) )
 				.toQuery() )
 				.hasDocRefHitsAnyOrder( parseIndex.typeName(), ( ParseIdConverter.id( DOCUMENT_1 ) ) );
 	}

@@ -100,6 +100,12 @@ public abstract class AbstractMultiIndexSearchIndexValueFieldContext<
 	}
 
 	@Override
+	public ProjectionConverter<F, ?> formatter() {
+		return fromTypeIfCompatible( SearchIndexValueFieldTypeContext::formatter, ProjectionConverter::isCompatibleWith,
+				"formatter" );
+	}
+
+	@Override
 	public boolean highlighterTypeSupported(SearchHighlighterType type) {
 		return fromTypeIfCompatible(
 				t -> t.highlighterTypeSupported( type ),

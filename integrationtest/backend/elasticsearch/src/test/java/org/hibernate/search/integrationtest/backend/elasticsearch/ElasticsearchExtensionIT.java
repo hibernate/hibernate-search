@@ -44,7 +44,7 @@ import org.hibernate.search.engine.backend.types.Sortable;
 import org.hibernate.search.engine.common.EntityReference;
 import org.hibernate.search.engine.common.spi.SearchIntegration;
 import org.hibernate.search.engine.search.aggregation.AggregationKey;
-import org.hibernate.search.engine.search.common.ValueConvert;
+import org.hibernate.search.engine.search.common.ValueModel;
 import org.hibernate.search.engine.search.loading.spi.SearchLoadingContext;
 import org.hibernate.search.engine.search.predicate.SearchPredicate;
 import org.hibernate.search.engine.search.projection.SearchProjection;
@@ -371,7 +371,7 @@ class ElasticsearchExtensionIT {
 
 		SearchQuery<DocumentReference> query = scope.query()
 				.where( f -> f.match().field( "nativeField_integer_converted" )
-						.matching( new JsonPrimitive( 2 ), ValueConvert.NO ) )
+						.matching( new JsonPrimitive( 2 ), ValueModel.INDEX ) )
 				.toQuery();
 		assertThatQuery( query )
 				.hasDocRefHitsAnyOrder( mainIndex.typeName(), SECOND_ID )
@@ -826,7 +826,7 @@ class ElasticsearchExtensionIT {
 		StubMappingScope scope = mainIndex.createScope();
 
 		SearchQuery<JsonElement> query = scope.query()
-				.select( f -> f.field( "nativeField_integer_converted", JsonElement.class, ValueConvert.NO ) )
+				.select( f -> f.field( "nativeField_integer_converted", JsonElement.class, ValueModel.INDEX ) )
 				.where( f -> f.id().matching( SECOND_ID ) )
 				.toQuery();
 

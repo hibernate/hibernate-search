@@ -51,7 +51,7 @@ import org.hibernate.search.engine.common.EntityReference;
 import org.hibernate.search.engine.common.spi.SearchIntegration;
 import org.hibernate.search.engine.reporting.spi.EventContexts;
 import org.hibernate.search.engine.search.aggregation.AggregationKey;
-import org.hibernate.search.engine.search.common.ValueConvert;
+import org.hibernate.search.engine.search.common.ValueModel;
 import org.hibernate.search.engine.search.loading.spi.SearchLoadingContext;
 import org.hibernate.search.engine.search.predicate.SearchPredicate;
 import org.hibernate.search.engine.search.projection.SearchProjection;
@@ -651,7 +651,7 @@ class LuceneExtensionIT {
 		StubMappingScope scope = mainIndex.createScope();
 
 		SearchQuery<Integer> query = scope.query()
-				.select( f -> f.field( "nativeField_converted", Integer.class, ValueConvert.NO ) )
+				.select( f -> f.field( "nativeField_converted", Integer.class, ValueModel.INDEX ) )
 				.where( f -> f.match().field( "string" ).matching( "text 1" ) )
 				.toQuery();
 

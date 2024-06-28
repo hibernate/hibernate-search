@@ -17,7 +17,7 @@ import org.hibernate.search.backend.lucene.search.common.impl.LuceneSearchIndexV
 import org.hibernate.search.backend.lucene.types.codec.impl.LuceneFieldCodec;
 import org.hibernate.search.engine.backend.types.converter.runtime.FromDocumentValueConvertContext;
 import org.hibernate.search.engine.backend.types.converter.spi.ProjectionConverter;
-import org.hibernate.search.engine.search.common.ValueConvert;
+import org.hibernate.search.engine.search.common.ValueModel;
 import org.hibernate.search.engine.search.loading.spi.LoadingResult;
 import org.hibernate.search.engine.search.projection.SearchProjection;
 import org.hibernate.search.engine.search.projection.spi.FieldProjectionBuilder;
@@ -176,9 +176,9 @@ public class LuceneFieldProjection<F, V, P> extends AbstractLuceneProjection<P> 
 		}
 
 		@Override
-		public <V> Builder<F, V> type(Class<V> expectedType, ValueConvert convert) {
+		public <V> Builder<F, V> type(Class<V> expectedType, ValueModel valueModel) {
 			return new Builder<>( codec, scope, field,
-					field.type().projectionConverter( convert ).withConvertedType( expectedType, field ) );
+					field.type().projectionConverter( valueModel ).withConvertedType( expectedType, field ) );
 		}
 	}
 

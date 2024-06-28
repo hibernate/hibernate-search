@@ -13,7 +13,7 @@ import org.hibernate.search.backend.lucene.types.codec.impl.DocValues;
 import org.hibernate.search.backend.lucene.types.codec.impl.Indexing;
 import org.hibernate.search.backend.lucene.types.codec.impl.LuceneBigDecimalFieldCodec;
 import org.hibernate.search.backend.lucene.types.codec.impl.Storage;
-import org.hibernate.search.engine.backend.types.converter.spi.DefaultParseConverters;
+import org.hibernate.search.engine.backend.types.converter.spi.DefaultStringConverters;
 import org.hibernate.search.engine.backend.types.dsl.ScaledNumberIndexFieldTypeOptionsStep;
 import org.hibernate.search.engine.mapper.mapping.building.spi.IndexFieldTypeDefaultsProvider;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
@@ -30,7 +30,7 @@ class LuceneBigDecimalIndexFieldTypeOptionsStep
 
 	LuceneBigDecimalIndexFieldTypeOptionsStep(LuceneIndexFieldTypeBuildContext buildContext,
 			IndexFieldTypeDefaultsProvider defaultsProvider) {
-		super( buildContext, BigDecimal.class, DefaultParseConverters.BIG_DECIMAL );
+		super( buildContext, BigDecimal.class, DefaultStringConverters.BIG_DECIMAL );
 		this.defaultsProvider = defaultsProvider;
 	}
 

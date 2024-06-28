@@ -11,7 +11,7 @@ import java.util.function.Function;
 import org.hibernate.search.engine.backend.common.DocumentReference;
 import org.hibernate.search.engine.common.EntityReference;
 import org.hibernate.search.engine.search.common.NamedValues;
-import org.hibernate.search.engine.search.common.ValueConvert;
+import org.hibernate.search.engine.search.common.ValueModel;
 import org.hibernate.search.engine.search.projection.SearchProjection;
 import org.hibernate.search.engine.spatial.GeoPoint;
 import org.hibernate.search.util.common.SearchException;
@@ -112,7 +112,7 @@ public interface SearchProjectionFactory<R, E> {
 	 * Project to the value of a field in the indexed document.
 	 * <p>
 	 * This method will apply projection converters on data fetched from the backend.
-	 * See {@link ValueConvert#YES}.
+	 * See {@link ValueModel#MAPPING}.
 	 *
 	 * @param fieldPath The <a href="#field-paths">path</a> to the index field whose value will be extracted.
 	 * @param type The resulting type of the projection.
@@ -120,7 +120,7 @@ public interface SearchProjectionFactory<R, E> {
 	 * @return A DSL step where the "field" projection can be defined in more details.
 	 */
 	default <T> FieldProjectionValueStep<?, T> field(String fieldPath, Class<T> type) {
-		return field( fieldPath, type, ValueConvert.YES );
+		return field( fieldPath, type, ValueModel.MAPPING );
 	}
 
 	/**
@@ -130,22 +130,40 @@ public interface SearchProjectionFactory<R, E> {
 	 * @param type The resulting type of the projection.
 	 * @param <T> The resulting type of the projection.
 	 * @param convert Controls how the data fetched from the backend should be converted.
-	 * See {@link ValueConvert}.
+	 * See {@link org.hibernate.search.engine.search.common.ValueConvert}.
+	 * @return A DSL step where the "field" projection can be defined in more details.
+	 * @deprecated Use {@link #field(String, Class, ValueModel)} instead.
+	 */
+	@Deprecated
+	default <T> FieldProjectionValueStep<?, T> field(String fieldPath, Class<T> type,
+			org.hibernate.search.engine.search.common.ValueConvert convert) {
+		return field( fieldPath, type,
+				org.hibernate.search.engine.search.common.ValueConvert.toValueModel( convert ) );
+	}
+
+	/**
+	 * Project to the value of a field in the indexed document.
+	 *
+	 * @param fieldPath The <a href="#field-paths">path</a> to the index field whose value will be extracted.
+	 * @param type The resulting type of the projection.
+	 * @param <T> The resulting type of the projection.
+	 * @param valueModel The model value, determines how the data fetched from the backend should be converted.
+	 * See {@link ValueModel}.
 	 * @return A DSL step where the "field" projection can be defined in more details.
 	 */
-	<T> FieldProjectionValueStep<?, T> field(String fieldPath, Class<T> type, ValueConvert convert);
+	<T> FieldProjectionValueStep<?, T> field(String fieldPath, Class<T> type, ValueModel valueModel);
 
 	/**
 	 * Project to the value of a field in the indexed document, without specifying a type.
 	 * <p>
 	 * This method will apply projection converters on data fetched from the backend.
-	 * See {@link ValueConvert#YES}.
+	 * See {@link ValueModel#MAPPING}.
 	 *
 	 * @param fieldPath The <a href="#field-paths">path</a> to the index field whose value will be extracted.
 	 * @return A DSL step where the "field" projection can be defined in more details.
 	 */
 	default FieldProjectionValueStep<?, Object> field(String fieldPath) {
-		return field( fieldPath, ValueConvert.YES );
+		return field( fieldPath, ValueModel.MAPPING );
 	}
 
 	/**
@@ -153,10 +171,25 @@ public interface SearchProjectionFactory<R, E> {
 	 *
 	 * @param fieldPath The <a href="#field-paths">path</a> to the index field whose value will be extracted.
 	 * @param convert Controls how the data fetched from the backend should be converted.
-	 * See {@link ValueConvert}.
+	 * See {@link org.hibernate.search.engine.search.common.ValueConvert}.
+	 * @return A DSL step where the "field" projection can be defined in more details.
+	 * @deprecated Use {@link #field(String, ValueModel)} instead.
+	 */
+	@Deprecated
+	default FieldProjectionValueStep<?, Object> field(String fieldPath,
+			org.hibernate.search.engine.search.common.ValueConvert convert) {
+		return field( fieldPath, org.hibernate.search.engine.search.common.ValueConvert.toValueModel( convert ) );
+	}
+
+	/**
+	 * Project to the value of a field in the indexed document, without specifying a type.
+	 *
+	 * @param fieldPath The <a href="#field-paths">path</a> to the index field whose value will be extracted.
+	 * @param valueModel The model value, determines how the data fetched from the backend should be converted.
+	 * See {@link ValueModel}.
 	 * @return A DSL step where the "field" projection can be defined in more details.
 	 */
-	FieldProjectionValueStep<?, Object> field(String fieldPath, ValueConvert convert);
+	FieldProjectionValueStep<?, Object> field(String fieldPath, ValueModel valueModel);
 
 	/**
 	 * Project on the score of the hit.

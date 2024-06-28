@@ -26,7 +26,7 @@ import org.hibernate.search.documentation.testsupport.BackendConfigurations;
 import org.hibernate.search.documentation.testsupport.DocumentationSetupHelper;
 import org.hibernate.search.engine.backend.common.DocumentReference;
 import org.hibernate.search.engine.common.EntityReference;
-import org.hibernate.search.engine.search.common.ValueConvert;
+import org.hibernate.search.engine.search.common.ValueModel;
 import org.hibernate.search.engine.search.query.SearchResult;
 import org.hibernate.search.engine.spatial.DistanceUnit;
 import org.hibernate.search.engine.spatial.GeoPoint;
@@ -280,7 +280,7 @@ class ProjectionDslIT {
 		withinSearchSession( searchSession -> {
 			// tag::field-noProjectionConverter[]
 			List<String> hits = searchSession.search( Book.class )
-					.select( f -> f.field( "genre", String.class, ValueConvert.NO ) )
+					.select( f -> f.field( "genre", String.class, ValueModel.INDEX ) )
 					.where( f -> f.matchAll() )
 					.fetchHits( 20 );
 			// end::field-noProjectionConverter[]

@@ -8,7 +8,7 @@ import java.util.function.Function;
 
 import org.hibernate.search.engine.search.common.NamedValues;
 import org.hibernate.search.engine.search.common.SortMode;
-import org.hibernate.search.engine.search.common.ValueConvert;
+import org.hibernate.search.engine.search.common.ValueModel;
 import org.hibernate.search.engine.search.predicate.SearchPredicate;
 import org.hibernate.search.engine.search.sort.SearchSort;
 import org.hibernate.search.engine.search.sort.dsl.SortFinalStep;
@@ -78,7 +78,7 @@ public class StubSearchSort implements SearchSort {
 		}
 
 		@Override
-		public void missingAs(Object value, ValueConvert convert) {
+		public void missingAs(Object value, ValueModel valueModel) {
 			// No-op
 		}
 

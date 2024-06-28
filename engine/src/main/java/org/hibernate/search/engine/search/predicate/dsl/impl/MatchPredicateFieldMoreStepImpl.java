@@ -11,7 +11,7 @@ import java.util.List;
 import java.util.function.Consumer;
 
 import org.hibernate.search.engine.logging.impl.Log;
-import org.hibernate.search.engine.search.common.ValueConvert;
+import org.hibernate.search.engine.search.common.ValueModel;
 import org.hibernate.search.engine.search.common.spi.SearchIndexScope;
 import org.hibernate.search.engine.search.predicate.SearchPredicate;
 import org.hibernate.search.engine.search.predicate.dsl.MatchPredicateFieldMoreStep;
@@ -57,8 +57,8 @@ class MatchPredicateFieldMoreStepImpl
 	}
 
 	@Override
-	public MatchPredicateOptionsStep<?> matching(Object value, ValueConvert convert) {
-		return commonState.matching( value, convert );
+	public MatchPredicateOptionsStep<?> matching(Object value, ValueModel valueModel) {
+		return commonState.matching( value, valueModel );
 	}
 
 	@Override
@@ -80,13 +80,13 @@ class MatchPredicateFieldMoreStepImpl
 			minimumShouldMatchStep = new MinimumShouldMatchConditionStepImpl<>( new MatchMinimumShouldMatchBuilder(), this );
 		}
 
-		MatchPredicateOptionsStep<?> matching(Object value, ValueConvert convert) {
+		MatchPredicateOptionsStep<?> matching(Object value, ValueModel valueModel) {
 			Contracts.assertNotNull( value, "value" );
-			Contracts.assertNotNull( convert, "convert" );
+			Contracts.assertNotNull( valueModel, "valueModel" );
 
 			for ( MatchPredicateFieldMoreStepImpl fieldSetState : getFieldSetStates() ) {
 				for ( MatchPredicateBuilder predicateBuilder : fieldSetState.predicateBuilders ) {
-					predicateBuilder.value( value, convert );
+					predicateBuilder.value( value, valueModel );
 				}
 			}
 			return this;

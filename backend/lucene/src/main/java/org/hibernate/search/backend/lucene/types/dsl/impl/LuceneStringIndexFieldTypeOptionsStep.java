@@ -35,7 +35,7 @@ import org.hibernate.search.engine.backend.types.Norms;
 import org.hibernate.search.engine.backend.types.Projectable;
 import org.hibernate.search.engine.backend.types.Sortable;
 import org.hibernate.search.engine.backend.types.TermVector;
-import org.hibernate.search.engine.backend.types.converter.spi.DefaultParseConverters;
+import org.hibernate.search.engine.backend.types.converter.spi.DefaultStringConverters;
 import org.hibernate.search.engine.backend.types.dsl.StringIndexFieldTypeOptionsStep;
 import org.hibernate.search.engine.search.aggregation.spi.AggregationTypeKeys;
 import org.hibernate.search.engine.search.highlighter.spi.SearchHighlighterType;
@@ -73,7 +73,7 @@ class LuceneStringIndexFieldTypeOptionsStep
 	private Set<Highlightable> highlightable;
 
 	LuceneStringIndexFieldTypeOptionsStep(LuceneIndexFieldTypeBuildContext buildContext) {
-		super( buildContext, String.class, DefaultParseConverters.STRING );
+		super( buildContext, String.class, DefaultStringConverters.STRING );
 	}
 
 	@Override

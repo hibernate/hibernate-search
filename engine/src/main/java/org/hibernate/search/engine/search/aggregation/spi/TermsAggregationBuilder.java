@@ -6,13 +6,13 @@ package org.hibernate.search.engine.search.aggregation.spi;
 
 import java.util.Map;
 
-import org.hibernate.search.engine.search.common.ValueConvert;
+import org.hibernate.search.engine.search.common.ValueModel;
 import org.hibernate.search.engine.search.predicate.SearchPredicate;
 
 public interface TermsAggregationBuilder<K> extends SearchAggregationBuilder<Map<K, Long>> {
 
 	interface TypeSelector {
-		<K> TermsAggregationBuilder<K> type(Class<K> expectedType, ValueConvert convert);
+		<K> TermsAggregationBuilder<K> type(Class<K> expectedType, ValueModel valueModel);
 	}
 
 	void filter(SearchPredicate filter);

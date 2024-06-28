@@ -14,7 +14,7 @@ import jakarta.persistence.EntityManagerFactory;
 
 import org.hibernate.search.documentation.testsupport.BackendConfigurations;
 import org.hibernate.search.documentation.testsupport.DocumentationSetupHelper;
-import org.hibernate.search.engine.search.common.ValueConvert;
+import org.hibernate.search.engine.search.common.ValueModel;
 import org.hibernate.search.mapper.orm.Search;
 import org.hibernate.search.mapper.orm.session.SearchSession;
 import org.hibernate.search.mapper.pojo.extractor.builtin.BuiltinContainerExtractors;
@@ -85,7 +85,7 @@ class ContainerExtractorIT {
 					.where( f -> f.and(
 							f.match().field( "availableFormats" ).matching( BookFormat.AUDIOBOOK ),
 							f.match().field( "availableFormats" ).matching( BookFormat.HARDCOVER ),
-							f.match().field( "authorCount" ).matching( 1, ValueConvert.NO )
+							f.match().field( "authorCount" ).matching( 1, ValueModel.INDEX )
 					) )
 					.fetchHits( 20 );
 			assertThat( result ).hasSize( 1 );

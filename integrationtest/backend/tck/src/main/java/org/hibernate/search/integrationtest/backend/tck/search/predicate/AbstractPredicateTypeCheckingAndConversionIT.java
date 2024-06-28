@@ -22,7 +22,7 @@ import org.hibernate.search.engine.backend.types.converter.runtime.ToDocumentVal
 import org.hibernate.search.engine.backend.types.dsl.SearchableProjectableIndexFieldTypeOptionsStep;
 import org.hibernate.search.engine.backend.types.dsl.StandardIndexFieldTypeOptionsStep;
 import org.hibernate.search.engine.reporting.spi.EventContexts;
-import org.hibernate.search.engine.search.common.ValueConvert;
+import org.hibernate.search.engine.search.common.ValueModel;
 import org.hibernate.search.engine.search.predicate.dsl.PredicateFinalStep;
 import org.hibernate.search.engine.search.predicate.dsl.SearchPredicateFactory;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.FieldTypeDescriptor;
@@ -39,7 +39,6 @@ import org.hibernate.search.util.impl.integrationtest.mapper.stub.SimpleMappedIn
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappingScope;
 import org.hibernate.search.util.impl.test.annotation.TestForIssue;
 
-import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 
@@ -124,7 +123,7 @@ public abstract class AbstractPredicateTypeCheckingAndConversionIT<V extends Abs
 			DataSet<?, V> dataSet) {
 		assertThatQuery( index.query()
 				.where( f -> predicate( f, defaultDslConverterField0Path( index, dataSet ),
-						unwrappedMatchingParam( 0, dataSet ), ValueConvert.YES ) )
+						unwrappedMatchingParam( 0, dataSet ), ValueModel.MAPPING ) )
 				.routing( dataSet.routingKey ) )
 				.hasDocRefHitsAnyOrder( index.typeName(), dataSet.docId( 0 ) );
 	}
@@ -139,7 +138,7 @@ public abstract class AbstractPredicateTypeCheckingAndConversionIT<V extends Abs
 			DataSet<?, V> dataSet) {
 		SearchPredicateFactory f = index.createScope().predicate();
 		assertThatThrownBy( () -> predicate( f, defaultDslConverterField0Path( index, dataSet ), invalidTypeParam(),
-				ValueConvert.YES ) )
+				ValueModel.MAPPING ) )
 				.isInstanceOf( SearchException.class )
 				.hasMessageContaining( "Unable to convert DSL argument: " )
 				.hasMessageContaining( InvalidType.class.getName() )
@@ -159,7 +158,7 @@ public abstract class AbstractPredicateTypeCheckingAndConversionIT<V extends Abs
 			DataSet<?, V> dataSet) {
 		assertThatQuery( index.query()
 				.where( f -> predicate( f, customDslConverterField0Path( index, dataSet ),
-						wrappedMatchingParam( 0, dataSet ), ValueConvert.YES ) )
+						wrappedMatchingParam( 0, dataSet ), ValueModel.MAPPING ) )
 				.routing( dataSet.routingKey ) )
 				.hasDocRefHitsAnyOrder( index.typeName(), dataSet.docId( 0 ) );
 	}
@@ -174,7 +173,7 @@ public abstract class AbstractPredicateTypeCheckingAndConversionIT<V extends Abs
 			DataSet<?, V> dataSet) {
 		SearchPredicateFactory f = index.createScope().predicate();
 		assertThatThrownBy( () -> predicate( f, customDslConverterField0Path( index, dataSet ), invalidTypeParam(),
-				ValueConvert.YES ) )
+				ValueModel.MAPPING ) )
 				.isInstanceOf( SearchException.class )
 				.hasMessageContaining( "Unable to convert DSL argument: " )
 				.hasMessageContaining( InvalidType.class.getName() )
@@ -194,7 +193,7 @@ public abstract class AbstractPredicateTypeCheckingAndConversionIT<V extends Abs
 			DataSet<?, V> dataSet) {
 		assertThatQuery( index.query()
 				.where( f -> predicate( f, defaultDslConverterField0Path( index, dataSet ),
-						unwrappedMatchingParam( 0, dataSet ), ValueConvert.NO ) )
+						unwrappedMatchingParam( 0, dataSet ), ValueModel.INDEX ) )
 				.routing( dataSet.routingKey ) )
 				.hasDocRefHitsAnyOrder( index.typeName(), dataSet.docId( 0 ) );
 	}
@@ -209,7 +208,7 @@ public abstract class AbstractPredicateTypeCheckingAndConversionIT<V extends Abs
 			DataSet<?, V> dataSet) {
 		SearchPredicateFactory f = index.createScope().predicate();
 		assertThatThrownBy( () -> predicate( f, defaultDslConverterField0Path( index, dataSet ), invalidTypeParam(),
-				ValueConvert.NO ) )
+				ValueModel.INDEX ) )
 				.isInstanceOf( SearchException.class )
 				.hasMessageContaining( "Unable to convert DSL argument: " )
 				.hasMessageContaining( InvalidType.class.getName() )
@@ -229,7 +228,7 @@ public abstract class AbstractPredicateTypeCheckingAndConversionIT<V extends Abs
 			DataSet<?, V> dataSet) {
 		assertThatQuery( index.query()
 				.where( f -> predicate( f, customDslConverterField0Path( index, dataSet ),
-						unwrappedMatchingParam( 0, dataSet ), ValueConvert.NO ) )
+						unwrappedMatchingParam( 0, dataSet ), ValueModel.INDEX ) )
 				.routing( dataSet.routingKey ) )
 				.hasDocRefHitsAnyOrder( index.typeName(), dataSet.docId( 0 ) );
 	}
@@ -244,7 +243,7 @@ public abstract class AbstractPredicateTypeCheckingAndConversionIT<V extends Abs
 			DataSet<?, V> dataSet) {
 		SearchPredicateFactory f = index.createScope().predicate();
 		assertThatThrownBy( () -> predicate( f, customDslConverterField0Path( index, dataSet ), invalidTypeParam(),
-				ValueConvert.NO ) )
+				ValueModel.INDEX ) )
 				.isInstanceOf( SearchException.class )
 				.hasMessageContaining( "Unable to convert DSL argument: " )
 				.hasMessageContaining( InvalidType.class.getName() )
@@ -265,13 +264,13 @@ public abstract class AbstractPredicateTypeCheckingAndConversionIT<V extends Abs
 		assertThatQuery( index.query()
 				.where( f -> predicate( f, customDslConverterField0Path( index, dataSet ), customDslConverterField1Path(
 						index, dataSet ),
-						wrappedMatchingParam( 0, dataSet ), ValueConvert.YES ) )
+						wrappedMatchingParam( 0, dataSet ), ValueModel.MAPPING ) )
 				.routing( dataSet.routingKey ) )
 				.hasDocRefHitsAnyOrder( index.typeName(), dataSet.docId( 0 ) );
 		assertThatQuery( index.query()
 				.where( f -> predicate( f, customDslConverterField0Path( index, dataSet ), customDslConverterField1Path(
 						index, dataSet ),
-						wrappedMatchingParam( 1, dataSet ), ValueConvert.YES ) )
+						wrappedMatchingParam( 1, dataSet ), ValueModel.MAPPING ) )
 				.routing( dataSet.routingKey ) )
 				.hasDocRefHitsAnyOrder( index.typeName(), dataSet.docId( 1 ) );
 	}
@@ -287,13 +286,13 @@ public abstract class AbstractPredicateTypeCheckingAndConversionIT<V extends Abs
 		assertThatQuery( index.query()
 				.where( f -> predicate( f, customDslConverterField0Path( index, dataSet ), customDslConverterField1Path(
 						index, dataSet ),
-						unwrappedMatchingParam( 0, dataSet ), ValueConvert.NO ) )
+						unwrappedMatchingParam( 0, dataSet ), ValueModel.INDEX ) )
 				.routing( dataSet.routingKey ) )
 				.hasDocRefHitsAnyOrder( index.typeName(), dataSet.docId( 0 ) );
 		assertThatQuery( index.query()
 				.where( f -> predicate( f, customDslConverterField0Path( index, dataSet ), customDslConverterField1Path(
 						index, dataSet ),
-						unwrappedMatchingParam( 1, dataSet ), ValueConvert.NO ) )
+						unwrappedMatchingParam( 1, dataSet ), ValueModel.INDEX ) )
 				.routing( dataSet.routingKey ) )
 				.hasDocRefHitsAnyOrder( index.typeName(), dataSet.docId( 1 ) );
 	}
@@ -312,7 +311,7 @@ public abstract class AbstractPredicateTypeCheckingAndConversionIT<V extends Abs
 				.where( f -> predicate( f, defaultDslConverterField0Path( index, dataSet ), unwrappedMatchingParam( 0,
 						dataSet
 				),
-						ValueConvert.YES ) )
+						ValueModel.MAPPING ) )
 				.routing( dataSet.routingKey ) )
 				.hasDocRefHitsAnyOrder( b -> {
 					b.doc( index.typeName(), dataSet.docId( 0 ) );
@@ -333,7 +332,7 @@ public abstract class AbstractPredicateTypeCheckingAndConversionIT<V extends Abs
 		String fieldPath = defaultDslConverterField0Path( index, dataSet );
 
 		assertThatThrownBy( () -> predicate( scope.predicate(), fieldPath,
-				unwrappedMatchingParam( 0, dataSet ), ValueConvert.YES ) )
+				unwrappedMatchingParam( 0, dataSet ), ValueModel.MAPPING ) )
 				.isInstanceOf( SearchException.class )
 				.hasMessageContainingAll(
 						"Inconsistent configuration for field '" + fieldPath + "' in a search query across multiple indexes",
@@ -356,7 +355,7 @@ public abstract class AbstractPredicateTypeCheckingAndConversionIT<V extends Abs
 
 		assertThatQuery( scope.query()
 				.where( f -> predicate( f, defaultDslConverterField0Path( index, dataSet ),
-						unwrappedMatchingParam( 0, dataSet ), ValueConvert.NO ) )
+						unwrappedMatchingParam( 0, dataSet ), ValueModel.INDEX ) )
 				.routing( dataSet.routingKey ) )
 				.hasDocRefHitsAnyOrder( b -> {
 					b.doc( index.typeName(), dataSet.docId( 0 ) );
@@ -384,7 +383,7 @@ public abstract class AbstractPredicateTypeCheckingAndConversionIT<V extends Abs
 				.where( f -> predicate( f, defaultDslConverterField0Path( index, dataSet ), unwrappedMatchingParam( 0,
 						dataSet
 				),
-						ValueConvert.YES ) )
+						ValueModel.MAPPING ) )
 				.routing( dataSet.routingKey ) )
 				.hasDocRefHitsAnyOrder( b -> {
 					b.doc( index.typeName(), dataSet.docId( 0 ) );
@@ -395,7 +394,7 @@ public abstract class AbstractPredicateTypeCheckingAndConversionIT<V extends Abs
 		assertThatQuery( scope.query()
 				.where( f -> f.or(
 						predicate( f, defaultDslConverterField0Path( index, dataSet ), unwrappedMatchingParam( 0, dataSet ),
-								ValueConvert.YES ),
+								ValueModel.MAPPING ),
 						f.id().matching( dataSet.docId( DataSet.MISSING_FIELD_INDEX_DOC_ORDINAL ) ) ) ) )
 				.hasDocRefHitsAnyOrder( c -> c
 						.doc( index.typeName(), dataSet.docId( 0 ) )
@@ -423,7 +422,7 @@ public abstract class AbstractPredicateTypeCheckingAndConversionIT<V extends Abs
 				.where( f -> predicate( f, defaultDslConverterField0Path( index, dataSet ), unwrappedMatchingParam( 0,
 						dataSet
 				),
-						ValueConvert.NO ) )
+						ValueModel.INDEX ) )
 				.routing( dataSet.routingKey ) )
 				.hasDocRefHitsAnyOrder( b -> {
 					b.doc( index.typeName(), dataSet.docId( 0 ) );
@@ -434,7 +433,7 @@ public abstract class AbstractPredicateTypeCheckingAndConversionIT<V extends Abs
 		assertThatQuery( scope.query()
 				.where( f -> f.or(
 						predicate( f, defaultDslConverterField0Path( index, dataSet ), unwrappedMatchingParam( 0, dataSet ),
-								ValueConvert.NO ),
+								ValueModel.INDEX ),
 						f.id().matching( dataSet.docId( DataSet.MISSING_FIELD_INDEX_DOC_ORDINAL ) ) ) ) )
 				.hasDocRefHitsAnyOrder( c -> c
 						.doc( index.typeName(), dataSet.docId( 0 ) )
@@ -455,7 +454,7 @@ public abstract class AbstractPredicateTypeCheckingAndConversionIT<V extends Abs
 		String fieldPath = defaultDslConverterField0Path( index, dataSet );
 
 		assertThatThrownBy( () -> predicate( scope.predicate(), fieldPath,
-				unwrappedMatchingParam( 0, dataSet ), ValueConvert.YES ) )
+				unwrappedMatchingParam( 0, dataSet ), ValueModel.MAPPING ) )
 				.isInstanceOf( SearchException.class )
 				.hasMessageContainingAll(
 						"Inconsistent configuration for field '" + fieldPath + "' in a search query across multiple indexes",
@@ -479,7 +478,7 @@ public abstract class AbstractPredicateTypeCheckingAndConversionIT<V extends Abs
 		String fieldPath = defaultDslConverterField0Path( index, dataSet );
 
 		assertThatThrownBy( () -> predicate( scope.predicate(), fieldPath,
-				unwrappedMatchingParam( 0, dataSet ), ValueConvert.NO ) )
+				unwrappedMatchingParam( 0, dataSet ), ValueModel.INDEX ) )
 				.isInstanceOf( SearchException.class )
 				.hasMessageContainingAll(
 						"Inconsistent configuration for field '" + fieldPath + "' in a search query across multiple indexes",
@@ -500,7 +499,7 @@ public abstract class AbstractPredicateTypeCheckingAndConversionIT<V extends Abs
 			DataSet<?, V> dataSet) {
 		assertThatQuery( index.query()
 				.where( f -> predicate( f, customDslConverterField0Path( index, dataSet ),
-						stringMatchingParam( 0, dataSet ), ValueConvert.PARSE ) )
+						stringMatchingParam( 0, dataSet ), ValueModel.STRING ) )
 				.routing( dataSet.routingKey ) )
 				.hasDocRefHitsAnyOrder( index.typeName(), dataSet.docId( 0 ) );
 	}
@@ -515,7 +514,7 @@ public abstract class AbstractPredicateTypeCheckingAndConversionIT<V extends Abs
 			DataSet<?, V> dataSet) {
 		SearchPredicateFactory f = index.createScope().predicate();
 		assertThatThrownBy( () -> predicate( f, defaultDslConverterField0Path( index, dataSet ), invalidTypeParam(),
-				ValueConvert.PARSE ) )
+				ValueModel.STRING ) )
 				.isInstanceOf( SearchException.class )
 				.hasMessageContaining( "Unable to convert DSL argument: " )
 				.hasMessageContaining( InvalidType.class.getName() )
@@ -535,7 +534,7 @@ public abstract class AbstractPredicateTypeCheckingAndConversionIT<V extends Abs
 			DataSet<?, V> dataSet) {
 		assertThatQuery( index.query()
 				.where( f -> predicate( f, customDslConverterField0Path( index, dataSet ),
-						stringMatchingParam( 0, dataSet ), ValueConvert.PARSE ) )
+						stringMatchingParam( 0, dataSet ), ValueModel.STRING ) )
 				.routing( dataSet.routingKey ) )
 				.hasDocRefHitsAnyOrder( index.typeName(), dataSet.docId( 0 ) );
 	}
@@ -550,7 +549,7 @@ public abstract class AbstractPredicateTypeCheckingAndConversionIT<V extends Abs
 			DataSet<?, V> dataSet) {
 		SearchPredicateFactory f = index.createScope().predicate();
 		assertThatThrownBy( () -> predicate( f, customDslConverterField0Path( index, dataSet ), invalidTypeParam(),
-				ValueConvert.PARSE ) )
+				ValueModel.STRING ) )
 				.isInstanceOf( SearchException.class )
 				.hasMessageContaining( "Unable to convert DSL argument: " )
 				.hasMessageContaining( InvalidType.class.getName() )
@@ -566,7 +565,7 @@ public abstract class AbstractPredicateTypeCheckingAndConversionIT<V extends Abs
 		for ( Map.Entry<String, Integer> entry : IndexIntegerBinding.Converter.NUMBERS.entrySet() ) {
 			assertThatQuery( integerIndex.query()
 					.where( f -> predicate( f, "integer", stringMatchingParamCustomParser( entry.getValue(), dataSet ),
-							ValueConvert.PARSE ) )
+							ValueModel.STRING ) )
 			).hasDocRefHitsAnyOrder( integerIndex.typeName(), dataSet.docId( entry.getValue() ) );
 		}
 	}
@@ -574,10 +573,10 @@ public abstract class AbstractPredicateTypeCheckingAndConversionIT<V extends Abs
 	protected abstract PredicateFinalStep predicate(SearchPredicateFactory f, String fieldPath, P matchingParam);
 
 	protected abstract PredicateFinalStep predicate(SearchPredicateFactory f, String fieldPath, P matchingParam,
-			ValueConvert valueConvert);
+			ValueModel valueModel);
 
 	protected abstract PredicateFinalStep predicate(SearchPredicateFactory f, String field0Path, String field1Path,
-			P matchingParam, ValueConvert valueConvert);
+			P matchingParam, ValueModel valueModel);
 
 	protected abstract P invalidTypeParam();
 

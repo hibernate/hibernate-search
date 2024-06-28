@@ -21,7 +21,7 @@ import org.hibernate.search.backend.lucene.search.common.impl.LuceneSearchIndexV
 import org.hibernate.search.engine.backend.types.converter.runtime.FromDocumentValueConvertContext;
 import org.hibernate.search.engine.backend.types.converter.spi.ProjectionConverter;
 import org.hibernate.search.engine.search.aggregation.spi.TermsAggregationBuilder;
-import org.hibernate.search.engine.search.common.ValueConvert;
+import org.hibernate.search.engine.search.common.ValueModel;
 
 import org.apache.lucene.facet.FacetResult;
 import org.apache.lucene.facet.FacetsCollector;
@@ -163,7 +163,7 @@ public abstract class AbstractLuceneFacetsBasedTermsAggregation<F, T, K>
 		}
 
 		@Override
-		public abstract <K> AbstractBuilder<F, ?, K> type(Class<K> expectedType, ValueConvert convert);
+		public abstract <K> AbstractBuilder<F, ?, K> type(Class<K> expectedType, ValueModel valueModel);
 	}
 
 	abstract static class AbstractBuilder<F, T, K>

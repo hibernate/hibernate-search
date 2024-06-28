@@ -22,7 +22,7 @@ import org.hibernate.search.backend.lucene.types.predicate.impl.LuceneNumericRan
 import org.hibernate.search.backend.lucene.types.predicate.impl.LuceneNumericTermsPredicate;
 import org.hibernate.search.backend.lucene.types.sort.impl.LuceneStandardFieldSort;
 import org.hibernate.search.engine.backend.types.Sortable;
-import org.hibernate.search.engine.backend.types.converter.ToDocumentValueConverter;
+import org.hibernate.search.engine.backend.types.converter.spi.DefaultStringConverters;
 import org.hibernate.search.engine.search.aggregation.spi.AggregationTypeKeys;
 import org.hibernate.search.engine.search.predicate.spi.PredicateTypeKeys;
 import org.hibernate.search.engine.search.projection.spi.ProjectionTypeKeys;
@@ -36,8 +36,8 @@ abstract class AbstractLuceneTemporalIndexFieldTypeOptionsStep<
 	private Sortable sortable = Sortable.DEFAULT;
 
 	AbstractLuceneTemporalIndexFieldTypeOptionsStep(LuceneIndexFieldTypeBuildContext buildContext, Class<F> fieldType,
-			ToDocumentValueConverter<String, F> defaultParseConverter) {
-		super( buildContext, fieldType, defaultParseConverter );
+			DefaultStringConverters.Converter<F> defaultConverter) {
+		super( buildContext, fieldType, defaultConverter );
 	}
 
 	@Override

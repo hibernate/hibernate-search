@@ -41,5 +41,12 @@ abstract class AbstractLuceneIndexFieldTypeOptionsStep<S extends AbstractLuceneI
 		return thisAsS();
 	}
 
+	@Override
+	public S formatter(FromDocumentValueConverter<? super F, String> formatter) {
+		Contracts.assertNotNull( formatter, "formatter" );
+		builder.formatter( formatter );
+		return thisAsS();
+	}
+
 	protected abstract S thisAsS();
 }

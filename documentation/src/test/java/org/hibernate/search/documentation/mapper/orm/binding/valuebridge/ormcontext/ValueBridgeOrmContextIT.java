@@ -13,7 +13,7 @@ import jakarta.persistence.EntityManagerFactory;
 
 import org.hibernate.search.documentation.testsupport.BackendConfigurations;
 import org.hibernate.search.documentation.testsupport.DocumentationSetupHelper;
-import org.hibernate.search.engine.search.common.ValueConvert;
+import org.hibernate.search.engine.search.common.ValueModel;
 import org.hibernate.search.mapper.orm.Search;
 import org.hibernate.search.mapper.orm.session.SearchSession;
 
@@ -50,7 +50,7 @@ class ValueBridgeOrmContextIT {
 			List<MyData> result = searchSession.search( MyEntity.class )
 					.select( f -> f.field( "myData", MyData.class ) )
 					.where( f -> f.match().field( "myData" )
-							.matching( "INDEXED", ValueConvert.NO ) )
+							.matching( "INDEXED", ValueModel.INDEX ) )
 					.fetchHits( 20 );
 
 			assertThat( result ).containsExactly( MyData.PROJECTED );

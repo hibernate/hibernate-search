@@ -9,13 +9,13 @@ import org.hibernate.search.backend.lucene.types.codec.impl.DocValues;
 import org.hibernate.search.backend.lucene.types.codec.impl.Indexing;
 import org.hibernate.search.backend.lucene.types.codec.impl.LuceneByteFieldCodec;
 import org.hibernate.search.backend.lucene.types.codec.impl.Storage;
-import org.hibernate.search.engine.backend.types.converter.spi.DefaultParseConverters;
+import org.hibernate.search.engine.backend.types.converter.spi.DefaultStringConverters;
 
 class LuceneByteIndexFieldTypeOptionsStep
 		extends AbstractLuceneNumericIndexFieldTypeOptionsStep<LuceneByteIndexFieldTypeOptionsStep, Byte> {
 
 	LuceneByteIndexFieldTypeOptionsStep(LuceneIndexFieldTypeBuildContext buildContext) {
-		super( buildContext, Byte.class, DefaultParseConverters.BYTE );
+		super( buildContext, Byte.class, DefaultStringConverters.BYTE );
 	}
 
 	@Override

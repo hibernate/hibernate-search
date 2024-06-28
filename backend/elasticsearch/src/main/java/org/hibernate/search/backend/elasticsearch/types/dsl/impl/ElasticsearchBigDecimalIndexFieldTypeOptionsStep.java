@@ -11,7 +11,7 @@ import org.hibernate.search.backend.elasticsearch.logging.impl.Log;
 import org.hibernate.search.backend.elasticsearch.lowlevel.index.mapping.impl.DataTypes;
 import org.hibernate.search.backend.elasticsearch.types.codec.impl.ElasticsearchBigDecimalFieldCodec;
 import org.hibernate.search.backend.elasticsearch.types.codec.impl.ElasticsearchFieldCodec;
-import org.hibernate.search.engine.backend.types.converter.spi.DefaultParseConverters;
+import org.hibernate.search.engine.backend.types.converter.spi.DefaultStringConverters;
 import org.hibernate.search.engine.backend.types.dsl.ScaledNumberIndexFieldTypeOptionsStep;
 import org.hibernate.search.engine.mapper.mapping.building.spi.IndexFieldTypeDefaultsProvider;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
@@ -28,7 +28,7 @@ class ElasticsearchBigDecimalIndexFieldTypeOptionsStep
 
 	ElasticsearchBigDecimalIndexFieldTypeOptionsStep(ElasticsearchIndexFieldTypeBuildContext buildContext,
 			IndexFieldTypeDefaultsProvider defaultsProvider) {
-		super( buildContext, BigDecimal.class, DataTypes.SCALED_FLOAT, DefaultParseConverters.BIG_DECIMAL );
+		super( buildContext, BigDecimal.class, DataTypes.SCALED_FLOAT, DefaultStringConverters.BIG_DECIMAL );
 		this.defaultsProvider = defaultsProvider;
 	}
 
