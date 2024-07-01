@@ -33,6 +33,11 @@ public class ElasticsearchBooleanFieldCodec implements ElasticsearchFieldCodec<B
 	}
 
 	@Override
+	public Boolean decode(Double value) {
+		return value != 0;
+	}
+
+	@Override
 	public Boolean decodeAggregationKey(JsonElement key, JsonElement keyAsString) {
 		if ( key == null || key.isJsonNull() ) {
 			return null;

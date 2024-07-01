@@ -37,6 +37,10 @@ public interface ElasticsearchFieldCodec<F> {
 
 	F decode(JsonElement element);
 
+	default F decode(Double element) {
+		return null;
+	}
+
 	/**
 	 * Decodes the key returned by a term aggregation.
 	 * @param key The "key" property  returned by the aggregation.
@@ -47,6 +51,18 @@ public interface ElasticsearchFieldCodec<F> {
 	 */
 	default F decodeAggregationKey(JsonElement key, JsonElement keyAsString) {
 		return decode( key );
+	}
+
+	default F decodeAggregationValue(JsonElement value, JsonElement valueAsString) {
+		if ( valueAsString != null ) {
+			return decode( valueAsString );
+		}
+		if ( value == null || value.isJsonNull() ) {
+			return null;
+		}
+
+		Double decoded = ElasticsearchDoubleFieldCodec.INSTANCE.decode( value );
+		return decode( decoded );
 	}
 
 	/**

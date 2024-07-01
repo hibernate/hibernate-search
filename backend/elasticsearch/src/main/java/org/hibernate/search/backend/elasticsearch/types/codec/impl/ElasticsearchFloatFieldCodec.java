@@ -5,6 +5,7 @@
 package org.hibernate.search.backend.elasticsearch.types.codec.impl;
 
 import org.hibernate.search.backend.elasticsearch.gson.impl.JsonElementTypes;
+import org.hibernate.search.engine.cfg.spi.NumberUtils;
 
 import com.google.gson.JsonElement;
 import com.google.gson.JsonNull;
@@ -30,6 +31,11 @@ public class ElasticsearchFloatFieldCodec implements ElasticsearchFieldCodec<Flo
 			return null;
 		}
 		return JsonElementTypes.FLOAT.fromElement( element );
+	}
+
+	@Override
+	public Float decode(Double value) {
+		return NumberUtils.toFloat( value );
 	}
 
 	@Override

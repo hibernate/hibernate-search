@@ -34,6 +34,11 @@ public class ElasticsearchStringFieldCodec implements ElasticsearchFieldCodec<St
 	}
 
 	@Override
+	public String decode(Double value) {
+		return value.toString();
+	}
+
+	@Override
 	public boolean isCompatibleWith(ElasticsearchFieldCodec<?> other) {
 		return INSTANCE == other;
 	}

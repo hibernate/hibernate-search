@@ -13,6 +13,7 @@ import java.math.RoundingMode;
 import org.hibernate.search.backend.elasticsearch.gson.impl.JsonElementTypes;
 import org.hibernate.search.backend.elasticsearch.logging.impl.Log;
 import org.hibernate.search.engine.cfg.spi.NumberScaleConstants;
+import org.hibernate.search.engine.cfg.spi.NumberUtils;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
 import com.google.gson.JsonElement;
@@ -63,6 +64,11 @@ public class ElasticsearchBigIntegerFieldCodec implements ElasticsearchFieldCode
 		}
 
 		return JsonElementTypes.BIG_INTEGER.fromElement( element );
+	}
+
+	@Override
+	public BigInteger decode(Double value) {
+		return NumberUtils.toBigInteger( value );
 	}
 
 	@Override

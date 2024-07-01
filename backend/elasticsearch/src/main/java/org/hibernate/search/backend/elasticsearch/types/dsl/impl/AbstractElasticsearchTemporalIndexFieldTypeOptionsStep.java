@@ -8,6 +8,8 @@ import java.time.format.DateTimeFormatter;
 import java.time.temporal.TemporalAccessor;
 
 import org.hibernate.search.backend.elasticsearch.lowlevel.index.mapping.impl.DataTypes;
+import org.hibernate.search.backend.elasticsearch.search.aggregation.impl.ElasticsearchMetricFieldAggregation;
+import org.hibernate.search.backend.elasticsearch.search.aggregation.impl.ElasticsearchMetricLongAggregation;
 import org.hibernate.search.backend.elasticsearch.search.aggregation.impl.ElasticsearchRangeAggregation;
 import org.hibernate.search.backend.elasticsearch.search.aggregation.impl.ElasticsearchTermsAggregation;
 import org.hibernate.search.backend.elasticsearch.search.predicate.impl.ElasticsearchExistsPredicate;
@@ -77,6 +79,18 @@ abstract class AbstractElasticsearchTemporalIndexFieldTypeOptionsStep<
 			builder.aggregable( true );
 			builder.queryElementFactory( AggregationTypeKeys.TERMS, new ElasticsearchTermsAggregation.Factory<>( codec ) );
 			builder.queryElementFactory( AggregationTypeKeys.RANGE, new ElasticsearchRangeAggregation.Factory<>( codec ) );
+			builder.queryElementFactory( AggregationTypeKeys.SUM,
+					new ElasticsearchMetricFieldAggregation.Factory<>( codec, "sum" ) );
+			builder.queryElementFactory( AggregationTypeKeys.MIN,
+					new ElasticsearchMetricFieldAggregation.Factory<>( codec, "min" ) );
+			builder.queryElementFactory( AggregationTypeKeys.MAX,
+					new ElasticsearchMetricFieldAggregation.Factory<>( codec, "max" ) );
+			builder.queryElementFactory( AggregationTypeKeys.COUNT,
+					new ElasticsearchMetricLongAggregation.Factory<>( codec, "value_count" ) );
+			builder.queryElementFactory( AggregationTypeKeys.COUNT_DISTINCT,
+					new ElasticsearchMetricLongAggregation.Factory<>( codec, "cardinality" ) );
+			builder.queryElementFactory( AggregationTypeKeys.AVG,
+					new ElasticsearchMetricFieldAggregation.Factory<>( codec, "avg" ) );
 		}
 	}
 

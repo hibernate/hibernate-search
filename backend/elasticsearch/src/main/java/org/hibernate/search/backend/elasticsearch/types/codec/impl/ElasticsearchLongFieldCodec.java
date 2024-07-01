@@ -6,6 +6,7 @@ package org.hibernate.search.backend.elasticsearch.types.codec.impl;
 
 import org.hibernate.search.backend.elasticsearch.gson.impl.JsonElementTypes;
 import org.hibernate.search.backend.elasticsearch.lowlevel.syntax.search.impl.ElasticsearchSearchSyntax;
+import org.hibernate.search.engine.cfg.spi.NumberUtils;
 
 import com.google.gson.JsonElement;
 import com.google.gson.JsonNull;
@@ -36,6 +37,11 @@ public class ElasticsearchLongFieldCodec implements ElasticsearchFieldCodec<Long
 			return null;
 		}
 		return JsonElementTypes.LONG.fromElement( element );
+	}
+
+	@Override
+	public Long decode(Double value) {
+		return NumberUtils.toLong( value );
 	}
 
 	@Override
