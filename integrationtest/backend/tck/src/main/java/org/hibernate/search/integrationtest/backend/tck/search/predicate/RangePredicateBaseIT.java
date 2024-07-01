@@ -13,7 +13,7 @@ import java.util.Objects;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
-import org.hibernate.search.engine.search.common.ValueConvert;
+import org.hibernate.search.engine.search.common.PredicateValueConvert;
 import org.hibernate.search.engine.search.predicate.dsl.PredicateFinalStep;
 import org.hibernate.search.engine.search.predicate.dsl.SearchPredicateFactory;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.FieldTypeDescriptor;
@@ -548,13 +548,13 @@ class RangePredicateBaseIT {
 
 		@Override
 		protected PredicateFinalStep predicate(SearchPredicateFactory f, String fieldPath, Range<?> rangeParam,
-				ValueConvert valueConvert) {
+				PredicateValueConvert valueConvert) {
 			return f.range().field( fieldPath ).within( rangeParam, valueConvert );
 		}
 
 		@Override
 		protected PredicateFinalStep predicate(SearchPredicateFactory f, String field0Path, String field1Path,
-				Range<?> rangeParam, ValueConvert valueConvert) {
+				Range<?> rangeParam, PredicateValueConvert valueConvert) {
 			return f.range().field( field0Path ).field( field1Path ).within( rangeParam, valueConvert );
 		}
 

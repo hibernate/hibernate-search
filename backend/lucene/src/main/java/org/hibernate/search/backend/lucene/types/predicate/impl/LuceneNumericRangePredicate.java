@@ -13,7 +13,7 @@ import org.hibernate.search.backend.lucene.search.predicate.impl.AbstractLuceneL
 import org.hibernate.search.backend.lucene.search.predicate.impl.PredicateRequestContext;
 import org.hibernate.search.backend.lucene.types.codec.impl.AbstractLuceneNumericFieldCodec;
 import org.hibernate.search.backend.lucene.types.lowlevel.impl.LuceneNumericDomain;
-import org.hibernate.search.engine.search.common.ValueConvert;
+import org.hibernate.search.engine.search.common.spi.InputValueConvert;
 import org.hibernate.search.engine.search.predicate.SearchPredicate;
 import org.hibernate.search.engine.search.predicate.spi.RangePredicateBuilder;
 import org.hibernate.search.util.common.data.Range;
@@ -53,7 +53,7 @@ public class LuceneNumericRangePredicate extends AbstractLuceneLeafSingleFieldPr
 		}
 
 		@Override
-		public void within(Range<?> range, ValueConvert convertLowerBound, ValueConvert convertUpperBound) {
+		public void within(Range<?> range, InputValueConvert convertLowerBound, InputValueConvert convertUpperBound) {
 			this.range = convertAndEncode( codec, range, convertLowerBound, convertUpperBound );
 		}
 

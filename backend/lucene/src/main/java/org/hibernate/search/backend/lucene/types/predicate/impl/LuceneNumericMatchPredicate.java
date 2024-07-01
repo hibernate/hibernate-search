@@ -13,7 +13,7 @@ import org.hibernate.search.backend.lucene.search.common.impl.LuceneSearchIndexV
 import org.hibernate.search.backend.lucene.search.predicate.impl.AbstractLuceneLeafSingleFieldPredicate;
 import org.hibernate.search.backend.lucene.search.predicate.impl.PredicateRequestContext;
 import org.hibernate.search.backend.lucene.types.codec.impl.AbstractLuceneNumericFieldCodec;
-import org.hibernate.search.engine.search.common.ValueConvert;
+import org.hibernate.search.engine.search.common.spi.InputValueConvert;
 import org.hibernate.search.engine.search.predicate.SearchPredicate;
 import org.hibernate.search.engine.search.predicate.spi.MatchPredicateBuilder;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
@@ -53,7 +53,7 @@ public class LuceneNumericMatchPredicate extends AbstractLuceneLeafSingleFieldPr
 		}
 
 		@Override
-		public void value(Object value, ValueConvert convert) {
+		public void value(Object value, InputValueConvert convert) {
 			this.value = convertAndEncode( codec, value, convert );
 		}
 

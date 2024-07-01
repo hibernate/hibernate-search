@@ -12,7 +12,7 @@ import org.hibernate.search.backend.lucene.search.common.impl.LuceneSearchIndexS
 import org.hibernate.search.backend.lucene.search.common.impl.LuceneSearchIndexValueFieldContext;
 import org.hibernate.search.backend.lucene.types.codec.impl.LuceneStandardFieldCodec;
 import org.hibernate.search.engine.backend.types.converter.spi.DslConverter;
-import org.hibernate.search.engine.search.common.ValueConvert;
+import org.hibernate.search.engine.search.common.spi.InputValueConvert;
 import org.hibernate.search.util.common.data.Range;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
@@ -45,7 +45,7 @@ public abstract class AbstractLuceneLeafSingleFieldPredicate extends AbstractLuc
 
 		protected abstract Query buildQuery(PredicateRequestContext context);
 
-		protected <E> E convertAndEncode(LuceneStandardFieldCodec<F, E> codec, Object value, ValueConvert convert) {
+		protected <E> E convertAndEncode(LuceneStandardFieldCodec<F, E> codec, Object value, InputValueConvert convert) {
 			DslConverter<?, ? extends F> toFieldValueConverter = field.type().dslConverter( convert );
 			try {
 				F converted = toFieldValueConverter.unknownTypeToDocumentValue( value,
@@ -58,8 +58,8 @@ public abstract class AbstractLuceneLeafSingleFieldPredicate extends AbstractLuc
 		}
 
 		protected <E> Range<E> convertAndEncode(LuceneStandardFieldCodec<F, E> codec, Range<?> range,
-				ValueConvert convertLowerBound,
-				ValueConvert convertUpperBound) {
+				InputValueConvert convertLowerBound,
+				InputValueConvert convertUpperBound) {
 			return Range.between(
 					convertAndEncode( codec, range.lowerBoundValue(), convertLowerBound ),
 					range.lowerBoundInclusion(),
@@ -69,8 +69,8 @@ public abstract class AbstractLuceneLeafSingleFieldPredicate extends AbstractLuc
 		}
 
 		private <E> E convertAndEncode(LuceneStandardFieldCodec<F, E> codec, Optional<?> valueOptional,
-				ValueConvert convert) {
-			if ( !valueOptional.isPresent() ) {
+				InputValueConvert convert) {
+			if ( valueOptional.isEmpty() ) {
 				return null;
 			}
 			else {

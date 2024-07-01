@@ -20,7 +20,7 @@ import org.hibernate.search.backend.lucene.types.sort.comparatorsource.impl.Luce
 import org.hibernate.search.backend.lucene.types.sort.comparatorsource.impl.LuceneTextFieldComparatorSource;
 import org.hibernate.search.engine.backend.types.converter.spi.DslConverter;
 import org.hibernate.search.engine.search.common.SortMode;
-import org.hibernate.search.engine.search.common.ValueConvert;
+import org.hibernate.search.engine.search.common.spi.InputValueConvert;
 import org.hibernate.search.engine.search.sort.SearchSort;
 import org.hibernate.search.engine.search.sort.dsl.SortOrder;
 import org.hibernate.search.engine.search.sort.spi.FieldSortBuilder;
@@ -93,7 +93,7 @@ public abstract class LuceneStandardFieldSort extends AbstractLuceneDocumentValu
 		}
 
 		@Override
-		public void missingAs(Object value, ValueConvert convert) {
+		public void missingAs(Object value, InputValueConvert convert) {
 			DslConverter<?, ? extends F> dslToIndexConverter = field.type().dslConverter( convert );
 			try {
 				F converted = dslToIndexConverter.unknownTypeToDocumentValue( value, scope.toDocumentValueConvertContext() );

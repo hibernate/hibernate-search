@@ -14,7 +14,7 @@ import org.hibernate.search.backend.lucene.search.common.impl.LuceneSearchIndexV
 import org.hibernate.search.backend.lucene.search.predicate.impl.AbstractLuceneLeafSingleFieldPredicate;
 import org.hibernate.search.backend.lucene.search.predicate.impl.PredicateRequestContext;
 import org.hibernate.search.backend.lucene.types.codec.impl.AbstractLuceneNumericFieldCodec;
-import org.hibernate.search.engine.search.common.ValueConvert;
+import org.hibernate.search.engine.search.common.spi.InputValueConvert;
 import org.hibernate.search.engine.search.predicate.SearchPredicate;
 import org.hibernate.search.engine.search.predicate.spi.TermsPredicateBuilder;
 
@@ -58,13 +58,13 @@ public class LuceneNumericTermsPredicate extends AbstractLuceneLeafSingleFieldPr
 		}
 
 		@Override
-		public void matchingAny(Collection<?> terms, ValueConvert convert) {
+		public void matchingAny(Collection<?> terms, InputValueConvert convert) {
 			allMatch = false;
 			fillTerms( terms, convert );
 		}
 
 		@Override
-		public void matchingAll(Collection<?> terms, ValueConvert convert) {
+		public void matchingAll(Collection<?> terms, InputValueConvert convert) {
 			allMatch = true;
 			fillTerms( terms, convert );
 		}
@@ -92,7 +92,7 @@ public class LuceneNumericTermsPredicate extends AbstractLuceneLeafSingleFieldPr
 			return builder.build();
 		}
 
-		private void fillTerms(Collection<?> terms, ValueConvert convert) {
+		private void fillTerms(Collection<?> terms, InputValueConvert convert) {
 			if ( terms.size() == 1 ) {
 				this.term = convertAndEncode( codec, terms.iterator().next(), convert );
 				this.terms = null;

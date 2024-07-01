@@ -7,7 +7,8 @@ package org.hibernate.search.engine.search.sort.dsl.impl;
 import java.util.function.Function;
 
 import org.hibernate.search.engine.search.common.SortMode;
-import org.hibernate.search.engine.search.common.ValueConvert;
+import org.hibernate.search.engine.search.common.SortValueConvert;
+import org.hibernate.search.engine.search.common.spi.InputValueConvert;
 import org.hibernate.search.engine.search.predicate.SearchPredicate;
 import org.hibernate.search.engine.search.predicate.dsl.PredicateFinalStep;
 import org.hibernate.search.engine.search.predicate.dsl.SearchPredicateFactory;
@@ -90,8 +91,8 @@ public class FieldSortOptionsStepImpl<PDF extends SearchPredicateFactory>
 	}
 
 	@Override
-	public FieldSortOptionsStepImpl<PDF> use(Object value, ValueConvert convert) {
-		builder.missingAs( value, convert );
+	public FieldSortOptionsStepImpl<PDF> use(Object value, SortValueConvert convert) {
+		builder.missingAs( value, InputValueConvert.from( convert ) );
 		return this;
 	}
 

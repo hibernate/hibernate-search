@@ -9,7 +9,8 @@ import org.hibernate.search.engine.search.aggregation.dsl.RangeAggregationRangeS
 import org.hibernate.search.engine.search.aggregation.dsl.spi.SearchAggregationDslContext;
 import org.hibernate.search.engine.search.aggregation.spi.AggregationTypeKeys;
 import org.hibernate.search.engine.search.aggregation.spi.RangeAggregationBuilder;
-import org.hibernate.search.engine.search.common.ValueConvert;
+import org.hibernate.search.engine.search.common.AggregationInputValueConvert;
+import org.hibernate.search.engine.search.common.spi.InputValueConvert;
 import org.hibernate.search.engine.search.predicate.dsl.SearchPredicateFactory;
 import org.hibernate.search.util.common.impl.Contracts;
 
@@ -21,11 +22,12 @@ public class RangeAggregationFieldStepImpl<PDF extends SearchPredicateFactory> i
 	}
 
 	@Override
-	public <F> RangeAggregationRangeStep<?, PDF, F> field(String fieldPath, Class<F> type, ValueConvert convert) {
+	public <F> RangeAggregationRangeStep<?, PDF, F> field(String fieldPath, Class<F> type,
+			AggregationInputValueConvert convert) {
 		Contracts.assertNotNull( fieldPath, "fieldPath" );
 		Contracts.assertNotNull( type, "type" );
 		RangeAggregationBuilder<F> builder = dslContext.scope()
-				.fieldQueryElement( fieldPath, AggregationTypeKeys.RANGE ).type( type, convert );
+				.fieldQueryElement( fieldPath, AggregationTypeKeys.RANGE ).type( type, InputValueConvert.from( convert ) );
 		return new RangeAggregationRangeStepImpl<>( builder, dslContext );
 	}
 }

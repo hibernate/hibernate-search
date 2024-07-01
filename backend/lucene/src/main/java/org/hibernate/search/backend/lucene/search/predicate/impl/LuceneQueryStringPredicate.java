@@ -12,7 +12,7 @@ import org.hibernate.search.backend.lucene.search.common.impl.LuceneSearchIndexS
 import org.hibernate.search.backend.lucene.types.predicate.impl.LuceneCommonQueryStringPredicateBuilderFieldState;
 import org.hibernate.search.engine.search.common.BooleanOperator;
 import org.hibernate.search.engine.search.common.RewriteMethod;
-import org.hibernate.search.engine.search.common.ValueConvert;
+import org.hibernate.search.engine.search.common.spi.InputValueConvert;
 import org.hibernate.search.engine.search.common.spi.SearchQueryElementTypeKey;
 import org.hibernate.search.engine.search.predicate.SearchPredicate;
 import org.hibernate.search.engine.search.predicate.spi.PredicateTypeKeys;
@@ -166,7 +166,7 @@ public class LuceneQueryStringPredicate extends LuceneCommonQueryStringPredicate
 
 			if ( !state.field().type().valueClass().isAssignableFrom( String.class ) ) {
 				var builder = state.field().queryElement( PredicateTypeKeys.MATCH, scope );
-				builder.value( queryText, ValueConvert.PARSE );
+				builder.value( queryText, InputValueConvert.STRING );
 
 				return LuceneSearchPredicate.from( scope, builder.build() ).toQuery( contextForField( state ) );
 			}
@@ -209,7 +209,7 @@ public class LuceneQueryStringPredicate extends LuceneCommonQueryStringPredicate
 								part1, startInclusive ? RangeBoundInclusion.INCLUDED : RangeBoundInclusion.EXCLUDED,
 								part2, endInclusive ? RangeBoundInclusion.INCLUDED : RangeBoundInclusion.EXCLUDED
 						),
-						ValueConvert.PARSE, ValueConvert.PARSE );
+						InputValueConvert.STRING, InputValueConvert.STRING );
 				return LuceneSearchPredicate.from( scope, builder.build() ).toQuery( contextForField( state ) );
 			}
 

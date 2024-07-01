@@ -16,7 +16,7 @@ import org.hibernate.search.backend.elasticsearch.search.common.impl.Elasticsear
 import org.hibernate.search.backend.elasticsearch.types.codec.impl.ElasticsearchFieldCodec;
 import org.hibernate.search.engine.backend.types.converter.spi.DslConverter;
 import org.hibernate.search.engine.reporting.spi.EventContexts;
-import org.hibernate.search.engine.search.common.ValueConvert;
+import org.hibernate.search.engine.search.common.spi.InputValueConvert;
 import org.hibernate.search.engine.search.predicate.SearchPredicate;
 import org.hibernate.search.engine.search.predicate.spi.RangePredicateBuilder;
 import org.hibernate.search.util.common.data.Range;
@@ -94,7 +94,7 @@ public class ElasticsearchRangePredicate extends AbstractElasticsearchSingleFiel
 		}
 
 		@Override
-		public void within(Range<?> range, ValueConvert convertLowerBound, ValueConvert convertUpperBound) {
+		public void within(Range<?> range, InputValueConvert convertLowerBound, InputValueConvert convertUpperBound) {
 			this.range = Range.between(
 					convertToFieldValue( range.lowerBoundValue(), convertLowerBound ),
 					range.lowerBoundInclusion(),
@@ -112,8 +112,8 @@ public class ElasticsearchRangePredicate extends AbstractElasticsearchSingleFiel
 			return new ElasticsearchRangePredicate( this );
 		}
 
-		private JsonElement convertToFieldValue(Optional<?> valueOptional, ValueConvert convert) {
-			if ( !valueOptional.isPresent() ) {
+		private JsonElement convertToFieldValue(Optional<?> valueOptional, InputValueConvert convert) {
+			if ( valueOptional.isEmpty() ) {
 				return null;
 			}
 			Object value = valueOptional.get();

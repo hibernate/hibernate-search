@@ -1017,4 +1017,5 @@ public interface Log extends BasicLogger {
 	@Message(id = ID_OFFSET + 161, value = "Invalid mass indexing default clean operation name: '%1$s'."
 			+ " Valid names are: %2$s.")
 	SearchException invalidMassIndexingDefaultCleanOperation(String name, List<String> names);
+
 }

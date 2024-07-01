@@ -6,7 +6,7 @@ package org.hibernate.search.engine.search.projection.dsl.impl;
 
 import java.util.List;
 
-import org.hibernate.search.engine.search.common.ValueConvert;
+import org.hibernate.search.engine.search.common.spi.OutputValueConvert;
 import org.hibernate.search.engine.search.projection.SearchProjection;
 import org.hibernate.search.engine.search.projection.dsl.FieldProjectionOptionsStep;
 import org.hibernate.search.engine.search.projection.dsl.FieldProjectionValueStep;
@@ -20,7 +20,7 @@ public final class FieldProjectionValueStepImpl<T>
 
 	public FieldProjectionValueStepImpl(SearchProjectionDslContext<?> dslContext, String fieldPath,
 			Class<T> clazz,
-			ValueConvert convert) {
+			OutputValueConvert convert) {
 		super( dslContext.scope().fieldQueryElement( fieldPath, ProjectionTypeKeys.FIELD )
 				.type( clazz, convert ),
 				ProjectionAccumulator.single() );
