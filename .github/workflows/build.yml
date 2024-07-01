@@ -63,10 +63,10 @@ jobs:
       matrix:
         os:
           - {
-            name: "Linux JDK 17",
+            name: "Linux JDK 21",
             runs-on: 'ubuntu-latest',
             java: {
-              version: 17
+              version: 21
             },
             maven: {
               # Since we only start an Elasticsearch container on Linux we add the profile to enable container reuse here:
@@ -77,10 +77,10 @@ jobs:
           # so we can't run Elasticsearch tests.
           # See https://github.com/actions/runner-images/issues/1143#issuecomment-972929995
           - {
-            name: "Windows JDK 17",
+            name: "Windows JDK 21",
             runs-on: 'windows-latest',
             java: {
-              version: 17
+              version: 21
             },
             maven: {
               args: '-Dtest.elasticsearch.skip=true'

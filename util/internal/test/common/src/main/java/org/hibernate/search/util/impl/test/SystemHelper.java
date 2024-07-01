@@ -5,6 +5,7 @@
 package org.hibernate.search.util.impl.test;
 
 import java.io.BufferedReader;
+import java.io.Closeable;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -35,7 +36,7 @@ public final class SystemHelper {
 
 	public static Process runCommandWithInheritedIO(String... command) throws IOException {
 		// We can't use `inheritIO()` in surefire as that would bypass surefire's
-		// output capturingand lead to warnings.
+		// output capturing and lead to warnings.
 		// So we use an old-fashioned solution...
 
 		Process process = new ProcessBuilder( command )
@@ -44,12 +45,16 @@ public final class SystemHelper {
 
 		// Drain the output/errors streams
 		ExecutorService service = Executors.newFixedThreadPool( 2 );
-		service.submit( () -> drain( process.getInputStream(), System.out::println ) );
-		service.submit( () -> drain( process.getErrorStream(), System.err::println ) );
+		try ( InputStream is = process.getInputStream(); InputStream es = process.getErrorStream();
+				Closeable pool = service::shutdownNow ) {
+			service.submit( () -> drain( is, System.out::println ) );
+			service.submit( () -> drain( es, System.err::println ) );
+			service.shutdown();
 
-		Awaitility.await( process + " termination" )
-				.atMost( 1, TimeUnit.MINUTES )
-				.until( () -> !process.isAlive() );
+			Awaitility.await( process + " termination" )
+					.atMost( 1, TimeUnit.MINUTES )
+					.until( () -> !process.isAlive() );
+		}
 
 		return process;
 	}
@@ -57,7 +62,7 @@ public final class SystemHelper {
 	private static void drain(InputStream stream, Consumer<String> consumer) {
 		try ( InputStreamReader in = new InputStreamReader( stream, Charsets.UTF_8 );
 				BufferedReader bufferedReader = new BufferedReader( in ); ) {
-			bufferedReader.lines().forEach( System.out::println );
+			bufferedReader.lines().forEach( consumer );
 		}
 		catch (IOException e) {
 			throw new RuntimeException( e );

@@ -25,6 +25,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.function.BiFunction;
 
+import org.hibernate.search.util.common.annotation.impl.SuppressForbiddenApis;
 import org.hibernate.search.util.common.impl.Closer;
 import org.hibernate.search.util.common.impl.SuppressingCloser;
 import org.hibernate.search.util.common.impl.Throwables;
@@ -75,6 +76,8 @@ class CodeSource implements Closeable {
 		this.codeSourceLocation = codeSourceLocation;
 	}
 
+	@SuppressForbiddenApis(reason = "URL constructors are deprecated in JDK 20+ in favor of using URI.toURL(),"
+			+ " but we need to start from URLs (not URIs) coming from java.security.CodeSource.")
 	public InputStream readOrNull(String resourcePathString) throws IOException {
 		Throwable exception = null;
 

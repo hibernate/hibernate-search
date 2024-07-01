@@ -7,6 +7,8 @@ package org.hibernate.search.engine.environment.classpath.spi;
 import java.io.InputStream;
 import java.net.URL;
 
+import org.hibernate.search.util.common.annotation.impl.SuppressForbiddenApis;
+
 /**
  * Default implementation of {@code ClassResolver} relying on an {@link AggregatedClassLoader}.
  *
@@ -25,6 +27,8 @@ public final class DefaultResourceResolver implements ResourceResolver {
 	}
 
 	@Override
+	@SuppressForbiddenApis(reason = "URL constructors are deprecated in JDK 20+ in favor of using URI.toURL(),"
+			+ " but we want to preserve backward compatibility for now (see below).")
 	public InputStream locateResourceStream(String name) {
 		try {
 			final InputStream stream = aggregatedClassLoader.getResourceAsStream( name );
@@ -42,6 +46,8 @@ public final class DefaultResourceResolver implements ResourceResolver {
 			try {
 				@SuppressWarnings("deprecation")
 				// TODO: HSEARCH-4765 address the URL -> URI constructor change once the URLClassLoader stops using the URL constructor
+				//   Main problem: would URI.create(stripped).toURL() fail, since `stripped` seems to be a relative URL?
+				//   Do we even have test coverage for this line?
 				InputStream resourceStream = new URL( stripped ).openStream();
 				return resourceStream;
 			}

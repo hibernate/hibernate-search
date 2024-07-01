@@ -1014,6 +1014,10 @@
                                     <bundledSignature>jdk-deprecated-16</bundledSignature>
                                     <bundledSignature>jdk-deprecated-17</bundledSignature>
                                     <bundledSignature>jdk-deprecated-18</bundledSignature>
+                                    <bundledSignature>jdk-deprecated-19</bundledSignature>
+                                    <bundledSignature>jdk-deprecated-20</bundledSignature>
+                                    <bundledSignature>jdk-deprecated-21</bundledSignature>
+                                    <bundledSignature>jdk-deprecated-22</bundledSignature>
 
                                     <bundledSignature>jdk-internal-1.8</bundledSignature>
                                     <bundledSignature>jdk-internal-9</bundledSignature>
@@ -1026,6 +1030,10 @@
                                     <bundledSignature>jdk-internal-16</bundledSignature>
                                     <bundledSignature>jdk-internal-17</bundledSignature>
                                     <bundledSignature>jdk-internal-18</bundledSignature>
+                                    <bundledSignature>jdk-internal-19</bundledSignature>
+                                    <bundledSignature>jdk-internal-20</bundledSignature>
+                                    <bundledSignature>jdk-internal-21</bundledSignature>
+                                    <bundledSignature>jdk-internal-22</bundledSignature>
                                 </bundledSignatures>
                                 <signaturesArtifacts>
                                     <signaturesArtifact>

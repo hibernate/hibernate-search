@@ -202,7 +202,7 @@
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
 
         <!-- JDK version required for the build; we target 11 but require at least 17 for the build -->
-        <jdk.min.version>17</jdk.min.version>
+        <jdk.min.version>21</jdk.min.version>
         <!-- The lowest supported version of Java for applications using Hibernate Search -->
         <!-- Set statically, independently from the current JDK: we want our code to comply with this version -->
         <java-version.main.release>11</java-version.main.release>
@@ -303,7 +303,7 @@
         <version.com.puppycrawl.tools.checkstyle>10.17.0</version.com.puppycrawl.tools.checkstyle>
         <version.versions.plugin>2.16.2</version.versions.plugin>
         <version.maven-wrapper-plugin>3.3.2</version.maven-wrapper-plugin>
-        <version.impsort-maven-plugin>1.10.0</version.impsort-maven-plugin>
+        <version.impsort-maven-plugin>1.11.0</version.impsort-maven-plugin>
         <version.formatter-maven-plugin>2.24.1</version.formatter-maven-plugin>
         <version.org.eclipse.m2e.lifecycle-mapping>1.0.0</version.org.eclipse.m2e.lifecycle-mapping>
         <version.sisu-maven-plugin>0.9.0.M3</version.sisu-maven-plugin>
