@@ -57,7 +57,7 @@ public final class SystemHelper {
 	private static void drain(InputStream stream, Consumer<String> consumer) {
 		try ( InputStreamReader in = new InputStreamReader( stream, Charsets.UTF_8 );
 				BufferedReader bufferedReader = new BufferedReader( in ); ) {
-			bufferedReader.lines().forEach( System.out::println );
+			bufferedReader.lines().forEach( consumer );
 		}
 		catch (IOException e) {
 			throw new RuntimeException( e );
