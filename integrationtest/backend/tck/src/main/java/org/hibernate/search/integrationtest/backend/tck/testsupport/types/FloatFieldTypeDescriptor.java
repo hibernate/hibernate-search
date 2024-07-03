@@ -32,7 +32,7 @@ public class FloatFieldTypeDescriptor extends StandardFieldTypeDescriptor<Float>
 						22.0f,
 						55f,
 						2500.5100000045f,
-						1584514514.000000184f,
+						1584514414.000000184f,
 						Float.MAX_VALUE
 				);
 			}
@@ -69,7 +69,7 @@ public class FloatFieldTypeDescriptor extends StandardFieldTypeDescriptor<Float>
 				0.0f,
 				-0.0f, // Negative 0 is a different float
 				42.42f,
-				1584514514.000000184f,
+				1584514414.000000184f,
 				-1.001f, 3.0f, 5.1f
 		);
 	}
