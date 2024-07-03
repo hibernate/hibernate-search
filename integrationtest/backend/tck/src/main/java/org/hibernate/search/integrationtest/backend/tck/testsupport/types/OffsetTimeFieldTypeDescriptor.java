@@ -116,4 +116,16 @@ public class OffsetTimeFieldTypeDescriptor extends StandardFieldTypeDescriptor<O
 				LocalTime.of( 12, 14, 52 ).atOffset( ZoneOffset.ofHours( 1 ) )
 		) );
 	}
+
+	@Override
+	public Object rawValue(OffsetTime value) {
+		if ( value == null ) {
+			return null;
+		}
+
+		// see private method OffsetTime#toEpochNano:
+		long nod = value.toLocalTime().toNanoOfDay();
+		long offsetNanos = value.getOffset().getTotalSeconds() * 1_000_000_000L;
+		return nod - offsetNanos;
+	}
 }

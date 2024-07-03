@@ -5,6 +5,7 @@
 package org.hibernate.search.integrationtest.backend.lucene.testsupport.util;
 
 import org.hibernate.search.engine.backend.types.ObjectStructure;
+import org.hibernate.search.integrationtest.backend.tck.testsupport.types.FieldTypeDescriptor;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.TckBackendFeatures;
 
 class LuceneTckBackendFeatures extends TckBackendFeatures {
@@ -61,5 +62,10 @@ class LuceneTckBackendFeatures extends TckBackendFeatures {
 	@Override
 	public boolean supportsHighlighterUnifiedPhraseMatching() {
 		return true;
+	}
+
+	@Override
+	public <F> Object toRawValue(FieldTypeDescriptor<F, ?> descriptor, F value) {
+		return descriptor.rawValue( value );
 	}
 }

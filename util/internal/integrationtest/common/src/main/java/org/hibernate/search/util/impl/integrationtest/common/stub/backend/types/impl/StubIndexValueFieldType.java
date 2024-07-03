@@ -9,6 +9,8 @@ import java.util.List;
 import java.util.function.Consumer;
 
 import org.hibernate.search.engine.backend.types.IndexFieldType;
+import org.hibernate.search.engine.backend.types.converter.spi.DslConverter;
+import org.hibernate.search.engine.backend.types.converter.spi.ProjectionConverter;
 import org.hibernate.search.engine.backend.types.spi.AbstractIndexValueFieldType;
 import org.hibernate.search.engine.search.aggregation.spi.AggregationTypeKeys;
 import org.hibernate.search.engine.search.common.spi.SearchQueryElementTypeKey;
@@ -46,6 +48,18 @@ public final class StubIndexValueFieldType<F>
 		for ( Consumer<StubIndexSchemaDataNode.Builder> modifier : modifiers ) {
 			modifier.accept( builder );
 		}
+	}
+
+	@Override
+	public DslConverter<?, F> rawDslConverter() {
+		throw new UnsupportedOperationException(
+				"Raw DSL converter is backend specific and there's no implementation for a stub backend." );
+	}
+
+	@Override
+	public ProjectionConverter<F, ?> rawProjectionConverter() {
+		throw new UnsupportedOperationException(
+				"Raw projection converter is backend specific and there's no implementation for a stub backend." );
 	}
 
 	public static class Builder<F>

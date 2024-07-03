@@ -6,6 +6,7 @@ package org.hibernate.search.integrationtest.backend.tck.testsupport.types;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
+import java.math.RoundingMode;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -156,5 +157,10 @@ public class BigDecimalFieldTypeDescriptor extends StandardFieldTypeDescriptor<B
 	private BigDecimal nextDown(BigDecimal originalValue) {
 		BigInteger unscaledLessOne = originalValue.setScale( DECIMAL_SCALE ).unscaledValue().subtract( BigInteger.ONE );
 		return new BigDecimal( unscaledLessOne, DECIMAL_SCALE );
+	}
+
+	@Override
+	public Object rawValue(BigDecimal value) {
+		return value == null ? null : value.setScale( DECIMAL_SCALE, RoundingMode.HALF_UP ).unscaledValue().longValue();
 	}
 }

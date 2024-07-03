@@ -145,7 +145,7 @@ class FieldDefaultBridgeOverridingIT<V, F> {
 		// This cast may be unsafe, but only if something is deeply wrong, and then an exception will be thrown below
 		@SuppressWarnings("unchecked")
 		DslConverter<V, ?> dslConverter =
-				(DslConverter<V, ?>) indexField.toValueField().type().dslConverter();
+				(DslConverter<V, ?>) indexField.toValueField().type().mappingDslConverter();
 		ToDocumentValueConvertContext toDocumentConvertContext =
 				new ToDocumentValueConvertContextImpl( BridgeTestUtils.toBackendMappingContext( mapping ) );
 

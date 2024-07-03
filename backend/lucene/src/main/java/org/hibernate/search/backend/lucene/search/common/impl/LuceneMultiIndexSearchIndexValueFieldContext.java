@@ -63,7 +63,7 @@ public class LuceneMultiIndexSearchIndexValueFieldContext<F>
 	}
 
 	@Override
-	public LuceneFieldCodec<F> codec() {
+	public LuceneFieldCodec<F, ?> codec() {
 		return fromTypeIfCompatible( LuceneSearchIndexValueFieldTypeContext::codec, LuceneFieldCodec::isCompatibleWith,
 				"codec" );
 	}

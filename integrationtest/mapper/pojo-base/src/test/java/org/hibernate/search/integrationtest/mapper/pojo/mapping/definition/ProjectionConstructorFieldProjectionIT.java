@@ -13,6 +13,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 
+import org.hibernate.search.engine.search.common.ValueConvert;
 import org.hibernate.search.engine.search.common.ValueModel;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.DocumentId;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.FieldProjection;
@@ -123,7 +124,7 @@ class ProjectionConstructorFieldProjectionIT extends AbstractProjectionConstruct
 	}
 
 	@Test
-	void valueConvert() {
+	void valueModel() {
 		@Indexed(index = INDEX_NAME)
 		class IndexedEntity {
 			@DocumentId
@@ -134,7 +135,6 @@ class ProjectionConstructorFieldProjectionIT extends AbstractProjectionConstruct
 		class MyProjection {
 			public final String myEnum;
 
-			@SuppressWarnings("deprecation")
 			@ProjectionConstructor
 			public MyProjection(
 					@FieldProjection(valueModel = ValueModel.INDEX) String myEnum) {
@@ -164,6 +164,33 @@ class ProjectionConstructorFieldProjectionIT extends AbstractProjectionConstruct
 						new MyProjection( "result2" )
 				)
 		);
+	}
+
+	@Test
+	void valueConvert_nonDefaultFails() {
+		@Indexed(index = INDEX_NAME)
+		class IndexedEntity {
+			@DocumentId
+			public Integer id;
+			@GenericField
+			public MyEnum myEnum;
+		}
+		class MyProjection {
+			public final String myEnum;
+
+			@SuppressWarnings("deprecation")
+			@ProjectionConstructor
+			public MyProjection(@FieldProjection(convert = ValueConvert.NO) String myEnum) {
+				this.myEnum = myEnum;
+			}
+		}
+
+		assertThatThrownBy( () -> setupHelper.start()
+				.withAnnotatedTypes( MyProjection.class )
+				.setup( IndexedEntity.class ) )
+				.isInstanceOf( SearchException.class )
+				.hasMessageContaining(
+						"Using `convert=ValueConvert.NO` in @FieldProjection is not allowed anymore. Use `valueModel=ValueModel.INDEX` instead." );
 	}
 
 	enum MyEnum {

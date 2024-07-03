@@ -12,7 +12,7 @@ import org.apache.lucene.index.VectorSimilarityFunction;
  *
  * @param <F> The field type exposed to the mapper.
  */
-public interface LuceneVectorFieldCodec<F> extends LuceneStandardFieldCodec<F, F> {
+public interface LuceneVectorFieldCodec<F> extends LuceneFieldCodec<F, F> {
 
 	/**
 	 * Custom {@link KnnVectorsFormat knn vector format} that will be used in {@link org.apache.lucene.codecs.perfield.PerFieldKnnVectorsFormat}

@@ -11,7 +11,7 @@ import org.hibernate.search.backend.lucene.types.codec.impl.LuceneFieldCodec;
 import org.hibernate.search.engine.search.common.spi.SearchQueryElementFactory;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
-public abstract class AbstractLuceneCodecAwareSearchQueryElementFactory<T, F, C extends LuceneFieldCodec<F>>
+public abstract class AbstractLuceneCodecAwareSearchQueryElementFactory<T, F, C extends LuceneFieldCodec<F, ?>>
 		extends AbstractLuceneValueFieldSearchQueryElementFactory<T, F> {
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );

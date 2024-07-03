@@ -13,6 +13,7 @@ import java.util.Objects;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
+import org.hibernate.search.engine.search.common.ValueConvert;
 import org.hibernate.search.engine.search.common.ValueModel;
 import org.hibernate.search.engine.search.predicate.dsl.PredicateFinalStep;
 import org.hibernate.search.engine.search.predicate.dsl.SearchPredicateFactory;
@@ -21,6 +22,8 @@ import org.hibernate.search.integrationtest.backend.tck.testsupport.types.GeoPoi
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.IntegerFieldTypeDescriptor;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.StandardFieldTypeDescriptor;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.InvalidType;
+import org.hibernate.search.integrationtest.backend.tck.testsupport.util.TckBackendFeatures;
+import org.hibernate.search.integrationtest.backend.tck.testsupport.util.TckConfiguration;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.ValueWrapper;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.extension.SearchSetupHelper;
 import org.hibernate.search.util.common.SearchException;
@@ -558,6 +561,20 @@ class RangePredicateBaseIT {
 			return f.range().field( field0Path ).field( field1Path ).within( rangeParam, valueModel );
 		}
 
+		@Deprecated
+		@Override
+		protected PredicateFinalStep predicate(SearchPredicateFactory f, String fieldPath, Range<?> matchingParam,
+				ValueConvert valueConvert) {
+			return f.range().field( fieldPath ).within( matchingParam, valueConvert );
+		}
+
+		@Deprecated
+		@Override
+		protected PredicateFinalStep predicate(SearchPredicateFactory f, String field0Path, String field1Path,
+				Range<?> matchingParam, ValueConvert valueConvert) {
+			return f.range().field( field0Path ).field( field1Path ).within( matchingParam, valueConvert );
+		}
+
 		@Override
 		protected Range<?> invalidTypeParam() {
 			return Range.between( new InvalidType(), new InvalidType() );
@@ -590,6 +607,23 @@ class RangePredicateBaseIT {
 					range.lowerBoundValue().map( IndexIntegerBinding.Converter::string ).orElse( null ),
 					range.lowerBoundInclusion(),
 					range.upperBoundValue().map( IndexIntegerBinding.Converter::string ).orElse( null ),
+					range.upperBoundInclusion()
+			);
+		}
+
+		@SuppressWarnings("unchecked")
+		@Override
+		protected Range<?> rawMatchingParam(int matchingDocOrdinal, DataSet<?, RangePredicateTestValues<F>> dataSet) {
+			Range<F> range = dataSet.values.matchingRange( matchingDocOrdinal );
+			TckBackendFeatures backendFeatures = TckConfiguration.get().getBackendFeatures();
+			return Range.between(
+					range.lowerBoundValue()
+							.map( v -> backendFeatures.toRawValue( ( (FieldTypeDescriptor<F, ?>) dataSet.fieldType ), v ) )
+							.orElse( null ),
+					range.lowerBoundInclusion(),
+					range.upperBoundValue()
+							.map( v -> backendFeatures.toRawValue( ( (FieldTypeDescriptor<F, ?>) dataSet.fieldType ), v ) )
+							.orElse( null ),
 					range.upperBoundInclusion()
 			);
 		}

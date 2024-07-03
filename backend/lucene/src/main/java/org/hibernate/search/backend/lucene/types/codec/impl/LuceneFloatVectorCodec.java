@@ -39,6 +39,11 @@ public class LuceneFloatVectorCodec extends AbstractLuceneVectorFieldCodec<float
 	}
 
 	@Override
+	public Class<float[]> encodedType() {
+		return float[].class;
+	}
+
+	@Override
 	protected byte[] toByteArray(float[] value) {
 		ByteBuffer buffer = ByteBuffer.allocate( Float.BYTES * value.length );
 		for ( float element : value ) {

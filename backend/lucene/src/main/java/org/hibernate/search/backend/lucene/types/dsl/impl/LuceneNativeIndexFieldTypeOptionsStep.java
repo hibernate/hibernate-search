@@ -26,7 +26,8 @@ class LuceneNativeIndexFieldTypeOptionsStep<F>
 
 	@Override
 	public IndexFieldType<F> toIndexFieldType() {
-		LuceneFieldFieldCodec<F> codec = new LuceneFieldFieldCodec<>( fieldContributor, fieldValueExtractor );
+		LuceneFieldFieldCodec<F> codec =
+				new LuceneFieldFieldCodec<>( builder.valueClass(), fieldContributor, fieldValueExtractor );
 		builder.codec( codec );
 
 		if ( fieldValueExtractor != null ) {

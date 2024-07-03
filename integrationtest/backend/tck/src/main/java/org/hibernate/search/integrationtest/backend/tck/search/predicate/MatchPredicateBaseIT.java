@@ -12,6 +12,7 @@ import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
 import org.hibernate.search.engine.backend.types.dsl.SearchableProjectableIndexFieldTypeOptionsStep;
+import org.hibernate.search.engine.search.common.ValueConvert;
 import org.hibernate.search.engine.search.common.ValueModel;
 import org.hibernate.search.engine.search.predicate.dsl.PredicateFinalStep;
 import org.hibernate.search.engine.search.predicate.dsl.SearchPredicateFactory;
@@ -20,6 +21,7 @@ import org.hibernate.search.integrationtest.backend.tck.testsupport.types.GeoPoi
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.IntegerFieldTypeDescriptor;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.StandardFieldTypeDescriptor;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.InvalidType;
+import org.hibernate.search.integrationtest.backend.tck.testsupport.util.TckConfiguration;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.ValueWrapper;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.extension.SearchSetupHelper;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.BulkIndexer;
@@ -562,6 +564,20 @@ class MatchPredicateBaseIT {
 			return f.match().field( field0Path ).field( field1Path ).matching( matchingParam, valueModel );
 		}
 
+		@Deprecated
+		@Override
+		protected PredicateFinalStep predicate(SearchPredicateFactory f, String fieldPath, Object matchingParam,
+				ValueConvert valueConvert) {
+			return f.match().field( fieldPath ).matching( matchingParam, valueConvert );
+		}
+
+		@Deprecated
+		@Override
+		protected PredicateFinalStep predicate(SearchPredicateFactory f, String field0Path, String field1Path,
+				Object matchingParam, ValueConvert valueConvert) {
+			return f.match().field( field0Path ).field( field1Path ).matching( matchingParam, valueConvert );
+		}
+
 		@Override
 		protected Object invalidTypeParam() {
 			return new InvalidType();
@@ -586,6 +602,14 @@ class MatchPredicateBaseIT {
 		protected Object stringMatchingParamCustomParser(int matchingDocOrdinal,
 				DataSet<?, MatchPredicateTestValues<F>> dataSet) {
 			return IndexIntegerBinding.Converter.string( dataSet.values.matchingArg( matchingDocOrdinal ) );
+		}
+
+		@SuppressWarnings("unchecked")
+		@Override
+		protected Object rawMatchingParam(int matchingDocOrdinal, DataSet<?, MatchPredicateTestValues<F>> dataSet) {
+			F value = dataSet.values.matchingArg( matchingDocOrdinal );
+			return TckConfiguration.get().getBackendFeatures()
+					.toRawValue( ( (FieldTypeDescriptor<F, ?>) dataSet.fieldType ), value );
 		}
 
 		@Override

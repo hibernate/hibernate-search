@@ -5,6 +5,7 @@
 package org.hibernate.search.integrationtest.backend.tck.testsupport.types;
 
 import java.time.LocalDateTime;
+import java.time.ZoneOffset;
 import java.time.temporal.ChronoUnit;
 import java.util.Arrays;
 import java.util.List;
@@ -113,5 +114,10 @@ public class LocalDateTimeFieldTypeDescriptor extends StandardFieldTypeDescripto
 				LocalDateTime.of( 1970, 1, 1, 0, 0, 0 ),
 				LocalDateTime.of( 1984, 10, 7, 12, 14, 52 )
 		) );
+	}
+
+	@Override
+	public Object rawValue(LocalDateTime value) {
+		return value == null ? null : value.toInstant( ZoneOffset.UTC ).toEpochMilli();
 	}
 }

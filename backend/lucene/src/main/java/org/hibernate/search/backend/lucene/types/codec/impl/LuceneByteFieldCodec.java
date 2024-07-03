@@ -43,4 +43,8 @@ public final class LuceneByteFieldCodec extends AbstractLuceneNumericFieldCodec<
 	public LuceneNumericDomain<Integer> getDomain() {
 		return LuceneIntegerDomain.get();
 	}
+
+	public Class<Integer> encodedType() {
+		return Integer.class;
+	}
 }

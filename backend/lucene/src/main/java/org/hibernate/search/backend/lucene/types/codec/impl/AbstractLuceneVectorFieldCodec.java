@@ -33,8 +33,8 @@ public abstract class AbstractLuceneVectorFieldCodec<F> implements LuceneVectorF
 	private final HibernateSearchKnnVectorsFormat knnVectorsFormat;
 	private final Consumer<F> checkVectorConsumer;
 
-	protected AbstractLuceneVectorFieldCodec(VectorSimilarityFunction vectorSimilarity, int dimension, Storage storage,
-			Indexing indexing, F indexNullAsValue, HibernateSearchKnnVectorsFormat knnVectorsFormat,
+	protected AbstractLuceneVectorFieldCodec(VectorSimilarityFunction vectorSimilarity, int dimension,
+			Storage storage, Indexing indexing, F indexNullAsValue, HibernateSearchKnnVectorsFormat knnVectorsFormat,
 			Consumer<F> checkVectorConsumer) {
 		this.vectorSimilarity = vectorSimilarity;
 		this.dimension = dimension;
@@ -80,10 +80,15 @@ public abstract class AbstractLuceneVectorFieldCodec<F> implements LuceneVectorF
 		return value;
 	}
 
+	@Override
+	public F decode(F field) {
+		return field;
+	}
+
 	protected abstract byte[] toByteArray(F value);
 
 	@Override
-	public boolean isCompatibleWith(LuceneFieldCodec<?> obj) {
+	public boolean isCompatibleWith(LuceneFieldCodec<?, ?> obj) {
 		if ( this == obj ) {
 			return true;
 		}

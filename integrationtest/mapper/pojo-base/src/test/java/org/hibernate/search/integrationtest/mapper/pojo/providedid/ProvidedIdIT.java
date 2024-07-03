@@ -69,7 +69,7 @@ class ProvidedIdIT {
 		// DslConverter
 		@SuppressWarnings("unchecked")
 		DslConverter<Object, String> dslConverter =
-				(DslConverter<Object, String>) indexModel.identifier().dslConverter();
+				(DslConverter<Object, String>) indexModel.identifier().mappingDslConverter();
 		ToDocumentValueConvertContext toDocumentConvertContext =
 				new ToDocumentValueConvertContextImpl( BridgeTestUtils.toBackendMappingContext( mapping ) );
 		assertThat( dslConverter.toDocumentValue( 120, toDocumentConvertContext ) )
@@ -80,7 +80,7 @@ class ProvidedIdIT {
 		// ProjectionConverter
 		@SuppressWarnings("unchecked")
 		ProjectionConverter<String, Object> projectionConverter =
-				(ProjectionConverter<String, Object>) indexModel.identifier().projectionConverter();
+				(ProjectionConverter<String, Object>) indexModel.identifier().mappingProjectionConverter();
 		try ( SearchSession searchSession = mapping.createSession() ) {
 			FromDocumentValueConvertContext fromDocumentConvertContext =
 					new FromDocumentValueConvertContextImpl( BridgeTestUtils.toBackendSessionContext( searchSession ) );

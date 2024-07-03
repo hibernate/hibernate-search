@@ -144,7 +144,7 @@ class IdentifierProjectionBaseIT {
 				.isInstanceOf( SearchException.class )
 				.hasMessageContainingAll(
 						"Inconsistent configuration for identifier in a search query across multiple indexes",
-						"Attribute 'projectionConverter' differs"
+						"Attribute 'mappingProjectionConverter' differs"
 				);
 	}
 

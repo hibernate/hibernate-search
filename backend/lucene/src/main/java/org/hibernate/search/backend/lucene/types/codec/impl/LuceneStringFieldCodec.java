@@ -59,7 +59,12 @@ public final class LuceneStringFieldCodec implements LuceneStandardFieldCodec<St
 	}
 
 	@Override
-	public boolean isCompatibleWith(LuceneFieldCodec<?> obj) {
+	public String decode(String field) {
+		return field;
+	}
+
+	@Override
+	public boolean isCompatibleWith(LuceneFieldCodec<?, ?> obj) {
 		if ( this == obj ) {
 			return true;
 		}
@@ -80,5 +85,9 @@ public final class LuceneStringFieldCodec implements LuceneStandardFieldCodec<St
 			return new BytesRef( value );
 		}
 		return analyzerOrNormalizer.normalize( absoluteFieldPath, value );
+	}
+
+	public Class<String> encodedType() {
+		return String.class;
 	}
 }

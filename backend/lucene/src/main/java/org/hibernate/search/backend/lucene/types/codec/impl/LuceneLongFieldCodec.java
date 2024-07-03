@@ -42,4 +42,8 @@ public final class LuceneLongFieldCodec extends AbstractLuceneNumericFieldCodec<
 	public LuceneNumericDomain<Long> getDomain() {
 		return LuceneLongDomain.get();
 	}
+
+	public Class<Long> encodedType() {
+		return Long.class;
+	}
 }

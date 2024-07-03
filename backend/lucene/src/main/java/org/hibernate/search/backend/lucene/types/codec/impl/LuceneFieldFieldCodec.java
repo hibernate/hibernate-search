@@ -15,15 +15,17 @@ import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
 import org.apache.lucene.index.IndexableField;
 
-public final class LuceneFieldFieldCodec<F> implements LuceneFieldCodec<F> {
+public final class LuceneFieldFieldCodec<F> implements LuceneFieldCodec<F, F> {
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	private final LuceneFieldContributor<F> fieldContributor;
-
 	private final LuceneFieldValueExtractor<F> fieldValueExtractor;
+	private final Class<F> valueClass;
 
-	public LuceneFieldFieldCodec(LuceneFieldContributor<F> fieldContributor, LuceneFieldValueExtractor<F> fieldValueExtractor) {
+	public LuceneFieldFieldCodec(Class<F> valueClass, LuceneFieldContributor<F> fieldContributor,
+			LuceneFieldValueExtractor<F> fieldValueExtractor) {
+		this.valueClass = valueClass;
 		this.fieldContributor = fieldContributor;
 		this.fieldValueExtractor = fieldValueExtractor;
 	}
@@ -47,7 +49,22 @@ public final class LuceneFieldFieldCodec<F> implements LuceneFieldCodec<F> {
 	}
 
 	@Override
-	public boolean isCompatibleWith(LuceneFieldCodec<?> obj) {
+	public F decode(F field) {
+		return field;
+	}
+
+	@Override
+	public F encode(F value) {
+		return value;
+	}
+
+	@Override
+	public Class<F> encodedType() {
+		return valueClass;
+	}
+
+	@Override
+	public boolean isCompatibleWith(LuceneFieldCodec<?, ?> obj) {
 		if ( this == obj ) {
 			return true;
 		}

@@ -13,8 +13,9 @@ import org.apache.lucene.index.IndexableField;
  * and returns decoded values to the hit extractor when projecting in a search query.
  *
  * @param <F> The field type as declared on
+ * @param <E> The encoded type. For example, for a {@code LocalDate} field this will be {@code Long}.
  */
-public interface LuceneFieldCodec<F> {
+public interface LuceneFieldCodec<F, E> {
 
 	/**
 	 * Encode the given value in the document by adding new fields to the Lucene document.
@@ -35,6 +36,22 @@ public interface LuceneFieldCodec<F> {
 	 */
 	F decode(IndexableField field);
 
+	F decode(E field);
+
+	/**
+	 * Encode the given value.
+	 * <p>
+	 * Useful for predicates and sorts in particular.
+	 *
+	 * @param value The value to encode.
+	 */
+	E encode(F value);
+
+	/**
+	 * @return The type of the encoded value.
+	 */
+	Class<E> encodedType();
+
 	/**
 	 * Determine whether the given codec provides an encoding that is compatible with this codec,
 	 * i.e. whether its {@link #decode(IndexableField)}
@@ -51,5 +68,5 @@ public interface LuceneFieldCodec<F> {
 	 * @return {@code true} if the given codec is compatible. {@code false} otherwise, or when
 	 * in doubt.
 	 */
-	boolean isCompatibleWith(LuceneFieldCodec<?> other);
+	boolean isCompatibleWith(LuceneFieldCodec<?, ?> other);
 }

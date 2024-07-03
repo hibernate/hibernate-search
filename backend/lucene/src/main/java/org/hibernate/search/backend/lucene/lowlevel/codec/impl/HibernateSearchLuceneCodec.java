@@ -51,7 +51,7 @@ public class HibernateSearchLuceneCodec extends FilterCodec {
 		public KnnVectorsFormat getKnnVectorsFormatForField(String fieldName) {
 			LuceneIndexField field = model.fieldOrNull( fieldName, IndexFieldFilter.ALL );
 			if ( field != null ) {
-				LuceneFieldCodec<?> codec = field.toValueField().type().codec();
+				LuceneFieldCodec<?, ?> codec = field.toValueField().type().codec();
 				if ( codec instanceof LuceneVectorFieldCodec ) {
 					KnnVectorsFormat knnVectorsFormat = ( (LuceneVectorFieldCodec<?>) codec ).knnVectorFormat();
 					if ( knnVectorsFormat != null ) {

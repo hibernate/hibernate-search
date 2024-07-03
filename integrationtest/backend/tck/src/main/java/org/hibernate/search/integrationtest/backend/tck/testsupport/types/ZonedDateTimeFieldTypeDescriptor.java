@@ -160,4 +160,9 @@ public class ZonedDateTimeFieldTypeDescriptor extends StandardFieldTypeDescripto
 				LocalDateTime.of( 2018, 3, 1, 12, 14, 52 ).atZone( ZoneId.of( "Europe/Paris" ) )
 		) );
 	}
+
+	@Override
+	public Object rawValue(ZonedDateTime value) {
+		return value == null ? null : value.toInstant().toEpochMilli();
+	}
 }

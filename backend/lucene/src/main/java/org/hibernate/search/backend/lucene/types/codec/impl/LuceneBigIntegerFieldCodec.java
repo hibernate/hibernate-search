@@ -73,7 +73,7 @@ public final class LuceneBigIntegerFieldCodec extends AbstractLuceneNumericField
 	}
 
 	@Override
-	public boolean isCompatibleWith(LuceneFieldCodec<?> obj) {
+	public boolean isCompatibleWith(LuceneFieldCodec<?, ?> obj) {
 		if ( this == obj ) {
 			return true;
 		}
@@ -94,4 +94,7 @@ public final class LuceneBigIntegerFieldCodec extends AbstractLuceneNumericField
 		return new BigDecimal( BigInteger.valueOf( value ), decimalScale );
 	}
 
+	public Class<Long> encodedType() {
+		return Long.class;
+	}
 }

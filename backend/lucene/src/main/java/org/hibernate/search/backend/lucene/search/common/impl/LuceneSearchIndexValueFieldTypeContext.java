@@ -12,7 +12,7 @@ import org.apache.lucene.analysis.Analyzer;
 public interface LuceneSearchIndexValueFieldTypeContext<F>
 		extends SearchIndexValueFieldTypeContext<LuceneSearchIndexScope<?>, LuceneSearchIndexValueFieldContext<F>, F> {
 
-	LuceneFieldCodec<F> codec();
+	LuceneFieldCodec<F, ?> codec();
 
 	Analyzer searchAnalyzerOrNormalizer();
 

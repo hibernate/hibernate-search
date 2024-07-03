@@ -42,4 +42,8 @@ public final class LuceneFloatFieldCodec extends AbstractLuceneNumericFieldCodec
 	public LuceneNumericDomain<Float> getDomain() {
 		return LuceneFloatDomain.get();
 	}
+
+	public Class<Float> encodedType() {
+		return Float.class;
+	}
 }

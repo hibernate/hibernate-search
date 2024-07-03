@@ -287,7 +287,7 @@ public class ElasticsearchSearchQueryImpl<H> extends AbstractSearchQuery<H, Elas
 	}
 
 	private URLEncodedString toElasticsearchId(ElasticsearchSearchIndexContext index, Object id) {
-		DslConverter<?, String> converter = index.identifier().dslConverter();
+		DslConverter<?, String> converter = index.identifier().mappingDslConverter();
 		ToDocumentValueConvertContext convertContext = scope.toDocumentValueConvertContext();
 		String documentId = converter.unknownTypeToDocumentValue( id, convertContext );
 		return URLEncodedString.fromString( scope.documentIdHelper()

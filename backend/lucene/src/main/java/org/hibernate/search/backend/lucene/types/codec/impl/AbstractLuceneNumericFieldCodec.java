@@ -6,16 +6,14 @@ package org.hibernate.search.backend.lucene.types.codec.impl;
 
 import org.hibernate.search.backend.lucene.types.lowlevel.impl.LuceneNumericDomain;
 
-public abstract class AbstractLuceneNumericFieldCodec<F, E extends Number>
-		implements LuceneStandardFieldCodec<F, E> {
+public abstract class AbstractLuceneNumericFieldCodec<F, E extends Number> implements LuceneStandardFieldCodec<F, E> {
 
 	private final Indexing indexing;
 	private final DocValues docValues;
 	private final Storage storage;
 	private final F indexNullAsValue;
 
-	public AbstractLuceneNumericFieldCodec(Indexing indexing, DocValues docValues, Storage storage,
-			F indexNullAsValue) {
+	public AbstractLuceneNumericFieldCodec(Indexing indexing, DocValues docValues, Storage storage, F indexNullAsValue) {
 		this.indexing = indexing;
 		this.docValues = docValues;
 		this.storage = storage;
@@ -54,7 +52,7 @@ public abstract class AbstractLuceneNumericFieldCodec<F, E extends Number>
 	}
 
 	@Override
-	public boolean isCompatibleWith(LuceneFieldCodec<?> obj) {
+	public boolean isCompatibleWith(LuceneFieldCodec<?, ?> obj) {
 		if ( this == obj ) {
 			return true;
 		}

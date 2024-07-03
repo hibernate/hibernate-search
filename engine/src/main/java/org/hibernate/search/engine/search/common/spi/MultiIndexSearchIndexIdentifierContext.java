@@ -42,21 +42,21 @@ public class MultiIndexSearchIndexIdentifierContext
 	}
 
 	@Override
-	public DslConverter<?, String> dslConverter() {
-		return fromContextsIfCompatible( SearchIndexIdentifierContext::dslConverter, DslConverter::isCompatibleWith,
-				"dslConverter" );
+	public DslConverter<?, String> mappingDslConverter() {
+		return fromContextsIfCompatible( SearchIndexIdentifierContext::mappingDslConverter, DslConverter::isCompatibleWith,
+				"mappingDslConverter" );
 	}
 
 	@Override
-	public DslConverter<?, String> parser() {
-		return fromContextsIfCompatible( SearchIndexIdentifierContext::parser, DslConverter::isCompatibleWith,
-				"parser" );
+	public DslConverter<?, String> parserDslConverter() {
+		return fromContextsIfCompatible( SearchIndexIdentifierContext::parserDslConverter, DslConverter::isCompatibleWith,
+				"parserDslConverter" );
 	}
 
 	@Override
-	public ProjectionConverter<String, ?> projectionConverter() {
-		return fromContextsIfCompatible( SearchIndexIdentifierContext::projectionConverter,
-				ProjectionConverter::isCompatibleWith, "projectionConverter" );
+	public ProjectionConverter<String, ?> mappingProjectionConverter() {
+		return fromContextsIfCompatible( SearchIndexIdentifierContext::mappingProjectionConverter,
+				ProjectionConverter::isCompatibleWith, "mappingProjectionConverter" );
 	}
 
 	protected final <T> T fromContextsIfCompatible(Function<SearchIndexIdentifierContext, T> getter,

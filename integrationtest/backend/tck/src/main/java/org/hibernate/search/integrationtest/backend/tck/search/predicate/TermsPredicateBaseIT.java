@@ -15,6 +15,7 @@ import java.util.Objects;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
+import org.hibernate.search.engine.search.common.ValueConvert;
 import org.hibernate.search.engine.search.common.ValueModel;
 import org.hibernate.search.engine.search.predicate.dsl.PredicateFinalStep;
 import org.hibernate.search.engine.search.predicate.dsl.SearchPredicateFactory;
@@ -593,6 +594,22 @@ class TermsPredicateBaseIT {
 					.matchingAny( Collections.singletonList( matchingParam ), valueModel );
 		}
 
+		@Deprecated
+		@Override
+		protected PredicateFinalStep predicate(SearchPredicateFactory f, String fieldPath, Object matchingParam,
+				ValueConvert valueConvert) {
+			return f.terms().field( fieldPath ).matchingAny( Collections.singletonList( matchingParam ), valueConvert );
+		}
+
+		@Deprecated
+		@Override
+		protected PredicateFinalStep predicate(SearchPredicateFactory f, String field0Path, String field1Path,
+				Object matchingParam, ValueConvert valueConvert) {
+			return f.terms().field( field0Path ).field( field1Path )
+					.matchingAny( Collections.singletonList( matchingParam ), valueConvert );
+
+		}
+
 		@Override
 		protected Object invalidTypeParam() {
 			return new InvalidType();
@@ -617,6 +634,14 @@ class TermsPredicateBaseIT {
 		protected Object stringMatchingParamCustomParser(int matchingDocOrdinal,
 				DataSet<?, TermsPredicateTestValues<F>> dataSet) {
 			return IndexIntegerBinding.Converter.string( dataSet.values.matchingArg( matchingDocOrdinal ) );
+		}
+
+		@SuppressWarnings("unchecked")
+		@Override
+		protected Object rawMatchingParam(int matchingDocOrdinal, DataSet<?, TermsPredicateTestValues<F>> dataSet) {
+			F value = dataSet.values.matchingArg( matchingDocOrdinal );
+			return TckConfiguration.get().getBackendFeatures()
+					.toRawValue( ( (FieldTypeDescriptor<F, ?>) dataSet.fieldType ), value );
 		}
 
 		@Override

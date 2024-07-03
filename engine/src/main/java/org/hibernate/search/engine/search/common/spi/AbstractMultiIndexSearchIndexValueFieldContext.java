@@ -70,39 +70,51 @@ public abstract class AbstractMultiIndexSearchIndexValueFieldContext<
 	}
 
 	@Override
-	public final DslConverter<?, F> dslConverter() {
-		return fromTypeIfCompatible( SearchIndexValueFieldTypeContext::dslConverter, DslConverter::isCompatibleWith,
-				"dslConverter" );
+	public final DslConverter<?, F> mappingDslConverter() {
+		return fromTypeIfCompatible( SearchIndexValueFieldTypeContext::mappingDslConverter, DslConverter::isCompatibleWith,
+				"mappingDslConverter" );
 	}
 
 	@Override
-	public final DslConverter<F, F> rawDslConverter() {
+	public final DslConverter<F, F> indexDslConverter() {
+		return fromTypeIfCompatible( SearchIndexValueFieldTypeContext::indexDslConverter, DslConverter::isCompatibleWith,
+				"indexDslConverter" );
+	}
+
+	@Override
+	public DslConverter<?, F> rawDslConverter() {
 		return fromTypeIfCompatible( SearchIndexValueFieldTypeContext::rawDslConverter, DslConverter::isCompatibleWith,
 				"rawDslConverter" );
 	}
 
 	@Override
-	public final ProjectionConverter<F, ?> projectionConverter() {
-		return fromTypeIfCompatible( SearchIndexValueFieldTypeContext::projectionConverter,
-				ProjectionConverter::isCompatibleWith, "projectionConverter" );
+	public final ProjectionConverter<F, ?> mappingProjectionConverter() {
+		return fromTypeIfCompatible( SearchIndexValueFieldTypeContext::mappingProjectionConverter,
+				ProjectionConverter::isCompatibleWith, "mappingProjectionConverter" );
 	}
 
 	@Override
-	public final ProjectionConverter<F, F> rawProjectionConverter() {
+	public final ProjectionConverter<F, F> indexProjectionConverter() {
+		return fromTypeIfCompatible( SearchIndexValueFieldTypeContext::indexProjectionConverter,
+				ProjectionConverter::isCompatibleWith, "indexProjectionConverter" );
+	}
+
+	@Override
+	public ProjectionConverter<F, ?> rawProjectionConverter() {
 		return fromTypeIfCompatible( SearchIndexValueFieldTypeContext::rawProjectionConverter,
 				ProjectionConverter::isCompatibleWith, "rawProjectionConverter" );
 	}
 
 	@Override
-	public DslConverter<?, F> parser() {
-		return fromTypeIfCompatible( SearchIndexValueFieldTypeContext::parser, DslConverter::isCompatibleWith,
-				"parser" );
+	public DslConverter<?, F> parserDslConverter() {
+		return fromTypeIfCompatible( SearchIndexValueFieldTypeContext::parserDslConverter, DslConverter::isCompatibleWith,
+				"parserDslConverter" );
 	}
 
 	@Override
-	public ProjectionConverter<F, ?> formatter() {
-		return fromTypeIfCompatible( SearchIndexValueFieldTypeContext::formatter, ProjectionConverter::isCompatibleWith,
-				"formatter" );
+	public ProjectionConverter<F, ?> formatterProjectionConverter() {
+		return fromTypeIfCompatible( SearchIndexValueFieldTypeContext::formatterProjectionConverter, ProjectionConverter::isCompatibleWith,
+				"formatterProjectionConverter" );
 	}
 
 	@Override
