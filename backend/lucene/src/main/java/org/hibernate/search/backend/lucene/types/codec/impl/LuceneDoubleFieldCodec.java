@@ -42,4 +42,8 @@ public final class LuceneDoubleFieldCodec extends AbstractLuceneNumericFieldCode
 	public LuceneNumericDomain<Double> getDomain() {
 		return LuceneDoubleDomain.get();
 	}
+
+	public Class<Double> encodedType() {
+		return Double.class;
+	}
 }

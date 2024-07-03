@@ -44,7 +44,7 @@ public class LuceneDistanceToFieldProjection<P> extends AbstractLuceneProjection
 	private final String nestedDocumentPath;
 	private final String requiredContextAbsoluteFieldPath;
 
-	private final LuceneFieldCodec<GeoPoint> codec;
+	private final LuceneFieldCodec<GeoPoint, ?> codec;
 
 	private final GeoPoint center;
 	private final DistanceUnit unit;
@@ -186,8 +186,8 @@ public class LuceneDistanceToFieldProjection<P> extends AbstractLuceneProjection
 			extends
 			AbstractLuceneCodecAwareSearchQueryElementFactory<DistanceToFieldProjectionBuilder,
 					GeoPoint,
-					LuceneFieldCodec<GeoPoint>> {
-		public Factory(LuceneFieldCodec<GeoPoint> codec) {
+					LuceneFieldCodec<GeoPoint, ?>> {
+		public Factory(LuceneFieldCodec<GeoPoint, ?> codec) {
 			super( codec );
 		}
 
@@ -204,14 +204,14 @@ public class LuceneDistanceToFieldProjection<P> extends AbstractLuceneProjection
 
 		private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
-		private final LuceneFieldCodec<GeoPoint> codec;
+		private final LuceneFieldCodec<GeoPoint, ?> codec;
 
 		private final LuceneSearchIndexValueFieldContext<GeoPoint> field;
 
 		private GeoPoint center;
 		private DistanceUnit unit = DistanceUnit.METERS;
 
-		private Builder(LuceneFieldCodec<GeoPoint> codec, LuceneSearchIndexScope<?> scope,
+		private Builder(LuceneFieldCodec<GeoPoint, ?> codec, LuceneSearchIndexScope<?> scope,
 				LuceneSearchIndexValueFieldContext<GeoPoint> field) {
 			super( scope );
 			this.codec = codec;

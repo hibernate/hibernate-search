@@ -150,8 +150,8 @@ public class LuceneFieldProjection<F, V, P> extends AbstractLuceneProjection<P> 
 
 	public static class Factory<F>
 			extends
-			AbstractLuceneCodecAwareSearchQueryElementFactory<FieldProjectionBuilder.TypeSelector, F, LuceneFieldCodec<F>> {
-		public Factory(LuceneFieldCodec<F> codec) {
+			AbstractLuceneCodecAwareSearchQueryElementFactory<FieldProjectionBuilder.TypeSelector, F, LuceneFieldCodec<F, ?>> {
+		public Factory(LuceneFieldCodec<F, ?> codec) {
 			super( codec );
 		}
 
@@ -164,11 +164,11 @@ public class LuceneFieldProjection<F, V, P> extends AbstractLuceneProjection<P> 
 	}
 
 	private static class TypeSelector<F> implements FieldProjectionBuilder.TypeSelector {
-		private final LuceneFieldCodec<F> codec;
+		private final LuceneFieldCodec<F, ?> codec;
 		private final LuceneSearchIndexScope<?> scope;
 		private final LuceneSearchIndexValueFieldContext<F> field;
 
-		private TypeSelector(LuceneFieldCodec<F> codec,
+		private TypeSelector(LuceneFieldCodec<F, ?> codec,
 				LuceneSearchIndexScope<?> scope, LuceneSearchIndexValueFieldContext<F> field) {
 			this.codec = codec;
 			this.scope = scope;
@@ -187,13 +187,13 @@ public class LuceneFieldProjection<F, V, P> extends AbstractLuceneProjection<P> 
 
 		private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
-		private final LuceneFieldCodec<F> codec;
+		private final LuceneFieldCodec<F, ?> codec;
 
 		private final LuceneSearchIndexValueFieldContext<F> field;
 
 		private final ProjectionConverter<F, ? extends V> converter;
 
-		private Builder(LuceneFieldCodec<F> codec, LuceneSearchIndexScope<?> scope,
+		private Builder(LuceneFieldCodec<F, ?> codec, LuceneSearchIndexScope<?> scope,
 				LuceneSearchIndexValueFieldContext<F> field, ProjectionConverter<F, ? extends V> converter) {
 			super( scope );
 			this.codec = codec;

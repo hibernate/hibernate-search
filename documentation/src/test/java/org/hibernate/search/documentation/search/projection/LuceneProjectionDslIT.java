@@ -7,7 +7,9 @@ package org.hibernate.search.documentation.search.projection;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmUtils.with;
 
+import java.time.LocalDate;
 import java.util.List;
+import java.util.Map;
 import java.util.function.Consumer;
 
 import jakarta.persistence.EntityManagerFactory;
@@ -16,8 +18,12 @@ import org.hibernate.search.backend.lucene.LuceneExtension;
 import org.hibernate.search.backend.lucene.search.projection.dsl.DocumentTree;
 import org.hibernate.search.documentation.testsupport.BackendConfigurations;
 import org.hibernate.search.documentation.testsupport.DocumentationSetupHelper;
+import org.hibernate.search.engine.search.aggregation.AggregationKey;
+import org.hibernate.search.engine.search.common.ValueModel;
+import org.hibernate.search.engine.search.query.SearchResult;
 import org.hibernate.search.mapper.orm.Search;
 import org.hibernate.search.mapper.orm.session.SearchSession;
+import org.hibernate.search.util.common.data.Range;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -90,6 +96,33 @@ class LuceneProjectionDslIT {
 		} );
 	}
 
+	@Test
+	void modelValueRaw() {
+		withinSearchSession( searchSession -> {
+			AggregationKey<Map<Range<Long>, Long>> dates = AggregationKey.of( "dates" );
+			AggregationKey<Map<Long, Long>> dateTerms = AggregationKey.of( "dateTerms" );
+			SearchResult<Long> hits = searchSession.search( Author.class )
+					.select( f -> f.field( "birthDate", Long.class, ValueModel.RAW ) )
+					.where( f -> f.match().field( "birthDate" ).matching( 92041L, ValueModel.RAW ) )
+					.sort( f -> f.field( "birthDate" ).missing().use( 92041L, ValueModel.RAW ) )
+					.aggregation( dates, f -> f.range().field( "birthDate", Long.class, ValueModel.RAW )
+							.range( 0L, 95000L )
+					)
+					.aggregation( dateTerms, f -> f.terms().field( "birthDate", Long.class, ValueModel.RAW ) )
+					.fetch( 20 );
+			assertThat( hits.aggregation( dates ) )
+					.hasSize( 1 )
+					.containsValue( 1L );
+			assertThat( hits.aggregation( dateTerms ) )
+					.hasSize( 1 )
+					.containsKey( 92041L )
+					.containsValue( 1L );
+			assertThat( hits.hits() )
+					.hasSize( 1 )
+					.containsOnly( 92041L );
+		} );
+	}
+
 	private void withinSearchSession(Consumer<SearchSession> action) {
 		with( entityManagerFactory ).runInTransaction( entityManager -> {
 			SearchSession searchSession = Search.session( entityManager );
@@ -103,12 +136,14 @@ class LuceneProjectionDslIT {
 			isaacAsimov.setId( ASIMOV_ID );
 			isaacAsimov.setFirstName( "Isaac" );
 			isaacAsimov.setLastName( "Asimov" );
+			isaacAsimov.setBirthDate( LocalDate.of( 2020, 1, 1 ) );
 			isaacAsimov.setPlaceOfBirth( EmbeddableGeoPoint.of( 53.976177, 32.158627 ) );
 
 			Author aLeeMartinez = new Author();
 			aLeeMartinez.setId( MARTINEZ_ID );
 			aLeeMartinez.setFirstName( "A. Lee" );
 			aLeeMartinez.setLastName( "Martinez" );
+			aLeeMartinez.setBirthDate( LocalDate.of( 2222, 1, 1 ) );
 			aLeeMartinez.setPlaceOfBirth( EmbeddableGeoPoint.of( 31.814315, -106.475524 ) );
 
 			Book book1 = new Book();

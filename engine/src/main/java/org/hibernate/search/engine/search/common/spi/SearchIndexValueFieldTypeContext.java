@@ -26,41 +26,49 @@ public interface SearchIndexValueFieldTypeContext<
 
 	Class<F> valueClass();
 
-	DslConverter<?, F> dslConverter();
+	DslConverter<?, F> mappingDslConverter();
 
-	DslConverter<F, F> rawDslConverter();
+	DslConverter<F, F> indexDslConverter();
+
+	DslConverter<?, F> rawDslConverter();
 
 	@Incubating
-	DslConverter<?, F> parser();
+	DslConverter<?, F> parserDslConverter();
 
 	default DslConverter<?, F> dslConverter(ValueModel valueModel) {
 		switch ( valueModel ) {
 			case INDEX:
+				return indexDslConverter();
+			case RAW:
 				return rawDslConverter();
 			case STRING:
-				return parser();
+				return parserDslConverter();
 			case MAPPING:
 			default:
-				return dslConverter();
+				return mappingDslConverter();
 		}
 	}
 
-	ProjectionConverter<F, ?> projectionConverter();
+	ProjectionConverter<F, ?> rawProjectionConverter();
 
-	ProjectionConverter<F, F> rawProjectionConverter();
+	ProjectionConverter<F, ?> mappingProjectionConverter();
+
+	ProjectionConverter<F, F> indexProjectionConverter();
 
 	@Incubating
-	ProjectionConverter<F, ?> formatter();
+	ProjectionConverter<F, ?> formatterProjectionConverter();
 
 	default ProjectionConverter<F, ?> projectionConverter(ValueModel valueModel) {
 		switch ( valueModel ) {
 			case INDEX:
-				return rawProjectionConverter();
+				return indexProjectionConverter();
 			case STRING:
-				return formatter();
+				return formatterProjectionConverter();
+			case RAW:
+				return rawProjectionConverter();
 			case MAPPING:
 			default:
-				return projectionConverter();
+				return mappingProjectionConverter();
 		}
 	}
 

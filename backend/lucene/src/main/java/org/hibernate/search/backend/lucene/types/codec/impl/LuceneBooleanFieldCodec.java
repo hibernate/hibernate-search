@@ -44,4 +44,7 @@ public final class LuceneBooleanFieldCodec extends AbstractLuceneNumericFieldCod
 		return LuceneIntegerDomain.get();
 	}
 
+	public Class<Integer> encodedType() {
+		return Integer.class;
+	}
 }

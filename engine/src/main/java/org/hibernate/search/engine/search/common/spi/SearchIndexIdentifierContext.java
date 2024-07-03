@@ -26,21 +26,21 @@ public interface SearchIndexIdentifierContext extends EventContextProvider {
 	default DslConverter<?, String> dslConverter(ValueModel valueModel) {
 		switch ( valueModel ) {
 			case INDEX:
-			case RAW: // TODO: HSEARCH-5187
+			case RAW:
 				return RAW_DSL_CONVERTER;
 			case STRING:
-				return parser();
+				return parserDslConverter();
 			case MAPPING:
 			default:
-				return dslConverter();
+				return mappingDslConverter();
 		}
 	}
 
-	DslConverter<?, String> dslConverter();
+	DslConverter<?, String> mappingDslConverter();
 
 	@Incubating
-	DslConverter<?, String> parser();
+	DslConverter<?, String> parserDslConverter();
 
-	ProjectionConverter<String, ?> projectionConverter();
+	ProjectionConverter<String, ?> mappingProjectionConverter();
 
 }

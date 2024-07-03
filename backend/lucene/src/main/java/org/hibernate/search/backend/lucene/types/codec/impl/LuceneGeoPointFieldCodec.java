@@ -4,6 +4,8 @@
  */
 package org.hibernate.search.backend.lucene.types.codec.impl;
 
+import java.util.Arrays;
+
 import org.hibernate.search.engine.spatial.GeoPoint;
 
 import org.apache.lucene.document.DoublePoint;
@@ -13,7 +15,7 @@ import org.apache.lucene.document.StoredField;
 import org.apache.lucene.index.IndexableField;
 import org.apache.lucene.util.BytesRef;
 
-public final class LuceneGeoPointFieldCodec implements LuceneFieldCodec<GeoPoint> {
+public final class LuceneGeoPointFieldCodec implements LuceneFieldCodec<GeoPoint, byte[]> {
 
 	private final Indexing indexing;
 	private final DocValues docValues;
@@ -61,7 +63,28 @@ public final class LuceneGeoPointFieldCodec implements LuceneFieldCodec<GeoPoint
 	}
 
 	@Override
-	public boolean isCompatibleWith(LuceneFieldCodec<?> obj) {
+	public GeoPoint decode(byte[] field) {
+		return fromBytes( field );
+	}
+
+	@Override
+	public byte[] encode(GeoPoint value) {
+		BytesRef storedBytes = toStoredBytes( value );
+		if ( storedBytes.offset == 0 ) {
+			return storedBytes.bytes;
+		}
+		else {
+			return Arrays.copyOfRange( storedBytes.bytes, storedBytes.offset, storedBytes.length );
+		}
+	}
+
+	@Override
+	public Class<byte[]> encodedType() {
+		return byte[].class;
+	}
+
+	@Override
+	public boolean isCompatibleWith(LuceneFieldCodec<?, ?> obj) {
 		if ( this == obj ) {
 			return true;
 		}
@@ -78,6 +101,12 @@ public final class LuceneGeoPointFieldCodec implements LuceneFieldCodec<GeoPoint
 	private static GeoPoint fromStoredBytes(BytesRef bytesRef) {
 		double latitude = DoublePoint.decodeDimension( bytesRef.bytes, bytesRef.offset );
 		double longitude = DoublePoint.decodeDimension( bytesRef.bytes, bytesRef.offset + Double.BYTES );
+		return GeoPoint.of( latitude, longitude );
+	}
+
+	private static GeoPoint fromBytes(byte[] bytes) {
+		double latitude = DoublePoint.decodeDimension( bytes, 0 );
+		double longitude = DoublePoint.decodeDimension( bytes, Double.BYTES );
 		return GeoPoint.of( latitude, longitude );
 	}
 }

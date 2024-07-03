@@ -71,4 +71,8 @@ public final class LuceneLocalTimeFieldCodec extends AbstractLuceneNumericFieldC
 	public LuceneNumericDomain<Long> getDomain() {
 		return LuceneLongDomain.get();
 	}
+
+	public Class<Long> encodedType() {
+		return Long.class;
+	}
 }

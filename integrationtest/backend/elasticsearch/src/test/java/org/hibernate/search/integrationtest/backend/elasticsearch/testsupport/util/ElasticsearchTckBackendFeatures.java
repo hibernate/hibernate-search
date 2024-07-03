@@ -341,4 +341,9 @@ public class ElasticsearchTckBackendFeatures extends TckBackendFeatures {
 				aoss -> false
 		);
 	}
+
+	@Override
+	public <F> Object toRawValue(FieldTypeDescriptor<F, ?> descriptor, F value) {
+		return formatForQueryStringPredicate( descriptor, value );
+	}
 }

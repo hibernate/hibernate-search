@@ -26,10 +26,10 @@ public abstract class AbstractIndexValueFieldType<
 		extends AbstractIndexNodeType<SC, N>
 		implements IndexValueFieldTypeDescriptor, IndexFieldType<F>, SearchIndexValueFieldTypeContext<SC, N, F> {
 	private final Class<F> valueClass;
-	private final DslConverter<F, F> rawDslConverter;
-	private final ProjectionConverter<F, F> rawProjectionConverter;
-	private final DslConverter<?, F> dslConverter;
-	private final ProjectionConverter<F, ?> projectionConverter;
+	private final DslConverter<F, F> indexDslConverter;
+	private final ProjectionConverter<F, F> indexProjectionConverter;
+	private final DslConverter<?, F> mappingDslConverter;
+	private final ProjectionConverter<F, ?> mappingProjectionConverter;
 	private final DslConverter<?, F> parseConverter;
 	private final ProjectionConverter<F, ?> formatConverter;
 
@@ -47,12 +47,13 @@ public abstract class AbstractIndexValueFieldType<
 	protected AbstractIndexValueFieldType(Builder<SC, N, F> builder) {
 		super( builder );
 		this.valueClass = builder.valueClass;
-		this.rawDslConverter = builder.rawDslConverter;
-		this.rawProjectionConverter = builder.rawProjectionConverter;
-		this.dslConverter = builder.dslConverter != null ? builder.dslConverter : rawDslConverter;
-		this.parseConverter = builder.parser != null ? builder.parser : rawDslConverter;
-		this.projectionConverter = builder.projectionConverter != null ? builder.projectionConverter : rawProjectionConverter;
-		this.formatConverter = builder.formatter != null ? builder.formatter : rawProjectionConverter;
+		this.indexDslConverter = builder.indexDslConverter;
+		this.indexProjectionConverter = builder.indexProjectionConverter;
+		this.mappingDslConverter = builder.mappingDslConverter != null ? builder.mappingDslConverter : indexDslConverter;
+		this.mappingProjectionConverter =
+				builder.mappingProjectionConverter != null ? builder.mappingProjectionConverter : indexProjectionConverter;
+		this.parseConverter = builder.parser != null ? builder.parser : indexDslConverter;
+		this.formatConverter = builder.formatter != null ? builder.formatter : indexProjectionConverter;
 		this.searchable = builder.searchable;
 		this.sortable = builder.sortable;
 		this.projectable = builder.projectable;
@@ -107,42 +108,42 @@ public abstract class AbstractIndexValueFieldType<
 
 	@Override
 	public final Class<?> dslArgumentClass() {
-		return dslConverter.valueType();
+		return mappingDslConverter.valueType();
 	}
 
 	@Override
-	public final DslConverter<?, F> dslConverter() {
-		return dslConverter;
+	public final DslConverter<?, F> mappingDslConverter() {
+		return mappingDslConverter;
 	}
 
 	@Override
-	public DslConverter<?, F> parser() {
+	public DslConverter<?, F> parserDslConverter() {
 		return parseConverter;
 	}
 
 	@Override
-	public ProjectionConverter<F, ?> formatter() {
+	public ProjectionConverter<F, ?> formatterProjectionConverter() {
 		return formatConverter;
 	}
 
 	@Override
-	public final DslConverter<F, F> rawDslConverter() {
-		return rawDslConverter;
+	public final DslConverter<F, F> indexDslConverter() {
+		return indexDslConverter;
 	}
 
 	@Override
 	public final Class<?> projectedValueClass() {
-		return projectionConverter.valueType();
+		return mappingProjectionConverter.valueType();
 	}
 
 	@Override
-	public final ProjectionConverter<F, ?> projectionConverter() {
-		return projectionConverter;
+	public final ProjectionConverter<F, ?> mappingProjectionConverter() {
+		return mappingProjectionConverter;
 	}
 
 	@Override
-	public final ProjectionConverter<F, F> rawProjectionConverter() {
-		return rawProjectionConverter;
+	public final ProjectionConverter<F, F> indexProjectionConverter() {
+		return indexProjectionConverter;
 	}
 
 	@Override
@@ -172,11 +173,11 @@ public abstract class AbstractIndexValueFieldType<
 			extends AbstractIndexNodeType.Builder<SC, N> {
 
 		private final Class<F> valueClass;
-		private final DslConverter<F, F> rawDslConverter;
-		private final ProjectionConverter<F, F> rawProjectionConverter;
+		private final DslConverter<F, F> indexDslConverter;
+		private final ProjectionConverter<F, F> indexProjectionConverter;
 
-		private DslConverter<?, F> dslConverter;
-		private ProjectionConverter<F, ?> projectionConverter;
+		private DslConverter<?, F> mappingDslConverter;
+		private ProjectionConverter<F, ?> mappingProjectionConverter;
 		private DslConverter<?, F> parser;
 		private ProjectionConverter<F, ?> formatter;
 
@@ -193,8 +194,8 @@ public abstract class AbstractIndexValueFieldType<
 
 		public Builder(Class<F> valueClass) {
 			this.valueClass = valueClass;
-			this.rawDslConverter = DslConverter.passThrough( valueClass );
-			this.rawProjectionConverter = ProjectionConverter.passThrough( valueClass );
+			this.indexDslConverter = DslConverter.passThrough( valueClass );
+			this.indexProjectionConverter = ProjectionConverter.passThrough( valueClass );
 		}
 
 		public final Class<F> valueClass() {
@@ -202,12 +203,12 @@ public abstract class AbstractIndexValueFieldType<
 		}
 
 		public final <V> void dslConverter(Class<V> valueType, ToDocumentValueConverter<V, ? extends F> toIndexConverter) {
-			this.dslConverter = new DslConverter<>( valueType, toIndexConverter );
+			this.mappingDslConverter = new DslConverter<>( valueType, toIndexConverter );
 		}
 
 		public final <V> void projectionConverter(Class<V> valueType,
 				FromDocumentValueConverter<? super F, V> fromIndexConverter) {
-			this.projectionConverter = new ProjectionConverter<>( valueType, fromIndexConverter );
+			this.mappingProjectionConverter = new ProjectionConverter<>( valueType, fromIndexConverter );
 		}
 
 		public final void parser(ToDocumentValueConverter<String, ? extends F> parser) {

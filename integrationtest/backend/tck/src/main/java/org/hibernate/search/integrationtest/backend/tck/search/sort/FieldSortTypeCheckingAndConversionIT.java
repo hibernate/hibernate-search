@@ -258,7 +258,7 @@ class FieldSortTypeCheckingAndConversionIT<F> {
 				.isInstanceOf( SearchException.class )
 				.hasMessageContainingAll(
 						"Inconsistent configuration for field '" + fieldPath + "' in a search query across multiple indexes",
-						"Attribute 'dslConverter' differs", " vs. "
+						"Attribute 'mappingDslConverter' differs", " vs. "
 				)
 				.satisfies( FailureReportUtils.hasContext(
 						EventContexts.fromIndexNames( mainIndex.name(), rawFieldCompatibleIndex.name() )

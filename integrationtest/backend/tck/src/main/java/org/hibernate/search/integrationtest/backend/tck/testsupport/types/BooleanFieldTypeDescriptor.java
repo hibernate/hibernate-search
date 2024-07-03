@@ -89,4 +89,9 @@ public class BooleanFieldTypeDescriptor extends StandardFieldTypeDescriptor<Bool
 				true, false
 		) );
 	}
+
+	@Override
+	public Object rawValue(Boolean value) {
+		return Boolean.TRUE.equals( value ) ? 1 : 0;
+	}
 }

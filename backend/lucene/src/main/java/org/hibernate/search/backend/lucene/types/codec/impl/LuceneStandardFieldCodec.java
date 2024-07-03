@@ -8,15 +8,6 @@ package org.hibernate.search.backend.lucene.types.codec.impl;
  * @param <F> The field type exposed to the mapper.
  * @param <E> The encoded type. For example, for a {@code LocalDate} field this will be {@code Long}.
  */
-public interface LuceneStandardFieldCodec<F, E> extends LuceneFieldCodec<F> {
-
-	/**
-	 * Encode the given value.
-	 * <p>
-	 * Useful for predicates and sorts in particular.
-	 *
-	 * @param value The value to encode.
-	 */
-	E encode(F value);
-
+public interface LuceneStandardFieldCodec<F, E> extends LuceneFieldCodec<F, E> {
+	// TODO: remove the interface if the changes are ok.
 }

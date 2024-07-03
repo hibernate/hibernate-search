@@ -142,7 +142,7 @@ class MatchIdPredicateSpecificsIT {
 				.isInstanceOf( SearchException.class )
 				.hasMessageContainingAll(
 						"Inconsistent configuration for identifier in a search query across multiple indexes",
-						"Attribute 'dslConverter' differs:", " vs. "
+						"Attribute 'mappingDslConverter' differs:", " vs. "
 				)
 				.satisfies( FailureReportUtils.hasContext(
 						EventContexts.fromIndexNames( mainIndex.name(), incompatibleIdConverterIndex.name() )

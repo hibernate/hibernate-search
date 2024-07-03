@@ -69,4 +69,8 @@ public final class LuceneMonthDayFieldCodec extends AbstractLuceneNumericFieldCo
 	public LuceneNumericDomain<Integer> getDomain() {
 		return LuceneIntegerDomain.get();
 	}
+
+	public Class<Integer> encodedType() {
+		return Integer.class;
+	}
 }

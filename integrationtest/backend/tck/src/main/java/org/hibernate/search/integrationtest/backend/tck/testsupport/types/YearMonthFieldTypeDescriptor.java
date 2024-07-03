@@ -8,6 +8,7 @@ import java.time.Month;
 import java.time.Year;
 import java.time.YearMonth;
 import java.time.format.DateTimeFormatter;
+import java.time.temporal.ChronoField;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -105,5 +106,10 @@ public class YearMonthFieldTypeDescriptor extends StandardFieldTypeDescriptor<Ye
 	@Override
 	public String format(YearMonth value) {
 		return FORMATTER.format( value );
+	}
+
+	@Override
+	public Object rawValue(YearMonth value) {
+		return value == null ? null : value.getLong( ChronoField.PROLEPTIC_MONTH );
 	}
 }

@@ -34,17 +34,17 @@ public final class IndexIdentifier implements SearchIndexIdentifierContext {
 	}
 
 	@Override
-	public DslConverter<?, String> dslConverter() {
+	public DslConverter<?, String> mappingDslConverter() {
 		return dslConverter;
 	}
 
 	@Override
-	public DslConverter<?, String> parser() {
+	public DslConverter<?, String> parserDslConverter() {
 		return parser;
 	}
 
 	@Override
-	public ProjectionConverter<String, ?> projectionConverter() {
+	public ProjectionConverter<String, ?> mappingProjectionConverter() {
 		return projectionConverter;
 	}
 

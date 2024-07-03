@@ -180,9 +180,9 @@ class FieldDefaultBridgeBaseIT<V, F> {
 		// This cast may be unsafe, but only if something is deeply wrong, and then an exception will be thrown below
 		@SuppressWarnings("unchecked")
 		DslConverter<V, ?> dslConverter =
-				(DslConverter<V, ?>) index1Field.toValueField().type().dslConverter();
+				(DslConverter<V, ?>) index1Field.toValueField().type().mappingDslConverter();
 		DslConverter<?, ?> compatibleDslConverter =
-				index2Field.toValueField().type().dslConverter();
+				index2Field.toValueField().type().mappingDslConverter();
 		DslConverter<?, ?> incompatibleDslConverter =
 				new DslConverter<>( typeDescriptor.getJavaType(), new IncompatibleToDocumentValueConverter<>() );
 		ToDocumentValueConvertContext toDocumentConvertContext =
@@ -231,9 +231,9 @@ class FieldDefaultBridgeBaseIT<V, F> {
 		// This cast may be unsafe, but only if something is deeply wrong, and then an exception will be thrown below
 		@SuppressWarnings("unchecked")
 		ProjectionConverter<F, V> projectionConverter =
-				(ProjectionConverter<F, V>) index1Field.toValueField().type().projectionConverter();
+				(ProjectionConverter<F, V>) index1Field.toValueField().type().mappingProjectionConverter();
 		ProjectionConverter<?, ?> compatibleProjectionConverter =
-				index2Field.toValueField().type().projectionConverter();
+				index2Field.toValueField().type().mappingProjectionConverter();
 		ProjectionConverter<?, ?> incompatibleProjectionConverter =
 				new ProjectionConverter<>( typeDescriptor.getJavaType(), new IncompatibleFromDocumentValueConverter<>() );
 

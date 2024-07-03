@@ -63,4 +63,8 @@ public final class LuceneOffsetDateTimeFieldCodec extends AbstractLuceneNumericF
 	public LuceneNumericDomain<Long> getDomain() {
 		return LuceneLongDomain.get();
 	}
+
+	public Class<Long> encodedType() {
+		return Long.class;
+	}
 }

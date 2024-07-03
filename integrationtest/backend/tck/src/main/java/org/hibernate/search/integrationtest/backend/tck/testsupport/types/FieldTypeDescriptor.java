@@ -224,4 +224,8 @@ public abstract class FieldTypeDescriptor<F, S extends SearchableProjectableInde
 	public String format(F value) {
 		return Objects.toString( value, null );
 	}
+
+	public Object rawValue(F value) {
+		return value;
+	}
 }

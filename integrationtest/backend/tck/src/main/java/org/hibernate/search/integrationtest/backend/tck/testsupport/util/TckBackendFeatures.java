@@ -163,4 +163,6 @@ public abstract class TckBackendFeatures implements StubMappingBackendFeatures {
 	public boolean vectorSearchRequiredMinimumSimilarityAsLucene() {
 		return true;
 	}
+
+	public abstract <F> Object toRawValue(FieldTypeDescriptor<F, ?> descriptor, F value);
 }

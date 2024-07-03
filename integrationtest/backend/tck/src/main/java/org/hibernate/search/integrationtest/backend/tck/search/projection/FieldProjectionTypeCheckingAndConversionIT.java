@@ -343,7 +343,7 @@ class FieldProjectionTypeCheckingAndConversionIT<F> {
 				.isInstanceOf( SearchException.class )
 				.hasMessageContainingAll(
 						"Inconsistent configuration for field '" + fieldPath + "' in a search query across multiple indexes",
-						"Attribute 'projectionConverter' differs:", " vs. "
+						"Attribute 'mappingProjectionConverter' differs:", " vs. "
 				);
 	}
 

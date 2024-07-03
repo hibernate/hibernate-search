@@ -98,4 +98,9 @@ public class LocalDateFieldTypeDescriptor extends StandardFieldTypeDescriptor<Lo
 				LocalDate.of( 1984, 10, 7 )
 		) );
 	}
+
+	@Override
+	public Object rawValue(LocalDate value) {
+		return value == null ? null : value.toEpochDay();
+	}
 }

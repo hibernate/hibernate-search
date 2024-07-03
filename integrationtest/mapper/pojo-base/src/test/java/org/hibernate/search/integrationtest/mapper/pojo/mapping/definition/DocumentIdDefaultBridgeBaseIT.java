@@ -183,9 +183,9 @@ class DocumentIdDefaultBridgeBaseIT<I> {
 		// This cast may be unsafe, but only if something is deeply wrong, and then an exception will be thrown below
 		@SuppressWarnings("unchecked")
 		DslConverter<I, ?> dslConverter =
-				(DslConverter<I, ?>) index1Model.identifier().dslConverter();
+				(DslConverter<I, ?>) index1Model.identifier().mappingDslConverter();
 		DslConverter<?, ?> compatibleDslConverter =
-				index2Model.identifier().dslConverter();
+				index2Model.identifier().mappingDslConverter();
 		DslConverter<?, ?> incompatibleDslConverter =
 				new DslConverter<>( typeDescriptor.getJavaType(), new IncompatibleToDocumentValueConverter<>() );
 		ToDocumentValueConvertContext convertContext =
@@ -226,9 +226,9 @@ class DocumentIdDefaultBridgeBaseIT<I> {
 		// This cast may be unsafe, but only if something is deeply wrong, and then an exception will be thrown below
 		@SuppressWarnings("unchecked")
 		ProjectionConverter<String, I> projectionConverter =
-				(ProjectionConverter<String, I>) index1Model.identifier().projectionConverter();
+				(ProjectionConverter<String, I>) index1Model.identifier().mappingProjectionConverter();
 		ProjectionConverter<String, ?> compatibleProjectionConverter =
-				index2Model.identifier().projectionConverter();
+				index2Model.identifier().mappingProjectionConverter();
 		ProjectionConverter<String, ?> incompatibleProjectionConverter =
 				new ProjectionConverter<>( typeDescriptor.getJavaType(), new IncompatibleFromDocumentValueConverter<>() );
 

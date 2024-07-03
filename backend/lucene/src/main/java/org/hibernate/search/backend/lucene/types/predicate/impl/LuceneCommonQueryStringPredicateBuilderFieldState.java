@@ -33,7 +33,7 @@ public final class LuceneCommonQueryStringPredicateBuilderFieldState
 		return boost;
 	}
 
-	public static class Factory<T, C extends LuceneFieldCodec<T>>
+	public static class Factory<T, C extends LuceneFieldCodec<T, ?>>
 			extends AbstractLuceneCodecAwareSearchQueryElementFactory<LuceneCommonQueryStringPredicateBuilderFieldState, T, C> {
 		public Factory(C codec) {
 			super( codec );
