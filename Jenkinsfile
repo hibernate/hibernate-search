@@ -485,6 +485,34 @@ stage('Default build') {
 	}
 }
 
+stage('Build reproducibility check') {
+	if (!enableDefaultBuild) {
+		// If we didn't build the default build, there's no artifacts installed, so we don't have what to compare.
+		echo 'Skipping build reproducibility check'
+		helper.markStageSkipped()
+		return
+	}
+	runBuildOnNode {
+		withMavenWorkspace {
+			echo "Unpacking default build cache."
+			dir(helper.configuration.maven.localRepositoryPath) {
+				unstash name:'default-build-cache'
+			}
+
+			echo "Generate the artifacts."
+			mvn "clean install -Pskip-checks -Preproducible"
+
+			echo "Running the reproducibility check."
+			mvn """ \
+				clean verify \
+				artifact:compare -Dreference.repo=hibernate-maven-central \
+				-Pskip-checks -Preproducible -Dno-build-cache \
+				--fail-at-end
+			"""
+		}
+	}
+}
+
 stage('Non-default environments') {
 	Map<String, Closure> executions = [:]
 
