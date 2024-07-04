@@ -27,6 +27,13 @@
         <deploy.skip>true</deploy.skip>
         <!-- This will make sure the build fails if we forget to set <deploy.skip>false</deploy.skip> in a child module -->
         <enforcer.publicModuleIsDeployedRule.skip>false</enforcer.publicModuleIsDeployedRule.skip>
+        <!--
+            We can only add the annotation processor arguments where the annotation processor will be actually executed.
+            If AP is not executed adding arguments will lead to a warning resulting in a build failure.
+
+            So we add it to all public modules, and override it anywhere where we have no logging.
+         -->
+        <logging.processor.skip.generated.annotation.compiler.argument>-Aorg.jboss.logging.tools.addGeneratedAnnotation=false</logging.processor.skip.generated.annotation.compiler.argument>
     </properties>
 
     <build>
