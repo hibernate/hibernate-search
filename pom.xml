@@ -363,6 +363,8 @@
 
         <javadoc.generate.jar.phase>none</javadoc.generate.jar.phase>
 
+        <logging.processor.skip.generated.annotation.compiler.argument></logging.processor.skip.generated.annotation.compiler.argument>
+
         <!-- Test settings -->
 
         <!-- Properties overridden in profiles to disable certain tests that only work with specific Java versions -->
@@ -650,6 +652,7 @@
                         <encoding>UTF-8</encoding>
                         <compilerArgs>
                             <compilerArg>-Xlint:unchecked</compilerArg>
+                            <compilerArg>${logging.processor.skip.generated.annotation.compiler.argument}</compilerArg>
                         </compilerArgs>
                     </configuration>
                     <executions>
