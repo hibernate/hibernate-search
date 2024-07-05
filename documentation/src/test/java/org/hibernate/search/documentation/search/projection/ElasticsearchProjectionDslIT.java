@@ -112,7 +112,6 @@ class ElasticsearchProjectionDslIT {
 					//					.where( f -> f.match().field( "birthDate" ).matching( "2020-01-01", ValueModel.RAW ) )
 					.where( f -> f.match().field( "age" ).matching( "123", ValueModel.RAW ) )
 					.fetchHits( 20 );
-			System.err.println( hits );
 			assertThat( hits ).hasSize( 1 );
 
 		} );

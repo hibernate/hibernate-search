@@ -100,9 +100,4 @@ public class YearFieldTypeDescriptor extends StandardFieldTypeDescriptor<Year> {
 				Year.of( 1970 ), Year.of( 4302 )
 		) );
 	}
-
-	@Override
-	public Object rawValue(Year value) {
-		return value == null ? null : value.getValue();
-	}
 }

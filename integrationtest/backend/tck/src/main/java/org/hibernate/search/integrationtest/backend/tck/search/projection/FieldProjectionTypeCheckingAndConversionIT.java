@@ -4,12 +4,14 @@
  */
 package org.hibernate.search.integrationtest.backend.tck.search.projection;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.hibernate.search.util.impl.integrationtest.common.assertion.SearchResultAssert.assertThatQuery;
 import static org.junit.jupiter.api.Assumptions.assumeTrue;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import org.hibernate.search.engine.backend.document.DocumentElement;
 import org.hibernate.search.engine.backend.document.IndexObjectFieldReference;
@@ -28,6 +30,8 @@ import org.hibernate.search.engine.search.common.ValueModel;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.FieldTypeDescriptor;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.SimpleFieldModel;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.SimpleFieldModelsByType;
+import org.hibernate.search.integrationtest.backend.tck.testsupport.util.TckBackendFeatures;
+import org.hibernate.search.integrationtest.backend.tck.testsupport.util.TckConfiguration;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.ValueWrapper;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.extension.SearchSetupHelper;
 import org.hibernate.search.util.common.SearchException;
@@ -255,6 +259,32 @@ class FieldProjectionTypeCheckingAndConversionIT<F> {
 						getFieldValue( 3, fieldType ),
 						null // Empty document
 				);
+	}
+
+	@ParameterizedTest(name = "{0}")
+	@MethodSource("params")
+	void withProjectionConverters_projectionConverterRaw(FieldTypeDescriptor<F, ?> fieldType) {
+		StubMappingScope scope = mainIndex.createScope();
+
+		String fieldPath = getFieldWithConverterPath( fieldType );
+
+		TckBackendFeatures backendFeatures = TckConfiguration.get().getBackendFeatures();
+		Class<?> rawJavaType = backendFeatures.rawType( fieldType );
+		assertThat( scope.query()
+				.select( f -> f.field( fieldPath, rawJavaType, ValueModel.RAW ) )
+				.where( f -> f.matchAll() )
+				.toQuery()
+				.fetchAllHits()
+				.stream()
+				.map( e -> ( (Object) e ) )
+				.collect( Collectors.toList() ) )
+				.containsOnly(
+						backendFeatures.toRawValue( fieldType, getFieldValue( 1, fieldType ) ),
+						backendFeatures.toRawValue( fieldType, getFieldValue( 2, fieldType ) ),
+						backendFeatures.toRawValue( fieldType, getFieldValue( 3, fieldType ) ),
+						null // Empty document
+				);
+
 	}
 
 	@ParameterizedTest(name = "{0}")

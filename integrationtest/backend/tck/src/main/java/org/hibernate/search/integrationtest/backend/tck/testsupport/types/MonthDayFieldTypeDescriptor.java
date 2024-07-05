@@ -109,13 +109,4 @@ public class MonthDayFieldTypeDescriptor extends StandardFieldTypeDescriptor<Mon
 				MonthDay.of( Month.FEBRUARY, 28 )
 		) );
 	}
-
-	@Override
-	public Object rawValue(MonthDay value) {
-		if ( value == null ) {
-			return null;
-		}
-
-		return 100 * value.getMonthValue() + value.getDayOfMonth();
-	}
 }

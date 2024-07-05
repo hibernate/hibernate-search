@@ -165,4 +165,6 @@ public abstract class TckBackendFeatures implements StubMappingBackendFeatures {
 	}
 
 	public abstract <F> Object toRawValue(FieldTypeDescriptor<F, ?> descriptor, F value);
+
+	public abstract <F> Class<?> rawType(FieldTypeDescriptor<F, ?> descriptor);
 }

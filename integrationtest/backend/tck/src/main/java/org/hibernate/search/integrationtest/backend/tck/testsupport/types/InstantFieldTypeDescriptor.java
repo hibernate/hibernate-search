@@ -99,9 +99,4 @@ public class InstantFieldTypeDescriptor extends StandardFieldTypeDescriptor<Inst
 				Instant.EPOCH, Instant.parse( "2018-02-01T10:15:30.00Z" )
 		) );
 	}
-
-	@Override
-	public Object rawValue(Instant value) {
-		return value == null ? null : value.toEpochMilli();
-	}
 }

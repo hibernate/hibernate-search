@@ -130,12 +130,12 @@ public final class LuceneIndexValueFieldType<F>
 
 		@Override
 		public E fromDocumentValue(F value, FromDocumentValueConvertContext context) {
-			return codec.encode( value );
+			return value == null ? null : codec.encode( value );
 		}
 
 		@Override
 		public F toDocumentValue(E value, ToDocumentValueConvertContext context) {
-			return codec.decode( value );
+			return value == null ? null : codec.decode( value );
 		}
 
 		@Override
