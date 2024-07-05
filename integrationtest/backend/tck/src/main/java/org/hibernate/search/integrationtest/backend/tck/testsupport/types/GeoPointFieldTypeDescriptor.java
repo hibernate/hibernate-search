@@ -87,4 +87,5 @@ public class GeoPointFieldTypeDescriptor extends StandardFieldTypeDescriptor<Geo
 	public Optional<IndexNullAsMatchPredicateExpectactions<GeoPoint>> getIndexNullAsMatchPredicateExpectations() {
 		return Optional.empty();
 	}
+
 }

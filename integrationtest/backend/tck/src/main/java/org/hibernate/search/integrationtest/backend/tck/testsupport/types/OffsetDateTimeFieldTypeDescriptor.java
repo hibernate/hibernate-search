@@ -137,9 +137,4 @@ public class OffsetDateTimeFieldTypeDescriptor extends StandardFieldTypeDescript
 				LocalDateTime.of( 2018, 3, 1, 12, 14, 52 ).atOffset( ZoneOffset.ofHours( 1 ) )
 		) );
 	}
-
-	@Override
-	public Object rawValue(OffsetDateTime value) {
-		return value == null ? null : value.toInstant().toEpochMilli();
-	}
 }

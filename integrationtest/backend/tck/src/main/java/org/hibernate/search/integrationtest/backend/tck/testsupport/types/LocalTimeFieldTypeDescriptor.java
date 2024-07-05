@@ -98,9 +98,4 @@ public class LocalTimeFieldTypeDescriptor extends StandardFieldTypeDescriptor<Lo
 				LocalTime.of( 12, 14, 52 )
 		) );
 	}
-
-	@Override
-	public Object rawValue(LocalTime value) {
-		return value == null ? null : value.toNanoOfDay();
-	}
 }

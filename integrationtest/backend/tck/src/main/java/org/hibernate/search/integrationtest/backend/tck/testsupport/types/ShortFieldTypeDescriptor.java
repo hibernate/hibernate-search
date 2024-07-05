@@ -92,9 +92,4 @@ public class ShortFieldTypeDescriptor extends StandardFieldTypeDescriptor<Short>
 				(short) 0, (short) 67
 		) );
 	}
-
-	@Override
-	public Object rawValue(Short value) {
-		return value == null ? null : value.intValue();
-	}
 }

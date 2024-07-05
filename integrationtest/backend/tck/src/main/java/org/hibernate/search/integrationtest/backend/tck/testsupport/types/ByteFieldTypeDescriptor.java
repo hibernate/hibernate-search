@@ -93,9 +93,4 @@ public class ByteFieldTypeDescriptor extends StandardFieldTypeDescriptor<Byte> {
 				(byte) 0, (byte) 42
 		) );
 	}
-
-	@Override
-	public Object rawValue(Byte value) {
-		return value == null ? null : value.intValue();
-	}
 }

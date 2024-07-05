@@ -4,9 +4,7 @@
  */
 package org.hibernate.search.integrationtest.backend.tck.testsupport.types;
 
-import java.math.BigDecimal;
 import java.math.BigInteger;
-import java.math.RoundingMode;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
@@ -120,10 +118,5 @@ public class BigIntegerFieldTypeDescriptor extends StandardFieldTypeDescriptor<B
 		return Optional.of( new IndexNullAsMatchPredicateExpectactions<>(
 				BigInteger.TEN, BigInteger.valueOf( 6700 )
 		) );
-	}
-
-	@Override
-	public Object rawValue(BigInteger value) {
-		return value == null ? null : new BigDecimal( value ).setScale( -2, RoundingMode.HALF_UP ).unscaledValue().longValue();
 	}
 }

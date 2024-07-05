@@ -346,4 +346,9 @@ public class ElasticsearchTckBackendFeatures extends TckBackendFeatures {
 	public <F> Object toRawValue(FieldTypeDescriptor<F, ?> descriptor, F value) {
 		return formatForQueryStringPredicate( descriptor, value );
 	}
+
+	@Override
+	public <F> Class<?> rawType(FieldTypeDescriptor<F, ?> descriptor) {
+		return String.class;
+	}
 }
