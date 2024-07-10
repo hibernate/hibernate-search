@@ -4,31 +4,25 @@
  */
 package org.hibernate.search.backend.elasticsearch.search.predicate.impl;
 
-import java.lang.invoke.MethodHandles;
 import java.util.Optional;
 
 import org.hibernate.search.backend.elasticsearch.gson.impl.JsonAccessor;
 import org.hibernate.search.backend.elasticsearch.gson.impl.JsonObjectAccessor;
-import org.hibernate.search.backend.elasticsearch.logging.impl.Log;
 import org.hibernate.search.backend.elasticsearch.search.common.impl.AbstractElasticsearchCodecAwareSearchQueryElementFactory;
 import org.hibernate.search.backend.elasticsearch.search.common.impl.ElasticsearchSearchIndexScope;
 import org.hibernate.search.backend.elasticsearch.search.common.impl.ElasticsearchSearchIndexValueFieldContext;
 import org.hibernate.search.backend.elasticsearch.types.codec.impl.ElasticsearchFieldCodec;
-import org.hibernate.search.engine.backend.types.converter.spi.DslConverter;
-import org.hibernate.search.engine.reporting.spi.EventContexts;
+import org.hibernate.search.backend.elasticsearch.types.converter.impl.ElasticsearchDslProjectionHelper;
 import org.hibernate.search.engine.search.common.ValueModel;
 import org.hibernate.search.engine.search.predicate.SearchPredicate;
 import org.hibernate.search.engine.search.predicate.spi.RangePredicateBuilder;
 import org.hibernate.search.util.common.data.Range;
 import org.hibernate.search.util.common.data.RangeBoundInclusion;
-import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 
 public class ElasticsearchRangePredicate extends AbstractElasticsearchSingleFieldPredicate {
-
-	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	private static final JsonObjectAccessor RANGE_ACCESSOR = JsonAccessor.root().property( "range" ).asObject();
 
@@ -117,18 +111,8 @@ public class ElasticsearchRangePredicate extends AbstractElasticsearchSingleFiel
 				return null;
 			}
 			Object value = valueOptional.get();
-			DslConverter<?, ? extends F> toFieldValueConverter = field.type().dslConverter( valueModel );
-			try {
-				F converted = toFieldValueConverter.unknownTypeToDocumentValue(
-						value, scope.toDocumentValueConvertContext()
-				);
-				return codec.encode( converted );
-			}
-			catch (RuntimeException e) {
-				throw log.cannotConvertDslParameter(
-						e.getMessage(), e, EventContexts.fromIndexFieldAbsolutePath( absoluteFieldPath )
-				);
-			}
+			return ElasticsearchDslProjectionHelper.convertAndEncode( scope, codec, field, value, valueModel,
+					ElasticsearchFieldCodec::encode );
 		}
 	}
 }

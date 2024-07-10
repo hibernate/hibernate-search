@@ -156,7 +156,7 @@ public class ElasticsearchFieldProjection<F, V, P, T> extends AbstractElasticsea
 		@Override
 		public <V> Builder<F, V, ?> type(Class<V> expectedType, ValueModel valueModel) {
 			if ( ValueModel.RAW.equals( valueModel ) ) {
-				return new Builder<>( JsonElement::getAsString, codec.canDecodeArrays(), scope, field,
+				return new Builder<>( codec::raw, codec.canDecodeArrays(), scope, field,
 						field.type().rawProjectionConverter()
 								.withConvertedType( expectedType, field )
 				);

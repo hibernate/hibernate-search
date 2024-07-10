@@ -9,7 +9,7 @@ import org.hibernate.search.backend.lucene.search.common.impl.LuceneSearchIndexS
 import org.hibernate.search.backend.lucene.search.common.impl.LuceneSearchIndexValueFieldContext;
 import org.hibernate.search.backend.lucene.search.predicate.impl.AbstractLuceneLeafSingleFieldPredicate;
 import org.hibernate.search.backend.lucene.search.predicate.impl.PredicateRequestContext;
-import org.hibernate.search.backend.lucene.types.codec.impl.LuceneStandardFieldCodec;
+import org.hibernate.search.backend.lucene.types.codec.impl.LuceneFieldCodec;
 import org.hibernate.search.engine.search.common.ValueModel;
 import org.hibernate.search.engine.search.predicate.SearchPredicate;
 import org.hibernate.search.engine.search.predicate.spi.RangePredicateBuilder;
@@ -29,8 +29,8 @@ public class LuceneTextRangePredicate extends AbstractLuceneLeafSingleFieldPredi
 
 	public static class Factory<F>
 			extends
-			AbstractLuceneCodecAwareSearchQueryElementFactory<RangePredicateBuilder, F, LuceneStandardFieldCodec<F, String>> {
-		public Factory(LuceneStandardFieldCodec<F, String> codec) {
+			AbstractLuceneCodecAwareSearchQueryElementFactory<RangePredicateBuilder, F, LuceneFieldCodec<F, String>> {
+		public Factory(LuceneFieldCodec<F, String> codec) {
 			super( codec );
 		}
 
@@ -41,11 +41,11 @@ public class LuceneTextRangePredicate extends AbstractLuceneLeafSingleFieldPredi
 	}
 
 	private static class Builder<F> extends AbstractBuilder<F> implements RangePredicateBuilder {
-		private final LuceneStandardFieldCodec<F, String> codec;
+		private final LuceneFieldCodec<F, String> codec;
 
 		private Range<String> range;
 
-		private Builder(LuceneStandardFieldCodec<F, String> codec, LuceneSearchIndexScope<?> scope,
+		private Builder(LuceneFieldCodec<F, String> codec, LuceneSearchIndexScope<?> scope,
 				LuceneSearchIndexValueFieldContext<F> field) {
 			super( scope, field );
 			this.codec = codec;

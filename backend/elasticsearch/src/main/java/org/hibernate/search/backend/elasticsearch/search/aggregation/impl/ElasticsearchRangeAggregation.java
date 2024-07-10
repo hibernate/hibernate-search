@@ -17,7 +17,7 @@ import org.hibernate.search.backend.elasticsearch.search.common.impl.Elasticsear
 import org.hibernate.search.backend.elasticsearch.search.common.impl.ElasticsearchSearchIndexValueFieldContext;
 import org.hibernate.search.backend.elasticsearch.search.predicate.impl.ElasticsearchSearchPredicate;
 import org.hibernate.search.backend.elasticsearch.types.codec.impl.ElasticsearchFieldCodec;
-import org.hibernate.search.engine.backend.types.converter.spi.DslConverter;
+import org.hibernate.search.backend.elasticsearch.types.converter.impl.ElasticsearchDslProjectionHelper;
 import org.hibernate.search.engine.search.aggregation.spi.RangeAggregationBuilder;
 import org.hibernate.search.engine.search.common.ValueModel;
 import org.hibernate.search.util.common.data.Range;
@@ -92,7 +92,7 @@ public class ElasticsearchRangeAggregation<F, K>
 		@Override
 		public <T> Builder<F, T> type(Class<T> expectedType, ValueModel valueModel) {
 			return new Builder<>( codec, scope, field,
-					field.type().dslConverter( valueModel ).withInputType( expectedType, field ) );
+					ElasticsearchDslProjectionHelper.encoder( scope, codec, field, expectedType, valueModel ) );
 		}
 	}
 
@@ -124,16 +124,16 @@ public class ElasticsearchRangeAggregation<F, K>
 			implements RangeAggregationBuilder<K> {
 
 		private final ElasticsearchFieldCodec<F> codec;
-		private final DslConverter<? super K, F> toFieldValueConverter;
+		private final Function<? super K, JsonElement> encoder;
 
 		private final List<Range<K>> rangesInOrder = new ArrayList<>();
 		private final JsonArray rangesJson = new JsonArray();
 
 		private Builder(ElasticsearchFieldCodec<F> codec, ElasticsearchSearchIndexScope<?> scope,
-				ElasticsearchSearchIndexValueFieldContext<F> field, DslConverter<? super K, F> toFieldValueConverter) {
+				ElasticsearchSearchIndexValueFieldContext<F> field, Function<? super K, JsonElement> encoder) {
 			super( scope, field );
 			this.codec = codec;
-			this.toFieldValueConverter = toFieldValueConverter;
+			this.encoder = encoder;
 		}
 
 		@Override
@@ -144,14 +144,14 @@ public class ElasticsearchRangeAggregation<F, K>
 				if ( !RangeBoundInclusion.INCLUDED.equals( range.lowerBoundInclusion() ) ) {
 					throw log.elasticsearchRangeAggregationRequiresCanonicalFormForRanges( range );
 				}
-				rangeJson.add( "from", convertToFieldValue( lowerBoundValue.get() ) );
+				rangeJson.add( "from", encoder.apply( lowerBoundValue.get() ) );
 			}
 			Optional<? extends K> upperBoundValue = range.upperBoundValue();
 			if ( upperBoundValue.isPresent() ) {
 				if ( !RangeBoundInclusion.EXCLUDED.equals( range.upperBoundInclusion() ) ) {
 					throw log.elasticsearchRangeAggregationRequiresCanonicalFormForRanges( range );
 				}
-				rangeJson.add( "to", convertToFieldValue( upperBoundValue.get() ) );
+				rangeJson.add( "to", encoder.apply( upperBoundValue.get() ) );
 			}
 			// We need to request a keyed response,
 			// because ranges are not always returned in the order they are submitted
@@ -165,14 +165,5 @@ public class ElasticsearchRangeAggregation<F, K>
 			return new ElasticsearchRangeAggregation<>( this );
 		}
 
-		private JsonElement convertToFieldValue(K value) {
-			try {
-				F converted = toFieldValueConverter.toDocumentValue( value, scope.toDocumentValueConvertContext() );
-				return codec.encodeForAggregation( scope.searchSyntax(), converted );
-			}
-			catch (RuntimeException e) {
-				throw log.cannotConvertDslParameter( e.getMessage(), e, field.eventContext() );
-			}
-		}
 	}
 }

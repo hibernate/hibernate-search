@@ -31,17 +31,17 @@ public interface SearchIndexValueFieldTypeContext<
 
 	DslConverter<F, F> indexDslConverter();
 
-	DslConverter<?, F> rawDslConverter();
+	DslConverter<?, ?> rawDslConverter();
 
 	@Incubating
 	DslConverter<?, F> parserDslConverter();
 
 	default DslConverter<?, F> dslConverter(ValueModel valueModel) {
 		switch ( valueModel ) {
+			case RAW:
+				throw new AssertionFailure( "Raw dsl converter is not supported" );
 			case INDEX:
 				return indexDslConverter();
-			case RAW:
-				return rawDslConverter();
 			case STRING:
 				return parserDslConverter();
 			case MAPPING:
@@ -61,12 +61,12 @@ public interface SearchIndexValueFieldTypeContext<
 
 	default ProjectionConverter<F, ?> projectionConverter(ValueModel valueModel) {
 		switch ( valueModel ) {
+			case RAW:
+				throw new AssertionFailure( "Raw projection converter is not supported" );
 			case INDEX:
 				return indexProjectionConverter();
 			case STRING:
 				return formatterProjectionConverter();
-			case RAW:
-				throw new AssertionFailure( "Raw projection converter is not supported" );
 			case MAPPING:
 			default:
 				return mappingProjectionConverter();

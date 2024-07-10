@@ -6,7 +6,7 @@ package org.hibernate.search.backend.lucene.types.codec.impl;
 
 import org.hibernate.search.backend.lucene.types.lowlevel.impl.LuceneNumericDomain;
 
-public abstract class AbstractLuceneNumericFieldCodec<F, E extends Number> implements LuceneStandardFieldCodec<F, E> {
+public abstract class AbstractLuceneNumericFieldCodec<F, E extends Number> implements LuceneFieldCodec<F, E> {
 
 	private final Indexing indexing;
 	private final DocValues docValues;
@@ -58,8 +58,6 @@ public abstract class AbstractLuceneNumericFieldCodec<F, E extends Number> imple
 		}
 		return getClass() == obj.getClass();
 	}
-
-	public abstract F decode(E encoded);
 
 	public abstract LuceneNumericDomain<E> getDomain();
 

@@ -60,7 +60,7 @@ public interface LuceneFieldCodec<F, E> {
 	/**
 	 * Determine whether the given codec provides an encoding that is compatible with this codec,
 	 * i.e. whether its {@link #decode(IndexableField)}
-	 * and {@link LuceneStandardFieldCodec#encode(Object)} methods behave the same way.
+	 * and {@link LuceneFieldCodec#encode(Object)} methods behave the same way.
 	 * <p>
 	 * NOTE: {@link #addToDocument(LuceneDocumentContent, String, Object)} may behave differently,
 	 * e.g. it may add docvalues while this codec does not.

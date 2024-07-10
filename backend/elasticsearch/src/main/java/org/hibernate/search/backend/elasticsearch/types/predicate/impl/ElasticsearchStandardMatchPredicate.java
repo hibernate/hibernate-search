@@ -15,7 +15,7 @@ import org.hibernate.search.backend.elasticsearch.search.common.impl.Elasticsear
 import org.hibernate.search.backend.elasticsearch.search.predicate.impl.AbstractElasticsearchSingleFieldPredicate;
 import org.hibernate.search.backend.elasticsearch.search.predicate.impl.PredicateRequestContext;
 import org.hibernate.search.backend.elasticsearch.types.codec.impl.ElasticsearchFieldCodec;
-import org.hibernate.search.engine.backend.types.converter.spi.DslConverter;
+import org.hibernate.search.backend.elasticsearch.types.converter.impl.ElasticsearchDslProjectionHelper;
 import org.hibernate.search.engine.reporting.spi.EventContexts;
 import org.hibernate.search.engine.search.common.ValueModel;
 import org.hibernate.search.engine.search.predicate.SearchPredicate;
@@ -96,16 +96,8 @@ public class ElasticsearchStandardMatchPredicate extends AbstractElasticsearchSi
 
 		@Override
 		public void value(Object value, ValueModel valueModel) {
-			DslConverter<?, ? extends F> dslToIndexConverter = field.type().dslConverter( valueModel );
-			try {
-				F converted = dslToIndexConverter.unknownTypeToDocumentValue( value, scope.toDocumentValueConvertContext() );
-				this.value = codec.encode( converted );
-			}
-			catch (RuntimeException e) {
-				throw log.cannotConvertDslParameter(
-						e.getMessage(), e, EventContexts.fromIndexFieldAbsolutePath( absoluteFieldPath )
-				);
-			}
+			this.value = ElasticsearchDslProjectionHelper.convertAndEncode( scope, codec, field, value, valueModel,
+					ElasticsearchFieldCodec::encode );
 		}
 
 		@Override

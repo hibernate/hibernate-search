@@ -11,7 +11,6 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.function.Function;
 
 import org.hibernate.search.backend.lucene.lowlevel.collector.impl.FacetsCollectorFactory;
 import org.hibernate.search.backend.lucene.lowlevel.join.impl.NestedDocsProvider;

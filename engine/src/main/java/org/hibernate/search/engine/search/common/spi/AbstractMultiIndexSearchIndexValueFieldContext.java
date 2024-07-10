@@ -82,7 +82,7 @@ public abstract class AbstractMultiIndexSearchIndexValueFieldContext<
 	}
 
 	@Override
-	public DslConverter<?, F> rawDslConverter() {
+	public DslConverter<?, ?> rawDslConverter() {
 		return fromTypeIfCompatible( SearchIndexValueFieldTypeContext::rawDslConverter, DslConverter::isCompatibleWith,
 				"rawDslConverter" );
 	}
@@ -113,7 +113,8 @@ public abstract class AbstractMultiIndexSearchIndexValueFieldContext<
 
 	@Override
 	public ProjectionConverter<F, ?> formatterProjectionConverter() {
-		return fromTypeIfCompatible( SearchIndexValueFieldTypeContext::formatterProjectionConverter, ProjectionConverter::isCompatibleWith,
+		return fromTypeIfCompatible( SearchIndexValueFieldTypeContext::formatterProjectionConverter,
+				ProjectionConverter::isCompatibleWith,
 				"formatterProjectionConverter" );
 	}
 

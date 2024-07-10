@@ -14,7 +14,7 @@ import org.hibernate.search.backend.lucene.search.common.impl.LuceneSearchIndexS
 import org.hibernate.search.backend.lucene.search.common.impl.LuceneSearchIndexValueFieldContext;
 import org.hibernate.search.backend.lucene.search.predicate.impl.AbstractLuceneLeafSingleFieldPredicate;
 import org.hibernate.search.backend.lucene.search.predicate.impl.PredicateRequestContext;
-import org.hibernate.search.backend.lucene.types.codec.impl.LuceneStandardFieldCodec;
+import org.hibernate.search.backend.lucene.types.codec.impl.LuceneFieldCodec;
 import org.hibernate.search.engine.search.common.ValueModel;
 import org.hibernate.search.engine.search.predicate.SearchPredicate;
 import org.hibernate.search.engine.search.predicate.spi.TermsPredicateBuilder;
@@ -35,8 +35,8 @@ public class LuceneTextTermsPredicate extends AbstractLuceneLeafSingleFieldPredi
 
 	public static class Factory<F>
 			extends
-			AbstractLuceneCodecAwareSearchQueryElementFactory<TermsPredicateBuilder, F, LuceneStandardFieldCodec<F, String>> {
-		public Factory(LuceneStandardFieldCodec<F, String> codec) {
+			AbstractLuceneCodecAwareSearchQueryElementFactory<TermsPredicateBuilder, F, LuceneFieldCodec<F, String>> {
+		public Factory(LuceneFieldCodec<F, String> codec) {
 			super( codec );
 		}
 
@@ -47,13 +47,13 @@ public class LuceneTextTermsPredicate extends AbstractLuceneLeafSingleFieldPredi
 	}
 
 	private static class Builder<F> extends AbstractBuilder<F> implements TermsPredicateBuilder {
-		private final LuceneStandardFieldCodec<F, String> codec;
+		private final LuceneFieldCodec<F, String> codec;
 
 		private String term;
 		private List<String> terms;
 		private boolean allMatch;
 
-		private Builder(LuceneStandardFieldCodec<F, String> codec, LuceneSearchIndexScope<?> scope,
+		private Builder(LuceneFieldCodec<F, String> codec, LuceneSearchIndexScope<?> scope,
 				LuceneSearchIndexValueFieldContext<F> field) {
 			super( scope, field );
 			// Score is always constant for this query

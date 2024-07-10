@@ -51,6 +51,11 @@ public abstract class AbstractElasticsearchVectorFieldCodec<F> implements Elasti
 		return fromJsonArray( JsonElementTypes.ARRAY.fromElement( element ) );
 	}
 
+	@Override
+	public String raw(JsonElement element) {
+		return element.getAsJsonArray().asList().toString();
+	}
+
 	protected abstract F fromJsonArray(JsonArray jsonElements);
 
 	@Override
