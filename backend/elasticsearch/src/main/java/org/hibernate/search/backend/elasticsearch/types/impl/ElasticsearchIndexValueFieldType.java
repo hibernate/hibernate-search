@@ -14,12 +14,13 @@ import org.hibernate.search.backend.elasticsearch.search.common.impl.Elasticsear
 import org.hibernate.search.backend.elasticsearch.search.common.impl.ElasticsearchSearchIndexValueFieldContext;
 import org.hibernate.search.backend.elasticsearch.search.common.impl.ElasticsearchSearchIndexValueFieldTypeContext;
 import org.hibernate.search.backend.elasticsearch.types.codec.impl.ElasticsearchFieldCodec;
-import org.hibernate.search.engine.backend.types.converter.FromDocumentValueConverter;
-import org.hibernate.search.engine.backend.types.converter.runtime.FromDocumentValueConvertContext;
+import org.hibernate.search.engine.backend.types.converter.ToDocumentValueConverter;
+import org.hibernate.search.engine.backend.types.converter.runtime.ToDocumentValueConvertContext;
 import org.hibernate.search.engine.backend.types.converter.spi.DslConverter;
 import org.hibernate.search.engine.backend.types.converter.spi.ProjectionConverter;
 import org.hibernate.search.engine.backend.types.spi.AbstractIndexValueFieldType;
 
+import com.google.gson.JsonElement;
 import com.google.gson.JsonPrimitive;
 
 public class ElasticsearchIndexValueFieldType<F>
@@ -33,7 +34,9 @@ public class ElasticsearchIndexValueFieldType<F>
 	private final PropertyMapping mapping;
 
 	private final Consumer<PropertyMappingIndexSettingsContributor> indexSettingsContributor;
-	private final ProjectionConverter<F, ?> rawProjectionConverter;
+	private final ProjectionConverter<?, ?> rawProjectionConverter;
+	private final DslConverter<?, ?> rawDslConverter;
+
 
 	public ElasticsearchIndexValueFieldType(Builder<F> builder) {
 		super( builder );
@@ -42,8 +45,8 @@ public class ElasticsearchIndexValueFieldType<F>
 		this.mapping = builder.mapping;
 		this.indexSettingsContributor = builder.indexSettingsContributor;
 
-		RawConverter<F> converter = new RawConverter<>( codec );
-		this.rawProjectionConverter = new ProjectionConverter<>( String.class, converter );
+		this.rawProjectionConverter = ProjectionConverter.passThrough( String.class );
+		this.rawDslConverter = new DslConverter<>( String.class, new RawNoParsingDslConverter() );
 	}
 
 	@Override
@@ -69,13 +72,12 @@ public class ElasticsearchIndexValueFieldType<F>
 	}
 
 	@Override
-	public DslConverter<?, F> rawDslConverter() {
-		// we reuse the parser here as we expect users to pass in strings...
-		return parserDslConverter();
+	public DslConverter<?, ?> rawDslConverter() {
+		return rawDslConverter;
 	}
 
 	@Override
-	public ProjectionConverter<F, ?> rawProjectionConverter() {
+	public ProjectionConverter<?, ?> rawProjectionConverter() {
 		return rawProjectionConverter;
 	}
 
@@ -126,24 +128,11 @@ public class ElasticsearchIndexValueFieldType<F>
 		}
 	}
 
-	private static class RawConverter<F> implements FromDocumentValueConverter<F, String> {
-		private final ElasticsearchFieldCodec<F> codec;
-
-		private RawConverter(ElasticsearchFieldCodec<F> codec) {
-			this.codec = codec;
-		}
+	private static class RawNoParsingDslConverter implements ToDocumentValueConverter<String, JsonElement> {
 
 		@Override
-		public String fromDocumentValue(F value, FromDocumentValueConvertContext context) {
-			return codec.encode( value ).toString();
-		}
-
-		@Override
-		public boolean isCompatibleWith(FromDocumentValueConverter<?, ?> other) {
-			if ( other instanceof RawConverter ) {
-				return codec.isCompatibleWith( ( (RawConverter<?>) other ).codec );
-			}
-			return false;
+		public JsonElement toDocumentValue(String value, ToDocumentValueConvertContext context) {
+			return new JsonPrimitive( value );
 		}
 	}
 }

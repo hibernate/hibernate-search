@@ -9,6 +9,7 @@ import java.lang.invoke.MethodHandles;
 import org.hibernate.search.backend.elasticsearch.gson.impl.JsonAccessor;
 import org.hibernate.search.backend.elasticsearch.gson.impl.JsonElementTypes;
 import org.hibernate.search.backend.elasticsearch.logging.impl.Log;
+import org.hibernate.search.engine.cfg.spi.FormatUtils;
 import org.hibernate.search.engine.spatial.GeoPoint;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
@@ -50,6 +51,12 @@ public class ElasticsearchGeoPointFieldCodec implements ElasticsearchFieldCodec<
 		double latitude = LATITUDE_ACCESSOR.get( object ).orElseThrow( log::elasticsearchResponseMissingData );
 		double longitude = LONGITUDE_ACCESSOR.get( object ).orElseThrow( log::elasticsearchResponseMissingData );
 		return GeoPoint.of( latitude, longitude );
+	}
+
+	@Override
+	public String raw(JsonElement element) {
+		GeoPoint point = decode( element );
+		return point == null ? null : FormatUtils.format( point );
 	}
 
 	@Override

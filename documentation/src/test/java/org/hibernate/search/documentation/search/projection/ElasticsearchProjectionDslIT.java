@@ -125,7 +125,7 @@ class ElasticsearchProjectionDslIT {
 			SearchResult<String> hits = searchSession.search( Author.class )
 					.select( f -> f.field( "birthDate", String.class, ValueModel.RAW ) )
 					.where( f -> f.match().field( "birthDate" ).matching( "2020-01-01", ValueModel.RAW ) )
-					.sort( f -> f.field( "birthDate" ).missing().use( "2020-01-01", ValueModel.RAW ) )
+					.sort( f -> f.field( "birthDate" ).missing().use( "1577836800", ValueModel.RAW ) )
 					.aggregation( dates, f -> f.range().field( "birthDate", String.class, ValueModel.RAW )
 							.range( "1900-01-01", "2020-10-10" )
 					)
@@ -136,11 +136,11 @@ class ElasticsearchProjectionDslIT {
 					.containsValue( 1L );
 			assertThat( hits.aggregation( dateTerms ) )
 					.hasSize( 1 )
-					.containsKey( "\"2020-01-01\"" )
+					.containsKey( "2020-01-01" )
 					.containsValue( 1L );
 			assertThat( hits.hits() )
 					.hasSize( 1 )
-					.containsOnly( "\"2020-01-01\"" );
+					.containsOnly( "2020-01-01" );
 		} );
 	}
 

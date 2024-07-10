@@ -37,6 +37,13 @@ public interface ElasticsearchFieldCodec<F> {
 
 	F decode(JsonElement element);
 
+	default String raw(JsonElement element) {
+		if ( element == null || element.isJsonNull() ) {
+			return null;
+		}
+		return element.getAsString();
+	}
+
 	/**
 	 * Decodes the key returned by a term aggregation.
 	 * @param key The "key" property  returned by the aggregation.

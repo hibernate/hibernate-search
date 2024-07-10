@@ -13,7 +13,7 @@ import org.apache.lucene.document.SortedSetDocValuesField;
 import org.apache.lucene.index.IndexableField;
 import org.apache.lucene.util.BytesRef;
 
-public final class LuceneStringFieldCodec implements LuceneStandardFieldCodec<String, String> {
+public final class LuceneStringFieldCodec implements LuceneFieldCodec<String, String> {
 
 	private final FieldType mainFieldType;
 	private final DocValues docValues;

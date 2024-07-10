@@ -17,9 +17,11 @@ import java.util.Locale;
 
 import org.hibernate.search.backend.elasticsearch.types.format.impl.ElasticsearchDefaultFieldFormatProvider;
 import org.hibernate.search.engine.backend.types.VectorSimilarity;
+import org.hibernate.search.engine.cfg.spi.FormatUtils;
 import org.hibernate.search.engine.spatial.GeoPoint;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.FieldTypeDescriptor;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.FloatFieldTypeDescriptor;
+import org.hibernate.search.integrationtest.backend.tck.testsupport.types.GeoPointFieldTypeDescriptor;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.InstantFieldTypeDescriptor;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.MonthDayFieldTypeDescriptor;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.TckBackendFeatures;
@@ -344,6 +346,10 @@ public class ElasticsearchTckBackendFeatures extends TckBackendFeatures {
 
 	@Override
 	public <F> Object toRawValue(FieldTypeDescriptor<F, ?> descriptor, F value) {
+		if ( GeoPointFieldTypeDescriptor.INSTANCE.equals( descriptor ) ) {
+			return value == null ? null : FormatUtils.format( (GeoPoint) value );
+		}
+
 		return formatForQueryStringPredicate( descriptor, value );
 	}
 

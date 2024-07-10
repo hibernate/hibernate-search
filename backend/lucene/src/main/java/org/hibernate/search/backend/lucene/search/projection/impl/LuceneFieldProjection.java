@@ -46,7 +46,7 @@ public class LuceneFieldProjection<F, V, P, T> extends AbstractLuceneProjection<
 	private final ProjectionConverter<T, ? extends V> converter;
 	private final ProjectionAccumulator.Provider<V, P> accumulatorProvider;
 
-	private LuceneFieldProjection(Builder<F, V, ?, T> builder, ProjectionAccumulator.Provider<V, P> accumulatorProvider) {
+	private LuceneFieldProjection(Builder<F, V, T> builder, ProjectionAccumulator.Provider<V, P> accumulatorProvider) {
 		this( builder.scope, builder.field, builder.decodeFunction, builder.converter, accumulatorProvider );
 	}
 
@@ -148,7 +148,9 @@ public class LuceneFieldProjection<F, V, P, T> extends AbstractLuceneProjection<
 		}
 	}
 
-	public static class Factory<F, E> extends AbstractLuceneCodecAwareSearchQueryElementFactory<FieldProjectionBuilder.TypeSelector, F, LuceneFieldCodec<F, E>> {
+	public static class Factory<F, E>
+			extends
+			AbstractLuceneCodecAwareSearchQueryElementFactory<FieldProjectionBuilder.TypeSelector, F, LuceneFieldCodec<F, E>> {
 		public Factory(LuceneFieldCodec<F, E> codec) {
 			super( codec );
 		}
@@ -174,7 +176,7 @@ public class LuceneFieldProjection<F, V, P, T> extends AbstractLuceneProjection<
 		}
 
 		@Override
-		public <V> Builder<F, V, E, ?> type(Class<V> expectedType, ValueModel valueModel) {
+		public <V> Builder<F, V, ?> type(Class<V> expectedType, ValueModel valueModel) {
 			if ( ValueModel.RAW.equals( valueModel ) ) {
 				return new Builder<>( scope, field,
 						codec::raw,
@@ -190,7 +192,7 @@ public class LuceneFieldProjection<F, V, P, T> extends AbstractLuceneProjection<
 		}
 	}
 
-	private static class Builder<F, V, E, T> extends AbstractLuceneProjection.AbstractBuilder<V>
+	private static class Builder<F, V, T> extends AbstractLuceneProjection.AbstractBuilder<V>
 			implements FieldProjectionBuilder<V> {
 
 		private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );

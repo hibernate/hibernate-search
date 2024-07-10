@@ -13,12 +13,12 @@ import org.hibernate.search.backend.lucene.search.common.impl.AbstractLuceneCode
 import org.hibernate.search.backend.lucene.search.common.impl.LuceneSearchIndexScope;
 import org.hibernate.search.backend.lucene.search.common.impl.LuceneSearchIndexValueFieldContext;
 import org.hibernate.search.backend.lucene.types.codec.impl.AbstractLuceneNumericFieldCodec;
-import org.hibernate.search.backend.lucene.types.codec.impl.LuceneStandardFieldCodec;
+import org.hibernate.search.backend.lucene.types.codec.impl.LuceneFieldCodec;
+import org.hibernate.search.backend.lucene.types.converter.impl.LuceneDslProjectionHelper;
 import org.hibernate.search.backend.lucene.types.lowlevel.impl.LuceneNumericDomain;
 import org.hibernate.search.backend.lucene.types.sort.comparatorsource.impl.LuceneFieldComparatorSource;
 import org.hibernate.search.backend.lucene.types.sort.comparatorsource.impl.LuceneNumericFieldComparatorSource;
 import org.hibernate.search.backend.lucene.types.sort.comparatorsource.impl.LuceneTextFieldComparatorSource;
-import org.hibernate.search.engine.backend.types.converter.spi.DslConverter;
 import org.hibernate.search.engine.search.common.SortMode;
 import org.hibernate.search.engine.search.common.ValueModel;
 import org.hibernate.search.engine.search.sort.SearchSort;
@@ -39,7 +39,7 @@ public abstract class LuceneStandardFieldSort extends AbstractLuceneDocumentValu
 		super( builder );
 	}
 
-	abstract static class AbstractFactory<F, E, C extends LuceneStandardFieldCodec<F, E>>
+	abstract static class AbstractFactory<F, E, C extends LuceneFieldCodec<F, E>>
 			extends AbstractLuceneCodecAwareSearchQueryElementFactory<FieldSortBuilder, F, C> {
 		protected AbstractFactory(C codec) {
 			super( codec );
@@ -50,9 +50,9 @@ public abstract class LuceneStandardFieldSort extends AbstractLuceneDocumentValu
 	 * @param <F> The field type exposed to the mapper.
 	 * @param <E> The encoded type.
 	 * @param <C> The codec type.
-	 * @see LuceneStandardFieldCodec
+	 * @see LuceneFieldCodec
 	 */
-	abstract static class AbstractBuilder<F, E, C extends LuceneStandardFieldCodec<F, E>>
+	abstract static class AbstractBuilder<F, E, C extends LuceneFieldCodec<F, E>>
 			extends AbstractLuceneDocumentValueSort.AbstractBuilder
 			implements FieldSortBuilder {
 		protected final LuceneSearchIndexValueFieldContext<F> field;
@@ -94,18 +94,12 @@ public abstract class LuceneStandardFieldSort extends AbstractLuceneDocumentValu
 
 		@Override
 		public void missingAs(Object value, ValueModel valueModel) {
-			DslConverter<?, ? extends F> dslToIndexConverter = field.type().dslConverter( valueModel );
-			try {
-				F converted = dslToIndexConverter.unknownTypeToDocumentValue( value, scope.toDocumentValueConvertContext() );
-				missingValue = encodeMissingAs( converted );
-			}
-			catch (RuntimeException e) {
-				throw log.cannotConvertDslParameter( e.getMessage(), e, getEventContext() );
-			}
+			E encoded = LuceneDslProjectionHelper.convertAndEncode( scope, codec, field, value, valueModel );
+			missingValue = mapMissingAs( encoded );
 		}
 
-		protected Object encodeMissingAs(F converted) {
-			return codec.encode( converted );
+		protected Object mapMissingAs(E encoded) {
+			return encoded;
 		}
 
 		@SuppressWarnings("unchecked")
@@ -179,8 +173,8 @@ public abstract class LuceneStandardFieldSort extends AbstractLuceneDocumentValu
 	}
 
 	public static class TextFieldFactory<F>
-			extends AbstractFactory<F, String, LuceneStandardFieldCodec<F, String>> {
-		public TextFieldFactory(LuceneStandardFieldCodec<F, String> codec) {
+			extends AbstractFactory<F, String, LuceneFieldCodec<F, String>> {
+		public TextFieldFactory(LuceneFieldCodec<F, String> codec) {
 			super( codec );
 		}
 
@@ -190,15 +184,15 @@ public abstract class LuceneStandardFieldSort extends AbstractLuceneDocumentValu
 		}
 	}
 
-	private static class TextFieldBuilder<F> extends AbstractBuilder<F, String, LuceneStandardFieldCodec<F, String>> {
-		private TextFieldBuilder(LuceneStandardFieldCodec<F, String> codec, LuceneSearchIndexScope<?> scope,
+	private static class TextFieldBuilder<F> extends AbstractBuilder<F, String, LuceneFieldCodec<F, String>> {
+		private TextFieldBuilder(LuceneFieldCodec<F, String> codec, LuceneSearchIndexScope<?> scope,
 				LuceneSearchIndexValueFieldContext<F> field) {
 			super( scope, field, codec, SortField.STRING_FIRST, SortField.STRING_LAST );
 		}
 
 		@Override
-		protected Object encodeMissingAs(F converted) {
-			return normalize( codec.encode( converted ) );
+		protected Object mapMissingAs(String encoded) {
+			return normalize( encoded );
 		}
 
 		@Override

@@ -15,7 +15,7 @@ import org.hibernate.search.backend.elasticsearch.search.common.impl.Elasticsear
 import org.hibernate.search.backend.elasticsearch.search.common.impl.ElasticsearchSearchIndexValueFieldContext;
 import org.hibernate.search.backend.elasticsearch.search.sort.impl.ElasticsearchSearchSortCollector;
 import org.hibernate.search.backend.elasticsearch.types.codec.impl.ElasticsearchFieldCodec;
-import org.hibernate.search.engine.backend.types.converter.spi.DslConverter;
+import org.hibernate.search.backend.elasticsearch.types.converter.impl.ElasticsearchDslProjectionHelper;
 import org.hibernate.search.engine.search.common.SortMode;
 import org.hibernate.search.engine.search.common.ValueModel;
 import org.hibernate.search.engine.search.sort.SearchSort;
@@ -119,14 +119,8 @@ public class ElasticsearchStandardFieldSort extends AbstractElasticsearchDocumen
 
 		@Override
 		public void missingAs(Object value, ValueModel valueModel) {
-			DslConverter<?, ? extends F> dslToIndexConverter = field.type().dslConverter( valueModel );
-			try {
-				F converted = dslToIndexConverter.unknownTypeToDocumentValue( value, scope.toDocumentValueConvertContext() );
-				this.missing = codec.encodeForMissing( converted );
-			}
-			catch (RuntimeException e) {
-				throw log.cannotConvertDslParameter( e.getMessage(), e, field.eventContext() );
-			}
+			this.missing = ElasticsearchDslProjectionHelper.convertAndEncode( scope, codec, field, value, valueModel,
+					ElasticsearchFieldCodec::encodeForMissing );
 		}
 
 		@Override
