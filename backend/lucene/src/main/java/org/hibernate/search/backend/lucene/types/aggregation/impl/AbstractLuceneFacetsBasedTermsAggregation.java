@@ -11,6 +11,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.function.Function;
 
 import org.hibernate.search.backend.lucene.lowlevel.collector.impl.FacetsCollectorFactory;
 import org.hibernate.search.backend.lucene.lowlevel.join.impl.NestedDocsProvider;
@@ -34,16 +35,16 @@ import org.apache.lucene.index.IndexReader;
  * @param <K> The type of keys in the returned map. It can be {@code F}
  * or a different type if value converters are used.
  */
-public abstract class AbstractLuceneFacetsBasedTermsAggregation<F, T, K>
+public abstract class AbstractLuceneFacetsBasedTermsAggregation<F, T, K, V>
 		extends AbstractLuceneBucketAggregation<K, Long> {
 
-	private final ProjectionConverter<F, ? extends K> fromFieldValueConverter;
+	private final ProjectionConverter<V, ? extends K> fromFieldValueConverter;
 
 	private final BucketOrder order;
 	private final int maxTermCount;
 	private final int minDocCount;
 
-	AbstractLuceneFacetsBasedTermsAggregation(AbstractBuilder<F, T, K> builder) {
+	AbstractLuceneFacetsBasedTermsAggregation(AbstractBuilder<F, T, K, V> builder) {
 		super( builder );
 		this.fromFieldValueConverter = builder.fromFieldValueConverter;
 		this.order = builder.order;
@@ -107,7 +108,7 @@ public abstract class AbstractLuceneFacetsBasedTermsAggregation<F, T, K>
 
 		abstract T labelToTerm(String label);
 
-		abstract F termToFieldValue(T key);
+		abstract V termToFieldValue(T key);
 
 		private List<Bucket<T>> getTopBuckets(AggregationExtractContext context) throws IOException {
 			FacetsCollector facetsCollector = context.getFacets( FacetsCollectorFactory.KEY );
@@ -145,7 +146,7 @@ public abstract class AbstractLuceneFacetsBasedTermsAggregation<F, T, K>
 		private Map<K, Long> toMap(FromDocumentValueConvertContext convertContext, List<Bucket<T>> buckets) {
 			Map<K, Long> result = new LinkedHashMap<>(); // LinkedHashMap to preserve ordering
 			for ( Bucket<T> bucket : buckets ) {
-				F decoded = termToFieldValue( bucket.term );
+				V decoded = termToFieldValue( bucket.term );
 				K key = fromFieldValueConverter.fromDocumentValue( decoded, convertContext );
 				result.put( key, bucket.count );
 			}
@@ -153,7 +154,7 @@ public abstract class AbstractLuceneFacetsBasedTermsAggregation<F, T, K>
 		}
 	}
 
-	abstract static class AbstractTypeSelector<F> implements TermsAggregationBuilder.TypeSelector {
+	abstract static class AbstractTypeSelector<F, E> implements TermsAggregationBuilder.TypeSelector {
 		protected final LuceneSearchIndexScope<?> scope;
 		protected final LuceneSearchIndexValueFieldContext<F> field;
 
@@ -163,21 +164,21 @@ public abstract class AbstractLuceneFacetsBasedTermsAggregation<F, T, K>
 		}
 
 		@Override
-		public abstract <K> AbstractBuilder<F, ?, K> type(Class<K> expectedType, ValueModel valueModel);
+		public abstract <K> AbstractBuilder<F, ?, K, ?> type(Class<K> expectedType, ValueModel valueModel);
 	}
 
-	abstract static class AbstractBuilder<F, T, K>
+	abstract static class AbstractBuilder<F, T, K, V>
 			extends AbstractLuceneBucketAggregation.AbstractBuilder<K, Long>
 			implements TermsAggregationBuilder<K> {
 
-		private final ProjectionConverter<F, ? extends K> fromFieldValueConverter;
+		private final ProjectionConverter<V, ? extends K> fromFieldValueConverter;
 
 		private BucketOrder order = BucketOrder.COUNT_DESC;
 		private int minDocCount = 1;
 		private int maxTermCount = 100;
 
 		AbstractBuilder(LuceneSearchIndexScope<?> scope, LuceneSearchIndexValueFieldContext<F> field,
-				ProjectionConverter<F, ? extends K> fromFieldValueConverter) {
+				ProjectionConverter<V, ? extends K> fromFieldValueConverter) {
 			super( scope, field );
 			this.fromFieldValueConverter = fromFieldValueConverter;
 		}
@@ -213,7 +214,7 @@ public abstract class AbstractLuceneFacetsBasedTermsAggregation<F, T, K>
 		}
 
 		@Override
-		public abstract AbstractLuceneFacetsBasedTermsAggregation<F, T, K> build();
+		public abstract AbstractLuceneFacetsBasedTermsAggregation<F, T, K, V> build();
 
 		protected final void order(BucketOrder order) {
 			this.order = order;

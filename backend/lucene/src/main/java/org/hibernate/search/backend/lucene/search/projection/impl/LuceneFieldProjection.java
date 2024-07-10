@@ -36,23 +36,24 @@ import org.apache.lucene.search.DocIdSetIterator;
  * @param <V> The type of individual field values after conversion.
  * @param <P> The type of the final projection result representing accumulated values of type {@code V}.
  */
-public class LuceneFieldProjection<F, V, P> extends AbstractLuceneProjection<P> {
+public class LuceneFieldProjection<F, V, P, T> extends AbstractLuceneProjection<P> {
 
 	private final String absoluteFieldPath;
 	private final String nestedDocumentPath;
 	private final String requiredContextAbsoluteFieldPath;
 
-	private final Function<IndexableField, F> decodeFunction;
-	private final ProjectionConverter<F, ? extends V> converter;
+	private final Function<IndexableField, T> decodeFunction;
+	private final ProjectionConverter<T, ? extends V> converter;
 	private final ProjectionAccumulator.Provider<V, P> accumulatorProvider;
 
-	private LuceneFieldProjection(Builder<F, V> builder, ProjectionAccumulator.Provider<V, P> accumulatorProvider) {
-		this( builder.scope, builder.field, builder.codec::decode, builder.converter, accumulatorProvider );
+	private LuceneFieldProjection(Builder<F, V, ?, T> builder, ProjectionAccumulator.Provider<V, P> accumulatorProvider) {
+		this( builder.scope, builder.field, builder.decodeFunction, builder.converter, accumulatorProvider );
 	}
 
 	LuceneFieldProjection(LuceneSearchIndexScope<?> scope,
 			LuceneSearchIndexValueFieldContext<?> field,
-			Function<IndexableField, F> decodeFunction, ProjectionConverter<F, ? extends V> converter,
+			Function<IndexableField, T> decodeFunction,
+			ProjectionConverter<T, ? extends V> converter,
 			ProjectionAccumulator.Provider<V, P> accumulatorProvider) {
 		super( scope );
 		this.absoluteFieldPath = field.absolutePath();
@@ -91,9 +92,9 @@ public class LuceneFieldProjection<F, V, P> extends AbstractLuceneProjection<P> 
 	private class ValueFieldExtractor<A> implements LuceneSearchProjection.Extractor<A, P> {
 
 		private final String contextAbsoluteFieldPath;
-		private final ProjectionAccumulator<F, V, A, P> accumulator;
+		private final ProjectionAccumulator<T, V, A, P> accumulator;
 
-		public ValueFieldExtractor(String contextAbsoluteFieldPath, ProjectionAccumulator<F, V, A, P> accumulator) {
+		public ValueFieldExtractor(String contextAbsoluteFieldPath, ProjectionAccumulator<T, V, A, P> accumulator) {
 			this.accumulator = accumulator;
 			this.contextAbsoluteFieldPath = contextAbsoluteFieldPath;
 		}
@@ -111,10 +112,10 @@ public class LuceneFieldProjection<F, V, P> extends AbstractLuceneProjection<P> 
 			return new StoredFieldValues( accumulator, context.collectorExecutionContext() );
 		}
 
-		private class StoredFieldValues extends AbstractNestingAwareAccumulatingValues<F, A> {
+		private class StoredFieldValues extends AbstractNestingAwareAccumulatingValues<T, A> {
 			private final StoredFieldsValuesDelegate delegate;
 
-			public StoredFieldValues(ProjectionAccumulator<F, V, A, P> accumulator,
+			public StoredFieldValues(ProjectionAccumulator<T, V, A, P> accumulator,
 					TopDocsDataCollectorExecutionContext context) {
 				super( contextAbsoluteFieldPath, nestedDocumentPath, accumulator, context );
 				this.delegate = context.storedFieldsValuesDelegate();
@@ -131,7 +132,7 @@ public class LuceneFieldProjection<F, V, P> extends AbstractLuceneProjection<P> 
 				Document document = delegate.get( docId );
 				for ( IndexableField field : document.getFields() ) {
 					if ( field.name().equals( absoluteFieldPath ) ) {
-						F decoded = decodeFunction.apply( field );
+						T decoded = decodeFunction.apply( field );
 						accumulated = accumulator.accumulate( accumulated, decoded );
 					}
 				}
@@ -140,35 +141,32 @@ public class LuceneFieldProjection<F, V, P> extends AbstractLuceneProjection<P> 
 		}
 
 		@Override
-		public P transform(LoadingResult<?> loadingResult, A extractedData,
-				ProjectionTransformContext context) {
+		public P transform(LoadingResult<?> loadingResult, A extractedData, ProjectionTransformContext context) {
 			FromDocumentValueConvertContext convertContext = context.fromDocumentValueConvertContext();
 			A transformedData = accumulator.transformAll( extractedData, converter, convertContext );
 			return accumulator.finish( transformedData );
 		}
 	}
 
-	public static class Factory<F>
-			extends
-			AbstractLuceneCodecAwareSearchQueryElementFactory<FieldProjectionBuilder.TypeSelector, F, LuceneFieldCodec<F, ?>> {
-		public Factory(LuceneFieldCodec<F, ?> codec) {
+	public static class Factory<F, E> extends AbstractLuceneCodecAwareSearchQueryElementFactory<FieldProjectionBuilder.TypeSelector, F, LuceneFieldCodec<F, E>> {
+		public Factory(LuceneFieldCodec<F, E> codec) {
 			super( codec );
 		}
 
 		@Override
-		public TypeSelector<?> create(LuceneSearchIndexScope<?> scope, LuceneSearchIndexValueFieldContext<F> field) {
+		public TypeSelector<?, ?> create(LuceneSearchIndexScope<?> scope, LuceneSearchIndexValueFieldContext<F> field) {
 			// Fail early if the nested structure differs in the case of multi-index search.
 			field.nestedPathHierarchy();
 			return new TypeSelector<>( codec, scope, field );
 		}
 	}
 
-	private static class TypeSelector<F> implements FieldProjectionBuilder.TypeSelector {
-		private final LuceneFieldCodec<F, ?> codec;
+	private static class TypeSelector<F, E> implements FieldProjectionBuilder.TypeSelector {
+		private final LuceneFieldCodec<F, E> codec;
 		private final LuceneSearchIndexScope<?> scope;
 		private final LuceneSearchIndexValueFieldContext<F> field;
 
-		private TypeSelector(LuceneFieldCodec<F, ?> codec,
+		private TypeSelector(LuceneFieldCodec<F, E> codec,
 				LuceneSearchIndexScope<?> scope, LuceneSearchIndexValueFieldContext<F> field) {
 			this.codec = codec;
 			this.scope = scope;
@@ -176,27 +174,37 @@ public class LuceneFieldProjection<F, V, P> extends AbstractLuceneProjection<P> 
 		}
 
 		@Override
-		public <V> Builder<F, V> type(Class<V> expectedType, ValueModel valueModel) {
-			return new Builder<>( codec, scope, field,
-					field.type().projectionConverter( valueModel ).withConvertedType( expectedType, field ) );
+		public <V> Builder<F, V, E, ?> type(Class<V> expectedType, ValueModel valueModel) {
+			if ( ValueModel.RAW.equals( valueModel ) ) {
+				return new Builder<>( scope, field,
+						codec::raw,
+						field.type().rawProjectionConverter().withConvertedType( expectedType, field )
+				);
+			}
+			else {
+				return new Builder<>( scope, field,
+						codec::decode,
+						field.type().projectionConverter( valueModel ).withConvertedType( expectedType, field )
+				);
+			}
 		}
 	}
 
-	private static class Builder<F, V> extends AbstractLuceneProjection.AbstractBuilder<V>
+	private static class Builder<F, V, E, T> extends AbstractLuceneProjection.AbstractBuilder<V>
 			implements FieldProjectionBuilder<V> {
 
 		private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
-		private final LuceneFieldCodec<F, ?> codec;
+		private final Function<IndexableField, T> decodeFunction;
 
 		private final LuceneSearchIndexValueFieldContext<F> field;
 
-		private final ProjectionConverter<F, ? extends V> converter;
+		private final ProjectionConverter<T, ? extends V> converter;
 
-		private Builder(LuceneFieldCodec<F, ?> codec, LuceneSearchIndexScope<?> scope,
-				LuceneSearchIndexValueFieldContext<F> field, ProjectionConverter<F, ? extends V> converter) {
+		private Builder(LuceneSearchIndexScope<?> scope, LuceneSearchIndexValueFieldContext<F> field,
+				Function<IndexableField, T> decodeFunction, ProjectionConverter<T, ? extends V> converter) {
 			super( scope );
-			this.codec = codec;
+			this.decodeFunction = decodeFunction;
 			this.field = field;
 			this.converter = converter;
 		}

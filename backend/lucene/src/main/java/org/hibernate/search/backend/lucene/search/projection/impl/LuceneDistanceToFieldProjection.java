@@ -51,7 +51,7 @@ public class LuceneDistanceToFieldProjection<P> extends AbstractLuceneProjection
 
 	private final ProjectionAccumulator.Provider<Double, P> accumulatorProvider;
 
-	private final LuceneFieldProjection<Double, Double, P> fieldProjection;
+	private final LuceneFieldProjection<Double, Double, P, ?> fieldProjection;
 
 	private LuceneDistanceToFieldProjection(Builder builder,
 			ProjectionAccumulator.Provider<Double, P> accumulatorProvider) {
@@ -186,8 +186,8 @@ public class LuceneDistanceToFieldProjection<P> extends AbstractLuceneProjection
 			extends
 			AbstractLuceneCodecAwareSearchQueryElementFactory<DistanceToFieldProjectionBuilder,
 					GeoPoint,
-					LuceneFieldCodec<GeoPoint, ?>> {
-		public Factory(LuceneFieldCodec<GeoPoint, ?> codec) {
+					LuceneFieldCodec<GeoPoint, byte[]>> {
+		public Factory(LuceneFieldCodec<GeoPoint, byte[]> codec) {
 			super( codec );
 		}
 

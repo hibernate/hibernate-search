@@ -8,6 +8,7 @@ import org.hibernate.search.engine.backend.types.converter.spi.DslConverter;
 import org.hibernate.search.engine.backend.types.converter.spi.ProjectionConverter;
 import org.hibernate.search.engine.search.common.ValueModel;
 import org.hibernate.search.engine.search.highlighter.spi.SearchHighlighterType;
+import org.hibernate.search.util.common.AssertionFailure;
 import org.hibernate.search.util.common.annotation.Incubating;
 
 /**
@@ -49,7 +50,7 @@ public interface SearchIndexValueFieldTypeContext<
 		}
 	}
 
-	ProjectionConverter<F, ?> rawProjectionConverter();
+	ProjectionConverter<?, ?> rawProjectionConverter();
 
 	ProjectionConverter<F, ?> mappingProjectionConverter();
 
@@ -65,7 +66,7 @@ public interface SearchIndexValueFieldTypeContext<
 			case STRING:
 				return formatterProjectionConverter();
 			case RAW:
-				return rawProjectionConverter();
+				throw new AssertionFailure( "Raw projection converter is not supported" );
 			case MAPPING:
 			default:
 				return mappingProjectionConverter();
