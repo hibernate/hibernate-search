@@ -6,6 +6,7 @@ package org.hibernate.search.backend.elasticsearch.search.aggregation.impl;
 
 import java.util.List;
 import java.util.Map;
+import java.util.function.BiFunction;
 
 import org.hibernate.search.backend.elasticsearch.search.common.impl.AbstractElasticsearchCodecAwareSearchQueryElementFactory;
 import org.hibernate.search.backend.elasticsearch.search.common.impl.ElasticsearchSearchIndexScope;
@@ -27,23 +28,23 @@ import com.google.gson.JsonObject;
  * @param <K> The type of keys in the returned map. It can be {@code F}
  * or a different type if value converters are used.
  */
-public class ElasticsearchTermsAggregation<F, K>
+public class ElasticsearchTermsAggregation<F, K, T>
 		extends AbstractElasticsearchBucketAggregation<K, Long> {
 
 	private final String absoluteFieldPath;
 
-	private final ProjectionConverter<F, ? extends K> fromFieldValueConverter;
-	private final ElasticsearchFieldCodec<F> codec;
+	private final ProjectionConverter<T, ? extends K> fromFieldValueConverter;
+	private final BiFunction<JsonElement, JsonElement, T> decodeFunction;
 
 	private final JsonObject order;
 	private final int size;
 	private final int minDocCount;
 
-	private ElasticsearchTermsAggregation(Builder<F, K> builder) {
+	private ElasticsearchTermsAggregation(Builder<F, K, T> builder) {
 		super( builder );
 		this.absoluteFieldPath = builder.field.absolutePath();
 		this.fromFieldValueConverter = builder.fromFieldValueConverter;
-		this.codec = builder.codec;
+		this.decodeFunction = builder.decodeFunction;
 		this.order = builder.order;
 		this.size = builder.size;
 		this.minDocCount = builder.minDocCount;
@@ -91,9 +92,16 @@ public class ElasticsearchTermsAggregation<F, K>
 		}
 
 		@Override
-		public <T> Builder<F, T> type(Class<T> expectedType, ValueModel valueModel) {
-			return new Builder<>( codec, scope, field,
-					field.type().projectionConverter( valueModel ).withConvertedType( expectedType, field ) );
+		public <T> Builder<F, T, ?> type(Class<T> expectedType, ValueModel valueModel) {
+			if ( ValueModel.RAW.equals( valueModel ) ) {
+				return new Builder<>( (key, string) -> key.getAsString(), scope, field,
+						field.type().rawProjectionConverter().withConvertedType( expectedType, field )
+				);
+			}
+			else {
+				return new Builder<>( codec::decodeAggregationKey, scope, field,
+						field.type().projectionConverter( valueModel ).withConvertedType( expectedType, field ) );
+			}
 		}
 	}
 
@@ -113,7 +121,7 @@ public class ElasticsearchTermsAggregation<F, K>
 				JsonElement keyJson = bucket.get( "key" );
 				JsonElement keyAsStringJson = bucket.get( "key_as_string" );
 				K key = fromFieldValueConverter.fromDocumentValue(
-						codec.decodeAggregationKey( keyJson, keyAsStringJson ),
+						decodeFunction.apply( keyJson, keyAsStringJson ),
 						convertContext
 				);
 				long documentCount = getBucketDocCount( bucket );
@@ -123,21 +131,21 @@ public class ElasticsearchTermsAggregation<F, K>
 		}
 	}
 
-	private static class Builder<F, K> extends AbstractBuilder<K, Long>
+	private static class Builder<F, K, T> extends AbstractBuilder<K, Long>
 			implements TermsAggregationBuilder<K> {
 
-		private final ElasticsearchFieldCodec<F> codec;
-		private final ProjectionConverter<F, ? extends K> fromFieldValueConverter;
+		private final BiFunction<JsonElement, JsonElement, T> decodeFunction;
+		private final ProjectionConverter<T, ? extends K> fromFieldValueConverter;
 
 		private JsonObject order;
 		private int minDocCount = 1;
 		private int size = 100;
 
-		private Builder(ElasticsearchFieldCodec<F> codec, ElasticsearchSearchIndexScope<?> scope,
+		private Builder(BiFunction<JsonElement, JsonElement, T> decodeFunction, ElasticsearchSearchIndexScope<?> scope,
 				ElasticsearchSearchIndexValueFieldContext<F> field,
-				ProjectionConverter<F, ? extends K> fromFieldValueConverter) {
+				ProjectionConverter<T, ? extends K> fromFieldValueConverter) {
 			super( scope, field );
-			this.codec = codec;
+			this.decodeFunction = decodeFunction;
 			this.fromFieldValueConverter = fromFieldValueConverter;
 		}
 
@@ -172,7 +180,7 @@ public class ElasticsearchTermsAggregation<F, K>
 		}
 
 		@Override
-		public ElasticsearchTermsAggregation<F, K> build() {
+		public ElasticsearchTermsAggregation<F, K, T> build() {
 			return new ElasticsearchTermsAggregation<>( this );
 		}
 

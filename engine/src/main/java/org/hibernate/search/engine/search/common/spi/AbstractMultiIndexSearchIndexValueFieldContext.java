@@ -100,7 +100,7 @@ public abstract class AbstractMultiIndexSearchIndexValueFieldContext<
 	}
 
 	@Override
-	public ProjectionConverter<F, ?> rawProjectionConverter() {
+	public ProjectionConverter<?, ?> rawProjectionConverter() {
 		return fromTypeIfCompatible( SearchIndexValueFieldTypeContext::rawProjectionConverter,
 				ProjectionConverter::isCompatibleWith, "rawProjectionConverter" );
 	}

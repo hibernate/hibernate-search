@@ -33,7 +33,7 @@ import org.apache.lucene.index.SortedSetDocValues;
  * or a different type if value converters are used.
  */
 public class LuceneTextTermsAggregation<K>
-		extends AbstractLuceneFacetsBasedTermsAggregation<String, String, K> {
+		extends AbstractLuceneFacetsBasedTermsAggregation<String, String, K, String> {
 
 	private static final Comparator<String> STRING_COMPARATOR = Comparator.naturalOrder();
 
@@ -113,21 +113,29 @@ public class LuceneTextTermsAggregation<K>
 		}
 	}
 
-	private static class TypeSelector extends AbstractTypeSelector<String> {
+	private static class TypeSelector extends AbstractTypeSelector<String, String> {
 		private TypeSelector(LuceneSearchIndexScope<?> scope, LuceneSearchIndexValueFieldContext<String> field) {
 			super( scope, field );
 		}
 
+		@SuppressWarnings("unchecked")
 		@Override
 		public <K> Builder<K> type(Class<K> expectedType, ValueModel valueModel) {
-			return new Builder<>( scope, field,
-					field.type().projectionConverter( valueModel ).withConvertedType( expectedType,
-							field ) );
+			if ( ValueModel.RAW.equals( valueModel ) ) {
+				return new Builder<>( scope, field,
+						( (ProjectionConverter<String, ?>) field.type().rawProjectionConverter() )
+								.withConvertedType( expectedType, field )
+				);
+			}
+			else {
+				return new Builder<>( scope, field,
+						field.type().projectionConverter( valueModel ).withConvertedType( expectedType, field ) );
+			}
 		}
 	}
 
 	private static class Builder<K>
-			extends AbstractBuilder<String, String, K> {
+			extends AbstractBuilder<String, String, K, String> {
 
 		private Builder(LuceneSearchIndexScope<?> scope, LuceneSearchIndexValueFieldContext<String> field,
 				ProjectionConverter<String, ? extends K> fromFieldValueConverter) {

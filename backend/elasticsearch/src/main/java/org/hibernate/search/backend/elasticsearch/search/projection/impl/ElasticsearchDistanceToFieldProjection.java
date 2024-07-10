@@ -65,7 +65,7 @@ public class ElasticsearchDistanceToFieldProjection<A, P> extends AbstractElasti
 	private final ProjectionAccumulator<Double, Double, A, P> accumulator;
 
 	private final String scriptFieldName;
-	private final ElasticsearchFieldProjection<?, Double, P> sourceProjection;
+	private final ElasticsearchFieldProjection<?, Double, P, ?> sourceProjection;
 
 	private ElasticsearchDistanceToFieldProjection(Builder builder,
 			ProjectionAccumulator.Provider<Double, P> accumulatorProvider,

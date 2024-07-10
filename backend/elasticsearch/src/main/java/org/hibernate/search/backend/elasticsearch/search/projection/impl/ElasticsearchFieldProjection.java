@@ -33,7 +33,7 @@ import com.google.gson.JsonPrimitive;
  * @param <V> The type of individual field values after conversion.
  * @param <P> The type of the final projection result representing accumulated values of type {@code V}.
  */
-public class ElasticsearchFieldProjection<F, V, P> extends AbstractElasticsearchProjection<P> {
+public class ElasticsearchFieldProjection<F, V, P, T> extends AbstractElasticsearchProjection<P> {
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
@@ -41,21 +41,21 @@ public class ElasticsearchFieldProjection<F, V, P> extends AbstractElasticsearch
 	private final String[] absoluteFieldPathComponents;
 	private final String requiredContextAbsoluteFieldPath;
 
-	private final Function<JsonElement, F> decodeFunction;
+	private final Function<JsonElement, T> decodeFunction;
 	private final boolean canDecodeArrays;
-	private final ProjectionConverter<? super F, ? extends V> converter;
+	private final ProjectionConverter<? super T, ? extends V> converter;
 	private final ProjectionAccumulator.Provider<V, P> accumulatorProvider;
 
-	private ElasticsearchFieldProjection(Builder<F, V> builder,
+	private ElasticsearchFieldProjection(Builder<F, V, T> builder,
 			ProjectionAccumulator.Provider<V, P> accumulatorProvider) {
-		this( builder.scope, builder.field, builder.codec::decode, builder.codec.canDecodeArrays(), builder.converter,
+		this( builder.scope, builder.field, builder.decodeFunction, builder.canDecodeArrays, builder.converter,
 				accumulatorProvider );
 	}
 
 	ElasticsearchFieldProjection(ElasticsearchSearchIndexScope<?> scope,
 			ElasticsearchSearchIndexValueFieldContext<?> field,
-			Function<JsonElement, F> decodeFunction, boolean canDecodeArrays,
-			ProjectionConverter<? super F, ? extends V> converter,
+			Function<JsonElement, T> decodeFunction, boolean canDecodeArrays,
+			ProjectionConverter<? super T, ? extends V> converter,
 			ProjectionAccumulator.Provider<V, P> accumulatorProvider) {
 		super( scope );
 		this.absoluteFieldPath = field.absolutePath();
@@ -93,8 +93,8 @@ public class ElasticsearchFieldProjection<F, V, P> extends AbstractElasticsearch
 	/**
 	 * @param <A> The type of the temporary storage for accumulated values, before and after being transformed.
 	 */
-	private class ValueFieldExtractor<A> extends AccumulatingSourceExtractor<F, V, A, P> {
-		public ValueFieldExtractor(String[] fieldPathComponents, ProjectionAccumulator<F, V, A, P> accumulator) {
+	private class ValueFieldExtractor<A> extends AccumulatingSourceExtractor<T, V, A, P> {
+		public ValueFieldExtractor(String[] fieldPathComponents, ProjectionAccumulator<T, V, A, P> accumulator) {
 			super( fieldPathComponents, accumulator );
 		}
 
@@ -107,7 +107,7 @@ public class ElasticsearchFieldProjection<F, V, P> extends AbstractElasticsearch
 		}
 
 		@Override
-		protected F extract(ProjectionHitMapper<?> projectionHitMapper, JsonObject hit, JsonElement sourceElement,
+		protected T extract(ProjectionHitMapper<?> projectionHitMapper, JsonObject hit, JsonElement sourceElement,
 				ProjectionExtractContext context) {
 			return decodeFunction.apply( sourceElement );
 		}
@@ -154,24 +154,36 @@ public class ElasticsearchFieldProjection<F, V, P> extends AbstractElasticsearch
 		}
 
 		@Override
-		public <V> Builder<F, V> type(Class<V> expectedType, ValueModel valueModel) {
-			return new Builder<>( codec, scope, field,
-					field.type().projectionConverter( valueModel ).withConvertedType( expectedType, field ) );
+		public <V> Builder<F, V, ?> type(Class<V> expectedType, ValueModel valueModel) {
+			if ( ValueModel.RAW.equals( valueModel ) ) {
+				return new Builder<>( JsonElement::getAsString, codec.canDecodeArrays(), scope, field,
+						field.type().rawProjectionConverter()
+								.withConvertedType( expectedType, field )
+				);
+			}
+			else {
+				return new Builder<>( codec::decode, codec.canDecodeArrays(), scope, field,
+						field.type().projectionConverter( valueModel ).withConvertedType( expectedType, field )
+				);
+			}
 		}
 	}
 
-	public static class Builder<F, V> implements FieldProjectionBuilder<V> {
+	public static class Builder<F, V, T> implements FieldProjectionBuilder<V> {
 
 		private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
-		private final ElasticsearchFieldCodec<F> codec;
+		private final Function<JsonElement, T> decodeFunction;
+		private final boolean canDecodeArrays;
 		private final ElasticsearchSearchIndexScope<?> scope;
 		private final ElasticsearchSearchIndexValueFieldContext<F> field;
-		private final ProjectionConverter<F, ? extends V> converter;
+		private final ProjectionConverter<T, ? extends V> converter;
 
-		private Builder(ElasticsearchFieldCodec<F> codec, ElasticsearchSearchIndexScope<?> scope,
-				ElasticsearchSearchIndexValueFieldContext<F> field, ProjectionConverter<F, ? extends V> converter) {
-			this.codec = codec;
+		private Builder(Function<JsonElement, T> decodeFunction, boolean canDecodeArrays,
+				ElasticsearchSearchIndexScope<?> scope,
+				ElasticsearchSearchIndexValueFieldContext<F> field, ProjectionConverter<T, ? extends V> converter) {
+			this.decodeFunction = decodeFunction;
+			this.canDecodeArrays = canDecodeArrays;
 			this.scope = scope;
 			this.field = field;
 			this.converter = converter;

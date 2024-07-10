@@ -9,6 +9,7 @@ import java.util.Comparator;
 import java.util.Map;
 import java.util.SortedSet;
 import java.util.TreeSet;
+import java.util.function.Function;
 
 import org.hibernate.search.backend.lucene.lowlevel.join.impl.NestedDocsProvider;
 import org.hibernate.search.backend.lucene.search.aggregation.impl.AggregationRequestContext;
@@ -35,19 +36,19 @@ import org.apache.lucene.search.DocIdSetIterator;
  * @param <K> The type of keys in the returned map. It can be {@code F}
  * or a different type if value converters are used.
  */
-public class LuceneNumericTermsAggregation<F, E extends Number, K>
-		extends AbstractLuceneFacetsBasedTermsAggregation<F, E, K> {
+public class LuceneNumericTermsAggregation<F, E extends Number, K, V>
+		extends AbstractLuceneFacetsBasedTermsAggregation<F, E, K, V> {
 
-	private final AbstractLuceneNumericFieldCodec<F, E> codec;
 	private final LuceneNumericDomain<E> numericDomain;
 
 	private final Comparator<E> termComparator;
+	private final Function<E, V> decoder;
 
-	private LuceneNumericTermsAggregation(Builder<F, E, K> builder) {
+	private LuceneNumericTermsAggregation(Builder<F, E, K, V> builder) {
 		super( builder );
-		this.codec = builder.codec;
-		this.numericDomain = codec.getDomain();
+		this.numericDomain = builder.codec.getDomain();
 		this.termComparator = numericDomain.createComparator();
+		this.decoder = builder.decoder;
 	}
 
 	@Override
@@ -55,12 +56,12 @@ public class LuceneNumericTermsAggregation<F, E extends Number, K>
 		return new LuceneNumericTermsAggregationExtractor();
 	}
 
-	public static class Factory<F>
+	public static class Factory<F, E extends Number>
 			extends
 			AbstractLuceneCodecAwareSearchQueryElementFactory<TermsAggregationBuilder.TypeSelector,
 					F,
-					AbstractLuceneNumericFieldCodec<F, ?>> {
-		public Factory(AbstractLuceneNumericFieldCodec<F, ?> codec) {
+					AbstractLuceneNumericFieldCodec<F, E>> {
+		public Factory(AbstractLuceneNumericFieldCodec<F, E> codec) {
 			super( codec );
 		}
 
@@ -117,41 +118,55 @@ public class LuceneNumericTermsAggregation<F, E extends Number, K>
 		}
 
 		@Override
-		F termToFieldValue(E term) {
-			return codec.decode( term );
+		V termToFieldValue(E term) {
+			return decoder.apply( term );
 		}
 	}
 
-	private static class TypeSelector<F> extends AbstractTypeSelector<F> {
-		private final AbstractLuceneNumericFieldCodec<F, ?> codec;
+	private static class TypeSelector<F, E extends Number> extends AbstractTypeSelector<F, E> {
+		private final AbstractLuceneNumericFieldCodec<F, E> codec;
 
-		private TypeSelector(AbstractLuceneNumericFieldCodec<F, ?> codec,
+		private TypeSelector(AbstractLuceneNumericFieldCodec<F, E> codec,
 				LuceneSearchIndexScope<?> scope, LuceneSearchIndexValueFieldContext<F> field) {
 			super( scope, field );
 			this.codec = codec;
 		}
 
+		@SuppressWarnings("unchecked")
 		@Override
-		public <K> Builder<F, ?, K> type(Class<K> expectedType, ValueModel valueModel) {
-			return new Builder<>( codec, scope, field,
-					field.type().projectionConverter( valueModel ).withConvertedType( expectedType,
-							field ) );
+		public <K> Builder<F, ?, K, ?> type(Class<K> expectedType, ValueModel valueModel) {
+			if ( ValueModel.RAW.equals( valueModel ) ) {
+				return new Builder<>( codec, scope, field,
+						( (ProjectionConverter<E, ?>) field.type().rawProjectionConverter() )
+								.withConvertedType( expectedType, field ),
+						Function.identity()
+				);
+			}
+			else {
+				return new Builder<>( codec, scope, field,
+						field.type().projectionConverter( valueModel ).withConvertedType( expectedType, field ),
+						codec::decode
+				);
+			}
 		}
 	}
 
-	private static class Builder<F, E extends Number, K>
-			extends AbstractBuilder<F, E, K> {
+	private static class Builder<F, E extends Number, K, V>
+			extends AbstractBuilder<F, E, K, V> {
 
 		private final AbstractLuceneNumericFieldCodec<F, E> codec;
+		private final Function<E, V> decoder;
 
 		public Builder(AbstractLuceneNumericFieldCodec<F, E> codec, LuceneSearchIndexScope<?> scope,
-				LuceneSearchIndexValueFieldContext<F> field, ProjectionConverter<F, ? extends K> fromFieldValueConverter) {
+				LuceneSearchIndexValueFieldContext<F> field, ProjectionConverter<V, ? extends K> fromFieldValueConverter,
+				Function<E, V> decoder) {
 			super( scope, field, fromFieldValueConverter );
 			this.codec = codec;
+			this.decoder = decoder;
 		}
 
 		@Override
-		public LuceneNumericTermsAggregation<F, E, K> build() {
+		public LuceneNumericTermsAggregation<F, E, K, V> build() {
 			return new LuceneNumericTermsAggregation<>( this );
 		}
 	}
