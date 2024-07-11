@@ -17,6 +17,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 
+import org.hibernate.search.engine.cfg.spi.FormatUtils;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.expectations.IndexNullAsMatchPredicateExpectactions;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.values.AscendingUniqueTermValues;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.values.IndexableValues;
@@ -115,5 +116,10 @@ public class OffsetTimeFieldTypeDescriptor extends StandardFieldTypeDescriptor<O
 				LocalTime.of( 0, 0, 0 ).atOffset( ZoneOffset.UTC ),
 				LocalTime.of( 12, 14, 52 ).atOffset( ZoneOffset.ofHours( 1 ) )
 		) );
+	}
+
+	@Override
+	public String format(OffsetTime value) {
+		return FormatUtils.format( value );
 	}
 }

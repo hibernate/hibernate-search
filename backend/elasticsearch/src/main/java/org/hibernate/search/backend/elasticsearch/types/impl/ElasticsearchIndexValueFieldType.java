@@ -46,7 +46,7 @@ public class ElasticsearchIndexValueFieldType<F>
 		this.indexSettingsContributor = builder.indexSettingsContributor;
 
 		this.rawProjectionConverter = ProjectionConverter.passThrough( String.class );
-		this.rawDslConverter = new DslConverter<>( String.class, new RawNoParsingDslConverter() );
+		this.rawDslConverter = new DslConverter<>( String.class, RawNoParsingDslConverter.INSTANCE );
 	}
 
 	@Override
@@ -130,9 +130,15 @@ public class ElasticsearchIndexValueFieldType<F>
 
 	private static class RawNoParsingDslConverter implements ToDocumentValueConverter<String, JsonElement> {
 
+		static final RawNoParsingDslConverter INSTANCE = new RawNoParsingDslConverter();
+
+		private RawNoParsingDslConverter() {
+		}
+
 		@Override
 		public JsonElement toDocumentValue(String value, ToDocumentValueConvertContext context) {
 			return new JsonPrimitive( value );
 		}
+
 	}
 }

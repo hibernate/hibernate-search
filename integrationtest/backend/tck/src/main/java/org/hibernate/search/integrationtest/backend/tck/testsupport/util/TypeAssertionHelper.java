@@ -4,9 +4,21 @@
  */
 package org.hibernate.search.integrationtest.backend.tck.testsupport.util;
 
+import java.math.BigDecimal;
+import java.math.RoundingMode;
+import java.time.Instant;
+import java.time.ZoneOffset;
+import java.time.temporal.ChronoUnit;
 import java.util.Objects;
+import java.util.function.BiPredicate;
 
+import org.hibernate.search.engine.cfg.spi.ParseUtils;
+import org.hibernate.search.integrationtest.backend.tck.testsupport.types.BigDecimalFieldTypeDescriptor;
+import org.hibernate.search.integrationtest.backend.tck.testsupport.types.BigIntegerFieldTypeDescriptor;
+import org.hibernate.search.integrationtest.backend.tck.testsupport.types.DoubleFieldTypeDescriptor;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.FieldTypeDescriptor;
+import org.hibernate.search.integrationtest.backend.tck.testsupport.types.FloatFieldTypeDescriptor;
+import org.hibernate.search.integrationtest.backend.tck.testsupport.types.OffsetTimeFieldTypeDescriptor;
 
 public abstract class TypeAssertionHelper<F, T> {
 
@@ -16,6 +28,10 @@ public abstract class TypeAssertionHelper<F, T> {
 	public abstract Class<T> getJavaClass();
 
 	public abstract T create(F fieldValue);
+
+	public boolean isSame(F a, F b) {
+		return Objects.equals( a, b );
+	}
 
 	public static <F> TypeAssertionHelper<F, F> identity(FieldTypeDescriptor<F, ?> typeDescriptor) {
 		return new TypeAssertionHelper<F, F>() {
@@ -74,7 +90,63 @@ public abstract class TypeAssertionHelper<F, T> {
 		};
 	}
 
-	public static <F> TypeAssertionHelper<F, String> parser(FieldTypeDescriptor<F, ?> typeDescriptor) {
+	@SuppressWarnings("unchecked")
+	public static <F, T> TypeAssertionHelper<F, T> raw(FieldTypeDescriptor<F, ?> typeDescriptor) {
+		BiPredicate<F, F> isSame;
+		if ( TckConfiguration.get().getBackendFeatures().rawType( typeDescriptor ).equals( String.class ) ) {
+			// If the raw type is String then we are looking at the Elasticsearch backend.
+			// Yes the strings in Lucene will also have string raw type, but we are not overriding the equals check for strings
+			// hence this "assumption" is relatively safe to make.
+			if ( BigDecimalFieldTypeDescriptor.INSTANCE.equals( typeDescriptor ) ) {
+				isSame = (a, b) -> new BigDecimal( ( (String) a ) ).setScale( 2, RoundingMode.HALF_UP )
+						.equals( new BigDecimal( ( (String) b ) ).setScale( 2, RoundingMode.HALF_UP ) );
+			}
+			else if ( FloatFieldTypeDescriptor.INSTANCE.equals( typeDescriptor ) ) {
+				isSame = (a, b) -> Math.abs( ParseUtils.parseFloat( (String) a )
+						- ParseUtils.parseFloat( (String) b ) ) < 1.0e-5f;
+			}
+			else if ( DoubleFieldTypeDescriptor.INSTANCE.equals( typeDescriptor ) ) {
+				isSame = (a, b) -> Math.abs( ParseUtils.parseDouble( (String) a )
+						- ParseUtils.parseDouble( (String) b ) ) < 1.0e-5;
+			}
+			else if ( BigIntegerFieldTypeDescriptor.INSTANCE.equals( typeDescriptor ) ) {
+				isSame = (a, b) -> ParseUtils.parseBigDecimal( (String) a ).toBigInteger()
+						.equals( ParseUtils.parseBigDecimal( (String) b ).toBigInteger() );
+			}
+			else {
+				isSame = Objects::equals;
+			}
+		}
+		else {
+			if ( OffsetTimeFieldTypeDescriptor.INSTANCE.equals( typeDescriptor ) ) {
+				isSame = (a, b) -> Instant.EPOCH.plus( (long) a, ChronoUnit.NANOS )
+						.atOffset( ZoneOffset.UTC ).toOffsetTime()
+						.equals( Instant.EPOCH.plus( (long) b, ChronoUnit.NANOS )
+								.atOffset( ZoneOffset.UTC ).toOffsetTime() );
+			}
+			else {
+				isSame = Objects::equals;
+			}
+		}
+		return new TypeAssertionHelper<F, T>() {
+			@Override
+			public Class<T> getJavaClass() {
+				return (Class<T>) TckConfiguration.get().getBackendFeatures().rawType( typeDescriptor );
+			}
+
+			@Override
+			public T create(F fieldValue) {
+				return (T) TckConfiguration.get().getBackendFeatures().toRawValue( typeDescriptor, fieldValue );
+			}
+
+			@Override
+			public boolean isSame(F a, F b) {
+				return isSame.test( a, b );
+			}
+		};
+	}
+
+	public static <F> TypeAssertionHelper<F, String> string(FieldTypeDescriptor<F, ?> typeDescriptor) {
 		return new TypeAssertionHelper<F, String>() {
 			@Override
 			public Class<String> getJavaClass() {
@@ -83,7 +155,7 @@ public abstract class TypeAssertionHelper<F, T> {
 
 			@Override
 			public String create(F fieldValue) {
-				return Objects.toString( fieldValue, null );
+				return TckConfiguration.get().getBackendFeatures().toStringValue( typeDescriptor, fieldValue );
 			}
 		};
 	}

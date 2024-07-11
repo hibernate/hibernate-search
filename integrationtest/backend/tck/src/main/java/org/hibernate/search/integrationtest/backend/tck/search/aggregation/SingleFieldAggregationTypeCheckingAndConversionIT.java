@@ -325,6 +325,48 @@ class SingleFieldAggregationTypeCheckingAndConversionIT<F> {
 
 	@ParameterizedTest(name = "{0}")
 	@MethodSource("params")
+	void invalidFieldType_conversionRaw(SupportedSingleFieldAggregationExpectations<F> expectations,
+			DataSet<F> dataSet) {
+		String fieldPath = mainIndex.binding().fieldModels.get( expectations.fieldType() ).relativeFieldName;
+
+		FieldTypeDescriptor<?, ?> wrongType = FieldTypeDescriptor.getIncompatibleRaw( expectations.fieldType() );
+
+		AggregationScenario<?> scenario = expectations.withFieldType( TypeAssertionHelper.wrongType( wrongType ) );
+
+		assertThatThrownBy( () -> scenario.setupWithConverterSetting(
+				mainIndex.createScope().aggregation(), fieldPath, ValueModel.RAW
+		) )
+				.isInstanceOf( SearchException.class )
+				.hasMessageContainingAll(
+						"Invalid type", "'" + wrongType.getJavaType().getName() + "'",
+						"Expected '", // we are ignoring the expected type as with raw it would be backend specific
+						"field '" + fieldPath + "'"
+				);
+	}
+
+	@ParameterizedTest(name = "{0}")
+	@MethodSource("params")
+	void invalidFieldType_conversionString(SupportedSingleFieldAggregationExpectations<F> expectations,
+			DataSet<F> dataSet) {
+		String fieldPath = mainIndex.binding().fieldModels.get( expectations.fieldType() ).relativeFieldName;
+
+		FieldTypeDescriptor<?, ?> wrongType = FieldTypeDescriptor.getIncompatible( expectations.fieldType() );
+
+		AggregationScenario<?> scenario = expectations.withFieldType( TypeAssertionHelper.wrongType( wrongType ) );
+
+		assertThatThrownBy( () -> scenario.setupWithConverterSetting(
+				mainIndex.createScope().aggregation(), fieldPath, ValueModel.STRING
+		) )
+				.isInstanceOf( SearchException.class )
+				.hasMessageContainingAll(
+						"Invalid type", "'" + wrongType.getJavaType().getName() + "'",
+						"Expected '" + String.class.getName() + "'",
+						"field '" + fieldPath + "'"
+				);
+	}
+
+	@ParameterizedTest(name = "{0}")
+	@MethodSource("params")
 	void nullFieldType(SupportedSingleFieldAggregationExpectations<F> expectations, DataSet<F> dataSet) {
 		String fieldPath = mainIndex.binding().fieldModels.get( expectations.fieldType() ).relativeFieldName;
 
@@ -499,6 +541,36 @@ class SingleFieldAggregationTypeCheckingAndConversionIT<F> {
 
 	@ParameterizedTest(name = "{0}")
 	@MethodSource("params")
+	void withConverter_conversionRaw(SupportedSingleFieldAggregationExpectations<F> expectations,
+			DataSet<F> dataSet) {
+		String fieldPath = mainIndex.binding().fieldModels.get( expectations.fieldType() ).relativeFieldName;
+
+		AggregationScenario<?> scenario = expectations.withFieldType(
+				TypeAssertionHelper.raw( expectations.fieldType() )
+		);
+		testValidAggregationWithConverterSetting(
+				scenario, mainIndex.createScope(), fieldPath, ValueModel.RAW,
+				dataSet
+		);
+	}
+
+	@ParameterizedTest(name = "{0}")
+	@MethodSource("params")
+	void withConverter_conversionString(SupportedSingleFieldAggregationExpectations<F> expectations,
+			DataSet<F> dataSet) {
+		String fieldPath = mainIndex.binding().fieldWithConverterModels.get( expectations.fieldType() ).relativeFieldName;
+
+		AggregationScenario<?> scenario = expectations.withFieldType(
+				TypeAssertionHelper.string( expectations.fieldType() )
+		);
+		testValidAggregationWithConverterSetting(
+				scenario, mainIndex.createScope(), fieldPath, ValueModel.STRING,
+				dataSet
+		);
+	}
+
+	@ParameterizedTest(name = "{0}")
+	@MethodSource("params")
 	void withConverter_invalidFieldType(SupportedSingleFieldAggregationExpectations<F> expectations,
 			DataSet<F> dataSet) {
 		String fieldPath = mainIndex.binding().fieldWithConverterModels.get( expectations.fieldType() ).relativeFieldName;
@@ -583,6 +655,40 @@ class SingleFieldAggregationTypeCheckingAndConversionIT<F> {
 
 	@ParameterizedTest(name = "{0}")
 	@MethodSource("params")
+	void multiIndex_withRawFieldCompatibleIndex_conversionRaw(SupportedSingleFieldAggregationExpectations<F> expectations,
+			DataSet<F> dataSet) {
+		StubMappingScope scope = mainIndex.createScope( rawFieldCompatibleIndex );
+
+		String fieldPath = mainIndex.binding().fieldWithConverterModels.get( expectations.fieldType() ).relativeFieldName;
+
+		AggregationScenario<?> scenario = expectations.withFieldTypeOnMainAndOtherIndex(
+				TypeAssertionHelper.raw( expectations.fieldType() )
+		);
+		testValidAggregationWithConverterSetting(
+				scenario, scope, fieldPath, ValueModel.RAW,
+				dataSet
+		);
+	}
+
+	@ParameterizedTest(name = "{0}")
+	@MethodSource("params")
+	void multiIndex_withRawFieldCompatibleIndex_conversionString(
+			SupportedSingleFieldAggregationExpectations<F> expectations, DataSet<F> dataSet) {
+		StubMappingScope scope = mainIndex.createScope( rawFieldCompatibleIndex );
+
+		String fieldPath = mainIndex.binding().fieldWithConverterModels.get( expectations.fieldType() ).relativeFieldName;
+
+		AggregationScenario<?> scenario = expectations.withFieldTypeOnMainAndOtherIndex(
+				TypeAssertionHelper.string( expectations.fieldType() )
+		);
+		testValidAggregationWithConverterSetting(
+				scenario, scope, fieldPath, ValueModel.STRING,
+				dataSet
+		);
+	}
+
+	@ParameterizedTest(name = "{0}")
+	@MethodSource("params")
 	void multiIndex_withIncompatibleIndex_conversionEnabled(SupportedSingleFieldAggregationExpectations<F> expectations,
 			DataSet<F> dataSet) {
 		StubMappingScope scope = mainIndex.createScope( incompatibleIndex );
@@ -603,6 +709,25 @@ class SingleFieldAggregationTypeCheckingAndConversionIT<F> {
 	@MethodSource("params")
 	void multiIndex_withIncompatibleIndex_conversionDisabled(SupportedSingleFieldAggregationExpectations<F> expectations,
 			DataSet<F> dataSet) {
+		multiIndex_withIncompatibleIndex_conversion( expectations, dataSet, ValueModel.INDEX );
+	}
+
+	@ParameterizedTest(name = "{0}")
+	@MethodSource("params")
+	void multiIndex_withIncompatibleIndex_conversionRaw(SupportedSingleFieldAggregationExpectations<F> expectations,
+			DataSet<F> dataSet) {
+		multiIndex_withIncompatibleIndex_conversion( expectations, dataSet, ValueModel.RAW );
+	}
+
+	@ParameterizedTest(name = "{0}")
+	@MethodSource("params")
+	void multiIndex_withIncompatibleIndex_conversionString(SupportedSingleFieldAggregationExpectations<F> expectations,
+			DataSet<F> dataSet) {
+		multiIndex_withIncompatibleIndex_conversion( expectations, dataSet, ValueModel.STRING );
+	}
+
+	void multiIndex_withIncompatibleIndex_conversion(SupportedSingleFieldAggregationExpectations<F> expectations,
+			DataSet<F> dataSet, ValueModel valueModel) {
 		StubMappingScope scope = mainIndex.createScope( incompatibleIndex );
 
 		String fieldPath = mainIndex.binding().fieldModels.get( expectations.fieldType() ).relativeFieldName;
@@ -610,7 +735,7 @@ class SingleFieldAggregationTypeCheckingAndConversionIT<F> {
 		AggregationScenario<?> scenario = expectations.simple();
 
 		assertThatThrownBy( () -> scenario.setupWithConverterSetting(
-				scope.aggregation(), fieldPath, ValueModel.INDEX
+				scope.aggregation(), fieldPath, valueModel
 		) )
 				.isInstanceOf( SearchException.class )
 				.hasMessageContainingAll(

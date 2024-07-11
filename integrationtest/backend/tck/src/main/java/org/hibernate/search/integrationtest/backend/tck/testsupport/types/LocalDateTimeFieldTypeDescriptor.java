@@ -10,6 +10,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
+import org.hibernate.search.engine.cfg.spi.FormatUtils;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.expectations.IndexNullAsMatchPredicateExpectactions;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.values.AscendingUniqueTermValues;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.values.IndexableValues;
@@ -113,5 +114,10 @@ public class LocalDateTimeFieldTypeDescriptor extends StandardFieldTypeDescripto
 				LocalDateTime.of( 1970, 1, 1, 0, 0, 0 ),
 				LocalDateTime.of( 1984, 10, 7, 12, 14, 52 )
 		) );
+	}
+
+	@Override
+	public String format(LocalDateTime value) {
+		return FormatUtils.format( value );
 	}
 }

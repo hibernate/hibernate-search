@@ -8,22 +8,41 @@ import static org.hibernate.search.util.impl.integrationtest.backend.elasticsear
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
+import java.math.RoundingMode;
 import java.time.Instant;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
+import java.time.Month;
 import java.time.MonthDay;
+import java.time.OffsetDateTime;
+import java.time.OffsetTime;
+import java.time.Year;
+import java.time.YearMonth;
 import java.time.ZoneOffset;
+import java.time.ZonedDateTime;
 import java.time.temporal.TemporalAccessor;
 import java.util.Locale;
+import java.util.Objects;
 
 import org.hibernate.search.backend.elasticsearch.types.format.impl.ElasticsearchDefaultFieldFormatProvider;
 import org.hibernate.search.engine.backend.types.VectorSimilarity;
 import org.hibernate.search.engine.cfg.spi.FormatUtils;
 import org.hibernate.search.engine.spatial.GeoPoint;
+import org.hibernate.search.integrationtest.backend.tck.testsupport.types.BigDecimalFieldTypeDescriptor;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.FieldTypeDescriptor;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.FloatFieldTypeDescriptor;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.GeoPointFieldTypeDescriptor;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.InstantFieldTypeDescriptor;
+import org.hibernate.search.integrationtest.backend.tck.testsupport.types.LocalDateFieldTypeDescriptor;
+import org.hibernate.search.integrationtest.backend.tck.testsupport.types.LocalDateTimeFieldTypeDescriptor;
+import org.hibernate.search.integrationtest.backend.tck.testsupport.types.LocalTimeFieldTypeDescriptor;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.MonthDayFieldTypeDescriptor;
+import org.hibernate.search.integrationtest.backend.tck.testsupport.types.OffsetDateTimeFieldTypeDescriptor;
+import org.hibernate.search.integrationtest.backend.tck.testsupport.types.OffsetTimeFieldTypeDescriptor;
+import org.hibernate.search.integrationtest.backend.tck.testsupport.types.YearFieldTypeDescriptor;
+import org.hibernate.search.integrationtest.backend.tck.testsupport.types.YearMonthFieldTypeDescriptor;
+import org.hibernate.search.integrationtest.backend.tck.testsupport.types.ZonedDateTimeFieldTypeDescriptor;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.TckBackendFeatures;
 import org.hibernate.search.util.impl.integrationtest.backend.elasticsearch.dialect.ElasticsearchTestDialect;
 
@@ -350,11 +369,66 @@ public class ElasticsearchTckBackendFeatures extends TckBackendFeatures {
 			return value == null ? null : FormatUtils.format( (GeoPoint) value );
 		}
 
+		if ( BigDecimalFieldTypeDescriptor.INSTANCE.equals( descriptor ) ) {
+			return value == null ? null : FormatUtils.format( (BigDecimal) value );
+		}
+
 		return formatForQueryStringPredicate( descriptor, value );
+	}
+
+	@Override
+	public <F> Object toSortRawValue(FieldTypeDescriptor<F, ?> descriptor, F value) {
+		// see corresponding Elasticsearch codecs #nullUnsafeScalar(..)
+		if ( InstantFieldTypeDescriptor.INSTANCE.equals( descriptor ) ) {
+			return Objects.toString( ( (Instant) value ).toEpochMilli() );
+		}
+		if ( YearFieldTypeDescriptor.INSTANCE.equals( descriptor ) ) {
+			return Objects.toString( ( (Year) value ).atDay( 1 ).atStartOfDay().toInstant( ZoneOffset.UTC ).toEpochMilli() );
+		}
+		if ( ZonedDateTimeFieldTypeDescriptor.INSTANCE.equals( descriptor ) ) {
+			return Objects.toString( ( (ZonedDateTime) value ).toInstant().toEpochMilli() );
+		}
+		if ( LocalDateTimeFieldTypeDescriptor.INSTANCE.equals( descriptor ) ) {
+			return Objects.toString( ( (LocalDateTime) value ).toInstant( ZoneOffset.UTC ).toEpochMilli() );
+		}
+		if ( LocalTimeFieldTypeDescriptor.INSTANCE.equals( descriptor ) ) {
+			return Objects.toString( ( (LocalTime) value ).atDate( LocalDate.of( 1970, Month.JANUARY, 1 ) )
+					.toInstant( ZoneOffset.UTC ).toEpochMilli() );
+		}
+		if ( LocalDateFieldTypeDescriptor.INSTANCE.equals( descriptor ) ) {
+			return Objects.toString( ( (LocalDate) value ).atStartOfDay( ZoneOffset.UTC ).toInstant().toEpochMilli() );
+		}
+		if ( MonthDayFieldTypeDescriptor.INSTANCE.equals( descriptor ) ) {
+			return Objects
+					.toString( ( (MonthDay) value ).atYear( 0 ).atStartOfDay().toInstant( ZoneOffset.UTC ).toEpochMilli() );
+		}
+		if ( YearMonthFieldTypeDescriptor.INSTANCE.equals( descriptor ) ) {
+			return Objects
+					.toString( ( (YearMonth) value ).atDay( 1 ).atStartOfDay().toInstant( ZoneOffset.UTC ).toEpochMilli() );
+		}
+		if ( OffsetDateTimeFieldTypeDescriptor.INSTANCE.equals( descriptor ) ) {
+			return Objects.toString( ( (OffsetDateTime) value ).toInstant().toEpochMilli() );
+		}
+		if ( OffsetTimeFieldTypeDescriptor.INSTANCE.equals( descriptor ) ) {
+			return Objects.toString(
+					( (OffsetTime) value ).atDate( LocalDate.of( 1970, Month.JANUARY, 1 ) ).toInstant().toEpochMilli() );
+		}
+		return super.toSortRawValue( descriptor, value );
 	}
 
 	@Override
 	public <F> Class<?> rawType(FieldTypeDescriptor<F, ?> descriptor) {
 		return String.class;
+	}
+
+	@Override
+	public <F> String toStringValue(FieldTypeDescriptor<F, ?> descriptor, F value) {
+		if ( BigDecimalFieldTypeDescriptor.INSTANCE.equals( descriptor ) ) {
+			if ( ( (BigDecimal) value ).scale() <= 0 ) {
+				return FormatUtils.format( ( (BigDecimal) value ).setScale( 1, RoundingMode.UNNECESSARY ) );
+			}
+			return FormatUtils.format( ( (BigDecimal) value ) );
+		}
+		return super.toStringValue( descriptor, value );
 	}
 }

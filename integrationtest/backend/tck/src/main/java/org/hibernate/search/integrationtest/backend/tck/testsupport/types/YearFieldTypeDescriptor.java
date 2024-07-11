@@ -10,6 +10,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
+import org.hibernate.search.engine.cfg.spi.FormatUtils;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.expectations.IndexNullAsMatchPredicateExpectactions;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.values.AscendingUniqueTermValues;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.values.IndexableValues;
@@ -99,5 +100,10 @@ public class YearFieldTypeDescriptor extends StandardFieldTypeDescriptor<Year> {
 		return Optional.of( new IndexNullAsMatchPredicateExpectactions<>(
 				Year.of( 1970 ), Year.of( 4302 )
 		) );
+	}
+
+	@Override
+	public String format(Year value) {
+		return FormatUtils.format( value );
 	}
 }

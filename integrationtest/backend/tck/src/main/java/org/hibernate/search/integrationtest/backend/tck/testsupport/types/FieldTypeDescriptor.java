@@ -104,6 +104,20 @@ public abstract class FieldTypeDescriptor<F, S extends SearchableProjectableInde
 		}
 	}
 
+	/**
+	 * It is different from the simple {@link #getIncompatible(FieldTypeDescriptor)} call as with raw types
+	 * we can have e.g. Byte that is mapped to int and Short that is also mapped to int in the backend
+	 * allowing to accept int values as inputs in some cases (even though it may end up causing problems in the end).
+	 */
+	public static StandardFieldTypeDescriptor<?> getIncompatibleRaw(FieldTypeDescriptor<?, ?> typeDescriptor) {
+		if ( GeoPointFieldTypeDescriptor.INSTANCE.equals( typeDescriptor ) ) {
+			return LongFieldTypeDescriptor.INSTANCE;
+		}
+		else {
+			return GeoPointFieldTypeDescriptor.INSTANCE;
+		}
+	}
+
 	protected final Class<F> javaType;
 	private final String uniqueName;
 
