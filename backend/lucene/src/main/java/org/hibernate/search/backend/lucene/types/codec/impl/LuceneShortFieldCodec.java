@@ -25,8 +25,13 @@ public final class LuceneShortFieldCodec extends AbstractLuceneNumericFieldCodec
 
 	@Override
 	public Short decode(IndexableField field) {
-		Integer integer = (Integer) field.numericValue();
+		Integer integer = raw( field );
 		return integer.shortValue();
+	}
+
+	@Override
+	public Integer raw(IndexableField field) {
+		return (Integer) field.numericValue();
 	}
 
 	@Override

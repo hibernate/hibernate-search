@@ -39,6 +39,11 @@ public class LuceneFloatVectorCodec extends AbstractLuceneVectorFieldCodec<float
 	}
 
 	@Override
+	public float[] raw(IndexableField field) {
+		return decode( field );
+	}
+
+	@Override
 	public Class<float[]> encodedType() {
 		return float[].class;
 	}

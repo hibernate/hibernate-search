@@ -58,6 +58,11 @@ public final class LuceneYearMonthFieldCodec extends AbstractLuceneNumericFieldC
 	}
 
 	@Override
+	public Long raw(IndexableField field) {
+		return encode( decode( field ) );
+	}
+
+	@Override
 	public Long encode(YearMonth value) {
 		return value == null ? null : value.getLong( ChronoField.PROLEPTIC_MONTH );
 	}

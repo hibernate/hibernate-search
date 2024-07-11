@@ -58,6 +58,11 @@ public final class LuceneLocalTimeFieldCodec extends AbstractLuceneNumericFieldC
 	}
 
 	@Override
+	public Long raw(IndexableField field) {
+		return encode( decode( field ) );
+	}
+
+	@Override
 	public Long encode(LocalTime value) {
 		return value == null ? null : value.toNanoOfDay();
 	}

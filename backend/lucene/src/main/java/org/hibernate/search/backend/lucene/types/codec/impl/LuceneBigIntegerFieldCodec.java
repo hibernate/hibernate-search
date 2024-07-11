@@ -53,6 +53,12 @@ public final class LuceneBigIntegerFieldCodec extends AbstractLuceneNumericField
 	}
 
 	@Override
+	public Long raw(IndexableField field) {
+		// because we are reading a string value, but we expect to return a long...
+		return encode( decode( field ) );
+	}
+
+	@Override
 	public Long encode(BigInteger value) {
 		BigDecimal decimal = new BigDecimal( value );
 		if ( decimal.compareTo( minScaledValue ) < 0 || decimal.compareTo( maxScaledValue ) > 0 ) {

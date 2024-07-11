@@ -29,6 +29,11 @@ public final class LuceneDoubleFieldCodec extends AbstractLuceneNumericFieldCode
 	}
 
 	@Override
+	public Double raw(IndexableField field) {
+		return decode( field );
+	}
+
+	@Override
 	public Double encode(Double value) {
 		return value;
 	}

@@ -29,6 +29,11 @@ public final class LuceneFloatFieldCodec extends AbstractLuceneNumericFieldCodec
 	}
 
 	@Override
+	public Float raw(IndexableField field) {
+		return decode( field );
+	}
+
+	@Override
 	public Float encode(Float value) {
 		return value;
 	}

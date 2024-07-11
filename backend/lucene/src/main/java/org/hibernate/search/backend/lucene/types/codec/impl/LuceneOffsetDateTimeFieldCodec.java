@@ -50,6 +50,11 @@ public final class LuceneOffsetDateTimeFieldCodec extends AbstractLuceneNumericF
 	}
 
 	@Override
+	public Long raw(IndexableField field) {
+		return encode( decode( field ) );
+	}
+
+	@Override
 	public Long encode(OffsetDateTime value) {
 		return value == null ? null : value.toInstant().toEpochMilli();
 	}

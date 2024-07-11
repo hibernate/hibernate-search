@@ -59,6 +59,11 @@ public final class LuceneStringFieldCodec implements LuceneFieldCodec<String, St
 	}
 
 	@Override
+	public String raw(IndexableField field) {
+		return decode( field );
+	}
+
+	@Override
 	public String decode(String field) {
 		return field;
 	}

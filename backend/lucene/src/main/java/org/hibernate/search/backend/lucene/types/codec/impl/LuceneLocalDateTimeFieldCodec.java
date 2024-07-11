@@ -50,6 +50,11 @@ public final class LuceneLocalDateTimeFieldCodec extends AbstractLuceneNumericFi
 	}
 
 	@Override
+	public Long raw(IndexableField field) {
+		return encode( decode( field ) );
+	}
+
+	@Override
 	public Long encode(LocalDateTime value) {
 		return value == null ? null : value.toInstant( ZoneOffset.UTC ).toEpochMilli();
 	}

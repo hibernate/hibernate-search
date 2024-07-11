@@ -36,10 +36,7 @@ public interface LuceneFieldCodec<F, E> {
 	 */
 	F decode(IndexableField field);
 
-	default E raw(IndexableField field) {
-		return encode( decode( field ) );
-		// TODO: move to the codec impls
-	}
+	E raw(IndexableField field);
 
 	F decode(E field);
 

@@ -63,6 +63,11 @@ public final class LuceneGeoPointFieldCodec implements LuceneFieldCodec<GeoPoint
 	}
 
 	@Override
+	public byte[] raw(IndexableField field) {
+		return field.binaryValue().bytes;
+	}
+
+	@Override
 	public GeoPoint decode(byte[] field) {
 		return fromBytes( field );
 	}

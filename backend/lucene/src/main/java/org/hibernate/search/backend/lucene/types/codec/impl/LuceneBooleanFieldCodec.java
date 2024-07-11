@@ -25,8 +25,13 @@ public final class LuceneBooleanFieldCodec extends AbstractLuceneNumericFieldCod
 
 	@Override
 	public Boolean decode(IndexableField field) {
-		Integer intValue = (Integer) field.numericValue();
+		Integer intValue = raw( field );
 		return ( intValue > 0 );
+	}
+
+	@Override
+	public Integer raw(IndexableField field) {
+		return (Integer) field.numericValue();
 	}
 
 	@Override

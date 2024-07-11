@@ -29,6 +29,11 @@ public final class LuceneLongFieldCodec extends AbstractLuceneNumericFieldCodec<
 	}
 
 	@Override
+	public Long raw(IndexableField field) {
+		return decode( field );
+	}
+
+	@Override
 	public Long encode(Long value) {
 		return value;
 	}

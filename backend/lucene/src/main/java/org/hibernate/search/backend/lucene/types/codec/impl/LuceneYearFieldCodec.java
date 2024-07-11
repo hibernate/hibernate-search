@@ -27,8 +27,13 @@ public final class LuceneYearFieldCodec extends AbstractLuceneNumericFieldCodec<
 
 	@Override
 	public Year decode(IndexableField field) {
-		Integer integer = (Integer) field.numericValue();
+		Integer integer = raw( field );
 		return Year.of( integer );
+	}
+
+	@Override
+	public Integer raw(IndexableField field) {
+		return (Integer) field.numericValue();
 	}
 
 	@Override
