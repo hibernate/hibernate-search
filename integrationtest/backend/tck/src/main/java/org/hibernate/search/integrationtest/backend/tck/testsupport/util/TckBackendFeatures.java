@@ -166,5 +166,15 @@ public abstract class TckBackendFeatures implements StubMappingBackendFeatures {
 
 	public abstract <F> Object toRawValue(FieldTypeDescriptor<F, ?> descriptor, F value);
 
+	// with some backends sorts need require a different raw value to what other places like predicates will allow.
+	// E.g. Elasticsearch won't accept the formatted string date-time types and expects it to be in form of a number instead.
+	public <F> Object toSortRawValue(FieldTypeDescriptor<F, ?> descriptor, F value) {
+		return toRawValue( descriptor, value );
+	}
+
 	public abstract <F> Class<?> rawType(FieldTypeDescriptor<F, ?> descriptor);
+
+	public <F> String toStringValue(FieldTypeDescriptor<F, ?> descriptor, F value) {
+		return descriptor.format( value );
+	}
 }

@@ -6,6 +6,7 @@ package org.hibernate.search.integrationtest.backend.tck.testsupport.types;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
+import java.math.RoundingMode;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -14,6 +15,7 @@ import java.util.Optional;
 
 import org.hibernate.search.engine.backend.types.dsl.IndexFieldTypeFactory;
 import org.hibernate.search.engine.backend.types.dsl.StandardIndexFieldTypeOptionsStep;
+import org.hibernate.search.engine.cfg.spi.FormatUtils;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.expectations.IndexNullAsMatchPredicateExpectactions;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.values.AscendingUniqueTermValues;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.values.IndexableValues;
@@ -156,5 +158,10 @@ public class BigDecimalFieldTypeDescriptor extends StandardFieldTypeDescriptor<B
 	private BigDecimal nextDown(BigDecimal originalValue) {
 		BigInteger unscaledLessOne = originalValue.setScale( DECIMAL_SCALE ).unscaledValue().subtract( BigInteger.ONE );
 		return new BigDecimal( unscaledLessOne, DECIMAL_SCALE );
+	}
+
+	@Override
+	public String format(BigDecimal value) {
+		return FormatUtils.format( value.setScale( DECIMAL_SCALE, RoundingMode.HALF_DOWN ) );
 	}
 }

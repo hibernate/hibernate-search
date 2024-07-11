@@ -12,6 +12,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 import java.util.Objects;
+import java.util.function.BiFunction;
 import java.util.function.Consumer;
 import java.util.function.Function;
 
@@ -167,6 +168,96 @@ class FieldSortTypeCheckingAndConversionIT<F> {
 				.hasDocRefHitsExactOrder( mainIndex.typeName(), DOCUMENT_1, DOCUMENT_2, EMPTY, DOCUMENT_3 );
 		query = matchAllQuery( f -> f.field( fieldPath ).asc().missing()
 				.use( getSingleValueForMissingUse( AFTER_DOCUMENT_3_ORDINAL, fieldTypeDescriptor ), ValueModel.INDEX ) );
+		assertThatQuery( query )
+				.hasDocRefHitsExactOrder( mainIndex.typeName(), DOCUMENT_1, DOCUMENT_2, DOCUMENT_3, EMPTY );
+	}
+
+	@ParameterizedTest(name = "{0}")
+	@MethodSource("params")
+	void withDslConverters_dslConverterIndex(StandardFieldTypeDescriptor<F> fieldTypeDescriptor) {
+		SearchQuery<DocumentReference> query;
+		String fieldPath = getFieldWithDslConverterPath( fieldTypeDescriptor );
+
+		query = matchAllQuery( f -> f.field( fieldPath ).asc().missing()
+				.use( getSingleValueForMissingUse( BEFORE_DOCUMENT_1_ORDINAL, fieldTypeDescriptor ), ValueModel.INDEX ) );
+		assertThatQuery( query )
+				.hasDocRefHitsExactOrder( mainIndex.typeName(), EMPTY, DOCUMENT_1, DOCUMENT_2, DOCUMENT_3 );
+		query = matchAllQuery( f -> f.field( fieldPath ).asc().missing()
+				.use( getSingleValueForMissingUse( BETWEEN_DOCUMENT_1_AND_2_ORDINAL, fieldTypeDescriptor ),
+						ValueModel.INDEX ) );
+		assertThatQuery( query )
+				.hasDocRefHitsExactOrder( mainIndex.typeName(), DOCUMENT_1, EMPTY, DOCUMENT_2, DOCUMENT_3 );
+		query = matchAllQuery( f -> f.field( fieldPath ).asc().missing()
+				.use( getSingleValueForMissingUse( BETWEEN_DOCUMENT_2_AND_3_ORDINAL, fieldTypeDescriptor ),
+						ValueModel.INDEX ) );
+		assertThatQuery( query )
+				.hasDocRefHitsExactOrder( mainIndex.typeName(), DOCUMENT_1, DOCUMENT_2, EMPTY, DOCUMENT_3 );
+		query = matchAllQuery( f -> f.field( fieldPath ).asc().missing()
+				.use( getSingleValueForMissingUse( AFTER_DOCUMENT_3_ORDINAL, fieldTypeDescriptor ), ValueModel.INDEX ) );
+		assertThatQuery( query )
+				.hasDocRefHitsExactOrder( mainIndex.typeName(), DOCUMENT_1, DOCUMENT_2, DOCUMENT_3, EMPTY );
+	}
+
+	@ParameterizedTest(name = "{0}")
+	@MethodSource("params")
+	void withDslConverters_dslConverterRaw(StandardFieldTypeDescriptor<F> fieldTypeDescriptor) {
+		SearchQuery<DocumentReference> query;
+		String fieldPath = getFieldWithDslConverterPath( fieldTypeDescriptor );
+
+		BiFunction<FieldTypeDescriptor<F, ?>, F, Object> toRawValue =
+				TckConfiguration.get().getBackendFeatures()::toSortRawValue;
+
+		query = matchAllQuery( f -> f.field( fieldPath ).asc().missing()
+				.use( toRawValue.apply( fieldTypeDescriptor,
+						getSingleValueForMissingUse( BEFORE_DOCUMENT_1_ORDINAL, fieldTypeDescriptor ) ), ValueModel.RAW ) );
+		assertThatQuery( query )
+				.hasDocRefHitsExactOrder( mainIndex.typeName(), EMPTY, DOCUMENT_1, DOCUMENT_2, DOCUMENT_3 );
+		query = matchAllQuery( f -> f.field( fieldPath ).asc().missing()
+				.use( toRawValue.apply( fieldTypeDescriptor,
+						getSingleValueForMissingUse( BETWEEN_DOCUMENT_1_AND_2_ORDINAL, fieldTypeDescriptor ) ),
+						ValueModel.RAW ) );
+		assertThatQuery( query )
+				.hasDocRefHitsExactOrder( mainIndex.typeName(), DOCUMENT_1, EMPTY, DOCUMENT_2, DOCUMENT_3 );
+		query = matchAllQuery( f -> f.field( fieldPath ).asc().missing()
+				.use( toRawValue.apply( fieldTypeDescriptor,
+						getSingleValueForMissingUse( BETWEEN_DOCUMENT_2_AND_3_ORDINAL, fieldTypeDescriptor ) ),
+						ValueModel.RAW ) );
+		assertThatQuery( query )
+				.hasDocRefHitsExactOrder( mainIndex.typeName(), DOCUMENT_1, DOCUMENT_2, EMPTY, DOCUMENT_3 );
+		query = matchAllQuery( f -> f.field( fieldPath ).asc().missing()
+				.use( toRawValue.apply( fieldTypeDescriptor,
+						getSingleValueForMissingUse( AFTER_DOCUMENT_3_ORDINAL, fieldTypeDescriptor ) ), ValueModel.RAW ) );
+		assertThatQuery( query )
+				.hasDocRefHitsExactOrder( mainIndex.typeName(), DOCUMENT_1, DOCUMENT_2, DOCUMENT_3, EMPTY );
+	}
+
+	@ParameterizedTest(name = "{0}")
+	@MethodSource("params")
+	void withDslConverters_dslConverterString(StandardFieldTypeDescriptor<F> fieldTypeDescriptor) {
+		SearchQuery<DocumentReference> query;
+		String fieldPath = getFieldWithDslConverterPath( fieldTypeDescriptor );
+		BiFunction<FieldTypeDescriptor<F, ?>, F, String> format =
+				TckConfiguration.get().getBackendFeatures()::toStringValue;
+		query = matchAllQuery( f -> f.field( fieldPath ).asc().missing()
+				.use( format.apply( fieldTypeDescriptor,
+						getSingleValueForMissingUse( BEFORE_DOCUMENT_1_ORDINAL, fieldTypeDescriptor ) ), ValueModel.STRING ) );
+		assertThatQuery( query )
+				.hasDocRefHitsExactOrder( mainIndex.typeName(), EMPTY, DOCUMENT_1, DOCUMENT_2, DOCUMENT_3 );
+		query = matchAllQuery( f -> f.field( fieldPath ).asc().missing()
+				.use( format.apply( fieldTypeDescriptor,
+						getSingleValueForMissingUse( BETWEEN_DOCUMENT_1_AND_2_ORDINAL, fieldTypeDescriptor ) ),
+						ValueModel.STRING ) );
+		assertThatQuery( query )
+				.hasDocRefHitsExactOrder( mainIndex.typeName(), DOCUMENT_1, EMPTY, DOCUMENT_2, DOCUMENT_3 );
+		query = matchAllQuery( f -> f.field( fieldPath ).asc().missing()
+				.use( format.apply( fieldTypeDescriptor,
+						getSingleValueForMissingUse( BETWEEN_DOCUMENT_2_AND_3_ORDINAL, fieldTypeDescriptor ) ),
+						ValueModel.STRING ) );
+		assertThatQuery( query )
+				.hasDocRefHitsExactOrder( mainIndex.typeName(), DOCUMENT_1, DOCUMENT_2, EMPTY, DOCUMENT_3 );
+		query = matchAllQuery( f -> f.field( fieldPath ).asc().missing()
+				.use( format.apply( fieldTypeDescriptor,
+						getSingleValueForMissingUse( AFTER_DOCUMENT_3_ORDINAL, fieldTypeDescriptor ) ), ValueModel.STRING ) );
 		assertThatQuery( query )
 				.hasDocRefHitsExactOrder( mainIndex.typeName(), DOCUMENT_1, DOCUMENT_2, DOCUMENT_3, EMPTY );
 	}

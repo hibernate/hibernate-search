@@ -29,7 +29,6 @@ import org.hibernate.search.integrationtest.backend.tck.testsupport.types.Analyz
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.FieldTypeDescriptor;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.ExpectationsAlternative;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.TypeAssertionHelper;
-import org.hibernate.search.util.common.data.Range;
 import org.hibernate.search.util.impl.integrationtest.common.NormalizationUtils;
 
 public class TermsAggregationDescriptor extends AggregationDescriptor {
@@ -159,7 +158,7 @@ public class TermsAggregationDescriptor extends AggregationDescriptor {
 					@Override
 					public void check(Map<T, Long> aggregationResult) {
 						@SuppressWarnings("unchecked")
-						Map.Entry<Range<T>, Long>[] expectedEntries = NormalizationUtils.normalize( expectedResult )
+						Map.Entry<F, Long>[] expectedEntries = NormalizationUtils.normalize( expectedResult )
 								.entrySet().stream()
 								.map( e -> entry(
 										helper.create( e.getKey() ),
@@ -167,10 +166,24 @@ public class TermsAggregationDescriptor extends AggregationDescriptor {
 								) )
 								.toArray( Map.Entry[]::new );
 						@SuppressWarnings("unchecked")
-						Map.Entry<Range<T>, Long>[] actualEntries = NormalizationUtils.normalize( aggregationResult )
+						Map.Entry<F, Long>[] actualEntries = NormalizationUtils.normalize( aggregationResult )
 								.entrySet().toArray( new Map.Entry[0] );
 						// Don't check the order, this is tested separately
-						assertThat( actualEntries ).containsOnly( expectedEntries );
+
+						for ( Map.Entry<F, Long> actualEntry : actualEntries ) {
+							F key = actualEntry.getKey();
+							boolean matched = false;
+							for ( Map.Entry<F, Long> expectedEntry : expectedEntries ) {
+								if ( helper.isSame( expectedEntry.getKey(), key ) ) {
+									assertThat( actualEntry.getValue() ).isEqualTo( expectedEntry.getValue() );
+									matched = true;
+								}
+							}
+							assertThat( matched )
+									.as( "Actual entry [" + actualEntry + "] in " + Arrays.toString( actualEntries )
+											+ "\n did not match the any expected ones: " + Arrays.toString( expectedEntries ) )
+									.isTrue();
+						}
 					}
 				};
 			}
