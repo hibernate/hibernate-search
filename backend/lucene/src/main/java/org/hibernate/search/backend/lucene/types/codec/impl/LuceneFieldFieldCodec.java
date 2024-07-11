@@ -49,6 +49,11 @@ public final class LuceneFieldFieldCodec<F> implements LuceneFieldCodec<F, F> {
 	}
 
 	@Override
+	public F raw(IndexableField field) {
+		return encode( decode( field ) );
+	}
+
+	@Override
 	public F decode(F field) {
 		return field;
 	}

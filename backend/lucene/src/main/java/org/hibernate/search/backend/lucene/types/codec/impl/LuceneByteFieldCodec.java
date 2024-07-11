@@ -25,8 +25,13 @@ public final class LuceneByteFieldCodec extends AbstractLuceneNumericFieldCodec<
 
 	@Override
 	public Byte decode(IndexableField field) {
-		Integer integer = (Integer) field.numericValue();
+		Integer integer = raw( field );
 		return integer.byteValue();
+	}
+
+	@Override
+	public Integer raw(IndexableField field) {
+		return (Integer) field.numericValue();
 	}
 
 	@Override

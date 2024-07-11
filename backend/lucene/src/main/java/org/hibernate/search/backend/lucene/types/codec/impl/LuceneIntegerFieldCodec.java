@@ -29,6 +29,11 @@ public final class LuceneIntegerFieldCodec extends AbstractLuceneNumericFieldCod
 	}
 
 	@Override
+	public Integer raw(IndexableField field) {
+		return decode( field );
+	}
+
+	@Override
 	public Integer encode(Integer value) {
 		return value;
 	}

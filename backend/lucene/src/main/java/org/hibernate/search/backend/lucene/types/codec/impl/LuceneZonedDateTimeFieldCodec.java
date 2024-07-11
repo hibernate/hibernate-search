@@ -56,6 +56,11 @@ public final class LuceneZonedDateTimeFieldCodec extends AbstractLuceneNumericFi
 	}
 
 	@Override
+	public Long raw(IndexableField field) {
+		return encode( decode( field ) );
+	}
+
+	@Override
 	public Long encode(ZonedDateTime value) {
 		return value == null ? null : value.toInstant().toEpochMilli();
 	}

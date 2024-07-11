@@ -51,6 +51,11 @@ public final class LuceneOffsetTimeFieldCodec extends AbstractLuceneNumericField
 	}
 
 	@Override
+	public Long raw(IndexableField field) {
+		return encode( decode( field ) );
+	}
+
+	@Override
 	public Long encode(OffsetTime value) {
 		if ( value == null ) {
 			return null;

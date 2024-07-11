@@ -52,6 +52,11 @@ public final class LuceneMonthDayFieldCodec extends AbstractLuceneNumericFieldCo
 	}
 
 	@Override
+	public Integer raw(IndexableField field) {
+		return encode( decode( field ) );
+	}
+
+	@Override
 	public Integer encode(MonthDay value) {
 		if ( value == null ) {
 			return null;

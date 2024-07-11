@@ -40,6 +40,11 @@ public final class LuceneInstantFieldCodec extends AbstractLuceneNumericFieldCod
 	}
 
 	@Override
+	public Long raw(IndexableField field) {
+		return encode( decode( field ) );
+	}
+
+	@Override
 	public Long encode(Instant value) {
 		return value == null ? null : value.toEpochMilli();
 	}

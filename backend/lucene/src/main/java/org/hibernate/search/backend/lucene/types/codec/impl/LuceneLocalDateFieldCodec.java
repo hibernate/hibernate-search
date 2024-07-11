@@ -50,6 +50,11 @@ public final class LuceneLocalDateFieldCodec extends AbstractLuceneNumericFieldC
 	}
 
 	@Override
+	public Long raw(IndexableField field) {
+		return encode( decode( field ) );
+	}
+
+	@Override
 	public Long encode(LocalDate value) {
 		return value == null ? null : value.toEpochDay();
 	}
