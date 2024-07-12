@@ -9,9 +9,7 @@ import static org.hibernate.search.util.impl.integrationtest.backend.elasticsear
 import static org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmUtils.with;
 import static org.hibernate.search.util.impl.test.JsonHelper.assertJsonEquals;
 
-import java.time.LocalDate;
 import java.util.List;
-import java.util.Map;
 import java.util.function.Consumer;
 
 import jakarta.persistence.EntityManagerFactory;
@@ -19,12 +17,8 @@ import jakarta.persistence.EntityManagerFactory;
 import org.hibernate.search.backend.elasticsearch.ElasticsearchExtension;
 import org.hibernate.search.documentation.testsupport.BackendConfigurations;
 import org.hibernate.search.documentation.testsupport.DocumentationSetupHelper;
-import org.hibernate.search.engine.search.aggregation.AggregationKey;
-import org.hibernate.search.engine.search.common.ValueModel;
-import org.hibernate.search.engine.search.query.SearchResult;
 import org.hibernate.search.mapper.orm.Search;
 import org.hibernate.search.mapper.orm.session.SearchSession;
-import org.hibernate.search.util.common.data.Range;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -104,46 +98,6 @@ class ElasticsearchProjectionDslIT {
 		} );
 	}
 
-	@Test
-	void modelValueString() {
-		withinSearchSession( searchSession -> {
-			List<?> hits = searchSession.search( Author.class )
-					.select( f -> f.field( "birthDate", String.class, ValueModel.RAW ) )
-					//					.where( f -> f.match().field( "birthDate" ).matching( "2020-01-01", ValueModel.RAW ) )
-					.where( f -> f.match().field( "age" ).matching( "123", ValueModel.RAW ) )
-					.fetchHits( 20 );
-			assertThat( hits ).hasSize( 1 );
-
-		} );
-	}
-
-	@Test
-	void modelValueRaw() {
-		withinSearchSession( searchSession -> {
-			AggregationKey<Map<Range<String>, Long>> dates = AggregationKey.of( "dates" );
-			AggregationKey<Map<String, Long>> dateTerms = AggregationKey.of( "dateTerms" );
-			SearchResult<String> hits = searchSession.search( Author.class )
-					.select( f -> f.field( "birthDate", String.class, ValueModel.RAW ) )
-					.where( f -> f.match().field( "birthDate" ).matching( "2020-01-01", ValueModel.RAW ) )
-					.sort( f -> f.field( "birthDate" ).missing().use( "1577836800", ValueModel.RAW ) )
-					.aggregation( dates, f -> f.range().field( "birthDate", String.class, ValueModel.RAW )
-							.range( "1900-01-01", "2020-10-10" )
-					)
-					.aggregation( dateTerms, f -> f.terms().field( "birthDate", String.class, ValueModel.RAW ) )
-					.fetch( 20 );
-			assertThat( hits.aggregation( dates ) )
-					.hasSize( 1 )
-					.containsValue( 1L );
-			assertThat( hits.aggregation( dateTerms ) )
-					.hasSize( 1 )
-					.containsKey( "2020-01-01" )
-					.containsValue( 1L );
-			assertThat( hits.hits() )
-					.hasSize( 1 )
-					.containsOnly( "2020-01-01" );
-		} );
-	}
-
 	private void withinSearchSession(Consumer<SearchSession> action) {
 		with( entityManagerFactory ).runInTransaction( entityManager -> {
 			SearchSession searchSession = Search.session( entityManager );
@@ -157,16 +111,12 @@ class ElasticsearchProjectionDslIT {
 			isaacAsimov.setId( ASIMOV_ID );
 			isaacAsimov.setFirstName( "Isaac" );
 			isaacAsimov.setLastName( "Asimov" );
-			isaacAsimov.setBirthDate( LocalDate.of( 2020, 1, 1 ) );
-			isaacAsimov.setAge( 150 );
 			isaacAsimov.setPlaceOfBirth( EmbeddableGeoPoint.of( 53.976177, 32.158627 ) );
 
 			Author aLeeMartinez = new Author();
 			aLeeMartinez.setId( MARTINEZ_ID );
 			aLeeMartinez.setFirstName( "A. Lee" );
 			aLeeMartinez.setLastName( "Martinez" );
-			aLeeMartinez.setBirthDate( LocalDate.of( 2222, 1, 1 ) );
-			aLeeMartinez.setAge( 123 );
 			aLeeMartinez.setPlaceOfBirth( EmbeddableGeoPoint.of( 31.814315, -106.475524 ) );
 
 			Book book1 = new Book();

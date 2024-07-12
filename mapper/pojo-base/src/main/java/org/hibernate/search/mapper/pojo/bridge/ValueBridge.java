@@ -9,6 +9,7 @@ import java.util.Objects;
 import org.hibernate.search.mapper.pojo.bridge.runtime.ValueBridgeFromIndexedValueContext;
 import org.hibernate.search.mapper.pojo.bridge.runtime.ValueBridgeToIndexedValueContext;
 import org.hibernate.search.mapper.pojo.bridge.runtime.ValueBridgeToIndexedValueContextExtension;
+import org.hibernate.search.util.common.annotation.Incubating;
 
 /**
  * A bridge between a POJO-extracted value of type {@code V} and an index field of type {@code F}.
@@ -59,6 +60,12 @@ public interface ValueBridge<V, F> extends AutoCloseable {
 				+ " does not support parsing a value from a String. Trying to parse the value: " + value + "." );
 	}
 
+	/**
+	 * Format the value to a String.
+	 * @param value The value to format.
+	 * @return The formatted String.
+	 */
+	@Incubating
 	default String format(F value) {
 		return Objects.toString( value, null );
 	}

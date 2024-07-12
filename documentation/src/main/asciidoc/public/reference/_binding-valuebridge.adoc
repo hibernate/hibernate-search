@@ -168,7 +168,7 @@ By default, when a custom bridge is used, some Hibernate Search features like
 specifying the `indexNullAs` attribute of `@*Field` annotations,
 or using a field with such a custom bridge in query string predicates
 (<<search-dsl-predicate-simple-query-string,`simpleQueryString()`>>/<<search-dsl-predicate-query-string,`queryString()`>>)
-with local backends (e.g. Lucene),
+with local backends (e.g. Lucene), or when using the `ValueModel.STRING` in the Search DSL
 will not work out of the box.
 
 In order to make it work, the bridge needs to implement the `parse` method
@@ -199,6 +199,40 @@ but necessary in order for Hibernate ORM to store the data correctly in the data
 include::{sourcedir}/org/hibernate/search/documentation/mapper/orm/binding/valuebridge/indexnullas/ValueBridgeIndexNullAsIT.java[tags=string-query]
 ----
 <1> Use a string representation of an ISBN in a query string predicate.
+====
+[[binding-valuebridge-format]]
+== Formatting the value as string with `format()`
+
+By default, when a custom bridge is used, requesting a `ValueModel.STRING` for a field projection
+will use a simple `toString()` call.
+
+In order to customize the format, the bridge needs to implement the `format` method
+so that Hibernate Search can convert the index field to the desired string representation.
+
+.Implementing `format`
+====
+[source, JAVA, indent=0, subs="+callouts"]
+----
+include::{sourcedir}/org/hibernate/search/documentation/mapper/orm/binding/valuebridge/string/ISBNValueBridge.java[tags=include]
+----
+<1> Implement `format` as necessary.
+The bridge may throw exceptions for invalid values.
+
+[source, JAVA, indent=0, subs="+callouts"]
+----
+include::{sourcedir}/org/hibernate/search/documentation/mapper/orm/binding/valuebridge/string/Book.java[tags=include;!getters-setters]
+----
+<1> This is unrelated to the value bridge,
+but necessary in order for Hibernate ORM to store the data correctly in the database.
+<2> Map the property to an index field.
+<3> Instruct Hibernate Search to use our custom value bridge.
+<4> Configure the field as projectable.
+
+[source, JAVA, indent=0, subs="+callouts"]
+----
+include::{sourcedir}/org/hibernate/search/documentation/mapper/orm/binding/valuebridge/string/ValueBridgeStringIT.java[tags=include]
+----
+<1> Use a string representation when requesting the field projection.
 ====
 
 [[binding-valuebridge-iscompatiblewith]]

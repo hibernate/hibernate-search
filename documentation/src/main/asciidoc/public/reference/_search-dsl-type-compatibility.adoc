@@ -60,8 +60,8 @@ instead of the default `Enum#name()`.
 
 Then, we will need to tell Hibernate Search that the value passed to the DSL should not be passed to the DSL converter,
 but should be assumed to match the type of the index field directly (in this case, `String`).
-To that end, one can simply use the variant of the `matching` method that accepts a `ValueConvert` parameter,
-and pass `ValueConvert.NO`:
+To that end, one can simply use the variant of the `matching` method that accepts a `ValueModel` parameter,
+and pass `ValueModel.INDEX`:
 
 .Disabling the DSL converter
 ====
@@ -71,19 +71,37 @@ include::{sourcedir}/org/hibernate/search/documentation/search/converter/DslConv
 ----
 ====
 
-All methods that apply DSL converters offer a variant that accepts a `ValueConvert` parameter:
+All methods that apply DSL converters offer a variant that accepts a `ValueModel` parameter:
 `matching`, `between`, `atLeast`, `atMost`, `greaterThan`, `lessThan`, `range`, ...
 
-In some cases, it may be helpful to pass string values to these DSL steps. `ValueConvert.PARSE` can be used to address that.
+In some cases, it may be helpful to pass string values to these DSL steps. `ValueModel.STRING` can be used to address that.
 By default, the string format should be compatible with the parsing logic defined in <<mapping-directfieldmapping-supported-types-table>>,
 alternatively see how it can be <<binding-valuebridge-parse,customized with bridges>>.
 
-.Using the `PARSE` DSL converter to work with string arguments
+.Using the `STRING` DSL converter to work with string arguments
 ====
 [source, JAVA, indent=0]
 ----
-include::{sourcedir}/org/hibernate/search/documentation/search/converter/DslConverterIT.java[tags=dsl-converter-parse]
+include::{sourcedir}/org/hibernate/search/documentation/search/converter/DslConverterIT.java[tags=dsl-converter-string]
 ----
+====
+
+There is also a possibility to use "raw" types that search backends operate with by passing `ValueModel.RAW` to the DSL step.
+
+CAUTION: Raw types are both backend and implementation specific. Use `ValueModel.RAW` cautiously and be aware that
+the format or types themselves may change in the future.
+
+Currently, the <<backend-elasticsearch,Elasticsearch backend>> uses `String` representation of raw types,
+while the <<backend-lucene,Lucene backend>> uses a variety of types depending on how a particular filed is stored in the index.
+Inspect the corresponding implementation of the `LuceneFieldCodec` to identify the type.
+
+.Using the `RAW` DSL converter to work with raw arguments
+====
+[source, JAVA, indent=0]
+----
+include::{sourcedir}/org/hibernate/search/documentation/search/converter/DslConverterIT.java[tags=dsl-converter-raw]
+----
+<1> Keep in mind that raw value is backend specific.
 ====
 
 [NOTE]
@@ -137,8 +155,8 @@ But in some cases, you may want to disable this conversion and return the index 
 (i.e. the value of `Enum.name()`).
 
 In that case, we will need to tell Hibernate Search that the value returned by the backend should not be passed to the projection converter.
-To that end, one can simply use the variant of the `field` method that accepts a `ValueConvert` parameter,
-and pass `ValueConvert.NO`:
+To that end, one can simply use the variant of the `field` method that accepts a `ValueModel` parameter,
+and pass `ValueModel.INDEX`:
 
 .Disabling the projection converter
 ====
@@ -146,6 +164,24 @@ and pass `ValueConvert.NO`:
 ----
 include::{sourcedir}/org/hibernate/search/documentation/search/converter/ProjectionConverterIT.java[tags=projection-converter-disabled]
 ----
+====
+
+There is also a possibility to request "raw" types that search backends operate with by passing `ValueModel.RAW` to the projection DSL step.
+
+CAUTION: Raw types are both backend and implementation specific. Use `ValueModel.RAW` cautiously and be aware that
+the format or types themselves may change in the future.
+
+Currently, the <<backend-elasticsearch,Elasticsearch backend>> uses `String` representation of raw types,
+while the <<backend-lucene,Lucene backend>> uses a variety of types depending on how a particular filed is stored in the index.
+Inspect the corresponding implementation of the `LuceneFieldCodec` to identify the type.
+
+.Using the `RAW` projection converter to work with raw projections
+====
+[source, JAVA, indent=0]
+----
+include::{sourcedir}/org/hibernate/search/documentation/search/converter/ProjectionConverterIT.java[tags=projection-converter-raw]
+----
+<1> Keep in mind that raw value is backend specific.
 ====
 
 [NOTE]

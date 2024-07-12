@@ -13,9 +13,7 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
 import jakarta.persistence.ManyToMany;
 
-import org.hibernate.search.engine.backend.types.Aggregable;
 import org.hibernate.search.engine.backend.types.Projectable;
-import org.hibernate.search.engine.backend.types.Sortable;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.FullTextField;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.GenericField;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
@@ -33,11 +31,8 @@ public class Author {
 	@FullTextField(analyzer = "name", projectable = Projectable.YES)
 	private String lastName;
 
-	@GenericField(projectable = Projectable.YES, sortable = Sortable.YES, aggregable = Aggregable.YES)
-	private LocalDate birthDate;
-
 	@GenericField(projectable = Projectable.YES)
-	private Integer age;
+	private LocalDate birthDate;
 
 	@Embedded
 	@GenericField(projectable = Projectable.YES)
@@ -106,13 +101,5 @@ public class Author {
 
 	public void setFlattenedBooks(List<Book> flattenedBooks) {
 		this.flattenedBooks = flattenedBooks;
-	}
-
-	public Integer getAge() {
-		return age;
-	}
-
-	public void setAge(Integer age) {
-		this.age = age;
 	}
 }
