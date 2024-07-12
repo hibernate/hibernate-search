@@ -8,11 +8,15 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.time.Duration;
+import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.hibernate.search.backend.elasticsearch.ElasticsearchDistributionName;
 import org.hibernate.search.backend.elasticsearch.ElasticsearchVersion;
+
+import com.github.dockerjava.api.model.HostConfig;
+import com.github.dockerjava.api.model.Ulimit;
 
 import org.testcontainers.containers.GenericContainer;
 import org.testcontainers.containers.wait.strategy.HttpWaitStrategy;
@@ -164,6 +168,13 @@ public final class SearchBackendContainer {
 			// Note: For OpenSearch 2.12 and later, a custom password for the admin user is required to be passed to set-up and utilize demo configuration.
 			container.withEnv( "OPENSEARCH_INITIAL_ADMIN_PASSWORD", "NotActua11y$trongPa$$word" );
 		}
+		container.withCreateContainerCmdModifier( cmd -> {
+			HostConfig hostConfig = cmd.getHostConfig();
+			if ( hostConfig == null ) {
+				throw new IllegalStateException( "Host config is `null`. Cannot redefine the ulimits!" );
+			}
+			hostConfig.withUlimits( List.of( new Ulimit( "nofile", 65536L, 65536L ) ) );
+		} );
 		return container;
 	}
 
