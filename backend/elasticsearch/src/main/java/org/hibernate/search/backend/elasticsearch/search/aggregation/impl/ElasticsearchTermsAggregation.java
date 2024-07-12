@@ -91,13 +91,17 @@ public class ElasticsearchTermsAggregation<F, K, T>
 			this.field = field;
 		}
 
+		@SuppressWarnings("unchecked")
 		@Override
 		public <T> Builder<F, T, ?> type(Class<T> expectedType, ValueModel valueModel) {
 			if ( ValueModel.RAW.equals( valueModel ) ) {
 				return new Builder<>(
 						(key, string) -> string != null && !string.isJsonNull() ? string.getAsString() : key.getAsString(),
 						scope, field,
-						field.type().rawProjectionConverter().withConvertedType( expectedType, field )
+						// unchecked cast to make eclipse-compiler happy
+						// we know that Elasticsearch projection converters work with the String
+						( (ProjectionConverter<String, ?>) field.type().rawProjectionConverter() )
+								.withConvertedType( expectedType, field )
 				);
 			}
 			else {
