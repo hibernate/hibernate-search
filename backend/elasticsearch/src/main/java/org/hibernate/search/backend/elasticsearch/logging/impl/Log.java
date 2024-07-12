@@ -533,7 +533,7 @@ public interface Log extends BasicLogger {
 			value = "Invalid Elasticsearch index layout:"
 					+ " the write alias and read alias are set to the same value: '%1$s'."
 					+ " The write alias and read alias must be different.")
-	SearchException sameWriteAndReadAliases(URLEncodedString writeAndReadAlias, @Param EventContext eventContext);
+	SearchException sameWriteAndReadAliases(URLEncodedString writeAndReadAlias);
 
 	@Message(id = ID_OFFSET + 97,
 			value = "Missing or imprecise Elasticsearch version:"

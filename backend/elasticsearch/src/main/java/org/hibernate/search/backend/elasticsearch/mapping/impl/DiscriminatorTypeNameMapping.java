@@ -11,6 +11,7 @@ import org.hibernate.search.backend.elasticsearch.document.impl.DocumentMetadata
 import org.hibernate.search.backend.elasticsearch.document.model.dsl.impl.ElasticsearchStringImplicitFieldContributor;
 import org.hibernate.search.backend.elasticsearch.document.model.dsl.impl.IndexSchemaRootContributor;
 import org.hibernate.search.backend.elasticsearch.gson.impl.JsonAccessor;
+import org.hibernate.search.backend.elasticsearch.index.layout.IndexLayoutStrategy;
 import org.hibernate.search.backend.elasticsearch.index.layout.impl.IndexNames;
 import org.hibernate.search.backend.elasticsearch.logging.impl.Log;
 import org.hibernate.search.backend.elasticsearch.lowlevel.index.mapping.impl.DataTypes;
@@ -54,6 +55,11 @@ public class DiscriminatorTypeNameMapping implements TypeNameMapping {
 	@Override
 	public Optional<ImplicitFieldContributor> getImplicitFieldContributor() {
 		return Optional.of( new ElasticsearchStringImplicitFieldContributor( MAPPED_TYPE_FIELD_NAME ) );
+	}
+
+	@Override
+	public void onStart(IndexLayoutStrategy indexLayoutStrategy) {
+		// do nothing
 	}
 
 	@Override

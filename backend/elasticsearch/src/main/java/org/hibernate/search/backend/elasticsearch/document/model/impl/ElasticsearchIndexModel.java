@@ -9,6 +9,7 @@ import java.util.Map;
 
 import org.hibernate.search.backend.elasticsearch.analysis.model.impl.ElasticsearchAnalysisDefinitionRegistry;
 import org.hibernate.search.backend.elasticsearch.document.model.lowlevel.impl.LowLevelIndexMetadataBuilder;
+import org.hibernate.search.backend.elasticsearch.index.impl.IndexManagerBackendContext;
 import org.hibernate.search.backend.elasticsearch.index.layout.impl.IndexNames;
 import org.hibernate.search.backend.elasticsearch.lowlevel.index.mapping.impl.RootTypeMapping;
 import org.hibernate.search.backend.elasticsearch.lowlevel.index.settings.impl.IndexSettings;
@@ -22,7 +23,7 @@ public class ElasticsearchIndexModel
 		extends AbstractIndexModel<ElasticsearchIndexModel, ElasticsearchIndexRoot, ElasticsearchIndexField>
 		implements ElasticsearchIndexDescriptor, ElasticsearchSearchIndexContext {
 
-	private final IndexNames names;
+	private final String hibernateSearchIndexName;
 
 	private final ElasticsearchAnalysisDefinitionRegistry analysisDefinitionRegistry;
 	private final PropertyMappingIndexSettingsContributor propertyMappingIndexSettingsContributor;
@@ -30,7 +31,9 @@ public class ElasticsearchIndexModel
 	private final RootTypeMapping mapping;
 	private final RootTypeMapping customMapping;
 
-	public ElasticsearchIndexModel(IndexNames names, String mappedTypeName,
+	private IndexNames names;
+
+	public ElasticsearchIndexModel(String hibernateSearchIndexName, String mappedTypeName,
 			IndexIdentifier identifier,
 			ElasticsearchIndexRoot rootNode, Map<String, ElasticsearchIndexField> staticFields,
 			List<AbstractElasticsearchIndexFieldTemplate<?>> fieldTemplates,
@@ -38,9 +41,9 @@ public class ElasticsearchIndexModel
 			PropertyMappingIndexSettingsContributor propertyMappingIndexSettingsContributor,
 			IndexSettings customIndexSettings,
 			RootTypeMapping mapping, RootTypeMapping customMapping) {
-		super( analysisDefinitionRegistry, names.hibernateSearchIndex(), mappedTypeName, identifier, rootNode, staticFields,
+		super( analysisDefinitionRegistry, hibernateSearchIndexName, mappedTypeName, identifier, rootNode, staticFields,
 				fieldTemplates );
-		this.names = names;
+		this.hibernateSearchIndexName = hibernateSearchIndexName;
 		this.analysisDefinitionRegistry = analysisDefinitionRegistry;
 		this.propertyMappingIndexSettingsContributor = propertyMappingIndexSettingsContributor;
 		this.customIndexSettings = customIndexSettings;
@@ -86,5 +89,13 @@ public class ElasticsearchIndexModel
 	@Override
 	public String writeName() {
 		return names.write().toString();
+	}
+
+	public String hibernateSearchIndexName() {
+		return hibernateSearchIndexName;
+	}
+
+	public void onStart(IndexManagerBackendContext backendContext) {
+		this.names = backendContext.createIndexNames( hibernateSearchIndexName, mappedTypeName() );
 	}
 }

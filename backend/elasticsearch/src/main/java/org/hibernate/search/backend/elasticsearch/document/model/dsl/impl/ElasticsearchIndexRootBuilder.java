@@ -20,7 +20,6 @@ import org.hibernate.search.backend.elasticsearch.document.model.impl.Elasticsea
 import org.hibernate.search.backend.elasticsearch.document.model.impl.ElasticsearchIndexValueField;
 import org.hibernate.search.backend.elasticsearch.document.model.impl.ElasticsearchIndexValueFieldTemplate;
 import org.hibernate.search.backend.elasticsearch.index.DynamicMapping;
-import org.hibernate.search.backend.elasticsearch.index.layout.impl.IndexNames;
 import org.hibernate.search.backend.elasticsearch.lowlevel.index.mapping.impl.DynamicType;
 import org.hibernate.search.backend.elasticsearch.lowlevel.index.mapping.impl.NamedDynamicTemplate;
 import org.hibernate.search.backend.elasticsearch.lowlevel.index.mapping.impl.RootTypeMapping;
@@ -56,7 +55,7 @@ public class ElasticsearchIndexRootBuilder extends AbstractElasticsearchIndexCom
 	private final BackendMapperContext backendMapperContext;
 	private final List<IndexSchemaRootContributor> schemaRootContributors = new ArrayList<>();
 	private final List<ImplicitFieldContributor> implicitFieldContributors = new ArrayList<>();
-	private final IndexNames indexNames;
+	private final String hibernateSearchIndexName;
 	private final String mappedTypeName;
 	private final ElasticsearchAnalysisDefinitionRegistry analysisDefinitionRegistry;
 	private final IndexSettings customIndexSettings;
@@ -70,7 +69,7 @@ public class ElasticsearchIndexRootBuilder extends AbstractElasticsearchIndexCom
 
 	public ElasticsearchIndexRootBuilder(ElasticsearchIndexFieldTypeFactoryProvider typeFactoryProvider,
 			EventContext indexEventContext,
-			BackendMapperContext backendMapperContext, IndexNames indexNames, String mappedTypeName,
+			BackendMapperContext backendMapperContext, String hibernateSearchIndexName, String mappedTypeName,
 			ElasticsearchAnalysisDefinitionRegistry analysisDefinitionRegistry,
 			IndexSettings customIndexSettings, RootTypeMapping customIndexMapping,
 			DynamicMapping dynamicMapping) {
@@ -78,7 +77,7 @@ public class ElasticsearchIndexRootBuilder extends AbstractElasticsearchIndexCom
 		this.typeFactoryProvider = typeFactoryProvider;
 		this.indexEventContext = indexEventContext;
 		this.backendMapperContext = backendMapperContext;
-		this.indexNames = indexNames;
+		this.hibernateSearchIndexName = hibernateSearchIndexName;
 		this.mappedTypeName = mappedTypeName;
 		this.analysisDefinitionRegistry = analysisDefinitionRegistry;
 		this.customIndexSettings = customIndexSettings;
@@ -209,7 +208,9 @@ public class ElasticsearchIndexRootBuilder extends AbstractElasticsearchIndexCom
 			contributor.contribute( implicitFieldCollector );
 		}
 
-		return new ElasticsearchIndexModel( indexNames, mappedTypeName, identifier,
+		return new ElasticsearchIndexModel(
+				hibernateSearchIndexName,
+				mappedTypeName, identifier,
 				rootNode, staticFields, fieldTemplates,
 				analysisDefinitionRegistry, propertyMappingIndexSettingsContributor, customIndexSettings, mapping,
 				customIndexMapping );

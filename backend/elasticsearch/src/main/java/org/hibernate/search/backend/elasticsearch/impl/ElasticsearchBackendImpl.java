@@ -25,8 +25,6 @@ import org.hibernate.search.backend.elasticsearch.document.model.dsl.impl.Elasti
 import org.hibernate.search.backend.elasticsearch.index.DynamicMapping;
 import org.hibernate.search.backend.elasticsearch.index.impl.ElasticsearchIndexManagerBuilder;
 import org.hibernate.search.backend.elasticsearch.index.impl.IndexManagerBackendContext;
-import org.hibernate.search.backend.elasticsearch.index.layout.IndexLayoutStrategy;
-import org.hibernate.search.backend.elasticsearch.index.layout.impl.IndexNames;
 import org.hibernate.search.backend.elasticsearch.logging.impl.Log;
 import org.hibernate.search.backend.elasticsearch.lowlevel.index.mapping.impl.RootTypeMapping;
 import org.hibernate.search.backend.elasticsearch.lowlevel.index.settings.impl.IndexSettings;
@@ -35,7 +33,6 @@ import org.hibernate.search.backend.elasticsearch.multitenancy.impl.MultiTenancy
 import org.hibernate.search.backend.elasticsearch.orchestration.impl.ElasticsearchSimpleWorkOrchestrator;
 import org.hibernate.search.backend.elasticsearch.resources.impl.BackendThreads;
 import org.hibernate.search.backend.elasticsearch.types.dsl.provider.impl.ElasticsearchIndexFieldTypeFactoryProvider;
-import org.hibernate.search.backend.elasticsearch.util.spi.URLEncodedString;
 import org.hibernate.search.backend.elasticsearch.validation.impl.ElasticsearchPropertyMappingValidatorProvider;
 import org.hibernate.search.engine.backend.Backend;
 import org.hibernate.search.engine.backend.index.spi.IndexManagerBuilder;
@@ -99,11 +96,9 @@ class ElasticsearchBackendImpl
 	private final ElasticsearchIndexFieldTypeFactoryProvider typeFactoryProvider;
 	private final Gson userFacingGson;
 	private final MultiTenancyStrategy multiTenancyStrategy;
-	private final BeanHolder<? extends IndexLayoutStrategy> indexLayoutStrategyHolder;
 	private final TypeNameMapping typeNameMapping;
 
 	private final IndexManagerBackendContext indexManagerBackendContext;
-	private final IndexNamesRegistry indexNamesRegistry;
 
 	ElasticsearchBackendImpl(Optional<String> backendName,
 			EventContext eventContext,
@@ -113,9 +108,7 @@ class ElasticsearchBackendImpl
 			ElasticsearchPropertyMappingValidatorProvider propertyMappingValidatorProvider,
 			Gson userFacingGson,
 			MultiTenancyStrategy multiTenancyStrategy,
-			BeanHolder<? extends IndexLayoutStrategy> indexLayoutStrategyHolder,
-			TypeNameMapping typeNameMapping,
-			FailureHandler failureHandler, TimingSource timingSource) {
+			TypeNameMapping typeNameMapping, FailureHandler failureHandler, TimingSource timingSource) {
 		this.backendName = backendName;
 		this.eventContext = eventContext;
 		this.threads = threads;
@@ -126,22 +119,19 @@ class ElasticsearchBackendImpl
 				link
 		);
 		this.multiTenancyStrategy = multiTenancyStrategy;
+		this.typeNameMapping = typeNameMapping;
 		this.typeFactoryProvider = typeFactoryProvider;
 		this.userFacingGson = userFacingGson;
-		this.indexLayoutStrategyHolder = indexLayoutStrategyHolder;
-		this.typeNameMapping = typeNameMapping;
 
 		this.indexManagerBackendContext = new IndexManagerBackendContext(
 				this, eventContext, threads, link,
 				userFacingGson,
 				multiTenancyStrategy,
-				indexLayoutStrategyHolder.get(),
 				typeNameMapping,
 				failureHandler, timingSource,
 				generalPurposeOrchestrator,
 				propertyMappingValidatorProvider
 		);
-		this.indexNamesRegistry = new IndexNamesRegistry();
 	}
 
 	@Override
@@ -151,6 +141,7 @@ class ElasticsearchBackendImpl
 
 	@Override
 	public void start(BackendStartContext context) {
+		indexManagerBackendContext.start( context );
 		threads.onStart( context.configurationPropertySource(), context.beanResolver(), context.threadPoolProvider() );
 		link.onStart( context.beanResolver(), context.configurationPropertySource() );
 		generalPurposeOrchestrator.start( context.configurationPropertySource() );
@@ -166,7 +157,7 @@ class ElasticsearchBackendImpl
 		try ( Closer<RuntimeException> closer = new Closer<>() ) {
 			closer.push( ElasticsearchSimpleWorkOrchestrator::stop, generalPurposeOrchestrator );
 			closer.push( ElasticsearchLinkImpl::onStop, link );
-			closer.push( BeanHolder::close, indexLayoutStrategyHolder );
+			closer.push( IndexManagerBackendContext::stop, indexManagerBackendContext );
 			closer.push( BackendThreads::onStop, threads );
 		}
 	}
@@ -203,14 +194,13 @@ class ElasticsearchBackendImpl
 
 		EventContext indexEventContext = EventContexts.fromIndexName( hibernateSearchIndexName );
 
-		IndexNames indexNames = createIndexNames( indexEventContext, hibernateSearchIndexName, mappedTypeName );
-
 		ElasticsearchAnalysisDefinitionRegistry analysisDefinitionRegistry =
 				createAnalysisDefinitionRegistry( buildContext, indexEventContext, propertySource );
 
 		return new ElasticsearchIndexManagerBuilder(
 				indexManagerBackendContext,
-				createIndexSchemaRootNodeBuilder( indexEventContext, backendMapperContext, indexNames, mappedTypeName,
+				createIndexSchemaRootNodeBuilder( indexEventContext, backendMapperContext, hibernateSearchIndexName,
+						mappedTypeName,
 						analysisDefinitionRegistry,
 						customIndexSettings( buildContext, propertySource, indexEventContext ),
 						customIndexMappings( buildContext, propertySource, indexEventContext ),
@@ -220,38 +210,8 @@ class ElasticsearchBackendImpl
 		);
 	}
 
-	private IndexNames createIndexNames(EventContext indexEventContext, String hibernateSearchIndexName,
-			String mappedTypeName) {
-		IndexLayoutStrategy indexLayoutStrategy = indexLayoutStrategyHolder.get();
-		URLEncodedString writeAlias = IndexNames.encodeName( indexLayoutStrategy.createWriteAlias( hibernateSearchIndexName ) );
-		URLEncodedString readAlias = IndexNames.encodeName( indexLayoutStrategy.createReadAlias( hibernateSearchIndexName ) );
-
-		URLEncodedString primaryName = null;
-		if ( writeAlias == null || readAlias == null ) {
-			primaryName = IndexNames.encodeName(
-					indexLayoutStrategy.createInitialElasticsearchIndexName( hibernateSearchIndexName ) );
-		}
-		else if ( writeAlias.equals( readAlias ) ) {
-			throw log.sameWriteAndReadAliases( writeAlias, indexEventContext );
-		}
-
-		URLEncodedString readName = readAlias != null ? readAlias : primaryName;
-		URLEncodedString writeName = writeAlias != null ? writeAlias : primaryName;
-
-		IndexNames indexNames = new IndexNames( hibernateSearchIndexName,
-				writeName, writeAlias != null, readName, readAlias != null );
-
-		// This will check that names are unique.
-		indexNamesRegistry.register( indexNames );
-
-		// This will allow the type mapping to resolve the type name from the index name.
-		typeNameMapping.register( indexNames, mappedTypeName );
-
-		return indexNames;
-	}
-
 	private ElasticsearchIndexRootBuilder createIndexSchemaRootNodeBuilder(EventContext indexEventContext,
-			BackendMapperContext backendMapperContext, IndexNames indexNames, String mappedTypeName,
+			BackendMapperContext backendMapperContext, String hibernateSearchIndexName, String mappedTypeName,
 			ElasticsearchAnalysisDefinitionRegistry analysisDefinitionRegistry,
 			IndexSettings customIndexSettings, RootTypeMapping customIndexMapping,
 			DynamicMapping dynamicMapping) {
@@ -260,7 +220,7 @@ class ElasticsearchBackendImpl
 				typeFactoryProvider,
 				indexEventContext,
 				backendMapperContext,
-				indexNames,
+				hibernateSearchIndexName,
 				mappedTypeName,
 				analysisDefinitionRegistry,
 				customIndexSettings, customIndexMapping,
