@@ -13,7 +13,6 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 
-import org.hibernate.search.engine.search.common.ValueConvert;
 import org.hibernate.search.engine.search.common.ValueModel;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.DocumentId;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.FieldProjection;
@@ -166,6 +165,7 @@ class ProjectionConstructorFieldProjectionIT extends AbstractProjectionConstruct
 		);
 	}
 
+	@Deprecated
 	@Test
 	void valueConvert_nonDefaultFails() {
 		@Indexed(index = INDEX_NAME)
@@ -178,9 +178,9 @@ class ProjectionConstructorFieldProjectionIT extends AbstractProjectionConstruct
 		class MyProjection {
 			public final String myEnum;
 
-			@SuppressWarnings("deprecation")
 			@ProjectionConstructor
-			public MyProjection(@FieldProjection(convert = ValueConvert.NO) String myEnum) {
+			public MyProjection(
+					@FieldProjection(convert = org.hibernate.search.engine.search.common.ValueConvert.NO) String myEnum) {
 				this.myEnum = myEnum;
 			}
 		}

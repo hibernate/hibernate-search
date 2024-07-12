@@ -15,7 +15,6 @@ import java.util.Objects;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
-import org.hibernate.search.engine.search.common.ValueConvert;
 import org.hibernate.search.engine.search.common.ValueModel;
 import org.hibernate.search.engine.search.predicate.dsl.PredicateFinalStep;
 import org.hibernate.search.engine.search.predicate.dsl.SearchPredicateFactory;
@@ -597,14 +596,14 @@ class TermsPredicateBaseIT {
 		@Deprecated
 		@Override
 		protected PredicateFinalStep predicate(SearchPredicateFactory f, String fieldPath, Object matchingParam,
-				ValueConvert valueConvert) {
+				org.hibernate.search.engine.search.common.ValueConvert valueConvert) {
 			return f.terms().field( fieldPath ).matchingAny( Collections.singletonList( matchingParam ), valueConvert );
 		}
 
 		@Deprecated
 		@Override
 		protected PredicateFinalStep predicate(SearchPredicateFactory f, String field0Path, String field1Path,
-				Object matchingParam, ValueConvert valueConvert) {
+				Object matchingParam, org.hibernate.search.engine.search.common.ValueConvert valueConvert) {
 			return f.terms().field( field0Path ).field( field1Path )
 					.matchingAny( Collections.singletonList( matchingParam ), valueConvert );
 

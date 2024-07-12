@@ -175,12 +175,16 @@ public class LuceneFieldProjection<F, V, P, T> extends AbstractLuceneProjection<
 			this.field = field;
 		}
 
+		@SuppressWarnings("unchecked")
 		@Override
 		public <V> Builder<F, V, ?> type(Class<V> expectedType, ValueModel valueModel) {
 			if ( ValueModel.RAW.equals( valueModel ) ) {
 				return new Builder<>( scope, field,
 						codec::raw,
-						field.type().rawProjectionConverter().withConvertedType( expectedType, field )
+						// unchecked cast to make eclipse-compiler happy
+						// we know that Lucene projection converters work with the encoded type
+						( (ProjectionConverter<E, ?>) field.type().rawProjectionConverter() )
+								.withConvertedType( expectedType, field )
 				);
 			}
 			else {

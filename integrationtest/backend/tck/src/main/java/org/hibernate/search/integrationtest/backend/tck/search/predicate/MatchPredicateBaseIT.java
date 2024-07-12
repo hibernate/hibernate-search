@@ -12,7 +12,6 @@ import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
 import org.hibernate.search.engine.backend.types.dsl.SearchableProjectableIndexFieldTypeOptionsStep;
-import org.hibernate.search.engine.search.common.ValueConvert;
 import org.hibernate.search.engine.search.common.ValueModel;
 import org.hibernate.search.engine.search.predicate.dsl.PredicateFinalStep;
 import org.hibernate.search.engine.search.predicate.dsl.SearchPredicateFactory;
@@ -567,14 +566,14 @@ class MatchPredicateBaseIT {
 		@Deprecated
 		@Override
 		protected PredicateFinalStep predicate(SearchPredicateFactory f, String fieldPath, Object matchingParam,
-				ValueConvert valueConvert) {
+				org.hibernate.search.engine.search.common.ValueConvert valueConvert) {
 			return f.match().field( fieldPath ).matching( matchingParam, valueConvert );
 		}
 
 		@Deprecated
 		@Override
 		protected PredicateFinalStep predicate(SearchPredicateFactory f, String field0Path, String field1Path,
-				Object matchingParam, ValueConvert valueConvert) {
+				Object matchingParam, org.hibernate.search.engine.search.common.ValueConvert valueConvert) {
 			return f.match().field( field0Path ).field( field1Path ).matching( matchingParam, valueConvert );
 		}
 

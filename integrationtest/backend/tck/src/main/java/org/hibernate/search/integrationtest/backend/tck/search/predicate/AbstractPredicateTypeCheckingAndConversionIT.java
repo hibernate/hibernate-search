@@ -22,7 +22,6 @@ import org.hibernate.search.engine.backend.types.converter.runtime.ToDocumentVal
 import org.hibernate.search.engine.backend.types.dsl.SearchableProjectableIndexFieldTypeOptionsStep;
 import org.hibernate.search.engine.backend.types.dsl.StandardIndexFieldTypeOptionsStep;
 import org.hibernate.search.engine.reporting.spi.EventContexts;
-import org.hibernate.search.engine.search.common.ValueConvert;
 import org.hibernate.search.engine.search.common.ValueModel;
 import org.hibernate.search.engine.search.predicate.dsl.PredicateFinalStep;
 import org.hibernate.search.engine.search.predicate.dsl.SearchPredicateFactory;
@@ -125,7 +124,7 @@ public abstract class AbstractPredicateTypeCheckingAndConversionIT<V extends Abs
 			DataSet<?, V> dataSet) {
 		assertThatQuery( index.query()
 				.where( f -> predicate( f, defaultDslConverterField0Path( index, dataSet ),
-						unwrappedMatchingParam( 0, dataSet ), ValueConvert.YES
+						unwrappedMatchingParam( 0, dataSet ), org.hibernate.search.engine.search.common.ValueConvert.YES
 				) )
 				.routing( dataSet.routingKey ) )
 				.hasDocRefHitsAnyOrder( index.typeName(), dataSet.docId( 0 ) );
@@ -212,7 +211,7 @@ public abstract class AbstractPredicateTypeCheckingAndConversionIT<V extends Abs
 			DataSet<?, V> dataSet) {
 		SearchPredicateFactory f = index.createScope().predicate();
 		assertThatThrownBy( () -> predicate( f, customDslConverterField0Path( index, dataSet ), invalidTypeParam(),
-				ValueConvert.YES ) )
+				org.hibernate.search.engine.search.common.ValueConvert.YES ) )
 				.isInstanceOf( SearchException.class )
 				.hasMessageContaining( "Unable to convert DSL argument: " )
 				.hasMessageContaining( InvalidType.class.getName() )
@@ -248,7 +247,7 @@ public abstract class AbstractPredicateTypeCheckingAndConversionIT<V extends Abs
 			DataSet<?, V> dataSet) {
 		assertThatQuery( index.query()
 				.where( f -> predicate( f, defaultDslConverterField0Path( index, dataSet ),
-						unwrappedMatchingParam( 0, dataSet ), ValueConvert.NO ) )
+						unwrappedMatchingParam( 0, dataSet ), org.hibernate.search.engine.search.common.ValueConvert.NO ) )
 				.routing( dataSet.routingKey ) )
 				.hasDocRefHitsAnyOrder( index.typeName(), dataSet.docId( 0 ) );
 	}
@@ -284,7 +283,7 @@ public abstract class AbstractPredicateTypeCheckingAndConversionIT<V extends Abs
 			DataSet<?, V> dataSet) {
 		SearchPredicateFactory f = index.createScope().predicate();
 		assertThatThrownBy( () -> predicate( f, defaultDslConverterField0Path( index, dataSet ), invalidTypeParam(),
-				ValueConvert.NO ) )
+				org.hibernate.search.engine.search.common.ValueConvert.NO ) )
 				.isInstanceOf( SearchException.class )
 				.hasMessageContaining( "Unable to convert DSL argument: " )
 				.hasMessageContaining( InvalidType.class.getName() )
@@ -320,7 +319,7 @@ public abstract class AbstractPredicateTypeCheckingAndConversionIT<V extends Abs
 			DataSet<?, V> dataSet) {
 		assertThatQuery( index.query()
 				.where( f -> predicate( f, customDslConverterField0Path( index, dataSet ),
-						unwrappedMatchingParam( 0, dataSet ), ValueConvert.NO ) )
+						unwrappedMatchingParam( 0, dataSet ), org.hibernate.search.engine.search.common.ValueConvert.NO ) )
 				.routing( dataSet.routingKey ) )
 				.hasDocRefHitsAnyOrder( index.typeName(), dataSet.docId( 0 ) );
 	}
@@ -356,7 +355,7 @@ public abstract class AbstractPredicateTypeCheckingAndConversionIT<V extends Abs
 			DataSet<?, V> dataSet) {
 		SearchPredicateFactory f = index.createScope().predicate();
 		assertThatThrownBy( () -> predicate( f, customDslConverterField0Path( index, dataSet ), invalidTypeParam(),
-				ValueConvert.NO ) )
+				org.hibernate.search.engine.search.common.ValueConvert.NO ) )
 				.isInstanceOf( SearchException.class )
 				.hasMessageContaining( "Unable to convert DSL argument: " )
 				.hasMessageContaining( InvalidType.class.getName() )
@@ -400,13 +399,13 @@ public abstract class AbstractPredicateTypeCheckingAndConversionIT<V extends Abs
 		assertThatQuery( index.query()
 				.where( f -> predicate( f, customDslConverterField0Path( index, dataSet ), customDslConverterField1Path(
 						index, dataSet ),
-						wrappedMatchingParam( 0, dataSet ), ValueConvert.YES ) )
+						wrappedMatchingParam( 0, dataSet ), org.hibernate.search.engine.search.common.ValueConvert.YES ) )
 				.routing( dataSet.routingKey ) )
 				.hasDocRefHitsAnyOrder( index.typeName(), dataSet.docId( 0 ) );
 		assertThatQuery( index.query()
 				.where( f -> predicate( f, customDslConverterField0Path( index, dataSet ), customDslConverterField1Path(
 						index, dataSet ),
-						wrappedMatchingParam( 1, dataSet ), ValueConvert.YES ) )
+						wrappedMatchingParam( 1, dataSet ), org.hibernate.search.engine.search.common.ValueConvert.YES ) )
 				.routing( dataSet.routingKey ) )
 				.hasDocRefHitsAnyOrder( index.typeName(), dataSet.docId( 1 ) );
 	}
@@ -445,13 +444,13 @@ public abstract class AbstractPredicateTypeCheckingAndConversionIT<V extends Abs
 		assertThatQuery( index.query()
 				.where( f -> predicate( f, customDslConverterField0Path( index, dataSet ), customDslConverterField1Path(
 						index, dataSet ),
-						unwrappedMatchingParam( 0, dataSet ), ValueConvert.NO ) )
+						unwrappedMatchingParam( 0, dataSet ), org.hibernate.search.engine.search.common.ValueConvert.NO ) )
 				.routing( dataSet.routingKey ) )
 				.hasDocRefHitsAnyOrder( index.typeName(), dataSet.docId( 0 ) );
 		assertThatQuery( index.query()
 				.where( f -> predicate( f, customDslConverterField0Path( index, dataSet ), customDslConverterField1Path(
 						index, dataSet ),
-						unwrappedMatchingParam( 1, dataSet ), ValueConvert.NO ) )
+						unwrappedMatchingParam( 1, dataSet ), org.hibernate.search.engine.search.common.ValueConvert.NO ) )
 				.routing( dataSet.routingKey ) )
 				.hasDocRefHitsAnyOrder( index.typeName(), dataSet.docId( 1 ) );
 	}
@@ -774,11 +773,11 @@ public abstract class AbstractPredicateTypeCheckingAndConversionIT<V extends Abs
 
 	@Deprecated
 	protected abstract PredicateFinalStep predicate(SearchPredicateFactory f, String fieldPath, P matchingParam,
-			ValueConvert valueConvert);
+			org.hibernate.search.engine.search.common.ValueConvert valueConvert);
 
 	@Deprecated
 	protected abstract PredicateFinalStep predicate(SearchPredicateFactory f, String field0Path, String field1Path,
-			P matchingParam, ValueConvert valueConvert);
+			P matchingParam, org.hibernate.search.engine.search.common.ValueConvert valueConvert);
 
 	protected abstract P invalidTypeParam();
 
