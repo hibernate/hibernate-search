@@ -60,11 +60,9 @@ class ElasticsearchIndexManagerImpl
 					.build();
 
 	private final IndexManagerBackendContext backendContext;
-
-	private final ElasticsearchIndexModel model;
 	private final List<DocumentMetadataContributor> documentMetadataContributors;
-
 	private final ElasticsearchBatchingWorkOrchestrator indexingOrchestrator;
+	private final ElasticsearchIndexModel model;
 
 	private ElasticsearchIndexSchemaManager schemaManager;
 	private ElasticsearchAnalysisPerformer analysisPerformer;
@@ -75,14 +73,15 @@ class ElasticsearchIndexManagerImpl
 		this.backendContext = backendContext;
 		this.model = model;
 		this.documentMetadataContributors = documentMetadataContributors;
-		this.indexingOrchestrator = backendContext.createIndexingOrchestrator( model.hibernateSearchName() );
+		this.indexingOrchestrator = backendContext.createIndexingOrchestrator( model.hibernateSearchIndexName() );
 	}
 
 	@Override
 	public String toString() {
 		return new StringBuilder( getClass().getSimpleName() )
 				.append( "[" )
-				.append( "names=" ).append( model.names() )
+				.append( "hibernateSearchName=" )
+				.append( model.hibernateSearchIndexName() )
 				.append( "]" )
 				.toString();
 	}
@@ -96,6 +95,9 @@ class ElasticsearchIndexManagerImpl
 			 * based on runtime data such as runtime user configuration or the detected ES version.
 			 * Useful for compile-time boot.
 			 */
+
+			model.onStart( backendContext );
+
 			schemaManager = backendContext.createSchemaManager(
 					model, context.configurationPropertySource()
 			);

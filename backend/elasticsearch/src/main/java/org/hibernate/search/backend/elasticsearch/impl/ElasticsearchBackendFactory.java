@@ -16,7 +16,6 @@ import org.hibernate.search.backend.elasticsearch.client.spi.ElasticsearchClient
 import org.hibernate.search.backend.elasticsearch.dialect.impl.ElasticsearchDialectFactory;
 import org.hibernate.search.backend.elasticsearch.dialect.model.impl.ElasticsearchModelDialect;
 import org.hibernate.search.backend.elasticsearch.gson.spi.GsonProvider;
-import org.hibernate.search.backend.elasticsearch.index.layout.IndexLayoutStrategy;
 import org.hibernate.search.backend.elasticsearch.logging.impl.Log;
 import org.hibernate.search.backend.elasticsearch.mapping.TypeNameMappingStrategyName;
 import org.hibernate.search.backend.elasticsearch.mapping.impl.DiscriminatorTypeNameMapping;
@@ -72,12 +71,6 @@ public class ElasticsearchBackendFactory implements BackendFactory {
 					.withDefault( ElasticsearchBackendSettings.Defaults.MAPPING_TYPE_NAME_STRATEGY )
 					.build();
 
-	private static final ConfigurationProperty<BeanReference<? extends IndexLayoutStrategy>> LAYOUT_STRATEGY =
-			ConfigurationProperty.forKey( ElasticsearchBackendSettings.LAYOUT_STRATEGY )
-					.asBeanReference( IndexLayoutStrategy.class )
-					.withDefault( ElasticsearchBackendSettings.Defaults.LAYOUT_STRATEGY )
-					.build();
-
 	@Override
 	public BackendImplementor create(EventContext eventContext, BackendBuildContext buildContext,
 			ConfigurationPropertySource propertySource) {
@@ -93,7 +86,6 @@ public class ElasticsearchBackendFactory implements BackendFactory {
 
 		BeanResolver beanResolver = buildContext.beanResolver();
 		BeanHolder<? extends ElasticsearchClientFactory> clientFactoryHolder = null;
-		BeanHolder<? extends IndexLayoutStrategy> indexLayoutStrategyHolder = null;
 		BackendThreads threads = null;
 		ElasticsearchLinkImpl link = null;
 		try {
@@ -141,8 +133,6 @@ public class ElasticsearchBackendFactory implements BackendFactory {
 			ElasticsearchPropertyMappingValidatorProvider propertyMappingValidatorProvider =
 					dialect.createElasticsearchPropertyMappingValidatorProvider();
 
-			indexLayoutStrategyHolder = createIndexLayoutStrategy( buildContext, propertySource );
-
 			return new ElasticsearchBackendImpl(
 					buildContext.backendName(),
 					eventContext,
@@ -151,15 +141,13 @@ public class ElasticsearchBackendFactory implements BackendFactory {
 					propertyMappingValidatorProvider,
 					userFacingGson,
 					getMultiTenancyStrategy( propertySource, buildContext ),
-					indexLayoutStrategyHolder,
-					createTypeNameMapping( propertySource, indexLayoutStrategyHolder.get() ),
+					createTypeNameMapping( propertySource ),
 					buildContext.failureHandler(), buildContext.timingSource()
 			);
 		}
 		catch (RuntimeException e) {
 			new SuppressingCloser( e )
 					.push( BeanHolder::close, clientFactoryHolder )
-					.push( BeanHolder::close, indexLayoutStrategyHolder )
 					.push( ElasticsearchLinkImpl::onStop, link )
 					.push( BackendThreads::onStop, threads );
 			throw e;
@@ -199,19 +187,12 @@ public class ElasticsearchBackendFactory implements BackendFactory {
 		}
 	}
 
-	private BeanHolder<? extends IndexLayoutStrategy> createIndexLayoutStrategy(BackendBuildContext buildContext,
-			ConfigurationPropertySource propertySource) {
-		final BeanResolver beanResolver = buildContext.beanResolver();
-		return LAYOUT_STRATEGY.getAndTransform( propertySource, beanResolver::resolve );
-	}
-
-	private TypeNameMapping createTypeNameMapping(ConfigurationPropertySource propertySource,
-			IndexLayoutStrategy indexLayoutStrategy) {
+	private TypeNameMapping createTypeNameMapping(ConfigurationPropertySource propertySource) {
 		TypeNameMappingStrategyName strategyName = MAPPING_TYPE_STRATEGY.get( propertySource );
 
 		switch ( strategyName ) {
 			case INDEX_NAME:
-				return new IndexNameTypeNameMapping( indexLayoutStrategy );
+				return new IndexNameTypeNameMapping();
 			case DISCRIMINATOR:
 				return new DiscriminatorTypeNameMapping();
 			default:
@@ -221,5 +202,4 @@ public class ElasticsearchBackendFactory implements BackendFactory {
 				) );
 		}
 	}
-
 }

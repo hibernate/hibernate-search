@@ -11,6 +11,7 @@ import org.hibernate.search.backend.elasticsearch.document.model.dsl.impl.Elasti
 import org.hibernate.search.backend.elasticsearch.document.model.impl.ElasticsearchIndexModel;
 import org.hibernate.search.engine.backend.document.model.dsl.spi.IndexRootBuilder;
 import org.hibernate.search.engine.backend.index.spi.IndexManagerBuilder;
+import org.hibernate.search.engine.backend.index.spi.IndexManagerImplementor;
 
 public class ElasticsearchIndexManagerBuilder implements IndexManagerBuilder {
 
@@ -39,7 +40,7 @@ public class ElasticsearchIndexManagerBuilder implements IndexManagerBuilder {
 	}
 
 	@Override
-	public ElasticsearchIndexManagerImpl build() {
+	public IndexManagerImplementor build() {
 		ElasticsearchIndexModel model = schemaRootNodeBuilder.build();
 
 		return new ElasticsearchIndexManagerImpl(

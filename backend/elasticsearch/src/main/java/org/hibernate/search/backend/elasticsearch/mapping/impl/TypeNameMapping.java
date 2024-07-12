@@ -8,6 +8,7 @@ import java.util.Optional;
 
 import org.hibernate.search.backend.elasticsearch.document.impl.DocumentMetadataContributor;
 import org.hibernate.search.backend.elasticsearch.document.model.dsl.impl.IndexSchemaRootContributor;
+import org.hibernate.search.backend.elasticsearch.index.layout.IndexLayoutStrategy;
 import org.hibernate.search.backend.elasticsearch.index.layout.impl.IndexNames;
 import org.hibernate.search.backend.elasticsearch.search.projection.impl.ProjectionExtractionHelper;
 import org.hibernate.search.engine.backend.document.model.dsl.spi.ImplicitFieldContributor;
@@ -35,6 +36,8 @@ public interface TypeNameMapping {
 	 * or an empty optional.
 	 */
 	Optional<ImplicitFieldContributor> getImplicitFieldContributor();
+
+	void onStart(IndexLayoutStrategy indexLayoutStrategy);
 
 	/**
 	 * Register a new index => type mapping.

@@ -19,6 +19,7 @@ import org.hibernate.search.backend.elasticsearch.search.projection.impl.Project
 import org.hibernate.search.backend.elasticsearch.search.projection.impl.ProjectionExtractionHelper;
 import org.hibernate.search.backend.elasticsearch.search.projection.impl.ProjectionRequestContext;
 import org.hibernate.search.engine.backend.document.model.dsl.spi.ImplicitFieldContributor;
+import org.hibernate.search.util.common.AssertionFailure;
 import org.hibernate.search.util.common.SearchException;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
@@ -31,14 +32,8 @@ import com.google.gson.JsonObject;
 public class IndexNameTypeNameMapping implements TypeNameMapping {
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
-	private final TypeNameFromIndexNameExtractionHelper mappedTypeNameExtractionHelper;
-
-	private final IndexLayoutStrategy indexLayoutStrategy;
-
-	public IndexNameTypeNameMapping(IndexLayoutStrategy indexLayoutStrategy) {
-		this.indexLayoutStrategy = indexLayoutStrategy;
-		this.mappedTypeNameExtractionHelper = new TypeNameFromIndexNameExtractionHelper( indexLayoutStrategy );
-	}
+	private TypeNameFromIndexNameExtractionHelper mappedTypeNameExtractionHelper;
+	private IndexLayoutStrategy indexLayoutStrategy;
 
 	@Override
 	public Optional<IndexSchemaRootContributor> getIndexSchemaRootContributor() {
@@ -58,7 +53,16 @@ public class IndexNameTypeNameMapping implements TypeNameMapping {
 	}
 
 	@Override
+	public void onStart(IndexLayoutStrategy indexLayoutStrategy) {
+		this.indexLayoutStrategy = indexLayoutStrategy;
+		this.mappedTypeNameExtractionHelper = new TypeNameFromIndexNameExtractionHelper( indexLayoutStrategy );
+	}
+
+	@Override
 	public void register(IndexNames indexNames, String mappedTypeName) {
+		if ( indexLayoutStrategy == null ) {
+			throw new AssertionFailure( "On start was not called yet. Cannot register an index before starting the backend." );
+		}
 		String uniqueKey = IndexNames.normalizeName(
 				indexLayoutStrategy.extractUniqueKeyFromHibernateSearchIndexName(
 						indexNames.hibernateSearchIndex()
