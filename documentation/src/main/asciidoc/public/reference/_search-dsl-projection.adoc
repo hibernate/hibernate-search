@@ -227,7 +227,7 @@ include::{sourcedir}/org/hibernate/search/documentation/search/projection/Projec
 ====
 
 If the provided identifier type does not match the type of identifiers for targeted entity types,
-an exception will be thrown. See also <<search-dsl-projected-value-type>>. 
+an exception will be thrown. See also <<search-dsl-projected-value-type>>.
 
 You can omit the "identifier type" argument, but then you will get projections of type `Object`:
 
@@ -421,7 +421,7 @@ include::{sourcedir}/org/hibernate/search/documentation/search/projection/Projec
 By default, the values returned by the `field` projection have the same type as
 the entity property corresponding to the target field.
 
-For example, if an entity property if of an enum type,
+For example, if an entity property is of an enum type,
 <<mapping-directfieldmapping-supported-types,the corresponding field may be of type `String`>>;
 the values returned by the `field` projection will be of the enum type regardless.
 

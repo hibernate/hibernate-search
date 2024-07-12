@@ -58,7 +58,7 @@ class IdentifierBridgeSimpleIT {
 			SearchSession searchSession = Search.session( entityManager );
 			//tag::include[]
 			List<Book> result = searchSession.search( Book.class )
-					.where( f -> f.id().matching( "1/42", ValueModel.INDEX ) ) // <1>
+					.where( f -> f.id().matching( "1/42", ValueModel.STRING ) ) // <1>
 					.fetchHits( 20 );
 			//end::include[]
 			assertThat( result ).hasSize( 1 );

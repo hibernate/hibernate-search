@@ -8,6 +8,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmUtils.with;
 
 import java.time.LocalDateTime;
+import java.time.ZoneOffset;
 import java.util.List;
 
 import jakarta.persistence.Basic;
@@ -27,6 +28,7 @@ import org.hibernate.search.mapper.pojo.bridge.runtime.ValueBridgeToIndexedValue
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.FullTextField;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.GenericField;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
+import org.hibernate.search.util.impl.integrationtest.common.extension.BackendConfiguration;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -81,16 +83,40 @@ class DslConverterIT {
 	}
 
 	@Test
-	void dslConverterParse() {
+	void dslConverterString() {
 		with( entityManagerFactory ).runInTransaction( entityManager -> {
 			SearchSession searchSession = Search.session( entityManager );
 
-			// tag::dsl-converter-parse[]
+			// tag::dsl-converter-string[]
 			List<AuthenticationEvent> result = searchSession.search( AuthenticationEvent.class )
 					.where( f -> f.match().field( "time" )
 							.matching( "2002-02-20T20:02:22", ValueModel.STRING ) )
 					.fetchHits( 20 );
-			// end::dsl-converter-parse[]
+			// end::dsl-converter-string[]
+
+			assertThat( result )
+					.extracting( "id" )
+					.containsExactly( 2 );
+		} );
+	}
+
+	@Test
+	void dslConverterRaw() {
+		with( entityManagerFactory ).runInTransaction( entityManager -> {
+			SearchSession searchSession = Search.session( entityManager );
+
+			// tag::dsl-converter-raw[]
+			Object rawDateTimeValue = // ... // <1>
+					// end::dsl-converter-raw[]
+					BackendConfiguration.isLucene()
+							? LocalDateTime.of( 2002, 02, 20, 20, 02, 22 ).toInstant( ZoneOffset.UTC ).toEpochMilli()
+							: "2002-02-20T20:02:22.000000000";
+			// tag::dsl-converter-raw[]
+			List<AuthenticationEvent> result = searchSession.search( AuthenticationEvent.class )
+					.where( f -> f.match().field( "time" )
+							.matching( rawDateTimeValue, ValueModel.RAW ) )
+					.fetchHits( 20 );
+			// end::dsl-converter-raw[]
 
 			assertThat( result )
 					.extracting( "id" )

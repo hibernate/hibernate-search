@@ -78,6 +78,31 @@ class ProjectionConverterIT {
 		} );
 	}
 
+
+	@Test
+	void projectionConverterRaw() {
+		with( entityManagerFactory ).runInTransaction( entityManager -> {
+			SearchSession searchSession = Search.session( entityManager );
+
+			// tag::projection-converter-raw[]
+			Class<String> rawProjectionType = // ... // <1>
+					// end::projection-converter-raw[]
+					String.class;
+
+			// tag::projection-converter-raw[]
+			List<?> result = searchSession.search( Order.class )
+					.select( f -> f.field( "status", rawProjectionType, ValueModel.RAW ) )
+					.where( f -> f.matchAll() )
+					.fetchHits( 20 );
+			// end::projection-converter-raw[]
+
+			assertThat( result.stream().map( Object::toString ) )
+					.containsExactlyInAnyOrder(
+							Stream.of( OrderStatus.values() ).map( Enum::name ).toArray( String[]::new )
+					);
+		} );
+	}
+
 	private void initData() {
 		with( entityManagerFactory ).runInTransaction( entityManager -> {
 			Order order1 = new Order( 1 );
