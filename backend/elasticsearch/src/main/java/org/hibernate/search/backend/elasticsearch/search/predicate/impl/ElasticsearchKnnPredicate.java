@@ -217,9 +217,14 @@ public abstract class ElasticsearchKnnPredicate extends AbstractElasticsearchSin
 		private static final JsonAccessor<Integer> K_ACCESSOR = JsonAccessor.root().property( "k" ).asInteger();
 
 		private static final JsonObjectAccessor FILTER_ACCESSOR = JsonAccessor.root().property( "filter" ).asObject();
+		private static final JsonAccessor<Float> MAX_DISTANCE = JsonAccessor.root().property( "max_distance" ).asFloat();
+		private static final JsonAccessor<Float> MIN_SCORE = JsonAccessor.root().property( "min_score" ).asFloat();
+
+		private final Float score;
 
 		private OpenSearchImpl(Builder<?> builder) {
 			super( builder );
+			this.score = builder.score;
 		}
 
 		@Override
@@ -232,13 +237,24 @@ public abstract class ElasticsearchKnnPredicate extends AbstractElasticsearchSin
 			if ( filter != null ) {
 				FILTER_ACCESSOR.set( innerObject, filter );
 			}
-			K_ACCESSOR.set( innerObject, k );
+			if ( similarity != null ) {
+				MAX_DISTANCE.set( innerObject, similarity );
+			}
+			if ( score != null ) {
+				MIN_SCORE.set( innerObject, score );
+			}
+			if ( similarity == null && score == null ) {
+				// [knn] requires exactly one of k, distance or score to be set
+				K_ACCESSOR.set( innerObject, k );
+			}
 			VECTOR_ACCESSOR.set( innerObject, vector );
 
 			return outerObject;
 		}
 
 		protected static class Builder<F> extends AbstractKnnBuilder<F> {
+			protected Float score;
+
 			protected Builder(ElasticsearchFieldCodec<F> codec, ElasticsearchSearchIndexScope<?> scope,
 					ElasticsearchSearchIndexValueFieldContext<F> field) {
 				super( codec, scope, field );
@@ -246,12 +262,12 @@ public abstract class ElasticsearchKnnPredicate extends AbstractElasticsearchSin
 
 			@Override
 			public void requiredMinimumSimilarity(float similarity) {
-				throw log.knnRequiredMinimumSimilarityUnsupportedOption();
+				this.similarity = similarity;
 			}
 
 			@Override
 			public void requiredMinimumScore(float score) {
-				throw log.knnRequiredMinimumSimilarityUnsupportedOption();
+				this.score = score;
 			}
 
 			@Override

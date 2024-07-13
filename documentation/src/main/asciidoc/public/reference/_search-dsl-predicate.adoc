@@ -1611,11 +1611,26 @@ include::{sourcedir}/org/hibernate/search/documentation/search/predicate/Predica
 <2> Specify the required minimum similarity value, to filter out irrelevant results.
 ====
 
-NOTE: This configuration is only available for a <<backend-lucene, Lucene backend>>
-and for the <<backend-elasticsearch-compatibility-elasticsearch,Elastic>> distribution of
+Alternatively, since in case of the `knn` predicate score and similarity are tight together
+as explained in <<mapping-directfieldmapping-vectorSimilarity,this table>>, it maybe be sometimes simpler to apply
+a score based filter instead.
+
+.Filtering out irrelevant results with score
+====
+[source, JAVA, indent=0, subs="+callouts"]
+----
+include::{sourcedir}/org/hibernate/search/documentation/search/predicate/PredicateDslIT.java[tags=knn-score]
+----
+<1> Create a knn predicate as usual.
+<2> Specify the required minimum score value, to filter out irrelevant results.
+====
+
+NOTE: This configuration has a slightly different behavior with the
+<<backend-elasticsearch-compatibility-opensearch,OpenSearch>> distribution of
 an <<backend-elasticsearch,Elasticsearch backend>>.
-<<backend-elasticsearch-compatibility-opensearch,OpenSearch>> does not have this option available,
-and trying to use it will lead to an exception being thrown.
+This distribution allows to use only one of the following options at the same time: `k`, minimum score, minimum similarity.
+Hence, if either `requiredMinimumSimilarity(..)` or `requiredMinimumScore(..)` is applied, then `k` value will be ignored
+and will not be sent in the request to the OpenSearch cluster.
 
 [[search-dsl-predicate-knn-limitations]]
 === Backend specifics and limitations

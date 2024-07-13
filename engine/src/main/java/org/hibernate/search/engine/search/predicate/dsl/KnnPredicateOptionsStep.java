@@ -30,6 +30,14 @@ public interface KnnPredicateOptionsStep
 	 */
 	KnnPredicateOptionsStep requiredMinimumSimilarity(float similarity);
 
+	/**
+	 * @param score The minimum sore limit: documents with vectors for which the similarity score is lower than the limit
+	 * will be filtered out from the results.
+	 * <p>
+	 * This is an alternative to the {@link #requiredMinimumSimilarity(float)} where the score is used for filtering
+	 * instead of the similarity. For the knn predicate the score and similarity are derived from each other.
+	 * @return {@code this}, for method chaining.
+	 */
 	@Incubating
 	KnnPredicateOptionsStep requiredMinimumScore(float score);
 

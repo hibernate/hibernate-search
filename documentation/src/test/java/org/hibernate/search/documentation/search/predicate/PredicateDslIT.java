@@ -1384,6 +1384,22 @@ class PredicateDslIT {
 						.extracting( Book::getId )
 						.containsExactlyInAnyOrder( BOOK1_ID );
 			} );
+
+			withinSearchSession( searchSession -> {
+				// tag::knn-score[]
+				float[] coverImageEmbeddingsVector = /*...*/
+						// end::knn-score[]
+						floats( 128, 1.0f );
+				// tag::knn-score[]
+				List<Book> hits = searchSession.search( Book.class )
+						.where( f -> f.knn( 5 ).field( "coverImageEmbeddings" ).matching( coverImageEmbeddingsVector ) // <1>
+								.requiredMinimumScore( 0.5f ) ) // <2>
+						.fetchHits( 20 );
+				// end::knn-score[]
+				assertThat( hits )
+						.extracting( Book::getId )
+						.containsExactlyInAnyOrder( BOOK1_ID );
+			} );
 		}
 	}
 
