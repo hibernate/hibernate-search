@@ -6,6 +6,7 @@ package org.hibernate.search.integrationtest.backend.tck.search.predicate;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.junit.jupiter.api.Assumptions.assumeFalse;
 import static org.junit.jupiter.api.Assumptions.assumeTrue;
 
 import java.util.ArrayList;
@@ -965,17 +966,13 @@ class KnnPredicateSpecificsIT {
 			return result;
 		}
 
-		@BeforeAll
-		static void beforeAll() {
-			assumeTrue(
-					TckConfiguration.get().getBackendFeatures().supportsVectorSearchRequiredMinimumSimilarity(),
-					"This test only make sense for backends that have a way to specify the required minimum similarity."
-			);
-		}
-
 		@ParameterizedTest
 		@MethodSource
 		void similarityFilterFloat(SimpleMappedIndex<IndexBinding> index, float similarity, float score, int matches) {
+			assumeTrue(
+					TckConfiguration.get().getBackendFeatures().vectorSearchRequiredMinimumSimilarityAsLucene(),
+					"This test only make sense for backends that produce the same scores as we expect in the Lucene backend for k-nn search."
+			);
 			assertThat( index.createScope().query()
 					.select( SearchProjectionFactory::score )
 					.where( f -> f.knn( 10 )
@@ -1038,11 +1035,64 @@ class KnnPredicateSpecificsIT {
 
 		@ParameterizedTest
 		@MethodSource
-		void similarityFilterFloatWithBoost(SimpleMappedIndex<IndexBinding> index, float similarity, float score, int matches) {
+		void similarityFilterFloatOpenSearch(SimpleMappedIndex<IndexBinding> index, float similarity, float score,
+				int matches) {
+			assumeFalse(
+					TckConfiguration.get().getBackendFeatures().vectorSearchRequiredMinimumSimilarityAsLucene(),
+					"This test only make sense for backends that produce the scores different from the ones we expect in the Lucene backend for k-nn search."
+			);
 			assertThat( index.createScope().query()
 					.select( SearchProjectionFactory::score )
-					.where( f -> f.knn(
-							10 )
+					.where( f -> f.knn( 10 )
+							.field( "location" )
+							.matching( noramlize( 5f, 4f ) )
+							.requiredMinimumSimilarity( similarity )
+					).fetchAll().hits() )
+					.hasSizeLessThanOrEqualTo( matches )
+					.allSatisfy( s -> assertThat( s ).isGreaterThanOrEqualTo( score ) );
+		}
+
+		/*
+		 * index, similarity, score, number of hits
+		 */
+		public static List<? extends Arguments> similarityFilterFloatOpenSearch() {
+			List<Arguments> args = new ArrayList<>();
+			SimpleMappedIndex<IndexBinding> index = indexes.get( VectorSimilarity.L2 );
+
+			// L2 scores for vector [5f, 4f]
+			// ES 8.14:
+			// [0.9995646, 0.99923563, 0.9990471, 0.9961991, 0.9760502, 0.9664738, 0.93500495, 0.9266528, 0.9165927, 0.8885436]
+			// ES 8.13:
+			// [0.9995734, 0.9992435, 0.9990251, 0.99538076, 0.9762654, 0.9665131, 0.9355144, 0.92745376, 0.91767627, 0.8887709]
+			// Lucene:
+			// [0.9995734, 0.9992435, 0.9990251, 0.99538076, 0.9762654, 0.9665131, 0.9355144, 0.92745376, 0.91767627, 0.8887709]
+			// score is 1/(1+d*d) and we are passing d here: d = sqrt( 1/s - 1 )
+			args.add( Arguments.of( index, 0.06812251021f, 0.96f, 6 ) );
+			args.add( Arguments.of( index, 0.15592186099f, 0.88f, 10 ) );
+			args.add( Arguments.of( index, 0.26254644016f, 0.81f, 12 ) );
+
+			index = indexes.get( VectorSimilarity.COSINE );
+
+			// COSINE scores for vector [5f, 4f]
+			// [0.9998933, 0.9998107, 0.99975604, 0.9988398, 0.9939221, 0.99133825, 0.98276734, 0.9804448, 0.9775728, 0.9687127]
+			// score is ( 1.0f + d ) / 2.0f and we are passing d here: d = 2s-1
+			args.add( Arguments.of( index, 0.9976796f, 0.94f, 12 ) );
+			args.add( Arguments.of( index, 0.9596214f, 0.94f, 12 ) );
+			args.add( Arguments.of( index, 0.6608890f, 0.94f, 12 ) );
+
+			return args;
+		}
+
+		@ParameterizedTest
+		@MethodSource
+		void similarityFilterFloatWithBoost(SimpleMappedIndex<IndexBinding> index, float similarity, float score, int matches) {
+			assumeTrue(
+					TckConfiguration.get().getBackendFeatures().vectorSearchRequiredMinimumSimilarityAsLucene(),
+					"This test only make sense for backends that produce the same scores as we expect in the Lucene backend for k-nn search."
+			);
+			assertThat( index.createScope().query()
+					.select( SearchProjectionFactory::score )
+					.where( f -> f.knn( 10 )
 							.field( "location" )
 							.matching( noramlize( 5f, 4f ) )
 							.requiredMinimumSimilarity( similarity )
@@ -1099,6 +1149,10 @@ class KnnPredicateSpecificsIT {
 		@ParameterizedTest
 		@MethodSource
 		void similarityFilterByte(SimpleMappedIndex<IndexBinding> index, float similarity, float score, int matches) {
+			assumeTrue(
+					TckConfiguration.get().getBackendFeatures().vectorSearchRequiredMinimumSimilarityAsLucene(),
+					"This test only make sense for backends that produce the same scores as we expect in the Lucene backend for k-nn search."
+			);
 			assertThat( index.createScope().query()
 					.select( SearchProjectionFactory::score )
 					.where( f -> f.knn( 10 )
@@ -1196,19 +1250,23 @@ class KnnPredicateSpecificsIT {
 
 			index = indexes.get( VectorSimilarity.DOT_PRODUCT );
 
-			// DOT_PRODUCT scores for vector [5f, 4f]
-			// [0.9998933, 0.9998107, 0.99975604, 0.99883986, 0.9939221, 0.9913382, 0.9827673, 0.9804448, 0.9775728, 0.9687127]
-			args.add( Arguments.of( index, 0.998f, 0.998f, 4 ) );
-			args.add( Arguments.of( index, 0.999f, 0.999f, 3 ) );
-			args.add( Arguments.of( index, 0.980f, 0.980f, 8 ) );
+			if ( index != null ) {
+				// DOT_PRODUCT scores for vector [5f, 4f]
+				// [0.9998933, 0.9998107, 0.99975604, 0.99883986, 0.9939221, 0.9913382, 0.9827673, 0.9804448, 0.9775728, 0.9687127]
+				args.add( Arguments.of( index, 0.998f, 0.998f, 4 ) );
+				args.add( Arguments.of( index, 0.999f, 0.999f, 3 ) );
+				args.add( Arguments.of( index, 0.980f, 0.980f, 8 ) );
+			}
 
 			index = indexes.get( VectorSimilarity.MAX_INNER_PRODUCT );
 
-			// MAX_INNER_PRODUCT scores for vector [5f, 4f]
-			// [1.9997866, 1.9996214, 1.9995121, 1.9976797, 1.9878442, 1.9826764, 1.9655346, 1.9608896, 1.9551456, 1.9374254]
-			args.add( Arguments.of( index, 1.997f, 1.997f, 4 ) );
-			args.add( Arguments.of( index, 1.999f, 1.999f, 3 ) );
-			args.add( Arguments.of( index, 1.960f, 1.960f, 8 ) );
+			if ( index != null ) {
+				// MAX_INNER_PRODUCT scores for vector [5f, 4f]
+				// [1.9997866, 1.9996214, 1.9995121, 1.9976797, 1.9878442, 1.9826764, 1.9655346, 1.9608896, 1.9551456, 1.9374254]
+				args.add( Arguments.of( index, 1.997f, 1.997f, 4 ) );
+				args.add( Arguments.of( index, 1.999f, 1.999f, 3 ) );
+				args.add( Arguments.of( index, 1.960f, 1.960f, 8 ) );
+			}
 
 			return args;
 		}
@@ -1252,20 +1310,24 @@ class KnnPredicateSpecificsIT {
 
 			index = indexes.get( VectorSimilarity.DOT_PRODUCT );
 
-			// DOT_PRODUCT scores for vector [5f, 4f]
-			// [0.5010834, 0.5006714, 0.50064087, 0.5006256, 0.5005646, 0.5005493, 0.5004883, 0.500473, 0.5004425, 0.5003967]
-			// score is 0.5f + d / (float) ( 2 * ( 1 << 15 ) ) and we are passing d here: d = (s - 0.5) * 65536.0
-			args.add( Arguments.of( index, 0.5006256f, 0.5006256f, 4 ) );
-			args.add( Arguments.of( index, 0.50064087f, 0.50064087f, 3 ) );
-			args.add( Arguments.of( index, 0.500473f, 0.500473f, 8 ) );
+			if ( index != null ) {
+				// DOT_PRODUCT scores for vector [5f, 4f]
+				// [0.5010834, 0.5006714, 0.50064087, 0.5006256, 0.5005646, 0.5005493, 0.5004883, 0.500473, 0.5004425, 0.5003967]
+				// score is 0.5f + d / (float) ( 2 * ( 1 << 15 ) ) and we are passing d here: d = (s - 0.5) * 65536.0
+				args.add( Arguments.of( index, 0.5006256f, 0.5006256f, 4 ) );
+				args.add( Arguments.of( index, 0.50064087f, 0.50064087f, 3 ) );
+				args.add( Arguments.of( index, 0.500473f, 0.500473f, 8 ) );
+			}
 
 			index = indexes.get( VectorSimilarity.MAX_INNER_PRODUCT );
 
-			// MAX_INNER_PRODUCT scores for vector [5f, 4f]
-			// [72.0f, 45.0f, 43.0f, 42.0f, 38.0f, 37.0f, 33.0f, 32.0f, 30.0f, 27.0f]
-			args.add( Arguments.of( index, 42.0f, 42.0f, 4 ) );
-			args.add( Arguments.of( index, 45.0f, 45.0f, 2 ) );
-			args.add( Arguments.of( index, 32.0f, 32.0f, 8 ) );
+			if ( index != null ) {
+				// MAX_INNER_PRODUCT scores for vector [5f, 4f]
+				// [72.0f, 45.0f, 43.0f, 42.0f, 38.0f, 37.0f, 33.0f, 32.0f, 30.0f, 27.0f]
+				args.add( Arguments.of( index, 42.0f, 42.0f, 4 ) );
+				args.add( Arguments.of( index, 45.0f, 45.0f, 2 ) );
+				args.add( Arguments.of( index, 32.0f, 32.0f, 8 ) );
+			}
 
 			return args;
 		}

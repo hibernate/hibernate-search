@@ -267,15 +267,6 @@ public class ElasticsearchTckBackendFeatures extends TckBackendFeatures {
 	}
 
 	@Override
-	public boolean supportsVectorSearchRequiredMinimumSimilarity() {
-		return isActualVersion(
-				es -> true,
-				os -> false,
-				aoss -> false
-		);
-	}
-
-	@Override
 	public boolean supportsSimilarity(VectorSimilarity vectorSimilarity) {
 		switch ( vectorSimilarity ) {
 			case DOT_PRODUCT:
@@ -335,6 +326,15 @@ public class ElasticsearchTckBackendFeatures extends TckBackendFeatures {
 
 	@Override
 	public boolean queryStringFailOnPatternQueries() {
+		return isActualVersion(
+				es -> true,
+				os -> false,
+				aoss -> false
+		);
+	}
+
+	@Override
+	public boolean vectorSearchRequiredMinimumSimilarityAsLucene() {
 		return isActualVersion(
 				es -> true,
 				os -> false,
