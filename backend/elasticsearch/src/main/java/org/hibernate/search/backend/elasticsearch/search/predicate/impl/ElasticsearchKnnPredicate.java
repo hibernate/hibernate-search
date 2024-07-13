@@ -86,6 +86,7 @@ public abstract class ElasticsearchKnnPredicate extends AbstractElasticsearchSin
 
 		private final Class<?> vectorElementsType;
 		private final int indexedVectorsDimension;
+		protected final ElasticsearchVectorFieldCodec<F> codec;
 		private int k;
 		private JsonArray vector;
 		private ElasticsearchSearchPredicate filter;
@@ -95,9 +96,9 @@ public abstract class ElasticsearchKnnPredicate extends AbstractElasticsearchSin
 				ElasticsearchSearchIndexValueFieldContext<F> field) {
 			super( scope, field );
 			if ( codec instanceof ElasticsearchVectorFieldCodec ) {
-				ElasticsearchVectorFieldCodec<F> vectorCodec = (ElasticsearchVectorFieldCodec<F>) codec;
-				vectorElementsType = vectorCodec.vectorElementsType();
-				indexedVectorsDimension = vectorCodec.getConfiguredDimensions();
+				this.codec = (ElasticsearchVectorFieldCodec<F>) codec;
+				vectorElementsType = this.codec.vectorElementsType();
+				indexedVectorsDimension = this.codec.getConfiguredDimensions();
 			}
 			else {
 				// shouldn't really happen as if someone tries this it should fail on `queryElementFactory` lookup.
@@ -198,6 +199,11 @@ public abstract class ElasticsearchKnnPredicate extends AbstractElasticsearchSin
 			}
 
 			@Override
+			public void requiredMinimumScore(float score) {
+				requiredMinimumSimilarity( codec.scoreToSimilarity( score ) );
+			}
+
+			@Override
 			public SearchPredicate build() {
 				return new Elasticsearch812Impl( this );
 			}
@@ -240,6 +246,11 @@ public abstract class ElasticsearchKnnPredicate extends AbstractElasticsearchSin
 
 			@Override
 			public void requiredMinimumSimilarity(float similarity) {
+				throw log.knnRequiredMinimumSimilarityUnsupportedOption();
+			}
+
+			@Override
+			public void requiredMinimumScore(float score) {
 				throw log.knnRequiredMinimumSimilarityUnsupportedOption();
 			}
 

@@ -7,6 +7,7 @@ package org.hibernate.search.engine.search.predicate.dsl;
 import java.util.function.Function;
 
 import org.hibernate.search.engine.search.predicate.SearchPredicate;
+import org.hibernate.search.util.common.annotation.Incubating;
 
 /**
  * The final step in a "knn" predicate definition, where optional parameters can be set.
@@ -28,5 +29,8 @@ public interface KnnPredicateOptionsStep
 	 * @return {@code this}, for method chaining.
 	 */
 	KnnPredicateOptionsStep requiredMinimumSimilarity(float similarity);
+
+	@Incubating
+	KnnPredicateOptionsStep requiredMinimumScore(float score);
 
 }

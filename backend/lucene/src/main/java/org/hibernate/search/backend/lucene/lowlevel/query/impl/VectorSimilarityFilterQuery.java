@@ -30,20 +30,12 @@ public class VectorSimilarityFilterQuery extends Query {
 	private final Query query;
 	private final float similarityAsScore;
 
-	public static VectorSimilarityFilterQuery create(KnnByteVectorQuery query, float similarityLimit, int dimension,
-			VectorSimilarityFunction vectorSimilarityFunction) {
-		// We assume that `similarityLimit` is a distance so we need to convert it to the score using a formula from a
-		// similarity function:
-		return new VectorSimilarityFilterQuery(
-				query, byteSimilarityDistanceToScore( similarityLimit, dimension, vectorSimilarityFunction ) );
+	public static VectorSimilarityFilterQuery create(KnnByteVectorQuery query, float requiredMinimumScore) {
+		return new VectorSimilarityFilterQuery( query, requiredMinimumScore );
 	}
 
-	public static VectorSimilarityFilterQuery create(KnnFloatVectorQuery query, float similarityLimit,
-			VectorSimilarityFunction vectorSimilarityFunction) {
-		// We assume that `similarityLimit` is a distance so we need to convert it to the score using a formula from a
-		// similarity function:
-		return new VectorSimilarityFilterQuery(
-				query, floatSimilarityDistanceToScore( similarityLimit, vectorSimilarityFunction ) );
+	public static VectorSimilarityFilterQuery create(KnnFloatVectorQuery query, float requiredMinimumScore) {
+		return new VectorSimilarityFilterQuery( query, requiredMinimumScore );
 	}
 
 	private VectorSimilarityFilterQuery(Query query, float similarityAsScore) {
@@ -98,7 +90,7 @@ public class VectorSimilarityFilterQuery extends Query {
 		return Objects.hash( query, similarityAsScore );
 	}
 
-	private static float floatSimilarityDistanceToScore(float distance, VectorSimilarityFunction similarityFunction) {
+	public static float floatSimilarityDistanceToScore(float distance, VectorSimilarityFunction similarityFunction) {
 		switch ( similarityFunction ) {
 			case EUCLIDEAN:
 				return 1.0f / ( 1.0f + distance * distance );
@@ -112,7 +104,7 @@ public class VectorSimilarityFilterQuery extends Query {
 		}
 	}
 
-	private static float byteSimilarityDistanceToScore(float distance, int dimension,
+	public static float byteSimilarityDistanceToScore(float distance, int dimension,
 			VectorSimilarityFunction similarityFunction) {
 		switch ( similarityFunction ) {
 			case EUCLIDEAN:

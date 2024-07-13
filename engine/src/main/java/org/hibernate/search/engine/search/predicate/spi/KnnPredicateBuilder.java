@@ -18,6 +18,8 @@ public interface KnnPredicateBuilder extends SearchPredicateBuilder {
 
 	void requiredMinimumSimilarity(float similarity);
 
+	void requiredMinimumScore(float score);
+
 	/**
 	 * @return An implementation-specific view of this builder,
 	 * allowing the backend to call a {@code build()} method in particular.
