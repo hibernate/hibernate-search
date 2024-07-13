@@ -15,8 +15,8 @@ import com.google.gson.JsonNull;
 
 public abstract class AbstractElasticsearchVectorFieldCodec<F> implements ElasticsearchVectorFieldCodec<F> {
 
-	private final VectorSimilarity similarity;
-	private final int dimension;
+	protected final VectorSimilarity similarity;
+	protected final int dimension;
 	private final Integer m;
 	private final Integer efConstruction;
 	private final F indexNullAs;

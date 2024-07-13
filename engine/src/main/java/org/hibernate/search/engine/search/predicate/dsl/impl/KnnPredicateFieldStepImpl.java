@@ -80,6 +80,12 @@ public class KnnPredicateFieldStepImpl
 	}
 
 	@Override
+	public KnnPredicateOptionsStep requiredMinimumScore(float score) {
+		this.builder.requiredMinimumScore( score );
+		return this;
+	}
+
+	@Override
 	public KnnPredicateOptionsStep boost(float boost) {
 		this.builder.boost( boost );
 		return this;

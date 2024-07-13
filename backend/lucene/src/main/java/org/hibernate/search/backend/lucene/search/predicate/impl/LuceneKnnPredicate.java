@@ -4,6 +4,9 @@
  */
 package org.hibernate.search.backend.lucene.search.predicate.impl;
 
+import static org.hibernate.search.backend.lucene.lowlevel.query.impl.VectorSimilarityFilterQuery.byteSimilarityDistanceToScore;
+import static org.hibernate.search.backend.lucene.lowlevel.query.impl.VectorSimilarityFilterQuery.floatSimilarityDistanceToScore;
+
 import java.lang.invoke.MethodHandles;
 import java.lang.reflect.Array;
 
@@ -30,7 +33,7 @@ public abstract class LuceneKnnPredicate<T> extends AbstractLuceneSingleFieldPre
 
 	protected final int k;
 	protected final T vector;
-	protected final Float similarity;
+	protected final Float requiredMinimumScore;
 	protected final VectorSimilarityFunction similarityFunction;
 	private final LuceneSearchPredicate filter;
 
@@ -39,7 +42,7 @@ public abstract class LuceneKnnPredicate<T> extends AbstractLuceneSingleFieldPre
 		this.k = builder.k;
 		this.vector = builder.vector;
 		this.filter = builder.filter;
-		this.similarity = builder.similarity;
+		this.requiredMinimumScore = builder.requiredMinimumScore;
 		this.similarityFunction = builder.similarityFunction;
 	}
 
@@ -49,13 +52,13 @@ public abstract class LuceneKnnPredicate<T> extends AbstractLuceneSingleFieldPre
 
 	private abstract static class Builder<F> extends AbstractBuilder implements KnnPredicateBuilder {
 		private final Class<?> vectorElementsType;
-		private final int indexedVectorsDimension;
-		private final VectorSimilarityFunction similarityFunction;
+		protected final int indexedVectorsDimension;
+		protected final VectorSimilarityFunction similarityFunction;
 		private final LuceneVectorFieldCodec<F> vectorCodec;
 		private int k;
 		private F vector;
 		private LuceneSearchPredicate filter;
-		private Float similarity;
+		private Float requiredMinimumScore;
 
 		protected Builder(LuceneSearchIndexScope<?> scope, LuceneSearchIndexValueFieldContext<F> field) {
 			super( scope, field );
@@ -104,8 +107,8 @@ public abstract class LuceneKnnPredicate<T> extends AbstractLuceneSingleFieldPre
 		}
 
 		@Override
-		public void requiredMinimumSimilarity(float similarity) {
-			this.similarity = similarity;
+		public void requiredMinimumScore(float score) {
+			this.requiredMinimumScore = score;
 		}
 	}
 
@@ -134,14 +137,22 @@ public abstract class LuceneKnnPredicate<T> extends AbstractLuceneSingleFieldPre
 		@Override
 		protected Query doToQuery(PredicateRequestContext context) {
 			KnnByteVectorQuery query = new KnnByteVectorQuery( absoluteFieldPath, vector, k, prepareFilter( context ) );
-			return similarity == null
+			return requiredMinimumScore == null
 					? query
-					: VectorSimilarityFilterQuery.create( query, similarity, vector.length, similarityFunction );
+					: VectorSimilarityFilterQuery.create( query, requiredMinimumScore );
 		}
 
 		private static class ByteBuilder extends Builder<byte[]> {
 			protected ByteBuilder(LuceneSearchIndexScope<?> scope, LuceneSearchIndexValueFieldContext<byte[]> field) {
 				super( scope, field );
+			}
+
+			@Override
+			public void requiredMinimumSimilarity(float similarity) {
+				// We assume that `similarityLimit` is a distance so we need to convert it to the score using a formula from a
+				// similarity function:
+				requiredMinimumScore(
+						byteSimilarityDistanceToScore( similarity, indexedVectorsDimension, similarityFunction ) );
 			}
 
 			@Override
@@ -160,12 +171,20 @@ public abstract class LuceneKnnPredicate<T> extends AbstractLuceneSingleFieldPre
 		@Override
 		protected Query doToQuery(PredicateRequestContext context) {
 			KnnFloatVectorQuery query = new KnnFloatVectorQuery( absoluteFieldPath, vector, k, prepareFilter( context ) );
-			return similarity == null ? query : VectorSimilarityFilterQuery.create( query, similarity, similarityFunction );
+			return requiredMinimumScore == null ? query : VectorSimilarityFilterQuery.create( query, requiredMinimumScore );
 		}
 
 		private static class FloatBuilder extends Builder<float[]> {
 			protected FloatBuilder(LuceneSearchIndexScope<?> scope, LuceneSearchIndexValueFieldContext<float[]> field) {
 				super( scope, field );
+			}
+
+			@Override
+			public void requiredMinimumSimilarity(float similarity) {
+				// We assume that `similarityLimit` is a distance so we need to convert it to the score using a formula from a
+				// similarity function:
+				requiredMinimumScore(
+						floatSimilarityDistanceToScore( similarity, similarityFunction ) );
 			}
 
 			@Override

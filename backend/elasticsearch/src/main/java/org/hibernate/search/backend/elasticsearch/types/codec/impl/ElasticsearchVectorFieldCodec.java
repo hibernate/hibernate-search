@@ -15,4 +15,9 @@ public interface ElasticsearchVectorFieldCodec<F> extends ElasticsearchFieldCode
 	 * @return The number of dimensions (array length) of vectors to be indexed that this codec can process.
 	 */
 	int getConfiguredDimensions();
+
+	/**
+	 * Convert the score vale to the similarity to be passed to the knn filter.
+	 */
+	float scoreToSimilarity(float score);
 }
