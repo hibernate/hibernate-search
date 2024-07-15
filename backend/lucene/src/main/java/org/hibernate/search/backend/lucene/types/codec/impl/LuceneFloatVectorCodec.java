@@ -9,6 +9,7 @@ import java.util.Arrays;
 import java.util.function.Consumer;
 
 import org.hibernate.search.backend.lucene.lowlevel.codec.impl.HibernateSearchKnnVectorsFormat;
+import org.hibernate.search.util.common.AssertionFailure;
 
 import org.apache.lucene.document.KnnFloatVectorField;
 import org.apache.lucene.index.IndexableField;
@@ -59,6 +60,21 @@ public class LuceneFloatVectorCodec extends AbstractLuceneVectorFieldCodec<float
 	@Override
 	public Class<?> vectorElementsType() {
 		return float.class;
+	}
+
+	@Override
+	public float similarityDistanceToScore(float distance) {
+		switch ( vectorSimilarity ) {
+			case EUCLIDEAN:
+				return 1.0f / ( 1.0f + distance * distance );
+			case DOT_PRODUCT:
+			case COSINE:
+				return ( 1.0f + distance ) / 2.0f;
+			case MAXIMUM_INNER_PRODUCT:
+				return VectorUtil.scaleMaxInnerProductScore( distance );
+			default:
+				throw new AssertionFailure( "Unknown similarity function: " + vectorSimilarity );
+		}
 	}
 
 	private static Consumer<float[]> check(VectorSimilarityFunction similarityFunction) {
