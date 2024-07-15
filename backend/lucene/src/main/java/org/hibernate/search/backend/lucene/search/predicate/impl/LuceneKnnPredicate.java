@@ -4,9 +4,6 @@
  */
 package org.hibernate.search.backend.lucene.search.predicate.impl;
 
-import static org.hibernate.search.backend.lucene.lowlevel.query.impl.VectorSimilarityFilterQuery.byteSimilarityDistanceToScore;
-import static org.hibernate.search.backend.lucene.lowlevel.query.impl.VectorSimilarityFilterQuery.floatSimilarityDistanceToScore;
-
 import java.lang.invoke.MethodHandles;
 import java.lang.reflect.Array;
 
@@ -22,7 +19,6 @@ import org.hibernate.search.engine.search.predicate.spi.KnnPredicateBuilder;
 import org.hibernate.search.util.common.AssertionFailure;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
-import org.apache.lucene.index.VectorSimilarityFunction;
 import org.apache.lucene.search.KnnByteVectorQuery;
 import org.apache.lucene.search.KnnFloatVectorQuery;
 import org.apache.lucene.search.Query;
@@ -34,7 +30,7 @@ public abstract class LuceneKnnPredicate<T> extends AbstractLuceneSingleFieldPre
 	protected final int k;
 	protected final T vector;
 	protected final Float requiredMinimumScore;
-	protected final VectorSimilarityFunction similarityFunction;
+	//protected final VectorSimilarityFunction similarityFunction;
 	private final LuceneSearchPredicate filter;
 
 	private LuceneKnnPredicate(Builder<T> builder) {
@@ -43,7 +39,7 @@ public abstract class LuceneKnnPredicate<T> extends AbstractLuceneSingleFieldPre
 		this.vector = builder.vector;
 		this.filter = builder.filter;
 		this.requiredMinimumScore = builder.requiredMinimumScore;
-		this.similarityFunction = builder.similarityFunction;
+		//this.similarityFunction = builder.vectorCodec.getVectorSimilarity();
 	}
 
 	protected Query prepareFilter(PredicateRequestContext context) {
@@ -51,10 +47,7 @@ public abstract class LuceneKnnPredicate<T> extends AbstractLuceneSingleFieldPre
 	}
 
 	private abstract static class Builder<F> extends AbstractBuilder implements KnnPredicateBuilder {
-		private final Class<?> vectorElementsType;
-		protected final int indexedVectorsDimension;
-		protected final VectorSimilarityFunction similarityFunction;
-		private final LuceneVectorFieldCodec<F> vectorCodec;
+		protected final LuceneVectorFieldCodec<F> vectorCodec;
 		private int k;
 		private F vector;
 		private LuceneSearchPredicate filter;
@@ -66,9 +59,6 @@ public abstract class LuceneKnnPredicate<T> extends AbstractLuceneSingleFieldPre
 			LuceneFieldCodec<F> codec = field.type().codec();
 			if ( codec instanceof LuceneVectorFieldCodec ) {
 				vectorCodec = (LuceneVectorFieldCodec<F>) codec;
-				vectorElementsType = vectorCodec.vectorElementsType();
-				indexedVectorsDimension = vectorCodec.getConfiguredDimensions();
-				similarityFunction = vectorCodec.getVectorSimilarity();
 			}
 			else {
 				// shouldn't really happen as if someone tries this it should fail on `queryElementFactory` lookup.
@@ -87,12 +77,13 @@ public abstract class LuceneKnnPredicate<T> extends AbstractLuceneSingleFieldPre
 			if ( !vector.getClass().isArray() ) {
 				throw new IllegalArgumentException( "Vector can only be either a float or a byte array (float[], byte[])." );
 			}
-			if ( !vectorElementsType.equals( vector.getClass().getComponentType() ) ) {
-				throw log.vectorKnnMatchVectorTypeDiffersFromField( absoluteFieldPath, vectorElementsType,
+			if ( !vectorCodec.vectorElementsType().equals( vector.getClass().getComponentType() ) ) {
+				throw log.vectorKnnMatchVectorTypeDiffersFromField( absoluteFieldPath, vectorCodec.vectorElementsType(),
 						vector.getClass().getComponentType() );
 			}
-			if ( Array.getLength( vector ) != indexedVectorsDimension ) {
-				throw log.vectorKnnMatchVectorDimensionDiffersFromField( absoluteFieldPath, indexedVectorsDimension,
+			if ( Array.getLength( vector ) != vectorCodec.getConfiguredDimensions() ) {
+				throw log.vectorKnnMatchVectorDimensionDiffersFromField( absoluteFieldPath,
+						vectorCodec.getConfiguredDimensions(),
 						Array.getLength( vector )
 				);
 			}
@@ -109,6 +100,13 @@ public abstract class LuceneKnnPredicate<T> extends AbstractLuceneSingleFieldPre
 		@Override
 		public void requiredMinimumScore(float score) {
 			this.requiredMinimumScore = score;
+		}
+
+		@Override
+		public void requiredMinimumSimilarity(float similarity) {
+			// We assume that `similarityLimit` is a distance so we need to convert it to the score using a formula from a
+			// similarity function:
+			requiredMinimumScore( vectorCodec.similarityDistanceToScore( similarity ) );
 		}
 	}
 
@@ -147,13 +145,6 @@ public abstract class LuceneKnnPredicate<T> extends AbstractLuceneSingleFieldPre
 				super( scope, field );
 			}
 
-			@Override
-			public void requiredMinimumSimilarity(float similarity) {
-				// We assume that `similarityLimit` is a distance so we need to convert it to the score using a formula from a
-				// similarity function:
-				requiredMinimumScore(
-						byteSimilarityDistanceToScore( similarity, indexedVectorsDimension, similarityFunction ) );
-			}
 
 			@Override
 			public SearchPredicate build() {
@@ -177,14 +168,6 @@ public abstract class LuceneKnnPredicate<T> extends AbstractLuceneSingleFieldPre
 		private static class FloatBuilder extends Builder<float[]> {
 			protected FloatBuilder(LuceneSearchIndexScope<?> scope, LuceneSearchIndexValueFieldContext<float[]> field) {
 				super( scope, field );
-			}
-
-			@Override
-			public void requiredMinimumSimilarity(float similarity) {
-				// We assume that `similarityLimit` is a distance so we need to convert it to the score using a formula from a
-				// similarity function:
-				requiredMinimumScore(
-						floatSimilarityDistanceToScore( similarity, similarityFunction ) );
 			}
 
 			@Override

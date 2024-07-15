@@ -35,4 +35,5 @@ public interface LuceneVectorFieldCodec<F> extends LuceneStandardFieldCodec<F, F
 	 */
 	VectorSimilarityFunction getVectorSimilarity();
 
+	float similarityDistanceToScore(float similarity);
 }

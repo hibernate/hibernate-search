@@ -7,10 +7,7 @@ package org.hibernate.search.backend.lucene.lowlevel.query.impl;
 import java.io.IOException;
 import java.util.Objects;
 
-import org.hibernate.search.util.common.AssertionFailure;
-
 import org.apache.lucene.index.LeafReaderContext;
-import org.apache.lucene.index.VectorSimilarityFunction;
 import org.apache.lucene.search.DocIdSetIterator;
 import org.apache.lucene.search.Explanation;
 import org.apache.lucene.search.FilterWeight;
@@ -23,7 +20,6 @@ import org.apache.lucene.search.ScoreMode;
 import org.apache.lucene.search.Scorer;
 import org.apache.lucene.search.TwoPhaseIterator;
 import org.apache.lucene.search.Weight;
-import org.apache.lucene.util.VectorUtil;
 
 public class VectorSimilarityFilterQuery extends Query {
 
@@ -88,36 +84,6 @@ public class VectorSimilarityFilterQuery extends Query {
 	@Override
 	public int hashCode() {
 		return Objects.hash( query, similarityAsScore );
-	}
-
-	public static float floatSimilarityDistanceToScore(float distance, VectorSimilarityFunction similarityFunction) {
-		switch ( similarityFunction ) {
-			case EUCLIDEAN:
-				return 1.0f / ( 1.0f + distance * distance );
-			case DOT_PRODUCT:
-			case COSINE:
-				return ( 1.0f + distance ) / 2.0f;
-			case MAXIMUM_INNER_PRODUCT:
-				return VectorUtil.scaleMaxInnerProductScore( distance );
-			default:
-				throw new AssertionFailure( "Unknown similarity function: " + similarityFunction );
-		}
-	}
-
-	public static float byteSimilarityDistanceToScore(float distance, int dimension,
-			VectorSimilarityFunction similarityFunction) {
-		switch ( similarityFunction ) {
-			case EUCLIDEAN:
-				return 1.0f / ( 1.0f + distance * distance );
-			case DOT_PRODUCT:
-				return 0.5f + distance / (float) ( dimension * ( 1 << 15 ) );
-			case COSINE:
-				return ( 1.0f + distance ) / 2.0f;
-			case MAXIMUM_INNER_PRODUCT:
-				return VectorUtil.scaleMaxInnerProductScore( distance );
-			default:
-				throw new AssertionFailure( "Unknown similarity function: " + similarityFunction );
-		}
 	}
 
 	private static class SimilarityWeight extends FilterWeight {

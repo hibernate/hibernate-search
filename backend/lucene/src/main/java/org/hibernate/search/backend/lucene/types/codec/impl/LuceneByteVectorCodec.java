@@ -7,11 +7,13 @@ package org.hibernate.search.backend.lucene.types.codec.impl;
 import java.util.Arrays;
 
 import org.hibernate.search.backend.lucene.lowlevel.codec.impl.HibernateSearchKnnVectorsFormat;
+import org.hibernate.search.util.common.AssertionFailure;
 
 import org.apache.lucene.document.KnnByteVectorField;
 import org.apache.lucene.index.IndexableField;
 import org.apache.lucene.index.VectorEncoding;
 import org.apache.lucene.index.VectorSimilarityFunction;
+import org.apache.lucene.util.VectorUtil;
 
 public class LuceneByteVectorCodec extends AbstractLuceneVectorFieldCodec<byte[]> {
 
@@ -46,6 +48,22 @@ public class LuceneByteVectorCodec extends AbstractLuceneVectorFieldCodec<byte[]
 	@Override
 	public Class<?> vectorElementsType() {
 		return byte.class;
+	}
+
+	@Override
+	public float similarityDistanceToScore(float distance) {
+		switch ( vectorSimilarity ) {
+			case EUCLIDEAN:
+				return 1.0f / ( 1.0f + distance * distance );
+			case DOT_PRODUCT:
+				return 0.5f + distance / (float) ( getConfiguredDimensions() * ( 1 << 15 ) );
+			case COSINE:
+				return ( 1.0f + distance ) / 2.0f;
+			case MAXIMUM_INNER_PRODUCT:
+				return VectorUtil.scaleMaxInnerProductScore( distance );
+			default:
+				throw new AssertionFailure( "Unknown similarity function: " + vectorSimilarity );
+		}
 	}
 
 	private static void cosineCheck(byte[] vector) {
