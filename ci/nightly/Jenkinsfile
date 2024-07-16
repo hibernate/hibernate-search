@@ -1,0 +1,71 @@
+/*
+ * SPDX-License-Identifier: Apache-2.0
+ * Copyright Red Hat Inc. and Hibernate Authors
+ */
+
+@Library('hibernate-jenkins-pipeline-helpers@1.17') _
+
+def withMavenWorkspace(Closure body) {
+	withMaven(jdk: 'OpenJDK 21 Latest', maven: 'Apache Maven 3.9',
+			mavenLocalRepo: env.WORKSPACE_TMP + '/.m2repository',
+			options: [
+					// Artifacts are not needed and take up disk space
+					artifactsPublisher(disabled: true),
+					// stdout/stderr for successful tests is not needed and takes up disk space
+					// we archive test results and stdout/stderr as part of the build scan anyway,
+					// see https://ge.hibernate.org/scans?search.rootProjectNames=Hibernate%20Search
+					junitPublisher(disabled: true)
+			]) {
+		withCredentials([string(credentialsId: 'ge.hibernate.org-access-key',
+				variable: 'DEVELOCITY_ACCESS_KEY')]) {
+			withGradle {
+				// withDevelocity, actually: https://plugins.jenkins.io/gradle/#plugin-content-capturing-build-scans-from-jenkins-pipeline
+				body()
+			}
+		}
+	}
+}
+
+pipeline {
+	agent none
+	triggers {
+		cron '@midnight'
+	}
+	options {
+		buildDiscarder logRotator(daysToKeepStr: '10', numToKeepStr: '3')
+		disableConcurrentBuilds(abortPrevious: true)
+		overrideIndexTriggers(false)
+	}
+	environment {
+		TESTCONTAINERS_REUSE_ENABLE = 'true'
+	}
+	stages {
+		stage('Build reproducibility check') {
+			agent {
+				label 'Worker&&Containers'
+			}
+			steps {
+				// The timeout cannot be in stage options, because that would
+				// include the time needed to provision a node.
+				timeout(time: 30, unit: 'MINUTES') {
+					withMavenWorkspace {
+						echo "Generate the artifacts."
+						sh "mvn clean install -Pskip-checks -Preproducible"
+
+						echo "Running the reproducibility check."
+						sh """mvn clean verify \
+							artifact:compare -Dreference.repo=hibernate-maven-central \
+							-Pskip-checks -Preproducible -Dno-build-cache \
+							--fail-at-end
+						"""
+					}
+				}
+			}
+		}
+	}
+	post {
+		always {
+			notifyBuildResult maintainers: 'marko@hibernate.org'
+		}
+	}
+}
