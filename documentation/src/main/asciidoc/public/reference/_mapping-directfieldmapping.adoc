@@ -136,7 +136,9 @@ which generally gives much more flexibility.
 
 [[mapping-directfieldmapping-annotations-vectorfield]]  `@VectorField`::
 +
+--
 include::../components/_incubating-warning.adoc[]
+--
 +
 Specific field type for vector fields to be used in a <<search-dsl-predicate-knn,vector search>>.
 +
@@ -363,7 +365,9 @@ highlighter, if they already support the other two (`[PLAIN, UNIFIED]`).
 
 [[mapping-directfieldmapping-dimension]] `dimension`::
 +
+--
 include::../components/_incubating-warning.adoc[]
+--
 +
 The size of the stored vectors. This is a required field. This size should match the vector size of the vectors produced by
 the model used to convert the data into vector representation.
@@ -377,7 +381,9 @@ Only available on `@VectorField`.
 
 [[mapping-directfieldmapping-vectorSimilarity]] `vectorSimilarity`::
 +
+--
 include::../components/_incubating-warning.adoc[]
+--
 +
 Defines how vector similarity is calculated during a <<search-dsl-predicate-knn,vector search>>.
 +
@@ -444,7 +450,9 @@ ifdef::backend-pdf[`d<0 ? 1/(1-d) : d+1`]
 
 [[mapping-directfieldmapping-efConstruction]] `efConstruction`::
 +
+--
 include::../components/_incubating-warning.adoc[]
+--
 +
 `efConstruction` is the size of the dynamic list used during k-NN graph creation. It affects how vectors are stored.
 Higher values lead to a more accurate graph but slower indexing speed.
@@ -455,7 +463,9 @@ Only available on `@VectorField`.
 
 [[mapping-directfieldmapping-m]] `m`::
 +
+--
 include::../components/_incubating-warning.adoc[]
+--
 +
 The number of neighbors each node will be connected to in the https://en.wikipedia.org/wiki/Nearest_neighbor_search#cite_note-:0-10[HNSW (Hierarchical Navigable Small World graphs) graph].
 Modifying this value will have an impact on memory consumption.
