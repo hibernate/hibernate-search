@@ -6,8 +6,12 @@ package org.hibernate.search.backend.elasticsearch.link.impl;
 
 import org.hibernate.search.backend.elasticsearch.client.spi.ElasticsearchClient;
 import org.hibernate.search.backend.elasticsearch.gson.spi.GsonProvider;
+import org.hibernate.search.backend.elasticsearch.index.layout.IndexLayoutStrategy;
+import org.hibernate.search.backend.elasticsearch.index.layout.impl.IndexNames;
 import org.hibernate.search.backend.elasticsearch.lowlevel.syntax.metadata.impl.ElasticsearchIndexMetadataSyntax;
 import org.hibernate.search.backend.elasticsearch.lowlevel.syntax.search.impl.ElasticsearchSearchSyntax;
+import org.hibernate.search.backend.elasticsearch.mapping.impl.TypeNameMapping;
+import org.hibernate.search.backend.elasticsearch.search.projection.impl.SearchProjectionBackendContext;
 import org.hibernate.search.backend.elasticsearch.search.query.impl.ElasticsearchSearchResultExtractorFactory;
 import org.hibernate.search.backend.elasticsearch.work.factory.impl.ElasticsearchWorkFactory;
 
@@ -33,4 +37,11 @@ public interface ElasticsearchLink {
 
 	Integer getScrollTimeout();
 
+	IndexLayoutStrategy getIndexLayoutStrategy();
+
+	TypeNameMapping getTypeNameMapping();
+
+	IndexNames createIndexNames(String hibernateSearchIndexName, String mappedTypeName);
+
+	SearchProjectionBackendContext getSearchProjectionBackendContext();
 }

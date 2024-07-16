@@ -58,18 +58,14 @@ public class DiscriminatorTypeNameMapping implements TypeNameMapping {
 	}
 
 	@Override
-	public void onStart(IndexLayoutStrategy indexLayoutStrategy) {
-		// do nothing
+	public ProjectionExtractionHelper<String> onStart(IndexLayoutStrategy indexLayoutStrategy) {
+		// do nothing, just return the instance:
+		return typeNameExtractionHelper;
 	}
 
 	@Override
 	public void register(IndexNames indexNames, String mappedTypeName) {
 		// Nothing to do
-	}
-
-	@Override
-	public ProjectionExtractionHelper<String> getTypeNameExtractionHelper() {
-		return typeNameExtractionHelper;
 	}
 
 	private static final class TypeNameDiscriminatorSchemaRootContributor

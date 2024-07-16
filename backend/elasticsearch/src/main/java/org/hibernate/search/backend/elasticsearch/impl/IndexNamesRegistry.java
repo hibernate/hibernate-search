@@ -2,7 +2,7 @@
  * SPDX-License-Identifier: Apache-2.0
  * Copyright Red Hat Inc. and Hibernate Authors
  */
-package org.hibernate.search.backend.elasticsearch.index.impl;
+package org.hibernate.search.backend.elasticsearch.impl;
 
 import java.lang.invoke.MethodHandles;
 import java.util.LinkedHashSet;

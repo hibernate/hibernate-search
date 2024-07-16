@@ -107,8 +107,9 @@ public class ElasticsearchBackendFactory implements BackendFactory {
 			ElasticsearchDialectFactory dialectFactory = new ElasticsearchDialectFactory();
 			link = new ElasticsearchLinkImpl(
 					clientFactoryHolder, threads, defaultGsonProvider, logPrettyPrinting,
-					dialectFactory, configuredVersion
+					dialectFactory, configuredVersion, createTypeNameMapping( propertySource )
 			);
+			MultiTenancyStrategy multiTenancyStrategy = getMultiTenancyStrategy( propertySource, buildContext );
 
 			ElasticsearchModelDialect dialect;
 			ElasticsearchVersion version;
@@ -119,7 +120,7 @@ public class ElasticsearchBackendFactory implements BackendFactory {
 			else {
 				// We must determine the Elasticsearch version, and thus instantiate the client, right now.
 				threads.onStart( propertySource, beanResolver, buildContext.threadPoolProvider() );
-				link.onStart( beanResolver, propertySource );
+				link.onStart( beanResolver, multiTenancyStrategy, propertySource );
 
 				version = link.getElasticsearchVersion();
 			}
@@ -140,8 +141,7 @@ public class ElasticsearchBackendFactory implements BackendFactory {
 					typeFactoryProvider,
 					propertyMappingValidatorProvider,
 					userFacingGson,
-					getMultiTenancyStrategy( propertySource, buildContext ),
-					createTypeNameMapping( propertySource ),
+					multiTenancyStrategy,
 					buildContext.failureHandler(), buildContext.timingSource()
 			);
 		}
