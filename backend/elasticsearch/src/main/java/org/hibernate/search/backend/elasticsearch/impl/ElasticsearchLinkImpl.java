@@ -16,17 +16,25 @@ import org.hibernate.search.backend.elasticsearch.client.spi.ElasticsearchClient
 import org.hibernate.search.backend.elasticsearch.dialect.impl.ElasticsearchDialectFactory;
 import org.hibernate.search.backend.elasticsearch.dialect.protocol.impl.ElasticsearchProtocolDialect;
 import org.hibernate.search.backend.elasticsearch.gson.spi.GsonProvider;
+import org.hibernate.search.backend.elasticsearch.index.layout.IndexLayoutStrategy;
+import org.hibernate.search.backend.elasticsearch.index.layout.impl.IndexNames;
 import org.hibernate.search.backend.elasticsearch.link.impl.ElasticsearchLink;
 import org.hibernate.search.backend.elasticsearch.logging.impl.Log;
 import org.hibernate.search.backend.elasticsearch.lowlevel.syntax.metadata.impl.ElasticsearchIndexMetadataSyntax;
 import org.hibernate.search.backend.elasticsearch.lowlevel.syntax.search.impl.ElasticsearchSearchSyntax;
+import org.hibernate.search.backend.elasticsearch.mapping.impl.TypeNameMapping;
+import org.hibernate.search.backend.elasticsearch.multitenancy.impl.MultiTenancyStrategy;
 import org.hibernate.search.backend.elasticsearch.resources.impl.BackendThreads;
+import org.hibernate.search.backend.elasticsearch.search.projection.impl.ProjectionExtractionHelper;
+import org.hibernate.search.backend.elasticsearch.search.projection.impl.SearchProjectionBackendContext;
 import org.hibernate.search.backend.elasticsearch.search.query.impl.ElasticsearchSearchResultExtractorFactory;
+import org.hibernate.search.backend.elasticsearch.util.spi.URLEncodedString;
 import org.hibernate.search.backend.elasticsearch.work.factory.impl.ElasticsearchWorkFactory;
 import org.hibernate.search.engine.cfg.ConfigurationPropertySource;
 import org.hibernate.search.engine.cfg.spi.ConfigurationProperty;
 import org.hibernate.search.engine.cfg.spi.OptionalConfigurationProperty;
 import org.hibernate.search.engine.environment.bean.BeanHolder;
+import org.hibernate.search.engine.environment.bean.BeanReference;
 import org.hibernate.search.engine.environment.bean.BeanResolver;
 import org.hibernate.search.util.common.AssertionFailure;
 import org.hibernate.search.util.common.impl.Closer;
@@ -59,12 +67,20 @@ class ElasticsearchLinkImpl implements ElasticsearchLink {
 					.withDefault( ElasticsearchBackendSettings.Defaults.QUERY_SHARD_FAILURE_IGNORE )
 					.build();
 
+	private static final ConfigurationProperty<BeanReference<? extends IndexLayoutStrategy>> LAYOUT_STRATEGY =
+			ConfigurationProperty.forKey( ElasticsearchBackendSettings.LAYOUT_STRATEGY )
+					.asBeanReference( IndexLayoutStrategy.class )
+					.withDefault( ElasticsearchBackendSettings.Defaults.LAYOUT_STRATEGY )
+					.build();
+
 	private final BeanHolder<? extends ElasticsearchClientFactory> clientFactoryHolder;
 	private final BackendThreads threads;
 	private final GsonProvider defaultGsonProvider;
 	private final boolean logPrettyPrinting;
 	private final ElasticsearchDialectFactory dialectFactory;
 	private final Optional<ElasticsearchVersion> configuredVersionOnBackendCreationOptional;
+	private final TypeNameMapping typeNameMapping;
+	private final IndexNamesRegistry indexNamesRegistry;
 
 	private ElasticsearchClientImplementor clientImplementor;
 	private ElasticsearchVersion elasticsearchVersion;
@@ -74,17 +90,22 @@ class ElasticsearchLinkImpl implements ElasticsearchLink {
 	private ElasticsearchWorkFactory workFactory;
 	private ElasticsearchSearchResultExtractorFactory searchResultExtractorFactory;
 	private Integer scrollTimeout;
+	private BeanHolder<? extends IndexLayoutStrategy> indexLayoutStrategyHolder;
+	private SearchProjectionBackendContext searchProjectionBackendContext;
 
 	ElasticsearchLinkImpl(BeanHolder<? extends ElasticsearchClientFactory> clientFactoryHolder,
 			BackendThreads threads, GsonProvider defaultGsonProvider, boolean logPrettyPrinting,
 			ElasticsearchDialectFactory dialectFactory,
-			Optional<ElasticsearchVersion> configuredVersionOnBackendCreationOptional) {
+			Optional<ElasticsearchVersion> configuredVersionOnBackendCreationOptional,
+			TypeNameMapping typeNameMapping) {
 		this.clientFactoryHolder = clientFactoryHolder;
 		this.threads = threads;
 		this.defaultGsonProvider = defaultGsonProvider;
 		this.logPrettyPrinting = logPrettyPrinting;
 		this.dialectFactory = dialectFactory;
 		this.configuredVersionOnBackendCreationOptional = configuredVersionOnBackendCreationOptional;
+		this.typeNameMapping = typeNameMapping;
+		this.indexNamesRegistry = new IndexNamesRegistry();
 	}
 
 	@Override
@@ -129,12 +150,62 @@ class ElasticsearchLinkImpl implements ElasticsearchLink {
 		return scrollTimeout;
 	}
 
+	@Override
+	public IndexLayoutStrategy getIndexLayoutStrategy() {
+		checkStarted();
+		return indexLayoutStrategyHolder.get();
+	}
+
+	@Override
+	public TypeNameMapping getTypeNameMapping() {
+		return typeNameMapping;
+	}
+
+	@Override
+	public IndexNames createIndexNames(String hibernateSearchIndexName, String mappedTypeName) {
+		checkStarted();
+
+		IndexLayoutStrategy indexLayoutStrategy = indexLayoutStrategyHolder.get();
+		URLEncodedString writeAlias = IndexNames.encodeName( indexLayoutStrategy.createWriteAlias( hibernateSearchIndexName ) );
+		URLEncodedString readAlias = IndexNames.encodeName( indexLayoutStrategy.createReadAlias( hibernateSearchIndexName ) );
+
+		URLEncodedString primaryName = null;
+		if ( writeAlias == null || readAlias == null ) {
+			primaryName = IndexNames.encodeName(
+					indexLayoutStrategy.createInitialElasticsearchIndexName( hibernateSearchIndexName ) );
+		}
+		else if ( writeAlias.equals( readAlias ) ) {
+			throw log.sameWriteAndReadAliases( writeAlias );
+		}
+
+		URLEncodedString readName = readAlias != null ? readAlias : primaryName;
+		URLEncodedString writeName = writeAlias != null ? writeAlias : primaryName;
+
+		IndexNames indexNames = new IndexNames( hibernateSearchIndexName,
+				writeName, writeAlias != null, readName, readAlias != null );
+
+		// This will check that names are unique.
+		indexNamesRegistry.register( indexNames );
+
+		// This will allow the type mapping to resolve the type name from the index name.
+		typeNameMapping.register( indexNames, mappedTypeName );
+
+		return indexNames;
+	}
+
+	@Override
+	public SearchProjectionBackendContext getSearchProjectionBackendContext() {
+		checkStarted();
+		return searchProjectionBackendContext;
+	}
+
 	ElasticsearchVersion getElasticsearchVersion() {
 		checkStarted();
 		return elasticsearchVersion;
 	}
 
-	void onStart(BeanResolver beanResolver, ConfigurationPropertySource propertySource) {
+	void onStart(BeanResolver beanResolver, MultiTenancyStrategy multiTenancyStrategy,
+			ConfigurationPropertySource propertySource) {
 		if ( clientImplementor == null ) {
 			clientImplementor = clientFactoryHolder.get().create(
 					beanResolver, propertySource, threads.getThreadProvider(), threads.getPrefix(),
@@ -153,12 +224,20 @@ class ElasticsearchLinkImpl implements ElasticsearchLink {
 			searchResultExtractorFactory = protocolDialect.createSearchResultExtractorFactory();
 			scrollTimeout = SCROLL_TIMEOUT.get( propertySource );
 		}
+		indexLayoutStrategyHolder = createIndexLayoutStrategy( beanResolver, propertySource );
+		ProjectionExtractionHelper<String> projectionExtractionHelper =
+				typeNameMapping.onStart( indexLayoutStrategyHolder.get() );
+		searchProjectionBackendContext = new SearchProjectionBackendContext(
+				projectionExtractionHelper,
+				multiTenancyStrategy.idProjectionExtractionHelper()
+		);
 	}
 
 	void onStop() {
 		try ( Closer<RuntimeException> closer = new Closer<>() ) {
 			closer.push( BeanHolder::close, clientFactoryHolder ); // Just in case start() was not called
 			closer.push( ElasticsearchClientImplementor::close, clientImplementor );
+			closer.push( BeanHolder::close, indexLayoutStrategyHolder );
 		}
 	}
 
@@ -255,5 +334,10 @@ class ElasticsearchLinkImpl implements ElasticsearchLink {
 		catch (RuntimeException e) {
 			throw log.failedToDetectElasticsearchVersion( e.getMessage(), e );
 		}
+	}
+
+	private BeanHolder<? extends IndexLayoutStrategy> createIndexLayoutStrategy(BeanResolver beanResolver,
+			ConfigurationPropertySource propertySource) {
+		return LAYOUT_STRATEGY.getAndTransform( propertySource, beanResolver::resolve );
 	}
 }

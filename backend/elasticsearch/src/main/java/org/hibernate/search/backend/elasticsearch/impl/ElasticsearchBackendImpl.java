@@ -28,7 +28,6 @@ import org.hibernate.search.backend.elasticsearch.index.impl.IndexManagerBackend
 import org.hibernate.search.backend.elasticsearch.logging.impl.Log;
 import org.hibernate.search.backend.elasticsearch.lowlevel.index.mapping.impl.RootTypeMapping;
 import org.hibernate.search.backend.elasticsearch.lowlevel.index.settings.impl.IndexSettings;
-import org.hibernate.search.backend.elasticsearch.mapping.impl.TypeNameMapping;
 import org.hibernate.search.backend.elasticsearch.multitenancy.impl.MultiTenancyStrategy;
 import org.hibernate.search.backend.elasticsearch.orchestration.impl.ElasticsearchSimpleWorkOrchestrator;
 import org.hibernate.search.backend.elasticsearch.resources.impl.BackendThreads;
@@ -96,7 +95,6 @@ class ElasticsearchBackendImpl
 	private final ElasticsearchIndexFieldTypeFactoryProvider typeFactoryProvider;
 	private final Gson userFacingGson;
 	private final MultiTenancyStrategy multiTenancyStrategy;
-	private final TypeNameMapping typeNameMapping;
 
 	private final IndexManagerBackendContext indexManagerBackendContext;
 
@@ -108,7 +106,7 @@ class ElasticsearchBackendImpl
 			ElasticsearchPropertyMappingValidatorProvider propertyMappingValidatorProvider,
 			Gson userFacingGson,
 			MultiTenancyStrategy multiTenancyStrategy,
-			TypeNameMapping typeNameMapping, FailureHandler failureHandler, TimingSource timingSource) {
+			FailureHandler failureHandler, TimingSource timingSource) {
 		this.backendName = backendName;
 		this.eventContext = eventContext;
 		this.threads = threads;
@@ -119,7 +117,6 @@ class ElasticsearchBackendImpl
 				link
 		);
 		this.multiTenancyStrategy = multiTenancyStrategy;
-		this.typeNameMapping = typeNameMapping;
 		this.typeFactoryProvider = typeFactoryProvider;
 		this.userFacingGson = userFacingGson;
 
@@ -127,7 +124,6 @@ class ElasticsearchBackendImpl
 				this, eventContext, threads, link,
 				userFacingGson,
 				multiTenancyStrategy,
-				typeNameMapping,
 				failureHandler, timingSource,
 				generalPurposeOrchestrator,
 				propertyMappingValidatorProvider
@@ -141,9 +137,8 @@ class ElasticsearchBackendImpl
 
 	@Override
 	public void start(BackendStartContext context) {
-		indexManagerBackendContext.start( context );
 		threads.onStart( context.configurationPropertySource(), context.beanResolver(), context.threadPoolProvider() );
-		link.onStart( context.beanResolver(), context.configurationPropertySource() );
+		link.onStart( context.beanResolver(), multiTenancyStrategy, context.configurationPropertySource() );
 		generalPurposeOrchestrator.start( context.configurationPropertySource() );
 	}
 
@@ -157,7 +152,6 @@ class ElasticsearchBackendImpl
 		try ( Closer<RuntimeException> closer = new Closer<>() ) {
 			closer.push( ElasticsearchSimpleWorkOrchestrator::stop, generalPurposeOrchestrator );
 			closer.push( ElasticsearchLinkImpl::onStop, link );
-			closer.push( IndexManagerBackendContext::stop, indexManagerBackendContext );
 			closer.push( BackendThreads::onStop, threads );
 		}
 	}
@@ -227,9 +221,9 @@ class ElasticsearchBackendImpl
 				dynamicMapping
 		);
 
-		typeNameMapping.getIndexSchemaRootContributor()
+		link.getTypeNameMapping().getIndexSchemaRootContributor()
 				.ifPresent( builder::addSchemaRootContributor );
-		typeNameMapping.getImplicitFieldContributor()
+		link.getTypeNameMapping().getImplicitFieldContributor()
 				.ifPresent( builder::addImplicitFieldContributor );
 
 		multiTenancyStrategy.indexSchemaRootContributor()
@@ -264,7 +258,7 @@ class ElasticsearchBackendImpl
 
 	private List<DocumentMetadataContributor> createDocumentMetadataContributors(String mappedTypeName) {
 		List<DocumentMetadataContributor> contributors = new ArrayList<>();
-		typeNameMapping.getDocumentMetadataContributor( mappedTypeName )
+		link.getTypeNameMapping().getDocumentMetadataContributor( mappedTypeName )
 				.ifPresent( contributors::add );
 		multiTenancyStrategy.documentMetadataContributor()
 				.ifPresent( contributors::add );

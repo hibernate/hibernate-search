@@ -37,7 +37,10 @@ public interface TypeNameMapping {
 	 */
 	Optional<ImplicitFieldContributor> getImplicitFieldContributor();
 
-	void onStart(IndexLayoutStrategy indexLayoutStrategy);
+	/**
+	 * @return A helper for projections that need to extract the mapped type name from search hits.
+	 */
+	ProjectionExtractionHelper<String> onStart(IndexLayoutStrategy indexLayoutStrategy);
 
 	/**
 	 * Register a new index => type mapping.
@@ -46,10 +49,5 @@ public interface TypeNameMapping {
 	 * @param mappedTypeName The name of the type mapped to the index.
 	 */
 	void register(IndexNames indexNames, String mappedTypeName);
-
-	/**
-	 * @return A helper for projections that need to extract the mapped type name from search hits.
-	 */
-	ProjectionExtractionHelper<String> getTypeNameExtractionHelper();
 
 }

@@ -53,9 +53,10 @@ public class IndexNameTypeNameMapping implements TypeNameMapping {
 	}
 
 	@Override
-	public void onStart(IndexLayoutStrategy indexLayoutStrategy) {
+	public ProjectionExtractionHelper<String> onStart(IndexLayoutStrategy indexLayoutStrategy) {
 		this.indexLayoutStrategy = indexLayoutStrategy;
 		this.mappedTypeNameExtractionHelper = new TypeNameFromIndexNameExtractionHelper( indexLayoutStrategy );
+		return this.mappedTypeNameExtractionHelper;
 	}
 
 	@Override
@@ -70,11 +71,6 @@ public class IndexNameTypeNameMapping implements TypeNameMapping {
 		);
 		mappedTypeNameExtractionHelper.primaryIndexNameUniqueKeyToMappedTypeNames
 				.put( uniqueKey, mappedTypeName );
-	}
-
-	@Override
-	public ProjectionExtractionHelper<String> getTypeNameExtractionHelper() {
-		return mappedTypeNameExtractionHelper;
 	}
 
 	private static final class TypeNameFromIndexNameExtractionHelper implements ProjectionExtractionHelper<String> {
