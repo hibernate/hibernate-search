@@ -1769,9 +1769,9 @@
                         -Dno-build-cache -Dbuildinfo.detect.skip=false \
                         -Dbuildinfo.skipModules='**/**internal**,**/**integrationtest**,**/**parent**,**/**documentation**,**/**reports**,**/**build**'
                 We can run
-                    mvn clean package -Pskip-checks -Preproducible -Dno-build-cache
+                    mvn clean package -Pskip-checks -Preproducibility-check -Dno-build-cache
             -->
-            <id>reproducible</id>
+            <id>reproducibility-check</id>
             <properties>
                 <maven-deploy-plugin.skip>false</maven-deploy-plugin.skip>
                 <maven.javadoc.skip>true</maven.javadoc.skip>
