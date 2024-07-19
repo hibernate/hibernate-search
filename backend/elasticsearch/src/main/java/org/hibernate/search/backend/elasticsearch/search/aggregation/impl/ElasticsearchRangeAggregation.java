@@ -17,7 +17,6 @@ import org.hibernate.search.backend.elasticsearch.search.common.impl.Elasticsear
 import org.hibernate.search.backend.elasticsearch.search.common.impl.ElasticsearchSearchIndexValueFieldContext;
 import org.hibernate.search.backend.elasticsearch.search.predicate.impl.ElasticsearchSearchPredicate;
 import org.hibernate.search.backend.elasticsearch.types.codec.impl.ElasticsearchFieldCodec;
-import org.hibernate.search.backend.elasticsearch.types.converter.impl.ElasticsearchDslProjectionHelper;
 import org.hibernate.search.engine.search.aggregation.spi.RangeAggregationBuilder;
 import org.hibernate.search.engine.search.common.ValueModel;
 import org.hibernate.search.util.common.data.Range;
@@ -73,26 +72,23 @@ public class ElasticsearchRangeAggregation<F, K>
 		@Override
 		public RangeAggregationBuilder.TypeSelector create(ElasticsearchSearchIndexScope<?> scope,
 				ElasticsearchSearchIndexValueFieldContext<F> field) {
-			return new TypeSelector<>( codec, scope, field );
+			return new TypeSelector<>( scope, field );
 		}
 	}
 
 	private static class TypeSelector<F> implements RangeAggregationBuilder.TypeSelector {
-		private final ElasticsearchFieldCodec<F> codec;
 		private final ElasticsearchSearchIndexScope<?> scope;
 		private final ElasticsearchSearchIndexValueFieldContext<F> field;
 
-		private TypeSelector(ElasticsearchFieldCodec<F> codec,
-				ElasticsearchSearchIndexScope<?> scope, ElasticsearchSearchIndexValueFieldContext<F> field) {
-			this.codec = codec;
+		private TypeSelector(ElasticsearchSearchIndexScope<?> scope,
+				ElasticsearchSearchIndexValueFieldContext<F> field) {
 			this.scope = scope;
 			this.field = field;
 		}
 
 		@Override
 		public <T> Builder<F, T> type(Class<T> expectedType, ValueModel valueModel) {
-			return new Builder<>( codec, scope, field,
-					ElasticsearchDslProjectionHelper.encoder( scope, codec, field, expectedType, valueModel ) );
+			return new Builder<>( scope, field, field.encodingContext().encoder( scope, field, expectedType, valueModel ) );
 		}
 	}
 
@@ -123,16 +119,14 @@ public class ElasticsearchRangeAggregation<F, K>
 	private static class Builder<F, K> extends AbstractBuilder<Range<K>, Long>
 			implements RangeAggregationBuilder<K> {
 
-		private final ElasticsearchFieldCodec<F> codec;
 		private final Function<? super K, JsonElement> encoder;
 
 		private final List<Range<K>> rangesInOrder = new ArrayList<>();
 		private final JsonArray rangesJson = new JsonArray();
 
-		private Builder(ElasticsearchFieldCodec<F> codec, ElasticsearchSearchIndexScope<?> scope,
-				ElasticsearchSearchIndexValueFieldContext<F> field, Function<? super K, JsonElement> encoder) {
+		private Builder(ElasticsearchSearchIndexScope<?> scope, ElasticsearchSearchIndexValueFieldContext<F> field,
+				Function<? super K, JsonElement> encoder) {
 			super( scope, field );
-			this.codec = codec;
 			this.encoder = encoder;
 		}
 

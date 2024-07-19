@@ -85,4 +85,10 @@ public class ElasticsearchMultiIndexSearchIndexValueFieldContext<F>
 		return fromTypeIfCompatible( ElasticsearchSearchIndexValueFieldTypeContext::codec,
 				ElasticsearchFieldCodec::isCompatibleWith, "codec" );
 	}
+
+	@Override
+	public ElasticsearchSearchEncodingContext<F> encodingContext() {
+		return fromNodeIfCompatible( ElasticsearchSearchIndexValueFieldContext::encodingContext,
+				ElasticsearchSearchEncodingContext::isCompatibleWith, "encodingContext" );
+	}
 }

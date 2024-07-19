@@ -9,7 +9,6 @@ import java.util.Optional;
 import org.hibernate.search.backend.lucene.search.common.impl.LuceneSearchIndexScope;
 import org.hibernate.search.backend.lucene.search.common.impl.LuceneSearchIndexValueFieldContext;
 import org.hibernate.search.backend.lucene.types.codec.impl.LuceneFieldCodec;
-import org.hibernate.search.backend.lucene.types.converter.impl.LuceneDslProjectionHelper;
 import org.hibernate.search.engine.search.common.ValueModel;
 import org.hibernate.search.util.common.data.Range;
 
@@ -41,7 +40,7 @@ public abstract class AbstractLuceneLeafSingleFieldPredicate extends AbstractLuc
 		protected abstract Query buildQuery(PredicateRequestContext context);
 
 		protected <E> E convertAndEncode(LuceneFieldCodec<F, E> codec, Object value, ValueModel valueModel) {
-			return LuceneDslProjectionHelper.convertAndEncode( scope, codec, field, value, valueModel );
+			return field.encodingContext().convertAndEncode( scope, field, codec, value, valueModel );
 		}
 
 		protected <E> Range<E> convertAndEncode(LuceneFieldCodec<F, E> codec, Range<?> range,
