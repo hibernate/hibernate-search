@@ -1018,7 +1018,9 @@ public interface Log extends BasicLogger {
 			+ " Valid names are: %2$s.")
 	SearchException invalidMassIndexingDefaultCleanOperation(String name, List<String> names);
 
-	@Message(id = ID_OFFSET + 162, value = "Using `convert=ValueConvert.NO` in @FieldProjection is not allowed anymore. "
-			+ "Use `valueModel=ValueModel.INDEX` instead.")
-	SearchException usingNonDefaultValueConvertNotAllowed(@Param EventContext eventContext);
+	@Message(id = ID_OFFSET + 162,
+			value = "Using non-default `valueModel=ValueModel.%1$s` and `convert=ValueConvert.%2$s` at the same time is not allowed. "
+					+ "Remove the `convert` attribute and keep only the `valueModel=ValueModel.%1$s`.")
+	SearchException usingNonDefaultValueConvertAndValueModelNotAllowed(String model,
+			String convert, @Param EventContext eventContext);
 }

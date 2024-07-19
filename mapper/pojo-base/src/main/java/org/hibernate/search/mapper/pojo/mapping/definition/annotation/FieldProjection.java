@@ -50,13 +50,14 @@ public @interface FieldProjection {
 	 * Setting {@link #valueModel()} to any non-default value will take precedence over {@link #convert()} default {@link org.hibernate.search.engine.search.common.ValueConvert#YES} value.
 	 */
 	@Deprecated
-	org.hibernate.search.engine.search.common.ValueConvert convert() default org.hibernate.search.engine.search.common.ValueConvert.YES;
+	org.hibernate.search.engine.search.common.ValueConvert convert() default org.hibernate.search.engine.search.common.ValueConvert.DEFAULT;
 
 	/**
 	 * @return The model value, determines how the data fetched from the backend should be converted.
 	 * @see ValueModel
 	 * @see SearchProjectionFactory#field(String, Class, ValueModel)
 	 */
-	ValueModel valueModel() default ValueModel.MAPPING;
+	@SuppressWarnings("removal")
+	ValueModel valueModel() default ValueModel.DEFAULT;
 
 }
