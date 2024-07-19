@@ -104,5 +104,15 @@ public enum ValueModel {
 	 * Please refer to the reference documentation for more information.
 	 */
 	@Incubating
-	RAW
+	RAW,
+	/**
+	 * The result of applying this constant is the same as {@link #MAPPING}.
+	 * <p>
+	 * The constant is only available to ease migration from the {@link ValueConvert} enum, and will be removed in the future.
+	 *
+	 * @deprecated This constant is deprecated and will be removed at the same time as the {@link ValueConvert} enum is removed.
+	 * Do <b>not</b> use this value explicitly.
+	 */
+	@Deprecated(forRemoval = true)
+	DEFAULT
 }

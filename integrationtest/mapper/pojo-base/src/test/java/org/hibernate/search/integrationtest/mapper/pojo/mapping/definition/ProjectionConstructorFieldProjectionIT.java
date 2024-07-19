@@ -167,7 +167,7 @@ class ProjectionConstructorFieldProjectionIT extends AbstractProjectionConstruct
 
 	@Deprecated
 	@Test
-	void valueConvert_nonDefaultFails() {
+	void valueConvert_nonDefault() {
 		@Indexed(index = INDEX_NAME)
 		class IndexedEntity {
 			@DocumentId
@@ -185,12 +185,57 @@ class ProjectionConstructorFieldProjectionIT extends AbstractProjectionConstruct
 			}
 		}
 
+		backendMock.expectAnySchema( INDEX_NAME );
+		SearchMapping mapping = setupHelper.start()
+				.withAnnotatedTypes( MyProjection.class )
+				.setup( IndexedEntity.class );
+
+		testSuccessfulRootProjection(
+				mapping, IndexedEntity.class, MyProjection.class,
+				Arrays.asList(
+						Arrays.asList( "result1" ),
+						Arrays.asList( "result2" )
+				),
+				f -> f.composite()
+						.from(
+								dummyProjectionForEnclosingClassInstance( f ),
+								f.field( "myEnum", String.class, ValueModel.INDEX )
+						)
+						.asList(),
+				Arrays.asList(
+						new MyProjection( "result1" ),
+						new MyProjection( "result2" )
+				)
+		);
+	}
+
+	@Deprecated
+	@Test
+	void valueConvertAndValueModel_nonDefaultFails() {
+		@Indexed(index = INDEX_NAME)
+		class IndexedEntity {
+			@DocumentId
+			public Integer id;
+			@GenericField
+			public MyEnum myEnum;
+		}
+		class MyProjection {
+			public final String myEnum;
+
+			@ProjectionConstructor
+			public MyProjection(
+					@FieldProjection(convert = org.hibernate.search.engine.search.common.ValueConvert.NO,
+							valueModel = ValueModel.INDEX) String myEnum) {
+				this.myEnum = myEnum;
+			}
+		}
+
 		assertThatThrownBy( () -> setupHelper.start()
 				.withAnnotatedTypes( MyProjection.class )
 				.setup( IndexedEntity.class ) )
 				.isInstanceOf( SearchException.class )
 				.hasMessageContaining(
-						"Using `convert=ValueConvert.NO` in @FieldProjection is not allowed anymore. Use `valueModel=ValueModel.INDEX` instead." );
+						"Using non-default `valueModel=ValueModel.INDEX` and `convert=ValueConvert.NO` at the same time is not allowed. Remove the `convert` attribute and keep only the `valueModel=ValueModel.INDEX`." );
 	}
 
 	enum MyEnum {

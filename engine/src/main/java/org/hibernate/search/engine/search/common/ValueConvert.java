@@ -65,12 +65,22 @@ public enum ValueConvert {
 	 * @deprecated Use {@link ValueModel#INDEX} instead.
 	 */
 	@Deprecated
-	NO;
+	NO,
+	/**
+	 * The result of applying this constant is the same as {@link #YES}.
+	 * <p>
+	 * It should <b>never</b> be used explicitly, and is only added to help with migration purposes.
+	 * It is used as default value in some annotations like {@code FieldProjection} to help determine
+	 * if the attribute value was not set explicitly.
+	 */
+	@Deprecated
+	DEFAULT;
 
 	@Deprecated
 	public static ValueModel toValueModel(ValueConvert valueConvert) {
 		Contracts.assertNotNull( valueConvert, "valueConvert" );
 		switch ( valueConvert ) {
+			case DEFAULT:
 			case YES:
 				return ValueModel.MAPPING;
 			case NO:
