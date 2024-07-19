@@ -19,4 +19,5 @@ public interface ElasticsearchSearchIndexValueFieldContext<F>
 	@Override
 	ElasticsearchSearchIndexValueFieldTypeContext<F> type();
 
+	ElasticsearchSearchEncodingContext<F> encodingContext();
 }

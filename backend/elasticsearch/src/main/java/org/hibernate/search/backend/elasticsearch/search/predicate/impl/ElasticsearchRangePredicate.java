@@ -12,7 +12,6 @@ import org.hibernate.search.backend.elasticsearch.search.common.impl.AbstractEla
 import org.hibernate.search.backend.elasticsearch.search.common.impl.ElasticsearchSearchIndexScope;
 import org.hibernate.search.backend.elasticsearch.search.common.impl.ElasticsearchSearchIndexValueFieldContext;
 import org.hibernate.search.backend.elasticsearch.types.codec.impl.ElasticsearchFieldCodec;
-import org.hibernate.search.backend.elasticsearch.types.converter.impl.ElasticsearchDslProjectionHelper;
 import org.hibernate.search.engine.search.common.ValueModel;
 import org.hibernate.search.engine.search.predicate.SearchPredicate;
 import org.hibernate.search.engine.search.predicate.spi.RangePredicateBuilder;
@@ -111,8 +110,7 @@ public class ElasticsearchRangePredicate extends AbstractElasticsearchSingleFiel
 				return null;
 			}
 			Object value = valueOptional.get();
-			return ElasticsearchDslProjectionHelper.convertAndEncode( scope, codec, field, value, valueModel,
-					ElasticsearchFieldCodec::encode );
+			return field.encodingContext().convertAndEncode( scope, field, value, valueModel, ElasticsearchFieldCodec::encode );
 		}
 	}
 }

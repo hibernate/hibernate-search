@@ -14,7 +14,6 @@ import org.hibernate.search.backend.lucene.search.common.impl.LuceneSearchIndexS
 import org.hibernate.search.backend.lucene.search.common.impl.LuceneSearchIndexValueFieldContext;
 import org.hibernate.search.backend.lucene.types.codec.impl.AbstractLuceneNumericFieldCodec;
 import org.hibernate.search.backend.lucene.types.codec.impl.LuceneFieldCodec;
-import org.hibernate.search.backend.lucene.types.converter.impl.LuceneDslProjectionHelper;
 import org.hibernate.search.backend.lucene.types.lowlevel.impl.LuceneNumericDomain;
 import org.hibernate.search.backend.lucene.types.sort.comparatorsource.impl.LuceneFieldComparatorSource;
 import org.hibernate.search.backend.lucene.types.sort.comparatorsource.impl.LuceneNumericFieldComparatorSource;
@@ -94,7 +93,7 @@ public abstract class LuceneStandardFieldSort extends AbstractLuceneDocumentValu
 
 		@Override
 		public void missingAs(Object value, ValueModel valueModel) {
-			E encoded = LuceneDslProjectionHelper.convertAndEncode( scope, codec, field, value, valueModel );
+			E encoded = field.encodingContext().convertAndEncode( scope, field, codec, value, valueModel );
 			missingValue = mapMissingAs( encoded );
 		}
 

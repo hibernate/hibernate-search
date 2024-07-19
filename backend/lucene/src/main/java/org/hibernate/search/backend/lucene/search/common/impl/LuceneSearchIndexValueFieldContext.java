@@ -12,4 +12,6 @@ public interface LuceneSearchIndexValueFieldContext<F>
 	@Override
 	LuceneSearchIndexValueFieldTypeContext<F> type();
 
+	LuceneSearchEncodingContext<F> encodingContext();
+
 }

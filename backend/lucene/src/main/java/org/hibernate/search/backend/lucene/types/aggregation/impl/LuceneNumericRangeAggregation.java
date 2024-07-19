@@ -19,7 +19,6 @@ import org.hibernate.search.backend.lucene.search.common.impl.AbstractLuceneCode
 import org.hibernate.search.backend.lucene.search.common.impl.LuceneSearchIndexScope;
 import org.hibernate.search.backend.lucene.search.common.impl.LuceneSearchIndexValueFieldContext;
 import org.hibernate.search.backend.lucene.types.codec.impl.AbstractLuceneNumericFieldCodec;
-import org.hibernate.search.backend.lucene.types.converter.impl.LuceneDslProjectionHelper;
 import org.hibernate.search.backend.lucene.types.lowlevel.impl.LuceneNumericDomain;
 import org.hibernate.search.engine.search.aggregation.spi.RangeAggregationBuilder;
 import org.hibernate.search.engine.search.common.ValueModel;
@@ -113,7 +112,7 @@ public class LuceneNumericRangeAggregation<F, E extends Number, K>
 		@Override
 		public <K> Builder<F, ?, K> type(Class<K> expectedType, ValueModel valueModel) {
 			return new Builder<>( codec,
-					LuceneDslProjectionHelper.encoder( scope, codec, field, expectedType, valueModel ),
+					field.encodingContext().encoder( scope, field, codec, expectedType, valueModel ),
 					scope, field );
 		}
 	}

@@ -15,7 +15,6 @@ import org.hibernate.search.backend.elasticsearch.search.common.impl.Elasticsear
 import org.hibernate.search.backend.elasticsearch.search.predicate.impl.AbstractElasticsearchSingleFieldPredicate;
 import org.hibernate.search.backend.elasticsearch.search.predicate.impl.PredicateRequestContext;
 import org.hibernate.search.backend.elasticsearch.types.codec.impl.ElasticsearchFieldCodec;
-import org.hibernate.search.backend.elasticsearch.types.converter.impl.ElasticsearchDslProjectionHelper;
 import org.hibernate.search.engine.search.common.ValueModel;
 import org.hibernate.search.engine.search.predicate.SearchPredicate;
 import org.hibernate.search.engine.search.predicate.spi.TermsPredicateBuilder;
@@ -160,8 +159,7 @@ public class ElasticsearchTermsPredicate extends AbstractElasticsearchSingleFiel
 		}
 
 		private JsonElement encode(Object term, ValueModel valueModel) {
-			return ElasticsearchDslProjectionHelper.convertAndEncode( scope, codec, field, term, valueModel,
-					ElasticsearchFieldCodec::encode );
+			return field.encodingContext().convertAndEncode( scope, field, term, valueModel, ElasticsearchFieldCodec::encode );
 		}
 	}
 }
