@@ -11,6 +11,8 @@ import org.hibernate.search.backend.elasticsearch.types.codec.impl.Elasticsearch
 import org.hibernate.search.backend.elasticsearch.types.codec.impl.ElasticsearchInstantFieldCodec;
 import org.hibernate.search.engine.backend.types.converter.spi.DefaultStringConverters;
 
+import com.google.gson.Gson;
+
 class ElasticsearchInstantIndexFieldTypeOptionsStep
 		extends
 		AbstractElasticsearchTemporalIndexFieldTypeOptionsStep<ElasticsearchInstantIndexFieldTypeOptionsStep, Instant> {
@@ -20,8 +22,8 @@ class ElasticsearchInstantIndexFieldTypeOptionsStep
 	}
 
 	@Override
-	protected ElasticsearchFieldCodec<Instant> createCodec(DateTimeFormatter formatter) {
-		return new ElasticsearchInstantFieldCodec( formatter );
+	protected ElasticsearchFieldCodec<Instant> createCodec(Gson gson, DateTimeFormatter formatter) {
+		return new ElasticsearchInstantFieldCodec( gson, formatter );
 	}
 
 	@Override

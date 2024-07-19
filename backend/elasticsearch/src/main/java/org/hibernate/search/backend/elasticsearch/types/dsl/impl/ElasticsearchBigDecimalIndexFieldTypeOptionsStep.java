@@ -39,10 +39,11 @@ class ElasticsearchBigDecimalIndexFieldTypeOptionsStep
 	}
 
 	@Override
-	protected ElasticsearchFieldCodec<BigDecimal> completeCodec() {
+	protected ElasticsearchFieldCodec<BigDecimal> completeCodec(ElasticsearchIndexFieldTypeBuildContext buildContext) {
 		int resolvedDecimalScale = resolveDecimalScale();
 
-		ElasticsearchBigDecimalFieldCodec codec = new ElasticsearchBigDecimalFieldCodec( resolvedDecimalScale );
+		ElasticsearchBigDecimalFieldCodec codec =
+				new ElasticsearchBigDecimalFieldCodec( buildContext.getUserFacingGson(), resolvedDecimalScale );
 		builder.mapping().setScalingFactor( codec.scalingFactor().doubleValue() );
 
 		return codec;

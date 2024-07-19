@@ -29,7 +29,7 @@ class ElasticsearchGeoPointIndexFieldTypeOptionsStep
 
 	@Override
 	protected void complete() {
-		ElasticsearchGeoPointFieldCodec codec = ElasticsearchGeoPointFieldCodec.INSTANCE;
+		ElasticsearchGeoPointFieldCodec codec = new ElasticsearchGeoPointFieldCodec( buildContext.getUserFacingGson() );
 		builder.codec( codec );
 
 		// Since docs values are going to be available as soon as the filed is either sortable or projectable

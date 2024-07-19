@@ -11,6 +11,8 @@ import org.hibernate.search.backend.elasticsearch.types.codec.impl.Elasticsearch
 import org.hibernate.search.backend.elasticsearch.types.codec.impl.ElasticsearchYearMonthFieldCodec;
 import org.hibernate.search.engine.backend.types.converter.spi.DefaultStringConverters;
 
+import com.google.gson.Gson;
+
 class ElasticsearchYearMonthIndexFieldTypeOptionsStep
 		extends
 		AbstractElasticsearchTemporalIndexFieldTypeOptionsStep<ElasticsearchYearMonthIndexFieldTypeOptionsStep, YearMonth> {
@@ -20,8 +22,8 @@ class ElasticsearchYearMonthIndexFieldTypeOptionsStep
 	}
 
 	@Override
-	protected ElasticsearchFieldCodec<YearMonth> createCodec(DateTimeFormatter formatter) {
-		return new ElasticsearchYearMonthFieldCodec( formatter );
+	protected ElasticsearchFieldCodec<YearMonth> createCodec(Gson gson, DateTimeFormatter formatter) {
+		return new ElasticsearchYearMonthFieldCodec( gson, formatter );
 	}
 
 	@Override

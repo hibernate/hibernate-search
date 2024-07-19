@@ -198,7 +198,7 @@ class ElasticsearchStringIndexFieldTypeOptionsStep
 			mapping.setNullValue( new JsonPrimitive( indexNullAs ) );
 		}
 
-		ElasticsearchStringFieldCodec codec = ElasticsearchStringFieldCodec.INSTANCE;
+		ElasticsearchStringFieldCodec codec = new ElasticsearchStringFieldCodec( buildContext.getUserFacingGson() );
 		builder.codec( codec );
 
 		if ( resolvedSearchable ) {

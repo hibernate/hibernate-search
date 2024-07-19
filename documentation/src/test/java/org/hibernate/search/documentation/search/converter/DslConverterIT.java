@@ -110,7 +110,7 @@ class DslConverterIT {
 					// end::dsl-converter-raw[]
 					BackendConfiguration.isLucene()
 							? LocalDateTime.of( 2002, 02, 20, 20, 02, 22 ).toInstant( ZoneOffset.UTC ).toEpochMilli()
-							: "2002-02-20T20:02:22.000000000";
+							: "\"2002-02-20T20:02:22.000000000\"";
 			// tag::dsl-converter-raw[]
 			List<AuthenticationEvent> result = searchSession.search( AuthenticationEvent.class )
 					.where( f -> f.match().field( "time" )

@@ -8,10 +8,12 @@ import java.time.YearMonth;
 import java.time.ZoneOffset;
 import java.time.format.DateTimeFormatter;
 
+import com.google.gson.Gson;
+
 public class ElasticsearchYearMonthFieldCodec extends AbstractElasticsearchJavaTimeFieldCodec<YearMonth> {
 
-	public ElasticsearchYearMonthFieldCodec(DateTimeFormatter delegate) {
-		super( delegate );
+	public ElasticsearchYearMonthFieldCodec(Gson gson, DateTimeFormatter delegate) {
+		super( gson, delegate );
 	}
 
 	@Override

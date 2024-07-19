@@ -26,6 +26,8 @@ import org.hibernate.search.engine.search.predicate.spi.PredicateTypeKeys;
 import org.hibernate.search.engine.search.projection.spi.ProjectionTypeKeys;
 import org.hibernate.search.engine.search.sort.spi.SortTypeKeys;
 
+import com.google.gson.Gson;
+
 abstract class AbstractElasticsearchTemporalIndexFieldTypeOptionsStep<
 		S extends AbstractElasticsearchTemporalIndexFieldTypeOptionsStep<?, F>,
 		F extends TemporalAccessor>
@@ -46,7 +48,7 @@ abstract class AbstractElasticsearchTemporalIndexFieldTypeOptionsStep<
 
 		DateTimeFormatter formatter = defaultFieldFormatProvider.getDefaultDateTimeFormatter( builder.valueClass() );
 
-		ElasticsearchFieldCodec<F> codec = createCodec( formatter );
+		ElasticsearchFieldCodec<F> codec = createCodec( buildContext.getUserFacingGson(), formatter );
 		builder.codec( codec );
 
 		if ( resolvedSearchable ) {
@@ -80,6 +82,6 @@ abstract class AbstractElasticsearchTemporalIndexFieldTypeOptionsStep<
 		}
 	}
 
-	protected abstract ElasticsearchFieldCodec<F> createCodec(DateTimeFormatter formatter);
+	protected abstract ElasticsearchFieldCodec<F> createCodec(Gson gson, DateTimeFormatter formatter);
 
 }

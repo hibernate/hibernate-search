@@ -9,6 +9,8 @@ import java.time.MonthDay;
 import java.time.ZoneOffset;
 import java.time.format.DateTimeFormatter;
 
+import com.google.gson.Gson;
+
 public class ElasticsearchMonthDayFieldCodec extends AbstractElasticsearchJavaTimeFieldCodec<MonthDay> {
 
 	/**
@@ -25,8 +27,8 @@ public class ElasticsearchMonthDayFieldCodec extends AbstractElasticsearchJavaTi
 	 */
 	private static final int LEAP_YEAR = 0; // Year 0 exists in the proleptic gregorian calendar and is a leap year.
 
-	public ElasticsearchMonthDayFieldCodec(DateTimeFormatter delegate) {
-		super( delegate );
+	public ElasticsearchMonthDayFieldCodec(Gson gson, DateTimeFormatter delegate) {
+		super( gson, delegate );
 	}
 
 	@Override

@@ -17,8 +17,8 @@ class ElasticsearchByteIndexFieldTypeOptionsStep
 	}
 
 	@Override
-	protected ElasticsearchFieldCodec<Byte> completeCodec() {
-		return ElasticsearchByteFieldCodec.INSTANCE;
+	protected ElasticsearchFieldCodec<Byte> completeCodec(ElasticsearchIndexFieldTypeBuildContext buildContext) {
+		return new ElasticsearchByteFieldCodec( buildContext.getUserFacingGson() );
 	}
 
 	@Override

@@ -8,10 +8,12 @@ import java.time.LocalDateTime;
 import java.time.ZoneOffset;
 import java.time.format.DateTimeFormatter;
 
+import com.google.gson.Gson;
+
 public class ElasticsearchLocalDateTimeFieldCodec extends AbstractElasticsearchJavaTimeFieldCodec<LocalDateTime> {
 
-	public ElasticsearchLocalDateTimeFieldCodec(DateTimeFormatter delegate) {
-		super( delegate );
+	public ElasticsearchLocalDateTimeFieldCodec(Gson gson, DateTimeFormatter delegate) {
+		super( gson, delegate );
 	}
 
 	@Override

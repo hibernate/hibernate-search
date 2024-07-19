@@ -14,7 +14,7 @@ import org.hibernate.search.backend.elasticsearch.search.common.impl.AbstractEla
 import org.hibernate.search.backend.elasticsearch.search.common.impl.ElasticsearchSearchIndexScope;
 import org.hibernate.search.backend.elasticsearch.search.common.impl.ElasticsearchSearchIndexValueFieldContext;
 import org.hibernate.search.backend.elasticsearch.search.projection.util.impl.SloppyMath;
-import org.hibernate.search.backend.elasticsearch.types.codec.impl.ElasticsearchGeoPointFieldCodec;
+import org.hibernate.search.backend.elasticsearch.types.codec.impl.ElasticsearchFieldCodec;
 import org.hibernate.search.engine.backend.types.converter.spi.ProjectionConverter;
 import org.hibernate.search.engine.search.loading.spi.LoadingResult;
 import org.hibernate.search.engine.search.loading.spi.ProjectionHitMapper;
@@ -39,7 +39,6 @@ public class ElasticsearchDistanceToFieldProjection<A, P> extends AbstractElasti
 	private static final JsonObjectAccessor SCRIPT_FIELDS_ACCESSOR = JsonAccessor.root().property( "script_fields" ).asObject();
 	private static final JsonObjectAccessor FIELDS_ACCESSOR = JsonAccessor.root().property( "fields" ).asObject();
 	private static final JsonArrayAccessor SORT_ACCESSOR = JsonAccessor.root().property( "sort" ).asArray();
-	private static final ElasticsearchGeoPointFieldCodec CODEC = ElasticsearchGeoPointFieldCodec.INSTANCE;
 
 	private static final ProjectionConverter<Double, Double> NO_OP_DOUBLE_CONVERTER =
 			ProjectionConverter.passThrough( Double.class );
@@ -56,6 +55,7 @@ public class ElasticsearchDistanceToFieldProjection<A, P> extends AbstractElasti
 					" return null;" +
 					" }";
 
+	private final ElasticsearchFieldCodec<GeoPoint> codec;
 	private final String absoluteFieldPath;
 	private final boolean singleValuedInRoot;
 
@@ -71,6 +71,8 @@ public class ElasticsearchDistanceToFieldProjection<A, P> extends AbstractElasti
 			ProjectionAccumulator.Provider<Double, P> accumulatorProvider,
 			ProjectionAccumulator<Double, Double, A, P> accumulator) {
 		super( builder );
+		this.codec = builder.field.type().codec();
+
 		this.absoluteFieldPath = builder.field.absolutePath();
 		this.singleValuedInRoot = !builder.field.multiValuedInRoot();
 		this.center = builder.center;
@@ -181,7 +183,7 @@ public class ElasticsearchDistanceToFieldProjection<A, P> extends AbstractElasti
 	}
 
 	private Double computeDistanceWithUnit(JsonElement geoPoint) {
-		GeoPoint decoded = CODEC.decode( geoPoint );
+		GeoPoint decoded = codec.decode( geoPoint );
 		if ( decoded == null ) {
 			return null;
 		}

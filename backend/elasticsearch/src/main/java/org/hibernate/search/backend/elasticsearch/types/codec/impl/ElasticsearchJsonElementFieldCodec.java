@@ -44,4 +44,14 @@ public class ElasticsearchJsonElementFieldCodec implements ElasticsearchFieldCod
 		ElasticsearchJsonElementFieldCodec castedOther = (ElasticsearchJsonElementFieldCodec) other;
 		return gson.equals( castedOther.gson );
 	}
+
+	@Override
+	public JsonElement fromJsonStringToElement(String value) {
+		return gson.fromJson( value, JsonElement.class );
+	}
+
+	@Override
+	public String fromJsonElementToString(JsonElement value) {
+		return gson.toJson( value );
+	}
 }

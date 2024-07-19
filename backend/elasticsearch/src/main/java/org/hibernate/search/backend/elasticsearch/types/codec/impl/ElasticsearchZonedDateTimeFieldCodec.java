@@ -9,10 +9,12 @@ import java.time.format.DateTimeFormatter;
 
 import org.hibernate.search.util.common.impl.TimeHelper;
 
+import com.google.gson.Gson;
+
 public class ElasticsearchZonedDateTimeFieldCodec extends AbstractElasticsearchJavaTimeFieldCodec<ZonedDateTime> {
 
-	public ElasticsearchZonedDateTimeFieldCodec(DateTimeFormatter delegate) {
-		super( delegate );
+	public ElasticsearchZonedDateTimeFieldCodec(Gson gson, DateTimeFormatter delegate) {
+		super( gson, delegate );
 	}
 
 	@Override

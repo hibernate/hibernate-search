@@ -33,7 +33,7 @@ abstract class AbstractElasticsearchNumericFieldTypeOptionsStep<
 
 	@Override
 	protected final void complete() {
-		ElasticsearchFieldCodec<F> codec = completeCodec();
+		ElasticsearchFieldCodec<F> codec = completeCodec( buildContext );
 		builder.codec( codec );
 
 		if ( resolvedSearchable ) {
@@ -66,5 +66,5 @@ abstract class AbstractElasticsearchNumericFieldTypeOptionsStep<
 		}
 	}
 
-	protected abstract ElasticsearchFieldCodec<F> completeCodec();
+	protected abstract ElasticsearchFieldCodec<F> completeCodec(ElasticsearchIndexFieldTypeBuildContext buildContext);
 }

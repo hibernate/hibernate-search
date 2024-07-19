@@ -9,12 +9,14 @@ import java.time.Month;
 import java.time.OffsetTime;
 import java.time.format.DateTimeFormatter;
 
+import com.google.gson.Gson;
+
 public class ElasticsearchOffsetTimeFieldCodec extends AbstractElasticsearchJavaTimeFieldCodec<OffsetTime> {
 
 	private static final LocalDate EPOCH_DATE = LocalDate.of( 1970, Month.JANUARY, 1 );
 
-	public ElasticsearchOffsetTimeFieldCodec(DateTimeFormatter delegate) {
-		super( delegate );
+	public ElasticsearchOffsetTimeFieldCodec(Gson gson, DateTimeFormatter delegate) {
+		super( gson, delegate );
 	}
 
 	@Override

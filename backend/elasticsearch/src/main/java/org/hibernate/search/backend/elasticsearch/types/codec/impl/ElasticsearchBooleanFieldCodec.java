@@ -6,14 +6,15 @@ package org.hibernate.search.backend.elasticsearch.types.codec.impl;
 
 import org.hibernate.search.backend.elasticsearch.gson.impl.JsonElementTypes;
 
+import com.google.gson.Gson;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonNull;
 import com.google.gson.JsonPrimitive;
 
-public class ElasticsearchBooleanFieldCodec implements ElasticsearchFieldCodec<Boolean> {
-	public static final ElasticsearchBooleanFieldCodec INSTANCE = new ElasticsearchBooleanFieldCodec();
+public final class ElasticsearchBooleanFieldCodec extends AbstractElasticsearchFieldCodec<Boolean> {
 
-	private ElasticsearchBooleanFieldCodec() {
+	public ElasticsearchBooleanFieldCodec(Gson gson) {
+		super( gson );
 	}
 
 	@Override
@@ -43,6 +44,16 @@ public class ElasticsearchBooleanFieldCodec implements ElasticsearchFieldCodec<B
 
 	@Override
 	public boolean isCompatibleWith(ElasticsearchFieldCodec<?> other) {
-		return INSTANCE == other;
+		return other instanceof ElasticsearchBooleanFieldCodec;
+	}
+
+	@Override
+	public String fromJsonElementToString(JsonElement value) {
+		if ( value == null || value.isJsonNull() ) {
+			return null;
+		}
+		// Sometimes the backend may return boolean as `true` and sometimes as `"true"`,
+		//  hence we just get the boolean value and convert it to String as:
+		return Boolean.toString( value.getAsBoolean() );
 	}
 }

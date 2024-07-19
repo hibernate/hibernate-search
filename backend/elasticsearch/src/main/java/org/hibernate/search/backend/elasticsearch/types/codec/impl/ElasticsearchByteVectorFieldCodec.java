@@ -7,13 +7,14 @@ package org.hibernate.search.backend.elasticsearch.types.codec.impl;
 import org.hibernate.search.engine.backend.types.VectorSimilarity;
 import org.hibernate.search.util.common.AssertionFailure;
 
+import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 
 public class ElasticsearchByteVectorFieldCodec extends AbstractElasticsearchVectorFieldCodec<byte[]> {
 
-	public ElasticsearchByteVectorFieldCodec(VectorSimilarity similarity, int dimension, Integer m,
+	public ElasticsearchByteVectorFieldCodec(Gson gson, VectorSimilarity similarity, int dimension, Integer m,
 			Integer efConstruction, byte[] indexNullAs) {
-		super( similarity, dimension, m, efConstruction, indexNullAs );
+		super( gson, similarity, dimension, m, efConstruction, indexNullAs );
 	}
 
 	@Override

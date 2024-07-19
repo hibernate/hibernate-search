@@ -11,6 +11,8 @@ import org.hibernate.search.backend.elasticsearch.types.codec.impl.Elasticsearch
 import org.hibernate.search.backend.elasticsearch.types.codec.impl.ElasticsearchLocalDateTimeFieldCodec;
 import org.hibernate.search.engine.backend.types.converter.spi.DefaultStringConverters;
 
+import com.google.gson.Gson;
+
 class ElasticsearchLocalDateTimeIndexFieldTypeOptionsStep
 		extends
 		AbstractElasticsearchTemporalIndexFieldTypeOptionsStep<ElasticsearchLocalDateTimeIndexFieldTypeOptionsStep,
@@ -21,8 +23,8 @@ class ElasticsearchLocalDateTimeIndexFieldTypeOptionsStep
 	}
 
 	@Override
-	protected ElasticsearchFieldCodec<LocalDateTime> createCodec(DateTimeFormatter formatter) {
-		return new ElasticsearchLocalDateTimeFieldCodec( formatter );
+	protected ElasticsearchFieldCodec<LocalDateTime> createCodec(Gson gson, DateTimeFormatter formatter) {
+		return new ElasticsearchLocalDateTimeFieldCodec( gson, formatter );
 	}
 
 	@Override
