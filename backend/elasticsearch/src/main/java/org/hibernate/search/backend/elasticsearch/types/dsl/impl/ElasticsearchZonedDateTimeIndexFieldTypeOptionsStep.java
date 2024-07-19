@@ -11,6 +11,8 @@ import org.hibernate.search.backend.elasticsearch.types.codec.impl.Elasticsearch
 import org.hibernate.search.backend.elasticsearch.types.codec.impl.ElasticsearchZonedDateTimeFieldCodec;
 import org.hibernate.search.engine.backend.types.converter.spi.DefaultStringConverters;
 
+import com.google.gson.Gson;
+
 class ElasticsearchZonedDateTimeIndexFieldTypeOptionsStep
 		extends
 		AbstractElasticsearchTemporalIndexFieldTypeOptionsStep<ElasticsearchZonedDateTimeIndexFieldTypeOptionsStep,
@@ -21,8 +23,8 @@ class ElasticsearchZonedDateTimeIndexFieldTypeOptionsStep
 	}
 
 	@Override
-	protected ElasticsearchFieldCodec<ZonedDateTime> createCodec(DateTimeFormatter formatter) {
-		return new ElasticsearchZonedDateTimeFieldCodec( formatter );
+	protected ElasticsearchFieldCodec<ZonedDateTime> createCodec(Gson gson, DateTimeFormatter formatter) {
+		return new ElasticsearchZonedDateTimeFieldCodec( gson, formatter );
 	}
 
 	@Override

@@ -6,14 +6,15 @@ package org.hibernate.search.backend.elasticsearch.types.codec.impl;
 
 import org.hibernate.search.backend.elasticsearch.gson.impl.JsonElementTypes;
 
+import com.google.gson.Gson;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonNull;
 import com.google.gson.JsonPrimitive;
 
-public class ElasticsearchDoubleFieldCodec implements ElasticsearchFieldCodec<Double> {
-	public static final ElasticsearchDoubleFieldCodec INSTANCE = new ElasticsearchDoubleFieldCodec();
+public final class ElasticsearchDoubleFieldCodec extends AbstractElasticsearchFieldCodec<Double> {
 
-	private ElasticsearchDoubleFieldCodec() {
+	public ElasticsearchDoubleFieldCodec(Gson gson) {
+		super( gson );
 	}
 
 	@Override
@@ -34,6 +35,6 @@ public class ElasticsearchDoubleFieldCodec implements ElasticsearchFieldCodec<Do
 
 	@Override
 	public boolean isCompatibleWith(ElasticsearchFieldCodec<?> other) {
-		return INSTANCE == other;
+		return other instanceof ElasticsearchDoubleFieldCodec;
 	}
 }

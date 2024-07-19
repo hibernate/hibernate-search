@@ -14,7 +14,9 @@ import org.hibernate.search.backend.elasticsearch.search.common.impl.Elasticsear
 import org.hibernate.search.backend.elasticsearch.search.common.impl.ElasticsearchSearchIndexValueFieldContext;
 import org.hibernate.search.backend.elasticsearch.search.common.impl.ElasticsearchSearchIndexValueFieldTypeContext;
 import org.hibernate.search.backend.elasticsearch.types.codec.impl.ElasticsearchFieldCodec;
+import org.hibernate.search.engine.backend.types.converter.FromDocumentValueConverter;
 import org.hibernate.search.engine.backend.types.converter.ToDocumentValueConverter;
+import org.hibernate.search.engine.backend.types.converter.runtime.FromDocumentValueConvertContext;
 import org.hibernate.search.engine.backend.types.converter.runtime.ToDocumentValueConvertContext;
 import org.hibernate.search.engine.backend.types.converter.spi.DslConverter;
 import org.hibernate.search.engine.backend.types.converter.spi.ProjectionConverter;
@@ -45,8 +47,8 @@ public class ElasticsearchIndexValueFieldType<F>
 		this.mapping = builder.mapping;
 		this.indexSettingsContributor = builder.indexSettingsContributor;
 
-		this.rawProjectionConverter = ProjectionConverter.passThrough( String.class );
-		this.rawDslConverter = new DslConverter<>( String.class, RawNoParsingDslConverter.INSTANCE );
+		this.rawProjectionConverter = new ProjectionConverter<>( String.class, new RawProjectionConverter<>( codec ) );
+		this.rawDslConverter = new DslConverter<>( String.class, new RawDslConverter<>( codec ) );
 	}
 
 	@Override
@@ -54,6 +56,7 @@ public class ElasticsearchIndexValueFieldType<F>
 		return elasticsearchTypeAsJson;
 	}
 
+	@Override
 	public ElasticsearchFieldCodec<F> codec() {
 		return codec;
 	}
@@ -128,17 +131,46 @@ public class ElasticsearchIndexValueFieldType<F>
 		}
 	}
 
-	private static class RawNoParsingDslConverter implements ToDocumentValueConverter<String, JsonElement> {
+	private static class RawDslConverter<F> implements ToDocumentValueConverter<String, JsonElement> {
 
-		static final RawNoParsingDslConverter INSTANCE = new RawNoParsingDslConverter();
+		private final ElasticsearchFieldCodec<F> codec;
 
-		private RawNoParsingDslConverter() {
+		private RawDslConverter(ElasticsearchFieldCodec<F> codec) {
+			this.codec = codec;
 		}
 
 		@Override
 		public JsonElement toDocumentValue(String value, ToDocumentValueConvertContext context) {
-			return new JsonPrimitive( value );
+			return codec.fromJsonStringToElement( value );
 		}
 
+		@Override
+		public boolean isCompatibleWith(ToDocumentValueConverter<?, ?> other) {
+			if ( !( other instanceof RawDslConverter ) ) {
+				return false;
+			}
+			return codec.isCompatibleWith( ( (RawDslConverter<?>) other ).codec );
+		}
+	}
+
+	private static class RawProjectionConverter<F> implements FromDocumentValueConverter<JsonElement, String> {
+		private final ElasticsearchFieldCodec<F> codec;
+
+		private RawProjectionConverter(ElasticsearchFieldCodec<F> codec) {
+			this.codec = codec;
+		}
+
+		@Override
+		public String fromDocumentValue(JsonElement value, FromDocumentValueConvertContext context) {
+			return codec.fromJsonElementToString( value );
+		}
+
+		@Override
+		public boolean isCompatibleWith(FromDocumentValueConverter<?, ?> other) {
+			if ( !( other instanceof RawProjectionConverter ) ) {
+				return false;
+			}
+			return codec.isCompatibleWith( ( (RawProjectionConverter<?>) other ).codec );
+		}
 	}
 }

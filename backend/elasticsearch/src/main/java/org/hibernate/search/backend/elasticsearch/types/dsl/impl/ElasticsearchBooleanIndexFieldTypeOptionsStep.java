@@ -32,7 +32,7 @@ class ElasticsearchBooleanIndexFieldTypeOptionsStep
 
 	@Override
 	protected void complete() {
-		ElasticsearchFieldCodec<Boolean> codec = ElasticsearchBooleanFieldCodec.INSTANCE;
+		ElasticsearchFieldCodec<Boolean> codec = new ElasticsearchBooleanFieldCodec( buildContext.getUserFacingGson() );
 		builder.codec( codec );
 
 		if ( resolvedSearchable ) {

@@ -6,14 +6,15 @@ package org.hibernate.search.backend.elasticsearch.types.codec.impl;
 
 import org.hibernate.search.backend.elasticsearch.gson.impl.JsonElementTypes;
 
+import com.google.gson.Gson;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonNull;
 import com.google.gson.JsonPrimitive;
 
-public class ElasticsearchShortFieldCodec implements ElasticsearchFieldCodec<Short> {
-	public static final ElasticsearchShortFieldCodec INSTANCE = new ElasticsearchShortFieldCodec();
+public final class ElasticsearchShortFieldCodec extends AbstractElasticsearchFieldCodec<Short> {
 
-	private ElasticsearchShortFieldCodec() {
+	public ElasticsearchShortFieldCodec(Gson gson) {
+		super( gson );
 	}
 
 	@Override
@@ -34,6 +35,6 @@ public class ElasticsearchShortFieldCodec implements ElasticsearchFieldCodec<Sho
 
 	@Override
 	public boolean isCompatibleWith(ElasticsearchFieldCodec<?> other) {
-		return INSTANCE == other;
+		return other instanceof ElasticsearchShortFieldCodec;
 	}
 }

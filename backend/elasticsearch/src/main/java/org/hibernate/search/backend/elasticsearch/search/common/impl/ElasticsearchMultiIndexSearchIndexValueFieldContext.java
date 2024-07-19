@@ -7,6 +7,7 @@ package org.hibernate.search.backend.elasticsearch.search.common.impl;
 import java.util.List;
 import java.util.Optional;
 
+import org.hibernate.search.backend.elasticsearch.types.codec.impl.ElasticsearchFieldCodec;
 import org.hibernate.search.engine.search.common.spi.AbstractMultiIndexSearchIndexValueFieldContext;
 import org.hibernate.search.engine.search.common.spi.SearchIndexSchemaElementContextHelper;
 
@@ -77,5 +78,11 @@ public class ElasticsearchMultiIndexSearchIndexValueFieldContext<F>
 			}
 		}
 		return false;
+	}
+
+	@Override
+	public ElasticsearchFieldCodec<F> codec() {
+		return fromTypeIfCompatible( ElasticsearchSearchIndexValueFieldTypeContext::codec,
+				ElasticsearchFieldCodec::isCompatibleWith, "codec" );
 	}
 }

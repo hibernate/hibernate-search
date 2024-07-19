@@ -8,6 +8,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmUtils.with;
 
 import java.util.List;
+import java.util.Locale;
 import java.util.stream.Stream;
 
 import jakarta.persistence.Basic;
@@ -25,6 +26,7 @@ import org.hibernate.search.mapper.orm.Search;
 import org.hibernate.search.mapper.orm.session.SearchSession;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.KeywordField;
+import org.hibernate.search.util.impl.integrationtest.common.extension.BackendConfiguration;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -95,11 +97,20 @@ class ProjectionConverterIT {
 					.where( f -> f.matchAll() )
 					.fetchHits( 20 );
 			// end::projection-converter-raw[]
+			if ( BackendConfiguration.isElasticsearch() ) {
+				assertThat( result.stream().map( Object::toString ) )
+						.containsExactlyInAnyOrder(
+								Stream.of( OrderStatus.values() ).map( Enum::name )
+										.map( s -> String.format( Locale.ROOT, "\"%s\"", s ) ).toArray( String[]::new )
+						);
 
-			assertThat( result.stream().map( Object::toString ) )
-					.containsExactlyInAnyOrder(
-							Stream.of( OrderStatus.values() ).map( Enum::name ).toArray( String[]::new )
-					);
+			}
+			else {
+				assertThat( result.stream().map( Object::toString ) )
+						.containsExactlyInAnyOrder(
+								Stream.of( OrderStatus.values() ).map( Enum::name ).toArray( String[]::new )
+						);
+			}
 		} );
 	}
 

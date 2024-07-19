@@ -11,6 +11,8 @@ import org.hibernate.search.backend.elasticsearch.types.codec.impl.Elasticsearch
 import org.hibernate.search.backend.elasticsearch.types.codec.impl.ElasticsearchOffsetTimeFieldCodec;
 import org.hibernate.search.engine.backend.types.converter.spi.DefaultStringConverters;
 
+import com.google.gson.Gson;
+
 class ElasticsearchOffsetTimeIndexFieldTypeOptionsStep
 		extends
 		AbstractElasticsearchTemporalIndexFieldTypeOptionsStep<ElasticsearchOffsetTimeIndexFieldTypeOptionsStep, OffsetTime> {
@@ -20,8 +22,8 @@ class ElasticsearchOffsetTimeIndexFieldTypeOptionsStep
 	}
 
 	@Override
-	protected ElasticsearchFieldCodec<OffsetTime> createCodec(DateTimeFormatter formatter) {
-		return new ElasticsearchOffsetTimeFieldCodec( formatter );
+	protected ElasticsearchFieldCodec<OffsetTime> createCodec(Gson gson, DateTimeFormatter formatter) {
+		return new ElasticsearchOffsetTimeFieldCodec( gson, formatter );
 	}
 
 	@Override

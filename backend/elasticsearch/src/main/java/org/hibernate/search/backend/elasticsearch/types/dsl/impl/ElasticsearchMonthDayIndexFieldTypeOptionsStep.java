@@ -11,6 +11,8 @@ import org.hibernate.search.backend.elasticsearch.types.codec.impl.Elasticsearch
 import org.hibernate.search.backend.elasticsearch.types.codec.impl.ElasticsearchMonthDayFieldCodec;
 import org.hibernate.search.engine.backend.types.converter.spi.DefaultStringConverters;
 
+import com.google.gson.Gson;
+
 class ElasticsearchMonthDayIndexFieldTypeOptionsStep
 		extends
 		AbstractElasticsearchTemporalIndexFieldTypeOptionsStep<ElasticsearchMonthDayIndexFieldTypeOptionsStep, MonthDay> {
@@ -20,8 +22,8 @@ class ElasticsearchMonthDayIndexFieldTypeOptionsStep
 	}
 
 	@Override
-	protected ElasticsearchFieldCodec<MonthDay> createCodec(DateTimeFormatter formatter) {
-		return new ElasticsearchMonthDayFieldCodec( formatter );
+	protected ElasticsearchFieldCodec<MonthDay> createCodec(Gson gson, DateTimeFormatter formatter) {
+		return new ElasticsearchMonthDayFieldCodec( gson, formatter );
 	}
 
 	@Override

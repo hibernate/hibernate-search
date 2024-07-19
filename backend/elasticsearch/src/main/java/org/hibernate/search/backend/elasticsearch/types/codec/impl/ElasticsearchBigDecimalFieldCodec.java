@@ -14,11 +14,12 @@ import org.hibernate.search.backend.elasticsearch.logging.impl.Log;
 import org.hibernate.search.engine.cfg.spi.NumberScaleConstants;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
+import com.google.gson.Gson;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonNull;
 import com.google.gson.JsonPrimitive;
 
-public class ElasticsearchBigDecimalFieldCodec implements ElasticsearchFieldCodec<BigDecimal> {
+public class ElasticsearchBigDecimalFieldCodec extends AbstractElasticsearchFieldCodec<BigDecimal> {
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
@@ -27,7 +28,8 @@ public class ElasticsearchBigDecimalFieldCodec implements ElasticsearchFieldCode
 	private final BigDecimal minScaledValue;
 	private final BigDecimal maxScaledValue;
 
-	public ElasticsearchBigDecimalFieldCodec(int decimalScale) {
+	public ElasticsearchBigDecimalFieldCodec(Gson gson, int decimalScale) {
+		super( gson );
 		this.decimalScale = decimalScale;
 		scalingFactor = BigDecimal.TEN.pow( decimalScale, new MathContext( 10, RoundingMode.HALF_UP ) );
 		minScaledValue = new BigDecimal( NumberScaleConstants.MIN_LONG_AS_BIGINTEGER, decimalScale );

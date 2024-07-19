@@ -17,8 +17,8 @@ class ElasticsearchLongIndexFieldTypeOptionsStep
 	}
 
 	@Override
-	protected ElasticsearchFieldCodec<Long> completeCodec() {
-		return ElasticsearchLongFieldCodec.INSTANCE;
+	protected ElasticsearchFieldCodec<Long> completeCodec(ElasticsearchIndexFieldTypeBuildContext buildContext) {
+		return new ElasticsearchLongFieldCodec( buildContext.getUserFacingGson() );
 	}
 
 	@Override

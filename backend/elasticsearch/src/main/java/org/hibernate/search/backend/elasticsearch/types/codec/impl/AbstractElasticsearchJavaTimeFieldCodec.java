@@ -9,16 +9,18 @@ import java.time.temporal.TemporalAccessor;
 
 import org.hibernate.search.backend.elasticsearch.gson.impl.JsonElementTypes;
 
+import com.google.gson.Gson;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonNull;
 import com.google.gson.JsonPrimitive;
 
 public abstract class AbstractElasticsearchJavaTimeFieldCodec<T extends TemporalAccessor>
-		implements ElasticsearchFieldCodec<T> {
+		extends AbstractElasticsearchFieldCodec<T> {
 
 	protected final DateTimeFormatter formatter;
 
-	public AbstractElasticsearchJavaTimeFieldCodec(DateTimeFormatter delegate) {
+	public AbstractElasticsearchJavaTimeFieldCodec(Gson gson, DateTimeFormatter delegate) {
+		super( gson );
 		this.formatter = delegate;
 	}
 

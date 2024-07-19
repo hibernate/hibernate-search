@@ -27,7 +27,8 @@ class ElasticsearchFloatVectorFieldTypeOptionsStep
 	@Override
 	protected AbstractElasticsearchVectorFieldCodec<float[]> createCodec(VectorSimilarity similarity, int dimension,
 			Integer m, Integer efConstruction, float[] indexNullAs) {
-		return new ElasticsearchFloatVectorFieldCodec( similarity, dimension, m, efConstruction, indexNullAs );
+		return new ElasticsearchFloatVectorFieldCodec( buildContext.getUserFacingGson(), similarity, dimension, m,
+				efConstruction, indexNullAs );
 	}
 
 	@Override

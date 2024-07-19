@@ -6,14 +6,15 @@ package org.hibernate.search.backend.elasticsearch.types.codec.impl;
 
 import org.hibernate.search.backend.elasticsearch.gson.impl.JsonElementTypes;
 
+import com.google.gson.Gson;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonNull;
 import com.google.gson.JsonPrimitive;
 
-public class ElasticsearchFloatFieldCodec implements ElasticsearchFieldCodec<Float> {
-	public static final ElasticsearchFloatFieldCodec INSTANCE = new ElasticsearchFloatFieldCodec();
+public final class ElasticsearchFloatFieldCodec extends AbstractElasticsearchFieldCodec<Float> {
 
-	private ElasticsearchFloatFieldCodec() {
+	public ElasticsearchFloatFieldCodec(Gson gson) {
+		super( gson );
 	}
 
 	@Override
@@ -34,6 +35,6 @@ public class ElasticsearchFloatFieldCodec implements ElasticsearchFieldCodec<Flo
 
 	@Override
 	public boolean isCompatibleWith(ElasticsearchFieldCodec<?> other) {
-		return INSTANCE == other;
+		return other instanceof ElasticsearchFloatFieldCodec;
 	}
 }

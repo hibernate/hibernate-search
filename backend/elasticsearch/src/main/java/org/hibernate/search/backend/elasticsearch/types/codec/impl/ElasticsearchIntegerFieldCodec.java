@@ -6,15 +6,15 @@ package org.hibernate.search.backend.elasticsearch.types.codec.impl;
 
 import org.hibernate.search.backend.elasticsearch.gson.impl.JsonElementTypes;
 
+import com.google.gson.Gson;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonNull;
 import com.google.gson.JsonPrimitive;
 
-public class ElasticsearchIntegerFieldCodec implements ElasticsearchFieldCodec<Integer> {
-	// Must be a singleton so that equals() works as required by the interface
-	public static final ElasticsearchIntegerFieldCodec INSTANCE = new ElasticsearchIntegerFieldCodec();
+public final class ElasticsearchIntegerFieldCodec extends AbstractElasticsearchFieldCodec<Integer> {
 
-	private ElasticsearchIntegerFieldCodec() {
+	public ElasticsearchIntegerFieldCodec(Gson gson) {
+		super( gson );
 	}
 
 	@Override
@@ -35,6 +35,6 @@ public class ElasticsearchIntegerFieldCodec implements ElasticsearchFieldCodec<I
 
 	@Override
 	public boolean isCompatibleWith(ElasticsearchFieldCodec<?> other) {
-		return INSTANCE == other;
+		return other instanceof ElasticsearchIntegerFieldCodec;
 	}
 }

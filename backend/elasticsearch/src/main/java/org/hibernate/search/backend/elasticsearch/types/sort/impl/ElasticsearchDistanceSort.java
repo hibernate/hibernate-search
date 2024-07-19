@@ -13,7 +13,7 @@ import org.hibernate.search.backend.elasticsearch.search.common.impl.AbstractEla
 import org.hibernate.search.backend.elasticsearch.search.common.impl.ElasticsearchSearchIndexScope;
 import org.hibernate.search.backend.elasticsearch.search.common.impl.ElasticsearchSearchIndexValueFieldContext;
 import org.hibernate.search.backend.elasticsearch.search.sort.impl.ElasticsearchSearchSortCollector;
-import org.hibernate.search.backend.elasticsearch.types.codec.impl.ElasticsearchGeoPointFieldCodec;
+import org.hibernate.search.backend.elasticsearch.types.codec.impl.ElasticsearchFieldCodec;
 import org.hibernate.search.engine.search.common.SortMode;
 import org.hibernate.search.engine.search.sort.SearchSort;
 import org.hibernate.search.engine.search.sort.dsl.SortOrder;
@@ -30,15 +30,17 @@ public class ElasticsearchDistanceSort extends AbstractElasticsearchDocumentValu
 	private static final JsonObjectAccessor GEO_DISTANCE_ACCESSOR = JsonAccessor.root().property( "_geo_distance" ).asObject();
 
 	private final GeoPoint center;
+	private final ElasticsearchFieldCodec<GeoPoint> codec;
 
 	private ElasticsearchDistanceSort(Builder builder) {
 		super( builder );
 		center = builder.center;
+		codec = builder.field.type().codec();
 	}
 
 	@Override
 	protected void doToJsonSorts(ElasticsearchSearchSortCollector collector, JsonObject innerObject) {
-		innerObject.add( absoluteFieldPath, ElasticsearchGeoPointFieldCodec.INSTANCE.encode( center ) );
+		innerObject.add( absoluteFieldPath, codec.encode( center ) );
 		// If there are multiple target indexes, or if the field is dynamic,
 		// some target indexes may not have this field in their mapping (yet),
 		// and in that case Elasticsearch would raise an exception.

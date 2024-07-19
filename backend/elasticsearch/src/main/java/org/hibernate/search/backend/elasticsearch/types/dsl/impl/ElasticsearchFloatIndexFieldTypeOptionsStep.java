@@ -17,8 +17,8 @@ class ElasticsearchFloatIndexFieldTypeOptionsStep
 	}
 
 	@Override
-	protected ElasticsearchFieldCodec<Float> completeCodec() {
-		return ElasticsearchFloatFieldCodec.INSTANCE;
+	protected ElasticsearchFieldCodec<Float> completeCodec(ElasticsearchIndexFieldTypeBuildContext buildContext) {
+		return new ElasticsearchFloatFieldCodec( buildContext.getUserFacingGson() );
 	}
 
 	@Override

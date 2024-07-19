@@ -39,14 +39,15 @@ class ElasticsearchBigIntegerIndexFieldTypeOptionsStep
 	}
 
 	@Override
-	protected ElasticsearchFieldCodec<BigInteger> completeCodec() {
+	protected ElasticsearchFieldCodec<BigInteger> completeCodec(ElasticsearchIndexFieldTypeBuildContext buildContext) {
 		int resolvedDecimalScale = resolveDecimalScale();
 
 		if ( resolvedDecimalScale > 0 ) {
-			throw log.invalidDecimalScale( resolvedDecimalScale, buildContext.getEventContext() );
+			throw log.invalidDecimalScale( resolvedDecimalScale, this.buildContext.getEventContext() );
 		}
 
-		ElasticsearchBigIntegerFieldCodec codec = new ElasticsearchBigIntegerFieldCodec( resolvedDecimalScale );
+		ElasticsearchBigIntegerFieldCodec codec =
+				new ElasticsearchBigIntegerFieldCodec( buildContext.getUserFacingGson(), resolvedDecimalScale );
 		builder.mapping().setScalingFactor( codec.scalingFactor().doubleValue() );
 
 		return codec;

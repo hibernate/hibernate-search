@@ -9,26 +9,24 @@ import java.lang.invoke.MethodHandles;
 import org.hibernate.search.backend.elasticsearch.gson.impl.JsonAccessor;
 import org.hibernate.search.backend.elasticsearch.gson.impl.JsonElementTypes;
 import org.hibernate.search.backend.elasticsearch.logging.impl.Log;
-import org.hibernate.search.engine.cfg.spi.FormatUtils;
 import org.hibernate.search.engine.spatial.GeoPoint;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
+import com.google.gson.Gson;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonNull;
 import com.google.gson.JsonObject;
 
-public class ElasticsearchGeoPointFieldCodec implements ElasticsearchFieldCodec<GeoPoint> {
+public final class ElasticsearchGeoPointFieldCodec extends AbstractElasticsearchFieldCodec<GeoPoint> {
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
-
-	// Must be a singleton so that equals() works as required by the interface
-	public static final ElasticsearchGeoPointFieldCodec INSTANCE = new ElasticsearchGeoPointFieldCodec();
 
 	private static final JsonAccessor<Double> LATITUDE_ACCESSOR =
 			JsonAccessor.root().property( "lat" ).asDouble();
 	private static final JsonAccessor<Double> LONGITUDE_ACCESSOR =
 			JsonAccessor.root().property( "lon" ).asDouble();
 
-	private ElasticsearchGeoPointFieldCodec() {
+	public ElasticsearchGeoPointFieldCodec(Gson gson) {
+		super( gson );
 	}
 
 	@Override
@@ -54,13 +52,7 @@ public class ElasticsearchGeoPointFieldCodec implements ElasticsearchFieldCodec<
 	}
 
 	@Override
-	public String raw(JsonElement element) {
-		GeoPoint point = decode( element );
-		return point == null ? null : FormatUtils.format( point );
-	}
-
-	@Override
 	public boolean isCompatibleWith(ElasticsearchFieldCodec<?> other) {
-		return INSTANCE == other;
+		return other instanceof ElasticsearchGeoPointFieldCodec;
 	}
 }

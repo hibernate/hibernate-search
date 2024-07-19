@@ -7,10 +7,12 @@ package org.hibernate.search.backend.elasticsearch.types.codec.impl;
 import java.time.OffsetDateTime;
 import java.time.format.DateTimeFormatter;
 
+import com.google.gson.Gson;
+
 public class ElasticsearchOffsetDateTimeFieldCodec extends AbstractElasticsearchJavaTimeFieldCodec<OffsetDateTime> {
 
-	public ElasticsearchOffsetDateTimeFieldCodec(DateTimeFormatter delegate) {
-		super( delegate );
+	public ElasticsearchOffsetDateTimeFieldCodec(Gson gson, DateTimeFormatter delegate) {
+		super( gson, delegate );
 	}
 
 	@Override

@@ -9,11 +9,13 @@ import java.util.Objects;
 import org.hibernate.search.backend.elasticsearch.gson.impl.JsonElementTypes;
 import org.hibernate.search.engine.backend.types.VectorSimilarity;
 
+import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonNull;
 
-public abstract class AbstractElasticsearchVectorFieldCodec<F> implements ElasticsearchVectorFieldCodec<F> {
+public abstract class AbstractElasticsearchVectorFieldCodec<F> extends AbstractElasticsearchFieldCodec<F>
+		implements ElasticsearchVectorFieldCodec<F> {
 
 	protected final VectorSimilarity similarity;
 	protected final int dimension;
@@ -21,8 +23,9 @@ public abstract class AbstractElasticsearchVectorFieldCodec<F> implements Elasti
 	private final Integer efConstruction;
 	private final F indexNullAs;
 
-	protected AbstractElasticsearchVectorFieldCodec(VectorSimilarity similarity, int dimension,
-			Integer m, Integer efConstruction, F indexNullAs) {
+	protected AbstractElasticsearchVectorFieldCodec(Gson gson, VectorSimilarity similarity, int dimension, Integer m,
+			Integer efConstruction, F indexNullAs) {
+		super( gson );
 		this.similarity = similarity;
 		this.dimension = dimension;
 		this.m = m;
@@ -49,11 +52,6 @@ public abstract class AbstractElasticsearchVectorFieldCodec<F> implements Elasti
 			return null;
 		}
 		return fromJsonArray( JsonElementTypes.ARRAY.fromElement( element ) );
-	}
-
-	@Override
-	public String raw(JsonElement element) {
-		return element.getAsJsonArray().asList().toString();
 	}
 
 	protected abstract F fromJsonArray(JsonArray jsonElements);

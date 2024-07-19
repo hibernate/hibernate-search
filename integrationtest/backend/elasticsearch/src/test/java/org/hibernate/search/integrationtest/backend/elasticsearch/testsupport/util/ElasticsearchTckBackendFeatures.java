@@ -22,6 +22,7 @@ import java.time.YearMonth;
 import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
 import java.time.temporal.TemporalAccessor;
+import java.util.LinkedHashMap;
 import java.util.Locale;
 import java.util.Objects;
 
@@ -46,7 +47,12 @@ import org.hibernate.search.integrationtest.backend.tck.testsupport.types.ZonedD
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.TckBackendFeatures;
 import org.hibernate.search.util.impl.integrationtest.backend.elasticsearch.dialect.ElasticsearchTestDialect;
 
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+
 public class ElasticsearchTckBackendFeatures extends TckBackendFeatures {
+
+	private Gson gson = new GsonBuilder().setPrettyPrinting().create();
 
 	ElasticsearchTckBackendFeatures() {
 	}
@@ -365,15 +371,18 @@ public class ElasticsearchTckBackendFeatures extends TckBackendFeatures {
 
 	@Override
 	public <F> Object toRawValue(FieldTypeDescriptor<F, ?> descriptor, F value) {
+		if ( TemporalAccessor.class.isAssignableFrom( descriptor.getJavaType() ) ) {
+			return gson.toJson( formatForQueryStringPredicate( descriptor, value ) );
+		}
+
 		if ( GeoPointFieldTypeDescriptor.INSTANCE.equals( descriptor ) ) {
-			return value == null ? null : FormatUtils.format( (GeoPoint) value );
+			// we use a linked map to preserve the order of keys so that we get a predictable string.
+			var point = new LinkedHashMap<>();
+			point.put( "lat", ( (GeoPoint) value ).latitude() );
+			point.put( "lon", ( (GeoPoint) value ).longitude() );
+			return gson.toJson( point );
 		}
-
-		if ( BigDecimalFieldTypeDescriptor.INSTANCE.equals( descriptor ) ) {
-			return value == null ? null : FormatUtils.format( (BigDecimal) value );
-		}
-
-		return formatForQueryStringPredicate( descriptor, value );
+		return gson.toJson( value );
 	}
 
 	@Override
