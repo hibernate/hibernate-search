@@ -4,6 +4,9 @@
  */
 package org.hibernate.search.integrationtest.backend.tck.testsupport.util;
 
+import java.util.Comparator;
+import java.util.Optional;
+
 import org.hibernate.search.engine.backend.types.ObjectStructure;
 import org.hibernate.search.engine.backend.types.VectorSimilarity;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.FieldTypeDescriptor;
@@ -176,5 +179,9 @@ public abstract class TckBackendFeatures implements StubMappingBackendFeatures {
 
 	public <F> String toStringValue(FieldTypeDescriptor<F, ?> descriptor, F value) {
 		return descriptor.format( value );
+	}
+
+	public Optional<Comparator<? super Object>> rawValueEqualsComparator(FieldTypeDescriptor<?, ?> fieldType) {
+		return Optional.empty();
 	}
 }

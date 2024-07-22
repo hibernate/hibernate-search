@@ -10,7 +10,9 @@ import static org.hibernate.search.util.impl.integrationtest.common.assertion.Se
 import static org.junit.jupiter.api.Assumptions.assumeTrue;
 
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import org.hibernate.search.engine.backend.document.DocumentElement;
@@ -45,6 +47,8 @@ import org.junit.jupiter.api.extension.RegisterExtension;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
+
+import org.assertj.core.api.ListAssert;
 
 /**
  * Tests behavior related to type checking and type conversion of
@@ -270,20 +274,24 @@ class FieldProjectionTypeCheckingAndConversionIT<F> {
 
 		TckBackendFeatures backendFeatures = TckConfiguration.get().getBackendFeatures();
 		Class<?> rawJavaType = backendFeatures.rawType( fieldType );
-		assertThat( scope.query()
+		Optional<Comparator<? super Object>> rawValueEqualsComparator = backendFeatures.rawValueEqualsComparator( fieldType );
+		ListAssert<Object> hitsAssert = assertThat( scope.query()
 				.select( f -> f.field( fieldPath, rawJavaType, ValueModel.RAW ) )
 				.where( f -> f.matchAll() )
 				.toQuery()
 				.fetchAllHits()
 				.stream()
 				.map( e -> ( (Object) e ) )
-				.collect( Collectors.toList() ) )
-				.containsOnly(
-						backendFeatures.toRawValue( fieldType, getFieldValue( 1, fieldType ) ),
-						backendFeatures.toRawValue( fieldType, getFieldValue( 2, fieldType ) ),
-						backendFeatures.toRawValue( fieldType, getFieldValue( 3, fieldType ) ),
-						null // Empty document
-				);
+				.collect( Collectors.toList() ) );
+		if ( rawValueEqualsComparator.isPresent() ) {
+			hitsAssert = hitsAssert.usingElementComparator( rawValueEqualsComparator.get() );
+		}
+		hitsAssert.containsOnly(
+				backendFeatures.toRawValue( fieldType, getFieldValue( 1, fieldType ) ),
+				backendFeatures.toRawValue( fieldType, getFieldValue( 2, fieldType ) ),
+				backendFeatures.toRawValue( fieldType, getFieldValue( 3, fieldType ) ),
+				null // Empty document
+		);
 
 	}
 

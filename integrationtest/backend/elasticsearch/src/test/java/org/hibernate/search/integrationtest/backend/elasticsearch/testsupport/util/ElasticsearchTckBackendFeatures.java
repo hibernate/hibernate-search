@@ -22,9 +22,11 @@ import java.time.YearMonth;
 import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
 import java.time.temporal.TemporalAccessor;
+import java.util.Comparator;
 import java.util.LinkedHashMap;
 import java.util.Locale;
 import java.util.Objects;
+import java.util.Optional;
 
 import org.hibernate.search.backend.elasticsearch.types.format.impl.ElasticsearchDefaultFieldFormatProvider;
 import org.hibernate.search.engine.backend.types.VectorSimilarity;
@@ -49,6 +51,7 @@ import org.hibernate.search.util.impl.integrationtest.backend.elasticsearch.dial
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import com.google.gson.JsonElement;
 
 public class ElasticsearchTckBackendFeatures extends TckBackendFeatures {
 
@@ -439,5 +442,25 @@ public class ElasticsearchTckBackendFeatures extends TckBackendFeatures {
 			return FormatUtils.format( ( (BigDecimal) value ) );
 		}
 		return super.toStringValue( descriptor, value );
+	}
+
+	@Override
+	public Optional<Comparator<? super Object>> rawValueEqualsComparator(FieldTypeDescriptor<?, ?> fieldType) {
+		if ( GeoPointFieldTypeDescriptor.INSTANCE.equals( fieldType ) ) {
+			return Optional.of( (Comparator<Object>) (o1, o2) -> {
+				// we have exact string match or both are null
+				if ( Objects.equals( o1, o2 ) ) {
+					return 0;
+				}
+				// if one is null and the other is not - not equal
+				if ( o1 == null || o2 == null ) {
+					return -1;
+				}
+				// compare parsed JSONs to address possible attribute order change:
+				return gson.fromJson( (String) o1, JsonElement.class )
+						.equals( gson.fromJson( (String) o2, JsonElement.class ) ) ? 0 : -1;
+			} );
+		}
+		return super.rawValueEqualsComparator( fieldType );
 	}
 }
