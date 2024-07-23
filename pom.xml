@@ -266,7 +266,7 @@
         <version.install.plugin>3.1.2</version.install.plugin>
         <version.enforcer.plugin>3.5.0</version.enforcer.plugin>
         <version.project-info.plugin>3.6.2</version.project-info.plugin>
-        <version.japicmp.plugin>0.21.2</version.japicmp.plugin>
+        <version.japicmp.plugin>0.22.0</version.japicmp.plugin>
         <version.nexus-staging.plugin>1.7.0</version.nexus-staging.plugin>
         <version.deploy.plugin>3.1.2</version.deploy.plugin>
         <version.gpg.plugin>3.2.4</version.gpg.plugin>
@@ -278,14 +278,14 @@
         <version.compiler.plugin>3.13.0</version.compiler.plugin>
         <version.dependency.plugin>3.7.1</version.dependency.plugin>
         <!-- Check dependencies for security vulnerabilities -->
-        <version.dependency-check.plugin>10.0.2</version.dependency-check.plugin>
+        <version.dependency-check.plugin>10.0.3</version.dependency-check.plugin>
         <version.exec.plugin>3.3.0</version.exec.plugin>
         <version.forbiddenapis.plugin>3.7</version.forbiddenapis.plugin>
         <!-- Make sure that upgraded Jandex plugin aligns with the Jandex version imported from the ORM platform pom -->
         <version.jandex.plugin>3.1.7</version.jandex.plugin>
         <version.maven.injection.plugin>1.0.2</version.maven.injection.plugin>
         <version.jar.plugin>3.4.2</version.jar.plugin>
-        <version.javadoc.plugin>3.7.0</version.javadoc.plugin>
+        <version.javadoc.plugin>3.8.0</version.javadoc.plugin>
         <version.jdeps.plugin>0.5.1</version.jdeps.plugin>
         <version.processor.plugin>5.1</version.processor.plugin>
         <version.resources.plugin>3.3.1</version.resources.plugin>
