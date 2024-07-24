@@ -139,6 +139,10 @@ public abstract class TckBackendFeatures implements StubMappingBackendFeatures {
 		return true;
 	}
 
+	public boolean supportsVectorSearchRequiredMinimumSimilarity() {
+		return true;
+	}
+
 	public boolean supportsSimilarity(VectorSimilarity vectorSimilarity) {
 		return true;
 	}

@@ -69,16 +69,29 @@ public abstract class ElasticsearchKnnPredicate extends AbstractElasticsearchSin
 		}
 	}
 
-	public static class OpenSearchFactory<F>
+	public static class OpenSearch2Factory<F>
 			extends AbstractElasticsearchCodecAwareSearchQueryElementFactory<KnnPredicateBuilder, F> {
-		public OpenSearchFactory(ElasticsearchFieldCodec<F> codec) {
+		public OpenSearch2Factory(ElasticsearchFieldCodec<F> codec) {
 			super( codec );
 		}
 
 		@Override
 		public KnnPredicateBuilder create(ElasticsearchSearchIndexScope<?> scope,
 				ElasticsearchSearchIndexValueFieldContext<F> field) {
-			return new OpenSearchImpl.Builder<>( codec, scope, field );
+			return new OpenSearch2Impl.Builder<>( codec, scope, field );
+		}
+	}
+
+	public static class OpenSearch214Factory<F>
+			extends AbstractElasticsearchCodecAwareSearchQueryElementFactory<KnnPredicateBuilder, F> {
+		public OpenSearch214Factory(ElasticsearchFieldCodec<F> codec) {
+			super( codec );
+		}
+
+		@Override
+		public KnnPredicateBuilder create(ElasticsearchSearchIndexScope<?> scope,
+				ElasticsearchSearchIndexValueFieldContext<F> field) {
+			return new OpenSearch214Impl.Builder<>( codec, scope, field );
 		}
 	}
 
@@ -210,33 +223,17 @@ public abstract class ElasticsearchKnnPredicate extends AbstractElasticsearchSin
 		}
 	}
 
-	private static class OpenSearchImpl extends ElasticsearchKnnPredicate {
-
-		private static final JsonObjectAccessor KNN_ACCESSOR = JsonAccessor.root().property( "knn" ).asObject();
-		private static final JsonArrayAccessor VECTOR_ACCESSOR = JsonAccessor.root().property( "vector" ).asArray();
-		private static final JsonAccessor<Integer> K_ACCESSOR = JsonAccessor.root().property( "k" ).asInteger();
-
-		private static final JsonObjectAccessor FILTER_ACCESSOR = JsonAccessor.root().property( "filter" ).asObject();
-		private static final JsonAccessor<Float> MAX_DISTANCE = JsonAccessor.root().property( "max_distance" ).asFloat();
-		private static final JsonAccessor<Float> MIN_SCORE = JsonAccessor.root().property( "min_score" ).asFloat();
+	private static class OpenSearch214Impl extends AbstractOpenSearchKnnPredicate {
 
 		private final Float score;
 
-		private OpenSearchImpl(Builder<?> builder) {
+		private OpenSearch214Impl(Builder<?> builder) {
 			super( builder );
 			this.score = builder.score;
 		}
 
 		@Override
-		protected JsonObject doToJsonQuery(PredicateRequestContext context, JsonObject outerObject, JsonObject innerObject) {
-			JsonObject field = new JsonObject();
-			KNN_ACCESSOR.set( outerObject, field );
-
-			field.add( absoluteFieldPath, innerObject );
-			JsonObject filter = prepareFilter( context );
-			if ( filter != null ) {
-				FILTER_ACCESSOR.set( innerObject, filter );
-			}
+		protected void addVersionSpecificFields(JsonObject innerObject) {
 			if ( similarity != null ) {
 				MAX_DISTANCE.set( innerObject, similarity );
 			}
@@ -247,9 +244,6 @@ public abstract class ElasticsearchKnnPredicate extends AbstractElasticsearchSin
 				// [knn] requires exactly one of k, distance or score to be set
 				K_ACCESSOR.set( innerObject, k );
 			}
-			VECTOR_ACCESSOR.set( innerObject, vector );
-
-			return outerObject;
 		}
 
 		protected static class Builder<F> extends AbstractKnnBuilder<F> {
@@ -272,8 +266,76 @@ public abstract class ElasticsearchKnnPredicate extends AbstractElasticsearchSin
 
 			@Override
 			public SearchPredicate build() {
-				return new OpenSearchImpl( this );
+				return new OpenSearch214Impl( this );
 			}
 		}
+	}
+
+	private static class OpenSearch2Impl extends AbstractOpenSearchKnnPredicate {
+
+		protected OpenSearch2Impl(Builder<?> builder) {
+			super( builder );
+		}
+
+		@Override
+		protected void addVersionSpecificFields(JsonObject innerObject) {
+			K_ACCESSOR.set( innerObject, k );
+		}
+
+		protected static class Builder<F> extends AbstractKnnBuilder<F> {
+			protected Builder(ElasticsearchFieldCodec<F> codec, ElasticsearchSearchIndexScope<?> scope,
+					ElasticsearchSearchIndexValueFieldContext<F> field) {
+				super( codec, scope, field );
+			}
+
+			@Override
+			public void requiredMinimumSimilarity(float similarity) {
+				throw log.knnRequiredMinimumSimilarityUnsupportedOption();
+			}
+
+			@Override
+			public void requiredMinimumScore(float score) {
+				throw log.knnRequiredMinimumSimilarityUnsupportedOption();
+			}
+
+			@Override
+			public SearchPredicate build() {
+				return new OpenSearch2Impl( this );
+			}
+		}
+	}
+
+	private abstract static class AbstractOpenSearchKnnPredicate extends ElasticsearchKnnPredicate {
+
+		protected static final JsonObjectAccessor KNN_ACCESSOR = JsonAccessor.root().property( "knn" ).asObject();
+		protected static final JsonArrayAccessor VECTOR_ACCESSOR = JsonAccessor.root().property( "vector" ).asArray();
+		protected static final JsonAccessor<Integer> K_ACCESSOR = JsonAccessor.root().property( "k" ).asInteger();
+
+		protected static final JsonObjectAccessor FILTER_ACCESSOR = JsonAccessor.root().property( "filter" ).asObject();
+		protected static final JsonAccessor<Float> MAX_DISTANCE = JsonAccessor.root().property( "max_distance" ).asFloat();
+		protected static final JsonAccessor<Float> MIN_SCORE = JsonAccessor.root().property( "min_score" ).asFloat();
+
+		private AbstractOpenSearchKnnPredicate(AbstractKnnBuilder<?> builder) {
+			super( builder );
+		}
+
+		@Override
+		protected final JsonObject doToJsonQuery(PredicateRequestContext context, JsonObject outerObject,
+				JsonObject innerObject) {
+			JsonObject field = new JsonObject();
+			KNN_ACCESSOR.set( outerObject, field );
+
+			field.add( absoluteFieldPath, innerObject );
+			JsonObject filter = prepareFilter( context );
+			if ( filter != null ) {
+				FILTER_ACCESSOR.set( innerObject, filter );
+			}
+			addVersionSpecificFields( innerObject );
+			VECTOR_ACCESSOR.set( innerObject, vector );
+
+			return outerObject;
+		}
+
+		protected abstract void addVersionSpecificFields(JsonObject innerObject);
 	}
 }

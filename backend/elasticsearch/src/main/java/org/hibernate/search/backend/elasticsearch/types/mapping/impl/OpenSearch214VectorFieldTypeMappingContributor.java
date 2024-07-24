@@ -11,13 +11,13 @@ import org.hibernate.search.backend.elasticsearch.types.impl.ElasticsearchIndexV
 import org.hibernate.search.engine.search.common.spi.SearchQueryElementFactory;
 import org.hibernate.search.engine.search.predicate.spi.KnnPredicateBuilder;
 
-public class OpenSearch2VectorFieldTypeMappingContributor extends AbstractOpenSearch2VectorFieldTypeMappingContributor {
+public class OpenSearch214VectorFieldTypeMappingContributor extends AbstractOpenSearch2VectorFieldTypeMappingContributor {
 
 	@Override
 	protected <F> SearchQueryElementFactory<? extends KnnPredicateBuilder,
 			ElasticsearchSearchIndexScope<?>,
 			ElasticsearchSearchIndexValueFieldContext<F>> getKnnPredicateFactory(
 					ElasticsearchIndexValueFieldType.Builder<F> builder) {
-		return new ElasticsearchKnnPredicate.OpenSearch2Factory<>( builder.codec() );
+		return new ElasticsearchKnnPredicate.OpenSearch214Factory<>( builder.codec() );
 	}
 }

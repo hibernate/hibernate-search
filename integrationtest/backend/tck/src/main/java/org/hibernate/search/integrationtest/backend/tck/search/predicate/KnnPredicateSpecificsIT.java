@@ -966,6 +966,14 @@ class KnnPredicateSpecificsIT {
 			return result;
 		}
 
+		@BeforeAll
+		static void beforeAll() {
+			assumeTrue(
+					TckConfiguration.get().getBackendFeatures().supportsVectorSearchRequiredMinimumSimilarity(),
+					"This test only make sense for backends that have a way to specify the required minimum similarity."
+			);
+		}
+
 		@ParameterizedTest
 		@MethodSource
 		void similarityFilterFloat(SimpleMappedIndex<IndexBinding> index, float similarity, float score, int matches) {
