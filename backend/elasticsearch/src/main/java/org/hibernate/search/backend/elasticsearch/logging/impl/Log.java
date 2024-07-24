@@ -870,6 +870,11 @@ public interface Log extends BasicLogger {
 					+ " and if you configured the %1$s version in Hibernate Search, update it accordingly.")
 	SearchException searchBackendVersionIncompatibleWithVectorIntegration(String distribution, String version);
 
+	@Message(id = ID_OFFSET + 187,
+			value = "An OpenSearch distribution does not allow specifying the `required minimum similarity` option. "
+					+ "This option is only applicable to an Elastic distribution of an Elasticsearch backend.")
+	SearchException knnRequiredMinimumSimilarityUnsupportedOption();
+
 	@Message(id = ID_OFFSET + 188,
 			value = "The OpenSearch distribution does not allow using %1$s as a space type for a Lucene engine."
 					+ " Try using a different similarity type and refer to the OpenSearch documentation for more details.")

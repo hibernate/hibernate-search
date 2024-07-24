@@ -297,6 +297,15 @@ public class ElasticsearchTckBackendFeatures extends TckBackendFeatures {
 	}
 
 	@Override
+	public boolean supportsVectorSearchRequiredMinimumSimilarity() {
+		return isActualVersion(
+				es -> true,
+				os -> !os.isLessThan( "2.14.0" ),
+				aoss -> true
+		);
+	}
+
+	@Override
 	public boolean supportsSimilarity(VectorSimilarity vectorSimilarity) {
 		switch ( vectorSimilarity ) {
 			case DOT_PRODUCT:

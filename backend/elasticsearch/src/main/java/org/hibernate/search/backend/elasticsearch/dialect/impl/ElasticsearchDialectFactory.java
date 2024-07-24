@@ -15,6 +15,7 @@ import org.hibernate.search.backend.elasticsearch.dialect.model.impl.Elasticsear
 import org.hibernate.search.backend.elasticsearch.dialect.model.impl.Elasticsearch8ModelDialect;
 import org.hibernate.search.backend.elasticsearch.dialect.model.impl.ElasticsearchModelDialect;
 import org.hibernate.search.backend.elasticsearch.dialect.model.impl.OpenSearch1ModelDialect;
+import org.hibernate.search.backend.elasticsearch.dialect.model.impl.OpenSearch214ModelDialect;
 import org.hibernate.search.backend.elasticsearch.dialect.model.impl.OpenSearch29ModelDialect;
 import org.hibernate.search.backend.elasticsearch.dialect.model.impl.OpenSearch2ModelDialect;
 import org.hibernate.search.backend.elasticsearch.dialect.protocol.impl.AmazonOpenSearchServerlessProtocolDialect;
@@ -130,10 +131,16 @@ public class ElasticsearchDialectFactory {
 			return new OpenSearch1ModelDialect();
 		}
 		else {
-			if ( major == 2 && ( minorOptional.isEmpty() || minorOptional.getAsInt() < 9 ) ) {
-				return new OpenSearch2ModelDialect();
+			if ( major == 2 ) {
+				if ( ( minorOptional.isEmpty() || minorOptional.getAsInt() < 9 ) ) {
+					return new OpenSearch2ModelDialect();
+				}
+
+				if ( ( minorOptional.getAsInt() < 14 ) ) {
+					return new OpenSearch29ModelDialect();
+				}
 			}
-			return new OpenSearch29ModelDialect();
+			return new OpenSearch214ModelDialect();
 		}
 	}
 
@@ -141,7 +148,7 @@ public class ElasticsearchDialectFactory {
 		if ( !AMAZON_OPENSEARCH_SERVERLESS.equals( version ) ) {
 			throw log.unexpectedAwsOpenSearchServerlessVersion( version, AMAZON_OPENSEARCH_SERVERLESS );
 		}
-		return new OpenSearch29ModelDialect();
+		return new OpenSearch214ModelDialect();
 	}
 
 	public ElasticsearchProtocolDialect createProtocolDialect(ElasticsearchVersion version) {
