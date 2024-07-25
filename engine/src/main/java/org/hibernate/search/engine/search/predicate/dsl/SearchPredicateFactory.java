@@ -193,6 +193,14 @@ public interface SearchPredicateFactory {
 	WildcardPredicateFieldStep<?> wildcard();
 
 	/**
+	 * Match documents where targeted fields have a value that starts with a given string.
+	 *
+	 * @return The initial step of a DSL where the "prefix" predicate can be defined.
+	 * @see PrefixPredicateFieldStep
+	 */
+	PrefixPredicateFieldStep<?> prefix();
+
+	/**
 	 * Match documents where targeted fields contain a term that matches a given regular expression.
 	 *
 	 * @return The initial step of a DSL where the "regexp" predicate can be defined.

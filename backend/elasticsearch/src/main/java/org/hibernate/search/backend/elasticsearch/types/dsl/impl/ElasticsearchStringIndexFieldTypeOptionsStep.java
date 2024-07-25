@@ -26,6 +26,7 @@ import org.hibernate.search.backend.elasticsearch.types.predicate.impl.Elasticse
 import org.hibernate.search.backend.elasticsearch.types.predicate.impl.ElasticsearchTermsPredicate;
 import org.hibernate.search.backend.elasticsearch.types.predicate.impl.ElasticsearchTextMatchPredicate;
 import org.hibernate.search.backend.elasticsearch.types.predicate.impl.ElasticsearchTextPhrasePredicate;
+import org.hibernate.search.backend.elasticsearch.types.predicate.impl.ElasticsearchTextPrefixPredicate;
 import org.hibernate.search.backend.elasticsearch.types.predicate.impl.ElasticsearchTextRegexpPredicate;
 import org.hibernate.search.backend.elasticsearch.types.predicate.impl.ElasticsearchTextWildcardPredicate;
 import org.hibernate.search.backend.elasticsearch.types.sort.impl.ElasticsearchStandardFieldSort;
@@ -207,6 +208,7 @@ class ElasticsearchStringIndexFieldTypeOptionsStep
 			builder.queryElementFactory( PredicateTypeKeys.RANGE, new ElasticsearchRangePredicate.Factory<>( codec ) );
 			builder.queryElementFactory( PredicateTypeKeys.EXISTS, new ElasticsearchExistsPredicate.Factory<>() );
 			builder.queryElementFactory( PredicateTypeKeys.PHRASE, new ElasticsearchTextPhrasePredicate.Factory() );
+			builder.queryElementFactory( PredicateTypeKeys.PREFIX, new ElasticsearchTextPrefixPredicate.Factory() );
 			builder.queryElementFactory( PredicateTypeKeys.WILDCARD, new ElasticsearchTextWildcardPredicate.Factory() );
 			builder.queryElementFactory( PredicateTypeKeys.REGEXP, new ElasticsearchTextRegexpPredicate.Factory() );
 			builder.queryElementFactory( PredicateTypeKeys.TERMS, new ElasticsearchTermsPredicate.Factory<>( codec ) );

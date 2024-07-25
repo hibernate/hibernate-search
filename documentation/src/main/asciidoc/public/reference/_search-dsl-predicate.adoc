@@ -1865,6 +1865,47 @@ or for the whole predicate with a call to `.boost(...)` after `.matching(...)`.
 of targeted fields to analyze searched text by default,
 but this can be <<search-dsl-predicate-common-overriding-analysis,overridden>>.
 
+[[search-dsl-predicate-prefix]]
+== `prefix`: match documents based on what a field starts with
+
+The `prefix` predicate matches documents for which a given field has a value starting with a given string.
+
+.Matching a simple prefix
+====
+[source, JAVA, indent=0, subs="+callouts"]
+----
+include::{sourcedir}/org/hibernate/search/documentation/search/predicate/PredicateDslIT.java[tags=prefix]
+----
+====
+
+[IMPORTANT]
+====
+If a normalizer has been defined on the field, the prefix used in prefix predicates
+will be normalized.
+
+If an analyzer has been defined on the field:
+
+* when using the Elasticsearch backend, the prefixes won't be analyzed nor normalized,
+and will be expected to match a *single* indexed token.
+This may behave differently on an older versions of the underlying search engine
+Hence, please refer to the documentation of your particular backend version for the exact behaviour.
+* when using the Lucene backend the prefixes will be normalized.
+
+When the goal is to match user-provided query strings,
+the <<search-dsl-predicate-simple-query-string,simple query string predicate>> should be preferred.
+
+This predicate may also not be ideal for autocomplete purposes. Refer to your particular backend documentation
+to determine the best option to achieve autocomplete functionality.
+====
+
+[[search-dsl-predicate-prefix-multiple-fields]]
+=== Targeting multiple fields
+
+Optionally, the predicate can target multiple fields.
+In that case, the predicate will match documents for which _any_ of the given fields matches.
+
+See <<search-dsl-predicate-common-multiple-fields>>.
+
 [[search-dsl-predicate-named]]
 == [[query-filter-fulltext]] `named`: call a predicate defined in the mapping
 

@@ -27,6 +27,7 @@ import org.hibernate.search.engine.search.predicate.spi.MatchPredicateBuilder;
 import org.hibernate.search.engine.search.predicate.spi.NamedPredicateBuilder;
 import org.hibernate.search.engine.search.predicate.spi.NestedPredicateBuilder;
 import org.hibernate.search.engine.search.predicate.spi.PhrasePredicateBuilder;
+import org.hibernate.search.engine.search.predicate.spi.PrefixPredicateBuilder;
 import org.hibernate.search.engine.search.predicate.spi.QueryStringPredicateBuilder;
 import org.hibernate.search.engine.search.predicate.spi.RangePredicateBuilder;
 import org.hibernate.search.engine.search.predicate.spi.RegexpPredicateBuilder;
@@ -159,7 +160,8 @@ public class StubSearchPredicate implements SearchPredicate {
 			SpatialWithinCirclePredicateBuilder,
 			SpatialWithinPolygonPredicateBuilder,
 			SpatialWithinBoundingBoxPredicateBuilder,
-			NamedPredicateBuilder {
+			NamedPredicateBuilder,
+			PrefixPredicateBuilder {
 		private boolean hasClause = false;
 
 		@Override
@@ -301,6 +303,11 @@ public class StubSearchPredicate implements SearchPredicate {
 		@Override
 		public void param(String name, Object value) {
 			// No-op, just simulates a call on this object
+		}
+
+		@Override
+		public void prefix(String prefix) {
+			// No-op
 		}
 	}
 

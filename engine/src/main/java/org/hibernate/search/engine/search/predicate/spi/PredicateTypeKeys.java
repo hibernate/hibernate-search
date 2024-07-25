@@ -27,6 +27,7 @@ public final class PredicateTypeKeys {
 	public static final SearchQueryElementTypeKey<RangePredicateBuilder> RANGE = of( IndexFieldTraits.Predicates.RANGE );
 	public static final SearchQueryElementTypeKey<ExistsPredicateBuilder> EXISTS = of( IndexFieldTraits.Predicates.EXISTS );
 	public static final SearchQueryElementTypeKey<PhrasePredicateBuilder> PHRASE = of( IndexFieldTraits.Predicates.PHRASE );
+	public static final SearchQueryElementTypeKey<PrefixPredicateBuilder> PREFIX = of( IndexFieldTraits.Predicates.PREFIX );
 	public static final SearchQueryElementTypeKey<WildcardPredicateBuilder> WILDCARD =
 			of( IndexFieldTraits.Predicates.WILDCARD );
 	public static final SearchQueryElementTypeKey<RegexpPredicateBuilder> REGEXP = of( IndexFieldTraits.Predicates.REGEXP );
