@@ -6,6 +6,7 @@ package org.hibernate.search.mapper.orm.loading.impl;
 
 import java.lang.invoke.MethodHandles;
 import java.util.ArrayList;
+import java.util.OptionalLong;
 
 import org.hibernate.ScrollMode;
 import org.hibernate.ScrollableResults;
@@ -78,8 +79,8 @@ public final class HibernateOrmMassIdentifierLoader<E, I> implements PojoMassIde
 	}
 
 	@Override
-	public long totalCount() {
-		return totalCount;
+	public OptionalLong totalCount() {
+		return OptionalLong.of( totalCount );
 	}
 
 	@Override

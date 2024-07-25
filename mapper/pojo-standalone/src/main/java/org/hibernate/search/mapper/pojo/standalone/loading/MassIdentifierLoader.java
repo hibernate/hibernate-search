@@ -4,10 +4,19 @@
  */
 package org.hibernate.search.mapper.pojo.standalone.loading;
 
+import java.util.OptionalLong;
+
 import org.hibernate.search.util.common.annotation.Incubating;
 
 /**
  * A loader for mass loading of entity identifiers, used in particular during mass indexing.
+ * <p>
+ * If the total count of identifiers to load is unknown, {@link #totalCount()} should remain unimplemented,
+ * i.e. return an empty optional. This will let the mass indexer know to increment the total on each new batch loaded instead
+ * of relying on the total being provided before the indexing starts.
+ * <p>
+ * The loading of the identifiers is considered as finished when {@link MassIdentifierSink#complete()} is called
+ * from the {@link #loadNext()}.
  */
 @Incubating
 public interface MassIdentifierLoader extends AutoCloseable {
@@ -17,11 +26,6 @@ public interface MassIdentifierLoader extends AutoCloseable {
 	 */
 	@Override
 	void close();
-
-	/**
-	 * @return The total count of identifiers expected to be loaded.
-	 */
-	long totalCount();
 
 	/**
 	 * Loads one batch of identifiers and adds them to the sink,
@@ -34,4 +38,10 @@ public interface MassIdentifierLoader extends AutoCloseable {
 	 */
 	void loadNext() throws InterruptedException;
 
+	/**
+	 * @return The total count of identifiers expected to be loaded.
+	 */
+	default OptionalLong totalCount() {
+		return OptionalLong.empty();
+	}
 }

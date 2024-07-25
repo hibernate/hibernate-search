@@ -4,6 +4,8 @@
  */
 package org.hibernate.search.mapper.pojo.standalone.loading.impl;
 
+import java.util.OptionalLong;
+
 import org.hibernate.search.mapper.pojo.loading.spi.PojoMassIdentifierLoader;
 import org.hibernate.search.mapper.pojo.standalone.loading.MassIdentifierLoader;
 
@@ -21,7 +23,7 @@ public class StandalonePojoMassIdentifierLoader implements PojoMassIdentifierLoa
 	}
 
 	@Override
-	public long totalCount() {
+	public OptionalLong totalCount() {
 		return delegate.totalCount();
 	}
 
