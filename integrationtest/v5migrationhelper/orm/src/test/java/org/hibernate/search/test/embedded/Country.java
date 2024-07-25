@@ -13,8 +13,8 @@ import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Id;
 import jakarta.persistence.OneToMany;
+import jakarta.persistence.OrderColumn;
 
-import org.hibernate.annotations.IndexColumn;
 import org.hibernate.search.annotations.DocumentId;
 import org.hibernate.search.annotations.Field;
 import org.hibernate.search.annotations.Indexed;
@@ -37,8 +37,7 @@ public class Country {
 	private String name;
 
 	@OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
-	//FIXME with JPA 2, move to @OrderColumn
-	@IndexColumn(name = "list_position")
+	@OrderColumn(name = "list_position")
 	@IndexedEmbedded
 	@IndexingDependency(reindexOnUpdate = ReindexOnUpdate.SHALLOW)
 	private List<State> states = new ArrayList<State>();
