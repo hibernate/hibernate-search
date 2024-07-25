@@ -138,7 +138,7 @@ jobs:
         continue-on-error: true
         if: "${{ !cancelled() && github.event_name == 'pull_request_target' && github.repository == 'hibernate/hibernate-search' }}"
         run: |
-          ./mvnw $MAVEN_ARGS gradle-enterprise:build-scan-publish-previous
+          ./mvnw $MAVEN_ARGS develocity:build-scan-publish-previous
         env:
           # WARNING: exposes secrets, so must only be passed to a step that doesn't run unapproved code.
           DEVELOCITY_ACCESS_KEY: ${{ secrets.GRADLE_ENTERPRISE_ACCESS_KEY_PR }}
@@ -156,7 +156,7 @@ jobs:
         continue-on-error: true
         if: "${{ !cancelled() && github.event_name == 'pull_request_target' && github.repository == 'hibernate/hibernate-search' }}"
         run: |
-          ./mvnw $MAVEN_ARGS gradle-enterprise:build-scan-publish-previous
+          ./mvnw $MAVEN_ARGS develocity:build-scan-publish-previous
         env:
           # WARNING: exposes secrets, so must only be passed to a step that doesn't run unapproved code.
           DEVELOCITY_ACCESS_KEY: ${{ secrets.GRADLE_ENTERPRISE_ACCESS_KEY_PR }}
