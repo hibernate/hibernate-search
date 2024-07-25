@@ -12,6 +12,7 @@ import java.lang.invoke.MethodHandles;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
+import java.util.OptionalLong;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Consumer;
@@ -822,8 +823,8 @@ public abstract class AbstractMassIndexingFailureIT {
 					}
 
 					@Override
-					public long totalCount() {
-						return 100;
+					public OptionalLong totalCount() {
+						return OptionalLong.of( 100 );
 					}
 
 					@Override
@@ -865,17 +866,17 @@ public abstract class AbstractMassIndexingFailureIT {
 					}
 
 					@Override
-					public long totalCount() {
+					public OptionalLong totalCount() {
 						// We need more than 1000 batches in order to reproduce HSEARCH-4236.
 						// That's because of the size of the queue:
 						// see org.hibernate.search.mapper.orm.massindexing.impl.PojoProducerConsumerQueue.DEFAULT_BUFF_LENGTH
-						return COUNT;
+						return OptionalLong.of( COUNT );
 					}
 
 					@Override
 					public void loadNext() throws InterruptedException {
 						sink.accept( Collections.singletonList( i++ ) );
-						if ( i >= totalCount() ) {
+						if ( i >= COUNT ) {
 							sink.complete();
 						}
 					}

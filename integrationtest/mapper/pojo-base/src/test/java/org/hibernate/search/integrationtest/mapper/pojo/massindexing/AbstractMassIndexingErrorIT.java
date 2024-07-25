@@ -11,6 +11,7 @@ import static org.assertj.core.api.Fail.fail;
 import java.lang.invoke.MethodHandles;
 import java.util.Collections;
 import java.util.List;
+import java.util.OptionalLong;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Consumer;
@@ -58,6 +59,7 @@ public abstract class AbstractMassIndexingErrorIT {
 	public static final String AUTHOR_2 = "James Joyce";
 	public static final String TITLE_3 = "Frankenstein";
 	public static final String AUTHOR_3 = "Mary Shelley";
+	private static final int TOTAL_COUNT = 1500;
 
 	@RegisterExtension
 	public final BackendMock backendMock = BackendMock.create();
@@ -491,8 +493,8 @@ public abstract class AbstractMassIndexingErrorIT {
 					}
 
 					@Override
-					public long totalCount() {
-						return 100;
+					public OptionalLong totalCount() {
+						return OptionalLong.of( 100 );
 					}
 
 					@Override
@@ -534,17 +536,17 @@ public abstract class AbstractMassIndexingErrorIT {
 					}
 
 					@Override
-					public long totalCount() {
+					public OptionalLong totalCount() {
 						// We need more than 1000 batches in order to reproduce HSEARCH-4236.
 						// That's because of the size of the queue:
 						// see org.hibernate.search.mapper.orm.massindexing.impl.PojoProducerConsumerQueue.DEFAULT_BUFF_LENGTH
-						return 1500;
+						return OptionalLong.of( TOTAL_COUNT );
 					}
 
 					@Override
 					public void loadNext() throws InterruptedException {
 						sink.accept( Collections.singletonList( i++ ) );
-						if ( i >= totalCount() ) {
+						if ( i >= TOTAL_COUNT ) {
 							sink.complete();
 						}
 					}
