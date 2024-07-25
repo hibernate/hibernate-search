@@ -27,6 +27,7 @@ import org.hibernate.search.engine.search.predicate.dsl.NestedPredicateClausesSt
 import org.hibernate.search.engine.search.predicate.dsl.NotPredicateFinalStep;
 import org.hibernate.search.engine.search.predicate.dsl.PhrasePredicateFieldStep;
 import org.hibernate.search.engine.search.predicate.dsl.PredicateFinalStep;
+import org.hibernate.search.engine.search.predicate.dsl.PrefixPredicateFieldStep;
 import org.hibernate.search.engine.search.predicate.dsl.QueryStringPredicateFieldStep;
 import org.hibernate.search.engine.search.predicate.dsl.RangePredicateFieldStep;
 import org.hibernate.search.engine.search.predicate.dsl.RegexpPredicateFieldStep;
@@ -49,6 +50,7 @@ import org.hibernate.search.engine.search.predicate.dsl.impl.NamedPredicateOptio
 import org.hibernate.search.engine.search.predicate.dsl.impl.NestedPredicateClausesStepImpl;
 import org.hibernate.search.engine.search.predicate.dsl.impl.NotPredicateFinalStepImpl;
 import org.hibernate.search.engine.search.predicate.dsl.impl.PhrasePredicateFieldStepImpl;
+import org.hibernate.search.engine.search.predicate.dsl.impl.PrefixPredicateFieldStepImpl;
 import org.hibernate.search.engine.search.predicate.dsl.impl.QueryStringPredicateFieldStepImpl;
 import org.hibernate.search.engine.search.predicate.dsl.impl.RangePredicateFieldStepImpl;
 import org.hibernate.search.engine.search.predicate.dsl.impl.RegexpPredicateFieldStepImpl;
@@ -164,6 +166,11 @@ public abstract class AbstractSearchPredicateFactory<
 	@Override
 	public WildcardPredicateFieldStep<?> wildcard() {
 		return new WildcardPredicateFieldStepImpl( dslContext );
+	}
+
+	@Override
+	public PrefixPredicateFieldStep<?> prefix() {
+		return new PrefixPredicateFieldStepImpl( dslContext );
 	}
 
 	@Override

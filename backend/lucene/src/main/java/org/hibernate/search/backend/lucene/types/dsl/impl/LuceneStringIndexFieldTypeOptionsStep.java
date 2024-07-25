@@ -25,6 +25,7 @@ import org.hibernate.search.backend.lucene.types.predicate.impl.LuceneCommonQuer
 import org.hibernate.search.backend.lucene.types.predicate.impl.LuceneExistsPredicate;
 import org.hibernate.search.backend.lucene.types.predicate.impl.LuceneTextMatchPredicate;
 import org.hibernate.search.backend.lucene.types.predicate.impl.LuceneTextPhrasePredicate;
+import org.hibernate.search.backend.lucene.types.predicate.impl.LuceneTextPrefixPredicate;
 import org.hibernate.search.backend.lucene.types.predicate.impl.LuceneTextRangePredicate;
 import org.hibernate.search.backend.lucene.types.predicate.impl.LuceneTextRegexpPredicate;
 import org.hibernate.search.backend.lucene.types.predicate.impl.LuceneTextTermsPredicate;
@@ -207,6 +208,7 @@ class LuceneStringIndexFieldTypeOptionsStep
 							? new LuceneExistsPredicate.DocValuesOrNormsBasedFactory<>()
 							: new LuceneExistsPredicate.DefaultFactory<>() );
 			builder.queryElementFactory( PredicateTypeKeys.PHRASE, new LuceneTextPhrasePredicate.Factory<>() );
+			builder.queryElementFactory( PredicateTypeKeys.PREFIX, new LuceneTextPrefixPredicate.Factory<>() );
 			builder.queryElementFactory( PredicateTypeKeys.WILDCARD, new LuceneTextWildcardPredicate.Factory<>() );
 			builder.queryElementFactory( PredicateTypeKeys.REGEXP, new LuceneTextRegexpPredicate.Factory<>() );
 			builder.queryElementFactory( LucenePredicateTypeKeys.SIMPLE_QUERY_STRING,

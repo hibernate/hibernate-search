@@ -1092,6 +1092,21 @@ class PredicateDslIT {
 	}
 
 	@Test
+	void prefix() {
+		withinSearchSession( searchSession -> {
+			// tag::prefix[]
+			List<Book> hits = searchSession.search( Book.class )
+					.where( f -> f.prefix().field( "description" )
+							.matching( "rob" ) )
+					.fetchHits( 20 );
+			// end::prefix[]
+			assertThat( hits )
+					.extracting( Book::getId )
+					.containsExactlyInAnyOrder( BOOK1_ID, BOOK2_ID, BOOK3_ID, BOOK4_ID );
+		} );
+	}
+
+	@Test
 	void regexp() {
 		withinSearchSession( searchSession -> {
 			// tag::regexp[]
