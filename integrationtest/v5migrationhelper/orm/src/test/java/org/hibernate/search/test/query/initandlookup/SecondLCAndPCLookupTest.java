@@ -190,7 +190,7 @@ class SecondLCAndPCLookupTest extends SearchTestBase {
 		Transaction tx = session.beginTransaction();
 		List list = listAll( session, Kernel.class );
 		assertThat( list ).hasSize( 2 );
-		session.delete( list.get( 0 ) );
+		session.remove( list.get( 0 ) );
 		tx.commit();
 		session.clear();
 		indexingSwitch.enable( true );
