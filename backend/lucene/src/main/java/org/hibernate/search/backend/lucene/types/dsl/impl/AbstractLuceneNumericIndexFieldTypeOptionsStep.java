@@ -4,8 +4,11 @@
  */
 package org.hibernate.search.backend.lucene.types.dsl.impl;
 
+import org.hibernate.search.backend.lucene.search.common.impl.AbstractLuceneCodecAwareSearchQueryElementFactory;
 import org.hibernate.search.backend.lucene.search.predicate.impl.LucenePredicateTypeKeys;
 import org.hibernate.search.backend.lucene.search.projection.impl.LuceneFieldProjection;
+import org.hibernate.search.backend.lucene.types.aggregation.impl.AbstractLuceneMetricNumericFieldAggregation;
+import org.hibernate.search.backend.lucene.types.aggregation.impl.AbstractLuceneMetricNumericLongAggregation;
 import org.hibernate.search.backend.lucene.types.aggregation.impl.LuceneNumericRangeAggregation;
 import org.hibernate.search.backend.lucene.types.aggregation.impl.LuceneNumericTermsAggregation;
 import org.hibernate.search.backend.lucene.types.codec.impl.AbstractLuceneNumericFieldCodec;
@@ -22,6 +25,7 @@ import org.hibernate.search.backend.lucene.types.sort.impl.LuceneStandardFieldSo
 import org.hibernate.search.engine.backend.types.Sortable;
 import org.hibernate.search.engine.backend.types.converter.spi.DefaultStringConverters;
 import org.hibernate.search.engine.search.aggregation.spi.AggregationTypeKeys;
+import org.hibernate.search.engine.search.aggregation.spi.FieldMetricAggregationBuilder;
 import org.hibernate.search.engine.search.predicate.spi.PredicateTypeKeys;
 import org.hibernate.search.engine.search.projection.spi.ProjectionTypeKeys;
 import org.hibernate.search.engine.search.sort.spi.SortTypeKeys;
@@ -85,9 +89,26 @@ abstract class AbstractLuceneNumericIndexFieldTypeOptionsStep<S extends Abstract
 			builder.aggregable( true );
 			builder.queryElementFactory( AggregationTypeKeys.TERMS, new LuceneNumericTermsAggregation.Factory<>( codec ) );
 			builder.queryElementFactory( AggregationTypeKeys.RANGE, new LuceneNumericRangeAggregation.Factory<>( codec ) );
+			builder.queryElementFactory( AggregationTypeKeys.SUM, sumAvgMetricAggregationFactory( codec, "sum" ) );
+			builder.queryElementFactory( AggregationTypeKeys.MIN,
+					new AbstractLuceneMetricNumericFieldAggregation.Factory<>( codec, "min" ) );
+			builder.queryElementFactory( AggregationTypeKeys.MAX,
+					new AbstractLuceneMetricNumericFieldAggregation.Factory<>( codec, "max" ) );
+			builder.queryElementFactory( AggregationTypeKeys.COUNT,
+					new AbstractLuceneMetricNumericLongAggregation.Factory<>( codec, "value_count" ) );
+			builder.queryElementFactory( AggregationTypeKeys.COUNT_DISTINCT,
+					new AbstractLuceneMetricNumericLongAggregation.Factory<>( codec, "cardinality" ) );
+			builder.queryElementFactory( AggregationTypeKeys.AVG, sumAvgMetricAggregationFactory( codec, "avg" ) );
 		}
 
 		return builder.build();
+	}
+
+	protected AbstractLuceneCodecAwareSearchQueryElementFactory<FieldMetricAggregationBuilder.TypeSelector,
+			F,
+			AbstractLuceneNumericFieldCodec<F, ?>> sumAvgMetricAggregationFactory(
+					AbstractLuceneNumericFieldCodec<F, ?> codec, String operation) {
+		return new AbstractLuceneMetricNumericFieldAggregation.Factory<>( codec, operation );
 	}
 
 	protected abstract AbstractLuceneNumericFieldCodec<F, ?> createCodec(Indexing indexing, DocValues docValues,

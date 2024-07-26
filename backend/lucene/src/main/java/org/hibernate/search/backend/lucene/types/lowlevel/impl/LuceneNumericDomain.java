@@ -39,6 +39,10 @@ public interface LuceneNumericDomain<E extends Number> {
 
 	E sortedDocValueToTerm(long longValue);
 
+	double sortedDocValueToDouble(long longValue);
+
+	E doubleToTerm(double doubleValue);
+
 	Facets createTermsFacetCounts(String absoluteFieldPath, FacetsCollector facetsCollector,
 			NestedDocsProvider nestedDocsProvider)
 			throws IOException;
