@@ -8,6 +8,8 @@ import java.time.temporal.TemporalAccessor;
 
 import org.hibernate.search.backend.lucene.search.predicate.impl.LucenePredicateTypeKeys;
 import org.hibernate.search.backend.lucene.search.projection.impl.LuceneFieldProjection;
+import org.hibernate.search.backend.lucene.types.aggregation.impl.AbstractLuceneMetricNumericFieldAggregation;
+import org.hibernate.search.backend.lucene.types.aggregation.impl.AbstractLuceneMetricNumericLongAggregation;
 import org.hibernate.search.backend.lucene.types.aggregation.impl.LuceneNumericRangeAggregation;
 import org.hibernate.search.backend.lucene.types.aggregation.impl.LuceneNumericTermsAggregation;
 import org.hibernate.search.backend.lucene.types.codec.impl.AbstractLuceneNumericFieldCodec;
@@ -90,6 +92,21 @@ abstract class AbstractLuceneTemporalIndexFieldTypeOptionsStep<
 			builder.aggregable( true );
 			builder.queryElementFactory( AggregationTypeKeys.TERMS, new LuceneNumericTermsAggregation.Factory<>( codec ) );
 			builder.queryElementFactory( AggregationTypeKeys.RANGE, new LuceneNumericRangeAggregation.Factory<>( codec ) );
+
+			if ( sumAggregationSupported() ) {
+				builder.queryElementFactory( AggregationTypeKeys.SUM,
+					new AbstractLuceneMetricNumericFieldAggregation.Factory<>( codec, "sum" ) );
+			}
+			builder.queryElementFactory( AggregationTypeKeys.MIN,
+					new AbstractLuceneMetricNumericFieldAggregation.Factory<>( codec, "min" ) );
+			builder.queryElementFactory( AggregationTypeKeys.MAX,
+					new AbstractLuceneMetricNumericFieldAggregation.Factory<>( codec, "max" ) );
+			builder.queryElementFactory( AggregationTypeKeys.COUNT,
+					new AbstractLuceneMetricNumericLongAggregation.Factory<>( codec, "value_count" ) );
+			builder.queryElementFactory( AggregationTypeKeys.COUNT_DISTINCT,
+					new AbstractLuceneMetricNumericLongAggregation.Factory<>( codec, "cardinality" ) );
+			builder.queryElementFactory( AggregationTypeKeys.AVG,
+					new AbstractLuceneMetricNumericFieldAggregation.Factory<>( codec, "avg" ) );
 		}
 
 		return builder.build();
@@ -97,4 +114,8 @@ abstract class AbstractLuceneTemporalIndexFieldTypeOptionsStep<
 
 	protected abstract AbstractLuceneNumericFieldCodec<F, ?> createCodec(Indexing indexing, DocValues docValues,
 			Storage storage, F indexNullAsValue);
+
+	protected boolean sumAggregationSupported() {
+		return true;
+	}
 }

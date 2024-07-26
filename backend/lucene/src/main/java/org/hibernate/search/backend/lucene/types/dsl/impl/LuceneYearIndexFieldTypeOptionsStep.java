@@ -30,4 +30,9 @@ class LuceneYearIndexFieldTypeOptionsStep
 			Storage storage, Year indexNullAsValue) {
 		return new LuceneYearFieldCodec( indexing, docValues, storage, indexNullAsValue );
 	}
+
+	@Override
+	protected boolean sumAggregationSupported() {
+		return false;
+	}
 }

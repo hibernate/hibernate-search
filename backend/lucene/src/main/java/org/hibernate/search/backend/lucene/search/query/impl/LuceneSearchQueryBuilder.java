@@ -270,7 +270,8 @@ public class LuceneSearchQueryBuilder<H> implements SearchQueryBuilder<H>, Lucen
 		if ( aggregations != null ) {
 			aggregationExtractors = new LinkedHashMap<>();
 			AggregationRequestContext aggregationRequestContext =
-					new AggregationRequestContext( extractionRequirementsBuilder, parameters );
+					new AggregationRequestContext( scope, sessionContext, routingKeys, extractionRequirementsBuilder,
+							parameters );
 			for ( Map.Entry<AggregationKey<?>, LuceneSearchAggregation<?>> entry : aggregations.entrySet() ) {
 				aggregationExtractors.put( entry.getKey(), entry.getValue().request( aggregationRequestContext ) );
 			}

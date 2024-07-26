@@ -83,6 +83,16 @@ public class LuceneDoubleDomain implements LuceneNumericDomain<Double> {
 	}
 
 	@Override
+	public double sortedDocValueToDouble(long longValue) {
+		return sortedDocValueToTerm( longValue );
+	}
+
+	@Override
+	public Double doubleToTerm(double doubleValue) {
+		return doubleValue;
+	}
+
+	@Override
 	public Facets createTermsFacetCounts(String absoluteFieldPath, FacetsCollector facetsCollector,
 			NestedDocsProvider nestedDocsProvider)
 			throws IOException {

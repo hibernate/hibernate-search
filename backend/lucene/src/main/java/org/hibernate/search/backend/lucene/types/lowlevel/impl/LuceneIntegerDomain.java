@@ -16,6 +16,7 @@ import org.hibernate.search.backend.lucene.lowlevel.facet.impl.FacetCountsUtils;
 import org.hibernate.search.backend.lucene.lowlevel.facet.impl.LongMultiValueFacetCounts;
 import org.hibernate.search.backend.lucene.lowlevel.facet.impl.LongMultiValueRangeFacetCounts;
 import org.hibernate.search.backend.lucene.lowlevel.join.impl.NestedDocsProvider;
+import org.hibernate.search.engine.cfg.spi.NumberUtils;
 import org.hibernate.search.util.common.data.Range;
 
 import org.apache.lucene.document.IntPoint;
@@ -79,6 +80,16 @@ public class LuceneIntegerDomain implements LuceneNumericDomain<Integer> {
 	@Override
 	public Integer sortedDocValueToTerm(long longValue) {
 		return (int) longValue;
+	}
+
+	@Override
+	public Integer doubleToTerm(double doubleValue) {
+		return NumberUtils.toInteger( doubleValue );
+	}
+
+	@Override
+	public double sortedDocValueToDouble(long longValue) {
+		return sortedDocValueToTerm( longValue ).doubleValue();
 	}
 
 	@Override
