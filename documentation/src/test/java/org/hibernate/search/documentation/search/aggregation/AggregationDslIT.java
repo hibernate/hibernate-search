@@ -437,6 +437,96 @@ class AggregationDslIT {
 		} );
 	}
 
+	@Test
+	void sum() {
+		withinSearchSession( searchSession -> {
+			// tag::sums[]
+			AggregationKey<Double> sumPricesKey = AggregationKey.of( "sumPricesScienceFictionBooks" );
+			SearchResult<Book> result = searchSession.search( Book.class )
+					.where( f -> f.match().field( "genre" ).matching( Genre.SCIENCE_FICTION ) )
+					.aggregation( sumPricesKey, f -> f.sum().field( "price", Double.class ) ) // <1>
+					.fetch( 20 );
+			Double sumPrices = result.aggregation( sumPricesKey );
+			assertThat( sumPrices ).isEqualTo( 60.97 );
+			// end::sums[]
+		} );
+	}
+
+	@Test
+	void min() {
+		withinSearchSession( searchSession -> {
+			// tag::min[]
+			AggregationKey<Date> oldestReleaseKey = AggregationKey.of( "oldestRelease" );
+			SearchResult<Book> result = searchSession.search( Book.class )
+					.where( f -> f.match().field( "genre" ).matching( Genre.SCIENCE_FICTION ) )
+					.aggregation( oldestReleaseKey, f -> f.min().field( "releaseDate", Date.class ) ) // <1>
+					.fetch( 20 );
+			Date oldestRelease = result.aggregation( oldestReleaseKey );
+			assertThat( oldestRelease ).isEqualTo( Date.valueOf( "1950-12-02" ) );
+			// end::min[]
+		} );
+	}
+
+	@Test
+	void max() {
+		withinSearchSession( searchSession -> {
+			// tag::max[]
+			AggregationKey<Date> mostRecentReleaseKey = AggregationKey.of( "mostRecentRelease" );
+			SearchResult<Book> result = searchSession.search( Book.class )
+					.where( f -> f.match().field( "genre" ).matching( Genre.SCIENCE_FICTION ) )
+					.aggregation( mostRecentReleaseKey, f -> f.max().field( "releaseDate", Date.class ) ) // <1>
+					.fetch( 20 );
+			Date mostRecentRelease = result.aggregation( mostRecentReleaseKey );
+
+			// end::max[]
+		} );
+	}
+
+	@Test
+	void count() {
+		withinSearchSession( searchSession -> {
+			// tag::count[]
+			AggregationKey<Long> countPricesKey = AggregationKey.of( "countPrices" );
+			SearchResult<Book> result = searchSession.search( Book.class )
+					.where( f -> f.match().field( "genre" ).matching( Genre.SCIENCE_FICTION ) )
+					.aggregation( countPricesKey, f -> f.count().field( "price" ) ) // <1>
+					.fetch( 20 );
+			Long countPrices = result.aggregation( countPricesKey );
+			assertThat( countPrices ).isEqualTo( 3L );
+			// end::count[]
+		} );
+	}
+
+	@Test
+	void countDistinct() {
+		withinSearchSession( searchSession -> {
+			// tag::count-distinct[]
+			AggregationKey<Long> countDistinctPricesKey = AggregationKey.of( "countDistinctPrices" );
+			SearchResult<Book> result = searchSession.search( Book.class )
+					.where( f -> f.match().field( "genre" ).matching( Genre.SCIENCE_FICTION ) )
+					.aggregation( countDistinctPricesKey, f -> f.countDistinct().field( "price" ) ) // <1>
+					.fetch( 20 );
+			Long countDistinctPrices = result.aggregation( countDistinctPricesKey );
+			assertThat( countDistinctPrices ).isEqualTo( 3L );
+			// end::count-distinct[]
+		} );
+	}
+
+	@Test
+	void avg() {
+		withinSearchSession( searchSession -> {
+			// tag::avg[]
+			AggregationKey<Double> avgPricesKey = AggregationKey.of( "avgPrices" );
+			SearchResult<Book> result = searchSession.search( Book.class )
+					.where( f -> f.match().field( "genre" ).matching( Genre.SCIENCE_FICTION ) )
+					.aggregation( avgPricesKey, f -> f.avg().field( "price", Double.class ) ) // <1>
+					.fetch( 20 );
+			Double avgPrices = result.aggregation( avgPricesKey );
+			assertThat( avgPrices ).isEqualTo( 20.323333333333334 );
+			// end::avg[]
+		} );
+	}
+
 	private void withinSearchSession(Consumer<SearchSession> action) {
 		with( entityManagerFactory ).runInTransaction( entityManager -> {
 			SearchSession searchSession = Search.session( entityManager );

@@ -324,6 +324,118 @@ See <<search-dsl-argument-type>> for more information.
 * For fields in nested objects, all nested objects are considered by default,
 but that can be <<search-dsl-aggregation-common-filter,controlled explicitly with `.filter(...)`>>.
 
+[[search-dsl-aggregation-metric]]
+== Metric aggregations
+
+include::../components/_incubating-warning.adoc[]
+
+Hibernate Search provides a set of most common metric aggregations such as `sum`, `min`, `max`, `count`,
+`count distinct` and `avg`. These aggregations can be requested for fields of numerical or temporal type.
+
+[NOTE]
+====
+At the moment, it is only possible to request metric aggregations at the root level;
+that is, the aggregation will be applied to the entire hit set.
+====
+
+[IMPORTANT]
+====
+The fields that are targeted by the aggregation function must be declared <<mapping-directfieldmapping-aggregable,aggregable>>.
+====
+
+=== Sum metric aggregation
+
+The `sum` aggregation sums up the field values.
+
+.Sum the prices of all science fiction books
+====
+[source, JAVA, indent=0, subs="+callouts"]
+----
+include::{sourcedir}/org/hibernate/search/documentation/search/aggregation/AggregationDslIT.java[tags=sums]
+----
+<1> Define the target field path to which you want to apply the aggregation function and the expected returned type.
+====
+
+[NOTE]
+====
+You can always use the field type for the expected returned value.
+Alternatively, as aggregations usually involve some mathematical computations,
+it is possible to request a `Double.class`  result, which will return the aggregated value
+as the corresponding search backend computed it.
+====
+
+=== Min metric aggregation
+
+The `min` aggregation provides the minimum value among the field values.
+
+.Find the min release date among all the science fiction books
+====
+[source, JAVA, indent=0, subs="+callouts"]
+----
+include::{sourcedir}/org/hibernate/search/documentation/search/aggregation/AggregationDslIT.java[tags=min]
+----
+<1> Define the target field path to which you want to apply the aggregation function and the expected returned type.
+====
+
+=== Max metric aggregation
+
+The `max` aggregation provides the maximum value among the field values.
+
+.Find the max release date among all the science fiction books
+====
+[source, JAVA, indent=0, subs="+callouts"]
+----
+include::{sourcedir}/org/hibernate/search/documentation/search/aggregation/AggregationDslIT.java[tags=max]
+----
+<1> Define the target field path to which you want to apply the aggregation function and the expected returned type.
+====
+
+=== Count metric aggregation
+
+The `count` aggregation counts the number of documents in which the field is not empty. 
+
+.Count the number of the science fiction books with prices
+====
+[source, JAVA, indent=0, subs="+callouts"]
+----
+include::{sourcedir}/org/hibernate/search/documentation/search/aggregation/AggregationDslIT.java[tags=count]
+----
+<1> Define the target field path to which you want to apply the aggregation function. For this function a `Long.class` value is always returned.
+====
+
+=== Count distinct metric aggregation
+
+The `count distinct` aggregation counts the number of unique field values.
+
+.Count anytime the price field has a different value among all the science fiction books
+====
+[source, JAVA, indent=0, subs="+callouts"]
+----
+include::{sourcedir}/org/hibernate/search/documentation/search/aggregation/AggregationDslIT.java[tags=count-distinct]
+----
+<1> Define the target field path to which you want to apply the aggregation function. For this function a `Long.class` value is always returned.
+====
+
+=== Avg metric aggregation
+
+The `avg` aggregation calculates the average value of a given numeric or temporal field among the selected documents.
+
+.Compute the average price of all science fiction books
+====
+[source, JAVA, indent=0, subs="+callouts"]
+----
+include::{sourcedir}/org/hibernate/search/documentation/search/aggregation/AggregationDslIT.java[tags=avg]
+----
+<1> Define the target field path to which you want to apply the aggregation function and the expected returned type.
+====
+
+[NOTE]
+====
+In the case of the `avg()` aggregation, the result may have some decimal values,
+even if the field type is represented by one of the integer number types.
+In this case, if you want to return decimals, provide `Double.class` for the expected returned type.
+====
+
 [[search-dsl-aggregation-withparameters]]
 == `withParameters`: create aggregations using query parameters
 
