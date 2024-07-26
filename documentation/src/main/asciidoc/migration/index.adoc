@@ -44,12 +44,13 @@ and only then to later versions (which will be significantly easier).
 == Requirements
 
 The requirements of Hibernate Search {hibernateSearchVersion}
-are the same as those of Hibernate Search {hibernateSearchPreviousStableVersionShort}:
+are mostly the same as those of Hibernate Search {hibernateSearchPreviousStableVersionShort},
+with the only difference being Hibernate ORM version upgrade:
 
 - JDK 11 or later;
 - Lucene 9 for its Lucene backend;
 - Elasticsearch 7.10+ or OpenSearch 1.3+ for its Elasticsearch backend;
-- Hibernate ORM 6.4.x for the Hibernate ORM integration.
+- Hibernate ORM 6.6.x for the Hibernate ORM integration.
 
 [[artifact-changes]]
 == Artifacts
