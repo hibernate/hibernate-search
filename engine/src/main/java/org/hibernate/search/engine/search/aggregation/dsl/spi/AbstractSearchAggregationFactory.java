@@ -8,11 +8,23 @@ import java.util.function.Function;
 
 import org.hibernate.search.engine.common.dsl.spi.DslExtensionState;
 import org.hibernate.search.engine.search.aggregation.dsl.AggregationFinalStep;
+import org.hibernate.search.engine.search.aggregation.dsl.AvgAggregationFieldStep;
+import org.hibernate.search.engine.search.aggregation.dsl.CountAggregationFieldStep;
+import org.hibernate.search.engine.search.aggregation.dsl.CountDistinctAggregationFieldStep;
 import org.hibernate.search.engine.search.aggregation.dsl.ExtendedSearchAggregationFactory;
+import org.hibernate.search.engine.search.aggregation.dsl.MaxAggregationFieldStep;
+import org.hibernate.search.engine.search.aggregation.dsl.MinAggregationFieldStep;
 import org.hibernate.search.engine.search.aggregation.dsl.RangeAggregationFieldStep;
 import org.hibernate.search.engine.search.aggregation.dsl.SearchAggregationFactoryExtension;
+import org.hibernate.search.engine.search.aggregation.dsl.SumAggregationFieldStep;
 import org.hibernate.search.engine.search.aggregation.dsl.TermsAggregationFieldStep;
+import org.hibernate.search.engine.search.aggregation.dsl.impl.AvgAggregationFieldStepImpl;
+import org.hibernate.search.engine.search.aggregation.dsl.impl.CountAggregationFieldStepImpl;
+import org.hibernate.search.engine.search.aggregation.dsl.impl.CountDistinctAggregationFieldStepImpl;
+import org.hibernate.search.engine.search.aggregation.dsl.impl.MaxAggregationFieldStepImpl;
+import org.hibernate.search.engine.search.aggregation.dsl.impl.MinAggregationFieldStepImpl;
 import org.hibernate.search.engine.search.aggregation.dsl.impl.RangeAggregationFieldStepImpl;
+import org.hibernate.search.engine.search.aggregation.dsl.impl.SumAggregationFieldStepImpl;
 import org.hibernate.search.engine.search.aggregation.dsl.impl.TermsAggregationFieldStepImpl;
 import org.hibernate.search.engine.search.aggregation.dsl.impl.WithParametersAggregationFinalStep;
 import org.hibernate.search.engine.search.aggregation.spi.SearchAggregationIndexScope;
@@ -39,6 +51,35 @@ public abstract class AbstractSearchAggregationFactory<
 	@Override
 	public TermsAggregationFieldStep<PDF> terms() {
 		return new TermsAggregationFieldStepImpl<>( dslContext );
+	}
+
+	@Override
+	public SumAggregationFieldStep<PDF> sum() {
+		return new SumAggregationFieldStepImpl<>( dslContext );
+	}
+
+	@Override
+	public MinAggregationFieldStep<PDF> min() {
+		return new MinAggregationFieldStepImpl<>( dslContext );
+	}
+
+	@Override
+	public MaxAggregationFieldStep<PDF> max() {
+		return new MaxAggregationFieldStepImpl<>( dslContext );
+	}
+
+	@Override
+	public CountAggregationFieldStep<PDF> count() {
+		return new CountAggregationFieldStepImpl<>( dslContext );
+	}
+
+	@Override
+	public CountDistinctAggregationFieldStep<PDF> countDistinct() {
+		return new CountDistinctAggregationFieldStepImpl<>( dslContext );
+	}
+
+	public AvgAggregationFieldStep<PDF> avg() {
+		return new AvgAggregationFieldStepImpl<>( dslContext );
 	}
 
 	@Override

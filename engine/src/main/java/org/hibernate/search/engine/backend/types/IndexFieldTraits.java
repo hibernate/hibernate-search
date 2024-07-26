@@ -100,6 +100,12 @@ public final class IndexFieldTraits {
 
 		public static final String RANGE = "aggregation:range";
 		public static final String TERMS = "aggregation:terms";
+		public static final String SUM = "aggregation:sum";
+		public static final String MIN = "aggregation:min";
+		public static final String MAX = "aggregation:max";
+		public static final String COUNT = "aggregation:count";
+		public static final String COUNT_DISTINCT = "aggregation:countDistinct";
+		public static final String AVG = "aggregation:avg";
 
 	}
 
