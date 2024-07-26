@@ -73,7 +73,7 @@ class LuceneQueryTest extends SearchTestBase {
 		assertThat( result ).as( "Query with no class filter" ).hasSize( 2 );
 		for ( Object element : result ) {
 			assertThat( Hibernate.isInitialized( element ) ).isTrue();
-			fullTextSession.delete( element );
+			fullTextSession.remove( element );
 		}
 		fullTextSession.flush();
 		query = parser.parse( "summary:Festina Or brand:Seiko" );

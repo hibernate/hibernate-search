@@ -40,7 +40,7 @@ class FieldAccessTest extends SearchTestBase {
 		QueryParser p = new QueryParser( "noDefaultField", TestConstants.standardAnalyzer );
 		List result = session.createFullTextQuery( p.parse( "Abstract:Hibernate" ) ).list();
 		assertThat( result ).as( "Query by field" ).hasSize( 1 );
-		s.delete( result.get( 0 ) );
+		s.remove( result.get( 0 ) );
 		tx.commit();
 		s.close();
 

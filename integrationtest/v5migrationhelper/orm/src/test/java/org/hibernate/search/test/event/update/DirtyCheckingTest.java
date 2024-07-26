@@ -51,7 +51,7 @@ class DirtyCheckingTest extends SearchTestBase {
 			assertExists( s, "Johnny", "Johnny Fontina" );
 
 			tx = s.beginTransaction();
-			s.delete( johnny );
+			s.remove( johnny );
 			tx.commit();
 		}
 	}

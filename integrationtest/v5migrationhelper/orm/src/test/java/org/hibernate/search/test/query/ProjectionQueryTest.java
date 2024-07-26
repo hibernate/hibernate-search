@@ -80,10 +80,10 @@ class ProjectionQueryTest extends SearchTestBase {
 
 		//cleanup
 		for ( Object element : s.createQuery( "from " + Husband.class.getName() ).list() ) {
-			s.delete( element );
+			s.remove( element );
 		}
 		for ( Object element : s.createQuery( "from " + Spouse.class.getName() ).list() ) {
-			s.delete( element );
+			s.remove( element );
 		}
 
 		tx.commit();
@@ -112,7 +112,7 @@ class ProjectionQueryTest extends SearchTestBase {
 
 		//cleanup
 		for ( Object element : s.createQuery( "from " + Employee.class.getName() ).list() ) {
-			s.delete( element );
+			s.remove( element );
 		}
 
 		tx.commit();
@@ -176,7 +176,7 @@ class ProjectionQueryTest extends SearchTestBase {
 
 		//cleanup
 		for ( Object element : s.createQuery( "from " + Employee.class.getName() ).list() ) {
-			s.delete( element );
+			s.remove( element );
 		}
 		tx.commit();
 		s.close();
@@ -206,7 +206,7 @@ class ProjectionQueryTest extends SearchTestBase {
 
 		//cleanup
 		for ( Object element : s.createQuery( "from " + Employee.class.getName() ).list() ) {
-			s.delete( element );
+			s.remove( element );
 		}
 		tx.commit();
 		s.close();
@@ -245,7 +245,7 @@ class ProjectionQueryTest extends SearchTestBase {
 
 		//cleanup
 		for ( Object element : s.createQuery( "from " + Employee.class.getName() ).list() ) {
-			s.delete( element );
+			s.remove( element );
 		}
 		tx.commit();
 		s.close();
@@ -283,7 +283,7 @@ class ProjectionQueryTest extends SearchTestBase {
 
 		//cleanup
 		for ( Object element : s.createQuery( "from " + Employee.class.getName() ).list() ) {
-			s.delete( element );
+			s.remove( element );
 		}
 		tx.commit();
 		s.close();
@@ -372,7 +372,7 @@ class ProjectionQueryTest extends SearchTestBase {
 
 		//cleanup
 		for ( Object element : s.createQuery( "from " + Employee.class.getName() ).list() ) {
-			s.delete( element );
+			s.remove( element );
 		}
 		tx.commit();
 		s.close();
@@ -406,7 +406,7 @@ class ProjectionQueryTest extends SearchTestBase {
 
 		//cleanup
 		for ( Object element : s.createQuery( "from " + Employee.class.getName() ).list() ) {
-			s.delete( element );
+			s.remove( element );
 		}
 		tx.commit();
 		s.close();
@@ -453,7 +453,7 @@ class ProjectionQueryTest extends SearchTestBase {
 
 		//cleanup
 		for ( Object element : s.createQuery( "from " + FootballTeam.class.getName() ).list() ) {
-			s.delete( element );
+			s.remove( element );
 		}
 		tx.commit();
 		s.close();
@@ -587,10 +587,10 @@ class ProjectionQueryTest extends SearchTestBase {
 
 		//cleanup
 		for ( Object element : s.createQuery( "from " + Book.class.getName() ).list() ) {
-			s.delete( element );
+			s.remove( element );
 		}
 		for ( Object element : s.createQuery( "from " + Author.class.getName() ).list() ) {
-			s.delete( element );
+			s.remove( element );
 		}
 		tx.commit();
 		s.close();

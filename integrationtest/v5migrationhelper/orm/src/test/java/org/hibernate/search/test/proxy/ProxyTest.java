@@ -40,7 +40,7 @@ class ProxyTest extends SearchTestBase {
 		tx = session.beginTransaction();
 		IAuthor loadedAuthor = (IAuthor) session.get( Author.class, author.getId() );
 		//author = (Author) loadedBook.getAuthors().iterator().next();
-		session.delete( loadedAuthor );
+		session.remove( loadedAuthor );
 
 		tx.commit();
 		session.close();
