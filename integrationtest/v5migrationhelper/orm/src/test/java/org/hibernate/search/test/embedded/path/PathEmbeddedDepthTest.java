@@ -152,7 +152,7 @@ class PathEmbeddedDepthTest extends SearchTestBase {
 		for ( Class<?> each : classes ) {
 			List<?> list = listAll( s, each );
 			for ( Object object : list ) {
-				s.delete( object );
+				s.remove( object );
 			}
 		}
 		tx.commit();

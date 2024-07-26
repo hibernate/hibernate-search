@@ -91,7 +91,7 @@ class EmbeddedTest extends SearchTestBase {
 		s.clear();
 
 		tx = s.beginTransaction();
-		s.delete( s.get( Tower.class, tower.getId() ) );
+		s.remove( s.get( Tower.class, tower.getId() ) );
 		tx.commit();
 
 		s.close();
@@ -221,7 +221,7 @@ class EmbeddedTest extends SearchTestBase {
 		assertThat( result ).as( "breaking link fails" ).isEmpty();
 
 		tx = s.beginTransaction();
-		s.delete( s.get( Tower.class, tower.getId() ) );
+		s.remove( s.get( Tower.class, tower.getId() ) );
 		tx.commit();
 
 		s.close();
@@ -307,8 +307,8 @@ class EmbeddedTest extends SearchTestBase {
 		// HSEARCH-56
 		assertThat( result ).as( "update of collection of embedded ignored" ).hasSize( 1 );
 
-		s.delete( s.get( Product.class, p1.getId() ) );
-		s.delete( s.get( Product.class, p2.getId() ) );
+		s.remove( s.get( Product.class, p1.getId() ) );
+		s.remove( s.get( Product.class, p2.getId() ) );
 		tx.commit();
 		s.close();
 	}
