@@ -115,6 +115,10 @@ With Hibernate ORM allowing non-`String` tenant identifiers, some of the Hiberna
 * `org.hibernate.search.mapper.orm.outboxpolling.mapping.OutboxPollingSearchMapping#clearAllAbortedEvents(String tenantId)` deprecated in favor of
 `org.hibernate.search.mapper.orm.outboxpolling.mapping.OutboxPollingSearchMapping#clearAllAbortedEvents(Object tenantId)`
 
+This version deprecates the `ValueConvert` enum used in various Search DSL methods and replaces it with a new `ValueModel` enum.
+For each deprecated method accepting the `ValueConvert` input, there is now an alternative that accepts `ValueModel` instead.
+Replace `ValueConvert.YES` with `ValueModel.MAPPING` and `ValueConvert.NO` with `ValueModel.INDEX` in your code where the values were set explicitly.
+
 [[spi]]
 == SPI
 
