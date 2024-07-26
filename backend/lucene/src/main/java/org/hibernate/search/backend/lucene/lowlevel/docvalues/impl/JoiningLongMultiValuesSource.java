@@ -42,7 +42,7 @@ public abstract class JoiningLongMultiValuesSource extends LongMultiValuesSource
 		return fromField( field, nested );
 	}
 
-	private static JoiningLongMultiValuesSource fromField(String field, NestedDocsProvider nested) {
+	public static JoiningLongMultiValuesSource fromField(String field, NestedDocsProvider nested) {
 		return new FieldLongMultiValuesSource( field, nested );
 	}
 

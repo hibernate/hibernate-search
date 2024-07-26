@@ -8,6 +8,8 @@ import java.time.temporal.TemporalAccessor;
 
 import org.hibernate.search.backend.lucene.search.predicate.impl.LucenePredicateTypeKeys;
 import org.hibernate.search.backend.lucene.search.projection.impl.LuceneFieldProjection;
+import org.hibernate.search.backend.lucene.types.aggregation.impl.LuceneMetricNumericFieldAggregation;
+import org.hibernate.search.backend.lucene.types.aggregation.impl.LuceneMetricNumericLongAggregation;
 import org.hibernate.search.backend.lucene.types.aggregation.impl.LuceneNumericRangeAggregation;
 import org.hibernate.search.backend.lucene.types.aggregation.impl.LuceneNumericTermsAggregation;
 import org.hibernate.search.backend.lucene.types.codec.impl.AbstractLuceneNumericFieldCodec;
@@ -90,6 +92,18 @@ abstract class AbstractLuceneTemporalIndexFieldTypeOptionsStep<
 			builder.aggregable( true );
 			builder.queryElementFactory( AggregationTypeKeys.TERMS, new LuceneNumericTermsAggregation.Factory<>( codec ) );
 			builder.queryElementFactory( AggregationTypeKeys.RANGE, new LuceneNumericRangeAggregation.Factory<>( codec ) );
+			builder.queryElementFactory( AggregationTypeKeys.SUM,
+					new LuceneMetricNumericFieldAggregation.Factory<>( codec, "sum" ) );
+			builder.queryElementFactory( AggregationTypeKeys.MIN,
+					new LuceneMetricNumericFieldAggregation.Factory<>( codec, "min" ) );
+			builder.queryElementFactory( AggregationTypeKeys.MAX,
+					new LuceneMetricNumericFieldAggregation.Factory<>( codec, "max" ) );
+			builder.queryElementFactory( AggregationTypeKeys.COUNT,
+					new LuceneMetricNumericLongAggregation.Factory<>( codec, "value_count" ) );
+			builder.queryElementFactory( AggregationTypeKeys.COUNT_DISTINCT,
+					new LuceneMetricNumericLongAggregation.Factory<>( codec, "cardinality" ) );
+			builder.queryElementFactory( AggregationTypeKeys.AVG,
+					new LuceneMetricNumericFieldAggregation.Factory<>( codec, "avg" ) );
 		}
 
 		return builder.build();
