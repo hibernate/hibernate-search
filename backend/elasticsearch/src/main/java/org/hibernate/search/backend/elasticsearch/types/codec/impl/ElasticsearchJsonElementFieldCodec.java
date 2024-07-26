@@ -7,6 +7,7 @@ package org.hibernate.search.backend.elasticsearch.types.codec.impl;
 import com.google.gson.Gson;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonNull;
+import com.google.gson.JsonPrimitive;
 
 public class ElasticsearchJsonElementFieldCodec implements ElasticsearchFieldCodec<JsonElement> {
 
@@ -30,6 +31,11 @@ public class ElasticsearchJsonElementFieldCodec implements ElasticsearchFieldCod
 			return null;
 		}
 		return element;
+	}
+
+	@Override
+	public JsonElement decode(Double value) {
+		return new JsonPrimitive( value );
 	}
 
 	@Override

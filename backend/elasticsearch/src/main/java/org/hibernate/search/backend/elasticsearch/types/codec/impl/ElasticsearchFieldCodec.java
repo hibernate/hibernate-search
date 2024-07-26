@@ -4,7 +4,10 @@
  */
 package org.hibernate.search.backend.elasticsearch.types.codec.impl;
 
+import java.util.Optional;
+
 import org.hibernate.search.backend.elasticsearch.lowlevel.syntax.search.impl.ElasticsearchSearchSyntax;
+import org.hibernate.search.util.common.AssertionFailure;
 
 import com.google.gson.JsonElement;
 
@@ -37,6 +40,10 @@ public interface ElasticsearchFieldCodec<F> {
 
 	F decode(JsonElement element);
 
+	default F decode(Double element) {
+		throw new AssertionFailure( this + " codec is not expected to handle decoding metric aggregation values." );
+	}
+
 	/**
 	 * Decodes the key returned by a term aggregation.
 	 * @param key The "key" property  returned by the aggregation.
@@ -47,6 +54,13 @@ public interface ElasticsearchFieldCodec<F> {
 	 */
 	default F decodeAggregationKey(JsonElement key, JsonElement keyAsString) {
 		return decode( key );
+	}
+
+	default F decodeAggregationValue(Optional<Double> value, JsonElement valueAsString) {
+		if ( valueAsString != null ) {
+			return decode( valueAsString );
+		}
+		return value.map( this::decode ).orElse( null );
 	}
 
 	/**
