@@ -8,9 +8,11 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
+import org.hibernate.search.engine.cfg.spi.ConvertUtils;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.expectations.IndexNullAsMatchPredicateExpectactions;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.values.AscendingUniqueTermValues;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.values.IndexableValues;
+import org.hibernate.search.integrationtest.backend.tck.testsupport.types.values.MetricAggregationsValues;
 
 public class ByteFieldTypeDescriptor extends StandardFieldTypeDescriptor<Byte> {
 
@@ -52,6 +54,21 @@ public class ByteFieldTypeDescriptor extends StandardFieldTypeDescriptor<Byte> {
 					throw new IllegalStateException( "Test dataset contains an out-of-bound value for byte: " + value );
 				}
 				return (byte) value;
+			}
+		};
+	}
+
+	@Override
+	public boolean supportsMetricAggregation() {
+		return true;
+	}
+
+	@Override
+	public MetricAggregationsValues<Byte> metricAggregationsValues() {
+		return new MetricAggregationsValues<Byte>() {
+			@Override
+			protected Byte valueOf(int value) {
+				return ConvertUtils.convertByte( value );
 			}
 		};
 	}

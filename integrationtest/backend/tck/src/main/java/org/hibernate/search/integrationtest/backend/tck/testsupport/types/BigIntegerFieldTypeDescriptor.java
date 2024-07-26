@@ -14,6 +14,8 @@ import org.hibernate.search.engine.backend.types.dsl.StandardIndexFieldTypeOptio
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.expectations.IndexNullAsMatchPredicateExpectactions;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.values.AscendingUniqueTermValues;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.values.IndexableValues;
+import org.hibernate.search.integrationtest.backend.tck.testsupport.types.values.MetricAggregationsValues;
+import org.hibernate.search.integrationtest.backend.tck.testsupport.util.TckConfiguration;
 
 public class BigIntegerFieldTypeDescriptor extends StandardFieldTypeDescriptor<BigInteger> {
 
@@ -56,6 +58,29 @@ public class BigIntegerFieldTypeDescriptor extends StandardFieldTypeDescriptor<B
 			@Override
 			protected BigInteger applyDelta(BigInteger value, int multiplierForDelta) {
 				return value.add( delta( multiplierForDelta ) );
+			}
+		};
+	}
+
+	@Override
+	public boolean supportsMetricAggregation() {
+		return true;
+	}
+
+	@Override
+	public MetricAggregationsValues<BigInteger> metricAggregationsValues() {
+		return new MetricAggregationsValues<BigInteger>() {
+			@Override
+			protected BigInteger valueOf(int value) {
+				return BigInteger.valueOf( value * 100L );
+			}
+
+			@Override
+			public BigInteger avg() {
+				if ( TckConfiguration.get().getBackendFeatures().negativeDecimalScaleIsAppliedToAvgAggregationFunction() ) {
+					return super.avg(); // BigInteger.valueOf( 500L )
+				}
+				return BigInteger.valueOf( 550L );
 			}
 		};
 	}

@@ -11,6 +11,7 @@ import java.util.Optional;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.expectations.IndexNullAsMatchPredicateExpectactions;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.values.AscendingUniqueTermValues;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.values.IndexableValues;
+import org.hibernate.search.integrationtest.backend.tck.testsupport.types.values.MetricAggregationsValues;
 
 public class IntegerFieldTypeDescriptor extends StandardFieldTypeDescriptor<Integer> {
 
@@ -45,6 +46,21 @@ public class IntegerFieldTypeDescriptor extends StandardFieldTypeDescriptor<Inte
 			@Override
 			protected Integer applyDelta(Integer value, int multiplierForDelta) {
 				return value + delta( multiplierForDelta );
+			}
+		};
+	}
+
+	@Override
+	public boolean supportsMetricAggregation() {
+		return true;
+	}
+
+	@Override
+	public MetricAggregationsValues<Integer> metricAggregationsValues() {
+		return new MetricAggregationsValues<Integer>() {
+			@Override
+			protected Integer valueOf(int value) {
+				return value;
 			}
 		};
 	}

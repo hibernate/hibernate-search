@@ -21,6 +21,7 @@ import org.hibernate.search.engine.cfg.spi.FormatUtils;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.expectations.IndexNullAsMatchPredicateExpectactions;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.values.AscendingUniqueTermValues;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.values.IndexableValues;
+import org.hibernate.search.integrationtest.backend.tck.testsupport.types.values.MetricAggregationsValues;
 
 public class OffsetTimeFieldTypeDescriptor extends StandardFieldTypeDescriptor<OffsetTime> {
 
@@ -63,6 +64,17 @@ public class OffsetTimeFieldTypeDescriptor extends StandardFieldTypeDescriptor<O
 				return value.plus( multiplierForDelta, ChronoUnit.HOURS );
 			}
 		};
+	}
+
+	@Override
+	public boolean supportsMetricAggregation() {
+		return false;
+	}
+
+	@Override
+	public MetricAggregationsValues<OffsetTime> metricAggregationsValues() {
+		throw new UnsupportedOperationException(
+				"Metric aggregations values are not supported by " + getClass().getName() );
 	}
 
 	@Override

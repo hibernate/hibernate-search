@@ -12,6 +12,7 @@ import org.hibernate.search.engine.spatial.GeoPoint;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.expectations.IndexNullAsMatchPredicateExpectactions;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.values.AscendingUniqueTermValues;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.values.IndexableValues;
+import org.hibernate.search.integrationtest.backend.tck.testsupport.types.values.MetricAggregationsValues;
 
 public class GeoPointFieldTypeDescriptor extends StandardFieldTypeDescriptor<GeoPoint> {
 
@@ -24,6 +25,17 @@ public class GeoPointFieldTypeDescriptor extends StandardFieldTypeDescriptor<Geo
 	@Override
 	protected AscendingUniqueTermValues<GeoPoint> createAscendingUniqueTermValues() {
 		return null; // Value lookup is not supported
+	}
+
+	@Override
+	public boolean supportsMetricAggregation() {
+		return false;
+	}
+
+	@Override
+	public MetricAggregationsValues<GeoPoint> metricAggregationsValues() {
+		throw new UnsupportedOperationException(
+				"Metric aggregations values are not supported by " + getClass().getName() );
 	}
 
 	@Override

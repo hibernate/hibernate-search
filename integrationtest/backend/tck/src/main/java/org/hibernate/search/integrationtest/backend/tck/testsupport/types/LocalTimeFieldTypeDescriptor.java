@@ -14,6 +14,7 @@ import org.hibernate.search.engine.cfg.spi.FormatUtils;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.expectations.IndexNullAsMatchPredicateExpectactions;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.values.AscendingUniqueTermValues;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.values.IndexableValues;
+import org.hibernate.search.integrationtest.backend.tck.testsupport.types.values.MetricAggregationsValues;
 
 public class LocalTimeFieldTypeDescriptor extends StandardFieldTypeDescriptor<LocalTime> {
 
@@ -51,6 +52,17 @@ public class LocalTimeFieldTypeDescriptor extends StandardFieldTypeDescriptor<Lo
 				return value.plus( multiplierForDelta, ChronoUnit.MINUTES );
 			}
 		};
+	}
+
+	@Override
+	public boolean supportsMetricAggregation() {
+		return false;
+	}
+
+	@Override
+	public MetricAggregationsValues<LocalTime> metricAggregationsValues() {
+		throw new UnsupportedOperationException(
+				"Metric aggregations values are not supported by " + getClass().getName() );
 	}
 
 	@Override
