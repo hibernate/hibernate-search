@@ -30,4 +30,9 @@ class ElasticsearchYearIndexFieldTypeOptionsStep
 	protected ElasticsearchYearIndexFieldTypeOptionsStep thisAsS() {
 		return this;
 	}
+
+	@Override
+	protected boolean sumAggregationSupported() {
+		return false;
+	}
 }

@@ -5,6 +5,7 @@
 package org.hibernate.search.backend.elasticsearch.types.codec.impl;
 
 import org.hibernate.search.backend.elasticsearch.gson.impl.JsonElementTypes;
+import org.hibernate.search.engine.cfg.spi.NumberUtils;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonElement;
@@ -31,6 +32,11 @@ public final class ElasticsearchIntegerFieldCodec extends AbstractElasticsearchF
 			return null;
 		}
 		return JsonElementTypes.INTEGER.fromElement( element );
+	}
+
+	@Override
+	public Integer decode(Double value) {
+		return NumberUtils.toInteger( value );
 	}
 
 	@Override

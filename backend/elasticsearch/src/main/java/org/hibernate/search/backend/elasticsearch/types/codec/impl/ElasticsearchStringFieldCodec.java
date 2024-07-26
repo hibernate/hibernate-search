@@ -34,6 +34,11 @@ public final class ElasticsearchStringFieldCodec extends AbstractElasticsearchFi
 	}
 
 	@Override
+	public String decode(Double value) {
+		return value.toString();
+	}
+
+	@Override
 	public boolean isCompatibleWith(ElasticsearchFieldCodec<?> other) {
 		return other instanceof ElasticsearchStringFieldCodec;
 	}

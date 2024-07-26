@@ -12,6 +12,7 @@ import java.math.RoundingMode;
 import org.hibernate.search.backend.elasticsearch.gson.impl.JsonElementTypes;
 import org.hibernate.search.backend.elasticsearch.logging.impl.Log;
 import org.hibernate.search.engine.cfg.spi.NumberScaleConstants;
+import org.hibernate.search.engine.cfg.spi.NumberUtils;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
 import com.google.gson.Gson;
@@ -63,6 +64,11 @@ public class ElasticsearchBigDecimalFieldCodec extends AbstractElasticsearchFiel
 		}
 
 		return JsonElementTypes.BIG_DECIMAL.fromElement( element );
+	}
+
+	@Override
+	public BigDecimal decode(Double value) {
+		return NumberUtils.toBigDecimal( value ).setScale( decimalScale, RoundingMode.FLOOR );
 	}
 
 	@Override

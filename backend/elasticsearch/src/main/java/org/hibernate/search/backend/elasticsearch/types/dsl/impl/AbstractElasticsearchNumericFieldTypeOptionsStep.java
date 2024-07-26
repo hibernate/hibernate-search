@@ -4,6 +4,8 @@
  */
 package org.hibernate.search.backend.elasticsearch.types.dsl.impl;
 
+import org.hibernate.search.backend.elasticsearch.search.aggregation.impl.ElasticsearchMetricFieldAggregation;
+import org.hibernate.search.backend.elasticsearch.search.aggregation.impl.ElasticsearchMetricLongAggregation;
 import org.hibernate.search.backend.elasticsearch.search.aggregation.impl.ElasticsearchRangeAggregation;
 import org.hibernate.search.backend.elasticsearch.search.aggregation.impl.ElasticsearchTermsAggregation;
 import org.hibernate.search.backend.elasticsearch.search.predicate.impl.ElasticsearchExistsPredicate;
@@ -63,6 +65,13 @@ abstract class AbstractElasticsearchNumericFieldTypeOptionsStep<
 			builder.aggregable( true );
 			builder.queryElementFactory( AggregationTypeKeys.TERMS, new ElasticsearchTermsAggregation.Factory<>( codec ) );
 			builder.queryElementFactory( AggregationTypeKeys.RANGE, new ElasticsearchRangeAggregation.Factory<>( codec ) );
+			builder.queryElementFactory( AggregationTypeKeys.SUM, ElasticsearchMetricFieldAggregation.sum( codec ) );
+			builder.queryElementFactory( AggregationTypeKeys.MIN, ElasticsearchMetricFieldAggregation.min( codec ) );
+			builder.queryElementFactory( AggregationTypeKeys.MAX, ElasticsearchMetricFieldAggregation.max( codec ) );
+			builder.queryElementFactory( AggregationTypeKeys.AVG, ElasticsearchMetricFieldAggregation.avg( codec ) );
+			builder.queryElementFactory( AggregationTypeKeys.COUNT, ElasticsearchMetricLongAggregation.count( codec ) );
+			builder.queryElementFactory( AggregationTypeKeys.COUNT_DISTINCT,
+					ElasticsearchMetricLongAggregation.countDistinct( codec ) );
 		}
 	}
 

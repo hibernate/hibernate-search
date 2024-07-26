@@ -5,6 +5,7 @@
 package org.hibernate.search.backend.elasticsearch.types.codec.impl;
 
 import org.hibernate.search.backend.elasticsearch.gson.impl.JsonElementTypes;
+import org.hibernate.search.engine.cfg.spi.NumberUtils;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonElement;
@@ -31,6 +32,11 @@ public final class ElasticsearchByteFieldCodec extends AbstractElasticsearchFiel
 			return null;
 		}
 		return JsonElementTypes.BYTE.fromElement( element );
+	}
+
+	@Override
+	public Byte decode(Double value) {
+		return NumberUtils.toByte( value );
 	}
 
 	@Override
