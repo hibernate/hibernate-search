@@ -196,4 +196,8 @@ public abstract class TckBackendFeatures implements StubMappingBackendFeatures {
 	public boolean rangeAggregationsDoNotIgnoreQuery() {
 		return true;
 	}
+
+	public boolean negativeDecimalScaleIsAppliedToAvgAggregationFunction() {
+		return true;
+	}
 }

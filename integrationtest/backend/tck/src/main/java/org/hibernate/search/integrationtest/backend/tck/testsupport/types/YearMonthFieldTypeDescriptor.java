@@ -8,6 +8,7 @@ import java.time.Month;
 import java.time.Year;
 import java.time.YearMonth;
 import java.time.format.DateTimeFormatter;
+import java.time.temporal.ChronoField;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -18,6 +19,7 @@ import java.util.Optional;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.expectations.IndexNullAsMatchPredicateExpectactions;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.values.AscendingUniqueTermValues;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.values.IndexableValues;
+import org.hibernate.search.integrationtest.backend.tck.testsupport.types.values.MetricAggregationsValues;
 
 public class YearMonthFieldTypeDescriptor extends StandardFieldTypeDescriptor<YearMonth> {
 
@@ -53,6 +55,28 @@ public class YearMonthFieldTypeDescriptor extends StandardFieldTypeDescriptor<Ye
 			@Override
 			protected YearMonth applyDelta(YearMonth value, int multiplierForDelta) {
 				return value.plus( multiplierForDelta, ChronoUnit.YEARS );
+			}
+		};
+	}
+
+	@Override
+	public boolean supportsMetricAggregation() {
+		return true;
+	}
+
+	@Override
+	public MetricAggregationsValues<YearMonth> metricAggregationsValues() {
+		return new MetricAggregationsValues<YearMonth>() {
+
+			@Override
+			public YearMonth sum() {
+				return null;
+			}
+
+			@Override
+			protected YearMonth valueOf(int value) {
+				return YearMonth.of( 2017, Month.NOVEMBER )
+						.with( ChronoField.PROLEPTIC_MONTH, value );
 			}
 		};
 	}

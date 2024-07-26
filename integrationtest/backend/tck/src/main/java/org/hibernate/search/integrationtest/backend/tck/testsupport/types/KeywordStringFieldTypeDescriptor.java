@@ -11,6 +11,7 @@ import java.util.Optional;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.expectations.IndexNullAsMatchPredicateExpectactions;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.values.AscendingUniqueTermValues;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.values.IndexableValues;
+import org.hibernate.search.integrationtest.backend.tck.testsupport.types.values.MetricAggregationsValues;
 
 public class KeywordStringFieldTypeDescriptor extends StandardFieldTypeDescriptor<String> {
 
@@ -52,6 +53,17 @@ public class KeywordStringFieldTypeDescriptor extends StandardFieldTypeDescripto
 				return valuesThatWontBeUsed();
 			}
 		};
+	}
+
+	@Override
+	public boolean supportsMetricAggregation() {
+		return false;
+	}
+
+	@Override
+	public MetricAggregationsValues<String> metricAggregationsValues() {
+		throw new UnsupportedOperationException(
+				"Metric aggregations values are not supported by " + getClass().getName() );
 	}
 
 	@Override

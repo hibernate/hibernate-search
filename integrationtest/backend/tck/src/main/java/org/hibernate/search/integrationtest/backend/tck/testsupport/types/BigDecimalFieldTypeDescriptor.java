@@ -19,6 +19,7 @@ import org.hibernate.search.engine.cfg.spi.FormatUtils;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.expectations.IndexNullAsMatchPredicateExpectactions;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.values.AscendingUniqueTermValues;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.values.IndexableValues;
+import org.hibernate.search.integrationtest.backend.tck.testsupport.types.values.MetricAggregationsValues;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.TckConfiguration;
 
 public class BigDecimalFieldTypeDescriptor extends StandardFieldTypeDescriptor<BigDecimal> {
@@ -62,6 +63,26 @@ public class BigDecimalFieldTypeDescriptor extends StandardFieldTypeDescriptor<B
 			@Override
 			protected BigDecimal applyDelta(BigDecimal value, int multiplierForDelta) {
 				return value.add( delta( multiplierForDelta ) );
+			}
+		};
+	}
+
+	@Override
+	public boolean supportsMetricAggregation() {
+		return true;
+	}
+
+	@Override
+	public MetricAggregationsValues<BigDecimal> metricAggregationsValues() {
+		return new MetricAggregationsValues<BigDecimal>() {
+			@Override
+			protected BigDecimal valueOf(int value) {
+				return BigDecimal.valueOf( value ).setScale( 2, RoundingMode.FLOOR );
+			}
+
+			@Override
+			public BigDecimal avg() {
+				return BigDecimal.valueOf( 5.5 ).setScale( 2, RoundingMode.FLOOR );
 			}
 		};
 	}

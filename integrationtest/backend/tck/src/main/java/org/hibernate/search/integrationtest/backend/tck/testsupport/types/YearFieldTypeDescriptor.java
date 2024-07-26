@@ -14,6 +14,7 @@ import org.hibernate.search.engine.cfg.spi.FormatUtils;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.expectations.IndexNullAsMatchPredicateExpectactions;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.values.AscendingUniqueTermValues;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.values.IndexableValues;
+import org.hibernate.search.integrationtest.backend.tck.testsupport.types.values.MetricAggregationsValues;
 
 public class YearFieldTypeDescriptor extends StandardFieldTypeDescriptor<Year> {
 
@@ -48,6 +49,27 @@ public class YearFieldTypeDescriptor extends StandardFieldTypeDescriptor<Year> {
 			@Override
 			protected Year applyDelta(Year value, int multiplierForDelta) {
 				return value.plus( multiplierForDelta, ChronoUnit.YEARS );
+			}
+		};
+	}
+
+	@Override
+	public boolean supportsMetricAggregation() {
+		return true;
+	}
+
+	@Override
+	public MetricAggregationsValues<Year> metricAggregationsValues() {
+		return new MetricAggregationsValues<Year>() {
+
+			@Override
+			public Year sum() {
+				return null;
+			}
+
+			@Override
+			protected Year valueOf(int value) {
+				return Year.of( value + 2000 );
 			}
 		};
 	}

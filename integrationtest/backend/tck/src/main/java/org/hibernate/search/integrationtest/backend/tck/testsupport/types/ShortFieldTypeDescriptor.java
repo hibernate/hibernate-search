@@ -8,9 +8,11 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
+import org.hibernate.search.engine.cfg.spi.ConvertUtils;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.expectations.IndexNullAsMatchPredicateExpectactions;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.values.AscendingUniqueTermValues;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.values.IndexableValues;
+import org.hibernate.search.integrationtest.backend.tck.testsupport.types.values.MetricAggregationsValues;
 
 public class ShortFieldTypeDescriptor extends StandardFieldTypeDescriptor<Short> {
 
@@ -52,6 +54,21 @@ public class ShortFieldTypeDescriptor extends StandardFieldTypeDescriptor<Short>
 					throw new IllegalStateException( "Test dataset contains an out-of-bound value for short: " + value );
 				}
 				return (short) value;
+			}
+		};
+	}
+
+	@Override
+	public boolean supportsMetricAggregation() {
+		return true;
+	}
+
+	@Override
+	public MetricAggregationsValues<Short> metricAggregationsValues() {
+		return new MetricAggregationsValues<Short>() {
+			@Override
+			protected Short valueOf(int value) {
+				return ConvertUtils.convertShort( value );
 			}
 		};
 	}

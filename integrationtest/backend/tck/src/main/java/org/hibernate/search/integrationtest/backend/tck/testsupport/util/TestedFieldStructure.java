@@ -29,7 +29,12 @@ public class TestedFieldStructure {
 		return ALL;
 	}
 
+	public static TestedFieldStructure of(IndexFieldLocation location, IndexFieldValueCardinality cardinality) {
+		return new TestedFieldStructure( location, cardinality );
+	}
+
 	private static final List<TestedFieldStructure> ALL;
+
 	static {
 		List<TestedFieldStructure> values = new ArrayList<>();
 		for ( IndexFieldLocation location : IndexFieldLocation.values() ) {

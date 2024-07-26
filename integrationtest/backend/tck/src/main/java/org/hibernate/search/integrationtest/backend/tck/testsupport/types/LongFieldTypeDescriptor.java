@@ -10,9 +10,11 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
+import org.hibernate.search.engine.cfg.spi.ConvertUtils;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.expectations.IndexNullAsMatchPredicateExpectactions;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.values.AscendingUniqueTermValues;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.values.IndexableValues;
+import org.hibernate.search.integrationtest.backend.tck.testsupport.types.values.MetricAggregationsValues;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.TckConfiguration;
 
 public class LongFieldTypeDescriptor extends StandardFieldTypeDescriptor<Long> {
@@ -57,6 +59,21 @@ public class LongFieldTypeDescriptor extends StandardFieldTypeDescriptor<Long> {
 			@Override
 			protected Long applyDelta(Long value, int multiplierForDelta) {
 				return value + delta( multiplierForDelta );
+			}
+		};
+	}
+
+	@Override
+	public boolean supportsMetricAggregation() {
+		return true;
+	}
+
+	@Override
+	public MetricAggregationsValues<Long> metricAggregationsValues() {
+		return new MetricAggregationsValues<Long>() {
+			@Override
+			protected Long valueOf(int value) {
+				return ConvertUtils.convertLong( value );
 			}
 		};
 	}

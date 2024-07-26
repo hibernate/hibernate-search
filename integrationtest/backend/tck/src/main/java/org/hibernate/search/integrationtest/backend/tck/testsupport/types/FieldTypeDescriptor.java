@@ -15,6 +15,7 @@ import org.hibernate.search.engine.backend.types.dsl.SearchableProjectableIndexF
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.expectations.IndexNullAsMatchPredicateExpectactions;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.values.AscendingUniqueTermValues;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.values.IndexableValues;
+import org.hibernate.search.integrationtest.backend.tck.testsupport.types.values.MetricAggregationsValues;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.TckConfiguration;
 
 public abstract class FieldTypeDescriptor<F, S extends SearchableProjectableIndexFieldTypeOptionsStep<?, F>> {
@@ -180,6 +181,10 @@ public abstract class FieldTypeDescriptor<F, S extends SearchableProjectableInde
 	}
 
 	protected abstract AscendingUniqueTermValues<F> createAscendingUniqueTermValues();
+
+	public abstract boolean supportsMetricAggregation();
+
+	public abstract MetricAggregationsValues<F> metricAggregationsValues();
 
 	/**
 	 * @return A set of indexables values, not necessarily unique.

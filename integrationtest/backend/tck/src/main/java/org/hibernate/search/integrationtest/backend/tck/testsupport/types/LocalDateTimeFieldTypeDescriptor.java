@@ -5,6 +5,7 @@
 package org.hibernate.search.integrationtest.backend.tck.testsupport.types;
 
 import java.time.LocalDateTime;
+import java.time.ZoneOffset;
 import java.time.temporal.ChronoUnit;
 import java.util.Arrays;
 import java.util.List;
@@ -14,6 +15,7 @@ import org.hibernate.search.engine.cfg.spi.FormatUtils;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.expectations.IndexNullAsMatchPredicateExpectactions;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.values.AscendingUniqueTermValues;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.values.IndexableValues;
+import org.hibernate.search.integrationtest.backend.tck.testsupport.types.values.MetricAggregationsValues;
 
 public class LocalDateTimeFieldTypeDescriptor extends StandardFieldTypeDescriptor<LocalDateTime> {
 
@@ -49,6 +51,26 @@ public class LocalDateTimeFieldTypeDescriptor extends StandardFieldTypeDescripto
 			@Override
 			protected LocalDateTime applyDelta(LocalDateTime value, int multiplierForDelta) {
 				return value.plus( multiplierForDelta, ChronoUnit.YEARS );
+			}
+		};
+	}
+
+	@Override
+	public boolean supportsMetricAggregation() {
+		return true;
+	}
+
+	@Override
+	public MetricAggregationsValues<LocalDateTime> metricAggregationsValues() {
+		return new MetricAggregationsValues<LocalDateTime>() {
+			@Override
+			protected LocalDateTime valueOf(int value) {
+				return LocalDateTime.ofEpochSecond( value, 0, ZoneOffset.UTC );
+			}
+
+			@Override
+			public LocalDateTime avg() {
+				return LocalDateTime.parse( "1970-01-01T00:00:05.500" );
 			}
 		};
 	}

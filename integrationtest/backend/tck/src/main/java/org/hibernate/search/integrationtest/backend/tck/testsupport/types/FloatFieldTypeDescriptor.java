@@ -8,9 +8,11 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
+import org.hibernate.search.engine.cfg.spi.ConvertUtils;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.expectations.IndexNullAsMatchPredicateExpectactions;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.values.AscendingUniqueTermValues;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.values.IndexableValues;
+import org.hibernate.search.integrationtest.backend.tck.testsupport.types.values.MetricAggregationsValues;
 
 public class FloatFieldTypeDescriptor extends StandardFieldTypeDescriptor<Float> {
 
@@ -45,6 +47,26 @@ public class FloatFieldTypeDescriptor extends StandardFieldTypeDescriptor<Float>
 			@Override
 			protected Float applyDelta(Float value, int multiplierForDelta) {
 				return value + delta( multiplierForDelta );
+			}
+		};
+	}
+
+	@Override
+	public boolean supportsMetricAggregation() {
+		return true;
+	}
+
+	@Override
+	public MetricAggregationsValues<Float> metricAggregationsValues() {
+		return new MetricAggregationsValues<Float>() {
+			@Override
+			protected Float valueOf(int value) {
+				return ConvertUtils.convertFloat( value );
+			}
+
+			@Override
+			public Float avg() {
+				return 5.5F;
 			}
 		};
 	}

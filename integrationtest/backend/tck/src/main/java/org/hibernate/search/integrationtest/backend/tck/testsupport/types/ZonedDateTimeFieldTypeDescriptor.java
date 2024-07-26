@@ -21,6 +21,7 @@ import java.util.Set;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.expectations.IndexNullAsMatchPredicateExpectactions;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.values.AscendingUniqueTermValues;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.values.IndexableValues;
+import org.hibernate.search.integrationtest.backend.tck.testsupport.types.values.MetricAggregationsValues;
 
 public class ZonedDateTimeFieldTypeDescriptor extends StandardFieldTypeDescriptor<ZonedDateTime> {
 
@@ -68,6 +69,27 @@ public class ZonedDateTimeFieldTypeDescriptor extends StandardFieldTypeDescripto
 			@Override
 			protected ZonedDateTime applyDelta(ZonedDateTime value, int multiplierForDelta) {
 				return value.plus( multiplierForDelta, ChronoUnit.DAYS );
+			}
+		};
+	}
+
+	@Override
+	public boolean supportsMetricAggregation() {
+		return true;
+	}
+
+	@Override
+	public MetricAggregationsValues<ZonedDateTime> metricAggregationsValues() {
+		return new MetricAggregationsValues<ZonedDateTime>() {
+			@Override
+			protected ZonedDateTime valueOf(int value) {
+				return ZonedDateTime.of( LocalDateTime.ofEpochSecond( value, 0, ZoneOffset.UTC ),
+						ZoneId.of( ZoneOffset.UTC.getId() ) );
+			}
+
+			@Override
+			public ZonedDateTime avg() {
+				return ZonedDateTime.parse( "1970-01-01T00:00:05.500Z" );
 			}
 		};
 	}

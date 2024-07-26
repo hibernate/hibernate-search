@@ -8,9 +8,11 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
+import org.hibernate.search.engine.cfg.spi.ConvertUtils;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.expectations.IndexNullAsMatchPredicateExpectactions;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.values.AscendingUniqueTermValues;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.values.IndexableValues;
+import org.hibernate.search.integrationtest.backend.tck.testsupport.types.values.MetricAggregationsValues;
 
 public class DoubleFieldTypeDescriptor extends StandardFieldTypeDescriptor<Double> {
 
@@ -45,6 +47,26 @@ public class DoubleFieldTypeDescriptor extends StandardFieldTypeDescriptor<Doubl
 			@Override
 			protected Double applyDelta(Double value, int multiplierForDelta) {
 				return value + delta( multiplierForDelta );
+			}
+		};
+	}
+
+	@Override
+	public boolean supportsMetricAggregation() {
+		return true;
+	}
+
+	@Override
+	public MetricAggregationsValues<Double> metricAggregationsValues() {
+		return new MetricAggregationsValues<Double>() {
+			@Override
+			protected Double valueOf(int value) {
+				return ConvertUtils.convertDouble( value );
+			}
+
+			@Override
+			public Double avg() {
+				return 5.5;
 			}
 		};
 	}

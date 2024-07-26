@@ -489,4 +489,9 @@ public class ElasticsearchTckBackendFeatures extends TckBackendFeatures {
 				aoss -> false
 		);
 	}
+
+	@Override
+	public boolean negativeDecimalScaleIsAppliedToAvgAggregationFunction() {
+		return false;
+	}
 }
