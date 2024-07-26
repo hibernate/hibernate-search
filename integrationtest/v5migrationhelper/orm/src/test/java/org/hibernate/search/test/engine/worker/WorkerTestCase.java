@@ -116,13 +116,13 @@ abstract class WorkerTestCase extends SearchTestBase {
 				s = sf.openSession();
 				tx = s.beginTransaction();
 				er = (Employer) s.get( Employer.class, er.getId() );
-				s.delete( er );
+				s.remove( er );
 				tx.commit();
 				s.close();
 				s = sf.openSession();
 				tx = s.beginTransaction();
 				ee = (Employee) s.get( Employee.class, ee.getId() );
-				s.delete( ee );
+				s.remove( ee );
 				tx.commit();
 				s.close();
 			}
@@ -180,9 +180,9 @@ abstract class WorkerTestCase extends SearchTestBase {
 				s = sf.openSession();
 				tx = s.beginTransaction();
 				er = (Employer) s.get( Employer.class, er.getId() );
-				s.delete( er );
+				s.remove( er );
 				ee = (Employee) s.get( Employee.class, ee.getId() );
-				s.delete( ee );
+				s.remove( ee );
 				tx.commit();
 				s.close();
 			}

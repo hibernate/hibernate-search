@@ -90,7 +90,7 @@ class QueryLoaderTest extends SearchTestBase {
 		music2.getAuthors().clear();
 
 		for ( Object o : listAll( s, Object.class ) ) {
-			s.delete( o );
+			s.remove( o );
 		}
 
 		tx.commit();

@@ -73,7 +73,7 @@ class MassIndexUsingManualFlushTest extends SearchTestBase {
 		List result = s.createFullTextQuery( parser.parse( "body:create" ) ).list();
 		assertThat( result ).hasSize( 14 );
 		for ( Object object : result ) {
-			s.delete( object );
+			s.remove( object );
 		}
 		tx.commit();
 		s.close();

@@ -52,7 +52,7 @@ class ExplanationTest extends SearchTestBase {
 		assertThat( results ).hasSize( 2 );
 		for ( Object[] result : results ) {
 			assertThat( result[1].toString() ).isEqualTo( ftQuery.explain( result[0] ).toString() );
-			s.delete( result[2] );
+			s.remove( result[2] );
 		}
 		tx.commit();
 		s.close();

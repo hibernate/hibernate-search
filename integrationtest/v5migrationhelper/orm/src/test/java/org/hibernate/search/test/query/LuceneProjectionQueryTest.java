@@ -67,7 +67,7 @@ class LuceneProjectionQueryTest extends SearchTestBase {
 		try {
 			Transaction tx = s.beginTransaction();
 			for ( Object element : s.createQuery( "from " + Employee.class.getName() ).list() ) {
-				s.delete( element );
+				s.remove( element );
 			}
 			tx.commit();
 		}

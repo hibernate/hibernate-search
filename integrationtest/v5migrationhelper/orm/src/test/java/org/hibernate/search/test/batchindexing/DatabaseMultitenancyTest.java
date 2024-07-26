@@ -240,7 +240,7 @@ class DatabaseMultitenancyTest extends SearchTestBase {
 		session.beginTransaction();
 		List<Clock> clocks = listAll( session, Clock.class );
 		for ( Clock clock : clocks ) {
-			session.delete( clock );
+			session.remove( clock );
 		}
 		session.getTransaction().commit();
 		session.clear();
