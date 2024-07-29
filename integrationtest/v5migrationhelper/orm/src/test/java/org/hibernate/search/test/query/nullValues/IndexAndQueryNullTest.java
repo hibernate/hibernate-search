@@ -38,8 +38,8 @@ class IndexAndQueryNullTest extends SearchTestBase {
 
 		FullTextSession fullTextSession = Search.getFullTextSession( openSession() );
 		Transaction tx = fullTextSession.beginTransaction();
-		getSession().save( fooValue );
-		getSession().save( nullValue );
+		getSession().persist( fooValue );
+		getSession().persist( nullValue );
 		tx.commit();
 
 		fullTextSession.clear();
@@ -59,8 +59,8 @@ class IndexAndQueryNullTest extends SearchTestBase {
 
 		FullTextSession fullTextSession = Search.getFullTextSession( openSession() );
 		Transaction tx = fullTextSession.beginTransaction();
-		getSession().save( fooValue );
-		getSession().save( nullValue );
+		getSession().persist( fooValue );
+		getSession().persist( nullValue );
 		tx.commit();
 
 		fullTextSession.clear();
@@ -87,8 +87,8 @@ class IndexAndQueryNullTest extends SearchTestBase {
 
 		FullTextSession fullTextSession = Search.getFullTextSession( openSession() );
 		Transaction tx = fullTextSession.beginTransaction();
-		getSession().save( fooValue );
-		getSession().save( nullValue );
+		getSession().persist( fooValue );
+		getSession().persist( nullValue );
 		tx.commit();
 
 		fullTextSession.clear();

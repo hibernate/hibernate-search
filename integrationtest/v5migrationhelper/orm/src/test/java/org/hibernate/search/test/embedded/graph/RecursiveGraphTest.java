@@ -44,7 +44,7 @@ class RecursiveGraphTest extends SearchTestBase {
 			if ( person == null ) {
 				continue;
 			}
-			s.save( person );
+			s.persist( person );
 		}
 		s.getTransaction().commit();
 		s.close();

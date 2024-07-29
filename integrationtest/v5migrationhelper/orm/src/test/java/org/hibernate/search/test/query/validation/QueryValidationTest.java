@@ -38,7 +38,7 @@ class QueryValidationTest extends SearchTestBase {
 		super.setUp();
 
 		Transaction tx = openSession().beginTransaction();
-		getSession().save( new A() );
+		getSession().persist( new A() );
 		tx.commit();
 		getSession().close();
 

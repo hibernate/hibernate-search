@@ -5,7 +5,6 @@
 package org.hibernate.search.test.embedded.sorting;
 
 import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Id;
 import jakarta.persistence.OneToOne;
 
@@ -25,7 +24,6 @@ class Villain {
 
 	@Id
 	@SortableField
-	@GeneratedValue
 	private Integer id;
 
 	@OneToOne

@@ -47,12 +47,12 @@ class ContainedInReindexPropagationTest extends SearchTestBase {
 		// first operation -> save
 		FullTextSession session = Search.getFullTextSession( openSession() );
 		Transaction tx = session.beginTransaction();
-		session.save( source );
-		session.save( target );
-		session.save( dad1 );
-		session.save( dad2 );
-		session.save( son1 );
-		session.save( son2 );
+		session.persist( source );
+		session.persist( target );
+		session.persist( dad1 );
+		session.persist( dad2 );
+		session.persist( son1 );
+		session.persist( son2 );
 		tx.commit();
 		session.close();
 
@@ -77,8 +77,8 @@ class ContainedInReindexPropagationTest extends SearchTestBase {
 		session = Search.getFullTextSession( openSession() );
 		tx = session.beginTransaction();
 
-		session.update( dad1 );
-		session.update( dad2 );
+		session.merge( dad1 );
+		session.merge( dad2 );
 
 		tx.commit();
 		session.close();

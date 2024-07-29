@@ -620,30 +620,30 @@ class LuceneQueryTest extends SearchTestBase {
 		Transaction tx = fullTextSession.beginTransaction();
 
 		Clock clock = new Clock( 1, "Seiko" );
-		fullTextSession.save( clock );
+		fullTextSession.persist( clock );
 		clock = new Clock( 2, "Festina" );
-		fullTextSession.save( clock );
+		fullTextSession.persist( clock );
 
 		Book book = new Book(
 				1,
 				"La chute de la petite reine a travers les yeux de Festina",
 				"La chute de la petite reine a travers les yeux de Festina, blahblah"
 		);
-		fullTextSession.save( book );
+		fullTextSession.persist( book );
 
 		Author emmanuel = new Author();
 		emmanuel.setName( "Emmanuel" );
-		fullTextSession.save( emmanuel );
+		fullTextSession.persist( emmanuel );
 		book.getAuthors().add( emmanuel );
 
 		book = new Book( 2, "La gloire de mon père", "Les deboires de mon père en vélo" );
-		fullTextSession.save( book );
+		fullTextSession.persist( book );
 
-		fullTextSession.save( new Employee( 1000, "Griffin", "ITech" ) );
-		fullTextSession.save( new Employee( 1001, "Jackson", "Accounting" ) );
-		fullTextSession.save( new Employee( 1002, "Jimenez", "ITech" ) );
-		fullTextSession.save( new Employee( 1003, "Stejskal", "ITech" ) );
-		fullTextSession.save( new Employee( 1004, "Whetbrook", "ITech" ) );
+		fullTextSession.persist( new Employee( 1000, "Griffin", "ITech" ) );
+		fullTextSession.persist( new Employee( 1001, "Jackson", "Accounting" ) );
+		fullTextSession.persist( new Employee( 1002, "Jimenez", "ITech" ) );
+		fullTextSession.persist( new Employee( 1003, "Stejskal", "ITech" ) );
+		fullTextSession.persist( new Employee( 1004, "Whetbrook", "ITech" ) );
 
 		tx.commit();
 		fullTextSession.close();

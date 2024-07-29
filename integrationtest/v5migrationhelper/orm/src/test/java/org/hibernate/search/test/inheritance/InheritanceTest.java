@@ -253,30 +253,30 @@ class InheritanceTest extends SearchTestBase {
 			shark.setName( "White Pointer" );
 			shark.setNumberOfDorsalFins( 2 );
 			shark.setWeight( 1500 );
-			s.save( shark );
+			s.persist( shark );
 
 			Mammal elephant = new Mammal();
 			elephant.setName( "Elephant" );
 			elephant.setHasSweatGlands( false );
 			elephant.setWeight( 4500 );
-			s.save( elephant );
+			s.persist( elephant );
 
 			Mammal chimp = new Mammal();
 			chimp.setName( "Chimpanzee" );
 			chimp.setHasSweatGlands( true );
 			chimp.setWeight( 50 );
-			s.save( chimp );
+			s.persist( chimp );
 
 			Bird dove = new Bird();
 			dove.setName( "Dove" );
 			dove.setNumberOfEggs( 2 );
-			s.save( dove );
+			s.persist( dove );
 
 			Eagle eagle = new Eagle();
 			eagle.setName( "Bald Eagle" );
 			eagle.setNumberOfEggs( 2 );
 			eagle.setWingType( Eagle.WingType.BROAD );
-			s.save( eagle );
+			s.persist( eagle );
 
 			tx.commit();
 		}

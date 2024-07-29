@@ -52,8 +52,8 @@ class EmbeddedSortableIdFieldTest extends SearchTestBase {
 			superman.setSortableVillain( darkseid );
 			darkseid.setHero( superman );
 
-			session.save( superman );
-			session.save( lex );
+			session.persist( superman );
+			session.persist( lex );
 
 			transaction.commit();
 		}

@@ -100,7 +100,7 @@ class WebShopTest extends AbstractFacetTest {
 			for ( String color : colors ) {
 				for ( int cc : ccs ) {
 					Car car = new Car( make, color, cc );
-					session.save( car );
+					session.persist( car );
 					allCars.add( car );
 				}
 			}

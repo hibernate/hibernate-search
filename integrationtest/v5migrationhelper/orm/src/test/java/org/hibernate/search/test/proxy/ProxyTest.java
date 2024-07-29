@@ -33,7 +33,7 @@ class ProxyTest extends SearchTestBase {
 		Set<IAuthor> authors = new HashSet<IAuthor>();
 		authors.add( author );
 		book.setAuthors( authors );
-		session.save( book );
+		session.persist( book );
 		tx.commit();
 		session.clear();
 

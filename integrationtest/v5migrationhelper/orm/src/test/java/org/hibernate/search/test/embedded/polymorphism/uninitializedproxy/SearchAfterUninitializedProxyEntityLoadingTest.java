@@ -77,11 +77,11 @@ class SearchAfterUninitializedProxyEntityLoadingTest extends SearchTestBase {
 			Transaction t = session.beginTransaction();
 
 			ConcreteEntity entity = new ConcreteEntity();
-			session.save( entity );
+			session.persist( entity );
 			entityId = entity.getId();
 
 			LazyAbstractEntityReference reference = new LazyAbstractEntityReference( entity );
-			session.save( reference );
+			session.persist( reference );
 			entityReferenceId = reference.getId();
 
 			session.flush();

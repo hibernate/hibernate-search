@@ -91,7 +91,7 @@ class SpatialContainedInTest extends SearchInitializationTestBase {
 			location.setLon( -31.5d );
 
 			Transaction tx = session.beginTransaction();
-			session.save( location );
+			session.persist( location );
 			tx.commit();
 		}
 
