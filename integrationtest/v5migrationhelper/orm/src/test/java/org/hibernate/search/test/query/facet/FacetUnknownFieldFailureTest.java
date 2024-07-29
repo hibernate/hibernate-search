@@ -73,18 +73,18 @@ class FacetUnknownFieldFailureTest extends AbstractFacetTest {
 			for ( String color : colors ) {
 				for ( int cc : ccs ) {
 					Car car = new Car( make, color, cc );
-					session.save( car );
+					session.persist( car );
 				}
 			}
 		}
 		Car car = new Car( "Honda", "yellow", 2407 );
-		session.save( car );
+		session.persist( car );
 
 		car = new Car( "Ford", "yellow", 2500 );
-		session.save( car );
+		session.persist( car );
 
 		Fruit apple = new Fruit( "Apple", 3.15 );
-		session.save( apple );
+		session.persist( apple );
 
 		tx.commit();
 		session.clear();

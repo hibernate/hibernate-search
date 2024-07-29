@@ -179,9 +179,9 @@ class PurgeTest extends SearchTestBase {
 
 			//create a couple of clocks
 			Clock clock = new Clock( 1, "Seiko" );
-			fullTextSession.save( clock );
+			fullTextSession.persist( clock );
 			clock = new Clock( 2, "Festina" );
-			fullTextSession.save( clock );
+			fullTextSession.persist( clock );
 
 			// create a couple of books
 			Book book = new Book(
@@ -189,16 +189,16 @@ class PurgeTest extends SearchTestBase {
 					"La chute de la petite reine a travers les yeux de Festina",
 					"La chute de la petite reine a travers les yeux de Festina, blahblah"
 			);
-			fullTextSession.save( book );
+			fullTextSession.persist( book );
 			book = new Book( 2, "La gloire de mon père", "Les deboires de mon père en vélo" );
-			fullTextSession.save( book );
+			fullTextSession.persist( book );
 
 			// create and index a tree
 			Tree tree = new Tree( "birch" );
 			for ( int i = 0; i < 4; i++ ) {
 				tree.growNewLeave();
 			}
-			fullTextSession.save( tree );
+			fullTextSession.persist( tree );
 
 			tx.commit();
 		}

@@ -35,7 +35,7 @@ class ImplicitIdTest extends SearchTestBase {
 
 		Session s = openSession();
 		Transaction tx = s.beginTransaction();
-		s.save( dog );
+		s.persist( dog );
 		tx.commit();
 		s.clear();
 

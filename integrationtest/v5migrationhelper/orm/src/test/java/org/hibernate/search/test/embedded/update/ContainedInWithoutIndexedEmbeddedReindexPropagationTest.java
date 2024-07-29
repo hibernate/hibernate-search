@@ -35,13 +35,12 @@ class ContainedInWithoutIndexedEmbeddedReindexPropagationTest extends SearchTest
 		Transaction tx = session.beginTransaction();
 
 		SimpleParentEntity parent = new SimpleParentEntity( "name1" );
-		session.save( parent );
+		session.persist( parent );
 
 		SimpleChildEntity child = new SimpleChildEntity( parent );
-		session.save( child );
+		session.persist( child );
 
 		parent.setChild( child );
-		session.update( parent );
 
 		tx.commit();
 		session.close();
@@ -57,7 +56,7 @@ class ContainedInWithoutIndexedEmbeddedReindexPropagationTest extends SearchTest
 		session = Search.getFullTextSession( openSession() );
 		tx = session.beginTransaction();
 		parent.setName( "newname2" );
-		session.update( parent );
+		session.merge( parent );
 		tx.commit();
 		session.close();
 
@@ -83,15 +82,15 @@ class ContainedInWithoutIndexedEmbeddedReindexPropagationTest extends SearchTest
 		FullTextSession session = Search.getFullTextSession( openSession() );
 		Transaction tx = session.beginTransaction();
 
-		session.save( shootingBrief1 );
-		session.save( shootingBrief2 );
+		session.persist( shootingBrief1 );
+		session.persist( shootingBrief2 );
 
 		model.setShootingBrief( shootingBrief1 );
 		article2.setShootingBrief( shootingBrief2 );
 
-		session.save( model );
-		session.save( article1 );
-		session.save( article2 );
+		session.persist( model );
+		session.persist( article1 );
+		session.persist( article2 );
 
 		tx.commit();
 		session.close();
@@ -108,7 +107,7 @@ class ContainedInWithoutIndexedEmbeddedReindexPropagationTest extends SearchTest
 		session = Search.getFullTextSession( openSession() );
 		tx = session.beginTransaction();
 		model.getAdditionalReferenceCodes().add( new ProductReferenceCode( model, "NEWREF" ) );
-		session.update( model );
+		session.merge( model );
 		tx.commit();
 		session.close();
 

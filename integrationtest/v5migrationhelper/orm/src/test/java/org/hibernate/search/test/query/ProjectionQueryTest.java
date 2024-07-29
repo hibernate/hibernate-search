@@ -52,11 +52,11 @@ class ProjectionQueryTest extends SearchTestBase {
 		Transaction tx = s.beginTransaction();
 		Spouse spouse = new Spouse();
 		spouse.setFirstName( "Christina" );
-		s.save( spouse );
+		s.persist( spouse );
 		Husband h = new Husband();
 		h.setLastName( "Roberto" );
 		h.setSpouse( spouse );
-		s.save( h );
+		s.persist( h );
 		tx.commit();
 
 		s.clear();
@@ -420,9 +420,9 @@ class ProjectionQueryTest extends SearchTestBase {
 		FootballTeam chelsea = new FootballTeam( 1, "Chelsea", 0.5d, 4 );
 		FootballTeam manUtd = new FootballTeam( 2, "Manchester United", 700.5d, 18 );
 		FootballTeam liverpool = new FootballTeam( 3, "Liverpool", 502.4d, 18 );
-		s.save( manUtd );
-		s.save( liverpool );
-		s.save( chelsea );
+		s.persist( manUtd );
+		s.persist( liverpool );
+		s.persist( chelsea );
 
 		tx.commit();
 
@@ -484,16 +484,16 @@ class ProjectionQueryTest extends SearchTestBase {
 	private void prepEmployeeIndex(FullTextSession s) {
 		Transaction tx = s.beginTransaction();
 		Employee e1 = new Employee( 1000, "Griffin", "ITech" );
-		s.save( e1 );
+		s.persist( e1 );
 		Employee e2 = new Employee( 1001, "Jackson", "Accounting" );
 		e2.setHireDate( new Date() );
-		s.save( e2 );
+		s.persist( e2 );
 		Employee e3 = new Employee( 1002, "Jimenez", "ITech" );
-		s.save( e3 );
+		s.persist( e3 );
 		Employee e4 = new Employee( 1003, "Stejskal", "ITech" );
-		s.save( e4 );
+		s.persist( e4 );
 		Employee e5 = new Employee( 1004, "Whetbrook", "ITech" );
-		s.save( e5 );
+		s.persist( e5 );
 
 		tx.commit();
 	}
@@ -509,12 +509,12 @@ class ProjectionQueryTest extends SearchTestBase {
 					"La chute de la petite reine a travers les yeux de Festina",
 					"La chute de la petite reine a travers les yeux de Festina, blahblah"
 			);
-			s.save( book );
+			s.persist( book );
 			Book book2 = new Book( 2, "Sous les fleurs il n'y a rien", null );
-			s.save( book2 );
+			s.persist( book2 );
 			Author emmanuel = new Author();
 			emmanuel.setName( "Emmanuel" );
-			s.save( emmanuel );
+			s.persist( emmanuel );
 			book.setMainAuthor( emmanuel );
 			tx.commit();
 			s.clear();
@@ -538,12 +538,12 @@ class ProjectionQueryTest extends SearchTestBase {
 				"La chute de la petite reine a travers les yeux de Festina",
 				"La chute de la petite reine a travers les yeux de Festina, blahblah"
 		);
-		s.save( book );
+		s.persist( book );
 		Book book2 = new Book( 2, "Sous les fleurs il n'y a rien", null );
-		s.save( book2 );
+		s.persist( book2 );
 		Author emmanuel = new Author();
 		emmanuel.setName( "Emmanuel" );
-		s.save( emmanuel );
+		s.persist( emmanuel );
 		book.setMainAuthor( emmanuel );
 		tx.commit();
 		s.clear();

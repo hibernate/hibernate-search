@@ -48,62 +48,63 @@ class SpatialIndexingTest extends SearchTestBase {
 		Transaction tx = fullTextSession.beginTransaction();
 
 		// POI
-		fullTextSession.save( new POI( 1, "Distance to 24,32 : 0", 24.0d, 32.0d, "" ) );
-		fullTextSession.save( new POI( 2, "Distance to 24,32 : 10.16", 24.0d, 31.9d, "" ) );
-		fullTextSession.save( new POI( 3, "Distance to 24,32 : 11.12", 23.9d, 32.0d, "" ) );
-		fullTextSession.save( new POI( 4, "Distance to 24,32 : 15.06", 23.9d, 32.1d, "" ) );
-		fullTextSession.save( new POI( 5, "Distance to 24,32 : 22.24", 24.2d, 32.0d, "" ) );
-		fullTextSession.save( new POI( 6, "Distance to 24,32 : 24.45", 24.2d, 31.9d, "" ) );
+		fullTextSession.persist( new POI( 1, "Distance to 24,32 : 0", 24.0d, 32.0d, "" ) );
+		fullTextSession.persist( new POI( 2, "Distance to 24,32 : 10.16", 24.0d, 31.9d, "" ) );
+		fullTextSession.persist( new POI( 3, "Distance to 24,32 : 11.12", 23.9d, 32.0d, "" ) );
+		fullTextSession.persist( new POI( 4, "Distance to 24,32 : 15.06", 23.9d, 32.1d, "" ) );
+		fullTextSession.persist( new POI( 5, "Distance to 24,32 : 22.24", 24.2d, 32.0d, "" ) );
+		fullTextSession.persist( new POI( 6, "Distance to 24,32 : 24.45", 24.2d, 31.9d, "" ) );
 
 		// NonGeoPOI
-		fullTextSession.save( new NonGeoPOI( 1, "Distance to 24,32 : 0", 24.0d, null, "" ) );
-		fullTextSession.save( new NonGeoPOI( 2, "Distance to 24,32 : 24.45", 24.2d, 31.9d, "" ) );
-		fullTextSession.save( new NonGeoPOI( 3, "Distance to 24,32 : 10.16", 24.0d, 31.9d, "" ) );
-		fullTextSession.save( new NonGeoPOI( 4, "Distance to 24,32 : 15.06", 23.9d, 32.1d, "" ) );
-		fullTextSession.save( new NonGeoPOI( 5, "Distance to 24,32 : 11.12", 23.9d, 32.0d, "" ) );
-		fullTextSession.save( new NonGeoPOI( 6, "Distance to 24,32 : 22.24", 24.2d, 32.0d, "" ) );
+		fullTextSession.persist( new NonGeoPOI( 1, "Distance to 24,32 : 0", 24.0d, null, "" ) );
+		fullTextSession.persist( new NonGeoPOI( 2, "Distance to 24,32 : 24.45", 24.2d, 31.9d, "" ) );
+		fullTextSession.persist( new NonGeoPOI( 3, "Distance to 24,32 : 10.16", 24.0d, 31.9d, "" ) );
+		fullTextSession.persist( new NonGeoPOI( 4, "Distance to 24,32 : 15.06", 23.9d, 32.1d, "" ) );
+		fullTextSession.persist( new NonGeoPOI( 5, "Distance to 24,32 : 11.12", 23.9d, 32.0d, "" ) );
+		fullTextSession.persist( new NonGeoPOI( 6, "Distance to 24,32 : 22.24", 24.2d, 32.0d, "" ) );
 
 		// MissingSpatialPOI
-		fullTextSession.save( new MissingSpatialPOI( 1, "Distance to 24,32 : 0", 24.0d, 32.0d, "" ) );
+		fullTextSession.persist( new MissingSpatialPOI( 1, "Distance to 24,32 : 0", 24.0d, 32.0d, "" ) );
 
 		// Event
 		SimpleDateFormat dateFormat = new SimpleDateFormat( "d M yyyy", Locale.ROOT );
 		Date date = dateFormat.parse( "10 9 1976" );
-		fullTextSession.save( new Event( 1, "Test", 24.0d, 32.0d, date ) );
+		fullTextSession.persist( new Event( 1, "Test", 24.0d, 32.0d, date ) );
 
 		// User
-		fullTextSession.save( new User( 1, 24.0d, 32.0d ) );
+		fullTextSession.persist( new User( 1, 24.0d, 32.0d ) );
 
 		// UserRange
-		fullTextSession.save( new UserRange( 1, 24.0d, 32.0d ) );
+		fullTextSession.persist( new UserRange( 1, 24.0d, 32.0d ) );
 
 		// UserEx
-		fullTextSession.save( new UserEx( 1, 24.0d, 32.0d, 11.9d, 27.4d ) );
+		fullTextSession.persist( new UserEx( 1, 24.0d, 32.0d, 11.9d, 27.4d ) );
 
 		// RangeEvent
 		dateFormat = new SimpleDateFormat( "d M yyyy", Locale.ROOT );
 		date = dateFormat.parse( "10 9 1976" );
-		fullTextSession.save( new RangeEvent( 1, "Test", 24.0d, 32.0d, date ) );
+		fullTextSession.persist( new RangeEvent( 1, "Test", 24.0d, 32.0d, date ) );
 
 		// Hotel
-		fullTextSession.save( new Hotel( 1, "Plazza Athénée", 24.0d, 32.0d, "Luxurious" ) );
+		fullTextSession.persist( new Hotel( 1, "Plazza Athénée", 24.0d, 32.0d, "Luxurious" ) );
 
 		// RangeHotel
-		fullTextSession.save( new RangeHotel( 1, "Plazza Athénée", 24.0d, 32.0d, "Luxurious" ) );
-		fullTextSession.save( new RangeHotel( 2, "End of the world Hotel - Left", 0.0d, 179.0d, "Roots" ) );
-		fullTextSession.save( new RangeHotel( 3, "End of the world Hotel - Right", 0.0d, -179.0d, "Cosy" ) );
+		fullTextSession.persist( new RangeHotel( 1, "Plazza Athénée", 24.0d, 32.0d, "Luxurious" ) );
+		fullTextSession.persist( new RangeHotel( 2, "End of the world Hotel - Left", 0.0d, 179.0d, "Roots" ) );
+		fullTextSession.persist( new RangeHotel( 3, "End of the world Hotel - Right", 0.0d, -179.0d, "Cosy" ) );
 
 		// Restaurant
-		fullTextSession.save(
+		fullTextSession.persist(
 				new Restaurant( 1, "Al's kitchen", "42, space avenue CA8596 BYOB Street", 24.0d, 32.0d )
 		);
 
 		// GetterUser
-		fullTextSession.save( new GetterUser( 1, 24.0d, 32.0d ) );
+		fullTextSession.persist( new GetterUser( 1, 24.0d, 32.0d ) );
 
 		//DoubleIndexedPOIs
-		fullTextSession.save( new DoubleIndexedPOI( 1, "Davide D'Alto", 37.780392d, -122.513898d, "Hibernate team member" ) );
-		fullTextSession.save( new DoubleIndexedPOI( 2, "Peter O'Tall", 40.723165d, -73.987439d, "" ) );
+		fullTextSession
+				.persist( new DoubleIndexedPOI( 1, "Davide D'Alto", 37.780392d, -122.513898d, "Hibernate team member" ) );
+		fullTextSession.persist( new DoubleIndexedPOI( 2, "Peter O'Tall", 40.723165d, -73.987439d, "" ) );
 
 		tx.commit();
 	}
