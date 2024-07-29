@@ -123,7 +123,7 @@ class PathEmbeddedDepthTest extends SearchTestBase {
 		ps[7].addParents( ps[14], ps[15] );
 
 		for ( int i = 1; i < 18; i++ ) {
-			session.save( ps[i] );
+			session.persist( ps[i] );
 		}
 		transaction.commit();
 	}

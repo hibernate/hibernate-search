@@ -87,7 +87,7 @@ class DoubleInsertEmbeddedTest extends SearchTestBase {
 
 		FullTextSession s = Search.getFullTextSession( openSession() );
 		s.getTransaction().begin();
-		s.save( contact );
+		s.persist( contact );
 		s.getTransaction().commit();
 
 		s.close();

@@ -34,7 +34,7 @@ class QueryUnindexedEntityTest extends SearchTestBase {
 		Transaction tx = s.beginTransaction();
 		Person person = new Person();
 		person.setName( "Jon Doe" );
-		s.save( person );
+		s.persist( person );
 		tx.commit();
 
 		tx = s.beginTransaction();

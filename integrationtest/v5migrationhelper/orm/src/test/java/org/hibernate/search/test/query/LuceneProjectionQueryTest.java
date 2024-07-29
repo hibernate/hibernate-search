@@ -45,16 +45,16 @@ class LuceneProjectionQueryTest extends SearchTestBase {
 		Transaction tx = s.beginTransaction();
 
 		Employee e1 = new Employee( 1000, "Griffin", "ITech" );
-		s.save( e1 );
+		s.persist( e1 );
 		Employee e2 = new Employee( 1001, "Jackson", "Accounting" );
 		e2.setHireDate( new Date() );
-		s.save( e2 );
+		s.persist( e2 );
 		Employee e3 = new Employee( 1002, "Jimenez", "ITech" );
-		s.save( e3 );
+		s.persist( e3 );
 		Employee e4 = new Employee( 1003, "Stejskal", "ITech" );
-		s.save( e4 );
+		s.persist( e4 );
 		Employee e5 = new Employee( 1004, "Whetbrook", "ITech" );
-		s.save( e5 );
+		s.persist( e5 );
 
 		tx.commit();
 		s.clear();

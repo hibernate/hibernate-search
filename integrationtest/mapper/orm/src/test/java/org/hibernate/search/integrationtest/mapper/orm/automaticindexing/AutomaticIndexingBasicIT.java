@@ -385,49 +385,7 @@ class AutomaticIndexingBasicIT {
 			entity1.setId( 1 );
 			entity1.setIndexedField( "updatedValue" );
 
-			session.update( entity1 );
-
-			// Hibernate ORM does not track dirtiness on calls to update(): we assume everything is dirty.
-			backendMock.expectWorks( IndexedEntity.INDEX )
-					.addOrUpdate( "1", b -> b
-							.field( "indexedField", entity1.getIndexedField() )
-							.field( "shallowReindexOnUpdateField", null )
-							.field( "noReindexOnUpdateField", null )
-					);
-		} );
-		backendMock.verifyExpectationsMet();
-	}
-
-	/**
-	 * Test that merging an entity using update() to change a non-indexed field
-	 * triggers reindexing of the indexed entity owning the property:
-	 */
-	@SuppressWarnings("deprecation") // This is specifically about "update", which is NOT strictly equivalent to "merge"
-	@Test
-	@TestForIssue(jiraKey = "HSEARCH-3199")
-	void sessionUpdate_directValueUpdate_nonIndexedField() {
-		with( sessionFactory ).runInTransaction( session -> {
-			IndexedEntity entity1 = new IndexedEntity();
-			entity1.setId( 1 );
-			entity1.setNonIndexedField( "initialValue" );
-
-			session.persist( entity1 );
-
-			backendMock.expectWorks( IndexedEntity.INDEX )
-					.add( "1", b -> b
-							.field( "indexedField", entity1.getIndexedField() )
-							.field( "shallowReindexOnUpdateField", null )
-							.field( "noReindexOnUpdateField", null )
-					);
-		} );
-		backendMock.verifyExpectationsMet();
-
-		with( sessionFactory ).runInTransaction( session -> {
-			IndexedEntity entity1 = new IndexedEntity();
-			entity1.setId( 1 );
-			entity1.setNonIndexedField( "updatedValue" );
-
-			session.update( entity1 );
+			session.merge( entity1 );
 
 			// Hibernate ORM does not track dirtiness on calls to update(): we assume everything is dirty.
 			backendMock.expectWorks( IndexedEntity.INDEX )

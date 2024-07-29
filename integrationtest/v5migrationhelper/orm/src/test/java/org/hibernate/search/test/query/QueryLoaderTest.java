@@ -49,7 +49,7 @@ class QueryLoaderTest extends SearchTestBase {
 		author.setName( "Random Moo Cow" );
 		music.addAuthor( author );
 		sess.persist( author );
-		sess.save( music );
+		sess.persist( music );
 
 		Music music2 = new Music();
 		music2.setTitle( "The Cow Goes Moo" );
@@ -69,7 +69,7 @@ class QueryLoaderTest extends SearchTestBase {
 		author.setName( "Moo Cow The Fourth" );
 		music2.addAuthor( author );
 		sess.persist( author );
-		sess.save( music2 );
+		sess.persist( music2 );
 		tx.commit();
 		sess.clear();
 

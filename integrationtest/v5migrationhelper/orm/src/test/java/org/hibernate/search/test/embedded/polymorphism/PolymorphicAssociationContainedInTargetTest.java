@@ -55,9 +55,9 @@ class PolymorphicAssociationContainedInTargetTest extends SearchTestBase {
 			derivedLevel2.setLevel3Child( derivedLevel2Level3 );
 			derivedLevel2Level3.setLevel2Parent( derivedLevel2 );
 
-			session.save( level1 );
-			session.save( derivedLevel2 );
-			session.save( derivedLevel2Level3 );
+			session.persist( level1 );
+			session.persist( derivedLevel2 );
+			session.persist( derivedLevel2Level3 );
 
 			transaction.commit();
 		}
@@ -98,9 +98,9 @@ class PolymorphicAssociationContainedInTargetTest extends SearchTestBase {
 			baseLevel2.setLevel3Child( baseLevel2Level3 );
 			baseLevel2Level3.setLevel2Parent( baseLevel2 );
 
-			session.save( level1 );
-			session.save( baseLevel2 );
-			session.save( baseLevel2Level3 );
+			session.persist( level1 );
+			session.persist( baseLevel2 );
+			session.persist( baseLevel2Level3 );
 
 			transaction.commit();
 		}

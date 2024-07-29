@@ -42,13 +42,13 @@ class ContainedInEntityInheritanceTest extends SearchTestBase {
 			Transaction transaction = session.beginTransaction();
 
 			containing = new Containing();
-			session.save( containing );
+			session.persist( containing );
 
 			Contained contained = new Contained();
 			containing.contained = contained;
 			contained.containing = containing;
-			session.save( contained );
-			session.save( containing );
+			session.persist( contained );
+			session.persist( containing );
 
 			transaction.commit();
 		}
@@ -60,7 +60,7 @@ class ContainedInEntityInheritanceTest extends SearchTestBase {
 
 			containing = session.byId( Containing.class ).load( containing.id );
 			containing.contained.field = 1;
-			session.save( containing.contained );
+			session.persist( containing.contained );
 
 			transaction.commit();
 		}

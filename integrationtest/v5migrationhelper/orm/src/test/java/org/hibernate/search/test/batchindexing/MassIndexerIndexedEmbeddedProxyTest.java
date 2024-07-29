@@ -93,12 +93,12 @@ class MassIndexerIndexedEmbeddedProxyTest extends SearchTestBase {
 
 			IndexedEmbeddedProxyLazyEntity lazyEntity = new IndexedEmbeddedProxyLazyEntity();
 			lazyEntity.setName( TEST_NAME_CONTENT );
-			session.save( lazyEntity );
+			session.persist( lazyEntity );
 
 			IndexedEmbeddedProxyRootEntity rootEntity = new IndexedEmbeddedProxyRootEntity();
 			rootEntity.setLazyEntity( lazyEntity );
 			rootEntity.setLazyEntity2( lazyEntity );
-			session.save( rootEntity );
+			session.persist( rootEntity );
 
 			transaction.commit();
 		}

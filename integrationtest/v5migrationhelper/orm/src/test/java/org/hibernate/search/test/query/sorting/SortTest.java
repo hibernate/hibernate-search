@@ -341,43 +341,43 @@ class SortTest extends SearchTestBase {
 		cal.set( 2007, Calendar.JULY, 25, 11, 20, 30 );
 
 		Author author = new Author( "Bob" );
-		fullTextSession.save( author );
+		fullTextSession.persist( author );
 		Book book = new Book( 1, "Hibernate & Lucene", "This is a test book." );
 		book.setPublicationDate( cal.getTime() );
 		book.setMainAuthor( author );
-		fullTextSession.save( book );
+		fullTextSession.persist( book );
 
 		author = new Author( "Anthony" );
-		fullTextSession.save( author );
+		fullTextSession.persist( author );
 		cal.add( Calendar.SECOND, 1 );
 		book = new Book( 2, "Hibernate & Lucene", "This is a test book." );
 		book.setMainAuthor( author );
 		book.setPublicationDate( cal.getTime() );
-		fullTextSession.save( book );
+		fullTextSession.persist( book );
 
 		author = new Author( "Calvin" );
-		fullTextSession.save( author );
+		fullTextSession.persist( author );
 		cal.add( Calendar.SECOND, 1 );
 		book = new Book( 3, "Hibernate & Lucene", "This is a test book." );
 		book.setMainAuthor( author );
 		book.setPublicationDate( cal.getTime() );
-		fullTextSession.save( book );
+		fullTextSession.persist( book );
 
 		author = new Author( "Ernst" );
-		fullTextSession.save( author );
+		fullTextSession.persist( author );
 		cal.add( Calendar.SECOND, 1 );
 		book = new Book( 10, "Hibernate & Lucene", "This is a test book." );
 		book.setMainAuthor( author );
 		book.setPublicationDate( cal.getTime() );
-		fullTextSession.save( book );
+		fullTextSession.persist( book );
 
 		author = new Author( "Dennis" );
-		fullTextSession.save( author );
+		fullTextSession.persist( author );
 		cal.add( Calendar.SECOND, 1 );
 		book = new Book( 4, "Groovy in Action", "The bible of Groovy" );
 		book.setMainAuthor( author );
 		book.setPublicationDate( cal.getTime() );
-		fullTextSession.save( book );
+		fullTextSession.persist( book );
 
 		tx.commit();
 		fullTextSession.clear();
@@ -389,13 +389,13 @@ class SortTest extends SearchTestBase {
 	private void createTestNumbers() {
 		Transaction tx = fullTextSession.beginTransaction();
 		NumberHolder holder = new NumberHolder( 1, 1 );
-		fullTextSession.save( holder );
+		fullTextSession.persist( holder );
 		holder = new NumberHolder( 1, 10 );
-		fullTextSession.save( holder );
+		fullTextSession.persist( holder );
 		holder = new NumberHolder( 1, 5 );
-		fullTextSession.save( holder );
+		fullTextSession.persist( holder );
 		holder = new NumberHolder( 3, 2 );
-		fullTextSession.save( holder );
+		fullTextSession.persist( holder );
 		tx.commit();
 		fullTextSession.clear();
 	}
@@ -403,10 +403,10 @@ class SortTest extends SearchTestBase {
 	private void createTestContractors() {
 		Transaction tx = fullTextSession.beginTransaction();
 
-		fullTextSession.save( new BrickLayer( 2, "Bill the brick layer", "Johnson" ) );
-		fullTextSession.save( new BrickLayer( 4, "Barny the brick layer", "Johnson" ) );
-		fullTextSession.save( new BrickLayer( 5, "Bart the brick layer", "Higgins" ) );
-		fullTextSession.save( new BrickLayer( 6, "Barny the brick layer", "Higgins" ) );
+		fullTextSession.persist( new BrickLayer( 2, "Bill the brick layer", "Johnson" ) );
+		fullTextSession.persist( new BrickLayer( 4, "Barny the brick layer", "Johnson" ) );
+		fullTextSession.persist( new BrickLayer( 5, "Bart the brick layer", "Higgins" ) );
+		fullTextSession.persist( new BrickLayer( 6, "Barny the brick layer", "Higgins" ) );
 
 		tx.commit();
 		fullTextSession.clear();
