@@ -33,7 +33,7 @@ class FieldOnCollectionReindexTest extends SearchTestBase {
 
 		// Saving entities
 		Transaction tx = hibernateSession.beginTransaction();
-		hibernateSession.save( indexedEntity );
+		hibernateSession.persist( indexedEntity );
 		tx.commit();
 
 		List<IndexedEntity> searchResult;
@@ -59,7 +59,7 @@ class FieldOnCollectionReindexTest extends SearchTestBase {
 		indexedEntity.setName( "new name" );
 
 		tx = hibernateSession.beginTransaction();
-		hibernateSession.update( indexedEntity );
+		hibernateSession.merge( indexedEntity );
 		tx.commit();
 
 		// Everything is OK: the index is correctly updated
@@ -71,7 +71,7 @@ class FieldOnCollectionReindexTest extends SearchTestBase {
 		indexedEntity.addKeyword( "test5" );
 
 		tx = hibernateSession.beginTransaction();
-		hibernateSession.update( indexedEntity );
+		hibernateSession.merge( indexedEntity );
 		tx.commit();
 
 		tx = hibernateSession.beginTransaction();

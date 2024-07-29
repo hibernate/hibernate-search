@@ -40,7 +40,7 @@ class ExplicitIdTest extends SearchTestBase {
 
 		Session s = openSession();
 		Transaction tx = s.beginTransaction();
-		s.save( hello );
+		s.persist( hello );
 		tx.commit();
 		s.clear();
 
@@ -70,8 +70,8 @@ class ExplicitIdTest extends SearchTestBase {
 
 		Session s = openSession();
 		Transaction tx = s.beginTransaction();
-		s.save( hello );
-		s.save( goodbye );
+		s.persist( hello );
+		s.persist( goodbye );
 		tx.commit();
 		s.clear();
 
@@ -101,8 +101,8 @@ class ExplicitIdTest extends SearchTestBase {
 
 		Session s = openSession();
 		Transaction tx = s.beginTransaction();
-		s.save( hello );
-		s.save( goodbye );
+		s.persist( hello );
+		s.persist( goodbye );
 		tx.commit();
 		s.clear();
 
@@ -137,7 +137,7 @@ class ExplicitIdTest extends SearchTestBase {
 
 		Session s = openSession();
 		Transaction tx = s.beginTransaction();
-		s.save( hello );
+		s.persist( hello );
 		tx.commit();
 		s.clear();
 

@@ -15,21 +15,21 @@ class NullValuesFacetingTest extends AbstractFacetTest {
 	@TestForIssue(jiraKey = "HSEARCH-1917")
 	void testNullStringFaceting() {
 		Car car = new Car( null, "yellow", 2500 );
-		fullTextSession.save( car );
+		fullTextSession.persist( car );
 	}
 
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-1917")
 	void testEmptyStringFaceting() {
 		Car car = new Car( "", "red", 2500 );
-		fullTextSession.save( car );
+		fullTextSession.persist( car );
 	}
 
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-1917")
 	void testNullNumericFaceting() {
 		Car car = new Car( "honda", "yellow", null );
-		fullTextSession.save( car );
+		fullTextSession.persist( car );
 	}
 
 	@Override

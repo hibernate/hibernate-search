@@ -46,7 +46,7 @@ class NestedContainedInTest extends SearchTestBase {
 		tag.setName( newTagName );
 
 		Transaction tx = getSession().beginTransaction();
-		getSession().saveOrUpdate( tag );
+		getSession().merge( tag );
 		tx.commit();
 
 		doQuery( newTagName );
@@ -68,9 +68,9 @@ class NestedContainedInTest extends SearchTestBase {
 		helpItem.getTags().add( helpItemTag );
 		tag.getHelpItems().add( helpItemTag );
 
-		getSession().save( helpItem );
-		getSession().save( tag );
-		getSession().save( helpItemTag );
+		getSession().persist( helpItem );
+		getSession().persist( tag );
+		getSession().persist( helpItemTag );
 
 		tx.commit();
 	}

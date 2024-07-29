@@ -60,9 +60,9 @@ class PolymorphicAssociationPropertyAccessTest extends SearchTestBase {
 
 			level3.setName( level3Name );
 
-			session.save( level1 );
-			session.save( level2 );
-			session.save( level3 );
+			session.persist( level1 );
+			session.persist( level2 );
+			session.persist( level3 );
 
 			transaction.commit();
 		}

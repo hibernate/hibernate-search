@@ -330,15 +330,15 @@ class RangeFacetingTest extends AbstractFacetTest {
 		Transaction tx = session.beginTransaction();
 		for ( int i = 0; i < albums.length; i++ ) {
 			Cd cd = new Cd( albums[i], albumPrices[i], releaseDates[i] );
-			session.save( cd );
+			session.persist( cd );
 		}
 		for ( int i = 0; i < fruits.length; i++ ) {
 			Fruit fruit = new Fruit( fruits[i], fruitPrices[i] );
-			session.save( fruit );
+			session.persist( fruit );
 		}
 		for ( Integer horsePower : horsePowers ) {
 			Truck truck = new Truck( horsePower );
-			session.save( truck );
+			session.persist( truck );
 		}
 		tx.commit();
 		session.clear();

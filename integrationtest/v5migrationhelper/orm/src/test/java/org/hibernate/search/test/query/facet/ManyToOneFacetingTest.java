@@ -69,7 +69,7 @@ class ManyToOneFacetingTest extends AbstractFacetTest {
 		indiaFacility.setCompany( acme );
 		acme.addCompanyFacility( indiaFacility );
 
-		session.save( acme );
+		session.persist( acme );
 
 		tx.commit();
 		session.clear();
