@@ -17,6 +17,7 @@ import java.util.Optional;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.expectations.IndexNullAsMatchPredicateExpectactions;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.values.AscendingUniqueTermValues;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.values.IndexableValues;
+import org.hibernate.search.integrationtest.backend.tck.testsupport.types.values.MetricAggregationsValues;
 
 public class MonthDayFieldTypeDescriptor extends StandardFieldTypeDescriptor<MonthDay> {
 
@@ -54,6 +55,11 @@ public class MonthDayFieldTypeDescriptor extends StandardFieldTypeDescriptor<Mon
 				return MonthDay.of( date.getMonth(), date.getDayOfMonth() );
 			}
 		};
+	}
+
+	@Override
+	public MetricAggregationsValues<MonthDay> metricAggregationsValues() {
+		return null;
 	}
 
 	@Override

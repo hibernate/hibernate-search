@@ -18,6 +18,7 @@ import java.util.Set;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.expectations.IndexNullAsMatchPredicateExpectactions;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.values.AscendingUniqueTermValues;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.values.IndexableValues;
+import org.hibernate.search.integrationtest.backend.tck.testsupport.types.values.MetricAggregationsValues;
 
 public class InstantFieldTypeDescriptor extends StandardFieldTypeDescriptor<Instant> {
 
@@ -53,6 +54,16 @@ public class InstantFieldTypeDescriptor extends StandardFieldTypeDescriptor<Inst
 			@Override
 			protected Instant applyDelta(Instant value, int multiplierForDelta) {
 				return value.plus( multiplierForDelta, ChronoUnit.DAYS );
+			}
+		};
+	}
+
+	@Override
+	public MetricAggregationsValues<Instant> metricAggregationsValues() {
+		return new MetricAggregationsValues<Instant>() {
+			@Override
+			protected Instant valueOf(int value) {
+				return Instant.ofEpochSecond( value * 100_000L );
 			}
 		};
 	}

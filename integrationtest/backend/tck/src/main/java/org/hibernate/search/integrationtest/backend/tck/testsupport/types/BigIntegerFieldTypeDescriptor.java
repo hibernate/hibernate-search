@@ -14,6 +14,7 @@ import org.hibernate.search.engine.backend.types.dsl.StandardIndexFieldTypeOptio
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.expectations.IndexNullAsMatchPredicateExpectactions;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.values.AscendingUniqueTermValues;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.values.IndexableValues;
+import org.hibernate.search.integrationtest.backend.tck.testsupport.types.values.MetricAggregationsValues;
 
 public class BigIntegerFieldTypeDescriptor extends StandardFieldTypeDescriptor<BigInteger> {
 
@@ -56,6 +57,16 @@ public class BigIntegerFieldTypeDescriptor extends StandardFieldTypeDescriptor<B
 			@Override
 			protected BigInteger applyDelta(BigInteger value, int multiplierForDelta) {
 				return value.add( delta( multiplierForDelta ) );
+			}
+		};
+	}
+
+	@Override
+	public MetricAggregationsValues<BigInteger> metricAggregationsValues() {
+		return new MetricAggregationsValues<BigInteger>() {
+			@Override
+			protected BigInteger valueOf(int value) {
+				return BigInteger.valueOf( value * 100L );
 			}
 		};
 	}

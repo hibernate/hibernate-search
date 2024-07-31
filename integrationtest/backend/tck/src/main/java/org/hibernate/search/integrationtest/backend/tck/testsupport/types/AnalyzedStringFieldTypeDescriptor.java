@@ -14,6 +14,7 @@ import org.hibernate.search.integrationtest.backend.tck.testsupport.configuratio
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.expectations.IndexNullAsMatchPredicateExpectactions;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.values.AscendingUniqueTermValues;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.values.IndexableValues;
+import org.hibernate.search.integrationtest.backend.tck.testsupport.types.values.MetricAggregationsValues;
 
 public class AnalyzedStringFieldTypeDescriptor extends StandardFieldTypeDescriptor<String> {
 
@@ -60,6 +61,11 @@ public class AnalyzedStringFieldTypeDescriptor extends StandardFieldTypeDescript
 				return valuesThatWontBeUsed();
 			}
 		};
+	}
+
+	@Override
+	public MetricAggregationsValues<String> metricAggregationsValues() {
+		return null;
 	}
 
 	@Override

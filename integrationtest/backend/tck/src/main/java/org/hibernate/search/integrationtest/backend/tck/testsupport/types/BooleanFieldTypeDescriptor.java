@@ -12,6 +12,7 @@ import java.util.Optional;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.expectations.IndexNullAsMatchPredicateExpectactions;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.values.AscendingUniqueTermValues;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.values.IndexableValues;
+import org.hibernate.search.integrationtest.backend.tck.testsupport.types.values.MetricAggregationsValues;
 
 public class BooleanFieldTypeDescriptor extends StandardFieldTypeDescriptor<Boolean> {
 
@@ -44,6 +45,11 @@ public class BooleanFieldTypeDescriptor extends StandardFieldTypeDescriptor<Bool
 				return valuesThatWontBeUsed();
 			}
 		};
+	}
+
+	@Override
+	public MetricAggregationsValues<Boolean> metricAggregationsValues() {
+		return null;
 	}
 
 	@Override

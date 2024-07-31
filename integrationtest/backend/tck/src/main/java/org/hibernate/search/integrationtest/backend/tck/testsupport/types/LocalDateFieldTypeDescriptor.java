@@ -13,6 +13,7 @@ import java.util.Optional;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.expectations.IndexNullAsMatchPredicateExpectactions;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.values.AscendingUniqueTermValues;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.values.IndexableValues;
+import org.hibernate.search.integrationtest.backend.tck.testsupport.types.values.MetricAggregationsValues;
 
 public class LocalDateFieldTypeDescriptor extends StandardFieldTypeDescriptor<LocalDate> {
 
@@ -47,6 +48,16 @@ public class LocalDateFieldTypeDescriptor extends StandardFieldTypeDescriptor<Lo
 			@Override
 			protected LocalDate applyDelta(LocalDate value, int multiplierForDelta) {
 				return value.plus( multiplierForDelta, ChronoUnit.YEARS );
+			}
+		};
+	}
+
+	@Override
+	public MetricAggregationsValues<LocalDate> metricAggregationsValues() {
+		return new MetricAggregationsValues<LocalDate>() {
+			@Override
+			protected LocalDate valueOf(int value) {
+				return LocalDate.ofEpochDay( value );
 			}
 		};
 	}

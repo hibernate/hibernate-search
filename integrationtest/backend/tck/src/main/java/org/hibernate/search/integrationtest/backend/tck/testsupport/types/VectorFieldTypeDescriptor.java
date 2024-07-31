@@ -10,6 +10,7 @@ import org.hibernate.search.engine.backend.types.dsl.IndexFieldTypeFactory;
 import org.hibernate.search.engine.backend.types.dsl.VectorFieldTypeOptionsStep;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.values.AscendingUniqueTermValues;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.values.IndexableValues;
+import org.hibernate.search.integrationtest.backend.tck.testsupport.types.values.MetricAggregationsValues;
 
 public abstract class VectorFieldTypeDescriptor<F>
 		extends FieldTypeDescriptor<F, VectorFieldTypeOptionsStep<?, F>> {
@@ -38,6 +39,11 @@ public abstract class VectorFieldTypeDescriptor<F>
 
 	@Override
 	protected AscendingUniqueTermValues<F> createAscendingUniqueTermValues() {
+		return null;
+	}
+
+	@Override
+	public MetricAggregationsValues<F> metricAggregationsValues() {
 		return null;
 	}
 
