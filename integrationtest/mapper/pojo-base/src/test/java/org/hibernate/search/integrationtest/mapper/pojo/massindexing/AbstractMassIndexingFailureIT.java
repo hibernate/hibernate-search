@@ -185,6 +185,33 @@ public abstract class AbstractMassIndexingFailureIT {
 	}
 
 	@Test
+	void failFast() {
+		String exceptionMessage = "Entity loading error";
+
+		SearchMapping mapping = setupWithThrowingEntityLoading( exceptionMessage );
+
+		MassIndexer massIndexer = mapping.scope( Object.class ).massIndexer()
+				.threadsToLoadObjects( 1 ) // Just to simplify the assertions
+				.batchSizeToLoadObjects( 1 )
+				.failFast( true );
+		doMassIndexingWithFailure(
+				massIndexer,
+				ThreadExpectation.CREATED_AND_TERMINATED,
+				throwable -> assertThat( throwable ).isInstanceOf( SearchException.class )
+						.hasMessageContainingAll(
+								"failure(s) occurred during mass indexing",
+								"See the logs for details.",
+								"First failure: ",
+								exceptionMessage
+						)
+						.hasCauseInstanceOf( SimulatedFailure.class ),
+				expectIndexScaleWork( StubIndexScaleWork.Type.PURGE, ExecutionExpectation.SUCCEED ),
+				expectIndexScaleWork( StubIndexScaleWork.Type.MERGE_SEGMENTS, ExecutionExpectation.SUCCEED )
+		// we do not expect flush or refresh since the indexing was stopped;
+		);
+	}
+
+	@Test
 	void indexing() {
 		SearchMapping mapping = setup();
 

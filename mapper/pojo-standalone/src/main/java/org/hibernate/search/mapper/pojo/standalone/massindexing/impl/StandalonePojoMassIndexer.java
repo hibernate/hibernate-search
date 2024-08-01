@@ -104,4 +104,10 @@ public class StandalonePojoMassIndexer implements MassIndexer {
 		delegate.environment( environment );
 		return this;
 	}
+
+	@Override
+	public MassIndexer failFast(boolean failFast) {
+		delegate.failFast( failFast );
+		return this;
+	}
 }

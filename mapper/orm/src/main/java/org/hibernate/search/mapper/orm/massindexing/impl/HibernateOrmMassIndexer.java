@@ -125,6 +125,12 @@ public class HibernateOrmMassIndexer implements MassIndexer {
 		return this;
 	}
 
+	@Override
+	public MassIndexer failFast(boolean failFast) {
+		delegate.failFast( failFast );
+		return this;
+	}
+
 	ConditionalExpression reindexOnly(Class<?> type, String conditionalExpression) {
 		return context.reindexOnly( type, conditionalExpression );
 	}
