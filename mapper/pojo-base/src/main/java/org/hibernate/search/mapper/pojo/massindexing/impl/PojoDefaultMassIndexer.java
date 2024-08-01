@@ -60,6 +60,7 @@ public class PojoDefaultMassIndexer implements PojoMassIndexer {
 	private Boolean dropAndCreateSchemaOnStart;
 	private Boolean purgeAtStart;
 	private Boolean mergeSegmentsAfterPurge;
+	private Boolean failFast;
 	private Long failureFloodingThreshold = null;
 
 	private MassIndexingFailureHandler failureHandler;
@@ -226,13 +227,21 @@ public class PojoDefaultMassIndexer implements PojoMassIndexer {
 		return this;
 	}
 
+	@Override
+	public PojoMassIndexer failFast(boolean failFast) {
+		this.failFast = failFast;
+		return this;
+	}
+
 	private MassIndexingFailureHandler getOrCreateFailureHandler() {
-		MassIndexingFailureHandler result = failureHandler;
-		if ( result == null ) {
-			result = new PojoMassIndexingDelegatingFailureHandler( mappingContext.failureHandler() );
+		MassIndexingFailureHandler handler = failureHandler;
+		if ( handler == null ) {
+			handler = new PojoMassIndexingDelegatingFailureHandler( mappingContext.failureHandler() );
 		}
-		result = new PojoMassIndexingFailSafeFailureHandlerWrapper( result );
-		return result;
+		return new PojoMassIndexingFailSafeFailureHandlerWrapper(
+				handler,
+				Boolean.TRUE.equals( failFast )
+		);
 	}
 
 	private MassIndexingMonitor getOrCreateMonitor() {

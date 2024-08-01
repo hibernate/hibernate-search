@@ -159,4 +159,17 @@ public interface PojoMassIndexer {
 	 */
 	@Incubating
 	PojoMassIndexer failureFloodingThreshold(long threshold);
+
+	/**
+	 * Enables the fail-fast option for this mass indexer.
+	 * <p>
+	 * With fail-fast option enabled, the mass indexer will request cancelling all internal mass-indexing processes
+	 * right after the first error is reported to the {@link MassIndexingFailureHandler}.
+	 *
+	 * @param failFast Whether to enabled fail fast option for this mass indexer.
+	 *
+	 * @return {@code this} for method chaining
+	 */
+	@Incubating
+	PojoMassIndexer failFast(boolean failFast);
 }

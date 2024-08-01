@@ -363,6 +363,13 @@ Defaults to a threshold defined by the failure handler in use; see `MassIndexing
 `FailureHandler#failureFloodingThreshold`.
 For the default log-based failure handler, the default threshold is 100.
 
+|`failFast(boolean)`
+| `false`
+|*This feature is _incubating_: it is still under active development.*
+An option to stop the indexing right after an error is encountered during the process,
+without waiting for the process to attempt indexing the remaining entities.
+With fail-fast enabled, the mass indexer will attempt to cancel any mass-indexing internal processes after the first
+error reported to the `MassIndexingFailureHandler`.
 |===
 
 [[indexing-massindexer-tuning]]

@@ -12,4 +12,8 @@ public class MassIndexingOperationHandledFailureException extends SearchExceptio
 	public MassIndexingOperationHandledFailureException(Throwable cause) {
 		super( cause );
 	}
+
+	public MassIndexingOperationHandledFailureException(String message) {
+		super( message );
+	}
 }

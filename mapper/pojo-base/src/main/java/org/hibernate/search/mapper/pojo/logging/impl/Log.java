@@ -32,6 +32,7 @@ import org.hibernate.search.mapper.pojo.logging.spi.PojoTypeModelFormatter;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.ObjectPath;
 import org.hibernate.search.mapper.pojo.mapping.impl.PojoContainedTypeManager;
 import org.hibernate.search.mapper.pojo.mapping.impl.PojoIndexedTypeManager;
+import org.hibernate.search.mapper.pojo.massindexing.impl.MassIndexingOperationHandledFailureException;
 import org.hibernate.search.mapper.pojo.model.path.PojoModelPathValueNode;
 import org.hibernate.search.mapper.pojo.model.path.spi.ProjectionConstructorPath;
 import org.hibernate.search.mapper.pojo.model.spi.PojoConstructorModel;
@@ -1023,4 +1024,8 @@ public interface Log extends BasicLogger {
 					+ "Remove the `convert` attribute and keep only the `valueModel=ValueModel.%1$s`.")
 	SearchException usingNonDefaultValueConvertAndValueModelNotAllowed(String model,
 			String convert, @Param EventContext eventContext);
+
+	@Message(id = ID_OFFSET + 163,
+			value = "Mass indexer running in a fail fast mode encountered a problem. Stopping the process.")
+	MassIndexingOperationHandledFailureException massIndexerFailFast();
 }

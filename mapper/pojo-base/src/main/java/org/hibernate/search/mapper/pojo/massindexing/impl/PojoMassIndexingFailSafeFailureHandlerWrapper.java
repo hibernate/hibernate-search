@@ -17,9 +17,11 @@ public class PojoMassIndexingFailSafeFailureHandlerWrapper implements MassIndexi
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	private final MassIndexingFailureHandler delegate;
+	private final boolean failFast;
 
-	public PojoMassIndexingFailSafeFailureHandlerWrapper(MassIndexingFailureHandler delegate) {
+	public PojoMassIndexingFailSafeFailureHandlerWrapper(MassIndexingFailureHandler delegate, boolean failFast) {
 		this.delegate = delegate;
+		this.failFast = failFast;
 	}
 
 	@Override
@@ -29,6 +31,9 @@ public class PojoMassIndexingFailSafeFailureHandlerWrapper implements MassIndexi
 		}
 		catch (Throwable t) {
 			log.failureInMassIndexingFailureHandler( t );
+		}
+		finally {
+			failFastIfNeeded();
 		}
 	}
 
@@ -40,6 +45,9 @@ public class PojoMassIndexingFailSafeFailureHandlerWrapper implements MassIndexi
 		catch (Throwable t) {
 			log.failureInMassIndexingFailureHandler( t );
 		}
+		finally {
+			failFastIfNeeded();
+		}
 	}
 
 	@Override
@@ -50,6 +58,12 @@ public class PojoMassIndexingFailSafeFailureHandlerWrapper implements MassIndexi
 		catch (Throwable t) {
 			log.failureInMassIndexingFailureHandler( t );
 			return MassIndexingFailureHandler.super.failureFloodingThreshold();
+		}
+	}
+
+	private void failFastIfNeeded() {
+		if ( failFast ) {
+			throw log.massIndexerFailFast();
 		}
 	}
 }
