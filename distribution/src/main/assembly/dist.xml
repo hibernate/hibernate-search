@@ -199,6 +199,10 @@
                 <exclude>*.log</exclude>
                 <exclude>*.sh</exclude>
                 <exclude>**/.gitignore</exclude>
+                <exclude>**/.gitattributes</exclude>
+                <exclude>**/.git-blame-ignore-revs</exclude>
+                <exclude>**/.mailmap</exclude>
+                <exclude>**/.cache/**</exclude>
                 <exclude>**/.settings/**</exclude>
                 <exclude>**/.project</exclude>
                 <exclude>**/.classpath</exclude>
@@ -211,6 +215,7 @@
                 <exclude>Jenkinsfile</exclude>
                 <exclude>jenkins/**</exclude>
                 <exclude>.empty/**</exclude>
+                <exclude>.run/**</exclude>
             </excludes>
         </fileSet>
 
