@@ -104,7 +104,12 @@ have not been kept up-to-date, and might need a refresh.
 In any case:
 
 * Check that everything has been pushed to the upstream repository.
-* Check that the CI job for the branch you want to release is green.
+* Check that the CI jobs for the branch you want to release are green:
+  * Check the [main build CI job](https://ci.hibernate.org/view/Search/job/hibernate-search/).
+  * Check the [nightly CI job](https://ci.hibernate.org/view/Search/job/hibernate-search-nightly/).
+  In particular to make sure that the build is reproducible.
+  * Check the [dependency update CI job](https://ci.hibernate.org/view/Search/job/hibernate-search-dependency-update/).
+  Not as important as the previous two jobs, but it's always good to double-check that there are no issues with ORM updates. 
 * Check Jira:
   * Check there are no outstanding issues assigned to the release.
   * Check there are no resolved/closed issues in the current `*-backlog` "version";
@@ -189,8 +194,8 @@ and the documentation to [docs.jboss.org](https://docs.jboss.org/hibernate/searc
 If you just released the latest stable, you will need to update other projects:
 
 * Approve and merge automatic updates that dependabot will send (it might take ~24h):
-  * In the [test case templates](https://github.com/hibernate/hibernate-test-case-templates/tree/master/search).
-  * In the [demos](https://github.com/hibernate/hibernate-demos/tree/master/hibernate-search).
+  * In the [test case templates](https://github.com/hibernate/hibernate-test-case-templates/tree/main/search).
+  * In the [demos](https://github.com/hibernate/hibernate-demos/tree/main/hibernate-search).
 * **If it's a `.Final` release**, upgrade the Hibernate Search dependency manually:
   * In the [Quarkus BOM](https://github.com/quarkusio/quarkus/blob/main/bom/application/pom.xml).
   * In the [WildFly root POM](https://github.com/wildfly/wildfly/blob/main/pom.xml).
