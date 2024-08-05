@@ -48,8 +48,8 @@ Otherwise, you can always try your luck with link:{luceneJavadocUrl}[Lucene's Ja
 == [[_hibernate_orm]] Hibernate ORM
 
 If you want to deepen your knowledge of Hibernate ORM,
-start with the link:$$http://hibernate.org/orm/documentation/$$[online documentation] or get hold
-of a copy of link:$$http://www.manning.com/bauer3/$$[Java Persistence with Hibernate, Second Edition].
+start with the link:$$https://hibernate.org/orm/documentation/$$[online documentation] or get hold
+of a copy of link:$$https://www.manning.com/bauer3/$$[Java Persistence with Hibernate, Second Edition].
 
 [[further-reading-other]]
 == Other

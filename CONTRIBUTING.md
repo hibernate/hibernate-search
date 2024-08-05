@@ -241,7 +241,7 @@ Here are some notable sub-directories:
 * `mapper`: The mappers, i.e. the modules that expose APIs to index and search user entities,
 and do the work of converting between user entities and documents to be indexed.
   * `pojo-base`: Contains base classes and APIs that are re-used in other POJO-based mapper.
-  * `orm`: A mapper for [Hibernate ORM](http://hibernate.org/orm/) entities.
+  * `orm`: A mapper for [Hibernate ORM](https://hibernate.org/orm/) entities.
   * `orm-outbox-polling`: An implementation of indexing coordination between nodes
   in the orm mapper (see above) using an outbox, i.e. an event table in the database. 
   * `pojo-standalone`: A mapper for POJOs in standalone mode, i.e. without Hibernate ORM.

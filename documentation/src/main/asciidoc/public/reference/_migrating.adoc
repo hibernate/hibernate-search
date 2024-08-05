@@ -4,7 +4,7 @@
 = [[getting-started-migrating]] Migrating
 
 If you are upgrading an existing application from an earlier version of Hibernate Search to the latest release,
-make sure to check out the http://hibernate.org/search/documentation/migrate/[migration guide].
+make sure to check out the https://hibernate.org/search/documentation/migrate/[migration guide].
 
 [WARNING]
 ====
