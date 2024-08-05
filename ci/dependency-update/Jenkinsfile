@@ -27,7 +27,11 @@ Map settings() {
 			return [
 					updateProperties: ['version.org.apache.lucene'],
 					onlyRunTestDependingOn: ['hibernate-search-backend-lucene'],
-					additionalMavenArgs: '-Dtest.elasticsearch.skip=true'
+					additionalMavenArgs: '-Dtest.elasticsearch.skip=true',
+					// With Lucene adding 9.12 Snapshot the 11 branch seems stale, and we are not getting any updates,
+					// resulting in the update step failing. Let's allow the build continue,
+					// just in case there are any new snapshots for 9.11 branch:
+					skipSourceModifiedCheck: true
 			]
 		case 'lucene9':
 			return [
