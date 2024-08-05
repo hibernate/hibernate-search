@@ -86,7 +86,7 @@ public class SearchScopeImpl<E> implements SearchScope<E> {
 	@Override
 	@SuppressWarnings("removal")
 	public SearchWorkspace workspace(String tenantId) {
-		return workspace( tenantId );
+		return workspace( (Object) tenantId );
 	}
 
 	@Override
