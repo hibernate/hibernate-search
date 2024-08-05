@@ -127,8 +127,6 @@ class FlushClearEvictAllIT {
 		private String name;
 
 		@OneToMany(mappedBy = "post", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-		@SuppressWarnings("deprecation")
-		@org.hibernate.annotations.LazyCollection(org.hibernate.annotations.LazyCollectionOption.EXTRA)
 		@OrderColumn(name = "idx")
 		private List<Comment> comments = new ArrayList<>();
 

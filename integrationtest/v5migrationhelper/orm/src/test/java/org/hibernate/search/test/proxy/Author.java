@@ -10,7 +10,6 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Id;
 import jakarta.persistence.ManyToOne;
 
-import org.hibernate.annotations.Proxy;
 import org.hibernate.search.annotations.Field;
 import org.hibernate.search.annotations.Indexed;
 
@@ -19,7 +18,6 @@ import org.hibernate.search.annotations.Indexed;
  */
 @Entity
 @Indexed
-@Proxy(proxyClass = IAuthor.class)
 public class Author implements IAuthor {
 
 	private Integer id;
