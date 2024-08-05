@@ -12,7 +12,6 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
 import jakarta.persistence.OneToMany;
 
-import org.hibernate.annotations.Proxy;
 import org.hibernate.search.annotations.Analyze;
 import org.hibernate.search.annotations.Field;
 import org.hibernate.search.annotations.Fields;
@@ -25,7 +24,6 @@ import org.hibernate.search.annotations.Store;
  */
 @Entity
 @Indexed(index = "Book")
-@Proxy(proxyClass = IBook.class)
 public class Book implements IBook {
 
 	private Integer id;

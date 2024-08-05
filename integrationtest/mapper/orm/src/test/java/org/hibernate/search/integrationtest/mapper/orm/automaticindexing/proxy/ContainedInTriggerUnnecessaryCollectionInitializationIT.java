@@ -134,8 +134,6 @@ class ContainedInTriggerUnnecessaryCollectionInitializationIT {
 		private int someInteger;
 
 		@OneToMany(mappedBy = "group")
-		@SuppressWarnings("deprecation")
-		@org.hibernate.annotations.LazyCollection(org.hibernate.annotations.LazyCollectionOption.EXTRA)
 		private Set<Post> posts = new HashSet<>();
 
 		public Integer getId() {
