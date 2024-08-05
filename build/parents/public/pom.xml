@@ -49,7 +49,7 @@
                                 <Implementation-Version>${project.version}</Implementation-Version>
                                 <Implementation-Vendor>hibernate.org</Implementation-Vendor>
                                 <Implementation-Vendor-Id>hibernate.org</Implementation-Vendor-Id>
-                                <Implementation-URL>http://hibernate.org/search/</Implementation-URL>
+                                <Implementation-URL>https://hibernate.org/search/</Implementation-URL>
                                 <Automatic-Module-Name>${java.module.name}</Automatic-Module-Name>
                             </manifestEntries>
                         </archive>

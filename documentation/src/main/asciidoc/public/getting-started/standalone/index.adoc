@@ -26,8 +26,8 @@
 include::../../components/_incubating-warning.adoc[]
 
 This guide will walk you through the initial steps required
-to index and query your entities using http://hibernate.org/search/[Hibernate Search],
-when your entities are **not** defined in http://hibernate.org/orm/[Hibernate ORM].
+to index and query your entities using https://hibernate.org/search/[Hibernate Search],
+when your entities are **not** defined in https://hibernate.org/orm/[Hibernate ORM].
 
 // Note as relfile -prefix/-suffix are just prepended/appended to the string created based on the file location we reference to
 // in some cases we need to get rid of some of the leading/trailing `..` in those strings. That is when we use `just-to-be-removed`.

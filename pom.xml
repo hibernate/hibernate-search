@@ -18,7 +18,7 @@
     <name>Hibernate Search</name>
     <description>Hibernate Search Root POM</description>
 
-    <url>http://hibernate.org/search/</url>
+    <url>https://hibernate.org/search/</url>
 
     <inceptionYear>2006</inceptionYear>
 

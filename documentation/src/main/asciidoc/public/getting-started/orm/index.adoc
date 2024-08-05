@@ -24,7 +24,7 @@
 :numbered:
 
 This guide will walk you through the initial steps required
-to index and query your http://hibernate.org/orm/[Hibernate ORM] entities using http://hibernate.org/search/[Hibernate Search].
+to index and query your https://hibernate.org/orm/[Hibernate ORM] entities using https://hibernate.org/search/[Hibernate Search].
 
 // Note as relfile -prefix/-suffix are just prepended/appended to the string created based on the file location we reference to
 // in some cases we need to get rid of some of the leading/trailing `..` in those strings. That is when we use `just-to-be-removed`.
@@ -150,7 +150,7 @@ it's time to have a look at the configuration file.
 
 [TIP]
 ====
-If you are new to Hibernate ORM, we recommend you start link:http://hibernate.org/quick-start.html[there]
+If you are new to Hibernate ORM, we recommend you start link:https://hibernate.org/quick-start.html[there]
 to implement entity persistence in your application,
 and only then come back here to add Hibernate Search indexing.
 ====

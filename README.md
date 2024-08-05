@@ -139,8 +139,8 @@ Getting started guides are available
 
 Fore more information, refer to the Hibernate Search website:
 
-* [Available versions and compatibility matrix](http://hibernate.org/search/releases/)
-* [Reference documentation for all versions (current and past)](http://hibernate.org/search/documentation/)
+* [Available versions and compatibility matrix](https://hibernate.org/search/releases/)
+* [Reference documentation for all versions (current and past)](https://hibernate.org/search/documentation/)
 
 For offline use, distribution bundles downloaded from [SourceForge](https://sourceforge.net/projects/hibernate/files/hibernate-search/)
 also include the reference documentation for the downloaded version in PDF and HTML format. 
@@ -149,7 +149,7 @@ also include the reference documentation for the downloaded version in PDF and H
 
 ### Latest Documentation
 
-See <http://hibernate.org/search/documentation/>.
+See <https://hibernate.org/search/documentation/>.
 
 ### Bug Reports
 
@@ -157,7 +157,7 @@ See the HSEARCH project on the Hibernate JIRA instance: <https://hibernate.atlas
 
 ### Community Support
 
-See <http://hibernate.org/community/>.
+See <https://hibernate.org/community/>.
 
 ## Contributing
 
