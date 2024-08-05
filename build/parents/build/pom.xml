@@ -37,7 +37,7 @@
 
             Also make sure to update Javadocs for RewriteMethod.
         -->
-        <version.org.apache.lucene>9.11.1</version.org.apache.lucene>
+        <version.org.apache.lucene>9.12.0</version.org.apache.lucene>
         <javadoc.org.apache.lucene.tag>${parsed-version.org.apache.lucene.majorVersion}_${parsed-version.org.apache.lucene.minorVersion}_${parsed-version.org.apache.lucene.incrementalVersion}</javadoc.org.apache.lucene.tag>
         <javadoc.org.apache.lucene.core.url>https://lucene.apache.org/core/${javadoc.org.apache.lucene.tag}/core/</javadoc.org.apache.lucene.core.url>
         <javadoc.org.apache.lucene.analysis.common.url>https://lucene.apache.org/core/${javadoc.org.apache.lucene.tag}/analysis/common/</javadoc.org.apache.lucene.analysis.common.url>
