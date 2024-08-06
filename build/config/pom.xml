@@ -232,6 +232,10 @@
                                 <argument>^org\.hibernate\.type\.spi\.TypeConfiguration$</argument>
                                 <argument>^org\.hibernate\.query\.spi\.ScrollableResultsImplementor$</argument>
                                 <argument>^org\.hibernate\.query\.spi\.QueryParameterBindingTypeResolver$</argument>
+                                <argument>^org\.hibernate\.query\.spi\.QueryParameter$</argument>
+                                <argument>^org\.hibernate\.query\.QueryParameter$</argument>
+                                <argument>^org\.hibernate\.query\.spi\.QueryParameterBinding$</argument>
+                                <argument>^org\.hibernate\.query\.spi\.QueryParameterBindings$</argument>
                                 <argument>^org\.hibernate\.query\.sqm\.spi\.SqmCreationContext$</argument>
                             </arguments>
                             <!--
