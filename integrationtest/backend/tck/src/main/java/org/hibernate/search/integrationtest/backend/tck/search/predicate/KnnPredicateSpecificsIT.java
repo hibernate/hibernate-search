@@ -18,6 +18,8 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
@@ -100,63 +102,83 @@ class KnnPredicateSpecificsIT {
 		setupHelper.start( tckBackendHelper -> tckBackendHelper.createHashBasedShardingBackendSetupStrategy( 1 ) )
 				.withIndexes( indexes ).setup();
 
-		List<BulkIndexer> bulkIndexers = new ArrayList<>();
+		// we have a lot of indexes to populate and that sometimes leads to a:
+		// "error": {
+		//      "type": "file_system_exception",
+		//      "reason": "/usr/share/opensearch/data/nodes/0/indices/vMOU2mEnTrKupqD8mDqCyQ/0/index/_0_Lucene99HnswVectorsFormat_1.vex: Too many open files"
+		//    }
+		// let's limit the number of indexes we populate at the same time...
+		try ( ExecutorService executor = Executors.newFixedThreadPool( 2 ) ) {
+			executor.submit( () -> {
+				final BulkIndexer indexer = SearchScopeConfigured.index.bulkIndexer();
+				SearchScopeConfigured.dataSets.forEach( d -> d.contribute( SearchScopeConfigured.index, indexer ) );
+				indexer.join();
+			} );
 
-		final BulkIndexer scopeIndexer = SearchScopeConfigured.index.bulkIndexer();
-		SearchScopeConfigured.dataSets.forEach( d -> d.contribute( SearchScopeConfigured.index, scopeIndexer ) );
-		bulkIndexers.add( scopeIndexer );
-		final BulkIndexer scopeDifferentDimensionIndexer = SearchScopeConfigured.indexDifferentDimension.bulkIndexer();
-		SearchScopeConfigured.dataSetsDimension
-				.forEach( d -> d.contribute( SearchScopeConfigured.indexDifferentDimension, scopeDifferentDimensionIndexer ) );
-		bulkIndexers.add( scopeDifferentDimensionIndexer );
-		final BulkIndexer scopeDifferentEfConstructionIndexer =
-				SearchScopeConfigured.indexDifferentEfConstruction.bulkIndexer();
-		SearchScopeConfigured.dataSets
-				.forEach( d -> d.contribute( SearchScopeConfigured.indexDifferentEfConstruction,
-						scopeDifferentEfConstructionIndexer ) );
-		bulkIndexers.add( scopeDifferentEfConstructionIndexer );
-		final BulkIndexer scopeDifferentMIndexer = SearchScopeConfigured.indexDifferentM.bulkIndexer();
-		SearchScopeConfigured.dataSets
-				.forEach( d -> d.contribute( SearchScopeConfigured.indexDifferentM,
-						scopeDifferentMIndexer ) );
-		bulkIndexers.add( scopeDifferentMIndexer );
-		final BulkIndexer scopeDifferentSimilarityIndexer = SearchScopeConfigured.indexDifferentSimilarity.bulkIndexer();
-		SearchScopeConfigured.dataSets
-				.forEach(
-						d -> d.contribute( SearchScopeConfigured.indexDifferentSimilarity, scopeDifferentSimilarityIndexer ) );
-		bulkIndexers.add( scopeDifferentSimilarityIndexer );
+			executor.submit( () -> {
+				final BulkIndexer indexer = SearchScopeConfigured.indexDifferentDimension.bulkIndexer();
+				SearchScopeConfigured.dataSetsDimension
+						.forEach( d -> d.contribute( SearchScopeConfigured.indexDifferentDimension, indexer ) );
+				indexer.join();
+			} );
 
-		for ( SimpleMappedIndex<VectorSimilarityConfigured.IndexBinding> index : VectorSimilarityConfigured.supportedIndexes ) {
-			final BulkIndexer similarityIndexer = index.bulkIndexer();
-			VectorSimilarityConfigured.dataSets
-					.forEach( d -> d.contribute( index, similarityIndexer ) );
-			bulkIndexers.add( similarityIndexer );
+			executor.submit( () -> {
+				final BulkIndexer indexer = SearchScopeConfigured.indexDifferentEfConstruction.bulkIndexer();
+				SearchScopeConfigured.dataSets
+						.forEach( d -> d.contribute( SearchScopeConfigured.indexDifferentEfConstruction, indexer ) );
+				indexer.join();
+			} );
+
+			executor.submit( () -> {
+				final BulkIndexer indexer = SearchScopeConfigured.indexDifferentM.bulkIndexer();
+				SearchScopeConfigured.dataSets.forEach( d -> d.contribute( SearchScopeConfigured.indexDifferentM, indexer ) );
+				indexer.join();
+			} );
+
+			executor.submit( () -> {
+				final BulkIndexer indexer = SearchScopeConfigured.indexDifferentSimilarity.bulkIndexer();
+				SearchScopeConfigured.dataSets
+						.forEach( d -> d.contribute( SearchScopeConfigured.indexDifferentSimilarity, indexer ) );
+				indexer.join();
+			} );
+
+			executor.submit( () -> {
+				final BulkIndexer indexer = SearchScopeConfigured.indexDifferentSimilarity.bulkIndexer();
+				SearchScopeConfigured.dataSets
+						.forEach( d -> d.contribute( SearchScopeConfigured.indexDifferentSimilarity, indexer ) );
+				indexer.join();
+			} );
+			for ( SimpleMappedIndex<
+					VectorSimilarityConfigured.IndexBinding> index : VectorSimilarityConfigured.supportedIndexes ) {
+				executor.submit( () -> {
+					final BulkIndexer indexer = index.bulkIndexer();
+					VectorSimilarityConfigured.dataSets.forEach( d -> d.contribute( index, indexer ) );
+					indexer.join();
+				} );
+			}
+
+			executor.submit( () -> {
+				BulkIndexer indexer = ExampleKnnSearchConfigured.index.bulkIndexer();
+				ExampleKnnSearchConfigured.dataset.accept( indexer );
+				indexer.join();
+			} );
+
+			executor.submit( () -> {
+				BulkIndexer indexer = ExampleKnnSearchConfigured.indexNested.bulkIndexer();
+				ExampleKnnSearchConfigured.datasetNested.accept( indexer );
+				indexer.join();
+			} );
+
+			for ( SimpleMappedIndex<
+					SimilarityFilterKnnSearchConfigured.IndexBinding> index : SimilarityFilterKnnSearchConfigured.indexes
+							.values() ) {
+				executor.submit( () -> {
+					BulkIndexer indexer = index.bulkIndexer();
+					SimilarityFilterKnnSearchConfigured.dataset.accept( index, indexer );
+					indexer.join();
+				} );
+			}
 		}
-
-		BulkIndexer exampleKnnSearchIndexer = ExampleKnnSearchConfigured.index.bulkIndexer();
-		ExampleKnnSearchConfigured.dataset.accept( exampleKnnSearchIndexer );
-		bulkIndexers.add( exampleKnnSearchIndexer );
-
-		BulkIndexer exampleKnnSearchNestedIndexer = ExampleKnnSearchConfigured.indexNested.bulkIndexer();
-		ExampleKnnSearchConfigured.datasetNested.accept( exampleKnnSearchNestedIndexer );
-		bulkIndexers.add( exampleKnnSearchNestedIndexer );
-
-		for ( SimpleMappedIndex<
-				SimilarityFilterKnnSearchConfigured.IndexBinding> index : SimilarityFilterKnnSearchConfigured.indexes
-						.values() ) {
-			BulkIndexer indexer = index.bulkIndexer();
-			SimilarityFilterKnnSearchConfigured.dataset.accept( index, indexer );
-			bulkIndexers.add( indexer );
-		}
-
-		bulkIndexers.add( scopeDifferentDimensionIndexer );
-		bulkIndexers.add( scopeDifferentEfConstructionIndexer );
-		bulkIndexers.add( scopeDifferentMIndexer );
-		bulkIndexers.add( scopeDifferentSimilarityIndexer );
-		bulkIndexers.add( exampleKnnSearchIndexer );
-		bulkIndexers.add( exampleKnnSearchNestedIndexer );
-
-		scopeIndexer.join( bulkIndexers.stream().toArray( BulkIndexer[]::new ) );
 	}
 
 	@Nested
