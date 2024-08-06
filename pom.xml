@@ -247,7 +247,7 @@
              WARNING: Do not forget to call 'mvn wrapper:wrapper'
              when you update this property!
          -->
-        <maven.min.version>3.9.6</maven.min.version>
+        <maven.min.version>3.9.8</maven.min.version>
 
         <!-- Set this through a property so that it can be overridden from the commandline -->
         <maven.compiler.failOnWarning>true</maven.compiler.failOnWarning>
@@ -615,6 +615,7 @@
                     <version>${version.maven-wrapper-plugin}</version>
                     <configuration>
                         <mavenVersion>${maven.min.version}</mavenVersion>
+                        <distributionType>bin</distributionType>
                     </configuration>
                 </plugin>
                 <plugin>
