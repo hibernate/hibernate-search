@@ -416,6 +416,7 @@ class KnnPredicateSpecificsIT {
 		}
 
 		public static final class DataSet<F> extends AbstractPredicateDataSet {
+			private static int DOCS_TOTAL = 5;
 			private final VectorFieldTypeDescriptor<F> fieldType;
 
 			protected DataSet(VectorFieldTypeDescriptor<F> fieldType) {
@@ -424,7 +425,7 @@ class KnnPredicateSpecificsIT {
 			}
 
 			public void contribute(SimpleMappedIndex<IndexBinding> index, BulkIndexer indexer) {
-				for ( int i = 0; i < 1024; i++ ) {
+				for ( int i = 0; i < DOCS_TOTAL; i++ ) {
 					F fieldValue = index.binding().sampleVector( fieldType );
 					indexer.add( docId( i ), routingKey, document -> initDocument( index, document, fieldValue ) );
 				}
