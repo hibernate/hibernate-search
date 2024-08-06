@@ -472,4 +472,9 @@ public class ElasticsearchTckBackendFeatures extends TckBackendFeatures {
 		}
 		return super.rawValueEqualsComparator( fieldType );
 	}
+
+	@Override
+	public boolean normalizesStringArgumentToPrefixPredicateForAnalyzedStringField() {
+		return false;
+	}
 }

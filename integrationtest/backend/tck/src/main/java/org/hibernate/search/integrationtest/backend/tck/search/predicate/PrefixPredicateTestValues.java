@@ -41,7 +41,7 @@ public final class PrefixPredicateTestValues extends AbstractPredicateTestValues
 		value = value.substring( 0, value.length() - 3 );
 		if ( AnalyzedStringFieldTypeDescriptor.INSTANCE.equals( fieldType )
 				&& !TckConfiguration.get().getBackendFeatures()
-						.normalizesStringArgumentToWildcardPredicateForAnalyzedStringField() ) {
+						.normalizesStringArgumentToPrefixPredicateForAnalyzedStringField() ) {
 			// The backend doesn't normalize missing value replacements automatically, we have to do it ourselves
 			value = value.toLowerCase( Locale.ROOT );
 		}

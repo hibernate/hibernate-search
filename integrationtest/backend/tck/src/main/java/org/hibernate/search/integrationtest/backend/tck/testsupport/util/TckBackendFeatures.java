@@ -188,4 +188,8 @@ public abstract class TckBackendFeatures implements StubMappingBackendFeatures {
 	public Optional<Comparator<? super Object>> rawValueEqualsComparator(FieldTypeDescriptor<?, ?> fieldType) {
 		return Optional.empty();
 	}
+
+	public boolean normalizesStringArgumentToPrefixPredicateForAnalyzedStringField() {
+		return true;
+	}
 }
