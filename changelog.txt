@@ -1,6 +1,54 @@
 Hibernate Search Changelog
 ==========================
 
+7.2.0.CR1 (2024-08-07)
+-------------------------
+
+** Bug
+    * HSEARCH-5211 Possible infinite recursion when creating a SearchWorkspace by calling a deprecated SearchScope#workspace(String)
+    * HSEARCH-5204 Fix rendering of some definition lists
+    * HSEARCH-5170 Setting an association to null before removing an entity may not trigger indexing
+    * HSEARCH-5136 Mapped superclass with generic ID causes MassIndexer to fail
+
+** Improvement
+    * HSEARCH-5217 Upgrade to Hibernate ORM 6.6.0.CR2
+    * HSEARCH-5212 Upgrade to Avro 1.12.0
+    * HSEARCH-5207 Upgrade jboss-logging-tools to 3.0.1.Final
+    * HSEARCH-5203 Test against latest Elasticsearch 8.14.3
+    * HSEARCH-5202 Upgrade Elasticsearch client to 8.14.3
+    * HSEARCH-5200 Upgrade Jackson to 2.17.2
+    * HSEARCH-5195 Upgrade Elasticsearch client to 8.14.2
+    * HSEARCH-5192 Make Hibernate Search build produce "reproducible" sources jar
+    * HSEARCH-5189 Delay creating index names for the Elasticsearch backend till "runtime"
+    * HSEARCH-5187 Deprecate `ValueConvert` in favor of more a more descriptive enum with more consistent handling
+    * HSEARCH-5184 Upgrade to Lucene 9.11.1
+    * HSEARCH-5183 Add a score based alternative to similarity filter in the knn predicate
+    * HSEARCH-5182 Enable knn similarity filter for the OpenSearch backend
+    * HSEARCH-5181 Add compatibility with OpenSearch 2.15.0
+    * HSEARCH-5179 Upgrade to AWS SDK 2.26.4
+    * HSEARCH-5175 Upgrade to Hibernate ORM 6.6.0.CR1
+    * HSEARCH-5172 Upgrade Elasticsearch client to 8.14.1
+    * HSEARCH-5167 Bump com.carrotsearch:hppc from 0.9.1 to 0.10.0
+
+** New Feature
+    * HSEARCH-3906 Support prefix queries in dsl
+
+** Task
+    * HSEARCH-5214 Test against latest Elasticsearch 7.17.23
+    * HSEARCH-5213 Use Maven 3.9.8 as a required minimum version for the build
+    * HSEARCH-5206 Test against latest OpenSearch 1.3.18
+    * HSEARCH-5196 Test against latest Elasticsearch 8.14.2
+    * HSEARCH-5194 Fix flaky KnnPredicateSpecificsIT
+    * HSEARCH-5193 Add a build step to verify the build reproducibility
+    * HSEARCH-5178 Reword confusing introduction to coordination in documentation
+    * HSEARCH-5177 Test against latest Elasticsearch 7.17.22
+    * HSEARCH-5174 Test against latest OpenSearch 1.3.17
+    * HSEARCH-5173 Test against latest Elasticsearch 8.14.1
+    * HSEARCH-5171 Reenable the tests in AbstractAutomaticIndexingAssociationBaseIT
+    * HSEARCH-5155 Build with JDK 21
+    * HSEARCH-5140 Switch to the new ORM BytecodeEnhanced extension 
+    * HSEARCH-5123 Promote the latest version of getting started guides
+
 7.2.0.Alpha2 (2024-06-10)
 -------------------------
 
