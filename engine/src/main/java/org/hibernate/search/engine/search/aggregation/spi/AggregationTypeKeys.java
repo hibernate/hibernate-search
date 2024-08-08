@@ -18,5 +18,17 @@ public final class AggregationTypeKeys {
 			of( IndexFieldTraits.Aggregations.TERMS );
 	public static final SearchQueryElementTypeKey<RangeAggregationBuilder.TypeSelector> RANGE =
 			of( IndexFieldTraits.Aggregations.RANGE );
+	public static final SearchQueryElementTypeKey<FieldMetricAggregationBuilder.TypeSelector> SUM =
+			of( IndexFieldTraits.Aggregations.SUM );
+	public static final SearchQueryElementTypeKey<FieldMetricAggregationBuilder.TypeSelector> MIN =
+			of( IndexFieldTraits.Aggregations.MIN );
+	public static final SearchQueryElementTypeKey<FieldMetricAggregationBuilder.TypeSelector> MAX =
+			of( IndexFieldTraits.Aggregations.MAX );
+	public static final SearchQueryElementTypeKey<SearchFilterableAggregationBuilder<Long>> COUNT =
+			of( IndexFieldTraits.Aggregations.COUNT );
+	public static final SearchQueryElementTypeKey<SearchFilterableAggregationBuilder<Long>> COUNT_DISTINCT =
+			of( IndexFieldTraits.Aggregations.COUNT_DISTINCT );
+	public static final SearchQueryElementTypeKey<FieldMetricAggregationBuilder.TypeSelector> AVG =
+			of( IndexFieldTraits.Aggregations.AVG );
 
 }

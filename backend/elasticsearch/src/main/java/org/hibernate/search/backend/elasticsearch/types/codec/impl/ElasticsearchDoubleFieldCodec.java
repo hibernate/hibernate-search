@@ -34,6 +34,11 @@ public final class ElasticsearchDoubleFieldCodec extends AbstractElasticsearchFi
 	}
 
 	@Override
+	public Double decode(Double value) {
+		return value;
+	}
+
+	@Override
 	public boolean isCompatibleWith(ElasticsearchFieldCodec<?> other) {
 		return other instanceof ElasticsearchDoubleFieldCodec;
 	}

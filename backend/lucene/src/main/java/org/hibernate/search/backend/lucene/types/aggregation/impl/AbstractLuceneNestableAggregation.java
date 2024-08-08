@@ -9,6 +9,7 @@ import java.lang.invoke.MethodHandles;
 import org.hibernate.search.backend.lucene.logging.impl.Log;
 import org.hibernate.search.backend.lucene.lowlevel.join.impl.NestedDocsProvider;
 import org.hibernate.search.backend.lucene.search.aggregation.impl.AggregationExtractContext;
+import org.hibernate.search.backend.lucene.search.aggregation.impl.AggregationRequestContext;
 import org.hibernate.search.backend.lucene.search.aggregation.impl.LuceneSearchAggregation;
 import org.hibernate.search.backend.lucene.search.common.impl.LuceneSearchIndexScope;
 import org.hibernate.search.backend.lucene.search.common.impl.LuceneSearchIndexValueFieldContext;
@@ -33,6 +34,15 @@ public abstract class AbstractLuceneNestableAggregation<A> implements LuceneSear
 	}
 
 	protected NestedDocsProvider createNestedDocsProvider(AggregationExtractContext context) {
+		NestedDocsProvider nestedDocsProvider = null;
+		if ( nestedDocumentPath != null ) {
+			nestedDocsProvider = context.createNestedDocsProvider( nestedDocumentPath,
+					toNestedFilterQuery( context.toPredicateRequestContext( nestedDocumentPath ) ) );
+		}
+		return nestedDocsProvider;
+	}
+
+	protected NestedDocsProvider createNestedDocsProvider(AggregationRequestContext context) {
 		NestedDocsProvider nestedDocsProvider = null;
 		if ( nestedDocumentPath != null ) {
 			nestedDocsProvider = context.createNestedDocsProvider( nestedDocumentPath,

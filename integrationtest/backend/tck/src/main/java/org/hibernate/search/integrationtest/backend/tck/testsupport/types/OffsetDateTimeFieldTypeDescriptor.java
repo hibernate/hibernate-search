@@ -19,6 +19,7 @@ import java.util.Set;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.expectations.IndexNullAsMatchPredicateExpectactions;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.values.AscendingUniqueTermValues;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.values.IndexableValues;
+import org.hibernate.search.integrationtest.backend.tck.testsupport.types.values.MetricAggregationsValues;
 
 public class OffsetDateTimeFieldTypeDescriptor extends StandardFieldTypeDescriptor<OffsetDateTime> {
 
@@ -65,6 +66,16 @@ public class OffsetDateTimeFieldTypeDescriptor extends StandardFieldTypeDescript
 	}
 
 	@Override
+	public MetricAggregationsValues<OffsetDateTime> metricAggregationsValues() {
+		return new MetricAggregationsValues<OffsetDateTime>() {
+			@Override
+			protected OffsetDateTime valueOf(int value) {
+				return OffsetDateTime.ofInstant( Instant.ofEpochSecond( value * 100_000L ), ZoneOffset.UTC );
+			}
+		};
+	}
+
+	@Override
 	protected IndexableValues<OffsetDateTime> createIndexableValues() {
 		return new IndexableValues<OffsetDateTime>() {
 			@Override
@@ -84,7 +95,8 @@ public class OffsetDateTimeFieldTypeDescriptor extends StandardFieldTypeDescript
 	@Override
 	protected List<OffsetDateTime> createUniquelyMatchableValues() {
 		List<OffsetDateTime> values = new ArrayList<>();
-		for ( LocalDateTime localDateTime : LocalDateTimeFieldTypeDescriptor.INSTANCE.getIndexableValues().getSingle() ) {
+		for ( LocalDateTime localDateTime : LocalDateTimeFieldTypeDescriptor.INSTANCE.getIndexableValues()
+				.getSingle() ) {
 			for ( ZoneOffset offset : createIndexableOffsetList() ) {
 				values.add( localDateTime.atOffset( offset ) );
 			}
@@ -127,7 +139,8 @@ public class OffsetDateTimeFieldTypeDescriptor extends StandardFieldTypeDescript
 
 	@Override
 	public OffsetDateTime valueFromInteger(int integer) {
-		return LocalDateTimeFieldTypeDescriptor.INSTANCE.valueFromInteger( integer ).atOffset( ZoneOffset.ofHours( 2 ) );
+		return LocalDateTimeFieldTypeDescriptor.INSTANCE.valueFromInteger( integer ).atOffset(
+				ZoneOffset.ofHours( 2 ) );
 	}
 
 	@Override

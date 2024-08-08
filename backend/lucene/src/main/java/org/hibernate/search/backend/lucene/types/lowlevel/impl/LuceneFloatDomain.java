@@ -16,6 +16,7 @@ import org.hibernate.search.backend.lucene.lowlevel.facet.impl.FacetCountsUtils;
 import org.hibernate.search.backend.lucene.lowlevel.facet.impl.LongMultiValueFacetCounts;
 import org.hibernate.search.backend.lucene.lowlevel.facet.impl.LongMultiValueRangeFacetCounts;
 import org.hibernate.search.backend.lucene.lowlevel.join.impl.NestedDocsProvider;
+import org.hibernate.search.engine.cfg.spi.NumberUtils;
 import org.hibernate.search.util.common.data.Range;
 
 import org.apache.lucene.document.FloatPoint;
@@ -80,6 +81,16 @@ public class LuceneFloatDomain implements LuceneNumericDomain<Float> {
 	@Override
 	public Float sortedDocValueToTerm(long longValue) {
 		return NumericUtils.sortableIntToFloat( (int) longValue );
+	}
+
+	@Override
+	public double sortedDocValueToDouble(long longValue) {
+		return sortedDocValueToTerm( longValue ).doubleValue();
+	}
+
+	@Override
+	public Float doubleToTerm(double doubleValue) {
+		return NumberUtils.toFloat( doubleValue );
 	}
 
 	@Override
