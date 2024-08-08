@@ -7,6 +7,7 @@ package org.hibernate.search.mapper.pojo.massindexing.impl;
 import java.lang.invoke.MethodHandles;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.OptionalLong;
 
 import org.hibernate.search.mapper.pojo.loading.spi.PojoMassIdentifierLoader;
 import org.hibernate.search.mapper.pojo.loading.spi.PojoMassIdentifierLoadingContext;
@@ -30,6 +31,8 @@ public class PojoMassIndexingEntityIdentifierLoadingRunnable<E, I>
 	private final String tenantId;
 	private final MassIndexingEnvironment.EntityIdentifierLoadingContext identifierLoadingContext;
 
+	private boolean reportIdentifierBatchLoaded = false;
+
 	public PojoMassIndexingEntityIdentifierLoadingRunnable(PojoMassIndexingNotifier notifier,
 			PojoMassIndexingContext massIndexingContext, MassIndexingEnvironment environment,
 			PojoMassIndexingIndexedTypeGroup<E> typeGroup,
@@ -49,10 +52,15 @@ public class PojoMassIndexingEntityIdentifierLoadingRunnable<E, I>
 	protected void runWithFailureHandler() throws InterruptedException {
 		log.trace( "started" );
 		LoadingContext context = new LoadingContext();
-		try ( PojoMassIdentifierLoader loader =
-				loadingStrategy.createIdentifierLoader( typeGroup.includedTypes(), context ) ) {
-			long totalCount = loader.totalCount();
-			getNotifier().reportAddedTotalCount( totalCount );
+		try ( PojoMassIdentifierLoader loader = loadingStrategy.createIdentifierLoader( typeGroup.includedTypes(), context ) ) {
+			OptionalLong count = loader.totalCount();
+			if ( count.isPresent() ) {
+				getNotifier().reportAddedTotalCount( count.getAsLong() );
+			}
+			else {
+				// means we don't know the total ahead of time, so we will be incrementing the total as each batch gets loaded
+				this.reportIdentifierBatchLoaded = true;
+			}
 			do {
 				loader.loadNext();
 			}
@@ -106,6 +114,9 @@ public class PojoMassIndexingEntityIdentifierLoadingRunnable<E, I>
 				public void accept(List<? extends I> batch) throws InterruptedException {
 					log.tracef( "produced a list of ids %s", batch );
 					List<I> copy = new ArrayList<>( batch );
+					if ( reportIdentifierBatchLoaded ) {
+						getNotifier().reportAddedTotalCount( batch.size() );
+					}
 					identifierQueue.put( copy );
 				}
 

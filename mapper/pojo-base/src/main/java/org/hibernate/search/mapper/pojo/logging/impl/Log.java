@@ -92,7 +92,7 @@ public interface Log extends BasicLogger {
 	int ID_OFFSET_LEGACY_ENGINE = MessageConstants.ENGINE_ID_RANGE_MIN;
 
 	@LogMessage(level = INFO)
-	@Message(id = ID_OFFSET_LEGACY_ENGINE + 27, value = "Mass indexing is going to index %d entities.")
+	@Message(id = ID_OFFSET_LEGACY_ENGINE + 27, value = "Mass indexing is going to index %d more entities.")
 	void indexingEntities(long count);
 
 	@LogMessage(level = INFO)

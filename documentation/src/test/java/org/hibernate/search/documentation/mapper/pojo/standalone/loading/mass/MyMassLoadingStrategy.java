@@ -6,6 +6,7 @@ package org.hibernate.search.documentation.mapper.pojo.standalone.loading.mass;
 
 import java.util.Collection;
 import java.util.List;
+import java.util.OptionalLong;
 
 import org.hibernate.search.documentation.mapper.pojo.standalone.loading.mydatastore.MyDatastore;
 import org.hibernate.search.documentation.mapper.pojo.standalone.loading.mydatastore.MyDatastoreConnection;
@@ -49,8 +50,8 @@ public class MyMassLoadingStrategy<E>
 			}
 
 			@Override
-			public long totalCount() { // <6>
-				return connection.countEntities( typeFilter );
+			public OptionalLong totalCount() { // <6>
+				return OptionalLong.of( connection.countEntities( typeFilter ) );
 			}
 
 			@Override

@@ -4,6 +4,8 @@
  */
 package org.hibernate.search.mapper.pojo.loading.spi;
 
+import java.util.OptionalLong;
+
 /**
  * A loader of entity identifiers in batch, used in particular for mass indexing.
  */
@@ -18,7 +20,7 @@ public interface PojoMassIdentifierLoader extends AutoCloseable {
 	/**
 	 * @return The total count of identifiers expected to be loaded.
 	 */
-	long totalCount();
+	OptionalLong totalCount();
 
 	/**
 	 * Loads one batch of identifiers and adds them to the sink,
