@@ -192,4 +192,8 @@ public abstract class TckBackendFeatures implements StubMappingBackendFeatures {
 	public boolean normalizesStringArgumentToPrefixPredicateForAnalyzedStringField() {
 		return true;
 	}
+
+	public boolean rangeAggregationsDoNotIgnoreQuery() {
+		return true;
+	}
 }

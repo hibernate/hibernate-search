@@ -27,6 +27,8 @@ import static org.hibernate.search.integrationtest.showcase.library.service.Test
 import static org.hibernate.search.integrationtest.showcase.library.service.TestDataService.SUBURBAN_2_ID;
 import static org.hibernate.search.integrationtest.showcase.library.service.TestDataService.THESAURUS_OF_LANGUAGES_ID;
 import static org.hibernate.search.integrationtest.showcase.library.service.TestDataService.UNIVERSITY_ID;
+import static org.hibernate.search.util.impl.integrationtest.backend.elasticsearch.dialect.ElasticsearchTestDialect.isActualVersion;
+import static org.junit.jupiter.api.Assumptions.assumeTrue;
 
 import java.util.Arrays;
 import java.util.Collections;
@@ -462,6 +464,15 @@ class LibraryShowcaseSearchIT extends AbstractLibraryShowcaseSearchIT {
 
 	@Test
 	void searchFaceted() {
+		assumeTrue(
+				TestActiveProfilesResolver.isLucene()
+						|| isActualVersion(
+								es -> true,
+								// See https://github.com/opensearch-project/OpenSearch/issues/15169
+								os -> os.isLessThan( "2.16.0" ),
+								aoss -> false
+						)
+		);
 		LibraryFacetedSearchResult result = libraryService.searchFaceted(
 				null, null, null,
 				0, 10

@@ -477,4 +477,16 @@ public class ElasticsearchTckBackendFeatures extends TckBackendFeatures {
 	public boolean normalizesStringArgumentToPrefixPredicateForAnalyzedStringField() {
 		return false;
 	}
+
+	@Override
+	public boolean rangeAggregationsDoNotIgnoreQuery() {
+		// See https://github.com/opensearch-project/OpenSearch/issues/15169
+		//  There is a problem with OpenSearch 2.16.0 where query is ignored for a range aggregation,
+		//  leading to routes, being ignored and incorrect counts produced in the results:
+		return isActualVersion(
+				es -> true,
+				os -> os.isLessThan( "2.16.0" ),
+				aoss -> false
+		);
+	}
 }

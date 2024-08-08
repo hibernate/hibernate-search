@@ -27,4 +27,8 @@ public class TestActiveProfilesResolver implements ActiveProfilesResolver {
 	public static String configuredBackend() {
 		return System.getProperty( "test.backend", DEFAULT_BACKEND );
 	}
+
+	public static boolean isLucene() {
+		return DEFAULT_BACKEND.equals( configuredBackend() );
+	}
 }
