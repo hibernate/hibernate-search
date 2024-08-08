@@ -8,7 +8,6 @@ import java.lang.invoke.MethodHandles;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
-import java.util.function.BiConsumer;
 import java.util.function.Function;
 
 import jakarta.persistence.LockModeType;
@@ -20,9 +19,7 @@ import org.hibernate.HibernateException;
 import org.hibernate.LockMode;
 import org.hibernate.LockOptions;
 import org.hibernate.ScrollMode;
-import org.hibernate.cache.spi.QueryKey;
 import org.hibernate.engine.spi.SessionImplementor;
-import org.hibernate.engine.spi.SharedSessionContractImplementor;
 import org.hibernate.graph.GraphSemantic;
 import org.hibernate.graph.RootGraph;
 import org.hibernate.graph.spi.AppliedGraph;
@@ -225,13 +222,13 @@ public final class HibernateOrmSearchQueryAdapter<R> extends AbstractQuery<R> {
 	@Override
 	public QueryParameterBindings getParameterBindings() {
 		// parameters not supported in Hibernate Search queries
-		return NO_PARAM_BINDINGS;
+		return QueryParameterBindings.empty();
 	}
 
 	@Override
 	public QueryParameterBindings getQueryParameterBindings() {
 		// parameters not supported in Hibernate Search queries
-		return NO_PARAM_BINDINGS;
+		return QueryParameterBindings.empty();
 	}
 
 	@Override
@@ -334,49 +331,4 @@ public final class HibernateOrmSearchQueryAdapter<R> extends AbstractQuery<R> {
 		final AppliedGraph appliedGraph = queryOptions.getAppliedGraph();
 		return appliedGraph != null && appliedGraph.getSemantic() != null;
 	}
-
-	/*
-	 * Suggested alternative to the deprecated QueryParameterBindings.NO_PARAM_BINDINGS is org.hibernate.query.internal.QueryParameterBindingsImpl#EMPTY,
-	 * which is in an internal package, and we don't want to rely on internal classes here if we can.
-	 */
-	private static final QueryParameterBindings NO_PARAM_BINDINGS = new QueryParameterBindings() {
-		@Override
-		public boolean isBound(QueryParameterImplementor<?> parameter) {
-			return false;
-		}
-
-		@Override
-		public <P> QueryParameterBinding<P> getBinding(QueryParameterImplementor<P> parameter) {
-			return null;
-		}
-
-		@Override
-		public QueryParameterBinding<?> getBinding(String name) {
-			return null;
-		}
-
-		@Override
-		public QueryParameterBinding<?> getBinding(int position) {
-			return null;
-		}
-
-		@Override
-		public void visitBindings(BiConsumer<QueryParameterImplementor<?>, QueryParameterBinding<?>> action) {
-			//do nothing
-		}
-
-		@Override
-		public void validate() {
-		}
-
-		@Override
-		public boolean hasAnyMultiValuedBindings() {
-			return false;
-		}
-
-		@Override
-		public QueryKey.ParameterBindingsMemento generateQueryKeyMemento(SharedSessionContractImplementor session) {
-			return NO_PARAMETER_BINDING_MEMENTO;
-		}
-	};
 }
