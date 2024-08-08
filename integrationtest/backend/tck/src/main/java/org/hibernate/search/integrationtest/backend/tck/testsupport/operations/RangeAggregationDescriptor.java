@@ -6,6 +6,7 @@ package org.hibernate.search.integrationtest.backend.tck.testsupport.operations;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.entry;
+import static org.junit.jupiter.api.Assumptions.assumeTrue;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -26,6 +27,7 @@ import org.hibernate.search.integrationtest.backend.tck.testsupport.operations.e
 import org.hibernate.search.integrationtest.backend.tck.testsupport.operations.expectations.UnsupportedSingleFieldAggregationExpectations;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.FieldTypeDescriptor;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.ExpectationsAlternative;
+import org.hibernate.search.integrationtest.backend.tck.testsupport.util.TckConfiguration;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.TypeAssertionHelper;
 import org.hibernate.search.util.common.data.Range;
 import org.hibernate.search.util.impl.integrationtest.common.NormalizationUtils;
@@ -129,6 +131,10 @@ public class RangeAggregationDescriptor extends AggregationDescriptor {
 
 			private <T> AggregationScenario<Map<Range<T>, Long>> doCreate(Map<Range<F>, Long> expectedResult,
 					TypeAssertionHelper<F, T> helper) {
+				assumeTrue(
+						TckConfiguration.get().getBackendFeatures().rangeAggregationsDoNotIgnoreQuery()
+				);
+
 				return new AggregationScenario<Map<Range<T>, Long>>() {
 					@Override
 					public AggregationFinalStep<Map<Range<T>, Long>> setup(SearchAggregationFactory factory,
