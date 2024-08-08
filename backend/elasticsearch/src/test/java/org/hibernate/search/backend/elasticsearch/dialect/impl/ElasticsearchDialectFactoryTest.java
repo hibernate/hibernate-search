@@ -519,20 +519,6 @@ class ElasticsearchDialectFactoryTest {
 				.hasMessageContaining( "'" + distributionName.toString() + ":" + configuredVersionString + "'" );
 	}
 
-	private void testAmbiguous() {
-		assertThatThrownBy(
-				() -> {
-					dialectFactory.createModelDialect( ElasticsearchVersion.of( distributionName, configuredVersionString ) );
-				},
-				"Test ambiguous version " + configuredVersionString
-		)
-				.isInstanceOf( SearchException.class )
-				.hasMessageContaining( "HSEARCH400561" )
-				.hasMessageContaining(
-						"Ambiguous Elasticsearch version: '" + distributionName + ":" + configuredVersionString + "'." )
-				.hasMessageContaining( "Please use a more precise version to remove the ambiguity" );
-	}
-
 	private void testSuccessWithWarning() {
 		ElasticsearchVersion parsedConfiguredVersion = ElasticsearchVersion.of( distributionName, configuredVersionString );
 		ElasticsearchVersion parsedActualVersion = ElasticsearchVersion.of( distributionName, actualVersionString );
