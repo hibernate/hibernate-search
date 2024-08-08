@@ -73,11 +73,11 @@ public final class PersistenceUtil {
 		return builder.openStatelessSession();
 	}
 
-	public static List<EntityTypeDescriptor<?, ?>> createDescriptors(SessionFactoryImplementor sessionFactory,
+	public static List<BatchCoreEntityTypeDescriptor<?, ?>> createDescriptors(SessionFactoryImplementor sessionFactory,
 			Set<HibernateOrmLoadingTypeContext<?>> types) {
-		List<EntityTypeDescriptor<?, ?>> result = new ArrayList<>( types.size() );
+		List<BatchCoreEntityTypeDescriptor<?, ?>> result = new ArrayList<>( types.size() );
 		for ( HibernateOrmLoadingTypeContext<?> type : types ) {
-			result.add( EntityTypeDescriptor.create( sessionFactory, type ) );
+			result.add( BatchCoreEntityTypeDescriptor.create( sessionFactory, type ) );
 		}
 		return result;
 	}
