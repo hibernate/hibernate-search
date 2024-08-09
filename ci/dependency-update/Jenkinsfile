@@ -9,19 +9,12 @@
 // Also make sure to update the parameters in the parameters {} section of the pipeline.
 Map settings() {
 	switch (env.DEPENDENCY_UPDATE_NAME) {
-		case 'orm6.6plus':
+		case 'orm6.6':
 			return [
 					updateProperties: ['version.org.hibernate.orm'],
 					onlyRunTestDependingOn: ['hibernate-search-mapper-orm'],
 					// rebuild orm utils to address removal of the bytecode enhanced engine
 					additionalMavenArgs: '-pl :hibernate-search-util-internal-integrationtest-mapper-orm'
-			]
-		case 'orm7':
-			return [
-					updateProperties: ['version.org.hibernate.orm'],
-					onlyRunTestDependingOn: ['hibernate-search-mapper-orm'],
-					// just rebuild all dependants since ORM7 upgrade will affect all mappers
-					additionalMavenArgs: '-am'
 			]
 		case 'lucene9.11':
 			return [
@@ -32,18 +25,6 @@ Map settings() {
 					// resulting in the update step failing. Let's allow the build continue,
 					// just in case there are any new snapshots for 9.11 branch:
 					skipSourceModifiedCheck: true
-			]
-		case 'lucene9':
-			return [
-					updateProperties: ['version.org.apache.lucene'],
-					onlyRunTestDependingOn: ['hibernate-search-backend-lucene'],
-					additionalMavenArgs: '-Dtest.elasticsearch.skip=true -pl :hibernate-search-backend-lucene,:hibernate-search-util-internal-integrationtest-backend-lucene'
-			]
-		case 'lucene10':
-			return [
-					updateProperties: ['version.org.apache.lucene'],
-					onlyRunTestDependingOn: ['hibernate-search-backend-lucene'],
-					additionalMavenArgs: '-Dtest.elasticsearch.skip=true -pl :hibernate-search-engine,:hibernate-search-backend-lucene,:hibernate-search-util-internal-integrationtest-backend-lucene,:hibernate-search-v5migrationhelper-engine'
 			]
 		case 'elasticsearch-latest':
 			return [
@@ -119,7 +100,7 @@ pipeline {
 	parameters {
 		// choice parameter doesn't have a default, but the first value should be treated as a default, if it wasn't specified manually.
 		// Make sure tp update axis and settings() when adding new choice parameter.
-		choice(name: 'UPDATE_JOB', choices: ['all', 'orm6.6plus', 'orm7', 'lucene9.11','lucene9', 'lucene10', 'elasticsearch-latest'], description: 'Select which update jobs to run. `All` will include all configured update jobs.')
+		choice(name: 'UPDATE_JOB', choices: ['all', 'orm6.6', 'lucene9.11', 'elasticsearch-latest'], description: 'Select which update jobs to run. `All` will include all configured update jobs.')
 		string(name: 'ORM_REPOSITORY', defaultValue: '', description: 'Git URL to Hibernate ORM repository. If provided, Hibernate ORM will be built locally. Works only in pair with ORM_BRANCH. Provide an http repository URL rather than an ssh one.')
 		string(name: 'ORM_BRANCH', defaultValue: '', description: 'Hibernate ORM branch to build from. If provided, Hibernate ORM will be built locally. Works only in pair with ORM_REPOSITORY. Either a pull request ID or a branch name should be provided, but not both at the same time. Use branch if you want to build from a fork repository.')
 		string(name: 'ORM_PULL_REQUEST_ID', defaultValue: '', description: 'Hibernate ORM pull request id to build from. If provided, Hibernate ORM will be built locally. Works only in pair with ORM_REPOSITORY. Either a pull request ID or a branch name should be provided, but not both at the same time.')
@@ -217,7 +198,7 @@ pipeline {
 						name 'DEPENDENCY_UPDATE_NAME'
 						// NOTE: Remember to update the settings() method above when changing this.
 						// And also add a new choice parameter in the parameters {} section of the pipeline
-						values 'orm6.6plus', 'orm7', 'lucene9.11','lucene9', 'lucene10', 'elasticsearch-latest'
+						values 'orm6.6', 'lucene9.11', 'elasticsearch-latest'
 					}
 				}
 				stages {
