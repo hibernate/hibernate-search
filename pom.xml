@@ -194,7 +194,7 @@
              Version to be used as baseline for API/SPI change reports,
              and for the migration guide
           -->
-        <version.org.hibernate.search.previous-stable>7.1.0.CR1</version.org.hibernate.search.previous-stable>
+        <version.org.hibernate.search.previous-stable>7.2.0.Final</version.org.hibernate.search.previous-stable>
 
         <!-- Build settings -->
 
