@@ -1,6 +1,15 @@
 Hibernate Search Changelog
 ==========================
 
+7.2.0.Final (2024-08-09)
+-------------------------
+
+** Improvement
+    * HSEARCH-5221 Upgrade to Elasticsearch client 8.15.0
+    * HSEARCH-5220 Add Elasticsearch 8.15.0 compatibility
+    * HSEARCH-5219 Upgrade to Hibernate ORM 6.6.0.Final
+    * HSEARCH-5218 Add compatibility with OpenSearch 2.16.0
+
 7.2.0.CR1 (2024-08-07)
 -------------------------
 
