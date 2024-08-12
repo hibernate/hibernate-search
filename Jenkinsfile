@@ -315,9 +315,9 @@ stage('Configure') {
 					// --------------------------------------------
 					// Amazon OpenSearch Service
 					new AmazonOpenSearchServiceBuildEnvironment(version: '1.3', condition: TestCondition.AFTER_MERGE),
-					new AmazonOpenSearchServiceBuildEnvironment(version: '2.11', condition: TestCondition.AFTER_MERGE),
+					new AmazonOpenSearchServiceBuildEnvironment(version: '2.13', condition: TestCondition.AFTER_MERGE),
 					// Also test static credentials, but only for the latest version
-					new AmazonOpenSearchServiceBuildEnvironment(version: '2.11', condition: TestCondition.AFTER_MERGE, staticCredentials: true)
+					new AmazonOpenSearchServiceBuildEnvironment(version: '2.13', condition: TestCondition.AFTER_MERGE, staticCredentials: true)
 			]
 	])
 
