@@ -447,6 +447,9 @@ stage('Default build') {
 							install \
 					"} \
 			"""
+			// Quick check after the initial build, if we spot the change here, no need to even proceed..
+			checkNoSourceFilesModifiedOrFail()
+
 			dir(helper.configuration.maven.localRepositoryPath) {
 				stash name:'default-build-result', includes:"org/hibernate/search/**"
 				stash name:'default-build-cache', includes:".develocity/**"
@@ -962,6 +965,8 @@ void withMavenWorkspace(Map args, Closure body) {
 		sh 'ci/docker-cleanup.sh'
 		tryFinally(body, { // Finally
 			sh 'ci/docker-cleanup.sh'
+		}, {
+			checkNoSourceFilesModifiedOrFail()
 		})
 	})
 }
@@ -1153,5 +1158,16 @@ def tryFinally(Closure main, Closure ... finallies) {
 	}
 	if ( mainFailure ) { // We may reach here if only the "finally" failed
 		throw mainFailure
+	}
+}
+
+void checkNoSourceFilesModifiedOrFail() {
+	echo 'Checking sources for changes'
+	// We are ignoring the failsafe-summary.xml as this file may get modified by integration tests running on
+	//  non-default envs and we don't want to change that at the moment:
+	if (0 == sh(script: "git diff HEAD -- ':!.empty/failsafe-summary.xml' | grep -q '.'", returnStatus: true)) {
+		throw new IllegalStateException('''Build resulted in source code modifications. 
+				Make sure you have executed the build locally and added all the necessary files to the commit. 
+				''')
 	}
 }
