@@ -142,7 +142,7 @@
         <version.org.skyscreamer.jsonassert>1.5.1</version.org.skyscreamer.jsonassert>
         <version.io.takari.junit>1.2.7</version.io.takari.junit>
         <version.com.github.tomakehurst.wiremock>3.0.0-beta-10</version.com.github.tomakehurst.wiremock>
-        <version.org.apache.commons.lang3>3.15.0</version.org.apache.commons.lang3>
+        <version.org.apache.commons.lang3>3.16.0</version.org.apache.commons.lang3>
         <version.org.apache.commons.math3>3.6.1</version.org.apache.commons.math3>
         <version.org.apache.commons.math3>3.6.1</version.org.apache.commons.math3>
         <version.commons-codec>1.17.1</version.commons-codec>
@@ -156,7 +156,7 @@
         <version.org.jboss.weld>5.1.2.Final</version.org.jboss.weld>
 
         <!-- >>> JDBC Drivers -->
-        <version.com.h2database>2.3.230</version.com.h2database>
+        <version.com.h2database>2.3.232</version.com.h2database>
         <!-- Sticking to Derby 10.15 for now since later versions require JDK 17+, and we need to test with JDK 11.
              See https://db.apache.org/derby/derby_downloads.html -->
         <version.org.apache.derby>10.15.2.0</version.org.apache.derby>
