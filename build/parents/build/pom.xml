@@ -151,6 +151,7 @@
                 - make sure to create a new payload in EventPayloadSerializationUtilsTest
                 - check the commons-codec version to see if it is aligned with the one used in elasticsearch-rest-client-sniffer
                   and if so - remove the commons-codec management.
+                - remove and generate the files in mapper/orm-outbox-polling/src/main/avro/generated
         -->
         <version.org.apache.avro>1.12.0</version.org.apache.avro>
         <version.org.jboss.weld>5.1.2.Final</version.org.jboss.weld>
