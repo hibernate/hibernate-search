@@ -97,6 +97,12 @@ public final class HibernateOrmMappingPropertiesMetadataContributor implements P
 	}
 
 	private void collectScale(PojoAdditionalMetadataCollectorPropertyNode collector, Value value) {
+		// If it is a formula we have nothing to collect.
+		//  Additionally, starting with ORM 6.0 this will start causing AssertionFailure exceptions,
+		//  see org.hibernate.mapping.SimpleValue#getColumns()
+		if ( value.hasFormula() ) {
+			return;
+		}
 		Iterator<Column> columnIterator = value.getColumns().iterator();
 		Dialect dialect = basicTypeMetadataProvider.getDialect();
 		Metadata metadata = basicTypeMetadataProvider.getMetadata();
