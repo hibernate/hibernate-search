@@ -3,7 +3,7 @@ index 15485e0ce1..7645e7bb21 100644
 --- a/main/java/org/hibernate/search/mapper/orm/bootstrap/impl/HibernateSearchIntegrator.java
 +++ b/main/java/org/hibernate/search/mapper/orm/bootstrap/impl/HibernateSearchIntegrator.java
 @@ -12,7 +12,6 @@
- 
+
  import org.hibernate.boot.Metadata;
  import org.hibernate.boot.spi.BootstrapContext;
 -import org.hibernate.boot.spi.MetadataImplementor;
@@ -12,7 +12,7 @@ index 15485e0ce1..7645e7bb21 100644
  import org.hibernate.search.mapper.orm.common.impl.HibernateOrmUtils;
 @@ -29,19 +28,16 @@
  public class HibernateSearchIntegrator implements Integrator {
- 
+
  	@Override
 -	public void integrate(Metadata metadata, SessionFactoryImplementor sessionFactory,
 -			SessionFactoryServiceRegistry serviceRegistry) {
@@ -21,12 +21,12 @@ index 15485e0ce1..7645e7bb21 100644
  		Optional<HibernateSearchPreIntegrationService> preIntegrationServiceOptional =
 -				HibernateOrmUtils.getServiceOrEmpty( serviceRegistry, HibernateSearchPreIntegrationService.class );
 +				HibernateOrmUtils.getServiceOrEmpty( bootstrapContext.getServiceRegistry(), HibernateSearchPreIntegrationService.class );
- 
+
  		if ( !preIntegrationServiceOptional.isPresent() ) {
  			// Hibernate Search is disabled
  			return;
  		}
- 
+
 -		// TODO When we'll move to Hibernate ORM 6, use the bootstrapContext parameter passed to the integrate() method
 -		BootstrapContext bootstrapContext = ( (MetadataImplementor) metadata ).getTypeConfiguration()
 -				.getMetadataBuildingContext().getBootstrapContext();
@@ -40,7 +40,7 @@ index 66de4ebc40..d0c4c1dafe 100644
 @@ -17,14 +17,14 @@
  import jakarta.persistence.EntityManager;
  import jakarta.persistence.EntityManagerFactory;
- 
+
 -import org.hibernate.AssertionFailure;
  import org.hibernate.Session;
  import org.hibernate.engine.spi.SessionFactoryImplementor;
@@ -58,13 +58,13 @@ index 66de4ebc40..d0c4c1dafe 100644
 @@ -66,25 +66,11 @@ public static SessionImplementor toSessionImplementor(EntityManager entityManage
  		}
  	}
- 
+
 -	private static boolean isSuperTypeOf(EntityPersister type1, EntityPersister type2) {
 -		return type1.isSubclassEntityName( type2.getEntityName() );
 +	private static boolean isSuperTypeOf(EntityMappingType type1, EntityMappingType type2) {
 +		return type1.getSubclassEntityNames().contains( type2.getEntityName() );
  	}
- 
+
 -	public static EntityPersister toRootEntityType(SessionFactoryImplementor sessionFactory,
 -			EntityPersister entityType) {
 -		/*
@@ -106,7 +106,7 @@ index 66de4ebc40..d0c4c1dafe 100644
  		}
  		return superTypeCandidate;
  	}
- 
+
  	public static boolean targetsAllConcreteSubTypes(SessionFactoryImplementor sessionFactory,
 -			EntityPersister parentType, Collection<?> targetConcreteSubTypes) {
 -		@SuppressWarnings("unchecked")
@@ -117,7 +117,7 @@ index 66de4ebc40..d0c4c1dafe 100644
  		if ( subClassEntityNames.size() == targetConcreteSubTypes.size() ) {
  			return true;
  		}
- 
+
 -		MetamodelImplementor metamodel = sessionFactory.getMetamodel();
 +		MappingMetamodel metamodel = sessionFactory.getMappingMetamodel();
  		int concreteSubTypesCount = 0;
@@ -153,19 +153,19 @@ index f5ea6d7742..b4a1e1eb8e 100644
  import org.hibernate.search.mapper.pojo.work.spi.PojoTypeIndexingPlan;
 +import org.hibernate.search.util.common.annotation.impl.SuppressForbiddenApis;
  import org.hibernate.search.util.common.logging.impl.LoggerFactory;
- 
+
  /**
 @@ -290,8 +292,8 @@ private PojoIndexingPlan getCurrentIndexingPlanIfExisting(SessionImplementor ses
  		return contextProvider.currentIndexingPlanIfExisting( sessionImplementor );
  	}
- 
+
 -	private HibernateOrmListenerTypeContext getTypeContextOrNull(EntityPersister entityPersister) {
 -		String entityName = entityPersister.getEntityName();
 +	private HibernateOrmListenerTypeContext getTypeContextOrNull(EntityMappingType entityMappingType) {
 +		String entityName = entityMappingType.getEntityName();
  		return contextProvider.typeContextProvider().byHibernateOrmEntityName().getOrNull( entityName );
  	}
- 
+
 @@ -363,8 +365,8 @@ private void processCollectionEvent(AbstractCollectionEvent event) {
  	 * Required since Hibernate ORM 4.3
  	 */
@@ -183,7 +183,7 @@ index a17a46c893..45316ede5d 100644
 +++ b/main/java/org/hibernate/search/mapper/orm/loading/impl/AbstractHibernateOrmLoadingStrategy.java
 @@ -13,7 +13,7 @@
  import java.util.Set;
- 
+
  import org.hibernate.engine.spi.SessionFactoryImplementor;
 -import org.hibernate.persister.entity.EntityPersister;
 +import org.hibernate.metamodel.mapping.EntityMappingType;
@@ -192,12 +192,12 @@ index a17a46c893..45316ede5d 100644
  import org.hibernate.search.util.common.AssertionFailure;
 @@ -22,13 +22,13 @@ public abstract class AbstractHibernateOrmLoadingStrategy<E, I>
  		implements HibernateOrmEntityLoadingStrategy<E, I> {
- 
+
  	private final SessionFactoryImplementor sessionFactory;
 -	private final EntityPersister rootEntityPersister;
 +	private final EntityMappingType rootEntityMappingType;
  	private final TypeQueryFactory<E, I> queryFactory;
- 
+
  	AbstractHibernateOrmLoadingStrategy(SessionFactoryImplementor sessionFactory,
 -			EntityPersister rootEntityPersister, TypeQueryFactory<E, I> queryFactory) {
 +			EntityMappingType rootEntityMappingType, TypeQueryFactory<E, I> queryFactory) {
@@ -206,7 +206,7 @@ index a17a46c893..45316ede5d 100644
 +		this.rootEntityMappingType = rootEntityMappingType;
  		this.queryFactory = queryFactory;
  	}
- 
+
 @@ -36,7 +36,7 @@ public abstract class AbstractHibernateOrmLoadingStrategy<E, I>
  	public HibernateOrmQueryLoader<E, I> createQueryLoader(
  			List<LoadingTypeContext<? extends E>> typeContexts, Optional<ConditionalExpression> conditionalExpression) {
@@ -219,7 +219,7 @@ index a17a46c893..45316ede5d 100644
 @@ -52,9 +52,9 @@ public HibernateOrmQueryLoader<E, I> createQueryLoader(
  				throw new AssertionFailure( "conditional expression is always defined on a single type" );
  			}
- 
+
 -			EntityPersister entityPersister = typeContexts.get( 0 ).entityPersister();
 +			EntityMappingType entityMappingType = typeContexts.get( 0 ).entityMappingType();
  			return new HibernateOrmQueryLoader<>(
@@ -233,7 +233,7 @@ index 4fa0ba9e1b..1dabd67a96 100644
 --- a/main/java/org/hibernate/search/mapper/orm/loading/impl/AbstractHibernateOrmSelectionEntityLoader.java
 +++ b/main/java/org/hibernate/search/mapper/orm/loading/impl/AbstractHibernateOrmSelectionEntityLoader.java
 @@ -10,7 +10,7 @@
- 
+
  import org.hibernate.QueryTimeoutException;
  import org.hibernate.exception.LockTimeoutException;
 -import org.hibernate.persister.entity.EntityPersister;
@@ -244,13 +244,13 @@ index 4fa0ba9e1b..1dabd67a96 100644
 @@ -19,14 +19,14 @@
  abstract class AbstractHibernateOrmSelectionEntityLoader<E> implements PojoSelectionEntityLoader<E> {
  	protected static final String IDS_PARAMETER_NAME = "ids";
- 
+
 -	protected final EntityPersister entityPersister;
 +	protected final EntityMappingType entityMappingType;
  	protected final LoadingSessionContext sessionContext;
  	protected final MutableEntityLoadingOptions loadingOptions;
  	protected final TypeQueryFactory<E, ?> queryFactory;
- 
+
 -	public AbstractHibernateOrmSelectionEntityLoader(EntityPersister entityPersister, TypeQueryFactory<E, ?> queryFactory,
 +	public AbstractHibernateOrmSelectionEntityLoader(EntityMappingType entityMappingType, TypeQueryFactory<E, ?> queryFactory,
  			LoadingSessionContext sessionContext, MutableEntityLoadingOptions loadingOptions) {
@@ -262,7 +262,7 @@ index 4fa0ba9e1b..1dabd67a96 100644
 @@ -58,7 +58,7 @@ final Query<E> createQuery(int fetchSize, Long timeout) {
  			query.setHint( HibernateOrmSearchQueryHints.JAVAX_TIMEOUT, Math.toIntExact( timeout ) );
  		}
- 
+
 -		EntityGraphHint<?> entityGraphHint = loadingOptions.entityGraphHintOrNullForType( entityPersister );
 +		EntityGraphHint<?> entityGraphHint = loadingOptions.entityGraphHintOrNullForType( entityMappingType );
  		if ( entityGraphHint != null ) {
@@ -274,25 +274,25 @@ index 81fa041778..ec2dc3cfa2 100644
 +++ b/main/java/org/hibernate/search/mapper/orm/loading/impl/ConditionalExpressionQueryFactory.java
 @@ -9,35 +9,36 @@
  import java.util.Set;
- 
+
  import org.hibernate.engine.spi.SharedSessionContractImplementor;
 -import org.hibernate.persister.entity.EntityPersister;
 +import org.hibernate.metamodel.mapping.EntityMappingType;
  import org.hibernate.query.Query;
  import org.hibernate.search.mapper.orm.massindexing.impl.ConditionalExpression;
- 
+
  public abstract class ConditionalExpressionQueryFactory<E, I> implements TypeQueryFactory<E, I> {
- 
+
  	private static final String TYPES_PARAM_NAME = "HIBERNATE_SEARCH_INCLUDED_TYPES_FILTER";
 +	protected final Class<I> uniquePropertyType;
  	protected final String uniquePropertyName;
- 
+
 -	public ConditionalExpressionQueryFactory(String uniquePropertyName) {
 +	public ConditionalExpressionQueryFactory(Class<I> uniquePropertyType, String uniquePropertyName) {
 +		this.uniquePropertyType = uniquePropertyType;
  		this.uniquePropertyName = uniquePropertyName;
  	}
- 
+
  	@Override
 -	public Query<Long> createQueryForCount(SharedSessionContractImplementor session, EntityPersister persister,
 +	public Query<Long> createQueryForCount(SharedSessionContractImplementor session, EntityMappingType entityMappingType,
@@ -303,7 +303,7 @@ index 81fa041778..ec2dc3cfa2 100644
  				Long.class, "e", includedTypesFilter, conditionalExpression
  		);
  	}
- 
+
  	@Override
 -	@SuppressWarnings("unchecked") // Can't do better here: EntityPersister has no generics
 -	public Query<I> createQueryForIdentifierListing(SharedSessionContractImplementor session, EntityPersister persister,
@@ -322,17 +322,17 @@ index 0ad329e389..bdd92e70f1 100644
 --- a/main/java/org/hibernate/search/mapper/orm/loading/impl/CriteriaTypeQueryFactory.java
 +++ b/main/java/org/hibernate/search/mapper/orm/loading/impl/CriteriaTypeQueryFactory.java
 @@ -26,16 +26,14 @@ class CriteriaTypeQueryFactory<E, I> extends ConditionalExpressionQueryFactory<E
- 
+
  	public static <E> CriteriaTypeQueryFactory<E, ?> create(EntityDomainType<E> type,
  			String uniquePropertyName) {
 -		return new CriteriaTypeQueryFactory<>( type, uniquePropertyName,
 -				type.getSingularAttribute( uniquePropertyName ) );
 +		return new CriteriaTypeQueryFactory<>( type, type.getSingularAttribute( uniquePropertyName ) );
  	}
- 
+
  	private final EntityDomainType<E> type;
  	private final SingularAttribute<? super E, I> uniqueProperty;
- 
+
 -	private CriteriaTypeQueryFactory(EntityDomainType<E> type,
 -			String uniquePropertyName, SingularAttribute<? super E, I> uniqueProperty) {
 -		super( uniquePropertyName );
@@ -357,7 +357,7 @@ index 8dea14d074..2280fb4fd4 100644
  import org.hibernate.search.mapper.pojo.loading.spi.PojoSelectionEntityLoader;
 @@ -22,20 +21,20 @@ public class HibernateOrmEntityIdEntityLoadingStrategy<E, I>
  		extends AbstractHibernateOrmLoadingStrategy<E, I> {
- 
+
  	public static HibernateOrmEntityLoadingStrategy<?, ?> create(SessionFactoryImplementor sessionFactory,
 -			EntityPersister entityPersister) {
 -		EntityPersister rootEntityPersister = HibernateOrmUtils.toRootEntityType( sessionFactory, entityPersister );
@@ -370,11 +370,11 @@ index 8dea14d074..2280fb4fd4 100644
 +				entityMappingType.getIdentifierMapping().getAttributeName() );
 +		return new HibernateOrmEntityIdEntityLoadingStrategy<>( sessionFactory, rootEntityMappingType, queryFactory );
  	}
- 
+
 -	private final EntityPersister rootEntityPersister;
 +	private final EntityMappingType rootEntityMappingType;
  	private final TypeQueryFactory<E, I> queryFactory;
- 
+
  	HibernateOrmEntityIdEntityLoadingStrategy(SessionFactoryImplementor sessionFactory,
 -			EntityPersister rootEntityPersister, TypeQueryFactory<E, I> queryFactory) {
 -		super( sessionFactory, rootEntityPersister, queryFactory );
@@ -384,7 +384,7 @@ index 8dea14d074..2280fb4fd4 100644
 +		this.rootEntityMappingType = rootEntityMappingType;
  		this.queryFactory = queryFactory;
  	}
- 
+
 @@ -47,12 +46,12 @@ public boolean equals(Object obj) {
  		HibernateOrmEntityIdEntityLoadingStrategy<?, ?> other = (HibernateOrmEntityIdEntityLoadingStrategy<?, ?>) obj;
  		// If the root entity type is different,
@@ -392,13 +392,13 @@ index 8dea14d074..2280fb4fd4 100644
 -		return rootEntityPersister.equals( other.rootEntityPersister );
 +		return rootEntityMappingType.equals( other.rootEntityMappingType );
  	}
- 
+
  	@Override
  	public int hashCode() {
 -		return rootEntityPersister.hashCode();
 +		return rootEntityMappingType.hashCode();
  	}
- 
+
  	@Override
 @@ -69,13 +68,12 @@ public <E2> PojoSelectionEntityLoader<E2> createLoader(Set<LoadingTypeContext<?
  			 */
@@ -409,7 +409,7 @@ index 8dea14d074..2280fb4fd4 100644
  							cacheLookupStrategy, loadingOptions );
  			return result;
  		}
- 
+
 -		EntityPersister commonSuperType =
 -				toMostSpecificCommonEntitySuperType( sessionContext.session(), targetEntityTypeContexts );
 +		EntityMappingType commonSuperType = toMostSpecificCommonEntitySuperType( targetEntityTypeContexts );
@@ -419,7 +419,7 @@ index 8dea14d074..2280fb4fd4 100644
 @@ -99,12 +97,11 @@ public <E2> PojoSelectionEntityLoader<E2> createLoader(Set<LoadingTypeContext<?
  		return result;
  	}
- 
+
 -	@SuppressWarnings("unchecked") // Can't do better here: EntityPersister has no generics
 -	private PojoSelectionEntityLoader<?> doCreate(EntityPersister entityPersister,
 +	private PojoSelectionEntityLoader<?> doCreate(EntityMappingType entityMappingType,
@@ -430,7 +430,7 @@ index 8dea14d074..2280fb4fd4 100644
 +		if ( !rootEntityMappingType.getJavaType().getJavaTypeClass().isAssignableFrom( entityMappingType.getJavaType().getJavaTypeClass() ) ) {
 +			throw invalidTypeException( entityMappingType );
  		}
- 
+
  		SessionImplementor session = sessionContext.session();
 @@ -136,40 +133,38 @@ private PojoSelectionEntityLoader<?> doCreate(EntityPersister entityPersister,
  				// to avoid a WrongClassException when the type of an entity changes,
@@ -442,7 +442,7 @@ index 8dea14d074..2280fb4fd4 100644
  			default:
  				throw new AssertionFailure( "Unexpected cache lookup strategy: " + cacheLookupStrategy );
  		}
- 
+
 -		// We must pass rootEntityPersister here, to avoid getting a WrongClassException when loading from the cache,
 -		// even if we know we actually want instances from the most specific entity persister,
 +		// We must pass rootEntityMappingType here, to avoid getting a WrongClassException when loading from the cache,
@@ -452,7 +452,7 @@ index 8dea14d074..2280fb4fd4 100644
 +		return new HibernateOrmSelectionEntityByIdLoader<>( rootEntityMappingType, queryFactory, sessionContext,
  				persistenceContextLookup, cacheLookupStrategyImplementor, loadingOptions );
  	}
- 
+
 -	private static EntityPersister toMostSpecificCommonEntitySuperType(SessionImplementor session,
 -			Iterable<? extends LoadingTypeContext<?>> targetEntityTypeContexts) {
 -		MetamodelImplementor metamodel = session.getSessionFactory().getMetamodel();
@@ -472,7 +472,7 @@ index 8dea14d074..2280fb4fd4 100644
  		}
  		return result;
  	}
- 
+
 -	private AssertionFailure invalidTypeException(EntityPersister otherEntityPersister) {
 +	private AssertionFailure invalidTypeException(EntityMappingType otherEntityMappingType) {
  		throw new AssertionFailure(
@@ -483,7 +483,7 @@ index 8dea14d074..2280fb4fd4 100644
 +						+ " Targeted entity name: " + otherEntityMappingType.getEntityName()
  		);
  	}
- 
+
 @@ -177,11 +172,11 @@ private AssertionFailure invalidTypesException(
  			Set<? extends LoadingTypeContext<?>> targetEntityTypeContexts) {
  		return new AssertionFailure(
@@ -506,15 +506,15 @@ index bf4e8fd64a..87f96d8441 100644
 @@ -6,7 +6,6 @@
   */
  package org.hibernate.search.mapper.orm.loading.impl;
- 
+
 -import java.io.Serializable;
  import java.util.List;
- 
+
  import org.hibernate.FlushMode;
 @@ -56,12 +55,11 @@ public void load(List<I> identifiers) throws InterruptedException {
  		transactionHelper.commit( session );
  	}
- 
+
 -	@SuppressWarnings("unchecked") // We can assume identifiers are serializable
  	private List<E> multiLoad(List<I> identifiers) {
  		return typeQueryLoader.createMultiIdentifierLoadAccess( session )
@@ -523,7 +523,7 @@ index bf4e8fd64a..87f96d8441 100644
 -				.multiLoad( (List<Serializable>) identifiers );
 +				.multiLoad( identifiers );
  	}
- 
+
  	private List<E> queryByIds(List<I> identifiers) {
 diff --git a/main/java/org/hibernate/search/mapper/orm/loading/impl/HibernateOrmMassIdentifierLoader.java b/main/java/org/hibernate/search/mapper/orm/loading/impl/HibernateOrmMassIdentifierLoader.java
 index 61cf2863dc..033ccecf9e 100644
@@ -535,7 +535,7 @@ index 61cf2863dc..033ccecf9e 100644
  	private long totalLoaded = 0;
 -	private final ScrollableResults results;
 +	private final ScrollableResults<I> results;
- 
+
  	public HibernateOrmMassIdentifierLoader(HibernateOrmQueryLoader<E, I> typeQueryLoader,
  			HibernateOrmMassLoadingOptions options,
 @@ -88,8 +88,7 @@ public void loadNext() throws InterruptedException {
@@ -554,7 +554,7 @@ index ab527b92d3..48140e8931 100644
 +++ b/main/java/org/hibernate/search/mapper/orm/loading/impl/HibernateOrmNonEntityIdPropertyEntityLoadingStrategy.java
 @@ -12,7 +12,7 @@
  import java.util.stream.Collectors;
- 
+
  import org.hibernate.engine.spi.SessionFactoryImplementor;
 -import org.hibernate.persister.entity.EntityPersister;
 +import org.hibernate.metamodel.mapping.EntityMappingType;
@@ -563,7 +563,7 @@ index ab527b92d3..48140e8931 100644
  import org.hibernate.search.mapper.pojo.loading.spi.PojoSelectionEntityLoader;
 @@ -26,30 +26,30 @@ public class HibernateOrmNonEntityIdPropertyEntityLoadingStrategy<E, I>
  	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
- 
+
  	public static <I> HibernateOrmEntityLoadingStrategy<?, ?> create(SessionFactoryImplementor sessionFactory,
 -			EntityPersister entityPersister,
 +			EntityMappingType entityMappingType,
@@ -579,13 +579,13 @@ index ab527b92d3..48140e8931 100644
 +				entityMappingType, queryFactory,
  				documentIdSourcePropertyName, documentIdSourceHandle );
  	}
- 
+
 -	private final EntityPersister entityPersister;
 +	private final EntityMappingType entityMappingType;
  	private final TypeQueryFactory<E, I> queryFactory;
  	private final String documentIdSourcePropertyName;
  	private final ValueReadHandle<?> documentIdSourceHandle;
- 
+
  	private HibernateOrmNonEntityIdPropertyEntityLoadingStrategy(SessionFactoryImplementor sessionFactory,
 -			EntityPersister entityPersister,
 +			EntityMappingType entityMappingType,
@@ -608,13 +608,13 @@ index ab527b92d3..48140e8931 100644
  				&& documentIdSourcePropertyName.equals( other.documentIdSourcePropertyName )
  				&& documentIdSourceHandle.equals( other.documentIdSourceHandle );
  	}
- 
+
  	@Override
  	public int hashCode() {
 -		return Objects.hash( entityPersister, documentIdSourcePropertyName, documentIdSourceHandle );
 +		return Objects.hash( entityMappingType, documentIdSourcePropertyName, documentIdSourceHandle );
  	}
- 
+
  	@Override
 @@ -89,17 +89,17 @@ private <E2> PojoSelectionEntityLoader<E2> doCreate(LoadingTypeContext<?> target
  			LoadingSessionContext sessionContext,
@@ -625,7 +625,7 @@ index ab527b92d3..48140e8931 100644
 +		if ( !entityMappingType.equals( targetEntityTypeContext.entityMappingType() ) ) {
 +			throw invalidTypeException( targetEntityTypeContext.entityMappingType() );
  		}
- 
+
  		/*
 -		 * We checked just above that "entityPersister" is equal to "targetEntityTypeContext.entityPersister()",
 +		 * We checked just above that "entityMappingType" is equal to "targetEntityTypeContext.entityMappingType()",
@@ -641,7 +641,7 @@ index ab527b92d3..48140e8931 100644
 @@ -121,22 +121,22 @@ private <E2> PojoSelectionEntityLoader<E2> doCreate(LoadingTypeContext<?> target
  		return result;
  	}
- 
+
 -	private AssertionFailure invalidTypeException(EntityPersister otherEntityPersister) {
 +	private AssertionFailure invalidTypeException(EntityMappingType otherEntityMappingType) {
  		throw new AssertionFailure(
@@ -652,7 +652,7 @@ index ab527b92d3..48140e8931 100644
 +						+ " Targeted entity name: " + otherEntityMappingType.getEntityName()
  		);
  	}
- 
+
  	private AssertionFailure multipleTypesException(Set<? extends LoadingTypeContext<?>> targetEntityTypeContexts) {
  		return new AssertionFailure(
  				"Attempt to use a criteria-based entity loader with multiple target entity types."
@@ -679,14 +679,14 @@ index 44a8719126..83a8b93fb7 100644
 +import org.hibernate.metamodel.mapping.EntityMappingType;
  import org.hibernate.query.Query;
  import org.hibernate.search.mapper.orm.massindexing.impl.ConditionalExpression;
- 
+
  public class HibernateOrmQueryLoader<E, I> {
  	private final TypeQueryFactory<E, I> queryFactory;
  	private final Set<Class<? extends E>> includedTypesFilter;
 -	private final EntityPersister persister;
 +	private final EntityMappingType entityMappingType;
  	private final ConditionalExpression conditionalExpression;
- 
+
  	public HibernateOrmQueryLoader(TypeQueryFactory<E, I> queryFactory,
  			Set<Class<? extends E>> includedTypesFilter) {
  		this.queryFactory = queryFactory;
@@ -695,7 +695,7 @@ index 44a8719126..83a8b93fb7 100644
 +		this.entityMappingType = null;
  		this.conditionalExpression = null;
  	}
- 
+
  	public HibernateOrmQueryLoader(TypeQueryFactory<E, I> queryFactory,
 -			EntityPersister persister, Set<Class<? extends E>> includedTypesFilter,
 +			EntityMappingType entityMappingType, Set<Class<? extends E>> includedTypesFilter,
@@ -706,7 +706,7 @@ index 44a8719126..83a8b93fb7 100644
 +		this.entityMappingType = entityMappingType;
  		this.conditionalExpression = conditionalExpression;
  	}
- 
+
 @@ -42,7 +42,7 @@ public Query<Long> createCountQuery(SharedSessionContractImplementor session) {
  		return ( conditionalExpression == null )
  				? queryFactory.createQueryForCount( session, includedTypesFilter )
@@ -715,7 +715,7 @@ index 44a8719126..83a8b93fb7 100644
 +						session, entityMappingType, includedTypesFilter, conditionalExpression
  				);
  	}
- 
+
 @@ -50,7 +50,7 @@ public Query<I> createIdentifiersQuery(SharedSessionContractImplementor session)
  		return ( conditionalExpression == null )
  				? queryFactory.createQueryForIdentifierListing( session, includedTypesFilter )
@@ -724,7 +724,7 @@ index 44a8719126..83a8b93fb7 100644
 +						session, entityMappingType, includedTypesFilter, conditionalExpression
  				);
  	}
- 
+
 diff --git a/main/java/org/hibernate/search/mapper/orm/loading/impl/HibernateOrmSelectionEntityByIdLoader.java b/main/java/org/hibernate/search/mapper/orm/loading/impl/HibernateOrmSelectionEntityByIdLoader.java
 index 8220212f46..3c20b4003b 100644
 --- a/main/java/org/hibernate/search/mapper/orm/loading/impl/HibernateOrmSelectionEntityByIdLoader.java
@@ -732,23 +732,23 @@ index 8220212f46..3c20b4003b 100644
 @@ -6,13 +6,13 @@
   */
  package org.hibernate.search.mapper.orm.loading.impl;
- 
+
 -import java.io.Serializable;
  import java.util.ArrayList;
  import java.util.List;
- 
+
  import org.hibernate.engine.spi.EntityKey;
 -import org.hibernate.persister.entity.EntityPersister;
 +import org.hibernate.metamodel.mapping.EntityMappingType;
  import org.hibernate.query.Query;
 +import org.hibernate.search.util.common.annotation.impl.SuppressForbiddenApis;
- 
+
  /**
   * An entity loader for indexed entities whose document ID is the entity ID.
 @@ -24,12 +24,12 @@ class HibernateOrmSelectionEntityByIdLoader<E> extends AbstractHibernateOrmSelec
  	private final PersistenceContextLookupStrategy persistenceContextLookup;
  	private final EntityLoadingCacheLookupStrategyImplementor cacheLookupStrategyImplementor;
- 
+
 -	HibernateOrmSelectionEntityByIdLoader(EntityPersister rootEntityPersister,
 +	HibernateOrmSelectionEntityByIdLoader(EntityMappingType rootEntityMappingType,
  			TypeQueryFactory<E, ?> queryFactory, LoadingSessionContext sessionContext,
@@ -763,7 +763,7 @@ index 8220212f46..3c20b4003b 100644
 @@ -84,11 +84,12 @@ protected List<E> doLoadEntities(List<?> allIds, Long timeout) {
  		return loadedEntities;
  	}
- 
+
 +	@SuppressForbiddenApis(reason = "generateEntityKey requires passing an EntityPersister")
  	private EntityKey[] toEntityKeys(List<?> ids) {
  		EntityKey[] entityKeys = new EntityKey[ids.size()];
@@ -781,7 +781,7 @@ index 11409cad25..58b36111c5 100644
 +++ b/main/java/org/hibernate/search/mapper/orm/loading/impl/HibernateOrmSelectionEntityByNonIdPropertyLoader.java
 @@ -12,7 +12,7 @@
  import java.util.Map;
- 
+
  import org.hibernate.Hibernate;
 -import org.hibernate.persister.entity.EntityPersister;
 +import org.hibernate.metamodel.mapping.EntityMappingType;
@@ -791,7 +791,7 @@ index 11409cad25..58b36111c5 100644
 @@ -33,14 +33,14 @@ class HibernateOrmSelectionEntityByNonIdPropertyLoader<E> extends AbstractHibern
  	private final String documentIdSourcePropertyName;
  	private final ValueReadHandle<?> documentIdSourceHandle;
- 
+
 -	HibernateOrmSelectionEntityByNonIdPropertyLoader(EntityPersister entityPersister,
 +	HibernateOrmSelectionEntityByNonIdPropertyLoader(EntityMappingType entityMappingType,
  			LoadingTypeContext<E> targetEntityTypeContext,
@@ -816,12 +816,12 @@ index a43ff3c025..abebc0d505 100644
 -import org.hibernate.persister.entity.EntityPersister;
 +import org.hibernate.metamodel.mapping.EntityMappingType;
  import org.hibernate.query.Query;
- 
+
  class HqlTypeQueryFactory<E, I> extends ConditionalExpressionQueryFactory<E, I> {
- 
+
 -	private final EntityPersister entityPersister;
 +	private final EntityMappingType entityMappingType;
- 
+
 -	HqlTypeQueryFactory(EntityPersister entityPersister, String uniquePropertyName) {
 -		super( uniquePropertyName );
 -		this.entityPersister = entityPersister;
@@ -833,7 +833,7 @@ index a43ff3c025..abebc0d505 100644
 +				uniquePropertyName );
 +		this.entityMappingType = entityMappingType;
  	}
- 
+
  	@Override
  	public Query<Long> createQueryForCount(SharedSessionContractImplementor session,
  			Set<? extends Class<? extends E>> includedTypesFilter) {
@@ -843,7 +843,7 @@ index a43ff3c025..abebc0d505 100644
  				Long.class,
  				"e", includedTypesFilter );
  	}
- 
+
 -	@SuppressWarnings("unchecked")
  	@Override
  	public Query<I> createQueryForIdentifierListing(SharedSessionContractImplementor session,
@@ -855,7 +855,7 @@ index a43ff3c025..abebc0d505 100644
 +				"select e. " + uniquePropertyName + " from " + entityMappingType.getEntityName() + " e",
 +				uniquePropertyType, "e", includedTypesFilter );
  	}
- 
+
  	@SuppressWarnings("unchecked")
  	@Override
  	public Query<E> createQueryForLoadByUniqueProperty(SessionImplementor session, String parameterName) {
@@ -867,46 +867,46 @@ index a43ff3c025..abebc0d505 100644
 +				(Class<E>) entityMappingType.getMappedJavaType().getJavaTypeClass()
  		);
  	}
- 
+
  	@Override
 -	@SuppressWarnings("unchecked") // Can't do better here: the underlying method has no generics
  	public MultiIdentifierLoadAccess<E> createMultiIdentifierLoadAccess(SessionImplementor session) {
 -		return session.byMultipleIds( entityPersister.getEntityName() );
 +		return session.byMultipleIds( entityMappingType.getEntityName() );
  	}
- 
+
  	@Override
  	public boolean uniquePropertyIsTheEntityId() {
 -		return uniquePropertyName.equals( entityPersister.getIdentifierPropertyName() );
 +		return uniquePropertyName.equals( entityMappingType.getIdentifierMapping().getAttributeName() );
  	}
- 
+
  	private <T> Query<T> createQueryWithTypesFilter(SharedSessionContractImplementor session,
 diff --git a/main/java/org/hibernate/search/mapper/orm/loading/impl/LoadingTypeContext.java b/main/java/org/hibernate/search/mapper/orm/loading/impl/LoadingTypeContext.java
 index 4fd6258ed4..eaac4243ea 100644
 --- a/main/java/org/hibernate/search/mapper/orm/loading/impl/LoadingTypeContext.java
 +++ b/main/java/org/hibernate/search/mapper/orm/loading/impl/LoadingTypeContext.java
 @@ -8,7 +8,7 @@
- 
+
  import java.util.List;
- 
+
 -import org.hibernate.persister.entity.EntityPersister;
 +import org.hibernate.metamodel.mapping.EntityMappingType;
  import org.hibernate.search.mapper.pojo.model.spi.PojoRawTypeIdentifier;
- 
+
  public interface LoadingTypeContext<E> {
 @@ -21,9 +21,9 @@ public interface LoadingTypeContext<E> {
  	PojoRawTypeIdentifier<E> typeIdentifier();
- 
+
  	/**
 -	 * @return The entity persister, giving access to a representation of the entity type in the Hibernate ORM metamodel.
 +	 * @return The entity mapping type, giving access to a representation of the entity type in the Hibernate ORM metamodel.
  	 */
 -	EntityPersister entityPersister();
 +	EntityMappingType entityMappingType();
- 
+
  	HibernateOrmEntityLoadingStrategy<? super E, ?> loadingStrategy();
- 
+
 diff --git a/main/java/org/hibernate/search/mapper/orm/loading/impl/MutableEntityLoadingOptions.java b/main/java/org/hibernate/search/mapper/orm/loading/impl/MutableEntityLoadingOptions.java
 index a8669bf79d..48e2214a60 100644
 --- a/main/java/org/hibernate/search/mapper/orm/loading/impl/MutableEntityLoadingOptions.java
@@ -914,17 +914,17 @@ index a8669bf79d..48e2214a60 100644
 @@ -9,7 +9,8 @@
  import java.util.ArrayList;
  import java.util.List;
- 
+
 -import org.hibernate.persister.entity.EntityPersister;
 +import org.hibernate.metamodel.mapping.EntityMappingType;
 +import org.hibernate.metamodel.model.domain.EntityDomainType;
  import org.hibernate.search.util.common.impl.Contracts;
- 
+
  public class MutableEntityLoadingOptions {
 @@ -30,15 +31,20 @@ public void fetchSize(int fetchSize) {
  		this.fetchSize = fetchSize;
  	}
- 
+
 -	public EntityGraphHint<?> entityGraphHintOrNullForType(EntityPersister entityPersister) {
 -		if ( entityGraphHints == null ) {
 +	public EntityGraphHint<?> entityGraphHintOrNullForType(EntityMappingType entityMappingType) {
@@ -971,7 +971,7 @@ index 2e7c0c9d52..f5b23c4b54 100644
  import org.hibernate.search.mapper.orm.logging.impl.Log;
 +import org.hibernate.search.util.common.annotation.impl.SuppressForbiddenApis;
  import org.hibernate.search.util.common.logging.impl.LoggerFactory;
- 
+
  /**
 @@ -24,25 +26,27 @@
   *
@@ -980,9 +980,9 @@ index 2e7c0c9d52..f5b23c4b54 100644
 +@SuppressForbiddenApis(reason = "EntityPersister is needed to retrieve/use EntityDataAccess")
  class PersistenceContextThenSecondLevelCacheLookupStrategy
  		implements EntityLoadingCacheLookupStrategyImplementor {
- 
+
  	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
- 
+
 -	static EntityLoadingCacheLookupStrategyImplementor create(EntityPersister commonEntitySuperTypePersister,
 +	static EntityLoadingCacheLookupStrategyImplementor create(EntityMappingType entityMappingType,
  			SessionImplementor session) {
@@ -1012,10 +1012,10 @@ index 82c86985ab..1d289634b7 100644
 @@ -6,32 +6,33 @@
   */
  package org.hibernate.search.mapper.orm.loading.impl;
- 
+
 +import java.util.Map;
  import java.util.Set;
- 
+
  import org.hibernate.MultiIdentifierLoadAccess;
  import org.hibernate.engine.spi.SessionFactoryImplementor;
  import org.hibernate.engine.spi.SessionImplementor;
@@ -1027,9 +1027,9 @@ index 82c86985ab..1d289634b7 100644
 +import org.hibernate.metamodel.model.domain.JpaMetamodel;
  import org.hibernate.query.Query;
  import org.hibernate.search.mapper.orm.massindexing.impl.ConditionalExpression;
- 
+
  public interface TypeQueryFactory<E, I> {
- 
+
 -	static TypeQueryFactory<?, ?> create(SessionFactoryImplementor sessionFactory, EntityPersister entityPersister,
 +	static TypeQueryFactory<?, ?> create(SessionFactoryImplementor sessionFactory, EntityMappingType entityMappingType,
  			String uniquePropertyName) {
@@ -1049,19 +1049,19 @@ index 82c86985ab..1d289634b7 100644
 +			return new HqlTypeQueryFactory<>( entityMappingType, uniquePropertyName );
  		}
  	}
- 
+
 @@ -41,10 +42,10 @@ Query<Long> createQueryForCount(SharedSessionContractImplementor session,
  	Query<I> createQueryForIdentifierListing(SharedSessionContractImplementor session,
  			Set<? extends Class<? extends E>> includedTypesFilter);
- 
+
 -	Query<Long> createQueryForCount(SharedSessionContractImplementor session, EntityPersister persister,
 +	Query<Long> createQueryForCount(SharedSessionContractImplementor session, EntityMappingType entityMappingType,
  			Set<? extends Class<? extends E>> includedTypesFilter, ConditionalExpression conditionalExpression);
- 
+
 -	Query<I> createQueryForIdentifierListing(SharedSessionContractImplementor session, EntityPersister persister,
 +	Query<I> createQueryForIdentifierListing(SharedSessionContractImplementor session, EntityMappingType entityMappingType,
  			Set<? extends Class<? extends E>> includedTypesFilter, ConditionalExpression conditionalExpression);
- 
+
  	Query<E> createQueryForLoadByUniqueProperty(SessionImplementor session, String parameterName);
 diff --git a/main/java/org/hibernate/search/mapper/orm/logging/impl/Log.java b/main/java/org/hibernate/search/mapper/orm/logging/impl/Log.java
 index 6fbfb8b005..0c63c4cddb 100644
@@ -1070,13 +1070,13 @@ index 6fbfb8b005..0c63c4cddb 100644
 @@ -253,14 +253,10 @@ SearchException foundMultipleEntitiesForDocumentId(String entityName, String doc
  			+ " Currently configured tenant identifiers: %2$s.")
  	SearchException invalidTenantId(String tenantId, Set<String> allTenantIds, String tenantIdsConfigurationPropertyKey);
- 
+
 -	// NOTE: This is used in -orm6 modules
 -	@SuppressWarnings("unused")
  	@LogMessage(level = Logger.Level.INFO)
  	@Message(id = ID_OFFSET + 56, value = "Ignoring unrecognized query hint [%s]")
  	void ignoringUnrecognizedQueryHint(String hintName);
- 
+
 -	// NOTE: This is used in -orm6 modules
 -	@SuppressWarnings("unused")
  	@Message(id = ID_OFFSET + 57,
@@ -1088,7 +1088,7 @@ index 3e83b7bc62..04702fd757 100644
 +++ b/main/java/org/hibernate/search/mapper/orm/mapping/impl/AbstractHibernateOrmTypeContext.java
 @@ -10,8 +10,8 @@
  import java.util.stream.Collectors;
- 
+
  import org.hibernate.engine.spi.SessionFactoryImplementor;
 -import org.hibernate.metamodel.spi.MetamodelImplementor;
 -import org.hibernate.persister.entity.EntityPersister;
@@ -1098,7 +1098,7 @@ index 3e83b7bc62..04702fd757 100644
  import org.hibernate.search.mapper.orm.loading.impl.HibernateOrmEntityIdEntityLoadingStrategy;
  import org.hibernate.search.mapper.orm.loading.impl.HibernateOrmEntityLoadingStrategy;
 @@ -32,7 +32,7 @@ abstract class AbstractHibernateOrmTypeContext<E>
- 
+
  	private final PojoRawTypeIdentifier<E> typeIdentifier;
  	private final String jpaEntityName;
 -	private final EntityPersister entityPersister;
@@ -1138,19 +1138,19 @@ index 3e83b7bc62..04702fd757 100644
  		else {
 @@ -88,12 +87,12 @@ public String jpaEntityName() {
  	}
- 
+
  	public String hibernateOrmEntityName() {
 -		return entityPersister.getEntityName();
 +		return entityMappingType.getEntityName();
  	}
- 
+
  	@Override
 -	public EntityPersister entityPersister() {
 -		return entityPersister;
 +	public EntityMappingType entityMappingType() {
 +		return entityMappingType;
  	}
- 
+
  	@Override
 diff --git a/main/java/org/hibernate/search/mapper/orm/mapping/impl/HibernateOrmMappingConfigurationContributor.java b/main/java/org/hibernate/search/mapper/orm/mapping/impl/HibernateOrmMappingConfigurationContributor.java
 index b04d92857d..a990dab6c6 100644
@@ -1158,13 +1158,13 @@ index b04d92857d..a990dab6c6 100644
 +++ b/main/java/org/hibernate/search/mapper/orm/mapping/impl/HibernateOrmMappingConfigurationContributor.java
 @@ -59,9 +59,8 @@ public void configure(MappingBuildContext buildContext, PojoMappingConfiguration
  			}
- 
+
  			// Sort the properties before processing for deterministic iteration
 -			@SuppressWarnings("unchecked") // Hibernate ORM gives us raw types, we must make do.
  			List<Property> properties =
 -					HibernateOrmUtils.sortedNonSyntheticProperties( persistentClass.getPropertyIterator() );
 +					HibernateOrmUtils.sortedNonSyntheticProperties( persistentClass.getProperties().iterator() );
- 
+
  			Property identifierProperty = persistentClass.getIdentifierProperty();
  			Optional<Property> identifierPropertyOptional = Optional.ofNullable( identifierProperty );
 @@ -125,9 +124,8 @@ private void contributeEmbeddableTypeMetadata(
@@ -1183,9 +1183,9 @@ index e737b7c23b..55cc7ffe23 100644
 --- a/main/java/org/hibernate/search/mapper/orm/mapping/impl/HibernateOrmMappingInitiator.java
 +++ b/main/java/org/hibernate/search/mapper/orm/mapping/impl/HibernateOrmMappingInitiator.java
 @@ -8,10 +8,9 @@
- 
+
  import java.util.List;
- 
+
 -import org.hibernate.MultiTenancyStrategy;
  import org.hibernate.annotations.common.reflection.ReflectionManager;
  import org.hibernate.boot.Metadata;
@@ -1202,7 +1202,7 @@ index e737b7c23b..55cc7ffe23 100644
 -				HibernateOrmUtils.getServiceOrFail( serviceRegistry, ConfigurationService.class );
  		HibernateSearchPreIntegrationService preIntegrationService =
  				HibernateOrmUtils.getServiceOrFail( serviceRegistry, HibernateSearchPreIntegrationService.class );
- 
+
 +		boolean multiTenancyEnabled = ( (MetadataImplementor) metadata ).getMetadataBuildingOptions()
 +				.isMultiTenancyEnabled();
 +
@@ -1210,12 +1210,12 @@ index e737b7c23b..55cc7ffe23 100644
 -				ormConfigurationService, preIntegrationService );
 +				preIntegrationService, multiTenancyEnabled );
  	}
- 
+
  	private final HibernateOrmBasicTypeMetadataProvider basicTypeMetadataProvider;
 @@ -87,10 +87,10 @@ public static HibernateOrmMappingInitiator create(Metadata metadata, IndexView j
  	private BeanHolder<? extends CoordinationStrategy> coordinationStrategyHolder;
  	private ConfiguredAutomaticIndexingStrategy configuredAutomaticIndexingStrategy;
- 
+
 -	private HibernateOrmMappingInitiator(HibernateOrmBasicTypeMetadataProvider basicTypeMetadataProvider,
 +	private HibernateOrmMappingInitiator(
 +			HibernateOrmBasicTypeMetadataProvider basicTypeMetadataProvider,
@@ -1224,12 +1224,12 @@ index e737b7c23b..55cc7ffe23 100644
 -			HibernateSearchPreIntegrationService preIntegrationService) {
 +			HibernateSearchPreIntegrationService preIntegrationService, boolean multiTenancyEnabled) {
  		super( introspector );
- 
+
  		this.basicTypeMetadataProvider = basicTypeMetadataProvider;
 @@ -99,19 +99,7 @@ private HibernateOrmMappingInitiator(HibernateOrmBasicTypeMetadataProvider basic
  		}
  		this.introspector = introspector;
- 
+
 -		/*
 -		 * This method is called when the session factory is created, and once again when HSearch boots.
 -		 * It logs a warning when the configuration property is invalid,
@@ -1244,17 +1244,17 @@ index e737b7c23b..55cc7ffe23 100644
 -				? TenancyMode.SINGLE_TENANCY
 -				: TenancyMode.MULTI_TENANCY );
 +		tenancyMode( multiTenancyEnabled ? TenancyMode.MULTI_TENANCY : TenancyMode.SINGLE_TENANCY );
- 
+
  		this.preIntegrationService = preIntegrationService;
  	}
 diff --git a/main/java/org/hibernate/search/mapper/orm/mapping/impl/HibernateOrmMappingPropertiesMetadataContributor.java b/main/java/org/hibernate/search/mapper/orm/mapping/impl/HibernateOrmMappingPropertiesMetadataContributor.java
-index 746e9621a5..23ebbba4d6 100644
+index 746e9621a5..039d5a2ef1 100644
 --- a/main/java/org/hibernate/search/mapper/orm/mapping/impl/HibernateOrmMappingPropertiesMetadataContributor.java
 +++ b/main/java/org/hibernate/search/mapper/orm/mapping/impl/HibernateOrmMappingPropertiesMetadataContributor.java
 @@ -10,12 +10,14 @@
  import java.util.List;
  import java.util.StringTokenizer;
- 
+
 +import org.hibernate.boot.Metadata;
 +import org.hibernate.dialect.Dialect;
 +import org.hibernate.engine.jdbc.Size;
@@ -1267,9 +1267,9 @@ index 746e9621a5..23ebbba4d6 100644
  import org.hibernate.mapping.SimpleValue;
  import org.hibernate.mapping.ToOne;
  import org.hibernate.mapping.Value;
-@@ -95,13 +97,18 @@ else if ( value instanceof SimpleValue ) {
+@@ -95,13 +97,24 @@ else if ( value instanceof SimpleValue ) {
  	}
- 
+
  	private void collectScale(PojoAdditionalMetadataCollectorPropertyNode collector, Value value) {
 -		Iterator<Selectable> ci = value.getColumnIterator();
 -		while ( ci.hasNext() ) {
@@ -1277,6 +1277,12 @@ index 746e9621a5..23ebbba4d6 100644
 -			if ( selectable instanceof Column ) {
 -				int scale = ( (Column) selectable ).getScale();
 -				collector.value( getExtractorPath( value ) ).decimalScale( scale );
++		// If it is a formula we have nothing to collect.
++		//  Additionally, starting with ORM 6.0 this will start causing AssertionFailure exceptions,
++		//  see org.hibernate.mapping.SimpleValue#getColumns()
++		if ( value.hasFormula() ) {
++			return;
++		}
 +		Iterator<Column> columnIterator = value.getColumns().iterator();
 +		Dialect dialect = basicTypeMetadataProvider.getDialect();
 +		Metadata metadata = basicTypeMetadataProvider.getMetadata();
@@ -1291,13 +1297,13 @@ index 746e9621a5..23ebbba4d6 100644
 +			collector.value( getExtractorPath( value ) ).decimalScale( scale );
  		}
  	}
- 
+
 diff --git a/main/java/org/hibernate/search/mapper/orm/model/impl/HibernateOrmBasicTypeMetadataProvider.java b/main/java/org/hibernate/search/mapper/orm/model/impl/HibernateOrmBasicTypeMetadataProvider.java
 index 73bfa52679..b604b66e20 100644
 --- a/main/java/org/hibernate/search/mapper/orm/model/impl/HibernateOrmBasicTypeMetadataProvider.java
 +++ b/main/java/org/hibernate/search/mapper/orm/model/impl/HibernateOrmBasicTypeMetadataProvider.java
 @@ -16,13 +16,14 @@
- 
+
  import org.hibernate.MappingException;
  import org.hibernate.boot.Metadata;
 +import org.hibernate.dialect.Dialect;
@@ -1306,29 +1312,29 @@ index 73bfa52679..b604b66e20 100644
  import org.hibernate.mapping.Property;
  import org.hibernate.mapping.Value;
  import org.hibernate.property.access.spi.Getter;
- 
+
 -@SuppressWarnings("unchecked") // Hibernate ORM gives us raw types, we must make do.
 +@SuppressWarnings("unchecked") // Hibernate Commons annotations gives us wildcard types, we must make do.
  public class HibernateOrmBasicTypeMetadataProvider {
- 
+
  	public static HibernateOrmBasicTypeMetadataProvider create(Metadata metadata) {
 @@ -34,7 +35,7 @@ public static HibernateOrmBasicTypeMetadataProvider create(Metadata metadata) {
  				new TreeSet<>( Comparator.comparing( PersistentClass::getEntityName ) );
  		persistentClasses.addAll( metadata.getEntityBindings() );
- 
+
 -		Builder builder = new Builder();
 +		Builder builder = new Builder( metadata );
- 
+
  		for ( PersistentClass persistentClass : persistentClasses ) {
  			collectPersistentClass( builder, persistentClass );
 @@ -55,7 +56,7 @@ private static void collectPersistentClass(Builder metadataProviderBuilder, Pers
- 
+
  			collectClassType(
  					metadataProviderBuilder, javaClass,
 -					persistentClass.getIdentifierProperty(), persistentClass.getPropertyIterator()
 +					persistentClass.getIdentifierProperty(), persistentClass.getProperties().iterator()
  			);
- 
+
  			metadataProviderBuilder.typeIdentifierResolverBuilder.addClassEntityType(
 @@ -66,7 +67,7 @@ private static void collectPersistentClass(Builder metadataProviderBuilder, Pers
  			collectDynamicMapType(
@@ -1337,7 +1343,7 @@ index 73bfa52679..b604b66e20 100644
 -					persistentClass.getIdentifierProperty(), persistentClass.getPropertyIterator()
 +					persistentClass.getIdentifierProperty(), persistentClass.getProperties().iterator()
  			);
- 
+
  			metadataProviderBuilder.typeIdentifierResolverBuilder.addDynamicMapEntityType(
 @@ -160,7 +161,7 @@ else if ( value instanceof org.hibernate.mapping.Array ) {
  		else if ( value instanceof org.hibernate.mapping.Map ) {
@@ -1377,7 +1383,7 @@ index 73bfa52679..b604b66e20 100644
  			return HibernateOrmTypeModelFactory.rawType( javaClass );
  		}
  	}
- 
+
 +	private final Metadata metadata;
 +
  	private final Map<String, PersistentClass> persistentClasses;
@@ -1385,7 +1391,7 @@ index 73bfa52679..b604b66e20 100644
  	private final Map<String, HibernateOrmBasicDynamicMapTypeMetadata> dynamicMapTypeMetadata;
 @@ -229,6 +232,7 @@ private static HibernateOrmTypeModelFactory<?> collectEmbedded(Builder metadataP
  	private final HibernateOrmRawTypeIdentifierResolver typeIdentifierResolver;
- 
+
  	private HibernateOrmBasicTypeMetadataProvider(Builder builder) {
 +		this.metadata = builder.metadata;
  		this.persistentClasses = builder.persistentClasses;
@@ -1394,7 +1400,7 @@ index 73bfa52679..b604b66e20 100644
 @@ -236,6 +240,14 @@ private HibernateOrmBasicTypeMetadataProvider(Builder builder) {
  		this.typeIdentifierResolver = builder.typeIdentifierResolverBuilder.build();
  	}
- 
+
 +	public Metadata getMetadata() {
 +		return metadata;
 +	}
@@ -1408,7 +1414,7 @@ index 73bfa52679..b604b66e20 100644
  	}
 @@ -267,6 +279,8 @@ Set<String> getKnownDynamicMapTypeNames() {
  	}
- 
+
  	private static class Builder {
 +		private final Metadata metadata;
 +
@@ -1418,7 +1424,7 @@ index 73bfa52679..b604b66e20 100644
 @@ -275,6 +289,10 @@ private static class Builder {
  		private final HibernateOrmRawTypeIdentifierResolver.Builder typeIdentifierResolverBuilder =
  				new HibernateOrmRawTypeIdentifierResolver.Builder();
- 
+
 +		public Builder(Metadata metadata) {
 +			this.metadata = metadata;
 +		}
@@ -1432,11 +1438,11 @@ index 1e978c8d18..e99b682d70 100644
 +++ b/main/java/org/hibernate/search/mapper/orm/model/impl/HibernateOrmPathDefinitionProvider.java
 @@ -7,7 +7,6 @@
  package org.hibernate.search.mapper.orm.model.impl;
- 
+
  import java.util.ArrayList;
 -import java.util.Iterator;
  import java.util.List;
- 
+
  import org.hibernate.mapping.PersistentClass;
 @@ -38,8 +37,7 @@ public HibernateOrmPathDefinitionProvider(PojoRawTypeModel<?> typeModel, Persist
  		this.typeModel = typeModel;
@@ -1484,7 +1490,7 @@ index 9bb356037e..7612f14f70 100644
 +++ b/main/java/org/hibernate/search/mapper/orm/search/query/impl/HibernateOrmSearchQueryAdapter.java
 @@ -7,34 +7,30 @@
  package org.hibernate.search.mapper.orm.search.query.impl;
- 
+
  import java.lang.invoke.MethodHandles;
 -import java.util.Calendar;
 -import java.util.Collections;
@@ -1494,14 +1500,14 @@ index 9bb356037e..7612f14f70 100644
  import java.util.Map;
 -import java.util.Set;
  import java.util.concurrent.TimeUnit;
- 
+
 -import jakarta.persistence.FlushModeType;
 -import jakarta.persistence.LockModeType;
 -import jakarta.persistence.Parameter;
 -import jakarta.persistence.QueryTimeoutException;
 -import jakarta.persistence.TemporalType;
 +import java.util.function.Function;
- 
+
  import org.hibernate.HibernateException;
  import org.hibernate.LockMode;
  import org.hibernate.LockOptions;
@@ -1538,7 +1544,7 @@ index 9bb356037e..7612f14f70 100644
  import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 -import org.hibernate.transform.ResultTransformer;
 -import org.hibernate.type.Type;
- 
+
 -@SuppressForbiddenApis(reason = "We need to extend the internal AbstractProducedQuery"
 +import jakarta.persistence.LockModeType;
 +import jakarta.persistence.Parameter;
@@ -1550,19 +1556,19 @@ index 9bb356037e..7612f14f70 100644
  @SuppressWarnings("unchecked") // For some reason javac issues warnings for all methods returning this; IDEA doesn't.
 -public final class HibernateOrmSearchQueryAdapter<R> extends AbstractProducedQuery<R> {
 +public final class HibernateOrmSearchQueryAdapter<R> extends AbstractQuery<R> {
- 
+
  	public static <R> HibernateOrmSearchQueryAdapter<R> create(SearchQuery<R> query) {
  		return query.extension( HibernateOrmSearchQueryAdapterExtension.get() );
 @@ -62,14 +60,12 @@ public static <R> HibernateOrmSearchQueryAdapter<R> create(SearchQuery<R> query)
  	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
- 
+
  	private final SearchQueryImplementor<R> delegate;
 -	private final MutableEntityLoadingOptions loadingOptions;
- 
+
 -	private Integer firstResult;
 -	private Integer maxResults;
 +	private final MutableEntityLoadingOptions loadingOptions;
- 
+
  	HibernateOrmSearchQueryAdapter(SearchQueryImplementor<R> delegate, SessionImplementor sessionImplementor,
  			MutableEntityLoadingOptions loadingOptions) {
 -		super( sessionImplementor, new ParameterMetadataImpl( null, null ) );
@@ -1571,7 +1577,7 @@ index 9bb356037e..7612f14f70 100644
  		this.loadingOptions = loadingOptions;
  	}
 @@ -85,83 +81,26 @@ public String toString() {
- 
+
  	@Override
  	@SuppressWarnings("unchecked")
 -	public <T> T unwrap(Class<T> type) {
@@ -1588,7 +1594,7 @@ index 9bb356037e..7612f14f70 100644
 +			throw new PersistenceException( "Unrecognized unwrap type [" + cls.getName() + "]" );
  		}
  	}
- 
+
  	@Override
  	public List<R> list() {
 -		/*
@@ -1659,7 +1665,7 @@ index 9bb356037e..7612f14f70 100644
 -		super.setFlushMode( flushModeType );
 -		return this;
  	}
- 
+
  	@Override
 @@ -181,14 +120,12 @@ public HibernateOrmSearchQueryAdapter<R> setHint(String hintName, Object value)
  				break;
@@ -1680,7 +1686,7 @@ index 9bb356037e..7612f14f70 100644
  		return this;
 @@ -201,150 +138,107 @@ public HibernateOrmSearchQueryAdapter<R> setTimeout(int timeout) {
  	}
- 
+
  	@Override
 -	@SuppressWarnings({ "unchecked", "rawtypes" })
 +	@SuppressWarnings("rawtypes")
@@ -1689,20 +1695,20 @@ index 9bb356037e..7612f14f70 100644
 +		applyGraph( (RootGraphImplementor) graph, semantic );
  		return this;
  	}
- 
+
  	@Override
 -	public ScrollableResultsImplementor scroll() {
 +	public ScrollableResultsImplementor<R> scroll() {
  		return scroll( ScrollMode.FORWARD_ONLY );
  	}
- 
+
  	@Override
 -	public ScrollableResultsImplementor scroll(ScrollMode scrollMode) {
 +	protected ScrollableResultsImplementor<R> doScroll(ScrollMode scrollMode) {
  		if ( !ScrollMode.FORWARD_ONLY.equals( scrollMode ) ) {
  			throw log.canOnlyUseScrollWithScrollModeForwardsOnly( scrollMode );
  		}
- 
+
  		int chunkSize = loadingOptions.fetchSize();
  		return new HibernateOrmSearchScrollableResultsAdapter<>( delegate.scroll( chunkSize ), getMaxResults(),
 -				ScrollHitExtractor.singleObject() );
@@ -1713,7 +1719,7 @@ index 9bb356037e..7612f14f70 100644
 -		return false;
 +				Function.identity() );
  	}
- 
+
  	@Override
  	protected List<R> doList() {
 -		return delegate.fetchHits( firstResult, maxResults );
@@ -1750,11 +1756,11 @@ index 9bb356037e..7612f14f70 100644
 +		}
 +		loadingOptions.entityGraphHint( entityGraphHint, true );
  	}
- 
+
  	//-------------------------------------------------------------
  	// Unsupported ORM/JPA query methods
  	//-------------------------------------------------------------
- 
+
 -	/**
 -	 * Return an iterator on the results.
 -	 * Retrieve the object one by one (initialize it during the next() operation)
@@ -1769,13 +1775,13 @@ index 9bb356037e..7612f14f70 100644
  	public Map<String, Object> getHints() {
  		throw new UnsupportedOperationException( "Not implemented yet" );
  	}
- 
+
  	@Override
 -	public <P> HibernateOrmSearchQueryAdapter<R> setParameter(Parameter<P> tParameter, P t) {
 +	public ParameterMetadataImplementor getParameterMetadata() {
  		throw parametersNoSupported();
  	}
- 
+
  	@Override
 -	public HibernateOrmSearchQueryAdapter<R> setParameter(Parameter<Calendar> calendarParameter, Calendar calendar,
 -			TemporalType temporalType) {
@@ -1794,19 +1800,19 @@ index 9bb356037e..7612f14f70 100644
 +	protected <P> QueryParameterBinding<P> locateBinding(String name) {
  		throw parametersNoSupported();
  	}
- 
+
  	@Override
 -	public HibernateOrmSearchQueryAdapter<R> setParameter(Parameter<Date> dateParameter, Date date, TemporalType temporalType) {
 +	protected <P> QueryParameterBinding<P> locateBinding(int position) {
  		throw parametersNoSupported();
  	}
- 
+
  	@Override
 -	public HibernateOrmSearchQueryAdapter<R> setParameter(String name, Object value) {
 +	protected <P> QueryParameterBinding<P> locateBinding(Parameter<P> parameter) {
  		throw parametersNoSupported();
  	}
- 
+
  	@Override
 -	public HibernateOrmSearchQueryAdapter<R> setParameter(String name, Date value, TemporalType temporalType) {
 -		throw parametersNoSupported();
@@ -1882,17 +1888,17 @@ index 9bb356037e..7612f14f70 100644
 +	protected <P> QueryParameterBinding<P> locateBinding(QueryParameterImplementor<P> parameter) {
  		throw parametersNoSupported();
  	}
- 
+
 @@ -353,18 +247,16 @@ private UnsupportedOperationException parametersNoSupported() {
  	}
- 
+
  	@Override
 -	public HibernateOrmSearchQueryAdapter<R> setLockOptions(LockOptions lockOptions) {
 -		throw lockOptionsNotSupported();
 +	public <T> QueryImplementor<T> setTupleTransformer(TupleTransformer<T> transformer) {
 +		throw resultOrTupleTransformerNotImplemented();
  	}
- 
+
 -	@Deprecated
  	@Override
 -	public HibernateOrmSearchQueryAdapter<R> setResultTransformer(ResultTransformer transformer) {
@@ -1901,15 +1907,15 @@ index 9bb356037e..7612f14f70 100644
 +	public QueryImplementor<R> setResultListTransformer(ResultListTransformer<R> resultListTransformer) {
 +		throw resultOrTupleTransformerNotImplemented();
  	}
- 
+
 -	private UnsupportedOperationException resultTransformerNotImplemented() {
 +	private UnsupportedOperationException resultOrTupleTransformerNotImplemented() {
  		return new UnsupportedOperationException( "Result transformers are not supported in Hibernate Search queries" );
  	}
- 
+
 @@ -394,8 +286,13 @@ private UnsupportedOperationException lockOptionsNotSupported() {
  	}
- 
+
  	@Override
 -	public int executeUpdate() {
 -		throw new UnsupportedOperationException( "executeUpdate is not supported in Hibernate Search queries" );
@@ -1921,12 +1927,12 @@ index 9bb356037e..7612f14f70 100644
 +	protected int doExecuteUpdate() {
 +		throw new UnsupportedOperationException( "executeUpdate() is not supported in Hibernate Search queries" );
  	}
- 
+
  	@Override
 @@ -403,30 +300,6 @@ public HibernateOrmSearchQueryAdapter<R> setLockMode(String alias, LockMode lock
  		throw lockOptionsNotSupported();
  	}
- 
+
 -	@Deprecated
 -	@Override
 -	public Type[] getReturnTypes() {
@@ -1957,7 +1963,7 @@ index 9bb356037e..7612f14f70 100644
 @@ -445,8 +318,4 @@ private static int hintValueToInteger(Object value) {
  		}
  	}
- 
+
 -	private static RootGraph<?> hintValueToEntityGraph(Object value) {
 -		return (RootGraph<?>) value;
 -	}
@@ -1969,7 +1975,7 @@ index 9d00283d91..8a1986f613 100644
 +++ b/main/java/org/hibernate/search/mapper/orm/search/query/spi/HibernateOrmSearchScrollableResultsAdapter.java
 @@ -7,14 +7,7 @@
  package org.hibernate.search.mapper.orm.search.query.spi;
- 
+
  import java.lang.invoke.MethodHandles;
 -import java.math.BigDecimal;
 -import java.math.BigInteger;
@@ -1980,21 +1986,21 @@ index 9d00283d91..8a1986f613 100644
 -import java.util.Locale;
 -import java.util.TimeZone;
 +import java.util.function.Function;
- 
+
  import jakarta.persistence.QueryTimeoutException;
- 
+
 @@ -25,15 +18,15 @@
  import org.hibernate.search.mapper.orm.logging.impl.Log;
  import org.hibernate.search.util.common.SearchTimeoutException;
  import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 -import org.hibernate.type.Type;
- 
+
 -public class HibernateOrmSearchScrollableResultsAdapter<H> implements ScrollableResults, ScrollableResultsImplementor {
 +public class HibernateOrmSearchScrollableResultsAdapter<R, H>
 +		implements ScrollableResults<R>, ScrollableResultsImplementor<R> {
- 
+
  	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
- 
+
  	private final SearchScroll<H> scroll;
  	private final int maxResults;
 -	private final ScrollHitExtractor<? super H> hitExtractor;
@@ -2004,7 +2010,7 @@ index 9d00283d91..8a1986f613 100644
  	private int currentIndexInScroll;
 @@ -42,7 +35,7 @@ public class HibernateOrmSearchScrollableResultsAdapter<H> implements Scrollable
  	private boolean closed;
- 
+
  	public HibernateOrmSearchScrollableResultsAdapter(SearchScroll<H> scroll, int maxResults,
 -			ScrollHitExtractor<? super H> hitExtractor) {
 +			Function<? super H, ? extends R> hitExtractor) {
@@ -2014,7 +2020,7 @@ index 9d00283d91..8a1986f613 100644
 @@ -183,6 +176,11 @@ public int getRowNumber() {
  		return currentIndexInScroll;
  	}
- 
+
 +	@Override
 +	public boolean position(int position) {
 +		return setRowNumber( position );
@@ -2026,7 +2032,7 @@ index 9d00283d91..8a1986f613 100644
 @@ -196,132 +194,23 @@ public boolean setRowNumber(int rowNumber) {
  		return scroll( rowNumber - currentIndexInScroll );
  	}
- 
+
 +	// We cannot use @Override here because this method only exists in ORM 6.1.2+
 +	public void setFetchSize(int i) {
 +		throw log.cannotSetFetchSize();
@@ -2036,7 +2042,7 @@ index 9d00283d91..8a1986f613 100644
  	public boolean isClosed() {
  		return closed;
  	}
- 
+
  	@Override
 -	public Object[] get() {
 +	public R get() {
@@ -2161,12 +2167,12 @@ index 9d00283d91..8a1986f613 100644
 -		throw columnTypesNotSupported();
 +		return hitExtractor.apply( currentHit );
  	}
- 
+
  	private SearchScrollResult<H> nextChunk() {
 @@ -333,43 +222,10 @@ private SearchScrollResult<H> nextChunk() {
  		}
  	}
- 
+
 -	private UnsupportedOperationException columnTypesNotSupported() {
 -		return new UnsupportedOperationException( "column types not supported in Hibernate Search queries" );
 -	}
@@ -2176,7 +2182,7 @@ index 9d00283d91..8a1986f613 100644
  			throw log.cannotUseClosedScrollableResults();
  		}
  	}
- 
+
 -	public interface ScrollHitExtractor<H> {
 -		Object[] toArray(H hit);
 -
