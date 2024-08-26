@@ -26,7 +26,7 @@ include::../components/_custom-projection-type-important.adoc[]
 ====
 [source, JAVA, indent=0, subs="+callouts"]
 ----
-include::{sourcedirJava17}/org/hibernate/search/documentation/mapper/orm/projection/MyBookProjection.java[tags=include]
+include::{sourcedir}/org/hibernate/search/documentation/mapper/orm/projection/MyBookProjection.java[tags=include]
 ----
 <1> Annotate the record type with `@ProjectionConstructor`,
 either at the type level (if there's only one constructor)
@@ -46,7 +46,7 @@ Alternatively, the object projection can be configured explicitly with <<search-
 
 [source, JAVA, indent=0, subs="+callouts"]
 ----
-include::{sourcedirJava17}/org/hibernate/search/documentation/mapper/orm/projection/ProjectionConstructorMappingJava17IT.java[tags=projection-mapped]
+include::{sourcedir}/org/hibernate/search/documentation/mapper/orm/projection/ProjectionConstructorMappingJava17IT.java[tags=projection-mapped]
 ----
 <1> Pass the custom projection type to `.select(...)`.
 <2> Each hit will be an instance of the custom projection type,
@@ -61,7 +61,7 @@ The example above executes a projection equivalent to the following code:
 ====
 [source, JAVA, indent=0, subs="+callouts"]
 ----
-include::{sourcedirJava17}/org/hibernate/search/documentation/mapper/orm/projection/ProjectionConstructorMappingJava17IT.java[tags=projection-programmatic]
+include::{sourcedir}/org/hibernate/search/documentation/mapper/orm/projection/ProjectionConstructorMappingJava17IT.java[tags=projection-programmatic]
 ----
 ====
 
@@ -166,7 +166,7 @@ and must be applied to the constructor you wish to use for projections.
 ====
 [source, JAVA, indent=0, subs="+callouts"]
 ----
-include::{sourcedirJava17}/org/hibernate/search/documentation/mapper/orm/projection/MyAuthorProjectionClassMultiConstructor.java[tags=include]
+include::{sourcedir}/org/hibernate/search/documentation/mapper/orm/projection/MyAuthorProjectionClassMultiConstructor.java[tags=include]
 ----
 <1> Annotate the constructor to use for projections with `@ProjectionConstructor`.
 <2> Other constructors can be used for other purposes than projections,
@@ -180,7 +180,7 @@ but it requires representing that constructor in the code with a specific syntax
 ====
 [source, JAVA, indent=0, subs="+callouts"]
 ----
-include::{sourcedirJava17}/org/hibernate/search/documentation/mapper/orm/projection/MyAuthorProjectionRecordMultiConstructor.java[tags=include]
+include::{sourcedir}/org/hibernate/search/documentation/mapper/orm/projection/MyAuthorProjectionRecordMultiConstructor.java[tags=include]
 ----
 <1> Annotate the constructor to use for projections with `@ProjectionConstructor`.
 <2> The (implicit) canonical constructor uses a specific syntax, without parentheses or parameters.
@@ -198,7 +198,7 @@ Behavior and options are identical to annotation-based mapping.
 ====
 [source, JAVA, indent=0]
 ----
-include::{sourcedirJava17}/org/hibernate/search/documentation/mapper/orm/projection/ProjectionConstructorMappingJava17IT.java[tags=programmatic-mainConstructor]
+include::{sourcedir}/org/hibernate/search/documentation/mapper/orm/projection/ProjectionConstructorMappingJava17IT.java[tags=programmatic-mainConstructor]
 ----
 <1> Mark the constructor as a projection constructor.
 <2> The equivalent to <<mapping-projection-inner-explicit,explicit projection annotations>>
@@ -214,6 +214,6 @@ passing the (raw) type of the constructor parameters as arguments.
 ====
 [source, JAVA, indent=0]
 ----
-include::{sourcedirJava17}/org/hibernate/search/documentation/mapper/orm/projection/ProjectionConstructorMappingJava17IT.java[tags=programmatic-constructor]
+include::{sourcedir}/org/hibernate/search/documentation/mapper/orm/projection/ProjectionConstructorMappingJava17IT.java[tags=programmatic-constructor]
 ----
 ====

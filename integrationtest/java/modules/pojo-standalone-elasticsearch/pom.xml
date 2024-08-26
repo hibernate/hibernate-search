@@ -14,10 +14,17 @@
     <packaging>jar</packaging>
 
     <name>Hibernate Search ITs - Java - Modules - POJO/Elasticsearch</name>
-    <description>Hibernate Search integration tests for Java 11+ modules</description>
+    <description>Hibernate Search integration tests for Java 17+ modules</description>
 
     <properties>
-        <maven.compiler.release>11</maven.compiler.release>
+        <!--
+             Maven compiler plugin attempts accessing module-info files
+             and if it is compiled with a JDK version > than the one in which maven runs with
+             it will result in test compilation failure when we test against newer JDKs.
+
+             Hence, we set this release version to the min version we test against:
+         -->
+        <maven.compiler.release>17</maven.compiler.release>
         <!-- Override the default from the parent POM: here we really do want to use the modulepath -->
         <failsafe.useModulePath>true</failsafe.useModulePath>
 

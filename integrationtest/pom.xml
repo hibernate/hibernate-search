@@ -34,13 +34,10 @@
         <profile>
             <id>springITs</id>
             <activation>
-                <property>
-                    <name>java-version.test.release</name>
-                    <value>!11</value>
-                </property>
+                <!-- Hack to activate by default, except when explicitly disabled -->
+                <jdk>[17,)</jdk>
             </activation>
             <modules>
-                <!-- Spring Boot 3 requires at minimum JDK 17. Hence, we want to ignore these modules on JDK 11: -->
                 <module>mapper/orm-spring</module>
                 <module>mapper/orm-spring-uberjar</module>
                 <module>showcase/library</module>
@@ -54,7 +51,7 @@
             <id>javaModuleITs</id>
             <activation>
                 <!-- Hack to activate by default, except when explicitly disabled -->
-                <jdk>[11,)</jdk>
+                <jdk>[17,)</jdk>
             </activation>
             <modules>
                 <module>java/modules/orm-elasticsearch</module>

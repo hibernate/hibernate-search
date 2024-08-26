@@ -953,7 +953,6 @@
                                 <goal>testCompile</goal>
                             </goals>
                             <configuration>
-                                <skip>${java-version.test.java17.noParameters.skip}</skip>
                                 <proc>none</proc>
                                 <executable>${java-version.test.compiler}</executable>
                                 <testIncludes>
@@ -1183,7 +1182,7 @@
                                 <skip>${maven.compiler.testSources.noParameterCompilation.skip}</skip>
                                 <configLocation>checkstyle-noparameters.xml</configLocation>
                                 <testSourceDirectories>
-                                    <testSourceDirectory>${project.basedir}/src/test/java17-noparameters</testSourceDirectory>
+                                    <testSourceDirectory>${project.basedir}/src/test/java-noparameters</testSourceDirectory>
                                 </testSourceDirectories>
                             </configuration>
                         </execution>
