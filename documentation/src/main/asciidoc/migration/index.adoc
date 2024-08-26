@@ -52,6 +52,14 @@ with the only difference being Hibernate ORM version upgrade:
 - Elasticsearch 7.10+ or OpenSearch 1.3+ for its Elasticsearch backend;
 - Hibernate ORM 6.6.x for the Hibernate ORM integration.
 
+[WARNING]
+====
+Hibernate Search 7.2 depends on JBoss Logging 3.6 and uses its most recent APIs.
+If the application is using the JBoss Logging library either explicitly as a direct dependency
+or implicitly as a transient dependency of, e.g. Hibernate ORM or any other library,
+make sure that the resolved JBoss Logging version is 3.6; otherwise, you may see errors on startup.
+====
+
 [[artifact-changes]]
 == Artifacts
 
