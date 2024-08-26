@@ -23,7 +23,6 @@
         <java-version.main.release>${java-version.test.release}</java-version.main.release>
         <java-version.main.compiler.java_home>${java-version.test.compiler.java_home}</java-version.main.compiler.java_home>
         <java-version.main.compiler>${java-version.test.compiler}</java-version.main.compiler>
-        <java-version.test.java17.add-main-source-phase.default>generate-sources</java-version.test.java17.add-main-source-phase.default>
 
         <!-- For some reason, the failsafe plugin uses the modulepath
              even when we didn't define a module-info.java,

@@ -59,7 +59,7 @@ include::../components/_custom-projection-type-important.adoc[]
 ====
 [source, JAVA, indent=0, subs="+callouts"]
 ----
-include::{sourcedirJava17}/org/hibernate/search/documentation/search/projection/MyBookProjection.java[tags=include]
+include::{sourcedir}/org/hibernate/search/documentation/search/projection/MyBookProjection.java[tags=include]
 ----
 <1> Annotate the record type with `@ProjectionConstructor`,
 either at the type level (if there's only one constructor)
@@ -79,7 +79,7 @@ Alternatively, the object projection can be configured explicitly with <<search-
 
 [source, JAVA, indent=0, subs="+callouts"]
 ----
-include::{sourcedirJava17}/org/hibernate/search/documentation/search/projection/ProjectionDslJava17IT.java[tags=entryPoint-mapped-record]
+include::{sourcedir}/org/hibernate/search/documentation/search/projection/ProjectionDslJava17IT.java[tags=entryPoint-mapped-record]
 ----
 <1> Pass the custom projection type to `.select(...)`.
 Hibernate Search will <<mapping-projection-inner-inference,infer the inner projections>>
@@ -127,7 +127,7 @@ use the `@DocumentReferenceProjection` annotation:
 ====
 [source, JAVA, indent=0, subs="+callouts"]
 ----
-include::{sourcedirJava17}/org/hibernate/search/documentation/search/projection/MyBookDocRefAndTitleProjection.java[tags=include]
+include::{sourcedir}/org/hibernate/search/documentation/search/projection/MyBookDocRefAndTitleProjection.java[tags=include]
 ----
 <1> Annotate the record type with <<mapping-projection-basics,`@ProjectionConstructor`>>.
 <2> Annotate the parameter that should receive the document reference with `@DocumentReferenceProjection`.
@@ -137,7 +137,7 @@ in this example an <<mapping-projection-inner-inference,inferred projection>> to
 
 [source, JAVA, indent=0, subs="+callouts"]
 ----
-include::{sourcedirJava17}/org/hibernate/search/documentation/search/projection/ProjectionDslJava17IT.java[tags=projection-constructor-document-reference]
+include::{sourcedir}/org/hibernate/search/documentation/search/projection/ProjectionDslJava17IT.java[tags=projection-constructor-document-reference]
 ----
 <1> Pass the custom projection type to `.select(...)`.
 <2> Each hit will be an instance of the custom projection type,
@@ -150,7 +150,7 @@ For <<mapping-projection-programmatic,programmatic mapping>>, use `DocumentRefer
 ====
 [source, JAVA, indent=0, subs="+callouts"]
 ----
-include::{sourcedirJava17}/org/hibernate/search/documentation/search/projection/ProjectionDslJava17IT.java[tags=programmatic-document-reference-projection]
+include::{sourcedir}/org/hibernate/search/documentation/search/projection/ProjectionDslJava17IT.java[tags=programmatic-document-reference-projection]
 ----
 ====
 
@@ -183,7 +183,7 @@ use the `@EntityReferenceProjection` annotation:
 ====
 [source, JAVA, indent=0, subs="+callouts"]
 ----
-include::{sourcedirJava17}/org/hibernate/search/documentation/search/projection/MyBookEntityRefAndTitleProjection.java[tags=include]
+include::{sourcedir}/org/hibernate/search/documentation/search/projection/MyBookEntityRefAndTitleProjection.java[tags=include]
 ----
 <1> Annotate the record type with <<mapping-projection-basics,`@ProjectionConstructor`>>.
 <2> Annotate the parameter that should receive the entity reference with `@EntityReferenceProjection`.
@@ -193,7 +193,7 @@ in this example an <<mapping-projection-inner-inference,inferred projection>> to
 
 [source, JAVA, indent=0, subs="+callouts"]
 ----
-include::{sourcedirJava17}/org/hibernate/search/documentation/search/projection/ProjectionDslJava17IT.java[tags=projection-constructor-entity-reference]
+include::{sourcedir}/org/hibernate/search/documentation/search/projection/ProjectionDslJava17IT.java[tags=projection-constructor-entity-reference]
 ----
 <1> Pass the custom projection type to `.select(...)`.
 <2> Each hit will be an instance of the custom projection type,
@@ -206,7 +206,7 @@ For <<mapping-projection-programmatic,programmatic mapping>>, use `EntityReferen
 ====
 [source, JAVA, indent=0, subs="+callouts"]
 ----
-include::{sourcedirJava17}/org/hibernate/search/documentation/search/projection/ProjectionDslJava17IT.java[tags=programmatic-entity-reference-projection]
+include::{sourcedir}/org/hibernate/search/documentation/search/projection/ProjectionDslJava17IT.java[tags=programmatic-entity-reference-projection]
 ----
 ====
 
@@ -249,7 +249,7 @@ use the `@IdProjection` annotation:
 ====
 [source, JAVA, indent=0, subs="+callouts"]
 ----
-include::{sourcedirJava17}/org/hibernate/search/documentation/search/projection/MyBookIdAndTitleProjection.java[tags=include]
+include::{sourcedir}/org/hibernate/search/documentation/search/projection/MyBookIdAndTitleProjection.java[tags=include]
 ----
 <1> Annotate the record type with <<mapping-projection-basics,`@ProjectionConstructor`>>.
 <2> Annotate the parameter that should receive the entity identifier with `@IdProjection`.
@@ -260,7 +260,7 @@ in this example an <<mapping-projection-inner-inference,inferred projection>> to
 
 [source, JAVA, indent=0, subs="+callouts"]
 ----
-include::{sourcedirJava17}/org/hibernate/search/documentation/search/projection/ProjectionDslJava17IT.java[tags=projection-constructor-id]
+include::{sourcedir}/org/hibernate/search/documentation/search/projection/ProjectionDslJava17IT.java[tags=projection-constructor-id]
 ----
 <1> Pass the custom projection type to `.select(...)`.
 <2> Each hit will be an instance of the custom projection type,
@@ -273,7 +273,7 @@ For <<mapping-projection-programmatic,programmatic mapping>>, use `IdProjectionB
 ====
 [source, JAVA, indent=0, subs="+callouts"]
 ----
-include::{sourcedirJava17}/org/hibernate/search/documentation/search/projection/ProjectionDslJava17IT.java[tags=programmatic-id-projection]
+include::{sourcedir}/org/hibernate/search/documentation/search/projection/ProjectionDslJava17IT.java[tags=programmatic-id-projection]
 ----
 ====
 
@@ -337,7 +337,7 @@ use the `@EntityProjection` annotation:
 ====
 [source, JAVA, indent=0, subs="+callouts"]
 ----
-include::{sourcedirJava17}/org/hibernate/search/documentation/search/projection/MyBookEntityAndTitleProjection.java[tags=include]
+include::{sourcedir}/org/hibernate/search/documentation/search/projection/MyBookEntityAndTitleProjection.java[tags=include]
 ----
 <1> Annotate the record type with <<mapping-projection-basics,`@ProjectionConstructor`>>.
 <2> Annotate the parameter that should receive the entity with `@EntityProjection`.
@@ -348,7 +348,7 @@ in this example an <<mapping-projection-inner-inference,inferred projection>> to
 
 [source, JAVA, indent=0, subs="+callouts"]
 ----
-include::{sourcedirJava17}/org/hibernate/search/documentation/search/projection/ProjectionDslJava17IT.java[tags=projection-constructor-entity]
+include::{sourcedir}/org/hibernate/search/documentation/search/projection/ProjectionDslJava17IT.java[tags=projection-constructor-entity]
 ----
 <1> Pass the custom projection type to `.select(...)`.
 <2> Each hit will be an instance of the custom projection type,
@@ -361,7 +361,7 @@ For <<mapping-projection-programmatic,programmatic mapping>>, use `EntityProject
 ====
 [source, JAVA, indent=0, subs="+callouts"]
 ----
-include::{sourcedirJava17}/org/hibernate/search/documentation/search/projection/ProjectionDslJava17IT.java[tags=programmatic-entity-projection]
+include::{sourcedir}/org/hibernate/search/documentation/search/projection/ProjectionDslJava17IT.java[tags=programmatic-entity-projection]
 ----
 ====
 
@@ -458,7 +458,7 @@ use the `@FieldProjection` annotation on the constructor parameter:
 ====
 [source, JAVA, indent=0, subs="+callouts"]
 ----
-include::{sourcedirJava17}/org/hibernate/search/documentation/search/projection/MyBookTitleAndAuthorNamesProjection.java[tags=include]
+include::{sourcedir}/org/hibernate/search/documentation/search/projection/MyBookTitleAndAuthorNamesProjection.java[tags=include]
 ----
 <1> Annotate the record type with <<mapping-projection-basics,`@ProjectionConstructor`>>.
 <2> Annotate the parameter that should receive the field value with `@FieldProjection`.
@@ -475,7 +475,7 @@ See <<mapping-projection-inner-inference-type>> for more information.
 
 [source, JAVA, indent=0, subs="+callouts"]
 ----
-include::{sourcedirJava17}/org/hibernate/search/documentation/search/projection/ProjectionDslJava17IT.java[tags=projection-constructor-field]
+include::{sourcedir}/org/hibernate/search/documentation/search/projection/ProjectionDslJava17IT.java[tags=projection-constructor-field]
 ----
 <1> Pass the custom projection type to `.select(...)`.
 <2> Each hit will be an instance of the custom projection type,
@@ -502,7 +502,7 @@ For <<mapping-projection-programmatic,programmatic mapping>>, use `FieldProjecti
 ====
 [source, JAVA, indent=0, subs="+callouts"]
 ----
-include::{sourcedirJava17}/org/hibernate/search/documentation/search/projection/ProjectionDslJava17IT.java[tags=programmatic-field-projection]
+include::{sourcedir}/org/hibernate/search/documentation/search/projection/ProjectionDslJava17IT.java[tags=programmatic-field-projection]
 ----
 ====
 
@@ -544,7 +544,7 @@ use the `@ScoreProjection` annotation:
 ====
 [source, JAVA, indent=0, subs="+callouts"]
 ----
-include::{sourcedirJava17}/org/hibernate/search/documentation/search/projection/MyBookScoreAndTitleProjection.java[tags=include]
+include::{sourcedir}/org/hibernate/search/documentation/search/projection/MyBookScoreAndTitleProjection.java[tags=include]
 ----
 <1> Annotate the record type with <<mapping-projection-basics,`@ProjectionConstructor`>>.
 <2> Annotate the parameter that should receive the score with `@ScoreProjection`.
@@ -554,7 +554,7 @@ in this example an <<mapping-projection-inner-inference,inferred projection>> to
 
 [source, JAVA, indent=0, subs="+callouts"]
 ----
-include::{sourcedirJava17}/org/hibernate/search/documentation/search/projection/ProjectionDslJava17IT.java[tags=projection-constructor-score]
+include::{sourcedir}/org/hibernate/search/documentation/search/projection/ProjectionDslJava17IT.java[tags=projection-constructor-score]
 ----
 <1> Pass the custom projection type to `.select(...)`.
 <2> Each hit will be an instance of the custom projection type,
@@ -567,7 +567,7 @@ For <<mapping-projection-programmatic,programmatic mapping>>, use `ScoreProjecti
 ====
 [source, JAVA, indent=0, subs="+callouts"]
 ----
-include::{sourcedirJava17}/org/hibernate/search/documentation/search/projection/ProjectionDslJava17IT.java[tags=programmatic-score-projection]
+include::{sourcedir}/org/hibernate/search/documentation/search/projection/ProjectionDslJava17IT.java[tags=programmatic-score-projection]
 ----
 ====
 
@@ -631,7 +631,7 @@ use the `@DistanceProjection` annotation on the constructor parameter:
 ====
 [source, JAVA, indent=0, subs="+callouts"]
 ----
-include::{sourcedirJava17}/org/hibernate/search/documentation/search/projection/MyAuthorPlaceProjection.java[tags=include]
+include::{sourcedir}/org/hibernate/search/documentation/search/projection/MyAuthorPlaceProjection.java[tags=include]
 ----
 <1> Annotate the record type with <<mapping-projection-basics,`@ProjectionConstructor`>>.
 <2> Annotate the parameter that should receive the distance value with `@DistanceProjection`.
@@ -647,7 +647,7 @@ where `T` is `Double` or a supertype.
 
 [source, JAVA, indent=0, subs="+callouts"]
 ----
-include::{sourcedirJava17}/org/hibernate/search/documentation/search/projection/ProjectionDslJava17IT.java[tags=projection-constructor-distance]
+include::{sourcedir}/org/hibernate/search/documentation/search/projection/ProjectionDslJava17IT.java[tags=projection-constructor-distance]
 ----
 <1> Pass the custom projection type to `.select(...)`.
 <2> Pass a query parameter value, with the same name `point-param` as in the `@DistanceProjection` `fromParam` of a projection constructor.
@@ -681,7 +681,7 @@ For <<mapping-projection-programmatic,programmatic mapping>>, use `DistanceProje
 ====
 [source, JAVA, indent=0, subs="+callouts"]
 ----
-include::{sourcedirJava17}/org/hibernate/search/documentation/search/projection/ProjectionDslJava17IT.java[tags=programmatic-distance-projection]
+include::{sourcedir}/org/hibernate/search/documentation/search/projection/ProjectionDslJava17IT.java[tags=programmatic-distance-projection]
 ----
 ====
 
@@ -821,7 +821,7 @@ include::../components/_custom-projection-type-important.adoc[]
 ====
 [source, JAVA, indent=0, subs="+callouts"]
 ----
-include::{sourcedirJava17}/org/hibernate/search/documentation/search/projection/MyBookProjection.java[tags=include]
+include::{sourcedir}/org/hibernate/search/documentation/search/projection/MyBookProjection.java[tags=include]
 ----
 <1> Annotate the record type with `@ProjectionConstructor`,
 either at the type level (if there's only one constructor)
@@ -841,7 +841,7 @@ Alternatively, the object projection can be configured explicitly with <<search-
 
 [source, JAVA, indent=0, subs="+callouts"]
 ----
-include::{sourcedirJava17}/org/hibernate/search/documentation/search/projection/ProjectionDslJava17IT.java[tags=composite-mapped-record]
+include::{sourcedir}/org/hibernate/search/documentation/search/projection/ProjectionDslJava17IT.java[tags=composite-mapped-record]
 ----
 <1> Call `.composite()`.
 <2> Define the result of the projection as a custom (annotated) type.
@@ -865,7 +865,7 @@ use the `@CompositeProjection` annotation on the constructor parameter:
 ====
 [source, JAVA, indent=0, subs="+callouts"]
 ----
-include::{sourcedirJava17}/org/hibernate/search/documentation/search/projection/MyBookMiscInfoAndTitleProjection.java[tags=include]
+include::{sourcedir}/org/hibernate/search/documentation/search/projection/MyBookMiscInfoAndTitleProjection.java[tags=include]
 ----
 <1> Annotate the record type with <<mapping-projection-basics,`@ProjectionConstructor`>>.
 <2> Annotate the parameter that should receive the composite projection with `@CompositeProjection`.
@@ -876,7 +876,7 @@ in this example an <<mapping-projection-inner-inference,inferred projection>> to
 
 [source, JAVA, indent=0, subs="+callouts"]
 ----
-include::{sourcedirJava17}/org/hibernate/search/documentation/search/projection/ProjectionDslJava17IT.java[tags=projection-constructor-composite]
+include::{sourcedir}/org/hibernate/search/documentation/search/projection/ProjectionDslJava17IT.java[tags=projection-constructor-composite]
 ----
 <1> Pass the custom projection type to `.select(...)`.
 <2> Each hit will be an instance of the custom projection type,
@@ -889,7 +889,7 @@ For <<mapping-projection-programmatic,programmatic mapping>>, use `CompositeProj
 ====
 [source, JAVA, indent=0, subs="+callouts"]
 ----
-include::{sourcedirJava17}/org/hibernate/search/documentation/search/projection/ProjectionDslJava17IT.java[tags=programmatic-composite-projection]
+include::{sourcedir}/org/hibernate/search/documentation/search/projection/ProjectionDslJava17IT.java[tags=programmatic-composite-projection]
 ----
 ====
 
@@ -1104,7 +1104,7 @@ include::../components/_custom-projection-type-important.adoc[]
 ====
 [source, JAVA, indent=0, subs="+callouts"]
 ----
-include::{sourcedirJava17}/org/hibernate/search/documentation/search/projection/MyAuthorProjection.java[tags=include]
+include::{sourcedir}/org/hibernate/search/documentation/search/projection/MyAuthorProjection.java[tags=include]
 ----
 <1> Annotate the record type with `@ProjectionConstructor`,
 either at the type level (if there's only one constructor)
@@ -1118,7 +1118,7 @@ Most projections have a corresponding annotation that can be used on constructor
 
 [source, JAVA, indent=0, subs="+callouts"]
 ----
-include::{sourcedirJava17}/org/hibernate/search/documentation/search/projection/ProjectionDslJava17IT.java[tags=object-mapped-record]
+include::{sourcedir}/org/hibernate/search/documentation/search/projection/ProjectionDslJava17IT.java[tags=object-mapped-record]
 ----
 <1> Call `.object( "authors" )`.
 <2> Define the result of the projection as a custom (annotated) type.
@@ -1150,7 +1150,7 @@ use the `@ObjectProjection` annotation on the constructor parameter:
 ====
 [source, JAVA, indent=0, subs="+callouts"]
 ----
-include::{sourcedirJava17}/org/hibernate/search/documentation/search/projection/MyBookTitleAndAuthorsProjection.java[tags=include]
+include::{sourcedir}/org/hibernate/search/documentation/search/projection/MyBookTitleAndAuthorsProjection.java[tags=include]
 ----
 <1> Annotate the record type with <<mapping-projection-basics,`@ProjectionConstructor`>>.
 <2> Annotate the parameter that should receive the objects with `@ObjectProjection`.
@@ -1169,7 +1169,7 @@ in this example an <<mapping-projection-inner-inference,inferred projection>> to
 
 [source, JAVA, indent=0, subs="+callouts"]
 ----
-include::{sourcedirJava17}/org/hibernate/search/documentation/search/projection/ProjectionDslJava17IT.java[tags=projection-constructor-object]
+include::{sourcedir}/org/hibernate/search/documentation/search/projection/ProjectionDslJava17IT.java[tags=projection-constructor-object]
 ----
 <1> Pass the custom projection type to `.select(...)`.
 <2> Each hit will be an instance of the custom projection type,
@@ -1200,7 +1200,7 @@ For <<mapping-projection-programmatic,programmatic mapping>>, use `ObjectProject
 ====
 [source, JAVA, indent=0, subs="+callouts"]
 ----
-include::{sourcedirJava17}/org/hibernate/search/documentation/search/projection/ProjectionDslJava17IT.java[tags=programmatic-object-projection]
+include::{sourcedir}/org/hibernate/search/documentation/search/projection/ProjectionDslJava17IT.java[tags=programmatic-object-projection]
 ----
 ====
 
@@ -1299,7 +1299,7 @@ and the <<mapping-indexedembedded-filtering,very similar filters>> it provides:
 
 [source, JAVA, indent=0, subs="+callouts"]
 ----
-include::{sourcedirJava17}/org/hibernate/search/documentation/search/projection/filters/Human.java[tags=include;!getters-setters]
+include::{sourcedir}/org/hibernate/search/documentation/search/projection/filters/Human.java[tags=include;!getters-setters]
 ----
 
 [[search-dsl-projection-object-mapping-filters-example-includepaths]]
@@ -1322,7 +1322,7 @@ and *not* explicitly included either because `includePaths` on `parents` does no
 
 [source, JAVA, indent=0, subs="+callouts"]
 ----
-include::{sourcedirJava17}/org/hibernate/search/documentation/search/projection/filters/includepaths/HumanProjection.java[tags=include]
+include::{sourcedir}/org/hibernate/search/documentation/search/projection/filters/includepaths/HumanProjection.java[tags=include]
 ----
 ====
 
@@ -1348,7 +1348,7 @@ The following fields in particular are excluded:
 
 [source, JAVA, indent=0, subs="+callouts"]
 ----
-include::{sourcedirJava17}/org/hibernate/search/documentation/search/projection/filters/excludepaths/HumanProjection.java[tags=include]
+include::{sourcedir}/org/hibernate/search/documentation/search/projection/filters/excludepaths/HumanProjection.java[tags=include]
 ----
 ====
 
@@ -1384,7 +1384,7 @@ and *not* explicitly included either because `includePaths` on `parents` does no
 
 [source, JAVA, indent=0, subs="+callouts"]
 ----
-include::{sourcedirJava17}/org/hibernate/search/documentation/search/projection/filters/includepathsanddepth/HumanProjection.java[tags=include]
+include::{sourcedir}/org/hibernate/search/documentation/search/projection/filters/includepathsanddepth/HumanProjection.java[tags=include]
 ----
 ====
 
@@ -1540,7 +1540,7 @@ use the `@HighlightProjection` annotation on the constructor parameter:
 ====
 [source, JAVA, indent=0, subs="+callouts"]
 ----
-include::{sourcedirJava17}/org/hibernate/search/documentation/search/projection/MyBookTitleAndHighlightedDescriptionProjection.java[tags=include]
+include::{sourcedir}/org/hibernate/search/documentation/search/projection/MyBookTitleAndHighlightedDescriptionProjection.java[tags=include]
 ----
 <1> Annotate the record type with <<mapping-projection-basics,`@ProjectionConstructor`>>.
 <2> Annotate the parameter that should receive the highlights value with `@HighlightProjection`.
@@ -1551,7 +1551,7 @@ in this example an <<mapping-projection-inner-inference,inferred projection>> to
 
 [source, JAVA, indent=0, subs="+callouts"]
 ----
-include::{sourcedirJava17}/org/hibernate/search/documentation/search/projection/ProjectionDslJava17IT.java[tags=projection-constructor-highlight]
+include::{sourcedir}/org/hibernate/search/documentation/search/projection/ProjectionDslJava17IT.java[tags=projection-constructor-highlight]
 ----
 <1> Pass the custom projection type to `.select(...)`.
 <2> Each hit will be an instance of the custom projection type,
@@ -1562,7 +1562,7 @@ populated with the requested highlights and field.
 ====
 [source, JAVA, indent=0, subs="+callouts"]
 ----
-include::{sourcedirJava17}/org/hibernate/search/documentation/search/projection/MyBookHighlightedTitleProjection.java[tags=include]
+include::{sourcedir}/org/hibernate/search/documentation/search/projection/MyBookHighlightedTitleProjection.java[tags=include]
 ----
 <1> Annotate the record type with <<mapping-projection-basics,`@ProjectionConstructor`>>.
 <2> Annotate the parameter that should receive the highlights value with `@HighlightProjection`.
@@ -1573,7 +1573,7 @@ can be used for single-valued highlight projections.
 
 [source, JAVA, indent=0, subs="+callouts"]
 ----
-include::{sourcedirJava17}/org/hibernate/search/documentation/search/projection/ProjectionDslJava17IT.java[tags=projection-constructor-highlight-single]
+include::{sourcedir}/org/hibernate/search/documentation/search/projection/ProjectionDslJava17IT.java[tags=projection-constructor-highlight-single]
 ----
 <1> Pass the custom projection type to `.select(...)`.
 <2> Configure the highlighter to return a single highlighted fragment.
@@ -1604,7 +1604,7 @@ For <<mapping-projection-programmatic,programmatic mapping>>, use `HighlightProj
 ====
 [source, JAVA, indent=0, subs="+callouts"]
 ----
-include::{sourcedirJava17}/org/hibernate/search/documentation/search/projection/ProjectionDslJava17IT.java[tags=programmatic-highlight-projection]
+include::{sourcedir}/org/hibernate/search/documentation/search/projection/ProjectionDslJava17IT.java[tags=programmatic-highlight-projection]
 ----
 ====
 
