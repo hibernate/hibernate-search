@@ -1010,15 +1010,6 @@
                                     <bundledSignature>jdk-unsafe</bundledSignature>
 
                                     <!-- All following signatures should be replicated for each target JDK version we intend to support -->
-                                    <bundledSignature>jdk-deprecated-1.8</bundledSignature>
-                                    <bundledSignature>jdk-deprecated-9</bundledSignature>
-                                    <bundledSignature>jdk-deprecated-10</bundledSignature>
-                                    <bundledSignature>jdk-deprecated-11</bundledSignature>
-                                    <bundledSignature>jdk-deprecated-12</bundledSignature>
-                                    <bundledSignature>jdk-deprecated-13</bundledSignature>
-                                    <bundledSignature>jdk-deprecated-14</bundledSignature>
-                                    <bundledSignature>jdk-deprecated-15</bundledSignature>
-                                    <bundledSignature>jdk-deprecated-16</bundledSignature>
                                     <bundledSignature>jdk-deprecated-17</bundledSignature>
                                     <bundledSignature>jdk-deprecated-18</bundledSignature>
                                     <bundledSignature>jdk-deprecated-19</bundledSignature>
@@ -1026,15 +1017,6 @@
                                     <bundledSignature>jdk-deprecated-21</bundledSignature>
                                     <bundledSignature>jdk-deprecated-22</bundledSignature>
 
-                                    <bundledSignature>jdk-internal-1.8</bundledSignature>
-                                    <bundledSignature>jdk-internal-9</bundledSignature>
-                                    <bundledSignature>jdk-internal-10</bundledSignature>
-                                    <bundledSignature>jdk-internal-11</bundledSignature>
-                                    <bundledSignature>jdk-internal-12</bundledSignature>
-                                    <bundledSignature>jdk-internal-13</bundledSignature>
-                                    <bundledSignature>jdk-internal-14</bundledSignature>
-                                    <bundledSignature>jdk-internal-15</bundledSignature>
-                                    <bundledSignature>jdk-internal-16</bundledSignature>
                                     <bundledSignature>jdk-internal-17</bundledSignature>
                                     <bundledSignature>jdk-internal-18</bundledSignature>
                                     <bundledSignature>jdk-internal-19</bundledSignature>
