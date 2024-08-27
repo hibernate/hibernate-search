@@ -161,7 +161,7 @@
         <!-- Sticking to Derby 10.15 for now since later versions require JDK 17+, and we need to test with JDK 11.
              See https://db.apache.org/derby/derby_downloads.html -->
         <version.org.apache.derby>10.15.2.0</version.org.apache.derby>
-        <version.org.postgresql>42.7.3</version.org.postgresql>
+        <version.org.postgresql>42.7.4</version.org.postgresql>
         <version.org.mariadb.jdbc>3.4.1</version.org.mariadb.jdbc>
         <version.mysql.mysql-connector-j>9.0.0</version.mysql.mysql-connector-j>
         <version.com.ibm.db2.jcc>11.5.9.0</version.com.ibm.db2.jcc>
@@ -175,7 +175,7 @@
         <version.com.ibm.jbatch>2.1.1</version.com.ibm.jbatch>
 
         <!-- >>> Jakarta Batch: JBeret SE dependencies -->
-        <version.org.jboss.marshalling>2.1.4.Final</version.org.jboss.marshalling>
+        <version.org.jboss.marshalling>2.2.0.Final</version.org.jboss.marshalling>
         <version.org.wildfly.security.wildfly-security-manager>1.1.2.Final</version.org.wildfly.security.wildfly-security-manager>
         <version.org.google.guava>33.3.0-jre</version.org.google.guava>
 
