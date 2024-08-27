@@ -5,7 +5,8 @@
 package org.hibernate.search.backend.lucene.types.dsl.impl;
 
 import org.hibernate.search.backend.lucene.search.common.impl.AbstractLuceneCodecAwareSearchQueryElementFactory;
-import org.hibernate.search.backend.lucene.types.aggregation.impl.AbstractLuceneMetricCompensatedSumAggregation;
+import org.hibernate.search.backend.lucene.types.aggregation.impl.LuceneAvgCompensatedSumAggregation;
+import org.hibernate.search.backend.lucene.types.aggregation.impl.LuceneSumCompensatedSumAggregation;
 import org.hibernate.search.backend.lucene.types.codec.impl.AbstractLuceneNumericFieldCodec;
 import org.hibernate.search.backend.lucene.types.codec.impl.DocValues;
 import org.hibernate.search.backend.lucene.types.codec.impl.Indexing;
@@ -35,8 +36,16 @@ class LuceneDoubleIndexFieldTypeOptionsStep
 	@Override
 	protected AbstractLuceneCodecAwareSearchQueryElementFactory<FieldMetricAggregationBuilder.TypeSelector,
 			Double,
-			AbstractLuceneNumericFieldCodec<Double, ?>> sumAvgMetricAggregationFactory(
-					AbstractLuceneNumericFieldCodec<Double, ?> codec, String operation) {
-		return new AbstractLuceneMetricCompensatedSumAggregation.Factory<>( codec, operation );
+			AbstractLuceneNumericFieldCodec<Double, ?>> sumMetricAggregationFactory(
+					AbstractLuceneNumericFieldCodec<Double, ?> codec) {
+		return LuceneSumCompensatedSumAggregation.factory( codec );
+	}
+
+	@Override
+	protected AbstractLuceneCodecAwareSearchQueryElementFactory<FieldMetricAggregationBuilder.TypeSelector,
+			Double,
+			AbstractLuceneNumericFieldCodec<Double, ?>> avgMetricAggregationFactory(
+					AbstractLuceneNumericFieldCodec<Double, ?> codec) {
+		return LuceneAvgCompensatedSumAggregation.factory( codec );
 	}
 }
