@@ -7,7 +7,10 @@ package org.hibernate.search.backend.lucene.types.aggregation.impl;
 import org.hibernate.search.backend.lucene.lowlevel.aggregation.collector.impl.CountCollectorFactory;
 import org.hibernate.search.backend.lucene.lowlevel.docvalues.impl.JoiningLongMultiValuesSource;
 import org.hibernate.search.backend.lucene.search.aggregation.impl.AggregationRequestContext;
+import org.hibernate.search.backend.lucene.search.common.impl.LuceneSearchIndexScope;
+import org.hibernate.search.backend.lucene.search.common.impl.LuceneSearchIndexValueFieldContext;
 import org.hibernate.search.backend.lucene.types.codec.impl.AbstractLuceneNumericFieldCodec;
+import org.hibernate.search.engine.search.aggregation.spi.FieldMetricAggregationBuilder;
 
 public class LuceneCountNumericLongAggregation extends AbstractLuceneMetricNumericLongAggregation {
 
@@ -15,7 +18,7 @@ public class LuceneCountNumericLongAggregation extends AbstractLuceneMetricNumer
 		return new Factory<>( codec, "value_count" );
 	}
 
-	LuceneCountNumericLongAggregation(AbstractLuceneMetricNumericLongAggregation.Builder builder) {
+	LuceneCountNumericLongAggregation(Builder builder) {
 		super( builder );
 	}
 
@@ -24,5 +27,16 @@ public class LuceneCountNumericLongAggregation extends AbstractLuceneMetricNumer
 		CountCollectorFactory collectorFactory = new CountCollectorFactory( source );
 		collectorKey = collectorFactory.getCollectorKey();
 		context.requireCollector( collectorFactory );
+	}
+
+	protected static class Builder extends AbstractBuilder<Long> implements FieldMetricAggregationBuilder<Long> {
+		public Builder(LuceneSearchIndexScope<?> scope, LuceneSearchIndexValueFieldContext<?> field) {
+			super( scope, field );
+		}
+
+		@Override
+		public AbstractLuceneMetricNumericLongAggregation build() {
+			return new LuceneCountNumericLongAggregation( this );
+		}
 	}
 }

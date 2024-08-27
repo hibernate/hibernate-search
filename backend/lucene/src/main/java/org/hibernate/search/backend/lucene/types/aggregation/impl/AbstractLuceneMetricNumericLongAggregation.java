@@ -24,7 +24,7 @@ public abstract class AbstractLuceneMetricNumericLongAggregation extends Abstrac
 
 	protected CollectorKey<?, Long> collectorKey;
 
-	AbstractLuceneMetricNumericLongAggregation(Builder builder) {
+	AbstractLuceneMetricNumericLongAggregation(AbstractBuilder<Long> builder) {
 		super( builder );
 		this.indexNames = builder.scope.hibernateSearchIndexNames();
 		this.absoluteFieldPath = builder.field.absolutePath();
@@ -69,27 +69,11 @@ public abstract class AbstractLuceneMetricNumericLongAggregation extends Abstrac
 		@Override
 		public FieldMetricAggregationBuilder<Long> create(LuceneSearchIndexScope<?> scope,
 				LuceneSearchIndexValueFieldContext<F> field) {
-			return new Builder( scope, field, operation );
-		}
-	}
-
-	protected static class Builder extends AbstractBuilder<Long> implements FieldMetricAggregationBuilder<Long> {
-		private final String operation;
-
-		public Builder(LuceneSearchIndexScope<?> scope,
-				LuceneSearchIndexValueFieldContext<?> field,
-				String operation) {
-			super( scope, field );
-			this.operation = operation;
-		}
-
-		@Override
-		public AbstractLuceneMetricNumericLongAggregation build() {
 			if ( "value_count".equals( operation ) ) {
-				return new LuceneCountNumericLongAggregation( this );
+				return new LuceneCountNumericLongAggregation.Builder( scope, field );
 			}
 			else if ( "cardinality".equals( operation ) ) {
-				return new LuceneCountDistinctNumericLongAggregation( this );
+				return new LuceneCountDistinctNumericLongAggregation.Builder( scope, field );
 			}
 			else {
 				throw new AssertionFailure( "Aggregation operation not supported: " + operation );

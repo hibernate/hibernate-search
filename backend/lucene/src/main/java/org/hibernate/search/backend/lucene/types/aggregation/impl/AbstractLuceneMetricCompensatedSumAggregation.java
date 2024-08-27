@@ -126,41 +126,30 @@ public abstract class AbstractLuceneMetricCompensatedSumAggregation<F, E extends
 						.withConvertedType( expectedType, field );
 			}
 
-			return new Builder<>( codec, scope, field,
-					projectionConverter,
-					operation
-			);
-		}
-	}
-
-	protected static class Builder<F, E extends Number, K> extends AbstractBuilder<K>
-			implements FieldMetricAggregationBuilder<K> {
-
-		private final AbstractLuceneNumericFieldCodec<F, E> codec;
-		private final ProjectionConverter<F, ? extends K> fromFieldValueConverter;
-		private final String operation;
-
-		public Builder(AbstractLuceneNumericFieldCodec<F, E> codec, LuceneSearchIndexScope<?> scope,
-				LuceneSearchIndexValueFieldContext<F> field,
-				ProjectionConverter<F, ? extends K> fromFieldValueConverter,
-				String operation) {
-			super( scope, field );
-			this.codec = codec;
-			this.fromFieldValueConverter = fromFieldValueConverter;
-			this.operation = operation;
-		}
-
-		@Override
-		public AbstractLuceneMetricCompensatedSumAggregation<F, E, K> build() {
 			if ( "sum".equals( operation ) ) {
-				return new LuceneSumCompensatedSumAggregation<>( this );
+				return new LuceneSumCompensatedSumAggregation.Builder<>( codec, scope, field, projectionConverter );
 			}
 			else if ( "avg".equals( operation ) ) {
-				return new LuceneAvgCompensatedSumAggregation<>( this );
+				return new LuceneAvgCompensatedSumAggregation.Builder<>( codec, scope, field, projectionConverter );
 			}
 			else {
 				throw new AssertionFailure( "Aggregation operation not supported: " + operation );
 			}
+		}
+	}
+
+	protected abstract static class Builder<F, E extends Number, K> extends AbstractBuilder<K>
+			implements FieldMetricAggregationBuilder<K> {
+
+		private final AbstractLuceneNumericFieldCodec<F, E> codec;
+		private final ProjectionConverter<F, ? extends K> fromFieldValueConverter;
+
+		public Builder(AbstractLuceneNumericFieldCodec<F, E> codec, LuceneSearchIndexScope<?> scope,
+				LuceneSearchIndexValueFieldContext<F> field,
+				ProjectionConverter<F, ? extends K> fromFieldValueConverter) {
+			super( scope, field );
+			this.codec = codec;
+			this.fromFieldValueConverter = fromFieldValueConverter;
 		}
 	}
 }

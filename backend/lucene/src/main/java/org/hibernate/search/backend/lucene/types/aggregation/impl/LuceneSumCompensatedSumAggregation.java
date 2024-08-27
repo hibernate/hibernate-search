@@ -8,8 +8,11 @@ import org.hibernate.search.backend.lucene.lowlevel.aggregation.collector.impl.C
 import org.hibernate.search.backend.lucene.lowlevel.docvalues.impl.JoiningLongMultiValuesSource;
 import org.hibernate.search.backend.lucene.search.aggregation.impl.AggregationExtractContext;
 import org.hibernate.search.backend.lucene.search.aggregation.impl.AggregationRequestContext;
+import org.hibernate.search.backend.lucene.search.common.impl.LuceneSearchIndexScope;
+import org.hibernate.search.backend.lucene.search.common.impl.LuceneSearchIndexValueFieldContext;
 import org.hibernate.search.backend.lucene.types.codec.impl.AbstractLuceneNumericFieldCodec;
 import org.hibernate.search.backend.lucene.types.lowlevel.impl.LuceneNumericDomain;
+import org.hibernate.search.engine.backend.types.converter.spi.ProjectionConverter;
 
 public class LuceneSumCompensatedSumAggregation<F, E extends Number, K>
 		extends AbstractLuceneMetricCompensatedSumAggregation<F, E, K> {
@@ -18,7 +21,7 @@ public class LuceneSumCompensatedSumAggregation<F, E extends Number, K>
 		return new Factory<>( codec, "sum" );
 	}
 
-	LuceneSumCompensatedSumAggregation(AbstractLuceneMetricCompensatedSumAggregation.Builder<F, E, K> builder) {
+	LuceneSumCompensatedSumAggregation(Builder<F, E, K> builder) {
 		super( builder );
 	}
 
@@ -35,5 +38,21 @@ public class LuceneSumCompensatedSumAggregation<F, E extends Number, K>
 	E extractEncoded(AggregationExtractContext context, LuceneNumericDomain<E> numericDomain) {
 		Double sum = context.getFacets( compensatedSumCollectorKey );
 		return numericDomain.doubleToTerm( sum );
+	}
+
+	protected static class Builder<F, E extends Number, K>
+			extends AbstractLuceneMetricCompensatedSumAggregation.Builder<F, E, K> {
+
+		public Builder(AbstractLuceneNumericFieldCodec<F, E> codec,
+				LuceneSearchIndexScope<?> scope,
+				LuceneSearchIndexValueFieldContext<F> field,
+				ProjectionConverter<F, ? extends K> fromFieldValueConverter) {
+			super( codec, scope, field, fromFieldValueConverter );
+		}
+
+		@Override
+		public AbstractLuceneMetricCompensatedSumAggregation<F, E, K> build() {
+			return new LuceneSumCompensatedSumAggregation<>( this );
+		}
 	}
 }
