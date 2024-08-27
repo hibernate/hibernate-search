@@ -62,11 +62,6 @@
             <artifactId>wildfly-security-manager</artifactId>
             <scope>compile</scope>
         </dependency>
-        <dependency>
-            <groupId>com.google.guava</groupId>
-            <artifactId>guava</artifactId>
-            <scope>compile</scope>
-        </dependency>
 
         <!-- JBeret-SE and additional dependencies -->
         <dependency>

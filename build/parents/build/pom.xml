@@ -113,7 +113,7 @@
 
         <!-- >>> Jakarta Batch -->
         <version.jakarta.batch>2.1.1</version.jakarta.batch>
-        <version.org.jberet>2.2.1.Final</version.org.jberet>
+        <version.org.jberet>3.0.0.Final</version.org.jberet>
 
         <!-- >>> Java EE/Jakarta EE dependencies -->
         <!-- This is used to generate a link to the Jakarta EE javadoc -->
@@ -175,7 +175,7 @@
         <version.com.ibm.jbatch>2.1.1</version.com.ibm.jbatch>
 
         <!-- >>> Jakarta Batch: JBeret SE dependencies -->
-        <version.org.jboss.marshalling>2.1.4.Final</version.org.jboss.marshalling>
+        <version.org.jboss.marshalling>2.2.0.Final</version.org.jboss.marshalling>
         <version.org.wildfly.security.wildfly-security-manager>1.1.2.Final</version.org.wildfly.security.wildfly-security-manager>
         <version.org.google.guava>33.3.0-jre</version.org.google.guava>
 
