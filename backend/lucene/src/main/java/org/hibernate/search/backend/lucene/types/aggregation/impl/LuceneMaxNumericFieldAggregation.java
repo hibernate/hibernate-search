@@ -7,7 +7,10 @@ package org.hibernate.search.backend.lucene.types.aggregation.impl;
 import org.hibernate.search.backend.lucene.lowlevel.aggregation.collector.impl.MaxCollectorFactory;
 import org.hibernate.search.backend.lucene.lowlevel.docvalues.impl.JoiningLongMultiValuesSource;
 import org.hibernate.search.backend.lucene.search.aggregation.impl.AggregationRequestContext;
+import org.hibernate.search.backend.lucene.search.common.impl.LuceneSearchIndexScope;
+import org.hibernate.search.backend.lucene.search.common.impl.LuceneSearchIndexValueFieldContext;
 import org.hibernate.search.backend.lucene.types.codec.impl.AbstractLuceneNumericFieldCodec;
+import org.hibernate.search.engine.backend.types.converter.spi.ProjectionConverter;
 
 public class LuceneMaxNumericFieldAggregation<F, E extends Number, K>
 		extends AbstractLuceneMetricNumericFieldAggregation<F, E, K> {
@@ -25,5 +28,21 @@ public class LuceneMaxNumericFieldAggregation<F, E extends Number, K>
 		MaxCollectorFactory collectorFactory = new MaxCollectorFactory( source );
 		collectorKey = collectorFactory.getCollectorKey();
 		context.requireCollector( collectorFactory );
+	}
+
+	protected static class Builder<F, E extends Number, K>
+			extends AbstractLuceneMetricNumericFieldAggregation.Builder<F, E, K> {
+
+		public Builder(AbstractLuceneNumericFieldCodec<F, E> codec,
+				LuceneSearchIndexScope<?> scope,
+				LuceneSearchIndexValueFieldContext<F> field,
+				ProjectionConverter<F, ? extends K> fromFieldValueConverter) {
+			super( codec, scope, field, fromFieldValueConverter );
+		}
+
+		@Override
+		public AbstractLuceneMetricNumericFieldAggregation<F, E, K> build() {
+			return new LuceneMaxNumericFieldAggregation<>( this );
+		}
 	}
 }
