@@ -101,7 +101,7 @@ public abstract class AbstractLuceneMetricNumericFieldAggregation<F, E extends N
 
 		private final String operation;
 
-		public Factory(AbstractLuceneNumericFieldCodec<F, ?> codec, String operation) {
+		protected Factory(AbstractLuceneNumericFieldCodec<F, ?> codec, String operation) {
 			super( codec );
 			this.operation = operation;
 		}

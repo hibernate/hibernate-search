@@ -9,10 +9,15 @@ import org.hibernate.search.backend.lucene.lowlevel.aggregation.collector.impl.C
 import org.hibernate.search.backend.lucene.lowlevel.docvalues.impl.JoiningLongMultiValuesSource;
 import org.hibernate.search.backend.lucene.search.aggregation.impl.AggregationExtractContext;
 import org.hibernate.search.backend.lucene.search.aggregation.impl.AggregationRequestContext;
+import org.hibernate.search.backend.lucene.types.codec.impl.AbstractLuceneNumericFieldCodec;
 import org.hibernate.search.backend.lucene.types.lowlevel.impl.LuceneNumericDomain;
 
 public class LuceneAvgCompensatedSumAggregation<F, E extends Number, K>
 		extends AbstractLuceneMetricCompensatedSumAggregation<F, E, K> {
+
+	public static <F> Factory<F> factory(AbstractLuceneNumericFieldCodec<F, ?> codec) {
+		return new Factory<>( codec, "avg" );
+	}
 
 	LuceneAvgCompensatedSumAggregation(Builder<F, E, K> builder) {
 		super( builder );

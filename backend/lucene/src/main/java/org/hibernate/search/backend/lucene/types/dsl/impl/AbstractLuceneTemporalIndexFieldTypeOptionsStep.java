@@ -8,10 +8,14 @@ import java.time.temporal.TemporalAccessor;
 
 import org.hibernate.search.backend.lucene.search.predicate.impl.LucenePredicateTypeKeys;
 import org.hibernate.search.backend.lucene.search.projection.impl.LuceneFieldProjection;
-import org.hibernate.search.backend.lucene.types.aggregation.impl.AbstractLuceneMetricNumericFieldAggregation;
-import org.hibernate.search.backend.lucene.types.aggregation.impl.AbstractLuceneMetricNumericLongAggregation;
+import org.hibernate.search.backend.lucene.types.aggregation.impl.LuceneAvgNumericFieldAggregation;
+import org.hibernate.search.backend.lucene.types.aggregation.impl.LuceneCountDistinctNumericLongAggregation;
+import org.hibernate.search.backend.lucene.types.aggregation.impl.LuceneCountNumericLongAggregation;
+import org.hibernate.search.backend.lucene.types.aggregation.impl.LuceneMaxNumericFieldAggregation;
+import org.hibernate.search.backend.lucene.types.aggregation.impl.LuceneMinNumericFieldAggregation;
 import org.hibernate.search.backend.lucene.types.aggregation.impl.LuceneNumericRangeAggregation;
 import org.hibernate.search.backend.lucene.types.aggregation.impl.LuceneNumericTermsAggregation;
+import org.hibernate.search.backend.lucene.types.aggregation.impl.LuceneSumNumericFieldAggregation;
 import org.hibernate.search.backend.lucene.types.codec.impl.AbstractLuceneNumericFieldCodec;
 import org.hibernate.search.backend.lucene.types.codec.impl.DocValues;
 import org.hibernate.search.backend.lucene.types.codec.impl.Indexing;
@@ -94,19 +98,14 @@ abstract class AbstractLuceneTemporalIndexFieldTypeOptionsStep<
 			builder.queryElementFactory( AggregationTypeKeys.RANGE, new LuceneNumericRangeAggregation.Factory<>( codec ) );
 
 			if ( sumAggregationSupported() ) {
-				builder.queryElementFactory( AggregationTypeKeys.SUM,
-					new AbstractLuceneMetricNumericFieldAggregation.Factory<>( codec, "sum" ) );
+				builder.queryElementFactory( AggregationTypeKeys.SUM, LuceneSumNumericFieldAggregation.factory( codec ) );
 			}
-			builder.queryElementFactory( AggregationTypeKeys.MIN,
-					new AbstractLuceneMetricNumericFieldAggregation.Factory<>( codec, "min" ) );
-			builder.queryElementFactory( AggregationTypeKeys.MAX,
-					new AbstractLuceneMetricNumericFieldAggregation.Factory<>( codec, "max" ) );
-			builder.queryElementFactory( AggregationTypeKeys.COUNT,
-					new AbstractLuceneMetricNumericLongAggregation.Factory<>( codec, "value_count" ) );
+			builder.queryElementFactory( AggregationTypeKeys.MIN, LuceneMinNumericFieldAggregation.factory( codec ) );
+			builder.queryElementFactory( AggregationTypeKeys.MAX, LuceneMaxNumericFieldAggregation.factory( codec ) );
+			builder.queryElementFactory( AggregationTypeKeys.COUNT, LuceneCountNumericLongAggregation.factory( codec ) );
 			builder.queryElementFactory( AggregationTypeKeys.COUNT_DISTINCT,
-					new AbstractLuceneMetricNumericLongAggregation.Factory<>( codec, "cardinality" ) );
-			builder.queryElementFactory( AggregationTypeKeys.AVG,
-					new AbstractLuceneMetricNumericFieldAggregation.Factory<>( codec, "avg" ) );
+					LuceneCountDistinctNumericLongAggregation.factory( codec ) );
+			builder.queryElementFactory( AggregationTypeKeys.AVG, LuceneAvgNumericFieldAggregation.factory( codec ) );
 		}
 
 		return builder.build();
