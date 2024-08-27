@@ -51,7 +51,7 @@ class IndexIndexerLargeDocumentsIT {
 	private static final String GREAT_EXPECTATIONS;
 	static {
 		try {
-			GREAT_EXPECTATIONS = TextContent.greatExpectations().read();
+			GREAT_EXPECTATIONS = TextContent.readGreatExpectations();
 		}
 		catch (IOException e) {
 			throw new UncheckedIOException( e );

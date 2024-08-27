@@ -7,9 +7,7 @@ package org.hibernate.search.integrationtest.performance.backend.base.testsuppor
 import java.util.ArrayList;
 import java.util.List;
 
-import com.google.common.io.LineProcessor;
-
-final class SimpleDataSampleParser implements LineProcessor<List<SampleDataset.DataSample>> {
+final class SimpleDataSampleParser {
 
 	private static final int LINES_PER_SAMPLE = 10;
 
@@ -20,7 +18,6 @@ final class SimpleDataSampleParser implements LineProcessor<List<SampleDataset.D
 	private String currentSampleFirstLine = null;
 	private final StringBuilder currentSampleWholeText = new StringBuilder();
 
-	@Override
 	public boolean processLine(String line) {
 		if ( line.isEmpty() ) {
 			return true;
@@ -39,7 +36,6 @@ final class SimpleDataSampleParser implements LineProcessor<List<SampleDataset.D
 		return true;
 	}
 
-	@Override
 	public List<SampleDataset.DataSample> getResult() {
 		pushCurrentSample();
 		return result;

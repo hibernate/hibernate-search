@@ -9,8 +9,6 @@ import java.util.List;
 
 import org.hibernate.search.util.impl.test.data.TextContent;
 
-import com.google.common.io.CharSource;
-
 public final class Datasets {
 
 	public static final String CONSTANT_TEXT = "constant-text";
@@ -26,14 +24,16 @@ public final class Datasets {
 			case CONSTANT_TEXT:
 				return new ConstantDataset();
 			case GREAT_EXPECTATIONS:
-				return new SampleDataset( parseSimple( TextContent.greatExpectations() ) );
+				return new SampleDataset( parseSimpleGreatExpectations() );
 			default:
 				throw new IllegalArgumentException( "Unknown dataset: " + name );
 		}
 	}
 
-	private static List<SampleDataset.DataSample> parseSimple(CharSource charSource) throws IOException {
-		return charSource.readLines( new SimpleDataSampleParser() );
+	private static List<SampleDataset.DataSample> parseSimpleGreatExpectations() throws IOException {
+		SimpleDataSampleParser parser = new SimpleDataSampleParser();
+		TextContent.greatExpectations( parser::processLine );
+		return parser.getResult();
 	}
 
 }

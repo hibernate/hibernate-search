@@ -9,14 +9,13 @@ import java.io.Closeable;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.nio.charset.StandardCharsets;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Consumer;
 
 import org.hibernate.search.util.impl.test.annotation.SuppressForbiddenApis;
-
-import com.google.common.base.Charsets;
 
 import org.awaitility.Awaitility;
 
@@ -60,7 +59,7 @@ public final class SystemHelper {
 	}
 
 	private static void drain(InputStream stream, Consumer<String> consumer) {
-		try ( InputStreamReader in = new InputStreamReader( stream, Charsets.UTF_8 );
+		try ( InputStreamReader in = new InputStreamReader( stream, StandardCharsets.UTF_8 );
 				BufferedReader bufferedReader = new BufferedReader( in ); ) {
 			bufferedReader.lines().forEach( consumer );
 		}

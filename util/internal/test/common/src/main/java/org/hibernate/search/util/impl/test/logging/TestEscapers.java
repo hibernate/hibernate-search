@@ -4,8 +4,7 @@
  */
 package org.hibernate.search.util.impl.test.logging;
 
-import com.google.common.escape.Escaper;
-import com.google.common.escape.Escapers;
+import java.util.Map;
 
 /**
  * Escapers to work around various bugs in test tools.
@@ -20,13 +19,19 @@ public final class TestEscapers {
 	private TestEscapers() {
 	}
 
-	private static final Escaper INSTANCE = Escapers.builder()
-			.addEscape( '\u0000', "[\\u0000]" )
-			.addEscape( '\uFFFF', "[\\uFFFF]" )
-			.build();
+	private static final Map<String, String> ESCAPE = Map.of(
+			"\u0000", "[\\u0000]",
+			"\uFFFF", "[\\uFFFF]"
+	);
 
 	public static String escape(String string) {
-		return string == null ? null : INSTANCE.escape( string );
+		if ( string == null ) {
+			return null;
+		}
+		for ( var entry : ESCAPE.entrySet() ) {
+			string = string.replace( entry.getKey(), entry.getValue() );
+		}
+		return string;
 	}
 
 }
