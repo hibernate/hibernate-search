@@ -6,21 +6,19 @@ package org.hibernate.search.integrationtest.performance.backend.base.testsuppor
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import java.io.IOException;
 import java.util.List;
 
 import org.hibernate.search.util.common.annotation.impl.SuppressJQAssistant;
 
 import org.junit.jupiter.api.Test;
 
-import com.google.common.io.CharSource;
-
 @SuppressJQAssistant(reason = "This really is a unit test, not an IT, so we want the 'Test' suffix")
 class SimpleDataSampleParserTest {
 
 	@Test
-	void test() throws IOException {
-		List<SampleDataset.DataSample> samples = CharSource.wrap( "\n"
+	void test() {
+		SimpleDataSampleParser parser = new SimpleDataSampleParser();
+		( "\n"
 				+ "This is the first real line\n"
 				+ "Followed by another one\n"
 				+ "Then a few empty lines:\n"
@@ -34,7 +32,10 @@ class SimpleDataSampleParserTest {
 				+ "\n"
 				+ "Then line 10\n"
 				+ "This is the first line of the next sample" )
-				.readLines( new SimpleDataSampleParser() );
+				.lines()
+				.forEach( parser::processLine );
+
+		List<SampleDataset.DataSample> samples = parser.getResult();
 
 		assertThat( samples ).hasSize( 2 );
 
