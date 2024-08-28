@@ -17,6 +17,7 @@ import org.hibernate.search.engine.backend.types.converter.runtime.FromDocumentV
 import org.hibernate.search.engine.backend.types.converter.spi.ProjectionConverter;
 import org.hibernate.search.engine.search.aggregation.spi.FieldMetricAggregationBuilder;
 import org.hibernate.search.engine.search.common.ValueModel;
+import org.hibernate.search.util.common.AssertionFailure;
 
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
@@ -126,9 +127,7 @@ public class ElasticsearchMetricFieldAggregation<F, K> extends AbstractElasticse
 		@Override
 		public <T> Builder<F, T> type(Class<T> expectedType, ValueModel valueModel) {
 			ProjectionConverter<F, ? extends T> projectionConverter = null;
-			if ( !Double.class.isAssignableFrom( expectedType )
-					||
-					field.type().projectionConverter( valueModel ).valueType().isAssignableFrom( expectedType ) ) {
+			if ( useProjectionConverter( expectedType, valueModel ) ) {
 				projectionConverter = field.type().projectionConverter( valueModel )
 						.withConvertedType( expectedType, field );
 			}
@@ -136,6 +135,22 @@ public class ElasticsearchMetricFieldAggregation<F, K> extends AbstractElasticse
 					projectionConverter,
 					operation
 			);
+		}
+
+		private <T> boolean useProjectionConverter(Class<T> expectedType, ValueModel valueModel) {
+			if ( !Double.class.isAssignableFrom( expectedType ) ) {
+				if ( ValueModel.RAW.equals( valueModel ) ) {
+					throw new AssertionFailure(
+							"Raw projection converter is not supported with metric aggregations at the moment" );
+				}
+				return true;
+			}
+
+			// expectedType == Double.class
+			if ( ValueModel.RAW.equals( valueModel ) ) {
+				return false;
+			}
+			return field.type().projectionConverter( valueModel ).valueType().isAssignableFrom( Double.class );
 		}
 	}
 
