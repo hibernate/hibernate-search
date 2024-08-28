@@ -19,7 +19,6 @@ import org.hibernate.search.backend.lucene.types.lowlevel.impl.LuceneNumericDoma
 import org.hibernate.search.engine.backend.types.converter.spi.ProjectionConverter;
 import org.hibernate.search.engine.search.aggregation.spi.FieldMetricAggregationBuilder;
 import org.hibernate.search.engine.search.common.ValueModel;
-import org.hibernate.search.util.common.AssertionFailure;
 
 /**
  * @param <F> The type of field values.
@@ -81,19 +80,16 @@ public abstract class AbstractLuceneMetricCompensatedSumAggregation<F, E extends
 
 	abstract E extractEncoded(AggregationExtractContext context, LuceneNumericDomain<E> numericDomain);
 
-	protected static class TypeSelector<F> implements FieldMetricAggregationBuilder.TypeSelector {
-		private final AbstractLuceneNumericFieldCodec<F, ?> codec;
-		private final LuceneSearchIndexScope<?> scope;
-		private final LuceneSearchIndexValueFieldContext<F> field;
-		private final String operation;
+	protected abstract static class TypeSelector<F> implements FieldMetricAggregationBuilder.TypeSelector {
+		protected final AbstractLuceneNumericFieldCodec<F, ?> codec;
+		protected final LuceneSearchIndexScope<?> scope;
+		protected final LuceneSearchIndexValueFieldContext<F> field;
 
 		protected TypeSelector(AbstractLuceneNumericFieldCodec<F, ?> codec,
-				LuceneSearchIndexScope<?> scope, LuceneSearchIndexValueFieldContext<F> field,
-				String operation) {
+				LuceneSearchIndexScope<?> scope, LuceneSearchIndexValueFieldContext<F> field) {
 			this.codec = codec;
 			this.scope = scope;
 			this.field = field;
-			this.operation = operation;
 		}
 
 		@Override
@@ -106,16 +102,11 @@ public abstract class AbstractLuceneMetricCompensatedSumAggregation<F, E extends
 						.withConvertedType( expectedType, field );
 			}
 
-			if ( "sum".equals( operation ) ) {
-				return new LuceneSumCompensatedSumAggregation.Builder<>( codec, scope, field, projectionConverter );
-			}
-			else if ( "avg".equals( operation ) ) {
-				return new LuceneAvgCompensatedSumAggregation.Builder<>( codec, scope, field, projectionConverter );
-			}
-			else {
-				throw new AssertionFailure( "Aggregation operation not supported: " + operation );
-			}
+			return getFtBuilder( projectionConverter );
 		}
+
+		protected abstract <T> Builder<F, ? extends Number, T> getFtBuilder(
+				ProjectionConverter<F, ? extends T> projectionConverter);
 	}
 
 	protected abstract static class Builder<F, E extends Number, K> extends AbstractBuilder<K>
