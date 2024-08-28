@@ -12,7 +12,6 @@ import org.hibernate.search.backend.lucene.lowlevel.collector.impl.CollectorKey;
 import org.hibernate.search.backend.lucene.lowlevel.docvalues.impl.JoiningLongMultiValuesSource;
 import org.hibernate.search.backend.lucene.search.aggregation.impl.AggregationExtractContext;
 import org.hibernate.search.backend.lucene.search.aggregation.impl.AggregationRequestContext;
-import org.hibernate.search.backend.lucene.search.common.impl.AbstractLuceneCodecAwareSearchQueryElementFactory;
 import org.hibernate.search.backend.lucene.search.common.impl.LuceneSearchIndexScope;
 import org.hibernate.search.backend.lucene.search.common.impl.LuceneSearchIndexValueFieldContext;
 import org.hibernate.search.backend.lucene.types.codec.impl.AbstractLuceneNumericFieldCodec;
@@ -82,32 +81,13 @@ public abstract class AbstractLuceneMetricCompensatedSumAggregation<F, E extends
 
 	abstract E extractEncoded(AggregationExtractContext context, LuceneNumericDomain<E> numericDomain);
 
-	public static class Factory<F>
-			extends AbstractLuceneCodecAwareSearchQueryElementFactory<FieldMetricAggregationBuilder.TypeSelector,
-					F,
-					AbstractLuceneNumericFieldCodec<F, ?>> {
-
-		private final String operation;
-
-		protected Factory(AbstractLuceneNumericFieldCodec<F, ?> codec, String operation) {
-			super( codec );
-			this.operation = operation;
-		}
-
-		@Override
-		public FieldMetricAggregationBuilder.TypeSelector create(LuceneSearchIndexScope<?> scope,
-				LuceneSearchIndexValueFieldContext<F> field) {
-			return new TypeSelector<>( codec, scope, field, operation );
-		}
-	}
-
-	private static class TypeSelector<F> implements FieldMetricAggregationBuilder.TypeSelector {
+	protected static class TypeSelector<F> implements FieldMetricAggregationBuilder.TypeSelector {
 		private final AbstractLuceneNumericFieldCodec<F, ?> codec;
 		private final LuceneSearchIndexScope<?> scope;
 		private final LuceneSearchIndexValueFieldContext<F> field;
 		private final String operation;
 
-		private TypeSelector(AbstractLuceneNumericFieldCodec<F, ?> codec,
+		protected TypeSelector(AbstractLuceneNumericFieldCodec<F, ?> codec,
 				LuceneSearchIndexScope<?> scope, LuceneSearchIndexValueFieldContext<F> field,
 				String operation) {
 			this.codec = codec;
