@@ -106,8 +106,10 @@ class MetricNumericFieldsAggregationsIT {
 		assertThat( result.aggregation( avgIntegersAsString ) ).isEqualTo( "5" );
 		assertThat( result.aggregation( avgConverted ) ).isEqualTo( "5" );
 		assertThat( result.aggregation( avgIntegersAsDouble ) ).isEqualTo( 5.8 );
+		assertThat( result.aggregation( avgIntegersAsDoubleRaw ) ).isEqualTo( 5.8 );
 		assertThat( result.aggregation( avgIntegersAsDoubleFiltered ) ).isEqualTo( 7.666666666666667 );
 		assertThat( result.aggregation( sumDoubles ) ).isEqualTo( 29.0 );
+		assertThat( result.aggregation( sumDoublesRaw ) ).isEqualTo( 29.0 );
 		assertThat( result.aggregation( sumFloats ) ).isEqualTo( 29F );
 		assertThat( result.aggregation( sumBigIntegers ) ).isEqualTo( BigInteger.valueOf( 29 ) );
 		assertThat( result.aggregation( sumBigDecimals ).setScale( 2, RoundingMode.CEILING ) )
@@ -146,8 +148,10 @@ class MetricNumericFieldsAggregationsIT {
 		assertThat( result.aggregation( avgIntegersAsString ) ).isEqualTo( "5" );
 		assertThat( result.aggregation( avgConverted ) ).isEqualTo( "5" );
 		assertThat( result.aggregation( avgIntegersAsDouble ) ).isEqualTo( 5.5 );
+		assertThat( result.aggregation( avgIntegersAsDoubleRaw ) ).isEqualTo( 5.5 );
 		assertThat( result.aggregation( avgIntegersAsDoubleFiltered ) ).isEqualTo( 11.8 );
 		assertThat( result.aggregation( sumDoubles ) ).isEqualTo( 55.0 );
+		assertThat( result.aggregation( sumDoublesRaw ) ).isEqualTo( 55.0 );
 		assertThat( result.aggregation( sumFloats ) ).isEqualTo( 55F );
 		assertThat( result.aggregation( sumBigIntegers ) ).isEqualTo( BigInteger.valueOf( 55 ) );
 		assertThat( result.aggregation( sumBigDecimals ).setScale( 2, RoundingMode.CEILING ) )
@@ -165,19 +169,7 @@ class MetricNumericFieldsAggregationsIT {
 			options.aggregation( sumIntegersRaw, f -> f.sum().field( "integer", Object.class, ValueModel.RAW ) );
 		} )
 				.isInstanceOf( AssertionFailure.class )
-				.hasMessageContaining( "Raw projection converter is not supported" );
-
-		assertThatThrownBy( () -> {
-			options.aggregation( avgIntegersAsDoubleRaw, f -> f.avg().field( "integer", Double.class, ValueModel.RAW ) );
-		} )
-				.isInstanceOf( AssertionFailure.class )
-				.hasMessageContaining( "Raw projection converter is not supported" );
-
-		assertThatThrownBy( () -> {
-			options.aggregation( sumDoublesRaw, f -> f.sum().field( "doubleF", Double.class, ValueModel.RAW ) );
-		} )
-				.isInstanceOf( AssertionFailure.class )
-				.hasMessageContaining( "Raw projection converter is not supported" );
+				.hasMessageContaining( "Raw projection converter is not supported with metric aggregations at the moment" );
 
 		return options
 				.aggregation( sumIntegers, f -> f.sum().field( "integer", Integer.class ) )
@@ -201,9 +193,11 @@ class MetricNumericFieldsAggregationsIT {
 				.aggregation( avgIntegersAsString, f -> f.avg().field( "integer", String.class, ValueModel.STRING ) )
 				.aggregation( avgConverted, f -> f.avg().field( "converted", String.class ) )
 				.aggregation( avgIntegersAsDouble, f -> f.avg().field( "integer", Double.class ) )
+				.aggregation( avgIntegersAsDoubleRaw, f -> f.avg().field( "integer", Double.class, ValueModel.RAW ) )
 				.aggregation( avgIntegersAsDoubleFiltered, f -> f.avg().field( "object.nestedInteger", Double.class )
 						.filter( ff -> ff.range().field( "object.nestedInteger" ).atLeast( 5 ) ) )
 				.aggregation( sumDoubles, f -> f.sum().field( "doubleF", Double.class ) )
+				.aggregation( sumDoublesRaw, f -> f.sum().field( "doubleF", Double.class, ValueModel.RAW ) )
 				.aggregation( sumFloats, f -> f.sum().field( "floatF", Float.class ) )
 				.aggregation( sumBigIntegers, f -> f.sum().field( "bigInteger", BigInteger.class ) )
 				.aggregation( sumBigDecimals, f -> f.sum().field( "bigDecimal", BigDecimal.class ) )
