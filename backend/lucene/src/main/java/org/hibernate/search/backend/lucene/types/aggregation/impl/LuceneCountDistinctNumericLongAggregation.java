@@ -7,6 +7,7 @@ package org.hibernate.search.backend.lucene.types.aggregation.impl;
 import org.hibernate.search.backend.lucene.lowlevel.aggregation.collector.impl.CountDistinctCollectorFactory;
 import org.hibernate.search.backend.lucene.lowlevel.docvalues.impl.JoiningLongMultiValuesSource;
 import org.hibernate.search.backend.lucene.search.aggregation.impl.AggregationRequestContext;
+import org.hibernate.search.backend.lucene.search.common.impl.AbstractLuceneCodecAwareSearchQueryElementFactory;
 import org.hibernate.search.backend.lucene.search.common.impl.LuceneSearchIndexScope;
 import org.hibernate.search.backend.lucene.search.common.impl.LuceneSearchIndexValueFieldContext;
 import org.hibernate.search.backend.lucene.types.codec.impl.AbstractLuceneNumericFieldCodec;
@@ -15,7 +16,7 @@ import org.hibernate.search.engine.search.aggregation.spi.FieldMetricAggregation
 public class LuceneCountDistinctNumericLongAggregation extends AbstractLuceneMetricNumericLongAggregation {
 
 	public static <F> Factory<F> factory(AbstractLuceneNumericFieldCodec<F, ?> codec) {
-		return new Factory<>( codec, "cardinality" );
+		return new Factory<>( codec );
 	}
 
 	LuceneCountDistinctNumericLongAggregation(Builder builder) {
@@ -27,6 +28,22 @@ public class LuceneCountDistinctNumericLongAggregation extends AbstractLuceneMet
 		CountDistinctCollectorFactory collectorFactory = new CountDistinctCollectorFactory( source );
 		collectorKey = collectorFactory.getCollectorKey();
 		context.requireCollector( collectorFactory );
+	}
+
+	protected static class Factory<F>
+			extends AbstractLuceneCodecAwareSearchQueryElementFactory<FieldMetricAggregationBuilder<Long>,
+					F,
+					AbstractLuceneNumericFieldCodec<F, ?>> {
+
+		protected Factory(AbstractLuceneNumericFieldCodec<F, ?> codec) {
+			super( codec );
+		}
+
+		@Override
+		public FieldMetricAggregationBuilder<Long> create(LuceneSearchIndexScope<?> scope,
+				LuceneSearchIndexValueFieldContext<F> field) {
+			return new Builder( scope, field );
+		}
 	}
 
 	protected static class Builder extends AbstractBuilder<Long> implements FieldMetricAggregationBuilder<Long> {

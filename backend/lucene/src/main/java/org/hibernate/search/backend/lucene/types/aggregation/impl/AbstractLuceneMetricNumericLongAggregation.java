@@ -10,12 +10,6 @@ import org.hibernate.search.backend.lucene.lowlevel.collector.impl.CollectorKey;
 import org.hibernate.search.backend.lucene.lowlevel.docvalues.impl.JoiningLongMultiValuesSource;
 import org.hibernate.search.backend.lucene.search.aggregation.impl.AggregationExtractContext;
 import org.hibernate.search.backend.lucene.search.aggregation.impl.AggregationRequestContext;
-import org.hibernate.search.backend.lucene.search.common.impl.AbstractLuceneCodecAwareSearchQueryElementFactory;
-import org.hibernate.search.backend.lucene.search.common.impl.LuceneSearchIndexScope;
-import org.hibernate.search.backend.lucene.search.common.impl.LuceneSearchIndexValueFieldContext;
-import org.hibernate.search.backend.lucene.types.codec.impl.AbstractLuceneNumericFieldCodec;
-import org.hibernate.search.engine.search.aggregation.spi.FieldMetricAggregationBuilder;
-import org.hibernate.search.util.common.AssertionFailure;
 
 public abstract class AbstractLuceneMetricNumericLongAggregation extends AbstractLuceneNestableAggregation<Long> {
 
@@ -51,33 +45,6 @@ public abstract class AbstractLuceneMetricNumericLongAggregation extends Abstrac
 		@Override
 		public Long extract(AggregationExtractContext context) {
 			return context.getFacets( collectorKey );
-		}
-	}
-
-	public static class Factory<F>
-			extends AbstractLuceneCodecAwareSearchQueryElementFactory<FieldMetricAggregationBuilder<Long>,
-					F,
-					AbstractLuceneNumericFieldCodec<F, ?>> {
-
-		private final String operation;
-
-		protected Factory(AbstractLuceneNumericFieldCodec<F, ?> codec, String operation) {
-			super( codec );
-			this.operation = operation;
-		}
-
-		@Override
-		public FieldMetricAggregationBuilder<Long> create(LuceneSearchIndexScope<?> scope,
-				LuceneSearchIndexValueFieldContext<F> field) {
-			if ( "value_count".equals( operation ) ) {
-				return new LuceneCountNumericLongAggregation.Builder( scope, field );
-			}
-			else if ( "cardinality".equals( operation ) ) {
-				return new LuceneCountDistinctNumericLongAggregation.Builder( scope, field );
-			}
-			else {
-				throw new AssertionFailure( "Aggregation operation not supported: " + operation );
-			}
 		}
 	}
 }
