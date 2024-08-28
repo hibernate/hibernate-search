@@ -20,7 +20,6 @@ import org.hibernate.search.engine.backend.types.converter.spi.ProjectionConvert
 import org.hibernate.search.engine.cfg.spi.NumberUtils;
 import org.hibernate.search.engine.search.aggregation.spi.FieldMetricAggregationBuilder;
 import org.hibernate.search.engine.search.common.ValueModel;
-import org.hibernate.search.util.common.AssertionFailure;
 
 /**
  * @param <F> The type of field values.
@@ -93,19 +92,16 @@ public abstract class AbstractLuceneMetricNumericFieldAggregation<F, E extends N
 		}
 	}
 
-	protected static class TypeSelector<F> implements FieldMetricAggregationBuilder.TypeSelector {
-		private final AbstractLuceneNumericFieldCodec<F, ?> codec;
-		private final LuceneSearchIndexScope<?> scope;
-		private final LuceneSearchIndexValueFieldContext<F> field;
-		private final String operation;
+	protected abstract static class TypeSelector<F> implements FieldMetricAggregationBuilder.TypeSelector {
+		protected final AbstractLuceneNumericFieldCodec<F, ?> codec;
+		protected final LuceneSearchIndexScope<?> scope;
+		protected final LuceneSearchIndexValueFieldContext<F> field;
 
 		protected TypeSelector(AbstractLuceneNumericFieldCodec<F, ?> codec,
-				LuceneSearchIndexScope<?> scope, LuceneSearchIndexValueFieldContext<F> field,
-				String operation) {
+				LuceneSearchIndexScope<?> scope, LuceneSearchIndexValueFieldContext<F> field) {
 			this.codec = codec;
 			this.scope = scope;
 			this.field = field;
-			this.operation = operation;
 		}
 
 		@Override
@@ -118,22 +114,11 @@ public abstract class AbstractLuceneMetricNumericFieldAggregation<F, E extends N
 						.withConvertedType( expectedType, field );
 			}
 
-			if ( "sum".equals( operation ) ) {
-				return new LuceneSumNumericFieldAggregation.Builder<>( codec, scope, field, projectionConverter );
-			}
-			else if ( "min".equals( operation ) ) {
-				return new LuceneMinNumericFieldAggregation.Builder<>( codec, scope, field, projectionConverter );
-			}
-			else if ( "max".equals( operation ) ) {
-				return new LuceneMaxNumericFieldAggregation.Builder<>( codec, scope, field, projectionConverter );
-			}
-			else if ( "avg".equals( operation ) ) {
-				return new LuceneAvgNumericFieldAggregation.Builder<>( codec, scope, field, projectionConverter );
-			}
-			else {
-				throw new AssertionFailure( "Aggregation operation not supported: " + operation );
-			}
+			return getFtBuilder( projectionConverter );
 		}
+
+		protected abstract <T> Builder<F, ? extends Number, T> getFtBuilder(
+				ProjectionConverter<F, ? extends T> projectionConverter);
 	}
 
 	protected abstract static class Builder<F, E extends Number, K> extends AbstractBuilder<K>

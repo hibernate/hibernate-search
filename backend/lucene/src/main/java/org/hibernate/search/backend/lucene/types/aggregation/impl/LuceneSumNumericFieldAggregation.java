@@ -44,7 +44,22 @@ public class LuceneSumNumericFieldAggregation<F, E extends Number, K>
 		@Override
 		public FieldMetricAggregationBuilder.TypeSelector create(LuceneSearchIndexScope<?> scope,
 				LuceneSearchIndexValueFieldContext<F> field) {
-			return new TypeSelector<>( codec, scope, field, "sum" );
+			return new FunctionTypeSelector<>( codec, scope, field );
+		}
+	}
+
+	protected static class FunctionTypeSelector<F> extends TypeSelector<F>
+			implements FieldMetricAggregationBuilder.TypeSelector {
+
+		protected FunctionTypeSelector(AbstractLuceneNumericFieldCodec<F, ?> codec, LuceneSearchIndexScope<?> scope,
+				LuceneSearchIndexValueFieldContext<F> field) {
+			super( codec, scope, field );
+		}
+
+		@Override
+		protected <T> Builder<F, ? extends Number, T> getFtBuilder(
+				ProjectionConverter<F, ? extends T> projectionConverter) {
+			return new Builder<>( codec, scope, field, projectionConverter );
 		}
 	}
 
