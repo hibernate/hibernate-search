@@ -4,7 +4,7 @@
     <parent>
         <groupId>org.hibernate.search</groupId>
         <artifactId>hibernate-search-integrationtest</artifactId>
-        <version>7.1.2.Final</version>
+        <version>7.1.3-SNAPSHOT</version>
     </parent>
     <artifactId>hibernate-search-integrationtest-performance</artifactId>
     <packaging>pom</packaging>
