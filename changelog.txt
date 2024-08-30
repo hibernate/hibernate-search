@@ -1,6 +1,24 @@
 Hibernate Search Changelog
 ==========================
 
+7.1.2.Final (2024-08-30)
+-------------------------
+
+** Bug
+    * HSEARCH-5226 @IndexedEmbedded fail when entity got @formula 
+    * HSEARCH-5162 ORM mass indexer fails when JPA compliance is enabled (hibernate.jpa.compliance.query=true)
+
+** Improvement
+    * HSEARCH-5216 Upgrade to Hibernate ORM 6.4.10.Final
+    * HSEARCH-5176 Mark Hibernate Search 7.1 series as compatible with Hibernate ORM 6.5
+    * HSEARCH-5169 Upgrade to Hibernate ORM 6.4.9.Final
+    * HSEARCH-5134 Upgrade to Hibernate ORM 6.4.8.Final
+
+** Task
+    * HSEARCH-5222 Update or remove Elasticsearch upgrade testing
+    * HSEARCH-5156 Address Spring Boot 3.3 upgrade nested JARs test failures
+    * HSEARCH-5123 Promote the latest version of getting started guides
+
 7.1.1.Final (2024-04-10)
 -------------------------
 
