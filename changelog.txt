@@ -1,6 +1,16 @@
 Hibernate Search Changelog
 ==========================
 
+7.2.1.Final (2024-08-30)
+-------------------------
+
+** Bug
+    * HSEARCH-5226 @IndexedEmbedded fail when entity got @formula 
+
+** Task
+    * HSEARCH-5223 Investigate the problem with outbox polling jar being marked as non-reproducible 
+    * HSEARCH-5222 Update or remove Elasticsearch upgrade testing
+
 7.2.0.Final (2024-08-09)
 -------------------------
 
