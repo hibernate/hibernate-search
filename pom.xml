@@ -285,7 +285,7 @@
         <version.jandex.plugin>3.2.2</version.jandex.plugin>
         <version.maven.injection.plugin>1.0.2</version.maven.injection.plugin>
         <version.jar.plugin>3.4.2</version.jar.plugin>
-        <version.javadoc.plugin>3.8.0</version.javadoc.plugin>
+        <version.javadoc.plugin>3.10.0</version.javadoc.plugin>
         <version.jdeps.plugin>0.5.1</version.jdeps.plugin>
         <version.processor.plugin>5.1</version.processor.plugin>
         <version.resources.plugin>3.3.1</version.resources.plugin>
