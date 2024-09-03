@@ -51,7 +51,7 @@ public final class ConstantProjectionDefinition<T> extends AbstractProjectionDef
 	}
 
 	@Override
-	public SearchProjection<T> create(SearchProjectionFactory<?, ?> factory,
+	public SearchProjection<T> create(SearchProjectionFactory<?, ?, ?> factory,
 			ProjectionDefinitionContext context) {
 		return factory.constant( value ).toProjection();
 	}

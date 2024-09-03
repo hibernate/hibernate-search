@@ -11,21 +11,22 @@ import org.hibernate.search.engine.search.predicate.dsl.SimpleBooleanPredicateCl
 import org.hibernate.search.engine.search.predicate.dsl.SimpleBooleanPredicateClausesStep;
 import org.hibernate.search.engine.search.predicate.dsl.spi.SearchPredicateDslContext;
 
-public final class SimpleBooleanPredicateClausesStepImpl
+public final class SimpleBooleanPredicateClausesStepImpl<SR>
 		extends
-		AbstractSimpleBooleanPredicateClausesStep<SimpleBooleanPredicateClausesStepImpl,
-				SimpleBooleanPredicateClausesCollector<?>>
-		implements SimpleBooleanPredicateClausesStep<SimpleBooleanPredicateClausesStepImpl> {
+		AbstractSimpleBooleanPredicateClausesStep<SR,
+				SimpleBooleanPredicateClausesStepImpl<SR>,
+				SimpleBooleanPredicateClausesCollector<SR, ?>>
+		implements SimpleBooleanPredicateClausesStep<SR, SimpleBooleanPredicateClausesStepImpl<SR>> {
 
 	public SimpleBooleanPredicateClausesStepImpl(SimpleBooleanPredicateOperator operator,
 			SearchPredicateDslContext<?> dslContext,
-			SearchPredicateFactory factory) {
+			SearchPredicateFactory<SR> factory) {
 		super( operator, dslContext, factory );
 	}
 
 	public SimpleBooleanPredicateClausesStepImpl(SimpleBooleanPredicateOperator operator,
 			SearchPredicateDslContext<?> dslContext,
-			SearchPredicateFactory factory,
+			SearchPredicateFactory<SR> factory,
 			SearchPredicate firstSearchPredicate,
 			SearchPredicate... otherSearchPredicates) {
 		this( operator, dslContext, factory );
@@ -37,7 +38,7 @@ public final class SimpleBooleanPredicateClausesStepImpl
 
 	public SimpleBooleanPredicateClausesStepImpl(SimpleBooleanPredicateOperator operator,
 			SearchPredicateDslContext<?> dslContext,
-			SearchPredicateFactory factory,
+			SearchPredicateFactory<SR> factory,
 			PredicateFinalStep firstSearchPredicate,
 			PredicateFinalStep... otherSearchPredicates) {
 		this( operator, dslContext, factory );
@@ -48,7 +49,7 @@ public final class SimpleBooleanPredicateClausesStepImpl
 	}
 
 	@Override
-	protected SimpleBooleanPredicateClausesStepImpl self() {
+	protected SimpleBooleanPredicateClausesStepImpl<SR> self() {
 		return this;
 	}
 }

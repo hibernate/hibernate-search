@@ -19,17 +19,17 @@ import org.hibernate.search.engine.search.projection.spi.ProjectionMappedTypeCon
 import org.hibernate.search.engine.search.projection.spi.SearchProjectionIndexScope;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
-public final class EntityProjectionOptionsStepImpl<E>
-		implements EntityProjectionOptionsStep<EntityProjectionOptionsStepImpl<E>, E> {
+public final class EntityProjectionOptionsStepImpl<SR, E>
+		implements EntityProjectionOptionsStep<EntityProjectionOptionsStepImpl<SR, E>, E> {
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	private final SearchProjectionIndexScope<?> scope;
-	private final SearchProjectionFactory<?, ?> projectionFactory;
+	private final SearchProjectionFactory<SR, ?, ?> projectionFactory;
 	private final Class<E> requestedEntityType;
 
 	public EntityProjectionOptionsStepImpl(SearchProjectionDslContext<?> dslContext,
-			SearchProjectionFactory<?, ?> projectionFactory, Class<E> requestedEntityType) {
+			SearchProjectionFactory<SR, ?, ?> projectionFactory, Class<E> requestedEntityType) {
 		this.scope = dslContext.scope();
 		this.projectionFactory = projectionFactory;
 		this.requestedEntityType = requestedEntityType;

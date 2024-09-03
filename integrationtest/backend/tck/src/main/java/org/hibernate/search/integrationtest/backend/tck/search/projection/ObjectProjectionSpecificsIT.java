@@ -42,7 +42,7 @@ class ObjectProjectionSpecificsIT {
 
 	@Test
 	void nullFieldPath() {
-		assertThatThrownBy( () -> index.createScope().projection().object( null ) )
+		assertThatThrownBy( () -> index.createScope().projection().object( (String) null ) )
 				.isInstanceOf( IllegalArgumentException.class )
 				.hasMessageContaining( "'objectFieldPath' must not be null" );
 	}
@@ -109,7 +109,7 @@ class ObjectProjectionSpecificsIT {
 				TckConfiguration.get().getBackendFeatures().reliesOnNestedDocumentsForMultiValuedObjectProjection(),
 				"This test is only relevant if the backend relies on nested documents to implement object projections on multi-valued fields"
 		);
-		SearchProjectionFactory<?, ?> f = index.createScope().projection();
+		SearchProjectionFactory<?, ?, ?> f = index.createScope().projection();
 		assertThatThrownBy( () -> f.object( "flattenedLevel1" ) )
 				.isInstanceOf( SearchException.class )
 				.hasMessageContainingAll( "Cannot use 'projection:object' on field 'flattenedLevel1'",
@@ -121,7 +121,7 @@ class ObjectProjectionSpecificsIT {
 
 	@Test
 	void multiValuedObjectField_singleValuedObjectProjection() {
-		SearchProjectionFactory<?, ?> f = index.createScope().projection();
+		SearchProjectionFactory<?, ?, ?> f = index.createScope().projection();
 		assertThatThrownBy( () -> f.object( "level1" )
 				.from( f.field( "level1.field1" ) )
 				.asList()

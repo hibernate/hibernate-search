@@ -140,7 +140,7 @@ public final class HighlightProjectionBinder implements ProjectionBinder {
 		}
 
 		@Override
-		public SearchProjection<? extends String> create(SearchProjectionFactory<?, ?> factory,
+		public SearchProjection<? extends String> create(SearchProjectionFactory<?, ?, ?> factory,
 				ProjectionDefinitionContext context) {
 			return factory.highlight( fieldPath ).highlighter( highlighterName ).single().toProjection();
 		}
@@ -153,7 +153,7 @@ public final class HighlightProjectionBinder implements ProjectionBinder {
 		}
 
 		@Override
-		public SearchProjection<List<String>> create(SearchProjectionFactory<?, ?> factory,
+		public SearchProjection<List<String>> create(SearchProjectionFactory<?, ?, ?> factory,
 				ProjectionDefinitionContext context) {
 			return factory.highlight( fieldPath ).highlighter( highlighterName ).toProjection();
 		}

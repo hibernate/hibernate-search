@@ -148,7 +148,7 @@ final class FullTextSessionImpl extends SessionDelegatorBaseImpl
 	}
 
 	@Override
-	public SearchQuerySelectStep<?, ?, ?, SearchLoadingOptionsStep, ?, ?> search(V5MigrationSearchScope scope) {
+	public SearchQuerySelectStep<?, ?, ?, ?, SearchLoadingOptionsStep, ?, ?> search(V5MigrationSearchScope scope) {
 		SearchSession searchSession = searchSession();
 		return searchSession.search( ( (V5MigrationOrmSearchScopeAdapter) scope ).toSearchScope() );
 	}

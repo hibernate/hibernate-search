@@ -25,13 +25,13 @@ public interface SearchQueryIndexScope<S extends SearchQueryIndexScope<?>>
 	<P> SearchQueryBuilder<P> select(BackendSessionContext sessionContext,
 			SearchLoadingContextBuilder<?, ?> loadingContextBuilder, SearchProjection<P> projection);
 
-	SearchPredicateFactory predicateFactory();
+	<SR> SearchPredicateFactory<SR> predicateFactory();
 
-	SearchSortFactory sortFactory();
+	<SR> SearchSortFactory<SR> sortFactory();
 
-	<R, E> SearchProjectionFactory<R, E> projectionFactory();
+	<SR, R, E> SearchProjectionFactory<SR, R, E> projectionFactory();
 
-	SearchAggregationFactory aggregationFactory();
+	<SR> SearchAggregationFactory<SR> aggregationFactory();
 
 	SearchHighlighterFactory highlighterFactory();
 

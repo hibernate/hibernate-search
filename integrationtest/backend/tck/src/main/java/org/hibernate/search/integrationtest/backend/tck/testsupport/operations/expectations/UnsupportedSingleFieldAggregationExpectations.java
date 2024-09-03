@@ -10,6 +10,6 @@ public interface UnsupportedSingleFieldAggregationExpectations {
 
 	String aggregationName();
 
-	void trySetup(SearchAggregationFactory factory, String fieldPath);
+	void trySetup(SearchAggregationFactory<?> factory, String fieldPath);
 
 }

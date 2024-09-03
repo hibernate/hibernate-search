@@ -20,13 +20,13 @@ class DistanceProjectionParameterSingleValuedBaseIT extends AbstractDistanceProj
 
 
 	@Override
-	protected void addParameter(SearchQueryOptionsStep<?, ?, ?, ?, ?> query, String parameterName, Object value) {
+	protected void addParameter(SearchQueryOptionsStep<?, ?, ?, ?, ?, ?> query, String parameterName, Object value) {
 		query.param( parameterName, value );
 	}
 
 	@Override
 	protected ProjectionFinalStep<Double> distance(
-			SearchProjectionFactory<EntityReference, DocumentReference> projection, String path, GeoPoint center,
+			SearchProjectionFactory<?, EntityReference, DocumentReference> projection, String path, GeoPoint center,
 			String parameterName) {
 		return projection.withParameters(
 				params -> projection.distance( path, params.get( parameterName, GeoPoint.class ) ) );
@@ -34,7 +34,7 @@ class DistanceProjectionParameterSingleValuedBaseIT extends AbstractDistanceProj
 
 	@Override
 	protected ProjectionFinalStep<List<Double>> distanceMulti(
-			SearchProjectionFactory<EntityReference, DocumentReference> projection, String path, GeoPoint center,
+			SearchProjectionFactory<?, EntityReference, DocumentReference> projection, String path, GeoPoint center,
 			String parameterName) {
 		return projection.withParameters(
 				params -> projection.distance( path, params.get( parameterName, GeoPoint.class ) ).multi() );
@@ -42,7 +42,7 @@ class DistanceProjectionParameterSingleValuedBaseIT extends AbstractDistanceProj
 
 	@Override
 	protected ProjectionFinalStep<Double> distance(
-			SearchProjectionFactory<EntityReference, DocumentReference> projection, String path, GeoPoint center,
+			SearchProjectionFactory<?, EntityReference, DocumentReference> projection, String path, GeoPoint center,
 			DistanceUnit unit, String centerParam, String unitParam) {
 		return projection.withParameters(
 				params -> projection.distance( path, params.get( centerParam, GeoPoint.class ) )
@@ -50,7 +50,7 @@ class DistanceProjectionParameterSingleValuedBaseIT extends AbstractDistanceProj
 	}
 
 	@Override
-	protected SortFinalStep sort(SearchSortFactory sort, String path, GeoPoint center, String parameterName) {
+	protected SortFinalStep sort(SearchSortFactory<?> sort, String path, GeoPoint center, String parameterName) {
 		return sort.withParameters( param -> sort.distance( path, param.get( parameterName, GeoPoint.class ) ) );
 	}
 }
