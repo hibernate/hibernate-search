@@ -30,13 +30,15 @@ public class ConfigurationPropertyProcessor implements AutoCloseable {
 	private final String javadocFolderName;
 	private final Path target;
 	private final Path output;
+	private final String javadocsBaseDir;
 
 	public ConfigurationPropertyProcessor(String javadocFolderName, String javadocsBaseLink, Path target, Path output,
-			String artifact, String moduleName) {
+			String artifact, String moduleName, String javadocsBaseDir) {
 		this.javadocFolderName = javadocFolderName;
 		this.target = target;
 		this.output = output;
 		this.fileName = artifact.startsWith( "_" ) ? artifact : "_" + artifact;
+		this.javadocsBaseDir = javadocsBaseDir;
 
 		this.propertyCollector = new ConfigurationPropertyCollector( javadocsBaseLink, locateJavaDocDirectory(), artifact,
 				moduleName
@@ -50,6 +52,7 @@ public class ConfigurationPropertyProcessor implements AutoCloseable {
 		Path output = new File( args[2] ).toPath();
 		String artifact = args[3];
 		String moduleName = args[4];
+		String javadocsBaseDir = args[5];
 
 		// we don't want to run this processor on parent poms so if that's what we got - return fast:
 		if ( artifact.startsWith( "hibernate-search-parent-public" ) ) {
@@ -62,7 +65,8 @@ public class ConfigurationPropertyProcessor implements AutoCloseable {
 				target,
 				output,
 				artifact,
-				moduleName
+				moduleName,
+				javadocsBaseDir
 		) ) {
 			processor.process();
 		}
@@ -108,7 +112,7 @@ public class ConfigurationPropertyProcessor implements AutoCloseable {
 	}
 
 	private Path locateJavaDocDirectory() {
-		Path javadocsLocation = target.resolve( "reports" ).resolve( javadocFolderName );
+		Path javadocsLocation = target.resolve( javadocsBaseDir ).resolve( javadocFolderName );
 		if ( !Files.exists( javadocsLocation ) ) {
 			throw new IllegalStateException(
 					"Was unable to locate javadocs. No processing is possible. Make sure that " +
