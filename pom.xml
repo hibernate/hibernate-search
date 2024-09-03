@@ -265,20 +265,20 @@
         <version.clean.plugin>3.4.0</version.clean.plugin>
         <version.install.plugin>3.1.3</version.install.plugin>
         <version.enforcer.plugin>3.5.0</version.enforcer.plugin>
-        <version.project-info.plugin>3.6.2</version.project-info.plugin>
-        <version.japicmp.plugin>0.22.0</version.japicmp.plugin>
+        <version.project-info.plugin>3.7.0</version.project-info.plugin>
+        <version.japicmp.plugin>0.23.0</version.japicmp.plugin>
         <version.nexus-staging.plugin>1.7.0</version.nexus-staging.plugin>
         <version.deploy.plugin>3.1.3</version.deploy.plugin>
         <version.gpg.plugin>3.2.5</version.gpg.plugin>
         <version.flatten-maven-plugin>1.6.0</version.flatten-maven-plugin>
         <version.assembly.plugin>3.7.1</version.assembly.plugin>
         <version.buildhelper.plugin>3.6.0</version.buildhelper.plugin>
-        <version.checkstyle.plugin>3.4.0</version.checkstyle.plugin>
+        <version.checkstyle.plugin>3.5.0</version.checkstyle.plugin>
         <version.bundle.plugin>5.1.9</version.bundle.plugin>
         <version.compiler.plugin>3.13.0</version.compiler.plugin>
-        <version.dependency.plugin>3.7.1</version.dependency.plugin>
+        <version.dependency.plugin>3.8.0</version.dependency.plugin>
         <!-- Check dependencies for security vulnerabilities -->
-        <version.dependency-check.plugin>10.0.3</version.dependency-check.plugin>
+        <version.dependency-check.plugin>10.0.4</version.dependency-check.plugin>
         <version.exec.plugin>3.4.1</version.exec.plugin>
         <version.forbiddenapis.plugin>3.7</version.forbiddenapis.plugin>
         <!-- Make sure that upgraded Jandex plugin aligns with the Jandex version imported from the ORM platform pom -->
@@ -292,7 +292,7 @@
         <version.shade.plugin>3.6.0</version.shade.plugin>
         <version.source.plugin>3.3.1</version.source.plugin>
         <!-- Surefire versions are a minefield of bugs: be careful with upgrades -->
-        <version.surefire.plugin>3.4.0</version.surefire.plugin>
+        <version.surefire.plugin>3.5.0</version.surefire.plugin>
         <version.surefire.plugin.java-version.asm>9.7</version.surefire.plugin.java-version.asm>
         <version.jacoco.plugin>0.8.12</version.jacoco.plugin>
         <version.com.buschmais.jqassistant.plugin>2.4.0</version.com.buschmais.jqassistant.plugin>
@@ -300,7 +300,7 @@
         <version.sonar.plugin>4.0.0.4121</version.sonar.plugin>
         <version.scripting.plugin>3.0.0</version.scripting.plugin>
         <version.org.apache.groovy.groovy-jsr223>4.0.13</version.org.apache.groovy.groovy-jsr223>
-        <version.com.puppycrawl.tools.checkstyle>10.17.0</version.com.puppycrawl.tools.checkstyle>
+        <version.com.puppycrawl.tools.checkstyle>10.18.1</version.com.puppycrawl.tools.checkstyle>
         <version.versions.plugin>2.17.1</version.versions.plugin>
         <version.maven-wrapper-plugin>3.3.2</version.maven-wrapper-plugin>
         <version.impsort-maven-plugin>1.11.0</version.impsort-maven-plugin>
