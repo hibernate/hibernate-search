@@ -38,7 +38,7 @@ public class ConfigurationPropertyProcessor implements AutoCloseable {
 		this.output = output;
 		this.fileName = artifact.startsWith( "_" ) ? artifact : "_" + artifact;
 
-		this.propertyCollector = new ConfigurationPropertyCollector( javadocsBaseLink, locateJavaDocFolder(), artifact,
+		this.propertyCollector = new ConfigurationPropertyCollector( javadocsBaseLink, locateJavaDocDirectory(), artifact,
 				moduleName
 		);
 	}
@@ -107,13 +107,13 @@ public class ConfigurationPropertyProcessor implements AutoCloseable {
 		}
 	}
 
-	private Path locateJavaDocFolder() {
-		Path site = target.resolve( "site" ).resolve( javadocFolderName );
-		if ( !Files.exists( site ) ) {
+	private Path locateJavaDocDirectory() {
+		Path javadocsLocation = target.resolve( "reports" ).resolve( javadocFolderName );
+		if ( !Files.exists( javadocsLocation ) ) {
 			throw new IllegalStateException(
 					"Was unable to locate javadocs. No processing is possible. Make sure that " +
 							"the Javadocs are generated prior to running this processor." );
 		}
-		return site;
+		return javadocsLocation;
 	}
 }
