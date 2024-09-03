@@ -363,6 +363,7 @@
         <injection-plugin.phase>compile</injection-plugin.phase>
 
         <javadoc.generate.jar.phase>none</javadoc.generate.jar.phase>
+        <javadoc.generate.html.directory>rendered-javadocs</javadoc.generate.html.directory>
 
         <logging.processor.skip.generated.annotation.compiler.argument></logging.processor.skip.generated.annotation.compiler.argument>
 
@@ -688,6 +689,9 @@
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-javadoc-plugin</artifactId>
                     <version>${version.javadoc.plugin}</version>
+                    <configuration>
+                        <outputDirectory>${project.build.directory}/${javadoc.generate.html.directory}</outputDirectory>
+                    </configuration>
                 </plugin>
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>

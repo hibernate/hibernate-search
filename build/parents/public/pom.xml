@@ -342,6 +342,7 @@
                                         <argument>${documentation.config.properties.output.directory}</argument>
                                         <argument>${project.artifactId}</argument>
                                         <argument>${project.name}</argument>
+                                        <argument>${javadoc.generate.html.directory}</argument>
                                     </arguments>
                                     <includePluginDependencies>true</includePluginDependencies>
                                 </configuration>
