@@ -4,7 +4,7 @@ jira:
   ignore:
       # See the `build-dependencies` group in the Dependabot's configuration file
     - user: dependabot[bot]
-      titlePattern: "Bump the build-dependencies group with \\d+ updates?"
+      titlePattern: "Bump.*the build-dependencies group( across \\d+ director(ies|y))?( with \\d+ updates?)?"
   ignoreFiles:
     # Git
     - ".git*"
