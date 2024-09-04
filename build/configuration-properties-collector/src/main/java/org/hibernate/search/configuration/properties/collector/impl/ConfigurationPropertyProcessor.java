@@ -30,10 +30,10 @@ public class ConfigurationPropertyProcessor implements AutoCloseable {
 	private final String javadocFolderName;
 	private final Path target;
 	private final Path output;
-	private final String javadocsBaseDir;
+	private final Path javadocsBaseDir;
 
 	public ConfigurationPropertyProcessor(String javadocFolderName, String javadocsBaseLink, Path target, Path output,
-			String artifact, String moduleName, String javadocsBaseDir) {
+			Path javadocsBaseDir, String artifact, String moduleName) {
 		this.javadocFolderName = javadocFolderName;
 		this.target = target;
 		this.output = output;
@@ -52,7 +52,7 @@ public class ConfigurationPropertyProcessor implements AutoCloseable {
 		Path output = new File( args[2] ).toPath();
 		String artifact = args[3];
 		String moduleName = args[4];
-		String javadocsBaseDir = args[5];
+		Path javadocsBaseDir = new File( args[5] ).toPath();
 
 		// we don't want to run this processor on parent poms so if that's what we got - return fast:
 		if ( artifact.startsWith( "hibernate-search-parent-public" ) ) {
@@ -64,9 +64,8 @@ public class ConfigurationPropertyProcessor implements AutoCloseable {
 				javadocsBaseLink,
 				target,
 				output,
-				artifact,
-				moduleName,
-				javadocsBaseDir
+				javadocsBaseDir, artifact,
+				moduleName
 		) ) {
 			processor.process();
 		}
@@ -112,11 +111,12 @@ public class ConfigurationPropertyProcessor implements AutoCloseable {
 	}
 
 	private Path locateJavaDocDirectory() {
-		Path javadocsLocation = target.resolve( javadocsBaseDir ).resolve( javadocFolderName );
+		Path javadocsLocation = javadocsBaseDir.resolve( javadocFolderName );
 		if ( !Files.exists( javadocsLocation ) ) {
 			throw new IllegalStateException(
-					"Was unable to locate javadocs. No processing is possible. Make sure that " +
-							"the Javadocs are generated prior to running this processor." );
+					"Was unable to locate javadocs. No processing is possible. Make sure that "
+							+ "the Javadocs are generated prior to running this processor. "
+							+ "Was expecting to find javadocs in " + javadocsLocation );
 		}
 		return javadocsLocation;
 	}
