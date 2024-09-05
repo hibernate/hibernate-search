@@ -90,16 +90,14 @@ class MassIndexingMonitorIT {
 				int expectedNumberOfLogs = NUMBER_OF_BOOKS / MASS_INDEXING_MONITOR_LOG_PERIOD;
 
 				// Example:
-				// Mass indexing progress: indexed 151 entities in 21 ms.
-				logged.expectEvent( Level.INFO, "Mass indexing progress: indexed", "entities in", "ms" ).times(
-						expectedNumberOfLogs );
+				// Indexed 75.50% 151/200. Per second: 8230.42 instant, 19755.16 overall. Remaining: 49, approximately PT0.005S.
+				logged.expectEvent( Level.INFO, "Mass indexed", "Speed", "Remaining:", "approx. PT" )
+						.times( expectedNumberOfLogs );
 
 				// Example:
-				// Mass indexing progress: 26.50%. Mass indexing speed: 2765.605713 documents/second since last message, 2765.605713 documents/second since start.
-				logged.expectEvent(
-						Level.INFO, "Mass indexing progress:", "%", "Mass indexing speed:",
-						"documents/second since last message", "documents/second since start"
-				).times( expectedNumberOfLogs );
+				// Mass indexing complete in PT0.210155998S. Indexed 200/200 entities
+				logged.expectEvent( Level.INFO, "Mass indexing complete in", "Indexed 200/200 entities" )
+						.times( 1 );
 
 				indexer.startAndWait();
 			}

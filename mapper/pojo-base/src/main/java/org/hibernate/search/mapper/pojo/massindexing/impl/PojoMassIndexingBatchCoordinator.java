@@ -268,7 +268,6 @@ public class PojoMassIndexingBatchCoordinator extends PojoMassIndexingFailureHan
 	@Override
 	protected void notifyFailure(RuntimeException exception) {
 		super.notifyFailure( exception );
-		// TODO HSEARCH-3729 Call a different method when indexing failed?
 		getNotifier().reportIndexingCompleted();
 	}
 
