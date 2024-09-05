@@ -100,15 +100,6 @@ public interface Log extends BasicLogger {
 	@Message(id = ID_OFFSET_LEGACY_ENGINE + 28, value = "Mass indexing complete. Indexed %1$d entities.")
 	void indexingEntitiesCompleted(long nbrOfEntities);
 
-	@LogMessage(level = INFO)
-	@Message(id = ID_OFFSET_LEGACY_ENGINE + 30, value = "Mass indexing progress: indexed %1$d entities in %2$d ms.")
-	void indexingProgressRaw(long doneCount, long elapsedMs);
-
-	@LogMessage(level = INFO)
-	@Message(id = ID_OFFSET_LEGACY_ENGINE + 31,
-			value = "Mass indexing progress: %3$.2f%%. Mass indexing speed: %1$f documents/second since last message, %2$f documents/second since start.")
-	void indexingProgressStats(float currentSpeed, float estimateSpeed, float estimatePercentileComplete);
-
 	@LogMessage(level = ERROR)
 	@Message(id = ID_OFFSET_LEGACY_ENGINE + 62, value = "Mass indexing received interrupt signal: aborting.")
 	void interruptedBatchIndexing();
@@ -1028,4 +1019,26 @@ public interface Log extends BasicLogger {
 	@Message(id = ID_OFFSET + 163,
 			value = "Mass indexer running in a fail fast mode encountered a problem. Stopping the process.")
 	MassIndexingOperationHandledFailureException massIndexerFailFast();
+
+	@LogMessage(level = INFO)
+	@Message(id = ID_OFFSET + 164,
+			value = "Mass indexing progress: indexed %1$d entities in %3$d ms (%2$d type(s) pending). Mass indexing speed: %4$f documents/second since last message, %5$f documents/second since start.")
+	void indexingProgress(long doneCount, long typesToIndex, long elapsedMs, float currentSpeed, float estimateSpeed);
+
+	@LogMessage(level = INFO)
+	@Message(id = ID_OFFSET + 165,
+			value = "Mass indexing progress: indexed %1$d entities in %2$d ms. Mass indexing speed: %3$f documents/second since last message, %4$f documents/second since start.")
+	void indexingProgress(long doneCount, long elapsedMs, float currentSpeed, float estimateSpeed);
+
+	@LogMessage(level = INFO)
+	@Message(id = ID_OFFSET + 166,
+			value = "Mass indexing progress: indexed %7$.2f%% %1$d/%2$d entities in %4$d ms (%3$d type(s) pending). Mass indexing speed: %5$f documents/second since last message, %6$f documents/second since start.")
+	void indexingProgress(long doneCount, long totalCount, long typesToIndex, long elapsedMs, float currentSpeed,
+			float estimateSpeed, float estimatePercentileComplete);
+
+	@LogMessage(level = INFO)
+	@Message(id = ID_OFFSET + 167,
+			value = "Mass indexing progress: indexed %6$.2f%% %1$d/%2$d entities in %3$d ms. Mass indexing speed: %4$f documents/second since last message, %5$f documents/second since start.")
+	void indexingProgress(long doneCount, long totalCount, long elapsedMs, float currentSpeed, float estimateSpeed,
+			float estimatePercentileComplete);
 }

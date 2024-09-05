@@ -4,6 +4,9 @@
  */
 package org.hibernate.search.mapper.pojo.massindexing;
 
+import org.hibernate.search.mapper.pojo.massindexing.impl.NoOpMassIndexingTypeGroupMonitor;
+import org.hibernate.search.util.common.annotation.Incubating;
+
 /**
  * A component that monitors progress of mass indexing.
  * <p>
@@ -17,6 +20,11 @@ package org.hibernate.search.mapper.pojo.massindexing;
  * @author Hardy Ferentschik
  */
 public interface MassIndexingMonitor {
+
+	@Incubating
+	default MassIndexingTypeGroupMonitor typeGroupMonitor(MassIndexingTypeGroupMonitorContext context) {
+		return NoOpMassIndexingTypeGroupMonitor.INSTANCE;
+	}
 
 	/**
 	 * Notify the monitor that {@code increment} more documents have been added to the index.
