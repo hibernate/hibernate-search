@@ -14,6 +14,7 @@ import java.lang.reflect.Type;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.nio.file.Path;
+import java.time.Duration;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
@@ -95,10 +96,6 @@ public interface Log extends BasicLogger {
 	@LogMessage(level = INFO)
 	@Message(id = ID_OFFSET_LEGACY_ENGINE + 27, value = "Mass indexing is going to index %d entities.")
 	void indexingEntities(long count);
-
-	@LogMessage(level = INFO)
-	@Message(id = ID_OFFSET_LEGACY_ENGINE + 28, value = "Mass indexing complete. Indexed %1$d entities.")
-	void indexingEntitiesCompleted(long nbrOfEntities);
 
 	@LogMessage(level = ERROR)
 	@Message(id = ID_OFFSET_LEGACY_ENGINE + 62, value = "Mass indexing received interrupt signal: aborting.")
@@ -1022,23 +1019,27 @@ public interface Log extends BasicLogger {
 
 	@LogMessage(level = INFO)
 	@Message(id = ID_OFFSET + 164,
-			value = "Mass indexing progress: indexed %1$d entities in %3$d ms (%2$d type(s) pending). Mass indexing speed: %4$f documents/second since last message, %5$f documents/second since start.")
-	void indexingProgress(long doneCount, long typesToIndex, long elapsedMs, float currentSpeed, float estimateSpeed);
+			value = "Mass indexed %1$d. Speed: %3$.2f/s instant, %4$.2f/s since start. Remaining: unknown, %2$d type(s) pending.")
+	void indexingProgress(long doneCount, long typesToIndex, float currentSpeed, float estimateSpeed);
 
 	@LogMessage(level = INFO)
 	@Message(id = ID_OFFSET + 165,
-			value = "Mass indexing progress: indexed %1$d entities in %2$d ms. Mass indexing speed: %3$f documents/second since last message, %4$f documents/second since start.")
-	void indexingProgress(long doneCount, long elapsedMs, float currentSpeed, float estimateSpeed);
+			value = "Mass indexed %1$d. Speed: %2$.2f/s instant, %3$.2f/s since start. Remaining: unknown.")
+	void indexingProgress(long doneCount, float currentSpeed, float estimateSpeed);
 
 	@LogMessage(level = INFO)
 	@Message(id = ID_OFFSET + 166,
-			value = "Mass indexing progress: indexed %7$.2f%% %1$d/%2$d entities in %4$d ms (%3$d type(s) pending). Mass indexing speed: %5$f documents/second since last message, %6$f documents/second since start.")
-	void indexingProgress(long doneCount, long totalCount, long typesToIndex, long elapsedMs, float currentSpeed,
-			float estimateSpeed, float estimatePercentileComplete);
+			value = "Mass indexed %1$.2f%% %2$d/%3$d. Speed: %4$.2f/s instant, %5$.2f/s since start. Remaining: %6$d, %7$d type(s) pending.")
+	void indexingProgress(float estimatePercentileComplete, long doneCount, long totalCount, float currentSpeed,
+			float estimateSpeed, long remainingCount, long typesToIndex);
 
 	@LogMessage(level = INFO)
 	@Message(id = ID_OFFSET + 167,
-			value = "Mass indexing progress: indexed %6$.2f%% %1$d/%2$d entities in %3$d ms. Mass indexing speed: %4$f documents/second since last message, %5$f documents/second since start.")
-	void indexingProgress(long doneCount, long totalCount, long elapsedMs, float currentSpeed, float estimateSpeed,
-			float estimatePercentileComplete);
+			value = "Mass indexed %1$.2f%% %2$d/%3$d. Speed: %4$.2f/s instant, %5$.2f/s since start. Remaining: %6$d, approx. %7$s.")
+	void indexingProgressWithRemainingTime(float estimatePercentileComplete, long doneCount, long totalCount,
+			float currentSpeed, float estimateSpeed, long remainingCount, Duration timeToFinish);
+
+	@LogMessage(level = INFO)
+	@Message(id = ID_OFFSET + 168, value = "Mass indexing complete in %3$s. Indexed %1$d/%2$d entities.")
+	void indexingEntitiesCompleted(long indexed, long total, Duration indexingTime);
 }

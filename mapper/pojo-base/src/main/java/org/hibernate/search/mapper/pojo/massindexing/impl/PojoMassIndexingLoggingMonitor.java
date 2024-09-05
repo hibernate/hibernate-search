@@ -5,8 +5,8 @@
 package org.hibernate.search.mapper.pojo.massindexing.impl;
 
 import java.lang.invoke.MethodHandles;
+import java.time.Duration;
 import java.util.OptionalLong;
-import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.concurrent.atomic.LongAdder;
@@ -107,7 +107,8 @@ public class PojoMassIndexingLoggingMonitor implements MassIndexingMonitor {
 
 	@Override
 	public void indexingCompleted() {
-		log.indexingEntitiesCompleted( totalCounter.longValue() );
+		log.indexingEntitiesCompleted( documentsDoneCounter.longValue(), totalCounter.longValue(),
+				Duration.ofNanos( System.nanoTime() - startTime ) );
 	}
 
 	protected int getStatusMessagePeriod() {
@@ -137,26 +138,26 @@ public class PojoMassIndexingLoggingMonitor implements MassIndexingMonitor {
 
 		if ( remainingUnknown ) {
 			if ( typesToIndex > 0 ) {
-				log.indexingProgress( doneCount, typesToIndex, TimeUnit.NANOSECONDS.toMillis( elapsedNano ), currentSpeed,
-						estimateSpeed );
+				log.indexingProgress( doneCount, typesToIndex, currentSpeed, estimateSpeed );
 			}
 			else {
-				log.indexingProgress( doneCount, TimeUnit.NANOSECONDS.toMillis( elapsedNano ), currentSpeed, estimateSpeed );
+				log.indexingProgress( doneCount, currentSpeed, estimateSpeed );
 			}
 		}
 		else {
 			float estimatePercentileComplete = doneCount * 100f / totalTodoCount;
+			long remainingCount = totalTodoCount - doneCount;
 
 			if ( typesToIndex > 0 ) {
 				log.indexingProgress(
-						doneCount, totalTodoCount, typesToIndex, TimeUnit.NANOSECONDS.toMillis( elapsedNano ), currentSpeed,
-						estimateSpeed, estimatePercentileComplete
+						estimatePercentileComplete, doneCount, totalTodoCount, currentSpeed, estimateSpeed,
+						remainingCount, typesToIndex
 				);
 			}
 			else {
-				log.indexingProgress(
-						doneCount, totalTodoCount, TimeUnit.NANOSECONDS.toMillis( elapsedNano ), currentSpeed, estimateSpeed,
-						estimatePercentileComplete
+				log.indexingProgressWithRemainingTime(
+						estimatePercentileComplete, doneCount, totalTodoCount, currentSpeed, estimateSpeed,
+						remainingCount, Duration.ofMillis( (long) ( ( remainingCount / currentSpeed ) * 1000 ) )
 				);
 			}
 		}
@@ -209,5 +210,4 @@ public class PojoMassIndexingLoggingMonitor implements MassIndexingMonitor {
 			}
 		}
 	}
-
 }

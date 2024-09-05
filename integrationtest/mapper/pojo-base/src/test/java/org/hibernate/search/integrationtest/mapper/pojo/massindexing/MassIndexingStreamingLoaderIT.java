@@ -73,9 +73,9 @@ class MassIndexingStreamingLoaderIT {
 
 		expectIndexingWorks();
 
-		logged.expectEvent( Level.INFO, "Mass indexing progress: indexed 50 entities", "(1 types pending)",
-				"Mass indexing speed:" );
-		logged.expectEvent( Level.INFO, "Mass indexing progress: indexed", "1950/2000 entities in", "Mass indexing speed:" );
+		logged.expectEvent( Level.INFO, "Mass indexed 50. Speed", "instant, ", "since start",
+				"Remaining: unknown, 1 type(s) pending" );
+		logged.expectEvent( Level.INFO, "Mass indexed", "1950/2000. Speed", "Remaining: 50, approx. PT" );
 
 		try {
 			mapping.scope( Object.class ).massIndexer()
@@ -107,8 +107,8 @@ class MassIndexingStreamingLoaderIT {
 
 		expectIndexingWorks();
 
-		logged.expectEvent( Level.INFO, "Mass indexing progress: indexed 50 entities", "Mass indexing speed:" );
-		logged.expectEvent( Level.INFO, "Mass indexing progress: indexed", "1950/2000 entities in", "Mass indexing speed:" );
+		logged.expectEvent( Level.INFO, "Mass indexed 50. Speed", "instant, ", "since start", "Remaining: unknown" );
+		logged.expectEvent( Level.INFO, "Mass indexed", "1950/2000. Speed", "Remaining: 50, approx. PT" );
 
 		try {
 			mapping.scope( Object.class ).massIndexer()
