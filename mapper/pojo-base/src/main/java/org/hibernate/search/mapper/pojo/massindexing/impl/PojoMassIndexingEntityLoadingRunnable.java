@@ -19,6 +19,7 @@ import org.hibernate.search.mapper.pojo.loading.spi.PojoMassLoadingContext;
 import org.hibernate.search.mapper.pojo.loading.spi.PojoMassLoadingStrategy;
 import org.hibernate.search.mapper.pojo.logging.impl.Log;
 import org.hibernate.search.mapper.pojo.massindexing.MassIndexingEnvironment;
+import org.hibernate.search.mapper.pojo.massindexing.MassIndexingTypeGroupMonitor;
 import org.hibernate.search.mapper.pojo.massindexing.spi.PojoMassIndexingContext;
 import org.hibernate.search.mapper.pojo.massindexing.spi.PojoMassIndexingSessionContext;
 import org.hibernate.search.mapper.pojo.model.spi.PojoRawTypeIdentifier;
@@ -32,6 +33,7 @@ public class PojoMassIndexingEntityLoadingRunnable<E, I>
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
+	private final MassIndexingTypeGroupMonitor typeGroupMonitor;
 	private final PojoMassIndexingContext massIndexingContext;
 	private final PojoMassIndexingIndexedTypeGroup<E> typeGroup;
 	private final PojoMassLoadingStrategy<E, I> loadingStrategy;
@@ -40,12 +42,14 @@ public class PojoMassIndexingEntityLoadingRunnable<E, I>
 	private final MassIndexingEnvironment.EntityLoadingContext entityLoadingContext;
 
 	protected PojoMassIndexingEntityLoadingRunnable(PojoMassIndexingNotifier notifier,
+			MassIndexingTypeGroupMonitor typeGroupMonitor,
 			PojoMassIndexingContext massIndexingContext, MassIndexingEnvironment environment,
 			PojoMassIndexingIndexedTypeGroup<E> typeGroup,
 			PojoMassLoadingStrategy<E, I> loadingStrategy,
 			PojoProducerConsumerQueue<List<I>> identifierQueue,
 			String tenantId) {
 		super( notifier, environment );
+		this.typeGroupMonitor = typeGroupMonitor;
 		this.massIndexingContext = massIndexingContext;
 		this.typeGroup = typeGroup;
 		this.loadingStrategy = loadingStrategy;
@@ -219,6 +223,7 @@ public class PojoMassIndexingEntityLoadingRunnable<E, I>
 			}
 
 			getNotifier().reportDocumentsAdded( successfulEntities );
+			typeGroupMonitor.documentsAdded( successfulEntities );
 
 			this.sessionContext = null;
 			this.entities = null;

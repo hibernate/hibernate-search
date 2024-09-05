@@ -16,6 +16,7 @@ import org.hibernate.search.mapper.pojo.loading.spi.PojoMassLoadingContext;
 import org.hibernate.search.mapper.pojo.loading.spi.PojoMassLoadingStrategy;
 import org.hibernate.search.mapper.pojo.logging.impl.Log;
 import org.hibernate.search.mapper.pojo.massindexing.MassIndexingEnvironment;
+import org.hibernate.search.mapper.pojo.massindexing.MassIndexingTypeGroupMonitor;
 import org.hibernate.search.mapper.pojo.massindexing.spi.PojoMassIndexingContext;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
@@ -24,6 +25,7 @@ public class PojoMassIndexingEntityIdentifierLoadingRunnable<E, I>
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
+	private final MassIndexingTypeGroupMonitor typeGroupMonitor;
 	private final PojoMassIndexingContext massIndexingContext;
 	private final PojoMassIndexingIndexedTypeGroup<E> typeGroup;
 	private final PojoMassLoadingStrategy<E, I> loadingStrategy;
@@ -31,14 +33,14 @@ public class PojoMassIndexingEntityIdentifierLoadingRunnable<E, I>
 	private final String tenantId;
 	private final MassIndexingEnvironment.EntityIdentifierLoadingContext identifierLoadingContext;
 
-	private boolean reportIdentifierBatchLoaded = false;
-
 	public PojoMassIndexingEntityIdentifierLoadingRunnable(PojoMassIndexingNotifier notifier,
+			MassIndexingTypeGroupMonitor typeGroupMonitor,
 			PojoMassIndexingContext massIndexingContext, MassIndexingEnvironment environment,
 			PojoMassIndexingIndexedTypeGroup<E> typeGroup,
 			PojoMassLoadingStrategy<E, I> loadingStrategy,
 			PojoProducerConsumerQueue<List<I>> identifierQueue, String tenantId) {
 		super( notifier, environment );
+		this.typeGroupMonitor = typeGroupMonitor;
 		this.massIndexingContext = massIndexingContext;
 		this.loadingStrategy = loadingStrategy;
 		this.typeGroup = typeGroup;
@@ -54,13 +56,11 @@ public class PojoMassIndexingEntityIdentifierLoadingRunnable<E, I>
 		LoadingContext context = new LoadingContext();
 		try ( PojoMassIdentifierLoader loader = loadingStrategy.createIdentifierLoader( typeGroup.includedTypes(), context ) ) {
 			OptionalLong count = loader.totalCount();
+			typeGroupMonitor.indexingStarted( count );
 			if ( count.isPresent() ) {
 				getNotifier().reportAddedTotalCount( count.getAsLong() );
 			}
-			else {
-				// means we don't know the total ahead of time, so we will be incrementing the total as each batch gets loaded
-				this.reportIdentifierBatchLoaded = true;
-			}
+
 			do {
 				loader.loadNext();
 			}
@@ -114,9 +114,6 @@ public class PojoMassIndexingEntityIdentifierLoadingRunnable<E, I>
 				public void accept(List<? extends I> batch) throws InterruptedException {
 					log.tracef( "produced a list of ids %s", batch );
 					List<I> copy = new ArrayList<>( batch );
-					if ( reportIdentifierBatchLoaded ) {
-						getNotifier().reportAddedTotalCount( batch.size() );
-					}
 					identifierQueue.put( copy );
 				}
 

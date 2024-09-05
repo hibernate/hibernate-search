@@ -5,6 +5,7 @@
 package org.hibernate.search.mapper.pojo.massindexing.impl;
 
 import java.lang.invoke.MethodHandles;
+import java.util.OptionalLong;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.concurrent.atomic.AtomicReference;
@@ -13,6 +14,8 @@ import java.util.function.BinaryOperator;
 
 import org.hibernate.search.mapper.pojo.logging.impl.Log;
 import org.hibernate.search.mapper.pojo.massindexing.MassIndexingMonitor;
+import org.hibernate.search.mapper.pojo.massindexing.MassIndexingTypeGroupMonitor;
+import org.hibernate.search.mapper.pojo.massindexing.MassIndexingTypeGroupMonitorContext;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
 /**
@@ -30,6 +33,9 @@ public class PojoMassIndexingLoggingMonitor implements MassIndexingMonitor {
 	private volatile long startTime;
 	private final int logAfterNumberOfDocuments;
 
+	private final AtomicLong typesToIndex = new AtomicLong();
+	private final AtomicLong groupsWithUnknownTotal = new AtomicLong();
+
 	/**
 	 * Logs progress of indexing job every 50 documents written.
 	 */
@@ -45,6 +51,12 @@ public class PojoMassIndexingLoggingMonitor implements MassIndexingMonitor {
 	 */
 	public PojoMassIndexingLoggingMonitor(int logAfterNumberOfDocuments) {
 		this.logAfterNumberOfDocuments = logAfterNumberOfDocuments;
+	}
+
+	@Override
+	public MassIndexingTypeGroupMonitor typeGroupMonitor(MassIndexingTypeGroupMonitorContext context) {
+		typesToIndex.addAndGet( context.includedTypes().size() );
+		return new MassIndexingTypeGroupMonitorImpl();
 	}
 
 	@Override
@@ -72,7 +84,8 @@ public class PojoMassIndexingLoggingMonitor implements MassIndexingMonitor {
 		int period = getStatusMessagePeriod();
 		if ( ( previous / period ) < ( current / period ) ) {
 			long currentTime = System.nanoTime();
-			printStatusMessage( startTime, currentTime, totalCounter.longValue(), current );
+			printStatusMessage( startTime, currentTime, totalCounter.longValue(), current, typesToIndex.get(),
+					groupsWithUnknownTotal.get() != 0 );
 		}
 	}
 
@@ -101,10 +114,13 @@ public class PojoMassIndexingLoggingMonitor implements MassIndexingMonitor {
 		return logAfterNumberOfDocuments;
 	}
 
-	protected void printStatusMessage(long startTime, long currentTime, long totalTodoCount, long doneCount) {
+	protected void printStatusMessage(long startTime, long currentTime, long totalTodoCount, long doneCount, long typesToIndex,
+			boolean remainingUnknown) {
 		StatusMessageInfo currentStatusMessageInfo = new StatusMessageInfo( currentTime, doneCount );
-		StatusMessageInfo previousStatusMessageInfo = lastMessageInfo.getAndAccumulate( currentStatusMessageInfo,
-				StatusMessageInfo.UPDATE_IF_MORE_UP_TO_DATE_FUNCTION );
+		StatusMessageInfo previousStatusMessageInfo = lastMessageInfo.getAndAccumulate(
+				currentStatusMessageInfo,
+				StatusMessageInfo.UPDATE_IF_MORE_UP_TO_DATE_FUNCTION
+		);
 
 		// Avoid logging outdated info if logging happened concurrently since we last called System.nanoTime()
 		if ( !currentStatusMessageInfo.isMoreUpToDateThan( previousStatusMessageInfo ) ) {
@@ -115,12 +131,35 @@ public class PojoMassIndexingLoggingMonitor implements MassIndexingMonitor {
 		// period between two log events might be too short to use millis as a result infinity speed will be displayed.
 		long intervalBetweenLogsNano = currentStatusMessageInfo.currentTime - previousStatusMessageInfo.currentTime;
 
-		log.indexingProgressRaw( doneCount, TimeUnit.NANOSECONDS.toMillis( elapsedNano ) );
 		float estimateSpeed = doneCount * 1_000_000_000f / elapsedNano;
 		float currentSpeed = ( currentStatusMessageInfo.documentsDone
 				- previousStatusMessageInfo.documentsDone ) * 1_000_000_000f / intervalBetweenLogsNano;
-		float estimatePercentileComplete = doneCount * 100f / totalTodoCount;
-		log.indexingProgressStats( currentSpeed, estimateSpeed, estimatePercentileComplete );
+
+		if ( remainingUnknown ) {
+			if ( typesToIndex > 0 ) {
+				log.indexingProgress( doneCount, typesToIndex, TimeUnit.NANOSECONDS.toMillis( elapsedNano ), currentSpeed,
+						estimateSpeed );
+			}
+			else {
+				log.indexingProgress( doneCount, TimeUnit.NANOSECONDS.toMillis( elapsedNano ), currentSpeed, estimateSpeed );
+			}
+		}
+		else {
+			float estimatePercentileComplete = doneCount * 100f / totalTodoCount;
+
+			if ( typesToIndex > 0 ) {
+				log.indexingProgress(
+						doneCount, totalTodoCount, typesToIndex, TimeUnit.NANOSECONDS.toMillis( elapsedNano ), currentSpeed,
+						estimateSpeed, estimatePercentileComplete
+				);
+			}
+			else {
+				log.indexingProgress(
+						doneCount, totalTodoCount, TimeUnit.NANOSECONDS.toMillis( elapsedNano ), currentSpeed, estimateSpeed,
+						estimatePercentileComplete
+				);
+			}
+		}
 	}
 
 	private static class StatusMessageInfo {
@@ -142,4 +181,33 @@ public class PojoMassIndexingLoggingMonitor implements MassIndexingMonitor {
 					|| documentsDone == other.documentsDone && currentTime > other.currentTime;
 		}
 	}
+
+	private class MassIndexingTypeGroupMonitorImpl implements MassIndexingTypeGroupMonitor {
+
+		private boolean totalUnknown = false;
+
+		@Override
+		public void documentsAdded(long increment) {
+			if ( totalUnknown ) {
+				totalCounter.add( increment );
+			}
+		}
+
+		@Override
+		public void indexingStarted(OptionalLong totalCount) {
+			typesToIndex.decrementAndGet();
+			if ( totalCount.isEmpty() ) {
+				groupsWithUnknownTotal.incrementAndGet();
+				totalUnknown = true;
+			}
+		}
+
+		@Override
+		public void indexingCompleted() {
+			if ( totalUnknown ) {
+				groupsWithUnknownTotal.decrementAndGet();
+			}
+		}
+	}
+
 }

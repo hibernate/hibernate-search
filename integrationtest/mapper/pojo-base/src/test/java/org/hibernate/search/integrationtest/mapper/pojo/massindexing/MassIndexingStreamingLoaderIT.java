@@ -8,7 +8,7 @@ import static org.assertj.core.api.Fail.fail;
 
 import java.lang.invoke.MethodHandles;
 import java.util.List;
-import java.util.stream.Collectors;
+import java.util.OptionalLong;
 import java.util.stream.IntStream;
 
 import org.hibernate.search.engine.backend.work.execution.DocumentCommitStrategy;
@@ -37,9 +37,10 @@ import org.junit.jupiter.api.extension.RegisterExtension;
 
 import org.apache.logging.log4j.Level;
 
-public class MassIndexingStreamingLoaderIT {
+class MassIndexingStreamingLoaderIT {
 
-	private static final int COUNT = 1500;
+	private static final int BOOK_COUNT = 500;
+	private static final int ARTICLE_COUNT = 1500;
 
 	@RegisterExtension
 	public final BackendMock backendMock = BackendMock.create();
@@ -55,9 +56,8 @@ public class MassIndexingStreamingLoaderIT {
 	public ExpectedLog4jLog logged = ExpectedLog4jLog.create();
 
 	@Test
-	void entityLoading() throws InterruptedException {
-
-		SearchMapping mapping = setupEntityLoading();
+	void oneAtATime() {
+		SearchMapping mapping = setup();
 
 		backendMock.expectIndexScaleWorks( Book.NAME )
 				.purge()
@@ -65,14 +65,55 @@ public class MassIndexingStreamingLoaderIT {
 				.flush()
 				.refresh();
 
+		backendMock.expectIndexScaleWorks( Article.NAME )
+				.purge()
+				.mergeSegments()
+				.flush()
+				.refresh();
+
 		expectIndexingWorks();
 
-		// additional 10 entities are added to total on each id-batch loaded:
-		logged.expectEvent( Level.INFO, "Mass indexing is going to index 10 more entities" );
+		logged.expectEvent( Level.INFO, "Mass indexing progress: indexed 50 entities", "(1 types pending)",
+				"Mass indexing speed:" );
+		logged.expectEvent( Level.INFO, "Mass indexing progress: indexed", "1950/2000 entities in", "Mass indexing speed:" );
 
 		try {
 			mapping.scope( Object.class ).massIndexer()
 					.threadsToLoadObjects( 1 )
+					.typesToIndexInParallel( 1 )
+					.batchSizeToLoadObjects( 10 )
+					.startAndWait();
+		}
+		catch (InterruptedException e) {
+			fail( "Unexpected InterruptedException: " + e.getMessage() );
+		}
+	}
+
+	@Test
+	void allTogether() {
+		SearchMapping mapping = setup();
+
+		backendMock.expectIndexScaleWorks( Book.NAME )
+				.purge()
+				.mergeSegments()
+				.flush()
+				.refresh();
+
+		backendMock.expectIndexScaleWorks( Article.NAME )
+				.purge()
+				.mergeSegments()
+				.flush()
+				.refresh();
+
+		expectIndexingWorks();
+
+		logged.expectEvent( Level.INFO, "Mass indexing progress: indexed 50 entities", "Mass indexing speed:" );
+		logged.expectEvent( Level.INFO, "Mass indexing progress: indexed", "1950/2000 entities in", "Mass indexing speed:" );
+
+		try {
+			mapping.scope( Object.class ).massIndexer()
+					.threadsToLoadObjects( 2 )
+					.typesToIndexInParallel( 2 )
 					.batchSizeToLoadObjects( 10 )
 					.startAndWait();
 		}
@@ -85,7 +126,18 @@ public class MassIndexingStreamingLoaderIT {
 		BackendMock.DocumentWorkCallListContext expected = backendMock.expectWorks(
 				Book.NAME, DocumentCommitStrategy.NONE, DocumentRefreshStrategy.NONE
 		);
-		for ( int i = 0; i < COUNT; i++ ) {
+		for ( int i = 0; i < BOOK_COUNT; i++ ) {
+			int id = i;
+			expected.add( Integer.toString( id ), b -> b
+					.field( "title", "title_" + id )
+					.field( "author", "author_" + id )
+			);
+		}
+
+		expected = backendMock.expectWorks(
+				Article.NAME, DocumentCommitStrategy.NONE, DocumentRefreshStrategy.NONE
+		);
+		for ( int i = 0; i < ARTICLE_COUNT; i++ ) {
 			int id = i;
 			expected.add( Integer.toString( id ), b -> b
 					.field( "title", "title_" + id )
@@ -94,8 +146,8 @@ public class MassIndexingStreamingLoaderIT {
 		}
 	}
 
-	private SearchMapping setupEntityLoading() {
-		return setup( new MassLoadingStrategy<Book, Integer>() {
+	private MassLoadingStrategy<Book, Integer> bookLoadingStrategy() {
+		return new MassLoadingStrategy<Book, Integer>() {
 			@Override
 			public MassIdentifierLoader createIdentifierLoader(LoadingTypeGroup<Book> includedTypes,
 					MassIdentifierSink<Integer> sink, MassLoadingOptions options) {
@@ -111,8 +163,8 @@ public class MassIndexingStreamingLoaderIT {
 					public void loadNext() throws InterruptedException {
 						sink.accept( IntStream.range( i, i = i + options.batchSize() )
 								.boxed()
-								.collect( Collectors.toList() ) );
-						if ( i >= COUNT ) {
+								.toList() );
+						if ( i >= BOOK_COUNT ) {
 							sink.complete();
 						}
 					}
@@ -132,23 +184,81 @@ public class MassIndexingStreamingLoaderIT {
 					public void load(List<Integer> identifiers) throws InterruptedException {
 						sink.accept( identifiers.stream()
 								.map( i -> new Book( i, "title_" + i, "author_" + i ) )
-								.collect( Collectors.toList() ) );
+								.toList() );
 					}
 				};
 			}
-		} );
+		};
 	}
 
-	private SearchMapping setup(MassLoadingStrategy<Book, Integer> loadingStrategy) {
+	private MassLoadingStrategy<Article, Integer> articleLoadingStrategy() {
+		return new MassLoadingStrategy<Article, Integer>() {
+			@Override
+			public MassIdentifierLoader createIdentifierLoader(LoadingTypeGroup<Article> includedTypes,
+					MassIdentifierSink<Integer> sink, MassLoadingOptions options) {
+				return new MassIdentifierLoader() {
+					private int i = 0;
+
+					@Override
+					public void close() {
+						// Nothing to do
+					}
+
+					@Override
+					public OptionalLong totalCount() {
+						return OptionalLong.of( ARTICLE_COUNT );
+					}
+
+					@Override
+					public void loadNext() throws InterruptedException {
+						sink.accept( IntStream.range( i, i = i + options.batchSize() )
+								.boxed()
+								.toList() );
+						if ( i >= ARTICLE_COUNT ) {
+							sink.complete();
+						}
+					}
+				};
+			}
+
+			@Override
+			public MassEntityLoader<Integer> createEntityLoader(LoadingTypeGroup<Article> includedTypes,
+					MassEntitySink<Article> sink, MassLoadingOptions options) {
+				return new MassEntityLoader<Integer>() {
+					@Override
+					public void close() {
+						// Nothing to do
+					}
+
+					@Override
+					public void load(List<Integer> identifiers) throws InterruptedException {
+						sink.accept( identifiers.stream()
+								.map( i -> new Article( i, "title_" + i, "author_" + i ) )
+								.toList() );
+					}
+				};
+			}
+		};
+	}
+
+	private SearchMapping setup() {
 		backendMock.expectAnySchema( Book.NAME );
+		backendMock.expectAnySchema( Article.NAME );
 
 		SearchMapping mapping = setupHelper.start()
 				.expectCustomBeans()
 				.withPropertyRadical( EngineSpiSettings.Radicals.THREAD_PROVIDER, threadSpy.getThreadProvider() )
-				.withConfiguration( b -> b.programmaticMapping().type( Book.class )
-						.searchEntity()
-						.loadingBinder( (EntityLoadingBinder) ctx -> ctx.massLoadingStrategy( Book.class, loadingStrategy ) ) )
-				.setup( Book.class );
+				.withConfiguration( b -> {
+					b.programmaticMapping().type( Book.class )
+							.searchEntity()
+							.loadingBinder(
+									(EntityLoadingBinder) ctx -> ctx.massLoadingStrategy( Book.class, bookLoadingStrategy() ) );
+					b.programmaticMapping().type( Article.class )
+							.searchEntity()
+							.loadingBinder(
+									(EntityLoadingBinder) ctx -> ctx.massLoadingStrategy( Article.class,
+											articleLoadingStrategy() ) );
+				} ).setup( Book.class, Article.class );
 
 		backendMock.verifyExpectationsMet();
 
@@ -172,6 +282,56 @@ public class MassIndexingStreamingLoaderIT {
 		}
 
 		public Book(Integer id, String title, String author) {
+			this.id = id;
+			this.title = title;
+			this.author = author;
+		}
+
+		@DocumentId
+		public Integer getId() {
+			return id;
+		}
+
+		public void setId(Integer id) {
+			this.id = id;
+		}
+
+		@GenericField
+		public String getTitle() {
+			return title;
+		}
+
+		public void setTitle(String title) {
+			this.title = title;
+		}
+
+		@GenericField
+		public String getAuthor() {
+			return author;
+		}
+
+		public void setAuthor(String author) {
+			this.author = author;
+		}
+	}
+
+	@Indexed(index = Article.NAME)
+	public static class Article {
+
+		public static final String NAME = "Article";
+		public static final PersistenceTypeKey<Article, Integer> PERSISTENCE_KEY =
+				new PersistenceTypeKey<>( Article.class, Integer.class );
+
+		private Integer id;
+
+		private String title;
+
+		private String author;
+
+		public Article() {
+		}
+
+		public Article(Integer id, String title, String author) {
 			this.id = id;
 			this.title = title;
 			this.author = author;
