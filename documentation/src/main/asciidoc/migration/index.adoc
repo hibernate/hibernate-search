@@ -88,17 +88,27 @@ are backward-compatible with Hibernate Search {hibernateSearchPreviousStableVers
 
 The https://hibernate.org/community/compatibility-policy/#code-categorization[API]
 in Hibernate Search {hibernateSearchVersion}
-is backward-compatible with Hibernate Search {hibernateSearchPreviousStableVersionShort}.
+is, in general, backward-compatible with Hibernate Search {hibernateSearchPreviousStableVersionShort}.
+But there are next changes:
+
+- An incubating `org.hibernate.search.mapper.pojo.standalone.loading.MassIdentifierLoader` changed the return type of `#totalCount()` from `long` to `OptionalLong`.
+This was done to address the scenarios where the total number of identifiers to load is not known ahead of time.
 
 [[spi]]
 == SPI
 
 The https://hibernate.org/community/compatibility-policy/#code-categorization[SPI]
 in Hibernate Search {hibernateSearchVersion}
-is backward-compatible with Hibernate Search {hibernateSearchPreviousStableVersionShort}.
+is, in general, backward-compatible with Hibernate Search {hibernateSearchPreviousStableVersionShort}.
+But there are next changes:
+
+- `org.hibernate.search.mapper.pojo.loading.spi.PojoMassIdentifierLoader` also changed the return type of `#totalCount()` from `long` to `OptionalLong`
+to reflect the changes in the `org.hibernate.search.mapper.pojo.standalone.loading.MassIdentifierLoader`
 
 [[behavior]]
 == Behavior
 
 The behavior of Hibernate Search {hibernateSearchVersion}
-is backward-compatible with Hibernate Search {hibernateSearchPreviousStableVersionShort}.
+is, in general, backward-compatible with Hibernate Search {hibernateSearchPreviousStableVersionShort}.
+
+The default mass indexer logging monitor updated the format of the logged messages to provide the information in a more condense form.
