@@ -11,11 +11,14 @@ import java.util.concurrent.atomic.AtomicLong;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.concurrent.atomic.LongAdder;
 import java.util.function.BinaryOperator;
+import java.util.stream.Collectors;
 
 import org.hibernate.search.mapper.pojo.logging.impl.Log;
 import org.hibernate.search.mapper.pojo.massindexing.MassIndexingMonitor;
+import org.hibernate.search.mapper.pojo.massindexing.MassIndexingType;
 import org.hibernate.search.mapper.pojo.massindexing.MassIndexingTypeGroupMonitor;
 import org.hibernate.search.mapper.pojo.massindexing.MassIndexingTypeGroupMonitorContext;
+import org.hibernate.search.mapper.pojo.massindexing.MassIndexingTypeGroupMonitorCreateContext;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
 /**
@@ -32,6 +35,8 @@ public class PojoMassIndexingLoggingMonitor implements MassIndexingMonitor {
 	private final LongAdder totalCounter = new LongAdder();
 	private volatile long startTime;
 	private final int logAfterNumberOfDocuments;
+	private boolean countOnStart;
+	private boolean countOnBeforeType;
 
 	private final AtomicLong typesToIndex = new AtomicLong();
 	private final AtomicLong groupsWithUnknownTotal = new AtomicLong();
@@ -50,13 +55,24 @@ public class PojoMassIndexingLoggingMonitor implements MassIndexingMonitor {
 	 * @param logAfterNumberOfDocuments log each time the specified number of documents has been added
 	 */
 	public PojoMassIndexingLoggingMonitor(int logAfterNumberOfDocuments) {
+		this( logAfterNumberOfDocuments, false, true );
+	}
+
+	public PojoMassIndexingLoggingMonitor(boolean countOnStart, boolean countOnBeforeType) {
+		this( 50, countOnStart, countOnBeforeType );
+	}
+
+	public PojoMassIndexingLoggingMonitor(int logAfterNumberOfDocuments, boolean countOnStart,
+			boolean countOnBeforeType) {
 		this.logAfterNumberOfDocuments = logAfterNumberOfDocuments;
+		this.countOnStart = countOnStart;
+		this.countOnBeforeType = countOnBeforeType;
 	}
 
 	@Override
-	public MassIndexingTypeGroupMonitor typeGroupMonitor(MassIndexingTypeGroupMonitorContext context) {
+	public MassIndexingTypeGroupMonitor typeGroupMonitor(MassIndexingTypeGroupMonitorCreateContext context) {
 		typesToIndex.addAndGet( context.includedTypes().size() );
-		return new MassIndexingTypeGroupMonitorImpl();
+		return new MassIndexingTypeGroupMonitorImpl( context );
 	}
 
 	@Override
@@ -96,13 +112,7 @@ public class PojoMassIndexingLoggingMonitor implements MassIndexingMonitor {
 
 	@Override
 	public void entitiesLoaded(long size) {
-		//not used
-	}
 
-	@Override
-	public void addToTotalCount(long count) {
-		totalCounter.add( count );
-		log.indexingEntities( count );
 	}
 
 	@Override
@@ -185,26 +195,54 @@ public class PojoMassIndexingLoggingMonitor implements MassIndexingMonitor {
 
 	private class MassIndexingTypeGroupMonitorImpl implements MassIndexingTypeGroupMonitor {
 
-		private boolean totalUnknown = false;
+		private final long numberOfTypes;
+		private final OptionalLong totalBefore;
+		private boolean totalUnknown = true;
+
+		public MassIndexingTypeGroupMonitorImpl(MassIndexingTypeGroupMonitorCreateContext context) {
+			this.numberOfTypes = context.includedTypes().size();
+			if ( countOnStart ) {
+				totalBefore = context.totalCount();
+				if ( totalBefore.isPresent() ) {
+					totalUnknown = false;
+					long count = totalBefore.getAsLong();
+					totalCounter.add( count );
+					log.indexingEntitiesApprox( count, context.includedTypes().stream().map( MassIndexingType::entityName )
+							.collect( Collectors.joining( ", ", "[ ", " ]" ) ) );
+				}
+			}
+			else {
+				totalBefore = OptionalLong.empty();
+			}
+		}
 
 		@Override
-		public void documentsAdded(long increment) {
+		public void documentsIndexed(long increment) {
 			if ( totalUnknown ) {
 				totalCounter.add( increment );
 			}
 		}
 
 		@Override
-		public void indexingStarted(OptionalLong totalCount) {
-			typesToIndex.decrementAndGet();
-			if ( totalCount.isEmpty() ) {
-				groupsWithUnknownTotal.incrementAndGet();
-				totalUnknown = true;
+		public void indexingStarted(MassIndexingTypeGroupMonitorContext context) {
+			typesToIndex.addAndGet( -numberOfTypes );
+
+			if ( countOnBeforeType ) {
+				OptionalLong totalCount = context.totalCount();
+				if ( totalCount.isEmpty() ) {
+					groupsWithUnknownTotal.incrementAndGet();
+				}
+				else {
+					totalUnknown = false;
+					long actual = totalCount.getAsLong();
+					totalCounter.add( actual - totalBefore.orElse( 0 ) );
+					log.indexingEntities( actual );
+				}
 			}
 		}
 
 		@Override
-		public void indexingCompleted() {
+		public void indexingCompleted(MassIndexingTypeGroupMonitorContext context) {
 			if ( totalUnknown ) {
 				groupsWithUnknownTotal.decrementAndGet();
 			}

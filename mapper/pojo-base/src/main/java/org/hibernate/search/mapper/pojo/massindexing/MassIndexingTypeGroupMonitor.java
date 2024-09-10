@@ -4,8 +4,6 @@
  */
 package org.hibernate.search.mapper.pojo.massindexing;
 
-import java.util.OptionalLong;
-
 import org.hibernate.search.util.common.annotation.Incubating;
 
 /**
@@ -29,22 +27,25 @@ public interface MassIndexingTypeGroupMonitor {
 	 * <p>
 	 * This method can be invoked from several threads thus implementors are required to be thread-safe.
 	 *
-	 * @param increment additional number of documents built
+	 * @param increment The additional number of documents built and added to the index.
 	 */
-	void documentsAdded(long increment);
+	void documentsIndexed(long increment);
 
 	/**
 	 * Notify the monitor that indexing of the type group is starting
 	 * and provide the expected number of entities in the group, if known.
 	 *
-	 * @param totalCount An optional containing the expected number of entities in the group to index, if known,
-	 * otherwise an empty optional is supplied.
+	 * @param context A context object exposing additional information and operations
+	 * that may be relevant for the implementors of this monitor.
 	 */
-	void indexingStarted(OptionalLong totalCount);
+	void indexingStarted(MassIndexingTypeGroupMonitorContext context);
 
 	/**
 	 * Notify the monitor that indexing of the type group is completed.
+	 *
+	 * @param context A context object exposing additional information and operations
+	 * that may be relevant for the implementors of this monitor.
 	 */
-	void indexingCompleted();
+	void indexingCompleted(MassIndexingTypeGroupMonitorContext context);
 
 }

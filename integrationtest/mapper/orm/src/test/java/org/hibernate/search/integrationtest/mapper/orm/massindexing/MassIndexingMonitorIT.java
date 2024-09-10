@@ -167,6 +167,7 @@ class MassIndexingMonitorIT {
 		}
 	}
 
+	@SuppressWarnings("removal")
 	public static class StaticCountersMonitor implements MassIndexingMonitor {
 
 		public static StaticCounters.Key ADDED = StaticCounters.createKey();

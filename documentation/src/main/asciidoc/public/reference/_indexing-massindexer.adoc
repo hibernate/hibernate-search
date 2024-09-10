@@ -318,6 +318,9 @@ The default, built-in monitor logs progress periodically at the `INFO` level,
 but a custom monitor can be set by implementing the `MassIndexingMonitor` interface
 and passing an instance using the `monitor` method.
 
+The built-in monitor's behaviour can be customized through `DefaultMassIndexingMonitor` builder,
+e.g. `indexer.monitor( DefaultMassIndexingMonitor.builder().countOnStart( false ).build() ) )`
+
 Implementations of `MassIndexingMonitor` must be thread-safe.
 
 |`failureHandler(MassIndexingFailureHandler)`

@@ -223,7 +223,7 @@ public class PojoMassIndexingEntityLoadingRunnable<E, I>
 			}
 
 			getNotifier().reportDocumentsAdded( successfulEntities );
-			typeGroupMonitor.documentsAdded( successfulEntities );
+			typeGroupMonitor.documentsIndexed( successfulEntities );
 
 			this.sessionContext = null;
 			this.entities = null;

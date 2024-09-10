@@ -1041,4 +1041,9 @@ public interface Log extends BasicLogger {
 	@LogMessage(level = INFO)
 	@Message(id = ID_OFFSET + 168, value = "Mass indexing complete in %3$s. Indexed %1$d/%2$d entities.")
 	void indexingEntitiesCompleted(long indexed, long total, Duration indexingTime);
+
+	@LogMessage(level = INFO)
+	@Message(id = ID_OFFSET + 169,
+			value = "Mass indexing is going to index approx. %1$d entities (%2$s). Actual number may change once the indexing starts.")
+	void indexingEntitiesApprox(long count, String types);
 }

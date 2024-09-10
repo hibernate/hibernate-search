@@ -22,6 +22,9 @@ import org.hibernate.search.mapper.pojo.mapping.definition.annotation.GenericFie
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.SearchEntity;
 import org.hibernate.search.mapper.pojo.massindexing.MassIndexingMonitor;
+import org.hibernate.search.mapper.pojo.massindexing.MassIndexingTypeGroupMonitor;
+import org.hibernate.search.mapper.pojo.massindexing.MassIndexingTypeGroupMonitorContext;
+import org.hibernate.search.mapper.pojo.massindexing.MassIndexingTypeGroupMonitorCreateContext;
 import org.hibernate.search.mapper.pojo.standalone.mapping.SearchMapping;
 import org.hibernate.search.mapper.pojo.standalone.massindexing.MassIndexer;
 import org.hibernate.search.mapper.pojo.standalone.session.SearchSession;
@@ -128,6 +131,66 @@ class MassIndexingMonitorIT {
 		assertThat( staticCounters.get( StaticCountersMonitor.INDEXING_COMPLETED ) ).isEqualTo( 1 );
 	}
 
+	@Test
+	void skipTotalCount() {
+		SearchMapping mapping = setup( null );
+
+		try ( SearchSession searchSession = mapping.createSession() ) {
+			MassIndexer indexer = searchSession.massIndexer()
+					// Simulate passing information to connect to a DB, ...
+					.context( StubLoadingContext.class, loadingContext );
+
+			CompletableFuture<?> indexingFuture = new CompletableFuture<>();
+			indexingFuture.completeExceptionally( new SimulatedFailure( "Indexing error" ) );
+
+			// add operations on indexes can follow any random order,
+			// since they are executed by different threads
+			backendMock.expectWorks(
+					Book.NAME, DocumentCommitStrategy.NONE, DocumentRefreshStrategy.NONE
+			)
+					.add( "1", b -> b
+							.field( "title", TITLE_1 )
+							.field( "author", AUTHOR_1 )
+					)
+					.add( "3", b -> b
+							.field( "title", TITLE_3 )
+							.field( "author", AUTHOR_3 )
+					)
+					.createAndExecuteFollowingWorks( indexingFuture )
+					.add( "2", b -> b
+							.field( "title", TITLE_2 )
+							.field( "author", AUTHOR_2 )
+					);
+
+			// purgeAtStart and mergeSegmentsAfterPurge are enabled by default,
+			// so we expect 1 purge, 1 mergeSegments and 1 flush calls in this order:
+			backendMock.expectIndexScaleWorks( Book.NAME, searchSession.tenantIdentifierValue() )
+					.purge()
+					.mergeSegments()
+					.flush()
+					.refresh();
+
+			try {
+				indexer.monitor( new StaticCountersMonitor( false ) )
+						.startAndWait();
+			}
+			catch (SearchException ignored) {
+				// Expected, but not relevant to this test
+			}
+			catch (InterruptedException e) {
+				fail( "Unexpected InterruptedException: " + e.getMessage() );
+			}
+		}
+
+		backendMock.verifyExpectationsMet();
+
+		assertThat( staticCounters.get( StaticCountersMonitor.LOADED ) ).isEqualTo( 3 );
+		assertThat( staticCounters.get( StaticCountersMonitor.BUILT ) ).isEqualTo( 3 );
+		assertThat( staticCounters.get( StaticCountersMonitor.ADDED ) ).isEqualTo( 2 );
+		assertThat( staticCounters.get( StaticCountersMonitor.TOTAL ) ).isEqualTo( 0 );
+		assertThat( staticCounters.get( StaticCountersMonitor.INDEXING_COMPLETED ) ).isEqualTo( 1 );
+	}
+
 	private void initData() {
 		persist( new Book( 1, TITLE_1, AUTHOR_1 ) );
 		persist( new Book( 2, TITLE_2, AUTHOR_2 ) );
@@ -178,6 +241,7 @@ class MassIndexingMonitorIT {
 		}
 	}
 
+	@SuppressWarnings("removal")
 	public static class StaticCountersMonitor implements MassIndexingMonitor {
 
 		public static StaticCounters.Key ADDED = StaticCounters.createKey();
@@ -185,6 +249,42 @@ class MassIndexingMonitorIT {
 		public static StaticCounters.Key LOADED = StaticCounters.createKey();
 		public static StaticCounters.Key TOTAL = StaticCounters.createKey();
 		public static StaticCounters.Key INDEXING_COMPLETED = StaticCounters.createKey();
+
+
+		private final boolean requiresTotalCount;
+
+		public StaticCountersMonitor() {
+			this( true );
+		}
+
+		public StaticCountersMonitor(boolean requiresTotalCount) {
+			this.requiresTotalCount = requiresTotalCount;
+		}
+
+		@Override
+		public MassIndexingTypeGroupMonitor typeGroupMonitor(MassIndexingTypeGroupMonitorCreateContext context) {
+			if ( requiresTotalCount ) {
+				return MassIndexingMonitor.super.typeGroupMonitor( context );
+			}
+			else {
+				return new MassIndexingTypeGroupMonitor() {
+					@Override
+					public void documentsIndexed(long increment) {
+						// do nothing
+					}
+
+					@Override
+					public void indexingStarted(MassIndexingTypeGroupMonitorContext context) {
+						// do nothing
+					}
+
+					@Override
+					public void indexingCompleted(MassIndexingTypeGroupMonitorContext context) {
+						// do nothing
+					}
+				};
+			}
+		}
 
 		@Override
 		public void documentsAdded(long increment) {

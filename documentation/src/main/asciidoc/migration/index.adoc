@@ -95,6 +95,10 @@ But there are next changes:
 This was done to address the scenarios where the total number of identifiers to load is not known ahead of time.
 - Deprecated `org.hibernate.search.mapper.orm.massindexing.MassIndexingFailureHandler`, `org.hibernate.search.mapper.orm.massindexing.MassIndexingMonitor`
 interfaces are removed in this version. They have their alternatives in a `org.hibernate.search.mapper.pojo.massindexing` for a while now.
+- `org.hibernate.search.mapper.pojo.massindexing.MassIndexingMonitor#addToTotalCount(..)` gets deprecated for removal.
+Instead, we are introducing the `org.hibernate.search.mapper.pojo.massindexing.MassIndexingTypeGroupMonitor`
+that can be obtained through `org.hibernate.search.mapper.pojo.massindexing.MassIndexingMonitor#typeGroupMonitor(..)`.
+This new type group monitor has more flexibility and also allows implementors to skip total count computations if needed.
 
 [[spi]]
 == SPI
