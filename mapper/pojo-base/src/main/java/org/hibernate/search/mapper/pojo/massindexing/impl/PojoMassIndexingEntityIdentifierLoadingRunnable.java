@@ -7,7 +7,6 @@ package org.hibernate.search.mapper.pojo.massindexing.impl;
 import java.lang.invoke.MethodHandles;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.OptionalLong;
 
 import org.hibernate.search.mapper.pojo.loading.spi.PojoMassIdentifierLoader;
 import org.hibernate.search.mapper.pojo.loading.spi.PojoMassIdentifierLoadingContext;
@@ -17,7 +16,6 @@ import org.hibernate.search.mapper.pojo.loading.spi.PojoMassLoadingStrategy;
 import org.hibernate.search.mapper.pojo.logging.impl.Log;
 import org.hibernate.search.mapper.pojo.massindexing.MassIndexingEnvironment;
 import org.hibernate.search.mapper.pojo.massindexing.MassIndexingTypeGroupMonitor;
-import org.hibernate.search.mapper.pojo.massindexing.spi.PojoMassIndexingContext;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
 public class PojoMassIndexingEntityIdentifierLoadingRunnable<E, I>
@@ -26,26 +24,24 @@ public class PojoMassIndexingEntityIdentifierLoadingRunnable<E, I>
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	private final MassIndexingTypeGroupMonitor typeGroupMonitor;
-	private final PojoMassIndexingContext massIndexingContext;
+	private final MassIndexingTypeGroupContext<E> massIndexingTypeGroupContext;
 	private final PojoMassIndexingIndexedTypeGroup<E> typeGroup;
 	private final PojoMassLoadingStrategy<E, I> loadingStrategy;
 	private final PojoProducerConsumerQueue<List<I>> identifierQueue;
-	private final String tenantId;
 	private final MassIndexingEnvironment.EntityIdentifierLoadingContext identifierLoadingContext;
 
 	public PojoMassIndexingEntityIdentifierLoadingRunnable(PojoMassIndexingNotifier notifier,
 			MassIndexingTypeGroupMonitor typeGroupMonitor,
-			PojoMassIndexingContext massIndexingContext, MassIndexingEnvironment environment,
+			MassIndexingTypeGroupContext<E> massIndexingTypeGroupContext, MassIndexingEnvironment environment,
 			PojoMassIndexingIndexedTypeGroup<E> typeGroup,
 			PojoMassLoadingStrategy<E, I> loadingStrategy,
-			PojoProducerConsumerQueue<List<I>> identifierQueue, String tenantId) {
+			PojoProducerConsumerQueue<List<I>> identifierQueue) {
 		super( notifier, environment );
 		this.typeGroupMonitor = typeGroupMonitor;
-		this.massIndexingContext = massIndexingContext;
+		this.massIndexingTypeGroupContext = massIndexingTypeGroupContext;
 		this.loadingStrategy = loadingStrategy;
 		this.typeGroup = typeGroup;
 		this.identifierQueue = identifierQueue;
-		this.tenantId = tenantId;
 
 		this.identifierLoadingContext = new EntityIdentifierLoadingContextImpl();
 	}
@@ -55,12 +51,7 @@ public class PojoMassIndexingEntityIdentifierLoadingRunnable<E, I>
 		log.trace( "started" );
 		LoadingContext context = new LoadingContext();
 		try ( PojoMassIdentifierLoader loader = loadingStrategy.createIdentifierLoader( typeGroup.includedTypes(), context ) ) {
-			OptionalLong count = loader.totalCount();
-			typeGroupMonitor.indexingStarted( count );
-			if ( count.isPresent() ) {
-				getNotifier().reportAddedTotalCount( count.getAsLong() );
-			}
-
+			typeGroupMonitor.indexingStarted( massIndexingTypeGroupContext.withIdentifierLoader( loader ) );
 			do {
 				loader.loadNext();
 			}
@@ -104,7 +95,7 @@ public class PojoMassIndexingEntityIdentifierLoadingRunnable<E, I>
 
 		@Override
 		public PojoMassLoadingContext parent() {
-			return massIndexingContext;
+			return massIndexingTypeGroupContext.massIndexingContext();
 		}
 
 		@Override
@@ -126,11 +117,12 @@ public class PojoMassIndexingEntityIdentifierLoadingRunnable<E, I>
 
 		@Override
 		public String tenantIdentifier() {
-			return tenantId;
+			return massIndexingTypeGroupContext.tenantIdentifier();
 		}
 	}
 
 	private static final class EntityIdentifierLoadingContextImpl
 			implements MassIndexingEnvironment.EntityIdentifierLoadingContext {
 	}
+
 }

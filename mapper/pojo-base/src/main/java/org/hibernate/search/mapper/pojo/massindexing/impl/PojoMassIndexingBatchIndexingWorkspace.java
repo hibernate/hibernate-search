@@ -7,19 +7,14 @@ package org.hibernate.search.mapper.pojo.massindexing.impl;
 import java.lang.invoke.MethodHandles;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Future;
 import java.util.concurrent.ThreadPoolExecutor;
-import java.util.stream.Collectors;
 
-import org.hibernate.search.mapper.pojo.loading.spi.PojoLoadingTypeContext;
 import org.hibernate.search.mapper.pojo.loading.spi.PojoMassLoadingStrategy;
 import org.hibernate.search.mapper.pojo.logging.impl.Log;
 import org.hibernate.search.mapper.pojo.massindexing.MassIndexingEnvironment;
-import org.hibernate.search.mapper.pojo.massindexing.MassIndexingType;
 import org.hibernate.search.mapper.pojo.massindexing.MassIndexingTypeGroupMonitor;
-import org.hibernate.search.mapper.pojo.massindexing.MassIndexingTypeGroupMonitorContext;
 import org.hibernate.search.mapper.pojo.massindexing.spi.PojoMassIndexingContext;
 import org.hibernate.search.mapper.pojo.massindexing.spi.PojoMassIndexingMappingContext;
 import org.hibernate.search.util.common.AssertionFailure;
@@ -45,11 +40,11 @@ public class PojoMassIndexingBatchIndexingWorkspace<E, I> extends PojoMassIndexi
 	private final PojoMassIndexingMappingContext mappingContext;
 	private final PojoMassIndexingIndexedTypeGroup<E> typeGroup;
 	private final PojoMassLoadingStrategy<E, I> loadingStrategy;
-	private final PojoMassIndexingContext massIndexingContext;
 
 	private final int entityExtractingThreads;
 	private final String tenantId;
 	private final MassIndexingTypeGroupMonitor typeGroupMonitor;
+	private final MassIndexingTypeGroupContext<E> massIndexingTypeGroupContext;
 
 	PojoMassIndexingBatchIndexingWorkspace(PojoMassIndexingMappingContext mappingContext,
 			PojoMassIndexingNotifier notifier,
@@ -62,10 +57,10 @@ public class PojoMassIndexingBatchIndexingWorkspace<E, I> extends PojoMassIndexi
 		this.mappingContext = mappingContext;
 		this.typeGroup = typeGroup;
 		this.loadingStrategy = loadingStrategy;
-		this.massIndexingContext = massIndexingContext;
 		this.entityExtractingThreads = entityExtractingThreads;
 		this.tenantId = tenantId;
-		this.typeGroupMonitor = notifier.typeGroupMonitor( new MassIndexingTypeGroupMonitorContextImpl( typeGroup ) );
+		this.massIndexingTypeGroupContext = new MassIndexingTypeGroupContext<>( typeGroup, massIndexingContext, tenantId );
+		this.typeGroupMonitor = notifier.typeGroupMonitor( massIndexingTypeGroupContext );
 	}
 
 	@Override
@@ -84,7 +79,7 @@ public class PojoMassIndexingBatchIndexingWorkspace<E, I> extends PojoMassIndexi
 		allFutures.addAll( identifierProducingFutures );
 		allFutures.addAll( indexingFutures );
 		Futures.unwrappedExceptionGet( Futures.firstFailureOrAllOf( allFutures ) );
-		typeGroupMonitor.indexingCompleted();
+		typeGroupMonitor.indexingCompleted( massIndexingTypeGroupContext );
 		log.debugf( "Indexing for %s is done", typeGroup.notifiedGroupName() );
 	}
 
@@ -112,9 +107,9 @@ public class PojoMassIndexingBatchIndexingWorkspace<E, I> extends PojoMassIndexi
 		final Runnable runnable = new PojoMassIndexingEntityIdentifierLoadingRunnable<>(
 				getNotifier(),
 				typeGroupMonitor,
-				massIndexingContext, getMassIndexingEnvironment(),
+				massIndexingTypeGroupContext, getMassIndexingEnvironment(),
 				typeGroup, loadingStrategy,
-				identifierQueue, tenantId
+				identifierQueue
 		);
 		//execIdentifiersLoader has size 1 and is not configurable: ensures the list is consistent as produced by one transaction
 		final ThreadPoolExecutor identifierProducingExecutor = mappingContext.threadPoolProvider().newFixedThreadPool(
@@ -133,7 +128,7 @@ public class PojoMassIndexingBatchIndexingWorkspace<E, I> extends PojoMassIndexi
 		final Runnable runnable = new PojoMassIndexingEntityLoadingRunnable<>(
 				getNotifier(),
 				typeGroupMonitor,
-				massIndexingContext, getMassIndexingEnvironment(),
+				massIndexingTypeGroupContext.massIndexingContext(), getMassIndexingEnvironment(),
 				typeGroup, loadingStrategy,
 				identifierQueue, tenantId
 		);
@@ -151,33 +146,4 @@ public class PojoMassIndexingBatchIndexingWorkspace<E, I> extends PojoMassIndexi
 		}
 	}
 
-	private static class MassIndexingTypeGroupMonitorContextImpl implements MassIndexingTypeGroupMonitorContext {
-
-		private final Set<MassIndexingType> includedTypes;
-
-		public MassIndexingTypeGroupMonitorContextImpl(PojoMassIndexingIndexedTypeGroup<?> typeGroup) {
-			includedTypes = typeGroup.includedTypes().stream().map( PojoLoadingTypeContext::entityName )
-					.map( MassIndexingTypeImpl::new )
-					.collect( Collectors.toSet() );
-		}
-
-		@Override
-		public Set<MassIndexingType> includedTypes() {
-			return includedTypes;
-		}
-	}
-
-
-	private static class MassIndexingTypeImpl implements MassIndexingType {
-		private final String entityName;
-
-		private MassIndexingTypeImpl(String entityName) {
-			this.entityName = entityName;
-		}
-
-		@Override
-		public String entityName() {
-			return entityName;
-		}
-	}
 }

@@ -4,7 +4,7 @@
  */
 package org.hibernate.search.mapper.pojo.massindexing;
 
-import org.hibernate.search.mapper.pojo.massindexing.impl.NoOpMassIndexingTypeGroupMonitor;
+import org.hibernate.search.mapper.pojo.massindexing.impl.LegacyDelegatingMassIndexingTypeGroupMonitor;
 import org.hibernate.search.util.common.annotation.Incubating;
 
 /**
@@ -21,9 +21,23 @@ import org.hibernate.search.util.common.annotation.Incubating;
  */
 public interface MassIndexingMonitor {
 
+	/**
+	 * Creates a type-group-specific monitor.
+	 * <p>
+	 * The mass indexer may group some of the types it has to index or index them separately.
+	 * The type group represents this combination of types that are retrieved for indexing
+	 * in the same pipeline.
+	 * <p>
+	 * The mass indexer will request to create a type group monitor in the main indexing thread
+	 * when initializing the mass indexing environment.
+	 *
+	 * @param context Describes the type group for which the monitor is requested.
+	 * @return A type group mass indexing monitor. By default, a no-op monitor is returned.
+	 * @see MassIndexingTypeGroupMonitor
+	 */
 	@Incubating
-	default MassIndexingTypeGroupMonitor typeGroupMonitor(MassIndexingTypeGroupMonitorContext context) {
-		return NoOpMassIndexingTypeGroupMonitor.INSTANCE;
+	default MassIndexingTypeGroupMonitor typeGroupMonitor(MassIndexingTypeGroupMonitorCreateContext context) {
+		return new LegacyDelegatingMassIndexingTypeGroupMonitor( this, context );
 	}
 
 	/**
@@ -94,8 +108,16 @@ public interface MassIndexingMonitor {
 	 * This method can be invoked from several threads thus implementors are required to be thread-safe.
 	 *
 	 * @param increment additional number of entities that will be indexed
+	 * @deprecated Use {@link MassIndexingTypeGroupMonitor#indexingStarted(MassIndexingTypeGroupMonitorContext)}
+	 * and get the total count, if available, from the {@link MassIndexingTypeGroupMonitorContext#totalCount()}.
+	 * Alternatively, use the {@link #typeGroupMonitor(MassIndexingTypeGroupMonitorCreateContext)}
+	 * and obtain the count from {@link MassIndexingTypeGroupMonitorCreateContext#totalCount()} if
+	 * a count is needed before any indexing processes are started.
 	 */
-	void addToTotalCount(long increment);
+	@Deprecated(forRemoval = true, since = "8.0")
+	default void addToTotalCount(long increment) {
+		// do nothing;
+	}
 
 	/**
 	 * Notify the monitor that indexing is complete.

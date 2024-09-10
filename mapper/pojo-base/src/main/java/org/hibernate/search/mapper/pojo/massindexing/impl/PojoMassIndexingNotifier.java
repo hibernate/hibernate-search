@@ -21,7 +21,6 @@ import org.hibernate.search.mapper.pojo.massindexing.MassIndexingFailureContext;
 import org.hibernate.search.mapper.pojo.massindexing.MassIndexingFailureHandler;
 import org.hibernate.search.mapper.pojo.massindexing.MassIndexingMonitor;
 import org.hibernate.search.mapper.pojo.massindexing.MassIndexingTypeGroupMonitor;
-import org.hibernate.search.mapper.pojo.massindexing.MassIndexingTypeGroupMonitorContext;
 import org.hibernate.search.mapper.pojo.massindexing.spi.PojoMassIndexingSessionContext;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
@@ -50,11 +49,7 @@ public class PojoMassIndexingNotifier {
 				.orElseGet( failureHandler::failureFloodingThreshold );
 	}
 
-	void reportAddedTotalCount(long totalCount) {
-		monitor.addToTotalCount( totalCount );
-	}
-
-	public MassIndexingTypeGroupMonitor typeGroupMonitor(MassIndexingTypeGroupMonitorContext context) {
+	MassIndexingTypeGroupMonitor typeGroupMonitor(MassIndexingTypeGroupContext<?> context) {
 		return monitor.typeGroupMonitor( context );
 	}
 
