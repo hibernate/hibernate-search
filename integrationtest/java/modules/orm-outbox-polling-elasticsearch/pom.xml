@@ -90,6 +90,16 @@
             <version>${version.jakarta.enterprise}</version>
             <scope>test</scope>
         </dependency>
+
+        <!--
+            NOTE: Remove this dependency once the Log4j2 is updated to 2.24.1+
+        -->
+        <dependency>
+            <groupId>org.jspecify</groupId>
+            <artifactId>jspecify</artifactId>
+            <version>1.0.0</version>
+            <scope>provided</scope>
+        </dependency>
     </dependencies>
 
     <build>

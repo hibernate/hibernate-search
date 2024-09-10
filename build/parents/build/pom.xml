@@ -126,6 +126,9 @@
         <!-- Test dependencies -->
 
         <!-- >>> Common -->
+        <!--
+            NOTE: with the next upgrade of the log4j (to 2.24.1+) *REMOVE* the additional jspecify dependency added to the JPMS tests
+        -->
         <version.log4j>2.24.0</version.log4j>
         <version.junit>4.13.2</version.junit>
         <version.junit-jupiter>5.11.0</version.junit-jupiter>
