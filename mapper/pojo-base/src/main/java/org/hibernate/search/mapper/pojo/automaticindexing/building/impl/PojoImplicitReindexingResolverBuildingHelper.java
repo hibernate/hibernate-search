@@ -189,19 +189,10 @@ public final class PojoImplicitReindexingResolverBuildingHelper {
 						entityStateRepresentation.pathFromStateArrayElement(), inversePathByInverseType );
 			}
 			catch (RuntimeException e) {
-				// We're logging instead of re-throwing for backwards compatibility,
-				// as we don't want this feature to cause errors in existing applications.
-				// TODO HSEARCH-4720 when we can afford breaking changes (in the next major), we should probably throw an exception
-				//  instead of just logging a warning here?
-				// Wrap the failure to append a message "please report this bug"
-				AssertionFailure assertionFailure = e instanceof AssertionFailure
-						? (AssertionFailure) e
-						: new AssertionFailure( e.getMessage(), e );
-				log.failedToCreateImplicitReindexingAssociationInverseSideResolverNode(
+				throw log.failedToCreateImplicitReindexingAssociationInverseSideResolverNode(
 						inversePathByInverseType,
 						EventContexts.fromType( typeModel ).append( PojoEventContexts.fromPath( path ) ),
-						assertionFailure.getMessage(), assertionFailure );
-				continue;
+						e.getMessage(), e );
 			}
 			List<PojoImplicitReindexingAssociationInverseSideResolverNode<Object>> nodesForOrdinal = result.get( ordinal );
 			if ( nodesForOrdinal == null ) {

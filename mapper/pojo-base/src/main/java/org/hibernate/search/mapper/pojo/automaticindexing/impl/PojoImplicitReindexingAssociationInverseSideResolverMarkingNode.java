@@ -4,10 +4,13 @@
  */
 package org.hibernate.search.mapper.pojo.automaticindexing.impl;
 
+import java.lang.invoke.MethodHandles;
 import java.util.Map;
 
+import org.hibernate.search.mapper.pojo.logging.impl.Log;
 import org.hibernate.search.mapper.pojo.model.path.impl.PojoPathOrdinalReference;
 import org.hibernate.search.mapper.pojo.model.spi.PojoRawTypeIdentifier;
+import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 import org.hibernate.search.util.common.spi.ToStringTreeAppender;
 
 /**
@@ -16,6 +19,8 @@ import org.hibernate.search.util.common.spi.ToStringTreeAppender;
  */
 public class PojoImplicitReindexingAssociationInverseSideResolverMarkingNode
 		extends PojoImplicitReindexingAssociationInverseSideResolverNode<Object> {
+
+	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	private final Map<PojoRawTypeIdentifier<?>, PojoPathOrdinalReference> inverseSidePathOrdinalByType;
 
@@ -45,11 +50,21 @@ public class PojoImplicitReindexingAssociationInverseSideResolverMarkingNode
 		PojoRawTypeIdentifier<?> entityTypeIdentifier = context.detectContainingEntityType( entity );
 		PojoPathOrdinalReference inverseSidePathOrdinal = inverseSidePathOrdinalByType.get( entityTypeIdentifier );
 		if ( inverseSidePathOrdinal == null ) {
-			// This shouldn't happen, as this means we encountered an unexpected entity type
-			// as the target of the association.
-			// We're ignoring the problem instead of throwing an exception for backwards compatibility,
-			// as we don't want this feature to cause errors in existing applications.
-			// TODO HSEARCH-4720 when we can afford breaking changes (in the next major), we should probably throw an exception here?
+			// This can happen when we have inheritance hierarchy in play:
+			// 	Assume having an entity A extended by an indexed entity B. And A has an association to A,e.g.:
+			//
+			// 	class A {
+			// 		A a;
+			// 	}
+			//	@Indexed class B extends A {
+			//	}
+			//
+			//	Now in this scenario we would care if an actual instance of `A a` is B. As that would be when `a` has to be re-indexed.
+			//	This means that the inverseSidePathOrdinalByType would contain only the key for `B` type, but not for `A`.
+			//	At runtime, when an actual instance of `A a` is B all good we find a inverse side in the map.
+			//	Otherwise, if the `A a` is an instance of A then the map won't have a reference, as we do not care about such scenario, `A` is not indexed.
+			//
+			//	And if that happens we just want to return fast without updating the association.
 			return;
 		}
 		collector.updateBecauseOfContainedAssociation( entityTypeIdentifier, entity, inverseSidePathOrdinal.ordinal );

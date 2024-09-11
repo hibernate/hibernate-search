@@ -214,14 +214,11 @@ final class HibernateOrmPathInterpreter
 				tryResolveStateRepresentation( wholePathStringRepresentation );
 			}
 			catch (RuntimeException e) {
-				// TODO HSEARCH-4720 when we can afford breaking changes (in the next major), we should probably throw an exception
-				//  instead of just logging a warning here?
-				log.failedToResolveStateRepresentation(
+				throw log.failedToResolveStateRepresentation(
 						wholePathStringRepresentation,
 						EventContexts.fromType( typeModel ).append( PojoEventContexts.fromPath( wholePath ) ),
 						e.getMessage(), e
 				);
-				disableStateRepresentation();
 			}
 		}
 
