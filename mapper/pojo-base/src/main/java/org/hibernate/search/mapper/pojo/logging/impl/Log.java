@@ -744,7 +744,6 @@ public interface Log extends BasicLogger {
 			value = "Invalid ObjectPath encountered '%1$s': %2$s")
 	SearchException invalidObjectPath(ObjectPath path, String causeMessage, @Cause Exception cause);
 
-	@LogMessage(level = Logger.Level.WARN)
 	@Message(id = ID_OFFSET + 122,
 			value = "An unexpected failure occurred while configuring resolution of association inverse side for reindexing."
 					+ " This may lead to incomplete reindexing and thus out-of-sync indexes."
@@ -752,7 +751,7 @@ public interface Log extends BasicLogger {
 					+ " Failure: %3$s"
 					+ " %2$s" // Context
 					+ " Association inverse side: %1$s.")
-	void failedToCreateImplicitReindexingAssociationInverseSideResolverNode(
+	SearchException failedToCreateImplicitReindexingAssociationInverseSideResolverNode(
 			Map<PojoRawTypeModel<?>, PojoModelPathValueNode> inversePathByInverseType,
 			@FormatWith(EventContextFormatter.class) EventContext context,
 			String causeMessage, @Cause Exception cause);

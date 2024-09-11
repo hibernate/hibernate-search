@@ -111,4 +111,7 @@ to reflect the changes in the `org.hibernate.search.mapper.pojo.standalone.loadi
 The behavior of Hibernate Search {hibernateSearchVersion}
 is, in general, backward-compatible with Hibernate Search {hibernateSearchPreviousStableVersionShort}.
 
-The default mass indexer logging monitor updated the format of the logged messages to provide the information in a more condense form.
+* The default mass indexer logging monitor updated the format of the logged messages to provide the information in a more condense form.
+* In a few places related to the discovery of the inverse side of an association (in the ORM mapper)
+that previously logged warnings, Hibernate Search now will throw exceptions instead.
+This is related to https://hibernate.atlassian.net/browse/HSEARCH-4708[HSEARCH-4708].
