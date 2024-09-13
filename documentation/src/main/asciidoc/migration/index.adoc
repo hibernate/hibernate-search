@@ -93,6 +93,8 @@ But there are next changes:
 
 - An incubating `org.hibernate.search.mapper.pojo.standalone.loading.MassIdentifierLoader` changed the return type of `#totalCount()` from `long` to `OptionalLong`.
 This was done to address the scenarios where the total number of identifiers to load is not known ahead of time.
+- Deprecated `org.hibernate.search.mapper.orm.massindexing.MassIndexingFailureHandler`, `org.hibernate.search.mapper.orm.massindexing.MassIndexingMonitor`
+interfaces are removed in this version. They have their alternatives in a `org.hibernate.search.mapper.pojo.massindexing` for a while now.
 
 [[spi]]
 == SPI
