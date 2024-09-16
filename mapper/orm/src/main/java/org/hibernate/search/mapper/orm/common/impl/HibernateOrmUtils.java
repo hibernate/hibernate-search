@@ -30,7 +30,9 @@ import org.hibernate.mapping.Property;
 import org.hibernate.metamodel.MappingMetamodel;
 import org.hibernate.metamodel.mapping.EntityMappingType;
 import org.hibernate.metamodel.model.domain.EntityDomainType;
-import org.hibernate.models.internal.SourceModelBuildingContextImpl;
+import org.hibernate.models.internal.BasicModelBuildingContextImpl;
+import org.hibernate.models.internal.SimpleClassLoading;
+import org.hibernate.models.jandex.internal.JandexModelBuildingContextImpl;
 import org.hibernate.models.spi.SourceModelBuildingContext;
 import org.hibernate.search.mapper.orm.logging.impl.Log;
 import org.hibernate.search.mapper.pojo.loading.spi.PojoLoadingTypeContext;
@@ -196,11 +198,19 @@ public final class HibernateOrmUtils {
 				getServiceOrEmpty( bootstrapContext.getServiceRegistry(), ClassLoaderService.class )
 						.orElseThrow();
 		ClassLoaderServiceLoading classLoading = new ClassLoaderServiceLoading( classLoaderService );
-		return new SourceModelBuildingContextImpl(
-				classLoading,
-				bootstrapContext.getJandexView(),
-				ModelsHelper::preFillRegistries
-		);
+		if ( bootstrapContext.getJandexView() == null ) {
+			return new BasicModelBuildingContextImpl(
+					classLoading,
+					ModelsHelper::preFillRegistries
+			);
+		}
+		else {
+			return new JandexModelBuildingContextImpl(
+					bootstrapContext.getJandexView(),
+					classLoading,
+					ModelsHelper::preFillRegistries
+			);
+		}
 	}
 
 }
