@@ -99,7 +99,7 @@ class LuceneQueryDslIT {
 			assertThat( sort.getSort()[0].getType() ).isEqualTo( SortField.Type.CUSTOM );
 
 			assertThat( topDocs ).isNotNull();
-			assertThat( topDocs.totalHits.value ).isEqualTo( 2L );
+			assertThat( topDocs.totalHits.value() ).isEqualTo( 2L );
 			assertThat( topDocs.scoreDocs ).hasSize( 2 );
 		} );
 	}
