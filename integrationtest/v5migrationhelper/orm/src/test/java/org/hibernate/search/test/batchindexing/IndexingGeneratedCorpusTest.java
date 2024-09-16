@@ -79,7 +79,7 @@ class IndexingGeneratedCorpusTest {
 				TitleAble instance = entityType.newInstance();
 				instance.setTitle( sentenceInventor.nextSentence() );
 				//to test for HSEARCH-512 we make all entities share some proxy
-				Nation country = fullTextSession.load( Nation.class, 1 );
+				Nation country = fullTextSession.getReference( Nation.class, 1 );
 				instance.setFirstPublishedIn( country );
 				fullTextSession.persist( instance );
 				totalEntitiesInDB++;
@@ -107,7 +107,7 @@ class IndexingGeneratedCorpusTest {
 			Transaction tx = fullTextSession.beginTransaction();
 			List<Book> allBooks =
 					fullTextSession.createQuery( "select b from " + Book.class.getName() + " b", Book.class ).list();
-			Nation italy = fullTextSession.load( Nation.class, 1 );
+			Nation italy = fullTextSession.getReference( Nation.class, 1 );
 			italy.getLibrariesHave().addAll( allBooks );
 			tx.commit();
 		}
