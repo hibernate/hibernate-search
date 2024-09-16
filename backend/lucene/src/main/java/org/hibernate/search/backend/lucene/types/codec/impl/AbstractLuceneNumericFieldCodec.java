@@ -64,4 +64,7 @@ public abstract class AbstractLuceneNumericFieldCodec<F, E extends Number> imple
 	abstract void addStoredToDocument(LuceneDocumentContent documentBuilder, String absoluteFieldPath,
 			F value, E encodedValue);
 
+	public Double sortedDocValueToDouble(Long value) {
+		return getDomain().sortedDocValueToDouble( value );
+	}
 }

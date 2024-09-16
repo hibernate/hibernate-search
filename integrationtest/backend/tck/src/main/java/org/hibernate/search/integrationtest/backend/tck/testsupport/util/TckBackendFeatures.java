@@ -4,6 +4,7 @@
  */
 package org.hibernate.search.integrationtest.backend.tck.testsupport.util;
 
+import java.time.temporal.TemporalAccessor;
 import java.util.Comparator;
 import java.util.Optional;
 
@@ -173,7 +174,7 @@ public abstract class TckBackendFeatures implements StubMappingBackendFeatures {
 
 	public abstract <F> Object toRawValue(FieldTypeDescriptor<F, ?> descriptor, F value);
 
-	// with some backends sorts need require a different raw value to what other places like predicates will allow.
+	// with some backends sorts require a different raw value to what other places like predicates will allow.
 	// E.g. Elasticsearch won't accept the formatted string date-time types and expects it to be in form of a number instead.
 	public <F> Object toSortRawValue(FieldTypeDescriptor<F, ?> descriptor, F value) {
 		return toRawValue( descriptor, value );
@@ -198,6 +199,26 @@ public abstract class TckBackendFeatures implements StubMappingBackendFeatures {
 	}
 
 	public boolean negativeDecimalScaleIsAppliedToAvgAggregationFunction() {
+		return true;
+	}
+
+	public <F, T> T fromRawAggregation(FieldTypeDescriptor<F, ?> typeDescriptor, T value) {
+		return value;
+	}
+
+	public <F> Double toDoubleValue(FieldTypeDescriptor<F, ?> descriptor, F fieldValue) {
+		if ( Number.class.isAssignableFrom( descriptor.getJavaType() ) ) {
+			return ( (Number) fieldValue ).doubleValue();
+		}
+
+		if ( TemporalAccessor.class.isAssignableFrom( descriptor.getJavaType() ) ) {
+			return ( (Number) toSortRawValue( descriptor, fieldValue ) ).doubleValue();
+		}
+
+		throw new UnsupportedOperationException( "Type " + descriptor.getJavaType() + " is not supported" );
+	}
+
+	public <F> boolean rawAggregationProduceSensibleDoubleValue(FieldTypeDescriptor<F, ?> fFieldTypeDescriptor) {
 		return true;
 	}
 }

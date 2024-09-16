@@ -14,7 +14,6 @@ import org.hibernate.search.backend.lucene.search.common.impl.LuceneSearchIndexS
 import org.hibernate.search.backend.lucene.search.common.impl.LuceneSearchIndexValueFieldContext;
 import org.hibernate.search.backend.lucene.types.codec.impl.AbstractLuceneNumericFieldCodec;
 import org.hibernate.search.backend.lucene.types.lowlevel.impl.LuceneNumericDomain;
-import org.hibernate.search.engine.backend.types.converter.spi.ProjectionConverter;
 import org.hibernate.search.engine.search.aggregation.spi.FieldMetricAggregationBuilder;
 
 public class LuceneAvgCompensatedSumAggregation<F, E extends Number, K>
@@ -29,10 +28,9 @@ public class LuceneAvgCompensatedSumAggregation<F, E extends Number, K>
 	}
 
 	@Override
-	void fillCollectors(JoiningLongMultiValuesSource source, AggregationRequestContext context,
-			LuceneNumericDomain<E> numericDomain) {
-		CompensatedSumCollectorFactory sumCollectorFactory = new CompensatedSumCollectorFactory( source,
-				numericDomain::sortedDocValueToDouble );
+	void fillCollectors(JoiningLongMultiValuesSource source, AggregationRequestContext context) {
+		CompensatedSumCollectorFactory sumCollectorFactory =
+				new CompensatedSumCollectorFactory( source, codec::sortedDocValueToDouble );
 		compensatedSumCollectorKey = sumCollectorFactory.getCollectorKey();
 		context.requireCollector( sumCollectorFactory );
 
@@ -65,18 +63,18 @@ public class LuceneAvgCompensatedSumAggregation<F, E extends Number, K>
 		}
 	}
 
-	protected static class FunctionTypeSelector<F> extends TypeSelector<F>
+	protected static class FunctionTypeSelector<F, E extends Number> extends TypeSelector<F, E>
 			implements FieldMetricAggregationBuilder.TypeSelector {
 
-		protected FunctionTypeSelector(AbstractLuceneNumericFieldCodec<F, ?> codec, LuceneSearchIndexScope<?> scope,
+		protected FunctionTypeSelector(AbstractLuceneNumericFieldCodec<F, E> codec, LuceneSearchIndexScope<?> scope,
 				LuceneSearchIndexValueFieldContext<F> field) {
 			super( codec, scope, field );
 		}
 
 		@Override
 		protected <T> Builder<F, ? extends Number, T> getFtBuilder(
-				ProjectionConverter<F, ? extends T> projectionConverter) {
-			return new Builder<>( codec, scope, field, projectionConverter );
+				ExtractedValueConverter<E, ? extends T> extractedConverter) {
+			return new Builder<>( codec, scope, field, extractedConverter );
 		}
 	}
 
@@ -86,8 +84,8 @@ public class LuceneAvgCompensatedSumAggregation<F, E extends Number, K>
 		public Builder(AbstractLuceneNumericFieldCodec<F, E> codec,
 				LuceneSearchIndexScope<?> scope,
 				LuceneSearchIndexValueFieldContext<F> field,
-				ProjectionConverter<F, ? extends K> fromFieldValueConverter) {
-			super( codec, scope, field, fromFieldValueConverter );
+				ExtractedValueConverter<E, ? extends K> extractedConverter) {
+			super( codec, scope, field, extractedConverter );
 		}
 
 		@Override

@@ -4,6 +4,8 @@
  */
 package org.hibernate.search.integrationtest.backend.tck.testsupport.util;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.time.Instant;
@@ -28,6 +30,10 @@ public abstract class TypeAssertionHelper<F, T> {
 	public abstract Class<T> getJavaClass();
 
 	public abstract T create(F fieldValue);
+
+	public void assertSameAggregation(T value1, F value2) {
+		assertThat( value1 ).isEqualTo( create( value2 ) );
+	}
 
 	public boolean isSame(F a, F b) {
 		return Objects.equals( a, b );
@@ -143,6 +149,19 @@ public abstract class TypeAssertionHelper<F, T> {
 			public boolean isSame(F a, F b) {
 				return isSame.test( a, b );
 			}
+
+			@Override
+			public void assertSameAggregation(T value1, F value2) {
+				if ( Number.class.isAssignableFrom( typeDescriptor.getJavaType() ) ) {
+					assertThat( Double.parseDouble( TckConfiguration.get().getBackendFeatures()
+							.fromRawAggregation( typeDescriptor, value1 ).toString() ) )
+							.isEqualTo( Double.parseDouble( value2.toString() ) );
+				}
+				else {
+					assertThat( TckConfiguration.get().getBackendFeatures().fromRawAggregation( typeDescriptor, value1 ) )
+							.isEqualTo( create( value2 ) );
+				}
+			}
 		};
 	}
 
@@ -156,6 +175,20 @@ public abstract class TypeAssertionHelper<F, T> {
 			@Override
 			public String create(F fieldValue) {
 				return TckConfiguration.get().getBackendFeatures().toStringValue( typeDescriptor, fieldValue );
+			}
+		};
+	}
+
+	public static <F> TypeAssertionHelper<F, Double> rawDouble(FieldTypeDescriptor<F, ?> typeDescriptor) {
+		return new TypeAssertionHelper<F, Double>() {
+			@Override
+			public Class<Double> getJavaClass() {
+				return Double.class;
+			}
+
+			@Override
+			public Double create(F fieldValue) {
+				return TckConfiguration.get().getBackendFeatures().toDoubleValue( typeDescriptor, fieldValue );
 			}
 		};
 	}

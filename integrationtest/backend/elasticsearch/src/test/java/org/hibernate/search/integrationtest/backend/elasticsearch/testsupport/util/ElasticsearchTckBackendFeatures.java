@@ -52,6 +52,7 @@ import org.hibernate.search.util.impl.integrationtest.backend.elasticsearch.dial
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
 
 public class ElasticsearchTckBackendFeatures extends TckBackendFeatures {
 
@@ -493,5 +494,24 @@ public class ElasticsearchTckBackendFeatures extends TckBackendFeatures {
 	@Override
 	public boolean negativeDecimalScaleIsAppliedToAvgAggregationFunction() {
 		return false;
+	}
+
+	@SuppressWarnings("unchecked")
+	@Override
+	public <F, T> T fromRawAggregation(FieldTypeDescriptor<F, ?> typeDescriptor, T value) {
+		JsonObject jsonObject = gson.fromJson( value.toString(), JsonObject.class );
+		return (T) ( gson.toJson( jsonObject.has( "value_as_string" )
+				? jsonObject.get( "value_as_string" )
+				: jsonObject.get( "value" ) ) );
+	}
+
+	@Override
+	public <F> boolean rawAggregationProduceSensibleDoubleValue(FieldTypeDescriptor<F, ?> fFieldTypeDescriptor) {
+		if ( YearFieldTypeDescriptor.INSTANCE.equals( fFieldTypeDescriptor )
+				|| YearMonthFieldTypeDescriptor.INSTANCE.equals( fFieldTypeDescriptor )
+				|| LocalDateFieldTypeDescriptor.INSTANCE.equals( fFieldTypeDescriptor ) ) {
+			return false;
+		}
+		return super.rawAggregationProduceSensibleDoubleValue( fFieldTypeDescriptor );
 	}
 }
