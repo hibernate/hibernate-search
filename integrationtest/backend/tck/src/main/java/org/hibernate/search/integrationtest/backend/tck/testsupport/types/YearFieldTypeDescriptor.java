@@ -71,6 +71,11 @@ public class YearFieldTypeDescriptor extends StandardFieldTypeDescriptor<Year> {
 			protected Year valueOf(int value) {
 				return Year.of( value + 2000 );
 			}
+
+			@Override
+			protected double doubleValueOf(double value) {
+				return value + 2000;
+			}
 		};
 	}
 

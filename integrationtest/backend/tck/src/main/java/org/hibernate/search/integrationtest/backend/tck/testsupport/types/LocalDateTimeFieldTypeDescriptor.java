@@ -72,6 +72,11 @@ public class LocalDateTimeFieldTypeDescriptor extends StandardFieldTypeDescripto
 			public LocalDateTime avg() {
 				return LocalDateTime.parse( "1970-01-01T00:00:05.500" );
 			}
+
+			@Override
+			protected double doubleValueOf(double value) {
+				return value * 1_000;
+			}
 		};
 	}
 

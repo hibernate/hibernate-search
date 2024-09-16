@@ -9,6 +9,7 @@ import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -90,6 +91,11 @@ public class ZonedDateTimeFieldTypeDescriptor extends StandardFieldTypeDescripto
 			@Override
 			public ZonedDateTime avg() {
 				return ZonedDateTime.parse( "1970-01-01T00:00:05.500Z" );
+			}
+
+			@Override
+			protected double doubleValueOf(double value) {
+				return value * 1_000;
 			}
 		};
 	}
@@ -181,5 +187,10 @@ public class ZonedDateTimeFieldTypeDescriptor extends StandardFieldTypeDescripto
 				LocalDateTime.of( 1970, 1, 1, 0, 0 ).atZone( ZoneId.of( "UTC" ) ),
 				LocalDateTime.of( 2018, 3, 1, 12, 14, 52 ).atZone( ZoneId.of( "Europe/Paris" ) )
 		) );
+	}
+
+	@Override
+	public String format(ZonedDateTime value) {
+		return DateTimeFormatter.ISO_ZONED_DATE_TIME.format( value );
 	}
 }

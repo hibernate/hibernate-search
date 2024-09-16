@@ -82,6 +82,11 @@ public class BigIntegerFieldTypeDescriptor extends StandardFieldTypeDescriptor<B
 				}
 				return BigInteger.valueOf( 550L );
 			}
+
+			@Override
+			protected double doubleValueOf(double value) {
+				return value * 100L;
+			}
 		};
 	}
 

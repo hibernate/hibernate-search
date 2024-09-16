@@ -75,6 +75,11 @@ public class InstantFieldTypeDescriptor extends StandardFieldTypeDescriptor<Inst
 			public Instant avg() {
 				return Instant.parse( "1970-01-07T08:46:40Z" );
 			}
+
+			@Override
+			protected double doubleValueOf(double value) {
+				return value * 100_000_000;
+			}
 		};
 	}
 

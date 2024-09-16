@@ -5,7 +5,6 @@
 package org.hibernate.search.integrationtest.backend.tck.search.aggregation;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
@@ -25,7 +24,6 @@ import org.hibernate.search.engine.search.query.SearchQuery;
 import org.hibernate.search.engine.search.query.SearchResult;
 import org.hibernate.search.engine.search.query.dsl.SearchQueryOptionsStep;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.extension.SearchSetupHelper;
-import org.hibernate.search.util.common.AssertionFailure;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.BulkIndexer;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.SimpleMappedIndex;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubLoadingOptionsStep;
@@ -165,11 +163,8 @@ class MetricNumericFieldsAggregationsIT {
 
 	private SearchQuery<DocumentReference> defineAggregations(
 			SearchQueryOptionsStep<?, DocumentReference, StubLoadingOptionsStep, ?, ?> options) {
-		assertThatThrownBy( () -> {
-			options.aggregation( sumIntegersRaw, f -> f.sum().field( "integer", Object.class, ValueModel.RAW ) );
-		} )
-				.isInstanceOf( AssertionFailure.class )
-				.hasMessageContaining( "Raw projection converter is not supported with metric aggregations at the moment" );
+
+		options.aggregation( sumIntegersRaw, f -> f.sum().field( "integer", Object.class, ValueModel.RAW ) );
 
 		return options
 				.aggregation( sumIntegers, f -> f.sum().field( "integer", Integer.class ) )
@@ -192,10 +187,11 @@ class MetricNumericFieldsAggregationsIT {
 				.aggregation( avgIntegers, f -> f.avg().field( "integer", Integer.class ) )
 				.aggregation( avgIntegersAsString, f -> f.avg().field( "integer", String.class, ValueModel.STRING ) )
 				.aggregation( avgConverted, f -> f.avg().field( "converted", String.class ) )
-				.aggregation( avgIntegersAsDouble, f -> f.avg().field( "integer", Double.class ) )
+				.aggregation( avgIntegersAsDouble, f -> f.avg().field( "integer", Double.class, ValueModel.RAW ) )
 				.aggregation( avgIntegersAsDoubleRaw, f -> f.avg().field( "integer", Double.class, ValueModel.RAW ) )
-				.aggregation( avgIntegersAsDoubleFiltered, f -> f.avg().field( "object.nestedInteger", Double.class )
-						.filter( ff -> ff.range().field( "object.nestedInteger" ).atLeast( 5 ) ) )
+				.aggregation( avgIntegersAsDoubleFiltered,
+						f -> f.avg().field( "object.nestedInteger", Double.class, ValueModel.RAW )
+								.filter( ff -> ff.range().field( "object.nestedInteger" ).atLeast( 5 ) ) )
 				.aggregation( sumDoubles, f -> f.sum().field( "doubleF", Double.class ) )
 				.aggregation( sumDoublesRaw, f -> f.sum().field( "doubleF", Double.class, ValueModel.RAW ) )
 				.aggregation( sumFloats, f -> f.sum().field( "floatF", Float.class ) )

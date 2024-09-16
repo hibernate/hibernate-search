@@ -8,6 +8,7 @@ import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.OffsetDateTime;
 import java.time.ZoneOffset;
+import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -81,6 +82,11 @@ public class OffsetDateTimeFieldTypeDescriptor extends StandardFieldTypeDescript
 			@Override
 			public OffsetDateTime avg() {
 				return OffsetDateTime.parse( "1970-01-07T08:46:40Z" );
+			}
+
+			@Override
+			protected double doubleValueOf(double value) {
+				return value * 100_000_000;
 			}
 		};
 	}
@@ -159,5 +165,10 @@ public class OffsetDateTimeFieldTypeDescriptor extends StandardFieldTypeDescript
 				LocalDateTime.of( 1970, 1, 1, 0, 0 ).atOffset( ZoneOffset.UTC ),
 				LocalDateTime.of( 2018, 3, 1, 12, 14, 52 ).atOffset( ZoneOffset.ofHours( 1 ) )
 		) );
+	}
+
+	@Override
+	public String format(OffsetDateTime value) {
+		return DateTimeFormatter.ISO_OFFSET_DATE_TIME.format( value );
 	}
 }

@@ -17,7 +17,6 @@ import org.hibernate.search.engine.backend.types.converter.runtime.FromDocumentV
 import org.hibernate.search.engine.backend.types.converter.spi.ProjectionConverter;
 import org.hibernate.search.engine.search.aggregation.spi.FieldMetricAggregationBuilder;
 import org.hibernate.search.engine.search.common.ValueModel;
-import org.hibernate.search.util.common.AssertionFailure;
 
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
@@ -64,15 +63,13 @@ public class ElasticsearchMetricFieldAggregation<F, K> extends AbstractElasticse
 	}
 
 	private final String absoluteFieldPath;
-	private final ProjectionConverter<F, ? extends K> fromFieldValueConverter;
-	private final ElasticsearchFieldCodec<F> codec;
+	private final AggregationExtractorBuilder<K> metricFieldExtractorCreator;
 	private final JsonAccessor<JsonObject> operation;
 
 	private ElasticsearchMetricFieldAggregation(Builder<F, K> builder) {
 		super( builder );
 		this.absoluteFieldPath = builder.field.absolutePath();
-		this.fromFieldValueConverter = builder.fromFieldValueConverter;
-		this.codec = builder.codec;
+		this.metricFieldExtractorCreator = builder.metricFieldExtractorCreator;
 		this.operation = builder.operation;
 	}
 
@@ -88,7 +85,7 @@ public class ElasticsearchMetricFieldAggregation<F, K> extends AbstractElasticse
 
 	@Override
 	protected Extractor<K> extractor(AggregationRequestContext context) {
-		return new MetricFieldExtractor( nestedPathHierarchy, filter );
+		return metricFieldExtractorCreator.extractor( filter );
 	}
 
 	private static class Factory<F>
@@ -124,72 +121,155 @@ public class ElasticsearchMetricFieldAggregation<F, K> extends AbstractElasticse
 			this.operation = operation;
 		}
 
+		@SuppressWarnings("unchecked")
 		@Override
 		public <T> Builder<F, T> type(Class<T> expectedType, ValueModel valueModel) {
-			ProjectionConverter<F, ? extends T> projectionConverter = null;
-			if ( useProjectionConverter( expectedType, valueModel ) ) {
-				projectionConverter = field.type().projectionConverter( valueModel )
-						.withConvertedType( expectedType, field );
-			}
-			return new Builder<>( codec, scope, field,
-					projectionConverter,
-					operation
-			);
-		}
+			AggregationExtractorBuilder<T> metricFieldExtractorCreator;
 
-		private <T> boolean useProjectionConverter(Class<T> expectedType, ValueModel valueModel) {
-			if ( !Double.class.isAssignableFrom( expectedType ) ) {
-				if ( ValueModel.RAW.equals( valueModel ) ) {
-					throw new AssertionFailure(
-							"Raw projection converter is not supported with metric aggregations at the moment" );
-				}
-				return true;
-			}
-
-			// expectedType == Double.class
 			if ( ValueModel.RAW.equals( valueModel ) ) {
-				return false;
+				if ( Double.class.isAssignableFrom( expectedType ) ) {
+					metricFieldExtractorCreator = (AggregationExtractorBuilder<
+							T>) new DoubleMetricFieldExtractor.Builder( field.nestedPathHierarchy() );
+				}
+				else {
+					var projectionConverter = (ProjectionConverter<JsonElement, ? extends T>) field.type()
+							.rawProjectionConverter().withConvertedType( expectedType, field );
+					metricFieldExtractorCreator = (AggregationExtractorBuilder<T>) new RawMetricFieldExtractor.Builder<>(
+							field.nestedPathHierarchy(),
+							projectionConverter );
+				}
 			}
-			return field.type().projectionConverter( valueModel ).valueType().isAssignableFrom( Double.class );
+			else {
+				var projectionConverter = field.type()
+						.projectionConverter( valueModel ).withConvertedType( expectedType, field );
+				metricFieldExtractorCreator =
+						new MetricFieldExtractor.Builder<>( field.nestedPathHierarchy(), projectionConverter, codec );
+			}
+
+			return new Builder<>( scope, field, metricFieldExtractorCreator, operation );
 		}
 	}
 
-	private class MetricFieldExtractor extends AbstractExtractor<K> {
-		protected MetricFieldExtractor(List<String> nestedPathHierarchy, ElasticsearchSearchPredicate filter) {
+	private static class MetricFieldExtractor<F, K> extends AbstractExtractor<K> {
+
+		private final ProjectionConverter<F, ? extends K> fromFieldValueConverter;
+		private final ElasticsearchFieldCodec<F> codec;
+
+		protected MetricFieldExtractor(List<String> nestedPathHierarchy, ElasticsearchSearchPredicate filter,
+				ProjectionConverter<F, ? extends K> fromFieldValueConverter, ElasticsearchFieldCodec<F> codec) {
 			super( nestedPathHierarchy, filter );
+			this.fromFieldValueConverter = fromFieldValueConverter;
+			this.codec = codec;
 		}
 
 		@Override
-		@SuppressWarnings("unchecked")
 		protected K doExtract(JsonObject aggregationResult, AggregationExtractContext context) {
 			FromDocumentValueConvertContext convertContext = context.fromDocumentValueConvertContext();
 			Optional<Double> value = VALUE_ACCESSOR.get( aggregationResult );
 			JsonElement valueAsString = aggregationResult.get( "value_as_string" );
 
-			if ( fromFieldValueConverter == null ) {
-				Double decode = value.orElse( null );
-				return (K) decode;
-			}
+
 			return fromFieldValueConverter.fromDocumentValue(
 					codec.decodeAggregationValue( value, valueAsString ),
 					convertContext
 			);
 		}
+
+		private static class Builder<F, K> extends AggregationExtractorBuilder<K> {
+			private final ProjectionConverter<F, ? extends K> fromFieldValueConverter;
+			private final ElasticsearchFieldCodec<F> codec;
+
+			private Builder(List<String> nestedPathHierarchy, ProjectionConverter<F, ? extends K> fromFieldValueConverter,
+					ElasticsearchFieldCodec<F> codec) {
+				super( nestedPathHierarchy );
+				this.fromFieldValueConverter = fromFieldValueConverter;
+				this.codec = codec;
+			}
+
+			@Override
+			AbstractExtractor<K> extractor(ElasticsearchSearchPredicate filter) {
+				return new MetricFieldExtractor<>( nestedPathHierarchy, filter, fromFieldValueConverter, codec );
+			}
+		}
+	}
+
+	private static class DoubleMetricFieldExtractor extends AbstractExtractor<Double> {
+		protected DoubleMetricFieldExtractor(List<String> nestedPathHierarchy, ElasticsearchSearchPredicate filter) {
+			super( nestedPathHierarchy, filter );
+		}
+
+		@Override
+		protected Double doExtract(JsonObject aggregationResult, AggregationExtractContext context) {
+			Optional<Double> value = VALUE_ACCESSOR.get( aggregationResult );
+			return value.orElse( null );
+		}
+
+		private static class Builder extends AggregationExtractorBuilder<Double> {
+
+			private Builder(List<String> nestedPathHierarchy) {
+				super( nestedPathHierarchy );
+			}
+
+			@Override
+			AbstractExtractor<Double> extractor(ElasticsearchSearchPredicate filter) {
+				return new DoubleMetricFieldExtractor( nestedPathHierarchy, filter );
+			}
+		}
+	}
+
+	private static class RawMetricFieldExtractor<K> extends AbstractExtractor<K> {
+
+		private final ProjectionConverter<JsonElement, K> projectionConverter;
+
+		protected RawMetricFieldExtractor(List<String> nestedPathHierarchy, ElasticsearchSearchPredicate filter,
+				ProjectionConverter<JsonElement, K> projectionConverter) {
+			super( nestedPathHierarchy, filter );
+			this.projectionConverter = projectionConverter;
+		}
+
+		@Override
+		protected K doExtract(JsonObject aggregationResult, AggregationExtractContext context) {
+			FromDocumentValueConvertContext convertContext = context.fromDocumentValueConvertContext();
+			return projectionConverter.fromDocumentValue( aggregationResult, convertContext );
+		}
+
+		private static class Builder<K> extends AggregationExtractorBuilder<K> {
+			private final ProjectionConverter<JsonElement, K> projectionConverter;
+
+			private Builder(List<String> nestedPathHierarchy, ProjectionConverter<JsonElement, K> projectionConverter) {
+				super( nestedPathHierarchy );
+				this.projectionConverter = projectionConverter;
+			}
+
+			@Override
+			AbstractExtractor<K> extractor(ElasticsearchSearchPredicate filter) {
+				return new RawMetricFieldExtractor<>( nestedPathHierarchy, filter, projectionConverter );
+			}
+		}
+	}
+
+	private abstract static class AggregationExtractorBuilder<K> {
+		protected final List<String> nestedPathHierarchy;
+
+		protected AggregationExtractorBuilder(List<String> nestedPathHierarchy) {
+			this.nestedPathHierarchy = nestedPathHierarchy;
+		}
+
+		abstract AbstractExtractor<K> extractor(ElasticsearchSearchPredicate filter);
 	}
 
 	private static class Builder<F, K> extends AbstractBuilder<K>
 			implements FieldMetricAggregationBuilder<K> {
 
-		private final ElasticsearchFieldCodec<F> codec;
-		private final ProjectionConverter<F, ? extends K> fromFieldValueConverter;
+		private final AggregationExtractorBuilder<K> metricFieldExtractorCreator;
 		private final JsonAccessor<JsonObject> operation;
 
-		private Builder(ElasticsearchFieldCodec<F> codec, ElasticsearchSearchIndexScope<?> scope,
+		private Builder(ElasticsearchSearchIndexScope<?> scope,
 				ElasticsearchSearchIndexValueFieldContext<F> field,
-				ProjectionConverter<F, ? extends K> fromFieldValueConverter, JsonAccessor<JsonObject> operation) {
+				AggregationExtractorBuilder<K> metricFieldExtractorCreator,
+				JsonAccessor<JsonObject> operation) {
 			super( scope, field );
-			this.codec = codec;
-			this.fromFieldValueConverter = fromFieldValueConverter;
+			this.metricFieldExtractorCreator = metricFieldExtractorCreator;
 			this.operation = operation;
 		}
 

@@ -42,6 +42,26 @@ public abstract class MetricAggregationsValues<F> {
 		return valueOf( 5 );
 	}
 
+	public double avgRaw() {
+		return doubleValueOf( 5.5 );
+	}
+
+	public double minRaw() {
+		return doubleValueOf( -10 );
+	}
+
+	public double maxRaw() {
+		return doubleValueOf( 18 );
+	}
+
+	public double sumRaw() {
+		return doubleValueOf( 55 );
+	}
+
+	protected double doubleValueOf(double value) {
+		return value;
+	}
+
 	protected abstract F valueOf(int value);
 
 	private List<F> createValues() {

@@ -11,7 +11,6 @@ import org.hibernate.search.backend.lucene.search.common.impl.AbstractLuceneCode
 import org.hibernate.search.backend.lucene.search.common.impl.LuceneSearchIndexScope;
 import org.hibernate.search.backend.lucene.search.common.impl.LuceneSearchIndexValueFieldContext;
 import org.hibernate.search.backend.lucene.types.codec.impl.AbstractLuceneNumericFieldCodec;
-import org.hibernate.search.engine.backend.types.converter.spi.ProjectionConverter;
 import org.hibernate.search.engine.search.aggregation.spi.FieldMetricAggregationBuilder;
 
 public class LuceneMinNumericFieldAggregation<F, E extends Number, K>
@@ -48,29 +47,28 @@ public class LuceneMinNumericFieldAggregation<F, E extends Number, K>
 		}
 	}
 
-	protected static class FunctionTypeSelector<F> extends TypeSelector<F>
+	private static class FunctionTypeSelector<F, E extends Number> extends TypeSelector<F, E>
 			implements FieldMetricAggregationBuilder.TypeSelector {
 
-		protected FunctionTypeSelector(AbstractLuceneNumericFieldCodec<F, ?> codec, LuceneSearchIndexScope<?> scope,
+		protected FunctionTypeSelector(AbstractLuceneNumericFieldCodec<F, E> codec, LuceneSearchIndexScope<?> scope,
 				LuceneSearchIndexValueFieldContext<F> field) {
 			super( codec, scope, field );
 		}
 
 		@Override
-		protected <T> Builder<F, ? extends Number, T> getFtBuilder(
-				ProjectionConverter<F, ? extends T> projectionConverter) {
-			return new Builder<>( codec, scope, field, projectionConverter );
+		protected <T> Builder<F, E, T> getFtBuilder(AbstractExtractorBuilder<F, E, T> extractorCreator) {
+			return new Builder<>( codec, scope, field, extractorCreator );
 		}
 	}
 
-	protected static class Builder<F, E extends Number, K>
+	private static class Builder<F, E extends Number, K>
 			extends AbstractLuceneMetricNumericFieldAggregation.Builder<F, E, K> {
 
 		public Builder(AbstractLuceneNumericFieldCodec<F, E> codec,
 				LuceneSearchIndexScope<?> scope,
 				LuceneSearchIndexValueFieldContext<F> field,
-				ProjectionConverter<F, ? extends K> fromFieldValueConverter) {
-			super( codec, scope, field, fromFieldValueConverter );
+				AbstractExtractorBuilder<F, E, K> extractorCreator) {
+			super( codec, scope, field, extractorCreator );
 		}
 
 		@Override

@@ -6,8 +6,6 @@ package org.hibernate.search.backend.lucene.types.aggregation.impl;
 
 import java.util.Set;
 
-import org.hibernate.search.backend.lucene.lowlevel.aggregation.collector.impl.AggregationFunctionCollector;
-import org.hibernate.search.backend.lucene.lowlevel.aggregation.collector.impl.Count;
 import org.hibernate.search.backend.lucene.lowlevel.collector.impl.CollectorKey;
 import org.hibernate.search.backend.lucene.lowlevel.docvalues.impl.JoiningLongMultiValuesSource;
 import org.hibernate.search.backend.lucene.search.aggregation.impl.AggregationExtractContext;
@@ -17,10 +15,8 @@ import org.hibernate.search.backend.lucene.search.common.impl.LuceneSearchIndexV
 import org.hibernate.search.backend.lucene.types.codec.impl.AbstractLuceneNumericFieldCodec;
 import org.hibernate.search.backend.lucene.types.lowlevel.impl.LuceneNumericDomain;
 import org.hibernate.search.engine.backend.types.converter.spi.ProjectionConverter;
-import org.hibernate.search.engine.cfg.spi.NumberUtils;
 import org.hibernate.search.engine.search.aggregation.spi.FieldMetricAggregationBuilder;
 import org.hibernate.search.engine.search.common.ValueModel;
-import org.hibernate.search.util.common.AssertionFailure;
 
 /**
  * @param <F> The type of field values.
@@ -32,14 +28,11 @@ public abstract class AbstractLuceneMetricNumericFieldAggregation<F, E extends N
 
 	private final Set<String> indexNames;
 	private final String absoluteFieldPath;
-	private final AbstractLuceneNumericFieldCodec<F, E> codec;
-	private final LuceneNumericDomain<E> numericDomain;
-	private final ProjectionConverter<F, ? extends K> fromFieldValueConverter;
+	protected final AbstractLuceneNumericFieldCodec<F, E> codec;
+	protected final LuceneNumericDomain<E> numericDomain;
+	private final AbstractExtractorBuilder<F, E, K> extractorCreator;
 
 	protected CollectorKey<?, Long> collectorKey;
-
-	// Supplementary collector used by the avg function
-	protected CollectorKey<AggregationFunctionCollector<Count>, Long> countCollectorKey;
 
 	AbstractLuceneMetricNumericFieldAggregation(Builder<F, E, K> builder) {
 		super( builder );
@@ -47,7 +40,7 @@ public abstract class AbstractLuceneMetricNumericFieldAggregation<F, E extends N
 		this.absoluteFieldPath = builder.field.absolutePath();
 		this.codec = builder.codec;
 		this.numericDomain = codec.getDomain();
-		this.fromFieldValueConverter = builder.fromFieldValueConverter;
+		this.extractorCreator = builder.extractorCreator;
 	}
 
 	@Override
@@ -56,7 +49,7 @@ public abstract class AbstractLuceneMetricNumericFieldAggregation<F, E extends N
 				absoluteFieldPath, createNestedDocsProvider( context )
 		);
 		fillCollectors( source, context );
-		return new LuceneNumericMetricFieldAggregationExtraction();
+		return extractorCreator.extractor( this );
 	}
 
 	abstract void fillCollectors(JoiningLongMultiValuesSource source, AggregationRequestContext context);
@@ -66,39 +59,116 @@ public abstract class AbstractLuceneMetricNumericFieldAggregation<F, E extends N
 		return indexNames;
 	}
 
-	private class LuceneNumericMetricFieldAggregationExtraction implements Extractor<K> {
+	private static class LuceneNumericMetricFieldAggregationExtraction<F, E extends Number, K> implements Extractor<K> {
+		private final CollectorKey<?, Long> collectorKey;
+		private final AbstractLuceneNumericFieldCodec<F, E> codec;
+		private final ProjectionConverter<F, ? extends K> fromFieldValueConverter;
+
+		private LuceneNumericMetricFieldAggregationExtraction(CollectorKey<?, Long> collectorKey,
+				AbstractLuceneNumericFieldCodec<F, E> codec, ProjectionConverter<F, ? extends K> fromFieldValueConverter) {
+			this.collectorKey = collectorKey;
+			this.codec = codec;
+			this.fromFieldValueConverter = fromFieldValueConverter;
+		}
 
 		@Override
-		@SuppressWarnings("unchecked")
 		public K extract(AggregationExtractContext context) {
 			Long collector = context.getFacets( collectorKey );
-			if ( countCollectorKey != null ) {
-				Long counts = context.getFacets( countCollectorKey );
-				Double avg = ( (double) collector / counts );
-				if ( fromFieldValueConverter == null ) {
-					return (K) avg;
-				}
 
-				collector = NumberUtils.toLong( avg );
-			}
-
-			if ( fromFieldValueConverter == null ) {
-				Double decode = collector.doubleValue();
-				return (K) decode;
-			}
-
-			E e = numericDomain.sortedDocValueToTerm( collector );
+			E e = codec.getDomain().sortedDocValueToTerm( collector );
 			F decode = codec.decode( e );
 			return fromFieldValueConverter.fromDocumentValue( decode, context.fromDocumentValueConvertContext() );
 		}
+
+		private static class Builder<F, E extends Number, K> extends AbstractExtractorBuilder<F, E, K> {
+			private final ProjectionConverter<F, ? extends K> fromFieldValueConverter;
+
+			private Builder(ProjectionConverter<F, ? extends K> fromFieldValueConverter) {
+				this.fromFieldValueConverter = fromFieldValueConverter;
+			}
+
+			@Override
+			Extractor<K> extractor(AbstractLuceneMetricNumericFieldAggregation<F, E, K> aggregation) {
+				return new LuceneNumericMetricFieldAggregationExtraction<>(
+						aggregation.collectorKey,
+						aggregation.codec,
+						fromFieldValueConverter
+				);
+			}
+		}
 	}
 
-	protected abstract static class TypeSelector<F> implements FieldMetricAggregationBuilder.TypeSelector {
-		protected final AbstractLuceneNumericFieldCodec<F, ?> codec;
+	private static class LuceneNumericMetricFieldAggregationDoubleExtraction implements Extractor<Double> {
+
+		private final CollectorKey<?, Long> collectorKey;
+		private final AbstractLuceneNumericFieldCodec<?, ?> codec;
+
+		private LuceneNumericMetricFieldAggregationDoubleExtraction(CollectorKey<?, Long> collectorKey,
+				AbstractLuceneNumericFieldCodec<?, ?> codec) {
+			this.collectorKey = collectorKey;
+			this.codec = codec;
+		}
+
+		@Override
+		public Double extract(AggregationExtractContext context) {
+			Long collector = context.getFacets( collectorKey );
+
+			return codec.sortedDocValueToDouble( collector );
+		}
+
+		private static class Builder<F, E extends Number> extends AbstractExtractorBuilder<F, E, Double> {
+
+			@Override
+			Extractor<Double> extractor(AbstractLuceneMetricNumericFieldAggregation<F, E, Double> aggregation) {
+				return new LuceneNumericMetricFieldAggregationDoubleExtraction(
+						aggregation.collectorKey,
+						aggregation.codec
+				);
+			}
+		}
+	}
+
+	private static class LuceneNumericMetricFieldAggregationRawExtraction<E extends Number, K> implements Extractor<K> {
+
+		private final CollectorKey<?, Long> collectorKey;
+		private final LuceneNumericDomain<E> numericDomain;
+
+		private LuceneNumericMetricFieldAggregationRawExtraction(CollectorKey<?, Long> collectorKey,
+				LuceneNumericDomain<E> numericDomain) {
+			this.collectorKey = collectorKey;
+			this.numericDomain = numericDomain;
+		}
+
+		@SuppressWarnings("unchecked")
+		@Override
+		public K extract(AggregationExtractContext context) {
+			Long collector = context.getFacets( collectorKey );
+			return (K) numericDomain.sortedDocValueToTerm( collector );
+		}
+
+		private static class Builder<F, E extends Number, K> extends AbstractExtractorBuilder<F, E, K> {
+
+			@Override
+			Extractor<K> extractor(AbstractLuceneMetricNumericFieldAggregation<F, E, K> aggregation) {
+				return new LuceneNumericMetricFieldAggregationRawExtraction<>(
+						aggregation.collectorKey,
+						aggregation.numericDomain
+				);
+			}
+		}
+	}
+
+	protected abstract static class AbstractExtractorBuilder<F, E extends Number, K> {
+
+		abstract Extractor<K> extractor(AbstractLuceneMetricNumericFieldAggregation<F, E, K> aggregation);
+	}
+
+	protected abstract static class TypeSelector<F, E extends Number> implements FieldMetricAggregationBuilder.TypeSelector {
+		protected final AbstractLuceneNumericFieldCodec<F, E> codec;
 		protected final LuceneSearchIndexScope<?> scope;
 		protected final LuceneSearchIndexValueFieldContext<F> field;
 
-		protected TypeSelector(AbstractLuceneNumericFieldCodec<F, ?> codec,
+		protected TypeSelector(AbstractLuceneNumericFieldCodec<F, E> codec,
 				LuceneSearchIndexScope<?> scope, LuceneSearchIndexValueFieldContext<F> field) {
 			this.codec = codec;
 			this.scope = scope;
@@ -107,47 +177,57 @@ public abstract class AbstractLuceneMetricNumericFieldAggregation<F, E extends N
 
 		@Override
 		public <T> Builder<F, ?, T> type(Class<T> expectedType, ValueModel valueModel) {
-			ProjectionConverter<F, ? extends T> projectionConverter = null;
-			if ( useProjectionConverter( expectedType, valueModel ) ) {
-				projectionConverter = field.type().projectionConverter( valueModel )
-						.withConvertedType( expectedType, field );
-			}
-
-			return getFtBuilder( projectionConverter );
-		}
-
-		private <T> boolean useProjectionConverter(Class<T> expectedType, ValueModel valueModel) {
-			if ( !Double.class.isAssignableFrom( expectedType ) ) {
-				if ( ValueModel.RAW.equals( valueModel ) ) {
-					throw new AssertionFailure(
-							"Raw projection converter is not supported with metric aggregations at the moment" );
-				}
-				return true;
-			}
-
-			// expectedType == Double.class
+			AbstractExtractorBuilder<F, E, T> extractorCreator;
 			if ( ValueModel.RAW.equals( valueModel ) ) {
-				return false;
+				if ( Double.class.isAssignableFrom( expectedType ) ) {
+					extractorCreator = doubleExtractor();
+				}
+				else {
+					var projectionConverter = field.type().rawProjectionConverter()
+							.withConvertedType( expectedType, field );
+					extractorCreator = rawExtractor( projectionConverter );
+				}
 			}
-			return field.type().projectionConverter( valueModel ).valueType().isAssignableFrom( Double.class );
+			else {
+				var projectionConverter = field.type().projectionConverter( valueModel )
+						.withConvertedType( expectedType, field );
+				extractorCreator = extractor( projectionConverter );
+			}
+
+			return getFtBuilder( extractorCreator );
 		}
 
-		protected abstract <T> Builder<F, ? extends Number, T> getFtBuilder(
-				ProjectionConverter<F, ? extends T> projectionConverter);
+		protected <T> AbstractExtractorBuilder<F, E, T> extractor(ProjectionConverter<F, ? extends T> projectionConverter) {
+			return new LuceneNumericMetricFieldAggregationExtraction.Builder<>( projectionConverter );
+		}
+
+		// we've checked the types in the place where we are calling this method:
+		protected <T> AbstractExtractorBuilder<F, E, T> rawExtractor(ProjectionConverter<?, ? extends T> projectionConverter) {
+			return new LuceneNumericMetricFieldAggregationRawExtraction.Builder<>();
+		}
+
+		// we've checked the types in the place where we are calling this method:
+		@SuppressWarnings("unchecked")
+		protected <T> AbstractExtractorBuilder<F, E, T> doubleExtractor() {
+			return (AbstractExtractorBuilder<F, E, T>) new LuceneNumericMetricFieldAggregationDoubleExtraction.Builder<>();
+		}
+
+		protected abstract <T> Builder<F, E, T> getFtBuilder(AbstractExtractorBuilder<F, E, T> extractorCreator);
+
 	}
 
 	protected abstract static class Builder<F, E extends Number, K> extends AbstractBuilder<K>
 			implements FieldMetricAggregationBuilder<K> {
 
 		private final AbstractLuceneNumericFieldCodec<F, E> codec;
-		private final ProjectionConverter<F, ? extends K> fromFieldValueConverter;
+		private final AbstractExtractorBuilder<F, E, K> extractorCreator;
 
 		public Builder(AbstractLuceneNumericFieldCodec<F, E> codec, LuceneSearchIndexScope<?> scope,
 				LuceneSearchIndexValueFieldContext<F> field,
-				ProjectionConverter<F, ? extends K> fromFieldValueConverter) {
+				AbstractExtractorBuilder<F, E, K> extractorCreator) {
 			super( scope, field );
 			this.codec = codec;
-			this.fromFieldValueConverter = fromFieldValueConverter;
+			this.extractorCreator = extractorCreator;
 		}
 	}
 }

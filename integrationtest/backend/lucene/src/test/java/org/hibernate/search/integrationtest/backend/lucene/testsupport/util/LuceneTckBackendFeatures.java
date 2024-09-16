@@ -181,4 +181,16 @@ class LuceneTckBackendFeatures extends TckBackendFeatures {
 		}
 		return descriptor.getJavaType();
 	}
+
+	@SuppressWarnings("unchecked")
+	@Override
+	public <F, T> T fromRawAggregation(FieldTypeDescriptor<F, ?> descriptor, T value) {
+		if ( BigIntegerFieldTypeDescriptor.INSTANCE.equals( descriptor ) ) {
+			return (T) ( (Number) ( ( (Number) value ).doubleValue() * 100 ) );
+		}
+		if ( BigDecimalFieldTypeDescriptor.INSTANCE.equals( descriptor ) ) {
+			return (T) ( (Number) ( ( (Number) value ).doubleValue() / 100 ) );
+		}
+		return super.fromRawAggregation( descriptor, value );
+	}
 }
