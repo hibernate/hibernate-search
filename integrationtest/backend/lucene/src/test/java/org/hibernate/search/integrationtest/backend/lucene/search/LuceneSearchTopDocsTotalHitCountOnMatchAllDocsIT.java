@@ -66,8 +66,8 @@ class LuceneSearchTopDocsTotalHitCountOnMatchAllDocsIT {
 		assertThatResult( result ).hasTotalHitCount( DOCUMENT_COUNT );
 
 		TopDocs topDocs = result.topDocs();
-		assertThat( topDocs.totalHits.relation ).isEqualTo( TotalHits.Relation.EQUAL_TO );
-		assertThat( topDocs.totalHits.value ).isEqualTo( DOCUMENT_COUNT );
+		assertThat( topDocs.totalHits.relation() ).isEqualTo( TotalHits.Relation.EQUAL_TO );
+		assertThat( topDocs.totalHits.value() ).isEqualTo( DOCUMENT_COUNT );
 	}
 
 	private static class IndexBinding {
