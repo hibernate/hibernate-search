@@ -94,6 +94,7 @@
             `net.bytebuddy.experimental` property can be removed.
          -->
         <version.org.hibernate.orm>7.0.0-SNAPSHOT</version.org.hibernate.orm>
+        <version.org.hibernate.models>0.9.1</version.org.hibernate.models>
 
         <javadoc.org.hibernate.orm.url>https://docs.jboss.org/hibernate/orm/${parsed-version.org.hibernate.orm.majorVersion}.${parsed-version.org.hibernate.orm.minorVersion}/javadocs/</javadoc.org.hibernate.orm.url>
         <documentation.org.hibernate.orm.url>https://docs.jboss.org/hibernate/orm/${parsed-version.org.hibernate.orm.majorVersion}.${parsed-version.org.hibernate.orm.minorVersion}/userguide/html_single/Hibernate_User_Guide.html</documentation.org.hibernate.orm.url>
@@ -394,6 +395,11 @@
                 <groupId>org.jboss.logging</groupId>
                 <artifactId>jboss-logging</artifactId>
                 <version>${version.org.jboss.logging.jboss-logging}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.hibernate.models</groupId>
+                <artifactId>hibernate-models-jandex</artifactId>
+                <version>${version.org.hibernate.models}</version>
             </dependency>
 
             <!-- Other public dependencies -->

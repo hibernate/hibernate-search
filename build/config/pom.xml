@@ -90,6 +90,11 @@
                                             <artifact>jakarta.persistence:jakarta.persistence-api</artifact>
                                             <failOnNotFound>true</failOnNotFound>
                                         </item>
+                                        <item>
+                                            <property>${version.org.hibernate.models}</property>
+                                            <artifact>org.hibernate.models:hibernate-models</artifact>
+                                            <failOnNotFound>true</failOnNotFound>
+                                        </item>
                                     </propertiesToCheck>
                                 </versionAlignRule>
                             </rules>
@@ -218,6 +223,7 @@
                                 <argument>^org\.hibernate\.query\.SelectionQuery$</argument>
                                 <argument>^org\.hibernate\.query\.MutationQuery$</argument>
                                 <argument>^org\.hibernate\.query\.BindableType$</argument>
+                                <argument>^org\.hibernate\.query\.BindingContext$</argument>
 
                                 <argument>^org\.hibernate\.metamodel\.MappingMetamodel$</argument>
                                 <argument>^org\.hibernate\.metamodel\.mapping\.Bindable$</argument>

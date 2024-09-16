@@ -25,6 +25,7 @@ import org.hibernate.boot.models.annotations.internal.JdbcTypeCodeAnnotation;
 import org.hibernate.boot.models.annotations.internal.TableJpaAnnotation;
 import org.hibernate.boot.models.annotations.internal.UuidGeneratorAnnotation;
 import org.hibernate.boot.spi.MetadataBuildingContext;
+import org.hibernate.models.internal.MutableClassDetailsRegistry;
 import org.hibernate.models.internal.jdk.JdkBuilders;
 import org.hibernate.models.spi.ClassDetails;
 import org.hibernate.models.spi.MutableClassDetails;
@@ -133,32 +134,33 @@ public class AdditionalMappingBuilder {
 	}
 
 	public ClassDetails build() {
-		return buildingContext.getMetadataCollector()
-				.getSourceModelBuildingContext()
-				.getClassDetailsRegistry()
-				.resolveClassDetails( type.getName(), (n, context) -> {
-					final MutableClassDetails classDetails = JdkBuilders.buildClassDetailsStatic(
-							type,
-							context
-					);
+		SourceModelBuildingContext context = buildingContext.getMetadataCollector()
+				.getSourceModelBuildingContext();
+		final MutableClassDetails classDetails = JdkBuilders.buildClassDetailsStatic(
+				type,
+				context
+		);
 
-					EntityJpaAnnotation entityUsage = (EntityJpaAnnotation) classDetails.applyAnnotationUsage(
-							JpaAnnotations.ENTITY,
-							context
-					);
-					entityUsage.name( name );
-					AccessJpaAnnotation accessUsage = (AccessJpaAnnotation) classDetails.applyAnnotationUsage(
-							JpaAnnotations.ACCESS,
-							context
-					);
-					accessUsage.value( AccessType.FIELD );
+		EntityJpaAnnotation entityUsage = (EntityJpaAnnotation) classDetails.applyAnnotationUsage(
+				JpaAnnotations.ENTITY,
+				context
+		);
+		entityUsage.name( name );
+		AccessJpaAnnotation accessUsage = (AccessJpaAnnotation) classDetails.applyAnnotationUsage(
+				JpaAnnotations.ACCESS,
+				context
+		);
+		accessUsage.value( AccessType.FIELD );
 
-					for ( BiConsumer<SourceModelBuildingContext, MutableClassDetails> contributor : contributors ) {
-						contributor.accept( context, classDetails );
-					}
+		for ( BiConsumer<SourceModelBuildingContext, MutableClassDetails> contributor : contributors ) {
+			contributor.accept( context, classDetails );
+		}
 
-					return classDetails;
-				} );
+		context.getClassDetailsRegistry()
+				.as( MutableClassDetailsRegistry.class )
+				.addClassDetails( type.getName(), classDetails );
+
+		return classDetails;
 	}
 
 	private void createAttribute(String name, Integer size, boolean nullable) {

@@ -58,7 +58,7 @@ class TransientFieldsDirtyTest extends SearchTestBase {
 			assertFormulaMatches( "3", session );
 
 			transaction = session.beginTransaction();
-			FormulaAdd loadedFormula = (FormulaAdd) session.load( FormulaAdd.class, 1L );
+			FormulaAdd loadedFormula = (FormulaAdd) session.getReference( FormulaAdd.class, 1L );
 			loadedFormula.a = 3;
 			transaction.commit();
 			session.clear();

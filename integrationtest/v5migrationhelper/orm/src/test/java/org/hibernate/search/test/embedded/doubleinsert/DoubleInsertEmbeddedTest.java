@@ -49,7 +49,7 @@ class DoubleInsertEmbeddedTest extends SearchTestBase {
 		PersonalContact contact = createTestData();
 		FullTextSession s = Search.getFullTextSession( openSession() );
 		s.getTransaction().begin();
-		contact = (PersonalContact) s.load( PersonalContact.class, contact.getId() );
+		contact = (PersonalContact) s.getReference( PersonalContact.class, contact.getId() );
 		contact.setEmail( "spam@hibernate.org" );
 		s.getTransaction().commit();
 		s.close();
