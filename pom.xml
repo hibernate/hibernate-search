@@ -269,7 +269,7 @@
         <version.japicmp.plugin>0.23.0</version.japicmp.plugin>
         <version.nexus-staging.plugin>1.7.0</version.nexus-staging.plugin>
         <version.deploy.plugin>3.1.3</version.deploy.plugin>
-        <version.gpg.plugin>3.2.5</version.gpg.plugin>
+        <version.gpg.plugin>3.2.6</version.gpg.plugin>
         <version.flatten-maven-plugin>1.6.0</version.flatten-maven-plugin>
         <version.assembly.plugin>3.7.1</version.assembly.plugin>
         <version.buildhelper.plugin>3.6.0</version.buildhelper.plugin>
