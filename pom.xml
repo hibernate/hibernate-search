@@ -209,7 +209,7 @@
         <java-version.main.compiler.java_home>${java.home}</java-version.main.compiler.java_home>
         <java-version.main.compiler>${java-version.main.compiler.java_home}/bin/javac</java-version.main.compiler>
         <!-- The versions of Java documented as supported for applications using Hibernate Search -->
-        <java-version.main.compatible.expected.text>17 or 21</java-version.main.compatible.expected.text>
+        <java-version.main.compatible.expected.text>17, 21 or 23</java-version.main.compatible.expected.text>
         <!-- The version of test bytecode, useful for testing compatibility with newer JDKs -->
         <!-- Set to the expected version of the JDK running Maven by default, but overridden on CI -->
         <java-version.test.release>${jdk.min.version}</java-version.test.release>
