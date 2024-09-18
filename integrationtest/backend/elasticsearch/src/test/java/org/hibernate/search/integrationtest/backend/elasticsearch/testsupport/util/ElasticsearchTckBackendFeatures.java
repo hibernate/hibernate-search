@@ -485,7 +485,7 @@ public class ElasticsearchTckBackendFeatures extends TckBackendFeatures {
 		//  leading to routes, being ignored and incorrect counts produced in the results:
 		return isActualVersion(
 				es -> true,
-				os -> os.isLessThan( "2.16.0" ),
+				os -> !os.isMatching( "2.16.0" ),
 				aoss -> false
 		);
 	}
