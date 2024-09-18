@@ -194,9 +194,7 @@ stage('Configure') {
 					// We want to enable preview features when testing newer builds of OpenJDK:
 					// even if we don't use these features, just enabling them can cause side effects
 					// and it's useful to test that.
-					new JdkBuildEnvironment(version: '22', testCompilerTool: 'OpenJDK 22 Latest',
-							testLauncherArgs: '--enable-preview',
-							condition: TestCondition.AFTER_MERGE),
+
 					// The following JDKs aren't supported by Hibernate ORM out-of-the box yet:
 					// they require the use of -Dnet.bytebuddy.experimental=true.
 					// Make sure to remove that argument as soon as possible
