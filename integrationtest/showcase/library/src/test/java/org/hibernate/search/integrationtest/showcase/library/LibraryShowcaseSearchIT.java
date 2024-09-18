@@ -469,7 +469,7 @@ class LibraryShowcaseSearchIT extends AbstractLibraryShowcaseSearchIT {
 						|| isActualVersion(
 								es -> true,
 								// See https://github.com/opensearch-project/OpenSearch/issues/15169
-								os -> os.isLessThan( "2.16.0" ),
+								os -> !os.isMatching( "2.16.0" ),
 								aoss -> false
 						)
 		);
