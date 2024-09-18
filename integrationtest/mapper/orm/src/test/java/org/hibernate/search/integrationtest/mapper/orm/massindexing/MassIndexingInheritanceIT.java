@@ -245,8 +245,9 @@ class MassIndexingInheritanceIT {
 		statementInspector.hasSelects( 3 )
 				// select count(bv1_0.id) from bedvehicle bv1_0
 				.anyMatch( "select count(_big)?\\([a-z0-9_.]+\\) from bedvehicle [a-z0-9_.]+" )
-				// select bv1_0.id from bedvehicle bv1_0
-				.anyMatch( "select [a-z0-9_.]+ from bedvehicle [a-z0-9_.]+" )
+				// there can be an additional join see https://hibernate.atlassian.net/browse/HHH-18503?focusedCommentId=116667
+				// select bv1_1.id from bedvehicle bv1_0 join baseentity bv1_1 on bv1_0.id=bv1_1.id
+				.anyMatch( "select [a-z0-9_.]+ from bedvehicle [a-z0-9_.]+ join baseentity [a-z0-9_.]+ on [a-z0-9_.=]+" )
 				// select bv1_0.id,bv1_1.type,bv1_2.bodytype,bv1_3.doortype,bv1_0.bedtype,bv1_4.truckroof
 				//   from bedvehicle bv1_0 join baseentity bv1_1 on bv1_0.id=bv1_1.id join basevehicle bv1_2 on bv1_0.id=bv1_2.id join dooredvehicle bv1_3 on bv1_0.id=bv1_3.id left join truck bv1_4 on bv1_0.id=bv1_4.id where bv1_0.id=?
 				.anyMatch( "select [a-z0-9_.,]+ from bedvehicle [a-z0-9_.]+ "
@@ -383,8 +384,9 @@ class MassIndexingInheritanceIT {
 		statementInspector.hasSelects( 3 )
 				// select count(bv1_0.id) from bedvehicle bv1_0
 				.anyMatch( "select count(_big)?\\([a-z0-9_.]+\\) from bedvehicle [a-z0-9_.]+" )
-				// select bv1_0.id from bedvehicle bv1_0
-				.anyMatch( "select [a-z0-9_.]+ from bedvehicle [a-z0-9_.]+" )
+				// there can be an additional join see https://hibernate.atlassian.net/browse/HHH-18503?focusedCommentId=116667
+				// select bv1_1.id from bedvehicle bv1_0 join baseentity bv1_1 on bv1_0.id=bv1_1.id
+				.anyMatch( "select [a-z0-9_.]+ from bedvehicle [a-z0-9_.]+ join baseentity [a-z0-9_.]+ on [a-z0-9_.=]+" )
 				// select bv1_0.id,bv1_1.type,bv1_2.bodytype,bv1_3.doortype,bv1_0.bedtype,bv1_4.truckroof
 				//   from bedvehicle bv1_0 join baseentity bv1_1 on bv1_0.id=bv1_1.id join basevehicle bv1_2 on bv1_0.id=bv1_2.id join dooredvehicle bv1_3 on bv1_0.id=bv1_3.id left join truck bv1_4 on bv1_0.id=bv1_4.id where bv1_0.id=?
 				.anyMatch( "select [a-z0-9_.,]+ from bedvehicle [a-z0-9_.]+ "
