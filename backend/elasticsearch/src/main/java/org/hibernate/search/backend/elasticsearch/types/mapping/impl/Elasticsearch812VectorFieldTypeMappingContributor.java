@@ -43,8 +43,10 @@ public class Elasticsearch812VectorFieldTypeMappingContributor implements Elasti
 
 	@Override
 	public <F> void contribute(ElasticsearchIndexValueFieldType.Builder<F> builder, Context context) {
-		builder.queryElementFactory( PredicateTypeKeys.KNN,
-				new ElasticsearchKnnPredicate.Elasticsearch812Factory<>( builder.codec() ) );
+		if ( context.searchable() ) {
+			builder.queryElementFactory( PredicateTypeKeys.KNN,
+					new ElasticsearchKnnPredicate.Elasticsearch812Factory<>( builder.codec() ) );
+		}
 	}
 
 	private static String resolveDefault(VectorSimilarity vectorSimilarity) {
