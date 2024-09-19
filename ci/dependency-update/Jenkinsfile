@@ -311,7 +311,7 @@ pipeline {
 	}
 	post {
 		always {
-			notifyBuildResult maintainers: 'yoann@hibernate.org marko@hibernate.org'
+			notifyBuildResult maintainers: 'marko@hibernate.org'
 		}
 	}
 }
