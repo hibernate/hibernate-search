@@ -106,7 +106,6 @@ abstract class AbstractElasticsearchVectorFieldTypeOptionsStep<
 		builder.codec( codec );
 		if ( resolvedSearchable ) {
 			builder.searchable( true );
-			mappingContributor.contribute( builder, this );
 			builder.queryElementFactory( PredicateTypeKeys.EXISTS, new ElasticsearchExistsPredicate.Factory<>() );
 		}
 
@@ -117,6 +116,9 @@ abstract class AbstractElasticsearchVectorFieldTypeOptionsStep<
 
 		builder.multivaluable( false );
 
+		// NOTE: we make additional contribution at the end of the configuration to make sure that
+		//  the context we pass (this) is fully configured:
+		mappingContributor.contribute( builder, this );
 		return builder.build();
 	}
 

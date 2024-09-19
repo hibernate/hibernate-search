@@ -64,9 +64,12 @@ abstract class AbstractOpenSearch2VectorFieldTypeMappingContributor implements E
 		SearchQueryElementFactory<? extends KnnPredicateBuilder,
 				ElasticsearchSearchIndexScope<?>,
 				ElasticsearchSearchIndexValueFieldContext<F>> factory = getKnnPredicateFactory( builder );
-		builder.queryElementFactory( PredicateTypeKeys.KNN, factory );
-
 		builder.contributeAdditionalIndexSettings( settings -> settings.addKnn( true ) );
+
+		// only add a predicate if the field on which this contribution happens is searchable:
+		if ( context.searchable() ) {
+			builder.queryElementFactory( PredicateTypeKeys.KNN, factory );
+		}
 	}
 
 	protected abstract <F> SearchQueryElementFactory<? extends KnnPredicateBuilder,
