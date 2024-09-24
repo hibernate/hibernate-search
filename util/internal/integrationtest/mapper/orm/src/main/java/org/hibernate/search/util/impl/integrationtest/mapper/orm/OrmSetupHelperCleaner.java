@@ -7,12 +7,8 @@ package org.hibernate.search.util.impl.integrationtest.mapper.orm;
 import java.lang.reflect.Modifier;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Comparator;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 import java.util.function.Consumer;
-import java.util.stream.Collectors;
 
 import jakarta.persistence.criteria.CriteriaBuilder;
 import jakarta.persistence.criteria.CriteriaQuery;
@@ -102,10 +98,6 @@ class OrmSetupHelperCleaner {
 				sessionFactory.getCache().evictAllRegions();
 
 				clearDatabase( sessionFactory, mapping );
-
-				// Must re-clear the caches as they may have been re-populated
-				// while executing queries in clearDatabase().
-				sessionFactory.getCache().evictAllRegions();
 			}
 			else {
 				manualClearDatabase( sessionFactory, mapping );
@@ -117,23 +109,12 @@ class OrmSetupHelperCleaner {
 		}
 	}
 
-	private void clearDatabase(SessionFactoryImplementor sessionFactory, HibernateOrmMapping mapping) {
-		if ( config.tenantsIds.isEmpty() ) {
-			clearDatabase( sessionFactory, mapping, null );
-		}
-		else {
-			for ( Object tenantsId : config.tenantsIds ) {
-				clearDatabase( sessionFactory, mapping, tenantsId );
-			}
-		}
-	}
-
 	private void manualClearDatabase(SessionFactoryImplementor sessionFactory, HibernateOrmMapping mapping) {
-		if ( config.tenantsIds.isEmpty() ) {
+		if ( config.tenantIds.isEmpty() ) {
 			executeActions( config.manual, sessionFactory, mapping, null );
 		}
 		else {
-			for ( Object tenantsId : config.tenantsIds ) {
+			for ( Object tenantsId : config.tenantIds ) {
 				executeActions( config.manual, sessionFactory, mapping, tenantsId );
 			}
 		}
@@ -155,38 +136,17 @@ class OrmSetupHelperCleaner {
 	}
 
 
-	private void clearDatabase(SessionFactoryImplementor sessionFactory, HibernateOrmMapping mapping, Object tenantId) {
-		executeActions( config.preClear, sessionFactory, mapping, tenantId );
-
-		Set<String> clearedEntityNames = new HashSet<>();
-		for ( Class<?> entityClass : config.entityClearOrder ) {
-			EntityType<?> entityType;
-			try {
-				entityType = sessionFactory.getJpaMetamodel().entity( entityClass );
-			}
-			catch (IllegalArgumentException e) {
-				// When using annotatedTypes to infer the clear order,
-				// some annotated types may not be entities;
-				// this can be ignored.
-				continue;
-			}
-			if ( clearedEntityNames.add( entityType.getName() ) ) {
-				clearEntityInstances( sessionFactory, mapping, tenantId, entityType );
+	private void clearDatabase(SessionFactoryImplementor sessionFactory, HibernateOrmMapping mapping) {
+		if ( config.tenantIds.isEmpty() ) {
+			executeActions( config.preClear, sessionFactory, mapping, null );
+		}
+		else {
+			for ( Object tenantId : config.tenantIds ) {
+				executeActions( config.preClear, sessionFactory, mapping, tenantId );
 			}
 		}
 
-		// Just in case some entity types were not mentioned in entityClearOrder,
-		// we try to delete all remaining entity types.
-		// Note we're stabilizing the order, because ORM uses a HashSet internally
-		// and the order may change from one execution to the next.
-		List<EntityType<?>> sortedEntityTypes = sessionFactory.getJpaMetamodel().getEntities().stream()
-				.sorted( Comparator.comparing( EntityType::getName ) )
-				.collect( Collectors.toList() );
-		for ( EntityType<?> entityType : sortedEntityTypes ) {
-			if ( clearedEntityNames.add( entityType.getName() ) ) {
-				clearEntityInstances( sessionFactory, mapping, tenantId, entityType );
-			}
-		}
+		sessionFactory.getSchemaManager().truncateMappedObjects();
 	}
 
 	private static void clearEntityInstances(SessionFactoryImplementor sessionFactory, HibernateOrmMapping mapping,
@@ -319,9 +279,7 @@ class OrmSetupHelperCleaner {
 	}
 
 	private static class DataClearConfigImpl implements DataClearConfig {
-		private final List<Object> tenantsIds = new ArrayList<>();
-
-		private final List<Class<?>> entityClearOrder = new ArrayList<>();
+		private final List<Object> tenantIds = new ArrayList<>();
 
 		private final List<ThrowingConsumer<Session, RuntimeException>> preClear = new ArrayList<>();
 		private final List<ThrowingConsumer<Session, RuntimeException>> manual = new ArrayList<>();
@@ -337,7 +295,7 @@ class OrmSetupHelperCleaner {
 
 		@Override
 		public DataClearConfig tenants(Object... tenantIds) {
-			Collections.addAll( this.tenantsIds, tenantIds );
+			Collections.addAll( this.tenantIds, tenantIds );
 			return this;
 		}
 
@@ -366,8 +324,6 @@ class OrmSetupHelperCleaner {
 
 		@Override
 		public DataClearConfig clearOrder(Class<?>... entityClasses) {
-			entityClearOrder.clear();
-			Collections.addAll( entityClearOrder, entityClasses );
 			return this;
 		}
 

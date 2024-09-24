@@ -17,6 +17,7 @@ import org.hibernate.service.spi.ServiceRegistryImplementor;
 import org.hibernate.tool.schema.internal.HibernateSchemaManagementTool;
 import org.hibernate.tool.schema.internal.SchemaCreatorImpl;
 import org.hibernate.tool.schema.internal.SchemaDropperImpl;
+import org.hibernate.tool.schema.internal.SchemaTruncatorImpl;
 import org.hibernate.tool.schema.internal.exec.GenerationTargetToDatabase;
 import org.hibernate.tool.schema.spi.ContributableMatcher;
 import org.hibernate.tool.schema.spi.DelayedDropAction;
@@ -27,6 +28,7 @@ import org.hibernate.tool.schema.spi.SchemaCreator;
 import org.hibernate.tool.schema.spi.SchemaDropper;
 import org.hibernate.tool.schema.spi.SchemaManagementTool;
 import org.hibernate.tool.schema.spi.SchemaMigrator;
+import org.hibernate.tool.schema.spi.SchemaTruncator;
 import org.hibernate.tool.schema.spi.SchemaValidator;
 import org.hibernate.tool.schema.spi.SourceDescriptor;
 import org.hibernate.tool.schema.spi.TargetDescriptor;
@@ -133,6 +135,19 @@ class MultitenancyTestHelperSchemaManagementTool
 	@Override
 	public SchemaValidator getSchemaValidator(Map<String, Object> options) {
 		throw notSupported();
+	}
+
+	@Override
+	public SchemaTruncator getSchemaTruncator(Map<String, Object> options) {
+		return new SchemaTruncator() {
+			final SchemaTruncatorImpl delegate = (SchemaTruncatorImpl) toolDelegate.getSchemaTruncator( options );
+
+			@Override
+			public void doTruncate(Metadata metadata, ExecutionOptions options,
+					ContributableMatcher contributableInclusionFilter, TargetDescriptor targetDescriptor) {
+				delegate.doTruncate( metadata, true, generationTargets );
+			}
+		};
 	}
 
 	@Override
