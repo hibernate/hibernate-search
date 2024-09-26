@@ -4,8 +4,6 @@
  */
 package org.hibernate.search.engine.search.projection.dsl.impl;
 
-import java.util.List;
-
 import org.hibernate.search.engine.search.projection.dsl.DistanceToFieldProjectionOptionsStep;
 import org.hibernate.search.engine.search.projection.dsl.DistanceToFieldProjectionValueStep;
 import org.hibernate.search.engine.search.projection.dsl.MultiProjectionTypeReference;
@@ -20,15 +18,15 @@ public final class DistanceToFieldProjectionValueStepImpl
 
 	public DistanceToFieldProjectionValueStepImpl(SearchProjectionDslContext<?> dslContext, String fieldPath,
 			GeoPoint center) {
-		super( dslContext.scope().fieldQueryElement( fieldPath, ProjectionTypeKeys.DISTANCE ),
-				ProjectionAccumulator.single() );
+		super( dslContext.scope().fieldQueryElement( fieldPath, ProjectionTypeKeys.DISTANCE ), ProjectionAccumulator.single() );
 		distanceFieldProjectionBuilder.center( center );
 	}
 
 	@Override
-	public DistanceToFieldProjectionOptionsStep<?, List<Double>> multi() {
+	public <C> DistanceToFieldProjectionOptionsStep<?, C> multi(
+			MultiProjectionTypeReference<C, Double> collectionTypeReference) {
 		return new DistanceToFieldProjectionOptionsStepImpl<>( distanceFieldProjectionBuilder,
-				ProjectionAccumulator.multi( MultiProjectionTypeReference.list() ) );
+				ProjectionAccumulator.multi( collectionTypeReference ) );
 	}
 
 }

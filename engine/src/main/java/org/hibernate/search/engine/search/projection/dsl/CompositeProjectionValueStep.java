@@ -24,7 +24,7 @@ public interface CompositeProjectionValueStep<N extends CompositeProjectionOptio
 	/**
 	 * Defines the projection as multi-valued, i.e. returning {@code List<T>} instead of {@code T}.
 	 * <p>
-	 * Calling {@link #multi()} is mandatory for {@link SearchProjectionFactory#object(String) object projections}
+	 * Calling{@link #multi()}/{@link #multi(MultiProjectionTypeReference)} is mandatory for {@link SearchProjectionFactory#object(String) object projections}
 	 * on multi-valued object fields,
 	 * otherwise the projection will throw an exception upon creating the search query.
 	 * <p>
@@ -33,6 +33,26 @@ public interface CompositeProjectionValueStep<N extends CompositeProjectionOptio
 	 *
 	 * @return A new step to define optional parameters for the projection.
 	 */
-	CompositeProjectionOptionsStep<?, List<T>> multi();
+	default CompositeProjectionOptionsStep<?, List<T>> multi() {
+		return multi( MultiProjectionTypeReference.list() );
+	}
+
+	/**
+	 * Defines the projection as multi-valued, i.e. returning a collection, e.g. {@code List<T>}, instead of {@code T}.
+	 * <p>
+	 * Calling {@link #multi()}/{@link #multi(MultiProjectionTypeReference)} is mandatory for {@link SearchProjectionFactory#object(String) object projections}
+	 * on multi-valued object fields,
+	 * otherwise the projection will throw an exception upon creating the query.
+	 * <p>
+	 * Requires a collection type reference, either a built-in (see {@link MultiProjectionTypeReference}) or a custom one.
+	 * <p>
+	 * Calling {@link #multi()} on {@link SearchProjectionFactory#composite() basic composite projections}
+	 * is generally not useful: the only effect is that projected values will be wrapped in a one-element collection.
+	 *
+	 * @param collectionTypeReference Collection type reference that specifies the expected collection into which the values have to be collected into.
+	 * @return A new step to define optional parameters for the multi-valued projections.
+	 * @see MultiProjectionTypeReference
+	 */
+	<C> CompositeProjectionOptionsStep<?, C> multi(MultiProjectionTypeReference<C, T> collectionTypeReference);
 
 }

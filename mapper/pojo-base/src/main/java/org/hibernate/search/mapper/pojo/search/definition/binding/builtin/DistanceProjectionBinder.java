@@ -12,6 +12,7 @@ import org.hibernate.search.engine.environment.bean.BeanHolder;
 import org.hibernate.search.engine.search.projection.definition.spi.ConstantProjectionDefinition;
 import org.hibernate.search.engine.search.projection.definition.spi.DistanceProjectionDefinition;
 import org.hibernate.search.engine.search.projection.dsl.DistanceToFieldProjectionOptionsStep;
+import org.hibernate.search.engine.search.projection.dsl.MultiProjectionTypeReference;
 import org.hibernate.search.engine.search.projection.dsl.SearchProjectionFactory;
 import org.hibernate.search.engine.spatial.DistanceUnit;
 import org.hibernate.search.engine.spatial.GeoPoint;
@@ -120,9 +121,10 @@ public final class DistanceProjectionBinder implements ProjectionBinder {
 	}
 
 	private void bind(ProjectionBindingContext context, ProjectionBindingMultiContext multi, String fieldPath) {
+		var reference = multi.multiProjectionTypeReference( Double.class );
 		multi.definition( Double.class, context.isIncluded( fieldPath )
-				? BeanHolder.of( new DistanceProjectionDefinition.MultiValued( fieldPath, parameterName, unit ) )
-				: ConstantProjectionDefinition.emptyList() );
+				? BeanHolder.of( new DistanceProjectionDefinition.MultiValued<>( fieldPath, parameterName, unit, reference ) )
+				: ConstantProjectionDefinition.empty( reference ) );
 	}
 
 	private String fieldPathOrFail(ProjectionBindingContext context) {

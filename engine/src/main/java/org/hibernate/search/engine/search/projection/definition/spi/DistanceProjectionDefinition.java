@@ -8,6 +8,7 @@ import java.util.List;
 
 import org.hibernate.search.engine.search.projection.SearchProjection;
 import org.hibernate.search.engine.search.projection.definition.ProjectionDefinitionContext;
+import org.hibernate.search.engine.search.projection.dsl.MultiProjectionTypeReference;
 import org.hibernate.search.engine.search.projection.dsl.SearchProjectionFactory;
 import org.hibernate.search.engine.spatial.DistanceUnit;
 import org.hibernate.search.engine.spatial.GeoPoint;
@@ -63,9 +64,13 @@ public abstract class DistanceProjectionDefinition<F> extends AbstractProjection
 	}
 
 	@Incubating
-	public static final class MultiValued extends DistanceProjectionDefinition<List<Double>> {
-		public MultiValued(String fieldPath, String parameterName, DistanceUnit unit) {
+	public static final class MultiValued<C> extends DistanceProjectionDefinition<C> {
+		private final MultiProjectionTypeReference<C, Double> collectionTypeReference;
+
+		public MultiValued(String fieldPath, String parameterName, DistanceUnit unit,
+				MultiProjectionTypeReference<C, Double> collectionTypeReference) {
 			super( fieldPath, parameterName, unit );
+			this.collectionTypeReference = collectionTypeReference;
 		}
 
 		@Override
@@ -74,11 +79,11 @@ public abstract class DistanceProjectionDefinition<F> extends AbstractProjection
 		}
 
 		@Override
-		public SearchProjection<List<Double>> create(SearchProjectionFactory<?, ?> factory,
+		public SearchProjection<C> create(SearchProjectionFactory<?, ?> factory,
 				ProjectionDefinitionContext context) {
 			return factory.withParameters( params -> factory
 					.distance( fieldPath, params.get( parameterName, GeoPoint.class ) )
-					.multi()
+					.multi(collectionTypeReference)
 					.unit( unit )
 			).toProjection();
 		}

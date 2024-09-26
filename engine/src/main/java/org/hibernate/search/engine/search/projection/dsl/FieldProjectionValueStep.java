@@ -25,7 +25,7 @@ public interface FieldProjectionValueStep<N extends FieldProjectionOptionsStep<?
 	/**
 	 * Defines the projection as multi-valued, i.e. returning {@code List<T>} instead of {@code T}.
 	 * <p>
-	 * Calling {@link #multi()} is mandatory for multi-valued fields,
+	 * Calling {@link #multi()}/{@link #multi(MultiProjectionTypeReference)} is mandatory for multi-valued fields,
 	 * otherwise the projection will throw an exception upon creating the query.
 	 *
 	 * @return A new step to define optional parameters for the multi-valued projections.
@@ -37,7 +37,7 @@ public interface FieldProjectionValueStep<N extends FieldProjectionOptionsStep<?
 	/**
 	 * Defines the projection as multi-valued, i.e. returning a collection, e.g. {@code List<T>}, instead of {@code T}.
 	 * <p>
-	 * Calling {@link #multi()} is mandatory for multi-valued fields,
+	 * Calling {@link #multi()}/{@link #multi(MultiProjectionTypeReference)} is mandatory for multi-valued fields,
 	 * otherwise the projection will throw an exception upon creating the query.
 	 * <p>
 	 * Requires a collection type reference, either a built-in (see {@link MultiProjectionTypeReference}) or a custom one.

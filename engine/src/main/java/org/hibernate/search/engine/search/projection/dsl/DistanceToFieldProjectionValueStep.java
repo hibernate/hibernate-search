@@ -25,11 +25,27 @@ public interface DistanceToFieldProjectionValueStep<N extends DistanceToFieldPro
 	/**
 	 * Defines the projection as multi-valued, i.e. returning {@code List<T>} instead of {@code T}.
 	 * <p>
-	 * Calling {@link #multi()} is mandatory for multi-valued fields,
+	 * Calling {@link #multi()}/{@link #multi(MultiProjectionTypeReference)} is mandatory for multi-valued fields,
 	 * otherwise the projection will throw an exception upon creating the query.
 	 *
 	 * @return A new step to define optional parameters for the multi-valued projections.
 	 */
-	DistanceToFieldProjectionOptionsStep<?, List<T>> multi();
+	default DistanceToFieldProjectionOptionsStep<?, List<T>> multi() {
+		return multi( MultiProjectionTypeReference.list() );
+	}
+
+	/**
+	 * Defines the projection as multi-valued, i.e. returning {@code List<T>} instead of {@code T}.
+	 * <p>
+	 * Calling {@link #multi()}/{@link #multi(MultiProjectionTypeReference)} is mandatory for multi-valued fields,
+	 * otherwise the projection will throw an exception upon creating the query.
+	 * <p>
+	 * Requires a collection type reference, either a built-in (see {@link MultiProjectionTypeReference}) or a custom one.
+	 *
+	 * @param collectionTypeReference Collection type reference that specifies the expected collection into which the values have to be collected into.
+	 * @return A new step to define optional parameters for the multi-valued projections.
+	 * @see MultiProjectionTypeReference
+	 */
+	<C> DistanceToFieldProjectionOptionsStep<?, C> multi(MultiProjectionTypeReference<C, T> collectionTypeReference);
 
 }
