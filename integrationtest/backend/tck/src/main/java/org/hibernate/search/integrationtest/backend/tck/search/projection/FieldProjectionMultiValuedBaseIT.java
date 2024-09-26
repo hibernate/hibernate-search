@@ -6,15 +6,22 @@ package org.hibernate.search.integrationtest.backend.tck.search.projection;
 
 import static org.hibernate.search.util.impl.integrationtest.common.assertion.SearchResultAssert.assertThatQuery;
 import static org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMapperUtils.documentProvider;
+import static org.junit.jupiter.api.Assumptions.assumeTrue;
 
+import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.Comparator;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Objects;
+import java.util.TreeSet;
 import java.util.function.Function;
 
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaElement;
 import org.hibernate.search.engine.backend.types.Projectable;
+import org.hibernate.search.engine.search.projection.dsl.MultiProjectionTypeReference;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.model.singlefield.SingleFieldIndexBinding;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.FieldTypeDescriptor;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.StandardFieldTypeDescriptor;
@@ -152,6 +159,133 @@ class FieldProjectionMultiValuedBaseIT<F> {
 						Arrays.asList( dataSet.getFieldValues( 2 ), dataSet.getFieldValues( 2 ) ),
 						Arrays.asList( dataSet.getFieldValues( 3 ), dataSet.getFieldValues( 3 ) ),
 						Arrays.asList( Collections.emptyList(), Collections.emptyList() ) // Empty document
+				);
+	}
+
+	@ParameterizedTest(name = "{0} - {1}")
+	@MethodSource("params")
+	void set(TestedFieldStructure fieldStructure, FieldTypeDescriptor<F, ?> fieldType, DataSet<F> dataSet) {
+		StubMappingScope scope = index.createScope();
+
+		String fieldPath = getFieldPath( fieldStructure, fieldType );
+
+		var multi = scope.projection().field( fieldPath, fieldType.getJavaType() )
+				.multi( MultiProjectionTypeReference.set() )
+				.toProjection();
+
+		assertThatQuery( scope.query()
+				.select( multi )
+				.where( f -> f.matchAll() )
+				.routing( dataSet.routingKey )
+				.toQuery() )
+				.hasHitsAnyOrder(
+						new HashSet<>( dataSet.getFieldValues( 1 ) ),
+						new HashSet<>( dataSet.getFieldValues( 2 ) ),
+						new HashSet<>( dataSet.getFieldValues( 3 ) ),
+						Collections.emptySet() // Empty document
+				);
+	}
+
+	@ParameterizedTest(name = "{0} - {1}")
+	@MethodSource("params")
+	void sortedSet(TestedFieldStructure fieldStructure, FieldTypeDescriptor<F, ?> fieldType, DataSet<F> dataSet) {
+		assumeTrue( Comparable.class.isAssignableFrom( fieldType.getJavaType() ),
+				"Some types that cannot be compared will fail the test as they cannot be added to a set without a comparator defined" );
+
+		StubMappingScope scope = index.createScope();
+
+		String fieldPath = getFieldPath( fieldStructure, fieldType );
+
+		var multi = scope.projection().field( fieldPath, fieldType.getJavaType() )
+				.multi( MultiProjectionTypeReference.sortedSet() )
+				.toProjection();
+
+		assertThatQuery( scope.query()
+				.select( multi )
+				.where( f -> f.matchAll() )
+				.routing( dataSet.routingKey )
+				.toQuery() )
+				.hasHitsAnyOrder(
+						new TreeSet<>( dataSet.getFieldValues( 1 ) ),
+						new TreeSet<>( dataSet.getFieldValues( 2 ) ),
+						new TreeSet<>( dataSet.getFieldValues( 3 ) ),
+						Collections.emptySortedSet() // Empty document
+				);
+	}
+
+	@ParameterizedTest(name = "{0} - {1}")
+	@MethodSource("params")
+	void sortedSetComparator(TestedFieldStructure fieldStructure, FieldTypeDescriptor<F, ?> fieldType, DataSet<F> dataSet) {
+		StubMappingScope scope = index.createScope();
+
+		String fieldPath = getFieldPath( fieldStructure, fieldType );
+
+		Comparator<F> comparator = Comparator.comparing( Objects::toString );
+		var multi = scope.projection().field( fieldPath, fieldType.getJavaType() )
+				.multi( MultiProjectionTypeReference.sortedSet( comparator ) )
+				.toProjection();
+
+		assertThatQuery( scope.query()
+				.select( multi )
+				.where( f -> f.matchAll() )
+				.routing( dataSet.routingKey )
+				.toQuery() )
+				.hasHitsAnyOrder(
+						treeSet( comparator, dataSet.getFieldValues( 1 ) ),
+						treeSet( comparator, dataSet.getFieldValues( 2 ) ),
+						treeSet( comparator, dataSet.getFieldValues( 3 ) ),
+						Collections.emptySortedSet() // Empty document
+				);
+	}
+
+	private static <F> TreeSet<F> treeSet(Comparator<F> comparator, List<F> values) {
+		TreeSet<F> set = new TreeSet<>( comparator );
+		set.addAll( values );
+		return set;
+	}
+
+	@ParameterizedTest(name = "{0} - {1}")
+	@MethodSource("params")
+	void array(TestedFieldStructure fieldStructure, FieldTypeDescriptor<F, ?> fieldType, DataSet<F> dataSet) {
+		StubMappingScope scope = index.createScope();
+
+		String fieldPath = getFieldPath( fieldStructure, fieldType );
+
+		var multi = scope.projection().field( fieldPath, fieldType.getJavaType() )
+				.multi( MultiProjectionTypeReference.array( fieldType.getJavaType() ) )
+				.toProjection();
+
+		F[] arrayToConvert = (F[]) Array.newInstance( fieldType.getJavaType(), 0 );
+		assertThatQuery( scope.query()
+				.select( multi )
+				.where( f -> f.matchAll() )
+				.routing( dataSet.routingKey )
+				.toQuery() )
+				.hasHitsAnyOrder(
+						dataSet.getFieldValues( 1 ).toArray( arrayToConvert ),
+						dataSet.getFieldValues( 2 ).toArray( arrayToConvert ),
+						dataSet.getFieldValues( 3 ).toArray( arrayToConvert ),
+						arrayToConvert // Empty document
+				);
+	}
+
+	@ParameterizedTest(name = "{0} - {1}")
+	@MethodSource("params")
+	void explicitList(TestedFieldStructure fieldStructure, FieldTypeDescriptor<F, ?> fieldType, DataSet<F> dataSet) {
+		StubMappingScope scope = index.createScope();
+
+		String fieldPath = getFieldPath( fieldStructure, fieldType );
+
+		assertThatQuery( scope.query()
+				.select( f -> f.field( fieldPath, fieldType.getJavaType() ).multi( MultiProjectionTypeReference.list() ) )
+				.where( f -> f.matchAll() )
+				.routing( dataSet.routingKey )
+				.toQuery() )
+				.hasHitsAnyOrder(
+						dataSet.getFieldValues( 1 ),
+						dataSet.getFieldValues( 2 ),
+						dataSet.getFieldValues( 3 ),
+						Collections.emptyList() // Empty document
 				);
 	}
 

@@ -9,6 +9,7 @@ import java.util.List;
 
 import org.hibernate.search.engine.backend.types.converter.runtime.FromDocumentValueConvertContext;
 import org.hibernate.search.engine.backend.types.converter.spi.ProjectionConverter;
+import org.hibernate.search.engine.search.projection.dsl.MultiProjectionTypeReference;
 
 /**
  * A variation on {@link java.util.stream.Collector} suitable for projections on field values.
@@ -41,6 +42,10 @@ public interface ProjectionAccumulator<E, V, A, R> {
 	@SuppressWarnings("unchecked") // PROVIDER works for any V.
 	static <V> Provider<V, List<V>> list() {
 		return ListProjectionAccumulator.PROVIDER;
+	}
+
+	static <V,C> Provider<V, C> multi(MultiProjectionTypeReference<C,V> reference) {
+		return ListBasedProjectionAccumulator.provider( reference );
 	}
 
 	/**

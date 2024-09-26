@@ -4,17 +4,20 @@
  */
 package org.hibernate.search.engine.search.projection.spi;
 
-import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
+
+import org.hibernate.search.engine.search.projection.dsl.MultiProjectionTypeReference;
 
 /**
  * A {@link ProjectionAccumulator} that can accumulate any number of values into a {@link java.util.List}.
  *
  * @param <E> The type of extracted values to accumulate before being transformed.
  * @param <V> The type of values to accumulate obtained by transforming extracted values ({@code E}).
+ *
+ * @deprecated Use {@link ListBasedProjectionAccumulator#provider(MultiProjectionTypeReference)} with {@link MultiProjectionTypeReference#list()} instead.
  */
-final class ListProjectionAccumulator<E, V> implements ProjectionAccumulator<E, V, List<Object>, List<V>> {
+@Deprecated(since = "8.0")
+final class ListProjectionAccumulator<E, V> extends AbstractListBasedProjectionAccumulator<E, V, List<V>> {
 
 	@SuppressWarnings("rawtypes")
 	static final Provider PROVIDER = new Provider() {
@@ -32,45 +35,6 @@ final class ListProjectionAccumulator<E, V> implements ProjectionAccumulator<E, 
 	};
 
 	private ListProjectionAccumulator() {
-	}
-
-	@Override
-	public String toString() {
-		return getClass().getSimpleName();
-	}
-
-	@Override
-	public List<Object> createInitial() {
-		return new ArrayList<>();
-	}
-
-	@Override
-	public List<Object> accumulate(List<Object> accumulated, E value) {
-		accumulated.add( value );
-		return accumulated;
-	}
-
-	@Override
-	public List<Object> accumulateAll(List<Object> accumulated, Collection<E> values) {
-		accumulated.addAll( values );
-		return accumulated;
-	}
-
-	@Override
-	public int size(List<Object> accumulated) {
-		return accumulated.size();
-	}
-
-	@Override
-	@SuppressWarnings("unchecked")
-	public E get(List<Object> accumulated, int index) {
-		return (E) accumulated.get( index );
-	}
-
-	@Override
-	public List<Object> transform(List<Object> accumulated, int index, V transformed) {
-		accumulated.set( index, transformed );
-		return accumulated;
 	}
 
 	@Override
