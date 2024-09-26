@@ -4,11 +4,10 @@
  */
 package org.hibernate.search.engine.search.projection.definition.spi;
 
-import java.util.List;
-
 import org.hibernate.search.engine.search.common.ValueModel;
 import org.hibernate.search.engine.search.projection.SearchProjection;
 import org.hibernate.search.engine.search.projection.definition.ProjectionDefinitionContext;
+import org.hibernate.search.engine.search.projection.dsl.MultiProjectionTypeReference;
 import org.hibernate.search.engine.search.projection.dsl.SearchProjectionFactory;
 import org.hibernate.search.util.common.annotation.Incubating;
 import org.hibernate.search.util.common.spi.ToStringTreeAppender;
@@ -61,9 +60,13 @@ public abstract class FieldProjectionDefinition<P, F> extends AbstractProjection
 	}
 
 	@Incubating
-	public static final class MultiValued<F> extends FieldProjectionDefinition<List<F>, F> {
-		public MultiValued(String fieldPath, Class<F> fieldType, ValueModel valueModel) {
+	public static final class MultiValued<C, F> extends FieldProjectionDefinition<C, F> {
+		private final MultiProjectionTypeReference<C, F> collectionTypeReference;
+
+		public MultiValued(String fieldPath, Class<F> fieldType, MultiProjectionTypeReference<C, F> collectionTypeReference,
+				ValueModel valueModel) {
 			super( fieldPath, fieldType, valueModel );
+			this.collectionTypeReference = collectionTypeReference;
 		}
 
 		@Override
@@ -72,9 +75,9 @@ public abstract class FieldProjectionDefinition<P, F> extends AbstractProjection
 		}
 
 		@Override
-		public SearchProjection<List<F>> create(SearchProjectionFactory<?, ?> factory,
-				ProjectionDefinitionContext context) {
-			return factory.field( fieldPath, fieldType, valueModel ).multi().toProjection();
+		public SearchProjection<C> create(SearchProjectionFactory<?, ?> factory, ProjectionDefinitionContext context) {
+			return factory.field( fieldPath, fieldType, valueModel )
+					.multi( collectionTypeReference ).toProjection();
 		}
 	}
 }

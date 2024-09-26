@@ -44,7 +44,7 @@ public interface ProjectionAccumulator<E, V, A, R> {
 		return ListProjectionAccumulator.PROVIDER;
 	}
 
-	static <V,C> Provider<V, C> multi(MultiProjectionTypeReference<C,V> reference) {
+	static <V, C> Provider<V, C> multi(MultiProjectionTypeReference<C, V> reference) {
 		return ListBasedProjectionAccumulator.provider( reference );
 	}
 

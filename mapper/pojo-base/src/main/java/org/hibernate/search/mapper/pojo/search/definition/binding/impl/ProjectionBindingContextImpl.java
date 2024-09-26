@@ -5,9 +5,12 @@
 package org.hibernate.search.mapper.pojo.search.definition.binding.impl;
 
 import java.lang.invoke.MethodHandles;
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
+import java.util.SortedSet;
 import java.util.function.BiFunction;
 import java.util.function.Function;
 
@@ -21,6 +24,7 @@ import org.hibernate.search.engine.search.projection.definition.ProjectionDefini
 import org.hibernate.search.engine.search.projection.definition.spi.CompositeProjectionDefinition;
 import org.hibernate.search.engine.search.projection.definition.spi.ConstantProjectionDefinition;
 import org.hibernate.search.engine.search.projection.definition.spi.ObjectProjectionDefinition;
+import org.hibernate.search.engine.search.projection.dsl.MultiProjectionTypeReference;
 import org.hibernate.search.mapper.pojo.extractor.builtin.BuiltinContainerExtractors;
 import org.hibernate.search.mapper.pojo.extractor.impl.BoundContainerExtractorPath;
 import org.hibernate.search.mapper.pojo.extractor.mapping.programmatic.ContainerExtractorPath;
@@ -107,7 +111,7 @@ public class ProjectionBindingContextImpl<P> implements ProjectionBindingContext
 	}
 
 	@Override
-	public Optional<MultiContextImpl<?>> multi() {
+	public Optional<MultiContextImpl<?, ?>> multi() {
 		BoundContainerExtractorPath<?, ?> boundParameterElementPath = mappingHelper.indexModelBinder()
 				.bindExtractorPath( parameterTypeModel, ContainerExtractorPath.defaultExtractors() );
 		List<String> boundParameterElementExtractorNames =
@@ -119,11 +123,15 @@ public class ProjectionBindingContextImpl<P> implements ProjectionBindingContext
 		else {
 			if ( boundParameterElementExtractorNames.size() > 1
 					|| !( BuiltinContainerExtractors.COLLECTION.equals( boundParameterElementExtractorNames.get( 0 ) )
-							|| BuiltinContainerExtractors.ITERABLE.equals( boundParameterElementExtractorNames.get( 0 ) ) )
-					|| !mappingHelper.introspector().typeModel( List.class ).isSubTypeOf( parameterTypeModel.rawType() ) ) {
+							|| BuiltinContainerExtractors.ITERABLE.equals( boundParameterElementExtractorNames.get( 0 ) ) ) ) {
 				throw log.invalidMultiValuedParameterTypeForProjectionConstructor( parameterTypeModel );
 			}
-			return Optional.of( new MultiContextImpl<>( boundParameterElementPath.getExtractedType() ) );
+			MultiProjectionTypeReference<?, ?> multiProjectionTypeReference = multiProjectionTypeReference(
+					parameterTypeModel.rawType().typeIdentifier().javaClass(),
+					boundParameterElementPath.getExtractedType().rawType().typeIdentifier().javaClass()
+			);
+			return Optional.of( new MultiContextImpl<>( parameterTypeModel, boundParameterElementPath.getExtractedType(),
+					multiProjectionTypeReference ) );
 		}
 	}
 
@@ -270,7 +278,7 @@ public class ProjectionBindingContextImpl<P> implements ProjectionBindingContext
 	}
 
 	public BeanHolder<? extends ProjectionDefinition<?>> applyDefaultProjection() {
-		Optional<? extends ProjectionBindingContextImpl<?>.MultiContextImpl<?>> multi = multi();
+		Optional<? extends ProjectionBindingContextImpl<?>.MultiContextImpl<?, ?>> multi = multi();
 		PojoConstructorModel<?> constructorModelOrNull;
 		if ( multi.isPresent() ) {
 			constructorModelOrNull = parameterBinder.findProjectionConstructorOrNull(
@@ -294,6 +302,38 @@ public class ProjectionBindingContextImpl<P> implements ProjectionBindingContext
 		}
 	}
 
+	// TODO: make this context aware of other "registered" type references
+	@SuppressWarnings({ "rawtypes", "unchecked" })
+	private <F, C> MultiProjectionTypeReference<C, F> multiProjectionTypeReference(Class<C> collectionType,
+			Class<F> elementType) {
+		MultiProjectionTypeReference reference = null;
+		if ( List.class.isAssignableFrom( collectionType ) ) {
+			reference = MultiProjectionTypeReference.list();
+		}
+		else if ( SortedSet.class.isAssignableFrom( collectionType ) ) {
+			if ( !Comparable.class.isAssignableFrom( elementType ) ) {
+				// TODO: throw some exception with instructions what to do ? (since this type won't "fit" into a sorted set without a comparator and .....
+				//  how we can get a comparator here ?
+			}
+			reference = MultiProjectionTypeReference.sortedSet();
+		}
+		else if ( Set.class.isAssignableFrom( collectionType ) ) {
+			reference = MultiProjectionTypeReference.set();
+		}
+		else if ( collectionType.isArray() ) {
+			reference = MultiProjectionTypeReference.array( elementType );
+		}
+		else if ( Collection.class.isAssignableFrom( collectionType ) || Iterable.class.isAssignableFrom( collectionType ) ) {
+			reference = MultiProjectionTypeReference.list();
+		}
+		else {
+			// TODO: unknown collection we should fail here nicely :)
+			throw log.invalidMultiValuedParameterTypeForProjectionConstructor( parameterTypeModel );
+		}
+
+		return reference;
+	}
+
 	private static class PartialBinding<P> {
 		private final BeanHolder<? extends ProjectionDefinition<? extends P>> definitionHolder;
 
@@ -310,25 +350,30 @@ public class ProjectionBindingContextImpl<P> implements ProjectionBindingContext
 		}
 	}
 
-	public class MultiContextImpl<PV> implements ProjectionBindingMultiContext {
+	public class MultiContextImpl<CV, PV> implements ProjectionBindingMultiContext {
 		public final PojoTypeModel<PV> parameterContainerElementTypeModel;
 		private final PojoModelValue<PV> parameterContainerElementRootElement;
+		private final PojoModelValue<CV> parameterContainerRootElement;
+		private final MultiProjectionTypeReference<?, ?> multiProjectionTypeReference;
 
-		public MultiContextImpl(PojoTypeModel<PV> parameterContainerElementTypeModel) {
+		public MultiContextImpl(PojoTypeModel<CV> containerTypeModel, PojoTypeModel<PV> parameterContainerElementTypeModel,
+				MultiProjectionTypeReference<?, ?> multiProjectionTypeReference) {
 			this.parameterContainerElementTypeModel = parameterContainerElementTypeModel;
 			this.parameterContainerElementRootElement = new PojoModelValueElement<>( mappingHelper.introspector(),
 					parameterContainerElementTypeModel );
+			this.parameterContainerRootElement =
+					new PojoModelValueElement<>( mappingHelper.introspector(), containerTypeModel );
+			this.multiProjectionTypeReference = multiProjectionTypeReference;
 		}
 
 		@Override
-		public <P2> void definition(Class<P2> expectedValueType,
-				ProjectionDefinition<? extends List<? extends P2>> definition) {
+		public <C, P2> void definition(Class<P2> expectedValueType, ProjectionDefinition<? extends C> definition) {
 			definition( expectedValueType, BeanHolder.of( definition ) );
 		}
 
 		@Override
-		public <P2> void definition(Class<P2> expectedValueType,
-				BeanHolder<? extends ProjectionDefinition<? extends List<? extends P2>>> definitionHolder) {
+		public <C, P2> void definition(Class<P2> expectedValueType,
+				BeanHolder<? extends ProjectionDefinition<? extends C>> definitionHolder) {
 			checkAndBind( definitionHolder, mappingHelper.introspector().typeModel( expectedValueType ) );
 		}
 
@@ -337,8 +382,18 @@ public class ProjectionBindingContextImpl<P> implements ProjectionBindingContext
 			return parameterContainerElementRootElement;
 		}
 
-		private <P2> void checkAndBind(
-				BeanHolder<? extends ProjectionDefinition<? extends List<? extends P2>>> definitionHolder,
+		@Override
+		public PojoModelValue<?> container() {
+			return parameterContainerRootElement;
+		}
+
+		@Override
+		public MultiProjectionTypeReference<?, ?> multiProjectionTypeReference() {
+			return multiProjectionTypeReference;
+		}
+
+		private <C, P2> void checkAndBind(
+				BeanHolder<? extends ProjectionDefinition<? extends C>> definitionHolder,
 				PojoRawTypeModel<P2> expectedValueType) {
 			if ( !expectedValueType.isSubTypeOf( parameterContainerElementTypeModel.rawType() ) ) {
 				throw log.invalidOutputTypeForMultiValuedProjectionDefinition( definitionHolder.get(), parameterTypeModel,

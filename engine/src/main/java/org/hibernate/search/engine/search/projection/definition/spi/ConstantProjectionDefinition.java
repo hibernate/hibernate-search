@@ -10,6 +10,7 @@ import java.util.List;
 import org.hibernate.search.engine.environment.bean.BeanHolder;
 import org.hibernate.search.engine.search.projection.SearchProjection;
 import org.hibernate.search.engine.search.projection.definition.ProjectionDefinitionContext;
+import org.hibernate.search.engine.search.projection.dsl.MultiProjectionTypeReference;
 import org.hibernate.search.engine.search.projection.dsl.SearchProjectionFactory;
 import org.hibernate.search.util.common.annotation.Incubating;
 import org.hibernate.search.util.common.spi.ToStringTreeAppender;
@@ -31,6 +32,12 @@ public final class ConstantProjectionDefinition<T> extends AbstractProjectionDef
 	@SuppressWarnings("unchecked") // EMPTY_LIST_INSTANCE works for any T
 	public static <T> BeanHolder<ConstantProjectionDefinition<List<T>>> emptyList() {
 		return (BeanHolder<ConstantProjectionDefinition<List<T>>>) EMPTY_LIST_INSTANCE;
+	}
+
+	public static <T> BeanHolder<ConstantProjectionDefinition<T>> empty(
+			MultiProjectionTypeReference<T, ?> multiProjectionTypeReference) {
+		// TODO: add predefined bean holders for the types we can safely cache
+		return BeanHolder.of( new ConstantProjectionDefinition<>( multiProjectionTypeReference.empty() ) );
 	}
 
 	private final T value;

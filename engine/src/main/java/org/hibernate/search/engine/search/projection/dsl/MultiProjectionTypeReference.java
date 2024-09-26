@@ -34,6 +34,10 @@ public interface MultiProjectionTypeReference<C, V> {
 	 */
 	C convert(List<V> list);
 
+	default C empty() {
+		return convert( List.of() );
+	}
+
 	/**
 	 * @return The type reference for the multi-valued projections that have to be collected as {@code List<V>}.
 	 * @param <V> The type of the elements in the collection.

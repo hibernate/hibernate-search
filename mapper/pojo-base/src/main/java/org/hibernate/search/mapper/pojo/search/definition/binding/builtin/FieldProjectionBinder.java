@@ -11,6 +11,7 @@ import org.hibernate.search.engine.environment.bean.BeanHolder;
 import org.hibernate.search.engine.search.common.ValueModel;
 import org.hibernate.search.engine.search.projection.definition.spi.ConstantProjectionDefinition;
 import org.hibernate.search.engine.search.projection.definition.spi.FieldProjectionDefinition;
+import org.hibernate.search.engine.search.projection.dsl.MultiProjectionTypeReference;
 import org.hibernate.search.engine.search.projection.dsl.SearchProjectionFactory;
 import org.hibernate.search.mapper.pojo.logging.impl.Log;
 import org.hibernate.search.mapper.pojo.search.definition.binding.ProjectionBinder;
@@ -93,7 +94,7 @@ public final class FieldProjectionBinder implements ProjectionBinder {
 		String fieldPath = fieldPathOrFail( context );
 		if ( multiOptional.isPresent() ) {
 			ProjectionBindingMultiContext multi = multiOptional.get();
-			bind( context, multi, fieldPath, multi.containerElement().rawType() );
+			bind( context, multi, fieldPath, multi.multiProjectionTypeReference(), multi.containerElement().rawType() );
 		}
 		else {
 			bind( context, fieldPath, context.constructorParameter().rawType() );
@@ -107,11 +108,13 @@ public final class FieldProjectionBinder implements ProjectionBinder {
 				: ConstantProjectionDefinition.nullValue() );
 	}
 
-	private <T> void bind(ProjectionBindingContext context, ProjectionBindingMultiContext multi, String fieldPath,
-			Class<T> containerElementType) {
+	@SuppressWarnings("unchecked") // we know that containerElementType should match the multiProjectionTypeReference as they both come from the same context
+	private <C, T> void bind(ProjectionBindingContext context, ProjectionBindingMultiContext multi, String fieldPath,
+			MultiProjectionTypeReference<C, T> multiProjectionTypeReference, Class<?> containerElementType) {
 		multi.definition( containerElementType, context.isIncluded( fieldPath )
-				? BeanHolder.of( new FieldProjectionDefinition.MultiValued<>( fieldPath, containerElementType, valueModel ) )
-				: ConstantProjectionDefinition.emptyList() );
+				? BeanHolder.of( new FieldProjectionDefinition.MultiValued<>( fieldPath, (Class<T>) containerElementType,
+						multiProjectionTypeReference, valueModel ) )
+				: ConstantProjectionDefinition.empty( multiProjectionTypeReference ) );
 	}
 
 	private String fieldPathOrFail(ProjectionBindingContext context) {

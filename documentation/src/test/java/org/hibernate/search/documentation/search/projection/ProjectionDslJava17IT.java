@@ -62,8 +62,7 @@ class ProjectionDslJava17IT {
 				// This wouldn't be needed in a typical application.
 				CollectionHelper.asSet( MyBookProjection.class, MyBookProjection.Author.class, MyAuthorProjection.class,
 						MyBookIdAndTitleProjection.class, MyBookTitleAndAuthorNamesProjection.class,
-						MyBookTitleAndAuthorsProjection.class,
-						MyBookIdAndTitleProjection.class, MyBookTitleAndAuthorNamesProjection.class,
+						MyBookTitleAndAuthorsProjection.class, MyBookTitleAndAuthorNamesInSetProjection.class,
 						MyBookScoreAndTitleProjection.class,
 						MyBookDocRefAndTitleProjection.class,
 						MyBookEntityAndTitleProjection.class,
@@ -135,6 +134,15 @@ class ProjectionDslJava17IT {
 					myBookTitleAndAuthorNamesProjectionMapping.mainConstructor().parameter( 1 )
 							.projection( FieldProjectionBinder.create( "authors.lastName" ) );
 					//end::programmatic-field-projection[]
+
+					TypeMappingStep myBookTitleAndAuthorNamesInSetProjectionMapping =
+							mapping.type( MyBookTitleAndAuthorNamesInSetProjection.class );
+					myBookTitleAndAuthorNamesInSetProjectionMapping.mainConstructor()
+							.projectionConstructor();
+					myBookTitleAndAuthorNamesInSetProjectionMapping.mainConstructor().parameter( 0 )
+							.projection( FieldProjectionBinder.create() );
+					myBookTitleAndAuthorNamesInSetProjectionMapping.mainConstructor().parameter( 1 )
+							.projection( FieldProjectionBinder.create( "authors.lastName" ) );
 
 					//tag::programmatic-score-projection[]
 					TypeMappingStep myBookScoreAndTitleProjection =
@@ -358,6 +366,32 @@ class ProjectionDslJava17IT {
 									book.getAuthors().stream()
 											.map( Author::getLastName )
 											.collect( Collectors.toList() )
+							) )
+							.collect( Collectors.toList() )
+			);
+		} );
+	}
+
+	@ParameterizedTest(name = "{0}")
+	@MethodSource("params")
+	void projectionConstructor_field_set(DocumentationSetupHelper.SetupVariant variant) {
+		init( variant );
+		with( entityManagerFactory ).runInTransaction( entityManager -> {
+			SearchSession searchSession = Search.session( entityManager );
+
+			// tag::projection-constructor-field[]
+			List<MyBookTitleAndAuthorNamesInSetProjection> hits = searchSession.search( Book.class )
+					.select( MyBookTitleAndAuthorNamesInSetProjection.class )// <1>
+					.where( f -> f.matchAll() )
+					.fetchHits( 20 ); // <2>
+			// end::projection-constructor-field[]
+			assertThat( hits ).containsExactlyInAnyOrderElementsOf(
+					entityManager.createQuery( "select b from Book b", Book.class ).getResultList().stream()
+							.map( book -> new MyBookTitleAndAuthorNamesInSetProjection(
+									book.getTitle(),
+									book.getAuthors().stream()
+											.map( Author::getLastName )
+											.collect( Collectors.toSet() )
 							) )
 							.collect( Collectors.toList() )
 			);

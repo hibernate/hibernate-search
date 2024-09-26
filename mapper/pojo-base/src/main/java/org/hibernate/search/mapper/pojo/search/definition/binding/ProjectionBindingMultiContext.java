@@ -4,10 +4,9 @@
  */
 package org.hibernate.search.mapper.pojo.search.definition.binding;
 
-import java.util.List;
-
 import org.hibernate.search.engine.environment.bean.BeanHolder;
 import org.hibernate.search.engine.search.projection.definition.ProjectionDefinition;
+import org.hibernate.search.engine.search.projection.dsl.MultiProjectionTypeReference;
 import org.hibernate.search.mapper.pojo.model.PojoModelValue;
 import org.hibernate.search.util.common.annotation.Incubating;
 
@@ -30,7 +29,7 @@ public interface ProjectionBindingMultiContext {
 	 * @param definition A definition of the projection to bind to the constructor parameter.
 	 * @param <P> The type of values returned by the projection.
 	 */
-	<P> void definition(Class<P> expectedValueType, ProjectionDefinition<? extends List<? extends P>> definition);
+	<C, P> void definition(Class<P> expectedValueType, ProjectionDefinition<? extends C> definition);
 
 	/**
 	 * Binds the constructor parameter to the given multi-valued projection definition.
@@ -43,15 +42,25 @@ public interface ProjectionBindingMultiContext {
 	 * {@code expectedValueType} should be set to {@code String.class}.
 	 * @param definitionHolder A {@link BeanHolder} containing the definition of the projection
 	 * to bind to the constructor parameter.
+	 * @param <C> The type of collection to collect the result into.
 	 * @param <P> The type of values returned by the projection.
 	 */
-	<P> void definition(Class<P> expectedValueType,
-			BeanHolder<? extends ProjectionDefinition<? extends List<? extends P>>> definitionHolder);
+	<C, P> void definition(Class<P> expectedValueType,
+			BeanHolder<? extends ProjectionDefinition<? extends C>> definitionHolder);
 
 	/**
-	 * @return An entry point allowing to inspect the constructor parameter being bound to a projection.
+	 * @return An entry point allowing to inspect the constructor parameter container element being bound to a projection.
 	 */
 	@Incubating
 	PojoModelValue<?> containerElement();
+
+	/**
+	 * @return An entry point allowing to inspect the constructor parameter container being bound to a projection.
+	 */
+	@Incubating
+	PojoModelValue<?> container();
+
+	@Incubating
+	MultiProjectionTypeReference<?, ?> multiProjectionTypeReference();
 
 }
