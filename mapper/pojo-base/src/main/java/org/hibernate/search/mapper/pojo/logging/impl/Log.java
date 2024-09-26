@@ -24,6 +24,7 @@ import org.hibernate.search.engine.backend.types.dsl.IndexFieldTypeOptionsStep;
 import org.hibernate.search.engine.common.EntityReference;
 import org.hibernate.search.engine.logging.spi.MappableTypeModelFormatter;
 import org.hibernate.search.engine.mapper.model.spi.MappingElement;
+import org.hibernate.search.engine.search.projection.dsl.MultiProjectionTypeReference;
 import org.hibernate.search.mapper.pojo.automaticindexing.building.impl.DerivedDependencyWalkingInfo;
 import org.hibernate.search.mapper.pojo.common.annotation.impl.SearchProcessingWithContextException;
 import org.hibernate.search.mapper.pojo.extractor.ContainerExtractor;
@@ -1041,4 +1042,8 @@ public interface Log extends BasicLogger {
 	@LogMessage(level = INFO)
 	@Message(id = ID_OFFSET + 168, value = "Mass indexing complete in %3$s. Indexed %1$d/%2$d entities.")
 	void indexingEntitiesCompleted(long indexed, long total, Duration indexingTime);
+
+	@Message(id = ID_OFFSET + 169, value = "Projection type reference %1$s does not accept the elements of type %2$s.")
+	SearchException projectionTypeReferenceDoesNotAcceptType(MultiProjectionTypeReference<?, ?> multiProjectionTypeReference,
+			@FormatWith(ClassFormatter.class) Class<?> containerElementType, @Param EventContext eventContext);
 }

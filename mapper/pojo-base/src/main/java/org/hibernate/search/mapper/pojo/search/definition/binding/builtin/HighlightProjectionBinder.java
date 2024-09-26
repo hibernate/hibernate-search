@@ -93,9 +93,8 @@ public final class HighlightProjectionBinder implements ProjectionBinder {
 			//				throw log.invalidParameterTypeForHighlightProjectionInProjectionConstructor(
 			//						multiContext.containerElement().rawType(), "String" );
 			//			}
-			@SuppressWarnings("unchecked")
 			MultiProjectionTypeReference<?, String> multiProjectionTypeReference =
-					(MultiProjectionTypeReference<?, String>) multiContext.multiProjectionTypeReference();
+					multiContext.multiProjectionTypeReference( String.class );
 			multiContext.definition( String.class,
 					new Multi<>( fieldPath, multiProjectionTypeReference, highlighterName ) );
 		}

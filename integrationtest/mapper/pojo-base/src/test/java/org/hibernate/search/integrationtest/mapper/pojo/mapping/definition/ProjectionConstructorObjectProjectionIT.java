@@ -13,6 +13,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 
+import org.hibernate.search.engine.search.projection.dsl.MultiProjectionTypeReference;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.DocumentId;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.FullTextField;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.GenericField;
@@ -944,18 +945,53 @@ class ProjectionConstructorObjectProjectionIT extends AbstractProjectionConstruc
 			}
 		}
 
-		assertThatThrownBy( () -> setupHelper.start()
-				.withAnnotatedTypes( MyProjection.class )
-				.setup( IndexedEntity.class ) )
-				.isInstanceOf( SearchException.class )
-				.satisfies( FailureReportUtils.hasFailureReport()
-						.typeContext( MyProjection.class.getName() )
-						.constructorContext( ProjectionConstructorObjectProjectionIT.class, String.class, Set.class )
-						.methodParameterContext( 2, "contained" )
-						.failure( "Invalid parameter type for projection constructor",
-								"java.util.Set<" + MyInnerProjection.class.getName() + ">",
-								"When inferring the cardinality of inner projections from constructor parameters,"
-										+ " multi-valued constructor parameters must be lists (java.util.List<...>)"
-										+ " or list supertypes (java.lang.Iterable<...>, java.util.Collection<...>)" ) );
+		backendMock.expectAnySchema( INDEX_NAME );
+		SearchMapping mapping = setupHelper.start()
+				.withAnnotatedTypes( MyProjection.class, MyInnerProjection.class )
+				.setup( IndexedEntity.class );
+
+		testSuccessfulRootProjection(
+				mapping, IndexedEntity.class, MyProjection.class,
+				Arrays.asList(
+						Arrays.asList( "result1", Arrays.asList(
+								Arrays.asList( "result1_1", 11 ),
+								Arrays.asList( "result1_2", 12 )
+						) ),
+						Arrays.asList( "result2", Arrays.asList(
+								Arrays.asList( "result2_1", 21 )
+						) ),
+						Arrays.asList( "result3", Collections.emptyList() ),
+						Arrays.asList( "result4", Arrays.asList(
+								Arrays.asList( "result4_1", 41 )
+						) )
+				),
+				f -> f.composite()
+						.from(
+								dummyProjectionForEnclosingClassInstance( f ),
+								f.field( "text", String.class ),
+								f.object( "contained" )
+										.from(
+												dummyProjectionForEnclosingClassInstance( f ),
+												f.field( "contained.text", String.class ),
+												f.field( "contained.integer", Integer.class )
+										)
+										.asList()
+										.multi( MultiProjectionTypeReference.set() )
+						)
+						.asList(),
+				Arrays.asList(
+						new MyProjection( "result1", Set.of(
+								new MyInnerProjection( "result1_1", 11 ),
+								new MyInnerProjection( "result1_2", 12 )
+						) ),
+						new MyProjection( "result2", Set.of(
+								new MyInnerProjection( "result2_1", 21 )
+						) ),
+						new MyProjection( "result3", Set.of() ),
+						new MyProjection( "result4", Set.of(
+								new MyInnerProjection( "result4_1", 41 )
+						) )
+				)
+		);
 	}
 }

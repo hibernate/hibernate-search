@@ -61,6 +61,6 @@ public interface ProjectionBindingMultiContext {
 	PojoModelValue<?> container();
 
 	@Incubating
-	MultiProjectionTypeReference<?, ?> multiProjectionTypeReference();
+	<T> MultiProjectionTypeReference<?, T> multiProjectionTypeReference(Class<T> containerElementType);
 
 }

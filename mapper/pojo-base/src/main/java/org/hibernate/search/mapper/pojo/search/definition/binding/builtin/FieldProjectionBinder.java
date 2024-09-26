@@ -94,7 +94,7 @@ public final class FieldProjectionBinder implements ProjectionBinder {
 		String fieldPath = fieldPathOrFail( context );
 		if ( multiOptional.isPresent() ) {
 			ProjectionBindingMultiContext multi = multiOptional.get();
-			bind( context, multi, fieldPath, multi.multiProjectionTypeReference(), multi.containerElement().rawType() );
+			bind( context, multi, fieldPath, multi.containerElement().rawType() );
 		}
 		else {
 			bind( context, fieldPath, context.constructorParameter().rawType() );
@@ -109,10 +109,12 @@ public final class FieldProjectionBinder implements ProjectionBinder {
 	}
 
 	@SuppressWarnings("unchecked") // we know that containerElementType should match the multiProjectionTypeReference as they both come from the same context
-	private <C, T> void bind(ProjectionBindingContext context, ProjectionBindingMultiContext multi, String fieldPath,
-			MultiProjectionTypeReference<C, T> multiProjectionTypeReference, Class<?> containerElementType) {
+	private <T> void bind(ProjectionBindingContext context, ProjectionBindingMultiContext multi, String fieldPath,
+			Class<T> containerElementType) {
+		MultiProjectionTypeReference<?, T> multiProjectionTypeReference =
+				multi.multiProjectionTypeReference( containerElementType );
 		multi.definition( containerElementType, context.isIncluded( fieldPath )
-				? BeanHolder.of( new FieldProjectionDefinition.MultiValued<>( fieldPath, (Class<T>) containerElementType,
+				? BeanHolder.of( new FieldProjectionDefinition.MultiValued<>( fieldPath, containerElementType,
 						multiProjectionTypeReference, valueModel ) )
 				: ConstantProjectionDefinition.empty( multiProjectionTypeReference ) );
 	}

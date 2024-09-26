@@ -109,8 +109,12 @@ public final class ObjectProjectionBinder implements ProjectionBinder {
 
 	private <T> void bind(ProjectionBindingContext context, ProjectionBindingMultiContext multi,
 			String fieldPath, Class<T> containerElementType) {
-		multi.definition( containerElementType,
-				context.createObjectDefinitionMulti( fieldPath, containerElementType, filter ) );
+		multi.definition(
+				containerElementType,
+				context.createObjectDefinitionMulti( fieldPath, containerElementType, filter,
+						multi.multiProjectionTypeReference( containerElementType )
+				)
+		);
 	}
 
 	private String fieldPathOrFail(ProjectionBindingContext context) {

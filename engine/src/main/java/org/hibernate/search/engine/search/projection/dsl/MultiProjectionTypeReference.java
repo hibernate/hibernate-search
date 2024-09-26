@@ -38,6 +38,10 @@ public interface MultiProjectionTypeReference<C, V> {
 		return convert( List.of() );
 	}
 
+	default boolean acceptsElementType(Class<?> elementType) {
+		return true;
+	}
+
 	@Override
 	String toString();
 

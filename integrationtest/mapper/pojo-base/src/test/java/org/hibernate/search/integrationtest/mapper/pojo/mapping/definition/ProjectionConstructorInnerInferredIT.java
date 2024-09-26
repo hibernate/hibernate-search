@@ -4,8 +4,6 @@
  */
 package org.hibernate.search.integrationtest.mapper.pojo.mapping.definition;
 
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
-
 import java.lang.invoke.MethodHandles;
 import java.util.Arrays;
 import java.util.Collection;
@@ -13,6 +11,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 
+import org.hibernate.search.engine.search.projection.dsl.MultiProjectionTypeReference;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.DocumentId;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.FullTextField;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.GenericField;
@@ -20,8 +19,6 @@ import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.IndexedEmbedded;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.ProjectionConstructor;
 import org.hibernate.search.mapper.pojo.standalone.mapping.SearchMapping;
-import org.hibernate.search.util.common.SearchException;
-import org.hibernate.search.util.impl.integrationtest.common.reporting.FailureReportUtils;
 import org.hibernate.search.util.impl.integrationtest.mapper.pojo.standalone.StandalonePojoMappingSetupHelper;
 import org.hibernate.search.util.impl.test.annotation.TestForIssue;
 
@@ -257,19 +254,33 @@ class ProjectionConstructorInnerInferredIT extends AbstractProjectionConstructor
 			}
 		}
 
-		assertThatThrownBy( () -> setupHelper.start()
+		backendMock.expectAnySchema( INDEX_NAME );
+		SearchMapping mapping = setupHelper.start()
 				.withAnnotatedTypes( MyProjection.class )
-				.setup( IndexedEntity.class ) )
-				.isInstanceOf( SearchException.class )
-				.satisfies( FailureReportUtils.hasFailureReport()
-						.typeContext( MyProjection.class.getName() )
-						.constructorContext( ProjectionConstructorInnerInferredIT.class, Set.class, List.class )
-						.methodParameterContext( 1, "text" )
-						.failure( "Invalid parameter type for projection constructor",
-								"java.util.Set<java.lang.String>",
-								"When inferring the cardinality of inner projections from constructor parameters,"
-										+ " multi-valued constructor parameters must be lists (java.util.List<...>)"
-										+ " or list supertypes (java.lang.Iterable<...>, java.util.Collection<...>)" ) );
+				.setup( IndexedEntity.class );
+
+		testSuccessfulRootProjection(
+				mapping, IndexedEntity.class, MyProjection.class,
+				Arrays.asList(
+						Arrays.asList( Set.of( "result1_1", "result1_2" ), Arrays.asList( 11, 12 ) ),
+						Arrays.asList( Set.of( "result2_1" ), Arrays.asList( 21 ) ),
+						Arrays.asList( Set.of(), Collections.emptyList() ),
+						Arrays.asList( Set.of( "result4_1" ), Arrays.asList( 41 ) )
+				),
+				f -> f.composite()
+						.from(
+								dummyProjectionForEnclosingClassInstance( f ),
+								f.field( "text", String.class ).multi( MultiProjectionTypeReference.set() ),
+								f.field( "integer", Integer.class ).multi()
+						)
+						.asList(),
+				Arrays.asList(
+						new MyProjection( Set.of( "result1_1", "result1_2" ), Arrays.asList( 11, 12 ) ),
+						new MyProjection( Set.of( "result2_1" ), Arrays.asList( 21 ) ),
+						new MyProjection( Set.of(), Collections.emptyList() ),
+						new MyProjection( Set.of( "result4_1" ), Arrays.asList( 41 ) )
+				)
+		);
 	}
 
 	@Test
@@ -732,19 +743,54 @@ class ProjectionConstructorInnerInferredIT extends AbstractProjectionConstructor
 			}
 		}
 
-		assertThatThrownBy( () -> setupHelper.start()
-				.withAnnotatedTypes( MyProjection.class )
-				.setup( IndexedEntity.class ) )
-				.isInstanceOf( SearchException.class )
-				.satisfies( FailureReportUtils.hasFailureReport()
-						.typeContext( MyProjection.class.getName() )
-						.constructorContext( ProjectionConstructorInnerInferredIT.class, String.class, Set.class )
-						.methodParameterContext( 2, "contained" )
-						.failure( "Invalid parameter type for projection constructor",
-								"java.util.Set<" + MyInnerProjection.class.getName() + ">",
-								"When inferring the cardinality of inner projections from constructor parameters,"
-										+ " multi-valued constructor parameters must be lists (java.util.List<...>)"
-										+ " or list supertypes (java.lang.Iterable<...>, java.util.Collection<...>)" ) );
+		backendMock.expectAnySchema( INDEX_NAME );
+		SearchMapping mapping = setupHelper.start()
+				.withAnnotatedTypes( MyProjection.class, MyInnerProjection.class )
+				.setup( IndexedEntity.class );
+
+		testSuccessfulRootProjection(
+				mapping, IndexedEntity.class, MyProjection.class,
+				Arrays.asList(
+						Arrays.asList( "result1", Set.of(
+								Arrays.asList( "result1_1", 11 ),
+								Arrays.asList( "result1_2", 12 )
+						) ),
+						Arrays.asList( "result2", Set.of(
+								Arrays.asList( "result2_1", 21 )
+						) ),
+						Arrays.asList( "result3", Set.of() ),
+						Arrays.asList( "result4", Set.of(
+								Arrays.asList( "result4_1", 41 )
+						) )
+				),
+				f -> f.composite()
+						.from(
+								dummyProjectionForEnclosingClassInstance( f ),
+								f.field( "text", String.class ),
+								f.object( "contained" )
+										.from(
+												dummyProjectionForEnclosingClassInstance( f ),
+												f.field( "contained.text", String.class ),
+												f.field( "contained.integer", Integer.class )
+										)
+										.asList()
+										.multi( MultiProjectionTypeReference.set() )
+						)
+						.asList(),
+				Arrays.asList(
+						new MyProjection( "result1", Set.of(
+								new MyInnerProjection( "result1_1", 11 ),
+								new MyInnerProjection( "result1_2", 12 )
+						) ),
+						new MyProjection( "result2", Set.of(
+								new MyInnerProjection( "result2_1", 21 )
+						) ),
+						new MyProjection( "result3", Set.of() ),
+						new MyProjection( "result4", Set.of(
+								new MyInnerProjection( "result4_1", 41 )
+						) )
+				)
+		);
 	}
 
 }

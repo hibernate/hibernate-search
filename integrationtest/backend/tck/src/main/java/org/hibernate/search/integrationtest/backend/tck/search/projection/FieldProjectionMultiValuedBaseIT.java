@@ -244,6 +244,7 @@ class FieldProjectionMultiValuedBaseIT<F> {
 		return set;
 	}
 
+	@SuppressWarnings("unchecked")
 	@ParameterizedTest(name = "{0} - {1}")
 	@MethodSource("params")
 	void array(TestedFieldStructure fieldStructure, FieldTypeDescriptor<F, ?> fieldType, DataSet<F> dataSet) {

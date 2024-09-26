@@ -64,7 +64,7 @@ public class ProjectionBindingContextImpl<P> implements ProjectionBindingContext
 	private MappingElement mappingElement;
 	private PartialBinding<P> partialBinding;
 
-	public ProjectionBindingContextImpl(ProjectionConstructorParameterBinder<P> parameterBinder,
+	ProjectionBindingContextImpl(ProjectionConstructorParameterBinder<P> parameterBinder,
 			Map<String, Object> params) {
 		this.mappingHelper = parameterBinder.mappingHelper;
 		this.parameterBinder = parameterBinder;
@@ -126,12 +126,7 @@ public class ProjectionBindingContextImpl<P> implements ProjectionBindingContext
 							|| BuiltinContainerExtractors.ITERABLE.equals( boundParameterElementExtractorNames.get( 0 ) ) ) ) {
 				throw log.invalidMultiValuedParameterTypeForProjectionConstructor( parameterTypeModel );
 			}
-			MultiProjectionTypeReference<?, ?> multiProjectionTypeReference = multiProjectionTypeReference(
-					parameterTypeModel.rawType().typeIdentifier().javaClass(),
-					boundParameterElementPath.getExtractedType().rawType().typeIdentifier().javaClass()
-			);
-			return Optional.of( new MultiContextImpl<>( parameterTypeModel, boundParameterElementPath.getExtractedType(),
-					multiProjectionTypeReference ) );
+			return Optional.of( new MultiContextImpl<>( parameterTypeModel, boundParameterElementPath.getExtractedType() ) );
 		}
 	}
 
@@ -166,19 +161,21 @@ public class ProjectionBindingContextImpl<P> implements ProjectionBindingContext
 	}
 
 	@Override
-	public <T> BeanHolder<? extends ProjectionDefinition<List<T>>> createObjectDefinitionMulti(String fieldPath,
-			Class<T> projectedType, TreeFilterDefinition filter) {
+	public <C, T> BeanHolder<? extends ProjectionDefinition<C>> createObjectDefinitionMulti(String fieldPath,
+			Class<T> projectedType, TreeFilterDefinition filter,
+			MultiProjectionTypeReference<C, T> collectionTypeReference) {
 		Contracts.assertNotNull( fieldPath, "fieldPath" );
 		Contracts.assertNotNull( projectedType, "projectedType" );
 		Contracts.assertNotNull( filter, "filter" );
-		Optional<BeanHolder<? extends ProjectionDefinition<List<T>>>> objectProjection = nestObjectProjection(
+		Contracts.assertNotNull( collectionTypeReference, "collectionTypeReference" );
+		Optional<BeanHolder<? extends ProjectionDefinition<C>>> objectProjection = nestObjectProjection(
 				fieldPath, filter,
 				nestingContext -> {
 					CompositeProjectionDefinition<T> composite =
 							createCompositeProjectionDefinition( projectedType, nestingContext );
 					try {
 						return BeanHolder.ofCloseable( new ObjectProjectionDefinition.MultiValued<>(
-								fieldPath, composite ) );
+								fieldPath, composite, collectionTypeReference ) );
 					}
 					catch (RuntimeException e) {
 						new SuppressingCloser( e )
@@ -187,7 +184,7 @@ public class ProjectionBindingContextImpl<P> implements ProjectionBindingContext
 					}
 				}
 		);
-		return objectProjection.orElse( ConstantProjectionDefinition.emptyList() );
+		return objectProjection.orElse( ConstantProjectionDefinition.empty( collectionTypeReference ) );
 	}
 
 	private <T> Optional<T> nestObjectProjection(String fieldPath, TreeFilterDefinition filter,
@@ -304,7 +301,7 @@ public class ProjectionBindingContextImpl<P> implements ProjectionBindingContext
 
 	// TODO: make this context aware of other "registered" type references
 	@SuppressWarnings({ "rawtypes", "unchecked" })
-	private <F, C> MultiProjectionTypeReference<C, F> multiProjectionTypeReference(Class<C> collectionType,
+	protected <F, C> MultiProjectionTypeReference<C, F> createMultiProjectionTypeReference(Class<C> collectionType,
 			Class<F> elementType) {
 		MultiProjectionTypeReference reference = null;
 		if ( List.class.isAssignableFrom( collectionType ) ) {
@@ -356,14 +353,16 @@ public class ProjectionBindingContextImpl<P> implements ProjectionBindingContext
 		private final PojoModelValue<CV> parameterContainerRootElement;
 		private final MultiProjectionTypeReference<?, ?> multiProjectionTypeReference;
 
-		public MultiContextImpl(PojoTypeModel<CV> containerTypeModel, PojoTypeModel<PV> parameterContainerElementTypeModel,
-				MultiProjectionTypeReference<?, ?> multiProjectionTypeReference) {
+		public MultiContextImpl(PojoTypeModel<CV> containerTypeModel, PojoTypeModel<PV> parameterContainerElementTypeModel) {
 			this.parameterContainerElementTypeModel = parameterContainerElementTypeModel;
 			this.parameterContainerElementRootElement = new PojoModelValueElement<>( mappingHelper.introspector(),
 					parameterContainerElementTypeModel );
 			this.parameterContainerRootElement =
 					new PojoModelValueElement<>( mappingHelper.introspector(), containerTypeModel );
-			this.multiProjectionTypeReference = multiProjectionTypeReference;
+			this.multiProjectionTypeReference = createMultiProjectionTypeReference(
+					parameterTypeModel.rawType().typeIdentifier().javaClass(),
+					parameterContainerElementTypeModel.rawType().typeIdentifier().javaClass()
+			);
 		}
 
 		@Override
@@ -378,7 +377,7 @@ public class ProjectionBindingContextImpl<P> implements ProjectionBindingContext
 		}
 
 		@Override
-		public PojoModelValue<?> containerElement() {
+		public PojoModelValue<PV> containerElement() {
 			return parameterContainerElementRootElement;
 		}
 
@@ -387,9 +386,14 @@ public class ProjectionBindingContextImpl<P> implements ProjectionBindingContext
 			return parameterContainerRootElement;
 		}
 
+		@SuppressWarnings("unchecked")
 		@Override
-		public MultiProjectionTypeReference<?, ?> multiProjectionTypeReference() {
-			return multiProjectionTypeReference;
+		public <T> MultiProjectionTypeReference<?, T> multiProjectionTypeReference(Class<T> containerElementType) {
+			if ( !multiProjectionTypeReference.acceptsElementType( containerElementType ) ) {
+				throw log.projectionTypeReferenceDoesNotAcceptType( multiProjectionTypeReference, containerElementType,
+						mappingElement.eventContext() );
+			}
+			return (MultiProjectionTypeReference<?, T>) multiProjectionTypeReference;
 		}
 
 		private <C, P2> void checkAndBind(
