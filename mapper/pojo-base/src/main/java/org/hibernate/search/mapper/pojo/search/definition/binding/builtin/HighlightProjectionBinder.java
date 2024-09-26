@@ -5,13 +5,13 @@
 package org.hibernate.search.mapper.pojo.search.definition.binding.builtin;
 
 import java.lang.invoke.MethodHandles;
-import java.util.List;
 import java.util.Optional;
 import java.util.function.Function;
 
 import org.hibernate.search.engine.search.projection.SearchProjection;
 import org.hibernate.search.engine.search.projection.definition.ProjectionDefinitionContext;
 import org.hibernate.search.engine.search.projection.definition.spi.AbstractProjectionDefinition;
+import org.hibernate.search.engine.search.projection.dsl.MultiProjectionTypeReference;
 import org.hibernate.search.engine.search.projection.dsl.SearchProjectionFactory;
 import org.hibernate.search.mapper.pojo.logging.impl.Log;
 import org.hibernate.search.mapper.pojo.search.definition.binding.ProjectionBinder;
@@ -87,10 +87,17 @@ public final class HighlightProjectionBinder implements ProjectionBinder {
 		Optional<? extends ProjectionBindingMultiContext> multiOptional = context.multi();
 
 		if ( multiOptional.isPresent() ) {
-			if ( !rawType.isAssignableFrom( List.class ) ) {
-				throw log.invalidParameterTypeForHighlightProjectionInProjectionConstructor( rawType, "List<String>" );
-			}
-			multiOptional.get().definition( String.class, new Multi( fieldPath, highlighterName ) );
+			ProjectionBindingMultiContext multiContext = multiOptional.get();
+			// TODO: do the check here as we are doing a cast just after it and better to be sure what types we have ...
+			//			if ( !multiContext.containerElement().rawType().isAssignableFrom( String.class ) ) {
+			//				throw log.invalidParameterTypeForHighlightProjectionInProjectionConstructor(
+			//						multiContext.containerElement().rawType(), "String" );
+			//			}
+			@SuppressWarnings("unchecked")
+			MultiProjectionTypeReference<?, String> multiProjectionTypeReference =
+					(MultiProjectionTypeReference<?, String>) multiContext.multiProjectionTypeReference();
+			multiContext.definition( String.class,
+					new Multi<>( fieldPath, multiProjectionTypeReference, highlighterName ) );
 		}
 		else {
 			if ( !rawType.isAssignableFrom( String.class ) ) {
@@ -146,16 +153,21 @@ public final class HighlightProjectionBinder implements ProjectionBinder {
 		}
 	}
 
-	private static class Multi extends Definition<List<String>> {
+	private static class Multi<C> extends Definition<C> {
 
-		private Multi(String fieldPath, String highlighterName) {
+		private final MultiProjectionTypeReference<C, String> multiProjectionTypeReference;
+
+		private Multi(String fieldPath, MultiProjectionTypeReference<C, String> multiProjectionTypeReference,
+				String highlighterName) {
 			super( fieldPath, highlighterName );
+			this.multiProjectionTypeReference = multiProjectionTypeReference;
 		}
 
 		@Override
-		public SearchProjection<List<String>> create(SearchProjectionFactory<?, ?> factory,
+		public SearchProjection<C> create(SearchProjectionFactory<?, ?> factory,
 				ProjectionDefinitionContext context) {
-			return factory.highlight( fieldPath ).highlighter( highlighterName ).toProjection();
+			return factory.highlight( fieldPath ).highlighter( highlighterName ).multi( multiProjectionTypeReference )
+					.toProjection();
 		}
 	}
 }

@@ -38,4 +38,14 @@ public interface HighlightProjectionOptionsStep extends HighlightProjectionFinal
 	 */
 	SingleHighlightProjectionFinalStep single();
 
+	/**
+	 * Redefine the multi-valued projection collection, where highlighted snippets will be placed inside the collection {@code C}
+	 * instead of the default {@code List<String>}.
+	 *
+	 * @param collectionTypeReference Collection type reference that specifies the expected collection into which the values have to be collected into.
+	 * @return A final step in the highlight projection definition.
+	 * @param <C> The type of the collection.
+	 */
+	<C> MultiHighlightProjectionFinalStep<C> multi(MultiProjectionTypeReference<C, String> collectionTypeReference);
+
 }
