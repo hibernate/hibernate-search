@@ -72,4 +72,9 @@ final class ListBasedProjectionAccumulator<C, E, V> extends AbstractListBasedPro
 			return false;
 		}
 	}
+
+	@Override
+	public String toString() {
+		return getClass().getSimpleName() + "[" + reference + "]";
+	}
 }

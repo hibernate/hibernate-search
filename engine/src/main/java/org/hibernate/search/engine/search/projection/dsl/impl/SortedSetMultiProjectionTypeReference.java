@@ -4,6 +4,7 @@
  */
 package org.hibernate.search.engine.search.projection.dsl.impl;
 
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 import java.util.SortedSet;
@@ -28,6 +29,16 @@ public class SortedSetMultiProjectionTypeReference<V> implements MultiProjection
 	@Override
 	public SortedSet<V> convert(List<V> list) {
 		return new TreeSet<>( list );
+	}
+
+	@Override
+	public SortedSet<V> empty() {
+		return Collections.emptySortedSet();
+	}
+
+	@Override
+	public String toString() {
+		return getClass().getSimpleName();
 	}
 
 	private record ComparatorBasedSortedSetMultiProjectionTypeReference<V>(Comparator<V> comparator)

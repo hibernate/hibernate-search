@@ -20,7 +20,7 @@ abstract class AbstractListBasedProjectionAccumulator<E, V, R> implements Projec
 
 
 	@Override
-	public final String toString() {
+	public String toString() {
 		return getClass().getSimpleName();
 	}
 

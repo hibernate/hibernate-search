@@ -38,6 +38,9 @@ public interface MultiProjectionTypeReference<C, V> {
 		return convert( List.of() );
 	}
 
+	@Override
+	String toString();
+
 	/**
 	 * @return The type reference for the multi-valued projections that have to be collected as {@code List<V>}.
 	 * @param <V> The type of the elements in the collection.

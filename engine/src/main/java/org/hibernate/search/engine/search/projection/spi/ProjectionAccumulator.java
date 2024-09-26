@@ -39,6 +39,10 @@ public interface ProjectionAccumulator<E, V, A, R> {
 		return SingleValuedProjectionAccumulator.PROVIDER;
 	}
 
+	/**
+	 * @deprecated Use {@link #multi(MultiProjectionTypeReference)} with {@link MultiProjectionTypeReference#list()} instead.
+	 */
+	@Deprecated(since = "8.0")
 	@SuppressWarnings("unchecked") // PROVIDER works for any V.
 	static <V> Provider<V, List<V>> list() {
 		return ListProjectionAccumulator.PROVIDER;

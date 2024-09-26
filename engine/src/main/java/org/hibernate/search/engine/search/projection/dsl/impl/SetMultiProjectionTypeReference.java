@@ -24,4 +24,14 @@ public class SetMultiProjectionTypeReference<V> implements MultiProjectionTypeRe
 	public Set<V> convert(List<V> list) {
 		return new HashSet<>( list );
 	}
+
+	@Override
+	public Set<V> empty() {
+		return Set.of();
+	}
+
+	@Override
+	public String toString() {
+		return getClass().getSimpleName();
+	}
 }

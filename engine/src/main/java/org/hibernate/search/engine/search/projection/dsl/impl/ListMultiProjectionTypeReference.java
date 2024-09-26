@@ -22,4 +22,14 @@ public class ListMultiProjectionTypeReference<V> implements MultiProjectionTypeR
 	public List<V> convert(List<V> list) {
 		return list;
 	}
+
+	@Override
+	public List<V> empty() {
+		return List.of();
+	}
+
+	@Override
+	public String toString() {
+		return getClass().getSimpleName();
+	}
 }

@@ -26,4 +26,8 @@ public record ArrayMultiProjectionTypeReference<V>(Class<V> elementType) impleme
 		return array;
 	}
 
+	@Override
+	public String toString() {
+		return getClass().getSimpleName() + "[" + elementType + "]";
+	}
 }

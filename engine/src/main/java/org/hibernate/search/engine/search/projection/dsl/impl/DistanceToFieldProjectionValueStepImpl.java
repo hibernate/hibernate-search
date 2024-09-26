@@ -8,6 +8,7 @@ import java.util.List;
 
 import org.hibernate.search.engine.search.projection.dsl.DistanceToFieldProjectionOptionsStep;
 import org.hibernate.search.engine.search.projection.dsl.DistanceToFieldProjectionValueStep;
+import org.hibernate.search.engine.search.projection.dsl.MultiProjectionTypeReference;
 import org.hibernate.search.engine.search.projection.dsl.spi.SearchProjectionDslContext;
 import org.hibernate.search.engine.search.projection.spi.ProjectionAccumulator;
 import org.hibernate.search.engine.search.projection.spi.ProjectionTypeKeys;
@@ -27,7 +28,7 @@ public final class DistanceToFieldProjectionValueStepImpl
 	@Override
 	public DistanceToFieldProjectionOptionsStep<?, List<Double>> multi() {
 		return new DistanceToFieldProjectionOptionsStepImpl<>( distanceFieldProjectionBuilder,
-				ProjectionAccumulator.list() );
+				ProjectionAccumulator.multi( MultiProjectionTypeReference.list() ) );
 	}
 
 }

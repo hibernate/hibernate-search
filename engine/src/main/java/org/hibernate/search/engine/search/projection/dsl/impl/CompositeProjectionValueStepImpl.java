@@ -9,6 +9,7 @@ import java.util.List;
 import org.hibernate.search.engine.search.projection.SearchProjection;
 import org.hibernate.search.engine.search.projection.dsl.CompositeProjectionOptionsStep;
 import org.hibernate.search.engine.search.projection.dsl.CompositeProjectionValueStep;
+import org.hibernate.search.engine.search.projection.dsl.MultiProjectionTypeReference;
 import org.hibernate.search.engine.search.projection.spi.CompositeProjectionBuilder;
 import org.hibernate.search.engine.search.projection.spi.ProjectionAccumulator;
 import org.hibernate.search.engine.search.projection.spi.ProjectionCompositor;
@@ -25,6 +26,6 @@ public class CompositeProjectionValueStepImpl<T>
 	@Override
 	public CompositeProjectionOptionsStep<?, List<T>> multi() {
 		return new CompositeProjectionOptionsStepImpl<>( builder, inners, compositor,
-				ProjectionAccumulator.list() );
+				ProjectionAccumulator.multi( MultiProjectionTypeReference.list() ) );
 	}
 }
