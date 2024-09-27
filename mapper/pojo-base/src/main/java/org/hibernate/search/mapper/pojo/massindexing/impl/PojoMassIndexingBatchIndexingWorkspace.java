@@ -84,6 +84,7 @@ public class PojoMassIndexingBatchIndexingWorkspace<E, I> extends PojoMassIndexi
 		allFutures.addAll( identifierProducingFutures );
 		allFutures.addAll( indexingFutures );
 		Futures.unwrappedExceptionGet( Futures.firstFailureOrAllOf( allFutures ) );
+		typeGroupMonitor.indexingCompleted();
 		log.debugf( "Indexing for %s is done", typeGroup.notifiedGroupName() );
 	}
 
@@ -144,8 +145,6 @@ public class PojoMassIndexingBatchIndexingWorkspace<E, I> extends PojoMassIndexi
 			for ( int i = 0; i < entityExtractingThreads; i++ ) {
 				indexingFutures.add( Futures.runAsync( runnable, indexingExecutor ) );
 			}
-			CompletableFuture.allOf( indexingFutures.toArray( CompletableFuture[]::new ) )
-					.thenRun( typeGroupMonitor::indexingCompleted );
 		}
 		finally {
 			indexingExecutor.shutdown();
