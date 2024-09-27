@@ -6,6 +6,7 @@ package org.hibernate.search.engine.search.projection.spi;
 
 import java.util.Collection;
 import java.util.List;
+import java.util.function.Function;
 
 import org.hibernate.search.engine.backend.types.converter.runtime.FromDocumentValueConvertContext;
 import org.hibernate.search.engine.backend.types.converter.spi.ProjectionConverter;
@@ -41,6 +42,10 @@ public interface ProjectionAccumulator<E, V, A, R> {
 	@SuppressWarnings("unchecked") // PROVIDER works for any V.
 	static <V> Provider<V, List<V>> list() {
 		return ListProjectionAccumulator.PROVIDER;
+	}
+
+	static <V, C> Provider<V, C> simple(Function<List<V>, C> converter) {
+		return new SimpleProjectionAccumulator.Provider<>( converter );
 	}
 
 	/**
