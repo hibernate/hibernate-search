@@ -12,11 +12,14 @@ import org.hibernate.search.engine.search.common.ValueModel;
 import org.hibernate.search.engine.search.projection.definition.spi.ConstantProjectionDefinition;
 import org.hibernate.search.engine.search.projection.definition.spi.FieldProjectionDefinition;
 import org.hibernate.search.engine.search.projection.dsl.MultiProjectionTypeReference;
+import org.hibernate.search.engine.search.projection.dsl.MultiProjectionTypeReferenceProvider;
 import org.hibernate.search.engine.search.projection.dsl.SearchProjectionFactory;
 import org.hibernate.search.mapper.pojo.logging.impl.Log;
 import org.hibernate.search.mapper.pojo.search.definition.binding.ProjectionBinder;
 import org.hibernate.search.mapper.pojo.search.definition.binding.ProjectionBindingContext;
 import org.hibernate.search.mapper.pojo.search.definition.binding.ProjectionBindingMultiContext;
+import org.hibernate.search.util.common.annotation.Incubating;
+import org.hibernate.search.util.common.impl.Contracts;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
 /**
@@ -60,6 +63,7 @@ public final class FieldProjectionBinder implements ProjectionBinder {
 
 	private final String fieldPathOrNull;
 	private ValueModel valueModel = ValueModel.MAPPING;
+	private MultiProjectionTypeReferenceProvider multiProjectionTypeReferenceProvider;
 
 	private FieldProjectionBinder(String fieldPathOrNull) {
 		this.fieldPathOrNull = fieldPathOrNull;
@@ -88,6 +92,14 @@ public final class FieldProjectionBinder implements ProjectionBinder {
 		return this;
 	}
 
+	@Incubating
+	public FieldProjectionBinder multiProjectionTypeReferenceProvider(
+			MultiProjectionTypeReferenceProvider multiProjectionTypeReferenceProvider) {
+		Contracts.assertNotNull( multiProjectionTypeReferenceProvider, "multiProjectionTypeReferenceProvider" );
+		this.multiProjectionTypeReferenceProvider = multiProjectionTypeReferenceProvider;
+		return this;
+	}
+
 	@Override
 	public void bind(ProjectionBindingContext context) {
 		Optional<? extends ProjectionBindingMultiContext> multiOptional = context.multi();
@@ -108,11 +120,15 @@ public final class FieldProjectionBinder implements ProjectionBinder {
 				: ConstantProjectionDefinition.nullValue() );
 	}
 
-	@SuppressWarnings("unchecked") // we know that containerElementType should match the multiProjectionTypeReference as they both come from the same context
 	private <T> void bind(ProjectionBindingContext context, ProjectionBindingMultiContext multi, String fieldPath,
 			Class<T> containerElementType) {
-		MultiProjectionTypeReference<?, T> multiProjectionTypeReference =
-				multi.multiProjectionTypeReference( containerElementType );
+		var typeReferenceProvider = this.multiProjectionTypeReferenceProvider == null
+				? multi.builtInMultiProjectionTypeReferenceProvider()
+				: this.multiProjectionTypeReferenceProvider;
+
+		MultiProjectionTypeReference<?, T> multiProjectionTypeReference = typeReferenceProvider
+				.multiProjectionTypeReference( multi.container().rawType(), containerElementType );
+
 		multi.definition( containerElementType, context.isIncluded( fieldPath )
 				? BeanHolder.of( new FieldProjectionDefinition.MultiValued<>( fieldPath, containerElementType,
 						multiProjectionTypeReference, valueModel ) )

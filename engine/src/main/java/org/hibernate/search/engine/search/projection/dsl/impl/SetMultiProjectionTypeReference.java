@@ -10,7 +10,7 @@ import java.util.Set;
 
 import org.hibernate.search.engine.search.projection.dsl.MultiProjectionTypeReference;
 
-public class SetMultiProjectionTypeReference<V> implements MultiProjectionTypeReference<Set<V>, V> {
+public final class SetMultiProjectionTypeReference<V> implements MultiProjectionTypeReference<Set<V>, V> {
 
 	@SuppressWarnings("rawtypes")
 	private static final SetMultiProjectionTypeReference INSTANCE = new SetMultiProjectionTypeReference();

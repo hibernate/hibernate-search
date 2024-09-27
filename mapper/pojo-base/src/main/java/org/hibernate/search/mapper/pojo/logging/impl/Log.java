@@ -24,7 +24,6 @@ import org.hibernate.search.engine.backend.types.dsl.IndexFieldTypeOptionsStep;
 import org.hibernate.search.engine.common.EntityReference;
 import org.hibernate.search.engine.logging.spi.MappableTypeModelFormatter;
 import org.hibernate.search.engine.mapper.model.spi.MappingElement;
-import org.hibernate.search.engine.search.projection.dsl.MultiProjectionTypeReference;
 import org.hibernate.search.mapper.pojo.automaticindexing.building.impl.DerivedDependencyWalkingInfo;
 import org.hibernate.search.mapper.pojo.common.annotation.impl.SearchProcessingWithContextException;
 import org.hibernate.search.mapper.pojo.extractor.ContainerExtractor;
@@ -706,8 +705,9 @@ public interface Log extends BasicLogger {
 	@Message(id = ID_OFFSET + 115,
 			value = "Invalid parameter type for projection constructor: %1$s."
 					+ " When inferring the cardinality of inner projections from constructor parameters,"
-					+ " multi-valued constructor parameters must be lists (java.util.List<...>)"
-					+ " or list supertypes (java.lang.Iterable<...>, java.util.Collection<...>)")
+					+ " multi-valued constructor parameters must be lists/sets (java.util.List<...>/java.util.Set<...>/java.util.SortedSet<...>)"
+					+ ", their supertypes (java.lang.Iterable<...>, java.util.Collection<...>)"
+					+ " or arrays")
 	SearchException invalidMultiValuedParameterTypeForProjectionConstructor(
 			@FormatWith(PojoTypeModelFormatter.class) PojoTypeModel<?> parentTypeModel);
 
@@ -1043,7 +1043,10 @@ public interface Log extends BasicLogger {
 	@Message(id = ID_OFFSET + 168, value = "Mass indexing complete in %3$s. Indexed %1$d/%2$d entities.")
 	void indexingEntitiesCompleted(long indexed, long total, Duration indexingTime);
 
-	@Message(id = ID_OFFSET + 169, value = "Projection type reference %1$s does not accept the elements of type %2$s.")
-	SearchException projectionTypeReferenceDoesNotAcceptType(MultiProjectionTypeReference<?, ?> multiProjectionTypeReference,
-			@FormatWith(ClassFormatter.class) Class<?> containerElementType, @Param EventContext eventContext);
+	@Message(id = ID_OFFSET + 169,
+			value = "Implicit binding of a java.util.SortedSet<%1$s> constructor parameter is not possible since %1$s is not implementing java.lang.Comparable."
+					+ " Either make %1$s implement java.lang.Comparable or use a programmatic mapping and provide"
+					+ " a custom MultiProjectionTypeReferenceProvider that, for example, utilizes a MultiProjectionTypeReference.sortedSet(comparator) reference.")
+	SearchException cannotBindSortedSetWithNonComparableElements(@FormatWith(ClassFormatter.class) Class<?> elementType,
+			@Param EventContext eventContext);
 }

@@ -8,7 +8,7 @@ import java.util.List;
 
 import org.hibernate.search.engine.search.projection.dsl.MultiProjectionTypeReference;
 
-public class ListMultiProjectionTypeReference<V> implements MultiProjectionTypeReference<List<V>, V> {
+public final class ListMultiProjectionTypeReference<V> implements MultiProjectionTypeReference<List<V>, V> {
 
 	@SuppressWarnings("rawtypes")
 	private static final ListMultiProjectionTypeReference INSTANCE = new ListMultiProjectionTypeReference();

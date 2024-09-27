@@ -6,7 +6,7 @@ package org.hibernate.search.mapper.pojo.search.definition.binding;
 
 import org.hibernate.search.engine.environment.bean.BeanHolder;
 import org.hibernate.search.engine.search.projection.definition.ProjectionDefinition;
-import org.hibernate.search.engine.search.projection.dsl.MultiProjectionTypeReference;
+import org.hibernate.search.engine.search.projection.dsl.MultiProjectionTypeReferenceProvider;
 import org.hibernate.search.mapper.pojo.model.PojoModelValue;
 import org.hibernate.search.util.common.annotation.Incubating;
 
@@ -61,6 +61,6 @@ public interface ProjectionBindingMultiContext {
 	PojoModelValue<?> container();
 
 	@Incubating
-	<T> MultiProjectionTypeReference<?, T> multiProjectionTypeReference(Class<T> containerElementType);
+	MultiProjectionTypeReferenceProvider builtInMultiProjectionTypeReferenceProvider();
 
 }

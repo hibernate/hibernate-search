@@ -12,11 +12,14 @@ import org.hibernate.search.engine.search.projection.SearchProjection;
 import org.hibernate.search.engine.search.projection.definition.ProjectionDefinitionContext;
 import org.hibernate.search.engine.search.projection.definition.spi.AbstractProjectionDefinition;
 import org.hibernate.search.engine.search.projection.dsl.MultiProjectionTypeReference;
+import org.hibernate.search.engine.search.projection.dsl.MultiProjectionTypeReferenceProvider;
 import org.hibernate.search.engine.search.projection.dsl.SearchProjectionFactory;
 import org.hibernate.search.mapper.pojo.logging.impl.Log;
 import org.hibernate.search.mapper.pojo.search.definition.binding.ProjectionBinder;
 import org.hibernate.search.mapper.pojo.search.definition.binding.ProjectionBindingContext;
 import org.hibernate.search.mapper.pojo.search.definition.binding.ProjectionBindingMultiContext;
+import org.hibernate.search.util.common.annotation.Incubating;
+import org.hibernate.search.util.common.impl.Contracts;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 import org.hibernate.search.util.common.spi.ToStringTreeAppender;
 
@@ -63,6 +66,7 @@ public final class HighlightProjectionBinder implements ProjectionBinder {
 
 	private final String fieldPathOrNull;
 	private String highlighterName;
+	private MultiProjectionTypeReferenceProvider multiProjectionTypeReferenceProvider;
 
 	private HighlightProjectionBinder(String fieldPathOrNull) {
 		this.fieldPathOrNull = fieldPathOrNull;
@@ -80,6 +84,14 @@ public final class HighlightProjectionBinder implements ProjectionBinder {
 		return this;
 	}
 
+	@Incubating
+	public HighlightProjectionBinder multiProjectionTypeReferenceProvider(
+			MultiProjectionTypeReferenceProvider multiProjectionTypeReferenceProvider) {
+		Contracts.assertNotNull( multiProjectionTypeReferenceProvider, "multiProjectionTypeReferenceProvider" );
+		this.multiProjectionTypeReferenceProvider = multiProjectionTypeReferenceProvider;
+		return this;
+	}
+
 	@Override
 	public void bind(ProjectionBindingContext context) {
 		String fieldPath = fieldPathOrFail( context );
@@ -88,13 +100,14 @@ public final class HighlightProjectionBinder implements ProjectionBinder {
 
 		if ( multiOptional.isPresent() ) {
 			ProjectionBindingMultiContext multiContext = multiOptional.get();
-			// TODO: do the check here as we are doing a cast just after it and better to be sure what types we have ...
-			//			if ( !multiContext.containerElement().rawType().isAssignableFrom( String.class ) ) {
-			//				throw log.invalidParameterTypeForHighlightProjectionInProjectionConstructor(
-			//						multiContext.containerElement().rawType(), "String" );
-			//			}
-			MultiProjectionTypeReference<?, String> multiProjectionTypeReference =
-					multiContext.multiProjectionTypeReference( String.class );
+			var typeReferenceProvider = this.multiProjectionTypeReferenceProvider == null
+					? multiContext.builtInMultiProjectionTypeReferenceProvider()
+					: this.multiProjectionTypeReferenceProvider;
+
+			MultiProjectionTypeReference<?, String> multiProjectionTypeReference = typeReferenceProvider
+					.multiProjectionTypeReference( multiContext.container().rawType(), String.class );
+			// If the container element type is not string the check in `multiContext.definition`
+			// will fail with a message explaining what went wrong:
 			multiContext.definition( String.class,
 					new Multi<>( fieldPath, multiProjectionTypeReference, highlighterName ) );
 		}

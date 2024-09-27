@@ -8,11 +8,15 @@ import java.lang.invoke.MethodHandles;
 import java.util.Optional;
 
 import org.hibernate.search.engine.common.tree.TreeFilterDefinition;
+import org.hibernate.search.engine.search.projection.dsl.MultiProjectionTypeReference;
+import org.hibernate.search.engine.search.projection.dsl.MultiProjectionTypeReferenceProvider;
 import org.hibernate.search.mapper.pojo.logging.impl.Log;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.ObjectProjection;
 import org.hibernate.search.mapper.pojo.search.definition.binding.ProjectionBinder;
 import org.hibernate.search.mapper.pojo.search.definition.binding.ProjectionBindingContext;
 import org.hibernate.search.mapper.pojo.search.definition.binding.ProjectionBindingMultiContext;
+import org.hibernate.search.util.common.annotation.Incubating;
+import org.hibernate.search.util.common.impl.Contracts;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
 /**
@@ -68,6 +72,8 @@ public final class ObjectProjectionBinder implements ProjectionBinder {
 
 	private TreeFilterDefinition filter = TreeFilterDefinition.includeAll();
 
+	private MultiProjectionTypeReferenceProvider multiProjectionTypeReferenceProvider;
+
 	private ObjectProjectionBinder(String fieldPathOrNull) {
 		this.fieldPathOrNull = fieldPathOrNull;
 	}
@@ -86,6 +92,14 @@ public final class ObjectProjectionBinder implements ProjectionBinder {
 	 */
 	public ObjectProjectionBinder filter(TreeFilterDefinition filter) {
 		this.filter = filter;
+		return this;
+	}
+
+	@Incubating
+	public ObjectProjectionBinder multiProjectionTypeReferenceProvider(
+			MultiProjectionTypeReferenceProvider multiProjectionTypeReferenceProvider) {
+		Contracts.assertNotNull( multiProjectionTypeReferenceProvider, "multiProjectionTypeReferenceProvider" );
+		this.multiProjectionTypeReferenceProvider = multiProjectionTypeReferenceProvider;
 		return this;
 	}
 
@@ -109,11 +123,16 @@ public final class ObjectProjectionBinder implements ProjectionBinder {
 
 	private <T> void bind(ProjectionBindingContext context, ProjectionBindingMultiContext multi,
 			String fieldPath, Class<T> containerElementType) {
+		var typeReferenceProvider = this.multiProjectionTypeReferenceProvider == null
+				? multi.builtInMultiProjectionTypeReferenceProvider()
+				: this.multiProjectionTypeReferenceProvider;
+
+		MultiProjectionTypeReference<?, T> reference = typeReferenceProvider
+				.multiProjectionTypeReference( multi.container().rawType(), containerElementType );
+
 		multi.definition(
 				containerElementType,
-				context.createObjectDefinitionMulti( fieldPath, containerElementType, filter,
-						multi.multiProjectionTypeReference( containerElementType )
-				)
+				context.createObjectDefinitionMulti( fieldPath, containerElementType, filter, reference )
 		);
 	}
 

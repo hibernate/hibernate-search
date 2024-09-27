@@ -12,7 +12,7 @@ import java.util.TreeSet;
 
 import org.hibernate.search.engine.search.projection.dsl.MultiProjectionTypeReference;
 
-public class SortedSetMultiProjectionTypeReference<V> implements MultiProjectionTypeReference<SortedSet<V>, V> {
+public final class SortedSetMultiProjectionTypeReference<V> implements MultiProjectionTypeReference<SortedSet<V>, V> {
 
 	@SuppressWarnings("rawtypes")
 	private static final SortedSetMultiProjectionTypeReference INSTANCE = new SortedSetMultiProjectionTypeReference();

@@ -6,12 +6,15 @@ package org.hibernate.search.engine.search.projection.definition.spi;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.Set;
+import java.util.SortedSet;
 
 import org.hibernate.search.engine.environment.bean.BeanHolder;
 import org.hibernate.search.engine.search.projection.SearchProjection;
 import org.hibernate.search.engine.search.projection.definition.ProjectionDefinitionContext;
 import org.hibernate.search.engine.search.projection.dsl.MultiProjectionTypeReference;
 import org.hibernate.search.engine.search.projection.dsl.SearchProjectionFactory;
+import org.hibernate.search.engine.search.projection.dsl.impl.SortedSetMultiProjectionTypeReference;
 import org.hibernate.search.util.common.annotation.Incubating;
 import org.hibernate.search.util.common.spi.ToStringTreeAppender;
 
@@ -23,20 +26,39 @@ public final class ConstantProjectionDefinition<T> extends AbstractProjectionDef
 	@SuppressWarnings("rawtypes")
 	private static final BeanHolder<? extends ConstantProjectionDefinition> EMPTY_LIST_INSTANCE =
 			BeanHolder.of( new ConstantProjectionDefinition<List>( Collections.emptyList() ) );
+	@SuppressWarnings("rawtypes")
+	private static final BeanHolder<? extends ConstantProjectionDefinition> EMPTY_SET_INSTANCE =
+			BeanHolder.of( new ConstantProjectionDefinition<Set>( Collections.emptySet() ) );
+	@SuppressWarnings("rawtypes")
+	private static final BeanHolder<? extends ConstantProjectionDefinition> EMPTY_SORTED_SET_INSTANCE =
+			BeanHolder.of( new ConstantProjectionDefinition<SortedSet>( Collections.emptySortedSet() ) );
 
 	@SuppressWarnings("unchecked") // NULL_VALUE_INSTANCE works for any T
 	public static <T> BeanHolder<ConstantProjectionDefinition<T>> nullValue() {
 		return (BeanHolder<ConstantProjectionDefinition<T>>) NULL_VALUE_INSTANCE;
 	}
 
+	/**
+	 * @deprecated Use {@link #empty(MultiProjectionTypeReference)} instead.
+	 */
+	@Deprecated(since = "8.0")
 	@SuppressWarnings("unchecked") // EMPTY_LIST_INSTANCE works for any T
 	public static <T> BeanHolder<ConstantProjectionDefinition<List<T>>> emptyList() {
 		return (BeanHolder<ConstantProjectionDefinition<List<T>>>) EMPTY_LIST_INSTANCE;
 	}
 
+	@SuppressWarnings("unchecked") // empty collections works for any T
 	public static <T> BeanHolder<ConstantProjectionDefinition<T>> empty(
 			MultiProjectionTypeReference<T, ?> multiProjectionTypeReference) {
-		// TODO: add predefined bean holders for the types we can safely cache
+		if ( MultiProjectionTypeReference.list().equals( multiProjectionTypeReference ) ) {
+			return (BeanHolder<ConstantProjectionDefinition<T>>) EMPTY_LIST_INSTANCE;
+		}
+		if ( MultiProjectionTypeReference.set().equals( multiProjectionTypeReference ) ) {
+			return (BeanHolder<ConstantProjectionDefinition<T>>) EMPTY_SET_INSTANCE;
+		}
+		if ( multiProjectionTypeReference instanceof SortedSetMultiProjectionTypeReference<?> ) {
+			return (BeanHolder<ConstantProjectionDefinition<T>>) EMPTY_SORTED_SET_INSTANCE;
+		}
 		return BeanHolder.of( new ConstantProjectionDefinition<>( multiProjectionTypeReference.empty() ) );
 	}
 

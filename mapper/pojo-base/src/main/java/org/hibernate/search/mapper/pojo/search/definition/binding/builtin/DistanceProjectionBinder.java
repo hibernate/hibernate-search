@@ -12,7 +12,7 @@ import org.hibernate.search.engine.environment.bean.BeanHolder;
 import org.hibernate.search.engine.search.projection.definition.spi.ConstantProjectionDefinition;
 import org.hibernate.search.engine.search.projection.definition.spi.DistanceProjectionDefinition;
 import org.hibernate.search.engine.search.projection.dsl.DistanceToFieldProjectionOptionsStep;
-import org.hibernate.search.engine.search.projection.dsl.MultiProjectionTypeReference;
+import org.hibernate.search.engine.search.projection.dsl.MultiProjectionTypeReferenceProvider;
 import org.hibernate.search.engine.search.projection.dsl.SearchProjectionFactory;
 import org.hibernate.search.engine.spatial.DistanceUnit;
 import org.hibernate.search.engine.spatial.GeoPoint;
@@ -20,6 +20,7 @@ import org.hibernate.search.mapper.pojo.logging.impl.Log;
 import org.hibernate.search.mapper.pojo.search.definition.binding.ProjectionBinder;
 import org.hibernate.search.mapper.pojo.search.definition.binding.ProjectionBindingContext;
 import org.hibernate.search.mapper.pojo.search.definition.binding.ProjectionBindingMultiContext;
+import org.hibernate.search.util.common.annotation.Incubating;
 import org.hibernate.search.util.common.impl.Contracts;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
@@ -75,6 +76,7 @@ public final class DistanceProjectionBinder implements ProjectionBinder {
 	private final String fieldPathOrNull;
 	private final String parameterName;
 	private DistanceUnit unit = DistanceUnit.METERS;
+	private MultiProjectionTypeReferenceProvider multiProjectionTypeReferenceProvider;
 
 	private DistanceProjectionBinder(String fieldPathOrNull, String parameterName) {
 		this.fieldPathOrNull = fieldPathOrNull;
@@ -89,6 +91,14 @@ public final class DistanceProjectionBinder implements ProjectionBinder {
 	 */
 	public DistanceProjectionBinder unit(DistanceUnit unit) {
 		this.unit = unit;
+		return this;
+	}
+
+	@Incubating
+	public DistanceProjectionBinder multiProjectionTypeReferenceProvider(
+			MultiProjectionTypeReferenceProvider multiProjectionTypeReferenceProvider) {
+		Contracts.assertNotNull( multiProjectionTypeReferenceProvider, "multiProjectionTypeReferenceProvider" );
+		this.multiProjectionTypeReferenceProvider = multiProjectionTypeReferenceProvider;
 		return this;
 	}
 
@@ -121,7 +131,11 @@ public final class DistanceProjectionBinder implements ProjectionBinder {
 	}
 
 	private void bind(ProjectionBindingContext context, ProjectionBindingMultiContext multi, String fieldPath) {
-		var reference = multi.multiProjectionTypeReference( Double.class );
+		var typeReferenceProvider = this.multiProjectionTypeReferenceProvider == null
+				? multi.builtInMultiProjectionTypeReferenceProvider()
+				: this.multiProjectionTypeReferenceProvider;
+		var reference = typeReferenceProvider.multiProjectionTypeReference( multi.container().rawType(), Double.class );
+
 		multi.definition( Double.class, context.isIncluded( fieldPath )
 				? BeanHolder.of( new DistanceProjectionDefinition.MultiValued<>( fieldPath, parameterName, unit, reference ) )
 				: ConstantProjectionDefinition.empty( reference ) );
