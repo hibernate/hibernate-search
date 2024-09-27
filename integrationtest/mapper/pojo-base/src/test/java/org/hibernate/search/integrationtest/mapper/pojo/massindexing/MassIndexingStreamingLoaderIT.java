@@ -40,7 +40,7 @@ import org.apache.logging.log4j.Level;
 class MassIndexingStreamingLoaderIT {
 
 	private static final int BOOK_COUNT = 500;
-	private static final int ARTICLE_COUNT = 1500;
+	private static final int ARTICLE_COUNT = 5500;
 
 	@RegisterExtension
 	public final BackendMock backendMock = BackendMock.create();
@@ -75,7 +75,7 @@ class MassIndexingStreamingLoaderIT {
 
 		logged.expectEvent( Level.INFO, "Mass indexed ", ". Speed", "instant, ", "since start",
 				"Remaining: unknown, 1 type(s) pending" );
-		logged.expectEvent( Level.INFO, "Mass indexed", "/2000. Speed", "Remaining: ", ", approx. PT" );
+		logged.expectEvent( Level.INFO, "Mass indexed", "/6000. Speed", "Remaining: ", ", approx. PT" );
 
 		try {
 			mapping.scope( Object.class ).massIndexer()
@@ -108,7 +108,7 @@ class MassIndexingStreamingLoaderIT {
 		expectIndexingWorks();
 
 		logged.expectEvent( Level.INFO, "Mass indexed ", ". Speed", "instant, ", "since start", "Remaining: unknown" );
-		logged.expectEvent( Level.INFO, "Mass indexed", "/2000. Speed", "Remaining: ", ", approx. PT" );
+		logged.expectEvent( Level.INFO, "Mass indexed", "/6000. Speed", "Remaining: ", ", approx. PT" );
 
 		try {
 			mapping.scope( Object.class ).massIndexer()
