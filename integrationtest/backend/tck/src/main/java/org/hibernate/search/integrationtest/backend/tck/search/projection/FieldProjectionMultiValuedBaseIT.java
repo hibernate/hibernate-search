@@ -7,14 +7,17 @@ package org.hibernate.search.integrationtest.backend.tck.search.projection;
 import static org.hibernate.search.util.impl.integrationtest.common.assertion.SearchResultAssert.assertThatQuery;
 import static org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMapperUtils.documentProvider;
 
+import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
 import java.util.function.Function;
 
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaElement;
 import org.hibernate.search.engine.backend.types.Projectable;
+import org.hibernate.search.engine.search.projection.ProjectionAccumulator;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.model.singlefield.SingleFieldIndexBinding;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.FieldTypeDescriptor;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.StandardFieldTypeDescriptor;
@@ -88,6 +91,7 @@ class FieldProjectionMultiValuedBaseIT<F> {
 		indexer.join();
 	}
 
+	@Deprecated
 	@ParameterizedTest(name = "{0} - {1}")
 	@MethodSource("params")
 	void simple(TestedFieldStructure fieldStructure, FieldTypeDescriptor<F, ?> fieldType, DataSet<F> dataSet) {
@@ -110,13 +114,76 @@ class FieldProjectionMultiValuedBaseIT<F> {
 
 	@ParameterizedTest(name = "{0} - {1}")
 	@MethodSource("params")
+	void simpleList(TestedFieldStructure fieldStructure, FieldTypeDescriptor<F, ?> fieldType, DataSet<F> dataSet) {
+		StubMappingScope scope = index.createScope();
+
+		String fieldPath = getFieldPath( fieldStructure, fieldType );
+
+		assertThatQuery( scope.query()
+				.select( f -> f.field( fieldPath, fieldType.getJavaType() ).accumulator( ProjectionAccumulator.list() ) )
+				.where( f -> f.matchAll() )
+				.routing( dataSet.routingKey )
+				.toQuery() )
+				.hasHitsAnyOrder(
+						dataSet.getFieldValues( 1 ),
+						dataSet.getFieldValues( 2 ),
+						dataSet.getFieldValues( 3 ),
+						Collections.emptyList() // Empty document
+				);
+	}
+
+	@ParameterizedTest(name = "{0} - {1}")
+	@MethodSource("params")
+	void simpleSet(TestedFieldStructure fieldStructure, FieldTypeDescriptor<F, ?> fieldType, DataSet<F> dataSet) {
+		StubMappingScope scope = index.createScope();
+
+		String fieldPath = getFieldPath( fieldStructure, fieldType );
+
+		assertThatQuery( scope.query()
+				.select( f -> f.field( fieldPath, fieldType.getJavaType() ).accumulator( ProjectionAccumulator.set() ) )
+				.where( f -> f.matchAll() )
+				.routing( dataSet.routingKey )
+				.toQuery() )
+				.hasHitsAnyOrder(
+						new HashSet<>( dataSet.getFieldValues( 1 ) ),
+						new HashSet<>( dataSet.getFieldValues( 2 ) ),
+						new HashSet<>( dataSet.getFieldValues( 3 ) ),
+						Collections.emptySet() // Empty document
+				);
+	}
+
+	@SuppressWarnings("unchecked")
+	@ParameterizedTest(name = "{0} - {1}")
+	@MethodSource("params")
+	void simpleArray(TestedFieldStructure fieldStructure, FieldTypeDescriptor<F, ?> fieldType, DataSet<F> dataSet) {
+		StubMappingScope scope = index.createScope();
+
+		String fieldPath = getFieldPath( fieldStructure, fieldType );
+
+		assertThatQuery( scope.query()
+				.select( f -> f.field( fieldPath, fieldType.getJavaType() )
+						.accumulator( ProjectionAccumulator.array( fieldType.getJavaType() ) ) )
+				.where( f -> f.matchAll() )
+				.routing( dataSet.routingKey )
+				.toQuery() )
+				.hasHitsAnyOrder(
+						dataSet.getFieldValues( 1 ).toArray( n -> (F[]) Array.newInstance( fieldType.getJavaType(), n ) ),
+						dataSet.getFieldValues( 2 ).toArray( n -> (F[]) Array.newInstance( fieldType.getJavaType(), n ) ),
+						dataSet.getFieldValues( 3 ).toArray( n -> (F[]) Array.newInstance( fieldType.getJavaType(), n ) ),
+						(F[]) Array.newInstance( fieldType.getJavaType(), 0 ) // Empty document
+				);
+
+	}
+
+	@ParameterizedTest(name = "{0} - {1}")
+	@MethodSource("params")
 	void noClass(TestedFieldStructure fieldStructure, FieldTypeDescriptor<F, ?> fieldType, DataSet<F> dataSet) {
 		StubMappingScope scope = index.createScope();
 
 		String fieldPath = getFieldPath( fieldStructure, fieldType );
 
 		assertThatQuery( scope.query()
-				.select( f -> f.field( fieldPath ).multi() )
+				.select( f -> f.field( fieldPath ).accumulator( ProjectionAccumulator.list() ) )
 				.where( f -> f.matchAll() )
 				.routing( dataSet.routingKey )
 				.toQuery() )
@@ -140,8 +207,8 @@ class FieldProjectionMultiValuedBaseIT<F> {
 
 		assertThatQuery( scope.query()
 				.select( f -> f.composite(
-						f.field( fieldPath, fieldType.getJavaType() ).multi(),
-						f.field( fieldPath, fieldType.getJavaType() ).multi()
+						f.field( fieldPath, fieldType.getJavaType() ).accumulator( ProjectionAccumulator.list() ),
+						f.field( fieldPath, fieldType.getJavaType() ).accumulator( ProjectionAccumulator.list() )
 				)
 				)
 				.where( f -> f.matchAll() )

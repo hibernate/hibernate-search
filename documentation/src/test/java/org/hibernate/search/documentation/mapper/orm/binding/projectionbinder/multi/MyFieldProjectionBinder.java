@@ -7,6 +7,7 @@ package org.hibernate.search.documentation.mapper.orm.binding.projectionbinder.m
 import java.util.List;
 import java.util.Optional;
 
+import org.hibernate.search.engine.search.projection.ProjectionAccumulator;
 import org.hibernate.search.engine.search.projection.SearchProjection;
 import org.hibernate.search.engine.search.projection.definition.ProjectionDefinition;
 import org.hibernate.search.engine.search.projection.definition.ProjectionDefinitionContext;
@@ -34,7 +35,7 @@ public class MyFieldProjectionBinder implements ProjectionBinder {
 		public SearchProjection<List<String>> create(SearchProjectionFactory<?, ?> factory,
 				ProjectionDefinitionContext context) {
 			return factory.field( "tags", String.class )
-					.multi() // <4>
+					.accumulator( ProjectionAccumulator.list() ) // <4>
 					.toProjection();
 		}
 	}
