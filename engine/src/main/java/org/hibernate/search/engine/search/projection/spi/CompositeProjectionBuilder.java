@@ -4,6 +4,7 @@
  */
 package org.hibernate.search.engine.search.projection.spi;
 
+import org.hibernate.search.engine.search.projection.ProjectionAccumulator;
 import org.hibernate.search.engine.search.projection.SearchProjection;
 
 public interface CompositeProjectionBuilder {

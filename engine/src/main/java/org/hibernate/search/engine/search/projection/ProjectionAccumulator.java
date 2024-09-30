@@ -2,13 +2,15 @@
  * SPDX-License-Identifier: Apache-2.0
  * Copyright Red Hat Inc. and Hibernate Authors
  */
-package org.hibernate.search.engine.search.projection.spi;
+package org.hibernate.search.engine.search.projection;
 
 import java.util.Collection;
 import java.util.List;
+import java.util.function.Function;
 
+import org.hibernate.search.engine.backend.types.converter.FromDocumentValueConverter;
 import org.hibernate.search.engine.backend.types.converter.runtime.FromDocumentValueConvertContext;
-import org.hibernate.search.engine.backend.types.converter.spi.ProjectionConverter;
+import org.hibernate.search.engine.search.projection.spi.BuiltInProjectionAccumulators;
 
 /**
  * A variation on {@link java.util.stream.Collector} suitable for projections on field values.
@@ -17,7 +19,7 @@ import org.hibernate.search.engine.backend.types.converter.spi.ProjectionConvert
  * <ul>
  *     <li>There is no concept of parallel execution.</li>
  *     <li>All operations are expected to be non-blocking,
- *     except for {@link #transformAll(Object, ProjectionConverter, FromDocumentValueConvertContext)}
+ *     except for {@link #transformAll(Object, FromDocumentValueConverter, FromDocumentValueConvertContext)}
  *     and {@link #finish(Object)}.</li>
  *     <li>Values to accumulate are expected to be {@link #transform(Object, int, Object) transformed} exactly once
  *     after accumulation, changing their type from {@link E} to {@link V}.
@@ -30,21 +32,19 @@ import org.hibernate.search.engine.backend.types.converter.spi.ProjectionConvert
  * @param <A> The type of the temporary storage for accumulated values,
  * before and after being transformed.
  * @param <R> The type of the final result containing values of type {@code V}.
- *
- * @deprecated Use {@link org.hibernate.search.engine.search.projection.ProjectionAccumulator} instead.
  */
-@Deprecated(since = "8.0")
-public interface ProjectionAccumulator<E, V, A, R>
-		extends org.hibernate.search.engine.search.projection.ProjectionAccumulator<E, V, A, R> {
+public interface ProjectionAccumulator<E, V, A, R> {
 
-	@SuppressWarnings("unchecked") // PROVIDER works for any V.
-	static <V> Provider<V, V> single() {
-		return SingleValuedProjectionAccumulator.PROVIDER;
+	static <V> ProjectionAccumulator.Provider<V, V> single() {
+		return BuiltInProjectionAccumulators.single();
 	}
 
-	@SuppressWarnings("unchecked") // PROVIDER works for any V.
 	static <V> Provider<V, List<V>> list() {
-		return ListProjectionAccumulator.PROVIDER;
+		return BuiltInProjectionAccumulators.list();
+	}
+
+	static <V, C> Provider<V, C> simple(Function<List<V>, C> converter) {
+		return BuiltInProjectionAccumulators.simple( converter );
 	}
 
 	/**
@@ -132,9 +132,14 @@ public interface ProjectionAccumulator<E, V, A, R>
 	 * @param context The context to be passed to the projection converter.
 	 * @return The new accumulated value.
 	 */
-	default A transformAll(A accumulated, ProjectionConverter<? super E, ? extends V> converter,
+	default A transformAll(A accumulated, FromDocumentValueConverter<? super E, ? extends V> converter,
 			FromDocumentValueConvertContext context) {
-		return transformAll( accumulated, converter::fromDocumentValue, context );
+		for ( int i = 0; i < size( accumulated ); i++ ) {
+			E initial = get( accumulated, i );
+			V transformed = converter.fromDocumentValue( initial, context );
+			accumulated = transform( accumulated, i, transformed );
+		}
+		return accumulated;
 	}
 
 	/**
@@ -144,11 +149,19 @@ public interface ProjectionAccumulator<E, V, A, R>
 	 *
 	 * @param accumulated The temporary storage created by {@link #createInitial()},
 	 * then populated by successive calls to {@link #accumulate(Object, Object)},
-	 * then transformed by a single call to {@link #transformAll(Object, ProjectionConverter, FromDocumentValueConvertContext)}
+	 * then transformed by a single call to {@link #transformAll(Object, FromDocumentValueConverter, FromDocumentValueConvertContext)}
 	 * or by successive calls to {@link #transform(Object, int, Object)}.
 	 * @return The final result of the accumulation.
 	 */
 	R finish(A accumulated);
+
+	/**
+	 * @return An "empty" final value, i.e. when a {@link #finish(Object) final transformation}
+	 * is applied to {@link #createInitial() the initial value}.
+	 */
+	default R empty() {
+		return finish( createInitial() );
+	}
 
 	/**
 	 * Provides an accumulator for a given type of values to accumulate ({@code T}).
@@ -159,7 +172,7 @@ public interface ProjectionAccumulator<E, V, A, R>
 	 * @param <U> The type of values to accumulate after being transformed.
 	 * @param <R> The type of the final result containing values of type {@code V}.
 	 */
-	interface Provider<U, R> extends org.hibernate.search.engine.search.projection.ProjectionAccumulator.Provider<U, R> {
+	interface Provider<U, R> {
 		/**
 		 * @param <T> The type of values to accumulate before being transformed.
 		 * @return An accumulator for the given type.

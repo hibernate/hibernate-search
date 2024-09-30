@@ -7,6 +7,8 @@ package org.hibernate.search.engine.search.projection.spi;
 import java.util.List;
 import java.util.function.Function;
 
+import org.hibernate.search.engine.search.projection.ProjectionAccumulator;
+
 /**
  * A {@link ProjectionAccumulator} that can accumulate any number of values into a {@link List},
  * and transforms that list into an arbitrary container using a given {@link Function}.
