@@ -6,6 +6,7 @@ package org.hibernate.search.engine.search.projection.definition.spi;
 
 import java.util.List;
 
+import org.hibernate.search.engine.search.projection.ProjectionAccumulator;
 import org.hibernate.search.engine.search.projection.SearchProjection;
 import org.hibernate.search.engine.search.projection.definition.ProjectionDefinitionContext;
 import org.hibernate.search.engine.search.projection.dsl.SearchProjectionFactory;
@@ -78,7 +79,7 @@ public abstract class DistanceProjectionDefinition<F> extends AbstractProjection
 				ProjectionDefinitionContext context) {
 			return factory.withParameters( params -> factory
 					.distance( fieldPath, params.get( parameterName, GeoPoint.class ) )
-					.multi()
+					.accumulator( ProjectionAccumulator.list() )
 					.unit( unit )
 			).toProjection();
 		}
