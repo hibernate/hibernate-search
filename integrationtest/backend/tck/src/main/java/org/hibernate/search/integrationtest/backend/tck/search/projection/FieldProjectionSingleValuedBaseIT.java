@@ -17,6 +17,7 @@ import java.util.function.Function;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaElement;
 import org.hibernate.search.engine.backend.types.Projectable;
 import org.hibernate.search.engine.backend.types.dsl.SearchableProjectableIndexFieldTypeOptionsStep;
+import org.hibernate.search.engine.search.projection.ProjectionAccumulator;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.model.singlefield.AbstractObjectBinding;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.model.singlefield.SingleFieldIndexBinding;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.FieldTypeDescriptor;
@@ -145,7 +146,7 @@ class FieldProjectionSingleValuedBaseIT<F> {
 		String fieldPath = getFieldPath( fieldStructure, fieldType );
 
 		assertThatQuery( scope.query()
-				.select( f -> f.field( fieldPath, fieldType.getJavaType() ).multi() )
+				.select( f -> f.field( fieldPath, fieldType.getJavaType() ).accumulator( ProjectionAccumulator.list() ) )
 				.where( f -> f.matchAll() )
 				.routing( dataSet.routingKey )
 				.toQuery() )

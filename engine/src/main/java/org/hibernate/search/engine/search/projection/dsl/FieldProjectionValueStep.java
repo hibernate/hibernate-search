@@ -13,10 +13,10 @@ import org.hibernate.search.engine.search.projection.ProjectionAccumulator;
  * where the projection (optionally) can be marked as multi-valued (returning Lists),
  * and where optional parameters can be set.
  * <p>
- * By default (if {@link #multi()} is not called), the projection is considered single-valued,
+ * By default (if {@link #accumulator(ProjectionAccumulator.Provider)} is not called), the projection is considered single-valued,
  * and its creation will fail if the field is multi-valued.
  *
- * @param <N> The next step if a method other than {@link #multi()} is called,
+ * @param <N> The next step if a method other than {@link #accumulator(ProjectionAccumulator.Provider)} is called,
  * i.e. the return type of methods defined in {@link FieldProjectionOptionsStep}
  * when called directly on this object.
  * @param <T> The type of projected field values.
@@ -31,7 +31,7 @@ public interface FieldProjectionValueStep<N extends FieldProjectionOptionsStep<?
 	 * otherwise the projection will throw an exception upon creating the query.
 	 *
 	 * @return A new step to define optional parameters for the multi-valued projections.
-	 * @deprecated Use {@link } instead.
+	 * @deprecated Use {@link #accumulator(ProjectionAccumulator.Provider)} instead.
 	 */
 	@Deprecated(since = "8.0")
 	FieldProjectionOptionsStep<?, List<T>> multi();

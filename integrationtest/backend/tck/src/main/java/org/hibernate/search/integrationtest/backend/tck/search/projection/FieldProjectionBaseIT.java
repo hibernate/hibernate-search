@@ -11,6 +11,7 @@ import java.util.List;
 
 import org.hibernate.search.engine.backend.types.ObjectStructure;
 import org.hibernate.search.engine.backend.types.dsl.SearchableProjectableIndexFieldTypeOptionsStep;
+import org.hibernate.search.engine.search.projection.ProjectionAccumulator;
 import org.hibernate.search.engine.search.projection.dsl.ProjectionFinalStep;
 import org.hibernate.search.engine.search.projection.dsl.SearchProjectionFactory;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.FieldTypeDescriptor;
@@ -143,7 +144,7 @@ class FieldProjectionBaseIT {
 		@Override
 		protected ProjectionFinalStep<List<F>> multiValuedProjection(SearchProjectionFactory<?, ?> f,
 				String absoluteFieldPath, DataSet<F, F, FieldProjectionTestValues<F>> dataSet) {
-			return f.field( absoluteFieldPath, dataSet.fieldType.getJavaType() ).multi();
+			return f.field( absoluteFieldPath, dataSet.fieldType.getJavaType() ).accumulator( ProjectionAccumulator.list() );
 		}
 
 	}
