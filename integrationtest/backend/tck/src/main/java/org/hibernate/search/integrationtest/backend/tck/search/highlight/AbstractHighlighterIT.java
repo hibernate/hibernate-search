@@ -14,7 +14,11 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
+import java.util.SortedSet;
+import java.util.TreeSet;
+import java.util.stream.Collectors;
 
 import org.hibernate.search.engine.backend.document.IndexFieldReference;
 import org.hibernate.search.engine.backend.document.IndexObjectFieldReference;
@@ -26,6 +30,7 @@ import org.hibernate.search.engine.search.highlighter.SearchHighlighter;
 import org.hibernate.search.engine.search.highlighter.dsl.HighlighterEncoder;
 import org.hibernate.search.engine.search.highlighter.dsl.HighlighterOptionsStep;
 import org.hibernate.search.engine.search.highlighter.dsl.SearchHighlighterFactory;
+import org.hibernate.search.engine.search.projection.ProjectionAccumulator;
 import org.hibernate.search.engine.search.query.SearchQuery;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.configuration.DefaultAnalysisDefinitions;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.TckConfiguration;
@@ -134,6 +139,58 @@ abstract class AbstractHighlighterIT {
 				.hasHitsAnyOrder(
 						Arrays.asList( "some <em>another</em> value" ),
 						Arrays.asList( "some yet <em>another</em> value" )
+				);
+	}
+
+	@Test
+	void collectAsSet() {
+		StubMappingScope scope = index.createScope();
+
+		SearchQuery<Set<String>> highlights = scope.query().select(
+				f -> f.highlight( "string" ).accumulator( ProjectionAccumulator.set() )
+		)
+				.where( f -> f.match().field( "string" ).matching( "another" ) )
+				.toQuery();
+
+		assertThatHits( highlights.fetchAllHits() )
+				.hasHitsAnyOrder(
+						Set.of( "some <em>another</em> value" ),
+						Set.of( "some yet <em>another</em> value" )
+				);
+	}
+
+	@Test
+	void collectAsSortedSet() {
+		StubMappingScope scope = index.createScope();
+
+		SearchQuery<SortedSet<String>> highlights = scope.query().select(
+				f -> f.highlight( "string" ).accumulator( ProjectionAccumulator.sortedSet() )
+		)
+				.where( f -> f.match().field( "string" ).matching( "another" ) )
+				.toQuery();
+
+		assertThatHits( highlights.fetchAllHits() )
+				.hasHitsAnyOrder(
+						new TreeSet<>( Set.of( "some <em>another</em> value" ) ),
+						new TreeSet<>( Set.of( "some yet <em>another</em> value" )
+						)
+				);
+	}
+
+	@Test
+	void collectAsArray() {
+		StubMappingScope scope = index.createScope();
+
+		SearchQuery<String[]> highlights = scope.query().select(
+				f -> f.highlight( "string" ).accumulator( ProjectionAccumulator.array( String.class ) )
+		)
+				.where( f -> f.match().field( "string" ).matching( "another" ) )
+				.toQuery();
+
+		assertThatHits( highlights.fetchAllHits() )
+				.hasHitsAnyOrder(
+						new String[] { "some <em>another</em> value" },
+						new String[] { "some yet <em>another</em> value" }
 				);
 	}
 
@@ -443,7 +500,7 @@ abstract class AbstractHighlighterIT {
 		StubMappingScope scope = index.createScope();
 
 		SearchQuery<String> highlights = scope.query().select(
-				f -> f.highlight( "anotherString" ).single()
+				f -> f.highlight( "anotherString" ).accumulator( ProjectionAccumulator.single() )
 		)
 				.where( f -> f.match().field( "anotherString" ).matching( "ipsum" ) )
 				.highlighter( h -> highlighter( h ).numberOfFragments( 1 ) )
@@ -455,7 +512,28 @@ abstract class AbstractHighlighterIT {
 				);
 	}
 
+
 	@Test
+	void numberOfFragmentsSingleOptional() {
+		StubMappingScope scope = index.createScope();
+
+		SearchQuery<Optional<String>> highlights = scope.query().select(
+				f -> f.highlight( "anotherString" ).accumulator( ProjectionAccumulator.optional() )
+		)
+				.where( f -> f.match().field( "anotherString" ).matching( "ipsum" ) )
+				.highlighter( h -> highlighter( h ).numberOfFragments( 1 ) )
+				.toQuery();
+
+		assertThatHits( highlights.fetchAllHits() )
+				.hasHitsAnyOrder(
+						numberOfFragmentsResult()
+								.stream().map( Optional::of )
+								.collect( Collectors.toList() )
+				);
+	}
+
+	@Test
+	@Deprecated(since = "8.0")
 	void numberOfFragmentsSingleNamedHighlighter() {
 		StubMappingScope scope = index.createScope();
 
