@@ -26,8 +26,13 @@ public final class DistanceToFieldProjectionValueStepImpl
 
 	@Override
 	public DistanceToFieldProjectionOptionsStep<?, List<Double>> multi() {
+		return accumulator( ProjectionAccumulator.list() );
+	}
+
+	@Override
+	public <R> DistanceToFieldProjectionOptionsStep<?, R> accumulator(ProjectionAccumulator.Provider<Double, R> accumulator) {
 		return new DistanceToFieldProjectionOptionsStepImpl<>( distanceFieldProjectionBuilder,
-				ProjectionAccumulator.list() );
+				accumulator );
 	}
 
 }

@@ -334,7 +334,7 @@ class ProjectionDslIT {
 			// tag::distance-multiValued[]
 			GeoPoint center = GeoPoint.of( 47.506060, 2.473916 );
 			SearchResult<List<Double>> result = searchSession.search( Book.class )
-					.select( f -> f.distance( "authors.placeOfBirth", center ).multi() )
+					.select( f -> f.distance( "authors.placeOfBirth", center ).accumulator( ProjectionAccumulator.list() ) )
 					.where( f -> f.matchAll() )
 					.fetch( 20 );
 			// end::distance-multiValued[]
