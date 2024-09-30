@@ -494,7 +494,7 @@ class ProjectionConstructorInnerInferredIT extends AbstractProjectionConstructor
 												f.field( "contained.integer", Integer.class )
 										)
 										.asList()
-										.multi()
+										.accumulator( ProjectionAccumulator.list() )
 						)
 						.asList(),
 				Arrays.asList(
@@ -584,7 +584,7 @@ class ProjectionConstructorInnerInferredIT extends AbstractProjectionConstructor
 												f.field( "contained.integer", Integer.class )
 										)
 										.asList()
-										.multi()
+										.accumulator( ProjectionAccumulator.list() )
 						)
 						.asList(),
 				Arrays.asList(
@@ -674,7 +674,7 @@ class ProjectionConstructorInnerInferredIT extends AbstractProjectionConstructor
 												f.field( "contained.integer", Integer.class )
 										)
 										.asList()
-										.multi()
+										.accumulator( ProjectionAccumulator.list() )
 						)
 						.asList(),
 				Arrays.asList(

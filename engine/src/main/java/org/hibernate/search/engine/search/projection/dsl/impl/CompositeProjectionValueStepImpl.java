@@ -24,7 +24,11 @@ public class CompositeProjectionValueStepImpl<T>
 
 	@Override
 	public CompositeProjectionOptionsStep<?, List<T>> multi() {
-		return new CompositeProjectionOptionsStepImpl<>( builder, inners, compositor,
-				ProjectionAccumulator.list() );
+		return accumulator( ProjectionAccumulator.list() );
+	}
+
+	@Override
+	public <R> CompositeProjectionOptionsStep<?, R> accumulator(ProjectionAccumulator.Provider<T, R> accumulator) {
+		return new CompositeProjectionOptionsStepImpl<>( builder, inners, compositor, accumulator );
 	}
 }

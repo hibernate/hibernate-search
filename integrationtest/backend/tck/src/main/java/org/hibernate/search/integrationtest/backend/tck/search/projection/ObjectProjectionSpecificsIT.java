@@ -16,6 +16,7 @@ import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaElement
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaObjectField;
 import org.hibernate.search.engine.backend.types.ObjectStructure;
 import org.hibernate.search.engine.backend.types.Projectable;
+import org.hibernate.search.engine.search.projection.ProjectionAccumulator;
 import org.hibernate.search.engine.search.projection.dsl.SearchProjectionFactory;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.TckConfiguration;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.extension.SearchSetupHelper;
@@ -88,10 +89,10 @@ class ObjectProjectionSpecificsIT {
 								f.object( "level1" )
 										.from( f.field( "level1.field1" ) )
 										.asList()
-										.multi()
+										.accumulator( ProjectionAccumulator.list() )
 						)
 						.asList()
-						.multi() )
+						.accumulator( ProjectionAccumulator.list() ) )
 				.where( f -> f.matchAll() )
 				.toQuery() )
 				.isInstanceOf( SearchException.class )

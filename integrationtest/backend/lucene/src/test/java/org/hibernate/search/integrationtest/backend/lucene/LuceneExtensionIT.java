@@ -888,7 +888,7 @@ class LuceneExtensionIT {
 		assertThatThrownBy( () -> mainIndex.createScope().query()
 				.select( f -> f.object( "nestedObject" ).from(
 						f.extension( LuceneExtension.get() ).document()
-				).asList().multi()
+				).asList().accumulator( ProjectionAccumulator.list() )
 				)
 				.where( f -> f.matchAll() )
 				.toQuery()
@@ -904,7 +904,7 @@ class LuceneExtensionIT {
 		assertThatThrownBy( () -> mainIndex.createScope().query()
 				.select( f -> f.object( "nestedObject" ).from(
 						f.extension( LuceneExtension.get() ).explanation()
-				).asList().multi()
+				).asList().accumulator( ProjectionAccumulator.list() )
 				)
 				.where( f -> f.matchAll() )
 				.toQuery()
@@ -935,7 +935,8 @@ class LuceneExtensionIT {
 						.object( "someOtherNestedObject.someOtherNestedNestedObject" )
 						.from( f.field( "someOtherNestedObject.someOtherNestedNestedObject.nestedNestedSomeOtherInteger" )
 								.accumulator( ProjectionAccumulator.list() ) )
-						.asList().multi() ).asList().multi() )
+						.asList().accumulator( ProjectionAccumulator.list() ) ).asList()
+						.accumulator( ProjectionAccumulator.list() ) )
 						.where( f -> f.match().field( "someOtherString" ).matching( "text 2" ) ).fetchAllHits()
 		).containsExactly(
 				List.of(
