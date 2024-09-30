@@ -6,6 +6,7 @@ package org.hibernate.search.engine.search.projection.spi;
 
 import java.lang.invoke.MethodHandles;
 
+import org.hibernate.search.engine.backend.types.converter.FromDocumentValueConverter;
 import org.hibernate.search.engine.backend.types.converter.runtime.FromDocumentValueConvertContext;
 import org.hibernate.search.engine.backend.types.converter.spi.ProjectionConverter;
 import org.hibernate.search.engine.logging.impl.Log;
@@ -79,6 +80,13 @@ final class SingleValuedProjectionAccumulator<E, V> implements ProjectionAccumul
 	@Override
 	@SuppressWarnings("unchecked")
 	public Object transformAll(Object accumulated, ProjectionConverter<? super E, ? extends V> converter,
+			FromDocumentValueConvertContext context) {
+		return converter.fromDocumentValue( (E) accumulated, context );
+	}
+
+	@Override
+	@SuppressWarnings("unchecked")
+	public Object transformAll(Object accumulated, FromDocumentValueConverter<? super E, ? extends V> converter,
 			FromDocumentValueConvertContext context) {
 		return converter.fromDocumentValue( (E) accumulated, context );
 	}

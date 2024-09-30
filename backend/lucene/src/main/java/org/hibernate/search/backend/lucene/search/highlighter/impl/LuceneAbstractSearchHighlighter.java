@@ -26,7 +26,7 @@ import org.hibernate.search.engine.search.highlighter.dsl.HighlighterTagSchema;
 import org.hibernate.search.engine.search.highlighter.spi.BoundaryScannerType;
 import org.hibernate.search.engine.search.highlighter.spi.SearchHighlighterBuilder;
 import org.hibernate.search.engine.search.highlighter.spi.SearchHighlighterType;
-import org.hibernate.search.engine.search.projection.spi.ProjectionAccumulator;
+import org.hibernate.search.engine.search.projection.ProjectionAccumulator;
 import org.hibernate.search.util.common.impl.Contracts;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 

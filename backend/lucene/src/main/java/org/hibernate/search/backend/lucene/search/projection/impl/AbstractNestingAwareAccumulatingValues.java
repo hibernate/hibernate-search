@@ -10,7 +10,7 @@ import org.hibernate.search.backend.lucene.lowlevel.collector.impl.TopDocsDataCo
 import org.hibernate.search.backend.lucene.lowlevel.collector.impl.Values;
 import org.hibernate.search.backend.lucene.lowlevel.join.impl.ChildDocIds;
 import org.hibernate.search.backend.lucene.lowlevel.join.impl.NestedDocsProvider;
-import org.hibernate.search.engine.search.projection.spi.ProjectionAccumulator;
+import org.hibernate.search.engine.search.projection.ProjectionAccumulator;
 
 import org.apache.lucene.index.LeafReaderContext;
 import org.apache.lucene.search.DocIdSetIterator;

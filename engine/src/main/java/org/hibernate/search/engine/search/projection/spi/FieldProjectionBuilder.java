@@ -5,6 +5,7 @@
 package org.hibernate.search.engine.search.projection.spi;
 
 import org.hibernate.search.engine.search.common.ValueModel;
+import org.hibernate.search.engine.search.projection.ProjectionAccumulator;
 import org.hibernate.search.engine.search.projection.SearchProjection;
 
 public interface FieldProjectionBuilder<T> extends SearchProjectionBuilder<T> {
