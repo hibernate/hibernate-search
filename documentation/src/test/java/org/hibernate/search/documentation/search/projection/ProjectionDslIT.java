@@ -581,7 +581,7 @@ class ProjectionDslIT {
 							.from( f.field( "authors.firstName", String.class ), // <2>
 									f.field( "authors.lastName", String.class ) ) // <3>
 							.as( MyAuthorName::new ) // <4>
-							.multi() ) // <5>
+							.accumulator( ProjectionAccumulator.list() ) ) // <5>
 					.where( f -> f.matchAll() )
 					.fetchHits( 20 ); // <6>
 			// end::object-customObject[]
@@ -631,7 +631,7 @@ class ProjectionDslIT {
 									new MyAuthorNameAndBirthDateAndPlaceOfBirthDistance(
 											(String) list.get( 0 ), (String) list.get( 1 ),
 											(LocalDate) list.get( 2 ), (Double) list.get( 3 ) ) )
-							.multi() ) // <7>
+							.accumulator( ProjectionAccumulator.list() ) ) // <7>
 					.where( f -> f.matchAll() )
 					.fetchHits( 20 ); // <8>
 			// end::object-customObject-asList[]
@@ -693,7 +693,7 @@ class ProjectionDslIT {
 									new MyAuthorNameAndBirthDateAndPlaceOfBirthDistance(
 											(String) array[0], (String) array[1],
 											(LocalDate) array[2], (Double) array[3] ) )
-							.multi() ) // <7>
+							.accumulator( ProjectionAccumulator.list() ) ) // <7>
 					.where( f -> f.matchAll() )
 					.fetchHits( 20 ); // <8>
 			// end::object-customObject-asArray[]
@@ -746,7 +746,7 @@ class ProjectionDslIT {
 							.from( f.field( "authors.firstName", String.class ), // <2>
 									f.field( "authors.lastName", String.class ) ) // <3>
 							.asList() // <4>
-							.multi() ) // <5>
+							.accumulator( ProjectionAccumulator.list() ) ) // <5>
 					.where( f -> f.matchAll() )
 					.fetchHits( 20 ); // <6>
 			// end::object-list[]
@@ -786,7 +786,7 @@ class ProjectionDslIT {
 							.from( f.field( "authors.firstName", String.class ), // <2>
 									f.field( "authors.lastName", String.class ) ) // <3>
 							.asArray() // <4>
-							.multi() ) // <5>
+							.accumulator( ProjectionAccumulator.list() ) ) // <5>
 					.where( f -> f.matchAll() )
 					.fetchHits( 20 ); // <6>
 			// end::object-array[]
