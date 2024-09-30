@@ -6,6 +6,8 @@ package org.hibernate.search.engine.search.projection.dsl;
 
 import java.util.List;
 
+import org.hibernate.search.engine.search.projection.ProjectionAccumulator;
+
 /**
  * The initial step in a "field" projection definition,
  * where the projection (optionally) can be marked as multi-valued (returning Lists),
@@ -29,7 +31,21 @@ public interface FieldProjectionValueStep<N extends FieldProjectionOptionsStep<?
 	 * otherwise the projection will throw an exception upon creating the query.
 	 *
 	 * @return A new step to define optional parameters for the multi-valued projections.
+	 * @deprecated Use {@link } instead.
 	 */
+	@Deprecated(since = "8.0")
 	FieldProjectionOptionsStep<?, List<T>> multi();
 
+	/**
+	 * Defines how to accumulate field projection values.
+	 * <p>
+	 * Calling {@code .accumulator(someMultiValuedAccumulatorProvider) } is mandatory for multi-valued fields,
+	 * e.g. {@code .accumulator(ProjectionAccumulator.list())},
+	 * otherwise the projection will throw an exception upon creating the query.
+	 *
+	 * @param accumulator The accumulator provider to apply to this projection.
+	 * @return A new step to define optional parameters for the accumulated projections.
+	 * @param <R> The type of the final result.
+	 */
+	<R> FieldProjectionOptionsStep<?, R> accumulator(ProjectionAccumulator.Provider<T, R> accumulator);
 }

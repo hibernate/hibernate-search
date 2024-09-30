@@ -27,7 +27,12 @@ public final class FieldProjectionValueStepImpl<T>
 
 	@Override
 	public FieldProjectionOptionsStep<?, List<T>> multi() {
-		return new FieldProjectionOptionsStepImpl<>( fieldProjectionBuilder, ProjectionAccumulator.list() );
+		return accumulator( ProjectionAccumulator.list() );
+	}
+
+	@Override
+	public <R> FieldProjectionOptionsStep<?, R> accumulator(ProjectionAccumulator.Provider<T, R> accumulator) {
+		return new FieldProjectionOptionsStepImpl<>( fieldProjectionBuilder, accumulator );
 	}
 
 	@Override
