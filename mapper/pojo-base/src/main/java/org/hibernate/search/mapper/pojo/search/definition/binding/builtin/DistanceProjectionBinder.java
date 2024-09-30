@@ -120,9 +120,12 @@ public final class DistanceProjectionBinder implements ProjectionBinder {
 	}
 
 	private void bind(ProjectionBindingContext context, ProjectionBindingMultiContext multi, String fieldPath) {
+		var accumulator = multi.projectionAccumulatorProviderFactory()
+				.projectionAccumulatorProvider( multi.container().rawType(), Double.class );
+
 		multi.definition( Double.class, context.isIncluded( fieldPath )
-				? BeanHolder.of( new DistanceProjectionDefinition.MultiValued( fieldPath, parameterName, unit ) )
-				: ConstantProjectionDefinition.emptyList() );
+				? BeanHolder.of( new DistanceProjectionDefinition.MultiValued<>( fieldPath, parameterName, unit, accumulator ) )
+				: ConstantProjectionDefinition.empty( accumulator ) );
 	}
 
 	private String fieldPathOrFail(ProjectionBindingContext context) {

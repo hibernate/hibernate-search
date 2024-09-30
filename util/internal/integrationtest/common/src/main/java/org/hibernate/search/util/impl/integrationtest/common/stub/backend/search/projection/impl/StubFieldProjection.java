@@ -7,7 +7,6 @@ package org.hibernate.search.util.impl.integrationtest.common.stub.backend.searc
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Iterator;
-import java.util.List;
 
 import org.hibernate.search.engine.backend.types.converter.spi.ProjectionConverter;
 import org.hibernate.search.engine.search.common.ValueModel;
@@ -43,13 +42,13 @@ public class StubFieldProjection<F, V, A, P> extends StubSearchProjection<P> {
 	@Override
 	public A extract(ProjectionHitMapper<?> projectionHitMapper, Iterator<?> projectionFromIndex,
 			StubSearchProjectionContext context) {
-		List<?> fieldValues;
+		Iterable<?> fieldValues;
 		if ( singleValued ) {
 			Object singleValue = projectionFromIndex.next();
 			fieldValues = singleValue == null ? Collections.emptyList() : Arrays.asList( singleValue );
 		}
 		else {
-			fieldValues = (List<?>) projectionFromIndex.next();
+			fieldValues = (Iterable<?>) projectionFromIndex.next();
 		}
 		A accumulated = accumulator.createInitial();
 		for ( Object fieldValue : fieldValues ) {
