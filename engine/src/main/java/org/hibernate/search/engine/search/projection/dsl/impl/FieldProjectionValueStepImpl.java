@@ -7,11 +7,11 @@ package org.hibernate.search.engine.search.projection.dsl.impl;
 import java.util.List;
 
 import org.hibernate.search.engine.search.common.ValueModel;
+import org.hibernate.search.engine.search.projection.ProjectionAccumulator;
 import org.hibernate.search.engine.search.projection.SearchProjection;
 import org.hibernate.search.engine.search.projection.dsl.FieldProjectionOptionsStep;
 import org.hibernate.search.engine.search.projection.dsl.FieldProjectionValueStep;
 import org.hibernate.search.engine.search.projection.dsl.spi.SearchProjectionDslContext;
-import org.hibernate.search.engine.search.projection.spi.ProjectionAccumulator;
 import org.hibernate.search.engine.search.projection.spi.ProjectionTypeKeys;
 
 public final class FieldProjectionValueStepImpl<T>

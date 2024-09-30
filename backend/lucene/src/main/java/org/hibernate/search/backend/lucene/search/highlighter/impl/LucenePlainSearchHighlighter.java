@@ -21,7 +21,7 @@ import org.hibernate.search.backend.lucene.search.projection.impl.ProjectionRequ
 import org.hibernate.search.engine.search.highlighter.dsl.HighlighterFragmenter;
 import org.hibernate.search.engine.search.highlighter.spi.BoundaryScannerType;
 import org.hibernate.search.engine.search.highlighter.spi.SearchHighlighterType;
-import org.hibernate.search.engine.search.projection.spi.ProjectionAccumulator;
+import org.hibernate.search.engine.search.projection.ProjectionAccumulator;
 
 import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.index.IndexableField;

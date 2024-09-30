@@ -19,9 +19,9 @@ import org.hibernate.search.engine.backend.types.converter.runtime.FromDocumentV
 import org.hibernate.search.engine.backend.types.converter.spi.ProjectionConverter;
 import org.hibernate.search.engine.search.common.ValueModel;
 import org.hibernate.search.engine.search.loading.spi.LoadingResult;
+import org.hibernate.search.engine.search.projection.ProjectionAccumulator;
 import org.hibernate.search.engine.search.projection.SearchProjection;
 import org.hibernate.search.engine.search.projection.spi.FieldProjectionBuilder;
-import org.hibernate.search.engine.search.projection.spi.ProjectionAccumulator;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
 import org.apache.lucene.document.Document;
@@ -143,7 +143,7 @@ public class LuceneFieldProjection<F, V, P, T> extends AbstractLuceneProjection<
 		@Override
 		public P transform(LoadingResult<?> loadingResult, A extractedData, ProjectionTransformContext context) {
 			FromDocumentValueConvertContext convertContext = context.fromDocumentValueConvertContext();
-			A transformedData = accumulator.transformAll( extractedData, converter, convertContext );
+			A transformedData = accumulator.transformAll( extractedData, converter::fromDocumentValue, convertContext );
 			return accumulator.finish( transformedData );
 		}
 	}
