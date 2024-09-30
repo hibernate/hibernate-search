@@ -20,6 +20,7 @@ import org.hibernate.search.documentation.testsupport.BackendConfigurations;
 import org.hibernate.search.documentation.testsupport.DocumentationSetupHelper;
 import org.hibernate.search.engine.backend.types.ObjectStructure;
 import org.hibernate.search.engine.backend.types.Projectable;
+import org.hibernate.search.engine.search.projection.ProjectionAccumulator;
 import org.hibernate.search.engine.spatial.GeoPoint;
 import org.hibernate.search.mapper.orm.Search;
 import org.hibernate.search.mapper.orm.session.SearchSession;
@@ -299,7 +300,7 @@ class ProjectionDslJava17IT {
 			List<List<MyAuthorProjection>> hits = searchSession.search( Book.class )
 					.select( f -> f.object( "authors" ) // <1>
 							.as( MyAuthorProjection.class ) // <2>
-							.multi() ) // <3>
+							.accumulator( ProjectionAccumulator.list() ) ) // <3>
 					.where( f -> f.matchAll() )
 					.fetchHits( 20 ); // <4>
 			// end::object-mapped-record[]

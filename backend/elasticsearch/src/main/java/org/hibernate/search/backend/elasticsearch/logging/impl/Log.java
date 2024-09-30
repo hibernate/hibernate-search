@@ -732,9 +732,9 @@ public interface Log extends BasicLogger {
 			value = "Invalid cardinality for projection on field '%1$s': the projection is single-valued,"
 					+ " but this field is effectively multi-valued in this context,"
 					+ " because parent object field '%2$s' is multi-valued."
-					+ " Either call '.multi()' when you create the projection on field '%1$s',"
+					+ " Either call '.accumulator(...)' when you create the projection on field '%1$s',"
 					+ " or wrap that projection in an object projection like this:"
-					+ " 'f.object(\"%2$s\").from(<the projection on field %1$s>).as(...).multi()'.")
+					+ " 'f.object(\"%2$s\").from(<the projection on field %1$s>).as(...).accumulator(...)'.")
 	SearchException invalidSingleValuedProjectionOnValueFieldInMultiValuedObjectField(String absolutePath,
 			String objectFieldAbsolutePath);
 

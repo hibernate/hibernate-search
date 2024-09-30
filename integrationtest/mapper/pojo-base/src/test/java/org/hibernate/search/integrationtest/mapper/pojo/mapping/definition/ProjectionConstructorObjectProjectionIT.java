@@ -13,6 +13,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 
+import org.hibernate.search.engine.search.projection.ProjectionAccumulator;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.DocumentId;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.FullTextField;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.GenericField;
@@ -705,7 +706,7 @@ class ProjectionConstructorObjectProjectionIT extends AbstractProjectionConstruc
 												f.field( "contained.integer", Integer.class )
 										)
 										.asList()
-										.multi()
+										.accumulator( ProjectionAccumulator.list() )
 						)
 						.asList(),
 				Arrays.asList(
@@ -795,7 +796,7 @@ class ProjectionConstructorObjectProjectionIT extends AbstractProjectionConstruc
 												f.field( "contained.integer", Integer.class )
 										)
 										.asList()
-										.multi()
+										.accumulator( ProjectionAccumulator.list() )
 						)
 						.asList(),
 				Arrays.asList(
@@ -885,7 +886,7 @@ class ProjectionConstructorObjectProjectionIT extends AbstractProjectionConstruc
 												f.field( "contained.integer", Integer.class )
 										)
 										.asList()
-										.multi()
+										.accumulator( ProjectionAccumulator.list() )
 						)
 						.asList(),
 				Arrays.asList(

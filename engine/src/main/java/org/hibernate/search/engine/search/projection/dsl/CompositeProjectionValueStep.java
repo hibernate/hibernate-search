@@ -6,14 +6,16 @@ package org.hibernate.search.engine.search.projection.dsl;
 
 import java.util.List;
 
+import org.hibernate.search.engine.search.projection.ProjectionAccumulator;
+
 /**
  * The step in a composite projection definition
  * where the projection (optionally) can be marked as multi-valued (returning Lists),
  * and where optional parameters can be set.
  * <p>
- * By default (if {@link #multi()} is not called), the projection is single-valued.
+ * By default (if {@link #accumulator(ProjectionAccumulator.Provider)} is not called), the projection is single-valued.
  *
- * @param <N> The next step if a method other than {@link #multi()} is called,
+ * @param <N> The next step if a method other than {@link #accumulator(ProjectionAccumulator.Provider)} is called,
  * i.e. the return type of methods defined in {@link CompositeProjectionOptionsStep}
  * when called directly on this object.
  * @param <T> The type of composed projections.
@@ -32,7 +34,22 @@ public interface CompositeProjectionValueStep<N extends CompositeProjectionOptio
 	 * is generally not useful: the only effect is that projected values will be wrapped in a one-element {@link List}.
 	 *
 	 * @return A new step to define optional parameters for the projection.
+	 * @deprecated Use {@link #accumulator(ProjectionAccumulator.Provider)} instead.
 	 */
+	@Deprecated(since = "8.0")
 	CompositeProjectionOptionsStep<?, List<T>> multi();
+
+	/**
+	 * Defines how to accumulate composite projection values.
+	 * <p>
+	 * Calling {@code .accumulator(someMultiValuedAccumulatorProvider) } is mandatory for multi-valued fields,
+	 * e.g. {@code .accumulator(ProjectionAccumulator.list())},
+	 * otherwise the projection will throw an exception upon creating the query.
+	 *
+	 * @param accumulator The accumulator provider to apply to this projection.
+	 * @return A new step to define optional parameters for the accumulated projections.
+	 * @param <R> The type of the final result.
+	 */
+	<R> CompositeProjectionOptionsStep<?, R> accumulator(ProjectionAccumulator.Provider<T, R> accumulator);
 
 }

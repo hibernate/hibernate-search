@@ -36,6 +36,7 @@ import org.hibernate.search.engine.backend.types.VectorSimilarity;
 import org.hibernate.search.engine.backend.types.dsl.SearchableProjectableIndexFieldTypeOptionsStep;
 import org.hibernate.search.engine.search.predicate.dsl.KnnPredicateOptionsStep;
 import org.hibernate.search.engine.search.predicate.dsl.SearchPredicateFactory;
+import org.hibernate.search.engine.search.projection.ProjectionAccumulator;
 import org.hibernate.search.engine.search.projection.dsl.SearchProjectionFactory;
 import org.hibernate.search.engine.search.query.SearchQuery;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.FieldTypeDescriptor;
@@ -775,7 +776,7 @@ class KnnPredicateSpecificsIT {
 															f.field( "nested.floatVector" )
 													)
 													.asList()
-													.multi()
+													.accumulator( ProjectionAccumulator.list() )
 									).asList()
 							).where(
 									f -> f.knn( 1 ).field( "nested.byteVector" ).matching( bytes( 2, (byte) -120 ) )
