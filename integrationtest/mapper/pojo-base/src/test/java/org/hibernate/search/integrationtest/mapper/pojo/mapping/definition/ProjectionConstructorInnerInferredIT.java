@@ -13,6 +13,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 
+import org.hibernate.search.engine.search.projection.ProjectionAccumulator;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.DocumentId;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.FullTextField;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.GenericField;
@@ -120,8 +121,8 @@ class ProjectionConstructorInnerInferredIT extends AbstractProjectionConstructor
 				f -> f.composite()
 						.from(
 								dummyProjectionForEnclosingClassInstance( f ),
-								f.field( "text", String.class ).multi(),
-								f.field( "integer", Integer.class ).multi()
+								f.field( "text", String.class ).accumulator( ProjectionAccumulator.list() ),
+								f.field( "integer", Integer.class ).accumulator( ProjectionAccumulator.list() )
 						)
 						.asList(),
 				Arrays.asList(
@@ -171,8 +172,8 @@ class ProjectionConstructorInnerInferredIT extends AbstractProjectionConstructor
 				f -> f.composite()
 						.from(
 								dummyProjectionForEnclosingClassInstance( f ),
-								f.field( "text", String.class ).multi(),
-								f.field( "integer", Integer.class ).multi()
+								f.field( "text", String.class ).accumulator( ProjectionAccumulator.list() ),
+								f.field( "integer", Integer.class ).accumulator( ProjectionAccumulator.list() )
 						)
 						.asList(),
 				Arrays.asList(
@@ -222,8 +223,8 @@ class ProjectionConstructorInnerInferredIT extends AbstractProjectionConstructor
 				f -> f.composite()
 						.from(
 								dummyProjectionForEnclosingClassInstance( f ),
-								f.field( "text", String.class ).multi(),
-								f.field( "integer", Integer.class ).multi()
+								f.field( "text", String.class ).accumulator( ProjectionAccumulator.list() ),
+								f.field( "integer", Integer.class ).accumulator( ProjectionAccumulator.list() )
 						)
 						.asList(),
 				Arrays.asList(
