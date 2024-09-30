@@ -705,8 +705,9 @@ public interface Log extends BasicLogger {
 	@Message(id = ID_OFFSET + 115,
 			value = "Invalid parameter type for projection constructor: %1$s."
 					+ " When inferring the cardinality of inner projections from constructor parameters,"
-					+ " multi-valued constructor parameters must be lists (java.util.List<...>)"
-					+ " or list supertypes (java.lang.Iterable<...>, java.util.Collection<...>)")
+					+ " multi-valued constructor parameters must be lists/sets (java.util.List<...>/java.util.Set<...>/java.util.SortedSet<...>)"
+					+ ", their supertypes (java.lang.Iterable<...>, java.util.Collection<...>)"
+					+ " or arrays")
 	SearchException invalidMultiValuedParameterTypeForProjectionConstructor(
 			@FormatWith(PojoTypeModelFormatter.class) PojoTypeModel<?> parentTypeModel);
 
@@ -1046,4 +1047,11 @@ public interface Log extends BasicLogger {
 	@Message(id = ID_OFFSET + 169,
 			value = "Mass indexing is going to index approx. %1$d entities (%2$s). Actual number may change once the indexing starts.")
 	void indexingEntitiesApprox(long count, String types);
+
+	@Message(id = ID_OFFSET + 170,
+			value = "Implicit binding of a java.util.SortedSet<%1$s> constructor parameter is not possible since %1$s is not implementing java.lang.Comparable."
+					+ " Either make %1$s implement java.lang.Comparable or use a programmatic mapping and provide"
+					+ " a custom ProjectionAccumulatorProviderFactory that, for example, utilizes a ProjectionAccumulator.sortedSet(comparator) accumulator provider.")
+	SearchException cannotBindSortedSetWithNonComparableElements(@FormatWith(ClassFormatter.class) Class<?> elementType,
+			@Param EventContext eventContext);
 }

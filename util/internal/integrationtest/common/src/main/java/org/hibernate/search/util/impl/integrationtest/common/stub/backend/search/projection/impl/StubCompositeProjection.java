@@ -7,7 +7,6 @@ package org.hibernate.search.util.impl.integrationtest.common.stub.backend.searc
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Iterator;
-import java.util.List;
 
 import org.hibernate.search.engine.search.loading.spi.LoadingResult;
 import org.hibernate.search.engine.search.loading.spi.ProjectionHitMapper;
@@ -34,19 +33,19 @@ class StubCompositeProjection<E, V, A, P> extends StubSearchProjection<P> {
 	@Override
 	public Object extract(ProjectionHitMapper<?> projectionHitMapper, Iterator<?> projectionFromIndex,
 			StubSearchProjectionContext context) {
-		List<?> allInnerProjectionsFromIndex;
+		Iterable<?> allInnerProjectionsFromIndex;
 		if ( singleValued ) {
 			Object singleValue = projectionFromIndex.next();
 			allInnerProjectionsFromIndex = singleValue == null ? Collections.emptyList() : Arrays.asList( singleValue );
 		}
 		else {
-			allInnerProjectionsFromIndex = (List<?>) projectionFromIndex.next();
+			allInnerProjectionsFromIndex = (Iterable<?>) projectionFromIndex.next();
 		}
 
 		A accumulated = accumulator.createInitial();
 		for ( Object innerProjectionsFromIndex : allInnerProjectionsFromIndex ) {
 			E extractedData = compositor.createInitial();
-			Iterator<?> innerProjectionFromIndex = ( (List<?>) innerProjectionsFromIndex ).iterator();
+			Iterator<?> innerProjectionFromIndex = ( (Iterable<?>) innerProjectionsFromIndex ).iterator();
 			for ( int i = 0; i < inners.length; i++ ) {
 				Object extractedDataForInner = inners[i].extract( projectionHitMapper, innerProjectionFromIndex, context );
 				extractedData = compositor.set( extractedData, i, extractedDataForInner );

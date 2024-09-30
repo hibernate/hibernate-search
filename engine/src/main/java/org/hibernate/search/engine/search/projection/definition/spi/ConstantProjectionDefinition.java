@@ -6,8 +6,11 @@ package org.hibernate.search.engine.search.projection.definition.spi;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.Set;
+import java.util.SortedSet;
 
 import org.hibernate.search.engine.environment.bean.BeanHolder;
+import org.hibernate.search.engine.search.projection.ProjectionAccumulator;
 import org.hibernate.search.engine.search.projection.SearchProjection;
 import org.hibernate.search.engine.search.projection.definition.ProjectionDefinitionContext;
 import org.hibernate.search.engine.search.projection.dsl.SearchProjectionFactory;
@@ -22,15 +25,42 @@ public final class ConstantProjectionDefinition<T> extends AbstractProjectionDef
 	@SuppressWarnings("rawtypes")
 	private static final BeanHolder<? extends ConstantProjectionDefinition> EMPTY_LIST_INSTANCE =
 			BeanHolder.of( new ConstantProjectionDefinition<List>( Collections.emptyList() ) );
+	@SuppressWarnings("rawtypes")
+	private static final BeanHolder<? extends ConstantProjectionDefinition> EMPTY_SET_INSTANCE =
+			BeanHolder.of( new ConstantProjectionDefinition<Set>( Collections.emptySet() ) );
+	@SuppressWarnings("rawtypes")
+	private static final BeanHolder<? extends ConstantProjectionDefinition> EMPTY_SORTED_SET_INSTANCE =
+			BeanHolder.of( new ConstantProjectionDefinition<SortedSet>( Collections.emptySortedSet() ) );
 
 	@SuppressWarnings("unchecked") // NULL_VALUE_INSTANCE works for any T
 	public static <T> BeanHolder<ConstantProjectionDefinition<T>> nullValue() {
 		return (BeanHolder<ConstantProjectionDefinition<T>>) NULL_VALUE_INSTANCE;
 	}
 
+	/**
+	 * @deprecated Use {@link #empty(ProjectionAccumulator.Provider)} instead.
+	 */
+	@Deprecated(since = "8.0")
 	@SuppressWarnings("unchecked") // EMPTY_LIST_INSTANCE works for any T
 	public static <T> BeanHolder<ConstantProjectionDefinition<List<T>>> emptyList() {
 		return (BeanHolder<ConstantProjectionDefinition<List<T>>>) EMPTY_LIST_INSTANCE;
+	}
+
+	@SuppressWarnings("unchecked") // empty collections works for any T
+	public static <T> BeanHolder<ConstantProjectionDefinition<T>> empty(ProjectionAccumulator.Provider<?, T> accumulator) {
+		T empty = accumulator.get().empty();
+
+		if ( ProjectionAccumulator.list().equals( accumulator ) ) {
+			return (BeanHolder<ConstantProjectionDefinition<T>>) EMPTY_LIST_INSTANCE;
+		}
+		if ( ProjectionAccumulator.set().equals( accumulator ) ) {
+			return (BeanHolder<ConstantProjectionDefinition<T>>) EMPTY_SET_INSTANCE;
+		}
+		if ( empty instanceof SortedSet ) {
+			return (BeanHolder<ConstantProjectionDefinition<T>>) EMPTY_SORTED_SET_INSTANCE;
+		}
+
+		return BeanHolder.of( new ConstantProjectionDefinition<>( empty ) );
 	}
 
 	private final T value;
