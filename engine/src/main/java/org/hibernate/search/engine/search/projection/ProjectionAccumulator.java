@@ -5,7 +5,11 @@
 package org.hibernate.search.engine.search.projection;
 
 import java.util.Collection;
+import java.util.Comparator;
 import java.util.List;
+import java.util.Optional;
+import java.util.Set;
+import java.util.SortedSet;
 import java.util.function.Function;
 
 import org.hibernate.search.engine.backend.types.converter.FromDocumentValueConverter;
@@ -45,6 +49,26 @@ public interface ProjectionAccumulator<E, V, A, R> {
 
 	static <V, C> Provider<V, C> simple(Function<List<V>, C> converter) {
 		return BuiltInProjectionAccumulators.simple( converter );
+	}
+
+	static <V> Provider<V, Optional<V>> optional() {
+		return BuiltInProjectionAccumulators.optional();
+	}
+
+	static <V> Provider<V, Set<V>> set() {
+		return BuiltInProjectionAccumulators.set();
+	}
+
+	static <V> Provider<V, SortedSet<V>> sortedSet() {
+		return BuiltInProjectionAccumulators.sortedSet();
+	}
+
+	static <V> Provider<V, SortedSet<V>> sortedSet(Comparator<? super V> comparator) {
+		return BuiltInProjectionAccumulators.sortedSet( comparator );
+	}
+
+	static <V> Provider<V, V[]> array(Class<? super V> componentType) {
+		return BuiltInProjectionAccumulators.array( componentType );
 	}
 
 	/**

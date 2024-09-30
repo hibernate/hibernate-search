@@ -15,15 +15,15 @@ import java.util.List;
  */
 final class ArrayProjectionAccumulator<E, V> extends ListBasedProjectionAccumulator<E, V, V[]> {
 
-	static <U, R> Provider<U, R> provider(Class<U> elementType) {
+	static <U, R> Provider<U, R> provider(Class<? super U> elementType) {
 		return new ArrayProvider<>( elementType );
 	}
 
-	private ArrayProjectionAccumulator(Class<V> elementType) {
+	private ArrayProjectionAccumulator(Class<? super V> elementType) {
 		this.elementType = elementType;
 	}
 
-	private final Class<V> elementType;
+	private final Class<? super V> elementType;
 
 	@SuppressWarnings("unchecked")
 	@Override
@@ -39,7 +39,7 @@ final class ArrayProjectionAccumulator<E, V> extends ListBasedProjectionAccumula
 	private static class ArrayProvider<U, R> implements Provider<U, R> {
 		private final ArrayProjectionAccumulator<?, U> instance;
 
-		private ArrayProvider(Class<U> elementType) {
+		private ArrayProvider(Class<? super U> elementType) {
 			instance = new ArrayProjectionAccumulator<>( elementType );
 		}
 

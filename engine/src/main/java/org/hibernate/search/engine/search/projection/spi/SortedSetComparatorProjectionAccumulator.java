@@ -17,15 +17,15 @@ import java.util.TreeSet;
  */
 final class SortedSetComparatorProjectionAccumulator<E, V> extends ListBasedProjectionAccumulator<E, V, SortedSet<V>> {
 
-	static <U, R> Provider<U, R> provider(Comparator<U> comparator) {
+	static <U, R> Provider<U, R> provider(Comparator<? super U> comparator) {
 		return new ComparatorBasedSortedSetProvider<>( comparator );
 	}
 
-	private SortedSetComparatorProjectionAccumulator(Comparator<V> comparator) {
+	private SortedSetComparatorProjectionAccumulator(Comparator<? super V> comparator) {
 		this.comparator = comparator;
 	}
 
-	private final Comparator<V> comparator;
+	private final Comparator<? super V> comparator;
 
 	@Override
 	public SortedSet<V> doFinish(List<V> accumulated) {
@@ -37,7 +37,7 @@ final class SortedSetComparatorProjectionAccumulator<E, V> extends ListBasedProj
 	private static class ComparatorBasedSortedSetProvider<U, R> implements Provider<U, R> {
 		private final SortedSetComparatorProjectionAccumulator<?, U> instance;
 
-		private ComparatorBasedSortedSetProvider(Comparator<U> comparator) {
+		private ComparatorBasedSortedSetProvider(Comparator<? super U> comparator) {
 			instance = new SortedSetComparatorProjectionAccumulator<>( comparator );
 		}
 

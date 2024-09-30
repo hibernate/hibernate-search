@@ -6,6 +6,7 @@ package org.hibernate.search.engine.search.projection.spi;
 
 import java.util.Comparator;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 import java.util.SortedSet;
 import java.util.function.Function;
@@ -31,7 +32,7 @@ public interface BuiltInProjectionAccumulators {
 	}
 
 	static <V> org.hibernate.search.engine.search.projection.ProjectionAccumulator.Provider<V, V[]> array(
-			Class<V> componentType) {
+			Class<? super V> componentType) {
 		return ArrayProjectionAccumulator.provider( componentType );
 	}
 
@@ -46,9 +47,12 @@ public interface BuiltInProjectionAccumulators {
 	}
 
 	static <V> org.hibernate.search.engine.search.projection.ProjectionAccumulator.Provider<V, SortedSet<V>> sortedSet(
-			Comparator<V> comparator) {
+			Comparator<? super V> comparator) {
 		return SortedSetComparatorProjectionAccumulator.provider( comparator );
 	}
 
-
+	@SuppressWarnings("unchecked") // PROVIDER works for any V.
+	static <V> org.hibernate.search.engine.search.projection.ProjectionAccumulator.Provider<V, Optional<V>> optional() {
+		return OptionalProjectionAccumulator.PROVIDER;
+	}
 }
