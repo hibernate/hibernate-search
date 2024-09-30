@@ -4,8 +4,6 @@
  */
 package org.hibernate.search.engine.search.projection.definition.spi;
 
-import java.util.List;
-
 import org.hibernate.search.engine.search.projection.ProjectionAccumulator;
 import org.hibernate.search.engine.search.projection.SearchProjection;
 import org.hibernate.search.engine.search.projection.definition.ProjectionDefinitionContext;
@@ -64,22 +62,26 @@ public abstract class DistanceProjectionDefinition<F> extends AbstractProjection
 	}
 
 	@Incubating
-	public static final class MultiValued extends DistanceProjectionDefinition<List<Double>> {
-		public MultiValued(String fieldPath, String parameterName, DistanceUnit unit) {
+	public static final class MultiValued<C> extends DistanceProjectionDefinition<C> {
+		private final ProjectionAccumulator.Provider<Double, C> accumulator;
+
+		public MultiValued(String fieldPath, String parameterName, DistanceUnit unit,
+				ProjectionAccumulator.Provider<Double, C> accumulator) {
 			super( fieldPath, parameterName, unit );
+			this.accumulator = accumulator;
 		}
 
 		@Override
 		protected boolean multi() {
-			return true;
+			return accumulator.isSingleValued();
 		}
 
 		@Override
-		public SearchProjection<List<Double>> create(SearchProjectionFactory<?, ?> factory,
+		public SearchProjection<C> create(SearchProjectionFactory<?, ?> factory,
 				ProjectionDefinitionContext context) {
 			return factory.withParameters( params -> factory
 					.distance( fieldPath, params.get( parameterName, GeoPoint.class ) )
-					.accumulator( ProjectionAccumulator.list() )
+					.accumulator( accumulator )
 					.unit( unit )
 			).toProjection();
 		}

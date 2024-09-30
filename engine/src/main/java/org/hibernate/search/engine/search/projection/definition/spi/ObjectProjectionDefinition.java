@@ -4,8 +4,6 @@
  */
 package org.hibernate.search.engine.search.projection.definition.spi;
 
-import java.util.List;
-
 import org.hibernate.search.engine.search.projection.ProjectionAccumulator;
 import org.hibernate.search.engine.search.projection.SearchProjection;
 import org.hibernate.search.engine.search.projection.definition.ProjectionDefinitionContext;
@@ -66,21 +64,25 @@ public abstract class ObjectProjectionDefinition<P, T>
 	}
 
 	@Incubating
-	public static final class MultiValued<T> extends ObjectProjectionDefinition<List<T>, T> {
-		public MultiValued(String fieldPath, CompositeProjectionDefinition<T> delegate) {
+	public static final class MultiValued<C, T> extends ObjectProjectionDefinition<C, T> {
+		private final ProjectionAccumulator.Provider<T, C> accumulator;
+
+		public MultiValued(String fieldPath, CompositeProjectionDefinition<T> delegate,
+				ProjectionAccumulator.Provider<T, C> accumulator) {
 			super( fieldPath, delegate );
+			this.accumulator = accumulator;
 		}
 
 		@Override
 		protected boolean multi() {
-			return true;
+			return accumulator.isSingleValued();
 		}
 
 		@Override
-		public SearchProjection<List<T>> create(SearchProjectionFactory<?, ?> factory,
+		public SearchProjection<C> create(SearchProjectionFactory<?, ?> factory,
 				ProjectionDefinitionContext context) {
 			return delegate.apply( factory.withRoot( fieldPath ), factory.object( fieldPath ), context )
-					.accumulator( ProjectionAccumulator.list() ).toProjection();
+					.accumulator( accumulator ).toProjection();
 		}
 	}
 }

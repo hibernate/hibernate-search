@@ -25,7 +25,6 @@ import org.hibernate.search.mapper.pojo.mapping.definition.annotation.ObjectProj
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.ProjectionConstructor;
 import org.hibernate.search.mapper.pojo.standalone.mapping.SearchMapping;
 import org.hibernate.search.util.common.SearchException;
-import org.hibernate.search.util.impl.integrationtest.common.reporting.FailureReportUtils;
 import org.hibernate.search.util.impl.integrationtest.mapper.pojo.standalone.StandalonePojoMappingSetupHelper;
 import org.hibernate.search.util.impl.test.annotation.TestForIssue;
 
@@ -718,19 +717,33 @@ class ProjectionConstructorFieldProjectionIT extends AbstractProjectionConstruct
 			}
 		}
 
-		assertThatThrownBy( () -> setupHelper.start()
+		backendMock.expectAnySchema( INDEX_NAME );
+		SearchMapping mapping = setupHelper.start()
 				.withAnnotatedTypes( MyProjection.class )
-				.setup( IndexedEntity.class ) )
-				.isInstanceOf( SearchException.class )
-				.satisfies( FailureReportUtils.hasFailureReport()
-						.typeContext( MyProjection.class.getName() )
-						.constructorContext( ProjectionConstructorFieldProjectionIT.class, Set.class, List.class )
-						.methodParameterContext( 1, "text" )
-						.failure( "Invalid parameter type for projection constructor",
-								"java.util.Set<java.lang.String>",
-								"When inferring the cardinality of inner projections from constructor parameters,"
-										+ " multi-valued constructor parameters must be lists (java.util.List<...>)"
-										+ " or list supertypes (java.lang.Iterable<...>, java.util.Collection<...>)" ) );
+				.setup( IndexedEntity.class );
+
+		testSuccessfulRootProjection(
+				mapping, IndexedEntity.class, MyProjection.class,
+				Arrays.asList(
+						Arrays.asList( Set.of( "result1_1", "result1_2" ), Arrays.asList( 11, 12 ) ),
+						Arrays.asList( Set.of( "result2_1" ), Arrays.asList( 21 ) ),
+						Arrays.asList( Set.of(), Collections.emptyList() ),
+						Arrays.asList( Set.of( "result4_1" ), Arrays.asList( 41 ) )
+				),
+				f -> f.composite()
+						.from(
+								dummyProjectionForEnclosingClassInstance( f ),
+								f.field( "text", String.class ).multi( MultiProjectionTypeReference.set() ),
+								f.field( "integer", Integer.class ).multi()
+						)
+						.asList(),
+				Arrays.asList(
+						new MyProjection( Set.of( "result1_1", "result1_2" ), Arrays.asList( 11, 12 ) ),
+						new MyProjection( Set.of( "result2_1" ), Arrays.asList( 21 ) ),
+						new MyProjection( Set.of(), Collections.emptyList() ),
+						new MyProjection( Set.of( "result4_1" ), Arrays.asList( 41 ) )
+				)
+		);
 	}
 
 }

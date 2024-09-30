@@ -5,10 +5,10 @@
 package org.hibernate.search.mapper.pojo.search.definition.binding.builtin;
 
 import java.lang.invoke.MethodHandles;
-import java.util.List;
 import java.util.Optional;
 import java.util.function.Function;
 
+import org.hibernate.search.engine.search.projection.ProjectionAccumulator;
 import org.hibernate.search.engine.search.projection.SearchProjection;
 import org.hibernate.search.engine.search.projection.definition.ProjectionDefinitionContext;
 import org.hibernate.search.engine.search.projection.definition.spi.AbstractProjectionDefinition;
@@ -87,10 +87,14 @@ public final class HighlightProjectionBinder implements ProjectionBinder {
 		Optional<? extends ProjectionBindingMultiContext> multiOptional = context.multi();
 
 		if ( multiOptional.isPresent() ) {
-			if ( !rawType.isAssignableFrom( List.class ) ) {
-				throw log.invalidParameterTypeForHighlightProjectionInProjectionConstructor( rawType, "List<String>" );
-			}
-			multiOptional.get().definition( String.class, new Multi( fieldPath, highlighterName ) );
+			ProjectionBindingMultiContext multiContext = multiOptional.get();
+
+			var accumulator = multiContext.projectionAccumulatorProviderFactory()
+					.projectionAccumulatorProvider( multiContext.container().rawType(), String.class );
+			// If the container element type is not string the check in `multiContext.definition`
+			// will fail with a message explaining what went wrong:
+			multiContext.definition( String.class,
+					new Multi<>( fieldPath, accumulator, highlighterName ) );
 		}
 		else {
 			if ( !rawType.isAssignableFrom( String.class ) ) {
@@ -142,20 +146,27 @@ public final class HighlightProjectionBinder implements ProjectionBinder {
 		@Override
 		public SearchProjection<? extends String> create(SearchProjectionFactory<?, ?> factory,
 				ProjectionDefinitionContext context) {
-			return factory.highlight( fieldPath ).highlighter( highlighterName ).single().toProjection();
+			return factory.highlight( fieldPath ).highlighter( highlighterName )
+					.accumulator( ProjectionAccumulator.single() )
+					.toProjection();
 		}
 	}
 
-	private static class Multi extends Definition<List<String>> {
+	private static class Multi<C> extends Definition<C> {
 
-		private Multi(String fieldPath, String highlighterName) {
+		private final ProjectionAccumulator.Provider<String, C> accumulator;
+
+		private Multi(String fieldPath, ProjectionAccumulator.Provider<String, C> accumulator,
+				String highlighterName) {
 			super( fieldPath, highlighterName );
+			this.accumulator = accumulator;
 		}
 
 		@Override
-		public SearchProjection<List<String>> create(SearchProjectionFactory<?, ?> factory,
+		public SearchProjection<C> create(SearchProjectionFactory<?, ?> factory,
 				ProjectionDefinitionContext context) {
-			return factory.highlight( fieldPath ).highlighter( highlighterName ).toProjection();
+			return factory.highlight( fieldPath ).highlighter( highlighterName ).accumulator( accumulator )
+					.toProjection();
 		}
 	}
 }
