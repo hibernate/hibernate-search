@@ -13,19 +13,19 @@ import org.hibernate.search.engine.search.projection.definition.ProjectionDefini
 import org.hibernate.search.engine.search.projection.definition.ProjectionDefinitionContext;
 import org.hibernate.search.engine.search.projection.dsl.SearchProjectionFactory;
 import org.hibernate.search.mapper.pojo.search.definition.binding.ProjectionBinder;
+import org.hibernate.search.mapper.pojo.search.definition.binding.ProjectionBindingContainerContext;
 import org.hibernate.search.mapper.pojo.search.definition.binding.ProjectionBindingContext;
-import org.hibernate.search.mapper.pojo.search.definition.binding.ProjectionBindingMultiContext;
 
 //tag::include[]
 public class MyFieldProjectionBinder implements ProjectionBinder {
 	@Override
 	public void bind(ProjectionBindingContext context) {
-		Optional<? extends ProjectionBindingMultiContext> multi = context.multi(); // <1>
-		if ( multi.isPresent() ) {
-			multi.get().definition( String.class, new MyProjectionDefinition() ); // <2>
+		Optional<? extends ProjectionBindingContainerContext> container = context.container(); // <1>
+		if ( container.isPresent() ) {
+			container.get().definition( String.class, new MyProjectionDefinition() ); // <2>
 		}
 		else {
-			throw new RuntimeException( "This binder only supports multi-valued constructor parameters" ); // <3>
+			throw new RuntimeException( "This binder only supports container-wrapped constructor parameters" ); // <3>
 		}
 	}
 

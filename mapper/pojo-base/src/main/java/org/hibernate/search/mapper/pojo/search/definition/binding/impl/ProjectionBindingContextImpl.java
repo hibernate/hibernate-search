@@ -39,6 +39,7 @@ import org.hibernate.search.mapper.pojo.model.spi.PojoConstructorModel;
 import org.hibernate.search.mapper.pojo.model.spi.PojoRawTypeModel;
 import org.hibernate.search.mapper.pojo.model.spi.PojoTypeModel;
 import org.hibernate.search.mapper.pojo.search.definition.binding.ProjectionBinder;
+import org.hibernate.search.mapper.pojo.search.definition.binding.ProjectionBindingContainerContext;
 import org.hibernate.search.mapper.pojo.search.definition.binding.ProjectionBindingContext;
 import org.hibernate.search.mapper.pojo.search.definition.binding.ProjectionBindingMultiContext;
 import org.hibernate.search.mapper.pojo.search.definition.binding.builtin.FieldProjectionBinder;
@@ -56,7 +57,7 @@ public class ProjectionBindingContextImpl<P> implements ProjectionBindingContext
 			(mappingElement, cyclicRecursionPath) -> log.objectProjectionCyclicRecursion( mappingElement,
 					mappingElement.eventContext(), cyclicRecursionPath );
 
-	private static final Set<String> COLLECTION_CONTAINER_EXTRACTORS = Set.of(
+	private static final Set<String> CONTAINER_EXTRACTORS = Set.of(
 			BuiltinContainerExtractors.ARRAY_OBJECT,
 			BuiltinContainerExtractors.ARRAY_CHAR,
 			BuiltinContainerExtractors.ARRAY_BOOLEAN,
@@ -66,6 +67,16 @@ public class ProjectionBindingContextImpl<P> implements ProjectionBindingContext
 			BuiltinContainerExtractors.ARRAY_LONG,
 			BuiltinContainerExtractors.ARRAY_FLOAT,
 			BuiltinContainerExtractors.ARRAY_DOUBLE,
+			BuiltinContainerExtractors.COLLECTION,
+			BuiltinContainerExtractors.ITERABLE,
+			// and some single ones:
+			BuiltinContainerExtractors.OPTIONAL,
+			BuiltinContainerExtractors.OPTIONAL_DOUBLE,
+			BuiltinContainerExtractors.OPTIONAL_INT,
+			BuiltinContainerExtractors.OPTIONAL_LONG
+	);
+
+	private static final Set<String> MULTI_EXTRACTORS = Set.of(
 			BuiltinContainerExtractors.COLLECTION,
 			BuiltinContainerExtractors.ITERABLE
 	);
@@ -126,23 +137,48 @@ public class ProjectionBindingContextImpl<P> implements ProjectionBindingContext
 	}
 
 	@Override
-	public Optional<MultiContextImpl<?, ?>> multi() {
+	public Optional<MultiContextImpl<?>> multi() {
+		PojoTypeModel<?> boundParameterElement = boundParameterElement( MULTI_EXTRACTORS );
+		if ( boundParameterElement == null ) {
+			return Optional.empty();
+		}
+		else {
+			if ( !mappingHelper.introspector().typeModel( List.class ).isSubTypeOf( parameterTypeModel.rawType() ) ) {
+				throw log.invalidMultiValuedParameterTypeForProjectionConstructor( parameterTypeModel );
+			}
+			return Optional.of( new MultiContextImpl<>( boundParameterElement ) );
+		}
+	}
+
+	@Override
+	public Optional<ContainerContextImpl<?, ?>> container() {
+		PojoTypeModel<?> boundParameterElement = boundParameterElement( CONTAINER_EXTRACTORS );
+		if ( boundParameterElement == null ) {
+			return Optional.empty();
+		}
+		else {
+			return Optional.of( new ContainerContextImpl<>( parameterTypeModel, boundParameterElement ) );
+		}
+	}
+
+	private PojoTypeModel<?> boundParameterElement(Set<String> extractors) {
 		BoundContainerExtractorPath<?, ?> boundParameterElementPath = mappingHelper.indexModelBinder()
 				.bindExtractorPath( parameterTypeModel, ContainerExtractorPath.defaultExtractors() );
 		List<String> boundParameterElementExtractorNames =
 				boundParameterElementPath.getExtractorPath().explicitExtractorNames();
 
 		if ( boundParameterElementExtractorNames.isEmpty() ) {
-			return Optional.empty();
+			return null;
 		}
 		else {
 			if ( boundParameterElementExtractorNames.size() > 1
-					|| !( COLLECTION_CONTAINER_EXTRACTORS.contains( boundParameterElementExtractorNames.get( 0 ) ) ) ) {
+					|| !( extractors.contains( boundParameterElementExtractorNames.get( 0 ) ) ) ) {
 				throw log.invalidMultiValuedParameterTypeForProjectionConstructor( parameterTypeModel );
 			}
-			return Optional.of( new MultiContextImpl<>( parameterTypeModel, boundParameterElementPath.getExtractedType() ) );
+			return boundParameterElementPath.getExtractedType();
 		}
 	}
+
 
 	@Override
 	public PojoModelConstructorParameter constructorParameter() {
@@ -150,32 +186,7 @@ public class ProjectionBindingContextImpl<P> implements ProjectionBindingContext
 	}
 
 	@Override
-	public <T> BeanHolder<? extends ProjectionDefinition<T>> createObjectDefinition(String fieldPath,
-			Class<T> projectedType, TreeFilterDefinition filter) {
-		Contracts.assertNotNull( fieldPath, "fieldPath" );
-		Contracts.assertNotNull( projectedType, "projectedType" );
-		Contracts.assertNotNull( filter, "filter" );
-		Optional<BeanHolder<? extends ProjectionDefinition<T>>> objectProjection = nestObjectProjection(
-				fieldPath, filter,
-				nestingContext -> {
-					CompositeProjectionDefinition<T> composite =
-							createCompositeProjectionDefinition( projectedType, nestingContext );
-					try {
-						return BeanHolder.ofCloseable( new ObjectProjectionDefinition.SingleValued<>(
-								fieldPath, composite ) );
-					}
-					catch (RuntimeException e) {
-						new SuppressingCloser( e )
-								.push( composite );
-						throw e;
-					}
-				}
-		);
-		return objectProjection.orElse( ConstantProjectionDefinition.nullValue() );
-	}
-
-	@Override
-	public <C, T> BeanHolder<? extends ProjectionDefinition<C>> createObjectDefinitionAccumulator(String fieldPath,
+	public <C, T> BeanHolder<? extends ProjectionDefinition<C>> createObjectDefinition(String fieldPath,
 			Class<T> projectedType, TreeFilterDefinition filter,
 			ProjectionAccumulator.Provider<T, C> accumulator) {
 		Contracts.assertNotNull( fieldPath, "fieldPath" );
@@ -188,12 +199,11 @@ public class ProjectionBindingContextImpl<P> implements ProjectionBindingContext
 					CompositeProjectionDefinition<T> composite =
 							createCompositeProjectionDefinition( projectedType, nestingContext );
 					try {
-						return BeanHolder.ofCloseable( new ObjectProjectionDefinition.MultiValued<>(
+						return BeanHolder.ofCloseable( new ObjectProjectionDefinition.WrappedValued<>(
 								fieldPath, composite, accumulator ) );
 					}
 					catch (RuntimeException e) {
-						new SuppressingCloser( e )
-								.push( composite );
+						new SuppressingCloser( e ).push( composite );
 						throw e;
 					}
 				}
@@ -289,11 +299,11 @@ public class ProjectionBindingContextImpl<P> implements ProjectionBindingContext
 	}
 
 	public BeanHolder<? extends ProjectionDefinition<?>> applyDefaultProjection() {
-		Optional<? extends ProjectionBindingContextImpl<?>.MultiContextImpl<?, ?>> multi = multi();
+		Optional<ContainerContextImpl<?, ?>> container = container();
 		PojoConstructorModel<?> constructorModelOrNull;
-		if ( multi.isPresent() ) {
+		if ( container.isPresent() ) {
 			constructorModelOrNull = parameterBinder.findProjectionConstructorOrNull(
-					multi.get().parameterContainerElementTypeModel.rawType() );
+					container.get().parameterContainerElementTypeModel.rawType() );
 		}
 		else {
 			constructorModelOrNull = parameterBinder.findProjectionConstructorOrNull(
@@ -329,12 +339,57 @@ public class ProjectionBindingContextImpl<P> implements ProjectionBindingContext
 		}
 	}
 
-	public class MultiContextImpl<CV, PV> implements ProjectionBindingMultiContext, ProjectionAccumulatorProviderFactory {
+	public class MultiContextImpl<PV> implements ProjectionBindingMultiContext {
+		public final PojoTypeModel<PV> parameterContainerElementTypeModel;
+		private final PojoModelValue<PV> parameterContainerElementRootElement;
+
+		public MultiContextImpl(PojoTypeModel<PV> parameterContainerElementTypeModel) {
+			this.parameterContainerElementTypeModel = parameterContainerElementTypeModel;
+			this.parameterContainerElementRootElement = new PojoModelValueElement<>( mappingHelper.introspector(),
+					parameterContainerElementTypeModel );
+		}
+
+		@Override
+		public <P2> void definition(Class<P2> expectedValueType,
+				ProjectionDefinition<? extends List<? extends P2>> definition) {
+			definition( expectedValueType, BeanHolder.of( definition ) );
+		}
+
+		@Override
+		public <P2> void definition(Class<P2> expectedValueType,
+				BeanHolder<? extends ProjectionDefinition<? extends List<? extends P2>>> definitionHolder) {
+			checkAndBind( definitionHolder, mappingHelper.introspector().typeModel( expectedValueType ) );
+		}
+
+		@Override
+		public PojoModelValue<PV> containerElement() {
+			return parameterContainerElementRootElement;
+		}
+
+		private <C, P2> void checkAndBind(
+				BeanHolder<? extends ProjectionDefinition<? extends C>> definitionHolder,
+				PojoRawTypeModel<P2> expectedValueType) {
+			if ( !expectedValueType.isSubTypeOf( parameterContainerElementTypeModel.rawType() ) ) {
+				throw log.invalidOutputTypeForMultiValuedProjectionDefinition( definitionHolder.get(), parameterTypeModel,
+						expectedValueType );
+			}
+
+			@SuppressWarnings("unchecked") // We check that P2 extends PV explicitly using reflection (see above) and we've already checked that P = List<? extends PV>
+			BeanHolder<? extends ProjectionDefinition<? extends P>> castDefinitionHolder =
+					(BeanHolder<? extends ProjectionDefinition<? extends P>>) definitionHolder;
+
+			partialBinding = new PartialBinding<>( castDefinitionHolder );
+		}
+	}
+
+	public class ContainerContextImpl<CV, PV>
+			implements ProjectionBindingContainerContext, ProjectionAccumulatorProviderFactory {
 		public final PojoTypeModel<PV> parameterContainerElementTypeModel;
 		private final PojoModelValue<PV> parameterContainerElementRootElement;
 		private final PojoModelValue<CV> parameterContainerRootElement;
 
-		public MultiContextImpl(PojoTypeModel<CV> containerTypeModel, PojoTypeModel<PV> parameterContainerElementTypeModel) {
+		public ContainerContextImpl(PojoTypeModel<CV> containerTypeModel,
+				PojoTypeModel<PV> parameterContainerElementTypeModel) {
 			this.parameterContainerElementTypeModel = parameterContainerElementTypeModel;
 			this.parameterContainerElementRootElement = new PojoModelValueElement<>( mappingHelper.introspector(),
 					parameterContainerElementTypeModel );
