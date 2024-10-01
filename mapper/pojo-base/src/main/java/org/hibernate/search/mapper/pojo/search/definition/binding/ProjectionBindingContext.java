@@ -151,7 +151,7 @@ public interface ProjectionBindingContext {
 	@Incubating
 	default <T> BeanHolder<? extends ProjectionDefinition<T>> createObjectDefinition(String fieldPath, Class<T> projectedType,
 			TreeFilterDefinition filter) {
-		return createObjectDefinition( fieldPath, projectedType, filter, ProjectionAccumulator.single() );
+		return createObjectDefinition( fieldPath, projectedType, filter, ProjectionAccumulator.nullable() );
 	}
 
 	/**

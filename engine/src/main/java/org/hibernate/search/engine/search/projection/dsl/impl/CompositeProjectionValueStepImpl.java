@@ -4,8 +4,6 @@
  */
 package org.hibernate.search.engine.search.projection.dsl.impl;
 
-import java.util.List;
-
 import org.hibernate.search.engine.search.projection.ProjectionAccumulator;
 import org.hibernate.search.engine.search.projection.SearchProjection;
 import org.hibernate.search.engine.search.projection.dsl.CompositeProjectionOptionsStep;
@@ -19,12 +17,7 @@ public class CompositeProjectionValueStepImpl<T>
 
 	public CompositeProjectionValueStepImpl(CompositeProjectionBuilder builder,
 			SearchProjection<?>[] inners, ProjectionCompositor<?, T> compositor) {
-		super( builder, inners, compositor, ProjectionAccumulator.single() );
-	}
-
-	@Override
-	public CompositeProjectionOptionsStep<?, List<T>> multi() {
-		return accumulator( ProjectionAccumulator.list() );
+		super( builder, inners, compositor, ProjectionAccumulator.nullable() );
 	}
 
 	@Override

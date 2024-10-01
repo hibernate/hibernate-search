@@ -81,7 +81,7 @@ public class LuceneSearchQuerySelectStepImpl<R, E, LOS>
 	public LuceneSearchQueryWhereStep<List<?>, LOS> select(SearchProjection<?>... projections) {
 		return select( scope.projectionBuilders().composite()
 				.build( projections, ProjectionCompositor.fromList( projections.length ),
-						ProjectionAccumulator.single() ) );
+						ProjectionAccumulator.nullable() ) );
 	}
 
 	@Override

@@ -34,7 +34,9 @@ public interface FieldProjectionValueStep<N extends FieldProjectionOptionsStep<?
 	 * @deprecated Use {@link #accumulator(ProjectionAccumulator.Provider)} instead.
 	 */
 	@Deprecated(since = "8.0")
-	FieldProjectionOptionsStep<?, List<T>> multi();
+	default FieldProjectionOptionsStep<?, List<T>> multi() {
+		return accumulator( ProjectionAccumulator.list() );
+	}
 
 	/**
 	 * Defines how to accumulate field projection values.

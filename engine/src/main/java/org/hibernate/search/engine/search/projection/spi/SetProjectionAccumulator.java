@@ -21,7 +21,7 @@ final class SetProjectionAccumulator<E, V> extends ListBasedProjectionAccumulato
 		private final SetProjectionAccumulator instance = new SetProjectionAccumulator();
 
 		@Override
-		public ProjectionAccumulator get() {
+		public org.hibernate.search.engine.search.projection.ProjectionAccumulator get() {
 			return instance;
 		}
 

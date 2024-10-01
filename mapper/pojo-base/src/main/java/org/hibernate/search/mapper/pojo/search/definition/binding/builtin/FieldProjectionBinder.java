@@ -104,7 +104,7 @@ public final class FieldProjectionBinder implements ProjectionBinder {
 	private <T> void bind(ProjectionBindingContext context, String fieldPath, Class<T> constructorParameterType) {
 		context.definition( constructorParameterType, context.isIncluded( fieldPath )
 				? BeanHolder.of( new FieldProjectionDefinition.AccumulatedValued<>( fieldPath, constructorParameterType,
-						ProjectionAccumulator.single(), valueModel ) )
+						ProjectionAccumulator.nullable(), valueModel ) )
 				: ConstantProjectionDefinition.nullValue() );
 	}
 

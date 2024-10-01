@@ -77,7 +77,7 @@ public final class DefaultSearchQuerySelectStep<R, E, LOS>
 	public DefaultSearchQueryOptionsStep<List<?>, LOS> select(SearchProjection<?>... projections) {
 		return select( scope.projectionBuilders().composite()
 				.build( projections, ProjectionCompositor.fromList( projections.length ),
-						ProjectionAccumulator.single() ) );
+						ProjectionAccumulator.nullable() ) );
 	}
 
 	@Override

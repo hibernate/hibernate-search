@@ -9,14 +9,16 @@ import java.util.Collection;
 import java.util.List;
 
 /**
- * A {@link ProjectionAccumulator} that can accumulate any number of values into a {@link List},
+ * A {@link org.hibernate.search.engine.search.projection.ProjectionAccumulator} that can accumulate any number of values into a {@link List},
  * and transforms that list into an arbitrary container on {@link #finish(List)}.
  *
  * @param <E> The type of extracted values to accumulate before being transformed.
  * @param <V> The type of values to accumulate obtained by transforming extracted values ({@code E}).
  * @param <R> The type of the final result containing values of type {@code V}.
  */
-abstract class ListBasedProjectionAccumulator<E, V, R> implements ProjectionAccumulator<E, V, List<Object>, R> {
+@SuppressWarnings("deprecation")
+abstract class ListBasedProjectionAccumulator<E, V, R>
+		implements org.hibernate.search.engine.search.projection.ProjectionAccumulator<E, V, List<Object>, R> {
 
 	ListBasedProjectionAccumulator() {
 	}

@@ -39,8 +39,8 @@ import org.hibernate.search.engine.search.projection.spi.BuiltInProjectionAccumu
  */
 public interface ProjectionAccumulator<E, V, A, R> {
 
-	static <V> ProjectionAccumulator.Provider<V, V> single() {
-		return BuiltInProjectionAccumulators.single();
+	static <V> ProjectionAccumulator.Provider<V, V> nullable() {
+		return BuiltInProjectionAccumulators.nullable();
 	}
 
 	static <V> Provider<V, List<V>> list() {

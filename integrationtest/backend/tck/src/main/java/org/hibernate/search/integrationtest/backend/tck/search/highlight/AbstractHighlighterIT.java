@@ -500,7 +500,7 @@ abstract class AbstractHighlighterIT {
 		StubMappingScope scope = index.createScope();
 
 		SearchQuery<String> highlights = scope.query().select(
-				f -> f.highlight( "anotherString" ).accumulator( ProjectionAccumulator.single() )
+				f -> f.highlight( "anotherString" ).accumulator( ProjectionAccumulator.nullable() )
 		)
 				.where( f -> f.match().field( "anotherString" ).matching( "ipsum" ) )
 				.highlighter( h -> highlighter( h ).numberOfFragments( 1 ) )
@@ -550,8 +550,9 @@ abstract class AbstractHighlighterIT {
 				);
 	}
 
+	@Deprecated
 	@Test
-	void numberOfFragmentsSingleError() {
+	void numberOfFragmentsSingleErrorSingle() {
 		StubMappingScope scope = index.createScope();
 
 		// numberOfFragments > 1
@@ -577,12 +578,55 @@ abstract class AbstractHighlighterIT {
 						"A single-valued highlight projection requested, but the corresponding highlighter does not set number of fragments to 1" );
 	}
 
+	@Deprecated
+	@Test
+	void numberOfFragmentsSingleButNoExpectedValuesReturnedSingle() {
+		StubMappingScope scope = index.createScope();
+
+		SearchQuery<String> highlights = scope.query().select(
+				f -> f.highlight( "anotherString" ).single()
+		)
+				.where( f -> f.match().field( "anotherString" ).matching( "thisCannotBeMatchedToAnythingInTheText" ) )
+				.highlighter( h -> highlighter( h ).numberOfFragments( 1 ) )
+				.toQuery();
+
+		assertThatHits( highlights.fetchAllHits() )
+				.hasHitsAnyOrder( List.of() );
+	}
+
+	@Test
+	void numberOfFragmentsSingleError() {
+		StubMappingScope scope = index.createScope();
+
+		// numberOfFragments > 1
+		assertThatThrownBy( () -> scope.query().select(
+				f -> f.highlight( "anotherString" ).accumulator( ProjectionAccumulator.nullable() )
+		)
+				.where( f -> f.match().field( "anotherString" ).matching( "ipsum" ) )
+				.highlighter( h -> highlighter( h ).numberOfFragments( 2 ) )
+				.toQuery()
+		).isInstanceOf( SearchException.class )
+				.hasMessageContainingAll(
+						"A single-valued highlight projection requested, but the corresponding highlighter does not set number of fragments to 1" );
+
+		// numberOfFragments not defined
+		assertThatThrownBy( () -> scope.query().select(
+				f -> f.highlight( "anotherString" ).accumulator( ProjectionAccumulator.nullable() )
+		)
+				.where( f -> f.match().field( "anotherString" ).matching( "ipsum" ) )
+				.highlighter( h -> highlighter( h ) )
+				.toQuery()
+		).isInstanceOf( SearchException.class )
+				.hasMessageContainingAll(
+						"A single-valued highlight projection requested, but the corresponding highlighter does not set number of fragments to 1" );
+	}
+
 	@Test
 	void numberOfFragmentsSingleButNoExpectedValuesReturned() {
 		StubMappingScope scope = index.createScope();
 
 		SearchQuery<String> highlights = scope.query().select(
-				f -> f.highlight( "anotherString" ).single()
+				f -> f.highlight( "anotherString" ).accumulator( ProjectionAccumulator.nullable() )
 		)
 				.where( f -> f.match().field( "anotherString" ).matching( "thisCannotBeMatchedToAnythingInTheText" ) )
 				.highlighter( h -> highlighter( h ).numberOfFragments( 1 ) )

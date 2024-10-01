@@ -118,7 +118,7 @@ public final class DistanceProjectionBinder implements ProjectionBinder {
 	private void bind(ProjectionBindingContext context, String fieldPath) {
 		context.definition( Double.class, context.isIncluded( fieldPath )
 				? BeanHolder.of( new DistanceProjectionDefinition.WrappedValued<>( fieldPath, parameterName, unit,
-						ProjectionAccumulator.single() ) )
+						ProjectionAccumulator.nullable() ) )
 				: ConstantProjectionDefinition.nullValue() );
 	}
 

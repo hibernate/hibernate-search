@@ -36,6 +36,7 @@ final class ArrayProjectionAccumulator<E, V> extends ListBasedProjectionAccumula
 		return array;
 	}
 
+	@SuppressWarnings("unchecked")
 	private static class ArrayProvider<U, R> implements Provider<U, R> {
 		private final ArrayProjectionAccumulator<?, U> instance;
 
@@ -44,8 +45,8 @@ final class ArrayProjectionAccumulator<E, V> extends ListBasedProjectionAccumula
 		}
 
 		@Override
-		public <T> ProjectionAccumulator<T, U, ?, R> get() {
-			return (ProjectionAccumulator<T, U, ?, R>) instance;
+		public <T> org.hibernate.search.engine.search.projection.ProjectionAccumulator<T, U, ?, R> get() {
+			return (org.hibernate.search.engine.search.projection.ProjectionAccumulator<T, U, ?, R>) instance;
 		}
 
 		@Override

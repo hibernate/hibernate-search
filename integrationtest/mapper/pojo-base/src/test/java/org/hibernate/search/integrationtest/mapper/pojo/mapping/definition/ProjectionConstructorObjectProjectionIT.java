@@ -976,7 +976,7 @@ class ProjectionConstructorObjectProjectionIT extends AbstractProjectionConstruc
 												f.field( "contained.integer", Integer.class )
 										)
 										.asList()
-										.multi( MultiProjectionTypeReference.set() )
+										.accumulator( ProjectionAccumulator.set() )
 						)
 						.asList(),
 				Arrays.asList(
