@@ -17,7 +17,7 @@ import java.util.function.Function;
 public interface BuiltInProjectionAccumulators {
 
 	@SuppressWarnings("unchecked") // PROVIDER works for any V.
-	static <V> org.hibernate.search.engine.search.projection.ProjectionAccumulator.Provider<V, V> single() {
+	static <V> org.hibernate.search.engine.search.projection.ProjectionAccumulator.Provider<V, V> nullable() {
 		return SingleValuedProjectionAccumulator.PROVIDER;
 	}
 

@@ -733,8 +733,8 @@ class ProjectionConstructorFieldProjectionIT extends AbstractProjectionConstruct
 				f -> f.composite()
 						.from(
 								dummyProjectionForEnclosingClassInstance( f ),
-								f.field( "text", String.class ).multi( MultiProjectionTypeReference.set() ),
-								f.field( "integer", Integer.class ).multi()
+								f.field( "text", String.class ).accumulator( ProjectionAccumulator.set() ),
+								f.field( "integer", Integer.class ).accumulator( ProjectionAccumulator.list() )
 						)
 						.asList(),
 				Arrays.asList(

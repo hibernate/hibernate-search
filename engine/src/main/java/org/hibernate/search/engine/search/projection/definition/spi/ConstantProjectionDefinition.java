@@ -54,7 +54,7 @@ public final class ConstantProjectionDefinition<T> extends AbstractProjectionDef
 	public static <T> BeanHolder<ConstantProjectionDefinition<T>> empty(ProjectionAccumulator.Provider<?, T> accumulator) {
 		T empty = accumulator.get().empty();
 
-		if ( ProjectionAccumulator.single().equals( accumulator ) ) {
+		if ( ProjectionAccumulator.nullable().equals( accumulator ) ) {
 			return nullValue();
 		}
 		if ( ProjectionAccumulator.optional().equals( accumulator ) ) {

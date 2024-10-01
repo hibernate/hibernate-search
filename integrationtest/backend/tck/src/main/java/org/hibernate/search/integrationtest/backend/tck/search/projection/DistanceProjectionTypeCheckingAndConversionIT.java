@@ -92,7 +92,7 @@ class DistanceProjectionTypeCheckingAndConversionIT {
 				.hasMessageContainingAll(
 						"Invalid cardinality for projection on field '" + fieldPath + "'",
 						"the projection is single-valued, but this field is multi-valued",
-						"Make sure to call '.multi()' when you create the projection"
+						"Make sure to call '.accumulator(...)' when you create the projection"
 				);
 	}
 
@@ -110,7 +110,7 @@ class DistanceProjectionTypeCheckingAndConversionIT {
 				.hasMessageContaining(
 						"Invalid cardinality for projection on field '" + fieldPath + "'",
 						"the projection is single-valued, but this field is multi-valued",
-						"Make sure to call '.multi()' when you create the projection"
+						"Make sure to call '.accumulator(...)' when you create the projection"
 				);
 	}
 
@@ -128,7 +128,7 @@ class DistanceProjectionTypeCheckingAndConversionIT {
 				.hasMessageContaining(
 						"Invalid cardinality for projection on field '" + fieldPath + "'",
 						"the projection is single-valued, but this field is multi-valued",
-						"Make sure to call '.multi()' when you create the projection"
+						"Make sure to call '.accumulator(...)' when you create the projection"
 				);
 	}
 

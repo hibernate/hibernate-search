@@ -37,7 +37,9 @@ public interface CompositeProjectionValueStep<N extends CompositeProjectionOptio
 	 * @deprecated Use {@link #accumulator(ProjectionAccumulator.Provider)} instead.
 	 */
 	@Deprecated(since = "8.0")
-	CompositeProjectionOptionsStep<?, List<T>> multi();
+	default CompositeProjectionOptionsStep<?, List<T>> multi() {
+		return accumulator( ProjectionAccumulator.list() );
+	}
 
 	/**
 	 * Defines how to accumulate composite projection values.

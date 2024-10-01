@@ -17,7 +17,7 @@ public interface DistanceToFieldProjectionBuilder extends SearchProjectionBuilde
 
 	@Override
 	default SearchProjection<Double> build() {
-		return build( ProjectionAccumulator.single() );
+		return build( ProjectionAccumulator.nullable() );
 	}
 
 	<P> SearchProjection<P> build(ProjectionAccumulator.Provider<Double, P> accumulatorProvider);
