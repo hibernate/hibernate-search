@@ -59,9 +59,22 @@ public interface ProjectionBindingContext {
 	 * @return An optional containing a context that can be used to bind a projection
 	 * if the type of the {@link #constructorParameter()} can be bound to a multi-valued projection;
 	 * an empty optional otherwise.
+	 * @deprecated Use {@link #container()} instead.
 	 */
+	@Deprecated(since = "8.0")
 	@Incubating
 	Optional<? extends ProjectionBindingMultiContext> multi();
+
+	/**
+	 * Inspects the type of the {@link #constructorParameter()}
+	 * to determine if it may be bound to a multi-valued projection.
+	 *
+	 * @return An optional containing a context that can be used to bind a projection
+	 * if the type of the {@link #constructorParameter()} can be bound to a multi-valued projection;
+	 * an empty optional otherwise.
+	 */
+	@Incubating
+	Optional<? extends ProjectionBindingContainerContext> container();
 
 	/**
 	 * @return A bean provider, allowing the retrieval of beans,
@@ -136,25 +149,9 @@ public interface ProjectionBindingContext {
 	 * @see org.hibernate.search.engine.search.projection.dsl.CompositeProjectionInnerStep#as(Class)
 	 */
 	@Incubating
-	<T> BeanHolder<? extends ProjectionDefinition<T>> createObjectDefinition(String fieldPath, Class<T> projectedType,
-			TreeFilterDefinition filter);
-
-	/**
-	 * @param fieldPath The (relative) path to an object field in the indexed document.
-	 * @param projectedType A type expected to have a corresponding projection mapping
-	 * (e.g. using {@link org.hibernate.search.mapper.pojo.mapping.definition.annotation.ProjectionConstructor}).
-	 * @param filter The filter to apply to determine which nested index field projections should be included in the projection.
-	 * See {@link ObjectProjection#includePaths()}, {@link ObjectProjection#excludePaths()},
-	 * {@link ObjectProjection#includeDepth()}, ...
-	 * @return A multi-valued object projection definition for the given type.
-	 * @throws SearchException If mapping the given type to a projection definition fails.
-	 * @see org.hibernate.search.engine.search.projection.dsl.SearchProjectionFactory#object(String)
-	 * @see org.hibernate.search.engine.search.projection.dsl.CompositeProjectionInnerStep#as(Class)
-	 */
-	@Incubating
-	default <T> BeanHolder<? extends ProjectionDefinition<List<T>>> createObjectDefinitionMulti(String fieldPath,
-			Class<T> projectedType, TreeFilterDefinition filter) {
-		return createObjectDefinitionAccumulator( fieldPath, projectedType, filter, ProjectionAccumulator.list() );
+	default <T> BeanHolder<? extends ProjectionDefinition<T>> createObjectDefinition(String fieldPath, Class<T> projectedType,
+			TreeFilterDefinition filter) {
+		return createObjectDefinition( fieldPath, projectedType, filter, ProjectionAccumulator.single() );
 	}
 
 	/**
@@ -168,9 +165,29 @@ public interface ProjectionBindingContext {
 	 * @throws SearchException If mapping the given type to a projection definition fails.
 	 * @see org.hibernate.search.engine.search.projection.dsl.SearchProjectionFactory#object(String)
 	 * @see org.hibernate.search.engine.search.projection.dsl.CompositeProjectionInnerStep#as(Class)
+	 * @deprecated Use {@link #createObjectDefinition(String, Class, TreeFilterDefinition, ProjectionAccumulator.Provider)} instead.
+	 */
+	@Deprecated(since = "8.0")
+	@Incubating
+	default <T> BeanHolder<? extends ProjectionDefinition<List<T>>> createObjectDefinitionMulti(String fieldPath,
+			Class<T> projectedType, TreeFilterDefinition filter) {
+		return createObjectDefinition( fieldPath, projectedType, filter, ProjectionAccumulator.list() );
+	}
+
+	/**
+	 * @param fieldPath The (relative) path to an object field in the indexed document.
+	 * @param projectedType A type expected to have a corresponding projection mapping
+	 * (e.g. using {@link org.hibernate.search.mapper.pojo.mapping.definition.annotation.ProjectionConstructor}).
+	 * @param filter The filter to apply to determine which nested index field projections should be included in the projection.
+	 * See {@link ObjectProjection#includePaths()}, {@link ObjectProjection#excludePaths()},
+	 * {@link ObjectProjection#includeDepth()}, ...
+	 * @return A container-wrapped object projection definition for the given type.
+	 * @throws SearchException If mapping the given type to a projection definition fails.
+	 * @see org.hibernate.search.engine.search.projection.dsl.SearchProjectionFactory#object(String)
+	 * @see org.hibernate.search.engine.search.projection.dsl.CompositeProjectionInnerStep#as(Class)
 	 */
 	@Incubating
-	<C, T> BeanHolder<? extends ProjectionDefinition<C>> createObjectDefinitionAccumulator(String fieldPath,
+	<C, T> BeanHolder<? extends ProjectionDefinition<C>> createObjectDefinition(String fieldPath,
 			Class<T> projectedType, TreeFilterDefinition filter, ProjectionAccumulator.Provider<T, C> accumulator);
 
 	/**
