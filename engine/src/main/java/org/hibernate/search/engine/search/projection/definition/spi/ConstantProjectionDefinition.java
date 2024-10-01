@@ -6,6 +6,7 @@ package org.hibernate.search.engine.search.projection.definition.spi;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 import java.util.SortedSet;
 
@@ -31,6 +32,9 @@ public final class ConstantProjectionDefinition<T> extends AbstractProjectionDef
 	@SuppressWarnings("rawtypes")
 	private static final BeanHolder<? extends ConstantProjectionDefinition> EMPTY_SORTED_SET_INSTANCE =
 			BeanHolder.of( new ConstantProjectionDefinition<SortedSet>( Collections.emptySortedSet() ) );
+	@SuppressWarnings("rawtypes")
+	private static final BeanHolder<? extends ConstantProjectionDefinition> OPTIONAL_EMPTY_INSTANCE =
+			BeanHolder.of( new ConstantProjectionDefinition<Optional>( Optional.empty() ) );
 
 	@SuppressWarnings("unchecked") // NULL_VALUE_INSTANCE works for any T
 	public static <T> BeanHolder<ConstantProjectionDefinition<T>> nullValue() {
@@ -50,6 +54,12 @@ public final class ConstantProjectionDefinition<T> extends AbstractProjectionDef
 	public static <T> BeanHolder<ConstantProjectionDefinition<T>> empty(ProjectionAccumulator.Provider<?, T> accumulator) {
 		T empty = accumulator.get().empty();
 
+		if ( ProjectionAccumulator.single().equals( accumulator ) ) {
+			return nullValue();
+		}
+		if ( ProjectionAccumulator.optional().equals( accumulator ) ) {
+			return (BeanHolder<ConstantProjectionDefinition<T>>) OPTIONAL_EMPTY_INSTANCE;
+		}
 		if ( ProjectionAccumulator.list().equals( accumulator ) ) {
 			return (BeanHolder<ConstantProjectionDefinition<T>>) EMPTY_LIST_INSTANCE;
 		}

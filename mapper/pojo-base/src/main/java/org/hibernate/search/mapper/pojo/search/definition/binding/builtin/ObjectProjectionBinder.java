@@ -12,8 +12,8 @@ import org.hibernate.search.engine.search.projection.ProjectionAccumulator;
 import org.hibernate.search.mapper.pojo.logging.impl.Log;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.ObjectProjection;
 import org.hibernate.search.mapper.pojo.search.definition.binding.ProjectionBinder;
+import org.hibernate.search.mapper.pojo.search.definition.binding.ProjectionBindingContainerContext;
 import org.hibernate.search.mapper.pojo.search.definition.binding.ProjectionBindingContext;
-import org.hibernate.search.mapper.pojo.search.definition.binding.ProjectionBindingMultiContext;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
 /**
@@ -92,11 +92,11 @@ public final class ObjectProjectionBinder implements ProjectionBinder {
 
 	@Override
 	public void bind(ProjectionBindingContext context) {
-		Optional<? extends ProjectionBindingMultiContext> multiOptional = context.multi();
+		Optional<? extends ProjectionBindingContainerContext> containerOptional = context.container();
 		String fieldPath = fieldPathOrFail( context );
-		if ( multiOptional.isPresent() ) {
-			ProjectionBindingMultiContext multi = multiOptional.get();
-			bind( context, multi, fieldPath, multi.containerElement().rawType() );
+		if ( containerOptional.isPresent() ) {
+			ProjectionBindingContainerContext container = containerOptional.get();
+			bind( context, container, fieldPath, container.containerElement().rawType() );
 		}
 		else {
 			bind( context, fieldPath, context.constructorParameter().rawType() );
@@ -108,15 +108,15 @@ public final class ObjectProjectionBinder implements ProjectionBinder {
 				context.createObjectDefinition( fieldPath, constructorParameterType, filter ) );
 	}
 
-	private <T> void bind(ProjectionBindingContext context, ProjectionBindingMultiContext multi,
+	private <T> void bind(ProjectionBindingContext context, ProjectionBindingContainerContext container,
 			String fieldPath, Class<T> containerElementType) {
 
-		ProjectionAccumulator.Provider<T, ?> accumulator = multi.projectionAccumulatorProviderFactory()
-				.projectionAccumulatorProvider( multi.container().rawType(), containerElementType );
+		ProjectionAccumulator.Provider<T, ?> accumulator = container.projectionAccumulatorProviderFactory()
+				.projectionAccumulatorProvider( container.container().rawType(), containerElementType );
 
-		multi.definition(
+		container.definition(
 				containerElementType,
-				context.createObjectDefinitionAccumulator( fieldPath, containerElementType, filter, accumulator )
+				context.createObjectDefinition( fieldPath, containerElementType, filter, accumulator )
 		);
 	}
 

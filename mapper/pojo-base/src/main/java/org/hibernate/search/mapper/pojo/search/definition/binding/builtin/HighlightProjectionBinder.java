@@ -15,8 +15,8 @@ import org.hibernate.search.engine.search.projection.definition.spi.AbstractProj
 import org.hibernate.search.engine.search.projection.dsl.SearchProjectionFactory;
 import org.hibernate.search.mapper.pojo.logging.impl.Log;
 import org.hibernate.search.mapper.pojo.search.definition.binding.ProjectionBinder;
+import org.hibernate.search.mapper.pojo.search.definition.binding.ProjectionBindingContainerContext;
 import org.hibernate.search.mapper.pojo.search.definition.binding.ProjectionBindingContext;
-import org.hibernate.search.mapper.pojo.search.definition.binding.ProjectionBindingMultiContext;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 import org.hibernate.search.util.common.spi.ToStringTreeAppender;
 
@@ -84,23 +84,23 @@ public final class HighlightProjectionBinder implements ProjectionBinder {
 	public void bind(ProjectionBindingContext context) {
 		String fieldPath = fieldPathOrFail( context );
 		Class<?> rawType = context.constructorParameter().rawType();
-		Optional<? extends ProjectionBindingMultiContext> multiOptional = context.multi();
+		Optional<? extends ProjectionBindingContainerContext> containerOptional = context.container();
 
-		if ( multiOptional.isPresent() ) {
-			ProjectionBindingMultiContext multiContext = multiOptional.get();
+		if ( containerOptional.isPresent() ) {
+			ProjectionBindingContainerContext container = containerOptional.get();
 
-			var accumulator = multiContext.projectionAccumulatorProviderFactory()
-					.projectionAccumulatorProvider( multiContext.container().rawType(), String.class );
+			var accumulator = container.projectionAccumulatorProviderFactory()
+					.projectionAccumulatorProvider( container.container().rawType(), String.class );
 			// If the container element type is not string the check in `multiContext.definition`
 			// will fail with a message explaining what went wrong:
-			multiContext.definition( String.class,
-					new Multi<>( fieldPath, accumulator, highlighterName ) );
+			container.definition( String.class, new HighlightDefinition<>( fieldPath, accumulator, highlighterName ) );
 		}
 		else {
 			if ( !rawType.isAssignableFrom( String.class ) ) {
 				throw log.invalidParameterTypeForHighlightProjectionInProjectionConstructor( rawType, "String" );
 			}
-			context.definition( String.class, new Single( fieldPath, highlighterName ) );
+			context.definition( String.class,
+					new HighlightDefinition<>( fieldPath, ProjectionAccumulator.single(), highlighterName ) );
 		}
 	}
 
@@ -137,26 +137,11 @@ public final class HighlightProjectionBinder implements ProjectionBinder {
 		}
 	}
 
-	private static class Single extends Definition<String> {
-
-		private Single(String fieldPath, String highlighterName) {
-			super( fieldPath, highlighterName );
-		}
-
-		@Override
-		public SearchProjection<? extends String> create(SearchProjectionFactory<?, ?> factory,
-				ProjectionDefinitionContext context) {
-			return factory.highlight( fieldPath ).highlighter( highlighterName )
-					.accumulator( ProjectionAccumulator.single() )
-					.toProjection();
-		}
-	}
-
-	private static class Multi<C> extends Definition<C> {
+	private static class HighlightDefinition<C> extends Definition<C> {
 
 		private final ProjectionAccumulator.Provider<String, C> accumulator;
 
-		private Multi(String fieldPath, ProjectionAccumulator.Provider<String, C> accumulator,
+		private HighlightDefinition(String fieldPath, ProjectionAccumulator.Provider<String, C> accumulator,
 				String highlighterName) {
 			super( fieldPath, highlighterName );
 			this.accumulator = accumulator;
@@ -165,7 +150,9 @@ public final class HighlightProjectionBinder implements ProjectionBinder {
 		@Override
 		public SearchProjection<C> create(SearchProjectionFactory<?, ?> factory,
 				ProjectionDefinitionContext context) {
-			return factory.highlight( fieldPath ).highlighter( highlighterName ).accumulator( accumulator )
+			return factory.highlight( fieldPath )
+					.highlighter( highlighterName )
+					.accumulator( accumulator )
 					.toProjection();
 		}
 	}
