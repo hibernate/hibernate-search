@@ -4,13 +4,18 @@
  */
 package org.hibernate.search.engine.search.projection.spi;
 
+import org.hibernate.search.engine.backend.types.converter.runtime.FromDocumentValueConvertContext;
+import org.hibernate.search.engine.backend.types.converter.spi.ProjectionConverter;
+
 /**
  * A {@link ProjectionAccumulator} that can accumulate up to one value, and will throw an exception beyond that.
  *
  * @param <E> The type of extracted values to accumulate before being transformed.
  * @param <V> The type of values to accumulate obtained by transforming extracted values ({@code E}).
  */
-final class SingleValuedProjectionAccumulator<E, V> extends BaseSingleValuedProjectionAccumulator<E, V, V> {
+@SuppressWarnings("deprecation")
+final class SingleValuedProjectionAccumulator<E, V> extends BaseSingleValuedProjectionAccumulator<E, V, V>
+		implements ProjectionAccumulator<E, V, Object, V> {
 
 	@SuppressWarnings("rawtypes")
 	static final ProjectionAccumulator.Provider PROVIDER = new ProjectionAccumulator.Provider() {
@@ -28,6 +33,13 @@ final class SingleValuedProjectionAccumulator<E, V> extends BaseSingleValuedProj
 	};
 
 	private SingleValuedProjectionAccumulator() {
+	}
+
+	@Override
+	@SuppressWarnings("unchecked")
+	public Object transformAll(Object accumulated, ProjectionConverter<? super E, ? extends V> converter,
+			FromDocumentValueConvertContext context) {
+		return converter.fromDocumentValue( (E) accumulated, context );
 	}
 
 	@Override

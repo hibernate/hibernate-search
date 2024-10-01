@@ -32,6 +32,7 @@ public class HighlightProjectionOptionsStepImpl
 		return this;
 	}
 
+	@SuppressWarnings("deprecation")
 	@Override
 	public SingleHighlightProjectionFinalStep single() {
 		return new SingleHighlightProjectionFinalStepImpl();
@@ -51,7 +52,7 @@ public class HighlightProjectionOptionsStepImpl
 	private class SingleHighlightProjectionFinalStepImpl extends AccumulatorHighlightProjectionFinalStepImpl<String>
 			implements SingleHighlightProjectionFinalStep {
 		public SingleHighlightProjectionFinalStepImpl() {
-			super( ProjectionAccumulator.single() );
+			super( ProjectionAccumulator.nullable() );
 		}
 	}
 

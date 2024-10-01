@@ -133,7 +133,7 @@ class ObjectProjectionSpecificsIT {
 				.hasMessageContainingAll(
 						"Invalid cardinality for projection on field 'level1'",
 						"the projection is single-valued, but this field is multi-valued",
-						"Make sure to call '.multi()' when you create the projection"
+						"Make sure to call '.accumulator(...)' when you create the projection"
 				);
 	}
 
@@ -152,9 +152,9 @@ class ObjectProjectionSpecificsIT {
 						"Invalid cardinality for projection on field 'level1WithSingleValuedLevel2.level2'",
 						"the projection is single-valued, but this field is effectively multi-valued in this context",
 						"because parent object field 'level1WithSingleValuedLevel2' is multi-valued",
-						"call '.multi()' when you create the projection on field 'level1WithSingleValuedLevel2.level2'",
+						"call '.accumulator(...)' when you create the projection on field 'level1WithSingleValuedLevel2.level2'",
 						"or wrap that projection in an object projection like this:"
-								+ " 'f.object(\"level1WithSingleValuedLevel2\").from(<the projection on field level1WithSingleValuedLevel2.level2>).as(...).multi()'."
+								+ " 'f.object(\"level1WithSingleValuedLevel2\").from(<the projection on field level1WithSingleValuedLevel2.level2>).as(...).accumulator(...)'."
 				);
 	}
 

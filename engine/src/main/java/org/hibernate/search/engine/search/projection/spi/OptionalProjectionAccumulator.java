@@ -7,7 +7,7 @@ package org.hibernate.search.engine.search.projection.spi;
 import java.util.Optional;
 
 /**
- * A {@link ProjectionAccumulator} that can accumulate up to one value, and will throw an exception beyond that.
+ * A {@link org.hibernate.search.engine.search.projection.ProjectionAccumulator} that can accumulate up to one value, and will throw an exception beyond that.
  * The value is wrapped in an {@link Optional}.
  *
  * @param <E> The type of extracted values to accumulate before being transformed.
@@ -20,7 +20,7 @@ final class OptionalProjectionAccumulator<E, V> extends BaseSingleValuedProjecti
 		private final OptionalProjectionAccumulator instance = new OptionalProjectionAccumulator();
 
 		@Override
-		public ProjectionAccumulator get() {
+		public org.hibernate.search.engine.search.projection.ProjectionAccumulator get() {
 			return instance;
 		}
 

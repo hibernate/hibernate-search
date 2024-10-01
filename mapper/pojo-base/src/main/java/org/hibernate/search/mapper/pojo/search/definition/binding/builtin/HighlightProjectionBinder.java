@@ -100,7 +100,7 @@ public final class HighlightProjectionBinder implements ProjectionBinder {
 				throw log.invalidParameterTypeForHighlightProjectionInProjectionConstructor( rawType, "String" );
 			}
 			context.definition( String.class,
-					new HighlightDefinition<>( fieldPath, ProjectionAccumulator.single(), highlighterName ) );
+					new HighlightDefinition<>( fieldPath, ProjectionAccumulator.nullable(), highlighterName ) );
 		}
 	}
 

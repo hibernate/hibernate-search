@@ -10,7 +10,7 @@ import java.util.SortedSet;
 import java.util.TreeSet;
 
 /**
- * A {@link ProjectionAccumulator} that can accumulate any number of values into a {@link SortedSet}.
+ * A {@link org.hibernate.search.engine.search.projection.ProjectionAccumulator} that can accumulate any number of values into a {@link SortedSet}.
  *
  * @param <E> The type of extracted values to accumulate before being transformed.
  * @param <V> The type of values to accumulate obtained by transforming extracted values ({@code E}).
@@ -34,6 +34,7 @@ final class SortedSetComparatorProjectionAccumulator<E, V> extends ListBasedProj
 		return set;
 	}
 
+	@SuppressWarnings("unchecked")
 	private static class ComparatorBasedSortedSetProvider<U, R> implements Provider<U, R> {
 		private final SortedSetComparatorProjectionAccumulator<?, U> instance;
 
@@ -42,8 +43,8 @@ final class SortedSetComparatorProjectionAccumulator<E, V> extends ListBasedProj
 		}
 
 		@Override
-		public <T> ProjectionAccumulator<T, U, ?, R> get() {
-			return (ProjectionAccumulator<T, U, ?, R>) instance;
+		public <T> org.hibernate.search.engine.search.projection.ProjectionAccumulator<T, U, ?, R> get() {
+			return (org.hibernate.search.engine.search.projection.ProjectionAccumulator<T, U, ?, R>) instance;
 		}
 
 		@Override

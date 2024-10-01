@@ -602,7 +602,7 @@ public interface Log extends BasicLogger {
 	@Message(id = ID_OFFSET + 113,
 			value = "Invalid cardinality for projection on field '%1$s': the projection is single-valued,"
 					+ " but this field is multi-valued."
-					+ " Make sure to call '.multi()' when you create the projection.")
+					+ " Make sure to call '.accumulator(...)' when you create the projection.")
 	SearchException invalidSingleValuedProjectionOnMultiValuedField(String absolutePath, @Param EventContext context);
 
 	@Message(id = ID_OFFSET + 117,

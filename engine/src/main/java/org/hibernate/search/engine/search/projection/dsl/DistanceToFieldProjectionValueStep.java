@@ -34,7 +34,9 @@ public interface DistanceToFieldProjectionValueStep<N extends DistanceToFieldPro
 	 * @deprecated Use {@link #accumulator(ProjectionAccumulator.Provider)} instead.
 	 */
 	@Deprecated(since = "8.0")
-	DistanceToFieldProjectionOptionsStep<?, List<T>> multi();
+	default DistanceToFieldProjectionOptionsStep<?, List<T>> multi() {
+		return accumulator( ProjectionAccumulator.list() );
+	}
 
 	/**
 	 * Defines how to accumulate distance projection values.

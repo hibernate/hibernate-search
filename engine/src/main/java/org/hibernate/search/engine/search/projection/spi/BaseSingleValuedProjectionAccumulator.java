@@ -8,17 +8,17 @@ import java.lang.invoke.MethodHandles;
 
 import org.hibernate.search.engine.backend.types.converter.FromDocumentValueConverter;
 import org.hibernate.search.engine.backend.types.converter.runtime.FromDocumentValueConvertContext;
-import org.hibernate.search.engine.backend.types.converter.spi.ProjectionConverter;
 import org.hibernate.search.engine.logging.impl.Log;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
 /**
- * A {@link ProjectionAccumulator} that can accumulate up to one value, and will throw an exception beyond that.
+ * A {@link org.hibernate.search.engine.search.projection.ProjectionAccumulator} that can accumulate up to one value, and will throw an exception beyond that.
  *
  * @param <E> The type of extracted values to accumulate before being transformed.
  * @param <V> The type of values to accumulate obtained by transforming extracted values ({@code E}).
  */
-abstract class BaseSingleValuedProjectionAccumulator<E, V, R> implements ProjectionAccumulator<E, V, Object, R> {
+abstract class BaseSingleValuedProjectionAccumulator<E, V, R>
+		implements org.hibernate.search.engine.search.projection.ProjectionAccumulator<E, V, Object, R> {
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
@@ -60,13 +60,6 @@ abstract class BaseSingleValuedProjectionAccumulator<E, V, R> implements Project
 			throw new IndexOutOfBoundsException( "Invalid index passed to " + this + ": " + index );
 		}
 		return transformed;
-	}
-
-	@Override
-	@SuppressWarnings("unchecked")
-	public final Object transformAll(Object accumulated, ProjectionConverter<? super E, ? extends V> converter,
-			FromDocumentValueConvertContext context) {
-		return converter.fromDocumentValue( (E) accumulated, context );
 	}
 
 	@Override
