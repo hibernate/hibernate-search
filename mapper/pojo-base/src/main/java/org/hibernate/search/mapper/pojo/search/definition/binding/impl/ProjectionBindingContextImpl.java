@@ -39,7 +39,6 @@ import org.hibernate.search.mapper.pojo.model.spi.PojoConstructorModel;
 import org.hibernate.search.mapper.pojo.model.spi.PojoRawTypeModel;
 import org.hibernate.search.mapper.pojo.model.spi.PojoTypeModel;
 import org.hibernate.search.mapper.pojo.search.definition.binding.ProjectionBinder;
-import org.hibernate.search.mapper.pojo.search.definition.binding.ProjectionBindingContainerContext;
 import org.hibernate.search.mapper.pojo.search.definition.binding.ProjectionBindingContext;
 import org.hibernate.search.mapper.pojo.search.definition.binding.ProjectionBindingMultiContext;
 import org.hibernate.search.mapper.pojo.search.definition.binding.builtin.FieldProjectionBinder;
@@ -86,6 +85,7 @@ public class ProjectionBindingContextImpl<P> implements ProjectionBindingContext
 	private final Map<String, Object> params;
 	private final PojoTypeModel<?> parameterTypeModel;
 	private final PojoModelConstructorParameterRootElement<P> parameterRootElement;
+	private final ProjectionAccumulatorProviderFactory projectionAccumulatorProviderFactory;
 
 	private MappingElement mappingElement;
 	private PartialBinding<P> partialBinding;
@@ -97,6 +97,7 @@ public class ProjectionBindingContextImpl<P> implements ProjectionBindingContext
 		this.params = params;
 		this.parameterTypeModel = parameterBinder.parameter.typeModel();
 		this.parameterRootElement = parameterBinder.parameterRootElement;
+		this.projectionAccumulatorProviderFactory = new BuiltInProjectionAccumulatorProviderFactory();
 	}
 
 	@Override
@@ -126,13 +127,13 @@ public class ProjectionBindingContextImpl<P> implements ProjectionBindingContext
 	}
 
 	@Override
-	public <P2> void definition(Class<P2> expectedValueType, ProjectionDefinition<? extends P2> definition) {
+	public <P2, C> void definition(Class<P2> expectedValueType, ProjectionDefinition<? extends C> definition) {
 		definition( expectedValueType, BeanHolder.of( definition ) );
 	}
 
 	@Override
-	public <P2> void definition(Class<P2> expectedValueType,
-			BeanHolder<? extends ProjectionDefinition<? extends P2>> definitionHolder) {
+	public <P2, C> void definition(Class<P2> expectedValueType,
+			BeanHolder<? extends ProjectionDefinition<? extends C>> definitionHolder) {
 		checkAndBind( definitionHolder, mappingHelper.introspector().typeModel( expectedValueType ) );
 	}
 
@@ -148,17 +149,6 @@ public class ProjectionBindingContextImpl<P> implements ProjectionBindingContext
 				throw log.invalidMultiValuedParameterTypeForProjectionConstructor( parameterTypeModel );
 			}
 			return Optional.of( new MultiContextImpl<>( boundParameterElement ) );
-		}
-	}
-
-	@Override
-	public Optional<ContainerContextImpl<?, ?>> container() {
-		PojoTypeModel<?> boundParameterElement = boundParameterElement( CONTAINER_EXTRACTORS );
-		if ( boundParameterElement == null ) {
-			return Optional.empty();
-		}
-		else {
-			return Optional.of( new ContainerContextImpl<>( parameterTypeModel, boundParameterElement ) );
 		}
 	}
 
@@ -180,10 +170,28 @@ public class ProjectionBindingContextImpl<P> implements ProjectionBindingContext
 		}
 	}
 
-
 	@Override
 	public PojoModelConstructorParameter constructorParameter() {
 		return parameterRootElement;
+	}
+
+	@Override
+	public Optional<PojoModelValue<?>> containerElement() {
+		return containerElementModel().map( this::getPojoModelValueElement );
+	}
+
+	private PojoModelValueElement<?> getPojoModelValueElement(PojoTypeModel<?> m) {
+		return new PojoModelValueElement<>( mappingHelper.introspector(), m );
+	}
+
+	private Optional<PojoTypeModel<?>> containerElementModel() {
+		PojoTypeModel<?> boundParameterElement = boundParameterElement( CONTAINER_EXTRACTORS );
+		if ( boundParameterElement == null ) {
+			return Optional.empty();
+		}
+		else {
+			return Optional.of( boundParameterElement );
+		}
 	}
 
 	@Override
@@ -262,6 +270,11 @@ public class ProjectionBindingContextImpl<P> implements ProjectionBindingContext
 				(prefixedRelativeName, inclusion) -> TreeNodeInclusion.INCLUDED.equals( inclusion ) );
 	}
 
+	@Override
+	public ProjectionAccumulatorProviderFactory projectionAccumulatorProviderFactory() {
+		return projectionAccumulatorProviderFactory;
+	}
+
 	public BeanHolder<? extends ProjectionDefinition<? extends P>> applyBinder(ProjectionBinder binder) {
 		try {
 			this.mappingElement = new PojoConstructorParameterProjectionMappingElement( parameterBinder.parent.constructor,
@@ -286,9 +299,17 @@ public class ProjectionBindingContextImpl<P> implements ProjectionBindingContext
 		}
 	}
 
-	private <P2> void checkAndBind(BeanHolder<? extends ProjectionDefinition<? extends P2>> definitionHolder,
+	private <P2, C> void checkAndBind(BeanHolder<? extends ProjectionDefinition<? extends C>> definitionHolder,
 			PojoRawTypeModel<P2> expectedValueType) {
-		if ( !expectedValueType.isSubTypeOf( parameterTypeModel.rawType() ) ) {
+		Optional<PojoTypeModel<?>> containerElementModel = containerElementModel();
+		if ( containerElementModel.isPresent() ) {
+			if ( !expectedValueType.isSubTypeOf( containerElementModel.get().rawType() ) ) {
+				throw log.invalidOutputTypeForMultiValuedProjectionDefinition( definitionHolder.get(), parameterTypeModel,
+						expectedValueType
+				);
+			}
+		}
+		else if ( !expectedValueType.isSubTypeOf( parameterTypeModel.rawType() ) ) {
 			throw log.invalidOutputTypeForProjectionDefinition( definitionHolder.get(), parameterTypeModel, expectedValueType );
 		}
 
@@ -300,15 +321,13 @@ public class ProjectionBindingContextImpl<P> implements ProjectionBindingContext
 	}
 
 	public BeanHolder<? extends ProjectionDefinition<?>> applyDefaultProjection() {
-		Optional<ContainerContextImpl<?, ?>> container = container();
+		Optional<PojoTypeModel<?>> containerElement = containerElementModel();
 		PojoConstructorModel<?> constructorModelOrNull;
-		if ( container.isPresent() ) {
-			constructorModelOrNull = parameterBinder.findProjectionConstructorOrNull(
-					container.get().parameterContainerElementTypeModel.rawType() );
+		if ( containerElement.isPresent() ) {
+			constructorModelOrNull = parameterBinder.findProjectionConstructorOrNull( containerElement.get().rawType() );
 		}
 		else {
-			constructorModelOrNull = parameterBinder.findProjectionConstructorOrNull(
-					parameterTypeModel.rawType() );
+			constructorModelOrNull = parameterBinder.findProjectionConstructorOrNull( parameterTypeModel.rawType() );
 		}
 		Optional<String> paramName = parameterRootElement.name();
 		if ( !paramName.isPresent() ) {
@@ -367,90 +386,27 @@ public class ProjectionBindingContextImpl<P> implements ProjectionBindingContext
 			return parameterContainerElementRootElement;
 		}
 
-		private <C, P2> void checkAndBind(
-				BeanHolder<? extends ProjectionDefinition<? extends C>> definitionHolder,
-				PojoRawTypeModel<P2> expectedValueType) {
-			if ( !expectedValueType.isSubTypeOf( parameterContainerElementTypeModel.rawType() ) ) {
-				throw log.invalidOutputTypeForMultiValuedProjectionDefinition( definitionHolder.get(), parameterTypeModel,
-						expectedValueType );
-			}
-
-			@SuppressWarnings("unchecked") // We check that P2 extends PV explicitly using reflection (see above) and we've already checked that P = List<? extends PV>
-			BeanHolder<? extends ProjectionDefinition<? extends P>> castDefinitionHolder =
-					(BeanHolder<? extends ProjectionDefinition<? extends P>>) definitionHolder;
-
-			partialBinding = new PartialBinding<>( castDefinitionHolder );
-		}
 	}
 
-	public class ContainerContextImpl<CV, PV>
-			implements ProjectionBindingContainerContext, ProjectionAccumulatorProviderFactory {
-		public final PojoTypeModel<PV> parameterContainerElementTypeModel;
-		private final PojoModelValue<PV> parameterContainerElementRootElement;
-		private final PojoModelValue<CV> parameterContainerRootElement;
-
-		public ContainerContextImpl(PojoTypeModel<CV> containerTypeModel,
-				PojoTypeModel<PV> parameterContainerElementTypeModel) {
-			this.parameterContainerElementTypeModel = parameterContainerElementTypeModel;
-			this.parameterContainerElementRootElement = new PojoModelValueElement<>( mappingHelper.introspector(),
-					parameterContainerElementTypeModel );
-			this.parameterContainerRootElement =
-					new PojoModelValueElement<>( mappingHelper.introspector(), containerTypeModel );
-		}
-
-		@Override
-		public <C, P2> void definition(Class<P2> expectedValueType, ProjectionDefinition<? extends C> definition) {
-			definition( expectedValueType, BeanHolder.of( definition ) );
-		}
-
-		@Override
-		public <C, P2> void definition(Class<P2> expectedValueType,
-				BeanHolder<? extends ProjectionDefinition<? extends C>> definitionHolder) {
-			checkAndBind( definitionHolder, mappingHelper.introspector().typeModel( expectedValueType ) );
-		}
-
-		@Override
-		public PojoModelValue<PV> containerElement() {
-			return parameterContainerElementRootElement;
-		}
-
-		@Override
-		public PojoModelValue<?> container() {
-			return parameterContainerRootElement;
-		}
-
-		@Override
-		public ProjectionAccumulatorProviderFactory projectionAccumulatorProviderFactory() {
-			return this;
-		}
-
-		private <C, P2> void checkAndBind(
-				BeanHolder<? extends ProjectionDefinition<? extends C>> definitionHolder,
-				PojoRawTypeModel<P2> expectedValueType) {
-			if ( !expectedValueType.isSubTypeOf( parameterContainerElementTypeModel.rawType() ) ) {
-				throw log.invalidOutputTypeForMultiValuedProjectionDefinition( definitionHolder.get(), parameterTypeModel,
-						expectedValueType );
-			}
-
-			@SuppressWarnings("unchecked") // We check that P2 extends PV explicitly using reflection (see above) and we've already checked that P = List<? extends PV>
-			BeanHolder<? extends ProjectionDefinition<? extends P>> castDefinitionHolder =
-					(BeanHolder<? extends ProjectionDefinition<? extends P>>) definitionHolder;
-
-			partialBinding = new PartialBinding<>( castDefinitionHolder );
-		}
+	private class BuiltInProjectionAccumulatorProviderFactory implements ProjectionAccumulatorProviderFactory {
 
 		@SuppressWarnings({ "rawtypes", "unchecked" })
 		@Override
 		public <R, U> ProjectionAccumulator.Provider<U, R> projectionAccumulatorProvider(Class<R> containerType,
 				Class<U> containerElementType) {
-			ProjectionAccumulator.Provider reference = null;
-			if ( List.class.isAssignableFrom( containerType ) ) {
+			ProjectionAccumulator.Provider reference;
+			if ( containerType == null ) {
+				reference = ProjectionAccumulator.nullable();
+			}
+			else if ( List.class.isAssignableFrom( containerType ) ) {
 				reference = ProjectionAccumulator.list();
 			}
 			else if ( SortedSet.class.isAssignableFrom( containerType ) ) {
 				if ( !Comparable.class.isAssignableFrom( containerElementType ) ) {
-					throw log.cannotBindSortedSetWithNonComparableElements( containerElementType,
-							mappingElement.eventContext() );
+					throw log.cannotBindSortedSetWithNonComparableElements(
+							containerElementType,
+							mappingElement.eventContext()
+					);
 				}
 				reference = ProjectionAccumulator.sortedSet();
 			}

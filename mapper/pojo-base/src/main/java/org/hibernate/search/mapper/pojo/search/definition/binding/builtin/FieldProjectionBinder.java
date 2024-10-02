@@ -9,13 +9,12 @@ import java.util.Optional;
 
 import org.hibernate.search.engine.environment.bean.BeanHolder;
 import org.hibernate.search.engine.search.common.ValueModel;
-import org.hibernate.search.engine.search.projection.ProjectionAccumulator;
 import org.hibernate.search.engine.search.projection.definition.spi.ConstantProjectionDefinition;
 import org.hibernate.search.engine.search.projection.definition.spi.FieldProjectionDefinition;
 import org.hibernate.search.engine.search.projection.dsl.SearchProjectionFactory;
 import org.hibernate.search.mapper.pojo.logging.impl.Log;
+import org.hibernate.search.mapper.pojo.model.PojoModelValue;
 import org.hibernate.search.mapper.pojo.search.definition.binding.ProjectionBinder;
-import org.hibernate.search.mapper.pojo.search.definition.binding.ProjectionBindingContainerContext;
 import org.hibernate.search.mapper.pojo.search.definition.binding.ProjectionBindingContext;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
@@ -90,30 +89,28 @@ public final class FieldProjectionBinder implements ProjectionBinder {
 
 	@Override
 	public void bind(ProjectionBindingContext context) {
-		Optional<? extends ProjectionBindingContainerContext> containerOptional = context.container();
+		Optional<PojoModelValue<?>> containerElementOptional = context.containerElement();
 		String fieldPath = fieldPathOrFail( context );
-		if ( containerOptional.isPresent() ) {
-			ProjectionBindingContainerContext container = containerOptional.get();
-			bind( context, container, fieldPath, container.containerElement().rawType() );
+		Class<?> containerClass;
+		Class<?> containerElementClass;
+		if ( containerElementOptional.isPresent() ) {
+			PojoModelValue<?> containerElement = containerElementOptional.get();
+			containerElementClass = containerElement.rawType();
+			containerClass = context.constructorParameter().rawType();
 		}
 		else {
-			bind( context, fieldPath, context.constructorParameter().rawType() );
+			containerElementClass = context.constructorParameter().rawType();
+			containerClass = null;
 		}
+		bind( context, fieldPath, containerClass, containerElementClass );
 	}
 
-	private <T> void bind(ProjectionBindingContext context, String fieldPath, Class<T> constructorParameterType) {
-		context.definition( constructorParameterType, context.isIncluded( fieldPath )
-				? BeanHolder.of( new FieldProjectionDefinition.AccumulatedValued<>( fieldPath, constructorParameterType,
-						ProjectionAccumulator.nullable(), valueModel ) )
-				: ConstantProjectionDefinition.nullValue() );
-	}
+	private <T, C> void bind(ProjectionBindingContext context, String fieldPath,
+			Class<C> containerType, Class<T> containerElementType) {
+		var accumulator = context.projectionAccumulatorProviderFactory()
+				.projectionAccumulatorProvider( containerType, containerElementType );
 
-	private <T> void bind(ProjectionBindingContext context, ProjectionBindingContainerContext container, String fieldPath,
-			Class<T> containerElementType) {
-		var accumulator = container.projectionAccumulatorProviderFactory()
-				.projectionAccumulatorProvider( container.container().rawType(), containerElementType );
-
-		container.definition( containerElementType, context.isIncluded( fieldPath )
+		context.definition( containerElementType, context.isIncluded( fieldPath )
 				? BeanHolder.of( new FieldProjectionDefinition.AccumulatedValued<>( fieldPath, containerElementType,
 						accumulator, valueModel ) )
 				: ConstantProjectionDefinition.empty( accumulator ) );
