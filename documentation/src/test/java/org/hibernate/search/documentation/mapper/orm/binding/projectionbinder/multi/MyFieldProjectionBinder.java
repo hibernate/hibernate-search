@@ -12,17 +12,17 @@ import org.hibernate.search.engine.search.projection.SearchProjection;
 import org.hibernate.search.engine.search.projection.definition.ProjectionDefinition;
 import org.hibernate.search.engine.search.projection.definition.ProjectionDefinitionContext;
 import org.hibernate.search.engine.search.projection.dsl.SearchProjectionFactory;
+import org.hibernate.search.mapper.pojo.model.PojoModelValue;
 import org.hibernate.search.mapper.pojo.search.definition.binding.ProjectionBinder;
-import org.hibernate.search.mapper.pojo.search.definition.binding.ProjectionBindingContainerContext;
 import org.hibernate.search.mapper.pojo.search.definition.binding.ProjectionBindingContext;
 
 //tag::include[]
 public class MyFieldProjectionBinder implements ProjectionBinder {
 	@Override
 	public void bind(ProjectionBindingContext context) {
-		Optional<? extends ProjectionBindingContainerContext> container = context.container(); // <1>
-		if ( container.isPresent() ) {
-			container.get().definition( String.class, new MyProjectionDefinition() ); // <2>
+		Optional<PojoModelValue<?>> containerElement = context.containerElement(); // <1>
+		if ( containerElement.isPresent() ) {
+			context.definition( String.class, new MyProjectionDefinition() ); // <2>
 		}
 		else {
 			throw new RuntimeException( "This binder only supports container-wrapped constructor parameters" ); // <3>
