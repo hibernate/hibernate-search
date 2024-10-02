@@ -36,7 +36,8 @@ Map settings() {
 			return [
 					updateProperties: ['version.org.apache.lucene'],
 					onlyRunTestDependingOn: ['hibernate-search-backend-lucene'],
-					additionalMavenArgs: '-Dtest.elasticsearch.skip=true -pl :hibernate-search-backend-lucene,:hibernate-search-util-internal-integrationtest-backend-lucene'
+					additionalMavenArgs: '-Dtest.elasticsearch.skip=true -pl :hibernate-search-backend-lucene,:hibernate-search-util-internal-integrationtest-backend-lucene',
+					skipSourceModifiedCheck: true
 			]
 		case 'lucene10':
 			return [
