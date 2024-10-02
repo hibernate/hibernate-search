@@ -6,9 +6,9 @@ package org.hibernate.search.mapper.orm.loading.impl;
 
 import java.util.List;
 
-import org.hibernate.FlushMode;
 import org.hibernate.LockOptions;
 import org.hibernate.engine.spi.SessionImplementor;
+import org.hibernate.query.QueryFlushMode;
 import org.hibernate.search.mapper.orm.common.spi.TransactionHelper;
 import org.hibernate.search.mapper.orm.loading.spi.HibernateOrmQueryLoader;
 import org.hibernate.search.mapper.pojo.loading.spi.PojoMassEntityLoader;
@@ -67,7 +67,7 @@ public final class HibernateOrmMassEntityLoader<E, I> implements PojoMassEntityL
 				.setCacheMode( options.cacheMode() )
 				.setLockOptions( LockOptions.NONE )
 				.setCacheable( false )
-				.setHibernateFlushMode( FlushMode.MANUAL )
+				.setQueryFlushMode( QueryFlushMode.NO_FLUSH )
 				.setFetchSize( identifiers.size() )
 				.list();
 	}

@@ -15,6 +15,7 @@ import jakarta.persistence.Id;
 import org.hibernate.FlushMode;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
+import org.hibernate.query.QueryFlushMode;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.GenericField;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
 import org.hibernate.search.mapper.pojo.work.spi.PojoIndexingPlan;
@@ -85,7 +86,7 @@ class AutomaticIndexingSessionFlushIT {
 
 			// An auto flush is performed on query invocation
 			List<?> resultList = session.createQuery( "select i from IndexedEntity i", IndexedEntity.class )
-					.setHibernateFlushMode( FlushMode.AUTO )
+					.setQueryFlushMode( QueryFlushMode.DEFAULT ) // FlushMode.AUTO
 					.getResultList();
 
 			if ( ormSetupHelper.areEntitiesProcessedInSession() ) {

@@ -18,9 +18,9 @@ import jakarta.persistence.EntityManagerFactory;
 import jakarta.persistence.LockModeType;
 
 import org.hibernate.CacheMode;
-import org.hibernate.FlushMode;
 import org.hibernate.Session;
 import org.hibernate.engine.spi.SessionImplementor;
+import org.hibernate.query.QueryFlushMode;
 import org.hibernate.search.engine.backend.work.execution.DocumentCommitStrategy;
 import org.hibernate.search.engine.backend.work.execution.DocumentRefreshStrategy;
 import org.hibernate.search.engine.backend.work.execution.OperationSubmitter;
@@ -181,7 +181,7 @@ public class EntityWriter extends AbstractItemWriter {
 				.setCacheable( false )
 				.setLockMode( LockModeType.NONE )
 				.setCacheMode( cacheMode )
-				.setHibernateFlushMode( FlushMode.MANUAL )
+				.setQueryFlushMode( QueryFlushMode.NO_FLUSH ) // FlushMode.MANUAL
 				.setFetchSize( entityFetchSize )
 				.list();
 	}

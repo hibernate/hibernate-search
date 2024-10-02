@@ -31,7 +31,6 @@ import org.hibernate.metamodel.MappingMetamodel;
 import org.hibernate.metamodel.mapping.EntityMappingType;
 import org.hibernate.metamodel.model.domain.EntityDomainType;
 import org.hibernate.models.internal.BasicModelBuildingContextImpl;
-import org.hibernate.models.internal.SimpleClassLoading;
 import org.hibernate.models.jandex.internal.JandexModelBuildingContextImpl;
 import org.hibernate.models.spi.SourceModelBuildingContext;
 import org.hibernate.search.mapper.orm.logging.impl.Log;
