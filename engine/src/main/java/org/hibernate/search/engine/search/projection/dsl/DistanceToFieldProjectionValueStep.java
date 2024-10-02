@@ -10,7 +10,8 @@ import org.hibernate.search.engine.search.projection.ProjectionAccumulator;
 
 /**
  * The initial step in a "distance to field" projection definition,
- * where the projection (optionally) can be marked as multi-valued (returning Lists),
+ * where (optionally) the projection accumulator can be provided, e.g. to mark a projection as multi-valued (returning {@code List}/{@code Set} etc.)
+ * or wrapped in some other container (e.g. {@code Optional<..>}),
  * and where optional parameters can be set.
  * <p>
  * By default (if {@link #accumulator(ProjectionAccumulator.Provider)} is not called), the projection is considered single-valued,

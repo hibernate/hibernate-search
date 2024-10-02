@@ -14,10 +14,12 @@ import org.hibernate.search.engine.environment.bean.BeanReference;
 import org.hibernate.search.engine.environment.bean.BeanResolver;
 import org.hibernate.search.engine.search.projection.ProjectionAccumulator;
 import org.hibernate.search.engine.search.projection.definition.ProjectionDefinition;
+import org.hibernate.search.engine.search.projection.dsl.ProjectionAccumulatorProviderFactory;
 import org.hibernate.search.engine.search.projection.dsl.SearchProjectionFactory;
 import org.hibernate.search.mapper.pojo.bridge.mapping.annotation.PropertyBinderRef;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.ObjectProjection;
 import org.hibernate.search.mapper.pojo.model.PojoModelConstructorParameter;
+import org.hibernate.search.mapper.pojo.model.PojoModelValue;
 import org.hibernate.search.util.common.SearchException;
 import org.hibernate.search.util.common.annotation.Incubating;
 
@@ -36,9 +38,12 @@ public interface ProjectionBindingContext {
 	 * Hibernate Search will check that these expectations are met, and throw an exception if they are not.
 	 * @param definition A definition of the projection
 	 * to bind to the {@link #constructorParameter()}.
-	 * @param <P> The type of values returned by the projection.
+	 * @param <P> The type of single projected value.
+	 * @param <C> The type of values returned by the projection.
+	 * It may be the same as {@code P}, if it is a simple single-valued projection,
+	 * or a type of the container if the {@code P} values are wrapped in some type of container (e.g. {@code Optional<..>}, {@code Collection<..>}..).
 	 */
-	<P> void definition(Class<P> expectedValueType, ProjectionDefinition<? extends P> definition);
+	<P, C> void definition(Class<P> expectedValueType, ProjectionDefinition<? extends C> definition);
 
 	/**
 	 * Binds the {@link #constructorParameter()} to the given projection definition.
@@ -48,9 +53,13 @@ public interface ProjectionBindingContext {
 	 * Hibernate Search will check that these expectations are met, and throw an exception if they are not.
 	 * @param definitionHolder A {@link BeanHolder} containing the definition of the projection
 	 * to bind to the {@link #constructorParameter()}.
-	 * @param <P> The type of values returned by the projection.
+	 * @param <P> The type of single projected value.
+	 * @param <C> The type of values returned by the projection.
+	 * It may be the same as {@code P}, if it is a simple single-valued projection,
+	 * or a type of the container if the {@code P} values are wrapped in some type of container (e.g. {@code Optional<..>}, {@code Collection<..>}..).
 	 */
-	<P> void definition(Class<P> expectedValueType, BeanHolder<? extends ProjectionDefinition<? extends P>> definitionHolder);
+	<P, C> void definition(Class<P> expectedValueType,
+			BeanHolder<? extends ProjectionDefinition<? extends C>> definitionHolder);
 
 	/**
 	 * Inspects the type of the {@link #constructorParameter()}
@@ -59,22 +68,11 @@ public interface ProjectionBindingContext {
 	 * @return An optional containing a context that can be used to bind a projection
 	 * if the type of the {@link #constructorParameter()} can be bound to a multi-valued projection;
 	 * an empty optional otherwise.
-	 * @deprecated Use {@link #container()} instead.
+	 * @deprecated Use {@link #containerElement()} and various bind methods of this context instead.
 	 */
 	@Deprecated(since = "8.0")
 	@Incubating
 	Optional<? extends ProjectionBindingMultiContext> multi();
-
-	/**
-	 * Inspects the type of the {@link #constructorParameter()}
-	 * to determine if it may be bound to a multi-valued projection.
-	 *
-	 * @return An optional containing a context that can be used to bind a projection
-	 * if the type of the {@link #constructorParameter()} can be bound to a multi-valued projection;
-	 * an empty optional otherwise.
-	 */
-	@Incubating
-	Optional<? extends ProjectionBindingContainerContext> container();
 
 	/**
 	 * @return A bean provider, allowing the retrieval of beans,
@@ -87,6 +85,14 @@ public interface ProjectionBindingContext {
 	 */
 	@Incubating
 	PojoModelConstructorParameter constructorParameter();
+
+	/**
+	 * @return An entry point allowing to inspect the constructor parameter container element being bound to a projection.
+	 * Returns non-empty optional only if a {@link #constructorParameter()} can be bound to a container-wrapped projection
+	 * (be it a single-valued optional, or some multi-valued collection).
+	 */
+	@Incubating
+	Optional<PojoModelValue<?>> containerElement();
 
 	/**
 	 * @param name The name of the parameter.
@@ -212,5 +218,8 @@ public interface ProjectionBindingContext {
 	 * returning {@code null} or an empty list, as appropriate.
 	 */
 	boolean isIncluded(String fieldPath);
+
+	@Incubating
+	ProjectionAccumulatorProviderFactory projectionAccumulatorProviderFactory();
 
 }
