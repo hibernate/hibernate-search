@@ -4,9 +4,14 @@
  */
 package org.hibernate.search.engine.search.projection.dsl;
 
+import java.util.Comparator;
 import java.util.List;
+import java.util.Optional;
+import java.util.Set;
+import java.util.SortedSet;
 
 import org.hibernate.search.engine.search.projection.ProjectionAccumulator;
+import org.hibernate.search.util.common.annotation.Incubating;
 
 /**
  * The initial step in a "field" projection definition,
@@ -42,7 +47,7 @@ public interface FieldProjectionValueStep<N extends FieldProjectionOptionsStep<?
 	/**
 	 * Defines how to accumulate field projection values.
 	 * <p>
-	 * Calling {@code .accumulator(someMultiValuedAccumulatorProvider) } is mandatory for multi-valued fields,
+	 * Calling {@code .accumulator(someMultiValuedAccumulatorProvider) } is mandatory for multivalued fields,
 	 * e.g. {@code .accumulator(ProjectionAccumulator.list())},
 	 * otherwise the projection will throw an exception upon creating the query.
 	 *
@@ -51,4 +56,61 @@ public interface FieldProjectionValueStep<N extends FieldProjectionOptionsStep<?
 	 * @param <R> The type of the final result.
 	 */
 	<R> FieldProjectionOptionsStep<?, R> accumulator(ProjectionAccumulator.Provider<T, R> accumulator);
+
+	/**
+	 * Defines the projection as single-valued wrapped in an {@link Optional}, i.e. returning {@code Optional<T>} instead of {@code T}.
+	 *
+	 * @return A new step to define optional parameters.
+	 */
+	@Incubating
+	default FieldProjectionOptionsStep<?, Optional<T>> optional() {
+		return accumulator( ProjectionAccumulator.optional() );
+	}
+
+	/**
+	 * Defines the projection as multivalued, i.e. returning {@code List<T>} instead of {@code T}.
+	 * @return A new step to define optional parameters.
+	 */
+	@Incubating
+	default FieldProjectionOptionsStep<?, List<T>> list() {
+		return accumulator( ProjectionAccumulator.list() );
+	}
+
+	/**
+	 * Defines the projection as multivalued, i.e. returning {@code Set<T>} instead of {@code T}.
+	 * @return A new step to define optional parameters.
+	 */
+	@Incubating
+	default FieldProjectionOptionsStep<?, Set<T>> set() {
+		return accumulator( ProjectionAccumulator.set() );
+	}
+
+	/**
+	 * Defines the projection as multivalued, i.e. returning {@code SortedSet<T>} instead of {@code T}.
+	 * @return A new step to define optional parameters.
+	 */
+	@Incubating
+	default FieldProjectionOptionsStep<?, SortedSet<T>> sortedSet() {
+		return accumulator( ProjectionAccumulator.sortedSet() );
+	}
+
+	/**
+	 * Defines the projection as multivalued, i.e. returning {@code SortedSet<T>} instead of {@code T}.
+	 * @param comparator The comparator to use for sorting elements within the set.
+	 * @return A new step to define optional parameters.
+	 */
+	@Incubating
+	default FieldProjectionOptionsStep<?, SortedSet<T>> sortedSet(Comparator<T> comparator) {
+		return accumulator( ProjectionAccumulator.sortedSet( comparator ) );
+	}
+
+	/**
+	 * Defines the projection as multivalued, i.e. returning {@code T[]} instead of {@code T}.
+	 * @param type The type of array elements.
+	 * @return A new step to define optional parameters.
+	 */
+	@Incubating
+	default FieldProjectionOptionsStep<?, T[]> array(Class<T> type) {
+		return accumulator( ProjectionAccumulator.array( type ) );
+	}
 }

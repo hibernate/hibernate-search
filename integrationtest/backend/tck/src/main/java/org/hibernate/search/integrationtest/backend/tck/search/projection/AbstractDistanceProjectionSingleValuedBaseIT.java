@@ -84,7 +84,7 @@ abstract class AbstractDistanceProjectionSingleValuedBaseIT {
 	@RegisterExtension
 	public static SearchSetupHelper setupHelper = SearchSetupHelper.create();
 
-	private static final SimpleMappedIndex<SingleFieldIndexBinding> mainIndex =
+	protected static final SimpleMappedIndex<SingleFieldIndexBinding> mainIndex =
 			SimpleMappedIndex.of(
 					root -> SingleFieldIndexBinding.createWithSingleValuedNestedFields(
 							root,
@@ -435,7 +435,7 @@ abstract class AbstractDistanceProjectionSingleValuedBaseIT {
 				);
 	}
 
-	private String getFieldPath(TestedFieldStructure fieldStructure) {
+	protected String getFieldPath(TestedFieldStructure fieldStructure) {
 		return mainIndex.binding().getFieldPath( fieldStructure, fieldType );
 	}
 
@@ -456,9 +456,9 @@ abstract class AbstractDistanceProjectionSingleValuedBaseIT {
 	protected abstract SortFinalStep sort(SearchSortFactory sort, String path, GeoPoint center,
 			String parameterName);
 
-	private static class DataSet {
-		private final TestedFieldStructure fieldStructure;
-		private final String routingKey;
+	protected static class DataSet {
+		protected final TestedFieldStructure fieldStructure;
+		protected final String routingKey;
 
 		private DataSet(TestedFieldStructure fieldStructure) {
 			this.fieldStructure = fieldStructure;
@@ -506,7 +506,7 @@ abstract class AbstractDistanceProjectionSingleValuedBaseIT {
 			return AscendingUniqueDistanceFromCenterValues.INSTANCE.getSingle().get( documentNumber - 1 );
 		}
 
-		private double getFieldDistanceFromCenter1(int documentNumber) {
+		protected double getFieldDistanceFromCenter1(int documentNumber) {
 			return IndexableGeoPointWithDistanceFromCenterValues.INSTANCE.getSingleDistancesFromCenterPoint1()
 					.get( documentNumber - 1 );
 		}

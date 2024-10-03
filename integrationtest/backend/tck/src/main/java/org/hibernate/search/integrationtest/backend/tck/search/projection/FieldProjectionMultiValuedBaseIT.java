@@ -21,7 +21,6 @@ import java.util.function.Function;
 
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaElement;
 import org.hibernate.search.engine.backend.types.Projectable;
-import org.hibernate.search.engine.search.projection.ProjectionAccumulator;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.model.singlefield.SingleFieldIndexBinding;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.FieldTypeDescriptor;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.StandardFieldTypeDescriptor;
@@ -124,7 +123,7 @@ class FieldProjectionMultiValuedBaseIT<F> {
 		String fieldPath = getFieldPath( fieldStructure, fieldType );
 
 		assertThatQuery( scope.query()
-				.select( f -> f.field( fieldPath, fieldType.getJavaType() ).accumulator( ProjectionAccumulator.list() ) )
+				.select( f -> f.field( fieldPath, fieldType.getJavaType() ).list() )
 				.where( f -> f.matchAll() )
 				.routing( dataSet.routingKey )
 				.toQuery() )
@@ -144,7 +143,7 @@ class FieldProjectionMultiValuedBaseIT<F> {
 		String fieldPath = getFieldPath( fieldStructure, fieldType );
 
 		assertThatQuery( scope.query()
-				.select( f -> f.field( fieldPath, fieldType.getJavaType() ).accumulator( ProjectionAccumulator.set() ) )
+				.select( f -> f.field( fieldPath, fieldType.getJavaType() ).set() )
 				.where( f -> f.matchAll() )
 				.routing( dataSet.routingKey )
 				.toQuery() )
@@ -166,7 +165,7 @@ class FieldProjectionMultiValuedBaseIT<F> {
 
 		assertThatQuery( scope.query()
 				.select( f -> f.field( fieldPath, fieldType.getJavaType() )
-						.accumulator( ProjectionAccumulator.array( fieldType.getJavaType() ) ) )
+						.array( fieldType.getJavaType() ) )
 				.where( f -> f.matchAll() )
 				.routing( dataSet.routingKey )
 				.toQuery() )
@@ -187,7 +186,7 @@ class FieldProjectionMultiValuedBaseIT<F> {
 		String fieldPath = getFieldPath( fieldStructure, fieldType );
 
 		assertThatQuery( scope.query()
-				.select( f -> f.field( fieldPath ).accumulator( ProjectionAccumulator.list() ) )
+				.select( f -> f.field( fieldPath ).list() )
 				.where( f -> f.matchAll() )
 				.routing( dataSet.routingKey )
 				.toQuery() )
@@ -211,8 +210,8 @@ class FieldProjectionMultiValuedBaseIT<F> {
 
 		assertThatQuery( scope.query()
 				.select( f -> f.composite(
-						f.field( fieldPath, fieldType.getJavaType() ).accumulator( ProjectionAccumulator.list() ),
-						f.field( fieldPath, fieldType.getJavaType() ).accumulator( ProjectionAccumulator.list() )
+						f.field( fieldPath, fieldType.getJavaType() ).list(),
+						f.field( fieldPath, fieldType.getJavaType() ).list()
 				)
 				)
 				.where( f -> f.matchAll() )
@@ -234,7 +233,7 @@ class FieldProjectionMultiValuedBaseIT<F> {
 		String fieldPath = getFieldPath( fieldStructure, fieldType );
 
 		var multi = scope.projection().field( fieldPath, fieldType.getJavaType() )
-				.accumulator( ProjectionAccumulator.set() )
+				.set()
 				.toProjection();
 
 		assertThatQuery( scope.query()
@@ -261,7 +260,7 @@ class FieldProjectionMultiValuedBaseIT<F> {
 		String fieldPath = getFieldPath( fieldStructure, fieldType );
 
 		var multi = scope.projection().field( fieldPath, fieldType.getJavaType() )
-				.accumulator( ProjectionAccumulator.sortedSet() )
+				.sortedSet()
 				.toProjection();
 
 		assertThatQuery( scope.query()
@@ -286,7 +285,7 @@ class FieldProjectionMultiValuedBaseIT<F> {
 
 		Comparator<F> comparator = Comparator.comparing( Objects::toString );
 		var multi = scope.projection().field( fieldPath, fieldType.getJavaType() )
-				.accumulator( ProjectionAccumulator.sortedSet( comparator ) )
+				.sortedSet( comparator )
 				.toProjection();
 
 		assertThatQuery( scope.query()
@@ -317,7 +316,7 @@ class FieldProjectionMultiValuedBaseIT<F> {
 		String fieldPath = getFieldPath( fieldStructure, fieldType );
 
 		var multi = scope.projection().field( fieldPath, fieldType.getJavaType() )
-				.accumulator( ProjectionAccumulator.array( fieldType.getJavaType() ) )
+				.array( fieldType.getJavaType() )
 				.toProjection();
 
 		F[] arrayToConvert = (F[]) Array.newInstance( fieldType.getJavaType(), 0 );
@@ -342,7 +341,7 @@ class FieldProjectionMultiValuedBaseIT<F> {
 		String fieldPath = getFieldPath( fieldStructure, fieldType );
 
 		assertThatQuery( scope.query()
-				.select( f -> f.field( fieldPath, fieldType.getJavaType() ).accumulator( ProjectionAccumulator.list() ) )
+				.select( f -> f.field( fieldPath, fieldType.getJavaType() ).list() )
 				.where( f -> f.matchAll() )
 				.routing( dataSet.routingKey )
 				.toQuery() )
