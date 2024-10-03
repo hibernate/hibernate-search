@@ -204,7 +204,7 @@
         <version.org.apache.commons.logging>1.1.3</version.org.apache.commons.logging>
         <version.org.apache.httpcomponents.httpclient>4.5.2</version.org.apache.httpcomponents.httpclient>
         <version.org.apache.httpcomponents.httpcore>4.4.4</version.org.apache.httpcomponents.httpcore>
-        <version.org.apache.avro>1.10.2</version.org.apache.avro>
+        <version.org.apache.avro>1.11.4</version.org.apache.avro>
         <version.xml-apis>1.3.03</version.xml-apis>
 
         <version.org.jboss.spec.javax.annotation.jboss-annotations-api_1.3_spec>1.0.1.Final</version.org.jboss.spec.javax.annotation.jboss-annotations-api_1.3_spec>
