@@ -62,7 +62,7 @@ public class StubFieldProjection<F, V, A, P> extends StubSearchProjection<P> {
 	public P transform(LoadingResult<?> loadingResult, Object extractedData,
 			StubSearchProjectionContext context) {
 		A accumulated = (A) extractedData;
-		A transformedData = accumulator.transformAll( accumulated, converter::fromDocumentValue,
+		A transformedData = accumulator.transformAll( accumulated, converter.delegate(),
 				context.fromDocumentValueConvertContext() );
 		return accumulator.finish( transformedData );
 	}

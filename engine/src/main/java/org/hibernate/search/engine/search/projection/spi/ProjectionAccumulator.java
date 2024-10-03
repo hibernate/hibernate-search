@@ -134,7 +134,7 @@ public interface ProjectionAccumulator<E, V, A, R>
 	 */
 	default A transformAll(A accumulated, ProjectionConverter<? super E, ? extends V> converter,
 			FromDocumentValueConvertContext context) {
-		return transformAll( accumulated, converter::fromDocumentValue, context );
+		return transformAll( accumulated, converter.delegate(), context );
 	}
 
 	/**
