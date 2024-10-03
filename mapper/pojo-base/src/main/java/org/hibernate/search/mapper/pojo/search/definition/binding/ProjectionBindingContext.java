@@ -13,8 +13,8 @@ import org.hibernate.search.engine.environment.bean.BeanHolder;
 import org.hibernate.search.engine.environment.bean.BeanReference;
 import org.hibernate.search.engine.environment.bean.BeanResolver;
 import org.hibernate.search.engine.search.projection.ProjectionAccumulator;
+import org.hibernate.search.engine.search.projection.ProjectionAccumulatorProviderFactory;
 import org.hibernate.search.engine.search.projection.definition.ProjectionDefinition;
-import org.hibernate.search.engine.search.projection.dsl.ProjectionAccumulatorProviderFactory;
 import org.hibernate.search.engine.search.projection.dsl.SearchProjectionFactory;
 import org.hibernate.search.mapper.pojo.bridge.mapping.annotation.PropertyBinderRef;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.ObjectProjection;
@@ -219,6 +219,10 @@ public interface ProjectionBindingContext {
 	 */
 	boolean isIncluded(String fieldPath);
 
+	/**
+	 * @return An instance of a projection accumulator provider factory capable of supplying an accumulator provider
+	 * based on a container and component types.
+	 */
 	@Incubating
 	ProjectionAccumulatorProviderFactory projectionAccumulatorProviderFactory();
 

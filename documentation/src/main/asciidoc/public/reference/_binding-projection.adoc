@@ -87,10 +87,13 @@ include::{sourcedir}/org/hibernate/search/documentation/mapper/orm/binding/proje
 
 include::../components/_incubating-warning.adoc[]
 
-You can call `.multi()` on the context passed to the projection binder
-in order to discover whether the constructor parameter being bound is multi-valued
-(according to the same rules as <<mapping-projection-inner-inference-type,implicit inner projection inference>>),
-and to bind a multi-valued projection.
+You can call `.containerElement()` on the context passed to the projection binder
+in order to discover whether the constructor parameter being bound is some sort of container wrapping the value/values
+(according to the same rules as <<mapping-projection-inner-inference-type,implicit inner projection inference>>).
+If the returned value is a non-empty optional, then the `.constructorParameter()` will provide access to the container type in use.
+Additionally, the same context has access to a factory (`.projectionAccumulatorProviderFactory()`)
+from which a projection accumulator can be obtained based on a container and element types
+(if the container type is `null` then the factory will return the `nullable()` single-valued accumulator).
 
 .Implementing and using a `ProjectionBinder` supporting multi-valued projections
 ====
@@ -98,15 +101,18 @@ and to bind a multi-valued projection.
 ----
 include::{sourcedir}/org/hibernate/search/documentation/mapper/orm/binding/projectionbinder/multi/MyFieldProjectionBinder.java[tags=include]
 ----
-<1> `multi()` returns an optional that contains a context
-if and only if the constructor parameter is considered multi-valued.
-<2> Call `multi.definition(...)` to define the projection to use.
-<3> Here we're failing for single-valued constructor parameters,
-but we could theoreticall fall back to a single-valued projection.
-<4> The projection definition, being multi-valued,
-must implement `ProjectionDefinition<List<T>>`,
-where `T` is the exepected type of projected values,
+<1> `containerElement()` returns an optional that contains a type of the container elements
+if and only if the constructor parameter is considered as such that is wrapped in a container, e.g. a multivalued collection.
+<2> Call `context.definition(...)` to define the projection to use.
+<3> Here we're failing for single-valued (nullable) constructor parameters,
+but we could theoretically fall back to a single-valued projection using the `ProjectionAccumulator.nullable()`.
+<4> The projection definition, being multivalued,
+must implement `ProjectionDefinition<SomeCollection<T>>`,
+where `T` is the expected type of projected values,
+`SomeCollection` is one of the supported collection types available in `ProjectionAccumulator`,
 and must configure returned projections accordingly.
+If the required collection type is not present in the `ProjectionAccumulator`,
+then a custom projection accumulator provider can be supplied.
 
 [source, JAVA, indent=0, subs="+callouts"]
 ----
@@ -138,7 +144,8 @@ or by delegating to it in a custom projection definition.
 
 Other methods exposed on the binding context work similarly:
 
-* `.createObjectDefinitionMulti(...)` returns a <<binding-projection-multi,multi-valued>> object projection definition.
+* `.createObjectDefinition(..., ProjectionAccumulator.Provider)` returns an object projection definition with the provided accumulator applied
+and can be used for <<binding-projection-multi,multivalued>> object projections or object projections wrapped in some other containers.
 * `.createCompositeDefinition(...)` returns a (single-valued)
 <<search-dsl-projection-composite,composite projection>> definition
 (which, on contrary to an <<search-dsl-projection-object,object projection>>, is not bound to an object field in the index).
