@@ -326,7 +326,8 @@
         <version.com.github.tomakehurst.wiremock>2.27.2</version.com.github.tomakehurst.wiremock>
         <version.org.apache.commons.lang3>3.12.0</version.org.apache.commons.lang3>
         <version.org.apache.commons.math3>3.6.1</version.org.apache.commons.math3>
-        <version.org.apache.avro>1.11.3</version.org.apache.avro>
+        <version.commons-codec>1.17.1</version.commons-codec>
+        <version.org.apache.avro>1.11.4</version.org.apache.avro>
         <version.org.jboss.weld>3.1.9.Final</version.org.jboss.weld>
         <version.org.jboss.weld.jakarta>4.0.3.Final</version.org.jboss.weld.jakarta>
 
@@ -1129,6 +1130,13 @@
                 <groupId>org.apache.avro</groupId>
                 <artifactId>avro</artifactId>
                 <version>${version.org.apache.avro}</version>
+            </dependency>
+
+            <!-- Added to management to align the version between avro and elasticsearch-rest-client-sniffer -->
+            <dependency>
+                <groupId>commons-codec</groupId>
+                <artifactId>commons-codec</artifactId>
+                <version>${version.commons-codec}</version>
             </dependency>
 
             <!-- JBeret used by batch-jsr352 jberet module -->
