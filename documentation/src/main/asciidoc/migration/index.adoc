@@ -103,7 +103,8 @@ interfaces are removed in this version. They have their alternatives in a `org.h
 Instead, we are introducing the `org.hibernate.search.mapper.pojo.massindexing.MassIndexingTypeGroupMonitor`
 that can be obtained through `org.hibernate.search.mapper.pojo.massindexing.MassIndexingMonitor#typeGroupMonitor(..)`.
 This new type group monitor has more flexibility and also allows implementors to skip total count computations if needed.
-- `multi()` methods exposed in various projection DSL steps are deprecated in favour of an `accumulator(ProjectionAccumulator.Provider)`.
+- `multi()` methods exposed in various projection DSL steps are deprecated in favour of an `accumulator(ProjectionAccumulator.Provider)`,
+or one of the "shortcut-methods": `.list()`/`.set()`/`.sortedSet()`...
 Check the `ProjectionAccumulator` factory methods to see the list of built-in accumulators that provide support for nullable/optional single-valued projections
 and for multivalued ones such as lists, sets arrays and more.
 

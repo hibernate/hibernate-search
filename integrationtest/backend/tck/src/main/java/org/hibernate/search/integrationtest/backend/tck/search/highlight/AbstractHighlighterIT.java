@@ -30,7 +30,6 @@ import org.hibernate.search.engine.search.highlighter.SearchHighlighter;
 import org.hibernate.search.engine.search.highlighter.dsl.HighlighterEncoder;
 import org.hibernate.search.engine.search.highlighter.dsl.HighlighterOptionsStep;
 import org.hibernate.search.engine.search.highlighter.dsl.SearchHighlighterFactory;
-import org.hibernate.search.engine.search.projection.ProjectionAccumulator;
 import org.hibernate.search.engine.search.query.SearchQuery;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.configuration.DefaultAnalysisDefinitions;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.TckConfiguration;
@@ -147,7 +146,7 @@ abstract class AbstractHighlighterIT {
 		StubMappingScope scope = index.createScope();
 
 		SearchQuery<Set<String>> highlights = scope.query().select(
-				f -> f.highlight( "string" ).accumulator( ProjectionAccumulator.set() )
+				f -> f.highlight( "string" ).set()
 		)
 				.where( f -> f.match().field( "string" ).matching( "another" ) )
 				.toQuery();
@@ -164,7 +163,7 @@ abstract class AbstractHighlighterIT {
 		StubMappingScope scope = index.createScope();
 
 		SearchQuery<SortedSet<String>> highlights = scope.query().select(
-				f -> f.highlight( "string" ).accumulator( ProjectionAccumulator.sortedSet() )
+				f -> f.highlight( "string" ).sortedSet()
 		)
 				.where( f -> f.match().field( "string" ).matching( "another" ) )
 				.toQuery();
@@ -182,7 +181,7 @@ abstract class AbstractHighlighterIT {
 		StubMappingScope scope = index.createScope();
 
 		SearchQuery<String[]> highlights = scope.query().select(
-				f -> f.highlight( "string" ).accumulator( ProjectionAccumulator.array( String.class ) )
+				f -> f.highlight( "string" ).array()
 		)
 				.where( f -> f.match().field( "string" ).matching( "another" ) )
 				.toQuery();
@@ -500,7 +499,7 @@ abstract class AbstractHighlighterIT {
 		StubMappingScope scope = index.createScope();
 
 		SearchQuery<String> highlights = scope.query().select(
-				f -> f.highlight( "anotherString" ).accumulator( ProjectionAccumulator.nullable() )
+				f -> f.highlight( "anotherString" ).nullable()
 		)
 				.where( f -> f.match().field( "anotherString" ).matching( "ipsum" ) )
 				.highlighter( h -> highlighter( h ).numberOfFragments( 1 ) )
@@ -518,7 +517,7 @@ abstract class AbstractHighlighterIT {
 		StubMappingScope scope = index.createScope();
 
 		SearchQuery<Optional<String>> highlights = scope.query().select(
-				f -> f.highlight( "anotherString" ).accumulator( ProjectionAccumulator.optional() )
+				f -> f.highlight( "anotherString" ).optional()
 		)
 				.where( f -> f.match().field( "anotherString" ).matching( "ipsum" ) )
 				.highlighter( h -> highlighter( h ).numberOfFragments( 1 ) )
@@ -600,7 +599,7 @@ abstract class AbstractHighlighterIT {
 
 		// numberOfFragments > 1
 		assertThatThrownBy( () -> scope.query().select(
-				f -> f.highlight( "anotherString" ).accumulator( ProjectionAccumulator.nullable() )
+				f -> f.highlight( "anotherString" ).nullable()
 		)
 				.where( f -> f.match().field( "anotherString" ).matching( "ipsum" ) )
 				.highlighter( h -> highlighter( h ).numberOfFragments( 2 ) )
@@ -611,7 +610,7 @@ abstract class AbstractHighlighterIT {
 
 		// numberOfFragments not defined
 		assertThatThrownBy( () -> scope.query().select(
-				f -> f.highlight( "anotherString" ).accumulator( ProjectionAccumulator.nullable() )
+				f -> f.highlight( "anotherString" ).nullable()
 		)
 				.where( f -> f.match().field( "anotherString" ).matching( "ipsum" ) )
 				.highlighter( h -> highlighter( h ) )
@@ -626,7 +625,7 @@ abstract class AbstractHighlighterIT {
 		StubMappingScope scope = index.createScope();
 
 		SearchQuery<String> highlights = scope.query().select(
-				f -> f.highlight( "anotherString" ).accumulator( ProjectionAccumulator.nullable() )
+				f -> f.highlight( "anotherString" ).nullable()
 		)
 				.where( f -> f.match().field( "anotherString" ).matching( "thisCannotBeMatchedToAnythingInTheText" ) )
 				.highlighter( h -> highlighter( h ).numberOfFragments( 1 ) )

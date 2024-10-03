@@ -22,6 +22,7 @@ import java.time.YearMonth;
 import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
 import java.time.temporal.TemporalAccessor;
+import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.LinkedHashMap;
 import java.util.Locale;
@@ -31,6 +32,7 @@ import java.util.Optional;
 import org.hibernate.search.backend.elasticsearch.types.format.impl.ElasticsearchDefaultFieldFormatProvider;
 import org.hibernate.search.engine.backend.types.VectorSimilarity;
 import org.hibernate.search.engine.cfg.spi.FormatUtils;
+import org.hibernate.search.engine.search.projection.ProjectionAccumulator;
 import org.hibernate.search.engine.spatial.GeoPoint;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.BigDecimalFieldTypeDescriptor;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.FieldTypeDescriptor;
@@ -513,5 +515,16 @@ public class ElasticsearchTckBackendFeatures extends TckBackendFeatures {
 			return false;
 		}
 		return super.rawAggregationProduceSensibleDoubleValue( fFieldTypeDescriptor );
+	}
+
+	@Override
+	public <U, R> R accumulatedNullValue(ProjectionAccumulator.Provider<U, R> accumulator) {
+		return accumulatedNullValue( accumulator.get() );
+	}
+
+	private <U, R, A> R accumulatedNullValue(ProjectionAccumulator<Object, U, A, R> accumulator) {
+		ArrayList<Object> values = new ArrayList<>();
+		values.add( null );
+		return accumulator.finish( accumulator.accumulateAll( accumulator.createInitial(), values ) );
 	}
 }
