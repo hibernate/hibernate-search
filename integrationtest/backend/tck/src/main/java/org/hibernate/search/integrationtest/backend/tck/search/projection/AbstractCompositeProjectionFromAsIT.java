@@ -5,6 +5,7 @@
 package org.hibernate.search.integrationtest.backend.tck.search.projection;
 
 import static org.hibernate.search.util.impl.integrationtest.common.assertion.SearchResultAssert.assertThatQuery;
+import static org.junit.jupiter.api.Assumptions.assumeTrue;
 import static org.mockito.Mockito.when;
 
 import java.time.LocalDate;
@@ -12,6 +13,9 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
+import java.util.SortedSet;
+import java.util.TreeSet;
 import java.util.function.BiFunction;
 import java.util.function.Function;
 import java.util.function.IntFunction;
@@ -289,8 +293,7 @@ public abstract class AbstractCompositeProjectionFromAsIT<B extends AbstractComp
 		@Test
 		public void as_transformer_accumulator() {
 			assertThatQuery( index.query()
-					.select( f -> doAs( doFromForMulti( f, startProjectionForMulti( f ) ) )
-							.accumulator( ProjectionAccumulator.list() ) )
+					.select( f -> doAs( doFromForMulti( f, startProjectionForMulti( f ) ) ).list() )
 					.where( f -> f.matchAll() ) )
 					.hasHitsAnyOrder( expectedTransformedForMulti() );
 		}
@@ -302,6 +305,35 @@ public abstract class AbstractCompositeProjectionFromAsIT<B extends AbstractComp
 					.select( f -> doAs( doFromForMulti( f, startProjectionForMulti( f ) ) ).multi() )
 					.where( f -> f.matchAll() ) )
 					.hasHitsAnyOrder( expectedTransformedForMulti() );
+		}
+
+		@Test
+		public void as_transformer_set() {
+			assertThatQuery( index.query()
+					.select( f -> doAs( doFromForMulti( f, startProjectionForMulti( f ) ) ).set() )
+					.where( f -> f.matchAll() ) )
+					.hasHitsAnyOrder( expectedTransformedForMulti()
+							.stream()
+							.map( l -> (Set<T>) new HashSet<>( l ) )
+							.toList()
+					);
+		}
+
+		@Test
+		public void as_transformer_sortedSet() {
+			Collection<List<T>> lists = expectedTransformedForMulti();
+			assumeTrue(
+					lists.iterator().next().get( 0 ) instanceof Comparable,
+					"This test only makes sense for comparable types"
+			);
+
+			assertThatQuery( index.query()
+					.select( f -> doAs( doFromForMulti( f, startProjectionForMulti( f ) ) ).sortedSet() )
+					.where( f -> f.matchAll() ) )
+					.hasHitsAnyOrder( lists.stream()
+							.map( l -> (SortedSet<T>) new TreeSet<>( l ) )
+							.toList()
+					);
 		}
 
 		@Override

@@ -6,6 +6,7 @@ package org.hibernate.search.util.impl.integrationtest.common.assertion;
 
 import java.util.Comparator;
 import java.util.Iterator;
+import java.util.Optional;
 
 public class TestComparators {
 
@@ -53,6 +54,42 @@ public class TestComparators {
 				return -1; // b is a prefix of a
 			}
 			else if ( bIt.hasNext() ) {
+				return 1; // a is a prefix of b
+			}
+			else {
+				return 0; // a and b have the same number of elements, all equal according to the element comparator
+			}
+		} );
+	}
+
+	public static <T> Comparator<Optional<T>> optional(Comparator<T> elementComparator) {
+		return Comparator.nullsFirst( (a, b) -> {
+			if ( a.isPresent() && b.isPresent() ) {
+				return elementComparator.compare( a.get(), b.get() );
+			}
+			if ( a.isEmpty() && b.isEmpty() ) {
+				return 0;
+			}
+			return a.isEmpty() ? -1 : 1;
+		} );
+	}
+
+	public static <T> Comparator<T[]> array(Comparator<T> elementComparator) {
+		return Comparator.nullsFirst( (a, b) -> {
+			int index = 0;
+			int min = Math.min( a.length, b.length );
+			for ( ; index < min; index++ ) {
+				T aElem = a[index];
+				T bElem = b[index];
+				int elemOrder = elementComparator.compare( aElem, bElem );
+				if ( elemOrder != 0 ) {
+					return elemOrder; // lexicographical ordering: the first differing element dictates the order.
+				}
+			}
+			if ( a.length < b.length ) {
+				return -1; // b is a prefix of a
+			}
+			else if ( a.length > b.length ) {
 				return 1; // a is a prefix of b
 			}
 			else {
