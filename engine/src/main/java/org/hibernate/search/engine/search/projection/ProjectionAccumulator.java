@@ -39,34 +39,72 @@ import org.hibernate.search.engine.search.projection.spi.BuiltInProjectionAccumu
  */
 public interface ProjectionAccumulator<E, V, A, R> {
 
+	/**
+	 * @return The projection accumulator capable of accumulating single-valued projections in an as-is form,
+	 * i.e. the value is returned without any extra transformations.
+	 * @param <V> The type of values to accumulate.
+	 */
 	static <V> ProjectionAccumulator.Provider<V, V> nullable() {
 		return BuiltInProjectionAccumulators.nullable();
 	}
 
-	static <V> Provider<V, List<V>> list() {
-		return BuiltInProjectionAccumulators.list();
-	}
-
-	static <V, C> Provider<V, C> simple(Function<List<V>, C> converter) {
-		return BuiltInProjectionAccumulators.simple( converter );
-	}
-
+	/**
+	 * @return The projection accumulator capable of accumulating single-valued projections and wrapping the values in an {@link Optional}.
+	 * @param <V> The type of values to accumulate.
+	 */
 	static <V> Provider<V, Optional<V>> optional() {
 		return BuiltInProjectionAccumulators.optional();
 	}
 
+	/**
+	 * @param converter The function that defines how to convert a list of collected values to the final collection.
+	 * @return An accumulator based on a list as a temporary storage.
+	 * @param <V> The type of values to accumulate.
+	 * @param <C> The type of the resulting collection.
+	 */
+	static <V, C> Provider<V, C> simple(Function<List<V>, C> converter) {
+		return BuiltInProjectionAccumulators.simple( converter );
+	}
+
+	/**
+	 * @return The projection accumulator capable of accumulating multivalued projections as a {@link List}.
+	 * @param <V> The type of values to accumulate.
+	 */
+	static <V> Provider<V, List<V>> list() {
+		return BuiltInProjectionAccumulators.list();
+	}
+
+	/**
+	 * @return The projection accumulator capable of accumulating multivalued projections as a {@link Set}.
+	 * @param <V> The type of values to accumulate.
+	 */
 	static <V> Provider<V, Set<V>> set() {
 		return BuiltInProjectionAccumulators.set();
 	}
 
+	/**
+	 * @return The projection accumulator capable of accumulating multivalued projections as a {@link SortedSet}.
+	 * @param <V> The type of values to accumulate.
+	 */
 	static <V> Provider<V, SortedSet<V>> sortedSet() {
 		return BuiltInProjectionAccumulators.sortedSet();
 	}
 
+	/**
+	 * @return The projection accumulator capable of accumulating multivalued projections as a {@link SortedSet}
+	 * using a custom comparator.
+	 * @param comparator The comparator which should be used by the sorted set.
+	 * @param <V> The type of values to accumulate.
+	 */
 	static <V> Provider<V, SortedSet<V>> sortedSet(Comparator<? super V> comparator) {
 		return BuiltInProjectionAccumulators.sortedSet( comparator );
 	}
 
+	/**
+	 * @return The projection accumulator capable of accumulating multivalued projections as an array.
+	 * @param componentType The type of the array elements.
+	 * @param <V> The type of values to accumulate.
+	 */
 	static <V> Provider<V, V[]> array(Class<? super V> componentType) {
 		return BuiltInProjectionAccumulators.array( componentType );
 	}

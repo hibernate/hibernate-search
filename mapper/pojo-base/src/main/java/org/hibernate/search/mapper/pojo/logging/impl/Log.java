@@ -1050,8 +1050,7 @@ public interface Log extends BasicLogger {
 
 	@Message(id = ID_OFFSET + 170,
 			value = "Implicit binding of a java.util.SortedSet<%1$s> constructor parameter is not possible since %1$s is not implementing java.lang.Comparable."
-					+ " Either make %1$s implement java.lang.Comparable or use a programmatic mapping and provide"
-					+ " a custom ProjectionAccumulatorProviderFactory that, for example, utilizes a ProjectionAccumulator.sortedSet(comparator) accumulator provider.")
+					+ " Either make %1$s implement java.lang.Comparable or create a custom @ProjectionBinding and use the ProjectionAccumulator.sortedSet(comparator) accumulator provider in it.")
 	SearchException cannotBindSortedSetWithNonComparableElements(@FormatWith(ClassFormatter.class) Class<?> elementType,
 			@Param EventContext eventContext);
 }

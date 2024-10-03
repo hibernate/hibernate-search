@@ -21,11 +21,11 @@ import org.hibernate.search.engine.environment.bean.BeanHolder;
 import org.hibernate.search.engine.environment.bean.BeanResolver;
 import org.hibernate.search.engine.mapper.model.spi.MappingElement;
 import org.hibernate.search.engine.search.projection.ProjectionAccumulator;
+import org.hibernate.search.engine.search.projection.ProjectionAccumulatorProviderFactory;
 import org.hibernate.search.engine.search.projection.definition.ProjectionDefinition;
 import org.hibernate.search.engine.search.projection.definition.spi.CompositeProjectionDefinition;
 import org.hibernate.search.engine.search.projection.definition.spi.ConstantProjectionDefinition;
 import org.hibernate.search.engine.search.projection.definition.spi.ObjectProjectionDefinition;
-import org.hibernate.search.engine.search.projection.dsl.ProjectionAccumulatorProviderFactory;
 import org.hibernate.search.mapper.pojo.extractor.builtin.BuiltinContainerExtractors;
 import org.hibernate.search.mapper.pojo.extractor.impl.BoundContainerExtractorPath;
 import org.hibernate.search.mapper.pojo.extractor.mapping.programmatic.ContainerExtractorPath;
@@ -359,6 +359,7 @@ public class ProjectionBindingContextImpl<P> implements ProjectionBindingContext
 		}
 	}
 
+	@Deprecated(since = "8.0")
 	public class MultiContextImpl<PV> implements ProjectionBindingMultiContext {
 		public final PojoTypeModel<PV> parameterContainerElementTypeModel;
 		private final PojoModelValue<PV> parameterContainerElementRootElement;
