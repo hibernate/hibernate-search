@@ -121,7 +121,7 @@ public class ElasticsearchFieldProjection<F, V, P, T> extends AbstractElasticsea
 		public P transform(LoadingResult<?> loadingResult, A extractedData,
 				ProjectionTransformContext context) {
 			FromDocumentValueConvertContext convertContext = context.fromDocumentValueConvertContext();
-			A transformedData = accumulator.transformAll( extractedData, converter::fromDocumentValue, convertContext );
+			A transformedData = accumulator.transformAll( extractedData, converter.delegate(), convertContext );
 			return accumulator.finish( transformedData );
 		}
 	}
