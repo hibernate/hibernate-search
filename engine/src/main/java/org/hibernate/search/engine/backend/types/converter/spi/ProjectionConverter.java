@@ -88,4 +88,11 @@ public final class ProjectionConverter<F, V> {
 		return delegate.isCompatibleWith( other.delegate );
 	}
 
+
+	/**
+	 * @return The document value converter that is backing up this converter.
+	 */
+	public FromDocumentValueConverter<? super F, V> delegate() {
+		return delegate;
+	}
 }
