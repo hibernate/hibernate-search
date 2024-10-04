@@ -14,7 +14,9 @@ import org.hibernate.search.util.common.annotation.Incubating;
 /**
  * The context returned by {@link ProjectionBindingContext#multi()}.
  * @see ProjectionBindingContext#multi()
+ * @deprecated Use {@link ProjectionBindingContext}/{@link ProjectionBindingContext#containerElement()} instead.
  */
+@Deprecated(since = "8.0")
 @Incubating
 public interface ProjectionBindingMultiContext {
 

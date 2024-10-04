@@ -7,15 +7,14 @@ package org.hibernate.search.util.impl.integrationtest.common.stub.backend.searc
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Iterator;
-import java.util.List;
 
 import org.hibernate.search.engine.backend.types.converter.spi.ProjectionConverter;
 import org.hibernate.search.engine.search.common.ValueModel;
 import org.hibernate.search.engine.search.loading.spi.LoadingResult;
 import org.hibernate.search.engine.search.loading.spi.ProjectionHitMapper;
+import org.hibernate.search.engine.search.projection.ProjectionAccumulator;
 import org.hibernate.search.engine.search.projection.SearchProjection;
 import org.hibernate.search.engine.search.projection.spi.FieldProjectionBuilder;
-import org.hibernate.search.engine.search.projection.spi.ProjectionAccumulator;
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.search.common.impl.AbstractStubSearchQueryElementFactory;
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.search.common.impl.StubSearchIndexNodeContext;
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.search.common.impl.StubSearchIndexScope;
@@ -43,13 +42,13 @@ public class StubFieldProjection<F, V, A, P> extends StubSearchProjection<P> {
 	@Override
 	public A extract(ProjectionHitMapper<?> projectionHitMapper, Iterator<?> projectionFromIndex,
 			StubSearchProjectionContext context) {
-		List<?> fieldValues;
+		Iterable<?> fieldValues;
 		if ( singleValued ) {
 			Object singleValue = projectionFromIndex.next();
 			fieldValues = singleValue == null ? Collections.emptyList() : Arrays.asList( singleValue );
 		}
 		else {
-			fieldValues = (List<?>) projectionFromIndex.next();
+			fieldValues = (Iterable<?>) projectionFromIndex.next();
 		}
 		A accumulated = accumulator.createInitial();
 		for ( Object fieldValue : fieldValues ) {
@@ -63,7 +62,8 @@ public class StubFieldProjection<F, V, A, P> extends StubSearchProjection<P> {
 	public P transform(LoadingResult<?> loadingResult, Object extractedData,
 			StubSearchProjectionContext context) {
 		A accumulated = (A) extractedData;
-		A transformedData = accumulator.transformAll( accumulated, converter, context.fromDocumentValueConvertContext() );
+		A transformedData = accumulator.transformAll( accumulated, converter.delegate(),
+				context.fromDocumentValueConvertContext() );
 		return accumulator.finish( transformedData );
 	}
 

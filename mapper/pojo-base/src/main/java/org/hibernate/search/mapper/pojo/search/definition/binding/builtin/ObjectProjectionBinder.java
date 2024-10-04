@@ -8,11 +8,12 @@ import java.lang.invoke.MethodHandles;
 import java.util.Optional;
 
 import org.hibernate.search.engine.common.tree.TreeFilterDefinition;
+import org.hibernate.search.engine.search.projection.ProjectionAccumulator;
 import org.hibernate.search.mapper.pojo.logging.impl.Log;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.ObjectProjection;
+import org.hibernate.search.mapper.pojo.model.PojoModelValue;
 import org.hibernate.search.mapper.pojo.search.definition.binding.ProjectionBinder;
 import org.hibernate.search.mapper.pojo.search.definition.binding.ProjectionBindingContext;
-import org.hibernate.search.mapper.pojo.search.definition.binding.ProjectionBindingMultiContext;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
 /**
@@ -91,26 +92,31 @@ public final class ObjectProjectionBinder implements ProjectionBinder {
 
 	@Override
 	public void bind(ProjectionBindingContext context) {
-		Optional<? extends ProjectionBindingMultiContext> multiOptional = context.multi();
+		Optional<PojoModelValue<?>> containerElementOptional = context.containerElement();
 		String fieldPath = fieldPathOrFail( context );
-		if ( multiOptional.isPresent() ) {
-			ProjectionBindingMultiContext multi = multiOptional.get();
-			bind( context, multi, fieldPath, multi.containerElement().rawType() );
+		Class<?> containerClass;
+		Class<?> containerElementClass;
+		if ( containerElementOptional.isPresent() ) {
+			PojoModelValue<?> containerElement = containerElementOptional.get();
+			containerElementClass = containerElement.rawType();
+			containerClass = context.constructorParameter().rawType();
 		}
 		else {
-			bind( context, fieldPath, context.constructorParameter().rawType() );
+			containerElementClass = context.constructorParameter().rawType();
+			containerClass = null;
 		}
+		bind( context, fieldPath, containerClass, containerElementClass );
 	}
 
-	private <T> void bind(ProjectionBindingContext context, String fieldPath, Class<T> constructorParameterType) {
-		context.definition( constructorParameterType,
-				context.createObjectDefinition( fieldPath, constructorParameterType, filter ) );
-	}
+	private <T, C> void bind(ProjectionBindingContext context, String fieldPath, Class<C> containerType,
+			Class<T> containerElementType) {
+		ProjectionAccumulator.Provider<T, ?> accumulator = context.projectionAccumulatorProviderFactory()
+				.projectionAccumulatorProvider( containerType, containerElementType );
 
-	private <T> void bind(ProjectionBindingContext context, ProjectionBindingMultiContext multi,
-			String fieldPath, Class<T> containerElementType) {
-		multi.definition( containerElementType,
-				context.createObjectDefinitionMulti( fieldPath, containerElementType, filter ) );
+		context.definition(
+				containerElementType,
+				context.createObjectDefinition( fieldPath, containerElementType, filter, accumulator )
+		);
 	}
 
 	private String fieldPathOrFail(ProjectionBindingContext context) {

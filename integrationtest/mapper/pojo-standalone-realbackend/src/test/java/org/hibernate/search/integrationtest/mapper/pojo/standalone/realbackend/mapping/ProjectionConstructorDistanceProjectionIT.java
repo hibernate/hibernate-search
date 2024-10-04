@@ -337,6 +337,6 @@ class ProjectionConstructorDistanceProjectionIT {
 				.setup( IndexedEntity.class )
 		).isInstanceOf( SearchException.class )
 				.hasMessageContainingAll(
-						"Invalid constructor parameter type: 'java.lang.String'. The distance projection results in values of type 'List<Double>'" );
+						"Invalid constructor parameter type: 'java.lang.String'. The distance projection results in values of type 'SomeContainer<Double>'" );
 	}
 }

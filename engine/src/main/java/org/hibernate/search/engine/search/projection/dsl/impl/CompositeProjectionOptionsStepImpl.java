@@ -4,10 +4,10 @@
  */
 package org.hibernate.search.engine.search.projection.dsl.impl;
 
+import org.hibernate.search.engine.search.projection.ProjectionAccumulator;
 import org.hibernate.search.engine.search.projection.SearchProjection;
 import org.hibernate.search.engine.search.projection.dsl.CompositeProjectionOptionsStep;
 import org.hibernate.search.engine.search.projection.spi.CompositeProjectionBuilder;
-import org.hibernate.search.engine.search.projection.spi.ProjectionAccumulator;
 import org.hibernate.search.engine.search.projection.spi.ProjectionCompositor;
 
 public class CompositeProjectionOptionsStepImpl<T, P>

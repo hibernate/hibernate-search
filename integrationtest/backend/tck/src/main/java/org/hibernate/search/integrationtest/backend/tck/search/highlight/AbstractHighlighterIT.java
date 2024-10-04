@@ -14,7 +14,11 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
+import java.util.SortedSet;
+import java.util.TreeSet;
+import java.util.stream.Collectors;
 
 import org.hibernate.search.engine.backend.document.IndexFieldReference;
 import org.hibernate.search.engine.backend.document.IndexObjectFieldReference;
@@ -134,6 +138,58 @@ abstract class AbstractHighlighterIT {
 				.hasHitsAnyOrder(
 						Arrays.asList( "some <em>another</em> value" ),
 						Arrays.asList( "some yet <em>another</em> value" )
+				);
+	}
+
+	@Test
+	void collectAsSet() {
+		StubMappingScope scope = index.createScope();
+
+		SearchQuery<Set<String>> highlights = scope.query().select(
+				f -> f.highlight( "string" ).set()
+		)
+				.where( f -> f.match().field( "string" ).matching( "another" ) )
+				.toQuery();
+
+		assertThatHits( highlights.fetchAllHits() )
+				.hasHitsAnyOrder(
+						Set.of( "some <em>another</em> value" ),
+						Set.of( "some yet <em>another</em> value" )
+				);
+	}
+
+	@Test
+	void collectAsSortedSet() {
+		StubMappingScope scope = index.createScope();
+
+		SearchQuery<SortedSet<String>> highlights = scope.query().select(
+				f -> f.highlight( "string" ).sortedSet()
+		)
+				.where( f -> f.match().field( "string" ).matching( "another" ) )
+				.toQuery();
+
+		assertThatHits( highlights.fetchAllHits() )
+				.hasHitsAnyOrder(
+						new TreeSet<>( Set.of( "some <em>another</em> value" ) ),
+						new TreeSet<>( Set.of( "some yet <em>another</em> value" )
+						)
+				);
+	}
+
+	@Test
+	void collectAsArray() {
+		StubMappingScope scope = index.createScope();
+
+		SearchQuery<String[]> highlights = scope.query().select(
+				f -> f.highlight( "string" ).array()
+		)
+				.where( f -> f.match().field( "string" ).matching( "another" ) )
+				.toQuery();
+
+		assertThatHits( highlights.fetchAllHits() )
+				.hasHitsAnyOrder(
+						new String[] { "some <em>another</em> value" },
+						new String[] { "some yet <em>another</em> value" }
 				);
 	}
 
@@ -443,7 +499,7 @@ abstract class AbstractHighlighterIT {
 		StubMappingScope scope = index.createScope();
 
 		SearchQuery<String> highlights = scope.query().select(
-				f -> f.highlight( "anotherString" ).single()
+				f -> f.highlight( "anotherString" ).nullable()
 		)
 				.where( f -> f.match().field( "anotherString" ).matching( "ipsum" ) )
 				.highlighter( h -> highlighter( h ).numberOfFragments( 1 ) )
@@ -455,7 +511,28 @@ abstract class AbstractHighlighterIT {
 				);
 	}
 
+
 	@Test
+	void numberOfFragmentsSingleOptional() {
+		StubMappingScope scope = index.createScope();
+
+		SearchQuery<Optional<String>> highlights = scope.query().select(
+				f -> f.highlight( "anotherString" ).optional()
+		)
+				.where( f -> f.match().field( "anotherString" ).matching( "ipsum" ) )
+				.highlighter( h -> highlighter( h ).numberOfFragments( 1 ) )
+				.toQuery();
+
+		assertThatHits( highlights.fetchAllHits() )
+				.hasHitsAnyOrder(
+						numberOfFragmentsResult()
+								.stream().map( Optional::of )
+								.collect( Collectors.toList() )
+				);
+	}
+
+	@Test
+	@Deprecated(since = "8.0")
 	void numberOfFragmentsSingleNamedHighlighter() {
 		StubMappingScope scope = index.createScope();
 
@@ -472,8 +549,9 @@ abstract class AbstractHighlighterIT {
 				);
 	}
 
+	@Deprecated
 	@Test
-	void numberOfFragmentsSingleError() {
+	void numberOfFragmentsSingleErrorSingle() {
 		StubMappingScope scope = index.createScope();
 
 		// numberOfFragments > 1
@@ -499,12 +577,55 @@ abstract class AbstractHighlighterIT {
 						"A single-valued highlight projection requested, but the corresponding highlighter does not set number of fragments to 1" );
 	}
 
+	@Deprecated
+	@Test
+	void numberOfFragmentsSingleButNoExpectedValuesReturnedSingle() {
+		StubMappingScope scope = index.createScope();
+
+		SearchQuery<String> highlights = scope.query().select(
+				f -> f.highlight( "anotherString" ).single()
+		)
+				.where( f -> f.match().field( "anotherString" ).matching( "thisCannotBeMatchedToAnythingInTheText" ) )
+				.highlighter( h -> highlighter( h ).numberOfFragments( 1 ) )
+				.toQuery();
+
+		assertThatHits( highlights.fetchAllHits() )
+				.hasHitsAnyOrder( List.of() );
+	}
+
+	@Test
+	void numberOfFragmentsSingleError() {
+		StubMappingScope scope = index.createScope();
+
+		// numberOfFragments > 1
+		assertThatThrownBy( () -> scope.query().select(
+				f -> f.highlight( "anotherString" ).nullable()
+		)
+				.where( f -> f.match().field( "anotherString" ).matching( "ipsum" ) )
+				.highlighter( h -> highlighter( h ).numberOfFragments( 2 ) )
+				.toQuery()
+		).isInstanceOf( SearchException.class )
+				.hasMessageContainingAll(
+						"A single-valued highlight projection requested, but the corresponding highlighter does not set number of fragments to 1" );
+
+		// numberOfFragments not defined
+		assertThatThrownBy( () -> scope.query().select(
+				f -> f.highlight( "anotherString" ).nullable()
+		)
+				.where( f -> f.match().field( "anotherString" ).matching( "ipsum" ) )
+				.highlighter( h -> highlighter( h ) )
+				.toQuery()
+		).isInstanceOf( SearchException.class )
+				.hasMessageContainingAll(
+						"A single-valued highlight projection requested, but the corresponding highlighter does not set number of fragments to 1" );
+	}
+
 	@Test
 	void numberOfFragmentsSingleButNoExpectedValuesReturned() {
 		StubMappingScope scope = index.createScope();
 
 		SearchQuery<String> highlights = scope.query().select(
-				f -> f.highlight( "anotherString" ).single()
+				f -> f.highlight( "anotherString" ).nullable()
 		)
 				.where( f -> f.match().field( "anotherString" ).matching( "thisCannotBeMatchedToAnythingInTheText" ) )
 				.highlighter( h -> highlighter( h ).numberOfFragments( 1 ) )

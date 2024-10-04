@@ -9,6 +9,7 @@ import java.util.Optional;
 
 import org.hibernate.search.engine.backend.types.ObjectStructure;
 import org.hibernate.search.engine.backend.types.VectorSimilarity;
+import org.hibernate.search.engine.search.projection.ProjectionAccumulator;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.FieldTypeDescriptor;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappingBackendFeatures;
 
@@ -199,5 +200,9 @@ public abstract class TckBackendFeatures implements StubMappingBackendFeatures {
 
 	public boolean negativeDecimalScaleIsAppliedToAvgAggregationFunction() {
 		return true;
+	}
+
+	public <U, R> R accumulatedNullValue(ProjectionAccumulator.Provider<U, R> accumulator) {
+		return accumulator.get().empty();
 	}
 }

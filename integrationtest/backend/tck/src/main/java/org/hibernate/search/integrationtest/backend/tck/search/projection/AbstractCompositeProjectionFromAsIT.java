@@ -5,12 +5,17 @@
 package org.hibernate.search.integrationtest.backend.tck.search.projection;
 
 import static org.hibernate.search.util.impl.integrationtest.common.assertion.SearchResultAssert.assertThatQuery;
+import static org.junit.jupiter.api.Assumptions.assumeTrue;
 import static org.mockito.Mockito.when;
 
 import java.time.LocalDate;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
+import java.util.SortedSet;
+import java.util.TreeSet;
 import java.util.function.BiFunction;
 import java.util.function.Function;
 import java.util.function.IntFunction;
@@ -20,6 +25,7 @@ import org.hibernate.search.engine.backend.common.spi.FieldPaths;
 import org.hibernate.search.engine.backend.document.DocumentElement;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaElement;
 import org.hibernate.search.engine.backend.types.Projectable;
+import org.hibernate.search.engine.search.projection.ProjectionAccumulator;
 import org.hibernate.search.engine.search.projection.definition.spi.ProjectionRegistry;
 import org.hibernate.search.engine.search.projection.dsl.CompositeProjectionFrom1AsStep;
 import org.hibernate.search.engine.search.projection.dsl.CompositeProjectionFrom2AsStep;
@@ -109,7 +115,8 @@ public abstract class AbstractCompositeProjectionFromAsIT<B extends AbstractComp
 		@Test
 		public void asList_multi() {
 			assertThatQuery( index.query()
-					.select( f -> doFromForMulti( f, startProjectionForMulti( f ) ).asList().multi() )
+					.select( f -> doFromForMulti( f, startProjectionForMulti( f ) ).asList()
+							.accumulator( ProjectionAccumulator.list() ) )
 					.where( f -> f.matchAll() ) )
 					.hasHitsAnyOrder( expectedListsForMulti() );
 		}
@@ -151,10 +158,23 @@ public abstract class AbstractCompositeProjectionFromAsIT<B extends AbstractComp
 		@Test
 		public void asArray_multi() {
 			assertThatQuery( index.query()
-					.select( f -> doFromForMulti( f, startProjectionForMulti( f ) ).asArray().multi() )
+					.select( f -> doFromForMulti( f, startProjectionForMulti( f ) ).asArray()
+							.accumulator( ProjectionAccumulator.list() ) )
 					.where( f -> f.matchAll() ) )
 					.hits().asIs().usingRecursiveFieldByFieldElementComparator()
 					.containsExactlyInAnyOrderElementsOf( expectedArraysForMulti() );
+		}
+
+		@Test
+		public void asArray_set() {
+			assertThatQuery( index.query()
+					.select( f -> doFromForMulti( f, startProjectionForMulti( f ) ).asArray()
+							.accumulator( ProjectionAccumulator.set() ) )
+					.where( f -> f.matchAll() ) )
+					.hits().asIs().usingRecursiveFieldByFieldElementComparator()
+					.containsExactlyInAnyOrderElementsOf( expectedArraysForMulti()
+							.stream().map( HashSet::new )
+							.toList() );
 		}
 
 		@Test
@@ -195,7 +215,8 @@ public abstract class AbstractCompositeProjectionFromAsIT<B extends AbstractComp
 				doFrom( f, index.binding().compositeForMulti(), CompositeBinding::relativePath, initialStep )
 						.asArray( ValueWrapper<Object[]>::new ) );
 				assertThatQuery( index.createScope().query()
-						.select( f -> startProjectionForMulti( f ).as( ValueWrapper.class ).multi() )
+						.select( f -> startProjectionForMulti( f ).as( ValueWrapper.class )
+								.accumulator( ProjectionAccumulator.list() ) )
 						.where( f -> f.matchAll() ) )
 						.hits().asIs().usingRecursiveFieldByFieldElementComparator()
 						.containsExactlyInAnyOrderElementsOf( expectedArraysForMulti().stream()
@@ -270,11 +291,49 @@ public abstract class AbstractCompositeProjectionFromAsIT<B extends AbstractComp
 		}
 
 		@Test
+		public void as_transformer_accumulator() {
+			assertThatQuery( index.query()
+					.select( f -> doAs( doFromForMulti( f, startProjectionForMulti( f ) ) ).list() )
+					.where( f -> f.matchAll() ) )
+					.hasHitsAnyOrder( expectedTransformedForMulti() );
+		}
+
+		@Deprecated
+		@Test
 		public void as_transformer_multi() {
 			assertThatQuery( index.query()
 					.select( f -> doAs( doFromForMulti( f, startProjectionForMulti( f ) ) ).multi() )
 					.where( f -> f.matchAll() ) )
 					.hasHitsAnyOrder( expectedTransformedForMulti() );
+		}
+
+		@Test
+		public void as_transformer_set() {
+			assertThatQuery( index.query()
+					.select( f -> doAs( doFromForMulti( f, startProjectionForMulti( f ) ) ).set() )
+					.where( f -> f.matchAll() ) )
+					.hasHitsAnyOrder( expectedTransformedForMulti()
+							.stream()
+							.map( l -> (Set<T>) new HashSet<>( l ) )
+							.toList()
+					);
+		}
+
+		@Test
+		public void as_transformer_sortedSet() {
+			Collection<List<T>> lists = expectedTransformedForMulti();
+			assumeTrue(
+					lists.iterator().next().get( 0 ) instanceof Comparable,
+					"This test only makes sense for comparable types"
+			);
+
+			assertThatQuery( index.query()
+					.select( f -> doAs( doFromForMulti( f, startProjectionForMulti( f ) ) ).sortedSet() )
+					.where( f -> f.matchAll() ) )
+					.hasHitsAnyOrder( lists.stream()
+							.map( l -> (SortedSet<T>) new TreeSet<>( l ) )
+							.toList()
+					);
 		}
 
 		@Override

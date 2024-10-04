@@ -4,8 +4,8 @@
  */
 package org.hibernate.search.engine.search.projection.dsl.spi;
 
+import org.hibernate.search.engine.search.projection.ProjectionAccumulator;
 import org.hibernate.search.engine.search.projection.SearchProjection;
-import org.hibernate.search.engine.search.projection.spi.ProjectionAccumulator;
 
 public abstract class HighlightProjectionBuilder {
 	protected final String path;

@@ -4,6 +4,7 @@
  */
 package org.hibernate.search.integrationtest.backend.tck.search.projection;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.hibernate.search.util.impl.integrationtest.common.assertion.SearchResultAssert.assertThatQuery;
 import static org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMapperUtils.documentProvider;
 import static org.junit.jupiter.api.Assumptions.assumeTrue;
@@ -12,6 +13,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 import java.util.function.Function;
 
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaElement;
@@ -113,6 +115,29 @@ class FieldProjectionSingleValuedBaseIT<F> {
 
 	@ParameterizedTest(name = "{0} - {1}")
 	@MethodSource("params")
+	void optional(TestedFieldStructure fieldStructure,
+			FieldTypeDescriptor<F, ?> fieldType, DataSet<F> dataSet) {
+		StubMappingScope scope = index.createScope();
+
+		String fieldPath = getFieldPath( fieldStructure, fieldType );
+
+		assertThat( scope.query()
+				.select( f -> f.field( fieldPath, fieldType.getJavaType() ).optional() )
+				.where( f -> f.matchAll() )
+				.routing( dataSet.routingKey )
+				.toQuery()
+				.fetchAllHits() )
+				.usingRecursiveFieldByFieldElementComparator()
+				.contains(
+						Optional.of( dataSet.getFieldValue( 1 ) ),
+						Optional.of( dataSet.getFieldValue( 2 ) ),
+						Optional.of( dataSet.getFieldValue( 3 ) ),
+						Optional.empty() // Empty document
+				);
+	}
+
+	@ParameterizedTest(name = "{0} - {1}")
+	@MethodSource("params")
 	void noClass(TestedFieldStructure fieldStructure,
 			FieldTypeDescriptor<F, ?> fieldType, DataSet<F> dataSet) {
 		StubMappingScope scope = index.createScope();
@@ -145,7 +170,7 @@ class FieldProjectionSingleValuedBaseIT<F> {
 		String fieldPath = getFieldPath( fieldStructure, fieldType );
 
 		assertThatQuery( scope.query()
-				.select( f -> f.field( fieldPath, fieldType.getJavaType() ).multi() )
+				.select( f -> f.field( fieldPath, fieldType.getJavaType() ).list() )
 				.where( f -> f.matchAll() )
 				.routing( dataSet.routingKey )
 				.toQuery() )

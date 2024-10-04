@@ -16,6 +16,7 @@ import org.hibernate.search.engine.search.sort.dsl.SortFinalStep;
 import org.hibernate.search.engine.spatial.DistanceUnit;
 import org.hibernate.search.engine.spatial.GeoPoint;
 
+@Deprecated(since = "8.0")
 class DistanceProjectionMultiValuedBaseIT extends AbstractDistanceProjectionMultiValuedBaseIT {
 
 	@Override

@@ -30,11 +30,15 @@ import org.hibernate.search.engine.backend.types.converter.spi.ProjectionConvert
  * @param <A> The type of the temporary storage for accumulated values,
  * before and after being transformed.
  * @param <R> The type of the final result containing values of type {@code V}.
+ *
+ * @deprecated Use {@link org.hibernate.search.engine.search.projection.ProjectionAccumulator} instead.
  */
-public interface ProjectionAccumulator<E, V, A, R> {
+@Deprecated
+public interface ProjectionAccumulator<E, V, A, R>
+		extends org.hibernate.search.engine.search.projection.ProjectionAccumulator<E, V, A, R> {
 
 	@SuppressWarnings("unchecked") // PROVIDER works for any V.
-	static <V> ProjectionAccumulator.Provider<V, V> single() {
+	static <V> Provider<V, V> single() {
 		return SingleValuedProjectionAccumulator.PROVIDER;
 	}
 
@@ -130,12 +134,7 @@ public interface ProjectionAccumulator<E, V, A, R> {
 	 */
 	default A transformAll(A accumulated, ProjectionConverter<? super E, ? extends V> converter,
 			FromDocumentValueConvertContext context) {
-		for ( int i = 0; i < size( accumulated ); i++ ) {
-			E initial = get( accumulated, i );
-			V transformed = converter.fromDocumentValue( initial, context );
-			accumulated = transform( accumulated, i, transformed );
-		}
-		return accumulated;
+		return transformAll( accumulated, converter.delegate(), context );
 	}
 
 	/**
@@ -160,7 +159,7 @@ public interface ProjectionAccumulator<E, V, A, R> {
 	 * @param <U> The type of values to accumulate after being transformed.
 	 * @param <R> The type of the final result containing values of type {@code V}.
 	 */
-	interface Provider<U, R> {
+	interface Provider<U, R> extends org.hibernate.search.engine.search.projection.ProjectionAccumulator.Provider<U, R> {
 		/**
 		 * @param <T> The type of values to accumulate before being transformed.
 		 * @return An accumulator for the given type.

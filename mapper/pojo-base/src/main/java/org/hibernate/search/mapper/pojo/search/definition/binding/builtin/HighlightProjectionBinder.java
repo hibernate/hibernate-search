@@ -5,18 +5,18 @@
 package org.hibernate.search.mapper.pojo.search.definition.binding.builtin;
 
 import java.lang.invoke.MethodHandles;
-import java.util.List;
 import java.util.Optional;
 import java.util.function.Function;
 
+import org.hibernate.search.engine.search.projection.ProjectionAccumulator;
 import org.hibernate.search.engine.search.projection.SearchProjection;
 import org.hibernate.search.engine.search.projection.definition.ProjectionDefinitionContext;
 import org.hibernate.search.engine.search.projection.definition.spi.AbstractProjectionDefinition;
 import org.hibernate.search.engine.search.projection.dsl.SearchProjectionFactory;
 import org.hibernate.search.mapper.pojo.logging.impl.Log;
+import org.hibernate.search.mapper.pojo.model.PojoModelValue;
 import org.hibernate.search.mapper.pojo.search.definition.binding.ProjectionBinder;
 import org.hibernate.search.mapper.pojo.search.definition.binding.ProjectionBindingContext;
-import org.hibernate.search.mapper.pojo.search.definition.binding.ProjectionBindingMultiContext;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 import org.hibernate.search.util.common.spi.ToStringTreeAppender;
 
@@ -83,21 +83,17 @@ public final class HighlightProjectionBinder implements ProjectionBinder {
 	@Override
 	public void bind(ProjectionBindingContext context) {
 		String fieldPath = fieldPathOrFail( context );
-		Class<?> rawType = context.constructorParameter().rawType();
-		Optional<? extends ProjectionBindingMultiContext> multiOptional = context.multi();
+		Optional<PojoModelValue<?>> containerElementOptional = context.containerElement();
 
-		if ( multiOptional.isPresent() ) {
-			if ( !rawType.isAssignableFrom( List.class ) ) {
-				throw log.invalidParameterTypeForHighlightProjectionInProjectionConstructor( rawType, "List<String>" );
-			}
-			multiOptional.get().definition( String.class, new Multi( fieldPath, highlighterName ) );
-		}
-		else {
-			if ( !rawType.isAssignableFrom( String.class ) ) {
-				throw log.invalidParameterTypeForHighlightProjectionInProjectionConstructor( rawType, "String" );
-			}
-			context.definition( String.class, new Single( fieldPath, highlighterName ) );
-		}
+		var accumulator = context.projectionAccumulatorProviderFactory()
+				.projectionAccumulatorProvider(
+						// if there's no container element, there's no container hence we are working with a "nullable" accumulator:
+						containerElementOptional.isPresent()
+								? context.constructorParameter().rawType()
+								: null,
+						String.class );
+
+		context.definition( String.class, new Definition<>( fieldPath, highlighterName, accumulator ) );
 	}
 
 	private String fieldPathOrFail(ProjectionBindingContext context) {
@@ -111,13 +107,15 @@ public final class HighlightProjectionBinder implements ProjectionBinder {
 		return paramName.get();
 	}
 
-	private abstract static class Definition<T> extends AbstractProjectionDefinition<T> {
-		protected final String fieldPath;
-		protected final String highlighterName;
+	private static class Definition<T> extends AbstractProjectionDefinition<T> {
+		private final String fieldPath;
+		private final String highlighterName;
+		private final ProjectionAccumulator.Provider<String, T> accumulator;
 
-		private Definition(String fieldPath, String highlighterName) {
+		private Definition(String fieldPath, String highlighterName, ProjectionAccumulator.Provider<String, T> accumulator) {
 			this.fieldPath = fieldPath;
 			this.highlighterName = highlighterName;
+			this.accumulator = accumulator;
 		}
 
 		@Override
@@ -126,36 +124,18 @@ public final class HighlightProjectionBinder implements ProjectionBinder {
 		}
 
 		@Override
+		public SearchProjection<T> create(SearchProjectionFactory<?, ?> factory, ProjectionDefinitionContext context) {
+			return factory.highlight( fieldPath )
+					.highlighter( highlighterName )
+					.accumulator( accumulator )
+					.toProjection();
+		}
+
+		@Override
 		public void appendTo(ToStringTreeAppender appender) {
 			super.appendTo( appender );
 			appender.attribute( "fieldPath", fieldPath );
 			appender.attribute( "highlighter", highlighterName );
-		}
-	}
-
-	private static class Single extends Definition<String> {
-
-		private Single(String fieldPath, String highlighterName) {
-			super( fieldPath, highlighterName );
-		}
-
-		@Override
-		public SearchProjection<? extends String> create(SearchProjectionFactory<?, ?> factory,
-				ProjectionDefinitionContext context) {
-			return factory.highlight( fieldPath ).highlighter( highlighterName ).single().toProjection();
-		}
-	}
-
-	private static class Multi extends Definition<List<String>> {
-
-		private Multi(String fieldPath, String highlighterName) {
-			super( fieldPath, highlighterName );
-		}
-
-		@Override
-		public SearchProjection<List<String>> create(SearchProjectionFactory<?, ?> factory,
-				ProjectionDefinitionContext context) {
-			return factory.highlight( fieldPath ).highlighter( highlighterName ).toProjection();
 		}
 	}
 }

@@ -12,11 +12,14 @@ import org.hibernate.search.engine.common.tree.TreeFilterDefinition;
 import org.hibernate.search.engine.environment.bean.BeanHolder;
 import org.hibernate.search.engine.environment.bean.BeanReference;
 import org.hibernate.search.engine.environment.bean.BeanResolver;
+import org.hibernate.search.engine.search.projection.ProjectionAccumulator;
+import org.hibernate.search.engine.search.projection.ProjectionAccumulatorProviderFactory;
 import org.hibernate.search.engine.search.projection.definition.ProjectionDefinition;
 import org.hibernate.search.engine.search.projection.dsl.SearchProjectionFactory;
 import org.hibernate.search.mapper.pojo.bridge.mapping.annotation.PropertyBinderRef;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.ObjectProjection;
 import org.hibernate.search.mapper.pojo.model.PojoModelConstructorParameter;
+import org.hibernate.search.mapper.pojo.model.PojoModelValue;
 import org.hibernate.search.util.common.SearchException;
 import org.hibernate.search.util.common.annotation.Incubating;
 
@@ -35,9 +38,12 @@ public interface ProjectionBindingContext {
 	 * Hibernate Search will check that these expectations are met, and throw an exception if they are not.
 	 * @param definition A definition of the projection
 	 * to bind to the {@link #constructorParameter()}.
-	 * @param <P> The type of values returned by the projection.
+	 * @param <P> The type of single projected value.
+	 * @param <C> The type of values returned by the projection.
+	 * It may be the same as {@code P}, if it is a simple single-valued projection,
+	 * or a type of the container if the {@code P} values are wrapped in some type of container (e.g. {@code Optional<..>}, {@code Collection<..>}..).
 	 */
-	<P> void definition(Class<P> expectedValueType, ProjectionDefinition<? extends P> definition);
+	<P, C> void definition(Class<P> expectedValueType, ProjectionDefinition<? extends C> definition);
 
 	/**
 	 * Binds the {@link #constructorParameter()} to the given projection definition.
@@ -47,9 +53,13 @@ public interface ProjectionBindingContext {
 	 * Hibernate Search will check that these expectations are met, and throw an exception if they are not.
 	 * @param definitionHolder A {@link BeanHolder} containing the definition of the projection
 	 * to bind to the {@link #constructorParameter()}.
-	 * @param <P> The type of values returned by the projection.
+	 * @param <P> The type of single projected value.
+	 * @param <C> The type of values returned by the projection.
+	 * It may be the same as {@code P}, if it is a simple single-valued projection,
+	 * or a type of the container if the {@code P} values are wrapped in some type of container (e.g. {@code Optional<..>}, {@code Collection<..>}..).
 	 */
-	<P> void definition(Class<P> expectedValueType, BeanHolder<? extends ProjectionDefinition<? extends P>> definitionHolder);
+	<P, C> void definition(Class<P> expectedValueType,
+			BeanHolder<? extends ProjectionDefinition<? extends C>> definitionHolder);
 
 	/**
 	 * Inspects the type of the {@link #constructorParameter()}
@@ -58,7 +68,9 @@ public interface ProjectionBindingContext {
 	 * @return An optional containing a context that can be used to bind a projection
 	 * if the type of the {@link #constructorParameter()} can be bound to a multi-valued projection;
 	 * an empty optional otherwise.
+	 * @deprecated Use {@link #containerElement()} and various bind methods of this context instead.
 	 */
+	@Deprecated(since = "8.0")
 	@Incubating
 	Optional<? extends ProjectionBindingMultiContext> multi();
 
@@ -73,6 +85,14 @@ public interface ProjectionBindingContext {
 	 */
 	@Incubating
 	PojoModelConstructorParameter constructorParameter();
+
+	/**
+	 * @return An entry point allowing to inspect the constructor parameter container element being bound to a projection.
+	 * Returns non-empty optional only if a {@link #constructorParameter()} can be bound to a container-wrapped projection
+	 * (be it a single-valued optional, or some multi-valued collection).
+	 */
+	@Incubating
+	Optional<PojoModelValue<?>> containerElement();
 
 	/**
 	 * @param name The name of the parameter.
@@ -135,8 +155,10 @@ public interface ProjectionBindingContext {
 	 * @see org.hibernate.search.engine.search.projection.dsl.CompositeProjectionInnerStep#as(Class)
 	 */
 	@Incubating
-	<T> BeanHolder<? extends ProjectionDefinition<T>> createObjectDefinition(String fieldPath, Class<T> projectedType,
-			TreeFilterDefinition filter);
+	default <T> BeanHolder<? extends ProjectionDefinition<T>> createObjectDefinition(String fieldPath, Class<T> projectedType,
+			TreeFilterDefinition filter) {
+		return createObjectDefinition( fieldPath, projectedType, filter, ProjectionAccumulator.nullable() );
+	}
 
 	/**
 	 * @param fieldPath The (relative) path to an object field in the indexed document.
@@ -149,10 +171,30 @@ public interface ProjectionBindingContext {
 	 * @throws SearchException If mapping the given type to a projection definition fails.
 	 * @see org.hibernate.search.engine.search.projection.dsl.SearchProjectionFactory#object(String)
 	 * @see org.hibernate.search.engine.search.projection.dsl.CompositeProjectionInnerStep#as(Class)
+	 * @deprecated Use {@link #createObjectDefinition(String, Class, TreeFilterDefinition, ProjectionAccumulator.Provider)} instead.
+	 */
+	@Deprecated(since = "8.0")
+	@Incubating
+	default <T> BeanHolder<? extends ProjectionDefinition<List<T>>> createObjectDefinitionMulti(String fieldPath,
+			Class<T> projectedType, TreeFilterDefinition filter) {
+		return createObjectDefinition( fieldPath, projectedType, filter, ProjectionAccumulator.list() );
+	}
+
+	/**
+	 * @param fieldPath The (relative) path to an object field in the indexed document.
+	 * @param projectedType A type expected to have a corresponding projection mapping
+	 * (e.g. using {@link org.hibernate.search.mapper.pojo.mapping.definition.annotation.ProjectionConstructor}).
+	 * @param filter The filter to apply to determine which nested index field projections should be included in the projection.
+	 * See {@link ObjectProjection#includePaths()}, {@link ObjectProjection#excludePaths()},
+	 * {@link ObjectProjection#includeDepth()}, ...
+	 * @return A container-wrapped object projection definition for the given type.
+	 * @throws SearchException If mapping the given type to a projection definition fails.
+	 * @see org.hibernate.search.engine.search.projection.dsl.SearchProjectionFactory#object(String)
+	 * @see org.hibernate.search.engine.search.projection.dsl.CompositeProjectionInnerStep#as(Class)
 	 */
 	@Incubating
-	<T> BeanHolder<? extends ProjectionDefinition<List<T>>> createObjectDefinitionMulti(String fieldPath,
-			Class<T> projectedType, TreeFilterDefinition filter);
+	<C, T> BeanHolder<? extends ProjectionDefinition<C>> createObjectDefinition(String fieldPath,
+			Class<T> projectedType, TreeFilterDefinition filter, ProjectionAccumulator.Provider<T, C> accumulator);
 
 	/**
 	 * @param projectedType A type expected to have a corresponding projection mapping
@@ -176,5 +218,12 @@ public interface ProjectionBindingContext {
 	 * returning {@code null} or an empty list, as appropriate.
 	 */
 	boolean isIncluded(String fieldPath);
+
+	/**
+	 * @return An instance of a projection accumulator provider factory capable of supplying an accumulator provider
+	 * based on a container and component types.
+	 */
+	@Incubating
+	ProjectionAccumulatorProviderFactory projectionAccumulatorProviderFactory();
 
 }

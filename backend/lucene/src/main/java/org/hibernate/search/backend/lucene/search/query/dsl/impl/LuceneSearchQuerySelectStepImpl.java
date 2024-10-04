@@ -20,9 +20,9 @@ import org.hibernate.search.engine.search.loading.spi.SearchLoadingContextBuilde
 import org.hibernate.search.engine.search.predicate.SearchPredicate;
 import org.hibernate.search.engine.search.predicate.dsl.PredicateFinalStep;
 import org.hibernate.search.engine.search.predicate.dsl.SimpleBooleanPredicateClausesCollector;
+import org.hibernate.search.engine.search.projection.ProjectionAccumulator;
 import org.hibernate.search.engine.search.projection.SearchProjection;
 import org.hibernate.search.engine.search.projection.dsl.ProjectionFinalStep;
-import org.hibernate.search.engine.search.projection.spi.ProjectionAccumulator;
 import org.hibernate.search.engine.search.projection.spi.ProjectionCompositor;
 import org.hibernate.search.engine.search.query.dsl.spi.AbstractSearchQuerySelectStep;
 
@@ -81,7 +81,7 @@ public class LuceneSearchQuerySelectStepImpl<R, E, LOS>
 	public LuceneSearchQueryWhereStep<List<?>, LOS> select(SearchProjection<?>... projections) {
 		return select( scope.projectionBuilders().composite()
 				.build( projections, ProjectionCompositor.fromList( projections.length ),
-						ProjectionAccumulator.single() ) );
+						ProjectionAccumulator.nullable() ) );
 	}
 
 	@Override

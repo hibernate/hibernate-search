@@ -9,6 +9,7 @@ import java.util.Optional;
 import java.util.function.Function;
 
 import org.hibernate.search.engine.environment.bean.BeanHolder;
+import org.hibernate.search.engine.search.projection.ProjectionAccumulator;
 import org.hibernate.search.engine.search.projection.definition.spi.ConstantProjectionDefinition;
 import org.hibernate.search.engine.search.projection.definition.spi.DistanceProjectionDefinition;
 import org.hibernate.search.engine.search.projection.dsl.DistanceToFieldProjectionOptionsStep;
@@ -16,9 +17,9 @@ import org.hibernate.search.engine.search.projection.dsl.SearchProjectionFactory
 import org.hibernate.search.engine.spatial.DistanceUnit;
 import org.hibernate.search.engine.spatial.GeoPoint;
 import org.hibernate.search.mapper.pojo.logging.impl.Log;
+import org.hibernate.search.mapper.pojo.model.PojoModelValue;
 import org.hibernate.search.mapper.pojo.search.definition.binding.ProjectionBinder;
 import org.hibernate.search.mapper.pojo.search.definition.binding.ProjectionBindingContext;
-import org.hibernate.search.mapper.pojo.search.definition.binding.ProjectionBindingMultiContext;
 import org.hibernate.search.util.common.impl.Contracts;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
@@ -94,35 +95,36 @@ public final class DistanceProjectionBinder implements ProjectionBinder {
 	@Override
 	public void bind(ProjectionBindingContext context) {
 		Contracts.assertNotNullNorEmpty( parameterName, "parameterName" );
-		Optional<? extends ProjectionBindingMultiContext> multiOptional = context.multi();
+		Optional<PojoModelValue<?>> containerElementOptional = context.containerElement();
 		String fieldPath = fieldPathOrFail( context );
-		if ( multiOptional.isPresent() ) {
-			ProjectionBindingMultiContext multi = multiOptional.get();
-			if ( !multi.containerElement().rawType().isAssignableFrom( Double.class ) ) {
-				throw log.invalidParameterTypeForDistanceProjectionInProjectionConstructor( multi.containerElement().rawType(),
-						"List<Double>" );
+		Class<?> containerClass;
+		if ( containerElementOptional.isPresent() ) {
+			PojoModelValue<?> containerElement = containerElementOptional.get();
+			if ( !containerElement.rawType().isAssignableFrom( Double.class ) ) {
+				throw log.invalidParameterTypeForDistanceProjectionInProjectionConstructor(
+						containerElement.rawType(),
+						"SomeContainer<Double>" );
 			}
-			bind( context, multi, fieldPath );
+			containerClass = context.constructorParameter().rawType();
 		}
 		else {
 			if ( !context.constructorParameter().rawType().isAssignableFrom( Double.class ) ) {
 				throw log.invalidParameterTypeForDistanceProjectionInProjectionConstructor(
 						context.constructorParameter().rawType(), "Double" );
 			}
-			bind( context, fieldPath );
+			containerClass = null;
 		}
+		ProjectionAccumulator.Provider<Double, ?> accumulator = context.projectionAccumulatorProviderFactory()
+				.projectionAccumulatorProvider( containerClass, Double.class );
+		bind( context, fieldPath, accumulator );
 	}
 
-	private void bind(ProjectionBindingContext context, String fieldPath) {
+	private void bind(ProjectionBindingContext context, String fieldPath,
+			ProjectionAccumulator.Provider<Double, ?> accumulator) {
 		context.definition( Double.class, context.isIncluded( fieldPath )
-				? BeanHolder.of( new DistanceProjectionDefinition.SingleValued( fieldPath, parameterName, unit ) )
-				: ConstantProjectionDefinition.nullValue() );
-	}
-
-	private void bind(ProjectionBindingContext context, ProjectionBindingMultiContext multi, String fieldPath) {
-		multi.definition( Double.class, context.isIncluded( fieldPath )
-				? BeanHolder.of( new DistanceProjectionDefinition.MultiValued( fieldPath, parameterName, unit ) )
-				: ConstantProjectionDefinition.emptyList() );
+				? BeanHolder
+						.of( new DistanceProjectionDefinition.WrappedValued<>( fieldPath, parameterName, unit, accumulator ) )
+				: ConstantProjectionDefinition.empty( accumulator ) );
 	}
 
 	private String fieldPathOrFail(ProjectionBindingContext context) {

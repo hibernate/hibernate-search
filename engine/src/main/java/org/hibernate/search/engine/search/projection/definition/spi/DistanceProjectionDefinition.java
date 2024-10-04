@@ -6,6 +6,7 @@ package org.hibernate.search.engine.search.projection.definition.spi;
 
 import java.util.List;
 
+import org.hibernate.search.engine.search.projection.ProjectionAccumulator;
 import org.hibernate.search.engine.search.projection.SearchProjection;
 import org.hibernate.search.engine.search.projection.definition.ProjectionDefinitionContext;
 import org.hibernate.search.engine.search.projection.dsl.SearchProjectionFactory;
@@ -42,6 +43,7 @@ public abstract class DistanceProjectionDefinition<F> extends AbstractProjection
 
 	protected abstract boolean multi();
 
+	@Deprecated(since = "8.0")
 	@Incubating
 	public static final class SingleValued extends DistanceProjectionDefinition<Double> {
 		public SingleValued(String fieldPath, String parameterName, DistanceUnit unit) {
@@ -62,8 +64,10 @@ public abstract class DistanceProjectionDefinition<F> extends AbstractProjection
 		}
 	}
 
+	@Deprecated(since = "8.0")
 	@Incubating
 	public static final class MultiValued extends DistanceProjectionDefinition<List<Double>> {
+
 		public MultiValued(String fieldPath, String parameterName, DistanceUnit unit) {
 			super( fieldPath, parameterName, unit );
 		}
@@ -78,7 +82,33 @@ public abstract class DistanceProjectionDefinition<F> extends AbstractProjection
 				ProjectionDefinitionContext context) {
 			return factory.withParameters( params -> factory
 					.distance( fieldPath, params.get( parameterName, GeoPoint.class ) )
-					.multi()
+					.accumulator( ProjectionAccumulator.list() )
+					.unit( unit )
+			).toProjection();
+		}
+	}
+
+	@Incubating
+	public static final class WrappedValued<C> extends DistanceProjectionDefinition<C> {
+		private final ProjectionAccumulator.Provider<Double, C> accumulator;
+
+		public WrappedValued(String fieldPath, String parameterName, DistanceUnit unit,
+				ProjectionAccumulator.Provider<Double, C> accumulator) {
+			super( fieldPath, parameterName, unit );
+			this.accumulator = accumulator;
+		}
+
+		@Override
+		protected boolean multi() {
+			return !accumulator.isSingleValued();
+		}
+
+		@Override
+		public SearchProjection<C> create(SearchProjectionFactory<?, ?> factory,
+				ProjectionDefinitionContext context) {
+			return factory.withParameters( params -> factory
+					.distance( fieldPath, params.get( parameterName, GeoPoint.class ) )
+					.accumulator( accumulator )
 					.unit( unit )
 			).toProjection();
 		}

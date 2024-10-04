@@ -8,6 +8,7 @@ import java.util.List;
 
 import org.hibernate.search.engine.backend.common.DocumentReference;
 import org.hibernate.search.engine.common.EntityReference;
+import org.hibernate.search.engine.search.projection.ProjectionAccumulator;
 import org.hibernate.search.engine.search.projection.dsl.ProjectionFinalStep;
 import org.hibernate.search.engine.search.projection.dsl.SearchProjectionFactory;
 import org.hibernate.search.engine.search.query.dsl.SearchQueryOptionsStep;
@@ -30,7 +31,8 @@ class DistanceProjectionParameterMultiValuedBaseIT extends AbstractDistanceProje
 			SearchProjectionFactory<EntityReference, DocumentReference> projection, String path, GeoPoint center,
 			String parameterName) {
 		return projection.withParameters(
-				params -> projection.distance( path, params.get( parameterName, GeoPoint.class ) ).multi() );
+				params -> projection.distance( path, params.get( parameterName, GeoPoint.class ) )
+						.accumulator( ProjectionAccumulator.list() ) );
 	}
 
 	@Override
@@ -38,7 +40,8 @@ class DistanceProjectionParameterMultiValuedBaseIT extends AbstractDistanceProje
 			SearchProjectionFactory<EntityReference, DocumentReference> projection, String path, GeoPoint center,
 			DistanceUnit unit, String centerParam, String unitParam) {
 		return projection.withParameters(
-				params -> projection.distance( path, params.get( centerParam, GeoPoint.class ) ).multi()
+				params -> projection.distance( path, params.get( centerParam, GeoPoint.class ) )
+						.accumulator( ProjectionAccumulator.list() )
 						.unit( params.get( unitParam, DistanceUnit.class ) ) );
 	}
 

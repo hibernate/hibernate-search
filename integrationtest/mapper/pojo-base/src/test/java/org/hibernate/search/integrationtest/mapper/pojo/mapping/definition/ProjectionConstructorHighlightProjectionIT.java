@@ -12,6 +12,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Set;
 
+import org.hibernate.search.engine.search.projection.ProjectionAccumulator;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.DocumentId;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.FullTextField;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.GenericField;
@@ -236,7 +237,7 @@ class ProjectionConstructorHighlightProjectionIT extends AbstractProjectionConst
 				f -> f.composite()
 						.from(
 								dummyProjectionForEnclosingClassInstance( f ),
-								f.highlight( "text" ).single()
+								f.highlight( "text" ).accumulator( ProjectionAccumulator.nullable() )
 						)
 						.asList(),
 				Arrays.asList(
@@ -422,16 +423,28 @@ class ProjectionConstructorHighlightProjectionIT extends AbstractProjectionConst
 			}
 		}
 
-		assertThatThrownBy( () -> setupHelper.start()
+		backendMock.expectAnySchema( INDEX_NAME );
+		SearchMapping mapping = setupHelper.start()
 				.withAnnotatedTypes( MyProjection.class )
-				.setup( IndexedEntity.class ) )
-				.isInstanceOf( SearchException.class )
-				.satisfies( FailureReportUtils.hasFailureReport()
-						.typeContext( MyProjection.class.getName() )
-						.constructorContext( ProjectionConstructorHighlightProjectionIT.class, Set.class )
-						.methodParameterContext( 1, "text" )
-						.failure( "Invalid parameter type for projection constructor: java.util.Set<java.lang.String>",
-								"When inferring the cardinality of inner projections from constructor parameters, multi-valued constructor parameters must be lists (java.util.List<...>) or list supertypes (java.lang.Iterable<...>, java.util.Collection<...>)" ) );
+				.setup( IndexedEntity.class );
+
+		testSuccessfulRootProjection(
+				mapping, IndexedEntity.class, MyProjection.class,
+				Arrays.asList(
+						Arrays.asList( Arrays.asList( "result1_term1", "result1_term2" ) ),
+						Arrays.asList( Arrays.asList( "result1_term1" ) )
+				),
+				f -> f.composite()
+						.from(
+								dummyProjectionForEnclosingClassInstance( f ),
+								f.highlight( "text" )
+						)
+						.asList(),
+				Arrays.asList(
+						new MyProjection( Set.of( "result1_term1", "result1_term2" ) ),
+						new MyProjection( Set.of( "result1_term1" ) )
+				)
+		);
 	}
 
 	@Test
