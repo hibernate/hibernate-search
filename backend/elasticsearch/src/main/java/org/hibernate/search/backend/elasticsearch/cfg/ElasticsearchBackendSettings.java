@@ -166,7 +166,7 @@ public final class ElasticsearchBackendSettings {
 	 * The maximum number of simultaneous connections to the Elasticsearch cluster,
 	 * all hosts taken together.
 	 * <p>
-	 * Expects a positive Integer value, such as {@code 20},
+	 * Expects a positive Integer value, such as {@code 40},
 	 * or a String that can be parsed into such Integer value.
 	 * <p>
 	 * Defaults to {@link Defaults#MAX_CONNECTIONS}.
@@ -176,7 +176,7 @@ public final class ElasticsearchBackendSettings {
 	/**
 	 * The maximum number of simultaneous connections to each host of the Elasticsearch cluster.
 	 * <p>
-	 * Expects a positive Integer value, such as {@code 10},
+	 * Expects a positive Integer value, such as {@code 20},
 	 * or a String that can be parsed into such Integer value.
 	 * <p>
 	 * Defaults to {@link Defaults#MAX_CONNECTIONS_PER_ROUTE}.
@@ -331,8 +331,8 @@ public final class ElasticsearchBackendSettings {
 		public static final String PATH_PREFIX = "";
 		public static final int READ_TIMEOUT = 30000;
 		public static final int CONNECTION_TIMEOUT = 1000;
-		public static final int MAX_CONNECTIONS = 20;
-		public static final int MAX_CONNECTIONS_PER_ROUTE = 10;
+		public static final int MAX_CONNECTIONS = 40;
+		public static final int MAX_CONNECTIONS_PER_ROUTE = 20;
 		public static final boolean DISCOVERY_ENABLED = false;
 		public static final int DISCOVERY_REFRESH_INTERVAL = 10;
 		public static final boolean LOG_JSON_PRETTY_PRINTING = false;
