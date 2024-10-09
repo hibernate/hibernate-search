@@ -117,7 +117,7 @@ alter table hsearch_outbox_event
 alter table hsearch_outbox_event
     rename column tmp to id;
 
--- change agent `id` column type to char:
+-- change agent `id` column type to uuid:
 alter table hsearch_agent
     add tmp uuid;
 update hsearch_agent
@@ -256,7 +256,7 @@ alter table hsearch_outbox_event
 alter table hsearch_outbox_event
     add constraint hsearch_outbox_event_pkey primary key (id);
 
--- change agent `id` column type to uuid:
+-- change agent `id` column type to uniqueidentifier:
 alter table hsearch_agent
     drop constraint if exists hsearch_agent_pkey;
 alter table hsearch_agent
