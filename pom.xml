@@ -1025,6 +1025,30 @@
                                     <spacesPerTab>4</spacesPerTab>
                                 </indent>
                             </format>
+                            <format>
+                                <!-- Asciidoctor specific rules -->
+                                <includes>
+                                    <include>**/*.adoc</include>
+                                </includes>
+                                <trimTrailingWhitespace/>
+                                <endWithNewline/>
+                                <licenseHeader>
+                                    <file>license.adoc.header</file>
+                                    <delimiter>(\n)*^((?!\/\/ .+).+)$</delimiter>
+                                </licenseHeader>
+                            </format>
+                            <format>
+                                <!-- Property files specific rules -->
+                                <includes>
+                                    <include>**/src/**/*.properties</include>
+                                </includes>
+                                <trimTrailingWhitespace/>
+                                <endWithNewline/>
+                                <licenseHeader>
+                                    <file>license.properties.header</file>
+                                    <delimiter><![CDATA[^\n?(?!# SPDX-License-Identifier: Apache-2.0)(?!# Copyright Red Hat Inc. and Hibernate Authors).+]]></delimiter>
+                                </licenseHeader>
+                            </format>
                         </formats>
                         <!-- define a language-specific format -->
                         <java>
@@ -1058,7 +1082,7 @@
                             <licenseHeader>
                                 <file>license.java.header</file>
                                 <!-- Delimiter is a regex which identifies the "top" of the file i.e. all above it is considered a header -->
-                                <delimiter>(\n)*^(\/\/tag.+|\/\/spotless.+|package .+;|//.+$|(?!package .+;)import .+;)</delimiter>
+                                <delimiter>(\n)*^(\/\/tag.+|\/\/spotless.+|package .+;|\/\/.+$|(?!package .+;)import .+;|/\*\*.*)</delimiter>
                             </licenseHeader>
                             <replaceRegex>
                                 <name>Remove wildcard imports</name>
