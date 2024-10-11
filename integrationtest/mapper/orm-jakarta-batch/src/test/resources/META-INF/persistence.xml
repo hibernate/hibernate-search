@@ -1,45 +1,45 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-    SPDX-License-Identifier: Apache-2.0
-    Copyright Red Hat Inc. and Hibernate Authors
+	SPDX-License-Identifier: Apache-2.0
+	Copyright Red Hat Inc. and Hibernate Authors
 -->
 <persistence xmlns="https://jakarta.ee/xml/ns/persistence" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-    version="3.0" xsi:schemaLocation="https://jakarta.ee/xml/ns/persistence https://jakarta.ee/xml/ns/persistence/persistence_3_0.xsd">
-    <persistence-unit name="lucene_pu" transaction-type="RESOURCE_LOCAL">
-        <provider>org.hibernate.jpa.HibernatePersistenceProvider</provider>
-        <properties>
-            <property name="hibernate.hbm2ddl.auto" value="create-drop" />
-            <property name="hibernate.session_factory_name" value="primary_session_factory" />
-            <property name="hibernate.session_factory_name_is_jndi" value="false" />
+	version="3.0" xsi:schemaLocation="https://jakarta.ee/xml/ns/persistence https://jakarta.ee/xml/ns/persistence/persistence_3_0.xsd">
+	<persistence-unit name="lucene_pu" transaction-type="RESOURCE_LOCAL">
+		<provider>org.hibernate.jpa.HibernatePersistenceProvider</provider>
+		<properties>
+			<property name="hibernate.hbm2ddl.auto" value="create-drop" />
+			<property name="hibernate.session_factory_name" value="primary_session_factory" />
+			<property name="hibernate.session_factory_name_is_jndi" value="false" />
 
-            <property name="hibernate.search.indexing.listeners.enabled" value="false"/>
-            <property name="hibernate.search.backend.type" value="lucene" />
-            <property name="hibernate.search.backend.directory.type" value="local-heap" />
-        </properties>
-    </persistence-unit>
-    <persistence-unit name="elasticsearch_pu" transaction-type="RESOURCE_LOCAL">
-        <provider>org.hibernate.jpa.HibernatePersistenceProvider</provider>
-        <properties>
-            <property name="hibernate.hbm2ddl.auto" value="create-drop" />
-            <property name="hibernate.session_factory_name" value="primary_session_factory" />
-            <property name="hibernate.session_factory_name_is_jndi" value="false" />
+			<property name="hibernate.search.indexing.listeners.enabled" value="false"/>
+			<property name="hibernate.search.backend.type" value="lucene" />
+			<property name="hibernate.search.backend.directory.type" value="local-heap" />
+		</properties>
+	</persistence-unit>
+	<persistence-unit name="elasticsearch_pu" transaction-type="RESOURCE_LOCAL">
+		<provider>org.hibernate.jpa.HibernatePersistenceProvider</provider>
+		<properties>
+			<property name="hibernate.hbm2ddl.auto" value="create-drop" />
+			<property name="hibernate.session_factory_name" value="primary_session_factory" />
+			<property name="hibernate.session_factory_name_is_jndi" value="false" />
 
-            <property name="hibernate.search.indexing.listeners.enabled" value="false"/>
-            <property name="hibernate.search.schema_management.strategy" value="drop-and-create-and-drop"/>
-            <property name="hibernate.search.backend.type" value="elasticsearch" />
+			<property name="hibernate.search.indexing.listeners.enabled" value="false"/>
+			<property name="hibernate.search.schema_management.strategy" value="drop-and-create-and-drop"/>
+			<property name="hibernate.search.backend.type" value="elasticsearch" />
 
-            <property name="hibernate.search.backend.log.json_pretty_printing" value="true" />
-        </properties>
-    </persistence-unit>
-    <persistence-unit name="unused_pu" transaction-type="RESOURCE_LOCAL">
-        <provider>org.hibernate.jpa.HibernatePersistenceProvider</provider>
-        <properties>
-            <property name="hibernate.hbm2ddl.auto" value="create-drop" />
-            <property name="hibernate.session_factory_name" value="unused_session_factory" />
-            <property name="hibernate.session_factory_name_is_jndi" value="false" />
+			<property name="hibernate.search.backend.log.json_pretty_printing" value="true" />
+		</properties>
+	</persistence-unit>
+	<persistence-unit name="unused_pu" transaction-type="RESOURCE_LOCAL">
+		<provider>org.hibernate.jpa.HibernatePersistenceProvider</provider>
+		<properties>
+			<property name="hibernate.hbm2ddl.auto" value="create-drop" />
+			<property name="hibernate.session_factory_name" value="unused_session_factory" />
+			<property name="hibernate.session_factory_name_is_jndi" value="false" />
 
-            <property name="hibernate.search.backend.type" value="lucene" />
-            <property name="hibernate.search.backend.directory.type" value="local-heap" />
-        </properties>
-    </persistence-unit>
+			<property name="hibernate.search.backend.type" value="lucene" />
+			<property name="hibernate.search.backend.directory.type" value="local-heap" />
+		</properties>
+	</persistence-unit>
 </persistence>

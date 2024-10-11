@@ -1,19 +1,19 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-    SPDX-License-Identifier: Apache-2.0
-    Copyright Red Hat Inc. and Hibernate Authors
+	SPDX-License-Identifier: Apache-2.0
+	Copyright Red Hat Inc. and Hibernate Authors
 -->
 <!DOCTYPE hibernate-mapping PUBLIC
-        "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
-        "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+		"-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+		"http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
 <hibernate-mapping>
-    <class entity-name="Book">
-        <id name="id" type="integer"/>
-        <property name="title" type="string"/>
-        <list name="quotes">
-            <key/>
-            <list-index/>
-            <element type="string"/>
-        </list>
-    </class>
+	<class entity-name="Book">
+		<id name="id" type="integer"/>
+		<property name="title" type="string"/>
+		<list name="quotes">
+			<key/>
+			<list-index/>
+			<element type="string"/>
+		</list>
+	</class>
 </hibernate-mapping>
