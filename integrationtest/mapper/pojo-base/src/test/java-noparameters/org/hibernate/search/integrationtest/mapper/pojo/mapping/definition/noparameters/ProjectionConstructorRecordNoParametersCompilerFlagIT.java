@@ -17,9 +17,6 @@ import org.hibernate.search.mapper.pojo.mapping.definition.annotation.GenericFie
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.ProjectionConstructor;
 import org.hibernate.search.mapper.pojo.standalone.mapping.SearchMapping;
-import org.hibernate.search.mapper.pojo.standalone.session.SearchSession;
-import org.hibernate.search.util.impl.integrationtest.common.extension.BackendMock;
-import org.hibernate.search.util.impl.integrationtest.common.extension.StubSearchWorkBehavior;
 import org.hibernate.search.util.impl.integrationtest.mapper.pojo.standalone.StandalonePojoMappingSetupHelper;
 
 import org.junit.jupiter.api.BeforeEach;
@@ -29,7 +26,8 @@ import org.junit.jupiter.api.extension.RegisterExtension;
 class ProjectionConstructorRecordNoParametersCompilerFlagIT extends AbstractProjectionConstructorIT {
 
 	@RegisterExtension
-	public StandalonePojoMappingSetupHelper setupHelper = StandalonePojoMappingSetupHelper.withBackendMock( MethodHandles.lookup(), backendMock );
+	public StandalonePojoMappingSetupHelper setupHelper =
+			StandalonePojoMappingSetupHelper.withBackendMock( MethodHandles.lookup(), backendMock );
 
 	@BeforeEach
 	void sourcesCompiledWithoutParametersFlag() {
@@ -51,7 +49,8 @@ class ProjectionConstructorRecordNoParametersCompilerFlagIT extends AbstractProj
 			public Integer integer;
 		}
 		@ProjectionConstructor
-		record MyProjection(String text, Integer integer) { }
+		record MyProjection(String text, Integer integer) {
+		}
 
 		backendMock.expectAnySchema( INDEX_NAME );
 		SearchMapping mapping = setupHelper.start()

@@ -1,5 +1,6 @@
 module org.hibernate.search.integrationtest.java.modules.pojo.standalone.lucene {
 	exports org.hibernate.search.integrationtest.java.modules.pojo.standalone.lucene.service;
+
 	opens org.hibernate.search.integrationtest.java.modules.pojo.standalone.lucene.entity to
 			org.hibernate.search.mapper.pojo.standalone;
 	opens org.hibernate.search.integrationtest.java.modules.pojo.standalone.lucene.config to

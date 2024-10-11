@@ -1,5 +1,6 @@
 module org.hibernate.search.integrationtest.java.module.orm.elasticsearch.outboxpolling {
 	exports org.hibernate.search.integrationtest.java.modules.orm.elasticsearch.outboxpolling.service;
+
 	opens org.hibernate.search.integrationtest.java.modules.orm.elasticsearch.outboxpolling.entity to
 			org.hibernate.orm.core,
 			/*

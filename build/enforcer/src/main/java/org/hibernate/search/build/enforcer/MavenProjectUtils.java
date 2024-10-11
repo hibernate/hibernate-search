@@ -19,19 +19,19 @@ public class MavenProjectUtils {
 	public static boolean isAnyParentPublicParent(MavenProject project) {
 		return project.hasParent()
 				&& ( HIBERNATE_SEARCH_PARENT_PUBLIC.equals( project.getParent().getArtifactId() )
-				|| isAnyParentPublicParent( project.getParent() ) );
+						|| isAnyParentPublicParent( project.getParent() ) );
 	}
 
 	public static boolean isAnyParentRelocationParent(MavenProject project) {
 		return project.hasParent()
 				&& ( HIBERNATE_SEARCH_PARENT_RELOCATION.equals( project.getParent().getArtifactId() )
-				|| isAnyParentRelocationParent( project.getParent() ) );
+						|| isAnyParentRelocationParent( project.getParent() ) );
 	}
 
 	public static boolean isAnyParentIntegrationTestParent(MavenProject project) {
 		return project.hasParent()
 				&& ( HIBERNATE_SEARCH_PARENT_INTEGRATION_TEST.equals( project.getParent().getArtifactId() )
-				|| isAnyParentIntegrationTestParent( project.getParent() ) );
+						|| isAnyParentIntegrationTestParent( project.getParent() ) );
 	}
 
 	public static boolean isProjectDeploySkipped(MavenProject project) {

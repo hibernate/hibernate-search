@@ -1,5 +1,6 @@
 module org.hibernate.search.integrationtest.java.module.orm.elasticsearch {
 	exports org.hibernate.search.integrationtest.java.modules.orm.elasticsearch.service;
+
 	opens org.hibernate.search.integrationtest.java.modules.orm.elasticsearch.entity to
 			org.hibernate.orm.core,
 			/*
