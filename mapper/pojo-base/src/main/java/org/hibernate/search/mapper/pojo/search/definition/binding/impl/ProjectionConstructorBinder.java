@@ -81,4 +81,3 @@ public class ProjectionConstructorBinder<T> implements EventContextProvider {
 	}
 
 }
-

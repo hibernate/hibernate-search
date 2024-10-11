@@ -30,4 +30,3 @@ public class ConnectedFacetContinuationContext implements FacetContinuationConte
 		return new ConnectedDiscreteFacetContext( context );
 	}
 }
-

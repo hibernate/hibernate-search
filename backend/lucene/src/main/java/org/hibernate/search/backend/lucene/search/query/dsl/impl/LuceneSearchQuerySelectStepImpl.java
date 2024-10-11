@@ -118,4 +118,3 @@ public class LuceneSearchQuerySelectStepImpl<R, E, LOS>
 	}
 
 }
-

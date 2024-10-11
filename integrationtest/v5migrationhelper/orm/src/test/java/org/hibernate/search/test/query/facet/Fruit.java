@@ -51,4 +51,3 @@ class Fruit {
 		return price;
 	}
 }
-

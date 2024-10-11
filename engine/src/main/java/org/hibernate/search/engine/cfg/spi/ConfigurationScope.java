@@ -10,7 +10,7 @@ import java.util.function.Predicate;
 import org.hibernate.search.util.common.annotation.Incubating;
 
 /**
- Holds a configuration scope.
+ * Holds a configuration scope.
  * <p>
  * It is <strong>not expected</strong> for service implementors to create the scopes.
  * Hibernate Search will create the scope itself, and it will pass a corresponding scope to the {@link ConfigurationProvider}

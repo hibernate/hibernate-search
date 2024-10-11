@@ -55,4 +55,3 @@ public class Tree {
 		leaves.add( new Leaf() );
 	}
 }
-

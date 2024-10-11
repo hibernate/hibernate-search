@@ -26,4 +26,3 @@ public interface FacetContinuationContext {
 	 */
 	DiscreteFacetContext discrete();
 }
-

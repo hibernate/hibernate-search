@@ -24,4 +24,3 @@ public class ConnectedFacetRangeStartContext<T> implements FacetRangeStartContex
 		return new ConnectedFacetRangeLimitContext<T>( context );
 	}
 }
-

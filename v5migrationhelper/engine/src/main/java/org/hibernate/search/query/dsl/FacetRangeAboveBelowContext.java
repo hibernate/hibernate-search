@@ -14,4 +14,3 @@ public interface FacetRangeAboveBelowContext<T> extends FacetRangeStartContext<T
 
 	FacetRangeAboveContext<T> above(T max);
 }
-

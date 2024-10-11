@@ -49,4 +49,3 @@ public class ConnectedFacetRangeEndContext<T> extends ConnectedFacetParameterCon
 		return context.getFacetingRequest();
 	}
 }
-

@@ -166,4 +166,3 @@ class FacetBuildingContext<T> {
 		return sb.toString();
 	}
 }
-

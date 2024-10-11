@@ -392,7 +392,7 @@ include::{sourcedir}/org/hibernate/search/documentation/search/aggregation/Aggre
 
 === Count metric aggregation
 
-The `count` aggregation counts the number of documents in which the field is not empty. 
+The `count` aggregation counts the number of documents in which the field is not empty.
 
 .Count the number of the science fiction books with prices
 ====

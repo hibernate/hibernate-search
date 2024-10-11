@@ -39,4 +39,3 @@ public class Grandpa {
 		this.name = name;
 	}
 }
-

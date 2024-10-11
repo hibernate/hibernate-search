@@ -39,4 +39,3 @@ public class ConnectedFacetRangeAboveBelowContext<T> implements FacetRangeAboveB
 		return new ConnectedFacetRangeAboveContext<T>( context );
 	}
 }
-

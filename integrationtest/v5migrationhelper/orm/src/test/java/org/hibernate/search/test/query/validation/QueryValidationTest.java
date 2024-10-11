@@ -117,4 +117,3 @@ class QueryValidationTest extends SearchTestBase {
 		private long id;
 	}
 }
-

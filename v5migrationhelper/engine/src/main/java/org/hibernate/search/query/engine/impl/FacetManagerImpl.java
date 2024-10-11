@@ -118,4 +118,3 @@ public class FacetManagerImpl implements FacetManager {
 		this.facetResults = null;
 	}
 }
-

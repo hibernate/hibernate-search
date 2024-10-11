@@ -36,4 +36,3 @@ public interface FacetParameterContext extends FacetTermination {
 	 */
 	FacetParameterContext maxFacetCount(int maxFacetCount);
 }
-

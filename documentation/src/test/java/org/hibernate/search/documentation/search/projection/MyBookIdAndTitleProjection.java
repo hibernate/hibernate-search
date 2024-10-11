@@ -17,4 +17,3 @@ public record MyBookIdAndTitleProjection(
 }
 //end::include[]
 // @formatter:on
-

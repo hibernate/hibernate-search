@@ -48,27 +48,27 @@ import org.junit.jupiter.api.extension.RegisterExtension;
  * where reindexing in type node #1 would happen when property 1 changed,
  * even though only property 2 matters to this node:
  * <pre><code>
-   PojoImplicitReindexingResolverDirtinessFilterNode {
-		dirtyPropertiesTriggeringReindexing=[property1, property2]
-		delegate=PojoImplicitReindexingResolverOriginalTypeNode { // This is type node #1
-			shouldMarkForReindexing=true
-			nestedNodes=[
- 				PojoImplicitReindexingResolverDirtinessFilterNode {
-					dirtyPropertiesTriggeringReindexing=[property1]
-					delegate=PojoImplicitReindexingResolverPropertyNode {
-						handle=MethodHandleValueReadHandle[level1]
-						nestedNodes=[
- 							PojoImplicitReindexingResolverOriginalTypeNode { // This is type node #2
-								shouldMarkForReindexing=true
-								nestedNodes=[
-								]
-							}
-						]
-					}
-				}
-			]
-		}
-	}
+ *   PojoImplicitReindexingResolverDirtinessFilterNode {
+ *		dirtyPropertiesTriggeringReindexing=[property1, property2]
+ *		delegate=PojoImplicitReindexingResolverOriginalTypeNode { // This is type node #1
+ *			shouldMarkForReindexing=true
+ *			nestedNodes=[
+ * 				PojoImplicitReindexingResolverDirtinessFilterNode {
+ *					dirtyPropertiesTriggeringReindexing=[property1]
+ *					delegate=PojoImplicitReindexingResolverPropertyNode {
+ *						handle=MethodHandleValueReadHandle[level1]
+ *						nestedNodes=[
+ * 							PojoImplicitReindexingResolverOriginalTypeNode { // This is type node #2
+ *								shouldMarkForReindexing=true
+ *								nestedNodes=[
+ *								]
+ *							}
+ *						]
+ *					}
+ *				}
+ *			]
+ *		}
+ *	}
  * </code></pre>
  *
  * Moving the responsibility of marking objects as "to reindex" to a nested node fixed the issue.

@@ -25,4 +25,3 @@ public class ClassLoadingException extends SearchException {
 		super( message, cause );
 	}
 }
-

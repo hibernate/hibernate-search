@@ -48,4 +48,3 @@ public class ConnectedFacetRangeBelowContinuationContext<T> extends ConnectedFac
 		return new ConnectedFacetRangeLimitContext<T>( context );
 	}
 }
-

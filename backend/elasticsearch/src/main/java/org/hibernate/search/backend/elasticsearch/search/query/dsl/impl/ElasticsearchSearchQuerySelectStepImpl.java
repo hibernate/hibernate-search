@@ -120,4 +120,3 @@ public class ElasticsearchSearchQuerySelectStepImpl<R, E, LOS>
 	}
 
 }
-

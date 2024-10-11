@@ -34,4 +34,3 @@ public class Leaf {
 		return tree;
 	}
 }
-

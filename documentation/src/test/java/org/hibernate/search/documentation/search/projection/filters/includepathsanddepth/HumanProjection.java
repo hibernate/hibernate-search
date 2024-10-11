@@ -24,4 +24,3 @@ public record HumanProjection(
 }
 // end::include[]
 // @formatter:on
-

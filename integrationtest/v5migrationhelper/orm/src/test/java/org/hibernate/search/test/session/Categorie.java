@@ -56,4 +56,3 @@ public class Categorie {
 		this.nom = nom;
 	}
 }
-

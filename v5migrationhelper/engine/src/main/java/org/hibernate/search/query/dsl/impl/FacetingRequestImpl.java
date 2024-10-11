@@ -116,4 +116,3 @@ public abstract class FacetingRequestImpl<A> implements FacetingRequest {
 		return sb.toString();
 	}
 }
-

@@ -21,4 +21,3 @@ public class SearchTimeoutException extends SearchException {
 	}
 
 }
-

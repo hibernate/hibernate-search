@@ -75,4 +75,3 @@ public class Son {
 		return name.hashCode();
 	}
 }
-

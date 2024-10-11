@@ -52,12 +52,12 @@ import org.hibernate.search.mapper.pojo.mapping.definition.annotation.processing
  * type {@link org.hibernate.search.spatial.Coordinates}.
  *
  * <pre>
-  * &#064;Entity
-  * public class User {
-  *     &#064;Spatial
-  *     public Coordinates getHome() { ... }
-  * }
-  * </pre>
+ * &#064;Entity
+ * public class User {
+ *     &#064;Spatial
+ *     public Coordinates getHome() { ... }
+ * }
+ * </pre>
  *
  * @hsearch.experimental Spatial support is still considered experimental
  * @author Nicolas Helleringer
