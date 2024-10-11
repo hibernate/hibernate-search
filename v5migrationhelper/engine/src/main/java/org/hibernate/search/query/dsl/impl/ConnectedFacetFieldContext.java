@@ -24,4 +24,3 @@ public class ConnectedFacetFieldContext implements FacetFieldContext {
 		return new ConnectedFacetContinuationContext( context );
 	}
 }
-

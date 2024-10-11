@@ -43,4 +43,3 @@ public class ConnectedDiscreteFacetContext implements DiscreteFacetContext {
 		return context.getFacetingRequest();
 	}
 }
-

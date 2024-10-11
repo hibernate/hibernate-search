@@ -33,4 +33,3 @@ public interface FacetContext {
 	 */
 	FacetFieldContext name(String name);
 }
-

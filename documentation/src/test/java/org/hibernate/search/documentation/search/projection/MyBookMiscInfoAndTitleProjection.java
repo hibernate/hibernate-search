@@ -25,4 +25,3 @@ public record MyBookMiscInfoAndTitleProjection(
 }
 //end::include[]
 // @formatter:on
-

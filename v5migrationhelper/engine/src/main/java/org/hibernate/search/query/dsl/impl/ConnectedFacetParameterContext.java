@@ -42,4 +42,3 @@ public class ConnectedFacetParameterContext implements FacetParameterContext {
 		return context.getFacetingRequest();
 	}
 }
-

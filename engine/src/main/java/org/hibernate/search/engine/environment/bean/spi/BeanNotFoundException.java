@@ -21,4 +21,3 @@ public class BeanNotFoundException extends SearchException {
 		super( message, cause );
 	}
 }
-

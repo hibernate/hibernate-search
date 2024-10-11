@@ -91,4 +91,3 @@ public abstract class AbstractFacet implements Facet {
 		return sb.toString();
 	}
 }
-

@@ -24,4 +24,3 @@ class ConnectedFacetContext implements FacetContext {
 		return new ConnectedFacetFieldContext( context );
 	}
 }
-

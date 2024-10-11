@@ -23,4 +23,3 @@ public record MyBookProjection(
 }
 //end::include[]
 // @formatter:on
-

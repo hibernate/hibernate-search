@@ -98,4 +98,3 @@ class LobTest extends SearchTestBase {
 		}
 	}
 }
-

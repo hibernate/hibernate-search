@@ -31,4 +31,3 @@ public class ConnectedFacetRangeAboveContext<T> extends ConnectedFacetParameterC
 		return context.getFacetingRequest();
 	}
 }
-

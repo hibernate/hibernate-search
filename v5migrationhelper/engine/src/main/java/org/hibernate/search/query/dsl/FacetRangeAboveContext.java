@@ -12,4 +12,3 @@ package org.hibernate.search.query.dsl;
 public interface FacetRangeAboveContext<T> extends FacetTermination, FacetParameterContext {
 	FacetRangeAboveContext<T> excludeLimit();
 }
-

@@ -22,4 +22,3 @@ public record MyBookTitleAndAuthorsProjection(
 }
 //end::include[]
 // @formatter:on
-

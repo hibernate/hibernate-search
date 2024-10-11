@@ -21,4 +21,3 @@ public record MyBookTitleAndAuthorNamesProjection(
 }
 //end::include[]
 // @formatter:on
-

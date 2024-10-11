@@ -56,4 +56,3 @@ final class ConnectedWithinContext implements WithinContext, WithinContext.Longi
 		);
 	}
 }
-
