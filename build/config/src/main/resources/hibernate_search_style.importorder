@@ -1,0 +1,14 @@
+#Organize Import Order
+# Import this file in Window -> Preferences -> Java -> Code Style -> Organize Imports -> Import...
+0=\#
+1=java
+2=javax
+3=jakarta
+4=org.hibernate
+5=org.hibernate.testing
+6=org.hibernate.test
+7=org.junit
+8=org.jboss
+9=com
+10=org.openjdk.jmh
+11=
