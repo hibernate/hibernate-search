@@ -1,125 +1,125 @@
 <?xml version='1.0' encoding='UTF-8'?>
 <!--
-    SPDX-License-Identifier: Apache-2.0
-    Copyright Red Hat Inc. and Hibernate Authors
+	SPDX-License-Identifier: Apache-2.0
+	Copyright Red Hat Inc. and Hibernate Authors
 -->
 <assembly xmlns="http://maven.apache.org/ASSEMBLY/2.1.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-          xsi:schemaLocation="http://maven.apache.org/ASSEMBLY/2.1.0 http://maven.apache.org/xsd/assembly-2.1.0.xsd">
-    <id>dist</id>
-    <formats>
-        <format>dir</format>
-    </formats>
-    <includeBaseDirectory>false</includeBaseDirectory>
+		xsi:schemaLocation="http://maven.apache.org/ASSEMBLY/2.1.0 http://maven.apache.org/xsd/assembly-2.1.0.xsd">
+	<id>dist</id>
+	<formats>
+		<format>dir</format>
+	</formats>
+	<includeBaseDirectory>false</includeBaseDirectory>
 
-    <fileSets>
-        <!-- Reference documentation and getting started guides-->
-        <fileSet>
-            <directory>${asciidoctor.aggregated-resources-dir}/css/</directory>
-            <outputDirectory>reference/en-US/html_single/css/</outputDirectory>
-        </fileSet>
-        <fileSet>
-            <directory>${asciidoctor.aggregated-resources-dir}/script/</directory>
-            <outputDirectory>reference/en-US/html_single/script/</outputDirectory>
-        </fileSet>
-        <fileSet>
-            <directory>${asciidoctor.aggregated-resources-dir}/images/</directory>
-            <outputDirectory>reference/en-US/html_single/images/</outputDirectory>
-        </fileSet>
+	<fileSets>
+		<!-- Reference documentation and getting started guides-->
+		<fileSet>
+			<directory>${asciidoctor.aggregated-resources-dir}/css/</directory>
+			<outputDirectory>reference/en-US/html_single/css/</outputDirectory>
+		</fileSet>
+		<fileSet>
+			<directory>${asciidoctor.aggregated-resources-dir}/script/</directory>
+			<outputDirectory>reference/en-US/html_single/script/</outputDirectory>
+		</fileSet>
+		<fileSet>
+			<directory>${asciidoctor.aggregated-resources-dir}/images/</directory>
+			<outputDirectory>reference/en-US/html_single/images/</outputDirectory>
+		</fileSet>
 
-        <fileSet>
-            <directory>${asciidoctor.aggregated-resources-dir}/css/</directory>
-            <outputDirectory>getting-started/orm/en-US/html_single/css/</outputDirectory>
-        </fileSet>
-        <fileSet>
-            <directory>${asciidoctor.aggregated-resources-dir}/script/</directory>
-            <outputDirectory>getting-started/orm/en-US/html_single/script/</outputDirectory>
-        </fileSet>
-        <fileSet>
-            <directory>${asciidoctor.aggregated-resources-dir}/images/</directory>
-            <outputDirectory>getting-started/orm/en-US/html_single/images/</outputDirectory>
-        </fileSet>
+		<fileSet>
+			<directory>${asciidoctor.aggregated-resources-dir}/css/</directory>
+			<outputDirectory>getting-started/orm/en-US/html_single/css/</outputDirectory>
+		</fileSet>
+		<fileSet>
+			<directory>${asciidoctor.aggregated-resources-dir}/script/</directory>
+			<outputDirectory>getting-started/orm/en-US/html_single/script/</outputDirectory>
+		</fileSet>
+		<fileSet>
+			<directory>${asciidoctor.aggregated-resources-dir}/images/</directory>
+			<outputDirectory>getting-started/orm/en-US/html_single/images/</outputDirectory>
+		</fileSet>
 
-        <fileSet>
-            <directory>${asciidoctor.aggregated-resources-dir}/css/</directory>
-            <outputDirectory>getting-started/standalone/en-US/html_single/css/</outputDirectory>
-        </fileSet>
-        <fileSet>
-            <directory>${asciidoctor.aggregated-resources-dir}/script/</directory>
-            <outputDirectory>getting-started/standalone/en-US/html_single/script/</outputDirectory>
-        </fileSet>
-        <fileSet>
-            <directory>${asciidoctor.aggregated-resources-dir}/images/</directory>
-            <outputDirectory>getting-started/standalone/en-US/html_single/images/</outputDirectory>
-        </fileSet>
+		<fileSet>
+			<directory>${asciidoctor.aggregated-resources-dir}/css/</directory>
+			<outputDirectory>getting-started/standalone/en-US/html_single/css/</outputDirectory>
+		</fileSet>
+		<fileSet>
+			<directory>${asciidoctor.aggregated-resources-dir}/script/</directory>
+			<outputDirectory>getting-started/standalone/en-US/html_single/script/</outputDirectory>
+		</fileSet>
+		<fileSet>
+			<directory>${asciidoctor.aggregated-resources-dir}/images/</directory>
+			<outputDirectory>getting-started/standalone/en-US/html_single/images/</outputDirectory>
+		</fileSet>
 
-        <fileSet>
-            <directory>${asciidoctor.aggregated-resources-dir}/css/</directory>
-            <outputDirectory>getting-started/en-US/html_single/css/</outputDirectory>
-        </fileSet>
-        <fileSet>
-            <directory>${asciidoctor.aggregated-resources-dir}/script/</directory>
-            <outputDirectory>getting-started/en-US/html_single/script/</outputDirectory>
-        </fileSet>
-        <fileSet>
-            <directory>${asciidoctor.aggregated-resources-dir}/images/</directory>
-            <outputDirectory>getting-started/en-US/html_single/images/</outputDirectory>
-        </fileSet>
+		<fileSet>
+			<directory>${asciidoctor.aggregated-resources-dir}/css/</directory>
+			<outputDirectory>getting-started/en-US/html_single/css/</outputDirectory>
+		</fileSet>
+		<fileSet>
+			<directory>${asciidoctor.aggregated-resources-dir}/script/</directory>
+			<outputDirectory>getting-started/en-US/html_single/script/</outputDirectory>
+		</fileSet>
+		<fileSet>
+			<directory>${asciidoctor.aggregated-resources-dir}/images/</directory>
+			<outputDirectory>getting-started/en-US/html_single/images/</outputDirectory>
+		</fileSet>
 
-        <!-- Internal documentation -->
-        <fileSet>
-            <directory>${asciidoctor.aggregated-resources-dir}/css/</directory>
-            <outputDirectory>internals/html_single/css/</outputDirectory>
-        </fileSet>
-        <fileSet>
-            <directory>${asciidoctor.aggregated-resources-dir}/script/</directory>
-            <outputDirectory>internals/html_single/script/</outputDirectory>
-        </fileSet>
-        <fileSet>
-            <directory>${asciidoctor.aggregated-resources-dir}/images/</directory>
-            <outputDirectory>internals/html_single/images/</outputDirectory>
-        </fileSet>
+		<!-- Internal documentation -->
+		<fileSet>
+			<directory>${asciidoctor.aggregated-resources-dir}/css/</directory>
+			<outputDirectory>internals/html_single/css/</outputDirectory>
+		</fileSet>
+		<fileSet>
+			<directory>${asciidoctor.aggregated-resources-dir}/script/</directory>
+			<outputDirectory>internals/html_single/script/</outputDirectory>
+		</fileSet>
+		<fileSet>
+			<directory>${asciidoctor.aggregated-resources-dir}/images/</directory>
+			<outputDirectory>internals/html_single/images/</outputDirectory>
+		</fileSet>
 
-        <!-- Migration guide -->
-        <fileSet>
-            <directory>${asciidoctor.aggregated-resources-dir}/css/</directory>
-            <outputDirectory>migration/html_single/css/</outputDirectory>
-        </fileSet>
-        <fileSet>
-            <directory>${asciidoctor.aggregated-resources-dir}/script/</directory>
-            <outputDirectory>migration/html_single/script/</outputDirectory>
-        </fileSet>
-        <fileSet>
-            <directory>${asciidoctor.aggregated-resources-dir}/images/</directory>
-            <outputDirectory>migration/html_single/images/</outputDirectory>
-        </fileSet>
-    </fileSets>
+		<!-- Migration guide -->
+		<fileSet>
+			<directory>${asciidoctor.aggregated-resources-dir}/css/</directory>
+			<outputDirectory>migration/html_single/css/</outputDirectory>
+		</fileSet>
+		<fileSet>
+			<directory>${asciidoctor.aggregated-resources-dir}/script/</directory>
+			<outputDirectory>migration/html_single/script/</outputDirectory>
+		</fileSet>
+		<fileSet>
+			<directory>${asciidoctor.aggregated-resources-dir}/images/</directory>
+			<outputDirectory>migration/html_single/images/</outputDirectory>
+		</fileSet>
+	</fileSets>
 
-    <files>
-        <!-- HTMLs: -->
-        <file>
-            <source>${asciidoctor.base-output-dir}/html/public/reference/index.html</source>
-            <outputDirectory>reference/en-US/html_single/</outputDirectory>
-        </file>
-        <file>
-            <source>${asciidoctor.base-output-dir}/html/public/getting-started/orm/index.html</source>
-            <outputDirectory>getting-started/orm/en-US/html_single/</outputDirectory>
-        </file>
-        <file>
-            <source>${asciidoctor.base-output-dir}/html/public/getting-started/standalone/index.html</source>
-            <outputDirectory>getting-started/standalone/en-US/html_single/</outputDirectory>
-        </file>
-        <file>
-            <source>${asciidoctor.base-output-dir}/html/public/getting-started/index.html</source>
-            <outputDirectory>getting-started/en-US/html_single/</outputDirectory>
-        </file>
+	<files>
+		<!-- HTMLs: -->
+		<file>
+			<source>${asciidoctor.base-output-dir}/html/public/reference/index.html</source>
+			<outputDirectory>reference/en-US/html_single/</outputDirectory>
+		</file>
+		<file>
+			<source>${asciidoctor.base-output-dir}/html/public/getting-started/orm/index.html</source>
+			<outputDirectory>getting-started/orm/en-US/html_single/</outputDirectory>
+		</file>
+		<file>
+			<source>${asciidoctor.base-output-dir}/html/public/getting-started/standalone/index.html</source>
+			<outputDirectory>getting-started/standalone/en-US/html_single/</outputDirectory>
+		</file>
+		<file>
+			<source>${asciidoctor.base-output-dir}/html/public/getting-started/index.html</source>
+			<outputDirectory>getting-started/en-US/html_single/</outputDirectory>
+		</file>
 
-        <file>
-            <source>${asciidoctor.base-output-dir}/html/migration/index.html</source>
-            <outputDirectory>migration/html_single/</outputDirectory>
-        </file>
-        <file>
-            <source>${asciidoctor.base-output-dir}/html/internals/index.html</source>
-            <outputDirectory>internals/html_single/</outputDirectory>
-        </file>
-    </files>
+		<file>
+			<source>${asciidoctor.base-output-dir}/html/migration/index.html</source>
+			<outputDirectory>migration/html_single/</outputDirectory>
+		</file>
+		<file>
+			<source>${asciidoctor.base-output-dir}/html/internals/index.html</source>
+			<outputDirectory>internals/html_single/</outputDirectory>
+		</file>
+	</files>
 </assembly>

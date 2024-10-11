@@ -1,43 +1,43 @@
 <?xml version='1.0' encoding='UTF-8'?>
 <!--
-    SPDX-License-Identifier: Apache-2.0
-    Copyright Red Hat Inc. and Hibernate Authors
+	SPDX-License-Identifier: Apache-2.0
+	Copyright Red Hat Inc. and Hibernate Authors
 -->
 <assembly xmlns="http://maven.apache.org/ASSEMBLY/2.1.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-          xsi:schemaLocation="http://maven.apache.org/ASSEMBLY/2.1.0 http://maven.apache.org/xsd/assembly-2.1.0.xsd">
-    <id>pdf</id>
-    <formats>
-        <format>dir</format>
-    </formats>
-    <includeBaseDirectory>false</includeBaseDirectory>
+		xsi:schemaLocation="http://maven.apache.org/ASSEMBLY/2.1.0 http://maven.apache.org/xsd/assembly-2.1.0.xsd">
+	<id>pdf</id>
+	<formats>
+		<format>dir</format>
+	</formats>
+	<includeBaseDirectory>false</includeBaseDirectory>
 
-    <!-- PDFs: -->
-    <files>
-        <file>
-            <source>${asciidoctor.base-output-dir}/pdf/public/reference/index.pdf</source>
-            <outputDirectory>reference/en-US/pdf/</outputDirectory>
-            <destName>hibernate_search_reference.pdf</destName>
-        </file>
-        <file>
-            <source>${asciidoctor.base-output-dir}/pdf/public/getting-started/orm/index.pdf</source>
-            <outputDirectory>getting-started/orm/en-US/pdf/</outputDirectory>
-            <destName>hibernate_search_getting_started_orm.pdf</destName>
-        </file>
-        <file>
-            <source>${asciidoctor.base-output-dir}/pdf/public/getting-started/standalone/index.pdf</source>
-            <outputDirectory>getting-started/standalone/en-US/pdf/</outputDirectory>
-            <destName>hibernate_search_getting_started_standalone.pdf</destName>
-        </file>
+	<!-- PDFs: -->
+	<files>
+		<file>
+			<source>${asciidoctor.base-output-dir}/pdf/public/reference/index.pdf</source>
+			<outputDirectory>reference/en-US/pdf/</outputDirectory>
+			<destName>hibernate_search_reference.pdf</destName>
+		</file>
+		<file>
+			<source>${asciidoctor.base-output-dir}/pdf/public/getting-started/orm/index.pdf</source>
+			<outputDirectory>getting-started/orm/en-US/pdf/</outputDirectory>
+			<destName>hibernate_search_getting_started_orm.pdf</destName>
+		</file>
+		<file>
+			<source>${asciidoctor.base-output-dir}/pdf/public/getting-started/standalone/index.pdf</source>
+			<outputDirectory>getting-started/standalone/en-US/pdf/</outputDirectory>
+			<destName>hibernate_search_getting_started_standalone.pdf</destName>
+		</file>
 
-        <file>
-            <source>${asciidoctor.base-output-dir}/pdf/migration/index.pdf</source>
-            <outputDirectory>migration/pdf/</outputDirectory>
-            <destName>hibernate_search_migration.pdf</destName>
-        </file>
-        <file>
-            <source>${asciidoctor.base-output-dir}/pdf/internals/index.pdf</source>
-            <outputDirectory>internals/pdf/</outputDirectory>
-            <destName>hibernate_search_internals.pdf</destName>
-        </file>
-    </files>
+		<file>
+			<source>${asciidoctor.base-output-dir}/pdf/migration/index.pdf</source>
+			<outputDirectory>migration/pdf/</outputDirectory>
+			<destName>hibernate_search_migration.pdf</destName>
+		</file>
+		<file>
+			<source>${asciidoctor.base-output-dir}/pdf/internals/index.pdf</source>
+			<outputDirectory>internals/pdf/</outputDirectory>
+			<destName>hibernate_search_internals.pdf</destName>
+		</file>
+	</files>
 </assembly>

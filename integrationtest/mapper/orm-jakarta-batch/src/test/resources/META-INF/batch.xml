@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-    SPDX-License-Identifier: Apache-2.0
-    Copyright Red Hat Inc. and Hibernate Authors
+	SPDX-License-Identifier: Apache-2.0
+	Copyright Red Hat Inc. and Hibernate Authors
 -->
 <batch-artifacts xmlns="https://jakarta.ee/xml/ns/jakartaee">
-    <!--
-         This simulates the presence of an application-defined batch.xml, to check that
-         our batch artifacts still get created properly.
-     -->
+	<!--
+		This simulates the presence of an application-defined batch.xml, to check that
+		our batch artifacts still get created properly.
+	-->
 </batch-artifacts>

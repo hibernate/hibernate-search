@@ -1,116 +1,116 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-    SPDX-License-Identifier: Apache-2.0
-    Copyright Red Hat Inc. and Hibernate Authors
+	SPDX-License-Identifier: Apache-2.0
+	Copyright Red Hat Inc. and Hibernate Authors
 -->
 <job id="hibernate-search-mass-indexing" xmlns="https://jakarta.ee/xml/ns/jakartaee" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-    xsi:schemaLocation="https://jakarta.ee/xml/ns/jakartaee https://jakarta.ee/xml/ns/jakartaee/jobXML_2_0.xsd" version="2.0">
+	xsi:schemaLocation="https://jakarta.ee/xml/ns/jakartaee https://jakarta.ee/xml/ns/jakartaee/jobXML_2_0.xsd" version="2.0">
 
-    <listeners>
-        <listener ref="org.hibernate.search.jakarta.batch.core.massindexing.spi.JobContextSetupListener">
-            <properties>
-                <property name="entityManagerFactoryNamespace" value="#{jobParameters['entityManagerFactoryNamespace']}" />
-                <property name="entityManagerFactoryReference" value="#{jobParameters['entityManagerFactoryReference']}" />
-                <property name="entityTypes" value="#{jobParameters['entityTypes']}" />
+	<listeners>
+		<listener ref="org.hibernate.search.jakarta.batch.core.massindexing.spi.JobContextSetupListener">
+			<properties>
+				<property name="entityManagerFactoryNamespace" value="#{jobParameters['entityManagerFactoryNamespace']}" />
+				<property name="entityManagerFactoryReference" value="#{jobParameters['entityManagerFactoryReference']}" />
+				<property name="entityTypes" value="#{jobParameters['entityTypes']}" />
 
-                <property name="maxThreads" value="#{jobParameters['maxThreads']}" />
-                <property name="maxResultsPerEntity" value="#{jobParameters['maxResultsPerEntity']}" />
-                <property name="idFetchSize" value="#{jobParameters['idFetchSize']}" />
-                <property name="entityFetchSize" value="#{jobParameters['entityFetchSize']}" />
-                <property name="cacheMode" value="#{jobParameters['cacheMode']}" />
-                <property name="mergeSegmentsOnFinish" value="#{jobParameters['mergeSegmentsOnFinish']}" />
-                <property name="mergeSegmentsAfterPurge" value="#{jobParameters['mergeSegmentsAfterPurge']}" />
-                <property name="purgeAllOnStart" value="#{jobParameters['purgeAllOnStart']}" />
-                <property name="dropAndCreateSchemaOnStart" value="#{jobParameters['dropAndCreateSchemaOnStart']}" />
-                <property name="sessionClearInterval" value="#{jobParameters['sessionClearInterval']}" />
-                <property name="checkpointInterval" value="#{jobParameters['checkpointInterval']}" />
-                <property name="rowsPerPartition" value="#{jobParameters['rowsPerPartition']}" />
-                <property name="reindexOnlyHql" value="#{jobParameters['reindexOnlyHql']}" />
-                <property name="reindexOnlyParameters" value="#{jobParameters['reindexOnlyParameters']}" />
-            </properties>
-        </listener>
-    </listeners>
+				<property name="maxThreads" value="#{jobParameters['maxThreads']}" />
+				<property name="maxResultsPerEntity" value="#{jobParameters['maxResultsPerEntity']}" />
+				<property name="idFetchSize" value="#{jobParameters['idFetchSize']}" />
+				<property name="entityFetchSize" value="#{jobParameters['entityFetchSize']}" />
+				<property name="cacheMode" value="#{jobParameters['cacheMode']}" />
+				<property name="mergeSegmentsOnFinish" value="#{jobParameters['mergeSegmentsOnFinish']}" />
+				<property name="mergeSegmentsAfterPurge" value="#{jobParameters['mergeSegmentsAfterPurge']}" />
+				<property name="purgeAllOnStart" value="#{jobParameters['purgeAllOnStart']}" />
+				<property name="dropAndCreateSchemaOnStart" value="#{jobParameters['dropAndCreateSchemaOnStart']}" />
+				<property name="sessionClearInterval" value="#{jobParameters['sessionClearInterval']}" />
+				<property name="checkpointInterval" value="#{jobParameters['checkpointInterval']}" />
+				<property name="rowsPerPartition" value="#{jobParameters['rowsPerPartition']}" />
+				<property name="reindexOnlyHql" value="#{jobParameters['reindexOnlyHql']}" />
+				<property name="reindexOnlyParameters" value="#{jobParameters['reindexOnlyParameters']}" />
+			</properties>
+		</listener>
+	</listeners>
 
-    <step id="beforeChunk" next="produceLuceneDoc">
-        <batchlet ref="org.hibernate.search.jakarta.batch.core.massindexing.step.beforechunk.impl.BeforeChunkBatchlet">
-            <properties>
-                <property name="optimizeAfterPurge" value="#{jobParameters['optimizeAfterPurge']}" />
-                <property name="purgeAllOnStart" value="#{jobParameters['purgeAllOnStart']}" />
-                <property name="dropAndCreateSchemaOnStart" value="#{jobParameters['dropAndCreateSchemaOnStart']}" />
-                <property name="tenantId" value="#{jobParameters['tenantId']}" />
-            </properties>
-        </batchlet>
-    </step>
+	<step id="beforeChunk" next="produceLuceneDoc">
+		<batchlet ref="org.hibernate.search.jakarta.batch.core.massindexing.step.beforechunk.impl.BeforeChunkBatchlet">
+			<properties>
+				<property name="optimizeAfterPurge" value="#{jobParameters['optimizeAfterPurge']}" />
+				<property name="purgeAllOnStart" value="#{jobParameters['purgeAllOnStart']}" />
+				<property name="dropAndCreateSchemaOnStart" value="#{jobParameters['dropAndCreateSchemaOnStart']}" />
+				<property name="tenantId" value="#{jobParameters['tenantId']}" />
+			</properties>
+		</batchlet>
+	</step>
 
-    <step id="produceLuceneDoc" next="afterChunk">
-        <listeners>
-            <listener ref="org.hibernate.search.jakarta.batch.core.massindexing.step.impl.StepProgressSetupListener">
-                <properties>
-                    <property name="tenantId" value="#{jobParameters['tenantId']}" />
-                    <property name="customQueryHQL" value="#{jobParameters['customQueryHQL']}" />
-                </properties>
-            </listener>
-        </listeners>
-        <!-- Here we use the property from the partition plan, so that defaults are correctly applied -->
-        <chunk item-count="#{partitionPlan['checkpointInterval']}">
-            <reader ref="org.hibernate.search.jakarta.batch.core.massindexing.step.spi.EntityIdReader">
-                <properties>
-                	<!-- Used to re-create the job context data as necessary -->
-	                <property name="entityManagerFactoryNamespace" value="#{jobParameters['entityManagerFactoryNamespace']}" />
-	                <property name="entityManagerFactoryReference" value="#{jobParameters['entityManagerFactoryReference']}" />
-	                <property name="entityTypes" value="#{jobParameters['entityTypes']}" />
-	                <property name="customQueryCriteria" value="#{jobParameters['customQueryCriteria']}" />
+	<step id="produceLuceneDoc" next="afterChunk">
+		<listeners>
+			<listener ref="org.hibernate.search.jakarta.batch.core.massindexing.step.impl.StepProgressSetupListener">
+				<properties>
+					<property name="tenantId" value="#{jobParameters['tenantId']}" />
+					<property name="customQueryHQL" value="#{jobParameters['customQueryHQL']}" />
+				</properties>
+			</listener>
+		</listeners>
+		<!-- Here we use the property from the partition plan, so that defaults are correctly applied -->
+		<chunk item-count="#{partitionPlan['checkpointInterval']}">
+			<reader ref="org.hibernate.search.jakarta.batch.core.massindexing.step.spi.EntityIdReader">
+				<properties>
+					<!-- Used to re-create the job context data as necessary -->
+					<property name="entityManagerFactoryNamespace" value="#{jobParameters['entityManagerFactoryNamespace']}" />
+					<property name="entityManagerFactoryReference" value="#{jobParameters['entityManagerFactoryReference']}" />
+					<property name="entityTypes" value="#{jobParameters['entityTypes']}" />
+					<property name="customQueryCriteria" value="#{jobParameters['customQueryCriteria']}" />
 
-                    <property name="entityName" value="#{partitionPlan['entityName']}" />
-                    <property name="partitionId" value="#{partitionPlan['partitionId']}" />
-                    <property name="lowerBound" value="#{partitionPlan['lowerBound']}" />
-                    <property name="upperBound" value="#{partitionPlan['upperBound']}" />
-                    <property name="indexScope" value="#{partitionPlan['indexScope']}" />
-                    <property name="tenantId" value="#{jobParameters['tenantId']}" />
-                    <property name="idFetchSize" value="#{jobParameters['entityFetchSize']}" />
-                    <!-- Here we use the property from the partition plan, so that defaults are correctly applied -->
-                    <property name="checkpointInterval" value="#{partitionPlan['checkpointInterval']}" />
-                    <property name="reindexOnlyHql" value="#{jobParameters['reindexOnlyHql']}" />
-                    <property name="reindexOnlyParameters" value="#{jobParameters['reindexOnlyParameters']}" />
-                    <property name="maxResultsPerEntity" value="#{jobParameters['maxResultsPerEntity']}" />
-                </properties>
-            </reader>
-            <writer ref="org.hibernate.search.jakarta.batch.core.massindexing.step.impl.EntityWriter">
-                <properties>
-                    <property name="entityName" value="#{partitionPlan['entityName']}" />
-                    <property name="partitionId" value="#{partitionPlan['partitionId']}" />
-                    <property name="tenantId" value="#{jobParameters['tenantId']}" />
-                    <property name="cacheMode" value="#{jobParameters['cacheMode']}" />
-                    <!-- Here we use the property from the partition plan, so that defaults are correctly applied -->
-                    <property name="checkpointInterval" value="#{partitionPlan['checkpointInterval']}" />
-                    <property name="entityFetchSize" value="#{jobParameters['entityFetchSize']}" />
-                </properties>
-            </writer>
-        </chunk>
-        <partition>
-            <mapper ref="org.hibernate.search.jakarta.batch.core.massindexing.step.impl.HibernateSearchPartitionMapper">
-                <properties>
-                    <property name="tenantId" value="#{jobParameters['tenantId']}" />
-                    <property name="reindexOnlyHql" value="#{jobParameters['reindexOnlyHql']}" />
-                    <property name="reindexOnlyParameters" value="#{jobParameters['reindexOnlyParameters']}" />
-                    <property name="maxThreads" value="#{jobParameters['maxThreads']}" />
-                    <property name="maxResultsPerEntity" value="#{jobParameters['maxResultsPerEntity']}" />
-                    <property name="checkpointInterval" value="#{jobParameters['checkpointInterval']}" />
-                    <property name="rowsPerPartition" value="#{jobParameters['rowsPerPartition']}" />
-                </properties>
-            </mapper>
-            <collector ref="org.hibernate.search.jakarta.batch.core.massindexing.step.impl.ProgressCollector" />
-            <analyzer ref="org.hibernate.search.jakarta.batch.core.massindexing.step.impl.ProgressAggregator" />
-        </partition>
-    </step>
+					<property name="entityName" value="#{partitionPlan['entityName']}" />
+					<property name="partitionId" value="#{partitionPlan['partitionId']}" />
+					<property name="lowerBound" value="#{partitionPlan['lowerBound']}" />
+					<property name="upperBound" value="#{partitionPlan['upperBound']}" />
+					<property name="indexScope" value="#{partitionPlan['indexScope']}" />
+					<property name="tenantId" value="#{jobParameters['tenantId']}" />
+					<property name="idFetchSize" value="#{jobParameters['entityFetchSize']}" />
+					<!-- Here we use the property from the partition plan, so that defaults are correctly applied -->
+					<property name="checkpointInterval" value="#{partitionPlan['checkpointInterval']}" />
+					<property name="reindexOnlyHql" value="#{jobParameters['reindexOnlyHql']}" />
+					<property name="reindexOnlyParameters" value="#{jobParameters['reindexOnlyParameters']}" />
+					<property name="maxResultsPerEntity" value="#{jobParameters['maxResultsPerEntity']}" />
+				</properties>
+			</reader>
+			<writer ref="org.hibernate.search.jakarta.batch.core.massindexing.step.impl.EntityWriter">
+				<properties>
+					<property name="entityName" value="#{partitionPlan['entityName']}" />
+					<property name="partitionId" value="#{partitionPlan['partitionId']}" />
+					<property name="tenantId" value="#{jobParameters['tenantId']}" />
+					<property name="cacheMode" value="#{jobParameters['cacheMode']}" />
+					<!-- Here we use the property from the partition plan, so that defaults are correctly applied -->
+					<property name="checkpointInterval" value="#{partitionPlan['checkpointInterval']}" />
+					<property name="entityFetchSize" value="#{jobParameters['entityFetchSize']}" />
+				</properties>
+			</writer>
+		</chunk>
+		<partition>
+			<mapper ref="org.hibernate.search.jakarta.batch.core.massindexing.step.impl.HibernateSearchPartitionMapper">
+				<properties>
+					<property name="tenantId" value="#{jobParameters['tenantId']}" />
+					<property name="reindexOnlyHql" value="#{jobParameters['reindexOnlyHql']}" />
+					<property name="reindexOnlyParameters" value="#{jobParameters['reindexOnlyParameters']}" />
+					<property name="maxThreads" value="#{jobParameters['maxThreads']}" />
+					<property name="maxResultsPerEntity" value="#{jobParameters['maxResultsPerEntity']}" />
+					<property name="checkpointInterval" value="#{jobParameters['checkpointInterval']}" />
+					<property name="rowsPerPartition" value="#{jobParameters['rowsPerPartition']}" />
+				</properties>
+			</mapper>
+			<collector ref="org.hibernate.search.jakarta.batch.core.massindexing.step.impl.ProgressCollector" />
+			<analyzer ref="org.hibernate.search.jakarta.batch.core.massindexing.step.impl.ProgressAggregator" />
+		</partition>
+	</step>
 
-    <step id="afterChunk">
-        <batchlet ref="org.hibernate.search.jakarta.batch.core.massindexing.step.afterchunk.impl.AfterChunkBatchlet">
-            <properties>
-                <property name="optimizeOnFinish" value="#{jobParameters['optimizeOnFinish']}" />
-                <property name="tenantId" value="#{jobParameters['tenantId']}" />
-            </properties>
-        </batchlet>
-    </step>
+	<step id="afterChunk">
+		<batchlet ref="org.hibernate.search.jakarta.batch.core.massindexing.step.afterchunk.impl.AfterChunkBatchlet">
+			<properties>
+				<property name="optimizeOnFinish" value="#{jobParameters['optimizeOnFinish']}" />
+				<property name="tenantId" value="#{jobParameters['tenantId']}" />
+			</properties>
+		</batchlet>
+	</step>
 
 </job>

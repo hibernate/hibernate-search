@@ -1,14 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-    SPDX-License-Identifier: Apache-2.0
-    Copyright Red Hat Inc. and Hibernate Authors
+	SPDX-License-Identifier: Apache-2.0
+	Copyright Red Hat Inc. and Hibernate Authors
 -->
 <!DOCTYPE suppressions PUBLIC
-    "-//Puppy Crawl//DTD Suppressions 1.1//EN"
-    "http://www.puppycrawl.com/dtds/suppressions_1_1.dtd">
+	"-//Puppy Crawl//DTD Suppressions 1.1//EN"
+	"http://www.puppycrawl.com/dtds/suppressions_1_1.dtd">
 <suppressions>
-    <suppress checks="." files="ConcurrentReferenceHashMap\.java$" />
-    <!-- ignore everything but the header checks for xml files-->
-    <suppress checks="^((?!Header).)*$" files=".*\.xml" />
-    <suppress files="[\\/]generated-sources[\\/]" checks="[a-zA-Z0-9]*"/>
+	<suppress checks="." files="ConcurrentReferenceHashMap\.java$" />
+	<!-- ignore everything but the header checks for xml files-->
+	<suppress checks="^((?!Header).)*$" files=".*\.xml" />
+	<suppress files="[\\/]generated-sources[\\/]" checks="[a-zA-Z0-9]*"/>
 </suppressions>

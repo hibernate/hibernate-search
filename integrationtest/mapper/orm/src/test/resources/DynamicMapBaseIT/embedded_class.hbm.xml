@@ -1,18 +1,18 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-    SPDX-License-Identifier: Apache-2.0
-    Copyright Red Hat Inc. and Hibernate Authors
+	SPDX-License-Identifier: Apache-2.0
+	Copyright Red Hat Inc. and Hibernate Authors
 -->
 <!DOCTYPE hibernate-mapping PUBLIC
-        "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
-        "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+		"-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+		"http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
 <hibernate-mapping>
-    <class entity-name="Book">
-        <id name="id" type="integer"/>
-        <property name="title" type="string"/>
-        <component name="quote" class="org.hibernate.search.integrationtest.mapper.orm.dynamicmap.DynamicMapBaseIT$QuoteEmbeddable">
-            <property access="field" name="author"/>
-            <property access="field"  name="content"/>
-        </component>
-    </class>
+	<class entity-name="Book">
+		<id name="id" type="integer"/>
+		<property name="title" type="string"/>
+		<component name="quote" class="org.hibernate.search.integrationtest.mapper.orm.dynamicmap.DynamicMapBaseIT$QuoteEmbeddable">
+			<property access="field" name="author"/>
+			<property access="field"  name="content"/>
+		</component>
+	</class>
 </hibernate-mapping>

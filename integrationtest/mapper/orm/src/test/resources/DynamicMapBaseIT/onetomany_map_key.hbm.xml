@@ -1,25 +1,25 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-    SPDX-License-Identifier: Apache-2.0
-    Copyright Red Hat Inc. and Hibernate Authors
+	SPDX-License-Identifier: Apache-2.0
+	Copyright Red Hat Inc. and Hibernate Authors
 -->
 <!DOCTYPE hibernate-mapping PUBLIC
-        "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
-        "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+		"-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+		"http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
 <hibernate-mapping>
-    <class entity-name="Book">
-        <id name="id" type="integer"/>
-        <property name="title" type="string"/>
-        <map name="quotes" sort="org.hibernate.search.integrationtest.mapper.orm.dynamicmap.DynamicMapBaseIT$DynamicMapIdComparator">
-            <key column="book_id"/>
-            <map-key-many-to-many entity-name="Quote"/>
-            <element type="integer" column="mark" />
-        </map>
-    </class>
-    <class entity-name="Quote">
-        <id name="id" type="integer"/>
-        <property name="author" type="string"/>
-        <property name="content" type="string"/>
-        <many-to-one name="book" entity-name="Book" />
-    </class>
+	<class entity-name="Book">
+		<id name="id" type="integer"/>
+		<property name="title" type="string"/>
+		<map name="quotes" sort="org.hibernate.search.integrationtest.mapper.orm.dynamicmap.DynamicMapBaseIT$DynamicMapIdComparator">
+			<key column="book_id"/>
+			<map-key-many-to-many entity-name="Quote"/>
+			<element type="integer" column="mark" />
+		</map>
+	</class>
+	<class entity-name="Quote">
+		<id name="id" type="integer"/>
+		<property name="author" type="string"/>
+		<property name="content" type="string"/>
+		<many-to-one name="book" entity-name="Book" />
+	</class>
 </hibernate-mapping>

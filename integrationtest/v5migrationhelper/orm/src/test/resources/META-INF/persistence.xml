@@ -1,47 +1,47 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-    SPDX-License-Identifier: Apache-2.0
-    Copyright Red Hat Inc. and Hibernate Authors
+	SPDX-License-Identifier: Apache-2.0
+	Copyright Red Hat Inc. and Hibernate Authors
 -->
 <persistence xmlns="https://jakarta.ee/xml/ns/persistence" version="3.0">
-    <persistence-unit name="EntityManagerSerializationTestPU">
-        <class>org.hibernate.search.test.jpa.Bretzel</class>
-        <exclude-unlisted-classes />
-    </persistence-unit>
+	<persistence-unit name="EntityManagerSerializationTestPU">
+		<class>org.hibernate.search.test.jpa.Bretzel</class>
+		<exclude-unlisted-classes />
+	</persistence-unit>
 
-    <persistence-unit name="IntegratorExtractionTestPU">
-        <class>org.hibernate.search.test.jpa.Bretzel</class>
-        <exclude-unlisted-classes />
-    </persistence-unit>
+	<persistence-unit name="IntegratorExtractionTestPU">
+		<class>org.hibernate.search.test.jpa.Bretzel</class>
+		<exclude-unlisted-classes />
+	</persistence-unit>
 
-    <persistence-unit name="EntityManagerTestPU">
-        <class>org.hibernate.search.test.jpa.Bretzel</class>
-        <exclude-unlisted-classes />
-    </persistence-unit>
+	<persistence-unit name="EntityManagerTestPU">
+		<class>org.hibernate.search.test.jpa.Bretzel</class>
+		<exclude-unlisted-classes />
+	</persistence-unit>
 
-    <persistence-unit name="SpatialQueryingJPATestPU">
-        <class>org.hibernate.search.test.spatial.POI</class>
-        <exclude-unlisted-classes />
-    </persistence-unit>
+	<persistence-unit name="SpatialQueryingJPATestPU">
+		<class>org.hibernate.search.test.spatial.POI</class>
+		<exclude-unlisted-classes />
+	</persistence-unit>
 
-    <persistence-unit name="JPATimeoutTestPU">
-        <class>org.hibernate.search.test.query.timeout.Clock</class>
-        <exclude-unlisted-classes />
-    </persistence-unit>
+	<persistence-unit name="JPATimeoutTestPU">
+		<class>org.hibernate.search.test.query.timeout.Clock</class>
+		<exclude-unlisted-classes />
+	</persistence-unit>
 
-    <persistence-unit name="SortUsingEntityManagerTest">
-        <class>org.hibernate.search.test.query.timeout.Clock</class>
-        <exclude-unlisted-classes />
-    </persistence-unit>
+	<persistence-unit name="SortUsingEntityManagerTest">
+		<class>org.hibernate.search.test.query.timeout.Clock</class>
+		<exclude-unlisted-classes />
+	</persistence-unit>
 
-    <persistence-unit name="SortUsingEntityManagerTestPU">
-        <class>org.hibernate.search.test.query.ProductArticle</class>
-        <exclude-unlisted-classes />
-    </persistence-unit>
+	<persistence-unit name="SortUsingEntityManagerTestPU">
+		<class>org.hibernate.search.test.query.ProductArticle</class>
+		<exclude-unlisted-classes />
+	</persistence-unit>
 
-    <persistence-unit name="ToStringTestPU">
-        <class>org.hibernate.search.test.jpa.ToStringTest$Foo</class>
-        <exclude-unlisted-classes />
-    </persistence-unit>
+	<persistence-unit name="ToStringTestPU">
+		<class>org.hibernate.search.test.jpa.ToStringTest$Foo</class>
+		<exclude-unlisted-classes />
+	</persistence-unit>
 
 </persistence>
