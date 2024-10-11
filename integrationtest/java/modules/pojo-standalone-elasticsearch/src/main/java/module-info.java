@@ -1,5 +1,6 @@
 module org.hibernate.search.integrationtest.java.modules.pojo.standalone.elasticsearch {
 	exports org.hibernate.search.integrationtest.java.modules.pojo.standalone.elasticsearch.service;
+
 	opens org.hibernate.search.integrationtest.java.modules.pojo.standalone.elasticsearch.entity to
 			org.hibernate.search.mapper.pojo.standalone;
 	opens org.hibernate.search.integrationtest.java.modules.pojo.standalone.elasticsearch.config to

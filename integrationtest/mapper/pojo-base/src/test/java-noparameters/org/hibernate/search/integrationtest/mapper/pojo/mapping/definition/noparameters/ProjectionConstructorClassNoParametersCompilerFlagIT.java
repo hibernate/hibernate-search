@@ -35,7 +35,8 @@ import org.junit.jupiter.api.extension.RegisterExtension;
 class ProjectionConstructorClassNoParametersCompilerFlagIT extends AbstractProjectionConstructorIT {
 
 	@RegisterExtension
-	public StandalonePojoMappingSetupHelper setupHelper = StandalonePojoMappingSetupHelper.withBackendMock( MethodHandles.lookup(), backendMock );
+	public StandalonePojoMappingSetupHelper setupHelper =
+			StandalonePojoMappingSetupHelper.withBackendMock( MethodHandles.lookup(), backendMock );
 
 	@BeforeEach
 	void sourcesCompiledWithoutParametersFlag() {
@@ -52,15 +53,18 @@ class ProjectionConstructorClassNoParametersCompilerFlagIT extends AbstractProje
 			private final String someText;
 			private final Integer someInteger;
 			private final InnerProjection someContained;
+
 			MyProjection(String someText, Integer someInteger, InnerProjection someContained) {
 				this.someText = someText;
 				this.someInteger = someInteger;
 				this.someContained = someContained;
 			}
+
 			@ProjectionConstructor
 			static class InnerProjection {
 				private final String someText2;
 				private final Integer someInteger2;
+
 				InnerProjection(String someText2, Integer someInteger2) {
 					this.someText2 = someText2;
 					this.someInteger2 = someInteger2;
@@ -73,7 +77,8 @@ class ProjectionConstructorClassNoParametersCompilerFlagIT extends AbstractProje
 				.isInstanceOf( SearchException.class )
 				.satisfies( FailureReportUtils.hasFailureReport()
 						.typeContext( MyProjection.class.getName() )
-						.constructorContext( ProjectionConstructorClassNoParametersCompilerFlagIT.class, String.class, Integer.class,
+						.constructorContext( ProjectionConstructorClassNoParametersCompilerFlagIT.class, String.class,
+								Integer.class,
 								MyProjection.InnerProjection.class )
 						.methodParameterContext( 1 )
 						.failure( "Missing parameter names in Java metadata for projection constructor",
@@ -102,6 +107,7 @@ class ProjectionConstructorClassNoParametersCompilerFlagIT extends AbstractProje
 			private final String someText;
 			private final Integer someInteger;
 			private final InnerProjection someContained;
+
 			MyProjection(@FieldProjection String someText,
 					@FieldProjection Integer someInteger,
 					@ObjectProjection InnerProjection someContained) {
@@ -109,10 +115,12 @@ class ProjectionConstructorClassNoParametersCompilerFlagIT extends AbstractProje
 				this.someInteger = someInteger;
 				this.someContained = someContained;
 			}
+
 			@ProjectionConstructor
 			static class InnerProjection {
 				private final String someText2;
 				private final Integer someInteger2;
+
 				InnerProjection(@FieldProjection String someText2,
 						@FieldProjection Integer someInteger2) {
 					this.someText2 = someText2;
@@ -126,7 +134,8 @@ class ProjectionConstructorClassNoParametersCompilerFlagIT extends AbstractProje
 				.isInstanceOf( SearchException.class )
 				.satisfies( FailureReportUtils.hasFailureReport()
 						.typeContext( MyProjection.class.getName() )
-						.constructorContext( ProjectionConstructorClassNoParametersCompilerFlagIT.class, String.class, Integer.class,
+						.constructorContext( ProjectionConstructorClassNoParametersCompilerFlagIT.class, String.class,
+								Integer.class,
 								MyProjection.InnerProjection.class )
 						.methodParameterContext( 1 )
 						.failure( "Missing parameter names in Java metadata for projection constructor",
@@ -155,6 +164,7 @@ class ProjectionConstructorClassNoParametersCompilerFlagIT extends AbstractProje
 			private final String someText;
 			private final Integer someInteger;
 			private final InnerProjection someContained;
+
 			MyProjection(@FieldProjection(path = "text") String someText,
 					@FieldProjection(path = "integer") Integer someInteger,
 					@ObjectProjection(path = "contained") InnerProjection someContained) {
@@ -162,10 +172,12 @@ class ProjectionConstructorClassNoParametersCompilerFlagIT extends AbstractProje
 				this.someInteger = someInteger;
 				this.someContained = someContained;
 			}
+
 			@ProjectionConstructor
 			static class InnerProjection {
 				private final String someText2;
 				private final Integer someInteger2;
+
 				InnerProjection(@FieldProjection(path = "text2") String someText2,
 						@FieldProjection(path = "integer2") Integer someInteger2) {
 					this.someText2 = someText2;

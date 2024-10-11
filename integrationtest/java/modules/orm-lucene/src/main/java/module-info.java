@@ -1,5 +1,6 @@
 module org.hibernate.search.integrationtest.java.module.orm.lucene {
 	exports org.hibernate.search.integrationtest.java.modules.orm.lucene.service;
+
 	opens org.hibernate.search.integrationtest.java.modules.orm.lucene.entity to
 			org.hibernate.orm.core,
 			/*

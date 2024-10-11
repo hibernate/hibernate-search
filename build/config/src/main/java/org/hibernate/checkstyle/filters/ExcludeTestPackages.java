@@ -22,10 +22,13 @@ import com.puppycrawl.tools.checkstyle.api.Filter;
  */
 public class ExcludeTestPackages implements Filter {
 
-	private static final String UNIT_TESTS_SUB_PATH = File.separator + "src" + File.separator + "test" + File.separator + "java";
-	private static final String COPIED_SOURCES_TESTS_SUB_PATH = File.separator + "copied-sources" + File.separator + "test" + File.separator + "java";
+	private static final String UNIT_TESTS_SUB_PATH =
+			File.separator + "src" + File.separator + "test" + File.separator + "java";
+	private static final String COPIED_SOURCES_TESTS_SUB_PATH =
+			File.separator + "copied-sources" + File.separator + "test" + File.separator + "java";
 	private static final String INTEGRATION_TESTS_SUB_PATH = File.separator + "integrationtest" + File.separator;
-	private static final String TEST_UTIL_SUB_PATH = File.separator + "util" + File.separator + "impl" + File.separator + "test" + File.separator;
+	private static final String TEST_UTIL_SUB_PATH =
+			File.separator + "util" + File.separator + "impl" + File.separator + "test" + File.separator;
 	private static final String MESSAGE_DISABLE_KEYWORD = "[not required for tests]";
 
 	@Override
