@@ -303,11 +303,10 @@
         <version.com.puppycrawl.tools.checkstyle>10.18.2</version.com.puppycrawl.tools.checkstyle>
         <version.versions.plugin>2.17.1</version.versions.plugin>
         <version.maven-wrapper-plugin>3.3.2</version.maven-wrapper-plugin>
-        <version.impsort-maven-plugin>1.12.0</version.impsort-maven-plugin>
-        <version.formatter-maven-plugin>2.24.1</version.formatter-maven-plugin>
         <version.org.eclipse.m2e.lifecycle-mapping>1.0.0</version.org.eclipse.m2e.lifecycle-mapping>
         <version.sisu-maven-plugin>0.9.0.M3</version.sisu-maven-plugin>
         <gitflow-incremental-builder.version>4.5.4</gitflow-incremental-builder.version>
+        <version.spotless-maven-plugin>2.43.0</version.spotless-maven-plugin>
 
         <!-- Repository Deployment URLs -->
 
@@ -434,8 +433,7 @@
 
         <!-- Formatting -->
         <format.skip>false</format.skip>
-        <goal.impsort-maven-plugin>sort</goal.impsort-maven-plugin>
-        <goal.formatter-maven-plugin>format</goal.formatter-maven-plugin>
+        <goal.spotless-maven-plugin>apply</goal.spotless-maven-plugin>
 
         <!-- For Reproducible Builds -->
         <project.build.outputTimestamp>2024-08-13T07:06:30Z</project.build.outputTimestamp>
@@ -1000,33 +998,75 @@
                    Code formatting configuration:
                -->
                 <plugin>
-                    <groupId>net.revelc.code</groupId>
-                    <artifactId>impsort-maven-plugin</artifactId>
-                    <version>${version.impsort-maven-plugin}</version>
+                    <groupId>com.diffplug.spotless</groupId>
+                    <artifactId>spotless-maven-plugin</artifactId>
+                    <version>${version.spotless-maven-plugin}</version>
                     <configuration>
-                        <!-- store outside of target to speed up formatting when mvn clean is used -->
-                        <cachedir>.cache/impsort-maven-plugin-${version.impsort-maven-plugin}</cachedir>
-                        <groups>java.,javax.,jakarta.,org.hibernate., org.hibernate.testing., org.hibernate.test., org.junit., org.jboss., com., *</groups>
-                        <staticGroups>*</staticGroups>
-                        <!-- To make static imports go on top: -->
-                        <staticAfter>false</staticAfter>
-                        <skip>${format.skip}</skip>
-                        <removeUnused>true</removeUnused>
+                        <upToDateChecking>
+                            <enabled>true</enabled>
+                            <indexFile>.cache/spotless-index-${version.spotless-maven-plugin}</indexFile>
+                        </upToDateChecking>
+                        <formats>
+                            <format>
+                                <!-- XML specific rules -->
+                                <includes>
+                                    <include>src/**/*.xml</include>
+                                </includes>
+                                <trimTrailingWhitespace/>
+                                <endWithNewline/>
+                                <licenseHeader>
+                                    <file>license.xml.header</file>
+                                    <!-- Delimiter is a regex which identifies the "top" of the file i.e. all above it is considered a header -->
+                                    <delimiter><![CDATA[(\n)*^(<[^!?]+|<!DOCTYPE.+)$]]></delimiter>
+                                    <skipLinesMatching><![CDATA[<\?xml.+\?>]]></skipLinesMatching>
+                                </licenseHeader>
+                                <indent>
+                                    <tabs>true</tabs>
+                                    <spacesPerTab>4</spacesPerTab>
+                                </indent>
+                            </format>
+                        </formats>
+                        <!-- define a language-specific format -->
+                        <java>
+                            <toggleOffOn/>
+                            <includes>
+                                <include>src/**/*.java</include>
+                            </includes>
+                            <excludes>
+                                <!-- Ignore avro-generated classes as we have them commited to the repository: -->
+                                <exclude>**/main/avro/generated/**/*.java</exclude>
+                            </excludes>
+                            <indent>
+                                <tabs>true</tabs>
+                                <spacesPerTab>4</spacesPerTab>
+                            </indent>
+
+                            <importOrder>
+                                <file>hibernate_search_style.importorder</file>
+                            </importOrder>
+                            <trimTrailingWhitespace/>
+                            <endWithNewline/>
+                            <eclipse>
+                                <!-- optional version of Eclipse Formatter -->
+                                <!-- <version>4.26</version> -->
+                                <file>hibernate_search_style.xml</file>
+                            </eclipse>
+                            <removeUnusedImports>
+                                <!-- default one fails to process the classes -->
+                                <engine>cleanthat-javaparser-unnecessaryimport</engine>
+                            </removeUnusedImports>
+                            <licenseHeader>
+                                <file>license.java.header</file>
+                                <!-- Delimiter is a regex which identifies the "top" of the file i.e. all above it is considered a header -->
+                                <delimiter>(\n)*^(\/\/tag.+|\/\/spotless.+|package .+;|//.+$|(?!package .+;)import .+;)</delimiter>
+                            </licenseHeader>
+                            <replaceRegex>
+                                <name>Remove wildcard imports</name>
+                                <searchRegex>^import\s+[^\*\s]+\*;$</searchRegex>
+                                <replacement>$1</replacement>
+                            </replaceRegex>
+                        </java>
                     </configuration>
-                    <executions>
-                        <execution>
-                            <id>import-sorting</id>
-                            <goals>
-                                <goal>${goal.impsort-maven-plugin}</goal>
-                            </goals>
-                            <phase>process-sources</phase>
-                        </execution>
-                    </executions>
-                </plugin>
-                <plugin>
-                    <groupId>net.revelc.code.formatter</groupId>
-                    <artifactId>formatter-maven-plugin</artifactId>
-                    <version>${version.formatter-maven-plugin}</version>
                     <dependencies>
                         <dependency>
                             <groupId>org.hibernate.search</groupId>
@@ -1034,20 +1074,16 @@
                             <version>${project.version}</version>
                         </dependency>
                     </dependencies>
-                    <configuration>
-                        <!-- store outside of target to speed up formatting when mvn clean is used -->
-                        <cachedir>.cache/formatter-maven-plugin-${version.formatter-maven-plugin}</cachedir>
-                        <configFile>hibernate_search_style.xml</configFile>
-                        <skip>${format.skip}</skip>
-                        <removeTrailingWhitespace>true</removeTrailingWhitespace>
-                    </configuration>
                     <executions>
                         <execution>
-                            <id>code-formatting</id>
-                            <goals>
-                                <goal>${goal.formatter-maven-plugin}</goal>
-                            </goals>
+                            <id>check-apply-formatting</id>
+                            <configuration>
+                                <skip>${format.skip}</skip>
+                            </configuration>
                             <phase>process-sources</phase>
+                            <goals>
+                                <goal>${goal.spotless-maven-plugin}</goal>
+                            </goals>
                         </execution>
                     </executions>
                 </plugin>
@@ -1530,8 +1566,7 @@
         <profile>
             <id>ci-build</id>
             <properties>
-                <goal.impsort-maven-plugin>check</goal.impsort-maven-plugin>
-                <goal.formatter-maven-plugin>validate</goal.formatter-maven-plugin>
+                <goal.spotless-maven-plugin>check</goal.spotless-maven-plugin>
             </properties>
         </profile>
 
