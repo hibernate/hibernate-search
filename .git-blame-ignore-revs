@@ -31,3 +31,7 @@ a422a266a66907ffb4c3bde135f2f5f74e0f79d8
 7b6b15c04f0ce6ec98e8d4983605b97f36d34fd5
 # HSEARCH-4394 Move main code from Java EE to Jakarta EE
 044a03d329f0005d089552995af8287cfa2f2ffc
+# switch to spotless and more formatting updates:
+77eb97fb72cb19b4bd2610a0cc4077cb66dc7681
+f655ea4d7872d568832821c89299dd2380e1d877
+2baaf0404a07866c24843e141739b2b1e17e9cc1
