@@ -295,7 +295,7 @@
         <version.surefire.plugin>3.5.1</version.surefire.plugin>
         <version.surefire.plugin.java-version.asm>9.7.1</version.surefire.plugin.java-version.asm>
         <version.jacoco.plugin>0.8.12</version.jacoco.plugin>
-        <version.com.buschmais.jqassistant.plugin>2.4.0</version.com.buschmais.jqassistant.plugin>
+        <version.com.buschmais.jqassistant.plugin>2.5.0</version.com.buschmais.jqassistant.plugin>
         <version.moditect.plugin>1.2.2.Final</version.moditect.plugin>
         <version.sonar.plugin>4.0.0.4121</version.sonar.plugin>
         <version.scripting.plugin>3.0.0</version.scripting.plugin>
