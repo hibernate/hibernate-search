@@ -372,13 +372,29 @@ hibernate.search.backend.max_connections_per_route = 10
 
 * `max_connections` defines maximum number of simultaneous connections
 to the Elasticsearch cluster, all hosts taken together.
-The default for this property is `20`.
+The default for this property is `40`.
 * `max_connections_per_route` defines maximum number of simultaneous connections
 to each host of the Elasticsearch cluster.
 The default for this property is `10`.
 
 +
 These properties expect a positive <<configuration-property-types,Integer value>>, such as `20`.
+
++
+[NOTE]
+====
+When working with an Elasticsearch backend cluster, multiple cluster nodes might exist.
+If so, the REST client communicating with the cluster will try to distribute the requests among the nodes.
+That’s why the maximum number of connections can be set per route (cluster node)
+and then limited by the general number of maximum connections.
+
+When modifying the maximum connection values, it is worth remembering the number
+of <<backend-elasticsearch-indexing-queues,indexing queues>> configured for the backend
+With an application performing a lot of indexing operations, having a subpar configuration of the maximum connections may
+result in all connections primarily being consumed by the indexing processes, resulting in the degrading performance of search operations,
+as those would be struggling to get a connection.
+To prevent that from happening consider having the maximum number of connections greater than the number of active indexing queues.
+====
 
 Keep Alive::
 +
