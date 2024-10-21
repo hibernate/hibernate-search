@@ -16,6 +16,7 @@
 		<id name="id" type="integer"/>
 		<property name="author" type="string"/>
 		<property name="content" type="string"/>
-		<one-to-one name="book" entity-name="Book" />
+		<!-- https://docs.jboss.org/hibernate/orm/4.3/manual/en-US/html_single/#assoc-bidirectional-121 -->
+		<many-to-one name="book" entity-name="Book" unique="true" />
 	</class>
 </hibernate-mapping>

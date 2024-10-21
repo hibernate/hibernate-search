@@ -41,7 +41,6 @@ import org.hibernate.search.util.impl.integrationtest.common.extension.StubSearc
 import org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmSetupHelper;
 import org.hibernate.search.util.impl.test.annotation.TestForIssue;
 
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -656,7 +655,6 @@ class DynamicMapBaseIT {
 	}
 
 	@Test
-	@Disabled("toone associations are buggy in dynamic-map mode -- see https://hibernate.atlassian.net/browse/HHH-16100")
 	void toOne() {
 		String hbmPath = "/DynamicMapBaseIT/toone.hbm.xml";
 		String bookTypeName = "Book";
