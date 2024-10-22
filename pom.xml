@@ -995,8 +995,8 @@
                     </dependencies>
                 </plugin>
                 <!--
-                   Code formatting configuration:
-               -->
+                    Code formatting configuration:
+                -->
                 <plugin>
                     <groupId>com.diffplug.spotless</groupId>
                     <artifactId>spotless-maven-plugin</artifactId>
@@ -1004,7 +1004,7 @@
                     <configuration>
                         <upToDateChecking>
                             <enabled>true</enabled>
-                            <indexFile>.cache/spotless-index-${version.spotless-maven-plugin}</indexFile>
+                            <indexFile>${project.basedir}/.cache/spotless-index-${version.spotless-maven-plugin}</indexFile>
                         </upToDateChecking>
                         <formats>
                             <format>
