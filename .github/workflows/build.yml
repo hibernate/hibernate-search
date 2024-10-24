@@ -165,21 +165,3 @@ jobs:
         run: ./ci/docker-cleanup.sh
       - name: Omit produced artifacts from build cache
         run: rm -r ~/.m2/repository/org/hibernate/search
-      # Workaround for https://github.com/actions/upload-artifact/issues/240
-      - name: List build reports to upload (if build failed)
-        if: ${{ failure() || cancelled() }}
-        # The weird syntax is because we're setting a multiline environment variable
-        # See https://docs.github.com/en/actions/using-workflows/workflow-commands-for-github-actions#example-of-a-multiline-string
-        run: |
-          {
-            echo 'buildReportPaths<<EOF'
-            find . -path '**/*-reports'
-            echo EOF
-          } >> "$GITHUB_ENV"
-      - name: Upload build reports (if build failed)
-        uses: actions/upload-artifact@v4
-        if: ${{ failure() || cancelled() }}
-        with:
-          name: ${{ format('build-reports-{0}', matrix.os.name ) }}
-          path: ${{ env.buildReportPaths }}
-          retention-days: 7
