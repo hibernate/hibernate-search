@@ -9,7 +9,7 @@
 # See https://docs.github.com/en/actions
 # for more information about GitHub actions.
 
-name: GitHub Actions Build
+name: GH Actions CI
 
 on:
   push:
@@ -24,9 +24,7 @@ on:
       - '!wip/**/dependency-update/**'
     tags:
       - '**'
-  # WARNING: Using pull_request_target to access secrets, but we check out the merge commit.
-  # See checkout action for details.
-  pull_request_target:
+  pull_request:
     types: [opened, synchronize, reopened, ready_for_review]
     branches:
       # Pattern order matters: the last matching inclusion/exclusion wins
@@ -44,7 +42,7 @@ on:
 
 concurrency:
   group: "workflow = ${{ github.workflow }}, ref = ${{ github.event.ref }}, pr = ${{ github.event.pull_request.id }}"
-  cancel-in-progress: ${{ github.event_name == 'pull_request_target' || github.repository != 'hibernate/hibernate-search' }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' || github.repository != 'hibernate/hibernate-search' }}
 
 defaults:
   run:
@@ -90,21 +88,9 @@ jobs:
       - name: Support longpaths on Windows
         if: "startsWith(matrix.os.runs-on, 'windows')"
         run: git config --global core.longpaths true
-      - name: Check out commit already pushed to branch
-        if: "! github.event.pull_request.number"
-        uses: actions/checkout@v4
-      - name: Check out PR head
-        uses: actions/checkout@v4
-        if: github.event.pull_request.number
+      - uses: actions/checkout@v4
         with:
-          # WARNING: This is potentially dangerous since we're checking out unreviewed code,
-          # and since we're using the pull_request_target event we can use secrets.
-          # Thus, we must be extra careful to never expose secrets to steps that execute this code,
-          # and to strictly limit our of secrets to those that only pose minor security threads.
-          # This means in particular we won't expose Develocity credentials to the main maven executions,
-          # but instead will execute maven a third time just to push build scans to Develocity;
-          # see below.
-          ref: "refs/pull/${{ github.event.pull_request.number }}/head"
+          persist-credentials: false
           # Fetch the whole history to make sure that gitflow incremental builder
           # can find the base commit.
           fetch-depth: 0
@@ -118,9 +104,10 @@ jobs:
         uses: actions/cache@v4
         with:
           path: ~/.m2/repository
-          key: ${{ runner.os }}-maven-${{ hashFiles('**/pom.xml') }}
+          # use a different key than workflows running in trusted mode
+          key: ${{ github.event_name == 'push' && 'trusted' || 'untrusted' }}-${{ runner.os }}-maven-${{ hashFiles('**/pom.xml') }}
           restore-keys: |
-            ${{ runner.os }}-maven-
+            ${{ github.event_name == 'push' && 'trusted' || 'untrusted' }}-${{ runner.os }}-maven-
       - name: Set up Maven
         run: ./mvnw -v
       - name: Docker cleanup
@@ -131,17 +118,19 @@ jobs:
           ./mvnw $MAVEN_ARGS ${{ matrix.os.maven.args }} clean install \
           -Pjqassistant -Pdist -Pci-build -DskipITs
         env:
-          # WARNING: exposes secrets, so must only be passed to a step that doesn't run unapproved code.
-          DEVELOCITY_ACCESS_KEY: "${{ github.event_name == 'push' && secrets.GRADLE_ENTERPRISE_ACCESS_KEY || '' }}"
-      - name: Publish Develocity build scan for previous build (pull request)
-        # Don't fail a build if publishing fails
-        continue-on-error: true
-        if: "${{ !cancelled() && github.event_name == 'pull_request_target' && github.repository == 'hibernate/hibernate-search' }}"
-        run: |
-          ./mvnw $MAVEN_ARGS develocity:build-scan-publish-previous
-        env:
-          # WARNING: exposes secrets, so must only be passed to a step that doesn't run unapproved code.
-          DEVELOCITY_ACCESS_KEY: ${{ secrets.GRADLE_ENTERPRISE_ACCESS_KEY_PR }}
+          DEVELOCITY_ACCESS_KEY: "${{ secrets.DEVELOCITY_ACCESS_KEY || '' }}"
+      # For jobs running on 'pull_request', tar and upload build scan data.
+      # The actual publishing must be done in a separate job (see ci-report.yml).
+      # We don't write to the remote cache as that would be unsafe.
+      - name: Tar build scan content pushed to subsequent jobs
+        if: "${{ github.event_name == 'pull_request' && !cancelled() }}"
+        run: tar -czf build-scan-data.tgz -C ~/.m2/.develocity/build-scan-data .
+      - name: Upload GitHub Actions artifact for the Develocity build scan
+        uses: actions/upload-artifact@v4
+        if: "${{ github.event_name == 'pull_request' && !cancelled() }}"
+        with:
+          name: build-scan-data-initial-${{ matrix.os.name }}
+          path: build-scan-data.tgz
 
       - name: Run integration tests in the default environment
         run: |
@@ -149,17 +138,17 @@ jobs:
           -Pskip-checks \
           ${{ github.event.pull_request.base.ref && format('-Dincremental -Dgib.referenceBranch=refs/remotes/origin/{0}', github.event.pull_request.base.ref) || '' }}
         env:
-          # WARNING: exposes secrets, so must only be passed to a step that doesn't run unapproved code.
-          DEVELOCITY_ACCESS_KEY: "${{ github.event_name == 'push' && secrets.GRADLE_ENTERPRISE_ACCESS_KEY || '' }}"
-      - name: Publish Develocity build scan for previous build (pull request)
-        # Don't fail a build if publishing fails
-        continue-on-error: true
-        if: "${{ !cancelled() && github.event_name == 'pull_request_target' && github.repository == 'hibernate/hibernate-search' }}"
-        run: |
-          ./mvnw $MAVEN_ARGS develocity:build-scan-publish-previous
-        env:
-          # WARNING: exposes secrets, so must only be passed to a step that doesn't run unapproved code.
-          DEVELOCITY_ACCESS_KEY: ${{ secrets.GRADLE_ENTERPRISE_ACCESS_KEY_PR }}
+          DEVELOCITY_ACCESS_KEY: "${{ secrets.DEVELOCITY_ACCESS_KEY || '' }}"
+      # Same as above, but for the build scan of the latest Maven run.
+      - name: Tar build scan content pushed to subsequent jobs
+        if: "${{ github.event_name == 'pull_request' && !cancelled() }}"
+        run: tar -czf build-scan-data.tgz -C ~/.m2/.develocity/build-scan-data .
+      - name: Upload GitHub Actions artifact for the Develocity build scan
+        uses: actions/upload-artifact@v4
+        if: "${{ github.event_name == 'pull_request' && !cancelled() }}"
+        with:
+          name: build-scan-data-integrationtest-${{ matrix.os.name }}
+          path: build-scan-data.tgz
 
       - name: Docker cleanup
         run: ./ci/docker-cleanup.sh
