@@ -68,7 +68,7 @@ abstract class AbstractAutomaticIndexingArrayIT<TIndexed, TArray, TIndexField> {
 
 		// Test replacing the array
 		with( sessionFactory ).runInTransaction( session -> {
-			TIndexed entity1 = session.get( primitives.getIndexedClass(), 1 );
+			TIndexed entity1 = session.find( primitives.getIndexedClass(), 1 );
 
 			TArray array2 = primitives.newArray( 3 );
 			primitives.setElement( array2, 0, 1 );
@@ -106,7 +106,7 @@ abstract class AbstractAutomaticIndexingArrayIT<TIndexed, TArray, TIndexField> {
 
 		// Test replacing an element in the array
 		with( sessionFactory ).runInTransaction( session -> {
-			TIndexed entity1 = session.get( primitives.getIndexedClass(), 1 );
+			TIndexed entity1 = session.find( primitives.getIndexedClass(), 1 );
 
 			TArray array = primitives.getSerializedArray( entity1 );
 			primitives.setElement( array, 1, 2 );
@@ -140,7 +140,7 @@ abstract class AbstractAutomaticIndexingArrayIT<TIndexed, TArray, TIndexField> {
 
 		// Test replacing the array
 		with( sessionFactory ).runInTransaction( session -> {
-			TIndexed entity1 = session.get( primitives.getIndexedClass(), 1 );
+			TIndexed entity1 = session.find( primitives.getIndexedClass(), 1 );
 
 			TArray array2 = primitives.newArray( 3 );
 			primitives.setElement( array2, 0, 1 );
@@ -178,7 +178,7 @@ abstract class AbstractAutomaticIndexingArrayIT<TIndexed, TArray, TIndexField> {
 
 		// Test replacing an element in the array
 		with( sessionFactory ).runInTransaction( session -> {
-			TIndexed entity1 = session.get( primitives.getIndexedClass(), 1 );
+			TIndexed entity1 = session.find( primitives.getIndexedClass(), 1 );
 
 			TArray array = primitives.getElementCollectionArray( entity1 );
 			primitives.setElement( array, 1, 2 );

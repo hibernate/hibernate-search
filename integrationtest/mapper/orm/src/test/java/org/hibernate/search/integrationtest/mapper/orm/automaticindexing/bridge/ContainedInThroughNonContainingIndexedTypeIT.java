@@ -87,7 +87,7 @@ class ContainedInThroughNonContainingIndexedTypeIT {
 
 		// Test updating the value
 		with( sessionFactory ).runInTransaction( session -> {
-			Contained contained = session.get( Contained.class, 2 );
+			Contained contained = session.find( Contained.class, 2 );
 			contained.setIndexedInContaining( 42 );
 
 			/*

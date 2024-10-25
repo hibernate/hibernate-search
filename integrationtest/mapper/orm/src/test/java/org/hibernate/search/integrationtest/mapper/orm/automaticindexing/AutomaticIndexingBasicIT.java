@@ -77,7 +77,7 @@ class AutomaticIndexingBasicIT {
 		backendMock.verifyExpectationsMet();
 
 		with( sessionFactory ).runInTransaction( session -> {
-			IndexedEntity entity1 = session.get( IndexedEntity.class, 1 );
+			IndexedEntity entity1 = session.find( IndexedEntity.class, 1 );
 			entity1.setIndexedField( "updatedValue" );
 
 			backendMock.expectWorks( IndexedEntity.INDEX )
@@ -90,7 +90,7 @@ class AutomaticIndexingBasicIT {
 		backendMock.verifyExpectationsMet();
 
 		with( sessionFactory ).runInTransaction( session -> {
-			IndexedEntity entity1 = session.get( IndexedEntity.class, 1 );
+			IndexedEntity entity1 = session.find( IndexedEntity.class, 1 );
 
 			session.remove( entity1 );
 
@@ -162,7 +162,7 @@ class AutomaticIndexingBasicIT {
 		backendMock.verifyExpectationsMet();
 
 		with( sessionFactory ).runInTransaction( session -> {
-			IndexedEntity entity1 = session.get( IndexedEntity.class, 1 );
+			IndexedEntity entity1 = session.find( IndexedEntity.class, 1 );
 			entity1.setNonIndexedField( "updatedValue" );
 
 			// Do not expect any work
@@ -170,7 +170,7 @@ class AutomaticIndexingBasicIT {
 		backendMock.verifyExpectationsMet();
 
 		with( sessionFactory ).runInTransaction( session -> {
-			IndexedEntity entity1 = session.get( IndexedEntity.class, 1 );
+			IndexedEntity entity1 = session.find( IndexedEntity.class, 1 );
 			entity1.setNonIndexedField( null );
 
 			// Do not expect any work
@@ -205,7 +205,7 @@ class AutomaticIndexingBasicIT {
 		backendMock.verifyExpectationsMet();
 
 		with( sessionFactory ).runInTransaction( session -> {
-			IndexedEntity entity1 = session.get( IndexedEntity.class, 1 );
+			IndexedEntity entity1 = session.find( IndexedEntity.class, 1 );
 			entity1.setShallowReindexOnUpdateField( "updatedValue" );
 
 			backendMock.expectWorks( IndexedEntity.INDEX )
@@ -218,7 +218,7 @@ class AutomaticIndexingBasicIT {
 		backendMock.verifyExpectationsMet();
 
 		with( sessionFactory ).runInTransaction( session -> {
-			IndexedEntity entity1 = session.get( IndexedEntity.class, 1 );
+			IndexedEntity entity1 = session.find( IndexedEntity.class, 1 );
 			entity1.setShallowReindexOnUpdateField( null );
 
 			backendMock.expectWorks( IndexedEntity.INDEX )
@@ -255,7 +255,7 @@ class AutomaticIndexingBasicIT {
 		backendMock.verifyExpectationsMet();
 
 		with( sessionFactory ).runInTransaction( session -> {
-			IndexedEntity entity1 = session.get( IndexedEntity.class, 1 );
+			IndexedEntity entity1 = session.find( IndexedEntity.class, 1 );
 			entity1.setNoReindexOnUpdateField( "updatedValue" );
 
 			// Do not expect any work
@@ -263,7 +263,7 @@ class AutomaticIndexingBasicIT {
 		backendMock.verifyExpectationsMet();
 
 		with( sessionFactory ).runInTransaction( session -> {
-			IndexedEntity entity1 = session.get( IndexedEntity.class, 1 );
+			IndexedEntity entity1 = session.find( IndexedEntity.class, 1 );
 			entity1.setNoReindexOnUpdateField( null );
 
 			// Do not expect any work

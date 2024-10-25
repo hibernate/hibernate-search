@@ -78,7 +78,7 @@ class AutomaticIndexingNonEntityIdDocumentIdIT {
 		backendMock.verifyExpectationsMet();
 
 		with( sessionFactory ).runInTransaction( session -> {
-			IndexedEntity entity1 = session.get( IndexedEntity.class, 1 );
+			IndexedEntity entity1 = session.find( IndexedEntity.class, 1 );
 			entity1.setIndexedField( "updatedValue" );
 
 			backendMock.expectWorks( IndexedEntity.INDEX )
@@ -93,7 +93,7 @@ class AutomaticIndexingNonEntityIdDocumentIdIT {
 		backendMock.verifyExpectationsMet();
 
 		with( sessionFactory ).runInTransaction( session -> {
-			IndexedEntity entity1 = session.get( IndexedEntity.class, 1 );
+			IndexedEntity entity1 = session.find( IndexedEntity.class, 1 );
 
 			session.remove( entity1 );
 
@@ -127,7 +127,7 @@ class AutomaticIndexingNonEntityIdDocumentIdIT {
 
 		// Test adding a value
 		with( sessionFactory ).runInTransaction( session -> {
-			IndexedEntity entity1 = session.get( IndexedEntity.class, 1 );
+			IndexedEntity entity1 = session.find( IndexedEntity.class, 1 );
 			entity1.getIndexedElementCollectionField().add( "secondValue" );
 
 			backendMock.expectWorks( IndexedEntity.INDEX )
@@ -144,7 +144,7 @@ class AutomaticIndexingNonEntityIdDocumentIdIT {
 
 		// Test removing a value
 		with( sessionFactory ).runInTransaction( session -> {
-			IndexedEntity entity1 = session.get( IndexedEntity.class, 1 );
+			IndexedEntity entity1 = session.find( IndexedEntity.class, 1 );
 			entity1.getIndexedElementCollectionField().remove( 1 );
 
 			backendMock.expectWorks( IndexedEntity.INDEX )
@@ -189,7 +189,7 @@ class AutomaticIndexingNonEntityIdDocumentIdIT {
 		backendMock.verifyExpectationsMet();
 
 		with( sessionFactory ).runInTransaction( session -> {
-			IndexedEntity entity1 = session.get( IndexedEntity.class, 1 );
+			IndexedEntity entity1 = session.find( IndexedEntity.class, 1 );
 			entity1.setIndexedElementCollectionField( new ArrayList<>( Arrays.asList(
 					"newFirstValue", "newSecondValue"
 			) ) );

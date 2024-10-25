@@ -79,7 +79,7 @@ class AutomaticIndexingElementCollectionIT {
 
 		// Test adding a value
 		with( sessionFactory ).runInTransaction( session -> {
-			IndexedEntity entity1 = session.get( IndexedEntity.class, 1 );
+			IndexedEntity entity1 = session.find( IndexedEntity.class, 1 );
 			entity1.getIndexedElementCollectionField().add( "secondValue" );
 
 			backendMock.expectWorks( IndexedEntity.INDEX )
@@ -95,7 +95,7 @@ class AutomaticIndexingElementCollectionIT {
 
 		// Test removing a value
 		with( sessionFactory ).runInTransaction( session -> {
-			IndexedEntity entity1 = session.get( IndexedEntity.class, 1 );
+			IndexedEntity entity1 = session.find( IndexedEntity.class, 1 );
 			entity1.getIndexedElementCollectionField().remove( 1 );
 
 			backendMock.expectWorks( IndexedEntity.INDEX )
@@ -137,7 +137,7 @@ class AutomaticIndexingElementCollectionIT {
 		backendMock.verifyExpectationsMet();
 
 		with( sessionFactory ).runInTransaction( session -> {
-			IndexedEntity entity1 = session.get( IndexedEntity.class, 1 );
+			IndexedEntity entity1 = session.find( IndexedEntity.class, 1 );
 			entity1.setIndexedElementCollectionField( new ArrayList<>( Arrays.asList(
 					"newFirstValue", "newSecondValue"
 			) ) );
@@ -175,7 +175,7 @@ class AutomaticIndexingElementCollectionIT {
 
 		// Test adding a value
 		with( sessionFactory ).runInTransaction( session -> {
-			IndexedEntity entity1 = session.get( IndexedEntity.class, 1 );
+			IndexedEntity entity1 = session.find( IndexedEntity.class, 1 );
 			entity1.getNonIndexedElementCollectionField().add( "secondValue" );
 
 			// Do not expect any work
@@ -184,7 +184,7 @@ class AutomaticIndexingElementCollectionIT {
 
 		// Test removing a value
 		with( sessionFactory ).runInTransaction( session -> {
-			IndexedEntity entity1 = session.get( IndexedEntity.class, 1 );
+			IndexedEntity entity1 = session.find( IndexedEntity.class, 1 );
 			entity1.getNonIndexedElementCollectionField().remove( 1 );
 
 			// Do not expect any work
@@ -215,7 +215,7 @@ class AutomaticIndexingElementCollectionIT {
 		backendMock.verifyExpectationsMet();
 
 		with( sessionFactory ).runInTransaction( session -> {
-			IndexedEntity entity1 = session.get( IndexedEntity.class, 1 );
+			IndexedEntity entity1 = session.find( IndexedEntity.class, 1 );
 			entity1.setNonIndexedElementCollectionField( new ArrayList<>( Arrays.asList(
 					"newFirstValue", "newSecondValue"
 			) ) );
@@ -253,7 +253,7 @@ class AutomaticIndexingElementCollectionIT {
 
 		// Test adding a value
 		with( sessionFactory ).runInTransaction( session -> {
-			IndexedEntity entity1 = session.get( IndexedEntity.class, 1 );
+			IndexedEntity entity1 = session.find( IndexedEntity.class, 1 );
 			entity1.getShallowReindexOnUpdateElementCollectionField().add( "secondValue" );
 
 			backendMock.expectWorks( IndexedEntity.INDEX )
@@ -266,7 +266,7 @@ class AutomaticIndexingElementCollectionIT {
 
 		// Test removing a value
 		with( sessionFactory ).runInTransaction( session -> {
-			IndexedEntity entity1 = session.get( IndexedEntity.class, 1 );
+			IndexedEntity entity1 = session.find( IndexedEntity.class, 1 );
 			entity1.getShallowReindexOnUpdateElementCollectionField().remove( 1 );
 
 			backendMock.expectWorks( IndexedEntity.INDEX )
@@ -305,7 +305,7 @@ class AutomaticIndexingElementCollectionIT {
 		backendMock.verifyExpectationsMet();
 
 		with( sessionFactory ).runInTransaction( session -> {
-			IndexedEntity entity1 = session.get( IndexedEntity.class, 1 );
+			IndexedEntity entity1 = session.find( IndexedEntity.class, 1 );
 			entity1.setShallowReindexOnUpdateElementCollectionField( new ArrayList<>( Arrays.asList(
 					"newFirstValue", "newSecondValue"
 			) ) );
@@ -342,7 +342,7 @@ class AutomaticIndexingElementCollectionIT {
 
 		// Test adding a value
 		with( sessionFactory ).runInTransaction( session -> {
-			IndexedEntity entity1 = session.get( IndexedEntity.class, 1 );
+			IndexedEntity entity1 = session.find( IndexedEntity.class, 1 );
 			entity1.getNoReindexOnUpdateElementCollectionField().add( "secondValue" );
 
 			// Do not expect any work
@@ -351,7 +351,7 @@ class AutomaticIndexingElementCollectionIT {
 
 		// Test removing a value
 		with( sessionFactory ).runInTransaction( session -> {
-			IndexedEntity entity1 = session.get( IndexedEntity.class, 1 );
+			IndexedEntity entity1 = session.find( IndexedEntity.class, 1 );
 			entity1.getNoReindexOnUpdateElementCollectionField().remove( 1 );
 
 			// Do not expect any work
@@ -384,7 +384,7 @@ class AutomaticIndexingElementCollectionIT {
 		backendMock.verifyExpectationsMet();
 
 		with( sessionFactory ).runInTransaction( session -> {
-			IndexedEntity entity1 = session.get( IndexedEntity.class, 1 );
+			IndexedEntity entity1 = session.find( IndexedEntity.class, 1 );
 			entity1.setNoReindexOnUpdateElementCollectionField( new ArrayList<>( Arrays.asList(
 					"newFirstValue", "newSecondValue"
 			) ) );

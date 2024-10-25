@@ -113,7 +113,7 @@ class AutomaticIndexingEmbeddedBridgeIT {
 
 		// Test updating a value used in an included bridge
 		with( sessionFactory ).runInTransaction( session -> {
-			ContainedEntity containedEntity = session.get( ContainedEntity.class, 3 );
+			ContainedEntity containedEntity = session.find( ContainedEntity.class, 3 );
 			containedEntity.setIncludedInFirstBridge( "updatedValue" );
 
 			backendMock.expectWorks( IndexedEntity.INDEX )
@@ -132,7 +132,7 @@ class AutomaticIndexingEmbeddedBridgeIT {
 		 * (every index field filtered out by the IndexedEmbedded filter)
 		 */
 		with( sessionFactory ).runInTransaction( session -> {
-			ContainedEntity containedEntity = session.get( ContainedEntity.class, 4 );
+			ContainedEntity containedEntity = session.find( ContainedEntity.class, 4 );
 			containedEntity.setIncludedInSecondBridge( "updatedValue" );
 
 			// Do not expect any work

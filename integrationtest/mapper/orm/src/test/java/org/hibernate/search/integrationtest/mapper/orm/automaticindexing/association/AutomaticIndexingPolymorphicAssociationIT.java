@@ -79,7 +79,7 @@ class AutomaticIndexingPolymorphicAssociationIT {
 		backendMock.verifyExpectationsMet();
 
 		with( sessionFactory ).runInTransaction( session -> {
-			Level3 derivedLevel2Level3 = session.get( Level3.class, 3 );
+			Level3 derivedLevel2Level3 = session.find( Level3.class, 3 );
 			derivedLevel2Level3.setName( EDIT_NAME );
 
 			backendMock.expectWorks( Level1.NAME )
@@ -117,7 +117,7 @@ class AutomaticIndexingPolymorphicAssociationIT {
 		backendMock.verifyExpectationsMet();
 
 		with( sessionFactory ).runInTransaction( session -> {
-			Level3 baseLevel2Level3 = session.get( Level3.class, 5 );
+			Level3 baseLevel2Level3 = session.find( Level3.class, 5 );
 			baseLevel2Level3.setName( EDIT_NAME );
 		} );
 		backendMock.verifyExpectationsMet();

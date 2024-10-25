@@ -139,7 +139,7 @@ class AutomaticIndexingOverReindexingIT {
 
 		// Test updating the value that should only affect level 2
 		with( sessionFactory ).runInTransaction( session -> {
-			Level3Entity level3 = session.get( Level3Entity.class, 3 );
+			Level3Entity level3 = session.find( Level3Entity.class, 3 );
 			level3.setProperty2( "updatedValue" );
 
 			backendMock.expectWorks( Level2Entity.INDEX )
@@ -154,7 +154,7 @@ class AutomaticIndexingOverReindexingIT {
 		// Test updating the value that should only affect level 1
 		// This is what used to fail and we don't want to see regress: it used to reindex level 2 as well, for no good reason.
 		with( sessionFactory ).runInTransaction( session -> {
-			Level3Entity level3 = session.get( Level3Entity.class, 3 );
+			Level3Entity level3 = session.find( Level3Entity.class, 3 );
 			level3.setProperty1( "updatedValue" );
 
 			backendMock.expectWorks( Level1Entity.INDEX )

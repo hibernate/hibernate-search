@@ -94,7 +94,7 @@ public abstract class AbstractAutomaticIndexingMultiValuedAssociationBaseIT<
 
 		// Test adding a value
 		with( sessionFactory ).runInTransaction( session -> {
-			TIndexed entity1 = session.get( _indexed().entityClass(), 1 );
+			TIndexed entity1 = session.find( _indexed().entityClass(), 1 );
 
 			TContained contained = _contained().newInstance( 2 );
 			field.set( contained, VALUE_1 );
@@ -115,7 +115,7 @@ public abstract class AbstractAutomaticIndexingMultiValuedAssociationBaseIT<
 
 		// Test adding a second value
 		with( sessionFactory ).runInTransaction( session -> {
-			TIndexed entity1 = session.get( _indexed().entityClass(), 1 );
+			TIndexed entity1 = session.find( _indexed().entityClass(), 1 );
 
 			TContained contained = _contained().newInstance( 3 );
 			field.set( contained, VALUE_2 );
@@ -139,9 +139,9 @@ public abstract class AbstractAutomaticIndexingMultiValuedAssociationBaseIT<
 
 		// Test removing a value
 		with( sessionFactory ).runInTransaction( session -> {
-			TIndexed entity1 = session.get( _indexed().entityClass(), 1 );
+			TIndexed entity1 = session.find( _indexed().entityClass(), 1 );
 
-			TContained contained = session.get( _contained().entityClass(), 2 );
+			TContained contained = session.find( _contained().entityClass(), 2 );
 
 			containedAssociation.clear( contained );
 			containingAssociation.remove( entity1, contained );
@@ -193,7 +193,7 @@ public abstract class AbstractAutomaticIndexingMultiValuedAssociationBaseIT<
 		backendMock.verifyExpectationsMet();
 
 		with( sessionFactory ).runInTransaction( session -> {
-			TIndexed entity1 = session.get( _indexed().entityClass(), 1 );
+			TIndexed entity1 = session.find( _indexed().entityClass(), 1 );
 
 			TContained contained = _contained().newInstance( 3 );
 			field.set( contained, VALUE_2 );
@@ -245,7 +245,7 @@ public abstract class AbstractAutomaticIndexingMultiValuedAssociationBaseIT<
 
 		// Test adding a value
 		with( sessionFactory ).runInTransaction( session -> {
-			TIndexed entity1 = session.get( _indexed().entityClass(), 1 );
+			TIndexed entity1 = session.find( _indexed().entityClass(), 1 );
 
 			TContained contained = _contained().newInstance( 2 );
 			field.set( contained, VALUE_1 );
@@ -261,7 +261,7 @@ public abstract class AbstractAutomaticIndexingMultiValuedAssociationBaseIT<
 
 		// Test adding a second value
 		with( sessionFactory ).runInTransaction( session -> {
-			TIndexed entity1 = session.get( _indexed().entityClass(), 1 );
+			TIndexed entity1 = session.find( _indexed().entityClass(), 1 );
 
 			TContained contained = _contained().newInstance( 3 );
 			field.set( contained, VALUE_2 );
@@ -277,9 +277,9 @@ public abstract class AbstractAutomaticIndexingMultiValuedAssociationBaseIT<
 
 		// Test removing a value
 		with( sessionFactory ).runInTransaction( session -> {
-			TIndexed entity1 = session.get( _indexed().entityClass(), 1 );
+			TIndexed entity1 = session.find( _indexed().entityClass(), 1 );
 
-			TContained contained = session.get( _contained().entityClass(), 2 );
+			TContained contained = session.find( _contained().entityClass(), 2 );
 
 			containedAssociation.clear( contained );
 			containingAssociation.remove( entity1, contained );
@@ -323,7 +323,7 @@ public abstract class AbstractAutomaticIndexingMultiValuedAssociationBaseIT<
 		backendMock.verifyExpectationsMet();
 
 		with( sessionFactory ).runInTransaction( session -> {
-			TIndexed entity1 = session.get( _indexed().entityClass(), 1 );
+			TIndexed entity1 = session.find( _indexed().entityClass(), 1 );
 
 			TContained contained = _contained().newInstance( 3 );
 			field.set( contained, VALUE_2 );
@@ -370,7 +370,7 @@ public abstract class AbstractAutomaticIndexingMultiValuedAssociationBaseIT<
 
 		// Test adding a value
 		with( sessionFactory ).runInTransaction( session -> {
-			TIndexed entity1 = session.get( _indexed().entityClass(), 1 );
+			TIndexed entity1 = session.find( _indexed().entityClass(), 1 );
 
 			TContained contained = _contained().newInstance( 2 );
 			field.set( contained, VALUE_1 );
@@ -391,7 +391,7 @@ public abstract class AbstractAutomaticIndexingMultiValuedAssociationBaseIT<
 
 		// Test adding a second value
 		with( sessionFactory ).runInTransaction( session -> {
-			TIndexed entity1 = session.get( _indexed().entityClass(), 1 );
+			TIndexed entity1 = session.find( _indexed().entityClass(), 1 );
 
 			TContained contained = _contained().newInstance( 3 );
 			field.set( contained, VALUE_2 );
@@ -415,9 +415,9 @@ public abstract class AbstractAutomaticIndexingMultiValuedAssociationBaseIT<
 
 		// Test removing a value
 		with( sessionFactory ).runInTransaction( session -> {
-			TIndexed entity1 = session.get( _indexed().entityClass(), 1 );
+			TIndexed entity1 = session.find( _indexed().entityClass(), 1 );
 
-			TContained contained = session.get( _contained().entityClass(), 2 );
+			TContained contained = session.find( _contained().entityClass(), 2 );
 
 			containingAssociation.remove( entity1, contained );
 			containedAssociation.clear( contained );
@@ -471,7 +471,7 @@ public abstract class AbstractAutomaticIndexingMultiValuedAssociationBaseIT<
 		backendMock.verifyExpectationsMet();
 
 		with( sessionFactory ).runInTransaction( session -> {
-			TIndexed entity1 = session.get( _indexed().entityClass(), 1 );
+			TIndexed entity1 = session.find( _indexed().entityClass(), 1 );
 
 			TContained contained = _contained().newInstance( 3 );
 			field.set( contained, VALUE_2 );
@@ -524,7 +524,7 @@ public abstract class AbstractAutomaticIndexingMultiValuedAssociationBaseIT<
 
 		// Test adding a value
 		with( sessionFactory ).runInTransaction( session -> {
-			TIndexed entity1 = session.get( _indexed().entityClass(), 1 );
+			TIndexed entity1 = session.find( _indexed().entityClass(), 1 );
 
 			TContained contained = _contained().newInstance( 2 );
 			field.set( contained, VALUE_1 );
@@ -540,7 +540,7 @@ public abstract class AbstractAutomaticIndexingMultiValuedAssociationBaseIT<
 
 		// Test adding a second value
 		with( sessionFactory ).runInTransaction( session -> {
-			TIndexed entity1 = session.get( _indexed().entityClass(), 1 );
+			TIndexed entity1 = session.find( _indexed().entityClass(), 1 );
 
 			TContained contained = _contained().newInstance( 3 );
 			field.set( contained, VALUE_2 );
@@ -556,9 +556,9 @@ public abstract class AbstractAutomaticIndexingMultiValuedAssociationBaseIT<
 
 		// Test removing a value
 		with( sessionFactory ).runInTransaction( session -> {
-			TIndexed entity1 = session.get( _indexed().entityClass(), 1 );
+			TIndexed entity1 = session.find( _indexed().entityClass(), 1 );
 
-			TContained contained = session.get( _contained().entityClass(), 2 );
+			TContained contained = session.find( _contained().entityClass(), 2 );
 
 			containingAssociation.remove( entity1, contained );
 			containedAssociation.clear( contained );
@@ -607,7 +607,7 @@ public abstract class AbstractAutomaticIndexingMultiValuedAssociationBaseIT<
 		backendMock.verifyExpectationsMet();
 
 		with( sessionFactory ).runInTransaction( session -> {
-			TIndexed entity1 = session.get( _indexed().entityClass(), 1 );
+			TIndexed entity1 = session.find( _indexed().entityClass(), 1 );
 
 			TContained contained = _contained().newInstance( 3 );
 			field.set( contained, VALUE_2 );
@@ -657,7 +657,7 @@ public abstract class AbstractAutomaticIndexingMultiValuedAssociationBaseIT<
 
 		// Test adding a value
 		with( sessionFactory ).runInTransaction( session -> {
-			TIndexed entity1 = session.get( _indexed().entityClass(), 1 );
+			TIndexed entity1 = session.find( _indexed().entityClass(), 1 );
 
 			TContained contained = _contained().newInstance( 2 );
 			field.set( contained, VALUE_1 );
@@ -680,7 +680,7 @@ public abstract class AbstractAutomaticIndexingMultiValuedAssociationBaseIT<
 
 		// Test adding a second value
 		with( sessionFactory ).runInTransaction( session -> {
-			TIndexed entity1 = session.get( _indexed().entityClass(), 1 );
+			TIndexed entity1 = session.find( _indexed().entityClass(), 1 );
 
 			TContained contained = _contained().newInstance( 3 );
 			field.set( contained, VALUE_2 );
@@ -706,9 +706,9 @@ public abstract class AbstractAutomaticIndexingMultiValuedAssociationBaseIT<
 
 		// Test removing a value
 		with( sessionFactory ).runInTransaction( session -> {
-			TIndexed entity1 = session.get( _indexed().entityClass(), 1 );
+			TIndexed entity1 = session.find( _indexed().entityClass(), 1 );
 
-			TContained contained = session.get( _contained().entityClass(), 2 );
+			TContained contained = session.find( _contained().entityClass(), 2 );
 
 			containedAssociation.clear( contained );
 			containingAssociation.remove( entity1, contained );
@@ -759,7 +759,7 @@ public abstract class AbstractAutomaticIndexingMultiValuedAssociationBaseIT<
 		backendMock.verifyExpectationsMet();
 
 		with( sessionFactory ).runInTransaction( session -> {
-			TIndexed entity1 = session.get( _indexed().entityClass(), 1 );
+			TIndexed entity1 = session.find( _indexed().entityClass(), 1 );
 
 			TContained contained = _contained().newInstance( 3 );
 			field.set( contained, VALUE_2 );
@@ -810,7 +810,7 @@ public abstract class AbstractAutomaticIndexingMultiValuedAssociationBaseIT<
 
 		// Test adding a value
 		with( sessionFactory ).runInTransaction( session -> {
-			TIndexed entity1 = session.get( _indexed().entityClass(), 1 );
+			TIndexed entity1 = session.find( _indexed().entityClass(), 1 );
 
 			TContained contained = _contained().newInstance( 2 );
 			field.set( contained, VALUE_1 );
@@ -826,7 +826,7 @@ public abstract class AbstractAutomaticIndexingMultiValuedAssociationBaseIT<
 
 		// Test adding a second value
 		with( sessionFactory ).runInTransaction( session -> {
-			TIndexed entity1 = session.get( _indexed().entityClass(), 1 );
+			TIndexed entity1 = session.find( _indexed().entityClass(), 1 );
 
 			TContained contained = _contained().newInstance( 3 );
 			field.set( contained, VALUE_2 );
@@ -842,9 +842,9 @@ public abstract class AbstractAutomaticIndexingMultiValuedAssociationBaseIT<
 
 		// Test removing a value
 		with( sessionFactory ).runInTransaction( session -> {
-			TIndexed entity1 = session.get( _indexed().entityClass(), 1 );
+			TIndexed entity1 = session.find( _indexed().entityClass(), 1 );
 
-			TContained contained = session.get( _contained().entityClass(), 2 );
+			TContained contained = session.find( _contained().entityClass(), 2 );
 
 			containedAssociation.clear( contained );
 			containingAssociation.remove( entity1, contained );
@@ -882,7 +882,7 @@ public abstract class AbstractAutomaticIndexingMultiValuedAssociationBaseIT<
 		backendMock.verifyExpectationsMet();
 
 		with( sessionFactory ).runInTransaction( session -> {
-			TIndexed entity1 = session.get( _indexed().entityClass(), 1 );
+			TIndexed entity1 = session.find( _indexed().entityClass(), 1 );
 
 			TContained contained = _contained().newInstance( 3 );
 			field.set( contained, VALUE_2 );
@@ -934,7 +934,7 @@ public abstract class AbstractAutomaticIndexingMultiValuedAssociationBaseIT<
 
 		// Test adding a value
 		with( sessionFactory ).runInTransaction( session -> {
-			TContaining containingEntity1 = session.get( _containing().entityClass(), 2 );
+			TContaining containingEntity1 = session.find( _containing().entityClass(), 2 );
 
 			TContained contained = _contained().newInstance( 4 );
 			field.set( contained, VALUE_1 );
@@ -957,7 +957,7 @@ public abstract class AbstractAutomaticIndexingMultiValuedAssociationBaseIT<
 
 		// Test adding another value
 		with( sessionFactory ).runInTransaction( session -> {
-			TContaining containingEntity1 = session.get( _containing().entityClass(), 2 );
+			TContaining containingEntity1 = session.find( _containing().entityClass(), 2 );
 
 			TContained contained = _contained().newInstance( 5 );
 			field.set( contained, VALUE_2 );
@@ -983,7 +983,7 @@ public abstract class AbstractAutomaticIndexingMultiValuedAssociationBaseIT<
 
 		// Test adding a value that is too deeply nested to matter (it's out of the IndexedEmbedded scope)
 		with( sessionFactory ).runInTransaction( session -> {
-			TContaining deeplyNestedContainingEntity1 = session.get( _containing().entityClass(), 3 );
+			TContaining deeplyNestedContainingEntity1 = session.find( _containing().entityClass(), 3 );
 
 			TContained contained = _contained().newInstance( 6 );
 			field.set( contained, "outOfScopeValue" );
@@ -999,9 +999,9 @@ public abstract class AbstractAutomaticIndexingMultiValuedAssociationBaseIT<
 
 		// Test removing a value
 		with( sessionFactory ).runInTransaction( session -> {
-			TContaining containingEntity1 = session.get( _containing().entityClass(), 2 );
+			TContaining containingEntity1 = session.find( _containing().entityClass(), 2 );
 
-			TContained contained = session.get( _contained().entityClass(), 4 );
+			TContained contained = session.find( _contained().entityClass(), 4 );
 
 			containedAssociation.clear( contained );
 			containingAssociation.remove( containingEntity1, contained );
@@ -1062,7 +1062,7 @@ public abstract class AbstractAutomaticIndexingMultiValuedAssociationBaseIT<
 		backendMock.verifyExpectationsMet();
 
 		with( sessionFactory ).runInTransaction( session -> {
-			TContaining containingEntity1 = session.get( _containing().entityClass(), 2 );
+			TContaining containingEntity1 = session.find( _containing().entityClass(), 2 );
 
 			TContained contained = _contained().newInstance( 4 );
 			field.set( contained, VALUE_2 );
@@ -1123,7 +1123,7 @@ public abstract class AbstractAutomaticIndexingMultiValuedAssociationBaseIT<
 
 		// Test adding a value
 		with( sessionFactory ).runInTransaction( session -> {
-			TContaining containingEntity1 = session.get( _containing().entityClass(), 2 );
+			TContaining containingEntity1 = session.find( _containing().entityClass(), 2 );
 
 			TContained contained = _contained().newInstance( 4 );
 			field.set( contained, VALUE_1 );
@@ -1139,7 +1139,7 @@ public abstract class AbstractAutomaticIndexingMultiValuedAssociationBaseIT<
 
 		// Test adding another value
 		with( sessionFactory ).runInTransaction( session -> {
-			TContaining containingEntity1 = session.get( _containing().entityClass(), 2 );
+			TContaining containingEntity1 = session.find( _containing().entityClass(), 2 );
 
 			TContained contained = _contained().newInstance( 5 );
 			field.set( contained, VALUE_2 );
@@ -1155,9 +1155,9 @@ public abstract class AbstractAutomaticIndexingMultiValuedAssociationBaseIT<
 
 		// Test removing a value
 		with( sessionFactory ).runInTransaction( session -> {
-			TContaining containingEntity1 = session.get( _containing().entityClass(), 2 );
+			TContaining containingEntity1 = session.find( _containing().entityClass(), 2 );
 
-			TContained contained = session.get( _contained().entityClass(), 4 );
+			TContained contained = session.find( _contained().entityClass(), 4 );
 
 			containedAssociation.clear( contained );
 			containingAssociation.remove( containingEntity1, contained );
@@ -1207,7 +1207,7 @@ public abstract class AbstractAutomaticIndexingMultiValuedAssociationBaseIT<
 		backendMock.verifyExpectationsMet();
 
 		with( sessionFactory ).runInTransaction( session -> {
-			TContaining containingEntity1 = session.get( _containing().entityClass(), 2 );
+			TContaining containingEntity1 = session.find( _containing().entityClass(), 2 );
 
 			TContained contained = _contained().newInstance( 4 );
 			field.set( contained, VALUE_2 );
@@ -1264,7 +1264,7 @@ public abstract class AbstractAutomaticIndexingMultiValuedAssociationBaseIT<
 
 		// Test adding a value
 		with( sessionFactory ).runInTransaction( session -> {
-			TContaining containingEntity1 = session.get( _containing().entityClass(), 2 );
+			TContaining containingEntity1 = session.find( _containing().entityClass(), 2 );
 
 			TContained contained = _contained().newInstance( 4 );
 			field.set( contained, VALUE_1 );
@@ -1287,7 +1287,7 @@ public abstract class AbstractAutomaticIndexingMultiValuedAssociationBaseIT<
 
 		// Test adding another value
 		with( sessionFactory ).runInTransaction( session -> {
-			TContaining containingEntity1 = session.get( _containing().entityClass(), 2 );
+			TContaining containingEntity1 = session.find( _containing().entityClass(), 2 );
 
 			TContained contained = _contained().newInstance( 5 );
 			field.set( contained, VALUE_2 );
@@ -1313,9 +1313,9 @@ public abstract class AbstractAutomaticIndexingMultiValuedAssociationBaseIT<
 
 		// Test removing a value
 		with( sessionFactory ).runInTransaction( session -> {
-			TContaining containingEntity1 = session.get( _containing().entityClass(), 2 );
+			TContaining containingEntity1 = session.find( _containing().entityClass(), 2 );
 
-			TContained contained = session.get( _contained().entityClass(), 4 );
+			TContained contained = session.find( _contained().entityClass(), 4 );
 
 			containingAssociation.remove( containingEntity1, contained );
 			containedAssociation.clear( contained );
@@ -1380,7 +1380,7 @@ public abstract class AbstractAutomaticIndexingMultiValuedAssociationBaseIT<
 		backendMock.verifyExpectationsMet();
 
 		with( sessionFactory ).runInTransaction( session -> {
-			TContaining containingEntity1 = session.get( _containing().entityClass(), 2 );
+			TContaining containingEntity1 = session.find( _containing().entityClass(), 2 );
 
 			TContained contained = _contained().newInstance( 4 );
 			field.set( contained, VALUE_2 );
@@ -1443,7 +1443,7 @@ public abstract class AbstractAutomaticIndexingMultiValuedAssociationBaseIT<
 
 		// Test adding a value
 		with( sessionFactory ).runInTransaction( session -> {
-			TContaining containingEntity1 = session.get( _containing().entityClass(), 2 );
+			TContaining containingEntity1 = session.find( _containing().entityClass(), 2 );
 
 			TContained contained = _contained().newInstance( 4 );
 			field.set( contained, VALUE_1 );
@@ -1459,7 +1459,7 @@ public abstract class AbstractAutomaticIndexingMultiValuedAssociationBaseIT<
 
 		// Test adding another value
 		with( sessionFactory ).runInTransaction( session -> {
-			TContaining containingEntity1 = session.get( _containing().entityClass(), 2 );
+			TContaining containingEntity1 = session.find( _containing().entityClass(), 2 );
 
 			TContained contained = _contained().newInstance( 5 );
 			field.set( contained, VALUE_2 );
@@ -1475,9 +1475,9 @@ public abstract class AbstractAutomaticIndexingMultiValuedAssociationBaseIT<
 
 		// Test removing a value
 		with( sessionFactory ).runInTransaction( session -> {
-			TContaining containingEntity1 = session.get( _containing().entityClass(), 2 );
+			TContaining containingEntity1 = session.find( _containing().entityClass(), 2 );
 
-			TContained contained = session.get( _contained().entityClass(), 4 );
+			TContained contained = session.find( _contained().entityClass(), 4 );
 
 			containingAssociation.remove( containingEntity1, contained );
 			containedAssociation.clear( contained );
@@ -1533,7 +1533,7 @@ public abstract class AbstractAutomaticIndexingMultiValuedAssociationBaseIT<
 		backendMock.verifyExpectationsMet();
 
 		with( sessionFactory ).runInTransaction( session -> {
-			TContaining containingEntity1 = session.get( _containing().entityClass(), 2 );
+			TContaining containingEntity1 = session.find( _containing().entityClass(), 2 );
 
 			TContained contained = _contained().newInstance( 4 );
 			field.set( contained, VALUE_2 );
@@ -1597,7 +1597,7 @@ public abstract class AbstractAutomaticIndexingMultiValuedAssociationBaseIT<
 
 		// Test adding a value
 		with( sessionFactory ).runInTransaction( session -> {
-			TContaining containingEntity1 = session.get( _containing().entityClass(), 2 );
+			TContaining containingEntity1 = session.find( _containing().entityClass(), 2 );
 
 			TContained contained = _contained().newInstance( 4 );
 			field.set( contained, VALUE_1 );
@@ -1622,7 +1622,7 @@ public abstract class AbstractAutomaticIndexingMultiValuedAssociationBaseIT<
 
 		// Test adding another value
 		with( sessionFactory ).runInTransaction( session -> {
-			TContaining containingEntity1 = session.get( _containing().entityClass(), 2 );
+			TContaining containingEntity1 = session.find( _containing().entityClass(), 2 );
 
 			TContained contained = _contained().newInstance( 5 );
 			field.set( contained, VALUE_2 );
@@ -1650,7 +1650,7 @@ public abstract class AbstractAutomaticIndexingMultiValuedAssociationBaseIT<
 
 		// Test adding a value that is too deeply nested to matter (it's out of the IndexedEmbedded scope)
 		with( sessionFactory ).runInTransaction( session -> {
-			TContaining deeplyNestedContainingEntity1 = session.get( _containing().entityClass(), 3 );
+			TContaining deeplyNestedContainingEntity1 = session.find( _containing().entityClass(), 3 );
 
 			TContained contained = _contained().newInstance( 6 );
 			field.set( contained, "outOfScopeValue" );
@@ -1666,9 +1666,9 @@ public abstract class AbstractAutomaticIndexingMultiValuedAssociationBaseIT<
 
 		// Test removing a value
 		with( sessionFactory ).runInTransaction( session -> {
-			TContaining containingEntity1 = session.get( _containing().entityClass(), 2 );
+			TContaining containingEntity1 = session.find( _containing().entityClass(), 2 );
 
-			TContained contained = session.get( _contained().entityClass(), 4 );
+			TContained contained = session.find( _contained().entityClass(), 4 );
 
 			containedAssociation.clear( contained );
 			containingAssociation.remove( containingEntity1, contained );
@@ -1727,7 +1727,7 @@ public abstract class AbstractAutomaticIndexingMultiValuedAssociationBaseIT<
 		backendMock.verifyExpectationsMet();
 
 		with( sessionFactory ).runInTransaction( session -> {
-			TContaining containingEntity1 = session.get( _containing().entityClass(), 2 );
+			TContaining containingEntity1 = session.find( _containing().entityClass(), 2 );
 
 			TContained contained = _contained().newInstance( 4 );
 			field.set( contained, VALUE_2 );
@@ -1787,7 +1787,7 @@ public abstract class AbstractAutomaticIndexingMultiValuedAssociationBaseIT<
 
 		// Test adding a value
 		with( sessionFactory ).runInTransaction( session -> {
-			TContaining containingEntity1 = session.get( _containing().entityClass(), 2 );
+			TContaining containingEntity1 = session.find( _containing().entityClass(), 2 );
 
 			TContained contained = _contained().newInstance( 4 );
 			field.set( contained, VALUE_1 );
@@ -1803,7 +1803,7 @@ public abstract class AbstractAutomaticIndexingMultiValuedAssociationBaseIT<
 
 		// Test adding another value
 		with( sessionFactory ).runInTransaction( session -> {
-			TContaining containingEntity1 = session.get( _containing().entityClass(), 2 );
+			TContaining containingEntity1 = session.find( _containing().entityClass(), 2 );
 
 			TContained contained = _contained().newInstance( 5 );
 			field.set( contained, VALUE_2 );
@@ -1819,9 +1819,9 @@ public abstract class AbstractAutomaticIndexingMultiValuedAssociationBaseIT<
 
 		// Test removing a value
 		with( sessionFactory ).runInTransaction( session -> {
-			TContaining containingEntity1 = session.get( _containing().entityClass(), 2 );
+			TContaining containingEntity1 = session.find( _containing().entityClass(), 2 );
 
-			TContained contained = session.get( _contained().entityClass(), 4 );
+			TContained contained = session.find( _contained().entityClass(), 4 );
 
 			containedAssociation.clear( contained );
 			containingAssociation.remove( containingEntity1, contained );
@@ -1865,7 +1865,7 @@ public abstract class AbstractAutomaticIndexingMultiValuedAssociationBaseIT<
 		backendMock.verifyExpectationsMet();
 
 		with( sessionFactory ).runInTransaction( session -> {
-			TContaining containingEntity1 = session.get( _containing().entityClass(), 2 );
+			TContaining containingEntity1 = session.find( _containing().entityClass(), 2 );
 
 			TContained contained = _contained().newInstance( 4 );
 			field.set( contained, VALUE_2 );
