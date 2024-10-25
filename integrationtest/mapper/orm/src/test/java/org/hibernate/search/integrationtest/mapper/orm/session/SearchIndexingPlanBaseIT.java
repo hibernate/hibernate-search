@@ -140,7 +140,7 @@ class SearchIndexingPlanBaseIT {
 		} );
 
 		with( sessionFactory ).runInTransaction( session -> {
-			IndexedEntity1 entity1 = session.get( IndexedEntity1.class, 1 );
+			IndexedEntity1 entity1 = session.find( IndexedEntity1.class, 1 );
 			ContainedEntity contained1 = entity1.contained.get( 0 );
 			contained1.text = "new text 1";
 

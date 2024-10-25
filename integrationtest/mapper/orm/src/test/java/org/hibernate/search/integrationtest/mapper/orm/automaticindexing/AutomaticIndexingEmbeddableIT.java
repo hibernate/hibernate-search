@@ -154,7 +154,7 @@ class AutomaticIndexingEmbeddableIT {
 			containedEntity.setId( 4 );
 			containedEntity.setIncludedInEmbeddedSingle( "initialValue" );
 
-			ContainingEntity containingEntity1 = session.get( ContainingEntity.class, 2 );
+			ContainingEntity containingEntity1 = session.find( ContainingEntity.class, 2 );
 			containingEntity1.setContainedEmbeddedSingle( new SingleContainingEmbeddable( containedEntity ) );
 			containedEntity.getContainingAsEmbeddedSingle().add( containingEntity1 );
 
@@ -181,7 +181,7 @@ class AutomaticIndexingEmbeddableIT {
 			containedEntity.setId( 5 );
 			containedEntity.setIncludedInEmbeddedSingle( "updatedValue" );
 
-			ContainingEntity containingEntity1 = session.get( ContainingEntity.class, 2 );
+			ContainingEntity containingEntity1 = session.find( ContainingEntity.class, 2 );
 			containingEntity1.getContainedEmbeddedSingle().getContainedSingle().getContainingAsEmbeddedSingle().clear();
 			containingEntity1.setContainedEmbeddedSingle( new SingleContainingEmbeddable( containedEntity ) );
 			containedEntity.getContainingAsEmbeddedSingle().add( containingEntity1 );
@@ -205,7 +205,7 @@ class AutomaticIndexingEmbeddableIT {
 
 		// Test removing a value
 		with( sessionFactory ).runInTransaction( session -> {
-			ContainingEntity containingEntity1 = session.get( ContainingEntity.class, 2 );
+			ContainingEntity containingEntity1 = session.find( ContainingEntity.class, 2 );
 			containingEntity1.getContainedEmbeddedSingle().getContainedSingle().getContainingAsEmbeddedSingle().clear();
 			containingEntity1.setContainedEmbeddedSingle( null );
 
@@ -263,7 +263,7 @@ class AutomaticIndexingEmbeddableIT {
 			containedEntity.setId( 5 );
 			containedEntity.setIncludedInEmbeddedSingle( "updatedValue" );
 
-			ContainingEntity containingEntity1 = session.get( ContainingEntity.class, 2 );
+			ContainingEntity containingEntity1 = session.find( ContainingEntity.class, 2 );
 			containingEntity1.getContainedEmbeddedSingle().getContainedSingle().getContainingAsEmbeddedSingle().clear();
 			containingEntity1.getContainedEmbeddedSingle().setContainedSingle( containedEntity );
 			containedEntity.getContainingAsEmbeddedSingle().add( containingEntity1 );
@@ -287,7 +287,7 @@ class AutomaticIndexingEmbeddableIT {
 
 		// Test removing a value
 		with( sessionFactory ).runInTransaction( session -> {
-			ContainingEntity containingEntity1 = session.get( ContainingEntity.class, 2 );
+			ContainingEntity containingEntity1 = session.find( ContainingEntity.class, 2 );
 			containingEntity1.getContainedEmbeddedSingle().getContainedSingle().getContainingAsEmbeddedSingle().clear();
 			containingEntity1.getContainedEmbeddedSingle().setContainedSingle( null );
 
@@ -341,7 +341,7 @@ class AutomaticIndexingEmbeddableIT {
 
 		// Test updating the value
 		with( sessionFactory ).runInTransaction( session -> {
-			ContainedEntity containedEntity = session.get( ContainedEntity.class, 4 );
+			ContainedEntity containedEntity = session.find( ContainedEntity.class, 4 );
 			containedEntity.setIncludedInEmbeddedSingle( "updatedValue" );
 
 			backendMock.expectWorks( IndexedEntity.INDEX )
@@ -361,7 +361,7 @@ class AutomaticIndexingEmbeddableIT {
 
 		// Test updating a value that is not included in the @IndexedEmbedded
 		with( sessionFactory ).runInTransaction( session -> {
-			ContainedEntity containedEntity = session.get( ContainedEntity.class, 4 );
+			ContainedEntity containedEntity = session.find( ContainedEntity.class, 4 );
 			containedEntity.setExcludedFromAll( "updatedExcludedValue" );
 
 			// Do not expect any work
@@ -400,7 +400,7 @@ class AutomaticIndexingEmbeddableIT {
 			containedEntity.setId( 4 );
 			containedEntity.setIncludedInEmbeddedList( "initialValue" );
 
-			ContainingEntity containingEntity1 = session.get( ContainingEntity.class, 2 );
+			ContainingEntity containingEntity1 = session.find( ContainingEntity.class, 2 );
 			containingEntity1.setContainedEmbeddedList( new ListContainingEmbeddable( containedEntity ) );
 			containedEntity.getContainingAsEmbeddedList().add( containingEntity1 );
 
@@ -427,7 +427,7 @@ class AutomaticIndexingEmbeddableIT {
 			containedEntity.setId( 5 );
 			containedEntity.setIncludedInEmbeddedList( "updatedValue" );
 
-			ContainingEntity containingEntity1 = session.get( ContainingEntity.class, 2 );
+			ContainingEntity containingEntity1 = session.find( ContainingEntity.class, 2 );
 			containingEntity1.getContainedEmbeddedList().getContainedList().get( 0 ).getContainingAsEmbeddedList().clear();
 			containingEntity1.setContainedEmbeddedList( new ListContainingEmbeddable( containedEntity ) );
 			containedEntity.getContainingAsEmbeddedList().add( containingEntity1 );
@@ -451,7 +451,7 @@ class AutomaticIndexingEmbeddableIT {
 
 		// Test removing a value
 		with( sessionFactory ).runInTransaction( session -> {
-			ContainingEntity containingEntity1 = session.get( ContainingEntity.class, 2 );
+			ContainingEntity containingEntity1 = session.find( ContainingEntity.class, 2 );
 			containingEntity1.getContainedEmbeddedList().getContainedList().get( 0 ).getContainingAsEmbeddedList().clear();
 			containingEntity1.setContainedEmbeddedList( null );
 
@@ -498,7 +498,7 @@ class AutomaticIndexingEmbeddableIT {
 			containedEntity.setId( 5 );
 			containedEntity.setIncludedInEmbeddedList( "firstValue" );
 
-			ContainingEntity containingEntity1 = session.get( ContainingEntity.class, 2 );
+			ContainingEntity containingEntity1 = session.find( ContainingEntity.class, 2 );
 			containingEntity1.getContainedEmbeddedList().getContainedList().add( containedEntity );
 			containedEntity.getContainingAsEmbeddedList().add( containingEntity1 );
 
@@ -525,7 +525,7 @@ class AutomaticIndexingEmbeddableIT {
 			containedEntity.setId( 6 );
 			containedEntity.setIncludedInEmbeddedList( "secondValue" );
 
-			ContainingEntity containingEntity1 = session.get( ContainingEntity.class, 2 );
+			ContainingEntity containingEntity1 = session.find( ContainingEntity.class, 2 );
 			containingEntity1.getContainedEmbeddedList().getContainedList().add( containedEntity );
 			containedEntity.getContainingAsEmbeddedList().add( containingEntity1 );
 
@@ -551,7 +551,7 @@ class AutomaticIndexingEmbeddableIT {
 
 		// Test removing a value
 		with( sessionFactory ).runInTransaction( session -> {
-			ContainingEntity containingEntity1 = session.get( ContainingEntity.class, 2 );
+			ContainingEntity containingEntity1 = session.find( ContainingEntity.class, 2 );
 			ContainedEntity containedEntity = containingEntity1.getContainedEmbeddedList().getContainedList().get( 0 );
 			containedEntity.getContainingAsEmbeddedList().clear();
 			containingEntity1.getContainedEmbeddedList().getContainedList().remove( containedEntity );
@@ -610,7 +610,7 @@ class AutomaticIndexingEmbeddableIT {
 
 		// Test updating the value
 		with( sessionFactory ).runInTransaction( session -> {
-			ContainedEntity containedEntity = session.get( ContainedEntity.class, 4 );
+			ContainedEntity containedEntity = session.find( ContainedEntity.class, 4 );
 			containedEntity.setIncludedInEmbeddedList( "updatedValue" );
 
 			backendMock.expectWorks( IndexedEntity.INDEX )
@@ -630,7 +630,7 @@ class AutomaticIndexingEmbeddableIT {
 
 		// Test updating a value that is not included in the @IndexedEmbedded
 		with( sessionFactory ).runInTransaction( session -> {
-			ContainedEntity containedEntity = session.get( ContainedEntity.class, 4 );
+			ContainedEntity containedEntity = session.find( ContainedEntity.class, 4 );
 			containedEntity.setExcludedFromAll( "updatedExcludedValue" );
 
 			// Do not expect any work
@@ -669,7 +669,7 @@ class AutomaticIndexingEmbeddableIT {
 			containedEntity.setId( 4 );
 			containedEntity.setIncludedInElementCollection( "firstValue" );
 
-			ContainingEntity containingEntity1 = session.get( ContainingEntity.class, 2 );
+			ContainingEntity containingEntity1 = session.find( ContainingEntity.class, 2 );
 			containingEntity1.getContainedElementCollection().add( new SingleContainingEmbeddable( containedEntity ) );
 			containedEntity.getContainingAsElementCollection().add( containingEntity1 );
 
@@ -697,7 +697,7 @@ class AutomaticIndexingEmbeddableIT {
 			containedEntity.setId( 5 );
 			containedEntity.setIncludedInElementCollection( "secondValue" );
 
-			ContainingEntity containingEntity1 = session.get( ContainingEntity.class, 2 );
+			ContainingEntity containingEntity1 = session.find( ContainingEntity.class, 2 );
 			containingEntity1.getContainedElementCollection().add( new SingleContainingEmbeddable( containedEntity ) );
 			containedEntity.getContainingAsElementCollection().add( containingEntity1 );
 
@@ -726,7 +726,7 @@ class AutomaticIndexingEmbeddableIT {
 
 		// Test removing a value
 		with( sessionFactory ).runInTransaction( session -> {
-			ContainingEntity containingEntity1 = session.get( ContainingEntity.class, 2 );
+			ContainingEntity containingEntity1 = session.find( ContainingEntity.class, 2 );
 			SingleContainingEmbeddable embeddable = containingEntity1.getContainedElementCollection().get( 0 );
 			embeddable.getContainedSingle().getContainingAsElementCollection().clear();
 			containingEntity1.getContainedElementCollection().remove( embeddable );
@@ -787,7 +787,7 @@ class AutomaticIndexingEmbeddableIT {
 			containedEntity.setId( 5 );
 			containedEntity.setIncludedInElementCollection( "initialValue" );
 
-			ContainingEntity containingEntity1 = session.get( ContainingEntity.class, 2 );
+			ContainingEntity containingEntity1 = session.find( ContainingEntity.class, 2 );
 			SingleContainingEmbeddable embedded;
 			if ( containingEntity1.getContainedElementCollection().isEmpty() ) { // Hibernate ORM 5
 				embedded = new SingleContainingEmbeddable();
@@ -827,7 +827,7 @@ class AutomaticIndexingEmbeddableIT {
 			containedEntity.setId( 6 );
 			containedEntity.setIncludedInElementCollection( "updatedValue" );
 
-			ContainingEntity containingEntity1 = session.get( ContainingEntity.class, 2 );
+			ContainingEntity containingEntity1 = session.find( ContainingEntity.class, 2 );
 			SingleContainingEmbeddable embeddable = containingEntity1.getContainedElementCollection().get( 0 );
 			embeddable.getContainedSingle().getContainingAsElementCollection().clear();
 			embeddable.setContainedSingle( containedEntity );
@@ -853,7 +853,7 @@ class AutomaticIndexingEmbeddableIT {
 
 		// Test removing a value
 		with( sessionFactory ).runInTransaction( session -> {
-			ContainingEntity containingEntity1 = session.get( ContainingEntity.class, 2 );
+			ContainingEntity containingEntity1 = session.find( ContainingEntity.class, 2 );
 			SingleContainingEmbeddable embeddable = containingEntity1.getContainedElementCollection().get( 0 );
 			embeddable.getContainedSingle().getContainingAsElementCollection().clear();
 			embeddable.setContainedSingle( null );
@@ -910,7 +910,7 @@ class AutomaticIndexingEmbeddableIT {
 
 		// Test updating the value
 		with( sessionFactory ).runInTransaction( session -> {
-			ContainedEntity containedEntity = session.get( ContainedEntity.class, 4 );
+			ContainedEntity containedEntity = session.find( ContainedEntity.class, 4 );
 			containedEntity.setIncludedInElementCollection( "updatedValue" );
 
 			backendMock.expectWorks( IndexedEntity.INDEX )
@@ -931,7 +931,7 @@ class AutomaticIndexingEmbeddableIT {
 
 		// Test updating a value that is not included in the @IndexedEmbedded
 		with( sessionFactory ).runInTransaction( session -> {
-			ContainedEntity containedEntity = session.get( ContainedEntity.class, 4 );
+			ContainedEntity containedEntity = session.find( ContainedEntity.class, 4 );
 			containedEntity.setExcludedFromAll( "updatedExcludedValue" );
 
 			// Do not expect any work
@@ -980,7 +980,7 @@ class AutomaticIndexingEmbeddableIT {
 			containedEntity.setId( 5 );
 			containedEntity.setIncludedInContainedSingleWithInverseSideEmbedded( "updatedValue" );
 
-			ContainingEntity containingEntity1 = session.get( ContainingEntity.class, 2 );
+			ContainingEntity containingEntity1 = session.find( ContainingEntity.class, 2 );
 			containingEntity1.getContainedSingleWithInverseSideEmbedded()
 					.getContainingAsSingleWithInverseSideEmbedded().setContainingAsSingle( null );
 			// Clear the one-to-one association and flush it first, to avoid problems with unique key constraints. See details in HHH-15767
@@ -1019,7 +1019,7 @@ class AutomaticIndexingEmbeddableIT {
 
 		// Test removing a value
 		with( sessionFactory ).runInTransaction( session -> {
-			ContainingEntity containingEntity1 = session.get( ContainingEntity.class, 2 );
+			ContainingEntity containingEntity1 = session.find( ContainingEntity.class, 2 );
 			containingEntity1.getContainedSingleWithInverseSideEmbedded()
 					.getContainingAsSingleWithInverseSideEmbedded().setContainingAsSingle( null );
 			containingEntity1.setContainedSingleWithInverseSideEmbedded( null );
@@ -1073,7 +1073,7 @@ class AutomaticIndexingEmbeddableIT {
 
 		// Test updating the value
 		with( sessionFactory ).runInTransaction( session -> {
-			ContainedEntity containedEntity = session.get( ContainedEntity.class, 4 );
+			ContainedEntity containedEntity = session.find( ContainedEntity.class, 4 );
 			containedEntity.setIncludedInContainedSingleWithInverseSideEmbedded( "updatedValue" );
 
 			backendMock.expectWorks( IndexedEntity.INDEX )
@@ -1092,7 +1092,7 @@ class AutomaticIndexingEmbeddableIT {
 
 		// Test updating a value that is not included in the @IndexedEmbedded
 		with( sessionFactory ).runInTransaction( session -> {
-			ContainedEntity containedEntity = session.get( ContainedEntity.class, 4 );
+			ContainedEntity containedEntity = session.find( ContainedEntity.class, 4 );
 			containedEntity.setExcludedFromAll( "updatedExcludedValue" );
 
 			// Do not expect any work
@@ -1131,7 +1131,7 @@ class AutomaticIndexingEmbeddableIT {
 			containedEntity.setId( 4 );
 			containedEntity.setIncludedInBidirectionalEmbedded( "initialValue" );
 
-			ContainingEntity containingEntity1 = session.get( ContainingEntity.class, 2 );
+			ContainingEntity containingEntity1 = session.find( ContainingEntity.class, 2 );
 			containingEntity1.setContainedBidirectionalEmbedded( new BidirectionalEmbeddable( containedEntity ) );
 			containedEntity.setContainingAsBidirectionalEmbedded( new InverseSideBidirectionalEmbeddable( containingEntity1 ) );
 
@@ -1158,7 +1158,7 @@ class AutomaticIndexingEmbeddableIT {
 			containedEntity.setId( 5 );
 			containedEntity.setIncludedInBidirectionalEmbedded( "updatedValue" );
 
-			ContainingEntity containingEntity1 = session.get( ContainingEntity.class, 2 );
+			ContainingEntity containingEntity1 = session.find( ContainingEntity.class, 2 );
 			containingEntity1.getContainedBidirectionalEmbedded().getContainedSingle()
 					.getContainingAsBidirectionalEmbedded().setContainingAsSingle( null );
 			containingEntity1.setContainedBidirectionalEmbedded( new BidirectionalEmbeddable( containedEntity ) );
@@ -1183,7 +1183,7 @@ class AutomaticIndexingEmbeddableIT {
 
 		// Test removing a value
 		with( sessionFactory ).runInTransaction( session -> {
-			ContainingEntity containingEntity1 = session.get( ContainingEntity.class, 2 );
+			ContainingEntity containingEntity1 = session.find( ContainingEntity.class, 2 );
 			containingEntity1.getContainedBidirectionalEmbedded().getContainedSingle()
 					.getContainingAsBidirectionalEmbedded().setContainingAsSingle( null );
 			containingEntity1.setContainedBidirectionalEmbedded( null );
@@ -1242,7 +1242,7 @@ class AutomaticIndexingEmbeddableIT {
 			containedEntity.setId( 5 );
 			containedEntity.setIncludedInBidirectionalEmbedded( "updatedValue" );
 
-			ContainingEntity containingEntity1 = session.get( ContainingEntity.class, 2 );
+			ContainingEntity containingEntity1 = session.find( ContainingEntity.class, 2 );
 			containingEntity1.getContainedBidirectionalEmbedded().getContainedSingle()
 					.getContainingAsBidirectionalEmbedded().setContainingAsSingle( null );
 			containingEntity1.getContainedBidirectionalEmbedded().setContainedSingle( containedEntity );
@@ -1267,7 +1267,7 @@ class AutomaticIndexingEmbeddableIT {
 
 		// Test removing a value
 		with( sessionFactory ).runInTransaction( session -> {
-			ContainingEntity containingEntity1 = session.get( ContainingEntity.class, 2 );
+			ContainingEntity containingEntity1 = session.find( ContainingEntity.class, 2 );
 			containingEntity1.getContainedBidirectionalEmbedded().getContainedSingle()
 					.getContainingAsBidirectionalEmbedded().setContainingAsSingle( null );
 			containingEntity1.getContainedBidirectionalEmbedded().setContainedSingle( null );
@@ -1323,7 +1323,7 @@ class AutomaticIndexingEmbeddableIT {
 
 		// Test updating the value
 		with( sessionFactory ).runInTransaction( session -> {
-			ContainedEntity containedEntity = session.get( ContainedEntity.class, 4 );
+			ContainedEntity containedEntity = session.find( ContainedEntity.class, 4 );
 			containedEntity.setIncludedInBidirectionalEmbedded( "updatedValue" );
 
 			backendMock.expectWorks( IndexedEntity.INDEX )
@@ -1343,7 +1343,7 @@ class AutomaticIndexingEmbeddableIT {
 
 		// Test updating a value that is not included in the @IndexedEmbedded
 		with( sessionFactory ).runInTransaction( session -> {
-			ContainedEntity containedEntity = session.get( ContainedEntity.class, 4 );
+			ContainedEntity containedEntity = session.find( ContainedEntity.class, 4 );
 			containedEntity.setExcludedFromAll( "updatedExcludedValue" );
 
 			// Do not expect any work

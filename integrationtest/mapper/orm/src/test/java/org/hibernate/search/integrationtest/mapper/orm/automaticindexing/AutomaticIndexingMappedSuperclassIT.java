@@ -83,7 +83,7 @@ class AutomaticIndexingMappedSuperclassIT {
 
 		// Test updating the value
 		with( sessionFactory ).runInTransaction( session -> {
-			ContainedEntity containedEntity = session.get( ContainedEntity.class, 3 );
+			ContainedEntity containedEntity = session.find( ContainedEntity.class, 3 );
 			containedEntity.setIncludedInSingle( "updatedValue" );
 
 			backendMock.expectWorks( IndexedEntity.INDEX )

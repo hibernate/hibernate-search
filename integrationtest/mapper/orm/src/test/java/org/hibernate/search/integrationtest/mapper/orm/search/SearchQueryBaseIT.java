@@ -544,9 +544,9 @@ class SearchQueryBaseIT {
 			);
 
 			assertThat( query.fetchAllHits() ).containsExactlyInAnyOrder(
-					new Book_Author_Score( new Book_Author( session.get( Book.class, 1 ), AUTHOR_4_3_2_1 ), 4.0F ),
-					new Book_Author_Score( new Book_Author( session.get( Book.class, 2 ), AUTHOR_CIDER_HOUSE ), 5.0F ),
-					new Book_Author_Score( new Book_Author( session.get( Book.class, 3 ), AUTHOR_AVENUE_OF_MYSTERIES ), 6.0F )
+					new Book_Author_Score( new Book_Author( session.find( Book.class, 1 ), AUTHOR_4_3_2_1 ), 4.0F ),
+					new Book_Author_Score( new Book_Author( session.find( Book.class, 2 ), AUTHOR_CIDER_HOUSE ), 5.0F ),
+					new Book_Author_Score( new Book_Author( session.find( Book.class, 3 ), AUTHOR_AVENUE_OF_MYSTERIES ), 6.0F )
 			);
 		} );
 	}

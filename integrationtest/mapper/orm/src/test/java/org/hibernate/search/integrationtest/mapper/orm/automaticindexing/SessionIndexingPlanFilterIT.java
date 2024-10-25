@@ -45,7 +45,7 @@ class SessionIndexingPlanFilterIT extends AbstractIndexingPlanFilterIT {
 		with( sessionFactory ).runInTransaction( session -> {
 			Search.session( session ).indexingPlanFilter( ctx -> ctx.exclude( IndexedEntity.class ) );
 
-			IndexedEntity entity1 = session.get( IndexedEntity.class, 1 );
+			IndexedEntity entity1 = session.find( IndexedEntity.class, 1 );
 			entity1.setIndexedField( "updatedValue" );
 
 		} );
@@ -54,7 +54,7 @@ class SessionIndexingPlanFilterIT extends AbstractIndexingPlanFilterIT {
 		with( sessionFactory ).runInTransaction( session -> {
 			Search.session( session ).indexingPlanFilter( ctx -> ctx.exclude( IndexedEntity.class ) );
 
-			IndexedEntity entity1 = session.get( IndexedEntity.class, 1 );
+			IndexedEntity entity1 = session.find( IndexedEntity.class, 1 );
 
 			entity1.getContainedIndexedEmbedded().forEach( e -> e.setContainingAsIndexedEmbedded( null ) );
 
@@ -101,7 +101,7 @@ class SessionIndexingPlanFilterIT extends AbstractIndexingPlanFilterIT {
 		with( sessionFactory ).runInTransaction( session -> {
 			Search.session( session ).indexingPlanFilter( ctx -> ctx.exclude( IndexedEntity.class ) );
 
-			OtherIndexedEntity entity1 = session.get( OtherIndexedEntity.class, 10 );
+			OtherIndexedEntity entity1 = session.find( OtherIndexedEntity.class, 10 );
 			entity1.setIndexedField( "updatedValue" );
 
 			backendMock.expectWorks( OtherIndexedEntity.INDEX )
@@ -115,8 +115,8 @@ class SessionIndexingPlanFilterIT extends AbstractIndexingPlanFilterIT {
 		with( sessionFactory ).runInTransaction( session -> {
 			Search.session( session ).indexingPlanFilter( ctx -> ctx.exclude( IndexedEntity.class ) );
 
-			IndexedEntity entity0 = session.get( IndexedEntity.class, 1 );
-			OtherIndexedEntity entity1 = session.get( OtherIndexedEntity.class, 10 );
+			IndexedEntity entity0 = session.find( IndexedEntity.class, 1 );
+			OtherIndexedEntity entity1 = session.find( OtherIndexedEntity.class, 10 );
 
 			entity0.getContainedIndexedEmbedded().forEach( e -> e.setContainingAsIndexedEmbedded( null ) );
 			entity1.getContainedIndexedEmbedded().forEach( e -> e.setOtherContainingAsIndexedEmbedded( null ) );
@@ -445,7 +445,7 @@ class SessionIndexingPlanFilterIT extends AbstractIndexingPlanFilterIT {
 			Search.session( session ).indexingPlanFilter(
 					ctx -> ctx.exclude( ContainedEntity.class )
 			);
-			ContainedEntity entity1 = session.get( ContainedEntity.class, 100 );
+			ContainedEntity entity1 = session.find( ContainedEntity.class, 100 );
 			entity1.setIndexedField( "updatedValue" );
 		} );
 
@@ -453,7 +453,7 @@ class SessionIndexingPlanFilterIT extends AbstractIndexingPlanFilterIT {
 			Search.session( session ).indexingPlanFilter(
 					ctx -> ctx.exclude( IndexedEntity.class )
 			);
-			IndexedEntity entity1 = session.get( IndexedEntity.class, 1 );
+			IndexedEntity entity1 = session.find( IndexedEntity.class, 1 );
 
 			entity1.getContainedIndexedEmbedded().forEach( e -> e.setContainingAsIndexedEmbedded( null ) );
 
@@ -537,7 +537,7 @@ class SessionIndexingPlanFilterIT extends AbstractIndexingPlanFilterIT {
 			Search.session( session ).indexingPlanFilter( ctx -> ctx.exclude( DYNAMIC_BASE_TYPE_A ) );
 
 			@SuppressWarnings("unchecked")
-			Map<String, Object> entity1 = (Map<String, Object>) session.get( DYNAMIC_SUBTYPE_B, 1 );
+			Map<String, Object> entity1 = (Map<String, Object>) session.byId( DYNAMIC_SUBTYPE_B ).load( 1 );
 			entity1.put( "propertyOfA", "updatedValue" );
 		} );
 		backendMock.verifyExpectationsMet();
@@ -545,8 +545,8 @@ class SessionIndexingPlanFilterIT extends AbstractIndexingPlanFilterIT {
 		with( sessionFactory ).runInTransaction( session -> {
 			Search.session( session ).indexingPlanFilter( ctx -> ctx.exclude( DYNAMIC_BASE_TYPE_A ) );
 
-			session.remove( session.get( DYNAMIC_SUBTYPE_B, 1 ) );
-			session.remove( session.get( DYNAMIC_SUBTYPE_C, 2 ) );
+			session.remove( session.byId( DYNAMIC_SUBTYPE_B ).load( 1 ) );
+			session.remove( session.byId( DYNAMIC_SUBTYPE_C ).load( 2 ) );
 
 		} );
 		backendMock.verifyExpectationsMet();

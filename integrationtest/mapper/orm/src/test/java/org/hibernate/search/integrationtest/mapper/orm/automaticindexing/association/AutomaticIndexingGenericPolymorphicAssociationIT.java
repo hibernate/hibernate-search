@@ -112,7 +112,7 @@ class AutomaticIndexingGenericPolymorphicAssociationIT {
 		// Test updating the value
 		with( sessionFactory ).runInTransaction( session -> {
 			@SuppressWarnings("unchecked")
-			ContainedEntity<MiddleContainingEntity> containedEntity = session.get( ContainedEntity.class, 3 );
+			ContainedEntity<MiddleContainingEntity> containedEntity = session.find( ContainedEntity.class, 3 );
 			containedEntity.setIncludedInSingle( "updatedValue" );
 
 			backendMock.expectWorks( IndexedEntity.INDEX )
@@ -154,7 +154,7 @@ class AutomaticIndexingGenericPolymorphicAssociationIT {
 		// Test updating the value
 		with( sessionFactory ).runInTransaction( session -> {
 			@SuppressWarnings("unchecked")
-			ContainedEntity<UnrelatedContainingEntity> containedEntity = session.get( ContainedEntity.class, 2 );
+			ContainedEntity<UnrelatedContainingEntity> containedEntity = session.find( ContainedEntity.class, 2 );
 			containedEntity.setIncludedInSingle( "updatedValue" );
 
 			// Do not expect any work

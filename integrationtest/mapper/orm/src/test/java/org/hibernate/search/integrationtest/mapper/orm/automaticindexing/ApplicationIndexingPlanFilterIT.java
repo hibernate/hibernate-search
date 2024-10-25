@@ -44,14 +44,14 @@ class ApplicationIndexingPlanFilterIT extends AbstractIndexingPlanFilterIT {
 				ctx -> ctx.exclude( IndexedEntity.class )
 		);
 		with( sessionFactory ).runInTransaction( session -> {
-			IndexedEntity entity1 = session.get( IndexedEntity.class, 1 );
+			IndexedEntity entity1 = session.find( IndexedEntity.class, 1 );
 			entity1.setIndexedField( "updatedValue" );
 
 		} );
 		backendMock.verifyExpectationsMet();
 
 		with( sessionFactory ).runInTransaction( session -> {
-			IndexedEntity entity1 = session.get( IndexedEntity.class, 1 );
+			IndexedEntity entity1 = session.find( IndexedEntity.class, 1 );
 
 			entity1.getContainedIndexedEmbedded().forEach( e -> e.setContainingAsIndexedEmbedded( null ) );
 
@@ -89,14 +89,14 @@ class ApplicationIndexingPlanFilterIT extends AbstractIndexingPlanFilterIT {
 				ctx -> ctx.exclude( IndexedEntity.INDEX )
 		);
 		with( sessionFactory ).runInTransaction( session -> {
-			IndexedEntity entity1 = session.get( IndexedEntity.class, 1 );
+			IndexedEntity entity1 = session.find( IndexedEntity.class, 1 );
 			entity1.setIndexedField( "updatedValue" );
 
 		} );
 		backendMock.verifyExpectationsMet();
 
 		with( sessionFactory ).runInTransaction( session -> {
-			IndexedEntity entity1 = session.get( IndexedEntity.class, 1 );
+			IndexedEntity entity1 = session.find( IndexedEntity.class, 1 );
 
 			entity1.getContainedIndexedEmbedded().forEach( e -> e.setContainingAsIndexedEmbedded( null ) );
 

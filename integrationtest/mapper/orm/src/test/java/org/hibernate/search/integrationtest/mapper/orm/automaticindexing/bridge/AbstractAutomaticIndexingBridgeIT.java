@@ -71,7 +71,7 @@ public abstract class AbstractAutomaticIndexingBridgeIT {
 		backendMock.verifyExpectationsMet();
 
 		with( sessionFactory ).runInTransaction( session -> {
-			IndexedEntity entity1 = session.get( IndexedEntity.class, 1 );
+			IndexedEntity entity1 = session.find( IndexedEntity.class, 1 );
 			entity1.setDirectField( "updatedValue" );
 
 			backendMock.expectWorks( IndexedEntity.INDEX )
@@ -87,7 +87,7 @@ public abstract class AbstractAutomaticIndexingBridgeIT {
 		backendMock.verifyExpectationsMet();
 
 		with( sessionFactory ).runInTransaction( session -> {
-			IndexedEntity entity1 = session.get( IndexedEntity.class, 1 );
+			IndexedEntity entity1 = session.find( IndexedEntity.class, 1 );
 
 			session.remove( entity1 );
 
@@ -137,7 +137,7 @@ public abstract class AbstractAutomaticIndexingBridgeIT {
 			containedEntity.setId( 4 );
 			containedEntity.setIncludedInTypeBridge( "initialValue" );
 
-			ContainingEntity containingEntity1 = session.get( ContainingEntity.class, 2 );
+			ContainingEntity containingEntity1 = session.find( ContainingEntity.class, 2 );
 			containingEntity1.setContainedSingle( containedEntity );
 			containedEntity.getContainingAsSingle().add( containingEntity1 );
 
@@ -161,7 +161,7 @@ public abstract class AbstractAutomaticIndexingBridgeIT {
 			containedEntity.setId( 5 );
 			containedEntity.setIncludedInTypeBridge( "updatedValue" );
 
-			ContainingEntity containingEntity1 = session.get( ContainingEntity.class, 2 );
+			ContainingEntity containingEntity1 = session.find( ContainingEntity.class, 2 );
 			containingEntity1.getContainedSingle().getContainingAsSingle().clear();
 			containingEntity1.setContainedSingle( containedEntity );
 			containedEntity.getContainingAsSingle().add( containingEntity1 );
@@ -186,7 +186,7 @@ public abstract class AbstractAutomaticIndexingBridgeIT {
 			containedEntity.setId( 6 );
 			containedEntity.setIncludedInTypeBridge( "outOfScopeValue" );
 
-			ContainingEntity deeplyNestedContainingEntity1 = session.get( ContainingEntity.class, 3 );
+			ContainingEntity deeplyNestedContainingEntity1 = session.find( ContainingEntity.class, 3 );
 			deeplyNestedContainingEntity1.setContainedSingle( containedEntity );
 			containedEntity.getContainingAsSingle().add( deeplyNestedContainingEntity1 );
 
@@ -198,7 +198,7 @@ public abstract class AbstractAutomaticIndexingBridgeIT {
 
 		// Test removing a value
 		with( sessionFactory ).runInTransaction( session -> {
-			ContainingEntity containingEntity1 = session.get( ContainingEntity.class, 2 );
+			ContainingEntity containingEntity1 = session.find( ContainingEntity.class, 2 );
 			containingEntity1.getContainedSingle().getContainingAsSingle().clear();
 			containingEntity1.setContainedSingle( null );
 
@@ -265,7 +265,7 @@ public abstract class AbstractAutomaticIndexingBridgeIT {
 
 		// Test updating the value
 		with( sessionFactory ).runInTransaction( session -> {
-			ContainedEntity containedEntity = session.get( ContainedEntity.class, 4 );
+			ContainedEntity containedEntity = session.find( ContainedEntity.class, 4 );
 			containedEntity.setIncludedInTypeBridge( "updatedValue" );
 
 			backendMock.expectWorks( IndexedEntity.INDEX )
@@ -282,7 +282,7 @@ public abstract class AbstractAutomaticIndexingBridgeIT {
 
 		// Test updating a value that is not included in the bridge
 		with( sessionFactory ).runInTransaction( session -> {
-			ContainedEntity containedEntity = session.get( ContainedEntity.class, 4 );
+			ContainedEntity containedEntity = session.find( ContainedEntity.class, 4 );
 			containedEntity.setExcludedFromAll( "updatedExcludedValue" );
 
 			// Do not expect any work
@@ -291,7 +291,7 @@ public abstract class AbstractAutomaticIndexingBridgeIT {
 
 		// Test updating a value that is too deeply nested to matter (it's out of the bridge scope)
 		with( sessionFactory ).runInTransaction( session -> {
-			ContainedEntity containedEntity = session.get( ContainedEntity.class, 5 );
+			ContainedEntity containedEntity = session.find( ContainedEntity.class, 5 );
 			containedEntity.setIncludedInTypeBridge( "updatedOutOfScopeValue" );
 
 			// Do not expect any work
@@ -336,7 +336,7 @@ public abstract class AbstractAutomaticIndexingBridgeIT {
 			containedEntity.setId( 4 );
 			containedEntity.setIncludedInSingleValuedPropertyBridge( "initialValue" );
 
-			ContainingEntity containingEntity1 = session.get( ContainingEntity.class, 2 );
+			ContainingEntity containingEntity1 = session.find( ContainingEntity.class, 2 );
 			containingEntity1.setContainedSingle( containedEntity );
 			containedEntity.getContainingAsSingle().add( containingEntity1 );
 
@@ -357,7 +357,7 @@ public abstract class AbstractAutomaticIndexingBridgeIT {
 			containedEntity.setId( 5 );
 			containedEntity.setIncludedInSingleValuedPropertyBridge( "updatedValue" );
 
-			ContainingEntity containingEntity1 = session.get( ContainingEntity.class, 2 );
+			ContainingEntity containingEntity1 = session.find( ContainingEntity.class, 2 );
 			containingEntity1.getContainedSingle().getContainingAsSingle().clear();
 			containingEntity1.setContainedSingle( containedEntity );
 			containedEntity.getContainingAsSingle().add( containingEntity1 );
@@ -379,7 +379,7 @@ public abstract class AbstractAutomaticIndexingBridgeIT {
 			containedEntity.setId( 6 );
 			containedEntity.setIncludedInSingleValuedPropertyBridge( "outOfScopeValue" );
 
-			ContainingEntity deeplyNestedContainingEntity1 = session.get( ContainingEntity.class, 3 );
+			ContainingEntity deeplyNestedContainingEntity1 = session.find( ContainingEntity.class, 3 );
 			deeplyNestedContainingEntity1.setContainedSingle( containedEntity );
 			containedEntity.getContainingAsSingle().add( deeplyNestedContainingEntity1 );
 
@@ -391,7 +391,7 @@ public abstract class AbstractAutomaticIndexingBridgeIT {
 
 		// Test removing a value
 		with( sessionFactory ).runInTransaction( session -> {
-			ContainingEntity containingEntity1 = session.get( ContainingEntity.class, 2 );
+			ContainingEntity containingEntity1 = session.find( ContainingEntity.class, 2 );
 			containingEntity1.getContainedSingle().getContainingAsSingle().clear();
 			containingEntity1.setContainedSingle( null );
 
@@ -453,7 +453,7 @@ public abstract class AbstractAutomaticIndexingBridgeIT {
 
 		// Test updating the value
 		with( sessionFactory ).runInTransaction( session -> {
-			ContainedEntity containedEntity = session.get( ContainedEntity.class, 4 );
+			ContainedEntity containedEntity = session.find( ContainedEntity.class, 4 );
 			containedEntity.setIncludedInSingleValuedPropertyBridge( "updatedValue" );
 
 			backendMock.expectWorks( IndexedEntity.INDEX )
@@ -467,7 +467,7 @@ public abstract class AbstractAutomaticIndexingBridgeIT {
 
 		// Test updating a value that is not included in the bridge
 		with( sessionFactory ).runInTransaction( session -> {
-			ContainedEntity containedEntity = session.get( ContainedEntity.class, 4 );
+			ContainedEntity containedEntity = session.find( ContainedEntity.class, 4 );
 			containedEntity.setExcludedFromAll( "updatedExcludedValue" );
 
 			// Do not expect any work
@@ -476,7 +476,7 @@ public abstract class AbstractAutomaticIndexingBridgeIT {
 
 		// Test updating a value that is too deeply nested to matter (it's out of the bridge scope)
 		with( sessionFactory ).runInTransaction( session -> {
-			ContainedEntity containedEntity = session.get( ContainedEntity.class, 5 );
+			ContainedEntity containedEntity = session.find( ContainedEntity.class, 5 );
 			containedEntity.setIncludedInSingleValuedPropertyBridge( "updatedOutOfScopeValue" );
 
 			// Do not expect any work
@@ -506,7 +506,7 @@ public abstract class AbstractAutomaticIndexingBridgeIT {
 
 		// Test adding a value
 		with( sessionFactory ).runInTransaction( session -> {
-			IndexedEntity entity1 = session.get( IndexedEntity.class, 1 );
+			IndexedEntity entity1 = session.find( IndexedEntity.class, 1 );
 
 			ContainingEntity containingEntity1 = new ContainingEntity();
 			containingEntity1.setId( 2 );
@@ -533,7 +533,7 @@ public abstract class AbstractAutomaticIndexingBridgeIT {
 
 		// Test adding a second value
 		with( sessionFactory ).runInTransaction( session -> {
-			IndexedEntity entity1 = session.get( IndexedEntity.class, 1 );
+			IndexedEntity entity1 = session.find( IndexedEntity.class, 1 );
 
 			ContainingEntity containingEntity2 = new ContainingEntity();
 			containingEntity2.setId( 4 );
@@ -560,7 +560,7 @@ public abstract class AbstractAutomaticIndexingBridgeIT {
 
 		// Test updating a value
 		with( sessionFactory ).runInTransaction( session -> {
-			IndexedEntity entity1 = session.get( IndexedEntity.class, 1 );
+			IndexedEntity entity1 = session.find( IndexedEntity.class, 1 );
 
 			ContainingEntity containingEntity3 = new ContainingEntity();
 			containingEntity3.setId( 6 );
@@ -591,7 +591,7 @@ public abstract class AbstractAutomaticIndexingBridgeIT {
 
 		// Test removing a value
 		with( sessionFactory ).runInTransaction( session -> {
-			IndexedEntity entity1 = session.get( IndexedEntity.class, 1 );
+			IndexedEntity entity1 = session.find( IndexedEntity.class, 1 );
 			for ( ContainingEntity containingEntity : entity1.getAssociation2() ) {
 				containingEntity.setAssociation2InverseSide( null );
 			}

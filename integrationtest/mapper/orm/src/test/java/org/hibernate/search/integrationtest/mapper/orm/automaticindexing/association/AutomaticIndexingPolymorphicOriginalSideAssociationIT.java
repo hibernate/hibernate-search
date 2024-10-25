@@ -135,7 +135,7 @@ class AutomaticIndexingPolymorphicOriginalSideAssociationIT {
 
 		// Test updating the value
 		with( sessionFactory ).runInTransaction( session -> {
-			ContainedEntity containedEntity = session.get( ContainedEntity.class, 5 );
+			ContainedEntity containedEntity = session.find( ContainedEntity.class, 5 );
 			containedEntity.setIncludedInSingle( "updatedValue" );
 
 			backendMock.expectWorks( IndexedEntity.INDEX )

@@ -89,7 +89,7 @@ class PersistenceContextThenSecondLevelCacheLookupStrategy
 
 		try {
 			// This will load the object from the second level cache
-			return session.get( persister.getEntityName(), entityKey.getIdentifier() );
+			return session.byId( persister.getEntityName() ).load( entityKey.getIdentifier() );
 		}
 		catch (ObjectNotFoundException ignored) {
 			// Unlikely but needed: an index might be out of sync, and the cache might be as well

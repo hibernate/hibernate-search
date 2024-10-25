@@ -145,12 +145,12 @@ class JsonPropertyIT {
 		} );
 		with( sessionFactory ).runInTransaction( session -> {
 			// not if json does not have equals -- will result in an index operation!
-			IndexedEntity entity1 = session.get( IndexedEntity.class, 1 );
+			IndexedEntity entity1 = session.find( IndexedEntity.class, 1 );
 			assertThat( entity1.getJson().getKeyword() ).isEqualTo( "keyword" );
 		} );
 
 		with( sessionFactory ).runInTransaction( session -> {
-			IndexedEntity entity1 = session.get( IndexedEntity.class, 1 );
+			IndexedEntity entity1 = session.find( IndexedEntity.class, 1 );
 			JsonThing json = entity1.getJson();
 			json.setKeyword( "updatedKeyword" );
 

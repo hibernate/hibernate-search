@@ -84,7 +84,7 @@ class FormulaPropertyIT {
 					);
 		} );
 		with( sessionFactory ).runInTransaction( session -> {
-			IndexedEntity entity1 = session.get( IndexedEntity.class, 1 );
+			IndexedEntity entity1 = session.find( IndexedEntity.class, 1 );
 			assertThat( entity1.string ).isEqualTo( "smth" );
 			assertThat( entity1.amountDifference ).isEqualTo( 10 );
 		} );

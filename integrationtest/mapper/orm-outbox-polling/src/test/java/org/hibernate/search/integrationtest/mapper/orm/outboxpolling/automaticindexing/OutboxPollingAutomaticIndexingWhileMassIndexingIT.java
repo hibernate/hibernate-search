@@ -67,7 +67,7 @@ class OutboxPollingAutomaticIndexingWhileMassIndexingIT {
 			IndexedEntity.getTextConcurrentOperation.set( () -> {} );
 			// 2. We simulate a concurrent transaction that updates the entity being mass-indexed.
 			with( sessionFactory ).runInTransaction( session -> {
-				IndexedEntity entity = session.get( IndexedEntity.class, 1 );
+				IndexedEntity entity = session.find( IndexedEntity.class, 1 );
 				entity.setText( "updated" );
 			} );
 			// 3. We give the event processor some time to process the change
@@ -148,7 +148,7 @@ class OutboxPollingAutomaticIndexingWhileMassIndexingIT {
 			IndexedEntity.getTextConcurrentOperation.set( () -> {} );
 			// 2. We simulate a concurrent transaction that updates another entity in a different tenant.
 			with( sessionFactory, tenant2Id ).runInTransaction( session -> {
-				IndexedEntity entity = session.get( IndexedEntity.class, 1 );
+				IndexedEntity entity = session.find( IndexedEntity.class, 1 );
 				entity.setText( "updated value for tenant 2" );
 				backendMock.expectWorks( IndexedEntity.NAME, tenant2Id )
 						.addOrUpdate( String.valueOf( 1 ), b -> b
@@ -159,7 +159,7 @@ class OutboxPollingAutomaticIndexingWhileMassIndexingIT {
 			backendMock.verifyExpectationsMet();
 			// 4. We simulate a concurrent transaction that updates the entity being mass-indexed, in the same tenant.
 			with( sessionFactory, tenant1Id ).runInTransaction( session -> {
-				IndexedEntity entity = session.get( IndexedEntity.class, 1 );
+				IndexedEntity entity = session.find( IndexedEntity.class, 1 );
 				entity.setText( "updated value for tenant 1" );
 			} );
 			// 5. We give the event processor some time to process the change
