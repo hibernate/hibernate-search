@@ -56,11 +56,11 @@ jobs:
         run: |
           shopt -s nullglob # Don't run the loop below if there are no artifacts
           status=0
+          mkdir -p ~/.m2/.develocity/
           for build_scan_data_directory in /tmp/downloaded-build-scan-data/*
           do
             rm -rf ~/.m2/.develocity/build-scan-data
-            mkdir -p ~/.m2/.develocity/build-scan-data
-            tar -xzf "$build_scan_data_directory/build-scan-data.tgz" -C ~/.m2/.develocity/build-scan-data \
+            mv "$build_scan_data_directory" ~/.m2/.develocity/build-scan-data \
             && ./mvnw $MAVEN_ARGS develocity:build-scan-publish-previous || status=1
           done
           exit $status

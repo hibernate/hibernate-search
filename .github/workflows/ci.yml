@@ -119,18 +119,15 @@ jobs:
           -Pjqassistant -Pdist -Pci-build -DskipITs
         env:
           DEVELOCITY_ACCESS_KEY: "${{ secrets.DEVELOCITY_ACCESS_KEY || '' }}"
-      # For jobs running on 'pull_request', tar and upload build scan data.
+      # For jobs running on 'pull_request', upload build scan data.
       # The actual publishing must be done in a separate job (see ci-report.yml).
       # We don't write to the remote cache as that would be unsafe.
-      - name: Tar build scan content pushed to subsequent jobs
-        if: "${{ github.event_name == 'pull_request' && !cancelled() }}"
-        run: tar -czf build-scan-data.tgz -C ~/.m2/.develocity/build-scan-data .
       - name: Upload GitHub Actions artifact for the Develocity build scan
         uses: actions/upload-artifact@v4
         if: "${{ github.event_name == 'pull_request' && !cancelled() }}"
         with:
           name: build-scan-data-initial-${{ matrix.os.name }}
-          path: build-scan-data.tgz
+          path: ~/.m2/.develocity/build-scan-data
 
       - name: Run integration tests in the default environment
         run: |
@@ -140,15 +137,12 @@ jobs:
         env:
           DEVELOCITY_ACCESS_KEY: "${{ secrets.DEVELOCITY_ACCESS_KEY || '' }}"
       # Same as above, but for the build scan of the latest Maven run.
-      - name: Tar build scan content pushed to subsequent jobs
-        if: "${{ github.event_name == 'pull_request' && !cancelled() }}"
-        run: tar -czf build-scan-data.tgz -C ~/.m2/.develocity/build-scan-data .
       - name: Upload GitHub Actions artifact for the Develocity build scan
         uses: actions/upload-artifact@v4
         if: "${{ github.event_name == 'pull_request' && !cancelled() }}"
         with:
           name: build-scan-data-integrationtest-${{ matrix.os.name }}
-          path: build-scan-data.tgz
+          path: ~/.m2/.develocity/build-scan-data
 
       - name: Docker cleanup
         run: ./ci/docker-cleanup.sh
