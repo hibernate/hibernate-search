@@ -20,7 +20,7 @@ import org.hibernate.search.mapper.orm.search.query.impl.HibernateOrmSearchQuery
 import org.hibernate.search.mapper.orm.session.SearchSession;
 import org.hibernate.search.mapper.orm.session.impl.DelegatingSearchSession;
 
-public final class Search {
+public final class Search2_0 {
 
 	private Search() {
 		// Private constructor
