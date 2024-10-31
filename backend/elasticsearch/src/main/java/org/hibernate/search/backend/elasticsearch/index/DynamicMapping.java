@@ -4,11 +4,8 @@
  */
 package org.hibernate.search.backend.elasticsearch.index;
 
-import java.lang.invoke.MethodHandles;
-
-import org.hibernate.search.backend.elasticsearch.logging.impl.Log;
+import org.hibernate.search.backend.elasticsearch.logging.impl.ConfigurationLog;
 import org.hibernate.search.engine.cfg.spi.ParseUtils;
-import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
 public enum DynamicMapping {
 
@@ -27,14 +24,12 @@ public enum DynamicMapping {
 	 */
 	STRICT( "strict" );
 
-	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
-
 	// This method conforms to the MicroProfile Config specification. Do not change its signature.
 	public static DynamicMapping of(String value) {
 		return ParseUtils.parseDiscreteValues(
 				DynamicMapping.values(),
 				DynamicMapping::externalRepresentation,
-				log::invalidDynamicType,
+				ConfigurationLog.INSTANCE::invalidDynamicType,
 				value
 		);
 	}

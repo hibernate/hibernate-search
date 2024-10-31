@@ -4,8 +4,6 @@
  */
 package org.hibernate.search.mapper.orm.loading.impl;
 
-import java.lang.invoke.MethodHandles;
-
 import jakarta.persistence.EntityGraph;
 
 import org.hibernate.engine.spi.SessionImplementor;
@@ -15,18 +13,15 @@ import org.hibernate.search.mapper.orm.loading.spi.EntityGraphHint;
 import org.hibernate.search.mapper.orm.loading.spi.HibernateOrmLoadingMappingContext;
 import org.hibernate.search.mapper.orm.loading.spi.HibernateOrmLoadingSessionContext;
 import org.hibernate.search.mapper.orm.loading.spi.MutableEntityLoadingOptions;
-import org.hibernate.search.mapper.orm.logging.impl.Log;
+import org.hibernate.search.mapper.orm.logging.impl.OrmSpecificLog;
 import org.hibernate.search.mapper.orm.search.loading.EntityLoadingCacheLookupStrategy;
 import org.hibernate.search.mapper.orm.search.loading.dsl.SearchLoadingOptionsStep;
 import org.hibernate.search.mapper.pojo.loading.spi.PojoSelectionLoadingContext;
 import org.hibernate.search.mapper.pojo.loading.spi.PojoSelectionLoadingContextBuilder;
 import org.hibernate.search.mapper.pojo.model.spi.PojoRuntimeIntrospector;
 import org.hibernate.search.util.common.impl.Contracts;
-import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
 public final class HibernateOrmSelectionLoadingContext implements PojoSelectionLoadingContext {
-
-	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	private final HibernateOrmLoadingSessionContext sessionContext;
 	private final MutableEntityLoadingOptions loadingOptions;
@@ -44,7 +39,7 @@ public final class HibernateOrmSelectionLoadingContext implements PojoSelectionL
 			sessionContext.session().checkOpen();
 		}
 		catch (IllegalStateException e) {
-			throw log.hibernateSessionIsClosed( e );
+			throw OrmSpecificLog.INSTANCE.hibernateSessionIsClosed( e );
 		}
 	}
 

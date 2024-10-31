@@ -7,10 +7,10 @@ package org.hibernate.search.integrationtest.mapper.orm.automaticindexing.sessio
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.assertj.core.api.Assertions.fail;
+import static org.hibernate.search.integrationtest.mapper.orm.logging.impl.TestLog.TEST_LOGGER;
 import static org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmUtils.with;
 import static org.hibernate.search.util.impl.test.FutureAssert.assertThatFuture;
 
-import java.lang.invoke.MethodHandles;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
@@ -32,12 +32,10 @@ import org.hibernate.search.mapper.orm.automaticindexing.session.AutomaticIndexi
 import org.hibernate.search.mapper.orm.automaticindexing.session.AutomaticIndexingSynchronizationStrategy;
 import org.hibernate.search.mapper.orm.automaticindexing.session.AutomaticIndexingSynchronizationStrategyNames;
 import org.hibernate.search.mapper.orm.cfg.HibernateOrmMapperSettings;
-import org.hibernate.search.mapper.orm.logging.impl.Log;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.GenericField;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
 import org.hibernate.search.util.common.SearchException;
 import org.hibernate.search.util.common.impl.Throwables;
-import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 import org.hibernate.search.util.impl.integrationtest.common.extension.BackendMock;
 import org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmSetupHelper;
 import org.hibernate.search.util.impl.test.extension.ExpectedLog4jLog;
@@ -52,8 +50,6 @@ import org.hamcrest.CoreMatchers;
 
 @Deprecated
 class AutomaticIndexingSynchronizationStrategyIT {
-
-	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	// Let's say 3 seconds are long enough to consider that, if nothing changed after this time, nothing ever will.
 	private static final long ALMOST_FOREVER_VALUE = 3L;
@@ -679,7 +675,7 @@ class AutomaticIndexingSynchronizationStrategyIT {
 					org.hibernate.search.mapper.orm.work.SearchIndexingPlanExecutionReport report =
 							future.get( SMALL_DURATION_VALUE, SMALL_DURATION_UNIT );
 					report.throwable().ifPresent( t -> {
-						throw log.indexingFailure( t.getMessage(), report.failingEntities(), t );
+						throw TEST_LOGGER.indexingFailure( t.getMessage(), report.failingEntities(), t );
 					} );
 				}
 				catch (TimeoutException e) {

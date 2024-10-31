@@ -20,4 +20,13 @@ public interface LuceneSearchHints extends BackendSearchHints {
 
 	@Message("A document projection represents a root document and adding it as a part of the nested object projection might produce misleading results.")
 	String documentProjectionNestingNotSupportedHint();
+
+	@Message(value = "Index Merge operation on index '%1$s'")
+	String indexMergeOperation(String indexName);
+
+	@Message(value = "This multi-valued field has a 'FLATTENED' structure,"
+			+ " which means the structure of objects is not preserved upon indexing,"
+			+ " making object projections impossible."
+			+ " Try setting the field structure to 'NESTED' and reindexing all your data.")
+	String missingSupportHintForObjectProjectionOnMultiValuedFlattenedObjectNode();
 }

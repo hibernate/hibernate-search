@@ -5,7 +5,6 @@
 package org.hibernate.search.jakarta.batch.core.massindexing.step.impl;
 
 import java.io.Serializable;
-import java.lang.invoke.MethodHandles;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 
@@ -25,7 +24,7 @@ import org.hibernate.search.engine.backend.work.execution.DocumentCommitStrategy
 import org.hibernate.search.engine.backend.work.execution.DocumentRefreshStrategy;
 import org.hibernate.search.engine.backend.work.execution.OperationSubmitter;
 import org.hibernate.search.engine.backend.work.execution.spi.UnsupportedOperationBehavior;
-import org.hibernate.search.jakarta.batch.core.logging.impl.Log;
+import org.hibernate.search.jakarta.batch.core.logging.impl.JakartaBatchLog;
 import org.hibernate.search.jakarta.batch.core.massindexing.MassIndexingJobParameters;
 import org.hibernate.search.jakarta.batch.core.massindexing.impl.JobContextData;
 import org.hibernate.search.jakarta.batch.core.massindexing.util.impl.EntityTypeDescriptor;
@@ -40,11 +39,9 @@ import org.hibernate.search.mapper.pojo.work.spi.PojoIndexer;
 import org.hibernate.search.mapper.pojo.work.spi.PojoScopeWorkspace;
 import org.hibernate.search.util.common.SearchException;
 import org.hibernate.search.util.common.impl.Futures;
-import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
 public class EntityWriter extends AbstractItemWriter {
 
-	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 	private static final String ID_PARAMETER_NAME = "ids";
 
 	@Inject
@@ -97,7 +94,7 @@ public class EntityWriter extends AbstractItemWriter {
 	 */
 	@Override
 	public void open(Serializable checkpoint) {
-		log.openingEntityWriter( partitionIdStr, entityName );
+		JakartaBatchLog.INSTANCE.openingEntityWriter( partitionIdStr, entityName );
 		JobContextData jobContextData = (JobContextData) jobContext.getTransientUserData();
 
 		emf = jobContextData.getEntityManagerFactory();
@@ -171,7 +168,7 @@ public class EntityWriter extends AbstractItemWriter {
 
 	@Override
 	public void close() throws Exception {
-		log.closingEntityWriter( partitionIdStr, entityName );
+		JakartaBatchLog.INSTANCE.closingEntityWriter( partitionIdStr, entityName );
 	}
 
 	private List<?> loadEntities(SessionImplementor session, List<Object> entityIds) {
@@ -207,7 +204,7 @@ public class EntityWriter extends AbstractItemWriter {
 	}
 
 	private CompletableFuture<?> writeItem(PojoIndexer indexer, Object entity) {
-		log.processEntity( entity );
+		JakartaBatchLog.INSTANCE.processEntity( entity );
 
 		if ( WriteMode.ADD.equals( writeMode ) ) {
 			return indexer.add( type.typeIdentifier(), null, null, entity,

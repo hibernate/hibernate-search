@@ -4,7 +4,6 @@
  */
 package org.hibernate.search.mapper.orm.model.impl;
 
-import java.lang.invoke.MethodHandles;
 import java.lang.reflect.AccessibleObject;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
@@ -20,7 +19,7 @@ import org.hibernate.bytecode.enhance.spi.EnhancerConstants;
 import org.hibernate.engine.spi.PersistentAttributeInterceptable;
 import org.hibernate.mapping.PersistentClass;
 import org.hibernate.models.spi.ClassDetailsRegistry;
-import org.hibernate.search.mapper.orm.logging.impl.Log;
+import org.hibernate.search.mapper.orm.logging.impl.MappingLog;
 import org.hibernate.search.mapper.pojo.model.models.spi.AbstractPojoModelsBootstrapIntrospector;
 import org.hibernate.search.mapper.pojo.model.models.spi.PojoModelsGenericContextHelper;
 import org.hibernate.search.mapper.pojo.model.spi.AbstractPojoRawTypeModel;
@@ -28,15 +27,12 @@ import org.hibernate.search.mapper.pojo.model.spi.GenericContextAwarePojoGeneric
 import org.hibernate.search.mapper.pojo.model.spi.PojoBootstrapIntrospector;
 import org.hibernate.search.mapper.pojo.model.spi.PojoRawTypeIdentifier;
 import org.hibernate.search.util.common.impl.ReflectionHelper;
-import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 import org.hibernate.search.util.common.reflect.spi.ValueCreateHandle;
 import org.hibernate.search.util.common.reflect.spi.ValueHandleFactory;
 import org.hibernate.search.util.common.reflect.spi.ValueReadHandle;
 
 public class HibernateOrmBootstrapIntrospector extends AbstractPojoModelsBootstrapIntrospector
 		implements PojoBootstrapIntrospector {
-
-	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	public static HibernateOrmBootstrapIntrospector create(
 			HibernateOrmBasicTypeMetadataProvider basicTypeMetadataProvider,
@@ -88,7 +84,7 @@ public class HibernateOrmBootstrapIntrospector extends AbstractPojoModelsBootstr
 
 		Set<String> typeNames = new LinkedHashSet<>( basicTypeMetadataProvider.getKnownDynamicMapTypeNames() );
 		typeNames.addAll( basicTypeMetadataProvider.getKnownHibernateOrmEntityNames() );
-		throw log.unknownNamedType( name, typeNames );
+		throw MappingLog.INSTANCE.unknownNamedType( name, typeNames );
 	}
 
 	@Override

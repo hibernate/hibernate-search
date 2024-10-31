@@ -6,9 +6,7 @@ package org.hibernate.search.backend.lucene.types.dsl.impl;
 
 import static org.hibernate.search.backend.lucene.lowlevel.codec.impl.HibernateSearchKnnVectorsFormat.DEFAULT_MAX_DIMENSIONS;
 
-import java.lang.invoke.MethodHandles;
-
-import org.hibernate.search.backend.lucene.logging.impl.Log;
+import org.hibernate.search.backend.lucene.logging.impl.MappingLog;
 import org.hibernate.search.backend.lucene.lowlevel.codec.impl.HibernateSearchKnnVectorsFormat;
 import org.hibernate.search.backend.lucene.search.common.impl.AbstractLuceneValueFieldSearchQueryElementFactory;
 import org.hibernate.search.backend.lucene.search.projection.impl.LuceneFieldProjection;
@@ -25,7 +23,6 @@ import org.hibernate.search.engine.search.predicate.spi.KnnPredicateBuilder;
 import org.hibernate.search.engine.search.predicate.spi.PredicateTypeKeys;
 import org.hibernate.search.engine.search.projection.spi.ProjectionTypeKeys;
 import org.hibernate.search.util.common.AssertionFailure;
-import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
 import org.apache.lucene.index.VectorSimilarityFunction;
 
@@ -37,7 +34,6 @@ abstract class AbstractLuceneVectorFieldTypeOptionsStep<S extends AbstractLucene
 		extends AbstractLuceneIndexFieldTypeOptionsStep<S, F>
 		implements LuceneVectorFieldTypeOptionsStep<S, F> {
 
-	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 	private static final int MAX_EF_CONSTRUCTION = 3200;
 	private static final int MAX_M = 512;
 
@@ -74,7 +70,7 @@ abstract class AbstractLuceneVectorFieldTypeOptionsStep<S extends AbstractLucene
 	@Override
 	public S efConstruction(int efConstruction) {
 		if ( efConstruction < 1 || efConstruction > MAX_EF_CONSTRUCTION ) {
-			throw log.vectorPropertyUnsupportedValue( "efConstruction", efConstruction, MAX_EF_CONSTRUCTION );
+			throw MappingLog.INSTANCE.vectorPropertyUnsupportedValue( "efConstruction", efConstruction, MAX_EF_CONSTRUCTION );
 		}
 		this.efConstruction = efConstruction;
 		return thisAsS();
@@ -83,7 +79,7 @@ abstract class AbstractLuceneVectorFieldTypeOptionsStep<S extends AbstractLucene
 	@Override
 	public S m(int m) {
 		if ( m < 1 || m > MAX_M ) {
-			throw log.vectorPropertyUnsupportedValue( "m", m, MAX_M );
+			throw MappingLog.INSTANCE.vectorPropertyUnsupportedValue( "m", m, MAX_M );
 		}
 		this.m = m;
 		return thisAsS();
@@ -92,7 +88,7 @@ abstract class AbstractLuceneVectorFieldTypeOptionsStep<S extends AbstractLucene
 	@Override
 	public S dimension(int dimension) {
 		if ( dimension < 1 || dimension > DEFAULT_MAX_DIMENSIONS ) {
-			throw log.vectorPropertyUnsupportedValue( "dimension", dimension, DEFAULT_MAX_DIMENSIONS );
+			throw MappingLog.INSTANCE.vectorPropertyUnsupportedValue( "dimension", dimension, DEFAULT_MAX_DIMENSIONS );
 		}
 		this.dimension = dimension;
 		return thisAsS();
@@ -107,7 +103,8 @@ abstract class AbstractLuceneVectorFieldTypeOptionsStep<S extends AbstractLucene
 	@Override
 	public LuceneIndexValueFieldType<F> toIndexFieldType() {
 		if ( dimension == null ) {
-			throw log.nullVectorDimension( buildContext.hints().missingVectorDimension(), buildContext.getEventContext() );
+			throw MappingLog.INSTANCE.nullVectorDimension( buildContext.hints().missingVectorDimension(),
+					buildContext.getEventContext() );
 		}
 		VectorSimilarityFunction resolvedVectorSimilarity = resolveDefault( vectorSimilarity );
 		boolean resolvedProjectable = resolveDefault( projectable );

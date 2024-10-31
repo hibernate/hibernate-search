@@ -97,7 +97,7 @@
 			<property name="message" value="Loggers must be static final" />
 		</module>
 		<module name="RegexpSinglelineJava">
-			<property name="format" value="\bLog (?!log |\w+Log |INSTANCE )\w+ =" />
+			<property name="format" value="\bLog (?!log |\w+Log |INSTANCE|([A-Z\d]++_)++LOGGER )\w+ =" />
 			<property name="message" value="Loggers must be named exactly `log` (or in some specific cases `INSTANCE` or `&lt;something&gt;Log`)" />
 		</module>
 	</module>

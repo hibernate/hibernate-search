@@ -4,22 +4,19 @@
  */
 package org.hibernate.search.backend.lucene.search.predicate.impl;
 
-import java.lang.invoke.MethodHandles;
 import java.util.Collection;
 import java.util.Map;
 import java.util.NavigableMap;
 import java.util.TreeMap;
 
-import org.hibernate.search.backend.lucene.logging.impl.Log;
+import org.hibernate.search.backend.lucene.logging.impl.QueryLog;
 import org.hibernate.search.engine.search.predicate.spi.MinimumShouldMatchBuilder;
-import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
 import org.apache.lucene.search.BooleanClause;
 import org.apache.lucene.search.BooleanQuery;
 import org.apache.lucene.search.Query;
 
 public final class LuceneCommonMinimumShouldMatchConstraints implements MinimumShouldMatchBuilder {
-	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	private NavigableMap<Integer, MinimumShouldMatchConstraint> minimumShouldMatchConstraints;
 
@@ -47,7 +44,7 @@ public final class LuceneCommonMinimumShouldMatchConstraints implements MinimumS
 		}
 		Object previous = minimumShouldMatchConstraints.put( ignoreConstraintCeiling, constraint );
 		if ( previous != null ) {
-			throw log.minimumShouldMatchConflictingConstraints( ignoreConstraintCeiling );
+			throw QueryLog.INSTANCE.minimumShouldMatchConflictingConstraints( ignoreConstraintCeiling );
 		}
 	}
 
@@ -92,7 +89,6 @@ public final class LuceneCommonMinimumShouldMatchConstraints implements MinimumS
 	}
 
 	private static final class MinimumShouldMatchConstraint {
-		private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 		private final Integer matchingClausesNumber;
 		private final Integer matchingClausesPercent;
@@ -122,7 +118,7 @@ public final class LuceneCommonMinimumShouldMatchConstraints implements MinimumS
 			}
 
 			if ( minimum < 1 || minimum > totalShouldClauseNumber ) {
-				throw log.minimumShouldMatchMinimumOutOfBounds( totalShouldClauseNumber, minimum );
+				throw QueryLog.INSTANCE.minimumShouldMatchMinimumOutOfBounds( totalShouldClauseNumber, minimum );
 			}
 
 			return minimum;

@@ -4,7 +4,6 @@
  */
 package org.hibernate.search.mapper.orm.outboxpolling.event.impl;
 
-import java.lang.invoke.MethodHandles;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
@@ -16,14 +15,11 @@ import org.hibernate.search.engine.backend.common.spi.MultiEntityOperationExecut
 import org.hibernate.search.engine.backend.work.execution.OperationSubmitter;
 import org.hibernate.search.mapper.orm.automaticindexing.spi.AutomaticIndexingQueueEventSendingPlan;
 import org.hibernate.search.mapper.orm.outboxpolling.avro.impl.EventPayloadSerializationUtils;
-import org.hibernate.search.mapper.orm.outboxpolling.logging.impl.Log;
+import org.hibernate.search.mapper.orm.outboxpolling.logging.impl.OutboxPollingEventsLog;
 import org.hibernate.search.mapper.pojo.work.spi.PojoIndexingQueueEventPayload;
 import org.hibernate.search.util.common.data.impl.RangeCompatibleHashFunction;
-import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
 public final class OutboxPollingOutboxEventSendingPlan implements AutomaticIndexingQueueEventSendingPlan {
-
-	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	// Note the hash function / table implementations MUST NOT CHANGE,
 	// otherwise existing indexes will no longer work correctly.
@@ -57,7 +53,7 @@ public final class OutboxPollingOutboxEventSendingPlan implements AutomaticIndex
 	@Override
 	public CompletableFuture<MultiEntityOperationExecutionReport> sendAndReport(OperationSubmitter operationSubmitter) {
 		if ( !OperationSubmitter.blocking().equals( operationSubmitter ) ) {
-			throw log.nonblockingOperationSubmitterNotSupported();
+			throw OutboxPollingEventsLog.INSTANCE.nonblockingOperationSubmitterNotSupported();
 		}
 
 		if ( session.isOpen() ) {
@@ -92,7 +88,7 @@ public final class OutboxPollingOutboxEventSendingPlan implements AutomaticIndex
 				}
 			}
 			currentSession.flush();
-			log.tracef( "Persisted %d outbox events: '%s'", events.size(), events );
+			OutboxPollingEventsLog.INSTANCE.tracef( "Persisted %d outbox events: '%s'", events.size(), events );
 			return CompletableFuture.completedFuture( builder.build() );
 		}
 		finally {

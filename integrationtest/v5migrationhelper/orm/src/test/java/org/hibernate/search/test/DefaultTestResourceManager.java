@@ -31,8 +31,8 @@ import org.hibernate.search.backend.lucene.multitenancy.MultiTenancyStrategyName
 import org.hibernate.search.engine.cfg.BackendSettings;
 import org.hibernate.search.test.testsupport.V5MigrationHelperOrmSetupHelper;
 import org.hibernate.search.test.util.TestConfiguration;
-import org.hibernate.search.util.logging.impl.Log;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
+import org.hibernate.search.util.logging.impl.MigrationHelperLog;
 
 /**
  * Manages bootstrap and teardown of an Hibernate SessionFactory for purposes of
@@ -47,7 +47,7 @@ import org.hibernate.search.util.logging.impl.LoggerFactory;
  */
 public final class DefaultTestResourceManager implements TestResourceManager {
 
-	private static final Log log = LoggerFactory.make( MethodHandles.lookup() );
+	private static final MigrationHelperLog log = LoggerFactory.make( MethodHandles.lookup() );
 
 	private final TestConfiguration test;
 	private final V5MigrationHelperOrmSetupHelper setupHelper;

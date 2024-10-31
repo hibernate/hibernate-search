@@ -4,17 +4,14 @@
  */
 package org.hibernate.search.mapper.orm.loading.impl;
 
-import java.lang.invoke.MethodHandles;
-
 import org.hibernate.ObjectNotFoundException;
 import org.hibernate.cache.spi.access.EntityDataAccess;
 import org.hibernate.engine.spi.EntityKey;
 import org.hibernate.engine.spi.SessionImplementor;
 import org.hibernate.metamodel.mapping.EntityMappingType;
 import org.hibernate.persister.entity.EntityPersister;
-import org.hibernate.search.mapper.orm.logging.impl.Log;
+import org.hibernate.search.mapper.orm.logging.impl.OrmSpecificLog;
 import org.hibernate.search.util.common.annotation.impl.SuppressForbiddenApis;
-import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
 /**
  * A lookup strategy that checks the persistence context (first level cache),
@@ -28,8 +25,6 @@ import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 class PersistenceContextThenSecondLevelCacheLookupStrategy
 		implements EntityLoadingCacheLookupStrategyImplementor {
 
-	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
-
 	static EntityLoadingCacheLookupStrategyImplementor create(EntityMappingType entityMappingType,
 			SessionImplementor session) {
 		EntityLoadingCacheLookupStrategyImplementor persistenceContextLookupStrategy =
@@ -38,7 +33,7 @@ class PersistenceContextThenSecondLevelCacheLookupStrategy
 		EntityDataAccess cacheAccess = entityPersister.getCacheAccessStrategy();
 		if ( cacheAccess == null ) {
 			// No second-level cache
-			log.skippingSecondLevelCacheLookupsForNonCachedEntityTypeEntityLoader(
+			OrmSpecificLog.INSTANCE.skippingSecondLevelCacheLookupsForNonCachedEntityTypeEntityLoader(
 					entityPersister.getEntityName() );
 			return persistenceContextLookupStrategy;
 		}

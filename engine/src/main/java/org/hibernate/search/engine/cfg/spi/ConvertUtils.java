@@ -4,7 +4,6 @@
  */
 package org.hibernate.search.engine.cfg.spi;
 
-import java.lang.invoke.MethodHandles;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.Collection;
@@ -16,13 +15,10 @@ import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 import org.hibernate.search.engine.environment.bean.BeanReference;
-import org.hibernate.search.engine.logging.impl.Log;
+import org.hibernate.search.engine.logging.impl.FormattingLog;
 import org.hibernate.search.util.common.SearchException;
-import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
 public final class ConvertUtils {
-
-	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	private ConvertUtils() {
 		// Private constructor, do not use
@@ -47,7 +43,7 @@ public final class ConvertUtils {
 			return parser.apply( (String) value );
 		}
 		catch (RuntimeException e) {
-			throw log.invalidPropertyValue( expectedType, e.getMessage(), e );
+			throw FormattingLog.INSTANCE.invalidPropertyValue( expectedType, e.getMessage(), e );
 		}
 	}
 
@@ -68,10 +64,10 @@ public final class ConvertUtils {
 			}
 		}
 		catch (RuntimeException e) {
-			throw log.invalidBooleanPropertyValue( e.getMessage(), e );
+			throw FormattingLog.INSTANCE.invalidBooleanPropertyValue( e.getMessage(), e );
 		}
 
-		throw log.invalidBooleanPropertyValue( "", null );
+		throw FormattingLog.INSTANCE.invalidBooleanPropertyValue( "", null );
 	}
 
 	/**
@@ -91,10 +87,10 @@ public final class ConvertUtils {
 			}
 		}
 		catch (RuntimeException e) {
-			throw log.invalidIntegerPropertyValue( e.getMessage(), e );
+			throw FormattingLog.INSTANCE.invalidIntegerPropertyValue( e.getMessage(), e );
 		}
 
-		throw log.invalidIntegerPropertyValue( "", null );
+		throw FormattingLog.INSTANCE.invalidIntegerPropertyValue( "", null );
 	}
 
 	/**
@@ -114,10 +110,10 @@ public final class ConvertUtils {
 			}
 		}
 		catch (RuntimeException e) {
-			throw log.invalidLongPropertyValue( e.getMessage(), e );
+			throw FormattingLog.INSTANCE.invalidLongPropertyValue( e.getMessage(), e );
 		}
 
-		throw log.invalidLongPropertyValue( "", null );
+		throw FormattingLog.INSTANCE.invalidLongPropertyValue( "", null );
 	}
 
 	/**
@@ -137,10 +133,10 @@ public final class ConvertUtils {
 			}
 		}
 		catch (RuntimeException e) {
-			throw log.invalidNumberPropertyValue( Byte.class, e.getMessage(), e );
+			throw FormattingLog.INSTANCE.invalidNumberPropertyValue( Byte.class, e.getMessage(), e );
 		}
 
-		throw log.invalidNumberPropertyValue( Byte.class, "", null );
+		throw FormattingLog.INSTANCE.invalidNumberPropertyValue( Byte.class, "", null );
 	}
 
 	/**
@@ -160,10 +156,10 @@ public final class ConvertUtils {
 			}
 		}
 		catch (RuntimeException e) {
-			throw log.invalidNumberPropertyValue( Short.class, e.getMessage(), e );
+			throw FormattingLog.INSTANCE.invalidNumberPropertyValue( Short.class, e.getMessage(), e );
 		}
 
-		throw log.invalidNumberPropertyValue( Short.class, "", null );
+		throw FormattingLog.INSTANCE.invalidNumberPropertyValue( Short.class, "", null );
 	}
 
 	/**
@@ -183,10 +179,10 @@ public final class ConvertUtils {
 			}
 		}
 		catch (RuntimeException e) {
-			throw log.invalidNumberPropertyValue( Float.class, e.getMessage(), e );
+			throw FormattingLog.INSTANCE.invalidNumberPropertyValue( Float.class, e.getMessage(), e );
 		}
 
-		throw log.invalidNumberPropertyValue( Float.class, "", null );
+		throw FormattingLog.INSTANCE.invalidNumberPropertyValue( Float.class, "", null );
 	}
 
 	/**
@@ -206,10 +202,10 @@ public final class ConvertUtils {
 			}
 		}
 		catch (RuntimeException e) {
-			throw log.invalidNumberPropertyValue( Double.class, e.getMessage(), e );
+			throw FormattingLog.INSTANCE.invalidNumberPropertyValue( Double.class, e.getMessage(), e );
 		}
 
-		throw log.invalidNumberPropertyValue( Double.class, "", null );
+		throw FormattingLog.INSTANCE.invalidNumberPropertyValue( Double.class, "", null );
 	}
 
 	/**
@@ -232,10 +228,10 @@ public final class ConvertUtils {
 			}
 		}
 		catch (RuntimeException e) {
-			throw log.invalidNumberPropertyValue( BigDecimal.class, e.getMessage(), e );
+			throw FormattingLog.INSTANCE.invalidNumberPropertyValue( BigDecimal.class, e.getMessage(), e );
 		}
 
-		throw log.invalidNumberPropertyValue( BigDecimal.class, "", null );
+		throw FormattingLog.INSTANCE.invalidNumberPropertyValue( BigDecimal.class, "", null );
 	}
 
 	/**
@@ -258,10 +254,10 @@ public final class ConvertUtils {
 			}
 		}
 		catch (RuntimeException e) {
-			throw log.invalidNumberPropertyValue( BigInteger.class, e.getMessage(), e );
+			throw FormattingLog.INSTANCE.invalidNumberPropertyValue( BigInteger.class, e.getMessage(), e );
 		}
 
-		throw log.invalidNumberPropertyValue( BigInteger.class, "", null );
+		throw FormattingLog.INSTANCE.invalidNumberPropertyValue( BigInteger.class, "", null );
 	}
 
 	public static <T> BeanReference<? extends T> convertBeanReference(Class<T> expectedType, Object value) {
@@ -282,10 +278,10 @@ public final class ConvertUtils {
 			}
 		}
 		catch (RuntimeException e) {
-			throw log.invalidBeanReferencePropertyValue( expectedType, e.getMessage(), e );
+			throw FormattingLog.INSTANCE.invalidBeanReferencePropertyValue( expectedType, e.getMessage(), e );
 		}
 
-		throw log.invalidBeanReferencePropertyValue( expectedType, "", null );
+		throw FormattingLog.INSTANCE.invalidBeanReferencePropertyValue( expectedType, "", null );
 	}
 
 	public static <T> List<T> convertMultiValue(Pattern separatorPattern,
@@ -310,7 +306,7 @@ public final class ConvertUtils {
 				singleElement = elementConverter.apply( value );
 			}
 			catch (RuntimeException e) {
-				throw log.invalidMultiPropertyValue( e.getMessage(), e );
+				throw FormattingLog.INSTANCE.invalidMultiPropertyValue( e.getMessage(), e );
 			}
 			if ( singleElement == null ) {
 				return Collections.emptyList();

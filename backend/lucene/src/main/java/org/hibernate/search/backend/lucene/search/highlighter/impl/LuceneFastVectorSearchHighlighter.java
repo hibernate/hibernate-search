@@ -15,6 +15,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Set;
 
+import org.hibernate.search.backend.lucene.logging.impl.QueryLog;
 import org.hibernate.search.backend.lucene.lowlevel.collector.impl.Values;
 import org.hibernate.search.backend.lucene.search.projection.impl.ProjectionExtractContext;
 import org.hibernate.search.engine.search.highlighter.dsl.HighlighterFragmenter;
@@ -160,7 +161,7 @@ class LuceneFastVectorSearchHighlighter extends LuceneAbstractSearchHighlighter 
 									LuceneFastVectorSearchHighlighter.this.boundaryScannerLocale )
 					);
 				default:
-					throw log.unsupportedBoundaryScannerType(
+					throw QueryLog.INSTANCE.unsupportedBoundaryScannerType(
 							LuceneFastVectorSearchHighlighter.this.getClass().getSimpleName(),
 							LuceneFastVectorSearchHighlighter.this.boundaryScannerType
 					);

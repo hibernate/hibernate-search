@@ -4,25 +4,21 @@
  */
 package org.hibernate.search.engine.search.projection.dsl.impl;
 
-import java.lang.invoke.MethodHandles;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import org.hibernate.search.engine.backend.reporting.spi.BackendMappingHints;
-import org.hibernate.search.engine.logging.impl.Log;
+import org.hibernate.search.engine.logging.impl.QueryLog;
 import org.hibernate.search.engine.search.projection.SearchProjection;
 import org.hibernate.search.engine.search.projection.dsl.EntityProjectionOptionsStep;
 import org.hibernate.search.engine.search.projection.dsl.SearchProjectionFactory;
 import org.hibernate.search.engine.search.projection.dsl.spi.SearchProjectionDslContext;
 import org.hibernate.search.engine.search.projection.spi.ProjectionMappedTypeContext;
 import org.hibernate.search.engine.search.projection.spi.SearchProjectionIndexScope;
-import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
 public final class EntityProjectionOptionsStepImpl<E>
 		implements EntityProjectionOptionsStep<EntityProjectionOptionsStepImpl<E>, E> {
-
-	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	private final SearchProjectionIndexScope<?> scope;
 	private final SearchProjectionFactory<?, ?> projectionFactory;
@@ -63,7 +59,8 @@ public final class EntityProjectionOptionsStepImpl<E>
 	@SuppressWarnings({ "unchecked" })
 	private SearchProjection<E> toProjection(ProjectionMappedTypeContext mappedTypeContext) {
 		if ( requestedEntityType != null && !requestedEntityType.isAssignableFrom( mappedTypeContext.javaClass() ) ) {
-			throw log.invalidTypeForEntityProjection( mappedTypeContext.name(), mappedTypeContext.javaClass(),
+			throw QueryLog.INSTANCE.invalidTypeForEntityProjection( mappedTypeContext.name(),
+					mappedTypeContext.javaClass(),
 					requestedEntityType
 			);
 		}
@@ -84,7 +81,7 @@ public final class EntityProjectionOptionsStepImpl<E>
 		// where the projection is impossible but it's just the default so it's not the user's fault,
 		// and in the end does not matter because the projection is never executed anyway.
 		BackendMappingHints hints = scope.mappingContext().hints();
-		return scope.projectionBuilders().throwing( () -> log.cannotCreateEntityProjection(
+		return scope.projectionBuilders().throwing( () -> QueryLog.INSTANCE.cannotCreateEntityProjection(
 				mappedTypeContext.name(), mappedTypeContext.javaClass(),
 				hints.noEntityProjectionAvailable() ) );
 	}

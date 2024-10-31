@@ -4,7 +4,6 @@
  */
 package org.hibernate.search.mapper.pojo.mapping.building.impl;
 
-import java.lang.invoke.MethodHandles;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Set;
@@ -17,15 +16,12 @@ import org.hibernate.search.engine.mapper.model.spi.MappingElement;
 import org.hibernate.search.engine.mapper.model.spi.TypeMetadataContributorProvider;
 import org.hibernate.search.engine.reporting.spi.ContextualFailureCollector;
 import org.hibernate.search.engine.reporting.spi.FailureCollector;
-import org.hibernate.search.mapper.pojo.logging.impl.Log;
+import org.hibernate.search.mapper.pojo.logging.impl.MappingLog;
 import org.hibernate.search.mapper.pojo.mapping.building.spi.PojoTypeMetadataContributor;
 import org.hibernate.search.mapper.pojo.model.additionalmetadata.building.impl.PojoTypeAdditionalMetadataProvider;
 import org.hibernate.search.mapper.pojo.model.spi.PojoBootstrapIntrospector;
-import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
 public class PojoMappingHelper implements IndexedEntityBindingMapperContext {
-
-	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	private final BeanResolver beanResolver;
 	private final ContextualFailureCollector failureCollector;
@@ -93,7 +89,7 @@ public class PojoMappingHelper implements IndexedEntityBindingMapperContext {
 			Set<String> uselessIncludePaths = pathTracker.uselessIncludePaths();
 			if ( !uselessIncludePaths.isEmpty() ) {
 				Set<String> encounteredFieldPaths = pathTracker.encounteredFieldPaths();
-				failureCollector.add( log.uselessIncludePathFilters(
+				failureCollector.add( MappingLog.INSTANCE.uselessIncludePathFilters(
 						entry.getKey(),
 						uselessIncludePaths, encounteredFieldPaths,
 						entry.getKey().eventContext()
@@ -104,7 +100,7 @@ public class PojoMappingHelper implements IndexedEntityBindingMapperContext {
 			// this would mean that we have a path in excludes that is unavailable
 			if ( !uselessExcludePaths.isEmpty() ) {
 				Set<String> encounteredFieldPaths = pathTracker.encounteredFieldPaths();
-				failureCollector.add( log.uselessExcludePathFilters(
+				failureCollector.add( MappingLog.INSTANCE.uselessExcludePathFilters(
 						entry.getKey(),
 						uselessExcludePaths, encounteredFieldPaths,
 						entry.getKey().eventContext()

@@ -4,23 +4,19 @@
  */
 package org.hibernate.search.backend.lucene.types.codec.impl;
 
-import java.lang.invoke.MethodHandles;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.math.RoundingMode;
 
-import org.hibernate.search.backend.lucene.logging.impl.Log;
+import org.hibernate.search.backend.lucene.logging.impl.IndexingLog;
 import org.hibernate.search.backend.lucene.types.lowlevel.impl.LuceneLongDomain;
 import org.hibernate.search.backend.lucene.types.lowlevel.impl.LuceneNumericDomain;
 import org.hibernate.search.engine.cfg.spi.NumberScaleConstants;
-import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
 import org.apache.lucene.document.StoredField;
 import org.apache.lucene.index.IndexableField;
 
 public final class LuceneBigDecimalFieldCodec extends AbstractLuceneNumericFieldCodec<BigDecimal, Long> {
-
-	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	private final int decimalScale;
 	private final BigDecimal minScaledValue;
@@ -61,7 +57,7 @@ public final class LuceneBigDecimalFieldCodec extends AbstractLuceneNumericField
 	@Override
 	public Long encode(BigDecimal value) {
 		if ( value.compareTo( minScaledValue ) < 0 || value.compareTo( maxScaledValue ) > 0 ) {
-			throw log.scaledNumberTooLarge( value, minScaledValue, maxScaledValue );
+			throw IndexingLog.INSTANCE.scaledNumberTooLarge( value, minScaledValue, maxScaledValue );
 		}
 
 		return unscale( value );

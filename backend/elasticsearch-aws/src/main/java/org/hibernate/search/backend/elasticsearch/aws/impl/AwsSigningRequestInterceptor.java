@@ -5,15 +5,13 @@
 package org.hibernate.search.backend.elasticsearch.aws.impl;
 
 import java.io.IOException;
-import java.lang.invoke.MethodHandles;
 import java.nio.charset.StandardCharsets;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
+import org.hibernate.search.backend.elasticsearch.aws.logging.impl.AwsLog;
 import org.hibernate.search.util.common.AssertionFailure;
-import org.hibernate.search.util.common.logging.impl.Log;
-import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpEntityEnclosingRequest;
@@ -35,8 +33,6 @@ import software.amazon.awssdk.http.auth.spi.signer.SignedRequest;
 import software.amazon.awssdk.regions.Region;
 
 class AwsSigningRequestInterceptor implements HttpRequestInterceptor {
-
-	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	private final AwsV4HttpSigner signer;
 	private final Region region;
@@ -60,13 +56,13 @@ class AwsSigningRequestInterceptor implements HttpRequestInterceptor {
 	private void sign(HttpRequest request, HttpContext context, HttpEntityContentStreamProvider contentStreamProvider) {
 		SdkHttpFullRequest awsRequest = toAwsRequest( request, context, contentStreamProvider );
 
-		if ( log.isTraceEnabled() ) {
-			log.tracef( "HTTP request (before signing): %s", request );
-			log.tracef( "AWS request (before signing): %s", awsRequest );
+		if ( AwsLog.INSTANCE.isTraceEnabled() ) {
+			AwsLog.INSTANCE.tracef( "HTTP request (before signing): %s", request );
+			AwsLog.INSTANCE.tracef( "AWS request (before signing): %s", awsRequest );
 		}
 
 		AwsCredentials credentials = credentialsProvider.resolveCredentials();
-		log.tracef( "AWS credentials: %s", credentials );
+		AwsLog.INSTANCE.tracef( "AWS credentials: %s", credentials );
 
 		SignedRequest signedRequest = signer.sign( r -> r.identity( credentials )
 				.request( awsRequest )
@@ -91,9 +87,9 @@ class AwsSigningRequestInterceptor implements HttpRequestInterceptor {
 			}
 		}
 
-		if ( log.isTraceEnabled() ) {
-			log.tracef( "AWS request (after signing): %s", signedRequest );
-			log.tracef( "HTTP request (after signing): %s", request );
+		if ( AwsLog.INSTANCE.isTraceEnabled() ) {
+			AwsLog.INSTANCE.tracef( "AWS request (after signing): %s", signedRequest );
+			AwsLog.INSTANCE.tracef( "HTTP request (after signing): %s", request );
 		}
 	}
 

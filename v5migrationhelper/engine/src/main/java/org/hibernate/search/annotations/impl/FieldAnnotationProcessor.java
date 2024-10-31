@@ -45,13 +45,13 @@ import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.Property
 import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.PropertyMappingStep;
 import org.hibernate.search.util.common.AssertionFailure;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
-import org.hibernate.search.util.logging.impl.Log;
+import org.hibernate.search.util.logging.impl.MigrationHelperLog;
 
 @Deprecated
 public class FieldAnnotationProcessor implements PropertyMappingAnnotationProcessor<Field> {
 	private static final String LEGACY_DEFAULT_NULL_TOKEN = "__DEFAULT_NULL_TOKEN__";
 
-	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
+	private static final MigrationHelperLog log = LoggerFactory.make( MigrationHelperLog.class, MethodHandles.lookup() );
 
 	@Override
 	public void process(PropertyMappingStep mapping, Field annotation,

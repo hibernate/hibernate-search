@@ -5,7 +5,6 @@
 package org.hibernate.search.jakarta.batch.core.massindexing.step.impl;
 
 import java.io.IOException;
-import java.lang.invoke.MethodHandles;
 import java.util.List;
 
 import jakarta.batch.api.BatchProperty;
@@ -18,14 +17,13 @@ import jakarta.persistence.LockModeType;
 
 import org.hibernate.StatelessSession;
 import org.hibernate.engine.spi.SharedSessionContractImplementor;
-import org.hibernate.search.jakarta.batch.core.logging.impl.Log;
+import org.hibernate.search.jakarta.batch.core.logging.impl.JakartaBatchLog;
 import org.hibernate.search.jakarta.batch.core.massindexing.MassIndexingJobParameters;
 import org.hibernate.search.jakarta.batch.core.massindexing.impl.JobContextData;
 import org.hibernate.search.jakarta.batch.core.massindexing.util.impl.EntityTypeDescriptor;
 import org.hibernate.search.jakarta.batch.core.massindexing.util.impl.PersistenceUtil;
 import org.hibernate.search.jakarta.batch.core.massindexing.util.impl.SerializationUtil;
 import org.hibernate.search.mapper.orm.loading.spi.ConditionalExpression;
-import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
 /**
  * Listener for managing the step indexing progress.
@@ -33,8 +31,6 @@ import org.hibernate.search.util.common.logging.impl.LoggerFactory;
  * @author Mincong Huang
  */
 public class StepProgressSetupListener extends AbstractStepListener {
-
-	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	@Inject
 	private JobContext jobContext;
@@ -77,7 +73,7 @@ public class StepProgressSetupListener extends AbstractStepListener {
 					PersistenceUtil.openStatelessSession( emf, jobData.getTenancyConfiguration().convert( tenantId ) ) ) {
 				for ( EntityTypeDescriptor<?, ?> type : jobData.getEntityTypeDescriptors() ) {
 					Long rowCount = countAll( session, type, reindexOnly );
-					log.rowsToIndex( type.jpaEntityName(), rowCount );
+					JakartaBatchLog.INSTANCE.rowsToIndex( type.jpaEntityName(), rowCount );
 					stepProgress.setRowsToIndex( type.jpaEntityName(), rowCount );
 				}
 			}

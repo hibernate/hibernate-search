@@ -4,18 +4,14 @@
  */
 package org.hibernate.search.mapper.pojo.identity.impl;
 
-import java.lang.invoke.MethodHandles;
 import java.util.function.Supplier;
 
 import org.hibernate.search.mapper.pojo.bridge.runtime.spi.BridgeMappingContext;
 import org.hibernate.search.mapper.pojo.bridge.runtime.spi.BridgeSessionContext;
-import org.hibernate.search.mapper.pojo.logging.impl.Log;
+import org.hibernate.search.mapper.pojo.logging.impl.MappingLog;
 import org.hibernate.search.mapper.pojo.model.spi.PojoRawTypeIdentifier;
-import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
 public final class UnconfiguredIdentifierMapping<E> implements IdentifierMappingImplementor<Object, E> {
-
-	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	private final PojoRawTypeIdentifier<E> typeIdentifier;
 
@@ -40,7 +36,7 @@ public final class UnconfiguredIdentifierMapping<E> implements IdentifierMapping
 			return providedId;
 		}
 		else {
-			throw log.cannotWorkWithIdentifierBecauseUnconfiguredIdentifierMapping( typeIdentifier );
+			throw MappingLog.INSTANCE.cannotWorkWithIdentifierBecauseUnconfiguredIdentifierMapping( typeIdentifier );
 		}
 	}
 
@@ -51,11 +47,11 @@ public final class UnconfiguredIdentifierMapping<E> implements IdentifierMapping
 
 	@Override
 	public String toDocumentIdentifier(Object identifier, BridgeMappingContext context) {
-		throw log.cannotWorkWithIdentifierBecauseUnconfiguredIdentifierMapping( typeIdentifier );
+		throw MappingLog.INSTANCE.cannotWorkWithIdentifierBecauseUnconfiguredIdentifierMapping( typeIdentifier );
 	}
 
 	@Override
 	public Object fromDocumentIdentifier(String documentId, BridgeSessionContext sessionContext) {
-		throw log.cannotWorkWithIdentifierBecauseUnconfiguredIdentifierMapping( typeIdentifier );
+		throw MappingLog.INSTANCE.cannotWorkWithIdentifierBecauseUnconfiguredIdentifierMapping( typeIdentifier );
 	}
 }

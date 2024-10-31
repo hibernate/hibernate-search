@@ -4,7 +4,6 @@
  */
 package org.hibernate.search.mapper.pojo.massindexing.impl;
 
-import java.lang.invoke.MethodHandles;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
@@ -12,14 +11,13 @@ import java.util.concurrent.Future;
 import java.util.concurrent.ThreadPoolExecutor;
 
 import org.hibernate.search.mapper.pojo.loading.spi.PojoMassLoadingStrategy;
-import org.hibernate.search.mapper.pojo.logging.impl.Log;
+import org.hibernate.search.mapper.pojo.logging.impl.MassIndexingLog;
 import org.hibernate.search.mapper.pojo.massindexing.MassIndexingEnvironment;
 import org.hibernate.search.mapper.pojo.massindexing.MassIndexingTypeGroupMonitor;
 import org.hibernate.search.mapper.pojo.massindexing.spi.PojoMassIndexingContext;
 import org.hibernate.search.mapper.pojo.massindexing.spi.PojoMassIndexingMappingContext;
 import org.hibernate.search.util.common.AssertionFailure;
 import org.hibernate.search.util.common.impl.Futures;
-import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
 /**
  * This runnable will prepare a pipeline for batch indexing
@@ -32,8 +30,6 @@ import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 public class PojoMassIndexingBatchIndexingWorkspace<E, I> extends PojoMassIndexingFailureHandledRunnable {
 
 	public static final String THREAD_NAME_PREFIX = "Mass indexing - ";
-
-	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	private final List<CompletableFuture<?>> identifierProducingFutures = new ArrayList<>();
 	private final List<CompletableFuture<?>> indexingFutures = new ArrayList<>();
@@ -80,7 +76,7 @@ public class PojoMassIndexingBatchIndexingWorkspace<E, I> extends PojoMassIndexi
 		allFutures.addAll( indexingFutures );
 		Futures.unwrappedExceptionGet( Futures.firstFailureOrAllOf( allFutures ) );
 		typeGroupMonitor.indexingCompleted( massIndexingTypeGroupContext );
-		log.debugf( "Indexing for %s is done", typeGroup.notifiedGroupName() );
+		MassIndexingLog.INSTANCE.debugf( "Indexing for %s is done", typeGroup.notifiedGroupName() );
 	}
 
 	@Override

@@ -4,7 +4,6 @@
  */
 package org.hibernate.search.mapper.orm.outboxpolling.event.impl;
 
-import java.lang.invoke.MethodHandles;
 import java.time.Clock;
 import java.time.Duration;
 import java.util.concurrent.CompletableFuture;
@@ -21,17 +20,14 @@ import org.hibernate.search.mapper.orm.common.spi.SessionHelper;
 import org.hibernate.search.mapper.orm.common.spi.TransactionHelper;
 import org.hibernate.search.mapper.orm.outboxpolling.cfg.HibernateOrmMapperOutboxPollingSettings;
 import org.hibernate.search.mapper.orm.outboxpolling.cluster.impl.AgentRepositoryProvider;
-import org.hibernate.search.mapper.orm.outboxpolling.logging.impl.Log;
+import org.hibernate.search.mapper.orm.outboxpolling.logging.impl.OutboxPollingEventsLog;
 import org.hibernate.search.mapper.pojo.massindexing.spi.PojoMassIndexerAgent;
 import org.hibernate.search.mapper.pojo.massindexing.spi.PojoMassIndexerAgentStartContext;
 import org.hibernate.search.util.common.impl.Closer;
-import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 import org.hibernate.search.util.common.spi.ToStringTreeAppendable;
 import org.hibernate.search.util.common.spi.ToStringTreeAppender;
 
 public final class OutboxPollingMassIndexerAgent implements PojoMassIndexerAgent, ToStringTreeAppendable {
-
-	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	private static String name(String tenantId) {
 		StringBuilder prefix = new StringBuilder( "Mass indexer agent" );
@@ -147,7 +143,7 @@ public final class OutboxPollingMassIndexerAgent implements PojoMassIndexerAgent
 
 	@Override
 	public CompletableFuture<?> start(PojoMassIndexerAgentStartContext context) {
-		log.startingOutboxMassIndexerAgent( name, this );
+		OutboxPollingEventsLog.INSTANCE.startingOutboxMassIndexerAgent( name, this );
 
 		processingTask = new SingletonTask(
 				name,
@@ -169,7 +165,7 @@ public final class OutboxPollingMassIndexerAgent implements PojoMassIndexerAgent
 
 	@Override
 	public void stop() {
-		log.stoppingOutboxMassIndexerAgent( name );
+		OutboxPollingEventsLog.INSTANCE.stoppingOutboxMassIndexerAgent( name );
 		try ( Closer<RuntimeException> closer = new Closer<>() ) {
 			closer.push( SingletonTask::stop, processingTask );
 			closer.push( OutboxPollingMassIndexerAgent::leaveCluster, this );

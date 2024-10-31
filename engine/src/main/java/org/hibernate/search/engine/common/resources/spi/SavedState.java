@@ -4,22 +4,18 @@
  */
 package org.hibernate.search.engine.common.resources.spi;
 
-import java.lang.invoke.MethodHandles;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 
-import org.hibernate.search.engine.logging.impl.Log;
+import org.hibernate.search.engine.logging.impl.CommonFailureLog;
 import org.hibernate.search.util.common.impl.Closer;
 import org.hibernate.search.util.common.impl.Contracts;
 import org.hibernate.search.util.common.impl.Throwables;
-import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 import org.hibernate.search.util.common.spi.ClosingOperator;
 
 public class SavedState implements AutoCloseable {
-
-	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	private static final SavedState EMPTY = new SavedState.Builder().build();
 
@@ -98,7 +94,8 @@ public class SavedState implements AutoCloseable {
 					entry.getValue().close();
 				}
 				catch (RuntimeException e) {
-					throw log.unableToCloseSavedValue( Throwables.safeToString( e, entry.toString() ), e.getMessage(), e );
+					throw CommonFailureLog.INSTANCE.unableToCloseSavedValue( Throwables.safeToString( e, entry.toString() ),
+							e.getMessage(), e );
 				}
 			}, map.entrySet() );
 		}
@@ -156,7 +153,7 @@ public class SavedState implements AutoCloseable {
 				closingOperator.close( value );
 			}
 			catch (Exception e) {
-				throw log.unableToCloseSavedValue( key.name, e.getMessage(), e );
+				throw CommonFailureLog.INSTANCE.unableToCloseSavedValue( key.name, e.getMessage(), e );
 			}
 		}
 	}

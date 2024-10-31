@@ -4,16 +4,14 @@
  */
 package org.hibernate.search.engine.environment.classpath.spi;
 
-import java.lang.invoke.MethodHandles;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.hibernate.search.engine.logging.impl.Log;
+import org.hibernate.search.engine.logging.impl.BeanLog;
 import org.hibernate.search.util.common.SearchException;
 import org.hibernate.search.util.common.impl.Throwables;
-import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
 /**
  * Utility class to load instances of other classes by using a fully qualified name,
@@ -26,8 +24,6 @@ import org.hibernate.search.util.common.logging.impl.LoggerFactory;
  * @author Ales Justin
  */
 public class ClassLoaderHelper {
-
-	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	private ClassLoaderHelper() {
 	}
@@ -57,7 +53,7 @@ public class ClassLoaderHelper {
 			instance = callNoArgConstructor( classToLoad );
 		}
 		catch (IllegalAccessException | InvocationTargetException | InstantiationException | RuntimeException e) {
-			throw log.unableToInstantiateClass( classNameToLoad, Throwables.getFirstNonNullMessage( e ), e );
+			throw BeanLog.INSTANCE.unableToInstantiateClass( classNameToLoad, Throwables.getFirstNonNullMessage( e ), e );
 		}
 		return verifySuperTypeCompatibility( targetSuperType, instance, classToLoad );
 	}
@@ -78,7 +74,7 @@ public class ClassLoaderHelper {
 			return callNoArgConstructor( classToLoad );
 		}
 		catch (IllegalAccessException | InvocationTargetException | InstantiationException | RuntimeException e) {
-			throw log.unableToInstantiateClass( classToLoad.getName(), Throwables.getFirstNonNullMessage( e ), e );
+			throw BeanLog.INSTANCE.unableToInstantiateClass( classToLoad.getName(), Throwables.getFirstNonNullMessage( e ), e );
 		}
 	}
 
@@ -94,7 +90,7 @@ public class ClassLoaderHelper {
 	@SuppressWarnings("unchecked")
 	private static <T> T verifySuperTypeCompatibility(Class<T> targetSuperType, Object instance, Class<?> classToLoad) {
 		if ( !targetSuperType.isInstance( instance ) ) {
-			throw log.subtypeExpected( classToLoad, targetSuperType );
+			throw BeanLog.INSTANCE.subtypeExpected( classToLoad, targetSuperType );
 		}
 		else {
 			return (T) instance;
@@ -122,14 +118,14 @@ public class ClassLoaderHelper {
 			instance = callMapArgConstructor( classToLoad, constructorParameter );
 		}
 		catch (Exception e) {
-			throw log.unableToInstantiateClass( classToLoad.getName(), Throwables.getFirstNonNullMessage( e ), e );
+			throw BeanLog.INSTANCE.unableToInstantiateClass( classToLoad.getName(), Throwables.getFirstNonNullMessage( e ), e );
 		}
 		return verifySuperTypeCompatibility( targetSuperType, instance, classToLoad );
 	}
 
 	private static void checkInstantiable(Class<?> classToLoad) {
 		if ( classToLoad.isInterface() ) {
-			throw log.implementationRequired( classToLoad );
+			throw BeanLog.INSTANCE.implementationRequired( classToLoad );
 		}
 	}
 
@@ -141,7 +137,7 @@ public class ClassLoaderHelper {
 			return constructor.newInstance();
 		}
 		catch (NoSuchMethodException e) {
-			throw log.noPublicNoArgConstructor( classToLoad );
+			throw BeanLog.INSTANCE.noPublicNoArgConstructor( classToLoad );
 		}
 	}
 
@@ -156,7 +152,7 @@ public class ClassLoaderHelper {
 			return singleMapConstructor.newInstance( constructorParameter );
 		}
 		catch (NoSuchMethodException e) {
-			throw log.noPublicMapArgConstructor( classToLoad );
+			throw BeanLog.INSTANCE.noPublicMapArgConstructor( classToLoad );
 		}
 	}
 
@@ -168,7 +164,7 @@ public class ClassLoaderHelper {
 			return clazzDef.asSubclass( targetSuperType );
 		}
 		catch (ClassCastException cce) {
-			throw log.subtypeExpected( clazzDef, targetSuperType );
+			throw BeanLog.INSTANCE.subtypeExpected( clazzDef, targetSuperType );
 		}
 	}
 }

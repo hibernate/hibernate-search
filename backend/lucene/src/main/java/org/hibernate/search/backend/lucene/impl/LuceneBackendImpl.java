@@ -4,7 +4,6 @@
  */
 package org.hibernate.search.backend.lucene.impl;
 
-import java.lang.invoke.MethodHandles;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 
@@ -14,7 +13,7 @@ import org.hibernate.search.backend.lucene.cache.impl.LuceneQueryCachingContext;
 import org.hibernate.search.backend.lucene.document.model.dsl.impl.LuceneIndexRootBuilder;
 import org.hibernate.search.backend.lucene.index.impl.IndexManagerBackendContext;
 import org.hibernate.search.backend.lucene.index.impl.LuceneIndexManagerBuilder;
-import org.hibernate.search.backend.lucene.logging.impl.Log;
+import org.hibernate.search.backend.lucene.logging.impl.CommonFailureLog;
 import org.hibernate.search.backend.lucene.multitenancy.impl.MultiTenancyStrategy;
 import org.hibernate.search.backend.lucene.orchestration.impl.LuceneSyncWorkOrchestratorImpl;
 import org.hibernate.search.backend.lucene.resources.impl.BackendThreads;
@@ -30,15 +29,12 @@ import org.hibernate.search.engine.common.timing.spi.TimingSource;
 import org.hibernate.search.engine.reporting.FailureHandler;
 import org.hibernate.search.engine.reporting.spi.EventContexts;
 import org.hibernate.search.util.common.impl.Closer;
-import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 import org.hibernate.search.util.common.reporting.EventContext;
 
 import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.search.similarities.Similarity;
 
 public class LuceneBackendImpl implements BackendImplementor, LuceneBackend {
-
-	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	private final Optional<String> backendName;
 
@@ -111,7 +107,7 @@ public class LuceneBackendImpl implements BackendImplementor, LuceneBackend {
 		if ( clazz.isAssignableFrom( LuceneBackend.class ) ) {
 			return (T) this;
 		}
-		throw log.backendUnwrappingWithUnknownType(
+		throw CommonFailureLog.INSTANCE.backendUnwrappingWithUnknownType(
 				clazz, LuceneBackend.class, eventContext
 		);
 	}

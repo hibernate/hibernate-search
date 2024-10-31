@@ -21,13 +21,12 @@ import org.hibernate.models.spi.ClassDetailsRegistry;
 import org.hibernate.resource.beans.container.spi.ExtendedBeanManager;
 import org.hibernate.search.mapper.orm.bootstrap.spi.HibernateOrmIntegrationBooter;
 import org.hibernate.search.mapper.orm.common.impl.HibernateOrmUtils;
-import org.hibernate.search.mapper.orm.logging.impl.Log;
+import org.hibernate.search.mapper.orm.logging.impl.CommonFailureLog;
 import org.hibernate.search.mapper.orm.mapping.impl.HibernateSearchContextProviderService;
 import org.hibernate.search.mapper.orm.spi.EnvironmentSynchronizer;
 import org.hibernate.search.util.common.AssertionFailure;
 import org.hibernate.search.util.common.impl.Futures;
 import org.hibernate.search.util.common.impl.SuppressingCloser;
-import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 import org.hibernate.search.util.common.reflect.spi.ValueHandleFactory;
 import org.hibernate.service.ServiceRegistry;
 
@@ -35,7 +34,6 @@ import org.jboss.jandex.IndexView;
 
 public class HibernateOrmIntegrationBooterImpl implements HibernateOrmIntegrationBooter {
 
-	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	private final Metadata metadata;
 	private final IndexView jandexIndex;
@@ -167,7 +165,7 @@ public class HibernateOrmIntegrationBooterImpl implements HibernateOrmIntegratio
 				// to skip further cleanup of other resources.
 				.whenComplete( Futures.handler( (ignored, throwable) -> {
 					if ( throwable != null ) {
-						log.shutdownFailed( throwable );
+						CommonFailureLog.INSTANCE.shutdownFailed( throwable );
 					}
 				} ) );
 

@@ -5,15 +5,13 @@
 package org.hibernate.search.backend.lucene.analysis.impl;
 
 import java.io.IOException;
-import java.lang.invoke.MethodHandles;
 import java.util.ArrayList;
 import java.util.List;
 
 import org.hibernate.search.backend.lucene.LuceneBackend;
-import org.hibernate.search.backend.lucene.logging.impl.Log;
+import org.hibernate.search.backend.lucene.logging.impl.AnalyzerLog;
 import org.hibernate.search.engine.backend.analysis.AnalysisToken;
 import org.hibernate.search.util.common.AssertionFailure;
-import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
 import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.analysis.TokenStream;
@@ -22,7 +20,6 @@ import org.apache.lucene.analysis.tokenattributes.OffsetAttribute;
 import org.apache.lucene.analysis.tokenattributes.TypeAttribute;
 
 public class LuceneAnalysisPerformer {
-	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	private final LuceneBackend backend;
 
@@ -32,14 +29,14 @@ public class LuceneAnalysisPerformer {
 
 	public List<? extends AnalysisToken> analyze(String analyzerName, String terms) {
 		Analyzer analyzer = backend.analyzer( analyzerName )
-				.orElseThrow( () -> log.noSuchAnalyzer( analyzerName ) );
+				.orElseThrow( () -> AnalyzerLog.INSTANCE.noSuchAnalyzer( analyzerName ) );
 
 		return analyze( analyzerName, analyzer, terms );
 	}
 
 	public AnalysisToken normalize(String normalizerName, String terms) {
 		Analyzer analyzer = backend.normalizer( normalizerName )
-				.orElseThrow( () -> log.noSuchNormalizer( normalizerName ) );
+				.orElseThrow( () -> AnalyzerLog.INSTANCE.noSuchNormalizer( normalizerName ) );
 
 		List<LuceneAnalysisToken> tokens = analyze( normalizerName, analyzer, terms );
 		if ( tokens.size() != 1 ) {
@@ -68,7 +65,7 @@ public class LuceneAnalysisPerformer {
 			}
 		}
 		catch (IOException e) {
-			throw log.unableToPerformAnalysisOperation( analyzerName, string, e.getMessage(), e );
+			throw AnalyzerLog.INSTANCE.unableToPerformAnalysisOperation( analyzerName, string, e.getMessage(), e );
 		}
 		return tokens;
 	}

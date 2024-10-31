@@ -4,7 +4,6 @@
  */
 package org.hibernate.search.mapper.orm.loading.impl;
 
-import java.lang.invoke.MethodHandles;
 import java.util.ArrayList;
 import java.util.OptionalLong;
 
@@ -13,15 +12,13 @@ import org.hibernate.ScrollableResults;
 import org.hibernate.engine.spi.SharedSessionContractImplementor;
 import org.hibernate.search.mapper.orm.common.spi.TransactionHelper;
 import org.hibernate.search.mapper.orm.loading.spi.HibernateOrmQueryLoader;
-import org.hibernate.search.mapper.orm.logging.impl.Log;
+import org.hibernate.search.mapper.orm.logging.impl.LoadingLog;
+import org.hibernate.search.mapper.orm.logging.impl.OrmSpecificLog;
 import org.hibernate.search.mapper.pojo.loading.spi.PojoMassIdentifierLoader;
 import org.hibernate.search.mapper.pojo.loading.spi.PojoMassIdentifierSink;
 import org.hibernate.search.util.common.impl.Closer;
-import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
 public final class HibernateOrmMassIdentifierLoader<E, I> implements PojoMassIdentifierLoader {
-
-	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	private final HibernateOrmMassLoadingContext options;
 	private final PojoMassIdentifierSink<I> sink;
@@ -54,8 +51,8 @@ public final class HibernateOrmMassIdentifierLoader<E, I> implements PojoMassIde
 				totalCount = totalCountFromQuery;
 			}
 
-			if ( log.isDebugEnabled() ) {
-				log.debugf( "going to fetch %d primary keys", totalCount );
+			if ( LoadingLog.INSTANCE.isDebugEnabled() ) {
+				LoadingLog.INSTANCE.debugf( "going to fetch %d primary keys", totalCount );
 			}
 
 			results = typeQueryLoader.createIdentifiersQuery( session )
@@ -100,7 +97,7 @@ public final class HibernateOrmMassIdentifierLoader<E, I> implements PojoMassIde
 			// Explicitly checking whether the TX is still open; Depending on the driver implementation new ids
 			// might be produced otherwise if the driver fetches all rows up-front
 			if ( !session.isTransactionInProgress() ) {
-				throw log.transactionNotActiveWhileProducingIdsForBatchIndexing();
+				throw OrmSpecificLog.INSTANCE.transactionNotActiveWhileProducingIdsForBatchIndexing();
 			}
 			sink.accept( destinationList );
 		}

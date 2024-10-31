@@ -6,6 +6,7 @@ package org.hibernate.search.backend.lucene.types.codec.impl;
 
 import java.util.Arrays;
 
+import org.hibernate.search.backend.lucene.logging.impl.IndexingLog;
 import org.hibernate.search.backend.lucene.lowlevel.codec.impl.HibernateSearchKnnVectorsFormat;
 import org.hibernate.search.util.common.AssertionFailure;
 
@@ -84,7 +85,7 @@ public class LuceneByteVectorCodec extends AbstractLuceneVectorFieldCodec<byte[]
 			}
 		}
 		// if we reached here means we had a vector of zeros so let's fail:
-		throw log.vectorCosineZeroMagnitudeNotAcceptable( Arrays.toString( vector ) );
+		throw IndexingLog.INSTANCE.vectorCosineZeroMagnitudeNotAcceptable( Arrays.toString( vector ) );
 	}
 
 	private static void noop(byte[] vector) {

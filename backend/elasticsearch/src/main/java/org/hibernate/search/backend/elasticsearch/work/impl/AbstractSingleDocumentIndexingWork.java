@@ -4,18 +4,13 @@
  */
 package org.hibernate.search.backend.elasticsearch.work.impl;
 
-import java.lang.invoke.MethodHandles;
-
-import org.hibernate.search.backend.elasticsearch.logging.impl.Log;
+import org.hibernate.search.backend.elasticsearch.logging.impl.ElasticsearchClientLog;
 import org.hibernate.search.engine.backend.work.execution.DocumentRefreshStrategy;
-import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
 import com.google.gson.JsonObject;
 
 public abstract class AbstractSingleDocumentIndexingWork
 		implements BulkableWork<Void>, SingleDocumentIndexingWork {
-
-	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	private final JsonObject bulkableActionMetadata;
 	private final JsonObject bulkableActionBody;
@@ -73,7 +68,7 @@ public abstract class AbstractSingleDocumentIndexingWork
 			resultAssessor.checkSuccess( bulkResponseItem );
 		}
 		catch (RuntimeException e) {
-			throw log.elasticsearchBulkedRequestFailed(
+			throw ElasticsearchClientLog.INSTANCE.elasticsearchBulkedRequestFailed(
 					getBulkableActionMetadata(), bulkResponseItem,
 					e.getMessage(),
 					e

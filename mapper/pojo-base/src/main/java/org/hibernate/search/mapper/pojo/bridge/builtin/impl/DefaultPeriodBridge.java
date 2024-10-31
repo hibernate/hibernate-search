@@ -4,17 +4,13 @@
  */
 package org.hibernate.search.mapper.pojo.bridge.builtin.impl;
 
-import java.lang.invoke.MethodHandles;
 import java.time.Period;
 import java.util.Locale;
 
 import org.hibernate.search.engine.cfg.spi.ParseUtils;
-import org.hibernate.search.mapper.pojo.logging.impl.Log;
-import org.hibernate.search.util.common.logging.impl.LoggerFactory;
+import org.hibernate.search.mapper.pojo.logging.impl.FormattingLog;
 
 public final class DefaultPeriodBridge extends AbstractConvertingDefaultBridge<Period, String> {
-
-	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	private static final int PADDING = 11;
 	private static final String INDEXED_FORMAT = "%+0" + PADDING + "d%+0" + PADDING + "d%+0" + PADDING + "d";
@@ -49,7 +45,7 @@ public final class DefaultPeriodBridge extends AbstractConvertingDefaultBridge<P
 			return Period.of( years, months, days );
 		}
 		catch (NumberFormatException e) {
-			throw log.parseException( value, Period.class, e.getMessage(), e );
+			throw FormattingLog.INSTANCE.parseException( value, Period.class, e.getMessage(), e );
 		}
 	}
 

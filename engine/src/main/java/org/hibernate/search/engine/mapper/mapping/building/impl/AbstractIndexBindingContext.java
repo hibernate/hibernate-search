@@ -4,7 +4,6 @@
  */
 package org.hibernate.search.engine.mapper.mapping.building.impl;
 
-import java.lang.invoke.MethodHandles;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -23,21 +22,18 @@ import org.hibernate.search.engine.common.tree.spi.TreeContributionListener;
 import org.hibernate.search.engine.common.tree.spi.TreeFilterPathTracker;
 import org.hibernate.search.engine.common.tree.spi.TreeNestingContext;
 import org.hibernate.search.engine.common.tree.spi.TreeNodeInclusion;
-import org.hibernate.search.engine.logging.impl.Log;
+import org.hibernate.search.engine.logging.impl.MappingLog;
 import org.hibernate.search.engine.mapper.mapping.building.spi.IndexBindingContext;
 import org.hibernate.search.engine.mapper.mapping.building.spi.IndexFieldTypeDefaultsProvider;
 import org.hibernate.search.engine.mapper.mapping.building.spi.IndexedEmbeddedBindingContext;
 import org.hibernate.search.engine.mapper.mapping.building.spi.IndexedEntityBindingMapperContext;
 import org.hibernate.search.engine.mapper.model.spi.MappingElement;
 import org.hibernate.search.util.common.SearchException;
-import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
 abstract class AbstractIndexBindingContext<B extends IndexCompositeNodeBuilder> implements IndexBindingContext {
 
-	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
-
 	private static final BiFunction<MappingElement, String, SearchException> CYCLIC_RECURSION_EXCEPTION_FACTORY =
-			(mappingElement, cyclicRecursionPath) -> log.indexedEmbeddedCyclicRecursion( mappingElement,
+			(mappingElement, cyclicRecursionPath) -> MappingLog.INSTANCE.indexedEmbeddedCyclicRecursion( mappingElement,
 					mappingElement.eventContext(), cyclicRecursionPath );
 
 	private final IndexedEntityBindingMapperContext mapperContext;

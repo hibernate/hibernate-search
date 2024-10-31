@@ -4,13 +4,10 @@
  */
 package org.hibernate.search.backend.elasticsearch.types.codec.impl;
 
-import java.lang.invoke.MethodHandles;
-
 import org.hibernate.search.backend.elasticsearch.gson.impl.JsonAccessor;
 import org.hibernate.search.backend.elasticsearch.gson.impl.JsonElementTypes;
-import org.hibernate.search.backend.elasticsearch.logging.impl.Log;
+import org.hibernate.search.backend.elasticsearch.logging.impl.ElasticsearchClientLog;
 import org.hibernate.search.engine.spatial.GeoPoint;
-import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonElement;
@@ -18,7 +15,6 @@ import com.google.gson.JsonNull;
 import com.google.gson.JsonObject;
 
 public final class ElasticsearchGeoPointFieldCodec extends AbstractElasticsearchFieldCodec<GeoPoint> {
-	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	private static final JsonAccessor<Double> LATITUDE_ACCESSOR =
 			JsonAccessor.root().property( "lat" ).asDouble();
@@ -46,8 +42,10 @@ public final class ElasticsearchGeoPointFieldCodec extends AbstractElasticsearch
 			return null;
 		}
 		JsonObject object = JsonElementTypes.OBJECT.fromElement( element );
-		double latitude = LATITUDE_ACCESSOR.get( object ).orElseThrow( log::elasticsearchResponseMissingData );
-		double longitude = LONGITUDE_ACCESSOR.get( object ).orElseThrow( log::elasticsearchResponseMissingData );
+		double latitude =
+				LATITUDE_ACCESSOR.get( object ).orElseThrow( ElasticsearchClientLog.INSTANCE::elasticsearchResponseMissingData );
+		double longitude =
+				LONGITUDE_ACCESSOR.get( object ).orElseThrow( ElasticsearchClientLog.INSTANCE::elasticsearchResponseMissingData );
 		return GeoPoint.of( latitude, longitude );
 	}
 

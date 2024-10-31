@@ -4,20 +4,16 @@
  */
 package org.hibernate.search.backend.lucene.multitenancy.impl;
 
-import java.lang.invoke.MethodHandles;
 import java.util.Collections;
 import java.util.Set;
 
-import org.hibernate.search.backend.lucene.logging.impl.Log;
-import org.hibernate.search.util.common.logging.impl.LoggerFactory;
+import org.hibernate.search.backend.lucene.logging.impl.ConfigurationLog;
 import org.hibernate.search.util.common.reporting.EventContext;
 
 import org.apache.lucene.document.Document;
 import org.apache.lucene.search.Query;
 
 public class NoMultiTenancyStrategy implements MultiTenancyStrategy {
-
-	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	@Override
 	public void contributeToIndexedDocument(Document document, String tenantId) {
@@ -37,14 +33,15 @@ public class NoMultiTenancyStrategy implements MultiTenancyStrategy {
 	@Override
 	public void checkTenantId(String tenantId, EventContext backendContext) {
 		if ( tenantId != null ) {
-			throw log.tenantIdProvidedButMultiTenancyDisabled( Collections.singleton( tenantId ), backendContext );
+			throw ConfigurationLog.INSTANCE.tenantIdProvidedButMultiTenancyDisabled( Collections.singleton( tenantId ),
+					backendContext );
 		}
 	}
 
 	@Override
 	public void checkTenantId(Set<String> tenantIds, EventContext context) {
 		if ( tenantIds != null && !tenantIds.isEmpty() ) {
-			throw log.tenantIdProvidedButMultiTenancyDisabled( tenantIds, context );
+			throw ConfigurationLog.INSTANCE.tenantIdProvidedButMultiTenancyDisabled( tenantIds, context );
 		}
 	}
 }

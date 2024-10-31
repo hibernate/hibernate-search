@@ -4,11 +4,10 @@
  */
 package org.hibernate.search.backend.elasticsearch.search.predicate.impl;
 
-import java.lang.invoke.MethodHandles;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
-import org.hibernate.search.backend.elasticsearch.logging.impl.Log;
+import org.hibernate.search.backend.elasticsearch.logging.impl.QueryLog;
 import org.hibernate.search.backend.elasticsearch.search.common.impl.AbstractElasticsearchCompositeNodeSearchQueryElementFactory;
 import org.hibernate.search.backend.elasticsearch.search.common.impl.ElasticsearchSearchIndexCompositeNodeContext;
 import org.hibernate.search.backend.elasticsearch.search.common.impl.ElasticsearchSearchIndexScope;
@@ -18,13 +17,10 @@ import org.hibernate.search.engine.search.predicate.definition.PredicateDefiniti
 import org.hibernate.search.engine.search.predicate.dsl.SearchPredicateFactory;
 import org.hibernate.search.engine.search.predicate.spi.NamedPredicateBuilder;
 import org.hibernate.search.engine.search.predicate.spi.NamedValuesBasedPredicateDefinitionContext;
-import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
 import com.google.gson.JsonObject;
 
 public class ElasticsearchNamedPredicate extends AbstractElasticsearchSingleFieldPredicate {
-
-	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	private final ElasticsearchSearchPredicate providedPredicate;
 
@@ -60,7 +56,7 @@ public class ElasticsearchNamedPredicate extends AbstractElasticsearchSingleFiel
 			super.checkCompatibleWith( other );
 			Factory castedOther = (Factory) other;
 			if ( !definition.equals( castedOther.definition ) ) {
-				throw log.differentPredicateDefinitionForQueryElement( definition, castedOther.definition );
+				throw QueryLog.INSTANCE.differentPredicateDefinitionForQueryElement( definition, castedOther.definition );
 			}
 		}
 
@@ -100,7 +96,7 @@ public class ElasticsearchNamedPredicate extends AbstractElasticsearchSingleFiel
 		@Override
 		public SearchPredicate build() {
 			NamedValuesBasedPredicateDefinitionContext ctx = new NamedValuesBasedPredicateDefinitionContext( factory, params,
-					name -> log.paramNotDefined( name, predicateName, field.eventContext() ) );
+					name -> QueryLog.INSTANCE.paramNotDefined( name, predicateName, field.eventContext() ) );
 
 			ElasticsearchSearchPredicate providedPredicate = ElasticsearchSearchPredicate.from(
 					scope, definition.create( ctx ) );

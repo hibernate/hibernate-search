@@ -4,7 +4,6 @@
  */
 package org.hibernate.search.mapper.pojo.search.loading.impl;
 
-import java.lang.invoke.MethodHandles;
 import java.util.Map;
 
 import org.hibernate.search.engine.backend.common.DocumentReference;
@@ -15,12 +14,9 @@ import org.hibernate.search.engine.search.loading.spi.ProjectionHitMapper;
 import org.hibernate.search.mapper.pojo.bridge.runtime.spi.BridgeSessionContext;
 import org.hibernate.search.mapper.pojo.common.spi.PojoEntityReferenceFactoryDelegate;
 import org.hibernate.search.mapper.pojo.loading.impl.PojoLoadingPlan;
-import org.hibernate.search.mapper.pojo.logging.impl.Log;
-import org.hibernate.search.util.common.logging.impl.LoggerFactory;
+import org.hibernate.search.mapper.pojo.logging.impl.LoadingLog;
 
 public final class PojoProjectionHitMapper<E> implements ProjectionHitMapper<E> {
-
-	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	private final Map<String, PojoSearchLoadingIndexedTypeContext<? extends E>> targetTypesByEntityName;
 	private final PojoEntityReferenceFactoryDelegate entityReferenceFactoryDelegate;
@@ -68,7 +64,7 @@ public final class PojoProjectionHitMapper<E> implements ProjectionHitMapper<E> 
 	private PojoSearchLoadingIndexedTypeContext<? extends E> toType(DocumentReference reference) {
 		PojoSearchLoadingIndexedTypeContext<? extends E> type = targetTypesByEntityName.get( reference.typeName() );
 		if ( type == null ) {
-			throw log.unexpectedEntityNameForEntityLoading( reference.typeName(), targetTypesByEntityName.keySet() );
+			throw LoadingLog.INSTANCE.unexpectedEntityNameForEntityLoading( reference.typeName(), targetTypesByEntityName.keySet() );
 		}
 		return type;
 	}

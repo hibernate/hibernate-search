@@ -4,11 +4,10 @@
  */
 package org.hibernate.search.backend.lucene.search.predicate.impl;
 
-import java.lang.invoke.MethodHandles;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
-import org.hibernate.search.backend.lucene.logging.impl.Log;
+import org.hibernate.search.backend.lucene.logging.impl.QueryLog;
 import org.hibernate.search.backend.lucene.search.common.impl.AbstractLuceneCompositeNodeSearchQueryElementFactory;
 import org.hibernate.search.backend.lucene.search.common.impl.LuceneSearchIndexCompositeNodeContext;
 import org.hibernate.search.backend.lucene.search.common.impl.LuceneSearchIndexScope;
@@ -18,13 +17,10 @@ import org.hibernate.search.engine.search.predicate.definition.PredicateDefiniti
 import org.hibernate.search.engine.search.predicate.dsl.SearchPredicateFactory;
 import org.hibernate.search.engine.search.predicate.spi.NamedPredicateBuilder;
 import org.hibernate.search.engine.search.predicate.spi.NamedValuesBasedPredicateDefinitionContext;
-import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
 import org.apache.lucene.search.Query;
 
 public class LuceneNamedPredicate extends AbstractLuceneSingleFieldPredicate {
-
-	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	private final LuceneSearchPredicate instance;
 
@@ -59,7 +55,7 @@ public class LuceneNamedPredicate extends AbstractLuceneSingleFieldPredicate {
 			super.checkCompatibleWith( other );
 			Factory castedOther = (Factory) other;
 			if ( !definition.equals( castedOther.definition ) ) {
-				throw log.differentPredicateDefinitionForQueryElement( definition, castedOther.definition );
+				throw QueryLog.INSTANCE.differentPredicateDefinitionForQueryElement( definition, castedOther.definition );
 			}
 		}
 
@@ -98,7 +94,7 @@ public class LuceneNamedPredicate extends AbstractLuceneSingleFieldPredicate {
 		@Override
 		public SearchPredicate build() {
 			NamedValuesBasedPredicateDefinitionContext ctx = new NamedValuesBasedPredicateDefinitionContext( factory, params,
-					name -> log.paramNotDefined( name, predicateName, field.eventContext() ) );
+					name -> QueryLog.INSTANCE.paramNotDefined( name, predicateName, field.eventContext() ) );
 
 			LuceneSearchPredicate providedPredicate = LuceneSearchPredicate.from( scope, definition.create( ctx ) );
 

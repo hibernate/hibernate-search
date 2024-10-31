@@ -4,22 +4,18 @@
  */
 package org.hibernate.search.backend.elasticsearch.work.impl;
 
-import java.lang.invoke.MethodHandles;
 import java.util.Set;
 
 import org.hibernate.search.backend.elasticsearch.client.impl.Paths;
 import org.hibernate.search.backend.elasticsearch.client.spi.ElasticsearchRequest;
 import org.hibernate.search.backend.elasticsearch.client.spi.ElasticsearchResponse;
-import org.hibernate.search.backend.elasticsearch.logging.impl.Log;
+import org.hibernate.search.backend.elasticsearch.logging.impl.QueryLog;
 import org.hibernate.search.backend.elasticsearch.util.spi.URLEncodedString;
 import org.hibernate.search.backend.elasticsearch.work.result.impl.ExplainResult;
-import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
 import com.google.gson.JsonObject;
 
 public class ExplainWork extends AbstractNonBulkableWork<ExplainResult> {
-
-	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	private static final ElasticsearchRequestSuccessAssessor SUCCESS_ASSESSOR =
 			ElasticsearchRequestSuccessAssessor.builder().ignoreErrorStatuses( 404 ).build();
@@ -37,7 +33,7 @@ public class ExplainWork extends AbstractNonBulkableWork<ExplainResult> {
 	protected ExplainResult generateResult(ElasticsearchWorkExecutionContext context,
 			ElasticsearchResponse response) {
 		if ( response.statusCode() == 404 ) {
-			throw log.explainUnknownDocument( indexName, id );
+			throw QueryLog.INSTANCE.explainUnknownDocument( indexName, id );
 		}
 		JsonObject body = response.body();
 		return new ExplainResultImpl( body );

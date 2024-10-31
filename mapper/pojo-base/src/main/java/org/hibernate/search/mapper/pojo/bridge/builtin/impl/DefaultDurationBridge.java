@@ -4,18 +4,14 @@
  */
 package org.hibernate.search.mapper.pojo.bridge.builtin.impl;
 
-import java.lang.invoke.MethodHandles;
 import java.time.Duration;
 
 import org.hibernate.search.engine.cfg.spi.ParseUtils;
-import org.hibernate.search.mapper.pojo.logging.impl.Log;
-import org.hibernate.search.util.common.logging.impl.LoggerFactory;
+import org.hibernate.search.mapper.pojo.logging.impl.FormattingLog;
 
 public final class DefaultDurationBridge extends AbstractConvertingDefaultBridge<Duration, Long> {
 
 	public static final DefaultDurationBridge INSTANCE = new DefaultDurationBridge();
-
-	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	private DefaultDurationBridge() {
 	}
@@ -36,7 +32,7 @@ public final class DefaultDurationBridge extends AbstractConvertingDefaultBridge
 			return value.toNanos();
 		}
 		catch (ArithmeticException ae) {
-			throw log.valueTooLargeForConversionException( Long.class, value, ae );
+			throw FormattingLog.INSTANCE.valueTooLargeForConversionException( Long.class, value, ae );
 		}
 	}
 

@@ -4,13 +4,10 @@
  */
 package org.hibernate.search.engine.search.projection.spi;
 
-import java.lang.invoke.MethodHandles;
-
 import org.hibernate.search.engine.backend.types.converter.FromDocumentValueConverter;
 import org.hibernate.search.engine.backend.types.converter.runtime.FromDocumentValueConvertContext;
-import org.hibernate.search.engine.logging.impl.Log;
+import org.hibernate.search.engine.logging.impl.QueryLog;
 import org.hibernate.search.engine.search.projection.ProjectionCollector;
-import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
 /**
  * A {@link ProjectionCollector} that can accumulate up to one value, and will throw an exception beyond that.
@@ -20,8 +17,6 @@ import org.hibernate.search.util.common.logging.impl.LoggerFactory;
  */
 abstract class BaseSingleValuedProjectionCollector<E, V, R>
 		implements ProjectionCollector<E, V, Object, R> {
-
-	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	protected BaseSingleValuedProjectionCollector() {
 	}
@@ -39,7 +34,7 @@ abstract class BaseSingleValuedProjectionCollector<E, V, R>
 	@Override
 	public final E accumulate(Object accumulated, E value) {
 		if ( accumulated != null ) {
-			throw log.unexpectedMultiValuedField( accumulated, value );
+			throw QueryLog.INSTANCE.unexpectedMultiValuedField( accumulated, value );
 		}
 		return value;
 	}

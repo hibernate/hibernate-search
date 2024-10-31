@@ -22,8 +22,8 @@ import org.hibernate.search.batchindexing.MassIndexerProgressMonitor;
 import org.hibernate.search.engine.cfg.BackendSettings;
 import org.hibernate.search.test.util.FullTextSessionBuilder;
 import org.hibernate.search.testsupport.textbuilder.SentenceInventor;
-import org.hibernate.search.util.logging.impl.Log;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
+import org.hibernate.search.util.logging.impl.MigrationHelperLog;
 
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
@@ -39,7 +39,7 @@ import org.apache.lucene.search.Query;
  */
 class IndexingGeneratedCorpusTest {
 
-	private static final Log log = LoggerFactory.make( MethodHandles.lookup() );
+	private static final MigrationHelperLog log = LoggerFactory.make( MethodHandles.lookup() );
 
 	private static final int BOOK_NUM = 140;
 	private static final int ANCIENTBOOK_NUM = 120;

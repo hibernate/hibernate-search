@@ -4,7 +4,6 @@
  */
 package org.hibernate.search.jakarta.batch.core.massindexing.step.impl;
 
-import java.lang.invoke.MethodHandles;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -22,7 +21,7 @@ import jakarta.persistence.LockModeType;
 import org.hibernate.StatelessSession;
 import org.hibernate.engine.spi.SharedSessionContractImplementor;
 import org.hibernate.query.SelectionQuery;
-import org.hibernate.search.jakarta.batch.core.logging.impl.Log;
+import org.hibernate.search.jakarta.batch.core.logging.impl.JakartaBatchLog;
 import org.hibernate.search.jakarta.batch.core.massindexing.MassIndexingJobParameters;
 import org.hibernate.search.jakarta.batch.core.massindexing.impl.JobContextData;
 import org.hibernate.search.jakarta.batch.core.massindexing.util.impl.EntityTypeDescriptor;
@@ -31,7 +30,6 @@ import org.hibernate.search.jakarta.batch.core.massindexing.util.impl.PartitionB
 import org.hibernate.search.jakarta.batch.core.massindexing.util.impl.PersistenceUtil;
 import org.hibernate.search.jakarta.batch.core.massindexing.util.impl.SerializationUtil;
 import org.hibernate.search.mapper.orm.loading.spi.ConditionalExpression;
-import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
 /**
  * This partition mapper provides a dynamic partition plan for chunk processing.
@@ -54,8 +52,6 @@ import org.hibernate.search.util.common.logging.impl.LoggerFactory;
  * @author Mincong Huang
  */
 public class HibernateSearchPartitionMapper implements PartitionMapper {
-
-	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	@Inject
 	private JobContext jobContext;
@@ -165,7 +161,7 @@ public class HibernateSearchPartitionMapper implements PartitionMapper {
 				);
 			}
 
-			log.debugf( "Partitions: %s", Arrays.toString( props ) );
+			JakartaBatchLog.INSTANCE.debugf( "Partitions: %s", Arrays.toString( props ) );
 
 			PartitionPlan partitionPlan = new PartitionPlanImpl();
 			partitionPlan.setPartitionProperties( props );
@@ -177,7 +173,7 @@ public class HibernateSearchPartitionMapper implements PartitionMapper {
 				partitionPlan.setThreads( threads );
 			}
 
-			log.partitionsPlan( partitionPlan.getPartitions(), partitionPlan.getThreads() );
+			JakartaBatchLog.INSTANCE.partitionsPlan( partitionPlan.getPartitions(), partitionPlan.getThreads() );
 			return partitionPlan;
 		}
 	}

@@ -4,7 +4,6 @@
  */
 package org.hibernate.search.mapper.pojo.search.definition.binding.impl;
 
-import java.lang.invoke.MethodHandles;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Optional;
@@ -13,7 +12,7 @@ import org.hibernate.search.engine.environment.bean.BeanHolder;
 import org.hibernate.search.engine.environment.bean.BeanReference;
 import org.hibernate.search.engine.search.projection.definition.ProjectionDefinition;
 import org.hibernate.search.engine.search.projection.definition.spi.ConstantProjectionDefinition;
-import org.hibernate.search.mapper.pojo.logging.impl.Log;
+import org.hibernate.search.mapper.pojo.logging.impl.ProjectionLog;
 import org.hibernate.search.mapper.pojo.mapping.building.impl.PojoMappingHelper;
 import org.hibernate.search.mapper.pojo.mapping.building.spi.PojoSearchMappingConstructorNode;
 import org.hibernate.search.mapper.pojo.mapping.building.spi.PojoSearchMappingMethodParameterNode;
@@ -25,12 +24,10 @@ import org.hibernate.search.mapper.pojo.model.spi.PojoRawTypeModel;
 import org.hibernate.search.mapper.pojo.reporting.spi.PojoEventContexts;
 import org.hibernate.search.mapper.pojo.search.definition.binding.ProjectionBinder;
 import org.hibernate.search.util.common.impl.SuppressingCloser;
-import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 import org.hibernate.search.util.common.reporting.EventContext;
 import org.hibernate.search.util.common.reporting.spi.EventContextProvider;
 
 class ProjectionConstructorParameterBinder<P> implements EventContextProvider {
-	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	final PojoMappingHelper mappingHelper;
 	final ProjectionConstructorBinder<?> parent;
@@ -80,7 +77,7 @@ class ProjectionConstructorParameterBinder<P> implements EventContextProvider {
 			for ( PojoSearchMappingMethodParameterNode.ProjectionBindingData projectionDefinition : parameterMapping.get()
 					.projectionBindings() ) {
 				if ( result != null ) {
-					throw log.multipleProjectionMappingsForParameter();
+					throw ProjectionLog.INSTANCE.multipleProjectionMappingsForParameter();
 				}
 				ProjectionBindingContextImpl<?> bindingContext =
 						new ProjectionBindingContextImpl<>( this, projectionDefinition.params );
@@ -120,7 +117,7 @@ class ProjectionConstructorParameterBinder<P> implements EventContextProvider {
 			for ( PojoSearchMappingConstructorNode constructorMapping : contributor.constructors().values() ) {
 				if ( constructorMapping.isProjectionConstructor() ) {
 					if ( result != null ) {
-						throw log.multipleProjectionConstructorsForType(
+						throw ProjectionLog.INSTANCE.multipleProjectionConstructorsForType(
 								projectedType.typeIdentifier().javaClass() );
 					}
 					result = constructorMapping;

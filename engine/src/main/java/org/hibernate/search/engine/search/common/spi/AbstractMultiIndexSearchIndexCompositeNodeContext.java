@@ -4,16 +4,14 @@
  */
 package org.hibernate.search.engine.search.common.spi;
 
-import java.lang.invoke.MethodHandles;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 import java.util.function.Function;
 
 import org.hibernate.search.engine.backend.common.spi.FieldPaths;
-import org.hibernate.search.engine.logging.impl.Log;
+import org.hibernate.search.engine.logging.impl.QueryLog;
 import org.hibernate.search.util.common.SearchException;
-import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
 public abstract class AbstractMultiIndexSearchIndexCompositeNodeContext<
 		S extends SearchIndexCompositeNodeContext<SC>,
@@ -22,8 +20,6 @@ public abstract class AbstractMultiIndexSearchIndexCompositeNodeContext<
 		F extends SearchIndexNodeContext<SC>>
 		extends AbstractMultiIndexSearchIndexNodeContext<S, SC, NT>
 		implements SearchIndexCompositeNodeContext<SC>, SearchIndexCompositeNodeTypeContext<SC, S> {
-
-	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	private Map<String, F> staticChildrenByName;
 
@@ -97,7 +93,8 @@ public abstract class AbstractMultiIndexSearchIndexCompositeNodeContext<
 					result.computeIfAbsent( childRelativeName, createChildFieldContext );
 				}
 				catch (SearchException e) {
-					throw log.inconsistentConfigurationInContextForSearch( relativeEventContext(), e.getMessage(),
+					throw QueryLog.INSTANCE.inconsistentConfigurationInContextForSearch( relativeEventContext(),
+							e.getMessage(),
 							indexesEventContext(), e );
 				}
 			}

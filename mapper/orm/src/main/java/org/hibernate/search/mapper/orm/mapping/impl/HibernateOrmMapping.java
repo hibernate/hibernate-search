@@ -4,7 +4,6 @@
  */
 package org.hibernate.search.mapper.orm.mapping.impl;
 
-import java.lang.invoke.MethodHandles;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Optional;
@@ -35,7 +34,7 @@ import org.hibernate.search.mapper.orm.common.impl.HibernateOrmUtils;
 import org.hibernate.search.mapper.orm.coordination.common.spi.CoordinationStrategy;
 import org.hibernate.search.mapper.orm.entity.SearchIndexedEntity;
 import org.hibernate.search.mapper.orm.event.impl.HibernateOrmListenerContextProvider;
-import org.hibernate.search.mapper.orm.logging.impl.Log;
+import org.hibernate.search.mapper.orm.logging.impl.OrmSpecificLog;
 import org.hibernate.search.mapper.orm.mapping.SearchMapping;
 import org.hibernate.search.mapper.orm.mapping.context.HibernateOrmMappingContext;
 import org.hibernate.search.mapper.orm.mapping.spi.CoordinationStrategyContext;
@@ -65,7 +64,6 @@ import org.hibernate.search.mapper.pojo.work.spi.ConfiguredSearchIndexingPlanFil
 import org.hibernate.search.mapper.pojo.work.spi.PojoIndexingPlan;
 import org.hibernate.search.mapper.pojo.work.spi.PojoTypeIndexingPlan;
 import org.hibernate.search.util.common.impl.Closer;
-import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
 @SuppressWarnings("deprecation")
 public class HibernateOrmMapping extends AbstractPojoMappingImplementor<HibernateOrmMapping>
@@ -73,8 +71,6 @@ public class HibernateOrmMapping extends AbstractPojoMappingImplementor<Hibernat
 		HibernateOrmListenerContextProvider, BatchMappingContext,
 		HibernateOrmScopeMappingContext, HibernateOrmSearchSessionMappingContext,
 		AutomaticIndexingMappingContext, CoordinationStrategyContext {
-
-	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	private static final ConfigurationProperty<EntityLoadingCacheLookupStrategy> QUERY_LOADING_CACHE_LOOKUP_STRATEGY =
 			ConfigurationProperty.forKey( HibernateOrmMapperSettings.Radicals.QUERY_LOADING_CACHE_LOOKUP_STRATEGY )
@@ -450,7 +446,7 @@ public class HibernateOrmMapping extends AbstractPojoMappingImplementor<Hibernat
 		SessionFactory givenSessionFactory = sessionImplementor.getSessionFactory();
 
 		if ( !givenSessionFactory.equals( sessionFactory ) ) {
-			throw log.usingDifferentSessionFactories( sessionFactory, givenSessionFactory );
+			throw OrmSpecificLog.INSTANCE.usingDifferentSessionFactories( sessionFactory, givenSessionFactory );
 		}
 
 		return new HibernateOrmSearchSession.Builder( this, typeContextContainer,

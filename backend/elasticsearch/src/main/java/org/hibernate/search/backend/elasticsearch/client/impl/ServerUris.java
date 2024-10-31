@@ -4,20 +4,16 @@
  */
 package org.hibernate.search.backend.elasticsearch.client.impl;
 
-import java.lang.invoke.MethodHandles;
 import java.util.List;
 import java.util.Locale;
 import java.util.Optional;
 
 import org.hibernate.search.backend.elasticsearch.cfg.ElasticsearchBackendSettings;
-import org.hibernate.search.backend.elasticsearch.logging.impl.Log;
-import org.hibernate.search.util.common.logging.impl.LoggerFactory;
+import org.hibernate.search.backend.elasticsearch.logging.impl.ConfigurationLog;
 
 import org.apache.http.HttpHost;
 
 final class ServerUris {
-
-	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	private final HttpHost[] hosts;
 	private final boolean sslEnabled;
@@ -37,11 +33,11 @@ final class ServerUris {
 		}
 
 		if ( protocol.isPresent() ) {
-			throw log.uriAndProtocol( uris.get(), protocol.get() );
+			throw ConfigurationLog.INSTANCE.uriAndProtocol( uris.get(), protocol.get() );
 		}
 
 		if ( hostAndPortStrings.isPresent() ) {
-			throw log.uriAndHosts( uris.get(), hostAndPortStrings.get() );
+			throw ConfigurationLog.INSTANCE.uriAndHosts( uris.get(), hostAndPortStrings.get() );
 		}
 
 		return fromStrings( uris.get() );
@@ -49,7 +45,7 @@ final class ServerUris {
 
 	private static ServerUris fromStrings(List<String> serverUrisStrings) {
 		if ( serverUrisStrings.isEmpty() ) {
-			throw log.emptyListOfUris();
+			throw ConfigurationLog.INSTANCE.emptyListOfUris();
 		}
 
 		HttpHost[] hosts = new HttpHost[serverUrisStrings.size()];
@@ -63,7 +59,7 @@ final class ServerUris {
 				https = currentHttps;
 			}
 			else if ( currentHttps != https ) {
-				throw log.differentProtocolsOnUris( serverUrisStrings );
+				throw ConfigurationLog.INSTANCE.differentProtocolsOnUris( serverUrisStrings );
 			}
 		}
 
@@ -72,7 +68,7 @@ final class ServerUris {
 
 	private static ServerUris fromStrings(String protocol, List<String> hostAndPortStrings) {
 		if ( hostAndPortStrings.isEmpty() ) {
-			throw log.emptyListOfHosts();
+			throw ConfigurationLog.INSTANCE.emptyListOfHosts();
 		}
 
 		HttpHost[] hosts = new HttpHost[hostAndPortStrings.size()];
@@ -88,7 +84,7 @@ final class ServerUris {
 
 	private static HttpHost createHttpHost(String scheme, String hostAndPort) {
 		if ( hostAndPort.indexOf( "://" ) >= 0 ) {
-			throw log.invalidHostAndPort( hostAndPort, null );
+			throw ConfigurationLog.INSTANCE.invalidHostAndPort( hostAndPort, null );
 		}
 		String host;
 		int port = -1;
@@ -101,7 +97,7 @@ final class ServerUris {
 				port = Integer.parseInt( hostAndPort.substring( portIdx + 1 ) );
 			}
 			catch (final NumberFormatException e) {
-				throw log.invalidHostAndPort( hostAndPort, e );
+				throw ConfigurationLog.INSTANCE.invalidHostAndPort( hostAndPort, e );
 			}
 			host = hostAndPort.substring( 0, portIdx );
 		}

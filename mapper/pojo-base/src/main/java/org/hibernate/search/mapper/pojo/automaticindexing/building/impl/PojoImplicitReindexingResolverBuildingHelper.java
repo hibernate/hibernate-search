@@ -4,7 +4,6 @@
  */
 package org.hibernate.search.mapper.pojo.automaticindexing.building.impl;
 
-import java.lang.invoke.MethodHandles;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -26,7 +25,7 @@ import org.hibernate.search.mapper.pojo.extractor.impl.BoundContainerExtractorPa
 import org.hibernate.search.mapper.pojo.extractor.impl.ContainerExtractorBinder;
 import org.hibernate.search.mapper.pojo.extractor.impl.ContainerExtractorHolder;
 import org.hibernate.search.mapper.pojo.extractor.mapping.programmatic.ContainerExtractorPath;
-import org.hibernate.search.mapper.pojo.logging.impl.Log;
+import org.hibernate.search.mapper.pojo.logging.impl.MappingLog;
 import org.hibernate.search.mapper.pojo.model.additionalmetadata.building.impl.PojoTypeAdditionalMetadataProvider;
 import org.hibernate.search.mapper.pojo.model.additionalmetadata.impl.PojoEntityTypeAdditionalMetadata;
 import org.hibernate.search.mapper.pojo.model.additionalmetadata.impl.PojoTypeAdditionalMetadata;
@@ -47,11 +46,8 @@ import org.hibernate.search.mapper.pojo.model.spi.PojoTypeModel;
 import org.hibernate.search.mapper.pojo.reporting.spi.PojoEventContexts;
 import org.hibernate.search.util.common.AssertionFailure;
 import org.hibernate.search.util.common.impl.Closer;
-import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
 public final class PojoImplicitReindexingResolverBuildingHelper {
-
-	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	private final ContainerExtractorBinder extractorBinder;
 	private final PojoTypeAdditionalMetadataProvider typeAdditionalMetadataProvider;
@@ -189,7 +185,7 @@ public final class PojoImplicitReindexingResolverBuildingHelper {
 						entityStateRepresentation.pathFromStateArrayElement(), inversePathByInverseType );
 			}
 			catch (RuntimeException e) {
-				throw log.failedToCreateImplicitReindexingAssociationInverseSideResolverNode(
+				throw MappingLog.INSTANCE.failedToCreateImplicitReindexingAssociationInverseSideResolverNode(
 						inversePathByInverseType,
 						EventContexts.fromType( typeModel ).append( PojoEventContexts.fromPath( path ) ),
 						e.getMessage(), e );

@@ -4,7 +4,6 @@
  */
 package org.hibernate.search.engine.cfg.impl;
 
-import java.lang.invoke.MethodHandles;
 import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -15,16 +14,14 @@ import org.hibernate.search.engine.cfg.spi.ConfigurationScope;
 import org.hibernate.search.engine.cfg.spi.ConfigurationScopeNamespaces;
 import org.hibernate.search.engine.environment.bean.BeanHolder;
 import org.hibernate.search.engine.environment.bean.BeanResolver;
-import org.hibernate.search.engine.logging.impl.Log;
+import org.hibernate.search.engine.logging.impl.ConfigurationLog;
 import org.hibernate.search.util.common.annotation.Incubating;
-import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
 /**
  * Provides shortcuts to create scopes, as well as a quick way to create a fallback property source for a given scope.
  */
 @Incubating
 public final class ConfigurationPropertySourceScopeUtils {
-	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	private static final Comparator<ConfigurationProvider> CONFIGURATION_PROVIDER_COMPARATOR =
 			Comparator.comparing( ConfigurationProvider::priority )
@@ -64,7 +61,7 @@ public final class ConfigurationPropertySourceScopeUtils {
 					.collect( Collectors.toList() );
 
 			if ( configurationProviders.size() > 1 ) {
-				log.multipleConfigurationProvidersAvailable( scope.toString(), configurationProviders );
+				ConfigurationLog.INSTANCE.multipleConfigurationProvidersAvailable( scope.toString(), configurationProviders );
 			}
 
 			ConfigurationPropertySource fallback = EmptyConfigurationPropertySource.get();

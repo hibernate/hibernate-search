@@ -5,15 +5,13 @@
 package org.hibernate.search.backend.lucene.analysis.model.dsl.impl;
 
 import java.io.IOException;
-import java.lang.invoke.MethodHandles;
 import java.util.ArrayList;
 import java.util.List;
 
 import org.hibernate.search.backend.lucene.analysis.impl.LuceneAnalysisComponentFactory;
 import org.hibernate.search.backend.lucene.analysis.model.dsl.LuceneAnalysisComponentParametersStep;
 import org.hibernate.search.backend.lucene.analysis.model.dsl.LuceneNormalizerOptionalComponentsStep;
-import org.hibernate.search.backend.lucene.logging.impl.Log;
-import org.hibernate.search.util.common.logging.impl.LoggerFactory;
+import org.hibernate.search.backend.lucene.logging.impl.AnalyzerLog;
 
 import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.analysis.CharFilterFactory;
@@ -21,8 +19,6 @@ import org.apache.lucene.analysis.TokenFilterFactory;
 
 class LuceneNormalizerComponentsStep
 		implements LuceneNormalizerOptionalComponentsStep, LuceneAnalyzerBuilder {
-
-	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	private final String name;
 
@@ -68,7 +64,7 @@ class LuceneNormalizerComponentsStep
 			);
 		}
 		catch (IOException | RuntimeException e) {
-			throw log.unableToCreateNormalizer( name, e.getMessage(), e );
+			throw AnalyzerLog.INSTANCE.unableToCreateNormalizer( name, e.getMessage(), e );
 		}
 	}
 

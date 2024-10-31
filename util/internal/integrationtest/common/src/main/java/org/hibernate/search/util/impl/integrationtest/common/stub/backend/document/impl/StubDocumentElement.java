@@ -4,20 +4,16 @@
  */
 package org.hibernate.search.util.impl.integrationtest.common.stub.backend.document.impl;
 
-import java.lang.invoke.MethodHandles;
+import static org.hibernate.search.util.impl.integrationtest.common.reporting.TestLog.BACKEND_TEST_LOGGER;
 
 import org.hibernate.search.engine.backend.document.DocumentElement;
 import org.hibernate.search.engine.backend.document.IndexFieldReference;
 import org.hibernate.search.engine.backend.document.IndexObjectFieldReference;
 import org.hibernate.search.engine.backend.document.spi.NoOpDocumentElement;
 import org.hibernate.search.engine.common.tree.spi.TreeNodeInclusion;
-import org.hibernate.search.util.common.logging.impl.Log;
-import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.document.StubDocumentNode;
 
 public class StubDocumentElement implements DocumentElement {
-
-	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	private final StubDocumentNode.Builder builder;
 
@@ -29,7 +25,7 @@ public class StubDocumentElement implements DocumentElement {
 	public <F> void addValue(IndexFieldReference<F> fieldReference, F value) {
 		StubIndexFieldReference<F> stubFieldReference = (StubIndexFieldReference<F>) fieldReference;
 		if ( TreeNodeInclusion.EXCLUDED.equals( stubFieldReference.getInclusion() ) ) {
-			log.tracev(
+			BACKEND_TEST_LOGGER.tracev(
 					"Ignoring write on document element {}, field '{}' with value '{}'" +
 							" because the field was excluded during bootstrap.",
 					this, stubFieldReference.getAbsolutePath(), value
@@ -43,7 +39,7 @@ public class StubDocumentElement implements DocumentElement {
 	public DocumentElement addObject(IndexObjectFieldReference fieldReference) {
 		StubIndexObjectFieldReference stubFieldReference = (StubIndexObjectFieldReference) fieldReference;
 		if ( TreeNodeInclusion.EXCLUDED.equals( stubFieldReference.getInclusion() ) ) {
-			log.tracev(
+			BACKEND_TEST_LOGGER.tracev(
 					"Ignoring add on document element {}, object field '{}'" +
 							" because the field was excluded during bootstrap.",
 					this, stubFieldReference.getAbsolutePath()
@@ -57,7 +53,7 @@ public class StubDocumentElement implements DocumentElement {
 	public void addNullObject(IndexObjectFieldReference fieldReference) {
 		StubIndexObjectFieldReference stubFieldReference = (StubIndexObjectFieldReference) fieldReference;
 		if ( TreeNodeInclusion.EXCLUDED.equals( stubFieldReference.getInclusion() ) ) {
-			log.tracev(
+			BACKEND_TEST_LOGGER.tracev(
 					"Ignoring add missing on document element {}, object field '{}'" +
 							" because the field was excluded during bootstrap.",
 					this, stubFieldReference.getAbsolutePath()

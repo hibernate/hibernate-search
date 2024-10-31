@@ -13,7 +13,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.hibernate.search.util.impl.test.logging.Log;
+import org.hibernate.search.util.impl.test.logging.impl.TestLog;
 
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
@@ -98,8 +98,8 @@ class HashTableUniformityTest {
 		generator.stream().limit( maxKeyCount )
 				.forEach( key -> {
 					int i = hashTable.computeIndex( key );
-					if ( Log.INSTANCE.isTraceEnabled() ) {
-						Log.INSTANCE.tracef( "Index \t%d for generated key '%s'", i, key );
+					if ( TestLog.TEST_LOGGER.isTraceEnabled() ) {
+						TestLog.TEST_LOGGER.tracef( "Index \t%d for generated key '%s'", i, key );
 					}
 					Long previous = hashTable.get( i );
 					hashTable.set( i, previous + 1 );
@@ -124,10 +124,10 @@ class HashTableUniformityTest {
 		double relativeStandardDeviation = Math.abs( standardDeviation / mean );
 
 		// Debug
-		Log.INSTANCE.debugf( "Chi-square test p-value: %.2f", chiSquareTestPValue );
-		Log.INSTANCE.debugf( "Relative standard deviation: %.2f%%", relativeStandardDeviation * 100 );
+		TestLog.TEST_LOGGER.debugf( "Chi-square test p-value: %.2f", chiSquareTestPValue );
+		TestLog.TEST_LOGGER.debugf( "Relative standard deviation: %.2f%%", relativeStandardDeviation * 100 );
 		for ( int i = 0; i < hashTable.size(); i++ ) {
-			Log.INSTANCE.debugf( "Bucket %d: %d elements (expected close to %.2f)",
+			TestLog.TEST_LOGGER.debugf( "Bucket %d: %d elements (expected close to %.2f)",
 					(Object) i, hashTable.get( i ), mean );
 		}
 

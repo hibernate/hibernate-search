@@ -4,7 +4,6 @@
  */
 package org.hibernate.search.engine.environment.classpath.spi;
 
-import java.lang.invoke.MethodHandles;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
@@ -18,16 +17,14 @@ import java.util.Set;
 import java.util.function.Supplier;
 import java.util.stream.Stream;
 
-import org.hibernate.search.engine.logging.impl.Log;
+import org.hibernate.search.engine.logging.impl.ConfigurationLog;
 import org.hibernate.search.util.common.AssertionFailure;
-import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
 /**
  * Default implementation of {@code ClassResolver} relying on an {@link AggregatedClassLoader}.
  */
 public abstract class DefaultServiceResolver implements ServiceResolver {
 
-	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 	private static final Method SERVICE_LOADER_STREAM_METHOD;
 	private static final Method PROVIDER_TYPE_METHOD;
 
@@ -217,7 +214,7 @@ public abstract class DefaultServiceResolver implements ServiceResolver {
 					return iterator.hasNext();
 				}
 				catch (ServiceConfigurationError e) {
-					log.ignoringServiceConfigurationError( serviceContract, e );
+					ConfigurationLog.INSTANCE.ignoringServiceConfigurationError( serviceContract, e );
 				}
 			}
 		}

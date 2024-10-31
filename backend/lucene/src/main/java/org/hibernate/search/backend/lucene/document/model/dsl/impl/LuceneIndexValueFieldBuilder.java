@@ -4,14 +4,13 @@
  */
 package org.hibernate.search.backend.lucene.document.model.dsl.impl;
 
-import java.lang.invoke.MethodHandles;
 import java.util.Map;
 
 import org.hibernate.search.backend.lucene.document.impl.LuceneIndexFieldReference;
 import org.hibernate.search.backend.lucene.document.model.impl.LuceneIndexCompositeNode;
 import org.hibernate.search.backend.lucene.document.model.impl.LuceneIndexField;
 import org.hibernate.search.backend.lucene.document.model.impl.LuceneIndexValueField;
-import org.hibernate.search.backend.lucene.logging.impl.Log;
+import org.hibernate.search.backend.lucene.logging.impl.MappingLog;
 import org.hibernate.search.backend.lucene.types.impl.LuceneIndexValueFieldType;
 import org.hibernate.search.engine.backend.common.spi.FieldPaths;
 import org.hibernate.search.engine.backend.document.IndexFieldReference;
@@ -19,13 +18,11 @@ import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaFieldOp
 import org.hibernate.search.engine.backend.document.model.dsl.spi.IndexSchemaBuildContext;
 import org.hibernate.search.engine.common.tree.spi.TreeNodeInclusion;
 import org.hibernate.search.engine.reporting.spi.EventContexts;
-import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 import org.hibernate.search.util.common.reporting.EventContext;
 
 class LuceneIndexValueFieldBuilder<F>
 		implements IndexSchemaFieldOptionsStep<LuceneIndexValueFieldBuilder<F>, IndexFieldReference<F>>,
 		LuceneIndexNodeContributor, IndexSchemaBuildContext {
-	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	private final AbstractLuceneIndexCompositeNodeBuilder parent;
 	private final String relativeFieldName;
@@ -54,7 +51,7 @@ class LuceneIndexValueFieldBuilder<F>
 	@Override
 	public LuceneIndexValueFieldBuilder<F> multiValued() {
 		if ( !type.multivaluable() ) {
-			throw log.multiValuedFieldNotAllowed( eventContext() );
+			throw MappingLog.INSTANCE.multiValuedFieldNotAllowed( eventContext() );
 		}
 		this.multiValued = true;
 		return this;
@@ -63,7 +60,7 @@ class LuceneIndexValueFieldBuilder<F>
 	@Override
 	public IndexFieldReference<F> toReference() {
 		if ( reference != null ) {
-			throw log.cannotCreateReferenceMultipleTimes( eventContext() );
+			throw MappingLog.INSTANCE.cannotCreateReferenceMultipleTimes( eventContext() );
 		}
 		this.reference = new LuceneIndexFieldReference<>();
 		return reference;
@@ -73,7 +70,7 @@ class LuceneIndexValueFieldBuilder<F>
 	public void contribute(LuceneIndexNodeCollector collector, LuceneIndexCompositeNode parentNode,
 			Map<String, LuceneIndexField> staticChildrenByNameForParent) {
 		if ( reference == null ) {
-			throw log.incompleteFieldDefinition( eventContext() );
+			throw MappingLog.INSTANCE.incompleteFieldDefinition( eventContext() );
 		}
 		LuceneIndexValueField<F> fieldNode = new LuceneIndexValueField<>( parentNode, relativeFieldName, type,
 				inclusion, multiValued, false );

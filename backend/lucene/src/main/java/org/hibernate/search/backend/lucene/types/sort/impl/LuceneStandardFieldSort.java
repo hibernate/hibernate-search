@@ -4,10 +4,9 @@
  */
 package org.hibernate.search.backend.lucene.types.sort.impl;
 
-import java.lang.invoke.MethodHandles;
 import java.time.temporal.TemporalAccessor;
 
-import org.hibernate.search.backend.lucene.logging.impl.Log;
+import org.hibernate.search.backend.lucene.logging.impl.QueryLog;
 import org.hibernate.search.backend.lucene.lowlevel.docvalues.impl.MultiValueMode;
 import org.hibernate.search.backend.lucene.search.common.impl.AbstractLuceneCodecAwareSearchQueryElementFactory;
 import org.hibernate.search.backend.lucene.search.common.impl.LuceneSearchIndexScope;
@@ -23,7 +22,6 @@ import org.hibernate.search.engine.search.common.ValueModel;
 import org.hibernate.search.engine.search.sort.SearchSort;
 import org.hibernate.search.engine.search.sort.dsl.SortOrder;
 import org.hibernate.search.engine.search.sort.spi.FieldSortBuilder;
-import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
 import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.search.Query;
@@ -31,8 +29,6 @@ import org.apache.lucene.search.SortField;
 import org.apache.lucene.util.BytesRef;
 
 public abstract class LuceneStandardFieldSort extends AbstractLuceneDocumentValueSort {
-
-	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	private LuceneStandardFieldSort(AbstractBuilder<?, ?, ?> builder) {
 		super( builder );
@@ -205,7 +201,7 @@ public abstract class LuceneStandardFieldSort extends AbstractLuceneDocumentValu
 				case AVG:
 				case MEDIAN:
 				default:
-					throw log.invalidSortModeForStringField( mode, getEventContext() );
+					throw QueryLog.INSTANCE.invalidSortModeForStringField( mode, getEventContext() );
 			}
 		}
 
@@ -269,7 +265,7 @@ public abstract class LuceneStandardFieldSort extends AbstractLuceneDocumentValu
 					super.mode( mode );
 					break;
 				case SUM:
-					throw log.invalidSortModeForTemporalField( mode, getEventContext() );
+					throw QueryLog.INSTANCE.invalidSortModeForTemporalField( mode, getEventContext() );
 			}
 		}
 	}

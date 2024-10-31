@@ -5,7 +5,6 @@
 package org.hibernate.search.backend.elasticsearch.client.impl;
 
 import java.io.IOException;
-import java.lang.invoke.MethodHandles;
 import java.util.List;
 
 import org.hibernate.search.backend.elasticsearch.ElasticsearchDistributionName;
@@ -14,10 +13,9 @@ import org.hibernate.search.backend.elasticsearch.client.spi.ElasticsearchClient
 import org.hibernate.search.backend.elasticsearch.client.spi.ElasticsearchRequest;
 import org.hibernate.search.backend.elasticsearch.client.spi.ElasticsearchResponse;
 import org.hibernate.search.backend.elasticsearch.gson.impl.JsonAccessor;
-import org.hibernate.search.backend.elasticsearch.logging.impl.Log;
+import org.hibernate.search.backend.elasticsearch.logging.impl.ElasticsearchClientLog;
 import org.hibernate.search.util.common.AssertionFailure;
 import org.hibernate.search.util.common.impl.Futures;
-import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
@@ -25,8 +23,6 @@ import com.google.gson.JsonObject;
 import org.apache.http.HttpEntity;
 
 public class ElasticsearchClientUtils {
-
-	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	private static final JsonAccessor<String> DISTRIBUTION_ACCESSOR =
 			JsonAccessor.root().property( "version" ).property( "distribution" ).asString();
@@ -60,7 +56,7 @@ public class ElasticsearchClientUtils {
 			}
 
 			if ( !ElasticsearchClientUtils.isSuccessCode( response.statusCode() ) ) {
-				throw log.elasticsearchResponseIndicatesFailure();
+				throw ElasticsearchClientLog.INSTANCE.elasticsearchResponseIndicatesFailure();
 			}
 
 			ElasticsearchDistributionName distributionOptional = DISTRIBUTION_ACCESSOR.get( response.body() )
@@ -73,7 +69,7 @@ public class ElasticsearchClientUtils {
 			return ElasticsearchVersion.of( distributionOptional, version );
 		}
 		catch (RuntimeException e) {
-			throw log.elasticsearchRequestFailed( request, response, e.getMessage(), e );
+			throw ElasticsearchClientLog.INSTANCE.elasticsearchRequestFailed( request, response, e.getMessage(), e );
 		}
 	}
 

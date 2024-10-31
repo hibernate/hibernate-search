@@ -8,6 +8,7 @@ import java.nio.ByteBuffer;
 import java.util.Arrays;
 import java.util.function.Consumer;
 
+import org.hibernate.search.backend.lucene.logging.impl.IndexingLog;
 import org.hibernate.search.backend.lucene.lowlevel.codec.impl.HibernateSearchKnnVectorsFormat;
 import org.hibernate.search.util.common.AssertionFailure;
 
@@ -101,14 +102,14 @@ public class LuceneFloatVectorCodec extends AbstractLuceneVectorFieldCodec<float
 	private static void cosineCheck(float[] vector) {
 		float l1 = VectorUtil.dotProduct( vector, vector );
 		if ( l1 < EPS ) {
-			throw log.vectorCosineZeroMagnitudeNotAcceptable( Arrays.toString( vector ) );
+			throw IndexingLog.INSTANCE.vectorCosineZeroMagnitudeNotAcceptable( Arrays.toString( vector ) );
 		}
 	}
 
 	private static void dotProductCheck(float[] vector) {
 		float l1 = VectorUtil.dotProduct( vector, vector );
 		if ( Math.abs( 1 - Math.sqrt( l1 ) ) > EPS ) {
-			throw log.vectorDotProductNonUnitMagnitudeNotAcceptable( Arrays.toString( vector ) );
+			throw IndexingLog.INSTANCE.vectorDotProductNonUnitMagnitudeNotAcceptable( Arrays.toString( vector ) );
 		}
 	}
 

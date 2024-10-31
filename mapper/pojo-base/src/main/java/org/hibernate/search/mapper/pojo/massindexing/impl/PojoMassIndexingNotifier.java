@@ -4,7 +4,6 @@
  */
 package org.hibernate.search.mapper.pojo.massindexing.impl;
 
-import java.lang.invoke.MethodHandles;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -15,22 +14,20 @@ import java.util.concurrent.atomic.AtomicReference;
 import java.util.concurrent.atomic.LongAdder;
 
 import org.hibernate.search.engine.common.EntityReference;
-import org.hibernate.search.mapper.pojo.logging.impl.Log;
+import org.hibernate.search.mapper.pojo.logging.impl.MassIndexingLog;
 import org.hibernate.search.mapper.pojo.massindexing.MassIndexingEntityFailureContext;
 import org.hibernate.search.mapper.pojo.massindexing.MassIndexingFailureContext;
 import org.hibernate.search.mapper.pojo.massindexing.MassIndexingFailureHandler;
 import org.hibernate.search.mapper.pojo.massindexing.MassIndexingMonitor;
 import org.hibernate.search.mapper.pojo.massindexing.MassIndexingTypeGroupMonitor;
 import org.hibernate.search.mapper.pojo.massindexing.spi.PojoMassIndexingSessionContext;
-import org.hibernate.search.util.common.logging.impl.LoggerFactory;
+import org.hibernate.search.mapper.pojo.reporting.impl.PojoMassIndexerMessages;
 
 /**
  * A central object to which various are reported,
  * responsible for notifying the user about these events.
  */
 public class PojoMassIndexingNotifier {
-
-	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	private final MassIndexingFailureHandler failureHandler;
 	private final MassIndexingMonitor monitor;
@@ -66,7 +63,7 @@ public class PojoMassIndexingNotifier {
 		boolean isFirst = firstFailure.compareAndSet( null, recordedFailure );
 		if ( isFirst ) {
 			// Only log this once, and only if the interruption was the original failure.
-			log.interruptedBatchIndexing();
+			MassIndexingLog.INSTANCE.interruptedBatchIndexing();
 		}
 		// else: don't report the interruption, as it was most likely caused by a previous failure
 	}
@@ -94,7 +91,7 @@ public class PojoMassIndexingNotifier {
 
 	void reportEntityIndexingFailure(PojoMassIndexingIndexedTypeGroup<?> typeGroup,
 			PojoMassIndexingSessionContext sessionContext, Object entity, Exception exception) {
-		String failingOperation = log.massIndexerIndexingInstance( typeGroup.notifiedGroupName() );
+		String failingOperation = PojoMassIndexerMessages.INSTANCE.massIndexerIndexingInstance( typeGroup.notifiedGroupName() );
 
 		// Don't record these failures as suppressed beyond the first one, because there may be hundreds of them.
 		RecordedFailure recordedFailure = recordFailure( exception, false );
@@ -118,7 +115,8 @@ public class PojoMassIndexingNotifier {
 	}
 
 	void reportEntitiesLoadingFailure(PojoMassIndexingIndexedTypeGroup<?> typeGroup, List<?> idList, Exception exception) {
-		String failingOperation = log.massIndexingLoadingAndExtractingEntityData( typeGroup.notifiedGroupName() );
+		String failingOperation =
+				PojoMassIndexerMessages.INSTANCE.massIndexingLoadingAndExtractingEntityData( typeGroup.notifiedGroupName() );
 
 		// Don't record these failures as suppressed beyond the first one, because there may be hundreds of them.
 		recordFailure( exception, false );
@@ -167,26 +165,25 @@ public class PojoMassIndexingNotifier {
 			long unreported = entry.getValue().get() - failureFloodingThreshold;
 			if ( unreported > 0 ) {
 				MassIndexingFailureContext.Builder builder = MassIndexingFailureContext.builder();
-				builder.throwable( log.notReportedFailures( unreported ) );
+				builder.throwable( MassIndexingLog.INSTANCE.notReportedFailures( unreported ) );
 				builder.failingOperation( entry.getKey() );
 				failureHandler.handle( builder.build() );
 			}
 		}
 
 		if ( firstFailure.throwable instanceof InterruptedException ) {
-			throw log.massIndexingThreadInterrupted(
-					(InterruptedException) firstFailure.throwable
+			throw MassIndexingLog.INSTANCE.massIndexingThreadInterrupted( (InterruptedException) firstFailure.throwable
 			);
 		}
 		else if ( firstFailure.entityReference != null ) {
-			throw log.massIndexingFirstFailureOnEntity(
+			throw MassIndexingLog.INSTANCE.massIndexingFirstFailureOnEntity(
 					failureCount.longValue(),
 					firstFailure.entityReference,
 					firstFailure.throwable.getMessage(), firstFailure.throwable
 			);
 		}
 		else {
-			throw log.massIndexingFirstFailure(
+			throw MassIndexingLog.INSTANCE.massIndexingFirstFailure(
 					failureCount.longValue(),
 					firstFailure.throwable.getMessage(), firstFailure.throwable
 			);

@@ -4,7 +4,6 @@
  */
 package org.hibernate.search.jakarta.batch.core.massindexing.util.impl;
 
-import java.lang.invoke.MethodHandles;
 import java.util.Arrays;
 import java.util.LinkedHashSet;
 import java.util.List;
@@ -16,13 +15,12 @@ import jakarta.persistence.EntityManagerFactory;
 import org.hibernate.engine.spi.SessionFactoryImplementor;
 import org.hibernate.search.jakarta.batch.core.context.jpa.impl.ActiveSessionFactoryRegistry;
 import org.hibernate.search.jakarta.batch.core.context.jpa.spi.EntityManagerFactoryRegistry;
-import org.hibernate.search.jakarta.batch.core.logging.impl.Log;
+import org.hibernate.search.jakarta.batch.core.logging.impl.JakartaBatchLog;
 import org.hibernate.search.jakarta.batch.core.massindexing.impl.JobContextData;
 import org.hibernate.search.mapper.orm.Search;
 import org.hibernate.search.mapper.orm.loading.spi.HibernateOrmLoadingTypeContext;
 import org.hibernate.search.mapper.orm.spi.BatchMappingContext;
 import org.hibernate.search.util.common.impl.StringHelper;
-import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
 /**
  * Utility allowing to set up and retrieve the job context data, shared by all the steps.
@@ -35,8 +33,6 @@ import org.hibernate.search.util.common.logging.impl.LoggerFactory;
  * @author Yoann Rodiere
  */
 public final class JobContextUtil {
-
-	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	private JobContextUtil() {
 		// Private constructor, do not use it.
@@ -71,7 +67,7 @@ public final class JobContextUtil {
 		}
 		else {
 			if ( StringHelper.isEmpty( entityManagerFactoryReference ) ) {
-				throw log.entityManagerFactoryReferenceIsEmpty();
+				throw JakartaBatchLog.INSTANCE.entityManagerFactoryReferenceIsEmpty();
 			}
 			else {
 				return registry.get( entityManagerFactoryNamespace, entityManagerFactoryReference );

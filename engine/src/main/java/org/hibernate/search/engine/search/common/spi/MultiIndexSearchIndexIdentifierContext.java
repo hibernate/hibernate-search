@@ -4,7 +4,6 @@
  */
 package org.hibernate.search.engine.search.common.spi;
 
-import java.lang.invoke.MethodHandles;
 import java.util.List;
 import java.util.function.BiPredicate;
 import java.util.function.Function;
@@ -12,15 +11,13 @@ import java.util.function.Function;
 import org.hibernate.search.engine.backend.scope.spi.AbstractSearchIndexScope;
 import org.hibernate.search.engine.backend.types.converter.spi.DslConverter;
 import org.hibernate.search.engine.backend.types.converter.spi.ProjectionConverter;
-import org.hibernate.search.engine.logging.impl.Log;
+import org.hibernate.search.engine.logging.impl.QueryLog;
 import org.hibernate.search.engine.reporting.spi.EventContexts;
 import org.hibernate.search.util.common.SearchException;
-import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 import org.hibernate.search.util.common.reporting.EventContext;
 
 public class MultiIndexSearchIndexIdentifierContext
 		implements SearchIndexIdentifierContext {
-	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	private final SearchIndexScope<?> scope;
 	private final List<SearchIndexIdentifierContext> contextByIndex;
@@ -78,11 +75,11 @@ public class MultiIndexSearchIndexIdentifierContext
 			T attribute1, T attribute2) {
 		try {
 			if ( !compatibilityChecker.test( attribute1, attribute2 ) ) {
-				throw log.differentAttribute( attributeName, attribute1, attribute2 );
+				throw QueryLog.INSTANCE.differentAttribute( attributeName, attribute1, attribute2 );
 			}
 		}
 		catch (SearchException e) {
-			throw log.inconsistentConfigurationInContextForSearch( relativeEventContext(), e.getMessage(),
+			throw QueryLog.INSTANCE.inconsistentConfigurationInContextForSearch( relativeEventContext(), e.getMessage(),
 					scope.eventContext(), e );
 		}
 	}

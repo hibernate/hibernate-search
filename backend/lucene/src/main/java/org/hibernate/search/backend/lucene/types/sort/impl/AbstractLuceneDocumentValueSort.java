@@ -4,9 +4,7 @@
  */
 package org.hibernate.search.backend.lucene.types.sort.impl;
 
-import java.lang.invoke.MethodHandles;
-
-import org.hibernate.search.backend.lucene.logging.impl.Log;
+import org.hibernate.search.backend.lucene.logging.impl.QueryLog;
 import org.hibernate.search.backend.lucene.lowlevel.docvalues.impl.MultiValueMode;
 import org.hibernate.search.backend.lucene.search.common.impl.LuceneSearchIndexScope;
 import org.hibernate.search.backend.lucene.search.common.impl.LuceneSearchIndexValueFieldContext;
@@ -20,15 +18,12 @@ import org.hibernate.search.engine.search.common.SortMode;
 import org.hibernate.search.engine.search.predicate.SearchPredicate;
 import org.hibernate.search.engine.search.sort.dsl.SortOrder;
 import org.hibernate.search.util.common.AssertionFailure;
-import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 import org.hibernate.search.util.common.reporting.EventContext;
 
 import org.apache.lucene.search.Query;
 import org.apache.lucene.search.SortField;
 
 public abstract class AbstractLuceneDocumentValueSort extends AbstractLuceneReversibleSort {
-
-	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	private final String absoluteFieldPath;
 	private final LuceneSearchPredicate nestedFilter;
@@ -84,14 +79,14 @@ public abstract class AbstractLuceneDocumentValueSort extends AbstractLuceneReve
 
 		public void mode(SortMode mode) {
 			if ( nestedDocumentPath != null && SortMode.MEDIAN.equals( mode ) ) {
-				throw log.invalidSortModeAcrossNested( mode, getEventContext() );
+				throw QueryLog.INSTANCE.invalidSortModeAcrossNested( mode, getEventContext() );
 			}
 			this.mode = mode;
 		}
 
 		public void filter(SearchPredicate filter) {
 			if ( nestedDocumentPath == null ) {
-				throw log.cannotFilterSortOnRootDocumentField( absoluteFieldPath, getEventContext() );
+				throw QueryLog.INSTANCE.cannotFilterSortOnRootDocumentField( absoluteFieldPath, getEventContext() );
 			}
 			LuceneSearchPredicate luceneFilter = LuceneSearchPredicate.from( scope, filter );
 			luceneFilter.checkNestableWithin( nestedDocumentPath );

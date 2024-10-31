@@ -5,7 +5,6 @@
 package org.hibernate.search.backend.lucene.analysis.model.dsl.impl;
 
 import java.io.IOException;
-import java.lang.invoke.MethodHandles;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -13,8 +12,7 @@ import org.hibernate.search.backend.lucene.analysis.impl.LuceneAnalysisComponent
 import org.hibernate.search.backend.lucene.analysis.model.dsl.LuceneAnalysisComponentParametersStep;
 import org.hibernate.search.backend.lucene.analysis.model.dsl.LuceneAnalyzerOptionalComponentsStep;
 import org.hibernate.search.backend.lucene.analysis.model.dsl.LuceneAnalyzerTokenizerStep;
-import org.hibernate.search.backend.lucene.logging.impl.Log;
-import org.hibernate.search.util.common.logging.impl.LoggerFactory;
+import org.hibernate.search.backend.lucene.logging.impl.AnalyzerLog;
 
 import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.analysis.CharFilterFactory;
@@ -24,8 +22,6 @@ import org.apache.lucene.analysis.TokenizerFactory;
 class LuceneAnalyzerComponentsStep
 		implements LuceneAnalyzerTokenizerStep, LuceneAnalyzerOptionalComponentsStep,
 		LuceneAnalyzerBuilder {
-
-	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	private final String name;
 
@@ -91,7 +87,7 @@ class LuceneAnalyzerComponentsStep
 			);
 		}
 		catch (IOException | RuntimeException e) {
-			throw log.unableToCreateAnalyzer( name, e.getMessage(), e );
+			throw AnalyzerLog.INSTANCE.unableToCreateAnalyzer( name, e.getMessage(), e );
 		}
 	}
 

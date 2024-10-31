@@ -4,13 +4,12 @@
  */
 package org.hibernate.search.backend.elasticsearch.search.predicate.impl;
 
-import java.lang.invoke.MethodHandles;
 import java.lang.reflect.Array;
 
 import org.hibernate.search.backend.elasticsearch.gson.impl.JsonAccessor;
 import org.hibernate.search.backend.elasticsearch.gson.impl.JsonArrayAccessor;
 import org.hibernate.search.backend.elasticsearch.gson.impl.JsonObjectAccessor;
-import org.hibernate.search.backend.elasticsearch.logging.impl.Log;
+import org.hibernate.search.backend.elasticsearch.logging.impl.QueryLog;
 import org.hibernate.search.backend.elasticsearch.lowlevel.query.impl.Queries;
 import org.hibernate.search.backend.elasticsearch.search.common.impl.AbstractElasticsearchCodecAwareSearchQueryElementFactory;
 import org.hibernate.search.backend.elasticsearch.search.common.impl.ElasticsearchSearchIndexScope;
@@ -20,14 +19,11 @@ import org.hibernate.search.backend.elasticsearch.types.codec.impl.Elasticsearch
 import org.hibernate.search.engine.search.predicate.SearchPredicate;
 import org.hibernate.search.engine.search.predicate.spi.KnnPredicateBuilder;
 import org.hibernate.search.util.common.AssertionFailure;
-import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 
 public abstract class ElasticsearchKnnPredicate extends AbstractElasticsearchSingleFieldPredicate {
-
-	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	protected final ElasticsearchSearchPredicate filter;
 	protected final int k;
@@ -51,7 +47,7 @@ public abstract class ElasticsearchKnnPredicate extends AbstractElasticsearchSin
 			return Queries.boolCombineMust( mainFilter, filters );
 		}
 		else if ( !filters.isEmpty() ) {
-			log.knnUsedInNestedContextRequiresFilters();
+			QueryLog.INSTANCE.knnUsedInNestedContextRequiresFilters();
 		}
 		return mainFilter;
 	}
@@ -130,11 +126,11 @@ public abstract class ElasticsearchKnnPredicate extends AbstractElasticsearchSin
 				throw new IllegalArgumentException( "Vector can only be either a float or a byte array (float[], byte[])." );
 			}
 			if ( !vectorElementsType.equals( vector.getClass().getComponentType() ) ) {
-				throw log.vectorKnnMatchVectorTypeDiffersFromField( absoluteFieldPath, vectorElementsType,
+				throw QueryLog.INSTANCE.vectorKnnMatchVectorTypeDiffersFromField( absoluteFieldPath, vectorElementsType,
 						vector.getClass().getComponentType() );
 			}
 			if ( Array.getLength( vector ) != indexedVectorsDimension ) {
-				throw log.vectorKnnMatchVectorDimensionDiffersFromField( absoluteFieldPath, indexedVectorsDimension,
+				throw QueryLog.INSTANCE.vectorKnnMatchVectorDimensionDiffersFromField( absoluteFieldPath, indexedVectorsDimension,
 						Array.getLength( vector )
 				);
 			}
@@ -290,12 +286,12 @@ public abstract class ElasticsearchKnnPredicate extends AbstractElasticsearchSin
 
 			@Override
 			public void requiredMinimumSimilarity(float similarity) {
-				throw log.knnRequiredMinimumSimilarityUnsupportedOption();
+				throw QueryLog.INSTANCE.knnRequiredMinimumSimilarityUnsupportedOption();
 			}
 
 			@Override
 			public void requiredMinimumScore(float score) {
-				throw log.knnRequiredMinimumSimilarityUnsupportedOption();
+				throw QueryLog.INSTANCE.knnRequiredMinimumSimilarityUnsupportedOption();
 			}
 
 			@Override

@@ -4,11 +4,9 @@
  */
 package org.hibernate.search.backend.elasticsearch.work.factory.impl;
 
-import java.lang.invoke.MethodHandles;
-
 import org.hibernate.search.backend.elasticsearch.gson.spi.GsonProvider;
 import org.hibernate.search.backend.elasticsearch.index.IndexStatus;
-import org.hibernate.search.backend.elasticsearch.logging.impl.Log;
+import org.hibernate.search.backend.elasticsearch.logging.impl.ElasticsearchSpecificLog;
 import org.hibernate.search.backend.elasticsearch.util.spi.URLEncodedString;
 import org.hibernate.search.backend.elasticsearch.work.impl.CloseIndexWork;
 import org.hibernate.search.backend.elasticsearch.work.impl.DeleteByQueryWork;
@@ -17,7 +15,6 @@ import org.hibernate.search.backend.elasticsearch.work.impl.ForceMergeWork;
 import org.hibernate.search.backend.elasticsearch.work.impl.OpenIndexWork;
 import org.hibernate.search.backend.elasticsearch.work.impl.RefreshWork;
 import org.hibernate.search.backend.elasticsearch.work.impl.WaitForIndexStatusWork;
-import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
 import com.google.gson.JsonObject;
 
@@ -30,7 +27,6 @@ import com.google.gson.JsonObject;
  * @see org.hibernate.search.backend.elasticsearch.ElasticsearchDistributionName#AMAZON_OPENSEARCH_SERVERLESS
  */
 public class AmazonOpenSearchServerlessWorkFactory extends Elasticsearch7WorkFactory {
-	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	public AmazonOpenSearchServerlessWorkFactory(GsonProvider gsonProvider, Boolean ignoreShardFailures) {
 		super( gsonProvider, ignoreShardFailures );
@@ -43,7 +39,7 @@ public class AmazonOpenSearchServerlessWorkFactory extends Elasticsearch7WorkFac
 
 	@Override
 	public DeleteByQueryWork.Builder deleteByQuery(URLEncodedString indexName, JsonObject payload) {
-		throw log.cannotExecuteOperationOnAmazonOpenSearchServerless( "deleteByQuery" );
+		throw ElasticsearchSpecificLog.INSTANCE.cannotExecuteOperationOnAmazonOpenSearchServerless( "deleteByQuery" );
 	}
 
 	@Override
@@ -53,7 +49,7 @@ public class AmazonOpenSearchServerlessWorkFactory extends Elasticsearch7WorkFac
 
 	@Override
 	public FlushWork.Builder flush() {
-		throw log.cannotExecuteOperationOnAmazonOpenSearchServerless( "flush" );
+		throw ElasticsearchSpecificLog.INSTANCE.cannotExecuteOperationOnAmazonOpenSearchServerless( "flush" );
 	}
 
 	@Override
@@ -63,7 +59,7 @@ public class AmazonOpenSearchServerlessWorkFactory extends Elasticsearch7WorkFac
 
 	@Override
 	public RefreshWork.Builder refresh() {
-		throw log.cannotExecuteOperationOnAmazonOpenSearchServerless( "refresh" );
+		throw ElasticsearchSpecificLog.INSTANCE.cannotExecuteOperationOnAmazonOpenSearchServerless( "refresh" );
 	}
 
 	@Override
@@ -73,23 +69,23 @@ public class AmazonOpenSearchServerlessWorkFactory extends Elasticsearch7WorkFac
 
 	@Override
 	public ForceMergeWork.Builder mergeSegments() {
-		throw log.cannotExecuteOperationOnAmazonOpenSearchServerless( "mergeSegments" );
+		throw ElasticsearchSpecificLog.INSTANCE.cannotExecuteOperationOnAmazonOpenSearchServerless( "mergeSegments" );
 	}
 
 	@Override
 	public OpenIndexWork.Builder openIndex(URLEncodedString indexName) {
-		throw log.cannotExecuteOperationOnAmazonOpenSearchServerless( "openIndex" );
+		throw ElasticsearchSpecificLog.INSTANCE.cannotExecuteOperationOnAmazonOpenSearchServerless( "openIndex" );
 	}
 
 	@Override
 	public CloseIndexWork.Builder closeIndex(URLEncodedString indexName) {
-		throw log.cannotExecuteOperationOnAmazonOpenSearchServerless( "closeIndex" );
+		throw ElasticsearchSpecificLog.INSTANCE.cannotExecuteOperationOnAmazonOpenSearchServerless( "closeIndex" );
 	}
 
 	@Override
 	public WaitForIndexStatusWork.Builder waitForIndexStatus(URLEncodedString indexName, IndexStatus requiredStatus,
 			int requiredStatusTimeoutInMs) {
-		throw log.cannotExecuteOperationOnAmazonOpenSearchServerless( "waitForIndexStatus" );
+		throw ElasticsearchSpecificLog.INSTANCE.cannotExecuteOperationOnAmazonOpenSearchServerless( "waitForIndexStatus" );
 	}
 
 	@Override

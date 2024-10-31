@@ -4,7 +4,6 @@
  */
 package org.hibernate.search.mapper.pojo.search.definition.impl;
 
-import java.lang.invoke.MethodHandles;
 import java.util.List;
 
 import org.hibernate.search.engine.environment.bean.BeanHolder;
@@ -15,20 +14,17 @@ import org.hibernate.search.engine.search.projection.definition.spi.CompositePro
 import org.hibernate.search.engine.search.projection.dsl.CompositeProjectionInnerStep;
 import org.hibernate.search.engine.search.projection.dsl.CompositeProjectionValueStep;
 import org.hibernate.search.engine.search.projection.dsl.SearchProjectionFactory;
-import org.hibernate.search.mapper.pojo.logging.impl.Log;
+import org.hibernate.search.mapper.pojo.logging.impl.ProjectionLog;
 import org.hibernate.search.mapper.pojo.model.path.spi.ProjectionConstructorPath;
 import org.hibernate.search.mapper.pojo.model.spi.PojoConstructorIdentifier;
 import org.hibernate.search.util.common.SearchException;
 import org.hibernate.search.util.common.impl.Closer;
-import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 import org.hibernate.search.util.common.reflect.spi.ValueCreateHandle;
 import org.hibernate.search.util.common.spi.ToStringTreeAppendable;
 import org.hibernate.search.util.common.spi.ToStringTreeAppender;
 
 public final class PojoConstructorProjectionDefinition<T>
 		implements CompositeProjectionDefinition<T>, ToStringTreeAppendable {
-
-	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	private final PojoConstructorIdentifier constructor;
 	private final ValueCreateHandle<? extends T> handle;
@@ -81,13 +77,13 @@ public final class PojoConstructorProjectionDefinition<T>
 			// We already know what prevented from applying a projection constructor correctly,
 			// just add a parent constructor and re-throw:
 			ProjectionConstructorPath path = new ProjectionConstructorPath( constructor, e.projectionConstructorPath(), i );
-			throw log.errorApplyingProjectionConstructor(
+			throw ProjectionLog.INSTANCE.errorApplyingProjectionConstructor(
 					e.getCause().getMessage(), e, path
 			);
 		}
 		catch (SearchException e) {
 			ProjectionConstructorPath path = new ProjectionConstructorPath( constructor );
-			throw log.errorApplyingProjectionConstructor( e.getMessage(), e, path );
+			throw ProjectionLog.INSTANCE.errorApplyingProjectionConstructor( e.getMessage(), e, path );
 		}
 	}
 

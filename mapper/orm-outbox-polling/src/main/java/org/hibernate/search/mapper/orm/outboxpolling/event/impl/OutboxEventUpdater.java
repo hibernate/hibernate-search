@@ -4,7 +4,6 @@
  */
 package org.hibernate.search.mapper.orm.outboxpolling.event.impl;
 
-import java.lang.invoke.MethodHandles;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
@@ -15,13 +14,11 @@ import java.util.stream.Collectors;
 import org.hibernate.engine.spi.SessionImplementor;
 import org.hibernate.search.engine.reporting.EntityIndexingFailureContext;
 import org.hibernate.search.engine.reporting.FailureHandler;
-import org.hibernate.search.mapper.orm.outboxpolling.logging.impl.Log;
+import org.hibernate.search.mapper.orm.outboxpolling.logging.impl.OutboxPollingEventsLog;
 import org.hibernate.search.util.common.SearchException;
-import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
 public class OutboxEventUpdater {
 
-	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 	private static final int MAX_RETRIES = 3;
 
 	private final FailureHandler failureHandler;
@@ -84,7 +81,7 @@ public class OutboxEventUpdater {
 				Instant processAfter = ( retryAfter > 0 ) ? Instant.now().plusSeconds( retryAfter ) : Instant.now();
 				event.setProcessAfter( processAfter );
 
-				log.backgroundIndexingRetry(
+				OutboxPollingEventsLog.INSTANCE.backgroundIndexingRetry(
 						event.getId(), event.getEntityName(), event.getEntityId(), attempts, processAfter
 				);
 			}
@@ -97,7 +94,7 @@ public class OutboxEventUpdater {
 
 	private void notifyMaxRetriesReached(OutboxEvent failedEvent) {
 		EntityIndexingFailureContext.Builder builder = EntityIndexingFailureContext.builder();
-		SearchException exception = log.maxRetryExhausted( MAX_RETRIES );
+		SearchException exception = OutboxPollingEventsLog.INSTANCE.maxRetryExhausted( MAX_RETRIES );
 		builder.throwable( exception );
 		builder.failingOperation( "Processing an outbox event." );
 		builder.failingEntityReference( processingPlan.entityReference(

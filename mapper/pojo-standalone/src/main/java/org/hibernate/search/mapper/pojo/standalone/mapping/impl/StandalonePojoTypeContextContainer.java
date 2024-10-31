@@ -4,7 +4,6 @@
  */
 package org.hibernate.search.mapper.pojo.standalone.mapping.impl;
 
-import java.lang.invoke.MethodHandles;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.LinkedHashMap;
@@ -13,14 +12,12 @@ import java.util.Map;
 
 import org.hibernate.search.mapper.pojo.model.spi.PojoRawTypeIdentifier;
 import org.hibernate.search.mapper.pojo.model.spi.PojoRawTypeModel;
-import org.hibernate.search.mapper.pojo.standalone.logging.impl.Log;
+import org.hibernate.search.mapper.pojo.standalone.logging.impl.MappingLog;
 import org.hibernate.search.mapper.pojo.standalone.session.impl.StandalonePojoSearchSessionTypeContextProvider;
 import org.hibernate.search.util.common.data.spi.KeyValueProvider;
-import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
 public class StandalonePojoTypeContextContainer
 		implements StandalonePojoSearchSessionTypeContextProvider {
-	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	private final KeyValueProvider<PojoRawTypeIdentifier<?>, AbstractStandalonePojoTypeContext<?>> byTypeIdentifier;
 	private final KeyValueProvider<PojoRawTypeIdentifier<?>, StandalonePojoIndexedTypeContext<?>> indexedByTypeIdentifier;
@@ -58,13 +55,15 @@ public class StandalonePojoTypeContextContainer
 			byExactClassContent.put( typeContext.javaClass(), typeContext );
 		}
 		this.byTypeIdentifier =
-				new KeyValueProvider<>( byTypeIdentifierContent, log::unknownTypeIdentifierForMappedEntityType );
+				new KeyValueProvider<>( byTypeIdentifierContent, MappingLog.INSTANCE::unknownTypeIdentifierForMappedEntityType );
 		this.indexedByTypeIdentifier =
-				new KeyValueProvider<>( indexedByTypeIdentifierContent, log::unknownTypeIdentifierForIndexedEntityType );
-		this.byExactClass = new KeyValueProvider<>( byExactClassContent, log::unknownClassForMappedEntityType );
-		this.indexedByExactClass = new KeyValueProvider<>( indexedByExactClassContent, log::unknownClassForIndexedEntityType );
+				new KeyValueProvider<>( indexedByTypeIdentifierContent,
+						MappingLog.INSTANCE::unknownTypeIdentifierForIndexedEntityType );
+		this.byExactClass = new KeyValueProvider<>( byExactClassContent, MappingLog.INSTANCE::unknownClassForMappedEntityType );
+		this.indexedByExactClass =
+				new KeyValueProvider<>( indexedByExactClassContent, MappingLog.INSTANCE::unknownClassForIndexedEntityType );
 		this.indexedByEntityName =
-				new KeyValueProvider<>( indexedByEntityNameContent, log::unknownEntityNameForIndexedEntityType );
+				new KeyValueProvider<>( indexedByEntityNameContent, MappingLog.INSTANCE::unknownEntityNameForIndexedEntityType );
 	}
 
 	@Override

@@ -19,7 +19,7 @@ import java.util.Set;
 import org.hibernate.search.backend.elasticsearch.ElasticsearchExtension;
 import org.hibernate.search.util.common.AssertionFailure;
 import org.hibernate.search.util.impl.test.jar.JandexTestUtils;
-import org.hibernate.search.util.impl.test.logging.Log;
+import org.hibernate.search.util.impl.test.logging.impl.TestLog;
 
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
@@ -61,7 +61,7 @@ class GsonClassesTest {
 		Set<String> annotatedClassesAndSubclasses = JandexTestUtils.toStrings(
 				JandexTestUtils.collectClassHierarchiesRecursively( backendElasticsearchIndex, annotatedClasses ) );
 
-		Log.INSTANCE.infof( "GSON-annotated classes and their class hierarchy: %s", annotatedClassesAndSubclasses );
+		TestLog.TEST_LOGGER.infof( "GSON-annotated classes and their class hierarchy: %s", annotatedClassesAndSubclasses );
 		assertThat( annotatedClassesAndSubclasses ).isNotEmpty();
 		assertThat( GsonClasses.typesRequiringReflection() ).containsAll( annotatedClassesAndSubclasses );
 	}
@@ -86,7 +86,7 @@ class GsonClassesTest {
 		Set<String> classesAndSubclasses = JandexTestUtils.toStrings(
 				JandexTestUtils.collectClassHierarchiesRecursively( backendElasticsearchIndex, classes ) );
 
-		Log.INSTANCE.infof( "Gson contract implementations and their class hierarchy: %s", classesAndSubclasses );
+		TestLog.TEST_LOGGER.infof( "Gson contract implementations and their class hierarchy: %s", classesAndSubclasses );
 		assertThat( classesAndSubclasses ).isNotEmpty();
 		assertThat( GsonClasses.typesRequiringReflection() ).containsAll( classesAndSubclasses );
 	}

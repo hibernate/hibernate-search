@@ -16,6 +16,7 @@ import java.util.Locale;
 import java.util.Set;
 import java.util.function.Supplier;
 
+import org.hibernate.search.backend.lucene.logging.impl.QueryLog;
 import org.hibernate.search.backend.lucene.lowlevel.collector.impl.Values;
 import org.hibernate.search.backend.lucene.search.projection.impl.ProjectionExtractContext;
 import org.hibernate.search.engine.search.highlighter.dsl.HighlighterFragmenter;
@@ -65,7 +66,7 @@ class LuceneUnifiedSearchHighlighter extends LuceneAbstractSearchHighlighter {
 		if ( this.noMatchSize > 0 && this.noMatchSize != Integer.MAX_VALUE ) {
 			// we don't want to throw an exception here as users might still want to get the no-match fragment even if
 			// they cannot limit the length of it...
-			log.unifiedHighlighterNoMatchSizeWarning( this.noMatchSize );
+			QueryLog.INSTANCE.unifiedHighlighterNoMatchSizeWarning( this.noMatchSize );
 		}
 	}
 
@@ -137,7 +138,7 @@ class LuceneUnifiedSearchHighlighter extends LuceneAbstractSearchHighlighter {
 				return BreakIterator.getSentenceInstance( LuceneUnifiedSearchHighlighter.this.boundaryScannerLocale );
 			}
 
-			throw log.unsupportedBoundaryScannerType(
+			throw QueryLog.INSTANCE.unsupportedBoundaryScannerType(
 					LuceneUnifiedSearchHighlighter.this.getClass().getSimpleName(),
 					LuceneUnifiedSearchHighlighter.this.boundaryScannerType
 			);

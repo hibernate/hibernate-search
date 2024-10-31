@@ -25,23 +25,21 @@ import org.hibernate.search.mapper.pojo.mapping.definition.annotation.AnnotatedT
 import org.hibernate.search.mapper.pojo.standalone.bootstrap.spi.StandalonePojoIntegrationBooter;
 import org.hibernate.search.mapper.pojo.standalone.bootstrap.spi.StandalonePojoIntegrationBooterBehavior;
 import org.hibernate.search.mapper.pojo.standalone.cfg.spi.StandalonePojoMapperSpiSettings;
-import org.hibernate.search.mapper.pojo.standalone.logging.impl.Log;
+import org.hibernate.search.mapper.pojo.standalone.logging.impl.ConfigurationLog;
 import org.hibernate.search.mapper.pojo.standalone.mapping.impl.StandalonePojoMapping;
 import org.hibernate.search.mapper.pojo.standalone.mapping.impl.StandalonePojoMappingInitiator;
 import org.hibernate.search.mapper.pojo.standalone.mapping.impl.StandalonePojoMappingKey;
 import org.hibernate.search.mapper.pojo.standalone.model.impl.StandalonePojoBootstrapIntrospector;
 import org.hibernate.search.util.common.impl.SuppressingCloser;
-import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 import org.hibernate.search.util.common.reflect.spi.ValueHandleFactory;
 
 public class StandalonePojoIntegrationBooterImpl implements StandalonePojoIntegrationBooter {
 
-	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	private static final OptionalConfigurationProperty<BeanProvider> BEAN_PROVIDER =
 			ConfigurationProperty.forKey( StandalonePojoMapperSpiSettings.BEAN_PROVIDER )
 					.as( BeanProvider.class, value -> {
-						throw log.invalidStringForBeanProvider( value, BeanProvider.class );
+						throw ConfigurationLog.INSTANCE.invalidStringForBeanProvider( value, BeanProvider.class );
 					} )
 					.build();
 

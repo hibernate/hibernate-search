@@ -4,10 +4,8 @@
  */
 package org.hibernate.search.backend.elasticsearch.types.predicate.impl;
 
-import java.lang.invoke.MethodHandles;
-
 import org.hibernate.search.backend.elasticsearch.gson.impl.JsonAccessor;
-import org.hibernate.search.backend.elasticsearch.logging.impl.Log;
+import org.hibernate.search.backend.elasticsearch.logging.impl.AnalyzerLog;
 import org.hibernate.search.backend.elasticsearch.lowlevel.index.analysis.impl.AnalyzerConstants;
 import org.hibernate.search.backend.elasticsearch.search.common.impl.AbstractElasticsearchCodecAwareSearchQueryElementFactory;
 import org.hibernate.search.backend.elasticsearch.search.common.impl.ElasticsearchSearchIndexScope;
@@ -18,13 +16,10 @@ import org.hibernate.search.backend.elasticsearch.types.codec.impl.Elasticsearch
 import org.hibernate.search.engine.reporting.spi.EventContexts;
 import org.hibernate.search.engine.search.predicate.SearchPredicate;
 import org.hibernate.search.engine.search.predicate.spi.MatchPredicateBuilder;
-import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
 import com.google.gson.JsonObject;
 
 public class ElasticsearchTextMatchPredicate extends ElasticsearchStandardMatchPredicate {
-
-	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	private static final JsonAccessor<Integer> FUZZINESS_ACCESSOR = JsonAccessor.root().property( "fuzziness" ).asInteger();
 	private static final JsonAccessor<Integer> PREFIX_LENGTH_ACCESSOR =
@@ -107,7 +102,7 @@ public class ElasticsearchTextMatchPredicate extends ElasticsearchStandardMatchP
 		@Override
 		public void skipAnalysis() {
 			if ( field.type().hasNormalizerOnAtLeastOneIndex() ) {
-				throw log.skipAnalysisOnNormalizedField( absoluteFieldPath,
+				throw AnalyzerLog.INSTANCE.skipAnalysisOnNormalizedField( absoluteFieldPath,
 						EventContexts.fromIndexFieldAbsolutePath( absoluteFieldPath ) );
 			}
 

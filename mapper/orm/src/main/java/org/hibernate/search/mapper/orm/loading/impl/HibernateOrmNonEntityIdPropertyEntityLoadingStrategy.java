@@ -4,7 +4,6 @@
  */
 package org.hibernate.search.mapper.orm.loading.impl;
 
-import java.lang.invoke.MethodHandles;
 import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -14,19 +13,16 @@ import org.hibernate.search.mapper.orm.common.impl.HibernateOrmUtils;
 import org.hibernate.search.mapper.orm.loading.spi.HibernateOrmEntityLoadingStrategy;
 import org.hibernate.search.mapper.orm.loading.spi.HibernateOrmLoadingSessionContext;
 import org.hibernate.search.mapper.orm.loading.spi.MutableEntityLoadingOptions;
-import org.hibernate.search.mapper.orm.logging.impl.Log;
+import org.hibernate.search.mapper.orm.logging.impl.OrmSpecificLog;
 import org.hibernate.search.mapper.orm.model.impl.DocumentIdSourceProperty;
 import org.hibernate.search.mapper.orm.search.loading.EntityLoadingCacheLookupStrategy;
 import org.hibernate.search.mapper.pojo.loading.spi.PojoLoadingTypeContext;
 import org.hibernate.search.mapper.pojo.loading.spi.PojoSelectionEntityLoader;
 import org.hibernate.search.util.common.AssertionFailure;
-import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 import org.hibernate.search.util.common.reflect.spi.ValueReadHandle;
 
 public class HibernateOrmNonEntityIdPropertyEntityLoadingStrategy<E, I>
 		extends AbstractHibernateOrmLoadingStrategy<E, I> {
-
-	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	public static <I> HibernateOrmEntityLoadingStrategy<?, ? super I> create(PersistentClass persistentClass,
 			DocumentIdSourceProperty<I> documentIdSourceProperty) {
@@ -138,7 +134,7 @@ public class HibernateOrmNonEntityIdPropertyEntityLoadingStrategy<E, I>
 			 * because this setting may still be relevant for other entity types targeted by the same query.
 			 * Let's log something, at least.
 			 */
-			log.skippingPreliminaryCacheLookupsForNonEntityIdEntityLoader(
+			OrmSpecificLog.INSTANCE.skippingPreliminaryCacheLookupsForNonEntityIdEntityLoader(
 					targetEntityTypeContext.entityName(), cacheLookupStrategy
 			);
 		}

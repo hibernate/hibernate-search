@@ -6,7 +6,6 @@ package org.hibernate.search.mapper.pojo.standalone.session.impl;
 
 import static org.hibernate.search.util.common.impl.CollectionHelper.asSetIgnoreNull;
 
-import java.lang.invoke.MethodHandles;
 import java.util.Collection;
 import java.util.function.Consumer;
 
@@ -19,10 +18,11 @@ import org.hibernate.search.mapper.pojo.standalone.loading.dsl.SelectionLoadingO
 import org.hibernate.search.mapper.pojo.standalone.loading.impl.StandalonePojoLoadingContext;
 import org.hibernate.search.mapper.pojo.standalone.loading.impl.StandalonePojoLoadingSessionContext;
 import org.hibernate.search.mapper.pojo.standalone.loading.impl.StandalonePojoSelectionLoadingContextBuilder;
-import org.hibernate.search.mapper.pojo.standalone.logging.impl.Log;
+import org.hibernate.search.mapper.pojo.standalone.logging.impl.SessionLog;
 import org.hibernate.search.mapper.pojo.standalone.mapping.impl.ConfiguredIndexingPlanSynchronizationStrategyHolder;
 import org.hibernate.search.mapper.pojo.standalone.massindexing.MassIndexer;
 import org.hibernate.search.mapper.pojo.standalone.massindexing.impl.StandalonePojoMassIndexingSessionContext;
+import org.hibernate.search.mapper.pojo.standalone.reporting.impl.StandalonePojoMapperHints;
 import org.hibernate.search.mapper.pojo.standalone.schema.management.SearchSchemaManager;
 import org.hibernate.search.mapper.pojo.standalone.scope.SearchScope;
 import org.hibernate.search.mapper.pojo.standalone.scope.impl.SearchScopeImpl;
@@ -37,12 +37,10 @@ import org.hibernate.search.mapper.pojo.work.IndexingPlanSynchronizationStrategy
 import org.hibernate.search.mapper.pojo.work.spi.ConfiguredIndexingPlanSynchronizationStrategy;
 import org.hibernate.search.mapper.pojo.work.spi.ConfiguredSearchIndexingPlanFilter;
 import org.hibernate.search.mapper.pojo.work.spi.PojoIndexer;
-import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
 public class StandalonePojoSearchSession extends AbstractPojoSearchSession
 		implements SearchSession, StandalonePojoMassIndexingSessionContext, StandalonePojoLoadingSessionContext {
 
-	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 	private static final ConfiguredSearchIndexingPlanFilter ACCEPT_ALL = typeIdentifier -> true;
 
 	private final StandalonePojoSearchSessionMappingContext mappingContext;
@@ -75,7 +73,7 @@ public class StandalonePojoSearchSession extends AbstractPojoSearchSession
 
 	private void checkOpenAndThrow() {
 		if ( !open ) {
-			throw log.hibernateSessionAccessError( "is closed" );
+			throw SessionLog.INSTANCE.hibernateSessionAccessError( StandalonePojoMapperHints.INSTANCE.closedSession() );
 		}
 	}
 

@@ -4,7 +4,6 @@
  */
 package org.hibernate.search.backend.elasticsearch.mapping.impl;
 
-import java.lang.invoke.MethodHandles;
 import java.util.Optional;
 
 import org.hibernate.search.backend.elasticsearch.document.impl.DocumentMetadataContributor;
@@ -13,7 +12,7 @@ import org.hibernate.search.backend.elasticsearch.document.model.dsl.impl.IndexS
 import org.hibernate.search.backend.elasticsearch.gson.impl.JsonAccessor;
 import org.hibernate.search.backend.elasticsearch.index.layout.IndexLayoutStrategy;
 import org.hibernate.search.backend.elasticsearch.index.layout.impl.IndexNames;
-import org.hibernate.search.backend.elasticsearch.logging.impl.Log;
+import org.hibernate.search.backend.elasticsearch.logging.impl.QueryLog;
 import org.hibernate.search.backend.elasticsearch.lowlevel.index.mapping.impl.DataTypes;
 import org.hibernate.search.backend.elasticsearch.lowlevel.index.mapping.impl.MetadataFields;
 import org.hibernate.search.backend.elasticsearch.lowlevel.index.mapping.impl.PropertyMapping;
@@ -22,7 +21,6 @@ import org.hibernate.search.backend.elasticsearch.search.projection.impl.Project
 import org.hibernate.search.backend.elasticsearch.search.projection.impl.ProjectionExtractionHelper;
 import org.hibernate.search.backend.elasticsearch.search.projection.impl.ProjectionRequestContext;
 import org.hibernate.search.engine.backend.document.model.dsl.spi.ImplicitFieldContributor;
-import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
 import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
@@ -32,7 +30,6 @@ import com.google.gson.JsonPrimitive;
  * Works correctly with index aliases.
  */
 public class DiscriminatorTypeNameMapping implements TypeNameMapping {
-	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	private static final String MAPPED_TYPE_FIELD_NAME = MetadataFields.internalFieldName( "entity_type" );
 
@@ -114,7 +111,7 @@ public class DiscriminatorTypeNameMapping implements TypeNameMapping {
 		@Override
 		public String extract(JsonObject hit, ProjectionExtractContext context) {
 			return HIT_MAPPED_TYPE_NAME_ACCESSOR.get( hit )
-					.orElseThrow( () -> log.missingTypeFieldInDocument( MAPPED_TYPE_FIELD_NAME ) );
+					.orElseThrow( () -> QueryLog.INSTANCE.missingTypeFieldInDocument( MAPPED_TYPE_FIELD_NAME ) );
 		}
 	}
 }

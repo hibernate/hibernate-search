@@ -4,22 +4,18 @@
  */
 package org.hibernate.search.backend.lucene.document.impl;
 
-import java.lang.invoke.MethodHandles;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.hibernate.search.backend.lucene.logging.impl.Log;
+import org.hibernate.search.backend.lucene.logging.impl.IndexingLog;
 import org.hibernate.search.backend.lucene.lowlevel.common.impl.MetadataFields;
 import org.hibernate.search.backend.lucene.multitenancy.impl.MultiTenancyStrategy;
 import org.hibernate.search.backend.lucene.types.codec.impl.LuceneDocumentContent;
-import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
 import org.apache.lucene.document.Document;
 import org.apache.lucene.index.IndexableField;
 
 public class LuceneDocumentContentImpl implements LuceneDocumentContent {
-
-	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	private final Document document = new Document();
 	private final Map<String, EncounteredFieldStatus> fieldStatus = new HashMap<>();
@@ -38,7 +34,7 @@ public class LuceneDocumentContentImpl implements LuceneDocumentContent {
 	void checkNoValueYetForSingleValued(String absoluteFieldPath) {
 		EncounteredFieldStatus previousValue = fieldStatus.putIfAbsent( absoluteFieldPath, EncounteredFieldStatus.ENCOUNTERED );
 		if ( previousValue != null ) {
-			throw log.multipleValuesForSingleValuedField( absoluteFieldPath );
+			throw IndexingLog.INSTANCE.multipleValuesForSingleValuedField( absoluteFieldPath );
 		}
 	}
 

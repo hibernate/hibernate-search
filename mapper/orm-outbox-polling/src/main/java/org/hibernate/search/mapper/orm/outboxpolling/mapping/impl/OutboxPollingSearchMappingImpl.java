@@ -6,7 +6,6 @@ package org.hibernate.search.mapper.orm.outboxpolling.mapping.impl;
 
 import static org.hibernate.search.mapper.orm.outboxpolling.event.impl.OutboxPollingOutboxEventAdditionalMappingProducer.ENTITY_NAME;
 
-import java.lang.invoke.MethodHandles;
 import java.util.Set;
 import java.util.function.Function;
 
@@ -20,14 +19,11 @@ import org.hibernate.query.Query;
 import org.hibernate.search.mapper.orm.common.spi.TransactionHelper;
 import org.hibernate.search.mapper.orm.coordination.common.spi.CoordinationStrategyStartContext;
 import org.hibernate.search.mapper.orm.outboxpolling.event.impl.OutboxEvent;
-import org.hibernate.search.mapper.orm.outboxpolling.logging.impl.Log;
+import org.hibernate.search.mapper.orm.outboxpolling.logging.impl.ConfigurationLog;
 import org.hibernate.search.mapper.orm.outboxpolling.mapping.OutboxPollingSearchMapping;
 import org.hibernate.search.mapper.orm.tenancy.spi.TenancyConfiguration;
-import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
 public class OutboxPollingSearchMappingImpl implements OutboxPollingSearchMapping {
-
-	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	private static final String COUNT_EVENTS_WITH_STATUS =
 			"select count(e) from " + ENTITY_NAME + " e where e.status = :status";
@@ -138,7 +134,7 @@ public class OutboxPollingSearchMappingImpl implements OutboxPollingSearchMappin
 
 	private void checkNoTenant() {
 		if ( !tenantIds.isEmpty() ) {
-			throw log.noTenantIdSpecified( tenantIds );
+			throw ConfigurationLog.INSTANCE.noTenantIdSpecified( tenantIds );
 		}
 	}
 
@@ -148,7 +144,7 @@ public class OutboxPollingSearchMappingImpl implements OutboxPollingSearchMappin
 
 	private void checkTenant(String tenantId) {
 		if ( tenantIds.isEmpty() ) {
-			throw log.multiTenancyNotEnabled( tenantId );
+			throw ConfigurationLog.INSTANCE.multiTenancyNotEnabled( tenantId );
 		}
 		if ( !tenantIds.contains( tenantId ) ) {
 			throw tenancyConfiguration.invalidTenantId( tenantId );

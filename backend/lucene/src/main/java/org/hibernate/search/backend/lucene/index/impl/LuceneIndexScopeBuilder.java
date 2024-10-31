@@ -4,20 +4,16 @@
  */
 package org.hibernate.search.backend.lucene.index.impl;
 
-import java.lang.invoke.MethodHandles;
 import java.util.LinkedHashSet;
 import java.util.Set;
 
-import org.hibernate.search.backend.lucene.logging.impl.Log;
+import org.hibernate.search.backend.lucene.logging.impl.QueryLog;
 import org.hibernate.search.backend.lucene.scope.impl.LuceneIndexScopeImpl;
 import org.hibernate.search.engine.backend.mapping.spi.BackendMappingContext;
 import org.hibernate.search.engine.backend.scope.spi.IndexScope;
 import org.hibernate.search.engine.backend.scope.spi.IndexScopeBuilder;
-import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
 class LuceneIndexScopeBuilder implements IndexScopeBuilder {
-
-	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	private final IndexManagerBackendContext backendContext;
 	private final BackendMappingContext mappingContext;
@@ -34,7 +30,7 @@ class LuceneIndexScopeBuilder implements IndexScopeBuilder {
 
 	void add(IndexManagerBackendContext backendContext, LuceneIndexManagerImpl indexManager) {
 		if ( !this.backendContext.equals( backendContext ) ) {
-			throw log.cannotMixLuceneScopeWithOtherBackend(
+			throw QueryLog.INSTANCE.cannotMixLuceneScopeWithOtherBackend(
 					this, indexManager, backendContext.getEventContext()
 			);
 		}

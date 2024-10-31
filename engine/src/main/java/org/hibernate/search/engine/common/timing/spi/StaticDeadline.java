@@ -4,13 +4,11 @@
  */
 package org.hibernate.search.engine.common.timing.spi;
 
-import java.lang.invoke.MethodHandles;
 import java.time.Duration;
 
 import org.hibernate.search.engine.common.timing.Deadline;
-import org.hibernate.search.engine.logging.impl.Log;
+import org.hibernate.search.engine.logging.impl.QueryLog;
 import org.hibernate.search.util.common.SearchTimeoutException;
-import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
 public final class StaticDeadline implements Deadline {
 
@@ -23,8 +21,6 @@ public final class StaticDeadline implements Deadline {
 	public static Deadline ofMilliseconds(long milliseconds) {
 		return new StaticDeadline( milliseconds );
 	}
-
-	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	private final long remainingTimeMillis;
 
@@ -44,6 +40,6 @@ public final class StaticDeadline implements Deadline {
 
 	@Override
 	public SearchTimeoutException forceTimeoutAndCreateException(Exception cause) {
-		return log.timedOut( Duration.ofMillis( remainingTimeMillis ), cause );
+		return QueryLog.INSTANCE.timedOut( Duration.ofMillis( remainingTimeMillis ), cause );
 	}
 }

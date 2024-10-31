@@ -4,10 +4,9 @@
  */
 package org.hibernate.search.backend.lucene.search.projection.impl;
 
-import java.lang.invoke.MethodHandles;
 import java.util.function.Function;
 
-import org.hibernate.search.backend.lucene.logging.impl.Log;
+import org.hibernate.search.backend.lucene.logging.impl.QueryLog;
 import org.hibernate.search.backend.lucene.lowlevel.collector.impl.StoredFieldsValuesDelegate;
 import org.hibernate.search.backend.lucene.lowlevel.collector.impl.TopDocsDataCollectorExecutionContext;
 import org.hibernate.search.backend.lucene.lowlevel.collector.impl.Values;
@@ -22,7 +21,6 @@ import org.hibernate.search.engine.search.loading.spi.LoadingResult;
 import org.hibernate.search.engine.search.projection.ProjectionCollector;
 import org.hibernate.search.engine.search.projection.SearchProjection;
 import org.hibernate.search.engine.search.projection.spi.FieldProjectionBuilder;
-import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
 import org.apache.lucene.document.Document;
 import org.apache.lucene.index.IndexableField;
@@ -78,7 +76,7 @@ public class LuceneFieldProjection<F, V, P, T> extends AbstractLuceneProjection<
 	public ValueFieldExtractor<?> request(ProjectionRequestContext context) {
 		context.checkValidField( absoluteFieldPath );
 		if ( !context.projectionCardinalityCorrectlyAddressed( requiredContextAbsoluteFieldPath ) ) {
-			throw log.invalidSingleValuedProjectionOnValueFieldInMultiValuedObjectField(
+			throw QueryLog.INSTANCE.invalidSingleValuedProjectionOnValueFieldInMultiValuedObjectField(
 					absoluteFieldPath, requiredContextAbsoluteFieldPath );
 		}
 		context.requireStoredField( absoluteFieldPath, nestedDocumentPath );
@@ -198,8 +196,6 @@ public class LuceneFieldProjection<F, V, P, T> extends AbstractLuceneProjection<
 	private static class Builder<F, V, T> extends AbstractLuceneProjection.AbstractBuilder<V>
 			implements FieldProjectionBuilder<V> {
 
-		private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
-
 		private final Function<IndexableField, T> decodeFunction;
 
 		private final LuceneSearchIndexValueFieldContext<F> field;
@@ -217,7 +213,8 @@ public class LuceneFieldProjection<F, V, P, T> extends AbstractLuceneProjection<
 		@Override
 		public <P> SearchProjection<P> build(ProjectionCollector.Provider<V, P> collectorProvider) {
 			if ( collectorProvider.isSingleValued() && field.multiValued() ) {
-				throw log.invalidSingleValuedProjectionOnMultiValuedField( field.absolutePath(), field.eventContext() );
+				throw QueryLog.INSTANCE.invalidSingleValuedProjectionOnMultiValuedField( field.absolutePath(),
+						field.eventContext() );
 			}
 			return new LuceneFieldProjection<>( this, collectorProvider );
 		}

@@ -14,6 +14,7 @@ import java.util.Set;
 import org.hibernate.search.backend.elasticsearch.gson.impl.JsonAccessor;
 import org.hibernate.search.backend.elasticsearch.gson.impl.JsonArrayAccessor;
 import org.hibernate.search.backend.elasticsearch.gson.impl.JsonObjectAccessor;
+import org.hibernate.search.backend.elasticsearch.logging.impl.QueryLog;
 import org.hibernate.search.backend.elasticsearch.search.common.impl.ElasticsearchSearchIndexScope;
 import org.hibernate.search.engine.search.highlighter.dsl.HighlighterEncoder;
 import org.hibernate.search.engine.search.highlighter.dsl.HighlighterFragmenter;
@@ -123,7 +124,7 @@ public class ElasticsearchSearchHighlighterImpl implements ElasticsearchSearchHi
 			toJson( highlightOptional.get() );
 		}
 		else {
-			log.noFieldsToHighlight();
+			QueryLog.INSTANCE.noFieldsToHighlight();
 		}
 	}
 

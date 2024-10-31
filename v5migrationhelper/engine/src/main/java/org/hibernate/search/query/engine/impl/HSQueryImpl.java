@@ -27,8 +27,8 @@ import org.hibernate.search.query.engine.spi.TupleTransformer;
 import org.hibernate.search.query.engine.spi.V5MigrationSearchSession;
 import org.hibernate.search.scope.spi.V5MigrationSearchScope;
 import org.hibernate.search.spatial.Coordinates;
-import org.hibernate.search.util.logging.impl.Log;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
+import org.hibernate.search.util.logging.impl.MigrationHelperLog;
 
 import org.apache.lucene.search.Explanation;
 import org.apache.lucene.search.Query;
@@ -38,7 +38,7 @@ public class HSQueryImpl<LOS> implements HSQuery {
 
 	private static final String HSEARCH_PROJECTION_FIELD_PREFIX = "__HSearch_";
 
-	private static final Log log = LoggerFactory.make( MethodHandles.lookup() );
+	private static final MigrationHelperLog log = LoggerFactory.make( MethodHandles.lookup() );
 
 	private final V5MigrationSearchScope scope;
 	private final V5MigrationSearchSession<LOS> session;

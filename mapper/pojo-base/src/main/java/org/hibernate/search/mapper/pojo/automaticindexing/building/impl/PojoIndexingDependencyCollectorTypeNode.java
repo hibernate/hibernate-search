@@ -4,7 +4,6 @@
  */
 package org.hibernate.search.mapper.pojo.automaticindexing.building.impl;
 
-import java.lang.invoke.MethodHandles;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -12,7 +11,7 @@ import java.util.Optional;
 import java.util.Set;
 
 import org.hibernate.search.mapper.pojo.automaticindexing.ReindexOnUpdate;
-import org.hibernate.search.mapper.pojo.logging.impl.Log;
+import org.hibernate.search.mapper.pojo.logging.impl.MappingLog;
 import org.hibernate.search.mapper.pojo.model.path.PojoModelPathValueNode;
 import org.hibernate.search.mapper.pojo.model.path.impl.BoundPojoModelPath;
 import org.hibernate.search.mapper.pojo.model.path.impl.BoundPojoModelPathCastedTypeNode;
@@ -22,7 +21,6 @@ import org.hibernate.search.mapper.pojo.model.path.impl.BoundPojoModelPathValueN
 import org.hibernate.search.mapper.pojo.model.spi.PojoRawTypeModel;
 import org.hibernate.search.mapper.pojo.model.spi.PojoTypeModel;
 import org.hibernate.search.util.common.AssertionFailure;
-import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
 /**
  * A node representing a type in a dependency collector.
@@ -32,8 +30,6 @@ import org.hibernate.search.util.common.logging.impl.LoggerFactory;
  * @param <T> The represented type
  */
 public class PojoIndexingDependencyCollectorTypeNode<T> extends PojoIndexingDependencyCollectorNode {
-
-	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	private final AbstractPojoIndexingDependencyCollectorValueNode parentNode;
 	/**
@@ -247,7 +243,7 @@ public class PojoIndexingDependencyCollectorTypeNode<T> extends PojoIndexingDepe
 			return buildingHelper.getConcreteEntitySubTypesForEntitySuperType( originalSideRawType );
 		}
 		else {
-			throw log.incorrectTargetTypeForInverseAssociation( inverseSideRawType, originalSideRawType );
+			throw MappingLog.INSTANCE.incorrectTargetTypeForInverseAssociation( inverseSideRawType, originalSideRawType );
 		}
 	}
 

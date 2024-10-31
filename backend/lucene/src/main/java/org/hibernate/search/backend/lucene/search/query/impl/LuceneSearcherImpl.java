@@ -5,10 +5,9 @@
 package org.hibernate.search.backend.lucene.search.query.impl;
 
 import java.io.IOException;
-import java.lang.invoke.MethodHandles;
 import java.util.Map;
 
-import org.hibernate.search.backend.lucene.logging.impl.Log;
+import org.hibernate.search.backend.lucene.logging.impl.QueryLog;
 import org.hibernate.search.backend.lucene.lowlevel.collector.impl.TimeoutCountCollectorManager;
 import org.hibernate.search.backend.lucene.lowlevel.reader.impl.IndexReaderMetadataResolver;
 import org.hibernate.search.backend.lucene.search.aggregation.impl.LuceneSearchAggregation;
@@ -19,8 +18,6 @@ import org.hibernate.search.backend.lucene.work.impl.LuceneSearcher;
 import org.hibernate.search.engine.search.aggregation.AggregationKey;
 import org.hibernate.search.engine.search.query.SearchResultTotal;
 import org.hibernate.search.engine.search.timeout.spi.TimeoutManager;
-import org.hibernate.search.util.common.logging.impl.DefaultLogCategories;
-import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
 import org.apache.lucene.index.IndexReader;
 import org.apache.lucene.search.Explanation;
@@ -31,9 +28,6 @@ class LuceneSearcherImpl<H> implements LuceneSearcher<LuceneLoadableSearchResult
 
 	private static final int PREFETCH_HITS_SIZE = 100;
 	private static final int PREFETCH_TOTAL_HIT_COUNT_THRESHOLD = 10_000;
-
-	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
-	private static final Log queryLog = LoggerFactory.make( Log.class, DefaultLogCategories.QUERY, MethodHandles.lookup() );
 
 	private final LuceneSearchQueryRequestContext requestContext;
 
@@ -86,10 +80,10 @@ class LuceneSearcherImpl<H> implements LuceneSearcher<LuceneLoadableSearchResult
 			int offset, Integer limit, int totalHitCountThreshold)
 			throws IOException {
 		if ( limit != null && (long) offset + limit > Integer.MAX_VALUE ) {
-			throw log.offsetLimitExceedsMaxValue( offset, limit );
+			throw QueryLog.INSTANCE.offsetLimitExceedsMaxValue( offset, limit );
 		}
 
-		queryLog.executingLuceneQuery( requestContext.getLuceneQuery() );
+		QueryLog.INSTANCE.executingLuceneQuery( requestContext.getLuceneQuery() );
 
 		int maxDocs = getMaxDocs( indexSearcher.getIndexReader(), offset, limit );
 		LuceneCollectors luceneCollectors = ( limit != null || maxDocs <= PREFETCH_HITS_SIZE )
@@ -103,7 +97,7 @@ class LuceneSearcherImpl<H> implements LuceneSearcher<LuceneLoadableSearchResult
 
 	@Override
 	public int count(IndexSearcher indexSearcher) throws IOException {
-		queryLog.executingLuceneQuery( requestContext.getLuceneQuery() );
+		QueryLog.INSTANCE.executingLuceneQuery( requestContext.getLuceneQuery() );
 
 		// Handling the hard timeout.
 		// Soft timeout has no sense in case of count,

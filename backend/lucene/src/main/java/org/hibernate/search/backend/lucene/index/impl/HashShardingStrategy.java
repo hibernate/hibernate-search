@@ -4,24 +4,20 @@
  */
 package org.hibernate.search.backend.lucene.index.impl;
 
-import java.lang.invoke.MethodHandles;
 import java.util.LinkedHashSet;
 import java.util.Set;
 
 import org.hibernate.search.backend.lucene.cfg.LuceneIndexSettings;
 import org.hibernate.search.backend.lucene.index.spi.ShardingStrategy;
 import org.hibernate.search.backend.lucene.index.spi.ShardingStrategyInitializationContext;
-import org.hibernate.search.backend.lucene.logging.impl.Log;
+import org.hibernate.search.backend.lucene.logging.impl.ConfigurationLog;
 import org.hibernate.search.engine.cfg.spi.ConfigurationProperty;
 import org.hibernate.search.engine.cfg.spi.OptionalConfigurationProperty;
 import org.hibernate.search.util.common.data.impl.HashTable;
 import org.hibernate.search.util.common.data.impl.ModuloHashTable;
 import org.hibernate.search.util.common.data.impl.SimpleHashFunction;
-import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
 public class HashShardingStrategy implements ShardingStrategy {
-
-	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	public static final String NAME = "hash";
 
@@ -36,7 +32,7 @@ public class HashShardingStrategy implements ShardingStrategy {
 	public void initialize(ShardingStrategyInitializationContext context) {
 		int numberOfShards = NUMBER_OF_SHARDS.getOrThrow(
 				context.configurationPropertySource(),
-				() -> log.missingPropertyValueForShardingStrategy( NAME )
+				() -> ConfigurationLog.INSTANCE.missingPropertyValueForShardingStrategy( NAME )
 		);
 		// Note the hash function / table implementations MUST NOT CHANGE,
 		// otherwise existing indexes will no longer work correctly.

@@ -4,24 +4,20 @@
  */
 package org.hibernate.search.backend.elasticsearch.work.impl;
 
-import java.lang.invoke.MethodHandles;
 import java.util.concurrent.CompletableFuture;
 import java.util.function.Function;
 
 import org.hibernate.search.backend.elasticsearch.client.spi.ElasticsearchRequest;
 import org.hibernate.search.backend.elasticsearch.client.spi.ElasticsearchResponse;
-import org.hibernate.search.backend.elasticsearch.logging.impl.Log;
+import org.hibernate.search.backend.elasticsearch.logging.impl.ElasticsearchClientLog;
 import org.hibernate.search.util.common.SearchException;
 import org.hibernate.search.util.common.impl.Futures;
 import org.hibernate.search.util.common.impl.Throwables;
-import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
 /**
  * @author Gunnar Morling
  */
 public abstract class AbstractNonBulkableWork<R> implements NonBulkableWork<R> {
-
-	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	private static final CompletableFuture<Void> SUCCESSFUL_FUTURE = CompletableFuture.completedFuture( null );
 
@@ -59,7 +55,7 @@ public abstract class AbstractNonBulkableWork<R> implements NonBulkableWork<R> {
 					}
 
 					// otherwise, throw a more generic request failed exception
-					throw log.elasticsearchRequestFailed(
+					throw ElasticsearchClientLog.INSTANCE.elasticsearchRequestFailed(
 							request, null,
 							throwable.getMessage(),
 							Throwables.expectException( throwable )
@@ -84,7 +80,7 @@ public abstract class AbstractNonBulkableWork<R> implements NonBulkableWork<R> {
 			result = generateResult( executionContext, response );
 		}
 		catch (RuntimeException e) {
-			throw log.elasticsearchRequestFailed( request, response, e.getMessage(), e );
+			throw ElasticsearchClientLog.INSTANCE.elasticsearchRequestFailed( request, response, e.getMessage(), e );
 		}
 
 		return result;

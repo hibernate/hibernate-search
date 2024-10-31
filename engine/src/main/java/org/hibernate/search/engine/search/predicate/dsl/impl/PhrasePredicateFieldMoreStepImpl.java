@@ -4,13 +4,12 @@
  */
 package org.hibernate.search.engine.search.predicate.dsl.impl;
 
-import java.lang.invoke.MethodHandles;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.function.Consumer;
 
-import org.hibernate.search.engine.logging.impl.Log;
+import org.hibernate.search.engine.logging.impl.QueryLog;
 import org.hibernate.search.engine.search.common.spi.SearchIndexScope;
 import org.hibernate.search.engine.search.predicate.SearchPredicate;
 import org.hibernate.search.engine.search.predicate.dsl.PhrasePredicateFieldMoreStep;
@@ -19,13 +18,10 @@ import org.hibernate.search.engine.search.predicate.dsl.spi.SearchPredicateDslCo
 import org.hibernate.search.engine.search.predicate.spi.PhrasePredicateBuilder;
 import org.hibernate.search.engine.search.predicate.spi.PredicateTypeKeys;
 import org.hibernate.search.util.common.impl.Contracts;
-import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
 class PhrasePredicateFieldMoreStepImpl
 		implements PhrasePredicateFieldMoreStep<PhrasePredicateFieldMoreStepImpl, PhrasePredicateOptionsStep<?>>,
 		AbstractBooleanMultiFieldPredicateCommonState.FieldSetState {
-
-	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	private final CommonState commonState;
 
@@ -89,7 +85,7 @@ class PhrasePredicateFieldMoreStepImpl
 		@Override
 		public CommonState slop(int slop) {
 			if ( slop < 0 ) {
-				throw log.invalidPhrasePredicateSlop( slop );
+				throw QueryLog.INSTANCE.invalidPhrasePredicateSlop( slop );
 			}
 
 			for ( PhrasePredicateFieldMoreStepImpl fieldSetState : getFieldSetStates() ) {

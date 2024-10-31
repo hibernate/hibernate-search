@@ -4,8 +4,6 @@
  */
 package org.hibernate.search.mapper.pojo.bridge.binding.impl;
 
-import java.lang.invoke.MethodHandles;
-
 import org.hibernate.search.engine.backend.types.dsl.IndexFieldTypeOptionsStep;
 import org.hibernate.search.engine.backend.types.dsl.ScaledNumberIndexFieldTypeOptionsStep;
 import org.hibernate.search.engine.backend.types.dsl.SearchableProjectableIndexFieldTypeOptionsStep;
@@ -14,12 +12,9 @@ import org.hibernate.search.engine.backend.types.dsl.StringIndexFieldTypeOptions
 import org.hibernate.search.engine.backend.types.dsl.VectorFieldTypeOptionsStep;
 import org.hibernate.search.mapper.pojo.bridge.ValueBridge;
 import org.hibernate.search.mapper.pojo.bridge.binding.spi.FieldModelContributorContext;
-import org.hibernate.search.mapper.pojo.logging.impl.Log;
-import org.hibernate.search.util.common.logging.impl.LoggerFactory;
+import org.hibernate.search.mapper.pojo.logging.impl.MappingLog;
 
 final class FieldModelContributorContextImpl<F> implements FieldModelContributorContext {
-
-	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	private final ValueBridge<?, F> bridge;
 	private final IndexFieldTypeOptionsStep<?, ? super F> fieldTypeOptionsStep;
@@ -46,7 +41,7 @@ final class FieldModelContributorContextImpl<F> implements FieldModelContributor
 			return (StandardIndexFieldTypeOptionsStep<?, ? super F>) fieldTypeOptionsStep;
 		}
 		else {
-			throw log.invalidFieldEncodingForStandardFieldMapping(
+			throw MappingLog.INSTANCE.invalidFieldEncodingForStandardFieldMapping(
 					fieldTypeOptionsStep, StandardIndexFieldTypeOptionsStep.class
 			);
 		}
@@ -58,7 +53,7 @@ final class FieldModelContributorContextImpl<F> implements FieldModelContributor
 			return (StringIndexFieldTypeOptionsStep<?>) fieldTypeOptionsStep;
 		}
 		else {
-			throw log.invalidFieldEncodingForStringFieldMapping(
+			throw MappingLog.INSTANCE.invalidFieldEncodingForStringFieldMapping(
 					fieldTypeOptionsStep, StringIndexFieldTypeOptionsStep.class
 			);
 		}
@@ -70,7 +65,7 @@ final class FieldModelContributorContextImpl<F> implements FieldModelContributor
 			return (ScaledNumberIndexFieldTypeOptionsStep<?, ?>) fieldTypeOptionsStep;
 		}
 		else {
-			throw log.invalidFieldEncodingForScaledNumberFieldMapping(
+			throw MappingLog.INSTANCE.invalidFieldEncodingForScaledNumberFieldMapping(
 					fieldTypeOptionsStep, ScaledNumberIndexFieldTypeOptionsStep.class
 			);
 		}
@@ -82,7 +77,7 @@ final class FieldModelContributorContextImpl<F> implements FieldModelContributor
 			return (VectorFieldTypeOptionsStep<?, ?>) fieldTypeOptionsStep;
 		}
 		else {
-			throw log.invalidFieldEncodingForVectorFieldMapping(
+			throw MappingLog.INSTANCE.invalidFieldEncodingForVectorFieldMapping(
 					fieldTypeOptionsStep, VectorFieldTypeOptionsStep.class
 			);
 		}
@@ -100,7 +95,7 @@ final class FieldModelContributorContextImpl<F> implements FieldModelContributor
 	@Override
 	public void checkNonStandardTypeOptionsStep() {
 		if ( fieldTypeOptionsStep instanceof StandardIndexFieldTypeOptionsStep ) {
-			throw log.invalidFieldEncodingForNonStandardFieldMapping(
+			throw MappingLog.INSTANCE.invalidFieldEncodingForNonStandardFieldMapping(
 					fieldTypeOptionsStep, StandardIndexFieldTypeOptionsStep.class
 			);
 		}

@@ -4,7 +4,6 @@
  */
 package org.hibernate.search.backend.elasticsearch.dialect.impl;
 
-import java.lang.invoke.MethodHandles;
 import java.util.OptionalInt;
 
 import org.hibernate.search.backend.elasticsearch.ElasticsearchDistributionName;
@@ -23,17 +22,14 @@ import org.hibernate.search.backend.elasticsearch.dialect.protocol.impl.Elastics
 import org.hibernate.search.backend.elasticsearch.dialect.protocol.impl.Elasticsearch80ProtocolDialect;
 import org.hibernate.search.backend.elasticsearch.dialect.protocol.impl.Elasticsearch81ProtocolDialect;
 import org.hibernate.search.backend.elasticsearch.dialect.protocol.impl.ElasticsearchProtocolDialect;
-import org.hibernate.search.backend.elasticsearch.logging.impl.Log;
+import org.hibernate.search.backend.elasticsearch.logging.impl.VersionLog;
 import org.hibernate.search.util.common.AssertionFailure;
 import org.hibernate.search.util.common.annotation.Incubating;
-import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
 /**
  * Creates an Elasticsearch dialect for a given Elasticsearch version.
  */
 public class ElasticsearchDialectFactory {
-
-	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	@Incubating
 	public static final ElasticsearchVersion AMAZON_OPENSEARCH_SERVERLESS =
@@ -93,7 +89,7 @@ public class ElasticsearchDialectFactory {
 		int major = majorOptional.getAsInt();
 
 		if ( major < 7 || ( major == 7 && minorOptional.isPresent() && minorOptional.getAsInt() < 10 ) ) {
-			throw log.unsupportedElasticsearchVersion( version );
+			throw VersionLog.INSTANCE.unsupportedElasticsearchVersion( version );
 		}
 		else if ( major == 7 ) {
 			return new Elasticsearch7ModelDialect();
@@ -125,7 +121,7 @@ public class ElasticsearchDialectFactory {
 		int major = majorOptional.getAsInt();
 
 		if ( major < 1 || ( major == 1 && minorOptional.isPresent() && minorOptional.getAsInt() < 3 ) ) {
-			throw log.unsupportedElasticsearchVersion( version );
+			throw VersionLog.INSTANCE.unsupportedElasticsearchVersion( version );
 		}
 		else if ( major == 1 ) {
 			return new OpenSearch1ModelDialect();
@@ -146,7 +142,7 @@ public class ElasticsearchDialectFactory {
 
 	private ElasticsearchModelDialect createModelDialectAmazonOpenSearchServerless(ElasticsearchVersion version) {
 		if ( !AMAZON_OPENSEARCH_SERVERLESS.equals( version ) ) {
-			throw log.unexpectedAwsOpenSearchServerlessVersion( version, AMAZON_OPENSEARCH_SERVERLESS );
+			throw VersionLog.INSTANCE.unexpectedAwsOpenSearchServerlessVersion( version, AMAZON_OPENSEARCH_SERVERLESS );
 		}
 		return new OpenSearch214ModelDialect();
 	}
@@ -178,7 +174,7 @@ public class ElasticsearchDialectFactory {
 		int minor = minorOptional.getAsInt();
 
 		if ( major < 7 || ( major == 7 && minor < 10 ) ) {
-			throw log.unsupportedElasticsearchVersion( version );
+			throw VersionLog.INSTANCE.unsupportedElasticsearchVersion( version );
 		}
 		else if ( major == 7 ) {
 			return createProtocolDialectElasticV7( version, minor );
@@ -187,21 +183,21 @@ public class ElasticsearchDialectFactory {
 			return createProtocolDialectElasticV8( version, minor );
 		}
 		else {
-			log.unknownElasticsearchVersion( version );
+			VersionLog.INSTANCE.unknownElasticsearchVersion( version );
 			return new Elasticsearch81ProtocolDialect();
 		}
 	}
 
 	private ElasticsearchProtocolDialect createProtocolDialectElasticV7(ElasticsearchVersion version, int minor) {
 		if ( minor > 17 ) {
-			log.unknownElasticsearchVersion( version );
+			VersionLog.INSTANCE.unknownElasticsearchVersion( version );
 		}
 		return new Elasticsearch70ProtocolDialect();
 	}
 
 	private ElasticsearchProtocolDialect createProtocolDialectElasticV8(ElasticsearchVersion version, int minor) {
 		if ( minor > 16 ) {
-			log.unknownElasticsearchVersion( version );
+			VersionLog.INSTANCE.unknownElasticsearchVersion( version );
 		}
 		else if ( minor == 0 ) {
 			return new Elasticsearch80ProtocolDialect();
@@ -223,7 +219,7 @@ public class ElasticsearchDialectFactory {
 		int minor = minorOptional.getAsInt();
 
 		if ( major < 1 || ( major == 1 && minor < 3 ) ) {
-			throw log.unsupportedElasticsearchVersion( version );
+			throw VersionLog.INSTANCE.unsupportedElasticsearchVersion( version );
 		}
 		else if ( major == 1 ) {
 			return createProtocolDialectOpenSearchV1( version, minor );
@@ -232,28 +228,28 @@ public class ElasticsearchDialectFactory {
 			return createProtocolDialectOpenSearchV2( version, minor );
 		}
 		else {
-			log.unknownElasticsearchVersion( version );
+			VersionLog.INSTANCE.unknownElasticsearchVersion( version );
 			return new Elasticsearch70ProtocolDialect();
 		}
 	}
 
 	private ElasticsearchProtocolDialect createProtocolDialectOpenSearchV1(ElasticsearchVersion version, int minor) {
 		if ( minor > 3 ) {
-			log.unknownElasticsearchVersion( version );
+			VersionLog.INSTANCE.unknownElasticsearchVersion( version );
 		}
 		return new Elasticsearch70ProtocolDialect();
 	}
 
 	private ElasticsearchProtocolDialect createProtocolDialectOpenSearchV2(ElasticsearchVersion version, int minor) {
 		if ( minor > 18 ) {
-			log.unknownElasticsearchVersion( version );
+			VersionLog.INSTANCE.unknownElasticsearchVersion( version );
 		}
 		return new Elasticsearch70ProtocolDialect();
 	}
 
 	private ElasticsearchProtocolDialect createProtocolDialectAmazonOpenSearchServerless(ElasticsearchVersion version) {
 		if ( !AMAZON_OPENSEARCH_SERVERLESS.equals( version ) ) {
-			throw log.unexpectedAwsOpenSearchServerlessVersion( version, AMAZON_OPENSEARCH_SERVERLESS );
+			throw VersionLog.INSTANCE.unexpectedAwsOpenSearchServerlessVersion( version, AMAZON_OPENSEARCH_SERVERLESS );
 		}
 		return new AmazonOpenSearchServerlessProtocolDialect();
 	}

@@ -5,7 +5,6 @@
 package org.hibernate.search.backend.lucene.index.impl;
 
 import java.io.IOException;
-import java.lang.invoke.MethodHandles;
 import java.util.List;
 import java.util.Set;
 import java.util.concurrent.CompletableFuture;
@@ -16,7 +15,8 @@ import org.hibernate.search.backend.lucene.analysis.impl.LuceneAnalysisPerformer
 import org.hibernate.search.backend.lucene.document.impl.LuceneIndexEntryFactory;
 import org.hibernate.search.backend.lucene.document.model.impl.LuceneIndexModel;
 import org.hibernate.search.backend.lucene.index.LuceneIndexManager;
-import org.hibernate.search.backend.lucene.logging.impl.Log;
+import org.hibernate.search.backend.lucene.logging.impl.CommonFailureLog;
+import org.hibernate.search.backend.lucene.logging.impl.QueryLog;
 import org.hibernate.search.backend.lucene.lowlevel.reader.impl.DirectoryReaderCollector;
 import org.hibernate.search.backend.lucene.schema.management.impl.LuceneIndexSchemaManager;
 import org.hibernate.search.backend.lucene.scope.model.impl.LuceneScopeIndexManagerContext;
@@ -40,7 +40,6 @@ import org.hibernate.search.engine.reporting.spi.EventContexts;
 import org.hibernate.search.engine.search.common.spi.SearchIndexIdentifierContext;
 import org.hibernate.search.util.common.impl.Closer;
 import org.hibernate.search.util.common.impl.Futures;
-import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 import org.hibernate.search.util.common.reporting.EventContext;
 
 import org.apache.lucene.analysis.Analyzer;
@@ -50,8 +49,6 @@ public class LuceneIndexManagerImpl
 		LuceneScopeIndexManagerContext {
 
 	private static final SavedState.Key<SavedState> SHARD_HOLDER_KEY = SavedState.key( "shard_holder" );
-
-	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	private final IndexManagerBackendContext backendContext;
 
@@ -154,7 +151,7 @@ public class LuceneIndexManagerImpl
 	@Override
 	public void addTo(IndexScopeBuilder builder) {
 		if ( !( builder instanceof LuceneIndexScopeBuilder ) ) {
-			throw log.cannotMixLuceneScopeWithOtherType(
+			throw QueryLog.INSTANCE.cannotMixLuceneScopeWithOtherType(
 					builder, this, backendContext.getEventContext()
 			);
 		}
@@ -246,7 +243,7 @@ public class LuceneIndexManagerImpl
 		if ( clazz.isAssignableFrom( LuceneIndexManager.class ) ) {
 			return (T) this;
 		}
-		throw log.indexManagerUnwrappingWithUnknownType(
+		throw CommonFailureLog.INSTANCE.indexManagerUnwrappingWithUnknownType(
 				clazz, LuceneIndexManager.class, getBackendAndIndexEventContext()
 		);
 	}

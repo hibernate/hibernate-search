@@ -4,15 +4,13 @@
  */
 package org.hibernate.search.backend.elasticsearch;
 
-import java.lang.invoke.MethodHandles;
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import org.hibernate.search.backend.elasticsearch.logging.impl.Log;
+import org.hibernate.search.backend.elasticsearch.logging.impl.ConfigurationLog;
 import org.hibernate.search.engine.cfg.spi.ParseUtils;
 import org.hibernate.search.util.common.annotation.Incubating;
-import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
 public enum ElasticsearchDistributionName {
 
@@ -42,14 +40,12 @@ public enum ElasticsearchDistributionName {
 	@Incubating
 	AMAZON_OPENSEARCH_SERVERLESS( "amazon-opensearch-serverless", null );
 
-	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
-
 	// This method conforms to the MicroProfile Config specification. Do not change its signature.
 	public static ElasticsearchDistributionName of(String value) {
 		return ParseUtils.parseDiscreteValues(
 				ElasticsearchDistributionName.values(),
 				ElasticsearchDistributionName::externalRepresentation,
-				log::invalidElasticsearchDistributionName,
+				ConfigurationLog.INSTANCE::invalidElasticsearchDistributionName,
 				value
 		);
 	}
@@ -64,7 +60,7 @@ public enum ElasticsearchDistributionName {
 		return ParseUtils.parseDiscreteValues(
 				ElasticsearchDistributionName.values(),
 				ElasticsearchDistributionName::serverResponseRepresentation,
-				log::invalidElasticsearchDistributionName,
+				ConfigurationLog.INSTANCE::invalidElasticsearchDistributionName,
 				value
 		);
 	}

@@ -4,7 +4,6 @@
  */
 package org.hibernate.search.mapper.orm.tenancy.spi;
 
-import java.lang.invoke.MethodHandles;
 import java.util.Collections;
 import java.util.LinkedHashSet;
 import java.util.List;
@@ -19,16 +18,13 @@ import org.hibernate.search.engine.environment.bean.BeanReference;
 import org.hibernate.search.engine.environment.bean.BeanResolver;
 import org.hibernate.search.engine.tenancy.spi.TenancyMode;
 import org.hibernate.search.mapper.orm.cfg.HibernateOrmMapperSettings;
-import org.hibernate.search.mapper.orm.logging.impl.Log;
+import org.hibernate.search.mapper.orm.logging.impl.ConfigurationLog;
 import org.hibernate.search.mapper.pojo.tenancy.TenantIdentifierConverter;
 import org.hibernate.search.util.common.AssertionFailure;
 import org.hibernate.search.util.common.SearchException;
 import org.hibernate.search.util.common.impl.Contracts;
-import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
 public class TenancyConfiguration implements AutoCloseable {
-
-	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	private static final OptionalConfigurationProperty<List<String>> MULTI_TENANCY_TENANT_IDS =
 			ConfigurationProperty.forKey( HibernateOrmMapperSettings.Radicals.MULTI_TENANCY_TENANT_IDS )
@@ -96,11 +92,13 @@ public class TenancyConfiguration implements AutoCloseable {
 	public Set<String> tenantIdsOrFail() {
 		// This will only fail when using multi-tenancy,
 		// because the set is always defined when using single-tenancy.
-		return tenantIds.orElseThrow( () -> log.missingTenantIdConfiguration( tenantIdsConfigurationPropertyKey ) );
+		return tenantIds
+				.orElseThrow( () -> ConfigurationLog.INSTANCE.missingTenantIdConfiguration( tenantIdsConfigurationPropertyKey ) );
 	}
 
 	public SearchException invalidTenantId(String tenantId) {
-		return log.invalidTenantId( tenantId, tenantIds.orElse( Collections.emptySet() ), tenantIdsConfigurationPropertyKey );
+		return ConfigurationLog.INSTANCE.invalidTenantId( tenantId, tenantIds.orElse( Collections.emptySet() ),
+				tenantIdsConfigurationPropertyKey );
 	}
 
 	public Object convert(String tenantIdentifier) {

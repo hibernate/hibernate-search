@@ -4,7 +4,6 @@
  */
 package org.hibernate.search.mapper.orm.outboxpolling.impl;
 
-import java.lang.invoke.MethodHandles;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
@@ -39,17 +38,14 @@ import org.hibernate.search.mapper.orm.outboxpolling.event.impl.OutboxPollingEve
 import org.hibernate.search.mapper.orm.outboxpolling.event.impl.OutboxPollingMassIndexerAgent;
 import org.hibernate.search.mapper.orm.outboxpolling.event.impl.OutboxPollingOutboxEventAdditionalMappingProducer;
 import org.hibernate.search.mapper.orm.outboxpolling.event.impl.OutboxPollingOutboxEventSendingPlan;
-import org.hibernate.search.mapper.orm.outboxpolling.logging.impl.Log;
+import org.hibernate.search.mapper.orm.outboxpolling.logging.impl.ConfigurationLog;
 import org.hibernate.search.mapper.orm.outboxpolling.mapping.impl.OutboxPollingSearchMappingImpl;
 import org.hibernate.search.mapper.orm.tenancy.spi.TenancyConfiguration;
 import org.hibernate.search.mapper.pojo.massindexing.spi.PojoMassIndexerAgent;
 import org.hibernate.search.mapper.pojo.massindexing.spi.PojoMassIndexerAgentCreateContext;
 import org.hibernate.search.util.common.impl.Closer;
-import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
 public class OutboxPollingCoordinationStrategy implements CoordinationStrategy {
-
-	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	private static final ConfigurationProperty<Boolean> EVENT_PROCESSOR_ENABLED =
 			ConfigurationProperty.forKey( HibernateOrmMapperOutboxPollingSettings.CoordinationRadicals.EVENT_PROCESSOR_ENABLED )
@@ -215,7 +211,7 @@ public class OutboxPollingCoordinationStrategy implements CoordinationStrategy {
 				initializeEventProcessors( context, configurationSource );
 			}
 			else {
-				log.eventProcessorDisabled( tenantId );
+				ConfigurationLog.INSTANCE.eventProcessorDisabled( tenantId );
 			}
 
 			this.massIndexerAgentFactory = OutboxPollingMassIndexerAgent.factory( context.mapping(), context.clock(),
@@ -234,13 +230,13 @@ public class OutboxPollingCoordinationStrategy implements CoordinationStrategy {
 				int totalShardCount = EVENT_PROCESSOR_SHARDS_TOTAL_COUNT.getAndMapOrThrow(
 						configurationSource,
 						this::checkTotalShardCount,
-						() -> log.missingPropertyForStaticSharding(
+						() -> ConfigurationLog.INSTANCE.missingPropertyForStaticSharding(
 								EVENT_PROCESSOR_SHARDS_ASSIGNED.resolveOrRaw( configurationSource ) )
 				);
 				shardAssignmentOrNulls = EVENT_PROCESSOR_SHARDS_ASSIGNED.getAndMapOrThrow(
 						configurationSource,
 						shardIndices -> toStaticShardAssignments( configurationSource, totalShardCount, shardIndices ),
-						() -> log.missingPropertyForStaticSharding(
+						() -> ConfigurationLog.INSTANCE.missingPropertyForStaticSharding(
 								EVENT_PROCESSOR_SHARDS_TOTAL_COUNT.resolveOrRaw( configurationSource ) )
 				);
 			}
@@ -263,7 +259,7 @@ public class OutboxPollingCoordinationStrategy implements CoordinationStrategy {
 
 		private Integer checkTotalShardCount(Integer totalShardCount) {
 			if ( totalShardCount <= 0 ) {
-				throw log.invalidTotalShardCount();
+				throw ConfigurationLog.INSTANCE.invalidTotalShardCount();
 			}
 			return totalShardCount;
 		}
@@ -275,7 +271,7 @@ public class OutboxPollingCoordinationStrategy implements CoordinationStrategy {
 			Set<Integer> uniqueShardIndices = new HashSet<>( shardIndices );
 			for ( Integer shardIndex : uniqueShardIndices ) {
 				if ( !( 0 <= shardIndex && shardIndex < totalShardCount ) ) {
-					throw log.invalidShardIndex( totalShardCount,
+					throw ConfigurationLog.INSTANCE.invalidShardIndex( totalShardCount,
 							EVENT_PROCESSOR_SHARDS_TOTAL_COUNT.resolveOrRaw( configurationPropertySource ) );
 				}
 			}

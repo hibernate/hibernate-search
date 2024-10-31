@@ -4,12 +4,9 @@
  */
 package org.hibernate.search.mapper.orm.automaticindexing;
 
-import java.lang.invoke.MethodHandles;
-
 import org.hibernate.search.engine.cfg.spi.ParseUtils;
-import org.hibernate.search.mapper.orm.logging.impl.Log;
+import org.hibernate.search.mapper.orm.logging.impl.ConfigurationLog;
 import org.hibernate.search.mapper.orm.session.SearchSession;
-import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
 /**
  * Strategy for listener-triggered indexing in Hibernate Search.
@@ -38,14 +35,12 @@ public enum AutomaticIndexingStrategyName {
 	@Deprecated
 	SESSION( "session" );
 
-	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
-
 	// This method conforms to the MicroProfile Config specification. Do not change its signature.
 	public static AutomaticIndexingStrategyName of(String value) {
 		return ParseUtils.parseDiscreteValues(
 				AutomaticIndexingStrategyName.values(),
 				AutomaticIndexingStrategyName::getExternalRepresentation,
-				log::invalidAutomaticIndexingStrategyName,
+				ConfigurationLog.INSTANCE::invalidAutomaticIndexingStrategyName,
 				value
 		);
 	}

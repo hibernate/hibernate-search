@@ -5,9 +5,9 @@
 package org.hibernate.search.integrationtest.jakarta.batch.util;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.hibernate.search.integrationtest.jakarta.batch.util.logging.TestLog.TEST_LOGGER;
 import static org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmUtils.with;
 
-import java.lang.invoke.MethodHandles;
 import java.util.List;
 import java.util.Properties;
 
@@ -21,7 +21,6 @@ import jakarta.persistence.EntityManagerFactory;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.engine.spi.SessionFactoryImplementor;
-import org.hibernate.search.jakarta.batch.core.logging.impl.Log;
 import org.hibernate.search.jakarta.batch.core.massindexing.MassIndexingJob;
 import org.hibernate.search.jakarta.batch.core.massindexing.util.impl.EntityTypeDescriptor;
 import org.hibernate.search.mapper.orm.Search;
@@ -29,14 +28,11 @@ import org.hibernate.search.mapper.orm.loading.spi.HibernateOrmLoadingTypeContex
 import org.hibernate.search.mapper.orm.mapping.SearchMapping;
 import org.hibernate.search.mapper.orm.session.SearchSession;
 import org.hibernate.search.mapper.orm.spi.BatchMappingContext;
-import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
 /**
  * @author Yoann Rodiere
  */
 public final class JobTestUtil {
-
-	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	public static final int JOB_TIMEOUT_MS = 30_000;
 
@@ -71,7 +67,7 @@ public final class JobTestUtil {
 
 		assertThat( operator ).extracting( Object::getClass ).asString()
 				.contains( expectedType );
-		log.infof( "Jakarta Batch operator type is %s (%s)", expectedType, operator.getClass() );
+		TEST_LOGGER.infof( "Jakarta Batch operator type is %s (%s)", expectedType, operator.getClass() );
 		return operator;
 	}
 
@@ -102,7 +98,7 @@ public final class JobTestUtil {
 				&& System.nanoTime() < endTime ) {
 
 			long executionId = jobExecution.getExecutionId();
-			log.infof(
+			TEST_LOGGER.infof(
 					"Job execution (id=%d) has status %s. Thread sleeps %d ms...",
 					executionId,
 					jobExecution.getBatchStatus(),

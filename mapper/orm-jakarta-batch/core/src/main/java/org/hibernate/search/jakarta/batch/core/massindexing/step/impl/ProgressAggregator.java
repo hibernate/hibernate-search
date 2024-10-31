@@ -5,16 +5,14 @@
 package org.hibernate.search.jakarta.batch.core.massindexing.step.impl;
 
 import java.io.Serializable;
-import java.lang.invoke.MethodHandles;
 import java.util.Locale;
 import java.util.Map;
+
+import org.hibernate.search.jakarta.batch.core.logging.impl.JakartaBatchLog;
 
 import jakarta.batch.api.partition.AbstractPartitionAnalyzer;
 import jakarta.batch.runtime.context.StepContext;
 import jakarta.inject.Inject;
-
-import org.hibernate.search.jakarta.batch.core.logging.impl.Log;
-import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
 /**
  * Progress aggregator aggregates the intermediary chunk progress received from each partition sent via the collectors.
@@ -23,8 +21,6 @@ import org.hibernate.search.util.common.logging.impl.LoggerFactory;
  * @author Mincong Huang
  */
 public class ProgressAggregator extends AbstractPartitionAnalyzer {
-
-	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	@Inject
 	private StepContext stepContext;
@@ -53,7 +49,7 @@ public class ProgressAggregator extends AbstractPartitionAnalyzer {
 			sb.append( System.lineSeparator() ).append( "\t" ).append( msg );
 		}
 		sb.append( System.lineSeparator() );
-		log.analyzeIndexProgress( sb.toString() );
+		JakartaBatchLog.INSTANCE.analyzeIndexProgress( sb.toString() );
 	}
 
 	private String formatEntityProgress(String entity, Long processed, Long total) {

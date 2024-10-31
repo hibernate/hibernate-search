@@ -4,18 +4,15 @@
  */
 package org.hibernate.search.mapper.pojo.bridge.binding.impl;
 
-import java.lang.invoke.MethodHandles;
 import java.util.Map;
 
 import org.hibernate.search.engine.environment.bean.BeanResolver;
-import org.hibernate.search.mapper.pojo.logging.impl.Log;
+import org.hibernate.search.mapper.pojo.logging.impl.MappingLog;
 import org.hibernate.search.mapper.pojo.model.dependency.impl.AbstractPojoBridgedElementDependencyContext;
 import org.hibernate.search.mapper.pojo.model.impl.AbstractPojoModelCompositeElement;
-import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
 public abstract class AbstractCompositeBindingContext extends AbstractBindingContext {
 
-	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	protected AbstractCompositeBindingContext(BeanResolver beanResolver, Map<String, Object> params) {
 		super( beanResolver, params );
@@ -29,10 +26,10 @@ public abstract class AbstractCompositeBindingContext extends AbstractBindingCon
 		boolean hasNonRootDependency = pojoModelRootElement.hasNonRootDependency()
 				|| pojoDependencyContext.hasNonRootDependency();
 		if ( isUseRootOnly && hasNonRootDependency ) {
-			throw log.inconsistentBridgeDependencyDeclaration();
+			throw MappingLog.INSTANCE.inconsistentBridgeDependencyDeclaration();
 		}
 		else if ( !isUseRootOnly && !hasDependency ) {
-			throw log.missingBridgeDependencyDeclaration();
+			throw MappingLog.INSTANCE.missingBridgeDependencyDeclaration();
 		}
 	}
 }

@@ -4,7 +4,6 @@
  */
 package org.hibernate.search.backend.lucene.document.impl;
 
-import java.lang.invoke.MethodHandles;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -14,7 +13,7 @@ import org.hibernate.search.backend.lucene.document.model.impl.LuceneIndexField;
 import org.hibernate.search.backend.lucene.document.model.impl.LuceneIndexModel;
 import org.hibernate.search.backend.lucene.document.model.impl.LuceneIndexObjectField;
 import org.hibernate.search.backend.lucene.document.model.impl.LuceneIndexValueField;
-import org.hibernate.search.backend.lucene.logging.impl.Log;
+import org.hibernate.search.backend.lucene.logging.impl.IndexingLog;
 import org.hibernate.search.backend.lucene.multitenancy.impl.MultiTenancyStrategy;
 import org.hibernate.search.backend.lucene.types.impl.LuceneIndexValueFieldType;
 import org.hibernate.search.engine.backend.document.DocumentElement;
@@ -22,13 +21,10 @@ import org.hibernate.search.engine.backend.document.IndexFieldReference;
 import org.hibernate.search.engine.backend.document.IndexObjectFieldReference;
 import org.hibernate.search.engine.backend.document.model.spi.IndexFieldFilter;
 import org.hibernate.search.engine.backend.document.spi.NoOpDocumentElement;
-import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
 import org.apache.lucene.document.Document;
 
 abstract class AbstractLuceneDocumentElementBuilder implements DocumentElement {
-
-	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	protected final LuceneIndexModel model;
 	protected final LuceneIndexCompositeNode schemaNode;
@@ -77,7 +73,7 @@ abstract class AbstractLuceneDocumentElementBuilder implements DocumentElement {
 		LuceneIndexField node = model.fieldOrNull( absoluteFieldPath, IndexFieldFilter.ALL );
 
 		if ( node == null ) {
-			throw log.unknownFieldForIndexing( absoluteFieldPath, model.eventContext() );
+			throw IndexingLog.INSTANCE.unknownFieldForIndexing( absoluteFieldPath, model.eventContext() );
 		}
 
 		addValueUnknownType( node.toValueField(), value );
@@ -89,7 +85,7 @@ abstract class AbstractLuceneDocumentElementBuilder implements DocumentElement {
 		LuceneIndexField fieldSchemaNode = model.fieldOrNull( absoluteFieldPath, IndexFieldFilter.ALL );
 
 		if ( fieldSchemaNode == null ) {
-			throw log.unknownFieldForIndexing( absoluteFieldPath, model.eventContext() );
+			throw IndexingLog.INSTANCE.unknownFieldForIndexing( absoluteFieldPath, model.eventContext() );
 		}
 
 		return addObject( fieldSchemaNode.toObjectField(), false );
@@ -101,7 +97,7 @@ abstract class AbstractLuceneDocumentElementBuilder implements DocumentElement {
 		LuceneIndexField fieldSchemaNode = model.fieldOrNull( absoluteFieldPath, IndexFieldFilter.ALL );
 
 		if ( fieldSchemaNode == null ) {
-			throw log.unknownFieldForIndexing( absoluteFieldPath, model.eventContext() );
+			throw IndexingLog.INSTANCE.unknownFieldForIndexing( absoluteFieldPath, model.eventContext() );
 		}
 
 		addObject( fieldSchemaNode.toObjectField(), true );
@@ -130,7 +126,8 @@ abstract class AbstractLuceneDocumentElementBuilder implements DocumentElement {
 
 	private void checkTreeConsistency(LuceneIndexCompositeNode expectedParentNode) {
 		if ( !Objects.equals( expectedParentNode, schemaNode ) ) {
-			throw log.invalidFieldForDocumentElement( expectedParentNode.absolutePath(), schemaNode.absolutePath() );
+			throw IndexingLog.INSTANCE.invalidFieldForDocumentElement( expectedParentNode.absolutePath(),
+					schemaNode.absolutePath() );
 		}
 	}
 

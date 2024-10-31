@@ -6,7 +6,6 @@ package org.hibernate.search.jakarta.batch.core.massindexing.step.spi;
 
 import java.io.IOException;
 import java.io.Serializable;
-import java.lang.invoke.MethodHandles;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -26,7 +25,7 @@ import org.hibernate.engine.spi.SharedSessionContractImplementor;
 import org.hibernate.query.SelectionQuery;
 import org.hibernate.search.jakarta.batch.core.context.jpa.spi.EntityManagerFactoryRegistry;
 import org.hibernate.search.jakarta.batch.core.inject.scope.spi.HibernateSearchPartitionScoped;
-import org.hibernate.search.jakarta.batch.core.logging.impl.Log;
+import org.hibernate.search.jakarta.batch.core.logging.impl.JakartaBatchLog;
 import org.hibernate.search.jakarta.batch.core.massindexing.MassIndexingJobParameters;
 import org.hibernate.search.jakarta.batch.core.massindexing.impl.JobContextData;
 import org.hibernate.search.jakarta.batch.core.massindexing.step.impl.HibernateSearchPartitionMapper;
@@ -40,7 +39,6 @@ import org.hibernate.search.jakarta.batch.core.massindexing.util.impl.Serializat
 import org.hibernate.search.mapper.orm.loading.spi.ConditionalExpression;
 import org.hibernate.search.mapper.orm.tenancy.spi.TenancyConfiguration;
 import org.hibernate.search.util.common.impl.Closer;
-import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
 /**
  * Reads entity identifiers from the database.
@@ -58,8 +56,6 @@ import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 @Named(value = "org.hibernate.search.jsr352.massindexing.impl.steps.lucene.EntityReader")
 @HibernateSearchPartitionScoped
 public class EntityIdReader extends AbstractItemReader {
-
-	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	@Inject
 	private JobContext jobContext;
@@ -164,7 +160,7 @@ public class EntityIdReader extends AbstractItemReader {
 	 */
 	@Override
 	public void open(Serializable checkpointInfo) throws IOException, ClassNotFoundException {
-		log.openingReader( serializedPartitionId, entityName );
+		JakartaBatchLog.INSTANCE.openingReader( serializedPartitionId, entityName );
 
 		JobContextData jobData = getOrCreateJobContextData();
 
@@ -206,7 +202,7 @@ public class EntityIdReader extends AbstractItemReader {
 	 */
 	@Override
 	public void close() {
-		log.closingReader( serializedPartitionId, entityName );
+		JakartaBatchLog.INSTANCE.closingReader( serializedPartitionId, entityName );
 		if ( chunkState != null ) {
 			chunkState.close();
 		}
@@ -220,11 +216,11 @@ public class EntityIdReader extends AbstractItemReader {
 	 */
 	@Override
 	public Object readItem() {
-		log.readingEntityId();
+		JakartaBatchLog.INSTANCE.readingEntityId();
 
 		Object id = chunkState.next();
 		if ( id == null ) {
-			log.noMoreResults();
+			JakartaBatchLog.INSTANCE.noMoreResults();
 		}
 		return id;
 	}
@@ -238,7 +234,7 @@ public class EntityIdReader extends AbstractItemReader {
 	@Override
 	public Serializable checkpointInfo() {
 		Serializable checkpointInfo = chunkState.end();
-		log.checkpointReached( entityName, checkpointInfo );
+		JakartaBatchLog.INSTANCE.checkpointReached( entityName, checkpointInfo );
 		return checkpointInfo;
 	}
 

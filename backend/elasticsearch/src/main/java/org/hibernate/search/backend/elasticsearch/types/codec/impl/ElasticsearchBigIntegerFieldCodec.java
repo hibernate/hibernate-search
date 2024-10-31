@@ -4,17 +4,15 @@
  */
 package org.hibernate.search.backend.elasticsearch.types.codec.impl;
 
-import java.lang.invoke.MethodHandles;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.math.MathContext;
 import java.math.RoundingMode;
 
 import org.hibernate.search.backend.elasticsearch.gson.impl.JsonElementTypes;
-import org.hibernate.search.backend.elasticsearch.logging.impl.Log;
+import org.hibernate.search.backend.elasticsearch.logging.impl.IndexingLog;
 import org.hibernate.search.engine.cfg.spi.NumberScaleConstants;
 import org.hibernate.search.engine.cfg.spi.NumberUtils;
-import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonElement;
@@ -22,8 +20,6 @@ import com.google.gson.JsonNull;
 import com.google.gson.JsonPrimitive;
 
 public class ElasticsearchBigIntegerFieldCodec extends AbstractElasticsearchFieldCodec<BigInteger> {
-
-	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	private final int decimalScale;
 	private final BigDecimal scalingFactor;
@@ -53,7 +49,7 @@ public class ElasticsearchBigIntegerFieldCodec extends AbstractElasticsearchFiel
 
 		BigDecimal decimal = new BigDecimal( value );
 		if ( decimal.compareTo( minScaledValue ) < 0 || decimal.compareTo( maxScaledValue ) > 0 ) {
-			throw log.scaledNumberTooLarge( value, minScaledValue, maxScaledValue );
+			throw IndexingLog.INSTANCE.scaledNumberTooLarge( value, minScaledValue, maxScaledValue );
 		}
 
 		return new JsonPrimitive( value );

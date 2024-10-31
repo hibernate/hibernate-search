@@ -4,18 +4,14 @@
  */
 package org.hibernate.search.backend.elasticsearch.search.predicate.impl;
 
-import java.lang.invoke.MethodHandles;
 import java.util.List;
 import java.util.Objects;
 
-import org.hibernate.search.backend.elasticsearch.logging.impl.Log;
-import org.hibernate.search.util.common.logging.impl.LoggerFactory;
+import org.hibernate.search.backend.elasticsearch.logging.impl.QueryLog;
 
 import com.google.gson.JsonObject;
 
 public abstract class AbstractElasticsearchNestablePredicate extends AbstractElasticsearchPredicate {
-
-	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	AbstractElasticsearchNestablePredicate(AbstractElasticsearchPredicate.AbstractBuilder builder) {
 		super( builder );
@@ -28,7 +24,7 @@ public abstract class AbstractElasticsearchNestablePredicate extends AbstractEla
 		String expectedParentNestedPath = context.getNestedPath();
 
 		if ( expectedParentNestedPath != null && !nestedPathHierarchy.contains( expectedParentNestedPath ) ) {
-			throw log.invalidNestedObjectPathForPredicate( this, expectedParentNestedPath,
+			throw QueryLog.INSTANCE.invalidNestedObjectPathForPredicate( this, expectedParentNestedPath,
 					getFieldPathsForErrorMessage() );
 		}
 	}

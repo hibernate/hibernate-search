@@ -4,19 +4,15 @@
  */
 package org.hibernate.search.mapper.pojo.bridge.binding.impl;
 
-import java.lang.invoke.MethodHandles;
 import java.util.Map;
 
 import org.hibernate.search.engine.environment.bean.BeanResolver;
 import org.hibernate.search.mapper.pojo.bridge.binding.MarkerBindingContext;
 import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.MarkerBinder;
-import org.hibernate.search.mapper.pojo.logging.impl.Log;
-import org.hibernate.search.util.common.logging.impl.LoggerFactory;
+import org.hibernate.search.mapper.pojo.logging.impl.MappingLog;
 
 public final class MarkerBindingContextImpl extends AbstractBindingContext
 		implements MarkerBindingContext {
-
-	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	private Object marker;
 
@@ -33,7 +29,7 @@ public final class MarkerBindingContextImpl extends AbstractBindingContext
 		// This call should set the partial binding
 		binder.bind( this );
 		if ( marker == null ) {
-			throw log.missingMarkerForBinder( binder );
+			throw MappingLog.INSTANCE.missingMarkerForBinder( binder );
 		}
 
 		return marker;

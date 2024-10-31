@@ -4,7 +4,6 @@
  */
 package org.hibernate.search.mapper.pojo.search.definition.binding.builtin;
 
-import java.lang.invoke.MethodHandles;
 import java.util.Optional;
 
 import org.hibernate.search.engine.environment.bean.BeanHolder;
@@ -12,11 +11,10 @@ import org.hibernate.search.engine.search.common.ValueModel;
 import org.hibernate.search.engine.search.projection.definition.spi.ConstantProjectionDefinition;
 import org.hibernate.search.engine.search.projection.definition.spi.FieldProjectionDefinition;
 import org.hibernate.search.engine.search.projection.dsl.SearchProjectionFactory;
-import org.hibernate.search.mapper.pojo.logging.impl.Log;
+import org.hibernate.search.mapper.pojo.logging.impl.ProjectionLog;
 import org.hibernate.search.mapper.pojo.model.PojoModelValue;
 import org.hibernate.search.mapper.pojo.search.definition.binding.ProjectionBinder;
 import org.hibernate.search.mapper.pojo.search.definition.binding.ProjectionBindingContext;
-import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
 /**
  * Binds a constructor parameter to a projection to the value of a field in the indexed document.
@@ -25,7 +23,6 @@ import org.hibernate.search.util.common.logging.impl.LoggerFactory;
  * @see org.hibernate.search.mapper.pojo.mapping.definition.annotation.FieldProjection
  */
 public final class FieldProjectionBinder implements ProjectionBinder {
-	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	/**
 	 * Creates a {@link FieldProjectionBinder} to be passed
@@ -122,7 +119,7 @@ public final class FieldProjectionBinder implements ProjectionBinder {
 		}
 		Optional<String> paramName = context.constructorParameter().name();
 		if ( !paramName.isPresent() ) {
-			throw log.missingParameterNameForFieldProjectionInProjectionConstructor();
+			throw ProjectionLog.INSTANCE.missingParameterNameForFieldProjectionInProjectionConstructor();
 		}
 		return paramName.get();
 	}

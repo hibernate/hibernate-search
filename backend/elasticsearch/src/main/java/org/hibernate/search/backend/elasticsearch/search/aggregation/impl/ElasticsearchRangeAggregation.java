@@ -4,14 +4,13 @@
  */
 package org.hibernate.search.backend.elasticsearch.search.aggregation.impl;
 
-import java.lang.invoke.MethodHandles;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.function.Function;
 
-import org.hibernate.search.backend.elasticsearch.logging.impl.Log;
+import org.hibernate.search.backend.elasticsearch.logging.impl.QueryLog;
 import org.hibernate.search.backend.elasticsearch.search.common.impl.AbstractElasticsearchCodecAwareSearchQueryElementFactory;
 import org.hibernate.search.backend.elasticsearch.search.common.impl.ElasticsearchSearchIndexScope;
 import org.hibernate.search.backend.elasticsearch.search.common.impl.ElasticsearchSearchIndexValueFieldContext;
@@ -22,7 +21,6 @@ import org.hibernate.search.engine.search.common.ValueModel;
 import org.hibernate.search.util.common.data.Range;
 import org.hibernate.search.util.common.data.RangeBoundInclusion;
 import org.hibernate.search.util.common.impl.CollectionHelper;
-import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
@@ -35,8 +33,6 @@ import com.google.gson.JsonObject;
  */
 public class ElasticsearchRangeAggregation<F, K>
 		extends AbstractElasticsearchBucketAggregation<Range<K>, Long> {
-
-	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	private final String absoluteFieldPath;
 
@@ -136,14 +132,14 @@ public class ElasticsearchRangeAggregation<F, K>
 			Optional<? extends K> lowerBoundValue = range.lowerBoundValue();
 			if ( lowerBoundValue.isPresent() ) {
 				if ( !RangeBoundInclusion.INCLUDED.equals( range.lowerBoundInclusion() ) ) {
-					throw log.elasticsearchRangeAggregationRequiresCanonicalFormForRanges( range );
+					throw QueryLog.INSTANCE.elasticsearchRangeAggregationRequiresCanonicalFormForRanges( range );
 				}
 				rangeJson.add( "from", encoder.apply( lowerBoundValue.get() ) );
 			}
 			Optional<? extends K> upperBoundValue = range.upperBoundValue();
 			if ( upperBoundValue.isPresent() ) {
 				if ( !RangeBoundInclusion.EXCLUDED.equals( range.upperBoundInclusion() ) ) {
-					throw log.elasticsearchRangeAggregationRequiresCanonicalFormForRanges( range );
+					throw QueryLog.INSTANCE.elasticsearchRangeAggregationRequiresCanonicalFormForRanges( range );
 				}
 				rangeJson.add( "to", encoder.apply( upperBoundValue.get() ) );
 			}

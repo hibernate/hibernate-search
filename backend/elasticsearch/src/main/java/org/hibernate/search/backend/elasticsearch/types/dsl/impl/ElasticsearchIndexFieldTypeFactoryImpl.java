@@ -4,7 +4,6 @@
  */
 package org.hibernate.search.backend.elasticsearch.types.dsl.impl;
 
-import java.lang.invoke.MethodHandles;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.time.Instant;
@@ -18,7 +17,7 @@ import java.time.Year;
 import java.time.YearMonth;
 import java.time.ZonedDateTime;
 
-import org.hibernate.search.backend.elasticsearch.logging.impl.Log;
+import org.hibernate.search.backend.elasticsearch.logging.impl.MappingLog;
 import org.hibernate.search.backend.elasticsearch.types.dsl.ElasticsearchIndexFieldTypeFactory;
 import org.hibernate.search.backend.elasticsearch.types.dsl.ElasticsearchNativeIndexFieldTypeMappingStep;
 import org.hibernate.search.backend.elasticsearch.types.format.impl.ElasticsearchDefaultFieldFormatProvider;
@@ -31,15 +30,12 @@ import org.hibernate.search.engine.backend.types.dsl.StringIndexFieldTypeOptions
 import org.hibernate.search.engine.backend.types.dsl.VectorFieldTypeOptionsStep;
 import org.hibernate.search.engine.mapper.mapping.building.spi.IndexFieldTypeDefaultsProvider;
 import org.hibernate.search.engine.spatial.GeoPoint;
-import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 import org.hibernate.search.util.common.reporting.EventContext;
 
 import com.google.gson.Gson;
 
 public class ElasticsearchIndexFieldTypeFactoryImpl
 		implements ElasticsearchIndexFieldTypeFactory, ElasticsearchIndexFieldTypeBuildContext {
-
-	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	private final EventContext eventContext;
 	private final BackendMapperContext backendMapperContext;
@@ -128,7 +124,7 @@ public class ElasticsearchIndexFieldTypeFactoryImpl
 			return (StandardIndexFieldTypeOptionsStep<?, F>) asBigInteger();
 		}
 		else {
-			throw log.cannotGuessFieldType( valueType, getEventContext() );
+			throw MappingLog.INSTANCE.cannotGuessFieldType( valueType, getEventContext() );
 		}
 	}
 
@@ -247,7 +243,7 @@ public class ElasticsearchIndexFieldTypeFactoryImpl
 			return (VectorFieldTypeOptionsStep<?, F>) asFloatVector();
 		}
 		else {
-			throw log.cannotGuessVectorFieldType( valueType, getEventContext() );
+			throw MappingLog.INSTANCE.cannotGuessVectorFieldType( valueType, getEventContext() );
 		}
 	}
 

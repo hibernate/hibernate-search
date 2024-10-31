@@ -17,8 +17,8 @@ import org.hibernate.search.Search;
 import org.hibernate.search.test.SearchTestBase;
 import org.hibernate.search.testsupport.TestConstants;
 import org.hibernate.search.util.common.SearchException;
-import org.hibernate.search.util.logging.impl.Log;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
+import org.hibernate.search.util.logging.impl.MigrationHelperLog;
 
 import org.junit.jupiter.api.Test;
 
@@ -31,7 +31,7 @@ import org.apache.lucene.search.Query;
  */
 class InheritanceTest extends SearchTestBase {
 
-	private static final Log log = LoggerFactory.make( MethodHandles.lookup() );
+	private static final MigrationHelperLog log = LoggerFactory.make( MethodHandles.lookup() );
 
 	@Test
 	void testSearchUnindexClass() throws Exception {

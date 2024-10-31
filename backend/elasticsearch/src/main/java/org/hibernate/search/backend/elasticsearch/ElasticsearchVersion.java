@@ -4,7 +4,6 @@
  */
 package org.hibernate.search.backend.elasticsearch;
 
-import java.lang.invoke.MethodHandles;
 import java.util.Locale;
 import java.util.Objects;
 import java.util.Optional;
@@ -12,12 +11,9 @@ import java.util.OptionalInt;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import org.hibernate.search.backend.elasticsearch.logging.impl.Log;
-import org.hibernate.search.util.common.logging.impl.LoggerFactory;
+import org.hibernate.search.backend.elasticsearch.logging.impl.VersionLog;
 
 public class ElasticsearchVersion {
-
-	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	private static final Pattern VERSION_PATTERN = Pattern.compile( "(\\d+)(?:\\.(\\d+)(?:\\.(\\d+)(?:-(\\w+))?)?)?" );
 	// This matches either no separator with an empty string before or after, or a separator with something left and right.
@@ -39,7 +35,7 @@ public class ElasticsearchVersion {
 		Matcher distributionAndVersionMatcher =
 				DISTRIBUTION_AND_VERSION_PATTERN.matcher( normalizedDistributionAndVersionString );
 		if ( !distributionAndVersionMatcher.matches() ) {
-			throw log.invalidElasticsearchVersionWithOptionalDistribution(
+			throw VersionLog.INSTANCE.invalidElasticsearchVersionWithOptionalDistribution(
 					normalizedDistributionAndVersionString, ElasticsearchDistributionName.allowedExternalRepresentations(),
 					ElasticsearchDistributionName.defaultValue().externalRepresentation(), null );
 		}
@@ -51,7 +47,7 @@ public class ElasticsearchVersion {
 					distributionAndVersionMatcher.group( 2 ) );
 		}
 		catch (RuntimeException e) {
-			throw log.invalidElasticsearchVersionWithOptionalDistribution(
+			throw VersionLog.INSTANCE.invalidElasticsearchVersionWithOptionalDistribution(
 					normalizedDistributionAndVersionString, ElasticsearchDistributionName.allowedExternalRepresentations(),
 					ElasticsearchDistributionName.defaultValue().externalRepresentation(), e );
 		}
@@ -73,7 +69,7 @@ public class ElasticsearchVersion {
 		final String normalizedVersion = versionString.trim().toLowerCase( Locale.ROOT );
 		Matcher matcher = VERSION_PATTERN.matcher( normalizedVersion );
 		if ( !matcher.matches() ) {
-			throw log.invalidElasticsearchVersionWithoutDistribution( normalizedVersion, null );
+			throw VersionLog.INSTANCE.invalidElasticsearchVersionWithoutDistribution( normalizedVersion, null );
 		}
 		try {
 			int major = parseVersionComponent( matcher.group( 1 ) );
@@ -83,7 +79,7 @@ public class ElasticsearchVersion {
 			return new ElasticsearchVersion( distribution, major, minor, micro, qualifier );
 		}
 		catch (RuntimeException e) {
-			throw log.invalidElasticsearchVersionWithoutDistribution( normalizedVersion, e );
+			throw VersionLog.INSTANCE.invalidElasticsearchVersionWithoutDistribution( normalizedVersion, e );
 		}
 	}
 

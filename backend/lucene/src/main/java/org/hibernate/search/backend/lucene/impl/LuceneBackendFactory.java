@@ -4,7 +4,6 @@
  */
 package org.hibernate.search.backend.lucene.impl;
 
-import java.lang.invoke.MethodHandles;
 import java.text.ParseException;
 import java.util.List;
 import java.util.Locale;
@@ -19,7 +18,8 @@ import org.hibernate.search.backend.lucene.cache.QueryCachingConfigurationContex
 import org.hibernate.search.backend.lucene.cache.QueryCachingConfigurer;
 import org.hibernate.search.backend.lucene.cache.impl.LuceneQueryCachingContext;
 import org.hibernate.search.backend.lucene.cfg.LuceneBackendSettings;
-import org.hibernate.search.backend.lucene.logging.impl.Log;
+import org.hibernate.search.backend.lucene.logging.impl.AnalyzerLog;
+import org.hibernate.search.backend.lucene.logging.impl.ConfigurationLog;
 import org.hibernate.search.backend.lucene.multitenancy.MultiTenancyStrategyName;
 import org.hibernate.search.backend.lucene.multitenancy.impl.DiscriminatorMultiTenancyStrategy;
 import org.hibernate.search.backend.lucene.multitenancy.impl.MultiTenancyStrategy;
@@ -37,14 +37,11 @@ import org.hibernate.search.engine.environment.bean.BeanReference;
 import org.hibernate.search.engine.environment.bean.BeanResolver;
 import org.hibernate.search.util.common.AssertionFailure;
 import org.hibernate.search.util.common.impl.SuppressingCloser;
-import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 import org.hibernate.search.util.common.reporting.EventContext;
 
 import org.apache.lucene.util.Version;
 
 public class LuceneBackendFactory implements BackendFactory {
-
-	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	private static final ConfigurationProperty<Optional<Version>> LUCENE_VERSION =
 			ConfigurationProperty.forKey( LuceneBackendSettings.LUCENE_VERSION )
@@ -114,13 +111,13 @@ public class LuceneBackendFactory implements BackendFactory {
 		Optional<Version> luceneVersionOptional = LUCENE_VERSION.get( propertySource );
 		if ( luceneVersionOptional.isPresent() ) {
 			luceneVersion = luceneVersionOptional.get();
-			if ( log.isDebugEnabled() ) {
-				log.debug( "Setting Lucene compatibility to Version " + luceneVersion );
+			if ( ConfigurationLog.INSTANCE.isDebugEnabled() ) {
+				ConfigurationLog.INSTANCE.debug( "Setting Lucene compatibility to Version " + luceneVersion );
 			}
 		}
 		else {
 			Version latestVersion = LuceneBackendSettings.Defaults.LUCENE_VERSION;
-			log.recommendConfiguringLuceneVersion(
+			ConfigurationLog.INSTANCE.recommendConfiguringLuceneVersion(
 					LUCENE_VERSION.resolveOrRaw( propertySource ),
 					latestVersion,
 					backendContext
@@ -136,11 +133,11 @@ public class LuceneBackendFactory implements BackendFactory {
 				propertySource, optionalName -> {
 					if ( MultiTenancyStrategyName.NONE.equals( optionalName )
 							&& buildContext.multiTenancyEnabled() ) {
-						throw log.multiTenancyRequiredButExplicitlyDisabledByBackend();
+						throw ConfigurationLog.INSTANCE.multiTenancyRequiredButExplicitlyDisabledByBackend();
 					}
 					if ( MultiTenancyStrategyName.DISCRIMINATOR.equals( optionalName )
 							&& !buildContext.multiTenancyEnabled() ) {
-						throw log.multiTenancyNotRequiredButExplicitlyEnabledByTheBackend();
+						throw ConfigurationLog.INSTANCE.multiTenancyNotRequiredButExplicitlyEnabledByTheBackend();
 					}
 					return optionalName;
 				} ).orElseGet( () -> {
@@ -189,7 +186,7 @@ public class LuceneBackendFactory implements BackendFactory {
 			return new LuceneAnalysisDefinitionRegistry( collector );
 		}
 		catch (Exception e) {
-			throw log.unableToApplyAnalysisConfiguration( e.getMessage(), e );
+			throw AnalyzerLog.INSTANCE.unableToApplyAnalysisConfiguration( e.getMessage(), e );
 		}
 	}
 
@@ -216,7 +213,7 @@ public class LuceneBackendFactory implements BackendFactory {
 					} );
 		}
 		catch (Exception e) {
-			throw log.unableToApplyQueryCacheConfiguration( e.getMessage(), e );
+			throw ConfigurationLog.INSTANCE.unableToApplyQueryCacheConfiguration( e.getMessage(), e );
 		}
 	}
 
@@ -225,7 +222,7 @@ public class LuceneBackendFactory implements BackendFactory {
 			return Version.parseLeniently( versionString );
 		}
 		catch (IllegalArgumentException | ParseException e) {
-			throw log.illegalLuceneVersionFormat( versionString, e.getMessage(), e );
+			throw ConfigurationLog.INSTANCE.illegalLuceneVersionFormat( versionString, e.getMessage(), e );
 		}
 	}
 }

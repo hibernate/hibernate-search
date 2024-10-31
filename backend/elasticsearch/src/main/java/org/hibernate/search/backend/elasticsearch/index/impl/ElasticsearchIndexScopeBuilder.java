@@ -4,22 +4,18 @@
  */
 package org.hibernate.search.backend.elasticsearch.index.impl;
 
-import java.lang.invoke.MethodHandles;
 import java.util.LinkedHashSet;
 import java.util.Set;
 import java.util.stream.Collectors;
 
 import org.hibernate.search.backend.elasticsearch.document.model.impl.ElasticsearchIndexModel;
-import org.hibernate.search.backend.elasticsearch.logging.impl.Log;
+import org.hibernate.search.backend.elasticsearch.logging.impl.QueryLog;
 import org.hibernate.search.backend.elasticsearch.scope.impl.ElasticsearchIndexScope;
 import org.hibernate.search.engine.backend.mapping.spi.BackendMappingContext;
 import org.hibernate.search.engine.backend.scope.spi.IndexScope;
 import org.hibernate.search.engine.backend.scope.spi.IndexScopeBuilder;
-import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
 class ElasticsearchIndexScopeBuilder implements IndexScopeBuilder {
-
-	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	private final IndexManagerBackendContext backendContext;
 	private final BackendMappingContext mappingContext;
@@ -36,7 +32,7 @@ class ElasticsearchIndexScopeBuilder implements IndexScopeBuilder {
 
 	void add(IndexManagerBackendContext backendContext, ElasticsearchIndexManagerImpl indexManager) {
 		if ( !this.backendContext.equals( backendContext ) ) {
-			throw log.cannotMixElasticsearchScopeWithOtherBackend(
+			throw QueryLog.INSTANCE.cannotMixElasticsearchScopeWithOtherBackend(
 					this, indexManager, backendContext.getEventContext()
 			);
 		}

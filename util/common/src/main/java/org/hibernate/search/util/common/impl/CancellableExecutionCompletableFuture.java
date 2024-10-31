@@ -4,13 +4,11 @@
  */
 package org.hibernate.search.util.common.impl;
 
-import java.lang.invoke.MethodHandles;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Future;
 
-import org.hibernate.search.util.common.logging.impl.Log;
-import org.hibernate.search.util.common.logging.impl.LoggerFactory;
+import org.hibernate.search.util.common.logging.impl.CommonFailuresLog;
 
 /**
  * A {@link CompletableFuture} that, upon cancellation,
@@ -18,8 +16,6 @@ import org.hibernate.search.util.common.logging.impl.LoggerFactory;
  * @param <T> The return type of the future.
  */
 class CancellableExecutionCompletableFuture<T> extends CompletableFuture<T> {
-
-	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	private final Future<?> future;
 
@@ -35,12 +31,14 @@ class CancellableExecutionCompletableFuture<T> extends CompletableFuture<T> {
 		 * Thus we mark 'this' as cancelled *first*, so that any exception in the operation
 		 * from now on will be ignored.
 		 */
-		log.tracef( "Cancelling CompletableFuture %s (mayInterruptIfRunning = %s)", this, mayInterruptIfRunning );
+		CommonFailuresLog.INSTANCE.tracef( "Cancelling CompletableFuture %s (mayInterruptIfRunning = %s)", this,
+				mayInterruptIfRunning );
 		super.cancel( mayInterruptIfRunning );
-		log.tracef( "Cancelling Future %s (mayInterruptIfRunning = %s)", future, mayInterruptIfRunning );
+		CommonFailuresLog.INSTANCE.tracef( "Cancelling Future %s (mayInterruptIfRunning = %s)", future, mayInterruptIfRunning );
 		boolean cancelled = future.cancel( mayInterruptIfRunning );
 		if ( !cancelled ) {
-			log.debugf( "Could not cancel Future %s (mayInterruptIfRunning = %s)", future, mayInterruptIfRunning );
+			CommonFailuresLog.INSTANCE.debugf( "Could not cancel Future %s (mayInterruptIfRunning = %s)", future,
+					mayInterruptIfRunning );
 		}
 		return cancelled;
 	}

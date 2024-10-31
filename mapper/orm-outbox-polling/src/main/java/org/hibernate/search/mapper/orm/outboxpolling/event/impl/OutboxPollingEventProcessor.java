@@ -4,7 +4,6 @@
  */
 package org.hibernate.search.mapper.orm.outboxpolling.event.impl;
 
-import java.lang.invoke.MethodHandles;
 import java.time.Clock;
 import java.time.Duration;
 import java.util.List;
@@ -30,15 +29,12 @@ import org.hibernate.search.mapper.orm.common.spi.TransactionHelper;
 import org.hibernate.search.mapper.orm.outboxpolling.cfg.HibernateOrmMapperOutboxPollingSettings;
 import org.hibernate.search.mapper.orm.outboxpolling.cluster.impl.AgentRepositoryProvider;
 import org.hibernate.search.mapper.orm.outboxpolling.cluster.impl.ShardAssignmentDescriptor;
-import org.hibernate.search.mapper.orm.outboxpolling.logging.impl.Log;
+import org.hibernate.search.mapper.orm.outboxpolling.logging.impl.OutboxPollingEventsLog;
 import org.hibernate.search.util.common.impl.Closer;
-import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 import org.hibernate.search.util.common.spi.ToStringTreeAppendable;
 import org.hibernate.search.util.common.spi.ToStringTreeAppender;
 
 public final class OutboxPollingEventProcessor implements ToStringTreeAppendable {
-
-	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	public static String namePrefix(String tenantId) {
 		StringBuilder prefix = new StringBuilder( "Outbox event processor" );
@@ -217,7 +213,7 @@ public final class OutboxPollingEventProcessor implements ToStringTreeAppendable
 	}
 
 	public void start() {
-		log.startingOutboxEventProcessor( name, this );
+		OutboxPollingEventsLog.INSTANCE.startingOutboxEventProcessor( name, this );
 		status.set( Status.STARTED );
 		processingTask.ensureScheduled();
 	}
@@ -232,7 +228,7 @@ public final class OutboxPollingEventProcessor implements ToStringTreeAppendable
 	}
 
 	public void stop() {
-		log.stoppingOutboxEventProcessor( name );
+		OutboxPollingEventsLog.INSTANCE.stoppingOutboxEventProcessor( name );
 		try ( Closer<RuntimeException> closer = new Closer<>() ) {
 			closer.push( SingletonTask::stop, processingTask );
 			closer.push( OutboxPollingEventProcessor::leaveCluster, this );
@@ -290,7 +286,7 @@ public final class OutboxPollingEventProcessor implements ToStringTreeAppendable
 						// It can happen with some databases (CockroachDB in particular, perhaps others)
 						// that treat transaction failures as a matter of course that applications should deal with.
 						// See also https://www.cockroachlabs.com/docs/v23.1/transaction-retry-error-reference.html
-						log.eventProcessorFindEventsUnableToLock( name, lockException );
+						OutboxPollingEventsLog.INSTANCE.eventProcessorFindEventsUnableToLock( name, lockException );
 						return;
 					}
 
@@ -302,7 +298,8 @@ public final class OutboxPollingEventProcessor implements ToStringTreeAppendable
 					// See the Scheduler class below.
 					ensureScheduled();
 
-					log.tracef( "Processing %d outbox events for '%s': '%s'", events.size(), name, events );
+					OutboxPollingEventsLog.INSTANCE.tracef( "Processing %d outbox events for '%s': '%s'", events.size(), name,
+							events );
 
 					// Process the events
 					eventProcessing.processEvents( events );

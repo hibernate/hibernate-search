@@ -8,8 +8,8 @@ import java.lang.invoke.MethodHandles;
 
 import org.hibernate.Session;
 import org.hibernate.search.impl.ImplementationFactory;
-import org.hibernate.search.util.logging.impl.Log;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
+import org.hibernate.search.util.logging.impl.MigrationHelperLog;
 
 /**
  * Helper class to get a {@code FullTextSession} from a regular ORM session.
@@ -21,7 +21,7 @@ import org.hibernate.search.util.logging.impl.LoggerFactory;
 @Deprecated
 public final class Search {
 
-	private static final Log log = LoggerFactory.make( MethodHandles.lookup() );
+	private static final MigrationHelperLog log = LoggerFactory.make( MethodHandles.lookup() );
 
 	private Search() {
 	}

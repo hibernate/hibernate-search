@@ -4,7 +4,6 @@
  */
 package org.hibernate.search.engine.common.impl;
 
-import java.lang.invoke.MethodHandles;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
@@ -26,11 +25,12 @@ import org.hibernate.search.engine.common.timing.spi.TimingSource;
 import org.hibernate.search.engine.environment.bean.BeanHolder;
 import org.hibernate.search.engine.environment.bean.spi.BeanProvider;
 import org.hibernate.search.engine.environment.thread.impl.ThreadPoolProviderImpl;
-import org.hibernate.search.engine.logging.impl.Log;
+import org.hibernate.search.engine.logging.impl.BackendLog;
 import org.hibernate.search.engine.mapper.mapping.building.spi.MappingKey;
 import org.hibernate.search.engine.mapper.mapping.spi.MappingImplementor;
 import org.hibernate.search.engine.reporting.FailureHandler;
 import org.hibernate.search.engine.reporting.impl.EngineEventContextMessages;
+import org.hibernate.search.engine.reporting.impl.EngineHints;
 import org.hibernate.search.engine.reporting.spi.ContextualFailureCollector;
 import org.hibernate.search.engine.reporting.spi.EventContexts;
 import org.hibernate.search.engine.reporting.spi.FailureCollector;
@@ -38,13 +38,10 @@ import org.hibernate.search.engine.reporting.spi.RootFailureCollector;
 import org.hibernate.search.util.common.impl.Closer;
 import org.hibernate.search.util.common.impl.Futures;
 import org.hibernate.search.util.common.impl.Throwables;
-import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
 public class SearchIntegrationImpl implements SearchIntegration {
 
 	static final SavedState.Key<Map<String, SavedState>> INDEX_MANAGERS_KEY = SavedState.key( "index_managers" );
-
-	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	private final BeanProvider beanProvider;
 	private final BeanHolder<? extends FailureHandler> failureHandlerHolder;
@@ -78,7 +75,7 @@ public class SearchIntegrationImpl implements SearchIntegration {
 	public Backend backend() {
 		BackendImplementor backend = backends.get( null );
 		if ( backend == null ) {
-			throw log.noDefaultBackendRegistered( backends.keySet() );
+			throw BackendLog.INSTANCE.noDefaultBackendRegistered( backends.keySet() );
 		}
 		return backend.toAPI();
 	}
@@ -87,11 +84,12 @@ public class SearchIntegrationImpl implements SearchIntegration {
 	public Backend backend(String backendName) {
 		BackendImplementor backend = backends.get( backendName );
 		if ( backend == null ) {
-			throw log.unknownNameForBackend( backendName,
-					backends.keySet().stream().filter( Objects::nonNull ).collect( Collectors.toList() ),
-					backends.containsKey( null )
-							? log.defaultBackendAvailable()
-							: log.defaultBackendUnavailable() );
+			throw BackendLog.INSTANCE
+					.unknownNameForBackend( backendName,
+							backends.keySet().stream().filter( Objects::nonNull ).collect( Collectors.toList() ),
+							backends.containsKey( null )
+									? EngineHints.INSTANCE.defaultBackendAvailable()
+									: EngineHints.INSTANCE.defaultBackendUnavailable() );
 		}
 		return backend.toAPI();
 	}
@@ -100,7 +98,7 @@ public class SearchIntegrationImpl implements SearchIntegration {
 	public IndexManager indexManager(String indexManagerName) {
 		IndexManagerImplementor indexManager = indexManagers.get( indexManagerName );
 		if ( indexManager == null ) {
-			throw log.unknownNameForIndexManager( indexManagerName, indexManagers.keySet() );
+			throw BackendLog.INSTANCE.unknownNameForIndexManager( indexManagerName, indexManagers.keySet() );
 		}
 		return indexManager.toAPI();
 	}

@@ -4,7 +4,6 @@
  */
 package org.hibernate.search.backend.elasticsearch.impl;
 
-import java.lang.invoke.MethodHandles;
 import java.util.Optional;
 
 import org.hibernate.search.backend.elasticsearch.ElasticsearchVersion;
@@ -19,7 +18,8 @@ import org.hibernate.search.backend.elasticsearch.gson.spi.GsonProvider;
 import org.hibernate.search.backend.elasticsearch.index.layout.IndexLayoutStrategy;
 import org.hibernate.search.backend.elasticsearch.index.layout.impl.IndexNames;
 import org.hibernate.search.backend.elasticsearch.link.impl.ElasticsearchLink;
-import org.hibernate.search.backend.elasticsearch.logging.impl.Log;
+import org.hibernate.search.backend.elasticsearch.logging.impl.MappingLog;
+import org.hibernate.search.backend.elasticsearch.logging.impl.VersionLog;
 import org.hibernate.search.backend.elasticsearch.lowlevel.syntax.metadata.impl.ElasticsearchIndexMetadataSyntax;
 import org.hibernate.search.backend.elasticsearch.lowlevel.syntax.search.impl.ElasticsearchSearchSyntax;
 import org.hibernate.search.backend.elasticsearch.mapping.impl.TypeNameMapping;
@@ -38,12 +38,10 @@ import org.hibernate.search.engine.environment.bean.BeanReference;
 import org.hibernate.search.engine.environment.bean.BeanResolver;
 import org.hibernate.search.util.common.AssertionFailure;
 import org.hibernate.search.util.common.impl.Closer;
-import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
 import com.google.gson.GsonBuilder;
 
 class ElasticsearchLinkImpl implements ElasticsearchLink {
-	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	static final OptionalConfigurationProperty<ElasticsearchVersion> VERSION =
 			ConfigurationProperty.forKey( ElasticsearchBackendSettings.VERSION )
@@ -175,7 +173,7 @@ class ElasticsearchLinkImpl implements ElasticsearchLink {
 					indexLayoutStrategy.createInitialElasticsearchIndexName( hibernateSearchIndexName ) );
 		}
 		else if ( writeAlias.equals( readAlias ) ) {
-			throw log.sameWriteAndReadAliases( writeAlias );
+			throw MappingLog.INSTANCE.sameWriteAndReadAliases( writeAlias );
 		}
 
 		URLEncodedString readName = readAlias != null ? readAlias : primaryName;
@@ -260,7 +258,7 @@ class ElasticsearchLinkImpl implements ElasticsearchLink {
 						if ( configuredVersionOnBackendCreationOptional.isPresent()
 								&& !configuredVersionOnBackendCreationOptional.get()
 										.matches( configuredVersionOnStartOptional.get() ) ) {
-							throw log.incompatibleElasticsearchVersionOnStart(
+							throw VersionLog.INSTANCE.incompatibleElasticsearchVersionOnStart(
 									configuredVersionOnBackendCreationOptional.get(),
 									configuredVersionOnStartOptional.get() );
 						}
@@ -278,7 +276,7 @@ class ElasticsearchLinkImpl implements ElasticsearchLink {
 					if ( ( resultOptional.isEmpty()
 							|| !ElasticsearchDialectFactory.isPreciseEnoughForProtocolDialect( resultOptional.get() ) )
 							&& versionCheckEnabled.isPresent() && !versionCheckEnabled.get() ) {
-						throw log.impreciseElasticsearchVersionWhenVersionCheckDisabled(
+						throw VersionLog.INSTANCE.impreciseElasticsearchVersionWhenVersionCheckDisabled(
 								VERSION_CHECK_ENABLED.resolveOrRaw( propertySource ) );
 					}
 
@@ -294,7 +292,7 @@ class ElasticsearchLinkImpl implements ElasticsearchLink {
 			// an error message in the context of the problematic configuration property.
 			VERSION_CHECK_ENABLED.getAndMap( propertySource, enabled -> {
 				if ( enabled ) {
-					throw log.cannotCheckElasticsearchVersion( configuredVersionOptional.get().distribution() );
+					throw VersionLog.INSTANCE.cannotCheckElasticsearchVersion( configuredVersionOptional.get().distribution() );
 				}
 				return enabled;
 			} );
@@ -306,7 +304,7 @@ class ElasticsearchLinkImpl implements ElasticsearchLink {
 			if ( configuredVersionOptional.isPresent() ) {
 				ElasticsearchVersion configuredVersion = configuredVersionOptional.get();
 				if ( !configuredVersion.matches( versionFromCluster ) ) {
-					throw log.unexpectedElasticsearchVersion( configuredVersion, versionFromCluster );
+					throw VersionLog.INSTANCE.unexpectedElasticsearchVersion( configuredVersion, versionFromCluster );
 				}
 			}
 			return versionFromCluster;
@@ -326,13 +324,13 @@ class ElasticsearchLinkImpl implements ElasticsearchLink {
 				// and we didn't notice the problem early
 				// because the version was unset
 				// or the distribution was incorrectly set to elasticsearch/opensearch.
-				throw log.unableToFetchElasticsearchVersion( VERSION.resolveOrRaw( propertySource ),
+				throw VersionLog.INSTANCE.unableToFetchElasticsearchVersion( VERSION.resolveOrRaw( propertySource ),
 						ElasticsearchDialectFactory.AMAZON_OPENSEARCH_SERVERLESS );
 			}
 			return version;
 		}
 		catch (RuntimeException e) {
-			throw log.failedToDetectElasticsearchVersion( e.getMessage(), e );
+			throw VersionLog.INSTANCE.failedToDetectElasticsearchVersion( e.getMessage(), e );
 		}
 	}
 

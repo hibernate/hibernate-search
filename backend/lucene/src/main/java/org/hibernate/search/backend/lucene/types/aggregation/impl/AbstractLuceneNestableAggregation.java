@@ -4,9 +4,7 @@
  */
 package org.hibernate.search.backend.lucene.types.aggregation.impl;
 
-import java.lang.invoke.MethodHandles;
-
-import org.hibernate.search.backend.lucene.logging.impl.Log;
+import org.hibernate.search.backend.lucene.logging.impl.QueryLog;
 import org.hibernate.search.backend.lucene.lowlevel.join.impl.NestedDocsProvider;
 import org.hibernate.search.backend.lucene.search.aggregation.impl.AggregationExtractContext;
 import org.hibernate.search.backend.lucene.search.aggregation.impl.AggregationRequestContext;
@@ -17,13 +15,10 @@ import org.hibernate.search.backend.lucene.search.predicate.impl.LuceneSearchPre
 import org.hibernate.search.backend.lucene.search.predicate.impl.PredicateRequestContext;
 import org.hibernate.search.engine.search.aggregation.spi.SearchAggregationBuilder;
 import org.hibernate.search.engine.search.predicate.SearchPredicate;
-import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
 import org.apache.lucene.search.Query;
 
 public abstract class AbstractLuceneNestableAggregation<A> implements LuceneSearchAggregation<A> {
-
-	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	private final String nestedDocumentPath;
 	private final LuceneSearchPredicate nestedFilter;
@@ -70,7 +65,7 @@ public abstract class AbstractLuceneNestableAggregation<A> implements LuceneSear
 
 		public void filter(SearchPredicate filter) {
 			if ( nestedDocumentPath == null ) {
-				throw log.cannotFilterAggregationOnRootDocumentField( field.absolutePath(), field.eventContext() );
+				throw QueryLog.INSTANCE.cannotFilterAggregationOnRootDocumentField( field.absolutePath(), field.eventContext() );
 			}
 			LuceneSearchPredicate luceneFilter = LuceneSearchPredicate.from( scope, filter );
 			luceneFilter.checkNestableWithin( nestedDocumentPath );

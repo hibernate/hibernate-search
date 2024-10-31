@@ -5,7 +5,6 @@
 package org.hibernate.search.mapper.pojo.schema.management.impl;
 
 import java.io.IOException;
-import java.lang.invoke.MethodHandles;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -14,13 +13,10 @@ import java.util.stream.Stream;
 
 import org.hibernate.search.engine.common.schema.management.SchemaExport;
 import org.hibernate.search.engine.reporting.spi.EventContexts;
-import org.hibernate.search.mapper.pojo.logging.impl.Log;
+import org.hibernate.search.mapper.pojo.logging.impl.SchemaExportLog;
 import org.hibernate.search.mapper.pojo.schema.management.SearchSchemaCollector;
-import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
 public class FileSearchSchemaCollector implements SearchSchemaCollector {
-
-	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	private static final Path DEFAULT_BACKEND_PATH = Paths.get( "backend" );
 
@@ -43,7 +39,7 @@ public class FileSearchSchemaCollector implements SearchSchemaCollector {
 			export.toFiles( checkOrCreateTargetDirectory( target ) );
 		}
 		catch (IOException | RuntimeException e) {
-			throw log.unableToExportSchema( e.getMessage(), e,
+			throw SchemaExportLog.INSTANCE.unableToExportSchema( e.getMessage(), e,
 					EventContexts.fromBackendName( backendName.orElse( null ) )
 							.append( EventContexts.fromIndexName( indexName ) )
 			);
@@ -53,7 +49,7 @@ public class FileSearchSchemaCollector implements SearchSchemaCollector {
 	private Path checkOrCreateTargetDirectory(Path targetDirectory) throws IOException {
 		if ( Files.exists( targetDirectory )
 				&& ( !Files.isDirectory( targetDirectory ) || isNotEmpty( targetDirectory ) ) ) {
-			throw log.schemaExporterTargetIsNotEmptyDirectory( targetDirectory );
+			throw SchemaExportLog.INSTANCE.schemaExporterTargetIsNotEmptyDirectory( targetDirectory );
 		}
 		else {
 			return Files.createDirectories( targetDirectory );

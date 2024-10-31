@@ -4,7 +4,6 @@
  */
 package org.hibernate.search.backend.elasticsearch.document.model.dsl.impl;
 
-import java.lang.invoke.MethodHandles;
 import java.util.Map;
 import java.util.TreeMap;
 
@@ -12,7 +11,7 @@ import org.hibernate.search.backend.elasticsearch.document.impl.ElasticsearchInd
 import org.hibernate.search.backend.elasticsearch.document.model.impl.ElasticsearchIndexCompositeNode;
 import org.hibernate.search.backend.elasticsearch.document.model.impl.ElasticsearchIndexField;
 import org.hibernate.search.backend.elasticsearch.document.model.impl.ElasticsearchIndexObjectField;
-import org.hibernate.search.backend.elasticsearch.logging.impl.Log;
+import org.hibernate.search.backend.elasticsearch.logging.impl.MappingLog;
 import org.hibernate.search.backend.elasticsearch.lowlevel.index.mapping.impl.AbstractTypeMapping;
 import org.hibernate.search.backend.elasticsearch.lowlevel.index.mapping.impl.DynamicType;
 import org.hibernate.search.backend.elasticsearch.lowlevel.index.mapping.impl.PropertyMapping;
@@ -23,12 +22,10 @@ import org.hibernate.search.engine.backend.document.model.dsl.spi.IndexObjectFie
 import org.hibernate.search.engine.backend.types.ObjectStructure;
 import org.hibernate.search.engine.common.tree.spi.TreeNodeInclusion;
 import org.hibernate.search.engine.reporting.spi.EventContexts;
-import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 import org.hibernate.search.util.common.reporting.EventContext;
 
 class ElasticsearchIndexObjectFieldBuilder extends AbstractElasticsearchIndexCompositeNodeBuilder
 		implements IndexObjectFieldBuilder, ElasticsearchIndexNodeContributor {
-	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	private final AbstractElasticsearchIndexCompositeNodeBuilder parent;
 	private final String absoluteFieldPath;
@@ -65,7 +62,7 @@ class ElasticsearchIndexObjectFieldBuilder extends AbstractElasticsearchIndexCom
 	@Override
 	public IndexObjectFieldReference toReference() {
 		if ( reference != null ) {
-			throw log.cannotCreateReferenceMultipleTimes( eventContext() );
+			throw MappingLog.INSTANCE.cannotCreateReferenceMultipleTimes( eventContext() );
 		}
 		this.reference = new ElasticsearchIndexObjectFieldReference();
 		return reference;
@@ -77,7 +74,7 @@ class ElasticsearchIndexObjectFieldBuilder extends AbstractElasticsearchIndexCom
 			Map<String, ElasticsearchIndexField> staticChildrenByNameForParent,
 			AbstractTypeMapping parentMapping) {
 		if ( reference == null ) {
-			throw log.incompleteFieldDefinition( eventContext() );
+			throw MappingLog.INSTANCE.incompleteFieldDefinition( eventContext() );
 		}
 
 		Map<String, ElasticsearchIndexField> staticChildrenByName = new TreeMap<>();

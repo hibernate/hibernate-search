@@ -4,11 +4,9 @@
  */
 package org.hibernate.search.backend.elasticsearch.types.sort.impl;
 
-import java.lang.invoke.MethodHandles;
-
 import org.hibernate.search.backend.elasticsearch.gson.impl.JsonAccessor;
 import org.hibernate.search.backend.elasticsearch.gson.impl.JsonObjectAccessor;
-import org.hibernate.search.backend.elasticsearch.logging.impl.Log;
+import org.hibernate.search.backend.elasticsearch.logging.impl.QueryLog;
 import org.hibernate.search.backend.elasticsearch.search.common.impl.AbstractElasticsearchValueFieldSearchQueryElementFactory;
 import org.hibernate.search.backend.elasticsearch.search.common.impl.ElasticsearchSearchIndexScope;
 import org.hibernate.search.backend.elasticsearch.search.common.impl.ElasticsearchSearchIndexValueFieldContext;
@@ -19,13 +17,10 @@ import org.hibernate.search.engine.search.sort.SearchSort;
 import org.hibernate.search.engine.search.sort.dsl.SortOrder;
 import org.hibernate.search.engine.search.sort.spi.DistanceSortBuilder;
 import org.hibernate.search.engine.spatial.GeoPoint;
-import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
 import com.google.gson.JsonObject;
 
 public class ElasticsearchDistanceSort extends AbstractElasticsearchDocumentValueSort {
-
-	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	private static final JsonObjectAccessor GEO_DISTANCE_ACCESSOR = JsonAccessor.root().property( "_geo_distance" ).asObject();
 
@@ -94,13 +89,13 @@ public class ElasticsearchDistanceSort extends AbstractElasticsearchDocumentValu
 		@Override
 		public void missingLowest() {
 			throw SortOrder.DESC.equals( order )
-					? log.missingLowestOnDescSortNotSupported( field.eventContext() )
-					: log.missingLowestOnAscSortNotSupported( field.eventContext() );
+					? QueryLog.INSTANCE.missingLowestOnDescSortNotSupported( field.eventContext() )
+					: QueryLog.INSTANCE.missingLowestOnAscSortNotSupported( field.eventContext() );
 		}
 
 		@Override
 		public void missingAs(GeoPoint value) {
-			throw log.missingAsOnSortNotSupported( field.eventContext() );
+			throw QueryLog.INSTANCE.missingAsOnSortNotSupported( field.eventContext() );
 		}
 
 		@Override
@@ -114,17 +109,17 @@ public class ElasticsearchDistanceSort extends AbstractElasticsearchDocumentValu
 					break;
 				case SUM:
 				default:
-					throw log.invalidSortModeForDistanceSort( mode, field.eventContext() );
+					throw QueryLog.INSTANCE.invalidSortModeForDistanceSort( mode, field.eventContext() );
 			}
 		}
 
 		@Override
 		public SearchSort build() {
 			if ( missingFirst && ( order == null || SortOrder.ASC.equals( order ) ) ) {
-				throw log.missingFirstOnAscSortNotSupported( field.eventContext() );
+				throw QueryLog.INSTANCE.missingFirstOnAscSortNotSupported( field.eventContext() );
 			}
 			if ( missingLast && SortOrder.DESC.equals( order ) ) {
-				throw log.missingLastOnDescSortNotSupported( field.eventContext() );
+				throw QueryLog.INSTANCE.missingLastOnDescSortNotSupported( field.eventContext() );
 			}
 
 			return new ElasticsearchDistanceSort( this );

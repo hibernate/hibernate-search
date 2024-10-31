@@ -4,20 +4,17 @@
  */
 package org.hibernate.search.mapper.pojo.identity.impl;
 
-import java.lang.invoke.MethodHandles;
 import java.util.function.Supplier;
 
 import org.hibernate.search.mapper.pojo.bridge.runtime.spi.BridgeMappingContext;
 import org.hibernate.search.mapper.pojo.bridge.runtime.spi.BridgeSessionContext;
-import org.hibernate.search.mapper.pojo.logging.impl.Log;
+import org.hibernate.search.mapper.pojo.logging.impl.IndexingLog;
+import org.hibernate.search.mapper.pojo.logging.impl.MappingLog;
 import org.hibernate.search.mapper.pojo.model.spi.PojoCaster;
 import org.hibernate.search.mapper.pojo.model.spi.PojoRawTypeIdentifier;
-import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 import org.hibernate.search.util.common.reflect.spi.ValueReadHandle;
 
 public final class UnmappedPropertyIdentifierMapping<I, E> implements IdentifierMappingImplementor<I, E> {
-
-	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	private final PojoCaster<? super I> caster;
 	private final ValueReadHandle<I> property;
@@ -47,7 +44,7 @@ public final class UnmappedPropertyIdentifierMapping<I, E> implements Identifier
 			return (I) caster.cast( providedId );
 		}
 		if ( entitySupplierOrNull == null ) {
-			throw log.nullProvidedIdentifierAndEntity();
+			throw IndexingLog.INSTANCE.nullProvidedIdentifierAndEntity();
 		}
 		return property.get( entitySupplierOrNull.get() );
 	}
@@ -59,11 +56,11 @@ public final class UnmappedPropertyIdentifierMapping<I, E> implements Identifier
 
 	@Override
 	public String toDocumentIdentifier(Object identifier, BridgeMappingContext context) {
-		throw log.cannotWorkWithIdentifierBecauseUnconfiguredIdentifierMapping( typeIdentifier );
+		throw MappingLog.INSTANCE.cannotWorkWithIdentifierBecauseUnconfiguredIdentifierMapping( typeIdentifier );
 	}
 
 	@Override
 	public I fromDocumentIdentifier(String documentId, BridgeSessionContext sessionContext) {
-		throw log.cannotWorkWithIdentifierBecauseUnconfiguredIdentifierMapping( typeIdentifier );
+		throw MappingLog.INSTANCE.cannotWorkWithIdentifierBecauseUnconfiguredIdentifierMapping( typeIdentifier );
 	}
 }

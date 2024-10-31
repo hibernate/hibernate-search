@@ -4,19 +4,15 @@
  */
 package org.hibernate.search.backend.lucene.lowlevel.writer.impl;
 
-import java.lang.invoke.MethodHandles;
 import java.util.function.BiConsumer;
 
-import org.hibernate.search.backend.lucene.logging.impl.Log;
+import org.hibernate.search.backend.lucene.logging.impl.ConfigurationLog;
 import org.hibernate.search.util.common.SearchException;
-import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
 import org.apache.lucene.index.IndexWriterConfig;
 import org.apache.lucene.index.LogByteSizeMergePolicy;
 
 class IndexWriterSettingValue<T> {
-
-	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	private final String settingName;
 	private final T value;
@@ -46,7 +42,7 @@ class IndexWriterSettingValue<T> {
 			writerSettingApplier.accept( writerConfig, value );
 		}
 		catch (RuntimeException e) {
-			throw log.illegalIndexWriterSetting( settingName, value, e.getMessage(), e );
+			throw ConfigurationLog.INSTANCE.illegalIndexWriterSetting( settingName, value, e.getMessage(), e );
 		}
 	}
 
@@ -59,7 +55,7 @@ class IndexWriterSettingValue<T> {
 			mergePolicySettingApplier.accept( logByteSizeMergePolicy, value );
 		}
 		catch (RuntimeException e) {
-			throw log.illegalMergePolicySetting( settingName, value, e.getMessage(), e );
+			throw ConfigurationLog.INSTANCE.illegalMergePolicySetting( settingName, value, e.getMessage(), e );
 		}
 	}
 }

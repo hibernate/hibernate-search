@@ -4,18 +4,14 @@
  */
 package org.hibernate.search.backend.lucene.search.predicate.impl;
 
-import java.lang.invoke.MethodHandles;
 import java.util.List;
 import java.util.Objects;
 
-import org.hibernate.search.backend.lucene.logging.impl.Log;
-import org.hibernate.search.util.common.logging.impl.LoggerFactory;
+import org.hibernate.search.backend.lucene.logging.impl.QueryLog;
 
 import org.apache.lucene.search.Query;
 
 abstract class AbstractLuceneNestablePredicate extends AbstractLuceneSearchPredicate {
-
-	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	AbstractLuceneNestablePredicate(AbstractBuilder builder) {
 		super( builder );
@@ -26,7 +22,7 @@ abstract class AbstractLuceneNestablePredicate extends AbstractLuceneSearchPredi
 		List<String> nestedPathHierarchy = getNestedPathHierarchy();
 
 		if ( expectedParentNestedPath != null && !nestedPathHierarchy.contains( expectedParentNestedPath ) ) {
-			throw log.invalidNestedObjectPathForPredicate( this, expectedParentNestedPath,
+			throw QueryLog.INSTANCE.invalidNestedObjectPathForPredicate( this, expectedParentNestedPath,
 					getFieldPathsForErrorMessage() );
 		}
 	}

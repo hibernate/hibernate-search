@@ -7,7 +7,6 @@ package org.hibernate.search.mapper.orm.outboxpolling.mapping.impl;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.lang.invoke.MethodHandles;
 import java.nio.charset.StandardCharsets;
 
 import jakarta.xml.bind.JAXBContext;
@@ -16,12 +15,9 @@ import jakarta.xml.bind.Marshaller;
 import jakarta.xml.bind.Unmarshaller;
 
 import org.hibernate.boot.jaxb.mapping.spi.JaxbEntityMappingsImpl;
-import org.hibernate.search.mapper.orm.outboxpolling.logging.impl.Log;
-import org.hibernate.search.util.common.logging.impl.LoggerFactory;
+import org.hibernate.search.mapper.orm.outboxpolling.logging.impl.ConfigurationLog;
 
 public class JaxbMappingHelper {
-
-	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	private JaxbMappingHelper() {
 	}
@@ -35,7 +31,7 @@ public class JaxbMappingHelper {
 			return out.toString( StandardCharsets.UTF_8 );
 		}
 		catch (IOException | JAXBException e) {
-			throw log.unableToProcessEntityMappings( e.getMessage(), e );
+			throw ConfigurationLog.INSTANCE.unableToProcessEntityMappings( e.getMessage(), e );
 		}
 	}
 
@@ -46,7 +42,7 @@ public class JaxbMappingHelper {
 			return (JaxbEntityMappingsImpl) unmarshaller.unmarshal( in );
 		}
 		catch (IOException | JAXBException e) {
-			throw log.unableToProcessEntityMappings( e.getMessage(), e );
+			throw ConfigurationLog.INSTANCE.unableToProcessEntityMappings( e.getMessage(), e );
 		}
 	}
 }

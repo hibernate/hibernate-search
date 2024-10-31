@@ -4,19 +4,15 @@
  */
 package org.hibernate.search.mapper.pojo.massindexing.impl;
 
-import java.lang.invoke.MethodHandles;
 
-import org.hibernate.search.mapper.pojo.logging.impl.Log;
 import org.hibernate.search.mapper.pojo.massindexing.MassIndexingEnvironment;
-import org.hibernate.search.util.common.logging.impl.LoggerFactory;
+import org.hibernate.search.mapper.pojo.reporting.impl.PojoMassIndexerMessages;
 
 /**
  * Common parent of all Runnable implementations for the batch indexing:
  * share the code for handling runtime exceptions.
  */
 public abstract class PojoMassIndexingFailureHandledRunnable implements Runnable {
-
-	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	private final PojoMassIndexingNotifier notifier;
 	private final MassIndexingEnvironment environment;
@@ -180,7 +176,7 @@ public abstract class PojoMassIndexingFailureHandledRunnable implements Runnable
 	}
 
 	protected String operationName() {
-		return log.massIndexerOperation();
+		return PojoMassIndexerMessages.INSTANCE.massIndexerOperation();
 	}
 
 }

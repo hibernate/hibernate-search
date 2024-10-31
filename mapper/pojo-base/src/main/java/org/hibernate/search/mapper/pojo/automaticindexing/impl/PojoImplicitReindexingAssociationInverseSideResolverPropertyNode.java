@@ -4,14 +4,11 @@
  */
 package org.hibernate.search.mapper.pojo.automaticindexing.impl;
 
-import java.lang.invoke.MethodHandles;
-
 import org.hibernate.search.mapper.pojo.common.annotation.impl.SearchProcessingWithContextException;
-import org.hibernate.search.mapper.pojo.logging.impl.Log;
+import org.hibernate.search.mapper.pojo.logging.impl.IndexingLog;
 import org.hibernate.search.mapper.pojo.model.path.PojoModelPath;
 import org.hibernate.search.mapper.pojo.reporting.spi.PojoEventContexts;
 import org.hibernate.search.util.common.impl.Closer;
-import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 import org.hibernate.search.util.common.reflect.spi.ValueReadHandle;
 import org.hibernate.search.util.common.spi.ToStringTreeAppender;
 
@@ -24,7 +21,6 @@ import org.hibernate.search.util.common.spi.ToStringTreeAppender;
  */
 class PojoImplicitReindexingAssociationInverseSideResolverPropertyNode<T, P>
 		extends PojoImplicitReindexingAssociationInverseSideResolverNode<T> {
-	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	private final ValueReadHandle<P> handle;
 	private final PojoImplicitReindexingAssociationInverseSideResolverNode<? super P> nested;
@@ -74,7 +70,7 @@ class PojoImplicitReindexingAssociationInverseSideResolverPropertyNode<T, P>
 			throw e;
 		}
 		catch (RuntimeException e) {
-			throw log.searchProcessingFailure( e, e.getMessage(), PojoEventContexts.fromPath( modelPath ) );
+			throw IndexingLog.INSTANCE.searchProcessingFailure( e, e.getMessage(), PojoEventContexts.fromPath( modelPath ) );
 		}
 	}
 

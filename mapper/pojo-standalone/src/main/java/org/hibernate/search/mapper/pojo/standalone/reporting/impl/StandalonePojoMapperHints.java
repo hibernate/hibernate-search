@@ -29,4 +29,7 @@ public interface StandalonePojoMapperHints extends MapperHints {
 			+ " section of the reference documentation.")
 	String cannotReadJandexRootMapping();
 
+	@Message("is closed")
+	String closedSession();
+
 }

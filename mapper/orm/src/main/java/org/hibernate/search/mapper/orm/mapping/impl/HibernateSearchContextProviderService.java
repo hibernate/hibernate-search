@@ -4,13 +4,11 @@
  */
 package org.hibernate.search.mapper.orm.mapping.impl;
 
-import java.lang.invoke.MethodHandles;
 import java.util.function.Supplier;
 
 import org.hibernate.engine.spi.SessionFactoryImplementor;
 import org.hibernate.search.mapper.orm.common.impl.HibernateOrmUtils;
-import org.hibernate.search.mapper.orm.logging.impl.Log;
-import org.hibernate.search.util.common.logging.impl.LoggerFactory;
+import org.hibernate.search.mapper.orm.logging.impl.ConfigurationLog;
 import org.hibernate.service.Service;
 
 /**
@@ -44,7 +42,7 @@ public final class HibernateSearchContextProviderService
 			return mapping;
 		}
 		else {
-			throw LoggerFactory.make( Log.class, MethodHandles.lookup() ).hibernateSearchNotInitialized();
+			throw ConfigurationLog.INSTANCE.hibernateSearchNotInitialized();
 		}
 	}
 

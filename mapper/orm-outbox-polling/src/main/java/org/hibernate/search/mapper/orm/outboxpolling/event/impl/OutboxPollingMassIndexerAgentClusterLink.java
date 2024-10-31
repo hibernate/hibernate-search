@@ -4,7 +4,6 @@
  */
 package org.hibernate.search.mapper.orm.outboxpolling.event.impl;
 
-import java.lang.invoke.MethodHandles;
 import java.time.Clock;
 import java.time.Duration;
 import java.time.Instant;
@@ -18,12 +17,10 @@ import org.hibernate.search.mapper.orm.outboxpolling.cluster.impl.AgentState;
 import org.hibernate.search.mapper.orm.outboxpolling.cluster.impl.AgentType;
 import org.hibernate.search.mapper.orm.outboxpolling.cluster.impl.ClusterDescriptor;
 import org.hibernate.search.mapper.orm.outboxpolling.cluster.impl.ShardAssignmentDescriptor;
-import org.hibernate.search.mapper.orm.outboxpolling.logging.impl.Log;
-import org.hibernate.search.util.common.logging.impl.LoggerFactory;
+import org.hibernate.search.mapper.orm.outboxpolling.logging.impl.OutboxPollingEventsLog;
 
 public final class OutboxPollingMassIndexerAgentClusterLink
 		extends AbstractAgentClusterLink<OutboxPollingMassIndexingInstructions> {
-	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	private static final ClusterDescriptor SINGLE_NODE_CLUSTER_DESCRIPTOR = null;
 	private static final ShardAssignmentDescriptor SINGLE_NODE_SHARD_ASSIGNMENT = null;
@@ -79,13 +76,14 @@ public final class OutboxPollingMassIndexerAgentClusterLink
 		AgentState expectedState = AgentState.SUSPENDED;
 		for ( Agent eventProcessor : eventProcessors ) {
 			if ( !expectedState.equals( eventProcessor.getState() ) ) {
-				log.tracef( "Agent '%s': waiting for event processor '%s', which has not reached state '%s' yet",
+				OutboxPollingEventsLog.INSTANCE.tracef(
+						"Agent '%s': waiting for event processor '%s', which has not reached state '%s' yet",
 						selfReference(), eventProcessor.getReference(), expectedState );
 				return false;
 			}
 		}
 
-		log.tracef( "Agent '%s': all event processors reached the expected state %s",
+		OutboxPollingEventsLog.INSTANCE.tracef( "Agent '%s': all event processors reached the expected state %s",
 				selfReference(), expectedState );
 		return true;
 	}
@@ -93,14 +91,16 @@ public final class OutboxPollingMassIndexerAgentClusterLink
 	@Override
 	protected OutboxPollingMassIndexingInstructions instructCommitAndRetryPulseAfterDelay(Instant now, Duration delay) {
 		Instant expiration = now.plus( delay );
-		log.tracef( "Agent '%s': instructions are to hold off mass indexing and to retry a pulse in %s, around %s",
+		OutboxPollingEventsLog.INSTANCE.tracef(
+				"Agent '%s': instructions are to hold off mass indexing and to retry a pulse in %s, around %s",
 				selfReference(), delay, expiration );
 		return new OutboxPollingMassIndexingInstructions( clock, expiration, false );
 	}
 
 	private OutboxPollingMassIndexingInstructions instructProceedWithMassIndexing(Instant now) {
 		Instant expiration = now.plus( pulseInterval );
-		log.tracef( "Agent '%s': instructions are to proceed with mass indexing and to retry a pulse in %s, around %s",
+		OutboxPollingEventsLog.INSTANCE.tracef(
+				"Agent '%s': instructions are to proceed with mass indexing and to retry a pulse in %s, around %s",
 				selfReference(), pulseInterval, expiration );
 		return new OutboxPollingMassIndexingInstructions( clock, expiration, true );
 	}

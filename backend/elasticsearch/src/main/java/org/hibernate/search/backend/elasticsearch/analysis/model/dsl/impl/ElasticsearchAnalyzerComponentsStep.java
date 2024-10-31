@@ -4,23 +4,18 @@
  */
 package org.hibernate.search.backend.elasticsearch.analysis.model.dsl.impl;
 
-import java.lang.invoke.MethodHandles;
-
 import org.hibernate.search.backend.elasticsearch.analysis.model.dsl.ElasticsearchAnalyzerOptionalComponentsStep;
 import org.hibernate.search.backend.elasticsearch.analysis.model.dsl.ElasticsearchAnalyzerTokenizerStep;
 import org.hibernate.search.backend.elasticsearch.analysis.model.impl.ElasticsearchAnalysisDefinitionCollector;
 import org.hibernate.search.backend.elasticsearch.analysis.model.impl.ElasticsearchAnalysisDefinitionContributor;
-import org.hibernate.search.backend.elasticsearch.logging.impl.Log;
+import org.hibernate.search.backend.elasticsearch.logging.impl.AnalyzerLog;
 import org.hibernate.search.backend.elasticsearch.lowlevel.index.analysis.impl.AnalyzerDefinition;
 import org.hibernate.search.util.common.impl.StringHelper;
-import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
 class ElasticsearchAnalyzerComponentsStep
 		implements ElasticsearchAnalyzerTokenizerStep,
 		ElasticsearchAnalyzerOptionalComponentsStep,
 		ElasticsearchAnalysisDefinitionContributor {
-
-	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	private final String name;
 
@@ -58,7 +53,7 @@ class ElasticsearchAnalyzerComponentsStep
 	@Override
 	public void contribute(ElasticsearchAnalysisDefinitionCollector collector) {
 		if ( StringHelper.isEmpty( definition.getTokenizer() ) ) {
-			throw log.invalidElasticsearchAnalyzerDefinition( name );
+			throw AnalyzerLog.INSTANCE.invalidElasticsearchAnalyzerDefinition( name );
 		}
 		collector.collect( name, definition );
 	}

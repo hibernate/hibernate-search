@@ -4,7 +4,6 @@
  */
 package org.hibernate.search.mapper.orm.event.impl;
 
-import java.lang.invoke.MethodHandles;
 import java.util.BitSet;
 
 import org.hibernate.HibernateException;
@@ -36,11 +35,10 @@ import org.hibernate.event.spi.PostUpdateEventListener;
 import org.hibernate.metamodel.mapping.EntityMappingType;
 import org.hibernate.persister.entity.EntityPersister;
 import org.hibernate.search.mapper.orm.common.impl.HibernateOrmUtils;
-import org.hibernate.search.mapper.orm.logging.impl.Log;
+import org.hibernate.search.mapper.orm.logging.impl.ConfigurationLog;
 import org.hibernate.search.mapper.pojo.work.spi.PojoIndexingPlan;
 import org.hibernate.search.mapper.pojo.work.spi.PojoTypeIndexingPlan;
 import org.hibernate.search.util.common.annotation.impl.SuppressForbiddenApis;
-import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
 /**
  * Hibernate ORM event listener called by various ORM life cycle events. This listener must be registered in order
@@ -58,8 +56,6 @@ public final class HibernateSearchEventListener
 		PostCollectionRecreateEventListener, PostCollectionRemoveEventListener, PostCollectionUpdateEventListener,
 		FlushEventListener, AutoFlushEventListener, ClearEventListener {
 
-	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
-
 	private final HibernateOrmListenerContextProvider contextProvider;
 	private final boolean dirtyCheckingEnabled;
 
@@ -67,7 +63,7 @@ public final class HibernateSearchEventListener
 			boolean dirtyCheckingEnabled) {
 		this.contextProvider = contextProvider;
 		this.dirtyCheckingEnabled = dirtyCheckingEnabled;
-		log.debug( "Hibernate Search dirty checks " + ( dirtyCheckingEnabled ? "enabled" : "disabled" ) );
+		ConfigurationLog.INSTANCE.debug( "Hibernate Search dirty checks " + ( dirtyCheckingEnabled ? "enabled" : "disabled" ) );
 	}
 
 	public void registerTo(SessionFactoryImplementor sessionFactory) {

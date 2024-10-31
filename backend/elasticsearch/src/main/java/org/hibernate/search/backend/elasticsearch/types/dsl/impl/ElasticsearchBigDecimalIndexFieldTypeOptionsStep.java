@@ -4,23 +4,19 @@
  */
 package org.hibernate.search.backend.elasticsearch.types.dsl.impl;
 
-import java.lang.invoke.MethodHandles;
 import java.math.BigDecimal;
 
-import org.hibernate.search.backend.elasticsearch.logging.impl.Log;
+import org.hibernate.search.backend.elasticsearch.logging.impl.MappingLog;
 import org.hibernate.search.backend.elasticsearch.lowlevel.index.mapping.impl.DataTypes;
 import org.hibernate.search.backend.elasticsearch.types.codec.impl.ElasticsearchBigDecimalFieldCodec;
 import org.hibernate.search.backend.elasticsearch.types.codec.impl.ElasticsearchFieldCodec;
 import org.hibernate.search.engine.backend.types.converter.spi.DefaultStringConverters;
 import org.hibernate.search.engine.backend.types.dsl.ScaledNumberIndexFieldTypeOptionsStep;
 import org.hibernate.search.engine.mapper.mapping.building.spi.IndexFieldTypeDefaultsProvider;
-import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
 class ElasticsearchBigDecimalIndexFieldTypeOptionsStep
 		extends AbstractElasticsearchNumericFieldTypeOptionsStep<ElasticsearchBigDecimalIndexFieldTypeOptionsStep, BigDecimal>
 		implements ScaledNumberIndexFieldTypeOptionsStep<ElasticsearchBigDecimalIndexFieldTypeOptionsStep, BigDecimal> {
-
-	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	private final IndexFieldTypeDefaultsProvider defaultsProvider;
 
@@ -62,6 +58,6 @@ class ElasticsearchBigDecimalIndexFieldTypeOptionsStep
 			return defaultsProvider.decimalScale();
 		}
 
-		throw log.nullDecimalScale( buildContext.hints().missingDecimalScale(), buildContext.getEventContext() );
+		throw MappingLog.INSTANCE.nullDecimalScale( buildContext.hints().missingDecimalScale(), buildContext.getEventContext() );
 	}
 }

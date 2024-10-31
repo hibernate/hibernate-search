@@ -11,8 +11,8 @@ import jakarta.persistence.PersistenceException;
 
 import org.hibernate.Session;
 import org.hibernate.search.util.common.SearchException;
-import org.hibernate.search.util.logging.impl.Log;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
+import org.hibernate.search.util.logging.impl.MigrationHelperLog;
 
 /**
  * Helper class that should be used when building a FullTextEntityManager
@@ -24,7 +24,7 @@ import org.hibernate.search.util.logging.impl.LoggerFactory;
 @Deprecated
 public final class Search {
 
-	private static final Log log = LoggerFactory.make( MethodHandles.lookup() );
+	private static final MigrationHelperLog log = LoggerFactory.make( MethodHandles.lookup() );
 
 	private Search() {
 	}

@@ -4,8 +4,6 @@
  */
 package org.hibernate.search.mapper.orm.session.impl;
 
-import java.lang.invoke.MethodHandles;
-
 import jakarta.transaction.Status;
 import jakarta.transaction.Synchronization;
 
@@ -13,8 +11,7 @@ import org.hibernate.action.spi.AfterTransactionCompletionProcess;
 import org.hibernate.action.spi.BeforeTransactionCompletionProcess;
 import org.hibernate.engine.spi.SessionImplementor;
 import org.hibernate.engine.spi.SharedSessionContractImplementor;
-import org.hibernate.search.mapper.orm.logging.impl.Log;
-import org.hibernate.search.util.common.logging.impl.LoggerFactory;
+import org.hibernate.search.mapper.orm.logging.impl.OrmSpecificLog;
 
 /**
  * An adapter for synchronizations, allowing to register them as
@@ -28,7 +25,6 @@ class SynchronizationAdapter
 		implements Synchronization,
 		BeforeTransactionCompletionProcess, AfterTransactionCompletionProcess {
 
-	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	private final Synchronization delegate;
 	private boolean beforeExecuted = false;
@@ -45,7 +41,7 @@ class SynchronizationAdapter
 
 	@Override
 	public void afterCompletion(int status) {
-		log.tracef(
+		OrmSpecificLog.INSTANCE.tracef(
 				"Transaction's afterCompletion is expected to be executed"
 						+ " through the AfterTransactionCompletionProcess interface, ignoring: %s",
 				delegate
@@ -58,7 +54,7 @@ class SynchronizationAdapter
 			doBeforeCompletion();
 		}
 		catch (RuntimeException e) {
-			throw log.synchronizationBeforeTransactionFailure( e.getMessage(), e );
+			throw OrmSpecificLog.INSTANCE.synchronizationBeforeTransactionFailure( e.getMessage(), e );
 		}
 	}
 
@@ -68,13 +64,13 @@ class SynchronizationAdapter
 			doAfterCompletion( success ? Status.STATUS_COMMITTED : Status.STATUS_ROLLEDBACK );
 		}
 		catch (RuntimeException e) {
-			throw log.synchronizationAfterTransactionFailure( e.getMessage(), e );
+			throw OrmSpecificLog.INSTANCE.synchronizationAfterTransactionFailure( e.getMessage(), e );
 		}
 	}
 
 	private void doBeforeCompletion() {
 		if ( beforeExecuted ) {
-			log.tracef(
+			OrmSpecificLog.INSTANCE.tracef(
 					"Transaction's beforeCompletion() phase already been processed, ignoring: %s", delegate
 			);
 		}
@@ -86,7 +82,7 @@ class SynchronizationAdapter
 
 	private void doAfterCompletion(int status) {
 		if ( afterExecuted ) {
-			log.tracef(
+			OrmSpecificLog.INSTANCE.tracef(
 					"Transaction's afterCompletion() phase already been processed, ignoring: %s", delegate
 			);
 		}

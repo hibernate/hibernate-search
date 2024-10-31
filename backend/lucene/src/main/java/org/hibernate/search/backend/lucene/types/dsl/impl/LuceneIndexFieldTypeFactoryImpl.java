@@ -4,7 +4,6 @@
  */
 package org.hibernate.search.backend.lucene.types.dsl.impl;
 
-import java.lang.invoke.MethodHandles;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.time.Instant;
@@ -19,7 +18,7 @@ import java.time.YearMonth;
 import java.time.ZonedDateTime;
 
 import org.hibernate.search.backend.lucene.analysis.model.impl.LuceneAnalysisDefinitionRegistry;
-import org.hibernate.search.backend.lucene.logging.impl.Log;
+import org.hibernate.search.backend.lucene.logging.impl.MappingLog;
 import org.hibernate.search.backend.lucene.types.converter.LuceneFieldContributor;
 import org.hibernate.search.backend.lucene.types.converter.LuceneFieldValueExtractor;
 import org.hibernate.search.backend.lucene.types.dsl.LuceneIndexFieldTypeFactory;
@@ -32,13 +31,10 @@ import org.hibernate.search.engine.backend.types.dsl.StringIndexFieldTypeOptions
 import org.hibernate.search.engine.backend.types.dsl.VectorFieldTypeOptionsStep;
 import org.hibernate.search.engine.mapper.mapping.building.spi.IndexFieldTypeDefaultsProvider;
 import org.hibernate.search.engine.spatial.GeoPoint;
-import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 import org.hibernate.search.util.common.reporting.EventContext;
 
 public class LuceneIndexFieldTypeFactoryImpl
 		implements LuceneIndexFieldTypeFactory, LuceneIndexFieldTypeBuildContext {
-
-	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	private final EventContext eventContext;
 	private final BackendMapperContext backendMapperContext;
@@ -121,7 +117,7 @@ public class LuceneIndexFieldTypeFactoryImpl
 			return (StandardIndexFieldTypeOptionsStep<?, F>) asBigInteger();
 		}
 		else {
-			throw log.cannotGuessFieldType( valueType, getEventContext() );
+			throw MappingLog.INSTANCE.cannotGuessFieldType( valueType, getEventContext() );
 		}
 	}
 
@@ -134,7 +130,7 @@ public class LuceneIndexFieldTypeFactoryImpl
 			return (VectorFieldTypeOptionsStep<?, F>) asFloatVector();
 		}
 		else {
-			throw log.cannotGuessVectorFieldType( valueType, getEventContext() );
+			throw MappingLog.INSTANCE.cannotGuessVectorFieldType( valueType, getEventContext() );
 		}
 	}
 

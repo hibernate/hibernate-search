@@ -5,8 +5,8 @@
 package org.hibernate.search.util.impl.integrationtest.common.extension;
 
 import static org.assertj.core.api.Assertions.fail;
+import static org.hibernate.search.util.impl.integrationtest.common.reporting.TestLog.BACKEND_TEST_LOGGER;
 
-import java.lang.invoke.MethodHandles;
 import java.util.ArrayList;
 import java.util.Deque;
 import java.util.LinkedList;
@@ -16,14 +16,10 @@ import java.util.function.Function;
 
 import org.hibernate.search.util.common.impl.ToStringStyle;
 import org.hibernate.search.util.common.impl.ToStringTreeBuilder;
-import org.hibernate.search.util.common.logging.impl.Log;
-import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
 import org.assertj.core.api.Fail;
 
 public class CallQueue<C extends Call<? super C>> {
-
-	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	public interface Settings {
 		boolean allowDuplicates();
@@ -52,19 +48,19 @@ public class CallQueue<C extends Call<? super C>> {
 	}
 
 	public void expectInOrder(C expectedCall) {
-		log.tracef( "Expecting %s", expectedCall );
+		BACKEND_TEST_LOGGER.tracef( "Expecting %s", expectedCall );
 		callsExpectedInOrder.addLast( expectedCall );
 	}
 
 	public void expectOutOfOrder(C expectedCall) {
-		log.tracef( "Expecting %s", expectedCall );
+		BACKEND_TEST_LOGGER.tracef( "Expecting %s", expectedCall );
 		callsExpectedOutOfOrder.add( expectedCall );
 	}
 
 	public final synchronized <C2 extends C, T> T verify(C2 actualCall, BiFunction<C, C2, CallBehavior<T>> callVerifyFunction,
 			Function<C2, T> noExpectationBehavior) {
 		try {
-			log.tracef( "Verifying %s", actualCall );
+			BACKEND_TEST_LOGGER.tracef( "Verifying %s", actualCall );
 			return tryVerify( actualCall, callVerifyFunction, noExpectationBehavior );
 		}
 		catch (AssertionError e) {

@@ -4,17 +4,12 @@
  */
 package org.hibernate.search.mapper.pojo.massindexing.impl;
 
-import java.lang.invoke.MethodHandles;
-
-import org.hibernate.search.mapper.pojo.logging.impl.Log;
+import org.hibernate.search.mapper.pojo.logging.impl.MassIndexingLog;
 import org.hibernate.search.mapper.pojo.massindexing.MassIndexingEntityFailureContext;
 import org.hibernate.search.mapper.pojo.massindexing.MassIndexingFailureContext;
 import org.hibernate.search.mapper.pojo.massindexing.MassIndexingFailureHandler;
-import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
 public class PojoMassIndexingFailSafeFailureHandlerWrapper implements MassIndexingFailureHandler {
-
-	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	private final MassIndexingFailureHandler delegate;
 	private final boolean failFast;
@@ -30,7 +25,7 @@ public class PojoMassIndexingFailSafeFailureHandlerWrapper implements MassIndexi
 			delegate.handle( context );
 		}
 		catch (Throwable t) {
-			log.failureInMassIndexingFailureHandler( t );
+			MassIndexingLog.INSTANCE.failureInMassIndexingFailureHandler( t );
 		}
 		finally {
 			failFastIfNeeded();
@@ -43,7 +38,7 @@ public class PojoMassIndexingFailSafeFailureHandlerWrapper implements MassIndexi
 			delegate.handle( context );
 		}
 		catch (Throwable t) {
-			log.failureInMassIndexingFailureHandler( t );
+			MassIndexingLog.INSTANCE.failureInMassIndexingFailureHandler( t );
 		}
 		finally {
 			failFastIfNeeded();
@@ -56,14 +51,14 @@ public class PojoMassIndexingFailSafeFailureHandlerWrapper implements MassIndexi
 			return delegate.failureFloodingThreshold();
 		}
 		catch (Throwable t) {
-			log.failureInMassIndexingFailureHandler( t );
+			MassIndexingLog.INSTANCE.failureInMassIndexingFailureHandler( t );
 			return MassIndexingFailureHandler.super.failureFloodingThreshold();
 		}
 	}
 
 	private void failFastIfNeeded() {
 		if ( failFast ) {
-			throw log.massIndexerFailFast();
+			throw MassIndexingLog.INSTANCE.massIndexerFailFast();
 		}
 	}
 }

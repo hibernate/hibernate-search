@@ -8,7 +8,6 @@ import static java.time.temporal.ChronoField.DAY_OF_MONTH;
 import static java.time.temporal.ChronoField.MONTH_OF_YEAR;
 import static java.time.temporal.ChronoField.YEAR;
 
-import java.lang.invoke.MethodHandles;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.time.DateTimeException;
@@ -39,15 +38,12 @@ import java.util.function.BiFunction;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
-import org.hibernate.search.engine.logging.impl.Log;
+import org.hibernate.search.engine.logging.impl.FormattingLog;
 import org.hibernate.search.engine.spatial.GeoPoint;
 import org.hibernate.search.util.common.SearchException;
 import org.hibernate.search.util.common.impl.TimeHelper;
-import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
 public final class ParseUtils {
-
-	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	// The DateTimeFormatter class does not expose a public constant for the ISO format, so we need to do it ourselves.
 	public static final DateTimeFormatter ISO_YEAR = new DateTimeFormatterBuilder()
@@ -82,7 +78,7 @@ public final class ParseUtils {
 
 	public static char parseCharacter(String value) {
 		if ( value.length() != 1 ) {
-			throw log.invalidStringForType( value, Character.class, "", null );
+			throw FormattingLog.INSTANCE.invalidStringForType( value, Character.class, "", null );
 		}
 		return value.charAt( 0 );
 	}
@@ -95,7 +91,7 @@ public final class ParseUtils {
 		else if ( "true".equalsIgnoreCase( value ) ) {
 			return true;
 		}
-		throw log.invalidStringForType( value, Boolean.class, "", null );
+		throw FormattingLog.INSTANCE.invalidStringForType( value, Boolean.class, "", null );
 	}
 
 	public static Integer parseInteger(String value) {
@@ -103,7 +99,7 @@ public final class ParseUtils {
 			return Integer.parseInt( value );
 		}
 		catch (RuntimeException e) {
-			throw log.invalidStringForType( value, Integer.class, e.getMessage(), e );
+			throw FormattingLog.INSTANCE.invalidStringForType( value, Integer.class, e.getMessage(), e );
 		}
 	}
 
@@ -112,7 +108,7 @@ public final class ParseUtils {
 			return Long.parseLong( value );
 		}
 		catch (RuntimeException e) {
-			throw log.invalidStringForType( value, Long.class, e.getMessage(), e );
+			throw FormattingLog.INSTANCE.invalidStringForType( value, Long.class, e.getMessage(), e );
 		}
 	}
 
@@ -121,7 +117,7 @@ public final class ParseUtils {
 			return Byte.parseByte( value );
 		}
 		catch (RuntimeException e) {
-			throw log.invalidStringForType( value, Byte.class, e.getMessage(), e );
+			throw FormattingLog.INSTANCE.invalidStringForType( value, Byte.class, e.getMessage(), e );
 		}
 	}
 
@@ -130,7 +126,7 @@ public final class ParseUtils {
 			return Short.parseShort( value );
 		}
 		catch (RuntimeException e) {
-			throw log.invalidStringForType( value, Short.class, e.getMessage(), e );
+			throw FormattingLog.INSTANCE.invalidStringForType( value, Short.class, e.getMessage(), e );
 		}
 	}
 
@@ -139,7 +135,7 @@ public final class ParseUtils {
 			return Float.parseFloat( value );
 		}
 		catch (RuntimeException e) {
-			throw log.invalidStringForType( value, Float.class, e.getMessage(), e );
+			throw FormattingLog.INSTANCE.invalidStringForType( value, Float.class, e.getMessage(), e );
 		}
 	}
 
@@ -148,7 +144,7 @@ public final class ParseUtils {
 			return Double.parseDouble( value );
 		}
 		catch (RuntimeException e) {
-			throw log.invalidStringForType( value, Double.class, e.getMessage(), e );
+			throw FormattingLog.INSTANCE.invalidStringForType( value, Double.class, e.getMessage(), e );
 		}
 	}
 
@@ -157,7 +153,7 @@ public final class ParseUtils {
 			return new BigDecimal( value );
 		}
 		catch (RuntimeException e) {
-			throw log.invalidStringForType( value, BigDecimal.class, e.getMessage(), e );
+			throw FormattingLog.INSTANCE.invalidStringForType( value, BigDecimal.class, e.getMessage(), e );
 		}
 	}
 
@@ -166,7 +162,7 @@ public final class ParseUtils {
 			return new BigInteger( value );
 		}
 		catch (RuntimeException e) {
-			throw log.invalidStringForType( value, BigInteger.class, e.getMessage(), e );
+			throw FormattingLog.INSTANCE.invalidStringForType( value, BigInteger.class, e.getMessage(), e );
 		}
 	}
 
@@ -176,7 +172,7 @@ public final class ParseUtils {
 			return Instant.parse( value );
 		}
 		catch (DateTimeParseException e) {
-			throw log.unableToParseTemporal( Instant.class, value, DateTimeFormatter.ISO_INSTANT, e );
+			throw FormattingLog.INSTANCE.unableToParseTemporal( Instant.class, value, DateTimeFormatter.ISO_INSTANT, e );
 		}
 	}
 
@@ -186,7 +182,7 @@ public final class ParseUtils {
 			return LocalDate.parse( value );
 		}
 		catch (DateTimeParseException e) {
-			throw log.unableToParseTemporal( LocalDate.class, value, DateTimeFormatter.ISO_LOCAL_DATE, e );
+			throw FormattingLog.INSTANCE.unableToParseTemporal( LocalDate.class, value, DateTimeFormatter.ISO_LOCAL_DATE, e );
 		}
 	}
 
@@ -196,7 +192,8 @@ public final class ParseUtils {
 			return LocalDateTime.parse( value );
 		}
 		catch (DateTimeParseException e) {
-			throw log.unableToParseTemporal( LocalDateTime.class, value, DateTimeFormatter.ISO_LOCAL_DATE_TIME, e );
+			throw FormattingLog.INSTANCE.unableToParseTemporal( LocalDateTime.class, value, DateTimeFormatter.ISO_LOCAL_DATE_TIME,
+					e );
 		}
 	}
 
@@ -206,7 +203,7 @@ public final class ParseUtils {
 			return LocalTime.parse( value );
 		}
 		catch (DateTimeParseException e) {
-			throw log.unableToParseTemporal( LocalTime.class, value, DateTimeFormatter.ISO_LOCAL_TIME, e );
+			throw FormattingLog.INSTANCE.unableToParseTemporal( LocalTime.class, value, DateTimeFormatter.ISO_LOCAL_TIME, e );
 		}
 	}
 
@@ -216,7 +213,8 @@ public final class ParseUtils {
 			return OffsetDateTime.parse( value );
 		}
 		catch (DateTimeParseException e) {
-			throw log.unableToParseTemporal( OffsetDateTime.class, value, DateTimeFormatter.ISO_OFFSET_DATE_TIME, e );
+			throw FormattingLog.INSTANCE.unableToParseTemporal( OffsetDateTime.class, value, DateTimeFormatter.ISO_OFFSET_DATE_TIME,
+					e );
 		}
 	}
 
@@ -225,7 +223,7 @@ public final class ParseUtils {
 			return OffsetTime.parse( value );
 		}
 		catch (DateTimeParseException e) {
-			throw log.unableToParseTemporal( OffsetTime.class, value, DateTimeFormatter.ISO_OFFSET_TIME, e );
+			throw FormattingLog.INSTANCE.unableToParseTemporal( OffsetTime.class, value, DateTimeFormatter.ISO_OFFSET_TIME, e );
 		}
 	}
 
@@ -237,7 +235,7 @@ public final class ParseUtils {
 			return TimeHelper.parseZoneDateTime( value, formatter );
 		}
 		catch (DateTimeParseException e) {
-			throw log.unableToParseTemporal( ZonedDateTime.class, value, formatter, e );
+			throw FormattingLog.INSTANCE.unableToParseTemporal( ZonedDateTime.class, value, formatter, e );
 		}
 	}
 
@@ -249,7 +247,7 @@ public final class ParseUtils {
 			return Year.parse( value, formatter );
 		}
 		catch (DateTimeParseException e) {
-			throw log.unableToParseTemporal( Year.class, value, formatter, e );
+			throw FormattingLog.INSTANCE.unableToParseTemporal( Year.class, value, formatter, e );
 		}
 	}
 
@@ -261,7 +259,7 @@ public final class ParseUtils {
 			return YearMonth.parse( value, formatter );
 		}
 		catch (DateTimeParseException e) {
-			throw log.unableToParseTemporal( YearMonth.class, value, formatter, e );
+			throw FormattingLog.INSTANCE.unableToParseTemporal( YearMonth.class, value, formatter, e );
 		}
 	}
 
@@ -273,7 +271,7 @@ public final class ParseUtils {
 			return MonthDay.parse( value, formatter );
 		}
 		catch (DateTimeParseException e) {
-			throw log.unableToParseTemporal( MonthDay.class, value, formatter, e );
+			throw FormattingLog.INSTANCE.unableToParseTemporal( MonthDay.class, value, formatter, e );
 		}
 	}
 
@@ -282,7 +280,7 @@ public final class ParseUtils {
 			return ZoneId.of( value );
 		}
 		catch (DateTimeException ex) {
-			throw log.invalidStringForType( value, ZoneId.class, ex.getMessage(), ex );
+			throw FormattingLog.INSTANCE.invalidStringForType( value, ZoneId.class, ex.getMessage(), ex );
 		}
 	}
 
@@ -291,7 +289,7 @@ public final class ParseUtils {
 			return ZoneOffset.of( value );
 		}
 		catch (DateTimeException e) {
-			throw log.invalidStringForType( value, ZoneOffset.class, e.getMessage(), e );
+			throw FormattingLog.INSTANCE.invalidStringForType( value, ZoneOffset.class, e.getMessage(), e );
 		}
 	}
 
@@ -300,7 +298,7 @@ public final class ParseUtils {
 			return Period.parse( value );
 		}
 		catch (DateTimeParseException e) {
-			throw log.invalidStringForType( value, Period.class, e.getMessage(), e );
+			throw FormattingLog.INSTANCE.invalidStringForType( value, Period.class, e.getMessage(), e );
 		}
 	}
 
@@ -309,7 +307,7 @@ public final class ParseUtils {
 			return Duration.parse( value );
 		}
 		catch (DateTimeParseException e) {
-			throw log.invalidStringForType( value, Duration.class, e.getMessage(), e );
+			throw FormattingLog.INSTANCE.invalidStringForType( value, Duration.class, e.getMessage(), e );
 		}
 	}
 
@@ -318,7 +316,7 @@ public final class ParseUtils {
 			return UUID.fromString( value );
 		}
 		catch (IllegalArgumentException ex) {
-			throw log.invalidStringForType( value, UUID.class, ex.getMessage(), ex );
+			throw FormattingLog.INSTANCE.invalidStringForType( value, UUID.class, ex.getMessage(), ex );
 		}
 	}
 
@@ -327,7 +325,7 @@ public final class ParseUtils {
 			return Enum.valueOf( enumType, value );
 		}
 		catch (IllegalArgumentException ex) {
-			throw log.invalidStringForEnum( value, enumType, ex );
+			throw FormattingLog.INSTANCE.invalidStringForEnum( value, enumType, ex );
 		}
 	}
 
@@ -335,14 +333,14 @@ public final class ParseUtils {
 		// using custom format, ex: '48.633308, 7.759294'
 		String[] split = value.split( GEO_POINT_SEPARATOR );
 		if ( split.length != 2 ) {
-			throw log.unableToParseGeoPoint( value );
+			throw FormattingLog.INSTANCE.unableToParseGeoPoint( value );
 		}
 
 		try {
 			return GeoPoint.of( Double.parseDouble( split[0] ), Double.parseDouble( split[1] ) );
 		}
 		catch (NumberFormatException e) {
-			throw log.unableToParseGeoPoint( value );
+			throw FormattingLog.INSTANCE.unableToParseGeoPoint( value );
 		}
 	}
 
@@ -376,7 +374,7 @@ public final class ParseUtils {
 			return parsed;
 		}
 		catch (SearchException ex) {
-			throw log.invalidStringForType( value, float[].class, ex.getMessage(), ex );
+			throw FormattingLog.INSTANCE.invalidStringForType( value, float[].class, ex.getMessage(), ex );
 		}
 	}
 
@@ -390,7 +388,7 @@ public final class ParseUtils {
 			return parsed;
 		}
 		catch (SearchException ex) {
-			throw log.invalidStringForType( value, float[].class, ex.getMessage(), ex );
+			throw FormattingLog.INSTANCE.invalidStringForType( value, float[].class, ex.getMessage(), ex );
 		}
 	}
 

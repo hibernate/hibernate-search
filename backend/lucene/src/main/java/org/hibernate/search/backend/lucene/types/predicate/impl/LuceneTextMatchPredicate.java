@@ -4,10 +4,8 @@
  */
 package org.hibernate.search.backend.lucene.types.predicate.impl;
 
-import java.lang.invoke.MethodHandles;
-
 import org.hibernate.search.backend.lucene.analysis.model.impl.LuceneAnalysisDefinitionRegistry;
-import org.hibernate.search.backend.lucene.logging.impl.Log;
+import org.hibernate.search.backend.lucene.logging.impl.AnalyzerLog;
 import org.hibernate.search.backend.lucene.lowlevel.common.impl.AnalyzerConstants;
 import org.hibernate.search.backend.lucene.lowlevel.query.impl.FuzzyQueryBuilder;
 import org.hibernate.search.backend.lucene.search.common.impl.AbstractLuceneCodecAwareSearchQueryElementFactory;
@@ -20,7 +18,6 @@ import org.hibernate.search.backend.lucene.types.codec.impl.LuceneFieldCodec;
 import org.hibernate.search.engine.search.common.ValueModel;
 import org.hibernate.search.engine.search.predicate.SearchPredicate;
 import org.hibernate.search.engine.search.predicate.spi.MatchPredicateBuilder;
-import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
 import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.index.Term;
@@ -31,8 +28,6 @@ import org.apache.lucene.search.TermQuery;
 import org.apache.lucene.util.QueryBuilder;
 
 public class LuceneTextMatchPredicate extends AbstractLuceneLeafSingleFieldPredicate {
-
-	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	private LuceneTextMatchPredicate(Builder<?> builder) {
 		super( builder );
@@ -86,7 +81,7 @@ public class LuceneTextMatchPredicate extends AbstractLuceneLeafSingleFieldPredi
 		public void analyzer(String analyzerName) {
 			this.overrideAnalyzerOrNormalizer = analysisDefinitionRegistry.getAnalyzerDefinition( analyzerName );
 			if ( overrideAnalyzerOrNormalizer == null ) {
-				throw log.unknownAnalyzer( analyzerName, field.eventContext() );
+				throw AnalyzerLog.INSTANCE.unknownAnalyzer( analyzerName, field.eventContext() );
 			}
 		}
 

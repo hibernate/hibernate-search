@@ -4,15 +4,13 @@
  */
 package org.hibernate.search.mapper.pojo.model.path;
 
-import java.lang.invoke.MethodHandles;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Pattern;
 
 import org.hibernate.search.mapper.pojo.extractor.mapping.programmatic.ContainerExtractorPath;
-import org.hibernate.search.mapper.pojo.logging.impl.Log;
+import org.hibernate.search.mapper.pojo.logging.impl.MappingLog;
 import org.hibernate.search.util.common.impl.Contracts;
-import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
 /**
  * Represents an arbitrarily long access path when walking the POJO model.
@@ -25,8 +23,6 @@ import org.hibernate.search.util.common.logging.impl.LoggerFactory;
  * then for each value extract property "propertyOfB".
  */
 public abstract class PojoModelPath {
-
-	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	protected static final Pattern DOT_PATTERN = Pattern.compile( "\\." );
 
@@ -185,7 +181,7 @@ public abstract class PojoModelPath {
 		public Builder value(String extractorName) {
 			checkHasPropertyName();
 			if ( defaultExtractors ) {
-				throw log.cannotUseDefaultExtractorsInMultiExtractorChain();
+				throw MappingLog.INSTANCE.cannotUseDefaultExtractorsInMultiExtractorChain();
 			}
 			noExtractors = false;
 			currentExplicitExtractors.add( extractorName );
@@ -211,7 +207,7 @@ public abstract class PojoModelPath {
 		public Builder valueWithDefaultExtractors() {
 			checkHasPropertyName();
 			if ( !currentExplicitExtractors.isEmpty() ) {
-				throw log.cannotUseDefaultExtractorsInMultiExtractorChain();
+				throw MappingLog.INSTANCE.cannotUseDefaultExtractorsInMultiExtractorChain();
 			}
 			noExtractors = false;
 			defaultExtractors = true;
@@ -282,7 +278,7 @@ public abstract class PojoModelPath {
 
 		private void checkHasPropertyName() {
 			if ( currentPropertyNode == null ) {
-				throw log.cannotDefinePojoModelPathWithoutProperty();
+				throw MappingLog.INSTANCE.cannotDefinePojoModelPathWithoutProperty();
 			}
 		}
 

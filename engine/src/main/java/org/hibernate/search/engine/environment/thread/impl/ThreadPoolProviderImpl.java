@@ -4,7 +4,8 @@
  */
 package org.hibernate.search.engine.environment.thread.impl;
 
-import java.lang.invoke.MethodHandles;
+import static org.hibernate.search.engine.logging.impl.CommonFailureLog.INSTANCE;
+
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.RejectedExecutionHandler;
 import java.util.concurrent.ScheduledExecutorService;
@@ -16,8 +17,6 @@ import org.hibernate.search.engine.environment.bean.BeanHolder;
 import org.hibernate.search.engine.environment.thread.spi.ThreadPoolProvider;
 import org.hibernate.search.engine.environment.thread.spi.ThreadProvider;
 import org.hibernate.search.util.common.impl.Closer;
-import org.hibernate.search.util.common.logging.impl.Log;
-import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
 /**
  * Helper to create threads and executors.
@@ -27,8 +26,6 @@ import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 public class ThreadPoolProviderImpl implements ThreadPoolProvider {
 
 	private static final int QUEUE_MAX_LENGTH = 1000;
-
-	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	private final BeanHolder<? extends ThreadProvider> threadProviderHolder;
 
@@ -104,7 +101,7 @@ public class ThreadPoolProviderImpl implements ThreadPoolProvider {
 				e.getQueue().put( r );
 			}
 			catch (InterruptedException e1) {
-				log.interruptedWorkError( r );
+				INSTANCE.interruptedWorkError( r );
 				Thread.currentThread().interrupt();
 			}
 		}

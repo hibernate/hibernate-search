@@ -4,22 +4,18 @@
  */
 package org.hibernate.search.backend.elasticsearch.search.projection.impl;
 
-import java.lang.invoke.MethodHandles;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.hibernate.search.backend.elasticsearch.logging.impl.Log;
+import org.hibernate.search.backend.elasticsearch.logging.impl.QueryLog;
 import org.hibernate.search.backend.elasticsearch.search.common.impl.ElasticsearchSearchIndexScope;
 import org.hibernate.search.engine.search.loading.spi.LoadingResult;
 import org.hibernate.search.engine.search.loading.spi.ProjectionHitMapper;
-import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
 import com.google.gson.JsonObject;
 
 final class ElasticsearchByMappedTypeProjection<P>
 		extends AbstractElasticsearchProjection<P> {
-
-	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	private final ProjectionExtractionHelper<String> mappedTypeNameHelper;
 	private final Map<String, ElasticsearchSearchProjection<? extends P>> inners;
@@ -68,7 +64,7 @@ final class ElasticsearchByMappedTypeProjection<P>
 			String typeName = mappedTypeNameHelper.extract( hit, context );
 			Extractor<?, ? extends P> inner = inners.get( typeName );
 			if ( inner == null ) {
-				throw log.unexpectedMappedTypeNameForByMappedTypeProjection( typeName, inners.keySet() );
+				throw QueryLog.INSTANCE.unexpectedMappedTypeNameForByMappedTypeProjection( typeName, inners.keySet() );
 			}
 			return new DelegateAndExtractedValue<>( inner, projectionHitMapper, hit, source, context );
 		}

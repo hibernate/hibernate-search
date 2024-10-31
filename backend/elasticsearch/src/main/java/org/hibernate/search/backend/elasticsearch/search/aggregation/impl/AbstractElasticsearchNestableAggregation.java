@@ -4,12 +4,12 @@
  */
 package org.hibernate.search.backend.elasticsearch.search.aggregation.impl;
 
-import java.lang.invoke.MethodHandles;
 import java.util.List;
 
 import org.hibernate.search.backend.elasticsearch.gson.impl.JsonAccessor;
 import org.hibernate.search.backend.elasticsearch.gson.impl.JsonObjectAccessor;
-import org.hibernate.search.backend.elasticsearch.logging.impl.Log;
+import org.hibernate.search.backend.elasticsearch.logging.impl.ElasticsearchClientLog;
+import org.hibernate.search.backend.elasticsearch.logging.impl.QueryLog;
 import org.hibernate.search.backend.elasticsearch.search.common.impl.ElasticsearchSearchIndexScope;
 import org.hibernate.search.backend.elasticsearch.search.common.impl.ElasticsearchSearchIndexValueFieldContext;
 import org.hibernate.search.backend.elasticsearch.search.predicate.impl.ElasticsearchSearchPredicate;
@@ -17,13 +17,10 @@ import org.hibernate.search.backend.elasticsearch.search.predicate.impl.Predicat
 import org.hibernate.search.backend.elasticsearch.search.predicate.impl.PredicateRequestContext;
 import org.hibernate.search.engine.search.aggregation.AggregationKey;
 import org.hibernate.search.engine.search.predicate.SearchPredicate;
-import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
 import com.google.gson.JsonObject;
 
 public abstract class AbstractElasticsearchNestableAggregation<A> extends AbstractElasticsearchAggregation<A> {
-
-	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	private static final JsonAccessor<String> REQUEST_NESTED_PATH_ACCESSOR =
 			JsonAccessor.root().property( "nested" ).property( "path" ).asString();
@@ -115,12 +112,12 @@ public abstract class AbstractElasticsearchNestableAggregation<A> extends Abstra
 
 			for ( int i = 0; i < nestedPathHierarchySize; ++i ) {
 				actualAggregationResult = RESPONSE_NESTED_ACCESSOR.get( actualAggregationResult )
-						.orElseThrow( log::elasticsearchResponseMissingData );
+						.orElseThrow( ElasticsearchClientLog.INSTANCE::elasticsearchResponseMissingData );
 			}
 
 			if ( filter != null ) {
 				actualAggregationResult = RESPONSE_FILTERED_ACCESSOR.get( actualAggregationResult )
-						.orElseThrow( log::elasticsearchResponseMissingData );
+						.orElseThrow( ElasticsearchClientLog.INSTANCE::elasticsearchResponseMissingData );
 			}
 
 			return doExtract( actualAggregationResult, context );
@@ -148,7 +145,7 @@ public abstract class AbstractElasticsearchNestableAggregation<A> extends Abstra
 
 		public void filter(SearchPredicate filter) {
 			if ( nestedPathHierarchy.isEmpty() ) {
-				throw log.cannotFilterAggregationOnRootDocumentField( field.absolutePath(), field.eventContext() );
+				throw QueryLog.INSTANCE.cannotFilterAggregationOnRootDocumentField( field.absolutePath(), field.eventContext() );
 			}
 			ElasticsearchSearchPredicate elasticsearchFilter = ElasticsearchSearchPredicate.from( scope, filter );
 			elasticsearchFilter.checkNestableWithin(

@@ -4,7 +4,6 @@
  */
 package org.hibernate.search.engine.common.impl;
 
-import java.lang.invoke.MethodHandles;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Optional;
@@ -25,19 +24,17 @@ import org.hibernate.search.engine.cfg.spi.OptionalConfigurationProperty;
 import org.hibernate.search.engine.environment.bean.BeanHolder;
 import org.hibernate.search.engine.environment.bean.BeanReference;
 import org.hibernate.search.engine.environment.bean.BeanResolver;
-import org.hibernate.search.engine.logging.impl.Log;
+import org.hibernate.search.engine.logging.impl.BackendLog;
+import org.hibernate.search.engine.logging.impl.MappingLog;
 import org.hibernate.search.engine.mapper.mapping.building.impl.IndexManagerBuildingState;
 import org.hibernate.search.engine.mapper.mapping.building.spi.BackendsInfo;
 import org.hibernate.search.engine.reporting.spi.EventContexts;
 import org.hibernate.search.engine.tenancy.spi.TenancyMode;
 import org.hibernate.search.util.common.AssertionFailure;
 import org.hibernate.search.util.common.impl.SuppressingCloser;
-import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 import org.hibernate.search.util.common.reporting.EventContext;
 
 class IndexManagerBuildingStateHolder {
-
-	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	private static final OptionalConfigurationProperty<BeanReference<? extends BackendFactory>> BACKEND_TYPE =
 			ConfigurationProperty.forKey( BackendSettings.TYPE ).asBeanReference( BackendFactory.class )
@@ -141,10 +138,10 @@ class IndexManagerBuildingStateHolder {
 		Map<String, BeanReference<BackendFactory>> referencesByName = beanResolver.namedConfiguredForRole(
 				BackendFactory.class );
 		if ( referencesByName.isEmpty() ) {
-			throw log.noBackendFactoryRegistered( BACKEND_TYPE.resolveOrRaw( backendPropertySource ) );
+			throw BackendLog.INSTANCE.noBackendFactoryRegistered( BACKEND_TYPE.resolveOrRaw( backendPropertySource ) );
 		}
 		else if ( referencesByName.size() > 1 ) {
-			throw log.multipleBackendFactoriesRegistered( BACKEND_TYPE.resolveOrRaw( backendPropertySource ),
+			throw BackendLog.INSTANCE.multipleBackendFactoriesRegistered( BACKEND_TYPE.resolveOrRaw( backendPropertySource ),
 					referencesByName.keySet() );
 		}
 		return referencesByName.values().iterator().next().resolve( beanResolver );
@@ -170,7 +167,7 @@ class IndexManagerBuildingStateHolder {
 				BackendMapperContext backendMapperContext, String backendName, String indexName, String mappedTypeName) {
 			IndexManagerInitialBuildState state = indexManagerBuildStateByName.get( indexName );
 			if ( state != null ) {
-				throw log.twoTypesTargetSameIndex( indexName, state.mappedTypeName, mappedTypeName );
+				throw MappingLog.INSTANCE.twoTypesTargetSameIndex( indexName, state.mappedTypeName, mappedTypeName );
 			}
 
 			ConfigurationPropertySourceExtractor indexPropertySourceExtractor =

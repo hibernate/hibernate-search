@@ -5,14 +5,12 @@
 package org.hibernate.search.backend.lucene.work.impl;
 
 import java.io.IOException;
-import java.lang.invoke.MethodHandles;
 
-import org.hibernate.search.backend.lucene.logging.impl.Log;
+import org.hibernate.search.backend.lucene.logging.impl.QueryLog;
 import org.hibernate.search.backend.lucene.lowlevel.common.impl.MetadataFields;
 import org.hibernate.search.backend.lucene.lowlevel.query.impl.MappedTypeNameQuery;
 import org.hibernate.search.backend.lucene.lowlevel.query.impl.Queries;
 import org.hibernate.search.util.common.AssertionFailure;
-import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
 import org.apache.lucene.search.BooleanClause;
 import org.apache.lucene.search.BooleanQuery;
@@ -22,8 +20,6 @@ import org.apache.lucene.search.Query;
 import org.apache.lucene.search.TopDocs;
 
 class ExplainWork implements ReadWork<Explanation> {
-
-	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	private final LuceneSearcher<?, ?> searcher;
 
@@ -49,7 +45,7 @@ class ExplainWork implements ReadWork<Explanation> {
 			return searcher.explain( indexSearcher, luceneDocId );
 		}
 		catch (IOException e) {
-			throw log.ioExceptionOnQueryExecution( searcher.getLuceneQueryForExceptions(), e.getMessage(),
+			throw QueryLog.INSTANCE.ioExceptionOnQueryExecution( searcher.getLuceneQueryForExceptions(), e.getMessage(),
 					context.getEventContext(), e );
 		}
 	}
@@ -64,7 +60,7 @@ class ExplainWork implements ReadWork<Explanation> {
 
 		TopDocs topDocs = indexSearcher.search( explainedDocumentQuery, 2 );
 		if ( topDocs.scoreDocs.length < 1 ) {
-			throw log.explainUnknownDocument( explainedDocumentTypeName, explainedDocumentId );
+			throw QueryLog.INSTANCE.explainUnknownDocument( explainedDocumentTypeName, explainedDocumentId );
 		}
 		if ( topDocs.scoreDocs.length > 1 ) {
 			throw new AssertionFailure(

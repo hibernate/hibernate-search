@@ -4,7 +4,6 @@
  */
 package org.hibernate.search.mapper.pojo.search.definition.binding.impl;
 
-import java.lang.invoke.MethodHandles;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
@@ -29,7 +28,8 @@ import org.hibernate.search.engine.search.projection.definition.spi.ObjectProjec
 import org.hibernate.search.mapper.pojo.extractor.builtin.BuiltinContainerExtractors;
 import org.hibernate.search.mapper.pojo.extractor.impl.BoundContainerExtractorPath;
 import org.hibernate.search.mapper.pojo.extractor.mapping.programmatic.ContainerExtractorPath;
-import org.hibernate.search.mapper.pojo.logging.impl.Log;
+import org.hibernate.search.mapper.pojo.logging.impl.CommonFailureLog;
+import org.hibernate.search.mapper.pojo.logging.impl.ProjectionLog;
 import org.hibernate.search.mapper.pojo.mapping.building.impl.PojoMappingHelper;
 import org.hibernate.search.mapper.pojo.model.PojoModelConstructorParameter;
 import org.hibernate.search.mapper.pojo.model.PojoModelValue;
@@ -47,13 +47,11 @@ import org.hibernate.search.util.common.SearchException;
 import org.hibernate.search.util.common.impl.AbstractCloser;
 import org.hibernate.search.util.common.impl.Contracts;
 import org.hibernate.search.util.common.impl.SuppressingCloser;
-import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
 public class ProjectionBindingContextImpl<P> implements ProjectionBindingContext {
-	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	private static final BiFunction<MappingElement, String, SearchException> CYCLIC_RECURSION_EXCEPTION_FACTORY =
-			(mappingElement, cyclicRecursionPath) -> log.objectProjectionCyclicRecursion( mappingElement,
+			(mappingElement, cyclicRecursionPath) -> ProjectionLog.INSTANCE.objectProjectionCyclicRecursion( mappingElement,
 					mappingElement.eventContext(), cyclicRecursionPath );
 
 	private static final Set<String> CONTAINER_EXTRACTORS = Set.of(
@@ -112,7 +110,7 @@ public class ProjectionBindingContextImpl<P> implements ProjectionBindingContext
 
 		Object value = params.get( name );
 		if ( value == null ) {
-			throw log.paramNotDefined( name );
+			throw CommonFailureLog.INSTANCE.paramNotDefined( name );
 		}
 
 		return paramType.cast( value );
@@ -146,7 +144,7 @@ public class ProjectionBindingContextImpl<P> implements ProjectionBindingContext
 		}
 		else {
 			if ( !mappingHelper.introspector().typeModel( List.class ).isSubTypeOf( parameterTypeModel.rawType() ) ) {
-				throw log.invalidMultiValuedParameterTypeForProjectionConstructor( parameterTypeModel );
+				throw ProjectionLog.INSTANCE.invalidMultiValuedParameterTypeForProjectionConstructor( parameterTypeModel );
 			}
 			return Optional.of( new MultiContextImpl<>( boundParameterElement ) );
 		}
@@ -164,7 +162,7 @@ public class ProjectionBindingContextImpl<P> implements ProjectionBindingContext
 		else {
 			if ( boundParameterElementExtractorNames.size() > 1
 					|| !( extractors.contains( boundParameterElementExtractorNames.get( 0 ) ) ) ) {
-				throw log.invalidMultiValuedParameterTypeForProjectionConstructor( parameterTypeModel );
+				throw ProjectionLog.INSTANCE.invalidMultiValuedParameterTypeForProjectionConstructor( parameterTypeModel );
 			}
 			return boundParameterElementPath.getExtractedType();
 		}
@@ -252,7 +250,7 @@ public class ProjectionBindingContextImpl<P> implements ProjectionBindingContext
 		PojoConstructorModel<T> projectionConstructor = parameterBinder.findProjectionConstructorOrNull(
 				mappingHelper.introspector().typeModel( projectedType ) );
 		if ( projectionConstructor == null ) {
-			throw log.invalidObjectClassForProjection( projectedType );
+			throw ProjectionLog.INSTANCE.invalidObjectClassForProjection( projectedType );
 		}
 		return new ProjectionConstructorBinder<>( mappingHelper, projectionConstructor, this, nestingContext )
 				.bind();
@@ -282,7 +280,7 @@ public class ProjectionBindingContextImpl<P> implements ProjectionBindingContext
 			// This call should set the partial binding
 			binder.bind( this );
 			if ( partialBinding == null ) {
-				throw log.missingProjectionDefinitionForBinder( binder );
+				throw ProjectionLog.INSTANCE.missingProjectionDefinitionForBinder( binder );
 			}
 
 			return partialBinding.complete();
@@ -304,13 +302,15 @@ public class ProjectionBindingContextImpl<P> implements ProjectionBindingContext
 		Optional<PojoTypeModel<?>> containerElementModel = containerElementModel();
 		if ( containerElementModel.isPresent() ) {
 			if ( !expectedValueType.isSubTypeOf( containerElementModel.get().rawType() ) ) {
-				throw log.invalidOutputTypeForMultiValuedProjectionDefinition( definitionHolder.get(), parameterTypeModel,
+				throw ProjectionLog.INSTANCE.invalidOutputTypeForMultiValuedProjectionDefinition( definitionHolder.get(),
+						parameterTypeModel,
 						expectedValueType
 				);
 			}
 		}
 		else if ( !expectedValueType.isSubTypeOf( parameterTypeModel.rawType() ) ) {
-			throw log.invalidOutputTypeForProjectionDefinition( definitionHolder.get(), parameterTypeModel, expectedValueType );
+			throw ProjectionLog.INSTANCE.invalidOutputTypeForProjectionDefinition( definitionHolder.get(), parameterTypeModel,
+					expectedValueType );
 		}
 
 		@SuppressWarnings("unchecked") // We check that P2 extends P explicitly using reflection (see above)
@@ -331,7 +331,7 @@ public class ProjectionBindingContextImpl<P> implements ProjectionBindingContext
 		}
 		Optional<String> paramName = parameterRootElement.name();
 		if ( !paramName.isPresent() ) {
-			throw log.missingParameterNameForInferredProjection();
+			throw ProjectionLog.INSTANCE.missingParameterNameForInferredProjection();
 		}
 		// We reuse projection binders instead of return projection definitions directly
 		// so that we take advantage of their handling of nesting filters.
@@ -404,7 +404,7 @@ public class ProjectionBindingContextImpl<P> implements ProjectionBindingContext
 			}
 			else if ( SortedSet.class.isAssignableFrom( containerType ) ) {
 				if ( !Comparable.class.isAssignableFrom( containerElementType ) ) {
-					throw log.cannotBindSortedSetWithNonComparableElements(
+					throw ProjectionLog.INSTANCE.cannotBindSortedSetWithNonComparableElements(
 							containerElementType,
 							mappingElement.eventContext()
 					);
@@ -421,7 +421,7 @@ public class ProjectionBindingContextImpl<P> implements ProjectionBindingContext
 				reference = ProjectionCollector.list();
 			}
 			else {
-				throw log.invalidMultiValuedParameterTypeForProjectionConstructor( parameterTypeModel );
+				throw ProjectionLog.INSTANCE.invalidMultiValuedParameterTypeForProjectionConstructor( parameterTypeModel );
 			}
 
 			return reference;

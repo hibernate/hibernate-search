@@ -4,7 +4,6 @@
  */
 package org.hibernate.search.backend.lucene.document.model.dsl.impl;
 
-import java.lang.invoke.MethodHandles;
 import java.util.Map;
 import java.util.TreeMap;
 
@@ -12,7 +11,7 @@ import org.hibernate.search.backend.lucene.document.impl.LuceneIndexObjectFieldR
 import org.hibernate.search.backend.lucene.document.model.impl.LuceneIndexCompositeNode;
 import org.hibernate.search.backend.lucene.document.model.impl.LuceneIndexField;
 import org.hibernate.search.backend.lucene.document.model.impl.LuceneIndexObjectField;
-import org.hibernate.search.backend.lucene.logging.impl.Log;
+import org.hibernate.search.backend.lucene.logging.impl.MappingLog;
 import org.hibernate.search.backend.lucene.types.impl.LuceneIndexCompositeNodeType;
 import org.hibernate.search.engine.backend.common.spi.FieldPaths;
 import org.hibernate.search.engine.backend.document.IndexObjectFieldReference;
@@ -20,12 +19,10 @@ import org.hibernate.search.engine.backend.document.model.dsl.spi.IndexObjectFie
 import org.hibernate.search.engine.backend.types.ObjectStructure;
 import org.hibernate.search.engine.common.tree.spi.TreeNodeInclusion;
 import org.hibernate.search.engine.reporting.spi.EventContexts;
-import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 import org.hibernate.search.util.common.reporting.EventContext;
 
 class LuceneIndexObjectFieldBuilder extends AbstractLuceneIndexCompositeNodeBuilder
 		implements IndexObjectFieldBuilder, LuceneIndexNodeContributor {
-	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	private final AbstractLuceneIndexCompositeNodeBuilder parent;
 	private final String absoluteFieldPath;
@@ -58,7 +55,7 @@ class LuceneIndexObjectFieldBuilder extends AbstractLuceneIndexCompositeNodeBuil
 	@Override
 	public IndexObjectFieldReference toReference() {
 		if ( reference != null ) {
-			throw log.cannotCreateReferenceMultipleTimes( eventContext() );
+			throw MappingLog.INSTANCE.cannotCreateReferenceMultipleTimes( eventContext() );
 		}
 		this.reference = new LuceneIndexObjectFieldReference();
 		return reference;
@@ -68,7 +65,7 @@ class LuceneIndexObjectFieldBuilder extends AbstractLuceneIndexCompositeNodeBuil
 	public void contribute(LuceneIndexNodeCollector collector, LuceneIndexCompositeNode parentNode,
 			Map<String, LuceneIndexField> staticChildrenByNameForParent) {
 		if ( reference == null ) {
-			throw log.incompleteFieldDefinition( eventContext() );
+			throw MappingLog.INSTANCE.incompleteFieldDefinition( eventContext() );
 		}
 
 		Map<String, LuceneIndexField> staticChildrenByName = new TreeMap<>();

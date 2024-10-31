@@ -5,7 +5,6 @@
 package org.hibernate.search.mapper.pojo.model.models.spi;
 
 import java.lang.annotation.Annotation;
-import java.lang.invoke.MethodHandles;
 import java.lang.reflect.AnnotatedType;
 import java.lang.reflect.Modifier;
 import java.lang.reflect.Parameter;
@@ -13,14 +12,11 @@ import java.util.Arrays;
 import java.util.Optional;
 import java.util.stream.Stream;
 
-import org.hibernate.search.mapper.pojo.logging.impl.Log;
+import org.hibernate.search.mapper.pojo.logging.impl.MappingLog;
 import org.hibernate.search.mapper.pojo.model.spi.PojoMethodParameterModel;
 import org.hibernate.search.mapper.pojo.model.spi.PojoTypeModel;
-import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
 public final class PojoModelsMethodParameterModel<T> implements PojoMethodParameterModel<T> {
-
-	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	private final PojoModelsConstructorModel<?> constructorModel;
 	private final int index;
@@ -74,7 +70,7 @@ public final class PojoModelsMethodParameterModel<T> implements PojoMethodParame
 						.memberTypeReference( annotatedType.getType() );
 			}
 			catch (RuntimeException e) {
-				throw log.errorRetrievingConstructorParameterTypeModel( index, constructorModel, e );
+				throw MappingLog.INSTANCE.errorRetrievingConstructorParameterTypeModel( index, constructorModel, e );
 			}
 		}
 		return typeModelCache;

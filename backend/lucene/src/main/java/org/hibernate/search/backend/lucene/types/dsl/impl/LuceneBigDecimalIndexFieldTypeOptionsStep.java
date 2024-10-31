@@ -4,10 +4,9 @@
  */
 package org.hibernate.search.backend.lucene.types.dsl.impl;
 
-import java.lang.invoke.MethodHandles;
 import java.math.BigDecimal;
 
-import org.hibernate.search.backend.lucene.logging.impl.Log;
+import org.hibernate.search.backend.lucene.logging.impl.MappingLog;
 import org.hibernate.search.backend.lucene.types.codec.impl.AbstractLuceneNumericFieldCodec;
 import org.hibernate.search.backend.lucene.types.codec.impl.DocValues;
 import org.hibernate.search.backend.lucene.types.codec.impl.Indexing;
@@ -16,13 +15,10 @@ import org.hibernate.search.backend.lucene.types.codec.impl.Storage;
 import org.hibernate.search.engine.backend.types.converter.spi.DefaultStringConverters;
 import org.hibernate.search.engine.backend.types.dsl.ScaledNumberIndexFieldTypeOptionsStep;
 import org.hibernate.search.engine.mapper.mapping.building.spi.IndexFieldTypeDefaultsProvider;
-import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
 class LuceneBigDecimalIndexFieldTypeOptionsStep
 		extends AbstractLuceneNumericIndexFieldTypeOptionsStep<LuceneBigDecimalIndexFieldTypeOptionsStep, BigDecimal>
 		implements ScaledNumberIndexFieldTypeOptionsStep<LuceneBigDecimalIndexFieldTypeOptionsStep, BigDecimal> {
-
-	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	private final IndexFieldTypeDefaultsProvider defaultsProvider;
 
@@ -63,6 +59,6 @@ class LuceneBigDecimalIndexFieldTypeOptionsStep
 			return defaultsProvider.decimalScale();
 		}
 
-		throw log.nullDecimalScale( buildContext.hints().missingDecimalScale(), buildContext.getEventContext() );
+		throw MappingLog.INSTANCE.nullDecimalScale( buildContext.hints().missingDecimalScale(), buildContext.getEventContext() );
 	}
 }

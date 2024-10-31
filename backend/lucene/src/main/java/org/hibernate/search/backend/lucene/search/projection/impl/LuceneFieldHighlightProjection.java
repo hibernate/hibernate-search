@@ -8,6 +8,7 @@ import java.io.IOException;
 import java.util.List;
 import java.util.Set;
 
+import org.hibernate.search.backend.lucene.logging.impl.QueryLog;
 import org.hibernate.search.backend.lucene.lowlevel.collector.impl.TopDocsDataCollectorExecutionContext;
 import org.hibernate.search.backend.lucene.lowlevel.collector.impl.Values;
 import org.hibernate.search.backend.lucene.search.common.impl.AbstractLuceneValueFieldSearchQueryElementFactory;
@@ -66,7 +67,7 @@ public class LuceneFieldHighlightProjection<T> implements LuceneSearchProjection
 	@Override
 	public Extractor<?, T> request(ProjectionRequestContext context) {
 		if ( context.absoluteCurrentFieldPath() != null ) {
-			throw log.cannotHighlightInNestedContext(
+			throw QueryLog.INSTANCE.cannotHighlightInNestedContext(
 					context.absoluteCurrentFieldPath(),
 					EventContexts.fromIndexFieldAbsolutePath( absoluteFieldPath )
 			);
@@ -74,11 +75,11 @@ public class LuceneFieldHighlightProjection<T> implements LuceneSearchProjection
 		context.checkValidField( absoluteFieldPath );
 		LuceneAbstractSearchHighlighter highlighter = context.highlighter( highlighterName );
 		if ( !typeContext.highlighterTypeSupported( highlighter.type() ) ) {
-			throw log.highlighterTypeNotSupported( highlighter.type(), absoluteFieldPath );
+			throw QueryLog.INSTANCE.highlighterTypeNotSupported( highlighter.type(), absoluteFieldPath );
 		}
 		highlighter.request( context, absoluteFieldPath );
 		if ( !highlighter.isCompatible( collectorProvider ) ) {
-			throw log.highlighterIncompatibleCardinality();
+			throw QueryLog.INSTANCE.highlighterIncompatibleCardinality();
 		}
 
 		return new FieldHighlightExtractor<>( context.absoluteCurrentNestedFieldPath(), highlighter,
@@ -152,7 +153,7 @@ public class LuceneFieldHighlightProjection<T> implements LuceneSearchProjection
 				LuceneSearchIndexValueFieldContext<F> field) {
 			if ( field.nestedDocumentPath() != null ) {
 				// see HSEARCH-4841 to remove this limitation.
-				throw log.cannotHighlightFieldFromNestedObjectStructure(
+				throw QueryLog.INSTANCE.cannotHighlightFieldFromNestedObjectStructure(
 						EventContexts.fromIndexFieldAbsolutePath( field.absolutePath() )
 				);
 			}

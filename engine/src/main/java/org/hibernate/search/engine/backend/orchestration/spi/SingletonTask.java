@@ -4,17 +4,15 @@
  */
 package org.hibernate.search.engine.backend.orchestration.spi;
 
-import java.lang.invoke.MethodHandles;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Future;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.BiFunction;
 
-import org.hibernate.search.engine.logging.impl.Log;
+import org.hibernate.search.engine.logging.impl.ExecutorLog;
 import org.hibernate.search.engine.reporting.FailureContext;
 import org.hibernate.search.engine.reporting.FailureHandler;
 import org.hibernate.search.util.common.impl.Futures;
-import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
 /**
  * A task that can be scheduled for a run and is guaranteed to never run concurrently,
@@ -22,7 +20,6 @@ import org.hibernate.search.util.common.logging.impl.LoggerFactory;
  */
 public final class SingletonTask {
 
-	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	private final String name;
 	private final Runnable runnable;
@@ -70,7 +67,7 @@ public final class SingletonTask {
 			return;
 		}
 
-		log.tracef( "Scheduling task '%s'.", name );
+		ExecutorLog.INSTANCE.tracef( "Scheduling task '%s'.", name );
 
 		/*
 		 * Our thread successfully switched the status:
@@ -193,7 +190,7 @@ public final class SingletonTask {
 			needsRun = false;
 			nextExecutionFuture = null;
 			try {
-				log.tracef( "Running task '%s'", name );
+				ExecutorLog.INSTANCE.tracef( "Running task '%s'", name );
 				worker.work().handle( workFinishedHandler );
 			}
 			catch (Throwable e) {
@@ -222,7 +219,7 @@ public final class SingletonTask {
 
 				// First, tell the worker that we're done.
 				try {
-					log.tracef( "Completed task '%s'", name );
+					ExecutorLog.INSTANCE.tracef( "Completed task '%s'", name );
 					worker.complete();
 				}
 				catch (Throwable e) {

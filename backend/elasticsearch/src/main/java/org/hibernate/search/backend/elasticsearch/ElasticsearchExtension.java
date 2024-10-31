@@ -4,10 +4,9 @@
  */
 package org.hibernate.search.backend.elasticsearch;
 
-import java.lang.invoke.MethodHandles;
 import java.util.Optional;
 
-import org.hibernate.search.backend.elasticsearch.logging.impl.Log;
+import org.hibernate.search.backend.elasticsearch.logging.impl.CommonFailureLog;
 import org.hibernate.search.backend.elasticsearch.schema.management.ElasticsearchIndexSchemaExport;
 import org.hibernate.search.backend.elasticsearch.search.aggregation.dsl.ElasticsearchSearchAggregationFactory;
 import org.hibernate.search.backend.elasticsearch.search.predicate.dsl.ElasticsearchSearchPredicateFactory;
@@ -38,7 +37,6 @@ import org.hibernate.search.engine.search.query.dsl.SearchQuerySelectStep;
 import org.hibernate.search.engine.search.query.spi.SearchQueryIndexScope;
 import org.hibernate.search.engine.search.sort.dsl.SearchSortFactory;
 import org.hibernate.search.engine.search.sort.dsl.SearchSortFactoryExtension;
-import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
 /**
  * An extension for the Elasticsearch backend, giving access to Elasticsearch-specific features.
@@ -71,8 +69,6 @@ public final class ElasticsearchExtension<H, R, E, LOS>
 		SearchAggregationFactoryExtension<ElasticsearchSearchAggregationFactory>,
 		IndexFieldTypeFactoryExtension<ElasticsearchIndexFieldTypeFactory>,
 		SchemaExportExtension<ElasticsearchIndexSchemaExport> {
-
-	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	private static final ElasticsearchExtension<Object, Object, Object, Object> INSTANCE = new ElasticsearchExtension<>();
 
@@ -198,7 +194,7 @@ public final class ElasticsearchExtension<H, R, E, LOS>
 			return (ElasticsearchIndexFieldTypeFactory) original;
 		}
 		else {
-			throw log.elasticsearchExtensionOnUnknownType( original );
+			throw CommonFailureLog.INSTANCE.elasticsearchExtensionOnUnknownType( original );
 		}
 	}
 
@@ -211,7 +207,7 @@ public final class ElasticsearchExtension<H, R, E, LOS>
 			return ( (ElasticsearchIndexSchemaExport) original );
 		}
 		else {
-			throw log.elasticsearchExtensionOnUnknownType( original );
+			throw CommonFailureLog.INSTANCE.elasticsearchExtensionOnUnknownType( original );
 		}
 	}
 }
