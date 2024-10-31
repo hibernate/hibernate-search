@@ -4,11 +4,8 @@
  */
 package org.hibernate.search.mapper.orm.search.loading;
 
-import java.lang.invoke.MethodHandles;
-
 import org.hibernate.search.engine.cfg.spi.ParseUtils;
-import org.hibernate.search.mapper.orm.logging.impl.Log;
-import org.hibernate.search.util.common.logging.impl.LoggerFactory;
+import org.hibernate.search.mapper.orm.logging.impl.ConfigurationLog;
 
 /**
  * Strategy for cache lookup before search query results are loaded.
@@ -43,14 +40,12 @@ public enum EntityLoadingCacheLookupStrategy {
 	 */
 	PERSISTENCE_CONTEXT_THEN_SECOND_LEVEL_CACHE( "persistence-context-then-second-level-cache" );
 
-	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
-
 	// This method conforms to the MicroProfile Config specification. Do not change its signature.
 	public static EntityLoadingCacheLookupStrategy of(String value) {
 		return ParseUtils.parseDiscreteValues(
 				EntityLoadingCacheLookupStrategy.values(),
 				EntityLoadingCacheLookupStrategy::externalRepresentation,
-				log::invalidEntityLoadingCacheLookupStrategyName,
+				ConfigurationLog.INSTANCE::invalidEntityLoadingCacheLookupStrategyName,
 				value
 		);
 	}

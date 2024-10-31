@@ -4,16 +4,14 @@
  */
 package org.hibernate.search.engine.search.common.spi;
 
-import java.lang.invoke.MethodHandles;
 import java.util.List;
 import java.util.Objects;
 import java.util.function.BiPredicate;
 import java.util.function.Function;
 
-import org.hibernate.search.engine.logging.impl.Log;
+import org.hibernate.search.engine.logging.impl.QueryLog;
 import org.hibernate.search.engine.reporting.spi.EventContexts;
 import org.hibernate.search.util.common.SearchException;
-import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 import org.hibernate.search.util.common.reporting.EventContext;
 
 public abstract class AbstractMultiIndexSearchIndexNodeContext<
@@ -21,7 +19,6 @@ public abstract class AbstractMultiIndexSearchIndexNodeContext<
 		SC extends SearchIndexScope<?>,
 		NT extends SearchIndexNodeTypeContext<SC, S>>
 		implements SearchIndexNodeContext<SC>, SearchIndexNodeTypeContext<SC, S> {
-	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	protected final SC scope;
 	protected final String absolutePath;
@@ -173,15 +170,16 @@ public abstract class AbstractMultiIndexSearchIndexNodeContext<
 		}
 		try {
 			if ( factory1 == null || factory2 == null ) {
-				throw log.partialSupportForQueryElement(
+				throw QueryLog.INSTANCE.partialSupportForQueryElement(
 						key, helper().partialSupportHint() );
 			}
 
 			factory1.checkCompatibleWith( factory2 );
 		}
 		catch (SearchException e) {
-			SearchException inconsistentSupportException = log.inconsistentSupportForQueryElement( key, e.getMessage(), e );
-			throw log.inconsistentConfigurationInContextForSearch( relativeEventContext(),
+			SearchException inconsistentSupportException =
+					QueryLog.INSTANCE.inconsistentSupportForQueryElement( key, e.getMessage(), e );
+			throw QueryLog.INSTANCE.inconsistentConfigurationInContextForSearch( relativeEventContext(),
 					inconsistentSupportException.getMessage(), indexesEventContext(), inconsistentSupportException );
 		}
 	}
@@ -190,11 +188,11 @@ public abstract class AbstractMultiIndexSearchIndexNodeContext<
 			T attribute1, T attribute2) {
 		try {
 			if ( !compatibilityChecker.test( attribute1, attribute2 ) ) {
-				throw log.differentAttribute( attributeName, attribute1, attribute2 );
+				throw QueryLog.INSTANCE.differentAttribute( attributeName, attribute1, attribute2 );
 			}
 		}
 		catch (SearchException e) {
-			throw log.inconsistentConfigurationInContextForSearch( relativeEventContext(), e.getMessage(),
+			throw QueryLog.INSTANCE.inconsistentConfigurationInContextForSearch( relativeEventContext(), e.getMessage(),
 					indexesEventContext(), e );
 		}
 	}

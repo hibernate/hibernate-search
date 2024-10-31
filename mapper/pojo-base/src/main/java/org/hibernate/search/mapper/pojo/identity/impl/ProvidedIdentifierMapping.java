@@ -4,20 +4,16 @@
  */
 package org.hibernate.search.mapper.pojo.identity.impl;
 
-import java.lang.invoke.MethodHandles;
 import java.util.function.Supplier;
 
 import org.hibernate.search.engine.environment.bean.BeanHolder;
 import org.hibernate.search.mapper.pojo.bridge.IdentifierBridge;
 import org.hibernate.search.mapper.pojo.bridge.runtime.spi.BridgeMappingContext;
 import org.hibernate.search.mapper.pojo.bridge.runtime.spi.BridgeSessionContext;
-import org.hibernate.search.mapper.pojo.logging.impl.Log;
+import org.hibernate.search.mapper.pojo.logging.impl.IndexingLog;
 import org.hibernate.search.util.common.impl.Closer;
-import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
 public final class ProvidedIdentifierMapping implements IdentifierMappingImplementor<Object, Object> {
-
-	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	private final BeanHolder<? extends IdentifierBridge<Object>> bridgeHolder;
 
@@ -48,7 +44,7 @@ public final class ProvidedIdentifierMapping implements IdentifierMappingImpleme
 	@Override
 	public Object getIdentifier(Object providedId, Supplier<?> entityProvider) {
 		if ( providedId == null ) {
-			throw log.nullProvidedIdentifier();
+			throw IndexingLog.INSTANCE.nullProvidedIdentifier();
 		}
 		return providedId;
 	}

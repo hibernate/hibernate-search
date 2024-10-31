@@ -5,11 +5,11 @@
 package org.hibernate.search.backend.lucene.search.query.impl;
 
 import java.io.IOException;
-import java.lang.invoke.MethodHandles;
 import java.util.Collections;
 import java.util.Set;
 
-import org.hibernate.search.backend.lucene.logging.impl.Log;
+import org.hibernate.search.backend.lucene.logging.impl.LuceneSpecificLog;
+import org.hibernate.search.backend.lucene.logging.impl.QueryLog;
 import org.hibernate.search.backend.lucene.lowlevel.reader.impl.HibernateSearchMultiReader;
 import org.hibernate.search.backend.lucene.orchestration.impl.LuceneSyncWorkOrchestrator;
 import org.hibernate.search.backend.lucene.search.query.LuceneSearchResult;
@@ -20,11 +20,8 @@ import org.hibernate.search.backend.lucene.work.impl.LuceneWorkFactory;
 import org.hibernate.search.backend.lucene.work.impl.ReadWork;
 import org.hibernate.search.engine.reporting.spi.EventContexts;
 import org.hibernate.search.engine.search.timeout.spi.TimeoutManager;
-import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
 public class LuceneSearchScrollImpl<H> implements LuceneSearchScroll<H> {
-
-	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	// shared with its query instance:
 	private final LuceneSyncWorkOrchestrator queryOrchestrator;
@@ -69,7 +66,8 @@ public class LuceneSearchScrollImpl<H> implements LuceneSearchScroll<H> {
 			indexReader.close();
 		}
 		catch (IOException | RuntimeException e) {
-			log.unableToCloseIndexReader( EventContexts.fromIndexNames( scope.hibernateSearchIndexNames() ), e );
+			LuceneSpecificLog.INSTANCE.unableToCloseIndexReader( EventContexts.fromIndexNames( scope.hibernateSearchIndexNames() ),
+					e );
 		}
 	}
 
@@ -110,7 +108,7 @@ public class LuceneSearchScrollImpl<H> implements LuceneSearchScroll<H> {
 			loadableSearchResult = currentPage.extract( nextChunkStartIndexInPage, nextChunkEndIndexInPage );
 		}
 		catch (IOException e) {
-			throw log.ioExceptionOnQueryExecution( searcher.getLuceneQueryForExceptions(), e.getMessage(),
+			throw QueryLog.INSTANCE.ioExceptionOnQueryExecution( searcher.getLuceneQueryForExceptions(), e.getMessage(),
 					EventContexts.fromIndexNames( scope.hibernateSearchIndexNames() ), e );
 		}
 

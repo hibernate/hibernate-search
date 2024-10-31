@@ -4,11 +4,10 @@
  */
 package org.hibernate.search.backend.elasticsearch.search.query.impl;
 
-import java.lang.invoke.MethodHandles;
 import java.util.Collections;
 import java.util.Map;
 
-import org.hibernate.search.backend.elasticsearch.logging.impl.Log;
+import org.hibernate.search.backend.elasticsearch.logging.impl.QueryLog;
 import org.hibernate.search.backend.elasticsearch.lowlevel.syntax.search.impl.ElasticsearchSearchSyntax;
 import org.hibernate.search.backend.elasticsearch.search.aggregation.impl.AggregationRequestContext;
 import org.hibernate.search.backend.elasticsearch.search.common.impl.ElasticsearchSearchIndexScope;
@@ -26,7 +25,6 @@ import org.hibernate.search.engine.search.loading.spi.SearchLoadingContext;
 import org.hibernate.search.engine.search.projection.ProjectionCollector;
 import org.hibernate.search.engine.search.query.spi.QueryParameters;
 import org.hibernate.search.engine.spatial.GeoPoint;
-import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
 import com.google.gson.JsonObject;
 
@@ -42,8 +40,6 @@ import com.google.gson.JsonObject;
  * </ul>
  */
 class ElasticsearchSearchQueryRequestContext implements ProjectionRequestRootContext, AggregationRequestContext {
-
-	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	private final ElasticsearchSearchIndexScope<?> scope;
 	private final BackendSessionContext sessionContext;
@@ -138,7 +134,7 @@ class ElasticsearchSearchQueryRequestContext implements ProjectionRequestRootCon
 		}
 		ElasticsearchSearchHighlighter highlighter = namedHighlighters.get( highlighterName );
 		if ( highlighter == null ) {
-			throw log.cannotFindHighlighter( highlighterName, namedHighlighters.keySet() );
+			throw QueryLog.INSTANCE.cannotFindHighlighter( highlighterName, namedHighlighters.keySet() );
 		}
 		return highlighter;
 	}

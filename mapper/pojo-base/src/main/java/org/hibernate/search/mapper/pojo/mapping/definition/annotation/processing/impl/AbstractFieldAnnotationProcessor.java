@@ -5,7 +5,6 @@
 package org.hibernate.search.mapper.pojo.mapping.definition.annotation.processing.impl;
 
 import java.lang.annotation.Annotation;
-import java.lang.invoke.MethodHandles;
 import java.util.Map;
 import java.util.Optional;
 
@@ -18,18 +17,14 @@ import org.hibernate.search.mapper.pojo.bridge.mapping.impl.BeanDelegatingBinder
 import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.ValueBinder;
 import org.hibernate.search.mapper.pojo.extractor.mapping.annotation.ContainerExtraction;
 import org.hibernate.search.mapper.pojo.extractor.mapping.programmatic.ContainerExtractorPath;
-import org.hibernate.search.mapper.pojo.logging.impl.Log;
+import org.hibernate.search.mapper.pojo.logging.impl.MappingLog;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.processing.MappingAnnotationProcessorContext;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.processing.PropertyMappingAnnotationProcessor;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.processing.PropertyMappingAnnotationProcessorContext;
 import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.PropertyMappingFieldOptionsStep;
 import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.PropertyMappingStep;
-import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
 abstract class AbstractFieldAnnotationProcessor<A extends Annotation> implements PropertyMappingAnnotationProcessor<A> {
-
-
-	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	@Override
 	public final void process(PropertyMappingStep mappingContext, A annotation,
@@ -83,7 +78,7 @@ abstract class AbstractFieldAnnotationProcessor<A extends Annotation> implements
 		);
 
 		if ( bridgeReference.isPresent() && binderReference.isPresent() ) {
-			throw log.invalidFieldDefiningBothBridgeReferenceAndBinderReference();
+			throw MappingLog.INSTANCE.invalidFieldDefiningBothBridgeReferenceAndBinderReference();
 		}
 		else if ( bridgeReference.isPresent() ) {
 			return new BeanBinder( bridgeReference.get() );

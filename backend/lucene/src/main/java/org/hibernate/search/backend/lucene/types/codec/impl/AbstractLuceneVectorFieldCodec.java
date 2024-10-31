@@ -4,13 +4,10 @@
  */
 package org.hibernate.search.backend.lucene.types.codec.impl;
 
-import java.lang.invoke.MethodHandles;
 import java.util.Objects;
 import java.util.function.Consumer;
 
-import org.hibernate.search.backend.lucene.logging.impl.Log;
 import org.hibernate.search.backend.lucene.lowlevel.codec.impl.HibernateSearchKnnVectorsFormat;
-import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
 import org.apache.lucene.codecs.KnnVectorsFormat;
 import org.apache.lucene.document.FieldType;
@@ -21,8 +18,6 @@ import org.apache.lucene.index.VectorSimilarityFunction;
 import org.apache.lucene.util.BytesRef;
 
 public abstract class AbstractLuceneVectorFieldCodec<F> implements LuceneVectorFieldCodec<F> {
-
-	protected static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	protected final FieldType fieldType;
 	protected final VectorSimilarityFunction vectorSimilarity;

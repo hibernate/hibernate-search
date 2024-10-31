@@ -8,13 +8,12 @@ import static org.hibernate.search.util.common.impl.CollectionHelper.asImmutable
 import static org.hibernate.search.util.common.impl.CollectionHelper.isSubset;
 import static org.hibernate.search.util.common.impl.CollectionHelper.notInTheOtherSet;
 
-import java.lang.invoke.MethodHandles;
 import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
 import java.util.Set;
 
-import org.hibernate.search.backend.lucene.logging.impl.Log;
+import org.hibernate.search.backend.lucene.logging.impl.QueryLog;
 import org.hibernate.search.backend.lucene.lowlevel.collector.impl.Values;
 import org.hibernate.search.backend.lucene.search.common.impl.LuceneSearchIndexScope;
 import org.hibernate.search.backend.lucene.search.projection.impl.ProjectionExtractContext;
@@ -28,7 +27,6 @@ import org.hibernate.search.engine.search.highlighter.spi.SearchHighlighterBuild
 import org.hibernate.search.engine.search.highlighter.spi.SearchHighlighterType;
 import org.hibernate.search.engine.search.projection.ProjectionCollector;
 import org.hibernate.search.util.common.impl.Contracts;
-import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
 import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.search.highlight.DefaultEncoder;
@@ -38,7 +36,6 @@ import org.apache.lucene.search.vectorhighlight.SimpleBoundaryScanner;
 
 public abstract class LuceneAbstractSearchHighlighter implements SearchHighlighter {
 
-	protected static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 	private static final Encoder DEFAULT_ENCODER = new DefaultEncoder();
 	private static final Encoder HTML_ENCODER = new SimpleHTMLEncoder();
 
@@ -136,11 +133,11 @@ public abstract class LuceneAbstractSearchHighlighter implements SearchHighlight
 
 	public static LuceneAbstractSearchHighlighter from(LuceneSearchIndexScope<?> scope, SearchHighlighter highlighter) {
 		if ( !( highlighter instanceof LuceneAbstractSearchHighlighter ) ) {
-			throw log.cannotMixLuceneSearchQueryWithOtherQueryHighlighters( highlighter );
+			throw QueryLog.INSTANCE.cannotMixLuceneSearchQueryWithOtherQueryHighlighters( highlighter );
 		}
 		LuceneAbstractSearchHighlighter casted = (LuceneAbstractSearchHighlighter) highlighter;
 		if ( !isSubset( scope.hibernateSearchIndexNames(), casted.indexNames() ) ) {
-			throw log.queryHighlighterDefinedOnDifferentIndexes( highlighter, casted.indexNames(),
+			throw QueryLog.INSTANCE.queryHighlighterDefinedOnDifferentIndexes( highlighter, casted.indexNames(),
 					scope.hibernateSearchIndexNames(),
 					notInTheOtherSet( scope.hibernateSearchIndexNames(), casted.indexNames() ) );
 		}
@@ -155,7 +152,7 @@ public abstract class LuceneAbstractSearchHighlighter implements SearchHighlight
 		Contracts.assertNotNull( fallback, "fallback highlighter" );
 
 		if ( !this.type().equals( fallback.type() ) ) {
-			throw log.cannotMixDifferentHighlighterTypesAtOverrideLevel( this.type(), fallback.type() );
+			throw QueryLog.INSTANCE.cannotMixDifferentHighlighterTypesAtOverrideLevel( this.type(), fallback.type() );
 		}
 		return createHighlighterSameType(
 				indexNames,
@@ -213,7 +210,7 @@ public abstract class LuceneAbstractSearchHighlighter implements SearchHighlight
 		@Override
 		public SearchHighlighterBuilder fragmentSize(Integer fragmentSize) {
 			if ( SearchHighlighterType.UNIFIED.equals( type() ) ) {
-				throw log.unifiedHighlighterFragmentSizeNotSupported();
+				throw QueryLog.INSTANCE.unifiedHighlighterFragmentSizeNotSupported();
 			}
 			return super.fragmentSize( fragmentSize );
 		}

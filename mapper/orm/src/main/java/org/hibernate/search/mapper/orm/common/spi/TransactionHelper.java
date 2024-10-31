@@ -4,7 +4,6 @@
  */
 package org.hibernate.search.mapper.orm.common.spi;
 
-import java.lang.invoke.MethodHandles;
 import java.util.function.Supplier;
 
 import jakarta.transaction.HeuristicMixedException;
@@ -20,8 +19,7 @@ import org.hibernate.engine.spi.SharedSessionContractImplementor;
 import org.hibernate.engine.transaction.jta.platform.spi.JtaPlatform;
 import org.hibernate.resource.transaction.spi.TransactionCoordinatorBuilder;
 import org.hibernate.search.mapper.orm.common.impl.HibernateOrmUtils;
-import org.hibernate.search.mapper.orm.logging.impl.Log;
-import org.hibernate.search.util.common.logging.impl.LoggerFactory;
+import org.hibernate.search.mapper.orm.logging.impl.OrmSpecificLog;
 import org.hibernate.service.spi.ServiceRegistryImplementor;
 
 /**
@@ -30,8 +28,6 @@ import org.hibernate.service.spi.ServiceRegistryImplementor;
  * while accepting some JTA-specific settings (transaction timeout) on a best-effort basis.
  */
 public final class TransactionHelper {
-
-	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	private final TransactionManager transactionManager;
 	private final boolean useJta;
@@ -88,7 +84,7 @@ public final class TransactionHelper {
 		}
 		// Just let runtime exceptions fall through
 		catch (NotSupportedException | SystemException e) {
-			throw log.transactionHandlingException( e.getMessage(), e );
+			throw OrmSpecificLog.INSTANCE.transactionHandlingException( e.getMessage(), e );
 		}
 	}
 
@@ -103,7 +99,7 @@ public final class TransactionHelper {
 		}
 		// Just let runtime exceptions fall through
 		catch (SystemException | RollbackException | HeuristicMixedException | HeuristicRollbackException e) {
-			throw log.transactionHandlingException( e.getMessage(), e );
+			throw OrmSpecificLog.INSTANCE.transactionHandlingException( e.getMessage(), e );
 		}
 	}
 
@@ -126,7 +122,7 @@ public final class TransactionHelper {
 			}
 		}
 		catch (Exception e) {
-			throw log.transactionHandlingException( e.getMessage(), e );
+			throw OrmSpecificLog.INSTANCE.transactionHandlingException( e.getMessage(), e );
 		}
 	}
 
@@ -134,25 +130,26 @@ public final class TransactionHelper {
 			TransactionCoordinatorBuilder transactionCoordinatorBuilder) {
 		if ( !transactionCoordinatorBuilder.isJta() ) {
 			//Today we only require a TransactionManager on JTA based transaction factories
-			log.trace( "TransactionFactory does not require a TransactionManager: don't wrap in a JTA transaction" );
+			OrmSpecificLog.INSTANCE
+					.trace( "TransactionFactory does not require a TransactionManager: don't wrap in a JTA transaction" );
 			return false;
 		}
 		if ( transactionManager == null ) {
 			//no TM, nothing to do OR configuration mistake
-			log.trace( "No TransactionManager found, do not start a surrounding JTA transaction" );
+			OrmSpecificLog.INSTANCE.trace( "No TransactionManager found, do not start a surrounding JTA transaction" );
 			return false;
 		}
 		try {
 			if ( transactionManager.getStatus() == Status.STATUS_NO_TRANSACTION ) {
-				log.trace( "No Transaction in progress, needs to start a JTA transaction" );
+				OrmSpecificLog.INSTANCE.trace( "No Transaction in progress, needs to start a JTA transaction" );
 				return true;
 			}
 		}
 		catch (SystemException e) {
-			log.cannotGuessTransactionStatus( e );
+			OrmSpecificLog.INSTANCE.cannotGuessTransactionStatus( e );
 			return false;
 		}
-		log.trace( "Transaction in progress, no need to start a JTA transaction" );
+		OrmSpecificLog.INSTANCE.trace( "Transaction in progress, no need to start a JTA transaction" );
 		return false;
 	}
 }

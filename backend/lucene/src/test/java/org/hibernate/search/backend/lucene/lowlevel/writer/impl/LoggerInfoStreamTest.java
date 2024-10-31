@@ -8,7 +8,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.List;
 
-import org.hibernate.search.backend.lucene.logging.impl.LuceneLogCategories;
+import org.hibernate.search.backend.lucene.logging.impl.LuceneInfoStreamLog;
 import org.hibernate.search.util.impl.test.extension.log4j.Log4j2ConfigurationAccessor;
 
 import org.junit.jupiter.api.AfterEach;
@@ -25,13 +25,11 @@ import org.apache.lucene.store.ByteBuffersDirectory;
 
 class LoggerInfoStreamTest {
 
-	private static final String LOGGER_NAME = LuceneLogCategories.INFOSTREAM_LOGGER_CATEGORY.getName();
-
 	private final Log4j2ConfigurationAccessor programmaticConfig;
 	private TestAppender testAppender;
 
 	public LoggerInfoStreamTest() {
-		programmaticConfig = new Log4j2ConfigurationAccessor( LOGGER_NAME );
+		programmaticConfig = new Log4j2ConfigurationAccessor( LuceneInfoStreamLog.CATEGORY_NAME );
 	}
 
 	@BeforeEach
@@ -61,7 +59,7 @@ class LoggerInfoStreamTest {
 		indexWriter.commit();
 		indexWriter.close();
 
-		List<String> logEvents = testAppender.searchByLoggerAndMessage( LOGGER_NAME, "IW:" );
+		List<String> logEvents = testAppender.searchByLoggerAndMessage( LuceneInfoStreamLog.CATEGORY_NAME, "IW:" );
 
 		assertThat( logEvents ).isNotEmpty();
 	}

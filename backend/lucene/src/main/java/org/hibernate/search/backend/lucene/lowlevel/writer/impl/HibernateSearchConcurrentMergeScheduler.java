@@ -4,13 +4,11 @@
  */
 package org.hibernate.search.backend.lucene.lowlevel.writer.impl;
 
-import java.lang.invoke.MethodHandles;
 
-import org.hibernate.search.backend.lucene.logging.impl.Log;
+import org.hibernate.search.backend.lucene.reporting.impl.LuceneSearchHints;
 import org.hibernate.search.engine.environment.thread.spi.ThreadProvider;
 import org.hibernate.search.engine.reporting.FailureContext;
 import org.hibernate.search.engine.reporting.FailureHandler;
-import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
 import org.apache.lucene.index.ConcurrentMergeScheduler;
 import org.apache.lucene.index.MergePolicy;
@@ -26,8 +24,6 @@ import org.apache.lucene.util.ThreadInterruptedException;
  */
 //TODO think about using an Executor instead of starting Threads directly
 class HibernateSearchConcurrentMergeScheduler extends ConcurrentMergeScheduler {
-
-	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	private final String indexName;
 	private final String contextDescription;
@@ -54,7 +50,7 @@ class HibernateSearchConcurrentMergeScheduler extends ConcurrentMergeScheduler {
 		catch (Exception ex) {
 			FailureContext.Builder contextBuilder = FailureContext.builder();
 			contextBuilder.throwable( ex );
-			contextBuilder.failingOperation( log.indexMergeOperation( indexName ) );
+			contextBuilder.failingOperation( LuceneSearchHints.INSTANCE.indexMergeOperation( indexName ) );
 			failureHandler.handle( contextBuilder.build() );
 		}
 	}

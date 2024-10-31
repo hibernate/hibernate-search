@@ -4,25 +4,22 @@
  */
 package org.hibernate.search.mapper.pojo.work.impl;
 
-import java.lang.invoke.MethodHandles;
 
 import org.hibernate.search.engine.backend.work.execution.DocumentCommitStrategy;
 import org.hibernate.search.engine.backend.work.execution.DocumentRefreshStrategy;
 import org.hibernate.search.engine.common.EntityReference;
 import org.hibernate.search.engine.reporting.EntityIndexingFailureContext;
 import org.hibernate.search.engine.reporting.FailureHandler;
-import org.hibernate.search.mapper.pojo.logging.impl.Log;
+import org.hibernate.search.mapper.pojo.reporting.impl.PojoMassIndexerMessages;
 import org.hibernate.search.mapper.pojo.work.IndexingPlanSynchronizationStrategy;
 import org.hibernate.search.mapper.pojo.work.IndexingPlanSynchronizationStrategyConfigurationContext;
 import org.hibernate.search.util.common.annotation.Incubating;
 import org.hibernate.search.util.common.impl.Futures;
-import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
 @Incubating
 public final class AsyncIndexingPlanSynchronizationStrategy implements IndexingPlanSynchronizationStrategy {
 
 	public static final IndexingPlanSynchronizationStrategy INSTANCE = new AsyncIndexingPlanSynchronizationStrategy();
-	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	private AsyncIndexingPlanSynchronizationStrategy() {
 	}
@@ -41,13 +38,13 @@ public final class AsyncIndexingPlanSynchronizationStrategy implements IndexingP
 			if ( throwable != null ) {
 				EntityIndexingFailureContext.Builder contextBuilder = EntityIndexingFailureContext.builder();
 				contextBuilder.throwable( throwable );
-				contextBuilder.failingOperation( log.backgroundIndexing() );
+				contextBuilder.failingOperation( PojoMassIndexerMessages.INSTANCE.backgroundIndexing() );
 				failureHandler.handle( contextBuilder.build() );
 			}
 			else if ( result != null && result.throwable().isPresent() ) {
 				EntityIndexingFailureContext.Builder contextBuilder = EntityIndexingFailureContext.builder();
 				contextBuilder.throwable( result.throwable().get() );
-				contextBuilder.failingOperation( log.backgroundIndexing() );
+				contextBuilder.failingOperation( PojoMassIndexerMessages.INSTANCE.backgroundIndexing() );
 				for ( EntityReference entityReference : result.failingEntities() ) {
 					contextBuilder.failingEntityReference( entityReference );
 				}

@@ -4,7 +4,6 @@
  */
 package org.hibernate.search.mapper.pojo.bridge.runtime.impl;
 
-import java.lang.invoke.MethodHandles;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -15,18 +14,15 @@ import java.util.function.Supplier;
 import org.hibernate.search.engine.environment.bean.BeanHolder;
 import org.hibernate.search.mapper.pojo.bridge.RoutingBridge;
 import org.hibernate.search.mapper.pojo.bridge.runtime.spi.BridgeSessionContext;
-import org.hibernate.search.mapper.pojo.logging.impl.Log;
+import org.hibernate.search.mapper.pojo.logging.impl.MappingLog;
 import org.hibernate.search.mapper.pojo.route.DocumentRoute;
 import org.hibernate.search.mapper.pojo.route.DocumentRouteDescriptor;
 import org.hibernate.search.mapper.pojo.route.DocumentRoutes;
 import org.hibernate.search.mapper.pojo.route.DocumentRoutesDescriptor;
 import org.hibernate.search.mapper.pojo.route.impl.DocumentRouteImpl;
 import org.hibernate.search.util.common.impl.Closer;
-import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
 public final class RoutingBridgeDocumentRouter<E> implements DocumentRouter<E> {
-
-	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	private final BeanHolder<? extends RoutingBridge<? super E>> routingBridgeHolder;
 
@@ -72,7 +68,7 @@ public final class RoutingBridgeDocumentRouter<E> implements DocumentRouter<E> {
 		public DocumentRoute addRoute() {
 			if ( currentRoute != null ) {
 				// TODO HSEARCH-3971 allow routing to multiple indexes *simultaneously*?
-				throw log.multipleCurrentRoutes( routingBridgeHolder.get() );
+				throw MappingLog.INSTANCE.multipleCurrentRoutes( routingBridgeHolder.get() );
 			}
 			currentRoute = new DocumentRouteImpl();
 			return currentRoute;
@@ -91,7 +87,7 @@ public final class RoutingBridgeDocumentRouter<E> implements DocumentRouter<E> {
 				return null;
 			}
 			if ( currentRoute == null ) {
-				throw log.noCurrentRoute( routingBridgeHolder.get() );
+				throw MappingLog.INSTANCE.noCurrentRoute( routingBridgeHolder.get() );
 			}
 
 			return currentRoute.toDescriptor();
@@ -126,7 +122,7 @@ public final class RoutingBridgeDocumentRouter<E> implements DocumentRouter<E> {
 				return Collections.emptyList();
 			}
 			if ( previousRoutes == null || previousRoutes.isEmpty() ) {
-				throw log.noPreviousRoute( routingBridgeHolder.get() );
+				throw MappingLog.INSTANCE.noPreviousRoute( routingBridgeHolder.get() );
 			}
 
 			Collection<DocumentRouteDescriptor> result = new LinkedHashSet<>( previousRoutes.size() );

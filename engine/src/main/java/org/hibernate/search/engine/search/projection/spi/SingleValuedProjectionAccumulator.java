@@ -4,6 +4,7 @@
  */
 package org.hibernate.search.engine.search.projection.spi;
 
+
 import org.hibernate.search.engine.backend.types.converter.runtime.FromDocumentValueConvertContext;
 import org.hibernate.search.engine.backend.types.converter.spi.ProjectionConverter;
 import org.hibernate.search.engine.search.projection.ProjectionCollector;

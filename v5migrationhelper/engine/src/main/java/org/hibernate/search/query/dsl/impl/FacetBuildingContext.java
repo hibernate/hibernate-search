@@ -16,14 +16,14 @@ import org.hibernate.search.query.facet.FacetingRequest;
 import org.hibernate.search.util.StringHelper;
 import org.hibernate.search.util.common.data.Range;
 import org.hibernate.search.util.common.data.RangeBoundInclusion;
-import org.hibernate.search.util.logging.impl.Log;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
+import org.hibernate.search.util.logging.impl.MigrationHelperLog;
 
 /**
  * @author Hardy Ferentschik
  */
 class FacetBuildingContext<T> {
-	private static final Log log = LoggerFactory.make( MethodHandles.lookup() );
+	private static final MigrationHelperLog log = LoggerFactory.make( MethodHandles.lookup() );
 
 	/**
 	 * The list of types which are supported for range faceting

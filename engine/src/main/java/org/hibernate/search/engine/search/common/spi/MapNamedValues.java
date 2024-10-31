@@ -4,22 +4,18 @@
  */
 package org.hibernate.search.engine.search.common.spi;
 
-import java.lang.invoke.MethodHandles;
 import java.util.Map;
 import java.util.Optional;
 import java.util.function.Function;
 
-import org.hibernate.search.engine.logging.impl.Log;
+import org.hibernate.search.engine.logging.impl.QueryLog;
 import org.hibernate.search.engine.search.common.NamedValues;
 import org.hibernate.search.util.common.SearchException;
 import org.hibernate.search.util.common.annotation.Incubating;
 import org.hibernate.search.util.common.impl.Contracts;
-import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
 @Incubating
 public class MapNamedValues implements NamedValues {
-
-	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	/**
 	 * Create a simple instance of {@link NamedValues} backed by a {@link Map map}.
@@ -70,11 +66,12 @@ public class MapNamedValues implements NamedValues {
 	private final NamedValueIncorrectType namedValueIncorrectType;
 
 	private MapNamedValues(Map<String, Object> values) {
-		this( values, log::namedValuesParameterNotDefined, log::namedValuesParameterIncorrectType );
+		this( values, QueryLog.INSTANCE::namedValuesParameterNotDefined,
+				QueryLog.INSTANCE::namedValuesParameterIncorrectType );
 	}
 
 	protected MapNamedValues(Map<String, Object> values, NamedValueMissing namedValueMissing) {
-		this( values, namedValueMissing, log::namedValuesParameterIncorrectType );
+		this( values, namedValueMissing, QueryLog.INSTANCE::namedValuesParameterIncorrectType );
 	}
 
 	protected MapNamedValues(Map<String, Object> values,

@@ -4,10 +4,9 @@
  */
 package org.hibernate.search.backend.lucene.search.predicate.impl;
 
-import java.lang.invoke.MethodHandles;
 import java.lang.reflect.Array;
 
-import org.hibernate.search.backend.lucene.logging.impl.Log;
+import org.hibernate.search.backend.lucene.logging.impl.QueryLog;
 import org.hibernate.search.backend.lucene.lowlevel.query.impl.VectorSimilarityFilterQuery;
 import org.hibernate.search.backend.lucene.search.common.impl.AbstractLuceneValueFieldSearchQueryElementFactory;
 import org.hibernate.search.backend.lucene.search.common.impl.LuceneSearchIndexScope;
@@ -17,15 +16,12 @@ import org.hibernate.search.backend.lucene.types.codec.impl.LuceneVectorFieldCod
 import org.hibernate.search.engine.search.predicate.SearchPredicate;
 import org.hibernate.search.engine.search.predicate.spi.KnnPredicateBuilder;
 import org.hibernate.search.util.common.AssertionFailure;
-import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
 import org.apache.lucene.search.KnnByteVectorQuery;
 import org.apache.lucene.search.KnnFloatVectorQuery;
 import org.apache.lucene.search.Query;
 
 public abstract class LuceneKnnPredicate<T> extends AbstractLuceneSingleFieldPredicate implements LuceneSearchPredicate {
-
-	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	protected final int k;
 	protected final T vector;
@@ -79,11 +75,12 @@ public abstract class LuceneKnnPredicate<T> extends AbstractLuceneSingleFieldPre
 				throw new IllegalArgumentException( "Vector can only be either a float or a byte array (float[], byte[])." );
 			}
 			if ( !vectorCodec.vectorElementsType().equals( vector.getClass().getComponentType() ) ) {
-				throw log.vectorKnnMatchVectorTypeDiffersFromField( absoluteFieldPath, vectorCodec.vectorElementsType(),
+				throw QueryLog.INSTANCE.vectorKnnMatchVectorTypeDiffersFromField( absoluteFieldPath,
+						vectorCodec.vectorElementsType(),
 						vector.getClass().getComponentType() );
 			}
 			if ( Array.getLength( vector ) != vectorCodec.getConfiguredDimensions() ) {
-				throw log.vectorKnnMatchVectorDimensionDiffersFromField( absoluteFieldPath,
+				throw QueryLog.INSTANCE.vectorKnnMatchVectorDimensionDiffersFromField( absoluteFieldPath,
 						vectorCodec.getConfiguredDimensions(),
 						Array.getLength( vector )
 				);

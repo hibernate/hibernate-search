@@ -4,10 +4,8 @@
  */
 package org.hibernate.search.engine.environment.classpath.spi;
 
-import java.lang.invoke.MethodHandles;
+import org.hibernate.search.engine.logging.impl.BeanLog;
 
-import org.hibernate.search.engine.logging.impl.Log;
-import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
 /**
  * Default implementation of {@code ClassResolver} relying on an {@link AggregatedClassLoader}.
@@ -15,8 +13,6 @@ import org.hibernate.search.util.common.logging.impl.LoggerFactory;
  * @author Hardy Ferentschik
  */
 public final class DefaultClassResolver implements ClassResolver {
-
-	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	private final AggregatedClassLoader aggregatedClassLoader;
 
@@ -34,7 +30,7 @@ public final class DefaultClassResolver implements ClassResolver {
 			return Class.forName( className, true, aggregatedClassLoader );
 		}
 		catch (Exception | LinkageError e) {
-			throw log.unableToLoadTheClass( className, e.getMessage(), e );
+			throw BeanLog.INSTANCE.unableToLoadTheClass( className, e.getMessage(), e );
 		}
 	}
 

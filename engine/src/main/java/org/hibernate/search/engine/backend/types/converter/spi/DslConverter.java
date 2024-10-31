@@ -4,14 +4,11 @@
  */
 package org.hibernate.search.engine.backend.types.converter.spi;
 
-import java.lang.invoke.MethodHandles;
-
 import org.hibernate.search.engine.backend.types.converter.ToDocumentValueConverter;
 import org.hibernate.search.engine.backend.types.converter.runtime.ToDocumentValueConvertContext;
 import org.hibernate.search.engine.backend.types.converter.runtime.ToDocumentValueConvertContextExtension;
-import org.hibernate.search.engine.logging.impl.Log;
+import org.hibernate.search.engine.logging.impl.QueryLog;
 import org.hibernate.search.util.common.impl.Contracts;
-import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 import org.hibernate.search.util.common.reporting.spi.EventContextProvider;
 
 /**
@@ -21,8 +18,6 @@ import org.hibernate.search.util.common.reporting.spi.EventContextProvider;
  * @param <F> The type of converted values passed to the backend.
  */
 public final class DslConverter<V, F> {
-
-	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	public static <F> DslConverter<F, F> passThrough(Class<F> fieldAndValueType) {
 		return new DslConverter<>( fieldAndValueType, new PassThroughToDocumentValueConverter<>() );
@@ -88,7 +83,8 @@ public final class DslConverter<V, F> {
 	public <T> DslConverter<? super T, F> withInputType(Class<T> inputTypeCandidate,
 			EventContextProvider eventContextProvider) {
 		if ( !valueType.isAssignableFrom( inputTypeCandidate ) ) {
-			throw log.invalidDslArgumentType( inputTypeCandidate, valueType, eventContextProvider.eventContext() );
+			throw QueryLog.INSTANCE.invalidDslArgumentType( inputTypeCandidate, valueType,
+					eventContextProvider.eventContext() );
 		}
 		return (DslConverter<? super T, F>) this;
 	}

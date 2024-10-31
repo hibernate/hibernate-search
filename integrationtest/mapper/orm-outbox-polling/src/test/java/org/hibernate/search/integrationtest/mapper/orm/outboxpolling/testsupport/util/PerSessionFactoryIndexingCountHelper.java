@@ -5,8 +5,8 @@
 package org.hibernate.search.integrationtest.mapper.orm.outboxpolling.testsupport.util;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.hibernate.search.integrationtest.mapper.orm.outboxpolling.testsupport.logging.TestLog.TEST_LOGGER;
 
-import java.lang.invoke.MethodHandles;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -21,12 +21,10 @@ import org.hibernate.search.mapper.orm.HibernateOrmExtension;
 import org.hibernate.search.mapper.orm.cfg.HibernateOrmMapperSettings;
 import org.hibernate.search.mapper.orm.mapping.HibernateOrmMappingConfigurationContext;
 import org.hibernate.search.mapper.orm.mapping.HibernateOrmSearchMappingConfigurer;
-import org.hibernate.search.mapper.orm.outboxpolling.logging.impl.Log;
 import org.hibernate.search.mapper.pojo.bridge.TypeBridge;
 import org.hibernate.search.mapper.pojo.bridge.binding.TypeBindingContext;
 import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.TypeBinder;
 import org.hibernate.search.mapper.pojo.bridge.runtime.TypeBridgeWriteContext;
-import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.document.model.StubIndexSchemaDataNode;
 import org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmSetupHelper;
 import org.hibernate.search.util.impl.integrationtest.mapper.orm.SimpleSessionFactoryBuilder;
@@ -38,7 +36,6 @@ import org.assertj.core.api.ListAssert;
 
 public class PerSessionFactoryIndexingCountHelper {
 
-	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	private static final String FAKE_FIELD_NAME = "fakeField";
 	private static final Class<?> FAKE_FIELD_TYPE = String.class;
@@ -109,14 +106,15 @@ public class PerSessionFactoryIndexingCountHelper {
 			for ( StaticCountersKeys counterKeys : counterKeys ) {
 				sum += counters.get( counterKeys.forTenantId( tenantId ) );
 			}
-			log.debugf( "Count of indexing operations across all session factories for tenant ID <%s>: %s", tenantId, sum );
+			TEST_LOGGER.debugf( "Count of indexing operations across all session factories for tenant ID <%s>: %s", tenantId,
+					sum );
 			return assertThat( sum )
 					.as( "Count of indexing operations across all session factories for tenant ID <%s>", tenantId );
 		}
 
 		public int forSessionFactory(int i) {
 			int count = counters.get( counterKeys.get( i ).forTenantId( tenantId ) );
-			log.debugf( "Count of indexing operations for session factory %d for tenant ID <%s>: %s",
+			TEST_LOGGER.debugf( "Count of indexing operations for session factory %d for tenant ID <%s>: %s",
 					(Integer) i, tenantId, (Integer) count );
 			return count;
 		}
@@ -124,7 +122,8 @@ public class PerSessionFactoryIndexingCountHelper {
 		public List<Integer> forEachSessionFactory() {
 			List<Integer> counts = counterKeys.stream().map( keys -> keys.forTenantId( tenantId ) )
 					.map( counters::get ).collect( Collectors.toList() );
-			log.debugf( "Count of indexing operations for each session factory for tenant ID <%s>: %s", tenantId, counts );
+			TEST_LOGGER.debugf( "Count of indexing operations for each session factory for tenant ID <%s>: %s", tenantId,
+					counts );
 			return counts;
 		}
 

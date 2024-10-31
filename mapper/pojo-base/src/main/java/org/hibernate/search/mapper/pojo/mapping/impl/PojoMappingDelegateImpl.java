@@ -4,7 +4,6 @@
  */
 package org.hibernate.search.mapper.pojo.mapping.impl;
 
-import java.lang.invoke.MethodHandles;
 import java.util.Collection;
 import java.util.Optional;
 import java.util.Set;
@@ -19,7 +18,7 @@ import org.hibernate.search.engine.search.projection.spi.ProjectionMappedTypeCon
 import org.hibernate.search.engine.tenancy.spi.TenancyMode;
 import org.hibernate.search.mapper.pojo.common.spi.PojoEntityReferenceFactoryDelegate;
 import org.hibernate.search.mapper.pojo.loading.spi.PojoLoadingTypeContextProvider;
-import org.hibernate.search.mapper.pojo.logging.impl.Log;
+import org.hibernate.search.mapper.pojo.logging.impl.MappingLog;
 import org.hibernate.search.mapper.pojo.mapping.spi.PojoMappingDelegate;
 import org.hibernate.search.mapper.pojo.mapping.spi.PojoRawTypeIdentifierResolver;
 import org.hibernate.search.mapper.pojo.model.spi.PojoRawTypeIdentifier;
@@ -42,10 +41,8 @@ import org.hibernate.search.mapper.pojo.work.spi.PojoIndexingPlan;
 import org.hibernate.search.mapper.pojo.work.spi.PojoIndexingQueueEventProcessingPlan;
 import org.hibernate.search.mapper.pojo.work.spi.PojoIndexingQueueEventSendingPlan;
 import org.hibernate.search.mapper.pojo.work.spi.PojoWorkSessionContext;
-import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
 public class PojoMappingDelegateImpl implements PojoMappingDelegate {
-	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	private final ThreadPoolProvider threadPoolProvider;
 	private final FailureHandler failureHandler;
@@ -116,7 +113,7 @@ public class PojoMappingDelegateImpl implements PojoMappingDelegate {
 			Collection<? extends Class<? extends E>> classes,
 			PojoScopeTypeExtendedContextProvider<E, C> indexedTypeExtendedContextProvider) {
 		if ( classes.isEmpty() ) {
-			throw log.invalidEmptyTargetForScope();
+			throw MappingLog.INSTANCE.invalidEmptyTargetForScope();
 		}
 		return PojoScopeDelegateImpl.create(
 				mappingContext,
@@ -132,13 +129,13 @@ public class PojoMappingDelegateImpl implements PojoMappingDelegate {
 			PojoScopeMappingContext mappingContext, Class<E> expectedSuperType, Collection<String> entityNames,
 			PojoScopeTypeExtendedContextProvider<E, C> indexedTypeExtendedContextProvider) {
 		if ( entityNames.isEmpty() ) {
-			throw log.invalidEmptyTargetForScope();
+			throw MappingLog.INSTANCE.invalidEmptyTargetForScope();
 		}
 		Set<? extends PojoIndexedTypeManager<?, ?>> typeContexts = typeManagers.indexedForSuperTypeEntityNames( entityNames );
 		for ( PojoIndexedTypeManager<?, ?> typeContext : typeContexts ) {
 			Class<?> actualJavaType = typeContext.typeIdentifier().javaClass();
 			if ( !expectedSuperType.isAssignableFrom( actualJavaType ) ) {
-				throw log.invalidEntitySuperType( typeContext.name(), expectedSuperType, actualJavaType );
+				throw MappingLog.INSTANCE.invalidEntitySuperType( typeContext.name(), expectedSuperType, actualJavaType );
 			}
 		}
 		return PojoScopeDelegateImpl.create(
@@ -156,7 +153,7 @@ public class PojoMappingDelegateImpl implements PojoMappingDelegate {
 			Collection<? extends PojoRawTypeIdentifier<? extends E>> targetedTypes,
 			PojoScopeTypeExtendedContextProvider<E, C> indexedTypeExtendedContextProvider) {
 		if ( targetedTypes.isEmpty() ) {
-			throw log.invalidEmptyTargetForScope();
+			throw MappingLog.INSTANCE.invalidEmptyTargetForScope();
 		}
 		return PojoScopeDelegateImpl.create(
 				mappingContext,

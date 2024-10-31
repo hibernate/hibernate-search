@@ -4,16 +4,14 @@
  */
 package org.hibernate.search.backend.elasticsearch.analysis.model.dsl.impl;
 
-import java.lang.invoke.MethodHandles;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
 import org.hibernate.search.backend.elasticsearch.analysis.model.dsl.ElasticsearchAnalysisComponentParametersStep;
 import org.hibernate.search.backend.elasticsearch.analysis.model.dsl.ElasticsearchAnalysisComponentTypeStep;
 import org.hibernate.search.backend.elasticsearch.analysis.model.impl.ElasticsearchAnalysisDefinitionContributor;
-import org.hibernate.search.backend.elasticsearch.logging.impl.Log;
+import org.hibernate.search.backend.elasticsearch.logging.impl.AnalyzerLog;
 import org.hibernate.search.backend.elasticsearch.lowlevel.index.analysis.impl.AnalysisDefinition;
-import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
@@ -23,8 +21,6 @@ abstract class AbstractElasticsearchAnalysisComponentParametersStep<D extends An
 		implements ElasticsearchAnalysisComponentParametersStep,
 		ElasticsearchAnalysisComponentTypeStep,
 		ElasticsearchAnalysisDefinitionContributor {
-
-	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	protected final String name;
 
@@ -49,7 +45,7 @@ abstract class AbstractElasticsearchAnalysisComponentParametersStep<D extends An
 		}
 		JsonElement previous = parameters.putIfAbsent( name, value );
 		if ( previous != null ) {
-			throw log.analysisComponentParameterConflict( name, previous, value );
+			throw AnalyzerLog.INSTANCE.analysisComponentParameterConflict( name, previous, value );
 		}
 		return this;
 	}

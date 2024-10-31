@@ -6,7 +6,7 @@ package org.hibernate.search.backend.lucene.cfg;
 
 import static java.lang.String.join;
 
-import org.hibernate.search.backend.lucene.logging.impl.LuceneLogCategories;
+import org.hibernate.search.backend.lucene.logging.impl.LuceneInfoStreamLog;
 import org.hibernate.search.backend.lucene.lowlevel.directory.FileSystemAccessStrategyName;
 import org.hibernate.search.backend.lucene.lowlevel.directory.LockingStrategyName;
 import org.hibernate.search.backend.lucene.lowlevel.index.IOStrategyName;
@@ -176,7 +176,7 @@ public final class LuceneIndexSettings {
 	/**
 	 * Whether to log the {@link IndexWriterConfig#setInfoStream(InfoStream)} (at the trace level) or not.
 	 * <p>
-	 * Logs are appended to the logger {@value LuceneLogCategories#INFOSTREAM_LOGGER_CATEGORY_NAME}.
+	 * Logs are appended to the logger {@value LuceneInfoStreamLog#CATEGORY_NAME}.
 	 * <p>
 	 * Expects a Boolean value such as {@code true} or {@code false},
 	 * or a String that can be parsed into such Boolean value.

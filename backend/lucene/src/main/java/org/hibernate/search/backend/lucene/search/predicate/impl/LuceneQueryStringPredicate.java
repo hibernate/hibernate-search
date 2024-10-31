@@ -4,10 +4,9 @@
  */
 package org.hibernate.search.backend.lucene.search.predicate.impl;
 
-import java.lang.invoke.MethodHandles;
 import java.util.Map;
 
-import org.hibernate.search.backend.lucene.logging.impl.Log;
+import org.hibernate.search.backend.lucene.logging.impl.QueryLog;
 import org.hibernate.search.backend.lucene.search.common.impl.LuceneSearchIndexScope;
 import org.hibernate.search.backend.lucene.types.predicate.impl.LuceneCommonQueryStringPredicateBuilderFieldState;
 import org.hibernate.search.engine.search.common.BooleanOperator;
@@ -19,7 +18,6 @@ import org.hibernate.search.engine.search.predicate.spi.PredicateTypeKeys;
 import org.hibernate.search.engine.search.predicate.spi.QueryStringPredicateBuilder;
 import org.hibernate.search.util.common.AssertionFailure;
 import org.hibernate.search.util.common.data.RangeBoundInclusion;
-import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
 import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.queryparser.classic.MultiFieldQueryParser;
@@ -30,8 +28,6 @@ import org.apache.lucene.search.MultiTermQuery;
 import org.apache.lucene.search.Query;
 
 public class LuceneQueryStringPredicate extends LuceneCommonQueryStringPredicate {
-
-	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	private LuceneQueryStringPredicate(Builder builder) {
 		super( builder );
@@ -108,7 +104,7 @@ public class LuceneQueryStringPredicate extends LuceneCommonQueryStringPredicate
 				return addMatchAllForBoolMustNotOnly( minimumShouldMatchConstraints.apply( queryParser.parse( queryString ) ) );
 			}
 			catch (ParseException e) {
-				throw log.queryStringParseException( queryString, e.getMessage(), e );
+				throw QueryLog.INSTANCE.queryStringParseException( queryString, e.getMessage(), e );
 			}
 		}
 

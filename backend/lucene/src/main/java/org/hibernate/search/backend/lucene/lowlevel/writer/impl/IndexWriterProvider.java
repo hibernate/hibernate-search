@@ -5,16 +5,14 @@
 package org.hibernate.search.backend.lucene.lowlevel.writer.impl;
 
 import java.io.IOException;
-import java.lang.invoke.MethodHandles;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.concurrent.locks.ReentrantLock;
 
-import org.hibernate.search.backend.lucene.logging.impl.Log;
+import org.hibernate.search.backend.lucene.logging.impl.LuceneSpecificLog;
 import org.hibernate.search.backend.lucene.lowlevel.directory.spi.DirectoryHolder;
 import org.hibernate.search.backend.lucene.resources.impl.BackendThreads;
 import org.hibernate.search.engine.common.timing.spi.TimingSource;
 import org.hibernate.search.engine.reporting.FailureHandler;
-import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 import org.hibernate.search.util.common.reporting.EventContext;
 
 import org.apache.lucene.index.IndexWriter;
@@ -26,8 +24,6 @@ import org.apache.lucene.index.MergeScheduler;
  * @author Sanne Grinovero (C) 2011 Red Hat Inc.
  */
 public class IndexWriterProvider {
-
-	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	private final String indexName;
 	private final EventContext eventContext;
@@ -87,7 +83,7 @@ public class IndexWriterProvider {
 	 * Should be used to clean up upon error.
 	 */
 	public void clearAfterFailure(Throwable throwable, Object failingOperation) {
-		log.indexWriterResetAfterFailure( eventContext );
+		LuceneSpecificLog.INSTANCE.indexWriterResetAfterFailure( eventContext );
 
 		/*
 		 * Acquire the lock so that we're sure no writer will be created for the directory before we close the current one.
@@ -126,7 +122,7 @@ public class IndexWriterProvider {
 							failureHandler,
 							this::clearAfterFailure
 					);
-					log.trace( "IndexWriter opened" );
+					LuceneSpecificLog.INSTANCE.trace( "IndexWriter opened" );
 					currentWriter.set( indexWriterDelegator );
 				}
 			}

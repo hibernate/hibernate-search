@@ -4,28 +4,27 @@
  */
 package org.hibernate.search.engine.search.common.spi;
 
-import java.lang.invoke.MethodHandles;
 import java.util.Objects;
 
-import org.hibernate.search.engine.logging.impl.Log;
+import org.hibernate.search.engine.logging.impl.MappingLog;
+import org.hibernate.search.engine.logging.impl.QueryLog;
+import org.hibernate.search.engine.reporting.impl.EngineHints;
 import org.hibernate.search.engine.reporting.spi.EventContexts;
 import org.hibernate.search.util.common.SearchException;
-import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 import org.hibernate.search.util.common.reporting.EventContext;
 
 public abstract class SearchIndexSchemaElementContextHelper {
-	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	public static <T extends SearchIndexCompositeNodeContext<?>> T throwingToComposite(SearchIndexNodeContext<?> element) {
-		throw log.invalidIndexNodeTypeNotComposite( element.relativeEventContext() );
+		throw MappingLog.INSTANCE.invalidIndexNodeTypeNotComposite( element.relativeEventContext() );
 	}
 
 	public static <T extends SearchIndexCompositeNodeContext<?>> T throwingToObjectField(SearchIndexNodeContext<?> element) {
-		throw log.invalidIndexNodeTypeNotObjectField( element.relativeEventContext() );
+		throw MappingLog.INSTANCE.invalidIndexNodeTypeNotObjectField( element.relativeEventContext() );
 	}
 
 	public static <T extends SearchIndexValueFieldContext<?>> T throwingToValueField(SearchIndexNodeContext<?> element) {
-		throw log.invalidIndexNodeTypeNotValueField( element.relativeEventContext() );
+		throw MappingLog.INSTANCE.invalidIndexNodeTypeNotValueField( element.relativeEventContext() );
 	}
 
 	public static void checkNestedDocumentPathCompatibility(SearchIndexNodeContext<?> left, SearchIndexNodeContext<?> right) {
@@ -33,7 +32,7 @@ public abstract class SearchIndexSchemaElementContextHelper {
 		String rightNestedDocumentPathHierarchy = right.nestedDocumentPath();
 
 		if ( !Objects.equals( leftNestedDocumentPathHierarchy, rightNestedDocumentPathHierarchy ) ) {
-			throw log.targetFieldsSpanningMultipleNestedPaths(
+			throw QueryLog.INSTANCE.targetFieldsSpanningMultipleNestedPaths(
 					left.absolutePath(), pathEventContext( leftNestedDocumentPathHierarchy ),
 					right.absolutePath(), pathEventContext( rightNestedDocumentPathHierarchy ) );
 		}
@@ -49,12 +48,12 @@ public abstract class SearchIndexSchemaElementContextHelper {
 	public static final SearchIndexSchemaElementContextHelper VALUE_FIELD = new SearchIndexSchemaElementContextHelper() {
 		@Override
 		protected String missingSupportHint(SearchQueryElementTypeKey<?> key) {
-			return log.missingSupportHintForValueField( key );
+			return EngineHints.INSTANCE.missingSupportHintForValueField( key );
 		}
 
 		@Override
 		public String partialSupportHint() {
-			return log.partialSupportHintForValueField();
+			return EngineHints.INSTANCE.partialSupportHintForValueField();
 		}
 
 	};
@@ -62,12 +61,12 @@ public abstract class SearchIndexSchemaElementContextHelper {
 	public static final SearchIndexSchemaElementContextHelper COMPOSITE = new SearchIndexSchemaElementContextHelper() {
 		@Override
 		protected String missingSupportHint(SearchQueryElementTypeKey<?> key) {
-			return log.missingSupportHintForCompositeNode();
+			return EngineHints.INSTANCE.missingSupportHintForCompositeNode();
 		}
 
 		@Override
 		public String partialSupportHint() {
-			return log.partialSupportHintForCompositeNode();
+			return EngineHints.INSTANCE.partialSupportHintForCompositeNode();
 		}
 	};
 
@@ -88,7 +87,7 @@ public abstract class SearchIndexSchemaElementContextHelper {
 	public <T, SC extends SearchIndexScope<?>, N extends SearchIndexNodeContext<SC>> SearchException cannotUseQueryElement(
 			SearchQueryElementTypeKey<T> key, N node, String hint,
 			Exception causeOrNull) {
-		throw log.cannotUseQueryElementForIndexNode( node.relativeEventContext(), key,
+		throw QueryLog.INSTANCE.cannotUseQueryElementForIndexNode( node.relativeEventContext(), key,
 				hint, node.eventContext(), causeOrNull );
 	}
 

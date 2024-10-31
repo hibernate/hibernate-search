@@ -5,7 +5,6 @@
 package org.hibernate.search.mapper.pojo.mapping.definition.annotation.processing.impl;
 
 import java.lang.annotation.Annotation;
-import java.lang.invoke.MethodHandles;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
@@ -14,7 +13,7 @@ import org.hibernate.search.engine.environment.bean.BeanHolder;
 import org.hibernate.search.engine.environment.bean.BeanReference;
 import org.hibernate.search.engine.environment.bean.BeanResolver;
 import org.hibernate.search.engine.reporting.spi.FailureCollector;
-import org.hibernate.search.mapper.pojo.logging.impl.Log;
+import org.hibernate.search.mapper.pojo.logging.impl.MappingLog;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.processing.ConstructorMapping;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.processing.ConstructorMappingAnnotationProcessor;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.processing.ConstructorMappingAnnotationProcessorRef;
@@ -30,14 +29,11 @@ import org.hibernate.search.mapper.pojo.mapping.definition.annotation.processing
 import org.hibernate.search.mapper.pojo.reporting.spi.PojoEventContexts;
 import org.hibernate.search.util.common.AssertionFailure;
 import org.hibernate.search.util.common.impl.SuppressingCloser;
-import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 import org.hibernate.search.util.common.reflect.impl.GenericTypeContext;
 import org.hibernate.search.util.common.reflect.impl.ReflectionUtils;
 
 @SuppressWarnings("rawtypes") // Using reflection for checks
 public class AnnotationProcessorProvider {
-
-	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	private final BeanResolver beanResolver;
 	private final FailureCollector rootFailureCollector;
@@ -227,7 +223,7 @@ public class AnnotationProcessorProvider {
 						referenceAnnotation.retrieval()
 				);
 		if ( !processorReference.isPresent() ) {
-			throw log.missingProcessorReferenceInMappingAnnotation( TypeMapping.class );
+			throw MappingLog.INSTANCE.missingProcessorReferenceInMappingAnnotation( TypeMapping.class );
 		}
 		return processorReference;
 	}
@@ -250,7 +246,7 @@ public class AnnotationProcessorProvider {
 						referenceAnnotation.retrieval()
 				);
 		if ( !processorReference.isPresent() ) {
-			throw log.missingProcessorReferenceInMappingAnnotation( ConstructorMapping.class );
+			throw MappingLog.INSTANCE.missingProcessorReferenceInMappingAnnotation( ConstructorMapping.class );
 		}
 		return processorReference;
 	}
@@ -273,7 +269,7 @@ public class AnnotationProcessorProvider {
 						referenceAnnotation.retrieval()
 				);
 		if ( !processorReference.isPresent() ) {
-			throw log.missingProcessorReferenceInMappingAnnotation( MethodParameterMapping.class );
+			throw MappingLog.INSTANCE.missingProcessorReferenceInMappingAnnotation( MethodParameterMapping.class );
 		}
 		return processorReference;
 	}
@@ -296,7 +292,7 @@ public class AnnotationProcessorProvider {
 						referenceAnnotation.retrieval()
 				);
 		if ( !processorReference.isPresent() ) {
-			throw log.missingProcessorReferenceInMappingAnnotation( PropertyMapping.class );
+			throw MappingLog.INSTANCE.missingProcessorReferenceInMappingAnnotation( PropertyMapping.class );
 		}
 		return processorReference;
 	}
@@ -315,7 +311,7 @@ public class AnnotationProcessorProvider {
 									+ processor + "'."
 					) );
 			if ( !processorAnnotationType.isAssignableFrom( encounteredAnnotationType ) ) {
-				throw log.invalidAnnotationTypeForAnnotationProcessor( processor, processorAnnotationType );
+				throw MappingLog.INSTANCE.invalidAnnotationTypeForAnnotationProcessor( processor, processorAnnotationType );
 			}
 
 			return delegateHolder;

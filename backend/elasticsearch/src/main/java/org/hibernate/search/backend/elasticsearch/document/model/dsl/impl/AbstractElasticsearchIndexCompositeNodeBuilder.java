@@ -4,13 +4,12 @@
  */
 package org.hibernate.search.backend.elasticsearch.document.model.dsl.impl;
 
-import java.lang.invoke.MethodHandles;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
 import org.hibernate.search.backend.elasticsearch.document.model.impl.ElasticsearchIndexCompositeNode;
 import org.hibernate.search.backend.elasticsearch.document.model.impl.ElasticsearchIndexField;
-import org.hibernate.search.backend.elasticsearch.logging.impl.Log;
+import org.hibernate.search.backend.elasticsearch.logging.impl.MappingLog;
 import org.hibernate.search.backend.elasticsearch.lowlevel.index.mapping.impl.AbstractTypeMapping;
 import org.hibernate.search.backend.elasticsearch.lowlevel.index.mapping.impl.DynamicType;
 import org.hibernate.search.backend.elasticsearch.search.predicate.impl.ElasticsearchNamedPredicate;
@@ -28,10 +27,8 @@ import org.hibernate.search.engine.backend.types.ObjectStructure;
 import org.hibernate.search.engine.common.tree.spi.TreeNodeInclusion;
 import org.hibernate.search.engine.search.predicate.definition.PredicateDefinition;
 import org.hibernate.search.engine.search.predicate.spi.PredicateTypeKeys;
-import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
 public abstract class AbstractElasticsearchIndexCompositeNodeBuilder implements IndexCompositeNodeBuilder {
-	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	protected final ElasticsearchIndexCompositeNodeType.Builder typeBuilder;
 
@@ -139,21 +136,21 @@ public abstract class AbstractElasticsearchIndexCompositeNodeBuilder implements 
 	private void putField(String name, ElasticsearchIndexNodeContributor contributor) {
 		Object previous = fields.putIfAbsent( name, contributor );
 		if ( previous != null ) {
-			throw log.indexSchemaNodeNameConflict( name, eventContext() );
+			throw MappingLog.INSTANCE.indexSchemaNodeNameConflict( name, eventContext() );
 		}
 	}
 
 	private void putTemplate(String name, ElasticsearchIndexNodeContributor contributor) {
 		Object previous = templates.putIfAbsent( name, contributor );
 		if ( previous != null ) {
-			throw log.indexSchemaFieldTemplateNameConflict( name, eventContext() );
+			throw MappingLog.INSTANCE.indexSchemaFieldTemplateNameConflict( name, eventContext() );
 		}
 	}
 
 	private void putNamedPredicate(String name, ElasticsearchIndexNamedPredicateOptions options) {
 		Object previous = namedPredicates.putIfAbsent( name, options );
 		if ( previous != null ) {
-			throw log.indexSchemaNamedPredicateNameConflict( name, eventContext() );
+			throw MappingLog.INSTANCE.indexSchemaNamedPredicateNameConflict( name, eventContext() );
 		}
 	}
 }

@@ -4,13 +4,11 @@
  */
 package org.hibernate.search.mapper.pojo.tenancy.spi;
 
-import java.lang.invoke.MethodHandles;
 import java.util.Objects;
 
-import org.hibernate.search.mapper.pojo.logging.impl.Log;
+import org.hibernate.search.mapper.pojo.logging.impl.FormattingLog;
 import org.hibernate.search.mapper.pojo.tenancy.TenantIdentifierConverter;
 import org.hibernate.search.util.common.annotation.Incubating;
-import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
 /**
  * A simple string-string tenant identifier converter implementation
@@ -18,7 +16,6 @@ import org.hibernate.search.util.common.logging.impl.LoggerFactory;
  */
 @Incubating
 public class StringTenantIdentifierConverter implements TenantIdentifierConverter {
-	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	public static final StringTenantIdentifierConverter INSTANCE = new StringTenantIdentifierConverter();
 
@@ -30,7 +27,7 @@ public class StringTenantIdentifierConverter implements TenantIdentifierConverte
 			return null;
 		}
 		if ( !( tenantId instanceof CharSequence ) ) {
-			throw log.nonStringTenantId( tenantId );
+			throw FormattingLog.INSTANCE.nonStringTenantId( tenantId );
 		}
 		else {
 			return Objects.toString( tenantId );

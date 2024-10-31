@@ -5,7 +5,6 @@
 package org.hibernate.search.backend.lucene.lowlevel.reader.impl;
 
 import java.io.IOException;
-import java.lang.invoke.MethodHandles;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -13,11 +12,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.hibernate.search.backend.lucene.logging.impl.Log;
+import org.hibernate.search.backend.lucene.logging.impl.LuceneSpecificLog;
 import org.hibernate.search.engine.reporting.spi.EventContexts;
 import org.hibernate.search.util.common.impl.Closer;
 import org.hibernate.search.util.common.impl.SuppressingCloser;
-import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
 import org.apache.lucene.index.DirectoryReader;
 import org.apache.lucene.index.IndexReader;
@@ -35,8 +33,6 @@ import org.apache.lucene.index.MultiReader;
  */
 public class HibernateSearchMultiReader extends MultiReader {
 
-	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
-
 	public static HibernateSearchMultiReader open(Set<String> indexNames,
 			Collection<? extends ReadIndexManagerContext> indexManagerContexts, Set<String> routingKeys) {
 		if ( indexManagerContexts.isEmpty() ) {
@@ -53,7 +49,7 @@ public class HibernateSearchMultiReader extends MultiReader {
 			catch (IOException | RuntimeException e) {
 				new SuppressingCloser( e )
 						.pushAll( builder.directoryReaders );
-				throw log.unableToOpenIndexReaders(
+				throw LuceneSpecificLog.INSTANCE.unableToOpenIndexReaders(
 						e.getMessage(), EventContexts.fromIndexNames( indexNames ), e
 				);
 			}
@@ -77,9 +73,9 @@ public class HibernateSearchMultiReader extends MultiReader {
 
 	@Override
 	protected synchronized void doClose() throws IOException {
-		final boolean traceEnabled = log.isTraceEnabled();
+		final boolean traceEnabled = LuceneSpecificLog.INSTANCE.isTraceEnabled();
 		if ( traceEnabled ) {
-			log.tracef( "Closing MultiReader: %s", this );
+			LuceneSpecificLog.INSTANCE.tracef( "Closing MultiReader: %s", this );
 		}
 		try ( Closer<IOException> closer = new Closer<>() ) {
 			/*
@@ -90,7 +86,7 @@ public class HibernateSearchMultiReader extends MultiReader {
 			closer.pushAll( DirectoryReader::decRef, directoryReaders );
 		}
 		if ( traceEnabled ) {
-			log.trace( "MultiReader closed." );
+			LuceneSpecificLog.INSTANCE.trace( "MultiReader closed." );
 		}
 	}
 

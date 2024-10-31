@@ -5,7 +5,6 @@
 package org.hibernate.search.mapper.pojo.model.models.spi;
 
 import java.lang.annotation.Annotation;
-import java.lang.invoke.MethodHandles;
 import java.lang.reflect.AnnotatedType;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Parameter;
@@ -14,17 +13,14 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Stream;
 
-import org.hibernate.search.mapper.pojo.logging.impl.Log;
+import org.hibernate.search.mapper.pojo.logging.impl.MappingLog;
 import org.hibernate.search.mapper.pojo.model.spi.PojoConstructorModel;
 import org.hibernate.search.mapper.pojo.model.spi.PojoMethodParameterModel;
 import org.hibernate.search.mapper.pojo.model.spi.PojoRawTypeModel;
 import org.hibernate.search.util.common.logging.impl.CommaSeparatedClassesFormatter;
-import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 import org.hibernate.search.util.common.reflect.spi.ValueCreateHandle;
 
 public class PojoModelsConstructorModel<T> implements PojoConstructorModel<T> {
-
-	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	private final AbstractPojoModelsBootstrapIntrospector introspector;
 	final AbstractPojoModelsRawTypeModel<T, ?> declaringTypeModel;
@@ -63,7 +59,7 @@ public class PojoModelsConstructorModel<T> implements PojoConstructorModel<T> {
 				handleCache = introspector.createValueCreateHandle( constructor );
 			}
 			catch (ReflectiveOperationException | RuntimeException e) {
-				throw log.errorRetrievingConstructorHandle( constructor, declaringTypeModel, e );
+				throw MappingLog.INSTANCE.errorRetrievingConstructorHandle( constructor, declaringTypeModel, e );
 			}
 		}
 		return handleCache;
@@ -72,11 +68,11 @@ public class PojoModelsConstructorModel<T> implements PojoConstructorModel<T> {
 	@Override
 	public PojoMethodParameterModel<?> parameter(int index) {
 		if ( index < 0 ) {
-			throw log.cannotFindConstructorParameter( this, index );
+			throw MappingLog.INSTANCE.cannotFindConstructorParameter( this, index );
 		}
 		List<PojoMethodParameterModel<?>> params = declaredParameters();
 		if ( index >= params.size() ) {
-			throw log.cannotFindConstructorParameter( this, index );
+			throw MappingLog.INSTANCE.cannotFindConstructorParameter( this, index );
 		}
 		return params.get( index );
 	}

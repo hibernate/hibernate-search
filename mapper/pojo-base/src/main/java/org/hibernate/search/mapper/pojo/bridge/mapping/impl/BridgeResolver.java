@@ -4,7 +4,6 @@
  */
 package org.hibernate.search.mapper.pojo.bridge.mapping.impl;
 
-import java.lang.invoke.MethodHandles;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.net.URI;
@@ -80,17 +79,14 @@ import org.hibernate.search.mapper.pojo.bridge.mapping.DefaultBinderDefinitionSt
 import org.hibernate.search.mapper.pojo.bridge.mapping.DefaultBridgeDefinitionStep;
 import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.IdentifierBinder;
 import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.ValueBinder;
-import org.hibernate.search.mapper.pojo.logging.impl.Log;
+import org.hibernate.search.mapper.pojo.logging.impl.MappingLog;
 import org.hibernate.search.mapper.pojo.model.spi.PojoBootstrapIntrospector;
 import org.hibernate.search.mapper.pojo.model.spi.PojoRawTypeIdentifier;
 import org.hibernate.search.mapper.pojo.model.spi.PojoTypeModel;
 import org.hibernate.search.mapper.pojo.model.typepattern.impl.TypePatternMatcher;
 import org.hibernate.search.mapper.pojo.model.typepattern.impl.TypePatternMatcherFactory;
-import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
 public final class BridgeResolver {
-
-	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	private final Map<PojoRawTypeIdentifier<?>, IdentifierBinder> exactRawTypeIdentifierBridgeMappings;
 	private final Map<PojoRawTypeIdentifier<?>, ValueBinder> exactRawTypeValueBridgeMappings;
@@ -115,7 +111,7 @@ public final class BridgeResolver {
 				typePatternIdentifierBridgeMappings
 		);
 		if ( result == null ) {
-			throw log.unableToResolveDefaultIdentifierBridgeFromSourceType( sourceType );
+			throw MappingLog.INSTANCE.unableToResolveDefaultIdentifierBridgeFromSourceType( sourceType );
 		}
 		return result;
 	}
@@ -127,7 +123,7 @@ public final class BridgeResolver {
 				typePatternValueBridgeMappings
 		);
 		if ( result == null ) {
-			throw log.unableToResolveDefaultValueBridgeFromSourceType( sourceType );
+			throw MappingLog.INSTANCE.unableToResolveDefaultValueBridgeFromSourceType( sourceType );
 		}
 		return result;
 	}

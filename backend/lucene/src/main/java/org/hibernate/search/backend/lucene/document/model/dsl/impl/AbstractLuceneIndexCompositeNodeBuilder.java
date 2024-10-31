@@ -4,13 +4,12 @@
  */
 package org.hibernate.search.backend.lucene.document.model.dsl.impl;
 
-import java.lang.invoke.MethodHandles;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
 import org.hibernate.search.backend.lucene.document.model.impl.LuceneIndexCompositeNode;
 import org.hibernate.search.backend.lucene.document.model.impl.LuceneIndexField;
-import org.hibernate.search.backend.lucene.logging.impl.Log;
+import org.hibernate.search.backend.lucene.logging.impl.MappingLog;
 import org.hibernate.search.backend.lucene.search.predicate.impl.LuceneNamedPredicate;
 import org.hibernate.search.backend.lucene.types.impl.LuceneIndexCompositeNodeType;
 import org.hibernate.search.backend.lucene.types.impl.LuceneIndexValueFieldType;
@@ -27,11 +26,9 @@ import org.hibernate.search.engine.backend.types.ObjectStructure;
 import org.hibernate.search.engine.common.tree.spi.TreeNodeInclusion;
 import org.hibernate.search.engine.search.predicate.definition.PredicateDefinition;
 import org.hibernate.search.engine.search.predicate.spi.PredicateTypeKeys;
-import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
 abstract class AbstractLuceneIndexCompositeNodeBuilder
 		implements IndexCompositeNodeBuilder, IndexSchemaBuildContext {
-	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	protected final LuceneIndexCompositeNodeType.Builder typeBuilder;
 
@@ -130,21 +127,21 @@ abstract class AbstractLuceneIndexCompositeNodeBuilder
 	private void putField(String name, LuceneIndexNodeContributor contributor) {
 		Object previous = fields.putIfAbsent( name, contributor );
 		if ( previous != null ) {
-			throw log.indexSchemaNodeNameConflict( name, eventContext() );
+			throw MappingLog.INSTANCE.indexSchemaNodeNameConflict( name, eventContext() );
 		}
 	}
 
 	private void putTemplate(String name, LuceneIndexNodeContributor contributor) {
 		Object previous = templates.putIfAbsent( name, contributor );
 		if ( previous != null ) {
-			throw log.indexSchemaFieldTemplateNameConflict( name, eventContext() );
+			throw MappingLog.INSTANCE.indexSchemaFieldTemplateNameConflict( name, eventContext() );
 		}
 	}
 
 	private void putNamedPredicate(String name, LuceneIndexNamedPredicateOptions options) {
 		Object previous = namedPredicates.putIfAbsent( name, options );
 		if ( previous != null ) {
-			throw log.indexSchemaNamedPredicateNameConflict( name, eventContext() );
+			throw MappingLog.INSTANCE.indexSchemaNamedPredicateNameConflict( name, eventContext() );
 		}
 	}
 }

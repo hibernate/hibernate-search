@@ -4,19 +4,15 @@
  */
 package org.hibernate.search.backend.elasticsearch.impl;
 
-import java.lang.invoke.MethodHandles;
 import java.util.LinkedHashSet;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
 import org.hibernate.search.backend.elasticsearch.index.layout.impl.IndexNames;
-import org.hibernate.search.backend.elasticsearch.logging.impl.Log;
-import org.hibernate.search.util.common.logging.impl.LoggerFactory;
+import org.hibernate.search.backend.elasticsearch.logging.impl.MappingLog;
 
 final class IndexNamesRegistry {
-
-	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	private final Map<String, IndexNames> indexNamesByName = new ConcurrentHashMap<>();
 
@@ -33,7 +29,7 @@ final class IndexNamesRegistry {
 		for ( String name : names ) {
 			IndexNames existingIndexNames = indexNamesByName.putIfAbsent( name, newIndexNames );
 			if ( existingIndexNames != null ) {
-				throw log.conflictingIndexNames(
+				throw MappingLog.INSTANCE.conflictingIndexNames(
 						existingIndexNames.hibernateSearchIndex(),
 						newIndexNames.hibernateSearchIndex(),
 						name

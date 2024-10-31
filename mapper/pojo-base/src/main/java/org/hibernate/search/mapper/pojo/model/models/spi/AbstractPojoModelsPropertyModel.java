@@ -5,7 +5,6 @@
 package org.hibernate.search.mapper.pojo.model.models.spi;
 
 import java.lang.annotation.Annotation;
-import java.lang.invoke.MethodHandles;
 import java.lang.reflect.Field;
 import java.lang.reflect.Member;
 import java.lang.reflect.Method;
@@ -14,18 +13,15 @@ import java.util.List;
 import java.util.stream.Stream;
 
 import org.hibernate.models.spi.MemberDetails;
-import org.hibernate.search.mapper.pojo.logging.impl.Log;
+import org.hibernate.search.mapper.pojo.logging.impl.MappingLog;
 import org.hibernate.search.mapper.pojo.model.spi.PojoPropertyModel;
 import org.hibernate.search.mapper.pojo.model.spi.PojoTypeModel;
 import org.hibernate.search.util.common.AssertionFailure;
 import org.hibernate.search.util.common.impl.Contracts;
-import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 import org.hibernate.search.util.common.reflect.spi.ValueReadHandle;
 
 public abstract class AbstractPojoModelsPropertyModel<T, I extends AbstractPojoModelsBootstrapIntrospector>
 		implements PojoPropertyModel<T> {
-
-	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	protected final I introspector;
 	protected final AbstractPojoModelsRawTypeModel<?, I> holderTypeModel;
@@ -76,7 +72,7 @@ public abstract class AbstractPojoModelsPropertyModel<T, I extends AbstractPojoM
 						.memberTypeReference( getterGenericReturnType() );
 			}
 			catch (RuntimeException e) {
-				throw log.errorRetrievingPropertyTypeModel( name(), holderTypeModel, e );
+				throw MappingLog.INSTANCE.errorRetrievingPropertyTypeModel( name(), holderTypeModel, e );
 			}
 		}
 		return typeModelCache;
@@ -89,7 +85,7 @@ public abstract class AbstractPojoModelsPropertyModel<T, I extends AbstractPojoM
 				handleCache = createHandle( member() );
 			}
 			catch (ReflectiveOperationException | RuntimeException e) {
-				throw log.errorRetrievingPropertyTypeModel( name(), holderTypeModel, e );
+				throw MappingLog.INSTANCE.errorRetrievingPropertyTypeModel( name(), holderTypeModel, e );
 			}
 		}
 		return handleCache;
@@ -99,7 +95,8 @@ public abstract class AbstractPojoModelsPropertyModel<T, I extends AbstractPojoM
 		if ( memberCache == null ) {
 			memberCache = members.get( 0 );
 			if ( members.size() > 1 ) {
-				log.arbitraryMemberSelection( holderTypeModel, name, memberCache, members.subList( 1, members.size() ) );
+				MappingLog.INSTANCE.arbitraryMemberSelection( holderTypeModel, name, memberCache,
+						members.subList( 1, members.size() ) );
 			}
 		}
 		return memberCache;

@@ -4,8 +4,9 @@
  */
 package org.hibernate.search.integrationtest.backend.tck.testsupport.util.extension;
 
+import static org.hibernate.search.integrationtest.backend.tck.reporting.TestLog.TCK_LOGGER;
+
 import java.io.IOException;
-import java.lang.invoke.MethodHandles;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -32,8 +33,6 @@ import org.hibernate.search.integrationtest.backend.tck.testsupport.util.TckBack
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.TckBackendSetupStrategy;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.TckConfiguration;
 import org.hibernate.search.util.common.impl.Closer;
-import org.hibernate.search.util.common.logging.impl.Log;
-import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 import org.hibernate.search.util.impl.integrationtest.common.TestConfigurationProvider;
 import org.hibernate.search.util.impl.integrationtest.common.bean.ForbiddenBeanProvider;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappedIndex;
@@ -49,8 +48,6 @@ import org.junit.jupiter.api.extension.ExtensionContext;
 import org.junit.jupiter.api.extension.TestExecutionExceptionHandler;
 
 public class SearchSetupHelper extends AbstractScopeTrackingExtension implements TestExecutionExceptionHandler {
-
-	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	private final TestConfigurationProvider configurationProvider = new TestConfigurationProvider();
 	private TckBackendSetupStrategy<?> setupStrategy;
@@ -142,7 +139,7 @@ public class SearchSetupHelper extends AbstractScopeTrackingExtension implements
 	public void handleTestExecutionException(ExtensionContext context, Throwable throwable) throws Throwable {
 		// When used as a "ClassExtension", exceptions are not properly reported by JUnit.
 		// Log them so that we have something in the logs, at least.
-		log.warn(
+		TCK_LOGGER.warn(
 				"Exception thrown by test and caught by SearchSetupHelper rule: " + throwable.getMessage(),
 				throwable
 		);

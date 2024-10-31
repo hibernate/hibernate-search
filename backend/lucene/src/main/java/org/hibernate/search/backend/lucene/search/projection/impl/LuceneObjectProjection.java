@@ -7,8 +7,10 @@ package org.hibernate.search.backend.lucene.search.projection.impl;
 import java.io.IOException;
 import java.util.Arrays;
 
+import org.hibernate.search.backend.lucene.logging.impl.QueryLog;
 import org.hibernate.search.backend.lucene.lowlevel.collector.impl.TopDocsDataCollectorExecutionContext;
 import org.hibernate.search.backend.lucene.lowlevel.collector.impl.Values;
+import org.hibernate.search.backend.lucene.reporting.impl.LuceneSearchHints;
 import org.hibernate.search.backend.lucene.search.common.impl.AbstractLuceneCompositeNodeSearchQueryElementFactory;
 import org.hibernate.search.backend.lucene.search.common.impl.LuceneSearchIndexCompositeNodeContext;
 import org.hibernate.search.backend.lucene.search.common.impl.LuceneSearchIndexScope;
@@ -77,7 +79,7 @@ public class LuceneObjectProjection<E, V, P>
 	public Extractor<?, P> request(ProjectionRequestContext context) {
 		ProjectionRequestContext innerContext = context.forField( absoluteFieldPath, nested );
 		if ( !context.projectionCardinalityCorrectlyAddressed( requiredContextAbsoluteFieldPath ) ) {
-			throw log.invalidSingleValuedProjectionOnValueFieldInMultiValuedObjectField(
+			throw QueryLog.INSTANCE.invalidSingleValuedProjectionOnValueFieldInMultiValuedObjectField(
 					absoluteFieldPath, requiredContextAbsoluteFieldPath );
 		}
 		Extractor<?, ?>[] innerExtractors = new Extractor[inners.length];
@@ -187,7 +189,8 @@ public class LuceneObjectProjection<E, V, P>
 			if ( !node.type().nested() ) {
 				if ( node.multiValued() ) {
 					throw node.cannotUseQueryElement( ProjectionTypeKeys.OBJECT,
-							log.missingSupportHintForObjectProjectionOnMultiValuedFlattenedObjectNode(), null );
+							LuceneSearchHints.INSTANCE.missingSupportHintForObjectProjectionOnMultiValuedFlattenedObjectNode(),
+							null );
 				}
 				try {
 					filter = LuceneSearchPredicate.from( scope, node.queryElement( PredicateTypeKeys.EXISTS, scope ).build() )
@@ -201,7 +204,8 @@ public class LuceneObjectProjection<E, V, P>
 			}
 			if ( node.multiValued() && !node.type().nested() ) {
 				throw node.cannotUseQueryElement( ProjectionTypeKeys.OBJECT,
-						log.missingSupportHintForObjectProjectionOnMultiValuedFlattenedObjectNode(), null );
+						LuceneSearchHints.INSTANCE.missingSupportHintForObjectProjectionOnMultiValuedFlattenedObjectNode(),
+						null );
 			}
 			return new Builder( scope, node, filter );
 		}
@@ -223,7 +227,7 @@ public class LuceneObjectProjection<E, V, P>
 		public <E, V, P> SearchProjection<P> build(SearchProjection<?>[] inners, ProjectionCompositor<E, V> compositor,
 				ProjectionCollector.Provider<V, P> collectorProvider) {
 			if ( collectorProvider.isSingleValued() && objectField.multiValued() ) {
-				throw log.invalidSingleValuedProjectionOnMultiValuedField( objectField.absolutePath(),
+				throw QueryLog.INSTANCE.invalidSingleValuedProjectionOnMultiValuedField( objectField.absolutePath(),
 						objectField.eventContext() );
 			}
 			LuceneSearchProjection<?>[] typedInners =

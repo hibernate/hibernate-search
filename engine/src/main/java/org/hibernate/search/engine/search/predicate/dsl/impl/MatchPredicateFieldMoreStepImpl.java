@@ -4,13 +4,12 @@
  */
 package org.hibernate.search.engine.search.predicate.dsl.impl;
 
-import java.lang.invoke.MethodHandles;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.function.Consumer;
 
-import org.hibernate.search.engine.logging.impl.Log;
+import org.hibernate.search.engine.logging.impl.QueryLog;
 import org.hibernate.search.engine.search.common.ValueModel;
 import org.hibernate.search.engine.search.common.spi.SearchIndexScope;
 import org.hibernate.search.engine.search.predicate.SearchPredicate;
@@ -22,13 +21,10 @@ import org.hibernate.search.engine.search.predicate.spi.MatchPredicateBuilder;
 import org.hibernate.search.engine.search.predicate.spi.MinimumShouldMatchBuilder;
 import org.hibernate.search.engine.search.predicate.spi.PredicateTypeKeys;
 import org.hibernate.search.util.common.impl.Contracts;
-import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
 class MatchPredicateFieldMoreStepImpl
 		implements MatchPredicateFieldMoreStep<MatchPredicateFieldMoreStepImpl, MatchPredicateOptionsStep<?>>,
 		AbstractBooleanMultiFieldPredicateCommonState.FieldSetState {
-
-	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	private final CommonState commonState;
 
@@ -95,10 +91,10 @@ class MatchPredicateFieldMoreStepImpl
 		@Override
 		public CommonState fuzzy(int maxEditDistance, int exactPrefixLength) {
 			if ( maxEditDistance < 0 || 2 < maxEditDistance ) {
-				throw log.invalidFuzzyMaximumEditDistance( maxEditDistance );
+				throw QueryLog.INSTANCE.invalidFuzzyMaximumEditDistance( maxEditDistance );
 			}
 			if ( exactPrefixLength < 0 ) {
-				throw log.invalidExactPrefixLength( exactPrefixLength );
+				throw QueryLog.INSTANCE.invalidExactPrefixLength( exactPrefixLength );
 			}
 
 			for ( MatchPredicateFieldMoreStepImpl fieldSetState : getFieldSetStates() ) {

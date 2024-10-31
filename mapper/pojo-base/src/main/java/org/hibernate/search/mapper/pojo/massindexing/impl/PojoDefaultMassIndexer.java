@@ -4,14 +4,13 @@
  */
 package org.hibernate.search.mapper.pojo.massindexing.impl;
 
-import java.lang.invoke.MethodHandles;
 import java.util.List;
 import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutorService;
 
 import org.hibernate.search.engine.tenancy.spi.TenancyMode;
-import org.hibernate.search.mapper.pojo.logging.impl.Log;
+import org.hibernate.search.mapper.pojo.logging.impl.MassIndexingLog;
 import org.hibernate.search.mapper.pojo.massindexing.MassIndexingDefaultCleanOperation;
 import org.hibernate.search.mapper.pojo.massindexing.MassIndexingEnvironment;
 import org.hibernate.search.mapper.pojo.massindexing.MassIndexingFailureHandler;
@@ -22,7 +21,6 @@ import org.hibernate.search.mapper.pojo.massindexing.spi.PojoMassIndexingMapping
 import org.hibernate.search.mapper.pojo.schema.management.spi.PojoScopeSchemaManager;
 import org.hibernate.search.mapper.pojo.scope.spi.PojoScopeDelegate;
 import org.hibernate.search.util.common.impl.Futures;
-import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
 /**
  * Prepares and configures a BatchIndexingWorkspace to start rebuilding
@@ -33,7 +31,6 @@ import org.hibernate.search.util.common.logging.impl.LoggerFactory;
  */
 public class PojoDefaultMassIndexer implements PojoMassIndexer {
 
-	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 	private static final MassIndexingEnvironment DO_NOTHING_ENVIRONMENT = new MassIndexingEnvironment() {
 		@Override
 		public void beforeExecution(Context context) {
@@ -183,12 +180,12 @@ public class PojoDefaultMassIndexer implements PojoMassIndexer {
 		boolean actualDropAndCreateSchemaOnStart = Boolean.TRUE.equals( dropAndCreateSchemaOnStart );
 		if ( actualDropAndCreateSchemaOnStart ) {
 			if ( Boolean.TRUE.equals( purgeAtStart ) ) {
-				log.redundantPurgeAfterDrop();
+				MassIndexingLog.INSTANCE.redundantPurgeAfterDrop();
 			}
 			if ( TenancyMode.MULTI_TENANCY.equals( massIndexingContext.tenancyMode() ) ) {
 				// Users are not setting the tenants explicitly,
 				//  hence if multitenancy is enabled we cannot  drop the schema:
-				throw log.schemaDropNotAllowedWithMultitenancy( massIndexingContext.tenantIds() );
+				throw MassIndexingLog.INSTANCE.schemaDropNotAllowedWithMultitenancy( massIndexingContext.tenantIds() );
 			}
 		}
 

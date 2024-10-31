@@ -4,7 +4,6 @@
  */
 package org.hibernate.search.mapper.pojo.massindexing.impl;
 
-import java.lang.invoke.MethodHandles;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
@@ -17,21 +16,18 @@ import org.hibernate.search.mapper.pojo.loading.spi.PojoMassEntityLoadingContext
 import org.hibernate.search.mapper.pojo.loading.spi.PojoMassEntitySink;
 import org.hibernate.search.mapper.pojo.loading.spi.PojoMassLoadingContext;
 import org.hibernate.search.mapper.pojo.loading.spi.PojoMassLoadingStrategy;
-import org.hibernate.search.mapper.pojo.logging.impl.Log;
+import org.hibernate.search.mapper.pojo.logging.impl.MassIndexingLog;
 import org.hibernate.search.mapper.pojo.massindexing.MassIndexingEnvironment;
 import org.hibernate.search.mapper.pojo.massindexing.MassIndexingTypeGroupMonitor;
 import org.hibernate.search.mapper.pojo.massindexing.spi.PojoMassIndexingContext;
 import org.hibernate.search.mapper.pojo.massindexing.spi.PojoMassIndexingSessionContext;
 import org.hibernate.search.mapper.pojo.model.spi.PojoRawTypeIdentifier;
+import org.hibernate.search.mapper.pojo.reporting.impl.PojoMassIndexerMessages;
 import org.hibernate.search.mapper.pojo.work.spi.PojoIndexer;
 import org.hibernate.search.util.common.impl.Futures;
 import org.hibernate.search.util.common.impl.Throwables;
-import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
-public class PojoMassIndexingEntityLoadingRunnable<E, I>
-		extends PojoMassIndexingFailureHandledRunnable {
-
-	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
+public class PojoMassIndexingEntityLoadingRunnable<E, I> extends PojoMassIndexingFailureHandledRunnable {
 
 	private final MassIndexingTypeGroupMonitor typeGroupMonitor;
 	private final PojoMassIndexingContext massIndexingContext;
@@ -61,7 +57,7 @@ public class PojoMassIndexingEntityLoadingRunnable<E, I>
 
 	@Override
 	protected void runWithFailureHandler() throws InterruptedException {
-		log.trace( "started" );
+		MassIndexingLog.INSTANCE.trace( "started loading entities" );
 		LoadingContext context = new LoadingContext();
 		try ( PojoMassEntityLoader<I> entityLoader =
 				loadingStrategy.createEntityLoader( typeGroup.includedTypes(), context ) ) {
@@ -69,7 +65,7 @@ public class PojoMassIndexingEntityLoadingRunnable<E, I>
 			do {
 				idList = identifierQueue.take();
 				if ( idList != null ) {
-					log.tracef( "received list of ids %s", idList );
+					MassIndexingLog.INSTANCE.tracef( "received list of ids %s", idList );
 					// This will pass the loaded entities to the sink, which will trigger indexing for those entities.
 					try {
 						entityLoader.load( idList );
@@ -82,7 +78,7 @@ public class PojoMassIndexingEntityLoadingRunnable<E, I>
 			while ( idList != null );
 			context.waitForLastBatches();
 		}
-		log.trace( "finished" );
+		MassIndexingLog.INSTANCE.trace( "finished loading entities" );
 	}
 
 	@Override
@@ -107,7 +103,7 @@ public class PojoMassIndexingEntityLoadingRunnable<E, I>
 
 	@Override
 	protected String operationName() {
-		return log.massIndexingLoadingAndExtractingEntityData( typeGroup.notifiedGroupName() );
+		return PojoMassIndexerMessages.INSTANCE.massIndexingLoadingAndExtractingEntityData( typeGroup.notifiedGroupName() );
 	}
 
 	private final class LoadingContext implements PojoMassEntityLoadingContext<E> {

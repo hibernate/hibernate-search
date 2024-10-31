@@ -4,17 +4,14 @@
  */
 package org.hibernate.search.mapper.orm.outboxpolling.cluster.impl;
 
-import java.lang.invoke.MethodHandles;
 import java.time.Instant;
 import java.util.Collections;
 
-import org.hibernate.search.mapper.orm.outboxpolling.logging.impl.Log;
-import org.hibernate.search.util.common.logging.impl.LoggerFactory;
+import org.hibernate.search.mapper.orm.outboxpolling.logging.impl.OutboxPollingEventsLog;
 import org.hibernate.search.util.common.spi.ToStringTreeAppendable;
 import org.hibernate.search.util.common.spi.ToStringTreeAppender;
 
 public final class AgentPersister implements ToStringTreeAppendable {
-	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	private final AgentType type;
 	private final String name;
@@ -61,7 +58,7 @@ public final class AgentPersister implements ToStringTreeAppendable {
 		Agent self = new Agent( type, name, expiration, AgentState.SUSPENDED, staticShardAssignment );
 		agentRepository.create( self );
 		selfReference = self.getReference();
-		log.infof( "Agent '%s': registering", selfReference );
+		OutboxPollingEventsLog.INSTANCE.infof( "Agent '%s': registering", selfReference );
 	}
 
 	public void leaveCluster(AgentRepository store) {
@@ -69,7 +66,7 @@ public final class AgentPersister implements ToStringTreeAppendable {
 			// We never even joined the cluster
 			return;
 		}
-		log.infof( "Agent '%s': leaving cluster", selfReference );
+		OutboxPollingEventsLog.INSTANCE.infof( "Agent '%s': leaving cluster", selfReference );
 		Agent agent = store.find( selfReference.id );
 		if ( agent != null ) {
 			store.delete( Collections.singletonList( agent ) );
@@ -78,7 +75,7 @@ public final class AgentPersister implements ToStringTreeAppendable {
 
 	public void setSuspended(Agent self) {
 		if ( self.getState() != AgentState.SUSPENDED ) {
-			log.infof( "Agent '%s': suspending", selfReference );
+			OutboxPollingEventsLog.INSTANCE.infof( "Agent '%s': suspending", selfReference );
 			self.setState( AgentState.SUSPENDED );
 		}
 		if ( staticShardAssignment == null ) {
@@ -90,7 +87,7 @@ public final class AgentPersister implements ToStringTreeAppendable {
 	public void setWaiting(Agent self, ClusterDescriptor clusterDescriptor,
 			ShardAssignmentDescriptor shardAssignment) {
 		if ( self.getState() != AgentState.WAITING ) {
-			log.infof( "Agent '%s': waiting for cluster changes. Shard assignment: %s. Cluster: %s",
+			OutboxPollingEventsLog.INSTANCE.infof( "Agent '%s': waiting for cluster changes. Shard assignment: %s. Cluster: %s",
 					selfReference, shardAssignment, clusterDescriptor );
 			self.setState( AgentState.WAITING );
 		}
@@ -102,7 +99,7 @@ public final class AgentPersister implements ToStringTreeAppendable {
 
 	public void setRunning(Agent self, ClusterDescriptor clusterDescriptor) {
 		if ( self.getState() != AgentState.RUNNING ) {
-			log.infof( "Agent '%s': running. Shard assignment: %s. Cluster: %s",
+			OutboxPollingEventsLog.INSTANCE.infof( "Agent '%s': running. Shard assignment: %s. Cluster: %s",
 					selfReference, self.getShardAssignment(), clusterDescriptor );
 			self.setState( AgentState.RUNNING );
 		}

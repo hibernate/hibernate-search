@@ -4,7 +4,6 @@
  */
 package org.hibernate.search.backend.elasticsearch.types.dsl.impl;
 
-import java.lang.invoke.MethodHandles;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.EnumSet;
@@ -12,7 +11,8 @@ import java.util.HashSet;
 import java.util.Locale;
 import java.util.Set;
 
-import org.hibernate.search.backend.elasticsearch.logging.impl.Log;
+import org.hibernate.search.backend.elasticsearch.logging.impl.AnalyzerLog;
+import org.hibernate.search.backend.elasticsearch.logging.impl.MappingLog;
 import org.hibernate.search.backend.elasticsearch.lowlevel.index.mapping.impl.DataTypes;
 import org.hibernate.search.backend.elasticsearch.lowlevel.index.mapping.impl.PropertyMapping;
 import org.hibernate.search.backend.elasticsearch.search.aggregation.impl.ElasticsearchTermsAggregation;
@@ -46,15 +46,12 @@ import org.hibernate.search.engine.search.projection.spi.ProjectionTypeKeys;
 import org.hibernate.search.engine.search.sort.spi.SortTypeKeys;
 import org.hibernate.search.util.common.AssertionFailure;
 import org.hibernate.search.util.common.impl.Contracts;
-import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
 import com.google.gson.JsonPrimitive;
 
 class ElasticsearchStringIndexFieldTypeOptionsStep
 		extends AbstractElasticsearchStandardIndexFieldTypeOptionsStep<ElasticsearchStringIndexFieldTypeOptionsStep, String>
 		implements StringIndexFieldTypeOptionsStep<ElasticsearchStringIndexFieldTypeOptionsStep> {
-
-	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	private String analyzerName;
 	private String searchAnalyzerName;
@@ -166,19 +163,21 @@ class ElasticsearchStringIndexFieldTypeOptionsStep
 			}
 
 			if ( normalizerName != null ) {
-				throw log.cannotApplyAnalyzerAndNormalizer( analyzerName, normalizerName, buildContext.getEventContext() );
+				throw AnalyzerLog.INSTANCE.cannotApplyAnalyzerAndNormalizer( analyzerName, normalizerName,
+						buildContext.getEventContext() );
 			}
 
 			if ( resolvedSortable ) {
-				throw log.cannotUseAnalyzerOnSortableField( analyzerName, buildContext.getEventContext() );
+				throw AnalyzerLog.INSTANCE.cannotUseAnalyzerOnSortableField( analyzerName, buildContext.getEventContext() );
 			}
 
 			if ( indexNullAs != null ) {
-				throw log.cannotUseIndexNullAsAndAnalyzer( analyzerName, indexNullAs, buildContext.getEventContext() );
+				throw AnalyzerLog.INSTANCE.cannotUseIndexNullAsAndAnalyzer( analyzerName, indexNullAs,
+						buildContext.getEventContext() );
 			}
 
 			if ( resolvedAggregable ) {
-				throw log.cannotUseAnalyzerOnAggregableField( analyzerName, buildContext.getEventContext() );
+				throw AnalyzerLog.INSTANCE.cannotUseAnalyzerOnAggregableField( analyzerName, buildContext.getEventContext() );
 			}
 		}
 		else {
@@ -189,7 +188,7 @@ class ElasticsearchStringIndexFieldTypeOptionsStep
 			builder.normalizerName( normalizerName );
 
 			if ( searchAnalyzerName != null ) {
-				throw log.searchAnalyzerWithoutAnalyzer( searchAnalyzerName, buildContext.getEventContext() );
+				throw AnalyzerLog.INSTANCE.searchAnalyzerWithoutAnalyzer( searchAnalyzerName, buildContext.getEventContext() );
 			}
 		}
 
@@ -266,7 +265,7 @@ class ElasticsearchStringIndexFieldTypeOptionsStep
 				return termVector.name().toLowerCase( Locale.ROOT );
 			}
 			else {
-				throw log.termVectorDontAllowFastVectorHighlighter( termVector );
+				throw MappingLog.INSTANCE.termVectorDontAllowFastVectorHighlighter( termVector );
 			}
 		}
 		else {
@@ -285,7 +284,7 @@ class ElasticsearchStringIndexFieldTypeOptionsStep
 			highlightable = EnumSet.of( Highlightable.DEFAULT );
 		}
 		if ( highlightable.isEmpty() ) {
-			throw log.noHighlightableProvided();
+			throw MappingLog.INSTANCE.noHighlightableProvided();
 		}
 		if ( highlightable.contains( Highlightable.DEFAULT ) ) {
 			if ( TermVector.WITH_POSITIONS_OFFSETS.equals( termVector )
@@ -301,7 +300,7 @@ class ElasticsearchStringIndexFieldTypeOptionsStep
 				return Collections.emptySet();
 			}
 			else {
-				throw log.unsupportedMixOfHighlightableValues( highlightable );
+				throw MappingLog.INSTANCE.unsupportedMixOfHighlightableValues( highlightable );
 			}
 		}
 		if ( highlightable.contains( Highlightable.ANY ) ) {

@@ -4,23 +4,18 @@
  */
 package org.hibernate.search.mapper.orm.session.impl;
 
-import java.lang.invoke.MethodHandles;
-
 import jakarta.transaction.Status;
 import jakarta.transaction.Synchronization;
 
 import org.hibernate.Transaction;
-import org.hibernate.search.mapper.orm.logging.impl.Log;
+import org.hibernate.search.mapper.orm.logging.impl.IndexingLog;
 import org.hibernate.search.mapper.pojo.work.spi.ConfiguredIndexingPlanSynchronizationStrategy;
 import org.hibernate.search.mapper.pojo.work.spi.PojoIndexingPlan;
-import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
 /**
  * Executes the indexing plan inside the transaction, before the commit.
  */
 class BeforeCommitIndexingPlanSynchronization implements Synchronization {
-
-	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	private final PojoIndexingPlan indexingPlan;
 	private final HibernateOrmSearchSessionHolder sessionHolder;
@@ -38,7 +33,7 @@ class BeforeCommitIndexingPlanSynchronization implements Synchronization {
 
 	@Override
 	public void beforeCompletion() {
-		log.tracef( "Processing Transaction's afterCompletion() phase for %s. Executing indexing plan.",
+		IndexingLog.INSTANCE.tracef( "Processing Transaction's afterCompletion() phase for %s. Executing indexing plan.",
 				transactionIdentifier );
 		synchronizationStrategy.executeAndSynchronize( indexingPlan );
 	}
@@ -47,7 +42,7 @@ class BeforeCommitIndexingPlanSynchronization implements Synchronization {
 	public void afterCompletion(int i) {
 		try {
 			if ( Status.STATUS_COMMITTED != i ) {
-				log.tracef(
+				IndexingLog.INSTANCE.tracef(
 						"Processing Transaction's afterCompletion() phase for %s. Cancelling work due to transaction status %d",
 						transactionIdentifier,
 						i

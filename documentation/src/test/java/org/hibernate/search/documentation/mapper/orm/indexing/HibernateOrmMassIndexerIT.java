@@ -6,10 +6,10 @@ package org.hibernate.search.documentation.mapper.orm.indexing;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.awaitility.Awaitility.await;
+import static org.hibernate.search.documentation.testsupport.logging.TestLog.DOCUMENTATION_TEST_LOGGER;
 import static org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmUtils.with;
 import static org.hibernate.search.util.impl.test.FutureAssert.assertThatFuture;
 
-import java.lang.invoke.MethodHandles;
 import java.time.Year;
 import java.util.concurrent.CompletionStage;
 import java.util.concurrent.Future;
@@ -20,14 +20,10 @@ import org.hibernate.search.documentation.testsupport.BackendConfigurations;
 import org.hibernate.search.mapper.orm.Search;
 import org.hibernate.search.mapper.orm.massindexing.MassIndexer;
 import org.hibernate.search.mapper.orm.session.SearchSession;
-import org.hibernate.search.util.common.logging.impl.Log;
-import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
 import org.junit.jupiter.api.Test;
 
 class HibernateOrmMassIndexerIT extends AbstractHibernateOrmMassIndexingIT {
-
-	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	@Test
 	void simple() {
@@ -112,10 +108,10 @@ class HibernateOrmMassIndexerIT extends AbstractHibernateOrmMassIndexingIT {
 							// tag::async[]
 							.start() // <2>
 							.thenRun( () -> { // <3>
-								log.info( "Mass indexing succeeded!" );
+								DOCUMENTATION_TEST_LOGGER.info( "Mass indexing succeeded!" );
 							} )
 							.exceptionally( throwable -> {
-								log.error( "Mass indexing failed!", throwable );
+								DOCUMENTATION_TEST_LOGGER.error( "Mass indexing failed!", throwable );
 								return null;
 							} );
 			// end::async[]

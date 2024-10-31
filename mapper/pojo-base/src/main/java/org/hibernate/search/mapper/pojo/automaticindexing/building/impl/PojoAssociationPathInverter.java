@@ -4,7 +4,6 @@
  */
 package org.hibernate.search.mapper.pojo.automaticindexing.building.impl;
 
-import java.lang.invoke.MethodHandles;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
@@ -16,7 +15,7 @@ import java.util.Set;
 import org.hibernate.search.mapper.pojo.extractor.impl.BoundContainerExtractorPath;
 import org.hibernate.search.mapper.pojo.extractor.impl.ContainerExtractorBinder;
 import org.hibernate.search.mapper.pojo.extractor.mapping.programmatic.ContainerExtractorPath;
-import org.hibernate.search.mapper.pojo.logging.impl.Log;
+import org.hibernate.search.mapper.pojo.logging.impl.MappingLog;
 import org.hibernate.search.mapper.pojo.model.additionalmetadata.building.impl.PojoTypeAdditionalMetadataProvider;
 import org.hibernate.search.mapper.pojo.model.additionalmetadata.impl.PojoPropertyAdditionalMetadata;
 import org.hibernate.search.mapper.pojo.model.additionalmetadata.impl.PojoTypeAdditionalMetadata;
@@ -31,14 +30,12 @@ import org.hibernate.search.mapper.pojo.model.path.impl.BoundPojoModelPathValueN
 import org.hibernate.search.mapper.pojo.model.spi.PojoPropertyModel;
 import org.hibernate.search.mapper.pojo.model.spi.PojoRawTypeModel;
 import org.hibernate.search.mapper.pojo.model.spi.PojoTypeModel;
-import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
 /**
  * An object responsible for inverting an association path,
  * i.e. a chain of properties and container value extractors going from one entity to another.
  */
 final class PojoAssociationPathInverter {
-	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	private final PojoTypeAdditionalMetadataProvider typeAdditionalMetadataProvider;
 	private final ContainerExtractorBinder extractorBinder;
@@ -245,7 +242,7 @@ final class PojoAssociationPathInverter {
 
 		if ( inverseSideValueAdditionalMetadata.isAssociationEmbedded() ) {
 			if ( encounteredAssociationHoldingTypes.contains( rawExtractedTypeModel ) ) {
-				throw log.infiniteRecursionForAssociationEmbeddeds(
+				throw MappingLog.INSTANCE.infiniteRecursionForAssociationEmbeddeds(
 						inverseSidePathValueNode.getRootType().rawType(),
 						inverseSidePathValueNode.toUnboundPath()
 				);

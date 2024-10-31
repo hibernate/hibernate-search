@@ -6,7 +6,6 @@ package org.hibernate.search.bridge.builtin.impl;
 
 import static java.util.function.Predicate.isEqual;
 
-import java.lang.invoke.MethodHandles;
 import java.util.function.Function;
 import java.util.stream.Collector;
 
@@ -33,18 +32,15 @@ import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.PropertyBind
 import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.TypeBinder;
 import org.hibernate.search.mapper.pojo.bridge.runtime.PropertyBridgeWriteContext;
 import org.hibernate.search.mapper.pojo.bridge.runtime.TypeBridgeWriteContext;
-import org.hibernate.search.mapper.pojo.logging.impl.Log;
 import org.hibernate.search.mapper.pojo.model.PojoElementAccessor;
 import org.hibernate.search.mapper.pojo.model.PojoModelCompositeElement;
 import org.hibernate.search.mapper.pojo.model.PojoModelType;
 import org.hibernate.search.spatial.Coordinates;
 import org.hibernate.search.spatial.impl.Point;
 import org.hibernate.search.util.common.impl.StreamHelper;
-import org.hibernate.search.util.common.logging.impl.LoggerFactory;
+import org.hibernate.search.util.logging.impl.MigrationHelperLog;
 
 public class CoordinatesBridge implements TypeBridge<Object>, PropertyBridge<Object> {
-
-	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	private final Function<Object, GeoPoint> coordinatesExtractor;
 	private final IndexFieldReference<GeoPoint> indexFieldReference;
@@ -204,8 +200,8 @@ public class CoordinatesBridge implements TypeBridge<Object>, PropertyBridge<Obj
 		private static Collector<PojoModelCompositeElement, ?, PojoModelCompositeElement> singleMarkedProperty(
 				String markerName, String fieldName, String markerSet) {
 			return StreamHelper.singleElement(
-					() -> log.unableToFindLongitudeOrLatitudeProperty( markerName, fieldName, markerSet ),
-					() -> log.multipleLatitudeOrLongitudeProperties( markerName, fieldName, markerSet )
+					() -> MigrationHelperLog.INSTANCE.unableToFindLongitudeOrLatitudeProperty( markerName, fieldName, markerSet ),
+					() -> MigrationHelperLog.INSTANCE.multipleLatitudeOrLongitudeProperties( markerName, fieldName, markerSet )
 			);
 		}
 	}

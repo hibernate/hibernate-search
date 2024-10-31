@@ -17,8 +17,8 @@ import org.hibernate.search.engine.search.predicate.dsl.SimpleQueryStringPredica
 import org.hibernate.search.engine.search.predicate.dsl.SimpleQueryStringPredicateFieldStep;
 import org.hibernate.search.engine.search.predicate.dsl.SimpleQueryStringPredicateOptionsStep;
 import org.hibernate.search.query.dsl.SimpleQueryStringTermination;
-import org.hibernate.search.util.logging.impl.Log;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
+import org.hibernate.search.util.logging.impl.MigrationHelperLog;
 
 import org.apache.lucene.search.Query;
 
@@ -27,7 +27,7 @@ import org.apache.lucene.search.Query;
  */
 public class ConnectedMultiFieldsSimpleQueryStringQueryBuilder implements SimpleQueryStringTermination {
 
-	private static final Log log = LoggerFactory.make( MethodHandles.lookup() );
+	private static final MigrationHelperLog log = LoggerFactory.make( MethodHandles.lookup() );
 
 	private final QueryBuildingContext queryContext;
 	private final QueryCustomizer queryCustomizer;

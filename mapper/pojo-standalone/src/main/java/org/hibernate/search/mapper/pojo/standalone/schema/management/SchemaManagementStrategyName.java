@@ -4,12 +4,9 @@
  */
 package org.hibernate.search.mapper.pojo.standalone.schema.management;
 
-import java.lang.invoke.MethodHandles;
-
 import org.hibernate.search.engine.cfg.spi.ParseUtils;
-import org.hibernate.search.mapper.pojo.standalone.logging.impl.Log;
+import org.hibernate.search.mapper.pojo.standalone.logging.impl.ConfigurationLog;
 import org.hibernate.search.util.common.annotation.Incubating;
-import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
 @Incubating
 public enum SchemaManagementStrategyName {
@@ -115,14 +112,12 @@ public enum SchemaManagementStrategyName {
 	 */
 	DROP_AND_CREATE_AND_DROP( "drop-and-create-and-drop" );
 
-	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
-
 	// This method conforms to the MicroProfile Config specification. Do not change its signature.
 	public static SchemaManagementStrategyName of(String value) {
 		return ParseUtils.parseDiscreteValues(
 				SchemaManagementStrategyName.values(),
 				SchemaManagementStrategyName::externalRepresentation,
-				log::invalidSchemaManagementStrategyName,
+				ConfigurationLog.INSTANCE::invalidSchemaManagementStrategyName,
 				value
 		);
 	}

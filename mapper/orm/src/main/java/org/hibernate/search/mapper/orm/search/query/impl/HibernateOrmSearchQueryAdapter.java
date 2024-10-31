@@ -4,7 +4,6 @@
  */
 package org.hibernate.search.mapper.orm.search.query.impl;
 
-import java.lang.invoke.MethodHandles;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
@@ -40,12 +39,11 @@ import org.hibernate.search.engine.search.query.SearchQuery;
 import org.hibernate.search.engine.search.query.spi.SearchQueryImplementor;
 import org.hibernate.search.mapper.orm.loading.spi.EntityGraphHint;
 import org.hibernate.search.mapper.orm.loading.spi.MutableEntityLoadingOptions;
-import org.hibernate.search.mapper.orm.logging.impl.Log;
+import org.hibernate.search.mapper.orm.logging.impl.OrmSpecificLog;
 import org.hibernate.search.mapper.orm.search.query.spi.HibernateOrmSearchQueryHints;
 import org.hibernate.search.mapper.orm.search.query.spi.HibernateOrmSearchScrollableResultsAdapter;
 import org.hibernate.search.util.common.SearchTimeoutException;
 import org.hibernate.search.util.common.annotation.impl.SuppressForbiddenApis;
-import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
 @SuppressForbiddenApis(reason = "We need to use the internal QueryOptionsImpl"
 		+ " in order to implement a org.hibernate.query.Query")
@@ -55,8 +53,6 @@ public final class HibernateOrmSearchQueryAdapter<R> extends AbstractQuery<R> {
 	public static <R> HibernateOrmSearchQueryAdapter<R> create(SearchQuery<R> query) {
 		return query.extension( HibernateOrmSearchQueryAdapterExtension.get() );
 	}
-
-	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	private final SearchQueryImplementor<R> delegate;
 
@@ -124,7 +120,7 @@ public final class HibernateOrmSearchQueryAdapter<R> extends AbstractQuery<R> {
 				applyEntityGraphHint( hintName, value );
 				break;
 			default:
-				log.ignoringUnrecognizedQueryHint( hintName );
+				OrmSpecificLog.INSTANCE.ignoringUnrecognizedQueryHint( hintName );
 				break;
 		}
 		return this;
@@ -174,7 +170,7 @@ public final class HibernateOrmSearchQueryAdapter<R> extends AbstractQuery<R> {
 	@Override
 	protected ScrollableResultsImplementor<R> doScroll(ScrollMode scrollMode) {
 		if ( !ScrollMode.FORWARD_ONLY.equals( scrollMode ) ) {
-			throw log.canOnlyUseScrollWithScrollModeForwardsOnly( scrollMode );
+			throw OrmSpecificLog.INSTANCE.canOnlyUseScrollWithScrollModeForwardsOnly( scrollMode );
 		}
 
 		int chunkSize = loadingOptions.fetchSize();

@@ -4,7 +4,6 @@
  */
 package org.hibernate.search.backend.elasticsearch.index.impl;
 
-import java.lang.invoke.MethodHandles;
 import java.util.Optional;
 import java.util.Set;
 
@@ -16,7 +15,7 @@ import org.hibernate.search.backend.elasticsearch.document.model.lowlevel.impl.L
 import org.hibernate.search.backend.elasticsearch.index.IndexStatus;
 import org.hibernate.search.backend.elasticsearch.index.layout.impl.IndexNames;
 import org.hibernate.search.backend.elasticsearch.link.impl.ElasticsearchLink;
-import org.hibernate.search.backend.elasticsearch.logging.impl.Log;
+import org.hibernate.search.backend.elasticsearch.logging.impl.ElasticsearchSpecificLog;
 import org.hibernate.search.backend.elasticsearch.lowlevel.index.impl.IndexMetadata;
 import org.hibernate.search.backend.elasticsearch.multitenancy.impl.MultiTenancyStrategy;
 import org.hibernate.search.backend.elasticsearch.orchestration.impl.ElasticsearchBatchingWorkOrchestrator;
@@ -50,14 +49,11 @@ import org.hibernate.search.engine.cfg.spi.OptionalConfigurationProperty;
 import org.hibernate.search.engine.common.timing.spi.TimingSource;
 import org.hibernate.search.engine.reporting.FailureHandler;
 import org.hibernate.search.engine.search.loading.spi.SearchLoadingContextBuilder;
-import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 import org.hibernate.search.util.common.reporting.EventContext;
 
 import com.google.gson.Gson;
 
 public class IndexManagerBackendContext implements SearchBackendContext, WorkExecutionBackendContext {
-
-	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	private static final OptionalConfigurationProperty<IndexStatus> LIFECYCLE_MINIMAL_REQUIRED_STATUS =
 			ConfigurationProperty.forKey( ElasticsearchIndexSettings.SCHEMA_MANAGEMENT_MINIMAL_REQUIRED_STATUS )
@@ -201,7 +197,7 @@ public class IndexManagerBackendContext implements SearchBackendContext, WorkExe
 				LIFECYCLE_MINIMAL_REQUIRED_STATUS.getAndTransform( indexPropertySource, optional -> {
 					if ( optional.isPresent() && !isStatusCheckPossible ) {
 						// Forbid explicit requirement when the status check is impossible
-						throw log.cannotRequireIndexStatus();
+						throw ElasticsearchSpecificLog.INSTANCE.cannotRequireIndexStatus();
 					}
 					else if ( !optional.isPresent() && isStatusCheckPossible ) {
 						// Default requirement when the status check is possible

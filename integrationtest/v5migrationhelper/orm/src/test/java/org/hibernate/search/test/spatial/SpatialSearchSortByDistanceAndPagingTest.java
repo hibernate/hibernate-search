@@ -33,8 +33,8 @@ import org.hibernate.search.annotations.Spatial;
 import org.hibernate.search.query.dsl.QueryBuilder;
 import org.hibernate.search.query.dsl.Unit;
 import org.hibernate.search.test.SearchTestBase;
-import org.hibernate.search.util.logging.impl.Log;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
+import org.hibernate.search.util.logging.impl.MigrationHelperLog;
 
 import org.hibernate.testing.orm.junit.JiraKey;
 
@@ -50,7 +50,7 @@ import org.apache.lucene.search.Sort;
  */
 @JiraKey("HSEARCH-1267")
 class SpatialSearchSortByDistanceAndPagingTest extends SearchTestBase {
-	private static final Log log = LoggerFactory.make( MethodHandles.lookup() );
+	private static final MigrationHelperLog log = LoggerFactory.make( MethodHandles.lookup() );
 
 	private static final int EXPECTED_RESULTS_COUNT = 37;
 	private static final double CENTER_LAT = 54.0;

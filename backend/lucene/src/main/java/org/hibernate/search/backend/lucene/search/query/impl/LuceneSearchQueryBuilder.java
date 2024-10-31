@@ -4,7 +4,6 @@
  */
 package org.hibernate.search.backend.lucene.search.query.impl;
 
-import java.lang.invoke.MethodHandles;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -15,7 +14,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
-import org.hibernate.search.backend.lucene.logging.impl.Log;
+import org.hibernate.search.backend.lucene.logging.impl.QueryLog;
 import org.hibernate.search.backend.lucene.lowlevel.common.impl.MetadataFields;
 import org.hibernate.search.backend.lucene.lowlevel.query.impl.Queries;
 import org.hibernate.search.backend.lucene.orchestration.impl.LuceneSyncWorkOrchestrator;
@@ -42,7 +41,6 @@ import org.hibernate.search.engine.search.query.spi.QueryParameters;
 import org.hibernate.search.engine.search.query.spi.SearchQueryBuilder;
 import org.hibernate.search.engine.search.sort.SearchSort;
 import org.hibernate.search.engine.search.timeout.spi.TimeoutManager;
-import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
 import org.apache.lucene.search.BooleanClause;
 import org.apache.lucene.search.BooleanClause.Occur;
@@ -52,8 +50,6 @@ import org.apache.lucene.search.Sort;
 import org.apache.lucene.search.SortField;
 
 public class LuceneSearchQueryBuilder<H> implements SearchQueryBuilder<H>, LuceneSearchSortCollector {
-
-	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	private final LuceneWorkFactory workFactory;
 	private final LuceneSyncWorkOrchestrator queryOrchestrator;
@@ -117,7 +113,7 @@ public class LuceneSearchQueryBuilder<H> implements SearchQueryBuilder<H>, Lucen
 		}
 		Object previous = aggregations.put( key, casted );
 		if ( previous != null ) {
-			throw log.duplicateAggregationKey( key );
+			throw QueryLog.INSTANCE.duplicateAggregationKey( key );
 		}
 	}
 
@@ -155,7 +151,7 @@ public class LuceneSearchQueryBuilder<H> implements SearchQueryBuilder<H>, Lucen
 	@Override
 	public void highlighter(String highlighterName, SearchHighlighter highlighter) {
 		if ( highlighterName == null || highlighterName.trim().isEmpty() ) {
-			throw log.highlighterNameCannotBeBlank();
+			throw QueryLog.INSTANCE.highlighterNameCannotBeBlank();
 		}
 		if (
 			this.namedHighlighters.put(
@@ -163,7 +159,7 @@ public class LuceneSearchQueryBuilder<H> implements SearchQueryBuilder<H>, Lucen
 					LuceneAbstractSearchHighlighter.from( scope, highlighter )
 			) != null
 		) {
-			throw log.highlighterWithTheSameNameCannotBeAdded( highlighterName );
+			throw QueryLog.INSTANCE.highlighterWithTheSameNameCannotBeAdded( highlighterName );
 		}
 	}
 

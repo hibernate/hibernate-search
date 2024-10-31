@@ -5,13 +5,12 @@
 package org.hibernate.search.backend.lucene.index.impl;
 
 import java.io.IOException;
-import java.lang.invoke.MethodHandles;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 
 import org.hibernate.search.backend.lucene.cfg.LuceneIndexSettings;
 import org.hibernate.search.backend.lucene.document.model.impl.LuceneIndexModel;
-import org.hibernate.search.backend.lucene.logging.impl.Log;
+import org.hibernate.search.backend.lucene.logging.impl.LuceneSpecificLog;
 import org.hibernate.search.backend.lucene.lowlevel.directory.impl.DirectoryCreationContextImpl;
 import org.hibernate.search.backend.lucene.lowlevel.directory.spi.DirectoryCreationContext;
 import org.hibernate.search.backend.lucene.lowlevel.directory.spi.DirectoryHolder;
@@ -30,7 +29,6 @@ import org.hibernate.search.engine.environment.bean.BeanReference;
 import org.hibernate.search.engine.environment.bean.BeanResolver;
 import org.hibernate.search.engine.reporting.spi.EventContexts;
 import org.hibernate.search.util.common.impl.Closer;
-import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 import org.hibernate.search.util.common.reporting.EventContext;
 
 import org.apache.lucene.index.DirectoryReader;
@@ -44,8 +42,6 @@ public final class Shard {
 					.build();
 
 	private static final SavedState.Key<DirectoryHolder> DIRECTORY_HOLDER_KEY = SavedState.key( "directory_holder" );
-
-	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	private final Optional<String> shardId;
 	private final IndexManagerBackendContext backendContext;
@@ -95,7 +91,7 @@ public final class Shard {
 			}
 		}
 		catch (IOException | RuntimeException e) {
-			throw log.unableToStartShard( e.getMessage(), e );
+			throw LuceneSpecificLog.INSTANCE.unableToStartShard( e.getMessage(), e );
 		}
 	}
 
@@ -115,7 +111,7 @@ public final class Shard {
 			indexingOrchestrator.start( propertySource );
 		}
 		catch (RuntimeException e) {
-			throw log.unableToStartShard( e.getMessage(), e );
+			throw LuceneSpecificLog.INSTANCE.unableToStartShard( e.getMessage(), e );
 		}
 	}
 
@@ -134,7 +130,7 @@ public final class Shard {
 			}
 		}
 		catch (RuntimeException | IOException e) {
-			throw log.unableToShutdownShard(
+			throw LuceneSpecificLog.INSTANCE.unableToShutdownShard(
 					e.getMessage(),
 					shardId.map( EventContexts::fromShardId ).orElse( null ),
 					e

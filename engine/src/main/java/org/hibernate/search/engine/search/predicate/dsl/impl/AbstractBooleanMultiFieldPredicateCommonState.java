@@ -4,19 +4,17 @@
  */
 package org.hibernate.search.engine.search.predicate.dsl.impl;
 
-import java.lang.invoke.MethodHandles;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Consumer;
 
-import org.hibernate.search.engine.logging.impl.Log;
+import org.hibernate.search.engine.logging.impl.QueryLog;
 import org.hibernate.search.engine.search.common.spi.SearchIndexScope;
 import org.hibernate.search.engine.search.predicate.SearchPredicate;
 import org.hibernate.search.engine.search.predicate.dsl.spi.AbstractPredicateFinalStep;
 import org.hibernate.search.engine.search.predicate.dsl.spi.SearchPredicateDslContext;
 import org.hibernate.search.engine.search.predicate.spi.BooleanPredicateBuilder;
 import org.hibernate.search.engine.search.predicate.spi.SearchPredicateBuilder;
-import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
 /**
  * A common state for a multi-field predicate DSL
@@ -34,8 +32,6 @@ abstract class AbstractBooleanMultiFieldPredicateCommonState<
 		S extends AbstractBooleanMultiFieldPredicateCommonState<?, ?>,
 		F extends AbstractBooleanMultiFieldPredicateCommonState.FieldSetState>
 		extends AbstractPredicateFinalStep {
-
-	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	private final List<F> fieldSetStates = new ArrayList<>();
 	private Float predicateLevelBoost;
@@ -91,7 +87,7 @@ abstract class AbstractBooleanMultiFieldPredicateCommonState<
 		if ( fieldSetBoost != null && withConstantScore ) {
 			// another good option would be the one to simply ignore the fieldSetBoost
 			// when the option withConstantScore is defined
-			throw log.perFieldBoostWithConstantScore();
+			throw QueryLog.INSTANCE.perFieldBoostWithConstantScore();
 		}
 		if ( predicateLevelBoost != null && fieldSetBoost != null ) {
 			predicateBuilder.boost( predicateLevelBoost * fieldSetBoost );

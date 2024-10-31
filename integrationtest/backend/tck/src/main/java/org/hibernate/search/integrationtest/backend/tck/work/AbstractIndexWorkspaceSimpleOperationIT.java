@@ -4,11 +4,11 @@
  */
 package org.hibernate.search.integrationtest.backend.tck.work;
 
+import static org.hibernate.search.integrationtest.backend.tck.reporting.TestLog.TCK_LOGGER;
 import static org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMapperUtils.documentProvider;
 import static org.hibernate.search.util.impl.test.FutureAssert.assertThatFuture;
 
 import java.io.IOException;
-import java.lang.invoke.MethodHandles;
 import java.util.concurrent.CompletableFuture;
 
 import org.hibernate.search.engine.backend.document.IndexFieldReference;
@@ -16,8 +16,6 @@ import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaElement
 import org.hibernate.search.engine.backend.work.execution.spi.IndexWorkspace;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.TckBackendAccessor;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.extension.SearchSetupHelper;
-import org.hibernate.search.util.common.logging.impl.Log;
-import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.SimpleMappedIndex;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappedIndex;
 
@@ -27,8 +25,6 @@ import org.junit.jupiter.api.extension.RegisterExtension;
 import org.awaitility.Awaitility;
 
 public abstract class AbstractIndexWorkspaceSimpleOperationIT {
-
-	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	private static final Integer DOCUMENT_COUNT = 50;
 
@@ -81,7 +77,7 @@ public abstract class AbstractIndexWorkspaceSimpleOperationIT {
 			setupHelper.cleanUp();
 		}
 		catch (RuntimeException | IOException e) {
-			log.debug( "Expected error while shutting down Hibernate Search, caused by the deletion of an index", e );
+			TCK_LOGGER.debug( "Expected error while shutting down Hibernate Search, caused by the deletion of an index", e );
 		}
 	}
 

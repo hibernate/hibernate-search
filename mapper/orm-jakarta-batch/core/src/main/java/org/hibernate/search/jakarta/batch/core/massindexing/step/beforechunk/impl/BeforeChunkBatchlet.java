@@ -4,7 +4,6 @@
  */
 package org.hibernate.search.jakarta.batch.core.massindexing.step.beforechunk.impl;
 
-import java.lang.invoke.MethodHandles;
 import java.util.Collections;
 import java.util.Objects;
 
@@ -16,7 +15,7 @@ import jakarta.persistence.EntityManagerFactory;
 
 import org.hibernate.search.engine.backend.work.execution.OperationSubmitter;
 import org.hibernate.search.engine.backend.work.execution.spi.UnsupportedOperationBehavior;
-import org.hibernate.search.jakarta.batch.core.logging.impl.Log;
+import org.hibernate.search.jakarta.batch.core.logging.impl.JakartaBatchLog;
 import org.hibernate.search.jakarta.batch.core.massindexing.MassIndexingJobParameters;
 import org.hibernate.search.jakarta.batch.core.massindexing.impl.JobContextData;
 import org.hibernate.search.jakarta.batch.core.massindexing.util.impl.SerializationUtil;
@@ -25,7 +24,6 @@ import org.hibernate.search.mapper.orm.spi.BatchMappingContext;
 import org.hibernate.search.mapper.pojo.massindexing.MassIndexingDefaultCleanOperation;
 import org.hibernate.search.mapper.pojo.work.spi.PojoScopeWorkspace;
 import org.hibernate.search.util.common.impl.Futures;
-import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
 /**
  * Enhancements before the chunk step {@code produceLuceneDoc} (lucene document production)
@@ -33,8 +31,6 @@ import org.hibernate.search.util.common.logging.impl.LoggerFactory;
  * @author Mincong Huang
  */
 public class BeforeChunkBatchlet extends AbstractBatchlet {
-
-	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	@Inject
 	private JobContext jobContext;
@@ -93,7 +89,7 @@ public class BeforeChunkBatchlet extends AbstractBatchlet {
 				//   and if we drop-create the schema then we'd lose the indexed docs for other tenants.
 				//   let the user decide what they want to do here, and either remove the tenant filter,
 				//   or do the schema drop through a schema manager.
-				throw log.tenantIdProvidedWithSchemaDrop( tenantId );
+				throw JakartaBatchLog.INSTANCE.tenantIdProvidedWithSchemaDrop( tenantId );
 			}
 			EntityManagerFactory emf = jobData.getEntityManagerFactory();
 			Search.mapping( emf ).scope( jobData.getEntityTypes() ).schemaManager().dropAndCreate();
@@ -101,7 +97,7 @@ public class BeforeChunkBatchlet extends AbstractBatchlet {
 
 		if ( Boolean.TRUE.equals( dropAndCreateSchemaOnStart )
 				&& ( serializedPurgeAllOnStart != null && Boolean.TRUE.equals( purgeAllOnStart ) ) ) {
-			log.redundantPurgeAfterDrop();
+			JakartaBatchLog.INSTANCE.redundantPurgeAfterDrop();
 		}
 
 		// No need to purge if we've dropped-created the schema already

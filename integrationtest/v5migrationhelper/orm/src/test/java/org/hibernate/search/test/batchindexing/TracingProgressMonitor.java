@@ -7,12 +7,12 @@ package org.hibernate.search.test.batchindexing;
 import java.lang.invoke.MethodHandles;
 
 import org.hibernate.search.batchindexing.MassIndexerProgressMonitor;
-import org.hibernate.search.util.logging.impl.Log;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
+import org.hibernate.search.util.logging.impl.MigrationHelperLog;
 
 public class TracingProgressMonitor implements MassIndexerProgressMonitor {
 
-	private static final Log log = LoggerFactory.make( MethodHandles.lookup() );
+	private static final MigrationHelperLog log = LoggerFactory.make( MethodHandles.lookup() );
 
 	@Override
 	public void entitiesLoaded(int increment) {

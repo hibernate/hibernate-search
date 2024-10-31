@@ -4,11 +4,10 @@
  */
 package org.hibernate.search.backend.elasticsearch.document.model.impl;
 
-import java.lang.invoke.MethodHandles;
 import java.util.function.BiFunction;
 import java.util.function.Function;
 
-import org.hibernate.search.backend.elasticsearch.logging.impl.Log;
+import org.hibernate.search.backend.elasticsearch.logging.impl.IndexingLog;
 import org.hibernate.search.backend.elasticsearch.search.common.impl.ElasticsearchSearchEncodingContext;
 import org.hibernate.search.backend.elasticsearch.search.common.impl.ElasticsearchSearchIndexScope;
 import org.hibernate.search.backend.elasticsearch.search.common.impl.ElasticsearchSearchIndexValueFieldContext;
@@ -20,7 +19,6 @@ import org.hibernate.search.engine.common.tree.spi.TreeNodeInclusion;
 import org.hibernate.search.engine.reporting.spi.EventContexts;
 import org.hibernate.search.engine.search.common.ValueModel;
 import org.hibernate.search.engine.search.common.spi.SearchIndexSchemaElementContextHelper;
-import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 import org.hibernate.search.util.common.reporting.EventContext;
 
 import com.google.gson.JsonElement;
@@ -34,8 +32,6 @@ public final class ElasticsearchIndexValueField<F>
 				F>
 		implements ElasticsearchIndexField, ElasticsearchSearchIndexValueFieldContext<F>,
 		ElasticsearchSearchEncodingContext<F> {
-
-	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	public ElasticsearchIndexValueField(ElasticsearchIndexCompositeNode parent, String relativeFieldName,
 			ElasticsearchIndexValueFieldType<F> type, TreeNodeInclusion inclusion, boolean multiValued) {
@@ -55,7 +51,7 @@ public final class ElasticsearchIndexValueField<F>
 	@SuppressWarnings("unchecked")
 	public <T> ElasticsearchIndexValueField<? super T> withValueType(Class<T> expectedSubType, EventContext eventContext) {
 		if ( !type.valueClass().isAssignableFrom( expectedSubType ) ) {
-			throw log.invalidFieldValueType( type.valueClass(), expectedSubType,
+			throw IndexingLog.INSTANCE.invalidFieldValueType( type.valueClass(), expectedSubType,
 					eventContext.append( EventContexts.fromIndexFieldAbsolutePath( absolutePath ) ) );
 		}
 		return (ElasticsearchIndexValueField<? super T>) this;
@@ -82,7 +78,7 @@ public final class ElasticsearchIndexValueField<F>
 			}
 		}
 		catch (RuntimeException e) {
-			throw log.cannotConvertDslParameter( e.getMessage(), e,
+			throw IndexingLog.INSTANCE.cannotConvertDslParameter( e.getMessage(), e,
 					EventContexts.fromIndexFieldAbsolutePath( field.absolutePath() ) );
 		}
 	}
@@ -99,7 +95,7 @@ public final class ElasticsearchIndexValueField<F>
 				return dslConverter.unknownTypeToDocumentValue( value, scope.toDocumentValueConvertContext() );
 			}
 			catch (RuntimeException e) {
-				throw log.cannotConvertDslParameter( e.getMessage(), e,
+				throw IndexingLog.INSTANCE.cannotConvertDslParameter( e.getMessage(), e,
 						EventContexts.fromIndexFieldAbsolutePath( field.absolutePath() ) );
 			}
 		}
@@ -110,7 +106,7 @@ public final class ElasticsearchIndexValueField<F>
 				return encodeFunction.apply( field.type().codec(), converted );
 			}
 			catch (RuntimeException e) {
-				throw log.cannotConvertDslParameter( e.getMessage(), e,
+				throw IndexingLog.INSTANCE.cannotConvertDslParameter( e.getMessage(), e,
 						EventContexts.fromIndexFieldAbsolutePath( field.absolutePath() ) );
 			}
 		}

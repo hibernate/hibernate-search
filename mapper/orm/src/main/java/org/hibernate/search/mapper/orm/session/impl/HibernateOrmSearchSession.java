@@ -6,7 +6,6 @@ package org.hibernate.search.mapper.orm.session.impl;
 
 import static org.hibernate.search.util.common.impl.CollectionHelper.asSetIgnoreNull;
 
-import java.lang.invoke.MethodHandles;
 import java.util.Collection;
 
 import jakarta.persistence.EntityManager;
@@ -23,7 +22,8 @@ import org.hibernate.search.engine.search.query.dsl.SearchQuerySelectStep;
 import org.hibernate.search.mapper.orm.automaticindexing.session.impl.DelegatingAutomaticIndexingSynchronizationStrategy;
 import org.hibernate.search.mapper.orm.automaticindexing.spi.AutomaticIndexingEventSendingSessionContext;
 import org.hibernate.search.mapper.orm.loading.impl.HibernateOrmSelectionLoadingContext;
-import org.hibernate.search.mapper.orm.logging.impl.Log;
+import org.hibernate.search.mapper.orm.logging.impl.ConfigurationLog;
+import org.hibernate.search.mapper.orm.logging.impl.OrmSpecificLog;
 import org.hibernate.search.mapper.orm.massindexing.MassIndexer;
 import org.hibernate.search.mapper.orm.model.impl.HibernateOrmRuntimeIntrospector;
 import org.hibernate.search.mapper.orm.schema.management.SearchSchemaManager;
@@ -47,7 +47,6 @@ import org.hibernate.search.mapper.pojo.work.spi.ConfiguredSearchIndexingPlanFil
 import org.hibernate.search.mapper.pojo.work.spi.PojoIndexer;
 import org.hibernate.search.mapper.pojo.work.spi.PojoIndexingPlan;
 import org.hibernate.search.mapper.pojo.work.spi.PojoIndexingQueueEventProcessingPlan;
-import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
 /**
  * The actual implementation of {@link SearchSession}.
@@ -92,8 +91,6 @@ public class HibernateOrmSearchSession extends AbstractPojoSearchSession
 		holder.searchSession( searchSession );
 		return searchSession;
 	}
-
-	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	private final HibernateOrmSearchSessionMappingContext mappingContext;
 	private final HibernateOrmSessionTypeContextProvider typeContextProvider;
@@ -237,7 +234,7 @@ public class HibernateOrmSearchSession extends AbstractPojoSearchSession
 				filter );
 
 		if ( automaticIndexingStrategy.usesAsyncProcessing() && !configuredFilter.supportsAsyncProcessing() ) {
-			throw log.cannotApplySessionFilterWhenAsyncProcessingIsUsed();
+			throw ConfigurationLog.INSTANCE.cannotApplySessionFilterWhenAsyncProcessingIsUsed();
 		}
 		configuredIndexingPlanFilter = configuredFilter;
 	}
@@ -370,7 +367,7 @@ public class HibernateOrmSearchSession extends AbstractPojoSearchSession
 			session.checkOpen();
 		}
 		catch (IllegalStateException e) {
-			throw log.hibernateSessionIsClosed( e );
+			throw OrmSpecificLog.INSTANCE.hibernateSessionIsClosed( e );
 		}
 	}
 

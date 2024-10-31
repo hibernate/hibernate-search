@@ -4,7 +4,6 @@
  */
 package org.hibernate.search.mapper.pojo.mapping.definition.annotation.processing.impl;
 
-import java.lang.invoke.MethodHandles;
 import java.util.Map;
 import java.util.Optional;
 
@@ -15,17 +14,14 @@ import org.hibernate.search.mapper.pojo.bridge.mapping.annotation.IdentifierBrid
 import org.hibernate.search.mapper.pojo.bridge.mapping.impl.BeanBinder;
 import org.hibernate.search.mapper.pojo.bridge.mapping.impl.BeanDelegatingBinder;
 import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.IdentifierBinder;
-import org.hibernate.search.mapper.pojo.logging.impl.Log;
+import org.hibernate.search.mapper.pojo.logging.impl.MappingLog;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.DocumentId;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.processing.MappingAnnotationProcessorContext;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.processing.PropertyMappingAnnotationProcessor;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.processing.PropertyMappingAnnotationProcessorContext;
 import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.PropertyMappingStep;
-import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
 public class DocumentIdProcessor implements PropertyMappingAnnotationProcessor<DocumentId> {
-
-	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	@Override
 	public void process(PropertyMappingStep mappingContext, DocumentId annotation,
@@ -55,7 +51,7 @@ public class DocumentIdProcessor implements PropertyMappingAnnotationProcessor<D
 		);
 
 		if ( bridgeReference.isPresent() && binderReference.isPresent() ) {
-			throw log.invalidDocumentIdDefiningBothBridgeReferenceAndBinderReference();
+			throw MappingLog.INSTANCE.invalidDocumentIdDefiningBothBridgeReferenceAndBinderReference();
 		}
 		else if ( bridgeReference.isPresent() ) {
 			return new BeanBinder( bridgeReference.get() );

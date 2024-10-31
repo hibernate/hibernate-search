@@ -4,11 +4,10 @@
  */
 package org.hibernate.search.backend.elasticsearch.types.sort.impl;
 
-import java.lang.invoke.MethodHandles;
 import java.util.List;
 
 import org.hibernate.search.backend.elasticsearch.gson.impl.JsonAccessor;
-import org.hibernate.search.backend.elasticsearch.logging.impl.Log;
+import org.hibernate.search.backend.elasticsearch.logging.impl.QueryLog;
 import org.hibernate.search.backend.elasticsearch.lowlevel.syntax.search.impl.ElasticsearchSearchSyntax;
 import org.hibernate.search.backend.elasticsearch.search.common.impl.ElasticsearchSearchIndexScope;
 import org.hibernate.search.backend.elasticsearch.search.common.impl.ElasticsearchSearchIndexValueFieldContext;
@@ -20,15 +19,12 @@ import org.hibernate.search.backend.elasticsearch.search.sort.impl.Elasticsearch
 import org.hibernate.search.engine.search.common.SortMode;
 import org.hibernate.search.engine.search.predicate.SearchPredicate;
 import org.hibernate.search.util.common.AssertionFailure;
-import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
 
 abstract class AbstractElasticsearchDocumentValueSort extends AbstractElasticsearchReversibleSort {
-
-	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	private static final JsonAccessor<JsonElement> MODE_ACCESSOR = JsonAccessor.root().property( "mode" );
 	private static final JsonPrimitive SUM_KEYWORD_JSON = new JsonPrimitive( "sum" );
@@ -91,7 +87,7 @@ abstract class AbstractElasticsearchDocumentValueSort extends AbstractElasticsea
 
 		public void mode(SortMode mode) {
 			if ( !nestedPathHierarchy.isEmpty() && SortMode.MEDIAN.equals( mode ) ) {
-				throw log.invalidSortModeAcrossNested( mode, field.eventContext() );
+				throw QueryLog.INSTANCE.invalidSortModeAcrossNested( mode, field.eventContext() );
 			}
 			if ( mode != null ) {
 				switch ( mode ) {
@@ -118,7 +114,7 @@ abstract class AbstractElasticsearchDocumentValueSort extends AbstractElasticsea
 
 		public void filter(SearchPredicate filter) {
 			if ( nestedPathHierarchy.isEmpty() ) {
-				throw log.cannotFilterSortOnRootDocumentField( field.absolutePath(), field.eventContext() );
+				throw QueryLog.INSTANCE.cannotFilterSortOnRootDocumentField( field.absolutePath(), field.eventContext() );
 			}
 			ElasticsearchSearchPredicate elasticsearchFilter = ElasticsearchSearchPredicate.from( scope, filter );
 			elasticsearchFilter.checkNestableWithin(

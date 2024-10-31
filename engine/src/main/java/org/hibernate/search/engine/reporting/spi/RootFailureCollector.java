@@ -4,7 +4,8 @@
  */
 package org.hibernate.search.engine.reporting.spi;
 
-import java.lang.invoke.MethodHandles;
+import static org.hibernate.search.engine.logging.impl.CommonFailureLog.INSTANCE;
+
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -13,19 +14,15 @@ import java.util.concurrent.ConcurrentLinkedDeque;
 import java.util.concurrent.ConcurrentSkipListMap;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import org.hibernate.search.engine.logging.impl.Log;
 import org.hibernate.search.engine.reporting.impl.EngineEventContextMessages;
 import org.hibernate.search.util.common.SearchException;
 import org.hibernate.search.util.common.data.impl.InsertionOrder;
 import org.hibernate.search.util.common.impl.ToStringStyle;
 import org.hibernate.search.util.common.impl.ToStringTreeBuilder;
-import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 import org.hibernate.search.util.common.reporting.EventContext;
 import org.hibernate.search.util.common.reporting.EventContextElement;
 
 public final class RootFailureCollector implements FailureCollector {
-
-	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	/**
 	 * This prevents Hibernate Search from trying too hard to collect errors,
@@ -56,13 +53,14 @@ public final class RootFailureCollector implements FailureCollector {
 			ToStringTreeBuilder builder = new ToStringTreeBuilder( style );
 			builder.startObject();
 			if ( failureCount.get() > FAILURE_LIMIT ) {
-				builder.value( log.collectedFailureLimitReached( process, FAILURE_LIMIT, failureCount.get() ) );
+				builder.value(
+						INSTANCE.collectedFailureLimitReached( process, FAILURE_LIMIT, failureCount.get() ) );
 			}
 			if ( delegate != null ) {
 				delegate.appendChildrenFailuresTo( failures, builder );
 			}
 			builder.endObject();
-			throw log.collectedFailures( process, builder.toString(), failures );
+			throw INSTANCE.collectedFailures( process, builder.toString(), failures );
 		}
 	}
 
@@ -111,7 +109,7 @@ public final class RootFailureCollector implements FailureCollector {
 			// This should not happen, but we want to be extra-cautious to avoid failures while handling failures
 			catch (RuntimeException e) {
 				// Just log the problem and degrade gracefully.
-				log.exceptionWhileCollectingFailure( e.getMessage(), e );
+				INSTANCE.exceptionWhileCollectingFailure( e.getMessage(), e );
 				return withDefaultContext();
 			}
 		}
@@ -226,7 +224,7 @@ public final class RootFailureCollector implements FailureCollector {
 		}
 
 		private void doAdd(Throwable failure, String failureMessage) {
-			log.newCollectedFailure( root.process, this, failure );
+			INSTANCE.newCollectedFailure( root.process, this, failure );
 
 			if ( root.shouldAddFailure() ) {
 				failureMessages.add( failureMessage );

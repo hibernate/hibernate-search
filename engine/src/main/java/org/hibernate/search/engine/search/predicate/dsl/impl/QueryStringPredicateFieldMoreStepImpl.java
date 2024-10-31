@@ -4,27 +4,23 @@
  */
 package org.hibernate.search.engine.search.predicate.dsl.impl;
 
-import java.lang.invoke.MethodHandles;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.EnumSet;
 import java.util.List;
 import java.util.Set;
 
-import org.hibernate.search.engine.logging.impl.Log;
+import org.hibernate.search.engine.logging.impl.QueryLog;
 import org.hibernate.search.engine.search.common.RewriteMethod;
 import org.hibernate.search.engine.search.predicate.dsl.QueryStringPredicateFieldMoreStep;
 import org.hibernate.search.engine.search.predicate.dsl.QueryStringPredicateOptionsStep;
 import org.hibernate.search.engine.search.predicate.dsl.spi.SearchPredicateDslContext;
 import org.hibernate.search.engine.search.predicate.spi.CommonQueryStringPredicateBuilder;
 import org.hibernate.search.engine.search.predicate.spi.QueryStringPredicateBuilder;
-import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
 class QueryStringPredicateFieldMoreStepImpl
 		implements
 		QueryStringPredicateFieldMoreStep<QueryStringPredicateFieldMoreStepImpl, QueryStringPredicateOptionsStep<?>> {
-
-	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	private final CommonState commonState;
 
@@ -98,7 +94,7 @@ class QueryStringPredicateFieldMoreStepImpl
 		@Override
 		public CommonState rewriteMethod(RewriteMethod rewriteMethod) {
 			if ( PARAMETERIZED_REWRITE_METHODS.contains( rewriteMethod ) ) {
-				throw log.parameterizedRewriteMethodWithoutParameter( rewriteMethod );
+				throw QueryLog.INSTANCE.parameterizedRewriteMethodWithoutParameter( rewriteMethod );
 			}
 			builder.rewriteMethod( rewriteMethod, null );
 			return this;
@@ -107,7 +103,7 @@ class QueryStringPredicateFieldMoreStepImpl
 		@Override
 		public CommonState rewriteMethod(RewriteMethod rewriteMethod, int n) {
 			if ( !PARAMETERIZED_REWRITE_METHODS.contains( rewriteMethod ) ) {
-				throw log.nonParameterizedRewriteMethodWithParameter( rewriteMethod );
+				throw QueryLog.INSTANCE.nonParameterizedRewriteMethodWithParameter( rewriteMethod );
 			}
 			builder.rewriteMethod( rewriteMethod, n );
 			return this;

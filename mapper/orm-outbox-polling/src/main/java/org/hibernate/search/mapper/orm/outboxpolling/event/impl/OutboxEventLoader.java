@@ -6,7 +6,6 @@ package org.hibernate.search.mapper.orm.outboxpolling.event.impl;
 
 import static org.hibernate.search.mapper.orm.outboxpolling.event.impl.OutboxPollingOutboxEventAdditionalMappingProducer.ENTITY_NAME;
 
-import java.lang.invoke.MethodHandles;
 import java.util.Collections;
 import java.util.List;
 import java.util.Set;
@@ -20,16 +19,13 @@ import org.hibernate.LockOptions;
 import org.hibernate.Session;
 import org.hibernate.dialect.Dialect;
 import org.hibernate.query.Query;
-import org.hibernate.search.mapper.orm.outboxpolling.logging.impl.Log;
-import org.hibernate.search.util.common.logging.impl.LoggerFactory;
+import org.hibernate.search.mapper.orm.outboxpolling.logging.impl.OutboxPollingEventsLog;
 import org.hibernate.search.util.common.spi.ToStringTreeAppendable;
 import org.hibernate.search.util.common.spi.ToStringTreeAppender;
 
 final class OutboxEventLoader implements ToStringTreeAppendable {
 
 	private static final String LOAD_QUERY_STRING = "select e from " + ENTITY_NAME + " e where e.id in (:ids)";
-
-	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	private final LockOptions lockOptions;
 
@@ -91,7 +87,7 @@ final class OutboxEventLoader implements ToStringTreeAppendable {
 			// skipping locked rows (see LockOptions.UPGRADE_SKIPLOCKED).
 			// If that happens, we will just log something and try again later.
 			// See also https://jira.mariadb.org/browse/MDEV-13115
-			log.outboxEventProcessorUnableToLock( processorName, lockException );
+			OutboxPollingEventsLog.INSTANCE.outboxEventProcessorUnableToLock( processorName, lockException );
 			return Collections.emptyList();
 		}
 	}

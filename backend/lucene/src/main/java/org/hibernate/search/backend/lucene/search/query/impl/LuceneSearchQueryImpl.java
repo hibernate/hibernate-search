@@ -4,13 +4,12 @@
  */
 package org.hibernate.search.backend.lucene.search.query.impl;
 
-import java.lang.invoke.MethodHandles;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
-import org.hibernate.search.backend.lucene.logging.impl.Log;
+import org.hibernate.search.backend.lucene.logging.impl.QueryLog;
 import org.hibernate.search.backend.lucene.lowlevel.reader.impl.HibernateSearchMultiReader;
 import org.hibernate.search.backend.lucene.orchestration.impl.LuceneSyncWorkOrchestrator;
 import org.hibernate.search.backend.lucene.search.common.impl.LuceneSearchIndexContext;
@@ -29,7 +28,6 @@ import org.hibernate.search.engine.search.query.SearchQueryExtension;
 import org.hibernate.search.engine.search.query.spi.AbstractSearchQuery;
 import org.hibernate.search.engine.search.timeout.spi.TimeoutManager;
 import org.hibernate.search.util.common.impl.Contracts;
-import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
 import org.apache.lucene.search.Explanation;
 import org.apache.lucene.search.Query;
@@ -37,8 +35,6 @@ import org.apache.lucene.search.Sort;
 
 public class LuceneSearchQueryImpl<H> extends AbstractSearchQuery<H, LuceneSearchResult<H>>
 		implements LuceneSearchQuery<H> {
-
-	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	private final LuceneSyncWorkOrchestrator queryOrchestrator;
 	private final LuceneWorkFactory workFactory;
@@ -127,7 +123,7 @@ public class LuceneSearchQueryImpl<H> extends AbstractSearchQuery<H, LuceneSearc
 		Map<String, ? extends LuceneSearchIndexContext> mappedTypeNameToIndex =
 				scope.mappedTypeNameToIndex();
 		if ( mappedTypeNameToIndex.size() != 1 ) {
-			throw log.explainRequiresTypeName( mappedTypeNameToIndex.keySet() );
+			throw QueryLog.INSTANCE.explainRequiresTypeName( mappedTypeNameToIndex.keySet() );
 		}
 
 		Map.Entry<String, ? extends LuceneSearchIndexContext> entry = mappedTypeNameToIndex.entrySet().iterator()
@@ -148,7 +144,7 @@ public class LuceneSearchQueryImpl<H> extends AbstractSearchQuery<H, LuceneSearc
 				scope.mappedTypeNameToIndex();
 		LuceneSearchIndexContext index = mappedTypeNameToIndex.get( typeName );
 		if ( !mappedTypeNameToIndex.containsKey( typeName ) ) {
-			throw log.explainRequiresTypeTargetedByQuery( mappedTypeNameToIndex.keySet(), typeName );
+			throw QueryLog.INSTANCE.explainRequiresTypeTargetedByQuery( mappedTypeNameToIndex.keySet(), typeName );
 		}
 
 		String documentId = toDocumentId( index, id );

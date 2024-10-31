@@ -4,7 +4,6 @@
  */
 package org.hibernate.search.mapper.pojo.bridge.binding.impl;
 
-import java.lang.invoke.MethodHandles;
 import java.lang.reflect.Type;
 import java.util.Map;
 import java.util.Optional;
@@ -24,7 +23,7 @@ import org.hibernate.search.mapper.pojo.bridge.binding.spi.FieldModelContributor
 import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.ValueBinder;
 import org.hibernate.search.mapper.pojo.bridge.runtime.impl.PojoValueBridgeDocumentValueConverter;
 import org.hibernate.search.mapper.pojo.bridge.runtime.impl.PojoValueBridgeStringConverter;
-import org.hibernate.search.mapper.pojo.logging.impl.Log;
+import org.hibernate.search.mapper.pojo.logging.impl.MappingLog;
 import org.hibernate.search.mapper.pojo.model.PojoModelValue;
 import org.hibernate.search.mapper.pojo.model.impl.PojoModelValueElement;
 import org.hibernate.search.mapper.pojo.model.spi.PojoBootstrapIntrospector;
@@ -34,13 +33,10 @@ import org.hibernate.search.util.common.AssertionFailure;
 import org.hibernate.search.util.common.impl.AbstractCloser;
 import org.hibernate.search.util.common.impl.Closer;
 import org.hibernate.search.util.common.impl.SuppressingCloser;
-import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 import org.hibernate.search.util.common.reflect.impl.GenericTypeContext;
 
 public class ValueBindingContextImpl<V> extends AbstractBindingContext
 		implements ValueBindingContext<V> {
-
-	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	private final PojoBootstrapIntrospector introspector;
 
@@ -94,7 +90,7 @@ public class ValueBindingContextImpl<V> extends AbstractBindingContext
 		try {
 			PojoRawTypeModel<V2> expectedValueTypeModel = introspector.typeModel( expectedValueType );
 			if ( !valueTypeModel.rawType().isSubTypeOf( expectedValueTypeModel ) ) {
-				throw log.invalidInputTypeForBridge( bridgeHolder.get(), valueTypeModel, expectedValueTypeModel );
+				throw MappingLog.INSTANCE.invalidInputTypeForBridge( bridgeHolder.get(), valueTypeModel, expectedValueTypeModel );
 			}
 
 			IndexFieldReference<F> indexFieldReference = createFieldReference(
@@ -128,7 +124,7 @@ public class ValueBindingContextImpl<V> extends AbstractBindingContext
 			// This call should set the partial binding
 			binder.bind( this );
 			if ( partialBinding == null ) {
-				throw log.missingBridgeForBinder( binder );
+				throw MappingLog.INSTANCE.missingBridgeForBinder( binder );
 			}
 
 			// If all fields are filtered out, we should ignore the bridge
@@ -195,7 +191,7 @@ public class ValueBindingContextImpl<V> extends AbstractBindingContext
 			return contributor.inferDefaultFieldType( indexFieldTypeFactory, (Class<F>) typeArgument );
 		}
 		else {
-			throw log.invalidGenericParameterToInferFieldType( bridge, typeArgument );
+			throw MappingLog.INSTANCE.invalidGenericParameterToInferFieldType( bridge, typeArgument );
 		}
 	}
 

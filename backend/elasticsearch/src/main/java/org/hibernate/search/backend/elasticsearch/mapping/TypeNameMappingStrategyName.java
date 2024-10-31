@@ -4,11 +4,8 @@
  */
 package org.hibernate.search.backend.elasticsearch.mapping;
 
-import java.lang.invoke.MethodHandles;
-
-import org.hibernate.search.backend.elasticsearch.logging.impl.Log;
+import org.hibernate.search.backend.elasticsearch.logging.impl.ConfigurationLog;
 import org.hibernate.search.engine.cfg.spi.ParseUtils;
-import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
 public enum TypeNameMappingStrategyName {
 
@@ -25,14 +22,12 @@ public enum TypeNameMappingStrategyName {
 	 */
 	DISCRIMINATOR( "discriminator" );
 
-	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
-
 	// This method conforms to the MicroProfile Config specification. Do not change its signature.
 	public static TypeNameMappingStrategyName of(String value) {
 		return ParseUtils.parseDiscreteValues(
 				TypeNameMappingStrategyName.values(),
 				TypeNameMappingStrategyName::externalRepresentation,
-				log::invalidTypeNameMappingStrategyName,
+				ConfigurationLog.INSTANCE::invalidTypeNameMappingStrategyName,
 				value
 		);
 	}

@@ -4,7 +4,6 @@
  */
 package org.hibernate.search.mapper.orm.search.query.spi;
 
-import java.lang.invoke.MethodHandles;
 import java.util.function.Function;
 
 import jakarta.persistence.QueryTimeoutException;
@@ -13,14 +12,11 @@ import org.hibernate.ScrollableResults;
 import org.hibernate.query.spi.ScrollableResultsImplementor;
 import org.hibernate.search.engine.search.query.SearchScroll;
 import org.hibernate.search.engine.search.query.SearchScrollResult;
-import org.hibernate.search.mapper.orm.logging.impl.Log;
+import org.hibernate.search.mapper.orm.logging.impl.OrmSpecificLog;
 import org.hibernate.search.util.common.SearchTimeoutException;
-import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
 public class HibernateOrmSearchScrollableResultsAdapter<R, H>
 		implements ScrollableResults<R>, ScrollableResultsImplementor<R> {
-
-	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	private final SearchScroll<H> scroll;
 	private final int maxResults;
@@ -54,14 +50,14 @@ public class HibernateOrmSearchScrollableResultsAdapter<R, H>
 	@Override
 	public boolean previous() {
 		checkNotClosed();
-		throw log.cannotScrollBackwards();
+		throw OrmSpecificLog.INSTANCE.cannotScrollBackwards();
 	}
 
 	@Override
 	public boolean scroll(int positions) {
 		checkNotClosed();
 		if ( positions < 0 ) {
-			throw log.cannotScrollBackwards();
+			throw OrmSpecificLog.INSTANCE.cannotScrollBackwards();
 		}
 		if ( afterLast ) {
 			return false;
@@ -101,7 +97,7 @@ public class HibernateOrmSearchScrollableResultsAdapter<R, H>
 	public boolean last() {
 		checkNotClosed();
 		if ( afterLast ) {
-			throw log.cannotScrollBackwards();
+			throw OrmSpecificLog.INSTANCE.cannotScrollBackwards();
 		}
 		while ( !isLast() && !afterLast ) {
 			next();
@@ -116,7 +112,7 @@ public class HibernateOrmSearchScrollableResultsAdapter<R, H>
 			return true;
 		}
 		if ( currentIndexInScroll != -1 ) {
-			throw log.cannotScrollBackwards();
+			throw OrmSpecificLog.INSTANCE.cannotScrollBackwards();
 		}
 		return scroll( 1 );
 	}
@@ -125,7 +121,7 @@ public class HibernateOrmSearchScrollableResultsAdapter<R, H>
 	public void beforeFirst() {
 		checkNotClosed();
 		if ( currentIndexInScroll != -1 ) {
-			throw log.cannotScrollBackwards();
+			throw OrmSpecificLog.INSTANCE.cannotScrollBackwards();
 		}
 	}
 
@@ -162,7 +158,7 @@ public class HibernateOrmSearchScrollableResultsAdapter<R, H>
 			scroll.close();
 		}
 		catch (RuntimeException e) {
-			log.unableToCloseSearcherInScrollableResult( e );
+			OrmSpecificLog.INSTANCE.unableToCloseSearcherInScrollableResult( e );
 		}
 	}
 
@@ -186,7 +182,7 @@ public class HibernateOrmSearchScrollableResultsAdapter<R, H>
 		if ( rowNumber < 0 ) {
 			// Can't set the position relative to the last element if we're forward only,
 			// since we don't know it's the last element until we reach it.
-			throw log.cannotSetScrollPositionRelativeToEnd();
+			throw OrmSpecificLog.INSTANCE.cannotSetScrollPositionRelativeToEnd();
 		}
 
 		return scroll( rowNumber - currentIndexInScroll );
@@ -194,7 +190,7 @@ public class HibernateOrmSearchScrollableResultsAdapter<R, H>
 
 	// We cannot use @Override here because this method only exists in ORM 6.1.2+
 	public void setFetchSize(int i) {
-		throw log.cannotSetFetchSize();
+		throw OrmSpecificLog.INSTANCE.cannotSetFetchSize();
 	}
 
 	@Override
@@ -222,7 +218,7 @@ public class HibernateOrmSearchScrollableResultsAdapter<R, H>
 
 	private void checkNotClosed() {
 		if ( closed ) {
-			throw log.cannotUseClosedScrollableResults();
+			throw OrmSpecificLog.INSTANCE.cannotUseClosedScrollableResults();
 		}
 	}
 

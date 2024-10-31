@@ -10,8 +10,8 @@ import java.lang.invoke.MethodHandles;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.hibernate.search.util.logging.impl.Log;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
+import org.hibernate.search.util.logging.impl.MigrationHelperLog;
 
 import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.analysis.TokenStream;
@@ -32,7 +32,7 @@ public final class AnalyzerUtils {
 		//not allowed
 	}
 
-	public static final Log log = LoggerFactory.make( MethodHandles.lookup() );
+	public static final MigrationHelperLog log = LoggerFactory.make( MethodHandles.lookup() );
 
 	public static List<String> tokenizedTermValues(Analyzer analyzer, String field, String text) throws IOException {
 		final List<String> tokenList = new ArrayList<String>();

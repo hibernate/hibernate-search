@@ -9,24 +9,20 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
-import java.lang.invoke.MethodHandles;
 import java.util.Base64;
 import java.util.Locale;
 import java.util.Map;
 
 import org.hibernate.CacheMode;
-import org.hibernate.search.jakarta.batch.core.logging.impl.Log;
+import org.hibernate.search.jakarta.batch.core.logging.impl.JakartaBatchLog;
 import org.hibernate.search.mapper.orm.loading.spi.ConditionalExpression;
 import org.hibernate.search.util.common.SearchException;
 import org.hibernate.search.util.common.impl.StringHelper;
-import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
 /**
  * @author Mincong Huang
  */
 public final class SerializationUtil {
-
-	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	private SerializationUtil() {
 		// Private constructor, do not use it.
@@ -72,7 +68,7 @@ public final class SerializationUtil {
 		if ( "false".equalsIgnoreCase( value ) ) {
 			return false;
 		}
-		throw log.unableToParseJobParameter( key, value, "", null );
+		throw JakartaBatchLog.INSTANCE.unableToParseJobParameter( key, value, "", null );
 	}
 
 	public static int parseIntegerParameter(String key, String value) {
@@ -80,7 +76,7 @@ public final class SerializationUtil {
 			return Integer.parseInt( value );
 		}
 		catch (NumberFormatException e) {
-			throw log.unableToParseJobParameter( key, value, e.getMessage(), e );
+			throw JakartaBatchLog.INSTANCE.unableToParseJobParameter( key, value, e.getMessage(), e );
 		}
 	}
 
@@ -106,7 +102,7 @@ public final class SerializationUtil {
 			return Enum.valueOf( clazz, value );
 		}
 		catch (IllegalArgumentException e) {
-			throw log.unableToParseJobParameter( key, value, e.getMessage(), e );
+			throw JakartaBatchLog.INSTANCE.unableToParseJobParameter( key, value, e.getMessage(), e );
 		}
 	}
 

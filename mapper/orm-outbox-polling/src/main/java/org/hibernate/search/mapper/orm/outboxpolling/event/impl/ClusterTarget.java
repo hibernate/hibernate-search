@@ -4,7 +4,6 @@
  */
 package org.hibernate.search.mapper.orm.outboxpolling.event.impl;
 
-import java.lang.invoke.MethodHandles;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -14,11 +13,9 @@ import org.hibernate.search.mapper.orm.outboxpolling.cluster.impl.Agent;
 import org.hibernate.search.mapper.orm.outboxpolling.cluster.impl.AgentType;
 import org.hibernate.search.mapper.orm.outboxpolling.cluster.impl.ClusterDescriptor;
 import org.hibernate.search.mapper.orm.outboxpolling.cluster.impl.ShardAssignmentDescriptor;
-import org.hibernate.search.mapper.orm.outboxpolling.logging.impl.Log;
-import org.hibernate.search.util.common.logging.impl.LoggerFactory;
+import org.hibernate.search.mapper.orm.outboxpolling.logging.impl.ConfigurationLog;
 
 class ClusterTarget {
-	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	static ClusterTarget create(List<Agent> allAgentsInIdOrder) {
 		Agent[] candidatesInIdOrder = allAgentsInIdOrder.toArray( new Agent[0] );
@@ -51,14 +48,14 @@ class ClusterTarget {
 				}
 			}
 			else if ( !firstStaticAgentTotalShardCount.equals( agentTotalShardCount ) ) {
-				throw log.conflictingOutboxEventBackgroundProcessorAgentTotalShardCountForStaticSharding(
+				throw ConfigurationLog.INSTANCE.conflictingOutboxEventBackgroundProcessorAgentTotalShardCountForStaticSharding(
 						agent.getReference(), agentStaticShardAssignment,
 						firstStaticAgent.getReference(), firstStaticAgentTotalShardCount
 				);
 			}
 			Agent previouslyAssigned = membersInShardOrder.set( agentStaticShardAssignment.assignedShardIndex, agent );
 			if ( previouslyAssigned != null ) {
-				throw log.conflictingOutboxEventBackgroundProcessorAgentShardsForStaticSharding(
+				throw ConfigurationLog.INSTANCE.conflictingOutboxEventBackgroundProcessorAgentShardsForStaticSharding(
 						agent.getReference(), agentStaticShardAssignment, previouslyAssigned.getReference()
 				);
 			}

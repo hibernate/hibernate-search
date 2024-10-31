@@ -15,17 +15,15 @@ import static org.hibernate.search.backend.lucene.cfg.LuceneIndexSettings.IO_WRI
 import static org.hibernate.search.backend.lucene.cfg.LuceneIndexSettings.IO_WRITER_RAM_BUFFER_SIZE;
 
 import java.io.Serializable;
-import java.lang.invoke.MethodHandles;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.BiConsumer;
 import java.util.function.Function;
 
-import org.hibernate.search.backend.lucene.logging.impl.Log;
+import org.hibernate.search.backend.lucene.logging.impl.LuceneSpecificLog;
 import org.hibernate.search.engine.cfg.ConfigurationPropertySource;
 import org.hibernate.search.engine.cfg.spi.ConfigurationProperty;
 import org.hibernate.search.engine.cfg.spi.OptionalConfigurationProperty;
-import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 import org.hibernate.search.util.common.reporting.EventContext;
 
 import org.apache.lucene.index.IndexWriterConfig;
@@ -38,8 +36,6 @@ import org.apache.lucene.index.LogByteSizeMergePolicy;
  * @author Sanne Grinovero
  */
 public final class IndexWriterSettings implements Serializable {
-
-	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	private IndexWriterSettings() {
 	}
@@ -140,8 +136,8 @@ public final class IndexWriterSettings implements Serializable {
 			if ( value == null ) {
 				return null;
 			}
-			if ( log.isDebugEnabled() ) {
-				log.debugf( "Set index writer parameter %s to value : %s. %s",
+			if ( LuceneSpecificLog.INSTANCE.isDebugEnabled() ) {
+				LuceneSpecificLog.INSTANCE.debugf( "Set index writer parameter %s to value : %s. %s",
 						settingName, value, eventContext.renderWithPrefix() );
 			}
 			R processedValue = processor.apply( value );

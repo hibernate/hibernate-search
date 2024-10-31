@@ -4,25 +4,21 @@
  */
 package org.hibernate.search.backend.elasticsearch.orchestration.impl;
 
-import java.lang.invoke.MethodHandles;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionStage;
 
-import org.hibernate.search.backend.elasticsearch.logging.impl.Log;
+import org.hibernate.search.backend.elasticsearch.logging.impl.ElasticsearchClientLog;
 import org.hibernate.search.backend.elasticsearch.work.impl.BulkableWork;
 import org.hibernate.search.backend.elasticsearch.work.impl.ElasticsearchWork;
 import org.hibernate.search.backend.elasticsearch.work.impl.ElasticsearchWorkExecutionContext;
 import org.hibernate.search.backend.elasticsearch.work.impl.NonBulkableWork;
 import org.hibernate.search.backend.elasticsearch.work.result.impl.BulkResult;
 import org.hibernate.search.util.common.impl.Futures;
-import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
 /**
  * A simple implementation of {@link ElasticsearchWorkSequenceBuilder}.
  */
 class ElasticsearchDefaultWorkSequenceBuilder implements ElasticsearchWorkSequenceBuilder {
-
-	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	private final ElasticsearchWorkExecutionContext context;
 
@@ -234,7 +230,8 @@ class ElasticsearchDefaultWorkSequenceBuilder implements ElasticsearchWorkSequen
 		void onBulkWorkComplete(Object ignored, Throwable throwable) {
 			if ( throwable != null ) {
 				// The bulk work failed; mark the bulked work as failed too
-				fail( log.elasticsearchFailedBecauseOfBulkFailure( throwable.getMessage(), throwable ) );
+				fail( ElasticsearchClientLog.INSTANCE.elasticsearchFailedBecauseOfBulkFailure( throwable.getMessage(),
+						throwable ) );
 			}
 		}
 

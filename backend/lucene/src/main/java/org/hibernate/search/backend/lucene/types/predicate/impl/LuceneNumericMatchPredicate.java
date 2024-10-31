@@ -4,9 +4,7 @@
  */
 package org.hibernate.search.backend.lucene.types.predicate.impl;
 
-import java.lang.invoke.MethodHandles;
-
-import org.hibernate.search.backend.lucene.logging.impl.Log;
+import org.hibernate.search.backend.lucene.logging.impl.QueryLog;
 import org.hibernate.search.backend.lucene.search.common.impl.AbstractLuceneCodecAwareSearchQueryElementFactory;
 import org.hibernate.search.backend.lucene.search.common.impl.LuceneSearchIndexScope;
 import org.hibernate.search.backend.lucene.search.common.impl.LuceneSearchIndexValueFieldContext;
@@ -16,13 +14,10 @@ import org.hibernate.search.backend.lucene.types.codec.impl.AbstractLuceneNumeri
 import org.hibernate.search.engine.search.common.ValueModel;
 import org.hibernate.search.engine.search.predicate.SearchPredicate;
 import org.hibernate.search.engine.search.predicate.spi.MatchPredicateBuilder;
-import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
 import org.apache.lucene.search.Query;
 
 public class LuceneNumericMatchPredicate extends AbstractLuceneLeafSingleFieldPredicate {
-
-	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	private LuceneNumericMatchPredicate(Builder<?, ?> builder) {
 		super( builder );
@@ -59,27 +54,27 @@ public class LuceneNumericMatchPredicate extends AbstractLuceneLeafSingleFieldPr
 
 		@Override
 		public void fuzzy(int maxEditDistance, int exactPrefixLength) {
-			throw log.fullTextFeaturesNotSupportedByFieldType( field.eventContext() );
+			throw QueryLog.INSTANCE.fullTextFeaturesNotSupportedByFieldType( field.eventContext() );
 		}
 
 		@Override
 		public void analyzer(String analyzerName) {
-			throw log.fullTextFeaturesNotSupportedByFieldType( field.eventContext() );
+			throw QueryLog.INSTANCE.fullTextFeaturesNotSupportedByFieldType( field.eventContext() );
 		}
 
 		@Override
 		public void skipAnalysis() {
-			throw log.fullTextFeaturesNotSupportedByFieldType( field.eventContext() );
+			throw QueryLog.INSTANCE.fullTextFeaturesNotSupportedByFieldType( field.eventContext() );
 		}
 
 		@Override
 		public void minimumShouldMatchNumber(int ignoreConstraintCeiling, int matchingClausesNumber) {
-			throw log.fullTextFeaturesNotSupportedByFieldType( field.eventContext() );
+			throw QueryLog.INSTANCE.fullTextFeaturesNotSupportedByFieldType( field.eventContext() );
 		}
 
 		@Override
 		public void minimumShouldMatchPercent(int ignoreConstraintCeiling, int matchingClausesPercent) {
-			throw log.fullTextFeaturesNotSupportedByFieldType( field.eventContext() );
+			throw QueryLog.INSTANCE.fullTextFeaturesNotSupportedByFieldType( field.eventContext() );
 		}
 
 		@Override

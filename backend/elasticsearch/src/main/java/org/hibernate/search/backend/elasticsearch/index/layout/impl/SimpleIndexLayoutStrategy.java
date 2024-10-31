@@ -4,13 +4,11 @@
  */
 package org.hibernate.search.backend.elasticsearch.index.layout.impl;
 
-import java.lang.invoke.MethodHandles;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.hibernate.search.backend.elasticsearch.index.layout.IndexLayoutStrategy;
-import org.hibernate.search.backend.elasticsearch.logging.impl.Log;
-import org.hibernate.search.util.common.logging.impl.LoggerFactory;
+import org.hibernate.search.backend.elasticsearch.logging.impl.ElasticsearchClientLog;
 
 /**
  * A simple layout strategy for indexes:
@@ -24,8 +22,6 @@ import org.hibernate.search.util.common.logging.impl.LoggerFactory;
  * </ul>
  */
 public final class SimpleIndexLayoutStrategy implements IndexLayoutStrategy {
-
-	static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	public static final String NAME = "simple";
 
@@ -55,7 +51,7 @@ public final class SimpleIndexLayoutStrategy implements IndexLayoutStrategy {
 	public String extractUniqueKeyFromElasticsearchIndexName(String elasticsearchIndexName) {
 		Matcher matcher = UNIQUE_KEY_EXTRACTION_PATTERN.matcher( elasticsearchIndexName );
 		if ( !matcher.matches() ) {
-			throw log.invalidIndexPrimaryName( elasticsearchIndexName, UNIQUE_KEY_EXTRACTION_PATTERN );
+			throw ElasticsearchClientLog.INSTANCE.invalidIndexPrimaryName( elasticsearchIndexName, UNIQUE_KEY_EXTRACTION_PATTERN );
 		}
 		return matcher.group( 1 );
 	}

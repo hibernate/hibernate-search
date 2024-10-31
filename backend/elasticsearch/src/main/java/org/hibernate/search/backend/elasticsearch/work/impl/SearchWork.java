@@ -4,7 +4,6 @@
  */
 package org.hibernate.search.backend.elasticsearch.work.impl;
 
-import java.lang.invoke.MethodHandles;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.concurrent.CompletableFuture;
@@ -12,17 +11,13 @@ import java.util.concurrent.CompletableFuture;
 import org.hibernate.search.backend.elasticsearch.client.impl.Paths;
 import org.hibernate.search.backend.elasticsearch.client.spi.ElasticsearchRequest;
 import org.hibernate.search.backend.elasticsearch.client.spi.ElasticsearchResponse;
-import org.hibernate.search.backend.elasticsearch.logging.impl.Log;
+import org.hibernate.search.backend.elasticsearch.logging.impl.QueryLog;
 import org.hibernate.search.backend.elasticsearch.util.spi.URLEncodedString;
 import org.hibernate.search.engine.common.timing.Deadline;
-import org.hibernate.search.util.common.logging.impl.DefaultLogCategories;
-import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
 import com.google.gson.JsonObject;
 
 public class SearchWork<R> extends AbstractNonBulkableWork<R> {
-
-	private static final Log queryLog = LoggerFactory.make( Log.class, DefaultLogCategories.QUERY, MethodHandles.lookup() );
 
 	private final ElasticsearchSearchResultExtractor<R> resultExtractor;
 	private final Deadline deadline;
@@ -38,7 +33,7 @@ public class SearchWork<R> extends AbstractNonBulkableWork<R> {
 	@Override
 	protected CompletableFuture<?> beforeExecute(ElasticsearchWorkExecutionContext executionContext,
 			ElasticsearchRequest request) {
-		queryLog.executingElasticsearchQuery(
+		QueryLog.INSTANCE.executingElasticsearchQuery(
 				request.path(),
 				request.parameters(),
 				executionContext.getGsonProvider().getLogHelper().toString( request.bodyParts() )

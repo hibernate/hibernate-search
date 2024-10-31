@@ -4,9 +4,7 @@
  */
 package org.hibernate.search.backend.elasticsearch.types.dsl.impl;
 
-import java.lang.invoke.MethodHandles;
-
-import org.hibernate.search.backend.elasticsearch.logging.impl.Log;
+import org.hibernate.search.backend.elasticsearch.logging.impl.MappingLog;
 import org.hibernate.search.backend.elasticsearch.lowlevel.index.mapping.impl.PropertyMapping;
 import org.hibernate.search.backend.elasticsearch.search.predicate.impl.ElasticsearchExistsPredicate;
 import org.hibernate.search.backend.elasticsearch.search.projection.impl.ElasticsearchFieldProjection;
@@ -20,14 +18,11 @@ import org.hibernate.search.engine.backend.types.dsl.VectorFieldTypeOptionsStep;
 import org.hibernate.search.engine.search.predicate.spi.PredicateTypeKeys;
 import org.hibernate.search.engine.search.projection.spi.ProjectionTypeKeys;
 import org.hibernate.search.util.common.AssertionFailure;
-import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
 abstract class AbstractElasticsearchVectorFieldTypeOptionsStep<
 		S extends AbstractElasticsearchVectorFieldTypeOptionsStep<?, F>,
 		F> extends AbstractElasticsearchIndexFieldTypeOptionsStep<S, F>
 		implements VectorFieldTypeOptionsStep<S, F>, ElasticsearchVectorFieldTypeMappingContributor.Context {
-
-	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	private final ElasticsearchVectorFieldTypeMappingContributor mappingContributor;
 
@@ -91,7 +86,8 @@ abstract class AbstractElasticsearchVectorFieldTypeOptionsStep<
 	@Override
 	public ElasticsearchIndexValueFieldType<F> toIndexFieldType() {
 		if ( dimension == null ) {
-			throw log.nullVectorDimension( buildContext.hints().missingVectorDimension(), buildContext.getEventContext() );
+			throw MappingLog.INSTANCE.nullVectorDimension( buildContext.hints().missingVectorDimension(),
+					buildContext.getEventContext() );
 		}
 		PropertyMapping mapping = builder.mapping();
 

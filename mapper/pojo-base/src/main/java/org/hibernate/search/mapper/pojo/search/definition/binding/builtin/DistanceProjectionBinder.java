@@ -4,7 +4,6 @@
  */
 package org.hibernate.search.mapper.pojo.search.definition.binding.builtin;
 
-import java.lang.invoke.MethodHandles;
 import java.util.Optional;
 import java.util.function.Function;
 
@@ -16,12 +15,11 @@ import org.hibernate.search.engine.search.projection.dsl.DistanceToFieldProjecti
 import org.hibernate.search.engine.search.projection.dsl.SearchProjectionFactory;
 import org.hibernate.search.engine.spatial.DistanceUnit;
 import org.hibernate.search.engine.spatial.GeoPoint;
-import org.hibernate.search.mapper.pojo.logging.impl.Log;
+import org.hibernate.search.mapper.pojo.logging.impl.ProjectionLog;
 import org.hibernate.search.mapper.pojo.model.PojoModelValue;
 import org.hibernate.search.mapper.pojo.search.definition.binding.ProjectionBinder;
 import org.hibernate.search.mapper.pojo.search.definition.binding.ProjectionBindingContext;
 import org.hibernate.search.util.common.impl.Contracts;
-import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
 /**
  * Binds a constructor parameter to a projection to the distance from the center to a field in the indexed document.
@@ -30,7 +28,6 @@ import org.hibernate.search.util.common.logging.impl.LoggerFactory;
  * @see org.hibernate.search.mapper.pojo.mapping.definition.annotation.DistanceProjection
  */
 public final class DistanceProjectionBinder implements ProjectionBinder {
-	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	/**
 	 * Creates a {@link DistanceProjectionBinder} to be passed
@@ -101,7 +98,7 @@ public final class DistanceProjectionBinder implements ProjectionBinder {
 		if ( containerElementOptional.isPresent() ) {
 			PojoModelValue<?> containerElement = containerElementOptional.get();
 			if ( !containerElement.rawType().isAssignableFrom( Double.class ) ) {
-				throw log.invalidParameterTypeForDistanceProjectionInProjectionConstructor(
+				throw ProjectionLog.INSTANCE.invalidParameterTypeForDistanceProjectionInProjectionConstructor(
 						containerElement.rawType(),
 						"SomeContainer<Double>" );
 			}
@@ -109,7 +106,7 @@ public final class DistanceProjectionBinder implements ProjectionBinder {
 		}
 		else {
 			if ( !context.constructorParameter().rawType().isAssignableFrom( Double.class ) ) {
-				throw log.invalidParameterTypeForDistanceProjectionInProjectionConstructor(
+				throw ProjectionLog.INSTANCE.invalidParameterTypeForDistanceProjectionInProjectionConstructor(
 						context.constructorParameter().rawType(), "Double" );
 			}
 			containerClass = null;
@@ -133,7 +130,7 @@ public final class DistanceProjectionBinder implements ProjectionBinder {
 		}
 		Optional<String> paramName = context.constructorParameter().name();
 		if ( paramName.isEmpty() ) {
-			throw log.missingParameterNameForFieldProjectionInProjectionConstructor();
+			throw ProjectionLog.INSTANCE.missingParameterNameForFieldProjectionInProjectionConstructor();
 		}
 		return paramName.get();
 	}

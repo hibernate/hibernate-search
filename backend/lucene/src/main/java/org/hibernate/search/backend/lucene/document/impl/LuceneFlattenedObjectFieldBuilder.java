@@ -4,18 +4,14 @@
  */
 package org.hibernate.search.backend.lucene.document.impl;
 
-import java.lang.invoke.MethodHandles;
 import java.util.HashSet;
 import java.util.Set;
 
 import org.hibernate.search.backend.lucene.document.model.impl.LuceneIndexModel;
 import org.hibernate.search.backend.lucene.document.model.impl.LuceneIndexObjectField;
-import org.hibernate.search.backend.lucene.logging.impl.Log;
-import org.hibernate.search.util.common.logging.impl.LoggerFactory;
+import org.hibernate.search.backend.lucene.logging.impl.IndexingLog;
 
 class LuceneFlattenedObjectFieldBuilder extends AbstractLuceneObjectFieldBuilder {
-
-	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	private final Set<String> encounteredFields = new HashSet<>();
 
@@ -31,7 +27,7 @@ class LuceneFlattenedObjectFieldBuilder extends AbstractLuceneObjectFieldBuilder
 		// because the single-valued field may have one value for each flattened object.
 		boolean firstEncounter = encounteredFields.add( absoluteFieldPath );
 		if ( !firstEncounter ) {
-			throw log.multipleValuesForSingleValuedField( absoluteFieldPath );
+			throw IndexingLog.INSTANCE.multipleValuesForSingleValuedField( absoluteFieldPath );
 		}
 	}
 }

@@ -4,7 +4,6 @@
  */
 package org.hibernate.search.mapper.pojo.bridge.binding.impl;
 
-import java.lang.invoke.MethodHandles;
 import java.util.Map;
 
 import org.hibernate.search.engine.environment.bean.BeanHolder;
@@ -12,19 +11,16 @@ import org.hibernate.search.engine.environment.bean.BeanResolver;
 import org.hibernate.search.mapper.pojo.bridge.RoutingBridge;
 import org.hibernate.search.mapper.pojo.bridge.binding.RoutingBindingContext;
 import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.RoutingBinder;
-import org.hibernate.search.mapper.pojo.logging.impl.Log;
+import org.hibernate.search.mapper.pojo.logging.impl.MappingLog;
 import org.hibernate.search.mapper.pojo.model.PojoModelType;
 import org.hibernate.search.mapper.pojo.model.dependency.PojoRoutingIndexingDependencyConfigurationContext;
 import org.hibernate.search.mapper.pojo.model.dependency.impl.PojoRoutingIndexingDependencyConfigurationContextImpl;
 import org.hibernate.search.mapper.pojo.model.impl.PojoModelTypeRootElement;
 import org.hibernate.search.mapper.pojo.model.spi.PojoBootstrapIntrospector;
 import org.hibernate.search.mapper.pojo.model.spi.PojoRawTypeModel;
-import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
 public class RoutingBindingContextImpl<E> extends AbstractCompositeBindingContext
 		implements RoutingBindingContext {
-
-	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	private final PojoBootstrapIntrospector introspector;
 
@@ -57,7 +53,7 @@ public class RoutingBindingContextImpl<E> extends AbstractCompositeBindingContex
 	public <E2> void bridge(Class<E2> expectedType, BeanHolder<? extends RoutingBridge<E2>> bridgeHolder) {
 		PojoRawTypeModel<E2> expectedTypeModel = introspector.typeModel( expectedType );
 		if ( !indexedEntityType.isSubTypeOf( expectedTypeModel ) ) {
-			throw log.invalidInputTypeForRoutingBridge( bridgeHolder.get(), indexedEntityType, expectedTypeModel );
+			throw MappingLog.INSTANCE.invalidInputTypeForRoutingBridge( bridgeHolder.get(), indexedEntityType, expectedTypeModel );
 		}
 		routingBridgeHolder = (BeanHolder<? extends RoutingBridge<? super E>>) bridgeHolder;
 	}
@@ -76,7 +72,7 @@ public class RoutingBindingContextImpl<E> extends AbstractCompositeBindingContex
 		binder.bind( this );
 
 		if ( routingBridgeHolder == null ) {
-			throw log.missingBridgeForBinder( binder );
+			throw MappingLog.INSTANCE.missingBridgeForBinder( binder );
 		}
 
 		checkBridgeDependencies( pojoModelTypeRootElement, dependencyContext );

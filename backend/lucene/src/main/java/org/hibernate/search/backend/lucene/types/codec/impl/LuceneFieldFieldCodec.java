@@ -4,20 +4,16 @@
  */
 package org.hibernate.search.backend.lucene.types.codec.impl;
 
-import java.lang.invoke.MethodHandles;
 import java.util.Objects;
 
-import org.hibernate.search.backend.lucene.logging.impl.Log;
+import org.hibernate.search.backend.lucene.logging.impl.IndexingLog;
 import org.hibernate.search.backend.lucene.types.converter.LuceneFieldContributor;
 import org.hibernate.search.backend.lucene.types.converter.LuceneFieldValueExtractor;
 import org.hibernate.search.util.common.AssertionFailure;
-import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
 import org.apache.lucene.index.IndexableField;
 
 public final class LuceneFieldFieldCodec<F> implements LuceneFieldCodec<F, F> {
-
-	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	private final LuceneFieldContributor<F> fieldContributor;
 	private final LuceneFieldValueExtractor<F> fieldValueExtractor;
@@ -84,7 +80,7 @@ public final class LuceneFieldFieldCodec<F> implements LuceneFieldCodec<F, F> {
 
 	private static void contributeField(LuceneDocumentContent documentBuilder, String absoluteFieldPath, IndexableField field) {
 		if ( !absoluteFieldPath.equals( field.name() ) ) {
-			throw log.invalidFieldPath( absoluteFieldPath, field.name() );
+			throw IndexingLog.INSTANCE.invalidFieldPath( absoluteFieldPath, field.name() );
 		}
 		documentBuilder.addField( field );
 	}

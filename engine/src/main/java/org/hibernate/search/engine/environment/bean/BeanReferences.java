@@ -4,18 +4,14 @@
  */
 package org.hibernate.search.engine.environment.bean;
 
-import java.lang.invoke.MethodHandles;
 import java.util.Arrays;
 import java.util.Locale;
 import java.util.stream.Collectors;
 
-import org.hibernate.search.engine.logging.impl.Log;
+import org.hibernate.search.engine.logging.impl.BeanLog;
 import org.hibernate.search.util.common.impl.Contracts;
-import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
 final class BeanReferences {
-
-	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	private BeanReferences() {
 	}
@@ -37,7 +33,7 @@ final class BeanReferences {
 				retrieval = BeanRetrieval.valueOf( retrievalAsString.toUpperCase( Locale.ROOT ) );
 			}
 			catch (IllegalArgumentException e) {
-				throw log.invalidBeanRetrieval( value, retrievalAsString + ':',
+				throw BeanLog.INSTANCE.invalidBeanRetrieval( value, retrievalAsString + ':',
 						Arrays.stream( BeanRetrieval.values() )
 								.map( v -> v.name().toLowerCase( Locale.ROOT ) + ':' )
 								.collect( Collectors.toList() ),

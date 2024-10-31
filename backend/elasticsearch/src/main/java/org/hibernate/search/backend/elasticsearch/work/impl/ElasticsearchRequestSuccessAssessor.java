@@ -6,7 +6,6 @@ package org.hibernate.search.backend.elasticsearch.work.impl;
 
 import static java.util.function.Predicate.isEqual;
 
-import java.lang.invoke.MethodHandles;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Optional;
@@ -15,15 +14,12 @@ import java.util.Set;
 import org.hibernate.search.backend.elasticsearch.client.impl.ElasticsearchClientUtils;
 import org.hibernate.search.backend.elasticsearch.client.spi.ElasticsearchResponse;
 import org.hibernate.search.backend.elasticsearch.gson.impl.JsonAccessor;
-import org.hibernate.search.backend.elasticsearch.logging.impl.Log;
+import org.hibernate.search.backend.elasticsearch.logging.impl.ElasticsearchClientLog;
 import org.hibernate.search.util.common.SearchException;
-import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
 import com.google.gson.JsonObject;
 
 public class ElasticsearchRequestSuccessAssessor {
-
-	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	private static final JsonAccessor<Integer> BULK_ITEM_STATUS_CODE = JsonAccessor.root().property( "status" ).asInteger();
 	private static final JsonAccessor<String> ERROR_TYPE =
@@ -119,10 +115,10 @@ public class ElasticsearchRequestSuccessAssessor {
 	private void checkSuccess(Optional<Integer> statusCode, JsonObject responseBody) {
 		if ( !isSuccess( statusCode, responseBody ) ) {
 			if ( statusCode.filter( isEqual( TIME_OUT_HTTP_STATUS_CODE ) ).isPresent() ) {
-				throw log.elasticsearchStatus408RequestTimeout();
+				throw ElasticsearchClientLog.INSTANCE.elasticsearchStatus408RequestTimeout();
 			}
 			else {
-				throw log.elasticsearchResponseIndicatesFailure();
+				throw ElasticsearchClientLog.INSTANCE.elasticsearchResponseIndicatesFailure();
 			}
 		}
 	}

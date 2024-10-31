@@ -4,7 +4,6 @@
  */
 package org.hibernate.search.mapper.pojo.identity.impl;
 
-import java.lang.invoke.MethodHandles;
 import java.util.Collections;
 import java.util.Map;
 import java.util.Optional;
@@ -15,7 +14,7 @@ import org.hibernate.search.mapper.pojo.bridge.IdentifierBridge;
 import org.hibernate.search.mapper.pojo.bridge.binding.impl.BoundIdentifierBridge;
 import org.hibernate.search.mapper.pojo.bridge.mapping.impl.BeanBinder;
 import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.IdentifierBinder;
-import org.hibernate.search.mapper.pojo.logging.impl.Log;
+import org.hibernate.search.mapper.pojo.logging.impl.MappingLog;
 import org.hibernate.search.mapper.pojo.mapping.building.impl.PojoMappingHelper;
 import org.hibernate.search.mapper.pojo.mapping.building.spi.PojoIndexMappingCollectorTypeNode;
 import org.hibernate.search.mapper.pojo.model.path.impl.BoundPojoModelPath;
@@ -23,10 +22,8 @@ import org.hibernate.search.mapper.pojo.model.path.impl.BoundPojoModelPathProper
 import org.hibernate.search.mapper.pojo.model.spi.PojoPropertyModel;
 import org.hibernate.search.mapper.pojo.model.spi.PojoRawTypeModel;
 import org.hibernate.search.util.common.impl.Closer;
-import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
 public final class PojoRootIdentityMappingCollector<E> implements PojoIdentityMappingCollector {
-	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	private final PojoRawTypeModel<E> typeModel;
 	private final PojoMappingHelper mappingHelper;
@@ -104,7 +101,7 @@ public final class PojoRootIdentityMappingCollector<E> implements PojoIdentityMa
 				identifierBridge( entityIdPropertyPath.get(), null, Collections.emptyMap() );
 			}
 			else {
-				throw log.missingIdentifierMapping( typeModel );
+				throw MappingLog.INSTANCE.missingIdentifierMapping( typeModel );
 			}
 		}
 		else {

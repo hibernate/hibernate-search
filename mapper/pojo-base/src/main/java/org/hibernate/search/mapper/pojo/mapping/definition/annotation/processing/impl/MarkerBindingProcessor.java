@@ -4,7 +4,6 @@
  */
 package org.hibernate.search.mapper.pojo.mapping.definition.annotation.processing.impl;
 
-import java.lang.invoke.MethodHandles;
 import java.util.Map;
 import java.util.Optional;
 
@@ -12,17 +11,14 @@ import org.hibernate.search.engine.environment.bean.BeanReference;
 import org.hibernate.search.mapper.pojo.bridge.mapping.annotation.MarkerBinderRef;
 import org.hibernate.search.mapper.pojo.bridge.mapping.impl.BeanDelegatingBinder;
 import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.MarkerBinder;
-import org.hibernate.search.mapper.pojo.logging.impl.Log;
+import org.hibernate.search.mapper.pojo.logging.impl.MappingLog;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.MarkerBinding;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.processing.MappingAnnotationProcessorContext;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.processing.PropertyMappingAnnotationProcessor;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.processing.PropertyMappingAnnotationProcessorContext;
 import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.PropertyMappingStep;
-import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
 public final class MarkerBindingProcessor implements PropertyMappingAnnotationProcessor<MarkerBinding> {
-
-	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	@Override
 	public void process(PropertyMappingStep mapping, MarkerBinding annotation,
@@ -43,7 +39,7 @@ public final class MarkerBindingProcessor implements PropertyMappingAnnotationPr
 		);
 
 		if ( !binderReference.isPresent() ) {
-			throw log.missingBinderReferenceInBinding();
+			throw MappingLog.INSTANCE.missingBinderReferenceInBinding();
 		}
 
 		return new BeanDelegatingBinder( binderReference.get() );

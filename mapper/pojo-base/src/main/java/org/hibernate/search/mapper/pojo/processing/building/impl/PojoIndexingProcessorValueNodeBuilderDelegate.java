@@ -4,7 +4,6 @@
  */
 package org.hibernate.search.mapper.pojo.processing.building.impl;
 
-import java.lang.invoke.MethodHandles;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -23,7 +22,7 @@ import org.hibernate.search.mapper.pojo.bridge.ValueBridge;
 import org.hibernate.search.mapper.pojo.bridge.binding.impl.BoundValueBridge;
 import org.hibernate.search.mapper.pojo.bridge.binding.spi.FieldModelContributor;
 import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.ValueBinder;
-import org.hibernate.search.mapper.pojo.logging.impl.Log;
+import org.hibernate.search.mapper.pojo.logging.impl.MappingLog;
 import org.hibernate.search.mapper.pojo.mapping.building.impl.PojoMappingHelper;
 import org.hibernate.search.mapper.pojo.mapping.building.spi.PojoIndexMappingCollectorValueNode;
 import org.hibernate.search.mapper.pojo.mapping.building.spi.PojoTypeMetadataContributor;
@@ -37,7 +36,6 @@ import org.hibernate.search.mapper.pojo.processing.impl.PojoIndexingProcessor;
 import org.hibernate.search.mapper.pojo.processing.impl.PojoIndexingProcessorValueBridgeNode;
 import org.hibernate.search.util.common.impl.Closer;
 import org.hibernate.search.util.common.impl.SuppressingCloser;
-import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
 /**
  * A delegate to be used by {@link PojoIndexingProcessorPropertyNodeBuilder}
@@ -48,8 +46,6 @@ import org.hibernate.search.util.common.logging.impl.LoggerFactory;
  */
 class PojoIndexingProcessorValueNodeBuilderDelegate<P, V> extends AbstractPojoProcessorNodeBuilder
 		implements PojoIndexMappingCollectorValueNode {
-
-	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	private final BoundPojoModelPathValueNode<?, P, V> modelPath;
 
@@ -139,7 +135,7 @@ class PojoIndexingProcessorValueNodeBuilderDelegate<P, V> extends AbstractPojoPr
 		Set<PojoTypeMetadataContributor> contributors = mappingHelper.contributorProvider()
 				.get( targetTypeModel.rawType() );
 		if ( !includeEmbeddedObjectId && contributors.isEmpty() ) {
-			throw log.invalidIndexedEmbedded( targetTypeModel );
+			throw MappingLog.INSTANCE.invalidIndexedEmbedded( targetTypeModel );
 		}
 		contributors.forEach( c -> c.contributeIndexMapping( nestedProcessorBuilder ) );
 		if ( includeEmbeddedObjectId ) {

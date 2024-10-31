@@ -4,7 +4,6 @@
  */
 package org.hibernate.search.engine.environment.bean.impl;
 
-import java.lang.invoke.MethodHandles;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -13,9 +12,8 @@ import java.util.Map;
 import java.util.TreeMap;
 
 import org.hibernate.search.engine.environment.bean.BeanReference;
-import org.hibernate.search.engine.logging.impl.Log;
+import org.hibernate.search.engine.logging.impl.BeanLog;
 import org.hibernate.search.util.common.AssertionFailure;
-import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
 /**
  * A registry for beans of a given exposed type that were explicitly registered through a
@@ -24,8 +22,6 @@ import org.hibernate.search.util.common.logging.impl.LoggerFactory;
  * @param <T> The type exposed by beans in this registry.
  */
 public class BeanReferenceRegistryForType<T> {
-
-	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	private final Class<T> exposedType;
 	private final List<BeanReference<T>> all = new ArrayList<>();
@@ -48,7 +44,7 @@ public class BeanReferenceRegistryForType<T> {
 			return all.get( 0 );
 		}
 		else if ( all.size() > 1 ) {
-			throw log.multipleConfiguredBeanReferencesForType( exposedType, all );
+			throw BeanLog.INSTANCE.multipleConfiguredBeanReferencesForType( exposedType, all );
 		}
 		else {
 			return null;

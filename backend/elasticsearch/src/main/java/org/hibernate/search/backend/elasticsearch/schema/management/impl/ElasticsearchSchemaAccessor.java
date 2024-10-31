@@ -4,7 +4,6 @@
  */
 package org.hibernate.search.backend.elasticsearch.schema.management.impl;
 
-import java.lang.invoke.MethodHandles;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.CompletableFuture;
@@ -12,7 +11,7 @@ import java.util.stream.Collectors;
 
 import org.hibernate.search.backend.elasticsearch.index.IndexStatus;
 import org.hibernate.search.backend.elasticsearch.index.layout.impl.IndexNames;
-import org.hibernate.search.backend.elasticsearch.logging.impl.Log;
+import org.hibernate.search.backend.elasticsearch.logging.impl.ElasticsearchClientLog;
 import org.hibernate.search.backend.elasticsearch.lowlevel.index.aliases.impl.IndexAliasDefinition;
 import org.hibernate.search.backend.elasticsearch.lowlevel.index.mapping.impl.RootTypeMapping;
 import org.hibernate.search.backend.elasticsearch.lowlevel.index.settings.impl.IndexSettings;
@@ -25,15 +24,12 @@ import org.hibernate.search.backend.elasticsearch.work.result.impl.ExistingIndex
 import org.hibernate.search.engine.backend.work.execution.OperationSubmitter;
 import org.hibernate.search.util.common.impl.Futures;
 import org.hibernate.search.util.common.impl.Throwables;
-import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
 /**
  * A utility implementing primitives for the various {@code ElasticsearchSchema*Impl}.
  * @author Gunnar Morling
  */
 final class ElasticsearchSchemaAccessor {
-
-	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	private final ElasticsearchWorkFactory workFactory;
 
@@ -93,7 +89,7 @@ final class ElasticsearchSchemaAccessor {
 				.build();
 		return execute( work, operationSubmitter )
 				.exceptionally( Futures.handler( e -> {
-					throw log.elasticsearchIndexMetadataRetrievalFailed( e.getMessage(),
+					throw ElasticsearchClientLog.INSTANCE.elasticsearchIndexMetadataRetrievalFailed( e.getMessage(),
 							Throwables.expectException( e ) );
 				} ) )
 				.thenApply( list -> {
@@ -102,11 +98,11 @@ final class ElasticsearchSchemaAccessor {
 							return null;
 						}
 						else {
-							throw log.indexMissing( indexNames.write(), indexNames.read() );
+							throw ElasticsearchClientLog.INSTANCE.indexMissing( indexNames.write(), indexNames.read() );
 						}
 					}
 					if ( list.size() > 1 ) {
-						throw log.elasticsearchIndexNameAndAliasesMatchMultipleIndexes(
+						throw ElasticsearchClientLog.INSTANCE.elasticsearchIndexNameAndAliasesMatchMultipleIndexes(
 								indexNames.write(), indexNames.read(),
 								list.stream().map( ExistingIndexMetadata::getPrimaryName ).collect( Collectors.toSet() )
 						);
@@ -120,7 +116,7 @@ final class ElasticsearchSchemaAccessor {
 		NonBulkableWork<?> work = getWorkFactory().putIndexAliases( indexName, aliases ).build();
 		return execute( work, operationSubmitter )
 				.exceptionally( Futures.handler( e -> {
-					throw log.elasticsearchAliasUpdateFailed( indexName.original, e.getMessage(),
+					throw ElasticsearchClientLog.INSTANCE.elasticsearchAliasUpdateFailed( indexName.original, e.getMessage(),
 							Throwables.expectException( e ) );
 				} ) );
 	}
@@ -130,7 +126,7 @@ final class ElasticsearchSchemaAccessor {
 		NonBulkableWork<?> work = getWorkFactory().putIndexSettings( indexName, settings ).build();
 		return execute( work, operationSubmitter )
 				.exceptionally( Futures.handler( e -> {
-					throw log.elasticsearchSettingsUpdateFailed( indexName.original, e.getMessage(),
+					throw ElasticsearchClientLog.INSTANCE.elasticsearchSettingsUpdateFailed( indexName.original, e.getMessage(),
 							Throwables.expectException( e ) );
 				} ) );
 	}
@@ -140,7 +136,7 @@ final class ElasticsearchSchemaAccessor {
 		NonBulkableWork<?> work = getWorkFactory().putIndexTypeMapping( indexName, mapping ).build();
 		return execute( work, operationSubmitter )
 				.exceptionally( Futures.handler( e -> {
-					throw log.elasticsearchMappingUpdateFailed(
+					throw ElasticsearchClientLog.INSTANCE.elasticsearchMappingUpdateFailed(
 							indexName.original, e.getMessage(), Throwables.expectException( e )
 					);
 				} ) );
@@ -162,7 +158,7 @@ final class ElasticsearchSchemaAccessor {
 						.build();
 		return execute( work, operationSubmitter )
 				.exceptionally( Futures.handler( e -> {
-					throw log.unexpectedIndexStatus(
+					throw ElasticsearchClientLog.INSTANCE.unexpectedIndexStatus(
 							name, requiredIndexStatus.externalRepresentation(), requiredStatusTimeoutInMs,
 							Throwables.expectException( e )
 					);
@@ -177,13 +173,13 @@ final class ElasticsearchSchemaAccessor {
 	public CompletableFuture<?> closeIndex(URLEncodedString indexName, OperationSubmitter operationSubmitter) {
 		NonBulkableWork<?> work = getWorkFactory().closeIndex( indexName ).build();
 		return execute( work, operationSubmitter )
-				.thenRun( () -> log.closedIndex( indexName ) );
+				.thenRun( () -> ElasticsearchClientLog.INSTANCE.closedIndex( indexName ) );
 	}
 
 	public CompletableFuture<?> openIndex(URLEncodedString indexName, OperationSubmitter operationSubmitter) {
 		NonBulkableWork<?> work = getWorkFactory().openIndex( indexName ).build();
 		return execute( work, operationSubmitter )
-				.thenRun( () -> log.openedIndex( indexName ) );
+				.thenRun( () -> ElasticsearchClientLog.INSTANCE.openedIndex( indexName ) );
 	}
 
 	private ElasticsearchWorkFactory getWorkFactory() {

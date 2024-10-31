@@ -4,25 +4,22 @@
  */
 package org.hibernate.search.mapper.pojo.work.impl;
 
-import java.lang.invoke.MethodHandles;
 import java.util.function.Supplier;
 
 import org.hibernate.search.engine.backend.document.DocumentElement;
 import org.hibernate.search.engine.backend.work.execution.spi.DocumentContributor;
 import org.hibernate.search.engine.common.EntityReference;
 import org.hibernate.search.mapper.pojo.common.spi.PojoEntityReferenceFactoryDelegate;
-import org.hibernate.search.mapper.pojo.logging.impl.Log;
+import org.hibernate.search.mapper.pojo.logging.impl.IndexingLog;
 import org.hibernate.search.mapper.pojo.model.spi.PojoRawTypeIdentifier;
 import org.hibernate.search.mapper.pojo.processing.impl.PojoIndexingProcessor;
 import org.hibernate.search.mapper.pojo.processing.spi.PojoIndexingProcessorRootContext;
 import org.hibernate.search.mapper.pojo.work.spi.PojoWorkSessionContext;
-import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
 /**
  * @param <E> The entity type mapped to the index.
  */
 public final class PojoDocumentContributor<E> implements DocumentContributor {
-	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	private final PojoRawTypeIdentifier<E> typeIdentifier;
 	private final String entityName;
@@ -57,7 +54,7 @@ public final class PojoDocumentContributor<E> implements DocumentContributor {
 					sessionContext.mappingContext().entityReferenceFactoryDelegate();
 			EntityReference entityReference = entityReferenceFactoryDelegate.create( typeIdentifier, entityName,
 					identifier );
-			throw log.errorBuildingDocument( entityReference, e.getMessage(), e );
+			throw IndexingLog.INSTANCE.errorBuildingDocument( entityReference, e.getMessage(), e );
 		}
 	}
 }

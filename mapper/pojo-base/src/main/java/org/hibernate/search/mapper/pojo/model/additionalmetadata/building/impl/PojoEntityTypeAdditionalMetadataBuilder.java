@@ -4,21 +4,17 @@
  */
 package org.hibernate.search.mapper.pojo.model.additionalmetadata.building.impl;
 
-import java.lang.invoke.MethodHandles;
 import java.util.Optional;
 
 import org.hibernate.search.engine.environment.bean.spi.ParameterizedBeanReference;
-import org.hibernate.search.mapper.pojo.logging.impl.Log;
+import org.hibernate.search.mapper.pojo.logging.impl.MappingLog;
 import org.hibernate.search.mapper.pojo.model.additionalmetadata.building.spi.PojoAdditionalMetadataCollectorEntityTypeNode;
 import org.hibernate.search.mapper.pojo.model.additionalmetadata.impl.PojoEntityTypeAdditionalMetadata;
 import org.hibernate.search.mapper.pojo.model.path.impl.SimplePojoPathsDefinitionProvider;
 import org.hibernate.search.mapper.pojo.model.path.spi.PojoPathDefinitionProvider;
 import org.hibernate.search.mapper.pojo.model.spi.PojoRawTypeModel;
-import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
 class PojoEntityTypeAdditionalMetadataBuilder implements PojoAdditionalMetadataCollectorEntityTypeNode {
-
-	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	private String entityName;
 	private String secondaryEntityName;
@@ -32,7 +28,7 @@ class PojoEntityTypeAdditionalMetadataBuilder implements PojoAdditionalMetadataC
 	@Override
 	public void entityName(String entityName) {
 		if ( this.entityName != null && !this.entityName.equals( entityName ) ) {
-			throw log.multipleEntityNames(
+			throw MappingLog.INSTANCE.multipleEntityNames(
 					this.entityName,
 					entityName
 			);
@@ -43,7 +39,7 @@ class PojoEntityTypeAdditionalMetadataBuilder implements PojoAdditionalMetadataC
 	@Override
 	public void secondaryEntityName(String secondaryEntityName) {
 		if ( this.secondaryEntityName != null && !this.secondaryEntityName.equals( secondaryEntityName ) ) {
-			throw log.multipleSecondaryEntityNames(
+			throw MappingLog.INSTANCE.multipleSecondaryEntityNames(
 					this.secondaryEntityName,
 					secondaryEntityName
 			);

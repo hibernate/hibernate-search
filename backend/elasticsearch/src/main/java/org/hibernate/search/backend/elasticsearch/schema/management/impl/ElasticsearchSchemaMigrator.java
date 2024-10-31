@@ -4,11 +4,10 @@
  */
 package org.hibernate.search.backend.elasticsearch.schema.management.impl;
 
-import java.lang.invoke.MethodHandles;
 import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 
-import org.hibernate.search.backend.elasticsearch.logging.impl.Log;
+import org.hibernate.search.backend.elasticsearch.logging.impl.ElasticsearchClientLog;
 import org.hibernate.search.backend.elasticsearch.lowlevel.index.aliases.impl.IndexAliasDefinition;
 import org.hibernate.search.backend.elasticsearch.lowlevel.index.impl.IndexMetadata;
 import org.hibernate.search.backend.elasticsearch.lowlevel.index.mapping.impl.RootTypeMapping;
@@ -18,15 +17,12 @@ import org.hibernate.search.engine.backend.work.execution.OperationSubmitter;
 import org.hibernate.search.util.common.SearchException;
 import org.hibernate.search.util.common.impl.Futures;
 import org.hibernate.search.util.common.impl.Throwables;
-import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
 /**
  * An object responsible for updating an existing index to match provided metadata.
  * @author Gunnar Morling
  */
 final class ElasticsearchSchemaMigrator {
-
-	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	private final ElasticsearchSchemaAccessor schemaAccessor;
 	private final ElasticsearchSchemaValidator schemaValidator;
@@ -98,7 +94,7 @@ final class ElasticsearchSchemaMigrator {
 		}
 
 		return mappingMigration.exceptionally( Futures.handler( e -> {
-			throw log.schemaUpdateFailed(
+			throw ElasticsearchClientLog.INSTANCE.schemaUpdateFailed(
 					indexName, e.getMessage(),
 					Throwables.expectException( e )
 			);

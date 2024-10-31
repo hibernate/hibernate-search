@@ -7,8 +7,8 @@ package org.hibernate.search.query.dsl.impl;
 
 import java.lang.invoke.MethodHandles;
 
-import org.hibernate.search.util.logging.impl.Log;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
+import org.hibernate.search.util.logging.impl.MigrationHelperLog;
 
 import org.apache.lucene.search.FuzzyQuery;
 import org.apache.lucene.util.automaton.LevenshteinAutomata;
@@ -17,7 +17,7 @@ import org.apache.lucene.util.automaton.LevenshteinAutomata;
 * @author Emmanuel Bernard
 */
 class TermQueryContext {
-	private static final Log log = LoggerFactory.make( MethodHandles.lookup() );
+	private static final MigrationHelperLog log = LoggerFactory.make( MethodHandles.lookup() );
 
 	private final Approximation approximation;
 

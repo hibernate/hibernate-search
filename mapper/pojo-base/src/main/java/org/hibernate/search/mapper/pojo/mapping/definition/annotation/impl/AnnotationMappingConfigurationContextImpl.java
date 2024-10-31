@@ -4,7 +4,6 @@
  */
 package org.hibernate.search.mapper.pojo.mapping.definition.annotation.impl;
 
-import java.lang.invoke.MethodHandles;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -20,7 +19,7 @@ import org.hibernate.search.engine.mapper.mapping.building.spi.MappingConfigurat
 import org.hibernate.search.engine.mapper.model.spi.MappableTypeModel;
 import org.hibernate.search.engine.mapper.model.spi.TypeMetadataDiscoverer;
 import org.hibernate.search.engine.reporting.spi.FailureCollector;
-import org.hibernate.search.mapper.pojo.logging.impl.Log;
+import org.hibernate.search.mapper.pojo.logging.impl.CommonFailureLog;
 import org.hibernate.search.mapper.pojo.mapping.building.spi.PojoTypeMetadataContributor;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.AnnotationMappingConfigurationContext;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.processing.spi.BuiltinAnnotations;
@@ -32,7 +31,6 @@ import org.hibernate.search.mapper.pojo.reporting.spi.MapperHints;
 import org.hibernate.search.util.common.jar.impl.JandexUtils;
 import org.hibernate.search.util.common.jar.impl.JarUtils;
 import org.hibernate.search.util.common.jar.spi.JandexBehavior;
-import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 import org.hibernate.search.util.common.reflect.spi.AnnotationHelper;
 
 import org.jboss.jandex.AnnotationInstance;
@@ -44,8 +42,6 @@ import org.jboss.jandex.IndexView;
 public class AnnotationMappingConfigurationContextImpl
 		implements AnnotationMappingConfigurationContext,
 		PojoMappingConfigurationContributor {
-
-	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	private final PojoBootstrapIntrospector introspector;
 	private final MapperHints mapperHints;
@@ -233,7 +229,7 @@ public class AnnotationMappingConfigurationContextImpl
 			}
 		}
 		catch (RuntimeException e) {
-			throw log.errorDiscoveringJandexIndex( codeSourceLocation, e.getMessage(),
+			throw CommonFailureLog.INSTANCE.errorDiscoveringJandexIndex( codeSourceLocation, e.getMessage(),
 					mapperHints.cannotReadJandexRootMapping(), e );
 		}
 	}

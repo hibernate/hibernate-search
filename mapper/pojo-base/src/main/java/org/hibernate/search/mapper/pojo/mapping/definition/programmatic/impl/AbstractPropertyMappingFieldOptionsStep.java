@@ -4,7 +4,6 @@
  */
 package org.hibernate.search.mapper.pojo.mapping.definition.programmatic.impl;
 
-import java.lang.invoke.MethodHandles;
 import java.util.Map;
 
 import org.hibernate.search.engine.backend.common.spi.FieldPaths;
@@ -13,18 +12,15 @@ import org.hibernate.search.mapper.pojo.bridge.ValueBridge;
 import org.hibernate.search.mapper.pojo.bridge.mapping.impl.BeanBinder;
 import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.ValueBinder;
 import org.hibernate.search.mapper.pojo.extractor.mapping.programmatic.ContainerExtractorPath;
-import org.hibernate.search.mapper.pojo.logging.impl.Log;
+import org.hibernate.search.mapper.pojo.logging.impl.MappingLog;
 import org.hibernate.search.mapper.pojo.mapping.building.spi.PojoIndexMappingCollectorPropertyNode;
 import org.hibernate.search.mapper.pojo.mapping.building.spi.PojoPropertyMetadataContributor;
 import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.PropertyMappingFieldOptionsStep;
 import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.PropertyMappingStep;
-import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
 abstract class AbstractPropertyMappingFieldOptionsStep<S extends PropertyMappingFieldOptionsStep<?>>
 		extends DelegatingPropertyMappingStep
 		implements PojoPropertyMetadataContributor, PropertyMappingFieldOptionsStep<S> {
-
-	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	protected final String relativeFieldName;
 	final PojoCompositeFieldModelContributor fieldModelContributor;
@@ -40,7 +36,7 @@ abstract class AbstractPropertyMappingFieldOptionsStep<S extends PropertyMapping
 		super( delegate );
 		this.relativeFieldName = relativeFieldName;
 		if ( relativeFieldName != null && relativeFieldName.contains( FieldPaths.PATH_SEPARATOR_STRING ) ) {
-			throw log.invalidFieldNameDotNotAllowed( relativeFieldName );
+			throw MappingLog.INSTANCE.invalidFieldNameDotNotAllowed( relativeFieldName );
 		}
 		this.fieldModelContributor = new PojoCompositeFieldModelContributor( fieldTypeDefaultInitiator );
 		// The very first field type contributor will just check that the field type is appropriate.

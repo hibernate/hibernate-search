@@ -4,19 +4,15 @@
  */
 package org.hibernate.search.engine.mapper.mapping.building.spi;
 
-import java.lang.invoke.MethodHandles;
 import java.util.Collection;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Optional;
 
-import org.hibernate.search.engine.logging.impl.Log;
+import org.hibernate.search.engine.logging.impl.BackendLog;
 import org.hibernate.search.engine.tenancy.spi.TenancyMode;
-import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
 public final class BackendsInfo {
-
-	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	// Using a linked hash map to preserve the order
 	private final Map<Optional<String>, BackendInfo> backendsByNames = new LinkedHashMap<>();
@@ -32,9 +28,9 @@ public final class BackendsInfo {
 						return info1;
 					}
 					if ( name.isPresent() ) {
-						throw log.differentMultiTenancyNamedBackend( name.get() );
+						throw BackendLog.INSTANCE.differentMultiTenancyNamedBackend( name.get() );
 					}
-					throw log.differentMultiTenancyDefaultBackend();
+					throw BackendLog.INSTANCE.differentMultiTenancyDefaultBackend();
 				}
 		);
 	}

@@ -27,8 +27,8 @@ import org.hibernate.search.query.engine.spi.V5MigrationSearchSession;
 import org.hibernate.search.query.hibernate.impl.FullTextQueryImpl;
 import org.hibernate.search.scope.impl.V5MigrationOrmSearchScopeAdapter;
 import org.hibernate.search.scope.spi.V5MigrationSearchScope;
-import org.hibernate.search.util.logging.impl.Log;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
+import org.hibernate.search.util.logging.impl.MigrationHelperLog;
 
 /**
  * Lucene full text search aware session.
@@ -40,7 +40,7 @@ import org.hibernate.search.util.logging.impl.LoggerFactory;
 final class FullTextSessionImpl extends SessionDelegatorBaseImpl
 		implements FullTextSession, SessionImplementor, V5MigrationSearchSession<SearchLoadingOptionsStep> {
 
-	private static final Log log = LoggerFactory.make( MethodHandles.lookup() );
+	private static final MigrationHelperLog log = LoggerFactory.make( MethodHandles.lookup() );
 
 	private static SessionImplementor doUnwrap(Session session) {
 		if ( session == null ) {

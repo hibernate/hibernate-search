@@ -4,7 +4,6 @@
  */
 package org.hibernate.search.backend.lucene.index.impl;
 
-import java.lang.invoke.MethodHandles;
 import java.util.LinkedHashSet;
 import java.util.Map;
 import java.util.Optional;
@@ -14,18 +13,15 @@ import org.hibernate.search.backend.lucene.cfg.LuceneIndexSettings;
 import org.hibernate.search.backend.lucene.document.model.impl.LuceneIndexModel;
 import org.hibernate.search.backend.lucene.index.spi.ShardingStrategy;
 import org.hibernate.search.backend.lucene.index.spi.ShardingStrategyInitializationContext;
-import org.hibernate.search.backend.lucene.logging.impl.Log;
+import org.hibernate.search.backend.lucene.logging.impl.ConfigurationLog;
 import org.hibernate.search.engine.backend.index.spi.IndexManagerStartContext;
 import org.hibernate.search.engine.cfg.ConfigurationPropertySource;
 import org.hibernate.search.engine.cfg.spi.ConfigurationProperty;
 import org.hibernate.search.engine.environment.bean.BeanHolder;
 import org.hibernate.search.engine.environment.bean.BeanReference;
 import org.hibernate.search.engine.environment.bean.BeanResolver;
-import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
 class ShardingStrategyInitializationContextImpl implements ShardingStrategyInitializationContext {
-
-	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	private static final ConfigurationProperty<BeanReference<? extends ShardingStrategy>> SHARDING_STRATEGY =
 			ConfigurationProperty.forKey( LuceneIndexSettings.ShardingRadicals.STRATEGY )
@@ -90,7 +86,7 @@ class ShardingStrategyInitializationContextImpl implements ShardingStrategyIniti
 		}
 
 		if ( shardIdentifiers.isEmpty() ) {
-			throw log.missingShardIdentifiersAfterShardingStrategyInitialization(
+			throw ConfigurationLog.INSTANCE.missingShardIdentifiersAfterShardingStrategyInitialization(
 					shardingStrategyHolder.get()
 			);
 		}

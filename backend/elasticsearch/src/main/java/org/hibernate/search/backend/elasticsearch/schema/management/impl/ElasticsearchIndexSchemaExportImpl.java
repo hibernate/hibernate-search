@@ -7,7 +7,6 @@ package org.hibernate.search.backend.elasticsearch.schema.management.impl;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
-import java.lang.invoke.MethodHandles;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -16,9 +15,8 @@ import java.util.List;
 import java.util.Map;
 
 import org.hibernate.search.backend.elasticsearch.client.spi.ElasticsearchRequest;
-import org.hibernate.search.backend.elasticsearch.logging.impl.Log;
+import org.hibernate.search.backend.elasticsearch.logging.impl.SchemaExportLog;
 import org.hibernate.search.backend.elasticsearch.schema.management.ElasticsearchIndexSchemaExport;
-import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonArray;
@@ -27,7 +25,6 @@ import com.google.gson.JsonObject;
 import com.google.gson.stream.JsonWriter;
 
 public class ElasticsearchIndexSchemaExportImpl implements ElasticsearchIndexSchemaExport {
-	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	private final Gson userFacingGson;
 	private final String indexName;
@@ -63,7 +60,7 @@ public class ElasticsearchIndexSchemaExportImpl implements ElasticsearchIndexSch
 			jsonWriter.flush();
 		}
 		catch (IOException e) {
-			throw log.unableToExportSchema( indexName, e.getMessage(), e );
+			throw SchemaExportLog.INSTANCE.unableToExportSchema( indexName, e.getMessage(), e );
 		}
 	}
 

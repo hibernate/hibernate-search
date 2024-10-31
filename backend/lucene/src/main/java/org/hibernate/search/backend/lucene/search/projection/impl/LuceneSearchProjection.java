@@ -7,21 +7,17 @@ package org.hibernate.search.backend.lucene.search.projection.impl;
 import static org.hibernate.search.util.common.impl.CollectionHelper.isSubset;
 import static org.hibernate.search.util.common.impl.CollectionHelper.notInTheOtherSet;
 
-import java.lang.invoke.MethodHandles;
 import java.util.Set;
 
-import org.hibernate.search.backend.lucene.logging.impl.Log;
+import org.hibernate.search.backend.lucene.logging.impl.QueryLog;
 import org.hibernate.search.backend.lucene.lowlevel.collector.impl.TopDocsDataCollector;
 import org.hibernate.search.backend.lucene.lowlevel.collector.impl.Values;
 import org.hibernate.search.backend.lucene.search.common.impl.LuceneSearchIndexScope;
 import org.hibernate.search.engine.search.loading.spi.LoadingResult;
 import org.hibernate.search.engine.search.loading.spi.ProjectionHitMapper;
 import org.hibernate.search.engine.search.projection.SearchProjection;
-import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
 public interface LuceneSearchProjection<P> extends SearchProjection<P> {
-
-	Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	Set<String> indexNames();
 
@@ -83,12 +79,13 @@ public interface LuceneSearchProjection<P> extends SearchProjection<P> {
 
 	static <P> LuceneSearchProjection<P> from(LuceneSearchIndexScope<?> scope, SearchProjection<P> projection) {
 		if ( !( projection instanceof LuceneSearchProjection ) ) {
-			throw log.cannotMixLuceneSearchQueryWithOtherProjections( projection );
+			throw QueryLog.INSTANCE.cannotMixLuceneSearchQueryWithOtherProjections( projection );
 		}
 		@SuppressWarnings("unchecked") // Necessary for ecj (Eclipse compiler)
 		LuceneSearchProjection<P> casted = (LuceneSearchProjection<P>) projection;
 		if ( !isSubset( scope.hibernateSearchIndexNames(), casted.indexNames() ) ) {
-			throw log.projectionDefinedOnDifferentIndexes( projection, casted.indexNames(), scope.hibernateSearchIndexNames(),
+			throw QueryLog.INSTANCE.projectionDefinedOnDifferentIndexes( projection, casted.indexNames(),
+					scope.hibernateSearchIndexNames(),
 					notInTheOtherSet( scope.hibernateSearchIndexNames(), casted.indexNames() ) );
 		}
 		return casted;

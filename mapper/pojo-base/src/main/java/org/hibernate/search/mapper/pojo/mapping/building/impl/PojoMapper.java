@@ -4,7 +4,6 @@
  */
 package org.hibernate.search.mapper.pojo.mapping.building.impl;
 
-import java.lang.invoke.MethodHandles;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.LinkedHashSet;
@@ -38,7 +37,7 @@ import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.RoutingBinde
 import org.hibernate.search.mapper.pojo.extractor.impl.ContainerExtractorBinder;
 import org.hibernate.search.mapper.pojo.identity.impl.IdentityMappingMode;
 import org.hibernate.search.mapper.pojo.identity.impl.PojoRootIdentityMappingCollector;
-import org.hibernate.search.mapper.pojo.logging.impl.Log;
+import org.hibernate.search.mapper.pojo.logging.impl.MappingLog;
 import org.hibernate.search.mapper.pojo.mapping.building.spi.PojoIndexMappingCollectorTypeNode;
 import org.hibernate.search.mapper.pojo.mapping.building.spi.PojoMapperDelegate;
 import org.hibernate.search.mapper.pojo.mapping.building.spi.PojoTypeMetadataContributor;
@@ -63,11 +62,8 @@ import org.hibernate.search.mapper.pojo.search.definition.impl.PojoSearchQueryEl
 import org.hibernate.search.util.common.AssertionFailure;
 import org.hibernate.search.util.common.impl.Closer;
 import org.hibernate.search.util.common.impl.SuppressingCloser;
-import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
 public class PojoMapper<MPBS extends MappingPartialBuildState> implements Mapper<MPBS> {
-
-	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	private final ContextualFailureCollector failureCollector;
 	private final TypeMetadataContributorProvider<PojoTypeMetadataContributor> contributorProvider;
@@ -162,7 +158,7 @@ public class PojoMapper<MPBS extends MappingPartialBuildState> implements Mapper
 			}
 		}
 
-		log.detectedMappedTypes( entityTypes, indexedEntityTypes, initialMappedTypes );
+		MappingLog.INSTANCE.detectedMappedTypes( entityTypes, indexedEntityTypes, initialMappedTypes );
 
 		// Register entity types and check for naming conflicts
 		// we want to have a map of all entities by their name so that we can later use this information
@@ -199,7 +195,7 @@ public class PojoMapper<MPBS extends MappingPartialBuildState> implements Mapper
 		// Ignore abstract types: indexing will be handled for concrete subtypes.
 		if ( !rawTypeModel.isAbstract() && indexedTypeMetadataOptional.isPresent() ) {
 			if ( !metadata.getEntityTypeMetadata().isPresent() ) {
-				throw log.missingEntityTypeMetadata( rawTypeModel );
+				throw MappingLog.INSTANCE.missingEntityTypeMetadata( rawTypeModel );
 			}
 			PojoIndexedTypeAdditionalMetadata indexedTypeMetadata = indexedTypeMetadataOptional.get();
 			backendsInfo.collect( indexedTypeMetadata.backendName(), tenancyMode );

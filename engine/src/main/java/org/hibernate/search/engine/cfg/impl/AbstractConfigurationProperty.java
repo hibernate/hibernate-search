@@ -4,19 +4,15 @@
  */
 package org.hibernate.search.engine.cfg.impl;
 
-import java.lang.invoke.MethodHandles;
 import java.util.Optional;
 import java.util.function.Function;
 
 import org.hibernate.search.engine.cfg.ConfigurationPropertySource;
 import org.hibernate.search.engine.cfg.spi.ConfigurationProperty;
 import org.hibernate.search.engine.cfg.spi.ConvertUtils;
-import org.hibernate.search.engine.logging.impl.Log;
-import org.hibernate.search.util.common.logging.impl.LoggerFactory;
+import org.hibernate.search.engine.logging.impl.ConfigurationLog;
 
 abstract class AbstractConfigurationProperty<T> implements ConfigurationProperty<T> {
-
-	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	private final String key;
 
@@ -56,7 +52,7 @@ abstract class AbstractConfigurationProperty<T> implements ConfigurationProperty
 				e.addSuppressed( e2 );
 			}
 
-			throw log.unableToConvertConfigurationProperty(
+			throw ConfigurationLog.INSTANCE.unableToConvertConfigurationProperty(
 					displayedKey, rawValue.isPresent() ? rawValue.get() : "", e.getMessage(), e
 			);
 		}

@@ -4,7 +4,6 @@
  */
 package org.hibernate.search.mapper.pojo.mapping.definition.annotation.processing.impl;
 
-import java.lang.invoke.MethodHandles;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashSet;
@@ -19,18 +18,15 @@ import org.hibernate.search.mapper.pojo.common.annotation.Param;
 import org.hibernate.search.mapper.pojo.extractor.mapping.annotation.ContainerExtract;
 import org.hibernate.search.mapper.pojo.extractor.mapping.annotation.ContainerExtraction;
 import org.hibernate.search.mapper.pojo.extractor.mapping.programmatic.ContainerExtractorPath;
-import org.hibernate.search.mapper.pojo.logging.impl.Log;
+import org.hibernate.search.mapper.pojo.logging.impl.MappingLog;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.ObjectPath;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.PropertyValue;
 import org.hibernate.search.mapper.pojo.model.path.PojoModelPath;
 import org.hibernate.search.mapper.pojo.model.path.PojoModelPathValueNode;
 import org.hibernate.search.util.common.AssertionFailure;
 import org.hibernate.search.util.common.impl.Contracts;
-import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
 public final class MappingAnnotationProcessorUtils {
-
-	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	private MappingAnnotationProcessorUtils() {
 	}
@@ -52,7 +48,7 @@ public final class MappingAnnotationProcessorUtils {
 		switch ( extract ) {
 			case NO:
 				if ( extractors.length != 0 ) {
-					throw log.cannotReferenceExtractorsWhenExtractionDisabled();
+					throw MappingLog.INSTANCE.cannotReferenceExtractorsWhenExtractionDisabled();
 				}
 				return ContainerExtractorPath.noExtractors();
 			case DEFAULT:
@@ -93,7 +89,7 @@ public final class MappingAnnotationProcessorUtils {
 		for ( Param param : params ) {
 			Object previous = map.put( param.name(), param.value() );
 			if ( previous != null ) {
-				throw log.conflictingParameterDefined( param.name(), param.value(), previous );
+				throw MappingLog.INSTANCE.conflictingParameterDefined( param.name(), param.value(), previous );
 			}
 		}
 		return map;

@@ -4,7 +4,6 @@
  */
 package org.hibernate.search.mapper.pojo.mapping.impl;
 
-import java.lang.invoke.MethodHandles;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -25,7 +24,8 @@ import org.hibernate.search.mapper.pojo.identity.impl.PojoRootIdentityMappingCol
 import org.hibernate.search.mapper.pojo.loading.definition.spi.PojoEntityLoadingBindingContext;
 import org.hibernate.search.mapper.pojo.loading.spi.PojoMassLoadingStrategy;
 import org.hibernate.search.mapper.pojo.loading.spi.PojoSelectionLoadingStrategy;
-import org.hibernate.search.mapper.pojo.logging.impl.Log;
+import org.hibernate.search.mapper.pojo.logging.impl.CommonFailureLog;
+import org.hibernate.search.mapper.pojo.logging.impl.IndexingLog;
 import org.hibernate.search.mapper.pojo.mapping.building.spi.PojoTypeExtendedMappingCollector;
 import org.hibernate.search.mapper.pojo.model.PojoModelElement;
 import org.hibernate.search.mapper.pojo.model.impl.PojoModelValueElement;
@@ -41,7 +41,6 @@ import org.hibernate.search.mapper.pojo.work.spi.PojoWorkSessionContext;
 import org.hibernate.search.util.common.AssertionFailure;
 import org.hibernate.search.util.common.impl.Closer;
 import org.hibernate.search.util.common.impl.Contracts;
-import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 import org.hibernate.search.util.common.spi.ToStringTreeAppendable;
 import org.hibernate.search.util.common.spi.ToStringTreeAppender;
 
@@ -51,7 +50,6 @@ import org.hibernate.search.util.common.spi.ToStringTreeAppender;
  */
 public abstract class AbstractPojoTypeManager<I, E>
 		implements AutoCloseable, ToStringTreeAppendable, PojoWorkTypeContext<I, E> {
-	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	protected final PojoRawTypeIdentifier<E> typeIdentifier;
 	private final List<PojoRawTypeIdentifier<? super E>> ascendingSuperTypes;
@@ -211,14 +209,14 @@ public abstract class AbstractPojoTypeManager<I, E>
 		catch (RuntimeException e) {
 			EntityReference entityReference = sessionContext.mappingContext().entityReferenceFactoryDelegate()
 					.create( typeIdentifier, entityName, identifier );
-			throw log.errorResolvingEntitiesToReindex( entityReference, e.getMessage(), e );
+			throw IndexingLog.INSTANCE.errorResolvingEntitiesToReindex( entityReference, e.getMessage(), e );
 		}
 	}
 
 	@Override
 	public PojoSelectionLoadingStrategy<? super E> selectionLoadingStrategy() {
 		return selectionLoadingStrategyOptional()
-				.orElseThrow( () -> log.noSelectionLoadingStrategy( entityName ) );
+				.orElseThrow( () -> IndexingLog.INSTANCE.noSelectionLoadingStrategy( entityName ) );
 	}
 
 	@Override
@@ -229,7 +227,7 @@ public abstract class AbstractPojoTypeManager<I, E>
 	@Override
 	public PojoMassLoadingStrategy<? super E, ?> massLoadingStrategy() {
 		return massLoadingStrategyOptional()
-				.orElseThrow( () -> log.noMassLoadingStrategy( entityName ) );
+				.orElseThrow( () -> IndexingLog.INSTANCE.noMassLoadingStrategy( entityName ) );
 	}
 
 	@Override
@@ -359,7 +357,8 @@ public abstract class AbstractPojoTypeManager<I, E>
 
 							private <E2> void checkEntitySuperType(Class<E2> expectedEntitySuperType) {
 								if ( !expectedEntitySuperType.isAssignableFrom( typeModel.typeIdentifier().javaClass() ) ) {
-									throw log.loadingConfigurationTypeMismatch( typeModel, expectedEntitySuperType );
+									throw IndexingLog.INSTANCE.loadingConfigurationTypeMismatch( typeModel,
+											expectedEntitySuperType );
 								}
 							}
 
@@ -375,7 +374,7 @@ public abstract class AbstractPojoTypeManager<I, E>
 
 								Object value = params.get( name );
 								if ( value == null ) {
-									throw log.paramNotDefined( name );
+									throw CommonFailureLog.INSTANCE.paramNotDefined( name );
 								}
 
 								return paramType.cast( value );

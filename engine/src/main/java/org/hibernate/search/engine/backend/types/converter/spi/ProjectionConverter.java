@@ -4,14 +4,11 @@
  */
 package org.hibernate.search.engine.backend.types.converter.spi;
 
-import java.lang.invoke.MethodHandles;
-
 import org.hibernate.search.engine.backend.types.converter.FromDocumentValueConverter;
 import org.hibernate.search.engine.backend.types.converter.runtime.FromDocumentValueConvertContext;
 import org.hibernate.search.engine.backend.types.converter.runtime.FromDocumentValueConvertContextExtension;
-import org.hibernate.search.engine.logging.impl.Log;
+import org.hibernate.search.engine.logging.impl.QueryLog;
 import org.hibernate.search.util.common.impl.Contracts;
-import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 import org.hibernate.search.util.common.reporting.spi.EventContextProvider;
 
 /**
@@ -21,8 +18,6 @@ import org.hibernate.search.util.common.reporting.spi.EventContextProvider;
  * @param <V> The type of projected values.
  */
 public final class ProjectionConverter<F, V> {
-
-	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	public static <F> ProjectionConverter<F, F> passThrough(Class<F> fieldAndValueType) {
 		return new ProjectionConverter<>( fieldAndValueType, new PassThroughFromDocumentValueConverter<>() );
@@ -72,7 +67,7 @@ public final class ProjectionConverter<F, V> {
 	public <T> ProjectionConverter<F, ? extends T> withConvertedType(Class<T> expectedType,
 			EventContextProvider eventContextProvider) {
 		if ( !expectedType.isAssignableFrom( valueType ) ) {
-			throw log.invalidReturnType( expectedType, valueType, eventContextProvider.eventContext() );
+			throw QueryLog.INSTANCE.invalidReturnType( expectedType, valueType, eventContextProvider.eventContext() );
 		}
 		return (ProjectionConverter<F, ? extends T>) this;
 	}

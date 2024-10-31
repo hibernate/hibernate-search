@@ -4,7 +4,6 @@
  */
 package org.hibernate.search.backend.elasticsearch.multitenancy.impl;
 
-import java.lang.invoke.MethodHandles;
 import java.util.Optional;
 import java.util.Set;
 import java.util.regex.Pattern;
@@ -13,7 +12,8 @@ import org.hibernate.search.backend.elasticsearch.common.impl.DocumentIdHelper;
 import org.hibernate.search.backend.elasticsearch.document.impl.DocumentMetadataContributor;
 import org.hibernate.search.backend.elasticsearch.document.model.dsl.impl.IndexSchemaRootContributor;
 import org.hibernate.search.backend.elasticsearch.gson.impl.JsonAccessor;
-import org.hibernate.search.backend.elasticsearch.logging.impl.Log;
+import org.hibernate.search.backend.elasticsearch.logging.impl.ConfigurationLog;
+import org.hibernate.search.backend.elasticsearch.logging.impl.ElasticsearchClientLog;
 import org.hibernate.search.backend.elasticsearch.lowlevel.index.mapping.impl.DataTypes;
 import org.hibernate.search.backend.elasticsearch.lowlevel.index.mapping.impl.MetadataFields;
 import org.hibernate.search.backend.elasticsearch.lowlevel.index.mapping.impl.PropertyMapping;
@@ -22,15 +22,12 @@ import org.hibernate.search.backend.elasticsearch.lowlevel.query.impl.Queries;
 import org.hibernate.search.backend.elasticsearch.search.projection.impl.ProjectionExtractContext;
 import org.hibernate.search.backend.elasticsearch.search.projection.impl.ProjectionExtractionHelper;
 import org.hibernate.search.backend.elasticsearch.search.projection.impl.ProjectionRequestContext;
-import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 import org.hibernate.search.util.common.reporting.EventContext;
 
 import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
 
 public class DiscriminatorMultiTenancyStrategy implements MultiTenancyStrategy {
-
-	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	private static final String ID_FIELD_NAME = MetadataFields.internalFieldName( "tenant_doc_id" );
 
@@ -102,14 +99,14 @@ public class DiscriminatorMultiTenancyStrategy implements MultiTenancyStrategy {
 		@Override
 		public void checkTenantId(String tenantId, EventContext backendContext) {
 			if ( tenantId == null ) {
-				throw log.multiTenancyEnabledButNoTenantIdProvided( backendContext );
+				throw ConfigurationLog.INSTANCE.multiTenancyEnabledButNoTenantIdProvided( backendContext );
 			}
 		}
 
 		@Override
 		public void checkTenantId(Set<String> tenantIds, EventContext context) {
 			if ( tenantIds == null || tenantIds.isEmpty() ) {
-				throw log.multiTenancyEnabledButNoTenantIdProvided( context );
+				throw ConfigurationLog.INSTANCE.multiTenancyEnabledButNoTenantIdProvided( context );
 			}
 		}
 
@@ -149,7 +146,7 @@ public class DiscriminatorMultiTenancyStrategy implements MultiTenancyStrategy {
 
 		@Override
 		public String extract(JsonObject hit, ProjectionExtractContext context) {
-			return HIT_ID_ACCESSOR.get( hit ).orElseThrow( log::elasticsearchResponseMissingData );
+			return HIT_ID_ACCESSOR.get( hit ).orElseThrow( ElasticsearchClientLog.INSTANCE::elasticsearchResponseMissingData );
 		}
 	}
 }

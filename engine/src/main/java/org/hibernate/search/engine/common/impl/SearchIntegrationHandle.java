@@ -4,15 +4,10 @@
  */
 package org.hibernate.search.engine.common.impl;
 
-import java.lang.invoke.MethodHandles;
-
 import org.hibernate.search.engine.common.spi.SearchIntegration;
-import org.hibernate.search.engine.logging.impl.Log;
-import org.hibernate.search.util.common.logging.impl.LoggerFactory;
+import org.hibernate.search.engine.logging.impl.CommonFailureLog;
 
 final class SearchIntegrationHandle implements SearchIntegration.Handle {
-
-	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	private SearchIntegration integration;
 
@@ -23,7 +18,7 @@ final class SearchIntegrationHandle implements SearchIntegration.Handle {
 	@Override
 	public SearchIntegration getOrFail() {
 		if ( integration == null ) {
-			throw log.noIntegrationBecauseInitializationNotComplete();
+			throw CommonFailureLog.INSTANCE.noIntegrationBecauseInitializationNotComplete();
 		}
 		return integration;
 	}

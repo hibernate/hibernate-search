@@ -4,15 +4,10 @@
  */
 package org.hibernate.search.engine.search.query.spi;
 
-import java.lang.invoke.MethodHandles;
-
-import org.hibernate.search.engine.logging.impl.Log;
+import org.hibernate.search.engine.logging.impl.QueryLog;
 import org.hibernate.search.engine.search.query.SearchResultTotal;
-import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
 public class SimpleSearchResultTotal implements SearchResultTotal {
-
-	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	public static SimpleSearchResultTotal of(long totalHitCount, boolean isExact) {
 		return new SimpleSearchResultTotal( totalHitCount, isExact );
@@ -47,7 +42,7 @@ public class SimpleSearchResultTotal implements SearchResultTotal {
 	@Override
 	public long hitCount() {
 		if ( !isExact ) {
-			throw log.notExactTotalHitCount();
+			throw QueryLog.INSTANCE.notExactTotalHitCount();
 		}
 		return totalHitCount;
 	}

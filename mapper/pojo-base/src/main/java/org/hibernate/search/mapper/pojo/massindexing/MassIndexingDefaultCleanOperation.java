@@ -4,11 +4,8 @@
  */
 package org.hibernate.search.mapper.pojo.massindexing;
 
-import java.lang.invoke.MethodHandles;
-
 import org.hibernate.search.engine.cfg.spi.ParseUtils;
-import org.hibernate.search.mapper.pojo.logging.impl.Log;
-import org.hibernate.search.util.common.logging.impl.LoggerFactory;
+import org.hibernate.search.mapper.pojo.logging.impl.MassIndexingLog;
 
 public enum MassIndexingDefaultCleanOperation {
 
@@ -25,14 +22,12 @@ public enum MassIndexingDefaultCleanOperation {
 	 */
 	DROP_AND_CREATE( "drop_and_create" );
 
-	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
-
 	// This method conforms to the MicroProfile Config specification. Do not change its signature.
 	public static MassIndexingDefaultCleanOperation of(String value) {
 		return ParseUtils.parseDiscreteValues(
 				MassIndexingDefaultCleanOperation.values(),
 				MassIndexingDefaultCleanOperation::externalRepresentation,
-				log::invalidMassIndexingDefaultCleanOperation,
+				MassIndexingLog.INSTANCE::invalidMassIndexingDefaultCleanOperation,
 				value
 		);
 	}

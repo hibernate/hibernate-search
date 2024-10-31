@@ -4,7 +4,6 @@
  */
 package org.hibernate.search.mapper.pojo.extractor.spi;
 
-import java.lang.invoke.MethodHandles;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -33,13 +32,10 @@ import org.hibernate.search.mapper.pojo.extractor.builtin.impl.OptionalIntValueE
 import org.hibernate.search.mapper.pojo.extractor.builtin.impl.OptionalLongValueExtractor;
 import org.hibernate.search.mapper.pojo.extractor.builtin.impl.OptionalValueExtractor;
 import org.hibernate.search.mapper.pojo.extractor.builtin.impl.ShortArrayElementExtractor;
-import org.hibernate.search.mapper.pojo.logging.impl.Log;
-import org.hibernate.search.util.common.logging.impl.LoggerFactory;
+import org.hibernate.search.mapper.pojo.logging.impl.MappingLog;
 
 @SuppressWarnings("rawtypes") // We need to allow raw container types, e.g. MapValueExtractor.class
 public final class ContainerExtractorRegistry {
-
-	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	public static Builder builder() {
 		return new Builder();
@@ -80,7 +76,7 @@ public final class ContainerExtractorRegistry {
 	public ContainerExtractorDefinition<?> forName(String name) {
 		ContainerExtractorDefinition<?> result = extractorsByName.get( name );
 		if ( result == null ) {
-			throw log.cannotResolveContainerExtractorName( name, BuiltinContainerExtractors.class );
+			throw MappingLog.INSTANCE.cannotResolveContainerExtractorName( name, BuiltinContainerExtractors.class );
 		}
 		return result;
 	}

@@ -4,7 +4,6 @@
  */
 package org.hibernate.search.backend.elasticsearch.search.query.impl;
 
-import java.lang.invoke.MethodHandles;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -16,7 +15,7 @@ import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
 import org.hibernate.search.backend.elasticsearch.gson.impl.JsonAccessor;
-import org.hibernate.search.backend.elasticsearch.logging.impl.Log;
+import org.hibernate.search.backend.elasticsearch.logging.impl.QueryLog;
 import org.hibernate.search.backend.elasticsearch.lowlevel.query.impl.Queries;
 import org.hibernate.search.backend.elasticsearch.orchestration.impl.ElasticsearchParallelWorkOrchestrator;
 import org.hibernate.search.backend.elasticsearch.search.aggregation.impl.ElasticsearchSearchAggregation;
@@ -46,7 +45,6 @@ import org.hibernate.search.engine.search.timeout.spi.TimeoutManager;
 import org.hibernate.search.engine.spatial.GeoPoint;
 import org.hibernate.search.util.common.impl.CollectionHelper;
 import org.hibernate.search.util.common.impl.Contracts;
-import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
@@ -55,8 +53,6 @@ import com.google.gson.JsonPrimitive;
 
 public class ElasticsearchSearchQueryBuilder<H>
 		implements SearchQueryBuilder<H>, ElasticsearchSearchSortCollector {
-
-	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	private static final JsonAccessor<JsonElement> REQUEST_SOURCE_ACCESSOR = JsonAccessor.root().property( "_source" );
 
@@ -132,7 +128,7 @@ public class ElasticsearchSearchQueryBuilder<H>
 		}
 		Object previous = aggregations.put( key, casted );
 		if ( previous != null ) {
-			throw log.duplicateAggregationKey( key );
+			throw QueryLog.INSTANCE.duplicateAggregationKey( key );
 		}
 	}
 
@@ -172,7 +168,7 @@ public class ElasticsearchSearchQueryBuilder<H>
 	@Override
 	public void highlighter(String highlighterName, SearchHighlighter highlighter) {
 		if ( highlighterName == null || highlighterName.trim().isEmpty() ) {
-			throw log.highlighterNameCannotBeBlank();
+			throw QueryLog.INSTANCE.highlighterNameCannotBeBlank();
 		}
 		if (
 			this.namedHighlighters.put(
@@ -180,7 +176,7 @@ public class ElasticsearchSearchQueryBuilder<H>
 					ElasticsearchSearchHighlighter.from( scope, highlighter )
 			) != null
 		) {
-			throw log.highlighterWithTheSameNameCannotBeAdded( highlighterName );
+			throw QueryLog.INSTANCE.highlighterWithTheSameNameCannotBeAdded( highlighterName );
 		}
 	}
 

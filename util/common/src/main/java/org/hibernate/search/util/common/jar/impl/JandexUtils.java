@@ -7,7 +7,6 @@ package org.hibernate.search.util.common.jar.impl;
 import java.io.IOException;
 import java.io.InputStream;
 import java.lang.annotation.Repeatable;
-import java.lang.invoke.MethodHandles;
 import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -19,8 +18,7 @@ import java.util.Set;
 import java.util.stream.Stream;
 
 import org.hibernate.search.util.common.AssertionFailure;
-import org.hibernate.search.util.common.logging.impl.Log;
-import org.hibernate.search.util.common.logging.impl.LoggerFactory;
+import org.hibernate.search.util.common.logging.impl.CommonFailuresLog;
 
 import org.jboss.jandex.AnnotationInstance;
 import org.jboss.jandex.AnnotationTarget;
@@ -34,8 +32,6 @@ import org.jboss.jandex.Indexer;
 import org.jboss.jandex.Type;
 
 public final class JandexUtils {
-
-	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	private static final DotName REPEATABLE = DotName.createSimple( Repeatable.class.getName() );
 
@@ -104,11 +100,11 @@ public final class JandexUtils {
 				return doBuildJandexIndex( codeSource.classesPathOrFail() );
 			}
 			catch (IOException | RuntimeException e) {
-				throw log.errorBuildingJandexIndex( codeSourceLocation, e.getMessage(), e );
+				throw CommonFailuresLog.INSTANCE.errorBuildingJandexIndex( codeSourceLocation, e.getMessage(), e );
 			}
 		}
 		catch (IOException | RuntimeException e) {
-			throw log.errorAccessingJandexIndex( codeSourceLocation, e.getMessage(), e );
+			throw CommonFailuresLog.INSTANCE.errorAccessingJandexIndex( codeSourceLocation, e.getMessage(), e );
 		}
 	}
 
@@ -117,7 +113,7 @@ public final class JandexUtils {
 			return doReadIndex( codeSource );
 		}
 		catch (IOException | RuntimeException e) {
-			throw log.errorAccessingJandexIndex( codeSourceLocation, e.getMessage(), e );
+			throw CommonFailuresLog.INSTANCE.errorAccessingJandexIndex( codeSourceLocation, e.getMessage(), e );
 		}
 	}
 
@@ -162,7 +158,7 @@ public final class JandexUtils {
 	private static boolean isUnsupportedVersionPath(Path metaInfVersions, Path path) {
 		Path relative = metaInfVersions.relativize( path );
 		if ( relative.getNameCount() < 2 ) {
-			log.debug( "Unexpected structure for META-INF/versions entry: " + path );
+			CommonFailuresLog.INSTANCE.debug( "Unexpected structure for META-INF/versions entry: " + path );
 			return true;
 		}
 		try {
@@ -172,7 +168,7 @@ public final class JandexUtils {
 			}
 		}
 		catch (NumberFormatException ex) {
-			log.debug( "Failed to parse META-INF/versions entry: " + path, ex );
+			CommonFailuresLog.INSTANCE.debug( "Failed to parse META-INF/versions entry: " + path, ex );
 			return true;
 		}
 		return false;

@@ -6,6 +6,7 @@ package org.hibernate.search.backend.elasticsearch.search.projection.impl;
 
 import java.util.Arrays;
 
+import org.hibernate.search.backend.elasticsearch.logging.impl.QueryLog;
 import org.hibernate.search.backend.elasticsearch.search.common.impl.AbstractElasticsearchCompositeNodeSearchQueryElementFactory;
 import org.hibernate.search.backend.elasticsearch.search.common.impl.ElasticsearchSearchIndexCompositeNodeContext;
 import org.hibernate.search.backend.elasticsearch.search.common.impl.ElasticsearchSearchIndexScope;
@@ -66,7 +67,7 @@ public class ElasticsearchObjectProjection<E, V, P>
 		ProjectionRequestContext innerContext = context.forField( absoluteFieldPath, absoluteFieldPathComponents );
 		if ( requiredContextAbsoluteFieldPath != null
 				&& !requiredContextAbsoluteFieldPath.equals( context.absoluteCurrentFieldPath() ) ) {
-			throw log.invalidSingleValuedProjectionOnValueFieldInMultiValuedObjectField(
+			throw QueryLog.INSTANCE.invalidSingleValuedProjectionOnValueFieldInMultiValuedObjectField(
 					absoluteFieldPath, requiredContextAbsoluteFieldPath );
 		}
 		String[] extractorFieldPathComponents = innerContext.relativeCurrentFieldPathComponents();
@@ -165,7 +166,7 @@ public class ElasticsearchObjectProjection<E, V, P>
 		public <E, V, P> SearchProjection<P> build(SearchProjection<?>[] inners, ProjectionCompositor<E, V> compositor,
 				ProjectionCollector.Provider<V, P> collectorProvider) {
 			if ( collectorProvider.isSingleValued() && objectField.multiValued() ) {
-				throw log.invalidSingleValuedProjectionOnMultiValuedField( objectField.absolutePath(),
+				throw QueryLog.INSTANCE.invalidSingleValuedProjectionOnMultiValuedField( objectField.absolutePath(),
 						objectField.eventContext() );
 			}
 			ElasticsearchSearchProjection<?>[] typedInners =

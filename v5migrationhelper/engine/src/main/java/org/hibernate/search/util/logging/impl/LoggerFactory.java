@@ -20,13 +20,13 @@ public final class LoggerFactory {
 		//now allowed
 	}
 
-	public static Log make(Lookup creationContext) {
-		return make( Log.class, creationContext );
+	public static MigrationHelperLog make(Lookup creationContext) {
+		return make( MigrationHelperLog.class, creationContext );
 	}
 
 	public static <T> T make(Class<T> logClass, Lookup creationContext) {
 		final String className = creationContext.lookupClass().getName();
-		return Logger.getMessageLogger( logClass, className );
+		return Logger.getMessageLogger( creationContext, logClass, className );
 	}
 
 }

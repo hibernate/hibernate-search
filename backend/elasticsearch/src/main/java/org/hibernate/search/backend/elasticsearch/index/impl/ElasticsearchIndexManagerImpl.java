@@ -4,7 +4,6 @@
  */
 package org.hibernate.search.backend.elasticsearch.index.impl;
 
-import java.lang.invoke.MethodHandles;
 import java.util.List;
 import java.util.Set;
 import java.util.concurrent.CompletableFuture;
@@ -16,7 +15,9 @@ import org.hibernate.search.backend.elasticsearch.document.impl.DocumentMetadata
 import org.hibernate.search.backend.elasticsearch.document.impl.ElasticsearchDocumentObjectBuilder;
 import org.hibernate.search.backend.elasticsearch.document.model.impl.ElasticsearchIndexModel;
 import org.hibernate.search.backend.elasticsearch.index.ElasticsearchIndexManager;
-import org.hibernate.search.backend.elasticsearch.logging.impl.Log;
+import org.hibernate.search.backend.elasticsearch.logging.impl.CommonFailureLog;
+import org.hibernate.search.backend.elasticsearch.logging.impl.DeprecationLog;
+import org.hibernate.search.backend.elasticsearch.logging.impl.QueryLog;
 import org.hibernate.search.backend.elasticsearch.metamodel.ElasticsearchIndexDescriptor;
 import org.hibernate.search.backend.elasticsearch.orchestration.impl.ElasticsearchBatchingWorkOrchestrator;
 import org.hibernate.search.backend.elasticsearch.schema.management.impl.ElasticsearchIndexSchemaManager;
@@ -43,7 +44,6 @@ import org.hibernate.search.engine.reporting.spi.EventContexts;
 import org.hibernate.search.util.common.impl.Closer;
 import org.hibernate.search.util.common.impl.Futures;
 import org.hibernate.search.util.common.impl.SuppressingCloser;
-import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 import org.hibernate.search.util.common.reporting.EventContext;
 
 import com.google.gson.JsonObject;
@@ -51,8 +51,6 @@ import com.google.gson.JsonObject;
 class ElasticsearchIndexManagerImpl
 		implements IndexManagerImplementor,
 		ElasticsearchIndexManager, WorkExecutionIndexManagerContext {
-
-	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	private static final OptionalConfigurationProperty<String> OBSOLETE_LIFECYCLE_STRATEGY =
 			ConfigurationProperty.forKey( "lifecycle.strategy" )
@@ -106,7 +104,7 @@ class ElasticsearchIndexManagerImpl
 			OBSOLETE_LIFECYCLE_STRATEGY.getAndMap(
 					context.configurationPropertySource(),
 					ignored -> {
-						throw log.lifecycleStrategyMovedToMapper();
+						throw DeprecationLog.INSTANCE.lifecycleStrategyMovedToMapper();
 					}
 			);
 
@@ -206,7 +204,7 @@ class ElasticsearchIndexManagerImpl
 	@Override
 	public void addTo(IndexScopeBuilder builder) {
 		if ( !( builder instanceof ElasticsearchIndexScopeBuilder ) ) {
-			throw log.cannotMixElasticsearchScopeWithOtherType(
+			throw QueryLog.INSTANCE.cannotMixElasticsearchScopeWithOtherType(
 					builder, this, backendContext.getEventContext()
 			);
 		}
@@ -260,7 +258,7 @@ class ElasticsearchIndexManagerImpl
 		if ( clazz.isAssignableFrom( ElasticsearchIndexManager.class ) ) {
 			return (T) this;
 		}
-		throw log.indexManagerUnwrappingWithUnknownType(
+		throw CommonFailureLog.INSTANCE.indexManagerUnwrappingWithUnknownType(
 				clazz, ElasticsearchIndexManager.class, getBackendAndIndexEventContext()
 		);
 	}

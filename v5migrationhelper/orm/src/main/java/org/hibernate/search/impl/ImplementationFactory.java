@@ -8,8 +8,8 @@ import java.lang.invoke.MethodHandles;
 
 import org.hibernate.search.FullTextSession;
 import org.hibernate.search.SearchFactory;
-import org.hibernate.search.util.logging.impl.Log;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
+import org.hibernate.search.util.logging.impl.MigrationHelperLog;
 
 /**
  * Creates concrete instances of FullTextSession and SearchFactory without exposing the underlying types.
@@ -18,7 +18,7 @@ import org.hibernate.search.util.logging.impl.LoggerFactory;
  */
 public final class ImplementationFactory {
 
-	private static final Log log = LoggerFactory.make( MethodHandles.lookup() );
+	private static final MigrationHelperLog log = LoggerFactory.make( MethodHandles.lookup() );
 
 	private ImplementationFactory() {
 		//not meant to be instantiated

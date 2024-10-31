@@ -7,12 +7,12 @@ package org.hibernate.search.query.dsl.impl;
 import java.lang.invoke.MethodHandles;
 
 import org.hibernate.search.engine.search.predicate.dsl.BooleanPredicateClausesStep;
-import org.hibernate.search.util.logging.impl.Log;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
+import org.hibernate.search.util.logging.impl.MigrationHelperLog;
 
 final class MinimumShouldMatchContextImpl {
 
-	private static final Log log = LoggerFactory.make( MethodHandles.lookup() );
+	private static final MigrationHelperLog log = LoggerFactory.make( MethodHandles.lookup() );
 
 	private MinimumShouldMatchConstraint minimumShouldMatchConstraint;
 

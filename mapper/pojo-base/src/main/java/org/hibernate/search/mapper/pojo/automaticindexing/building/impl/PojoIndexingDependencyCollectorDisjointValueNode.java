@@ -4,11 +4,10 @@
  */
 package org.hibernate.search.mapper.pojo.automaticindexing.building.impl;
 
-import java.lang.invoke.MethodHandles;
 import java.util.Set;
 
 import org.hibernate.search.mapper.pojo.automaticindexing.ReindexOnUpdate;
-import org.hibernate.search.mapper.pojo.logging.impl.Log;
+import org.hibernate.search.mapper.pojo.logging.impl.MappingLog;
 import org.hibernate.search.mapper.pojo.model.path.PojoModelPathValueNode;
 import org.hibernate.search.mapper.pojo.model.path.impl.BoundPojoModelPath;
 import org.hibernate.search.mapper.pojo.model.path.impl.BoundPojoModelPathValueNode;
@@ -16,7 +15,6 @@ import org.hibernate.search.mapper.pojo.model.path.spi.PojoModelPathBinder;
 import org.hibernate.search.mapper.pojo.model.spi.PojoRawTypeModel;
 import org.hibernate.search.mapper.pojo.model.spi.PojoTypeModel;
 import org.hibernate.search.util.common.AssertionFailure;
-import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
 /**
  * A node representing a disjoint value in a dependency collector,
@@ -29,8 +27,6 @@ import org.hibernate.search.util.common.logging.impl.LoggerFactory;
  */
 public class PojoIndexingDependencyCollectorDisjointValueNode<V>
 		extends AbstractPojoIndexingDependencyCollectorValueNode {
-
-	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	private final PojoIndexingDependencyCollectorTypeNode<?> parentNode;
 	private final PojoRawTypeModel<V> inverseSideEntityTypeModel;
@@ -113,7 +109,7 @@ public class PojoIndexingDependencyCollectorDisjointValueNode<V>
 		}
 		// Note: this should catch errors related to properties not found, among others.
 		catch (RuntimeException e) {
-			throw log.cannotApplyExplicitInverseAssociationPath(
+			throw MappingLog.INSTANCE.cannotApplyExplicitInverseAssociationPath(
 					inverseSideRawEntityType, inverseAssociationUnboundPath,
 					originalSideRawConcreteEntityType,
 					e.getMessage(), e

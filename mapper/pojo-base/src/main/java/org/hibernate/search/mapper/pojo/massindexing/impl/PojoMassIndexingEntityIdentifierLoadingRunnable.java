@@ -4,7 +4,6 @@
  */
 package org.hibernate.search.mapper.pojo.massindexing.impl;
 
-import java.lang.invoke.MethodHandles;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -13,15 +12,13 @@ import org.hibernate.search.mapper.pojo.loading.spi.PojoMassIdentifierLoadingCon
 import org.hibernate.search.mapper.pojo.loading.spi.PojoMassIdentifierSink;
 import org.hibernate.search.mapper.pojo.loading.spi.PojoMassLoadingContext;
 import org.hibernate.search.mapper.pojo.loading.spi.PojoMassLoadingStrategy;
-import org.hibernate.search.mapper.pojo.logging.impl.Log;
+import org.hibernate.search.mapper.pojo.logging.impl.MassIndexingLog;
 import org.hibernate.search.mapper.pojo.massindexing.MassIndexingEnvironment;
 import org.hibernate.search.mapper.pojo.massindexing.MassIndexingTypeGroupMonitor;
-import org.hibernate.search.util.common.logging.impl.LoggerFactory;
+import org.hibernate.search.mapper.pojo.reporting.impl.PojoMassIndexerMessages;
 
 public class PojoMassIndexingEntityIdentifierLoadingRunnable<E, I>
 		extends PojoMassIndexingFailureHandledRunnable {
-
-	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	private final MassIndexingTypeGroupMonitor typeGroupMonitor;
 	private final MassIndexingTypeGroupContext<E> massIndexingTypeGroupContext;
@@ -48,7 +45,7 @@ public class PojoMassIndexingEntityIdentifierLoadingRunnable<E, I>
 
 	@Override
 	protected void runWithFailureHandler() throws InterruptedException {
-		log.trace( "started" );
+		MassIndexingLog.INSTANCE.trace( "started" );
 		LoadingContext context = new LoadingContext();
 		try ( PojoMassIdentifierLoader loader = loadingStrategy.createIdentifierLoader( typeGroup.includedTypes(), context ) ) {
 			typeGroupMonitor.indexingStarted( massIndexingTypeGroupContext.withIdentifierLoader( loader ) );
@@ -62,7 +59,7 @@ public class PojoMassIndexingEntityIdentifierLoadingRunnable<E, I>
 			// or if the thread is interrupted by the workspace (due to consumer failure).
 			identifierQueue.producerStopping();
 		}
-		log.trace( "finished" );
+		MassIndexingLog.INSTANCE.trace( "finished" );
 	}
 
 	@Override
@@ -87,7 +84,7 @@ public class PojoMassIndexingEntityIdentifierLoadingRunnable<E, I>
 
 	@Override
 	protected String operationName() {
-		return log.massIndexerFetchingIds( typeGroup.notifiedGroupName() );
+		return PojoMassIndexerMessages.INSTANCE.massIndexerFetchingIds( typeGroup.notifiedGroupName() );
 	}
 
 	private class LoadingContext implements PojoMassIdentifierLoadingContext<I> {
@@ -103,7 +100,7 @@ public class PojoMassIndexingEntityIdentifierLoadingRunnable<E, I>
 			return new PojoMassIdentifierSink<I>() {
 				@Override
 				public void accept(List<? extends I> batch) throws InterruptedException {
-					log.tracef( "produced a list of ids %s", batch );
+					MassIndexingLog.INSTANCE.tracef( "produced a list of ids %s", batch );
 					List<I> copy = new ArrayList<>( batch );
 					identifierQueue.put( copy );
 				}

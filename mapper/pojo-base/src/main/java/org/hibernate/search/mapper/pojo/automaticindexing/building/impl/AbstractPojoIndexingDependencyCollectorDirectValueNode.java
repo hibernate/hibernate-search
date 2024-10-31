@@ -4,7 +4,6 @@
  */
 package org.hibernate.search.mapper.pojo.automaticindexing.building.impl;
 
-import java.lang.invoke.MethodHandles;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
@@ -15,7 +14,7 @@ import java.util.Set;
 import org.hibernate.search.mapper.pojo.automaticindexing.ReindexOnUpdate;
 import org.hibernate.search.mapper.pojo.automaticindexing.impl.PojoImplicitReindexingResolverNode;
 import org.hibernate.search.mapper.pojo.extractor.mapping.programmatic.ContainerExtractorPath;
-import org.hibernate.search.mapper.pojo.logging.impl.Log;
+import org.hibernate.search.mapper.pojo.logging.impl.MappingLog;
 import org.hibernate.search.mapper.pojo.model.path.PojoModelPathValueNode;
 import org.hibernate.search.mapper.pojo.model.path.impl.BoundPojoModelPath;
 import org.hibernate.search.mapper.pojo.model.path.impl.BoundPojoModelPathValueNode;
@@ -24,7 +23,6 @@ import org.hibernate.search.mapper.pojo.model.spi.PojoRawTypeModel;
 import org.hibernate.search.mapper.pojo.model.spi.PojoTypeModel;
 import org.hibernate.search.util.common.AssertionFailure;
 import org.hibernate.search.util.common.data.impl.LinkedNode;
-import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
 /**
  * A node representing a value in a dependency collector.
@@ -50,8 +48,6 @@ import org.hibernate.search.util.common.logging.impl.LoggerFactory;
  */
 public abstract class AbstractPojoIndexingDependencyCollectorDirectValueNode<P, V>
 		extends AbstractPojoIndexingDependencyCollectorValueNode {
-
-	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	final PojoIndexingDependencyCollectorPropertyNode<?, P> parentNode;
 	final BoundPojoModelPathValueNode<?, P, V> modelPathFromLastEntityNode;
@@ -155,7 +151,7 @@ public abstract class AbstractPojoIndexingDependencyCollectorDirectValueNode<P, 
 							.invertPath( inverseSideEntityType, modelPathFromConcreteEntitySubType )
 							.orElse( null );
 					if ( inverseAssociationPath == null ) {
-						throw log.cannotInvertAssociationForReindexing(
+						throw MappingLog.INSTANCE.cannotInvertAssociationForReindexing(
 								inverseSideRawEntityType, concreteEntityType,
 								modelPathFromLastEntityNode.toUnboundPath()
 						);
@@ -200,7 +196,7 @@ public abstract class AbstractPojoIndexingDependencyCollectorDirectValueNode<P, 
 		}
 		// Note: this should catch errors related to properties not found, among others.
 		catch (RuntimeException e) {
-			throw log.cannotApplyImplicitInverseAssociationPath(
+			throw MappingLog.INSTANCE.cannotApplyImplicitInverseAssociationPath(
 					inverseSideRawEntityType, inverseAssociationPath,
 					originalSideRawConcreteEntityType, modelPathFromLastEntityNode.toUnboundPath(),
 					e.getMessage(), e

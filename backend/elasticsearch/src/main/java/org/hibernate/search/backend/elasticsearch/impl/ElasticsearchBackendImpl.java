@@ -8,7 +8,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
-import java.lang.invoke.MethodHandles;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
@@ -25,7 +24,9 @@ import org.hibernate.search.backend.elasticsearch.document.model.dsl.impl.Elasti
 import org.hibernate.search.backend.elasticsearch.index.DynamicMapping;
 import org.hibernate.search.backend.elasticsearch.index.impl.ElasticsearchIndexManagerBuilder;
 import org.hibernate.search.backend.elasticsearch.index.impl.IndexManagerBackendContext;
-import org.hibernate.search.backend.elasticsearch.logging.impl.Log;
+import org.hibernate.search.backend.elasticsearch.logging.impl.AnalyzerLog;
+import org.hibernate.search.backend.elasticsearch.logging.impl.CommonFailureLog;
+import org.hibernate.search.backend.elasticsearch.logging.impl.MappingLog;
 import org.hibernate.search.backend.elasticsearch.lowlevel.index.mapping.impl.RootTypeMapping;
 import org.hibernate.search.backend.elasticsearch.lowlevel.index.settings.impl.IndexSettings;
 import org.hibernate.search.backend.elasticsearch.multitenancy.impl.MultiTenancyStrategy;
@@ -49,17 +50,12 @@ import org.hibernate.search.engine.environment.bean.BeanResolver;
 import org.hibernate.search.engine.reporting.FailureHandler;
 import org.hibernate.search.engine.reporting.spi.EventContexts;
 import org.hibernate.search.util.common.impl.Closer;
-import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 import org.hibernate.search.util.common.reporting.EventContext;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonSyntaxException;
 
-class ElasticsearchBackendImpl
-		implements BackendImplementor,
-		ElasticsearchBackend {
-
-	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
+class ElasticsearchBackendImpl implements BackendImplementor, ElasticsearchBackend {
 
 	private static final OptionalConfigurationProperty<
 			List<BeanReference<? extends ElasticsearchAnalysisConfigurer>>> ANALYSIS_CONFIGURER =
@@ -162,7 +158,7 @@ class ElasticsearchBackendImpl
 		if ( clazz.isAssignableFrom( ElasticsearchBackend.class ) ) {
 			return (T) this;
 		}
-		throw log.backendUnwrappingWithUnknownType( clazz, ElasticsearchBackend.class, eventContext );
+		throw CommonFailureLog.INSTANCE.backendUnwrappingWithUnknownType( clazz, ElasticsearchBackend.class, eventContext );
 	}
 
 	@Override
@@ -252,7 +248,7 @@ class ElasticsearchBackendImpl
 					.orElseGet( ElasticsearchAnalysisDefinitionRegistry::new );
 		}
 		catch (Exception e) {
-			throw log.unableToApplyAnalysisConfiguration( e.getMessage(), e, indexEventContext );
+			throw AnalyzerLog.INSTANCE.unableToApplyAnalysisConfiguration( e.getMessage(), e, indexEventContext );
 		}
 	}
 
@@ -276,17 +272,17 @@ class ElasticsearchBackendImpl
 		String filePath = schemaManagementSettingsFile.get();
 		try ( InputStream inputStream = buildContext.resourceResolver().locateResourceStream( filePath ) ) {
 			if ( inputStream == null ) {
-				throw log.customIndexSettingsFileNotFound( filePath, indexEventContext );
+				throw MappingLog.INSTANCE.customIndexSettingsFileNotFound( filePath, indexEventContext );
 			}
 			try ( Reader reader = new InputStreamReader( inputStream, StandardCharsets.UTF_8 ) ) {
 				return userFacingGson.fromJson( reader, IndexSettings.class );
 			}
 		}
 		catch (IOException e) {
-			throw log.customIndexSettingsErrorOnLoading( filePath, e.getMessage(), e, indexEventContext );
+			throw MappingLog.INSTANCE.customIndexSettingsErrorOnLoading( filePath, e.getMessage(), e, indexEventContext );
 		}
 		catch (JsonSyntaxException e) {
-			throw log.customIndexSettingsJsonSyntaxErrors( filePath, e.getMessage(), e, indexEventContext );
+			throw MappingLog.INSTANCE.customIndexSettingsJsonSyntaxErrors( filePath, e.getMessage(), e, indexEventContext );
 		}
 	}
 
@@ -301,17 +297,17 @@ class ElasticsearchBackendImpl
 		String filePath = schemaManagementMappingsFile.get();
 		try ( InputStream inputStream = buildContext.resourceResolver().locateResourceStream( filePath ) ) {
 			if ( inputStream == null ) {
-				throw log.customIndexMappingFileNotFound( filePath, indexEventContext );
+				throw MappingLog.INSTANCE.customIndexMappingFileNotFound( filePath, indexEventContext );
 			}
 			try ( Reader reader = new InputStreamReader( inputStream, StandardCharsets.UTF_8 ) ) {
 				return userFacingGson.fromJson( reader, RootTypeMapping.class );
 			}
 		}
 		catch (IOException e) {
-			throw log.customIndexMappingErrorOnLoading( filePath, e.getMessage(), e, indexEventContext );
+			throw MappingLog.INSTANCE.customIndexMappingErrorOnLoading( filePath, e.getMessage(), e, indexEventContext );
 		}
 		catch (JsonSyntaxException e) {
-			throw log.customIndexMappingJsonSyntaxErrors( filePath, e.getMessage(), e, indexEventContext );
+			throw MappingLog.INSTANCE.customIndexMappingJsonSyntaxErrors( filePath, e.getMessage(), e, indexEventContext );
 		}
 	}
 }

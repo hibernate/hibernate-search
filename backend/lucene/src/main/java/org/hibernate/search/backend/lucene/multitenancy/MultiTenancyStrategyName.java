@@ -4,11 +4,8 @@
  */
 package org.hibernate.search.backend.lucene.multitenancy;
 
-import java.lang.invoke.MethodHandles;
-
-import org.hibernate.search.backend.lucene.logging.impl.Log;
+import org.hibernate.search.backend.lucene.logging.impl.ConfigurationLog;
 import org.hibernate.search.engine.cfg.spi.ParseUtils;
-import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
 public enum MultiTenancyStrategyName {
 
@@ -22,14 +19,12 @@ public enum MultiTenancyStrategyName {
 	 */
 	DISCRIMINATOR( "discriminator" );
 
-	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
-
 	// This method conforms to the MicroProfile Config specification. Do not change its signature.
 	public static MultiTenancyStrategyName of(String value) {
 		return ParseUtils.parseDiscreteValues(
 				MultiTenancyStrategyName.values(),
 				MultiTenancyStrategyName::externalRepresentation,
-				log::invalidMultiTenancyStrategyName,
+				ConfigurationLog.INSTANCE::invalidMultiTenancyStrategyName,
 				value
 		);
 	}

@@ -4,18 +4,14 @@
  */
 package org.hibernate.search.integrationtest.mapper.orm.outboxpolling.testsupport.util;
 
-import java.lang.invoke.MethodHandles;
+import static org.hibernate.search.integrationtest.mapper.orm.outboxpolling.testsupport.logging.TestLog.TEST_LOGGER;
 
 import org.hibernate.search.mapper.orm.outboxpolling.cluster.impl.AgentRepositoryProvider;
 import org.hibernate.search.mapper.orm.outboxpolling.event.impl.DefaultOutboxEventFinder;
 import org.hibernate.search.mapper.orm.outboxpolling.event.impl.OutboxEventFinderProvider;
 import org.hibernate.search.mapper.orm.outboxpolling.impl.OutboxPollingInternalConfigurer;
-import org.hibernate.search.mapper.orm.outboxpolling.logging.impl.Log;
-import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
 public class TestingOutboxPollingInternalConfigurer implements OutboxPollingInternalConfigurer {
-
-	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	private OutboxEventFilter outboxEventFilter;
 	private OutboxAgentDisconnectionSimulator agentDisconnectionSimulator;
@@ -34,7 +30,7 @@ public class TestingOutboxPollingInternalConfigurer implements OutboxPollingInte
 	@Override
 	public OutboxEventFinderProvider wrapEventFinder(DefaultOutboxEventFinder.Provider delegate) {
 		if ( outboxEventFilter != null ) {
-			log.debugf(
+			TEST_LOGGER.debugf(
 					"Outbox processing will use a filter for the outbox event finder: '%s'.",
 					outboxEventFilter
 			);
@@ -48,7 +44,7 @@ public class TestingOutboxPollingInternalConfigurer implements OutboxPollingInte
 	@Override
 	public AgentRepositoryProvider wrapAgentRepository(AgentRepositoryProvider delegate) {
 		if ( agentDisconnectionSimulator != null ) {
-			log.debugf(
+			TEST_LOGGER.debugf(
 					"Outbox processing will use a disconnection simulator for the agent repository provider '%s'.",
 					agentDisconnectionSimulator
 			);

@@ -4,7 +4,6 @@
  */
 package org.hibernate.search.mapper.pojo.work.impl;
 
-import java.lang.invoke.MethodHandles;
 import java.util.BitSet;
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -19,7 +18,7 @@ import org.hibernate.search.mapper.pojo.automaticindexing.impl.PojoImplicitReind
 import org.hibernate.search.mapper.pojo.automaticindexing.spi.PojoImplicitReindexingResolverSessionContext;
 import org.hibernate.search.mapper.pojo.bridge.runtime.impl.DocumentRouter;
 import org.hibernate.search.mapper.pojo.bridge.runtime.impl.NoOpDocumentRouter;
-import org.hibernate.search.mapper.pojo.logging.impl.Log;
+import org.hibernate.search.mapper.pojo.logging.impl.IndexingLog;
 import org.hibernate.search.mapper.pojo.model.path.spi.PojoPathFilter;
 import org.hibernate.search.mapper.pojo.model.spi.PojoRawTypeIdentifier;
 import org.hibernate.search.mapper.pojo.model.spi.PojoRuntimeIntrospector;
@@ -29,7 +28,6 @@ import org.hibernate.search.mapper.pojo.work.spi.PojoTypeIndexingPlan;
 import org.hibernate.search.mapper.pojo.work.spi.PojoWorkSessionContext;
 import org.hibernate.search.util.common.AssertionFailure;
 import org.hibernate.search.util.common.SearchException;
-import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
 /**
  * @param <I> The type of identifiers of entities in this plan.
@@ -38,7 +36,6 @@ import org.hibernate.search.util.common.logging.impl.LoggerFactory;
  */
 abstract class AbstractPojoTypeIndexingPlan<I, E, S extends AbstractPojoTypeIndexingPlan<I, E, S>.AbstractEntityState>
 		implements PojoImplicitReindexingAssociationInverseSideResolverRootContext, PojoTypeIndexingPlan {
-	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	final PojoWorkSessionContext sessionContext;
 	final PojoIndexingPlanImpl root;
@@ -388,7 +385,7 @@ abstract class AbstractPojoTypeIndexingPlan<I, E, S extends AbstractPojoTypeInde
 			catch (RuntimeException e) {
 				EntityReference entityReference = sessionContext.mappingContext().entityReferenceFactoryDelegate()
 						.create( typeContext().typeIdentifier(), typeContext().entityName(), identifier );
-				throw log.errorResolvingEntitiesToReindex( entityReference, e.getMessage(), e );
+				throw IndexingLog.INSTANCE.errorResolvingEntitiesToReindex( entityReference, e.getMessage(), e );
 			}
 			typeContext().resolveEntitiesToReindex( root, sessionContext, identifier,
 					entitySupplier, this );

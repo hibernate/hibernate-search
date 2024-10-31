@@ -4,7 +4,6 @@
  */
 package org.hibernate.search.backend.lucene.types.dsl.impl;
 
-import java.lang.invoke.MethodHandles;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.EnumSet;
@@ -12,7 +11,8 @@ import java.util.HashSet;
 import java.util.Set;
 
 import org.hibernate.search.backend.lucene.analysis.model.impl.LuceneAnalysisDefinitionRegistry;
-import org.hibernate.search.backend.lucene.logging.impl.Log;
+import org.hibernate.search.backend.lucene.logging.impl.AnalyzerLog;
+import org.hibernate.search.backend.lucene.logging.impl.MappingLog;
 import org.hibernate.search.backend.lucene.lowlevel.common.impl.AnalyzerConstants;
 import org.hibernate.search.backend.lucene.search.predicate.impl.LucenePredicateTypeKeys;
 import org.hibernate.search.backend.lucene.search.projection.impl.LuceneFieldHighlightProjection;
@@ -45,7 +45,6 @@ import org.hibernate.search.engine.search.projection.spi.ProjectionTypeKeys;
 import org.hibernate.search.engine.search.sort.spi.SortTypeKeys;
 import org.hibernate.search.util.common.AssertionFailure;
 import org.hibernate.search.util.common.impl.Contracts;
-import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
 import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.document.FieldType;
@@ -54,8 +53,6 @@ import org.apache.lucene.index.IndexOptions;
 class LuceneStringIndexFieldTypeOptionsStep
 		extends AbstractLuceneStandardIndexFieldTypeOptionsStep<LuceneStringIndexFieldTypeOptionsStep, String>
 		implements StringIndexFieldTypeOptionsStep<LuceneStringIndexFieldTypeOptionsStep> {
-
-	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	private String analyzerName;
 	private Analyzer analyzer;
@@ -82,7 +79,7 @@ class LuceneStringIndexFieldTypeOptionsStep
 		this.analyzerName = analyzerName;
 		this.analyzer = getAnalysisDefinitionRegistry().getAnalyzerDefinition( analyzerName );
 		if ( analyzer == null ) {
-			throw log.unknownAnalyzer( analyzerName, buildContext.getEventContext() );
+			throw AnalyzerLog.INSTANCE.unknownAnalyzer( analyzerName, buildContext.getEventContext() );
 		}
 		return this;
 	}
@@ -92,7 +89,7 @@ class LuceneStringIndexFieldTypeOptionsStep
 		this.searchAnalyzerName = searchAnalyzerName;
 		this.searchAnalyzer = getAnalysisDefinitionRegistry().getAnalyzerDefinition( searchAnalyzerName );
 		if ( searchAnalyzer == null ) {
-			throw log.unknownAnalyzer( searchAnalyzerName, buildContext.getEventContext() );
+			throw AnalyzerLog.INSTANCE.unknownAnalyzer( searchAnalyzerName, buildContext.getEventContext() );
 		}
 		return this;
 	}
@@ -102,7 +99,7 @@ class LuceneStringIndexFieldTypeOptionsStep
 		this.normalizerName = normalizerName;
 		this.normalizer = getAnalysisDefinitionRegistry().getNormalizerDefinition( normalizerName );
 		if ( normalizer == null ) {
-			throw log.unknownNormalizer( normalizerName, buildContext.getEventContext() );
+			throw AnalyzerLog.INSTANCE.unknownNormalizer( normalizerName, buildContext.getEventContext() );
 		}
 		return this;
 	}
@@ -158,19 +155,21 @@ class LuceneStringIndexFieldTypeOptionsStep
 			}
 
 			if ( resolvedSortable ) {
-				throw log.cannotUseAnalyzerOnSortableField( analyzerName, buildContext.getEventContext() );
+				throw AnalyzerLog.INSTANCE.cannotUseAnalyzerOnSortableField( analyzerName, buildContext.getEventContext() );
 			}
 
 			if ( normalizer != null ) {
-				throw log.cannotApplyAnalyzerAndNormalizer( analyzerName, normalizerName, buildContext.getEventContext() );
+				throw AnalyzerLog.INSTANCE.cannotApplyAnalyzerAndNormalizer( analyzerName, normalizerName,
+						buildContext.getEventContext() );
 			}
 
 			if ( indexNullAsValue != null ) {
-				throw log.cannotUseIndexNullAsAndAnalyzer( analyzerName, indexNullAsValue, buildContext.getEventContext() );
+				throw AnalyzerLog.INSTANCE.cannotUseIndexNullAsAndAnalyzer( analyzerName, indexNullAsValue,
+						buildContext.getEventContext() );
 			}
 
 			if ( resolvedAggregable ) {
-				throw log.cannotUseAnalyzerOnAggregableField( analyzerName, buildContext.getEventContext() );
+				throw AnalyzerLog.INSTANCE.cannotUseAnalyzerOnAggregableField( analyzerName, buildContext.getEventContext() );
 			}
 		}
 		else {
@@ -186,7 +185,7 @@ class LuceneStringIndexFieldTypeOptionsStep
 			}
 
 			if ( searchAnalyzer != null ) {
-				throw log.searchAnalyzerWithoutAnalyzer( searchAnalyzerName, buildContext.getEventContext() );
+				throw AnalyzerLog.INSTANCE.searchAnalyzerWithoutAnalyzer( searchAnalyzerName, buildContext.getEventContext() );
 			}
 		}
 
@@ -270,7 +269,7 @@ class LuceneStringIndexFieldTypeOptionsStep
 				localTermVector = termVector;
 			}
 			else {
-				throw log.termVectorDontAllowFastVectorHighlighter( termVector );
+				throw MappingLog.INSTANCE.termVectorDontAllowFastVectorHighlighter( termVector );
 			}
 		}
 		switch ( localTermVector ) {
@@ -369,7 +368,7 @@ class LuceneStringIndexFieldTypeOptionsStep
 			highlightable = EnumSet.of( Highlightable.DEFAULT );
 		}
 		if ( highlightable.isEmpty() ) {
-			throw log.noHighlightableProvided();
+			throw MappingLog.INSTANCE.noHighlightableProvided();
 		}
 		if ( highlightable.contains( Highlightable.DEFAULT ) ) {
 			// means we have the default case, so let's check if either plain or unified highlighters can be applied:
@@ -389,7 +388,7 @@ class LuceneStringIndexFieldTypeOptionsStep
 				return Collections.emptySet();
 			}
 			else {
-				throw log.unsupportedMixOfHighlightableValues( highlightable );
+				throw MappingLog.INSTANCE.unsupportedMixOfHighlightableValues( highlightable );
 			}
 		}
 		if ( highlightable.contains( Highlightable.ANY ) ) {

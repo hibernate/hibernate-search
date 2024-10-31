@@ -4,13 +4,11 @@
  */
 package org.hibernate.search.backend.elasticsearch.aws.impl;
 
-import java.lang.invoke.MethodHandles;
-
 import org.hibernate.search.backend.elasticsearch.ElasticsearchDistributionName;
 import org.hibernate.search.backend.elasticsearch.ElasticsearchVersion;
 import org.hibernate.search.backend.elasticsearch.aws.cfg.ElasticsearchAwsBackendSettings;
 import org.hibernate.search.backend.elasticsearch.aws.cfg.ElasticsearchAwsCredentialsTypeNames;
-import org.hibernate.search.backend.elasticsearch.aws.logging.impl.Log;
+import org.hibernate.search.backend.elasticsearch.aws.logging.impl.AwsLog;
 import org.hibernate.search.backend.elasticsearch.aws.spi.ElasticsearchAwsCredentialsProvider;
 import org.hibernate.search.backend.elasticsearch.client.ElasticsearchHttpClientConfigurationContext;
 import org.hibernate.search.backend.elasticsearch.client.ElasticsearchHttpClientConfigurer;
@@ -20,14 +18,11 @@ import org.hibernate.search.engine.cfg.spi.OptionalConfigurationProperty;
 import org.hibernate.search.engine.environment.bean.BeanHolder;
 import org.hibernate.search.engine.environment.bean.BeanReference;
 import org.hibernate.search.engine.environment.bean.BeanResolver;
-import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
 import software.amazon.awssdk.auth.credentials.AwsCredentialsProvider;
 import software.amazon.awssdk.regions.Region;
 
 public class ElasticsearchAwsHttpClientConfigurer implements ElasticsearchHttpClientConfigurer {
-
-	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	private static final ConfigurationProperty<Boolean> SIGNING_ENABLED =
 			ConfigurationProperty.forKey( ElasticsearchAwsBackendSettings.SIGNING_ENABLED )
@@ -62,11 +57,11 @@ public class ElasticsearchAwsHttpClientConfigurer implements ElasticsearchHttpCl
 		ConfigurationPropertySource propertySource = context.configurationPropertySource();
 
 		if ( !SIGNING_ENABLED.get( propertySource ) ) {
-			log.debug( "AWS request signing is disabled." );
+			AwsLog.INSTANCE.debug( "AWS request signing is disabled." );
 			return;
 		}
 
-		Region region = REGION.getAndMapOrThrow( propertySource, Region::of, log::missingPropertyForSigning );
+		Region region = REGION.getAndMapOrThrow( propertySource, Region::of, AwsLog.INSTANCE::missingPropertyForSigning );
 		String service;
 		switch ( context.configuredVersion().map( ElasticsearchVersion::distribution )
 				.orElse( ElasticsearchDistributionName.OPENSEARCH ) ) {
@@ -81,7 +76,7 @@ public class ElasticsearchAwsHttpClientConfigurer implements ElasticsearchHttpCl
 		}
 		AwsCredentialsProvider credentialsProvider = createCredentialsProvider( context.beanResolver(), propertySource );
 
-		log.debugf( "AWS request signing is enabled [region = '%s', service = '%s', credentialsProvider = '%s'].",
+		AwsLog.INSTANCE.debugf( "AWS request signing is enabled [region = '%s', service = '%s', credentialsProvider = '%s'].",
 				region, service, credentialsProvider );
 
 		AwsSigningRequestInterceptor signingInterceptor =
@@ -94,7 +89,7 @@ public class ElasticsearchAwsHttpClientConfigurer implements ElasticsearchHttpCl
 			ConfigurationPropertySource propertySource) {
 		if ( LEGACY_ACCESS_KEY.get( propertySource ).isPresent()
 				|| LEGACY_SECRET_KEY.get( propertySource ).isPresent() ) {
-			throw log.obsoleteAccessKeyIdOrSecretAccessKeyForSigning(
+			throw AwsLog.INSTANCE.obsoleteAccessKeyIdOrSecretAccessKeyForSigning(
 					LEGACY_ACCESS_KEY.resolveOrRaw( propertySource ),
 					LEGACY_SECRET_KEY.resolveOrRaw( propertySource ),
 					CREDENTIALS_TYPE.resolveOrRaw( propertySource ),

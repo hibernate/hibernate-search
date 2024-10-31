@@ -4,21 +4,17 @@
  */
 package org.hibernate.search.mapper.pojo.work.impl;
 
-import java.lang.invoke.MethodHandles;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 
-import org.hibernate.search.mapper.pojo.logging.impl.Log;
+import org.hibernate.search.mapper.pojo.logging.impl.IndexingLog;
 import org.hibernate.search.mapper.pojo.model.spi.PojoRawTypeIdentifier;
 import org.hibernate.search.mapper.pojo.scope.impl.PojoScopeTypeContextProvider;
 import org.hibernate.search.mapper.pojo.work.SearchIndexingPlanFilterContext;
 import org.hibernate.search.mapper.pojo.work.spi.ConfiguredSearchIndexingPlanFilter;
-import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
 public class SearchIndexingPlanFilterContextImpl implements SearchIndexingPlanFilterContext {
-
-	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	private final PojoScopeTypeContextProvider contextProvider;
 	private final Set<PojoRawTypeIdentifier<?>> includes = new HashSet<>();
@@ -132,7 +128,7 @@ public class SearchIndexingPlanFilterContextImpl implements SearchIndexingPlanFi
 	private boolean addIfNotPresentInOther(PojoRawTypeIdentifier<?> typeIdentifier, Set<PojoRawTypeIdentifier<?>> a,
 			Set<PojoRawTypeIdentifier<?>> b) {
 		if ( b.contains( typeIdentifier ) ) {
-			throw log.indexingPlanFilterCannotIncludeExcludeSameType( typeIdentifier, includes, excludes );
+			throw IndexingLog.INSTANCE.indexingPlanFilterCannotIncludeExcludeSameType( typeIdentifier, includes, excludes );
 		}
 		return a.add( typeIdentifier );
 	}

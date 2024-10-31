@@ -24,8 +24,8 @@ import org.hibernate.search.query.dsl.QueryBuilder;
 import org.hibernate.search.query.facet.Facet;
 import org.hibernate.search.query.facet.FacetingRequest;
 import org.hibernate.search.query.facet.RangeFacet;
-import org.hibernate.search.util.logging.impl.Log;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
+import org.hibernate.search.util.logging.impl.MigrationHelperLog;
 
 import org.junit.jupiter.api.Test;
 
@@ -38,7 +38,7 @@ import org.apache.lucene.search.Query;
  */
 class WebShopTest extends AbstractFacetTest {
 
-	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
+	private static final MigrationHelperLog log = LoggerFactory.make( MigrationHelperLog.class, MethodHandles.lookup() );
 
 	@Test
 	void testSimulateClient() {

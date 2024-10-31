@@ -20,7 +20,11 @@ public final class LoggerFactory {
 	}
 
 	public static <T> T make(Class<T> logClass, LogCategory category, Lookup creationContext) {
-		return Logger.getMessageLogger( creationContext, logClass, category.getName() );
+		return make( logClass, category.getName(), creationContext );
+	}
+
+	public static <T> T make(Class<T> logClass, String category, Lookup creationContext) {
+		return Logger.getMessageLogger( creationContext, logClass, category );
 	}
 
 }

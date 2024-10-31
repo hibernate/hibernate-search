@@ -4,19 +4,16 @@
  */
 package org.hibernate.search.mapper.orm.outboxpolling.cfg.impl;
 
-import java.lang.invoke.MethodHandles;
 import java.util.Locale;
 
 import org.hibernate.search.engine.cfg.ConfigurationPropertySource;
 import org.hibernate.search.engine.cfg.spi.OptionalConfigurationProperty;
-import org.hibernate.search.mapper.orm.outboxpolling.logging.impl.Log;
-import org.hibernate.search.util.common.logging.impl.LoggerFactory;
+import org.hibernate.search.mapper.orm.outboxpolling.logging.impl.ConfigurationLog;
+import org.hibernate.search.mapper.orm.outboxpolling.logging.impl.DeprecationLog;
 import org.hibernate.type.SqlTypes;
 import org.hibernate.type.descriptor.JdbcTypeNameMapper;
 
 public final class UuidDataTypeUtils {
-
-	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	private UuidDataTypeUtils() {
 	}
@@ -47,11 +44,11 @@ public final class UuidDataTypeUtils {
 		}
 		String propertyName = property.resolveOrRaw( source );
 		if ( UUID_CHAR.equalsIgnoreCase( value ) ) {
-			log.usingDeprecatedPropertyValue( propertyName, value, "CHAR" );
+			DeprecationLog.INSTANCE.usingDeprecatedPropertyValue( propertyName, value, "CHAR" );
 			return SqlTypes.CHAR;
 		}
 		else if ( UUID_BINARY.equalsIgnoreCase( value ) ) {
-			log.usingDeprecatedPropertyValue( propertyName, value, "BINARY" );
+			DeprecationLog.INSTANCE.usingDeprecatedPropertyValue( propertyName, value, "BINARY" );
 			return SqlTypes.BINARY;
 		}
 		return TypeCodeConverter.convert( value );
@@ -70,7 +67,7 @@ public final class UuidDataTypeUtils {
 				return Integer.parseInt( string );
 			}
 			catch (NumberFormatException ex) {
-				throw log.unableToParseJdbcTypeCode( value, ex.getMessage(), ex );
+				throw ConfigurationLog.INSTANCE.unableToParseJdbcTypeCode( value, ex.getMessage(), ex );
 			}
 		}
 	}

@@ -4,11 +4,10 @@
  */
 package org.hibernate.search.backend.lucene.search.projection.impl;
 
-import java.lang.invoke.MethodHandles;
 import java.util.Collection;
 import java.util.Map;
 
-import org.hibernate.search.backend.lucene.logging.impl.Log;
+import org.hibernate.search.backend.lucene.logging.impl.QueryLog;
 import org.hibernate.search.backend.lucene.search.extraction.impl.ExtractionRequirements;
 import org.hibernate.search.backend.lucene.search.highlighter.impl.LuceneAbstractSearchHighlighter;
 import org.hibernate.search.engine.backend.common.spi.FieldPaths;
@@ -16,11 +15,8 @@ import org.hibernate.search.engine.reporting.spi.EventContexts;
 import org.hibernate.search.engine.search.common.NamedValues;
 import org.hibernate.search.engine.search.common.spi.SearchQueryElementTypeKey;
 import org.hibernate.search.engine.search.query.spi.QueryParameters;
-import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
 public final class ProjectionRequestContext {
-
-	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	private final ExtractionRequirements.Builder extractionRequirementsBuilder;
 	private final String absoluteCurrentNestedFieldPath;
@@ -65,13 +61,13 @@ public final class ProjectionRequestContext {
 
 	public void checkValidField(String absoluteFieldPath) {
 		if ( !FieldPaths.isStrictPrefix( absoluteCurrentNestedFieldPath, absoluteFieldPath ) ) {
-			throw log.invalidContextForProjectionOnField( absoluteFieldPath, absoluteCurrentNestedFieldPath );
+			throw QueryLog.INSTANCE.invalidContextForProjectionOnField( absoluteFieldPath, absoluteCurrentNestedFieldPath );
 		}
 	}
 
 	void checkNotNested(SearchQueryElementTypeKey<?> projectionKey, String hint) {
 		if ( absoluteCurrentFieldPath() != null ) {
-			throw log.cannotUseProjectionInNestedContext(
+			throw QueryLog.INSTANCE.cannotUseProjectionInNestedContext(
 					projectionKey.toString(),
 					hint,
 					EventContexts.indexSchemaRoot()
@@ -115,7 +111,7 @@ public final class ProjectionRequestContext {
 		else {
 			LuceneAbstractSearchHighlighter highlighter = namedHighlighters.get( name );
 			if ( highlighter == null ) {
-				throw log.cannotFindHighlighterWithName( name, namedHighlighters.keySet() );
+				throw QueryLog.INSTANCE.cannotFindHighlighterWithName( name, namedHighlighters.keySet() );
 			}
 			return highlighter;
 		}

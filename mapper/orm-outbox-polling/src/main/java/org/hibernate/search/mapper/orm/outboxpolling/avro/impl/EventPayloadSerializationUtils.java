@@ -7,12 +7,10 @@ package org.hibernate.search.mapper.orm.outboxpolling.avro.impl;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.lang.invoke.MethodHandles;
 
 import org.hibernate.search.mapper.orm.outboxpolling.avro.generated.impl.PojoIndexingQueueEventPayloadDto;
-import org.hibernate.search.mapper.orm.outboxpolling.logging.impl.Log;
+import org.hibernate.search.mapper.orm.outboxpolling.logging.impl.OutboxPollingEventsLog;
 import org.hibernate.search.mapper.pojo.work.spi.PojoIndexingQueueEventPayload;
-import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
 import org.apache.avro.io.BinaryDecoder;
 import org.apache.avro.io.DecoderFactory;
@@ -22,8 +20,6 @@ import org.apache.avro.specific.SpecificDatumReader;
 import org.apache.avro.specific.SpecificDatumWriter;
 
 public final class EventPayloadSerializationUtils {
-
-	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	private EventPayloadSerializationUtils() {
 	}
@@ -40,7 +36,7 @@ public final class EventPayloadSerializationUtils {
 			encoder.flush();
 		}
 		catch (IOException | RuntimeException e) {
-			throw log.unableToSerializeOutboxEventPayloadWithAvro( e.getMessage(), e );
+			throw OutboxPollingEventsLog.INSTANCE.unableToSerializeOutboxEventPayloadWithAvro( e.getMessage(), e );
 		}
 
 		return out.toByteArray();
@@ -57,7 +53,7 @@ public final class EventPayloadSerializationUtils {
 			return EventPayloadFromDtoConverterUtils.convert( reader.read( null, decoder ) );
 		}
 		catch (IOException | RuntimeException e) {
-			throw log.unableToDeserializeOutboxEventPayloadWithAvro( e.getMessage(), e );
+			throw OutboxPollingEventsLog.INSTANCE.unableToDeserializeOutboxEventPayloadWithAvro( e.getMessage(), e );
 		}
 	}
 }

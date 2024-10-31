@@ -4,7 +4,6 @@
  */
 package org.hibernate.search.engine.cfg.spi;
 
-import java.lang.invoke.MethodHandles;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
@@ -13,10 +12,9 @@ import java.util.concurrent.ConcurrentHashMap;
 import org.hibernate.search.engine.cfg.ConfigurationPropertyCheckingStrategyName;
 import org.hibernate.search.engine.cfg.ConfigurationPropertySource;
 import org.hibernate.search.engine.cfg.EngineSettings;
-import org.hibernate.search.engine.logging.impl.Log;
+import org.hibernate.search.engine.logging.impl.ConfigurationLog;
 import org.hibernate.search.util.common.AssertionFailure;
 import org.hibernate.search.util.common.impl.CollectionHelper;
-import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
 /**
  * A utility that checks usage of property keys
@@ -24,8 +22,6 @@ import org.hibernate.search.util.common.logging.impl.LoggerFactory;
  * and requiring special hooks to be called before and after bootstrap.
  */
 public final class ConfigurationPropertyChecker {
-
-	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	private static final ConfigurationProperty<
 			ConfigurationPropertyCheckingStrategyName> CONFIGURATION_PROPERTY_CHECKING_STRATEGY =
@@ -79,7 +75,7 @@ public final class ConfigurationPropertyChecker {
 
 	public void beforeBoot() {
 		if ( !warn ) {
-			log.configurationPropertyTrackingDisabled();
+			ConfigurationLog.INSTANCE.configurationPropertyTrackingDisabled();
 		}
 
 		checkHibernateSearch5Properties();
@@ -97,7 +93,7 @@ public final class ConfigurationPropertyChecker {
 			}
 		}
 		if ( !obsoleteKeys.isEmpty() ) {
-			throw log.obsoleteConfigurationPropertiesFromSearch5( obsoleteKeys );
+			throw ConfigurationLog.INSTANCE.obsoleteConfigurationPropertiesFromSearch5( obsoleteKeys );
 		}
 	}
 
@@ -121,7 +117,7 @@ public final class ConfigurationPropertyChecker {
 		}
 
 		if ( !unconsumedPropertyKeys.isEmpty() ) {
-			log.configurationPropertyTrackingUnusedProperties(
+			ConfigurationLog.INSTANCE.configurationPropertyTrackingUnusedProperties(
 					unconsumedPropertyKeys,
 					configurationPropertyCheckingStrategyPropertyName,
 					ConfigurationPropertyCheckingStrategyName.IGNORE.externalRepresentation()

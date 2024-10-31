@@ -5,13 +5,13 @@
 package org.hibernate.search.backend.lucene.orchestration.impl;
 
 import java.io.IOException;
-import java.lang.invoke.MethodHandles;
 import java.util.Collection;
 import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 
 import org.hibernate.search.backend.lucene.cache.impl.LuceneQueryCachingContext;
-import org.hibernate.search.backend.lucene.logging.impl.Log;
+import org.hibernate.search.backend.lucene.logging.impl.CommonFailureLog;
+import org.hibernate.search.backend.lucene.logging.impl.LuceneSpecificLog;
 import org.hibernate.search.backend.lucene.lowlevel.reader.impl.HibernateSearchMultiReader;
 import org.hibernate.search.backend.lucene.lowlevel.reader.impl.IndexReaderMetadataResolver;
 import org.hibernate.search.backend.lucene.lowlevel.reader.impl.ReadIndexManagerContext;
@@ -22,7 +22,6 @@ import org.hibernate.search.engine.backend.work.execution.OperationSubmitter;
 import org.hibernate.search.engine.cfg.ConfigurationPropertySource;
 import org.hibernate.search.engine.reporting.spi.EventContexts;
 import org.hibernate.search.util.common.impl.SuppressingCloser;
-import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 import org.hibernate.search.util.common.reporting.EventContext;
 
 import org.apache.lucene.search.IndexSearcher;
@@ -31,8 +30,6 @@ import org.apache.lucene.search.similarities.Similarity;
 public class LuceneSyncWorkOrchestratorImpl
 		extends AbstractWorkOrchestrator<LuceneSyncWorkOrchestratorImpl.WorkExecution<?>>
 		implements LuceneSyncWorkOrchestrator {
-
-	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	private final Similarity similarity;
 	private final LuceneQueryCachingContext cachingContext;
@@ -83,7 +80,7 @@ public class LuceneSyncWorkOrchestratorImpl
 	@Override
 	protected void doSubmit(WorkExecution<?> work, OperationSubmitter operationSubmitter) {
 		if ( !OperationSubmitter.blocking().equals( operationSubmitter ) ) {
-			throw log.nonblockingOperationSubmitterNotSupported();
+			throw CommonFailureLog.INSTANCE.nonblockingOperationSubmitterNotSupported();
 		}
 		work.execute();
 	}
@@ -168,7 +165,7 @@ public class LuceneSyncWorkOrchestratorImpl
 				indexReader.close();
 			}
 			catch (IOException | RuntimeException e) {
-				log.unableToCloseIndexReader( getEventContext(), e );
+				LuceneSpecificLog.INSTANCE.unableToCloseIndexReader( getEventContext(), e );
 			}
 		}
 	}

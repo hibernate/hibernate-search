@@ -5,20 +5,19 @@
 package org.hibernate.search.backend.lucene.lowlevel.writer.impl;
 
 import java.io.IOException;
-import java.lang.invoke.MethodHandles;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.ReentrantLock;
 
-import org.hibernate.search.backend.lucene.logging.impl.Log;
+import org.hibernate.search.backend.lucene.logging.impl.IndexingLog;
+import org.hibernate.search.backend.lucene.logging.impl.LuceneSpecificLog;
 import org.hibernate.search.engine.backend.orchestration.spi.SingletonTask;
 import org.hibernate.search.engine.common.execution.spi.SimpleScheduledExecutor;
 import org.hibernate.search.engine.common.timing.spi.TimingSource;
 import org.hibernate.search.engine.reporting.FailureContext;
 import org.hibernate.search.engine.reporting.FailureHandler;
 import org.hibernate.search.util.common.impl.Closer;
-import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 import org.hibernate.search.util.common.reporting.EventContext;
 
 import org.apache.lucene.index.DirectoryReader;
@@ -31,8 +30,6 @@ import org.apache.lucene.search.Query;
  * @author Sanne Grinovero (C) 2011 Red Hat Inc.
  */
 public class IndexWriterDelegatorImpl implements IndexWriterDelegator {
-
-	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	private final IndexWriter delegate;
 	private final EventContext eventContext;
@@ -152,19 +149,19 @@ public class IndexWriterDelegatorImpl implements IndexWriterDelegator {
 			finally {
 				commitLock.unlock();
 			}
-			log.trace( "IndexWriter closed" );
+			LuceneSpecificLog.INSTANCE.trace( "IndexWriter closed" );
 		}
 	}
 
 	void closeAfterFailure(Throwable throwable, Object failingOperation) {
 		Exception exceptionToReport =
-				log.uncommittedOperationsBecauseOfFailure( throwable.getMessage(), eventContext, throwable );
+				LuceneSpecificLog.INSTANCE.uncommittedOperationsBecauseOfFailure( throwable.getMessage(), eventContext, throwable );
 		try {
 			close();
 		}
 		catch (RuntimeException | IOException e) {
 			exceptionToReport.addSuppressed(
-					log.unableToCloseIndexWriterAfterFailures( e.getMessage(), eventContext, e ) );
+					LuceneSpecificLog.INSTANCE.unableToCloseIndexWriterAfterFailures( e.getMessage(), eventContext, e ) );
 		}
 
 		/*
@@ -190,7 +187,7 @@ public class IndexWriterDelegatorImpl implements IndexWriterDelegator {
 			updateCommitExpiration();
 		}
 		catch (RuntimeException | IOException e) {
-			throw log.unableToCommitIndex( e.getMessage(), eventContext, e );
+			throw IndexingLog.INSTANCE.unableToCommitIndex( e.getMessage(), eventContext, e );
 		}
 		finally {
 			commitLock.unlock();

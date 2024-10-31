@@ -4,7 +4,6 @@
  */
 package org.hibernate.search.mapper.orm.outboxpolling.event.impl;
 
-import java.lang.invoke.MethodHandles;
 import java.time.Clock;
 import java.time.Duration;
 import java.time.Instant;
@@ -16,13 +15,11 @@ import org.hibernate.search.engine.reporting.FailureHandler;
 import org.hibernate.search.mapper.orm.outboxpolling.cluster.impl.Agent;
 import org.hibernate.search.mapper.orm.outboxpolling.cluster.impl.AgentPersister;
 import org.hibernate.search.mapper.orm.outboxpolling.cluster.impl.AgentReference;
-import org.hibernate.search.mapper.orm.outboxpolling.logging.impl.Log;
-import org.hibernate.search.util.common.logging.impl.LoggerFactory;
+import org.hibernate.search.mapper.orm.outboxpolling.logging.impl.OutboxPollingEventsLog;
 import org.hibernate.search.util.common.spi.ToStringTreeAppendable;
 import org.hibernate.search.util.common.spi.ToStringTreeAppender;
 
 abstract class AbstractAgentClusterLink<R> implements ToStringTreeAppendable {
-	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	protected final FailureHandler failureHandler;
 	protected final Clock clock;
@@ -65,7 +62,7 @@ abstract class AbstractAgentClusterLink<R> implements ToStringTreeAppendable {
 		List<Agent> allAgentsInIdOrder = context.agentRepository().findAllOrderById();
 
 		Instant now = clock.instant();
-		log.tracef( "Agent '%s': starting pulse at %s with self = %s, all agents = %s",
+		OutboxPollingEventsLog.INSTANCE.tracef( "Agent '%s': starting pulse at %s with self = %s, all agents = %s",
 				selfReference(), now, self, allAgentsInIdOrder );
 
 		// In order to avoid transaction deadlocks with some RDBMS (and this time I mean Oracle),
@@ -84,9 +81,10 @@ abstract class AbstractAgentClusterLink<R> implements ToStringTreeAppendable {
 				.filter( a -> a.getExpiration().isBefore( expirationLimit ) )
 				.collect( Collectors.toList() );
 		if ( !timedOutAgents.isEmpty() ) {
-			log.removingTimedOutAgents( selfReference(), timedOutAgents );
+			OutboxPollingEventsLog.INSTANCE.removingTimedOutAgents( selfReference(), timedOutAgents );
 			context.agentRepository().delete( timedOutAgents );
-			log.infof( "Agent '%s': reassessing the new situation in the next pulse", selfReference() );
+			OutboxPollingEventsLog.INSTANCE.infof( "Agent '%s': reassessing the new situation in the next pulse",
+					selfReference() );
 			return instructCommitAndRetryPulseAfterDelay( now, pollingInterval );
 		}
 
@@ -104,7 +102,7 @@ abstract class AbstractAgentClusterLink<R> implements ToStringTreeAppendable {
 		// Delay expiration with each write
 		self.setExpiration( now.plus( pulseExpiration ) );
 		R instructions = pulseResult.applyAndReturnInstructions( now, self, agentPersister );
-		log.tracef( "Agent '%s': ending pulse at %s with self = %s",
+		OutboxPollingEventsLog.INSTANCE.tracef( "Agent '%s': ending pulse at %s with self = %s",
 				selfReference(), now, self );
 		return instructions;
 	}
@@ -127,7 +125,7 @@ abstract class AbstractAgentClusterLink<R> implements ToStringTreeAppendable {
 	private Agent findSelfExpectRegistered(AgentClusterLinkContext context) {
 		Agent self = agentPersister.findSelf( context.agentRepository() );
 		if ( self == null ) {
-			throw log.agentRegistrationIneffective( selfReference() );
+			throw OutboxPollingEventsLog.INSTANCE.agentRegistrationIneffective( selfReference() );
 		}
 		return self;
 	}

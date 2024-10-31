@@ -4,18 +4,15 @@
  */
 package org.hibernate.search.mapper.pojo.search.definition.impl;
 
-import java.lang.invoke.MethodHandles;
 import java.util.Map;
 import java.util.Optional;
 
 import org.hibernate.search.engine.search.projection.definition.spi.CompositeProjectionDefinition;
 import org.hibernate.search.engine.search.projection.definition.spi.ProjectionRegistry;
-import org.hibernate.search.mapper.pojo.logging.impl.Log;
+import org.hibernate.search.mapper.pojo.logging.impl.ProjectionLog;
 import org.hibernate.search.util.common.impl.Closer;
-import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
 public final class PojoSearchQueryElementRegistry implements ProjectionRegistry, AutoCloseable {
-	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	private final Map<Class<?>, CompositeProjectionDefinition<?>> compositeProjectionDefinitions;
 
@@ -27,7 +24,7 @@ public final class PojoSearchQueryElementRegistry implements ProjectionRegistry,
 	public <T> CompositeProjectionDefinition<T> composite(Class<T> objectClass) {
 		Optional<CompositeProjectionDefinition<T>> definition = compositeOptional( objectClass );
 		if ( !definition.isPresent() ) {
-			throw log.invalidObjectClassForProjection( objectClass );
+			throw ProjectionLog.INSTANCE.invalidObjectClassForProjection( objectClass );
 		}
 		return definition.get();
 	}

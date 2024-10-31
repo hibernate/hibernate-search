@@ -5,17 +5,13 @@
 package org.hibernate.search.backend.lucene.work.impl;
 
 import java.io.IOException;
-import java.lang.invoke.MethodHandles;
 
-import org.hibernate.search.backend.lucene.logging.impl.Log;
+import org.hibernate.search.backend.lucene.logging.impl.QueryLog;
 import org.hibernate.search.backend.lucene.lowlevel.writer.impl.IndexWriterDelegator;
-import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
 import org.apache.lucene.search.Query;
 
 public class DeleteEntriesByQueryWork implements IndexManagementWork<Long> {
-
-	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	private final Query query;
 
@@ -39,7 +35,7 @@ public class DeleteEntriesByQueryWork implements IndexManagementWork<Long> {
 			return indexWriterDelegator.deleteDocuments( query );
 		}
 		catch (IOException e) {
-			throw log.unableToDeleteAllEntriesFromIndex( query, e.getMessage(), context.getEventContext(), e );
+			throw QueryLog.INSTANCE.unableToDeleteAllEntriesFromIndex( query, e.getMessage(), context.getEventContext(), e );
 		}
 	}
 

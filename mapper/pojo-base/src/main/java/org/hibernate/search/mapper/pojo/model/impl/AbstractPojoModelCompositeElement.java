@@ -4,14 +4,13 @@
  */
 package org.hibernate.search.mapper.pojo.model.impl;
 
-import java.lang.invoke.MethodHandles;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
 import org.hibernate.search.mapper.pojo.automaticindexing.building.impl.PojoIndexingDependencyCollectorTypeNode;
-import org.hibernate.search.mapper.pojo.logging.impl.Log;
+import org.hibernate.search.mapper.pojo.logging.impl.MappingLog;
 import org.hibernate.search.mapper.pojo.model.PojoElementAccessor;
 import org.hibernate.search.mapper.pojo.model.PojoModelCompositeElement;
 import org.hibernate.search.mapper.pojo.model.PojoModelProperty;
@@ -22,14 +21,11 @@ import org.hibernate.search.mapper.pojo.model.path.impl.BoundPojoModelPathTypeNo
 import org.hibernate.search.mapper.pojo.model.spi.PojoBootstrapIntrospector;
 import org.hibernate.search.mapper.pojo.model.spi.PojoPropertyModel;
 import org.hibernate.search.mapper.pojo.model.spi.PojoTypeModel;
-import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
 /**
  * @param <V> The type of the element, i.e. the type of values returned by accessors to this element.
  */
 public abstract class AbstractPojoModelCompositeElement<V> implements PojoModelCompositeElement {
-
-	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	private final PojoBootstrapIntrospector introspector;
 	private final PojoTypeAdditionalMetadataProvider typeAdditionalMetadataProvider;
@@ -55,7 +51,7 @@ public abstract class AbstractPojoModelCompositeElement<V> implements PojoModelC
 	@SuppressWarnings("unchecked") // The cast is checked using reflection
 	public final <T> PojoElementAccessor<T> createAccessor(Class<T> requestedType) {
 		if ( !isAssignableTo( requestedType ) ) {
-			throw log.incompatibleRequestedType( getModelPathTypeNode().toUnboundPath(), requestedType );
+			throw MappingLog.INSTANCE.incompatibleRequestedType( getModelPathTypeNode().toUnboundPath(), requestedType );
 		}
 		return (PojoElementAccessor<T>) createAccessor();
 	}

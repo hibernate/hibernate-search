@@ -7,10 +7,10 @@ package org.hibernate.search.integrationtest.mapper.orm.automaticindexing.sessio
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.assertj.core.api.Assertions.fail;
+import static org.hibernate.search.integrationtest.mapper.orm.logging.impl.TestLog.TEST_LOGGER;
 import static org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmUtils.with;
 import static org.hibernate.search.util.impl.test.FutureAssert.assertThatFuture;
 
-import java.lang.invoke.MethodHandles;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
@@ -29,7 +29,6 @@ import org.hibernate.search.engine.backend.work.execution.DocumentRefreshStrateg
 import org.hibernate.search.engine.backend.work.execution.OperationSubmitter;
 import org.hibernate.search.mapper.orm.Search;
 import org.hibernate.search.mapper.orm.cfg.HibernateOrmMapperSettings;
-import org.hibernate.search.mapper.orm.logging.impl.Log;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.GenericField;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
 import org.hibernate.search.mapper.pojo.work.IndexingPlanSynchronizationStrategy;
@@ -38,7 +37,6 @@ import org.hibernate.search.mapper.pojo.work.IndexingPlanSynchronizationStrategy
 import org.hibernate.search.mapper.pojo.work.SearchIndexingPlanExecutionReport;
 import org.hibernate.search.util.common.SearchException;
 import org.hibernate.search.util.common.impl.Throwables;
-import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 import org.hibernate.search.util.impl.integrationtest.common.extension.BackendMock;
 import org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmSetupHelper;
 import org.hibernate.search.util.impl.test.extension.ExpectedLog4jLog;
@@ -52,8 +50,6 @@ import org.awaitility.Awaitility;
 import org.hamcrest.CoreMatchers;
 
 class IndexingPlanSynchronizationStrategyIT {
-
-	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	// Let's say 3 seconds are long enough to consider that, if nothing changed after this time, nothing ever will.
 	private static final long ALMOST_FOREVER_VALUE = 3L;
@@ -681,7 +677,7 @@ class IndexingPlanSynchronizationStrategyIT {
 					future.get( SMALL_DURATION_VALUE, SMALL_DURATION_UNIT );
 					SearchIndexingPlanExecutionReport report = future.get( SMALL_DURATION_VALUE, SMALL_DURATION_UNIT );
 					report.throwable().ifPresent( t -> {
-						throw log.indexingFailure( t.getMessage(), report.failingEntities(), t );
+						throw TEST_LOGGER.indexingFailure( t.getMessage(), report.failingEntities(), t );
 					} );
 				}
 				catch (TimeoutException e) {

@@ -17,7 +17,7 @@
             ${test.elasticsearch.connection.jvm.args}
             ${test.weld.jvm.args}
         </surefire.jvm.args.module>
-        
+
         <failsafe.lucene-jbatch.reportsDirectory>${project.build.directory}/failsafe-reports/lucene-jbatch</failsafe.lucene-jbatch.reportsDirectory>
         <failsafe.lucene-jbatch.summaryFile>${failsafe.lucene-jbatch.reportsDirectory}/failsafe-summary.xml</failsafe.lucene-jbatch.summaryFile>
         <failsafe.lucene-jberet.reportsDirectory>${project.build.directory}/failsafe-reports/lucene-jberet</failsafe.lucene-jberet.reportsDirectory>
@@ -79,6 +79,16 @@
         <dependency>
             <groupId>org.hibernate.search</groupId>
             <artifactId>hibernate-search-util-internal-integrationtest-jberet-se</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.jboss.logging</groupId>
+            <artifactId>jboss-logging</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.jboss.logging</groupId>
+            <artifactId>jboss-logging-annotations</artifactId>
             <scope>test</scope>
         </dependency>
 

@@ -5,24 +5,20 @@
 package org.hibernate.search.backend.lucene.search.projection.impl;
 
 import java.io.IOException;
-import java.lang.invoke.MethodHandles;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.hibernate.search.backend.lucene.logging.impl.Log;
+import org.hibernate.search.backend.lucene.logging.impl.QueryLog;
 import org.hibernate.search.backend.lucene.lowlevel.collector.impl.CollectorExecutionContext;
 import org.hibernate.search.backend.lucene.lowlevel.collector.impl.Values;
 import org.hibernate.search.backend.lucene.lowlevel.reader.impl.IndexReaderMetadataResolver;
 import org.hibernate.search.backend.lucene.search.common.impl.LuceneSearchIndexScope;
 import org.hibernate.search.engine.search.loading.spi.LoadingResult;
-import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
 import org.apache.lucene.index.LeafReaderContext;
 
 public class LuceneByMappedTypeProjection<P>
 		extends AbstractLuceneProjection<P> {
-
-	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	private final Map<String, LuceneSearchProjection<? extends P>> inners;
 
@@ -116,7 +112,7 @@ public class LuceneByMappedTypeProjection<P>
 			String typeName = metadataResolver.resolveMappedTypeName( context );
 			currentLeafInner = inners.get( typeName );
 			if ( currentLeafInner == null ) {
-				throw log.unexpectedMappedTypeNameForByMappedTypeProjection( typeName, inners.keySet() );
+				throw QueryLog.INSTANCE.unexpectedMappedTypeNameForByMappedTypeProjection( typeName, inners.keySet() );
 			}
 			currentLeafInner.context( context );
 		}

@@ -5,21 +5,17 @@
 package org.hibernate.search.backend.lucene.lowlevel.directory.impl;
 
 import java.io.IOException;
-import java.lang.invoke.MethodHandles;
 import java.nio.file.Path;
 import java.util.function.Supplier;
 
-import org.hibernate.search.backend.lucene.logging.impl.Log;
+import org.hibernate.search.backend.lucene.logging.impl.LuceneSpecificLog;
 import org.hibernate.search.backend.lucene.lowlevel.directory.spi.DirectoryHolder;
-import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 import org.hibernate.search.util.common.reporting.EventContext;
 
 import org.apache.lucene.store.Directory;
 import org.apache.lucene.store.LockFactory;
 
 final class LocalFileSystemDirectoryHolder implements DirectoryHolder {
-
-	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	private final Path directoryPath;
 	private final FileSystemAccessStrategy accessStrategy;
@@ -42,7 +38,7 @@ final class LocalFileSystemDirectoryHolder implements DirectoryHolder {
 			FileSystemUtils.initializeWriteableDirectory( directoryPath );
 		}
 		catch (Exception e) {
-			throw log.unableToInitializeIndexDirectory( e.getMessage(), eventContext, e );
+			throw LuceneSpecificLog.INSTANCE.unableToInitializeIndexDirectory( e.getMessage(), eventContext, e );
 		}
 
 		this.directory = accessStrategy.createDirectory( directoryPath, lockFactorySupplier.get() );

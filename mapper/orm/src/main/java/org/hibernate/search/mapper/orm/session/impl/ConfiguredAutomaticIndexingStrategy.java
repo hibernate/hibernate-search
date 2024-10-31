@@ -4,7 +4,6 @@
  */
 package org.hibernate.search.mapper.orm.session.impl;
 
-import java.lang.invoke.MethodHandles;
 import java.util.Optional;
 import java.util.function.Function;
 
@@ -23,17 +22,15 @@ import org.hibernate.search.mapper.orm.automaticindexing.spi.AutomaticIndexingQu
 import org.hibernate.search.mapper.orm.cfg.HibernateOrmMapperSettings;
 import org.hibernate.search.mapper.orm.event.impl.HibernateOrmListenerContextProvider;
 import org.hibernate.search.mapper.orm.event.impl.HibernateSearchEventListener;
-import org.hibernate.search.mapper.orm.logging.impl.Log;
+import org.hibernate.search.mapper.orm.logging.impl.ConfigurationLog;
+import org.hibernate.search.mapper.orm.logging.impl.DeprecationLog;
 import org.hibernate.search.mapper.pojo.work.IndexingPlanSynchronizationStrategy;
 import org.hibernate.search.mapper.pojo.work.spi.ConfiguredIndexingPlanSynchronizationStrategy;
 import org.hibernate.search.mapper.pojo.work.spi.PojoIndexingPlan;
 import org.hibernate.search.mapper.pojo.work.spi.PojoIndexingQueueEventProcessingPlan;
 import org.hibernate.search.util.common.impl.Closer;
-import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
 public final class ConfiguredAutomaticIndexingStrategy {
-
-	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	@SuppressWarnings("deprecation")
 	private static final OptionalConfigurationProperty<Boolean> AUTOMATIC_INDEXING_ENABLED =
@@ -110,12 +107,12 @@ public final class ConfiguredAutomaticIndexingStrategy {
 		Optional<Boolean> indexingListenersEnabledOptional = INDEXING_LISTENERS_ENABLED.get( configurationSource );
 		if ( automaticIndexingEnabledOptional.isPresent() ) {
 			if ( indexingListenersEnabledOptional.isPresent() ) {
-				throw log.bothNewAndOldConfigurationPropertiesForIndexingListenersAreUsed(
+				throw DeprecationLog.INSTANCE.bothNewAndOldConfigurationPropertiesForIndexingListenersAreUsed(
 						AUTOMATIC_INDEXING_ENABLED.resolveOrRaw( configurationSource ),
 						INDEXING_LISTENERS_ENABLED.resolveOrRaw( configurationSource )
 				);
 			}
-			log.deprecatedPropertyUsedInsteadOfNew(
+			DeprecationLog.INSTANCE.deprecatedPropertyUsedInsteadOfNew(
 					AUTOMATIC_INDEXING_ENABLED.resolveOrRaw( configurationSource ),
 					INDEXING_LISTENERS_ENABLED.resolveOrRaw( configurationSource )
 			);
@@ -125,21 +122,21 @@ public final class ConfiguredAutomaticIndexingStrategy {
 		if ( automaticIndexingEnabledOptional.orElse( indexingListenersEnabledOptional.orElse(
 				HibernateOrmMapperSettings.Defaults.INDEXING_LISTENERS_ENABLED ) )
 				&& AUTOMATIC_INDEXING_ENABLED_LEGACY_STRATEGY.getAndMap( configurationSource, enabled -> {
-					log.deprecatedPropertyUsedInsteadOfNew(
+					DeprecationLog.INSTANCE.deprecatedPropertyUsedInsteadOfNew(
 							AUTOMATIC_INDEXING_ENABLED_LEGACY_STRATEGY.resolveOrRaw( configurationSource ),
 							INDEXING_LISTENERS_ENABLED.resolveOrRaw( configurationSource )
 					);
 					return enabled;
 				} )
 						.orElse( true ) ) {
-			log.debug( "Hibernate Search event listeners activated" );
+			ConfigurationLog.INSTANCE.debug( "Hibernate Search event listeners activated" );
 			@SuppressWarnings("deprecation")
 			HibernateSearchEventListener hibernateSearchEventListener = new HibernateSearchEventListener(
 					contextProvider, AUTOMATIC_INDEXING_ENABLE_DIRTY_CHECK.getAndTransform(
 							startContext.configurationPropertySource(), dirtyCheckingEnabled -> {
 								//we want to log a warning if the user set a non-default value
 								if ( HibernateOrmMapperSettings.Defaults.AUTOMATIC_INDEXING_ENABLE_DIRTY_CHECK != dirtyCheckingEnabled ) {
-									log.automaticIndexingEnableDirtyCheckIsDeprecated(
+									DeprecationLog.INSTANCE.automaticIndexingEnableDirtyCheckIsDeprecated(
 											AUTOMATIC_INDEXING_ENABLE_DIRTY_CHECK.resolveOrRaw(
 													startContext.configurationPropertySource() ) );
 								}
@@ -149,7 +146,7 @@ public final class ConfiguredAutomaticIndexingStrategy {
 			hibernateSearchEventListener.registerTo( mappingContext.sessionFactory() );
 		}
 		else {
-			log.debug( "Hibernate Search event listeners deactivated" );
+			ConfigurationLog.INSTANCE.debug( "Hibernate Search event listeners deactivated" );
 		}
 	}
 
@@ -160,7 +157,7 @@ public final class ConfiguredAutomaticIndexingStrategy {
 				.get( configurationSource ).isPresent();
 
 		if ( legacyStrategySet && newStrategySet ) {
-			throw log.bothNewAndOldConfigurationPropertiesForIndexingPlanSyncAreUsed(
+			throw DeprecationLog.INSTANCE.bothNewAndOldConfigurationPropertiesForIndexingPlanSyncAreUsed(
 					INDEXING_PLAN_SYNCHRONIZATION_STRATEGY.resolveOrRaw( configurationSource ),
 					AUTOMATIC_INDEXING_SYNCHRONIZATION_STRATEGY.resolveOrRaw( configurationSource )
 			);
@@ -170,7 +167,7 @@ public final class ConfiguredAutomaticIndexingStrategy {
 			if ( legacyStrategySet || newStrategySet ) {
 				// If we send events to a queue, we're mostly asynchronous
 				// and thus configuring the synchronization strategy does not make sense.
-				throw log.cannotConfigureSynchronizationStrategyWithIndexingEventQueue();
+				throw ConfigurationLog.INSTANCE.cannotConfigureSynchronizationStrategyWithIndexingEventQueue();
 			}
 
 			// We force the synchronization strategy to sync.
@@ -185,7 +182,7 @@ public final class ConfiguredAutomaticIndexingStrategy {
 					? extends org.hibernate.search.mapper.orm.automaticindexing.session.AutomaticIndexingSynchronizationStrategy> holder =
 							// Going through the config property source again in order to get context if an error occurs.
 							AUTOMATIC_INDEXING_SYNCHRONIZATION_STRATEGY.getAndMap( configurationSource, reference -> {
-								log.automaticIndexingSynchronizationStrategyIsDeprecated(
+								DeprecationLog.INSTANCE.automaticIndexingSynchronizationStrategyIsDeprecated(
 										AUTOMATIC_INDEXING_SYNCHRONIZATION_STRATEGY.resolveOrRaw( configurationSource ),
 										INDEXING_PLAN_SYNCHRONIZATION_STRATEGY.resolveOrRaw( configurationSource ) );
 								return startContext.beanResolver().resolve( reference );
@@ -221,7 +218,7 @@ public final class ConfiguredAutomaticIndexingStrategy {
 	public ConfiguredIndexingPlanSynchronizationStrategy configureOverriddenSynchronizationStrategy(
 			IndexingPlanSynchronizationStrategy synchronizationStrategy) {
 		if ( usesAsyncProcessing() ) {
-			throw log.cannotConfigureSynchronizationStrategyWithIndexingEventQueue();
+			throw ConfigurationLog.INSTANCE.cannotConfigureSynchronizationStrategyWithIndexingEventQueue();
 		}
 
 		return configure( synchronizationStrategy );

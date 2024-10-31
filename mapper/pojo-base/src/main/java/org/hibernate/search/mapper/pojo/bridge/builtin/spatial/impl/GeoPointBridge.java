@@ -6,7 +6,6 @@ package org.hibernate.search.mapper.pojo.bridge.builtin.spatial.impl;
 
 import static java.util.function.Predicate.isEqual;
 
-import java.lang.invoke.MethodHandles;
 import java.util.function.Function;
 import java.util.stream.Collector;
 
@@ -24,15 +23,12 @@ import org.hibernate.search.mapper.pojo.bridge.binding.TypeBindingContext;
 import org.hibernate.search.mapper.pojo.bridge.builtin.programmatic.GeoPointBinder;
 import org.hibernate.search.mapper.pojo.bridge.runtime.PropertyBridgeWriteContext;
 import org.hibernate.search.mapper.pojo.bridge.runtime.TypeBridgeWriteContext;
-import org.hibernate.search.mapper.pojo.logging.impl.Log;
+import org.hibernate.search.mapper.pojo.logging.impl.MappingLog;
 import org.hibernate.search.mapper.pojo.model.PojoElementAccessor;
 import org.hibernate.search.mapper.pojo.model.PojoModelCompositeElement;
 import org.hibernate.search.util.common.impl.StreamHelper;
-import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
 public class GeoPointBridge implements TypeBridge<Object>, PropertyBridge<Object> {
-
-	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	private final Function<Object, GeoPoint> coordinatesExtractor;
 	private final IndexFieldReference<GeoPoint> indexFieldReference;
@@ -100,7 +96,7 @@ public class GeoPointBridge implements TypeBridge<Object>, PropertyBridge<Object
 		@Override
 		public void bind(TypeBindingContext context) {
 			if ( fieldName == null || fieldName.isEmpty() ) {
-				throw log.missingFieldNameForGeoPointBridgeOnType( context.bridgedElement().toString() );
+				throw MappingLog.INSTANCE.missingFieldNameForGeoPointBridgeOnType( context.bridgedElement().toString() );
 			}
 
 			GeoPointBridge bridge = doBind(
@@ -174,8 +170,8 @@ public class GeoPointBridge implements TypeBridge<Object>, PropertyBridge<Object
 		private static Collector<PojoModelCompositeElement, ?, PojoModelCompositeElement> singleMarkedProperty(
 				String markerName, String fieldName, String markerSet) {
 			return StreamHelper.singleElement(
-					() -> log.unableToFindLongitudeOrLatitudeProperty( markerName, fieldName, markerSet ),
-					() -> log.multipleLatitudeOrLongitudeProperties( markerName, fieldName, markerSet )
+					() -> MappingLog.INSTANCE.unableToFindLongitudeOrLatitudeProperty( markerName, fieldName, markerSet ),
+					() -> MappingLog.INSTANCE.multipleLatitudeOrLongitudeProperties( markerName, fieldName, markerSet )
 			);
 		}
 	}

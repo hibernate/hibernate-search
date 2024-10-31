@@ -4,15 +4,14 @@
  */
 package org.hibernate.search.engine.reporting.impl;
 
-import java.lang.invoke.MethodHandles;
+import static org.hibernate.search.engine.logging.impl.CommonFailureLog.INSTANCE;
+
 import java.util.List;
 
 import org.hibernate.search.engine.common.EntityReference;
 import org.hibernate.search.engine.reporting.EntityIndexingFailureContext;
 import org.hibernate.search.engine.reporting.FailureContext;
 import org.hibernate.search.engine.reporting.FailureHandler;
-import org.hibernate.search.util.common.logging.impl.Log;
-import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
 /**
  * @author Amin Mohammed-Coleman
@@ -21,19 +20,18 @@ import org.hibernate.search.util.common.logging.impl.LoggerFactory;
  */
 public class LogFailureHandler implements FailureHandler {
 
-	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 	private static final int FAILURE_FLOODING_THRESHOLD = 100;
 
 	public static final String NAME = "log";
 
 	@Override
 	public void handle(FailureContext context) {
-		log.exceptionOccurred( formatMessage( context ).toString(), context.throwable() );
+		INSTANCE.exceptionOccurred( formatMessage( context ).toString(), context.throwable() );
 	}
 
 	@Override
 	public void handle(EntityIndexingFailureContext context) {
-		log.exceptionOccurred( formatMessage( context ).toString(), context.throwable() );
+		INSTANCE.exceptionOccurred( formatMessage( context ).toString(), context.throwable() );
 	}
 
 	@Override

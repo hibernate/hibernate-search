@@ -4,18 +4,16 @@
  */
 package org.hibernate.search.jakarta.batch.core.massindexing.util.impl;
 
-import java.lang.invoke.MethodHandles;
 import java.util.LinkedHashSet;
 import java.util.Set;
 
 import jakarta.persistence.EntityManagerFactory;
 
 import org.hibernate.search.jakarta.batch.core.context.jpa.spi.EntityManagerFactoryRegistry;
-import org.hibernate.search.jakarta.batch.core.logging.impl.Log;
+import org.hibernate.search.jakarta.batch.core.logging.impl.JakartaBatchLog;
 import org.hibernate.search.mapper.orm.Search;
 import org.hibernate.search.mapper.orm.mapping.SearchMapping;
 import org.hibernate.search.util.common.SearchException;
-import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
 /**
  * Utility class for job parameter validation.
@@ -24,27 +22,25 @@ import org.hibernate.search.util.common.logging.impl.LoggerFactory;
  */
 public final class ValidationUtil {
 
-	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
-
 	private ValidationUtil() {
 		// Private constructor, do not use it.
 	}
 
 	public static void validateCheckpointInterval(int checkpointInterval, int rowsPerPartition) {
 		if ( checkpointInterval > rowsPerPartition ) {
-			throw log.illegalCheckpointInterval( checkpointInterval, rowsPerPartition );
+			throw JakartaBatchLog.INSTANCE.illegalCheckpointInterval( checkpointInterval, rowsPerPartition );
 		}
 	}
 
 	public static void validateEntityFetchSize(int entityFetchSize, int checkpointInterval) {
 		if ( entityFetchSize > checkpointInterval ) {
-			throw log.illegalEntityFetchSize( entityFetchSize, checkpointInterval );
+			throw JakartaBatchLog.INSTANCE.illegalEntityFetchSize( entityFetchSize, checkpointInterval );
 		}
 	}
 
 	public static void validatePositive(String parameterName, int parameterValue) {
 		if ( parameterValue <= 0 ) {
-			throw log.negativeValueOrZero( parameterName, parameterValue );
+			throw JakartaBatchLog.INSTANCE.negativeValueOrZero( parameterName, parameterValue );
 		}
 	}
 
@@ -73,7 +69,7 @@ public final class ValidationUtil {
 		}
 
 		if ( failingTypes.size() > 0 ) {
-			throw log.failingEntityTypes( String.join( ", ", failingTypes ) );
+			throw JakartaBatchLog.INSTANCE.failingEntityTypes( String.join( ", ", failingTypes ) );
 		}
 	}
 

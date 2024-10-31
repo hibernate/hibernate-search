@@ -4,10 +4,8 @@
  */
 package org.hibernate.search.mapper.pojo.model.dependency.impl;
 
-import java.lang.invoke.MethodHandles;
-
 import org.hibernate.search.mapper.pojo.extractor.impl.ContainerExtractorBinder;
-import org.hibernate.search.mapper.pojo.logging.impl.Log;
+import org.hibernate.search.mapper.pojo.logging.impl.MappingLog;
 import org.hibernate.search.mapper.pojo.model.additionalmetadata.building.impl.PojoTypeAdditionalMetadataProvider;
 import org.hibernate.search.mapper.pojo.model.path.PojoModelPathValueNode;
 import org.hibernate.search.mapper.pojo.model.path.impl.BoundPojoModelPath;
@@ -16,11 +14,8 @@ import org.hibernate.search.mapper.pojo.model.path.impl.BoundPojoModelPathValueN
 import org.hibernate.search.mapper.pojo.model.path.spi.PojoModelPathBinder;
 import org.hibernate.search.mapper.pojo.model.spi.PojoBootstrapIntrospector;
 import org.hibernate.search.mapper.pojo.model.spi.PojoRawTypeModel;
-import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
 public abstract class AbstractPojoBridgedElementDependencyContext {
-
-	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	private final PojoBootstrapIntrospector introspector;
 	final BoundPojoModelPath.Walker bindingPathWalker;
@@ -51,12 +46,12 @@ public abstract class AbstractPojoBridgedElementDependencyContext {
 			PojoRawTypeModel<?> bridgedType,
 			Class<?> otherEntityClass, PojoModelPathValueNode pathFromOtherEntityTypeToBridgedType) {
 		if ( !typeAdditionalMetadataProvider.get( bridgedType ).isEntity() ) {
-			throw log.cannotDefineOtherEntityDependencyOnNonEntityBridgedType( bridgedType );
+			throw MappingLog.INSTANCE.cannotDefineOtherEntityDependencyOnNonEntityBridgedType( bridgedType );
 		}
 
 		PojoRawTypeModel<?> otherEntityType = introspector.typeModel( otherEntityClass );
 		if ( !typeAdditionalMetadataProvider.get( otherEntityType ).isEntity() ) {
-			throw log.cannotDefineOtherEntityDependencyFromNonEntityType( otherEntityType );
+			throw MappingLog.INSTANCE.cannotDefineOtherEntityDependencyFromNonEntityType( otherEntityType );
 		}
 
 		BoundPojoModelPathOriginalTypeNode<?> otherEntityRootPath = BoundPojoModelPath.root( otherEntityType );
@@ -70,7 +65,7 @@ public abstract class AbstractPojoBridgedElementDependencyContext {
 
 		PojoRawTypeModel<?> inverseSideRawType = boundPathFromOtherEntityTypeToBridgedType.getTypeModel().rawType();
 		if ( !inverseSideRawType.isSubTypeOf( bridgedType ) && !bridgedType.isSubTypeOf( inverseSideRawType ) ) {
-			throw log.incorrectTargetTypeForInverseAssociation( inverseSideRawType, bridgedType );
+			throw MappingLog.INSTANCE.incorrectTargetTypeForInverseAssociation( inverseSideRawType, bridgedType );
 		}
 
 		return new PojoOtherEntityIndexingDependencyConfigurationContextImpl<>(

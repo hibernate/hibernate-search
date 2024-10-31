@@ -4,21 +4,17 @@
  */
 package org.hibernate.search.engine.search.query.spi;
 
-import java.lang.invoke.MethodHandles;
 import java.time.Duration;
 import java.util.List;
 import java.util.Map;
 import java.util.StringJoiner;
 
-import org.hibernate.search.engine.logging.impl.Log;
+import org.hibernate.search.engine.logging.impl.QueryLog;
 import org.hibernate.search.engine.search.aggregation.AggregationKey;
 import org.hibernate.search.engine.search.query.SearchResult;
 import org.hibernate.search.engine.search.query.SearchResultTotal;
-import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
 public class SimpleSearchResult<H> implements SearchResult<H> {
-
-	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	private final SearchResultTotal resultTotal;
 	private final List<H> hits;
@@ -50,7 +46,7 @@ public class SimpleSearchResult<H> implements SearchResult<H> {
 	public <T> T aggregation(AggregationKey<T> key) {
 		Object aggregationResult = aggregationResults.get( key );
 		if ( aggregationResult == null && !aggregationResults.containsKey( key ) ) {
-			throw log.unknownAggregationKey( key );
+			throw QueryLog.INSTANCE.unknownAggregationKey( key );
 		}
 		return (T) aggregationResult;
 	}

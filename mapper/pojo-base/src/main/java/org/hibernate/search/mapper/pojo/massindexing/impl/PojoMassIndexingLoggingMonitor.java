@@ -4,7 +4,6 @@
  */
 package org.hibernate.search.mapper.pojo.massindexing.impl;
 
-import java.lang.invoke.MethodHandles;
 import java.time.Duration;
 import java.util.OptionalLong;
 import java.util.concurrent.atomic.AtomicLong;
@@ -13,13 +12,12 @@ import java.util.concurrent.atomic.LongAdder;
 import java.util.function.BinaryOperator;
 import java.util.stream.Collectors;
 
-import org.hibernate.search.mapper.pojo.logging.impl.Log;
+import org.hibernate.search.mapper.pojo.logging.impl.MassIndexingLog;
 import org.hibernate.search.mapper.pojo.massindexing.MassIndexingMonitor;
 import org.hibernate.search.mapper.pojo.massindexing.MassIndexingType;
 import org.hibernate.search.mapper.pojo.massindexing.MassIndexingTypeGroupMonitor;
 import org.hibernate.search.mapper.pojo.massindexing.MassIndexingTypeGroupMonitorContext;
 import org.hibernate.search.mapper.pojo.massindexing.MassIndexingTypeGroupMonitorCreateContext;
-import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
 /**
  * A very simple implementation of {@code MassIndexerProgressMonitor} which
@@ -29,7 +27,6 @@ import org.hibernate.search.util.common.logging.impl.LoggerFactory;
  */
 public class PojoMassIndexingLoggingMonitor implements MassIndexingMonitor {
 
-	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 	private final AtomicLong documentsDoneCounter = new AtomicLong();
 	private final AtomicReference<StatusMessageInfo> lastMessageInfo = new AtomicReference<>();
 	private final LongAdder totalCounter = new LongAdder();
@@ -117,7 +114,7 @@ public class PojoMassIndexingLoggingMonitor implements MassIndexingMonitor {
 
 	@Override
 	public void indexingCompleted() {
-		log.indexingEntitiesCompleted( documentsDoneCounter.longValue(), totalCounter.longValue(),
+		MassIndexingLog.INSTANCE.indexingEntitiesCompleted( documentsDoneCounter.longValue(), totalCounter.longValue(),
 				Duration.ofNanos( System.nanoTime() - startTime ) );
 	}
 
@@ -148,10 +145,10 @@ public class PojoMassIndexingLoggingMonitor implements MassIndexingMonitor {
 
 		if ( remainingUnknown ) {
 			if ( typesToIndex > 0 ) {
-				log.indexingProgress( doneCount, typesToIndex, currentSpeed, estimateSpeed );
+				MassIndexingLog.INSTANCE.indexingProgress( doneCount, typesToIndex, currentSpeed, estimateSpeed );
 			}
 			else {
-				log.indexingProgress( doneCount, currentSpeed, estimateSpeed );
+				MassIndexingLog.INSTANCE.indexingProgress( doneCount, currentSpeed, estimateSpeed );
 			}
 		}
 		else {
@@ -159,13 +156,13 @@ public class PojoMassIndexingLoggingMonitor implements MassIndexingMonitor {
 			long remainingCount = totalTodoCount - doneCount;
 
 			if ( typesToIndex > 0 ) {
-				log.indexingProgress(
+				MassIndexingLog.INSTANCE.indexingProgress(
 						estimatePercentileComplete, doneCount, totalTodoCount, currentSpeed, estimateSpeed,
 						remainingCount, typesToIndex
 				);
 			}
 			else {
-				log.indexingProgressWithRemainingTime(
+				MassIndexingLog.INSTANCE.indexingProgressWithRemainingTime(
 						estimatePercentileComplete, doneCount, totalTodoCount, currentSpeed, estimateSpeed,
 						remainingCount, Duration.ofMillis( (long) ( ( remainingCount / currentSpeed ) * 1000 ) )
 				);
@@ -207,8 +204,9 @@ public class PojoMassIndexingLoggingMonitor implements MassIndexingMonitor {
 					totalUnknown = false;
 					long count = totalBefore.getAsLong();
 					totalCounter.add( count );
-					log.indexingEntitiesApprox( count, context.includedTypes().stream().map( MassIndexingType::entityName )
-							.collect( Collectors.joining( ", ", "[ ", " ]" ) ) );
+					MassIndexingLog.INSTANCE.indexingEntitiesApprox( count,
+							context.includedTypes().stream().map( MassIndexingType::entityName )
+									.collect( Collectors.joining( ", ", "[ ", " ]" ) ) );
 				}
 			}
 			else {
@@ -236,7 +234,7 @@ public class PojoMassIndexingLoggingMonitor implements MassIndexingMonitor {
 					totalUnknown = false;
 					long actual = totalCount.getAsLong();
 					totalCounter.add( actual - totalBefore.orElse( 0 ) );
-					log.indexingEntities( actual );
+					MassIndexingLog.INSTANCE.indexingEntities( actual );
 				}
 			}
 		}

@@ -4,7 +4,6 @@
  */
 package org.hibernate.search.mapper.pojo.standalone.model.impl;
 
-import java.lang.invoke.MethodHandles;
 import java.lang.reflect.AccessibleObject;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Member;
@@ -18,9 +17,8 @@ import org.hibernate.search.mapper.pojo.model.spi.GenericContextAwarePojoGeneric
 import org.hibernate.search.mapper.pojo.model.spi.PojoBootstrapIntrospector;
 import org.hibernate.search.mapper.pojo.model.spi.PojoRawTypeIdentifier;
 import org.hibernate.search.mapper.pojo.model.spi.PojoRawTypeModel;
-import org.hibernate.search.mapper.pojo.standalone.logging.impl.Log;
+import org.hibernate.search.mapper.pojo.standalone.logging.impl.MappingLog;
 import org.hibernate.search.util.common.impl.ReflectionHelper;
-import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 import org.hibernate.search.util.common.reflect.spi.ValueCreateHandle;
 import org.hibernate.search.util.common.reflect.spi.ValueHandleFactory;
 import org.hibernate.search.util.common.reflect.spi.ValueReadHandle;
@@ -32,8 +30,6 @@ import org.jboss.jandex.IndexView;
  */
 public class StandalonePojoBootstrapIntrospector extends AbstractPojoModelsBootstrapIntrospector
 		implements PojoBootstrapIntrospector {
-
-	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	public static StandalonePojoBootstrapIntrospector create(IndexView indexView, ValueHandleFactory valueHandleFactory) {
 		return new StandalonePojoBootstrapIntrospector( indexView, valueHandleFactory );
@@ -63,7 +59,7 @@ public class StandalonePojoBootstrapIntrospector extends AbstractPojoModelsBoots
 
 	@Override
 	public PojoRawTypeModel<?> typeModel(String name) {
-		throw log.namedTypesNotSupported( name );
+		throw MappingLog.INSTANCE.namedTypesNotSupported( name );
 	}
 
 	@Override
@@ -87,7 +83,7 @@ public class StandalonePojoBootstrapIntrospector extends AbstractPojoModelsBoots
 			);
 		}
 		catch (RuntimeException e) {
-			throw log.errorRetrievingTypeModel( clazz, e );
+			throw MappingLog.INSTANCE.errorRetrievingTypeModel( clazz, e );
 		}
 	}
 

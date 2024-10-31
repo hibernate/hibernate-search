@@ -4,7 +4,6 @@
  */
 package org.hibernate.search.engine.search.predicate.dsl.impl;
 
-import java.lang.invoke.MethodHandles;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -12,7 +11,7 @@ import java.util.List;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
-import org.hibernate.search.engine.logging.impl.Log;
+import org.hibernate.search.engine.logging.impl.QueryLog;
 import org.hibernate.search.engine.reporting.spi.EventContexts;
 import org.hibernate.search.engine.search.common.ValueModel;
 import org.hibernate.search.engine.search.predicate.SearchPredicate;
@@ -23,14 +22,11 @@ import org.hibernate.search.engine.search.predicate.spi.PredicateTypeKeys;
 import org.hibernate.search.engine.search.predicate.spi.RangePredicateBuilder;
 import org.hibernate.search.util.common.data.Range;
 import org.hibernate.search.util.common.impl.Contracts;
-import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 import org.hibernate.search.util.common.reporting.EventContext;
 
 class RangePredicateFieldMoreStepImpl
 		implements RangePredicateFieldMoreStep<RangePredicateFieldMoreStepImpl, RangePredicateOptionsStep<?>>,
 		AbstractBooleanMultiFieldPredicateCommonState.FieldSetState {
-
-	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	private final CommonState commonState;
 
@@ -93,7 +89,7 @@ class RangePredicateFieldMoreStepImpl
 			Contracts.assertNotNull( lowerBoundModel, "lowerBoundModel" );
 			Contracts.assertNotNull( upperBoundModel, "upperBoundModel" );
 			if ( range.lowerBoundValue().isEmpty() && range.upperBoundValue().isEmpty() ) {
-				throw log.rangePredicateCannotMatchNullValue( getEventContext() );
+				throw QueryLog.INSTANCE.rangePredicateCannotMatchNullValue( getEventContext() );
 			}
 			for ( RangePredicateFieldMoreStepImpl fieldSetState : getFieldSetStates() ) {
 				for ( String path : fieldSetState.fieldPaths ) {
@@ -112,7 +108,7 @@ class RangePredicateFieldMoreStepImpl
 					for ( var range : ranges ) {
 						Contracts.assertNotNull( range, "range" );
 						if ( range.lowerBoundValue().isEmpty() && range.upperBoundValue().isEmpty() ) {
-							throw log.rangePredicateCannotMatchNullValue( getEventContext() );
+							throw QueryLog.INSTANCE.rangePredicateCannotMatchNullValue( getEventContext() );
 						}
 						RangePredicateBuilder builder = scope().fieldQueryElement( path, PredicateTypeKeys.RANGE );
 						builder.within( range, valueModel, valueModel );

@@ -6,8 +6,6 @@ package org.hibernate.search.mapper.pojo.bridge.builtin.alternative.impl;
 
 import static java.util.function.Predicate.isEqual;
 
-import java.lang.invoke.MethodHandles;
-
 import org.hibernate.search.engine.backend.document.DocumentElement;
 import org.hibernate.search.engine.environment.bean.BeanHolder;
 import org.hibernate.search.engine.environment.bean.BeanReference;
@@ -17,16 +15,13 @@ import org.hibernate.search.mapper.pojo.bridge.builtin.programmatic.AlternativeB
 import org.hibernate.search.mapper.pojo.bridge.builtin.programmatic.AlternativeBinderDelegate;
 import org.hibernate.search.mapper.pojo.bridge.builtin.programmatic.AlternativeValueBridge;
 import org.hibernate.search.mapper.pojo.bridge.runtime.TypeBridgeWriteContext;
-import org.hibernate.search.mapper.pojo.logging.impl.Log;
+import org.hibernate.search.mapper.pojo.logging.impl.MappingLog;
 import org.hibernate.search.mapper.pojo.model.PojoElementAccessor;
 import org.hibernate.search.mapper.pojo.model.PojoModelProperty;
 import org.hibernate.search.mapper.pojo.model.PojoModelType;
 import org.hibernate.search.util.common.impl.StreamHelper;
-import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
 public final class AlternativeBinderImpl<D, P> implements AlternativeBinder {
-
-	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	private final Class<D> discriminatorType;
 	private final String fieldValueSourcePropertyName;
@@ -77,8 +72,8 @@ public final class AlternativeBinderImpl<D, P> implements AlternativeBinder {
 						.map( AlternativeDiscriminatorBinderImpl.Marker::id )
 						.anyMatch( isEqual( alternativeId ) ) )
 				.collect( StreamHelper.singleElement(
-						() -> log.cannotFindAlternativeDiscriminator( alternativeId, fieldValueSourcePropertyName ),
-						() -> log.conflictingAlternativeDiscriminators( alternativeId, fieldValueSourcePropertyName )
+						() -> MappingLog.INSTANCE.cannotFindAlternativeDiscriminator( alternativeId, fieldValueSourcePropertyName ),
+						() -> MappingLog.INSTANCE.conflictingAlternativeDiscriminators( alternativeId, fieldValueSourcePropertyName )
 				) );
 	}
 

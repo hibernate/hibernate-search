@@ -4,11 +4,10 @@
  */
 package org.hibernate.search.backend.elasticsearch.types.sort.impl;
 
-import java.lang.invoke.MethodHandles;
 import java.time.temporal.TemporalAccessor;
 
 import org.hibernate.search.backend.elasticsearch.gson.impl.JsonAccessor;
-import org.hibernate.search.backend.elasticsearch.logging.impl.Log;
+import org.hibernate.search.backend.elasticsearch.logging.impl.QueryLog;
 import org.hibernate.search.backend.elasticsearch.lowlevel.index.mapping.impl.DataTypes;
 import org.hibernate.search.backend.elasticsearch.search.common.impl.AbstractElasticsearchCodecAwareSearchQueryElementFactory;
 import org.hibernate.search.backend.elasticsearch.search.common.impl.ElasticsearchSearchIndexScope;
@@ -20,15 +19,12 @@ import org.hibernate.search.engine.search.common.ValueModel;
 import org.hibernate.search.engine.search.sort.SearchSort;
 import org.hibernate.search.engine.search.sort.dsl.SortOrder;
 import org.hibernate.search.engine.search.sort.spi.FieldSortBuilder;
-import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
 
 public class ElasticsearchStandardFieldSort extends AbstractElasticsearchDocumentValueSort {
-
-	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	private static final JsonAccessor<JsonElement> MISSING_ACCESSOR = JsonAccessor.root().property( "missing" );
 	private static final JsonPrimitive MISSING_FIRST_KEYWORD_JSON = new JsonPrimitive( "_first" );
@@ -167,7 +163,7 @@ public class ElasticsearchStandardFieldSort extends AbstractElasticsearchDocumen
 					break;
 				case SUM:
 				default:
-					throw log.invalidSortModeForTemporalField( mode, field.eventContext() );
+					throw QueryLog.INSTANCE.invalidSortModeForTemporalField( mode, field.eventContext() );
 			}
 		}
 	}
@@ -201,7 +197,7 @@ public class ElasticsearchStandardFieldSort extends AbstractElasticsearchDocumen
 				case AVG:
 				case MEDIAN:
 				default:
-					throw log.invalidSortModeForStringField( mode, field.eventContext() );
+					throw QueryLog.INSTANCE.invalidSortModeForStringField( mode, field.eventContext() );
 			}
 		}
 	}

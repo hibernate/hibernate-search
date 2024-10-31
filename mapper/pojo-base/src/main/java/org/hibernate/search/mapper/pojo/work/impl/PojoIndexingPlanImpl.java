@@ -4,7 +4,6 @@
  */
 package org.hibernate.search.mapper.pojo.work.impl;
 
-import java.lang.invoke.MethodHandles;
 import java.util.ArrayList;
 import java.util.BitSet;
 import java.util.LinkedHashMap;
@@ -19,7 +18,7 @@ import org.hibernate.search.mapper.pojo.automaticindexing.impl.PojoReindexingAss
 import org.hibernate.search.mapper.pojo.automaticindexing.impl.PojoReindexingCollector;
 import org.hibernate.search.mapper.pojo.loading.impl.PojoLoadingPlan;
 import org.hibernate.search.mapper.pojo.loading.impl.PojoMultiLoaderLoadingPlan;
-import org.hibernate.search.mapper.pojo.logging.impl.Log;
+import org.hibernate.search.mapper.pojo.logging.impl.IndexingLog;
 import org.hibernate.search.mapper.pojo.model.spi.PojoRawTypeIdentifier;
 import org.hibernate.search.mapper.pojo.model.spi.PojoRuntimeIntrospector;
 import org.hibernate.search.mapper.pojo.processing.spi.PojoIndexingProcessorRootContext;
@@ -28,14 +27,11 @@ import org.hibernate.search.mapper.pojo.route.DocumentRoutesDescriptor;
 import org.hibernate.search.mapper.pojo.work.spi.PojoIndexingPlan;
 import org.hibernate.search.mapper.pojo.work.spi.PojoWorkSessionContext;
 import org.hibernate.search.util.common.AssertionFailure;
-import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
 public class PojoIndexingPlanImpl
 		implements PojoIndexingPlan, PojoLoadingPlanProvider,
 		PojoReindexingCollector, PojoReindexingAssociationInverseSideCollector,
 		PojoIndexingProcessorRootContext {
-
-	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	private final PojoWorkTypeContextProvider typeContextProvider;
 	private final PojoWorkSessionContext sessionContext;
@@ -138,7 +134,7 @@ public class PojoIndexingPlanImpl
 	@Override
 	public void process() {
 		if ( isProcessing ) {
-			throw log.recursiveIndexingPlanProcess();
+			throw IndexingLog.INSTANCE.recursiveIndexingPlanProcess();
 		}
 
 		isProcessing = true;
@@ -268,7 +264,7 @@ public class PojoIndexingPlanImpl
 
 	private AbstractPojoTypeIndexingPlan<?, ?, ?> createDelegate(PojoRawTypeIdentifier<?> typeIdentifier) {
 		if ( !sessionContext.configuredIndexingPlanFilter().isIncluded( typeIdentifier ) ) {
-			throw log.attemptToCreateIndexingPlanForExcludedType( typeIdentifier );
+			throw IndexingLog.INSTANCE.attemptToCreateIndexingPlanForExcludedType( typeIdentifier );
 		}
 		PojoWorkTypeContext<?, ?> typeContext = typeContextProvider.forExactType( typeIdentifier );
 		Optional<? extends PojoWorkIndexedTypeContext<?, ?>> indexedTypeContextOptional =

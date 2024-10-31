@@ -4,7 +4,6 @@
  */
 package org.hibernate.search.mapper.pojo.bridge.binding.impl;
 
-import java.lang.invoke.MethodHandles;
 import java.util.Map;
 import java.util.Optional;
 
@@ -16,7 +15,7 @@ import org.hibernate.search.mapper.pojo.bridge.binding.IdentifierBindingContext;
 import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.IdentifierBinder;
 import org.hibernate.search.mapper.pojo.bridge.runtime.impl.PojoIdentifierBridgeDocumentValueConverter;
 import org.hibernate.search.mapper.pojo.bridge.runtime.impl.PojoIdentifierBridgeParseConverter;
-import org.hibernate.search.mapper.pojo.logging.impl.Log;
+import org.hibernate.search.mapper.pojo.logging.impl.MappingLog;
 import org.hibernate.search.mapper.pojo.model.PojoModelValue;
 import org.hibernate.search.mapper.pojo.model.impl.PojoModelValueElement;
 import org.hibernate.search.mapper.pojo.model.spi.PojoBootstrapIntrospector;
@@ -24,12 +23,9 @@ import org.hibernate.search.mapper.pojo.model.spi.PojoRawTypeModel;
 import org.hibernate.search.mapper.pojo.model.spi.PojoTypeModel;
 import org.hibernate.search.util.common.impl.AbstractCloser;
 import org.hibernate.search.util.common.impl.SuppressingCloser;
-import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
 public class DefaultIdentifierBindingContext<I> extends AbstractBindingContext
 		implements IdentifierBindingContext<I> {
-
-	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	private final PojoBootstrapIntrospector introspector;
 	private final Optional<IndexedEntityBindingContext> indexedEntityBindingContext;
@@ -61,7 +57,8 @@ public class DefaultIdentifierBindingContext<I> extends AbstractBindingContext
 		PojoRawTypeModel<I2> expectedValueTypeModel = introspector.typeModel( expectedValueType );
 		try {
 			if ( !identifierTypeModel.rawType().equals( expectedValueTypeModel ) ) {
-				throw log.invalidInputTypeForBridge( bridgeHolder.get(), identifierTypeModel, expectedValueTypeModel );
+				throw MappingLog.INSTANCE.invalidInputTypeForBridge( bridgeHolder.get(), identifierTypeModel,
+						expectedValueTypeModel );
 			}
 
 			@SuppressWarnings("unchecked") // We check that I2 equals I explicitly using reflection (see above)
@@ -88,7 +85,7 @@ public class DefaultIdentifierBindingContext<I> extends AbstractBindingContext
 			// This call should set the partial binding
 			binder.bind( this );
 			if ( partialBinding == null ) {
-				throw log.missingBridgeForBinder( binder );
+				throw MappingLog.INSTANCE.missingBridgeForBinder( binder );
 			}
 
 			return partialBinding.complete( indexedEntityBindingContext );

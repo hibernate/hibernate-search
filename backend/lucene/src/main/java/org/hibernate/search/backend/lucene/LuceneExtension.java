@@ -4,10 +4,9 @@
  */
 package org.hibernate.search.backend.lucene;
 
-import java.lang.invoke.MethodHandles;
 import java.util.Optional;
 
-import org.hibernate.search.backend.lucene.logging.impl.Log;
+import org.hibernate.search.backend.lucene.logging.impl.CommonFailureLog;
 import org.hibernate.search.backend.lucene.schema.management.LuceneIndexSchemaExport;
 import org.hibernate.search.backend.lucene.scope.LuceneIndexScope;
 import org.hibernate.search.backend.lucene.search.aggregation.dsl.LuceneSearchAggregationFactory;
@@ -41,7 +40,6 @@ import org.hibernate.search.engine.search.query.dsl.SearchQuerySelectStep;
 import org.hibernate.search.engine.search.query.spi.SearchQueryIndexScope;
 import org.hibernate.search.engine.search.sort.dsl.SearchSortFactory;
 import org.hibernate.search.engine.search.sort.dsl.SearchSortFactoryExtension;
-import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
 /**
  * An extension for the Lucene backend, giving access to Lucene-specific features.
@@ -75,8 +73,6 @@ public final class LuceneExtension<H, R, E, LOS>
 		IndexFieldTypeFactoryExtension<LuceneIndexFieldTypeFactory>,
 		IndexScopeExtension<LuceneIndexScope>,
 		SchemaExportExtension<LuceneIndexSchemaExport> {
-
-	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	private static final LuceneExtension<Object, Object, Object, Object> INSTANCE = new LuceneExtension<>();
 
@@ -201,7 +197,7 @@ public final class LuceneExtension<H, R, E, LOS>
 			return (LuceneIndexFieldTypeFactory) original;
 		}
 		else {
-			throw log.luceneExtensionOnUnknownType( original );
+			throw CommonFailureLog.INSTANCE.luceneExtensionOnUnknownType( original );
 		}
 	}
 
@@ -214,7 +210,7 @@ public final class LuceneExtension<H, R, E, LOS>
 			return (LuceneIndexScope) original;
 		}
 		else {
-			throw log.luceneExtensionOnUnknownType( original );
+			throw CommonFailureLog.INSTANCE.luceneExtensionOnUnknownType( original );
 		}
 	}
 
@@ -227,7 +223,7 @@ public final class LuceneExtension<H, R, E, LOS>
 			return (LuceneIndexSchemaExport) original;
 		}
 		else {
-			throw log.luceneExtensionOnUnknownType( original );
+			throw CommonFailureLog.INSTANCE.luceneExtensionOnUnknownType( original );
 		}
 	}
 }

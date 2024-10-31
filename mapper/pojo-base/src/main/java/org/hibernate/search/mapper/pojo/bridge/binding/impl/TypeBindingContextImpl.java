@@ -4,7 +4,6 @@
  */
 package org.hibernate.search.mapper.pojo.bridge.binding.impl;
 
-import java.lang.invoke.MethodHandles;
 import java.util.Map;
 import java.util.Optional;
 
@@ -16,7 +15,7 @@ import org.hibernate.search.engine.mapper.mapping.building.spi.IndexBindingConte
 import org.hibernate.search.mapper.pojo.bridge.TypeBridge;
 import org.hibernate.search.mapper.pojo.bridge.binding.TypeBindingContext;
 import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.TypeBinder;
-import org.hibernate.search.mapper.pojo.logging.impl.Log;
+import org.hibernate.search.mapper.pojo.logging.impl.MappingLog;
 import org.hibernate.search.mapper.pojo.model.PojoModelType;
 import org.hibernate.search.mapper.pojo.model.dependency.PojoTypeIndexingDependencyConfigurationContext;
 import org.hibernate.search.mapper.pojo.model.dependency.impl.PojoTypeIndexingDependencyConfigurationContextImpl;
@@ -27,12 +26,9 @@ import org.hibernate.search.mapper.pojo.model.spi.PojoTypeModel;
 import org.hibernate.search.util.common.impl.AbstractCloser;
 import org.hibernate.search.util.common.impl.Closer;
 import org.hibernate.search.util.common.impl.SuppressingCloser;
-import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
 public class TypeBindingContextImpl<T> extends AbstractCompositeBindingContext
 		implements TypeBindingContext {
-
-	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	private final PojoBootstrapIntrospector introspector;
 	private final PojoTypeModel<T> typeModel;
@@ -96,7 +92,7 @@ public class TypeBindingContextImpl<T> extends AbstractCompositeBindingContext
 			// This call should set the partial binding
 			binder.bind( this );
 			if ( partialBinding == null ) {
-				throw log.missingBridgeForBinder( binder );
+				throw MappingLog.INSTANCE.missingBridgeForBinder( binder );
 			}
 
 			checkBridgeDependencies( bridgedElement, dependencyContext );
@@ -128,7 +124,7 @@ public class TypeBindingContextImpl<T> extends AbstractCompositeBindingContext
 	private <T2> void checkAndBind(BeanHolder<? extends TypeBridge<T2>> bridgeHolder,
 			PojoRawTypeModel<?> expectedPropertyTypeModel) {
 		if ( !typeModel.rawType().isSubTypeOf( expectedPropertyTypeModel ) ) {
-			throw log.invalidInputTypeForBridge( bridgeHolder.get(), typeModel, expectedPropertyTypeModel );
+			throw MappingLog.INSTANCE.invalidInputTypeForBridge( bridgeHolder.get(), typeModel, expectedPropertyTypeModel );
 		}
 
 		@SuppressWarnings("unchecked") // We check that T extends T2 explicitly using reflection (see above)

@@ -4,17 +4,13 @@
  */
 package org.hibernate.search.engine.reporting.impl;
 
-import java.lang.invoke.MethodHandles;
+import static org.hibernate.search.engine.logging.impl.CommonFailureLog.INSTANCE;
 
-import org.hibernate.search.engine.logging.impl.Log;
 import org.hibernate.search.engine.reporting.EntityIndexingFailureContext;
 import org.hibernate.search.engine.reporting.FailureContext;
 import org.hibernate.search.engine.reporting.FailureHandler;
-import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
 public class FailSafeFailureHandlerWrapper implements FailureHandler {
-
-	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	private final FailureHandler delegate;
 
@@ -28,7 +24,7 @@ public class FailSafeFailureHandlerWrapper implements FailureHandler {
 			delegate.handle( context );
 		}
 		catch (Throwable t) {
-			log.failureInFailureHandler( t );
+			INSTANCE.failureInFailureHandler( t );
 		}
 	}
 
@@ -38,7 +34,7 @@ public class FailSafeFailureHandlerWrapper implements FailureHandler {
 			delegate.handle( context );
 		}
 		catch (Throwable t) {
-			log.failureInFailureHandler( t );
+			INSTANCE.failureInFailureHandler( t );
 		}
 	}
 
@@ -48,7 +44,7 @@ public class FailSafeFailureHandlerWrapper implements FailureHandler {
 			return delegate.failureFloodingThreshold();
 		}
 		catch (Throwable t) {
-			log.failureInFailureHandler( t );
+			INSTANCE.failureInFailureHandler( t );
 			return FailureHandler.super.failureFloodingThreshold();
 		}
 	}

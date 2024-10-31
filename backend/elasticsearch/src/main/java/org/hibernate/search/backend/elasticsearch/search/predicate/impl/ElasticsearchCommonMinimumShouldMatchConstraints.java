@@ -4,17 +4,14 @@
  */
 package org.hibernate.search.backend.elasticsearch.search.predicate.impl;
 
-import java.lang.invoke.MethodHandles;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.TreeMap;
 
-import org.hibernate.search.backend.elasticsearch.logging.impl.Log;
+import org.hibernate.search.backend.elasticsearch.logging.impl.QueryLog;
 import org.hibernate.search.engine.search.predicate.spi.MinimumShouldMatchBuilder;
-import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
 public final class ElasticsearchCommonMinimumShouldMatchConstraints implements MinimumShouldMatchBuilder {
-	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	private Map<Integer, CommonMinimumShouldMatchConstraint> minimumShouldMatchConstraints;
 
@@ -42,7 +39,7 @@ public final class ElasticsearchCommonMinimumShouldMatchConstraints implements M
 		}
 		Object previous = minimumShouldMatchConstraints.put( ignoreConstraintCeiling, constraint );
 		if ( previous != null ) {
-			throw log.minimumShouldMatchConflictingConstraints( ignoreConstraintCeiling );
+			throw QueryLog.INSTANCE.minimumShouldMatchConflictingConstraints( ignoreConstraintCeiling );
 		}
 	}
 

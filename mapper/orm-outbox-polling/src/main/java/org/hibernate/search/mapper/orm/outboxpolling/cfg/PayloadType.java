@@ -4,12 +4,9 @@
  */
 package org.hibernate.search.mapper.orm.outboxpolling.cfg;
 
-import java.lang.invoke.MethodHandles;
-
 import org.hibernate.search.engine.cfg.spi.ParseUtils;
-import org.hibernate.search.mapper.orm.outboxpolling.logging.impl.Log;
+import org.hibernate.search.mapper.orm.outboxpolling.logging.impl.ConfigurationLog;
 import org.hibernate.search.util.common.annotation.Incubating;
-import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
 @Incubating
 public enum PayloadType {
@@ -34,14 +31,12 @@ public enum PayloadType {
 		return externalRepresentation;
 	}
 
-	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
-
 	// This method conforms to the MicroProfile Config specification. Do not change its signature.
 	public static PayloadType of(String value) {
 		return ParseUtils.parseDiscreteValues(
 				PayloadType.values(),
 				PayloadType::externalRepresentation,
-				log::invalidPayloadTypeName,
+				ConfigurationLog.INSTANCE::invalidPayloadTypeName,
 				value
 		);
 	}

@@ -4,7 +4,6 @@
  */
 package org.hibernate.search.mapper.orm.outboxpolling.event.impl;
 
-import java.lang.invoke.MethodHandles;
 import java.util.Optional;
 import java.util.function.Consumer;
 
@@ -23,15 +22,12 @@ import org.hibernate.search.mapper.orm.outboxpolling.cfg.impl.UuidDataTypeUtils;
 import org.hibernate.search.mapper.orm.outboxpolling.cfg.spi.HibernateOrmMapperOutboxPollingSpiSettings;
 import org.hibernate.search.mapper.orm.outboxpolling.cluster.impl.Agent;
 import org.hibernate.search.mapper.orm.outboxpolling.impl.HibernateOrmUtils;
-import org.hibernate.search.mapper.orm.outboxpolling.logging.impl.Log;
+import org.hibernate.search.mapper.orm.outboxpolling.logging.impl.ConfigurationLog;
 import org.hibernate.search.mapper.orm.outboxpolling.mapping.impl.AdditionalMappingBuilder;
 import org.hibernate.search.mapper.orm.outboxpolling.mapping.impl.JaxbMappingHelper;
-import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
 public final class OutboxPollingOutboxEventAdditionalMappingProducer
 		implements HibernateSearchOrmMappingProducer {
-
-	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	private static final String CLASS_NAME = OutboxEvent.class.getName();
 
@@ -136,7 +132,7 @@ public final class OutboxPollingOutboxEventAdditionalMappingProducer
 				&& ( schema.isPresent()
 						|| catalog.isPresent() || table.isPresent() || uuidStrategy.isPresent() || uuidType.isPresent() ) ) {
 
-			throw log.outboxEventConfigurationPropertyConflict(
+			throw ConfigurationLog.INSTANCE.outboxEventConfigurationPropertyConflict(
 					OUTBOXEVENT_ENTITY_MAPPING.resolveOrRaw( propertySource ),
 					new String[] {
 							ENTITY_MAPPING_OUTBOXEVENT_SCHEMA.resolveOrRaw( propertySource ),
@@ -150,7 +146,7 @@ public final class OutboxPollingOutboxEventAdditionalMappingProducer
 
 		if ( mapping.isPresent() ) {
 			JaxbEntityMappingsImpl mappings = JaxbMappingHelper.unmarshall( mapping.get() );
-			log.outboxEventGeneratedEntityMapping( mappings );
+			ConfigurationLog.INSTANCE.outboxEventGeneratedEntityMapping( mappings );
 			return contributions -> {
 				contributions.contributeEntity( Agent.class );
 				contributions.contributeBinding( mappings );
@@ -171,7 +167,7 @@ public final class OutboxPollingOutboxEventAdditionalMappingProducer
 					HibernateOrmUtils.isDiscriminatorMultiTenancyEnabled( buildingContext )
 			);
 
-			log.outboxEventGeneratedEntityMappingClassDetails( mappings );
+			ConfigurationLog.INSTANCE.outboxEventGeneratedEntityMappingClassDetails( mappings );
 
 			return contributions -> {
 				contributions.contributeEntity( Agent.class );

@@ -5,16 +5,14 @@
 package org.hibernate.search.backend.lucene.analysis.impl;
 
 import java.io.IOException;
-import java.lang.invoke.MethodHandles;
 import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
-import org.hibernate.search.backend.lucene.logging.impl.Log;
+import org.hibernate.search.backend.lucene.logging.impl.AnalyzerLog;
 import org.hibernate.search.engine.environment.classpath.spi.ClassLoaderHelper;
 import org.hibernate.search.engine.environment.classpath.spi.ClassResolver;
 import org.hibernate.search.engine.environment.classpath.spi.ResourceResolver;
-import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
 import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.analysis.CharFilterFactory;
@@ -32,7 +30,6 @@ import org.apache.lucene.util.Version;
  * @author Hardy Ferentschik
  */
 public final class LuceneAnalysisComponentFactory {
-	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	private static final String LUCENE_VERSION_PARAM = "luceneMatchVersion";
 
@@ -97,7 +94,7 @@ public final class LuceneAnalysisComponentFactory {
 			return tokenizerFactory;
 		}
 		catch (RuntimeException e) {
-			throw log.unableToCreateAnalysisComponent( factoryClass, e.getMessage(), e );
+			throw AnalyzerLog.INSTANCE.unableToCreateAnalysisComponent( factoryClass, e.getMessage(), e );
 		}
 	}
 

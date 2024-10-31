@@ -4,11 +4,8 @@
  */
 package org.hibernate.search.backend.lucene.lowlevel.directory;
 
-import java.lang.invoke.MethodHandles;
-
-import org.hibernate.search.backend.lucene.logging.impl.Log;
+import org.hibernate.search.backend.lucene.logging.impl.ConfigurationLog;
 import org.hibernate.search.engine.cfg.spi.ParseUtils;
-import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
 public enum LockingStrategyName {
 
@@ -17,14 +14,12 @@ public enum LockingStrategyName {
 	SINGLE_INSTANCE( "single-instance" ),
 	NONE( "none" );
 
-	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
-
 	// This method conforms to the MicroProfile Config specification. Do not change its signature.
 	public static LockingStrategyName of(String value) {
 		return ParseUtils.parseDiscreteValues(
 				LockingStrategyName.values(),
 				LockingStrategyName::externalRepresentation,
-				log::invalidLockingStrategyName,
+				ConfigurationLog.INSTANCE::invalidLockingStrategyName,
 				value
 		);
 	}

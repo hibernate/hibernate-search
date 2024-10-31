@@ -4,7 +4,6 @@
  */
 package org.hibernate.search.backend.elasticsearch.search.query.impl;
 
-import java.lang.invoke.MethodHandles;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -12,7 +11,7 @@ import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
 import org.hibernate.search.backend.elasticsearch.gson.impl.JsonAccessor;
-import org.hibernate.search.backend.elasticsearch.logging.impl.Log;
+import org.hibernate.search.backend.elasticsearch.logging.impl.QueryLog;
 import org.hibernate.search.backend.elasticsearch.orchestration.impl.ElasticsearchParallelWorkOrchestrator;
 import org.hibernate.search.backend.elasticsearch.search.common.impl.ElasticsearchSearchIndexContext;
 import org.hibernate.search.backend.elasticsearch.search.common.impl.ElasticsearchSearchIndexScope;
@@ -38,15 +37,12 @@ import org.hibernate.search.engine.search.query.spi.AbstractSearchQuery;
 import org.hibernate.search.engine.search.timeout.spi.TimeoutManager;
 import org.hibernate.search.util.common.impl.Contracts;
 import org.hibernate.search.util.common.impl.Futures;
-import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 
 public class ElasticsearchSearchQueryImpl<H> extends AbstractSearchQuery<H, ElasticsearchSearchResult<H>>
 		implements ElasticsearchSearchQuery<H> {
-
-	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	private final ElasticsearchWorkFactory workFactory;
 	private final ElasticsearchParallelWorkOrchestrator queryOrchestrator;
@@ -132,7 +128,7 @@ public class ElasticsearchSearchQueryImpl<H> extends AbstractSearchQuery<H, Elas
 
 		if ( limit == null && result.total().hitCountLowerBound() > defaultedLimit ) {
 			// user may not be aware of this defaultedLimit
-			log.defaultedLimitedHits( defaultedLimit, result.total().hitCountLowerBound() );
+			QueryLog.INSTANCE.defaultedLimitedHits( defaultedLimit, result.total().hitCountLowerBound() );
 		}
 		return result;
 	}
@@ -160,7 +156,7 @@ public class ElasticsearchSearchQueryImpl<H> extends AbstractSearchQuery<H, Elas
 
 		if ( limit == null && result.total().hitCountLowerBound() > defaultedLimit ) {
 			// user may not be aware of this defaultedLimit
-			log.defaultedLimitedHits( defaultedLimit, result.total().hitCountLowerBound() );
+			QueryLog.INSTANCE.defaultedLimitedHits( defaultedLimit, result.total().hitCountLowerBound() );
 		}
 		return result.hits();
 	}
@@ -210,7 +206,7 @@ public class ElasticsearchSearchQueryImpl<H> extends AbstractSearchQuery<H, Elas
 		Map<String, ElasticsearchSearchIndexContext> mappedTypeNameToIndex =
 				scope.mappedTypeNameToIndex();
 		if ( mappedTypeNameToIndex.size() != 1 ) {
-			throw log.explainRequiresTypeName( mappedTypeNameToIndex.keySet() );
+			throw QueryLog.INSTANCE.explainRequiresTypeName( mappedTypeNameToIndex.keySet() );
 		}
 
 		return doExplain( mappedTypeNameToIndex.values().iterator().next(), id );
@@ -225,7 +221,7 @@ public class ElasticsearchSearchQueryImpl<H> extends AbstractSearchQuery<H, Elas
 				scope.mappedTypeNameToIndex();
 		ElasticsearchSearchIndexContext index = mappedTypeNameToIndex.get( typeName );
 		if ( index == null ) {
-			throw log.explainRequiresTypeTargetedByQuery( mappedTypeNameToIndex.keySet(), typeName );
+			throw QueryLog.INSTANCE.explainRequiresTypeTargetedByQuery( mappedTypeNameToIndex.keySet(), typeName );
 		}
 
 		return doExplain( index, id );

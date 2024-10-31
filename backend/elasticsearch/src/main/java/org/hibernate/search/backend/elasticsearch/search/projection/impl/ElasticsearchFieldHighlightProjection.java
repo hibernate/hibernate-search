@@ -10,6 +10,7 @@ import java.util.Set;
 import org.hibernate.search.backend.elasticsearch.gson.impl.JsonAccessor;
 import org.hibernate.search.backend.elasticsearch.gson.impl.JsonArrayAccessor;
 import org.hibernate.search.backend.elasticsearch.gson.impl.JsonObjectAccessor;
+import org.hibernate.search.backend.elasticsearch.logging.impl.QueryLog;
 import org.hibernate.search.backend.elasticsearch.search.common.impl.AbstractElasticsearchValueFieldSearchQueryElementFactory;
 import org.hibernate.search.backend.elasticsearch.search.common.impl.ElasticsearchSearchIndexScope;
 import org.hibernate.search.backend.elasticsearch.search.common.impl.ElasticsearchSearchIndexValueFieldContext;
@@ -73,7 +74,7 @@ public class ElasticsearchFieldHighlightProjection<T> implements ElasticsearchSe
 	@Override
 	public Extractor<?, T> request(JsonObject requestBody, ProjectionRequestContext context) {
 		if ( context.absoluteCurrentFieldPath() != null ) {
-			throw log.cannotHighlightInNestedContext(
+			throw QueryLog.INSTANCE.cannotHighlightInNestedContext(
 					context.absoluteCurrentFieldPath(),
 					EventContexts.fromIndexFieldAbsolutePath( absoluteFieldPath )
 			);
@@ -91,10 +92,10 @@ public class ElasticsearchFieldHighlightProjection<T> implements ElasticsearchSe
 			highlighterType = highlighterType == null ? SearchHighlighterType.UNIFIED : highlighterType;
 		}
 		if ( !typeContext.highlighterTypeSupported( highlighterType ) ) {
-			throw log.highlighterTypeNotSupported( highlighterType, absoluteFieldPath );
+			throw QueryLog.INSTANCE.highlighterTypeNotSupported( highlighterType, absoluteFieldPath );
 		}
 		if ( !context.root().isCompatibleHighlighter( highlighterName, collectorProvider ) ) {
-			throw log.highlighterIncompatibleCardinality();
+			throw QueryLog.INSTANCE.highlighterIncompatibleCardinality();
 		}
 
 		highlighter.applyToField(
@@ -140,7 +141,7 @@ public class ElasticsearchFieldHighlightProjection<T> implements ElasticsearchSe
 				ElasticsearchSearchIndexValueFieldContext<F> field) {
 			if ( field.nestedDocumentPath() != null ) {
 				// see HSEARCH-4841 to remove this limitation.
-				throw log.cannotHighlightFieldFromNestedObjectStructure(
+				throw QueryLog.INSTANCE.cannotHighlightFieldFromNestedObjectStructure(
 						EventContexts.fromIndexFieldAbsolutePath( field.absolutePath() )
 				);
 			}

@@ -4,18 +4,14 @@
  */
 package org.hibernate.search.engine.environment.bean.impl;
 
-import java.lang.invoke.MethodHandles;
 import java.util.Map;
 
 import org.hibernate.search.engine.environment.bean.BeanHolder;
 import org.hibernate.search.engine.environment.bean.BeanReference;
 import org.hibernate.search.engine.environment.bean.BeanResolver;
-import org.hibernate.search.engine.logging.impl.Log;
-import org.hibernate.search.util.common.logging.impl.LoggerFactory;
+import org.hibernate.search.engine.logging.impl.BeanLog;
 
 final class ConfigurationBeanRegistry {
-
-	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	private final Map<Class<?>, BeanReferenceRegistryForType<?>> explicitlyConfiguredBeans;
 
@@ -33,7 +29,7 @@ final class ConfigurationBeanRegistry {
 			return beanResolver.resolve( reference );
 		}
 		else {
-			throw log.noConfiguredBeanReferenceForType( typeReference );
+			throw BeanLog.INSTANCE.noConfiguredBeanReferenceForType( typeReference );
 		}
 	}
 
@@ -48,7 +44,7 @@ final class ConfigurationBeanRegistry {
 			return beanResolver.resolve( reference );
 		}
 		else {
-			throw log.noConfiguredBeanReferenceForTypeAndName( typeReference, nameReference );
+			throw BeanLog.INSTANCE.noConfiguredBeanReferenceForTypeAndName( typeReference, nameReference );
 		}
 	}
 

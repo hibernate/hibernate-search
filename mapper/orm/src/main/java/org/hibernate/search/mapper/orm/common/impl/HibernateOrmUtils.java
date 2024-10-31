@@ -4,7 +4,6 @@
  */
 package org.hibernate.search.mapper.orm.common.impl;
 
-import java.lang.invoke.MethodHandles;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
@@ -33,11 +32,10 @@ import org.hibernate.metamodel.model.domain.EntityDomainType;
 import org.hibernate.models.internal.BasicModelBuildingContextImpl;
 import org.hibernate.models.jandex.internal.JandexModelBuildingContextImpl;
 import org.hibernate.models.spi.SourceModelBuildingContext;
-import org.hibernate.search.mapper.orm.logging.impl.Log;
+import org.hibernate.search.mapper.orm.logging.impl.OrmSpecificLog;
 import org.hibernate.search.mapper.pojo.loading.spi.PojoLoadingTypeContext;
 import org.hibernate.search.util.common.AssertionFailure;
 import org.hibernate.search.util.common.annotation.impl.SuppressForbiddenApis;
-import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 import org.hibernate.service.Service;
 import org.hibernate.service.ServiceRegistry;
 import org.hibernate.service.spi.ServiceBinding;
@@ -47,8 +45,6 @@ import org.jboss.jandex.IndexView;
 
 public final class HibernateOrmUtils {
 
-	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
-
 	private HibernateOrmUtils() {
 	}
 
@@ -57,7 +53,7 @@ public final class HibernateOrmUtils {
 			return entityManagerFactory.unwrap( SessionFactoryImplementor.class );
 		}
 		catch (IllegalStateException e) {
-			throw log.hibernateSessionFactoryAccessError( e.getMessage(), e );
+			throw OrmSpecificLog.INSTANCE.hibernateSessionFactoryAccessError( e.getMessage(), e );
 		}
 	}
 
@@ -66,7 +62,7 @@ public final class HibernateOrmUtils {
 			return entityManager.unwrap( Session.class );
 		}
 		catch (IllegalStateException e) {
-			throw log.hibernateSessionAccessError( e.getMessage(), e );
+			throw OrmSpecificLog.INSTANCE.hibernateSessionAccessError( e.getMessage(), e );
 		}
 	}
 
@@ -75,7 +71,7 @@ public final class HibernateOrmUtils {
 			return entityManager.unwrap( SessionImplementor.class );
 		}
 		catch (IllegalStateException e) {
-			throw log.hibernateSessionAccessError( e.getMessage(), e );
+			throw OrmSpecificLog.INSTANCE.hibernateSessionAccessError( e.getMessage(), e );
 		}
 	}
 

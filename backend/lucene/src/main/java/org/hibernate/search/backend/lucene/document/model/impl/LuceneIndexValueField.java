@@ -4,10 +4,9 @@
  */
 package org.hibernate.search.backend.lucene.document.model.impl;
 
-import java.lang.invoke.MethodHandles;
 import java.util.function.Function;
 
-import org.hibernate.search.backend.lucene.logging.impl.Log;
+import org.hibernate.search.backend.lucene.logging.impl.IndexingLog;
 import org.hibernate.search.backend.lucene.search.common.impl.LuceneSearchEncodingContext;
 import org.hibernate.search.backend.lucene.search.common.impl.LuceneSearchIndexScope;
 import org.hibernate.search.backend.lucene.search.common.impl.LuceneSearchIndexValueFieldContext;
@@ -19,7 +18,6 @@ import org.hibernate.search.engine.common.tree.spi.TreeNodeInclusion;
 import org.hibernate.search.engine.reporting.spi.EventContexts;
 import org.hibernate.search.engine.search.common.ValueModel;
 import org.hibernate.search.engine.search.common.spi.SearchIndexSchemaElementContextHelper;
-import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 import org.hibernate.search.util.common.reporting.EventContext;
 
 public final class LuceneIndexValueField<F>
@@ -30,8 +28,6 @@ public final class LuceneIndexValueField<F>
 				LuceneIndexCompositeNode,
 				F>
 		implements LuceneIndexField, LuceneSearchIndexValueFieldContext<F>, LuceneSearchEncodingContext<F> {
-
-	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	private final boolean dynamic;
 
@@ -60,7 +56,7 @@ public final class LuceneIndexValueField<F>
 	@SuppressWarnings("unchecked")
 	public <T> LuceneIndexValueField<? super T> withValueType(Class<T> expectedSubType, EventContext eventContext) {
 		if ( !type.valueClass().isAssignableFrom( expectedSubType ) ) {
-			throw log.invalidFieldValueType( type.valueClass(), expectedSubType,
+			throw IndexingLog.INSTANCE.invalidFieldValueType( type.valueClass(), expectedSubType,
 					eventContext.append( EventContexts.fromIndexFieldAbsolutePath( absolutePath ) ) );
 		}
 		return (LuceneIndexValueField<? super T>) this;
@@ -78,7 +74,7 @@ public final class LuceneIndexValueField<F>
 				return value -> dslConverter.toDocumentValue( value, scope.toDocumentValueConvertContext() );
 			}
 			catch (RuntimeException e) {
-				throw log.cannotConvertDslParameter( e.getMessage(), e, field.eventContext() );
+				throw IndexingLog.INSTANCE.cannotConvertDslParameter( e.getMessage(), e, field.eventContext() );
 			}
 		}
 		else {
@@ -89,7 +85,7 @@ public final class LuceneIndexValueField<F>
 						toFieldValueConverter.toDocumentValue( value, scope.toDocumentValueConvertContext() ) );
 			}
 			catch (RuntimeException e) {
-				throw log.cannotConvertDslParameter( e.getMessage(), e, field.eventContext() );
+				throw IndexingLog.INSTANCE.cannotConvertDslParameter( e.getMessage(), e, field.eventContext() );
 			}
 		}
 	}
@@ -106,7 +102,7 @@ public final class LuceneIndexValueField<F>
 				return dslConverter.unknownTypeToDocumentValue( value, scope.toDocumentValueConvertContext() );
 			}
 			catch (RuntimeException e) {
-				throw log.cannotConvertDslParameter( e.getMessage(), e, field.eventContext() );
+				throw IndexingLog.INSTANCE.cannotConvertDslParameter( e.getMessage(), e, field.eventContext() );
 			}
 		}
 		else {
@@ -116,7 +112,7 @@ public final class LuceneIndexValueField<F>
 				return codec.encode( converted );
 			}
 			catch (RuntimeException e) {
-				throw log.cannotConvertDslParameter( e.getMessage(), e, field.eventContext() );
+				throw IndexingLog.INSTANCE.cannotConvertDslParameter( e.getMessage(), e, field.eventContext() );
 			}
 		}
 	}

@@ -4,18 +4,14 @@
  */
 package org.hibernate.search.engine.common.tree;
 
-import java.lang.invoke.MethodHandles;
 import java.util.Collections;
 import java.util.LinkedHashSet;
 import java.util.Objects;
 import java.util.Set;
 
-import org.hibernate.search.engine.logging.impl.Log;
-import org.hibernate.search.util.common.logging.impl.LoggerFactory;
+import org.hibernate.search.engine.logging.impl.MappingLog;
 
 public final class TreeFilterDefinition {
-
-	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	private static final TreeFilterDefinition INCLUDE_ALL = new TreeFilterDefinition( null, null, null );
 
@@ -38,7 +34,7 @@ public final class TreeFilterDefinition {
 		this.includePaths = includePaths == null ? Collections.emptySet() : new LinkedHashSet<>( includePaths );
 		this.excludePaths = excludePaths == null ? Collections.emptySet() : new LinkedHashSet<>( excludePaths );
 		if ( !this.includePaths.isEmpty() && !this.excludePaths.isEmpty() ) {
-			throw log.cannotIncludeAndExcludePathsWithinSameFilter(
+			throw MappingLog.INSTANCE.cannotIncludeAndExcludePathsWithinSameFilter(
 					includePaths,
 					excludePaths
 			);

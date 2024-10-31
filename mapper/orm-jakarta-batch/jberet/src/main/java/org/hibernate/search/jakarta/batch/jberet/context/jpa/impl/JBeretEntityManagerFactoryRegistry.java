@@ -4,7 +4,6 @@
  */
 package org.hibernate.search.jakarta.batch.jberet.context.jpa.impl;
 
-import java.lang.invoke.MethodHandles;
 
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.enterprise.context.spi.CreationalContext;
@@ -22,8 +21,7 @@ import jakarta.persistence.EntityManagerFactory;
 import jakarta.persistence.PersistenceUnit;
 
 import org.hibernate.search.jakarta.batch.core.context.jpa.spi.EntityManagerFactoryRegistry;
-import org.hibernate.search.jakarta.batch.jberet.logging.impl.Log;
-import org.hibernate.search.util.common.logging.impl.LoggerFactory;
+import org.hibernate.search.jakarta.batch.jberet.logging.impl.JakartaBatchLog;
 
 /**
  * An {@link EntityManagerFactoryRegistry} that retrieves the entity manager factory
@@ -84,8 +82,6 @@ public class EntityManagerFactoriesProducer {
 @ApplicationScoped
 public class JBeretEntityManagerFactoryRegistry implements EntityManagerFactoryRegistry {
 
-	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
-
 	private static final String CDI_NAMESPACE_NAME = "cdi";
 
 	@Inject
@@ -101,11 +97,11 @@ public class JBeretEntityManagerFactoryRegistry implements EntityManagerFactoryR
 				return getVetoedBeanReference( beanManager, PersistenceUnitAccessor.class ).entityManagerFactory;
 			}
 			catch (RuntimeException e) {
-				throw log.cannotRetrieveEntityManagerFactoryInJakartaBatch();
+				throw JakartaBatchLog.INSTANCE.cannotRetrieveEntityManagerFactoryInJakartaBatch();
 			}
 		}
 		else if ( entityManagerFactoryInstance.isAmbiguous() ) {
-			throw log.ambiguousEntityManagerFactoryInJakartaBatch();
+			throw JakartaBatchLog.INSTANCE.ambiguousEntityManagerFactoryInJakartaBatch();
 		}
 		else {
 			return entityManagerFactoryInstance.get();
@@ -126,12 +122,12 @@ public class JBeretEntityManagerFactoryRegistry implements EntityManagerFactoryR
 				Instance<EntityManagerFactory> instance =
 						entityManagerFactoryInstance.select( new NamedQualifier( reference ) );
 				if ( instance.isUnsatisfied() ) {
-					throw log.noAvailableEntityManagerFactoryInCDI( reference );
+					throw JakartaBatchLog.INSTANCE.noAvailableEntityManagerFactoryInCDI( reference );
 				}
 				factory = instance.get();
 				break;
 			default:
-				throw log.unknownEntityManagerFactoryNamespace( namespace );
+				throw JakartaBatchLog.INSTANCE.unknownEntityManagerFactoryNamespace( namespace );
 		}
 
 		return factory;

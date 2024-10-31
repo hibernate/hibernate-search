@@ -5,16 +5,12 @@
 package org.hibernate.search.backend.lucene.work.impl;
 
 import java.io.IOException;
-import java.lang.invoke.MethodHandles;
 
-import org.hibernate.search.backend.lucene.logging.impl.Log;
-import org.hibernate.search.util.common.logging.impl.LoggerFactory;
+import org.hibernate.search.backend.lucene.logging.impl.QueryLog;
 
 import org.apache.lucene.search.IndexSearcher;
 
 public class SearchWork<R> implements ReadWork<R> {
-
-	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	private final LuceneSearcher<R, ?> searcher;
 
@@ -41,7 +37,7 @@ public class SearchWork<R> implements ReadWork<R> {
 			);
 		}
 		catch (IOException e) {
-			throw log.ioExceptionOnQueryExecution( searcher.getLuceneQueryForExceptions(), e.getMessage(),
+			throw QueryLog.INSTANCE.ioExceptionOnQueryExecution( searcher.getLuceneQueryForExceptions(), e.getMessage(),
 					context.getEventContext(), e );
 		}
 	}

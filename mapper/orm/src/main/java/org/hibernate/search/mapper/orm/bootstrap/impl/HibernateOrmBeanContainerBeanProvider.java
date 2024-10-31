@@ -4,24 +4,20 @@
  */
 package org.hibernate.search.mapper.orm.bootstrap.impl;
 
-import java.lang.invoke.MethodHandles;
-
 import org.hibernate.resource.beans.container.spi.BeanContainer;
 import org.hibernate.resource.beans.container.spi.ContainedBean;
 import org.hibernate.resource.beans.spi.BeanInstanceProducer;
 import org.hibernate.search.engine.environment.bean.BeanHolder;
 import org.hibernate.search.engine.environment.bean.spi.BeanProvider;
-import org.hibernate.search.mapper.orm.logging.impl.Log;
+import org.hibernate.search.mapper.orm.logging.impl.ConfigurationLog;
 import org.hibernate.search.util.common.impl.Contracts;
 import org.hibernate.search.util.common.impl.SuppressingCloser;
-import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
 /**
  * A {@link BeanProvider} relying on a Hibernate ORM {@link BeanContainer} to resolve beans.
  */
 final class HibernateOrmBeanContainerBeanProvider implements BeanProvider {
 
-	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	private static final BeanContainer.LifecycleOptions LIFECYCLE_OPTIONS = new BeanContainer.LifecycleOptions() {
 		@Override
@@ -45,12 +41,12 @@ final class HibernateOrmBeanContainerBeanProvider implements BeanProvider {
 		this.fallbackInstanceProducer = new BeanInstanceProducer() {
 			@Override
 			public <B> B produceBeanInstance(Class<B> aClass) {
-				throw log.beanNotFoundInBeanContainer( beanContainer );
+				throw ConfigurationLog.INSTANCE.beanNotFoundInBeanContainer( beanContainer );
 			}
 
 			@Override
 			public <B> B produceBeanInstance(String s, Class<B> aClass) {
-				throw log.beanNotFoundInBeanContainer( beanContainer );
+				throw ConfigurationLog.INSTANCE.beanNotFoundInBeanContainer( beanContainer );
 			}
 		};
 	}
@@ -75,7 +71,7 @@ final class HibernateOrmBeanContainerBeanProvider implements BeanProvider {
 		}
 		catch (Exception e) {
 			new SuppressingCloser( e ).push( result );
-			log.debugf( e, "Error resolving bean of type [%s] - using fallback", typeReference );
+			ConfigurationLog.INSTANCE.debugf( e, "Error resolving bean of type [%s] - using fallback", typeReference );
 			try {
 				result = BeanHolder.of( fallbackInstanceProducer.produceBeanInstance( typeReference ) );
 			}

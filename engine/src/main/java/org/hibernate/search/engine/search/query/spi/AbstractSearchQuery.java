@@ -4,14 +4,12 @@
  */
 package org.hibernate.search.engine.search.query.spi;
 
-import java.lang.invoke.MethodHandles;
 import java.util.List;
 import java.util.Optional;
 
-import org.hibernate.search.engine.logging.impl.Log;
+import org.hibernate.search.engine.logging.impl.QueryLog;
 import org.hibernate.search.engine.search.query.SearchQuery;
 import org.hibernate.search.engine.search.query.SearchResult;
-import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
 /**
  * An abstract base for implementations of {@link SearchQuery}.
@@ -20,8 +18,6 @@ import org.hibernate.search.util.common.logging.impl.LoggerFactory;
  * @param <R> The result type (extending {@link SearchResult}).
  */
 public abstract class AbstractSearchQuery<H, R extends SearchResult<H>> implements SearchQueryImplementor<H> {
-
-	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	@Override
 	public String toString() {
@@ -60,7 +56,7 @@ public abstract class AbstractSearchQuery<H, R extends SearchResult<H>> implemen
 			return Optional.empty();
 		}
 		else if ( fetchedHitCount > 1 ) {
-			throw log.nonSingleHit();
+			throw QueryLog.INSTANCE.nonSingleHit();
 		}
 		else {
 			return Optional.of( hits.get( 0 ) );

@@ -4,7 +4,6 @@
  */
 package org.hibernate.search.mapper.orm.model.impl;
 
-import java.lang.invoke.MethodHandles;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.LinkedHashSet;
@@ -26,7 +25,7 @@ import org.hibernate.mapping.SimpleValue;
 import org.hibernate.mapping.ToOne;
 import org.hibernate.mapping.Value;
 import org.hibernate.search.engine.reporting.spi.EventContexts;
-import org.hibernate.search.mapper.orm.logging.impl.Log;
+import org.hibernate.search.mapper.orm.logging.impl.MappingLog;
 import org.hibernate.search.mapper.pojo.extractor.builtin.BuiltinContainerExtractors;
 import org.hibernate.search.mapper.pojo.extractor.mapping.programmatic.ContainerExtractorPath;
 import org.hibernate.search.mapper.pojo.model.path.PojoModelPath;
@@ -44,7 +43,6 @@ import org.hibernate.search.mapper.pojo.reporting.spi.PojoEventContexts;
 import org.hibernate.search.util.common.AssertionFailure;
 import org.hibernate.search.util.common.SearchException;
 import org.hibernate.search.util.common.impl.CollectionHelper;
-import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
 /**
  * A single-use interpreter of {@link org.hibernate.search.mapper.pojo.model.path.PojoModelPath}
@@ -161,7 +159,6 @@ import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 final class HibernateOrmPathInterpreter
 		implements PojoModelPathWalker<HibernateOrmPathInterpreter.Context, Value, Property, Value> {
 
-	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 	private static final Set<String> PRIMITIVE_EXTRACTOR_NAMES = CollectionHelper.asImmutableSet(
 			BuiltinContainerExtractors.ARRAY_CHAR,
 			BuiltinContainerExtractors.ARRAY_BOOLEAN,
@@ -214,7 +211,7 @@ final class HibernateOrmPathInterpreter
 				tryResolveStateRepresentation( wholePathStringRepresentation );
 			}
 			catch (RuntimeException e) {
-				throw log.failedToResolveStateRepresentation(
+				throw MappingLog.INSTANCE.failedToResolveStateRepresentation(
 						wholePathStringRepresentation,
 						EventContexts.fromType( typeModel ).append( PojoEventContexts.fromPath( wholePath ) ),
 						e.getMessage(), e
@@ -273,7 +270,7 @@ final class HibernateOrmPathInterpreter
 			 * We were able to resolve the path, but didn't find any Value that could possibly
 			 * be reported as dirty by Hibernate ORM.
 			 */
-			throw log.unreportedPathForDirtyChecking( path, value );
+			throw MappingLog.INSTANCE.unreportedPathForDirtyChecking( path, value );
 		}
 		// Else everything is good, the string representation was successfully added to the set.
 		return new PojoPathDefinition( context.stringRepresentations,
@@ -302,11 +299,11 @@ final class HibernateOrmPathInterpreter
 				return ( (Component) parentValue ).getProperty( pathNode.propertyName() );
 			}
 			else {
-				throw log.unknownPathForDirtyChecking( pathNode, null );
+				throw MappingLog.INSTANCE.unknownPathForDirtyChecking( pathNode, null );
 			}
 		}
 		catch (MappingException e) {
-			throw log.unknownPathForDirtyChecking( pathNode, e );
+			throw MappingLog.INSTANCE.unknownPathForDirtyChecking( pathNode, e );
 		}
 	}
 
@@ -333,7 +330,7 @@ final class HibernateOrmPathInterpreter
 
 		if ( Component.class.isAssignableFrom( valueClass ) ) {
 			if ( !extractorPath.isEmpty() ) {
-				throw log.unknownPathForDirtyChecking( path, null );
+				throw MappingLog.INSTANCE.unknownPathForDirtyChecking( path, null );
 			}
 			if ( isWholePath ) {
 				// The path as a whole (and not just a prefix) was resolved to an embedded
@@ -375,7 +372,7 @@ final class HibernateOrmPathInterpreter
 				 * We only allow an empty extractor path for a collection at the very end of the path,
 				 * meaning "reindex whenever that collection changes, we don't really care about the values".
 				 */
-				throw log.unknownPathForDirtyChecking( path, null );
+				throw MappingLog.INSTANCE.unknownPathForDirtyChecking( path, null );
 			}
 
 			List<String> extractorNames = extractorPath.explicitExtractorNames();
@@ -386,7 +383,7 @@ final class HibernateOrmPathInterpreter
 			);
 		}
 		else {
-			throw log.unknownPathForDirtyChecking( path, null );
+			throw MappingLog.INSTANCE.unknownPathForDirtyChecking( path, null );
 		}
 	}
 
@@ -402,7 +399,7 @@ final class HibernateOrmPathInterpreter
 				containedValue = resolveExtractor( collectionValue, extractorName );
 			}
 			catch (SearchException e) {
-				throw log.unknownPathForDirtyChecking( path, e );
+				throw MappingLog.INSTANCE.unknownPathForDirtyChecking( path, e );
 			}
 		}
 		while ( extractorNameIterator.hasNext() && containedValue instanceof org.hibernate.mapping.Collection );
@@ -424,7 +421,7 @@ final class HibernateOrmPathInterpreter
 			}
 		}
 
-		throw log.unknownPathForDirtyChecking( path, null );
+		throw MappingLog.INSTANCE.unknownPathForDirtyChecking( path, null );
 	}
 
 	private Value resolveExtractor(org.hibernate.mapping.Collection collectionValue, String extractorName) {
@@ -454,7 +451,7 @@ final class HibernateOrmPathInterpreter
 			return collectionValue.getElement();
 		}
 
-		throw log.invalidContainerExtractorForDirtyChecking( collectionValue.getClass(), extractorName );
+		throw MappingLog.INSTANCE.invalidContainerExtractorForDirtyChecking( collectionValue.getClass(), extractorName );
 	}
 
 	private void resolveStateExtractorIfRelevant(Context context, String stringRepresentationAsProperty, Value value) {

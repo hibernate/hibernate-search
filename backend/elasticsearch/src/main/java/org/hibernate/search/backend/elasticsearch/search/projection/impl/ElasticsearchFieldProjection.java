@@ -4,10 +4,9 @@
  */
 package org.hibernate.search.backend.elasticsearch.search.projection.impl;
 
-import java.lang.invoke.MethodHandles;
 import java.util.function.Function;
 
-import org.hibernate.search.backend.elasticsearch.logging.impl.Log;
+import org.hibernate.search.backend.elasticsearch.logging.impl.QueryLog;
 import org.hibernate.search.backend.elasticsearch.search.common.impl.AbstractElasticsearchCodecAwareSearchQueryElementFactory;
 import org.hibernate.search.backend.elasticsearch.search.common.impl.ElasticsearchSearchIndexScope;
 import org.hibernate.search.backend.elasticsearch.search.common.impl.ElasticsearchSearchIndexValueFieldContext;
@@ -20,7 +19,6 @@ import org.hibernate.search.engine.search.loading.spi.ProjectionHitMapper;
 import org.hibernate.search.engine.search.projection.ProjectionCollector;
 import org.hibernate.search.engine.search.projection.SearchProjection;
 import org.hibernate.search.engine.search.projection.spi.FieldProjectionBuilder;
-import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
@@ -34,8 +32,6 @@ import com.google.gson.JsonPrimitive;
  * @param <P> The type of the final projection result representing accumulated values of type {@code V}.
  */
 public class ElasticsearchFieldProjection<F, V, P, T> extends AbstractElasticsearchProjection<P> {
-
-	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	private final String absoluteFieldPath;
 	private final String[] absoluteFieldPathComponents;
@@ -82,7 +78,7 @@ public class ElasticsearchFieldProjection<F, V, P, T> extends AbstractElasticsea
 	public ValueFieldExtractor<?> request(JsonObject requestBody, ProjectionRequestContext context) {
 		ProjectionRequestContext innerContext = context.forField( absoluteFieldPath, absoluteFieldPathComponents );
 		if ( !context.projectionCardinalityCorrectlyAddressed( requiredContextAbsoluteFieldPath ) ) {
-			throw log.invalidSingleValuedProjectionOnValueFieldInMultiValuedObjectField(
+			throw QueryLog.INSTANCE.invalidSingleValuedProjectionOnValueFieldInMultiValuedObjectField(
 					absoluteFieldPath, requiredContextAbsoluteFieldPath );
 		}
 		JsonPrimitive fieldPathJson = new JsonPrimitive( absoluteFieldPath );
@@ -174,8 +170,6 @@ public class ElasticsearchFieldProjection<F, V, P, T> extends AbstractElasticsea
 
 	public static class Builder<F, V, T> implements FieldProjectionBuilder<V> {
 
-		private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
-
 		private final Function<JsonElement, T> decodeFunction;
 		private final boolean canDecodeArrays;
 		private final ElasticsearchSearchIndexScope<?> scope;
@@ -195,7 +189,8 @@ public class ElasticsearchFieldProjection<F, V, P, T> extends AbstractElasticsea
 		@Override
 		public <P> SearchProjection<P> build(ProjectionCollector.Provider<V, P> collectorProvider) {
 			if ( collectorProvider.isSingleValued() && field.multiValued() ) {
-				throw log.invalidSingleValuedProjectionOnMultiValuedField( field.absolutePath(), field.eventContext() );
+				throw QueryLog.INSTANCE.invalidSingleValuedProjectionOnMultiValuedField( field.absolutePath(),
+						field.eventContext() );
 			}
 			return new ElasticsearchFieldProjection<>( this, collectorProvider );
 		}

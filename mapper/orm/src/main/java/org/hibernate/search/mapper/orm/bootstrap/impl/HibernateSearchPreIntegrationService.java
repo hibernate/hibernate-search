@@ -4,7 +4,6 @@
  */
 package org.hibernate.search.mapper.orm.bootstrap.impl;
 
-import java.lang.invoke.MethodHandles;
 import java.util.Map;
 import java.util.Optional;
 
@@ -32,12 +31,12 @@ import org.hibernate.search.mapper.orm.cfg.HibernateOrmMapperSettings;
 import org.hibernate.search.mapper.orm.cfg.spi.HibernateOrmMapperSpiSettings;
 import org.hibernate.search.mapper.orm.common.impl.HibernateOrmUtils;
 import org.hibernate.search.mapper.orm.coordination.impl.CoordinationConfigurationContextImpl;
-import org.hibernate.search.mapper.orm.logging.impl.Log;
+import org.hibernate.search.mapper.orm.logging.impl.ConfigurationLog;
+import org.hibernate.search.mapper.orm.logging.impl.VersionLog;
 import org.hibernate.search.mapper.orm.mapping.impl.HibernateOrmMappingInitiator;
 import org.hibernate.search.mapper.orm.mapping.impl.HibernateOrmMappingKey;
 import org.hibernate.search.util.common.impl.Closer;
 import org.hibernate.search.util.common.impl.SuppressingCloser;
-import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 import org.hibernate.search.util.common.reflect.spi.ValueHandleFactory;
 import org.hibernate.service.Service;
 import org.hibernate.service.ServiceRegistry;
@@ -54,8 +53,6 @@ import org.jboss.jandex.IndexView;
  * and those services rely on the Hibernate Search configuration.
  */
 public abstract class HibernateSearchPreIntegrationService implements Service, AutoCloseable {
-
-	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	private static final ConfigurationProperty<Boolean> ENABLED =
 			ConfigurationProperty.forKey( HibernateOrmMapperSettings.ENABLED )
@@ -96,7 +93,7 @@ public abstract class HibernateSearchPreIntegrationService implements Service, A
 			initiated = true;
 
 			if ( LOG_VERSION.get( AllAwareConfigurationPropertySource.system() ) ) {
-				log.version( Version.versionString() );
+				VersionLog.INSTANCE.version( Version.versionString() );
 			}
 
 			ConfigurationPropertyChecker propertyChecker = ConfigurationPropertyChecker.create();
@@ -112,7 +109,7 @@ public abstract class HibernateSearchPreIntegrationService implements Service, A
 			Optional<HibernateOrmIntegrationPartialBuildState> partialBuildState =
 					HibernateOrmIntegrationPartialBuildState.get( propertySource );
 			if ( !enabled ) {
-				log.debug( "Hibernate Search is disabled through configuration properties." );
+				ConfigurationLog.INSTANCE.debug( "Hibernate Search is disabled through configuration properties." );
 				// The partial build state won't get used.
 				partialBuildState.ifPresent( HibernateOrmIntegrationPartialBuildState::closeOnFailure );
 				// Hibernate Search will not boot.

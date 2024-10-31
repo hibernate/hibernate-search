@@ -4,7 +4,6 @@
  */
 package org.hibernate.search.mapper.pojo.bridge.mapping.impl;
 
-import java.lang.invoke.MethodHandles;
 import java.lang.reflect.Type;
 
 import org.hibernate.search.engine.environment.bean.BeanHolder;
@@ -16,10 +15,9 @@ import org.hibernate.search.mapper.pojo.bridge.binding.IdentifierBindingContext;
 import org.hibernate.search.mapper.pojo.bridge.binding.ValueBindingContext;
 import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.IdentifierBinder;
 import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.ValueBinder;
-import org.hibernate.search.mapper.pojo.logging.impl.Log;
+import org.hibernate.search.mapper.pojo.logging.impl.MappingLog;
 import org.hibernate.search.util.common.AssertionFailure;
 import org.hibernate.search.util.common.impl.SuppressingCloser;
-import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 import org.hibernate.search.util.common.reflect.impl.GenericTypeContext;
 
 /**
@@ -27,8 +25,6 @@ import org.hibernate.search.util.common.reflect.impl.GenericTypeContext;
  */
 public final class BeanBinder
 		implements IdentifierBinder, ValueBinder {
-
-	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	private final BeanReference<?> beanReference;
 
@@ -82,7 +78,7 @@ public final class BeanBinder
 			context.bridge( (Class<I>) typeArgument, bridge );
 		}
 		else {
-			throw log.invalidGenericParameterToInferIdentifierType( bridge, typeArgument );
+			throw MappingLog.INSTANCE.invalidGenericParameterToInferIdentifierType( bridge, typeArgument );
 		}
 	}
 
@@ -97,7 +93,7 @@ public final class BeanBinder
 			context.bridge( (Class<V>) typeArgument, bridge );
 		}
 		else {
-			throw log.invalidGenericParameterToInferValueType( bridge, typeArgument );
+			throw MappingLog.INSTANCE.invalidGenericParameterToInferValueType( bridge, typeArgument );
 		}
 	}
 

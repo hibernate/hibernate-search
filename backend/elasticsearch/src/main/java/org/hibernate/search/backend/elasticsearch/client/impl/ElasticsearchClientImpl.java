@@ -8,7 +8,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
-import java.lang.invoke.MethodHandles;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.time.Duration;
@@ -22,14 +21,14 @@ import org.hibernate.search.backend.elasticsearch.client.spi.ElasticsearchClient
 import org.hibernate.search.backend.elasticsearch.client.spi.ElasticsearchRequest;
 import org.hibernate.search.backend.elasticsearch.client.spi.ElasticsearchResponse;
 import org.hibernate.search.backend.elasticsearch.gson.spi.JsonLogHelper;
-import org.hibernate.search.backend.elasticsearch.logging.impl.ElasticsearchLogCategories;
-import org.hibernate.search.backend.elasticsearch.logging.impl.Log;
+import org.hibernate.search.backend.elasticsearch.logging.impl.CommonFailureLog;
+import org.hibernate.search.backend.elasticsearch.logging.impl.ElasticsearchClientLog;
+import org.hibernate.search.backend.elasticsearch.logging.impl.ElasticsearchRequestLog;
 import org.hibernate.search.engine.common.execution.spi.SimpleScheduledExecutor;
 import org.hibernate.search.engine.common.timing.Deadline;
 import org.hibernate.search.engine.environment.bean.BeanHolder;
 import org.hibernate.search.util.common.impl.Closer;
 import org.hibernate.search.util.common.impl.Futures;
-import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
@@ -46,11 +45,6 @@ import org.elasticsearch.client.RestClient;
 import org.elasticsearch.client.sniff.Sniffer;
 
 public class ElasticsearchClientImpl implements ElasticsearchClientImplementor {
-
-	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
-
-	private static final Log requestLog =
-			LoggerFactory.make( Log.class, ElasticsearchLogCategories.REQUEST, MethodHandles.lookup() );
 
 	private final BeanHolder<? extends RestClient> restClientHolder;
 
@@ -81,7 +75,7 @@ public class ElasticsearchClientImpl implements ElasticsearchClientImplementor {
 	public CompletableFuture<ElasticsearchResponse> submit(ElasticsearchRequest request) {
 		CompletableFuture<ElasticsearchResponse> result = Futures.create( () -> send( request ) )
 				.thenApply( this::convertResponse );
-		if ( requestLog.isDebugEnabled() ) {
+		if ( ElasticsearchRequestLog.INSTANCE.isDebugEnabled() ) {
 			long startTime = System.nanoTime();
 			result.thenAccept( response -> log( request, startTime, response ) );
 		}
@@ -94,7 +88,7 @@ public class ElasticsearchClientImpl implements ElasticsearchClientImplementor {
 		if ( RestClient.class.isAssignableFrom( clientClass ) ) {
 			return (T) restClientHolder.get();
 		}
-		throw log.clientUnwrappingWithUnkownType( clientClass, RestClient.class );
+		throw CommonFailureLog.INSTANCE.clientUnwrappingWithUnknownType( clientClass, RestClient.class );
 	}
 
 	private CompletableFuture<Response> send(ElasticsearchRequest elasticsearchRequest) {
@@ -151,7 +145,7 @@ public class ElasticsearchClientImpl implements ElasticsearchClientImplementor {
 		ScheduledFuture<?> timeout = timeoutExecutorService.schedule(
 				() -> {
 					if ( !completableFuture.isDone() ) {
-						RuntimeException cause = log.requestTimedOut(
+						RuntimeException cause = ElasticsearchClientLog.INSTANCE.requestTimedOut(
 								Duration.ofNanos( TimeUnit.MILLISECONDS.toNanos( currentTimeoutValue ) ),
 								elasticsearchRequest );
 						completableFuture.completeExceptionally(
@@ -211,7 +205,7 @@ public class ElasticsearchClientImpl implements ElasticsearchClientImplementor {
 					body );
 		}
 		catch (IOException | RuntimeException e) {
-			throw log.failedToParseElasticsearchResponse( response.getStatusLine().getStatusCode(),
+			throw ElasticsearchClientLog.INSTANCE.failedToParseElasticsearchResponse( response.getStatusLine().getStatusCode(),
 					response.getStatusLine().getReasonPhrase(), e.getMessage(), e );
 		}
 	}
@@ -237,20 +231,22 @@ public class ElasticsearchClientImpl implements ElasticsearchClientImplementor {
 
 	private void log(ElasticsearchRequest request, long start, ElasticsearchResponse response) {
 		boolean successCode = ElasticsearchClientUtils.isSuccessCode( response.statusCode() );
-		if ( !requestLog.isTraceEnabled() && successCode ) {
+		if ( !ElasticsearchRequestLog.INSTANCE.isTraceEnabled() && successCode ) {
 			return;
 		}
 		long executionTimeNs = System.nanoTime() - start;
 		long executionTimeMs = TimeUnit.NANOSECONDS.toMillis( executionTimeNs );
 		if ( successCode ) {
-			requestLog.executedRequest( request.method(), response.host(), request.path(), request.parameters(),
+			ElasticsearchRequestLog.INSTANCE.executedRequest( request.method(), response.host(), request.path(),
+					request.parameters(),
 					request.bodyParts().size(), executionTimeMs,
 					response.statusCode(), response.statusMessage(),
 					jsonLogHelper.toString( request.bodyParts() ),
 					jsonLogHelper.toString( response.body() ) );
 		}
 		else {
-			requestLog.executedRequestWithFailure( request.method(), response.host(), request.path(), request.parameters(),
+			ElasticsearchRequestLog.INSTANCE.executedRequestWithFailure( request.method(), response.host(), request.path(),
+					request.parameters(),
 					request.bodyParts().size(), executionTimeMs,
 					response.statusCode(), response.statusMessage(),
 					jsonLogHelper.toString( request.bodyParts() ),
@@ -270,7 +266,7 @@ public class ElasticsearchClientImpl implements ElasticsearchClientImplementor {
 			closer.push( BeanHolder::close, this.restClientHolder );
 		}
 		catch (RuntimeException | IOException e) {
-			throw log.unableToShutdownClient( e.getMessage(), e );
+			throw ElasticsearchClientLog.INSTANCE.unableToShutdownClient( e.getMessage(), e );
 		}
 	}
 

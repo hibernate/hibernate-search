@@ -4,7 +4,6 @@
  */
 package org.hibernate.search.mapper.orm.mapping.impl;
 
-import java.lang.invoke.MethodHandles;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.LinkedHashMap;
@@ -14,7 +13,7 @@ import java.util.Map;
 import org.hibernate.engine.spi.SessionFactoryImplementor;
 import org.hibernate.search.mapper.orm.automaticindexing.impl.AutomaticIndexingTypeContextProvider;
 import org.hibernate.search.mapper.orm.event.impl.HibernateOrmListenerTypeContextProvider;
-import org.hibernate.search.mapper.orm.logging.impl.Log;
+import org.hibernate.search.mapper.orm.logging.impl.MappingLog;
 import org.hibernate.search.mapper.orm.model.impl.HibernateOrmBasicTypeMetadataProvider;
 import org.hibernate.search.mapper.orm.session.impl.HibernateOrmSessionTypeContextProvider;
 import org.hibernate.search.mapper.orm.spi.BatchTypeContextProvider;
@@ -22,13 +21,10 @@ import org.hibernate.search.mapper.pojo.loading.spi.PojoLoadingTypeContextProvid
 import org.hibernate.search.mapper.pojo.model.spi.PojoRawTypeIdentifier;
 import org.hibernate.search.mapper.pojo.model.spi.PojoRawTypeModel;
 import org.hibernate.search.util.common.data.spi.KeyValueProvider;
-import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
 class HibernateOrmTypeContextContainer
 		implements HibernateOrmListenerTypeContextProvider, HibernateOrmSessionTypeContextProvider,
 		AutomaticIndexingTypeContextProvider, BatchTypeContextProvider {
-
-	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	private final KeyValueProvider<PojoRawTypeIdentifier<?>, HibernateOrmIndexedTypeContext<?>> indexedByTypeIdentifier;
 	private final KeyValueProvider<Class<?>, AbstractHibernateOrmTypeContext<?>> byExactClass;
@@ -82,14 +78,16 @@ class HibernateOrmTypeContextContainer
 			byHibernateOrmEntityNameContent.put( typeContext.hibernateOrmEntityName(), typeContext );
 		}
 		this.indexedByTypeIdentifier =
-				new KeyValueProvider<>( indexedByTypeIdentifierContent, log::unknownTypeIdentifierForIndexedEntityType );
-		this.byExactClass = new KeyValueProvider<>( byExactClassContent, log::unknownClassForMappedEntityType );
-		this.indexedByExactClass = new KeyValueProvider<>( indexedByExactClassContent, log::unknownClassForIndexedEntityType );
-		this.byEntityName = new KeyValueProvider<>( byEntityNameContent, log::unknownEntityNameForMappedEntityType );
+				new KeyValueProvider<>( indexedByTypeIdentifierContent,
+						MappingLog.INSTANCE::unknownTypeIdentifierForIndexedEntityType );
+		this.byExactClass = new KeyValueProvider<>( byExactClassContent, MappingLog.INSTANCE::unknownClassForMappedEntityType );
+		this.indexedByExactClass =
+				new KeyValueProvider<>( indexedByExactClassContent, MappingLog.INSTANCE::unknownClassForIndexedEntityType );
+		this.byEntityName = new KeyValueProvider<>( byEntityNameContent, MappingLog.INSTANCE::unknownEntityNameForMappedEntityType );
 		this.indexedByEntityName =
-				new KeyValueProvider<>( indexedByEntityNameContent, log::unknownEntityNameForIndexedEntityType );
+				new KeyValueProvider<>( indexedByEntityNameContent, MappingLog.INSTANCE::unknownEntityNameForIndexedEntityType );
 		this.byHibernateOrmEntityName = new KeyValueProvider<>( byHibernateOrmEntityNameContent,
-				log::unknownHibernateOrmEntityNameForMappedEntityType );
+				MappingLog.INSTANCE::unknownHibernateOrmEntityNameForMappedEntityType );
 	}
 
 	@Override

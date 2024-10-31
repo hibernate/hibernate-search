@@ -4,25 +4,20 @@
  */
 package org.hibernate.search.mapper.pojo.mapping.definition.programmatic.impl;
 
-import java.lang.invoke.MethodHandles;
-
 import org.hibernate.search.engine.backend.types.Projectable;
 import org.hibernate.search.engine.backend.types.Searchable;
 import org.hibernate.search.engine.backend.types.VectorSimilarity;
 import org.hibernate.search.engine.backend.types.dsl.IndexFieldTypeFactory;
 import org.hibernate.search.mapper.pojo.bridge.binding.spi.FieldModelContributorContext;
 import org.hibernate.search.mapper.pojo.extractor.mapping.programmatic.ContainerExtractorPath;
-import org.hibernate.search.mapper.pojo.logging.impl.Log;
+import org.hibernate.search.mapper.pojo.logging.impl.MappingLog;
 import org.hibernate.search.mapper.pojo.mapping.building.spi.PojoPropertyMetadataContributor;
 import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.PropertyMappingStep;
 import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.PropertyMappingVectorFieldOptionsStep;
-import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
 class PropertyMappingVectorFieldOptionsStepImpl
 		extends AbstractPropertyMappingFieldOptionsStep<PropertyMappingVectorFieldOptionsStep>
 		implements PropertyMappingVectorFieldOptionsStep, PojoPropertyMetadataContributor {
-
-	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	PropertyMappingVectorFieldOptionsStepImpl(PropertyMappingStep parent, Integer dimension, String relativeFieldName) {
 		super( parent, relativeFieldName,
@@ -73,7 +68,7 @@ class PropertyMappingVectorFieldOptionsStepImpl
 	@Override
 	public PropertyMappingVectorFieldOptionsStep extractors(ContainerExtractorPath extractorPath) {
 		if ( extractorPath.isDefault() ) {
-			throw log.vectorFieldMustUseExplicitExtractorPath();
+			throw MappingLog.INSTANCE.vectorFieldMustUseExplicitExtractorPath();
 		}
 		return super.extractors( extractorPath );
 	}

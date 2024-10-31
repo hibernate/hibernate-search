@@ -6,19 +6,15 @@ package org.hibernate.search.util.common.reflect.spi;
 
 import java.lang.annotation.Annotation;
 import java.lang.annotation.Repeatable;
-import java.lang.invoke.MethodHandles;
 import java.lang.reflect.Method;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.stream.Stream;
 
-import org.hibernate.search.util.common.logging.impl.Log;
-import org.hibernate.search.util.common.logging.impl.LoggerFactory;
+import org.hibernate.search.util.common.logging.impl.CommonFailuresLog;
 
 public final class AnnotationHelper {
-
-	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	private final ValueHandleFactory handleFactory;
 
@@ -40,7 +36,7 @@ public final class AnnotationHelper {
 				return Arrays.stream( annotationArray );
 			}
 			catch (Throwable e) {
-				log.cannotAccessRepeateableContainingAnnotationValue(
+				CommonFailuresLog.INSTANCE.cannotAccessRepeateableContainingAnnotationValue(
 						containingAnnotationCandidateType, e
 				);
 			}
@@ -72,7 +68,7 @@ public final class AnnotationHelper {
 						return result;
 					}
 					catch (IllegalAccessException e) {
-						log.cannotAccessRepeateableContainingAnnotationValue(
+						CommonFailuresLog.INSTANCE.cannotAccessRepeateableContainingAnnotationValue(
 								containingAnnotationCandidateType, e
 						);
 					}

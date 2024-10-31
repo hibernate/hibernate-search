@@ -4,7 +4,6 @@
  */
 package org.hibernate.search.mapper.pojo.extractor.impl;
 
-import java.lang.invoke.MethodHandles;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -21,14 +20,13 @@ import org.hibernate.search.mapper.pojo.extractor.builtin.impl.CollectionElement
 import org.hibernate.search.mapper.pojo.extractor.mapping.programmatic.ContainerExtractorPath;
 import org.hibernate.search.mapper.pojo.extractor.spi.ContainerExtractorDefinition;
 import org.hibernate.search.mapper.pojo.extractor.spi.ContainerExtractorRegistry;
-import org.hibernate.search.mapper.pojo.logging.impl.Log;
+import org.hibernate.search.mapper.pojo.logging.impl.MappingLog;
 import org.hibernate.search.mapper.pojo.model.spi.PojoTypeModel;
 import org.hibernate.search.mapper.pojo.model.typepattern.impl.ExtractingTypePatternMatcher;
 import org.hibernate.search.mapper.pojo.model.typepattern.impl.TypePatternMatcherFactory;
 import org.hibernate.search.util.common.AssertionFailure;
 import org.hibernate.search.util.common.SearchException;
 import org.hibernate.search.util.common.impl.SuppressingCloser;
-import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 import org.hibernate.search.util.common.reflect.impl.GenericTypeContext;
 
 /**
@@ -58,8 +56,6 @@ import org.hibernate.search.util.common.reflect.impl.GenericTypeContext;
  * a {@link ContainerExtractor}, which can be used at runtime to extract values from a container.
  */
 public class ContainerExtractorBinder {
-
-	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	private final BeanResolver beanResolver;
 	private final ContainerExtractorRegistry containerExtractorRegistry;
@@ -213,15 +209,15 @@ public class ContainerExtractorBinder {
 		Class<? extends ContainerExtractor> extractorClass = containerExtractorRegistry.forName( extractorName ).type();
 		GenericTypeContext typeContext = new GenericTypeContext( extractorClass );
 		Type typePattern = typeContext.resolveTypeArgument( ContainerExtractor.class, 0 )
-				.orElseThrow( () -> log.cannotInferContainerExtractorClassTypePattern( extractorClass, null ) );
+				.orElseThrow( () -> MappingLog.INSTANCE.cannotInferContainerExtractorClassTypePattern( extractorClass, null ) );
 		Type typeToExtract = typeContext.resolveTypeArgument( ContainerExtractor.class, 1 )
-				.orElseThrow( () -> log.cannotInferContainerExtractorClassTypePattern( extractorClass, null ) );
+				.orElseThrow( () -> MappingLog.INSTANCE.cannotInferContainerExtractorClassTypePattern( extractorClass, null ) );
 		ExtractingTypePatternMatcher typePatternMatcher;
 		try {
 			typePatternMatcher = typePatternMatcherFactory.createExtractingMatcher( typePattern, typeToExtract );
 		}
 		catch (UnsupportedOperationException e) {
-			throw log.cannotInferContainerExtractorClassTypePattern( extractorClass, e );
+			throw MappingLog.INSTANCE.cannotInferContainerExtractorClassTypePattern( extractorClass, e );
 		}
 		return new SingleExtractorContributor( typePatternMatcher, extractorName, extractorClass );
 	}
@@ -271,7 +267,7 @@ public class ContainerExtractorBinder {
 
 		void append(ExtractorResolutionState<?> state) {
 			if ( !tryAppend( state ) ) {
-				throw log.invalidContainerExtractorForType( extractorName, extractorClass, state.extractedType );
+				throw MappingLog.INSTANCE.invalidContainerExtractorForType( extractorName, extractorClass, state.extractedType );
 			}
 		}
 	}
@@ -295,7 +291,7 @@ public class ContainerExtractorBinder {
 			for ( ExtractorContributor extractorContributor : candidates ) {
 				if ( extractorContributor.tryAppend( state ) ) {
 					if ( !encounteredTypes.add( state.extractedType ) ) {
-						throw log.defaultContainerExtractorCyclicRecursion( initialType, state.extractorNames );
+						throw MappingLog.INSTANCE.defaultContainerExtractorCyclicRecursion( initialType, state.extractorNames );
 					}
 					// Recurse as much as possible
 					tryAppend( state );

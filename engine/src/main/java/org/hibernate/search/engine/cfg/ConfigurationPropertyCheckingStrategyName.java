@@ -4,11 +4,8 @@
  */
 package org.hibernate.search.engine.cfg;
 
-import java.lang.invoke.MethodHandles;
-
 import org.hibernate.search.engine.cfg.spi.ParseUtils;
-import org.hibernate.search.engine.logging.impl.Log;
-import org.hibernate.search.util.common.logging.impl.LoggerFactory;
+import org.hibernate.search.engine.logging.impl.ConfigurationLog;
 
 public enum ConfigurationPropertyCheckingStrategyName {
 
@@ -22,14 +19,12 @@ public enum ConfigurationPropertyCheckingStrategyName {
 	 */
 	WARN( "warn" );
 
-	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
-
 	// This method conforms to the MicroProfile Config specification. Do not change its signature.
 	public static ConfigurationPropertyCheckingStrategyName of(String value) {
 		return ParseUtils.parseDiscreteValues(
 				ConfigurationPropertyCheckingStrategyName.values(),
 				ConfigurationPropertyCheckingStrategyName::externalRepresentation,
-				log::invalidConfigurationPropertyCheckingStrategyName,
+				ConfigurationLog.INSTANCE::invalidConfigurationPropertyCheckingStrategyName,
 				value
 		);
 	}

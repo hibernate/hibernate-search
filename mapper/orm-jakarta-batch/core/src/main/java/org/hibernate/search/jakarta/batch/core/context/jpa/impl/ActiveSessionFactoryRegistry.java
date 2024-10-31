@@ -4,7 +4,6 @@
  */
 package org.hibernate.search.jakarta.batch.core.context.jpa.impl;
 
-import java.lang.invoke.MethodHandles;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.concurrent.ConcurrentHashMap;
@@ -16,8 +15,7 @@ import org.hibernate.SessionFactory;
 import org.hibernate.cfg.AvailableSettings;
 import org.hibernate.engine.spi.SessionFactoryImplementor;
 import org.hibernate.search.jakarta.batch.core.context.jpa.spi.EntityManagerFactoryRegistry;
-import org.hibernate.search.jakarta.batch.core.logging.impl.Log;
-import org.hibernate.search.util.common.logging.impl.LoggerFactory;
+import org.hibernate.search.jakarta.batch.core.logging.impl.JakartaBatchLog;
 
 /**
  * A registry containing all the currently active (non-closed) session factories
@@ -35,8 +33,6 @@ import org.hibernate.search.util.common.logging.impl.LoggerFactory;
  * @author Yoann Rodiere
  */
 public class ActiveSessionFactoryRegistry implements EntityManagerFactoryRegistry {
-
-	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	private static final ActiveSessionFactoryRegistry INSTANCE = new ActiveSessionFactoryRegistry();
 
@@ -82,10 +78,10 @@ public class ActiveSessionFactoryRegistry implements EntityManagerFactoryRegistr
 	@Override
 	public synchronized EntityManagerFactory useDefault() {
 		if ( sessionFactories.isEmpty() ) {
-			throw log.noEntityManagerFactoryCreated();
+			throw JakartaBatchLog.INSTANCE.noEntityManagerFactoryCreated();
 		}
 		else if ( sessionFactories.size() > 1 ) {
-			throw log.tooManyActiveEntityManagerFactories();
+			throw JakartaBatchLog.INSTANCE.tooManyActiveEntityManagerFactories();
 		}
 		else {
 			return sessionFactories.iterator().next();
@@ -105,17 +101,17 @@ public class ActiveSessionFactoryRegistry implements EntityManagerFactoryRegistr
 			case PERSISTENCE_UNIT_NAME_NAMESPACE:
 				factory = sessionFactoriesByPUName.get( reference );
 				if ( factory == null ) {
-					throw log.cannotFindEntityManagerFactoryByPUName( reference );
+					throw JakartaBatchLog.INSTANCE.cannotFindEntityManagerFactoryByPUName( reference );
 				}
 				break;
 			case SESSION_FACTORY_NAME_NAMESPACE:
 				factory = sessionFactoriesByName.get( reference );
 				if ( factory == null ) {
-					throw log.cannotFindEntityManagerFactoryByName( reference );
+					throw JakartaBatchLog.INSTANCE.cannotFindEntityManagerFactoryByName( reference );
 				}
 				break;
 			default:
-				throw log.unknownEntityManagerFactoryNamespace( namespace );
+				throw JakartaBatchLog.INSTANCE.unknownEntityManagerFactoryNamespace( namespace );
 		}
 
 		return factory;

@@ -4,7 +4,6 @@
  */
 package org.hibernate.search.mapper.pojo.mapping.impl;
 
-import java.lang.invoke.MethodHandles;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
@@ -19,7 +18,7 @@ import org.hibernate.search.mapper.pojo.automaticindexing.building.impl.PojoImpl
 import org.hibernate.search.mapper.pojo.bridge.binding.impl.BoundRoutingBridge;
 import org.hibernate.search.mapper.pojo.identity.impl.PojoRootIdentityMappingCollector;
 import org.hibernate.search.mapper.pojo.loading.spi.PojoLoadingTypeContextProvider;
-import org.hibernate.search.mapper.pojo.logging.impl.Log;
+import org.hibernate.search.mapper.pojo.logging.impl.MappingLog;
 import org.hibernate.search.mapper.pojo.mapping.building.spi.PojoContainedTypeExtendedMappingCollector;
 import org.hibernate.search.mapper.pojo.mapping.building.spi.PojoIndexedTypeExtendedMappingCollector;
 import org.hibernate.search.mapper.pojo.mapping.spi.PojoRawTypeIdentifierResolver;
@@ -32,12 +31,10 @@ import org.hibernate.search.mapper.pojo.work.impl.PojoWorkTypeContextProvider;
 import org.hibernate.search.util.common.data.spi.KeyValueProvider;
 import org.hibernate.search.util.common.impl.Closer;
 import org.hibernate.search.util.common.impl.CollectionHelper;
-import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
 public class PojoTypeManagerContainer
 		implements AutoCloseable, PojoWorkTypeContextProvider, PojoScopeTypeContextProvider,
 		PojoRawTypeIdentifierResolver, PojoLoadingTypeContextProvider {
-	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	public static Builder builder() {
 		return new Builder();
@@ -80,7 +77,7 @@ public class PojoTypeManagerContainer
 			PojoRawTypeIdentifier<?> typeIdentifier = typeModel.typeIdentifier();
 			typeManagerBuilder.hasNonIndexedConcreteSubtypes( hasNonIndexedConcreteSubtypesSet.contains( typeManagerBuilder ) );
 			var typeManager = typeManagerBuilder.build();
-			log.indexedTypeManager( typeModel, typeManager );
+			MappingLog.INSTANCE.indexedTypeManager( typeModel, typeManager );
 
 			byExactTypeContent.put( typeIdentifier, typeManager );
 			indexedByExactTypeContent.put( typeIdentifier, typeManager );
@@ -96,7 +93,7 @@ public class PojoTypeManagerContainer
 			PojoRawTypeModel<?> typeModel = typeManagerBuilder.typeModel;
 			PojoRawTypeIdentifier<?> typeIdentifier = typeModel.typeIdentifier();
 			var typeManager = typeManagerBuilder.build();
-			log.containedTypeManager( typeModel, typeManager );
+			MappingLog.INSTANCE.containedTypeManager( typeModel, typeManager );
 
 			byExactTypeContent.put( typeIdentifier, typeManager );
 
@@ -104,15 +101,17 @@ public class PojoTypeManagerContainer
 
 			registerSuperTypes( bySuperTypeContent, typeModel, typeManager );
 		}
-		this.byExactType = new KeyValueProvider<>( byExactTypeContent, log::unknownTypeIdentifierForMappedEntityType );
+		this.byExactType =
+				new KeyValueProvider<>( byExactTypeContent, MappingLog.INSTANCE::unknownTypeIdentifierForMappedEntityType );
 		this.indexedByExactType =
-				new KeyValueProvider<>( indexedByExactTypeContent, log::unknownTypeIdentifierForIndexedEntityType );
-		this.byEntityName = new KeyValueProvider<>( byEntityNameContent, log::unknownEntityNameForMappedEntityType );
+				new KeyValueProvider<>( indexedByExactTypeContent, MappingLog.INSTANCE::unknownTypeIdentifierForIndexedEntityType );
+		this.byEntityName = new KeyValueProvider<>( byEntityNameContent, MappingLog.INSTANCE::unknownEntityNameForMappedEntityType );
 		this.indexedByEntityName =
-				new KeyValueProvider<>( indexedByEntityNameContent, log::unknownEntityNameForIndexedEntityType );
+				new KeyValueProvider<>( indexedByEntityNameContent, MappingLog.INSTANCE::unknownEntityNameForIndexedEntityType );
 		indexedBySuperTypeContent.replaceAll( (k, v) -> Collections.unmodifiableSet( v ) );
 		this.indexedBySuperType =
-				KeyValueProvider.createWithMultiKeyException( indexedBySuperTypeContent, log::invalidIndexedSuperTypes );
+				KeyValueProvider.createWithMultiKeyException( indexedBySuperTypeContent,
+						MappingLog.INSTANCE::invalidIndexedSuperTypes );
 
 		Map<String, PojoRawTypeIdentifier<?>> typeIdentifierByEntityNameContent = new LinkedHashMap<>();
 		Map<String, PojoRawTypeIdentifier<?>> typeIdentifierBySecondaryEntityNameContent = new LinkedHashMap<>();
@@ -128,9 +127,9 @@ public class PojoTypeManagerContainer
 			typeIdentifierByEntityNameContent.putIfAbsent( entry.getKey(), typeIdentifier );
 		}
 		this.typeIdentifierByEntityName =
-				new KeyValueProvider<>( typeIdentifierByEntityNameContent, log::unknownEntityName );
+				new KeyValueProvider<>( typeIdentifierByEntityNameContent, MappingLog.INSTANCE::unknownEntityName );
 		this.typeIdentifierBySecondaryEntityName =
-				new KeyValueProvider<>( typeIdentifierBySecondaryEntityNameContent, log::unknownEntityName );
+				new KeyValueProvider<>( typeIdentifierBySecondaryEntityNameContent, MappingLog.INSTANCE::unknownEntityName );
 
 		Map<String, Set<PojoIndexedTypeManager<?, ?>>> indexedBySuperTypeEntityNameContent =
 				new LinkedHashMap<>();
@@ -153,10 +152,10 @@ public class PojoTypeManagerContainer
 		}
 		indexedBySuperTypeEntityNameContent.replaceAll( (k, v) -> Collections.unmodifiableSet( v ) );
 		this.indexedBySuperTypeEntityName = KeyValueProvider.createWithMultiKeyException( indexedBySuperTypeEntityNameContent,
-				log::invalidIndexedSuperTypeEntityNames );
+				MappingLog.INSTANCE::invalidIndexedSuperTypeEntityNames );
 		indexedBySuperTypeClassContent.replaceAll( (k, v) -> Collections.unmodifiableSet( v ) );
 		this.indexedBySuperTypeClass = KeyValueProvider.createWithMultiKeyException( indexedBySuperTypeClassContent,
-				log::invalidIndexedSuperTypeClasses );
+				MappingLog.INSTANCE::invalidIndexedSuperTypeClasses );
 
 		Map<Class<?>, PojoRawTypeIdentifier<?>> nonInterfaceSuperTypeIdentifierByClassContent = new LinkedHashMap<>();
 		Map<String, PojoRawTypeIdentifier<?>> nonInterfaceSuperTypeIdentifierByEntityNameContent = new LinkedHashMap<>();
@@ -181,11 +180,12 @@ public class PojoTypeManagerContainer
 			}
 		}
 		this.byNonInterfaceSuperType =
-				new KeyValueProvider<>( byNonInterfaceSuperTypeContent, log::unknownNonInterfaceSuperTypeIdentifier );
+				new KeyValueProvider<>( byNonInterfaceSuperTypeContent,
+						MappingLog.INSTANCE::unknownNonInterfaceSuperTypeIdentifier );
 		this.nonInterfaceSuperTypeIdentifierByEntityName = new KeyValueProvider<>(
-				nonInterfaceSuperTypeIdentifierByEntityNameContent, log::unknownEntityNameForNonInterfaceSuperType );
+				nonInterfaceSuperTypeIdentifierByEntityNameContent, MappingLog.INSTANCE::unknownEntityNameForNonInterfaceSuperType );
 		this.nonInterfaceSuperTypeIdentifierByClass = new KeyValueProvider<>( nonInterfaceSuperTypeIdentifierByClassContent,
-				log::unknownClassForNonInterfaceSuperType );
+				MappingLog.INSTANCE::unknownClassForNonInterfaceSuperType );
 
 		this.allIndexed = Collections.unmodifiableSet( new LinkedHashSet<>( indexedByExactTypeContent.values() ) );
 		this.allIndexedAndContainedTypes = Collections.unmodifiableSet( byExactTypeContent.keySet() );
@@ -369,7 +369,7 @@ public class PojoTypeManagerContainer
 					.add( entityName );
 			PojoRawTypeModel<?> previousType = allEntitiesByName.putIfAbsent( entityName, entityType );
 			if ( previousType != null ) {
-				throw log.multipleEntityTypesWithSameName( entityName, previousType, entityType );
+				throw MappingLog.INSTANCE.multipleEntityTypesWithSameName( entityName, previousType, entityType );
 			}
 			if ( secondaryEntityName != null ) {
 				allEntityNamesByTypeIdentifier
@@ -377,7 +377,8 @@ public class PojoTypeManagerContainer
 						.add( secondaryEntityName );
 				previousType = allEntitiesBySecondaryName.putIfAbsent( secondaryEntityName, entityType );
 				if ( previousType != null ) {
-					throw log.multipleEntityTypesWithSameSecondaryName( secondaryEntityName, previousType, entityType );
+					throw MappingLog.INSTANCE.multipleEntityTypesWithSameSecondaryName( secondaryEntityName, previousType,
+							entityType );
 				}
 			}
 			registerSuperTypes( entityTypeIdentifiersBySuperType, entityType, entityType.typeIdentifier() );

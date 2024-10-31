@@ -4,23 +4,19 @@
  */
 package org.hibernate.search.engine.search.timeout.spi;
 
-import java.lang.invoke.MethodHandles;
 import java.time.Duration;
 import java.util.concurrent.TimeUnit;
 
 import org.hibernate.search.engine.common.timing.Deadline;
 import org.hibernate.search.engine.common.timing.spi.TimingSource;
-import org.hibernate.search.engine.logging.impl.Log;
+import org.hibernate.search.engine.logging.impl.QueryLog;
 import org.hibernate.search.util.common.SearchTimeoutException;
 import org.hibernate.search.util.common.impl.TimeHelper;
-import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
 /**
  * @author Emmanuel Bernard
  */
 public class TimeoutManager {
-
-	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	public static TimeoutManager of(TimingSource timingSource, Long timeout, TimeUnit timeUnit,
 			boolean exceptionOnTimeout) {
@@ -192,7 +188,7 @@ public class TimeoutManager {
 		@Override
 		public SearchTimeoutException forceTimeoutAndCreateException(Exception cause) {
 			this.timedOut = true;
-			return log.timedOut( Duration.ofNanos( timeoutUnit.toNanos( timeoutValue ) ), cause );
+			return QueryLog.INSTANCE.timedOut( Duration.ofNanos( timeoutUnit.toNanos( timeoutValue ) ), cause );
 		}
 	}
 }

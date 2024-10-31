@@ -4,7 +4,6 @@
  */
 package org.hibernate.search.engine.backend.orchestration.spi;
 
-import java.lang.invoke.MethodHandles;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
@@ -12,8 +11,7 @@ import java.util.function.Consumer;
 
 import org.hibernate.search.engine.backend.work.execution.OperationSubmitter;
 import org.hibernate.search.engine.cfg.ConfigurationPropertySource;
-import org.hibernate.search.engine.logging.impl.Log;
-import org.hibernate.search.util.common.logging.impl.LoggerFactory;
+import org.hibernate.search.engine.logging.impl.ExecutorLog;
 
 /**
  * An abstract base for orchestrator implementations,
@@ -22,8 +20,6 @@ import org.hibernate.search.util.common.logging.impl.LoggerFactory;
  * @param <W> The type of batched works.
  */
 public abstract class AbstractWorkOrchestrator<W> {
-
-	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	private final String name;
 
@@ -127,18 +123,18 @@ public abstract class AbstractWorkOrchestrator<W> {
 	public final void submit(W work, OperationSubmitter operationSubmitter) {
 		if ( !lifecycleLock.readLock().tryLock() ) {
 			// The orchestrator is starting, pre-stopping or stopping: abort.
-			throw log.submittedWorkToStoppedOrchestrator( name );
+			throw ExecutorLog.INSTANCE.submittedWorkToStoppedOrchestrator( name );
 		}
 		try {
 			if ( !State.RUNNING.equals( state ) ) {
 				// The orchestrator is stopping or stopped: abort.
-				throw log.submittedWorkToStoppedOrchestrator( name );
+				throw ExecutorLog.INSTANCE.submittedWorkToStoppedOrchestrator( name );
 			}
 			doSubmit( work, operationSubmitter );
 		}
 		catch (InterruptedException e) {
 			Thread.currentThread().interrupt();
-			throw log.threadInterruptedWhileSubmittingWork( name );
+			throw ExecutorLog.INSTANCE.threadInterruptedWhileSubmittingWork( name );
 		}
 		finally {
 			lifecycleLock.readLock().unlock();

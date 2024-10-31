@@ -4,7 +4,6 @@
  */
 package org.hibernate.search.engine.backend.orchestration.spi;
 
-import java.lang.invoke.MethodHandles;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ArrayBlockingQueue;
@@ -16,10 +15,9 @@ import java.util.function.Consumer;
 
 import org.hibernate.search.engine.backend.work.execution.OperationSubmitter;
 import org.hibernate.search.engine.common.execution.spi.SimpleScheduledExecutor;
-import org.hibernate.search.engine.logging.impl.Log;
+import org.hibernate.search.engine.logging.impl.ExecutorLog;
 import org.hibernate.search.engine.reporting.FailureHandler;
 import org.hibernate.search.util.common.AssertionFailure;
-import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
 /**
  * An executor of works that accepts works from multiple threads, puts them in a queue,
@@ -30,7 +28,6 @@ import org.hibernate.search.util.common.logging.impl.LoggerFactory;
  */
 public final class BatchingExecutor<P extends BatchedWorkProcessor, W extends BatchedWork<? super P>> {
 
-	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 	private static final BiConsumer<? super BatchedWork<?>, Throwable> ASYNC_FAILURE_REPORTER = BatchedWork::markAsFailed;
 
 	private final String name;
@@ -80,7 +77,7 @@ public final class BatchingExecutor<P extends BatchedWorkProcessor, W extends Ba
 	 * @param executorService An executor service with at least one thread.
 	 */
 	public synchronized void start(SimpleScheduledExecutor executorService) {
-		log.startingExecutor( name );
+		ExecutorLog.INSTANCE.startingExecutor( name );
 		processingTask = new SingletonTask(
 				name, worker,
 				new BatchScheduler( executorService ),
@@ -95,7 +92,7 @@ public final class BatchingExecutor<P extends BatchedWorkProcessor, W extends Ba
 	 * This will remove pending works from the queue.
 	 */
 	public synchronized void stop() {
-		log.stoppingExecutor( name );
+		ExecutorLog.INSTANCE.stoppingExecutor( name );
 
 		workQueue.clear();
 
@@ -176,9 +173,9 @@ public final class BatchingExecutor<P extends BatchedWorkProcessor, W extends Ba
 			}
 
 			int workCount = workBuffer.size();
-			boolean traceEnabled = log.isTraceEnabled();
+			boolean traceEnabled = ExecutorLog.INSTANCE.isTraceEnabled();
 			if ( traceEnabled ) {
-				log.tracef( "Processing %d works in executor '%s'", workCount, name );
+				ExecutorLog.INSTANCE.tracef( "Processing %d works in executor '%s'", workCount, name );
 			}
 
 			processor.beginBatch();
@@ -195,7 +192,7 @@ public final class BatchingExecutor<P extends BatchedWorkProcessor, W extends Ba
 			CompletableFuture<?> future = processor.endBatch();
 			if ( traceEnabled ) {
 				future.whenComplete( (result, throwable) -> {
-					log.tracef( "Processed %d works in executor '%s'", workCount, name );
+					ExecutorLog.INSTANCE.tracef( "Processed %d works in executor '%s'", workCount, name );
 				} );
 			}
 

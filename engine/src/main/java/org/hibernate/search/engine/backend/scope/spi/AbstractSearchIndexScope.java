@@ -4,7 +4,6 @@
  */
 package org.hibernate.search.engine.backend.scope.spi;
 
-import java.lang.invoke.MethodHandles;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
@@ -13,7 +12,7 @@ import java.util.TreeSet;
 import org.hibernate.search.engine.backend.document.model.spi.AbstractIndexModel;
 import org.hibernate.search.engine.backend.mapping.spi.BackendMappingContext;
 import org.hibernate.search.engine.backend.types.converter.runtime.ToDocumentValueConvertContext;
-import org.hibernate.search.engine.logging.impl.Log;
+import org.hibernate.search.engine.logging.impl.QueryLog;
 import org.hibernate.search.engine.reporting.spi.EventContexts;
 import org.hibernate.search.engine.search.common.spi.MultiIndexSearchIndexIdentifierContext;
 import org.hibernate.search.engine.search.common.spi.SearchIndexCompositeNodeContext;
@@ -26,7 +25,6 @@ import org.hibernate.search.engine.search.projection.spi.ProjectionMappedTypeCon
 import org.hibernate.search.engine.search.query.spi.SearchQueryIndexScope;
 import org.hibernate.search.util.common.SearchException;
 import org.hibernate.search.util.common.impl.Contracts;
-import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 import org.hibernate.search.util.common.reporting.EventContext;
 
 public abstract class AbstractSearchIndexScope<
@@ -35,8 +33,6 @@ public abstract class AbstractSearchIndexScope<
 		N extends SearchIndexNodeContext<? super S>,
 		C extends SearchIndexCompositeNodeContext<? super S>>
 		implements SearchIndexScope<S>, SearchQueryIndexScope<S> {
-
-	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	// Mapping context
 	protected final BackendMappingContext mappingContext;
@@ -156,7 +152,7 @@ public abstract class AbstractSearchIndexScope<
 			resultOrNull = createMultiIndexFieldContext( absoluteFieldPath );
 		}
 		if ( resultOrNull == null ) {
-			throw log.unknownFieldForSearch( absoluteFieldPath, indexesAndRootEventContext() );
+			throw QueryLog.INSTANCE.unknownFieldForSearch( absoluteFieldPath, indexesAndRootEventContext() );
 		}
 		return resultOrNull;
 	}
@@ -182,11 +178,10 @@ public abstract class AbstractSearchIndexScope<
 				firstField = fieldForCurrentIndex;
 			}
 			else if ( firstField.isComposite() != fieldForCurrentIndex.isComposite() ) {
-				SearchException cause = log.conflictingFieldModel();
-				throw log.inconsistentConfigurationInContextForSearch(
+				SearchException cause = QueryLog.INSTANCE.conflictingFieldModel();
+				throw QueryLog.INSTANCE.inconsistentConfigurationInContextForSearch(
 						EventContexts.fromIndexFieldAbsolutePath( absoluteFieldPath ), cause.getMessage(),
-						EventContexts.fromIndexNames( modelOfFirstField.hibernateSearchName(),
-								model.hibernateSearchName() ),
+						EventContexts.fromIndexNames( modelOfFirstField.hibernateSearchName(), model.hibernateSearchName() ),
 						cause );
 			}
 			fieldForEachIndex.add( fieldForCurrentIndex );

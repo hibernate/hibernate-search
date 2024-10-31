@@ -4,7 +4,6 @@
  */
 package org.hibernate.search.mapper.pojo.model.spi;
 
-import java.lang.invoke.MethodHandles;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
@@ -16,12 +15,9 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import org.hibernate.search.mapper.pojo.logging.impl.Log;
-import org.hibernate.search.util.common.logging.impl.LoggerFactory;
+import org.hibernate.search.mapper.pojo.logging.impl.MappingLog;
 
 public abstract class AbstractPojoRawTypeModel<T, I extends PojoBootstrapIntrospector> implements PojoRawTypeModel<T> {
-
-	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	protected final I introspector;
 	protected final PojoRawTypeIdentifier<T> typeIdentifier;
@@ -79,7 +75,7 @@ public abstract class AbstractPojoRawTypeModel<T, I extends PojoBootstrapIntrosp
 	public final PojoConstructorModel<T> mainConstructor() {
 		Collection<PojoConstructorModel<T>> theDeclaredConstructors = declaredConstructors();
 		if ( theDeclaredConstructors.size() != 1 ) {
-			throw log.cannotFindMainConstructorNotExactlyOneConstructor( this );
+			throw MappingLog.INSTANCE.cannotFindMainConstructorNotExactlyOneConstructor( this );
 		}
 		return theDeclaredConstructors.iterator().next();
 	}
@@ -91,7 +87,7 @@ public abstract class AbstractPojoRawTypeModel<T, I extends PojoBootstrapIntrosp
 				return constructor;
 			}
 		}
-		throw log.cannotFindConstructorWithParameterTypes( this, parameterTypes, declaredConstructors() );
+		throw MappingLog.INSTANCE.cannotFindConstructorWithParameterTypes( this, parameterTypes, declaredConstructors() );
 	}
 
 	@Override
@@ -108,7 +104,7 @@ public abstract class AbstractPojoRawTypeModel<T, I extends PojoBootstrapIntrosp
 	public final PojoPropertyModel<?> property(String propertyName) {
 		PojoPropertyModel<?> propertyModel = propertyOrNull( propertyName );
 		if ( propertyModel == null ) {
-			throw log.cannotFindReadableProperty( this, propertyName );
+			throw MappingLog.INSTANCE.cannotFindReadableProperty( this, propertyName );
 		}
 		return propertyModel;
 	}

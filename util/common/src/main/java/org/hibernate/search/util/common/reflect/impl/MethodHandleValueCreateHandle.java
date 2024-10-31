@@ -5,17 +5,13 @@
 package org.hibernate.search.util.common.reflect.impl;
 
 import java.lang.invoke.MethodHandle;
-import java.lang.invoke.MethodHandles;
 import java.lang.reflect.Member;
 
 import org.hibernate.search.util.common.impl.Throwables;
-import org.hibernate.search.util.common.logging.impl.Log;
-import org.hibernate.search.util.common.logging.impl.LoggerFactory;
+import org.hibernate.search.util.common.logging.impl.CommonFailuresLog;
 import org.hibernate.search.util.common.reflect.spi.ValueCreateHandle;
 
 public final class MethodHandleValueCreateHandle<T> implements ValueCreateHandle<T> {
-
-	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	private final Member member;
 	private final MethodHandle delegate;
@@ -57,7 +53,8 @@ public final class MethodHandleValueCreateHandle<T> implements ValueCreateHandle
 			if ( e instanceof InterruptedException ) {
 				Thread.currentThread().interrupt();
 			}
-			throw log.errorInvokingStaticMember( member, Throwables.safeToString( e, arguments ), e, e.getMessage() );
+			throw CommonFailuresLog.INSTANCE.errorInvokingStaticMember( member, Throwables.safeToString( e, arguments ), e,
+					e.getMessage() );
 		}
 	}
 

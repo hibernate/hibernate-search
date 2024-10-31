@@ -4,7 +4,6 @@
  */
 package org.hibernate.search.backend.elasticsearch.impl;
 
-import java.lang.invoke.MethodHandles;
 import java.util.Locale;
 import java.util.Optional;
 
@@ -16,7 +15,7 @@ import org.hibernate.search.backend.elasticsearch.client.spi.ElasticsearchClient
 import org.hibernate.search.backend.elasticsearch.dialect.impl.ElasticsearchDialectFactory;
 import org.hibernate.search.backend.elasticsearch.dialect.model.impl.ElasticsearchModelDialect;
 import org.hibernate.search.backend.elasticsearch.gson.spi.GsonProvider;
-import org.hibernate.search.backend.elasticsearch.logging.impl.Log;
+import org.hibernate.search.backend.elasticsearch.logging.impl.ConfigurationLog;
 import org.hibernate.search.backend.elasticsearch.mapping.TypeNameMappingStrategyName;
 import org.hibernate.search.backend.elasticsearch.mapping.impl.DiscriminatorTypeNameMapping;
 import org.hibernate.search.backend.elasticsearch.mapping.impl.IndexNameTypeNameMapping;
@@ -39,15 +38,12 @@ import org.hibernate.search.engine.environment.bean.BeanReference;
 import org.hibernate.search.engine.environment.bean.BeanResolver;
 import org.hibernate.search.util.common.AssertionFailure;
 import org.hibernate.search.util.common.impl.SuppressingCloser;
-import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 import org.hibernate.search.util.common.reporting.EventContext;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 
 public class ElasticsearchBackendFactory implements BackendFactory {
-
-	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	private static final OptionalConfigurationProperty<MultiTenancyStrategyName> MULTI_TENANCY_STRATEGY =
 			ConfigurationProperty.forKey( ElasticsearchBackendSettings.MULTI_TENANCY_STRATEGY )
@@ -95,7 +91,7 @@ public class ElasticsearchBackendFactory implements BackendFactory {
 					CLIENT_FACTORY.getAndMap( propertySource, beanResolver::resolve );
 			if ( customClientFactoryHolderOptional.isPresent() ) {
 				clientFactoryHolder = customClientFactoryHolderOptional.get();
-				log.debugf(
+				ConfigurationLog.INSTANCE.debugf(
 						"Elasticsearch backend will use client factory '%s'. Context: %s",
 						clientFactoryHolder, eventContext.render()
 				);
@@ -160,11 +156,11 @@ public class ElasticsearchBackendFactory implements BackendFactory {
 				propertySource, optionalName -> {
 					if ( MultiTenancyStrategyName.NONE.equals( optionalName )
 							&& buildContext.multiTenancyEnabled() ) {
-						throw log.multiTenancyRequiredButExplicitlyDisabledByBackend();
+						throw ConfigurationLog.INSTANCE.multiTenancyRequiredButExplicitlyDisabledByBackend();
 					}
 					if ( MultiTenancyStrategyName.DISCRIMINATOR.equals( optionalName )
 							&& !buildContext.multiTenancyEnabled() ) {
-						throw log.multiTenancyNotRequiredButExplicitlyEnabledByTheBackend();
+						throw ConfigurationLog.INSTANCE.multiTenancyNotRequiredButExplicitlyEnabledByTheBackend();
 					}
 					return optionalName;
 				} ).orElseGet( () -> {

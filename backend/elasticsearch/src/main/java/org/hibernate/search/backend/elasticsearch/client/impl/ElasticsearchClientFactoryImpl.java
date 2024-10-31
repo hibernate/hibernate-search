@@ -4,7 +4,6 @@
  */
 package org.hibernate.search.backend.elasticsearch.client.impl;
 
-import java.lang.invoke.MethodHandles;
 import java.util.List;
 import java.util.Optional;
 
@@ -15,7 +14,7 @@ import org.hibernate.search.backend.elasticsearch.client.ElasticsearchHttpClient
 import org.hibernate.search.backend.elasticsearch.client.spi.ElasticsearchClientFactory;
 import org.hibernate.search.backend.elasticsearch.client.spi.ElasticsearchClientImplementor;
 import org.hibernate.search.backend.elasticsearch.gson.spi.GsonProvider;
-import org.hibernate.search.backend.elasticsearch.logging.impl.Log;
+import org.hibernate.search.backend.elasticsearch.logging.impl.ElasticsearchClientLog;
 import org.hibernate.search.engine.cfg.ConfigurationPropertySource;
 import org.hibernate.search.engine.cfg.spi.ConfigurationProperty;
 import org.hibernate.search.engine.cfg.spi.OptionalConfigurationProperty;
@@ -25,7 +24,6 @@ import org.hibernate.search.engine.environment.bean.BeanReference;
 import org.hibernate.search.engine.environment.bean.BeanResolver;
 import org.hibernate.search.engine.environment.thread.spi.ThreadProvider;
 import org.hibernate.search.util.common.impl.SuppressingCloser;
-import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
 import org.apache.http.auth.AuthScope;
 import org.apache.http.auth.UsernamePasswordCredentials;
@@ -44,8 +42,6 @@ import org.elasticsearch.client.sniff.SnifferBuilder;
  * @author Gunnar Morling
  */
 public class ElasticsearchClientFactoryImpl implements ElasticsearchClientFactory {
-
-	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	private static final OptionalConfigurationProperty<BeanReference<? extends RestClient>> CLIENT_INSTANCE =
 			ConfigurationProperty.forKey( ElasticsearchBackendSpiSettings.CLIENT_INSTANCE )
@@ -256,7 +252,7 @@ public class ElasticsearchClientFactoryImpl implements ElasticsearchClientFactor
 		if ( username.isPresent() ) {
 			Optional<String> password = PASSWORD.get( propertySource );
 			if ( password.isPresent() && !hosts.isSslEnabled() ) {
-				log.usingPasswordOverHttp();
+				ElasticsearchClientLog.INSTANCE.usingPasswordOverHttp();
 			}
 
 			BasicCredentialsProvider credentialsProvider = new BasicCredentialsProvider();

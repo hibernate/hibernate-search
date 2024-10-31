@@ -4,9 +4,7 @@
  */
 package org.hibernate.search.backend.lucene.types.sort.impl;
 
-import java.lang.invoke.MethodHandles;
-
-import org.hibernate.search.backend.lucene.logging.impl.Log;
+import org.hibernate.search.backend.lucene.logging.impl.QueryLog;
 import org.hibernate.search.backend.lucene.lowlevel.docvalues.impl.MultiValueMode;
 import org.hibernate.search.backend.lucene.search.common.impl.AbstractLuceneValueFieldSearchQueryElementFactory;
 import org.hibernate.search.backend.lucene.search.common.impl.LuceneSearchIndexScope;
@@ -19,14 +17,12 @@ import org.hibernate.search.engine.search.sort.dsl.SortOrder;
 import org.hibernate.search.engine.search.sort.spi.DistanceSortBuilder;
 import org.hibernate.search.engine.spatial.GeoPoint;
 import org.hibernate.search.util.common.AssertionFailure;
-import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
 import org.apache.lucene.search.Query;
 import org.apache.lucene.util.SloppyMath;
 
 public class LuceneGeoPointDistanceSort extends AbstractLuceneDocumentValueSort {
 
-	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 	private final double effectiveMissingValue;
 	private final GeoPoint center;
 
@@ -101,7 +97,7 @@ public class LuceneGeoPointDistanceSort extends AbstractLuceneDocumentValueSort 
 					break;
 				case SUM:
 				default:
-					throw log.invalidSortModeForDistanceSort( mode, getEventContext() );
+					throw QueryLog.INSTANCE.invalidSortModeForDistanceSort( mode, getEventContext() );
 			}
 		}
 

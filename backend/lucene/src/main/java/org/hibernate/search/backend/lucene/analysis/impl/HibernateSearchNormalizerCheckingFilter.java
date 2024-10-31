@@ -5,18 +5,14 @@
 package org.hibernate.search.backend.lucene.analysis.impl;
 
 import java.io.IOException;
-import java.lang.invoke.MethodHandles;
 
-import org.hibernate.search.backend.lucene.logging.impl.Log;
-import org.hibernate.search.util.common.logging.impl.LoggerFactory;
+import org.hibernate.search.backend.lucene.logging.impl.AnalyzerLog;
 
 import org.apache.lucene.analysis.TokenFilter;
 import org.apache.lucene.analysis.TokenStream;
 import org.apache.lucene.analysis.tokenattributes.CharTermAttribute;
 
 final class HibernateSearchNormalizerCheckingFilter extends TokenFilter {
-
-	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	private static final char TOKEN_SEPARATOR = ' ';
 
@@ -60,7 +56,7 @@ final class HibernateSearchNormalizerCheckingFilter extends TokenFilter {
 
 		if ( tokenCount > 1 ) {
 			termAtt.setEmpty().append( concatenatedTokenBuilder );
-			log.normalizerProducedMultipleTokens( normalizerName, tokenCount );
+			AnalyzerLog.INSTANCE.normalizerProducedMultipleTokens( normalizerName, tokenCount );
 		}
 
 		return tokenCount > 0;

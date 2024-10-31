@@ -4,7 +4,6 @@
  */
 package org.hibernate.search.util.common.reflect.impl;
 
-import java.lang.invoke.MethodHandles;
 import java.lang.reflect.GenericArrayType;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
@@ -17,8 +16,7 @@ import java.util.Optional;
 
 import org.hibernate.search.util.common.AssertionFailure;
 import org.hibernate.search.util.common.impl.Contracts;
-import org.hibernate.search.util.common.logging.impl.Log;
-import org.hibernate.search.util.common.logging.impl.LoggerFactory;
+import org.hibernate.search.util.common.logging.impl.CommonFailuresLog;
 
 /**
  * A representation of generic parameters and their mapped values.
@@ -56,8 +54,6 @@ import org.hibernate.search.util.common.logging.impl.LoggerFactory;
  * replace type variables with their known value, unlike other libraries such as Guava.
  */
 public final class GenericTypeContext {
-
-	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	private final Type resolvedType;
 	private final GenericTypeContext declaringContext;
@@ -153,13 +149,15 @@ public final class GenericTypeContext {
 		TypeVariable<? extends Class<?>>[] typeParameters = rawSuperType.getTypeParameters();
 		int typeParametersLength = typeParameters.length;
 		if ( typeParametersLength == 0 ) {
-			throw log.cannotRequestTypeParameterOfUnparameterizedType( resolvedType, rawSuperType, typeParameterIndex );
+			throw CommonFailuresLog.INSTANCE.cannotRequestTypeParameterOfUnparameterizedType( resolvedType, rawSuperType,
+					typeParameterIndex );
 		}
 		else if ( typeParametersLength <= typeParameterIndex ) {
-			throw log.typeParameterIndexOutOfBound( resolvedType, rawSuperType, typeParameterIndex, typeParametersLength );
+			throw CommonFailuresLog.INSTANCE.typeParameterIndexOutOfBound( resolvedType, rawSuperType, typeParameterIndex,
+					typeParametersLength );
 		}
 		else if ( typeParameterIndex < 0 ) {
-			throw log.invalidTypeParameterIndex( resolvedType, rawSuperType, typeParameterIndex );
+			throw CommonFailuresLog.INSTANCE.invalidTypeParameterIndex( resolvedType, rawSuperType, typeParameterIndex );
 		}
 
 		TypeVariable<?> typeVariable = typeParameters[typeParameterIndex];

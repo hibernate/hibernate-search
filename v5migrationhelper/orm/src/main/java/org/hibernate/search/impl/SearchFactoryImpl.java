@@ -15,8 +15,8 @@ import org.hibernate.search.mapper.orm.entity.SearchIndexedEntity;
 import org.hibernate.search.mapper.orm.mapping.SearchMapping;
 import org.hibernate.search.query.dsl.QueryContextBuilder;
 import org.hibernate.search.spi.SearchIntegrator;
-import org.hibernate.search.util.logging.impl.Log;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
+import org.hibernate.search.util.logging.impl.MigrationHelperLog;
 
 import org.apache.lucene.analysis.Analyzer;
 
@@ -28,7 +28,7 @@ import org.apache.lucene.analysis.Analyzer;
  */
 final class SearchFactoryImpl implements SearchFactory {
 
-	public static final Log log = LoggerFactory.make( MethodHandles.lookup() );
+	public static final MigrationHelperLog log = LoggerFactory.make( MethodHandles.lookup() );
 
 	private final V5MigrationOrmSearchIntegratorAdapter searchIntegrator;
 

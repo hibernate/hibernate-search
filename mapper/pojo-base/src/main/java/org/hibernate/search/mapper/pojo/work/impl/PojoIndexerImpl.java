@@ -4,7 +4,6 @@
  */
 package org.hibernate.search.mapper.pojo.work.impl;
 
-import java.lang.invoke.MethodHandles;
 import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentHashMap;
@@ -12,16 +11,13 @@ import java.util.concurrent.ConcurrentHashMap;
 import org.hibernate.search.engine.backend.work.execution.DocumentCommitStrategy;
 import org.hibernate.search.engine.backend.work.execution.DocumentRefreshStrategy;
 import org.hibernate.search.engine.backend.work.execution.OperationSubmitter;
-import org.hibernate.search.mapper.pojo.logging.impl.Log;
+import org.hibernate.search.mapper.pojo.logging.impl.IndexingLog;
 import org.hibernate.search.mapper.pojo.model.spi.PojoRawTypeIdentifier;
 import org.hibernate.search.mapper.pojo.route.DocumentRoutesDescriptor;
 import org.hibernate.search.mapper.pojo.work.spi.PojoIndexer;
 import org.hibernate.search.mapper.pojo.work.spi.PojoWorkSessionContext;
-import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
 public class PojoIndexerImpl implements PojoIndexer {
-
-	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	private final PojoWorkTypeContextProvider typeContextProvider;
 	private final PojoWorkSessionContext sessionContext;
@@ -40,7 +36,7 @@ public class PojoIndexerImpl implements PojoIndexer {
 			Object entity, DocumentCommitStrategy commitStrategy, DocumentRefreshStrategy refreshStrategy,
 			OperationSubmitter operationSubmitter) {
 		if ( entity == null ) {
-			throw log.nullEntityForIndexerAddOrUpdate();
+			throw IndexingLog.INSTANCE.nullEntityForIndexerAddOrUpdate();
 		}
 		return getDelegate( typeIdentifier )
 				.add( providedId, providedRoutes, entity, commitStrategy, refreshStrategy, operationSubmitter );
@@ -52,7 +48,7 @@ public class PojoIndexerImpl implements PojoIndexer {
 			DocumentCommitStrategy commitStrategy, DocumentRefreshStrategy refreshStrategy,
 			OperationSubmitter operationSubmitter) {
 		if ( entity == null ) {
-			throw log.nullEntityForIndexerAddOrUpdate();
+			throw IndexingLog.INSTANCE.nullEntityForIndexerAddOrUpdate();
 		}
 		return getDelegate( typeIdentifier )
 				.addOrUpdate( providedId, providedRoutes, entity, commitStrategy, refreshStrategy, operationSubmitter );

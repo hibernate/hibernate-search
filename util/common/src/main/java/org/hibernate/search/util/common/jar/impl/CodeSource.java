@@ -8,7 +8,6 @@ import java.io.Closeable;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
-import java.lang.invoke.MethodHandles;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.net.URI;
@@ -29,12 +28,9 @@ import org.hibernate.search.util.common.annotation.impl.SuppressForbiddenApis;
 import org.hibernate.search.util.common.impl.Closer;
 import org.hibernate.search.util.common.impl.SuppressingCloser;
 import org.hibernate.search.util.common.impl.Throwables;
-import org.hibernate.search.util.common.logging.impl.Log;
-import org.hibernate.search.util.common.logging.impl.LoggerFactory;
+import org.hibernate.search.util.common.logging.impl.CommonFailuresLog;
 
 class CodeSource implements Closeable {
-
-	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	private static final String JAR_URI_PATH_SEPARATOR = "!/";
 	// Starting with Spring Boot 3.2 the nested jars in a repackaged app will be using an url structure as:
@@ -55,13 +51,13 @@ class CodeSource implements Closeable {
 					return (FileSystem) newFileSystem.invoke( null, path, Collections.emptyMap() );
 				}
 				catch (IllegalAccessException | InvocationTargetException e) {
-					throw log.cannotOpenNestedJar( jarUri, e );
+					throw CommonFailuresLog.INSTANCE.cannotOpenNestedJar( jarUri, e );
 				}
 			};
 		}
 		catch (NoSuchMethodException ignored) {
 			creator = (path, jarUri) -> {
-				throw log.cannotOpenNestedJar( jarUri, null );
+				throw CommonFailuresLog.INSTANCE.cannotOpenNestedJar( jarUri, null );
 			};
 		}
 		NESTED_JAR_FILESYSTEM_CREATOR = creator;
@@ -163,11 +159,11 @@ class CodeSource implements Closeable {
 				}
 			}
 			else {
-				throw log.cannotInterpretCodeSourceUrl( codeSourceLocation );
+				throw CommonFailuresLog.INSTANCE.cannotInterpretCodeSourceUrl( codeSourceLocation );
 			}
 		}
 		catch (RuntimeException | URISyntaxException | IOException e) {
-			throw log.cannotOpenCodeSourceFileSystem( codeSourceLocation, e.getMessage(), e );
+			throw CommonFailuresLog.INSTANCE.cannotOpenCodeSourceFileSystem( codeSourceLocation, e.getMessage(), e );
 		}
 	}
 

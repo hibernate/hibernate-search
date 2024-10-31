@@ -4,7 +4,6 @@
  */
 package org.hibernate.search.mapper.pojo.mapping.definition.programmatic.impl;
 
-import java.lang.invoke.MethodHandles;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
@@ -13,19 +12,16 @@ import org.hibernate.search.engine.backend.common.spi.FieldPaths;
 import org.hibernate.search.engine.backend.types.ObjectStructure;
 import org.hibernate.search.engine.common.tree.TreeFilterDefinition;
 import org.hibernate.search.mapper.pojo.extractor.mapping.programmatic.ContainerExtractorPath;
-import org.hibernate.search.mapper.pojo.logging.impl.Log;
+import org.hibernate.search.mapper.pojo.logging.impl.MappingLog;
 import org.hibernate.search.mapper.pojo.mapping.building.spi.PojoIndexMappingCollectorPropertyNode;
 import org.hibernate.search.mapper.pojo.mapping.building.spi.PojoPropertyMetadataContributor;
 import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.PropertyMappingIndexedEmbeddedStep;
 import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.PropertyMappingStep;
 import org.hibernate.search.mapper.pojo.model.spi.PojoRawTypeIdentifier;
 import org.hibernate.search.util.common.annotation.Search5DeprecatedAPI;
-import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
 class PropertyMappingIndexedEmbeddedStepImpl extends DelegatingPropertyMappingStep
 		implements PropertyMappingIndexedEmbeddedStep, PojoPropertyMetadataContributor {
-
-	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	private final PojoRawTypeIdentifier<?> definingType;
 
@@ -49,7 +45,7 @@ class PropertyMappingIndexedEmbeddedStepImpl extends DelegatingPropertyMappingSt
 		super( parent );
 		this.definingType = definingType;
 		if ( relativeFieldName != null && relativeFieldName.contains( FieldPaths.PATH_SEPARATOR_STRING ) ) {
-			throw log.invalidFieldNameDotNotAllowed( relativeFieldName );
+			throw MappingLog.INSTANCE.invalidFieldNameDotNotAllowed( relativeFieldName );
 		}
 		this.relativeFieldName = relativeFieldName;
 	}
@@ -75,7 +71,7 @@ class PropertyMappingIndexedEmbeddedStepImpl extends DelegatingPropertyMappingSt
 	@Search5DeprecatedAPI
 	public PropertyMappingIndexedEmbeddedStep prefix(String prefix) {
 		if ( relativeFieldName != null && prefix != null ) {
-			throw log.cannotSetBothIndexedEmbeddedNameAndPrefix( relativeFieldName, prefix );
+			throw MappingLog.INSTANCE.cannotSetBothIndexedEmbeddedNameAndPrefix( relativeFieldName, prefix );
 		}
 		this.prefix = prefix;
 		return this;

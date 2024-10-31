@@ -4,7 +4,6 @@
  */
 package org.hibernate.search.mapper.pojo.search.definition.binding.builtin;
 
-import java.lang.invoke.MethodHandles;
 import java.util.Optional;
 import java.util.function.Function;
 
@@ -13,11 +12,10 @@ import org.hibernate.search.engine.search.projection.SearchProjection;
 import org.hibernate.search.engine.search.projection.definition.ProjectionDefinitionContext;
 import org.hibernate.search.engine.search.projection.definition.spi.AbstractProjectionDefinition;
 import org.hibernate.search.engine.search.projection.dsl.SearchProjectionFactory;
-import org.hibernate.search.mapper.pojo.logging.impl.Log;
+import org.hibernate.search.mapper.pojo.logging.impl.ProjectionLog;
 import org.hibernate.search.mapper.pojo.model.PojoModelValue;
 import org.hibernate.search.mapper.pojo.search.definition.binding.ProjectionBinder;
 import org.hibernate.search.mapper.pojo.search.definition.binding.ProjectionBindingContext;
-import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 import org.hibernate.search.util.common.spi.ToStringTreeAppender;
 
 /**
@@ -29,7 +27,6 @@ import org.hibernate.search.util.common.spi.ToStringTreeAppender;
  * @see org.hibernate.search.mapper.pojo.mapping.definition.annotation.HighlightProjection
  */
 public final class HighlightProjectionBinder implements ProjectionBinder {
-	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	/**
 	 * Creates a {@link HighlightProjectionBinder} to be passed
@@ -102,7 +99,7 @@ public final class HighlightProjectionBinder implements ProjectionBinder {
 		}
 		Optional<String> paramName = context.constructorParameter().name();
 		if ( paramName.isEmpty() ) {
-			throw log.missingParameterNameForHighlightProjectionInProjectionConstructor();
+			throw ProjectionLog.INSTANCE.missingParameterNameForHighlightProjectionInProjectionConstructor();
 		}
 		return paramName.get();
 	}

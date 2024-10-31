@@ -5,9 +5,8 @@
 package org.hibernate.search.backend.lucene.search.projection.impl;
 
 import java.io.IOException;
-import java.lang.invoke.MethodHandles;
 
-import org.hibernate.search.backend.lucene.logging.impl.Log;
+import org.hibernate.search.backend.lucene.logging.impl.QueryLog;
 import org.hibernate.search.backend.lucene.lowlevel.collector.impl.TopDocsDataCollectorExecutionContext;
 import org.hibernate.search.backend.lucene.lowlevel.collector.impl.Values;
 import org.hibernate.search.backend.lucene.lowlevel.docvalues.impl.GeoPointDistanceDocValues;
@@ -22,7 +21,6 @@ import org.hibernate.search.engine.search.projection.SearchProjection;
 import org.hibernate.search.engine.search.projection.spi.DistanceToFieldProjectionBuilder;
 import org.hibernate.search.engine.spatial.DistanceUnit;
 import org.hibernate.search.engine.spatial.GeoPoint;
-import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
 import org.apache.lucene.index.DocValues;
 import org.apache.lucene.index.IndexableField;
@@ -95,7 +93,7 @@ public class LuceneDistanceToFieldProjection<P> extends AbstractLuceneProjection
 		else {
 			context.checkValidField( absoluteFieldPath );
 			if ( !context.projectionCardinalityCorrectlyAddressed( requiredContextAbsoluteFieldPath ) ) {
-				throw log.invalidSingleValuedProjectionOnValueFieldInMultiValuedObjectField(
+				throw QueryLog.INSTANCE.invalidSingleValuedProjectionOnValueFieldInMultiValuedObjectField(
 						absoluteFieldPath, requiredContextAbsoluteFieldPath );
 			}
 			return new DocValuesBasedDistanceExtractor<>( collectorProvider.get(),
@@ -201,8 +199,6 @@ public class LuceneDistanceToFieldProjection<P> extends AbstractLuceneProjection
 	public static class Builder extends AbstractLuceneProjection.AbstractBuilder<Double>
 			implements DistanceToFieldProjectionBuilder {
 
-		private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
-
 		private final LuceneFieldCodec<GeoPoint, ?> codec;
 
 		private final LuceneSearchIndexValueFieldContext<GeoPoint> field;
@@ -230,7 +226,8 @@ public class LuceneDistanceToFieldProjection<P> extends AbstractLuceneProjection
 		@Override
 		public <P> SearchProjection<P> build(ProjectionCollector.Provider<Double, P> collectorProvider) {
 			if ( collectorProvider.isSingleValued() && field.multiValued() ) {
-				throw log.invalidSingleValuedProjectionOnMultiValuedField( field.absolutePath(), field.eventContext() );
+				throw QueryLog.INSTANCE.invalidSingleValuedProjectionOnMultiValuedField( field.absolutePath(),
+						field.eventContext() );
 			}
 			return new LuceneDistanceToFieldProjection<>( this, collectorProvider );
 		}
