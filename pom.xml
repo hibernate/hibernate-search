@@ -278,21 +278,21 @@
         <version.compiler.plugin>3.13.0</version.compiler.plugin>
         <version.dependency.plugin>3.8.1</version.dependency.plugin>
         <!-- Check dependencies for security vulnerabilities -->
-        <version.dependency-check.plugin>11.0.0</version.dependency-check.plugin>
+        <version.dependency-check.plugin>11.1.0</version.dependency-check.plugin>
         <version.exec.plugin>3.5.0</version.exec.plugin>
         <version.forbiddenapis.plugin>3.8</version.forbiddenapis.plugin>
         <!-- Make sure that upgraded Jandex plugin aligns with the Jandex version imported from the ORM platform pom -->
         <version.jandex.plugin>3.2.3</version.jandex.plugin>
         <version.maven.injection.plugin>1.0.2</version.maven.injection.plugin>
         <version.jar.plugin>3.4.2</version.jar.plugin>
-        <version.javadoc.plugin>3.10.1</version.javadoc.plugin>
+        <version.javadoc.plugin>3.11.1</version.javadoc.plugin>
         <version.jdeps.plugin>0.5.1</version.jdeps.plugin>
         <version.processor.plugin>5.1</version.processor.plugin>
         <version.resources.plugin>3.3.1</version.resources.plugin>
         <version.shade.plugin>3.6.0</version.shade.plugin>
         <version.source.plugin>3.3.1</version.source.plugin>
         <!-- Surefire versions are a minefield of bugs: be careful with upgrades -->
-        <version.surefire.plugin>3.5.1</version.surefire.plugin>
+        <version.surefire.plugin>3.5.2</version.surefire.plugin>
         <version.surefire.plugin.java-version.asm>9.7.1</version.surefire.plugin.java-version.asm>
         <version.jacoco.plugin>0.8.12</version.jacoco.plugin>
         <version.com.buschmais.jqassistant.plugin>2.5.0</version.com.buschmais.jqassistant.plugin>
@@ -300,7 +300,7 @@
         <version.sonar.plugin>4.0.0.4121</version.sonar.plugin>
         <version.scripting.plugin>3.0.0</version.scripting.plugin>
         <version.org.apache.groovy.groovy-jsr223>4.0.13</version.org.apache.groovy.groovy-jsr223>
-        <version.com.puppycrawl.tools.checkstyle>10.19.0</version.com.puppycrawl.tools.checkstyle>
+        <version.com.puppycrawl.tools.checkstyle>10.20.0</version.com.puppycrawl.tools.checkstyle>
         <version.versions.plugin>2.17.1</version.versions.plugin>
         <version.maven-wrapper-plugin>3.3.2</version.maven-wrapper-plugin>
         <version.org.eclipse.m2e.lifecycle-mapping>1.0.0</version.org.eclipse.m2e.lifecycle-mapping>
@@ -345,7 +345,7 @@
 
         <!-- Asciidoctor -->
 
-        <version.asciidoctor.plugin>3.0.0</version.asciidoctor.plugin>
+        <version.asciidoctor.plugin>3.1.0</version.asciidoctor.plugin>
         <version.org.hibernate.infra.hibernate-asciidoctor-theme>5.0.2.Final</version.org.hibernate.infra.hibernate-asciidoctor-theme>
         <version.org.asciidoctor.asciidoctorj>3.0.0</version.org.asciidoctor.asciidoctorj>
         <version.org.asciidoctor.asciidoctorj-pdf>2.3.19</version.org.asciidoctor.asciidoctorj-pdf>
