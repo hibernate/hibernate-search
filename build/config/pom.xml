@@ -200,7 +200,7 @@
                             <goal>java</goal>
                         </goals>
                         <configuration>
-                            <mainClass>org.hibernate.checkstyle.report.AnnotationReportGenerator</mainClass>
+                            <mainClass>org.hibernate.search.build.report.forbiddenapis.AnnotationReportGenerator</mainClass>
                             <arguments>
                                 <!-- The location of classes to process: -->
                                 <argument>${tmpdir.dependencies-to-parse}/hibernate-core</argument>
@@ -256,7 +256,7 @@
                             <goal>java</goal>
                         </goals>
                         <configuration>
-                            <mainClass>org.hibernate.checkstyle.report.InternalReportGenerator</mainClass>
+                            <mainClass>org.hibernate.search.build.report.forbiddenapis.InternalReportGenerator</mainClass>
                             <arguments>
                                 <!-- The location of classes to process: -->
                                 <argument>${tmpdir.dependencies-to-parse}/hibernate-core</argument>
