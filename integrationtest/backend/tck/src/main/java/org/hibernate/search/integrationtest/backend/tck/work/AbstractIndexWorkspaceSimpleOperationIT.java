@@ -4,9 +4,9 @@
  */
 package org.hibernate.search.integrationtest.backend.tck.work;
 
-import static org.hibernate.search.integrationtest.backend.tck.reporting.TestLog.TCK_LOGGER;
 import static org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMapperUtils.documentProvider;
 import static org.hibernate.search.util.impl.test.FutureAssert.assertThatFuture;
+import static org.hibernate.search.util.impl.test.logging.impl.TestLog.TEST_LOGGER;
 
 import java.io.IOException;
 import java.util.concurrent.CompletableFuture;
@@ -77,7 +77,7 @@ public abstract class AbstractIndexWorkspaceSimpleOperationIT {
 			setupHelper.cleanUp();
 		}
 		catch (RuntimeException | IOException e) {
-			TCK_LOGGER.debug( "Expected error while shutting down Hibernate Search, caused by the deletion of an index", e );
+			TEST_LOGGER.debug( "Expected error while shutting down Hibernate Search, caused by the deletion of an index", e );
 		}
 	}
 

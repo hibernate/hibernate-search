@@ -7,7 +7,7 @@ package org.hibernate.search.integrationtest.mapper.orm.automaticindexing.sessio
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.assertj.core.api.Assertions.fail;
-import static org.hibernate.search.integrationtest.mapper.orm.logging.impl.TestLog.TEST_LOGGER;
+import static org.hibernate.search.integrationtest.mapper.orm.automaticindexing.session.IndexingPlanSynchronizationStrategyIT.indexingFailure;
 import static org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmUtils.with;
 import static org.hibernate.search.util.impl.test.FutureAssert.assertThatFuture;
 
@@ -675,7 +675,7 @@ class AutomaticIndexingSynchronizationStrategyIT {
 					org.hibernate.search.mapper.orm.work.SearchIndexingPlanExecutionReport report =
 							future.get( SMALL_DURATION_VALUE, SMALL_DURATION_UNIT );
 					report.throwable().ifPresent( t -> {
-						throw TEST_LOGGER.indexingFailure( t.getMessage(), report.failingEntities(), t );
+						throw indexingFailure( t, report.failingEntities() );
 					} );
 				}
 				catch (TimeoutException e) {

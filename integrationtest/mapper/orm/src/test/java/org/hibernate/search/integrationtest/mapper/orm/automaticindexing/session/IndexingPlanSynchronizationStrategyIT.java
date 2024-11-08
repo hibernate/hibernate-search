@@ -7,10 +7,10 @@ package org.hibernate.search.integrationtest.mapper.orm.automaticindexing.sessio
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.assertj.core.api.Assertions.fail;
-import static org.hibernate.search.integrationtest.mapper.orm.logging.impl.TestLog.TEST_LOGGER;
 import static org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmUtils.with;
 import static org.hibernate.search.util.impl.test.FutureAssert.assertThatFuture;
 
+import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
@@ -36,6 +36,7 @@ import org.hibernate.search.mapper.pojo.work.IndexingPlanSynchronizationStrategy
 import org.hibernate.search.mapper.pojo.work.IndexingPlanSynchronizationStrategyNames;
 import org.hibernate.search.mapper.pojo.work.SearchIndexingPlanExecutionReport;
 import org.hibernate.search.util.common.SearchException;
+import org.hibernate.search.util.common.annotation.impl.SuppressForbiddenApis;
 import org.hibernate.search.util.common.impl.Throwables;
 import org.hibernate.search.util.impl.integrationtest.common.extension.BackendMock;
 import org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmSetupHelper;
@@ -48,6 +49,7 @@ import org.apache.logging.log4j.Level;
 import org.assertj.core.api.InstanceOfAssertFactories;
 import org.awaitility.Awaitility;
 import org.hamcrest.CoreMatchers;
+import org.jetbrains.annotations.NotNull;
 
 class IndexingPlanSynchronizationStrategyIT {
 
@@ -677,7 +679,7 @@ class IndexingPlanSynchronizationStrategyIT {
 					future.get( SMALL_DURATION_VALUE, SMALL_DURATION_UNIT );
 					SearchIndexingPlanExecutionReport report = future.get( SMALL_DURATION_VALUE, SMALL_DURATION_UNIT );
 					report.throwable().ifPresent( t -> {
-						throw TEST_LOGGER.indexingFailure( t.getMessage(), report.failingEntities(), t );
+						throw indexingFailure( t, report.failingEntities() );
 					} );
 				}
 				catch (TimeoutException e) {
@@ -696,5 +698,13 @@ class IndexingPlanSynchronizationStrategyIT {
 				}
 			} );
 		}
+	}
+
+	@SuppressForbiddenApis(reason = "Just an exception in the tests instead of adding methods to test logger.")
+	static @NotNull SearchException indexingFailure(Throwable t, List<?> failingEntities) {
+		return new SearchException( String.format(
+				"Indexing failure: %1$s.\nThe following entities may not have been updated correctly in the index: %2$s.",
+				t.getMessage(), failingEntities
+		), t );
 	}
 }

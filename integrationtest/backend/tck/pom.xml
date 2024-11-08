@@ -25,14 +25,6 @@
             <groupId>org.hibernate.search</groupId>
             <artifactId>hibernate-search-util-internal-integrationtest-mapper-stub</artifactId>
         </dependency>
-        <dependency>
-            <groupId>org.jboss.logging</groupId>
-            <artifactId>jboss-logging</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.jboss.logging</groupId>
-            <artifactId>jboss-logging-annotations</artifactId>
-        </dependency>
     </dependencies>
 
 </project>

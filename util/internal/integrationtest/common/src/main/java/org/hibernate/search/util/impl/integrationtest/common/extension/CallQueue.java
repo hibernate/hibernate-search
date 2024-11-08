@@ -5,7 +5,7 @@
 package org.hibernate.search.util.impl.integrationtest.common.extension;
 
 import static org.assertj.core.api.Assertions.fail;
-import static org.hibernate.search.util.impl.integrationtest.common.reporting.TestLog.BACKEND_TEST_LOGGER;
+import static org.hibernate.search.util.impl.test.logging.impl.TestLog.TEST_LOGGER;
 
 import java.util.ArrayList;
 import java.util.Deque;
@@ -48,19 +48,19 @@ public class CallQueue<C extends Call<? super C>> {
 	}
 
 	public void expectInOrder(C expectedCall) {
-		BACKEND_TEST_LOGGER.tracef( "Expecting %s", expectedCall );
+		TEST_LOGGER.tracef( "Expecting %s", expectedCall );
 		callsExpectedInOrder.addLast( expectedCall );
 	}
 
 	public void expectOutOfOrder(C expectedCall) {
-		BACKEND_TEST_LOGGER.tracef( "Expecting %s", expectedCall );
+		TEST_LOGGER.tracef( "Expecting %s", expectedCall );
 		callsExpectedOutOfOrder.add( expectedCall );
 	}
 
 	public final synchronized <C2 extends C, T> T verify(C2 actualCall, BiFunction<C, C2, CallBehavior<T>> callVerifyFunction,
 			Function<C2, T> noExpectationBehavior) {
 		try {
-			BACKEND_TEST_LOGGER.tracef( "Verifying %s", actualCall );
+			TEST_LOGGER.tracef( "Verifying %s", actualCall );
 			return tryVerify( actualCall, callVerifyFunction, noExpectationBehavior );
 		}
 		catch (AssertionError e) {
