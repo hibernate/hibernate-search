@@ -90,6 +90,8 @@ public final class SearchBackendContainer {
 				// Older images require HTTP authentication for all requests;
 				// it's not practical for testing, so we disable that:
 				.withEnv( "xpack.security.enabled", "false" )
+				// Prevent swapping
+				.withEnv( "bootstrap.memory_lock", "true" )
 				// Limit the RAM usage.
 				// Recent versions of ES limit themselves to 50% of the total available RAM,
 				// but on CI this is sometimes too much, as we also have the Maven JVM
