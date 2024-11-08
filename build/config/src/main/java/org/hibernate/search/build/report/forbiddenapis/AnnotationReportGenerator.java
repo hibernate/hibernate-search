@@ -2,9 +2,9 @@
  * SPDX-License-Identifier: Apache-2.0
  * Copyright Red Hat Inc. and Hibernate Authors
  */
-package org.hibernate.checkstyle.report;
+package org.hibernate.search.build.report.forbiddenapis;
 
-import static org.hibernate.checkstyle.report.ReportGeneratorHelper.createIndex;
+import static org.hibernate.search.build.report.forbiddenapis.ReportGeneratorHelper.createIndex;
 
 import java.io.FileOutputStream;
 import java.io.IOException;

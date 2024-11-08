@@ -102,7 +102,7 @@
 		</module>
 	</module>
 
-	<module name="org.hibernate.checkstyle.filters.ExcludeTestPackages" />
+	<module name="org.hibernate.search.build.checkstyle.filters.ExcludeTestPackages" />
 
 	<module name="RegexpSingleline">
 		<!-- not using an "illegal import" rule as the java.lang package doesn't need to be imported -->

@@ -2,7 +2,7 @@
  * SPDX-License-Identifier: Apache-2.0
  * Copyright Red Hat Inc. and Hibernate Authors
  */
-package org.hibernate.checkstyle.filters;
+package org.hibernate.search.build.checkstyle.filters;
 
 import java.io.File;
 
