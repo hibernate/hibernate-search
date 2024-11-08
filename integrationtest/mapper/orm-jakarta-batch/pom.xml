@@ -81,16 +81,6 @@
             <artifactId>hibernate-search-util-internal-integrationtest-jberet-se</artifactId>
             <scope>test</scope>
         </dependency>
-        <dependency>
-            <groupId>org.jboss.logging</groupId>
-            <artifactId>jboss-logging</artifactId>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.jboss.logging</groupId>
-            <artifactId>jboss-logging-annotations</artifactId>
-            <scope>test</scope>
-        </dependency>
 
         <!--
             Leave this dependency here, not in a utils module, so that we don't need to recompile

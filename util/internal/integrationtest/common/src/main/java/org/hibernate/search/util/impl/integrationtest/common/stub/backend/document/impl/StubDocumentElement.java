@@ -4,7 +4,7 @@
  */
 package org.hibernate.search.util.impl.integrationtest.common.stub.backend.document.impl;
 
-import static org.hibernate.search.util.impl.integrationtest.common.reporting.TestLog.BACKEND_TEST_LOGGER;
+import static org.hibernate.search.util.impl.test.logging.impl.TestLog.TEST_LOGGER;
 
 import org.hibernate.search.engine.backend.document.DocumentElement;
 import org.hibernate.search.engine.backend.document.IndexFieldReference;
@@ -25,7 +25,7 @@ public class StubDocumentElement implements DocumentElement {
 	public <F> void addValue(IndexFieldReference<F> fieldReference, F value) {
 		StubIndexFieldReference<F> stubFieldReference = (StubIndexFieldReference<F>) fieldReference;
 		if ( TreeNodeInclusion.EXCLUDED.equals( stubFieldReference.getInclusion() ) ) {
-			BACKEND_TEST_LOGGER.tracev(
+			TEST_LOGGER.tracev(
 					"Ignoring write on document element {}, field '{}' with value '{}'" +
 							" because the field was excluded during bootstrap.",
 					this, stubFieldReference.getAbsolutePath(), value
@@ -39,7 +39,7 @@ public class StubDocumentElement implements DocumentElement {
 	public DocumentElement addObject(IndexObjectFieldReference fieldReference) {
 		StubIndexObjectFieldReference stubFieldReference = (StubIndexObjectFieldReference) fieldReference;
 		if ( TreeNodeInclusion.EXCLUDED.equals( stubFieldReference.getInclusion() ) ) {
-			BACKEND_TEST_LOGGER.tracev(
+			TEST_LOGGER.tracev(
 					"Ignoring add on document element {}, object field '{}'" +
 							" because the field was excluded during bootstrap.",
 					this, stubFieldReference.getAbsolutePath()
@@ -53,7 +53,7 @@ public class StubDocumentElement implements DocumentElement {
 	public void addNullObject(IndexObjectFieldReference fieldReference) {
 		StubIndexObjectFieldReference stubFieldReference = (StubIndexObjectFieldReference) fieldReference;
 		if ( TreeNodeInclusion.EXCLUDED.equals( stubFieldReference.getInclusion() ) ) {
-			BACKEND_TEST_LOGGER.tracev(
+			TEST_LOGGER.tracev(
 					"Ignoring add missing on document element {}, object field '{}'" +
 							" because the field was excluded during bootstrap.",
 					this, stubFieldReference.getAbsolutePath()

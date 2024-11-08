@@ -5,8 +5,8 @@
 package org.hibernate.search.integrationtest.jakarta.batch.util;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.hibernate.search.integrationtest.jakarta.batch.util.logging.TestLog.TEST_LOGGER;
 import static org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmUtils.with;
+import static org.hibernate.search.util.impl.test.logging.impl.TestLog.TEST_LOGGER;
 
 import java.util.List;
 import java.util.Properties;

@@ -6,9 +6,9 @@ package org.hibernate.search.documentation.mapper.orm.indexing;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.awaitility.Awaitility.await;
-import static org.hibernate.search.documentation.testsupport.logging.TestLog.DOCUMENTATION_TEST_LOGGER;
 import static org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmUtils.with;
 import static org.hibernate.search.util.impl.test.FutureAssert.assertThatFuture;
+import static org.hibernate.search.util.impl.test.logging.impl.TestLog.TEST_LOGGER;
 
 import java.time.Year;
 import java.util.concurrent.CompletionStage;
@@ -108,10 +108,10 @@ class HibernateOrmMassIndexerIT extends AbstractHibernateOrmMassIndexingIT {
 							// tag::async[]
 							.start() // <2>
 							.thenRun( () -> { // <3>
-								DOCUMENTATION_TEST_LOGGER.info( "Mass indexing succeeded!" );
+								TEST_LOGGER.info( "Mass indexing succeeded!" );
 							} )
 							.exceptionally( throwable -> {
-								DOCUMENTATION_TEST_LOGGER.error( "Mass indexing failed!", throwable );
+								TEST_LOGGER.error( "Mass indexing failed!", throwable );
 								return null;
 							} );
 			// end::async[]

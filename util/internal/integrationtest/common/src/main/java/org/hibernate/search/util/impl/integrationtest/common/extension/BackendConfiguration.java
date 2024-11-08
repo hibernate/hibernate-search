@@ -4,7 +4,8 @@
  */
 package org.hibernate.search.util.impl.integrationtest.common.extension;
 
-import static org.hibernate.search.util.impl.integrationtest.common.reporting.TestLog.BACKEND_TEST_LOGGER;
+
+import static org.hibernate.search.util.impl.test.logging.impl.TestLog.TEST_LOGGER;
 
 import java.util.Map;
 
@@ -26,12 +27,12 @@ public abstract class BackendConfiguration {
 		if ( property == null ) {
 			BACKEND_TYPE = IDE_BACKEND_TYPE;
 			IS_IDE = true;
-			BACKEND_TEST_LOGGER.warn( "The backend type wasn't set; tests are probably running from an IDE."
+			TEST_LOGGER.warn( "The backend type wasn't set; tests are probably running from an IDE."
 					+ " Defaulting to backend type '" + BACKEND_TYPE + "' and setting it explicitly"
 					+ " to avoid problems with classpaths containing multiple backend types." );
-			BACKEND_TEST_LOGGER.warn( "To test another backend type, change the constant 'IDE_BACKEND_TYPE' in class '"
+			TEST_LOGGER.warn( "To test another backend type, change the constant 'IDE_BACKEND_TYPE' in class '"
 					+ BackendConfiguration.class.getName() + "'." );
-			BACKEND_TEST_LOGGER.warn( "Tests of the backend type auto-detection feature will not work properly." );
+			TEST_LOGGER.warn( "Tests of the backend type auto-detection feature will not work properly." );
 		}
 		else {
 			BACKEND_TYPE = property;

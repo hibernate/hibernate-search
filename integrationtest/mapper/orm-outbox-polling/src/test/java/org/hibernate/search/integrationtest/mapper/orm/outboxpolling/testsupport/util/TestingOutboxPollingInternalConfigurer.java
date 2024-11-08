@@ -4,7 +4,8 @@
  */
 package org.hibernate.search.integrationtest.mapper.orm.outboxpolling.testsupport.util;
 
-import static org.hibernate.search.integrationtest.mapper.orm.outboxpolling.testsupport.logging.TestLog.TEST_LOGGER;
+
+import static org.hibernate.search.util.impl.test.logging.impl.TestLog.TEST_LOGGER;
 
 import org.hibernate.search.mapper.orm.outboxpolling.cluster.impl.AgentRepositoryProvider;
 import org.hibernate.search.mapper.orm.outboxpolling.event.impl.DefaultOutboxEventFinder;

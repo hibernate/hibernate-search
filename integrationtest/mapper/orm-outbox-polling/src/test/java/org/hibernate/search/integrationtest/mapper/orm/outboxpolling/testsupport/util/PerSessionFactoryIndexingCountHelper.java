@@ -5,7 +5,7 @@
 package org.hibernate.search.integrationtest.mapper.orm.outboxpolling.testsupport.util;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.hibernate.search.integrationtest.mapper.orm.outboxpolling.testsupport.logging.TestLog.TEST_LOGGER;
+import static org.hibernate.search.util.impl.test.logging.impl.TestLog.TEST_LOGGER;
 
 import java.util.ArrayList;
 import java.util.Collection;

@@ -4,7 +4,7 @@
  */
 package org.hibernate.search.integrationtest.backend.tck.testsupport.util.extension;
 
-import static org.hibernate.search.integrationtest.backend.tck.reporting.TestLog.TCK_LOGGER;
+import static org.hibernate.search.util.impl.test.logging.impl.TestLog.TEST_LOGGER;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -139,7 +139,7 @@ public class SearchSetupHelper extends AbstractScopeTrackingExtension implements
 	public void handleTestExecutionException(ExtensionContext context, Throwable throwable) throws Throwable {
 		// When used as a "ClassExtension", exceptions are not properly reported by JUnit.
 		// Log them so that we have something in the logs, at least.
-		TCK_LOGGER.warn(
+		TEST_LOGGER.warn(
 				"Exception thrown by test and caught by SearchSetupHelper rule: " + throwable.getMessage(),
 				throwable
 		);

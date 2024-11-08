@@ -961,18 +961,6 @@
                                 <testExcludes>
                                     <testExclude>**/noparameters/**/*</testExclude>
                                 </testExcludes>
-                                <annotationProcessorPaths>
-                                    <path>
-                                        <groupId>org.jboss.logging</groupId>
-                                        <artifactId>jboss-logging-processor</artifactId>
-                                        <version>${version.org.jboss.logging.jboss-logging-tools}</version>
-                                    </path>
-                                    <path>
-                                        <groupId>org.jboss.logging</groupId>
-                                        <artifactId>jboss-logging</artifactId>
-                                        <version>${version.org.jboss.logging.jboss-logging}</version>
-                                    </path>
-                                </annotationProcessorPaths>
                             </configuration>
                         </execution>
                         <execution>
