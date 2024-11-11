@@ -21,7 +21,7 @@ import org.hibernate.search.backend.lucene.search.projection.impl.ProjectionRequ
 import org.hibernate.search.engine.search.highlighter.dsl.HighlighterFragmenter;
 import org.hibernate.search.engine.search.highlighter.spi.BoundaryScannerType;
 import org.hibernate.search.engine.search.highlighter.spi.SearchHighlighterType;
-import org.hibernate.search.engine.search.projection.ProjectionAccumulator;
+import org.hibernate.search.engine.search.projection.ProjectionCollector;
 
 import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.index.IndexableField;
@@ -87,9 +87,9 @@ class LucenePlainSearchHighlighter extends LuceneAbstractSearchHighlighter {
 	@Override
 	public <A, T> Values<A> createValues(String parentDocumentPath, String nestedDocumentPath,
 			String absoluteFieldPath, Analyzer analyzer, ProjectionExtractContext context,
-			ProjectionAccumulator<String, ?, A, T> accumulator) {
+			ProjectionCollector<String, ?, A, T> collector) {
 		return new PlainHighlighterValues<>(
-				parentDocumentPath, nestedDocumentPath, absoluteFieldPath, analyzer, context, accumulator );
+				parentDocumentPath, nestedDocumentPath, absoluteFieldPath, analyzer, context, collector );
 	}
 
 	@Override
@@ -109,8 +109,8 @@ class LucenePlainSearchHighlighter extends LuceneAbstractSearchHighlighter {
 		private final String field;
 
 		PlainHighlighterValues(String parentDocumentPath, String nestedDocumentPath, String field, Analyzer analyzer,
-				ProjectionExtractContext context, ProjectionAccumulator<String, ?, A, T> accumulator) {
-			super( parentDocumentPath, nestedDocumentPath, context.collectorExecutionContext(), accumulator );
+				ProjectionExtractContext context, ProjectionCollector<String, ?, A, T> collector) {
+			super( parentDocumentPath, nestedDocumentPath, context.collectorExecutionContext(), collector );
 			this.storedFieldsValuesDelegate = context.collectorExecutionContext().storedFieldsValuesDelegate();
 			this.field = field;
 			this.analyzer = analyzer;

@@ -10,23 +10,23 @@ import org.hibernate.search.backend.lucene.lowlevel.collector.impl.TopDocsDataCo
 import org.hibernate.search.backend.lucene.lowlevel.collector.impl.Values;
 import org.hibernate.search.backend.lucene.lowlevel.join.impl.ChildDocIds;
 import org.hibernate.search.backend.lucene.lowlevel.join.impl.NestedDocsProvider;
-import org.hibernate.search.engine.search.projection.ProjectionAccumulator;
+import org.hibernate.search.engine.search.projection.ProjectionCollector;
 
 import org.apache.lucene.index.LeafReaderContext;
 import org.apache.lucene.search.DocIdSetIterator;
 
 abstract class AbstractNestingAwareAccumulatingValues<E, A> implements Values<A> {
 	private final NestedDocsProvider nestedDocsProvider;
-	protected final ProjectionAccumulator<E, ?, A, ?> accumulator;
+	protected final ProjectionCollector<E, ?, A, ?> collector;
 
 	protected ChildDocIds currentLeafChildDocIds;
 
 	AbstractNestingAwareAccumulatingValues(String parentDocumentPath, String nestedDocumentPath,
-			ProjectionAccumulator<E, ?, A, ?> accumulator, TopDocsDataCollectorExecutionContext context) {
+			ProjectionCollector<E, ?, A, ?> collector, TopDocsDataCollectorExecutionContext context) {
 		this.nestedDocsProvider = nestedDocumentPath == null || nestedDocumentPath.equals( parentDocumentPath )
 				? null
 				: context.createNestedDocsProvider( parentDocumentPath, nestedDocumentPath );
-		this.accumulator = accumulator;
+		this.collector = collector;
 	}
 
 	@Override
@@ -44,7 +44,7 @@ abstract class AbstractNestingAwareAccumulatingValues<E, A> implements Values<A>
 
 	@Override
 	public final A get(int parentDocId) throws IOException {
-		A accumulated = accumulator.createInitial();
+		A accumulated = collector.createInitial();
 
 		if ( nestedDocsProvider == null ) {
 			// No nesting: we work directly on the parent doc.

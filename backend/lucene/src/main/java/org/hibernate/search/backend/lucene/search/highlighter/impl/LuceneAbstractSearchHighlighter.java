@@ -26,7 +26,7 @@ import org.hibernate.search.engine.search.highlighter.dsl.HighlighterTagSchema;
 import org.hibernate.search.engine.search.highlighter.spi.BoundaryScannerType;
 import org.hibernate.search.engine.search.highlighter.spi.SearchHighlighterBuilder;
 import org.hibernate.search.engine.search.highlighter.spi.SearchHighlighterType;
-import org.hibernate.search.engine.search.projection.ProjectionAccumulator;
+import org.hibernate.search.engine.search.projection.ProjectionCollector;
 import org.hibernate.search.util.common.impl.Contracts;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
@@ -193,9 +193,9 @@ public abstract class LuceneAbstractSearchHighlighter implements SearchHighlight
 
 	public abstract <A, T> Values<A> createValues(String parentDocumentPath, String nestedDocumentPath,
 			String absoluteFieldPath, Analyzer analyzer, ProjectionExtractContext context,
-			ProjectionAccumulator<String, ?, A, T> accumulator);
+			ProjectionCollector<String, ?, A, T> collector);
 
-	public boolean isCompatible(ProjectionAccumulator.Provider<?, ?> provider) {
+	public boolean isCompatible(ProjectionCollector.Provider<?, ?> provider) {
 		return !provider.isSingleValued()
 				|| ( provider.isSingleValued() && ( numberOfFragments != null && numberOfFragments.equals( 1 ) ) );
 	}

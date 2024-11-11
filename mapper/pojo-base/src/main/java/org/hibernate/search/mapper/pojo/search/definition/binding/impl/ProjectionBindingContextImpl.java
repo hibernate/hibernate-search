@@ -20,8 +20,8 @@ import org.hibernate.search.engine.common.tree.spi.TreeNodeInclusion;
 import org.hibernate.search.engine.environment.bean.BeanHolder;
 import org.hibernate.search.engine.environment.bean.BeanResolver;
 import org.hibernate.search.engine.mapper.model.spi.MappingElement;
-import org.hibernate.search.engine.search.projection.ProjectionAccumulator;
-import org.hibernate.search.engine.search.projection.ProjectionAccumulatorProviderFactory;
+import org.hibernate.search.engine.search.projection.ProjectionCollector;
+import org.hibernate.search.engine.search.projection.ProjectionCollectorProviderFactory;
 import org.hibernate.search.engine.search.projection.definition.ProjectionDefinition;
 import org.hibernate.search.engine.search.projection.definition.spi.CompositeProjectionDefinition;
 import org.hibernate.search.engine.search.projection.definition.spi.ConstantProjectionDefinition;
@@ -85,7 +85,7 @@ public class ProjectionBindingContextImpl<P> implements ProjectionBindingContext
 	private final Map<String, Object> params;
 	private final PojoTypeModel<?> parameterTypeModel;
 	private final PojoModelConstructorParameterRootElement<P> parameterRootElement;
-	private final ProjectionAccumulatorProviderFactory projectionAccumulatorProviderFactory;
+	private final ProjectionCollectorProviderFactory projectionCollectorProviderFactory;
 
 	private MappingElement mappingElement;
 	private PartialBinding<P> partialBinding;
@@ -97,7 +97,7 @@ public class ProjectionBindingContextImpl<P> implements ProjectionBindingContext
 		this.params = params;
 		this.parameterTypeModel = parameterBinder.parameter.typeModel();
 		this.parameterRootElement = parameterBinder.parameterRootElement;
-		this.projectionAccumulatorProviderFactory = new BuiltInProjectionAccumulatorProviderFactory();
+		this.projectionCollectorProviderFactory = new BuiltInProjectionCollectorProviderFactory();
 	}
 
 	@Override
@@ -197,11 +197,11 @@ public class ProjectionBindingContextImpl<P> implements ProjectionBindingContext
 	@Override
 	public <C, T> BeanHolder<? extends ProjectionDefinition<C>> createObjectDefinition(String fieldPath,
 			Class<T> projectedType, TreeFilterDefinition filter,
-			ProjectionAccumulator.Provider<T, C> accumulator) {
+			ProjectionCollector.Provider<T, C> collector) {
 		Contracts.assertNotNull( fieldPath, "fieldPath" );
 		Contracts.assertNotNull( projectedType, "projectedType" );
 		Contracts.assertNotNull( filter, "filter" );
-		Contracts.assertNotNull( accumulator, "accumulator" );
+		Contracts.assertNotNull( collector, "collector" );
 		Optional<BeanHolder<? extends ProjectionDefinition<C>>> objectProjection = nestObjectProjection(
 				fieldPath, filter,
 				nestingContext -> {
@@ -209,7 +209,7 @@ public class ProjectionBindingContextImpl<P> implements ProjectionBindingContext
 							createCompositeProjectionDefinition( projectedType, nestingContext );
 					try {
 						return BeanHolder.ofCloseable( new ObjectProjectionDefinition.WrappedValued<>(
-								fieldPath, composite, accumulator ) );
+								fieldPath, composite, collector ) );
 					}
 					catch (RuntimeException e) {
 						new SuppressingCloser( e ).push( composite );
@@ -217,7 +217,7 @@ public class ProjectionBindingContextImpl<P> implements ProjectionBindingContext
 					}
 				}
 		);
-		return objectProjection.orElse( ConstantProjectionDefinition.empty( accumulator ) );
+		return objectProjection.orElse( ConstantProjectionDefinition.empty( collector ) );
 	}
 
 	private <T> Optional<T> nestObjectProjection(String fieldPath, TreeFilterDefinition filter,
@@ -271,8 +271,8 @@ public class ProjectionBindingContextImpl<P> implements ProjectionBindingContext
 	}
 
 	@Override
-	public ProjectionAccumulatorProviderFactory projectionAccumulatorProviderFactory() {
-		return projectionAccumulatorProviderFactory;
+	public ProjectionCollectorProviderFactory projectionCollectorProviderFactory() {
+		return projectionCollectorProviderFactory;
 	}
 
 	public BeanHolder<? extends ProjectionDefinition<? extends P>> applyBinder(ProjectionBinder binder) {
@@ -389,18 +389,18 @@ public class ProjectionBindingContextImpl<P> implements ProjectionBindingContext
 
 	}
 
-	private class BuiltInProjectionAccumulatorProviderFactory implements ProjectionAccumulatorProviderFactory {
+	private class BuiltInProjectionCollectorProviderFactory implements ProjectionCollectorProviderFactory {
 
 		@SuppressWarnings({ "rawtypes", "unchecked" })
 		@Override
-		public <R, U> ProjectionAccumulator.Provider<U, R> projectionAccumulatorProvider(Class<R> containerType,
+		public <R, U> ProjectionCollector.Provider<U, R> projectionCollectorProvider(Class<R> containerType,
 				Class<U> containerElementType) {
-			ProjectionAccumulator.Provider reference;
+			ProjectionCollector.Provider reference;
 			if ( containerType == null ) {
-				reference = ProjectionAccumulator.nullable();
+				reference = ProjectionCollector.nullable();
 			}
 			else if ( List.class.isAssignableFrom( containerType ) ) {
-				reference = ProjectionAccumulator.list();
+				reference = ProjectionCollector.list();
 			}
 			else if ( SortedSet.class.isAssignableFrom( containerType ) ) {
 				if ( !Comparable.class.isAssignableFrom( containerElementType ) ) {
@@ -409,16 +409,16 @@ public class ProjectionBindingContextImpl<P> implements ProjectionBindingContext
 							mappingElement.eventContext()
 					);
 				}
-				reference = ProjectionAccumulator.sortedSet();
+				reference = ProjectionCollector.sortedSet();
 			}
 			else if ( Set.class.isAssignableFrom( containerType ) ) {
-				reference = ProjectionAccumulator.set();
+				reference = ProjectionCollector.set();
 			}
 			else if ( containerType.isArray() ) {
-				reference = ProjectionAccumulator.array( containerElementType );
+				reference = ProjectionCollector.array( containerElementType );
 			}
 			else if ( Collection.class.isAssignableFrom( containerType ) || Iterable.class.isAssignableFrom( containerType ) ) {
-				reference = ProjectionAccumulator.list();
+				reference = ProjectionCollector.list();
 			}
 			else {
 				throw log.invalidMultiValuedParameterTypeForProjectionConstructor( parameterTypeModel );

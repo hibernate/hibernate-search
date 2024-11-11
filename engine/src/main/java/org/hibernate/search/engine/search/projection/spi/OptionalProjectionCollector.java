@@ -6,21 +6,23 @@ package org.hibernate.search.engine.search.projection.spi;
 
 import java.util.Optional;
 
+import org.hibernate.search.engine.search.projection.ProjectionCollector;
+
 /**
- * A {@link org.hibernate.search.engine.search.projection.ProjectionAccumulator} that can accumulate up to one value, and will throw an exception beyond that.
+ * A {@link ProjectionCollector} that can accumulate up to one value, and will throw an exception beyond that.
  * The value is wrapped in an {@link Optional}.
  *
  * @param <E> The type of extracted values to accumulate before being transformed.
  * @param <V> The type of values to accumulate obtained by transforming extracted values ({@code E}).
  */
-final class OptionalProjectionAccumulator<E, V> extends BaseSingleValuedProjectionAccumulator<E, V, Optional<V>> {
+final class OptionalProjectionCollector<E, V> extends BaseSingleValuedProjectionCollector<E, V, Optional<V>> {
 
 	@SuppressWarnings("rawtypes")
 	static final Provider PROVIDER = new Provider() {
-		private final OptionalProjectionAccumulator instance = new OptionalProjectionAccumulator();
+		private final OptionalProjectionCollector instance = new OptionalProjectionCollector();
 
 		@Override
-		public org.hibernate.search.engine.search.projection.ProjectionAccumulator get() {
+		public ProjectionCollector get() {
 			return instance;
 		}
 
@@ -30,7 +32,7 @@ final class OptionalProjectionAccumulator<E, V> extends BaseSingleValuedProjecti
 		}
 	};
 
-	private OptionalProjectionAccumulator() {
+	private OptionalProjectionCollector() {
 	}
 
 	@Override

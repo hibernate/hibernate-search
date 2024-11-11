@@ -16,7 +16,7 @@ import org.hibernate.search.documentation.testsupport.BackendConfigurations;
 import org.hibernate.search.documentation.testsupport.DocumentationSetupHelper;
 import org.hibernate.search.engine.backend.types.ObjectStructure;
 import org.hibernate.search.engine.backend.types.Projectable;
-import org.hibernate.search.engine.search.projection.ProjectionAccumulator;
+import org.hibernate.search.engine.search.projection.ProjectionCollector;
 import org.hibernate.search.mapper.orm.Search;
 import org.hibernate.search.mapper.orm.session.SearchSession;
 import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.TypeMappingStep;
@@ -145,7 +145,7 @@ class ProjectionConstructorMappingJava17IT {
 													f.field( "authors.lastName", String.class )
 											)
 											.as( MyBookProjection.Author::new )
-											.accumulator( ProjectionAccumulator.list() )
+											.collector( ProjectionCollector.list() )
 							)
 							.as( MyBookProjection::new ) )
 					.where( f -> f.matchAll() )

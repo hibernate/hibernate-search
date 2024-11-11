@@ -32,7 +32,7 @@ import java.util.Optional;
 import org.hibernate.search.backend.elasticsearch.types.format.impl.ElasticsearchDefaultFieldFormatProvider;
 import org.hibernate.search.engine.backend.types.VectorSimilarity;
 import org.hibernate.search.engine.cfg.spi.FormatUtils;
-import org.hibernate.search.engine.search.projection.ProjectionAccumulator;
+import org.hibernate.search.engine.search.projection.ProjectionCollector;
 import org.hibernate.search.engine.spatial.GeoPoint;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.BigDecimalFieldTypeDescriptor;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.FieldTypeDescriptor;
@@ -518,13 +518,13 @@ public class ElasticsearchTckBackendFeatures extends TckBackendFeatures {
 	}
 
 	@Override
-	public <U, R> R accumulatedNullValue(ProjectionAccumulator.Provider<U, R> accumulator) {
-		return accumulatedNullValue( accumulator.get() );
+	public <U, R> R accumulatedNullValue(ProjectionCollector.Provider<U, R> collector) {
+		return accumulatedNullValue( collector.get() );
 	}
 
-	private <U, R, A> R accumulatedNullValue(ProjectionAccumulator<Object, U, A, R> accumulator) {
+	private <U, R, A> R accumulatedNullValue(ProjectionCollector<Object, U, A, R> collector) {
 		ArrayList<Object> values = new ArrayList<>();
 		values.add( null );
-		return accumulator.finish( accumulator.accumulateAll( accumulator.createInitial(), values ) );
+		return collector.finish( collector.accumulateAll( collector.createInitial(), values ) );
 	}
 }

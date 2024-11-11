@@ -17,7 +17,7 @@ import org.hibernate.search.backend.lucene.search.common.impl.LuceneSearchIndexV
 import org.hibernate.search.backend.lucene.types.codec.impl.LuceneFieldCodec;
 import org.hibernate.search.engine.backend.types.converter.spi.ProjectionConverter;
 import org.hibernate.search.engine.search.loading.spi.LoadingResult;
-import org.hibernate.search.engine.search.projection.ProjectionAccumulator;
+import org.hibernate.search.engine.search.projection.ProjectionCollector;
 import org.hibernate.search.engine.search.projection.SearchProjection;
 import org.hibernate.search.engine.search.projection.spi.DistanceToFieldProjectionBuilder;
 import org.hibernate.search.engine.spatial.DistanceUnit;
@@ -49,27 +49,27 @@ public class LuceneDistanceToFieldProjection<P> extends AbstractLuceneProjection
 	private final GeoPoint center;
 	private final DistanceUnit unit;
 
-	private final ProjectionAccumulator.Provider<Double, P> accumulatorProvider;
+	private final ProjectionCollector.Provider<Double, P> collectorProvider;
 
 	private final LuceneFieldProjection<Double, Double, P, ?> fieldProjection;
 
 	private LuceneDistanceToFieldProjection(Builder builder,
-			ProjectionAccumulator.Provider<Double, P> accumulatorProvider) {
+			ProjectionCollector.Provider<Double, P> collectorProvider) {
 		super( builder );
 		this.absoluteFieldPath = builder.field.absolutePath();
 		this.nestedDocumentPath = builder.field.nestedDocumentPath();
-		this.requiredContextAbsoluteFieldPath = accumulatorProvider.isSingleValued()
+		this.requiredContextAbsoluteFieldPath = collectorProvider.isSingleValued()
 				? builder.field.closestMultiValuedParentAbsolutePath()
 				: null;
 		this.codec = builder.codec;
 		this.center = builder.center;
 		this.unit = builder.unit;
-		this.accumulatorProvider = accumulatorProvider;
+		this.collectorProvider = collectorProvider;
 		if ( builder.field.multiValued() ) {
 			// For multi-valued fields, use a field projection, because we need order to be preserved.
 			this.fieldProjection = new LuceneFieldProjection<>(
 					builder.scope, builder.field,
-					this::computeDistanceWithUnit, NO_OP_DOUBLE_CONVERTER, accumulatorProvider
+					this::computeDistanceWithUnit, NO_OP_DOUBLE_CONVERTER, collectorProvider
 			);
 		}
 		else {
@@ -83,7 +83,7 @@ public class LuceneDistanceToFieldProjection<P> extends AbstractLuceneProjection
 		return getClass().getSimpleName() + "["
 				+ "absoluteFieldPath=" + absoluteFieldPath
 				+ ", center=" + center
-				+ ", accumulatorProvider=" + accumulatorProvider
+				+ ", collectorProvider=" + collectorProvider
 				+ "]";
 	}
 
@@ -99,7 +99,7 @@ public class LuceneDistanceToFieldProjection<P> extends AbstractLuceneProjection
 				throw log.invalidSingleValuedProjectionOnValueFieldInMultiValuedObjectField(
 						absoluteFieldPath, requiredContextAbsoluteFieldPath );
 			}
-			return new DocValuesBasedDistanceExtractor<>( accumulatorProvider.get(),
+			return new DocValuesBasedDistanceExtractor<>( collectorProvider.get(),
 					context.absoluteCurrentNestedFieldPath() );
 		}
 	}
@@ -108,12 +108,12 @@ public class LuceneDistanceToFieldProjection<P> extends AbstractLuceneProjection
 	 * @param <A> The type of the temporary storage for accumulated values, before and after being transformed.
 	 */
 	private class DocValuesBasedDistanceExtractor<A> implements Extractor<A, P> {
-		private final ProjectionAccumulator<Double, Double, A, P> accumulator;
+		private final ProjectionCollector<Double, Double, A, P> collector;
 		private final String contextAbsoluteFieldPath;
 
-		private DocValuesBasedDistanceExtractor(ProjectionAccumulator<Double, Double, A, P> accumulator,
+		private DocValuesBasedDistanceExtractor(ProjectionCollector<Double, Double, A, P> collector,
 				String contextAbsoluteFieldPath) {
-			this.accumulator = accumulator;
+			this.collector = collector;
 			this.contextAbsoluteFieldPath = contextAbsoluteFieldPath;
 		}
 
@@ -122,7 +122,7 @@ public class LuceneDistanceToFieldProjection<P> extends AbstractLuceneProjection
 			return getClass().getSimpleName() + "["
 					+ "absoluteFieldPath=" + absoluteFieldPath
 					+ ", center=" + center
-					+ ", accumulator=" + accumulator
+					+ ", collector=" + collector
 					+ "]";
 		}
 
@@ -140,7 +140,7 @@ public class LuceneDistanceToFieldProjection<P> extends AbstractLuceneProjection
 
 			public DocValuesBasedDistanceValues(TopDocsDataCollectorExecutionContext context) {
 				super( contextAbsoluteFieldPath, nestedDocumentPath,
-						DocValuesBasedDistanceExtractor.this.accumulator, context );
+						DocValuesBasedDistanceExtractor.this.collector, context );
 			}
 
 			@Override
@@ -155,7 +155,7 @@ public class LuceneDistanceToFieldProjection<P> extends AbstractLuceneProjection
 				if ( currentLeafValues.advanceExact( docId ) ) {
 					for ( int i = 0; i < currentLeafValues.docValueCount(); i++ ) {
 						Double distanceOrNull = currentLeafValues.nextValue();
-						accumulated = accumulator.accumulate( accumulated, unit.fromMeters( distanceOrNull ) );
+						accumulated = collector.accumulate( accumulated, unit.fromMeters( distanceOrNull ) );
 					}
 				}
 				return accumulated;
@@ -166,7 +166,7 @@ public class LuceneDistanceToFieldProjection<P> extends AbstractLuceneProjection
 		public P transform(LoadingResult<?> loadingResult, A extractedData,
 				ProjectionTransformContext context) {
 			// Nothing to transform: we take the values as they are.
-			return accumulator.finish( extractedData );
+			return collector.finish( extractedData );
 		}
 	}
 
@@ -229,11 +229,11 @@ public class LuceneDistanceToFieldProjection<P> extends AbstractLuceneProjection
 		}
 
 		@Override
-		public <P> SearchProjection<P> build(ProjectionAccumulator.Provider<Double, P> accumulatorProvider) {
-			if ( accumulatorProvider.isSingleValued() && field.multiValued() ) {
+		public <P> SearchProjection<P> build(ProjectionCollector.Provider<Double, P> collectorProvider) {
+			if ( collectorProvider.isSingleValued() && field.multiValued() ) {
 				throw log.invalidSingleValuedProjectionOnMultiValuedField( field.absolutePath(), field.eventContext() );
 			}
-			return new LuceneDistanceToFieldProjection<>( this, accumulatorProvider );
+			return new LuceneDistanceToFieldProjection<>( this, collectorProvider );
 		}
 	}
 }

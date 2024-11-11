@@ -9,20 +9,21 @@ import java.lang.invoke.MethodHandles;
 import org.hibernate.search.engine.backend.types.converter.FromDocumentValueConverter;
 import org.hibernate.search.engine.backend.types.converter.runtime.FromDocumentValueConvertContext;
 import org.hibernate.search.engine.logging.impl.Log;
+import org.hibernate.search.engine.search.projection.ProjectionCollector;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
 /**
- * A {@link org.hibernate.search.engine.search.projection.ProjectionAccumulator} that can accumulate up to one value, and will throw an exception beyond that.
+ * A {@link ProjectionCollector} that can accumulate up to one value, and will throw an exception beyond that.
  *
  * @param <E> The type of extracted values to accumulate before being transformed.
  * @param <V> The type of values to accumulate obtained by transforming extracted values ({@code E}).
  */
-abstract class BaseSingleValuedProjectionAccumulator<E, V, R>
-		implements org.hibernate.search.engine.search.projection.ProjectionAccumulator<E, V, Object, R> {
+abstract class BaseSingleValuedProjectionCollector<E, V, R>
+		implements ProjectionCollector<E, V, Object, R> {
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
-	protected BaseSingleValuedProjectionAccumulator() {
+	protected BaseSingleValuedProjectionCollector() {
 	}
 
 	@Override

@@ -12,7 +12,7 @@ import org.hibernate.search.engine.backend.common.DocumentReference;
 import org.hibernate.search.engine.common.EntityReference;
 import org.hibernate.search.engine.search.common.NamedValues;
 import org.hibernate.search.engine.search.common.ValueModel;
-import org.hibernate.search.engine.search.projection.ProjectionAccumulator;
+import org.hibernate.search.engine.search.projection.ProjectionCollector;
 import org.hibernate.search.engine.search.projection.SearchProjection;
 import org.hibernate.search.engine.spatial.GeoPoint;
 import org.hibernate.search.util.common.SearchException;
@@ -218,7 +218,7 @@ public interface SearchProjectionFactory<R, E> {
 	 * Compared to the basic {@link #composite() composite projection},
 	 * an object projection is bound to a specific object field,
 	 * and thus it yields zero, one or many values, as many as there are objects in the targeted object field.
-	 * Therefore, you must take care of calling {@link CompositeProjectionValueStep#accumulator(ProjectionAccumulator.Provider)}
+	 * Therefore, you must take care of calling {@link CompositeProjectionValueStep#collector(ProjectionCollector.Provider)}
 	 * if the object field is multi-valued.
 	 *
 	 * @param objectFieldPath The <a href="#field-paths">path</a> to the object field whose object(s) will be extracted.
@@ -233,7 +233,7 @@ public interface SearchProjectionFactory<R, E> {
 	 * On contrary to the {@link #object(String)  object projection},
 	 * a composite projection is not bound to a specific object field,
 	 * and thus it will always yield one and only one value,
-	 * regardless of whether {@link CompositeProjectionValueStep#accumulator(ProjectionAccumulator.Provider)} is called.
+	 * regardless of whether {@link CompositeProjectionValueStep#collector(ProjectionCollector.Provider)} is called.
 	 *
 	 * @return A DSL step where the "composite" projection can be defined in more details.
 	 */

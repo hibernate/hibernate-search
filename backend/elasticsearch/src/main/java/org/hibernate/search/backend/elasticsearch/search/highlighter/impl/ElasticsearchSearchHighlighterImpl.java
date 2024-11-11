@@ -21,7 +21,7 @@ import org.hibernate.search.engine.search.highlighter.dsl.HighlighterTagSchema;
 import org.hibernate.search.engine.search.highlighter.spi.BoundaryScannerType;
 import org.hibernate.search.engine.search.highlighter.spi.SearchHighlighterBuilder;
 import org.hibernate.search.engine.search.highlighter.spi.SearchHighlighterType;
-import org.hibernate.search.engine.search.projection.ProjectionAccumulator;
+import org.hibernate.search.engine.search.projection.ProjectionCollector;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
@@ -143,9 +143,9 @@ public class ElasticsearchSearchHighlighterImpl implements ElasticsearchSearchHi
 	}
 
 	@Override
-	public boolean isCompatible(ProjectionAccumulator.Provider<?, ?> provider) {
-		return !provider.isSingleValued()
-				|| ( provider.isSingleValued() && ( numberOfFragments != null && numberOfFragments.equals( 1 ) ) );
+	public boolean isCompatible(ProjectionCollector.Provider<?, ?> collectorProvider) {
+		return !collectorProvider.isSingleValued()
+				|| ( collectorProvider.isSingleValued() && ( numberOfFragments != null && numberOfFragments.equals( 1 ) ) );
 	}
 
 	private JsonObject toJson(JsonObject result) {

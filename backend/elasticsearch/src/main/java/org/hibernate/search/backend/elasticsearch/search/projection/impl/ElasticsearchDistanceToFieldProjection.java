@@ -18,7 +18,7 @@ import org.hibernate.search.backend.elasticsearch.types.codec.impl.Elasticsearch
 import org.hibernate.search.engine.backend.types.converter.spi.ProjectionConverter;
 import org.hibernate.search.engine.search.loading.spi.LoadingResult;
 import org.hibernate.search.engine.search.loading.spi.ProjectionHitMapper;
-import org.hibernate.search.engine.search.projection.ProjectionAccumulator;
+import org.hibernate.search.engine.search.projection.ProjectionCollector;
 import org.hibernate.search.engine.search.projection.SearchProjection;
 import org.hibernate.search.engine.search.projection.spi.DistanceToFieldProjectionBuilder;
 import org.hibernate.search.engine.spatial.DistanceUnit;
@@ -62,14 +62,14 @@ public class ElasticsearchDistanceToFieldProjection<A, P> extends AbstractElasti
 	private final GeoPoint center;
 	private final DistanceUnit unit;
 
-	private final ProjectionAccumulator<Double, Double, A, P> accumulator;
+	private final ProjectionCollector<Double, Double, A, P> collector;
 
 	private final String scriptFieldName;
 	private final ElasticsearchFieldProjection<?, Double, P, ?> sourceProjection;
 
 	private ElasticsearchDistanceToFieldProjection(Builder builder,
-			ProjectionAccumulator.Provider<Double, P> accumulatorProvider,
-			ProjectionAccumulator<Double, Double, A, P> accumulator) {
+			ProjectionCollector.Provider<Double, P> collectorProvider,
+			ProjectionCollector<Double, Double, A, P> collector) {
 		super( builder );
 		this.codec = builder.field.type().codec();
 
@@ -77,7 +77,7 @@ public class ElasticsearchDistanceToFieldProjection<A, P> extends AbstractElasti
 		this.singleValuedInRoot = !builder.field.multiValuedInRoot();
 		this.center = builder.center;
 		this.unit = builder.unit;
-		this.accumulator = accumulator;
+		this.collector = collector;
 		if ( singleValuedInRoot && builder.field.nestedPathHierarchy().isEmpty() ) {
 			// Rely on docValues when there is no sort to extract the distance from.
 			scriptFieldName = createScriptFieldName( absoluteFieldPath, center );
@@ -88,7 +88,7 @@ public class ElasticsearchDistanceToFieldProjection<A, P> extends AbstractElasti
 			scriptFieldName = null;
 			this.sourceProjection = new ElasticsearchFieldProjection<>(
 					builder.scope, builder.field,
-					this::computeDistanceWithUnit, false, NO_OP_DOUBLE_CONVERTER, accumulatorProvider
+					this::computeDistanceWithUnit, false, NO_OP_DOUBLE_CONVERTER, collectorProvider
 			);
 		}
 	}
@@ -99,7 +99,7 @@ public class ElasticsearchDistanceToFieldProjection<A, P> extends AbstractElasti
 				+ "absoluteFieldPath=" + absoluteFieldPath
 				+ ", center=" + center
 				+ ", unit=" + unit
-				+ ", accumulator=" + accumulator
+				+ ", collector=" + collector
 				+ "]";
 	}
 
@@ -130,13 +130,13 @@ public class ElasticsearchDistanceToFieldProjection<A, P> extends AbstractElasti
 		Integer distanceSortIndex = singleValuedInRoot ? context.getDistanceSortIndex( absoluteFieldPath, center ) : null;
 
 		if ( distanceSortIndex != null ) {
-			A accumulated = accumulator.createInitial();
-			accumulated = accumulator.accumulate( accumulated, extractDistanceFromSortKey( hit, distanceSortIndex ) );
+			A accumulated = collector.createInitial();
+			accumulated = collector.accumulate( accumulated, extractDistanceFromSortKey( hit, distanceSortIndex ) );
 			return accumulated;
 		}
 		else {
-			A accumulated = accumulator.createInitial();
-			accumulated = accumulator.accumulate( accumulated, extractDistanceFromScriptField( hit ) );
+			A accumulated = collector.createInitial();
+			accumulated = collector.accumulate( accumulated, extractDistanceFromScriptField( hit ) );
 			return accumulated;
 		}
 	}
@@ -145,7 +145,7 @@ public class ElasticsearchDistanceToFieldProjection<A, P> extends AbstractElasti
 	public P transform(LoadingResult<?> loadingResult, A extractedData,
 			ProjectionTransformContext context) {
 		// Nothing to transform: we take the values as they are.
-		return accumulator.finish( extractedData );
+		return collector.finish( extractedData );
 	}
 
 	private Double extractDistanceFromScriptField(JsonObject hit) {
@@ -255,9 +255,9 @@ public class ElasticsearchDistanceToFieldProjection<A, P> extends AbstractElasti
 		}
 
 		@Override
-		public <P> SearchProjection<P> build(ProjectionAccumulator.Provider<Double, P> accumulatorProvider) {
-			return new ElasticsearchDistanceToFieldProjection<>( this, accumulatorProvider,
-					accumulatorProvider.get() );
+		public <P> SearchProjection<P> build(ProjectionCollector.Provider<Double, P> collectorProvider) {
+			return new ElasticsearchDistanceToFieldProjection<>( this, collectorProvider,
+					collectorProvider.get() );
 		}
 	}
 }

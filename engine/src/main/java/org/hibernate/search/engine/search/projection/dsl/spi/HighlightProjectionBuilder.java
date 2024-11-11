@@ -4,7 +4,7 @@
  */
 package org.hibernate.search.engine.search.projection.dsl.spi;
 
-import org.hibernate.search.engine.search.projection.ProjectionAccumulator;
+import org.hibernate.search.engine.search.projection.ProjectionCollector;
 import org.hibernate.search.engine.search.projection.SearchProjection;
 
 public abstract class HighlightProjectionBuilder {
@@ -20,5 +20,5 @@ public abstract class HighlightProjectionBuilder {
 		return this;
 	}
 
-	public abstract <V> SearchProjection<V> build(ProjectionAccumulator.Provider<String, V> accumulatorProvider);
+	public abstract <V> SearchProjection<V> build(ProjectionCollector.Provider<String, V> collectorProvider);
 }

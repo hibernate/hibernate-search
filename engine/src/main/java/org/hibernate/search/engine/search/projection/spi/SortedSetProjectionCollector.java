@@ -8,21 +8,23 @@ import java.util.List;
 import java.util.SortedSet;
 import java.util.TreeSet;
 
+import org.hibernate.search.engine.search.projection.ProjectionCollector;
+
 /**
- * A {@link org.hibernate.search.engine.search.projection.ProjectionAccumulator} that can accumulate any number of values into a {@link SortedSet}.
+ * A {@link ProjectionCollector} that can accumulate any number of values into a {@link SortedSet}.
  *
  * @param <E> The type of extracted values to accumulate before being transformed.
  * @param <V> The type of values to accumulate obtained by transforming extracted values ({@code E}).
  */
-final class SortedSetProjectionAccumulator<E, V> extends ListBasedProjectionAccumulator<E, V, SortedSet<V>> {
+final class SortedSetProjectionCollector<E, V> extends ListBasedProjectionCollector<E, V, SortedSet<V>> {
 
 	@SuppressWarnings("rawtypes")
-	static final org.hibernate.search.engine.search.projection.ProjectionAccumulator.Provider PROVIDER =
-			new org.hibernate.search.engine.search.projection.ProjectionAccumulator.Provider() {
-				private final SortedSetProjectionAccumulator instance = new SortedSetProjectionAccumulator();
+	static final ProjectionCollector.Provider PROVIDER =
+			new ProjectionCollector.Provider() {
+				private final SortedSetProjectionCollector instance = new SortedSetProjectionCollector();
 
 				@Override
-				public org.hibernate.search.engine.search.projection.ProjectionAccumulator get() {
+				public ProjectionCollector get() {
 					return instance;
 				}
 
@@ -32,7 +34,7 @@ final class SortedSetProjectionAccumulator<E, V> extends ListBasedProjectionAccu
 				}
 			};
 
-	private SortedSetProjectionAccumulator() {
+	private SortedSetProjectionCollector() {
 	}
 
 	@Override

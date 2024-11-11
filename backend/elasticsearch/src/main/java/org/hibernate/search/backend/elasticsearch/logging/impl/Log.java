@@ -602,7 +602,7 @@ public interface Log extends BasicLogger {
 	@Message(id = ID_OFFSET + 113,
 			value = "Invalid cardinality for projection on field '%1$s': the projection is single-valued,"
 					+ " but this field is multi-valued."
-					+ " Make sure to call '.accumulator(...)' when you create the projection.")
+					+ " Make sure to call '.collector(...)' when you create the projection.")
 	SearchException invalidSingleValuedProjectionOnMultiValuedField(String absolutePath, @Param EventContext context);
 
 	@Message(id = ID_OFFSET + 117,
@@ -732,9 +732,9 @@ public interface Log extends BasicLogger {
 			value = "Invalid cardinality for projection on field '%1$s': the projection is single-valued,"
 					+ " but this field is effectively multi-valued in this context,"
 					+ " because parent object field '%2$s' is multi-valued."
-					+ " Either call '.accumulator(...)' when you create the projection on field '%1$s',"
+					+ " Either call '.collector(...)' when you create the projection on field '%1$s',"
 					+ " or wrap that projection in an object projection like this:"
-					+ " 'f.object(\"%2$s\").from(<the projection on field %1$s>).as(...).accumulator(...)'.")
+					+ " 'f.object(\"%2$s\").from(<the projection on field %1$s>).as(...).collector(...)'.")
 	SearchException invalidSingleValuedProjectionOnValueFieldInMultiValuedObjectField(String absolutePath,
 			String objectFieldAbsolutePath);
 

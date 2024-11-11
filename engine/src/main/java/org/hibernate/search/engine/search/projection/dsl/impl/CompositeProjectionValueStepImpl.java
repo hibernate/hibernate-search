@@ -4,7 +4,7 @@
  */
 package org.hibernate.search.engine.search.projection.dsl.impl;
 
-import org.hibernate.search.engine.search.projection.ProjectionAccumulator;
+import org.hibernate.search.engine.search.projection.ProjectionCollector;
 import org.hibernate.search.engine.search.projection.SearchProjection;
 import org.hibernate.search.engine.search.projection.dsl.CompositeProjectionOptionsStep;
 import org.hibernate.search.engine.search.projection.dsl.CompositeProjectionValueStep;
@@ -17,11 +17,11 @@ public class CompositeProjectionValueStepImpl<T>
 
 	public CompositeProjectionValueStepImpl(CompositeProjectionBuilder builder,
 			SearchProjection<?>[] inners, ProjectionCompositor<?, T> compositor) {
-		super( builder, inners, compositor, ProjectionAccumulator.nullable() );
+		super( builder, inners, compositor, ProjectionCollector.nullable() );
 	}
 
 	@Override
-	public <R> CompositeProjectionOptionsStep<?, R> accumulator(ProjectionAccumulator.Provider<T, R> accumulator) {
-		return new CompositeProjectionOptionsStepImpl<>( builder, inners, compositor, accumulator );
+	public <R> CompositeProjectionOptionsStep<?, R> collector(ProjectionCollector.Provider<T, R> collector) {
+		return new CompositeProjectionOptionsStepImpl<>( builder, inners, compositor, collector );
 	}
 }

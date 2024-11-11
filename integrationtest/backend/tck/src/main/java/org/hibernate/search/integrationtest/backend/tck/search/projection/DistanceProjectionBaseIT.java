@@ -9,7 +9,7 @@ import java.util.List;
 
 import org.hibernate.search.engine.backend.types.ObjectStructure;
 import org.hibernate.search.engine.backend.types.dsl.SearchableProjectableIndexFieldTypeOptionsStep;
-import org.hibernate.search.engine.search.projection.ProjectionAccumulator;
+import org.hibernate.search.engine.search.projection.ProjectionCollector;
 import org.hibernate.search.engine.search.projection.dsl.ProjectionFinalStep;
 import org.hibernate.search.engine.search.projection.dsl.SearchProjectionFactory;
 import org.hibernate.search.engine.spatial.GeoPoint;
@@ -155,7 +155,7 @@ class DistanceProjectionBaseIT {
 		protected ProjectionFinalStep<List<Double>> multiValuedProjection(SearchProjectionFactory<?, ?> f,
 				String absoluteFieldPath, DataSet<GeoPoint, Double, DistanceProjectionTestValues> dataSet) {
 			return f.distance( absoluteFieldPath, dataSet.values.projectionCenterPoint() )
-					.accumulator( ProjectionAccumulator.list() );
+					.collector( ProjectionCollector.list() );
 		}
 
 	}

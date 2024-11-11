@@ -12,8 +12,8 @@ import org.hibernate.search.engine.common.tree.TreeFilterDefinition;
 import org.hibernate.search.engine.environment.bean.BeanHolder;
 import org.hibernate.search.engine.environment.bean.BeanReference;
 import org.hibernate.search.engine.environment.bean.BeanResolver;
-import org.hibernate.search.engine.search.projection.ProjectionAccumulator;
-import org.hibernate.search.engine.search.projection.ProjectionAccumulatorProviderFactory;
+import org.hibernate.search.engine.search.projection.ProjectionCollector;
+import org.hibernate.search.engine.search.projection.ProjectionCollectorProviderFactory;
 import org.hibernate.search.engine.search.projection.definition.ProjectionDefinition;
 import org.hibernate.search.engine.search.projection.dsl.SearchProjectionFactory;
 import org.hibernate.search.mapper.pojo.bridge.mapping.annotation.PropertyBinderRef;
@@ -157,7 +157,7 @@ public interface ProjectionBindingContext {
 	@Incubating
 	default <T> BeanHolder<? extends ProjectionDefinition<T>> createObjectDefinition(String fieldPath, Class<T> projectedType,
 			TreeFilterDefinition filter) {
-		return createObjectDefinition( fieldPath, projectedType, filter, ProjectionAccumulator.nullable() );
+		return createObjectDefinition( fieldPath, projectedType, filter, ProjectionCollector.nullable() );
 	}
 
 	/**
@@ -171,13 +171,13 @@ public interface ProjectionBindingContext {
 	 * @throws SearchException If mapping the given type to a projection definition fails.
 	 * @see org.hibernate.search.engine.search.projection.dsl.SearchProjectionFactory#object(String)
 	 * @see org.hibernate.search.engine.search.projection.dsl.CompositeProjectionInnerStep#as(Class)
-	 * @deprecated Use {@link #createObjectDefinition(String, Class, TreeFilterDefinition, ProjectionAccumulator.Provider)} instead.
+	 * @deprecated Use {@link #createObjectDefinition(String, Class, TreeFilterDefinition, ProjectionCollector.Provider)} instead.
 	 */
 	@Deprecated(since = "8.0")
 	@Incubating
 	default <T> BeanHolder<? extends ProjectionDefinition<List<T>>> createObjectDefinitionMulti(String fieldPath,
 			Class<T> projectedType, TreeFilterDefinition filter) {
-		return createObjectDefinition( fieldPath, projectedType, filter, ProjectionAccumulator.list() );
+		return createObjectDefinition( fieldPath, projectedType, filter, ProjectionCollector.list() );
 	}
 
 	/**
@@ -194,7 +194,7 @@ public interface ProjectionBindingContext {
 	 */
 	@Incubating
 	<C, T> BeanHolder<? extends ProjectionDefinition<C>> createObjectDefinition(String fieldPath,
-			Class<T> projectedType, TreeFilterDefinition filter, ProjectionAccumulator.Provider<T, C> accumulator);
+			Class<T> projectedType, TreeFilterDefinition filter, ProjectionCollector.Provider<T, C> collector);
 
 	/**
 	 * @param projectedType A type expected to have a corresponding projection mapping
@@ -220,10 +220,10 @@ public interface ProjectionBindingContext {
 	boolean isIncluded(String fieldPath);
 
 	/**
-	 * @return An instance of a projection accumulator provider factory capable of supplying an accumulator provider
+	 * @return An instance of a projection collector provider factory capable of supplying a collector provider
 	 * based on a container and component types.
 	 */
 	@Incubating
-	ProjectionAccumulatorProviderFactory projectionAccumulatorProviderFactory();
+	ProjectionCollectorProviderFactory projectionCollectorProviderFactory();
 
 }

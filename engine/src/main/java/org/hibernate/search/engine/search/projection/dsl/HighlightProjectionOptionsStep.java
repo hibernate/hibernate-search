@@ -11,7 +11,7 @@ import java.util.SortedSet;
 import java.util.function.Function;
 
 import org.hibernate.search.engine.search.highlighter.dsl.HighlighterOptionsStep;
-import org.hibernate.search.engine.search.projection.ProjectionAccumulator;
+import org.hibernate.search.engine.search.projection.ProjectionCollector;
 import org.hibernate.search.util.common.annotation.Incubating;
 
 /**
@@ -41,17 +41,17 @@ public interface HighlightProjectionOptionsStep extends HighlightProjectionFinal
 	 *
 	 * @return A final step in the highlight projection definition.
 	 * @see HighlighterOptionsStep#numberOfFragments(int)
-	 * @deprecated Use the {@link #accumulator(ProjectionAccumulator.Provider)} instead, e.g. {@code .accumulator(ProjectionAccumulator.single())}
+	 * @deprecated Use the {@link #collector(ProjectionCollector.Provider)} instead, e.g. {@code .collector(ProjectionCollector.single())}
 	 */
 	@Deprecated(since = "8.0")
 	SingleHighlightProjectionFinalStep single();
 
 	/**
-	 * Defines the accumulator to apply to the highlighted strings.
+	 * Defines the collector to apply to the highlighted strings.
 	 * <p>
 	 * By default, highlighting results in a list {@code List<String>} of highlighted strings.
 	 * This method allows changing the returned type to a different collection of strings, e.g. {@code Set<String>}/{@code String[]}
-	 * or obtaining a single-valued projection (i.e. {@code projectionAccumulatorProvider.isSingleValued () == true}).
+	 * or obtaining a single-valued projection (i.e. {@code projectionCollectorProvider.isSingleValued () == true}).
 	 * <p>
 	 * Note: single-valued projections can only be used when the highlighter
 	 * that creates highlighted fragments for this projection is configured
@@ -59,11 +59,12 @@ public interface HighlightProjectionOptionsStep extends HighlightProjectionFinal
 	 * is applied to the highlighter.
 	 * Otherwise, it will lead to an exception being thrown when the query is created.
 	 *
-	 * @param accumulator The accumulator provider to apply to this projection.
+	 * @param collector The collector provider to apply to this projection.
 	 * @return A final step in the highlight projection definition.
 	 * @param <R> The type of the final result.
 	 */
-	<R> ProjectionFinalStep<R> accumulator(ProjectionAccumulator.Provider<String, R> accumulator);
+	@Incubating
+	<R> ProjectionFinalStep<R> collector(ProjectionCollector.Provider<String, R> collector);
 
 	/**
 	 * Defines the projection as single-valued, i.e. returning {@code String} instead of {@code List<String>}.
@@ -78,7 +79,7 @@ public interface HighlightProjectionOptionsStep extends HighlightProjectionFinal
 	 */
 	@Incubating
 	default ProjectionFinalStep<String> nullable() {
-		return accumulator( ProjectionAccumulator.nullable() );
+		return collector( ProjectionCollector.nullable() );
 	}
 
 	/**
@@ -94,7 +95,7 @@ public interface HighlightProjectionOptionsStep extends HighlightProjectionFinal
 	 */
 	@Incubating
 	default ProjectionFinalStep<Optional<String>> optional() {
-		return accumulator( ProjectionAccumulator.optional() );
+		return collector( ProjectionCollector.optional() );
 	}
 
 	/**
@@ -103,7 +104,7 @@ public interface HighlightProjectionOptionsStep extends HighlightProjectionFinal
 	 */
 	@Incubating
 	default ProjectionFinalStep<Set<String>> set() {
-		return accumulator( ProjectionAccumulator.set() );
+		return collector( ProjectionCollector.set() );
 	}
 
 	/**
@@ -112,7 +113,7 @@ public interface HighlightProjectionOptionsStep extends HighlightProjectionFinal
 	 */
 	@Incubating
 	default ProjectionFinalStep<SortedSet<String>> sortedSet() {
-		return accumulator( ProjectionAccumulator.sortedSet() );
+		return collector( ProjectionCollector.sortedSet() );
 	}
 
 	/**
@@ -122,7 +123,7 @@ public interface HighlightProjectionOptionsStep extends HighlightProjectionFinal
 	 */
 	@Incubating
 	default ProjectionFinalStep<SortedSet<String>> sortedSet(Comparator<String> comparator) {
-		return accumulator( ProjectionAccumulator.sortedSet( comparator ) );
+		return collector( ProjectionCollector.sortedSet( comparator ) );
 	}
 
 	/**
@@ -131,6 +132,6 @@ public interface HighlightProjectionOptionsStep extends HighlightProjectionFinal
 	 */
 	@Incubating
 	default ProjectionFinalStep<String[]> array() {
-		return accumulator( ProjectionAccumulator.array( String.class ) );
+		return collector( ProjectionCollector.array( String.class ) );
 	}
 }

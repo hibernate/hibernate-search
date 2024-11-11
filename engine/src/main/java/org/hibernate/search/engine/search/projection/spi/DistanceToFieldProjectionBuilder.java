@@ -4,7 +4,7 @@
  */
 package org.hibernate.search.engine.search.projection.spi;
 
-import org.hibernate.search.engine.search.projection.ProjectionAccumulator;
+import org.hibernate.search.engine.search.projection.ProjectionCollector;
 import org.hibernate.search.engine.search.projection.SearchProjection;
 import org.hibernate.search.engine.spatial.DistanceUnit;
 import org.hibernate.search.engine.spatial.GeoPoint;
@@ -17,9 +17,9 @@ public interface DistanceToFieldProjectionBuilder extends SearchProjectionBuilde
 
 	@Override
 	default SearchProjection<Double> build() {
-		return build( ProjectionAccumulator.nullable() );
+		return build( ProjectionCollector.nullable() );
 	}
 
-	<P> SearchProjection<P> build(ProjectionAccumulator.Provider<Double, P> accumulatorProvider);
+	<P> SearchProjection<P> build(ProjectionCollector.Provider<Double, P> collectorProvider);
 
 }

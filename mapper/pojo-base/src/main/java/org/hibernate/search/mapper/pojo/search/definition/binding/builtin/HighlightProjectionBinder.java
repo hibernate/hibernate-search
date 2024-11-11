@@ -8,7 +8,7 @@ import java.lang.invoke.MethodHandles;
 import java.util.Optional;
 import java.util.function.Function;
 
-import org.hibernate.search.engine.search.projection.ProjectionAccumulator;
+import org.hibernate.search.engine.search.projection.ProjectionCollector;
 import org.hibernate.search.engine.search.projection.SearchProjection;
 import org.hibernate.search.engine.search.projection.definition.ProjectionDefinitionContext;
 import org.hibernate.search.engine.search.projection.definition.spi.AbstractProjectionDefinition;
@@ -85,15 +85,15 @@ public final class HighlightProjectionBinder implements ProjectionBinder {
 		String fieldPath = fieldPathOrFail( context );
 		Optional<PojoModelValue<?>> containerElementOptional = context.containerElement();
 
-		var accumulator = context.projectionAccumulatorProviderFactory()
-				.projectionAccumulatorProvider(
-						// if there's no container element, there's no container hence we are working with a "nullable" accumulator:
+		var collector = context.projectionCollectorProviderFactory()
+				.projectionCollectorProvider(
+						// if there's no container element, there's no container hence we are working with a "nullable" collector:
 						containerElementOptional.isPresent()
 								? context.constructorParameter().rawType()
 								: null,
 						String.class );
 
-		context.definition( String.class, new Definition<>( fieldPath, highlighterName, accumulator ) );
+		context.definition( String.class, new Definition<>( fieldPath, highlighterName, collector ) );
 	}
 
 	private String fieldPathOrFail(ProjectionBindingContext context) {
@@ -110,12 +110,12 @@ public final class HighlightProjectionBinder implements ProjectionBinder {
 	private static class Definition<T> extends AbstractProjectionDefinition<T> {
 		private final String fieldPath;
 		private final String highlighterName;
-		private final ProjectionAccumulator.Provider<String, T> accumulator;
+		private final ProjectionCollector.Provider<String, T> collector;
 
-		private Definition(String fieldPath, String highlighterName, ProjectionAccumulator.Provider<String, T> accumulator) {
+		private Definition(String fieldPath, String highlighterName, ProjectionCollector.Provider<String, T> collector) {
 			this.fieldPath = fieldPath;
 			this.highlighterName = highlighterName;
-			this.accumulator = accumulator;
+			this.collector = collector;
 		}
 
 		@Override
@@ -127,7 +127,7 @@ public final class HighlightProjectionBinder implements ProjectionBinder {
 		public SearchProjection<T> create(SearchProjectionFactory<?, ?> factory, ProjectionDefinitionContext context) {
 			return factory.highlight( fieldPath )
 					.highlighter( highlighterName )
-					.accumulator( accumulator )
+					.collector( collector )
 					.toProjection();
 		}
 

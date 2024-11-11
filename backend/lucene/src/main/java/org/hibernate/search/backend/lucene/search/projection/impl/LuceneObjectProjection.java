@@ -16,7 +16,7 @@ import org.hibernate.search.backend.lucene.search.predicate.impl.LuceneSearchPre
 import org.hibernate.search.backend.lucene.search.predicate.impl.PredicateRequestContext;
 import org.hibernate.search.engine.search.loading.spi.LoadingResult;
 import org.hibernate.search.engine.search.predicate.spi.PredicateTypeKeys;
-import org.hibernate.search.engine.search.projection.ProjectionAccumulator;
+import org.hibernate.search.engine.search.projection.ProjectionCollector;
 import org.hibernate.search.engine.search.projection.SearchProjection;
 import org.hibernate.search.engine.search.projection.spi.CompositeProjectionBuilder;
 import org.hibernate.search.engine.search.projection.spi.ProjectionCompositor;
@@ -47,21 +47,21 @@ public class LuceneObjectProjection<E, V, P>
 	private final String requiredContextAbsoluteFieldPath;
 	private final LuceneSearchProjection<?>[] inners;
 	private final ProjectionCompositor<E, V> compositor;
-	private final ProjectionAccumulator.Provider<V, P> accumulatorProvider;
+	private final ProjectionCollector.Provider<V, P> collectorProvider;
 
 	public LuceneObjectProjection(Builder builder, LuceneSearchProjection<?>[] inners,
-			ProjectionCompositor<E, V> compositor, ProjectionAccumulator.Provider<V, P> accumulatorProvider) {
+			ProjectionCompositor<E, V> compositor, ProjectionCollector.Provider<V, P> collectorProvider) {
 		super( builder.scope );
 		this.absoluteFieldPath = builder.objectField.absolutePath();
 		this.nested = builder.objectField.type().nested();
 		this.filter = builder.filter;
 		this.nestedDocumentPath = builder.objectField.nestedDocumentPath();
-		this.requiredContextAbsoluteFieldPath = accumulatorProvider.isSingleValued()
+		this.requiredContextAbsoluteFieldPath = collectorProvider.isSingleValued()
 				? builder.objectField.closestMultiValuedParentAbsolutePath()
 				: null;
 		this.inners = inners;
 		this.compositor = compositor;
-		this.accumulatorProvider = accumulatorProvider;
+		this.collectorProvider = collectorProvider;
 	}
 
 	@Override
@@ -69,7 +69,7 @@ public class LuceneObjectProjection<E, V, P>
 		return getClass().getSimpleName() + "["
 				+ "inners=" + Arrays.toString( inners )
 				+ ", compositor=" + compositor
-				+ ", accumulatorProvider=" + accumulatorProvider
+				+ ", collectorProvider=" + collectorProvider
 				+ "]";
 	}
 
@@ -86,7 +86,7 @@ public class LuceneObjectProjection<E, V, P>
 			innerExtractors[i] = inners[i].request( innerContext );
 		}
 		return new ObjectFieldExtractor<>( context.absoluteCurrentNestedFieldPath(), innerExtractors,
-				accumulatorProvider.get() );
+				collectorProvider.get() );
 	}
 
 	/**
@@ -95,13 +95,13 @@ public class LuceneObjectProjection<E, V, P>
 	private class ObjectFieldExtractor<A> implements Extractor<A, P> {
 		private final String contextAbsoluteFieldPath;
 		private final Extractor<?, ?>[] inners;
-		private final ProjectionAccumulator<E, V, A, P> accumulator;
+		private final ProjectionCollector<E, V, A, P> collector;
 
 		private ObjectFieldExtractor(String contextAbsoluteFieldPath,
-				Extractor<?, ?>[] inners, ProjectionAccumulator<E, V, A, P> accumulator) {
+				Extractor<?, ?>[] inners, ProjectionCollector<E, V, A, P> collector) {
 			this.contextAbsoluteFieldPath = contextAbsoluteFieldPath;
 			this.inners = inners;
-			this.accumulator = accumulator;
+			this.collector = collector;
 		}
 
 		@Override
@@ -109,7 +109,7 @@ public class LuceneObjectProjection<E, V, P>
 			return getClass().getSimpleName() + "["
 					+ "inners=" + Arrays.toString( inners )
 					+ ", compositor=" + compositor
-					+ ", accumulator=" + accumulator
+					+ ", collector=" + collector
 					+ "]";
 		}
 
@@ -129,7 +129,7 @@ public class LuceneObjectProjection<E, V, P>
 			private BitSet filterMatchedBitSet;
 
 			private ObjectFieldValues(TopDocsDataCollectorExecutionContext context, Values<?>[] inners) {
-				super( contextAbsoluteFieldPath, nestedDocumentPath, ObjectFieldExtractor.this.accumulator, context );
+				super( contextAbsoluteFieldPath, nestedDocumentPath, ObjectFieldExtractor.this.collector, context );
 				this.inners = inners;
 				this.filterBitSetProducer = filter == null ? null : new QueryBitSetProducer( filter );
 
@@ -158,15 +158,15 @@ public class LuceneObjectProjection<E, V, P>
 					Object extractedDataForInner = inners[i].get( docId );
 					components = compositor.set( components, i, extractedDataForInner );
 				}
-				return accumulator.accumulate( accumulated, components );
+				return collector.accumulate( accumulated, components );
 			}
 		}
 
 		@Override
 		public final P transform(LoadingResult<?> loadingResult, A accumulated,
 				ProjectionTransformContext context) {
-			for ( int i = 0; i < accumulator.size( accumulated ); i++ ) {
-				E transformedData = accumulator.get( accumulated, i );
+			for ( int i = 0; i < collector.size( accumulated ); i++ ) {
+				E transformedData = collector.get( accumulated, i );
 				// Transform in-place
 				for ( int j = 0; j < inners.length; j++ ) {
 					Object extractedDataForInner = compositor.get( transformedData, j );
@@ -174,9 +174,9 @@ public class LuceneObjectProjection<E, V, P>
 							extractedDataForInner, context );
 					transformedData = compositor.set( transformedData, j, transformedDataForInner );
 				}
-				accumulated = accumulator.transform( accumulated, i, compositor.finish( transformedData ) );
+				accumulated = collector.transform( accumulated, i, compositor.finish( transformedData ) );
 			}
-			return accumulator.finish( accumulated );
+			return collector.finish( accumulated );
 		}
 	}
 
@@ -222,8 +222,8 @@ public class LuceneObjectProjection<E, V, P>
 
 		@Override
 		public <E, V, P> SearchProjection<P> build(SearchProjection<?>[] inners, ProjectionCompositor<E, V> compositor,
-				ProjectionAccumulator.Provider<V, P> accumulatorProvider) {
-			if ( accumulatorProvider.isSingleValued() && objectField.multiValued() ) {
+				ProjectionCollector.Provider<V, P> collectorProvider) {
+			if ( collectorProvider.isSingleValued() && objectField.multiValued() ) {
 				throw log.invalidSingleValuedProjectionOnMultiValuedField( objectField.absolutePath(),
 						objectField.eventContext() );
 			}
@@ -233,7 +233,7 @@ public class LuceneObjectProjection<E, V, P>
 				typedInners[i] = LuceneSearchProjection.from( scope, inners[i] );
 			}
 			return new LuceneObjectProjection<>( this, typedInners,
-					compositor, accumulatorProvider );
+					compositor, collectorProvider );
 		}
 	}
 }

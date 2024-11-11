@@ -11,7 +11,7 @@ import org.hibernate.search.backend.elasticsearch.search.common.impl.Elasticsear
 import org.hibernate.search.backend.elasticsearch.search.common.impl.ElasticsearchSearchIndexScope;
 import org.hibernate.search.engine.search.loading.spi.LoadingResult;
 import org.hibernate.search.engine.search.loading.spi.ProjectionHitMapper;
-import org.hibernate.search.engine.search.projection.ProjectionAccumulator;
+import org.hibernate.search.engine.search.projection.ProjectionCollector;
 import org.hibernate.search.engine.search.projection.SearchProjection;
 import org.hibernate.search.engine.search.projection.spi.CompositeProjectionBuilder;
 import org.hibernate.search.engine.search.projection.spi.ProjectionCompositor;
@@ -37,19 +37,19 @@ public class ElasticsearchObjectProjection<E, V, P>
 	private final String requiredContextAbsoluteFieldPath;
 	private final ElasticsearchSearchProjection<?>[] inners;
 	private final ProjectionCompositor<E, V> compositor;
-	private final ProjectionAccumulator.Provider<V, P> accumulatorProvider;
+	private final ProjectionCollector.Provider<V, P> collectorProvider;
 
 	public ElasticsearchObjectProjection(Builder builder, ElasticsearchSearchProjection<?>[] inners,
-			ProjectionCompositor<E, V> compositor, ProjectionAccumulator.Provider<V, P> accumulatorProvider) {
+			ProjectionCompositor<E, V> compositor, ProjectionCollector.Provider<V, P> collectorProvider) {
 		super( builder.scope );
 		this.absoluteFieldPath = builder.objectField.absolutePath();
 		this.absoluteFieldPathComponents = builder.objectField.absolutePathComponents();
-		this.requiredContextAbsoluteFieldPath = accumulatorProvider.isSingleValued()
+		this.requiredContextAbsoluteFieldPath = collectorProvider.isSingleValued()
 				? builder.objectField.closestMultiValuedParentAbsolutePath()
 				: null;
 		this.inners = inners;
 		this.compositor = compositor;
-		this.accumulatorProvider = accumulatorProvider;
+		this.collectorProvider = collectorProvider;
 	}
 
 	@Override
@@ -57,7 +57,7 @@ public class ElasticsearchObjectProjection<E, V, P>
 		return getClass().getSimpleName() + "["
 				+ "inners=" + Arrays.toString( inners )
 				+ ", compositor=" + compositor
-				+ ", accumulatorProvider=" + accumulatorProvider
+				+ ", collectorProvider=" + collectorProvider
 				+ "]";
 	}
 
@@ -76,7 +76,7 @@ public class ElasticsearchObjectProjection<E, V, P>
 		for ( int i = 0; i < inners.length; i++ ) {
 			innerExtractors[i] = inners[i].request( requestBody, innerContext );
 		}
-		return new ObjectFieldExtractor<>( extractorFieldPathComponents, accumulatorProvider.get(), innerExtractors );
+		return new ObjectFieldExtractor<>( extractorFieldPathComponents, collectorProvider.get(), innerExtractors );
 	}
 
 	/**
@@ -85,9 +85,9 @@ public class ElasticsearchObjectProjection<E, V, P>
 	private class ObjectFieldExtractor<A> extends AccumulatingSourceExtractor<E, V, A, P> {
 		private final Extractor<?, ?>[] inners;
 
-		private ObjectFieldExtractor(String[] fieldPathComponents, ProjectionAccumulator<E, V, A, P> accumulator,
+		private ObjectFieldExtractor(String[] fieldPathComponents, ProjectionCollector<E, V, A, P> collector,
 				Extractor<?, ?>[] inners) {
-			super( fieldPathComponents, accumulator );
+			super( fieldPathComponents, collector );
 			this.inners = inners;
 		}
 
@@ -96,7 +96,7 @@ public class ElasticsearchObjectProjection<E, V, P>
 			return getClass().getSimpleName() + "["
 					+ "inners=" + Arrays.toString( inners )
 					+ ", compositor=" + compositor
-					+ ", accumulator=" + accumulator
+					+ ", collector=" + collector
 					+ "]";
 		}
 
@@ -123,8 +123,8 @@ public class ElasticsearchObjectProjection<E, V, P>
 		@Override
 		public final P transform(LoadingResult<?> loadingResult, A accumulated,
 				ProjectionTransformContext context) {
-			for ( int i = 0; i < accumulator.size( accumulated ); i++ ) {
-				E transformedData = accumulator.get( accumulated, i );
+			for ( int i = 0; i < collector.size( accumulated ); i++ ) {
+				E transformedData = collector.get( accumulated, i );
 				if ( transformedData == null ) {
 					continue;
 				}
@@ -136,9 +136,9 @@ public class ElasticsearchObjectProjection<E, V, P>
 					transformedData = compositor.set( transformedData, j, transformedDataForInner );
 				}
 
-				accumulated = accumulator.transform( accumulated, i, compositor.finish( transformedData ) );
+				accumulated = collector.transform( accumulated, i, compositor.finish( transformedData ) );
 			}
-			return accumulator.finish( accumulated );
+			return collector.finish( accumulated );
 		}
 	}
 
@@ -163,8 +163,8 @@ public class ElasticsearchObjectProjection<E, V, P>
 
 		@Override
 		public <E, V, P> SearchProjection<P> build(SearchProjection<?>[] inners, ProjectionCompositor<E, V> compositor,
-				ProjectionAccumulator.Provider<V, P> accumulatorProvider) {
-			if ( accumulatorProvider.isSingleValued() && objectField.multiValued() ) {
+				ProjectionCollector.Provider<V, P> collectorProvider) {
+			if ( collectorProvider.isSingleValued() && objectField.multiValued() ) {
 				throw log.invalidSingleValuedProjectionOnMultiValuedField( objectField.absolutePath(),
 						objectField.eventContext() );
 			}
@@ -174,7 +174,7 @@ public class ElasticsearchObjectProjection<E, V, P>
 				typedInners[i] = ElasticsearchSearchProjection.from( scope, inners[i] );
 			}
 			return new ElasticsearchObjectProjection<>( this, typedInners,
-					compositor, accumulatorProvider );
+					compositor, collectorProvider );
 		}
 	}
 }

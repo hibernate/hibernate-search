@@ -5,7 +5,7 @@
 package org.hibernate.search.engine.search.projection.spi;
 
 import org.hibernate.search.engine.search.common.ValueModel;
-import org.hibernate.search.engine.search.projection.ProjectionAccumulator;
+import org.hibernate.search.engine.search.projection.ProjectionCollector;
 import org.hibernate.search.engine.search.projection.SearchProjection;
 
 public interface FieldProjectionBuilder<T> extends SearchProjectionBuilder<T> {
@@ -16,9 +16,9 @@ public interface FieldProjectionBuilder<T> extends SearchProjectionBuilder<T> {
 
 	@Override
 	default SearchProjection<T> build() {
-		return build( ProjectionAccumulator.nullable() );
+		return build( ProjectionCollector.nullable() );
 	}
 
-	<P> SearchProjection<P> build(ProjectionAccumulator.Provider<T, P> accumulatorProvider);
+	<P> SearchProjection<P> build(ProjectionCollector.Provider<T, P> collectorProvider);
 
 }

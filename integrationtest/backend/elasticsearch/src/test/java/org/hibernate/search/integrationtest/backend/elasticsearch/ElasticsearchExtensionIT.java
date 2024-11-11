@@ -47,7 +47,7 @@ import org.hibernate.search.engine.search.aggregation.AggregationKey;
 import org.hibernate.search.engine.search.common.ValueModel;
 import org.hibernate.search.engine.search.loading.spi.SearchLoadingContext;
 import org.hibernate.search.engine.search.predicate.SearchPredicate;
-import org.hibernate.search.engine.search.projection.ProjectionAccumulator;
+import org.hibernate.search.engine.search.projection.ProjectionCollector;
 import org.hibernate.search.engine.search.projection.SearchProjection;
 import org.hibernate.search.engine.search.query.SearchQuery;
 import org.hibernate.search.engine.search.sort.SearchSort;
@@ -1108,7 +1108,7 @@ class ElasticsearchExtensionIT {
 		assertThatThrownBy( () -> mainIndex.createScope().query()
 				.select( f -> f.object( "nestedObject" ).from(
 						f.extension( ElasticsearchExtension.get() ).jsonHit()
-				).asList().accumulator( ProjectionAccumulator.list() )
+				).asList().collector( ProjectionCollector.list() )
 				)
 				.where( f -> f.matchAll() )
 				.toQuery()
@@ -1124,7 +1124,7 @@ class ElasticsearchExtensionIT {
 		assertThatThrownBy( () -> mainIndex.createScope().query()
 				.select( f -> f.object( "nestedObject" ).from(
 						f.extension( ElasticsearchExtension.get() ).source()
-				).asList().accumulator( ProjectionAccumulator.list() )
+				).asList().collector( ProjectionCollector.list() )
 				)
 				.where( f -> f.matchAll() )
 				.toQuery()
@@ -1140,7 +1140,7 @@ class ElasticsearchExtensionIT {
 		assertThatThrownBy( () -> mainIndex.createScope().query()
 				.select( f -> f.object( "nestedObject" ).from(
 						f.extension( ElasticsearchExtension.get() ).explanation()
-				).asList().accumulator( ProjectionAccumulator.list() )
+				).asList().collector( ProjectionCollector.list() )
 				)
 				.where( f -> f.matchAll() )
 				.toQuery()

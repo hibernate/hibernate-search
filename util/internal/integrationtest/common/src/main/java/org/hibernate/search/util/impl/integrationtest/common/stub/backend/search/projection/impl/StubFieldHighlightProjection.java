@@ -8,7 +8,7 @@ import java.util.Iterator;
 
 import org.hibernate.search.engine.search.loading.spi.LoadingResult;
 import org.hibernate.search.engine.search.loading.spi.ProjectionHitMapper;
-import org.hibernate.search.engine.search.projection.ProjectionAccumulator;
+import org.hibernate.search.engine.search.projection.ProjectionCollector;
 import org.hibernate.search.engine.search.projection.SearchProjection;
 import org.hibernate.search.engine.search.projection.dsl.spi.HighlightProjectionBuilder;
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.search.common.impl.AbstractStubSearchQueryElementFactory;
@@ -18,13 +18,13 @@ import org.hibernate.search.util.impl.integrationtest.common.stub.backend.search
 public class StubFieldHighlightProjection<T, A> extends StubSearchProjection<T> {
 	private final String fieldPath;
 	private final String highlighterName;
-	private final ProjectionAccumulator<Object, String, A, T> accumulator;
+	private final ProjectionCollector<Object, String, A, T> collector;
 
 	public StubFieldHighlightProjection(String fieldPath, String highlighterName,
-			ProjectionAccumulator<Object, String, A, T> accumulator) {
+			ProjectionCollector<Object, String, A, T> collector) {
 		this.fieldPath = fieldPath;
 		this.highlighterName = highlighterName;
-		this.accumulator = accumulator;
+		this.collector = collector;
 	}
 
 	@Override
@@ -36,7 +36,7 @@ public class StubFieldHighlightProjection<T, A> extends StubSearchProjection<T> 
 	@Override
 	@SuppressWarnings("unchecked")
 	public T transform(LoadingResult<?> loadingResult, Object extractedData, StubSearchProjectionContext context) {
-		return accumulator.finish( (A) extractedData );
+		return collector.finish( (A) extractedData );
 	}
 
 	@Override
@@ -64,8 +64,8 @@ public class StubFieldHighlightProjection<T, A> extends StubSearchProjection<T> 
 		}
 
 		@Override
-		public <V> SearchProjection<V> build(ProjectionAccumulator.Provider<String, V> accumulatorProvider) {
-			return new StubFieldHighlightProjection<>( path, highlighterName, accumulatorProvider.get() );
+		public <V> SearchProjection<V> build(ProjectionCollector.Provider<String, V> collectorProvider) {
+			return new StubFieldHighlightProjection<>( path, highlighterName, collectorProvider.get() );
 		}
 	}
 }

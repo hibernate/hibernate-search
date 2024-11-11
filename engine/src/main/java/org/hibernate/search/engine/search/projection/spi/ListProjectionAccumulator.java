@@ -6,14 +6,16 @@ package org.hibernate.search.engine.search.projection.spi;
 
 import java.util.List;
 
+import org.hibernate.search.engine.search.projection.ProjectionCollector;
+
 /**
- * A {@link ProjectionAccumulator} that can accumulate any number of values into a {@link java.util.List}.
+ * A {@link ProjectionCollector} that can accumulate any number of values into a {@link java.util.List}.
  *
  * @param <E> The type of extracted values to accumulate before being transformed.
  * @param <V> The type of values to accumulate obtained by transforming extracted values ({@code E}).
  */
 @SuppressWarnings("deprecation")
-final class ListProjectionAccumulator<E, V> extends ListBasedProjectionAccumulator<E, V, List<V>>
+final class ListProjectionAccumulator<E, V> extends ListBasedProjectionCollector<E, V, List<V>>
 		implements ProjectionAccumulator<E, V, List<Object>, List<V>> {
 
 	@SuppressWarnings("rawtypes")

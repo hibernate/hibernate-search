@@ -4,7 +4,7 @@
  */
 package org.hibernate.search.engine.search.projection.dsl.impl;
 
-import org.hibernate.search.engine.search.projection.ProjectionAccumulator;
+import org.hibernate.search.engine.search.projection.ProjectionCollector;
 import org.hibernate.search.engine.search.projection.SearchProjection;
 import org.hibernate.search.engine.search.projection.dsl.FieldProjectionOptionsStep;
 import org.hibernate.search.engine.search.projection.spi.FieldProjectionBuilder;
@@ -13,17 +13,17 @@ public class FieldProjectionOptionsStepImpl<T, P>
 		implements FieldProjectionOptionsStep<FieldProjectionOptionsStepImpl<T, P>, P> {
 
 	protected final FieldProjectionBuilder<T> fieldProjectionBuilder;
-	private final ProjectionAccumulator.Provider<T, P> accumulatorProvider;
+	private final ProjectionCollector.Provider<T, P> collectorProvider;
 
 	FieldProjectionOptionsStepImpl(FieldProjectionBuilder<T> fieldProjectionBuilder,
-			ProjectionAccumulator.Provider<T, P> accumulatorProvider) {
+			ProjectionCollector.Provider<T, P> collectorProvider) {
 		this.fieldProjectionBuilder = fieldProjectionBuilder;
-		this.accumulatorProvider = accumulatorProvider;
+		this.collectorProvider = collectorProvider;
 	}
 
 	@Override
 	public SearchProjection<P> toProjection() {
-		return fieldProjectionBuilder.build( accumulatorProvider );
+		return fieldProjectionBuilder.build( collectorProvider );
 	}
 
 }

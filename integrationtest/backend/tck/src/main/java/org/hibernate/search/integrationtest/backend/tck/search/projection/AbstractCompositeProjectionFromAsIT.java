@@ -25,7 +25,7 @@ import org.hibernate.search.engine.backend.common.spi.FieldPaths;
 import org.hibernate.search.engine.backend.document.DocumentElement;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaElement;
 import org.hibernate.search.engine.backend.types.Projectable;
-import org.hibernate.search.engine.search.projection.ProjectionAccumulator;
+import org.hibernate.search.engine.search.projection.ProjectionCollector;
 import org.hibernate.search.engine.search.projection.definition.spi.ProjectionRegistry;
 import org.hibernate.search.engine.search.projection.dsl.CompositeProjectionFrom1AsStep;
 import org.hibernate.search.engine.search.projection.dsl.CompositeProjectionFrom2AsStep;
@@ -116,7 +116,7 @@ public abstract class AbstractCompositeProjectionFromAsIT<B extends AbstractComp
 		public void asList_multi() {
 			assertThatQuery( index.query()
 					.select( f -> doFromForMulti( f, startProjectionForMulti( f ) ).asList()
-							.accumulator( ProjectionAccumulator.list() ) )
+							.collector( ProjectionCollector.list() ) )
 					.where( f -> f.matchAll() ) )
 					.hasHitsAnyOrder( expectedListsForMulti() );
 		}
@@ -159,7 +159,7 @@ public abstract class AbstractCompositeProjectionFromAsIT<B extends AbstractComp
 		public void asArray_multi() {
 			assertThatQuery( index.query()
 					.select( f -> doFromForMulti( f, startProjectionForMulti( f ) ).asArray()
-							.accumulator( ProjectionAccumulator.list() ) )
+							.collector( ProjectionCollector.list() ) )
 					.where( f -> f.matchAll() ) )
 					.hits().asIs().usingRecursiveFieldByFieldElementComparator()
 					.containsExactlyInAnyOrderElementsOf( expectedArraysForMulti() );
@@ -169,7 +169,7 @@ public abstract class AbstractCompositeProjectionFromAsIT<B extends AbstractComp
 		public void asArray_set() {
 			assertThatQuery( index.query()
 					.select( f -> doFromForMulti( f, startProjectionForMulti( f ) ).asArray()
-							.accumulator( ProjectionAccumulator.set() ) )
+							.collector( ProjectionCollector.set() ) )
 					.where( f -> f.matchAll() ) )
 					.hits().asIs().usingRecursiveFieldByFieldElementComparator()
 					.containsExactlyInAnyOrderElementsOf( expectedArraysForMulti()
@@ -216,7 +216,7 @@ public abstract class AbstractCompositeProjectionFromAsIT<B extends AbstractComp
 						.asArray( ValueWrapper<Object[]>::new ) );
 				assertThatQuery( index.createScope().query()
 						.select( f -> startProjectionForMulti( f ).as( ValueWrapper.class )
-								.accumulator( ProjectionAccumulator.list() ) )
+								.collector( ProjectionCollector.list() ) )
 						.where( f -> f.matchAll() ) )
 						.hits().asIs().usingRecursiveFieldByFieldElementComparator()
 						.containsExactlyInAnyOrderElementsOf( expectedArraysForMulti().stream()

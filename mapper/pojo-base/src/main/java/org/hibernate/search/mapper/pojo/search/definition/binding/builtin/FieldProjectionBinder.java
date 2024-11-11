@@ -107,13 +107,13 @@ public final class FieldProjectionBinder implements ProjectionBinder {
 
 	private <T, C> void bind(ProjectionBindingContext context, String fieldPath,
 			Class<C> containerType, Class<T> containerElementType) {
-		var accumulator = context.projectionAccumulatorProviderFactory()
-				.projectionAccumulatorProvider( containerType, containerElementType );
+		var collector = context.projectionCollectorProviderFactory()
+				.projectionCollectorProvider( containerType, containerElementType );
 
 		context.definition( containerElementType, context.isIncluded( fieldPath )
 				? BeanHolder.of( new FieldProjectionDefinition.AccumulatedValued<>( fieldPath, containerElementType,
-						accumulator, valueModel ) )
-				: ConstantProjectionDefinition.empty( accumulator ) );
+						collector, valueModel ) )
+				: ConstantProjectionDefinition.empty( collector ) );
 	}
 
 	private String fieldPathOrFail(ProjectionBindingContext context) {
