@@ -39,7 +39,7 @@ See <<mapping-projection-inner-inference>> for more information on how construct
 +
 Alternatively, the field projection can be configured explicitly with <<search-dsl-projection-field-mapping,`@FieldProjection`>>.
 <4> To project on an object field, add a constructor parameter named after that field and with its own custom projection type.
-Multivalued projections <<mapping-projection-inner-inference-type,must be modeled as one of the multivalued containers available in `ProjectionAccumulator`>> or their supertype.
+Multivalued projections <<mapping-projection-inner-inference-type,must be modeled as one of the multivalued containers for which a collector is available in `ProjectionCollector`>> or their supertype.
 +
 Alternatively, the object projection can be configured explicitly with <<search-dsl-projection-object-mapping,`@ObjectProjection`>>.
 <5> Annotate any custom projection type used for object fields with `@ProjectionConstructor` as well.
@@ -106,10 +106,10 @@ for the target field, which in general is the type of the property annotated wit
 (generally mapped using <<mapping-indexedembedded,`@IndexedEmbedded`>>),
 set the parameter type to another custom type annotated with `@ProjectionConstructor`,
 whose constructor will define which fields to extract from that object field.
-* For projections where values are wrapped in some container, be it a multivalued projection represented by some collection or array,
+* For projections where values are wrapped in a container, be it a multivalued projection represented by some collection or array,
 or a single-valued projection wrapped in an optional,
 follow the rules above for the elements inside the container and then wrap the type with one of the containers
-available in `ProjectionAccumulator` (`Iterable`, `Collection`, `List`, etc.),
+available in `ProjectionCollector` (`Iterable`, `Collection`, `List`, etc.),
 e.g. `Iterable<SomeType>`, `Collection<SomeType>`, `List<SomeType>`, etc.
 
 [IMPORTANT]
@@ -120,12 +120,10 @@ Constructor parameters meant to represent a multivalued projection
 
 [NOTE]
 ====
-In case the `ProjectionAccumulator` does not provide a suitable accumulator for a container/collection
+In case the `ProjectionCollector` does not provide a suitable collector for a container/collection
 needed for a constructor parameter mapping, <<binding-projection-multi,a custom projection binding>> can be implemented
-and a user-implemented projection accumulator applied.
+and a user-implemented projection collector applied.
 ====
-
-
 
 [[mapping-projection-inner-inference-fieldpath]]
 === [[mapper-orm-mapping-projection-inner-inference-fieldpath]] Inner projection and field path

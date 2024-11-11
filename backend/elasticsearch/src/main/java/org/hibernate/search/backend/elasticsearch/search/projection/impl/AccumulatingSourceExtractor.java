@@ -12,7 +12,7 @@ import org.hibernate.search.backend.elasticsearch.gson.impl.JsonArrayAccessor;
 import org.hibernate.search.backend.elasticsearch.gson.impl.JsonElementTypes;
 import org.hibernate.search.backend.elasticsearch.gson.impl.UnexpectedJsonElementTypeException;
 import org.hibernate.search.engine.search.loading.spi.ProjectionHitMapper;
-import org.hibernate.search.engine.search.projection.ProjectionAccumulator;
+import org.hibernate.search.engine.search.projection.ProjectionCollector;
 
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
@@ -24,18 +24,18 @@ abstract class AccumulatingSourceExtractor<E, V, A, P>
 			JsonAccessor.root().property( "_source" ).asArray();
 
 	private final String[] fieldPathComponents;
-	final ProjectionAccumulator<E, V, A, P> accumulator;
+	final ProjectionCollector<E, V, A, P> collector;
 
 	public AccumulatingSourceExtractor(String[] fieldPathComponents,
-			ProjectionAccumulator<E, V, A, P> accumulator) {
+			ProjectionCollector<E, V, A, P> collector) {
 		this.fieldPathComponents = fieldPathComponents;
-		this.accumulator = accumulator;
+		this.collector = collector;
 	}
 
 	@Override
 	public final A extract(ProjectionHitMapper<?> projectionHitMapper, JsonObject hit,
 			JsonObject source, ProjectionExtractContext context) {
-		A accumulated = accumulator.createInitial();
+		A accumulated = collector.createInitial();
 		accumulated = collect( projectionHitMapper, hit, source, context, accumulated, 0 );
 		return accumulated;
 	}
@@ -83,17 +83,17 @@ abstract class AccumulatingSourceExtractor<E, V, A, P>
 		}
 		else if ( fieldValue.isJsonNull() ) {
 			// Present, but null
-			return accumulator.accumulate( accumulated, extract( projectionHitMapper, hit, fieldValue, context ) );
+			return collector.accumulate( accumulated, extract( projectionHitMapper, hit, fieldValue, context ) );
 		}
 		else if ( !canDecodeArrays() && fieldValue.isJsonArray() ) {
 			for ( JsonElement childElement : fieldValue.getAsJsonArray() ) {
-				accumulated = accumulator.accumulate( accumulated,
+				accumulated = collector.accumulate( accumulated,
 						extract( projectionHitMapper, hit, childElement, context ) );
 			}
 			return accumulated;
 		}
 		else {
-			return accumulator.accumulate( accumulated, extract( projectionHitMapper, hit, fieldValue, context ) );
+			return collector.accumulate( accumulated, extract( projectionHitMapper, hit, fieldValue, context ) );
 		}
 	}
 

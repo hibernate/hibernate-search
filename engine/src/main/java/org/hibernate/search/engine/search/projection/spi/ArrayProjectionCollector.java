@@ -7,19 +7,21 @@ package org.hibernate.search.engine.search.projection.spi;
 import java.lang.reflect.Array;
 import java.util.List;
 
+import org.hibernate.search.engine.search.projection.ProjectionCollector;
+
 /**
- * A {@link ProjectionAccumulator} that can accumulate any number of values into a {@code V[]}.
+ * A {@link ProjectionCollector} that can accumulate any number of values into a {@code V[]}.
  *
  * @param <E> The type of extracted values to accumulate before being transformed.
  * @param <V> The type of values to accumulate obtained by transforming extracted values ({@code E}).
  */
-final class ArrayProjectionAccumulator<E, V> extends ListBasedProjectionAccumulator<E, V, V[]> {
+final class ArrayProjectionCollector<E, V> extends ListBasedProjectionCollector<E, V, V[]> {
 
 	static <U, R> Provider<U, R> provider(Class<? super U> elementType) {
 		return new ArrayProvider<>( elementType );
 	}
 
-	private ArrayProjectionAccumulator(Class<? super V> elementType) {
+	private ArrayProjectionCollector(Class<? super V> elementType) {
 		this.elementType = elementType;
 	}
 
@@ -38,15 +40,15 @@ final class ArrayProjectionAccumulator<E, V> extends ListBasedProjectionAccumula
 
 	@SuppressWarnings("unchecked")
 	private static class ArrayProvider<U, R> implements Provider<U, R> {
-		private final ArrayProjectionAccumulator<?, U> instance;
+		private final ArrayProjectionCollector<?, U> instance;
 
 		private ArrayProvider(Class<? super U> elementType) {
-			instance = new ArrayProjectionAccumulator<>( elementType );
+			instance = new ArrayProjectionCollector<>( elementType );
 		}
 
 		@Override
-		public <T> org.hibernate.search.engine.search.projection.ProjectionAccumulator<T, U, ?, R> get() {
-			return (org.hibernate.search.engine.search.projection.ProjectionAccumulator<T, U, ?, R>) instance;
+		public <T> ProjectionCollector<T, U, ?, R> get() {
+			return (ProjectionCollector<T, U, ?, R>) instance;
 		}
 
 		@Override

@@ -21,7 +21,7 @@ import org.hibernate.search.backend.lucene.search.projection.impl.ProjectionExtr
 import org.hibernate.search.engine.search.highlighter.dsl.HighlighterFragmenter;
 import org.hibernate.search.engine.search.highlighter.spi.BoundaryScannerType;
 import org.hibernate.search.engine.search.highlighter.spi.SearchHighlighterType;
-import org.hibernate.search.engine.search.projection.ProjectionAccumulator;
+import org.hibernate.search.engine.search.projection.ProjectionCollector;
 
 import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.search.IndexSearcher;
@@ -90,9 +90,9 @@ class LuceneUnifiedSearchHighlighter extends LuceneAbstractSearchHighlighter {
 	@Override
 	public <A, T> Values<A> createValues(String parentDocumentPath, String nestedDocumentPath,
 			String absoluteFieldPath, Analyzer analyzer, ProjectionExtractContext context,
-			ProjectionAccumulator<String, ?, A, T> accumulator) {
+			ProjectionCollector<String, ?, A, T> collector) {
 		return new UnifiedHighlighterValues<>(
-				parentDocumentPath, nestedDocumentPath, absoluteFieldPath, analyzer, context, accumulator );
+				parentDocumentPath, nestedDocumentPath, absoluteFieldPath, analyzer, context, collector );
 	}
 
 	@Override
@@ -109,8 +109,8 @@ class LuceneUnifiedSearchHighlighter extends LuceneAbstractSearchHighlighter {
 		private final MultiValueUnifiedHighlighter highlighter;
 
 		UnifiedHighlighterValues(String parentDocumentPath, String nestedDocumentPath, String field, Analyzer analyzer,
-				ProjectionExtractContext context, ProjectionAccumulator<String, ?, A, T> accumulator) {
-			super( parentDocumentPath, nestedDocumentPath, context.collectorExecutionContext(), accumulator );
+				ProjectionExtractContext context, ProjectionCollector<String, ?, A, T> collector) {
+			super( parentDocumentPath, nestedDocumentPath, context.collectorExecutionContext(), collector );
 			this.fieldsIn = new String[] { field };
 			this.maxPassagesIn = new int[] { LuceneUnifiedSearchHighlighter.this.numberOfFragments };
 			this.query = context.collectorExecutionContext().originalQuery();

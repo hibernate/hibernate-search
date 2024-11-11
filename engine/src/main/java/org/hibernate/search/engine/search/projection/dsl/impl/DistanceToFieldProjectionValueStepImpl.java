@@ -4,7 +4,7 @@
  */
 package org.hibernate.search.engine.search.projection.dsl.impl;
 
-import org.hibernate.search.engine.search.projection.ProjectionAccumulator;
+import org.hibernate.search.engine.search.projection.ProjectionCollector;
 import org.hibernate.search.engine.search.projection.dsl.DistanceToFieldProjectionOptionsStep;
 import org.hibernate.search.engine.search.projection.dsl.DistanceToFieldProjectionValueStep;
 import org.hibernate.search.engine.search.projection.dsl.spi.SearchProjectionDslContext;
@@ -18,14 +18,15 @@ public final class DistanceToFieldProjectionValueStepImpl
 	public DistanceToFieldProjectionValueStepImpl(SearchProjectionDslContext<?> dslContext, String fieldPath,
 			GeoPoint center) {
 		super( dslContext.scope().fieldQueryElement( fieldPath, ProjectionTypeKeys.DISTANCE ),
-				ProjectionAccumulator.nullable() );
+				ProjectionCollector.nullable() );
 		distanceFieldProjectionBuilder.center( center );
 	}
 
 	@Override
-	public <R> DistanceToFieldProjectionOptionsStep<?, R> accumulator(ProjectionAccumulator.Provider<Double, R> accumulator) {
+	public <R> DistanceToFieldProjectionOptionsStep<?, R> collector(ProjectionCollector.Provider<Double, R> collector) {
 		return new DistanceToFieldProjectionOptionsStepImpl<>( distanceFieldProjectionBuilder,
-				accumulator );
+				collector
+		);
 	}
 
 }

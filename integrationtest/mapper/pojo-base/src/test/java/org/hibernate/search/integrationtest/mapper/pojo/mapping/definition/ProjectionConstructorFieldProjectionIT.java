@@ -14,7 +14,7 @@ import java.util.List;
 import java.util.Set;
 
 import org.hibernate.search.engine.search.common.ValueModel;
-import org.hibernate.search.engine.search.projection.ProjectionAccumulator;
+import org.hibernate.search.engine.search.projection.ProjectionCollector;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.DocumentId;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.FieldProjection;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.FullTextField;
@@ -580,8 +580,8 @@ class ProjectionConstructorFieldProjectionIT extends AbstractProjectionConstruct
 				f -> f.composite()
 						.from(
 								dummyProjectionForEnclosingClassInstance( f ),
-								f.field( "text", String.class ).accumulator( ProjectionAccumulator.list() ),
-								f.field( "integer", Integer.class ).accumulator( ProjectionAccumulator.list() )
+								f.field( "text", String.class ).collector( ProjectionCollector.list() ),
+								f.field( "integer", Integer.class ).collector( ProjectionCollector.list() )
 						)
 						.asList(),
 				Arrays.asList(
@@ -631,8 +631,8 @@ class ProjectionConstructorFieldProjectionIT extends AbstractProjectionConstruct
 				f -> f.composite()
 						.from(
 								dummyProjectionForEnclosingClassInstance( f ),
-								f.field( "text", String.class ).accumulator( ProjectionAccumulator.list() ),
-								f.field( "integer", Integer.class ).accumulator( ProjectionAccumulator.list() )
+								f.field( "text", String.class ).collector( ProjectionCollector.list() ),
+								f.field( "integer", Integer.class ).collector( ProjectionCollector.list() )
 						)
 						.asList(),
 				Arrays.asList(
@@ -682,8 +682,8 @@ class ProjectionConstructorFieldProjectionIT extends AbstractProjectionConstruct
 				f -> f.composite()
 						.from(
 								dummyProjectionForEnclosingClassInstance( f ),
-								f.field( "text", String.class ).accumulator( ProjectionAccumulator.list() ),
-								f.field( "integer", Integer.class ).accumulator( ProjectionAccumulator.list() )
+								f.field( "text", String.class ).collector( ProjectionCollector.list() ),
+								f.field( "integer", Integer.class ).collector( ProjectionCollector.list() )
 						)
 						.asList(),
 				Arrays.asList(
@@ -733,8 +733,8 @@ class ProjectionConstructorFieldProjectionIT extends AbstractProjectionConstruct
 				f -> f.composite()
 						.from(
 								dummyProjectionForEnclosingClassInstance( f ),
-								f.field( "text", String.class ).accumulator( ProjectionAccumulator.set() ),
-								f.field( "integer", Integer.class ).accumulator( ProjectionAccumulator.list() )
+								f.field( "text", String.class ).collector( ProjectionCollector.set() ),
+								f.field( "integer", Integer.class ).collector( ProjectionCollector.list() )
 						)
 						.asList(),
 				Arrays.asList(

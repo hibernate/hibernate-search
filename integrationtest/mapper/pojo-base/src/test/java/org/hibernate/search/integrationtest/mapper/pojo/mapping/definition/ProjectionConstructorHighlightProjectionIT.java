@@ -12,7 +12,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Set;
 
-import org.hibernate.search.engine.search.projection.ProjectionAccumulator;
+import org.hibernate.search.engine.search.projection.ProjectionCollector;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.DocumentId;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.FullTextField;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.GenericField;
@@ -237,7 +237,7 @@ class ProjectionConstructorHighlightProjectionIT extends AbstractProjectionConst
 				f -> f.composite()
 						.from(
 								dummyProjectionForEnclosingClassInstance( f ),
-								f.highlight( "text" ).accumulator( ProjectionAccumulator.nullable() )
+								f.highlight( "text" ).collector( ProjectionCollector.nullable() )
 						)
 						.asList(),
 				Arrays.asList(

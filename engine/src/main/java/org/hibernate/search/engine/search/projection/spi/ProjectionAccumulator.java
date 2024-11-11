@@ -9,6 +9,7 @@ import java.util.List;
 
 import org.hibernate.search.engine.backend.types.converter.runtime.FromDocumentValueConvertContext;
 import org.hibernate.search.engine.backend.types.converter.spi.ProjectionConverter;
+import org.hibernate.search.engine.search.projection.ProjectionCollector;
 
 /**
  * A variation on {@link java.util.stream.Collector} suitable for projections on field values.
@@ -31,11 +32,11 @@ import org.hibernate.search.engine.backend.types.converter.spi.ProjectionConvert
  * before and after being transformed.
  * @param <R> The type of the final result containing values of type {@code V}.
  *
- * @deprecated Use {@link org.hibernate.search.engine.search.projection.ProjectionAccumulator} instead.
+ * @deprecated Use {@link ProjectionCollector} instead.
  */
 @Deprecated(since = "8.0")
 public interface ProjectionAccumulator<E, V, A, R>
-		extends org.hibernate.search.engine.search.projection.ProjectionAccumulator<E, V, A, R> {
+		extends ProjectionCollector<E, V, A, R> {
 
 	@SuppressWarnings("unchecked") // PROVIDER works for any V.
 	static <V> Provider<V, V> single() {
@@ -55,6 +56,7 @@ public interface ProjectionAccumulator<E, V, A, R>
 	 * @return The initial accumulated container,
 	 * to pass to the first call to {@link #accumulate(Object, Object)}.
 	 */
+	@Override
 	A createInitial();
 
 	/**
@@ -68,6 +70,7 @@ public interface ProjectionAccumulator<E, V, A, R>
 	 * @param value The value to accumulate.
 	 * @return The new accumulated value.
 	 */
+	@Override
 	A accumulate(A accumulated, E value);
 
 	/**
@@ -81,6 +84,7 @@ public interface ProjectionAccumulator<E, V, A, R>
 	 * @param values The values to accumulate.
 	 * @return The new accumulated value.
 	 */
+	@Override
 	default A accumulateAll(A accumulated, Collection<E> values) {
 		for ( E value : values ) {
 			accumulated = accumulate( accumulated, value );
@@ -93,6 +97,7 @@ public interface ProjectionAccumulator<E, V, A, R>
 	 * returned by the last call to {@link #accumulate(Object, Object)}.
 	 * @return The number of elements in the accumulated value.
 	 */
+	@Override
 	int size(A accumulated);
 
 	/**
@@ -105,6 +110,7 @@ public interface ProjectionAccumulator<E, V, A, R>
 	 * @param index The index of the value to retrieve.
 	 * @return The value at the given index.
 	 */
+	@Override
 	E get(A accumulated, int index);
 
 	/**
@@ -119,6 +125,7 @@ public interface ProjectionAccumulator<E, V, A, R>
 	 * @param transformed The transformed value.
 	 * @return The new accumulated value.
 	 */
+	@Override
 	A transform(A accumulated, int index, V transformed);
 
 	/**
@@ -148,6 +155,7 @@ public interface ProjectionAccumulator<E, V, A, R>
 	 * or by successive calls to {@link #transform(Object, int, Object)}.
 	 * @return The final result of the accumulation.
 	 */
+	@Override
 	R finish(A accumulated);
 
 	/**
@@ -159,17 +167,19 @@ public interface ProjectionAccumulator<E, V, A, R>
 	 * @param <U> The type of values to accumulate after being transformed.
 	 * @param <R> The type of the final result containing values of type {@code V}.
 	 */
-	interface Provider<U, R> extends org.hibernate.search.engine.search.projection.ProjectionAccumulator.Provider<U, R> {
+	interface Provider<U, R> extends ProjectionCollector.Provider<U, R> {
 		/**
 		 * @param <T> The type of values to accumulate before being transformed.
 		 * @return An accumulator for the given type.
 		 */
+		@Override
 		<T> ProjectionAccumulator<T, U, ?, R> get();
 
 		/**
 		 * @return {@code true} if accumulators returned by {@link #get()} can only accept a single value,
 		 * and will fail beyond that.
 		 */
+		@Override
 		boolean isSingleValued();
 	}
 

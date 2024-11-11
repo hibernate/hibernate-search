@@ -16,7 +16,7 @@ import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaElement
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaObjectField;
 import org.hibernate.search.engine.backend.types.ObjectStructure;
 import org.hibernate.search.engine.backend.types.Projectable;
-import org.hibernate.search.engine.search.projection.ProjectionAccumulator;
+import org.hibernate.search.engine.search.projection.ProjectionCollector;
 import org.hibernate.search.engine.search.projection.dsl.SearchProjectionFactory;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.TckConfiguration;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.extension.SearchSetupHelper;
@@ -89,10 +89,10 @@ class ObjectProjectionSpecificsIT {
 								f.object( "level1" )
 										.from( f.field( "level1.field1" ) )
 										.asList()
-										.accumulator( ProjectionAccumulator.list() )
+										.collector( ProjectionCollector.list() )
 						)
 						.asList()
-						.accumulator( ProjectionAccumulator.list() ) )
+						.collector( ProjectionCollector.list() ) )
 				.where( f -> f.matchAll() )
 				.toQuery() )
 				.isInstanceOf( SearchException.class )
@@ -133,7 +133,7 @@ class ObjectProjectionSpecificsIT {
 				.hasMessageContainingAll(
 						"Invalid cardinality for projection on field 'level1'",
 						"the projection is single-valued, but this field is multi-valued",
-						"Make sure to call '.accumulator(...)' when you create the projection"
+						"Make sure to call '.collector(...)' when you create the projection"
 				);
 	}
 
@@ -152,9 +152,9 @@ class ObjectProjectionSpecificsIT {
 						"Invalid cardinality for projection on field 'level1WithSingleValuedLevel2.level2'",
 						"the projection is single-valued, but this field is effectively multi-valued in this context",
 						"because parent object field 'level1WithSingleValuedLevel2' is multi-valued",
-						"call '.accumulator(...)' when you create the projection on field 'level1WithSingleValuedLevel2.level2'",
+						"call '.collector(...)' when you create the projection on field 'level1WithSingleValuedLevel2.level2'",
 						"or wrap that projection in an object projection like this:"
-								+ " 'f.object(\"level1WithSingleValuedLevel2\").from(<the projection on field level1WithSingleValuedLevel2.level2>).as(...).accumulator(...)'."
+								+ " 'f.object(\"level1WithSingleValuedLevel2\").from(<the projection on field level1WithSingleValuedLevel2.level2>).as(...).collector(...)'."
 				);
 	}
 

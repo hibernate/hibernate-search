@@ -72,7 +72,7 @@ See <<mapping-projection-inner-inference>> for more information on how construct
 +
 Alternatively, the field projection can be configured explicitly with <<search-dsl-projection-field-mapping,`@FieldProjection`>>.
 <4> To project on an object field, add a constructor parameter named after that field and with its own custom projection type.
-Multivalued projections <<mapping-projection-inner-inference-type,must be modeled as one of the multivalued containers available in `ProjectionAccumulator`>> or their supertype.
+Multivalued projections <<mapping-projection-inner-inference-type,must be modeled as one of the multivalued containers available in `ProjectionCollector`>> or their supertype.
 +
 Alternatively, the object projection can be configured explicitly with <<search-dsl-projection-object-mapping,`@ObjectProjection`>>.
 <5> Annotate any custom projection type used for object fields with `@ProjectionConstructor` as well.
@@ -403,7 +403,7 @@ include::{sourcedir}/org/hibernate/search/documentation/search/projection/Projec
 [[search-dsl-projection-field-multivalued]]
 === Multivalued fields
 
-To return multiple values, and thus allow projection on multivalued fields, use `.accumulator(..)`.
+To return multiple values, and thus allow projection on multivalued fields, use `.collector(..)`.
 This will change the return type of the projection to `SomeContainer<T>` where `T` is what the single-valued projection
 would have returned.
 
@@ -610,7 +610,7 @@ include::{sourcedir}/org/hibernate/search/documentation/search/projection/Projec
 [[search-dsl-projection-distance-multivalued]]
 === Multivalued fields
 
-To return multiple values, and thus allow projection on multivalued fields, use `.accumulator(..)`.
+To return multiple values, and thus allow projection on multivalued fields, use `.collector(..)`.
 This will change the return type of the projection to `SomeContainer<Double>`.
 
 .Returning the distance to a point, for multivalued fields
@@ -834,7 +834,7 @@ See <<mapping-projection-inner-inference>> for more information on how construct
 +
 Alternatively, the field projection can be configured explicitly with <<search-dsl-projection-field-mapping,`@FieldProjection`>>.
 <4> To project on an object field, add a constructor parameter named after that field and with its own custom projection type.
-Multivalued projections <<mapping-projection-inner-inference-type,must be modeled as one of the multivalued containers available in `ProjectionAccumulator`>> or their supertype.
+Multivalued projections <<mapping-projection-inner-inference-type,must be modeled as one of the multivalued containers for which a collector is available in `ProjectionCollector`>> or their supertype.
 +
 Alternatively, the object projection can be configured explicitly with <<search-dsl-projection-object-mapping,`@ObjectProjection`>>.
 <5> Annotate any custom projection type used for object fields with `@ProjectionConstructor` as well.

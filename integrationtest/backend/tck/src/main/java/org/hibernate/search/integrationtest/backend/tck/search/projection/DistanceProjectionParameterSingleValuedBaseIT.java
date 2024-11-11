@@ -8,7 +8,7 @@ import java.util.List;
 
 import org.hibernate.search.engine.backend.common.DocumentReference;
 import org.hibernate.search.engine.common.EntityReference;
-import org.hibernate.search.engine.search.projection.ProjectionAccumulator;
+import org.hibernate.search.engine.search.projection.ProjectionCollector;
 import org.hibernate.search.engine.search.projection.dsl.ProjectionFinalStep;
 import org.hibernate.search.engine.search.projection.dsl.SearchProjectionFactory;
 import org.hibernate.search.engine.search.query.dsl.SearchQueryOptionsStep;
@@ -39,7 +39,7 @@ class DistanceProjectionParameterSingleValuedBaseIT extends AbstractDistanceProj
 			String parameterName) {
 		return projection.withParameters(
 				params -> projection.distance( path, params.get( parameterName, GeoPoint.class ) )
-						.accumulator( ProjectionAccumulator.list() ) );
+						.collector( ProjectionCollector.list() ) );
 	}
 
 	@Override

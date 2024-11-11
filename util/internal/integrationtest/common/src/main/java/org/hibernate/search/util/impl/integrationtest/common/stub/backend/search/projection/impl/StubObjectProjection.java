@@ -4,7 +4,7 @@
  */
 package org.hibernate.search.util.impl.integrationtest.common.stub.backend.search.projection.impl;
 
-import org.hibernate.search.engine.search.projection.ProjectionAccumulator;
+import org.hibernate.search.engine.search.projection.ProjectionCollector;
 import org.hibernate.search.engine.search.projection.SearchProjection;
 import org.hibernate.search.engine.search.projection.spi.CompositeProjectionBuilder;
 import org.hibernate.search.engine.search.projection.spi.ProjectionCompositor;
@@ -17,9 +17,9 @@ public class StubObjectProjection<E, V, A, P> extends StubCompositeProjection<E,
 	private final String objectFieldPath;
 
 	private StubObjectProjection(String objectFieldPath, StubSearchProjection<?>[] inners,
-			ProjectionCompositor<E, V> compositor, ProjectionAccumulator<E, V, A, P> accumulator,
+			ProjectionCompositor<E, V> compositor, ProjectionCollector<E, V, A, P> collector,
 			boolean singleValued) {
-		super( inners, compositor, accumulator, singleValued );
+		super( inners, compositor, collector, singleValued );
 		this.objectFieldPath = objectFieldPath;
 	}
 
@@ -51,9 +51,9 @@ public class StubObjectProjection<E, V, A, P> extends StubCompositeProjection<E,
 
 		@Override
 		protected <E, V, A, P> SearchProjection<P> doBuild(StubSearchProjection<?>[] typedInners,
-				ProjectionCompositor<E, V> compositor, ProjectionAccumulator<E, V, A, P> accumulator,
+				ProjectionCompositor<E, V> compositor, ProjectionCollector<E, V, A, P> collector,
 				boolean singleValued) {
-			return new StubObjectProjection<>( objectFieldPath, typedInners, compositor, accumulator, singleValued );
+			return new StubObjectProjection<>( objectFieldPath, typedInners, compositor, collector, singleValued );
 		}
 	}
 }

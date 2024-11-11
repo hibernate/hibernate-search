@@ -6,7 +6,7 @@ package org.hibernate.search.engine.search.projection.dsl.impl;
 
 import java.util.List;
 
-import org.hibernate.search.engine.search.projection.ProjectionAccumulator;
+import org.hibernate.search.engine.search.projection.ProjectionCollector;
 import org.hibernate.search.engine.search.projection.SearchProjection;
 import org.hibernate.search.engine.search.projection.dsl.HighlightProjectionFinalStep;
 import org.hibernate.search.engine.search.projection.dsl.HighlightProjectionOptionsStep;
@@ -39,33 +39,33 @@ public class HighlightProjectionOptionsStepImpl
 	}
 
 	@Override
-	public <R> ProjectionFinalStep<R> accumulator(
-			org.hibernate.search.engine.search.projection.ProjectionAccumulator.Provider<String, R> accumulator) {
-		return new AccumulatorHighlightProjectionFinalStepImpl<>( accumulator );
+	public <R> ProjectionFinalStep<R> collector(
+			ProjectionCollector.Provider<String, R> collector) {
+		return new CollectorHighlightProjectionFinalStepImpl<>( collector );
 	}
 
 	@Override
 	public SearchProjection<List<String>> toProjection() {
-		return highlight.build( ProjectionAccumulator.list() );
+		return highlight.build( ProjectionCollector.list() );
 	}
 
-	private class SingleHighlightProjectionFinalStepImpl extends AccumulatorHighlightProjectionFinalStepImpl<String>
+	private class SingleHighlightProjectionFinalStepImpl extends CollectorHighlightProjectionFinalStepImpl<String>
 			implements SingleHighlightProjectionFinalStep {
 		public SingleHighlightProjectionFinalStepImpl() {
-			super( ProjectionAccumulator.nullable() );
+			super( ProjectionCollector.nullable() );
 		}
 	}
 
-	private class AccumulatorHighlightProjectionFinalStepImpl<V> implements ProjectionFinalStep<V> {
-		private final ProjectionAccumulator.Provider<String, V> accumulatorProvider;
+	private class CollectorHighlightProjectionFinalStepImpl<V> implements ProjectionFinalStep<V> {
+		private final ProjectionCollector.Provider<String, V> collectorProvider;
 
-		private AccumulatorHighlightProjectionFinalStepImpl(ProjectionAccumulator.Provider<String, V> accumulatorProvider) {
-			this.accumulatorProvider = accumulatorProvider;
+		private CollectorHighlightProjectionFinalStepImpl(ProjectionCollector.Provider<String, V> collectorProvider) {
+			this.collectorProvider = collectorProvider;
 		}
 
 		@Override
 		public SearchProjection<V> toProjection() {
-			return highlight.build( accumulatorProvider );
+			return highlight.build( collectorProvider );
 		}
 	}
 }

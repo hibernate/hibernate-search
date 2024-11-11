@@ -27,7 +27,7 @@ import org.hibernate.search.documentation.testsupport.DocumentationSetupHelper;
 import org.hibernate.search.engine.backend.common.DocumentReference;
 import org.hibernate.search.engine.common.EntityReference;
 import org.hibernate.search.engine.search.common.ValueModel;
-import org.hibernate.search.engine.search.projection.ProjectionAccumulator;
+import org.hibernate.search.engine.search.projection.ProjectionCollector;
 import org.hibernate.search.engine.search.query.SearchResult;
 import org.hibernate.search.engine.spatial.DistanceUnit;
 import org.hibernate.search.engine.spatial.GeoPoint;
@@ -241,7 +241,7 @@ class ProjectionDslIT {
 		withinSearchSession( searchSession -> {
 			// tag::field-multiValued[]
 			List<List<String>> hits = searchSession.search( Book.class )
-					.select( f -> f.field( "authors.lastName", String.class ).accumulator( ProjectionAccumulator.list() ) )
+					.select( f -> f.field( "authors.lastName", String.class ).collector( ProjectionCollector.list() ) )
 					.where( f -> f.matchAll() )
 					.fetchHits( 20 );
 			// end::field-multiValued[]
@@ -334,7 +334,7 @@ class ProjectionDslIT {
 			// tag::distance-multiValued[]
 			GeoPoint center = GeoPoint.of( 47.506060, 2.473916 );
 			SearchResult<List<Double>> result = searchSession.search( Book.class )
-					.select( f -> f.distance( "authors.placeOfBirth", center ).accumulator( ProjectionAccumulator.list() ) )
+					.select( f -> f.distance( "authors.placeOfBirth", center ).collector( ProjectionCollector.list() ) )
 					.where( f -> f.matchAll() )
 					.fetch( 20 );
 			// end::distance-multiValued[]
@@ -581,7 +581,7 @@ class ProjectionDslIT {
 							.from( f.field( "authors.firstName", String.class ), // <2>
 									f.field( "authors.lastName", String.class ) ) // <3>
 							.as( MyAuthorName::new ) // <4>
-							.accumulator( ProjectionAccumulator.list() ) ) // <5>
+							.collector( ProjectionCollector.list() ) ) // <5>
 					.where( f -> f.matchAll() )
 					.fetchHits( 20 ); // <6>
 			// end::object-customObject[]
@@ -631,7 +631,7 @@ class ProjectionDslIT {
 									new MyAuthorNameAndBirthDateAndPlaceOfBirthDistance(
 											(String) list.get( 0 ), (String) list.get( 1 ),
 											(LocalDate) list.get( 2 ), (Double) list.get( 3 ) ) )
-							.accumulator( ProjectionAccumulator.list() ) ) // <7>
+							.collector( ProjectionCollector.list() ) ) // <7>
 					.where( f -> f.matchAll() )
 					.fetchHits( 20 ); // <8>
 			// end::object-customObject-asList[]
@@ -693,7 +693,7 @@ class ProjectionDslIT {
 									new MyAuthorNameAndBirthDateAndPlaceOfBirthDistance(
 											(String) array[0], (String) array[1],
 											(LocalDate) array[2], (Double) array[3] ) )
-							.accumulator( ProjectionAccumulator.list() ) ) // <7>
+							.collector( ProjectionCollector.list() ) ) // <7>
 					.where( f -> f.matchAll() )
 					.fetchHits( 20 ); // <8>
 			// end::object-customObject-asArray[]
@@ -746,7 +746,7 @@ class ProjectionDslIT {
 							.from( f.field( "authors.firstName", String.class ), // <2>
 									f.field( "authors.lastName", String.class ) ) // <3>
 							.asList() // <4>
-							.accumulator( ProjectionAccumulator.list() ) ) // <5>
+							.collector( ProjectionCollector.list() ) ) // <5>
 					.where( f -> f.matchAll() )
 					.fetchHits( 20 ); // <6>
 			// end::object-list[]
@@ -786,7 +786,7 @@ class ProjectionDslIT {
 							.from( f.field( "authors.firstName", String.class ), // <2>
 									f.field( "authors.lastName", String.class ) ) // <3>
 							.asArray() // <4>
-							.accumulator( ProjectionAccumulator.list() ) ) // <5>
+							.collector( ProjectionCollector.list() ) ) // <5>
 					.where( f -> f.matchAll() )
 					.fetchHits( 20 ); // <6>
 			// end::object-array[]

@@ -21,7 +21,7 @@ import org.hibernate.search.engine.backend.common.DocumentReference;
 import org.hibernate.search.engine.common.EntityReference;
 import org.hibernate.search.engine.search.loading.spi.ProjectionHitMapper;
 import org.hibernate.search.engine.search.loading.spi.SearchLoadingContext;
-import org.hibernate.search.engine.search.projection.ProjectionAccumulator;
+import org.hibernate.search.engine.search.projection.ProjectionCollector;
 import org.hibernate.search.engine.search.projection.definition.spi.CompositeProjectionDefinition;
 import org.hibernate.search.engine.search.projection.definition.spi.ProjectionRegistry;
 import org.hibernate.search.engine.search.query.SearchQuery;
@@ -123,7 +123,7 @@ class EntityProjectionIT extends AbstractEntityProjectionIT {
 							.select( f -> f.composite().from(
 									f.object( binding.nested.absolutePath )
 											.from( f.field( binding.nested.fieldPath(), String.class ) )
-											.asList().accumulator( ProjectionAccumulator.list() ),
+											.asList().collector( ProjectionCollector.list() ),
 									f.entity()
 							).asList()
 							)

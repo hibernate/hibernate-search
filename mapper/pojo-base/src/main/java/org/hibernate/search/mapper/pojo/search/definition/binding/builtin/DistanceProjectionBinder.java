@@ -9,7 +9,7 @@ import java.util.Optional;
 import java.util.function.Function;
 
 import org.hibernate.search.engine.environment.bean.BeanHolder;
-import org.hibernate.search.engine.search.projection.ProjectionAccumulator;
+import org.hibernate.search.engine.search.projection.ProjectionCollector;
 import org.hibernate.search.engine.search.projection.definition.spi.ConstantProjectionDefinition;
 import org.hibernate.search.engine.search.projection.definition.spi.DistanceProjectionDefinition;
 import org.hibernate.search.engine.search.projection.dsl.DistanceToFieldProjectionOptionsStep;
@@ -114,17 +114,17 @@ public final class DistanceProjectionBinder implements ProjectionBinder {
 			}
 			containerClass = null;
 		}
-		ProjectionAccumulator.Provider<Double, ?> accumulator = context.projectionAccumulatorProviderFactory()
-				.projectionAccumulatorProvider( containerClass, Double.class );
-		bind( context, fieldPath, accumulator );
+		ProjectionCollector.Provider<Double, ?> collector = context.projectionCollectorProviderFactory()
+				.projectionCollectorProvider( containerClass, Double.class );
+		bind( context, fieldPath, collector );
 	}
 
 	private void bind(ProjectionBindingContext context, String fieldPath,
-			ProjectionAccumulator.Provider<Double, ?> accumulator) {
+			ProjectionCollector.Provider<Double, ?> collector) {
 		context.definition( Double.class, context.isIncluded( fieldPath )
 				? BeanHolder
-						.of( new DistanceProjectionDefinition.WrappedValued<>( fieldPath, parameterName, unit, accumulator ) )
-				: ConstantProjectionDefinition.empty( accumulator ) );
+						.of( new DistanceProjectionDefinition.WrappedValued<>( fieldPath, parameterName, unit, collector ) )
+				: ConstantProjectionDefinition.empty( collector ) );
 	}
 
 	private String fieldPathOrFail(ProjectionBindingContext context) {

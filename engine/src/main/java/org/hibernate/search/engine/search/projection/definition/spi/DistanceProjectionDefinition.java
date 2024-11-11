@@ -6,7 +6,7 @@ package org.hibernate.search.engine.search.projection.definition.spi;
 
 import java.util.List;
 
-import org.hibernate.search.engine.search.projection.ProjectionAccumulator;
+import org.hibernate.search.engine.search.projection.ProjectionCollector;
 import org.hibernate.search.engine.search.projection.SearchProjection;
 import org.hibernate.search.engine.search.projection.definition.ProjectionDefinitionContext;
 import org.hibernate.search.engine.search.projection.dsl.SearchProjectionFactory;
@@ -82,7 +82,7 @@ public abstract class DistanceProjectionDefinition<F> extends AbstractProjection
 				ProjectionDefinitionContext context) {
 			return factory.withParameters( params -> factory
 					.distance( fieldPath, params.get( parameterName, GeoPoint.class ) )
-					.accumulator( ProjectionAccumulator.list() )
+					.collector( ProjectionCollector.list() )
 					.unit( unit )
 			).toProjection();
 		}
@@ -90,17 +90,17 @@ public abstract class DistanceProjectionDefinition<F> extends AbstractProjection
 
 	@Incubating
 	public static final class WrappedValued<C> extends DistanceProjectionDefinition<C> {
-		private final ProjectionAccumulator.Provider<Double, C> accumulator;
+		private final ProjectionCollector.Provider<Double, C> collector;
 
 		public WrappedValued(String fieldPath, String parameterName, DistanceUnit unit,
-				ProjectionAccumulator.Provider<Double, C> accumulator) {
+				ProjectionCollector.Provider<Double, C> collector) {
 			super( fieldPath, parameterName, unit );
-			this.accumulator = accumulator;
+			this.collector = collector;
 		}
 
 		@Override
 		protected boolean multi() {
-			return !accumulator.isSingleValued();
+			return !collector.isSingleValued();
 		}
 
 		@Override
@@ -108,7 +108,7 @@ public abstract class DistanceProjectionDefinition<F> extends AbstractProjection
 				ProjectionDefinitionContext context) {
 			return factory.withParameters( params -> factory
 					.distance( fieldPath, params.get( parameterName, GeoPoint.class ) )
-					.accumulator( accumulator )
+					.collector( collector )
 					.unit( unit )
 			).toProjection();
 		}

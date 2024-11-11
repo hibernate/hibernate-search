@@ -12,7 +12,7 @@ import org.hibernate.search.engine.backend.document.IndexObjectFieldReference;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaElement;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaObjectField;
 import org.hibernate.search.engine.backend.types.ObjectStructure;
-import org.hibernate.search.engine.search.projection.ProjectionAccumulator;
+import org.hibernate.search.engine.search.projection.ProjectionCollector;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.extension.SearchSetupHelper;
 import org.hibernate.search.util.common.SearchException;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.SimpleMappedIndex;
@@ -40,7 +40,7 @@ class UnsupportedNestingProjectionBaseIT {
 		assertThatThrownBy( () -> index.createScope().query()
 				.select( f -> f.object( "nested" ).from(
 						f.id()
-				).asList().accumulator( ProjectionAccumulator.list() )
+				).asList().collector( ProjectionCollector.list() )
 				)
 				.where( f -> f.matchAll() )
 				.toQuery()
@@ -57,7 +57,7 @@ class UnsupportedNestingProjectionBaseIT {
 		assertThatThrownBy( () -> index.createScope().query()
 				.select( f -> f.object( "nested" ).from(
 						f.entity()
-				).asList().accumulator( ProjectionAccumulator.list() )
+				).asList().collector( ProjectionCollector.list() )
 				)
 				.where( f -> f.matchAll() )
 				.toQuery()
@@ -74,7 +74,7 @@ class UnsupportedNestingProjectionBaseIT {
 		assertThatThrownBy( () -> index.createScope().query()
 				.select( f -> f.object( "nested" ).from(
 						f.entityReference()
-				).asList().accumulator( ProjectionAccumulator.list() )
+				).asList().collector( ProjectionCollector.list() )
 				)
 				.where( f -> f.matchAll() )
 				.toQuery()
@@ -91,7 +91,7 @@ class UnsupportedNestingProjectionBaseIT {
 		assertThatThrownBy( () -> index.createScope().query()
 				.select( f -> f.object( "nested" ).from(
 						f.documentReference()
-				).asList().accumulator( ProjectionAccumulator.list() )
+				).asList().collector( ProjectionCollector.list() )
 				)
 				.where( f -> f.matchAll() )
 				.toQuery()
@@ -108,7 +108,7 @@ class UnsupportedNestingProjectionBaseIT {
 		assertThatThrownBy( () -> index.createScope().query()
 				.select( f -> f.object( "nested" ).from(
 						f.score()
-				).asList().accumulator( ProjectionAccumulator.list() )
+				).asList().collector( ProjectionCollector.list() )
 				)
 				.where( f -> f.matchAll() )
 				.toQuery()

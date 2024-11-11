@@ -4,7 +4,7 @@
  */
 package org.hibernate.search.util.impl.integrationtest.common.stub.backend.search.projection.impl;
 
-import org.hibernate.search.engine.search.projection.ProjectionAccumulator;
+import org.hibernate.search.engine.search.projection.ProjectionCollector;
 import org.hibernate.search.engine.search.projection.SearchProjection;
 import org.hibernate.search.engine.search.projection.spi.DistanceToFieldProjectionBuilder;
 import org.hibernate.search.engine.spatial.DistanceUnit;
@@ -39,7 +39,7 @@ public abstract class StubDistanceToFieldProjection<T> extends StubSearchProject
 		}
 
 		@Override
-		public <P> SearchProjection<P> build(ProjectionAccumulator.Provider<Double, P> accumulatorProvider) {
+		public <P> SearchProjection<P> build(ProjectionCollector.Provider<Double, P> collectorProvider) {
 			throw new AssertionFailure( "Distance projections are not supported in the stub backend." );
 		}
 	}

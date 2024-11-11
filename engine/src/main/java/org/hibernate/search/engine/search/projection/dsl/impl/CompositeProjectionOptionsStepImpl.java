@@ -4,7 +4,7 @@
  */
 package org.hibernate.search.engine.search.projection.dsl.impl;
 
-import org.hibernate.search.engine.search.projection.ProjectionAccumulator;
+import org.hibernate.search.engine.search.projection.ProjectionCollector;
 import org.hibernate.search.engine.search.projection.SearchProjection;
 import org.hibernate.search.engine.search.projection.dsl.CompositeProjectionOptionsStep;
 import org.hibernate.search.engine.search.projection.spi.CompositeProjectionBuilder;
@@ -16,19 +16,19 @@ public class CompositeProjectionOptionsStepImpl<T, P>
 	final CompositeProjectionBuilder builder;
 	final SearchProjection<?>[] inners;
 	final ProjectionCompositor<?, T> compositor;
-	private final ProjectionAccumulator.Provider<T, P> accumulatorProvider;
+	private final ProjectionCollector.Provider<T, P> collectorProvider;
 
 	public CompositeProjectionOptionsStepImpl(CompositeProjectionBuilder builder,
 			SearchProjection<?>[] inners, ProjectionCompositor<?, T> compositor,
-			ProjectionAccumulator.Provider<T, P> accumulatorProvider) {
+			ProjectionCollector.Provider<T, P> collectorProvider) {
 		this.builder = builder;
 		this.inners = inners;
 		this.compositor = compositor;
-		this.accumulatorProvider = accumulatorProvider;
+		this.collectorProvider = collectorProvider;
 	}
 
 	@Override
 	public SearchProjection<P> toProjection() {
-		return builder.build( inners, compositor, accumulatorProvider );
+		return builder.build( inners, compositor, collectorProvider );
 	}
 }

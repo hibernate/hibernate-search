@@ -8,20 +8,22 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import org.hibernate.search.engine.search.projection.ProjectionCollector;
+
 /**
- * A {@link ProjectionAccumulator} that can accumulate any number of values into a {@link Set}.
+ * A {@link ProjectionCollector} that can accumulate any number of values into a {@link Set}.
  *
  * @param <E> The type of extracted values to accumulate before being transformed.
  * @param <V> The type of values to accumulate obtained by transforming extracted values ({@code E}).
  */
-final class SetProjectionAccumulator<E, V> extends ListBasedProjectionAccumulator<E, V, Set<V>> {
+final class SetProjectionCollector<E, V> extends ListBasedProjectionCollector<E, V, Set<V>> {
 
 	@SuppressWarnings("rawtypes")
 	static final Provider PROVIDER = new Provider() {
-		private final SetProjectionAccumulator instance = new SetProjectionAccumulator();
+		private final SetProjectionCollector instance = new SetProjectionCollector();
 
 		@Override
-		public org.hibernate.search.engine.search.projection.ProjectionAccumulator get() {
+		public ProjectionCollector get() {
 			return instance;
 		}
 
@@ -31,7 +33,7 @@ final class SetProjectionAccumulator<E, V> extends ListBasedProjectionAccumulato
 		}
 	};
 
-	private SetProjectionAccumulator() {
+	private SetProjectionCollector() {
 	}
 
 	@Override

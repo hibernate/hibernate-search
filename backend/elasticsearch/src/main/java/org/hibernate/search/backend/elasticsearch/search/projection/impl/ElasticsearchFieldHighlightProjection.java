@@ -19,7 +19,7 @@ import org.hibernate.search.engine.reporting.spi.EventContexts;
 import org.hibernate.search.engine.search.highlighter.spi.SearchHighlighterType;
 import org.hibernate.search.engine.search.loading.spi.LoadingResult;
 import org.hibernate.search.engine.search.loading.spi.ProjectionHitMapper;
-import org.hibernate.search.engine.search.projection.ProjectionAccumulator;
+import org.hibernate.search.engine.search.projection.ProjectionCollector;
 import org.hibernate.search.engine.search.projection.SearchProjection;
 import org.hibernate.search.engine.search.projection.dsl.spi.HighlightProjectionBuilder;
 
@@ -38,23 +38,23 @@ public class ElasticsearchFieldHighlightProjection<T> implements ElasticsearchSe
 
 	private final String highlighterName;
 	private final ElasticsearchSearchIndexValueFieldTypeContext<?> typeContext;
-	private final ProjectionAccumulator.Provider<String, T> accumulatorProvider;
+	private final ProjectionCollector.Provider<String, T> collectorProvider;
 
 	private ElasticsearchFieldHighlightProjection(Builder builder,
-			ProjectionAccumulator.Provider<String, T> accumulatorProvider) {
-		this( builder.scope, builder.field, builder.highlighterName(), accumulatorProvider );
+			ProjectionCollector.Provider<String, T> collectorProvider) {
+		this( builder.scope, builder.field, builder.highlighterName(), collectorProvider );
 	}
 
 	private ElasticsearchFieldHighlightProjection(ElasticsearchSearchIndexScope<?> scope,
 			ElasticsearchSearchIndexValueFieldContext<?> field,
 			String highlighterName,
-			ProjectionAccumulator.Provider<String, T> accumulatorProvider) {
+			ProjectionCollector.Provider<String, T> collectorProvider) {
 		this.indexNames = scope.hibernateSearchIndexNames();
 		this.absoluteFieldPath = field.absolutePath();
 		this.absoluteFieldPathComponents = field.absolutePathComponents();
 		this.highlighterName = highlighterName;
 		this.typeContext = field.type();
-		this.accumulatorProvider = accumulatorProvider;
+		this.collectorProvider = collectorProvider;
 	}
 
 	@Override
@@ -93,7 +93,7 @@ public class ElasticsearchFieldHighlightProjection<T> implements ElasticsearchSe
 		if ( !typeContext.highlighterTypeSupported( highlighterType ) ) {
 			throw log.highlighterTypeNotSupported( highlighterType, absoluteFieldPath );
 		}
-		if ( !context.root().isCompatibleHighlighter( highlighterName, accumulatorProvider ) ) {
+		if ( !context.root().isCompatibleHighlighter( highlighterName, collectorProvider ) ) {
 			throw log.highlighterIncompatibleCardinality();
 		}
 
@@ -102,26 +102,26 @@ public class ElasticsearchFieldHighlightProjection<T> implements ElasticsearchSe
 				REQUEST_HIGHLIGHT_FIELDS_ACCESSOR.getOrCreate( requestBody, JsonObject::new )
 		);
 
-		return new FieldHighlightExtractor<>( innerContext.absoluteCurrentFieldPath(), accumulatorProvider.get() );
+		return new FieldHighlightExtractor<>( innerContext.absoluteCurrentFieldPath(), collectorProvider.get() );
 	}
 
 	private class FieldHighlightExtractor<A> implements Extractor<A, T> {
 		private final JsonArrayAccessor highlightAccessor;
-		private final ProjectionAccumulator<String, String, A, T> accumulator;
+		private final ProjectionCollector<String, String, A, T> collector;
 
-		private FieldHighlightExtractor(String fieldPath, ProjectionAccumulator<String, String, A, T> accumulator) {
+		private FieldHighlightExtractor(String fieldPath, ProjectionCollector<String, String, A, T> collector) {
 			this.highlightAccessor = JsonAccessor.root().property( "highlight" ).property( fieldPath ).asArray();
-			this.accumulator = accumulator;
+			this.collector = collector;
 		}
 
 		@Override
 		public A extract(ProjectionHitMapper<?> projectionHitMapper, JsonObject hit, JsonObject source,
 				ProjectionExtractContext context) {
-			A initial = accumulator.createInitial();
+			A initial = collector.createInitial();
 			Optional<JsonArray> highlights = highlightAccessor.get( hit );
 			if ( highlights.isPresent() ) {
 				for ( JsonElement element : highlights.get() ) {
-					initial = accumulator.accumulate( initial, element.getAsString() );
+					initial = collector.accumulate( initial, element.getAsString() );
 				}
 			}
 			return initial;
@@ -129,7 +129,7 @@ public class ElasticsearchFieldHighlightProjection<T> implements ElasticsearchSe
 
 		@Override
 		public T transform(LoadingResult<?> loadingResult, A extractedData, ProjectionTransformContext context) {
-			return accumulator.finish( extractedData );
+			return collector.finish( extractedData );
 		}
 	}
 
@@ -164,8 +164,8 @@ public class ElasticsearchFieldHighlightProjection<T> implements ElasticsearchSe
 		}
 
 		@Override
-		public <V> SearchProjection<V> build(ProjectionAccumulator.Provider<String, V> accumulatorProvider) {
-			return new ElasticsearchFieldHighlightProjection<>( this, accumulatorProvider );
+		public <V> SearchProjection<V> build(ProjectionCollector.Provider<String, V> collectorProvider) {
+			return new ElasticsearchFieldHighlightProjection<>( this, collectorProvider );
 		}
 	}
 }

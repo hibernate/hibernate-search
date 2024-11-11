@@ -20,7 +20,7 @@ import org.hibernate.search.backend.lucene.search.projection.impl.ProjectionExtr
 import org.hibernate.search.engine.search.highlighter.dsl.HighlighterFragmenter;
 import org.hibernate.search.engine.search.highlighter.spi.BoundaryScannerType;
 import org.hibernate.search.engine.search.highlighter.spi.SearchHighlighterType;
-import org.hibernate.search.engine.search.projection.ProjectionAccumulator;
+import org.hibernate.search.engine.search.projection.ProjectionCollector;
 
 import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.document.Field;
@@ -86,9 +86,10 @@ class LuceneFastVectorSearchHighlighter extends LuceneAbstractSearchHighlighter 
 	@Override
 	public <A, T> Values<A> createValues(String parentDocumentPath, String nestedDocumentPath,
 			String absoluteFieldPath, Analyzer analyzer, ProjectionExtractContext context,
-			ProjectionAccumulator<String, ?, A, T> accumulator) {
+			ProjectionCollector<String, ?, A, T> collector) {
 		return new FastVectorHighlighterValues<>( parentDocumentPath, nestedDocumentPath, absoluteFieldPath, context,
-				accumulator );
+				collector
+		);
 	}
 
 	@Override
@@ -108,8 +109,8 @@ class LuceneFastVectorSearchHighlighter extends LuceneAbstractSearchHighlighter 
 		private final Integer maxNumFragments;
 
 		FastVectorHighlighterValues(String parentDocumentPath, String nestedDocumentPath, String field,
-				ProjectionExtractContext context, ProjectionAccumulator<String, ?, A, T> accumulator) {
-			super( parentDocumentPath, nestedDocumentPath, context.collectorExecutionContext(), accumulator );
+				ProjectionExtractContext context, ProjectionCollector<String, ?, A, T> collector) {
+			super( parentDocumentPath, nestedDocumentPath, context.collectorExecutionContext(), collector );
 			this.field = field;
 
 			this.highlighter = new FastVectorHighlighter();

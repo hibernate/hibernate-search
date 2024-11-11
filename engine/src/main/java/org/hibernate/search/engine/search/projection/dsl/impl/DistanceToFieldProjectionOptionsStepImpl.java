@@ -4,7 +4,7 @@
  */
 package org.hibernate.search.engine.search.projection.dsl.impl;
 
-import org.hibernate.search.engine.search.projection.ProjectionAccumulator;
+import org.hibernate.search.engine.search.projection.ProjectionCollector;
 import org.hibernate.search.engine.search.projection.SearchProjection;
 import org.hibernate.search.engine.search.projection.dsl.DistanceToFieldProjectionOptionsStep;
 import org.hibernate.search.engine.search.projection.spi.DistanceToFieldProjectionBuilder;
@@ -15,12 +15,12 @@ public class DistanceToFieldProjectionOptionsStepImpl<P>
 		implements DistanceToFieldProjectionOptionsStep<DistanceToFieldProjectionOptionsStepImpl<P>, P> {
 
 	protected final DistanceToFieldProjectionBuilder distanceFieldProjectionBuilder;
-	private final ProjectionAccumulator.Provider<Double, P> accumulatorProvider;
+	private final ProjectionCollector.Provider<Double, P> collectorProvider;
 
 	DistanceToFieldProjectionOptionsStepImpl(DistanceToFieldProjectionBuilder distanceFieldProjectionBuilder,
-			ProjectionAccumulator.Provider<Double, P> accumulatorProvider) {
+			ProjectionCollector.Provider<Double, P> collectorProvider) {
 		this.distanceFieldProjectionBuilder = distanceFieldProjectionBuilder;
-		this.accumulatorProvider = accumulatorProvider;
+		this.collectorProvider = collectorProvider;
 	}
 
 	@Override
@@ -33,7 +33,7 @@ public class DistanceToFieldProjectionOptionsStepImpl<P>
 
 	@Override
 	public SearchProjection<P> toProjection() {
-		return distanceFieldProjectionBuilder.build( accumulatorProvider );
+		return distanceFieldProjectionBuilder.build( collectorProvider );
 	}
 
 }

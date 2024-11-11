@@ -6,7 +6,7 @@ package org.hibernate.search.engine.search.projection.definition.spi;
 
 import java.util.List;
 
-import org.hibernate.search.engine.search.projection.ProjectionAccumulator;
+import org.hibernate.search.engine.search.projection.ProjectionCollector;
 import org.hibernate.search.engine.search.projection.SearchProjection;
 import org.hibernate.search.engine.search.projection.definition.ProjectionDefinitionContext;
 import org.hibernate.search.engine.search.projection.dsl.SearchProjectionFactory;
@@ -83,30 +83,30 @@ public abstract class ObjectProjectionDefinition<P, T>
 		public SearchProjection<List<T>> create(SearchProjectionFactory<?, ?> factory,
 				ProjectionDefinitionContext context) {
 			return delegate.apply( factory.withRoot( fieldPath ), factory.object( fieldPath ), context )
-					.accumulator( ProjectionAccumulator.list() ).toProjection();
+					.collector( ProjectionCollector.list() ).toProjection();
 		}
 	}
 
 	@Incubating
 	public static final class WrappedValued<C, T> extends ObjectProjectionDefinition<C, T> {
-		private final ProjectionAccumulator.Provider<T, C> accumulator;
+		private final ProjectionCollector.Provider<T, C> collector;
 
 		public WrappedValued(String fieldPath, CompositeProjectionDefinition<T> delegate,
-				ProjectionAccumulator.Provider<T, C> accumulator) {
+				ProjectionCollector.Provider<T, C> collector) {
 			super( fieldPath, delegate );
-			this.accumulator = accumulator;
+			this.collector = collector;
 		}
 
 		@Override
 		protected boolean multi() {
-			return !accumulator.isSingleValued();
+			return !collector.isSingleValued();
 		}
 
 		@Override
 		public SearchProjection<C> create(SearchProjectionFactory<?, ?> factory,
 				ProjectionDefinitionContext context) {
 			return delegate.apply( factory.withRoot( fieldPath ), factory.object( fieldPath ), context )
-					.accumulator( accumulator ).toProjection();
+					.collector( collector ).toProjection();
 		}
 	}
 }

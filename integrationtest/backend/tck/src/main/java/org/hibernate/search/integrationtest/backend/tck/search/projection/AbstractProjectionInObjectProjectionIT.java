@@ -21,7 +21,7 @@ import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaObjectF
 import org.hibernate.search.engine.backend.types.ObjectStructure;
 import org.hibernate.search.engine.backend.types.Projectable;
 import org.hibernate.search.engine.backend.types.dsl.SearchableProjectableIndexFieldTypeOptionsStep;
-import org.hibernate.search.engine.search.projection.ProjectionAccumulator;
+import org.hibernate.search.engine.search.projection.ProjectionCollector;
 import org.hibernate.search.engine.search.projection.dsl.ProjectionFinalStep;
 import org.hibernate.search.engine.search.projection.dsl.SearchProjectionFactory;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.FieldTypeDescriptor;
@@ -91,10 +91,10 @@ public abstract class AbstractProjectionInObjectProjectionIT<F, P, V extends Abs
 																		mainIndex, dataSet ), dataSet )
 														)
 														.as( ObjectDto::new )
-														.accumulator( ProjectionAccumulator.list() )
+														.collector( ProjectionCollector.list() )
 										)
 										.as( Level1ObjectDto::new )
-										.accumulator( ProjectionAccumulator.list() )
+										.collector( ProjectionCollector.list() )
 						)
 						.as( IdAndObjectDto::new ) )
 				.where( f -> f.matchAll() )
@@ -257,7 +257,7 @@ public abstract class AbstractProjectionInObjectProjectionIT<F, P, V extends Abs
 												), dataSet )
 										)
 										.as( ObjectDto::new )
-										.accumulator( ProjectionAccumulator.list() )
+										.collector( ProjectionCollector.list() )
 						)
 						.as( IdAndObjectDto::new ) )
 				.where( f -> f.matchAll() )
@@ -363,7 +363,7 @@ public abstract class AbstractProjectionInObjectProjectionIT<F, P, V extends Abs
 														.as( FlattenedObjectDto::new )
 										)
 										.as( Level1ObjectWithFlattenedLevel2Dto::new )
-										.accumulator( ProjectionAccumulator.list() )
+										.collector( ProjectionCollector.list() )
 						)
 						.as( IdAndObjectDto::new ) )
 				.where( f -> f.matchAll() )
@@ -563,7 +563,7 @@ public abstract class AbstractProjectionInObjectProjectionIT<F, P, V extends Abs
 												), dataSet )
 										)
 										.as( ObjectDto::new )
-										.accumulator( ProjectionAccumulator.list() )
+										.collector( ProjectionCollector.list() )
 						)
 						.as( IdAndObjectDto::new ) )
 				.where( f -> f.matchAll() )
@@ -664,7 +664,7 @@ public abstract class AbstractProjectionInObjectProjectionIT<F, P, V extends Abs
 																		mainIndex, dataSet ), dataSet )
 														)
 														.as( ObjectDto::new )
-														.accumulator( ProjectionAccumulator.list() )
+														.collector( ProjectionCollector.list() )
 										)
 										.as( FlattenedLevel1ObjectDto::new )
 						)
@@ -790,7 +790,7 @@ public abstract class AbstractProjectionInObjectProjectionIT<F, P, V extends Abs
 								)
 						)
 						.asList()
-						.accumulator( ProjectionAccumulator.list() ) )
+						.collector( ProjectionCollector.list() ) )
 				.where( f -> f.matchAll() )
 				.routing( dataSet.routingKey )
 				.toQuery() )
@@ -837,7 +837,7 @@ public abstract class AbstractProjectionInObjectProjectionIT<F, P, V extends Abs
 										.asList()
 						)
 						.asList()
-						.accumulator( ProjectionAccumulator.list() ) )
+						.collector( ProjectionCollector.list() ) )
 				.where( f -> f.matchAll() )
 				.routing( dataSet.routingKey )
 				.toQuery() )
@@ -848,13 +848,13 @@ public abstract class AbstractProjectionInObjectProjectionIT<F, P, V extends Abs
 						) + "'",
 						"the projection is single-valued, but this field is effectively multi-valued in this context",
 						"because parent object field '" + level2Path( mainIndex, dataSet ) + "' is multi-valued",
-						"call '.accumulator(...)' when you create the projection on field '" + level2SingleValuedFieldPath(
+						"call '.collector(...)' when you create the projection on field '" + level2SingleValuedFieldPath(
 								mainIndex, dataSet ) + "'",
 						"or wrap that projection in an object projection like this:"
 								+ " 'f.object(\"" + level2Path( mainIndex, dataSet ) + "\").from(<the projection on field "
 								+ level2SingleValuedFieldPath(
 										mainIndex, dataSet )
-								+ ">).as(...).accumulator(...)'."
+								+ ">).as(...).collector(...)'."
 				);
 	}
 
@@ -892,10 +892,10 @@ public abstract class AbstractProjectionInObjectProjectionIT<F, P, V extends Abs
 																		mainIndex, dataSet ), dataSet )
 														)
 														.as( ObjectDto::new )
-														.accumulator( ProjectionAccumulator.list() )
+														.collector( ProjectionCollector.list() )
 										)
 										.as( Level1ObjectDto::new )
-										.accumulator( ProjectionAccumulator.list() )
+										.collector( ProjectionCollector.list() )
 						)
 						.as( IdAndObjectDto::new ) )
 				.where( f -> f.matchAll() )

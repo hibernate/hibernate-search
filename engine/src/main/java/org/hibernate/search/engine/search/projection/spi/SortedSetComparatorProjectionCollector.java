@@ -9,19 +9,21 @@ import java.util.List;
 import java.util.SortedSet;
 import java.util.TreeSet;
 
+import org.hibernate.search.engine.search.projection.ProjectionCollector;
+
 /**
- * A {@link org.hibernate.search.engine.search.projection.ProjectionAccumulator} that can accumulate any number of values into a {@link SortedSet}.
+ * A {@link ProjectionCollector} that can accumulate any number of values into a {@link SortedSet}.
  *
  * @param <E> The type of extracted values to accumulate before being transformed.
  * @param <V> The type of values to accumulate obtained by transforming extracted values ({@code E}).
  */
-final class SortedSetComparatorProjectionAccumulator<E, V> extends ListBasedProjectionAccumulator<E, V, SortedSet<V>> {
+final class SortedSetComparatorProjectionCollector<E, V> extends ListBasedProjectionCollector<E, V, SortedSet<V>> {
 
 	static <U, R> Provider<U, R> provider(Comparator<? super U> comparator) {
 		return new ComparatorBasedSortedSetProvider<>( comparator );
 	}
 
-	private SortedSetComparatorProjectionAccumulator(Comparator<? super V> comparator) {
+	private SortedSetComparatorProjectionCollector(Comparator<? super V> comparator) {
 		this.comparator = comparator;
 	}
 
@@ -36,15 +38,15 @@ final class SortedSetComparatorProjectionAccumulator<E, V> extends ListBasedProj
 
 	@SuppressWarnings("unchecked")
 	private static class ComparatorBasedSortedSetProvider<U, R> implements Provider<U, R> {
-		private final SortedSetComparatorProjectionAccumulator<?, U> instance;
+		private final SortedSetComparatorProjectionCollector<?, U> instance;
 
 		private ComparatorBasedSortedSetProvider(Comparator<? super U> comparator) {
-			instance = new SortedSetComparatorProjectionAccumulator<>( comparator );
+			instance = new SortedSetComparatorProjectionCollector<>( comparator );
 		}
 
 		@Override
-		public <T> org.hibernate.search.engine.search.projection.ProjectionAccumulator<T, U, ?, R> get() {
-			return (org.hibernate.search.engine.search.projection.ProjectionAccumulator<T, U, ?, R>) instance;
+		public <T> ProjectionCollector<T, U, ?, R> get() {
+			return (ProjectionCollector<T, U, ?, R>) instance;
 		}
 
 		@Override

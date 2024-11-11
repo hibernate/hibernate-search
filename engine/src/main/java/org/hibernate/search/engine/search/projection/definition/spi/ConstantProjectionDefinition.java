@@ -11,7 +11,7 @@ import java.util.Set;
 import java.util.SortedSet;
 
 import org.hibernate.search.engine.environment.bean.BeanHolder;
-import org.hibernate.search.engine.search.projection.ProjectionAccumulator;
+import org.hibernate.search.engine.search.projection.ProjectionCollector;
 import org.hibernate.search.engine.search.projection.SearchProjection;
 import org.hibernate.search.engine.search.projection.definition.ProjectionDefinitionContext;
 import org.hibernate.search.engine.search.projection.dsl.SearchProjectionFactory;
@@ -42,7 +42,7 @@ public final class ConstantProjectionDefinition<T> extends AbstractProjectionDef
 	}
 
 	/**
-	 * @deprecated Use {@link #empty(ProjectionAccumulator.Provider)} instead.
+	 * @deprecated Use {@link #empty(ProjectionCollector.Provider)} instead.
 	 */
 	@Deprecated(since = "8.0")
 	@SuppressWarnings("unchecked") // EMPTY_LIST_INSTANCE works for any T
@@ -51,19 +51,19 @@ public final class ConstantProjectionDefinition<T> extends AbstractProjectionDef
 	}
 
 	@SuppressWarnings("unchecked") // empty collections works for any T
-	public static <T> BeanHolder<ConstantProjectionDefinition<T>> empty(ProjectionAccumulator.Provider<?, T> accumulator) {
-		T empty = accumulator.get().empty();
+	public static <T> BeanHolder<ConstantProjectionDefinition<T>> empty(ProjectionCollector.Provider<?, T> collector) {
+		T empty = collector.get().empty();
 
-		if ( ProjectionAccumulator.nullable().equals( accumulator ) ) {
+		if ( ProjectionCollector.nullable().equals( collector ) ) {
 			return nullValue();
 		}
-		if ( ProjectionAccumulator.optional().equals( accumulator ) ) {
+		if ( ProjectionCollector.optional().equals( collector ) ) {
 			return (BeanHolder<ConstantProjectionDefinition<T>>) OPTIONAL_EMPTY_INSTANCE;
 		}
-		if ( ProjectionAccumulator.list().equals( accumulator ) ) {
+		if ( ProjectionCollector.list().equals( collector ) ) {
 			return (BeanHolder<ConstantProjectionDefinition<T>>) EMPTY_LIST_INSTANCE;
 		}
-		if ( ProjectionAccumulator.set().equals( accumulator ) ) {
+		if ( ProjectionCollector.set().equals( collector ) ) {
 			return (BeanHolder<ConstantProjectionDefinition<T>>) EMPTY_SET_INSTANCE;
 		}
 		if ( empty instanceof SortedSet ) {

@@ -8,7 +8,7 @@ import java.lang.invoke.MethodHandles;
 import java.util.Optional;
 
 import org.hibernate.search.engine.common.tree.TreeFilterDefinition;
-import org.hibernate.search.engine.search.projection.ProjectionAccumulator;
+import org.hibernate.search.engine.search.projection.ProjectionCollector;
 import org.hibernate.search.mapper.pojo.logging.impl.Log;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.ObjectProjection;
 import org.hibernate.search.mapper.pojo.model.PojoModelValue;
@@ -110,12 +110,12 @@ public final class ObjectProjectionBinder implements ProjectionBinder {
 
 	private <T, C> void bind(ProjectionBindingContext context, String fieldPath, Class<C> containerType,
 			Class<T> containerElementType) {
-		ProjectionAccumulator.Provider<T, ?> accumulator = context.projectionAccumulatorProviderFactory()
-				.projectionAccumulatorProvider( containerType, containerElementType );
+		ProjectionCollector.Provider<T, ?> collector = context.projectionCollectorProviderFactory()
+				.projectionCollectorProvider( containerType, containerElementType );
 
 		context.definition(
 				containerElementType,
-				context.createObjectDefinition( fieldPath, containerElementType, filter, accumulator )
+				context.createObjectDefinition( fieldPath, containerElementType, filter, collector )
 		);
 	}
 

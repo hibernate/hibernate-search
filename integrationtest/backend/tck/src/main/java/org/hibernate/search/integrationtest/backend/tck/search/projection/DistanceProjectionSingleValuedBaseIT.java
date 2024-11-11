@@ -16,7 +16,7 @@ import java.util.TreeSet;
 
 import org.hibernate.search.engine.backend.common.DocumentReference;
 import org.hibernate.search.engine.common.EntityReference;
-import org.hibernate.search.engine.search.projection.ProjectionAccumulator;
+import org.hibernate.search.engine.search.projection.ProjectionCollector;
 import org.hibernate.search.engine.search.projection.dsl.DistanceToFieldProjectionOptionsStep;
 import org.hibernate.search.engine.search.projection.dsl.DistanceToFieldProjectionValueStep;
 import org.hibernate.search.engine.search.projection.dsl.ProjectionFinalStep;
@@ -84,7 +84,7 @@ class DistanceProjectionSingleValuedBaseIT extends AbstractDistanceProjectionSin
 						Set.of( dataSet.getFieldDistanceFromCenter1( 1 ) ),
 						Set.of( dataSet.getFieldDistanceFromCenter1( 2 ) ),
 						Set.of( dataSet.getFieldDistanceFromCenter1( 3 ) ),
-						TckConfiguration.get().getBackendFeatures().accumulatedNullValue( ProjectionAccumulator.set() ) // Empty document
+						TckConfiguration.get().getBackendFeatures().accumulatedNullValue( ProjectionCollector.set() ) // Empty document
 				);
 	}
 
@@ -113,7 +113,7 @@ class DistanceProjectionSingleValuedBaseIT extends AbstractDistanceProjectionSin
 						new TreeSet<>( Set.of( dataSet.getFieldDistanceFromCenter1( 2 ) ) ),
 						new TreeSet<>( Set.of( dataSet.getFieldDistanceFromCenter1( 3 ) ) ),
 						TckConfiguration.get().getBackendFeatures()
-								.accumulatedNullValue( ProjectionAccumulator.sortedSet( comparator ) ) // Empty document
+								.accumulatedNullValue( ProjectionCollector.sortedSet( comparator ) ) // Empty document
 				);
 	}
 
@@ -140,7 +140,7 @@ class DistanceProjectionSingleValuedBaseIT extends AbstractDistanceProjectionSin
 						new Double[] { dataSet.getFieldDistanceFromCenter1( 2 ) },
 						new Double[] { dataSet.getFieldDistanceFromCenter1( 3 ) },
 						TckConfiguration.get().getBackendFeatures()
-								.accumulatedNullValue( ProjectionAccumulator.array( Double.class ) ) // Empty document
+								.accumulatedNullValue( ProjectionCollector.array( Double.class ) ) // Empty document
 				);
 	}
 

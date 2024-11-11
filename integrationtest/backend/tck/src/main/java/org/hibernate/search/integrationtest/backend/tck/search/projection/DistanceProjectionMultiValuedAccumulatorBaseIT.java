@@ -8,7 +8,7 @@ import java.util.List;
 
 import org.hibernate.search.engine.backend.common.DocumentReference;
 import org.hibernate.search.engine.common.EntityReference;
-import org.hibernate.search.engine.search.projection.ProjectionAccumulator;
+import org.hibernate.search.engine.search.projection.ProjectionCollector;
 import org.hibernate.search.engine.search.projection.dsl.ProjectionFinalStep;
 import org.hibernate.search.engine.search.projection.dsl.SearchProjectionFactory;
 import org.hibernate.search.engine.search.query.dsl.SearchQueryOptionsStep;
@@ -28,14 +28,14 @@ class DistanceProjectionMultiValuedAccumulatorBaseIT extends AbstractDistancePro
 	protected ProjectionFinalStep<List<Double>> distance(
 			SearchProjectionFactory<EntityReference, DocumentReference> projection, String path, GeoPoint center,
 			String parameterName) {
-		return projection.distance( path, center ).accumulator( ProjectionAccumulator.list() );
+		return projection.distance( path, center ).collector( ProjectionCollector.list() );
 	}
 
 	@Override
 	protected ProjectionFinalStep<List<Double>> distance(
 			SearchProjectionFactory<EntityReference, DocumentReference> projection, String path, GeoPoint center,
 			DistanceUnit unit, String centerParam, String unitParam) {
-		return projection.distance( path, center ).accumulator( ProjectionAccumulator.list() ).unit( unit );
+		return projection.distance( path, center ).collector( ProjectionCollector.list() ).unit( unit );
 	}
 
 	@Override

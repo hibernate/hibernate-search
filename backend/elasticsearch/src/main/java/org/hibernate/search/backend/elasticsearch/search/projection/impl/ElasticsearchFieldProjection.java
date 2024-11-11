@@ -17,7 +17,7 @@ import org.hibernate.search.engine.backend.types.converter.spi.ProjectionConvert
 import org.hibernate.search.engine.search.common.ValueModel;
 import org.hibernate.search.engine.search.loading.spi.LoadingResult;
 import org.hibernate.search.engine.search.loading.spi.ProjectionHitMapper;
-import org.hibernate.search.engine.search.projection.ProjectionAccumulator;
+import org.hibernate.search.engine.search.projection.ProjectionCollector;
 import org.hibernate.search.engine.search.projection.SearchProjection;
 import org.hibernate.search.engine.search.projection.spi.FieldProjectionBuilder;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
@@ -44,36 +44,37 @@ public class ElasticsearchFieldProjection<F, V, P, T> extends AbstractElasticsea
 	private final Function<JsonElement, T> decodeFunction;
 	private final boolean canDecodeArrays;
 	private final ProjectionConverter<? super T, ? extends V> converter;
-	private final ProjectionAccumulator.Provider<V, P> accumulatorProvider;
+	private final ProjectionCollector.Provider<V, P> collectorProvider;
 
 	private ElasticsearchFieldProjection(Builder<F, V, T> builder,
-			ProjectionAccumulator.Provider<V, P> accumulatorProvider) {
+			ProjectionCollector.Provider<V, P> collectorProvider) {
 		this( builder.scope, builder.field, builder.decodeFunction, builder.canDecodeArrays, builder.converter,
-				accumulatorProvider );
+				collectorProvider
+		);
 	}
 
 	ElasticsearchFieldProjection(ElasticsearchSearchIndexScope<?> scope,
 			ElasticsearchSearchIndexValueFieldContext<?> field,
 			Function<JsonElement, T> decodeFunction, boolean canDecodeArrays,
 			ProjectionConverter<? super T, ? extends V> converter,
-			ProjectionAccumulator.Provider<V, P> accumulatorProvider) {
+			ProjectionCollector.Provider<V, P> collectorProvider) {
 		super( scope );
 		this.absoluteFieldPath = field.absolutePath();
 		this.absoluteFieldPathComponents = field.absolutePathComponents();
-		this.requiredContextAbsoluteFieldPath = accumulatorProvider.isSingleValued()
+		this.requiredContextAbsoluteFieldPath = collectorProvider.isSingleValued()
 				? field.closestMultiValuedParentAbsolutePath()
 				: null;
 		this.decodeFunction = decodeFunction;
 		this.canDecodeArrays = canDecodeArrays;
 		this.converter = converter;
-		this.accumulatorProvider = accumulatorProvider;
+		this.collectorProvider = collectorProvider;
 	}
 
 	@Override
 	public String toString() {
 		return getClass().getSimpleName() + "["
 				+ "absoluteFieldPath=" + absoluteFieldPath
-				+ ", accumulatorProvider=" + accumulatorProvider
+				+ ", collectorProvider=" + collectorProvider
 				+ "]";
 	}
 
@@ -87,22 +88,22 @@ public class ElasticsearchFieldProjection<F, V, P, T> extends AbstractElasticsea
 		}
 		JsonPrimitive fieldPathJson = new JsonPrimitive( absoluteFieldPath );
 		AccumulatingSourceExtractor.REQUEST_SOURCE_ACCESSOR.addElementIfAbsent( requestBody, fieldPathJson );
-		return new ValueFieldExtractor<>( innerContext.relativeCurrentFieldPathComponents(), accumulatorProvider.get() );
+		return new ValueFieldExtractor<>( innerContext.relativeCurrentFieldPathComponents(), collectorProvider.get() );
 	}
 
 	/**
 	 * @param <A> The type of the temporary storage for accumulated values, before and after being transformed.
 	 */
 	private class ValueFieldExtractor<A> extends AccumulatingSourceExtractor<T, V, A, P> {
-		public ValueFieldExtractor(String[] fieldPathComponents, ProjectionAccumulator<T, V, A, P> accumulator) {
-			super( fieldPathComponents, accumulator );
+		public ValueFieldExtractor(String[] fieldPathComponents, ProjectionCollector<T, V, A, P> collector) {
+			super( fieldPathComponents, collector );
 		}
 
 		@Override
 		public String toString() {
 			return getClass().getSimpleName() + "["
 					+ "absoluteFieldPath=" + absoluteFieldPath
-					+ ", accumulator=" + accumulator
+					+ ", collector=" + collector
 					+ "]";
 		}
 
@@ -121,8 +122,8 @@ public class ElasticsearchFieldProjection<F, V, P, T> extends AbstractElasticsea
 		public P transform(LoadingResult<?> loadingResult, A extractedData,
 				ProjectionTransformContext context) {
 			FromDocumentValueConvertContext convertContext = context.fromDocumentValueConvertContext();
-			A transformedData = accumulator.transformAll( extractedData, converter.delegate(), convertContext );
-			return accumulator.finish( transformedData );
+			A transformedData = collector.transformAll( extractedData, converter.delegate(), convertContext );
+			return collector.finish( transformedData );
 		}
 	}
 
@@ -193,11 +194,11 @@ public class ElasticsearchFieldProjection<F, V, P, T> extends AbstractElasticsea
 		}
 
 		@Override
-		public <P> SearchProjection<P> build(ProjectionAccumulator.Provider<V, P> accumulatorProvider) {
-			if ( accumulatorProvider.isSingleValued() && field.multiValued() ) {
+		public <P> SearchProjection<P> build(ProjectionCollector.Provider<V, P> collectorProvider) {
+			if ( collectorProvider.isSingleValued() && field.multiValued() ) {
 				throw log.invalidSingleValuedProjectionOnMultiValuedField( field.absolutePath(), field.eventContext() );
 			}
-			return new ElasticsearchFieldProjection<>( this, accumulatorProvider );
+			return new ElasticsearchFieldProjection<>( this, collectorProvider );
 		}
 	}
 }

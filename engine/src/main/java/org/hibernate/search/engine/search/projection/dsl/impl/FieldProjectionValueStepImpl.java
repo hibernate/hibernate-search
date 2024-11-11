@@ -5,7 +5,7 @@
 package org.hibernate.search.engine.search.projection.dsl.impl;
 
 import org.hibernate.search.engine.search.common.ValueModel;
-import org.hibernate.search.engine.search.projection.ProjectionAccumulator;
+import org.hibernate.search.engine.search.projection.ProjectionCollector;
 import org.hibernate.search.engine.search.projection.SearchProjection;
 import org.hibernate.search.engine.search.projection.dsl.FieldProjectionOptionsStep;
 import org.hibernate.search.engine.search.projection.dsl.FieldProjectionValueStep;
@@ -20,12 +20,12 @@ public final class FieldProjectionValueStepImpl<T>
 			Class<T> clazz, ValueModel valueModel) {
 		super( dslContext.scope().fieldQueryElement( fieldPath, ProjectionTypeKeys.FIELD )
 				.type( clazz, valueModel ),
-				ProjectionAccumulator.nullable() );
+				ProjectionCollector.nullable() );
 	}
 
 	@Override
-	public <R> FieldProjectionOptionsStep<?, R> accumulator(ProjectionAccumulator.Provider<T, R> accumulator) {
-		return new FieldProjectionOptionsStepImpl<>( fieldProjectionBuilder, accumulator );
+	public <R> FieldProjectionOptionsStep<?, R> collector(ProjectionCollector.Provider<T, R> collector) {
+		return new FieldProjectionOptionsStepImpl<>( fieldProjectionBuilder, collector );
 	}
 
 	@Override

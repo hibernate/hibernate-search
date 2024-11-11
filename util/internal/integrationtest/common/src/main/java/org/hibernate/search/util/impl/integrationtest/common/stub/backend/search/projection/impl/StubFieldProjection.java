@@ -12,7 +12,7 @@ import org.hibernate.search.engine.backend.types.converter.spi.ProjectionConvert
 import org.hibernate.search.engine.search.common.ValueModel;
 import org.hibernate.search.engine.search.loading.spi.LoadingResult;
 import org.hibernate.search.engine.search.loading.spi.ProjectionHitMapper;
-import org.hibernate.search.engine.search.projection.ProjectionAccumulator;
+import org.hibernate.search.engine.search.projection.ProjectionCollector;
 import org.hibernate.search.engine.search.projection.SearchProjection;
 import org.hibernate.search.engine.search.projection.spi.FieldProjectionBuilder;
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.search.common.impl.AbstractStubSearchQueryElementFactory;
@@ -25,17 +25,17 @@ public class StubFieldProjection<F, V, A, P> extends StubSearchProjection<P> {
 	private final Class<F> fieldType;
 	private final Class<V> expectedType;
 	private final ProjectionConverter<F, ? extends V> converter;
-	private final ProjectionAccumulator<F, V, A, P> accumulator;
+	private final ProjectionCollector<F, V, A, P> collector;
 	private final boolean singleValued;
 
 	public StubFieldProjection(String fieldPath, Class<F> fieldType, Class<V> expectedType,
 			ProjectionConverter<F, ? extends V> converter,
-			ProjectionAccumulator<F, V, A, P> accumulator, boolean singleValued) {
+			ProjectionCollector<F, V, A, P> collector, boolean singleValued) {
 		this.fieldPath = fieldPath;
 		this.fieldType = fieldType;
 		this.expectedType = expectedType;
 		this.converter = converter;
-		this.accumulator = accumulator;
+		this.collector = collector;
 		this.singleValued = singleValued;
 	}
 
@@ -50,9 +50,9 @@ public class StubFieldProjection<F, V, A, P> extends StubSearchProjection<P> {
 		else {
 			fieldValues = (Iterable<?>) projectionFromIndex.next();
 		}
-		A accumulated = accumulator.createInitial();
+		A accumulated = collector.createInitial();
 		for ( Object fieldValue : fieldValues ) {
-			accumulated = accumulator.accumulate( accumulated, fieldType.cast( fieldValue ) );
+			accumulated = collector.accumulate( accumulated, fieldType.cast( fieldValue ) );
 		}
 		return accumulated;
 	}
@@ -62,9 +62,9 @@ public class StubFieldProjection<F, V, A, P> extends StubSearchProjection<P> {
 	public P transform(LoadingResult<?> loadingResult, Object extractedData,
 			StubSearchProjectionContext context) {
 		A accumulated = (A) extractedData;
-		A transformedData = accumulator.transformAll( accumulated, converter.delegate(),
+		A transformedData = collector.transformAll( accumulated, converter.delegate(),
 				context.fromDocumentValueConvertContext() );
-		return accumulator.finish( transformedData );
+		return collector.finish( transformedData );
 	}
 
 	@Override
@@ -78,7 +78,7 @@ public class StubFieldProjection<F, V, A, P> extends StubSearchProjection<P> {
 		self.attribute( "fieldType", fieldType );
 		self.attribute( "expectedType", expectedType );
 		self.attribute( "converter", converter );
-		self.attribute( "accumulator", accumulator );
+		self.attribute( "collector", collector );
 		self.attribute( "singleValued", singleValued );
 	}
 
@@ -120,9 +120,9 @@ public class StubFieldProjection<F, V, A, P> extends StubSearchProjection<P> {
 		}
 
 		@Override
-		public <P> SearchProjection<P> build(ProjectionAccumulator.Provider<V, P> accumulatorProvider) {
+		public <P> SearchProjection<P> build(ProjectionCollector.Provider<V, P> collectorProvider) {
 			return new StubFieldProjection<>( fieldPath, valueClass, expectedType, converter,
-					accumulatorProvider.get(), accumulatorProvider.isSingleValued() );
+					collectorProvider.get(), collectorProvider.isSingleValued() );
 		}
 	}
 }

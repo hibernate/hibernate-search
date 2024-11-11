@@ -7,7 +7,7 @@ package org.hibernate.search.engine.search.projection.definition.spi;
 import java.util.List;
 
 import org.hibernate.search.engine.search.common.ValueModel;
-import org.hibernate.search.engine.search.projection.ProjectionAccumulator;
+import org.hibernate.search.engine.search.projection.ProjectionCollector;
 import org.hibernate.search.engine.search.projection.SearchProjection;
 import org.hibernate.search.engine.search.projection.definition.ProjectionDefinitionContext;
 import org.hibernate.search.engine.search.projection.dsl.SearchProjectionFactory;
@@ -78,30 +78,30 @@ public abstract class FieldProjectionDefinition<P, F> extends AbstractProjection
 		@Override
 		public SearchProjection<List<F>> create(SearchProjectionFactory<?, ?> factory, ProjectionDefinitionContext context) {
 			return factory.field( fieldPath, fieldType, valueModel )
-					.accumulator( ProjectionAccumulator.list() ).toProjection();
+					.collector( ProjectionCollector.list() ).toProjection();
 		}
 	}
 
 	@Incubating
 	public static final class AccumulatedValued<C, F> extends FieldProjectionDefinition<C, F> {
-		private final ProjectionAccumulator.Provider<F, C> accumulator;
+		private final ProjectionCollector.Provider<F, C> collector;
 
-		public AccumulatedValued(String fieldPath, Class<F> fieldType, ProjectionAccumulator.Provider<F, C> accumulator,
+		public AccumulatedValued(String fieldPath, Class<F> fieldType, ProjectionCollector.Provider<F, C> collector,
 				ValueModel valueModel) {
 			super( fieldPath, fieldType, valueModel );
-			this.accumulator = accumulator;
+			this.collector = collector;
 		}
 
 		@Override
 		protected boolean multi() {
-			return !accumulator.isSingleValued();
+			return !collector.isSingleValued();
 		}
 
 		@Override
 		public SearchProjection<C> create(SearchProjectionFactory<?, ?> factory,
 				ProjectionDefinitionContext context) {
 			return factory.field( fieldPath, fieldType, valueModel )
-					.accumulator( accumulator ).toProjection();
+					.collector( collector ).toProjection();
 		}
 	}
 }

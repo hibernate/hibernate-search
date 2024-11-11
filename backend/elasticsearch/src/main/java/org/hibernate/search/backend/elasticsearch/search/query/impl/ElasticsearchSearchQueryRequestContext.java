@@ -23,7 +23,7 @@ import org.hibernate.search.engine.backend.session.spi.BackendSessionContext;
 import org.hibernate.search.engine.search.common.NamedValues;
 import org.hibernate.search.engine.search.common.spi.SearchQueryElementTypeKey;
 import org.hibernate.search.engine.search.loading.spi.SearchLoadingContext;
-import org.hibernate.search.engine.search.projection.ProjectionAccumulator;
+import org.hibernate.search.engine.search.projection.ProjectionCollector;
 import org.hibernate.search.engine.search.query.spi.QueryParameters;
 import org.hibernate.search.engine.spatial.GeoPoint;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
@@ -144,17 +144,17 @@ class ElasticsearchSearchQueryRequestContext implements ProjectionRequestRootCon
 	}
 
 	@Override
-	public boolean isCompatibleHighlighter(String highlighterName, ProjectionAccumulator.Provider<?, ?> accumulatorProvider) {
+	public boolean isCompatibleHighlighter(String highlighterName, ProjectionCollector.Provider<?, ?> collectorProvider) {
 		ElasticsearchSearchHighlighter highlighter = highlighter( highlighterName );
 		if ( ElasticsearchSearchHighlighterImpl.NO_OPTIONS_CONFIGURATION == highlighter ) {
 			// if there was no highlighter configured at all it means that the settings are default,
-			// and we assume that they are incompatible with the single-valued accumulator:
+			// and we assume that they are incompatible with the single-valued collector:
 			return queryHighlighter != null
-					? queryHighlighter.isCompatible( accumulatorProvider )
-					: !accumulatorProvider.isSingleValued();
+					? queryHighlighter.isCompatible( collectorProvider )
+					: !collectorProvider.isSingleValued();
 		}
 		else {
-			return highlighter.isCompatible( accumulatorProvider );
+			return highlighter.isCompatible( collectorProvider );
 		}
 	}
 
