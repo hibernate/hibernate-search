@@ -53,7 +53,7 @@ Map settings() {
 					updateProperties: [],
 					onlyRunTestDependingOn: ['hibernate-search-backend-elasticsearch'],
 					// We want to use the snapshot version of an image from the ES registry since that's where they are publishing their snapshots.
-					additionalMavenArgs: '-Dtest.lucene.skip=true -Dtest.elasticsearch.run.elastic.image.name=docker.elastic.co/elasticsearch/elasticsearch -Dtest.elasticsearch.run.elastic.image.tag=8.15.4-SNAPSHOT',
+					additionalMavenArgs: '-Dtest.lucene.skip=true -Dtest.elasticsearch.run.elastic.image.name=docker.elastic.co/elasticsearch/elasticsearch -Dtest.elasticsearch.run.elastic.image.tag=8.16.1-SNAPSHOT',
 					// This job won't change the versions in the pom. We are passing the latest Elasticsearch version through an additional maven argument `-D`
 					skipSourceModifiedCheck: true
 			]
@@ -65,7 +65,19 @@ Map settings() {
 					updateProperties: [],
 					onlyRunTestDependingOn: ['hibernate-search-backend-elasticsearch'],
 					// We want to use the snapshot version of an image from the ES registry since that's where they are publishing their snapshots.
-					additionalMavenArgs: '-Dtest.lucene.skip=true -Dtest.elasticsearch.run.elastic.image.name=docker.elastic.co/elasticsearch/elasticsearch -Dtest.elasticsearch.run.elastic.image.tag=8.16.0-SNAPSHOT',
+					additionalMavenArgs: '-Dtest.lucene.skip=true -Dtest.elasticsearch.run.elastic.image.name=docker.elastic.co/elasticsearch/elasticsearch -Dtest.elasticsearch.run.elastic.image.tag=8.17.0-SNAPSHOT',
+					// This job won't change the versions in the pom. We are passing the latest Elasticsearch version through an additional maven argument `-D`
+					skipSourceModifiedCheck: true
+			]
+		// Targets the next major release of the of Elasticsearch
+		// (currently not published at all)
+		case 'elasticsearch-future':
+			return [
+					// There are no properties to update in this case.
+					updateProperties: [],
+					onlyRunTestDependingOn: ['hibernate-search-backend-elasticsearch'],
+					// We want to use the snapshot version of an image from the ES registry since that's where they are publishing their snapshots.
+					additionalMavenArgs: '-Dtest.lucene.skip=true -Dtest.elasticsearch.run.elastic.image.name=docker.elastic.co/elasticsearch/elasticsearch -Dtest.elasticsearch.run.elastic.image.tag=9.0.0-SNAPSHOT',
 					// This job won't change the versions in the pom. We are passing the latest Elasticsearch version through an additional maven argument `-D`
 					skipSourceModifiedCheck: true
 			]
@@ -133,7 +145,7 @@ pipeline {
 	parameters {
 		// choice parameter doesn't have a default, but the first value should be treated as a default, if it wasn't specified manually.
 		// Make sure tp update axis and settings() when adding new choice parameter.
-		choice(name: 'UPDATE_JOB', choices: ['all', 'orm6.6plus', 'orm7', 'lucene9.12','lucene9', 'lucene10', 'elasticsearch-current', 'elasticsearch-next'], description: 'Select which update jobs to run. `All` will include all configured update jobs.')
+		choice(name: 'UPDATE_JOB', choices: ['all', 'orm6.6plus', 'orm7', 'lucene9.12','lucene9', 'lucene10', 'elasticsearch-current', 'elasticsearch-next', 'elasticsearch-future'], description: 'Select which update jobs to run. `All` will include all configured update jobs.')
 		string(name: 'ORM_REPOSITORY', defaultValue: '', description: 'Git URL to Hibernate ORM repository. If provided, Hibernate ORM will be built locally. Works only in pair with ORM_BRANCH. Provide an http repository URL rather than an ssh one.')
 		string(name: 'ORM_BRANCH', defaultValue: '', description: 'Hibernate ORM branch to build from. If provided, Hibernate ORM will be built locally. Works only in pair with ORM_REPOSITORY. Either a pull request ID or a branch name should be provided, but not both at the same time. Use branch if you want to build from a fork repository.')
 		string(name: 'ORM_PULL_REQUEST_ID', defaultValue: '', description: 'Hibernate ORM pull request id to build from. If provided, Hibernate ORM will be built locally. Works only in pair with ORM_REPOSITORY. Either a pull request ID or a branch name should be provided, but not both at the same time.')
@@ -231,7 +243,7 @@ pipeline {
 						name 'DEPENDENCY_UPDATE_NAME'
 						// NOTE: Remember to update the settings() method above when changing this.
 						// And also add a new choice parameter in the parameters {} section of the pipeline
-						values 'orm6.6plus', 'orm7', 'lucene9.12','lucene9', 'lucene10', 'elasticsearch-current', 'elasticsearch-next'
+						values 'orm6.6plus', 'orm7', 'lucene9.12','lucene9', 'lucene10', 'elasticsearch-current', 'elasticsearch-next', 'elasticsearch-future'
 					}
 				}
 				stages {
