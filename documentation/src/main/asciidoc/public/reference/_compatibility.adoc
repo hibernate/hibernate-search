@@ -65,11 +65,13 @@ as part of your dependency management to keep all its artifact versions aligned:
 ====
 
 [NOTE]
-.Elasticsearch 7.11+ licensing
+.Elasticsearch licensing
 ====
 While Elasticsearch up to 7.10 was distributed under the Apache License 2.0,
-be aware that Elasticsearch 7.11 and later are distributed under the Elastic License and the SSPL,
+be aware that Elasticsearch 7.11-8.15 versions are distributed under the Elastic License and the SSPL,
 which are https://opensource.org/node/1099[not considered open-source by the Open Source Initiative].
+Starting with Elasticsearch 8.16 the AGPL v3 license was added.
+Please refer to https://www.elastic.co/ to learn more on the licensing of Elasticsearch.
 
 Only the low-level Java REST client, which Hibernate Search depends on, remains open-source.
 ====
