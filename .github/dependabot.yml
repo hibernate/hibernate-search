@@ -35,7 +35,7 @@ updates:
         patterns:
           # Maven extensions:
           - "*-maven-extension"
-          - "org.hibernate.search.develocity:*"
+          - "org.hibernate.infra.develocity:*"
           # Maven plugins:
           - "*maven*plugin*"
           - "org.apache.maven*:*"
