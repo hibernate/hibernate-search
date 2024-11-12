@@ -297,10 +297,10 @@
         <version.jacoco.plugin>0.8.12</version.jacoco.plugin>
         <version.com.buschmais.jqassistant.plugin>2.5.0</version.com.buschmais.jqassistant.plugin>
         <version.moditect.plugin>1.2.2.Final</version.moditect.plugin>
-        <version.sonar.plugin>4.0.0.4121</version.sonar.plugin>
+        <version.sonar.plugin>5.0.0.4389</version.sonar.plugin>
         <version.scripting.plugin>3.0.0</version.scripting.plugin>
         <version.org.apache.groovy.groovy-jsr223>4.0.13</version.org.apache.groovy.groovy-jsr223>
-        <version.com.puppycrawl.tools.checkstyle>10.20.0</version.com.puppycrawl.tools.checkstyle>
+        <version.com.puppycrawl.tools.checkstyle>10.20.1</version.com.puppycrawl.tools.checkstyle>
         <version.versions.plugin>2.17.1</version.versions.plugin>
         <version.maven-wrapper-plugin>3.3.2</version.maven-wrapper-plugin>
         <version.org.eclipse.m2e.lifecycle-mapping>1.0.0</version.org.eclipse.m2e.lifecycle-mapping>
