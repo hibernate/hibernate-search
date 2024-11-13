@@ -28,7 +28,10 @@ import org.jboss.logging.annotations.MessageLogger;
 import org.jboss.logging.annotations.Param;
 
 @CategorizedLogger(
-		category = MappingLog.CATEGORY_NAME
+		category = MappingLog.CATEGORY_NAME,
+		description = """
+				Logs the information on normalizing the index names for the Elasticsearch backend.
+				"""
 )
 @MessageLogger(projectCode = MessageConstants.PROJECT_CODE)
 public interface MappingLog extends BasicLogger {

@@ -31,7 +31,10 @@ import org.jboss.logging.annotations.Param;
 import org.apache.lucene.util.Version;
 
 @CategorizedLogger(
-		category = ConfigurationLog.CATEGORY_NAME
+		category = ConfigurationLog.CATEGORY_NAME,
+		description = """
+				Logs information on the Lucene compatibility version used in the index.
+				"""
 )
 @MessageLogger(projectCode = MessageConstants.PROJECT_CODE)
 public interface ConfigurationLog extends BasicLogger {

@@ -12,7 +12,6 @@ import org.hibernate.search.util.common.logging.CategorizedLogger;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 import org.hibernate.search.util.common.logging.impl.MessageConstants;
 
-import org.jboss.logging.BasicLogger;
 import org.jboss.logging.annotations.Message;
 import org.jboss.logging.annotations.MessageLogger;
 import org.jboss.logging.annotations.ValidIdRange;
@@ -20,7 +19,10 @@ import org.jboss.logging.annotations.ValidIdRanges;
 
 
 @CategorizedLogger(
-		category = JakartaBatchLog.CATEGORY_NAME
+		category = JakartaBatchLog.CATEGORY_NAME,
+		description = """
+				Logs debug information on various batch indexing operations.
+				"""
 )
 @MessageLogger(projectCode = MessageConstants.PROJECT_CODE)
 @ValidIdRanges({
@@ -30,7 +32,7 @@ import org.jboss.logging.annotations.ValidIdRanges;
 		@ValidIdRange(min = MessageConstants.JAKARTA_BATCH_CORE_ID_RANGE_MIN,
 				max = MessageConstants.JAKARTA_BATCH_CORE_ID_RANGE_MIN + 5),
 })
-public interface JakartaBatchLog extends BasicLogger {
+public interface JakartaBatchLog {
 
 	String CATEGORY_NAME = "org.hibernate.search.mapper.jakarta.batch";
 

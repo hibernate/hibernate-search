@@ -55,11 +55,14 @@ import org.jboss.logging.annotations.MessageLogger;
 import org.jboss.logging.annotations.Param;
 
 @CategorizedLogger(
-		category = MappingLog.CATEGORY_NAME
+		category = MappingLog.CATEGORY_NAME,
+		description = """
+				Logs debug information and warnings that occur during the mapping construction.
+				"""
 )
 @MessageLogger(projectCode = MessageConstants.PROJECT_CODE)
 public interface MappingLog extends BasicLogger {
-	String CATEGORY_NAME = "org.hibernate.search.mapper.mapping";
+	String CATEGORY_NAME = "org.hibernate.search.mapping";
 
 	MappingLog INSTANCE = LoggerFactory.make( MappingLog.class, CATEGORY_NAME, MethodHandles.lookup() );
 

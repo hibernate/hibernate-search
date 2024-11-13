@@ -33,7 +33,10 @@ import org.jboss.logging.annotations.MessageLogger;
 import org.jboss.logging.annotations.Param;
 
 @CategorizedLogger(
-		category = ProjectionLog.CATEGORY_NAME
+		category = ProjectionLog.CATEGORY_NAME,
+		description = """
+				Logs debug information on projection operations.
+				"""
 )
 @MessageLogger(projectCode = MessageConstants.PROJECT_CODE)
 public interface ProjectionLog {
