@@ -1,0 +1,13 @@
+// SPDX-License-Identifier: Apache-2.0
+// Copyright Red Hat Inc. and Hibernate Authors
+[appendix]
+[[logging-categories-aggregated]]
+= List of all available logging categories
+
+The following list provides the Hibernate Search logging categories available in the {hibernateSearchVersion} version.
+It specifies what kind of messages could be expected from a particular category and from which modules these may be produced
+if a specific category of the logger is enabled.
+These logging categories are shared between Hibernate Search modules to group log messages
+of similar purpose coming from different parts of Hibernate Search.
+
+include::{documentationConfigPropertiesOutputDirectory}/_hibernate-logging-categories.adoc[opts=optional]

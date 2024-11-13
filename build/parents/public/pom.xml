@@ -34,11 +34,30 @@
             So we add it to all public modules, and override it anywhere where we have no logging.
          -->
         <logging.processor.skip.generated.annotation.compiler.argument>-Aorg.jboss.logging.tools.addGeneratedAnnotation=false</logging.processor.skip.generated.annotation.compiler.argument>
+        <logging.processor.categories.report.module-name.compiler.argument>-Aorg.hibernate.search.build.loggers.module_name=${project.artifactId}</logging.processor.categories.report.module-name.compiler.argument>
     </properties>
 
     <build>
         <pluginManagement>
             <plugins>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-compiler-plugin</artifactId>
+                    <executions>
+                        <execution>
+                            <id>default-compile</id>
+                            <configuration>
+                                <annotationProcessorPaths combine.children="append">
+                                    <path>
+                                        <groupId>${project.groupId}</groupId>
+                                        <artifactId>hibernate-search-build-config</artifactId>
+                                        <version>${project.version}</version>
+                                    </path>
+                                </annotationProcessorPaths>
+                            </configuration>
+                        </execution>
+                    </executions>
+                </plugin>
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-jar-plugin</artifactId>

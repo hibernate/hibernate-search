@@ -186,6 +186,7 @@
         <version.com.atomikos>6.0.0</version.com.atomikos>
 
         <version.jsoup>1.18.1</version.jsoup>
+        <version.snakeyaml>2.3</version.snakeyaml>
 
         <!-- Whether javadoc warnings should fail the build -->
         <failOnJavadocWarning>true</failOnJavadocWarning>
@@ -888,6 +889,13 @@
                 <groupId>org.jsoup</groupId>
                 <artifactId>jsoup</artifactId>
                 <version>${version.jsoup}</version>
+            </dependency>
+
+            <!-- For generating logging categories reports -->
+            <dependency>
+                <groupId>org.yaml</groupId>
+                <artifactId>snakeyaml</artifactId>
+                <version>${version.snakeyaml}</version>
             </dependency>
 
             <!-- The version is used to generate a link to the WildFly documentation -->
