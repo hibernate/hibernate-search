@@ -48,7 +48,7 @@ public class HibernateOrmIntegrationBooterImpl implements HibernateOrmIntegratio
 	private HibernateOrmIntegrationBooterImpl(BuilderImpl builder) {
 		this.metadata = builder.metadata;
 		ServiceRegistry serviceRegistry = builder.bootstrapContext.getServiceRegistry();
-		this.jandexIndex = builder.bootstrapContext.getJandexView();
+		this.jandexIndex = (IndexView) builder.bootstrapContext.getJandexView();
 		this.valueHandleFactory = builder.valueHandleFactory != null
 				? builder.valueHandleFactory
 				: ValueHandleFactory.usingMethodHandle( MethodHandles.publicLookup() );

@@ -163,7 +163,7 @@ public final class HibernateOrmSearchQueryAdapter<R> extends AbstractQuery<R> {
 	}
 
 	@Override
-	public KeyedResultList<R> getKeyedResultList(KeyedPage page) {
+	public KeyedResultList<R> getKeyedResultList(KeyedPage<R> page) {
 		throw keyedResultListNoSupported();
 	}
 
