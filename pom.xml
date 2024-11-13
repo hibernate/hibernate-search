@@ -365,6 +365,7 @@
         <javadoc.generate.html.directory>${project.reporting.outputDirectory}/javadocs</javadoc.generate.html.directory>
 
         <logging.processor.skip.generated.annotation.compiler.argument></logging.processor.skip.generated.annotation.compiler.argument>
+        <logging.processor.categories.report.module-name.compiler.argument></logging.processor.categories.report.module-name.compiler.argument>
 
         <!-- Test settings -->
 
@@ -646,6 +647,7 @@
                         <compilerArgs>
                             <compilerArg>-Xlint:unchecked</compilerArg>
                             <compilerArg>${logging.processor.skip.generated.annotation.compiler.argument}</compilerArg>
+                            <compilerArg>${logging.processor.categories.report.module-name.compiler.argument}</compilerArg>
                         </compilerArgs>
                     </configuration>
                     <executions>

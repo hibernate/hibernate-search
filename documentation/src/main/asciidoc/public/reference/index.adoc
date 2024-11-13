@@ -75,4 +75,6 @@ include::_credits.adoc[]
 
 include::_configuration-properties-aggregated.adoc[]
 
+include::_logging-categories-aggregated.adoc[]
+
 :leveloffset: -1

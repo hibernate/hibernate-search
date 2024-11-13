@@ -131,7 +131,7 @@
                         </goals>
                         <configuration>
                             <rules>
-                                <dependencyManagementIncludesAllPublicArtifactsRule/>
+                                <dependencyManagementIncludesOnlyAllPublicArtifactsRule/>
                             </rules>
                         </configuration>
                     </execution>
