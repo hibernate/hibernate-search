@@ -43,6 +43,8 @@ import org.hibernate.service.ServiceRegistry;
 import org.hibernate.service.spi.ServiceBinding;
 import org.hibernate.service.spi.ServiceRegistryImplementor;
 
+import org.jboss.jandex.IndexView;
+
 public final class HibernateOrmUtils {
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
@@ -205,7 +207,7 @@ public final class HibernateOrmUtils {
 		}
 		else {
 			return new JandexModelBuildingContextImpl(
-					bootstrapContext.getJandexView(),
+					(IndexView) bootstrapContext.getJandexView(),
 					classLoading,
 					ModelsHelper::preFillRegistries
 			);

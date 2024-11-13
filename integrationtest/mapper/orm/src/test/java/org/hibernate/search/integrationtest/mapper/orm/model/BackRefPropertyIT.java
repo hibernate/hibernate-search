@@ -104,7 +104,6 @@ class BackRefPropertyIT {
 		private Integer id;
 
 		@ManyToOne
-		@OrderColumn
 		@IndexedEmbedded
 		private ContainedEntity contained;
 
