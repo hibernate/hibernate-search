@@ -34,7 +34,13 @@ import org.jboss.logging.annotations.Message;
 import org.jboss.logging.annotations.MessageLogger;
 
 @CategorizedLogger(
-		category = OutboxPollingEventsLog.CATEGORY_NAME
+		category = OutboxPollingEventsLog.CATEGORY_NAME,
+		description = """
+				Logs various outbox polling-related events happening in the background.
+				+
+				Messages may include information on starting/stopping event processors,
+				agents or issues with locking indexing events.
+				"""
 )
 @MessageLogger(projectCode = MessageConstants.PROJECT_CODE)
 public interface OutboxPollingEventsLog extends BasicLogger {

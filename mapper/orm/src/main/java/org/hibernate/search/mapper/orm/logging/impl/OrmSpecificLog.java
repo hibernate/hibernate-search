@@ -27,7 +27,11 @@ import org.jboss.logging.annotations.Message;
 import org.jboss.logging.annotations.MessageLogger;
 
 @CategorizedLogger(
-		category = OrmSpecificLog.CATEGORY_NAME
+		category = OrmSpecificLog.CATEGORY_NAME,
+		description = """
+				Logs information on Hibernate ORM-specific matters related
+				but not limited to transactions, caching and unrecognized query hints.
+				"""
 )
 @MessageLogger(projectCode = MessageConstants.PROJECT_CODE)
 public interface OrmSpecificLog extends BasicLogger {

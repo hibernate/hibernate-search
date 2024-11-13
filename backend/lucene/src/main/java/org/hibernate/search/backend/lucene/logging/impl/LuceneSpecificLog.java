@@ -31,7 +31,13 @@ import org.jboss.logging.annotations.Param;
 import org.apache.lucene.store.Directory;
 
 @CategorizedLogger(
-		category = LuceneSpecificLog.CATEGORY_NAME
+		category = LuceneSpecificLog.CATEGORY_NAME,
+		description = """
+				Logs information on Lucene-specific matters.
+				+
+				Messages may include details on Index Reader/Writer operations,
+				issues with the index directories and others.
+				"""
 )
 @MessageLogger(projectCode = MessageConstants.PROJECT_CODE)
 public interface LuceneSpecificLog extends BasicLogger {

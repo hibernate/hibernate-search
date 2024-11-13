@@ -26,7 +26,11 @@ import org.jboss.logging.annotations.ValidIdRange;
 import org.jboss.logging.annotations.ValidIdRanges;
 
 @CategorizedLogger(
-		category = CommonFailuresLog.CATEGORY_NAME
+		category = CommonFailuresLog.CATEGORY_NAME,
+		description = """
+				Logs information on various non-critical errors related to parsing the Jandex index
+				or on low-level executor operations like canceling tasks etc.
+				"""
 )
 @MessageLogger(projectCode = MessageConstants.PROJECT_CODE)
 @ValidIdRanges({

@@ -25,7 +25,12 @@ import org.jboss.logging.annotations.Message;
 import org.jboss.logging.annotations.MessageLogger;
 
 @CategorizedLogger(
-		category = ConfigurationLog.CATEGORY_NAME
+		category = ConfigurationLog.CATEGORY_NAME,
+		description = """
+				Logs warnings about unused configuration properties and tracking of such properties.
+				+
+				Debug logs may also include information on configuration providers or other configuration-related issues.
+				"""
 )
 @MessageLogger(projectCode = MessageConstants.PROJECT_CODE)
 public interface ConfigurationLog {

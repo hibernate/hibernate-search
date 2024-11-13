@@ -27,7 +27,10 @@ import org.jboss.logging.annotations.MessageLogger;
 import org.jboss.logging.annotations.Suppressed;
 
 @CategorizedLogger(
-		category = CommonFailureLog.CATEGORY_NAME
+		category = CommonFailureLog.CATEGORY_NAME,
+		description = """
+				Logs unexpected problems that may occur during background Hibernate Search processes.
+				"""
 )
 @MessageLogger(projectCode = MessageConstants.PROJECT_CODE)
 public interface CommonFailureLog {

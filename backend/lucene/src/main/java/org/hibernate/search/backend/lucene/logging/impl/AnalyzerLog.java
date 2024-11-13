@@ -26,7 +26,10 @@ import org.jboss.logging.annotations.MessageLogger;
 import org.jboss.logging.annotations.Param;
 
 @CategorizedLogger(
-		category = AnalyzerLog.CATEGORY_NAME
+		category = AnalyzerLog.CATEGORY_NAME,
+		description = """
+				Logs information on misconfigured or misbehaving analyzers/normalisers.
+				"""
 )
 @MessageLogger(projectCode = MessageConstants.PROJECT_CODE)
 public interface AnalyzerLog {

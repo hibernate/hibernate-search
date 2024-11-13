@@ -19,7 +19,10 @@ import org.jboss.logging.annotations.Message;
 import org.jboss.logging.annotations.MessageLogger;
 
 @CategorizedLogger(
-		category = LoadingLog.CATEGORY_NAME
+		category = LoadingLog.CATEGORY_NAME,
+		description = """
+				Logs debug information on some Hibernate ORM-related loading operations e.g. loading identifiers.
+				"""
 )
 @MessageLogger(projectCode = MessageConstants.PROJECT_CODE)
 public interface LoadingLog extends BasicLogger {

@@ -33,11 +33,16 @@ import org.jboss.logging.annotations.MessageLogger;
 import com.google.gson.JsonObject;
 
 @CategorizedLogger(
-		category = ElasticsearchClientLog.CATEGORY_NAME
+		category = ElasticsearchClientLog.CATEGORY_NAME,
+		description = """
+				Logs information on low-level Elasticsearch backend operations.
+				+
+				This may include warnings about misconfigured Elasticsearch REST clients or index operations.
+				"""
 )
 @MessageLogger(projectCode = MessageConstants.PROJECT_CODE)
 public interface ElasticsearchClientLog {
-	String CATEGORY_NAME = "org.hibernate.search.elasticsearch.client";
+	String CATEGORY_NAME = "org.hibernate.search.backend.elasticsearch.client";
 
 	ElasticsearchClientLog INSTANCE = LoggerFactory.make( ElasticsearchClientLog.class, CATEGORY_NAME, MethodHandles.lookup() );
 

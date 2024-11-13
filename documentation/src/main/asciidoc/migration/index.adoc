@@ -107,6 +107,11 @@ This new type group monitor has more flexibility and also allows implementors to
 or one of the "shortcut-methods": `.list()`/`.set()`/`.sortedSet()`...
 Check the `ProjectionCollector` factory methods to see the list of built-in collectors that provide support for nullable/optional single-valued projections
 and for multivalued ones such as lists, sets arrays and more.
+- The `org.hibernate.search.elasticsearch.request` logging category is now renamed to `org.hibernate.search.backend.elasticsearch.request`
+to be in a more consistent format compared with other logging categories.
+- Hibernate Search now uses logging categories instead of class names to log messages.
+See link:https://docs.jboss.org/hibernate/search/{hibernateSearchVersionShort}/reference/en-US/html_single/#logging-categories-aggregated[Appendix B: List of all available logging categories]
+to find out what categories are available.
 
 [[spi]]
 == SPI

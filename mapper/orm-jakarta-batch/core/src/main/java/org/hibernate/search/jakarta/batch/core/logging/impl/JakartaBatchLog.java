@@ -29,7 +29,10 @@ import org.jboss.logging.annotations.ValidIdRanges;
  * @author Mincong Huang
  */
 @CategorizedLogger(
-		category = JakartaBatchLog.CATEGORY_NAME
+		category = JakartaBatchLog.CATEGORY_NAME,
+		description = """
+				Logs debug information on various batch indexing operations.
+				"""
 )
 @MessageLogger(projectCode = MessageConstants.PROJECT_CODE)
 @ValidIdRanges({

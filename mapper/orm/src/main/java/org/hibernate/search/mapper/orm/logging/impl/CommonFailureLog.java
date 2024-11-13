@@ -19,7 +19,10 @@ import org.jboss.logging.annotations.Message;
 import org.jboss.logging.annotations.MessageLogger;
 
 @CategorizedLogger(
-		category = CommonFailureLog.CATEGORY_NAME
+		category = CommonFailureLog.CATEGORY_NAME,
+		description = """
+				Logs problems with shutting down Hibernate Search.
+				"""
 )
 @MessageLogger(projectCode = MessageConstants.PROJECT_CODE)
 public interface CommonFailureLog {

@@ -21,7 +21,11 @@ import org.jboss.logging.annotations.Message;
 import org.jboss.logging.annotations.MessageLogger;
 
 @CategorizedLogger(
-		category = ExecutorLog.CATEGORY_NAME
+		category = ExecutorLog.CATEGORY_NAME,
+		description = """
+				Logs the information on various executor operations.
+				The executor, in this case in particular, can be the one used to batch the index work.
+				"""
 )
 @MessageLogger(projectCode = MessageConstants.PROJECT_CODE)
 public interface ExecutorLog extends BasicLogger {

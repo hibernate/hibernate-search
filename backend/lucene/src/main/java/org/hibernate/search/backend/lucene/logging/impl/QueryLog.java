@@ -44,7 +44,12 @@ import org.jboss.logging.annotations.Param;
 import org.apache.lucene.search.Query;
 
 @CategorizedLogger(
-		category = QueryLog.CATEGORY_NAME
+		category = QueryLog.CATEGORY_NAME,
+		description = """
+				Logs the Lucene queries that are about to be executed.
+				+
+				It may also log some hints on potentially misconfigured Lucene highlight queries, etc.
+				"""
 )
 @MessageLogger(projectCode = MessageConstants.PROJECT_CODE)
 public interface QueryLog {

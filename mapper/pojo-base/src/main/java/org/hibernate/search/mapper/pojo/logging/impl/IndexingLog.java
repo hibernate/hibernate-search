@@ -22,7 +22,6 @@ import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 import org.hibernate.search.util.common.logging.impl.MessageConstants;
 import org.hibernate.search.util.common.reporting.EventContext;
 
-import org.jboss.logging.BasicLogger;
 import org.jboss.logging.annotations.Cause;
 import org.jboss.logging.annotations.FormatWith;
 import org.jboss.logging.annotations.Message;
@@ -33,7 +32,7 @@ import org.jboss.logging.annotations.Param;
 		category = IndexingLog.CATEGORY_NAME
 )
 @MessageLogger(projectCode = MessageConstants.PROJECT_CODE)
-public interface IndexingLog extends BasicLogger {
+public interface IndexingLog {
 	String CATEGORY_NAME = "org.hibernate.search.mapper.indexing";
 
 	IndexingLog INSTANCE = LoggerFactory.make( IndexingLog.class, CATEGORY_NAME, MethodHandles.lookup() );

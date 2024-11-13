@@ -20,7 +20,10 @@ import org.jboss.logging.annotations.Message;
 import org.jboss.logging.annotations.MessageLogger;
 
 @CategorizedLogger(
-		category = IndexingLog.CATEGORY_NAME
+		category = IndexingLog.CATEGORY_NAME,
+		description = """
+				Logged messages may notify when the particular indexing plan synchronization stage occurs (e.g. before/after transaction).
+				"""
 )
 @MessageLogger(projectCode = MessageConstants.PROJECT_CODE)
 public interface IndexingLog extends BasicLogger {

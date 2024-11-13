@@ -17,7 +17,10 @@ import org.jboss.logging.annotations.Message;
 import org.jboss.logging.annotations.MessageLogger;
 
 @CategorizedLogger(
-		category = DeprecationLog.CATEGORY_NAME
+		category = DeprecationLog.CATEGORY_NAME,
+		description = """
+				Notifies about usage of deprecated configuration properties or configuration property values.
+				"""
 )
 @MessageLogger(projectCode = MessageConstants.PROJECT_CODE)
 public interface DeprecationLog {

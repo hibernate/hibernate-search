@@ -18,7 +18,10 @@ import org.jboss.logging.annotations.Message;
 import org.jboss.logging.annotations.MessageLogger;
 
 @CategorizedLogger(
-		category = VersionLog.CATEGORY_NAME
+		category = VersionLog.CATEGORY_NAME,
+		description = """
+				Logs the version of Hibernate Search, when the Hibernate ORM mapper is used.
+				"""
 )
 @MessageLogger(projectCode = MessageConstants.PROJECT_CODE)
 public interface VersionLog {

@@ -19,7 +19,14 @@ import org.jboss.logging.annotations.ValidIdRange;
 import org.jboss.logging.annotations.ValidIdRanges;
 
 @CategorizedLogger(
-		category = AwsLog.CATEGORY_NAME
+		category = AwsLog.CATEGORY_NAME,
+		description = """
+				Provides trace/debug level logs on signing requests sent to an AWS Elasticsearch cluster.
+				+
+				Let the user know whether the request signing is enabled or disabled.
+				+
+				Can log the request before and after signing to help debug any issues with AWS Elasticsearch cluster communication.
+				"""
 )
 @MessageLogger(projectCode = MessageConstants.PROJECT_CODE)
 @ValidIdRanges({

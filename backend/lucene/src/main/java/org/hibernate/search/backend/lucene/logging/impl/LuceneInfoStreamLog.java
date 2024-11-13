@@ -19,7 +19,15 @@ import org.jboss.logging.annotations.Message;
 import org.jboss.logging.annotations.MessageLogger;
 
 @CategorizedLogger(
-		category = LuceneInfoStreamLog.CATEGORY_NAME
+		category = LuceneInfoStreamLog.CATEGORY_NAME,
+		description = """
+				Logs the Lucene infostream.
+				+
+				To enable the logger, the category needs to be enabled at TRACE level and configuration
+				property `io.writer.infostream` needs to be enabled on the index.
+				+
+				See `org.hibernate.search.backend.lucene.cfg.LuceneIndexSettings.IO_WRITER_INFOSTREAM` for more details.
+				"""
 )
 @MessageLogger(projectCode = MessageConstants.PROJECT_CODE)
 public interface LuceneInfoStreamLog extends BasicLogger {
