@@ -33,6 +33,11 @@
     </properties>
 
     <dependencies>
+        <!-- Need to have a dependency on scanner if we want to rely on automatic entity discovery in tests: -->
+        <dependency>
+            <groupId>org.hibernate.orm</groupId>
+            <artifactId>hibernate-scan-jandex</artifactId>
+        </dependency>
         <dependency>
             <groupId>org.hibernate.search</groupId>
             <artifactId>hibernate-search-mapper-orm-jakarta-batch-core</artifactId>
@@ -48,7 +53,6 @@
             <artifactId>hibernate-search-util-internal-integrationtest-mapper-orm</artifactId>
             <scope>test</scope>
         </dependency>
-
         <dependency>
             <groupId>org.hibernate.search</groupId>
             <artifactId>hibernate-search-backend-lucene</artifactId>
