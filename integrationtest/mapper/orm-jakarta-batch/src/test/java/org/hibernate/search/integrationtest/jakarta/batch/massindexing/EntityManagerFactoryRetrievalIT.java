@@ -23,11 +23,13 @@ import org.hibernate.search.jakarta.batch.core.massindexing.MassIndexingJob;
 
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
 /**
  * @author Mincong Huang
  */
+@Disabled("Requires next Hibernate ORM 7 release.")
 class EntityManagerFactoryRetrievalIT {
 
 	private static final String PERSISTENCE_UNIT_NAME = PersistenceUnitTestUtil.getPersistenceUnitName();

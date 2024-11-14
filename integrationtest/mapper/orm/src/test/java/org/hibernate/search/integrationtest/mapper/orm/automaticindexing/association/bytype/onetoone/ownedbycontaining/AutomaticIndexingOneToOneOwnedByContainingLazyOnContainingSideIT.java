@@ -45,6 +45,7 @@ import org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmSetupHelper;
 import org.hibernate.testing.bytecode.enhancement.EnhancementOptions;
 import org.hibernate.testing.bytecode.enhancement.extension.BytecodeEnhanced;
 
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
 /**
@@ -53,6 +54,7 @@ import org.junit.jupiter.api.Test;
  * with a {@code @OneToOne} association owned by the containing side,
  * and with lazy associations on the containing side.
  */
+@Disabled("Requires next Hibernate ORM 7 release.")
 @BytecodeEnhanced // So that we can have lazy *ToOne associations
 @EnhancementOptions(lazyLoading = true)
 class AutomaticIndexingOneToOneOwnedByContainingLazyOnContainingSideIT
