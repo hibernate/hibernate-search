@@ -41,6 +41,7 @@ import org.hibernate.search.util.impl.integrationtest.common.extension.BackendCo
 import org.hibernate.search.util.impl.integrationtest.common.reporting.FailureReportChecker;
 import org.hibernate.search.util.impl.integrationtest.common.reporting.FailureReportUtils;
 import org.hibernate.search.util.impl.integrationtest.mapper.pojo.standalone.StandalonePojoMappingSetupHelper;
+import org.hibernate.search.util.impl.test.extension.RetryExtension;
 
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
@@ -74,7 +75,7 @@ class VectorFieldIT {
 	 * As for the Elasticsearch/OpenSearch -- we only transmit the error-response from the backend to the user,
 	 * so there's no need to do that much of extensive testing for this backend and `vectorSizeLimits_more_than_max` covers the basics.
 	 */
-	@Test
+	@RetryExtension.TestWithRetry
 	void vectorSizeLimits_max_allowed_dimension_with_lots_of_documents() {
 		// with OpenSearch 2.12 it allows up to 16000 which will lead to an OOM in this particular test:
 		int maxDimension = Math.min( 4096, maxDimension() );
