@@ -32,6 +32,7 @@ class ElasticsearchKnnPredicateMultipleShardsIT {
 
 	private static final SimpleMappedIndex<IndexBinding> index =
 			SimpleMappedIndex.of( IndexBinding::new ).name( "multipleShardsKnnSearchPredicate" );
+	private static final int SHARD_COUNT = 4;
 
 	@BeforeAll
 	static void setup() {
@@ -39,7 +40,7 @@ class ElasticsearchKnnPredicateMultipleShardsIT {
 				TckConfiguration.get().getBackendFeatures().supportsVectorSearch(),
 				"These tests only make sense for a backend where Vector Search is supported and implemented."
 		);
-		setupHelper.start( tckBackendHelper -> tckBackendHelper.createHashBasedShardingBackendSetupStrategy( 4 ) )
+		setupHelper.start( tckBackendHelper -> tckBackendHelper.createHashBasedShardingBackendSetupStrategy( SHARD_COUNT ) )
 				.withIndexes( index ).setup();
 		BulkIndexer exampleKnnSearchIndexer = index.bulkIndexer();
 		dataset.accept( exampleKnnSearchIndexer );
@@ -57,9 +58,11 @@ class ElasticsearchKnnPredicateMultipleShardsIT {
 
 		List<Object> result = query.fetchAll().hits();
 
-		assertThat( result )
-				.containsOnly( "ID:2", "ID:1", "ID:3", "ID:4", "ID:6", "ID:5", "ID:7", "ID:12", "ID:9", "ID:17", "ID:13",
-						"ID:20" );
+		// we expect that we have to get more than 3 because we actually assume that each shard would provide 3
+		// (given the sharding and docs distribution worked as we'd hope for)
+		// But since the combined list of IDs may vary, we just check the number of returned hits:
+		assertThat( result ).hasSizeGreaterThan( 3 )
+				.hasSizeLessThanOrEqualTo( k * SHARD_COUNT );
 	}
 
 	@Test
@@ -102,13 +105,11 @@ class ElasticsearchKnnPredicateMultipleShardsIT {
 				"ID:23",
 				"ID:19",
 				"ID:24",
-				"ID:18",
-				// and 4 are based on the knn predicate (k = 1 and shards = 4)
-				"ID:2",
-				"ID:1",
-				"ID:3",
-				"ID:4"
-		);
+				"ID:18"
+		// and 4 are based on the knn predicate (k = 1 and shards = 4)
+		// But since those are not consistently returned, sometimes we can get 1,3,4,5 and other times 2,1,3,4
+		// we will not check for their IDs but just the size of the returned hits instead.
+		).hasSize( 16 );
 	}
 
 	private static class IndexBinding {
@@ -130,7 +131,7 @@ class ElasticsearchKnnPredicateMultipleShardsIT {
 			} )
 			.add( "ID:2", document -> {
 				document.addValue( index.binding().location, new float[] { 5.2f, 3.9f } );
-				document.addValue( index.binding().rating, 4 );
+				document.addValue( index.binding().rating, SHARD_COUNT );
 			} )
 			.add( "ID:3", document -> {
 				document.addValue( index.binding().location, new float[] { 4.9f, 3.4f } );

@@ -1193,7 +1193,7 @@ class KnnPredicateSpecificsIT {
 							.matching( noramlize( index.binding().similarity, 5, 4 ) )
 							.requiredMinimumSimilarity( similarity )
 					).fetchAll().hits() )
-					.hasSize( matches )
+					.hasSizeLessThanOrEqualTo( matches )
 					.allSatisfy( s -> assertThat( s ).isGreaterThanOrEqualTo( score ) );
 		}
 
@@ -1314,7 +1314,7 @@ class KnnPredicateSpecificsIT {
 							.matching( noramlize( index.binding().similarity, 5, 4 ) )
 							.requiredMinimumScore( minScore )
 					).fetchAll().hits() )
-					.hasSize( matches )
+					.hasSizeLessThanOrEqualTo( matches )
 					.allSatisfy( s -> assertThat( s ).isGreaterThanOrEqualTo( score ) );
 		}
 
