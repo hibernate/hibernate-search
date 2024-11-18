@@ -6,7 +6,7 @@
 /*
  * See https://github.com/hibernate/hibernate-jenkins-pipeline-helpers
  */
-@Library('hibernate-jenkins-pipeline-helpers@1.18') _
+@Library('hibernate-jenkins-pipeline-helpers') _
 
 import groovy.transform.Field
 import org.hibernate.jenkins.pipeline.helpers.job.JobHelper
