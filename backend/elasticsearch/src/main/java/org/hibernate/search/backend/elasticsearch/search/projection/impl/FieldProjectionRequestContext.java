@@ -86,4 +86,16 @@ public class FieldProjectionRequestContext implements ProjectionRequestContext {
 		return root().queryParameters();
 	}
 
+	@Override
+	public boolean projectionCardinalityCorrectlyAddressed(String requiredContextAbsoluteFieldPath) {
+		// requiredContextAbsoluteFieldPath generally speaking should be the path from root to the closest multi-valued field
+		// (i.e. the very last multi-valued field in the current path)
+		//
+		// Hence if we have the context that includes that path or matches it exactly then we can assume that the cardinality was correctly handled:
+		return requiredContextAbsoluteFieldPath == null
+				|| requiredContextAbsoluteFieldPath.equals( absoluteCurrentFieldPath )
+				|| ( absoluteCurrentFieldPath != null
+						&& absoluteCurrentFieldPath.startsWith( requiredContextAbsoluteFieldPath + "." ) );
+	}
+
 }

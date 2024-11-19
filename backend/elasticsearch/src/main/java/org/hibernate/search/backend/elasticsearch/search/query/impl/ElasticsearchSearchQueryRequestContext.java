@@ -127,6 +127,11 @@ class ElasticsearchSearchQueryRequestContext implements ProjectionRequestRootCon
 	}
 
 	@Override
+	public boolean projectionCardinalityCorrectlyAddressed(String requiredContextAbsoluteFieldPath) {
+		return requiredContextAbsoluteFieldPath == null;
+	}
+
+	@Override
 	public ElasticsearchSearchHighlighter highlighter(String highlighterName) {
 		if ( highlighterName == null ) {
 			return ElasticsearchSearchHighlighterImpl.NO_OPTIONS_CONFIGURATION;
