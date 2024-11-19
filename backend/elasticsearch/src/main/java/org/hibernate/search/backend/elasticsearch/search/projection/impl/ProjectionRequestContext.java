@@ -23,4 +23,5 @@ public interface ProjectionRequestContext {
 
 	NamedValues queryParameters();
 
+	boolean projectionCardinalityCorrectlyAddressed(String requiredContextAbsoluteFieldPath);
 }
