@@ -76,8 +76,7 @@ public class LuceneObjectProjection<E, V, P>
 	@Override
 	public Extractor<?, P> request(ProjectionRequestContext context) {
 		ProjectionRequestContext innerContext = context.forField( absoluteFieldPath, nested );
-		if ( requiredContextAbsoluteFieldPath != null
-				&& !requiredContextAbsoluteFieldPath.equals( context.absoluteCurrentNestedFieldPath() ) ) {
+		if ( !context.projectionCardinalityCorrectlyAddressed( requiredContextAbsoluteFieldPath ) ) {
 			throw log.invalidSingleValuedProjectionOnValueFieldInMultiValuedObjectField(
 					absoluteFieldPath, requiredContextAbsoluteFieldPath );
 		}

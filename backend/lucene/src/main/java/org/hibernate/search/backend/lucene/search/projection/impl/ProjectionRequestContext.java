@@ -95,6 +95,15 @@ public final class ProjectionRequestContext {
 		return absoluteCurrentNestedFieldPath;
 	}
 
+	public boolean projectionCardinalityCorrectlyAddressed(String requiredContextAbsoluteFieldPath) {
+		String absoluteCurrentNestedFieldPath = absoluteCurrentNestedFieldPath();
+		return requiredContextAbsoluteFieldPath == null
+				|| requiredContextAbsoluteFieldPath.equals( absoluteCurrentNestedFieldPath )
+				|| ( absoluteCurrentNestedFieldPath != null
+						&& absoluteCurrentNestedFieldPath.startsWith( requiredContextAbsoluteFieldPath + "." ) );
+
+	}
+
 	public String absoluteCurrentFieldPath() {
 		return absoluteCurrentFieldPath;
 	}

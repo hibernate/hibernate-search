@@ -94,8 +94,7 @@ public class LuceneDistanceToFieldProjection<P> extends AbstractLuceneProjection
 		}
 		else {
 			context.checkValidField( absoluteFieldPath );
-			if ( requiredContextAbsoluteFieldPath != null
-					&& !requiredContextAbsoluteFieldPath.equals( context.absoluteCurrentNestedFieldPath() ) ) {
+			if ( !context.projectionCardinalityCorrectlyAddressed( requiredContextAbsoluteFieldPath ) ) {
 				throw log.invalidSingleValuedProjectionOnValueFieldInMultiValuedObjectField(
 						absoluteFieldPath, requiredContextAbsoluteFieldPath );
 			}

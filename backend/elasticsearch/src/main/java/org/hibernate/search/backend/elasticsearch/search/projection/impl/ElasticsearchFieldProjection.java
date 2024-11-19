@@ -80,8 +80,7 @@ public class ElasticsearchFieldProjection<F, V, P, T> extends AbstractElasticsea
 	@Override
 	public ValueFieldExtractor<?> request(JsonObject requestBody, ProjectionRequestContext context) {
 		ProjectionRequestContext innerContext = context.forField( absoluteFieldPath, absoluteFieldPathComponents );
-		if ( requiredContextAbsoluteFieldPath != null
-				&& !requiredContextAbsoluteFieldPath.equals( context.absoluteCurrentFieldPath() ) ) {
+		if ( !context.projectionCardinalityCorrectlyAddressed( requiredContextAbsoluteFieldPath ) ) {
 			throw log.invalidSingleValuedProjectionOnValueFieldInMultiValuedObjectField(
 					absoluteFieldPath, requiredContextAbsoluteFieldPath );
 		}
