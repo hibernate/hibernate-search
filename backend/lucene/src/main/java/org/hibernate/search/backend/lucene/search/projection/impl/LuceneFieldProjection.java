@@ -77,8 +77,7 @@ public class LuceneFieldProjection<F, V, P, T> extends AbstractLuceneProjection<
 	@Override
 	public ValueFieldExtractor<?> request(ProjectionRequestContext context) {
 		context.checkValidField( absoluteFieldPath );
-		if ( requiredContextAbsoluteFieldPath != null
-				&& !requiredContextAbsoluteFieldPath.equals( context.absoluteCurrentNestedFieldPath() ) ) {
+		if ( !context.projectionCardinalityCorrectlyAddressed( requiredContextAbsoluteFieldPath ) ) {
 			throw log.invalidSingleValuedProjectionOnValueFieldInMultiValuedObjectField(
 					absoluteFieldPath, requiredContextAbsoluteFieldPath );
 		}
