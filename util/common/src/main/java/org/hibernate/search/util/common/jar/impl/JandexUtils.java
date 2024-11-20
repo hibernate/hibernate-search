@@ -158,7 +158,7 @@ public final class JandexUtils {
 	private static boolean isUnsupportedVersionPath(Path metaInfVersions, Path path) {
 		Path relative = metaInfVersions.relativize( path );
 		if ( relative.getNameCount() < 2 ) {
-			CommonFailuresLog.INSTANCE.debug( "Unexpected structure for META-INF/versions entry: " + path );
+			CommonFailuresLog.INSTANCE.metaInfVersionBadStructure( path );
 			return true;
 		}
 		try {
@@ -168,7 +168,7 @@ public final class JandexUtils {
 			}
 		}
 		catch (NumberFormatException ex) {
-			CommonFailuresLog.INSTANCE.debug( "Failed to parse META-INF/versions entry: " + path, ex );
+			CommonFailuresLog.INSTANCE.metaInfVersionParsingFailed( path, ex );
 			return true;
 		}
 		return false;

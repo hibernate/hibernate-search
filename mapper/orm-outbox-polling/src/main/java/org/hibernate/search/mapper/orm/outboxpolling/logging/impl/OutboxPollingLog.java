@@ -30,6 +30,6 @@ public interface OutboxPollingLog extends ConfigurationLog, DeprecationLog, Outb
 	 * here to the next value.
 	 */
 	@LogMessage(level = TRACE)
-	@Message(id = ID_OFFSET + 38, value = "")
+	@Message(id = ID_OFFSET + 68, value = "")
 	void nextLoggerIdForConvenience();
 }

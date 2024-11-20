@@ -43,9 +43,11 @@ public final class ElasticsearchGeoPointFieldCodec extends AbstractElasticsearch
 		}
 		JsonObject object = JsonElementTypes.OBJECT.fromElement( element );
 		double latitude =
-				LATITUDE_ACCESSOR.get( object ).orElseThrow( ElasticsearchClientLog.INSTANCE::elasticsearchResponseMissingData );
+				LATITUDE_ACCESSOR.get( object )
+						.orElseThrow( ElasticsearchClientLog.INSTANCE::elasticsearchResponseMissingData );
 		double longitude =
-				LONGITUDE_ACCESSOR.get( object ).orElseThrow( ElasticsearchClientLog.INSTANCE::elasticsearchResponseMissingData );
+				LONGITUDE_ACCESSOR.get( object )
+						.orElseThrow( ElasticsearchClientLog.INSTANCE::elasticsearchResponseMissingData );
 		return GeoPoint.of( latitude, longitude );
 	}
 

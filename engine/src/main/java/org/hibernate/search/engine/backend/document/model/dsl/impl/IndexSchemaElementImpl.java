@@ -143,7 +143,8 @@ public class IndexSchemaElementImpl<B extends IndexCompositeNodeBuilder> impleme
 
 	private void checkRelativeFieldName(String relativeFieldName) {
 		if ( StringHelper.isEmpty( relativeFieldName ) ) {
-			throw MappingLog.INSTANCE.relativeFieldNameCannotBeNullOrEmpty( relativeFieldName, objectNodeBuilder.eventContext() );
+			throw MappingLog.INSTANCE.relativeFieldNameCannotBeNullOrEmpty( relativeFieldName,
+					objectNodeBuilder.eventContext() );
 		}
 		if ( relativeFieldName.contains( FieldPaths.PATH_SEPARATOR_STRING ) ) {
 			throw MappingLog.INSTANCE.relativeFieldNameCannotContainDot( relativeFieldName, objectNodeBuilder.eventContext() );

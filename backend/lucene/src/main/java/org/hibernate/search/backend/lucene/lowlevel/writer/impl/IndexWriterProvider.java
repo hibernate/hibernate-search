@@ -122,7 +122,7 @@ public class IndexWriterProvider {
 							failureHandler,
 							this::clearAfterFailure
 					);
-					LuceneSpecificLog.INSTANCE.trace( "IndexWriter opened" );
+					LuceneSpecificLog.INSTANCE.openedIndexWriter();
 					currentWriter.set( indexWriterDelegator );
 				}
 			}

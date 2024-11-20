@@ -15,6 +15,8 @@ import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 import org.hibernate.search.util.common.logging.impl.MessageConstants;
 
 import org.jboss.logging.BasicLogger;
+import org.jboss.logging.Logger;
+import org.jboss.logging.annotations.LogMessage;
 import org.jboss.logging.annotations.Message;
 import org.jboss.logging.annotations.MessageLogger;
 
@@ -38,4 +40,8 @@ public interface LoadingLog extends BasicLogger {
 			+ " '%2$s' is the document ID and must be assigned unique values.")
 	SearchException foundMultipleEntitiesForDocumentId(String entityName, String documentIdSourcePropertyName,
 			Object id);
+
+	@LogMessage(level = Logger.Level.DEBUG)
+	@Message(id = ID_OFFSET + 134, value = "Going to fetch %d primary keys")
+	void numberOfKeysToFetch(long totalCount);
 }

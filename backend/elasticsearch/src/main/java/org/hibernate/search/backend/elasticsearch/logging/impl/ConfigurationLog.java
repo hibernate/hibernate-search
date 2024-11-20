@@ -6,19 +6,21 @@ package org.hibernate.search.backend.elasticsearch.logging.impl;
 
 import static org.hibernate.search.backend.elasticsearch.logging.impl.ElasticsearchLog.ID_OFFSET;
 import static org.hibernate.search.backend.elasticsearch.logging.impl.ElasticsearchLog.ID_OFFSET_LEGACY_ES;
+import static org.jboss.logging.Logger.Level.DEBUG;
 
 import java.lang.invoke.MethodHandles;
 import java.util.List;
 import java.util.Set;
 
+import org.hibernate.search.engine.environment.bean.BeanHolder;
 import org.hibernate.search.util.common.SearchException;
 import org.hibernate.search.util.common.logging.CategorizedLogger;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 import org.hibernate.search.util.common.logging.impl.MessageConstants;
 import org.hibernate.search.util.common.reporting.EventContext;
 
-import org.jboss.logging.BasicLogger;
 import org.jboss.logging.annotations.Cause;
+import org.jboss.logging.annotations.LogMessage;
 import org.jboss.logging.annotations.Message;
 import org.jboss.logging.annotations.MessageLogger;
 import org.jboss.logging.annotations.Param;
@@ -30,7 +32,7 @@ import org.jboss.logging.annotations.Param;
 				"""
 )
 @MessageLogger(projectCode = MessageConstants.PROJECT_CODE)
-public interface ConfigurationLog extends BasicLogger {
+public interface ConfigurationLog {
 	String CATEGORY_NAME = "org.hibernate.search.configuration";
 
 	ConfigurationLog INSTANCE = LoggerFactory.make( ConfigurationLog.class, CATEGORY_NAME, MethodHandles.lookup() );
@@ -114,4 +116,9 @@ public interface ConfigurationLog extends BasicLogger {
 			value = "Invalid backend configuration: mapping requires single-tenancy"
 					+ " but multi-tenancy strategy is set.")
 	SearchException multiTenancyNotRequiredButExplicitlyEnabledByTheBackend();
+
+	@LogMessage(level = DEBUG)
+	@Message(id = ID_OFFSET + 192,
+			value = "Elasticsearch backend will use client factory '%s'. Context: %s")
+	void backendClientFactory(BeanHolder<?> clientFactoryHolder, String eventContext);
 }

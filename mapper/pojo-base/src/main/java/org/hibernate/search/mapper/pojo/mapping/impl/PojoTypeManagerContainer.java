@@ -104,10 +104,13 @@ public class PojoTypeManagerContainer
 		this.byExactType =
 				new KeyValueProvider<>( byExactTypeContent, MappingLog.INSTANCE::unknownTypeIdentifierForMappedEntityType );
 		this.indexedByExactType =
-				new KeyValueProvider<>( indexedByExactTypeContent, MappingLog.INSTANCE::unknownTypeIdentifierForIndexedEntityType );
-		this.byEntityName = new KeyValueProvider<>( byEntityNameContent, MappingLog.INSTANCE::unknownEntityNameForMappedEntityType );
+				new KeyValueProvider<>( indexedByExactTypeContent,
+						MappingLog.INSTANCE::unknownTypeIdentifierForIndexedEntityType );
+		this.byEntityName =
+				new KeyValueProvider<>( byEntityNameContent, MappingLog.INSTANCE::unknownEntityNameForMappedEntityType );
 		this.indexedByEntityName =
-				new KeyValueProvider<>( indexedByEntityNameContent, MappingLog.INSTANCE::unknownEntityNameForIndexedEntityType );
+				new KeyValueProvider<>( indexedByEntityNameContent,
+						MappingLog.INSTANCE::unknownEntityNameForIndexedEntityType );
 		indexedBySuperTypeContent.replaceAll( (k, v) -> Collections.unmodifiableSet( v ) );
 		this.indexedBySuperType =
 				KeyValueProvider.createWithMultiKeyException( indexedBySuperTypeContent,
@@ -183,7 +186,8 @@ public class PojoTypeManagerContainer
 				new KeyValueProvider<>( byNonInterfaceSuperTypeContent,
 						MappingLog.INSTANCE::unknownNonInterfaceSuperTypeIdentifier );
 		this.nonInterfaceSuperTypeIdentifierByEntityName = new KeyValueProvider<>(
-				nonInterfaceSuperTypeIdentifierByEntityNameContent, MappingLog.INSTANCE::unknownEntityNameForNonInterfaceSuperType );
+				nonInterfaceSuperTypeIdentifierByEntityNameContent,
+				MappingLog.INSTANCE::unknownEntityNameForNonInterfaceSuperType );
 		this.nonInterfaceSuperTypeIdentifierByClass = new KeyValueProvider<>( nonInterfaceSuperTypeIdentifierByClassContent,
 				MappingLog.INSTANCE::unknownClassForNonInterfaceSuperType );
 

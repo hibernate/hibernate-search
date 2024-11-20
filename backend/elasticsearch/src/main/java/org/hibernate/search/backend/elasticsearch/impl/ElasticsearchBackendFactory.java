@@ -91,10 +91,7 @@ public class ElasticsearchBackendFactory implements BackendFactory {
 					CLIENT_FACTORY.getAndMap( propertySource, beanResolver::resolve );
 			if ( customClientFactoryHolderOptional.isPresent() ) {
 				clientFactoryHolder = customClientFactoryHolderOptional.get();
-				ConfigurationLog.INSTANCE.debugf(
-						"Elasticsearch backend will use client factory '%s'. Context: %s",
-						clientFactoryHolder, eventContext.render()
-				);
+				ConfigurationLog.INSTANCE.backendClientFactory( clientFactoryHolder, eventContext.render() );
 			}
 			else {
 				clientFactoryHolder = BeanHolder.of( new ElasticsearchClientFactoryImpl() );

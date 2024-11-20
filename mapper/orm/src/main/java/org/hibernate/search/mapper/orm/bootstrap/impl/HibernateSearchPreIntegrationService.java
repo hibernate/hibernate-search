@@ -109,7 +109,7 @@ public abstract class HibernateSearchPreIntegrationService implements Service, A
 			Optional<HibernateOrmIntegrationPartialBuildState> partialBuildState =
 					HibernateOrmIntegrationPartialBuildState.get( propertySource );
 			if ( !enabled ) {
-				ConfigurationLog.INSTANCE.debug( "Hibernate Search is disabled through configuration properties." );
+				ConfigurationLog.INSTANCE.hibernateSearchDisabled();
 				// The partial build state won't get used.
 				partialBuildState.ifPresent( HibernateOrmIntegrationPartialBuildState::closeOnFailure );
 				// Hibernate Search will not boot.

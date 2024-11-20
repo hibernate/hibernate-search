@@ -267,7 +267,8 @@ public class ContainerExtractorBinder {
 
 		void append(ExtractorResolutionState<?> state) {
 			if ( !tryAppend( state ) ) {
-				throw MappingLog.INSTANCE.invalidContainerExtractorForType( extractorName, extractorClass, state.extractedType );
+				throw MappingLog.INSTANCE.invalidContainerExtractorForType( extractorName, extractorClass,
+						state.extractedType );
 			}
 		}
 	}

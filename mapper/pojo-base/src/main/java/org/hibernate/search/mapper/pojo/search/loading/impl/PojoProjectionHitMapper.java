@@ -64,7 +64,8 @@ public final class PojoProjectionHitMapper<E> implements ProjectionHitMapper<E> 
 	private PojoSearchLoadingIndexedTypeContext<? extends E> toType(DocumentReference reference) {
 		PojoSearchLoadingIndexedTypeContext<? extends E> type = targetTypesByEntityName.get( reference.typeName() );
 		if ( type == null ) {
-			throw LoadingLog.INSTANCE.unexpectedEntityNameForEntityLoading( reference.typeName(), targetTypesByEntityName.keySet() );
+			throw LoadingLog.INSTANCE.unexpectedEntityNameForEntityLoading( reference.typeName(),
+					targetTypesByEntityName.keySet() );
 		}
 		return type;
 	}

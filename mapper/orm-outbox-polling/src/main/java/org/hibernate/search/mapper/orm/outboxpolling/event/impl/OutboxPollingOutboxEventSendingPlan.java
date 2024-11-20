@@ -88,7 +88,7 @@ public final class OutboxPollingOutboxEventSendingPlan implements AutomaticIndex
 				}
 			}
 			currentSession.flush();
-			OutboxPollingEventsLog.INSTANCE.tracef( "Persisted %d outbox events: '%s'", events.size(), events );
+			OutboxPollingEventsLog.INSTANCE.eventPlanNumberOfPersistedEvents( events.size(), events );
 			return CompletableFuture.completedFuture( builder.build() );
 		}
 		finally {

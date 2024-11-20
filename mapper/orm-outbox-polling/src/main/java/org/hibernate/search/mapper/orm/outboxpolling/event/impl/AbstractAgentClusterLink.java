@@ -62,8 +62,7 @@ abstract class AbstractAgentClusterLink<R> implements ToStringTreeAppendable {
 		List<Agent> allAgentsInIdOrder = context.agentRepository().findAllOrderById();
 
 		Instant now = clock.instant();
-		OutboxPollingEventsLog.INSTANCE.tracef( "Agent '%s': starting pulse at %s with self = %s, all agents = %s",
-				selfReference(), now, self, allAgentsInIdOrder );
+		OutboxPollingEventsLog.INSTANCE.agentPulseStarting( selfReference(), now, self, allAgentsInIdOrder );
 
 		// In order to avoid transaction deadlocks with some RDBMS (and this time I mean Oracle),
 		// we make sure that if we need to delete expired agents,
@@ -83,8 +82,7 @@ abstract class AbstractAgentClusterLink<R> implements ToStringTreeAppendable {
 		if ( !timedOutAgents.isEmpty() ) {
 			OutboxPollingEventsLog.INSTANCE.removingTimedOutAgents( selfReference(), timedOutAgents );
 			context.agentRepository().delete( timedOutAgents );
-			OutboxPollingEventsLog.INSTANCE.infof( "Agent '%s': reassessing the new situation in the next pulse",
-					selfReference() );
+			OutboxPollingEventsLog.INSTANCE.agentReassessing( selfReference() );
 			return instructCommitAndRetryPulseAfterDelay( now, pollingInterval );
 		}
 
@@ -102,8 +100,7 @@ abstract class AbstractAgentClusterLink<R> implements ToStringTreeAppendable {
 		// Delay expiration with each write
 		self.setExpiration( now.plus( pulseExpiration ) );
 		R instructions = pulseResult.applyAndReturnInstructions( now, self, agentPersister );
-		OutboxPollingEventsLog.INSTANCE.tracef( "Agent '%s': ending pulse at %s with self = %s",
-				selfReference(), now, self );
+		OutboxPollingEventsLog.INSTANCE.agentPulseEnded( selfReference(), now, self );
 		return instructions;
 	}
 

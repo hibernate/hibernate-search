@@ -93,7 +93,8 @@ public class TenancyConfiguration implements AutoCloseable {
 		// This will only fail when using multi-tenancy,
 		// because the set is always defined when using single-tenancy.
 		return tenantIds
-				.orElseThrow( () -> ConfigurationLog.INSTANCE.missingTenantIdConfiguration( tenantIdsConfigurationPropertyKey ) );
+				.orElseThrow(
+						() -> ConfigurationLog.INSTANCE.missingTenantIdConfiguration( tenantIdsConfigurationPropertyKey ) );
 	}
 
 	public SearchException invalidTenantId(String tenantId) {

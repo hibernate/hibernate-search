@@ -83,9 +83,11 @@ class HibernateOrmTypeContextContainer
 		this.byExactClass = new KeyValueProvider<>( byExactClassContent, MappingLog.INSTANCE::unknownClassForMappedEntityType );
 		this.indexedByExactClass =
 				new KeyValueProvider<>( indexedByExactClassContent, MappingLog.INSTANCE::unknownClassForIndexedEntityType );
-		this.byEntityName = new KeyValueProvider<>( byEntityNameContent, MappingLog.INSTANCE::unknownEntityNameForMappedEntityType );
+		this.byEntityName =
+				new KeyValueProvider<>( byEntityNameContent, MappingLog.INSTANCE::unknownEntityNameForMappedEntityType );
 		this.indexedByEntityName =
-				new KeyValueProvider<>( indexedByEntityNameContent, MappingLog.INSTANCE::unknownEntityNameForIndexedEntityType );
+				new KeyValueProvider<>( indexedByEntityNameContent,
+						MappingLog.INSTANCE::unknownEntityNameForIndexedEntityType );
 		this.byHibernateOrmEntityName = new KeyValueProvider<>( byHibernateOrmEntityNameContent,
 				MappingLog.INSTANCE::unknownHibernateOrmEntityNameForMappedEntityType );
 	}

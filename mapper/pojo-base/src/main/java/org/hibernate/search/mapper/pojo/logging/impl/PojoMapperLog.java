@@ -56,7 +56,7 @@ public interface PojoMapperLog
 	 * here to the next value.
 	 */
 	@LogMessage(level = TRACE)
-	@Message(id = ID_OFFSET + 172, value = "")
+	@Message(id = ID_OFFSET + 179, value = "")
 	void nextLoggerIdForConvenience();
 
 }

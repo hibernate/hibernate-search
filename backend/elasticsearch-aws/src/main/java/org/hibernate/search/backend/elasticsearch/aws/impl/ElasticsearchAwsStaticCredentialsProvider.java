@@ -31,9 +31,11 @@ public class ElasticsearchAwsStaticCredentialsProvider implements ElasticsearchA
 	@Override
 	public AwsCredentialsProvider create(ConfigurationPropertySource propertySource) {
 		String accessKey = CREDENTIALS_ACCESS_KEY_ID.getOrThrow( propertySource,
-				() -> AwsLog.INSTANCE.missingPropertyForSigningWithCredentialsType( ElasticsearchAwsCredentialsTypeNames.STATIC ) );
+				() -> AwsLog.INSTANCE
+						.missingPropertyForSigningWithCredentialsType( ElasticsearchAwsCredentialsTypeNames.STATIC ) );
 		String secretKey = CREDENTIALS_SECRET_ACCESS_KEY.getOrThrow( propertySource,
-				() -> AwsLog.INSTANCE.missingPropertyForSigningWithCredentialsType( ElasticsearchAwsCredentialsTypeNames.STATIC ) );
+				() -> AwsLog.INSTANCE
+						.missingPropertyForSigningWithCredentialsType( ElasticsearchAwsCredentialsTypeNames.STATIC ) );
 		return StaticCredentialsProvider.create( AwsBasicCredentials.create( accessKey, secretKey ) );
 	}
 }

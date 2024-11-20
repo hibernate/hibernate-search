@@ -62,6 +62,7 @@ class ElasticsearchBigIntegerIndexFieldTypeOptionsStep
 			return defaultsProvider.decimalScale();
 		}
 
-		throw MappingLog.INSTANCE.nullDecimalScale( buildContext.hints().missingDecimalScale(), buildContext.getEventContext() );
+		throw MappingLog.INSTANCE.nullDecimalScale( buildContext.hints().missingDecimalScale(),
+				buildContext.getEventContext() );
 	}
 }

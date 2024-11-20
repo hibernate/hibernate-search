@@ -33,7 +33,7 @@ class AfterCommitIndexingPlanSynchronization implements Synchronization {
 
 	@Override
 	public void beforeCompletion() {
-		IndexingLog.INSTANCE.tracef( "Processing Transaction's beforeCompletion() phase for %s.", transactionIdentifier );
+		IndexingLog.INSTANCE.beforeCompletion( transactionIdentifier );
 		indexingPlan.process();
 	}
 
@@ -41,16 +41,11 @@ class AfterCommitIndexingPlanSynchronization implements Synchronization {
 	public void afterCompletion(int i) {
 		try {
 			if ( Status.STATUS_COMMITTED == i ) {
-				IndexingLog.INSTANCE.tracef( "Processing Transaction's afterCompletion() phase for %s. Executing indexing plan.",
-						transactionIdentifier );
+				IndexingLog.INSTANCE.afterCompletionExecuting( transactionIdentifier );
 				synchronizationStrategy.executeAndSynchronize( indexingPlan );
 			}
 			else {
-				IndexingLog.INSTANCE.tracef(
-						"Processing Transaction's afterCompletion() phase for %s. Cancelling indexing plan due to transaction status %d",
-						transactionIdentifier,
-						i
-				);
+				IndexingLog.INSTANCE.afterCompletionCanceling( transactionIdentifier, i );
 				indexingPlan.discard();
 			}
 		}

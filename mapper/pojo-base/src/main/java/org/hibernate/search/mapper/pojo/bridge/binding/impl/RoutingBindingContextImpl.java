@@ -53,7 +53,8 @@ public class RoutingBindingContextImpl<E> extends AbstractCompositeBindingContex
 	public <E2> void bridge(Class<E2> expectedType, BeanHolder<? extends RoutingBridge<E2>> bridgeHolder) {
 		PojoRawTypeModel<E2> expectedTypeModel = introspector.typeModel( expectedType );
 		if ( !indexedEntityType.isSubTypeOf( expectedTypeModel ) ) {
-			throw MappingLog.INSTANCE.invalidInputTypeForRoutingBridge( bridgeHolder.get(), indexedEntityType, expectedTypeModel );
+			throw MappingLog.INSTANCE.invalidInputTypeForRoutingBridge( bridgeHolder.get(), indexedEntityType,
+					expectedTypeModel );
 		}
 		routingBridgeHolder = (BeanHolder<? extends RoutingBridge<? super E>>) bridgeHolder;
 	}

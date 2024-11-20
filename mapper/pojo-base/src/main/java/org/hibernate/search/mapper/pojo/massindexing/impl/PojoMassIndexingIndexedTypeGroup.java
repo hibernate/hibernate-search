@@ -77,6 +77,7 @@ public class PojoMassIndexingIndexedTypeGroup<E> {
 	private final PojoMassIndexingTypeContextProvider typeContextProvider;
 	private final Set<PojoMassIndexingIndexedTypeContext<? extends E>> includedTypes;
 	private final PojoMassLoadingContext loadingContext;
+	private final String notifiedGroupName;
 	private Boolean groupingAllowed;
 
 	private PojoMassIndexingIndexedTypeGroup(PojoMassLoadingStrategy<E, ?> loadingStrategy,
@@ -91,6 +92,8 @@ public class PojoMassIndexingIndexedTypeGroup<E> {
 		this.loadingStrategy = loadingStrategy;
 		this.includedTypes = includedTypes;
 		this.loadingContext = loadingContext;
+		this.notifiedGroupName = includedTypes.stream().map( PojoMassIndexingIndexedTypeContext::entityName )
+				.collect( Collectors.joining( "," ) );
 		if ( includedTypes.size() > 1 ) {
 			// We're already grouping, so obviously it's allowed.
 			groupingAllowed = true;
@@ -108,8 +111,7 @@ public class PojoMassIndexingIndexedTypeGroup<E> {
 	}
 
 	public String notifiedGroupName() {
-		return includedTypes.stream().map( PojoMassIndexingIndexedTypeContext::entityName )
-				.collect( Collectors.joining( "," ) );
+		return notifiedGroupName;
 	}
 
 	public Set<PojoMassIndexingIndexedTypeContext<? extends E>> includedTypes() {

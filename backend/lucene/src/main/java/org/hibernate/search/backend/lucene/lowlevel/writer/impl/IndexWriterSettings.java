@@ -137,8 +137,7 @@ public final class IndexWriterSettings implements Serializable {
 				return null;
 			}
 			if ( LuceneSpecificLog.INSTANCE.isDebugEnabled() ) {
-				LuceneSpecificLog.INSTANCE.debugf( "Set index writer parameter %s to value : %s. %s",
-						settingName, value, eventContext.renderWithPrefix() );
+				LuceneSpecificLog.INSTANCE.indexWriterSetParameter( settingName, value, eventContext.renderWithPrefix() );
 			}
 			R processedValue = processor.apply( value );
 			return new IndexWriterSettingValue<>( settingName, processedValue,

@@ -45,7 +45,7 @@ public class PojoMassIndexingEntityIdentifierLoadingRunnable<E, I>
 
 	@Override
 	protected void runWithFailureHandler() throws InterruptedException {
-		MassIndexingLog.INSTANCE.trace( "started" );
+		MassIndexingLog.INSTANCE.identifierLoadingStarted( typeGroup.notifiedGroupName() );
 		LoadingContext context = new LoadingContext();
 		try ( PojoMassIdentifierLoader loader = loadingStrategy.createIdentifierLoader( typeGroup.includedTypes(), context ) ) {
 			typeGroupMonitor.indexingStarted( massIndexingTypeGroupContext.withIdentifierLoader( loader ) );
@@ -59,7 +59,7 @@ public class PojoMassIndexingEntityIdentifierLoadingRunnable<E, I>
 			// or if the thread is interrupted by the workspace (due to consumer failure).
 			identifierQueue.producerStopping();
 		}
-		MassIndexingLog.INSTANCE.trace( "finished" );
+		MassIndexingLog.INSTANCE.identifierLoadingFinished( typeGroup.notifiedGroupName() );
 	}
 
 	@Override
@@ -100,7 +100,7 @@ public class PojoMassIndexingEntityIdentifierLoadingRunnable<E, I>
 			return new PojoMassIdentifierSink<I>() {
 				@Override
 				public void accept(List<? extends I> batch) throws InterruptedException {
-					MassIndexingLog.INSTANCE.tracef( "produced a list of ids %s", batch );
+					MassIndexingLog.INSTANCE.identifierLoadingLoadedIds( batch );
 					List<I> copy = new ArrayList<>( batch );
 					identifierQueue.put( copy );
 				}

@@ -31,14 +31,12 @@ class CancellableExecutionCompletableFuture<T> extends CompletableFuture<T> {
 		 * Thus we mark 'this' as cancelled *first*, so that any exception in the operation
 		 * from now on will be ignored.
 		 */
-		CommonFailuresLog.INSTANCE.tracef( "Cancelling CompletableFuture %s (mayInterruptIfRunning = %s)", this,
-				mayInterruptIfRunning );
+		CommonFailuresLog.INSTANCE.cancellingCompletableFuture( this, mayInterruptIfRunning );
 		super.cancel( mayInterruptIfRunning );
-		CommonFailuresLog.INSTANCE.tracef( "Cancelling Future %s (mayInterruptIfRunning = %s)", future, mayInterruptIfRunning );
+		CommonFailuresLog.INSTANCE.cancellingFuture( future, mayInterruptIfRunning );
 		boolean cancelled = future.cancel( mayInterruptIfRunning );
 		if ( !cancelled ) {
-			CommonFailuresLog.INSTANCE.debugf( "Could not cancel Future %s (mayInterruptIfRunning = %s)", future,
-					mayInterruptIfRunning );
+			CommonFailuresLog.INSTANCE.cancellingFutureFailed( future, mayInterruptIfRunning );
 		}
 		return cancelled;
 	}

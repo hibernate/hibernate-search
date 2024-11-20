@@ -11,6 +11,8 @@ import static org.jboss.logging.Logger.Level.WARN;
 
 import java.lang.invoke.MethodHandles;
 
+import jakarta.transaction.Synchronization;
+
 import org.hibernate.ScrollMode;
 import org.hibernate.SessionFactory;
 import org.hibernate.search.mapper.orm.search.loading.EntityLoadingCacheLookupStrategy;
@@ -19,7 +21,6 @@ import org.hibernate.search.util.common.logging.CategorizedLogger;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 import org.hibernate.search.util.common.logging.impl.MessageConstants;
 
-import org.jboss.logging.BasicLogger;
 import org.jboss.logging.Logger;
 import org.jboss.logging.annotations.Cause;
 import org.jboss.logging.annotations.LogMessage;
@@ -34,7 +35,7 @@ import org.jboss.logging.annotations.MessageLogger;
 				"""
 )
 @MessageLogger(projectCode = MessageConstants.PROJECT_CODE)
-public interface OrmSpecificLog extends BasicLogger {
+public interface OrmSpecificLog {
 	String CATEGORY_NAME = "org.hibernate.search.mapper.orm";
 
 	OrmSpecificLog INSTANCE = LoggerFactory.make( OrmSpecificLog.class, CATEGORY_NAME, MethodHandles.lookup() );
@@ -123,4 +124,34 @@ public interface OrmSpecificLog extends BasicLogger {
 					+ " for example with .loading(o -> o.fetchSize(50))."
 					+ " See the reference documentation for more information.")
 	SearchException cannotSetFetchSize();
+
+	@LogMessage(level = Logger.Level.TRACE)
+	@Message(id = ID_OFFSET + 127,
+			value = "TransactionFactory does not require a TransactionManager: don't wrap in a JTA transaction")
+	void transactionManagerNotRequired();
+
+	@LogMessage(level = Logger.Level.TRACE)
+	@Message(id = ID_OFFSET + 128, value = "No TransactionManager found, do not start a surrounding JTA transaction")
+	void transactionManagerNotFound();
+
+	@LogMessage(level = Logger.Level.TRACE)
+	@Message(id = ID_OFFSET + 129, value = "No Transaction in progress, needs to start a JTA transaction")
+	void noInProgressTransaction();
+
+	@LogMessage(level = Logger.Level.TRACE)
+	@Message(id = ID_OFFSET + 130, value = "Transaction in progress, no need to start a JTA transaction")
+	void transactionAlreadyInProgress();
+
+	@LogMessage(level = Logger.Level.TRACE)
+	@Message(id = ID_OFFSET + 131, value = "Transaction's afterCompletion is expected to be executed"
+			+ " through the AfterTransactionCompletionProcess interface, ignoring: %s")
+	void syncAdapterIgnoringAfterCompletion(Synchronization delegate);
+
+	@LogMessage(level = Logger.Level.TRACE)
+	@Message(id = ID_OFFSET + 132, value = "Transaction's beforeCompletion() phase already been processed, ignoring: %s")
+	void syncAdapterIgnoringBeforeCompletionAlreadyExecuted(Synchronization delegate);
+
+	@LogMessage(level = Logger.Level.TRACE)
+	@Message(id = ID_OFFSET + 133, value = "Transaction's afterCompletion() phase already been processed, ignoring: %s")
+	void syncAdapterIgnoringAfterCompletionAlreadyExecuted(Synchronization delegate);
 }

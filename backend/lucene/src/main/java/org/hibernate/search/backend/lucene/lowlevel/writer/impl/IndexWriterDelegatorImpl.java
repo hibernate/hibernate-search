@@ -149,13 +149,14 @@ public class IndexWriterDelegatorImpl implements IndexWriterDelegator {
 			finally {
 				commitLock.unlock();
 			}
-			LuceneSpecificLog.INSTANCE.trace( "IndexWriter closed" );
+			LuceneSpecificLog.INSTANCE.closedIndexWriter();
 		}
 	}
 
 	void closeAfterFailure(Throwable throwable, Object failingOperation) {
 		Exception exceptionToReport =
-				LuceneSpecificLog.INSTANCE.uncommittedOperationsBecauseOfFailure( throwable.getMessage(), eventContext, throwable );
+				LuceneSpecificLog.INSTANCE.uncommittedOperationsBecauseOfFailure( throwable.getMessage(), eventContext,
+						throwable );
 		try {
 			close();
 		}

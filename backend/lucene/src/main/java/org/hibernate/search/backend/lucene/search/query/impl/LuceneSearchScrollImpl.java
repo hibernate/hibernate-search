@@ -66,7 +66,8 @@ public class LuceneSearchScrollImpl<H> implements LuceneSearchScroll<H> {
 			indexReader.close();
 		}
 		catch (IOException | RuntimeException e) {
-			LuceneSpecificLog.INSTANCE.unableToCloseIndexReader( EventContexts.fromIndexNames( scope.hibernateSearchIndexNames() ),
+			LuceneSpecificLog.INSTANCE.unableToCloseIndexReader(
+					EventContexts.fromIndexNames( scope.hibernateSearchIndexNames() ),
 					e );
 		}
 	}

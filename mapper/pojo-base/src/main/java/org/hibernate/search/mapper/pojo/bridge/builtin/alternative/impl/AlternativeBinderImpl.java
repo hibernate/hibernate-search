@@ -72,8 +72,10 @@ public final class AlternativeBinderImpl<D, P> implements AlternativeBinder {
 						.map( AlternativeDiscriminatorBinderImpl.Marker::id )
 						.anyMatch( isEqual( alternativeId ) ) )
 				.collect( StreamHelper.singleElement(
-						() -> MappingLog.INSTANCE.cannotFindAlternativeDiscriminator( alternativeId, fieldValueSourcePropertyName ),
-						() -> MappingLog.INSTANCE.conflictingAlternativeDiscriminators( alternativeId, fieldValueSourcePropertyName )
+						() -> MappingLog.INSTANCE.cannotFindAlternativeDiscriminator( alternativeId,
+								fieldValueSourcePropertyName ),
+						() -> MappingLog.INSTANCE.conflictingAlternativeDiscriminators( alternativeId,
+								fieldValueSourcePropertyName )
 				) );
 	}
 
