@@ -12,6 +12,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 import java.util.TreeMap;
 import java.util.TreeSet;
@@ -45,6 +46,7 @@ public class LoggerCategoriesProcessor extends AbstractProcessor {
 
 	private Messager messager;
 	private final Map<String, Set<String>> categories = new TreeMap<>();
+	private final Map<String, Set<String>> categoryLevels = new TreeMap<>();
 	private String moduleName;
 
 	@Override
@@ -83,6 +85,9 @@ public class LoggerCategoriesProcessor extends AbstractProcessor {
 											"Logger %s either has some log-message methods or extends a BasicLogger, but does not provide any description on what it is used for."
 													.formatted( category ) );
 								}
+
+								categoryLevels.computeIfAbsent( category, k -> new TreeSet<>() )
+										.addAll( loggingLevels( logger ) );
 							}
 						}
 					}
@@ -112,7 +117,7 @@ public class LoggerCategoriesProcessor extends AbstractProcessor {
 										ReportConstants.ROOT,
 										Map.of(
 												ReportConstants.MODULE_NAME, moduleName,
-												ReportConstants.CATEGORIES, toYamlCategories( categories )
+												ReportConstants.CATEGORIES, toYamlCategories( categories, categoryLevels )
 										)
 								),
 								writer
@@ -132,12 +137,13 @@ public class LoggerCategoriesProcessor extends AbstractProcessor {
 		return false;
 	}
 
-	private List<Map<String, Object>> toYamlCategories(Map<String, Set<String>> categories) {
+	private List<Map<String, Object>> toYamlCategories(Map<String, Set<String>> categories, Map<String, Set<String>> levels) {
 		List<Map<String, Object>> values = new ArrayList<>();
 		for ( var entry : categories.entrySet() ) {
 			Map<String, Object> value = new HashMap<>();
 			value.put( ReportConstants.CATEGORY_NAME, entry.getKey() );
 			value.put( ReportConstants.CATEGORY_DESCRIPTION, new ArrayList<>( entry.getValue() ) );
+			value.put( ReportConstants.LOG_LEVELS, new ArrayList<>( levels.getOrDefault( entry.getKey(), Set.of() ) ) );
 
 			values.add( value );
 		}
@@ -156,14 +162,32 @@ public class LoggerCategoriesProcessor extends AbstractProcessor {
 		return false;
 	}
 
+	private Set<String> loggingLevels(TypeElement logger) {
+		Set<String> levels = new TreeSet<>();
+		for ( Element element : processingEnv.getElementUtils().getAllMembers( logger ) ) {
+			if ( element.getKind() == ElementKind.METHOD ) {
+				ExecutableElement executable = (ExecutableElement) element;
+				Optional<AnnotationMirror> logMessage = getLogMessage( executable );
+
+				logMessage
+						.ifPresent( annotationMirror -> levels.add( getAnnotationValueAsString( annotationMirror, "level" ) ) );
+			}
+		}
+		return levels;
+	}
+
 	private boolean hasLoggingAnnotation(ExecutableElement executable) {
+		return getLogMessage( executable ).isPresent();
+	}
+
+	private Optional<AnnotationMirror> getLogMessage(ExecutableElement executable) {
 		for ( AnnotationMirror am : executable.getAnnotationMirrors() ) {
 			if ( ( (TypeElement) am.getAnnotationType().asElement() ).getQualifiedName()
 					.contentEquals( "org.jboss.logging.annotations.LogMessage" ) ) {
-				return true;
+				return Optional.of( am );
 			}
 		}
-		return false;
+		return Optional.empty();
 	}
 
 	private boolean isVoid(ExecutableElement executable) {

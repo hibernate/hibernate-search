@@ -20,6 +20,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.TreeMap;
 import java.util.TreeSet;
+import java.util.stream.Collectors;
 
 import org.yaml.snakeyaml.Yaml;
 
@@ -74,6 +75,11 @@ public class LoggerCategoriesReporter {
 					if ( descr != null ) {
 						c.descriptions.addAll( descr );
 					}
+
+					List<String> levels = (List<String>) category.get( ReportConstants.LOG_LEVELS );
+					if ( descr != null ) {
+						c.levels.addAll( levels );
+					}
 				}
 			}
 		}
@@ -92,6 +98,11 @@ public class LoggerCategoriesReporter {
 				for ( String module : category.modules ) {
 					writer.write( "* `%s`\n".formatted( module ) );
 				}
+				if ( !category.levels.isEmpty() ) {
+					writer.write( "Produces messages with log levels:::\n" );
+					writer.write( category.levels.stream().map( "`%s`"::formatted ).collect( Collectors.joining(", ")) );
+					writer.write( "\n" );
+				}
 			}
 		}
 	}
@@ -100,6 +111,7 @@ public class LoggerCategoriesReporter {
 		String name;
 		Set<String> descriptions = new TreeSet<>();
 		Set<String> modules = new TreeSet<>();
+		Set<String> levels = new TreeSet<>();
 
 		public Category(String name) {
 			this.name = name;
