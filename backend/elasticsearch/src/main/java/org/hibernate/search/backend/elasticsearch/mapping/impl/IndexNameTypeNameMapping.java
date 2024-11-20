@@ -102,7 +102,8 @@ public class IndexNameTypeNameMapping implements TypeNameMapping {
 				}
 			}
 			catch (SearchException e) {
-				throw ElasticsearchClientLog.INSTANCE.elasticsearchResponseUnknownIndexName( primaryIndexName, e.getMessage(), e );
+				throw ElasticsearchClientLog.INSTANCE.elasticsearchResponseUnknownIndexName( primaryIndexName, e.getMessage(),
+						e );
 			}
 			return mappedTypeName;
 		}

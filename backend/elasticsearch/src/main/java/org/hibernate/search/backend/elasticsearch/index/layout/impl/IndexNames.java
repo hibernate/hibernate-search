@@ -14,7 +14,7 @@ public final class IndexNames {
 	public static String normalizeName(String indexName) {
 		String esIndexName = indexName.toLowerCase( Locale.ENGLISH );
 		if ( !esIndexName.equals( indexName ) ) {
-			MappingLog.INSTANCE.debugf( "Normalizing index name from '%1$s' to '%2$s'", indexName, esIndexName );
+			MappingLog.INSTANCE.normalizeIndexName( indexName, esIndexName );
 		}
 		return esIndexName;
 	}

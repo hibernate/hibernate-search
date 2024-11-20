@@ -112,7 +112,7 @@ public class LuceneBackendFactory implements BackendFactory {
 		if ( luceneVersionOptional.isPresent() ) {
 			luceneVersion = luceneVersionOptional.get();
 			if ( ConfigurationLog.INSTANCE.isDebugEnabled() ) {
-				ConfigurationLog.INSTANCE.debug( "Setting Lucene compatibility to Version " + luceneVersion );
+				ConfigurationLog.INSTANCE.luceneCompatibilityVersion( luceneVersion );
 			}
 		}
 		else {

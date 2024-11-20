@@ -130,18 +130,17 @@ public final class TransactionHelper {
 			TransactionCoordinatorBuilder transactionCoordinatorBuilder) {
 		if ( !transactionCoordinatorBuilder.isJta() ) {
 			//Today we only require a TransactionManager on JTA based transaction factories
-			OrmSpecificLog.INSTANCE
-					.trace( "TransactionFactory does not require a TransactionManager: don't wrap in a JTA transaction" );
+			OrmSpecificLog.INSTANCE.transactionManagerNotRequired();
 			return false;
 		}
 		if ( transactionManager == null ) {
 			//no TM, nothing to do OR configuration mistake
-			OrmSpecificLog.INSTANCE.trace( "No TransactionManager found, do not start a surrounding JTA transaction" );
+			OrmSpecificLog.INSTANCE.transactionManagerNotFound();
 			return false;
 		}
 		try {
 			if ( transactionManager.getStatus() == Status.STATUS_NO_TRANSACTION ) {
-				OrmSpecificLog.INSTANCE.trace( "No Transaction in progress, needs to start a JTA transaction" );
+				OrmSpecificLog.INSTANCE.noInProgressTransaction();
 				return true;
 			}
 		}
@@ -149,7 +148,7 @@ public final class TransactionHelper {
 			OrmSpecificLog.INSTANCE.cannotGuessTransactionStatus( e );
 			return false;
 		}
-		OrmSpecificLog.INSTANCE.trace( "Transaction in progress, no need to start a JTA transaction" );
+		OrmSpecificLog.INSTANCE.transactionAlreadyInProgress();
 		return false;
 	}
 }

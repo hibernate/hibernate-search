@@ -175,7 +175,7 @@ public final class BatchingExecutor<P extends BatchedWorkProcessor, W extends Ba
 			int workCount = workBuffer.size();
 			boolean traceEnabled = ExecutorLog.INSTANCE.isTraceEnabled();
 			if ( traceEnabled ) {
-				ExecutorLog.INSTANCE.tracef( "Processing %d works in executor '%s'", workCount, name );
+				ExecutorLog.INSTANCE.numberOfWorksInExecutor( workCount, name );
 			}
 
 			processor.beginBatch();
@@ -192,7 +192,7 @@ public final class BatchingExecutor<P extends BatchedWorkProcessor, W extends Ba
 			CompletableFuture<?> future = processor.endBatch();
 			if ( traceEnabled ) {
 				future.whenComplete( (result, throwable) -> {
-					ExecutorLog.INSTANCE.tracef( "Processed %d works in executor '%s'", workCount, name );
+					ExecutorLog.INSTANCE.numberOfProcessedWorksInExecutor( workCount, name );
 				} );
 			}
 

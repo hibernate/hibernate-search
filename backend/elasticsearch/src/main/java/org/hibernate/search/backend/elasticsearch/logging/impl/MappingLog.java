@@ -5,6 +5,7 @@
 package org.hibernate.search.backend.elasticsearch.logging.impl;
 
 import static org.hibernate.search.backend.elasticsearch.logging.impl.ElasticsearchLog.ID_OFFSET;
+import static org.jboss.logging.Logger.Level.DEBUG;
 
 import java.lang.invoke.MethodHandles;
 import java.util.Set;
@@ -20,9 +21,9 @@ import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 import org.hibernate.search.util.common.logging.impl.MessageConstants;
 import org.hibernate.search.util.common.reporting.EventContext;
 
-import org.jboss.logging.BasicLogger;
 import org.jboss.logging.annotations.Cause;
 import org.jboss.logging.annotations.FormatWith;
+import org.jboss.logging.annotations.LogMessage;
 import org.jboss.logging.annotations.Message;
 import org.jboss.logging.annotations.MessageLogger;
 import org.jboss.logging.annotations.Param;
@@ -34,7 +35,7 @@ import org.jboss.logging.annotations.Param;
 				"""
 )
 @MessageLogger(projectCode = MessageConstants.PROJECT_CODE)
-public interface MappingLog extends BasicLogger {
+public interface MappingLog {
 	String CATEGORY_NAME = "org.hibernate.search.mapping";
 
 	MappingLog INSTANCE = LoggerFactory.make( MappingLog.class, CATEGORY_NAME, MethodHandles.lookup() );
@@ -153,4 +154,8 @@ public interface MappingLog extends BasicLogger {
 			value = "The OpenSearch distribution does not allow using %1$s as a space type for a Lucene engine."
 					+ " Try using a different similarity type and refer to the OpenSearch documentation for more details.")
 	SearchException vectorSimilarityNotSupportedByOpenSearchBackend(VectorSimilarity vectorSimilarity);
+
+	@LogMessage(level = DEBUG)
+	@Message(id = ID_OFFSET + 191, value = "Normalizing index name from '%1$s' to '%2$s'")
+	void normalizeIndexName(String indexName, String esIndexName);
 }

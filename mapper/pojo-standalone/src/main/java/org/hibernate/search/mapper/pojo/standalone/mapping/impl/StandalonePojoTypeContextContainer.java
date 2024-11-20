@@ -55,7 +55,8 @@ public class StandalonePojoTypeContextContainer
 			byExactClassContent.put( typeContext.javaClass(), typeContext );
 		}
 		this.byTypeIdentifier =
-				new KeyValueProvider<>( byTypeIdentifierContent, MappingLog.INSTANCE::unknownTypeIdentifierForMappedEntityType );
+				new KeyValueProvider<>( byTypeIdentifierContent,
+						MappingLog.INSTANCE::unknownTypeIdentifierForMappedEntityType );
 		this.indexedByTypeIdentifier =
 				new KeyValueProvider<>( indexedByTypeIdentifierContent,
 						MappingLog.INSTANCE::unknownTypeIdentifierForIndexedEntityType );
@@ -63,7 +64,8 @@ public class StandalonePojoTypeContextContainer
 		this.indexedByExactClass =
 				new KeyValueProvider<>( indexedByExactClassContent, MappingLog.INSTANCE::unknownClassForIndexedEntityType );
 		this.indexedByEntityName =
-				new KeyValueProvider<>( indexedByEntityNameContent, MappingLog.INSTANCE::unknownEntityNameForIndexedEntityType );
+				new KeyValueProvider<>( indexedByEntityNameContent,
+						MappingLog.INSTANCE::unknownEntityNameForIndexedEntityType );
 	}
 
 	@Override

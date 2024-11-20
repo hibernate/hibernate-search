@@ -129,7 +129,7 @@ public final class ConfiguredAutomaticIndexingStrategy {
 					return enabled;
 				} )
 						.orElse( true ) ) {
-			ConfigurationLog.INSTANCE.debug( "Hibernate Search event listeners activated" );
+			ConfigurationLog.INSTANCE.hibernateSearchListenerEnabled();
 			@SuppressWarnings("deprecation")
 			HibernateSearchEventListener hibernateSearchEventListener = new HibernateSearchEventListener(
 					contextProvider, AUTOMATIC_INDEXING_ENABLE_DIRTY_CHECK.getAndTransform(
@@ -146,7 +146,7 @@ public final class ConfiguredAutomaticIndexingStrategy {
 			hibernateSearchEventListener.registerTo( mappingContext.sessionFactory() );
 		}
 		else {
-			ConfigurationLog.INSTANCE.debug( "Hibernate Search event listeners deactivated" );
+			ConfigurationLog.INSTANCE.hibernateSearchListenerDisabled();
 		}
 	}
 

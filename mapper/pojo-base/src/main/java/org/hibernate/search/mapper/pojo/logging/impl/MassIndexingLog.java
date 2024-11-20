@@ -6,6 +6,7 @@ package org.hibernate.search.mapper.pojo.logging.impl;
 
 import static org.hibernate.search.mapper.pojo.logging.impl.PojoMapperLog.ID_OFFSET;
 import static org.hibernate.search.mapper.pojo.logging.impl.PojoMapperLog.ID_OFFSET_LEGACY_ENGINE;
+import static org.jboss.logging.Logger.Level.DEBUG;
 import static org.jboss.logging.Logger.Level.ERROR;
 import static org.jboss.logging.Logger.Level.INFO;
 
@@ -20,7 +21,6 @@ import org.hibernate.search.util.common.logging.CategorizedLogger;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 import org.hibernate.search.util.common.logging.impl.MessageConstants;
 
-import org.jboss.logging.BasicLogger;
 import org.jboss.logging.Logger;
 import org.jboss.logging.annotations.Cause;
 import org.jboss.logging.annotations.LogMessage;
@@ -36,7 +36,7 @@ import org.jboss.logging.annotations.MessageLogger;
 				"""
 )
 @MessageLogger(projectCode = MessageConstants.PROJECT_CODE)
-public interface MassIndexingLog extends BasicLogger {
+public interface MassIndexingLog {
 	String CATEGORY_NAME = "org.hibernate.search.mapper.massindexing";
 
 	MassIndexingLog INSTANCE = LoggerFactory.make( MassIndexingLog.class, CATEGORY_NAME, MethodHandles.lookup() );
@@ -134,4 +134,31 @@ public interface MassIndexingLog extends BasicLogger {
 			value = "Mass indexing is going to index approx. %1$d entities (%2$s). Actual number may change once the indexing starts.")
 	void indexingEntitiesApprox(long count, String types);
 
+	@LogMessage(level = DEBUG)
+	@Message(id = ID_OFFSET + 172, value = "Indexing for %s is done.")
+	void indexingForTypeGroupDone(String typeGroup);
+
+	@LogMessage(level = DEBUG)
+	@Message(id = ID_OFFSET + 173, value = "Identifier loading for %s started.")
+	void identifierLoadingStarted(String typeGroup);
+
+	@LogMessage(level = DEBUG)
+	@Message(id = ID_OFFSET + 174, value = "Identifier loading for %s finished.")
+	void identifierLoadingFinished(String typeGroup);
+
+	@LogMessage(level = DEBUG)
+	@Message(id = ID_OFFSET + 175, value = "Identifier loading produced a list of ids: %s.")
+	void identifierLoadingLoadedIds(List<?> ids);
+
+	@LogMessage(level = DEBUG)
+	@Message(id = ID_OFFSET + 176, value = "Entity loading for %s started.")
+	void entityLoadingStarted(String typeGroup);
+
+	@LogMessage(level = DEBUG)
+	@Message(id = ID_OFFSET + 177, value = "Entity loading for %s finished.")
+	void entityLoadingFinished(String typeGroup);
+
+	@LogMessage(level = DEBUG)
+	@Message(id = ID_OFFSET + 178, value = "Entity loading will attempt to load entities for ids: %s.")
+	void entityLoadingAttemptToLoadIds(List<?> ids);
 }

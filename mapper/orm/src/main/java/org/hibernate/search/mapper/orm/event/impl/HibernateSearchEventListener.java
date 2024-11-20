@@ -63,7 +63,7 @@ public final class HibernateSearchEventListener
 			boolean dirtyCheckingEnabled) {
 		this.contextProvider = contextProvider;
 		this.dirtyCheckingEnabled = dirtyCheckingEnabled;
-		ConfigurationLog.INSTANCE.debug( "Hibernate Search dirty checks " + ( dirtyCheckingEnabled ? "enabled" : "disabled" ) );
+		ConfigurationLog.INSTANCE.dirtyChecksEnabled( dirtyCheckingEnabled );
 	}
 
 	public void registerTo(SessionFactoryImplementor sessionFactory) {

@@ -76,7 +76,7 @@ public class PojoMassIndexingBatchIndexingWorkspace<E, I> extends PojoMassIndexi
 		allFutures.addAll( indexingFutures );
 		Futures.unwrappedExceptionGet( Futures.firstFailureOrAllOf( allFutures ) );
 		typeGroupMonitor.indexingCompleted( massIndexingTypeGroupContext );
-		MassIndexingLog.INSTANCE.debugf( "Indexing for %s is done", typeGroup.notifiedGroupName() );
+		MassIndexingLog.INSTANCE.indexingForTypeGroupDone( typeGroup.notifiedGroupName() );
 	}
 
 	@Override

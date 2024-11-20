@@ -71,7 +71,7 @@ final class HibernateOrmBeanContainerBeanProvider implements BeanProvider {
 		}
 		catch (Exception e) {
 			new SuppressingCloser( e ).push( result );
-			ConfigurationLog.INSTANCE.debugf( e, "Error resolving bean of type [%s] - using fallback", typeReference );
+			ConfigurationLog.INSTANCE.errorResolvingBean( typeReference, e );
 			try {
 				result = BeanHolder.of( fallbackInstanceProducer.produceBeanInstance( typeReference ) );
 			}

@@ -17,7 +17,9 @@ import org.hibernate.search.util.common.logging.CategorizedLogger;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 import org.hibernate.search.util.common.logging.impl.MessageConstants;
 
-import org.jboss.logging.BasicLogger;
+import org.jboss.logging.Logger;
+import org.jboss.logging.annotations.Cause;
+import org.jboss.logging.annotations.LogMessage;
 import org.jboss.logging.annotations.Message;
 import org.jboss.logging.annotations.MessageLogger;
 
@@ -28,7 +30,7 @@ import org.jboss.logging.annotations.MessageLogger;
 				"""
 )
 @MessageLogger(projectCode = MessageConstants.PROJECT_CODE)
-public interface ConfigurationLog extends BasicLogger {
+public interface ConfigurationLog {
 	String CATEGORY_NAME = "org.hibernate.search.configuration";
 
 	ConfigurationLog INSTANCE = LoggerFactory.make( ConfigurationLog.class, CATEGORY_NAME, MethodHandles.lookup() );
@@ -75,4 +77,24 @@ public interface ConfigurationLog extends BasicLogger {
 			value = "Unable to apply the given filter at the session level with the outbox polling coordination strategy. " +
 					"With this coordination strategy, applying a session-level indexing plan filter is only allowed if it excludes all types.")
 	SearchException cannotApplySessionFilterWhenAsyncProcessingIsUsed();
+
+	@LogMessage(level = Logger.Level.DEBUG)
+	@Message(id = ID_OFFSET + 138, value = "Error resolving bean of type [%s] - using fallback")
+	void errorResolvingBean(Class<?> typeReference, @Cause Exception e);
+
+	@LogMessage(level = Logger.Level.DEBUG)
+	@Message(id = ID_OFFSET + 139, value = "Hibernate Search is disabled through configuration properties.")
+	void hibernateSearchDisabled();
+
+	@LogMessage(level = Logger.Level.DEBUG)
+	@Message(id = ID_OFFSET + 140, value = "Hibernate Search dirty checks: %s")
+	void dirtyChecksEnabled(boolean dirtyCheckingEnabled);
+
+	@LogMessage(level = Logger.Level.DEBUG)
+	@Message(id = ID_OFFSET + 141, value = "Hibernate Search event listeners activated")
+	void hibernateSearchListenerEnabled();
+
+	@LogMessage(level = Logger.Level.DEBUG)
+	@Message(id = ID_OFFSET + 142, value = "Hibernate Search event listeners deactivated")
+	void hibernateSearchListenerDisabled();
 }

@@ -45,6 +45,6 @@ public interface EngineLog
 	 * here to the next value.
 	 */
 	@LogMessage(level = TRACE)
-	@Message(id = ID_OFFSET + 130, value = "")
+	@Message(id = ID_OFFSET + 135, value = "")
 	void nextLoggerIdForConvenience();
 }

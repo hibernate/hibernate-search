@@ -21,6 +21,7 @@ import org.hibernate.search.util.common.logging.impl.MessageConstants;
 import org.hibernate.search.util.common.reporting.EventContext;
 
 import org.jboss.logging.BasicLogger;
+import org.jboss.logging.Logger;
 import org.jboss.logging.annotations.Cause;
 import org.jboss.logging.annotations.FormatWith;
 import org.jboss.logging.annotations.LogMessage;
@@ -124,4 +125,7 @@ public interface ConfigurationLog extends BasicLogger {
 					+ " but multi-tenancy strategy is set.")
 	SearchException multiTenancyNotRequiredButExplicitlyEnabledByTheBackend();
 
+	@LogMessage(level = Logger.Level.DEBUG)
+	@Message(id = ID_OFFSET + 188, value = "Setting Lucene compatibility to Version %s")
+	void luceneCompatibilityVersion(Version luceneVersion);
 }

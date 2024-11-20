@@ -13,7 +13,6 @@ import org.hibernate.search.util.common.logging.CategorizedLogger;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 import org.hibernate.search.util.common.logging.impl.MessageConstants;
 
-import org.jboss.logging.BasicLogger;
 import org.jboss.logging.Logger;
 import org.jboss.logging.Logger.Level;
 import org.jboss.logging.annotations.Cause;
@@ -39,7 +38,7 @@ import org.jboss.logging.annotations.ValidIdRanges;
 		@ValidIdRange(min = MessageConstants.JAKARTA_BATCH_CORE_ID_RANGE_MIN,
 				max = MessageConstants.JAKARTA_BATCH_CORE_ID_RANGE_MAX),
 })
-public interface JakartaBatchLog extends BasicLogger {
+public interface JakartaBatchLog {
 
 	String CATEGORY_NAME = "org.hibernate.search.mapper.jakarta.batch";
 
@@ -199,4 +198,8 @@ public interface JakartaBatchLog extends BasicLogger {
 			value = "Both \"dropAndCreateSchemaOnStart\" and \"purgeAllOnStart\" are enabled. " +
 					"Consider having just one setting enabled as after the index is recreated there is nothing to purge.")
 	void redundantPurgeAfterDrop();
+
+	@LogMessage(level = Level.DEBUG)
+	@Message(id = ID_OFFSET + 38, value = "Partitions: %s")
+	void listPartitions(String partitions);
 }

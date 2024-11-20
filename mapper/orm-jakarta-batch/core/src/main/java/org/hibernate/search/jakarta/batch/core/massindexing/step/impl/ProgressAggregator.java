@@ -8,11 +8,11 @@ import java.io.Serializable;
 import java.util.Locale;
 import java.util.Map;
 
-import org.hibernate.search.jakarta.batch.core.logging.impl.JakartaBatchLog;
-
 import jakarta.batch.api.partition.AbstractPartitionAnalyzer;
 import jakarta.batch.runtime.context.StepContext;
 import jakarta.inject.Inject;
+
+import org.hibernate.search.jakarta.batch.core.logging.impl.JakartaBatchLog;
 
 /**
  * Progress aggregator aggregates the intermediary chunk progress received from each partition sent via the collectors.

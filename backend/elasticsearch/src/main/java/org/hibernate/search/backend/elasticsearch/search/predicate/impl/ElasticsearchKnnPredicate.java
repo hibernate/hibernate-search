@@ -130,7 +130,8 @@ public abstract class ElasticsearchKnnPredicate extends AbstractElasticsearchSin
 						vector.getClass().getComponentType() );
 			}
 			if ( Array.getLength( vector ) != indexedVectorsDimension ) {
-				throw QueryLog.INSTANCE.vectorKnnMatchVectorDimensionDiffersFromField( absoluteFieldPath, indexedVectorsDimension,
+				throw QueryLog.INSTANCE.vectorKnnMatchVectorDimensionDiffersFromField( absoluteFieldPath,
+						indexedVectorsDimension,
 						Array.getLength( vector )
 				);
 			}

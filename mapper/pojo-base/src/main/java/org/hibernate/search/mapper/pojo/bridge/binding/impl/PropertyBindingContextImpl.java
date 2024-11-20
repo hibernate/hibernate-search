@@ -124,7 +124,8 @@ public class PropertyBindingContextImpl<P> extends AbstractCompositeBindingConte
 	private <P2> void checkAndBind(BeanHolder<? extends PropertyBridge<P2>> bridgeHolder,
 			PojoRawTypeModel<?> expectedPropertyTypeModel) {
 		if ( !propertyTypeModel.rawType().isSubTypeOf( expectedPropertyTypeModel ) ) {
-			throw MappingLog.INSTANCE.invalidInputTypeForBridge( bridgeHolder.get(), propertyTypeModel, expectedPropertyTypeModel );
+			throw MappingLog.INSTANCE.invalidInputTypeForBridge( bridgeHolder.get(), propertyTypeModel,
+					expectedPropertyTypeModel );
 		}
 
 		@SuppressWarnings("unchecked") // We check that P extends P2 explicitly using reflection (see above)

@@ -57,12 +57,12 @@ class AwsSigningRequestInterceptor implements HttpRequestInterceptor {
 		SdkHttpFullRequest awsRequest = toAwsRequest( request, context, contentStreamProvider );
 
 		if ( AwsLog.INSTANCE.isTraceEnabled() ) {
-			AwsLog.INSTANCE.tracef( "HTTP request (before signing): %s", request );
-			AwsLog.INSTANCE.tracef( "AWS request (before signing): %s", awsRequest );
+			AwsLog.INSTANCE.httpRequestBeforeSigning( request );
+			AwsLog.INSTANCE.awsRequestBeforeSigning( awsRequest );
 		}
 
 		AwsCredentials credentials = credentialsProvider.resolveCredentials();
-		AwsLog.INSTANCE.tracef( "AWS credentials: %s", credentials );
+		AwsLog.INSTANCE.awsCredentials( credentials );
 
 		SignedRequest signedRequest = signer.sign( r -> r.identity( credentials )
 				.request( awsRequest )
@@ -88,8 +88,8 @@ class AwsSigningRequestInterceptor implements HttpRequestInterceptor {
 		}
 
 		if ( AwsLog.INSTANCE.isTraceEnabled() ) {
-			AwsLog.INSTANCE.tracef( "AWS request (after signing): %s", signedRequest );
-			AwsLog.INSTANCE.tracef( "HTTP request (after signing): %s", request );
+			AwsLog.INSTANCE.httpRequestAfterSigning( signedRequest );
+			AwsLog.INSTANCE.awsRequestAfterSigning( request );
 		}
 	}
 

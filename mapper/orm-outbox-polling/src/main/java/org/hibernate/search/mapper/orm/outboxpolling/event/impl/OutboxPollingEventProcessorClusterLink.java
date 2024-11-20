@@ -24,8 +24,6 @@ import org.hibernate.search.util.common.AssertionFailure;
 import org.hibernate.search.util.common.SearchException;
 import org.hibernate.search.util.common.spi.ToStringTreeAppender;
 
-import org.jboss.logging.Logger;
-
 public final class OutboxPollingEventProcessorClusterLink
 		extends AbstractAgentClusterLink<OutboxPollingEventProcessingInstructions> {
 
@@ -72,10 +70,12 @@ public final class OutboxPollingEventProcessorClusterLink
 	protected WriteAction<OutboxPollingEventProcessingInstructions> doPulse(List<Agent> allAgentsInIdOrder, Agent currentSelf) {
 		for ( Agent agent : allAgentsInIdOrder ) {
 			if ( AgentType.MASS_INDEXING.equals( agent.getType() ) ) {
-				OutboxPollingEventsLog.INSTANCE.logf(
-						currentSelf.getState() != AgentState.SUSPENDED ? Logger.Level.INFO : Logger.Level.TRACE,
-						"Agent '%s': another agent '%s' is currently mass indexing",
-						selfReference(), agent );
+				if ( currentSelf.getState() != AgentState.SUSPENDED ) {
+					OutboxPollingEventsLog.INSTANCE.agentOtherAgentIsIndexingInfo( selfReference(), agent );
+				}
+				else {
+					OutboxPollingEventsLog.INSTANCE.agentOtherAgentIsIndexingTrace( selfReference(), agent );
+				}
 				return (now, self, agentPersister) -> {
 					agentPersister.setSuspended( self );
 					return instructCommitAndRetryPulseAfterDelay( now, pulseInterval );
@@ -93,8 +93,9 @@ public final class OutboxPollingEventProcessorClusterLink
 		catch (SearchException e) {
 			FailureContext.Builder contextBuilder = FailureContext.builder();
 			contextBuilder
-					.throwable( OutboxPollingEventsLog.INSTANCE.outboxEventProcessorPulseFailed( selfReference(), e.getMessage(),
-							allAgentsInIdOrder, e ) );
+					.throwable(
+							OutboxPollingEventsLog.INSTANCE.outboxEventProcessorPulseFailed( selfReference(), e.getMessage(),
+									allAgentsInIdOrder, e ) );
 			contextBuilder.failingOperation( OutboxPollingEventsLog.INSTANCE.outboxEventProcessorPulse( selfReference() ) );
 			failureHandler.handle( contextBuilder.build() );
 			return (now, self, agentPersister) -> {
@@ -106,13 +107,13 @@ public final class OutboxPollingEventProcessorClusterLink
 		Optional<ShardAssignmentDescriptor> shardAssignmentOptional =
 				ShardAssignmentDescriptor.fromClusterMemberList( clusterTarget.descriptor.memberIdsInShardOrder,
 						selfReference().id );
-		if ( !shardAssignmentOptional.isPresent() ) {
-			OutboxPollingEventsLog.INSTANCE.logf(
-					currentSelf.getState() != AgentState.SUSPENDED ? Logger.Level.INFO : Logger.Level.TRACE,
-					"Agent '%s': this agent is superfluous and will not perform event processing,"
-							+ " because other agents are enough to handle all the shards."
-							+ " Target cluster: %s.",
-					selfReference(), clusterTarget.descriptor );
+		if ( shardAssignmentOptional.isEmpty() ) {
+			if ( currentSelf.getState() != AgentState.SUSPENDED ) {
+				OutboxPollingEventsLog.INSTANCE.agentSuperfluousInfo( selfReference(), clusterTarget.descriptor );
+			}
+			else {
+				OutboxPollingEventsLog.INSTANCE.agentSuperfluousTrace( selfReference(), clusterTarget.descriptor );
+			}
 			return (now, self, agentPersister) -> {
 				agentPersister.setSuspended( self );
 				return instructCommitAndRetryPulseAfterDelay( now, pulseInterval );
@@ -122,11 +123,12 @@ public final class OutboxPollingEventProcessorClusterLink
 		ShardAssignmentDescriptor targetShardAssignment = shardAssignmentOptional.get();
 
 		if ( clusterTarget.descriptor.memberIdsInShardOrder.contains( null ) ) {
-			OutboxPollingEventsLog.INSTANCE.logf(
-					currentSelf.getState() != AgentState.SUSPENDED ? Logger.Level.INFO : Logger.Level.TRACE,
-					"Agent '%s': some cluster members are missing; this agent will wait until they are present."
-							+ " Target cluster: %s.",
-					selfReference(), clusterTarget.descriptor );
+			if ( currentSelf.getState() != AgentState.SUSPENDED ) {
+				OutboxPollingEventsLog.INSTANCE.agentClusterMembersMissingInfo( selfReference(), clusterTarget.descriptor );
+			}
+			else {
+				OutboxPollingEventsLog.INSTANCE.agentClusterMembersMissingTrace( selfReference(), clusterTarget.descriptor );
+			}
 			return (now, self, agentPersister) -> {
 				agentPersister.setSuspended( self );
 				return instructCommitAndRetryPulseAfterDelay( now, pollingInterval );
@@ -136,9 +138,7 @@ public final class OutboxPollingEventProcessorClusterLink
 		ShardAssignmentDescriptor persistedShardAssignment = currentSelf.getShardAssignment();
 
 		if ( !targetShardAssignment.equals( persistedShardAssignment ) ) {
-			OutboxPollingEventsLog.INSTANCE.infof( "Agent '%s': the persisted shard assignment (%s) does not match the target."
-					+ " Target assignment: %s."
-					+ " Cluster: %s.",
+			OutboxPollingEventsLog.INSTANCE.agentAssignmentDoesNotMatchTarget(
 					selfReference(), persistedShardAssignment, targetShardAssignment,
 					clusterTarget.descriptor );
 			return (now, self, agentPersister) -> {
@@ -181,7 +181,7 @@ public final class OutboxPollingEventProcessorClusterLink
 						+ " does not match the static shard assignment"
 						+ " (" + lastShardAssignment + ")" );
 			}
-			OutboxPollingEventsLog.INSTANCE.infof( "Agent '%s': assigning to %s", selfReference(), targetShardAssignment );
+			OutboxPollingEventsLog.INSTANCE.agentAssignment( selfReference(), targetShardAssignment );
 			this.lastShardAssignment = shardAssignmentProvider.create( targetShardAssignment );
 		}
 		return (now, self, agentPersister) -> {
@@ -198,14 +198,13 @@ public final class OutboxPollingEventProcessorClusterLink
 		AgentState expectedState = AgentState.SUSPENDED;
 		for ( Agent agent : excludedAgents ) {
 			if ( !expectedState.equals( agent.getState() ) ) {
-				OutboxPollingEventsLog.INSTANCE.tracef( "Agent '%s': waiting for agent '%s', which has not reached state '%s' yet",
-						selfReference(), agent.getReference(), expectedState );
+				OutboxPollingEventsLog.INSTANCE.agentWaitingAgentReachState( selfReference(), agent.getReference(),
+						expectedState );
 				return false;
 			}
 		}
 
-		OutboxPollingEventsLog.INSTANCE.tracef( "Agent '%s': agents excluded from the cluster reached the expected state %s",
-				selfReference(), expectedState );
+		OutboxPollingEventsLog.INSTANCE.agentExcluded( selfReference(), expectedState );
 		return true;
 	}
 
@@ -217,48 +216,41 @@ public final class OutboxPollingEventProcessorClusterLink
 		for ( Agent agent : clusterMembersInShardOrder ) {
 			AgentState state = agent.getState();
 			if ( !expectedStates.contains( agent.getState() ) ) {
-				OutboxPollingEventsLog.INSTANCE.tracef(
-						"Agent '%s': waiting for agent '%s', whose state %s is not in the expected %s yet",
-						selfReference(), agent.getReference(), state, expectedStates );
+				OutboxPollingEventsLog.INSTANCE.clusterMembersAreInClusterWaitingForState( selfReference(),
+						agent.getReference(),
+						state, expectedStates );
 				return false;
 			}
 			Integer totalShardCount = agent.getTotalShardCount();
 			if ( totalShardCount == null || expectedTotalShardCount != totalShardCount ) {
-				OutboxPollingEventsLog.INSTANCE.tracef(
-						"Agent '%s': waiting for agent '%s', whose total shard count %s is not the expected %s yet",
-						selfReference(), agent.getReference(), totalShardCount, expectedTotalShardCount );
+				OutboxPollingEventsLog.INSTANCE.clusterMembersAreInClusterShardCountExpectation( selfReference(),
+						agent.getReference(), totalShardCount, expectedTotalShardCount );
 				return false;
 			}
 			Integer assignedShardIndex = agent.getAssignedShardIndex();
 			if ( assignedShardIndex == null || expectedAssignedShardIndex != assignedShardIndex ) {
-				OutboxPollingEventsLog.INSTANCE.tracef(
-						"Agent '%s': waiting for agent '%s', whose assigned shard index %s is not the expected %s yet",
-						selfReference(), agent.getReference(), assignedShardIndex, expectedAssignedShardIndex );
+				OutboxPollingEventsLog.INSTANCE.clusterMembersAreInClusterSharIndexExpectation( selfReference(),
+						agent.getReference(), assignedShardIndex, expectedAssignedShardIndex );
 				return false;
 			}
 			++expectedAssignedShardIndex;
 		}
 
-		OutboxPollingEventsLog.INSTANCE.tracef(
-				"Agent '%s': all cluster members reached the expected states %s and shard assignment %s",
-				selfReference(), expectedStates, clusterDescriptor );
+		OutboxPollingEventsLog.INSTANCE.clusterMembersAreInClusterReachedExpectedStates( selfReference(), expectedStates,
+				clusterDescriptor );
 		return true;
 	}
 
 	@Override
 	protected OutboxPollingEventProcessingInstructions instructCommitAndRetryPulseAfterDelay(Instant now, Duration delay) {
 		Instant expiration = now.plus( delay );
-		OutboxPollingEventsLog.INSTANCE.tracef(
-				"Agent '%s': instructions are to not process events and to retry a pulse in %s, around %s",
-				selfReference(), delay, expiration );
+		OutboxPollingEventsLog.INSTANCE.instructCommitAndRetryPulseAfterDelay( selfReference(), delay, expiration );
 		return new OutboxPollingEventProcessingInstructions( clock, expiration, Optional.empty() );
 	}
 
 	private OutboxPollingEventProcessingInstructions instructProceedWithEventProcessing(Instant now) {
 		Instant expiration = now.plus( pulseInterval );
-		OutboxPollingEventsLog.INSTANCE.tracef(
-				"Agent '%s': instructions are to process events and to retry a pulse in %s, around %s",
-				selfReference(), pulseInterval, expiration );
+		OutboxPollingEventsLog.INSTANCE.instructProceedWithEventProcessing( selfReference(), pulseInterval, expiration );
 		return new OutboxPollingEventProcessingInstructions( clock, expiration,
 				Optional.of( lastShardAssignment.eventFinder ) );
 	}

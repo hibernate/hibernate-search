@@ -67,7 +67,7 @@ public final class SingletonTask {
 			return;
 		}
 
-		ExecutorLog.INSTANCE.tracef( "Scheduling task '%s'.", name );
+		ExecutorLog.INSTANCE.schedulingTask( name );
 
 		/*
 		 * Our thread successfully switched the status:
@@ -190,7 +190,7 @@ public final class SingletonTask {
 			needsRun = false;
 			nextExecutionFuture = null;
 			try {
-				ExecutorLog.INSTANCE.tracef( "Running task '%s'", name );
+				ExecutorLog.INSTANCE.runningTask( name );
 				worker.work().handle( workFinishedHandler );
 			}
 			catch (Throwable e) {
@@ -219,7 +219,7 @@ public final class SingletonTask {
 
 				// First, tell the worker that we're done.
 				try {
-					ExecutorLog.INSTANCE.tracef( "Completed task '%s'", name );
+					ExecutorLog.INSTANCE.completedTask( name );
 					worker.complete();
 				}
 				catch (Throwable e) {

@@ -51,7 +51,8 @@ public final class SimpleIndexLayoutStrategy implements IndexLayoutStrategy {
 	public String extractUniqueKeyFromElasticsearchIndexName(String elasticsearchIndexName) {
 		Matcher matcher = UNIQUE_KEY_EXTRACTION_PATTERN.matcher( elasticsearchIndexName );
 		if ( !matcher.matches() ) {
-			throw ElasticsearchClientLog.INSTANCE.invalidIndexPrimaryName( elasticsearchIndexName, UNIQUE_KEY_EXTRACTION_PATTERN );
+			throw ElasticsearchClientLog.INSTANCE.invalidIndexPrimaryName( elasticsearchIndexName,
+					UNIQUE_KEY_EXTRACTION_PATTERN );
 		}
 		return matcher.group( 1 );
 	}

@@ -161,7 +161,7 @@ public class HibernateSearchPartitionMapper implements PartitionMapper {
 				);
 			}
 
-			JakartaBatchLog.INSTANCE.debugf( "Partitions: %s", Arrays.toString( props ) );
+			JakartaBatchLog.INSTANCE.listPartitions( Arrays.toString( props ) );
 
 			PartitionPlan partitionPlan = new PartitionPlanImpl();
 			partitionPlan.setPartitionProperties( props );

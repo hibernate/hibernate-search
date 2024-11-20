@@ -145,7 +145,8 @@ public abstract class AbstractElasticsearchNestableAggregation<A> extends Abstra
 
 		public void filter(SearchPredicate filter) {
 			if ( nestedPathHierarchy.isEmpty() ) {
-				throw QueryLog.INSTANCE.cannotFilterAggregationOnRootDocumentField( field.absolutePath(), field.eventContext() );
+				throw QueryLog.INSTANCE.cannotFilterAggregationOnRootDocumentField( field.absolutePath(),
+						field.eventContext() );
 			}
 			ElasticsearchSearchPredicate elasticsearchFilter = ElasticsearchSearchPredicate.from( scope, filter );
 			elasticsearchFilter.checkNestableWithin(

@@ -7,6 +7,7 @@ package org.hibernate.search.engine.logging.impl;
 import static org.hibernate.search.engine.logging.impl.EngineLog.ID_OFFSET;
 import static org.hibernate.search.engine.logging.impl.EngineLog.ID_OFFSET_LEGACY;
 import static org.jboss.logging.Logger.Level.DEBUG;
+import static org.jboss.logging.Logger.Level.TRACE;
 
 import java.lang.invoke.MethodHandles;
 
@@ -57,5 +58,25 @@ public interface ExecutorLog extends BasicLogger {
 			value = "Unable to submit work to '%1$s': this orchestrator is stopped."
 					+ " The work has been discarded.")
 	SearchException submittedWorkToStoppedOrchestrator(String orchestratorName);
+
+	@LogMessage(level = TRACE)
+	@Message(id = ID_OFFSET + 130, value = "Processing %d works in executor '%s'")
+	void numberOfWorksInExecutor(int workCount, String name);
+
+	@LogMessage(level = TRACE)
+	@Message(id = ID_OFFSET + 131, value = "Processed %d works in executor '%s'")
+	void numberOfProcessedWorksInExecutor(int workCount, String name);
+
+	@LogMessage(level = TRACE)
+	@Message(id = ID_OFFSET + 132, value = "Scheduling task '%s'.")
+	void schedulingTask(String name);
+
+	@LogMessage(level = TRACE)
+	@Message(id = ID_OFFSET + 133, value = "Running task '%s'")
+	void runningTask(String name);
+
+	@LogMessage(level = TRACE)
+	@Message(id = ID_OFFSET + 134, value = "Completed task '%s'")
+	void completedTask(String name);
 
 }

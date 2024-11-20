@@ -6,12 +6,15 @@ package org.hibernate.search.backend.lucene.logging.impl;
 
 import static org.hibernate.search.backend.lucene.logging.impl.LuceneLog.ID_OFFSET;
 import static org.hibernate.search.backend.lucene.logging.impl.LuceneLog.ID_OFFSET_LEGACY_ENGINE;
+import static org.jboss.logging.Logger.Level.DEBUG;
 import static org.jboss.logging.Logger.Level.INFO;
+import static org.jboss.logging.Logger.Level.TRACE;
 import static org.jboss.logging.Logger.Level.WARN;
 
 import java.lang.invoke.MethodHandles;
 import java.nio.file.Path;
 
+import org.hibernate.search.backend.lucene.lowlevel.reader.impl.HibernateSearchMultiReader;
 import org.hibernate.search.util.common.SearchException;
 import org.hibernate.search.util.common.logging.CategorizedLogger;
 import org.hibernate.search.util.common.logging.impl.EventContextFormatter;
@@ -136,4 +139,24 @@ public interface LuceneSpecificLog extends BasicLogger {
 	@Message(id = ID_OFFSET + 187,
 			value = "Unable to refresh an index reader: %1$s")
 	SearchException unableToRefresh(String causeMessage, @Param EventContext context, @Cause Exception cause);
+
+	@LogMessage(level = TRACE)
+	@Message(id = ID_OFFSET + 189, value = "Closing MultiReader: %s")
+	void closingMultiReader(HibernateSearchMultiReader hibernateSearchMultiReader);
+
+	@LogMessage(level = TRACE)
+	@Message(id = ID_OFFSET + 190, value = "MultiReader closed: %s")
+	void closedMultiReader(HibernateSearchMultiReader hibernateSearchMultiReader);
+
+	@LogMessage(level = TRACE)
+	@Message(id = ID_OFFSET + 191, value = "IndexWriter closed")
+	void closedIndexWriter();
+
+	@LogMessage(level = TRACE)
+	@Message(id = ID_OFFSET + 192, value = "IndexWriter opened")
+	void openedIndexWriter();
+
+	@LogMessage(level = DEBUG)
+	@Message(id = ID_OFFSET + 193, value = "Set index writer parameter %s to value : %s. %s")
+	void indexWriterSetParameter(String settingName, Object value, String context);
 }

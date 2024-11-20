@@ -50,6 +50,6 @@ public interface OrmLog
 	 * here to the next value.
 	 */
 	@LogMessage(level = TRACE)
-	@Message(id = ID_OFFSET + 127, value = "")
+	@Message(id = ID_OFFSET + 143, value = "")
 	void nextLoggerIdForConvenience();
 }

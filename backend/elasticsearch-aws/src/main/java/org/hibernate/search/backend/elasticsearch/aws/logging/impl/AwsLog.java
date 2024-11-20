@@ -5,6 +5,9 @@
 
 package org.hibernate.search.backend.elasticsearch.aws.logging.impl;
 
+import static org.jboss.logging.Logger.Level.DEBUG;
+import static org.jboss.logging.Logger.Level.TRACE;
+
 import java.lang.invoke.MethodHandles;
 
 import org.hibernate.search.util.common.SearchException;
@@ -13,10 +16,18 @@ import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 import org.hibernate.search.util.common.logging.impl.MessageConstants;
 
 import org.jboss.logging.BasicLogger;
+import org.jboss.logging.annotations.LogMessage;
 import org.jboss.logging.annotations.Message;
 import org.jboss.logging.annotations.MessageLogger;
 import org.jboss.logging.annotations.ValidIdRange;
 import org.jboss.logging.annotations.ValidIdRanges;
+
+import org.apache.http.HttpRequest;
+import software.amazon.awssdk.auth.credentials.AwsCredentials;
+import software.amazon.awssdk.auth.credentials.AwsCredentialsProvider;
+import software.amazon.awssdk.http.SdkHttpFullRequest;
+import software.amazon.awssdk.http.auth.spi.signer.SignedRequest;
+import software.amazon.awssdk.regions.Region;
 
 @CategorizedLogger(
 		category = AwsLog.CATEGORY_NAME,
@@ -63,4 +74,32 @@ public interface AwsLog extends BasicLogger {
 			String credentialsTypePropertyKey, String credentialsTypePropertyValueStatic,
 			String accessKeyIdPropertyKey, String secretAccessKeyPropertyKey);
 
+	@LogMessage(level = TRACE)
+	@Message(id = ID_OFFSET + 3, value = "HTTP request (before signing): %s")
+	void httpRequestBeforeSigning(HttpRequest request);
+
+	@LogMessage(level = TRACE)
+	@Message(id = ID_OFFSET + 4, value = "AWS request (before signing): %s")
+	void awsRequestBeforeSigning(SdkHttpFullRequest awsRequest);
+
+	@LogMessage(level = TRACE)
+	@Message(id = ID_OFFSET + 5, value = "AWS credentials: %s")
+	void awsCredentials(AwsCredentials credentials);
+
+	@LogMessage(level = TRACE)
+	@Message(id = ID_OFFSET + 6, value = "AWS request (after signing): %s")
+	void httpRequestAfterSigning(SignedRequest signedRequest);
+
+	@LogMessage(level = TRACE)
+	@Message(id = ID_OFFSET + 7, value = "HTTP request (after signing): %s")
+	void awsRequestAfterSigning(HttpRequest request);
+
+	@LogMessage(level = DEBUG)
+	@Message(id = ID_OFFSET + 8, value = "AWS request signing is disabled.")
+	void signingDisabled();
+
+	@LogMessage(level = DEBUG)
+	@Message(id = ID_OFFSET + 9,
+			value = "AWS request signing is enabled [region = '%s', service = '%s', credentialsProvider = '%s'].")
+	void signingEnabled(Region region, String service, AwsCredentialsProvider credentialsProvider);
 }

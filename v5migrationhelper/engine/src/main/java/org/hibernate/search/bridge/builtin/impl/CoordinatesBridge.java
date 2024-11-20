@@ -200,7 +200,8 @@ public class CoordinatesBridge implements TypeBridge<Object>, PropertyBridge<Obj
 		private static Collector<PojoModelCompositeElement, ?, PojoModelCompositeElement> singleMarkedProperty(
 				String markerName, String fieldName, String markerSet) {
 			return StreamHelper.singleElement(
-					() -> MigrationHelperLog.INSTANCE.unableToFindLongitudeOrLatitudeProperty( markerName, fieldName, markerSet ),
+					() -> MigrationHelperLog.INSTANCE.unableToFindLongitudeOrLatitudeProperty( markerName, fieldName,
+							markerSet ),
 					() -> MigrationHelperLog.INSTANCE.multipleLatitudeOrLongitudeProperties( markerName, fieldName, markerSet )
 			);
 		}

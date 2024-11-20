@@ -41,11 +41,7 @@ class SynchronizationAdapter
 
 	@Override
 	public void afterCompletion(int status) {
-		OrmSpecificLog.INSTANCE.tracef(
-				"Transaction's afterCompletion is expected to be executed"
-						+ " through the AfterTransactionCompletionProcess interface, ignoring: %s",
-				delegate
-		);
+		OrmSpecificLog.INSTANCE.syncAdapterIgnoringAfterCompletion( delegate );
 	}
 
 	@Override
@@ -70,9 +66,7 @@ class SynchronizationAdapter
 
 	private void doBeforeCompletion() {
 		if ( beforeExecuted ) {
-			OrmSpecificLog.INSTANCE.tracef(
-					"Transaction's beforeCompletion() phase already been processed, ignoring: %s", delegate
-			);
+			OrmSpecificLog.INSTANCE.syncAdapterIgnoringBeforeCompletionAlreadyExecuted( delegate );
 		}
 		else {
 			delegate.beforeCompletion();
@@ -82,9 +76,7 @@ class SynchronizationAdapter
 
 	private void doAfterCompletion(int status) {
 		if ( afterExecuted ) {
-			OrmSpecificLog.INSTANCE.tracef(
-					"Transaction's afterCompletion() phase already been processed, ignoring: %s", delegate
-			);
+			OrmSpecificLog.INSTANCE.syncAdapterIgnoringAfterCompletionAlreadyExecuted( delegate );
 		}
 		else {
 			delegate.afterCompletion( status );

@@ -298,8 +298,7 @@ public final class OutboxPollingEventProcessor implements ToStringTreeAppendable
 					// See the Scheduler class below.
 					ensureScheduled();
 
-					OutboxPollingEventsLog.INSTANCE.tracef( "Processing %d outbox events for '%s': '%s'", events.size(), name,
-							events );
+					OutboxPollingEventsLog.INSTANCE.processingOutboxEvents( events.size(), name, events );
 
 					// Process the events
 					eventProcessing.processEvents( events );

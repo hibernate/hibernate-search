@@ -57,7 +57,7 @@ public class PojoMassIndexingEntityLoadingRunnable<E, I> extends PojoMassIndexin
 
 	@Override
 	protected void runWithFailureHandler() throws InterruptedException {
-		MassIndexingLog.INSTANCE.trace( "started loading entities" );
+		MassIndexingLog.INSTANCE.entityLoadingStarted( typeGroup.notifiedGroupName() );
 		LoadingContext context = new LoadingContext();
 		try ( PojoMassEntityLoader<I> entityLoader =
 				loadingStrategy.createEntityLoader( typeGroup.includedTypes(), context ) ) {
@@ -65,7 +65,7 @@ public class PojoMassIndexingEntityLoadingRunnable<E, I> extends PojoMassIndexin
 			do {
 				idList = identifierQueue.take();
 				if ( idList != null ) {
-					MassIndexingLog.INSTANCE.tracef( "received list of ids %s", idList );
+					MassIndexingLog.INSTANCE.entityLoadingAttemptToLoadIds( idList );
 					// This will pass the loaded entities to the sink, which will trigger indexing for those entities.
 					try {
 						entityLoader.load( idList );
@@ -78,7 +78,7 @@ public class PojoMassIndexingEntityLoadingRunnable<E, I> extends PojoMassIndexin
 			while ( idList != null );
 			context.waitForLastBatches();
 		}
-		MassIndexingLog.INSTANCE.trace( "finished loading entities" );
+		MassIndexingLog.INSTANCE.entityLoadingFinished( typeGroup.notifiedGroupName() );
 	}
 
 	@Override

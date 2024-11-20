@@ -76,32 +76,26 @@ public final class OutboxPollingMassIndexerAgentClusterLink
 		AgentState expectedState = AgentState.SUSPENDED;
 		for ( Agent eventProcessor : eventProcessors ) {
 			if ( !expectedState.equals( eventProcessor.getState() ) ) {
-				OutboxPollingEventsLog.INSTANCE.tracef(
-						"Agent '%s': waiting for event processor '%s', which has not reached state '%s' yet",
-						selfReference(), eventProcessor.getReference(), expectedState );
+				OutboxPollingEventsLog.INSTANCE.agentWaitingForEvents( selfReference(), eventProcessor.getReference(),
+						expectedState );
 				return false;
 			}
 		}
 
-		OutboxPollingEventsLog.INSTANCE.tracef( "Agent '%s': all event processors reached the expected state %s",
-				selfReference(), expectedState );
+		OutboxPollingEventsLog.INSTANCE.agentProcessorsExpired( selfReference(), expectedState );
 		return true;
 	}
 
 	@Override
 	protected OutboxPollingMassIndexingInstructions instructCommitAndRetryPulseAfterDelay(Instant now, Duration delay) {
 		Instant expiration = now.plus( delay );
-		OutboxPollingEventsLog.INSTANCE.tracef(
-				"Agent '%s': instructions are to hold off mass indexing and to retry a pulse in %s, around %s",
-				selfReference(), delay, expiration );
+		OutboxPollingEventsLog.INSTANCE.agentHoldMassIndexing( selfReference(), delay, expiration );
 		return new OutboxPollingMassIndexingInstructions( clock, expiration, false );
 	}
 
 	private OutboxPollingMassIndexingInstructions instructProceedWithMassIndexing(Instant now) {
 		Instant expiration = now.plus( pulseInterval );
-		OutboxPollingEventsLog.INSTANCE.tracef(
-				"Agent '%s': instructions are to proceed with mass indexing and to retry a pulse in %s, around %s",
-				selfReference(), pulseInterval, expiration );
+		OutboxPollingEventsLog.INSTANCE.agentProceedMassIndexing( selfReference(), pulseInterval, expiration );
 		return new OutboxPollingMassIndexingInstructions( clock, expiration, true );
 	}
 

@@ -5,17 +5,22 @@
 
 package org.hibernate.search.util.common.logging.impl;
 
+import static org.jboss.logging.Logger.Level.DEBUG;
+import static org.jboss.logging.Logger.Level.TRACE;
+
 import java.io.IOException;
 import java.lang.invoke.MethodHandles;
 import java.lang.reflect.Member;
 import java.lang.reflect.Type;
 import java.net.URI;
 import java.net.URL;
+import java.nio.file.Path;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.Future;
 
 import org.hibernate.search.util.common.SearchException;
 import org.hibernate.search.util.common.logging.CategorizedLogger;
 
-import org.jboss.logging.BasicLogger;
 import org.jboss.logging.Logger;
 import org.jboss.logging.annotations.Cause;
 import org.jboss.logging.annotations.FormatWith;
@@ -36,7 +41,7 @@ import org.jboss.logging.annotations.ValidIdRanges;
 @ValidIdRanges({
 		@ValidIdRange(min = MessageConstants.UTIL_ID_RANGE_MIN, max = MessageConstants.UTIL_ID_RANGE_MAX),
 })
-public interface CommonFailuresLog extends BasicLogger {
+public interface CommonFailuresLog {
 
 	String CATEGORY_NAME = "org.hibernate.search.common.failures";
 
@@ -128,4 +133,23 @@ public interface CommonFailuresLog extends BasicLogger {
 					+ "See the reference documentation for information about mapping configurers.")
 	SearchException cannotOpenNestedJar(URI uri, @Cause Throwable e);
 
+	@LogMessage(level = DEBUG)
+	@Message(id = ID_OFFSET + 19, value = "Unexpected structure for META-INF/versions entry: %s")
+	void metaInfVersionBadStructure(Path path);
+
+	@LogMessage(level = DEBUG)
+	@Message(id = ID_OFFSET + 20, value = "Failed to parse META-INF/versions entry: %s")
+	void metaInfVersionParsingFailed(Path path, @Cause Throwable e);
+
+	@LogMessage(level = TRACE)
+	@Message(id = ID_OFFSET + 21, value = "Cancelling CompletableFuture %s (mayInterruptIfRunning = %s)")
+	void cancellingCompletableFuture(CompletableFuture<?> future, boolean mayInterruptIfRunning);
+
+	@LogMessage(level = TRACE)
+	@Message(id = ID_OFFSET + 22, value = "Cancelling Future %s (mayInterruptIfRunning = %s)")
+	void cancellingFuture(Future<?> future, boolean mayInterruptIfRunning);
+
+	@LogMessage(level = TRACE)
+	@Message(id = ID_OFFSET + 23, value = "Could not cancel Future %s (mayInterruptIfRunning = %s)")
+	void cancellingFutureFailed(Future<?> future, boolean mayInterruptIfRunning);
 }

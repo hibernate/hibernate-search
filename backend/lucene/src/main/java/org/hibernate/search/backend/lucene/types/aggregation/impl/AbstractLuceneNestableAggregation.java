@@ -65,7 +65,8 @@ public abstract class AbstractLuceneNestableAggregation<A> implements LuceneSear
 
 		public void filter(SearchPredicate filter) {
 			if ( nestedDocumentPath == null ) {
-				throw QueryLog.INSTANCE.cannotFilterAggregationOnRootDocumentField( field.absolutePath(), field.eventContext() );
+				throw QueryLog.INSTANCE.cannotFilterAggregationOnRootDocumentField( field.absolutePath(),
+						field.eventContext() );
 			}
 			LuceneSearchPredicate luceneFilter = LuceneSearchPredicate.from( scope, filter );
 			luceneFilter.checkNestableWithin( nestedDocumentPath );

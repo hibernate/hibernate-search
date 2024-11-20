@@ -45,7 +45,6 @@ import org.hibernate.search.util.common.logging.impl.ToStringTreeMultilineFormat
 import org.hibernate.search.util.common.logging.impl.TypeFormatter;
 import org.hibernate.search.util.common.reporting.EventContext;
 
-import org.jboss.logging.BasicLogger;
 import org.jboss.logging.Logger;
 import org.jboss.logging.annotations.Cause;
 import org.jboss.logging.annotations.FormatWith;
@@ -61,7 +60,7 @@ import org.jboss.logging.annotations.Param;
 				"""
 )
 @MessageLogger(projectCode = MessageConstants.PROJECT_CODE)
-public interface MappingLog extends BasicLogger {
+public interface MappingLog {
 	String CATEGORY_NAME = "org.hibernate.search.mapping";
 
 	MappingLog INSTANCE = LoggerFactory.make( MappingLog.class, CATEGORY_NAME, MethodHandles.lookup() );

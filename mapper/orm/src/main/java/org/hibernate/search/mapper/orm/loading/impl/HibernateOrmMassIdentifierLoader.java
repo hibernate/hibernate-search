@@ -52,7 +52,7 @@ public final class HibernateOrmMassIdentifierLoader<E, I> implements PojoMassIde
 			}
 
 			if ( LoadingLog.INSTANCE.isDebugEnabled() ) {
-				LoadingLog.INSTANCE.debugf( "going to fetch %d primary keys", totalCount );
+				LoadingLog.INSTANCE.numberOfKeysToFetch( totalCount );
 			}
 
 			results = typeQueryLoader.createIdentifiersQuery( session )

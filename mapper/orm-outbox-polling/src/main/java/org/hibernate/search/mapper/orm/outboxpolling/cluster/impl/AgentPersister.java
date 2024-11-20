@@ -58,7 +58,7 @@ public final class AgentPersister implements ToStringTreeAppendable {
 		Agent self = new Agent( type, name, expiration, AgentState.SUSPENDED, staticShardAssignment );
 		agentRepository.create( self );
 		selfReference = self.getReference();
-		OutboxPollingEventsLog.INSTANCE.infof( "Agent '%s': registering", selfReference );
+		OutboxPollingEventsLog.INSTANCE.agentRegistering( selfReference );
 	}
 
 	public void leaveCluster(AgentRepository store) {
@@ -66,7 +66,7 @@ public final class AgentPersister implements ToStringTreeAppendable {
 			// We never even joined the cluster
 			return;
 		}
-		OutboxPollingEventsLog.INSTANCE.infof( "Agent '%s': leaving cluster", selfReference );
+		OutboxPollingEventsLog.INSTANCE.agentLeaving( selfReference );
 		Agent agent = store.find( selfReference.id );
 		if ( agent != null ) {
 			store.delete( Collections.singletonList( agent ) );
@@ -75,7 +75,7 @@ public final class AgentPersister implements ToStringTreeAppendable {
 
 	public void setSuspended(Agent self) {
 		if ( self.getState() != AgentState.SUSPENDED ) {
-			OutboxPollingEventsLog.INSTANCE.infof( "Agent '%s': suspending", selfReference );
+			OutboxPollingEventsLog.INSTANCE.agentSuspending( selfReference );
 			self.setState( AgentState.SUSPENDED );
 		}
 		if ( staticShardAssignment == null ) {
@@ -87,8 +87,7 @@ public final class AgentPersister implements ToStringTreeAppendable {
 	public void setWaiting(Agent self, ClusterDescriptor clusterDescriptor,
 			ShardAssignmentDescriptor shardAssignment) {
 		if ( self.getState() != AgentState.WAITING ) {
-			OutboxPollingEventsLog.INSTANCE.infof( "Agent '%s': waiting for cluster changes. Shard assignment: %s. Cluster: %s",
-					selfReference, shardAssignment, clusterDescriptor );
+			OutboxPollingEventsLog.INSTANCE.agentWaiting( selfReference, shardAssignment, clusterDescriptor );
 			self.setState( AgentState.WAITING );
 		}
 		if ( staticShardAssignment == null && shardAssignment != null ) {
@@ -99,8 +98,7 @@ public final class AgentPersister implements ToStringTreeAppendable {
 
 	public void setRunning(Agent self, ClusterDescriptor clusterDescriptor) {
 		if ( self.getState() != AgentState.RUNNING ) {
-			OutboxPollingEventsLog.INSTANCE.infof( "Agent '%s': running. Shard assignment: %s. Cluster: %s",
-					selfReference, self.getShardAssignment(), clusterDescriptor );
+			OutboxPollingEventsLog.INSTANCE.agentRunning( selfReference, self.getShardAssignment(), clusterDescriptor );
 			self.setState( AgentState.RUNNING );
 		}
 	}
