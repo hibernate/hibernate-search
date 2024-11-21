@@ -104,7 +104,8 @@ public final class ExtractionRequirements {
 			// but if it's not there and not all docs are matched, we need a separate collector.
 			// Note that adding this collector can have a significant cost in some situations
 			// (e.g. for queries matching many hits), so we only add it if it's really necessary.
-			TotalHitCountCollectorManager totalHitCountCollectorManager = new TotalHitCountCollectorManager();
+			TotalHitCountCollectorManager totalHitCountCollectorManager =
+					new TotalHitCountCollectorManager( indexSearcher.getSlices() );
 			collectorsForAllMatchingDocsBuilder.add( LuceneCollectors.TOTAL_HIT_COUNT_KEY, totalHitCountCollectorManager );
 		}
 		collectorsForAllMatchingDocsBuilder.addAll( requiredCollectorForAllMatchingDocsFactories );

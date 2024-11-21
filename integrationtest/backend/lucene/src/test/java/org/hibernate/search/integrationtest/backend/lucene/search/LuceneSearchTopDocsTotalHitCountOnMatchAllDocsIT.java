@@ -14,6 +14,7 @@ import org.hibernate.search.engine.backend.document.IndexFieldReference;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaElement;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.configuration.DefaultAnalysisDefinitions;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.extension.SearchSetupHelper;
+import org.hibernate.search.util.impl.integrationtest.backend.lucene.TotalHitsUtils;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.SimpleMappedIndex;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMapperUtils;
 import org.hibernate.search.util.impl.test.annotation.TestForIssue;
@@ -66,8 +67,8 @@ class LuceneSearchTopDocsTotalHitCountOnMatchAllDocsIT {
 		assertThatResult( result ).hasTotalHitCount( DOCUMENT_COUNT );
 
 		TopDocs topDocs = result.topDocs();
-		assertThat( topDocs.totalHits.relation ).isEqualTo( TotalHits.Relation.EQUAL_TO );
-		assertThat( topDocs.totalHits.value ).isEqualTo( DOCUMENT_COUNT );
+		assertThat( TotalHitsUtils.relation( topDocs.totalHits ) ).isEqualTo( TotalHits.Relation.EQUAL_TO );
+		assertThat( TotalHitsUtils.value( topDocs.totalHits ) ).isEqualTo( DOCUMENT_COUNT );
 	}
 
 	private static class IndexBinding {
@@ -78,8 +79,7 @@ class LuceneSearchTopDocsTotalHitCountOnMatchAllDocsIT {
 					"text",
 					f -> f.asString()
 							.analyzer( DefaultAnalysisDefinitions.ANALYZER_STANDARD_ENGLISH.name )
-			)
-					.toReference();
+			).toReference();
 		}
 	}
 }

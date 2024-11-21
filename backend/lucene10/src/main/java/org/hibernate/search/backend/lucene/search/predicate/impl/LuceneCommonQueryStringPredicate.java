@@ -158,7 +158,7 @@ abstract class LuceneCommonQueryStringPredicate extends AbstractLuceneNestablePr
 		protected Query addMatchAllForBoolMustNotOnly(Query query) {
 			if ( query instanceof BooleanQuery ) {
 				BooleanQuery booleanQuery = (BooleanQuery) query;
-				long notMustNot = booleanQuery.clauses().stream().map( BooleanClause::getOccur )
+				long notMustNot = booleanQuery.clauses().stream().map( BooleanClause::occur )
 						.filter( Predicate.not( BooleanClause.Occur.MUST_NOT::equals ) )
 						.count();
 
