@@ -200,7 +200,7 @@ stage('Configure') {
 					// Make sure to remove that argument as soon as possible
 					// -- generally that requires upgrading bytebuddy in Hibernate ORM after the JDK goes GA.
 					new JdkBuildEnvironment(version: '23', testCompilerTool: 'OpenJDK 23 Latest',
-							testLauncherArgs: '--enable-preview -Dnet.bytebuddy.experimental=true',
+							testLauncherArgs: '--enable-preview',
 							condition: TestCondition.AFTER_MERGE),
 					new JdkBuildEnvironment(version: '24', testCompilerTool: 'OpenJDK 24 Latest',
 							testLauncherArgs: '--enable-preview -Dnet.bytebuddy.experimental=true',
