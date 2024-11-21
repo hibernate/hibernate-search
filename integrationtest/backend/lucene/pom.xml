@@ -1,5 +1,5 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-    xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <parent>
         <groupId>org.hibernate.search</groupId>
@@ -10,7 +10,8 @@
     <artifactId>hibernate-search-integrationtest-backend-lucene</artifactId>
 
     <name>Hibernate Search ITs - Backend - Lucene</name>
-    <description>Hibernate Search integration tests for the Lucene backend, running the Backend TCK in particular</description>
+    <description>Hibernate Search integration tests for the Lucene backend, running the Backend TCK in particular
+    </description>
 
     <properties>
         <surefire.module>lucene</surefire.module>
@@ -26,6 +27,11 @@
         <dependency>
             <groupId>org.hibernate.search</groupId>
             <artifactId>hibernate-search-util-internal-integrationtest-backend-lucene</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.hibernate.search</groupId>
+            <artifactId>hibernate-search-util-internal-integrationtest-backend-lucene10</artifactId>
             <scope>test</scope>
         </dependency>
         <dependency>
@@ -52,6 +58,40 @@
                             <dependenciesToScan>
                                 <dependency>${project.groupId}:hibernate-search-integrationtest-backend-tck</dependency>
                             </dependenciesToScan>
+                            <classpathDependencyExcludes>
+                                <classpathDependencyExclude>org.hibernate.search:hibernate-search-util-internal-integrationtest-backend-lucene10</classpathDependencyExclude>
+                            </classpathDependencyExcludes>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>it-10</id>
+                        <goals>
+                            <goal>integration-test</goal>
+                            <goal>verify</goal>
+                        </goals>
+                        <configuration>
+                            <skip>${test.lucene.skip}</skip>
+                            <!-- WARNING: When using <dependenciesToScan>, be sure to set the Maven property surefire.module -->
+                            <dependenciesToScan>
+                                <dependency>${project.groupId}:hibernate-search-integrationtest-backend-tck</dependency>
+                            </dependenciesToScan>
+                            <classpathDependencyExcludes>
+                                <classpathDependencyExclude>org.hibernate.search:hibernate-search-backend-lucene</classpathDependencyExclude>
+                                <classpathDependencyExclude>org.hibernate.search:hibernate-search-util-internal-integrationtest-backend-lucene</classpathDependencyExclude>
+                                <classpathDependencyExclude>org.apache.lucene:*</classpathDependencyExclude>
+                            </classpathDependencyExcludes>
+                            <additionalClasspathDependencies>
+                                <additionalClasspathDependency>
+                                    <groupId>org.hibernate.search</groupId>
+                                    <artifactId>hibernate-search-backend-lucene10</artifactId>
+                                    <version>${project.version}</version>
+                                </additionalClasspathDependency>
+                                <additionalClasspathDependency>
+                                    <groupId>org.hibernate.search</groupId>
+                                    <artifactId>hibernate-search-util-internal-integrationtest-backend-lucene10</artifactId>
+                                    <version>${project.version}</version>
+                                </additionalClasspathDependency>
+                            </additionalClasspathDependencies>
                         </configuration>
                     </execution>
                 </executions>
