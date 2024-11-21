@@ -272,6 +272,7 @@
                 artifact.moduleSpecificKeyword =
                     CASE artifact.name
                         WHEN 'hibernate-search-backend-lucene' THEN 'Lucene'
+                        WHEN 'hibernate-search-backend-lucene10' THEN 'Lucene'
                         WHEN 'hibernate-search-backend-elasticsearch' THEN 'Elasticsearch'
                         WHEN 'hibernate-search-backend-elasticsearch-aws' THEN 'ElasticsearchAws'
                         WHEN 'hibernate-search-mapper-pojo-base' THEN 'Pojo'

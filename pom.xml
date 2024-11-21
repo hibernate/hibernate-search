@@ -169,6 +169,7 @@
         <module>util/common</module>
         <module>engine</module>
         <module>backend/lucene</module>
+        <module>backend/lucene10</module>
         <module>backend/elasticsearch</module>
         <module>backend/elasticsearch-aws</module>
         <module>mapper/pojo-base</module>

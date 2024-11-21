@@ -63,6 +63,17 @@
 			</includes>
 		</dependencySet>
 		<dependencySet>
+			<outputDirectory>dist/backend/lucene10</outputDirectory>
+			<scope>runtime</scope>
+			<useProjectArtifact>false</useProjectArtifact>
+			<useTransitiveDependencies>true</useTransitiveDependencies>
+			<useTransitiveFiltering>true</useTransitiveFiltering>
+			<useStrictFiltering>true</useStrictFiltering>
+			<includes>
+				<include>org.hibernate.search:hibernate-search-backend-lucene10</include>
+			</includes>
+		</dependencySet>
+		<dependencySet>
 			<outputDirectory>dist/backend/elasticsearch</outputDirectory>
 			<scope>runtime</scope>
 			<useProjectArtifact>false</useProjectArtifact>
