@@ -61,7 +61,7 @@ public final class ReusableDocumentStoredFieldVisitor extends StoredFieldVisitor
 	@Override
 	public void stringField(FieldInfo fieldInfo, String value) {
 		final FieldType ft = new FieldType( TextField.TYPE_STORED );
-		ft.setStoreTermVectors( fieldInfo.hasVectors() );
+		ft.setStoreTermVectors( fieldInfo.hasTermVectors() );
 		ft.setOmitNorms( fieldInfo.omitsNorms() );
 		ft.setIndexOptions( fieldInfo.getIndexOptions() );
 		getDocument().add( new Field( fieldInfo.name, value, ft ) );

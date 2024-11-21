@@ -29,6 +29,7 @@ import org.apache.lucene.index.SortedSetDocValues;
 import org.apache.lucene.search.DocIdSetIterator;
 import org.apache.lucene.util.BytesRef;
 import org.apache.lucene.util.LongValues;
+import org.apache.lucene.util.PriorityQueue;
 
 /**
  * Copied with some changes from {@code org.apache.lucene.facet.sortedset.SortedSetDocValuesFacetCounts}
@@ -84,14 +85,14 @@ public class TextMultiValueFacetCounts extends Facets {
 			topN = ordCount;
 		}
 
-		TopOrdAndIntQueue q = null;
+		HibernateSearchTopOrdAndIntQueue q = null;
 
 		int bottomCount = 0;
 
 		int totCount = 0;
 		int childCount = 0;
 
-		TopOrdAndIntQueue.OrdAndValue reuse = null;
+		TopOrdAndIntQueue.OrdAndInt reuse = null;
 
 		for ( int ord = 0; ord < ordCount; ord++ ) {
 			if ( counts[ord] > 0 ) {
@@ -99,18 +100,18 @@ public class TextMultiValueFacetCounts extends Facets {
 				childCount++;
 				if ( counts[ord] > bottomCount ) {
 					if ( reuse == null ) {
-						reuse = new TopOrdAndIntQueue.OrdAndValue();
+						reuse = new TopOrdAndIntQueue.OrdAndInt();
 					}
 					reuse.ord = ord;
 					reuse.value = counts[ord];
 					if ( q == null ) {
 						// Lazy init, so we don't create this for the
 						// sparse case unnecessarily
-						q = new TopOrdAndIntQueue( topN );
+						q = new HibernateSearchTopOrdAndIntQueue( topN );
 					}
 					reuse = q.insertWithOverflow( reuse );
 					if ( q.size() == topN ) {
-						bottomCount = q.top().value;
+						bottomCount = ( q.top() ).value;
 					}
 				}
 			}
@@ -122,7 +123,7 @@ public class TextMultiValueFacetCounts extends Facets {
 
 		LabelAndValue[] labelValues = new LabelAndValue[q.size()];
 		for ( int i = labelValues.length - 1; i >= 0; i-- ) {
-			TopOrdAndIntQueue.OrdAndValue ordAndValue = q.pop();
+			TopOrdAndIntQueue.OrdAndInt ordAndValue = q.pop();
 			final BytesRef term = dv.lookupOrd( ordAndValue.ord );
 			labelValues[i] = new LabelAndValue( term.utf8ToString(), ordAndValue.value );
 		}
@@ -138,7 +139,7 @@ public class TextMultiValueFacetCounts extends Facets {
 		}
 		IntHashSet uniqueOrdinalsForDocument = new IntHashSet();
 
-		DocIdSetIterator docs = hits.bits.iterator();
+		DocIdSetIterator docs = hits.bits().iterator();
 
 		// TODO: yet another option is to count all segs
 		// first, only in seg-ord space, and then do a
@@ -154,7 +155,7 @@ public class TextMultiValueFacetCounts extends Facets {
 
 			int numSegOrds = (int) segValues.getValueCount();
 
-			if ( hits.totalHits < numSegOrds / 10 ) {
+			if ( hits.totalHits() < numSegOrds / 10 ) {
 				IntProcedure incrementCountForOrdinal = ord -> counts[ord]++;
 				// Remap every ord to global ord as we iterate:
 				for ( int doc = docs.nextDoc(); doc != DocIdSetIterator.NO_MORE_DOCS; doc = docs.nextDoc() ) {
@@ -236,12 +237,12 @@ public class TextMultiValueFacetCounts extends Facets {
 			// the top-level reader passed to the
 			// SortedSetDocValuesReaderState, else cryptic
 			// AIOOBE can happen:
-			if ( ReaderUtil.getTopLevelContext( hits.context ).reader() != reader ) {
+			if ( ReaderUtil.getTopLevelContext( hits.context() ).reader() != reader ) {
 				throw new IllegalStateException(
 						"the SortedSetDocValuesReaderState provided to this class does not match the reader being searched; you must create a new SortedSetDocValuesReaderState every time you open a new IndexReader" );
 			}
 
-			countOneSegment( ordinalMap, valuesSource.getValues( hits.context ), hits.context.ord, hits );
+			countOneSegment( ordinalMap, valuesSource.getValues( hits.context() ), hits.context().ord, hits );
 		}
 	}
 
@@ -253,6 +254,22 @@ public class TextMultiValueFacetCounts extends Facets {
 	@Override
 	public List<FacetResult> getAllDims(int topN) throws IOException {
 		return Collections.singletonList( getTopChildren( topN, field ) );
+	}
+
+	/**
+	 * While there is a `TopOrdAndIntQueue` in Lucene, unfortunately it works with OrdAndValue objects (in API).
+	 * And there's no access to the value, leading to casting any type value has to be accessed. Hence, this impl:
+	 */
+	private static class HibernateSearchTopOrdAndIntQueue extends PriorityQueue<TopOrdAndIntQueue.OrdAndInt> {
+
+		public HibernateSearchTopOrdAndIntQueue(int maxSize) {
+			super( maxSize );
+		}
+
+		@Override
+		protected boolean lessThan(TopOrdAndIntQueue.OrdAndInt a, TopOrdAndIntQueue.OrdAndInt b) {
+			return a.lessThan( b );
+		}
 	}
 
 }

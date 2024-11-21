@@ -53,17 +53,17 @@ public class LongMultiValueRangeFacetCounts extends MultiValueRangeFacetCounts {
 
 		int missingCount = 0;
 		for ( FacetsCollector.MatchingDocs hits : matchingDocs ) {
-			LongMultiValues fv = valueSource.getValues( hits.context );
+			LongMultiValues fv = valueSource.getValues( hits.context() );
 
-			totCount += hits.totalHits;
+			totCount += hits.totalHits();
 			final DocIdSetIterator fastMatchDocs;
 			if ( fastMatchQuery != null ) {
-				final IndexReaderContext topLevelContext = ReaderUtil.getTopLevelContext( hits.context );
+				final IndexReaderContext topLevelContext = ReaderUtil.getTopLevelContext( hits.context() );
 				final IndexSearcher searcher = new IndexSearcher( topLevelContext );
 				searcher.setQueryCache( null );
 				final Weight fastMatchWeight =
 						searcher.createWeight( searcher.rewrite( fastMatchQuery ), ScoreMode.COMPLETE_NO_SCORES, 1 );
-				Scorer s = fastMatchWeight.scorer( hits.context );
+				Scorer s = fastMatchWeight.scorer( hits.context() );
 				if ( s == null ) {
 					continue;
 				}
@@ -73,7 +73,7 @@ public class LongMultiValueRangeFacetCounts extends MultiValueRangeFacetCounts {
 				fastMatchDocs = null;
 			}
 
-			DocIdSetIterator docs = hits.bits.iterator();
+			DocIdSetIterator docs = hits.bits().iterator();
 			for ( int doc = docs.nextDoc(); doc != DocIdSetIterator.NO_MORE_DOCS; ) {
 				if ( fastMatchDocs != null ) {
 					int fastMatchDoc = fastMatchDocs.docID();
