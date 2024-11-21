@@ -119,9 +119,9 @@ public class LuceneCollectors {
 		}
 
 		if ( resultTotal == null ) {
-			boolean exact = TotalHits.Relation.EQUAL_TO.equals( topDocs.totalHits.relation )
+			boolean exact = TotalHits.Relation.EQUAL_TO.equals( topDocs.totalHits.relation() )
 					&& !timeoutManager.isTimedOut();
-			resultTotal = SimpleSearchResultTotal.of( topDocs.totalHits.value, exact );
+			resultTotal = SimpleSearchResultTotal.of( topDocs.totalHits.value(), exact );
 		}
 		else if ( resultTotal.isHitCountExact() ) {
 			// Update the total hit count of the topDocs, which might not be precise enough,

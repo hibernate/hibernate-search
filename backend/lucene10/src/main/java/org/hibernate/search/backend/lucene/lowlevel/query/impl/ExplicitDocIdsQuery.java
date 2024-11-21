@@ -7,7 +7,6 @@ package org.hibernate.search.backend.lucene.lowlevel.query.impl;
 import java.util.Arrays;
 
 import org.apache.lucene.index.LeafReaderContext;
-import org.apache.lucene.search.ConstantScoreScorer;
 import org.apache.lucene.search.ConstantScoreWeight;
 import org.apache.lucene.search.DocIdSetIterator;
 import org.apache.lucene.search.IndexSearcher;
@@ -15,7 +14,7 @@ import org.apache.lucene.search.Query;
 import org.apache.lucene.search.QueryVisitor;
 import org.apache.lucene.search.ScoreDoc;
 import org.apache.lucene.search.ScoreMode;
-import org.apache.lucene.search.Scorer;
+import org.apache.lucene.search.ScorerSupplier;
 import org.apache.lucene.search.Weight;
 
 public final class ExplicitDocIdsQuery extends Query {
@@ -56,15 +55,16 @@ public final class ExplicitDocIdsQuery extends Query {
 	@Override
 	public Weight createWeight(IndexSearcher searcher, ScoreMode scoreMode, float boost) {
 		return new ConstantScoreWeight( this, 1.0f ) {
+
 			@Override
-			public Scorer scorer(LeafReaderContext context) {
+			public ScorerSupplier scorerSupplier(LeafReaderContext context) {
 				DocIdSetIterator matchingDocs = ExplicitDocIdSetIterator.of(
 						sortedDocIds, context.docBase, context.reader().maxDoc()
 				);
 				if ( matchingDocs == null ) {
 					return null; // Skip this leaf
 				}
-				return new ConstantScoreScorer( this, this.score(), scoreMode, matchingDocs );
+				return new ConstantScorerSupplier( this.score(), scoreMode, matchingDocs );
 			}
 
 			@Override
