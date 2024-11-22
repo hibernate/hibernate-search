@@ -20,9 +20,8 @@ import org.jboss.logging.annotations.ValidIdRanges;
 		@ValidIdRange(min = MessageConstants.BACKEND_ES_ID_RANGE_MIN, max = MessageConstants.BACKEND_ES_ID_RANGE_MAX),
 })
 public interface ElasticsearchLog
-		extends AnalyzerLog, CommonFailureLog, ConfigurationLog, ElasticsearchClientLog, ElasticsearchRequestLog,
-		ElasticsearchSpecificLog, IndexingLog,
-		MappingLog, QueryLog, SchemaExportLog, VersionLog {
+		extends AnalysisLog, ConfigurationLog, DeprecationLog, ElasticsearchClientLog, ElasticsearchMiscLog,
+		ElasticsearchRequestLog, IndexingLog, MappingLog, QueryLog, VersionLog {
 
 	// -----------------------------------
 	// Pre-existing messages from Search 5 (ES module)

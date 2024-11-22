@@ -29,13 +29,12 @@ import org.jboss.logging.annotations.MessageLogger;
 @CategorizedLogger(
 		category = ConfigurationLog.CATEGORY_NAME,
 		description = """
-				Logs the resulting entity mapping for Hibernate Search-specific entities
-				representing the agent and outbox event required by the outbox polling.
+				Logs related to the outbox polling-specific configuration.
 				"""
 )
 @MessageLogger(projectCode = MessageConstants.PROJECT_CODE)
 public interface ConfigurationLog {
-	String CATEGORY_NAME = "org.hibernate.search.configuration";
+	String CATEGORY_NAME = "org.hibernate.search.configuration.mapper.orm.outboxpolling";
 
 	ConfigurationLog INSTANCE = LoggerFactory.make( ConfigurationLog.class, CATEGORY_NAME, MethodHandles.lookup() );
 

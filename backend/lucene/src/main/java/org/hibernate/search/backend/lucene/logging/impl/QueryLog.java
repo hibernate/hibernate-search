@@ -46,14 +46,12 @@ import org.apache.lucene.search.Query;
 @CategorizedLogger(
 		category = QueryLog.CATEGORY_NAME,
 		description = """
-				Logs the Lucene queries that are about to be executed.
-				+
-				It may also log some hints on potentially misconfigured Lucene highlight queries, etc.
+				Logs the Lucene queries that are about to be executed and other query related messages.
 				"""
 )
 @MessageLogger(projectCode = MessageConstants.PROJECT_CODE)
 public interface QueryLog {
-	String CATEGORY_NAME = "org.hibernate.search.query";
+	String CATEGORY_NAME = "org.hibernate.search.query.lucene";
 
 	QueryLog INSTANCE = LoggerFactory.make( QueryLog.class, CATEGORY_NAME, MethodHandles.lookup() );
 

@@ -4,7 +4,7 @@
  */
 package org.hibernate.search.engine.reporting.impl;
 
-import static org.hibernate.search.engine.logging.impl.CommonFailureLog.INSTANCE;
+import static org.hibernate.search.engine.logging.impl.EngineMiscLog.INSTANCE;
 
 import org.hibernate.search.engine.reporting.EntityIndexingFailureContext;
 import org.hibernate.search.engine.reporting.FailureContext;

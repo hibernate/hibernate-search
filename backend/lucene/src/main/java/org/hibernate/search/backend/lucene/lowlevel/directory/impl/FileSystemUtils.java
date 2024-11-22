@@ -9,7 +9,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 
-import org.hibernate.search.backend.lucene.logging.impl.LuceneSpecificLog;
+import org.hibernate.search.backend.lucene.logging.impl.LuceneMiscLog;
 
 final class FileSystemUtils {
 
@@ -20,11 +20,11 @@ final class FileSystemUtils {
 		File directoryFile = directory.toFile();
 		if ( directoryFile.exists() ) {
 			if ( !directoryFile.isDirectory() || !Files.isWritable( directory ) ) {
-				throw LuceneSpecificLog.INSTANCE.pathIsNotWriteableDirectory( directory );
+				throw LuceneMiscLog.INSTANCE.pathIsNotWriteableDirectory( directory );
 			}
 		}
 		else {
-			LuceneSpecificLog.INSTANCE.indexDirectoryNotFoundCreatingNewOne( directory );
+			LuceneMiscLog.INSTANCE.indexDirectoryNotFoundCreatingNewOne( directory );
 			Files.createDirectories( directory );
 		}
 	}

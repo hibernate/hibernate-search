@@ -12,7 +12,7 @@ import java.util.Map;
 import java.util.TreeMap;
 
 import org.hibernate.search.engine.environment.bean.BeanReference;
-import org.hibernate.search.engine.logging.impl.BeanLog;
+import org.hibernate.search.engine.logging.impl.EngineMiscLog;
 import org.hibernate.search.util.common.AssertionFailure;
 
 /**
@@ -44,7 +44,7 @@ public class BeanReferenceRegistryForType<T> {
 			return all.get( 0 );
 		}
 		else if ( all.size() > 1 ) {
-			throw BeanLog.INSTANCE.multipleConfiguredBeanReferencesForType( exposedType, all );
+			throw EngineMiscLog.INSTANCE.multipleConfiguredBeanReferencesForType( exposedType, all );
 		}
 		else {
 			return null;

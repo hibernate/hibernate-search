@@ -4,7 +4,7 @@
  */
 package org.hibernate.search.engine.environment.thread.impl;
 
-import static org.hibernate.search.engine.logging.impl.CommonFailureLog.INSTANCE;
+import static org.hibernate.search.engine.logging.impl.EngineMiscLog.INSTANCE;
 
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.RejectedExecutionHandler;

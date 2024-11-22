@@ -11,7 +11,7 @@ import java.util.Optional;
 import java.util.function.Consumer;
 import java.util.function.Function;
 
-import org.hibernate.search.engine.logging.impl.CommonFailureLog;
+import org.hibernate.search.engine.logging.impl.EngineMiscLog;
 
 /**
  * A utility class holding the state of the extension contexts found in several DSLs.
@@ -36,7 +36,7 @@ public final class DslExtensionState<R> {
 	public <E> void ifSupported(Object extension, Optional<E> extendedContextOptional,
 			Function<E, ? extends R> extendedContextFunction) {
 		if ( appliedOrElse ) {
-			throw CommonFailureLog.INSTANCE.cannotCallDslExtensionIfSupportedAfterOrElse();
+			throw EngineMiscLog.INSTANCE.cannotCallDslExtensionIfSupportedAfterOrElse();
 		}
 		if ( !appliedAtLeastOneExtension ) {
 			if ( extendedContextOptional.isPresent() ) {
@@ -70,7 +70,7 @@ public final class DslExtensionState<R> {
 	public R orElseFail() {
 		if ( !appliedAtLeastOneExtension ) {
 			appliedOrElse = true;
-			throw CommonFailureLog.INSTANCE
+			throw EngineMiscLog.INSTANCE
 					.dslExtensionNoMatch( unsupportedExtensions == null ? Collections.emptyList() : unsupportedExtensions );
 		}
 		return result;

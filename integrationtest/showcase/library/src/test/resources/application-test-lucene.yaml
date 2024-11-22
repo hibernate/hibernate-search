@@ -9,7 +9,7 @@ logging.level:
   org.hibernate.SQL: DEBUG
   org.hibernate.search.mapper.orm.massindexing: INFO
   org.hibernate.search.query: DEBUG
-  org.hibernate.search.backend.elasticsearch.request: DEBUG
+  org.hibernate.search.elasticsearch.client.request: DEBUG
   org.hibernate.search.backend.lucene: DEBUG
 
 # Default environment variable values for IDEs that are unable to extract them from the maven-failsafe configuration

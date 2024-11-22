@@ -24,12 +24,12 @@ import org.jboss.logging.annotations.MessageLogger;
 @CategorizedLogger(
 		category = IndexingLog.CATEGORY_NAME,
 		description = """
-				Logged messages may notify when the particular indexing plan synchronization stage occurs (e.g. before/after transaction).
+				Logs related to the indexing process that are Hibernate ORM mapper specific.
 				"""
 )
 @MessageLogger(projectCode = MessageConstants.PROJECT_CODE)
 public interface IndexingLog {
-	String CATEGORY_NAME = "org.hibernate.search.mapper.indexing";
+	String CATEGORY_NAME = "org.hibernate.search.indexing.mapper.orm";
 
 	IndexingLog INSTANCE = LoggerFactory.make( IndexingLog.class, CATEGORY_NAME, MethodHandles.lookup() );
 

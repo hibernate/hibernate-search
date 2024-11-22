@@ -12,6 +12,7 @@ import java.lang.invoke.MethodHandles;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Member;
 import java.lang.reflect.Type;
+import java.nio.file.Path;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
@@ -56,12 +57,12 @@ import org.jboss.logging.annotations.Param;
 @CategorizedLogger(
 		category = MappingLog.CATEGORY_NAME,
 		description = """
-				Logs debug information and warnings that occur during the mapping construction.
+				Logs related to creating Hibernate Search mapping.
 				"""
 )
 @MessageLogger(projectCode = MessageConstants.PROJECT_CODE)
 public interface MappingLog {
-	String CATEGORY_NAME = "org.hibernate.search.mapping";
+	String CATEGORY_NAME = "org.hibernate.search.mapping.mapper";
 
 	MappingLog INSTANCE = LoggerFactory.make( MappingLog.class, CATEGORY_NAME, MethodHandles.lookup() );
 
@@ -69,6 +70,13 @@ public interface MappingLog {
 	// Pre-existing messages from Search 5 (engine module)
 	// DO NOT ADD ANY NEW MESSAGES HERE
 	// -----------------------------------
+	@Message(id = ID_OFFSET + 126,
+			value = "Target path '%1$s' already exists and is not an empty directory. Use a path to an empty or non-existing directory.")
+	SearchException schemaExporterTargetIsNotEmptyDirectory(Path targetDirectory);
+
+	@Message(id = ID_OFFSET + 127, value = "Unable to export the schema: %1$s")
+	SearchException unableToExportSchema(String cause, @Cause Exception e, @Param EventContext context);
+
 	@Message(id = ID_OFFSET_LEGACY_ENGINE + 135,
 			value = "No default value bridge implementation for type '%1$s'."
 					+ " Use a custom bridge.")

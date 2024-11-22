@@ -9,7 +9,7 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Optional;
 
-import org.hibernate.search.engine.logging.impl.BackendLog;
+import org.hibernate.search.engine.logging.impl.ConfigurationLog;
 import org.hibernate.search.engine.tenancy.spi.TenancyMode;
 
 public final class BackendsInfo {
@@ -28,9 +28,9 @@ public final class BackendsInfo {
 						return info1;
 					}
 					if ( name.isPresent() ) {
-						throw BackendLog.INSTANCE.differentMultiTenancyNamedBackend( name.get() );
+						throw ConfigurationLog.INSTANCE.differentMultiTenancyNamedBackend( name.get() );
 					}
-					throw BackendLog.INSTANCE.differentMultiTenancyDefaultBackend();
+					throw ConfigurationLog.INSTANCE.differentMultiTenancyDefaultBackend();
 				}
 		);
 	}

@@ -11,7 +11,7 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.ReentrantLock;
 
 import org.hibernate.search.backend.lucene.logging.impl.IndexingLog;
-import org.hibernate.search.backend.lucene.logging.impl.LuceneSpecificLog;
+import org.hibernate.search.backend.lucene.logging.impl.LuceneMiscLog;
 import org.hibernate.search.engine.backend.orchestration.spi.SingletonTask;
 import org.hibernate.search.engine.common.execution.spi.SimpleScheduledExecutor;
 import org.hibernate.search.engine.common.timing.spi.TimingSource;
@@ -149,20 +149,20 @@ public class IndexWriterDelegatorImpl implements IndexWriterDelegator {
 			finally {
 				commitLock.unlock();
 			}
-			LuceneSpecificLog.INSTANCE.closedIndexWriter();
+			LuceneMiscLog.INSTANCE.closedIndexWriter();
 		}
 	}
 
 	void closeAfterFailure(Throwable throwable, Object failingOperation) {
 		Exception exceptionToReport =
-				LuceneSpecificLog.INSTANCE.uncommittedOperationsBecauseOfFailure( throwable.getMessage(), eventContext,
+				LuceneMiscLog.INSTANCE.uncommittedOperationsBecauseOfFailure( throwable.getMessage(), eventContext,
 						throwable );
 		try {
 			close();
 		}
 		catch (RuntimeException | IOException e) {
 			exceptionToReport.addSuppressed(
-					LuceneSpecificLog.INSTANCE.unableToCloseIndexWriterAfterFailures( e.getMessage(), eventContext, e ) );
+					LuceneMiscLog.INSTANCE.unableToCloseIndexWriterAfterFailures( e.getMessage(), eventContext, e ) );
 		}
 
 		/*

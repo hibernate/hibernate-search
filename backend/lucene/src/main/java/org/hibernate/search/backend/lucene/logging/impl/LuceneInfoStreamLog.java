@@ -40,7 +40,7 @@ public interface LuceneInfoStreamLog extends BasicLogger {
 	 *
 	 * @see org.hibernate.search.backend.lucene.cfg.LuceneIndexSettings#IO_WRITER_INFOSTREAM
 	 */
-	String CATEGORY_NAME = "org.hibernate.search.backend.lucene.infostream";
+	String CATEGORY_NAME = "org.hibernate.search.lucene.infostream";
 
 	LuceneInfoStreamLog INSTANCE =
 			LoggerFactory.make( LuceneInfoStreamLog.class, CATEGORY_NAME, MethodHandles.lookup() );

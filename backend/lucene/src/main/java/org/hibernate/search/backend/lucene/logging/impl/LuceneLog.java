@@ -43,8 +43,8 @@ import org.jboss.logging.annotations.ValidIdRanges;
 		@ValidIdRange(min = 353, max = 353)
 })
 public interface LuceneLog
-		extends AnalyzerLog, CommonFailureLog, ConfigurationLog, IndexingLog, LuceneInfoStreamLog, LuceneSpecificLog,
-		MappingLog, QueryLog, SchemaExportLog {
+		extends AnalysisLog, ConfigurationLog, IndexingLog, LuceneInfoStreamLog, LuceneMiscLog,
+		MappingLog, QueryLog {
 
 	// -----------------------------------
 	// Pre-existing messages from Search 5 (engine module)

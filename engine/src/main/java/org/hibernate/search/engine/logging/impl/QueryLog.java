@@ -31,7 +31,7 @@ import org.jboss.logging.annotations.Param;
 
 @CategorizedLogger(
 		category = QueryLog.CATEGORY_NAME,
-		description = "Anything related to queries."
+		description = "Logs related to the queries."
 )
 @MessageLogger(projectCode = MessageConstants.PROJECT_CODE)
 public interface QueryLog {

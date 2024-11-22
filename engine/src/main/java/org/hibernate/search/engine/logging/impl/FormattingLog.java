@@ -25,7 +25,7 @@ import org.jboss.logging.annotations.MessageLogger;
 
 @CategorizedLogger(
 		category = FormattingLog.CATEGORY_NAME,
-		description = "Anything related to parsing/formatting."
+		description = "Logs related to parsing/formatting."
 )
 @MessageLogger(projectCode = MessageConstants.PROJECT_CODE)
 public interface FormattingLog {

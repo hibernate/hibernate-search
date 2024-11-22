@@ -10,7 +10,7 @@ import java.util.Map;
 import org.hibernate.search.backend.elasticsearch.analysis.model.dsl.ElasticsearchAnalysisComponentParametersStep;
 import org.hibernate.search.backend.elasticsearch.analysis.model.dsl.ElasticsearchAnalysisComponentTypeStep;
 import org.hibernate.search.backend.elasticsearch.analysis.model.impl.ElasticsearchAnalysisDefinitionContributor;
-import org.hibernate.search.backend.elasticsearch.logging.impl.AnalyzerLog;
+import org.hibernate.search.backend.elasticsearch.logging.impl.AnalysisLog;
 import org.hibernate.search.backend.elasticsearch.lowlevel.index.analysis.impl.AnalysisDefinition;
 
 import com.google.gson.JsonArray;
@@ -45,7 +45,7 @@ abstract class AbstractElasticsearchAnalysisComponentParametersStep<D extends An
 		}
 		JsonElement previous = parameters.putIfAbsent( name, value );
 		if ( previous != null ) {
-			throw AnalyzerLog.INSTANCE.analysisComponentParameterConflict( name, previous, value );
+			throw AnalysisLog.INSTANCE.analysisComponentParameterConflict( name, previous, value );
 		}
 		return this;
 	}

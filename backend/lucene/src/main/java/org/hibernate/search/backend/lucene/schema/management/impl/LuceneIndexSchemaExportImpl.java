@@ -10,7 +10,7 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 
-import org.hibernate.search.backend.lucene.logging.impl.SchemaExportLog;
+import org.hibernate.search.backend.lucene.logging.impl.LuceneMiscLog;
 import org.hibernate.search.backend.lucene.schema.management.LuceneIndexSchemaExport;
 
 public class LuceneIndexSchemaExportImpl implements LuceneIndexSchemaExport {
@@ -34,7 +34,7 @@ public class LuceneIndexSchemaExportImpl implements LuceneIndexSchemaExport {
 			outputStream.write( EXPORT_MESSAGE );
 		}
 		catch (IOException e) {
-			throw SchemaExportLog.INSTANCE.unableToExportSchema( indexName, e.getMessage(), e );
+			throw LuceneMiscLog.INSTANCE.unableToExportSchema( indexName, e.getMessage(), e );
 		}
 	}
 }

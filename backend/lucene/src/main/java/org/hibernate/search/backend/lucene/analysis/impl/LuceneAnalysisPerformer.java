@@ -9,7 +9,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.hibernate.search.backend.lucene.LuceneBackend;
-import org.hibernate.search.backend.lucene.logging.impl.AnalyzerLog;
+import org.hibernate.search.backend.lucene.logging.impl.AnalysisLog;
 import org.hibernate.search.engine.backend.analysis.AnalysisToken;
 import org.hibernate.search.util.common.AssertionFailure;
 
@@ -29,14 +29,14 @@ public class LuceneAnalysisPerformer {
 
 	public List<? extends AnalysisToken> analyze(String analyzerName, String terms) {
 		Analyzer analyzer = backend.analyzer( analyzerName )
-				.orElseThrow( () -> AnalyzerLog.INSTANCE.noSuchAnalyzer( analyzerName ) );
+				.orElseThrow( () -> AnalysisLog.INSTANCE.noSuchAnalyzer( analyzerName ) );
 
 		return analyze( analyzerName, analyzer, terms );
 	}
 
 	public AnalysisToken normalize(String normalizerName, String terms) {
 		Analyzer analyzer = backend.normalizer( normalizerName )
-				.orElseThrow( () -> AnalyzerLog.INSTANCE.noSuchNormalizer( normalizerName ) );
+				.orElseThrow( () -> AnalysisLog.INSTANCE.noSuchNormalizer( normalizerName ) );
 
 		List<LuceneAnalysisToken> tokens = analyze( normalizerName, analyzer, terms );
 		if ( tokens.size() != 1 ) {
@@ -65,7 +65,7 @@ public class LuceneAnalysisPerformer {
 			}
 		}
 		catch (IOException e) {
-			throw AnalyzerLog.INSTANCE.unableToPerformAnalysisOperation( analyzerName, string, e.getMessage(), e );
+			throw AnalysisLog.INSTANCE.unableToPerformAnalysisOperation( analyzerName, string, e.getMessage(), e );
 		}
 		return tokens;
 	}

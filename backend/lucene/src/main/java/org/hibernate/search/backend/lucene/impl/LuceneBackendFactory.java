@@ -18,7 +18,7 @@ import org.hibernate.search.backend.lucene.cache.QueryCachingConfigurationContex
 import org.hibernate.search.backend.lucene.cache.QueryCachingConfigurer;
 import org.hibernate.search.backend.lucene.cache.impl.LuceneQueryCachingContext;
 import org.hibernate.search.backend.lucene.cfg.LuceneBackendSettings;
-import org.hibernate.search.backend.lucene.logging.impl.AnalyzerLog;
+import org.hibernate.search.backend.lucene.logging.impl.AnalysisLog;
 import org.hibernate.search.backend.lucene.logging.impl.ConfigurationLog;
 import org.hibernate.search.backend.lucene.multitenancy.MultiTenancyStrategyName;
 import org.hibernate.search.backend.lucene.multitenancy.impl.DiscriminatorMultiTenancyStrategy;
@@ -186,7 +186,7 @@ public class LuceneBackendFactory implements BackendFactory {
 			return new LuceneAnalysisDefinitionRegistry( collector );
 		}
 		catch (Exception e) {
-			throw AnalyzerLog.INSTANCE.unableToApplyAnalysisConfiguration( e.getMessage(), e );
+			throw AnalysisLog.INSTANCE.unableToApplyAnalysisConfiguration( e.getMessage(), e );
 		}
 	}
 

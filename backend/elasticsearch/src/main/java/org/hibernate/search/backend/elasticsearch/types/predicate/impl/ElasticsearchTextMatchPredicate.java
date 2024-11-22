@@ -5,7 +5,7 @@
 package org.hibernate.search.backend.elasticsearch.types.predicate.impl;
 
 import org.hibernate.search.backend.elasticsearch.gson.impl.JsonAccessor;
-import org.hibernate.search.backend.elasticsearch.logging.impl.AnalyzerLog;
+import org.hibernate.search.backend.elasticsearch.logging.impl.AnalysisLog;
 import org.hibernate.search.backend.elasticsearch.lowlevel.index.analysis.impl.AnalyzerConstants;
 import org.hibernate.search.backend.elasticsearch.search.common.impl.AbstractElasticsearchCodecAwareSearchQueryElementFactory;
 import org.hibernate.search.backend.elasticsearch.search.common.impl.ElasticsearchSearchIndexScope;
@@ -102,7 +102,7 @@ public class ElasticsearchTextMatchPredicate extends ElasticsearchStandardMatchP
 		@Override
 		public void skipAnalysis() {
 			if ( field.type().hasNormalizerOnAtLeastOneIndex() ) {
-				throw AnalyzerLog.INSTANCE.skipAnalysisOnNormalizedField( absoluteFieldPath,
+				throw AnalysisLog.INSTANCE.skipAnalysisOnNormalizedField( absoluteFieldPath,
 						EventContexts.fromIndexFieldAbsolutePath( absoluteFieldPath ) );
 			}
 

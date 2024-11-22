@@ -32,7 +32,7 @@ import org.hibernate.metamodel.model.domain.EntityDomainType;
 import org.hibernate.models.internal.BasicModelBuildingContextImpl;
 import org.hibernate.models.jandex.internal.JandexModelBuildingContextImpl;
 import org.hibernate.models.spi.SourceModelBuildingContext;
-import org.hibernate.search.mapper.orm.logging.impl.OrmSpecificLog;
+import org.hibernate.search.mapper.orm.logging.impl.OrmMiscLog;
 import org.hibernate.search.mapper.pojo.loading.spi.PojoLoadingTypeContext;
 import org.hibernate.search.util.common.AssertionFailure;
 import org.hibernate.search.util.common.annotation.impl.SuppressForbiddenApis;
@@ -53,7 +53,7 @@ public final class HibernateOrmUtils {
 			return entityManagerFactory.unwrap( SessionFactoryImplementor.class );
 		}
 		catch (IllegalStateException e) {
-			throw OrmSpecificLog.INSTANCE.hibernateSessionFactoryAccessError( e.getMessage(), e );
+			throw OrmMiscLog.INSTANCE.hibernateSessionFactoryAccessError( e.getMessage(), e );
 		}
 	}
 
@@ -62,7 +62,7 @@ public final class HibernateOrmUtils {
 			return entityManager.unwrap( Session.class );
 		}
 		catch (IllegalStateException e) {
-			throw OrmSpecificLog.INSTANCE.hibernateSessionAccessError( e.getMessage(), e );
+			throw OrmMiscLog.INSTANCE.hibernateSessionAccessError( e.getMessage(), e );
 		}
 	}
 
@@ -71,7 +71,7 @@ public final class HibernateOrmUtils {
 			return entityManager.unwrap( SessionImplementor.class );
 		}
 		catch (IllegalStateException e) {
-			throw OrmSpecificLog.INSTANCE.hibernateSessionAccessError( e.getMessage(), e );
+			throw OrmMiscLog.INSTANCE.hibernateSessionAccessError( e.getMessage(), e );
 		}
 	}
 

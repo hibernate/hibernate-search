@@ -16,7 +16,7 @@ import java.util.Optional;
 
 import org.hibernate.search.util.common.AssertionFailure;
 import org.hibernate.search.util.common.impl.Contracts;
-import org.hibernate.search.util.common.logging.impl.CommonFailuresLog;
+import org.hibernate.search.util.common.logging.impl.CommonMiscLog;
 
 /**
  * A representation of generic parameters and their mapped values.
@@ -149,15 +149,15 @@ public final class GenericTypeContext {
 		TypeVariable<? extends Class<?>>[] typeParameters = rawSuperType.getTypeParameters();
 		int typeParametersLength = typeParameters.length;
 		if ( typeParametersLength == 0 ) {
-			throw CommonFailuresLog.INSTANCE.cannotRequestTypeParameterOfUnparameterizedType( resolvedType, rawSuperType,
+			throw CommonMiscLog.INSTANCE.cannotRequestTypeParameterOfUnparameterizedType( resolvedType, rawSuperType,
 					typeParameterIndex );
 		}
 		else if ( typeParametersLength <= typeParameterIndex ) {
-			throw CommonFailuresLog.INSTANCE.typeParameterIndexOutOfBound( resolvedType, rawSuperType, typeParameterIndex,
+			throw CommonMiscLog.INSTANCE.typeParameterIndexOutOfBound( resolvedType, rawSuperType, typeParameterIndex,
 					typeParametersLength );
 		}
 		else if ( typeParameterIndex < 0 ) {
-			throw CommonFailuresLog.INSTANCE.invalidTypeParameterIndex( resolvedType, rawSuperType, typeParameterIndex );
+			throw CommonMiscLog.INSTANCE.invalidTypeParameterIndex( resolvedType, rawSuperType, typeParameterIndex );
 		}
 
 		TypeVariable<?> typeVariable = typeParameters[typeParameterIndex];

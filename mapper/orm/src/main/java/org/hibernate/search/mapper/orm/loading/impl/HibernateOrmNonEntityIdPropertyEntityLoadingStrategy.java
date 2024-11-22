@@ -13,7 +13,7 @@ import org.hibernate.search.mapper.orm.common.impl.HibernateOrmUtils;
 import org.hibernate.search.mapper.orm.loading.spi.HibernateOrmEntityLoadingStrategy;
 import org.hibernate.search.mapper.orm.loading.spi.HibernateOrmLoadingSessionContext;
 import org.hibernate.search.mapper.orm.loading.spi.MutableEntityLoadingOptions;
-import org.hibernate.search.mapper.orm.logging.impl.OrmSpecificLog;
+import org.hibernate.search.mapper.orm.logging.impl.OrmMiscLog;
 import org.hibernate.search.mapper.orm.model.impl.DocumentIdSourceProperty;
 import org.hibernate.search.mapper.orm.search.loading.EntityLoadingCacheLookupStrategy;
 import org.hibernate.search.mapper.pojo.loading.spi.PojoLoadingTypeContext;
@@ -134,7 +134,7 @@ public class HibernateOrmNonEntityIdPropertyEntityLoadingStrategy<E, I>
 			 * because this setting may still be relevant for other entity types targeted by the same query.
 			 * Let's log something, at least.
 			 */
-			OrmSpecificLog.INSTANCE.skippingPreliminaryCacheLookupsForNonEntityIdEntityLoader(
+			OrmMiscLog.INSTANCE.skippingPreliminaryCacheLookupsForNonEntityIdEntityLoader(
 					targetEntityTypeContext.entityName(), cacheLookupStrategy
 			);
 		}

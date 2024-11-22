@@ -10,7 +10,7 @@ import org.hibernate.engine.spi.EntityKey;
 import org.hibernate.engine.spi.SessionImplementor;
 import org.hibernate.metamodel.mapping.EntityMappingType;
 import org.hibernate.persister.entity.EntityPersister;
-import org.hibernate.search.mapper.orm.logging.impl.OrmSpecificLog;
+import org.hibernate.search.mapper.orm.logging.impl.OrmMiscLog;
 import org.hibernate.search.util.common.annotation.impl.SuppressForbiddenApis;
 
 /**
@@ -33,7 +33,7 @@ class PersistenceContextThenSecondLevelCacheLookupStrategy
 		EntityDataAccess cacheAccess = entityPersister.getCacheAccessStrategy();
 		if ( cacheAccess == null ) {
 			// No second-level cache
-			OrmSpecificLog.INSTANCE.skippingSecondLevelCacheLookupsForNonCachedEntityTypeEntityLoader(
+			OrmMiscLog.INSTANCE.skippingSecondLevelCacheLookupsForNonCachedEntityTypeEntityLoader(
 					entityPersister.getEntityName() );
 			return persistenceContextLookupStrategy;
 		}

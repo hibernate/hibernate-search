@@ -19,7 +19,7 @@ import org.hibernate.engine.spi.SharedSessionContractImplementor;
 import org.hibernate.engine.transaction.jta.platform.spi.JtaPlatform;
 import org.hibernate.resource.transaction.spi.TransactionCoordinatorBuilder;
 import org.hibernate.search.mapper.orm.common.impl.HibernateOrmUtils;
-import org.hibernate.search.mapper.orm.logging.impl.OrmSpecificLog;
+import org.hibernate.search.mapper.orm.logging.impl.OrmMiscLog;
 import org.hibernate.service.spi.ServiceRegistryImplementor;
 
 /**
@@ -84,7 +84,7 @@ public final class TransactionHelper {
 		}
 		// Just let runtime exceptions fall through
 		catch (NotSupportedException | SystemException e) {
-			throw OrmSpecificLog.INSTANCE.transactionHandlingException( e.getMessage(), e );
+			throw OrmMiscLog.INSTANCE.transactionHandlingException( e.getMessage(), e );
 		}
 	}
 
@@ -99,7 +99,7 @@ public final class TransactionHelper {
 		}
 		// Just let runtime exceptions fall through
 		catch (SystemException | RollbackException | HeuristicMixedException | HeuristicRollbackException e) {
-			throw OrmSpecificLog.INSTANCE.transactionHandlingException( e.getMessage(), e );
+			throw OrmMiscLog.INSTANCE.transactionHandlingException( e.getMessage(), e );
 		}
 	}
 
@@ -122,7 +122,7 @@ public final class TransactionHelper {
 			}
 		}
 		catch (Exception e) {
-			throw OrmSpecificLog.INSTANCE.transactionHandlingException( e.getMessage(), e );
+			throw OrmMiscLog.INSTANCE.transactionHandlingException( e.getMessage(), e );
 		}
 	}
 
@@ -130,25 +130,25 @@ public final class TransactionHelper {
 			TransactionCoordinatorBuilder transactionCoordinatorBuilder) {
 		if ( !transactionCoordinatorBuilder.isJta() ) {
 			//Today we only require a TransactionManager on JTA based transaction factories
-			OrmSpecificLog.INSTANCE.transactionManagerNotRequired();
+			OrmMiscLog.INSTANCE.transactionManagerNotRequired();
 			return false;
 		}
 		if ( transactionManager == null ) {
 			//no TM, nothing to do OR configuration mistake
-			OrmSpecificLog.INSTANCE.transactionManagerNotFound();
+			OrmMiscLog.INSTANCE.transactionManagerNotFound();
 			return false;
 		}
 		try {
 			if ( transactionManager.getStatus() == Status.STATUS_NO_TRANSACTION ) {
-				OrmSpecificLog.INSTANCE.noInProgressTransaction();
+				OrmMiscLog.INSTANCE.noInProgressTransaction();
 				return true;
 			}
 		}
 		catch (SystemException e) {
-			OrmSpecificLog.INSTANCE.cannotGuessTransactionStatus( e );
+			OrmMiscLog.INSTANCE.cannotGuessTransactionStatus( e );
 			return false;
 		}
-		OrmSpecificLog.INSTANCE.transactionAlreadyInProgress();
+		OrmMiscLog.INSTANCE.transactionAlreadyInProgress();
 		return false;
 	}
 }

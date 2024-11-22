@@ -19,9 +19,7 @@ import org.jboss.logging.annotations.ValidIdRanges;
 @ValidIdRanges({
 		@ValidIdRange(min = MessageConstants.ENGINE_ID_RANGE_MIN, max = MessageConstants.ENGINE_ID_RANGE_MAX),
 })
-public interface EngineLog
-		extends BackendLog, BeanLog, CommonFailureLog, ConfigurationLog, ExecutorLog, FormattingLog, MappingLog,
-		QueryLog {
+public interface EngineLog extends EngineMiscLog, ConfigurationLog, ExecutorLog, FormattingLog, MappingLog, QueryLog {
 
 	// -----------------------------------
 	// Pre-existing messages from Search 5 (engine module)

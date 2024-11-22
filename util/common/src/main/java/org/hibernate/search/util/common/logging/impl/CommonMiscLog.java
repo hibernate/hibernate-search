@@ -31,21 +31,21 @@ import org.jboss.logging.annotations.ValidIdRange;
 import org.jboss.logging.annotations.ValidIdRanges;
 
 @CategorizedLogger(
-		category = CommonFailuresLog.CATEGORY_NAME,
+		category = CommonMiscLog.CATEGORY_NAME,
 		description = """
-				Logs information on various non-critical errors related to parsing the Jandex index
-				or on low-level executor operations like canceling tasks etc.
+				The root category for any Hibernate Search logs.
+				It may also include logs that do not fit any other, more specific, logging category.
 				"""
 )
 @MessageLogger(projectCode = MessageConstants.PROJECT_CODE)
 @ValidIdRanges({
 		@ValidIdRange(min = MessageConstants.UTIL_ID_RANGE_MIN, max = MessageConstants.UTIL_ID_RANGE_MAX),
 })
-public interface CommonFailuresLog {
+public interface CommonMiscLog {
 
-	String CATEGORY_NAME = "org.hibernate.search.common.failures";
+	String CATEGORY_NAME = "org.hibernate.search";
 
-	CommonFailuresLog INSTANCE = LoggerFactory.make( CommonFailuresLog.class, CATEGORY_NAME, MethodHandles.lookup() );
+	CommonMiscLog INSTANCE = LoggerFactory.make( CommonMiscLog.class, CATEGORY_NAME, MethodHandles.lookup() );
 
 	// -----------------------------------
 	// New messages from Search 6 onwards

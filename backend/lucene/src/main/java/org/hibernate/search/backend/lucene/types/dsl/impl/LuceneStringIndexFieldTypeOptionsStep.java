@@ -11,7 +11,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 import org.hibernate.search.backend.lucene.analysis.model.impl.LuceneAnalysisDefinitionRegistry;
-import org.hibernate.search.backend.lucene.logging.impl.AnalyzerLog;
+import org.hibernate.search.backend.lucene.logging.impl.AnalysisLog;
 import org.hibernate.search.backend.lucene.logging.impl.MappingLog;
 import org.hibernate.search.backend.lucene.lowlevel.common.impl.AnalyzerConstants;
 import org.hibernate.search.backend.lucene.search.predicate.impl.LucenePredicateTypeKeys;
@@ -79,7 +79,7 @@ class LuceneStringIndexFieldTypeOptionsStep
 		this.analyzerName = analyzerName;
 		this.analyzer = getAnalysisDefinitionRegistry().getAnalyzerDefinition( analyzerName );
 		if ( analyzer == null ) {
-			throw AnalyzerLog.INSTANCE.unknownAnalyzer( analyzerName, buildContext.getEventContext() );
+			throw AnalysisLog.INSTANCE.unknownAnalyzer( analyzerName, buildContext.getEventContext() );
 		}
 		return this;
 	}
@@ -89,7 +89,7 @@ class LuceneStringIndexFieldTypeOptionsStep
 		this.searchAnalyzerName = searchAnalyzerName;
 		this.searchAnalyzer = getAnalysisDefinitionRegistry().getAnalyzerDefinition( searchAnalyzerName );
 		if ( searchAnalyzer == null ) {
-			throw AnalyzerLog.INSTANCE.unknownAnalyzer( searchAnalyzerName, buildContext.getEventContext() );
+			throw AnalysisLog.INSTANCE.unknownAnalyzer( searchAnalyzerName, buildContext.getEventContext() );
 		}
 		return this;
 	}
@@ -99,7 +99,7 @@ class LuceneStringIndexFieldTypeOptionsStep
 		this.normalizerName = normalizerName;
 		this.normalizer = getAnalysisDefinitionRegistry().getNormalizerDefinition( normalizerName );
 		if ( normalizer == null ) {
-			throw AnalyzerLog.INSTANCE.unknownNormalizer( normalizerName, buildContext.getEventContext() );
+			throw AnalysisLog.INSTANCE.unknownNormalizer( normalizerName, buildContext.getEventContext() );
 		}
 		return this;
 	}
@@ -155,21 +155,21 @@ class LuceneStringIndexFieldTypeOptionsStep
 			}
 
 			if ( resolvedSortable ) {
-				throw AnalyzerLog.INSTANCE.cannotUseAnalyzerOnSortableField( analyzerName, buildContext.getEventContext() );
+				throw AnalysisLog.INSTANCE.cannotUseAnalyzerOnSortableField( analyzerName, buildContext.getEventContext() );
 			}
 
 			if ( normalizer != null ) {
-				throw AnalyzerLog.INSTANCE.cannotApplyAnalyzerAndNormalizer( analyzerName, normalizerName,
+				throw AnalysisLog.INSTANCE.cannotApplyAnalyzerAndNormalizer( analyzerName, normalizerName,
 						buildContext.getEventContext() );
 			}
 
 			if ( indexNullAsValue != null ) {
-				throw AnalyzerLog.INSTANCE.cannotUseIndexNullAsAndAnalyzer( analyzerName, indexNullAsValue,
+				throw AnalysisLog.INSTANCE.cannotUseIndexNullAsAndAnalyzer( analyzerName, indexNullAsValue,
 						buildContext.getEventContext() );
 			}
 
 			if ( resolvedAggregable ) {
-				throw AnalyzerLog.INSTANCE.cannotUseAnalyzerOnAggregableField( analyzerName, buildContext.getEventContext() );
+				throw AnalysisLog.INSTANCE.cannotUseAnalyzerOnAggregableField( analyzerName, buildContext.getEventContext() );
 			}
 		}
 		else {
@@ -185,7 +185,7 @@ class LuceneStringIndexFieldTypeOptionsStep
 			}
 
 			if ( searchAnalyzer != null ) {
-				throw AnalyzerLog.INSTANCE.searchAnalyzerWithoutAnalyzer( searchAnalyzerName, buildContext.getEventContext() );
+				throw AnalysisLog.INSTANCE.searchAnalyzerWithoutAnalyzer( searchAnalyzerName, buildContext.getEventContext() );
 			}
 		}
 

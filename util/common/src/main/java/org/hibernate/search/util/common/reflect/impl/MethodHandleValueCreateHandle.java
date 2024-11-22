@@ -8,7 +8,7 @@ import java.lang.invoke.MethodHandle;
 import java.lang.reflect.Member;
 
 import org.hibernate.search.util.common.impl.Throwables;
-import org.hibernate.search.util.common.logging.impl.CommonFailuresLog;
+import org.hibernate.search.util.common.logging.impl.CommonMiscLog;
 import org.hibernate.search.util.common.reflect.spi.ValueCreateHandle;
 
 public final class MethodHandleValueCreateHandle<T> implements ValueCreateHandle<T> {
@@ -53,7 +53,7 @@ public final class MethodHandleValueCreateHandle<T> implements ValueCreateHandle
 			if ( e instanceof InterruptedException ) {
 				Thread.currentThread().interrupt();
 			}
-			throw CommonFailuresLog.INSTANCE.errorInvokingStaticMember( member, Throwables.safeToString( e, arguments ), e,
+			throw CommonMiscLog.INSTANCE.errorInvokingStaticMember( member, Throwables.safeToString( e, arguments ), e,
 					e.getMessage() );
 		}
 	}

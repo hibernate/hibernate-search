@@ -25,7 +25,7 @@ import org.jboss.logging.annotations.MessageLogger;
 )
 @MessageLogger(projectCode = MessageConstants.PROJECT_CODE)
 public interface VersionLog {
-	String CATEGORY_NAME = "org.hibernate.search.version";
+	String CATEGORY_NAME = "org.hibernate.search.version.orm";
 
 	VersionLog INSTANCE = LoggerFactory.make( VersionLog.class, CATEGORY_NAME, MethodHandles.lookup() );
 

@@ -10,7 +10,7 @@ import java.util.concurrent.CompletableFuture;
 
 import org.hibernate.search.backend.lucene.cfg.LuceneIndexSettings;
 import org.hibernate.search.backend.lucene.document.model.impl.LuceneIndexModel;
-import org.hibernate.search.backend.lucene.logging.impl.LuceneSpecificLog;
+import org.hibernate.search.backend.lucene.logging.impl.LuceneMiscLog;
 import org.hibernate.search.backend.lucene.lowlevel.directory.impl.DirectoryCreationContextImpl;
 import org.hibernate.search.backend.lucene.lowlevel.directory.spi.DirectoryCreationContext;
 import org.hibernate.search.backend.lucene.lowlevel.directory.spi.DirectoryHolder;
@@ -91,7 +91,7 @@ public final class Shard {
 			}
 		}
 		catch (IOException | RuntimeException e) {
-			throw LuceneSpecificLog.INSTANCE.unableToStartShard( e.getMessage(), e );
+			throw LuceneMiscLog.INSTANCE.unableToStartShard( e.getMessage(), e );
 		}
 	}
 
@@ -111,7 +111,7 @@ public final class Shard {
 			indexingOrchestrator.start( propertySource );
 		}
 		catch (RuntimeException e) {
-			throw LuceneSpecificLog.INSTANCE.unableToStartShard( e.getMessage(), e );
+			throw LuceneMiscLog.INSTANCE.unableToStartShard( e.getMessage(), e );
 		}
 	}
 
@@ -130,7 +130,7 @@ public final class Shard {
 			}
 		}
 		catch (RuntimeException | IOException e) {
-			throw LuceneSpecificLog.INSTANCE.unableToShutdownShard(
+			throw LuceneMiscLog.INSTANCE.unableToShutdownShard(
 					e.getMessage(),
 					shardId.map( EventContexts::fromShardId ).orElse( null ),
 					e

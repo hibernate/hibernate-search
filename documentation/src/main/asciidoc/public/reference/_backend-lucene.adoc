@@ -1041,7 +1041,7 @@ When used together with `max_buffered_docs` a flush occurs for whichever event h
 |Enables low level trace information about Lucene's internal components; `true` or `false`.
 
 Logs will be appended to the logger
-<<troubleshooting-logging-lucene-infostream,`org.hibernate.search.backend.lucene.infostream`>> at the `TRACE` level.
+<<troubleshooting-logging-lucene-infostream,`org.hibernate.search.lucene.infostream`>> at the `TRACE` level.
 
 This may cause significant performance degradation, even if the logger ignores the TRACE level,
 so this should only be used for troubleshooting purposes.

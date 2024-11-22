@@ -21,7 +21,7 @@ import org.hibernate.models.spi.ClassDetailsRegistry;
 import org.hibernate.resource.beans.container.spi.ExtendedBeanManager;
 import org.hibernate.search.mapper.orm.bootstrap.spi.HibernateOrmIntegrationBooter;
 import org.hibernate.search.mapper.orm.common.impl.HibernateOrmUtils;
-import org.hibernate.search.mapper.orm.logging.impl.CommonFailureLog;
+import org.hibernate.search.mapper.orm.logging.impl.OrmMiscLog;
 import org.hibernate.search.mapper.orm.mapping.impl.HibernateSearchContextProviderService;
 import org.hibernate.search.mapper.orm.spi.EnvironmentSynchronizer;
 import org.hibernate.search.util.common.AssertionFailure;
@@ -165,7 +165,7 @@ public class HibernateOrmIntegrationBooterImpl implements HibernateOrmIntegratio
 				// to skip further cleanup of other resources.
 				.whenComplete( Futures.handler( (ignored, throwable) -> {
 					if ( throwable != null ) {
-						CommonFailureLog.INSTANCE.shutdownFailed( throwable );
+						OrmMiscLog.INSTANCE.shutdownFailed( throwable );
 					}
 				} ) );
 

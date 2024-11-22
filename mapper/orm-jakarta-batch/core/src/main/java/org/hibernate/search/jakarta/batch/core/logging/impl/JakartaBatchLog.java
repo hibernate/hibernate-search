@@ -30,7 +30,7 @@ import org.jboss.logging.annotations.ValidIdRanges;
 @CategorizedLogger(
 		category = JakartaBatchLog.CATEGORY_NAME,
 		description = """
-				Logs debug information on various batch indexing operations.
+				Logs related to the batch indexing operations.
 				"""
 )
 @MessageLogger(projectCode = MessageConstants.PROJECT_CODE)

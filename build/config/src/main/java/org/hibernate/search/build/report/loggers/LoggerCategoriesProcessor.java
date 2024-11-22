@@ -45,7 +45,7 @@ import org.yaml.snakeyaml.Yaml;
 public class LoggerCategoriesProcessor extends AbstractProcessor {
 
 	private Messager messager;
-	private final Map<String, Set<String>> categories = new TreeMap<>();
+	private final Map<String, String> categories = new TreeMap<>();
 	private final Map<String, Set<String>> categoryLevels = new TreeMap<>();
 	private String moduleName;
 
@@ -76,9 +76,12 @@ public class LoggerCategoriesProcessor extends AbstractProcessor {
 								String category = getAnnotationValueAsString( mirror, "category" );
 								String description = getAnnotationValueAsString( mirror, "description" );
 
-								Set<String> descriptions = categories.computeIfAbsent( category, k -> new TreeSet<>() );
 								if ( description != null && !description.isBlank() ) {
-									descriptions.add( description );
+									if ( categories.put( category, description ) != null ) {
+										messager.printMessage( Diagnostic.Kind.ERROR,
+												"Logging category %sis already defined in this module. Failed on logger: %s"
+														.formatted( category, logger ) );
+									}
 								}
 								else {
 									messager.printMessage( Diagnostic.Kind.WARNING,
@@ -137,12 +140,12 @@ public class LoggerCategoriesProcessor extends AbstractProcessor {
 		return false;
 	}
 
-	private List<Map<String, Object>> toYamlCategories(Map<String, Set<String>> categories, Map<String, Set<String>> levels) {
+	private List<Map<String, Object>> toYamlCategories(Map<String, String> categories, Map<String, Set<String>> levels) {
 		List<Map<String, Object>> values = new ArrayList<>();
 		for ( var entry : categories.entrySet() ) {
 			Map<String, Object> value = new HashMap<>();
 			value.put( ReportConstants.CATEGORY_NAME, entry.getKey() );
-			value.put( ReportConstants.CATEGORY_DESCRIPTION, new ArrayList<>( entry.getValue() ) );
+			value.put( ReportConstants.CATEGORY_DESCRIPTION, entry.getValue() );
 			value.put( ReportConstants.LOG_LEVELS, new ArrayList<>( levels.getOrDefault( entry.getKey(), Set.of() ) ) );
 
 			values.add( value );

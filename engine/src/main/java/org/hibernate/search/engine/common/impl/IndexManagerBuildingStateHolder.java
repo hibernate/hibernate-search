@@ -24,7 +24,7 @@ import org.hibernate.search.engine.cfg.spi.OptionalConfigurationProperty;
 import org.hibernate.search.engine.environment.bean.BeanHolder;
 import org.hibernate.search.engine.environment.bean.BeanReference;
 import org.hibernate.search.engine.environment.bean.BeanResolver;
-import org.hibernate.search.engine.logging.impl.BackendLog;
+import org.hibernate.search.engine.logging.impl.ConfigurationLog;
 import org.hibernate.search.engine.logging.impl.MappingLog;
 import org.hibernate.search.engine.mapper.mapping.building.impl.IndexManagerBuildingState;
 import org.hibernate.search.engine.mapper.mapping.building.spi.BackendsInfo;
@@ -138,10 +138,11 @@ class IndexManagerBuildingStateHolder {
 		Map<String, BeanReference<BackendFactory>> referencesByName = beanResolver.namedConfiguredForRole(
 				BackendFactory.class );
 		if ( referencesByName.isEmpty() ) {
-			throw BackendLog.INSTANCE.noBackendFactoryRegistered( BACKEND_TYPE.resolveOrRaw( backendPropertySource ) );
+			throw ConfigurationLog.INSTANCE.noBackendFactoryRegistered( BACKEND_TYPE.resolveOrRaw( backendPropertySource ) );
 		}
 		else if ( referencesByName.size() > 1 ) {
-			throw BackendLog.INSTANCE.multipleBackendFactoriesRegistered( BACKEND_TYPE.resolveOrRaw( backendPropertySource ),
+			throw ConfigurationLog.INSTANCE.multipleBackendFactoriesRegistered(
+					BACKEND_TYPE.resolveOrRaw( backendPropertySource ),
 					referencesByName.keySet() );
 		}
 		return referencesByName.values().iterator().next().resolve( beanResolver );

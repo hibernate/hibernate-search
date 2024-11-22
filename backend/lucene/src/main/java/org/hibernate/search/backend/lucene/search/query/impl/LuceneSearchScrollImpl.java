@@ -8,7 +8,7 @@ import java.io.IOException;
 import java.util.Collections;
 import java.util.Set;
 
-import org.hibernate.search.backend.lucene.logging.impl.LuceneSpecificLog;
+import org.hibernate.search.backend.lucene.logging.impl.LuceneMiscLog;
 import org.hibernate.search.backend.lucene.logging.impl.QueryLog;
 import org.hibernate.search.backend.lucene.lowlevel.reader.impl.HibernateSearchMultiReader;
 import org.hibernate.search.backend.lucene.orchestration.impl.LuceneSyncWorkOrchestrator;
@@ -66,7 +66,7 @@ public class LuceneSearchScrollImpl<H> implements LuceneSearchScroll<H> {
 			indexReader.close();
 		}
 		catch (IOException | RuntimeException e) {
-			LuceneSpecificLog.INSTANCE.unableToCloseIndexReader(
+			LuceneMiscLog.INSTANCE.unableToCloseIndexReader(
 					EventContexts.fromIndexNames( scope.hibernateSearchIndexNames() ),
 					e );
 		}

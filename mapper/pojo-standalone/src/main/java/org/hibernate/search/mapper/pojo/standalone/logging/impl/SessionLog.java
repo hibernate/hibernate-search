@@ -21,7 +21,7 @@ import org.jboss.logging.annotations.MessageLogger;
 )
 @MessageLogger(projectCode = MessageConstants.PROJECT_CODE)
 public interface SessionLog {
-	String CATEGORY_NAME = "org.hibernate.search.session";
+	String CATEGORY_NAME = "org.hibernate.search.mapper.standalone.session";
 
 	SessionLog INSTANCE = LoggerFactory.make( SessionLog.class, CATEGORY_NAME, MethodHandles.lookup() );
 

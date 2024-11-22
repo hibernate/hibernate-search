@@ -12,7 +12,7 @@ import org.hibernate.search.backend.lucene.analysis.impl.LuceneAnalysisComponent
 import org.hibernate.search.backend.lucene.analysis.model.dsl.LuceneAnalysisComponentParametersStep;
 import org.hibernate.search.backend.lucene.analysis.model.dsl.LuceneAnalyzerOptionalComponentsStep;
 import org.hibernate.search.backend.lucene.analysis.model.dsl.LuceneAnalyzerTokenizerStep;
-import org.hibernate.search.backend.lucene.logging.impl.AnalyzerLog;
+import org.hibernate.search.backend.lucene.logging.impl.AnalysisLog;
 
 import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.analysis.CharFilterFactory;
@@ -87,7 +87,7 @@ class LuceneAnalyzerComponentsStep
 			);
 		}
 		catch (IOException | RuntimeException e) {
-			throw AnalyzerLog.INSTANCE.unableToCreateAnalyzer( name, e.getMessage(), e );
+			throw AnalysisLog.INSTANCE.unableToCreateAnalyzer( name, e.getMessage(), e );
 		}
 	}
 

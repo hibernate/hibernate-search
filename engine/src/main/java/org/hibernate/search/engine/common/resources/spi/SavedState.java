@@ -9,7 +9,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 
-import org.hibernate.search.engine.logging.impl.CommonFailureLog;
+import org.hibernate.search.engine.logging.impl.EngineMiscLog;
 import org.hibernate.search.util.common.impl.Closer;
 import org.hibernate.search.util.common.impl.Contracts;
 import org.hibernate.search.util.common.impl.Throwables;
@@ -94,7 +94,7 @@ public class SavedState implements AutoCloseable {
 					entry.getValue().close();
 				}
 				catch (RuntimeException e) {
-					throw CommonFailureLog.INSTANCE.unableToCloseSavedValue( Throwables.safeToString( e, entry.toString() ),
+					throw EngineMiscLog.INSTANCE.unableToCloseSavedValue( Throwables.safeToString( e, entry.toString() ),
 							e.getMessage(), e );
 				}
 			}, map.entrySet() );
@@ -153,7 +153,7 @@ public class SavedState implements AutoCloseable {
 				closingOperator.close( value );
 			}
 			catch (Exception e) {
-				throw CommonFailureLog.INSTANCE.unableToCloseSavedValue( key.name, e.getMessage(), e );
+				throw EngineMiscLog.INSTANCE.unableToCloseSavedValue( key.name, e.getMessage(), e );
 			}
 		}
 	}

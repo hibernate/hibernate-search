@@ -34,12 +34,12 @@ import org.apache.lucene.util.Version;
 @CategorizedLogger(
 		category = ConfigurationLog.CATEGORY_NAME,
 		description = """
-				Logs information on the Lucene compatibility version used in the index.
+				Logs related to the Lucene-specific backend configuration.
 				"""
 )
 @MessageLogger(projectCode = MessageConstants.PROJECT_CODE)
 public interface ConfigurationLog extends BasicLogger {
-	String CATEGORY_NAME = "org.hibernate.search.configuration";
+	String CATEGORY_NAME = "org.hibernate.search.configuration.lucene";
 
 	ConfigurationLog INSTANCE = LoggerFactory.make( ConfigurationLog.class, CATEGORY_NAME, MethodHandles.lookup() );
 

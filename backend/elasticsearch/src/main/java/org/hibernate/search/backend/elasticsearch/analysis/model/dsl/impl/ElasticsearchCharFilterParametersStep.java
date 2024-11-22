@@ -5,7 +5,7 @@
 package org.hibernate.search.backend.elasticsearch.analysis.model.dsl.impl;
 
 import org.hibernate.search.backend.elasticsearch.analysis.model.impl.ElasticsearchAnalysisDefinitionCollector;
-import org.hibernate.search.backend.elasticsearch.logging.impl.AnalyzerLog;
+import org.hibernate.search.backend.elasticsearch.logging.impl.AnalysisLog;
 import org.hibernate.search.backend.elasticsearch.lowlevel.index.analysis.impl.CharFilterDefinition;
 import org.hibernate.search.util.common.impl.StringHelper;
 
@@ -19,7 +19,7 @@ class ElasticsearchCharFilterParametersStep
 	@Override
 	public void contribute(ElasticsearchAnalysisDefinitionCollector collector) {
 		if ( StringHelper.isEmpty( definition.getType() ) ) {
-			throw AnalyzerLog.INSTANCE.invalidElasticsearchCharFilterDefinition( name );
+			throw AnalysisLog.INSTANCE.invalidElasticsearchCharFilterDefinition( name );
 		}
 		collector.collect( name, definition );
 	}

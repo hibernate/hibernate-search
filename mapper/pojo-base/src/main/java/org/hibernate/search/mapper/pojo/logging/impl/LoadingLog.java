@@ -22,7 +22,7 @@ import org.jboss.logging.annotations.MessageLogger;
 )
 @MessageLogger(projectCode = MessageConstants.PROJECT_CODE)
 public interface LoadingLog {
-	String CATEGORY_NAME = "org.hibernate.search.mapper.loading";
+	String CATEGORY_NAME = "org.hibernate.search.loading.mapper";
 
 	LoadingLog INSTANCE = LoggerFactory.make( LoadingLog.class, CATEGORY_NAME, MethodHandles.lookup() );
 

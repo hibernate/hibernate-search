@@ -6,7 +6,7 @@ package org.hibernate.search.backend.elasticsearch.index.layout.impl;
 
 import java.util.Locale;
 
-import org.hibernate.search.backend.elasticsearch.logging.impl.MappingLog;
+import org.hibernate.search.backend.elasticsearch.logging.impl.ElasticsearchMiscLog;
 import org.hibernate.search.backend.elasticsearch.util.spi.URLEncodedString;
 
 public final class IndexNames {
@@ -14,7 +14,7 @@ public final class IndexNames {
 	public static String normalizeName(String indexName) {
 		String esIndexName = indexName.toLowerCase( Locale.ENGLISH );
 		if ( !esIndexName.equals( indexName ) ) {
-			MappingLog.INSTANCE.normalizeIndexName( indexName, esIndexName );
+			ElasticsearchMiscLog.INSTANCE.normalizeIndexName( indexName, esIndexName );
 		}
 		return esIndexName;
 	}

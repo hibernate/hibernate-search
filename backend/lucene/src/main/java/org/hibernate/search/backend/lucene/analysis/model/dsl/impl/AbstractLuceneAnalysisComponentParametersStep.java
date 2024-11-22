@@ -9,7 +9,7 @@ import java.util.Map;
 
 import org.hibernate.search.backend.lucene.analysis.model.dsl.LuceneAnalysisComponentParametersStep;
 import org.hibernate.search.backend.lucene.analysis.model.dsl.LuceneAnalysisOptionalComponentsStep;
-import org.hibernate.search.backend.lucene.logging.impl.AnalyzerLog;
+import org.hibernate.search.backend.lucene.logging.impl.AnalysisLog;
 
 import org.apache.lucene.analysis.CharFilterFactory;
 import org.apache.lucene.analysis.TokenFilterFactory;
@@ -29,7 +29,7 @@ abstract class AbstractLuceneAnalysisComponentParametersStep<T>
 	public LuceneAnalysisComponentParametersStep param(String name, String value) {
 		String previous = params.putIfAbsent( name, value );
 		if ( previous != null ) {
-			throw AnalyzerLog.INSTANCE.analysisComponentParameterConflict( name, previous, value );
+			throw AnalysisLog.INSTANCE.analysisComponentParameterConflict( name, previous, value );
 		}
 		return this;
 	}

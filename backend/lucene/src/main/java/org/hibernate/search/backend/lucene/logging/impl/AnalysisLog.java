@@ -26,16 +26,17 @@ import org.jboss.logging.annotations.MessageLogger;
 import org.jboss.logging.annotations.Param;
 
 @CategorizedLogger(
-		category = AnalyzerLog.CATEGORY_NAME,
+		category = AnalysisLog.CATEGORY_NAME,
 		description = """
-				Logs information on misconfigured or misbehaving analyzers/normalisers.
+				Logs related to the analysis specific to the Lucene backend.
+				May include information on misconfigured or misbehaving analyzers/normalisers.
 				"""
 )
 @MessageLogger(projectCode = MessageConstants.PROJECT_CODE)
-public interface AnalyzerLog {
-	String CATEGORY_NAME = "org.hibernate.search.analyzer";
+public interface AnalysisLog {
+	String CATEGORY_NAME = "org.hibernate.search.analysis.lucene";
 
-	AnalyzerLog INSTANCE = LoggerFactory.make( AnalyzerLog.class, CATEGORY_NAME, MethodHandles.lookup() );
+	AnalysisLog INSTANCE = LoggerFactory.make( AnalysisLog.class, CATEGORY_NAME, MethodHandles.lookup() );
 
 	// -----------------------------------
 	// Pre-existing messages from Search 5 (engine module)

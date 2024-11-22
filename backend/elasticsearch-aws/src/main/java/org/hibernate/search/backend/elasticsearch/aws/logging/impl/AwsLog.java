@@ -32,11 +32,7 @@ import software.amazon.awssdk.regions.Region;
 @CategorizedLogger(
 		category = AwsLog.CATEGORY_NAME,
 		description = """
-				Provides trace/debug level logs on signing requests sent to an AWS Elasticsearch cluster.
-				+
-				Let the user know whether the request signing is enabled or disabled.
-				+
-				Can log the request before and after signing to help debug any issues with AWS Elasticsearch cluster communication.
+				Logs related to the AWS integration of the Elasticsearch backend.
 				"""
 )
 @MessageLogger(projectCode = MessageConstants.PROJECT_CODE)
@@ -46,7 +42,7 @@ import software.amazon.awssdk.regions.Region;
 })
 public interface AwsLog extends BasicLogger {
 
-	String CATEGORY_NAME = "org.hibernate.search.backend.elasticsearch.aws";
+	String CATEGORY_NAME = "org.hibernate.search.elasticsearch.aws";
 
 	AwsLog INSTANCE = LoggerFactory.make( AwsLog.class, CATEGORY_NAME, MethodHandles.lookup() );
 

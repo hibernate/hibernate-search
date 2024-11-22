@@ -10,8 +10,7 @@ import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 
 import org.hibernate.search.backend.lucene.cache.impl.LuceneQueryCachingContext;
-import org.hibernate.search.backend.lucene.logging.impl.CommonFailureLog;
-import org.hibernate.search.backend.lucene.logging.impl.LuceneSpecificLog;
+import org.hibernate.search.backend.lucene.logging.impl.LuceneMiscLog;
 import org.hibernate.search.backend.lucene.lowlevel.reader.impl.HibernateSearchMultiReader;
 import org.hibernate.search.backend.lucene.lowlevel.reader.impl.IndexReaderMetadataResolver;
 import org.hibernate.search.backend.lucene.lowlevel.reader.impl.ReadIndexManagerContext;
@@ -80,7 +79,7 @@ public class LuceneSyncWorkOrchestratorImpl
 	@Override
 	protected void doSubmit(WorkExecution<?> work, OperationSubmitter operationSubmitter) {
 		if ( !OperationSubmitter.blocking().equals( operationSubmitter ) ) {
-			throw CommonFailureLog.INSTANCE.nonblockingOperationSubmitterNotSupported();
+			throw LuceneMiscLog.INSTANCE.nonblockingOperationSubmitterNotSupported();
 		}
 		work.execute();
 	}
@@ -165,7 +164,7 @@ public class LuceneSyncWorkOrchestratorImpl
 				indexReader.close();
 			}
 			catch (IOException | RuntimeException e) {
-				LuceneSpecificLog.INSTANCE.unableToCloseIndexReader( getEventContext(), e );
+				LuceneMiscLog.INSTANCE.unableToCloseIndexReader( getEventContext(), e );
 			}
 		}
 	}

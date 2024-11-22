@@ -10,7 +10,7 @@ import org.hibernate.search.engine.environment.bean.BeanResolver;
 import org.hibernate.search.engine.search.common.NamedValues;
 import org.hibernate.search.engine.search.common.spi.MapNamedValues;
 import org.hibernate.search.mapper.pojo.bridge.binding.BindingContext;
-import org.hibernate.search.mapper.pojo.logging.impl.CommonFailureLog;
+import org.hibernate.search.mapper.pojo.logging.impl.PojoMapperMiscLog;
 
 abstract class AbstractBindingContext implements BindingContext {
 
@@ -19,7 +19,7 @@ abstract class AbstractBindingContext implements BindingContext {
 
 	AbstractBindingContext(BeanResolver beanResolver, Map<String, Object> params) {
 		this.beanResolver = beanResolver;
-		this.params = MapNamedValues.fromMap( params, CommonFailureLog.INSTANCE::paramNotDefined );
+		this.params = MapNamedValues.fromMap( params, PojoMapperMiscLog.INSTANCE::paramNotDefined );
 	}
 
 	@Override

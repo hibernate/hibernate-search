@@ -23,7 +23,7 @@ import org.jboss.logging.annotations.MessageLogger;
 )
 @MessageLogger(projectCode = MessageConstants.PROJECT_CODE)
 public interface ConfigurationLog {
-	String CATEGORY_NAME = "org.hibernate.search.configuration";
+	String CATEGORY_NAME = "org.hibernate.search.configuration.mapper.standalone";
 
 	ConfigurationLog INSTANCE = LoggerFactory.make( ConfigurationLog.class, CATEGORY_NAME, MethodHandles.lookup() );
 

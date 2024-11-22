@@ -7,9 +7,8 @@
 include::../components/_incubating-warning.adoc[]
 
 The following list provides the Hibernate Search logging categories available in the {hibernateSearchVersion} version.
-It specifies what kind of messages could be expected from a particular category and from which modules these may be produced
-if a specific category of the logger is enabled.
-These logging categories are shared between Hibernate Search modules to group log messages
-of similar purpose coming from different parts of Hibernate Search.
+The information includes the modules using a particular logging category and the levels at which the logger may produce messages.
+Log categories are grouped in a way that allows multiple categories to be enabled simultaneously by specifying the most
+common subcategory, where the `org.hibernate.search` is the root category.
 
 include::{documentationConfigPropertiesOutputDirectory}/_hibernate-logging-categories.adoc[opts=optional]

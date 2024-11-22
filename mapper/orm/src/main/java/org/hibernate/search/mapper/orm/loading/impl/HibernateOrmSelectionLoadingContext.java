@@ -13,7 +13,7 @@ import org.hibernate.search.mapper.orm.loading.spi.EntityGraphHint;
 import org.hibernate.search.mapper.orm.loading.spi.HibernateOrmLoadingMappingContext;
 import org.hibernate.search.mapper.orm.loading.spi.HibernateOrmLoadingSessionContext;
 import org.hibernate.search.mapper.orm.loading.spi.MutableEntityLoadingOptions;
-import org.hibernate.search.mapper.orm.logging.impl.OrmSpecificLog;
+import org.hibernate.search.mapper.orm.logging.impl.OrmMiscLog;
 import org.hibernate.search.mapper.orm.search.loading.EntityLoadingCacheLookupStrategy;
 import org.hibernate.search.mapper.orm.search.loading.dsl.SearchLoadingOptionsStep;
 import org.hibernate.search.mapper.pojo.loading.spi.PojoSelectionLoadingContext;
@@ -39,7 +39,7 @@ public final class HibernateOrmSelectionLoadingContext implements PojoSelectionL
 			sessionContext.session().checkOpen();
 		}
 		catch (IllegalStateException e) {
-			throw OrmSpecificLog.INSTANCE.hibernateSessionIsClosed( e );
+			throw OrmMiscLog.INSTANCE.hibernateSessionIsClosed( e );
 		}
 	}
 

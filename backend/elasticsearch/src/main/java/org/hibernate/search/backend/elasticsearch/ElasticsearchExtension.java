@@ -6,7 +6,7 @@ package org.hibernate.search.backend.elasticsearch;
 
 import java.util.Optional;
 
-import org.hibernate.search.backend.elasticsearch.logging.impl.CommonFailureLog;
+import org.hibernate.search.backend.elasticsearch.logging.impl.ElasticsearchMiscLog;
 import org.hibernate.search.backend.elasticsearch.schema.management.ElasticsearchIndexSchemaExport;
 import org.hibernate.search.backend.elasticsearch.search.aggregation.dsl.ElasticsearchSearchAggregationFactory;
 import org.hibernate.search.backend.elasticsearch.search.predicate.dsl.ElasticsearchSearchPredicateFactory;
@@ -194,7 +194,7 @@ public final class ElasticsearchExtension<H, R, E, LOS>
 			return (ElasticsearchIndexFieldTypeFactory) original;
 		}
 		else {
-			throw CommonFailureLog.INSTANCE.elasticsearchExtensionOnUnknownType( original );
+			throw ElasticsearchMiscLog.INSTANCE.elasticsearchExtensionOnUnknownType( original );
 		}
 	}
 
@@ -207,7 +207,7 @@ public final class ElasticsearchExtension<H, R, E, LOS>
 			return ( (ElasticsearchIndexSchemaExport) original );
 		}
 		else {
-			throw CommonFailureLog.INSTANCE.elasticsearchExtensionOnUnknownType( original );
+			throw ElasticsearchMiscLog.INSTANCE.elasticsearchExtensionOnUnknownType( original );
 		}
 	}
 }

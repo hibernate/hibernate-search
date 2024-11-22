@@ -7,7 +7,7 @@ package org.hibernate.search.util.common.reflect.impl;
 import java.lang.reflect.Field;
 
 import org.hibernate.search.util.common.impl.Throwables;
-import org.hibernate.search.util.common.logging.impl.CommonFailuresLog;
+import org.hibernate.search.util.common.logging.impl.CommonMiscLog;
 import org.hibernate.search.util.common.reflect.spi.ValueReadHandle;
 
 public final class FieldValueReadHandle<T> implements ValueReadHandle<T> {
@@ -30,7 +30,7 @@ public final class FieldValueReadHandle<T> implements ValueReadHandle<T> {
 			return (T) field.get( thiz );
 		}
 		catch (RuntimeException | IllegalAccessException e) {
-			throw CommonFailuresLog.INSTANCE.errorInvokingMember( field, Throwables.safeToString( e, thiz ), e,
+			throw CommonMiscLog.INSTANCE.errorInvokingMember( field, Throwables.safeToString( e, thiz ), e,
 					e.getMessage() );
 		}
 	}

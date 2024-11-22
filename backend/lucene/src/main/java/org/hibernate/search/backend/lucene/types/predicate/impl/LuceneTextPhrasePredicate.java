@@ -5,7 +5,7 @@
 package org.hibernate.search.backend.lucene.types.predicate.impl;
 
 import org.hibernate.search.backend.lucene.analysis.model.impl.LuceneAnalysisDefinitionRegistry;
-import org.hibernate.search.backend.lucene.logging.impl.AnalyzerLog;
+import org.hibernate.search.backend.lucene.logging.impl.AnalysisLog;
 import org.hibernate.search.backend.lucene.lowlevel.common.impl.AnalyzerConstants;
 import org.hibernate.search.backend.lucene.search.common.impl.AbstractLuceneValueFieldSearchQueryElementFactory;
 import org.hibernate.search.backend.lucene.search.common.impl.LuceneSearchIndexScope;
@@ -65,7 +65,7 @@ public class LuceneTextPhrasePredicate extends AbstractLuceneLeafSingleFieldPred
 		public void analyzer(String analyzerName) {
 			this.overrideAnalyzer = analysisDefinitionRegistry.getAnalyzerDefinition( analyzerName );
 			if ( overrideAnalyzer == null ) {
-				throw AnalyzerLog.INSTANCE.unknownAnalyzer( analyzerName,
+				throw AnalysisLog.INSTANCE.unknownAnalyzer( analyzerName,
 						EventContexts.fromIndexFieldAbsolutePath( absoluteFieldPath ) );
 			}
 		}

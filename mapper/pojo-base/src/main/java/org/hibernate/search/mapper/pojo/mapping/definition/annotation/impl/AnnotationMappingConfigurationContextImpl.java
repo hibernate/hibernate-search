@@ -19,7 +19,7 @@ import org.hibernate.search.engine.mapper.mapping.building.spi.MappingConfigurat
 import org.hibernate.search.engine.mapper.model.spi.MappableTypeModel;
 import org.hibernate.search.engine.mapper.model.spi.TypeMetadataDiscoverer;
 import org.hibernate.search.engine.reporting.spi.FailureCollector;
-import org.hibernate.search.mapper.pojo.logging.impl.CommonFailureLog;
+import org.hibernate.search.mapper.pojo.logging.impl.PojoMapperMiscLog;
 import org.hibernate.search.mapper.pojo.mapping.building.spi.PojoTypeMetadataContributor;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.AnnotationMappingConfigurationContext;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.processing.spi.BuiltinAnnotations;
@@ -229,7 +229,7 @@ public class AnnotationMappingConfigurationContextImpl
 			}
 		}
 		catch (RuntimeException e) {
-			throw CommonFailureLog.INSTANCE.errorDiscoveringJandexIndex( codeSourceLocation, e.getMessage(),
+			throw PojoMapperMiscLog.INSTANCE.errorDiscoveringJandexIndex( codeSourceLocation, e.getMessage(),
 					mapperHints.cannotReadJandexRootMapping(), e );
 		}
 	}
