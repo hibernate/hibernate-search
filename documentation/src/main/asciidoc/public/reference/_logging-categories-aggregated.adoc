@@ -4,6 +4,8 @@
 [[logging-categories-aggregated]]
 = List of all available logging categories
 
+include::../components/_incubating-warning.adoc[]
+
 The following list provides the Hibernate Search logging categories available in the {hibernateSearchVersion} version.
 It specifies what kind of messages could be expected from a particular category and from which modules these may be produced
 if a specific category of the logger is enabled.
