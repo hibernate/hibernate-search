@@ -6,7 +6,7 @@ package org.hibernate.search.backend.lucene.analysis.impl;
 
 import java.io.InputStream;
 
-import org.hibernate.search.backend.lucene.logging.impl.CommonFailureLog;
+import org.hibernate.search.backend.lucene.logging.impl.LuceneMiscLog;
 import org.hibernate.search.engine.environment.classpath.spi.ClassLoaderHelper;
 import org.hibernate.search.engine.environment.classpath.spi.ClassResolver;
 import org.hibernate.search.engine.environment.classpath.spi.ResourceResolver;
@@ -35,7 +35,7 @@ final class HibernateSearchResourceLoader implements ResourceLoader {
 		InputStream inputStream = resourceResolver.locateResourceStream( resource );
 
 		if ( inputStream == null ) {
-			throw CommonFailureLog.INSTANCE.unableToLoadResource( resource );
+			throw LuceneMiscLog.INSTANCE.unableToLoadResource( resource );
 		}
 		else {
 			return inputStream;

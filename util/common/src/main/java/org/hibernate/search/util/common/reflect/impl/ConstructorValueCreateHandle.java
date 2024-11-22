@@ -8,7 +8,7 @@ import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 
 import org.hibernate.search.util.common.impl.Throwables;
-import org.hibernate.search.util.common.logging.impl.CommonFailuresLog;
+import org.hibernate.search.util.common.logging.impl.CommonMiscLog;
 import org.hibernate.search.util.common.reflect.spi.ValueCreateHandle;
 
 public final class ConstructorValueCreateHandle<T>
@@ -45,7 +45,7 @@ public final class ConstructorValueCreateHandle<T>
 			return (T) constructor.newInstance( arguments );
 		}
 		catch (RuntimeException | IllegalAccessException | InstantiationException e) {
-			throw CommonFailuresLog.INSTANCE.errorInvokingStaticMember( constructor, Throwables.safeToString( e, arguments ),
+			throw CommonMiscLog.INSTANCE.errorInvokingStaticMember( constructor, Throwables.safeToString( e, arguments ),
 					e, e.getMessage() );
 		}
 		catch (InvocationTargetException e) {
@@ -54,7 +54,7 @@ public final class ConstructorValueCreateHandle<T>
 				throw (Error) thrown;
 			}
 			else {
-				throw CommonFailuresLog.INSTANCE.errorInvokingStaticMember( constructor,
+				throw CommonMiscLog.INSTANCE.errorInvokingStaticMember( constructor,
 						Throwables.safeToString( thrown, arguments ),
 						thrown, thrown.getMessage() );
 			}

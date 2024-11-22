@@ -42,7 +42,7 @@ import com.google.gson.JsonObject;
 )
 @MessageLogger(projectCode = MessageConstants.PROJECT_CODE)
 public interface ElasticsearchClientLog {
-	String CATEGORY_NAME = "org.hibernate.search.backend.elasticsearch.client";
+	String CATEGORY_NAME = "org.hibernate.search.elasticsearch.client";
 
 	ElasticsearchClientLog INSTANCE = LoggerFactory.make( ElasticsearchClientLog.class, CATEGORY_NAME, MethodHandles.lookup() );
 

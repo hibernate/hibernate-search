@@ -21,12 +21,13 @@ import org.jboss.logging.annotations.MessageLogger;
 @CategorizedLogger(
 		category = DeprecationLog.CATEGORY_NAME,
 		description = """
-				Notifies about usage of deprecated configuration properties or configuration property values.
+				Logs related to the usage of deprecated configuration properties
+				or configuration property values specific to the Hibernate ORM mapper.
 				"""
 )
 @MessageLogger(projectCode = MessageConstants.PROJECT_CODE)
 public interface DeprecationLog {
-	String CATEGORY_NAME = "org.hibernate.search.deprecation";
+	String CATEGORY_NAME = "org.hibernate.search.deprecation.mapper.orm";
 
 	DeprecationLog INSTANCE = LoggerFactory.make( DeprecationLog.class, CATEGORY_NAME, MethodHandles.lookup() );
 

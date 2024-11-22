@@ -24,8 +24,8 @@ import org.hibernate.search.backend.elasticsearch.document.model.dsl.impl.Elasti
 import org.hibernate.search.backend.elasticsearch.index.DynamicMapping;
 import org.hibernate.search.backend.elasticsearch.index.impl.ElasticsearchIndexManagerBuilder;
 import org.hibernate.search.backend.elasticsearch.index.impl.IndexManagerBackendContext;
-import org.hibernate.search.backend.elasticsearch.logging.impl.AnalyzerLog;
-import org.hibernate.search.backend.elasticsearch.logging.impl.CommonFailureLog;
+import org.hibernate.search.backend.elasticsearch.logging.impl.AnalysisLog;
+import org.hibernate.search.backend.elasticsearch.logging.impl.ElasticsearchMiscLog;
 import org.hibernate.search.backend.elasticsearch.logging.impl.MappingLog;
 import org.hibernate.search.backend.elasticsearch.lowlevel.index.mapping.impl.RootTypeMapping;
 import org.hibernate.search.backend.elasticsearch.lowlevel.index.settings.impl.IndexSettings;
@@ -158,7 +158,7 @@ class ElasticsearchBackendImpl implements BackendImplementor, ElasticsearchBacke
 		if ( clazz.isAssignableFrom( ElasticsearchBackend.class ) ) {
 			return (T) this;
 		}
-		throw CommonFailureLog.INSTANCE.backendUnwrappingWithUnknownType( clazz, ElasticsearchBackend.class, eventContext );
+		throw ElasticsearchMiscLog.INSTANCE.backendUnwrappingWithUnknownType( clazz, ElasticsearchBackend.class, eventContext );
 	}
 
 	@Override
@@ -248,7 +248,7 @@ class ElasticsearchBackendImpl implements BackendImplementor, ElasticsearchBacke
 					.orElseGet( ElasticsearchAnalysisDefinitionRegistry::new );
 		}
 		catch (Exception e) {
-			throw AnalyzerLog.INSTANCE.unableToApplyAnalysisConfiguration( e.getMessage(), e, indexEventContext );
+			throw AnalysisLog.INSTANCE.unableToApplyAnalysisConfiguration( e.getMessage(), e, indexEventContext );
 		}
 	}
 

@@ -12,7 +12,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.stream.Stream;
 
-import org.hibernate.search.util.common.logging.impl.CommonFailuresLog;
+import org.hibernate.search.util.common.logging.impl.CommonMiscLog;
 
 public final class AnnotationHelper {
 
@@ -36,7 +36,7 @@ public final class AnnotationHelper {
 				return Arrays.stream( annotationArray );
 			}
 			catch (Throwable e) {
-				CommonFailuresLog.INSTANCE.cannotAccessRepeateableContainingAnnotationValue(
+				CommonMiscLog.INSTANCE.cannotAccessRepeateableContainingAnnotationValue(
 						containingAnnotationCandidateType, e
 				);
 			}
@@ -68,7 +68,7 @@ public final class AnnotationHelper {
 						return result;
 					}
 					catch (IllegalAccessException e) {
-						CommonFailuresLog.INSTANCE.cannotAccessRepeateableContainingAnnotationValue(
+						CommonMiscLog.INSTANCE.cannotAccessRepeateableContainingAnnotationValue(
 								containingAnnotationCandidateType, e
 						);
 					}

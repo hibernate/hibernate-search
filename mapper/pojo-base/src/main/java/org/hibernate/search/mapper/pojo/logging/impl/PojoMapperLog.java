@@ -35,8 +35,7 @@ import org.jboss.logging.annotations.ValidIdRanges;
 		@ValidIdRange(min = 337, max = 337)
 })
 public interface PojoMapperLog
-		extends CommonFailureLog, FormattingLog, IndexingLog, LoadingLog, MappingLog, MassIndexingLog, ProjectionLog,
-		SchemaExportLog {
+		extends FormattingLog, IndexingLog, LoadingLog, MappingLog, MassIndexingLog, PojoMapperMiscLog, ProjectionLog {
 
 	// -----------------------------------
 	// Pre-existing messages from Search 5 (engine module)

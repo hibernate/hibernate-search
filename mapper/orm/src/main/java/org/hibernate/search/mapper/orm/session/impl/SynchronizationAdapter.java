@@ -11,7 +11,7 @@ import org.hibernate.action.spi.AfterTransactionCompletionProcess;
 import org.hibernate.action.spi.BeforeTransactionCompletionProcess;
 import org.hibernate.engine.spi.SessionImplementor;
 import org.hibernate.engine.spi.SharedSessionContractImplementor;
-import org.hibernate.search.mapper.orm.logging.impl.OrmSpecificLog;
+import org.hibernate.search.mapper.orm.logging.impl.OrmMiscLog;
 
 /**
  * An adapter for synchronizations, allowing to register them as
@@ -41,7 +41,7 @@ class SynchronizationAdapter
 
 	@Override
 	public void afterCompletion(int status) {
-		OrmSpecificLog.INSTANCE.syncAdapterIgnoringAfterCompletion( delegate );
+		OrmMiscLog.INSTANCE.syncAdapterIgnoringAfterCompletion( delegate );
 	}
 
 	@Override
@@ -50,7 +50,7 @@ class SynchronizationAdapter
 			doBeforeCompletion();
 		}
 		catch (RuntimeException e) {
-			throw OrmSpecificLog.INSTANCE.synchronizationBeforeTransactionFailure( e.getMessage(), e );
+			throw OrmMiscLog.INSTANCE.synchronizationBeforeTransactionFailure( e.getMessage(), e );
 		}
 	}
 
@@ -60,13 +60,13 @@ class SynchronizationAdapter
 			doAfterCompletion( success ? Status.STATUS_COMMITTED : Status.STATUS_ROLLEDBACK );
 		}
 		catch (RuntimeException e) {
-			throw OrmSpecificLog.INSTANCE.synchronizationAfterTransactionFailure( e.getMessage(), e );
+			throw OrmMiscLog.INSTANCE.synchronizationAfterTransactionFailure( e.getMessage(), e );
 		}
 	}
 
 	private void doBeforeCompletion() {
 		if ( beforeExecuted ) {
-			OrmSpecificLog.INSTANCE.syncAdapterIgnoringBeforeCompletionAlreadyExecuted( delegate );
+			OrmMiscLog.INSTANCE.syncAdapterIgnoringBeforeCompletionAlreadyExecuted( delegate );
 		}
 		else {
 			delegate.beforeCompletion();
@@ -76,7 +76,7 @@ class SynchronizationAdapter
 
 	private void doAfterCompletion(int status) {
 		if ( afterExecuted ) {
-			OrmSpecificLog.INSTANCE.syncAdapterIgnoringAfterCompletionAlreadyExecuted( delegate );
+			OrmMiscLog.INSTANCE.syncAdapterIgnoringAfterCompletionAlreadyExecuted( delegate );
 		}
 		else {
 			delegate.afterCompletion( status );

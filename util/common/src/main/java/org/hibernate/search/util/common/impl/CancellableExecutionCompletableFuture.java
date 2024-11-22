@@ -8,7 +8,7 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Future;
 
-import org.hibernate.search.util.common.logging.impl.CommonFailuresLog;
+import org.hibernate.search.util.common.logging.impl.CommonMiscLog;
 
 /**
  * A {@link CompletableFuture} that, upon cancellation,
@@ -31,12 +31,12 @@ class CancellableExecutionCompletableFuture<T> extends CompletableFuture<T> {
 		 * Thus we mark 'this' as cancelled *first*, so that any exception in the operation
 		 * from now on will be ignored.
 		 */
-		CommonFailuresLog.INSTANCE.cancellingCompletableFuture( this, mayInterruptIfRunning );
+		CommonMiscLog.INSTANCE.cancellingCompletableFuture( this, mayInterruptIfRunning );
 		super.cancel( mayInterruptIfRunning );
-		CommonFailuresLog.INSTANCE.cancellingFuture( future, mayInterruptIfRunning );
+		CommonMiscLog.INSTANCE.cancellingFuture( future, mayInterruptIfRunning );
 		boolean cancelled = future.cancel( mayInterruptIfRunning );
 		if ( !cancelled ) {
-			CommonFailuresLog.INSTANCE.cancellingFutureFailed( future, mayInterruptIfRunning );
+			CommonMiscLog.INSTANCE.cancellingFutureFailed( future, mayInterruptIfRunning );
 		}
 		return cancelled;
 	}

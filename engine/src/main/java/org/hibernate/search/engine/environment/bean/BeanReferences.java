@@ -8,7 +8,7 @@ import java.util.Arrays;
 import java.util.Locale;
 import java.util.stream.Collectors;
 
-import org.hibernate.search.engine.logging.impl.BeanLog;
+import org.hibernate.search.engine.logging.impl.EngineMiscLog;
 import org.hibernate.search.util.common.impl.Contracts;
 
 final class BeanReferences {
@@ -33,7 +33,7 @@ final class BeanReferences {
 				retrieval = BeanRetrieval.valueOf( retrievalAsString.toUpperCase( Locale.ROOT ) );
 			}
 			catch (IllegalArgumentException e) {
-				throw BeanLog.INSTANCE.invalidBeanRetrieval( value, retrievalAsString + ':',
+				throw EngineMiscLog.INSTANCE.invalidBeanRetrieval( value, retrievalAsString + ':',
 						Arrays.stream( BeanRetrieval.values() )
 								.map( v -> v.name().toLowerCase( Locale.ROOT ) + ':' )
 								.collect( Collectors.toList() ),

@@ -34,7 +34,7 @@ import org.hibernate.search.mapper.orm.common.impl.HibernateOrmUtils;
 import org.hibernate.search.mapper.orm.coordination.common.spi.CoordinationStrategy;
 import org.hibernate.search.mapper.orm.entity.SearchIndexedEntity;
 import org.hibernate.search.mapper.orm.event.impl.HibernateOrmListenerContextProvider;
-import org.hibernate.search.mapper.orm.logging.impl.OrmSpecificLog;
+import org.hibernate.search.mapper.orm.logging.impl.OrmMiscLog;
 import org.hibernate.search.mapper.orm.mapping.SearchMapping;
 import org.hibernate.search.mapper.orm.mapping.context.HibernateOrmMappingContext;
 import org.hibernate.search.mapper.orm.mapping.spi.CoordinationStrategyContext;
@@ -446,7 +446,7 @@ public class HibernateOrmMapping extends AbstractPojoMappingImplementor<Hibernat
 		SessionFactory givenSessionFactory = sessionImplementor.getSessionFactory();
 
 		if ( !givenSessionFactory.equals( sessionFactory ) ) {
-			throw OrmSpecificLog.INSTANCE.usingDifferentSessionFactories( sessionFactory, givenSessionFactory );
+			throw OrmMiscLog.INSTANCE.usingDifferentSessionFactories( sessionFactory, givenSessionFactory );
 		}
 
 		return new HibernateOrmSearchSession.Builder( this, typeContextContainer,

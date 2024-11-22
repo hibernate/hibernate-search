@@ -6,7 +6,7 @@ package org.hibernate.search.util.common.impl;
 
 import java.util.Collection;
 
-import org.hibernate.search.util.common.logging.impl.CommonFailuresLog;
+import org.hibernate.search.util.common.logging.impl.CommonMiscLog;
 
 public final class Contracts {
 
@@ -15,49 +15,49 @@ public final class Contracts {
 
 	public static void assertNotNull(Object object, String objectDescription) {
 		if ( object == null ) {
-			throw CommonFailuresLog.INSTANCE.mustNotBeNull( objectDescription );
+			throw CommonMiscLog.INSTANCE.mustNotBeNull( objectDescription );
 		}
 	}
 
 	public static void assertNotNullNorEmpty(Collection<?> object, String objectDescription) {
 		if ( object == null || object.isEmpty() ) {
-			throw CommonFailuresLog.INSTANCE.collectionMustNotBeNullNorEmpty( objectDescription );
+			throw CommonMiscLog.INSTANCE.collectionMustNotBeNullNorEmpty( objectDescription );
 		}
 	}
 
 	public static void assertNotNullNorEmpty(Object[] object, String objectDescription) {
 		if ( object == null || object.length == 0 ) {
-			throw CommonFailuresLog.INSTANCE.arrayMustNotBeNullNorEmpty( objectDescription );
+			throw CommonMiscLog.INSTANCE.arrayMustNotBeNullNorEmpty( objectDescription );
 		}
 	}
 
 	public static void assertPositiveOrZero(int number, String objectDescription) {
 		if ( number < 0 ) {
-			throw CommonFailuresLog.INSTANCE.mustBePositiveOrZero( objectDescription );
+			throw CommonMiscLog.INSTANCE.mustBePositiveOrZero( objectDescription );
 		}
 	}
 
 	public static void assertStrictlyPositive(int number, String objectDescription) {
 		if ( number <= 0 ) {
-			throw CommonFailuresLog.INSTANCE.mustBeStrictlyPositive( objectDescription );
+			throw CommonMiscLog.INSTANCE.mustBeStrictlyPositive( objectDescription );
 		}
 	}
 
 	public static void assertStrictlyPositive(long number, String objectDescription) {
 		if ( number <= 0 ) {
-			throw CommonFailuresLog.INSTANCE.mustBePositiveOrZero( objectDescription );
+			throw CommonMiscLog.INSTANCE.mustBePositiveOrZero( objectDescription );
 		}
 	}
 
 	public static void assertNotNullNorEmpty(String object, String objectDescription) {
 		if ( object == null || object.isEmpty() ) {
-			throw CommonFailuresLog.INSTANCE.stringMustNotBeNullNorEmpty( objectDescription );
+			throw CommonMiscLog.INSTANCE.stringMustNotBeNullNorEmpty( objectDescription );
 		}
 	}
 
 	public static void assertNoNullElement(Collection<?> collection, String collectionDescription) {
 		if ( collection != null && collection.contains( null ) ) {
-			throw CommonFailuresLog.INSTANCE.collectionMustNotContainNullElement( collectionDescription );
+			throw CommonMiscLog.INSTANCE.collectionMustNotContainNullElement( collectionDescription );
 		}
 	}
 

@@ -42,14 +42,12 @@ import org.jboss.logging.annotations.Param;
 @CategorizedLogger(
 		category = QueryLog.CATEGORY_NAME,
 		description = """
-				Logs the Elasticsearch queries that are about to be executed.
-				+
-				It may also log some hints on the number of returned hits, potentially misconfigured Elasticsearch highlight or k-NN queries, etc.
+				Logs the Elasticsearch queries that are about to be executed and other query related messages.
 				"""
 )
 @MessageLogger(projectCode = MessageConstants.PROJECT_CODE)
 public interface QueryLog {
-	String CATEGORY_NAME = "org.hibernate.search.query";
+	String CATEGORY_NAME = "org.hibernate.search.query.elasticsearch";
 
 	QueryLog INSTANCE = LoggerFactory.make( QueryLog.class, CATEGORY_NAME, MethodHandles.lookup() );
 

@@ -9,7 +9,7 @@ import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
-import org.hibernate.search.backend.lucene.logging.impl.AnalyzerLog;
+import org.hibernate.search.backend.lucene.logging.impl.AnalysisLog;
 import org.hibernate.search.engine.environment.classpath.spi.ClassLoaderHelper;
 import org.hibernate.search.engine.environment.classpath.spi.ClassResolver;
 import org.hibernate.search.engine.environment.classpath.spi.ResourceResolver;
@@ -94,7 +94,7 @@ public final class LuceneAnalysisComponentFactory {
 			return tokenizerFactory;
 		}
 		catch (RuntimeException e) {
-			throw AnalyzerLog.INSTANCE.unableToCreateAnalysisComponent( factoryClass, e.getMessage(), e );
+			throw AnalysisLog.INSTANCE.unableToCreateAnalysisComponent( factoryClass, e.getMessage(), e );
 		}
 	}
 

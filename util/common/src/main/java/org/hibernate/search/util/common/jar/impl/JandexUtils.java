@@ -18,7 +18,7 @@ import java.util.Set;
 import java.util.stream.Stream;
 
 import org.hibernate.search.util.common.AssertionFailure;
-import org.hibernate.search.util.common.logging.impl.CommonFailuresLog;
+import org.hibernate.search.util.common.logging.impl.CommonMiscLog;
 
 import org.jboss.jandex.AnnotationInstance;
 import org.jboss.jandex.AnnotationTarget;
@@ -100,11 +100,11 @@ public final class JandexUtils {
 				return doBuildJandexIndex( codeSource.classesPathOrFail() );
 			}
 			catch (IOException | RuntimeException e) {
-				throw CommonFailuresLog.INSTANCE.errorBuildingJandexIndex( codeSourceLocation, e.getMessage(), e );
+				throw CommonMiscLog.INSTANCE.errorBuildingJandexIndex( codeSourceLocation, e.getMessage(), e );
 			}
 		}
 		catch (IOException | RuntimeException e) {
-			throw CommonFailuresLog.INSTANCE.errorAccessingJandexIndex( codeSourceLocation, e.getMessage(), e );
+			throw CommonMiscLog.INSTANCE.errorAccessingJandexIndex( codeSourceLocation, e.getMessage(), e );
 		}
 	}
 
@@ -113,7 +113,7 @@ public final class JandexUtils {
 			return doReadIndex( codeSource );
 		}
 		catch (IOException | RuntimeException e) {
-			throw CommonFailuresLog.INSTANCE.errorAccessingJandexIndex( codeSourceLocation, e.getMessage(), e );
+			throw CommonMiscLog.INSTANCE.errorAccessingJandexIndex( codeSourceLocation, e.getMessage(), e );
 		}
 	}
 
@@ -158,7 +158,7 @@ public final class JandexUtils {
 	private static boolean isUnsupportedVersionPath(Path metaInfVersions, Path path) {
 		Path relative = metaInfVersions.relativize( path );
 		if ( relative.getNameCount() < 2 ) {
-			CommonFailuresLog.INSTANCE.metaInfVersionBadStructure( path );
+			CommonMiscLog.INSTANCE.metaInfVersionBadStructure( path );
 			return true;
 		}
 		try {
@@ -168,7 +168,7 @@ public final class JandexUtils {
 			}
 		}
 		catch (NumberFormatException ex) {
-			CommonFailuresLog.INSTANCE.metaInfVersionParsingFailed( path, ex );
+			CommonMiscLog.INSTANCE.metaInfVersionParsingFailed( path, ex );
 			return true;
 		}
 		return false;

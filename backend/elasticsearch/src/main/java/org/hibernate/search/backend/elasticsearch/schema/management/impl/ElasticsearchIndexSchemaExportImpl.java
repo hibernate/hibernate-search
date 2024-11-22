@@ -15,7 +15,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.hibernate.search.backend.elasticsearch.client.spi.ElasticsearchRequest;
-import org.hibernate.search.backend.elasticsearch.logging.impl.SchemaExportLog;
+import org.hibernate.search.backend.elasticsearch.logging.impl.ElasticsearchMiscLog;
 import org.hibernate.search.backend.elasticsearch.schema.management.ElasticsearchIndexSchemaExport;
 
 import com.google.gson.Gson;
@@ -60,7 +60,7 @@ public class ElasticsearchIndexSchemaExportImpl implements ElasticsearchIndexSch
 			jsonWriter.flush();
 		}
 		catch (IOException e) {
-			throw SchemaExportLog.INSTANCE.unableToExportSchema( indexName, e.getMessage(), e );
+			throw ElasticsearchMiscLog.INSTANCE.unableToExportSchema( indexName, e.getMessage(), e );
 		}
 	}
 

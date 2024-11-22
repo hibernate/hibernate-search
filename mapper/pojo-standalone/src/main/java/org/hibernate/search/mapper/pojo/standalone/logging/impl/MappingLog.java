@@ -27,7 +27,7 @@ import org.jboss.logging.annotations.MessageLogger;
 )
 @MessageLogger(projectCode = MessageConstants.PROJECT_CODE)
 public interface MappingLog {
-	String CATEGORY_NAME = "org.hibernate.search.mapping";
+	String CATEGORY_NAME = "org.hibernate.search.mapping.mapper.standalone";
 
 	MappingLog INSTANCE = LoggerFactory.make( MappingLog.class, CATEGORY_NAME, MethodHandles.lookup() );
 

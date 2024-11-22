@@ -26,7 +26,7 @@ import org.jboss.logging.annotations.Param;
 )
 @MessageLogger(projectCode = MessageConstants.PROJECT_CODE)
 public interface IndexingLog {
-	String CATEGORY_NAME = "org.hibernate.search.backend.indexing";
+	String CATEGORY_NAME = "org.hibernate.search.indexing.lucene";
 
 	IndexingLog INSTANCE = LoggerFactory.make( IndexingLog.class, CATEGORY_NAME, MethodHandles.lookup() );
 

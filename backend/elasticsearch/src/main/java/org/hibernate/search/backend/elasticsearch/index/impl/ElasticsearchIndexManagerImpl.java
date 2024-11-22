@@ -15,8 +15,8 @@ import org.hibernate.search.backend.elasticsearch.document.impl.DocumentMetadata
 import org.hibernate.search.backend.elasticsearch.document.impl.ElasticsearchDocumentObjectBuilder;
 import org.hibernate.search.backend.elasticsearch.document.model.impl.ElasticsearchIndexModel;
 import org.hibernate.search.backend.elasticsearch.index.ElasticsearchIndexManager;
-import org.hibernate.search.backend.elasticsearch.logging.impl.CommonFailureLog;
 import org.hibernate.search.backend.elasticsearch.logging.impl.DeprecationLog;
+import org.hibernate.search.backend.elasticsearch.logging.impl.ElasticsearchMiscLog;
 import org.hibernate.search.backend.elasticsearch.logging.impl.QueryLog;
 import org.hibernate.search.backend.elasticsearch.metamodel.ElasticsearchIndexDescriptor;
 import org.hibernate.search.backend.elasticsearch.orchestration.impl.ElasticsearchBatchingWorkOrchestrator;
@@ -258,7 +258,7 @@ class ElasticsearchIndexManagerImpl
 		if ( clazz.isAssignableFrom( ElasticsearchIndexManager.class ) ) {
 			return (T) this;
 		}
-		throw CommonFailureLog.INSTANCE.indexManagerUnwrappingWithUnknownType(
+		throw ElasticsearchMiscLog.INSTANCE.indexManagerUnwrappingWithUnknownType(
 				clazz, ElasticsearchIndexManager.class, getBackendAndIndexEventContext()
 		);
 	}

@@ -26,12 +26,12 @@ import org.jboss.logging.annotations.MessageLogger;
 @CategorizedLogger(
 		category = ConfigurationLog.CATEGORY_NAME,
 		description = """
-				Logs information on Hibernate Search-specific Hibernate ORM event listeners, dirty checking of entities, etc.
+				Logs related to Hibernate ORM mapper-specific configuration.
 				"""
 )
 @MessageLogger(projectCode = MessageConstants.PROJECT_CODE)
 public interface ConfigurationLog {
-	String CATEGORY_NAME = "org.hibernate.search.configuration";
+	String CATEGORY_NAME = "org.hibernate.search.configuration.mapper.orm";
 
 	ConfigurationLog INSTANCE = LoggerFactory.make( ConfigurationLog.class, CATEGORY_NAME, MethodHandles.lookup() );
 

@@ -43,16 +43,14 @@ import org.jboss.logging.annotations.MessageLogger;
 @CategorizedLogger(
 		category = OutboxPollingEventsLog.CATEGORY_NAME,
 		description = """
-				Logs various outbox polling-related events happening in the background.
-				+
-				Messages may include information on starting/stopping event processors,
-				agents or issues with locking indexing events.
+				The main category for the outbox polling-specific logs.
+				It may also include logs that do not fit any other, more specific, outbox polling category.
 				"""
 )
 @MessageLogger(projectCode = MessageConstants.PROJECT_CODE)
 public interface OutboxPollingEventsLog {
 
-	String CATEGORY_NAME = "org.hibernate.search.mapper.outboxpolling";
+	String CATEGORY_NAME = "org.hibernate.search.mapper.orm.outboxpolling";
 
 	OutboxPollingEventsLog INSTANCE = LoggerFactory.make( OutboxPollingEventsLog.class, CATEGORY_NAME, MethodHandles.lookup() );
 

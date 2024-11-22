@@ -4,7 +4,7 @@
  */
 package org.hibernate.search.engine.reporting.spi;
 
-import static org.hibernate.search.engine.logging.impl.CommonFailureLog.INSTANCE;
+import static org.hibernate.search.engine.logging.impl.EngineMiscLog.INSTANCE;
 
 import java.util.ArrayList;
 import java.util.Collection;

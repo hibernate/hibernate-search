@@ -13,7 +13,7 @@ import org.hibernate.engine.spi.SharedSessionContractImplementor;
 import org.hibernate.search.mapper.orm.common.spi.TransactionHelper;
 import org.hibernate.search.mapper.orm.loading.spi.HibernateOrmQueryLoader;
 import org.hibernate.search.mapper.orm.logging.impl.LoadingLog;
-import org.hibernate.search.mapper.orm.logging.impl.OrmSpecificLog;
+import org.hibernate.search.mapper.orm.logging.impl.OrmMiscLog;
 import org.hibernate.search.mapper.pojo.loading.spi.PojoMassIdentifierLoader;
 import org.hibernate.search.mapper.pojo.loading.spi.PojoMassIdentifierSink;
 import org.hibernate.search.util.common.impl.Closer;
@@ -97,7 +97,7 @@ public final class HibernateOrmMassIdentifierLoader<E, I> implements PojoMassIde
 			// Explicitly checking whether the TX is still open; Depending on the driver implementation new ids
 			// might be produced otherwise if the driver fetches all rows up-front
 			if ( !session.isTransactionInProgress() ) {
-				throw OrmSpecificLog.INSTANCE.transactionNotActiveWhileProducingIdsForBatchIndexing();
+				throw OrmMiscLog.INSTANCE.transactionNotActiveWhileProducingIdsForBatchIndexing();
 			}
 			sink.accept( destinationList );
 		}

@@ -8,7 +8,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 
 import org.hibernate.search.util.common.impl.Throwables;
-import org.hibernate.search.util.common.logging.impl.CommonFailuresLog;
+import org.hibernate.search.util.common.logging.impl.CommonMiscLog;
 import org.hibernate.search.util.common.reflect.spi.ValueReadHandle;
 
 public final class MethodValueReadHandle<T> implements ValueReadHandle<T> {
@@ -31,7 +31,7 @@ public final class MethodValueReadHandle<T> implements ValueReadHandle<T> {
 			return (T) method.invoke( thiz );
 		}
 		catch (RuntimeException | IllegalAccessException e) {
-			throw CommonFailuresLog.INSTANCE.errorInvokingMember( method, Throwables.safeToString( e, thiz ), e,
+			throw CommonMiscLog.INSTANCE.errorInvokingMember( method, Throwables.safeToString( e, thiz ), e,
 					e.getMessage() );
 		}
 		catch (InvocationTargetException e) {
@@ -40,7 +40,7 @@ public final class MethodValueReadHandle<T> implements ValueReadHandle<T> {
 				throw (Error) thrown;
 			}
 			else {
-				throw CommonFailuresLog.INSTANCE.errorInvokingMember( method, Throwables.safeToString( thrown, thiz ), thrown,
+				throw CommonMiscLog.INSTANCE.errorInvokingMember( method, Throwables.safeToString( thrown, thiz ), thrown,
 						thrown.getMessage() );
 			}
 		}

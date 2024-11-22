@@ -24,8 +24,8 @@ import org.hibernate.search.mapper.pojo.identity.impl.PojoRootIdentityMappingCol
 import org.hibernate.search.mapper.pojo.loading.definition.spi.PojoEntityLoadingBindingContext;
 import org.hibernate.search.mapper.pojo.loading.spi.PojoMassLoadingStrategy;
 import org.hibernate.search.mapper.pojo.loading.spi.PojoSelectionLoadingStrategy;
-import org.hibernate.search.mapper.pojo.logging.impl.CommonFailureLog;
 import org.hibernate.search.mapper.pojo.logging.impl.IndexingLog;
+import org.hibernate.search.mapper.pojo.logging.impl.PojoMapperMiscLog;
 import org.hibernate.search.mapper.pojo.mapping.building.spi.PojoTypeExtendedMappingCollector;
 import org.hibernate.search.mapper.pojo.model.PojoModelElement;
 import org.hibernate.search.mapper.pojo.model.impl.PojoModelValueElement;
@@ -374,7 +374,7 @@ public abstract class AbstractPojoTypeManager<I, E>
 
 								Object value = params.get( name );
 								if ( value == null ) {
-									throw CommonFailureLog.INSTANCE.paramNotDefined( name );
+									throw PojoMapperMiscLog.INSTANCE.paramNotDefined( name );
 								}
 
 								return paramType.cast( value );

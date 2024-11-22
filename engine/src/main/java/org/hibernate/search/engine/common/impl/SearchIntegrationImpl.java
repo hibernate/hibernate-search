@@ -25,7 +25,7 @@ import org.hibernate.search.engine.common.timing.spi.TimingSource;
 import org.hibernate.search.engine.environment.bean.BeanHolder;
 import org.hibernate.search.engine.environment.bean.spi.BeanProvider;
 import org.hibernate.search.engine.environment.thread.impl.ThreadPoolProviderImpl;
-import org.hibernate.search.engine.logging.impl.BackendLog;
+import org.hibernate.search.engine.logging.impl.ConfigurationLog;
 import org.hibernate.search.engine.mapper.mapping.building.spi.MappingKey;
 import org.hibernate.search.engine.mapper.mapping.spi.MappingImplementor;
 import org.hibernate.search.engine.reporting.FailureHandler;
@@ -75,7 +75,7 @@ public class SearchIntegrationImpl implements SearchIntegration {
 	public Backend backend() {
 		BackendImplementor backend = backends.get( null );
 		if ( backend == null ) {
-			throw BackendLog.INSTANCE.noDefaultBackendRegistered( backends.keySet() );
+			throw ConfigurationLog.INSTANCE.noDefaultBackendRegistered( backends.keySet() );
 		}
 		return backend.toAPI();
 	}
@@ -84,7 +84,7 @@ public class SearchIntegrationImpl implements SearchIntegration {
 	public Backend backend(String backendName) {
 		BackendImplementor backend = backends.get( backendName );
 		if ( backend == null ) {
-			throw BackendLog.INSTANCE
+			throw ConfigurationLog.INSTANCE
 					.unknownNameForBackend( backendName,
 							backends.keySet().stream().filter( Objects::nonNull ).collect( Collectors.toList() ),
 							backends.containsKey( null )
@@ -98,7 +98,7 @@ public class SearchIntegrationImpl implements SearchIntegration {
 	public IndexManager indexManager(String indexManagerName) {
 		IndexManagerImplementor indexManager = indexManagers.get( indexManagerName );
 		if ( indexManager == null ) {
-			throw BackendLog.INSTANCE.unknownNameForIndexManager( indexManagerName, indexManagers.keySet() );
+			throw ConfigurationLog.INSTANCE.unknownNameForIndexManager( indexManagerName, indexManagers.keySet() );
 		}
 		return indexManager.toAPI();
 	}

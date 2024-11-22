@@ -28,7 +28,7 @@ import org.hibernate.search.util.common.annotation.impl.SuppressForbiddenApis;
 import org.hibernate.search.util.common.impl.Closer;
 import org.hibernate.search.util.common.impl.SuppressingCloser;
 import org.hibernate.search.util.common.impl.Throwables;
-import org.hibernate.search.util.common.logging.impl.CommonFailuresLog;
+import org.hibernate.search.util.common.logging.impl.CommonMiscLog;
 
 class CodeSource implements Closeable {
 
@@ -51,13 +51,13 @@ class CodeSource implements Closeable {
 					return (FileSystem) newFileSystem.invoke( null, path, Collections.emptyMap() );
 				}
 				catch (IllegalAccessException | InvocationTargetException e) {
-					throw CommonFailuresLog.INSTANCE.cannotOpenNestedJar( jarUri, e );
+					throw CommonMiscLog.INSTANCE.cannotOpenNestedJar( jarUri, e );
 				}
 			};
 		}
 		catch (NoSuchMethodException ignored) {
 			creator = (path, jarUri) -> {
-				throw CommonFailuresLog.INSTANCE.cannotOpenNestedJar( jarUri, null );
+				throw CommonMiscLog.INSTANCE.cannotOpenNestedJar( jarUri, null );
 			};
 		}
 		NESTED_JAR_FILESYSTEM_CREATOR = creator;
@@ -159,11 +159,11 @@ class CodeSource implements Closeable {
 				}
 			}
 			else {
-				throw CommonFailuresLog.INSTANCE.cannotInterpretCodeSourceUrl( codeSourceLocation );
+				throw CommonMiscLog.INSTANCE.cannotInterpretCodeSourceUrl( codeSourceLocation );
 			}
 		}
 		catch (RuntimeException | URISyntaxException | IOException e) {
-			throw CommonFailuresLog.INSTANCE.cannotOpenCodeSourceFileSystem( codeSourceLocation, e.getMessage(), e );
+			throw CommonMiscLog.INSTANCE.cannotOpenCodeSourceFileSystem( codeSourceLocation, e.getMessage(), e );
 		}
 	}
 

@@ -14,7 +14,7 @@ import java.util.TreeMap;
 import java.util.stream.Collectors;
 
 import org.hibernate.search.backend.elasticsearch.analysis.impl.ElasticsearchAnalysisDescriptor;
-import org.hibernate.search.backend.elasticsearch.logging.impl.AnalyzerLog;
+import org.hibernate.search.backend.elasticsearch.logging.impl.AnalysisLog;
 import org.hibernate.search.backend.elasticsearch.lowlevel.index.analysis.impl.AnalyzerDefinition;
 import org.hibernate.search.backend.elasticsearch.lowlevel.index.analysis.impl.CharFilterDefinition;
 import org.hibernate.search.backend.elasticsearch.lowlevel.index.analysis.impl.NormalizerDefinition;
@@ -71,7 +71,7 @@ public final class ElasticsearchAnalysisDefinitionRegistry implements AnalysisDe
 			public void collect(String name, TokenizerDefinition definition) {
 				TokenizerDefinition previous = tokenizerDefinitions.putIfAbsent( name, definition );
 				if ( previous != null && previous != definition ) {
-					throw AnalyzerLog.INSTANCE.tokenizerNamingConflict( name );
+					throw AnalysisLog.INSTANCE.tokenizerNamingConflict( name );
 				}
 			}
 
@@ -79,7 +79,7 @@ public final class ElasticsearchAnalysisDefinitionRegistry implements AnalysisDe
 			public void collect(String name, TokenFilterDefinition definition) {
 				TokenFilterDefinition previous = tokenFilterDefinitions.putIfAbsent( name, definition );
 				if ( previous != null && previous != definition ) {
-					throw AnalyzerLog.INSTANCE.tokenFilterNamingConflict( name );
+					throw AnalysisLog.INSTANCE.tokenFilterNamingConflict( name );
 				}
 			}
 
@@ -87,7 +87,7 @@ public final class ElasticsearchAnalysisDefinitionRegistry implements AnalysisDe
 			public void collect(String name, CharFilterDefinition definition) {
 				CharFilterDefinition previous = charFilterDefinitions.putIfAbsent( name, definition );
 				if ( previous != null && previous != definition ) {
-					throw AnalyzerLog.INSTANCE.charFilterNamingConflict( name );
+					throw AnalysisLog.INSTANCE.charFilterNamingConflict( name );
 				}
 			}
 		} );

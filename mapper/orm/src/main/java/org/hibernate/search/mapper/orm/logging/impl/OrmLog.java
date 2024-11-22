@@ -29,9 +29,7 @@ import org.jboss.logging.annotations.ValidIdRanges;
 		@ValidIdRange(min = 276, max = 276),
 		@ValidIdRange(min = 348, max = 349)
 })
-public interface OrmLog
-		extends CommonFailureLog, ConfigurationLog, DeprecationLog, IndexingLog, LoadingLog, MappingLog, OrmSpecificLog,
-		VersionLog {
+public interface OrmLog extends ConfigurationLog, DeprecationLog, IndexingLog, LoadingLog, MappingLog, OrmMiscLog, VersionLog {
 
 	// -----------------------------------
 	// Pre-existing messages from Search 5

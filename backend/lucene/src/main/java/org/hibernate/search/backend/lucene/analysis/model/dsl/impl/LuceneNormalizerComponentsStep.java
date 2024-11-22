@@ -11,7 +11,7 @@ import java.util.List;
 import org.hibernate.search.backend.lucene.analysis.impl.LuceneAnalysisComponentFactory;
 import org.hibernate.search.backend.lucene.analysis.model.dsl.LuceneAnalysisComponentParametersStep;
 import org.hibernate.search.backend.lucene.analysis.model.dsl.LuceneNormalizerOptionalComponentsStep;
-import org.hibernate.search.backend.lucene.logging.impl.AnalyzerLog;
+import org.hibernate.search.backend.lucene.logging.impl.AnalysisLog;
 
 import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.analysis.CharFilterFactory;
@@ -64,7 +64,7 @@ class LuceneNormalizerComponentsStep
 			);
 		}
 		catch (IOException | RuntimeException e) {
-			throw AnalyzerLog.INSTANCE.unableToCreateNormalizer( name, e.getMessage(), e );
+			throw AnalysisLog.INSTANCE.unableToCreateNormalizer( name, e.getMessage(), e );
 		}
 	}
 

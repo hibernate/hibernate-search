@@ -6,7 +6,7 @@ package org.hibernate.search.backend.lucene.analysis.impl;
 
 import java.io.IOException;
 
-import org.hibernate.search.backend.lucene.logging.impl.AnalyzerLog;
+import org.hibernate.search.backend.lucene.logging.impl.AnalysisLog;
 
 import org.apache.lucene.analysis.TokenFilter;
 import org.apache.lucene.analysis.TokenStream;
@@ -56,7 +56,7 @@ final class HibernateSearchNormalizerCheckingFilter extends TokenFilter {
 
 		if ( tokenCount > 1 ) {
 			termAtt.setEmpty().append( concatenatedTokenBuilder );
-			AnalyzerLog.INSTANCE.normalizerProducedMultipleTokens( normalizerName, tokenCount );
+			AnalysisLog.INSTANCE.normalizerProducedMultipleTokens( normalizerName, tokenCount );
 		}
 
 		return tokenCount > 0;

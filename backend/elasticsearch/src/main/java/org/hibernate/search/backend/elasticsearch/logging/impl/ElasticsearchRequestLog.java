@@ -26,8 +26,6 @@ import org.apache.http.HttpHost;
 		description = """
 				Logs executed requests and responses sent to the Elasticsearch cluster.
 				It also includes the execution time of the request.
-				+
-				Logger must be enabled at TRACE level for this category to print messages.
 				"""
 )
 @MessageLogger(projectCode = MessageConstants.PROJECT_CODE)
@@ -38,7 +36,7 @@ public interface ElasticsearchRequestLog extends BasicLogger {
 	 * <p>
 	 * To enable the logger, the category needs to be enabled at TRACE level.
 	 */
-	String CATEGORY_NAME = "org.hibernate.search.backend.elasticsearch.request";
+	String CATEGORY_NAME = "org.hibernate.search.elasticsearch.client.request";
 
 	ElasticsearchRequestLog INSTANCE =
 			LoggerFactory.make( ElasticsearchRequestLog.class, CATEGORY_NAME, MethodHandles.lookup() );

@@ -26,12 +26,12 @@ import org.jboss.logging.annotations.MessageLogger;
 @CategorizedLogger(
 		category = VersionLog.CATEGORY_NAME,
 		description = """
-				Logs the warning about an unknown Elasticsearch/OpenSearch version.
+				Logs related to the Elasticsearch/OpenSearch version.
 				"""
 )
 @MessageLogger(projectCode = MessageConstants.PROJECT_CODE)
 public interface VersionLog {
-	String CATEGORY_NAME = "org.hibernate.search.version";
+	String CATEGORY_NAME = "org.hibernate.search.version.elasticsearch";
 
 	VersionLog INSTANCE = LoggerFactory.make( VersionLog.class, CATEGORY_NAME, MethodHandles.lookup() );
 

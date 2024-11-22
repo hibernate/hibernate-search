@@ -4,7 +4,7 @@
  */
 package org.hibernate.search.engine.environment.classpath.spi;
 
-import org.hibernate.search.engine.logging.impl.BeanLog;
+import org.hibernate.search.engine.logging.impl.EngineMiscLog;
 
 
 /**
@@ -30,7 +30,7 @@ public final class DefaultClassResolver implements ClassResolver {
 			return Class.forName( className, true, aggregatedClassLoader );
 		}
 		catch (Exception | LinkageError e) {
-			throw BeanLog.INSTANCE.unableToLoadTheClass( className, e.getMessage(), e );
+			throw EngineMiscLog.INSTANCE.unableToLoadTheClass( className, e.getMessage(), e );
 		}
 	}
 

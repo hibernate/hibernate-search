@@ -23,7 +23,7 @@ import org.hibernate.search.mapper.orm.automaticindexing.session.impl.Delegating
 import org.hibernate.search.mapper.orm.automaticindexing.spi.AutomaticIndexingEventSendingSessionContext;
 import org.hibernate.search.mapper.orm.loading.impl.HibernateOrmSelectionLoadingContext;
 import org.hibernate.search.mapper.orm.logging.impl.ConfigurationLog;
-import org.hibernate.search.mapper.orm.logging.impl.OrmSpecificLog;
+import org.hibernate.search.mapper.orm.logging.impl.OrmMiscLog;
 import org.hibernate.search.mapper.orm.massindexing.MassIndexer;
 import org.hibernate.search.mapper.orm.model.impl.HibernateOrmRuntimeIntrospector;
 import org.hibernate.search.mapper.orm.schema.management.SearchSchemaManager;
@@ -367,7 +367,7 @@ public class HibernateOrmSearchSession extends AbstractPojoSearchSession
 			session.checkOpen();
 		}
 		catch (IllegalStateException e) {
-			throw OrmSpecificLog.INSTANCE.hibernateSessionIsClosed( e );
+			throw OrmMiscLog.INSTANCE.hibernateSessionIsClosed( e );
 		}
 	}
 

@@ -11,7 +11,7 @@ import java.util.HashSet;
 import java.util.Locale;
 import java.util.Set;
 
-import org.hibernate.search.backend.elasticsearch.logging.impl.AnalyzerLog;
+import org.hibernate.search.backend.elasticsearch.logging.impl.AnalysisLog;
 import org.hibernate.search.backend.elasticsearch.logging.impl.MappingLog;
 import org.hibernate.search.backend.elasticsearch.lowlevel.index.mapping.impl.DataTypes;
 import org.hibernate.search.backend.elasticsearch.lowlevel.index.mapping.impl.PropertyMapping;
@@ -163,21 +163,21 @@ class ElasticsearchStringIndexFieldTypeOptionsStep
 			}
 
 			if ( normalizerName != null ) {
-				throw AnalyzerLog.INSTANCE.cannotApplyAnalyzerAndNormalizer( analyzerName, normalizerName,
+				throw AnalysisLog.INSTANCE.cannotApplyAnalyzerAndNormalizer( analyzerName, normalizerName,
 						buildContext.getEventContext() );
 			}
 
 			if ( resolvedSortable ) {
-				throw AnalyzerLog.INSTANCE.cannotUseAnalyzerOnSortableField( analyzerName, buildContext.getEventContext() );
+				throw AnalysisLog.INSTANCE.cannotUseAnalyzerOnSortableField( analyzerName, buildContext.getEventContext() );
 			}
 
 			if ( indexNullAs != null ) {
-				throw AnalyzerLog.INSTANCE.cannotUseIndexNullAsAndAnalyzer( analyzerName, indexNullAs,
+				throw AnalysisLog.INSTANCE.cannotUseIndexNullAsAndAnalyzer( analyzerName, indexNullAs,
 						buildContext.getEventContext() );
 			}
 
 			if ( resolvedAggregable ) {
-				throw AnalyzerLog.INSTANCE.cannotUseAnalyzerOnAggregableField( analyzerName, buildContext.getEventContext() );
+				throw AnalysisLog.INSTANCE.cannotUseAnalyzerOnAggregableField( analyzerName, buildContext.getEventContext() );
 			}
 		}
 		else {
@@ -188,7 +188,7 @@ class ElasticsearchStringIndexFieldTypeOptionsStep
 			builder.normalizerName( normalizerName );
 
 			if ( searchAnalyzerName != null ) {
-				throw AnalyzerLog.INSTANCE.searchAnalyzerWithoutAnalyzer( searchAnalyzerName, buildContext.getEventContext() );
+				throw AnalysisLog.INSTANCE.searchAnalyzerWithoutAnalyzer( searchAnalyzerName, buildContext.getEventContext() );
 			}
 		}
 

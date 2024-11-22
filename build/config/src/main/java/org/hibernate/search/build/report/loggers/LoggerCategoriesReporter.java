@@ -17,6 +17,7 @@ import java.util.Enumeration;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 import java.util.TreeMap;
 import java.util.TreeSet;
@@ -71,13 +72,10 @@ public class LoggerCategoriesReporter {
 					String name = (String) category.get( ReportConstants.CATEGORY_NAME );
 					Category c = report.computeIfAbsent( name, Category::new );
 					c.modules.add( moduleName );
-					List<String> descr = (List<String>) category.get( ReportConstants.CATEGORY_DESCRIPTION );
-					if ( descr != null ) {
-						c.descriptions.addAll( descr );
-					}
+					c.description = Objects.toString( category.get( ReportConstants.CATEGORY_DESCRIPTION ) );
 
 					List<String> levels = (List<String>) category.get( ReportConstants.LOG_LEVELS );
-					if ( descr != null ) {
+					if ( levels != null ) {
 						c.levels.addAll( levels );
 					}
 				}
@@ -88,19 +86,14 @@ public class LoggerCategoriesReporter {
 				Writer writer = new OutputStreamWriter( fos, StandardCharsets.UTF_8 ) ) {
 			for ( Category category : report.values() ) {
 				writer.write( "[[logging-category-%s]]`%s`::\n".formatted( category.name.replace( '.', '-' ), category.name ) );
-				if ( !category.descriptions.isEmpty() ) {
-					writer.write( "Description:::\n" );
-					for ( String description : category.descriptions ) {
-						writer.write( "* %s\n".formatted( description ) );
-					}
-				}
+				writer.write( "Description:::\n" );
+				writer.write( "%s\n".formatted( category.description ) );
 				writer.write( "Used in modules:::\n" );
-				for ( String module : category.modules ) {
-					writer.write( "* `%s`\n".formatted( module ) );
-				}
+				writer.write( category.modules.stream().map( "`%s`"::formatted ).collect( Collectors.joining( ", " ) ) );
+				writer.write( "\n" );
 				if ( !category.levels.isEmpty() ) {
 					writer.write( "Produces messages with log levels:::\n" );
-					writer.write( category.levels.stream().map( "`%s`"::formatted ).collect( Collectors.joining(", ")) );
+					writer.write( category.levels.stream().map( "`%s`"::formatted ).collect( Collectors.joining( ", " ) ) );
 					writer.write( "\n" );
 				}
 			}
@@ -109,7 +102,7 @@ public class LoggerCategoriesReporter {
 
 	private static class Category {
 		String name;
-		Set<String> descriptions = new TreeSet<>();
+		String description;
 		Set<String> modules = new TreeSet<>();
 		Set<String> levels = new TreeSet<>();
 

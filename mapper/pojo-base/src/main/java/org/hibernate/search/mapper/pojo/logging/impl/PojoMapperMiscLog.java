@@ -19,13 +19,13 @@ import org.jboss.logging.annotations.Message;
 import org.jboss.logging.annotations.MessageLogger;
 
 @CategorizedLogger(
-		category = CommonFailureLog.CATEGORY_NAME
+		category = PojoMapperMiscLog.CATEGORY_NAME
 )
 @MessageLogger(projectCode = MessageConstants.PROJECT_CODE)
-public interface CommonFailureLog {
-	String CATEGORY_NAME = "org.hibernate.search.common.failures";
+public interface PojoMapperMiscLog {
+	String CATEGORY_NAME = "org.hibernate.search.mapper";
 
-	CommonFailureLog INSTANCE = LoggerFactory.make( CommonFailureLog.class, CATEGORY_NAME, MethodHandles.lookup() );
+	PojoMapperMiscLog INSTANCE = LoggerFactory.make( PojoMapperMiscLog.class, CATEGORY_NAME, MethodHandles.lookup() );
 
 	@Message(id = ID_OFFSET + 104, value = "Param with name '%1$s' has not been defined for the binder.")
 	SearchException paramNotDefined(String name);

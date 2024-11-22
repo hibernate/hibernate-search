@@ -33,7 +33,7 @@ import org.jboss.logging.annotations.Param;
 )
 @MessageLogger(projectCode = MessageConstants.PROJECT_CODE)
 public interface IndexingLog {
-	String CATEGORY_NAME = "org.hibernate.search.mapper.indexing";
+	String CATEGORY_NAME = "org.hibernate.search.indexing.mapper";
 
 	IndexingLog INSTANCE = LoggerFactory.make( IndexingLog.class, CATEGORY_NAME, MethodHandles.lookup() );
 

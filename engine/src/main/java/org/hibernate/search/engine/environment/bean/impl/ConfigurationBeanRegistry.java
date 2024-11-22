@@ -9,7 +9,7 @@ import java.util.Map;
 import org.hibernate.search.engine.environment.bean.BeanHolder;
 import org.hibernate.search.engine.environment.bean.BeanReference;
 import org.hibernate.search.engine.environment.bean.BeanResolver;
-import org.hibernate.search.engine.logging.impl.BeanLog;
+import org.hibernate.search.engine.logging.impl.EngineMiscLog;
 
 final class ConfigurationBeanRegistry {
 
@@ -29,7 +29,7 @@ final class ConfigurationBeanRegistry {
 			return beanResolver.resolve( reference );
 		}
 		else {
-			throw BeanLog.INSTANCE.noConfiguredBeanReferenceForType( typeReference );
+			throw EngineMiscLog.INSTANCE.noConfiguredBeanReferenceForType( typeReference );
 		}
 	}
 
@@ -44,7 +44,7 @@ final class ConfigurationBeanRegistry {
 			return beanResolver.resolve( reference );
 		}
 		else {
-			throw BeanLog.INSTANCE.noConfiguredBeanReferenceForTypeAndName( typeReference, nameReference );
+			throw EngineMiscLog.INSTANCE.noConfiguredBeanReferenceForTypeAndName( typeReference, nameReference );
 		}
 	}
 

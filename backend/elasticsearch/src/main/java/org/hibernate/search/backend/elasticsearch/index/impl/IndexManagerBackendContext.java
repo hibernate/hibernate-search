@@ -15,7 +15,7 @@ import org.hibernate.search.backend.elasticsearch.document.model.lowlevel.impl.L
 import org.hibernate.search.backend.elasticsearch.index.IndexStatus;
 import org.hibernate.search.backend.elasticsearch.index.layout.impl.IndexNames;
 import org.hibernate.search.backend.elasticsearch.link.impl.ElasticsearchLink;
-import org.hibernate.search.backend.elasticsearch.logging.impl.ElasticsearchSpecificLog;
+import org.hibernate.search.backend.elasticsearch.logging.impl.ElasticsearchMiscLog;
 import org.hibernate.search.backend.elasticsearch.lowlevel.index.impl.IndexMetadata;
 import org.hibernate.search.backend.elasticsearch.multitenancy.impl.MultiTenancyStrategy;
 import org.hibernate.search.backend.elasticsearch.orchestration.impl.ElasticsearchBatchingWorkOrchestrator;
@@ -197,7 +197,7 @@ public class IndexManagerBackendContext implements SearchBackendContext, WorkExe
 				LIFECYCLE_MINIMAL_REQUIRED_STATUS.getAndTransform( indexPropertySource, optional -> {
 					if ( optional.isPresent() && !isStatusCheckPossible ) {
 						// Forbid explicit requirement when the status check is impossible
-						throw ElasticsearchSpecificLog.INSTANCE.cannotRequireIndexStatus();
+						throw ElasticsearchMiscLog.INSTANCE.cannotRequireIndexStatus();
 					}
 					else if ( !optional.isPresent() && isStatusCheckPossible ) {
 						// Default requirement when the status check is possible

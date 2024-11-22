@@ -24,7 +24,7 @@ import org.hibernate.search.engine.environment.bean.spi.BeanProvider;
 import org.hibernate.search.engine.environment.classpath.spi.ClassLoaderHelper;
 import org.hibernate.search.engine.environment.classpath.spi.ClassResolver;
 import org.hibernate.search.engine.environment.classpath.spi.ServiceResolver;
-import org.hibernate.search.engine.logging.impl.BeanLog;
+import org.hibernate.search.engine.logging.impl.EngineMiscLog;
 import org.hibernate.search.util.common.AssertionFailure;
 import org.hibernate.search.util.common.impl.Contracts;
 
@@ -149,7 +149,7 @@ public final class BeanResolverImpl implements BeanResolver {
 				}
 			}
 		}
-		throw BeanLog.INSTANCE.cannotResolveBeanReference( typeReference,
+		throw EngineMiscLog.INSTANCE.cannotResolveBeanReference( typeReference,
 				buildFailureMessage( sources, firstFailure, otherFailures ), firstFailure, otherFailures );
 	}
 
@@ -171,7 +171,7 @@ public final class BeanResolverImpl implements BeanResolver {
 				}
 			}
 		}
-		throw BeanLog.INSTANCE.cannotResolveBeanReference( typeReference, nameReference,
+		throw EngineMiscLog.INSTANCE.cannotResolveBeanReference( typeReference, nameReference,
 				buildFailureMessage( sources, firstFailure, otherFailures ), firstFailure, otherFailures );
 	}
 
@@ -209,7 +209,7 @@ public final class BeanResolverImpl implements BeanResolver {
 			return ClassLoaderHelper.classForName( typeReference, nameReference, classResolver );
 		}
 		catch (RuntimeException e) {
-			throw BeanLog.INSTANCE.unableToResolveToClassName( typeReference, nameReference, e.getMessage(), e );
+			throw EngineMiscLog.INSTANCE.unableToResolveToClassName( typeReference, nameReference, e.getMessage(), e );
 		}
 	}
 
@@ -218,7 +218,7 @@ public final class BeanResolverImpl implements BeanResolver {
 			return BeanHolder.of( ClassLoaderHelper.untypedInstanceFromClass( typeReference ) );
 		}
 		catch (RuntimeException e) {
-			throw BeanLog.INSTANCE.unableToCreateBeanUsingReflection( e.getMessage(), e );
+			throw EngineMiscLog.INSTANCE.unableToCreateBeanUsingReflection( e.getMessage(), e );
 		}
 	}
 
@@ -237,11 +237,11 @@ public final class BeanResolverImpl implements BeanResolver {
 	private String renderFailure(BeanSource source, RuntimeException failure) {
 		switch ( source ) {
 			case CONFIGURATION:
-				return BeanLog.INSTANCE.failedToResolveBeanUsingInternalRegistry( failure.getMessage() );
+				return EngineMiscLog.INSTANCE.failedToResolveBeanUsingInternalRegistry( failure.getMessage() );
 			case BEAN_MANAGER, BEAN_MANAGER_ASSUME_CLASS_NAME:
-				return BeanLog.INSTANCE.failedToResolveBeanUsingBeanManager( failure.getMessage() );
+				return EngineMiscLog.INSTANCE.failedToResolveBeanUsingBeanManager( failure.getMessage() );
 			case REFLECTION:
-				return BeanLog.INSTANCE.failedToResolveBeanUsingReflection( failure.getMessage() );
+				return EngineMiscLog.INSTANCE.failedToResolveBeanUsingReflection( failure.getMessage() );
 			default:
 				throw unknownBeanSource( source );
 		}

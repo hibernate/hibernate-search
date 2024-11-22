@@ -14,9 +14,9 @@ before it is executed.
 
 For more general information about what is being executed, rely on loggers:
 
-* <<troubleshooting-logging-lucene-infostream,`org.hibernate.search.backend.lucene.infostream`>>
+* <<troubleshooting-logging-lucene-infostream,`org.hibernate.search.lucene.infostream`>>
 for Lucene.
-* <<troubleshooting-logging-elasticsearch-request,`org.hibernate.search.backend.elasticsearch.request`>>
+* <<troubleshooting-logging-elasticsearch-request,`org.hibernate.search.elasticsearch.client.request`>>
 for Elasticsearch.
 
 [[troubleshooting-logging]]
@@ -28,7 +28,7 @@ Here are a few loggers that can be useful when debugging an application that use
 Available for all backends.
 +
 Logs every single search query at the `TRACE` level, before its execution.
-[[troubleshooting-logging-elasticsearch-request]]`org.hibernate.search.backend.elasticsearch.request`::
+[[troubleshooting-logging-elasticsearch-request]]`org.hibernate.search.elasticsearch.client.request`::
 Available for Elasticsearch backends only.
 +
 Logs requests sent to Elasticsearch at the `DEBUG` or `TRACE` level after their execution.
@@ -40,7 +40,7 @@ or the `TRACE` level to log every single request.
 +
 You can enable pretty-printing (line breaks and indentation) for the request and response
 using a <<backend-elasticsearch-configuration-logging,configuration property>>.
-[[troubleshooting-logging-lucene-infostream]]`org.hibernate.search.backend.lucene.infostream`::
+[[troubleshooting-logging-lucene-infostream]]`org.hibernate.search.lucene.infostream`::
 Available for Lucene backends only.
 +
 Logs low level trace information about Lucene's internal components, at the `TRACE` level.

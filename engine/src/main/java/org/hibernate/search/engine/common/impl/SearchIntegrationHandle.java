@@ -5,7 +5,7 @@
 package org.hibernate.search.engine.common.impl;
 
 import org.hibernate.search.engine.common.spi.SearchIntegration;
-import org.hibernate.search.engine.logging.impl.CommonFailureLog;
+import org.hibernate.search.engine.logging.impl.EngineMiscLog;
 
 final class SearchIntegrationHandle implements SearchIntegration.Handle {
 
@@ -18,7 +18,7 @@ final class SearchIntegrationHandle implements SearchIntegration.Handle {
 	@Override
 	public SearchIntegration getOrFail() {
 		if ( integration == null ) {
-			throw CommonFailureLog.INSTANCE.noIntegrationBecauseInitializationNotComplete();
+			throw EngineMiscLog.INSTANCE.noIntegrationBecauseInitializationNotComplete();
 		}
 		return integration;
 	}

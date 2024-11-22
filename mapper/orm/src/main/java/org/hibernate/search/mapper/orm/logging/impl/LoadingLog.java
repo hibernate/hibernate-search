@@ -23,12 +23,12 @@ import org.jboss.logging.annotations.MessageLogger;
 @CategorizedLogger(
 		category = LoadingLog.CATEGORY_NAME,
 		description = """
-				Logs debug information on some Hibernate ORM-related loading operations e.g. loading identifiers.
+				Logs related to the loading process that are Hibernate ORM mapper specific.
 				"""
 )
 @MessageLogger(projectCode = MessageConstants.PROJECT_CODE)
 public interface LoadingLog extends BasicLogger {
-	String CATEGORY_NAME = "org.hibernate.search.mapper.loading";
+	String CATEGORY_NAME = "org.hibernate.search.loading.mapper.orm";
 
 	LoadingLog INSTANCE = LoggerFactory.make( LoadingLog.class, CATEGORY_NAME, MethodHandles.lookup() );
 

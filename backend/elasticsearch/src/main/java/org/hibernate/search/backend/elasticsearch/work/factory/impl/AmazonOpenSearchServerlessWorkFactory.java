@@ -6,7 +6,7 @@ package org.hibernate.search.backend.elasticsearch.work.factory.impl;
 
 import org.hibernate.search.backend.elasticsearch.gson.spi.GsonProvider;
 import org.hibernate.search.backend.elasticsearch.index.IndexStatus;
-import org.hibernate.search.backend.elasticsearch.logging.impl.ElasticsearchSpecificLog;
+import org.hibernate.search.backend.elasticsearch.logging.impl.ElasticsearchMiscLog;
 import org.hibernate.search.backend.elasticsearch.util.spi.URLEncodedString;
 import org.hibernate.search.backend.elasticsearch.work.impl.CloseIndexWork;
 import org.hibernate.search.backend.elasticsearch.work.impl.DeleteByQueryWork;
@@ -39,7 +39,7 @@ public class AmazonOpenSearchServerlessWorkFactory extends Elasticsearch7WorkFac
 
 	@Override
 	public DeleteByQueryWork.Builder deleteByQuery(URLEncodedString indexName, JsonObject payload) {
-		throw ElasticsearchSpecificLog.INSTANCE.cannotExecuteOperationOnAmazonOpenSearchServerless( "deleteByQuery" );
+		throw ElasticsearchMiscLog.INSTANCE.cannotExecuteOperationOnAmazonOpenSearchServerless( "deleteByQuery" );
 	}
 
 	@Override
@@ -49,7 +49,7 @@ public class AmazonOpenSearchServerlessWorkFactory extends Elasticsearch7WorkFac
 
 	@Override
 	public FlushWork.Builder flush() {
-		throw ElasticsearchSpecificLog.INSTANCE.cannotExecuteOperationOnAmazonOpenSearchServerless( "flush" );
+		throw ElasticsearchMiscLog.INSTANCE.cannotExecuteOperationOnAmazonOpenSearchServerless( "flush" );
 	}
 
 	@Override
@@ -59,7 +59,7 @@ public class AmazonOpenSearchServerlessWorkFactory extends Elasticsearch7WorkFac
 
 	@Override
 	public RefreshWork.Builder refresh() {
-		throw ElasticsearchSpecificLog.INSTANCE.cannotExecuteOperationOnAmazonOpenSearchServerless( "refresh" );
+		throw ElasticsearchMiscLog.INSTANCE.cannotExecuteOperationOnAmazonOpenSearchServerless( "refresh" );
 	}
 
 	@Override
@@ -69,23 +69,23 @@ public class AmazonOpenSearchServerlessWorkFactory extends Elasticsearch7WorkFac
 
 	@Override
 	public ForceMergeWork.Builder mergeSegments() {
-		throw ElasticsearchSpecificLog.INSTANCE.cannotExecuteOperationOnAmazonOpenSearchServerless( "mergeSegments" );
+		throw ElasticsearchMiscLog.INSTANCE.cannotExecuteOperationOnAmazonOpenSearchServerless( "mergeSegments" );
 	}
 
 	@Override
 	public OpenIndexWork.Builder openIndex(URLEncodedString indexName) {
-		throw ElasticsearchSpecificLog.INSTANCE.cannotExecuteOperationOnAmazonOpenSearchServerless( "openIndex" );
+		throw ElasticsearchMiscLog.INSTANCE.cannotExecuteOperationOnAmazonOpenSearchServerless( "openIndex" );
 	}
 
 	@Override
 	public CloseIndexWork.Builder closeIndex(URLEncodedString indexName) {
-		throw ElasticsearchSpecificLog.INSTANCE.cannotExecuteOperationOnAmazonOpenSearchServerless( "closeIndex" );
+		throw ElasticsearchMiscLog.INSTANCE.cannotExecuteOperationOnAmazonOpenSearchServerless( "closeIndex" );
 	}
 
 	@Override
 	public WaitForIndexStatusWork.Builder waitForIndexStatus(URLEncodedString indexName, IndexStatus requiredStatus,
 			int requiredStatusTimeoutInMs) {
-		throw ElasticsearchSpecificLog.INSTANCE.cannotExecuteOperationOnAmazonOpenSearchServerless( "waitForIndexStatus" );
+		throw ElasticsearchMiscLog.INSTANCE.cannotExecuteOperationOnAmazonOpenSearchServerless( "waitForIndexStatus" );
 	}
 
 	@Override

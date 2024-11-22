@@ -15,7 +15,7 @@ import org.hibernate.search.backend.lucene.analysis.impl.LuceneAnalysisPerformer
 import org.hibernate.search.backend.lucene.document.impl.LuceneIndexEntryFactory;
 import org.hibernate.search.backend.lucene.document.model.impl.LuceneIndexModel;
 import org.hibernate.search.backend.lucene.index.LuceneIndexManager;
-import org.hibernate.search.backend.lucene.logging.impl.CommonFailureLog;
+import org.hibernate.search.backend.lucene.logging.impl.LuceneMiscLog;
 import org.hibernate.search.backend.lucene.logging.impl.QueryLog;
 import org.hibernate.search.backend.lucene.lowlevel.reader.impl.DirectoryReaderCollector;
 import org.hibernate.search.backend.lucene.schema.management.impl.LuceneIndexSchemaManager;
@@ -243,7 +243,7 @@ public class LuceneIndexManagerImpl
 		if ( clazz.isAssignableFrom( LuceneIndexManager.class ) ) {
 			return (T) this;
 		}
-		throw CommonFailureLog.INSTANCE.indexManagerUnwrappingWithUnknownType(
+		throw LuceneMiscLog.INSTANCE.indexManagerUnwrappingWithUnknownType(
 				clazz, LuceneIndexManager.class, getBackendAndIndexEventContext()
 		);
 	}

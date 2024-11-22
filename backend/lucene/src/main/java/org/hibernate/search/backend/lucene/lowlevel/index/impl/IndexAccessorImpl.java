@@ -8,7 +8,7 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.nio.file.NoSuchFileException;
 
-import org.hibernate.search.backend.lucene.logging.impl.LuceneSpecificLog;
+import org.hibernate.search.backend.lucene.logging.impl.LuceneMiscLog;
 import org.hibernate.search.backend.lucene.lowlevel.common.impl.AnalyzerConstants;
 import org.hibernate.search.backend.lucene.lowlevel.directory.spi.DirectoryHolder;
 import org.hibernate.search.backend.lucene.lowlevel.reader.impl.IndexReaderProvider;
@@ -66,7 +66,7 @@ public class IndexAccessorImpl implements AutoCloseable, IndexAccessor {
 			initializeDirectory( directory );
 		}
 		catch (IOException | RuntimeException e) {
-			throw LuceneSpecificLog.INSTANCE.unableToInitializeIndexDirectory(
+			throw LuceneMiscLog.INSTANCE.unableToInitializeIndexDirectory(
 					e.getMessage(), eventContext, e
 			);
 		}
@@ -82,10 +82,10 @@ public class IndexAccessorImpl implements AutoCloseable, IndexAccessor {
 			}
 		}
 		catch (IOException | RuntimeException e) {
-			throw LuceneSpecificLog.INSTANCE.unableToValidateIndexDirectory( e.getMessage(), eventContext, e );
+			throw LuceneMiscLog.INSTANCE.unableToValidateIndexDirectory( e.getMessage(), eventContext, e );
 		}
 
-		throw LuceneSpecificLog.INSTANCE.missingIndex( directory, eventContext );
+		throw LuceneMiscLog.INSTANCE.missingIndex( directory, eventContext );
 	}
 
 	@Override
@@ -116,7 +116,7 @@ public class IndexAccessorImpl implements AutoCloseable, IndexAccessor {
 			close();
 		}
 		catch (IOException | RuntimeException e) {
-			throw LuceneSpecificLog.INSTANCE.unableToDropIndexDirectory( e.getMessage(), eventContext, e );
+			throw LuceneMiscLog.INSTANCE.unableToDropIndexDirectory( e.getMessage(), eventContext, e );
 		}
 	}
 
@@ -142,7 +142,7 @@ public class IndexAccessorImpl implements AutoCloseable, IndexAccessor {
 			indexReaderProvider.clear();
 		}
 		catch (IOException e) {
-			throw LuceneSpecificLog.INSTANCE.unableToRefresh( e.getMessage(), eventContext, e );
+			throw LuceneMiscLog.INSTANCE.unableToRefresh( e.getMessage(), eventContext, e );
 		}
 	}
 
@@ -153,7 +153,7 @@ public class IndexAccessorImpl implements AutoCloseable, IndexAccessor {
 			indexWriterProvider.getOrCreate().mergeSegments();
 		}
 		catch (IOException e) {
-			throw LuceneSpecificLog.INSTANCE.unableToMergeSegments( e.getMessage(), eventContext, e );
+			throw LuceneMiscLog.INSTANCE.unableToMergeSegments( e.getMessage(), eventContext, e );
 		}
 	}
 
@@ -198,7 +198,7 @@ public class IndexAccessorImpl implements AutoCloseable, IndexAccessor {
 			}
 		}
 		catch (IOException e) {
-			throw LuceneSpecificLog.INSTANCE.unableToComputeIndexSize( e.getMessage(), eventContext, e );
+			throw LuceneMiscLog.INSTANCE.unableToComputeIndexSize( e.getMessage(), eventContext, e );
 		}
 
 		return totalSize;
@@ -227,7 +227,7 @@ public class IndexAccessorImpl implements AutoCloseable, IndexAccessor {
 			iw.close();
 		}
 		catch (LockObtainFailedException lofe) {
-			LuceneSpecificLog.INSTANCE.lockingFailureDuringInitialization( directory.toString(), eventContext, lofe );
+			LuceneMiscLog.INSTANCE.lockingFailureDuringInitialization( directory.toString(), eventContext, lofe );
 		}
 	}
 }

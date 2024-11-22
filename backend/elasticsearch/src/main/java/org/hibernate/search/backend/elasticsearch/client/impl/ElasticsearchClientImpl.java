@@ -21,8 +21,8 @@ import org.hibernate.search.backend.elasticsearch.client.spi.ElasticsearchClient
 import org.hibernate.search.backend.elasticsearch.client.spi.ElasticsearchRequest;
 import org.hibernate.search.backend.elasticsearch.client.spi.ElasticsearchResponse;
 import org.hibernate.search.backend.elasticsearch.gson.spi.JsonLogHelper;
-import org.hibernate.search.backend.elasticsearch.logging.impl.CommonFailureLog;
 import org.hibernate.search.backend.elasticsearch.logging.impl.ElasticsearchClientLog;
+import org.hibernate.search.backend.elasticsearch.logging.impl.ElasticsearchMiscLog;
 import org.hibernate.search.backend.elasticsearch.logging.impl.ElasticsearchRequestLog;
 import org.hibernate.search.engine.common.execution.spi.SimpleScheduledExecutor;
 import org.hibernate.search.engine.common.timing.Deadline;
@@ -88,7 +88,7 @@ public class ElasticsearchClientImpl implements ElasticsearchClientImplementor {
 		if ( RestClient.class.isAssignableFrom( clientClass ) ) {
 			return (T) restClientHolder.get();
 		}
-		throw CommonFailureLog.INSTANCE.clientUnwrappingWithUnknownType( clientClass, RestClient.class );
+		throw ElasticsearchMiscLog.INSTANCE.clientUnwrappingWithUnknownType( clientClass, RestClient.class );
 	}
 
 	private CompletableFuture<Response> send(ElasticsearchRequest elasticsearchRequest) {

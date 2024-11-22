@@ -13,7 +13,7 @@ import org.hibernate.search.backend.lucene.cache.impl.LuceneQueryCachingContext;
 import org.hibernate.search.backend.lucene.document.model.dsl.impl.LuceneIndexRootBuilder;
 import org.hibernate.search.backend.lucene.index.impl.IndexManagerBackendContext;
 import org.hibernate.search.backend.lucene.index.impl.LuceneIndexManagerBuilder;
-import org.hibernate.search.backend.lucene.logging.impl.CommonFailureLog;
+import org.hibernate.search.backend.lucene.logging.impl.LuceneMiscLog;
 import org.hibernate.search.backend.lucene.multitenancy.impl.MultiTenancyStrategy;
 import org.hibernate.search.backend.lucene.orchestration.impl.LuceneSyncWorkOrchestratorImpl;
 import org.hibernate.search.backend.lucene.resources.impl.BackendThreads;
@@ -107,7 +107,7 @@ public class LuceneBackendImpl implements BackendImplementor, LuceneBackend {
 		if ( clazz.isAssignableFrom( LuceneBackend.class ) ) {
 			return (T) this;
 		}
-		throw CommonFailureLog.INSTANCE.backendUnwrappingWithUnknownType(
+		throw LuceneMiscLog.INSTANCE.backendUnwrappingWithUnknownType(
 				clazz, LuceneBackend.class, eventContext
 		);
 	}

@@ -28,7 +28,7 @@ import org.hibernate.search.engine.search.projection.definition.spi.ObjectProjec
 import org.hibernate.search.mapper.pojo.extractor.builtin.BuiltinContainerExtractors;
 import org.hibernate.search.mapper.pojo.extractor.impl.BoundContainerExtractorPath;
 import org.hibernate.search.mapper.pojo.extractor.mapping.programmatic.ContainerExtractorPath;
-import org.hibernate.search.mapper.pojo.logging.impl.CommonFailureLog;
+import org.hibernate.search.mapper.pojo.logging.impl.PojoMapperMiscLog;
 import org.hibernate.search.mapper.pojo.logging.impl.ProjectionLog;
 import org.hibernate.search.mapper.pojo.mapping.building.impl.PojoMappingHelper;
 import org.hibernate.search.mapper.pojo.model.PojoModelConstructorParameter;
@@ -110,7 +110,7 @@ public class ProjectionBindingContextImpl<P> implements ProjectionBindingContext
 
 		Object value = params.get( name );
 		if ( value == null ) {
-			throw CommonFailureLog.INSTANCE.paramNotDefined( name );
+			throw PojoMapperMiscLog.INSTANCE.paramNotDefined( name );
 		}
 
 		return paramType.cast( value );

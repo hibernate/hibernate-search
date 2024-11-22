@@ -6,7 +6,7 @@ package org.hibernate.search.engine.environment.bean.impl;
 
 import org.hibernate.search.engine.environment.bean.BeanHolder;
 import org.hibernate.search.engine.environment.bean.spi.BeanProvider;
-import org.hibernate.search.engine.logging.impl.BeanLog;
+import org.hibernate.search.engine.logging.impl.EngineMiscLog;
 
 public final class NoConfiguredBeanManagerBeanProvider implements BeanProvider {
 
@@ -21,12 +21,12 @@ public final class NoConfiguredBeanManagerBeanProvider implements BeanProvider {
 
 	@Override
 	public <T> BeanHolder<T> forType(Class<T> typeReference) {
-		throw BeanLog.INSTANCE.noConfiguredBeanManager();
+		throw EngineMiscLog.INSTANCE.noConfiguredBeanManager();
 	}
 
 	@Override
 	public <T> BeanHolder<T> forTypeAndName(Class<T> typeReference, String implementationFullyQualifiedClassName) {
-		throw BeanLog.INSTANCE.noConfiguredBeanManager();
+		throw EngineMiscLog.INSTANCE.noConfiguredBeanManager();
 	}
 
 }

@@ -21,7 +21,7 @@ import org.jboss.logging.annotations.ValidIdRanges;
 @CategorizedLogger(
 		category = JakartaBatchLog.CATEGORY_NAME,
 		description = """
-				Logs debug information on various batch indexing operations.
+				Logs related to the batch indexing operations specific to JBeret.
 				"""
 )
 @MessageLogger(projectCode = MessageConstants.PROJECT_CODE)
@@ -34,7 +34,7 @@ import org.jboss.logging.annotations.ValidIdRanges;
 })
 public interface JakartaBatchLog {
 
-	String CATEGORY_NAME = "org.hibernate.search.mapper.jakarta.batch";
+	String CATEGORY_NAME = "org.hibernate.search.mapper.jakarta.batch.jberet";
 
 	JakartaBatchLog INSTANCE = LoggerFactory.make( JakartaBatchLog.class, CATEGORY_NAME, MethodHandles.lookup() );
 

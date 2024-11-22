@@ -20,7 +20,7 @@ import java.util.List;
 import java.util.function.BiConsumer;
 import java.util.function.Function;
 
-import org.hibernate.search.backend.lucene.logging.impl.LuceneSpecificLog;
+import org.hibernate.search.backend.lucene.logging.impl.LuceneMiscLog;
 import org.hibernate.search.engine.cfg.ConfigurationPropertySource;
 import org.hibernate.search.engine.cfg.spi.ConfigurationProperty;
 import org.hibernate.search.engine.cfg.spi.OptionalConfigurationProperty;
@@ -136,8 +136,8 @@ public final class IndexWriterSettings implements Serializable {
 			if ( value == null ) {
 				return null;
 			}
-			if ( LuceneSpecificLog.INSTANCE.isDebugEnabled() ) {
-				LuceneSpecificLog.INSTANCE.indexWriterSetParameter( settingName, value, eventContext.renderWithPrefix() );
+			if ( LuceneMiscLog.INSTANCE.isDebugEnabled() ) {
+				LuceneMiscLog.INSTANCE.indexWriterSetParameter( settingName, value, eventContext.renderWithPrefix() );
 			}
 			R processedValue = processor.apply( value );
 			return new IndexWriterSettingValue<>( settingName, processedValue,

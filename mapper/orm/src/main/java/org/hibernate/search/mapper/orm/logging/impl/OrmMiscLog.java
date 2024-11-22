@@ -16,6 +16,7 @@ import jakarta.transaction.Synchronization;
 import org.hibernate.ScrollMode;
 import org.hibernate.SessionFactory;
 import org.hibernate.search.mapper.orm.search.loading.EntityLoadingCacheLookupStrategy;
+import org.hibernate.search.mapper.pojo.logging.impl.PojoMapperLog;
 import org.hibernate.search.util.common.SearchException;
 import org.hibernate.search.util.common.logging.CategorizedLogger;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
@@ -28,17 +29,17 @@ import org.jboss.logging.annotations.Message;
 import org.jboss.logging.annotations.MessageLogger;
 
 @CategorizedLogger(
-		category = OrmSpecificLog.CATEGORY_NAME,
+		category = OrmMiscLog.CATEGORY_NAME,
 		description = """
-				Logs information on Hibernate ORM-specific matters related
-				but not limited to transactions, caching and unrecognized query hints.
+				The main category for the Hibernate ORM mapper-specific logs.
+				It may also include logs that do not fit any other, more specific, Hibernate ORM mapper category.
 				"""
 )
 @MessageLogger(projectCode = MessageConstants.PROJECT_CODE)
-public interface OrmSpecificLog {
+public interface OrmMiscLog {
 	String CATEGORY_NAME = "org.hibernate.search.mapper.orm";
 
-	OrmSpecificLog INSTANCE = LoggerFactory.make( OrmSpecificLog.class, CATEGORY_NAME, MethodHandles.lookup() );
+	OrmMiscLog INSTANCE = LoggerFactory.make( OrmMiscLog.class, CATEGORY_NAME, MethodHandles.lookup() );
 
 	// -----------------------------------
 	// Pre-existing messages from Search 5
@@ -98,6 +99,10 @@ public interface OrmSpecificLog {
 
 	@Message(id = ID_OFFSET + 25, value = "Unable to handle transaction: %1$s")
 	SearchException transactionHandlingException(String causeMessage, @Cause Throwable cause);
+
+	@LogMessage(level = Logger.Level.ERROR)
+	@Message(id = PojoMapperLog.ID_OFFSET + 35, value = "Unable to shut down Hibernate Search:")
+	void shutdownFailed(@Cause Throwable cause);
 
 	@Message(id = ID_OFFSET + 36, value = "Cannot use scroll() with scroll mode '%1$s' with Hibernate Search queries:"
 			+ " only ScrollMode.FORWARDS_ONLY is supported.")

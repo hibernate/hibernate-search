@@ -39,7 +39,7 @@ import org.hibernate.search.engine.search.query.SearchQuery;
 import org.hibernate.search.engine.search.query.spi.SearchQueryImplementor;
 import org.hibernate.search.mapper.orm.loading.spi.EntityGraphHint;
 import org.hibernate.search.mapper.orm.loading.spi.MutableEntityLoadingOptions;
-import org.hibernate.search.mapper.orm.logging.impl.OrmSpecificLog;
+import org.hibernate.search.mapper.orm.logging.impl.OrmMiscLog;
 import org.hibernate.search.mapper.orm.search.query.spi.HibernateOrmSearchQueryHints;
 import org.hibernate.search.mapper.orm.search.query.spi.HibernateOrmSearchScrollableResultsAdapter;
 import org.hibernate.search.util.common.SearchTimeoutException;
@@ -120,7 +120,7 @@ public final class HibernateOrmSearchQueryAdapter<R> extends AbstractQuery<R> {
 				applyEntityGraphHint( hintName, value );
 				break;
 			default:
-				OrmSpecificLog.INSTANCE.ignoringUnrecognizedQueryHint( hintName );
+				OrmMiscLog.INSTANCE.ignoringUnrecognizedQueryHint( hintName );
 				break;
 		}
 		return this;
@@ -170,7 +170,7 @@ public final class HibernateOrmSearchQueryAdapter<R> extends AbstractQuery<R> {
 	@Override
 	protected ScrollableResultsImplementor<R> doScroll(ScrollMode scrollMode) {
 		if ( !ScrollMode.FORWARD_ONLY.equals( scrollMode ) ) {
-			throw OrmSpecificLog.INSTANCE.canOnlyUseScrollWithScrollModeForwardsOnly( scrollMode );
+			throw OrmMiscLog.INSTANCE.canOnlyUseScrollWithScrollModeForwardsOnly( scrollMode );
 		}
 
 		int chunkSize = loadingOptions.fetchSize();

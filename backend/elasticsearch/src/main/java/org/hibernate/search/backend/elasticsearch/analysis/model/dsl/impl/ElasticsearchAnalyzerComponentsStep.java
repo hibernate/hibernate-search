@@ -8,7 +8,7 @@ import org.hibernate.search.backend.elasticsearch.analysis.model.dsl.Elasticsear
 import org.hibernate.search.backend.elasticsearch.analysis.model.dsl.ElasticsearchAnalyzerTokenizerStep;
 import org.hibernate.search.backend.elasticsearch.analysis.model.impl.ElasticsearchAnalysisDefinitionCollector;
 import org.hibernate.search.backend.elasticsearch.analysis.model.impl.ElasticsearchAnalysisDefinitionContributor;
-import org.hibernate.search.backend.elasticsearch.logging.impl.AnalyzerLog;
+import org.hibernate.search.backend.elasticsearch.logging.impl.AnalysisLog;
 import org.hibernate.search.backend.elasticsearch.lowlevel.index.analysis.impl.AnalyzerDefinition;
 import org.hibernate.search.util.common.impl.StringHelper;
 
@@ -53,7 +53,7 @@ class ElasticsearchAnalyzerComponentsStep
 	@Override
 	public void contribute(ElasticsearchAnalysisDefinitionCollector collector) {
 		if ( StringHelper.isEmpty( definition.getTokenizer() ) ) {
-			throw AnalyzerLog.INSTANCE.invalidElasticsearchAnalyzerDefinition( name );
+			throw AnalysisLog.INSTANCE.invalidElasticsearchAnalyzerDefinition( name );
 		}
 		collector.collect( name, definition );
 	}

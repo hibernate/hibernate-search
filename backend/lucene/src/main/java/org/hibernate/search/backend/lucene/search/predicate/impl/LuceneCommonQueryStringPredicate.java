@@ -14,7 +14,7 @@ import java.util.function.Predicate;
 
 import org.hibernate.search.backend.lucene.analysis.impl.ScopedAnalyzer;
 import org.hibernate.search.backend.lucene.analysis.model.impl.LuceneAnalysisDefinitionRegistry;
-import org.hibernate.search.backend.lucene.logging.impl.AnalyzerLog;
+import org.hibernate.search.backend.lucene.logging.impl.AnalysisLog;
 import org.hibernate.search.backend.lucene.lowlevel.common.impl.AnalyzerConstants;
 import org.hibernate.search.backend.lucene.search.common.impl.LuceneSearchIndexScope;
 import org.hibernate.search.backend.lucene.types.predicate.impl.LuceneCommonQueryStringPredicateBuilderFieldState;
@@ -135,7 +135,7 @@ abstract class LuceneCommonQueryStringPredicate extends AbstractLuceneNestablePr
 		public void analyzer(String analyzerName) {
 			this.overrideAnalyzer = analysisDefinitionRegistry.getAnalyzerDefinition( analyzerName );
 			if ( overrideAnalyzer == null ) {
-				throw AnalyzerLog.INSTANCE.unknownAnalyzer( analyzerName,
+				throw AnalysisLog.INSTANCE.unknownAnalyzer( analyzerName,
 						EventContexts.fromIndexNames( scope.hibernateSearchIndexNames() ) );
 			}
 		}

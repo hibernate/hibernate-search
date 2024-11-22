@@ -28,12 +28,12 @@ import org.jboss.logging.annotations.Param;
 @CategorizedLogger(
 		category = ConfigurationLog.CATEGORY_NAME,
 		description = """
-				Logs debug information on the client factory used by the Elasticsearch backend.
+				Logs related to the Elasticsearch-specific backend configuration.
 				"""
 )
 @MessageLogger(projectCode = MessageConstants.PROJECT_CODE)
 public interface ConfigurationLog {
-	String CATEGORY_NAME = "org.hibernate.search.configuration";
+	String CATEGORY_NAME = "org.hibernate.search.configuration.elasticsearch";
 
 	ConfigurationLog INSTANCE = LoggerFactory.make( ConfigurationLog.class, CATEGORY_NAME, MethodHandles.lookup() );
 

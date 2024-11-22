@@ -8,7 +8,7 @@ import java.io.IOException;
 import java.nio.file.Path;
 import java.util.function.Supplier;
 
-import org.hibernate.search.backend.lucene.logging.impl.LuceneSpecificLog;
+import org.hibernate.search.backend.lucene.logging.impl.LuceneMiscLog;
 import org.hibernate.search.backend.lucene.lowlevel.directory.spi.DirectoryHolder;
 import org.hibernate.search.util.common.reporting.EventContext;
 
@@ -38,7 +38,7 @@ final class LocalFileSystemDirectoryHolder implements DirectoryHolder {
 			FileSystemUtils.initializeWriteableDirectory( directoryPath );
 		}
 		catch (Exception e) {
-			throw LuceneSpecificLog.INSTANCE.unableToInitializeIndexDirectory( e.getMessage(), eventContext, e );
+			throw LuceneMiscLog.INSTANCE.unableToInitializeIndexDirectory( e.getMessage(), eventContext, e );
 		}
 
 		this.directory = accessStrategy.createDirectory( directoryPath, lockFactorySupplier.get() );

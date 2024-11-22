@@ -6,7 +6,7 @@ package org.hibernate.search.backend.lucene;
 
 import java.util.Optional;
 
-import org.hibernate.search.backend.lucene.logging.impl.CommonFailureLog;
+import org.hibernate.search.backend.lucene.logging.impl.LuceneMiscLog;
 import org.hibernate.search.backend.lucene.schema.management.LuceneIndexSchemaExport;
 import org.hibernate.search.backend.lucene.scope.LuceneIndexScope;
 import org.hibernate.search.backend.lucene.search.aggregation.dsl.LuceneSearchAggregationFactory;
@@ -197,7 +197,7 @@ public final class LuceneExtension<H, R, E, LOS>
 			return (LuceneIndexFieldTypeFactory) original;
 		}
 		else {
-			throw CommonFailureLog.INSTANCE.luceneExtensionOnUnknownType( original );
+			throw LuceneMiscLog.INSTANCE.luceneExtensionOnUnknownType( original );
 		}
 	}
 
@@ -210,7 +210,7 @@ public final class LuceneExtension<H, R, E, LOS>
 			return (LuceneIndexScope) original;
 		}
 		else {
-			throw CommonFailureLog.INSTANCE.luceneExtensionOnUnknownType( original );
+			throw LuceneMiscLog.INSTANCE.luceneExtensionOnUnknownType( original );
 		}
 	}
 
@@ -223,7 +223,7 @@ public final class LuceneExtension<H, R, E, LOS>
 			return (LuceneIndexSchemaExport) original;
 		}
 		else {
-			throw CommonFailureLog.INSTANCE.luceneExtensionOnUnknownType( original );
+			throw LuceneMiscLog.INSTANCE.luceneExtensionOnUnknownType( original );
 		}
 	}
 }

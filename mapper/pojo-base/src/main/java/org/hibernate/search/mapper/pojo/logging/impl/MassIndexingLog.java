@@ -30,9 +30,7 @@ import org.jboss.logging.annotations.MessageLogger;
 @CategorizedLogger(
 		category = MassIndexingLog.CATEGORY_NAME,
 		description = """
-				Logs information on various mass indexing operations (e.g. when they start/end or progress).
-				+
-				It may also include messages on misconfigured mass indexer.
+				Logs related to various mass indexing operations.
 				"""
 )
 @MessageLogger(projectCode = MessageConstants.PROJECT_CODE)
