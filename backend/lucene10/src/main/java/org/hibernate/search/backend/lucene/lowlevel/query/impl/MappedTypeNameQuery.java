@@ -4,17 +4,18 @@
  */
 package org.hibernate.search.backend.lucene.lowlevel.query.impl;
 
+import java.io.IOException;
+
 import org.hibernate.search.backend.lucene.lowlevel.reader.impl.IndexReaderMetadataResolver;
 
 import org.apache.lucene.index.LeafReaderContext;
-import org.apache.lucene.search.ConstantScoreScorer;
 import org.apache.lucene.search.ConstantScoreWeight;
 import org.apache.lucene.search.DocIdSetIterator;
 import org.apache.lucene.search.IndexSearcher;
 import org.apache.lucene.search.Query;
 import org.apache.lucene.search.QueryVisitor;
 import org.apache.lucene.search.ScoreMode;
-import org.apache.lucene.search.Scorer;
+import org.apache.lucene.search.ScorerSupplier;
 import org.apache.lucene.search.Weight;
 
 public final class MappedTypeNameQuery extends Query {
@@ -51,8 +52,9 @@ public final class MappedTypeNameQuery extends Query {
 	@Override
 	public Weight createWeight(IndexSearcher searcher, ScoreMode scoreMode, float boost) {
 		return new ConstantScoreWeight( this, 1.0f ) {
+
 			@Override
-			public Scorer scorer(LeafReaderContext context) {
+			public ScorerSupplier scorerSupplier(LeafReaderContext context) throws IOException {
 				String leafMappedTypeName = metadataResolver.resolveMappedTypeName( context );
 				DocIdSetIterator matchingDocs;
 				if ( mappedTypeName.equals( leafMappedTypeName ) ) {
@@ -61,7 +63,8 @@ public final class MappedTypeNameQuery extends Query {
 				else {
 					matchingDocs = DocIdSetIterator.empty();
 				}
-				return new ConstantScoreScorer( this, this.score(), scoreMode, matchingDocs );
+
+				return new ConstantScorerSupplier( this, this.score(), scoreMode, matchingDocs );
 			}
 
 			@Override
