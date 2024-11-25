@@ -73,7 +73,7 @@ public final class LuceneCommonMinimumShouldMatchConstraints implements MinimumS
 		}
 		if ( query instanceof BooleanQuery ) {
 			BooleanQuery booleanQuery = (BooleanQuery) query;
-			int shouldClauses = (int) booleanQuery.clauses().stream().map( BooleanClause::getOccur )
+			int shouldClauses = (int) booleanQuery.clauses().stream().map( BooleanClause::occur )
 					.filter( BooleanClause.Occur.SHOULD::equals )
 					.count();
 			int minimumShouldMatch = minimumShouldMatch( shouldClauses );
