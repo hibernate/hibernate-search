@@ -1,6 +1,26 @@
 Hibernate Search Changelog
 ==========================
 
+7.2.2.Final (2024-11-25)
+-------------------------
+
+** Bug
+    * HSEARCH-5268 "No readable property named '_identifierMapper'" error when using @IdClass for composite key
+    * HSEARCH-5255 Issue with cardinality and @ObjectProjection
+
+** Improvement
+    * HSEARCH-5276 Upgrade Elasticsearch client to 8.15.4
+    * HSEARCH-5267 Upgrade to Hibernate ORM 6.6.3.Final
+    * HSEARCH-5248 Upgrade Elasticsearch client to 8.15.2
+    * HSEARCH-5244 Upgrade to Hibernate ORM 6.6.1.Final
+    * HSEARCH-5237 Upgrade Elasticsearch client to 8.15.1
+
+** Task
+    * HSEARCH-5277 Test against latest Elasticsearch 8.15.4
+    * HSEARCH-5256 Use spotless maven plugin instead of formatter/impsorter/license check plugins
+    * HSEARCH-5247 Test against latest Elasticsearch 8.15.2
+    * HSEARCH-5236 Test against latest Elasticsearch 8.15.1
+
 7.2.1.Final (2024-08-30)
 -------------------------
 
