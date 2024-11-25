@@ -49,9 +49,9 @@ public class LongMultiValueFacetCounts extends Facets {
 		LongProcedure incrementCountForDocumentId = this::increment;
 
 		for ( FacetsCollector.MatchingDocs hits : matchingDocs ) {
-			LongMultiValues fv = valueSource.getValues( hits.context );
+			LongMultiValues fv = valueSource.getValues( hits.context() );
 
-			DocIdSetIterator docs = hits.bits.iterator();
+			DocIdSetIterator docs = hits.bits().iterator();
 			for ( int doc = docs.nextDoc(); doc != DocIdSetIterator.NO_MORE_DOCS; doc = docs.nextDoc() ) {
 				if ( fv.advanceExact( doc ) ) {
 					totCount++;

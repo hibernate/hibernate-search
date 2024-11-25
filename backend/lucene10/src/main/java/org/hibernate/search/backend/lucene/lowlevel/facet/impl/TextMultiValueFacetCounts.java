@@ -139,7 +139,7 @@ public class TextMultiValueFacetCounts extends Facets {
 		}
 		IntHashSet uniqueOrdinalsForDocument = new IntHashSet();
 
-		DocIdSetIterator docs = hits.bits.iterator();
+		DocIdSetIterator docs = hits.bits().iterator();
 
 		// TODO: yet another option is to count all segs
 		// first, only in seg-ord space, and then do a
@@ -155,7 +155,7 @@ public class TextMultiValueFacetCounts extends Facets {
 
 			int numSegOrds = (int) segValues.getValueCount();
 
-			if ( hits.totalHits < numSegOrds / 10 ) {
+			if ( hits.totalHits() < numSegOrds / 10 ) {
 				IntProcedure incrementCountForOrdinal = ord -> counts[ord]++;
 				// Remap every ord to global ord as we iterate:
 				for ( int doc = docs.nextDoc(); doc != DocIdSetIterator.NO_MORE_DOCS; doc = docs.nextDoc() ) {
@@ -237,12 +237,12 @@ public class TextMultiValueFacetCounts extends Facets {
 			// the top-level reader passed to the
 			// SortedSetDocValuesReaderState, else cryptic
 			// AIOOBE can happen:
-			if ( ReaderUtil.getTopLevelContext( hits.context ).reader() != reader ) {
+			if ( ReaderUtil.getTopLevelContext( hits.context() ).reader() != reader ) {
 				throw new IllegalStateException(
 						"the SortedSetDocValuesReaderState provided to this class does not match the reader being searched; you must create a new SortedSetDocValuesReaderState every time you open a new IndexReader" );
 			}
 
-			countOneSegment( ordinalMap, valuesSource.getValues( hits.context ), hits.context.ord, hits );
+			countOneSegment( ordinalMap, valuesSource.getValues( hits.context() ), hits.context().ord, hits );
 		}
 	}
 
