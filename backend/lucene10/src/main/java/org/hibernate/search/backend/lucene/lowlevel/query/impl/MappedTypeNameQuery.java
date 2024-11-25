@@ -64,7 +64,7 @@ public final class MappedTypeNameQuery extends Query {
 					matchingDocs = DocIdSetIterator.empty();
 				}
 
-				return new ConstantScorerSupplier( this, this.score(), scoreMode, matchingDocs );
+				return new ConstantScorerSupplier( this.score(), scoreMode, matchingDocs );
 			}
 
 			@Override

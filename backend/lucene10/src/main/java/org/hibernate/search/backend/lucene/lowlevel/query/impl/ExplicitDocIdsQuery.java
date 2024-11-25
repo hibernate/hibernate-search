@@ -64,7 +64,7 @@ public final class ExplicitDocIdsQuery extends Query {
 				if ( matchingDocs == null ) {
 					return null; // Skip this leaf
 				}
-				return new ConstantScorerSupplier( this, this.score(), scoreMode, matchingDocs );
+				return new ConstantScorerSupplier( this.score(), scoreMode, matchingDocs );
 			}
 
 			@Override

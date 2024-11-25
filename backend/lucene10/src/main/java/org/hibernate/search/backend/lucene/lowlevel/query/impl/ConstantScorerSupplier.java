@@ -11,16 +11,13 @@ import org.apache.lucene.search.DocIdSetIterator;
 import org.apache.lucene.search.ScoreMode;
 import org.apache.lucene.search.Scorer;
 import org.apache.lucene.search.ScorerSupplier;
-import org.apache.lucene.search.Weight;
 
 class ConstantScorerSupplier extends ScorerSupplier {
-	private final Weight weight;
 	private final float score;
 	private final ScoreMode scoreMode;
 	private final DocIdSetIterator matchingDocs;
 
-	public ConstantScorerSupplier(Weight weight, float score, ScoreMode scoreMode, DocIdSetIterator matchingDocs) {
-		this.weight = weight;
+	public ConstantScorerSupplier(float score, ScoreMode scoreMode, DocIdSetIterator matchingDocs) {
 		this.score = score;
 		this.scoreMode = scoreMode;
 		this.matchingDocs = matchingDocs;
@@ -28,7 +25,7 @@ class ConstantScorerSupplier extends ScorerSupplier {
 
 	@Override
 	public Scorer get(long leadCost) throws IOException {
-		return new ConstantScoreScorer( weight, score, scoreMode, matchingDocs );
+		return new ConstantScoreScorer( score, scoreMode, matchingDocs );
 	}
 
 	@Override

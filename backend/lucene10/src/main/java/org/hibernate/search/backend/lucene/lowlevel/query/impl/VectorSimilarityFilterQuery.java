@@ -110,18 +110,16 @@ public class VectorSimilarityFilterQuery extends Query {
 			if ( scorerSupplier == null ) {
 				return null;
 			}
-			return new MinScoreScorerSupplier( this, scorerSupplier, similarityAsScore );
+			return new MinScoreScorerSupplier( scorerSupplier, similarityAsScore );
 		}
 	}
 
 	private static class MinScoreScorerSupplier extends ScorerSupplier {
 
-		private final Weight weight;
 		private final ScorerSupplier delegate;
 		private final float similarityAsScore;
 
-		private MinScoreScorerSupplier(Weight weight, ScorerSupplier delegate, float similarityAsScore) {
-			this.weight = weight;
+		private MinScoreScorerSupplier(ScorerSupplier delegate, float similarityAsScore) {
 			this.delegate = delegate;
 			this.similarityAsScore = similarityAsScore;
 		}
@@ -132,7 +130,7 @@ public class VectorSimilarityFilterQuery extends Query {
 			if ( scorer == null ) {
 				return null;
 			}
-			return new MinScoreScorer( weight, scorer, similarityAsScore );
+			return new MinScoreScorer( scorer, similarityAsScore );
 		}
 
 		@Override
@@ -147,8 +145,7 @@ public class VectorSimilarityFilterQuery extends Query {
 		private final float minScore;
 		private float curScore;
 
-		MinScoreScorer(Weight weight, Scorer scorer, float minScore) {
-			super( weight );
+		MinScoreScorer(Scorer scorer, float minScore) {
 			this.in = scorer;
 			this.minScore = minScore;
 		}
