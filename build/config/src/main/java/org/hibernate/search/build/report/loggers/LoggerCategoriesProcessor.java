@@ -23,7 +23,6 @@ import javax.annotation.processing.ProcessingEnvironment;
 import javax.annotation.processing.RoundEnvironment;
 import javax.annotation.processing.SupportedAnnotationTypes;
 import javax.annotation.processing.SupportedOptions;
-import javax.annotation.processing.SupportedSourceVersion;
 import javax.lang.model.SourceVersion;
 import javax.lang.model.element.AnnotationMirror;
 import javax.lang.model.element.AnnotationValue;
@@ -41,7 +40,6 @@ import org.yaml.snakeyaml.Yaml;
 
 @SupportedAnnotationTypes("org.hibernate.search.util.common.logging.CategorizedLogger")
 @SupportedOptions({ Configuration.MODULE_NAME })
-@SupportedSourceVersion(SourceVersion.RELEASE_17)
 public class LoggerCategoriesProcessor extends AbstractProcessor {
 
 	private Messager messager;
@@ -60,6 +58,11 @@ public class LoggerCategoriesProcessor extends AbstractProcessor {
 					"Module name cannot be null nor blank. Specify the %s annotation processor argument to define the module name"
 							.formatted( Configuration.MODULE_NAME ) );
 		}
+	}
+
+	@Override
+	public SourceVersion getSupportedSourceVersion() {
+		return SourceVersion.latestSupported();
 	}
 
 	@Override
