@@ -9,7 +9,9 @@ import java.io.OutputStreamWriter;
 import java.io.Writer;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
-import java.util.HashMap;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -117,17 +119,12 @@ public class LoggerCategoriesProcessor extends AbstractProcessor {
 						writer.write( "# This Hibernate Search module does not use any logging categories.\n" );
 					}
 					else {
+						Map<String, Object> data = new LinkedHashMap<>();
+						data.put( ReportConstants.MODULE_NAME, moduleName );
+						data.put( ReportConstants.CATEGORIES, toYamlCategories( categories, categoryLevels ) );
+
 						Yaml yaml = new Yaml();
-						yaml.dump(
-								Map.of(
-										ReportConstants.ROOT,
-										Map.of(
-												ReportConstants.MODULE_NAME, moduleName,
-												ReportConstants.CATEGORIES, toYamlCategories( categories, categoryLevels )
-										)
-								),
-								writer
-						);
+						yaml.dump( Collections.singletonMap( ReportConstants.ROOT, data ), writer );
 					}
 				}
 				catch (IOException e) {
@@ -146,7 +143,7 @@ public class LoggerCategoriesProcessor extends AbstractProcessor {
 	private List<Map<String, Object>> toYamlCategories(Map<String, String> categories, Map<String, Set<String>> levels) {
 		List<Map<String, Object>> values = new ArrayList<>();
 		for ( var entry : categories.entrySet() ) {
-			Map<String, Object> value = new HashMap<>();
+			Map<String, Object> value = new LinkedHashMap<>();
 			value.put( ReportConstants.CATEGORY_NAME, entry.getKey() );
 			value.put( ReportConstants.CATEGORY_DESCRIPTION, entry.getValue() );
 			value.put( ReportConstants.LOG_LEVELS, new ArrayList<>( levels.getOrDefault( entry.getKey(), Set.of() ) ) );
