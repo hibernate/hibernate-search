@@ -93,6 +93,7 @@ updates:
       # We don't care that much about being on the very latest version of some integration test dependencies
       - dependency-name: "org.springframework.boot:*"
         update-types: [ "version-update:semver-patch" ]
+        versions: ['3.4.0']
       # We strictly align these dependencies on the version used in Hibernate ORM.
       - dependency-name: "io.smallrye:jandex"
       - dependency-name: "jakarta.persistence:jakarta.persistence-api"
