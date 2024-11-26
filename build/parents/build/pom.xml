@@ -127,13 +127,13 @@
         <!-- Test dependencies -->
 
         <!-- >>> Common -->
-        <version.log4j>2.24.1</version.log4j>
+        <version.log4j>2.24.2</version.log4j>
         <version.junit>4.13.2</version.junit>
         <version.junit-jupiter>5.11.3</version.junit-jupiter>
         <version.junit-platform-suite-engine>1.10.0</version.junit-platform-suite-engine>
         <version.org.osgi.core>6.0.0</version.org.osgi.core>
         <!-- Make sure to update Ryuk container version in `ryuk.Dockerfile` whenever updating testcontainers to align it with the lib. -->
-        <version.testcontainers>1.20.3</version.testcontainers>
+        <version.testcontainers>1.20.4</version.testcontainers>
 
         <version.org.hamcrest>3.0</version.org.hamcrest>
         <version.org.mockito>5.14.2</version.org.mockito>
@@ -163,9 +163,9 @@
              See https://db.apache.org/derby/derby_downloads.html -->
         <version.org.apache.derby>10.15.2.0</version.org.apache.derby>
         <version.org.postgresql>42.7.4</version.org.postgresql>
-        <version.org.mariadb.jdbc>3.5.0</version.org.mariadb.jdbc>
+        <version.org.mariadb.jdbc>3.5.1</version.org.mariadb.jdbc>
         <version.mysql.mysql-connector-j>9.1.0</version.mysql.mysql-connector-j>
-        <version.com.ibm.db2.jcc>11.5.9.0</version.com.ibm.db2.jcc>
+        <version.com.ibm.db2.jcc>12.1.0.0</version.com.ibm.db2.jcc>
         <version.com.oracle.database.jdbc>23.6.0.24.10</version.com.oracle.database.jdbc>
         <version.com.microsoft.sqlserver.mssql-jdbc>12.2.0.jre11</version.com.microsoft.sqlserver.mssql-jdbc>
 
@@ -181,6 +181,10 @@
 
         <!-- >>> Spring integration tests -->
         <!-- When updating Spring Boot check if it supports JDK23 and enable testing with it if so (see testWithJdk23 profile). -->
+        <!--
+            See https://github.com/atomikos/transactions-essentials/issues/234.
+            Atomikos has to be fixed/updated before we can bump the Spring Boot version.
+        -->
         <version.org.springframework.boot>3.3.0</version.org.springframework.boot>
         <!-- Spring Boot 3 Atomikos starter and related libs version: -->
         <version.com.atomikos>6.0.0</version.com.atomikos>
