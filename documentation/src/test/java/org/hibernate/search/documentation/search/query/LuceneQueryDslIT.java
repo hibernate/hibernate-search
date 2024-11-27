@@ -16,6 +16,7 @@ import org.hibernate.search.documentation.testsupport.BackendConfigurations;
 import org.hibernate.search.documentation.testsupport.DocumentationSetupHelper;
 import org.hibernate.search.mapper.orm.Search;
 import org.hibernate.search.mapper.orm.session.SearchSession;
+import org.hibernate.search.util.impl.integrationtest.backend.lucene.TotalHitsUtils;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -99,7 +100,7 @@ class LuceneQueryDslIT {
 			assertThat( sort.getSort()[0].getType() ).isEqualTo( SortField.Type.CUSTOM );
 
 			assertThat( topDocs ).isNotNull();
-			assertThat( topDocs.totalHits.value ).isEqualTo( 2L );
+			assertThat( TotalHitsUtils.value( topDocs.totalHits ) ).isEqualTo( 2L );
 			assertThat( topDocs.scoreDocs ).hasSize( 2 );
 		} );
 	}
