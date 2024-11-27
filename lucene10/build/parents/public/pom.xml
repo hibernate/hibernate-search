@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+    SPDX-License-Identifier: Apache-2.0
+    Copyright Red Hat Inc. and Hibernate Authors
+-->
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <parent>
+        <groupId>org.hibernate.search</groupId>
+        <artifactId>hibernate-search-parent-public</artifactId>
+        <version>8.0.0-SNAPSHOT</version>
+        <relativePath>../../../../build/parents/public</relativePath>
+    </parent>
+    <artifactId>hibernate-search-parent-public-lucene10</artifactId>
+    <packaging>pom</packaging>
+
+    <name>Hibernate Search Parent POM for Public Artifacts - Lucene 10</name>
+    <description>Common build configuration for all public artifacts - Lucene 10</description>
+
+    <dependencyManagement>
+        <dependencies>
+            <!-- Lucene backend -->
+            <dependency>
+                <groupId>org.apache.lucene</groupId>
+                <artifactId>lucene-core</artifactId>
+                <version>${version.org.apache.lucene10}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.lucene</groupId>
+                <artifactId>lucene-analysis-common</artifactId>
+                <version>${version.org.apache.lucene10}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.lucene</groupId>
+                <artifactId>lucene-queryparser</artifactId>
+                <version>${version.org.apache.lucene10}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.lucene</groupId>
+                <artifactId>lucene-join</artifactId>
+                <version>${version.org.apache.lucene10}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.lucene</groupId>
+                <artifactId>lucene-facet</artifactId>
+                <version>${version.org.apache.lucene10}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.lucene</groupId>
+                <artifactId>lucene-highlighter</artifactId>
+                <version>${version.org.apache.lucene10}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>org.hibernate.search</groupId>
+                <artifactId>hibernate-search-util-internal-integrationtest-backend-lucene10</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-enforcer-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>ban-lucene-9</id>
+                        <goals>
+                            <goal>enforce</goal>
+                        </goals>
+                        <configuration>
+                            <rules>
+                                <bannedDependencies>
+                                    <excludes>
+                                        <exclude>org.apache.lucene:*:[${version.org.apache.lucene}]</exclude>
+                                    </excludes>
+                                </bannedDependencies>
+                            </rules>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
+    </build>
+
+</project>

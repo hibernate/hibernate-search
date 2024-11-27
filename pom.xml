@@ -169,7 +169,6 @@
         <module>util/common</module>
         <module>engine</module>
         <module>backend/lucene</module>
-        <module>backend/lucene10</module>
         <module>backend/elasticsearch</module>
         <module>backend/elasticsearch-aws</module>
         <module>mapper/pojo-base</module>
@@ -188,6 +187,7 @@
         <module>build/parents/springtest</module>
         <module>integrationtest</module>
         <module>documentation</module>
+        <module>lucene10</module>
     </modules>
 
     <properties>
@@ -306,8 +306,9 @@
         <version.maven-wrapper-plugin>3.3.2</version.maven-wrapper-plugin>
         <version.org.eclipse.m2e.lifecycle-mapping>1.0.0</version.org.eclipse.m2e.lifecycle-mapping>
         <version.sisu-maven-plugin>0.9.0.M3</version.sisu-maven-plugin>
-        <gitflow-incremental-builder.version>4.5.4</gitflow-incremental-builder.version>
+        <version.gitflow-incremental-builder>4.5.4</version.gitflow-incremental-builder>
         <version.spotless-maven-plugin>2.43.0</version.spotless-maven-plugin>
+        <version.maven-antrun-plugin>3.1.0</version.maven-antrun-plugin>
 
         <!-- Repository Deployment URLs -->
 
@@ -1122,7 +1123,12 @@
                 <plugin>
                     <groupId>io.github.gitflow-incremental-builder</groupId>
                     <artifactId>gitflow-incremental-builder</artifactId>
-                    <version>${gitflow-incremental-builder.version}</version>
+                    <version>${version.gitflow-incremental-builder}</version>
+                </plugin>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-antrun-plugin</artifactId>
+                    <version>${version.maven-antrun-plugin}</version>
                 </plugin>
             </plugins>
         </pluginManagement>
