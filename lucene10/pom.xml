@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+    SPDX-License-Identifier: Apache-2.0
+    Copyright Red Hat Inc. and Hibernate Authors
+-->
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <parent>
+        <groupId>org.hibernate.search</groupId>
+        <artifactId>hibernate-search-parent</artifactId>
+        <version>8.0.0-SNAPSHOT</version>
+        <relativePath>..</relativePath>
+    </parent>
+    <artifactId>hibernate-search-parent-lucene10</artifactId>
+    <packaging>pom</packaging>
+
+    <name>Hibernate Search Aggregator POM for Lucene 10 Artifacts</name>
+    <description>Hibernate Search Aggregator POM for Lucene 10 Artifacts</description>
+
+    <modules>
+        <module>build/parents/internal</module>
+        <module>build/parents/public</module>
+        <module>build/parents/integrationtest</module>
+        <module>build/parents/springtest</module>
+        <module>util/internal/integrationtest/</module>
+        <module>backend/lucene</module>
+        <module>integrationtest</module>
+        <module>documentation</module>
+    </modules>
+</project>
