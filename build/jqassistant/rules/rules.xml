@@ -251,6 +251,7 @@
                 AND (
                     artifact.name =~ ".*-integrationtest-.*"
                     OR artifact.name = "hibernate-search-documentation"
+                    OR artifact.name = "hibernate-search-documentation-lucene10"
                 )
             SET
                 artifact:IntegrationTest

@@ -149,6 +149,32 @@
             <artifactId>hibernate-search-documentation</artifactId>
             <scope>test</scope>
         </dependency>
+        <!-- All Lucene 10 things: -->
+        <dependency>
+            <groupId>org.hibernate.search</groupId>
+            <artifactId>hibernate-search-integrationtest-backend-lucene10</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.hibernate.search</groupId>
+            <artifactId>hibernate-search-integrationtest-mapper-pojo-standalone-realbackend-lucene10</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.hibernate.search</groupId>
+            <artifactId>hibernate-search-integrationtest-mapper-orm-realbackend-lucene10</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.hibernate.search</groupId>
+            <artifactId>hibernate-search-integrationtest-mapper-orm-jakarta-batch-lucene10</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.hibernate.search</groupId>
+            <artifactId>hibernate-search-documentation-lucene10</artifactId>
+            <scope>test</scope>
+        </dependency>
     </dependencies>
 
     <build>
@@ -275,6 +301,11 @@
                     <artifactId>hibernate-search-integrationtest-spring-repackaged-application</artifactId>
                     <scope>test</scope>
                 </dependency>
+                <dependency>
+                    <groupId>org.hibernate.search</groupId>
+                    <artifactId>hibernate-search-integrationtest-showcase-library-lucene10</artifactId>
+                    <scope>test</scope>
+                </dependency>
             </dependencies>
         </profile>
 
@@ -312,6 +343,16 @@
                 <dependency>
                     <groupId>org.hibernate.search</groupId>
                     <artifactId>hibernate-search-integrationtest-java-modules-pojo-standalone-lucene</artifactId>
+                    <scope>test</scope>
+                </dependency>
+                <dependency>
+                    <groupId>org.hibernate.search</groupId>
+                    <artifactId>hibernate-search-integrationtest-java-modules-orm-lucene-lucene10</artifactId>
+                    <scope>test</scope>
+                </dependency>
+                <dependency>
+                    <groupId>org.hibernate.search</groupId>
+                    <artifactId>hibernate-search-integrationtest-java-modules-pojo-standalone-lucene-lucene10</artifactId>
                     <scope>test</scope>
                 </dependency>
             </dependencies>
