@@ -127,7 +127,7 @@
         <!-- Test dependencies -->
 
         <!-- >>> Common -->
-        <version.log4j>2.24.2</version.log4j>
+        <version.log4j>2.24.1</version.log4j>
         <version.junit>4.13.2</version.junit>
         <version.junit-jupiter>5.11.3</version.junit-jupiter>
         <version.junit-platform-suite-engine>1.10.0</version.junit-platform-suite-engine>
