@@ -252,6 +252,7 @@
                                 <argument>^org\.hibernate\.query\.spi\.ScrollableResultsImplementor$</argument>
                                 <argument>^org\.hibernate\.query\.spi\.QueryParameterBindingTypeResolver$</argument>
                                 <argument>^org\.hibernate\.query\.sqm\.spi\.SqmCreationContext$</argument>
+                                <argument>^org\.hibernate\.sql\.results\.graph\.Fetchable$</argument>
                             </arguments>
                             <!--
                                 While this will include more than we really need, it is easier to do so.
