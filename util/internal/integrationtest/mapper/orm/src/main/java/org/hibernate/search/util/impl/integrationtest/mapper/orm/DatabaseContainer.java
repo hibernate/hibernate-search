@@ -62,14 +62,12 @@ public final class DatabaseContainer {
 		// Let's see if an external DB connection was provided:
 		String url = System.getProperty( "jdbc.url" );
 		if ( url != null && !url.trim().isEmpty() ) {
-			// -Dhibernate.dialect=${db.dialect}
 			// -Dhibernate.connection.driver_class=${jdbc.driver}
 			// -Dhibernate.connection.url=${jdbc.url}
 			// -Dhibernate.connection.username=${jdbc.user}
 			// -Dhibernate.connection.password=${jdbc.pass}
 			// -Dhibernate.connection.isolation=${jdbc.isolation}
 			return DATABASE.configuration( url, DATABASE_CONTAINER )
-					.withDialect( System.getProperty( "db.dialect" ) )
 					.withDriver( System.getProperty( "jdbc.driver" ) )
 					.withUser( System.getProperty( "jdbc.user" ) )
 					.withPass( System.getProperty( "jdbc.pass" ) )
@@ -97,7 +95,7 @@ public final class DatabaseContainer {
 			@Override
 			Configuration configuration(JdbcDatabaseContainer<?> container) {
 				return new Configuration(
-						dialect(),
+						this,
 						"org.h2.Driver",
 						"jdbc:h2:mem:db1;DB_CLOSE_DELAY=-1",
 						"sa",
@@ -317,7 +315,7 @@ public final class DatabaseContainer {
 
 		Configuration configuration(JdbcDatabaseContainer<?> container) {
 			return new Configuration(
-					dialect(),
+					this,
 					container.getDriverClassName(),
 					container.getJdbcUrl(),
 					container.getUsername(),
@@ -328,7 +326,7 @@ public final class DatabaseContainer {
 
 		Configuration configuration(String jdbcUrl, JdbcDatabaseContainer<?> container) {
 			return new Configuration(
-					dialect(),
+					this,
 					container.getDriverClassName(),
 					jdbcUrl,
 					container.getUsername(),
@@ -439,24 +437,21 @@ public final class DatabaseContainer {
 
 
 	public static class Configuration {
-		private final String dialect;
+		private final DatabaseContainer.SupportedDatabase database;
 		private final String driver;
 		private final String url;
 		private final String user;
 		private final String pass;
 		private final String isolation;
 
-		private Configuration(String dialect, String driver, String url, String user, String pass, String isolation) {
-			this.dialect = dialect;
+		private Configuration(DatabaseContainer.SupportedDatabase database, String driver, String url, String user, String pass,
+				String isolation) {
+			this.database = database;
 			this.driver = driver;
 			this.url = url;
 			this.user = user;
 			this.pass = pass;
 			this.isolation = isolation;
-		}
-
-		public String dialect() {
-			return dialect;
 		}
 
 		public String driver() {
@@ -480,12 +475,12 @@ public final class DatabaseContainer {
 		}
 
 		public boolean is(DatabaseContainer.SupportedDatabase database) {
-			return database.dialect().equals( dialect );
+			return this.database.equals( database );
 		}
 
 		public boolean is(DatabaseContainer.SupportedDatabase... databases) {
 			for ( SupportedDatabase database : databases ) {
-				if ( database.dialect().equals( dialect ) ) {
+				if ( this.database.equals( database ) ) {
 					return true;
 				}
 			}
@@ -494,7 +489,6 @@ public final class DatabaseContainer {
 
 		@SuppressWarnings("deprecation") // since DialectContext is using the deprecated properties we cannot switch to JAKARTA_* for now...
 		public void add(Map<String, Object> map) {
-			map.put( JdbcSettings.DIALECT, this.dialect );
 			map.put( JdbcSettings.DRIVER, this.driver );
 			map.put( JdbcSettings.URL, this.url );
 			map.put( JdbcSettings.USER, this.user );
@@ -509,46 +503,39 @@ public final class DatabaseContainer {
 			consumer.accept( "spring.datasource.password", this.pass );
 		}
 
-		private Configuration withDialect(String dialect) {
-			if ( dialect == null ) {
-				return this;
-			}
-			return new Configuration( dialect, driver, url, user, pass, isolation );
-		}
-
 		private Configuration withDriver(String driver) {
 			if ( driver == null ) {
 				return this;
 			}
-			return new Configuration( dialect, driver, url, user, pass, isolation );
+			return new Configuration( database, driver, url, user, pass, isolation );
 		}
 
 		private Configuration withUrl(String url) {
 			if ( url == null ) {
 				return this;
 			}
-			return new Configuration( dialect, driver, url, user, pass, isolation );
+			return new Configuration( database, driver, url, user, pass, isolation );
 		}
 
 		private Configuration withUser(String user) {
 			if ( user == null ) {
 				return this;
 			}
-			return new Configuration( dialect, driver, url, user, pass, isolation );
+			return new Configuration( database, driver, url, user, pass, isolation );
 		}
 
 		private Configuration withPass(String pass) {
 			if ( pass == null ) {
 				return this;
 			}
-			return new Configuration( dialect, driver, url, user, pass, isolation );
+			return new Configuration( database, driver, url, user, pass, isolation );
 		}
 
 		private Configuration withIsolation(String isolation) {
 			if ( isolation == null ) {
 				return this;
 			}
-			return new Configuration( dialect, driver, url, user, pass, isolation );
+			return new Configuration( database, driver, url, user, pass, isolation );
 		}
 	}
 }

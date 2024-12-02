@@ -55,9 +55,6 @@ import org.junit.jupiter.api.extension.RegisterExtension;
 
 class OutboxPollingCustomEntityMappingIT {
 
-	private static final String POSTGRESQL_DIALECT = "org.hibernate.dialect.PostgreSQLDialect";
-	private static final String MSSQL_DIALECT = "org.hibernate.dialect.SQLServerDialect";
-
 	private static final String CUSTOM_SCHEMA = "CUSTOM_SCHEMA";
 	private static final String ORIGINAL_OUTBOX_EVENT_TABLE_NAME =
 			HibernateOrmMapperOutboxPollingSettings.Defaults.COORDINATION_ENTITY_MAPPING_OUTBOX_EVENT_TABLE;
@@ -417,18 +414,14 @@ class OutboxPollingCustomEntityMappingIT {
 		JdbcType agent = idJdbcType( sessionFactory, Agent.class );
 		JdbcType event = idJdbcType( sessionFactory, OutboxEvent.class );
 
-		String dialect = DatabaseContainer.configuration().dialect();
-
-		switch ( dialect ) {
-			case POSTGRESQL_DIALECT:
-			case MSSQL_DIALECT:
-				assertThat( agent.getDdlTypeCode() ).isEqualTo( SqlTypes.UUID );
-				assertThat( event.getDdlTypeCode() ).isEqualTo( SqlTypes.UUID );
-				break;
-			default:
-				assertThat( agent.getDdlTypeCode() ).isIn( SqlTypes.UUID, SqlTypes.BINARY, SqlTypes.CHAR );
-				assertThat( event.getDdlTypeCode() ).isIn( SqlTypes.UUID, SqlTypes.BINARY, SqlTypes.CHAR );
-				break;
+		if ( DatabaseContainer.configuration().is( DatabaseContainer.SupportedDatabase.POSTGRES,
+				DatabaseContainer.SupportedDatabase.MSSQL ) ) {
+			assertThat( agent.getDdlTypeCode() ).isEqualTo( SqlTypes.UUID );
+			assertThat( event.getDdlTypeCode() ).isEqualTo( SqlTypes.UUID );
+		}
+		else {
+			assertThat( agent.getDdlTypeCode() ).isIn( SqlTypes.UUID, SqlTypes.BINARY, SqlTypes.CHAR );
+			assertThat( event.getDdlTypeCode() ).isIn( SqlTypes.UUID, SqlTypes.BINARY, SqlTypes.CHAR );
 		}
 	}
 
