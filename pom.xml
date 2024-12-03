@@ -274,7 +274,7 @@
         <version.assembly.plugin>3.7.1</version.assembly.plugin>
         <version.buildhelper.plugin>3.6.0</version.buildhelper.plugin>
         <version.checkstyle.plugin>3.6.0</version.checkstyle.plugin>
-        <version.bundle.plugin>5.1.9</version.bundle.plugin>
+        <version.bundle.plugin>6.0.0</version.bundle.plugin>
         <version.compiler.plugin>3.13.0</version.compiler.plugin>
         <version.dependency.plugin>3.8.1</version.dependency.plugin>
         <!-- Check dependencies for security vulnerabilities -->
@@ -300,7 +300,7 @@
         <version.sonar.plugin>5.0.0.4389</version.sonar.plugin>
         <version.scripting.plugin>3.0.0</version.scripting.plugin>
         <version.org.apache.groovy.groovy-jsr223>4.0.13</version.org.apache.groovy.groovy-jsr223>
-        <version.com.puppycrawl.tools.checkstyle>10.20.1</version.com.puppycrawl.tools.checkstyle>
+        <version.com.puppycrawl.tools.checkstyle>10.20.2</version.com.puppycrawl.tools.checkstyle>
         <version.versions.plugin>2.18.0</version.versions.plugin>
         <version.maven-wrapper-plugin>3.3.2</version.maven-wrapper-plugin>
         <version.org.eclipse.m2e.lifecycle-mapping>1.0.0</version.org.eclipse.m2e.lifecycle-mapping>
