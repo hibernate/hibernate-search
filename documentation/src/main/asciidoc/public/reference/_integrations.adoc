@@ -25,3 +25,40 @@ Check the https://hibernate.org/search/releases/#compatibility-matrix[compatibil
 to find versions of Hibernate Search compatible with these older versions of Hibernate ORM.
 
 Use <<other-integrations-jakarta,Hibernate ORM 7>> instead.
+
+[[other-integrations-lucene10]]
+== Lucene 10
+
+include::../components/_incubating-warning.adoc[]
+
+Hibernate Search {hibernateSearchVersionShort} provides two variants of the <<backend-lucene,Lucene backend>>.
+
+The default, stable one, that works with JDK 17+ and uses Lucene {luceneVersion}:
+
+[source, XML, subs="+attributes"]
+----
+<dependency>
+    <groupId>org.hibernate.search</groupId>
+    <artifactId>hibernate-search-backend-lucene</artifactId>
+</dependency>
+----
+
+And an incubating one based on Lucene {lucene10Version}, that requires JDK 21+:
+
+[source, XML, subs="+attributes"]
+----
+<dependency>
+    <groupId>org.hibernate.search</groupId>
+    <artifactId>hibernate-search-backend-lucene10</artifactId>
+</dependency>
+----
+
+[NOTE]
+====
+`hibernate-search-backend-lucene10` is tested against the same test suite as `hibernate-search-backend-lucene`
+and currently provides the same search capabilities. The main difference is the Lucene version backing it.
+While Hibernate Search {hibernateSearchVersionShort} still <<compatibility-dependencies,targets>> JDK 17,
+Lucene 10 is leveraging new Java APIs, particularly to work with memory, that are available starting with JDK 21.
+For users running their applications on JDK 21+ and wanting to get the latest Lucene improvements, it would be beneficial to
+use this new backend.
+====
