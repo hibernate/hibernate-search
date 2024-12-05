@@ -9,7 +9,6 @@ import java.util.List;
 import java.util.function.BiConsumer;
 import java.util.stream.Collectors;
 
-import org.hibernate.BaseSessionEventListener;
 import org.hibernate.Session;
 import org.hibernate.SessionEventListener;
 import org.hibernate.SessionFactory;
@@ -45,7 +44,7 @@ public class OrmSoftAssertions extends AutoCloseableSoftAssertions {
 		statistics = sessionFactory.getStatistics();
 		statistics.setStatisticsEnabled( true );
 		statistics.clear();
-		sessionEventListener = new BaseSessionEventListener() {
+		sessionEventListener = new SessionEventListener() {
 			@Override
 			public void jdbcPrepareStatementStart() {
 				++statementExecutionCount;

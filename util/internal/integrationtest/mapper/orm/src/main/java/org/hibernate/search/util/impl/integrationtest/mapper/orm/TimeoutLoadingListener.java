@@ -4,12 +4,12 @@
  */
 package org.hibernate.search.util.impl.integrationtest.mapper.orm;
 
-import org.hibernate.BaseSessionEventListener;
 import org.hibernate.QueryTimeoutException;
 import org.hibernate.Session;
+import org.hibernate.SessionEventListener;
 import org.hibernate.engine.spi.SessionImplementor;
 
-public class TimeoutLoadingListener extends BaseSessionEventListener {
+public class TimeoutLoadingListener implements SessionEventListener {
 
 	public static void registerTimingOutLoadingListener(Session session) {
 		session.unwrap( SessionImplementor.class ).addEventListeners( new TimeoutLoadingListener() );

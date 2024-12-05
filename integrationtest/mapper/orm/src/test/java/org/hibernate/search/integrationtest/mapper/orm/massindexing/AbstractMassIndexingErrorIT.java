@@ -16,7 +16,7 @@ import java.util.function.Consumer;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
 
-import org.hibernate.BaseSessionEventListener;
+import org.hibernate.SessionEventListener;
 import org.hibernate.SessionFactory;
 import org.hibernate.cfg.AvailableSettings;
 import org.hibernate.search.engine.backend.work.execution.DocumentCommitStrategy;
@@ -585,7 +585,7 @@ public abstract class AbstractMassIndexingErrorIT {
 		}
 	}
 
-	public static class JdbcStatementErrorOnIdLoadingThreadListener extends BaseSessionEventListener {
+	public static class JdbcStatementErrorOnIdLoadingThreadListener implements SessionEventListener {
 		private static final String MESSAGE = "Simulated JDBC statement error on ID loading";
 
 		@Override
@@ -596,7 +596,7 @@ public abstract class AbstractMassIndexingErrorIT {
 		}
 	}
 
-	public static class JdbcStatementErrorOnEntityLoadingThreadListener extends BaseSessionEventListener {
+	public static class JdbcStatementErrorOnEntityLoadingThreadListener implements SessionEventListener {
 		private static final String MESSAGE = "Simulated JDBC statement error on entity loading";
 
 		@Override

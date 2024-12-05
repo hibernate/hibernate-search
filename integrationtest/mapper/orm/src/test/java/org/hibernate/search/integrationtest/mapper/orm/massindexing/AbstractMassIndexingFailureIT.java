@@ -17,7 +17,7 @@ import java.util.function.Consumer;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
 
-import org.hibernate.BaseSessionEventListener;
+import org.hibernate.SessionEventListener;
 import org.hibernate.SessionFactory;
 import org.hibernate.cfg.AvailableSettings;
 import org.hibernate.search.engine.backend.work.execution.DocumentCommitStrategy;
@@ -888,7 +888,7 @@ public abstract class AbstractMassIndexingFailureIT {
 		}
 	}
 
-	public static class JdbcStatementFailureOnIdLoadingThreadListener extends BaseSessionEventListener {
+	public static class JdbcStatementFailureOnIdLoadingThreadListener implements SessionEventListener {
 		private static final String MESSAGE = "Simulated JDBC statement failure on ID loading";
 
 		@Override
@@ -899,7 +899,7 @@ public abstract class AbstractMassIndexingFailureIT {
 		}
 	}
 
-	public static class JdbcStatementFailureOnEntityLoadingThreadListener extends BaseSessionEventListener {
+	public static class JdbcStatementFailureOnEntityLoadingThreadListener implements SessionEventListener {
 		private static final String MESSAGE = "Simulated JDBC statement failure on entity loading";
 
 		@Override
