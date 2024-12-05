@@ -485,7 +485,8 @@
             **/org/hibernate/checkstyle/**,
             **/org/hibernate/search/build/enforcer/**,
             **/src/test/java/**,
-            **/org/hibernate/search/integrationtest/**
+            **/org/hibernate/search/integrationtest/**,
+            **/lucene-next/**
         </sonar.cpd.exclusions>
     </properties>
 
