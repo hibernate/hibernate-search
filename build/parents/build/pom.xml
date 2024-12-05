@@ -190,7 +190,7 @@
         <!-- Enable Spring Boot updates once Atomikos is updated -->
         <version.com.atomikos>6.0.0</version.com.atomikos>
 
-        <version.jsoup>1.18.2</version.jsoup>
+        <version.jsoup>1.18.3</version.jsoup>
         <version.snakeyaml>2.3</version.snakeyaml>
 
         <!-- Whether javadoc warnings should fail the build -->
