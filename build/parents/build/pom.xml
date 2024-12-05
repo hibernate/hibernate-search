@@ -114,7 +114,7 @@
 
         <!-- >>> Jakarta Batch -->
         <version.jakarta.batch>2.1.1</version.jakarta.batch>
-        <version.org.jberet>3.0.0.Final</version.org.jberet>
+        <version.org.jberet>3.1.0.Final</version.org.jberet>
 
         <!-- >>> Java EE/Jakarta EE dependencies -->
         <!-- This is used to generate a link to the Jakarta EE javadoc -->
