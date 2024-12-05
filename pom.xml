@@ -274,11 +274,11 @@
         <version.assembly.plugin>3.7.1</version.assembly.plugin>
         <version.buildhelper.plugin>3.6.0</version.buildhelper.plugin>
         <version.checkstyle.plugin>3.6.0</version.checkstyle.plugin>
-        <version.bundle.plugin>5.1.9</version.bundle.plugin>
+        <version.bundle.plugin>6.0.0</version.bundle.plugin>
         <version.compiler.plugin>3.13.0</version.compiler.plugin>
         <version.dependency.plugin>3.8.1</version.dependency.plugin>
         <!-- Check dependencies for security vulnerabilities -->
-        <version.dependency-check.plugin>11.1.0</version.dependency-check.plugin>
+        <version.dependency-check.plugin>11.1.1</version.dependency-check.plugin>
         <version.exec.plugin>3.5.0</version.exec.plugin>
         <version.forbiddenapis.plugin>3.8</version.forbiddenapis.plugin>
         <!-- Make sure that upgraded Jandex plugin aligns with the Jandex version imported from the ORM platform pom -->
@@ -300,7 +300,7 @@
         <version.sonar.plugin>5.0.0.4389</version.sonar.plugin>
         <version.scripting.plugin>3.0.0</version.scripting.plugin>
         <version.org.apache.groovy.groovy-jsr223>4.0.13</version.org.apache.groovy.groovy-jsr223>
-        <version.com.puppycrawl.tools.checkstyle>10.20.1</version.com.puppycrawl.tools.checkstyle>
+        <version.com.puppycrawl.tools.checkstyle>10.20.2</version.com.puppycrawl.tools.checkstyle>
         <version.versions.plugin>2.18.0</version.versions.plugin>
         <version.maven-wrapper-plugin>3.3.2</version.maven-wrapper-plugin>
         <version.org.eclipse.m2e.lifecycle-mapping>1.0.0</version.org.eclipse.m2e.lifecycle-mapping>
@@ -341,7 +341,7 @@
                 is outdated and leads to compilation errors.
          -->
         <version.org.codehaus.plexus.plexus-compiler.compiler-eclipse>2.14.2</version.org.codehaus.plexus.plexus-compiler.compiler-eclipse>
-        <version.org.eclipse.jdt.ecj>3.39.0</version.org.eclipse.jdt.ecj>
+        <version.org.eclipse.jdt.ecj>3.40.0</version.org.eclipse.jdt.ecj>
 
         <!-- Asciidoctor -->
 
