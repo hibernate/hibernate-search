@@ -6,11 +6,11 @@ package org.hibernate.search.util.impl.integrationtest.mapper.orm;
 
 import static org.assertj.core.api.Assertions.fail;
 
-import org.hibernate.BaseSessionEventListener;
 import org.hibernate.Session;
+import org.hibernate.SessionEventListener;
 import org.hibernate.engine.spi.SessionImplementor;
 
-public class SlowerLoadingListener extends BaseSessionEventListener {
+public class SlowerLoadingListener implements SessionEventListener {
 
 	public static void registerSlowerLoadingListener(Session session, long delay) {
 		session.unwrap( SessionImplementor.class ).addEventListeners( new SlowerLoadingListener( delay ) );
