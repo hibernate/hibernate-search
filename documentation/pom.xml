@@ -337,6 +337,7 @@
                         <jakartaPersistenceVersion>${parsed-version.jakarta.persistence.majorVersion}.${parsed-version.jakarta.persistence.minorVersion}</jakartaPersistenceVersion>
                         <jandexPluginVersion>${version.jandex.plugin}</jandexPluginVersion>
                         <luceneVersion>${version.org.apache.lucene}</luceneVersion>
+                        <lucene10Version>${version.org.apache.lucene10}</lucene10Version>
                         <luceneUrl>https://lucene.apache.org</luceneUrl>
                         <luceneJavadocUrl>${javadoc.org.apache.lucene.core.url}</luceneJavadocUrl>
                         <luceneAnalysisCommonJavadocUrl>${javadoc.org.apache.lucene.analysis.common.url}</luceneAnalysisCommonJavadocUrl>
