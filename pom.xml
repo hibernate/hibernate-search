@@ -187,7 +187,7 @@
         <module>build/parents/springtest</module>
         <module>integrationtest</module>
         <module>documentation</module>
-        <module>lucene10</module>
+        <module>lucene-next</module>
     </modules>
 
     <properties>

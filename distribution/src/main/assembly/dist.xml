@@ -63,14 +63,14 @@
 			</includes>
 		</dependencySet>
 		<dependencySet>
-			<outputDirectory>dist/backend/lucene10</outputDirectory>
+			<outputDirectory>dist/backend/lucene-next</outputDirectory>
 			<scope>runtime</scope>
 			<useProjectArtifact>false</useProjectArtifact>
 			<useTransitiveDependencies>true</useTransitiveDependencies>
 			<useTransitiveFiltering>true</useTransitiveFiltering>
 			<useStrictFiltering>true</useStrictFiltering>
 			<includes>
-				<include>org.hibernate.search:hibernate-search-backend-lucene10</include>
+				<include>org.hibernate.search:hibernate-search-backend-lucene-next</include>
 			</includes>
 		</dependencySet>
 		<dependencySet>

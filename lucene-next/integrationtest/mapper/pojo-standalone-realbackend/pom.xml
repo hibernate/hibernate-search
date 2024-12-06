@@ -1,0 +1,159 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <parent>
+        <groupId>org.hibernate.search</groupId>
+        <artifactId>hibernate-search-integrationtest-lucene-next</artifactId>
+        <version>8.0.0-SNAPSHOT</version>
+        <relativePath>../..</relativePath>
+    </parent>
+    <artifactId>hibernate-search-integrationtest-mapper-pojo-standalone-realbackend-lucene-next</artifactId>
+
+    <name>Hibernate Search ITs - POJO Standalone - Real backend - Lucene 10</name>
+    <description>Hibernate Search integration tests for the POJO Standalone mapper with a real (non-mock) backend - Lucene 10</description>
+
+    <properties>
+        <transform.original.pathFromRoot>integrationtest/mapper/pojo-standalone-realbackend</transform.original.pathFromRoot>
+
+        <failsafe.lucene.reportsDirectory>${project.build.directory}/failsafe-reports/lucene</failsafe.lucene.reportsDirectory>
+        <failsafe.lucene.summaryFile>${failsafe.lucene.reportsDirectory}/failsafe-summary.xml</failsafe.lucene.summaryFile>
+        <failsafe.jvm.args.jacoco.lucene></failsafe.jvm.args.jacoco.lucene>
+    </properties>
+
+    <dependencies>
+        <dependency>
+            <groupId>org.hibernate.search</groupId>
+            <artifactId>hibernate-search-mapper-pojo-standalone</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.hibernate.search</groupId>
+            <artifactId>hibernate-search-backend-lucene-next</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.hibernate.search</groupId>
+            <artifactId>hibernate-search-backend-elasticsearch</artifactId>
+            <scope>test</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>org.hibernate.search</groupId>
+            <artifactId>hibernate-search-util-internal-integrationtest-mapper-pojo-standalone</artifactId>
+            <scope>test</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>org.hibernate.search</groupId>
+            <artifactId>hibernate-search-util-internal-integrationtest-backend-lucene-next</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.hibernate.search</groupId>
+            <artifactId>hibernate-search-util-internal-integrationtest-backend-elasticsearch</artifactId>
+            <scope>test</scope>
+        </dependency>
+    </dependencies>
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-antrun-plugin</artifactId>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-failsafe-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>it-lucene</id>
+                        <goals>
+                            <goal>integration-test</goal>
+                        </goals>
+                        <configuration>
+                            <skip>${test.lucene.skip}</skip>
+                            <argLine>${failsafe.jvm.args.no-jacoco} @{failsafe.jvm.args.jacoco.lucene}</argLine>
+                            <reportNameSuffix>${surefire.executionIdentifier}-lucene</reportNameSuffix>
+                            <reportsDirectory>${failsafe.lucene.reportsDirectory}</reportsDirectory>
+                            <summaryFile>${failsafe.lucene.summaryFile}</summaryFile>
+                            <classpathDependencyExcludes>
+                                <classpathDependencyExclude>org.hibernate.search:hibernate-search-backend-elasticsearch</classpathDependencyExclude>
+                            </classpathDependencyExcludes>
+                            <systemPropertyVariables>
+                                <org.hibernate.search.integrationtest.backend.type>lucene</org.hibernate.search.integrationtest.backend.type>
+                            </systemPropertyVariables>
+                            <excludes>
+                                <exclude>org.hibernate.search.integrationtest.mapper.pojo.standalone.realbackend.schema.management.ElasticsearchSchemaManagerExporterIT</exclude>
+                            </excludes>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>it-verify</id>
+                        <goals>
+                            <goal>verify</goal>
+                        </goals>
+                        <configuration>
+                            <summaryFiles>
+                                <summaryFile>${failsafe.lucene.summaryFile}</summaryFile>
+                            </summaryFiles>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
+    </build>
+
+    <profiles>
+        <!--
+             The "verify" goal fails if a file specified in "summaryFiles" doesn't exist,
+             and that's exactly what happens when we skip an "integration-test" goal.
+             See https://github.com/apache/maven-surefire/blob/2fed802397f8c7de4cfc72f49ab4565e72f7aab7/maven-failsafe-plugin/src/main/java/org/apache/maven/plugin/failsafe/VerifyMojo.java#L179-L183
+         -->
+        <profile>
+            <id>lucene-test-skip</id>
+            <activation>
+                <property>
+                    <name>test.lucene.skip</name>
+                    <value>true</value>
+                </property>
+            </activation>
+            <properties>
+                <failsafe.lucene.summaryFile>${rootProject.empty.failsafe.summaryFile}</failsafe.lucene.summaryFile>
+            </properties>
+        </profile>
+        <profile>
+            <id>coverage</id>
+            <build>
+                <plugins>
+                    <!-- We need to send the jacoco report of each test execution to a different file,
+                        otherwise Develocity won't be able to cache test executions. -->
+                    <plugin>
+                        <groupId>org.jacoco</groupId>
+                        <artifactId>jacoco-maven-plugin</artifactId>
+                        <executions>
+                            <execution>
+                                <id>jacoco-prepare-agent-integration</id>
+                                <configuration>
+                                    <skip>true</skip>
+                                </configuration>
+                            </execution>
+                            <execution>
+                                <id>jacoco-prepare-agent-integration-lucene</id>
+                                <phase>initialize</phase>
+                                <goals>
+                                    <goal>prepare-agent-integration</goal>
+                                </goals>
+                                <configuration>
+                                    <propertyName>failsafe.jvm.args.jacoco.lucene</propertyName>
+                                    <destFile>${project.build.directory}/${jacoco.environment.sub-directory}/lucene/jacoco.exec</destFile>
+                                </configuration>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+    </profiles>
+
+</project>
+
