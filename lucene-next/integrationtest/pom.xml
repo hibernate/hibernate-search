@@ -1,0 +1,51 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <parent>
+        <groupId>org.hibernate.search</groupId>
+        <artifactId>hibernate-search-parent-integrationtest-lucene-next</artifactId>
+        <version>8.0.0-SNAPSHOT</version>
+        <relativePath>../build/parents/integrationtest</relativePath>
+    </parent>
+    <artifactId>hibernate-search-integrationtest-lucene-next</artifactId>
+    <packaging>pom</packaging>
+
+    <name>Hibernate Search ITs - Aggregator POM - Lucene 10</name>
+    <description>Aggregator POM of Hibernate Search integration tests (except documentation) - Lucene 10</description>
+
+    <modules>
+        <module>backend/lucene</module>
+        <module>mapper/pojo-standalone-realbackend</module>
+        <module>mapper/orm-realbackend</module>
+        <module>mapper/orm-jakarta-batch</module>
+    </modules>
+
+    <profiles>
+        <profile>
+            <id>springITs</id>
+            <activation>
+                <!-- Hack to activate by default, except when explicitly disabled -->
+                <jdk>[17,)</jdk>
+            </activation>
+            <modules>
+                <module>showcase/library</module>
+            </modules>
+        </profile>
+        <profile>
+            <!--
+                We want to keep these module path tests within their own profile,
+                so we can easily exclude building them all in some scenarios like eclipse compiler profile etc.
+             -->
+            <id>javaModuleITs</id>
+            <activation>
+                <!-- Hack to activate by default, except when explicitly disabled -->
+                <jdk>[17,)</jdk>
+            </activation>
+            <modules>
+                <module>java/modules/orm-lucene</module>
+                <module>java/modules/pojo-standalone-lucene</module>
+            </modules>
+        </profile>
+    </profiles>
+</project>
+

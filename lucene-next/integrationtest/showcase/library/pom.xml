@@ -1,0 +1,232 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <parent>
+        <groupId>org.hibernate.search</groupId>
+        <artifactId>hibernate-search-parent-springtest-lucene-next</artifactId>
+        <version>8.0.0-SNAPSHOT</version>
+        <relativePath>../../../build/parents/springtest</relativePath>
+    </parent>
+    <artifactId>hibernate-search-integrationtest-showcase-library-lucene-next</artifactId>
+
+    <name>Hibernate Search ITs - Showcase - Library - Lucene 10</name>
+    <description>Hibernate Search showcase based on the ORM and Elasticsearch integrations, using libraries and books as business objects - Lucene 10</description>
+
+    <properties>
+        <transform.original.pathFromRoot>integrationtest/showcase/library</transform.original.pathFromRoot>
+
+        <test.lucene.skip>${failsafe.spring.skip}</test.lucene.skip>
+        <test.elasticsearch.skip>${failsafe.spring.skip}</test.elasticsearch.skip>
+
+        <failsafe.lucene.reportsDirectory>${project.build.directory}/failsafe-reports/lucene</failsafe.lucene.reportsDirectory>
+        <failsafe.lucene.summaryFile>${failsafe.lucene.reportsDirectory}/failsafe-summary.xml</failsafe.lucene.summaryFile>
+        <failsafe.jvm.args.jacoco.lucene></failsafe.jvm.args.jacoco.lucene>
+
+        <!--
+            Remove Hibernate system properties from parent settings:
+            They are supposed to be handled by the spring.datasource subsystem
+            and not by the Hibernate internal pool!
+            See also the failsafe configuration.
+         -->
+        <failsafe.jvm.args.hibernate-orm></failsafe.jvm.args.hibernate-orm>
+    </properties>
+
+    <dependencies>
+        <dependency>
+            <groupId>org.hibernate.search</groupId>
+            <artifactId>hibernate-search-mapper-orm</artifactId>
+        </dependency>
+        <!-- Only necessary when using the Lucene backend -->
+        <dependency>
+            <groupId>org.hibernate.search</groupId>
+            <artifactId>hibernate-search-backend-lucene-next</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.hibernate.search</groupId>
+            <artifactId>hibernate-search-backend-elasticsearch</artifactId>
+        </dependency>
+        <!-- Only needed to start ES container in tests -->
+        <dependency>
+            <groupId>org.hibernate.search</groupId>
+            <artifactId>hibernate-search-util-internal-integrationtest-backend-elasticsearch</artifactId>
+            <scope>test</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-data-jpa</artifactId>
+            <exclusions>
+                <!-- Using JBoss Logging -->
+                <exclusion>
+                    <groupId>org.springframework.boot</groupId>
+                    <artifactId>spring-boot-starter-logging</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+
+        <dependency>
+            <groupId>org.hibernate.search</groupId>
+            <artifactId>hibernate-search-util-internal-integrationtest-mapper-orm</artifactId>
+            <scope>test</scope>
+        </dependency>
+
+        <!--
+            Leave this dependency here, not in a utils module, so that we don't need to recompile
+            the utils to re-run the tests with a different database.
+         -->
+        <dependency>
+            <groupId>${jdbc.driver.groupId}</groupId>
+            <artifactId>${jdbc.driver.artifactId}</artifactId>
+            <scope>test</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-test</artifactId>
+            <scope>test</scope>
+            <exclusions>
+                <!-- Using JBoss Logging -->
+                <exclusion>
+                    <groupId>org.springframework.boot</groupId>
+                    <artifactId>spring-boot-starter-logging</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+    </dependencies>
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-antrun-plugin</artifactId>
+            </plugin>
+            <plugin>
+                <groupId>io.smallrye</groupId>
+                <artifactId>jandex-maven-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>make-index</id>
+                        <goals>
+                            <goal>jandex</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-failsafe-plugin</artifactId>
+                <configuration>
+                    <!--
+                        Since we do not pass the Hibernate ORM settings through system properties directly
+                        (see the override of the failsafe.jvm.args.hibernate-orm near the top of this file),
+                        we need to pass the settings some other way.
+                        Here we chose to use environment variables.
+                     -->
+                    <environmentVariables>
+                        <ELASTICSEARCH_URIS>${test.elasticsearch.connection.uris}</ELASTICSEARCH_URIS>
+                        <ELASTICSEARCH_USERNAME>${test.elasticsearch.connection.username}</ELASTICSEARCH_USERNAME>
+                        <ELASTICSEARCH_PASSWORD>${test.elasticsearch.connection.password}</ELASTICSEARCH_PASSWORD>
+                        <ELASTICSEARCH_AWS_SIGNING_ENABLED>${test.elasticsearch.connection.aws.signing.enabled}</ELASTICSEARCH_AWS_SIGNING_ENABLED>
+                        <ELASTICSEARCH_AWS_REGION>${test.elasticsearch.connection.aws.region}</ELASTICSEARCH_AWS_REGION>
+                        <ELASTICSEARCH_AWS_CREDENTIALS_TYPE>${test.elasticsearch.connection.aws.credentials.type}</ELASTICSEARCH_AWS_CREDENTIALS_TYPE>
+                        <ELASTICSEARCH_AWS_CREDENTIALS_ACCESS_KEY_ID>${env.HIBERNATE_SEARCH_AWS_STATIC_CREDENTIALS_ACCESS_KEY_ID}</ELASTICSEARCH_AWS_CREDENTIALS_ACCESS_KEY_ID>
+                        <ELASTICSEARCH_AWS_CREDENTIALS_SECRET_ACCESS_KEY>${env.HIBERNATE_SEARCH_AWS_STATIC_CREDENTIALS_SECRET_ACCESS_KEY}</ELASTICSEARCH_AWS_CREDENTIALS_SECRET_ACCESS_KEY>
+                        <!--
+                             The test settings add a different suffix to this value for each test execution.
+                             We can't add this suffix (${random.uuid}) here due to IDEA limitations:
+                             IDEA just ignores this environment variable if it finds a reference to an unknown property
+                             such as "${random.uuid}".
+                         -->
+                        <LUCENE_ROOT_PATH>${project.build.directory}/test-indexes/</LUCENE_ROOT_PATH>
+                    </environmentVariables>
+                </configuration>
+
+                <executions>
+                    <execution>
+                        <id>it-lucene</id>
+                        <goals>
+                            <goal>integration-test</goal>
+                        </goals>
+                        <configuration>
+                            <skip>${test.lucene.skip}</skip>
+                            <argLine>${failsafe.jvm.args.no-jacoco} @{failsafe.jvm.args.jacoco.lucene}</argLine>
+                            <reportNameSuffix>${surefire.executionIdentifier}-lucene</reportNameSuffix>
+                            <reportsDirectory>${failsafe.lucene.reportsDirectory}</reportsDirectory>
+                            <summaryFile>${failsafe.lucene.summaryFile}</summaryFile>
+                            <systemPropertyVariables>
+                                <!-- See TestActiveProfilesResolver -->
+                                <test.backend>lucene</test.backend>
+                            </systemPropertyVariables>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>it-verify</id>
+                        <goals>
+                            <goal>verify</goal>
+                        </goals>
+                        <configuration>
+                            <skip>${failsafe.spring.skip}</skip>
+                            <summaryFiles>
+                                <summaryFile>${failsafe.lucene.summaryFile}</summaryFile>
+                            </summaryFiles>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
+    </build>
+
+    <profiles>
+        <!--
+             The "verify" goal fails if a file specified in "summaryFiles" doesn't exist,
+             and that's exactly what happens when we skip an "integration-test" goal.
+             See https://github.com/apache/maven-surefire/blob/2fed802397f8c7de4cfc72f49ab4565e72f7aab7/maven-failsafe-plugin/src/main/java/org/apache/maven/plugin/failsafe/VerifyMojo.java#L179-L183
+         -->
+        <profile>
+            <id>lucene-test-skip</id>
+            <activation>
+                <property>
+                    <name>test.lucene.skip</name>
+                    <value>true</value>
+                </property>
+            </activation>
+            <properties>
+                <failsafe.lucene.summaryFile>${rootProject.empty.failsafe.summaryFile}</failsafe.lucene.summaryFile>
+            </properties>
+        </profile>
+        <profile>
+            <id>coverage</id>
+            <build>
+                <plugins>
+                    <!-- We need to send the jacoco report of each test execution to a different file,
+                        otherwise Develocity won't be able to cache test executions. -->
+                    <plugin>
+                        <groupId>org.jacoco</groupId>
+                        <artifactId>jacoco-maven-plugin</artifactId>
+                        <executions>
+                            <execution>
+                                <id>jacoco-prepare-agent-integration</id>
+                                <configuration>
+                                    <skip>true</skip>
+                                </configuration>
+                            </execution>
+                            <execution>
+                                <id>jacoco-prepare-agent-integration-lucene</id>
+                                <phase>initialize</phase>
+                                <goals>
+                                    <goal>prepare-agent-integration</goal>
+                                </goals>
+                                <configuration>
+                                    <propertyName>failsafe.jvm.args.jacoco.lucene</propertyName>
+                                    <destFile>${project.build.directory}/${jacoco.environment.sub-directory}/lucene/jacoco.exec</destFile>
+                                </configuration>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+    </profiles>
+
+</project>
+
