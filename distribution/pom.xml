@@ -154,6 +154,83 @@
         <plugins>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-dependency-plugin</artifactId>
+                <executions>
+                    <!--
+                        The Maven assembly plugin will not "pull" the Lucene-next dependencies since
+                        per dependency management Lucene libs are resolved to `version.org.apache.lucene` (9.x).
+                        We copy the libs required by the Lucene next backend and include them "manually" instead.
+
+                        The enforcer plugin checks that this list matches what we have in the backend itself.
+                     -->
+                    <execution>
+                        <id>copy-dependencies-lucene-next</id>
+                        <phase>generate-sources</phase>
+                        <goals>
+                            <goal>copy</goal>
+                        </goals>
+                        <configuration>
+                            <artifactItems>
+                                <artifactItem>
+                                    <groupId>org.apache.lucene</groupId>
+                                    <artifactId>lucene-core</artifactId>
+                                    <version>${version.org.apache.lucene.next}</version>
+                                </artifactItem>
+                                <artifactItem>
+                                    <groupId>org.apache.lucene</groupId>
+                                    <artifactId>lucene-analysis-common</artifactId>
+                                    <version>${version.org.apache.lucene.next}</version>
+                                </artifactItem>
+                                <artifactItem>
+                                    <groupId>org.apache.lucene</groupId>
+                                    <artifactId>lucene-queryparser</artifactId>
+                                    <version>${version.org.apache.lucene.next}</version>
+                                </artifactItem>
+                                <artifactItem>
+                                    <groupId>org.apache.lucene</groupId>
+                                    <artifactId>lucene-queries</artifactId>
+                                    <version>${version.org.apache.lucene.next}</version>
+                                </artifactItem>
+                                <artifactItem>
+                                    <groupId>org.apache.lucene</groupId>
+                                    <artifactId>lucene-sandbox</artifactId>
+                                    <version>${version.org.apache.lucene.next}</version>
+                                </artifactItem>
+                                <artifactItem>
+                                    <groupId>org.apache.lucene</groupId>
+                                    <artifactId>lucene-join</artifactId>
+                                    <version>${version.org.apache.lucene.next}</version>
+                                </artifactItem>
+                                <artifactItem>
+                                    <groupId>org.apache.lucene</groupId>
+                                    <artifactId>lucene-facet</artifactId>
+                                    <version>${version.org.apache.lucene.next}</version>
+                                </artifactItem>
+                                <artifactItem>
+                                    <groupId>org.apache.lucene</groupId>
+                                    <artifactId>lucene-highlighter</artifactId>
+                                    <version>${version.org.apache.lucene.next}</version>
+                                </artifactItem>
+                                <artifactItem>
+                                    <groupId>org.apache.lucene</groupId>
+                                    <artifactId>lucene-memory</artifactId>
+                                    <version>${version.org.apache.lucene.next}</version>
+                                </artifactItem>
+                                <artifactItem>
+                                    <groupId>com.carrotsearch</groupId>
+                                    <artifactId>hppc</artifactId>
+                                    <version>${version.com.carrotsearch.hppc}</version>
+                                </artifactItem>
+                            </artifactItems>
+                            <outputDirectory>${project.build.directory}/dependencies-lucene-next</outputDirectory>
+                            <overWriteReleases>false</overWriteReleases>
+                            <overWriteSnapshots>true</overWriteSnapshots>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-javadoc-plugin</artifactId>
                 <executions>
                     <execution>
@@ -238,10 +315,37 @@
                                     <pathsToSkip>
                                         <path>v5migrationhelper/engine/src/main/java</path>
                                         <path>v5migrationhelper/orm/src/main/java</path>
+                                        <path>lucene-next/backend/lucene/src/main/java</path>
                                         <path>v5migrationhelper/orm/target/generated-sources/annotations</path>
                                         <path>v5migrationhelper/engine/target/generated-sources/annotations</path>
+                                        <path>lucene-next/backend/lucene/target/generated-sources/annotations</path>
                                     </pathsToSkip>
                                 </javadocSourcePathIncludesAllPublicArtifactsRule>
+                                <allLuceneNextDependenciesCopiedRule>
+                                    <!-- We skip these dependencies as they are already added to the distribution through other entries: -->
+                                    <dependenciesToSkip>
+                                        <dependency>
+                                            <groupId>org.jboss.logging</groupId>
+                                            <artifactId>jboss-logging</artifactId>
+                                        </dependency>
+                                        <dependency>
+                                            <groupId>org.jboss.logging</groupId>
+                                            <artifactId>jboss-logging-annotations</artifactId>
+                                        </dependency>
+                                        <dependency>
+                                            <groupId>org.hibernate.search</groupId>
+                                            <artifactId>hibernate-search-engine</artifactId>
+                                        </dependency>
+                                        <dependency>
+                                            <groupId>org.hibernate.search</groupId>
+                                            <artifactId>hibernate-search-util-common</artifactId>
+                                        </dependency>
+                                        <dependency>
+                                            <groupId>io.smallrye</groupId>
+                                            <artifactId>jandex</artifactId>
+                                        </dependency>
+                                    </dependenciesToSkip>
+                                </allLuceneNextDependenciesCopiedRule>
                             </rules>
                         </configuration>
                     </execution>
