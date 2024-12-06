@@ -40,7 +40,7 @@
         </dependency>
         <dependency>
             <groupId>org.hibernate.search</groupId>
-            <artifactId>hibernate-search-backend-lucene10</artifactId>
+            <artifactId>hibernate-search-backend-lucene-next</artifactId>
         </dependency>
         <dependency>
             <groupId>org.hibernate.search</groupId>
@@ -152,27 +152,27 @@
         <!-- All Lucene 10 things: -->
         <dependency>
             <groupId>org.hibernate.search</groupId>
-            <artifactId>hibernate-search-integrationtest-backend-lucene10</artifactId>
+            <artifactId>hibernate-search-integrationtest-backend-lucene-next</artifactId>
             <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.hibernate.search</groupId>
-            <artifactId>hibernate-search-integrationtest-mapper-pojo-standalone-realbackend-lucene10</artifactId>
+            <artifactId>hibernate-search-integrationtest-mapper-pojo-standalone-realbackend-lucene-next</artifactId>
             <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.hibernate.search</groupId>
-            <artifactId>hibernate-search-integrationtest-mapper-orm-realbackend-lucene10</artifactId>
+            <artifactId>hibernate-search-integrationtest-mapper-orm-realbackend-lucene-next</artifactId>
             <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.hibernate.search</groupId>
-            <artifactId>hibernate-search-integrationtest-mapper-orm-jakarta-batch-lucene10</artifactId>
+            <artifactId>hibernate-search-integrationtest-mapper-orm-jakarta-batch-lucene-next</artifactId>
             <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.hibernate.search</groupId>
-            <artifactId>hibernate-search-documentation-lucene10</artifactId>
+            <artifactId>hibernate-search-documentation-lucene-next</artifactId>
             <scope>test</scope>
         </dependency>
     </dependencies>
@@ -303,7 +303,7 @@
                 </dependency>
                 <dependency>
                     <groupId>org.hibernate.search</groupId>
-                    <artifactId>hibernate-search-integrationtest-showcase-library-lucene10</artifactId>
+                    <artifactId>hibernate-search-integrationtest-showcase-library-lucene-next</artifactId>
                     <scope>test</scope>
                 </dependency>
             </dependencies>
@@ -347,12 +347,12 @@
                 </dependency>
                 <dependency>
                     <groupId>org.hibernate.search</groupId>
-                    <artifactId>hibernate-search-integrationtest-java-modules-orm-lucene-lucene10</artifactId>
+                    <artifactId>hibernate-search-integrationtest-java-modules-orm-lucene-next</artifactId>
                     <scope>test</scope>
                 </dependency>
                 <dependency>
                     <groupId>org.hibernate.search</groupId>
-                    <artifactId>hibernate-search-integrationtest-java-modules-pojo-standalone-lucene-lucene10</artifactId>
+                    <artifactId>hibernate-search-integrationtest-java-modules-pojo-standalone-lucene-next</artifactId>
                     <scope>test</scope>
                 </dependency>
             </dependencies>

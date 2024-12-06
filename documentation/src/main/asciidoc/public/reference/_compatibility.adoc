@@ -21,7 +21,7 @@
 |
 |Apache Lucene (for the <<backend-lucene,Lucene backend>>)
 |{luceneVersion}
-|Or Lucene {lucene10Version} when using JDK 21+ and <<other-integrations-lucene10,different Maven artifacts>>.
+|Or Lucene {luceneNextVersion} when using JDK 21+ and <<other-integrations-lucene-next,different Maven artifacts>>.
 |Elasticsearch server (for the <<backend-elasticsearch,Elasticsearch backend>>)
 |{elasticsearchCompatibleVersions}
 |Most of older minor versions (e.g. {elasticsearchOtherPotentiallyCompatibleVersions}) are not given priority for bugfixes and new features.
