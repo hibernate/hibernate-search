@@ -49,7 +49,7 @@
             </dependency>
             <dependency>
                 <groupId>org.hibernate.search</groupId>
-                <artifactId>hibernate-search-backend-lucene10</artifactId>
+                <artifactId>hibernate-search-backend-lucene-next</artifactId>
                 <version>${project.version}</version>
             </dependency>
             <dependency>
