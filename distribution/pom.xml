@@ -160,6 +160,8 @@
                         <configuration>
                             <!-- We don't include the v5migrationhelper modules here,
                                  so as not to confuse the documentation with obsolete API -->
+                            <!-- While the generated sources will unlikely contain any public classes for which we
+                                 have to generate any JavaDocs, we still include them for completeness -->
                             <sourcepath>
                                 ${basedir}/../engine/src/main/java;
                                 ${basedir}/../util/common/src/main/java;
@@ -172,6 +174,18 @@
                                 ${basedir}/../mapper/orm-outbox-polling/src/main/java;
                                 ${basedir}/../mapper/orm-jakarta-batch/core/src/main/java;
                                 ${basedir}/../mapper/orm-jakarta-batch/jberet/src/main/java;
+                                ${basedir}/../engine/target/generated-sources/annotations;
+                                ${basedir}/../util/common/target/generated-sources/annotations;
+                                ${basedir}/../mapper/pojo-base/target/generated-sources/annotations;
+                                ${basedir}/../mapper/orm/target/generated-sources/annotations;
+                                ${basedir}/../mapper/pojo-standalone/target/generated-sources/annotations;
+                                ${basedir}/../backend/elasticsearch/target/generated-sources/annotations;
+                                ${basedir}/../backend/elasticsearch-aws/target/generated-sources/annotations;
+                                ${basedir}/../backend/lucene/target/generated-sources/annotations;
+                                ${basedir}/../mapper/orm-outbox-polling/src/main/avro/generated;
+                                ${basedir}/../mapper/orm-outbox-polling/target/generated-sources/annotations;
+                                ${basedir}/../mapper/orm-jakarta-batch/core/target/generated-sources/annotations;
+                                ${basedir}/../mapper/orm-jakarta-batch/jberet/target/generated-sources/annotations;
                             </sourcepath>
                             <docfilessubdirs>true</docfilessubdirs>
                             <packagesheader>Hibernate Search Packages</packagesheader>
@@ -219,6 +233,8 @@
                                     <pathsToSkip>
                                         <path>v5migrationhelper/engine/src/main/java</path>
                                         <path>v5migrationhelper/orm/src/main/java</path>
+                                        <path>v5migrationhelper/orm/target/generated-sources/annotations</path>
+                                        <path>v5migrationhelper/engine/target/generated-sources/annotations</path>
                                     </pathsToSkip>
                                 </javadocSourcePathIncludesAllPublicArtifactsRule>
                             </rules>
