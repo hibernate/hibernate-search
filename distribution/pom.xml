@@ -202,6 +202,37 @@
                     </execution>
                 </executions>
             </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-enforcer-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>enforce-custom-javadoc-bundle-rules</id>
+                        <goals>
+                            <goal>enforce</goal>
+                        </goals>
+                        <configuration>
+                            <rules>
+                                <javadocSourcePathIncludesAllPublicArtifactsRule>
+                                    <!-- We don't include the v5migrationhelper modules here,
+                                        so as not to confuse the documentation with obsolete API -->
+                                    <pathsToSkip>
+                                        <path>v5migrationhelper/engine/src/main/java</path>
+                                        <path>v5migrationhelper/orm/src/main/java</path>
+                                    </pathsToSkip>
+                                </javadocSourcePathIncludesAllPublicArtifactsRule>
+                            </rules>
+                        </configuration>
+                    </execution>
+                </executions>
+                <dependencies>
+                    <dependency>
+                        <groupId>org.hibernate.search</groupId>
+                        <artifactId>hibernate-search-build-enforcer</artifactId>
+                        <version>${project.version}</version>
+                    </dependency>
+                </dependencies>
+            </plugin>
         </plugins>
     </build>
 </project>
