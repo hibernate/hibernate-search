@@ -155,12 +155,13 @@
                                 ${basedir}/../util/common/src/main/java;
                                 ${basedir}/../mapper/pojo-base/src/main/java;
                                 ${basedir}/../mapper/orm/src/main/java;
+                                ${basedir}/../mapper/pojo-standalone/src/main/java;
                                 ${basedir}/../backend/elasticsearch/src/main/java;
                                 ${basedir}/../backend/elasticsearch-aws/src/main/java;
                                 ${basedir}/../backend/lucene/src/main/java;
-                                ${basedir}/../mapper/lucene/src/main/java;
                                 ${basedir}/../mapper/orm-coordination-outbox-polling/src/main/java;
                                 ${basedir}/../mapper/orm-batch-jsr352/core/src/main/java;
+                                ${basedir}/../mapper/orm-batch-jsr352/jberet/src/main/java;
                             </sourcepath>
                             <docfilessubdirs>true</docfilessubdirs>
                             <packagesheader>Hibernate Search Packages</packagesheader>
