@@ -3,7 +3,9 @@
 	SPDX-License-Identifier: Apache-2.0
 	Copyright Red Hat Inc. and Hibernate Authors
 -->
-<assembly>
+<assembly xmlns="http://maven.apache.org/ASSEMBLY/2.2.0"
+		xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+		xsi:schemaLocation="http://maven.apache.org/ASSEMBLY/2.2.0 http://maven.apache.org/xsd/assembly-2.2.0.xsd">
 	<id>dist</id>
 	<formats>
 		<format>tar.gz</format>
@@ -180,6 +182,11 @@
 	</files>
 
 	<fileSets>
+		<fileSet>
+			<!-- Lucene "next" dependencies -->
+			<directory>target/dependencies-lucene-next</directory>
+			<outputDirectory>dist/backend/lucene-next</outputDirectory>
+		</fileSet>
 		<!-- Include all sources -->
 		<fileSet>
 			<directory>..</directory>
