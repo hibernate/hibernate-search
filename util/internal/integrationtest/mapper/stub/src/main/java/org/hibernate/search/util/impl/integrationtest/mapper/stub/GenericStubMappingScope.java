@@ -19,32 +19,32 @@ import org.hibernate.search.engine.search.sort.dsl.SearchSortFactory;
  * A wrapper around {@link MappedIndexScope} providing some syntactic sugar,
  * such as methods that do not force to provide a session context.
  */
-public class GenericStubMappingScope<R, E> {
+public class GenericStubMappingScope<SR, R, E> {
 
 	private final StubMapping mapping;
-	private final MappedIndexScope<R, E> delegate;
+	private final MappedIndexScope<SR, R, E> delegate;
 	private final SearchLoadingContext<E> loadingContext;
 
-	GenericStubMappingScope(StubMapping mapping, MappedIndexScope<R, E> delegate,
+	GenericStubMappingScope(StubMapping mapping, MappedIndexScope<SR, R, E> delegate,
 			SearchLoadingContext<E> loadingContext) {
 		this.mapping = mapping;
 		this.delegate = delegate;
 		this.loadingContext = loadingContext;
 	}
 
-	public SearchQuerySelectStep<?, R, E, StubLoadingOptionsStep, ?, ?> query() {
+	public SearchQuerySelectStep<SR, ?, R, E, StubLoadingOptionsStep, ?, ?> query() {
 		return query( mapping.session() );
 	}
 
-	public SearchQuerySelectStep<?, R, E, StubLoadingOptionsStep, ?, ?> query(StubSession sessionContext) {
+	public SearchQuerySelectStep<SR, ?, R, E, StubLoadingOptionsStep, ?, ?> query(StubSession sessionContext) {
 		return query( sessionContext, new StubLoadingOptionsStep() );
 	}
 
-	public <LOS> SearchQuerySelectStep<?, R, E, LOS, ?, ?> query(LOS loadingOptionsStep) {
+	public <LOS> SearchQuerySelectStep<SR, ?, R, E, LOS, ?, ?> query(LOS loadingOptionsStep) {
 		return query( mapping.session(), loadingOptionsStep );
 	}
 
-	public <LOS> SearchQuerySelectStep<?, R, E, LOS, ?, ?> query(StubSession sessionContext,
+	public <LOS> SearchQuerySelectStep<SR, ?, R, E, LOS, ?, ?> query(StubSession sessionContext,
 			LOS loadingOptionsStep) {
 		SearchLoadingContextBuilder<E, LOS> loadingContextBuilder = new SearchLoadingContextBuilder<E, LOS>() {
 			@Override
@@ -60,19 +60,19 @@ public class GenericStubMappingScope<R, E> {
 		return delegate.search( sessionContext, loadingContextBuilder );
 	}
 
-	public SearchPredicateFactory predicate() {
+	public SearchPredicateFactory<SR> predicate() {
 		return delegate.predicate();
 	}
 
-	public SearchSortFactory sort() {
+	public SearchSortFactory<SR> sort() {
 		return delegate.sort();
 	}
 
-	public SearchProjectionFactory<R, E> projection() {
+	public SearchProjectionFactory<SR, R, E> projection() {
 		return delegate.projection();
 	}
 
-	public SearchAggregationFactory aggregation() {
+	public SearchAggregationFactory<SR> aggregation() {
 		return delegate.aggregation();
 	}
 

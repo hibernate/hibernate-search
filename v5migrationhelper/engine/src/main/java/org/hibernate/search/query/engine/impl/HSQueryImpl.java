@@ -225,7 +225,7 @@ public class HSQueryImpl<LOS> implements HSQuery {
 		if ( sort == null ) {
 			sort = scope.sort().score().toSort();
 		}
-		SearchQueryOptionsStep<?, ?, LOS, ?, ?> optionsStep = session.search( scope )
+		SearchQueryOptionsStep<?, ?, ?, LOS, ?, ?> optionsStep = session.search( scope )
 				.select( projection )
 				.where( predicate )
 				.sort( sort );
@@ -247,7 +247,7 @@ public class HSQueryImpl<LOS> implements HSQuery {
 	}
 
 	private SearchProjection<?> createCompositeProjection() {
-		SearchProjectionFactory<?, ?> factory = scope.projection();
+		SearchProjectionFactory<?, ?, ?> factory = scope.projection();
 
 		if ( projectedFields == null || projectedFields.length == 0 ) {
 			// No tuple, so we ignore the tupleTransformer (Search 5 behavior)
@@ -271,7 +271,7 @@ public class HSQueryImpl<LOS> implements HSQuery {
 	}
 
 	private SearchProjection<?> createProjection(String field) {
-		SearchProjectionFactory<?, ?> factory = scope.projection();
+		SearchProjectionFactory<?, ?, ?> factory = scope.projection();
 		if ( field == null ) {
 			// Hack to return null when a null field name is requested,
 			// which is what Search 5 used to do...

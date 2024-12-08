@@ -179,10 +179,10 @@ public abstract class AbstractPredicateTypeCheckingNoConversionIT<V extends Abst
 				) );
 	}
 
-	protected abstract PredicateFinalStep predicate(SearchPredicateFactory f, String fieldPath, int matchingDocOrdinal,
+	protected abstract PredicateFinalStep predicate(SearchPredicateFactory<?> f, String fieldPath, int matchingDocOrdinal,
 			DataSet<?, V> dataSet);
 
-	protected abstract PredicateFinalStep predicate(SearchPredicateFactory f, String field0Path, String field1Path,
+	protected abstract PredicateFinalStep predicate(SearchPredicateFactory<?> f, String field0Path, String field1Path,
 			int matchingDocOrdinal, DataSet<?, V> dataSet);
 
 	protected abstract String predicateTrait();

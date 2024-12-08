@@ -21,6 +21,7 @@ import org.hibernate.search.mapper.pojo.schema.management.spi.PojoScopeSchemaMan
 import org.hibernate.search.mapper.pojo.work.spi.PojoScopeWorkspace;
 
 /**
+ * @param <SR> Scope root type.
  * @param <R> The type of entity references, i.e. the type of hits returned by
  * {@link SearchQuerySelectStep#selectEntityReference()} reference queries},
  * @param <E> The type of loaded entities, i.e. the type of hits returned by
@@ -30,21 +31,21 @@ import org.hibernate.search.mapper.pojo.work.spi.PojoScopeWorkspace;
  * {@link #includedIndexedTypes()}.
  * or the type of objects returned for {@link SearchProjectionFactory#entity() entity projections}.
  */
-public interface PojoScopeDelegate<R extends EntityReference, E, C> {
+public interface PojoScopeDelegate<SR, R extends EntityReference, E, C> {
 
 	Set<C> includedIndexedTypes();
 
-	<LOS> SearchQuerySelectStep<?, R, E, LOS, SearchProjectionFactory<R, E>, ?> search(
+	<LOS> SearchQuerySelectStep<SR, ?, R, E, LOS, SearchProjectionFactory<SR, R, E>, ?> search(
 			PojoScopeSessionContext sessionContext,
 			PojoSelectionLoadingContextBuilder<LOS> loadingContextBuilder);
 
-	SearchPredicateFactory predicate();
+	SearchPredicateFactory<SR> predicate();
 
-	SearchSortFactory sort();
+	SearchSortFactory<SR> sort();
 
-	SearchProjectionFactory<R, E> projection();
+	SearchProjectionFactory<SR, R, E> projection();
 
-	SearchAggregationFactory aggregation();
+	SearchAggregationFactory<SR> aggregation();
 
 	SearchHighlighterFactory highlighter();
 

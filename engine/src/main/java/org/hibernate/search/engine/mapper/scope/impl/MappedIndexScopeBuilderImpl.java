@@ -10,7 +10,7 @@ import org.hibernate.search.engine.backend.scope.spi.IndexScopeBuilder;
 import org.hibernate.search.engine.mapper.scope.spi.MappedIndexScope;
 import org.hibernate.search.engine.mapper.scope.spi.MappedIndexScopeBuilder;
 
-public class MappedIndexScopeBuilderImpl<R, E> implements MappedIndexScopeBuilder<R, E> {
+public class MappedIndexScopeBuilderImpl<SR, R, E> implements MappedIndexScopeBuilder<SR, R, E> {
 	private final IndexScopeBuilder delegate;
 
 	public MappedIndexScopeBuilderImpl(IndexManagerImplementor firstIndexManager,
@@ -23,7 +23,7 @@ public class MappedIndexScopeBuilderImpl<R, E> implements MappedIndexScopeBuilde
 	}
 
 	@Override
-	public MappedIndexScope<R, E> build() {
+	public MappedIndexScope<SR, R, E> build() {
 		return new MappedIndexScopeImpl<>( delegate.build() );
 	}
 }

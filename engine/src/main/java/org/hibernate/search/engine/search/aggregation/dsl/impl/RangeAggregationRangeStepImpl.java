@@ -19,27 +19,31 @@ import org.hibernate.search.engine.search.predicate.dsl.SearchPredicateFactory;
 import org.hibernate.search.util.common.data.Range;
 import org.hibernate.search.util.common.impl.Contracts;
 
-class RangeAggregationRangeStepImpl<PDF extends SearchPredicateFactory, F>
-		implements RangeAggregationRangeStep<RangeAggregationRangeStepImpl<PDF, F>, PDF, F>,
-		RangeAggregationRangeMoreStep<RangeAggregationRangeStepImpl<PDF, F>, RangeAggregationRangeStepImpl<PDF, F>, PDF, F> {
+class RangeAggregationRangeStepImpl<SR, PDF extends SearchPredicateFactory<SR>, F>
+		implements RangeAggregationRangeStep<SR, RangeAggregationRangeStepImpl<SR, PDF, F>, PDF, F>,
+		RangeAggregationRangeMoreStep<SR,
+				RangeAggregationRangeStepImpl<SR, PDF, F>,
+				RangeAggregationRangeStepImpl<SR, PDF, F>,
+				PDF,
+				F> {
 	private final RangeAggregationBuilder<F> builder;
-	private final SearchAggregationDslContext<?, ? extends PDF> dslContext;
+	private final SearchAggregationDslContext<SR, ?, ? extends PDF> dslContext;
 
 	RangeAggregationRangeStepImpl(RangeAggregationBuilder<F> builder,
-			SearchAggregationDslContext<?, ? extends PDF> dslContext) {
+			SearchAggregationDslContext<SR, ?, ? extends PDF> dslContext) {
 		this.builder = builder;
 		this.dslContext = dslContext;
 	}
 
 	@Override
-	public RangeAggregationRangeStepImpl<PDF, F> range(Range<? extends F> range) {
+	public RangeAggregationRangeStepImpl<SR, PDF, F> range(Range<? extends F> range) {
 		Contracts.assertNotNull( range, "range" );
 		builder.range( range );
 		return this;
 	}
 
 	@Override
-	public RangeAggregationRangeStepImpl<PDF, F> ranges(Collection<? extends Range<? extends F>> ranges) {
+	public RangeAggregationRangeStepImpl<SR, PDF, F> ranges(Collection<? extends Range<? extends F>> ranges) {
 		Contracts.assertNotNull( ranges, "ranges" );
 		for ( Range<? extends F> range : ranges ) {
 			range( range );
@@ -48,7 +52,7 @@ class RangeAggregationRangeStepImpl<PDF extends SearchPredicateFactory, F>
 	}
 
 	@Override
-	public RangeAggregationRangeStepImpl<PDF, F> filter(
+	public RangeAggregationRangeStepImpl<SR, PDF, F> filter(
 			Function<? super PDF, ? extends PredicateFinalStep> clauseContributor) {
 		SearchPredicate predicate = clauseContributor.apply( dslContext.predicateFactory() ).toPredicate();
 
@@ -56,7 +60,7 @@ class RangeAggregationRangeStepImpl<PDF extends SearchPredicateFactory, F>
 	}
 
 	@Override
-	public RangeAggregationRangeStepImpl<PDF, F> filter(SearchPredicate searchPredicate) {
+	public RangeAggregationRangeStepImpl<SR, PDF, F> filter(SearchPredicate searchPredicate) {
 		builder.filter( searchPredicate );
 		return this;
 	}

@@ -18,17 +18,17 @@ import org.hibernate.search.engine.search.predicate.spi.PredicateTypeKeys;
 import org.hibernate.search.engine.search.predicate.spi.PrefixPredicateBuilder;
 import org.hibernate.search.util.common.impl.Contracts;
 
-class PrefixPredicateFieldMoreStepImpl
-		implements PrefixPredicateFieldMoreStep<PrefixPredicateFieldMoreStepImpl, PrefixPredicateOptionsStep<?>>,
+class PrefixPredicateFieldMoreStepImpl<SR>
+		implements PrefixPredicateFieldMoreStep<SR, PrefixPredicateFieldMoreStepImpl<SR>, PrefixPredicateOptionsStep<?>>,
 		AbstractBooleanMultiFieldPredicateCommonState.FieldSetState {
 
-	private final CommonState commonState;
+	private final CommonState<SR> commonState;
 
 	private final List<PrefixPredicateBuilder> predicateBuilders = new ArrayList<>();
 
 	private Float fieldSetBoost;
 
-	PrefixPredicateFieldMoreStepImpl(CommonState commonState, List<String> fieldPaths) {
+	PrefixPredicateFieldMoreStepImpl(CommonState<SR> commonState, List<String> fieldPaths) {
 		this.commonState = commonState;
 		this.commonState.add( this );
 		SearchIndexScope<?> scope = commonState.scope();
@@ -38,12 +38,12 @@ class PrefixPredicateFieldMoreStepImpl
 	}
 
 	@Override
-	public PrefixPredicateFieldMoreStepImpl fields(String... fieldPaths) {
-		return new PrefixPredicateFieldMoreStepImpl( commonState, Arrays.asList( fieldPaths ) );
+	public PrefixPredicateFieldMoreStepImpl<SR> fields(String... fieldPaths) {
+		return new PrefixPredicateFieldMoreStepImpl<>( commonState, Arrays.asList( fieldPaths ) );
 	}
 
 	@Override
-	public PrefixPredicateFieldMoreStepImpl boost(float boost) {
+	public PrefixPredicateFieldMoreStepImpl<SR> boost(float boost) {
 		this.fieldSetBoost = boost;
 		return this;
 	}
@@ -63,9 +63,9 @@ class PrefixPredicateFieldMoreStepImpl
 		}
 	}
 
-	static class CommonState
-			extends AbstractBooleanMultiFieldPredicateCommonState<CommonState, PrefixPredicateFieldMoreStepImpl>
-			implements PrefixPredicateOptionsStep<CommonState> {
+	static class CommonState<SR>
+			extends AbstractBooleanMultiFieldPredicateCommonState<CommonState<SR>, PrefixPredicateFieldMoreStepImpl<SR>>
+			implements PrefixPredicateOptionsStep<CommonState<SR>> {
 
 		CommonState(SearchPredicateDslContext<?> dslContext) {
 			super( dslContext );
@@ -73,7 +73,7 @@ class PrefixPredicateFieldMoreStepImpl
 
 		private PrefixPredicateOptionsStep<?> matching(String prefix) {
 			Contracts.assertNotNull( prefix, "prefix" );
-			for ( PrefixPredicateFieldMoreStepImpl fieldSetState : getFieldSetStates() ) {
+			for ( PrefixPredicateFieldMoreStepImpl<SR> fieldSetState : getFieldSetStates() ) {
 				for ( PrefixPredicateBuilder predicateBuilder : fieldSetState.predicateBuilders ) {
 					predicateBuilder.prefix( prefix );
 				}
@@ -82,7 +82,7 @@ class PrefixPredicateFieldMoreStepImpl
 		}
 
 		@Override
-		protected CommonState thisAsS() {
+		protected CommonState<SR> thisAsS() {
 			return this;
 		}
 	}
