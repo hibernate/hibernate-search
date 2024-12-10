@@ -1,0 +1,97 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <parent>
+        <groupId>org.hibernate.search</groupId>
+        <artifactId>hibernate-search-integrationtest-lucene-next</artifactId>
+        <version>8.0.0-SNAPSHOT</version>
+        <relativePath>../../..</relativePath>
+    </parent>
+    <artifactId>hibernate-search-integrationtest-java-modules-pojo-standalone-lucene-next</artifactId>
+    <packaging>jar</packaging>
+
+    <name>Hibernate Search ITs - Java - Modules - POJO/Lucene - Lucene 10</name>
+    <description>Hibernate Search integration tests for Java 17+ modules - Lucene 10</description>
+
+    <properties>
+        <transform.original.pathFromRoot>integrationtest/java/modules/pojo-standalone-lucene</transform.original.pathFromRoot>
+        <!--
+             Maven compiler plugin attempts accessing module-info files
+             and if it is compiled with a JDK version > than the one in which maven runs with
+             it will result in test compilation failure when we test against newer JDKs.
+
+             Hence, we set this release version to the min version we test against:
+         -->
+        <maven.compiler.release>17</maven.compiler.release>
+        <!-- Override the default from the parent POM: here we really do want to use the modulepath -->
+        <failsafe.useModulePath>true</failsafe.useModulePath>
+    </properties>
+
+    <dependencies>
+        <dependency>
+            <groupId>org.hibernate.search</groupId>
+            <artifactId>hibernate-search-mapper-pojo-standalone</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.hibernate.search</groupId>
+            <artifactId>hibernate-search-backend-lucene-next</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>org.hibernate.search</groupId>
+            <artifactId>hibernate-search-util-internal-integrationtest-mapper-pojo-standalone</artifactId>
+            <scope>test</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>org.hibernate.search</groupId>
+            <artifactId>hibernate-search-util-internal-integrationtest-backend-lucene-next</artifactId>
+            <scope>test</scope>
+        </dependency>
+    </dependencies>
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-antrun-plugin</artifactId>
+            </plugin>
+            <!-- This is only necessary because we don't reference our annotated types directly in AnnotatedTypeSource
+                 and because Hibernate Search never builds Jandex indexes automatically
+                 for classes in a `org.hibernate` package.
+                 See org.hibernate.search.mapper.pojo.mapping.definition.annotation.impl.AnnotationMappingConfigurationContextImpl.isJandexBuildingAllowed
+             -->
+            <plugin>
+                <groupId>io.smallrye</groupId>
+                <artifactId>jandex-maven-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>make-index</id>
+                        <goals>
+                            <goal>jandex</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <artifactId>maven-failsafe-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>it</id>
+                        <goals>
+                            <goal>integration-test</goal>
+                            <goal>verify</goal>
+                        </goals>
+                        <configuration>
+                            <skip>${test.lucene.skip}</skip>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
+    </build>
+
+</project>

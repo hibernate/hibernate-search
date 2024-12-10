@@ -546,6 +546,8 @@ stage('Non-default environments') {
 							-pl !integrationtest/java/modules/orm-lucene \
 							-pl !integrationtest/java/modules/orm-elasticsearch \
 							-pl !integrationtest/java/modules/orm-outbox-polling-elasticsearch \
+							-pl !lucene-next/documentation \
+							-pl !lucene-next/integrationtest/java/modules/orm-lucene \
 					'''
 					String mavenDockerArgs = ""
 					def startedContainers = false

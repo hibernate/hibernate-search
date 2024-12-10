@@ -1,0 +1,20 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <parent>
+        <groupId>org.hibernate.search</groupId>
+        <artifactId>hibernate-search-parent-internal-lucene-next</artifactId>
+        <version>8.0.0-SNAPSHOT</version>
+        <relativePath>../../../build/parents/internal</relativePath>
+    </parent>
+    <artifactId>hibernate-search-util-internal-integrationtest-lucene-next</artifactId>
+    <packaging>pom</packaging>
+
+    <name>Hibernate Search Utils - Internal - ITs - Aggregator POM - Lucene 10</name>
+    <description>Aggregator POM of Hibernate Search integration testing utilities - Lucene 10</description>
+
+    <modules>
+        <module>backend/lucene</module>
+    </modules>
+</project>
+
