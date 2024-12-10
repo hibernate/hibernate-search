@@ -145,33 +145,33 @@ class DistanceProjectionSingleValuedBaseIT extends AbstractDistanceProjectionSin
 	}
 
 	@Override
-	protected void addParameter(SearchQueryOptionsStep<?, ?, ?, ?, ?> query, String parameterName, Object value) {
+	protected void addParameter(SearchQueryOptionsStep<?, ?, ?, ?, ?, ?> query, String parameterName, Object value) {
 		// do nothing
 	}
 
 	@Override
 	protected DistanceToFieldProjectionValueStep<?, Double> distance(
-			SearchProjectionFactory<EntityReference, DocumentReference> projection, String path, GeoPoint center,
+			SearchProjectionFactory<?, EntityReference, DocumentReference> projection, String path, GeoPoint center,
 			String parameterName) {
 		return projection.distance( path, center );
 	}
 
 	@Override
 	protected ProjectionFinalStep<List<Double>> distanceMulti(
-			SearchProjectionFactory<EntityReference, DocumentReference> projection, String path, GeoPoint center,
+			SearchProjectionFactory<?, EntityReference, DocumentReference> projection, String path, GeoPoint center,
 			String parameterName) {
 		return projection.distance( path, center ).list();
 	}
 
 	@Override
 	protected DistanceToFieldProjectionOptionsStep<?, Double> distance(
-			SearchProjectionFactory<EntityReference, DocumentReference> projection, String path, GeoPoint center,
+			SearchProjectionFactory<?, EntityReference, DocumentReference> projection, String path, GeoPoint center,
 			DistanceUnit unit, String centerParam, String unitParam) {
 		return projection.distance( path, center ).unit( unit );
 	}
 
 	@Override
-	protected SortFinalStep sort(SearchSortFactory sort, String path, GeoPoint center, String parameterName) {
+	protected SortFinalStep sort(SearchSortFactory<?> sort, String path, GeoPoint center, String parameterName) {
 		return sort.distance( path, center );
 	}
 }

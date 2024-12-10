@@ -10,17 +10,17 @@ import org.hibernate.search.engine.search.predicate.dsl.WildcardPredicateFieldMo
 import org.hibernate.search.engine.search.predicate.dsl.WildcardPredicateFieldStep;
 import org.hibernate.search.engine.search.predicate.dsl.spi.SearchPredicateDslContext;
 
-public final class WildcardPredicateFieldStepImpl
-		implements WildcardPredicateFieldStep<WildcardPredicateFieldMoreStep<?, ?>> {
+public final class WildcardPredicateFieldStepImpl<SR>
+		implements WildcardPredicateFieldStep<SR, WildcardPredicateFieldMoreStep<SR, ?, ?>> {
 
-	private final WildcardPredicateFieldMoreStepImpl.CommonState commonState;
+	private final WildcardPredicateFieldMoreStepImpl.CommonState<SR> commonState;
 
 	public WildcardPredicateFieldStepImpl(SearchPredicateDslContext<?> dslContext) {
-		this.commonState = new WildcardPredicateFieldMoreStepImpl.CommonState( dslContext );
+		this.commonState = new WildcardPredicateFieldMoreStepImpl.CommonState<>( dslContext );
 	}
 
 	@Override
-	public WildcardPredicateFieldMoreStep<?, ?> fields(String... fieldPaths) {
-		return new WildcardPredicateFieldMoreStepImpl( commonState, Arrays.asList( fieldPaths ) );
+	public WildcardPredicateFieldMoreStep<SR, ?, ?> fields(String... fieldPaths) {
+		return new WildcardPredicateFieldMoreStepImpl<>( commonState, Arrays.asList( fieldPaths ) );
 	}
 }

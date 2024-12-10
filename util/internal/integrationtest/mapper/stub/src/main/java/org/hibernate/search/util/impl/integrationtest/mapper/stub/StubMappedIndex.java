@@ -195,7 +195,7 @@ public abstract class StubMappedIndex {
 	/**
 	 * @return {@code createScope().query()}.
 	 */
-	public SearchQuerySelectStep<?, EntityReference, DocumentReference, StubLoadingOptionsStep, ?, ?> query() {
+	public SearchQuerySelectStep<Object, ?, EntityReference, DocumentReference, StubLoadingOptionsStep, ?, ?> query() {
 		return createScope().query();
 	}
 
@@ -203,7 +203,7 @@ public abstract class StubMappedIndex {
 	 * @return A scope containing this index only.
 	 */
 	public StubMappingScope createScope() {
-		MappedIndexScopeBuilder<EntityReference, DocumentReference> builder =
+		MappedIndexScopeBuilder<Object, EntityReference, DocumentReference> builder =
 				delegate().createScopeBuilder( mapping );
 		return new StubMappingScope( mapping, builder.build() );
 	}
@@ -212,7 +212,7 @@ public abstract class StubMappedIndex {
 	 * @return A scope containing this index and the given other indexes.
 	 */
 	public StubMappingScope createScope(StubMappedIndex... others) {
-		MappedIndexScopeBuilder<EntityReference, DocumentReference> builder =
+		MappedIndexScopeBuilder<Object, EntityReference, DocumentReference> builder =
 				delegate().createScopeBuilder( mapping );
 		for ( StubMappedIndex other : others ) {
 			other.delegate().addTo( builder );
@@ -223,14 +223,14 @@ public abstract class StubMappedIndex {
 	/**
 	 * @return A scope containing this index and the given other indexes.
 	 */
-	public <R, E> GenericStubMappingScope<R, E> createGenericScope(
+	public <R, E> GenericStubMappingScope<Object, R, E> createGenericScope(
 			SearchLoadingContext<E> loadingContext, StubMappedIndex... others) {
 		if ( ( (StubMappingImpl) mapping ).fixture.typeContexts == null ) {
 			throw new AssertionFailure( "When testing loading with a \"generic\" scope,"
 					+ " you must also set custom type contexts with consistent types."
 					+ " Use mapping.with().typeContext(...).run(...)." );
 		}
-		MappedIndexScopeBuilder<R, E> builder = delegate().createScopeBuilder( mapping );
+		MappedIndexScopeBuilder<Object, R, E> builder = delegate().createScopeBuilder( mapping );
 		for ( StubMappedIndex other : others ) {
 			other.delegate().addTo( builder );
 		}

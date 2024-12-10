@@ -10,8 +10,10 @@ package org.hibernate.search.engine.search.predicate.dsl;
  * <p>
  * The resulting nested predicate must match <em>all</em> inner clauses,
  * similarly to an {@link SearchPredicateFactory#and() "and" predicate}.
+ *
+ * @param <SR> Scope root type.
  */
-public interface NestedPredicateClausesCollector<S extends NestedPredicateClausesCollector<?>>
-		extends SimpleBooleanPredicateClausesCollector<S> {
+public interface NestedPredicateClausesCollector<SR, S extends NestedPredicateClausesCollector<SR, ?>>
+		extends SimpleBooleanPredicateClausesCollector<SR, S> {
 
 }

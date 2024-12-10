@@ -9,9 +9,10 @@ package org.hibernate.search.engine.search.predicate.dsl;
  * <p>
  * Different types of clauses have different effects, see {@link BooleanPredicateOptionsCollector}.
  *
+ * @param <SR> Scope root type.
  * @param <S> The "self" type (the actual exposed type of this step).
  */
-public interface BooleanPredicateClausesStep<S extends BooleanPredicateClausesStep<?>>
-		extends GenericBooleanPredicateClausesStep<S, BooleanPredicateOptionsCollector<?>> {
+public interface BooleanPredicateClausesStep<SR, S extends BooleanPredicateClausesStep<SR, ?>>
+		extends GenericBooleanPredicateClausesStep<SR, S, BooleanPredicateOptionsCollector<SR, ?>> {
 
 }

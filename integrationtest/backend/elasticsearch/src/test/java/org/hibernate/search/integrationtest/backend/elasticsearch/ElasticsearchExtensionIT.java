@@ -108,19 +108,19 @@ class ElasticsearchExtensionIT {
 		StubMappingScope scope = mainIndex.createScope();
 
 		// Put intermediary contexts into variables to check they have the right type
-		ElasticsearchSearchQuerySelectStep<EntityReference, DocumentReference, StubLoadingOptionsStep> context1 =
+		ElasticsearchSearchQuerySelectStep<?, EntityReference, DocumentReference, StubLoadingOptionsStep> context1 =
 				scope.query().extension( ElasticsearchExtension.get() );
-		ElasticsearchSearchQueryWhereStep<DocumentReference, StubLoadingOptionsStep> context2 = context1.select(
+		ElasticsearchSearchQueryWhereStep<?, DocumentReference, StubLoadingOptionsStep> context2 = context1.select(
 				f -> f.composite()
 						.from( f.documentReference(), f.source() )
 						// We don't care about the source, it's just to test that the factory context allows ES-specific projection
 						.as( (docRef, source) -> docRef )
 		);
 		// Note we can use Elasticsearch-specific predicates immediately
-		ElasticsearchSearchQueryOptionsStep<DocumentReference, StubLoadingOptionsStep> context3 =
+		ElasticsearchSearchQueryOptionsStep<?, DocumentReference, StubLoadingOptionsStep> context3 =
 				context2.where( f -> f.fromJson( "{'match_all': {}}" ) );
 		// Note we can use Elasticsearch-specific sorts immediately
-		ElasticsearchSearchQueryOptionsStep<DocumentReference, StubLoadingOptionsStep> context4 =
+		ElasticsearchSearchQueryOptionsStep<?, DocumentReference, StubLoadingOptionsStep> context4 =
 				context3.sort( f -> f.fromJson( "{'nativeField_sort1': 'asc'}" ) );
 
 		// Put the query and result into variables to check they have the right type
@@ -132,16 +132,16 @@ class ElasticsearchExtensionIT {
 				.hasTotalHitCount( 6 );
 
 		// Also check (at compile time) the context type for other asXXX() methods, since we need to override each method explicitly
-		ElasticsearchSearchQueryWhereStep<EntityReference, StubLoadingOptionsStep> selectEntityReferenceContext =
+		ElasticsearchSearchQueryWhereStep<?, EntityReference, StubLoadingOptionsStep> selectEntityReferenceContext =
 				scope.query().extension( ElasticsearchExtension.get() ).selectEntityReference();
-		ElasticsearchSearchQueryWhereStep<DocumentReference, StubLoadingOptionsStep> selectEntityContext =
+		ElasticsearchSearchQueryWhereStep<?, DocumentReference, StubLoadingOptionsStep> selectEntityContext =
 				scope.query().extension( ElasticsearchExtension.get() ).selectEntity();
 		SearchProjection<DocumentReference> projection = scope.projection().documentReference().toProjection();
-		ElasticsearchSearchQueryWhereStep<DocumentReference, StubLoadingOptionsStep> selectProjectionContext =
+		ElasticsearchSearchQueryWhereStep<?, DocumentReference, StubLoadingOptionsStep> selectProjectionContext =
 				scope.query().extension( ElasticsearchExtension.get() ).select( projection );
-		ElasticsearchSearchQueryWhereStep<List<?>, StubLoadingOptionsStep> selectProjectionsContext =
+		ElasticsearchSearchQueryWhereStep<?, List<?>, StubLoadingOptionsStep> selectProjectionsContext =
 				scope.query().extension( ElasticsearchExtension.get() ).select( projection, projection );
-		ElasticsearchSearchQueryOptionsStep<DocumentReference, StubLoadingOptionsStep> defaultResultContext =
+		ElasticsearchSearchQueryOptionsStep<?, DocumentReference, StubLoadingOptionsStep> defaultResultContext =
 				scope.query().extension( ElasticsearchExtension.get() )
 						.where( f -> f.fromJson( "{'match_all': {}}" ) );
 	}
