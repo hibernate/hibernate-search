@@ -132,6 +132,9 @@ updates:
         versions: [ "4.2.1" ]
       # Enable updates after JDK 21 upgrade (as of jsonassert 1.5.2 it requires JDK 21)
       - dependency-name: "org.skyscreamer:jsonassert"
+      # Because of https://github.com/apache/logging-log4j2/issues/3234
+      - dependency-name: "org.apache.logging.log4j:*"
+        versions: ["2.24.2"]
   - package-ecosystem: "docker"
     registries:
       - dockerhub
