@@ -12,7 +12,7 @@ import org.apache.lucene.search.Query;
 /**
  * A factory for search predicates with some Lucene-specific methods.
  */
-public interface LuceneSearchPredicateFactory extends ExtendedSearchPredicateFactory<LuceneSearchPredicateFactory> {
+public interface LuceneSearchPredicateFactory<SR> extends ExtendedSearchPredicateFactory<SR, LuceneSearchPredicateFactory<SR>> {
 
 	/**
 	 * Create a predicate from a Lucene {@link Query}.

@@ -10,21 +10,24 @@ import org.hibernate.search.backend.lucene.search.predicate.dsl.LuceneSearchPred
 import org.hibernate.search.engine.search.aggregation.dsl.spi.AbstractSearchAggregationFactory;
 import org.hibernate.search.engine.search.aggregation.dsl.spi.SearchAggregationDslContext;
 
-public class LuceneSearchAggregationFactoryImpl
+public class LuceneSearchAggregationFactoryImpl<SR>
 		extends AbstractSearchAggregationFactory<
-				LuceneSearchAggregationFactory,
+				SR,
+				LuceneSearchAggregationFactory<SR>,
 				LuceneSearchAggregationIndexScope<?>,
-				LuceneSearchPredicateFactory>
-		implements LuceneSearchAggregationFactory {
+				LuceneSearchPredicateFactory<SR>>
+		implements LuceneSearchAggregationFactory<SR> {
 
 	public LuceneSearchAggregationFactoryImpl(
-			SearchAggregationDslContext<LuceneSearchAggregationIndexScope<?>, LuceneSearchPredicateFactory> dslContext) {
+			SearchAggregationDslContext<SR,
+					LuceneSearchAggregationIndexScope<?>,
+					LuceneSearchPredicateFactory<SR>> dslContext) {
 		super( dslContext );
 	}
 
 	@Override
-	public LuceneSearchAggregationFactory withRoot(String objectFieldPath) {
-		return new LuceneSearchAggregationFactoryImpl( dslContext.rescope(
+	public LuceneSearchAggregationFactory<SR> withRoot(String objectFieldPath) {
+		return new LuceneSearchAggregationFactoryImpl<SR>( dslContext.rescope(
 				dslContext.scope().withRoot( objectFieldPath ),
 				dslContext.predicateFactory().withRoot( objectFieldPath ) ) );
 	}
