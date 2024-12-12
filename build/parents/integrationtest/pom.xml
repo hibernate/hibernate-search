@@ -179,7 +179,7 @@
             <id>ci-oracle</id>
             <properties>
                 <jdbc.driver.groupId>com.oracle.database.jdbc</jdbc.driver.groupId>
-                <jdbc.driver.artifactId>ojdbc11</jdbc.driver.artifactId>
+                <jdbc.driver.artifactId>ojdbc17</jdbc.driver.artifactId>
                 <test.database.run.kind>oracle</test.database.run.kind>
                 <!-- avoid `ORA-01882: timezone region not found` exception on CI -->
                 <failsafe.jvm.args.jdbc>-Doracle.jdbc.timezoneAsRegion=false</failsafe.jvm.args.jdbc>
