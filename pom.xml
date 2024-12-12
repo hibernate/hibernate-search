@@ -1399,6 +1399,20 @@
         </profile>
 
         <profile>
+            <id>testWithJdk25</id>
+            <activation>
+                <property>
+                    <name>java-version.test.release</name>
+                    <value>25</value>
+                </property>
+            </activation>
+            <properties>
+                <!-- Spring Boot 3 isn't ready for JDK25 yet -->
+                <failsafe.spring.skip>true</failsafe.spring.skip>
+            </properties>
+        </profile>
+
+        <profile>
             <id>compiler-eclipse</id>
             <build>
                 <pluginManagement>
