@@ -13,19 +13,20 @@ import org.hibernate.search.engine.search.predicate.dsl.spi.StaticPredicateFinal
 
 import org.apache.lucene.search.Query;
 
-public class LuceneSearchPredicateFactoryImpl
+public class LuceneSearchPredicateFactoryImpl<SR>
 		extends AbstractSearchPredicateFactory<
-				LuceneSearchPredicateFactory,
+				SR,
+				LuceneSearchPredicateFactory<SR>,
 				LuceneSearchPredicateIndexScope<?>>
-		implements LuceneSearchPredicateFactory {
+		implements LuceneSearchPredicateFactory<SR> {
 
 	public LuceneSearchPredicateFactoryImpl(SearchPredicateDslContext<LuceneSearchPredicateIndexScope<?>> dslContext) {
 		super( dslContext );
 	}
 
 	@Override
-	public LuceneSearchPredicateFactory withRoot(String objectFieldPath) {
-		return new LuceneSearchPredicateFactoryImpl( dslContext.rescope(
+	public LuceneSearchPredicateFactory<SR> withRoot(String objectFieldPath) {
+		return new LuceneSearchPredicateFactoryImpl<SR>( dslContext.rescope(
 				dslContext.scope().withRoot( objectFieldPath ) ) );
 	}
 

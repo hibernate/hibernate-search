@@ -36,16 +36,16 @@ public interface LuceneSearchQueryIndexScope<S extends LuceneSearchQueryIndexSco
 			SearchLoadingContextBuilder<?, ?> loadingContextBuilder, SearchProjection<P> projection);
 
 	@Override
-	LuceneSearchPredicateFactory predicateFactory();
+	<SR> LuceneSearchPredicateFactory<SR> predicateFactory();
 
 	@Override
-	LuceneSearchSortFactory sortFactory();
+	<SR> LuceneSearchSortFactory<SR> sortFactory();
 
 	@Override
-	<R, E> LuceneSearchProjectionFactory<R, E> projectionFactory();
+	<SR, R, E> LuceneSearchProjectionFactory<SR, R, E> projectionFactory();
 
 	@Override
-	LuceneSearchAggregationFactory aggregationFactory();
+	<SR> LuceneSearchAggregationFactory<SR> aggregationFactory();
 
 	Query filterOrNull(String tenantId);
 
