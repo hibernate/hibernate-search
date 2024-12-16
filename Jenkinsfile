@@ -51,15 +51,6 @@ import org.hibernate.jenkins.pipeline.helpers.alternative.AlternativeMultiMap
  *
  * ### Integrations
  *
- * #### Nexus deployment
- *
- * This job is only able to deploy snapshot artifacts,
- * for every non-PR build on "primary" branches (main and maintenance branches),
- * but the name of a Maven settings file must be provided in the job configuration file
- * (see below).
- *
- * For actual releases, see jenkins/release.groovy.
- *
  * #### AWS
  *
  * This job will trigger integration tests against an Elasticsearch service hosted on AWS.
@@ -140,11 +131,6 @@ import org.hibernate.jenkins.pipeline.helpers.alternative.AlternativeMultiMap
  *         # See https://docs.gradle.com/enterprise/gradle-plugin/#via_environment_variable
  *         # WARNING: These credentials should not give write access to the build cache!
  *         pr: ...
- *     deployment:
- *       maven:
- *         # String containing the ID of a Maven settings file registered using the config-file-provider Jenkins plugin.
- *         # The settings must provide credentials to the server with ID 'ossrh'.
- *         settingsId: ...
  */
 
 @Field final String DEFAULT_JDK_TOOL = 'OpenJDK 21 Latest'
@@ -162,7 +148,6 @@ import org.hibernate.jenkins.pipeline.helpers.alternative.AlternativeMultiMap
 
 @Field boolean enableDefaultBuild = false
 @Field boolean enableDefaultBuildIT = false
-@Field boolean deploySnapshot = false
 @Field boolean incrementalBuild = false
 
 this.helper = new JobHelper(this)
@@ -375,15 +360,6 @@ Some useful filters: 'default', 'jdk', 'jdk-10', 'eclipse', 'postgresql', 'elast
 			])
 	])
 
-	if (helper.scmSource.branch.primary && !helper.scmSource.pullRequest) {
-		if (helper.configuration.file?.deployment?.maven?.settingsId) {
-			deploySnapshot = true
-		}
-		else {
-			echo "Missing deployment configuration in job configuration file - snapshot deployment will be skipped."
-		}
-	}
-
 	if (params.ENVIRONMENT_FILTER) {
 		keepOnlyEnvironmentsMatchingFilter(params.ENVIRONMENT_FILTER)
 	}
@@ -402,8 +378,7 @@ Some useful filters: 'default', 'jdk', 'jdk-10', 'eclipse', 'postgresql', 'elast
 
 	enableDefaultBuild =
 			enableDefaultBuildIT ||
-			environments.content.any { key, envSet -> envSet.enabled.any { buildEnv -> buildEnv.requiresDefaultBuildArtifacts() } } ||
-			deploySnapshot
+			environments.content.any { key, envSet -> envSet.enabled.any { buildEnv -> buildEnv.requiresDefaultBuildArtifacts() } }
 
 	if (helper.scmSource.pullRequest) {
 		incrementalBuild = true
@@ -418,7 +393,6 @@ Resulting execution plan:
     enableDefaultBuild=$enableDefaultBuild
     enableDefaultBuildIT=$enableDefaultBuildIT
     environments=${environments.enabledAsString}
-    deploySnapshot=$deploySnapshot
     incrementalBuild=$incrementalBuild
 """
 }
@@ -430,7 +404,7 @@ stage('Default build') {
 		return
 	}
 	runBuildOnNode( NODE_PATTERN_BASE, [time: 2, unit: 'HOURS'] ) {
-		withMavenWorkspace(mavenSettingsConfig: deploySnapshot ? helper.configuration.file.deployment.maven.settingsId : null) {
+		withMavenWorkspace {
 			String commonMavenArgs = """ \
 					--fail-at-end \
 					-Pcoverage \
@@ -443,12 +417,7 @@ stage('Default build') {
 					-Pdist \
 					-Pjqassistant -Pci-build \
 					-DskipITs \
-					clean \
-					${deploySnapshot ? "\
-							deploy \
-					" : "\
-							install \
-					"} \
+					clean install \
 			"""
 			// Quick check after the initial build, if we spot the change here, no need to even proceed..
 			checkNoSourceFilesModifiedOrFail()

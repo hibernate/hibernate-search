@@ -507,7 +507,6 @@ For primary branches, it may also re-execute the same build in different environ
 See [this section](#building-from-source) for information on how to execute similar builds from the commandline.
 
 The job can be triggered manually, which is particularly useful to test more environments on a pull request.
-
 ### Release pipeline
 
 https://ci.hibernate.org/job/hibernate-search/
