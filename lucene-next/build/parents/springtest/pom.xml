@@ -29,6 +29,12 @@
         <transform.output.test.resources.path>${transform.output.root.path}/test/resources</transform.output.test.resources.path>
 
         <sonar.tests>${project.build.directory}/copied-sources</sonar.tests>
+        <!--
+            Maven's versions plugin is not able to update the `version.org.apache.lucene.next` property in the root POM
+            But it can update it once it's in these poms that override the Lucene dependency management.
+            Hence, we are using this `version.org.apache.lucene.next.updatable` property:
+         -->
+        <version.org.apache.lucene.next.updatable>${version.org.apache.lucene.next}</version.org.apache.lucene.next.updatable>
     </properties>
 
     <dependencyManagement>
@@ -37,32 +43,32 @@
             <dependency>
                 <groupId>org.apache.lucene</groupId>
                 <artifactId>lucene-core</artifactId>
-                <version>${version.org.apache.lucene.next}</version>
+                <version>${version.org.apache.lucene.next.updatable}</version>
             </dependency>
             <dependency>
                 <groupId>org.apache.lucene</groupId>
                 <artifactId>lucene-analysis-common</artifactId>
-                <version>${version.org.apache.lucene.next}</version>
+                <version>${version.org.apache.lucene.next.updatable}</version>
             </dependency>
             <dependency>
                 <groupId>org.apache.lucene</groupId>
                 <artifactId>lucene-queryparser</artifactId>
-                <version>${version.org.apache.lucene.next}</version>
+                <version>${version.org.apache.lucene.next.updatable}</version>
             </dependency>
             <dependency>
                 <groupId>org.apache.lucene</groupId>
                 <artifactId>lucene-join</artifactId>
-                <version>${version.org.apache.lucene.next}</version>
+                <version>${version.org.apache.lucene.next.updatable}</version>
             </dependency>
             <dependency>
                 <groupId>org.apache.lucene</groupId>
                 <artifactId>lucene-facet</artifactId>
-                <version>${version.org.apache.lucene.next}</version>
+                <version>${version.org.apache.lucene.next.updatable}</version>
             </dependency>
             <dependency>
                 <groupId>org.apache.lucene</groupId>
                 <artifactId>lucene-highlighter</artifactId>
-                <version>${version.org.apache.lucene.next}</version>
+                <version>${version.org.apache.lucene.next.updatable}</version>
             </dependency>
 
             <dependency>

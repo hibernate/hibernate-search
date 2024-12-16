@@ -34,9 +34,9 @@ Map settings() {
 			]
 		case 'lucene10':
 			return [
-					updateProperties: ['version.org.apache.lucene'],
-					onlyRunTestDependingOn: ['hibernate-search-backend-lucene'],
-					additionalMavenArgs: '-Dtest.elasticsearch.skip=true -pl :hibernate-search-engine,:hibernate-search-backend-lucene,:hibernate-search-util-internal-integrationtest-backend-lucene,:hibernate-search-v5migrationhelper-engine'
+					updateProperties: ['version.org.apache.lucene.next'],
+					onlyRunTestDependingOn: ['hibernate-search-backend-lucene-next'],
+					additionalMavenArgs: '-Dtest.elasticsearch.skip=true -pl :hibernate-search-backend-lucene-next,:hibernate-search-util-internal-integrationtest-backend-lucene-next'
 			]
 		// Targets the next micro release of the latest/currently integrated version of Elasticsearch
 		// (previous minor version is already published)
