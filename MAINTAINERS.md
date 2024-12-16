@@ -8,11 +8,12 @@ i.e. anybody with direct push access to the git repository.
 
 See [CONTRIBUTING.md](CONTRIBUTING.md).
 
-## Continuous integration
+## <a id="ci"></a> Continuous integration
 
-Continuous integration happens on a self-hosted Jenkins instance at https://ci.hibernate.org.
+Continuous integration happens on a self-hosted Jenkins instance at https://ci.hibernate.org,
+and to a smaller extent on GitHub Actions.
 
-Several multi-branch pipelines are available.
+Below is a list of all notable workflows/jobs.
 
 ### Main pipeline
 
@@ -39,6 +40,15 @@ For primary branches, it may also re-execute the same build in different environ
 
 See [CONTRIBUTING.md](CONTRIBUTING.md#building-from-source)
 for information about how to execute similar builds from the commandline.
+
+### GitHub Actions workflow
+
+A GitHub Actions workflow is set up, mainly to build/test on Windows,
+and to help contributors build Hibernate Search from their own GitHub fork.
+
+See [.github/workflows](.github/workflows) for the workflow definition.
+
+See https://docs.github.com/en/actions for more information about GitHub actions.
 
 ### Snapshot publishing pipeline
 
