@@ -40,6 +40,17 @@ For primary branches, it may also re-execute the same build in different environ
 See [CONTRIBUTING.md](CONTRIBUTING.md#building-from-source)
 for information about how to execute similar builds from the commandline.
 
+### Snapshot publishing pipeline
+
+https://ci.hibernate.org/job/hibernate-search-publish-snapshot/
+
+This job takes care of publishing snapshots for primary branches.
+
+It is triggered automatically on push to each branch, but throttled
+to avoid problems when multiple PRs get merged in short span of time.
+
+See [ci/snapshot-publish/Jenkinsfile](ci/snapshot-publish/Jenkinsfile) for the job definition.
+
 ### Release pipeline
 
 https://ci.hibernate.org/job/hibernate-search-release/

@@ -53,15 +53,6 @@ import org.hibernate.jenkins.pipeline.helpers.alternative.AlternativeMultiMap
  *
  * ### Integrations
  *
- * #### Nexus deployment
- *
- * This job is only able to deploy snapshot artifacts,
- * for every non-PR build on "primary" branches (main and maintenance branches),
- * but the name of a Maven settings file must be provided in the job configuration file
- * (see below).
- *
- * For actual releases, see jenkins/release.groovy.
- *
  * #### AWS
  *
  * This job will trigger integration tests against an Elasticsearch service hosted on AWS.
@@ -126,11 +117,6 @@ import org.hibernate.jenkins.pipeline.helpers.alternative.AlternativeMultiMap
  *       # Expects username/password credentials where the username is the organization ID on sonarcloud.io
  *       # and the password is a sonarcloud.io access token with sufficient rights for that organization.
  *       credentials: ...
- *     deployment:
- *       maven:
- *         # String containing the ID of a Maven settings file registered using the config-file-provider Jenkins plugin.
- *         # The settings must provide credentials to the server with ID 'ossrh'.
- *         settingsId: ...
  */
 
 @Field final String DEFAULT_JDK_TOOL = 'OpenJDK 17 Latest'
@@ -148,7 +134,6 @@ import org.hibernate.jenkins.pipeline.helpers.alternative.AlternativeMultiMap
 
 @Field boolean enableDefaultBuild = false
 @Field boolean enableDefaultBuildIT = false
-@Field boolean deploySnapshot = false
 
 this.helper = new JobHelper(this)
 
@@ -363,15 +348,6 @@ Some useful filters: 'default', 'jdk', 'jdk-10', 'eclipse', 'postgresql', 'elast
 			])
 	])
 
-	if (helper.scmSource.branch.primary && !helper.scmSource.pullRequest) {
-		if (helper.configuration.file?.deployment?.maven?.settingsId) {
-			deploySnapshot = true
-		}
-		else {
-			echo "Missing deployment configuration in job configuration file - snapshot deployment will be skipped."
-		}
-	}
-
 	if (params.ENVIRONMENT_FILTER) {
 		keepOnlyEnvironmentsMatchingFilter(params.ENVIRONMENT_FILTER)
 	}
@@ -390,8 +366,7 @@ Some useful filters: 'default', 'jdk', 'jdk-10', 'eclipse', 'postgresql', 'elast
 
 	enableDefaultBuild =
 			enableDefaultBuildIT ||
-			environments.content.any { key, envSet -> envSet.enabled.any { buildEnv -> buildEnv.requiresDefaultBuildArtifacts() } } ||
-			deploySnapshot
+			environments.content.any { key, envSet -> envSet.enabled.any { buildEnv -> buildEnv.requiresDefaultBuildArtifacts() } }
 
 	echo """Branch: ${helper.scmSource.branch.name}
 PR: ${helper.scmSource.pullRequest?.id}
@@ -402,7 +377,6 @@ Resulting execution plan:
     enableDefaultBuild=$enableDefaultBuild
     enableDefaultBuildIT=$enableDefaultBuildIT
     environments=${environments.enabledAsString}
-    deploySnapshot=$deploySnapshot
 """
 }
 
@@ -413,7 +387,7 @@ stage('Default build') {
 		return
 	}
 	runBuildOnNode( NODE_PATTERN_BASE, [time: 2, unit: 'HOURS'] ) {
-		withMavenWorkspace(mavenSettingsConfig: deploySnapshot ? helper.configuration.file.deployment.maven.settingsId : null) {
+		withMavenWorkspace {
 			String mavenArgs = """ \
 					--fail-at-end \
 					-Pdist -Pcoverage -Pjqassistant -Pci-sources-check \
@@ -422,12 +396,7 @@ stage('Default build') {
 			"""
 			pullContainerImages( mavenArgs )
 			sh """ \
-					mvn clean \
-					${deploySnapshot ? "\
-							deploy \
-					" : "\
-							install \
-					"} \
+					mvn clean install \
 					$mavenArgs \
 			"""
 
