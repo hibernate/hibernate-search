@@ -54,16 +54,6 @@ import org.hibernate.jenkins.pipeline.helpers.version.Version
  *
  * ### Integrations
  *
- * #### Nexus deployment
- *
- * This job includes two deployment modes:
- *
- * - A deployment of snapshot artifacts for every non-PR build on "primary" branches (master and maintenance branches).
- * - A full release when starting the job with specific parameters.
- *
- * In the first case, the name of a Maven settings file must be provided in the job configuration file
- * (see below).
- *
  * #### AWS
  *
  * This job will trigger integration tests against an Elasticsearch service hosted on AWS.
@@ -115,12 +105,6 @@ import org.hibernate.jenkins.pipeline.helpers.version.Version
  *       # Expects username/password credentials where the username is the AWS access key
  *       # and the password is the AWS secret key.
  *       credentials: ...
- *     deployment:
- *       maven:
- *         # String containing the ID of a Maven settings file registered using the config-file-provider Jenkins plugin.
- *         # The settings must provide credentials to the servers with ID
- *         # 'jboss-releases-repository' and 'jboss-snapshots-repository'.
- *         settingsId: ...
  */
 
 @Field final String MAVEN_TOOL = 'Apache Maven 3.5'
@@ -140,7 +124,6 @@ import org.hibernate.jenkins.pipeline.helpers.version.Version
 @Field boolean enableNonDefaultSupportedEnvIT = false
 @Field boolean enableExperimentalEnvIT = false
 @Field boolean performRelease = false
-@Field boolean deploySnapshot = false
 
 @Field Version releaseVersion
 @Field Version afterReleaseDevelopmentVersion
@@ -238,15 +221,6 @@ ALL_ENV""",
 
 	performRelease = (params.RELEASE_VERSION ? true : false)
 
-	if (!performRelease && helper.scmSource.branch.primary && !helper.scmSource.pullRequest) {
-		if (helper.configuration.file?.deployment?.maven?.settingsId) {
-			deploySnapshot = true
-		}
-		else {
-			echo "Missing deployment configuration in job configuration file - snapshot deployment will be skipped."
-		}
-	}
-
 	switch (params.INTEGRATION_TESTS) {
 		case 'DEFAULT_ENV_ONLY':
 			enableDefaultEnvIT = true
@@ -287,15 +261,14 @@ ALL_ENV""",
 	}
 
 	enableDefaultBuild =
-			enableDefaultEnvIT || enableNonDefaultSupportedEnvIT || enableExperimentalEnvIT || deploySnapshot
+			enableDefaultEnvIT || enableNonDefaultSupportedEnvIT || enableExperimentalEnvIT
 
 	echo """Branch: ${helper.scmSource.branch.name}, PR: ${helper.scmSource.pullRequest?.id}, integration test setting: $params.INTEGRATION_TESTS, resulting execution plan:
 enableDefaultBuild=$enableDefaultBuild
 enableDefaultEnvIT=$enableDefaultEnvIT
 enableNonDefaultSupportedEnvIT=$enableNonDefaultSupportedEnvIT
 enableExperimentalEnvIT=$enableExperimentalEnvIT
-performRelease=$performRelease
-deploySnapshot=$deploySnapshot"""
+performRelease=$performRelease"""
 
 	// Filter environments
 
@@ -480,15 +453,7 @@ stage('Non-default environment ITs') {
 }
 
 stage('Deploy') {
-	if (deploySnapshot) {
-		echo "Deploying snapshots"
-		runBuildOnNode {
-			helper.withMavenWorkspace(mavenSettingsConfig: helper.configuration.file.deployment.maven.settingsId) {
-				sh "mvn clean deploy -Pdist -DskipTests"
-			}
-		}
-	}
-	else if (performRelease) {
+	if (performRelease) {
 		echo "Performing full release for version ${releaseVersion.toString()}"
 		runBuildOnNode {
 			helper.withMavenWorkspace(mavenSettingsConfig: params.RELEASE_DRY_RUN ? null : helper.configuration.file.deployment.maven.settingsId) {
