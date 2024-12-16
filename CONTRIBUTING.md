@@ -481,54 +481,8 @@ The Neo4j web UI will be accessible from http://localhost:7474/.
 
 ## <a id="ci"></a> Continuous integration
 
-Continuous integration happens on a self-hosted Jenkins instance at https://ci.hibernate.org.
+See [MAINTAINERS.md](MAINTAINERS.md#ci) for information about CI.
 
-Several multi-branch pipelines are available.
-
-### Main pipeline
-
-https://ci.hibernate.org/job/hibernate-search/
-
-See [Jenkinsfile](Jenkinsfile).
-
-This job takes care of:
-
-* Primary branch builds
-* Pull request builds
-
-It executes the build in a default environment, at the very least.
-For primary branches, it may also re-execute the same build in different environments:
-
-* Newer JDKs
-* Different database vendors (PostgreSQL, Oracle, ...)
-* Different versions of Elasticsearch/OpenSearch
-* AWS Elasticsearch/OpenSearch Service
-
-See [this section](#building-from-source) for information on how to execute similar builds from the commandline.
-
-The job can be triggered manually, which is particularly useful to test more environments on a pull request.
-### Release pipeline
-
-https://ci.hibernate.org/job/hibernate-search/
-
-See [Jenkinsfile](Jenkinsfile).
-
-This job takes care of:
-
-* Primary branch builds
-* Pull request builds
-
-It executes the build in a default environment, at the very least.
-For primary branches, it may also re-execute the same build in different environments:
-
-* Newer JDKs
-* Different database vendors (PostgreSQL, Oracle, ...)
-* Different versions of Elasticsearch/OpenSearch
-* AWS Elasticsearch/OpenSearch Service
-
-See [this section](#building-from-source) for information on how to execute similar builds from the commandline.
-
-The job can be triggered manually, which is particularly useful to test more environments on a pull request.
 ## More conventions
 
 ### Naming and architecture rules

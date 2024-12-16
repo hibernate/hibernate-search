@@ -1,13 +1,8 @@
 # SPDX-License-Identifier: Apache-2.0
 # Copyright Red Hat Inc. and Hibernate Authors
 
-# The main CI of Hibernate Search is https://ci.hibernate.org/job/hibernate-search/.
-# However, Hibernate Search builds run on GitHub actions regularly
-# to build on Windows
-# and check that both the Linux and Windows workflows still work
-# and can be used in GitHub forks.
-# See https://docs.github.com/en/actions
-# for more information about GitHub actions.
+# This is not the main CI job, but it is useful on forks.
+# See MAINTAINERS.md for details about all available CI jobs.
 
 name: GH Actions CI
 
