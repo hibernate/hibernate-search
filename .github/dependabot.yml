@@ -100,6 +100,10 @@ updates:
       - dependency-name: "jakarta.enterprise:jakarta.enterprise.cdi-api"
       - dependency-name: "jakarta.xml.bind:jakarta.xml.bind-api"
       - dependency-name: "net.bytebuddy:*"
+      # Because we stay on a particular version of CDI that matches the one in ORM
+      # we don't want always want to get the latest Weld version:
+      - dependency-name: "org.jboss.weld.se:*"
+        update-types: ["version-update:semver-major"]
       # Sticking to Derby 10.15 for now since later versions require JDK 17+, and we need to test with JDK 11.
       # See https://db.apache.org/derby/derby_downloads.html
       - dependency-name: "org.apache.derby:*"
