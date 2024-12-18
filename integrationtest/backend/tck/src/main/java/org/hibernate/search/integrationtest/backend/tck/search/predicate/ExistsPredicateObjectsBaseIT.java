@@ -127,7 +127,7 @@ class ExistsPredicateObjectsBaseIT {
 		}
 
 		@Override
-		protected PredicateFinalStep predicate(SearchPredicateFactory f, ObjectFieldBinding objectFieldBinding,
+		protected PredicateFinalStep predicate(SearchPredicateFactory<?> f, ObjectFieldBinding objectFieldBinding,
 				int matchingDocOrdinal, AbstractPredicateDataSet dataSet) {
 			if ( matchingDocOrdinal != 0 ) {
 				throw new IllegalStateException( "This predicate can only match the first document" );
@@ -135,7 +135,8 @@ class ExistsPredicateObjectsBaseIT {
 			return f.exists().field( targetField( objectFieldBinding, ( (DataSet) dataSet ) ).absolutePath );
 		}
 
-		protected PredicateFinalStep predicateWithRelativePath(SearchPredicateFactory f, ObjectFieldBinding objectFieldBinding,
+		protected PredicateFinalStep predicateWithRelativePath(SearchPredicateFactory<?> f,
+				ObjectFieldBinding objectFieldBinding,
 				AbstractPredicateDataSet dataSet) {
 			return f.exists().field( targetField( objectFieldBinding, ( (DataSet) dataSet ) ).relativeName );
 		}
@@ -192,26 +193,26 @@ class ExistsPredicateObjectsBaseIT {
 		}
 
 		@Override
-		protected PredicateFinalStep predicate(SearchPredicateFactory f, int matchingDocOrdinal,
+		protected PredicateFinalStep predicate(SearchPredicateFactory<?> f, int matchingDocOrdinal,
 				AbstractPredicateDataSet dataSet, StubMappedIndex index) {
 			return f.exists().field( fieldPath( matchingDocOrdinal, dataSet ) );
 		}
 
 		@Override
-		protected PredicateFinalStep predicateWithBoost(SearchPredicateFactory f, int matchingDocOrdinal,
+		protected PredicateFinalStep predicateWithBoost(SearchPredicateFactory<?> f, int matchingDocOrdinal,
 				float boost, AbstractPredicateDataSet dataSet,
 				StubMappedIndex index) {
 			return f.exists().field( fieldPath( matchingDocOrdinal, dataSet ) ).boost( boost );
 		}
 
 		@Override
-		protected PredicateFinalStep predicateWithConstantScore(SearchPredicateFactory f, int matchingDocOrdinal,
+		protected PredicateFinalStep predicateWithConstantScore(SearchPredicateFactory<?> f, int matchingDocOrdinal,
 				AbstractPredicateDataSet dataSet, StubMappedIndex index) {
 			return f.exists().field( fieldPath( matchingDocOrdinal, dataSet ) ).constantScore();
 		}
 
 		@Override
-		protected PredicateFinalStep predicateWithConstantScoreAndBoost(SearchPredicateFactory f,
+		protected PredicateFinalStep predicateWithConstantScoreAndBoost(SearchPredicateFactory<?> f,
 				int matchingDocOrdinal, float boost, AbstractPredicateDataSet dataSet,
 				StubMappedIndex index) {
 			return f.exists().field( fieldPath( matchingDocOrdinal, dataSet ) ).constantScore().boost( boost );

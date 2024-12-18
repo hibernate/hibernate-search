@@ -20,7 +20,7 @@ import java.util.Optional;
  * @see SearchPredicateFactory#extension(SearchPredicateFactoryExtension)
  * @see ExtendedSearchPredicateFactory
  */
-public interface SearchPredicateFactoryExtension<T> {
+public interface SearchPredicateFactoryExtension<SR, T> {
 
 	/**
 	 * Attempt to extend a given factory, returning an empty {@link Optional} in case of failure.
@@ -31,6 +31,6 @@ public interface SearchPredicateFactoryExtension<T> {
 	 * @return An optional containing the extended search predicate factory ({@link T}) in case
 	 * of success, or an empty optional otherwise.
 	 */
-	Optional<T> extendOptional(SearchPredicateFactory original);
+	Optional<T> extendOptional(SearchPredicateFactory<SR> original);
 
 }
