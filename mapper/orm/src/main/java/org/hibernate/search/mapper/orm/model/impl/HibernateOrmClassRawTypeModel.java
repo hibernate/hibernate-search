@@ -18,10 +18,11 @@ import java.util.stream.Stream;
 import org.hibernate.models.spi.MemberDetails;
 import org.hibernate.search.mapper.pojo.model.models.spi.AbstractPojoModelsRawTypeModel;
 import org.hibernate.search.mapper.pojo.model.spi.GenericContextAwarePojoGenericTypeModel.RawTypeDeclaringContext;
+import org.hibernate.search.mapper.pojo.model.spi.PojoPropertyModel;
 import org.hibernate.search.mapper.pojo.model.spi.PojoRawTypeIdentifier;
 
 public class HibernateOrmClassRawTypeModel<T>
-		extends AbstractPojoModelsRawTypeModel<T, HibernateOrmBootstrapIntrospector> {
+		extends AbstractPojoModelsRawTypeModel<T, HibernateOrmBootstrapIntrospector, PojoPropertyModel<?>> {
 
 	private final HibernateOrmBasicClassTypeMetadata ormTypeMetadata;
 

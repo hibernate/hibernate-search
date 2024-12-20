@@ -40,6 +40,7 @@ public class IndexedProcessor implements TypeMappingAnnotationProcessor<Indexed>
 		}
 
 		Map<String, Object> params = context.toMap( routingBinderReferenceAnnotation.params() );
-		indexedStep.routingBinder( new BeanDelegatingBinder( routingBinderReference.get() ), params );
+		indexedStep.routingBinder(
+				new BeanDelegatingBinder( routingBinderReference.get(), routingBinderReferenceAnnotation.type() ), params );
 	}
 }

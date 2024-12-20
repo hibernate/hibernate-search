@@ -20,11 +20,15 @@ import org.hibernate.search.engine.mapper.model.spi.MappableTypeModel;
 import org.hibernate.search.mapper.pojo.model.spi.AbstractPojoRawTypeModel;
 import org.hibernate.search.mapper.pojo.model.spi.GenericContextAwarePojoGenericTypeModel.RawTypeDeclaringContext;
 import org.hibernate.search.mapper.pojo.model.spi.PojoConstructorModel;
+import org.hibernate.search.mapper.pojo.model.spi.PojoPropertyModel;
 import org.hibernate.search.mapper.pojo.model.spi.PojoRawTypeIdentifier;
 import org.hibernate.search.mapper.pojo.model.spi.PojoTypeModel;
 
-public abstract class AbstractPojoModelsRawTypeModel<T, I extends AbstractPojoModelsBootstrapIntrospector>
-		extends AbstractPojoRawTypeModel<T, I> {
+public abstract class AbstractPojoModelsRawTypeModel<
+		T,
+		I extends AbstractPojoModelsBootstrapIntrospector,
+		P extends PojoPropertyModel<?>>
+		extends AbstractPojoRawTypeModel<T, I, P> {
 
 	protected final ClassDetails classDetails;
 	final RawTypeDeclaringContext<T> rawTypeDeclaringContext;
@@ -47,7 +51,7 @@ public abstract class AbstractPojoModelsRawTypeModel<T, I extends AbstractPojoMo
 	@Override
 	public final boolean isSubTypeOf(MappableTypeModel other) {
 		return other instanceof AbstractPojoModelsRawTypeModel
-				&& ( (AbstractPojoModelsRawTypeModel<?, ?>) other ).classDetails.toJavaClass()
+				&& ( (AbstractPojoModelsRawTypeModel<?, ?, ?>) other ).classDetails.toJavaClass()
 						.isAssignableFrom( classDetails.toJavaClass() );
 	}
 
@@ -80,7 +84,7 @@ public abstract class AbstractPojoModelsRawTypeModel<T, I extends AbstractPojoMo
 	}
 
 	@Override
-	protected final Stream<String> declaredPropertyNames() {
+	protected Stream<String> declaredPropertyNames() {
 		return Stream.concat(
 				declaredFieldAccessPropertiesByName().keySet().stream(),
 				declaredMethodAccessPropertiesByName().keySet().stream()

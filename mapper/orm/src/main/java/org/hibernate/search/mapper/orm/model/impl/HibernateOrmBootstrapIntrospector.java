@@ -21,7 +21,6 @@ import org.hibernate.mapping.PersistentClass;
 import org.hibernate.models.spi.ClassDetailsRegistry;
 import org.hibernate.search.mapper.orm.logging.impl.MappingLog;
 import org.hibernate.search.mapper.pojo.model.models.spi.AbstractPojoModelsBootstrapIntrospector;
-import org.hibernate.search.mapper.pojo.model.models.spi.PojoModelsGenericContextHelper;
 import org.hibernate.search.mapper.pojo.model.spi.AbstractPojoRawTypeModel;
 import org.hibernate.search.mapper.pojo.model.spi.GenericContextAwarePojoGenericTypeModel.RawTypeDeclaringContext;
 import org.hibernate.search.mapper.pojo.model.spi.PojoBootstrapIntrospector;
@@ -30,6 +29,7 @@ import org.hibernate.search.util.common.impl.ReflectionHelper;
 import org.hibernate.search.util.common.reflect.spi.ValueCreateHandle;
 import org.hibernate.search.util.common.reflect.spi.ValueHandleFactory;
 import org.hibernate.search.util.common.reflect.spi.ValueReadHandle;
+import org.hibernate.search.util.common.reflect.spi.ValueReadWriteHandle;
 
 public class HibernateOrmBootstrapIntrospector extends AbstractPojoModelsBootstrapIntrospector
 		implements PojoBootstrapIntrospector {
@@ -44,7 +44,6 @@ public class HibernateOrmBootstrapIntrospector extends AbstractPojoModelsBootstr
 	}
 
 	private final HibernateOrmBasicTypeMetadataProvider basicTypeMetadataProvider;
-	private final PojoModelsGenericContextHelper genericContextHelper;
 
 	/*
 	 * Note: the main purpose of these caches is not to improve performance,
@@ -64,11 +63,10 @@ public class HibernateOrmBootstrapIntrospector extends AbstractPojoModelsBootstr
 			ValueHandleFactory valueHandleFactory) {
 		super( classDetailsRegistry, valueHandleFactory );
 		this.basicTypeMetadataProvider = basicTypeMetadataProvider;
-		this.genericContextHelper = new PojoModelsGenericContextHelper( this );
 	}
 
 	@Override
-	public AbstractPojoRawTypeModel<?, ?> typeModel(String name) {
+	public AbstractPojoRawTypeModel<?, ?, ?> typeModel(String name) {
 		HibernateOrmBasicDynamicMapTypeMetadata dynamicMapTypeOrmMetadata =
 				basicTypeMetadataProvider.getBasicDynamicMapTypeMetadata( name );
 		if ( dynamicMapTypeOrmMetadata != null ) {
@@ -110,6 +108,12 @@ public class HibernateOrmBootstrapIntrospector extends AbstractPojoModelsBootstr
 	protected ValueReadHandle<?> createValueReadHandle(Member member) throws IllegalAccessException {
 		setAccessible( member );
 		return super.createValueReadHandle( member );
+	}
+
+	@Override
+	protected ValueReadWriteHandle<?> createValueReadWriteHandle(Member member) throws IllegalAccessException {
+		setAccessible( member );
+		return super.createValueReadWriteHandle( member );
 	}
 
 	ValueReadHandle<?> createValueReadHandle(Class<?> holderClass, Member member,

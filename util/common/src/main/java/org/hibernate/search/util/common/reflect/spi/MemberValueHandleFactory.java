@@ -10,6 +10,7 @@ import java.lang.reflect.Method;
 
 import org.hibernate.search.util.common.reflect.impl.ConstructorValueCreateHandle;
 import org.hibernate.search.util.common.reflect.impl.FieldValueReadHandle;
+import org.hibernate.search.util.common.reflect.impl.FieldValueReadWriteHandle;
 import org.hibernate.search.util.common.reflect.impl.MethodValueReadHandle;
 
 @SuppressWarnings("deprecation")
@@ -27,5 +28,10 @@ final class MemberValueHandleFactory implements ValueHandleFactory, ValueReadHan
 	@Override
 	public ValueReadHandle<?> createForMethod(Method method) {
 		return new MethodValueReadHandle<>( method );
+	}
+
+	@Override
+	public ValueReadWriteHandle<?> createForFieldWrite(Field field) {
+		return new FieldValueReadWriteHandle<>( field );
 	}
 }

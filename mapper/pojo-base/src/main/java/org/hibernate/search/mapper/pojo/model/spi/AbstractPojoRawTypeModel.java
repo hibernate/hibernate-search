@@ -17,15 +17,16 @@ import java.util.stream.Stream;
 
 import org.hibernate.search.mapper.pojo.logging.impl.MappingLog;
 
-public abstract class AbstractPojoRawTypeModel<T, I extends PojoBootstrapIntrospector> implements PojoRawTypeModel<T> {
+public abstract class AbstractPojoRawTypeModel<T, I extends PojoBootstrapIntrospector, P extends PojoPropertyModel<?>>
+		implements PojoRawTypeModel<T> {
 
 	protected final I introspector;
 	protected final PojoRawTypeIdentifier<T> typeIdentifier;
 	private final PojoCaster<T> caster;
 
-	private final Map<String, PojoPropertyModel<?>> propertyModelCache = new HashMap<>();
+	private final Map<String, P> propertyModelCache = new HashMap<>();
 
-	private List<PojoPropertyModel<?>> declaredProperties;
+	private List<P> declaredProperties;
 	private List<PojoConstructorModel<T>> declaredConstructors;
 
 	public AbstractPojoRawTypeModel(I introspector, PojoRawTypeIdentifier<T> typeIdentifier) {
@@ -42,7 +43,7 @@ public abstract class AbstractPojoRawTypeModel<T, I extends PojoBootstrapIntrosp
 		if ( o == null || getClass() != o.getClass() ) {
 			return false;
 		}
-		AbstractPojoRawTypeModel<?, ?> that = (AbstractPojoRawTypeModel<?, ?>) o;
+		AbstractPojoRawTypeModel<?, ?, ?> that = (AbstractPojoRawTypeModel<?, ?, ?>) o;
 		/*
 		 * We need to take the introspector into account, so that the engine does not confuse
 		 * type models from different mappers during bootstrap.
@@ -101,8 +102,8 @@ public abstract class AbstractPojoRawTypeModel<T, I extends PojoBootstrapIntrosp
 	protected abstract List<PojoConstructorModel<T>> createDeclaredConstructors();
 
 	@Override
-	public final PojoPropertyModel<?> property(String propertyName) {
-		PojoPropertyModel<?> propertyModel = propertyOrNull( propertyName );
+	public final P property(String propertyName) {
+		P propertyModel = propertyOrNull( propertyName );
 		if ( propertyModel == null ) {
 			throw MappingLog.INSTANCE.cannotFindReadableProperty( this, propertyName );
 		}
@@ -110,7 +111,7 @@ public abstract class AbstractPojoRawTypeModel<T, I extends PojoBootstrapIntrosp
 	}
 
 	@Override
-	public final Collection<PojoPropertyModel<?>> declaredProperties() {
+	public Collection<P> declaredProperties() {
 		if ( declaredProperties == null ) {
 			declaredProperties = Collections.unmodifiableList( declaredPropertyNames()
 					.map( this::propertyOrNull )
@@ -150,9 +151,9 @@ public abstract class AbstractPojoRawTypeModel<T, I extends PojoBootstrapIntrosp
 
 	protected abstract Stream<String> declaredPropertyNames();
 
-	protected abstract PojoPropertyModel<?> createPropertyModel(String propertyName);
+	protected abstract P createPropertyModel(String propertyName);
 
-	private PojoPropertyModel<?> propertyOrNull(String propertyName) {
+	private P propertyOrNull(String propertyName) {
 		return propertyModelCache.computeIfAbsent( propertyName, this::createPropertyModel );
 	}
 

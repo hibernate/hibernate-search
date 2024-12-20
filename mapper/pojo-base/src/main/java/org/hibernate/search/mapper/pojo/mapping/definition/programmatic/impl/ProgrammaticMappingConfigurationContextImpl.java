@@ -10,6 +10,7 @@ import java.util.Map;
 import org.hibernate.search.engine.mapper.mapping.building.spi.MappingBuildContext;
 import org.hibernate.search.engine.mapper.mapping.building.spi.MappingConfigurationCollector;
 import org.hibernate.search.mapper.pojo.mapping.building.spi.PojoTypeMetadataContributor;
+import org.hibernate.search.mapper.pojo.mapping.definition.annotation.impl.AnnotationPojoInjectableBinderCollector;
 import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.ProgrammaticMappingConfigurationContext;
 import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.TypeMappingStep;
 import org.hibernate.search.mapper.pojo.mapping.spi.PojoMappingConfigurationContext;
@@ -24,9 +25,12 @@ public class ProgrammaticMappingConfigurationContextImpl
 
 	// Use a LinkedHashMap for deterministic iteration
 	private final Map<PojoRawTypeModel<?>, TypeMappingStepImpl> typeMappingContributors = new LinkedHashMap<>();
+	private final AnnotationPojoInjectableBinderCollector binderCollector;
 
-	public ProgrammaticMappingConfigurationContextImpl(PojoBootstrapIntrospector introspector) {
+	public ProgrammaticMappingConfigurationContextImpl(PojoBootstrapIntrospector introspector,
+			AnnotationPojoInjectableBinderCollector annotationPojoInjectableBinderCollector) {
 		this.introspector = introspector;
+		this.binderCollector = annotationPojoInjectableBinderCollector;
 	}
 
 	@Override
@@ -48,7 +52,11 @@ public class ProgrammaticMappingConfigurationContextImpl
 	}
 
 	private TypeMappingStep type(PojoRawTypeModel<?> typeModel) {
-		return typeMappingContributors.computeIfAbsent( typeModel, TypeMappingStepImpl::new );
+		return typeMappingContributors.computeIfAbsent( typeModel, this::typeMappingStep );
+	}
+
+	private TypeMappingStepImpl typeMappingStep(PojoRawTypeModel<?> typeModel) {
+		return new TypeMappingStepImpl( typeModel, binderCollector );
 	}
 
 }

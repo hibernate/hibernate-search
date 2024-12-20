@@ -713,4 +713,12 @@ public interface MappingLog {
 
 	@Message(id = ID_OFFSET + 170, value = "Property name '%1$s' cannot contain dots.")
 	IllegalArgumentException propertyNameCannotContainDots(String propertyName);
+
+	@Message(id = ID_OFFSET + 179, value = "Unable to retrieve injectable binder model for class '%1$s'.")
+	SearchException errorRetrievingInjectableBinderModel(@FormatWith(ClassFormatter.class) Class<?> clazz,
+			@Cause Exception cause);
+
+	@LogMessage(level = Logger.Level.DEBUG)
+	@Message(id = ID_OFFSET + 180, value = "Unable to retrieve injectable binder model for class '%1$s': %2$s")
+	void cannotLoadClassDetailsButIgnore(@FormatWith(ClassFormatter.class) Class<?> binderType, String message);
 }

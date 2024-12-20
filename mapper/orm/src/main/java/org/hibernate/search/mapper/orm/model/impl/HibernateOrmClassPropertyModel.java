@@ -12,7 +12,7 @@ import org.hibernate.search.mapper.pojo.model.models.spi.AbstractPojoModelsPrope
 import org.hibernate.search.util.common.reflect.spi.ValueReadHandle;
 
 class HibernateOrmClassPropertyModel<T>
-		extends AbstractPojoModelsPropertyModel<T, HibernateOrmBootstrapIntrospector> {
+		extends AbstractPojoModelsPropertyModel<T, HibernateOrmBootstrapIntrospector, ValueReadHandle<T>> {
 
 	private final HibernateOrmBasicClassPropertyMetadata ormPropertyMetadata;
 
