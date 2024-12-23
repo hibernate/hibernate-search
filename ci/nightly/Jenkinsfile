@@ -40,24 +40,48 @@ pipeline {
 		TESTCONTAINERS_REUSE_ENABLE = 'true'
 	}
 	stages {
-		stage('Build reproducibility check') {
-			agent {
-				label 'Worker&&Containers'
-			}
-			steps {
-				// The timeout cannot be in stage options, because that would
-				// include the time needed to provision a node.
-				timeout(time: 30, unit: 'MINUTES') {
-					withMavenWorkspace {
-						echo "Generate the artifacts."
-						sh "mvn clean install -Pskip-checks -Preproducibility-check"
+		stage ('Run checks') {
+			parallel {
+				stage('Build reproducibility check') {
+					agent {
+						label 'Worker&&Containers'
+					}
+					steps {
+						// The timeout cannot be in stage options, because that would
+						// include the time needed to provision a node.
+						timeout(time: 30, unit: 'MINUTES') {
+							withMavenWorkspace {
+								echo "Generate the artifacts."
+								sh "mvn clean install -Pskip-checks -Preproducibility-check"
 
-						echo "Running the reproducibility check."
-						sh """mvn clean verify \
-							artifact:compare -Dreference.repo=hibernate-maven-central \
-							-Pskip-checks -Preproducibility-check -Dno-build-cache \
-							--fail-at-end
-						"""
+								echo "Running the reproducibility check."
+								sh """mvn clean verify \
+									artifact:compare -Dreference.repo=hibernate-maven-central \
+									-Pskip-checks -Preproducibility-check -Dno-build-cache \
+									--fail-at-end
+								"""
+							}
+						}
+					}
+				}
+				stage('Build documentation PDF') {
+					agent {
+						label 'Worker&&Containers'
+					}
+					steps {
+						// The timeout cannot be in stage options, because that would
+						// include the time needed to provision a node.
+						timeout(time: 30, unit: 'MINUTES') {
+							withMavenWorkspace {
+								echo "Generate documentation and distribution packages."
+								sh """mvn clean install \
+									-Pdocumentation-pdf \
+									-DskipTests \
+									--fail-at-end \
+									-Dscan=false -Dno-build-cache
+								"""
+							}
+						}
 					}
 				}
 			}
