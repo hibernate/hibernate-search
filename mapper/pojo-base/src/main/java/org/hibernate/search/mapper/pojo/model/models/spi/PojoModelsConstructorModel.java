@@ -23,14 +23,14 @@ import org.hibernate.search.util.common.reflect.spi.ValueCreateHandle;
 public class PojoModelsConstructorModel<T> implements PojoConstructorModel<T> {
 
 	private final AbstractPojoModelsBootstrapIntrospector introspector;
-	final AbstractPojoModelsRawTypeModel<T, ?> declaringTypeModel;
+	final AbstractPojoModelsRawTypeModel<T, ?, ?> declaringTypeModel;
 	private final Constructor<T> constructor;
 
 	private List<PojoMethodParameterModel<?>> declaredParameters;
 	private ValueCreateHandle<T> handleCache;
 
 	public PojoModelsConstructorModel(AbstractPojoModelsBootstrapIntrospector introspector,
-			AbstractPojoModelsRawTypeModel<T, ?> declaringTypeModel, Constructor<T> constructor) {
+			AbstractPojoModelsRawTypeModel<T, ?, ?> declaringTypeModel, Constructor<T> constructor) {
 		this.introspector = introspector;
 		this.declaringTypeModel = declaringTypeModel;
 		this.constructor = constructor;

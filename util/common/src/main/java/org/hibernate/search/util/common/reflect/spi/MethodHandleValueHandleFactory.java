@@ -12,6 +12,7 @@ import java.lang.reflect.Method;
 import org.hibernate.search.util.common.annotation.impl.SuppressForbiddenApis;
 import org.hibernate.search.util.common.reflect.impl.MethodHandleValueCreateHandle;
 import org.hibernate.search.util.common.reflect.impl.MethodHandleValueReadHandle;
+import org.hibernate.search.util.common.reflect.impl.MethodHandleValueReadWriteHandle;
 
 @SuppressWarnings("deprecation")
 @SuppressForbiddenApis(reason = "MethodHandles don't always work, but usage of this class is configurable,"
@@ -37,5 +38,11 @@ final class MethodHandleValueHandleFactory implements ValueHandleFactory, ValueR
 	@Override
 	public ValueReadHandle<?> createForMethod(Method method) throws IllegalAccessException {
 		return new MethodHandleValueReadHandle<>( method, lookup.unreflect( method ) );
+	}
+
+	@Override
+	public ValueReadWriteHandle<?> createForFieldWrite(Field field) throws IllegalAccessException {
+		return new MethodHandleValueReadWriteHandle<>( field, lookup.unreflectSetter( field ),
+				lookup.unreflectGetter( field ) );
 	}
 }

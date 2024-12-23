@@ -34,6 +34,7 @@ import org.hibernate.search.mapper.pojo.extractor.impl.BoundContainerExtractorPa
 import org.hibernate.search.mapper.pojo.extractor.impl.ContainerExtractorBinder;
 import org.hibernate.search.mapper.pojo.extractor.impl.ContainerExtractorHolder;
 import org.hibernate.search.mapper.pojo.extractor.mapping.programmatic.ContainerExtractorPath;
+import org.hibernate.search.mapper.pojo.mapping.definition.annotation.impl.PojoInjectableBinderInjector;
 import org.hibernate.search.mapper.pojo.model.additionalmetadata.building.impl.PojoTypeAdditionalMetadataProvider;
 import org.hibernate.search.mapper.pojo.model.additionalmetadata.impl.PojoEntityTypeAdditionalMetadata;
 import org.hibernate.search.mapper.pojo.model.dependency.impl.PojoPropertyIndexingDependencyConfigurationContextImpl;
@@ -64,16 +65,19 @@ public final class PojoIndexModelBinder {
 
 	private final BeanResolver beanResolver;
 	private final PojoBootstrapIntrospector introspector;
+	private final PojoInjectableBinderInjector binderInjector;
 	private final ContainerExtractorBinder extractorBinder;
 	private final BridgeResolver bridgeResolver;
 	private final PojoTypeAdditionalMetadataProvider typeAdditionalMetadataProvider;
 
 	PojoIndexModelBinder(MappingBuildContext buildContext,
 			PojoBootstrapIntrospector introspector,
+			PojoInjectableBinderInjector binderInjector,
 			ContainerExtractorBinder extractorBinder, BridgeResolver bridgeResolver,
 			PojoTypeAdditionalMetadataProvider typeAdditionalMetadataProvider) {
 		this.beanResolver = buildContext.beanResolver();
 		this.introspector = introspector;
+		this.binderInjector = binderInjector;
 		this.extractorBinder = extractorBinder;
 		this.bridgeResolver = bridgeResolver;
 		this.typeAdditionalMetadataProvider = typeAdditionalMetadataProvider;
@@ -171,7 +175,7 @@ public final class PojoIndexModelBinder {
 		PojoTypeModel<P> propertyTypeModel = modelPath.getPropertyModel().typeModel();
 
 		PropertyBindingContextImpl<P> bindingContext = new PropertyBindingContextImpl<>(
-				beanResolver, introspector,
+				beanResolver, introspector, binderInjector,
 				propertyTypeModel,
 				indexBindingContext,
 				pojoModelRootElement,
