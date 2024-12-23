@@ -82,7 +82,8 @@ public final class ExtractionRequirements {
 		if ( maxDocs > 0 ) {
 			if ( sort == null || isDescendingScoreSort( sort ) ) {
 				topDocsCollectorManager = new HibernateSearchTopScoreDocCollectorManager( offset, maxDocs, null,
-						totalHitCountThreshold, true );
+						totalHitCountThreshold
+				);
 			}
 			else {
 				if ( requireScore ) {
@@ -94,7 +95,8 @@ public final class ExtractionRequirements {
 					scoreSortFieldIndexForRescoring = getScoreSortFieldIndexOrNull( sort );
 				}
 				topDocsCollectorManager = new HibernateSearchTopFieldCollectorManager( offset, sort, maxDocs, null,
-						totalHitCountThreshold, true );
+						totalHitCountThreshold
+				);
 			}
 			collectorsForAllMatchingDocsBuilder.add( LuceneCollectors.TOP_DOCS_KEY, topDocsCollectorManager );
 		}
@@ -203,9 +205,8 @@ public final class ExtractionRequirements {
 		private final int numHits;
 		private final int offset;
 
-		public HibernateSearchTopScoreDocCollectorManager(int offset, int numHits, ScoreDoc after, int totalHitsThreshold,
-				boolean supportsConcurrency) {
-			super( numHits, after, totalHitsThreshold, supportsConcurrency );
+		public HibernateSearchTopScoreDocCollectorManager(int offset, int numHits, ScoreDoc after, int totalHitsThreshold) {
+			super( numHits, after, totalHitsThreshold );
 			this.numHits = numHits;
 			this.offset = offset;
 		}
@@ -227,8 +228,8 @@ public final class ExtractionRequirements {
 		private final int offset;
 
 		public HibernateSearchTopFieldCollectorManager(int offset, Sort sort, int numHits, FieldDoc after,
-				int totalHitsThreshold, boolean supportsConcurrency) {
-			super( sort, numHits, after, totalHitsThreshold, supportsConcurrency );
+				int totalHitsThreshold) {
+			super( sort, numHits, after, totalHitsThreshold );
 			this.numHits = numHits;
 			this.offset = offset;
 			this.sort = sort;
