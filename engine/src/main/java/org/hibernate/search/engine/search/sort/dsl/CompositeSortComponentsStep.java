@@ -13,10 +13,11 @@ import org.hibernate.search.engine.search.sort.SearchSort;
  * for example when calling {@link SearchSortFactory#composite()},
  * but not in "implicit" composite sorts such as when calling {@link SortThenStep#then()}.
  *
+ * @param <SR> Scope root type.
  * @param <S> The "self" type (the actual exposed type of this step).
  */
-public interface CompositeSortComponentsStep<S extends CompositeSortComponentsStep<?>>
-		extends SortFinalStep, SortThenStep {
+public interface CompositeSortComponentsStep<SR, S extends CompositeSortComponentsStep<SR, ?>>
+		extends SortFinalStep, SortThenStep<SR> {
 
 	/**
 	 * Add an element to the composite sort based on a previously-built {@link SearchSort}.

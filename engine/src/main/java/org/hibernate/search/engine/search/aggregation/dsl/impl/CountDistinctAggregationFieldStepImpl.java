@@ -11,16 +11,16 @@ import org.hibernate.search.engine.search.aggregation.spi.AggregationTypeKeys;
 import org.hibernate.search.engine.search.aggregation.spi.SearchFilterableAggregationBuilder;
 import org.hibernate.search.engine.search.predicate.dsl.SearchPredicateFactory;
 
-public class CountDistinctAggregationFieldStepImpl<PDF extends SearchPredicateFactory>
-		implements CountDistinctAggregationFieldStep<PDF> {
-	private final SearchAggregationDslContext<?, ? extends PDF> dslContext;
+public class CountDistinctAggregationFieldStepImpl<SR, PDF extends SearchPredicateFactory<SR>>
+		implements CountDistinctAggregationFieldStep<SR, PDF> {
+	private final SearchAggregationDslContext<SR, ?, ? extends PDF> dslContext;
 
-	public CountDistinctAggregationFieldStepImpl(SearchAggregationDslContext<?, ? extends PDF> dslContext) {
+	public CountDistinctAggregationFieldStepImpl(SearchAggregationDslContext<SR, ?, ? extends PDF> dslContext) {
 		this.dslContext = dslContext;
 	}
 
 	@Override
-	public CountDistinctAggregationOptionsStep<?, PDF> field(String fieldPath) {
+	public CountDistinctAggregationOptionsStep<SR, ?, PDF> field(String fieldPath) {
 		SearchFilterableAggregationBuilder<Long> builder = dslContext.scope()
 				.fieldQueryElement( fieldPath, AggregationTypeKeys.COUNT_DISTINCT );
 		return new CountDistinctAggregationOptionsStepImpl<>( builder, dslContext );

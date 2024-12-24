@@ -198,12 +198,12 @@ class SearchQueryTimeoutIT {
 		}
 	}
 
-	private SearchQueryOptionsStep<?, DocumentReference, ?, ?, ?> startSlowQuery() {
+	private SearchQueryOptionsStep<?, ?, DocumentReference, ?, ?, ?> startSlowQuery() {
 		return index.createScope().query()
 				.where( f -> TckConfiguration.get().getBackendHelper().createSlowPredicate( f ) );
 	}
 
-	private SearchQueryOptionsStep<?, DocumentReference, ?, ?, ?> startFastQuery() {
+	private SearchQueryOptionsStep<?, ?, DocumentReference, ?, ?, ?> startFastQuery() {
 		return index.createScope().query()
 				.where( f -> f.match().field( EMPTY_FIELD_NAME ).matching( NON_MATCHING_INTEGER ) );
 	}

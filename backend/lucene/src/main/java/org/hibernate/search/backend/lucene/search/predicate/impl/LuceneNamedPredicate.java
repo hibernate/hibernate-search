@@ -70,7 +70,7 @@ public class LuceneNamedPredicate extends AbstractLuceneSingleFieldPredicate {
 		private final PredicateDefinition definition;
 		private final String predicateName;
 		private final LuceneSearchIndexCompositeNodeContext field;
-		private SearchPredicateFactory factory;
+		private SearchPredicateFactory<?> factory;
 		private final Map<String, Object> params = new LinkedHashMap<>();
 
 		Builder(PredicateDefinition definition, String predicateName, LuceneSearchIndexScope<?> scope,
@@ -82,7 +82,7 @@ public class LuceneNamedPredicate extends AbstractLuceneSingleFieldPredicate {
 		}
 
 		@Override
-		public void factory(SearchPredicateFactory factory) {
+		public void factory(SearchPredicateFactory<?> factory) {
 			this.factory = factory;
 		}
 
@@ -93,8 +93,9 @@ public class LuceneNamedPredicate extends AbstractLuceneSingleFieldPredicate {
 
 		@Override
 		public SearchPredicate build() {
-			NamedValuesBasedPredicateDefinitionContext ctx = new NamedValuesBasedPredicateDefinitionContext( factory, params,
-					name -> QueryLog.INSTANCE.paramNotDefined( name, predicateName, field.eventContext() ) );
+			NamedValuesBasedPredicateDefinitionContext<?> ctx =
+					new NamedValuesBasedPredicateDefinitionContext<>( factory, params,
+							name -> QueryLog.INSTANCE.paramNotDefined( name, predicateName, field.eventContext() ) );
 
 			LuceneSearchPredicate providedPredicate = LuceneSearchPredicate.from( scope, definition.create( ctx ) );
 

@@ -81,7 +81,7 @@ class SearchSortIT {
 	}
 
 	private SearchQuery<DocumentReference> simpleQuery(
-			Function<? super SearchSortFactory, ? extends SortFinalStep> sortContributor) {
+			Function<? super SearchSortFactory<?>, ? extends SortFinalStep> sortContributor) {
 		StubMappingScope scope = mainIndex.createScope();
 		return scope.query()
 				.where( f -> f.matchAll() )
@@ -349,19 +349,19 @@ class SearchSortIT {
 
 		// Mandatory extension, supported
 		query = simpleQuery( c -> c
-				.extension( new SupportedExtension() ).extendedSort( "string" ).missing().last()
+				.extension( new SupportedExtension<>() ).extendedSort( "string" ).missing().last()
 		);
 		assertThatQuery( query )
 				.hasDocRefHitsAnyOrder( mainIndex.typeName(), FIRST_ID, SECOND_ID, THIRD_ID, EMPTY_ID );
 		query = simpleQuery( b -> b
-				.extension( new SupportedExtension() ).extendedSort( "string" ).desc().missing().last()
+				.extension( new SupportedExtension<>() ).extendedSort( "string" ).desc().missing().last()
 		);
 		assertThatQuery( query )
 				.hasDocRefHitsAnyOrder( mainIndex.typeName(), THIRD_ID, SECOND_ID, FIRST_ID, EMPTY_ID );
 
 		// Mandatory extension, unsupported
 		assertThatThrownBy(
-				() -> mainIndex.createScope().sort().extension( new UnSupportedExtension() )
+				() -> mainIndex.createScope().sort().extension( new UnSupportedExtension<>() )
 		)
 				.isInstanceOf( SearchException.class );
 
@@ -369,11 +369,11 @@ class SearchSortIT {
 		query = simpleQuery( b -> b
 				.extension()
 				.ifSupported(
-						new SupportedExtension(),
+						new SupportedExtension<>(),
 						c -> c.extendedSort( "string" ).missing().last()
 				)
 				.ifSupported(
-						new SupportedExtension(),
+						new SupportedExtension<>(),
 						ignored -> fail( "This should not be called" )
 				)
 				.orElseFail()
@@ -383,11 +383,11 @@ class SearchSortIT {
 		query = simpleQuery( b -> b
 				.extension()
 				.ifSupported(
-						new SupportedExtension(),
+						new SupportedExtension<>(),
 						c -> c.extendedSort( "string" ).desc().missing().last()
 				)
 				.ifSupported(
-						new SupportedExtension(),
+						new SupportedExtension<>(),
 						ignored -> fail( "This should not be called" )
 				)
 				.orElseFail()
@@ -399,11 +399,11 @@ class SearchSortIT {
 		query = simpleQuery( b -> b
 				.extension()
 				.ifSupported(
-						new UnSupportedExtension(),
+						new UnSupportedExtension<>(),
 						ignored -> fail( "This should not be called" )
 				)
 				.ifSupported(
-						new SupportedExtension(),
+						new SupportedExtension<>(),
 						c -> c.extendedSort( "string" ).missing().last()
 				)
 				.orElse( ignored -> fail( "This should not be called" ) )
@@ -413,11 +413,11 @@ class SearchSortIT {
 		query = simpleQuery( b -> b
 				.extension()
 				.ifSupported(
-						new UnSupportedExtension(),
+						new UnSupportedExtension<>(),
 						ignored -> fail( "This should not be called" )
 				)
 				.ifSupported(
-						new SupportedExtension(),
+						new SupportedExtension<>(),
 						c -> c.extendedSort( "string" ).desc().missing().last()
 				)
 				.orElse( ignored -> fail( "This should not be called" ) )
@@ -429,11 +429,11 @@ class SearchSortIT {
 		query = simpleQuery( b -> b
 				.extension()
 				.ifSupported(
-						new UnSupportedExtension(),
+						new UnSupportedExtension<>(),
 						ignored -> fail( "This should not be called" )
 				)
 				.ifSupported(
-						new UnSupportedExtension(),
+						new UnSupportedExtension<>(),
 						ignored -> fail( "This should not be called" )
 				)
 				.orElse(
@@ -445,11 +445,11 @@ class SearchSortIT {
 		query = simpleQuery( b -> b
 				.extension()
 				.ifSupported(
-						new UnSupportedExtension(),
+						new UnSupportedExtension<>(),
 						ignored -> fail( "This should not be called" )
 				)
 				.ifSupported(
-						new UnSupportedExtension(),
+						new UnSupportedExtension<>(),
 						ignored -> fail( "This should not be called" )
 				)
 				.orElse(
@@ -554,30 +554,30 @@ class SearchSortIT {
 		}
 	}
 
-	private static class SupportedExtension implements SearchSortFactoryExtension<MyExtendedFactory> {
+	private static class SupportedExtension<SR> implements SearchSortFactoryExtension<SR, MyExtendedFactory<SR>> {
 		@Override
-		public Optional<MyExtendedFactory> extendOptional(SearchSortFactory original) {
+		public Optional<MyExtendedFactory<SR>> extendOptional(SearchSortFactory<SR> original) {
 			assertThat( original ).isNotNull();
-			return Optional.of( new MyExtendedFactory( original ) );
+			return Optional.of( new MyExtendedFactory<>( original ) );
 		}
 	}
 
-	private static class UnSupportedExtension implements SearchSortFactoryExtension<MyExtendedFactory> {
+	private static class UnSupportedExtension<SR> implements SearchSortFactoryExtension<SR, MyExtendedFactory<SR>> {
 		@Override
-		public Optional<MyExtendedFactory> extendOptional(SearchSortFactory original) {
+		public Optional<MyExtendedFactory<SR>> extendOptional(SearchSortFactory<SR> original) {
 			assertThat( original ).isNotNull();
 			return Optional.empty();
 		}
 	}
 
-	private static class MyExtendedFactory {
-		private final SearchSortFactory delegate;
+	private static class MyExtendedFactory<SR> {
+		private final SearchSortFactory<SR> delegate;
 
-		MyExtendedFactory(SearchSortFactory delegate) {
+		MyExtendedFactory(SearchSortFactory<SR> delegate) {
 			this.delegate = delegate;
 		}
 
-		public FieldSortOptionsStep<?, ? extends SearchPredicateFactory> extendedSort(String absoluteFieldPath) {
+		public FieldSortOptionsStep<SR, ?, ? extends SearchPredicateFactory<SR>> extendedSort(String absoluteFieldPath) {
 			return delegate.field( absoluteFieldPath );
 		}
 	}

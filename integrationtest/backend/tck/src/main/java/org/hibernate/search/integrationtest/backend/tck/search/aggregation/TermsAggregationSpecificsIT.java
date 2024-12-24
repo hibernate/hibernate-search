@@ -622,7 +622,7 @@ class TermsAggregationSpecificsIT<F> {
 				);
 	}
 
-	private SearchQueryOptionsStep<?, DocumentReference, ?, ?, ?> matchAllQuery() {
+	private SearchQueryOptionsStep<?, ?, DocumentReference, ?, ?, ?> matchAllQuery() {
 		return index.createScope().query().where( f -> f.matchAll() );
 	}
 

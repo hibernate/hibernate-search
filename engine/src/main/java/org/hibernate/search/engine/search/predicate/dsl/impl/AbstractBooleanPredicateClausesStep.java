@@ -17,18 +17,18 @@ import org.hibernate.search.engine.search.predicate.dsl.spi.AbstractPredicateFin
 import org.hibernate.search.engine.search.predicate.dsl.spi.SearchPredicateDslContext;
 import org.hibernate.search.engine.search.predicate.spi.BooleanPredicateBuilder;
 
-abstract class AbstractBooleanPredicateClausesStep<S extends C, C extends BooleanPredicateOptionsCollector<?>>
+abstract class AbstractBooleanPredicateClausesStep<SR, S extends C, C extends BooleanPredicateOptionsCollector<SR, ?>>
 		extends AbstractPredicateFinalStep
-		implements GenericBooleanPredicateClausesStep<S, C> {
+		implements GenericBooleanPredicateClausesStep<SR, S, C> {
 
-	private final SearchPredicateFactory factory;
+	private final SearchPredicateFactory<SR> factory;
 
 	private final BooleanPredicateBuilder builder;
 
 	private final MinimumShouldMatchConditionStepImpl<S> minimumShouldMatchStep;
 
 	public AbstractBooleanPredicateClausesStep(SearchPredicateDslContext<?> dslContext,
-			SearchPredicateFactory factory) {
+			SearchPredicateFactory<SR> factory) {
 		super( dslContext );
 		this.factory = factory;
 		this.builder = dslContext.scope().predicateBuilders().bool();
@@ -81,28 +81,28 @@ abstract class AbstractBooleanPredicateClausesStep<S extends C, C extends Boolea
 
 	@Override
 	public S must(
-			Function<? super SearchPredicateFactory, ? extends PredicateFinalStep> clauseContributor) {
+			Function<? super SearchPredicateFactory<SR>, ? extends PredicateFinalStep> clauseContributor) {
 		must( clauseContributor.apply( factory ) );
 		return self();
 	}
 
 	@Override
 	public S mustNot(
-			Function<? super SearchPredicateFactory, ? extends PredicateFinalStep> clauseContributor) {
+			Function<? super SearchPredicateFactory<SR>, ? extends PredicateFinalStep> clauseContributor) {
 		mustNot( clauseContributor.apply( factory ) );
 		return self();
 	}
 
 	@Override
 	public S should(
-			Function<? super SearchPredicateFactory, ? extends PredicateFinalStep> clauseContributor) {
+			Function<? super SearchPredicateFactory<SR>, ? extends PredicateFinalStep> clauseContributor) {
 		should( clauseContributor.apply( factory ) );
 		return self();
 	}
 
 	@Override
 	public S filter(
-			Function<? super SearchPredicateFactory, ? extends PredicateFinalStep> clauseContributor) {
+			Function<? super SearchPredicateFactory<SR>, ? extends PredicateFinalStep> clauseContributor) {
 		filter( clauseContributor.apply( factory ) );
 		return self();
 	}

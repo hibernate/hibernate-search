@@ -12,20 +12,23 @@ import org.hibernate.search.engine.search.predicate.dsl.spi.SearchPredicateDslCo
 import org.hibernate.search.engine.search.predicate.spi.NestedPredicateBuilder;
 import org.hibernate.search.engine.search.predicate.spi.PredicateTypeKeys;
 
-public final class NestedPredicateClausesStepImpl
-		extends AbstractSimpleBooleanPredicateClausesStep<NestedPredicateClausesStepImpl, NestedPredicateClausesCollector<?>>
-		implements NestedPredicateClausesStep<NestedPredicateClausesStepImpl> {
+public final class NestedPredicateClausesStepImpl<SR>
+		extends
+		AbstractSimpleBooleanPredicateClausesStep<SR,
+				NestedPredicateClausesStepImpl<SR>,
+				NestedPredicateClausesCollector<SR, ?>>
+		implements NestedPredicateClausesStep<SR, NestedPredicateClausesStepImpl<SR>> {
 
 	private final NestedPredicateBuilder builder;
 
 	public NestedPredicateClausesStepImpl(SearchPredicateDslContext<?> dslContext, String objectFieldPath,
-			SearchPredicateFactory factory) {
+			SearchPredicateFactory<SR> factory) {
 		super( SimpleBooleanPredicateOperator.AND, dslContext, factory );
 		this.builder = dslContext.scope().fieldQueryElement( objectFieldPath, PredicateTypeKeys.NESTED );
 	}
 
 	@Override
-	protected NestedPredicateClausesStepImpl self() {
+	protected NestedPredicateClausesStepImpl<SR> self() {
 		return this;
 	}
 

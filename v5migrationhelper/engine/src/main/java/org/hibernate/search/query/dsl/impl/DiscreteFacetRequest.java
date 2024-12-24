@@ -25,8 +25,8 @@ public class DiscreteFacetRequest extends FacetingRequestImpl<Map<Object, Long>>
 	}
 
 	@Override
-	public AggregationFinalStep<Map<Object, Long>> requestAggregation(SearchAggregationFactory factory) {
-		TermsAggregationOptionsStep<?, ?, Object, Map<Object, Long>> optionsStep = factory
+	public AggregationFinalStep<Map<Object, Long>> requestAggregation(SearchAggregationFactory<?> factory) {
+		TermsAggregationOptionsStep<?, ?, ?, Object, Map<Object, Long>> optionsStep = factory
 				.terms().field( getFieldName(), Object.class );
 		if ( maxNumberOfFacets >= 0 ) {
 			optionsStep = optionsStep.maxTermCount( maxNumberOfFacets );
