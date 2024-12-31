@@ -359,15 +359,15 @@ class ElasticsearchDefaultWorkSequenceBuilderTest {
 		assertThatFuture( work1FutureFromSequenceBuilder ).getFailure()
 				.isInstanceOf( SearchException.class )
 				.hasMessageContaining( "Call to the bulk REST API failed" )
-				.hasCauseReference( exception );
+				.cause().isSameAs( exception );
 		assertThatFuture( work2FutureFromSequenceBuilder ).getFailure()
 				.isInstanceOf( SearchException.class )
 				.hasMessageContaining( "Call to the bulk REST API failed" )
-				.hasCauseReference( exception );
+				.cause().isSameAs( exception );
 		assertThatFuture( work3FutureFromSequenceBuilder ).getFailure()
 				.isInstanceOf( SearchException.class )
 				.hasMessageContaining( "Call to the bulk REST API failed" )
-				.hasCauseReference( exception );
+				.cause().isSameAs( exception );
 		assertThatFuture( work4FutureFromSequenceBuilder ).isPending();
 		assertThatFuture( sequenceFuture ).isPending();
 
@@ -441,15 +441,15 @@ class ElasticsearchDefaultWorkSequenceBuilderTest {
 		assertThatFuture( work1FutureFromSequenceBuilder ).getFailure()
 				.isInstanceOf( SearchException.class )
 				.hasMessageContaining( "Call to the bulk REST API failed" )
-				.hasCauseReference( exception );
+				.cause().isSameAs( exception );
 		assertThatFuture( work2FutureFromSequenceBuilder ).getFailure()
 				.isInstanceOf( SearchException.class )
 				.hasMessageContaining( "Call to the bulk REST API failed" )
-				.hasCauseReference( exception );
+				.cause().isSameAs( exception );
 		assertThatFuture( work3FutureFromSequenceBuilder ).getFailure()
 				.isInstanceOf( SearchException.class )
 				.hasMessageContaining( "Call to the bulk REST API failed" )
-				.hasCauseReference( exception );
+				.cause().isSameAs( exception );
 		assertThatFuture( work4FutureFromSequenceBuilder ).isPending();
 		assertThatFuture( sequenceFuture ).isPending();
 
