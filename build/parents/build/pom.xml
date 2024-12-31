@@ -138,7 +138,7 @@
 
         <version.org.hamcrest>3.0</version.org.hamcrest>
         <version.org.mockito>5.14.2</version.org.mockito>
-        <version.org.assertj.assertj-core>3.26.3</version.org.assertj.assertj-core>
+        <version.org.assertj.assertj-core>3.27.1</version.org.assertj.assertj-core>
         <!-- NOTE: Remove a Dependabot rule for 4.2.1 once the upgrade can be applied -->
         <version.org.awaitily>4.2.2</version.org.awaitily>
         <version.org.skyscreamer.jsonassert>1.5.1</version.org.skyscreamer.jsonassert>
