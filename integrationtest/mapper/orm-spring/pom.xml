@@ -44,11 +44,16 @@
                 </exclusion>
             </exclusions>
         </dependency>
-
         <dependency>
-            <groupId>com.atomikos</groupId>
-            <artifactId>transactions-spring-boot3-starter</artifactId>
-            <version>${version.com.atomikos}</version>
+            <groupId>dev.snowdrop</groupId>
+            <artifactId>narayana-spring-boot-starter</artifactId>
+            <version>${version.dev.snowdrop}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>io.agroal</groupId>
+            <artifactId>agroal-spring-boot-starter</artifactId>
+            <version>2.5</version>
             <scope>test</scope>
         </dependency>
 

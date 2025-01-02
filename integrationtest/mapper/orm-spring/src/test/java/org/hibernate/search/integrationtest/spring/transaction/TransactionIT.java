@@ -30,7 +30,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 // Adding a property here is just a "workaround" to make sure that a different context is used for this test
 // otherwise there can be build errors when running all the tests via maven.
-@SpringBootTest(properties = "spring.jta.atomikos.datasource.bean-name=hsearch-datasource1")
+@SpringBootTest(properties = "spring.datasource.name=hsearch-datasource1")
 @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
 class TransactionIT extends AbstractMapperOrmSpringIT {
 

@@ -7,6 +7,8 @@ package org.hibernate.search.integrationtest.spring.jta.timeout;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.awaitility.Awaitility.await;
 
+import java.util.concurrent.TimeUnit;
+
 import jakarta.persistence.EntityManagerFactory;
 
 import org.hibernate.engine.spi.SessionFactoryImplementor;
@@ -19,7 +21,7 @@ import org.hibernate.search.integrationtest.spring.testsupport.AbstractMapperOrm
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import com.atomikos.icatch.jta.TransactionManagerImp;
+import com.arjuna.ats.arjuna.coordinator.TxControl;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -45,8 +47,8 @@ class TransactionTimeoutJtaAndSpringOutboxIT extends AbstractMapperOrmSpringIT {
 				.getServiceRegistry().getService( TransactionCoordinatorBuilder.class ) )
 				.returns( true, TransactionCoordinatorBuilder::isJta );
 
-		// We changed the default Atomikos timeout to 1s (1000ms)
-		assertThat( TransactionManagerImp.getDefaultTimeout() ).isOne();
+		// We changed the default timeout to 1s (1000ms)
+		assertThat( TxControl.getDefaultTimeout() ).isOne();
 
 		// The test is supposed to time out
 	}
@@ -62,6 +64,7 @@ class TransactionTimeoutJtaAndSpringOutboxIT extends AbstractMapperOrmSpringIT {
 		snertDAO.persist( snert );
 
 		await( "Waiting for indexing assertions" )
+				.pollDelay( 1, TimeUnit.SECONDS )
 				.untilAsserted( () -> assertThat( TimeoutFailureCollector.EXCEPTIONS ).isNotEmpty() );
 
 		Throwable exception = TimeoutFailureCollector.EXCEPTIONS.iterator().next();
