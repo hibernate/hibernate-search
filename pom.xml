@@ -1379,20 +1379,6 @@
         </profile>
 
         <profile>
-            <id>testWithJdk23</id>
-            <activation>
-                <property>
-                    <name>java-version.test.release</name>
-                    <value>23</value>
-                </property>
-            </activation>
-            <properties>
-                <!-- Spring Boot 3 isn't ready for JDK23 yet -->
-                <failsafe.spring.skip>true</failsafe.spring.skip>
-            </properties>
-        </profile>
-
-        <profile>
             <id>testWithJdk24</id>
             <activation>
                 <property>

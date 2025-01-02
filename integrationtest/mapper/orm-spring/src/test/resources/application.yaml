@@ -11,6 +11,12 @@ spring.datasource:
   url: ${JDBC_URL} # From environment variable
   username: ${JDBC_USERNAME} # From environment variable
   password: ${JDBC_PASSWORD} # From environment variable
+  generate-unique-name: false
+  name: hsearch-datasource
+  type: io.agroal.springframework.boot.AgroalDataSource
+  agroal:
+    min-size: 2
+    max-size: 10
 
 logging.level:
   org.springframework.core.env: DEBUG
@@ -20,13 +26,8 @@ logging.level:
   org.hibernate.search.elasticsearch.client.request: DEBUG
   org.hibernate.search.backend.lucene: DEBUG
 
-# since atomikos connection pool has a max size set to 1 ...
-# we will not be able to execute more than one transaction at a time, leading to errors in tests
 spring:
   jta:
-    atomikos:
-      datasource:
-        bean-name: hsearch-datasource
-        min-pool-size: 2
-        max-pool-size: 10
-
+    enabled: true
+narayana:
+  log-dir: target/transaction-logs

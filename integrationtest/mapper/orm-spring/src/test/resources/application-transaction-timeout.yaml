@@ -6,7 +6,5 @@ spring.jpa:
           internal:
             configurer: org.hibernate.search.integrationtest.spring.jta.timeout.TimeoutOutboxPollingInternalConfigurer
         background_failure_handler: org.hibernate.search.integrationtest.spring.jta.timeout.TimeoutFailureCollector
-atomikos:
-  properties:
-    # note this value is converted to seconds (default-jta-timeout/1000) so we should keep in mind when updating it:
-    default-jta-timeout: 1000
+narayana:
+  default-timeout: 1

@@ -20,7 +20,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
 
-import com.atomikos.icatch.jta.TransactionManagerImp;
+import com.arjuna.ats.arjuna.coordinator.TxControl;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -48,8 +48,8 @@ class RaisedTimeoutJtaAndSpringOutboxIT extends AbstractMapperOrmSpringIT {
 				.getServiceRegistry().getService( TransactionCoordinatorBuilder.class ) )
 				.returns( true, TransactionCoordinatorBuilder::isJta );
 
-		// We changed the default Atomikos timeout to 1s (1000ms)
-		assertThat( TransactionManagerImp.getDefaultTimeout() ).isOne();
+		// We changed the default timeout to 1s (1000ms)
+		assertThat( TxControl.getDefaultTimeout() ).isOne();
 
 		// However, the test is not supposed to time out,
 		// because we raised the timeout to 60 seconds in Hibernate Search properties
