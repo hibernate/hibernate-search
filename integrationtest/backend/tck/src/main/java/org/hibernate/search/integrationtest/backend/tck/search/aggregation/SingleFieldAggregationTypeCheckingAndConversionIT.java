@@ -766,8 +766,8 @@ class SingleFieldAggregationTypeCheckingAndConversionIT<F> {
 	}
 
 	private <A> void testValidAggregation(AggregationScenario<A> scenario, StubMappingScope scope,
-			Function<SearchPredicateFactory, ? extends PredicateFinalStep> predicateContributor,
-			BiFunction<SearchAggregationFactory, AggregationScenario<A>, AggregationFinalStep<A>> aggregationContributor,
+			Function<SearchPredicateFactory<?>, ? extends PredicateFinalStep> predicateContributor,
+			BiFunction<SearchAggregationFactory<?>, AggregationScenario<A>, AggregationFinalStep<A>> aggregationContributor,
 			DataSet<F> dataSet) {
 		AggregationKey<A> aggregationKey = AggregationKey.of( AGGREGATION_NAME );
 		assertThatQuery(

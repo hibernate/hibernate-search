@@ -9,15 +9,17 @@ import org.hibernate.search.engine.search.sort.dsl.spi.AbstractSearchSortFactory
 import org.hibernate.search.engine.search.sort.dsl.spi.SearchSortDslContext;
 import org.hibernate.search.engine.search.sort.spi.SearchSortIndexScope;
 
-public class StubSearchSortFactory
-		extends AbstractSearchSortFactory<StubSearchSortFactory, SearchSortIndexScope<?>, SearchPredicateFactory> {
-	public StubSearchSortFactory(SearchSortDslContext<SearchSortIndexScope<?>, SearchPredicateFactory> dslContext) {
+public class StubSearchSortFactory<SR>
+		extends
+		AbstractSearchSortFactory<SR, StubSearchSortFactory<SR>, SearchSortIndexScope<?>, SearchPredicateFactory<SR>> {
+	public StubSearchSortFactory(
+			SearchSortDslContext<SR, SearchSortIndexScope<?>, SearchPredicateFactory<SR>> dslContext) {
 		super( dslContext );
 	}
 
 	@Override
-	public StubSearchSortFactory withRoot(String objectFieldPath) {
-		return new StubSearchSortFactory( dslContext.rescope( dslContext.scope().withRoot( objectFieldPath ),
+	public StubSearchSortFactory<SR> withRoot(String objectFieldPath) {
+		return new StubSearchSortFactory<>( dslContext.rescope( dslContext.scope().withRoot( objectFieldPath ),
 				dslContext.predicateFactory().withRoot( objectFieldPath ) ) );
 	}
 }
