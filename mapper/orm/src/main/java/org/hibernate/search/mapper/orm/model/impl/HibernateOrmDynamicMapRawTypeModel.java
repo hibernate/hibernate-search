@@ -14,13 +14,14 @@ import java.util.stream.Stream;
 import org.hibernate.search.engine.mapper.model.spi.MappableTypeModel;
 import org.hibernate.search.mapper.pojo.model.spi.AbstractPojoRawTypeModel;
 import org.hibernate.search.mapper.pojo.model.spi.PojoConstructorModel;
+import org.hibernate.search.mapper.pojo.model.spi.PojoPropertyModel;
 import org.hibernate.search.mapper.pojo.model.spi.PojoRawTypeIdentifier;
 import org.hibernate.search.mapper.pojo.model.spi.PojoRawTypeModel;
 import org.hibernate.search.mapper.pojo.model.spi.PojoTypeModel;
 
 @SuppressWarnings("rawtypes")
 public class HibernateOrmDynamicMapRawTypeModel
-		extends AbstractPojoRawTypeModel<Map, HibernateOrmBootstrapIntrospector> {
+		extends AbstractPojoRawTypeModel<Map, HibernateOrmBootstrapIntrospector, PojoPropertyModel<?>> {
 
 	private final HibernateOrmBasicDynamicMapTypeMetadata ormTypeMetadata;
 
