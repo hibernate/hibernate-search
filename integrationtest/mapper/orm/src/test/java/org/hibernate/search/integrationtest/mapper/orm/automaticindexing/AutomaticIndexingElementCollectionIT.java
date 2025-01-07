@@ -219,10 +219,6 @@ class AutomaticIndexingElementCollectionIT {
 			entity1.setNonIndexedElementCollectionField( new ArrayList<>( Arrays.asList(
 					"newFirstValue", "newSecondValue"
 			) ) );
-
-			// TODO HSEARCH-3204: remove the statement below to not expect any work
-			backendMock.expectWorks( IndexedEntity.INDEX )
-					.addOrUpdate( "1", b -> {} );
 		} );
 		backendMock.verifyExpectationsMet();
 	}
@@ -388,15 +384,6 @@ class AutomaticIndexingElementCollectionIT {
 			entity1.setNoReindexOnUpdateElementCollectionField( new ArrayList<>( Arrays.asList(
 					"newFirstValue", "newSecondValue"
 			) ) );
-
-			// TODO HSEARCH-3204: remove the statement below to not expect any work
-			backendMock.expectWorks( IndexedEntity.INDEX )
-					.addOrUpdate( "1", b -> b
-							.field(
-									"noReindexOnUpdateElementCollectionField",
-									"newFirstValue", "newSecondValue"
-							)
-					);
 		} );
 		backendMock.verifyExpectationsMet();
 	}
