@@ -43,6 +43,11 @@ class IdentifierMappingCustomTypeIT {
 		} );
 
 		with( entityManagerFactory ).runInTransaction( entityManager -> {
+			entityManager.createNativeQuery( "select * from Book" )
+					.getResultList().forEach( System.err::println );
+		} );
+
+		with( entityManagerFactory ).runInTransaction( entityManager -> {
 			SearchSession searchSession = Search.session( entityManager );
 
 			List<DocumentReference> result = searchSession.search( Book.class )
