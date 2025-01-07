@@ -1339,8 +1339,7 @@ public abstract class AbstractAutomaticIndexingAssociationBaseIT<
 			else {
 				// For some reason we end up reindexing needlessly,
 				// probably because we don't have enough information in the change events
-				// (HSEARCH-3204: missing "role" for a replaced collection;
-				// HSEARCH-4718: no information about which property changed within an embeddable,
+				// (HSEARCH-4718: no information about which property changed within an embeddable,
 				// ...)
 				backendMock.expectWorks( _indexed().indexName() )
 						.addOrUpdate( "1", b -> {} );
@@ -1622,8 +1621,7 @@ public abstract class AbstractAutomaticIndexingAssociationBaseIT<
 
 			// For some reason we end up reindexing needlessly,
 			// probably because we don't have enough information in the change events
-			// (HSEARCH-3204: missing "role" for a replaced collection;
-			// HSEARCH-4718: no information about which property changed within an embeddable,
+			// (HSEARCH-4718: no information about which property changed within an embeddable,
 			// ...)
 			backendMock.expectWorks( _indexed().indexName() )
 					.addOrUpdate( "1", b -> b
@@ -1686,8 +1684,7 @@ public abstract class AbstractAutomaticIndexingAssociationBaseIT<
 
 			// For some reason we end up reindexing needlessly,
 			// probably because we don't have enough information in the change events
-			// (HSEARCH-3204: missing "role" for a replaced collection;
-			// HSEARCH-4718: no information about which property changed within an embeddable,
+			// (HSEARCH-4718: no information about which property changed within an embeddable,
 			// ...)
 			backendMock.expectWorks( _indexed().indexName() )
 					.addOrUpdate( "1", b -> b
@@ -2884,8 +2881,7 @@ public abstract class AbstractAutomaticIndexingAssociationBaseIT<
 			else {
 				// For some reason we end up reindexing needlessly,
 				// probably because we don't have enough information in the change events
-				// (HSEARCH-3204: missing "role" for a replaced collection;
-				// HSEARCH-4718: no information about which property changed within an embeddable,
+				// (HSEARCH-4718: no information about which property changed within an embeddable,
 				// ...)
 				backendMock.expectWorks( _indexed().indexName() )
 						.addOrUpdate( "1", b -> b
@@ -2926,8 +2922,7 @@ public abstract class AbstractAutomaticIndexingAssociationBaseIT<
 			else {
 				// For some reason we end up reindexing needlessly,
 				// probably because we don't have enough information in the change events
-				// (HSEARCH-3204: missing "role" for a replaced collection;
-				// HSEARCH-4718: no information about which property changed within an embeddable,
+				// (HSEARCH-4718: no information about which property changed within an embeddable,
 				// ...)
 				backendMock.expectWorks( _indexed().indexName() )
 						.addOrUpdate( "1", b -> b
@@ -3242,8 +3237,7 @@ public abstract class AbstractAutomaticIndexingAssociationBaseIT<
 
 			// For some reason we end up reindexing needlessly,
 			// probably because we don't have enough information in the change events
-			// (HSEARCH-3204: missing "role" for a replaced collection;
-			// HSEARCH-4718: no information about which property changed within an embeddable,
+			// (HSEARCH-4718: no information about which property changed within an embeddable,
 			// ...)
 			backendMock.expectWorks( _indexed().indexName() )
 					.addOrUpdate( "1", b -> b
@@ -3314,8 +3308,7 @@ public abstract class AbstractAutomaticIndexingAssociationBaseIT<
 
 			// For some reason we end up reindexing needlessly,
 			// probably because we don't have enough information in the change events
-			// (HSEARCH-3204: missing "role" for a replaced collection;
-			// HSEARCH-4718: no information about which property changed within an embeddable,
+			// (HSEARCH-4718: no information about which property changed within an embeddable,
 			// ...)
 			backendMock.expectWorks( _indexed().indexName() )
 					.addOrUpdate( "1", b -> b
@@ -4357,16 +4350,6 @@ public abstract class AbstractAutomaticIndexingAssociationBaseIT<
 			field.setContainer( contained, new ArrayList<>( Arrays.asList(
 					"newFirstValue", "newSecondValue"
 			) ) );
-
-			// TODO HSEARCH-3204: remove the statement below to not expect any work
-			backendMock.expectWorks( _indexed().indexName() )
-					.addOrUpdate( "1", b -> b
-							.objectField( "child", b2 -> b2
-									.objectField( "containedIndexedEmbedded", b3 -> b3
-											.field( "indexedField", null )
-									)
-							)
-					);
 		} );
 		backendMock.verifyExpectationsMet();
 	}
