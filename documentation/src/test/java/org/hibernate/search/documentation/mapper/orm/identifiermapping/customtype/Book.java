@@ -4,12 +4,12 @@
  */
 package org.hibernate.search.documentation.mapper.orm.identifiermapping.customtype;
 
-import jakarta.persistence.Convert;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
 
+import org.hibernate.annotations.Type;
 import org.hibernate.search.documentation.testsupport.data.ISBN;
-import org.hibernate.search.documentation.testsupport.data.ISBNAttributeConverter;
+import org.hibernate.search.documentation.testsupport.data.ISBNUserType;
 import org.hibernate.search.mapper.pojo.bridge.mapping.annotation.IdentifierBridgeRef;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.DocumentId;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
@@ -20,7 +20,7 @@ import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
 public class Book {
 
 	@Id
-	@Convert(converter = ISBNAttributeConverter.class)
+	@Type(ISBNUserType.class)
 	@DocumentId(identifierBridge = @IdentifierBridgeRef(type = ISBNIdentifierBridge.class))
 	private ISBN isbn;
 
