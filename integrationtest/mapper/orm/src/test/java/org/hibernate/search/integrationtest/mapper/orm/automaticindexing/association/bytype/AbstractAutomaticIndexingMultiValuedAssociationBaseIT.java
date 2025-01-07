@@ -336,10 +336,6 @@ public abstract class AbstractAutomaticIndexingMultiValuedAssociationBaseIT<
 			containedAssociation.set( contained, entity1 );
 
 			session.persist( contained );
-
-			// TODO HSEARCH-3204: remove the statement below to not expect any work
-			backendMock.expectWorks( _indexed().indexName() )
-					.addOrUpdate( "1", b -> {} );
 		} );
 		backendMock.verifyExpectationsMet();
 	}
@@ -620,17 +616,6 @@ public abstract class AbstractAutomaticIndexingMultiValuedAssociationBaseIT<
 			containedAssociation.set( contained, entity1 );
 
 			session.persist( contained );
-
-			// TODO HSEARCH-3204: remove the statement below to not expect any work
-			backendMock.expectWorks( _indexed().indexName() )
-					.addOrUpdate( "1", b -> b
-							.objectField( "containedIndexedEmbeddedNoReindexOnUpdate", b2 -> b2
-									.field( "indexedField", VALUE_1 )
-							)
-							.objectField( "containedIndexedEmbeddedNoReindexOnUpdate", b2 -> b2
-									.field( "indexedField", VALUE_2 )
-							)
-					);
 		} );
 		backendMock.verifyExpectationsMet();
 	}
@@ -895,10 +880,6 @@ public abstract class AbstractAutomaticIndexingMultiValuedAssociationBaseIT<
 			containedAssociation.set( contained, entity1 );
 
 			session.persist( contained );
-
-			// TODO HSEARCH-3204: remove the statement below to not expect any work
-			backendMock.expectWorks( _indexed().indexName() )
-					.addOrUpdate( "1", b -> {} );
 		} );
 		backendMock.verifyExpectationsMet();
 	}
@@ -1220,12 +1201,6 @@ public abstract class AbstractAutomaticIndexingMultiValuedAssociationBaseIT<
 			containedAssociation.set( contained, containingEntity1 );
 
 			session.persist( contained );
-
-			// TODO HSEARCH-3204: remove the statement below to not expect any work
-			backendMock.expectWorks( _indexed().indexName() )
-					.addOrUpdate( "1", b -> b
-							.objectField( "child", b2 -> {} )
-					);
 		} );
 		backendMock.verifyExpectationsMet();
 	}
@@ -1546,19 +1521,6 @@ public abstract class AbstractAutomaticIndexingMultiValuedAssociationBaseIT<
 			containedAssociation.set( contained, containingEntity1 );
 
 			session.persist( contained );
-
-			// TODO HSEARCH-3204: remove the statement below to not expect any work
-			backendMock.expectWorks( _indexed().indexName() )
-					.addOrUpdate( "1", b -> b
-							.objectField( "child", b2 -> b2
-									.objectField( "containedIndexedEmbeddedNoReindexOnUpdate", b3 -> b3
-											.field( "indexedField", VALUE_1 )
-									)
-									.objectField( "containedIndexedEmbeddedNoReindexOnUpdate", b3 -> b3
-											.field( "indexedField", VALUE_2 )
-									)
-							)
-					);
 		} );
 		backendMock.verifyExpectationsMet();
 	}
@@ -1879,11 +1841,6 @@ public abstract class AbstractAutomaticIndexingMultiValuedAssociationBaseIT<
 
 			session.persist( contained );
 
-			// TODO HSEARCH-3204: remove the statement below to not expect any work
-			backendMock.expectWorks( _indexed().indexName() )
-					.addOrUpdate( "1", b -> b
-							.objectField( "child", b2 -> {} )
-					);
 		} );
 		backendMock.verifyExpectationsMet();
 	}
