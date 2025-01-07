@@ -147,7 +147,7 @@
         <version.org.apache.commons.lang3>3.17.0</version.org.apache.commons.lang3>
         <version.org.apache.commons.math3>3.6.1</version.org.apache.commons.math3>
         <version.org.apache.commons.math3>3.6.1</version.org.apache.commons.math3>
-        <version.commons-codec>1.17.1</version.commons-codec>
+        <version.commons-codec>1.17.2</version.commons-codec>
         <!--
             When upgrading Avro:
                 - make sure to create a new payload in EventPayloadSerializationUtilsTest
