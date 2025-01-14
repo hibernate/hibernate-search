@@ -236,7 +236,7 @@ public interface SearchProjectionFactory<SR, R, E> {
 	 */
 	@Incubating
 	default DistanceToFieldProjectionValueStep<?, Double> distance(
-			DistanceProjectionFieldReference<? super SR, ?> fieldReference,
+			DistanceProjectionFieldReference<? super SR> fieldReference,
 			GeoPoint center) {
 		return distance( fieldReference.absolutePath(), center );
 	}

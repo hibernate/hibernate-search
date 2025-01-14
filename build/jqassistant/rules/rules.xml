@@ -281,6 +281,7 @@
                         WHEN 'hibernate-search-mapper-orm' THEN 'HibernateOrm'
                         WHEN 'hibernate-search-mapper-orm-outbox-polling' THEN 'OutboxPolling'
                         WHEN 'hibernate-search-mapper-orm-jakarta-batch-jberet' THEN 'JBeret'
+                        WHEN 'hibernate-search-metamodel-processor' THEN 'Processor'
                         ELSE 'UNKNOWN-MODULE-SPECIFIC-KEYWORD-PLEASE-UPDATE-JQASSISTANT-RULES'
                     END
             RETURN
@@ -362,6 +363,7 @@
                 AND NOT type.name ENDS WITH "ScrollableResultsAdapter"
                 AND NOT type.name ENDS WITH "_$bundle"
                 AND NOT type:SuppressJQAssistant
+                AND NOT type:e
             RETURN
                 type, method
         ]]></cypher>
