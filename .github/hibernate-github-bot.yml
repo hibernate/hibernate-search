@@ -65,3 +65,7 @@ develocity:
         replacement: "" # Just remove these tags
 licenseAgreement:
   enabled: true
+  ignore:
+    # See the `build-dependencies` group in the Dependabot's configuration file
+    - user: dependabot[bot]
+      titlePattern: "Bump.*the build-dependencies group( across \\d+ director(ies|y))?( with \\d+ updates?)?"
