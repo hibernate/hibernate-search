@@ -4,5 +4,5 @@
  */
 package org.hibernate.search.engine.search.reference.projection;
 
-public interface DistanceProjectionFieldReference<SR, T> extends TypedProjectionFieldReference<SR, T> {
+public interface DistanceProjectionFieldReference<SR> extends ProjectionFieldReference<SR> {
 }
