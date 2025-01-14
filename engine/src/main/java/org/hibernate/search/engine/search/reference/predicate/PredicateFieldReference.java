@@ -6,5 +6,6 @@ package org.hibernate.search.engine.search.reference.predicate;
 
 import org.hibernate.search.engine.search.reference.FieldReference;
 
+
 public interface PredicateFieldReference<SR> extends FieldReference<SR> {
 }

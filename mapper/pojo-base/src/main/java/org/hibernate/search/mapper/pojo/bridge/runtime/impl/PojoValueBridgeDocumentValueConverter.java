@@ -64,6 +64,10 @@ public final class PojoValueBridgeDocumentValueConverter<V, F>
 		return bridge.isCompatibleWith( castedOther.bridge );
 	}
 
+	public ValueBridge<V, F> bridge() {
+		return bridge;
+	}
+
 	private static final class ContextExtension
 			implements ToDocumentValueConvertContextExtension<ValueBridgeToIndexedValueContext>,
 			FromDocumentValueConvertContextExtension<ValueBridgeFromIndexedValueContext> {

@@ -369,6 +369,11 @@
                 <type>pom</type>
                 <version>${project.version}</version>
             </dependency>
+            <dependency>
+                <groupId>org.hibernate.search</groupId>
+                <artifactId>hibernate-search-metamodel-processor</artifactId>
+                <version>${project.version}</version>
+            </dependency>
 
             <!-- Remaining Hibernate Search dependencies -->
             <dependency>

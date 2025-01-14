@@ -11,6 +11,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.function.BiConsumer;
+import java.util.function.Function;
 
 import org.hibernate.search.engine.cfg.ConfigurationPropertySource;
 import org.hibernate.search.engine.cfg.spi.AllAwareConfigurationPropertySource;
@@ -22,6 +23,7 @@ import org.hibernate.search.engine.common.spi.SearchIntegrationEnvironment;
 import org.hibernate.search.engine.common.spi.SearchIntegrationPartialBuildState;
 import org.hibernate.search.engine.environment.bean.spi.BeanProvider;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.AnnotatedTypeSource;
+import org.hibernate.search.mapper.pojo.model.spi.PojoBootstrapIntrospector;
 import org.hibernate.search.mapper.pojo.standalone.bootstrap.spi.StandalonePojoIntegrationBooter;
 import org.hibernate.search.mapper.pojo.standalone.bootstrap.spi.StandalonePojoIntegrationBooterBehavior;
 import org.hibernate.search.mapper.pojo.standalone.cfg.spi.StandalonePojoMapperSpiSettings;
@@ -46,12 +48,14 @@ public class StandalonePojoIntegrationBooterImpl implements StandalonePojoIntegr
 	private final List<AnnotatedTypeSource> annotatedTypeSources;
 	private final ConfigurationPropertyChecker propertyChecker;
 	private final ValueHandleFactory valueHandleFactory;
+	private final Function<PojoBootstrapIntrospector, PojoBootstrapIntrospector> introspectorCustomizer;
 	private final ConfigurationPropertySource propertySource;
 
 	private StandalonePojoIntegrationBooterImpl(BuilderImpl builder) {
 		annotatedTypeSources = builder.annotatedTypeSources;
 		propertyChecker = ConfigurationPropertyChecker.create();
 		valueHandleFactory = builder.valueHandleFactory;
+		introspectorCustomizer = builder.introspectorCustomizer;
 
 		propertySource = propertyChecker.wrap(
 				AllAwareConfigurationPropertySource.fromMap( builder.properties )
@@ -87,13 +91,14 @@ public class StandalonePojoIntegrationBooterImpl implements StandalonePojoIntegr
 		try {
 			environment = createEnvironment();
 
-			StandalonePojoBootstrapIntrospector introspector =
+			PojoBootstrapIntrospector introspector =
 					StandalonePojoBootstrapIntrospector.create(
 							environment.classResolver(),
 							null,
 							valueHandleFactory != null
 									? valueHandleFactory
 									: ValueHandleFactory.usingMethodHandle( MethodHandles.publicLookup() ) );
+			introspector = introspectorCustomizer.apply( introspector );
 			StandalonePojoMappingKey mappingKey = new StandalonePojoMappingKey();
 			StandalonePojoMappingInitiator mappingInitiator = new StandalonePojoMappingInitiator( introspector );
 			for ( AnnotatedTypeSource source : annotatedTypeSources ) {
@@ -138,8 +143,9 @@ public class StandalonePojoIntegrationBooterImpl implements StandalonePojoIntegr
 
 	public static class BuilderImpl implements Builder {
 		private final List<AnnotatedTypeSource> annotatedTypeSources = new ArrayList<>();
-		private ValueHandleFactory valueHandleFactory;
 		private final Map<String, Object> properties = new HashMap<>();
+		private ValueHandleFactory valueHandleFactory;
+		private Function<PojoBootstrapIntrospector, PojoBootstrapIntrospector> introspectorCustomizer = Function.identity();
 
 		public BuilderImpl() {
 		}
@@ -153,6 +159,12 @@ public class StandalonePojoIntegrationBooterImpl implements StandalonePojoIntegr
 		@Override
 		public BuilderImpl valueReadHandleFactory(ValueHandleFactory valueHandleFactory) {
 			this.valueHandleFactory = valueHandleFactory;
+			return this;
+		}
+
+		@Override
+		public Builder introspectorCustomizer(Function<PojoBootstrapIntrospector, PojoBootstrapIntrospector> customize) {
+			this.introspectorCustomizer = customize;
 			return this;
 		}
 

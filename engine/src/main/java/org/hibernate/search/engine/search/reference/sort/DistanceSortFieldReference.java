@@ -4,5 +4,5 @@
  */
 package org.hibernate.search.engine.search.reference.sort;
 
-public interface DistanceSortFieldReference<SR, T> extends TypedSortFieldReference<SR, T> {
+public interface DistanceSortFieldReference<SR> extends SortFieldReference<SR> {
 }

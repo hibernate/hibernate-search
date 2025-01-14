@@ -103,7 +103,7 @@ public interface SearchSortFactory<SR> {
 	 */
 	@Incubating
 	default DistanceSortOptionsStep<SR, ?, ? extends SearchPredicateFactory<SR>> distance(
-			DistanceSortFieldReference<? super SR, ?> fieldReference, GeoPoint location) {
+			DistanceSortFieldReference<? super SR> fieldReference, GeoPoint location) {
 		return distance( fieldReference.absolutePath(), location );
 	}
 
@@ -138,7 +138,7 @@ public interface SearchSortFactory<SR> {
 	 */
 	@Incubating
 	default DistanceSortOptionsStep<SR, ?, ? extends SearchPredicateFactory<SR>> distance(
-			DistanceSortFieldReference<? super SR, ?> fieldReference, double latitude,
+			DistanceSortFieldReference<? super SR> fieldReference, double latitude,
 			double longitude) {
 		return distance( fieldReference, GeoPoint.of( latitude, longitude ) );
 	}

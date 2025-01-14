@@ -2,7 +2,7 @@
  * SPDX-License-Identifier: Apache-2.0
  * Copyright Red Hat Inc. and Hibernate Authors
  */
-package org.hibernate.search.mapper.pojo.mapping.definition.annotation.processing.impl;
+package org.hibernate.search.mapper.pojo.mapping.definition.annotation.processing.spi;
 
 import java.util.Arrays;
 import java.util.Collections;
@@ -24,8 +24,10 @@ import org.hibernate.search.mapper.pojo.mapping.definition.annotation.PropertyVa
 import org.hibernate.search.mapper.pojo.model.path.PojoModelPath;
 import org.hibernate.search.mapper.pojo.model.path.PojoModelPathValueNode;
 import org.hibernate.search.util.common.AssertionFailure;
+import org.hibernate.search.util.common.annotation.Incubating;
 import org.hibernate.search.util.common.impl.Contracts;
 
+@Incubating
 public final class MappingAnnotationProcessorUtils {
 
 	private MappingAnnotationProcessorUtils() {

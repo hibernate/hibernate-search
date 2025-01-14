@@ -6,8 +6,10 @@ package org.hibernate.search.mapper.pojo.standalone.bootstrap.spi;
 
 import java.util.Map;
 import java.util.function.BiConsumer;
+import java.util.function.Function;
 
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.AnnotatedTypeSource;
+import org.hibernate.search.mapper.pojo.model.spi.PojoBootstrapIntrospector;
 import org.hibernate.search.mapper.pojo.standalone.bootstrap.impl.StandalonePojoIntegrationBooterImpl;
 import org.hibernate.search.mapper.pojo.standalone.mapping.CloseableSearchMapping;
 import org.hibernate.search.util.common.annotation.Incubating;
@@ -24,6 +26,9 @@ public interface StandalonePojoIntegrationBooter {
 		Builder annotatedTypeSource(AnnotatedTypeSource source);
 
 		Builder valueReadHandleFactory(ValueHandleFactory valueHandleFactory);
+
+		@Incubating
+		Builder introspectorCustomizer(Function<PojoBootstrapIntrospector, PojoBootstrapIntrospector> customize);
 
 		Builder property(String name, Object value);
 
