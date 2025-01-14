@@ -1,7 +1,11 @@
-package org.hibernate.search.engine.search.reference.spi;
+/*
+ * SPDX-License-Identifier: Apache-2.0
+ * Copyright Red Hat Inc. and Hibernate Authors
+ */
+package org.hibernate.search.metamodel.processor;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.fail;
+import static org.assertj.core.api.Assertions.fail;
 
 import java.lang.reflect.Field;
 import java.util.HashSet;
@@ -9,6 +13,8 @@ import java.util.Set;
 import java.util.stream.Stream;
 
 import org.hibernate.search.engine.backend.types.IndexFieldTraits;
+import org.hibernate.search.metamodel.processor.writer.impl.TraitReferenceDetails;
+import org.hibernate.search.metamodel.processor.writer.impl.TraitReferenceMapping;
 
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
@@ -18,9 +24,21 @@ class TraitReferenceMappingTest {
 
 	@MethodSource("traitNames")
 	@ParameterizedTest
-	void allTraitsPresent(String traitName) {
-		assertThat( TraitReferenceMapping.instance().reference( traitName ) )
-				.isNotNull();
+	void smoke(String traitName) {
+		TraitReferenceDetails reference = TraitReferenceMapping.instance().reference( traitName );
+		assertThat( reference ).isNotNull();
+		if ( reference.referenceClass().getTypeParameters().length > 1 ) {
+			assertThat( reference.traitKind().requiresValueModel() ).isTrue();
+			assertThat( reference.traitKind().requiresInputType()
+					|| reference.traitKind().requiresOutputType() ).isTrue();
+			assertThat( reference.extraPropertyName() ).isNotNull();
+		}
+		else {
+			assertThat( reference.traitKind().requiresValueModel() ).isFalse();
+			assertThat( reference.traitKind().requiresInputType() ).isFalse();
+			assertThat( reference.traitKind().requiresOutputType() ).isFalse();
+			assertThat( reference.extraPropertyName() ).isNull();
+		}
 	}
 
 	private static Stream<Arguments> traitNames() {

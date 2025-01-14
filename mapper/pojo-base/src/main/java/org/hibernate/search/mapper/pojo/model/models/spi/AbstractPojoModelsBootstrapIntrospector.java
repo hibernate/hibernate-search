@@ -145,31 +145,7 @@ public abstract class AbstractPojoModelsBootstrapIntrospector implements PojoBoo
 	}
 
 	private static String noPrefix(MemberDetails details) {
-		String fullName = details.getName();
-		if ( fullName.startsWith( "get" ) ) {
-			return decapitalize( fullName.substring( "get".length() ) );
-		}
-		if ( fullName.startsWith( "is" ) ) {
-			return decapitalize( fullName.substring( "is".length() ) );
-		}
-		return fullName;
-	}
-
-	// See conventions expressed by https://docs.oracle.com/javase/7/docs/api/java/beans/Introspector.html#decapitalize(java.lang.String)
-	private static String decapitalize(String name) {
-		if ( name != null && !name.isEmpty() ) {
-			if ( name.length() > 1 && Character.isUpperCase( name.charAt( 1 ) ) ) {
-				return name;
-			}
-			else {
-				char[] chars = name.toCharArray();
-				chars[0] = Character.toLowerCase( chars[0] );
-				return new String( chars );
-			}
-		}
-		else {
-			return name;
-		}
+		return PojoBootstrapIntrospector.noPrefix( details.getName() );
 	}
 
 	private record HibernateSearchClassLoading(ClassResolver delegate) implements ClassLoading {

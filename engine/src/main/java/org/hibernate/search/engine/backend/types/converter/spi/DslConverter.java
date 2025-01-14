@@ -8,6 +8,7 @@ import org.hibernate.search.engine.backend.types.converter.ToDocumentValueConver
 import org.hibernate.search.engine.backend.types.converter.runtime.ToDocumentValueConvertContext;
 import org.hibernate.search.engine.backend.types.converter.runtime.ToDocumentValueConvertContextExtension;
 import org.hibernate.search.engine.logging.impl.QueryLog;
+import org.hibernate.search.util.common.annotation.Incubating;
 import org.hibernate.search.util.common.impl.Contracts;
 import org.hibernate.search.util.common.reporting.spi.EventContextProvider;
 
@@ -98,5 +99,13 @@ public final class DslConverter<V, F> {
 	 */
 	public boolean isCompatibleWith(DslConverter<?, ?> other) {
 		return delegate.isCompatibleWith( other.delegate );
+	}
+
+	/**
+	 * @return The document value converter that is backing up this converter.
+	 */
+	@Incubating
+	public ToDocumentValueConverter<V, ? extends F> delegate() {
+		return delegate;
 	}
 }

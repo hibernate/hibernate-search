@@ -4,6 +4,7 @@
  */
 package org.hibernate.search.mapper.pojo.model.spi;
 
+import org.hibernate.search.util.common.annotation.Incubating;
 import org.hibernate.search.util.common.reflect.spi.ValueHandleFactory;
 
 /**
@@ -38,4 +39,33 @@ public interface PojoBootstrapIntrospector {
 		return (org.hibernate.search.util.common.reflect.spi.ValueReadHandleFactory) annotationValueHandleFactory();
 	}
 
+	@Incubating
+	static String noPrefix(String methodName) {
+		if ( methodName.startsWith( "get" ) ) {
+			return decapitalize( methodName.substring( "get".length() ) );
+		}
+		if ( methodName.startsWith( "is" ) ) {
+			return decapitalize( methodName.substring( "is".length() ) );
+		}
+		// TODO: handle hasXXX ?
+		return methodName;
+	}
+
+	// See conventions expressed by https://docs.oracle.com/javase/7/docs/api/java/beans/Introspector.html#decapitalize(java.lang.String)
+	@Incubating
+	static String decapitalize(String name) {
+		if ( name != null && !name.isEmpty() ) {
+			if ( name.length() > 1 && Character.isUpperCase( name.charAt( 1 ) ) ) {
+				return name;
+			}
+			else {
+				char[] chars = name.toCharArray();
+				chars[0] = Character.toLowerCase( chars[0] );
+				return new String( chars );
+			}
+		}
+		else {
+			return name;
+		}
+	}
 }

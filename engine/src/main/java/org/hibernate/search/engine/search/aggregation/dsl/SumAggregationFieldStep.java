@@ -8,7 +8,6 @@ import java.util.function.Function;
 
 import org.hibernate.search.engine.search.common.ValueModel;
 import org.hibernate.search.engine.search.predicate.dsl.SearchPredicateFactory;
-import org.hibernate.search.engine.search.reference.aggregation.MaxAggregationFieldReference;
 import org.hibernate.search.engine.search.reference.aggregation.SumAggregationFieldReference;
 import org.hibernate.search.util.common.annotation.Incubating;
 

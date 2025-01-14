@@ -1,0 +1,121 @@
+/*
+ * SPDX-License-Identifier: Apache-2.0
+ * Copyright Red Hat Inc. and Hibernate Authors
+ */
+package org.hibernate.search.metamodel.processor;
+
+import static org.assertj.core.api.Assertions.fail;
+
+import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.util.List;
+import java.util.Set;
+
+import javax.annotation.processing.Processor;
+import javax.tools.DiagnosticCollector;
+import javax.tools.JavaCompiler;
+import javax.tools.JavaFileObject;
+import javax.tools.StandardJavaFileManager;
+import javax.tools.StandardLocation;
+import javax.tools.ToolProvider;
+
+import org.hibernate.search.metamodel.processor.model.ISBN;
+import org.hibernate.search.metamodel.processor.model.MyEmbeddedEntity;
+import org.hibernate.search.metamodel.processor.model.MyEnum;
+import org.hibernate.search.metamodel.processor.model.MyIndexedEntity;
+import org.hibernate.search.metamodel.processor.model.SomeGenerics;
+import org.hibernate.search.metamodel.processor.model.SomeRandomType;
+import org.hibernate.search.metamodel.processor.model.SomeRandomTypeBinder;
+
+import org.junit.jupiter.api.Test;
+
+class HibernateSearchMetamodelProcessorTest {
+
+	private static final Path BASE_DIR;
+	private static final Path TARGET_DIR;
+	private static final Path PROCESSOR_OUT_DIR;
+
+	static {
+		TARGET_DIR = getTargetDir();
+		BASE_DIR = TARGET_DIR.getParent();
+		PROCESSOR_OUT_DIR = TARGET_DIR.resolve( "processor-generated-test-classes" );
+		if ( !Files.exists( PROCESSOR_OUT_DIR ) ) {
+			try {
+				Files.createDirectories( PROCESSOR_OUT_DIR );
+			}
+			catch (IOException e) {
+				fail( "Unable to create test output directory " + PROCESSOR_OUT_DIR );
+			}
+		}
+	}
+
+	@Test
+	void smoke() {
+		DiagnosticCollector<JavaFileObject> diagnostics = new DiagnosticCollector<>();
+
+		compile(
+				new HibernateSearchMetamodelProcessor(), diagnostics,
+				getSourceFile( SomeGenerics.class ),
+				getSourceFile( MyIndexedEntity.class ),
+				getSourceFile( MyEmbeddedEntity.class ),
+				getSourceFile( SomeRandomType.class ),
+				getSourceFile( SomeRandomTypeBinder.class ),
+				getSourceFile( ISBN.class ),
+				getSourceFile( MyEnum.class )
+		);
+
+		diagnostics.getDiagnostics().forEach( System.out::println );
+
+	}
+
+	public boolean compile(Processor annotationProcessor, DiagnosticCollector<JavaFileObject> diagnostics,
+			File... sourceFiles) {
+		JavaCompiler compiler = ToolProvider.getSystemJavaCompiler();
+
+		StandardJavaFileManager fileManager = compiler.getStandardFileManager( null, null, null );
+		Iterable<? extends JavaFileObject> compilationUnits = fileManager.getJavaFileObjects( sourceFiles );
+
+		try {
+			fileManager.setLocation( StandardLocation.CLASS_PATH, dependencies() );
+			fileManager.setLocation( StandardLocation.CLASS_OUTPUT, List.of( PROCESSOR_OUT_DIR.toFile() ) );
+		}
+		catch (IOException e) {
+			throw new RuntimeException( e );
+		}
+
+		List<String> options = List.of();
+
+		JavaCompiler.CompilationTask task = compiler.getTask( null, fileManager, diagnostics, options, null, compilationUnits );
+		task.setProcessors( List.of( annotationProcessor ) );
+
+		return task.call();
+	}
+
+	private Iterable<? extends File> dependencies() {
+		return Set.of(
+				dependency( "hibernate-search-mapper-pojo-base.jar" ),
+				dependency( "hibernate-search-engine.jar" )
+		);
+	}
+
+	private File dependency(String name) {
+		return TARGET_DIR.toAbsolutePath().resolve( "test-dependencies" ).resolve( name ).toFile();
+	}
+
+	public File getSourceFile(Class<?> clazz) {
+		String sourceFileName = clazz.getName().replace( ".", File.separator ) + ".java";
+		return BASE_DIR.toAbsolutePath().resolve( "src" ).resolve( "test" ).resolve( "java" ).resolve( sourceFileName )
+				.toFile();
+	}
+
+
+	private static Path getTargetDir() {
+		// target/test-classes
+		String targetClassesDir = HibernateSearchMetamodelProcessorTest.class.getProtectionDomain()
+				.getCodeSource().getLocation().getFile();
+		return Path.of( targetClassesDir ).getParent();
+	}
+
+}
