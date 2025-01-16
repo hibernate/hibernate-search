@@ -40,11 +40,11 @@ We provide [test case templates for all Hibernate projects](https://github.com/h
 to help you get started:
 just fork this repository, build your test case and attach it as an archive to a JIRA issue.
 
-## Setting up a development environment
+## <a id="setup"></a> Setting up a development environment
 
 ### <a id="setup-build-tools"></a> Build tools
 
-You will need JDK 17 exactly for the build.
+You will need at least JDK 21 for the build.
 
 A maven wrapper script is provided at the root of the repository (`./mvnw`),
 so you can use that and don't need to care about the required version of Maven
@@ -54,7 +54,7 @@ so you can use that and don't need to care about the required version of Maven
 
 Hibernate Search relies on a [Develocity](https://gradle.com/develocity/) instance
 at [https://ge.hibernate.org](https://ge.hibernate.org/scans?search.rootProjectNames=Hibernate%20Search)
-to speed up its build through a build cache
+to speed up its build through a build cache.
 
 By default, only [continuous integration](#ci) builds will write to the remote build cache or publish build scans.
 
@@ -92,7 +92,7 @@ If you already did that, close IntelliJ IDEA, run `./mvnw clean`, and open Intel
 You will need to change some settings:
 
 * `Build, Execution, Deployment > Build Tools > Maven`: set `Maven home path` to `Use Maven wrapper`
-* In `Project structure`, make sure the project JDK is JDK 17.
+* In `Project structure`, make sure the project JDK is JDK 21.
 * Set up [formatting rules and code style](#setup-ide-formatting).
 
 Then a few steps will initialize your workspace:
@@ -150,7 +150,7 @@ Be especially careful about setting up the [formatting rules and code style](#se
 If you built the project at least once (`./mvnw clean install`),
 you can very quickly check that you have respected the formatting rules by running Checkstyle:
 ```bash
-./mvnw checkstyle:check -fn
+./mvnw spotless:check checkstyle:check -fn
 ```
 
 ### Create a topic branch
@@ -212,20 +212,20 @@ or `org.hibernate.search.integrationtest.backend.lucene.testsupport.util.LuceneT
 
 * Push your changes to a topic branch in your fork of the repository.
 * Initiate a [pull request](http://help.github.com/send-pull-requests/).
-* Update the JIRA issue, using the "Link to pull request" button to include a link to
-the created pull request.
+* Jira automation should link your pull request to the corresponding JIRA issue and update its status.
 
 ## <a id="source-code-structure"></a> Source code structure
 
 The project is split in several Maven modules:
 
-* `build`: Various modules that are mostly useful for the build itself.
+* `build`: Various modules that are mostly useful for the build itself. Some of the submodules:
+  * `build-config`: Code-related artifacts like [checkstyle](https://checkstyle.org/) and
+    [forbiddenapis](https://github.com/policeman-tools/forbidden-apis) rules.
+  * `enforcer`: Contains custom enforcer rules used in the project build.
 * `backend`: The backends, i.e. the modules that provide integration to actual indexing services.
   * `elasticsearch`: A backend that connects to a remote Elasticsearch cluster.
   * `elasticsearch-aws`: Implementation of AWS authentication using request signing for the Elasticsearch backend.
   * `lucene`: A backend that uses an embedded (same JVM) Lucene instance.
-* `build-config`: Code-related artifacts like [checkstyle](https://checkstyle.org/) and
-[forbiddenapis](https://github.com/policeman-tools/forbidden-apis) rules.
 * `distribution`: Builds the distribution package.
 * `documentation`: The project documentation.
 * `engine`: The Hibernate Search engine.
@@ -265,7 +265,7 @@ Note: on Windows, you will need a Docker install able to run Linux containers.
 If you don't have that, you can skip the Elasticsearch tests and only run tests against H2 database (without using DB containers):
 `./mvnw clean install -Dtest.elasticsearch.skip=true`.
 
-Note: the produced JARs are compatible with Java 8 and later,
+Note: the produced JARs are compatible with Java 17 and later,
 regardless of the JDK used to build Hibernate Search.
 
 **WARNING:** Avoid using other goals unless you know what you're doing, because they may leave your workspace
@@ -300,7 +300,7 @@ You can then find the freshly built documentation at the following location:
 ./documentation/target/dist/
 ```
 
-By default only the HTML output is enabled; to also generate the PDF output, enable the `documentation-pdf` profile:
+By default, only the HTML output is enabled; to also generate the PDF output, enable the `documentation-pdf` profile:
 
 ```bash
 ./mvnw clean install -pl documentation -am -DskipTests -Pdocumentation-pdf
