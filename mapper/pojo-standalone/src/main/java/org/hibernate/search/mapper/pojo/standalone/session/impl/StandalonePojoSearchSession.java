@@ -25,6 +25,7 @@ import org.hibernate.search.mapper.pojo.standalone.massindexing.impl.StandaloneP
 import org.hibernate.search.mapper.pojo.standalone.reporting.impl.StandalonePojoMapperHints;
 import org.hibernate.search.mapper.pojo.standalone.schema.management.SearchSchemaManager;
 import org.hibernate.search.mapper.pojo.standalone.scope.SearchScope;
+import org.hibernate.search.mapper.pojo.standalone.scope.StandalonePojoRootReferenceScope;
 import org.hibernate.search.mapper.pojo.standalone.scope.impl.SearchScopeImpl;
 import org.hibernate.search.mapper.pojo.standalone.session.SearchSession;
 import org.hibernate.search.mapper.pojo.standalone.session.SearchSessionBuilder;
@@ -127,13 +128,21 @@ public class StandalonePojoSearchSession extends AbstractPojoSearchSession
 	}
 
 	@Override
-	public <T> SearchQuerySelectStep<?, EntityReference, T, ?, ?, ?> search(Collection<? extends Class<? extends T>> classes) {
+	public <T> SearchQuerySelectStep<T, ?, EntityReference, T, ?, ?, ?> search(
+			Collection<? extends Class<? extends T>> classes) {
 		return search( scope( classes ) );
 	}
 
 	@Override
-	public <T> SearchQuerySelectStep<?, EntityReference, T, ?, ?, ?> search(SearchScope<T> scope) {
-		return search( (SearchScopeImpl<T>) scope );
+	public <SR, T> SearchQuerySelectStep<SR, ?, EntityReference, T, ?, ?, ?> search(SearchScope<SR, T> scope) {
+		return search( (SearchScopeImpl<SR, T>) scope );
+	}
+
+	@Override
+	public <SR, T> SearchQuerySelectStep<SR, ?, EntityReference, T, ?, ?, ?> search(
+			StandalonePojoRootReferenceScope<SR, T> referenceScope) {
+		SearchScope<SR, T> scope = referenceScope.create( this );
+		return search( scope );
 	}
 
 	@Override
@@ -147,12 +156,12 @@ public class StandalonePojoSearchSession extends AbstractPojoSearchSession
 	}
 
 	@Override
-	public <T> SearchScopeImpl<T> scope(Collection<? extends Class<? extends T>> types) {
+	public <SR, T> SearchScopeImpl<SR, T> scope(Collection<? extends Class<? extends T>> types) {
 		return mappingContext.createScope( types );
 	}
 
 	@Override
-	public <T> SearchScopeImpl<T> scope(Class<T> expectedSuperType, Collection<String> entityNames) {
+	public <SR, T> SearchScopeImpl<SR, T> scope(Class<T> expectedSuperType, Collection<String> entityNames) {
 		return mappingContext.createScope( expectedSuperType, entityNames );
 	}
 
@@ -200,7 +209,7 @@ public class StandalonePojoSearchSession extends AbstractPojoSearchSession
 		return mappingContext;
 	}
 
-	private <T> SearchQuerySelectStep<?, EntityReference, T, ?, ?, ?> search(SearchScopeImpl<T> scope) {
+	private <SR, T> SearchQuerySelectStep<SR, ?, EntityReference, T, ?, ?, ?> search(SearchScopeImpl<SR, T> scope) {
 		return scope.search( this, loadingContextBuilder() );
 	}
 

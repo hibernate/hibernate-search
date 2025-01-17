@@ -42,11 +42,12 @@ import org.hibernate.search.engine.spatial.GeoPoint;
 import org.hibernate.search.util.common.impl.Contracts;
 
 public abstract class AbstractSearchProjectionFactory<
-		S extends ExtendedSearchProjectionFactory<S, R, E>,
+		SR,
+		S extends ExtendedSearchProjectionFactory<SR, S, R, E>,
 		SC extends SearchProjectionIndexScope<?>,
 		R,
 		E>
-		implements ExtendedSearchProjectionFactory<S, R, E> {
+		implements ExtendedSearchProjectionFactory<SR, S, R, E> {
 
 	protected final SearchProjectionDslContext<SC> dslContext;
 
@@ -106,12 +107,12 @@ public abstract class AbstractSearchProjectionFactory<
 	@Override
 	public CompositeProjectionInnerStep object(String objectFieldPath) {
 		Contracts.assertNotNull( objectFieldPath, "objectFieldPath" );
-		return new CompositeProjectionInnerStepImpl( dslContext, this, objectFieldPath );
+		return new CompositeProjectionInnerStepImpl<>( dslContext, this, objectFieldPath );
 	}
 
 	@Override
 	public CompositeProjectionInnerStep composite() {
-		return new CompositeProjectionInnerStepImpl( dslContext, this );
+		return new CompositeProjectionInnerStepImpl<>( dslContext, this );
 	}
 
 	@Override
@@ -132,14 +133,14 @@ public abstract class AbstractSearchProjectionFactory<
 	}
 
 	@Override
-	public <T> T extension(SearchProjectionFactoryExtension<T, R, E> extension) {
+	public <T> T extension(SearchProjectionFactoryExtension<SR, T, R, E> extension) {
 		return DslExtensionState.returnIfSupported(
 				extension, extension.extendOptional( this )
 		);
 	}
 
 	@Override
-	public <T> SearchProjectionFactoryExtensionIfSupportedStep<T, R, E> extension() {
+	public <T> SearchProjectionFactoryExtensionIfSupportedStep<SR, T, R, E> extension() {
 		return new SearchProjectionFactoryExtensionStep<>( this );
 	}
 

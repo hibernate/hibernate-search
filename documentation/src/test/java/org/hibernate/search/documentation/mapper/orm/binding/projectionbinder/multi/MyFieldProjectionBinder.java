@@ -32,7 +32,7 @@ public class MyFieldProjectionBinder implements ProjectionBinder {
 	private static class MyProjectionDefinition
 			implements ProjectionDefinition<List<String>> { // <4>
 		@Override
-		public SearchProjection<List<String>> create(SearchProjectionFactory<?, ?> factory,
+		public SearchProjection<List<String>> create(SearchProjectionFactory<?, ?, ?> factory,
 				ProjectionDefinitionContext context) {
 			return factory.field( "tags", String.class )
 					.collector( ProjectionCollector.list() ) // <4>

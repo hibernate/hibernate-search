@@ -59,7 +59,7 @@ class CustomConstructorMappingAnnotationBaseIT {
 	@RegisterExtension
 	public StaticCounters counters = StaticCounters.create();
 
-	protected final ProjectionFinalStep<?> dummyProjectionForEnclosingClassInstance(SearchProjectionFactory<?, ?> f) {
+	protected final ProjectionFinalStep<?> dummyProjectionForEnclosingClassInstance(SearchProjectionFactory<?, ?, ?> f) {
 		return f.constant( null );
 	}
 
@@ -96,7 +96,7 @@ class CustomConstructorMappingAnnotationBaseIT {
 			backendMock.expectSearchProjection(
 					INDEX_NAME,
 					b -> {
-						SearchProjectionFactory<?, ?> f = mapping.scope( IndexedEntity.class ).projection();
+						SearchProjectionFactory<?, ?, ?> f = mapping.scope( IndexedEntity.class ).projection();
 						b.projection( f.composite()
 								.from(
 										dummyProjectionForEnclosingClassInstance( f ),
