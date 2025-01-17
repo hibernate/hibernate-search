@@ -15,7 +15,7 @@ import java.util.stream.Collectors;
 
 import jakarta.persistence.EntityManagerFactory;
 
-import org.hibernate.search.jakarta.batch.core.massindexing.util.impl.EntityTypeDescriptor;
+import org.hibernate.search.jakarta.batch.core.massindexing.util.impl.BatchCoreEntityTypeDescriptor;
 import org.hibernate.search.mapper.orm.tenancy.spi.TenancyConfiguration;
 import org.hibernate.search.mapper.pojo.massindexing.MassIndexingDefaultCleanOperation;
 
@@ -33,7 +33,7 @@ public class JobContextData {
 	 * In Jakarta Batch standard, only string values can be propagated using job properties, but class types are frequently
 	 * used too. So this map has string keys to facilitate lookup for values extracted from job properties.
 	 */
-	private Map<String, EntityTypeDescriptor<?, ?>> entityTypeDescriptorMap;
+	private Map<String, BatchCoreEntityTypeDescriptor<?, ?>> entityTypeDescriptorMap;
 
 	private TenancyConfiguration tenancyConfiguration;
 	private MassIndexingDefaultCleanOperation massIndexingDefaultCleanOperation;
@@ -50,8 +50,8 @@ public class JobContextData {
 		this.entityManagerFactory = entityManagerFactory;
 	}
 
-	public void setEntityTypeDescriptors(Collection<EntityTypeDescriptor<?, ?>> descriptors) {
-		for ( EntityTypeDescriptor<?, ?> descriptor : descriptors ) {
+	public void setEntityTypeDescriptors(Collection<BatchCoreEntityTypeDescriptor<?, ?>> descriptors) {
+		for ( BatchCoreEntityTypeDescriptor<?, ?> descriptor : descriptors ) {
 			entityTypeDescriptorMap.put( descriptor.jpaEntityName(), descriptor );
 		}
 	}
@@ -72,8 +72,8 @@ public class JobContextData {
 		this.massIndexingDefaultCleanOperation = massIndexingDefaultCleanOperation;
 	}
 
-	public EntityTypeDescriptor<?, ?> getEntityTypeDescriptor(String entityName) {
-		EntityTypeDescriptor<?, ?> descriptor = entityTypeDescriptorMap.get( entityName );
+	public BatchCoreEntityTypeDescriptor<?, ?> getEntityTypeDescriptor(String entityName) {
+		BatchCoreEntityTypeDescriptor<?, ?> descriptor = entityTypeDescriptorMap.get( entityName );
 		if ( descriptor == null ) {
 			String msg = String.format( Locale.ROOT, "entity type %s not found.", entityName );
 			throw new NoSuchElementException( msg );
@@ -81,13 +81,13 @@ public class JobContextData {
 		return descriptor;
 	}
 
-	public List<EntityTypeDescriptor<?, ?>> getEntityTypeDescriptors() {
+	public List<BatchCoreEntityTypeDescriptor<?, ?>> getEntityTypeDescriptors() {
 		return new ArrayList<>( entityTypeDescriptorMap.values() );
 	}
 
 	public List<Class<?>> getEntityTypes() {
 		return entityTypeDescriptorMap.values().stream()
-				.map( EntityTypeDescriptor::javaClass )
+				.map( BatchCoreEntityTypeDescriptor::javaClass )
 				.collect( Collectors.toList() );
 	}
 
