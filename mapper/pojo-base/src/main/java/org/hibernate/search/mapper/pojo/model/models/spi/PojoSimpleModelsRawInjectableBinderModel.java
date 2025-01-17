@@ -14,13 +14,15 @@ import java.util.stream.Stream;
 
 import org.hibernate.models.spi.MemberDetails;
 import org.hibernate.search.mapper.pojo.model.spi.GenericContextAwarePojoGenericTypeModel.RawTypeDeclaringContext;
-import org.hibernate.search.mapper.pojo.model.spi.PojoPropertyModel;
+import org.hibernate.search.mapper.pojo.model.spi.PojoInjectableBinderModel;
+import org.hibernate.search.mapper.pojo.model.spi.PojoInjectablePropertyModel;
 import org.hibernate.search.mapper.pojo.model.spi.PojoRawTypeIdentifier;
 
-public final class PojoSimpleModelsRawTypeModel<T>
-		extends AbstractPojoModelsRawTypeModel<T, AbstractPojoModelsBootstrapIntrospector, PojoPropertyModel<?>> {
+public final class PojoSimpleModelsRawInjectableBinderModel<T>
+		extends AbstractPojoModelsRawTypeModel<T, AbstractPojoModelsBootstrapIntrospector, PojoInjectablePropertyModel<?>>
+		implements PojoInjectableBinderModel<T> {
 
-	public PojoSimpleModelsRawTypeModel(AbstractPojoModelsBootstrapIntrospector introspector,
+	public PojoSimpleModelsRawInjectableBinderModel(AbstractPojoModelsBootstrapIntrospector introspector,
 			PojoRawTypeIdentifier<T> typeIdentifier,
 			RawTypeDeclaringContext<T> rawTypeDeclaringContext) {
 		super( introspector, typeIdentifier, rawTypeDeclaringContext );
@@ -28,25 +30,26 @@ public final class PojoSimpleModelsRawTypeModel<T>
 
 	@Override
 	@SuppressWarnings("unchecked") // xClass represents T, so its supertypes represent ? super T
-	public Stream<PojoSimpleModelsRawTypeModel<? super T>> ascendingSuperTypes() {
+	public Stream<PojoSimpleModelsRawInjectableBinderModel<? super T>> ascendingSuperTypes() {
 		return introspector.ascendingSuperClasses( classDetails )
-				.map( xc -> (PojoSimpleModelsRawTypeModel<? super T>) introspector.typeModel( xc ) );
+				.map( xc -> (PojoSimpleModelsRawInjectableBinderModel<? super T>) introspector.injectableBinderModel( xc ) );
 	}
 
 	@Override
 	@SuppressWarnings("unchecked") // xClass represents T, so its supertypes represent ? super T
-	public Stream<PojoSimpleModelsRawTypeModel<? super T>> descendingSuperTypes() {
+	public Stream<PojoSimpleModelsRawInjectableBinderModel<? super T>> descendingSuperTypes() {
 		return introspector.descendingSuperClasses( classDetails )
-				.map( xc -> (PojoSimpleModelsRawTypeModel<? super T>) introspector.typeModel( xc ) );
+				.map( xc -> (PojoSimpleModelsRawInjectableBinderModel<? super T>) introspector.injectableBinderModel( xc ) );
 	}
 
 	@Override
-	protected PojoPropertyModel<?> createPropertyModel(String propertyName) {
-		List<MemberDetails> declaredProperties = new ArrayList<>( 2 );
-		List<MemberDetails> methodAccessProperties = declaredMethodAccessPropertiesByName().get( propertyName );
-		if ( methodAccessProperties != null ) {
-			declaredProperties.addAll( methodAccessProperties );
-		}
+	protected Stream<String> declaredPropertyNames() {
+		return declaredFieldAccessPropertiesByName().keySet().stream();
+	}
+
+	@Override
+	protected PojoInjectablePropertyModel<?> createPropertyModel(String propertyName) {
+		List<MemberDetails> declaredProperties = new ArrayList<>( 1 );
 		MemberDetails fieldAccessProperty = declaredFieldAccessPropertiesByName().get( propertyName );
 		if ( fieldAccessProperty != null ) {
 			declaredProperties.add( fieldAccessProperty );
@@ -57,7 +60,7 @@ public final class PojoSimpleModelsRawTypeModel<T>
 			return null;
 		}
 
-		return new PojoSimpleModelsPropertyModel<>( introspector, this, propertyName,
+		return new PojoSimpleModelsInjectablePropertyModel<>( introspector, this, propertyName,
 				declaredProperties, members );
 	}
 
@@ -72,7 +75,7 @@ public final class PojoSimpleModelsRawTypeModel<T>
 		return field == null ? null : Collections.singletonList( field );
 	}
 
-	private <T2> T2 findInSelfOrParents(Function<PojoSimpleModelsRawTypeModel<?>, T2> getter) {
+	private <T2> T2 findInSelfOrParents(Function<PojoSimpleModelsRawInjectableBinderModel<?>, T2> getter) {
 		return ascendingSuperTypes()
 				.map( getter )
 				.filter( Objects::nonNull )

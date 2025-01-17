@@ -43,19 +43,22 @@ class AnnotationPojoTypeMetadataContributorFactory {
 	private final FailureCollector rootFailureCollector;
 	private final PojoMappingConfigurationContext configurationContext;
 	private final AnnotationHelper annotationHelper;
+	private final AnnotationPojoInjectableBinderCollector injectableBinderCollector;
 	private final AnnotationProcessorProvider annotationProcessorProvider;
 
 	AnnotationPojoTypeMetadataContributorFactory(BeanResolver beanResolver, FailureCollector rootFailureCollector,
-			PojoMappingConfigurationContext configurationContext, AnnotationHelper annotationHelper) {
+			PojoMappingConfigurationContext configurationContext, AnnotationHelper annotationHelper,
+			AnnotationPojoInjectableBinderCollector injectableBinderCollector) {
 		this.rootFailureCollector = rootFailureCollector;
 		this.configurationContext = configurationContext;
 		this.annotationHelper = annotationHelper;
+		this.injectableBinderCollector = injectableBinderCollector;
 		this.annotationProcessorProvider = new AnnotationProcessorProvider( beanResolver, rootFailureCollector );
 	}
 
 	public Optional<PojoTypeMetadataContributor> createIfAnnotated(PojoRawTypeModel<?> typeModel) {
 		// Create a programmatic type mapping object
-		TypeMappingStepImpl typeMappingStep = new TypeMappingStepImpl( typeModel );
+		TypeMappingStepImpl typeMappingStep = new TypeMappingStepImpl( typeModel, injectableBinderCollector );
 
 		// Process annotations and add metadata to the type mapping
 		boolean processedAtLeastOneAnnotation = processAnnotations( typeMappingStep, typeModel );

@@ -45,6 +45,7 @@ public class AnnotationMappingConfigurationContextImpl
 
 	private final PojoBootstrapIntrospector introspector;
 	private final MapperHints mapperHints;
+	private final AnnotationPojoInjectableBinderCollector injectableBinderCollector;
 
 	private boolean discoverAnnotatedTypesFromRootMappingAnnotations = false;
 	private boolean discoverJandexIndexesFromAddedTypes = false;
@@ -56,9 +57,11 @@ public class AnnotationMappingConfigurationContextImpl
 	private final List<IndexView> explicitJandexIndexes = new ArrayList<>();
 
 	public AnnotationMappingConfigurationContextImpl(PojoBootstrapIntrospector introspector,
-			MapperHints mapperHints) {
+			MapperHints mapperHints,
+			AnnotationPojoInjectableBinderCollector injectableBinderCollector) {
 		this.introspector = introspector;
 		this.mapperHints = mapperHints;
+		this.injectableBinderCollector = injectableBinderCollector;
 	}
 
 	@Override
@@ -111,7 +114,7 @@ public class AnnotationMappingConfigurationContextImpl
 		AnnotationHelper annotationHelper = new AnnotationHelper( introspector.annotationValueHandleFactory() );
 		AnnotationPojoTypeMetadataContributorFactory contributorFactory =
 				new AnnotationPojoTypeMetadataContributorFactory( beanResolver, failureCollector, configurationContext,
-						annotationHelper );
+						annotationHelper, injectableBinderCollector );
 
 		Set<PojoRawTypeModel<?>> typesToProcess = new LinkedHashSet<>();
 
@@ -154,6 +157,8 @@ public class AnnotationMappingConfigurationContextImpl
 					new PojoAnnotationTypeMetadataDiscoverer( contributorFactory, alreadyContributedTypes );
 			collector.collectDiscoverer( discoverer );
 		}
+
+		injectableBinderCollector.processDiscoveredBinders();
 	}
 
 	private void discoverAnnotatedTypesFromRootMappingAnnotation(Set<PojoRawTypeModel<?>> annotatedTypes,
