@@ -156,7 +156,7 @@
                 - remove and generate the files in mapper/orm-outbox-polling/src/main/avro/generated
         -->
         <version.org.apache.avro>1.12.0</version.org.apache.avro>
-        <version.org.jboss.weld>5.1.4.Final</version.org.jboss.weld>
+        <version.org.jboss.weld>5.1.5.Final</version.org.jboss.weld>
 
         <!-- >>> JDBC Drivers -->
         <version.com.h2database>2.3.232</version.com.h2database>
@@ -165,7 +165,7 @@
         <version.org.apache.derby>10.15.2.0</version.org.apache.derby>
         <version.org.postgresql>42.7.5</version.org.postgresql>
         <version.org.mariadb.jdbc>3.5.1</version.org.mariadb.jdbc>
-        <version.mysql.mysql-connector-j>9.1.0</version.mysql.mysql-connector-j>
+        <version.mysql.mysql-connector-j>9.2.0</version.mysql.mysql-connector-j>
         <version.com.ibm.db2.jcc>12.1.0.0</version.com.ibm.db2.jcc>
         <version.com.oracle.database.jdbc>23.6.0.24.10</version.com.oracle.database.jdbc>
         <version.com.microsoft.sqlserver.mssql-jdbc>12.2.0.jre11</version.com.microsoft.sqlserver.mssql-jdbc>
