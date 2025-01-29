@@ -14,8 +14,10 @@ import org.hibernate.search.engine.environment.bean.BeanResolver;
 import org.hibernate.search.engine.mapper.mapping.building.spi.IndexBindingContext;
 import org.hibernate.search.mapper.pojo.bridge.PropertyBridge;
 import org.hibernate.search.mapper.pojo.bridge.binding.PropertyBindingContext;
+import org.hibernate.search.mapper.pojo.bridge.mapping.impl.BeanDelegatingBinder;
 import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.PropertyBinder;
 import org.hibernate.search.mapper.pojo.logging.impl.MappingLog;
+import org.hibernate.search.mapper.pojo.mapping.definition.annotation.impl.PojoInjectableBinderInjector;
 import org.hibernate.search.mapper.pojo.model.PojoModelProperty;
 import org.hibernate.search.mapper.pojo.model.dependency.PojoPropertyIndexingDependencyConfigurationContext;
 import org.hibernate.search.mapper.pojo.model.dependency.impl.PojoPropertyIndexingDependencyConfigurationContextImpl;
@@ -31,6 +33,7 @@ public class PropertyBindingContextImpl<P> extends AbstractCompositeBindingConte
 		implements PropertyBindingContext {
 
 	private final PojoBootstrapIntrospector introspector;
+	private final PojoInjectableBinderInjector binderInjector;
 	private final PojoTypeModel<?> propertyTypeModel;
 	private final PojoModelPropertyRootElement<P> bridgedElement;
 	private final PojoPropertyIndexingDependencyConfigurationContextImpl<P> dependencyContext;
@@ -42,6 +45,7 @@ public class PropertyBindingContextImpl<P> extends AbstractCompositeBindingConte
 
 	public PropertyBindingContextImpl(BeanResolver beanResolver,
 			PojoBootstrapIntrospector introspector,
+			PojoInjectableBinderInjector binderInjector,
 			PojoTypeModel<P> propertyTypeModel,
 			IndexBindingContext indexBindingContext,
 			PojoModelPropertyRootElement<P> bridgedElement,
@@ -49,6 +53,7 @@ public class PropertyBindingContextImpl<P> extends AbstractCompositeBindingConte
 			Map<String, Object> params) {
 		super( beanResolver, params );
 		this.introspector = introspector;
+		this.binderInjector = binderInjector;
 		this.propertyTypeModel = propertyTypeModel;
 		this.bridgedElement = bridgedElement;
 		this.dependencyContext = dependencyContext;
@@ -90,6 +95,11 @@ public class PropertyBindingContextImpl<P> extends AbstractCompositeBindingConte
 	public Optional<BoundPropertyBridge<P>> applyBinder(PropertyBinder binder) {
 		try {
 			// This call should set the partial binding
+			// TODO: we probably should delay the injection of the binder properties till this point
+			//  here we have access to the index schema element and can create the sub-elements we need.
+			if ( !BeanDelegatingBinder.class.equals( binder.getClass() ) ) {
+				injectBinderFields( binder );
+			}
 			binder.bind( this );
 			if ( partialBinding == null ) {
 				throw MappingLog.INSTANCE.missingBridgeForBinder( binder );
@@ -133,6 +143,13 @@ public class PropertyBindingContextImpl<P> extends AbstractCompositeBindingConte
 				(BeanHolder<? extends PropertyBridge<? super P>>) bridgeHolder;
 
 		this.partialBinding = new PartialBinding<>( castedBridgeHolder );
+	}
+
+	// TODO: if users have their delegating binders, those won't get injected with fields ...
+	//  we probably do not care as much about it as in that case we won't get anything out for the static model ...
+	//  but just in case we think of some valid use case then maybe expose this method (or rather whatever it will grow into) through the context to the user.
+	public void injectBinderFields(PropertyBinder binder) {
+		binderInjector.injectFields( binder, indexSchemaElement, params() );
 	}
 
 	private static class PartialBinding<P> {

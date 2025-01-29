@@ -57,7 +57,7 @@ public class DocumentIdProcessor implements PropertyMappingAnnotationProcessor<D
 			return new BeanBinder( bridgeReference.get() );
 		}
 		else if ( binderReference.isPresent() ) {
-			return new BeanDelegatingBinder( binderReference.get() );
+			return new BeanDelegatingBinder( binderReference.get(), binderReferenceAnnotation.type() );
 		}
 		else {
 			// The bridge will be auto-detected from the property type

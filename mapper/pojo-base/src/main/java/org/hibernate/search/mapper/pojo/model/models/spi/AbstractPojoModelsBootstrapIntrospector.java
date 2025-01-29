@@ -9,6 +9,7 @@ import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.Member;
 import java.lang.reflect.Method;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
@@ -18,6 +19,7 @@ import java.util.stream.Collector;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import org.hibernate.models.UnknownClassException;
 import org.hibernate.models.internal.BasicModelBuildingContextImpl;
 import org.hibernate.models.internal.SimpleClassLoading;
 import org.hibernate.models.jandex.internal.JandexModelBuildingContextImpl;
@@ -26,20 +28,27 @@ import org.hibernate.models.spi.ClassDetails;
 import org.hibernate.models.spi.ClassDetailsRegistry;
 import org.hibernate.models.spi.MemberDetails;
 import org.hibernate.models.spi.MethodDetails;
+import org.hibernate.search.mapper.pojo.logging.impl.MappingLog;
+import org.hibernate.search.mapper.pojo.model.spi.GenericContextAwarePojoGenericTypeModel;
 import org.hibernate.search.mapper.pojo.model.spi.PojoBootstrapIntrospector;
+import org.hibernate.search.mapper.pojo.model.spi.PojoInjectableBinderModel;
+import org.hibernate.search.mapper.pojo.model.spi.PojoRawTypeIdentifier;
 import org.hibernate.search.util.common.AssertionFailure;
 import org.hibernate.search.util.common.impl.StreamHelper;
 import org.hibernate.search.util.common.reflect.spi.ValueCreateHandle;
 import org.hibernate.search.util.common.reflect.spi.ValueHandleFactory;
 import org.hibernate.search.util.common.reflect.spi.ValueReadHandle;
+import org.hibernate.search.util.common.reflect.spi.ValueReadWriteHandle;
 
 import org.jboss.jandex.IndexView;
 
 public abstract class AbstractPojoModelsBootstrapIntrospector implements PojoBootstrapIntrospector {
 
 	private final PojoModelsClassOrdering typeOrdering;
-	protected final ValueHandleFactory valueHandleFactory;
 	private final ClassDetailsRegistry classDetailsRegistry;
+	private final Map<Class<?>, PojoInjectableBinderModel<?>> injectableBinderModelCache = new HashMap<>();
+	protected final PojoModelsGenericContextHelper genericContextHelper;
+	protected final ValueHandleFactory valueHandleFactory;
 
 	public AbstractPojoModelsBootstrapIntrospector(ValueHandleFactory valueHandleFactory) {
 		this( simpleClassDetailsRegistry( null ), valueHandleFactory );
@@ -50,6 +59,7 @@ public abstract class AbstractPojoModelsBootstrapIntrospector implements PojoBoo
 		this.classDetailsRegistry = classDetailsRegistry;
 		this.typeOrdering = new PojoModelsClassOrdering( classDetailsRegistry );
 		this.valueHandleFactory = valueHandleFactory;
+		this.genericContextHelper = new PojoModelsGenericContextHelper( this );
 	}
 
 	protected static ClassDetailsRegistry simpleClassDetailsRegistry(IndexView indexView) {
@@ -70,6 +80,29 @@ public abstract class AbstractPojoModelsBootstrapIntrospector implements PojoBoo
 	@Override
 	public ValueHandleFactory annotationValueHandleFactory() {
 		return valueHandleFactory;
+	}
+
+	@SuppressWarnings("unchecked")
+	@Override
+	public <T> PojoInjectableBinderModel<T> injectableBinderModel(Class<T> clazz) {
+		return (PojoInjectableBinderModel<T>) injectableBinderModelCache.computeIfAbsent(
+				clazz, this::createInjectableBinderModel );
+	}
+
+	private <T> PojoInjectableBinderModel<T> createInjectableBinderModel(Class<T> clazz) {
+		PojoRawTypeIdentifier<T> typeIdentifier = PojoRawTypeIdentifier.of( clazz );
+		try {
+			return new PojoSimpleModelsRawInjectableBinderModel<>(
+					this, typeIdentifier,
+					new GenericContextAwarePojoGenericTypeModel.RawTypeDeclaringContext<>( genericContextHelper, clazz )
+			);
+		}
+		catch (UnknownClassException e) {
+			throw e;
+		}
+		catch (RuntimeException e) {
+			throw MappingLog.INSTANCE.errorRetrievingInjectableBinderModel( clazz, e );
+		}
 	}
 
 	public Stream<? extends Annotation> annotations(AnnotationTarget annotationTarget) {
@@ -115,6 +148,15 @@ public abstract class AbstractPojoModelsBootstrapIntrospector implements PojoBoo
 		else if ( member instanceof Field ) {
 			Field field = (Field) member;
 			return valueHandleFactory.createForField( field );
+		}
+		else {
+			throw new AssertionFailure( "Unexpected type for a " + Member.class.getName() + ": " + member );
+		}
+	}
+
+	protected ValueReadWriteHandle<?> createValueReadWriteHandle(Member member) throws IllegalAccessException {
+		if ( member instanceof Field field ) {
+			return valueHandleFactory.createForFieldWrite( field );
 		}
 		else {
 			throw new AssertionFailure( "Unexpected type for a " + Member.class.getName() + ": " + member );

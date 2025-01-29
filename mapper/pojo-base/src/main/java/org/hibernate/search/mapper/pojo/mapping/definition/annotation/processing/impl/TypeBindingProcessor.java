@@ -42,6 +42,6 @@ public final class TypeBindingProcessor implements TypeMappingAnnotationProcesso
 			throw MappingLog.INSTANCE.missingBinderReferenceInBinding();
 		}
 
-		return new BeanDelegatingBinder( binderReference.get() );
+		return new BeanDelegatingBinder( binderReference.get(), binderReferenceAnnotation.type() );
 	}
 }

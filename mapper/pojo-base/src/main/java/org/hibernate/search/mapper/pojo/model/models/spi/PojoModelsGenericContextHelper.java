@@ -29,7 +29,7 @@ public class PojoModelsGenericContextHelper implements GenericContextAwarePojoGe
 
 	@Override
 	public Type propertyGenericType(PojoPropertyModel<?> rawPropertyModel) {
-		AbstractPojoModelsPropertyModel<?, ?> propertyModel = (AbstractPojoModelsPropertyModel<?, ?>) rawPropertyModel;
+		AbstractPojoModelsPropertyModel<?, ?, ?> propertyModel = (AbstractPojoModelsPropertyModel<?, ?, ?>) rawPropertyModel;
 		return propertyModel.getterGenericReturnType();
 	}
 }

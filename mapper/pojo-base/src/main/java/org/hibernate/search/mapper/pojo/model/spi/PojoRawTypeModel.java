@@ -77,7 +77,7 @@ public interface PojoRawTypeModel<T> extends PojoTypeModel<T>, MappableTypeModel
 	/**
 	 * @return All declared properties of this type.
 	 */
-	Collection<PojoPropertyModel<?>> declaredProperties();
+	Collection<? extends PojoPropertyModel<?>> declaredProperties();
 
 	/**
 	 * @param other The type to cast to this type.
