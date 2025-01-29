@@ -34,7 +34,7 @@ class EntityReferenceProjectionIT extends AbstractEntityReferenceProjectionIT {
 	}
 
 	@Override
-	public <R, E, LOS> SearchQueryWhereStep<?, R, LOS, ?> select(SearchQuerySelectStep<?, R, E, LOS, ?, ?> step) {
+	public <SR, R, E, LOS> SearchQueryWhereStep<SR, ?, R, LOS, ?> select(SearchQuerySelectStep<SR, ?, R, E, LOS, ?, ?> step) {
 		return step.select( f -> f.entityReference() );
 	}
 }

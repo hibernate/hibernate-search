@@ -5,8 +5,8 @@
 package org.hibernate.search.engine.mapper.scope.spi;
 
 
-public interface MappedIndexScopeBuilder<R, E> {
+public interface MappedIndexScopeBuilder<SR, R, E> {
 
-	MappedIndexScope<R, E> build();
+	MappedIndexScope<SR, R, E> build();
 
 }

@@ -19,15 +19,15 @@ import org.hibernate.search.engine.search.projection.spi.CompositeProjectionBuil
 import org.hibernate.search.engine.search.projection.spi.ProjectionTypeKeys;
 import org.hibernate.search.util.common.impl.Contracts;
 
-public class CompositeProjectionInnerStepImpl implements CompositeProjectionInnerStep {
+public class CompositeProjectionInnerStepImpl<SR> implements CompositeProjectionInnerStep {
 
 	private final SearchProjectionDslContext<?> dslContext;
-	private final SearchProjectionFactory<?, ?> projectionFactory;
+	private final SearchProjectionFactory<SR, ?, ?> projectionFactory;
 	private final CompositeProjectionBuilder builder;
 	private final String objectFieldPath;
 
 	public CompositeProjectionInnerStepImpl(SearchProjectionDslContext<?> dslContext,
-			SearchProjectionFactory<?, ?> projectionFactory) {
+			SearchProjectionFactory<SR, ?, ?> projectionFactory) {
 		this.dslContext = dslContext;
 		this.projectionFactory = projectionFactory;
 		this.builder = dslContext.scope().projectionBuilders().composite();
@@ -35,7 +35,7 @@ public class CompositeProjectionInnerStepImpl implements CompositeProjectionInne
 	}
 
 	public CompositeProjectionInnerStepImpl(SearchProjectionDslContext<?> dslContext,
-			SearchProjectionFactory<?, ?> projectionFactory, String objectFieldPath) {
+			SearchProjectionFactory<SR, ?, ?> projectionFactory, String objectFieldPath) {
 		this.dslContext = dslContext;
 		this.projectionFactory = projectionFactory;
 		this.builder = dslContext.scope().fieldQueryElement( objectFieldPath, ProjectionTypeKeys.OBJECT );
@@ -44,7 +44,7 @@ public class CompositeProjectionInnerStepImpl implements CompositeProjectionInne
 
 	@Override
 	public <V> CompositeProjectionValueStep<?, V> as(Class<V> objectClass) {
-		SearchProjectionFactory<?, ?> projectionFactoryWithCorrectRoot = objectFieldPath == null
+		SearchProjectionFactory<SR, ?, ?> projectionFactoryWithCorrectRoot = objectFieldPath == null
 				? projectionFactory
 				: projectionFactory.withRoot( objectFieldPath );
 		return dslContext.scope().projectionRegistry().composite( objectClass )

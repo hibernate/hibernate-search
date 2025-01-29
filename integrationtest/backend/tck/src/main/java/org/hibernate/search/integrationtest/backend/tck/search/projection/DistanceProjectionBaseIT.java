@@ -146,13 +146,13 @@ class DistanceProjectionBaseIT {
 		}
 
 		@Override
-		protected ProjectionFinalStep<Double> singleValuedProjection(SearchProjectionFactory<?, ?> f,
+		protected ProjectionFinalStep<Double> singleValuedProjection(SearchProjectionFactory<?, ?, ?> f,
 				String absoluteFieldPath, DataSet<GeoPoint, Double, DistanceProjectionTestValues> dataSet) {
 			return f.distance( absoluteFieldPath, dataSet.values.projectionCenterPoint() );
 		}
 
 		@Override
-		protected ProjectionFinalStep<List<Double>> multiValuedProjection(SearchProjectionFactory<?, ?> f,
+		protected ProjectionFinalStep<List<Double>> multiValuedProjection(SearchProjectionFactory<?, ?, ?> f,
 				String absoluteFieldPath, DataSet<GeoPoint, Double, DistanceProjectionTestValues> dataSet) {
 			return f.distance( absoluteFieldPath, dataSet.values.projectionCenterPoint() )
 					.collector( ProjectionCollector.list() );
@@ -174,7 +174,7 @@ class DistanceProjectionBaseIT {
 		}
 
 		@Override
-		protected void tryProjection(SearchProjectionFactory<?, ?> f, String fieldPath) {
+		protected void tryProjection(SearchProjectionFactory<?, ?, ?> f, String fieldPath) {
 			f.distance( fieldPath, GeoPoint.of( 0.0, 0.0 ) );
 		}
 
@@ -206,7 +206,7 @@ class DistanceProjectionBaseIT {
 		}
 
 		@Override
-		protected void tryProjection(SearchProjectionFactory<?, ?> f, String fieldPath) {
+		protected void tryProjection(SearchProjectionFactory<?, ?, ?> f, String fieldPath) {
 			f.distance( fieldPath, GeoPoint.of( 0.0, 0.0 ) );
 		}
 
@@ -245,7 +245,8 @@ class DistanceProjectionBaseIT {
 		}
 
 		@Override
-		protected void tryProjection(SearchProjectionFactory<?, ?> f, String fieldPath, FieldTypeDescriptor<?, ?> fieldType) {
+		protected void tryProjection(SearchProjectionFactory<?, ?, ?> f, String fieldPath,
+				FieldTypeDescriptor<?, ?> fieldType) {
 			f.distance( fieldPath, GeoPoint.of( 0.0, 0.0 ) );
 		}
 

@@ -80,7 +80,7 @@ class EntityProjectionIT extends AbstractEntityProjectionIT {
 	}
 
 	@Override
-	public <R, E, LOS> SearchQueryWhereStep<?, E, LOS, ?> select(SearchQuerySelectStep<?, R, E, LOS, ?, ?> step) {
+	public <SR, R, E, LOS> SearchQueryWhereStep<SR, ?, E, LOS, ?> select(SearchQuerySelectStep<SR, ?, R, E, LOS, ?, ?> step) {
 		return step.select( f -> f.entity() );
 	}
 
@@ -115,7 +115,7 @@ class EntityProjectionIT extends AbstractEntityProjectionIT {
 				.typeContext( mainIndex.typeName(), mainTypeContextMock )
 				.projectionRegistry( projectionRegistryMock )
 				.run( () -> {
-					GenericStubMappingScope<EntityReference, StubEntity> scope =
+					GenericStubMappingScope<?, EntityReference, StubEntity> scope =
 							mainIndex.createGenericScope( loadingContextMock );
 
 					IndexBinding binding = mainIndex.binding();
@@ -173,7 +173,7 @@ class EntityProjectionIT extends AbstractEntityProjectionIT {
 		mainIndex.mapping().with()
 				.typeContext( mainIndex.typeName(), mainTypeContextMock )
 				.run( () -> {
-					GenericStubMappingScope<EntityReference, StubEntity> scope =
+					GenericStubMappingScope<?, EntityReference, StubEntity> scope =
 							mainIndex.createGenericScope( loadingContextMock );
 					SearchQuery<StubEntity> query = scope.query().select( f -> f.entity( StubEntity.class ) )
 							.where( f -> f.matchAll() )
@@ -207,7 +207,7 @@ class EntityProjectionIT extends AbstractEntityProjectionIT {
 		mainIndex.mapping().with()
 				.typeContext( mainIndex.typeName(), mainTypeContextMock )
 				.run( () -> {
-					GenericStubMappingScope<EntityReference, StubEntity> scope =
+					GenericStubMappingScope<?, EntityReference, StubEntity> scope =
 							mainIndex.createGenericScope( loadingContextMock );
 					SearchQuery<Object> query = scope.query().select( f -> f.entity( Object.class ) )
 							.where( f -> f.matchAll() )
@@ -236,7 +236,7 @@ class EntityProjectionIT extends AbstractEntityProjectionIT {
 		mainIndex.mapping().with()
 				.typeContext( mainIndex.typeName(), mainTypeContextMock )
 				.run( () -> {
-					GenericStubMappingScope<EntityReference, StubEntity> scope =
+					GenericStubMappingScope<?, EntityReference, StubEntity> scope =
 							mainIndex.createGenericScope( loadingContextMock );
 					assertThatThrownBy( () -> scope.query().select( f -> f.entity( Integer.class ) ) )
 							.isInstanceOf( SearchException.class )

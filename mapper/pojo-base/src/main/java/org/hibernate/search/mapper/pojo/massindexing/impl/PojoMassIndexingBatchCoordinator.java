@@ -43,7 +43,7 @@ public class PojoMassIndexingBatchCoordinator extends PojoMassIndexingFailureHan
 	private final PojoMassIndexingContext massIndexingContext;
 
 	private final PojoScopeSchemaManager scopeSchemaManager;
-	private final PojoScopeDelegate<?, ?, ?> pojoScopeDelegate;
+	private final PojoScopeDelegate<?, ?, ?, ?> pojoScopeDelegate;
 	private final int typesToIndexInParallel;
 	private final int documentBuilderThreads;
 	private final Boolean mergeSegmentsOnFinish;
@@ -61,7 +61,7 @@ public class PojoMassIndexingBatchCoordinator extends PojoMassIndexingFailureHan
 			List<PojoMassIndexingIndexedTypeGroup<?>> typeGroupsToIndex,
 			PojoMassIndexingContext massIndexingContext,
 			PojoScopeSchemaManager scopeSchemaManager,
-			PojoScopeDelegate<?, ?, ?> pojoScopeDelegate,
+			PojoScopeDelegate<?, ?, ?, ?> pojoScopeDelegate,
 			MassIndexingEnvironment environment,
 			int typesToIndexInParallel, int documentBuilderThreads, Boolean mergeSegmentsOnFinish,
 			boolean dropAndCreateSchemaOnStart, Boolean purgeAtStart, Boolean mergeSegmentsAfterPurge) {
