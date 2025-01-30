@@ -323,11 +323,6 @@ class OrmSetupHelperCleaner {
 		}
 
 		@Override
-		public DataClearConfig clearOrder(Class<?>... entityClasses) {
-			return this;
-		}
-
-		@Override
 		public DataClearConfig clearIndexData(boolean clear) {
 			this.clearIndexData = clear;
 			return this;

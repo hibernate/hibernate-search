@@ -16,12 +16,6 @@ public interface DataClearConfig {
 
 	<T> DataClearConfig preClear(Class<T> entityType, Consumer<T> preClear);
 
-	/**
-	 * @deprecated No longer needed as we now use truncate
-	 */
-	@Deprecated
-	DataClearConfig clearOrder(Class<?>... entityClasses);
-
 	DataClearConfig clearIndexData(boolean clear);
 
 	default DataClearConfig clearDatabaseData(boolean clear) {

@@ -63,10 +63,7 @@ class AutomaticIndexingPolymorphicInverseSideAssociationIT {
 				FirstMiddleContainingEntity.class,
 				SecondMiddleContainingEntity.class,
 				ContainedEntity.class
-		).dataClearing( config -> config.clearOrder( IndexedEntity.class, ContainingEntity.class,
-				UnrelatedContainingEntity.class,
-				FirstMiddleContainingEntity.class, SecondMiddleContainingEntity.class, ContainedEntity.class
-		) ).setup();
+		).setup();
 	}
 
 	/**
