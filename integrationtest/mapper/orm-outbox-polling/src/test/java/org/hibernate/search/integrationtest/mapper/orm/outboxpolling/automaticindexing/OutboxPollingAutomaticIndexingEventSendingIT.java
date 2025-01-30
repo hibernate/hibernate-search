@@ -89,8 +89,6 @@ class OutboxPollingAutomaticIndexingEventSendingIT {
 				.withAnnotatedTypes( IndexedEntity.class, AnotherIndexedEntity.class, RoutedIndexedEntity.class,
 						IndexedAndContainingEntity.class, ContainedEntity.class, IndexedAndContainedEntity.class
 				)
-				.dataClearing( config -> config.clearOrder( ContainedEntity.class, IndexedAndContainedEntity.class,
-						IndexedAndContainingEntity.class ) )
 				.setup();
 	}
 

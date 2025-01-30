@@ -66,7 +66,6 @@ class OutboxPollingAutomaticIndexingEdgeCasesIT {
 						new TestingOutboxPollingInternalConfigurer().outboxEventFilter( eventFilter )
 				)
 				.withAnnotatedTypes( IndexedEntity.class, IndexedAndContainedEntity.class )
-				.dataClearing( config -> config.clearOrder( IndexedAndContainedEntity.class, IndexedEntity.class ) )
 				.setup();
 	}
 

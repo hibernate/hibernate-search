@@ -89,10 +89,7 @@ class SearchQueryBaseIT {
 		backendMock.expectAnySchema( Book.NAME );
 		backendMock.expectAnySchema( Author.NAME );
 
-		sessionFactory = ormSetupHelper.start().withAnnotatedTypes( Book.class, Author.class, NotIndexed.class )
-				.dataClearing(
-						config -> config.clearOrder( Book.class, Author.class, NotIndexed.class ) )
-				.setup();
+		sessionFactory = ormSetupHelper.start().withAnnotatedTypes( Book.class, Author.class, NotIndexed.class ).setup();
 	}
 
 	@BeforeEach

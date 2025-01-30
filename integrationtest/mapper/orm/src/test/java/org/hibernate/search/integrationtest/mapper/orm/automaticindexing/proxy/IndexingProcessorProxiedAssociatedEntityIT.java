@@ -55,11 +55,6 @@ public class IndexingProcessorProxiedAssociatedEntityIT {
 
 		sessionFactory = ormSetupHelper.start()
 				.withAnnotatedTypes( IndexedEntity.class, ContainedEntity.class )
-				.dataClearing( config -> config.clearOrder( ContainedEntity.class, IndexedEntity.class )
-						.preClear( IndexedEntity.class, entity -> {
-							entity.containedSingle = null;
-							entity.containedList = new ArrayList<>();
-						} ) )
 				.setup();
 	}
 

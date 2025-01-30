@@ -68,9 +68,6 @@ class ToJpaQueryIT {
 		sessionFactory = ormSetupHelper.start()
 				.withProperty( AvailableSettings.JPA_QUERY_COMPLIANCE, true )
 				.withAnnotatedTypes( IndexedEntity.class, ContainedEntity.class )
-				.dataClearing( config -> config
-						.preClear( ContainedEntity.class, c -> c.setContainingLazy( null ) )
-						.clearOrder( IndexedEntity.class, ContainedEntity.class ) )
 				.setup();
 	}
 

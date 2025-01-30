@@ -45,7 +45,6 @@ class AutomaticIndexingPolymorphicAssociationIT {
 	void setup() {
 		backendMock.expectAnySchema( Level1.NAME );
 		sessionFactory = ormSetupHelper.start()
-				.dataClearing( config -> config.clearOrder( Level3.class, DerivedLevel2.class, Level2.class, Level1.class ) )
 				.setup( Level1.class, Level2.class, DerivedLevel2.class, Level3.class );
 	}
 

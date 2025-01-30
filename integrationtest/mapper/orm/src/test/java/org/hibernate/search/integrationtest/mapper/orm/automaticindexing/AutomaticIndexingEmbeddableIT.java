@@ -114,13 +114,7 @@ class AutomaticIndexingEmbeddableIT {
 						IndexedEntity.class,
 						ContainingEntity.class,
 						ContainedEntity.class
-				)
-				.dataClearing( config -> config.preClear( ContainedEntity.class, contained -> {
-					contained.getContainingAsElementCollection().clear();
-					contained.getContainingAsSingleWithInverseSideEmbedded().setContainingAsSingle( null );
-				} )
-						.clearOrder( ContainingEntity.class, IndexedEntity.class, ContainedEntity.class ) )
-				.setup();
+				).setup();
 	}
 
 	@Test

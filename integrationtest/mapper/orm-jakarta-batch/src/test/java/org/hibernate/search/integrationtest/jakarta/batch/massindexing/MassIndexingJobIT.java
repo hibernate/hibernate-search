@@ -84,7 +84,6 @@ class MassIndexingJobIT {
 				.withAnnotatedTypes( Company.class, Person.class, WhoAmI.class, CompanyGroup.class )
 				.withProperty( "hibernate.jpa.compliance.query", jpaCompliance )
 				.withProperty( HibernateOrmMapperSettings.INDEXING_LISTENERS_ENABLED, false )
-				.dataClearing( config -> config.clearOrder( CompanyGroup.class, Company.class ) )
 				.setup();
 	}
 

@@ -58,9 +58,7 @@ class ReindexingResolverProxiedAssociatedEntityIT {
 				IndexedEntity.class,
 				ContainedLevel1Entity.class,
 				ContainedLevel2Entity.class
-		).dataClearing(
-				config -> config.clearOrder( IndexedEntity.class, ContainedLevel2Entity.class, ContainedLevel1Entity.class ) )
-				.setup();
+		).setup();
 	}
 
 	@Test

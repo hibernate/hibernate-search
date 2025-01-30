@@ -65,9 +65,6 @@ class ToHibernateOrmQueryIT {
 		backendMock.expectAnySchema( IndexedEntity.NAME );
 		sessionFactory = ormSetupHelper.start().withAnnotatedTypes(
 				IndexedEntity.class, ContainedEntity.class )
-				.dataClearing( config -> config
-						.preClear( ContainedEntity.class, c -> c.setContainingLazy( null ) )
-						.clearOrder( IndexedEntity.class, ContainedEntity.class ) )
 				.setup();
 	}
 
