@@ -143,6 +143,7 @@ public final class HibernateOrmSearchQueryAdapter<R> extends AbstractQuery<R> {
 
 	@Override
 	@SuppressWarnings("rawtypes")
+	@Deprecated(since = "8.0")
 	public HibernateOrmSearchQueryAdapter<R> applyGraph(RootGraph graph, GraphSemantic semantic) {
 		applyGraph( (RootGraphImplementor) graph, semantic );
 		return this;

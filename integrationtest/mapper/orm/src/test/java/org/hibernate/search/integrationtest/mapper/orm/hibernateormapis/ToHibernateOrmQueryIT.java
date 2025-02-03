@@ -16,6 +16,7 @@ import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 import jakarta.persistence.Entity;
+import jakarta.persistence.EntityGraph;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.Id;
 import jakarta.persistence.ManyToOne;
@@ -481,7 +482,11 @@ class ToHibernateOrmQueryIT {
 			SearchSession searchSession = Search.session( session );
 			Query<IndexedEntity> query = Search.toOrmQuery( createSimpleQuery( searchSession ) );
 
-			query.applyFetchGraph( session.getEntityGraph( IndexedEntity.GRAPH_EAGER ) );
+			query.setEntityGraph(
+					(EntityGraph<IndexedEntity>) session.getSessionFactory().getNamedEntityGraphs( IndexedEntity.class )
+							.get( IndexedEntity.GRAPH_EAGER ),
+					GraphSemantic.FETCH
+			);
 
 			backendMock.expectSearchObjects(
 					IndexedEntity.NAME,
@@ -497,7 +502,11 @@ class ToHibernateOrmQueryIT {
 			SearchSession searchSession = Search.session( session );
 			Query<IndexedEntity> query = Search.toOrmQuery( createSimpleQuery( searchSession ) );
 
-			query.applyFetchGraph( session.getEntityGraph( IndexedEntity.GRAPH_LAZY ) );
+			query.setEntityGraph(
+					(EntityGraph<IndexedEntity>) session.getSessionFactory().getNamedEntityGraphs( IndexedEntity.class )
+							.get( IndexedEntity.GRAPH_LAZY ),
+					GraphSemantic.FETCH
+			);
 
 			backendMock.expectSearchObjects(
 					IndexedEntity.NAME,
@@ -511,6 +520,14 @@ class ToHibernateOrmQueryIT {
 		} );
 	}
 
+	<R> Query<R> setEntityGraph(Query<R> q, EntityGraph<R> graph, GraphSemantic semantic) {
+		return null;
+	}
+
+	<R> Query<R> setEntityGraph1(Query<R> q, EntityGraph<? extends R> graph, GraphSemantic semantic) {
+		return null;
+	}
+
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-3628")
 	void graph_setter_load() {
@@ -518,7 +535,11 @@ class ToHibernateOrmQueryIT {
 			SearchSession searchSession = Search.session( session );
 			Query<IndexedEntity> query = Search.toOrmQuery( createSimpleQuery( searchSession ) );
 
-			query.applyLoadGraph( session.getEntityGraph( IndexedEntity.GRAPH_EAGER ) );
+			query.setEntityGraph(
+					(EntityGraph<IndexedEntity>) session.getSessionFactory().getNamedEntityGraphs( IndexedEntity.class )
+							.get( IndexedEntity.GRAPH_EAGER ),
+					GraphSemantic.LOAD
+			);
 
 			backendMock.expectSearchObjects(
 					IndexedEntity.NAME,
@@ -534,7 +555,11 @@ class ToHibernateOrmQueryIT {
 			SearchSession searchSession = Search.session( session );
 			Query<IndexedEntity> query = Search.toOrmQuery( createSimpleQuery( searchSession ) );
 
-			query.applyLoadGraph( session.getEntityGraph( IndexedEntity.GRAPH_LAZY ) );
+			query.setEntityGraph(
+					(EntityGraph<IndexedEntity>) session.getSessionFactory().getNamedEntityGraphs( IndexedEntity.class )
+							.get( IndexedEntity.GRAPH_LAZY ),
+					GraphSemantic.LOAD
+			);
 
 			backendMock.expectSearchObjects(
 					IndexedEntity.NAME,
@@ -585,7 +610,11 @@ class ToHibernateOrmQueryIT {
 							.toQuery()
 			);
 
-			query.applyFetchGraph( session.getEntityGraph( IndexedEntity.GRAPH_LAZY ) );
+			query.setEntityGraph(
+					(EntityGraph<IndexedEntity>) session.getSessionFactory().getNamedEntityGraphs( IndexedEntity.class )
+							.get( IndexedEntity.GRAPH_LAZY ),
+					GraphSemantic.FETCH
+			);
 
 			backendMock.expectSearchObjects(
 					IndexedEntity.NAME,

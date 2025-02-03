@@ -144,6 +144,11 @@ class BeanResolutionIT {
 		}
 
 		@Override
+		public Class<T> getBeanClass() {
+			return bean != null ? (Class<T>) bean.getClass() : null;
+		}
+
+		@Override
 		public T getBeanInstance() {
 			return bean;
 		}
