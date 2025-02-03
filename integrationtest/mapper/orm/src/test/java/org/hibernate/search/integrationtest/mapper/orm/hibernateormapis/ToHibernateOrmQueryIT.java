@@ -16,6 +16,7 @@ import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 import jakarta.persistence.Entity;
+import jakarta.persistence.EntityGraph;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.Id;
 import jakarta.persistence.ManyToOne;
@@ -474,6 +475,7 @@ class ToHibernateOrmQueryIT {
 		} );
 	}
 
+	@SuppressWarnings("unchecked")
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-3628")
 	void graph_setter_fetch() {
@@ -481,7 +483,11 @@ class ToHibernateOrmQueryIT {
 			SearchSession searchSession = Search.session( session );
 			Query<IndexedEntity> query = Search.toOrmQuery( createSimpleQuery( searchSession ) );
 
-			query.applyFetchGraph( session.getEntityGraph( IndexedEntity.GRAPH_EAGER ) );
+			query.setEntityGraph(
+					(EntityGraph<IndexedEntity>) session.getSessionFactory().getNamedEntityGraphs( IndexedEntity.class )
+							.get( IndexedEntity.GRAPH_EAGER ),
+					GraphSemantic.FETCH
+			);
 
 			backendMock.expectSearchObjects(
 					IndexedEntity.NAME,
@@ -496,8 +502,12 @@ class ToHibernateOrmQueryIT {
 		with( sessionFactory ).runNoTransaction( session -> {
 			SearchSession searchSession = Search.session( session );
 			Query<IndexedEntity> query = Search.toOrmQuery( createSimpleQuery( searchSession ) );
-
-			query.applyFetchGraph( session.getEntityGraph( IndexedEntity.GRAPH_LAZY ) );
+			// TODO: HSEARCH-5318 use different API for the entity graphs:
+			query.setEntityGraph(
+					(EntityGraph<IndexedEntity>) session.getSessionFactory().getNamedEntityGraphs( IndexedEntity.class )
+							.get( IndexedEntity.GRAPH_LAZY ),
+					GraphSemantic.FETCH
+			);
 
 			backendMock.expectSearchObjects(
 					IndexedEntity.NAME,
@@ -511,6 +521,7 @@ class ToHibernateOrmQueryIT {
 		} );
 	}
 
+	@SuppressWarnings("unchecked")
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-3628")
 	void graph_setter_load() {
@@ -518,7 +529,12 @@ class ToHibernateOrmQueryIT {
 			SearchSession searchSession = Search.session( session );
 			Query<IndexedEntity> query = Search.toOrmQuery( createSimpleQuery( searchSession ) );
 
-			query.applyLoadGraph( session.getEntityGraph( IndexedEntity.GRAPH_EAGER ) );
+			// TODO: HSEARCH-5318 use different API for the entity graphs:
+			query.setEntityGraph(
+					(EntityGraph<IndexedEntity>) session.getSessionFactory().getNamedEntityGraphs( IndexedEntity.class )
+							.get( IndexedEntity.GRAPH_EAGER ),
+					GraphSemantic.LOAD
+			);
 
 			backendMock.expectSearchObjects(
 					IndexedEntity.NAME,
@@ -534,7 +550,12 @@ class ToHibernateOrmQueryIT {
 			SearchSession searchSession = Search.session( session );
 			Query<IndexedEntity> query = Search.toOrmQuery( createSimpleQuery( searchSession ) );
 
-			query.applyLoadGraph( session.getEntityGraph( IndexedEntity.GRAPH_LAZY ) );
+			// TODO: HSEARCH-5318 use different API for the entity graphs:
+			query.setEntityGraph(
+					(EntityGraph<IndexedEntity>) session.getSessionFactory().getNamedEntityGraphs( IndexedEntity.class )
+							.get( IndexedEntity.GRAPH_LAZY ),
+					GraphSemantic.LOAD
+			);
 
 			backendMock.expectSearchObjects(
 					IndexedEntity.NAME,
@@ -573,6 +594,7 @@ class ToHibernateOrmQueryIT {
 		} );
 	}
 
+	@SuppressWarnings("unchecked")
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-3628")
 	void graph_override_setter() {
@@ -585,7 +607,12 @@ class ToHibernateOrmQueryIT {
 							.toQuery()
 			);
 
-			query.applyFetchGraph( session.getEntityGraph( IndexedEntity.GRAPH_LAZY ) );
+			// TODO: HSEARCH-5318 use different API for the entity graphs:
+			query.setEntityGraph(
+					(EntityGraph<IndexedEntity>) session.getSessionFactory().getNamedEntityGraphs( IndexedEntity.class )
+							.get( IndexedEntity.GRAPH_LAZY ),
+					GraphSemantic.FETCH
+			);
 
 			backendMock.expectSearchObjects(
 					IndexedEntity.NAME,
