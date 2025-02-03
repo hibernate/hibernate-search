@@ -4,7 +4,7 @@ jira:
   ignore:
     # See the `build-dependencies` group in the Dependabot's configuration file
     - user: dependabot[bot]
-      titlePattern: "Bump.*the build-dependencies group( across \\d+ director(ies|y))?( with \\d+ updates?)?"
+      titlePattern: "Bump.*the (build-dependencies|database-containers|build-containers|workflow-actions) group.*+"
   ignoreFiles:
     # Git
     - ".git*"
@@ -68,4 +68,4 @@ licenseAgreement:
   ignore:
     # See the `build-dependencies` group in the Dependabot's configuration file
     - user: dependabot[bot]
-      titlePattern: "Bump.*the build-dependencies group( across \\d+ director(ies|y))?( with \\d+ updates?)?"
+      titlePattern: "Bump.*"
