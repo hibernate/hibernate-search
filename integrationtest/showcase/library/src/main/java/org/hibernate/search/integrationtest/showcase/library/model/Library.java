@@ -14,6 +14,7 @@ import jakarta.persistence.ElementCollection;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
 import jakarta.persistence.OneToMany;
+import jakarta.persistence.Table;
 
 import org.hibernate.search.engine.backend.types.Aggregable;
 import org.hibernate.search.engine.backend.types.Projectable;
@@ -31,6 +32,9 @@ import org.hibernate.search.mapper.pojo.mapping.definition.annotation.KeywordFie
  * A place where documents are available.
  */
 @Entity
+// MySQL 9.2 defines `library` as a reserved keyword:
+// https://dev.mysql.com/doc/refman/9.2/en/keywords.html#keywords-new-in-current-series
+@Table(name = "library_table")
 @Indexed
 @GeoPointBinding(fieldName = "location", sortable = Sortable.YES)
 public class Library extends AbstractEntity<Integer> {
