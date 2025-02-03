@@ -21,7 +21,7 @@ public final class Version {
 	 */
 	public static String versionString() {
 		// This implementation is replaced during the build with another one that returns the correct value.
-		return "UNKNOWN";
+		return "42.0";
 	}
 
 	/**
