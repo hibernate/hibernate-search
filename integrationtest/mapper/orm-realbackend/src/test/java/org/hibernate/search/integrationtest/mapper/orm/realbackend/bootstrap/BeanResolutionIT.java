@@ -136,11 +136,17 @@ class BeanResolutionIT {
 		}
 	}
 
+	@SuppressWarnings("unchecked")
 	private static class StubContainedBean<T> implements ContainedBean<T> {
 		private final T bean;
 
 		private StubContainedBean(T bean) {
 			this.bean = bean;
+		}
+
+		@Override
+		public Class<T> getBeanClass() {
+			return bean != null ? (Class<T>) bean.getClass() : null;
 		}
 
 		@Override

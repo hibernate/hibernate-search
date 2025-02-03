@@ -51,6 +51,7 @@ abstract class AbstractHibernateOrmSelectionEntityLoader<E> implements PojoSelec
 
 	abstract List<E> doLoadEntities(List<?> allIds, Long timeout);
 
+	@SuppressWarnings("unchecked")
 	final Query<E> createQuery(int fetchSize, Long timeout) {
 		Query<E> query = queryFactory.createQueryForLoadByUniqueProperty( sessionContext.session(), IDS_PARAMETER_NAME );
 
@@ -59,9 +60,11 @@ abstract class AbstractHibernateOrmSelectionEntityLoader<E> implements PojoSelec
 			query.setHint( HibernateOrmSearchQueryHints.JAVAX_TIMEOUT, Math.toIntExact( timeout ) );
 		}
 
-		EntityGraphHint<?> entityGraphHint = loadingOptions.entityGraphHintOrNullForType( entityMappingType );
+		// TODO: HSEARCH-5318 use different API for the entity graphs:
+		EntityGraphHint<E> entityGraphHint =
+				(EntityGraphHint<E>) loadingOptions.entityGraphHintOrNullForType( entityMappingType );
 		if ( entityGraphHint != null ) {
-			query.applyGraph( entityGraphHint.graph, entityGraphHint.semantic );
+			query.setEntityGraph( entityGraphHint.graph, entityGraphHint.semantic );
 		}
 
 		return query;
