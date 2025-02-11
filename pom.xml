@@ -285,7 +285,7 @@
         <version.exec.plugin>3.5.0</version.exec.plugin>
         <version.forbiddenapis.plugin>3.8</version.forbiddenapis.plugin>
         <!-- Make sure that upgraded Jandex plugin aligns with the Jandex version imported from the ORM platform pom -->
-        <version.jandex.plugin>3.2.4</version.jandex.plugin>
+        <version.jandex.plugin>3.2.5</version.jandex.plugin>
         <version.maven.injection.plugin>1.0.2</version.maven.injection.plugin>
         <version.jar.plugin>3.4.2</version.jar.plugin>
         <version.javadoc.plugin>3.11.2</version.javadoc.plugin>
