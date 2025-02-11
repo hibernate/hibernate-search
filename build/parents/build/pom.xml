@@ -70,13 +70,13 @@
         -->
         <!-- The versions of OpenSearch advertised as compatible with Hibernate Search -->
         <!-- Make sure to only mention tested versions here -->
-        <version.org.opensearch.compatible.regularly-tested.text>1.3 or 2.18</version.org.opensearch.compatible.regularly-tested.text>
+        <version.org.opensearch.compatible.regularly-tested.text>1.3 or 2.19</version.org.opensearch.compatible.regularly-tested.text>
         <!-- These are the versions same as above, but pointing only to the major part (used in compatibility section of ES backend documentation
           as versions that Hibernate Search is compatible with. -->
         <!-- NOTE: Adding new major versions would require to update the compatibility table in `backend-elasticsearch-compatibility` section of `backend-elasticsearch.asciidoc`. -->
         <version.org.opensearch.compatible.expected.text>1.3 or 2.x</version.org.opensearch.compatible.expected.text>
         <!-- The latest version of OpenSearch tested against by default -->
-        <version.org.opensearch.latest>2.18.0</version.org.opensearch.latest>
+        <version.org.opensearch.latest>2.19.0</version.org.opensearch.latest>
         <!-- The main compatible version of OpenSearch, advertised by default. Used in documentation links. -->
         <version.org.opensearch.compatible.main>${version.org.opensearch.latest}</version.org.opensearch.compatible.main>
         <documentation.org.opensearch.url>https://opensearch.org/docs/${parsed-version.org.opensearch.compatible.main.majorVersion}.${parsed-version.org.opensearch.compatible.main.minorVersion}</documentation.org.opensearch.url>
