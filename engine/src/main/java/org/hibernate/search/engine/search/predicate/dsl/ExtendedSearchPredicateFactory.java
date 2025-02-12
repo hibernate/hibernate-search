@@ -11,10 +11,11 @@ package org.hibernate.search.engine.search.predicate.dsl;
  * <strong>Warning:</strong> Generic parameters of this type are subject to change,
  * so this type should not be referenced directly in user code.
  *
+ * @param <SR> Scope root type.
  * @param <S> The self type, i.e. the exposed type of this factory.
  */
-public interface ExtendedSearchPredicateFactory<S extends ExtendedSearchPredicateFactory<?>>
-		extends SearchPredicateFactory {
+public interface ExtendedSearchPredicateFactory<SR, S extends ExtendedSearchPredicateFactory<SR, ?>>
+		extends SearchPredicateFactory<SR> {
 
 	@Override
 	S withRoot(String objectFieldPath);

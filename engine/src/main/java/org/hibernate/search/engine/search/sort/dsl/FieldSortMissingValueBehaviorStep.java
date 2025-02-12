@@ -14,47 +14,7 @@ import org.hibernate.search.util.common.SearchException;
  *
  * @author Emmanuel Bernard emmanuel@hibernate.org
  */
-public interface FieldSortMissingValueBehaviorStep<N> {
-
-	/**
-	 * Put documents with missing values last in the sorting.
-	 *
-	 * <p>This instruction is independent of whether the sort is being ascending
-	 * or descending.
-	 *
-	 * @return The next step.
-	 */
-	N last();
-
-	/**
-	 * Put documents with missing values first in the sorting.
-	 *
-	 * <p>This instruction is independent of whether the sort is being ascending
-	 * or descending.
-	 *
-	 * @return The next step.
-	 */
-	N first();
-
-	/**
-	 * Give documents with missing values the highest value when sorting.
-	 * <p>
-	 * This puts documents with missing values last when using ascending order,
-	 * or first when using descending order.
-	 *
-	 * @return The next step.
-	 */
-	N highest();
-
-	/**
-	 * Give documents with missing values the lowest value when sorting.
-	 * <p>
-	 * This puts documents with missing values first when using ascending order,
-	 * or last when using descending order.
-	 *
-	 * @return The next step.
-	 */
-	N lowest();
+public interface FieldSortMissingValueBehaviorStep<N> extends FieldSortMissingValueBehaviorGenericStep<Object, N> {
 
 	/**
 	 * When documents are missing a value on the sort field, use the given value instead.

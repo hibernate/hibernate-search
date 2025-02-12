@@ -53,7 +53,7 @@ class MatchAllPredicateSpecificsIT {
 				.where( f -> f.matchAll().except( c2 -> c2.match().field( "string" ).matching( STRING_1 ) ) ) )
 				.hasDocRefHitsAnyOrder( index.typeName(), DOCUMENT_2, DOCUMENT_3 );
 
-		SearchPredicateFactory f1 = index.createScope().predicate();
+		SearchPredicateFactory<?> f1 = index.createScope().predicate();
 		SearchPredicate searchPredicate = f1.match().field( "string" ).matching( STRING_2 ).toPredicate();
 
 		assertThatQuery( index.query()
@@ -69,7 +69,7 @@ class MatchAllPredicateSpecificsIT {
 						.except( f.match().field( "string" ).matching( STRING_2 ) ) ) )
 				.hasDocRefHitsAnyOrder( index.typeName(), DOCUMENT_3 );
 
-		SearchPredicateFactory f1 = index.createScope().predicate();
+		SearchPredicateFactory<?> f1 = index.createScope().predicate();
 		SearchPredicate searchPredicate1 = f1.match().field( "string" ).matching( STRING_3 ).toPredicate();
 		SearchPredicate searchPredicate2 = f1.match().field( "string" ).matching( STRING_2 ).toPredicate();
 

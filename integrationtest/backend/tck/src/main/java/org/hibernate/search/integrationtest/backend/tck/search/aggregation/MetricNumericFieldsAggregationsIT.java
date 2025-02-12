@@ -80,7 +80,7 @@ class MetricNumericFieldsAggregationsIT {
 	@Test
 	void test_filteringResults() {
 		StubMappingScope scope = mainIndex.createScope();
-		SearchQueryOptionsStep<?, DocumentReference, StubLoadingOptionsStep, ?, ?> options = scope.query()
+		SearchQueryOptionsStep<?, ?, DocumentReference, StubLoadingOptionsStep, ?, ?> options = scope.query()
 				.where( f -> f.match().field( "style" ).matching( "bla" ) );
 		SearchQuery<DocumentReference> query = defineAggregations( options );
 
@@ -122,7 +122,7 @@ class MetricNumericFieldsAggregationsIT {
 	@Test
 	void test_allResults() {
 		StubMappingScope scope = mainIndex.createScope();
-		SearchQueryOptionsStep<?, DocumentReference, StubLoadingOptionsStep, ?, ?> options = scope.query()
+		SearchQueryOptionsStep<?, ?, DocumentReference, StubLoadingOptionsStep, ?, ?> options = scope.query()
 				.where( f -> f.matchAll() );
 		SearchQuery<DocumentReference> query = defineAggregations( options );
 
@@ -162,7 +162,7 @@ class MetricNumericFieldsAggregationsIT {
 	}
 
 	private SearchQuery<DocumentReference> defineAggregations(
-			SearchQueryOptionsStep<?, DocumentReference, StubLoadingOptionsStep, ?, ?> options) {
+			SearchQueryOptionsStep<?, ?, DocumentReference, StubLoadingOptionsStep, ?, ?> options) {
 
 		options.aggregation( sumIntegersRaw, f -> f.sum().field( "integer", Object.class, ValueModel.RAW ) );
 

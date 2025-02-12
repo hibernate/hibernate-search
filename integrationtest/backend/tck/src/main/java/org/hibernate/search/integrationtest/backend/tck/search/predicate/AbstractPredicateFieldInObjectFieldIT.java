@@ -81,20 +81,20 @@ public abstract class AbstractPredicateFieldInObjectFieldIT<V extends AbstractPr
 
 	@Override
 	@SuppressWarnings("unchecked")
-	protected final PredicateFinalStep predicate(SearchPredicateFactory f, ObjectFieldBinding objectFieldBinding,
+	protected final PredicateFinalStep predicate(SearchPredicateFactory<?> f, ObjectFieldBinding objectFieldBinding,
 			int matchingDocOrdinal, AbstractPredicateDataSet dataSet) {
 		return predicate( f, objectFieldBinding.absoluteFieldPath( ( (DataSet<?, V>) dataSet ).fieldType ), matchingDocOrdinal,
 				(DataSet<?, V>) dataSet
 		);
 	}
 
-	protected final PredicateFinalStep predicateWithRelativePath(SearchPredicateFactory f,
+	protected final PredicateFinalStep predicateWithRelativePath(SearchPredicateFactory<?> f,
 			ObjectFieldBinding objectFieldBinding,
 			int matchingDocOrdinal, DataSet<?, V> dataSet) {
 		return predicate( f, objectFieldBinding.relativeFieldPath( dataSet.fieldType ), matchingDocOrdinal, dataSet );
 	}
 
-	protected abstract PredicateFinalStep predicate(SearchPredicateFactory f, String fieldPath, int matchingDocOrdinal,
+	protected abstract PredicateFinalStep predicate(SearchPredicateFactory<?> f, String fieldPath, int matchingDocOrdinal,
 			DataSet<?, V> dataSet);
 
 	public static final class DataSet<F, V extends AbstractPredicateTestValues<F>>
