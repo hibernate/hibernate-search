@@ -4,6 +4,7 @@
  */
 package org.hibernate.search.mapper.pojo.model.spi;
 
+import org.hibernate.search.util.common.annotation.Incubating;
 import org.hibernate.search.util.common.reflect.spi.ValueHandleFactory;
 
 /**
@@ -37,5 +38,8 @@ public interface PojoBootstrapIntrospector {
 	default org.hibernate.search.util.common.reflect.spi.ValueReadHandleFactory annotationValueReadHandleFactory() {
 		return (org.hibernate.search.util.common.reflect.spi.ValueReadHandleFactory) annotationValueHandleFactory();
 	}
+
+	@Incubating
+	<T> PojoInjectableBinderModel<T> injectableBinderModel(Class<T> clazz);
 
 }
