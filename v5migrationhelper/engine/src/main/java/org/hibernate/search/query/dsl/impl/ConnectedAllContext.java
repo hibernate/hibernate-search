@@ -38,9 +38,9 @@ public class ConnectedAllContext implements AllContext {
 	}
 
 	private SearchPredicate createPredicate() {
-		SearchPredicateFactory factory = queryContext.getScope().predicate();
+		SearchPredicateFactory<?> factory = queryContext.getScope().predicate();
 
-		MatchAllPredicateOptionsStep<?> optionsStep = factory.matchAll();
+		MatchAllPredicateOptionsStep<?, ?> optionsStep = factory.matchAll();
 
 		for ( Query query : except ) {
 			optionsStep = optionsStep.except( factory.extension( LuceneExtension.get() ).fromLuceneQuery( query ) );

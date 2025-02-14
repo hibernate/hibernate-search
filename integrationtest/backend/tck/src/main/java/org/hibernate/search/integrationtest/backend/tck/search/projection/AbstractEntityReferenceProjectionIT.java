@@ -47,8 +47,8 @@ public abstract class AbstractEntityReferenceProjectionIT {
 		this.mainIndex = mainIndex;
 	}
 
-	public abstract <R, E, LOS> SearchQueryWhereStep<?, R, LOS, ?> select(
-			SearchQuerySelectStep<?, R, E, LOS, ?, ?> step);
+	public abstract <SR, R, E, LOS> SearchQueryWhereStep<SR, ?, R, LOS, ?> select(
+			SearchQuerySelectStep<SR, ?, R, E, LOS, ?, ?> step);
 
 	@Test
 	void test() {
@@ -63,7 +63,7 @@ public abstract class AbstractEntityReferenceProjectionIT {
 		mainIndex.mapping().with()
 				.typeContext( mainIndex.typeName(), mainTypeContextMock )
 				.run( () -> {
-					GenericStubMappingScope<EntityReference, StubEntity> scope =
+					GenericStubMappingScope<?, EntityReference, StubEntity> scope =
 							mainIndex.createGenericScope( loadingContextMock );
 					SearchQuery<EntityReference> referencesQuery = select( scope.query() )
 							.where( f -> f.matchAll() )

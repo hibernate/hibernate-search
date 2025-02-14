@@ -23,16 +23,16 @@ public interface V5MigrationSearchScope {
 
 	Set<IndexManager> indexManagers();
 
-	SearchPredicateFactory predicate();
+	SearchPredicateFactory<?> predicate();
 
-	SearchSortFactory sort();
+	SearchSortFactory<?> sort();
 
-	SearchProjectionFactory<?, ?> projection();
+	SearchProjectionFactory<?, ?, ?> projection();
 
 	SearchProjection<Object> idProjection();
 
 	SearchProjection<? extends Class<?>> objectClassProjection();
 
-	SearchAggregationFactory aggregation();
+	SearchAggregationFactory<?> aggregation();
 
 }

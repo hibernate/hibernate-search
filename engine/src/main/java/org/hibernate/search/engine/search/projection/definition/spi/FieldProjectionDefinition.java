@@ -56,7 +56,7 @@ public abstract class FieldProjectionDefinition<P, F> extends AbstractProjection
 		}
 
 		@Override
-		public SearchProjection<F> create(SearchProjectionFactory<?, ?> factory,
+		public SearchProjection<F> create(SearchProjectionFactory<?, ?, ?> factory,
 				ProjectionDefinitionContext context) {
 			return factory.field( fieldPath, fieldType, valueModel ).toProjection();
 		}
@@ -76,7 +76,7 @@ public abstract class FieldProjectionDefinition<P, F> extends AbstractProjection
 		}
 
 		@Override
-		public SearchProjection<List<F>> create(SearchProjectionFactory<?, ?> factory, ProjectionDefinitionContext context) {
+		public SearchProjection<List<F>> create(SearchProjectionFactory<?, ?, ?> factory, ProjectionDefinitionContext context) {
 			return factory.field( fieldPath, fieldType, valueModel )
 					.collector( ProjectionCollector.list() ).toProjection();
 		}
@@ -98,7 +98,7 @@ public abstract class FieldProjectionDefinition<P, F> extends AbstractProjection
 		}
 
 		@Override
-		public SearchProjection<C> create(SearchProjectionFactory<?, ?> factory,
+		public SearchProjection<C> create(SearchProjectionFactory<?, ?, ?> factory,
 				ProjectionDefinitionContext context) {
 			return factory.field( fieldPath, fieldType, valueModel )
 					.collector( collector ).toProjection();
