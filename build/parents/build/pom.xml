@@ -187,7 +187,7 @@
         <version.dev.snowdrop>3.3.1</version.dev.snowdrop>
 
         <version.jsoup>1.18.3</version.jsoup>
-        <version.snakeyaml>2.3</version.snakeyaml>
+        <version.snakeyaml>2.4</version.snakeyaml>
 
         <!-- Whether javadoc warnings should fail the build -->
         <failOnJavadocWarning>true</failOnJavadocWarning>
