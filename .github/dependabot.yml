@@ -87,6 +87,8 @@ updates:
           - "org.eclipse.jdt:*"
           # We only use the version of WildFly for a link in the documentation
           - "org.wildfly.bom:wildfly"
+          # Used to generate reports during build time:
+          - "org.yaml:snakeyaml"
     ignore:
       # These dependencies are updated manually
       - dependency-name: "org.hibernate:*"
