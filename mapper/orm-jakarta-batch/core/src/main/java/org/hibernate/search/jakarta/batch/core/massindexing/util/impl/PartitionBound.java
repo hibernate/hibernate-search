@@ -14,11 +14,11 @@ package org.hibernate.search.jakarta.batch.core.massindexing.util.impl;
  */
 public class PartitionBound {
 
-	private EntityTypeDescriptor<?, ?> entityType;
+	private BatchCoreEntityTypeDescriptor<?, ?> entityType;
 	private Object lowerBound;
 	private Object upperBound;
 
-	public PartitionBound(EntityTypeDescriptor<?, ?> entityType, Object lowerBound, Object upperBound) {
+	public PartitionBound(BatchCoreEntityTypeDescriptor<?, ?> entityType, Object lowerBound, Object upperBound) {
 		this.entityType = entityType;
 		this.lowerBound = lowerBound;
 		this.upperBound = upperBound;
