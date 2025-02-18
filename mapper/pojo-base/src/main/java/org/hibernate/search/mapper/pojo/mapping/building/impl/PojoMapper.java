@@ -41,6 +41,7 @@ import org.hibernate.search.mapper.pojo.logging.impl.MappingLog;
 import org.hibernate.search.mapper.pojo.mapping.building.spi.PojoIndexMappingCollectorTypeNode;
 import org.hibernate.search.mapper.pojo.mapping.building.spi.PojoMapperDelegate;
 import org.hibernate.search.mapper.pojo.mapping.building.spi.PojoTypeMetadataContributor;
+import org.hibernate.search.mapper.pojo.mapping.definition.annotation.impl.PojoInjectableBinderInjector;
 import org.hibernate.search.mapper.pojo.mapping.impl.AbstractPojoTypeManager;
 import org.hibernate.search.mapper.pojo.mapping.impl.PojoIndexedTypeManager;
 import org.hibernate.search.mapper.pojo.mapping.impl.PojoMappingDelegateImpl;
@@ -92,6 +93,7 @@ public class PojoMapper<MPBS extends MappingPartialBuildState> implements Mapper
 	public PojoMapper(MappingBuildContext buildContext,
 			TypeMetadataContributorProvider<PojoTypeMetadataContributor> contributorProvider,
 			PojoBootstrapIntrospector introspector,
+			PojoInjectableBinderInjector binderInjector,
 			ContainerExtractorBinder extractorBinder,
 			BridgeResolver bridgeResolver,
 			BeanReference<? extends IdentifierBridge<Object>> providedIdentifierBridge,
@@ -118,7 +120,7 @@ public class PojoMapper<MPBS extends MappingPartialBuildState> implements Mapper
 		this.extractorBinder = extractorBinder;
 
 		PojoIndexModelBinder indexModelBinder = new PojoIndexModelBinder(
-				buildContext, introspector, extractorBinder, bridgeResolver, typeAdditionalMetadataProvider
+				buildContext, introspector, binderInjector, extractorBinder, bridgeResolver, typeAdditionalMetadataProvider
 		);
 
 		mappingHelper = new PojoMappingHelper( buildContext.beanResolver(), failureCollector, contributorProvider,

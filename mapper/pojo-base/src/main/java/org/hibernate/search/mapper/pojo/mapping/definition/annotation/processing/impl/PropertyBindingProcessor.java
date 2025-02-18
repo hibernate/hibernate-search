@@ -43,6 +43,6 @@ public final class PropertyBindingProcessor implements PropertyMappingAnnotation
 			throw MappingLog.INSTANCE.missingBinderReferenceInBinding();
 		}
 
-		return new BeanDelegatingBinder( binderReference.get() );
+		return new BeanDelegatingBinder( binderReference.get(), binderReferenceAnnotation.type() );
 	}
 }
