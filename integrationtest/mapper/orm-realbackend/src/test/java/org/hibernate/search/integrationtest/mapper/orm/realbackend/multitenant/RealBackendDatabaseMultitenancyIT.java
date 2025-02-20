@@ -206,7 +206,7 @@ class RealBackendDatabaseMultitenancyIT {
 
 		// and let's check mass indexing as well:
 		SearchMapping searchMapping = Search.mapping( sessionFactory );
-		SearchScope<Object> scope = searchMapping.scope( Object.class );
+		SearchScope<?, Object> scope = searchMapping.scope( Object.class );
 		// aws-serverless does not support purge, so we'll just drop the entire index here:
 		scope.schemaManager().dropAndCreate();
 

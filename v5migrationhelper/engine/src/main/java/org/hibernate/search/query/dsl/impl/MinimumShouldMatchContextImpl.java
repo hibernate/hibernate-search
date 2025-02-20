@@ -28,7 +28,7 @@ final class MinimumShouldMatchContextImpl {
 		);
 	}
 
-	void applyMinimum(BooleanPredicateClausesStep<?> step) {
+	void applyMinimum(BooleanPredicateClausesStep<?, ?> step) {
 		if ( minimumShouldMatchConstraint != null ) {
 			minimumShouldMatchConstraint.apply( step );
 		}
@@ -50,7 +50,7 @@ final class MinimumShouldMatchContextImpl {
 			this.matchingClausesPercent = matchingClausesPercent;
 		}
 
-		void apply(BooleanPredicateClausesStep<?> step) {
+		void apply(BooleanPredicateClausesStep<?, ?> step) {
 			if ( matchingClausesNumber != null ) {
 				step.minimumShouldMatchNumber( matchingClausesNumber );
 			}

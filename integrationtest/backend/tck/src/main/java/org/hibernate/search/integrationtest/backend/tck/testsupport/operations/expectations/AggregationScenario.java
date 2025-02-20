@@ -14,14 +14,14 @@ import org.hibernate.search.engine.search.predicate.dsl.SearchPredicateFactory;
 
 public interface AggregationScenario<A> {
 
-	default AggregationFinalStep<A> setup(SearchAggregationFactory factory, String fieldPath) {
+	default AggregationFinalStep<A> setup(SearchAggregationFactory<?> factory, String fieldPath) {
 		return setup( factory, fieldPath, null );
 	}
 
-	AggregationFinalStep<A> setup(SearchAggregationFactory factory, String fieldPath,
-			Function<? super SearchPredicateFactory, ? extends PredicateFinalStep> filterOrNull);
+	AggregationFinalStep<A> setup(SearchAggregationFactory<?> factory, String fieldPath,
+			Function<? super SearchPredicateFactory<?>, ? extends PredicateFinalStep> filterOrNull);
 
-	AggregationFinalStep<A> setupWithConverterSetting(SearchAggregationFactory factory, String fieldPath,
+	AggregationFinalStep<A> setupWithConverterSetting(SearchAggregationFactory<?> factory, String fieldPath,
 			ValueModel valueModel);
 
 	void check(A aggregationResult);

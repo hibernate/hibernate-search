@@ -269,7 +269,7 @@ class NestedPredicateSpecificsIT {
 	@TestForIssue(jiraKey = "HSEARCH-4173")
 	void multiIndex_missingNestedField() {
 		StubMappingScope scope = mainIndex.createScope( missingFieldIndex );
-		SearchPredicateFactory f = scope.predicate();
+		SearchPredicateFactory<?> f = scope.predicate();
 		SearchPredicate nestedPredicate = f.nested( "nestedObject" )
 				// This is referred to as "condition 1" in the data initialization method
 				.add( f.nested( "nestedObject.nestedObject" )

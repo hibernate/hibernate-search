@@ -44,8 +44,12 @@ public interface TckBackendHelper {
 	 * @param f A {@link SearchPredicateFactory}
 	 * @return A slow predicate, i.e. a predicate whose execution will take more than 10 milliseconds per document.
 	 */
-	PredicateFinalStep createSlowPredicate(SearchPredicateFactory f);
+	PredicateFinalStep createSlowPredicate(SearchPredicateFactory<?> f);
 
-	<R, E, LOS> SearchQueryDslExtension<? extends SearchQuerySelectStep<?, R, E, LOS, ?, ?>, R, E, LOS> queryDslExtension();
+	<SR, R, E, LOS> SearchQueryDslExtension<SR,
+			? extends SearchQuerySelectStep<SR, ?, R, E, LOS, ?, ?>,
+			R,
+			E,
+			LOS> queryDslExtension();
 
 }

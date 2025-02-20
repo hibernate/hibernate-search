@@ -137,10 +137,10 @@ public class RangeAggregationDescriptor extends AggregationDescriptor {
 
 				return new AggregationScenario<Map<Range<T>, Long>>() {
 					@Override
-					public AggregationFinalStep<Map<Range<T>, Long>> setup(SearchAggregationFactory factory,
+					public AggregationFinalStep<Map<Range<T>, Long>> setup(SearchAggregationFactory<?> factory,
 							String fieldPath,
-							Function<? super SearchPredicateFactory, ? extends PredicateFinalStep> filterOrNull) {
-						RangeAggregationOptionsStep<?, ?, ?, Map<Range<T>, Long>> optionsStep =
+							Function<? super SearchPredicateFactory<?>, ? extends PredicateFinalStep> filterOrNull) {
+						RangeAggregationOptionsStep<?, ?, ?, ?, Map<Range<T>, Long>> optionsStep =
 								factory.range().field( fieldPath, helper.getJavaClass() )
 										.range( helper.create( ascendingValues.get( 0 ) ),
 												helper.create( ascendingValues.get( 2 ) ) )
@@ -157,7 +157,8 @@ public class RangeAggregationDescriptor extends AggregationDescriptor {
 					}
 
 					@Override
-					public AggregationFinalStep<Map<Range<T>, Long>> setupWithConverterSetting(SearchAggregationFactory factory,
+					public AggregationFinalStep<Map<Range<T>, Long>> setupWithConverterSetting(
+							SearchAggregationFactory<?> factory,
 							String fieldPath, ValueModel valueModel) {
 						return factory.range().field( fieldPath, helper.getJavaClass(), valueModel )
 								.range( helper.create( ascendingValues.get( 0 ) ),
@@ -198,7 +199,7 @@ public class RangeAggregationDescriptor extends AggregationDescriptor {
 			}
 
 			@Override
-			public void trySetup(SearchAggregationFactory factory, String fieldPath) {
+			public void trySetup(SearchAggregationFactory<?> factory, String fieldPath) {
 				factory.range().field( fieldPath, typeDescriptor.getJavaType() );
 			}
 

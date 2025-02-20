@@ -25,7 +25,7 @@ public abstract class AbstractProjectionConstructorIT {
 	@RegisterExtension
 	public BackendMock backendMock = BackendMock.create();
 
-	protected final ProjectionFinalStep<?> dummyProjectionForEnclosingClassInstance(SearchProjectionFactory<?, ?> f) {
+	protected final ProjectionFinalStep<?> dummyProjectionForEnclosingClassInstance(SearchProjectionFactory<?, ?, ?> f) {
 		return f.constant( null );
 	}
 
@@ -53,7 +53,7 @@ public abstract class AbstractProjectionConstructorIT {
 
 	protected final <P> void testSuccessfulRootProjection(SearchMapping mapping, Class<?> indexedType, Class<P> projectionType,
 			List<?> rawProjectionResults,
-			Function<SearchProjectionFactory<?, ?>, ProjectionFinalStep<?>> expectedProjection,
+			Function<SearchProjectionFactory<?, ?, ?>, ProjectionFinalStep<?>> expectedProjection,
 			List<P> expectedProjectionResults) {
 		try ( SearchSession session = createSession( mapping ) ) {
 			backendMock.expectSearchProjection(
