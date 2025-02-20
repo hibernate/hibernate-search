@@ -58,18 +58,27 @@ class ExistsPredicateBaseIT {
 						ScaleCheckingConfigured.incompatibleIndex
 				)
 				.setup();
+		// This test would often fail on OpenSearch with:
+		// "caused_by": {
+		//   "type": "file_system_exception",
+		//   "reason": "/usr/share/opensearch/data/nodes/0/indices/HGn3KNKwStCqW3PdIahetA/0/index/_0_Lucene912_0.psm: Too many open files"
+		// }
+		// to give OpenSearch more breathing room, we do not populate all indexes at the same time.
 
 		final BulkIndexer singleFieldIndexer = SingleFieldConfigured.index.bulkIndexer();
 		SingleFieldConfigured.dataSets.forEach( d -> d.contribute( SingleFieldConfigured.index, singleFieldIndexer ) );
+		singleFieldIndexer.join();
 
 		final BulkIndexer inObjectFieldMainIndexer = InObjectFieldConfigured.mainIndex.bulkIndexer();
 		final BulkIndexer inObjectFieldMissingFieldIndexer = InObjectFieldConfigured.missingFieldIndex.bulkIndexer();
 		InObjectFieldConfigured.dataSets
 				.forEach( d -> d.contribute( InObjectFieldConfigured.mainIndex, inObjectFieldMainIndexer,
 						InObjectFieldConfigured.missingFieldIndex, inObjectFieldMissingFieldIndexer ) );
+		inObjectFieldMainIndexer.join( inObjectFieldMissingFieldIndexer );
 
 		final BulkIndexer scoreIndexer = ScoreConfigured.index.bulkIndexer();
 		ScoreConfigured.dataSets.forEach( d -> d.contribute( scoreIndexer ) );
+		scoreIndexer.join();
 
 		final BulkIndexer typeCheckingMainIndexer = TypeCheckingNoConversionConfigured.index.bulkIndexer();
 		final BulkIndexer typeCheckingCompatibleIndexer = TypeCheckingNoConversionConfigured.compatibleIndex.bulkIndexer();
@@ -82,17 +91,15 @@ class ExistsPredicateBaseIT {
 						TypeCheckingNoConversionConfigured.rawFieldCompatibleIndex, typeCheckingRawFieldCompatibleIndexer,
 						TypeCheckingNoConversionConfigured.missingFieldIndex, typeCheckingMissingFieldIndexer ) );
 
+		typeCheckingMainIndexer.join( typeCheckingCompatibleIndexer, typeCheckingRawFieldCompatibleIndexer,
+				typeCheckingMissingFieldIndexer );
+
 		final BulkIndexer scaleCheckingMainIndexer = ScaleCheckingConfigured.index.bulkIndexer();
 		final BulkIndexer scaleCheckingCompatibleIndexer = ScaleCheckingConfigured.compatibleIndex.bulkIndexer();
 		ScaleCheckingConfigured.dataSet.contribute( ScaleCheckingConfigured.index, scaleCheckingMainIndexer,
 				ScaleCheckingConfigured.compatibleIndex, scaleCheckingCompatibleIndexer );
 
-		singleFieldIndexer.join(
-				inObjectFieldMainIndexer, inObjectFieldMissingFieldIndexer, scoreIndexer,
-				typeCheckingMainIndexer, typeCheckingCompatibleIndexer,
-				typeCheckingRawFieldCompatibleIndexer, typeCheckingMissingFieldIndexer,
-				scaleCheckingMainIndexer, scaleCheckingCompatibleIndexer
-		);
+		scaleCheckingMainIndexer.join( scaleCheckingCompatibleIndexer );
 	}
 
 	private static <F> ExistsPredicateTestValues<F> testValues(FieldTypeDescriptor<F, ?> fieldType) {
