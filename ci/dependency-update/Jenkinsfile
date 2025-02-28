@@ -309,7 +309,7 @@ pipeline {
 										pullContainerImages()
 										sh """ \
 									mvn clean install -U -Pdependency-update -Pdist -Pci-build -Dsurefire.environment=${normalize(env.DEPENDENCY_UPDATE_NAME)} \
-									--fail-at-end \
+									--fail-at-end -Dno-build-cache \
 									${env[qualify('ADDITIONAL_MAVEN_ARGS')]} \
 								"""
 									}
