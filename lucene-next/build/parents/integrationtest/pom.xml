@@ -183,5 +183,36 @@
             </plugin>
         </plugins>
     </build>
+    <profiles>
+        <!-- Profile enabled when an Elasticsearch/OpenSearch container must NOT be started as a test container, but when an URL to an "external" service is supplied! -->
+        <profile>
+            <id>search-container-do-not-start</id>
+            <activation>
+                <!-- Activate if test.elasticsearch.connection.uris has been defined explicitly -->
+                <property>
+                    <name>test.elasticsearch.connection.uris</name>
+                </property>
+            </activation>
+            <properties>
+                <test.elasticsearch.run.image.pull>false</test.elasticsearch.run.image.pull>
+            </properties>
+        </profile>
+
+        <!-- Profile enabled when Elasticsearch tests are skipped -->
+        <profile>
+            <id>elasticsearch-test-skip</id>
+            <activation>
+                <!-- Activate if test.elasticsearch.connection.uris has been defined explicitly -->
+                <property>
+                    <name>test.elasticsearch.skip</name>
+                    <value>true</value>
+                </property>
+            </activation>
+            <properties>
+                <test.elasticsearch.run.skip.forRelevantModules>true</test.elasticsearch.run.skip.forRelevantModules>
+                <test.elasticsearch.run.image.pull>false</test.elasticsearch.run.image.pull>
+            </properties>
+        </profile>
+    </profiles>
 </project>
 
