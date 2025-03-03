@@ -96,9 +96,6 @@ updates:
       # AWS SDK releases way too often (every week?); ignore all patch updates
       - dependency-name: "software.amazon.awssdk:*"
         update-types: ["version-update:semver-patch"]
-      # Groovy is only used during the build; ignore all patch updates
-      - dependency-name: "org.apache.groovy:groovy-jsr223"
-        update-types: [ "version-update:semver-patch" ]
       # We don't care that much about being on the very latest version of some integration test dependencies
       - dependency-name: "org.springframework.boot:*"
         update-types: [ "version-update:semver-patch" ]
