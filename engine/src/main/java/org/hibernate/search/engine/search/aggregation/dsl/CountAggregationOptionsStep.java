@@ -12,13 +12,15 @@ import org.hibernate.search.util.common.annotation.Incubating;
 /**
  * The final step in a "count" aggregation definition, where optional parameters can be set.
  *
+ * @param <SR> Scope root type.
  * @param <S> The "self" type (the actual exposed type of this step).
  * @param <PDF> The type of factory used to create predicates in {@link #filter(Function)}.
  */
 @Incubating
 public interface CountAggregationOptionsStep<
-		S extends CountAggregationOptionsStep<?, PDF>,
-		PDF extends SearchPredicateFactory>
-		extends AggregationFinalStep<Long>, AggregationFilterStep<S, PDF> {
+		SR,
+		S extends CountAggregationOptionsStep<SR, ?, PDF>,
+		PDF extends SearchPredicateFactory<SR>>
+		extends AggregationFinalStep<Long>, AggregationFilterStep<SR, S, PDF> {
 
 }

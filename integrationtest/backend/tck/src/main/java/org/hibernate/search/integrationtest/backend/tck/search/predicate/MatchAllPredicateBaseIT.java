@@ -71,7 +71,7 @@ class MatchAllPredicateBaseIT {
 		}
 
 		@Override
-		protected PredicateFinalStep predicate(SearchPredicateFactory f, ObjectFieldBinding objectFieldBinding,
+		protected PredicateFinalStep predicate(SearchPredicateFactory<?> f, ObjectFieldBinding objectFieldBinding,
 				int matchingDocOrdinal, AbstractPredicateDataSet dataSet) {
 			return f.matchAll()
 					.except( f.id().matchingAny( InObjectFieldConfigured.dataSet.docIdsExcept( matchingDocOrdinal ) ) );
@@ -116,13 +116,13 @@ class MatchAllPredicateBaseIT {
 		}
 
 		@Override
-		protected PredicateFinalStep predicate(SearchPredicateFactory f, int matchingDocOrdinal,
+		protected PredicateFinalStep predicate(SearchPredicateFactory<?> f, int matchingDocOrdinal,
 				AbstractPredicateDataSet dataSet, StubMappedIndex index) {
 			return f.matchAll().except( f.id().matchingAny( ScoreConfigured.dataSet.docIdsExcept( matchingDocOrdinal ) ) );
 		}
 
 		@Override
-		protected PredicateFinalStep predicateWithBoost(SearchPredicateFactory f, int matchingDocOrdinal,
+		protected PredicateFinalStep predicateWithBoost(SearchPredicateFactory<?> f, int matchingDocOrdinal,
 				float boost, AbstractPredicateDataSet dataSet,
 				StubMappedIndex index) {
 			return f.matchAll().except( f.id().matchingAny( ScoreConfigured.dataSet.docIdsExcept( matchingDocOrdinal ) ) )
@@ -130,14 +130,14 @@ class MatchAllPredicateBaseIT {
 		}
 
 		@Override
-		protected PredicateFinalStep predicateWithConstantScore(SearchPredicateFactory f, int matchingDocOrdinal,
+		protected PredicateFinalStep predicateWithConstantScore(SearchPredicateFactory<?> f, int matchingDocOrdinal,
 				AbstractPredicateDataSet dataSet, StubMappedIndex index) {
 			return f.matchAll().except( f.id().matchingAny( ScoreConfigured.dataSet.docIdsExcept( matchingDocOrdinal ) ) )
 					.constantScore();
 		}
 
 		@Override
-		protected PredicateFinalStep predicateWithConstantScoreAndBoost(SearchPredicateFactory f,
+		protected PredicateFinalStep predicateWithConstantScoreAndBoost(SearchPredicateFactory<?> f,
 				int matchingDocOrdinal, float boost, AbstractPredicateDataSet dataSet,
 				StubMappedIndex index) {
 			return f.matchAll().except( f.id().matchingAny( ScoreConfigured.dataSet.docIdsExcept( matchingDocOrdinal ) ) )

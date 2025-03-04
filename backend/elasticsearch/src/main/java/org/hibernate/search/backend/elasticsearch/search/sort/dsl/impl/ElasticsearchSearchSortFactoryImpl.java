@@ -15,36 +15,39 @@ import org.hibernate.search.engine.search.sort.dsl.spi.StaticSortThenStep;
 
 import com.google.gson.JsonObject;
 
-public class ElasticsearchSearchSortFactoryImpl
+public class ElasticsearchSearchSortFactoryImpl<SR>
 		extends AbstractSearchSortFactory<
-				ElasticsearchSearchSortFactory,
+				SR,
+				ElasticsearchSearchSortFactory<SR>,
 				ElasticsearchSearchSortIndexScope<?>,
-				ElasticsearchSearchPredicateFactory>
-		implements ElasticsearchSearchSortFactory {
+				ElasticsearchSearchPredicateFactory<SR>>
+		implements ElasticsearchSearchSortFactory<SR> {
 
 	public ElasticsearchSearchSortFactoryImpl(
-			SearchSortDslContext<ElasticsearchSearchSortIndexScope<?>, ElasticsearchSearchPredicateFactory> dslContext) {
+			SearchSortDslContext<SR,
+					ElasticsearchSearchSortIndexScope<?>,
+					ElasticsearchSearchPredicateFactory<SR>> dslContext) {
 		super( dslContext );
 	}
 
 	@Override
-	public ElasticsearchSearchSortFactory withRoot(String objectFieldPath) {
-		return new ElasticsearchSearchSortFactoryImpl( dslContext.rescope(
+	public ElasticsearchSearchSortFactory<SR> withRoot(String objectFieldPath) {
+		return new ElasticsearchSearchSortFactoryImpl<SR>( dslContext.rescope(
 				dslContext.scope().withRoot( objectFieldPath ),
 				dslContext.predicateFactory().withRoot( objectFieldPath ) ) );
 	}
 
 	@Override
-	public SortThenStep fromJson(JsonObject jsonObject) {
+	public SortThenStep<SR> fromJson(JsonObject jsonObject) {
 		return staticThenStep( dslContext.scope().sortBuilders().fromJson( jsonObject ) );
 	}
 
 	@Override
-	public SortThenStep fromJson(String jsonString) {
+	public SortThenStep<SR> fromJson(String jsonString) {
 		return staticThenStep( dslContext.scope().sortBuilders().fromJson( jsonString ) );
 	}
 
-	private SortThenStep staticThenStep(ElasticsearchSearchSort sort) {
-		return new StaticSortThenStep( dslContext, sort );
+	private SortThenStep<SR> staticThenStep(ElasticsearchSearchSort sort) {
+		return new StaticSortThenStep<SR>( dslContext, sort );
 	}
 }

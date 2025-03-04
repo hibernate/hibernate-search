@@ -8,15 +8,15 @@ import org.hibernate.search.engine.search.predicate.dsl.spi.AbstractSearchPredic
 import org.hibernate.search.engine.search.predicate.dsl.spi.SearchPredicateDslContext;
 import org.hibernate.search.engine.search.predicate.spi.SearchPredicateIndexScope;
 
-public class StubSearchPredicateFactory
-		extends AbstractSearchPredicateFactory<StubSearchPredicateFactory, SearchPredicateIndexScope<?>> {
+public class StubSearchPredicateFactory<SR>
+		extends AbstractSearchPredicateFactory<SR, StubSearchPredicateFactory<SR>, SearchPredicateIndexScope<?>> {
 	public StubSearchPredicateFactory(
 			SearchPredicateDslContext<SearchPredicateIndexScope<?>> dslContext) {
 		super( dslContext );
 	}
 
 	@Override
-	public StubSearchPredicateFactory withRoot(String objectFieldPath) {
-		return new StubSearchPredicateFactory( dslContext.rescope( dslContext.scope().withRoot( objectFieldPath ) ) );
+	public StubSearchPredicateFactory<SR> withRoot(String objectFieldPath) {
+		return new StubSearchPredicateFactory<>( dslContext.rescope( dslContext.scope().withRoot( objectFieldPath ) ) );
 	}
 }

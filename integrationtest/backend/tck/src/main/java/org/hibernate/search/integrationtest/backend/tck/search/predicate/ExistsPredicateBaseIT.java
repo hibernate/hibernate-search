@@ -131,13 +131,13 @@ class ExistsPredicateBaseIT {
 		}
 
 		@Override
-		protected PredicateFinalStep predicate(SearchPredicateFactory f, String fieldPath, int matchingDocOrdinal,
+		protected PredicateFinalStep predicate(SearchPredicateFactory<?> f, String fieldPath, int matchingDocOrdinal,
 				DataSet<?, ExistsPredicateTestValues<F>> dataSet) {
 			return f.exists().field( fieldPath );
 		}
 
 		@Override
-		protected PredicateFinalStep predicate(SearchPredicateFactory f, String fieldPath, String paramName,
+		protected PredicateFinalStep predicate(SearchPredicateFactory<?> f, String fieldPath, String paramName,
 				DataSet<?, ExistsPredicateTestValues<F>> dataSet) {
 			assumeTrue( false, "Exists predicate does not have parameters" );
 			throw new AssertionFailure( "shouldn't reach this far" );
@@ -175,26 +175,26 @@ class ExistsPredicateBaseIT {
 		}
 
 		@Override
-		protected PredicateFinalStep predicate(SearchPredicateFactory f, int matchingDocOrdinal,
+		protected PredicateFinalStep predicate(SearchPredicateFactory<?> f, int matchingDocOrdinal,
 				AbstractPredicateDataSet dataSet, StubMappedIndex index) {
 			return f.exists().field( fieldPath( matchingDocOrdinal, dataSet ) );
 		}
 
 		@Override
-		protected PredicateFinalStep predicateWithBoost(SearchPredicateFactory f, int matchingDocOrdinal,
+		protected PredicateFinalStep predicateWithBoost(SearchPredicateFactory<?> f, int matchingDocOrdinal,
 				float boost, AbstractPredicateDataSet dataSet,
 				StubMappedIndex index) {
 			return f.exists().field( fieldPath( matchingDocOrdinal, dataSet ) ).boost( boost );
 		}
 
 		@Override
-		protected PredicateFinalStep predicateWithConstantScore(SearchPredicateFactory f, int matchingDocOrdinal,
+		protected PredicateFinalStep predicateWithConstantScore(SearchPredicateFactory<?> f, int matchingDocOrdinal,
 				AbstractPredicateDataSet dataSet, StubMappedIndex index) {
 			return f.exists().field( fieldPath( matchingDocOrdinal, dataSet ) ).constantScore();
 		}
 
 		@Override
-		protected PredicateFinalStep predicateWithConstantScoreAndBoost(SearchPredicateFactory f,
+		protected PredicateFinalStep predicateWithConstantScoreAndBoost(SearchPredicateFactory<?> f,
 				int matchingDocOrdinal, float boost, AbstractPredicateDataSet dataSet,
 				StubMappedIndex index) {
 			return f.exists().field( fieldPath( matchingDocOrdinal, dataSet ) ).constantScore().boost( boost );
@@ -274,7 +274,7 @@ class ExistsPredicateBaseIT {
 		}
 
 		@Override
-		protected PredicateFinalStep predicate(SearchPredicateFactory f, String fieldPath, int matchingDocOrdinal,
+		protected PredicateFinalStep predicate(SearchPredicateFactory<?> f, String fieldPath, int matchingDocOrdinal,
 				DataSet<?, ExistsPredicateTestValues<F>> dataSet) {
 			if ( matchingDocOrdinal != 0 ) {
 				throw new IllegalStateException( "This predicate can only match the first document" );
@@ -317,7 +317,7 @@ class ExistsPredicateBaseIT {
 		}
 
 		@Override
-		protected void tryPredicate(SearchPredicateFactory f, String fieldPath) {
+		protected void tryPredicate(SearchPredicateFactory<?> f, String fieldPath) {
 			f.exists().field( fieldPath );
 		}
 
@@ -379,7 +379,7 @@ class ExistsPredicateBaseIT {
 		}
 
 		@Override
-		protected void tryPredicate(SearchPredicateFactory f, String fieldPath, FieldTypeDescriptor<?, ?> fieldType) {
+		protected void tryPredicate(SearchPredicateFactory<?> f, String fieldPath, FieldTypeDescriptor<?, ?> fieldType) {
 			f.exists().field( fieldPath );
 		}
 
@@ -447,13 +447,13 @@ class ExistsPredicateBaseIT {
 		}
 
 		@Override
-		protected PredicateFinalStep predicate(SearchPredicateFactory f, String fieldPath, int matchingDocOrdinal,
+		protected PredicateFinalStep predicate(SearchPredicateFactory<?> f, String fieldPath, int matchingDocOrdinal,
 				DataSet<?, ExistsPredicateTestValues<F>> dataSet) {
 			return f.exists().field( fieldPath );
 		}
 
 		@Override
-		protected PredicateFinalStep predicate(SearchPredicateFactory f, String field0Path, String field1Path,
+		protected PredicateFinalStep predicate(SearchPredicateFactory<?> f, String field0Path, String field1Path,
 				int matchingDocOrdinal, DataSet<?, ExistsPredicateTestValues<F>> dataSet) {
 			throw new org.opentest4j.TestAbortedException( "The 'exists' predicate can only target one field at a time" );
 		}
@@ -491,7 +491,7 @@ class ExistsPredicateBaseIT {
 		}
 
 		@Override
-		protected PredicateFinalStep predicate(SearchPredicateFactory f, String fieldPath, Object matchingParam) {
+		protected PredicateFinalStep predicate(SearchPredicateFactory<?> f, String fieldPath, Object matchingParam) {
 			return f.exists().field( fieldPath );
 		}
 

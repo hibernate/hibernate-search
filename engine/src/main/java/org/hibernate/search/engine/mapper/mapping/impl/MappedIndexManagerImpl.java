@@ -62,14 +62,14 @@ public class MappedIndexManagerImpl implements MappedIndexManager {
 	}
 
 	@Override
-	public <R, E> MappedIndexScopeBuilder<R, E> createScopeBuilder(BackendMappingContext mappingContext) {
+	public <SR, R, E> MappedIndexScopeBuilder<SR, R, E> createScopeBuilder(BackendMappingContext mappingContext) {
 		return new MappedIndexScopeBuilderImpl<>(
 				implementor, mappingContext
 		);
 	}
 
 	@Override
-	public void addTo(MappedIndexScopeBuilder<?, ?> builder) {
-		( (MappedIndexScopeBuilderImpl<?, ?>) builder ).add( implementor );
+	public void addTo(MappedIndexScopeBuilder<?, ?, ?> builder) {
+		( (MappedIndexScopeBuilderImpl<?, ?, ?>) builder ).add( implementor );
 	}
 }

@@ -14,19 +14,19 @@ import org.hibernate.search.engine.search.predicate.SearchPredicate;
 import org.hibernate.search.engine.search.predicate.dsl.PredicateFinalStep;
 import org.hibernate.search.engine.search.predicate.dsl.SearchPredicateFactory;
 
-class MinAggregationOptionsStepImpl<PDF extends SearchPredicateFactory, F>
-		implements MinAggregationOptionsStep<MinAggregationOptionsStepImpl<PDF, F>, PDF, F> {
+class MinAggregationOptionsStepImpl<SR, PDF extends SearchPredicateFactory<SR>, F>
+		implements MinAggregationOptionsStep<SR, MinAggregationOptionsStepImpl<SR, PDF, F>, PDF, F> {
 	private final FieldMetricAggregationBuilder<F> builder;
-	private final SearchAggregationDslContext<?, ? extends PDF> dslContext;
+	private final SearchAggregationDslContext<SR, ?, ? extends PDF> dslContext;
 
 	MinAggregationOptionsStepImpl(FieldMetricAggregationBuilder<F> builder,
-			SearchAggregationDslContext<?, ? extends PDF> dslContext) {
+			SearchAggregationDslContext<SR, ?, ? extends PDF> dslContext) {
 		this.builder = builder;
 		this.dslContext = dslContext;
 	}
 
 	@Override
-	public MinAggregationOptionsStepImpl<PDF, F> filter(
+	public MinAggregationOptionsStepImpl<SR, PDF, F> filter(
 			Function<? super PDF, ? extends PredicateFinalStep> clauseContributor) {
 		SearchPredicate predicate = clauseContributor.apply( dslContext.predicateFactory() ).toPredicate();
 
@@ -34,7 +34,7 @@ class MinAggregationOptionsStepImpl<PDF extends SearchPredicateFactory, F>
 	}
 
 	@Override
-	public MinAggregationOptionsStepImpl<PDF, F> filter(SearchPredicate searchPredicate) {
+	public MinAggregationOptionsStepImpl<SR, PDF, F> filter(SearchPredicate searchPredicate) {
 		builder.filter( searchPredicate );
 		return this;
 	}
