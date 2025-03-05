@@ -101,6 +101,11 @@ class KnnPredicateBaseIT {
 		}
 
 		@Override
+		protected boolean produceMultipleResults() {
+			return true;
+		}
+
+		@Override
 		protected PredicateFinalStep predicate(SearchPredicateFactory f, String fieldPath, int matchingDocOrdinal,
 				DataSet<?, KnnPredicateTestValues<F>> dataSet) {
 			return knnPredicateOptionsStep( f, fieldPath, matchingDocOrdinal,
@@ -113,10 +118,10 @@ class KnnPredicateBaseIT {
 			return f.withParameters( params -> {
 				Object param = params.get( paramName, dataSet.fieldType.getJavaType() );
 				if ( param instanceof byte[] ) {
-					return f.knn( 1 ).field( fieldPath ).matching( (byte[]) param );
+					return f.knn( 10 ).field( fieldPath ).matching( (byte[]) param );
 				}
 				else {
-					return f.knn( 1 ).field( fieldPath ).matching( (float[]) param );
+					return f.knn( 10 ).field( fieldPath ).matching( (float[]) param );
 				}
 			} );
 		}

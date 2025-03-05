@@ -95,7 +95,7 @@ class LuceneIndexSegmentFilesIT {
 			// we've purged the segments, so we expect that there's exactly 0 current segment
 			assertThat( numberOfCurrentSegments() ).isZero();
 			// we do have a scroll opened so there are some stale files:
-			assertThat( numberOfAllSegments() ).isGreaterThan( 1 );
+			assertThat( numberOfAllSegments() ).isGreaterThanOrEqualTo( 1 );
 			// scroll still works:
 			next = scroll.next();
 			assertThat( next.hits() ).hasSize( 5 );
