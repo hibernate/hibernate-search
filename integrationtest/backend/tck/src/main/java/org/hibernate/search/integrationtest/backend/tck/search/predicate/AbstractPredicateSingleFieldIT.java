@@ -32,10 +32,20 @@ public abstract class AbstractPredicateSingleFieldIT<V extends AbstractPredicate
 		int valueCount = dataSet.values.size();
 		for ( int i = 0; i < valueCount; i++ ) {
 			int matchingDocOrdinal = i;
-			assertThatQuery( index.query()
-					.where( f -> predicate( f, fieldPath( index, dataSet ), matchingDocOrdinal, dataSet ) )
-					.routing( dataSet.routingKey ) )
-					.hasDocRefHitsAnyOrder( index.typeName(), dataSet.docId( i ) );
+			if ( produceMultipleResults() ) {
+				assertThatQuery( index.query()
+						.where( f -> predicate( f, fieldPath( index, dataSet ), matchingDocOrdinal, dataSet ) )
+						.routing( dataSet.routingKey ) )
+						.hits()
+						.ordinal( 0 )
+						.isDocRefHit( index.typeName(), dataSet.docId( matchingDocOrdinal ) );
+			}
+			else {
+				assertThatQuery( index.query()
+						.where( f -> predicate( f, fieldPath( index, dataSet ), matchingDocOrdinal, dataSet ) )
+						.routing( dataSet.routingKey ) )
+						.hasDocRefHitsAnyOrder( index.typeName(), dataSet.docId( i ) );
+			}
 		}
 	}
 
@@ -53,10 +63,28 @@ public abstract class AbstractPredicateSingleFieldIT<V extends AbstractPredicate
 			for ( Map.Entry<String, Object> parameter : parameters.entrySet() ) {
 				query.param( parameter.getKey(), parameter.getValue() );
 			}
-			assertThatQuery( query
-					.routing( dataSet.routingKey ) )
-					.hasDocRefHitsAnyOrder( index.typeName(), dataSet.docId( matchingDocOrdinal ) );
+			if ( produceMultipleResults() ) {
+				assertThatQuery( query
+						.routing( dataSet.routingKey ) )
+						.hits()
+						.ordinal( 0 )
+						.isDocRefHit( index.typeName(), dataSet.docId( matchingDocOrdinal ) );
+			}
+			else {
+				assertThatQuery( query
+						.routing( dataSet.routingKey ) )
+						.hasDocRefHitsAnyOrder( index.typeName(), dataSet.docId( matchingDocOrdinal ) );
+			}
 		}
+	}
+
+	// for most predicates we are expecting an exact match on a single document.
+	// knn predicate is a bit of a unique scenario:
+	//  while in most runs having a knn(1).match(....) would give you that same unique exact match ...
+	//  since it is an approximate similarity search it may end up giving the wrong document
+	//  With higher k values, there's a better guarantee that the first element in the results will be the one we want
+	protected boolean produceMultipleResults() {
+		return false;
 	}
 
 	protected abstract PredicateFinalStep predicate(SearchPredicateFactory f, String fieldPath, int matchingDocOrdinal,

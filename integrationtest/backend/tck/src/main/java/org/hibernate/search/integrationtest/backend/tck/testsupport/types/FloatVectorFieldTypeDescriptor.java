@@ -101,7 +101,7 @@ public class FloatVectorFieldTypeDescriptor extends VectorFieldTypeDescriptor<fl
 			floats[i] = startingValue + i;
 			sum += floats[i] * floats[i];
 		}
-		sum = (float) Math.sqrt( size );
+		sum = (float) Math.sqrt( sum );
 		for ( int i = 0; i < size; i++ ) {
 			floats[i] = floats[i] / sum;
 		}
