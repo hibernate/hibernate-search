@@ -84,7 +84,7 @@ public final class JobContextUtil {
 			entityTypesToIndex.add( mapping.typeContextProvider().byEntityName().getOrFail( s ) );
 		}
 
-		List<EntityTypeDescriptor<?, ?>> descriptors = PersistenceUtil.createDescriptors(
+		List<BatchCoreEntityTypeDescriptor<?, ?>> descriptors = PersistenceUtil.createDescriptors(
 				emf.unwrap( SessionFactoryImplementor.class ),
 				entityTypesToIndex );
 
