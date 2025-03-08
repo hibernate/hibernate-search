@@ -13,6 +13,7 @@ import org.hibernate.search.mapper.pojo.bridge.binding.PropertyBindingContext;
 import org.hibernate.search.mapper.pojo.bridge.binding.RoutingBindingContext;
 import org.hibernate.search.mapper.pojo.bridge.binding.TypeBindingContext;
 import org.hibernate.search.mapper.pojo.bridge.binding.ValueBindingContext;
+import org.hibernate.search.mapper.pojo.bridge.binding.impl.PropertyBindingContextImpl;
 import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.IdentifierBinder;
 import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.MarkerBinder;
 import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.PropertyBinder;
@@ -29,9 +30,11 @@ public final class BeanDelegatingBinder
 		MarkerBinder, IdentifierBinder, ValueBinder {
 
 	private final BeanReference<?> delegateReference;
+	private final Class<?> type;
 
-	public BeanDelegatingBinder(BeanReference<?> delegateReference) {
+	public BeanDelegatingBinder(BeanReference<?> delegateReference, Class<?> type) {
 		this.delegateReference = delegateReference;
+		this.type = type;
 	}
 
 	@Override
@@ -51,7 +54,11 @@ public final class BeanDelegatingBinder
 	public void bind(PropertyBindingContext context) {
 		try ( BeanHolder<? extends PropertyBinder> delegateHolder =
 				createDelegate( context.beanResolver(), PropertyBinder.class ) ) {
-			delegateHolder.get().bind( context );
+			PropertyBinder binder = delegateHolder.get();
+			// TODO: injecting into this delegating binder itself will make no sense,
+			//  and we need to inject into the delegate itself ...
+			( (PropertyBindingContextImpl) context ).injectBinderFields( binder );
+			binder.bind( context );
 		}
 	}
 
@@ -91,4 +98,7 @@ public final class BeanDelegatingBinder
 		return delegateReference.asSubTypeOf( expectedType ).resolve( beanResolver );
 	}
 
+	public Class<?> getDelegateType() {
+		return type;
+	}
 }
