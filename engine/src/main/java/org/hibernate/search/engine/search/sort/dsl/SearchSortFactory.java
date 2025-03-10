@@ -9,6 +9,7 @@ import java.util.function.Function;
 
 import org.hibernate.search.engine.search.common.NamedValues;
 import org.hibernate.search.engine.search.predicate.dsl.SearchPredicateFactory;
+import org.hibernate.search.engine.search.reference.sort.DistanceSortFieldReference;
 import org.hibernate.search.engine.search.reference.sort.FieldSortFieldReference;
 import org.hibernate.search.engine.spatial.GeoPoint;
 import org.hibernate.search.util.common.SearchException;
@@ -102,7 +103,7 @@ public interface SearchSortFactory<SR> {
 	 */
 	@Incubating
 	default DistanceSortOptionsStep<SR, ?, ? extends SearchPredicateFactory<SR>> distance(
-			FieldSortFieldReference<? super SR, ?> fieldReference, GeoPoint location) {
+			DistanceSortFieldReference<? super SR, ?> fieldReference, GeoPoint location) {
 		return distance( fieldReference.absolutePath(), location );
 	}
 
@@ -137,7 +138,7 @@ public interface SearchSortFactory<SR> {
 	 */
 	@Incubating
 	default DistanceSortOptionsStep<SR, ?, ? extends SearchPredicateFactory<SR>> distance(
-			FieldSortFieldReference<? super SR, ?> fieldReference, double latitude,
+			DistanceSortFieldReference<? super SR, ?> fieldReference, double latitude,
 			double longitude) {
 		return distance( fieldReference, GeoPoint.of( latitude, longitude ) );
 	}
