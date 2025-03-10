@@ -7,6 +7,8 @@ package org.hibernate.search.engine.search.aggregation.dsl;
 import java.util.function.Function;
 
 import org.hibernate.search.engine.search.predicate.dsl.SearchPredicateFactory;
+import org.hibernate.search.engine.search.reference.aggregation.CountAggregationFieldReference;
+import org.hibernate.search.engine.search.reference.aggregation.MaxAggregationFieldReference;
 import org.hibernate.search.util.common.annotation.Incubating;
 
 /**
@@ -26,4 +28,14 @@ public interface CountAggregationFieldStep<SR, PDF extends SearchPredicateFactor
 	 */
 	CountAggregationOptionsStep<SR, ?, PDF> field(String fieldPath);
 
+	/**
+	 * Target the given field in the avg aggregation.
+	 *
+	 * @param reference The field reference representing a <a href="SearchAggregationFactory.html#field-paths">path</a> to the index field to aggregate.
+	 * @return The next step.
+	 */
+	@Incubating
+	default CountAggregationOptionsStep<SR, ?, PDF> field(CountAggregationFieldReference<SR> reference) {
+		return field( reference.absolutePath() );
+	}
 }
