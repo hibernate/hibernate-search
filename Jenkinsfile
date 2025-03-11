@@ -981,20 +981,20 @@ void mvn(String args) {
 
 // Perform authenticated pulls of container images, to avoid failure due to download throttling on dockerhub.
 def pullContainerImages(String mavenArgs) {
-	String containerImageRefsString = ((String) sh( script: "./ci/list-container-images.sh ${mavenArgs}", returnStdout: true ) )
-	String[] containerImageRefs = containerImageRefsString ? containerImageRefsString.split( '\\s+' ) : new String[0]
-	echo 'Container images to be used in tests: ' + Arrays.toString( containerImageRefs )
-	if ( containerImageRefs.length == 0 ) {
-		return
-	}
-	docker.withRegistry('https://index.docker.io/v1/', 'hibernateci.hub.docker.com') {
-		// Cannot use a foreach loop because then Jenkins wants to serialize the iterator,
-		// and obviously the iterator is not serializable.
-		for (int i = 0; i < containerImageRefs.length; i++) {
-			containerImageRef = containerImageRefs[i]
-			docker.image( containerImageRef ).pull()
-		}
-	}
+//	String containerImageRefsString = ((String) sh( script: "./ci/list-container-images.sh ${mavenArgs}", returnStdout: true ) )
+//	String[] containerImageRefs = containerImageRefsString ? containerImageRefsString.split( '\\s+' ) : new String[0]
+//	echo 'Container images to be used in tests: ' + Arrays.toString( containerImageRefs )
+//	if ( containerImageRefs.length == 0 ) {
+//		return
+//	}
+//	docker.withRegistry('https://index.docker.io/v1/', 'hibernateci.hub.docker.com') {
+//		// Cannot use a foreach loop because then Jenkins wants to serialize the iterator,
+//		// and obviously the iterator is not serializable.
+//		for (int i = 0; i < containerImageRefs.length; i++) {
+//			containerImageRef = containerImageRefs[i]
+//			docker.image( containerImageRef ).pull()
+//		}
+//	}
 }
 
 void mavenNonDefaultBuild(BuildEnvironment buildEnv, String args, List<String> artifactsToTest = []) {
