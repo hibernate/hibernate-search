@@ -134,7 +134,7 @@
         <version.junit-platform-suite-engine>1.10.0</version.junit-platform-suite-engine>
         <version.org.osgi.core>6.0.0</version.org.osgi.core>
         <!-- Make sure to update Ryuk container version in `ryuk.Dockerfile` whenever updating testcontainers to align it with the lib. -->
-        <version.testcontainers>1.20.5</version.testcontainers>
+        <version.testcontainers>1.20.6</version.testcontainers>
 
         <version.org.hamcrest>3.0</version.org.hamcrest>
         <version.org.mockito>5.16.0</version.org.mockito>
@@ -186,7 +186,7 @@
         <!-- Spring Boot 3 JTA starter and related libs version: -->
         <version.dev.snowdrop>3.3.1</version.dev.snowdrop>
 
-        <version.jsoup>1.18.3</version.jsoup>
+        <version.jsoup>1.19.1</version.jsoup>
         <version.snakeyaml>2.4</version.snakeyaml>
 
         <!-- Whether javadoc warnings should fail the build -->
