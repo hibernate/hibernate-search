@@ -17,6 +17,7 @@ import org.hibernate.search.mapper.pojo.mapping.building.spi.ErrorCollectingPojo
 import org.hibernate.search.mapper.pojo.mapping.building.spi.PojoIndexMappingCollectorTypeNode;
 import org.hibernate.search.mapper.pojo.mapping.building.spi.PojoSearchMappingConstructorNode;
 import org.hibernate.search.mapper.pojo.mapping.building.spi.PojoTypeMetadataContributor;
+import org.hibernate.search.mapper.pojo.mapping.definition.annotation.impl.AnnotationPojoInjectableBinderCollector;
 import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.ConstructorMappingStep;
 import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.PropertyMappingStep;
 import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.TypeMappingIndexedStep;
@@ -32,13 +33,16 @@ public class TypeMappingStepImpl
 		implements TypeMappingStep, PojoMappingConfigurationContributor, PojoTypeMetadataContributor {
 
 	private final PojoRawTypeModel<?> typeModel;
+	private final AnnotationPojoInjectableBinderCollector injectableBinderCollector;
 
 	private final ErrorCollectingPojoTypeMetadataContributor children = new ErrorCollectingPojoTypeMetadataContributor();
 
 	private Map<List<Class<?>>, InitialConstructorMappingStep> constructors;
 
-	public TypeMappingStepImpl(PojoRawTypeModel<?> typeModel) {
+	public TypeMappingStepImpl(PojoRawTypeModel<?> typeModel,
+			AnnotationPojoInjectableBinderCollector injectableBinderCollector) {
 		this.typeModel = typeModel;
+		this.injectableBinderCollector = injectableBinderCollector;
 	}
 
 	@Override
@@ -104,7 +108,7 @@ public class TypeMappingStepImpl
 	@Override
 	public PropertyMappingStep property(String propertyName) {
 		PojoPropertyModel<?> propertyModel = typeModel.property( propertyName );
-		InitialPropertyMappingStep child = new InitialPropertyMappingStep( this, propertyModel );
+		InitialPropertyMappingStep child = new InitialPropertyMappingStep( this, propertyModel, injectableBinderCollector );
 		children.add( child );
 		return child;
 	}

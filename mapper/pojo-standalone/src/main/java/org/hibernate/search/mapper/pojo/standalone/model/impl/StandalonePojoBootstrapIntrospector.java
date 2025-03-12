@@ -11,7 +11,6 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.hibernate.search.mapper.pojo.model.models.spi.AbstractPojoModelsBootstrapIntrospector;
-import org.hibernate.search.mapper.pojo.model.models.spi.PojoModelsGenericContextHelper;
 import org.hibernate.search.mapper.pojo.model.models.spi.PojoSimpleModelsRawTypeModel;
 import org.hibernate.search.mapper.pojo.model.spi.GenericContextAwarePojoGenericTypeModel.RawTypeDeclaringContext;
 import org.hibernate.search.mapper.pojo.model.spi.PojoBootstrapIntrospector;
@@ -22,6 +21,7 @@ import org.hibernate.search.util.common.impl.ReflectionHelper;
 import org.hibernate.search.util.common.reflect.spi.ValueCreateHandle;
 import org.hibernate.search.util.common.reflect.spi.ValueHandleFactory;
 import org.hibernate.search.util.common.reflect.spi.ValueReadHandle;
+import org.hibernate.search.util.common.reflect.spi.ValueReadWriteHandle;
 
 import org.jboss.jandex.IndexView;
 
@@ -35,13 +35,11 @@ public class StandalonePojoBootstrapIntrospector extends AbstractPojoModelsBoots
 		return new StandalonePojoBootstrapIntrospector( indexView, valueHandleFactory );
 	}
 
-	private final PojoModelsGenericContextHelper genericContextHelper;
 
 	private final Map<Class<?>, PojoRawTypeModel<?>> typeModelCache = new HashMap<>();
 
 	private StandalonePojoBootstrapIntrospector(IndexView indexView, ValueHandleFactory valueHandleFactory) {
 		super( simpleClassDetailsRegistry( indexView ), valueHandleFactory );
-		this.genericContextHelper = new PojoModelsGenericContextHelper( this );
 	}
 
 	@Override
@@ -66,6 +64,12 @@ public class StandalonePojoBootstrapIntrospector extends AbstractPojoModelsBoots
 	protected ValueReadHandle<?> createValueReadHandle(Member member) throws IllegalAccessException {
 		setAccessible( member );
 		return super.createValueReadHandle( member );
+	}
+
+	@Override
+	protected ValueReadWriteHandle<?> createValueReadWriteHandle(Member member) throws IllegalAccessException {
+		setAccessible( member );
+		return super.createValueReadWriteHandle( member );
 	}
 
 	@Override

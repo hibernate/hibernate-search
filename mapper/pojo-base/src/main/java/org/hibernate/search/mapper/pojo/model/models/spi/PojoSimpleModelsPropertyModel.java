@@ -12,7 +12,7 @@ import org.hibernate.search.util.common.reflect.spi.ValueReadHandle;
 
 final class PojoSimpleModelsPropertyModel<T>
 		extends
-		AbstractPojoModelsPropertyModel<T, AbstractPojoModelsBootstrapIntrospector> {
+		AbstractPojoModelsPropertyModel<T, AbstractPojoModelsBootstrapIntrospector, ValueReadHandle<T>> {
 
 	PojoSimpleModelsPropertyModel(AbstractPojoModelsBootstrapIntrospector introspector,
 			PojoSimpleModelsRawTypeModel<?> holderTypeModel,

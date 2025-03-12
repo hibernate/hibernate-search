@@ -20,11 +20,14 @@ import org.hibernate.search.util.common.AssertionFailure;
 import org.hibernate.search.util.common.impl.Contracts;
 import org.hibernate.search.util.common.reflect.spi.ValueReadHandle;
 
-public abstract class AbstractPojoModelsPropertyModel<T, I extends AbstractPojoModelsBootstrapIntrospector>
+public abstract class AbstractPojoModelsPropertyModel<
+		T,
+		I extends AbstractPojoModelsBootstrapIntrospector,
+		H extends ValueReadHandle<T>>
 		implements PojoPropertyModel<T> {
 
 	protected final I introspector;
-	protected final AbstractPojoModelsRawTypeModel<?, I> holderTypeModel;
+	protected final AbstractPojoModelsRawTypeModel<?, I, ?> holderTypeModel;
 
 	protected final String name;
 	/**
@@ -35,11 +38,11 @@ public abstract class AbstractPojoModelsPropertyModel<T, I extends AbstractPojoM
 	protected final List<MemberDetails> declaredProperties;
 	private final List<Member> members;
 
-	private ValueReadHandle<T> handleCache;
+	private H handleCache;
 	private PojoTypeModel<T> typeModelCache;
 	private Member memberCache;
 
-	public AbstractPojoModelsPropertyModel(I introspector, AbstractPojoModelsRawTypeModel<?, I> holderTypeModel,
+	public AbstractPojoModelsPropertyModel(I introspector, AbstractPojoModelsRawTypeModel<?, I, ?> holderTypeModel,
 			String name, List<MemberDetails> declaredProperties, List<Member> members) {
 		Contracts.assertNotNullNorEmpty( members, "members" );
 		this.introspector = introspector;
@@ -79,7 +82,7 @@ public abstract class AbstractPojoModelsPropertyModel<T, I extends AbstractPojoM
 	}
 
 	@Override
-	public final ValueReadHandle<T> handle() {
+	public final H handle() {
 		if ( handleCache == null ) {
 			try {
 				handleCache = createHandle( member() );
@@ -102,7 +105,7 @@ public abstract class AbstractPojoModelsPropertyModel<T, I extends AbstractPojoM
 		return memberCache;
 	}
 
-	protected abstract ValueReadHandle<T> createHandle(Member member) throws ReflectiveOperationException;
+	protected abstract H createHandle(Member member) throws ReflectiveOperationException;
 
 	final Type getterGenericReturnType() {
 		Member member = member();

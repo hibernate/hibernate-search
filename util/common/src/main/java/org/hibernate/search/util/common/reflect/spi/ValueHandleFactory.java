@@ -9,6 +9,8 @@ import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 
+import org.hibernate.search.util.common.annotation.Incubating;
+
 public interface ValueHandleFactory {
 
 	<T> ValueCreateHandle<T> createForConstructor(Constructor<T> constructor) throws IllegalAccessException;
@@ -16,6 +18,9 @@ public interface ValueHandleFactory {
 	ValueReadHandle<?> createForField(Field field) throws IllegalAccessException;
 
 	ValueReadHandle<?> createForMethod(Method method) throws IllegalAccessException;
+
+	@Incubating
+	ValueReadWriteHandle<?> createForFieldWrite(Field field) throws IllegalAccessException;
 
 	/**
 	 * @return A factory producing value handles that rely on {@code java.lang.reflect}

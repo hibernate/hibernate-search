@@ -12,6 +12,7 @@ import org.hibernate.search.mapper.pojo.mapping.building.spi.ErrorCollectingPojo
 import org.hibernate.search.mapper.pojo.mapping.building.spi.PojoIndexMappingCollectorPropertyNode;
 import org.hibernate.search.mapper.pojo.mapping.building.spi.PojoIndexMappingCollectorTypeNode;
 import org.hibernate.search.mapper.pojo.mapping.building.spi.PojoTypeMetadataContributor;
+import org.hibernate.search.mapper.pojo.mapping.definition.annotation.impl.AnnotationPojoInjectableBinderCollector;
 import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.AssociationInverseSideOptionsStep;
 import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.IndexingDependencyOptionsStep;
 import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.PropertyMappingDocumentIdOptionsStep;
@@ -33,13 +34,16 @@ class InitialPropertyMappingStep
 
 	private final TypeMappingStepImpl parent;
 	private final PojoPropertyModel<?> propertyModel;
+	private final AnnotationPojoInjectableBinderCollector injectableBinderCollector;
 
 	private final ErrorCollectingPojoPropertyMetadataContributor children =
 			new ErrorCollectingPojoPropertyMetadataContributor();
 
-	InitialPropertyMappingStep(TypeMappingStepImpl parent, PojoPropertyModel<?> propertyModel) {
+	InitialPropertyMappingStep(TypeMappingStepImpl parent, PojoPropertyModel<?> propertyModel,
+			AnnotationPojoInjectableBinderCollector injectableBinderCollector) {
 		this.parent = parent;
 		this.propertyModel = propertyModel;
+		this.injectableBinderCollector = injectableBinderCollector;
 	}
 
 	@Override
@@ -72,6 +76,7 @@ class InitialPropertyMappingStep
 	@Override
 	public PropertyMappingStep binder(PropertyBinder binder, Map<String, Object> params) {
 		children.add( new PropertyBridgeMappingContributor( binder, params ) );
+		injectableBinderCollector.add( binder );
 		return this;
 	}
 

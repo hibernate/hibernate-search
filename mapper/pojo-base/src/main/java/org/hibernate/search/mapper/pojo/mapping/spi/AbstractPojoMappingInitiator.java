@@ -29,6 +29,7 @@ import org.hibernate.search.mapper.pojo.mapping.building.spi.PojoTypeMetadataCon
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.AnnotationMappingConfigurationContext;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.IndexedEmbedded;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.impl.AnnotationMappingConfigurationContextImpl;
+import org.hibernate.search.mapper.pojo.mapping.definition.annotation.impl.PojoInjectableBinderInjector;
 import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.ProgrammaticMappingConfigurationContext;
 import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.impl.ProgrammaticMappingConfigurationContextImpl;
 import org.hibernate.search.mapper.pojo.mapping.impl.PojoMappingConfigurationContextImpl;
@@ -40,6 +41,7 @@ public abstract class AbstractPojoMappingInitiator<MPBS extends MappingPartialBu
 		implements MappingInitiator<PojoTypeMetadataContributor, MPBS> {
 
 	private final PojoBootstrapIntrospector introspector;
+	private final PojoInjectableBinderInjector binderInjector;
 
 	private BeanReference<? extends IdentifierBridge<Object>> providedIdentifierBridge;
 	private IdentityMappingMode containedEntityIdentityMappingMode = IdentityMappingMode.OPTIONAL;
@@ -59,13 +61,15 @@ public abstract class AbstractPojoMappingInitiator<MPBS extends MappingPartialBu
 
 	protected AbstractPojoMappingInitiator(PojoBootstrapIntrospector introspector, MapperHints mapperHints) {
 		this.introspector = introspector;
+		this.binderInjector = new PojoInjectableBinderInjector( introspector );
 
 		/*
 		 * Make sure to create and add the annotation mapping even if the user does not call the
 		 * annotationMapping() method to register annotated types explicitly,
 		 * in case annotated type discovery is enabled.
 		 */
-		annotationMappingConfiguration = new AnnotationMappingConfigurationContextImpl( introspector, mapperHints );
+		annotationMappingConfiguration =
+				new AnnotationMappingConfigurationContextImpl( introspector, mapperHints, binderInjector.binderCollector() );
 		addConfigurationContributor( annotationMappingConfiguration );
 
 		typePatternMatcherFactory = new TypePatternMatcherFactory( introspector );
@@ -74,7 +78,8 @@ public abstract class AbstractPojoMappingInitiator<MPBS extends MappingPartialBu
 	}
 
 	public ProgrammaticMappingConfigurationContext programmaticMapping() {
-		ProgrammaticMappingConfigurationContextImpl context = new ProgrammaticMappingConfigurationContextImpl( introspector );
+		ProgrammaticMappingConfigurationContextImpl context =
+				new ProgrammaticMappingConfigurationContextImpl( introspector, binderInjector.binderCollector() );
 		addConfigurationContributor( context );
 		return context;
 	}
@@ -139,7 +144,7 @@ public abstract class AbstractPojoMappingInitiator<MPBS extends MappingPartialBu
 			TypeMetadataContributorProvider<PojoTypeMetadataContributor> contributorProvider) {
 		return new PojoMapper<>(
 				buildContext, contributorProvider,
-				introspector,
+				introspector, binderInjector,
 				extractorBinder, bridgeResolver,
 				providedIdentifierBridge,
 				containedEntityIdentityMappingMode, tenancyMode,
