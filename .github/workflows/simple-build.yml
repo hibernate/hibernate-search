@@ -43,18 +43,19 @@ jobs:
     # Ignore dependabot PRs; we'll batch dependency upgrades manually in a single PR before we test them.
     if: github.actor != 'dependabot[bot]'
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # 4.2.2
       - name: Set up Java 11
-        uses: actions/setup-java@v1
+        uses: actions/setup-java@3a4f6e1af504cf6a31855fa899c6aa5355ba6c12 # 4.7.0
         with:
           java-version: 11
+          distribution: temurin
       - name: Get year/month for cache key
         id: get-date
         run: |
           echo "::set-output name=yearmonth::$(/bin/date -u "+%Y-%m")"
         shell: bash
       - name: Cache Maven local repository
-        uses: actions/cache@v2
+        uses: actions/cache@d4323d4df104b026a6aa633fdb11d772146be0bf # 4.2.2
         id: cache-maven
         with:
           path: ~/.m2/repository
@@ -67,7 +68,7 @@ jobs:
       - name: Build and test
         run: ./mvnw $MAVEN_ARGS install -Pdist -Pcoverage -Pjqassistant
       - name: Upload test reports (if Maven failed)
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@4cec3d8aa04e39d1a68397de0c4cd6fb9dce8ec1 # 4.6.1
         if: failure()
         with:
           name: test-reports-java11
