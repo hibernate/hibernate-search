@@ -138,6 +138,7 @@ public abstract class DoubleMultiValuesToSingleValuesSource extends DoubleValues
 
 			int lastSeenParentDoc = -1;
 			double lastEmittedValue = -1;
+			boolean result = false;
 
 			@Override
 			public double doubleValue() {
@@ -148,16 +149,18 @@ public abstract class DoubleMultiValuesToSingleValuesSource extends DoubleValues
 			public boolean advanceExact(int parentDoc) throws IOException {
 				assert parentDoc >= lastSeenParentDoc : "can only evaluate current and upcoming parent docs";
 				if ( parentDoc == lastSeenParentDoc ) {
-					return true;
-				}
-
-				if ( !childDocsWithValues.advanceExactParent( parentDoc ) ) {
-					// No child of this parent has a value
-					return false;
+					return result;
 				}
 
 				lastSeenParentDoc = parentDoc;
+				if ( !childDocsWithValues.advanceExactParent( parentDoc ) ) {
+					// No child of this parent has a value
+					result = false;
+					return false;
+				}
+
 				lastEmittedValue = mode.pick( values, childDocsWithValues );
+				result = true;
 				return true;
 			}
 
