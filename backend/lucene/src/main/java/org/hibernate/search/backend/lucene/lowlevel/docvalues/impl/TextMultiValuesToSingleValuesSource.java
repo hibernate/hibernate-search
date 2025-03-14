@@ -118,6 +118,7 @@ public abstract class TextMultiValuesToSingleValuesSource {
 		return new SortedSetDocValuesToSortedDocValuesWrapper( values ) {
 			int lastSeenParentDoc = -1;
 			int lastEmittedOrd = -1;
+			boolean result = false;
 
 			@Override
 			public int ordValue() {
@@ -133,16 +134,18 @@ public abstract class TextMultiValuesToSingleValuesSource {
 			public boolean advanceExact(int parentDoc) throws IOException {
 				assert parentDoc >= lastSeenParentDoc : "can only evaluate current and upcoming parent docs";
 				if ( parentDoc == lastSeenParentDoc ) {
-					return true;
+					return result;
 				}
+				lastSeenParentDoc = parentDoc;
 
 				if ( !childDocsWithValues.advanceExactParent( parentDoc ) ) {
 					// No child of this parent has a value
+					result = false;
 					return false;
 				}
 
-				lastSeenParentDoc = parentDoc;
 				lastEmittedOrd = (int) mode.pick( values, childDocsWithValues );
+				result = true;
 				return true;
 			}
 		};
