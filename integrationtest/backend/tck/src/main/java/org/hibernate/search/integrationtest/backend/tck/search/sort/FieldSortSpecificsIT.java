@@ -7,6 +7,7 @@ package org.hibernate.search.integrationtest.backend.tck.search.sort;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.hibernate.search.util.impl.integrationtest.common.assertion.SearchHitsAssert.assertThatHits;
 import static org.hibernate.search.util.impl.integrationtest.common.assertion.SearchResultAssert.assertThatQuery;
+import static org.hibernate.search.util.impl.integrationtest.common.assertion.SearchResultAssert.assertThatResult;
 import static org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMapperUtils.documentProvider;
 import static org.junit.jupiter.api.Assumptions.assumeFalse;
 import static org.junit.jupiter.api.Assumptions.assumeTrue;
@@ -584,6 +585,27 @@ class FieldSortSpecificsIT<F> {
 		assertThatQuery( query )
 				.hasDocRefHitsExactOrder( index.typeName(), dataSet.doc3Id, dataSet.doc2Id, dataSet.doc1Id,
 						dataSet.emptyDoc1Id );
+	}
+
+	@ParameterizedTest(name = "{0} - {2} - {1}")
+	@MethodSource("params")
+	@TestForIssue(jiraKey = { "HSEARCH-5334" })
+	void missingValue_singleElement(TestedFieldStructure fieldStructure,
+			FieldTypeDescriptor<F, ?> fieldType, SortMode sortMode,
+			DataSet<F> dataSetForAsc, DataSet<F> dataSetForDesc) {
+		assumeTestParametersWork( fieldStructure, fieldType, sortMode );
+
+		DataSet<F> dataSet;
+		SearchQuery<DocumentReference> query;
+
+		String fieldPath = getFieldPath( fieldStructure, fieldType );
+
+		// Explicit order with missing().last()
+		dataSet = dataSetForAsc;
+		query = matchNonEmptyAndEmpty1Query( dataSet, f -> f.field( fieldPath ).asc().missing().lowest(), sortMode,
+				fieldStructure );
+		assertThatResult( query.fetch( 0, 1 ) )
+				.hasDocRefHitsExactOrder( index.typeName(), dataSet.emptyDoc1Id );
 	}
 
 	private SearchQuery<DocumentReference> matchNonEmptyQuery(DataSet<F> dataSet,
