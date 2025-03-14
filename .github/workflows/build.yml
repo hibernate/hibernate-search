@@ -84,18 +84,19 @@ jobs:
       - name: Support longpaths on Windows
         if: "startsWith(matrix.os.runs-on, 'windows')"
         run: git config --global core.longpaths true
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # 4.2.2
         with:
           # Fetch the whole history to make sure that gitflow incremental builder
           # can find the base commit.
           fetch-depth: 0
       - name: Set up Java ${{ matrix.os.java.version }}
-        uses: actions/setup-java@v1
+        uses: actions/setup-java@3a4f6e1af504cf6a31855fa899c6aa5355ba6c12 # 4.7.0
         with:
           java-version: ${{ matrix.os.java.version }}
+          distribution: temurin
       # https://github.com/actions/cache/blob/main/examples.md#java---maven
       - name: Cache local Maven repository
-        uses: actions/cache@v3
+        uses: actions/cache@d4323d4df104b026a6aa633fdb11d772146be0bf # 4.2.2
         with:
           path: ~/.m2/repository
           key: ${{ runner.os }}-maven-${{ hashFiles('**/pom.xml') }}
@@ -131,7 +132,7 @@ jobs:
             echo EOF
           } >> "$GITHUB_ENV"
       - name: Upload build reports (if build failed)
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@4cec3d8aa04e39d1a68397de0c4cd6fb9dce8ec1 # 4.6.1
         if: ${{ failure() || cancelled() }}
         with:
           name: ${{ format('build-reports-{0}', matrix.os.name ) }}
