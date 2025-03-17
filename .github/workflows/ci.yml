@@ -1,0 +1,145 @@
+# SPDX-License-Identifier: Apache-2.0
+# Copyright Red Hat Inc. and Hibernate Authors
+
+# This is not the main CI job, but it is useful on forks.
+# See MAINTAINERS.md for details about all available CI jobs.
+
+name: GH Actions CI
+
+on:
+  push:
+    branches:
+      # Pattern order matters: the last matching inclusion/exclusion wins
+      - '**'
+      - '!3.*'
+      - '!4.*'
+      - '!5.*'
+      - '!6.*'
+      - '!dependabot/**'
+      - '!wip/**/dependency-update/**'
+    tags:
+      - '**'
+  pull_request:
+    types: [ opened, synchronize, reopened, ready_for_review ]
+    branches:
+      # Pattern order matters: the last matching inclusion/exclusion wins
+      - '**'
+      - '!3.*'
+      - '!4.*'
+      - '!5.*'
+      - '!6.*'
+      # Ignore dependabot PRs that are not just about build dependencies;
+      # we'll reject such dependant PRs and send a PR ourselves.
+      - '!dependabot/**'
+      - 'dependabot/maven/build-dependencies-**'
+      - 'dependabot/docker/**/build-containers-**'
+      - 'dependabot/docker/**/database-containers-**'
+
+concurrency:
+  group: "workflow = ${{ github.workflow }}, ref = ${{ github.event.ref }}, pr = ${{ github.event.pull_request.id }}"
+  cancel-in-progress: ${{ github.event_name == 'pull_request' || github.repository != 'hibernate/hibernate-search' }}
+
+defaults:
+  run:
+    shell: bash
+
+env:
+  MAVEN_ARGS: "-e -B --settings .github/mvn-settings.xml --fail-at-end"
+  TESTCONTAINERS_REUSE_ENABLE: true
+
+jobs:
+  build:
+    name: ${{matrix.os.name}}
+    runs-on: ${{ matrix.os.runs-on }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os:
+          - {
+            name: "Linux JDK 21",
+            runs-on: 'ubuntu-latest',
+            java: {
+              version: 21
+            },
+            maven: {
+              # Since we only start an Elasticsearch container on Linux we add the profile to enable container reuse here:
+              args: '-Pci-build'
+            }
+          }
+          # We can't start Linux containers on GitHub Actions' Windows VMs,
+          # so we can't run Elasticsearch tests.
+          # See https://github.com/actions/runner-images/issues/1143#issuecomment-972929995
+          - {
+            name: "Windows JDK 21",
+            runs-on: 'windows-latest',
+            java: {
+              version: 21
+            },
+            maven: {
+              args: '-Dtest.elasticsearch.skip=true'
+            }
+          }
+    steps:
+      - name: Support longpaths on Windows
+        if: "startsWith(matrix.os.runs-on, 'windows')"
+        run: git config --global core.longpaths true
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # 4.2.2
+        with:
+          persist-credentials: false
+          # Fetch the whole history to make sure that gitflow incremental builder
+          # can find the base commit.
+          fetch-depth: 0
+      - name: Set up Java ${{ matrix.os.java.version }}
+        uses: actions/setup-java@3a4f6e1af504cf6a31855fa899c6aa5355ba6c12 # 4.7.0
+        with:
+          java-version: ${{ matrix.os.java.version }}
+          distribution: temurin
+      # https://github.com/actions/cache/blob/main/examples.md#java---maven
+      - name: Cache local Maven repository
+        uses: actions/cache@d4323d4df104b026a6aa633fdb11d772146be0bf # 4.2.2
+        with:
+          path: ~/.m2/repository
+          # use a different key than workflows running in trusted mode
+          key: ${{ github.event_name == 'push' && 'trusted' || 'untrusted' }}-${{ runner.os }}-maven-${{ hashFiles('**/pom.xml') }}
+          restore-keys: |
+            ${{ github.event_name == 'push' && 'trusted' || 'untrusted' }}-${{ runner.os }}-maven-
+      - name: Set up Maven
+        run: ./mvnw -v
+      - name: Docker cleanup
+        run: ./ci/docker-cleanup.sh
+
+      - name: Build code and run unit tests and basic checks
+        run: |
+          ./mvnw $MAVEN_ARGS ${{ matrix.os.maven.args }} clean install \
+          -Pjqassistant -Pdist -Pci-build -DskipITs
+        env:
+          DEVELOCITY_ACCESS_KEY: "${{ secrets.DEVELOCITY_ACCESS_KEY || '' }}"
+      # For jobs running on 'pull_request', upload build scan data.
+      # The actual publishing must be done in a separate job (see ci-report.yml).
+      # We don't write to the remote cache as that would be unsafe.
+      - name: Upload GitHub Actions artifact for the Develocity build scan
+        uses: actions/upload-artifact@4cec3d8aa04e39d1a68397de0c4cd6fb9dce8ec1 # 4.6.1
+        if: "${{ github.event_name == 'pull_request' && !cancelled() }}"
+        with:
+          name: build-scan-data-initial-${{ matrix.os.name }}
+          path: ~/.m2/.develocity/build-scan-data
+
+      - name: Run integration tests in the default environment
+        run: |
+          ./mvnw $MAVEN_ARGS ${{ matrix.os.maven.args }} clean verify \
+          -Pskip-checks \
+          ${{ github.event.pull_request.base.ref && format('-Dincremental -Dgib.referenceBranch=refs/remotes/origin/{0}', github.event.pull_request.base.ref) || '' }}
+        env:
+          DEVELOCITY_ACCESS_KEY: "${{ secrets.DEVELOCITY_ACCESS_KEY || '' }}"
+      # Same as above, but for the build scan of the latest Maven run.
+      - name: Upload GitHub Actions artifact for the Develocity build scan
+        uses: actions/upload-artifact@4cec3d8aa04e39d1a68397de0c4cd6fb9dce8ec1 # 4.6.1
+        if: "${{ github.event_name == 'pull_request' && !cancelled() }}"
+        with:
+          name: build-scan-data-integrationtest-${{ matrix.os.name }}
+          path: ~/.m2/.develocity/build-scan-data
+
+      - name: Docker cleanup
+        run: ./ci/docker-cleanup.sh
+      - name: Omit produced artifacts from build cache
+        run: rm -r ~/.m2/repository/org/hibernate/search
