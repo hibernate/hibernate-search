@@ -82,20 +82,23 @@ public class StandalonePojoIntegrationBooterImpl implements StandalonePojoIntegr
 	}
 
 	private StandalonePojoIntegrationPartialBuildState doBootFirstPhase() {
-		StandalonePojoBootstrapIntrospector introspector =
-				StandalonePojoBootstrapIntrospector.create( null, valueHandleFactory != null
-						? valueHandleFactory
-						: ValueHandleFactory.usingMethodHandle( MethodHandles.publicLookup() ) );
-		StandalonePojoMappingKey mappingKey = new StandalonePojoMappingKey();
-		StandalonePojoMappingInitiator mappingInitiator = new StandalonePojoMappingInitiator( introspector );
-		for ( AnnotatedTypeSource source : annotatedTypeSources ) {
-			source.apply( mappingInitiator.annotationMapping() );
-		}
-
 		SearchIntegrationEnvironment environment = null;
 		SearchIntegrationPartialBuildState integrationPartialBuildState = null;
 		try {
 			environment = createEnvironment();
+
+			StandalonePojoBootstrapIntrospector introspector =
+					StandalonePojoBootstrapIntrospector.create(
+							environment.classResolver(),
+							null,
+							valueHandleFactory != null
+									? valueHandleFactory
+									: ValueHandleFactory.usingMethodHandle( MethodHandles.publicLookup() ) );
+			StandalonePojoMappingKey mappingKey = new StandalonePojoMappingKey();
+			StandalonePojoMappingInitiator mappingInitiator = new StandalonePojoMappingInitiator( introspector );
+			for ( AnnotatedTypeSource source : annotatedTypeSources ) {
+				source.apply( mappingInitiator.annotationMapping() );
+			}
 
 			SearchIntegration.Builder integrationBuilder = SearchIntegration.builder( environment );
 			integrationBuilder.addMappingInitiator( mappingKey, mappingInitiator );
