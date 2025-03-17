@@ -9,6 +9,8 @@ import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.Member;
 import java.lang.reflect.Method;
+import java.net.URL;
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
@@ -19,13 +21,15 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import org.hibernate.models.internal.BasicModelBuildingContextImpl;
-import org.hibernate.models.internal.SimpleClassLoading;
 import org.hibernate.models.jandex.internal.JandexModelBuildingContextImpl;
 import org.hibernate.models.spi.AnnotationTarget;
 import org.hibernate.models.spi.ClassDetails;
 import org.hibernate.models.spi.ClassDetailsRegistry;
+import org.hibernate.models.spi.ClassLoading;
 import org.hibernate.models.spi.MemberDetails;
 import org.hibernate.models.spi.MethodDetails;
+import org.hibernate.search.engine.environment.classpath.spi.ClassLoadingException;
+import org.hibernate.search.engine.environment.classpath.spi.ClassResolver;
 import org.hibernate.search.mapper.pojo.model.spi.PojoBootstrapIntrospector;
 import org.hibernate.search.util.common.AssertionFailure;
 import org.hibernate.search.util.common.impl.StreamHelper;
@@ -41,27 +45,28 @@ public abstract class AbstractPojoModelsBootstrapIntrospector implements PojoBoo
 	protected final ValueHandleFactory valueHandleFactory;
 	private final ClassDetailsRegistry classDetailsRegistry;
 
-	public AbstractPojoModelsBootstrapIntrospector(ValueHandleFactory valueHandleFactory) {
-		this( simpleClassDetailsRegistry( null ), valueHandleFactory );
+	protected AbstractPojoModelsBootstrapIntrospector(ClassResolver classResolver, IndexView indexView,
+			ValueHandleFactory valueHandleFactory) {
+		this( simpleClassDetailsRegistry( classResolver, indexView ), valueHandleFactory );
 	}
 
-	public AbstractPojoModelsBootstrapIntrospector(ClassDetailsRegistry classDetailsRegistry,
+	protected AbstractPojoModelsBootstrapIntrospector(ClassDetailsRegistry classDetailsRegistry,
 			ValueHandleFactory valueHandleFactory) {
 		this.classDetailsRegistry = classDetailsRegistry;
 		this.typeOrdering = new PojoModelsClassOrdering( classDetailsRegistry );
 		this.valueHandleFactory = valueHandleFactory;
 	}
 
-	protected static ClassDetailsRegistry simpleClassDetailsRegistry(IndexView indexView) {
+	private static ClassDetailsRegistry simpleClassDetailsRegistry(ClassResolver classResolver, IndexView indexView) {
 		if ( indexView == null ) {
 			return new BasicModelBuildingContextImpl(
-					SimpleClassLoading.SIMPLE_CLASS_LOADING
+					new HibernateSearchClassLoading( classResolver )
 			).getClassDetailsRegistry();
 		}
 		else {
 			return new JandexModelBuildingContextImpl(
 					indexView,
-					SimpleClassLoading.SIMPLE_CLASS_LOADING,
+					new HibernateSearchClassLoading( classResolver ),
 					null
 			).getClassDetailsRegistry();
 		}
@@ -163,6 +168,41 @@ public abstract class AbstractPojoModelsBootstrapIntrospector implements PojoBoo
 		}
 		else {
 			return name;
+		}
+	}
+
+	private record HibernateSearchClassLoading(ClassResolver delegate) implements ClassLoading {
+
+		@SuppressWarnings("unchecked")
+		@Override
+		public <T> Class<T> classForName(String name) {
+			return (Class<T>) delegate.classForName( name );
+		}
+
+		@SuppressWarnings("unchecked")
+		@Override
+		public <T> Class<T> findClassForName(String name) {
+			try {
+				return (Class<T>) delegate.classForName( name );
+			}
+			catch (ClassLoadingException e) {
+				return null;
+			}
+		}
+
+		@Override
+		public Package packageForName(String name) {
+			return delegate.packageForName( name );
+		}
+
+		@Override
+		public URL locateResource(String resourceName) {
+			return delegate.locateResource( resourceName );
+		}
+
+		@Override
+		public <S> Collection<S> loadJavaServices(Class<S> serviceType) {
+			return delegate.loadJavaServices( serviceType );
 		}
 	}
 }

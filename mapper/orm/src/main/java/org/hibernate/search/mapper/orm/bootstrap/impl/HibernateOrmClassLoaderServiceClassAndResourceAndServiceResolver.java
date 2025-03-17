@@ -5,6 +5,8 @@
 package org.hibernate.search.mapper.orm.bootstrap.impl;
 
 import java.io.InputStream;
+import java.net.URL;
+import java.util.Collection;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
@@ -60,6 +62,36 @@ final class HibernateOrmClassLoaderServiceClassAndResourceAndServiceResolver
 	}
 
 	@Override
+	public Package packageForName(String packageName) {
+		Package pakcage = null;
+		try {
+			pakcage = hibernateClassLoaderService.packageForNameOrNull( packageName );
+		}
+		catch (Exception e) {
+			// ignore
+		}
+		if ( pakcage == null ) {
+			pakcage = internalClassResolver.packageForName( packageName );
+		}
+		return pakcage;
+	}
+
+	@Override
+	public URL locateResource(String resourceName) {
+		URL url = null;
+		try {
+			url = hibernateClassLoaderService.locateResource( resourceName );
+		}
+		catch (Exception e) {
+			// ignore
+		}
+		if ( url == null ) {
+			url = internalClassResolver.locateResource( resourceName );
+		}
+		return url;
+	}
+
+	@Override
 	public InputStream locateResourceStream(String name) {
 		InputStream in = hibernateClassLoaderService.locateResourceStream( name );
 		if ( in == null ) {
@@ -69,9 +101,9 @@ final class HibernateOrmClassLoaderServiceClassAndResourceAndServiceResolver
 	}
 
 	@Override
-	public <T> Iterable<T> loadJavaServices(Class<T> serviceContract) {
+	public <T> Collection<T> loadJavaServices(Class<T> serviceContract) {
 		// when it comes to services, we need to search in both services and the de-duplicate
-		// however, we cannot rely on 'equals' for comparison. Instead compare class names
+		// however, we cannot rely on 'equals' for comparison. Instead, compare class names
 		Iterable<T> servicesFromORMCLassLoader = hibernateClassLoaderService.loadJavaServices( serviceContract );
 		Iterable<T> servicesFromLocalClassLoader = internalServiceResolver.loadJavaServices( serviceContract );
 
