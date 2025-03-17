@@ -879,13 +879,11 @@ def pullContainerImages(String mavenArgs) {
 	if ( containerImageRefs.length == 0 ) {
 		return
 	}
-	docker.withRegistry('https://index.docker.io/v1/', 'hibernateci.hub.docker.com') {
-		// Cannot use a foreach loop because then Jenkins wants to serialize the iterator,
-		// and obviously the iterator is not serializable.
-		for (int i = 0; i < containerImageRefs.length; i++) {
-			containerImageRef = containerImageRefs[i]
-			docker.image( containerImageRef ).pull()
-		}
+	// Cannot use a foreach loop because then Jenkins wants to serialize the iterator,
+	// and obviously the iterator is not serializable.
+	for (int i = 0; i < containerImageRefs.length; i++) {
+		containerImageRef = containerImageRefs[i]
+		sh "docker pull ${containerImageRef}"
 	}
 }
 
