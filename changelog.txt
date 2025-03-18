@@ -1,6 +1,24 @@
 Hibernate Search Changelog
 ==========================
 
+7.2.3.Final (2025-03-18)
+-------------------------
+
+** Bug
+    * HSEARCH-5334 Conditional search failure when sorting by nullable fields
+
+** Improvement
+    * HSEARCH-5340 Upgrade to Hibernate ORM 6.6.11.Final
+    * HSEARCH-5323 Upgrade to Hibernate ORM 6.6.9.Final
+    * HSEARCH-5320 Upgrade to Hibernate ORM 6.6.8.Final
+    * HSEARCH-5313 Upgrade to Hibernate ORM 6.6.7.Final
+    * HSEARCH-5311 Upgrade to Hibernate ORM 6.6.6.Final
+    * HSEARCH-5303 Upgrade to Hibernate ORM 6.6.5.Final
+    * HSEARCH-5294 Upgrade to Hibernate ORM 6.6.4.Final
+
+** Task
+    * HSEARCH-5287 Test Hibernate Search against JDK 25
+
 7.2.2.Final (2024-11-25)
 -------------------------
 
