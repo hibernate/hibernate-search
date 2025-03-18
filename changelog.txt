@@ -1,6 +1,44 @@
 Hibernate Search Changelog
 ==========================
 
+8.0.0.Alpha2 (2025-03-18)
+-------------------------
+
+** Bug
+    * HSEARCH-5334 Conditional search failure when sorting by nullable fields
+
+** Improvement
+    * HSEARCH-5343 Upgrade to AWS SDK 2.31.2
+    * HSEARCH-5342 Use a org.hibernate.models.spi.ClassLoading based on org.hibernate.search.engine.environment.classpath.spi.ClassResolver
+    * HSEARCH-5331 Upgrade Elasticsearch client to 8.17.3
+    * HSEARCH-5330 Upgrade to Jackson 2.18.3
+    * HSEARCH-5329 Upgrade jboss-logging-tools to 3.0.4.Final
+    * HSEARCH-5317 Add compatibility with OpenSearch 2.19.0
+    * HSEARCH-5315 Upgrade Elasticsearch client to 8.17.2
+    * HSEARCH-5312 Upgrade to GSON 2.12.1
+    * HSEARCH-5310 Upgrade to commons-codec 1.18.0
+    * HSEARCH-5307 Upgrade Elasticsearch client to 8.17.1
+    * HSEARCH-5306 Upgrade to AWS SDK 2.30.2
+    * HSEARCH-5299 Upgrade to commons-codec 1.17.2
+    * HSEARCH-5298 Upgrade to Hibernate ORM 7.0.0.Beta4
+    * HSEARCH-5295 Upgrade to Lucene 10.1.0
+    * HSEARCH-3204 Detect which collection is being recreated in PostCollectionRecreateEvents
+
+** Task
+    * HSEARCH-5335 Test against latest Elasticsearch 7.17.28
+    * HSEARCH-5333 Better account for knn test flakiness
+    * HSEARCH-5332 Test against the latest Elasticsearch 8.17.3
+    * HSEARCH-5328 Bump groovy-jsr223 to 4.0.26 and enable patch updates for it
+    * HSEARCH-5327 Do not pull search backend images when running lucene only build
+    * HSEARCH-5325 Test against the latest OpenSearch 2.19.1
+    * HSEARCH-5319 Address ExistsPredicateBaseIT issues with OpenSearch backend
+    * HSEARCH-5316 Test against the latest Elasticsearch 8.17.2
+    * HSEARCH-5308 Test against latest Elasticsearch 8.17.1
+    * HSEARCH-5302 Test against latest Elasticsearch 7.17.27
+    * HSEARCH-5297 Switch to narayana-spring-boot instead of atomikos
+    * HSEARCH-5296 Add a step to build pdf documentation to the nightly CI job
+    * HSEARCH-5239 Take advantage of ORM's SchemaManager.truncateMappedObjects() in tests
+
 8.0.0.Alpha1 (2024-12-17)
 -------------------------
 
