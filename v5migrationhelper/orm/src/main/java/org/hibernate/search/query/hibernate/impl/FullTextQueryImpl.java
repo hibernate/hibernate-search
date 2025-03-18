@@ -136,9 +136,13 @@ public class FullTextQueryImpl extends AbstractQuery implements FullTextQuery {
 	protected ScrollableResultsImplementor doScroll(ScrollMode scrollMode) {
 		SearchScroll<?> scroll = hSearchQuery.scroll( fetchSize != null ? fetchSize : 100 );
 		Integer maxResults = hSearchQuery.maxResults();
-		return new HibernateOrmSearchScrollableResultsAdapter<>( scroll,
+		// do not return right away to make eclipse compiler happy:
+		HibernateOrmSearchScrollableResultsAdapter adapter = new HibernateOrmSearchScrollableResultsAdapter(
+				scroll,
 				maxResults != null ? maxResults : Integer.MAX_VALUE,
-				Search5ScrollHitExtractor.INSTANCE );
+				Search5ScrollHitExtractor.INSTANCE
+		);
+		return adapter;
 	}
 
 	@Override
