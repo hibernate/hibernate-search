@@ -14,7 +14,7 @@ import java.util.function.BiConsumer;
 
 import org.hibernate.boot.Metadata;
 import org.hibernate.boot.spi.BootstrapContext;
-import org.hibernate.cfg.AvailableSettings;
+import org.hibernate.cfg.ManagedBeanSettings;
 import org.hibernate.engine.config.spi.ConfigurationService;
 import org.hibernate.engine.spi.SessionFactoryImplementor;
 import org.hibernate.models.spi.ClassDetailsRegistry;
@@ -30,23 +30,20 @@ import org.hibernate.search.util.common.impl.SuppressingCloser;
 import org.hibernate.search.util.common.reflect.spi.ValueHandleFactory;
 import org.hibernate.service.ServiceRegistry;
 
-import org.jboss.jandex.IndexView;
-
 public class HibernateOrmIntegrationBooterImpl implements HibernateOrmIntegrationBooter {
 
-
 	private final Metadata metadata;
-	private final IndexView jandexIndex;
+	private final Object jandexIndex;
 	private final ValueHandleFactory valueHandleFactory;
 	private final HibernateSearchPreIntegrationService preIntegrationService;
 	private final Optional<EnvironmentSynchronizer> environmentSynchronizer;
 	private final ClassDetailsRegistry classDetailsRegistry;
 
-	@SuppressWarnings("deprecation") // There is no alternative to getReflectionManager() at the moment.
+	@SuppressWarnings("deprecation") // using some deprecated config properties as a fallback
 	private HibernateOrmIntegrationBooterImpl(BuilderImpl builder) {
 		this.metadata = builder.metadata;
 		ServiceRegistry serviceRegistry = builder.bootstrapContext.getServiceRegistry();
-		this.jandexIndex = (IndexView) builder.bootstrapContext.getJandexView();
+		this.jandexIndex = builder.bootstrapContext.getJandexView();
 		this.valueHandleFactory = builder.valueHandleFactory != null
 				? builder.valueHandleFactory
 				: ValueHandleFactory.usingMethodHandle( MethodHandles.publicLookup() );
@@ -62,14 +59,13 @@ public class HibernateOrmIntegrationBooterImpl implements HibernateOrmIntegratio
 		else {
 			ConfigurationService ormConfigurationService =
 					HibernateOrmUtils.getServiceOrFail( serviceRegistry, ConfigurationService.class );
-			Object unknownBeanManager = ormConfigurationService.getSettings().get( AvailableSettings.CDI_BEAN_MANAGER );
+			Object unknownBeanManager =
+					ormConfigurationService.getSettings().get( ManagedBeanSettings.JAKARTA_CDI_BEAN_MANAGER );
 			if ( unknownBeanManager == null ) {
 				// Try jakarta settings as a default
-				// Not getting the constant from AvailableSettings because it does not exist in some ORM versions
-				unknownBeanManager = ormConfigurationService.getSettings().get( "jakarta.persistence.bean.manager" );
+				unknownBeanManager = ormConfigurationService.getSettings().get( ManagedBeanSettings.CDI_BEAN_MANAGER );
 			}
-			if ( unknownBeanManager instanceof ExtendedBeanManager ) {
-				ExtendedBeanManager extendedBeanManager = (ExtendedBeanManager) unknownBeanManager;
+			if ( unknownBeanManager instanceof ExtendedBeanManager extendedBeanManager ) {
 				ExtendedBeanManagerSynchronizer synchronizer = new ExtendedBeanManagerSynchronizer();
 				extendedBeanManager.registerLifecycleListener( synchronizer );
 				this.environmentSynchronizer = Optional.of( synchronizer );

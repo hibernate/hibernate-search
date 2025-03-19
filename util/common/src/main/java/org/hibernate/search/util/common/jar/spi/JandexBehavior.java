@@ -15,7 +15,15 @@ public final class JandexBehavior {
 		operation.execute();
 	}
 
+	public static <T> T applyWithJandex(JandexAction<T> operation) {
+		return operation.execute();
+	}
+
 	public interface JandexOperation {
 		void execute();
+	}
+
+	public interface JandexAction<T> {
+		T execute();
 	}
 }

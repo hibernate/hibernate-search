@@ -35,4 +35,8 @@ public interface PojoMapperMiscLog {
 	SearchException errorDiscoveringJandexIndex(URL codeSourceLocation, String causeMessage, String hint,
 			@Cause Exception cause);
 
+	@Message(id = ID_OFFSET + 179,
+			value = "Passed parameter value '%1$s' is not a Jandex index view and cannot be accepted.")
+	SearchException passedObjectNotJandexIndex(Object notIndex);
+
 }

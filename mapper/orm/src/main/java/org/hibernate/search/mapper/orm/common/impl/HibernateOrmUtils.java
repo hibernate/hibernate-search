@@ -36,6 +36,7 @@ import org.hibernate.search.mapper.orm.logging.impl.OrmMiscLog;
 import org.hibernate.search.mapper.pojo.loading.spi.PojoLoadingTypeContext;
 import org.hibernate.search.util.common.AssertionFailure;
 import org.hibernate.search.util.common.annotation.impl.SuppressForbiddenApis;
+import org.hibernate.search.util.common.jar.spi.JandexBehavior;
 import org.hibernate.service.Service;
 import org.hibernate.service.ServiceRegistry;
 import org.hibernate.service.spi.ServiceBinding;
@@ -202,11 +203,11 @@ public final class HibernateOrmUtils {
 			);
 		}
 		else {
-			return new JandexModelBuildingContextImpl(
+			return JandexBehavior.applyWithJandex( () -> new JandexModelBuildingContextImpl(
 					(IndexView) bootstrapContext.getJandexView(),
 					classLoading,
 					ModelsHelper::preFillRegistries
-			);
+			) );
 		}
 	}
 
