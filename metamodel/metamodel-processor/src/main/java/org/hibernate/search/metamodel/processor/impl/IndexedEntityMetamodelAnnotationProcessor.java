@@ -58,6 +58,9 @@ public class IndexedEntityMetamodelAnnotationProcessor implements MetamodelAnnot
 		try ( CloseableSearchMapping searchMapping = StandalonePojoIntegrationBooter.builder()
 				.introspectorCustomizer( this::wrapIntrospector )
 				.property( "hibernate.search.backend.directory.type", "local-heap" )
+				.property( "hibernate.search.backend.version_check.enabled", "false" )
+				.property( "hibernate.search.schema_management.strategy", "none" )
+				.property( "hibernate.search.backend.version", "8.17.3" )
 				.property(
 						StandalonePojoMapperSettings.MAPPING_CONFIGURER,
 						BeanReference.ofInstance( (StandalonePojoMappingConfigurer) configurationContext -> {
@@ -109,7 +112,8 @@ public class IndexedEntityMetamodelAnnotationProcessor implements MetamodelAnnot
 
 			for ( SearchIndexedEntity<?> entity : searchMapping.allIndexedEntities() ) {
 				context.messager().printMessage( Diagnostic.Kind.NOTE, entity.name() );
-				String packageName = entity.name().substring( 0, entity.name().lastIndexOf( "." ) );
+				TypeElement typeElement = introspectorContext.typeElementsByName( entity.name() );
+				String packageName = context.elementUtils().getPackageOf( typeElement ).getQualifiedName().toString();
 
 				MetamodelClassWriter.Builder builder =
 						new MetamodelClassWriter.Builder( MetamodelNamesFormatter.DEFAULT, packageName, entity.name() );
