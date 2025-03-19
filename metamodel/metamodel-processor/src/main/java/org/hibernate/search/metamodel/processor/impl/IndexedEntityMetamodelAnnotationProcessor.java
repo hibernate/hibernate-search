@@ -43,7 +43,6 @@ public class IndexedEntityMetamodelAnnotationProcessor implements MetamodelAnnot
 	private static final String ANNOTATION_INDEXED = "org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed";
 	private final HibernateSearchMetamodelProcessorContext context;
 	private final ProcessorIntrospectorContext introspectorContext;
-	private ProcessorPojoModelsBootstrapIntrospector introspector;
 
 	public IndexedEntityMetamodelAnnotationProcessor(HibernateSearchMetamodelProcessorContext context) {
 		this.context = context;
@@ -60,7 +59,9 @@ public class IndexedEntityMetamodelAnnotationProcessor implements MetamodelAnnot
 				.property( "hibernate.search.backend.directory.type", "local-heap" )
 				.property( "hibernate.search.backend.version_check.enabled", "false" )
 				.property( "hibernate.search.schema_management.strategy", "none" )
-				.property( "hibernate.search.backend.version", "8.17.3" )
+				.property( "hibernate.search.backend.version", context.configuration().backendVersion() )
+				.property( "hibernate.search.backend.lucene_version", context.configuration().luceneVersion() )
+				.property( "hibernate.search.configuration_property_checking.strategy", "ignore" )
 				.property(
 						StandalonePojoMapperSettings.MAPPING_CONFIGURER,
 						BeanReference.ofInstance( (StandalonePojoMappingConfigurer) configurationContext -> {
@@ -95,7 +96,6 @@ public class IndexedEntityMetamodelAnnotationProcessor implements MetamodelAnnot
 									processTypeAndProperties( indexedEntityType, typeMappingContext, ctx );
 								}
 								else {
-									// TODO: generate message bundle with JBoss Logging ?
 									context.messager()
 											.printMessage(
 													Diagnostic.Kind.ERROR,
@@ -105,18 +105,19 @@ public class IndexedEntityMetamodelAnnotationProcessor implements MetamodelAnnot
 											);
 								}
 							}
-
 						} )
-				).build()
-				.boot() ) {
+				).build().boot() ) {
+
+			boolean ormMapperPresent = context.isOrmMapperPresent();
 
 			for ( SearchIndexedEntity<?> entity : searchMapping.allIndexedEntities() ) {
-				context.messager().printMessage( Diagnostic.Kind.NOTE, entity.name() );
 				TypeElement typeElement = introspectorContext.typeElementsByName( entity.name() );
 				String packageName = context.elementUtils().getPackageOf( typeElement ).getQualifiedName().toString();
 
-				MetamodelClassWriter.Builder builder =
-						new MetamodelClassWriter.Builder( MetamodelNamesFormatter.DEFAULT, packageName, entity.name() );
+				MetamodelClassWriter builder =
+						new MetamodelClassWriter( ormMapperPresent, context.configuration(), MetamodelNamesFormatter.DEFAULT,
+								packageName,
+								entity.name() );
 
 				entity.indexManager().descriptor().staticFields()
 						.forEach( f -> {
@@ -133,7 +134,6 @@ public class IndexedEntityMetamodelAnnotationProcessor implements MetamodelAnnot
 						} );
 				try {
 					JavaFileObject source = context.filer().createSourceFile( builder.fqcn() );
-					context.messager().printMessage( Diagnostic.Kind.NOTE, source.toUri().toString() );
 					try ( Writer writer = source.openWriter() ) {
 						writer.append( builder.formatted() );
 					}
@@ -146,8 +146,6 @@ public class IndexedEntityMetamodelAnnotationProcessor implements MetamodelAnnot
 				}
 			}
 		}
-
-		context.messager().printMessage( Diagnostic.Kind.NOTE, "End" );
 	}
 
 	public static void processTypeAndProperties(TypeElement typeElement, TypeMappingStep typeMappingContext,
@@ -201,7 +199,6 @@ public class IndexedEntityMetamodelAnnotationProcessor implements MetamodelAnnot
 	}
 
 	private ProcessorPojoModelsBootstrapIntrospector wrapIntrospector(PojoBootstrapIntrospector introspector) {
-		this.introspector = new ProcessorPojoModelsBootstrapIntrospector( introspectorContext, introspector );
-		return this.introspector;
+		return new ProcessorPojoModelsBootstrapIntrospector( introspectorContext, introspector );
 	}
 }

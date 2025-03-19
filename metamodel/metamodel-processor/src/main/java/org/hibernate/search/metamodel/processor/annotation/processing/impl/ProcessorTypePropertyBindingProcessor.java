@@ -22,7 +22,7 @@ import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.PropertyBind
 import org.hibernate.search.mapper.pojo.bridge.runtime.PropertyBridgeWriteContext;
 import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.PropertyMappingStep;
 
-public class ProcessorTypePropertyBindingProcessor extends AbstractProcessorAnnotationProcessor {
+class ProcessorTypePropertyBindingProcessor extends AbstractProcessorAnnotationProcessor {
 	@Override
 	public void process(PropertyMappingStep mapping, AnnotationMirror annotation, Element element,
 			ProcessorAnnotationProcessorContext context) {

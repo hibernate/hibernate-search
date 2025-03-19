@@ -14,8 +14,8 @@ import java.util.TreeSet;
 
 import org.hibernate.search.engine.search.common.ValueModel;
 
-public record TypedFieldReferenceDetails(   String name, String identifier, Collection<String> typeVariables,
-											List<ClassProperty> properties, Collection<String> implementedInterfaces) {
+record TypedFieldReferenceDetails(  String name, String identifier, Collection<String> typeVariables,
+									List<ClassProperty> properties, Collection<String> implementedInterfaces) {
 	public static TypedFieldReferenceDetails of(Collection<TraitReferenceDetails> traits) {
 		StringBuilder name = new StringBuilder();
 		Set<String> typeVariables = new LinkedHashSet<>();

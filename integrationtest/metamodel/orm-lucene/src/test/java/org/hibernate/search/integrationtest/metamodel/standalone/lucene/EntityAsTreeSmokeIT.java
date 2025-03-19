@@ -64,7 +64,8 @@ class EntityAsTreeSmokeIT {
 
 		try ( var s = sessionFactory.openSession() ) {
 			SearchSession session = Search.session( s );
-			SearchScope<EntityAsTreeSmokeIT_IndexedEntity__, IndexedEntity> scope = EntityAsTreeSmokeIT_IndexedEntity__.INDEX.scope( session );
+			SearchScope<EntityAsTreeSmokeIT_IndexedEntity__, IndexedEntity> scope =
+					EntityAsTreeSmokeIT_IndexedEntity__.INDEX.scope( session );
 			assertThat( session.search( scope )
 					.where( f -> f.match().field( EntityAsTreeSmokeIT_IndexedEntity__.INDEX.containedEntities.text )
 							.matching( "entity text" ) )
@@ -80,7 +81,8 @@ class EntityAsTreeSmokeIT {
 
 		try ( var s = sessionFactory.openSession() ) {
 			SearchSession session = Search.session( s );
-			SearchScope<EntityAsTreeSmokeIT_IndexedEntity__, IndexedEntity> scope = EntityAsTreeSmokeIT_IndexedEntity__.INDEX.scope( session );
+			SearchScope<EntityAsTreeSmokeIT_IndexedEntity__, IndexedEntity> scope =
+					EntityAsTreeSmokeIT_IndexedEntity__.INDEX.scope( session );
 			assertThat( session.search( scope )
 					.select( f -> f.id() )
 					.where( f -> f.match().field( EntityAsTreeSmokeIT_IndexedEntity__.INDEX.containedEntities.text )

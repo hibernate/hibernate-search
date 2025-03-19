@@ -23,7 +23,6 @@ import org.hibernate.search.util.common.reflect.spi.ValueHandleFactory;
 public class ProcessorPojoModelsBootstrapIntrospector implements PojoBootstrapIntrospector {
 
 	private final Map<Name, PojoRawTypeModel<?>> elementTypeModelCache = new HashMap<>();
-	private final Map<Class<?>, PojoRawTypeModel<?>> typeModelCache = new HashMap<>();
 	private final ProcessorIntrospectorContext context;
 	private final PojoBootstrapIntrospector delegate;
 	private final ProcessorTypeOrdering typeOrdering;

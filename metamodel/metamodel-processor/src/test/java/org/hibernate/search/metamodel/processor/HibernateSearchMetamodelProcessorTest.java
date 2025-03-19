@@ -4,6 +4,7 @@
  */
 package org.hibernate.search.metamodel.processor;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.fail;
 
 import java.io.File;
@@ -14,6 +15,7 @@ import java.util.List;
 import java.util.Set;
 
 import javax.annotation.processing.Processor;
+import javax.tools.Diagnostic;
 import javax.tools.DiagnosticCollector;
 import javax.tools.JavaCompiler;
 import javax.tools.JavaFileObject;
@@ -65,9 +67,10 @@ class HibernateSearchMetamodelProcessorTest {
 				getSourceFile( ISBN.class ),
 				getSourceFile( MyEnum.class )
 		);
-
 		diagnostics.getDiagnostics().forEach( System.out::println );
 
+		assertThat( diagnostics.getDiagnostics().stream().map( Diagnostic::getKind ) )
+				.doesNotContain( Diagnostic.Kind.ERROR, Diagnostic.Kind.WARNING );
 	}
 
 	public boolean compile(Processor annotationProcessor, DiagnosticCollector<JavaFileObject> diagnostics,
@@ -96,6 +99,7 @@ class HibernateSearchMetamodelProcessorTest {
 	private Iterable<? extends File> dependencies() {
 		return Set.of(
 				dependency( "hibernate-search-mapper-pojo-base.jar" ),
+				dependency( "hibernate-search-mapper-pojo-standalone.jar" ),
 				dependency( "hibernate-search-engine.jar" )
 		);
 	}

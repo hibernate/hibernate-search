@@ -256,7 +256,7 @@
                                 ${basedir}/../mapper/orm-outbox-polling/src/main/java;
                                 ${basedir}/../mapper/orm-jakarta-batch/core/src/main/java;
                                 ${basedir}/../mapper/orm-jakarta-batch/jberet/src/main/java;
-                                ${basedir}/../metamodel/processor/src/main/java;
+                                ${basedir}/../metamodel/metamodel-processor/src/main/java;
                                 ${basedir}/../engine/target/generated-sources/annotations;
                                 ${basedir}/../util/common/target/generated-sources/annotations;
                                 ${basedir}/../mapper/pojo-base/target/generated-sources/annotations;
@@ -269,7 +269,7 @@
                                 ${basedir}/../mapper/orm-outbox-polling/target/generated-sources/annotations;
                                 ${basedir}/../mapper/orm-jakarta-batch/core/target/generated-sources/annotations;
                                 ${basedir}/../mapper/orm-jakarta-batch/jberet/target/generated-sources/annotations;
-                                ${basedir}/../metamodel/processor/target/generated-sources/annotations;
+                                ${basedir}/../metamodel/metamodel-processor/target/generated-sources/annotations;
                             </sourcepath>
                             <docfilessubdirs>true</docfilessubdirs>
                             <packagesheader>Hibernate Search Packages</packagesheader>

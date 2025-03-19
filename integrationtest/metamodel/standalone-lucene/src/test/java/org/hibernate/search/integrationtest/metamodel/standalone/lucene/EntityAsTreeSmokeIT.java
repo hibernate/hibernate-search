@@ -75,7 +75,8 @@ class EntityAsTreeSmokeIT {
 		indexed2.containedNonEntities.add( containedNonEntity2_1 );
 
 		try ( SearchSession session = mapping.createSession() ) {
-			SearchScope<EntityAsTreeSmokeIT_IndexedEntity__, IndexedEntity> scope = EntityAsTreeSmokeIT_IndexedEntity__.INDEX.scope( session );
+			SearchScope<EntityAsTreeSmokeIT_IndexedEntity__, IndexedEntity> scope =
+					EntityAsTreeSmokeIT_IndexedEntity__.INDEX.scope( session );
 			assertThat( session.search( scope )
 					.where( f -> f.match().field( EntityAsTreeSmokeIT_IndexedEntity__.INDEX.containedEntities.text )
 							.matching( "entity text" ) )
@@ -91,7 +92,8 @@ class EntityAsTreeSmokeIT {
 			simulatedIndexedEntityDatastore.put( indexed2.id, indexed2 );
 		}
 		try ( SearchSession session = mapping.createSession() ) {
-			SearchScope<EntityAsTreeSmokeIT_IndexedEntity__, IndexedEntity> scope = EntityAsTreeSmokeIT_IndexedEntity__.INDEX.scope( session );
+			SearchScope<EntityAsTreeSmokeIT_IndexedEntity__, IndexedEntity> scope =
+					EntityAsTreeSmokeIT_IndexedEntity__.INDEX.scope( session );
 			assertThat( session.search( scope )
 					.where( f -> f.match().field( EntityAsTreeSmokeIT_IndexedEntity__.INDEX.containedEntities.text )
 							.matching( "entity" ) )
@@ -104,7 +106,8 @@ class EntityAsTreeSmokeIT {
 			session.indexingPlan().delete( indexed1 );
 		}
 		try ( SearchSession session = mapping.createSession() ) {
-			SearchScope<EntityAsTreeSmokeIT_IndexedEntity__, IndexedEntity> scope = EntityAsTreeSmokeIT_IndexedEntity__.INDEX.scope( session );
+			SearchScope<EntityAsTreeSmokeIT_IndexedEntity__, IndexedEntity> scope =
+					EntityAsTreeSmokeIT_IndexedEntity__.INDEX.scope( session );
 			assertThat( session.search( scope )
 					.where( f -> f.match().field( EntityAsTreeSmokeIT_IndexedEntity__.INDEX.containedEntities.text )
 							.matching( "entity text" ) )

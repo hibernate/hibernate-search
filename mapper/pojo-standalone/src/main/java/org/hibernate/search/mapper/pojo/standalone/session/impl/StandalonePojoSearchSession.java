@@ -141,7 +141,7 @@ public class StandalonePojoSearchSession extends AbstractPojoSearchSession
 	@Override
 	public <SR, T> SearchQuerySelectStep<SR, ?, EntityReference, T, ?, ?, ?> search(
 			StandalonePojoRootReferenceScope<SR, T> referenceScope) {
-		SearchScope<SR, T> scope = referenceScope.create( this );
+		SearchScope<SR, T> scope = referenceScope.scope( this );
 		return search( scope );
 	}
 

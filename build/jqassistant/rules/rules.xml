@@ -472,6 +472,7 @@
         <requiresConcept refId="hsearch:UtilArtifacts" />
         <requiresConcept refId="hsearch:Main" />
         <requiresConcept refId="hsearch:Impl" />
+        <requiresConcept refId="hsearch:SuppressJQAssistant" />
         <description>
             Main (non-test) types must not depend on implementation types from other modules.
             SPIs must be used for such dependencies.
@@ -485,6 +486,7 @@
                 artifact1 <> artifact2
                 // Exceptions
                 AND NOT artifact2:Util
+                AND NOT type1:SuppressJQAssistant
             RETURN
                 artifact1, type1, artifact2, type2
         ]]></cypher>

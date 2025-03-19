@@ -39,7 +39,7 @@ import org.hibernate.search.engine.search.reference.projection.ObjectProjectionF
 import org.hibernate.search.engine.search.reference.sort.DistanceSortFieldReference;
 import org.hibernate.search.engine.search.reference.sort.FieldSortFieldReference;
 
-public class TraitReferenceMapping {
+class TraitReferenceMapping {
 	private final Map<String, TraitReferenceDetails> traits;
 
 	private TraitReferenceMapping() {

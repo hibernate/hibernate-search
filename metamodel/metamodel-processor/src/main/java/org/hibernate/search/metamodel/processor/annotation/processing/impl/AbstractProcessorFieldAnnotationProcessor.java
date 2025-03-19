@@ -37,7 +37,7 @@ public abstract class AbstractProcessorFieldAnnotationProcessor extends Abstract
 			fieldContext.valueBridge( new ProcessorEnumValueBridge( element.asType() ) );
 		}
 
-		ContainerExtractorPath extractorPath = toContainerExtractorPath( getExtraction( annotation ) );
+		ContainerExtractorPath extractorPath = toContainerExtractorPath( getExtraction( annotation ), context );
 		fieldContext.extractors( extractorPath );
 	}
 

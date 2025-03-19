@@ -6,7 +6,7 @@ package org.hibernate.search.metamodel.processor.writer.impl;
 
 import java.util.Locale;
 
-public record ClassProperty(String type, String name) implements Comparable<ClassProperty> {
+record ClassProperty(String type, String name) implements Comparable<ClassProperty> {
 
 	public String asParameter() {
 		return type + " " + name;

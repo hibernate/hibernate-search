@@ -6,7 +6,7 @@ package org.hibernate.search.metamodel.processor.writer.impl;
 
 import java.util.Locale;
 
-public record ValueFieldReferenceDetails(TypedFieldReferenceDetails typedField) {
+record ValueFieldReferenceDetails(TypedFieldReferenceDetails typedField) {
 
 	public String formatted() {
 		// I - dsl type (input) ValueModel.MAPPING
