@@ -16,7 +16,7 @@ import org.hibernate.search.mapper.pojo.bridge.binding.PropertyBindingContext;
 import org.hibernate.search.mapper.pojo.bridge.builtin.programmatic.GeoPointBinder;
 import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.PropertyMappingStep;
 
-public class ProcessorLongitudeProcessor extends AbstractProcessorAnnotationProcessor {
+class ProcessorLongitudeProcessor extends AbstractProcessorAnnotationProcessor {
 	@Override
 	public void process(PropertyMappingStep mapping, AnnotationMirror annotation, Element element,
 			ProcessorAnnotationProcessorContext context) {

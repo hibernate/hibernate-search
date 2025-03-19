@@ -25,7 +25,7 @@ import org.hibernate.search.mapper.pojo.extractor.mapping.programmatic.Container
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.processing.spi.MappingAnnotationProcessorUtils;
 import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.PropertyMappingStep;
 
-public class ProcessorIndexedEmbeddedProcessor extends AbstractProcessorAnnotationProcessor {
+class ProcessorIndexedEmbeddedProcessor extends AbstractProcessorAnnotationProcessor {
 
 	@SuppressWarnings("deprecation")
 	@Override
@@ -38,7 +38,7 @@ public class ProcessorIndexedEmbeddedProcessor extends AbstractProcessorAnnotati
 		String[] includePathsArray = toStringArray( getAnnotationValue( annotation, "includePaths" ) );
 		String[] excludePathsArray = toStringArray( getAnnotationValue( annotation, "excludePaths" ) );
 
-		ContainerExtractorPath extractorPath = toContainerExtractorPath( annotation );
+		ContainerExtractorPath extractorPath = toContainerExtractorPath( annotation, context );
 
 		if ( getAnnotationValue( annotation, "targetType" ) != null ) {
 			context.messager().printMessage( Diagnostic.Kind.WARNING,
@@ -69,8 +69,6 @@ public class ProcessorIndexedEmbeddedProcessor extends AbstractProcessorAnnotati
 	}
 
 	private void collectExtraTypes(TypeMirror type, ProcessorAnnotationProcessorContext context) {
-		// TODO: add a marker annotation to allow users to simply put some @BlaBlaBla annotation on a type
-		//  we should consider adding through programmaticMapping().type(sometype).
 		if ( type == null || type.getKind() == TypeKind.NONE ) {
 			return;
 		}

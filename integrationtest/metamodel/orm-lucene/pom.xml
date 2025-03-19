@@ -61,7 +61,6 @@
                     <execution>
                         <id>default-testCompile</id>
                         <configuration>
-                            <fork>false</fork>
                             <proc>full</proc>
                             <annotationProcessors>
                                 <annotationProcessor>org.hibernate.search.metamodel.processor.HibernateSearchMetamodelProcessor</annotationProcessor>

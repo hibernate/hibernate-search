@@ -19,7 +19,7 @@ import org.hibernate.search.mapper.pojo.bridge.builtin.programmatic.GeoPointBind
 import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.PropertyMappingStep;
 import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.TypeMappingStep;
 
-public class ProcessorGeoPointBindingProcessor extends AbstractProcessorAnnotationProcessor
+class ProcessorGeoPointBindingProcessor extends AbstractProcessorAnnotationProcessor
 		implements ProcessorTypeMappingAnnotationProcessor {
 	@Override
 	public void process(PropertyMappingStep mapping, AnnotationMirror annotation, Element element,

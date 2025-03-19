@@ -22,7 +22,7 @@ import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.PropertyBind
 import org.hibernate.search.mapper.pojo.bridge.runtime.PropertyBridgeWriteContext;
 import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.PropertyMappingStep;
 
-public class ProcessorTypePropertyBindingProcessor extends AbstractProcessorAnnotationProcessor {
+class ProcessorTypePropertyBindingProcessor extends AbstractProcessorAnnotationProcessor {
 	@Override
 	public void process(PropertyMappingStep mapping, AnnotationMirror annotation, Element element,
 			ProcessorAnnotationProcessorContext context) {
@@ -34,6 +34,8 @@ public class ProcessorTypePropertyBindingProcessor extends AbstractProcessorAnno
 
 				mapping.binder( new ProcessorPropertyBinder( context, binder ) );
 			}
+			context.messager().printMessage( Diagnostic.Kind.WARNING,
+					"Custom binders are not yet supported by the static metamodel processor and will be ignored.", element );
 		}
 	}
 

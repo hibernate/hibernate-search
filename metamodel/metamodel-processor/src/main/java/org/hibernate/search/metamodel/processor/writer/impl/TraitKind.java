@@ -4,7 +4,7 @@
  */
 package org.hibernate.search.metamodel.processor.writer.impl;
 
-public enum TraitKind {
+enum TraitKind {
 
 	UNTYPED( false, false, false ),
 	TYPED_INPUT( true, true, false ),

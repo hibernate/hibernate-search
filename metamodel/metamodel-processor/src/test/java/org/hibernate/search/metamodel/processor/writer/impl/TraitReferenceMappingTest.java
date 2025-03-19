@@ -2,7 +2,7 @@
  * SPDX-License-Identifier: Apache-2.0
  * Copyright Red Hat Inc. and Hibernate Authors
  */
-package org.hibernate.search.metamodel.processor;
+package org.hibernate.search.metamodel.processor.writer.impl;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.fail;
@@ -13,8 +13,6 @@ import java.util.Set;
 import java.util.stream.Stream;
 
 import org.hibernate.search.engine.backend.types.IndexFieldTraits;
-import org.hibernate.search.metamodel.processor.writer.impl.TraitReferenceDetails;
-import org.hibernate.search.metamodel.processor.writer.impl.TraitReferenceMapping;
 
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;

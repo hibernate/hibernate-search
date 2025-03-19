@@ -1,0 +1,106 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <parent>
+        <groupId>org.hibernate.search</groupId>
+        <artifactId>hibernate-search-integrationtest</artifactId>
+        <version>8.0.0-SNAPSHOT</version>
+        <relativePath>../..</relativePath>
+    </parent>
+    <artifactId>hibernate-search-integrationtest-metamodel-orm-elasticsearch</artifactId>
+
+    <name>Hibernate Search ITs - Metamodel - ORM mapper with the Elasticsearch backend</name>
+    <description>Hibernate Search integration tests for metamodel generation with ORM mapper and the Elasticsearch backend</description>
+
+    <properties>
+    </properties>
+
+    <dependencies>
+        <dependency>
+            <groupId>org.hibernate.search</groupId>
+            <artifactId>hibernate-search-mapper-orm</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.hibernate.search</groupId>
+            <artifactId>hibernate-search-backend-elasticsearch</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.hibernate.search</groupId>
+            <artifactId>hibernate-search-util-internal-integrationtest-mapper-orm</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.hibernate.search</groupId>
+            <artifactId>hibernate-search-util-internal-integrationtest-backend-elasticsearch</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <!--
+            Leave this dependency here, not in a utils module, so that we don't need to recompile
+            the utils to re-run the tests with a different database.
+         -->
+        <dependency>
+            <groupId>${jdbc.driver.groupId}</groupId>
+            <artifactId>${jdbc.driver.artifactId}</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.hibernate.search</groupId>
+            <artifactId>hibernate-search-metamodel-processor</artifactId>
+            <scope>provided</scope>
+        </dependency>
+    </dependencies>
+
+    <build>
+        <plugins>
+            <plugin>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <version>${version.compiler.plugin}</version>
+                <executions>
+                    <execution>
+                        <id>default-testCompile</id>
+                        <configuration>
+                            <proc>full</proc>
+                            <annotationProcessors>
+                                <annotationProcessor>org.hibernate.search.metamodel.processor.HibernateSearchMetamodelProcessor</annotationProcessor>
+                            </annotationProcessors>
+                            <annotationProcessorPaths>
+                                <path>
+                                    <groupId>org.hibernate.search</groupId>
+                                    <artifactId>hibernate-search-metamodel-processor</artifactId>
+                                    <version>${project.version}</version>
+                                </path>
+                                <path>
+                                    <groupId>org.hibernate.search</groupId>
+                                    <artifactId>hibernate-search-backend-elasticsearch</artifactId>
+                                    <version>${project.version}</version>
+                                </path>
+                            </annotationProcessorPaths>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-failsafe-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>it</id>
+                        <goals>
+                            <goal>integration-test</goal>
+                            <goal>verify</goal>
+                        </goals>
+                        <configuration>
+                            <skip>${test.elasticsearch.skip}</skip>
+                            <systemPropertyVariables>
+                                <org.hibernate.search.integrationtest.backend.type>elasticsearch</org.hibernate.search.integrationtest.backend.type>
+                            </systemPropertyVariables>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
+    </build>
+</project>
+

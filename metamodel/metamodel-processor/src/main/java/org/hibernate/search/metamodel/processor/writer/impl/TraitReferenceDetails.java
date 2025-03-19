@@ -9,8 +9,8 @@ import java.util.Optional;
 import org.hibernate.search.util.common.annotation.Incubating;
 
 @Incubating
-public record TraitReferenceDetails(Class<?> referenceClass, String implementationLabel, TraitKind traitKind,
-									String extraPropertyName)
+record TraitReferenceDetails(   Class<?> referenceClass, String implementationLabel, TraitKind traitKind,
+								String extraPropertyName)
 		implements Comparable<TraitReferenceDetails> {
 
 	public TraitReferenceDetails(Class<?> referenceClass, String implementationLabel, TraitKind traitKind) {

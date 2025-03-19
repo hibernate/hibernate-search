@@ -99,6 +99,15 @@
                     </execution>
                 </executions>
             </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-surefire-plugin</artifactId>
+                <configuration>
+                    <systemPropertyVariables>
+                        <org.hibernate.search.integrationtest.backend.elasticsearch.version>${version.org.elasticsearch.client}</org.hibernate.search.integrationtest.backend.elasticsearch.version>
+                    </systemPropertyVariables>
+                </configuration>
+            </plugin>
         </plugins>
     </build>
 </project>
