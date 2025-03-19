@@ -134,8 +134,7 @@ public class AdditionalMappingBuilder {
 	}
 
 	public ClassDetails build() {
-		SourceModelBuildingContext context = buildingContext.getMetadataCollector()
-				.getSourceModelBuildingContext();
+		SourceModelBuildingContext context = buildingContext.getBootstrapContext().getModelsContext();
 		final MutableClassDetails classDetails = JdkBuilders.buildClassDetailsStatic(
 				type,
 				context

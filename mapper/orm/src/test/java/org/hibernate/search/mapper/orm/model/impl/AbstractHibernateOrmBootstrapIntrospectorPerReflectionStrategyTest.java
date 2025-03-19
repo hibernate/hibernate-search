@@ -4,7 +4,7 @@
  */
 package org.hibernate.search.mapper.orm.model.impl;
 
-import static org.hibernate.search.mapper.orm.common.impl.HibernateOrmUtils.createModelBuildingContext;
+import static org.hibernate.search.mapper.orm.common.impl.HibernateOrmUtils.getServiceOrEmpty;
 
 import java.lang.invoke.MethodHandles;
 import java.util.ArrayList;
@@ -13,11 +13,17 @@ import java.util.List;
 
 import org.hibernate.boot.Metadata;
 import org.hibernate.boot.MetadataSources;
+import org.hibernate.boot.models.internal.ClassLoaderServiceLoading;
+import org.hibernate.boot.models.internal.ModelsHelper;
 import org.hibernate.boot.registry.StandardServiceRegistry;
 import org.hibernate.boot.registry.StandardServiceRegistryBuilder;
+import org.hibernate.boot.registry.classloading.spi.ClassLoaderService;
+import org.hibernate.boot.spi.BootstrapContext;
 import org.hibernate.boot.spi.MetadataImplementor;
 import org.hibernate.cfg.AvailableSettings;
 import org.hibernate.dialect.H2Dialect;
+import org.hibernate.models.internal.BasicModelBuildingContextImpl;
+import org.hibernate.models.spi.SourceModelBuildingContext;
 import org.hibernate.search.util.common.impl.Closer;
 import org.hibernate.search.util.common.reflect.spi.ValueHandleFactory;
 
@@ -65,6 +71,17 @@ public abstract class AbstractHibernateOrmBootstrapIntrospectorPerReflectionStra
 
 		return HibernateOrmBootstrapIntrospector.create( basicTypeMetadataProvider, context.getClassDetailsRegistry(),
 				valueHandleFactory
+		);
+	}
+
+	public static SourceModelBuildingContext createModelBuildingContext(BootstrapContext bootstrapContext) {
+		ClassLoaderService classLoaderService =
+				getServiceOrEmpty( bootstrapContext.getServiceRegistry(), ClassLoaderService.class )
+						.orElseThrow();
+		ClassLoaderServiceLoading classLoading = new ClassLoaderServiceLoading( classLoaderService );
+		return new BasicModelBuildingContextImpl(
+				classLoading,
+				ModelsHelper::preFillRegistries
 		);
 	}
 

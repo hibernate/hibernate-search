@@ -244,7 +244,7 @@
                                 <argument>^org\.hibernate\.metamodel\.mapping\.SelectablePath$</argument>
                                 <argument>^org\.hibernate\.metamodel\.model\.domain\.JpaMetamodel$</argument>
 
-                                <argument>^org\.hibernate\.boot\.spi\.BootstrapContext$</argument>
+                                <argument>^org\.hibernate\.boot\.spi\.BootstrapContext\b.*+$</argument>
                                 <argument>^org\.hibernate\.boot\.spi\.AdditionalMappingContributor$</argument>
                                 <argument>^org\.hibernate\.boot\.spi\.AdditionalMappingContributions$</argument>
                                 <argument>^org\.hibernate\.collection\.spi\.PersistentCollection$</argument>
