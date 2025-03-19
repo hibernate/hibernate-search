@@ -4,7 +4,8 @@
  */
 package org.hibernate.search.metamodel.processor.mapping.impl;
 
-import java.util.Objects;
+import java.util.HashMap;
+import java.util.Map;
 
 import javax.annotation.processing.Messager;
 import javax.lang.model.element.TypeElement;
@@ -17,8 +18,7 @@ import org.hibernate.search.metamodel.processor.impl.HibernateSearchMetamodelPro
 public final class ProcessorIntrospectorContext {
 	private final HibernateSearchMetamodelProcessorContext processorContext;
 
-	private String typeName;
-	private TypeElement indexedEntityType;
+	private final Map<String, TypeElement> typeElements = new HashMap<>();
 	private ProcessorAnnotationProcessorContext processorAnnotationProcessorContext;
 
 	public ProcessorIntrospectorContext(HibernateSearchMetamodelProcessorContext processorContext) {
@@ -42,15 +42,11 @@ public final class ProcessorIntrospectorContext {
 	}
 
 	public void typeElementsByName(String typeName, TypeElement indexedEntityType) {
-		this.typeName = typeName;
-		this.indexedEntityType = indexedEntityType;
+		typeElements.put( typeName, indexedEntityType );
 	}
 
 	public TypeElement typeElementsByName(String typeName) {
-		if ( Objects.equals( typeName, this.typeName ) ) {
-			return indexedEntityType;
-		}
-		return null;
+		return typeElements.get( typeName );
 	}
 
 	public void processorAnnotationProcessorContext(ProcessorAnnotationProcessorContext processorAnnotationProcessorContext) {

@@ -14,6 +14,7 @@ import javax.annotation.processing.SupportedAnnotationTypes;
 import javax.annotation.processing.SupportedOptions;
 import javax.lang.model.SourceVersion;
 import javax.lang.model.element.TypeElement;
+import javax.tools.Diagnostic;
 
 import org.hibernate.search.metamodel.processor.impl.HibernateSearchMetamodelProcessorContext;
 import org.hibernate.search.metamodel.processor.impl.IndexedEntityMetamodelAnnotationProcessor;
@@ -48,6 +49,7 @@ public class HibernateSearchMetamodelProcessor extends AbstractProcessor {
 
 	@Override
 	public boolean process(Set<? extends TypeElement> annotations, RoundEnvironment roundEnv) {
+		context.messager().printMessage( Diagnostic.Kind.NOTE, "Hibernate Search Metamodel Processor started" );
 		for ( MetamodelAnnotationProcessor processor : processors ) {
 			processor.process( roundEnv );
 		}

@@ -59,8 +59,8 @@ public abstract class AbstractProcessorFieldAnnotationProcessor extends Abstract
 	public record ProcessorEnumValueBridge(TypeMirror valueType) implements ValueBridge<Object, String> {
 
 		@Override
-			public String toIndexedValue(Object value, ValueBridgeToIndexedValueContext context) {
-				return "";
-			}
+		public String toIndexedValue(Object value, ValueBridgeToIndexedValueContext context) {
+			return "";
 		}
+	}
 }
