@@ -38,7 +38,8 @@ public class MetamodelClassWriter {
 		private final int depth;
 
 		public Builder(MetamodelNamesFormatter metamodelNamesFormatter, String packageName, String className) {
-			this( metamodelNamesFormatter, packageName, className, metamodelClassName( metamodelNamesFormatter, className ),
+			this( metamodelNamesFormatter, packageName, className,
+					metamodelClassName( metamodelNamesFormatter, packageName, className ),
 					TraitReferenceMapping.instance(), new TreeMap<>(), 1 );
 		}
 
@@ -195,13 +196,14 @@ public class MetamodelClassWriter {
 		}
 
 		public String metamodelClassName() {
-			return metamodelClassName( metamodelNamesFormatter, className );
+			return metamodelClassName( metamodelNamesFormatter, packageName, className );
 		}
 
-		private static String metamodelClassName(MetamodelNamesFormatter metamodelNamesFormatter, String className) {
+		private static String metamodelClassName(MetamodelNamesFormatter metamodelNamesFormatter, String packageName,
+				String className) {
 			String classSimpleName;
 			if ( className.contains( "." ) ) {
-				classSimpleName = className.substring( className.lastIndexOf( "." ) + 1 );
+				classSimpleName = className.substring( packageName.length() + 1 ).replace( '.', '_' );
 			}
 			else {
 				classSimpleName = className;

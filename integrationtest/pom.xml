@@ -28,6 +28,9 @@
         <module>performance</module>
         <module>v5migrationhelper/engine</module>
         <module>v5migrationhelper/orm</module>
+        <module>metamodel/standalone-lucene</module>
+        <module>metamodel/standalone-elasticsearch</module>
+        <module>metamodel/orm-lucene</module>
     </modules>
 
     <profiles>
