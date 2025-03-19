@@ -22,10 +22,9 @@ import org.hibernate.search.engine.backend.types.dsl.IndexFieldTypeFinalStep;
 import org.hibernate.search.mapper.pojo.bridge.binding.PropertyBindingContext;
 import org.hibernate.search.mapper.pojo.extractor.mapping.annotation.ContainerExtract;
 import org.hibernate.search.mapper.pojo.extractor.mapping.programmatic.ContainerExtractorPath;
-import org.hibernate.search.metamodel.processor.logging.impl.MappingLog;
 import org.hibernate.search.util.common.AssertionFailure;
 
-public abstract class AbstractProcessorAnnotationProcessor implements ProcessorPropertyMappingAnnotationProcessor {
+abstract class AbstractProcessorAnnotationProcessor implements ProcessorPropertyMappingAnnotationProcessor {
 
 	protected static final String[] EMPTY = new String[0];
 
@@ -59,11 +58,13 @@ public abstract class AbstractProcessorAnnotationProcessor implements ProcessorP
 	protected abstract Optional<IndexFieldTypeFinalStep<?>> configureField(PropertyBindingContext bindingContext,
 			AnnotationMirror annotation, ProcessorAnnotationProcessorContext context, Element element, TypeMirror fieldType);
 
-	protected ContainerExtractorPath toContainerExtractorPath(AnnotationMirror extraction) {
-		return toContainerExtractorPath( extraction, "DEFAULT" );
+	protected ContainerExtractorPath toContainerExtractorPath(AnnotationMirror extraction,
+			ProcessorAnnotationProcessorContext context) {
+		return toContainerExtractorPath( extraction, "DEFAULT", context );
 	}
 
-	protected ContainerExtractorPath toContainerExtractorPath(AnnotationMirror extraction, String defaultValue) {
+	protected ContainerExtractorPath toContainerExtractorPath(AnnotationMirror extraction, String defaultValue,
+			ProcessorAnnotationProcessorContext context) {
 		if ( extraction == null ) {
 			return ContainerExtractorPath.defaultExtractors();
 		}
@@ -74,7 +75,12 @@ public abstract class AbstractProcessorAnnotationProcessor implements ProcessorP
 			switch ( extract ) {
 				case NO:
 					if ( extractors.length != 0 ) {
-						throw MappingLog.INSTANCE.cannotReferenceExtractorsWhenExtractionDisabled();
+						context.messager().printMessage(
+								Diagnostic.Kind.ERROR, "Unexpected extractor references:"
+										+ " extractors cannot be defined explicitly when extract = ContainerExtract.NO."
+										+ " Either leave 'extract' to its default value to define extractors explicitly"
+										+ " or leave the 'extractor' list to its default, empty value to disable extraction."
+						);
 					}
 					return ContainerExtractorPath.noExtractors();
 				case DEFAULT:

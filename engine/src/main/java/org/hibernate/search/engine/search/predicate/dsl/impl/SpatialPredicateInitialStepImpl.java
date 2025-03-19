@@ -8,7 +8,7 @@ import org.hibernate.search.engine.search.predicate.dsl.SpatialPredicateInitialS
 import org.hibernate.search.engine.search.predicate.dsl.SpatialWithinPredicateFieldStep;
 import org.hibernate.search.engine.search.predicate.dsl.spi.SearchPredicateDslContext;
 
-public final class SpatialPredicateInitialStepImpl implements SpatialPredicateInitialStep {
+public final class SpatialPredicateInitialStepImpl<SR> implements SpatialPredicateInitialStep<SR> {
 
 	private final SearchPredicateDslContext<?> dslContext;
 
@@ -17,7 +17,7 @@ public final class SpatialPredicateInitialStepImpl implements SpatialPredicateIn
 	}
 
 	@Override
-	public SpatialWithinPredicateFieldStep<?> within() {
-		return new SpatialWithinPredicateFieldStepImpl( dslContext );
+	public SpatialWithinPredicateFieldStep<SR, ?> within() {
+		return new SpatialWithinPredicateFieldStepImpl<>( dslContext );
 	}
 }

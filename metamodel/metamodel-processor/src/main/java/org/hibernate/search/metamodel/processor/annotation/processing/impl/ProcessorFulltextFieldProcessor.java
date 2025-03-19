@@ -24,21 +24,24 @@ import org.hibernate.search.mapper.pojo.bridge.binding.PropertyBindingContext;
 import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.PropertyMappingStandardFieldOptionsStep;
 import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.PropertyMappingStep;
 
-public class ProcessorFulltextFieldProcessor extends AbstractProcessorStandardFieldAnnotationProcessor {
+class ProcessorFulltextFieldProcessor extends AbstractProcessorStandardFieldAnnotationProcessor {
 	@Override
 	PropertyMappingStandardFieldOptionsStep<?> initStandardFieldMappingContext(PropertyMappingStep mappingContext,
 			AnnotationMirror annotation, String fieldName) {
 		var fieldContext = mappingContext.fullTextField( fieldName );
 
-		String analyzer = getAnnotationValueAsString( annotation, "analyzer", AnalyzerNames.DEFAULT );
-		if ( !analyzer.isEmpty() ) {
-			fieldContext.analyzer( analyzer );
-		}
-
-		String searchAnalyzer = getAnnotationValueAsString( annotation, "searchAnalyzer", "" );
-		if ( !searchAnalyzer.isEmpty() ) {
-			fieldContext.searchAnalyzer( searchAnalyzer );
-		}
+		// NOTE: we are skipping reading analyzers on purpose!
+		// we won't have their configuration while running a processor, and since the analyzer does not influence the search capabilities
+		// it's relatively safe to just use the default ones instead:
+		//
+		// String analyzer = getAnnotationValueAsString( annotation, "analyzer", AnalyzerNames.DEFAULT );
+		// String searchAnalyzer = getAnnotationValueAsString( annotation, "searchAnalyzer", "" );
+		// if ( !analyzer.isEmpty() ) {
+		// 	fieldContext.analyzer( analyzer );
+		// }
+		// if ( !searchAnalyzer.isEmpty() ) {
+		// 	fieldContext.searchAnalyzer( searchAnalyzer );
+		// }
 
 		Norms norms = getNorms( annotation );
 		if ( !Norms.DEFAULT.equals( norms ) ) {

@@ -14,7 +14,6 @@ import javax.annotation.processing.SupportedAnnotationTypes;
 import javax.annotation.processing.SupportedOptions;
 import javax.lang.model.SourceVersion;
 import javax.lang.model.element.TypeElement;
-import javax.tools.Diagnostic;
 
 import org.hibernate.search.metamodel.processor.impl.HibernateSearchMetamodelProcessorContext;
 import org.hibernate.search.metamodel.processor.impl.IndexedEntityMetamodelAnnotationProcessor;
@@ -30,15 +29,14 @@ import org.hibernate.search.metamodel.processor.impl.MetamodelAnnotationProcesso
 public class HibernateSearchMetamodelProcessor extends AbstractProcessor {
 
 	private HibernateSearchMetamodelProcessorContext context;
-	private HibernateSearchMetamodelProcessorSettings.Configuration configuration;
 	private List<MetamodelAnnotationProcessor> processors;
 
 	@Override
 	public synchronized void init(ProcessingEnvironment processingEnv) {
 		super.init( processingEnv );
 		context = new HibernateSearchMetamodelProcessorContext( processingEnv.getElementUtils(), processingEnv.getTypeUtils(),
-				processingEnv.getMessager(), processingEnv.getFiler() );
-		configuration = new HibernateSearchMetamodelProcessorSettings.Configuration( processingEnv.getOptions() );
+				processingEnv.getMessager(), processingEnv.getFiler(),
+				new HibernateSearchMetamodelProcessorSettings.Configuration( processingEnv.getOptions() ) );
 		processors = List.of( new IndexedEntityMetamodelAnnotationProcessor( context ) );
 	}
 
@@ -49,12 +47,8 @@ public class HibernateSearchMetamodelProcessor extends AbstractProcessor {
 
 	@Override
 	public boolean process(Set<? extends TypeElement> annotations, RoundEnvironment roundEnv) {
-		context.messager().printMessage( Diagnostic.Kind.NOTE, "Hibernate Search Metamodel Processor started" );
 		for ( MetamodelAnnotationProcessor processor : processors ) {
 			processor.process( roundEnv );
-		}
-		if ( roundEnv.processingOver() ) {
-			// create metamodel classes
 		}
 		return false;
 	}

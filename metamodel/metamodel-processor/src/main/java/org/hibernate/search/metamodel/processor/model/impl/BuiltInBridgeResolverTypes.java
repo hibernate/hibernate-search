@@ -7,9 +7,7 @@ package org.hibernate.search.metamodel.processor.model.impl;
 import java.util.Optional;
 import java.util.Set;
 
-import javax.lang.model.element.TypeElement;
 import javax.lang.model.type.ArrayType;
-import javax.lang.model.type.TypeKind;
 import javax.lang.model.type.TypeMirror;
 import javax.lang.model.util.Types;
 
@@ -32,9 +30,6 @@ public final class BuiltInBridgeResolverTypes {
 			"java.lang.Long",
 			"java.lang.Float",
 			"java.lang.Double",
-
-			// TODO: handle enums somehow:
-			// strictSubTypesOf( Enum.class )
 
 			"java.math.BigInteger",
 			"java.math.BigDecimal",
@@ -65,41 +60,14 @@ public final class BuiltInBridgeResolverTypes {
 			"java.net.URI",
 			"java.net.URL",
 
-			// TODO: handle geo pints
-			// subTypesOf( GeoPoint.class )
 			"org.hibernate.search.engine.spatial.GeoPoint"
 
 	// arrays for vector fields:
 	// primitive types are handled differently
 	);
 
-	private static Set<String> CONTAINERS = Set.of(
-			"java.util.List",
-			"java.util.Set"
-	);
-
 	public static boolean isBuiltInType(String typeName) {
 		return TYPES.contains( typeName );
-	}
-
-	public static boolean isContainer(TypeMirror mirror, Types types) {
-		if ( mirror == null || mirror.getKind() == TypeKind.NONE ) {
-			return false;
-		}
-		TypeElement element = (TypeElement) types.asElement( mirror );
-		if ( CONTAINERS.contains( element.getQualifiedName().toString() ) ) {
-			return true;
-		}
-		if ( isContainer( element.getSuperclass(), types ) ) {
-			return true;
-		}
-		for ( TypeMirror i : element.getInterfaces() ) {
-			if ( isContainer( i, types ) ) {
-				return true;
-			}
-		}
-
-		return false;
 	}
 
 	public static Optional<Class<?>> loadableType(TypeMirror propertyType, Types types) {

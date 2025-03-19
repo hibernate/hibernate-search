@@ -302,7 +302,7 @@ public interface SearchPredicateFactory<SR> {
 	 * @return The initial step of a DSL where spatial predicates can be defined.
 	 * @see SpatialPredicateInitialStep
 	 */
-	SpatialPredicateInitialStep spatial();
+	SpatialPredicateInitialStep<SR> spatial();
 
 	/**
 	 * Match documents if they match a combination of defined named predicate clauses.

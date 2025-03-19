@@ -19,12 +19,14 @@ import org.hibernate.search.mapper.pojo.mapping.definition.annotation.FullTextFi
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.IndexedEmbedded;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.SearchEntity;
+import org.hibernate.search.mapper.pojo.standalone.cfg.StandalonePojoMapperSettings;
 import org.hibernate.search.mapper.pojo.standalone.loading.SelectionLoadingStrategy;
 import org.hibernate.search.mapper.pojo.standalone.loading.binding.EntityLoadingBinder;
 import org.hibernate.search.mapper.pojo.standalone.mapping.SearchMapping;
 import org.hibernate.search.mapper.pojo.standalone.scope.SearchScope;
 import org.hibernate.search.mapper.pojo.standalone.session.SearchSession;
 import org.hibernate.search.mapper.pojo.work.IndexingPlanSynchronizationStrategy;
+import org.hibernate.search.mapper.pojo.work.IndexingPlanSynchronizationStrategyNames;
 import org.hibernate.search.util.impl.integrationtest.backend.lucene.LuceneBackendConfiguration;
 import org.hibernate.search.util.impl.integrationtest.mapper.pojo.standalone.StandalonePojoMappingSetupHelper;
 
@@ -47,6 +49,8 @@ class EntityAsTreeSmokeIT {
 	void setup() {
 		mapping = setupHelper.start()
 				.withAnnotatedTypes( ContainedNonEntity.class, IndexedEntity.class, ContainedEntity.class )
+				.withProperty( StandalonePojoMapperSettings.INDEXING_PLAN_SYNCHRONIZATION_STRATEGY,
+						IndexingPlanSynchronizationStrategyNames.SYNC )
 				.withConfiguration( b -> b.programmaticMapping()
 						.type( IndexedEntity.class )
 						.searchEntity()
@@ -75,7 +79,8 @@ class EntityAsTreeSmokeIT {
 		indexed2.containedNonEntities.add( containedNonEntity2_1 );
 
 		try ( SearchSession session = mapping.createSession() ) {
-			SearchScope<EntityAsTreeSmokeIT_IndexedEntity__, IndexedEntity> scope = EntityAsTreeSmokeIT_IndexedEntity__.INDEX.scope( session );
+			SearchScope<EntityAsTreeSmokeIT_IndexedEntity__, IndexedEntity> scope =
+					EntityAsTreeSmokeIT_IndexedEntity__.INDEX.scope( session );
 			assertThat( session.search( scope )
 					.where( f -> f.match().field( EntityAsTreeSmokeIT_IndexedEntity__.INDEX.containedEntities.text )
 							.matching( "entity text" ) )
@@ -91,7 +96,8 @@ class EntityAsTreeSmokeIT {
 			simulatedIndexedEntityDatastore.put( indexed2.id, indexed2 );
 		}
 		try ( SearchSession session = mapping.createSession() ) {
-			SearchScope<EntityAsTreeSmokeIT_IndexedEntity__, IndexedEntity> scope = EntityAsTreeSmokeIT_IndexedEntity__.INDEX.scope( session );
+			SearchScope<EntityAsTreeSmokeIT_IndexedEntity__, IndexedEntity> scope =
+					EntityAsTreeSmokeIT_IndexedEntity__.INDEX.scope( session );
 			assertThat( session.search( scope )
 					.where( f -> f.match().field( EntityAsTreeSmokeIT_IndexedEntity__.INDEX.containedEntities.text )
 							.matching( "entity" ) )
@@ -104,7 +110,8 @@ class EntityAsTreeSmokeIT {
 			session.indexingPlan().delete( indexed1 );
 		}
 		try ( SearchSession session = mapping.createSession() ) {
-			SearchScope<EntityAsTreeSmokeIT_IndexedEntity__, IndexedEntity> scope = EntityAsTreeSmokeIT_IndexedEntity__.INDEX.scope( session );
+			SearchScope<EntityAsTreeSmokeIT_IndexedEntity__, IndexedEntity> scope =
+					EntityAsTreeSmokeIT_IndexedEntity__.INDEX.scope( session );
 			assertThat( session.search( scope )
 					.where( f -> f.match().field( EntityAsTreeSmokeIT_IndexedEntity__.INDEX.containedEntities.text )
 							.matching( "entity text" ) )

@@ -18,16 +18,20 @@ import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.Property
 import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.PropertyMappingNonFullTextFieldOptionsStep;
 import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.PropertyMappingStep;
 
-public class ProcessorKeywordFieldProcessor extends AbstractProcessorNonFullTextFieldAnnotationProcessor {
+class ProcessorKeywordFieldProcessor extends AbstractProcessorNonFullTextFieldAnnotationProcessor {
 	@Override
 	PropertyMappingNonFullTextFieldOptionsStep<?> initSortableFieldMappingContext(PropertyMappingStep mappingContext,
 			AnnotationMirror annotation, String fieldName) {
 		PropertyMappingKeywordFieldOptionsStep fieldContext = mappingContext.keywordField( fieldName );
 
-		String normalizer = getAnnotationValueAsString( annotation, "normalizer", "" );
-		if ( !normalizer.isEmpty() ) {
-			fieldContext.normalizer( normalizer );
-		}
+		// NOTE: we are skipping reading analyzers on purpose!
+		// we won't have their configuration while running a processor, and since the analyzer does not influence the search capabilities
+		// it's relatively safe to just use the default ones instead:
+		//
+		// String normalizer = getAnnotationValueAsString( annotation, "normalizer", "" );
+		// if ( !normalizer.isEmpty() ) {
+		// 	fieldContext.normalizer( normalizer );
+		// }
 
 		Norms norms = getNorms( annotation );
 		if ( !Norms.DEFAULT.equals( norms ) ) {
