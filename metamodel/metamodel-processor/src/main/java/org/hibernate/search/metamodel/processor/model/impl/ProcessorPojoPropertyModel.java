@@ -62,15 +62,7 @@ public class ProcessorPojoPropertyModel<T> implements PojoPropertyModel<T> {
 	@SuppressWarnings("unchecked")
 	@Override
 	public PojoTypeModel<T> typeModel() {
-		// todo need to handle enums
-		//  need to handle geo point subtypes
-		//		Optional<Class<?>> loadableType = BuiltInBridgeResolverTypes.loadableType( propertyType, context.typeUtils() );
-		//		if ( loadableType.isPresent() ) {
-		//			return (PojoTypeModel<T>) introspector.typeModel( loadableType.get() );
-		//		}
-		//		else {
 		return (PojoTypeModel<T>) introspector.typeModel( propertyType );
-		//		}
 	}
 
 	@SuppressWarnings("unchecked")

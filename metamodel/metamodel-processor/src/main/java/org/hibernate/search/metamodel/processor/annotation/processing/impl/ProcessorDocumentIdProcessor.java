@@ -14,7 +14,7 @@ import org.hibernate.search.mapper.pojo.bridge.binding.PropertyBindingContext;
 import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.IdentifierBinder;
 import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.PropertyMappingStep;
 
-public class ProcessorDocumentIdProcessor implements ProcessorPropertyMappingAnnotationProcessor {
+class ProcessorDocumentIdProcessor implements ProcessorPropertyMappingAnnotationProcessor {
 	@Override
 	public void process(PropertyMappingStep mapping, AnnotationMirror annotation, Element element,
 			ProcessorAnnotationProcessorContext context) {

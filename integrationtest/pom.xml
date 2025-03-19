@@ -31,6 +31,7 @@
         <module>metamodel/standalone-lucene</module>
         <module>metamodel/standalone-elasticsearch</module>
         <module>metamodel/orm-lucene</module>
+        <module>metamodel/orm-elasticsearch</module>
     </modules>
 
     <profiles>

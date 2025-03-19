@@ -13,7 +13,7 @@ import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.Property
 import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.PropertyMappingStandardFieldOptionsStep;
 import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.PropertyMappingStep;
 
-public abstract class AbstractProcessorNonFullTextFieldAnnotationProcessor
+abstract class AbstractProcessorNonFullTextFieldAnnotationProcessor
 		extends AbstractProcessorStandardFieldAnnotationProcessor {
 	@Override
 	PropertyMappingStandardFieldOptionsStep<?> initStandardFieldMappingContext(PropertyMappingStep mappingContext,

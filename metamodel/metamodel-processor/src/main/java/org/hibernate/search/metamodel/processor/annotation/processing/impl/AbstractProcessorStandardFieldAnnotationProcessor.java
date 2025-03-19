@@ -11,7 +11,7 @@ import org.hibernate.search.engine.backend.types.Searchable;
 import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.PropertyMappingStandardFieldOptionsStep;
 import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.PropertyMappingStep;
 
-public abstract class AbstractProcessorStandardFieldAnnotationProcessor extends AbstractProcessorFieldAnnotationProcessor {
+abstract class AbstractProcessorStandardFieldAnnotationProcessor extends AbstractProcessorFieldAnnotationProcessor {
 	@Override
 	PropertyMappingStandardFieldOptionsStep<?> initFieldMappingContext(PropertyMappingStep mappingContext,
 			AnnotationMirror annotation,

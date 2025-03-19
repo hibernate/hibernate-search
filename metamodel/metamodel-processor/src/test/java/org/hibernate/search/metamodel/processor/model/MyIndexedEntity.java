@@ -8,6 +8,7 @@ import java.time.LocalDate;
 import java.util.List;
 import java.util.Set;
 
+import org.hibernate.search.engine.backend.types.Projectable;
 import org.hibernate.search.engine.spatial.GeoPoint;
 import org.hibernate.search.mapper.pojo.bridge.builtin.annotation.GeoPointBinding;
 import org.hibernate.search.mapper.pojo.bridge.builtin.annotation.Latitude;
@@ -35,7 +36,7 @@ public class MyIndexedEntity {
 	@GenericField
 	private LocalDate date;
 
-	@KeywordField
+	@KeywordField(projectable = Projectable.YES)
 	private String keyword;
 
 	@FullTextField

@@ -27,9 +27,7 @@ import org.hibernate.search.engine.search.reference.predicate.QueryStringPredica
 import org.hibernate.search.engine.search.reference.predicate.RangePredicateFieldReference;
 import org.hibernate.search.engine.search.reference.predicate.RegexpPredicateFieldReference;
 import org.hibernate.search.engine.search.reference.predicate.SimpleQueryStringPredicateFieldReference;
-import org.hibernate.search.engine.search.reference.predicate.SpatialWithinBoundingBoxPredicateFieldReference;
-import org.hibernate.search.engine.search.reference.predicate.SpatialWithinCirclePredicateFieldReference;
-import org.hibernate.search.engine.search.reference.predicate.SpatialWithinPolygonPredicateFieldReference;
+import org.hibernate.search.engine.search.reference.predicate.SpatialPredicateFieldReference;
 import org.hibernate.search.engine.search.reference.predicate.TermsPredicateFieldReference;
 import org.hibernate.search.engine.search.reference.predicate.WildcardPredicateFieldReference;
 import org.hibernate.search.engine.search.reference.projection.DistanceProjectionFieldReference;
@@ -39,7 +37,7 @@ import org.hibernate.search.engine.search.reference.projection.ObjectProjectionF
 import org.hibernate.search.engine.search.reference.sort.DistanceSortFieldReference;
 import org.hibernate.search.engine.search.reference.sort.FieldSortFieldReference;
 
-public class TraitReferenceMapping {
+class TraitReferenceMapping {
 	private final Map<String, TraitReferenceDetails> traits;
 
 	private TraitReferenceMapping() {
@@ -65,12 +63,12 @@ public class TraitReferenceMapping {
 				new TraitReferenceDetails( RegexpPredicateFieldReference.class, "P8", TraitKind.UNTYPED ) );
 		traits.put( IndexFieldTraits.Predicates.SIMPLE_QUERY_STRING, new TraitReferenceDetails(
 				SimpleQueryStringPredicateFieldReference.class, "P9", TraitKind.TYPED_INPUT, "predicateType" ) );
-		traits.put( IndexFieldTraits.Predicates.SPATIAL_WITHIN_BOUNDING_BOX, new TraitReferenceDetails(
-				SpatialWithinBoundingBoxPredicateFieldReference.class, "P10", TraitKind.TYPED_INPUT, "predicateType" ) );
-		traits.put( IndexFieldTraits.Predicates.SPATIAL_WITHIN_CIRCLE, new TraitReferenceDetails(
-				SpatialWithinCirclePredicateFieldReference.class, "P11", TraitKind.TYPED_INPUT, "predicateType" ) );
-		traits.put( IndexFieldTraits.Predicates.SPATIAL_WITHIN_POLYGON, new TraitReferenceDetails(
-				SpatialWithinPolygonPredicateFieldReference.class, "P12", TraitKind.TYPED_INPUT, "predicateType" ) );
+		traits.put( IndexFieldTraits.Predicates.SPATIAL_WITHIN_BOUNDING_BOX,
+				new TraitReferenceDetails( SpatialPredicateFieldReference.class, "P10", TraitKind.UNTYPED ) );
+		traits.put( IndexFieldTraits.Predicates.SPATIAL_WITHIN_CIRCLE,
+				new TraitReferenceDetails( SpatialPredicateFieldReference.class, "P10", TraitKind.UNTYPED ) );
+		traits.put( IndexFieldTraits.Predicates.SPATIAL_WITHIN_POLYGON,
+				new TraitReferenceDetails( SpatialPredicateFieldReference.class, "P10", TraitKind.UNTYPED ) );
 		traits.put( IndexFieldTraits.Predicates.TERMS,
 				new TraitReferenceDetails( TermsPredicateFieldReference.class, "P13", TraitKind.UNTYPED ) );
 		traits.put( IndexFieldTraits.Predicates.WILDCARD,

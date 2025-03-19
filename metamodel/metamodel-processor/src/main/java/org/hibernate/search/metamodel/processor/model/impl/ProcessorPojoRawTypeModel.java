@@ -23,6 +23,7 @@ import javax.lang.model.element.Name;
 import javax.lang.model.element.TypeElement;
 import javax.lang.model.element.VariableElement;
 import javax.lang.model.type.DeclaredType;
+import javax.lang.model.type.PrimitiveType;
 import javax.lang.model.type.TypeKind;
 import javax.lang.model.type.TypeMirror;
 
@@ -57,7 +58,12 @@ public class ProcessorPojoRawTypeModel<T> implements PojoRawTypeModel<T> {
 	private ProcessorPojoRawTypeModel(TypeMirror typeMirror, TypeElement typeElement,
 			HibernateSearchMetamodelProcessorContext context, ProcessorPojoModelsBootstrapIntrospector introspector) {
 		this.typeMirror = typeMirror;
-		this.typeElement = typeElement;
+		if ( typeElement == null && typeMirror instanceof PrimitiveType primitiveType ) {
+			this.typeElement = context.typeUtils().boxedClass( primitiveType );
+		}
+		else {
+			this.typeElement = typeElement;
+		}
 		this.context = context;
 		this.introspector = introspector;
 	}

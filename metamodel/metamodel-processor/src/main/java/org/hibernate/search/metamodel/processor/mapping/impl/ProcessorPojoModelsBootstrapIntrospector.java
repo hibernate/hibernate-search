@@ -11,6 +11,7 @@ import java.util.Optional;
 
 import javax.lang.model.element.Name;
 import javax.lang.model.element.TypeElement;
+import javax.lang.model.type.PrimitiveType;
 import javax.lang.model.type.TypeMirror;
 
 import org.hibernate.search.mapper.pojo.model.spi.PojoBootstrapIntrospector;
@@ -23,7 +24,6 @@ import org.hibernate.search.util.common.reflect.spi.ValueHandleFactory;
 public class ProcessorPojoModelsBootstrapIntrospector implements PojoBootstrapIntrospector {
 
 	private final Map<Name, PojoRawTypeModel<?>> elementTypeModelCache = new HashMap<>();
-	private final Map<Class<?>, PojoRawTypeModel<?>> typeModelCache = new HashMap<>();
 	private final ProcessorIntrospectorContext context;
 	private final PojoBootstrapIntrospector delegate;
 	private final ProcessorTypeOrdering typeOrdering;
@@ -69,6 +69,10 @@ public class ProcessorPojoModelsBootstrapIntrospector implements PojoBootstrapIn
 	}
 
 	public PojoRawTypeModel<?> typeModel(TypeMirror typeMirror) {
+		if ( typeMirror instanceof PrimitiveType primitiveType ) {
+			// box the primitive so it's easier to deal with them later:
+			typeMirror = context.typeUtils().boxedClass( primitiveType ).asType();
+		}
 		Optional<Class<?>> loadableType =
 				BuiltInBridgeResolverTypes.loadableType( typeMirror, context.processorContext().typeUtils() );
 		if ( loadableType.isPresent() ) {

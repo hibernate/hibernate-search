@@ -4,16 +4,20 @@
  */
 package org.hibernate.search.metamodel.processor;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.fail;
 
 import java.io.File;
 import java.io.IOException;
+import java.net.URISyntaxException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.List;
 import java.util.Set;
 
 import javax.annotation.processing.Processor;
+import javax.tools.Diagnostic;
 import javax.tools.DiagnosticCollector;
 import javax.tools.JavaCompiler;
 import javax.tools.JavaFileObject;
@@ -21,8 +25,10 @@ import javax.tools.StandardJavaFileManager;
 import javax.tools.StandardLocation;
 import javax.tools.ToolProvider;
 
+import org.hibernate.search.metamodel.processor.model.FieldTypesEntity;
 import org.hibernate.search.metamodel.processor.model.ISBN;
 import org.hibernate.search.metamodel.processor.model.MyEmbeddedEntity;
+import org.hibernate.search.metamodel.processor.model.MyEntityWithBinders;
 import org.hibernate.search.metamodel.processor.model.MyEnum;
 import org.hibernate.search.metamodel.processor.model.MyIndexedEntity;
 import org.hibernate.search.metamodel.processor.model.SomeGenerics;
@@ -63,11 +69,29 @@ class HibernateSearchMetamodelProcessorTest {
 				getSourceFile( SomeRandomType.class ),
 				getSourceFile( SomeRandomTypeBinder.class ),
 				getSourceFile( ISBN.class ),
-				getSourceFile( MyEnum.class )
+				getSourceFile( MyEnum.class ),
+				getSourceFile( FieldTypesEntity.class )
 		);
-
 		diagnostics.getDiagnostics().forEach( System.out::println );
 
+		assertThat( diagnostics.getDiagnostics().stream().map( Diagnostic::getKind ) )
+				.doesNotContain( Diagnostic.Kind.ERROR );
+	}
+
+	@Test
+	void binderWarning() {
+		DiagnosticCollector<JavaFileObject> diagnostics = new DiagnosticCollector<>();
+
+		compile(
+				new HibernateSearchMetamodelProcessor(), diagnostics,
+				getSourceFile( MyEntityWithBinders.class ),
+				getSourceFile( SomeRandomType.class ),
+				getSourceFile( SomeRandomTypeBinder.class )
+		);
+		diagnostics.getDiagnostics().forEach( System.out::println );
+
+		assertThat( diagnostics.getDiagnostics().stream().map( Diagnostic::getKind ) )
+				.contains( Diagnostic.Kind.WARNING );
 	}
 
 	public boolean compile(Processor annotationProcessor, DiagnosticCollector<JavaFileObject> diagnostics,
@@ -96,6 +120,7 @@ class HibernateSearchMetamodelProcessorTest {
 	private Iterable<? extends File> dependencies() {
 		return Set.of(
 				dependency( "hibernate-search-mapper-pojo-base.jar" ),
+				dependency( "hibernate-search-mapper-pojo-standalone.jar" ),
 				dependency( "hibernate-search-engine.jar" )
 		);
 	}
@@ -112,10 +137,17 @@ class HibernateSearchMetamodelProcessorTest {
 
 
 	private static Path getTargetDir() {
-		// target/test-classes
-		String targetClassesDir = HibernateSearchMetamodelProcessorTest.class.getProtectionDomain()
-				.getCodeSource().getLocation().getFile();
-		return Path.of( targetClassesDir ).getParent();
+		try {
+			// target/test-classes
+			var targetClassesDir = HibernateSearchMetamodelProcessorTest.class.getProtectionDomain()
+					.getCodeSource().getLocation().toURI();
+			// use URI to make things work on Win as well:
+			return Paths.get( targetClassesDir ).getParent();
+		}
+		catch (URISyntaxException e) {
+			fail( e.getMessage() );
+			return null;
+		}
 	}
 
 }

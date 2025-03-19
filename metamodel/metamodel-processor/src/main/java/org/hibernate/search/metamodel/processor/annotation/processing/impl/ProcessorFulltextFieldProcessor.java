@@ -24,7 +24,7 @@ import org.hibernate.search.mapper.pojo.bridge.binding.PropertyBindingContext;
 import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.PropertyMappingStandardFieldOptionsStep;
 import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.PropertyMappingStep;
 
-public class ProcessorFulltextFieldProcessor extends AbstractProcessorStandardFieldAnnotationProcessor {
+class ProcessorFulltextFieldProcessor extends AbstractProcessorStandardFieldAnnotationProcessor {
 	@Override
 	PropertyMappingStandardFieldOptionsStep<?> initStandardFieldMappingContext(PropertyMappingStep mappingContext,
 			AnnotationMirror annotation, String fieldName) {

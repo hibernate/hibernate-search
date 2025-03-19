@@ -24,7 +24,7 @@ import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.Property
 import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.PropertyMappingVectorFieldOptionsStep;
 import org.hibernate.search.metamodel.processor.model.impl.BuiltInBridgeResolverTypes;
 
-public class ProcessorVectorFieldProcessor extends AbstractProcessorFieldAnnotationProcessor {
+class ProcessorVectorFieldProcessor extends AbstractProcessorFieldAnnotationProcessor {
 	@Override
 	PropertyMappingFieldOptionsStep<?> initFieldMappingContext(PropertyMappingStep mappingContext, AnnotationMirror annotation,
 			String fieldName) {
@@ -118,11 +118,12 @@ public class ProcessorVectorFieldProcessor extends AbstractProcessorFieldAnnotat
 		return Optional.of( optionsStep );
 	}
 
-	protected ContainerExtractorPath toContainerExtractorPath(AnnotationMirror extraction) {
+	protected ContainerExtractorPath toContainerExtractorPath(AnnotationMirror extraction,
+			ProcessorAnnotationProcessorContext context) {
 		if ( extraction == null ) {
 			return ContainerExtractorPath.noExtractors();
 		}
-		return toContainerExtractorPath( extraction, "NO" );
+		return toContainerExtractorPath( extraction, "NO", context );
 	}
 
 	protected VectorSimilarity getVectorSimilarity(AnnotationMirror annotation) {

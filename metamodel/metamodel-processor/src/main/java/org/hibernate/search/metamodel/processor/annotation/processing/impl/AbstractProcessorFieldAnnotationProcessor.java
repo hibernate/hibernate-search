@@ -29,7 +29,8 @@ public abstract class AbstractProcessorFieldAnnotationProcessor extends Abstract
 		AnnotationMirror valueBinder = getValueBinder( annotation );
 		if ( valueBinder != null ) {
 			// TODO: do we also inject fields into a value binder ... ?
-			context.messager().printMessage( Diagnostic.Kind.WARNING, "Defined value binder " + valueBinder + " is ignored " );
+			context.messager().printMessage( Diagnostic.Kind.WARNING, "Defined value binder " + valueBinder + " is ignored ",
+					element );
 		}
 		else if ( element.asType().getKind() == TypeKind.DECLARED
 				&& context.types().asElement( element.asType() ).getKind() == ElementKind.ENUM ) {
@@ -37,7 +38,7 @@ public abstract class AbstractProcessorFieldAnnotationProcessor extends Abstract
 			fieldContext.valueBridge( new ProcessorEnumValueBridge( element.asType() ) );
 		}
 
-		ContainerExtractorPath extractorPath = toContainerExtractorPath( getExtraction( annotation ) );
+		ContainerExtractorPath extractorPath = toContainerExtractorPath( getExtraction( annotation ), context );
 		fieldContext.extractors( extractorPath );
 	}
 

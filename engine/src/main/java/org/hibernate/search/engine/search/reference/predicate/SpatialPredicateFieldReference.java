@@ -4,5 +4,5 @@
  */
 package org.hibernate.search.engine.search.reference.predicate;
 
-public interface SpatialWithinCirclePredicateFieldReference<SR, T> extends TypedPredicateFieldReference<SR, T> {
+public interface SpatialPredicateFieldReference<SR> extends PredicateFieldReference<SR> {
 }

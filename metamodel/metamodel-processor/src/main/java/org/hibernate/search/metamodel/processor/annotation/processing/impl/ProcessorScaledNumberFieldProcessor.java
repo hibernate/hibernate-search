@@ -19,7 +19,7 @@ import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.Property
 import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.PropertyMappingStep;
 import org.hibernate.search.metamodel.processor.model.impl.BuiltInBridgeResolverTypes;
 
-public class ProcessorScaledNumberFieldProcessor extends AbstractProcessorNonFullTextFieldAnnotationProcessor {
+class ProcessorScaledNumberFieldProcessor extends AbstractProcessorNonFullTextFieldAnnotationProcessor {
 	@Override
 	PropertyMappingNonFullTextFieldOptionsStep<?> initSortableFieldMappingContext(PropertyMappingStep mappingContext,
 			AnnotationMirror annotation, String fieldName) {
@@ -27,6 +27,11 @@ public class ProcessorScaledNumberFieldProcessor extends AbstractProcessorNonFul
 		int decimalScale = getAnnotationValueAsInt( annotation, "decimalScale", AnnotationDefaultValues.DEFAULT_DECIMAL_SCALE );
 		if ( decimalScale != AnnotationDefaultValues.DEFAULT_DECIMAL_SCALE ) {
 			fieldContext.decimalScale( decimalScale );
+		}
+		else {
+			// it might be that we are looking at the ORM field and in such case the scale may be defined there,
+			// we don't really care about the scale value:
+			fieldContext.decimalScale( 0 );
 		}
 		return fieldContext;
 	}

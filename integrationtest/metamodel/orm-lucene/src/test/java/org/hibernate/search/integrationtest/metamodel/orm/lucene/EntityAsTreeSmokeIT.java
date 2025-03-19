@@ -2,7 +2,7 @@
  * SPDX-License-Identifier: Apache-2.0
  * Copyright Red Hat Inc. and Hibernate Authors
  */
-package org.hibernate.search.integrationtest.metamodel.standalone.lucene;
+package org.hibernate.search.integrationtest.metamodel.orm.lucene;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmUtils.with;
@@ -20,11 +20,13 @@ import jakarta.persistence.OneToMany;
 import org.hibernate.SessionFactory;
 import org.hibernate.search.engine.backend.types.Projectable;
 import org.hibernate.search.mapper.orm.Search;
+import org.hibernate.search.mapper.orm.cfg.HibernateOrmMapperSettings;
 import org.hibernate.search.mapper.orm.scope.SearchScope;
 import org.hibernate.search.mapper.orm.session.SearchSession;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.FullTextField;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.IndexedEmbedded;
+import org.hibernate.search.mapper.pojo.work.IndexingPlanSynchronizationStrategyNames;
 import org.hibernate.search.util.impl.integrationtest.backend.lucene.LuceneBackendConfiguration;
 import org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmSetupHelper;
 
@@ -43,6 +45,8 @@ class EntityAsTreeSmokeIT {
 	void setup() {
 		sessionFactory = setupHelper.start()
 				.withAnnotatedTypes( ContainedNonEntity.class, IndexedEntity.class, ContainedEntity.class )
+				.withProperty( HibernateOrmMapperSettings.INDEXING_PLAN_SYNCHRONIZATION_STRATEGY,
+						IndexingPlanSynchronizationStrategyNames.SYNC )
 				.setup();
 	}
 
@@ -64,7 +68,8 @@ class EntityAsTreeSmokeIT {
 
 		try ( var s = sessionFactory.openSession() ) {
 			SearchSession session = Search.session( s );
-			SearchScope<EntityAsTreeSmokeIT_IndexedEntity__, IndexedEntity> scope = EntityAsTreeSmokeIT_IndexedEntity__.INDEX.scope( session );
+			SearchScope<EntityAsTreeSmokeIT_IndexedEntity__, IndexedEntity> scope =
+					EntityAsTreeSmokeIT_IndexedEntity__.INDEX.scope( session );
 			assertThat( session.search( scope )
 					.where( f -> f.match().field( EntityAsTreeSmokeIT_IndexedEntity__.INDEX.containedEntities.text )
 							.matching( "entity text" ) )
@@ -80,7 +85,8 @@ class EntityAsTreeSmokeIT {
 
 		try ( var s = sessionFactory.openSession() ) {
 			SearchSession session = Search.session( s );
-			SearchScope<EntityAsTreeSmokeIT_IndexedEntity__, IndexedEntity> scope = EntityAsTreeSmokeIT_IndexedEntity__.INDEX.scope( session );
+			SearchScope<EntityAsTreeSmokeIT_IndexedEntity__, IndexedEntity> scope =
+					EntityAsTreeSmokeIT_IndexedEntity__.INDEX.scope( session );
 			assertThat( session.search( scope )
 					.select( f -> f.id() )
 					.where( f -> f.match().field( EntityAsTreeSmokeIT_IndexedEntity__.INDEX.containedEntities.text )

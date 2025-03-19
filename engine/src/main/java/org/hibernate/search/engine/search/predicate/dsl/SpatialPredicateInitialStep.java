@@ -8,7 +8,7 @@ package org.hibernate.search.engine.search.predicate.dsl;
 /**
  * The initial step of all spatial predicate definitions.
  */
-public interface SpatialPredicateInitialStep {
+public interface SpatialPredicateInitialStep<SR> {
 
 	/**
 	 * Match documents where targeted fields point to a location within given bounds:
@@ -16,6 +16,6 @@ public interface SpatialPredicateInitialStep {
 	 *
 	 * @return The initial step of a DSL allowing the definition of a "within" predicate.
 	 */
-	SpatialWithinPredicateFieldStep<?> within();
+	SpatialWithinPredicateFieldStep<SR, ?> within();
 
 }

@@ -215,8 +215,8 @@ public abstract class AbstractSearchPredicateFactory<
 	}
 
 	@Override
-	public SpatialPredicateInitialStep spatial() {
-		return new SpatialPredicateInitialStepImpl( dslContext );
+	public SpatialPredicateInitialStep<SR> spatial() {
+		return new SpatialPredicateInitialStepImpl<>( dslContext );
 	}
 
 	@Override
