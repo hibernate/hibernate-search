@@ -258,7 +258,7 @@ class DynamicMapBaseIT {
 		with( sessionFactory ).runNoTransaction( session -> {
 			SearchSession searchSession = Search.session( session );
 
-			SearchScope<Map> scope = searchSession.scope( Map.class, entityTypeName );
+			SearchScope<?, Map> scope = searchSession.scope( Map.class, entityTypeName );
 
 			backendMock.expectIndexScaleWorks( INDEX1_NAME )
 					.purge()

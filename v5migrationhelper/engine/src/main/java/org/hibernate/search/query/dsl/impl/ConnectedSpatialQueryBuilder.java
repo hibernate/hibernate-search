@@ -35,7 +35,7 @@ public class ConnectedSpatialQueryBuilder implements SpatialTermination {
 	}
 
 	private SearchPredicate createPredicate() {
-		SearchPredicateFactory factory = queryContext.getScope().predicate();
+		SearchPredicateFactory<?> factory = queryContext.getScope().predicate();
 
 		SpatialWithinPredicateOptionsStep<?> optionsStep = factory.spatial().within()
 				.field( spatialContext.getCoordinatesField() )

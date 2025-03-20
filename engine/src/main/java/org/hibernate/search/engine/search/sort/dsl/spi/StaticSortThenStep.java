@@ -6,10 +6,10 @@ package org.hibernate.search.engine.search.sort.dsl.spi;
 
 import org.hibernate.search.engine.search.sort.SearchSort;
 
-public final class StaticSortThenStep extends AbstractSortThenStep {
+public final class StaticSortThenStep<SR> extends AbstractSortThenStep<SR> {
 	final SearchSort sort;
 
-	public StaticSortThenStep(SearchSortDslContext<?, ?> parentDslContext, SearchSort sort) {
+	public StaticSortThenStep(SearchSortDslContext<SR, ?, ?> parentDslContext, SearchSort sort) {
 		super( parentDslContext );
 		this.sort = sort;
 	}

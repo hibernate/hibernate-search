@@ -10,13 +10,14 @@ import java.util.function.Function;
  * The initial step when attempting to apply multiple extensions
  * to a {@link SearchProjectionFactory}.
  *
+ * @param <SR> Scope root type.
  * @param <R> The type of entity references in the parent {@link SearchProjectionFactory}.
  * @param <E> The type of entities in the parent {@link SearchProjectionFactory}.
  * @param <P> The resulting projection type.
  *
  * @see SearchProjectionFactory#extension()
  */
-public interface SearchProjectionFactoryExtensionIfSupportedStep<P, R, E> {
+public interface SearchProjectionFactoryExtensionIfSupportedStep<SR, P, R, E> {
 
 	/**
 	 * If the given extension is supported, and none of the previous extensions passed to
@@ -35,8 +36,8 @@ public interface SearchProjectionFactoryExtensionIfSupportedStep<P, R, E> {
 	 * @param <T> The type of the extended factory.
 	 * @return {@code this}, for method chaining.
 	 */
-	<T> SearchProjectionFactoryExtensionIfSupportedMoreStep<P, R, E> ifSupported(
-			SearchProjectionFactoryExtension<T, R, E> extension,
+	<T> SearchProjectionFactoryExtensionIfSupportedMoreStep<SR, P, R, E> ifSupported(
+			SearchProjectionFactoryExtension<SR, T, R, E> extension,
 			Function<T, ? extends ProjectionFinalStep<P>> projectionContributor
 	);
 
