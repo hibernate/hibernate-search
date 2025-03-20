@@ -98,8 +98,15 @@ public class AnnotationMappingConfigurationContextImpl
 	}
 
 	@Override
-	public AnnotationMappingConfigurationContext addJandexIndex(IndexView jandexIndex) {
-		explicitJandexIndexes.add( jandexIndex );
+	public AnnotationMappingConfigurationContext addJandexIndex(Object jandexIndex) {
+		JandexBehavior.doWithJandex( () -> {
+			if ( jandexIndex instanceof IndexView indexView ) {
+				explicitJandexIndexes.add( indexView );
+			}
+			else {
+				throw PojoMapperMiscLog.INSTANCE.passedObjectNotJandexIndex( jandexIndex );
+			}
+		} );
 		return this;
 	}
 

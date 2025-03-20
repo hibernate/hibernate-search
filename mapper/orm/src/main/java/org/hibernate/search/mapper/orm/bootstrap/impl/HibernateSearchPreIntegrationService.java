@@ -43,8 +43,6 @@ import org.hibernate.service.ServiceRegistry;
 import org.hibernate.service.spi.ServiceContributor;
 import org.hibernate.service.spi.ServiceRegistryImplementor;
 
-import org.jboss.jandex.IndexView;
-
 /**
  * A service that can perform the earliest steps of the integration of Hibernate Search into Hibernate ORM,
  * before {@link HibernateSearchIntegrator} is even called.
@@ -224,7 +222,7 @@ public abstract class HibernateSearchPreIntegrationService implements Service, A
 	abstract BeanResolver beanResolver();
 
 	abstract HibernateOrmIntegrationPartialBuildState doBootFirstPhase(Metadata metadata,
-			IndexView jandexIndex, ClassDetailsRegistry classDetailsRegistry,
+			Object jandexIndex, ClassDetailsRegistry classDetailsRegistry,
 			ValueHandleFactory valueHandleFactory);
 
 	static class NotBooted extends HibernateSearchPreIntegrationService {
@@ -259,7 +257,7 @@ public abstract class HibernateSearchPreIntegrationService implements Service, A
 
 		@Override
 		HibernateOrmIntegrationPartialBuildState doBootFirstPhase(Metadata metadata,
-				IndexView jandexIndex, ClassDetailsRegistry classDetailsRegistry,
+				Object jandexIndex, ClassDetailsRegistry classDetailsRegistry,
 				ValueHandleFactory valueHandleFactory) {
 			HibernateOrmMappingInitiator mappingInitiator = null;
 			SearchIntegrationPartialBuildState searchIntegrationPartialBuildState = null;
@@ -318,7 +316,7 @@ public abstract class HibernateSearchPreIntegrationService implements Service, A
 		}
 
 		@Override
-		HibernateOrmIntegrationPartialBuildState doBootFirstPhase(Metadata metadata, IndexView jandexIndex,
+		HibernateOrmIntegrationPartialBuildState doBootFirstPhase(Metadata metadata, Object jandexIndex,
 				ClassDetailsRegistry classDetailsRegistry, ValueHandleFactory valueHandleFactory) {
 			return partialBuildState;
 		}

@@ -40,8 +40,6 @@ import org.hibernate.search.util.common.impl.Closer;
 import org.hibernate.search.util.common.reflect.spi.ValueHandleFactory;
 import org.hibernate.service.ServiceRegistry;
 
-import org.jboss.jandex.IndexView;
-
 public class HibernateOrmMappingInitiator extends AbstractPojoMappingInitiator<HibernateOrmMappingPartialBuildState>
 		implements HibernateOrmMappingConfigurationContext {
 
@@ -72,7 +70,7 @@ public class HibernateOrmMappingInitiator extends AbstractPojoMappingInitiator<H
 							.multivalued()
 							.build();
 
-	public static HibernateOrmMappingInitiator create(Metadata metadata, IndexView jandexIndex,
+	public static HibernateOrmMappingInitiator create(Metadata metadata, Object jandexIndex,
 			ClassDetailsRegistry classDetailsRegistry,
 			ValueHandleFactory valueHandleFactory, ServiceRegistry serviceRegistry) {
 		HibernateOrmBasicTypeMetadataProvider basicTypeMetadataProvider =
@@ -98,7 +96,7 @@ public class HibernateOrmMappingInitiator extends AbstractPojoMappingInitiator<H
 
 	private HibernateOrmMappingInitiator(
 			HibernateOrmBasicTypeMetadataProvider basicTypeMetadataProvider,
-			IndexView jandexIndex, HibernateOrmBootstrapIntrospector introspector,
+			Object jandexIndex, HibernateOrmBootstrapIntrospector introspector,
 			HibernateSearchPreIntegrationService preIntegrationService, boolean multiTenancyEnabled) {
 		super( introspector, HibernateOrmMapperHints.INSTANCE );
 
