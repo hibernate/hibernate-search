@@ -53,8 +53,8 @@ so you can use that and don't need to care about the required version of Maven
 ### <a id="setup-develocity"></a> Develocity build cache and build scans
 
 Hibernate Search relies on a [Develocity](https://gradle.com/develocity/) instance
-at [https://ge.hibernate.org](https://ge.hibernate.org/scans?search.rootProjectNames=Hibernate%20Search)
-to speed up its build through a build cache
+at [https://develocity.commonhaus.dev](https://develocity.commonhaus.dev/scans?search.rootProjectNames=Hibernate%20Search)
+to speed up its build through a build cache.
 
 By default, only [continuous integration](#ci) builds will write to the remote build cache or publish build scans.
 
