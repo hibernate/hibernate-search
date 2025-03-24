@@ -925,7 +925,7 @@ void withMavenWorkspace(Map args, Closure body) {
 			artifactsPublisher(disabled: true),
 			// stdout/stderr for successful tests is not needed and takes up disk space
 			// we archive test results and stdout/stderr as part of the build scan anyway,
-			// see https://ge.hibernate.org/scans?search.rootProjectNames=Hibernate%20Search
+			// see https://develocity.commonhaus.dev/scans?search.rootProjectNames=Hibernate%20Search
 			junitPublisher(disabled: true)
 	])
 	helper.withMavenWorkspace(args, {
