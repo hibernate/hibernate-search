@@ -4,8 +4,6 @@
  */
 package org.hibernate.search.mapper.orm.bootstrap.impl;
 
-import static org.hibernate.search.mapper.orm.common.impl.HibernateOrmUtils.createModelBuildingContext;
-
 import java.lang.invoke.MethodHandles;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
@@ -30,13 +28,10 @@ import org.hibernate.search.util.common.impl.SuppressingCloser;
 import org.hibernate.search.util.common.reflect.spi.ValueHandleFactory;
 import org.hibernate.service.ServiceRegistry;
 
-import org.jboss.jandex.IndexView;
-
 public class HibernateOrmIntegrationBooterImpl implements HibernateOrmIntegrationBooter {
 
 
 	private final Metadata metadata;
-	private final IndexView jandexIndex;
 	private final ValueHandleFactory valueHandleFactory;
 	private final HibernateSearchPreIntegrationService preIntegrationService;
 	private final Optional<EnvironmentSynchronizer> environmentSynchronizer;
@@ -46,7 +41,6 @@ public class HibernateOrmIntegrationBooterImpl implements HibernateOrmIntegratio
 	private HibernateOrmIntegrationBooterImpl(BuilderImpl builder) {
 		this.metadata = builder.metadata;
 		ServiceRegistry serviceRegistry = builder.bootstrapContext.getServiceRegistry();
-		this.jandexIndex = (IndexView) builder.bootstrapContext.getJandexView();
 		this.valueHandleFactory = builder.valueHandleFactory != null
 				? builder.valueHandleFactory
 				: ValueHandleFactory.usingMethodHandle( MethodHandles.publicLookup() );
@@ -78,7 +72,7 @@ public class HibernateOrmIntegrationBooterImpl implements HibernateOrmIntegratio
 				this.environmentSynchronizer = Optional.empty();
 			}
 		}
-		this.classDetailsRegistry = createModelBuildingContext( builder.bootstrapContext ).getClassDetailsRegistry();
+		this.classDetailsRegistry = builder.bootstrapContext.getModelsContext().getClassDetailsRegistry();
 	}
 
 	@Override
@@ -90,7 +84,7 @@ public class HibernateOrmIntegrationBooterImpl implements HibernateOrmIntegratio
 			);
 		}
 
-		preIntegrationService.doBootFirstPhase( metadata, jandexIndex, classDetailsRegistry, valueHandleFactory )
+		preIntegrationService.doBootFirstPhase( metadata, classDetailsRegistry, valueHandleFactory )
 				.set( propertyCollector );
 	}
 
@@ -174,7 +168,7 @@ public class HibernateOrmIntegrationBooterImpl implements HibernateOrmIntegratio
 
 	private HibernateSearchContextProviderService bootNow(SessionFactoryImplementor sessionFactoryImplementor) {
 		HibernateOrmIntegrationPartialBuildState partialBuildState =
-				preIntegrationService.doBootFirstPhase( metadata, jandexIndex, classDetailsRegistry, valueHandleFactory );
+				preIntegrationService.doBootFirstPhase( metadata, classDetailsRegistry, valueHandleFactory );
 
 		try {
 			return partialBuildState.doBootSecondPhase( sessionFactoryImplementor,
