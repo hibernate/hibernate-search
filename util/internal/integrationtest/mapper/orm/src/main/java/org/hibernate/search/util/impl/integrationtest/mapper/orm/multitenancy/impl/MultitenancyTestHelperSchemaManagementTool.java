@@ -8,12 +8,17 @@ import java.util.Map;
 
 import org.hibernate.boot.Metadata;
 import org.hibernate.boot.registry.StandardServiceInitiator;
+import org.hibernate.boot.registry.StandardServiceRegistry;
+import org.hibernate.boot.spi.MetadataImplementor;
+import org.hibernate.engine.config.spi.ConfigurationService;
 import org.hibernate.engine.jdbc.connections.spi.ConnectionProvider;
 import org.hibernate.engine.jdbc.connections.spi.MultiTenantConnectionProvider;
+import org.hibernate.engine.jdbc.env.spi.JdbcEnvironment;
 import org.hibernate.service.Service;
 import org.hibernate.service.ServiceRegistry;
 import org.hibernate.service.spi.ServiceRegistryAwareService;
 import org.hibernate.service.spi.ServiceRegistryImplementor;
+import org.hibernate.tool.schema.internal.ExceptionHandlerLoggedImpl;
 import org.hibernate.tool.schema.internal.HibernateSchemaManagementTool;
 import org.hibernate.tool.schema.internal.SchemaCreatorImpl;
 import org.hibernate.tool.schema.internal.SchemaDropperImpl;
@@ -21,6 +26,7 @@ import org.hibernate.tool.schema.internal.SchemaTruncatorImpl;
 import org.hibernate.tool.schema.internal.exec.GenerationTargetToDatabase;
 import org.hibernate.tool.schema.spi.ContributableMatcher;
 import org.hibernate.tool.schema.spi.DelayedDropAction;
+import org.hibernate.tool.schema.spi.ExceptionHandler;
 import org.hibernate.tool.schema.spi.ExecutionOptions;
 import org.hibernate.tool.schema.spi.ExtractionTool;
 import org.hibernate.tool.schema.spi.GenerationTarget;
@@ -28,6 +34,7 @@ import org.hibernate.tool.schema.spi.SchemaCreator;
 import org.hibernate.tool.schema.spi.SchemaDropper;
 import org.hibernate.tool.schema.spi.SchemaManagementTool;
 import org.hibernate.tool.schema.spi.SchemaMigrator;
+import org.hibernate.tool.schema.spi.SchemaPopulator;
 import org.hibernate.tool.schema.spi.SchemaTruncator;
 import org.hibernate.tool.schema.spi.SchemaValidator;
 import org.hibernate.tool.schema.spi.SourceDescriptor;
@@ -138,6 +145,11 @@ class MultitenancyTestHelperSchemaManagementTool
 	}
 
 	@Override
+	public SchemaPopulator getSchemaPopulator(Map<String, Object> options) {
+		return toolDelegate.getSchemaPopulator( options );
+	}
+
+	@Override
 	public SchemaTruncator getSchemaTruncator(Map<String, Object> options) {
 		return new SchemaTruncator() {
 			final SchemaTruncatorImpl delegate = (SchemaTruncatorImpl) toolDelegate.getSchemaTruncator( options );
@@ -145,7 +157,29 @@ class MultitenancyTestHelperSchemaManagementTool
 			@Override
 			public void doTruncate(Metadata metadata, ExecutionOptions options,
 					ContributableMatcher contributableInclusionFilter, TargetDescriptor targetDescriptor) {
-				delegate.doTruncate( metadata, true, generationTargets );
+				final StandardServiceRegistry serviceRegistry =
+						( (MetadataImplementor) metadata ).getMetadataBuildingOptions().getServiceRegistry();
+
+				delegate.doTruncate( metadata,
+						new ExecutionOptions() {
+							@Override
+							public boolean shouldManageNamespaces() {
+								return true;
+							}
+
+							@Override
+							public Map<String, Object> getConfigurationValues() {
+								return serviceRegistry.requireService( ConfigurationService.class ).getSettings();
+							}
+
+							@Override
+							public ExceptionHandler getExceptionHandler() {
+								return ExceptionHandlerLoggedImpl.INSTANCE;
+							}
+						},
+						(contributed) -> true,
+						serviceRegistry.requireService( JdbcEnvironment.class ).getDialect(),
+						generationTargets );
 			}
 		};
 	}

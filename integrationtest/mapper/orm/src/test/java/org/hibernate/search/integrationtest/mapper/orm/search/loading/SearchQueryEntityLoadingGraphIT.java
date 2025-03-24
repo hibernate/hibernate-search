@@ -175,7 +175,7 @@ public class SearchQueryEntityLoadingGraphIT<T> extends AbstractSearchQueryEntit
 						.toQuery()
 		) )
 				.isInstanceOf( IllegalArgumentException.class )
-				.hasMessageContainingAll( "Could not locate EntityGraph with given name", "invalidGraphName" );
+				.hasMessageContainingAll( "No EntityGraph with given name", "invalidGraphName" );
 	}
 
 	@Test
