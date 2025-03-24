@@ -18,10 +18,6 @@ import jakarta.persistence.EntityManagerFactory;
 import org.hibernate.Session;
 import org.hibernate.binder.internal.TenantIdBinder;
 import org.hibernate.boot.Metadata;
-import org.hibernate.boot.models.internal.ClassLoaderServiceLoading;
-import org.hibernate.boot.models.internal.ModelsHelper;
-import org.hibernate.boot.registry.classloading.spi.ClassLoaderService;
-import org.hibernate.boot.spi.BootstrapContext;
 import org.hibernate.engine.spi.SessionFactoryImplementor;
 import org.hibernate.engine.spi.SessionImplementor;
 import org.hibernate.mapping.PersistentClass;
@@ -29,9 +25,6 @@ import org.hibernate.mapping.Property;
 import org.hibernate.metamodel.MappingMetamodel;
 import org.hibernate.metamodel.mapping.EntityMappingType;
 import org.hibernate.metamodel.model.domain.EntityDomainType;
-import org.hibernate.models.internal.BasicModelBuildingContextImpl;
-import org.hibernate.models.jandex.internal.JandexModelBuildingContextImpl;
-import org.hibernate.models.spi.SourceModelBuildingContext;
 import org.hibernate.search.mapper.orm.logging.impl.OrmMiscLog;
 import org.hibernate.search.mapper.pojo.loading.spi.PojoLoadingTypeContext;
 import org.hibernate.search.util.common.AssertionFailure;
@@ -40,8 +33,6 @@ import org.hibernate.service.Service;
 import org.hibernate.service.ServiceRegistry;
 import org.hibernate.service.spi.ServiceBinding;
 import org.hibernate.service.spi.ServiceRegistryImplementor;
-
-import org.jboss.jandex.IndexView;
 
 public final class HibernateOrmUtils {
 
@@ -188,26 +179,6 @@ public final class HibernateOrmUtils {
 
 	public static boolean isDiscriminatorMultiTenancyEnabled(Metadata metadata) {
 		return metadata.getFilterDefinition( TenantIdBinder.FILTER_NAME ) != null;
-	}
-
-	public static SourceModelBuildingContext createModelBuildingContext(BootstrapContext bootstrapContext) {
-		ClassLoaderService classLoaderService =
-				getServiceOrEmpty( bootstrapContext.getServiceRegistry(), ClassLoaderService.class )
-						.orElseThrow();
-		ClassLoaderServiceLoading classLoading = new ClassLoaderServiceLoading( classLoaderService );
-		if ( bootstrapContext.getJandexView() == null ) {
-			return new BasicModelBuildingContextImpl(
-					classLoading,
-					ModelsHelper::preFillRegistries
-			);
-		}
-		else {
-			return new JandexModelBuildingContextImpl(
-					(IndexView) bootstrapContext.getJandexView(),
-					classLoading,
-					ModelsHelper::preFillRegistries
-			);
-		}
 	}
 
 }

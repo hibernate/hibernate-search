@@ -40,8 +40,6 @@ import org.hibernate.search.util.common.impl.Closer;
 import org.hibernate.search.util.common.reflect.spi.ValueHandleFactory;
 import org.hibernate.service.ServiceRegistry;
 
-import org.jboss.jandex.IndexView;
-
 public class HibernateOrmMappingInitiator extends AbstractPojoMappingInitiator<HibernateOrmMappingPartialBuildState>
 		implements HibernateOrmMappingConfigurationContext {
 
@@ -72,7 +70,7 @@ public class HibernateOrmMappingInitiator extends AbstractPojoMappingInitiator<H
 							.multivalued()
 							.build();
 
-	public static HibernateOrmMappingInitiator create(Metadata metadata, IndexView jandexIndex,
+	public static HibernateOrmMappingInitiator create(Metadata metadata,
 			ClassDetailsRegistry classDetailsRegistry,
 			ValueHandleFactory valueHandleFactory, ServiceRegistry serviceRegistry) {
 		HibernateOrmBasicTypeMetadataProvider basicTypeMetadataProvider =
@@ -85,7 +83,7 @@ public class HibernateOrmMappingInitiator extends AbstractPojoMappingInitiator<H
 		boolean multiTenancyEnabled = ( (MetadataImplementor) metadata ).getMetadataBuildingOptions().isMultiTenancyEnabled()
 				|| isDiscriminatorMultiTenancyEnabled( metadata );
 
-		return new HibernateOrmMappingInitiator( basicTypeMetadataProvider, jandexIndex, introspector,
+		return new HibernateOrmMappingInitiator( basicTypeMetadataProvider, introspector,
 				preIntegrationService, multiTenancyEnabled );
 	}
 
@@ -98,14 +96,11 @@ public class HibernateOrmMappingInitiator extends AbstractPojoMappingInitiator<H
 
 	private HibernateOrmMappingInitiator(
 			HibernateOrmBasicTypeMetadataProvider basicTypeMetadataProvider,
-			IndexView jandexIndex, HibernateOrmBootstrapIntrospector introspector,
+			HibernateOrmBootstrapIntrospector introspector,
 			HibernateSearchPreIntegrationService preIntegrationService, boolean multiTenancyEnabled) {
 		super( introspector, HibernateOrmMapperHints.INSTANCE );
 
 		this.basicTypeMetadataProvider = basicTypeMetadataProvider;
-		if ( jandexIndex != null ) {
-			annotationMapping().addJandexIndex( jandexIndex );
-		}
 		this.introspector = introspector;
 
 		tenancyMode( multiTenancyEnabled ? TenancyMode.MULTI_TENANCY : TenancyMode.SINGLE_TENANCY );
