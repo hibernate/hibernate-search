@@ -4,7 +4,7 @@
 [![Build Status](https://img.shields.io/jenkins/build?jobUrl=https%3A%2F%2Fci.hibernate.org%2Fjob%2Fhibernate-search%2Fjob%2Fmain%2F&style=for-the-badge)](https://ci.hibernate.org/job/hibernate-search/job/main)
 [![Sonar Coverage](https://img.shields.io/sonar/coverage/org.hibernate.search:hibernate-search-parent?server=https%3A%2F%2Fsonarcloud.io&style=for-the-badge)](https://sonarcloud.io/project/activity?id=org.hibernate.search%3Ahibernate-search-parent&graph=coverage)
 [![Quality gate](https://img.shields.io/sonar/alert_status/org.hibernate.search:hibernate-search-parent?logo=sonarcloud&server=https%3A%2F%2Fsonarcloud.io&style=for-the-badge)](https://sonarcloud.io/dashboard?id=org.hibernate.search%3Ahibernate-search-parent)
-[![Develocity](https://img.shields.io/badge/Revved%20up%20by-Develocity-06A0CE?style=for-the-badge&logo=gradle)](https://ge.hibernate.org/scans?search.rootProjectNames=Hibernate%20Search)
+[![Develocity](https://img.shields.io/badge/Revved%20up%20by-Develocity-06A0CE?style=for-the-badge&logo=gradle)](https://develocity.commonhaus.dev/scans?search.rootProjectNames=Hibernate%20Search)
 [![Reproducible Builds](https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/jvm-repo-rebuild/reproducible-central/master/content/org/hibernate/search/hibernate-search-bom/badge.json&style=for-the-badge)](https://github.com/jvm-repo-rebuild/reproducible-central/blob/master/content/org/hibernate/search/hibernate-search-bom/README.md)
 
 ## Description
