@@ -94,7 +94,7 @@
             NOTE: when Hibernate ORM updates Byte Buddy, make sure to check Jenkinsfile to see if
             `net.bytebuddy.experimental` property can be removed.
          -->
-        <version.org.hibernate.orm>7.0.0.Beta4</version.org.hibernate.orm>
+        <version.org.hibernate.orm>7.0.0.Beta5</version.org.hibernate.orm>
         <version.org.hibernate.models>0.9.3</version.org.hibernate.models>
 
         <javadoc.org.hibernate.orm.url>https://docs.jboss.org/hibernate/orm/${parsed-version.org.hibernate.orm.majorVersion}.${parsed-version.org.hibernate.orm.minorVersion}/javadocs/</javadoc.org.hibernate.orm.url>

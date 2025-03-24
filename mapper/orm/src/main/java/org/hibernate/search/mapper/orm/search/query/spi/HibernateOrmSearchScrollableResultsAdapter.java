@@ -162,6 +162,8 @@ public class HibernateOrmSearchScrollableResultsAdapter<R, H>
 		}
 	}
 
+	@SuppressWarnings("removal")
+	@Deprecated(since = "8.0", forRemoval = true)
 	@Override
 	public int getRowNumber() {
 		if ( afterLast ) {
@@ -172,9 +174,19 @@ public class HibernateOrmSearchScrollableResultsAdapter<R, H>
 
 	@Override
 	public boolean position(int position) {
-		return setRowNumber( position );
+		return setRowNumber( position - 1 );
 	}
 
+	@Override
+	public int getPosition() {
+		if ( afterLast ) {
+			return -1;
+		}
+		return currentIndexInScroll + 1;
+	}
+
+	@SuppressWarnings("removal")
+	@Deprecated(since = "8.0", forRemoval = true)
 	@Override
 	public boolean setRowNumber(int rowNumber) {
 		checkNotClosed();
