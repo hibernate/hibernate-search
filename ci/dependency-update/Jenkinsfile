@@ -115,7 +115,8 @@ def withMavenWorkspace(Closure body) {
 					// see https://ge.hibernate.org/scans?search.rootProjectNames=Hibernate%20Search
 					junitPublisher(disabled: true)
 			]) {
-		withCredentials([string(credentialsId: 'ge.hibernate.org-access-key',
+		def develocityMainCredentialsId = helper.configuration.file?.develocity?.credentials?.main
+		withCredentials([string(credentialsId: develocityMainCredentialsId,
 				variable: 'DEVELOCITY_ACCESS_KEY')]) {
 			withGradle { // withDevelocity, actually: https://plugins.jenkins.io/gradle/#plugin-content-capturing-build-scans-from-jenkins-pipeline
 				body()
