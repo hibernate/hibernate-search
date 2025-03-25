@@ -115,12 +115,20 @@ def withMavenWorkspace(Closure body) {
 					// see https://develocity.commonhaus.dev/scans?search.rootProjectNames=Hibernate%20Search
 					junitPublisher(disabled: true)
 			]) {
-		def develocityMainCredentialsId = helper.configuration.file?.develocity?.credentials?.main
-		def develocityBaseUrl = helper.configuration.file?.develocity?.url
-		withCredentials([string(credentialsId: develocityMainCredentialsId,
-				variable: 'DEVELOCITY_ACCESS_KEY')]) {
-			withGradle { // withDevelocity, actually: https://plugins.jenkins.io/gradle/#plugin-content-capturing-build-scans-from-jenkins-pipeline
-				body()
+		script {
+			configFileProvider([configFile(fileId: 'job-configuration.yaml', variable: 'CONFIG_FILE')]) {
+				def configData = readYaml file: env.CONFIG_FILE
+
+				def develocityMainCredentialsId = configData.develocity.credentials.main
+				def develocityBaseUrl = configData.develocity.url
+				env.DEVELOCITY_BASE_URL = develocityBaseUrl
+				withCredentials([string(credentialsId: develocityMainCredentialsId,
+						variable: 'DEVELOCITY_ACCESS_KEY')]) {
+					withGradle {
+						// withDevelocity, actually: https://plugins.jenkins.io/gradle/#plugin-content-capturing-build-scans-from-jenkins-pipeline
+						body()
+					}
+				}
 			}
 		}
 	}
@@ -158,7 +166,6 @@ pipeline {
 	}
 	environment {
 		TESTCONTAINERS_REUSE_ENABLE = 'true'
-		DEVELOCITY_BASE_URL = helper.configuration.file?.develocity?.url
 	}
 	stages {
 		// This allows testing the original (unpatched) artifacts,
