@@ -18,13 +18,11 @@ def withMavenWorkspace(Closure body) {
 			]) {
 		def develocityMainCredentialsId = helper.configuration.file?.develocity?.credentials?.main
 		def develocityBaseUrl = helper.configuration.file?.develocity?.url
-		withEnv(["DEVELOCITY_BASE_URL=${develocityBaseUrl}"]) {
-			withCredentials([string(credentialsId: develocityMainCredentialsId,
-					variable: 'DEVELOCITY_ACCESS_KEY')]) {
-				withGradle {
-					// withDevelocity, actually: https://plugins.jenkins.io/gradle/#plugin-content-capturing-build-scans-from-jenkins-pipeline
-					body()
-				}
+		withCredentials([string(credentialsId: develocityMainCredentialsId,
+				variable: 'DEVELOCITY_ACCESS_KEY')]) {
+			withGradle {
+				// withDevelocity, actually: https://plugins.jenkins.io/gradle/#plugin-content-capturing-build-scans-from-jenkins-pipeline
+				body()
 			}
 		}
 	}
@@ -42,6 +40,7 @@ pipeline {
 	}
 	environment {
 		TESTCONTAINERS_REUSE_ENABLE = 'true'
+		DEVELOCITY_BASE_URL = helper.configuration.file?.develocity?.url
 	}
 	stages {
 		stage ('Run checks') {
