@@ -66,3 +66,4 @@ jobs:
           exit $status
         env:
           DEVELOCITY_ACCESS_KEY: ${{ secrets.DEVELOCITY_ACCESS_KEY_PR }}
+          DEVELOCITY_BASE_URL: "${{ env.DEVELOCITY_BASE_URL || 'https://develocity.commonhaus.dev' }}"
