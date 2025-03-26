@@ -53,7 +53,7 @@ Map settings() {
 					updateProperties: [],
 					onlyRunTestDependingOn: ['hibernate-search-backend-elasticsearch'],
 					// We want to use the snapshot version of an image from the ES registry since that's where they are publishing their snapshots.
-					additionalMavenArgs: '-Dtest.lucene.skip=true -Dtest.elasticsearch.run.elastic.image.name=docker.elastic.co/elasticsearch/elasticsearch -Dtest.elasticsearch.run.elastic.image.tag=8.17.4-SNAPSHOT',
+					additionalMavenArgs: '-Dtest.lucene.skip=true -Dtest.elasticsearch.run.elastic.image.name=docker.elastic.co/elasticsearch/elasticsearch -Dtest.elasticsearch.run.elastic.image.tag=8.17.5-SNAPSHOT',
 					// This job won't change the versions in the pom. We are passing the latest Elasticsearch version through an additional maven argument `-D`
 					skipSourceModifiedCheck: true
 			]
