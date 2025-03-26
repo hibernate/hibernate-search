@@ -13,33 +13,34 @@ import org.hibernate.search.engine.search.projection.SearchProjection;
 import org.hibernate.search.engine.search.projection.dsl.ProjectionFinalStep;
 import org.hibernate.search.engine.search.query.dsl.SearchQuerySelectStep;
 
-public interface LuceneSearchQuerySelectStep<R, E, LOS>
+public interface LuceneSearchQuerySelectStep<SR, R, E, LOS>
 		extends SearchQuerySelectStep<
-				LuceneSearchQueryOptionsStep<E, LOS>,
+				SR,
+				LuceneSearchQueryOptionsStep<SR, E, LOS>,
 				R,
 				E,
 				LOS,
-				LuceneSearchProjectionFactory<R, E>,
-				LuceneSearchPredicateFactory>,
-		LuceneSearchQueryWhereStep<E, LOS> {
+				LuceneSearchProjectionFactory<SR, R, E>,
+				LuceneSearchPredicateFactory<SR>>,
+		LuceneSearchQueryWhereStep<SR, E, LOS> {
 
 	@Override
-	LuceneSearchQueryWhereStep<E, LOS> selectEntity();
+	LuceneSearchQueryWhereStep<SR, E, LOS> selectEntity();
 
 	@Override
-	LuceneSearchQueryWhereStep<R, LOS> selectEntityReference();
+	LuceneSearchQueryWhereStep<SR, R, LOS> selectEntityReference();
 
 	@Override
-	<P> LuceneSearchQueryWhereStep<P, LOS> select(Class<P> objectClass);
+	<P> LuceneSearchQueryWhereStep<SR, P, LOS> select(Class<P> objectClass);
 
 	@Override
-	<P> LuceneSearchQueryWhereStep<P, LOS> select(
-			Function<? super LuceneSearchProjectionFactory<R, E>, ? extends ProjectionFinalStep<P>> projectionContributor);
+	<P> LuceneSearchQueryWhereStep<SR, P, LOS> select(
+			Function<? super LuceneSearchProjectionFactory<SR, R, E>, ? extends ProjectionFinalStep<P>> projectionContributor);
 
 	@Override
-	<P> LuceneSearchQueryWhereStep<P, LOS> select(SearchProjection<P> projection);
+	<P> LuceneSearchQueryWhereStep<SR, P, LOS> select(SearchProjection<P> projection);
 
 	@Override
-	LuceneSearchQueryWhereStep<List<?>, LOS> select(SearchProjection<?>... projections);
+	LuceneSearchQueryWhereStep<SR, List<?>, LOS> select(SearchProjection<?>... projections);
 
 }

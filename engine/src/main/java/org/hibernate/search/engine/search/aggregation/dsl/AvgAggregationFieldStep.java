@@ -8,15 +8,17 @@ import java.util.function.Function;
 
 import org.hibernate.search.engine.search.common.ValueModel;
 import org.hibernate.search.engine.search.predicate.dsl.SearchPredicateFactory;
+import org.hibernate.search.engine.search.reference.aggregation.AvgAggregationFieldReference;
 import org.hibernate.search.util.common.annotation.Incubating;
 
 /**
  * The initial step in an "avg" aggregation definition, where the target field can be set.
  *
+ * @param <SR> Scope root type.
  * @param <PDF> The type of factory used to create predicates in {@link AggregationFilterStep#filter(Function)}.
  */
 @Incubating
-public interface AvgAggregationFieldStep<PDF extends SearchPredicateFactory> {
+public interface AvgAggregationFieldStep<SR, PDF extends SearchPredicateFactory<SR>> {
 
 	/**
 	 * Target the given field in the avg aggregation.
@@ -26,7 +28,7 @@ public interface AvgAggregationFieldStep<PDF extends SearchPredicateFactory> {
 	 * @param <F> The type of field values or {@link Double} if a double result is required.
 	 * @return The next step.
 	 */
-	default <F> AvgAggregationOptionsStep<?, PDF, F> field(String fieldPath, Class<F> type) {
+	default <F> AvgAggregationOptionsStep<SR, ?, PDF, F> field(String fieldPath, Class<F> type) {
 		return field( fieldPath, type, ValueModel.MAPPING );
 	}
 
@@ -40,7 +42,19 @@ public interface AvgAggregationFieldStep<PDF extends SearchPredicateFactory> {
 	 * See {@link ValueModel}.
 	 * @return The next step.
 	 */
-	<F> AvgAggregationOptionsStep<?, PDF, F> field(String fieldPath, Class<F> type,
+	<F> AvgAggregationOptionsStep<SR, ?, PDF, F> field(String fieldPath, Class<F> type,
 			ValueModel valueModel);
+
+	/**
+	 * Target the given field in the avg aggregation.
+	 *
+	 * @param reference The field reference representing a <a href="SearchAggregationFactory.html#field-paths">path</a> to the index field to aggregate.
+	 * @param <F> The type of field values or {@link Double} if a double result is required.
+	 * @return The next step.
+	 */
+	@Incubating
+	default <F> AvgAggregationOptionsStep<SR, ?, PDF, F> field(AvgAggregationFieldReference<SR, F> reference) {
+		return field( reference.absolutePath(), reference.aggregationType(), reference.valueModel() );
+	}
 
 }

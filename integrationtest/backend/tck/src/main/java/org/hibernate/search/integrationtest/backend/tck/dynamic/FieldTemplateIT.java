@@ -268,7 +268,7 @@ class FieldTemplateIT {
 	}
 
 	private SearchQuery<DocumentReference> query(
-			Function<? super SearchPredicateFactory, ? extends PredicateFinalStep> predicateContributor,
+			Function<? super SearchPredicateFactory<?>, ? extends PredicateFinalStep> predicateContributor,
 			TestedFieldStructure fieldStructure) {
 		return index.createScope().query()
 				.where( f -> {

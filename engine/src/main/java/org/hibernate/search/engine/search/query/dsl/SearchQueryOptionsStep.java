@@ -30,6 +30,7 @@ import org.hibernate.search.util.common.annotation.Incubating;
  * The final step in a query definition, where optional parameters such as {@link #sort(Function) sorts} can be set,
  * and where the query can be {@link SearchFetchable executed} or {@link #toQuery() retrieved as an object}.
  *
+ * @param <SR> Scope root type.
  * @param <S> The "self" type (the actual exposed type of this step).
  * May be a subtype of SearchQueryOptionsStep with more exposed methods.
  * @param <H> The type of hits for the created query.
@@ -38,11 +39,12 @@ import org.hibernate.search.util.common.annotation.Incubating;
  * @param <AF> The type of factory used to create aggregations in {@link #aggregation(AggregationKey, Function)}.
  */
 public interface SearchQueryOptionsStep<
-		S extends SearchQueryOptionsStep<?, H, LOS, SF, AF>,
+		SR,
+		S extends SearchQueryOptionsStep<SR, ?, H, LOS, SF, AF>,
 		H,
 		LOS,
-		SF extends SearchSortFactory,
-		AF extends SearchAggregationFactory>
+		SF extends SearchSortFactory<SR>,
+		AF extends SearchAggregationFactory<SR>>
 		extends SearchQueryFinalStep<H>, SearchFetchable<H> {
 
 	/**

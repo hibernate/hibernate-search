@@ -59,7 +59,7 @@ public abstract class ObjectProjectionDefinition<P, T>
 		}
 
 		@Override
-		public SearchProjection<T> create(SearchProjectionFactory<?, ?> factory,
+		public SearchProjection<T> create(SearchProjectionFactory<?, ?, ?> factory,
 				ProjectionDefinitionContext context) {
 			return delegate.apply( factory.withRoot( fieldPath ), factory.object( fieldPath ), context )
 					.toProjection();
@@ -80,7 +80,7 @@ public abstract class ObjectProjectionDefinition<P, T>
 		}
 
 		@Override
-		public SearchProjection<List<T>> create(SearchProjectionFactory<?, ?> factory,
+		public SearchProjection<List<T>> create(SearchProjectionFactory<?, ?, ?> factory,
 				ProjectionDefinitionContext context) {
 			return delegate.apply( factory.withRoot( fieldPath ), factory.object( fieldPath ), context )
 					.collector( ProjectionCollector.list() ).toProjection();
@@ -103,7 +103,7 @@ public abstract class ObjectProjectionDefinition<P, T>
 		}
 
 		@Override
-		public SearchProjection<C> create(SearchProjectionFactory<?, ?> factory,
+		public SearchProjection<C> create(SearchProjectionFactory<?, ?, ?> factory,
 				ProjectionDefinitionContext context) {
 			return delegate.apply( factory.withRoot( fieldPath ), factory.object( fieldPath ), context )
 					.collector( collector ).toProjection();
