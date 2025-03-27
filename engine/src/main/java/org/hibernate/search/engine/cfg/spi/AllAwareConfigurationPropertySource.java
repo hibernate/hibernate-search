@@ -21,7 +21,8 @@ import org.hibernate.search.engine.cfg.impl.SystemConfigurationPropertySource;
  */
 public interface AllAwareConfigurationPropertySource extends ConfigurationPropertySource {
 
-	Set<String> resolveAll(BiPredicate<String, Object> predicate);
+	Set<String> resolveAll(BiPredicate<String, Object>
+			predicate);
 
 	/**
 	 * @param map The {@link Map} object to extract property values from.
