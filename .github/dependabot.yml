@@ -70,6 +70,8 @@ updates:
           - "org.jboss.marshalling:jboss-marshalling" # JBeret IT dependency
           - "org.wildfly.security:wildfly-security-manager" # JBeret IT dependency
           - "org.springframework.boot:*" # Spring is only for ITs
+          - "io.agroal:agroal-spring-boot-starter" # part of Spring dependencies, is only for ITs
+          - "dev.snowdrop:narayana-spring-boot-starter" # part of Spring dependencies, is only for ITs
           - "org.mockito:*"
           - "org.hamcrest:*"
           - "org.apache.logging.log4j:*"
