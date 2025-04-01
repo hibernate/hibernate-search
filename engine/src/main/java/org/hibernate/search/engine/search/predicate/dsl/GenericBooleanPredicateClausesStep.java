@@ -16,13 +16,15 @@ import org.hibernate.search.engine.search.predicate.SearchPredicate;
  * refer to {@link BooleanPredicateOptionsCollector}, {@link PredicateScoreStep} or {@link PredicateFinalStep}
  * for meaningful documentation.
  *
+ * @param <SR> Scope root type.
  * @param <S> The "self" type (the actual exposed type of this collector).
  * @param <C> The "collector" type (the type of collector passed to the consumer in {@link #with(Consumer)}.
  */
 public interface GenericBooleanPredicateClausesStep<
+		SR,
 		S extends C,
-		C extends BooleanPredicateOptionsCollector<?>>
-		extends BooleanPredicateOptionsCollector<C>, PredicateScoreStep<S>, PredicateFinalStep {
+		C extends BooleanPredicateOptionsCollector<SR, ?>>
+		extends BooleanPredicateOptionsCollector<SR, C>, PredicateScoreStep<S>, PredicateFinalStep {
 
 	@Override
 	S with(Consumer<? super C> contributor);
@@ -60,16 +62,16 @@ public interface GenericBooleanPredicateClausesStep<
 	}
 
 	@Override
-	S must(Function<? super SearchPredicateFactory, ? extends PredicateFinalStep> clauseContributor);
+	S must(Function<? super SearchPredicateFactory<SR>, ? extends PredicateFinalStep> clauseContributor);
 
 	@Override
-	S mustNot(Function<? super SearchPredicateFactory, ? extends PredicateFinalStep> clauseContributor);
+	S mustNot(Function<? super SearchPredicateFactory<SR>, ? extends PredicateFinalStep> clauseContributor);
 
 	@Override
-	S should(Function<? super SearchPredicateFactory, ? extends PredicateFinalStep> clauseContributor);
+	S should(Function<? super SearchPredicateFactory<SR>, ? extends PredicateFinalStep> clauseContributor);
 
 	@Override
-	S filter(Function<? super SearchPredicateFactory, ? extends PredicateFinalStep> clauseContributor);
+	S filter(Function<? super SearchPredicateFactory<SR>, ? extends PredicateFinalStep> clauseContributor);
 
 	@Override
 	default S minimumShouldMatchNumber(int matchingClausesNumber) {

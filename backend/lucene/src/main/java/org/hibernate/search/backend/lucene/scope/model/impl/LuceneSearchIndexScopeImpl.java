@@ -162,24 +162,24 @@ public final class LuceneSearchIndexScopeImpl
 	}
 
 	@Override
-	public LuceneSearchPredicateFactory predicateFactory() {
-		return new LuceneSearchPredicateFactoryImpl( SearchPredicateDslContext.root( this ) );
+	public <SR> LuceneSearchPredicateFactory<SR> predicateFactory() {
+		return new LuceneSearchPredicateFactoryImpl<>( SearchPredicateDslContext.root( this ) );
 	}
 
 	@Override
-	public LuceneSearchSortFactory sortFactory() {
-		return new LuceneSearchSortFactoryImpl( SearchSortDslContext
+	public <SR> LuceneSearchSortFactory<SR> sortFactory() {
+		return new LuceneSearchSortFactoryImpl<SR>( SearchSortDslContext
 				.root( this, LuceneSearchSortFactoryImpl::new, predicateFactory() ) );
 	}
 
 	@Override
-	public <R, E> LuceneSearchProjectionFactory<R, E> projectionFactory() {
+	public <SR, R, E> LuceneSearchProjectionFactory<SR, R, E> projectionFactory() {
 		return new LuceneSearchProjectionFactoryImpl<>( SearchProjectionDslContext.root( this ) );
 	}
 
 	@Override
-	public LuceneSearchAggregationFactory aggregationFactory() {
-		return new LuceneSearchAggregationFactoryImpl( SearchAggregationDslContext.root( this, predicateFactory() ) );
+	public <SR> LuceneSearchAggregationFactory<SR> aggregationFactory() {
+		return new LuceneSearchAggregationFactoryImpl<SR>( SearchAggregationDslContext.root( this, predicateFactory() ) );
 	}
 
 	@Override

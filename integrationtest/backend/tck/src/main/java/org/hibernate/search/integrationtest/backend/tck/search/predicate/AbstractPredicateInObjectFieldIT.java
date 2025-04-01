@@ -180,7 +180,7 @@ public abstract class AbstractPredicateInObjectFieldIT {
 				.hasTotalHitCount( 2 );
 	}
 
-	protected abstract PredicateFinalStep predicate(SearchPredicateFactory f, ObjectFieldBinding objectFieldBinding,
+	protected abstract PredicateFinalStep predicate(SearchPredicateFactory<?> f, ObjectFieldBinding objectFieldBinding,
 			int matchingDocOrdinal, AbstractPredicateDataSet dataSet);
 
 	abstract static class AbstractObjectBinding {
@@ -326,7 +326,7 @@ public abstract class AbstractPredicateInObjectFieldIT {
 		public static final String IMPL_PARAM_NAME = "impl";
 
 		@Override
-		public SearchPredicate create(PredicateDefinitionContext context) {
+		public SearchPredicate create(PredicateDefinitionContext<?> context) {
 			PredicateDefinition impl = context.params().get( IMPL_PARAM_NAME, PredicateDefinition.class );
 			return impl.create( context );
 		}

@@ -8,15 +8,17 @@ import java.util.function.Function;
 
 import org.hibernate.search.engine.search.common.ValueModel;
 import org.hibernate.search.engine.search.predicate.dsl.SearchPredicateFactory;
+import org.hibernate.search.engine.search.reference.aggregation.MaxAggregationFieldReference;
 import org.hibernate.search.util.common.annotation.Incubating;
 
 /**
  * The initial step in a "min" aggregation definition, where the target field can be set.
  *
+ * @param <SR> Scope root type.
  * @param <PDF> The type of factory used to create predicates in {@link AggregationFilterStep#filter(Function)}.
  */
 @Incubating
-public interface MaxAggregationFieldStep<PDF extends SearchPredicateFactory> {
+public interface MaxAggregationFieldStep<SR, PDF extends SearchPredicateFactory<SR>> {
 
 	/**
 	 * Target the given field in the min aggregation.
@@ -26,7 +28,7 @@ public interface MaxAggregationFieldStep<PDF extends SearchPredicateFactory> {
 	 * @param <F> The type of field values.
 	 * @return The next step.
 	 */
-	default <F> MaxAggregationOptionsStep<?, PDF, F> field(String fieldPath, Class<F> type) {
+	default <F> MaxAggregationOptionsStep<SR, ?, PDF, F> field(String fieldPath, Class<F> type) {
 		return field( fieldPath, type, ValueModel.MAPPING );
 	}
 
@@ -40,6 +42,17 @@ public interface MaxAggregationFieldStep<PDF extends SearchPredicateFactory> {
 	 * See {@link ValueModel}.
 	 * @return The next step.
 	 */
-	<F> MaxAggregationOptionsStep<?, PDF, F> field(String fieldPath, Class<F> type, ValueModel valueModel);
+	<F> MaxAggregationOptionsStep<SR, ?, PDF, F> field(String fieldPath, Class<F> type, ValueModel valueModel);
 
+	/**
+	 * Target the given field in the avg aggregation.
+	 *
+	 * @param reference The field reference representing a <a href="SearchAggregationFactory.html#field-paths">path</a> to the index field to aggregate.
+	 * @param <F> The type of field values.
+	 * @return The next step.
+	 */
+	@Incubating
+	default <F> MaxAggregationOptionsStep<SR, ?, PDF, F> field(MaxAggregationFieldReference<SR, F> reference) {
+		return field( reference.absolutePath(), reference.aggregationType(), reference.valueModel() );
+	}
 }
