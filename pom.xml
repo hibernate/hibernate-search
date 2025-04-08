@@ -281,9 +281,9 @@
         <version.compiler.plugin>3.14.0</version.compiler.plugin>
         <version.dependency.plugin>3.8.1</version.dependency.plugin>
         <!-- Check dependencies for security vulnerabilities -->
-        <version.dependency-check.plugin>12.1.0</version.dependency-check.plugin>
+        <version.dependency-check.plugin>12.1.1</version.dependency-check.plugin>
         <version.exec.plugin>3.5.0</version.exec.plugin>
-        <version.forbiddenapis.plugin>3.8</version.forbiddenapis.plugin>
+        <version.forbiddenapis.plugin>3.9</version.forbiddenapis.plugin>
         <!-- Make sure that upgraded Jandex plugin aligns with the Jandex version imported from the ORM platform pom -->
         <version.jandex.plugin>3.2.7</version.jandex.plugin>
         <version.maven.injection.plugin>1.0.2</version.maven.injection.plugin>
@@ -297,7 +297,7 @@
         <!-- Surefire versions are a minefield of bugs: be careful with upgrades -->
         <version.surefire.plugin>3.5.3</version.surefire.plugin>
         <version.surefire.plugin.java-version.asm>9.8</version.surefire.plugin.java-version.asm>
-        <version.jacoco.plugin>0.8.12</version.jacoco.plugin>
+        <version.jacoco.plugin>0.8.13</version.jacoco.plugin>
         <version.com.buschmais.jqassistant.plugin>2.6.0</version.com.buschmais.jqassistant.plugin>
         <version.moditect.plugin>1.2.2.Final</version.moditect.plugin>
         <version.sonar.plugin>5.1.0.4751</version.sonar.plugin>
@@ -307,13 +307,13 @@
             e.g. 4.0.13 won't work with JDK 23, while 4.0.26 is working just fine.
          -->
         <version.org.apache.groovy.groovy-jsr223>4.0.26</version.org.apache.groovy.groovy-jsr223>
-        <version.com.puppycrawl.tools.checkstyle>10.22.0</version.com.puppycrawl.tools.checkstyle>
+        <version.com.puppycrawl.tools.checkstyle>10.23.0</version.com.puppycrawl.tools.checkstyle>
         <version.versions.plugin>2.18.0</version.versions.plugin>
         <version.maven-wrapper-plugin>3.3.2</version.maven-wrapper-plugin>
         <version.org.eclipse.m2e.lifecycle-mapping>1.0.0</version.org.eclipse.m2e.lifecycle-mapping>
         <version.sisu-maven-plugin>0.9.0.M3</version.sisu-maven-plugin>
         <version.gitflow-incremental-builder>4.5.4</version.gitflow-incremental-builder>
-        <version.spotless-maven-plugin>2.44.3</version.spotless-maven-plugin>
+        <version.spotless-maven-plugin>2.44.4</version.spotless-maven-plugin>
         <version.maven-antrun-plugin>3.1.0</version.maven-antrun-plugin>
 
         <!-- Repository Deployment URLs -->
