@@ -19,9 +19,7 @@ import org.apache.lucene.index.SegmentWriteState;
 
 public class HibernateSearchKnnVectorsFormat extends KnnVectorsFormat {
 	// OpenSearch has a limit of 16000
-	// Elasticsearch has a limit of 4096
-	// We'll keep it at 4096 for now as well:
-	public static final int DEFAULT_MAX_DIMENSIONS = 4096;
+	public static final int DEFAULT_MAX_DIMENSIONS = 16000;
 	private static final KnnVectorsFormat DEFAULT_KNN_VECTORS_FORMAT = new HibernateSearchKnnVectorsFormat();
 
 	public static KnnVectorsFormat defaultFormat() {
