@@ -372,7 +372,7 @@ include::../components/_incubating-warning.adoc[]
 The size of the stored vectors. This is a required field. This size should match the vector size of the vectors produced by
 the model used to convert the data into vector representation.
 It is expected to be a positive integer value. Maximum accepted value is backend-specific.
-For the <<backend-lucene, Lucene backend>> the dimension must be in `[1, 4096]` range.
+For the <<backend-lucene, Lucene backend>> the dimension must be in `[1, 16000]` range.
 As for the <<backend-elasticsearch, Elasticsearch backend>> the range depends on the distribution.
 See the link:{elasticsearchDocUrl}/dense-vector.html#dense-vector-params[Elasticsearch]/link:{openSearchDocUrl}/search-plugins/knn/approximate-knn/#get-started-with-approximate-k-nn[OpenSearch]
 specific documentation to learn about the vector types of these distributions.
