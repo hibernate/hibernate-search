@@ -52,8 +52,8 @@ import org.junit.jupiter.params.provider.ValueSource;
 class VectorFieldIT {
 
 	private static final String INDEX_NAME = "IndexName";
-	private static final int BATCHES = 20;
-	private static final int BATCH_SIZE = 1_000;
+	private static final int BATCHES = 50;
+	private static final int BATCH_SIZE = 200;
 
 	@RegisterExtension
 	public StandalonePojoMappingSetupHelper setupHelper = StandalonePojoMappingSetupHelper.withSingleBackend(
@@ -78,7 +78,7 @@ class VectorFieldIT {
 	@RetryExtension.TestWithRetry
 	void vectorSizeLimits_max_allowed_dimension_with_lots_of_documents() {
 		// with OpenSearch 2.12 it allows up to 16000 which will lead to an OOM in this particular test:
-		int maxDimension = Math.min( 4096, maxDimension() );
+		int maxDimension = Math.min( 16000, maxDimension() );
 		@Indexed(index = INDEX_NAME)
 		class IndexedEntity {
 			@DocumentId
@@ -212,7 +212,7 @@ class VectorFieldIT {
 
 	private static int maxDimension() {
 		if ( BackendConfiguration.isLucene() ) {
-			return 4096;
+			return 16000;
 		}
 		else {
 			ElasticsearchVersion actualVersion = ElasticsearchTestDialect.getActualVersion();
