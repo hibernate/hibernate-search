@@ -22,7 +22,7 @@
 
     <properties>
         <!-- Do not publish internal modules -->
-        <skipNexusStagingDeployMojo>true</skipNexusStagingDeployMojo>
+        <deploy.skip>true</deploy.skip>
         <!--
              Skip javadoc generation for internal modules: we don't want to publish them.
              Note this shouldn't be necessary because we don't even use the maven-javadoc-plugin
