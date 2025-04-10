@@ -267,9 +267,7 @@
         <version.enforcer.plugin>3.5.0</version.enforcer.plugin>
         <version.project-info.plugin>3.6.2</version.project-info.plugin>
         <version.japicmp.plugin>0.22.0</version.japicmp.plugin>
-        <version.nexus-staging.plugin>1.7.0</version.nexus-staging.plugin>
         <version.deploy.plugin>3.1.2</version.deploy.plugin>
-        <version.gpg.plugin>3.2.4</version.gpg.plugin>
         <version.flatten-maven-plugin>1.6.0</version.flatten-maven-plugin>
         <version.assembly.plugin>3.7.1</version.assembly.plugin>
         <version.buildhelper.plugin>3.6.0</version.buildhelper.plugin>
@@ -311,9 +309,11 @@
 
         <!-- Repository Deployment URLs -->
 
+        <!-- We always publish to a local directory, JReleaser is supposed to take care of publishing to Nexus: -->
+        <local.staging.releases.repo.id>staging-deploy</local.staging.releases.repo.id>
+        <local.staging.releases.repo.url>file:${maven.multiModuleProjectDirectory}/target/staging-deploy/maven</local.staging.releases.repo.url>
         <ossrh.releases.repo.id>ossrh</ossrh.releases.repo.id>
         <ossrh.releases.repo.url>https://oss.sonatype.org/service/local/staging/deploy/maven2/</ossrh.releases.repo.url>
-        <ossrh.releases.repo.baseUrl>https://oss.sonatype.org/</ossrh.releases.repo.baseUrl>
         <ossrh.snapshots.repo.id>ossrh</ossrh.snapshots.repo.id>
         <ossrh.snapshots.repo.url>https://oss.sonatype.org/content/repositories/snapshots</ossrh.snapshots.repo.url>
 
@@ -322,7 +322,6 @@
             Specific modules will override the setting at their own level.
         -->
         <deploy.skip>true</deploy.skip>
-        <maven-deploy-plugin.skip>true</maven-deploy-plugin.skip>
 
         <!-- Can be overridden by subprojects if dependency convergence cannot be achieved -->
         <enforcer.dependencyconvergence.skip>false</enforcer.dependencyconvergence.skip>
@@ -555,38 +554,12 @@
                 </plugin>
                 <!-- We want to deploy the public BOM, so we manage this plugin in the root pom. -->
                 <plugin>
-                    <groupId>org.sonatype.plugins</groupId>
-                    <artifactId>nexus-staging-maven-plugin</artifactId>
-                    <version>${version.nexus-staging.plugin}</version>
-                    <configuration>
-                        <skipNexusStagingDeployMojo>${deploy.skip}</skipNexusStagingDeployMojo>
-                    </configuration>
-                </plugin>
-                <!-- We want to disable this plugin as soon as possible, hence we manage it in the root pom. -->
-                <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-deploy-plugin</artifactId>
                     <version>${version.deploy.plugin}</version>
-                </plugin>
-                <!-- Public BOM must be also signed, so we manage this plugin in the root pom. -->
-                <plugin>
-                    <groupId>org.apache.maven.plugins</groupId>
-                    <artifactId>maven-gpg-plugin</artifactId>
-                    <version>${version.gpg.plugin}</version>
-                    <executions>
-                        <execution>
-                            <id>sign-artifacts</id>
-                            <phase>verify</phase>
-                            <goals>
-                                <goal>sign</goal>
-                            </goals>
-                            <configuration>
-                                <skip>${deploy.skip}</skip>
-                                <homedir>${env.RELEASE_GPG_HOMEDIR}</homedir>
-                                <bestPractices>true</bestPractices>
-                            </configuration>
-                        </execution>
-                    </executions>
+                    <configuration>
+                        <skip>${deploy.skip}</skip>
+                    </configuration>
                 </plugin>
                 <!-- Public BOM will be flattened too, so we manage this plugin in the root pom. -->
                 <plugin>
@@ -1068,44 +1041,6 @@
             </plugins>
         </pluginManagement>
         <plugins>
-            <!-- Skip the deploy plugin explicitly: we use nexus-staging-maven-plugin instead -->
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-deploy-plugin</artifactId>
-                <configuration>
-                    <skip>${maven-deploy-plugin.skip}</skip>
-                </configuration>
-            </plugin>
-            <!--
-                 Configure the nexus-staging-maven-plugin explicitly (without <extension>true</extension>)
-                 in order to work around a problem in the "reports" module (see that module's POM for more info).
-             -->
-            <plugin>
-                <groupId>org.sonatype.plugins</groupId>
-                <artifactId>nexus-staging-maven-plugin</artifactId>
-                <extensions>false</extensions><!-- This is essential: do not put true here -->
-                <configuration>
-                    <serverId>${ossrh.releases.repo.id}</serverId>
-                    <!-- The following, by default, is only used for actual releases, not for snapshot deployments -->
-                    <nexusUrl>${ossrh.releases.repo.baseUrl}</nexusUrl>
-                    <!-- oss.sonatype.org has been very slow when closing repositories lately;
-                         let's raise the timeout until we switch to s01.sonatype.org -->
-                    <stagingProgressTimeoutMinutes>60</stagingProgressTimeoutMinutes>
-                </configuration>
-                <executions>
-                    <execution>
-                        <id>default-deploy</id>
-                        <phase>deploy</phase>
-                        <goals>
-                            <!--
-                                This will only put artifacts in a staging directory.
-                                See the "reports" module for actual deployment, at the end of the build.
-                             -->
-                            <goal>deploy</goal>
-                        </goals>
-                    </execution>
-                </executions>
-            </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
@@ -1301,12 +1236,16 @@
                 <javadoc.generate.jar.phase>prepare-package</javadoc.generate.jar.phase>
             </properties>
             <build>
-                <plugins>
-                    <plugin>
-                        <groupId>org.apache.maven.plugins</groupId>
-                        <artifactId>maven-gpg-plugin</artifactId>
-                    </plugin>
-                </plugins>
+                <pluginManagement>
+                    <plugins>
+                        <plugin>
+                            <artifactId>maven-deploy-plugin</artifactId>
+                            <configuration>
+                                <altReleaseDeploymentRepository>${local.staging.releases.repo.id}::${local.staging.releases.repo.url}</altReleaseDeploymentRepository>
+                            </configuration>
+                        </plugin>
+                    </plugins>
+                </pluginManagement>
             </build>
         </profile>
 
@@ -1788,10 +1727,8 @@
             -->
             <id>reproducibility-check</id>
             <properties>
-                <maven-deploy-plugin.skip>false</maven-deploy-plugin.skip>
                 <maven.javadoc.skip>true</maven.javadoc.skip>
                 <skipTests>true</skipTests>
-                <gpg.skip>true</gpg.skip>
             </properties>
         </profile>
 
