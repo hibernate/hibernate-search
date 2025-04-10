@@ -19,6 +19,7 @@
 
     <name>Hibernate Search JSR-352 Core</name>
     <description>Core of the Hibernate Search JSR-352 integration</description>
+    <url>http://search.hibernate.org</url>
 
     <dependencies>
         <dependency>

@@ -17,6 +17,7 @@
 
     <name>Hibernate Search JBoss Modules Testing</name>
     <description>Additional JBoss modules which are meant for internal testing exclusively</description>
+    <url>http://search.hibernate.org</url>
 
     <properties>
         <feature-pack.dir>${project.build.directory}/feature-pack/src/main/resources</feature-pack.dir>
@@ -62,13 +63,6 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-deploy-plugin</artifactId>
-                <configuration>
-                    <skip>true</skip>
-                </configuration>
-            </plugin>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-gpg-plugin</artifactId>
                 <configuration>
                     <skip>true</skip>
                 </configuration>

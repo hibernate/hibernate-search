@@ -17,18 +17,12 @@
 
     <name>Shared test resources</name>
     <description>Contains resources which we want to reuse across multiple modules for testing purposes</description>
+    <url>http://search.hibernate.org</url>
     
     <build>
         <plugins>
             <plugin>
                 <artifactId>maven-deploy-plugin</artifactId>
-                <configuration>
-                    <skip>true</skip>
-                </configuration>
-            </plugin>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-gpg-plugin</artifactId>
                 <configuration>
                     <skip>true</skip>
                 </configuration>
