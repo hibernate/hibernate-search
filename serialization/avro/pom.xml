@@ -19,6 +19,7 @@
 
     <name>Hibernate Search Avro Serialization</name>
     <description>Implementation of the Hibernate Search serialization protocol for remote indexing using Avro</description>
+    <url>http://search.hibernate.org</url>
 
     <dependencies>
         <dependency>

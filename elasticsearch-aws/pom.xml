@@ -19,6 +19,7 @@
 
     <name>Hibernate Search Elasticsearch AWS integration</name>
     <description>Configurer for the Hibernate Search Elasticsearch backend enabling connection to an AWS-hosted Elasticsearch cluster</description>
+    <url>http://search.hibernate.org</url>
     
     <dependencies>
         <dependency>

@@ -23,7 +23,6 @@
 
     <properties>
         <maven.deploy.skip>true</maven.deploy.skip>
-        <gpg.skip>true</gpg.skip>
         <maven.javadoc.skip>true</maven.javadoc.skip>
         <!--
         Disable the dependency convergence rule, because the dependencies of various integration tests do not converge

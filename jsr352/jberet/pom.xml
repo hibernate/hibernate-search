@@ -19,6 +19,7 @@
     
     <name>Hibernate Search JSR-352 JBeret</name>
     <description>Hibernate Search JSR-352 integration - for JBeret</description>
+    <url>http://search.hibernate.org</url>
 
     <dependencies>
         <dependency>

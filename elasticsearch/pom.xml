@@ -19,6 +19,7 @@
 
     <name>Hibernate Search Elasticsearch</name>
     <description>Hibernate Search backend which has indexing operations forwarded to Elasticsearch</description>
+    <url>http://search.hibernate.org</url>
     
     <dependencies>
         <dependency>

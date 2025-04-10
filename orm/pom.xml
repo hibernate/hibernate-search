@@ -19,6 +19,7 @@
 
     <name>Hibernate Search ORM</name>
     <description>Hibernate Search integration with Hibernate Core</description>
+    <url>http://search.hibernate.org</url>
 
     <dependencies>
         <dependency>
