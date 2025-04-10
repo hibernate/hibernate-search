@@ -16,7 +16,6 @@ import jakarta.transaction.Synchronization;
 import org.hibernate.ScrollMode;
 import org.hibernate.SessionFactory;
 import org.hibernate.search.mapper.orm.search.loading.EntityLoadingCacheLookupStrategy;
-import org.hibernate.search.mapper.pojo.logging.impl.PojoMapperLog;
 import org.hibernate.search.util.common.SearchException;
 import org.hibernate.search.util.common.logging.CategorizedLogger;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
@@ -101,7 +100,7 @@ public interface OrmMiscLog {
 	SearchException transactionHandlingException(String causeMessage, @Cause Throwable cause);
 
 	@LogMessage(level = Logger.Level.ERROR)
-	@Message(id = PojoMapperLog.ID_OFFSET + 35, value = "Unable to shut down Hibernate Search:")
+	@Message(id = ID_OFFSET + 35, value = "Unable to shut down Hibernate Search:")
 	void shutdownFailed(@Cause Throwable cause);
 
 	@Message(id = ID_OFFSET + 36, value = "Cannot use scroll() with scroll mode '%1$s' with Hibernate Search queries:"

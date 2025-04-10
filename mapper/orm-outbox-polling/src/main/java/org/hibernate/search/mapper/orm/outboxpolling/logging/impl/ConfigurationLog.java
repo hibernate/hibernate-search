@@ -4,7 +4,7 @@
  */
 package org.hibernate.search.mapper.orm.outboxpolling.logging.impl;
 
-import static org.hibernate.search.engine.logging.impl.EngineLog.ID_OFFSET;
+import static org.hibernate.search.mapper.orm.outboxpolling.logging.impl.OutboxPollingLog.ID_OFFSET;
 import static org.jboss.logging.Logger.Level.DEBUG;
 
 import java.lang.invoke.MethodHandles;
@@ -143,12 +143,12 @@ public interface ConfigurationLog {
 	SearchException unableToParseJdbcTypeCode(String value, String causeMessage, @Cause Exception cause);
 
 	@LogMessage(level = DEBUG)
-	@Message(id = ID_OFFSET + 38,
+	@Message(id = ID_OFFSET + 68,
 			value = "Generated entity mapping for outbox events used in the outbox-polling coordination strategy: %1$s")
 	void outboxEventGeneratedEntityMappingClassDetails(@FormatWith(ClassDetailsMappingsFormatter.class) ClassDetails mappings);
 
 	@LogMessage(level = DEBUG)
-	@Message(id = ID_OFFSET + 39,
+	@Message(id = ID_OFFSET + 69,
 			value = "Generated entity mapping for agents used in the outbox-polling coordination strategy: %1$s")
 	void agentGeneratedEntityMappingClassDetails(@FormatWith(ClassDetailsMappingsFormatter.class) ClassDetails mappings);
 }
