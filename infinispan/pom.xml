@@ -16,9 +16,11 @@
     </parent>
 
     <artifactId>hibernate-search-infinispan</artifactId>
+    <packaging>pom</packaging>
 
     <name>Hibernate Search Infinispan Directory Provider</name>
     <description>Hibernate Search Infinispan Directory Provider</description>
+    <url>http://search.hibernate.org</url>
 
     <distributionManagement>
         <relocation>
@@ -33,14 +35,6 @@
         <plugins>
             <plugin>
                 <artifactId>maven-deploy-plugin</artifactId>
-            </plugin>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-jar-plugin</artifactId>
-                <configuration>
-                    <!-- We need an empty JAR, otherwise the build will fail -->
-                    <skipIfEmpty>false</skipIfEmpty>
-                </configuration>
             </plugin>
         </plugins>
     </build>

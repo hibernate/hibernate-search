@@ -20,6 +20,7 @@
 
     <name>Hibernate Search [Deprecated Module]</name>
     <description>Hibernate Search [Deprecated Module]</description>
+    <url>http://search.hibernate.org</url>
 
     <distributionManagement>
         <relocation>

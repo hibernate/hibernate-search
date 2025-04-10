@@ -19,6 +19,7 @@
 
     <name>Hibernate Search Testing</name>
     <description>Hibernate Search Testing Utilities</description>
+    <url>http://search.hibernate.org</url>
 
     <dependencies>
         <dependency>

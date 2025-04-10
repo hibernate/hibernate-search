@@ -17,6 +17,7 @@
 
     <name>Hibernate Search JBoss Modules Elasticsearch</name>
     <description>Hibernate Search Elasticsearch modules to use in JBoss AS / Wildfly</description>
+    <url>http://search.hibernate.org</url>
 
     <properties>
         <feature-pack.dir>${project.build.directory}/feature-pack/src/main/resources</feature-pack.dir>

@@ -19,6 +19,7 @@
 
     <name>Hibernate Search Engine</name>
     <description>Core of the Object/Lucene mapper, query engine and index management</description>
+    <url>http://search.hibernate.org</url>
 
     <dependencies>
         <dependency>
