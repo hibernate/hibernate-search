@@ -20,7 +20,6 @@ import java.util.UUID;
 
 import jakarta.persistence.PersistenceException;
 
-import org.hibernate.search.engine.logging.impl.EngineLog;
 import org.hibernate.search.mapper.orm.outboxpolling.cluster.impl.Agent;
 import org.hibernate.search.mapper.orm.outboxpolling.cluster.impl.AgentReference;
 import org.hibernate.search.mapper.orm.outboxpolling.cluster.impl.AgentState;
@@ -109,12 +108,12 @@ public interface OutboxPollingEventsLog {
 	@Message(id = ID_OFFSET + 22, value = "Stopping outbox mass indexer agent '%1$s'")
 	void stoppingOutboxMassIndexerAgent(String name);
 
-	@Message(id = EngineLog.ID_OFFSET + 28, value = "Agent '%1$s': could not find the agent after starting a new transaction."
+	@Message(id = ID_OFFSET + 28, value = "Agent '%1$s': could not find the agent after starting a new transaction."
 			+ " The agent was present just a moment ago."
 			+ " Either this problem is a rare occurrence, or the pulse expiration delay is too short.")
 	SearchException agentRegistrationIneffective(AgentReference agentReference);
 
-	@Message(id = EngineLog.ID_OFFSET + 29, value = "Nonblocking operation submitter is not supported.")
+	@Message(id = ID_OFFSET + 29, value = "Nonblocking operation submitter is not supported.")
 	SearchException nonblockingOperationSubmitterNotSupported();
 
 	@LogMessage(level = DEBUG)
