@@ -17,10 +17,10 @@ import org.hibernate.search.engine.tenancy.spi.TenancyMode;
 import org.hibernate.search.mapper.pojo.mapping.building.spi.PojoMapperDelegate;
 import org.hibernate.search.mapper.pojo.mapping.building.spi.PojoTypeMetadataContributor;
 import org.hibernate.search.mapper.pojo.mapping.spi.AbstractPojoMappingInitiator;
+import org.hibernate.search.mapper.pojo.model.spi.PojoBootstrapIntrospector;
 import org.hibernate.search.mapper.pojo.standalone.cfg.StandalonePojoMapperSettings;
 import org.hibernate.search.mapper.pojo.standalone.mapping.StandalonePojoMappingConfigurationContext;
 import org.hibernate.search.mapper.pojo.standalone.mapping.StandalonePojoMappingConfigurer;
-import org.hibernate.search.mapper.pojo.standalone.model.impl.StandalonePojoBootstrapIntrospector;
 import org.hibernate.search.mapper.pojo.standalone.reporting.impl.StandalonePojoMapperHints;
 
 public class StandalonePojoMappingInitiator extends AbstractPojoMappingInitiator<StandalonePojoMappingPartialBuildState>
@@ -54,7 +54,7 @@ public class StandalonePojoMappingInitiator extends AbstractPojoMappingInitiator
 					.withDefault( StandalonePojoMapperSettings.Defaults.MULTI_TENANCY_ENABLED )
 					.build();
 
-	public StandalonePojoMappingInitiator(StandalonePojoBootstrapIntrospector introspector) {
+	public StandalonePojoMappingInitiator(PojoBootstrapIntrospector introspector) {
 		super( introspector, StandalonePojoMapperHints.INSTANCE );
 	}
 

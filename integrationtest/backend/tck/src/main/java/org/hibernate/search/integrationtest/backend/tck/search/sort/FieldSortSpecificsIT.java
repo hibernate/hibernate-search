@@ -494,10 +494,10 @@ class FieldSortSpecificsIT<F> {
 						dataSet.emptyDoc1Id, dataSet.emptyDoc2Id, dataSet.emptyDoc3Id, dataSet.emptyDoc4Id
 				) ) ) )
 				.routing( dataSet.routingKey )
-				.sort( ( (Function<SearchSortFactory,
-						FieldSortOptionsStep<?, ?>>) f -> f.withRoot( parentObjectBinding.absolutePath )
+				.sort( ( (Function<SearchSortFactory<?>,
+						FieldSortOptionsStep<?, ?, ?>>) f -> f.withRoot( parentObjectBinding.absolutePath )
 								.field( parentObjectBinding.getRelativeFieldName( fieldStructure, fieldType ) ) )
-						.andThen( (FieldSortOptionsStep<?, ?> optionsStep1) -> applySortMode( optionsStep1, sortMode ) )
+						.andThen( (FieldSortOptionsStep<?, ?, ?> optionsStep1) -> applySortMode( optionsStep1, sortMode ) )
 						// Don't call this.applyFilter: we need to use the relative name of the discriminator field.
 						.andThen( optionsStep -> {
 							if ( fieldStructure.isInNested() ) {
@@ -609,13 +609,14 @@ class FieldSortSpecificsIT<F> {
 	}
 
 	private SearchQuery<DocumentReference> matchNonEmptyQuery(DataSet<F> dataSet,
-			Function<? super SearchSortFactory, ? extends FieldSortOptionsStep<?, ?>> sortContributor,
+			Function<? super SearchSortFactory<?>, ? extends FieldSortOptionsStep<?, ?, ?>> sortContributor,
 			SortMode sortMode, TestedFieldStructure fieldStructure) {
 		return matchNonEmptyQuery( dataSet, sortContributor, index.createScope(), sortMode, fieldStructure );
 	}
 
 	private SearchQuery<DocumentReference> matchNonEmptyQuery(DataSet<F> dataSet,
-			Function<? super SearchSortFactory, ? extends FieldSortOptionsStep<?, ?>> sortContributor, StubMappingScope scope,
+			Function<? super SearchSortFactory<?>, ? extends FieldSortOptionsStep<?, ?, ?>> sortContributor,
+			StubMappingScope scope,
 			SortMode sortMode, TestedFieldStructure fieldStructure) {
 		return query(
 				dataSet,
@@ -631,13 +632,14 @@ class FieldSortSpecificsIT<F> {
 	}
 
 	private SearchQuery<DocumentReference> matchNonEmptyAndEmpty1Query(DataSet<F> dataSet,
-			Function<? super SearchSortFactory, ? extends FieldSortOptionsStep<?, ?>> sortContributor,
+			Function<? super SearchSortFactory<?>, ? extends FieldSortOptionsStep<?, ?, ?>> sortContributor,
 			SortMode sortMode, TestedFieldStructure fieldStructure) {
 		return matchNonEmptyAndEmpty1Query( dataSet, sortContributor, index.createScope(), sortMode, fieldStructure );
 	}
 
 	private SearchQuery<DocumentReference> matchNonEmptyAndEmpty1Query(DataSet<F> dataSet,
-			Function<? super SearchSortFactory, ? extends FieldSortOptionsStep<?, ?>> sortContributor, StubMappingScope scope,
+			Function<? super SearchSortFactory<?>, ? extends FieldSortOptionsStep<?, ?, ?>> sortContributor,
+			StubMappingScope scope,
 			SortMode sortMode, TestedFieldStructure fieldStructure) {
 		return query(
 				dataSet,
@@ -651,20 +653,21 @@ class FieldSortSpecificsIT<F> {
 	}
 
 	private SearchQuery<DocumentReference> matchAllQuery(DataSet<F> dataSet,
-			Function<? super SearchSortFactory, ? extends FieldSortOptionsStep<?, ?>> sortContributor,
+			Function<? super SearchSortFactory<?>, ? extends FieldSortOptionsStep<?, ?, ?>> sortContributor,
 			SortMode sortMode, TestedFieldStructure fieldStructure) {
 		return matchAllQuery( dataSet, sortContributor, index.createScope(), sortMode, fieldStructure );
 	}
 
 	private SearchQuery<DocumentReference> matchAllQuery(DataSet<F> dataSet,
-			Function<? super SearchSortFactory, ? extends FieldSortOptionsStep<?, ?>> sortContributor, StubMappingScope scope,
+			Function<? super SearchSortFactory<?>, ? extends FieldSortOptionsStep<?, ?, ?>> sortContributor,
+			StubMappingScope scope,
 			SortMode sortMode, TestedFieldStructure fieldStructure) {
 		return query( dataSet, f -> f.matchAll(), sortContributor, scope, sortMode, fieldStructure );
 	}
 
 	private SearchQuery<DocumentReference> query(DataSet<F> dataSet,
-			Function<? super SearchPredicateFactory, ? extends PredicateFinalStep> predicateContributor,
-			Function<? super SearchSortFactory, ? extends FieldSortOptionsStep<?, ?>> sortContributor,
+			Function<? super SearchPredicateFactory<?>, ? extends PredicateFinalStep> predicateContributor,
+			Function<? super SearchSortFactory<?>, ? extends FieldSortOptionsStep<?, ?, ?>> sortContributor,
 			StubMappingScope scope, SortMode sortMode, TestedFieldStructure fieldStructure) {
 		return scope.query()
 				.where( predicateContributor )
@@ -674,7 +677,7 @@ class FieldSortSpecificsIT<F> {
 				.toQuery();
 	}
 
-	private FieldSortOptionsStep<?, ?> applySortMode(FieldSortOptionsStep<?, ?> optionsStep, SortMode sortMode) {
+	private FieldSortOptionsStep<?, ?, ?> applySortMode(FieldSortOptionsStep<?, ?, ?> optionsStep, SortMode sortMode) {
 		if ( sortMode != null ) {
 			return optionsStep.mode( sortMode );
 		}
@@ -683,7 +686,7 @@ class FieldSortSpecificsIT<F> {
 		}
 	}
 
-	private FieldSortOptionsStep<?, ?> applyFilter(FieldSortOptionsStep<?, ?> optionsStep,
+	private FieldSortOptionsStep<?, ?, ?> applyFilter(FieldSortOptionsStep<?, ?, ?> optionsStep,
 			TestedFieldStructure fieldStructure) {
 		if ( fieldStructure.isInNested() ) {
 			return optionsStep.filter( f -> f.match()

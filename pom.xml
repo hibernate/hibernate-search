@@ -188,6 +188,7 @@
         <module>integrationtest</module>
         <module>documentation</module>
         <module>lucene-next</module>
+        <module>metamodel/metamodel-processor</module>
     </modules>
 
     <properties>

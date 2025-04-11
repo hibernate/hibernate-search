@@ -219,7 +219,7 @@ class MatchPredicateSpecificsIT {
 
 	@Test
 	void unsupportedFieldType() {
-		SearchPredicateFactory f = index.createScope().predicate();
+		SearchPredicateFactory<?> f = index.createScope().predicate();
 
 		for ( FieldTypeDescriptor<?, ?> fieldType : unsupportedFieldTypes ) {
 			SimpleFieldModel<?> fieldModel = index.binding().unsupportedTypeFields.get( fieldType );
@@ -257,7 +257,7 @@ class MatchPredicateSpecificsIT {
 
 	@Test
 	void invalidMaxEditDistance() {
-		SearchPredicateFactory f = index.createScope().predicate();
+		SearchPredicateFactory<?> f = index.createScope().predicate();
 		String absoluteFieldPath = index.binding().analyzedStringField.relativeFieldName;
 
 		assertThatThrownBy( () -> f.match().field( absoluteFieldPath )
@@ -275,7 +275,7 @@ class MatchPredicateSpecificsIT {
 
 	@Test
 	void invalidPrefixLength() {
-		SearchPredicateFactory f = index.createScope().predicate();
+		SearchPredicateFactory<?> f = index.createScope().predicate();
 		String absoluteFieldPath = index.binding().analyzedStringField.relativeFieldName;
 
 		assertThatThrownBy( () -> f.match().field( absoluteFieldPath )

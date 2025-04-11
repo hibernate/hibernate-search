@@ -9,17 +9,18 @@ import org.hibernate.search.engine.search.predicate.dsl.BooleanPredicateOptionsC
 import org.hibernate.search.engine.search.predicate.dsl.SearchPredicateFactory;
 import org.hibernate.search.engine.search.predicate.dsl.spi.SearchPredicateDslContext;
 
-public final class BooleanPredicateClausesStepImpl
-		extends AbstractBooleanPredicateClausesStep<BooleanPredicateClausesStepImpl, BooleanPredicateOptionsCollector<?>>
-		implements BooleanPredicateClausesStep<BooleanPredicateClausesStepImpl> {
+public final class BooleanPredicateClausesStepImpl<SR>
+		extends
+		AbstractBooleanPredicateClausesStep<SR, BooleanPredicateClausesStepImpl<SR>, BooleanPredicateOptionsCollector<SR, ?>>
+		implements BooleanPredicateClausesStep<SR, BooleanPredicateClausesStepImpl<SR>> {
 
 	public BooleanPredicateClausesStepImpl(SearchPredicateDslContext<?> dslContext,
-			SearchPredicateFactory factory) {
+			SearchPredicateFactory<SR> factory) {
 		super( dslContext, factory );
 	}
 
 	@Override
-	protected BooleanPredicateClausesStepImpl self() {
+	protected BooleanPredicateClausesStepImpl<SR> self() {
 		return this;
 	}
 

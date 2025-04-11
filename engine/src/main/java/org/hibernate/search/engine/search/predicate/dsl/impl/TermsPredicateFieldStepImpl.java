@@ -10,16 +10,17 @@ import org.hibernate.search.engine.search.predicate.dsl.TermsPredicateFieldMoreS
 import org.hibernate.search.engine.search.predicate.dsl.TermsPredicateFieldStep;
 import org.hibernate.search.engine.search.predicate.dsl.spi.SearchPredicateDslContext;
 
-public final class TermsPredicateFieldStepImpl implements TermsPredicateFieldStep<TermsPredicateFieldMoreStep<?, ?>> {
+public final class TermsPredicateFieldStepImpl<SR>
+		implements TermsPredicateFieldStep<SR, TermsPredicateFieldMoreStep<SR, ?, ?>> {
 
-	private final TermsPredicateFieldMoreStepImpl.CommonState commonState;
+	private final TermsPredicateFieldMoreStepImpl.CommonState<SR> commonState;
 
 	public TermsPredicateFieldStepImpl(SearchPredicateDslContext<?> dslContext) {
-		this.commonState = new TermsPredicateFieldMoreStepImpl.CommonState( dslContext );
+		this.commonState = new TermsPredicateFieldMoreStepImpl.CommonState<>( dslContext );
 	}
 
 	@Override
-	public TermsPredicateFieldMoreStep<?, ?> fields(String... fieldPaths) {
-		return new TermsPredicateFieldMoreStepImpl( commonState, Arrays.asList( fieldPaths ) );
+	public TermsPredicateFieldMoreStep<SR, ?, ?> fields(String... fieldPaths) {
+		return new TermsPredicateFieldMoreStepImpl<>( commonState, Arrays.asList( fieldPaths ) );
 	}
 }

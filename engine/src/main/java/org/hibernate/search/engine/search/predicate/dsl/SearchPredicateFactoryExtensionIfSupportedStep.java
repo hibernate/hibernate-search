@@ -12,7 +12,7 @@ import java.util.function.Function;
  *
  * @see SearchPredicateFactory#extension()
  */
-public interface SearchPredicateFactoryExtensionIfSupportedStep {
+public interface SearchPredicateFactoryExtensionIfSupportedStep<SR> {
 
 	/**
 	 * If the given extension is supported, and none of the previous extensions passed to
@@ -31,8 +31,8 @@ public interface SearchPredicateFactoryExtensionIfSupportedStep {
 	 * @param <T> The type of the extended factory.
 	 * @return The next step.
 	 */
-	<T> SearchPredicateFactoryExtensionIfSupportedMoreStep ifSupported(
-			SearchPredicateFactoryExtension<T> extension,
+	<T> SearchPredicateFactoryExtensionIfSupportedMoreStep<SR> ifSupported(
+			SearchPredicateFactoryExtension<SR, T> extension,
 			Function<T, ? extends PredicateFinalStep> predicateContributor
 	);
 

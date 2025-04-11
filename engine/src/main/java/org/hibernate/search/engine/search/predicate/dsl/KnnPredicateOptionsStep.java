@@ -12,23 +12,24 @@ import org.hibernate.search.util.common.annotation.Incubating;
 /**
  * The final step in a "knn" predicate definition, where optional parameters can be set.
  */
-public interface KnnPredicateOptionsStep
-		extends PredicateScoreStep<KnnPredicateOptionsStep>, PredicateFinalStep {
+public interface KnnPredicateOptionsStep<SR>
+		extends PredicateScoreStep<KnnPredicateOptionsStep<SR>>, PredicateFinalStep {
 
-	KnnPredicateOptionsStep filter(SearchPredicate searchPredicate);
+	KnnPredicateOptionsStep<SR> filter(SearchPredicate searchPredicate);
 
-	default KnnPredicateOptionsStep filter(PredicateFinalStep searchPredicate) {
+	default KnnPredicateOptionsStep<SR> filter(PredicateFinalStep searchPredicate) {
 		return filter( searchPredicate.toPredicate() );
 	}
 
-	KnnPredicateOptionsStep filter(Function<? super SearchPredicateFactory, ? extends PredicateFinalStep> clauseContributor);
+	KnnPredicateOptionsStep<SR> filter(
+			Function<? super SearchPredicateFactory<SR>, ? extends PredicateFinalStep> clauseContributor);
 
 	/**
 	 * @param similarity A similarity limit: documents with vectors distance to which, according to the configured similarity function,
 	 * is further than this limit will be filtered out from the results.
 	 * @return {@code this}, for method chaining.
 	 */
-	KnnPredicateOptionsStep requiredMinimumSimilarity(float similarity);
+	KnnPredicateOptionsStep<SR> requiredMinimumSimilarity(float similarity);
 
 	/**
 	 * @param score The minimum sore limit: documents with vectors for which the similarity score is lower than the limit
@@ -39,6 +40,6 @@ public interface KnnPredicateOptionsStep
 	 * @return {@code this}, for method chaining.
 	 */
 	@Incubating
-	KnnPredicateOptionsStep requiredMinimumScore(float score);
+	KnnPredicateOptionsStep<SR> requiredMinimumScore(float score);
 
 }
