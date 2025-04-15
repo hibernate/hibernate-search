@@ -93,6 +93,7 @@ public abstract class ConditionalExpressionQueryFactory<E, I> implements TypeQue
 		if ( order != null ) {
 			hqlBuilder.append( " order by " ).append( order );
 		}
+		@SuppressWarnings({ "deprecation", "removal" }) // QueryProducerImplementor is marked for removal, while the createQuery() is also present in other interfaces
 		Query<T> query = session.createQuery( hqlBuilder.toString(), returnedType );
 		for ( ConditionalExpression expression : conditionalExpressions ) {
 			expression.applyParams( query );

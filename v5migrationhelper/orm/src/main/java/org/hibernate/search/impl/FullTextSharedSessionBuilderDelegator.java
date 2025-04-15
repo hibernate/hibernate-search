@@ -6,7 +6,10 @@ package org.hibernate.search.impl;
 
 import java.sql.Connection;
 import java.util.TimeZone;
+import java.util.function.UnaryOperator;
 
+import org.hibernate.ConnectionAcquisitionMode;
+import org.hibernate.ConnectionReleaseMode;
 import org.hibernate.FlushMode;
 import org.hibernate.Interceptor;
 import org.hibernate.SessionEventListener;
@@ -91,6 +94,12 @@ class FullTextSharedSessionBuilderDelegator implements FullTextSharedSessionBuil
 	}
 
 	@Override
+	public FullTextSharedSessionBuilder identifierRollback(boolean identifierRollback) {
+		builder.identifierRollback( identifierRollback );
+		return this;
+	}
+
+	@Override
 	public FullTextSession openSession() {
 		return Search.getFullTextSession( builder.openSession() );
 	}
@@ -127,6 +136,12 @@ class FullTextSharedSessionBuilderDelegator implements FullTextSharedSessionBuil
 	}
 
 	@Override
+	public FullTextSharedSessionBuilder statementInspector(UnaryOperator<String> operator) {
+		builder.statementInspector( operator );
+		return this;
+	}
+
+	@Override
 	public FullTextSharedSessionBuilder connectionHandlingMode() {
 		builder.connectionHandlingMode();
 		return this;
@@ -141,6 +156,13 @@ class FullTextSharedSessionBuilderDelegator implements FullTextSharedSessionBuil
 	@Override
 	public FullTextSharedSessionBuilder connectionHandlingMode(PhysicalConnectionHandlingMode mode) {
 		builder.connectionHandlingMode( mode );
+		return this;
+	}
+
+	@Override
+	public FullTextSharedSessionBuilder connectionHandling(ConnectionAcquisitionMode acquisitionMode,
+			ConnectionReleaseMode releaseMode) {
+		builder.connectionHandling( acquisitionMode, releaseMode );
 		return this;
 	}
 

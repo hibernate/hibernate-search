@@ -28,16 +28,16 @@ import org.hibernate.boot.spi.MetadataBuildingContext;
 import org.hibernate.models.internal.MutableClassDetailsRegistry;
 import org.hibernate.models.internal.jdk.JdkBuilders;
 import org.hibernate.models.spi.ClassDetails;
+import org.hibernate.models.spi.ModelsContext;
 import org.hibernate.models.spi.MutableClassDetails;
 import org.hibernate.models.spi.MutableMemberDetails;
-import org.hibernate.models.spi.SourceModelBuildingContext;
 
 public class AdditionalMappingBuilder {
 
 	private final MetadataBuildingContext buildingContext;
 	private final Class<?> type;
 	private final String name;
-	private final List<BiConsumer<SourceModelBuildingContext, MutableClassDetails>> contributors = new ArrayList<>();
+	private final List<BiConsumer<ModelsContext, MutableClassDetails>> contributors = new ArrayList<>();
 
 	public AdditionalMappingBuilder(MetadataBuildingContext buildingContext, Class<?> type, String name) {
 		this.buildingContext = buildingContext;
@@ -134,7 +134,7 @@ public class AdditionalMappingBuilder {
 	}
 
 	public ClassDetails build() {
-		SourceModelBuildingContext context = buildingContext.getBootstrapContext().getModelsContext();
+		ModelsContext context = buildingContext.getBootstrapContext().getModelsContext();
 		final MutableClassDetails classDetails = JdkBuilders.buildClassDetailsStatic(
 				type,
 				context
@@ -151,7 +151,7 @@ public class AdditionalMappingBuilder {
 		);
 		accessUsage.value( AccessType.FIELD );
 
-		for ( BiConsumer<SourceModelBuildingContext, MutableClassDetails> contributor : contributors ) {
+		for ( BiConsumer<ModelsContext, MutableClassDetails> contributor : contributors ) {
 			contributor.accept( context, classDetails );
 		}
 
