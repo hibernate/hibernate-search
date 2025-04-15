@@ -130,7 +130,7 @@
         <!-- >>> Common -->
         <version.log4j>2.24.3</version.log4j>
         <version.junit>4.13.2</version.junit>
-        <version.junit-jupiter>5.12.1</version.junit-jupiter>
+        <version.junit-jupiter>5.12.2</version.junit-jupiter>
         <version.junit-platform-suite-engine>1.10.0</version.junit-platform-suite-engine>
         <version.org.osgi.core>6.0.0</version.org.osgi.core>
         <!-- Make sure to update Ryuk container version in `ryuk.Dockerfile` whenever updating testcontainers to align it with the lib. -->
@@ -184,7 +184,7 @@
         <!-- When updating Spring Boot check if it supports JDK24 and enable testing with it if so (see testWithJdk24 profile). -->
         <version.org.springframework.boot>3.4.1</version.org.springframework.boot>
         <!-- Spring Boot 3 JTA starter and related libs version: -->
-        <version.dev.snowdrop>3.3.1</version.dev.snowdrop>
+        <version.dev.snowdrop>3.4.0</version.dev.snowdrop>
 
         <version.jsoup>1.19.1</version.jsoup>
         <version.snakeyaml>2.4</version.snakeyaml>
