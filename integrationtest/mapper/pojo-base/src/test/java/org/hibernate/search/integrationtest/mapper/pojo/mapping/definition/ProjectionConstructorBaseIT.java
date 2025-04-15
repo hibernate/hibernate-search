@@ -6,6 +6,7 @@ package org.hibernate.search.integrationtest.mapper.pojo.mapping.definition;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.junit.jupiter.api.Assumptions.assumeTrue;
 
 import java.lang.invoke.MethodHandles;
 import java.util.Arrays;
@@ -51,35 +52,36 @@ class ProjectionConstructorBaseIT extends AbstractProjectionConstructorIT {
 			@GenericField
 			public Integer integer;
 		}
-		@ProjectionConstructor
-		class MyProjection {
-			public final String text;
-			public final Integer integer;
-
-			public MyProjection(String text, Integer integer) {
-				this.text = text;
-				this.integer = integer;
-			}
-		}
 
 		backendMock.expectAnySchema( INDEX_NAME );
 		SearchMapping mapping = setupHelper.start()
-				.withAnnotatedTypes( MyProjection.class )
+				.withAnnotatedTypes( TypeLevelAnnotationMyProjection.class )
 				.setup( IndexedEntity.class );
 
 		testSuccessfulRootProjectionExecutionOnly(
-				mapping, IndexedEntity.class, MyProjection.class,
+				mapping, IndexedEntity.class, TypeLevelAnnotationMyProjection.class,
 				Arrays.asList(
 						Arrays.asList( "result1", 1 ),
 						Arrays.asList( "result2", 2 ),
 						Arrays.asList( "result3", 3 )
 				),
 				Arrays.asList(
-						new MyProjection( "result1", 1 ),
-						new MyProjection( "result2", 2 ),
-						new MyProjection( "result3", 3 )
+						new TypeLevelAnnotationMyProjection( "result1", 1 ),
+						new TypeLevelAnnotationMyProjection( "result2", 2 ),
+						new TypeLevelAnnotationMyProjection( "result3", 3 )
 				)
 		);
+	}
+
+	@ProjectionConstructor
+	static class TypeLevelAnnotationMyProjection {
+		public final String text;
+		public final Integer integer;
+
+		public TypeLevelAnnotationMyProjection(String text, Integer integer) {
+			this.text = text;
+			this.integer = integer;
+		}
 	}
 
 	@Test
@@ -93,31 +95,33 @@ class ProjectionConstructorBaseIT extends AbstractProjectionConstructorIT {
 			@GenericField
 			public Integer integer;
 		}
-		@ProjectionConstructor
-		class MyProjection {
-			public final String text;
-			public final Integer integer;
-
-			public MyProjection(String text, Integer integer) {
-				this.text = text;
-				this.integer = integer;
-			}
-
-			public MyProjection(String text, Integer integer, String somethingElse) {
-				this.text = text;
-				this.integer = integer;
-			}
-		}
 
 		assertThatThrownBy( () -> setupHelper.start()
-				.withAnnotatedTypes( MyProjection.class )
+				.withAnnotatedTypes( TypeLevelAnnotation_multipleConstructorsMyProjection.class )
 				.setup( IndexedEntity.class ) )
 				.isInstanceOf( SearchException.class )
 				.satisfies( FailureReportUtils.hasFailureReport()
-						.typeContext( MyProjection.class.getName() )
+						.typeContext( TypeLevelAnnotation_multipleConstructorsMyProjection.class.getName() )
 						.annotationContextAnyParameters( ProjectionConstructor.class )
 						.failure( "No main constructor for type",
-								MyProjection.class.getName(), "this type does not declare exactly one constructor" ) );
+								TypeLevelAnnotation_multipleConstructorsMyProjection.class.getName(),
+								"this type does not declare exactly one constructor" ) );
+	}
+
+	@ProjectionConstructor
+	static class TypeLevelAnnotation_multipleConstructorsMyProjection {
+		public final String text;
+		public final Integer integer;
+
+		public TypeLevelAnnotation_multipleConstructorsMyProjection(String text, Integer integer) {
+			this.text = text;
+			this.integer = integer;
+		}
+
+		public TypeLevelAnnotation_multipleConstructorsMyProjection(String text, Integer integer, String somethingElse) {
+			this.text = text;
+			this.integer = integer;
+		}
 	}
 
 	@Test
@@ -131,45 +135,46 @@ class ProjectionConstructorBaseIT extends AbstractProjectionConstructorIT {
 			@GenericField
 			public Integer integer;
 		}
-		class MyProjection {
-			public final String text;
-			public final Integer integer;
-
-			public MyProjection() {
-				this.text = "foo";
-				this.integer = 42;
-			}
-
-			@ProjectionConstructor
-			public MyProjection(String text, Integer integer) {
-				this.text = text;
-				this.integer = integer;
-			}
-
-			public MyProjection(String text, Integer integer, String somethingElse) {
-				this.text = text;
-				this.integer = integer;
-			}
-		}
 
 		backendMock.expectAnySchema( INDEX_NAME );
 		SearchMapping mapping = setupHelper.start()
-				.withAnnotatedTypes( MyProjection.class )
+				.withAnnotatedTypes( ConstructorLevelAnnotationMyProjection.class )
 				.setup( IndexedEntity.class );
 
 		testSuccessfulRootProjectionExecutionOnly(
-				mapping, IndexedEntity.class, MyProjection.class,
+				mapping, IndexedEntity.class, ConstructorLevelAnnotationMyProjection.class,
 				Arrays.asList(
 						Arrays.asList( "result1", 1 ),
 						Arrays.asList( "result2", 2 ),
 						Arrays.asList( "result3", 3 )
 				),
 				Arrays.asList(
-						new MyProjection( "result1", 1 ),
-						new MyProjection( "result2", 2 ),
-						new MyProjection( "result3", 3 )
+						new ConstructorLevelAnnotationMyProjection( "result1", 1 ),
+						new ConstructorLevelAnnotationMyProjection( "result2", 2 ),
+						new ConstructorLevelAnnotationMyProjection( "result3", 3 )
 				)
 		);
+	}
+
+	static class ConstructorLevelAnnotationMyProjection {
+		public final String text;
+		public final Integer integer;
+
+		public ConstructorLevelAnnotationMyProjection() {
+			this.text = "foo";
+			this.integer = 42;
+		}
+
+		@ProjectionConstructor
+		public ConstructorLevelAnnotationMyProjection(String text, Integer integer) {
+			this.text = text;
+			this.integer = integer;
+		}
+
+		public ConstructorLevelAnnotationMyProjection(String text, Integer integer, String somethingElse) {
+			this.text = text;
+			this.integer = integer;
+		}
 	}
 
 	@Test
@@ -183,75 +188,80 @@ class ProjectionConstructorBaseIT extends AbstractProjectionConstructorIT {
 			@GenericField
 			public Integer integer;
 		}
-		abstract class MyAbstractProjection {
-			public final String text;
-			public final Integer integer;
-
-			@ProjectionConstructor
-			public MyAbstractProjection(String text, Integer integer) {
-				this.text = text;
-				this.integer = integer;
-			}
-
-			public MyAbstractProjection(String text, Integer integer, String somethingElse) {
-				this.text = text;
-				this.integer = integer;
-			}
-		}
 
 		assertThatThrownBy( () -> setupHelper.start()
-				.withAnnotatedTypes( MyAbstractProjection.class )
+				.withAnnotatedTypes( AbstractTypeMyAbstractProjection.class )
 				.setup( IndexedEntity.class ) )
 				.isInstanceOf( SearchException.class )
 				.satisfies( FailureReportUtils.hasFailureReport()
-						.typeContext( MyAbstractProjection.class.getName() )
-						.constructorContext( ProjectionConstructorBaseIT.class, String.class, Integer.class )
+						.typeContext( AbstractTypeMyAbstractProjection.class.getName() )
+						.constructorContext( String.class, Integer.class )
 						.failure( "Invalid declaring type for projection constructor",
-								MyAbstractProjection.class.getName(), "is abstract",
+								AbstractTypeMyAbstractProjection.class.getName(), "is abstract",
 								"Projection constructors can only be declared on concrete types" ) );
+	}
+
+	abstract static class AbstractTypeMyAbstractProjection {
+		public final String text;
+		public final Integer integer;
+
+		@ProjectionConstructor
+		public AbstractTypeMyAbstractProjection(String text, Integer integer) {
+			this.text = text;
+			this.integer = integer;
+		}
+
+		public AbstractTypeMyAbstractProjection(String text, Integer integer, String somethingElse) {
+			this.text = text;
+			this.integer = integer;
+		}
 	}
 
 	@Test
 	void entityAndProjection() {
-		@Indexed(index = INDEX_NAME)
-		class IndexedEntity {
-			@DocumentId
-			public Integer id;
-			@FullTextField
-			public String text;
-			@GenericField
-			public Integer integer;
-
-			public IndexedEntity() {
-			}
-
-			@ProjectionConstructor
-			public IndexedEntity(String text, Integer integer) {
-				this.text = text;
-				this.integer = integer;
-			}
-		}
-
 		backendMock.expectAnySchema( INDEX_NAME );
-		SearchMapping mapping = setupHelper.start().setup( IndexedEntity.class );
+		SearchMapping mapping = setupHelper.start().setup( EntityAndProjectionIndexedEntity.class );
 
 		testSuccessfulRootProjectionExecutionOnly(
-				mapping, IndexedEntity.class, IndexedEntity.class,
+				mapping, EntityAndProjectionIndexedEntity.class, EntityAndProjectionIndexedEntity.class,
 				Arrays.asList(
 						Arrays.asList( "result1", 1 ),
 						Arrays.asList( "result2", 2 ),
 						Arrays.asList( "result3", 3 )
 				),
 				Arrays.asList(
-						new IndexedEntity( "result1", 1 ),
-						new IndexedEntity( "result2", 2 ),
-						new IndexedEntity( "result3", 3 )
+						new EntityAndProjectionIndexedEntity( "result1", 1 ),
+						new EntityAndProjectionIndexedEntity( "result2", 2 ),
+						new EntityAndProjectionIndexedEntity( "result3", 3 )
 				)
 		);
 	}
 
+	@Indexed(index = INDEX_NAME)
+	static class EntityAndProjectionIndexedEntity {
+		@DocumentId
+		public Integer id;
+		@FullTextField
+		public String text;
+		@GenericField
+		public Integer integer;
+
+		public EntityAndProjectionIndexedEntity() {
+		}
+
+		@ProjectionConstructor
+		public EntityAndProjectionIndexedEntity(String text, Integer integer) {
+			this.text = text;
+			this.integer = integer;
+		}
+	}
+
 	@Test
 	void noArgConstructor() {
+		assumeTrue(
+				Runtime.version().feature() < 25,
+				"With JDK 25+ nonstatic (inner class) projections are not supported."
+		);
 		@Indexed(index = INDEX_NAME)
 		class IndexedEntity {
 			@DocumentId
@@ -261,40 +271,41 @@ class ProjectionConstructorBaseIT extends AbstractProjectionConstructorIT {
 			@GenericField
 			public Integer integer;
 		}
-		class MyProjection {
-			public final String text;
-			public final Integer integer;
-
-			@ProjectionConstructor
-			public MyProjection() {
-				this.text = "foo";
-				this.integer = 42;
-			}
-
-			public MyProjection(String text, Integer integer) {
-				this.text = text;
-				this.integer = integer;
-			}
-		}
 
 		backendMock.expectAnySchema( INDEX_NAME );
 		SearchMapping mapping = setupHelper.start()
-				.withAnnotatedTypes( MyProjection.class )
+				.withAnnotatedTypes( NoArgConstructorMyProjection.class )
 				.setup( IndexedEntity.class );
 
 		testSuccessfulRootProjectionExecutionOnly(
-				mapping, IndexedEntity.class, MyProjection.class,
+				mapping, IndexedEntity.class, NoArgConstructorMyProjection.class,
 				Arrays.asList(
 						Arrays.asList(),
 						Arrays.asList(),
 						Arrays.asList()
 				),
 				Arrays.asList(
-						new MyProjection(),
-						new MyProjection(),
-						new MyProjection()
+						new NoArgConstructorMyProjection(),
+						new NoArgConstructorMyProjection(),
+						new NoArgConstructorMyProjection()
 				)
 		);
+	}
+
+	class NoArgConstructorMyProjection {
+		public final String text;
+		public final Integer integer;
+
+		@ProjectionConstructor
+		public NoArgConstructorMyProjection() {
+			this.text = "foo";
+			this.integer = 42;
+		}
+
+		public NoArgConstructorMyProjection(String text, Integer integer) {
+			this.text = text;
+			this.integer = integer;
+		}
 	}
 
 	@Test
@@ -308,34 +319,35 @@ class ProjectionConstructorBaseIT extends AbstractProjectionConstructorIT {
 			@GenericField
 			public Integer integer;
 		}
-		class MyNonProjection {
-			public final String text;
-			public final Integer integer;
-
-			public MyNonProjection() {
-				this.text = "foo";
-				this.integer = 42;
-			}
-
-			public MyNonProjection(String text, Integer integer) {
-				this.text = text;
-				this.integer = integer;
-			}
-		}
 
 		backendMock.expectAnySchema( INDEX_NAME );
 		SearchMapping mapping = setupHelper.start()
-				.withAnnotatedTypes( MyNonProjection.class )
+				.withAnnotatedTypes( NoProjectionConstructorMyNonProjection.class )
 				.setup( IndexedEntity.class );
 
 		try ( SearchSession session = mapping.createSession() ) {
 			assertThatThrownBy( () -> session.search( IndexedEntity.class )
-					.select( MyNonProjection.class ) )
+					.select( NoProjectionConstructorMyNonProjection.class ) )
 					.isInstanceOf( SearchException.class )
 					.hasMessageContainingAll( "Invalid object class for projection",
-							MyNonProjection.class.getName(),
+							NoProjectionConstructorMyNonProjection.class.getName(),
 							"Make sure that this class is mapped correctly, "
 									+ "either through annotations (@ProjectionConstructor) or programmatic mapping" );
+		}
+	}
+
+	static class NoProjectionConstructorMyNonProjection {
+		public final String text;
+		public final Integer integer;
+
+		public NoProjectionConstructorMyNonProjection() {
+			this.text = "foo";
+			this.integer = 42;
+		}
+
+		public NoProjectionConstructorMyNonProjection(String text, Integer integer) {
+			this.text = text;
+			this.integer = integer;
 		}
 	}
 
@@ -351,21 +363,6 @@ class ProjectionConstructorBaseIT extends AbstractProjectionConstructorIT {
 			@GenericField
 			public Integer integer;
 		}
-		class MyProjection {
-			public final String text;
-			public final Integer integer;
-
-			public MyProjection() {
-				this.text = "foo";
-				this.integer = 42;
-			}
-
-			@ProjectionConstructor
-			public MyProjection(String text, Integer integer) {
-				this.text = text;
-				this.integer = integer;
-			}
-		}
 
 		backendMock.expectAnySchema( INDEX_NAME );
 		SearchMapping mapping = setupHelper.start()
@@ -375,14 +372,30 @@ class ProjectionConstructorBaseIT extends AbstractProjectionConstructorIT {
 
 		try ( SearchSession session = mapping.createSession() ) {
 			assertThatThrownBy( () -> session.search( IndexedEntity.class )
-					.select( MyProjection.class ) )
+					.select( AnnotationNotProcessedMyProjection.class ) )
 					.isInstanceOf( SearchException.class )
 					.hasMessageContainingAll( "Invalid object class for projection",
-							MyProjection.class.getName(),
+							AnnotationNotProcessedMyProjection.class.getName(),
 							"Make sure that this class is mapped correctly, "
 									+ "either through annotations (@ProjectionConstructor) or programmatic mapping",
 							"If it is, make sure the class is included in a Jandex index"
 									+ " made available to Hibernate Search" );
+		}
+	}
+
+	static class AnnotationNotProcessedMyProjection {
+		public final String text;
+		public final Integer integer;
+
+		public AnnotationNotProcessedMyProjection() {
+			this.text = "foo";
+			this.integer = 42;
+		}
+
+		@ProjectionConstructor
+		public AnnotationNotProcessedMyProjection(String text, Integer integer) {
+			this.text = text;
+			this.integer = integer;
 		}
 	}
 
@@ -397,66 +410,80 @@ class ProjectionConstructorBaseIT extends AbstractProjectionConstructorIT {
 			@GenericField
 			public Integer integer;
 		}
-		class MyNonProjection {
-			public final String text;
-			public final Integer integer;
-
-			public MyNonProjection() {
-				this.text = "foo";
-				this.integer = 42;
-			}
-
-			public MyNonProjection(String text, Integer integer) {
-				this.text = text;
-				this.integer = integer;
-			}
-
-			public MyNonProjection(String text, Integer integer, String somethingElse) {
-				this.text = text;
-				this.integer = integer;
-			}
-		}
-		class MyProjectionSubclass extends MyNonProjection {
-			public MyProjectionSubclass() {
-				super();
-			}
-
-			@ProjectionConstructor
-			public MyProjectionSubclass(String text, Integer integer) {
-				super( text + "_fromSubclass", integer );
-			}
-
-			public MyProjectionSubclass(String text, Integer integer, String somethingElse) {
-				super( text, integer, somethingElse );
-			}
-		}
 
 		backendMock.expectAnySchema( INDEX_NAME );
 		SearchMapping mapping = setupHelper.start()
-				.withAnnotatedTypes( MyNonProjection.class, MyProjectionSubclass.class )
+				.withAnnotatedTypes(
+						Inheritance_sameConstructorParameters_subclassOnlyWithProjectionConstructorMyNonProjection.class,
+						Inheritance_sameConstructorParameters_subclassOnlyWithProjectionConstructorMyProjectionSubclass.class )
 				.setup( IndexedEntity.class );
 
 		try ( SearchSession session = mapping.createSession() ) {
 			assertThatThrownBy( () -> session.search( IndexedEntity.class )
-					.select( MyNonProjection.class ) )
+					.select( Inheritance_sameConstructorParameters_subclassOnlyWithProjectionConstructorMyNonProjection.class ) )
 					.isInstanceOf( SearchException.class )
 					.hasMessageContainingAll( "Invalid object class for projection",
-							MyNonProjection.class.getName() );
+							Inheritance_sameConstructorParameters_subclassOnlyWithProjectionConstructorMyNonProjection.class
+									.getName() );
 		}
 
 		testSuccessfulRootProjectionExecutionOnly(
-				mapping, IndexedEntity.class, MyProjectionSubclass.class,
+				mapping, IndexedEntity.class,
+				Inheritance_sameConstructorParameters_subclassOnlyWithProjectionConstructorMyProjectionSubclass.class,
 				Arrays.asList(
 						Arrays.asList( "result1", 1 ),
 						Arrays.asList( "result2", 2 ),
 						Arrays.asList( "result3", 3 )
 				),
 				Arrays.asList(
-						new MyProjectionSubclass( "result1", 1 ),
-						new MyProjectionSubclass( "result2", 2 ),
-						new MyProjectionSubclass( "result3", 3 )
+						new Inheritance_sameConstructorParameters_subclassOnlyWithProjectionConstructorMyProjectionSubclass(
+								"result1", 1 ),
+						new Inheritance_sameConstructorParameters_subclassOnlyWithProjectionConstructorMyProjectionSubclass(
+								"result2", 2 ),
+						new Inheritance_sameConstructorParameters_subclassOnlyWithProjectionConstructorMyProjectionSubclass(
+								"result3", 3 )
 				)
 		);
+	}
+
+	static class Inheritance_sameConstructorParameters_subclassOnlyWithProjectionConstructorMyNonProjection {
+		public final String text;
+		public final Integer integer;
+
+		public Inheritance_sameConstructorParameters_subclassOnlyWithProjectionConstructorMyNonProjection() {
+			this.text = "foo";
+			this.integer = 42;
+		}
+
+		public Inheritance_sameConstructorParameters_subclassOnlyWithProjectionConstructorMyNonProjection(String text,
+				Integer integer) {
+			this.text = text;
+			this.integer = integer;
+		}
+
+		public Inheritance_sameConstructorParameters_subclassOnlyWithProjectionConstructorMyNonProjection(String text,
+				Integer integer, String somethingElse) {
+			this.text = text;
+			this.integer = integer;
+		}
+	}
+
+	static class Inheritance_sameConstructorParameters_subclassOnlyWithProjectionConstructorMyProjectionSubclass
+			extends Inheritance_sameConstructorParameters_subclassOnlyWithProjectionConstructorMyNonProjection {
+		public Inheritance_sameConstructorParameters_subclassOnlyWithProjectionConstructorMyProjectionSubclass() {
+			super();
+		}
+
+		@ProjectionConstructor
+		public Inheritance_sameConstructorParameters_subclassOnlyWithProjectionConstructorMyProjectionSubclass(String text,
+				Integer integer) {
+			super( text + "_fromSubclass", integer );
+		}
+
+		public Inheritance_sameConstructorParameters_subclassOnlyWithProjectionConstructorMyProjectionSubclass(String text,
+				Integer integer, String somethingElse) {
+			super( text, integer, somethingElse );
+		}
 	}
 
 	@Test
@@ -470,65 +497,79 @@ class ProjectionConstructorBaseIT extends AbstractProjectionConstructorIT {
 			@GenericField
 			public Integer integer;
 		}
-		class MyProjection {
-			public final String text;
-			public final Integer integer;
-
-			public MyProjection() {
-				this.text = "foo";
-				this.integer = 42;
-			}
-
-			@ProjectionConstructor
-			public MyProjection(String text, Integer integer) {
-				this.text = text;
-				this.integer = integer;
-			}
-
-			public MyProjection(String text, Integer integer, String somethingElse) {
-				this.text = text;
-				this.integer = integer;
-			}
-		}
-		class MyNonProjectionSubclass extends MyProjection {
-			public MyNonProjectionSubclass() {
-				super();
-			}
-
-			public MyNonProjectionSubclass(String text, Integer integer) {
-				super( text + "_fromSubclass", integer );
-			}
-
-			public MyNonProjectionSubclass(String text, Integer integer, String somethingElse) {
-				super( text, integer, somethingElse );
-			}
-		}
 
 		backendMock.expectAnySchema( INDEX_NAME );
 		SearchMapping mapping = setupHelper.start()
-				.withAnnotatedTypes( MyProjection.class, MyNonProjectionSubclass.class )
+				.withAnnotatedTypes(
+						Inheritance_sameConstructorParameters_superclassOnlyWithProjectionConstructorMyProjection.class,
+						Inheritance_sameConstructorParameters_superclassOnlyWithProjectionConstructorMyNonProjectionSubclass.class )
 				.setup( IndexedEntity.class );
 
 		testSuccessfulRootProjectionExecutionOnly(
-				mapping, IndexedEntity.class, MyProjection.class,
+				mapping, IndexedEntity.class,
+				Inheritance_sameConstructorParameters_superclassOnlyWithProjectionConstructorMyProjection.class,
 				Arrays.asList(
 						Arrays.asList( "result1", 1 ),
 						Arrays.asList( "result2", 2 ),
 						Arrays.asList( "result3", 3 )
 				),
 				Arrays.asList(
-						new MyProjection( "result1", 1 ),
-						new MyProjection( "result2", 2 ),
-						new MyProjection( "result3", 3 )
+						new Inheritance_sameConstructorParameters_superclassOnlyWithProjectionConstructorMyProjection(
+								"result1", 1 ),
+						new Inheritance_sameConstructorParameters_superclassOnlyWithProjectionConstructorMyProjection(
+								"result2", 2 ),
+						new Inheritance_sameConstructorParameters_superclassOnlyWithProjectionConstructorMyProjection(
+								"result3", 3 )
 				)
 		);
 
 		try ( SearchSession session = mapping.createSession() ) {
 			assertThatThrownBy( () -> session.search( IndexedEntity.class )
-					.select( MyNonProjectionSubclass.class ) )
+					.select( Inheritance_sameConstructorParameters_superclassOnlyWithProjectionConstructorMyNonProjectionSubclass.class ) )
 					.isInstanceOf( SearchException.class )
 					.hasMessageContainingAll( "Invalid object class for projection",
-							MyNonProjectionSubclass.class.getName() );
+							Inheritance_sameConstructorParameters_superclassOnlyWithProjectionConstructorMyNonProjectionSubclass.class
+									.getName() );
+		}
+	}
+
+	static class Inheritance_sameConstructorParameters_superclassOnlyWithProjectionConstructorMyProjection {
+		public final String text;
+		public final Integer integer;
+
+		public Inheritance_sameConstructorParameters_superclassOnlyWithProjectionConstructorMyProjection() {
+			this.text = "foo";
+			this.integer = 42;
+		}
+
+		@ProjectionConstructor
+		public Inheritance_sameConstructorParameters_superclassOnlyWithProjectionConstructorMyProjection(String text,
+				Integer integer) {
+			this.text = text;
+			this.integer = integer;
+		}
+
+		public Inheritance_sameConstructorParameters_superclassOnlyWithProjectionConstructorMyProjection(String text,
+				Integer integer, String somethingElse) {
+			this.text = text;
+			this.integer = integer;
+		}
+	}
+
+	static class Inheritance_sameConstructorParameters_superclassOnlyWithProjectionConstructorMyNonProjectionSubclass
+			extends Inheritance_sameConstructorParameters_superclassOnlyWithProjectionConstructorMyProjection {
+		public Inheritance_sameConstructorParameters_superclassOnlyWithProjectionConstructorMyNonProjectionSubclass() {
+			super();
+		}
+
+		public Inheritance_sameConstructorParameters_superclassOnlyWithProjectionConstructorMyNonProjectionSubclass(String text,
+				Integer integer) {
+			super( text + "_fromSubclass", integer );
+		}
+
+		public Inheritance_sameConstructorParameters_superclassOnlyWithProjectionConstructorMyNonProjectionSubclass(String text,
+				Integer integer, String somethingElse) {
+			super( text, integer, somethingElse );
 		}
 	}
 
@@ -543,73 +584,90 @@ class ProjectionConstructorBaseIT extends AbstractProjectionConstructorIT {
 			@GenericField
 			public Integer integer;
 		}
-		class MyProjection {
-			public final String text;
-			public final Integer integer;
-
-			public MyProjection() {
-				this.text = "foo";
-				this.integer = 42;
-			}
-
-			@ProjectionConstructor
-			public MyProjection(String text, Integer integer) {
-				this.text = text;
-				this.integer = integer;
-			}
-
-			public MyProjection(String text, Integer integer, String somethingElse) {
-				this.text = text;
-				this.integer = integer;
-			}
-		}
-		class MyProjectionSubclass extends MyProjection {
-			public MyProjectionSubclass() {
-				super();
-			}
-
-			@ProjectionConstructor
-			public MyProjectionSubclass(String text, Integer integer) {
-				super( text + "_fromSubclass", integer );
-			}
-
-			public MyProjectionSubclass(String text, Integer integer, String somethingElse) {
-				super( text, integer, somethingElse );
-			}
-		}
 
 		backendMock.expectAnySchema( INDEX_NAME );
 		SearchMapping mapping = setupHelper.start()
-				.withAnnotatedTypes( MyProjection.class, MyProjectionSubclass.class )
+				.withAnnotatedTypes(
+						Inheritance_sameConstructorParameters_bothClassesWithProjectionConstructorMyProjection.class,
+						Inheritance_sameConstructorParameters_bothClassesWithProjectionConstructorMyProjectionSubclass.class )
 				.setup( IndexedEntity.class );
 
 		testSuccessfulRootProjectionExecutionOnly(
-				mapping, IndexedEntity.class, MyProjection.class,
+				mapping, IndexedEntity.class,
+				Inheritance_sameConstructorParameters_bothClassesWithProjectionConstructorMyProjection.class,
 				Arrays.asList(
 						Arrays.asList( "result1", 1 ),
 						Arrays.asList( "result2", 2 ),
 						Arrays.asList( "result3", 3 )
 				),
 				Arrays.asList(
-						new MyProjection( "result1", 1 ),
-						new MyProjection( "result2", 2 ),
-						new MyProjection( "result3", 3 )
+						new Inheritance_sameConstructorParameters_bothClassesWithProjectionConstructorMyProjection( "result1",
+								1 ),
+						new Inheritance_sameConstructorParameters_bothClassesWithProjectionConstructorMyProjection( "result2",
+								2 ),
+						new Inheritance_sameConstructorParameters_bothClassesWithProjectionConstructorMyProjection( "result3",
+								3 )
 				)
 		);
 
 		testSuccessfulRootProjectionExecutionOnly(
-				mapping, IndexedEntity.class, MyProjectionSubclass.class,
+				mapping, IndexedEntity.class,
+				Inheritance_sameConstructorParameters_bothClassesWithProjectionConstructorMyProjectionSubclass.class,
 				Arrays.asList(
 						Arrays.asList( "result1", 1 ),
 						Arrays.asList( "result2", 2 ),
 						Arrays.asList( "result3", 3 )
 				),
 				Arrays.asList(
-						new MyProjectionSubclass( "result1", 1 ),
-						new MyProjectionSubclass( "result2", 2 ),
-						new MyProjectionSubclass( "result3", 3 )
+						new Inheritance_sameConstructorParameters_bothClassesWithProjectionConstructorMyProjectionSubclass(
+								"result1", 1 ),
+						new Inheritance_sameConstructorParameters_bothClassesWithProjectionConstructorMyProjectionSubclass(
+								"result2", 2 ),
+						new Inheritance_sameConstructorParameters_bothClassesWithProjectionConstructorMyProjectionSubclass(
+								"result3", 3 )
 				)
 		);
+	}
+
+	static class Inheritance_sameConstructorParameters_bothClassesWithProjectionConstructorMyProjection {
+		public final String text;
+		public final Integer integer;
+
+		public Inheritance_sameConstructorParameters_bothClassesWithProjectionConstructorMyProjection() {
+			this.text = "foo";
+			this.integer = 42;
+		}
+
+		@ProjectionConstructor
+		public Inheritance_sameConstructorParameters_bothClassesWithProjectionConstructorMyProjection(String text,
+				Integer integer) {
+			this.text = text;
+			this.integer = integer;
+		}
+
+		public Inheritance_sameConstructorParameters_bothClassesWithProjectionConstructorMyProjection(String text,
+				Integer integer, String somethingElse) {
+			this.text = text;
+			this.integer = integer;
+		}
+	}
+
+	static class Inheritance_sameConstructorParameters_bothClassesWithProjectionConstructorMyProjectionSubclass
+			extends Inheritance_sameConstructorParameters_bothClassesWithProjectionConstructorMyProjection {
+		public Inheritance_sameConstructorParameters_bothClassesWithProjectionConstructorMyProjectionSubclass() {
+			super();
+		}
+
+		@ProjectionConstructor
+		public Inheritance_sameConstructorParameters_bothClassesWithProjectionConstructorMyProjectionSubclass(String text,
+				Integer integer) {
+			super( text + "_fromSubclass", integer );
+		}
+
+		public Inheritance_sameConstructorParameters_bothClassesWithProjectionConstructorMyProjectionSubclass(String text,
+				Integer integer, String somethingElse) {
+			super( text, integer, somethingElse );
+		}
 	}
 
 	// This checks that everything works correctly when a constructor projection
@@ -634,20 +692,10 @@ class ProjectionConstructorBaseIT extends AbstractProjectionConstructorIT {
 			@IndexedEmbedded
 			public Contained contained;
 		}
-		class MyProjection {
-			public final String text;
-			public final Integer integer;
-
-			@ProjectionConstructor
-			public MyProjection(String text, Integer integer) {
-				this.text = text;
-				this.integer = integer;
-			}
-		}
 
 		backendMock.expectAnySchema( INDEX_NAME );
 		SearchMapping mapping = setupHelper.start()
-				.withAnnotatedTypes( MyProjection.class )
+				.withAnnotatedTypes( NonRootMyProjection.class )
 				.setup( IndexedEntity.class );
 
 		try ( SearchSession session = mapping.createSession() ) {
@@ -661,16 +709,27 @@ class ProjectionConstructorBaseIT extends AbstractProjectionConstructorIT {
 			);
 
 			assertThat( session.search( IndexedEntity.class )
-					.select( f -> f.object( "contained" ).as( MyProjection.class ) )
+					.select( f -> f.object( "contained" ).as( NonRootMyProjection.class ) )
 					.where( f -> f.matchAll() )
 					.fetchAllHits() )
 					.usingRecursiveComparison()
 					.isEqualTo( Arrays.asList(
-							new MyProjection( "text1", 1 ),
-							new MyProjection( "text2", 2 )
+							new NonRootMyProjection( "text1", 1 ),
+							new NonRootMyProjection( "text2", 2 )
 					) );
 		}
 		backendMock.verifyExpectationsMet();
+	}
+
+	static class NonRootMyProjection {
+		public final String text;
+		public final Integer integer;
+
+		@ProjectionConstructor
+		public NonRootMyProjection(String text, Integer integer) {
+			this.text = text;
+			this.integer = integer;
+		}
 	}
 
 	@Test
@@ -715,52 +774,56 @@ class ProjectionConstructorBaseIT extends AbstractProjectionConstructorIT {
 
 		}
 
-		@ProjectionConstructor
-		class MyProjectionAuthor {
-			public final String firstName;
-			public final String lastName;
-			// Extra property that is part of projection but is not present in the index.
-			public final String email;
-
-			MyProjectionAuthor(String firstName, String lastName, String email) {
-				this.firstName = firstName;
-				this.lastName = lastName;
-				this.email = email;
-			}
-		}
-		@ProjectionConstructor
-		class MyProjectionBook {
-			public final String title;
-			public final List<MyProjectionAuthor> authors;
-
-			MyProjectionBook(String title, List<MyProjectionAuthor> authors) {
-				this.title = title;
-				this.authors = authors;
-			}
-		}
-
 		backendMock.expectAnySchema( Book.INDEX_NAME );
 		SearchMapping mapping = setupHelper.start()
-				.withAnnotatedTypes( MyProjectionBook.class )
+				.withAnnotatedTypes( IncompatibleProjectionWithExtraPropertiesMissingMyProjectionBook.class )
 				.setup( Book.class );
 
 		try ( SearchSession session = mapping.createSession() ) {
 			assertThatThrownBy( () -> session.search( Book.class )
-					.select( MyProjectionBook.class )
+					.select( IncompatibleProjectionWithExtraPropertiesMissingMyProjectionBook.class )
 					.where( f -> f.matchAll() )
 					.fetchAllHits()
 			).isInstanceOf( SearchException.class )
 					.hasMessageContainingAll(
 							"Could not apply projection constructor",
 							"Unknown field 'authors.email'",
-							"for parameter #2 in"
+							"for parameter #1 in"
 					).hasMessageFindingMatch(
 							// constructor string as per `PojoConstructorModelFormatter`
-							Pattern.quote( MyProjectionAuthor.class.getName() ) + "\\(.+\\)"
+							Pattern.quote( IncompatibleProjectionWithExtraPropertiesMissingMyProjectionAuthor.class.getName() )
+									+ "\\(.+\\)"
 					).hasMessageFindingMatch(
 							// constructor string as per `PojoConstructorModelFormatter`
-							Pattern.quote( MyProjectionBook.class.getName() ) + "\\(.+\\*java\\.util\\.List\\*\\)"
+							Pattern.quote( IncompatibleProjectionWithExtraPropertiesMissingMyProjectionBook.class.getName() )
+									+ "\\(.+\\*java\\.util\\.List\\*\\)"
 					);
+		}
+	}
+
+	@ProjectionConstructor
+	static class IncompatibleProjectionWithExtraPropertiesMissingMyProjectionAuthor {
+		public final String firstName;
+		public final String lastName;
+		// Extra property that is part of projection but is not present in the index.
+		public final String email;
+
+		IncompatibleProjectionWithExtraPropertiesMissingMyProjectionAuthor(String firstName, String lastName, String email) {
+			this.firstName = firstName;
+			this.lastName = lastName;
+			this.email = email;
+		}
+	}
+
+	@ProjectionConstructor
+	static class IncompatibleProjectionWithExtraPropertiesMissingMyProjectionBook {
+		public final String title;
+		public final List<IncompatibleProjectionWithExtraPropertiesMissingMyProjectionAuthor> authors;
+
+		IncompatibleProjectionWithExtraPropertiesMissingMyProjectionBook(String title,
+				List<IncompatibleProjectionWithExtraPropertiesMissingMyProjectionAuthor> authors) {
+			this.title = title;
+			this.authors = authors;
 		}
 	}
 
@@ -774,7 +837,7 @@ class ProjectionConstructorBaseIT extends AbstractProjectionConstructorIT {
 				public Integer id;
 			}
 
-			class MyProjection {
+			static class MyProjection {
 				public final Integer id;
 
 				@ProjectionConstructor
@@ -790,8 +853,8 @@ class ProjectionConstructorBaseIT extends AbstractProjectionConstructorIT {
 				.isInstanceOf( SearchException.class )
 				.satisfies( FailureReportUtils.hasFailureReport()
 						.typeContext( Model.MyProjection.class.getName() )
-						.constructorContext( Model.class, Integer.class )
-						.methodParameterContext( 1, "id" )
+						.constructorContext( Integer.class )
+						.methodParameterContext( 0, "id" )
 						.failure(
 								"Multiple projections are mapped for this parameter",
 								"At most one projection is allowed for each parameter" ) );
