@@ -4,6 +4,9 @@
  */
 package org.hibernate.search.mapper.orm.outboxpolling.event.impl;
 
+import static org.hibernate.ConnectionAcquisitionMode.AS_NEEDED;
+import static org.hibernate.ConnectionReleaseMode.AFTER_TRANSACTION;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
