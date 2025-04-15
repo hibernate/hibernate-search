@@ -9,6 +9,7 @@ import java.util.Optional;
 import java.util.stream.Stream;
 
 import org.hibernate.search.engine.mapper.model.spi.MappableTypeModel;
+import org.hibernate.search.util.common.annotation.Incubating;
 
 public interface PojoMethodParameterModel<T> {
 
@@ -25,6 +26,17 @@ public interface PojoMethodParameterModel<T> {
 	 * e.g. an instance of the enclosing class in the case of Java inner classes or method-local classes.
 	 */
 	boolean isEnclosingInstance();
+
+	/**
+	 * Starting with JDk 25, there is an additional check within the constructor itself,
+	 * that by default prevents passing {@code null} as a value for an enclosing instance.
+	 *
+	 * @return Whether {@code null} can be passed as an enclosing instance.
+	 */
+	@Incubating
+	default boolean enclosingInstanceCanBeNull() {
+		return Runtime.version().feature() < 25;
+	}
 
 	/**
 	 * @return {@code true} if {@code obj} is a {@link MappableTypeModel} referencing the exact same type
