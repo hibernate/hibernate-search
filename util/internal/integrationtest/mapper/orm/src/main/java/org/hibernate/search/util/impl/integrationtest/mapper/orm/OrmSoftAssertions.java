@@ -7,12 +7,12 @@ package org.hibernate.search.util.impl.integrationtest.mapper.orm;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.BiConsumer;
+import java.util.function.UnaryOperator;
 import java.util.stream.Collectors;
 
 import org.hibernate.Session;
 import org.hibernate.SessionEventListener;
 import org.hibernate.SessionFactory;
-import org.hibernate.resource.jdbc.spi.StatementInspector;
 import org.hibernate.stat.Statistics;
 
 import org.assertj.core.api.AbstractIntegerAssert;
@@ -34,7 +34,7 @@ public class OrmSoftAssertions extends AutoCloseableSoftAssertions {
 	}
 
 	private final Statistics statistics;
-	private final StatementInspector statementInspector;
+	private final UnaryOperator<String> statementInspector;
 	private final SessionEventListener sessionEventListener;
 
 	private int statementExecutionCount = 0;

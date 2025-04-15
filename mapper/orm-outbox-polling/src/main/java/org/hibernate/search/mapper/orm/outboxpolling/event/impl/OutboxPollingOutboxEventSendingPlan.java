@@ -4,12 +4,16 @@
  */
 package org.hibernate.search.mapper.orm.outboxpolling.event.impl;
 
+import static org.hibernate.ConnectionAcquisitionMode.AS_NEEDED;
+import static org.hibernate.ConnectionReleaseMode.AFTER_TRANSACTION;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 
+import org.hibernate.ConnectionAcquisitionMode;
+import org.hibernate.ConnectionReleaseMode;
 import org.hibernate.Session;
-import org.hibernate.resource.jdbc.spi.PhysicalConnectionHandlingMode;
 import org.hibernate.search.engine.backend.common.spi.EntityReferenceFactory;
 import org.hibernate.search.engine.backend.common.spi.MultiEntityOperationExecutionReport;
 import org.hibernate.search.engine.backend.work.execution.OperationSubmitter;
@@ -66,8 +70,7 @@ public final class OutboxPollingOutboxEventSendingPlan implements AutomaticIndex
 		try ( Session temporarySession = session.sessionWithOptions()
 				.connection()
 				.autoClose( false )
-				.connectionHandlingMode(
-						PhysicalConnectionHandlingMode.DELAYED_ACQUISITION_AND_RELEASE_AFTER_TRANSACTION )
+				.connectionHandling( ConnectionAcquisitionMode.AS_NEEDED, ConnectionReleaseMode.AFTER_TRANSACTION )
 				.openSession() ) {
 			return sendAndReportOnSession( temporarySession, entityReferenceFactory );
 		}
