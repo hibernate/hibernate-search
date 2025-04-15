@@ -162,4 +162,9 @@ public interface ProjectionLog {
 	SearchException cannotBindSortedSetWithNonComparableElements(@FormatWith(ClassFormatter.class) Class<?> elementType,
 			@Param EventContext eventContext);
 
+	@Message(id = ID_OFFSET + 179,
+			value = "An enclosing instance constructor parameter on a projection constructor is not allowed. " +
+					"Make the projection class either static, or a top-level class to remove the enclosing instance constructor parameter.")
+	SearchException nullEnclosingParameterInProjectionConstructorNotAllowed(@Param EventContext eventContext);
+
 }

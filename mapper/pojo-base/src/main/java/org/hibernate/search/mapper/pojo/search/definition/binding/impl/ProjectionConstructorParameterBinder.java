@@ -56,7 +56,16 @@ class ProjectionConstructorParameterBinder<P> implements EventContextProvider {
 			// and it's often useful to be able to declare a method-local type for projections
 			// (those types have a "surrounding instance" parameter in their constructor
 			// even if they don't use it).
-			return ConstantProjectionDefinition.nullValue();
+
+			// NOTE: with JDK 25+ this is no longer the case,
+			// and will fail further at runtime when such projection is created.
+			// Hence, let's fails faster instead;
+			if ( parameter.enclosingInstanceCanBeNull() ) {
+				return ConstantProjectionDefinition.nullValue();
+			}
+			else {
+				throw ProjectionLog.INSTANCE.nullEnclosingParameterInProjectionConstructorNotAllowed( eventContext() );
+			}
 		}
 
 		BeanHolder<? extends ProjectionDefinition<?>> result = null;
