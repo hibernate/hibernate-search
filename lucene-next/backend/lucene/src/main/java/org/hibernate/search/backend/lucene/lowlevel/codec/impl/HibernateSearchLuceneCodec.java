@@ -13,12 +13,12 @@ import org.hibernate.search.engine.backend.document.model.spi.IndexFieldFilter;
 import org.apache.lucene.codecs.Codec;
 import org.apache.lucene.codecs.FilterCodec;
 import org.apache.lucene.codecs.KnnVectorsFormat;
-import org.apache.lucene.codecs.lucene101.Lucene101Codec;
+import org.apache.lucene.codecs.lucene103.Lucene103Codec;
 import org.apache.lucene.codecs.perfield.PerFieldKnnVectorsFormat;
 
 public class HibernateSearchLuceneCodec extends FilterCodec {
 
-	public static final Codec DEFAULT_CODEC = new Lucene101Codec();
+	public static final Codec DEFAULT_CODEC = new Lucene103Codec();
 
 	private final KnnVectorsFormat knnVectorsFormat;
 
