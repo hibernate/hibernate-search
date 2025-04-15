@@ -52,102 +52,100 @@ class ProjectionConstructorEntityProjectionIT extends AbstractProjectionConstruc
 
 	@Test
 	void noArg() {
-		class MyProjection {
-			public final IndexedEntity entity;
-
-			@ProjectionConstructor
-			public MyProjection(@EntityProjection IndexedEntity entity) {
-				this.entity = entity;
-			}
-		}
-
 		backendMock.expectAnySchema( INDEX_NAME );
 		SearchMapping mapping = setupHelper.start()
 				.expectCustomBeans()
-				.withAnnotatedTypes( IndexedEntity.class, MyProjection.class )
+				.withAnnotatedTypes( IndexedEntity.class, NoArgMyProjection.class )
 				.setup();
 
 		testSuccessfulRootProjection(
-				mapping, IndexedEntity.class, MyProjection.class,
+				mapping, IndexedEntity.class, NoArgMyProjection.class,
 				Arrays.asList(
 						Arrays.asList( StubBackendUtils.reference( IndexedEntity.NAME, "1" ) ),
 						Arrays.asList( StubBackendUtils.reference( IndexedEntity.NAME, "2" ) )
 				),
 				f -> f.composite()
 						.from(
-								dummyProjectionForEnclosingClassInstance( f ),
 								f.entity( IndexedEntity.class )
 						)
 						.asList(),
 				Arrays.asList(
-						new MyProjection( loadingContext.persistenceMap( IndexedEntity.PERSISTENCE_KEY ).get( 1 ) ),
-						new MyProjection( loadingContext.persistenceMap( IndexedEntity.PERSISTENCE_KEY ).get( 2 ) )
+						new NoArgMyProjection( loadingContext.persistenceMap( IndexedEntity.PERSISTENCE_KEY ).get( 1 ) ),
+						new NoArgMyProjection( loadingContext.persistenceMap( IndexedEntity.PERSISTENCE_KEY ).get( 2 ) )
 				)
 		);
 	}
 
+	static class NoArgMyProjection {
+		public final IndexedEntity entity;
+
+		@ProjectionConstructor
+		public NoArgMyProjection(@EntityProjection IndexedEntity entity) {
+			this.entity = entity;
+		}
+	}
+
 	@Test
 	void supertype() {
-		class MyProjection {
-			public final Object entity;
-
-			@ProjectionConstructor
-			public MyProjection(@EntityProjection Object entity) {
-				this.entity = entity;
-			}
-		}
-
 		backendMock.expectAnySchema( INDEX_NAME );
 		SearchMapping mapping = setupHelper.start()
 				.expectCustomBeans()
-				.withAnnotatedTypes( IndexedEntity.class, MyProjection.class )
+				.withAnnotatedTypes( IndexedEntity.class, SupertypeMyProjection.class )
 				.setup();
 
 		testSuccessfulRootProjection(
-				mapping, IndexedEntity.class, MyProjection.class,
+				mapping, IndexedEntity.class, SupertypeMyProjection.class,
 				Arrays.asList(
 						Arrays.asList( StubBackendUtils.reference( IndexedEntity.NAME, "1" ) ),
 						Arrays.asList( StubBackendUtils.reference( IndexedEntity.NAME, "2" ) )
 				),
 				f -> f.composite()
 						.from(
-								dummyProjectionForEnclosingClassInstance( f ),
 								f.entity( Object.class )
 						)
 						.asList(),
 				Arrays.asList(
-						new MyProjection( loadingContext.persistenceMap( IndexedEntity.PERSISTENCE_KEY ).get( 1 ) ),
-						new MyProjection( loadingContext.persistenceMap( IndexedEntity.PERSISTENCE_KEY ).get( 2 ) )
+						new SupertypeMyProjection( loadingContext.persistenceMap( IndexedEntity.PERSISTENCE_KEY ).get( 1 ) ),
+						new SupertypeMyProjection( loadingContext.persistenceMap( IndexedEntity.PERSISTENCE_KEY ).get( 2 ) )
 				)
 		);
 	}
 
+	static class SupertypeMyProjection {
+		public final Object entity;
+
+		@ProjectionConstructor
+		public SupertypeMyProjection(@EntityProjection Object entity) {
+			this.entity = entity;
+		}
+	}
+
 	@Test
 	void invalidType() {
-		class MyProjection {
-			public final Integer entity;
-
-			@ProjectionConstructor
-			public MyProjection(@EntityProjection Integer entity) {
-				this.entity = entity;
-			}
-		}
-
 		backendMock.expectAnySchema( INDEX_NAME );
 		SearchMapping mapping = setupHelper.start()
 				.expectCustomBeans()
-				.withAnnotatedTypes( IndexedEntity.class, MyProjection.class )
+				.withAnnotatedTypes( IndexedEntity.class, InvalidTypeMyProjection.class )
 				.setup();
 
 		try ( SearchSession session = createSession( mapping ) ) {
 			assertThatThrownBy( () -> session.search( IndexedEntity.class )
-					.select( MyProjection.class ) )
+					.select( InvalidTypeMyProjection.class ) )
 					.isInstanceOf( SearchException.class )
 					.hasMessageContainingAll(
 							"Invalid type for entity projection on type '" + IndexedEntity.NAME + "'",
 							"the entity type's Java class '" + IndexedEntity.class.getName()
 									+ "' does not extend the requested projection type '" + Integer.class.getName() + "'"
 					);
+		}
+	}
+
+	static class InvalidTypeMyProjection {
+		public final Integer entity;
+
+		@ProjectionConstructor
+		public InvalidTypeMyProjection(@EntityProjection Integer entity) {
+			this.entity = entity;
 		}
 	}
 

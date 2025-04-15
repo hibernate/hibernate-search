@@ -6,6 +6,7 @@ package org.hibernate.search.integrationtest.mapper.pojo.mapping.annotation.proc
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.junit.jupiter.api.Assumptions.assumeTrue;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Repeatable;
@@ -15,7 +16,6 @@ import java.lang.annotation.Target;
 import java.lang.invoke.MethodHandles;
 import java.util.Collections;
 
-import org.hibernate.search.engine.search.projection.dsl.ProjectionFinalStep;
 import org.hibernate.search.engine.search.projection.dsl.SearchProjectionFactory;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.DocumentId;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.GenericField;
@@ -60,10 +60,6 @@ class CustomMethodParameterMappingAnnotationBaseIT {
 	@RegisterExtension
 	public StaticCounters counters = StaticCounters.create();
 
-	protected final ProjectionFinalStep<?> dummyProjectionForEnclosingClassInstance(SearchProjectionFactory<?, ?> f) {
-		return f.constant( null );
-	}
-
 	/**
 	 * Basic test checking that a simple constructor mapping will be applied as expected.
 	 */
@@ -76,20 +72,12 @@ class CustomMethodParameterMappingAnnotationBaseIT {
 			@GenericField(name = "myText")
 			String text;
 		}
-		class MyProjection {
-			public final String text;
-
-			@ProjectionConstructor
-			public MyProjection(@WorkingAnnotation String text) {
-				this.text = text;
-			}
-		}
 
 		backendMock.expectAnySchema( INDEX_NAME );
 
 		SearchMapping mapping = setupHelper.start()
 				.expectCustomBeans()
-				.withAnnotatedTypes( MyProjection.class )
+				.withAnnotatedTypes( SimpleMyProjection.class )
 				.setup( IndexedEntity.class );
 		backendMock.verifyExpectationsMet();
 
@@ -100,7 +88,6 @@ class CustomMethodParameterMappingAnnotationBaseIT {
 						SearchProjectionFactory<?, ?> f = mapping.scope( IndexedEntity.class ).projection();
 						b.projection( f.composite()
 								.from(
-										dummyProjectionForEnclosingClassInstance( f ),
 										f.field( "myText", String.class )
 								)
 								.asList() );
@@ -113,16 +100,25 @@ class CustomMethodParameterMappingAnnotationBaseIT {
 			);
 
 			assertThat( session.search( IndexedEntity.class )
-					.select( MyProjection.class )
+					.select( SimpleMyProjection.class )
 					.where( f -> f.matchAll() )
 					.fetchAllHits() )
 					.usingRecursiveFieldByFieldElementComparator()
 					.containsExactly(
-							new MyProjection( "hit1Text" ),
-							new MyProjection( "hit2Text" )
+							new SimpleMyProjection( "hit1Text" ),
+							new SimpleMyProjection( "hit2Text" )
 					);
 		}
 		backendMock.verifyExpectationsMet();
+	}
+
+	static class SimpleMyProjection {
+		public final String text;
+
+		@ProjectionConstructor
+		public SimpleMyProjection(@WorkingAnnotation String text) {
+			this.text = text;
+		}
 	}
 
 	@Retention(RetentionPolicy.RUNTIME)
@@ -224,25 +220,11 @@ class CustomMethodParameterMappingAnnotationBaseIT {
 			@DocumentId
 			Integer id;
 		}
-		class MyProjection {
-			@ProjectionConstructor
-			public MyProjection(
-					@AnnotatedElementAwareAnnotation @OtherAnnotationForAnnotatedElementAwareAnnotation(
-							name = "nonRepeatable") String paramWithOtherAnnotation,
-					@AnnotatedElementAwareAnnotation @RepeatableOtherAnnotationForAnnotatedElementAwareAnnotation.List({
-							@RepeatableOtherAnnotationForAnnotatedElementAwareAnnotation(name = "explicitRepeatable1"),
-							@RepeatableOtherAnnotationForAnnotatedElementAwareAnnotation(name = "explicitRepeatable2")
-					}) String paramWithExplicitRepeatableOtherAnnotation,
-					@AnnotatedElementAwareAnnotation @RepeatableOtherAnnotationForAnnotatedElementAwareAnnotation(
-							name = "implicitRepeatable1") @RepeatableOtherAnnotationForAnnotatedElementAwareAnnotation(
-									name = "implicitRepeatable2") String paramWithImplicitRepeatableOtherAnnotation) {
-			}
-		}
 
 		backendMock.expectAnySchema( INDEX_NAME );
 
 		SearchMapping mapping = setupHelper.start().expectCustomBeans()
-				.withAnnotatedTypes( MyProjection.class )
+				.withAnnotatedTypes( AnnotatedElementMyProjection.class )
 				.setup( IndexedEntity.class );
 		backendMock.verifyExpectationsMet();
 
@@ -254,6 +236,21 @@ class CustomMethodParameterMappingAnnotationBaseIT {
 		assertThat( counters
 				.get( AnnotatedElementAwareAnnotation.CONSTRUCTOR_PARAMETER_WITH_IMPLICIT_REPEATABLE_OTHER_ANNOTATION ) )
 				.isEqualTo( 1 );
+	}
+
+	static class AnnotatedElementMyProjection {
+		@ProjectionConstructor
+		public AnnotatedElementMyProjection(
+				@AnnotatedElementAwareAnnotation @OtherAnnotationForAnnotatedElementAwareAnnotation(
+						name = "nonRepeatable") String paramWithOtherAnnotation,
+				@AnnotatedElementAwareAnnotation @RepeatableOtherAnnotationForAnnotatedElementAwareAnnotation.List({
+						@RepeatableOtherAnnotationForAnnotatedElementAwareAnnotation(name = "explicitRepeatable1"),
+						@RepeatableOtherAnnotationForAnnotatedElementAwareAnnotation(name = "explicitRepeatable2")
+				}) String paramWithExplicitRepeatableOtherAnnotation,
+				@AnnotatedElementAwareAnnotation @RepeatableOtherAnnotationForAnnotatedElementAwareAnnotation(
+						name = "implicitRepeatable1") @RepeatableOtherAnnotationForAnnotatedElementAwareAnnotation(
+								name = "implicitRepeatable2") String paramWithImplicitRepeatableOtherAnnotation) {
+		}
 	}
 
 	@Retention(RetentionPolicy.RUNTIME)
@@ -329,6 +326,10 @@ class CustomMethodParameterMappingAnnotationBaseIT {
 
 	@Test
 	void eventContext() {
+		assumeTrue(
+				Runtime.version().feature() < 25,
+				"With JDK 25+ nonstatic (inner class) projections are not supported."
+		);
 		@Indexed(index = INDEX_NAME)
 		class IndexedEntityType {
 			@DocumentId
@@ -355,6 +356,35 @@ class CustomMethodParameterMappingAnnotationBaseIT {
 						+ ", parameter at index 1 (text)"
 						+ ", annotation '@\\E.*"
 						+ EventContextAwareAnnotation.class.getSimpleName() + "\\Q()\\E'" );
+	}
+
+	@Test
+	void eventContextStaticClass() {
+		backendMock.expectAnySchema( INDEX_NAME );
+
+		SearchMapping mapping = setupHelper.start().expectCustomBeans().setup( EventContextIndexedEntityType.class );
+		backendMock.verifyExpectationsMet();
+
+		assertThat( EventContextAwareAnnotation.Processor.lastProcessedContext ).isNotNull();
+		// Ideally we would not need a regexp here,
+		// but the annotation can be rendered differently depending on the JDK in use...
+		// See https://bugs.openjdk.java.net/browse/JDK-8282230
+		assertThat( EventContextAwareAnnotation.Processor.lastProcessedContext.render() )
+				.matches( "\\Qtype '" + EventContextIndexedEntityType.class.getName() + "', constructor with parameter types ["
+						+ String.class.getName() + "]"
+						+ ", parameter at index 0 (text)"
+						+ ", annotation '@\\E.*"
+						+ EventContextAwareAnnotation.class.getSimpleName() + "\\Q()\\E'" );
+	}
+
+	@Indexed(index = INDEX_NAME)
+	static class EventContextIndexedEntityType {
+		@DocumentId
+		Integer id;
+
+		@ProjectionConstructor
+		EventContextIndexedEntityType(@EventContextAwareAnnotation String text) {
+		}
 	}
 
 	@Retention(RetentionPolicy.RUNTIME)

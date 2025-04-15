@@ -47,37 +47,37 @@ class ProjectionConstructorFieldProjectionIT extends AbstractProjectionConstruct
 			@FullTextField
 			public String text;
 		}
-		class MyProjection {
-			public final String text;
-
-			@ProjectionConstructor
-			public MyProjection(@FieldProjection String text) {
-				this.text = text;
-			}
-		}
 
 		backendMock.expectAnySchema( INDEX_NAME );
 		SearchMapping mapping = setupHelper.start()
-				.withAnnotatedTypes( MyProjection.class )
+				.withAnnotatedTypes( NoArgMyProjection.class )
 				.setup( IndexedEntity.class );
 
 		testSuccessfulRootProjection(
-				mapping, IndexedEntity.class, MyProjection.class,
+				mapping, IndexedEntity.class, NoArgMyProjection.class,
 				Arrays.asList(
 						Arrays.asList( "result1" ),
 						Arrays.asList( "result2" )
 				),
 				f -> f.composite()
 						.from(
-								dummyProjectionForEnclosingClassInstance( f ),
 								f.field( "text", String.class )
 						)
 						.asList(),
 				Arrays.asList(
-						new MyProjection( "result1" ),
-						new MyProjection( "result2" )
+						new NoArgMyProjection( "result1" ),
+						new NoArgMyProjection( "result2" )
 				)
 		);
+	}
+
+	static class NoArgMyProjection {
+		public final String text;
+
+		@ProjectionConstructor
+		public NoArgMyProjection(@FieldProjection String text) {
+			this.text = text;
+		}
 	}
 
 	@Test
@@ -89,37 +89,37 @@ class ProjectionConstructorFieldProjectionIT extends AbstractProjectionConstruct
 			@FullTextField(name = "myText")
 			public String text;
 		}
-		class MyProjection {
-			public final String text;
-
-			@ProjectionConstructor
-			public MyProjection(@FieldProjection(path = "myText") String text) {
-				this.text = text;
-			}
-		}
 
 		backendMock.expectAnySchema( INDEX_NAME );
 		SearchMapping mapping = setupHelper.start()
-				.withAnnotatedTypes( MyProjection.class )
+				.withAnnotatedTypes( PathMyProjection.class )
 				.setup( IndexedEntity.class );
 
 		testSuccessfulRootProjection(
-				mapping, IndexedEntity.class, MyProjection.class,
+				mapping, IndexedEntity.class, PathMyProjection.class,
 				Arrays.asList(
 						Arrays.asList( "result1" ),
 						Arrays.asList( "result2" )
 				),
 				f -> f.composite()
 						.from(
-								dummyProjectionForEnclosingClassInstance( f ),
 								f.field( "myText", String.class )
 						)
 						.asList(),
 				Arrays.asList(
-						new MyProjection( "result1" ),
-						new MyProjection( "result2" )
+						new PathMyProjection( "result1" ),
+						new PathMyProjection( "result2" )
 				)
 		);
+	}
+
+	static class PathMyProjection {
+		public final String text;
+
+		@ProjectionConstructor
+		public PathMyProjection(@FieldProjection(path = "myText") String text) {
+			this.text = text;
+		}
 	}
 
 	@Test
@@ -131,38 +131,38 @@ class ProjectionConstructorFieldProjectionIT extends AbstractProjectionConstruct
 			@GenericField
 			public MyEnum myEnum;
 		}
-		class MyProjection {
-			public final String myEnum;
-
-			@ProjectionConstructor
-			public MyProjection(
-					@FieldProjection(valueModel = ValueModel.INDEX) String myEnum) {
-				this.myEnum = myEnum;
-			}
-		}
 
 		backendMock.expectAnySchema( INDEX_NAME );
 		SearchMapping mapping = setupHelper.start()
-				.withAnnotatedTypes( MyProjection.class )
+				.withAnnotatedTypes( ValueModelMyProjection.class )
 				.setup( IndexedEntity.class );
 
 		testSuccessfulRootProjection(
-				mapping, IndexedEntity.class, MyProjection.class,
+				mapping, IndexedEntity.class, ValueModelMyProjection.class,
 				Arrays.asList(
 						Arrays.asList( "result1" ),
 						Arrays.asList( "result2" )
 				),
 				f -> f.composite()
 						.from(
-								dummyProjectionForEnclosingClassInstance( f ),
 								f.field( "myEnum", String.class, ValueModel.INDEX )
 						)
 						.asList(),
 				Arrays.asList(
-						new MyProjection( "result1" ),
-						new MyProjection( "result2" )
+						new ValueModelMyProjection( "result1" ),
+						new ValueModelMyProjection( "result2" )
 				)
 		);
+	}
+
+	static class ValueModelMyProjection {
+		public final String myEnum;
+
+		@ProjectionConstructor
+		public ValueModelMyProjection(
+				@FieldProjection(valueModel = ValueModel.INDEX) String myEnum) {
+			this.myEnum = myEnum;
+		}
 	}
 
 	@Deprecated
@@ -175,38 +175,39 @@ class ProjectionConstructorFieldProjectionIT extends AbstractProjectionConstruct
 			@GenericField
 			public MyEnum myEnum;
 		}
-		class MyProjection {
-			public final String myEnum;
-
-			@ProjectionConstructor
-			public MyProjection(
-					@FieldProjection(convert = org.hibernate.search.engine.search.common.ValueConvert.NO) String myEnum) {
-				this.myEnum = myEnum;
-			}
-		}
 
 		backendMock.expectAnySchema( INDEX_NAME );
 		SearchMapping mapping = setupHelper.start()
-				.withAnnotatedTypes( MyProjection.class )
+				.withAnnotatedTypes( ValueConvert_nonDefaultMyProjection.class )
 				.setup( IndexedEntity.class );
 
 		testSuccessfulRootProjection(
-				mapping, IndexedEntity.class, MyProjection.class,
+				mapping, IndexedEntity.class, ValueConvert_nonDefaultMyProjection.class,
 				Arrays.asList(
 						Arrays.asList( "result1" ),
 						Arrays.asList( "result2" )
 				),
 				f -> f.composite()
 						.from(
-								dummyProjectionForEnclosingClassInstance( f ),
 								f.field( "myEnum", String.class, ValueModel.INDEX )
 						)
 						.asList(),
 				Arrays.asList(
-						new MyProjection( "result1" ),
-						new MyProjection( "result2" )
+						new ValueConvert_nonDefaultMyProjection( "result1" ),
+						new ValueConvert_nonDefaultMyProjection( "result2" )
 				)
 		);
+	}
+
+	@Deprecated
+	static class ValueConvert_nonDefaultMyProjection {
+		public final String myEnum;
+
+		@ProjectionConstructor
+		public ValueConvert_nonDefaultMyProjection(
+				@FieldProjection(convert = org.hibernate.search.engine.search.common.ValueConvert.NO) String myEnum) {
+			this.myEnum = myEnum;
+		}
 	}
 
 	@Deprecated
@@ -219,23 +220,25 @@ class ProjectionConstructorFieldProjectionIT extends AbstractProjectionConstruct
 			@GenericField
 			public MyEnum myEnum;
 		}
-		class MyProjection {
-			public final String myEnum;
-
-			@ProjectionConstructor
-			public MyProjection(
-					@FieldProjection(convert = org.hibernate.search.engine.search.common.ValueConvert.NO,
-							valueModel = ValueModel.INDEX) String myEnum) {
-				this.myEnum = myEnum;
-			}
-		}
 
 		assertThatThrownBy( () -> setupHelper.start()
-				.withAnnotatedTypes( MyProjection.class )
+				.withAnnotatedTypes( ValueConvertAndValueModel_nonDefaultFailsMyProjection.class )
 				.setup( IndexedEntity.class ) )
 				.isInstanceOf( SearchException.class )
 				.hasMessageContaining(
 						"Using non-default `valueModel=ValueModel.INDEX` and `convert=ValueConvert.NO` at the same time is not allowed. Remove the `convert` attribute and keep only the `valueModel=ValueModel.INDEX`." );
+	}
+
+	@Deprecated
+	static class ValueConvertAndValueModel_nonDefaultFailsMyProjection {
+		public final String myEnum;
+
+		@ProjectionConstructor
+		public ValueConvertAndValueModel_nonDefaultFailsMyProjection(
+				@FieldProjection(convert = org.hibernate.search.engine.search.common.ValueConvert.NO,
+						valueModel = ValueModel.INDEX) String myEnum) {
+			this.myEnum = myEnum;
+		}
 	}
 
 	enum MyEnum {
@@ -251,37 +254,37 @@ class ProjectionConstructorFieldProjectionIT extends AbstractProjectionConstruct
 			@FullTextField
 			public String text;
 		}
-		class MyProjection {
-			public final Object text;
-
-			@ProjectionConstructor
-			public MyProjection(@FieldProjection Object text) {
-				this.text = text;
-			}
-		}
 
 		backendMock.expectAnySchema( INDEX_NAME );
 		SearchMapping mapping = setupHelper.start()
-				.withAnnotatedTypes( MyProjection.class )
+				.withAnnotatedTypes( SupertypeMyProjection.class )
 				.setup( IndexedEntity.class );
 
 		testSuccessfulRootProjection(
-				mapping, IndexedEntity.class, MyProjection.class,
+				mapping, IndexedEntity.class, SupertypeMyProjection.class,
 				Arrays.asList(
 						Arrays.asList( "result1" ),
 						Arrays.asList( "result2" )
 				),
 				f -> f.composite()
 						.from(
-								dummyProjectionForEnclosingClassInstance( f ),
 								f.field( "text", Object.class )
 						)
 						.asList(),
 				Arrays.asList(
-						new MyProjection( "result1" ),
-						new MyProjection( "result2" )
+						new SupertypeMyProjection( "result1" ),
+						new SupertypeMyProjection( "result2" )
 				)
 		);
+	}
+
+	static class SupertypeMyProjection {
+		public final Object text;
+
+		@ProjectionConstructor
+		public SupertypeMyProjection(@FieldProjection Object text) {
+			this.text = text;
+		}
 	}
 
 	@Test
@@ -293,37 +296,37 @@ class ProjectionConstructorFieldProjectionIT extends AbstractProjectionConstruct
 			@GenericField
 			public int integer;
 		}
-		class MyProjection {
-			public final int integer;
-
-			@ProjectionConstructor
-			public MyProjection(@FieldProjection int integer) {
-				this.integer = integer;
-			}
-		}
 
 		backendMock.expectAnySchema( INDEX_NAME );
 		SearchMapping mapping = setupHelper.start()
-				.withAnnotatedTypes( MyProjection.class )
+				.withAnnotatedTypes( PrimitiveTypeMyProjection.class )
 				.setup( IndexedEntity.class );
 
 		testSuccessfulRootProjection(
-				mapping, IndexedEntity.class, MyProjection.class,
+				mapping, IndexedEntity.class, PrimitiveTypeMyProjection.class,
 				Arrays.asList(
 						Arrays.asList( 1 ),
 						Arrays.asList( 2 )
 				),
 				f -> f.composite()
 						.from(
-								dummyProjectionForEnclosingClassInstance( f ),
 								f.field( "integer", Integer.class )
 						)
 						.asList(),
 				Arrays.asList(
-						new MyProjection( 1 ),
-						new MyProjection( 2 )
+						new PrimitiveTypeMyProjection( 1 ),
+						new PrimitiveTypeMyProjection( 2 )
 				)
 		);
+	}
+
+	static class PrimitiveTypeMyProjection {
+		public final int integer;
+
+		@ProjectionConstructor
+		public PrimitiveTypeMyProjection(@FieldProjection int integer) {
+			this.integer = integer;
+		}
 	}
 
 	@Test
@@ -345,32 +348,14 @@ class ProjectionConstructorFieldProjectionIT extends AbstractProjectionConstruct
 			@IndexedEmbedded
 			public Contained contained;
 		}
-		class MyInnerProjection {
-			public final String text;
-
-			@ProjectionConstructor
-			public MyInnerProjection(@FieldProjection String text) {
-				this.text = text;
-			}
-		}
-		class MyProjection {
-			public final String text;
-			public final MyInnerProjection contained;
-
-			@ProjectionConstructor
-			public MyProjection(@FieldProjection String text, MyInnerProjection contained) {
-				this.text = text;
-				this.contained = contained;
-			}
-		}
 
 		backendMock.expectAnySchema( INDEX_NAME );
 		SearchMapping mapping = setupHelper.start()
-				.withAnnotatedTypes( MyProjection.class, MyInnerProjection.class )
+				.withAnnotatedTypes( InObjectFieldMyProjection.class, InObjectFieldMyInnerProjection.class )
 				.setup( IndexedEntity.class );
 
 		testSuccessfulRootProjection(
-				mapping, IndexedEntity.class, MyProjection.class,
+				mapping, IndexedEntity.class, InObjectFieldMyProjection.class,
 				Arrays.asList(
 						Arrays.asList( "result1", Arrays.asList( "result1_1" ) ),
 						Arrays.asList( "result2", Arrays.asList( (Object) null ) ),
@@ -378,22 +363,40 @@ class ProjectionConstructorFieldProjectionIT extends AbstractProjectionConstruct
 				),
 				f -> f.composite()
 						.from(
-								dummyProjectionForEnclosingClassInstance( f ),
 								f.field( "text", String.class ),
 								f.object( "contained" )
 										.from(
-												dummyProjectionForEnclosingClassInstance( f ),
 												f.field( "contained.text", String.class )
 										)
 										.asList()
 						)
 						.asList(),
 				Arrays.asList(
-						new MyProjection( "result1", new MyInnerProjection( "result1_1" ) ),
-						new MyProjection( "result2", new MyInnerProjection( null ) ),
-						new MyProjection( "result3", null )
+						new InObjectFieldMyProjection( "result1", new InObjectFieldMyInnerProjection( "result1_1" ) ),
+						new InObjectFieldMyProjection( "result2", new InObjectFieldMyInnerProjection( null ) ),
+						new InObjectFieldMyProjection( "result3", null )
 				)
 		);
+	}
+
+	static class InObjectFieldMyInnerProjection {
+		public final String text;
+
+		@ProjectionConstructor
+		public InObjectFieldMyInnerProjection(@FieldProjection String text) {
+			this.text = text;
+		}
+	}
+
+	static class InObjectFieldMyProjection {
+		public final String text;
+		public final InObjectFieldMyInnerProjection contained;
+
+		@ProjectionConstructor
+		public InObjectFieldMyProjection(@FieldProjection String text, InObjectFieldMyInnerProjection contained) {
+			this.text = text;
+			this.contained = contained;
+		}
 	}
 
 	@Test
@@ -415,46 +418,24 @@ class ProjectionConstructorFieldProjectionIT extends AbstractProjectionConstruct
 			@IndexedEmbedded
 			public Contained contained;
 		}
-		class MyInnerProjection {
-			public final String text;
-			public final Integer integer;
-
-			@ProjectionConstructor
-			public MyInnerProjection(@FieldProjection String text, @FieldProjection Integer integer) {
-				this.text = text;
-				this.integer = integer;
-			}
-		}
-		class MyProjection {
-			public final String text;
-			public final MyInnerProjection contained;
-
-			@ProjectionConstructor
-			public MyProjection(@FieldProjection String text,
-					@ObjectProjection(includePaths = { "text" }) MyInnerProjection contained) {
-				this.text = text;
-				this.contained = contained;
-			}
-		}
 
 		backendMock.expectAnySchema( INDEX_NAME );
 		SearchMapping mapping = setupHelper.start()
-				.withAnnotatedTypes( MyProjection.class, MyInnerProjection.class )
+				.withAnnotatedTypes( InObjectField_filteredOutMyProjection.class,
+						InObjectField_filteredOutMyInnerProjection.class )
 				.setup( IndexedEntity.class );
 
 		testSuccessfulRootProjection(
-				mapping, IndexedEntity.class, MyProjection.class,
+				mapping, IndexedEntity.class, InObjectField_filteredOutMyProjection.class,
 				Arrays.asList(
 						Arrays.asList( "result1", Arrays.asList( "result1_1", null ) ),
 						Arrays.asList( "result2", null )
 				),
 				f -> f.composite()
 						.from(
-								dummyProjectionForEnclosingClassInstance( f ),
 								f.field( "text", String.class ),
 								f.object( "contained" )
 										.from(
-												dummyProjectionForEnclosingClassInstance( f ),
 												f.field( "contained.text", String.class ),
 												// "contained.integer" got filtered out due to @ObjectProjection filters
 												f.constant( null )
@@ -463,10 +444,34 @@ class ProjectionConstructorFieldProjectionIT extends AbstractProjectionConstruct
 						)
 						.asList(),
 				Arrays.asList(
-						new MyProjection( "result1", new MyInnerProjection( "result1_1", null ) ),
-						new MyProjection( "result2", null )
+						new InObjectField_filteredOutMyProjection( "result1",
+								new InObjectField_filteredOutMyInnerProjection( "result1_1", null ) ),
+						new InObjectField_filteredOutMyProjection( "result2", null )
 				)
 		);
+	}
+
+	static class InObjectField_filteredOutMyInnerProjection {
+		public final String text;
+		public final Integer integer;
+
+		@ProjectionConstructor
+		public InObjectField_filteredOutMyInnerProjection(@FieldProjection String text, @FieldProjection Integer integer) {
+			this.text = text;
+			this.integer = integer;
+		}
+	}
+
+	static class InObjectField_filteredOutMyProjection {
+		public final String text;
+		public final InObjectField_filteredOutMyInnerProjection contained;
+
+		@ProjectionConstructor
+		public InObjectField_filteredOutMyProjection(@FieldProjection String text,
+				@ObjectProjection(includePaths = { "text" }) InObjectField_filteredOutMyInnerProjection contained) {
+			this.text = text;
+			this.contained = contained;
+		}
 	}
 
 	@Test
@@ -488,46 +493,24 @@ class ProjectionConstructorFieldProjectionIT extends AbstractProjectionConstruct
 			@IndexedEmbedded
 			public Contained contained;
 		}
-		class MyInnerProjection {
-			public final String text;
-			public final List<Integer> integer;
-
-			@ProjectionConstructor
-			public MyInnerProjection(@FieldProjection String text, @FieldProjection List<Integer> integer) {
-				this.text = text;
-				this.integer = integer;
-			}
-		}
-		class MyProjection {
-			public final String text;
-			public final MyInnerProjection contained;
-
-			@ProjectionConstructor
-			public MyProjection(@FieldProjection String text,
-					@ObjectProjection(includePaths = { "text" }) MyInnerProjection contained) {
-				this.text = text;
-				this.contained = contained;
-			}
-		}
 
 		backendMock.expectAnySchema( INDEX_NAME );
 		SearchMapping mapping = setupHelper.start()
-				.withAnnotatedTypes( MyProjection.class, MyInnerProjection.class )
+				.withAnnotatedTypes( InObjectField_multiValued_filteredOutMyProjection.class,
+						InObjectField_multiValued_filteredOutMyInnerProjection.class )
 				.setup( IndexedEntity.class );
 
 		testSuccessfulRootProjection(
-				mapping, IndexedEntity.class, MyProjection.class,
+				mapping, IndexedEntity.class, InObjectField_multiValued_filteredOutMyProjection.class,
 				Arrays.asList(
 						Arrays.asList( "result1", Arrays.asList( "result1_1", null ) ),
 						Arrays.asList( "result2", null )
 				),
 				f -> f.composite()
 						.from(
-								dummyProjectionForEnclosingClassInstance( f ),
 								f.field( "text", String.class ),
 								f.object( "contained" )
 										.from(
-												dummyProjectionForEnclosingClassInstance( f ),
 												f.field( "contained.text", String.class ),
 												// "contained.integer" got filtered out due to @ObjectProjection filters
 												f.constant( Collections.emptyList() )
@@ -536,10 +519,36 @@ class ProjectionConstructorFieldProjectionIT extends AbstractProjectionConstruct
 						)
 						.asList(),
 				Arrays.asList(
-						new MyProjection( "result1", new MyInnerProjection( "result1_1", Collections.emptyList() ) ),
-						new MyProjection( "result2", null )
+						new InObjectField_multiValued_filteredOutMyProjection( "result1",
+								new InObjectField_multiValued_filteredOutMyInnerProjection( "result1_1",
+										Collections.emptyList() ) ),
+						new InObjectField_multiValued_filteredOutMyProjection( "result2", null )
 				)
 		);
+	}
+
+	static class InObjectField_multiValued_filteredOutMyInnerProjection {
+		public final String text;
+		public final List<Integer> integer;
+
+		@ProjectionConstructor
+		public InObjectField_multiValued_filteredOutMyInnerProjection(@FieldProjection String text,
+				@FieldProjection List<Integer> integer) {
+			this.text = text;
+			this.integer = integer;
+		}
+	}
+
+	static class InObjectField_multiValued_filteredOutMyProjection {
+		public final String text;
+		public final InObjectField_multiValued_filteredOutMyInnerProjection contained;
+
+		@ProjectionConstructor
+		public InObjectField_multiValued_filteredOutMyProjection(@FieldProjection String text,
+				@ObjectProjection(includePaths = { "text" }) InObjectField_multiValued_filteredOutMyInnerProjection contained) {
+			this.text = text;
+			this.contained = contained;
+		}
 	}
 
 	@Test
@@ -553,24 +562,14 @@ class ProjectionConstructorFieldProjectionIT extends AbstractProjectionConstruct
 			@GenericField
 			public Set<Integer> integer;
 		}
-		class MyProjection {
-			public final List<String> text;
-			public final List<Integer> integer;
-
-			@ProjectionConstructor
-			public MyProjection(@FieldProjection List<String> text, @FieldProjection List<Integer> integer) {
-				this.text = text;
-				this.integer = integer;
-			}
-		}
 
 		backendMock.expectAnySchema( INDEX_NAME );
 		SearchMapping mapping = setupHelper.start()
-				.withAnnotatedTypes( MyProjection.class )
+				.withAnnotatedTypes( MultiValued_listMyProjection.class )
 				.setup( IndexedEntity.class );
 
 		testSuccessfulRootProjection(
-				mapping, IndexedEntity.class, MyProjection.class,
+				mapping, IndexedEntity.class, MultiValued_listMyProjection.class,
 				Arrays.asList(
 						Arrays.asList( Arrays.asList( "result1_1", "result1_2" ), Arrays.asList( 11, 12 ) ),
 						Arrays.asList( Arrays.asList( "result2_1" ), Arrays.asList( 21 ) ),
@@ -579,18 +578,28 @@ class ProjectionConstructorFieldProjectionIT extends AbstractProjectionConstruct
 				),
 				f -> f.composite()
 						.from(
-								dummyProjectionForEnclosingClassInstance( f ),
 								f.field( "text", String.class ).multi(),
 								f.field( "integer", Integer.class ).multi()
 						)
 						.asList(),
 				Arrays.asList(
-						new MyProjection( Arrays.asList( "result1_1", "result1_2" ), Arrays.asList( 11, 12 ) ),
-						new MyProjection( Arrays.asList( "result2_1" ), Arrays.asList( 21 ) ),
-						new MyProjection( Collections.emptyList(), Collections.emptyList() ),
-						new MyProjection( Arrays.asList( "result4_1" ), Arrays.asList( 41 ) )
+						new MultiValued_listMyProjection( Arrays.asList( "result1_1", "result1_2" ), Arrays.asList( 11, 12 ) ),
+						new MultiValued_listMyProjection( Arrays.asList( "result2_1" ), Arrays.asList( 21 ) ),
+						new MultiValued_listMyProjection( Collections.emptyList(), Collections.emptyList() ),
+						new MultiValued_listMyProjection( Arrays.asList( "result4_1" ), Arrays.asList( 41 ) )
 				)
 		);
+	}
+
+	static class MultiValued_listMyProjection {
+		public final List<String> text;
+		public final List<Integer> integer;
+
+		@ProjectionConstructor
+		public MultiValued_listMyProjection(@FieldProjection List<String> text, @FieldProjection List<Integer> integer) {
+			this.text = text;
+			this.integer = integer;
+		}
 	}
 
 	@Test
@@ -604,24 +613,14 @@ class ProjectionConstructorFieldProjectionIT extends AbstractProjectionConstruct
 			@GenericField
 			public Set<Integer> integer;
 		}
-		class MyProjection {
-			public final Collection<String> text;
-			public final Collection<Integer> integer;
-
-			@ProjectionConstructor
-			public MyProjection(@FieldProjection Collection<String> text, @FieldProjection Collection<Integer> integer) {
-				this.text = text;
-				this.integer = integer;
-			}
-		}
 
 		backendMock.expectAnySchema( INDEX_NAME );
 		SearchMapping mapping = setupHelper.start()
-				.withAnnotatedTypes( MyProjection.class )
+				.withAnnotatedTypes( MultiValued_collectionMyProjection.class )
 				.setup( IndexedEntity.class );
 
 		testSuccessfulRootProjection(
-				mapping, IndexedEntity.class, MyProjection.class,
+				mapping, IndexedEntity.class, MultiValued_collectionMyProjection.class,
 				Arrays.asList(
 						Arrays.asList( Arrays.asList( "result1_1", "result1_2" ), Arrays.asList( 11, 12 ) ),
 						Arrays.asList( Arrays.asList( "result2_1" ), Arrays.asList( 21 ) ),
@@ -630,18 +629,30 @@ class ProjectionConstructorFieldProjectionIT extends AbstractProjectionConstruct
 				),
 				f -> f.composite()
 						.from(
-								dummyProjectionForEnclosingClassInstance( f ),
 								f.field( "text", String.class ).multi(),
 								f.field( "integer", Integer.class ).multi()
 						)
 						.asList(),
 				Arrays.asList(
-						new MyProjection( Arrays.asList( "result1_1", "result1_2" ), Arrays.asList( 11, 12 ) ),
-						new MyProjection( Arrays.asList( "result2_1" ), Arrays.asList( 21 ) ),
-						new MyProjection( Collections.emptyList(), Collections.emptyList() ),
-						new MyProjection( Arrays.asList( "result4_1" ), Arrays.asList( 41 ) )
+						new MultiValued_collectionMyProjection( Arrays.asList( "result1_1", "result1_2" ),
+								Arrays.asList( 11, 12 ) ),
+						new MultiValued_collectionMyProjection( Arrays.asList( "result2_1" ), Arrays.asList( 21 ) ),
+						new MultiValued_collectionMyProjection( Collections.emptyList(), Collections.emptyList() ),
+						new MultiValued_collectionMyProjection( Arrays.asList( "result4_1" ), Arrays.asList( 41 ) )
 				)
 		);
+	}
+
+	static class MultiValued_collectionMyProjection {
+		public final Collection<String> text;
+		public final Collection<Integer> integer;
+
+		@ProjectionConstructor
+		public MultiValued_collectionMyProjection(@FieldProjection Collection<String> text,
+				@FieldProjection Collection<Integer> integer) {
+			this.text = text;
+			this.integer = integer;
+		}
 	}
 
 	@Test
@@ -655,24 +666,14 @@ class ProjectionConstructorFieldProjectionIT extends AbstractProjectionConstruct
 			@GenericField
 			public Set<Integer> integer;
 		}
-		class MyProjection {
-			public final Iterable<String> text;
-			public final Iterable<Integer> integer;
-
-			@ProjectionConstructor
-			public MyProjection(@FieldProjection Iterable<String> text, @FieldProjection Iterable<Integer> integer) {
-				this.text = text;
-				this.integer = integer;
-			}
-		}
 
 		backendMock.expectAnySchema( INDEX_NAME );
 		SearchMapping mapping = setupHelper.start()
-				.withAnnotatedTypes( MyProjection.class )
+				.withAnnotatedTypes( MultiValued_iterableMyProjection.class )
 				.setup( IndexedEntity.class );
 
 		testSuccessfulRootProjection(
-				mapping, IndexedEntity.class, MyProjection.class,
+				mapping, IndexedEntity.class, MultiValued_iterableMyProjection.class,
 				Arrays.asList(
 						Arrays.asList( Arrays.asList( "result1_1", "result1_2" ), Arrays.asList( 11, 12 ) ),
 						Arrays.asList( Arrays.asList( "result2_1" ), Arrays.asList( 21 ) ),
@@ -681,18 +682,30 @@ class ProjectionConstructorFieldProjectionIT extends AbstractProjectionConstruct
 				),
 				f -> f.composite()
 						.from(
-								dummyProjectionForEnclosingClassInstance( f ),
 								f.field( "text", String.class ).multi(),
 								f.field( "integer", Integer.class ).multi()
 						)
 						.asList(),
 				Arrays.asList(
-						new MyProjection( Arrays.asList( "result1_1", "result1_2" ), Arrays.asList( 11, 12 ) ),
-						new MyProjection( Arrays.asList( "result2_1" ), Arrays.asList( 21 ) ),
-						new MyProjection( Collections.emptyList(), Collections.emptyList() ),
-						new MyProjection( Arrays.asList( "result4_1" ), Arrays.asList( 41 ) )
+						new MultiValued_iterableMyProjection( Arrays.asList( "result1_1", "result1_2" ),
+								Arrays.asList( 11, 12 ) ),
+						new MultiValued_iterableMyProjection( Arrays.asList( "result2_1" ), Arrays.asList( 21 ) ),
+						new MultiValued_iterableMyProjection( Collections.emptyList(), Collections.emptyList() ),
+						new MultiValued_iterableMyProjection( Arrays.asList( "result4_1" ), Arrays.asList( 41 ) )
 				)
 		);
+	}
+
+	static class MultiValued_iterableMyProjection {
+		public final Iterable<String> text;
+		public final Iterable<Integer> integer;
+
+		@ProjectionConstructor
+		public MultiValued_iterableMyProjection(@FieldProjection Iterable<String> text,
+				@FieldProjection Iterable<Integer> integer) {
+			this.text = text;
+			this.integer = integer;
+		}
 	}
 
 	@Test
@@ -706,30 +719,31 @@ class ProjectionConstructorFieldProjectionIT extends AbstractProjectionConstruct
 			@GenericField
 			public Set<Integer> integer;
 		}
-		class MyProjection {
-			public final Set<String> text;
-			public final List<Integer> integer;
-
-			@ProjectionConstructor
-			public MyProjection(@FieldProjection Set<String> text, @FieldProjection List<Integer> integer) {
-				this.text = text;
-				this.integer = integer;
-			}
-		}
 
 		assertThatThrownBy( () -> setupHelper.start()
-				.withAnnotatedTypes( MyProjection.class )
+				.withAnnotatedTypes( MultiValued_setMyProjection.class )
 				.setup( IndexedEntity.class ) )
 				.isInstanceOf( SearchException.class )
 				.satisfies( FailureReportUtils.hasFailureReport()
-						.typeContext( MyProjection.class.getName() )
-						.constructorContext( ProjectionConstructorFieldProjectionIT.class, Set.class, List.class )
-						.methodParameterContext( 1, "text" )
+						.typeContext( MultiValued_setMyProjection.class.getName() )
+						.constructorContext( Set.class, List.class )
+						.methodParameterContext( 0, "text" )
 						.failure( "Invalid parameter type for projection constructor",
 								"java.util.Set<java.lang.String>",
 								"When inferring the cardinality of inner projections from constructor parameters,"
 										+ " multi-valued constructor parameters must be lists (java.util.List<...>)"
 										+ " or list supertypes (java.lang.Iterable<...>, java.util.Collection<...>)" ) );
+	}
+
+	static class MultiValued_setMyProjection {
+		public final Set<String> text;
+		public final List<Integer> integer;
+
+		@ProjectionConstructor
+		public MultiValued_setMyProjection(@FieldProjection Set<String> text, @FieldProjection List<Integer> integer) {
+			this.text = text;
+			this.integer = integer;
+		}
 	}
 
 }

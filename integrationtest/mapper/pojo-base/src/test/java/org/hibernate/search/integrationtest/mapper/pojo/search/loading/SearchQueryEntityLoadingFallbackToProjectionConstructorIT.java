@@ -97,30 +97,18 @@ class SearchQueryEntityLoadingFallbackToProjectionConstructorIT {
 
 	@Test
 	void withoutLoadingStrategy_withProjectionConstructor() {
-		@SearchEntity(name = ENTITY_NAME)
-		@Indexed
-		class IndexedEntity {
-			@DocumentId
-			public Integer id;
-			@FullTextField
-			public String text;
-
-			@ProjectionConstructor
-			public IndexedEntity(@IdProjection Integer id, String text) {
-				this.id = id;
-				this.text = text;
-			}
-		}
-
 		backendMock.expectAnySchema( ENTITY_NAME );
 		SearchMapping mapping = setupHelper.start()
-				.withAnnotatedTypes( IndexedEntity.class )
+				.withAnnotatedTypes( WithoutLoadingStrategy_withProjectionConstructorIndexedEntity.class )
 				.setup();
 		backendMock.verifyExpectationsMet();
 
-		IndexedEntity instance1 = new IndexedEntity( 1, "text1" );
-		IndexedEntity instance2 = new IndexedEntity( 2, "text2" );
-		IndexedEntity instance3 = new IndexedEntity( 3, "text3" );
+		WithoutLoadingStrategy_withProjectionConstructorIndexedEntity instance1 =
+				new WithoutLoadingStrategy_withProjectionConstructorIndexedEntity( 1, "text1" );
+		WithoutLoadingStrategy_withProjectionConstructorIndexedEntity instance2 =
+				new WithoutLoadingStrategy_withProjectionConstructorIndexedEntity( 2, "text2" );
+		WithoutLoadingStrategy_withProjectionConstructorIndexedEntity instance3 =
+				new WithoutLoadingStrategy_withProjectionConstructorIndexedEntity( 3, "text3" );
 
 		try ( SearchSession session = mapping.createSession() ) {
 			backendMock.expectSearchProjection(
@@ -133,13 +121,28 @@ class SearchQueryEntityLoadingFallbackToProjectionConstructorIT {
 					)
 			);
 
-			assertThat( session.search( IndexedEntity.class )
+			assertThat( session.search( WithoutLoadingStrategy_withProjectionConstructorIndexedEntity.class )
 					.where( f -> f.matchAll() )
 					.fetchAllHits() )
 					.usingRecursiveComparison()
 					.isEqualTo( Arrays.asList( instance1, instance2, instance3 ) );
 		}
 		backendMock.verifyExpectationsMet();
+	}
+
+	@SearchEntity(name = ENTITY_NAME)
+	@Indexed
+	static class WithoutLoadingStrategy_withProjectionConstructorIndexedEntity {
+		@DocumentId
+		public Integer id;
+		@FullTextField
+		public String text;
+
+		@ProjectionConstructor
+		public WithoutLoadingStrategy_withProjectionConstructorIndexedEntity(@IdProjection Integer id, String text) {
+			this.id = id;
+			this.text = text;
+		}
 	}
 
 	@Test

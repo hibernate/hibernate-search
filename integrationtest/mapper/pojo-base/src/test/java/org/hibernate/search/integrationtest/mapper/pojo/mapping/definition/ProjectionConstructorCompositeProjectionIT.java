@@ -46,45 +46,23 @@ class ProjectionConstructorCompositeProjectionIT extends AbstractProjectionConst
 			@GenericField
 			public Integer integer;
 		}
-		class MyInnerProjection {
-			public final String text2;
-			public final Integer integer;
-
-			@ProjectionConstructor
-			public MyInnerProjection(String text2, Integer integer) {
-				this.text2 = text2;
-				this.integer = integer;
-			}
-		}
-		class MyProjection {
-			public final String text;
-			public final MyInnerProjection composite;
-
-			@ProjectionConstructor
-			public MyProjection(String text, @CompositeProjection MyInnerProjection composite) {
-				this.text = text;
-				this.composite = composite;
-			}
-		}
 
 		backendMock.expectAnySchema( INDEX_NAME );
 		SearchMapping mapping = setupHelper.start()
-				.withAnnotatedTypes( MyProjection.class, MyInnerProjection.class )
+				.withAnnotatedTypes( NoArgMyProjection.class, NoArgMyInnerProjection.class )
 				.setup( IndexedEntity.class );
 
 		testSuccessfulRootProjection(
-				mapping, IndexedEntity.class, MyProjection.class,
+				mapping, IndexedEntity.class, NoArgMyProjection.class,
 				Arrays.asList(
 						Arrays.asList( "result1", Arrays.asList( "result1_1", 1 ) ),
 						Arrays.asList( "result2", Arrays.asList( null, null ) )
 				),
 				f -> f.composite()
 						.from(
-								dummyProjectionForEnclosingClassInstance( f ),
 								f.field( "text", String.class ),
 								f.composite()
 										.from(
-												dummyProjectionForEnclosingClassInstance( f ),
 												f.field( "text2", String.class ),
 												f.field( "integer", Integer.class )
 										)
@@ -92,10 +70,32 @@ class ProjectionConstructorCompositeProjectionIT extends AbstractProjectionConst
 						)
 						.asList(),
 				Arrays.asList(
-						new MyProjection( "result1", new MyInnerProjection( "result1_1", 1 ) ),
-						new MyProjection( "result2", new MyInnerProjection( null, null ) )
+						new NoArgMyProjection( "result1", new NoArgMyInnerProjection( "result1_1", 1 ) ),
+						new NoArgMyProjection( "result2", new NoArgMyInnerProjection( null, null ) )
 				)
 		);
+	}
+
+	static class NoArgMyInnerProjection {
+		public final String text2;
+		public final Integer integer;
+
+		@ProjectionConstructor
+		public NoArgMyInnerProjection(String text2, Integer integer) {
+			this.text2 = text2;
+			this.integer = integer;
+		}
+	}
+
+	static class NoArgMyProjection {
+		public final String text;
+		public final NoArgMyInnerProjection composite;
+
+		@ProjectionConstructor
+		public NoArgMyProjection(String text, @CompositeProjection NoArgMyInnerProjection composite) {
+			this.text = text;
+			this.composite = composite;
+		}
 	}
 
 	@Test
@@ -109,41 +109,43 @@ class ProjectionConstructorCompositeProjectionIT extends AbstractProjectionConst
 			@FullTextField
 			public String text2;
 		}
-		class MyNonProjection {
-			public final String text2;
-			public final Integer integer;
-
-			public MyNonProjection() {
-				this.text2 = "foo";
-				this.integer = 42;
-			}
-
-			public MyNonProjection(String text2, Integer integer) {
-				this.text2 = text2;
-				this.integer = integer;
-			}
-		}
-		class MyProjection {
-			public final MyNonProjection composite;
-
-			@ProjectionConstructor
-			public MyProjection(@CompositeProjection MyNonProjection composite) {
-				this.composite = composite;
-			}
-		}
 
 		assertThatThrownBy( () -> setupHelper.start()
-				.withAnnotatedTypes( MyProjection.class, MyNonProjection.class )
+				.withAnnotatedTypes( InvalidTypeMyProjection.class, InvalidTypeMyNonProjection.class )
 				.setup( IndexedEntity.class ) )
 				.isInstanceOf( SearchException.class )
 				.satisfies( FailureReportUtils.hasFailureReport()
-						.typeContext( MyProjection.class.getName() )
-						.constructorContext( ProjectionConstructorCompositeProjectionIT.class, MyNonProjection.class )
-						.methodParameterContext( 1, "composite" )
+						.typeContext( InvalidTypeMyProjection.class.getName() )
+						.constructorContext( InvalidTypeMyNonProjection.class )
+						.methodParameterContext( 0, "composite" )
 						.failure( "Invalid object class for projection",
-								MyNonProjection.class.getName(),
+								InvalidTypeMyNonProjection.class.getName(),
 								"Make sure that this class is mapped correctly, "
 										+ "either through annotations (@ProjectionConstructor) or programmatic mapping" ) );
+	}
+
+	static class InvalidTypeMyNonProjection {
+		public final String text2;
+		public final Integer integer;
+
+		public InvalidTypeMyNonProjection() {
+			this.text2 = "foo";
+			this.integer = 42;
+		}
+
+		public InvalidTypeMyNonProjection(String text2, Integer integer) {
+			this.text2 = text2;
+			this.integer = integer;
+		}
+	}
+
+	static class InvalidTypeMyProjection {
+		public final InvalidTypeMyNonProjection composite;
+
+		@ProjectionConstructor
+		public InvalidTypeMyProjection(@CompositeProjection InvalidTypeMyNonProjection composite) {
+			this.composite = composite;
+		}
 	}
 
 	@Test
@@ -167,44 +169,15 @@ class ProjectionConstructorCompositeProjectionIT extends AbstractProjectionConst
 			@IndexedEmbedded
 			public Contained contained;
 		}
-		class MyInnerProjectionLevel2 {
-			public final String text2;
-			public final Integer integer;
-
-			@ProjectionConstructor
-			public MyInnerProjectionLevel2(String text2, Integer integer) {
-				this.text2 = text2;
-				this.integer = integer;
-			}
-		}
-		class MyInnerProjectionLevel1 {
-			public final String text;
-			public final MyInnerProjectionLevel2 composite;
-
-			@ProjectionConstructor
-			public MyInnerProjectionLevel1(String text, @CompositeProjection MyInnerProjectionLevel2 composite) {
-				this.text = text;
-				this.composite = composite;
-			}
-		}
-		class MyProjection {
-			public final String text;
-			public final MyInnerProjectionLevel1 contained;
-
-			@ProjectionConstructor
-			public MyProjection(String text, MyInnerProjectionLevel1 contained) {
-				this.text = text;
-				this.contained = contained;
-			}
-		}
 
 		backendMock.expectAnySchema( INDEX_NAME );
 		SearchMapping mapping = setupHelper.start()
-				.withAnnotatedTypes( MyProjection.class, MyInnerProjectionLevel1.class, MyInnerProjectionLevel2.class )
+				.withAnnotatedTypes( InObjectFieldMyProjection.class, InObjectFieldMyInnerProjectionLevel1.class,
+						InObjectFieldMyInnerProjectionLevel2.class )
 				.setup( IndexedEntity.class );
 
 		testSuccessfulRootProjection(
-				mapping, IndexedEntity.class, MyProjection.class,
+				mapping, IndexedEntity.class, InObjectFieldMyProjection.class,
 				Arrays.asList(
 						Arrays.asList( "result1", Arrays.asList( "result1_1", Arrays.asList( "result1_1_1", 1 ) ) ),
 						Arrays.asList( "result2", Arrays.asList( null, null ) ),
@@ -212,15 +185,12 @@ class ProjectionConstructorCompositeProjectionIT extends AbstractProjectionConst
 				),
 				f -> f.composite()
 						.from(
-								dummyProjectionForEnclosingClassInstance( f ),
 								f.field( "text", String.class ),
 								f.object( "contained" )
 										.from(
-												dummyProjectionForEnclosingClassInstance( f ),
 												f.field( "contained.text", String.class ),
 												f.composite()
 														.from(
-																dummyProjectionForEnclosingClassInstance( f ),
 																f.field( "contained.text2", String.class ),
 																f.field( "contained.integer", Integer.class )
 														)
@@ -230,13 +200,47 @@ class ProjectionConstructorCompositeProjectionIT extends AbstractProjectionConst
 						)
 						.asList(),
 				Arrays.asList(
-						new MyProjection( "result1", new MyInnerProjectionLevel1( "result1_1",
-								new MyInnerProjectionLevel2( "result1_1_1", 1 ) ) ),
-						new MyProjection( "result2", new MyInnerProjectionLevel1( null, null ) ),
-						new MyProjection( "result3", new MyInnerProjectionLevel1( "result3_1",
-								new MyInnerProjectionLevel2( null, null ) ) )
+						new InObjectFieldMyProjection( "result1", new InObjectFieldMyInnerProjectionLevel1( "result1_1",
+								new InObjectFieldMyInnerProjectionLevel2( "result1_1_1", 1 ) ) ),
+						new InObjectFieldMyProjection( "result2", new InObjectFieldMyInnerProjectionLevel1( null, null ) ),
+						new InObjectFieldMyProjection( "result3", new InObjectFieldMyInnerProjectionLevel1( "result3_1",
+								new InObjectFieldMyInnerProjectionLevel2( null, null ) ) )
 				)
 		);
+	}
+
+	static class InObjectFieldMyInnerProjectionLevel2 {
+		public final String text2;
+		public final Integer integer;
+
+		@ProjectionConstructor
+		public InObjectFieldMyInnerProjectionLevel2(String text2, Integer integer) {
+			this.text2 = text2;
+			this.integer = integer;
+		}
+	}
+
+	static class InObjectFieldMyInnerProjectionLevel1 {
+		public final String text;
+		public final InObjectFieldMyInnerProjectionLevel2 composite;
+
+		@ProjectionConstructor
+		public InObjectFieldMyInnerProjectionLevel1(String text,
+				@CompositeProjection InObjectFieldMyInnerProjectionLevel2 composite) {
+			this.text = text;
+			this.composite = composite;
+		}
+	}
+
+	static class InObjectFieldMyProjection {
+		public final String text;
+		public final InObjectFieldMyInnerProjectionLevel1 contained;
+
+		@ProjectionConstructor
+		public InObjectFieldMyProjection(String text, InObjectFieldMyInnerProjectionLevel1 contained) {
+			this.text = text;
+			this.contained = contained;
+		}
 	}
 
 	@Test
@@ -252,38 +256,40 @@ class ProjectionConstructorCompositeProjectionIT extends AbstractProjectionConst
 			@GenericField
 			public Integer integer;
 		}
-		class MyInnerProjection {
-			public final String text2;
-			public final Integer integer;
-
-			@ProjectionConstructor
-			public MyInnerProjection(String text2, Integer integer) {
-				this.text2 = text2;
-				this.integer = integer;
-			}
-		}
-		class MyProjection {
-			public final String text;
-			public final List<MyInnerProjection> composite;
-
-			@ProjectionConstructor
-			public MyProjection(String text, @CompositeProjection List<MyInnerProjection> composite) {
-				this.text = text;
-				this.composite = composite;
-			}
-		}
 
 		assertThatThrownBy( () -> setupHelper.start()
-				.withAnnotatedTypes( MyProjection.class )
+				.withAnnotatedTypes( MultiValuedMyProjection.class )
 				.setup( IndexedEntity.class ) )
 				.isInstanceOf( SearchException.class )
 				.satisfies( FailureReportUtils.hasFailureReport()
-						.typeContext( MyProjection.class.getName() )
-						.constructorContext( ProjectionConstructorCompositeProjectionIT.class, String.class, List.class )
-						.methodParameterContext( 2, "composite" )
+						.typeContext( MultiValuedMyProjection.class.getName() )
+						.constructorContext( String.class, List.class )
+						.methodParameterContext( 1, "composite" )
 						.failure( "Invalid object class for projection",
 								List.class.getName(),
 								"Make sure that this class is mapped correctly, "
 										+ "either through annotations (@ProjectionConstructor) or programmatic mapping" ) );
+	}
+
+	static class MultiValuedMyInnerProjection {
+		public final String text2;
+		public final Integer integer;
+
+		@ProjectionConstructor
+		public MultiValuedMyInnerProjection(String text2, Integer integer) {
+			this.text2 = text2;
+			this.integer = integer;
+		}
+	}
+
+	static class MultiValuedMyProjection {
+		public final String text;
+		public final List<MultiValuedMyInnerProjection> composite;
+
+		@ProjectionConstructor
+		public MultiValuedMyProjection(String text, @CompositeProjection List<MultiValuedMyInnerProjection> composite) {
+			this.text = text;
+			this.composite = composite;
+		}
 	}
 }
