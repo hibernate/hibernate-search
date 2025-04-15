@@ -9,13 +9,14 @@ import java.util.Set;
 
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.ElementCollection;
+import jakarta.persistence.Embedded;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Id;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
 
-import org.hibernate.annotations.Target;
+import org.hibernate.annotations.TargetEmbeddable;
 import org.hibernate.search.annotations.Field;
 import org.hibernate.search.annotations.Indexed;
 import org.hibernate.search.annotations.IndexedEmbedded;
@@ -38,7 +39,8 @@ public class Address {
 	private String street;
 
 	@IndexedEmbedded(depth = 1, prefix = "ownedBy_", targetElement = Owner.class)
-	@Target(Owner.class)
+	@TargetEmbeddable(Owner.class)
+	@Embedded
 	private Person ownedBy;
 
 	@ElementCollection

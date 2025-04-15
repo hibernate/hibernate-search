@@ -36,6 +36,7 @@ class CriteriaTypeQueryFactory<E, I> extends ConditionalExpressionQueryFactory<E
 		this.entityClass = entityClass;
 	}
 
+	@SuppressWarnings({ "deprecation", "removal" }) // QueryProducerImplementor is marked for removal, while the createQuery() is also present in other interfaces
 	@Override
 	public Query<Long> createQueryForCount(SharedSessionContractImplementor session,
 			Set<? extends Class<? extends E>> includedTypesFilter) {
@@ -49,6 +50,7 @@ class CriteriaTypeQueryFactory<E, I> extends ConditionalExpressionQueryFactory<E
 		return session.createQuery( criteriaQuery );
 	}
 
+	@SuppressWarnings({ "deprecation", "removal" }) // QueryProducerImplementor is marked for removal, while the createQuery() is also present in other interfaces
 	@Override
 	public Query<I> createQueryForIdentifierListing(SharedSessionContractImplementor session,
 			Set<? extends Class<? extends E>> includedTypesFilter) {
@@ -64,7 +66,7 @@ class CriteriaTypeQueryFactory<E, I> extends ConditionalExpressionQueryFactory<E
 	}
 
 	@Override
-	@SuppressWarnings("rawtypes")
+	@SuppressWarnings({ "rawtypes", "removal", "deprecation" }) // QueryProducerImplementor is marked for removal, while the createQuery() is also present in other interfaces
 	public Query<E> createQueryForLoadByUniqueProperty(SessionImplementor session, String parameterName) {
 		CriteriaBuilder criteriaBuilder = session.getCriteriaBuilder();
 		ParameterExpression<Collection> idsParameter = criteriaBuilder.parameter( Collection.class, parameterName );

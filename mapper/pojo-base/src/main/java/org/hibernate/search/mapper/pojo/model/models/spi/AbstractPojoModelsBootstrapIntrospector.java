@@ -20,8 +20,8 @@ import java.util.stream.Collector;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import org.hibernate.models.internal.BasicModelBuildingContextImpl;
-import org.hibernate.models.jandex.internal.JandexModelBuildingContextImpl;
+import org.hibernate.models.internal.BasicModelsContextImpl;
+import org.hibernate.models.jandex.internal.JandexModelsContextImpl;
 import org.hibernate.models.spi.AnnotationTarget;
 import org.hibernate.models.spi.ClassDetails;
 import org.hibernate.models.spi.ClassDetailsRegistry;
@@ -59,12 +59,13 @@ public abstract class AbstractPojoModelsBootstrapIntrospector implements PojoBoo
 
 	private static ClassDetailsRegistry simpleClassDetailsRegistry(ClassResolver classResolver, IndexView indexView) {
 		if ( indexView == null ) {
-			return new BasicModelBuildingContextImpl(
-					new HibernateSearchClassLoading( classResolver )
+			return new BasicModelsContextImpl(
+					new HibernateSearchClassLoading( classResolver ),
+					null
 			).getClassDetailsRegistry();
 		}
 		else {
-			return new JandexModelBuildingContextImpl(
+			return new JandexModelsContextImpl(
 					indexView,
 					new HibernateSearchClassLoading( classResolver ),
 					null
@@ -188,11 +189,6 @@ public abstract class AbstractPojoModelsBootstrapIntrospector implements PojoBoo
 			catch (ClassLoadingException e) {
 				return null;
 			}
-		}
-
-		@Override
-		public Package packageForName(String name) {
-			return delegate.packageForName( name );
 		}
 
 		@Override

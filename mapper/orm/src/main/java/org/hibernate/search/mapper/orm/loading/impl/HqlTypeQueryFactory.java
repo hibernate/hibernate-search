@@ -41,7 +41,7 @@ class HqlTypeQueryFactory<E, I> extends ConditionalExpressionQueryFactory<E, I> 
 				uniquePropertyType, "e", includedTypesFilter );
 	}
 
-	@SuppressWarnings("unchecked")
+	@SuppressWarnings({ "deprecation", "removal" }) // QueryProducerImplementor is marked for removal, while the createQuery() is also present in other interfaces
 	@Override
 	public Query<E> createQueryForLoadByUniqueProperty(SessionImplementor session, String parameterName) {
 		return session.createQuery(
@@ -62,6 +62,7 @@ class HqlTypeQueryFactory<E, I> extends ConditionalExpressionQueryFactory<E, I> 
 		if ( !includedTypesFilter.isEmpty() ) {
 			hql += " where type(" + entityAlias + ") in (:types)";
 		}
+		@SuppressWarnings({ "deprecation", "removal" }) // QueryProducerImplementor is marked for removal, while the createQuery() is also present in other interfaces
 		Query<T> query = session.createQuery( hql, returnedType );
 		if ( !includedTypesFilter.isEmpty() ) {
 			query.setParameterList( "types", includedTypesFilter );
