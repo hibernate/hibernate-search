@@ -41,37 +41,37 @@ class ProjectionConstructorDocumentReferenceProjectionIT extends AbstractProject
 			@FullTextField
 			public String text;
 		}
-		class MyProjection {
-			public final DocumentReference documentReference;
-
-			@ProjectionConstructor
-			public MyProjection(@DocumentReferenceProjection DocumentReference documentReference) {
-				this.documentReference = documentReference;
-			}
-		}
 
 		backendMock.expectAnySchema( INDEX_NAME );
 		SearchMapping mapping = setupHelper.start()
-				.withAnnotatedTypes( MyProjection.class )
+				.withAnnotatedTypes( NoArgMyProjection.class )
 				.setup( IndexedEntity.class );
 
 		testSuccessfulRootProjection(
-				mapping, IndexedEntity.class, MyProjection.class,
+				mapping, IndexedEntity.class, NoArgMyProjection.class,
 				Arrays.asList(
 						Arrays.asList( reference( INDEX_NAME, "1" ) ),
 						Arrays.asList( reference( INDEX_NAME, "2" ) )
 				),
 				f -> f.composite()
 						.from(
-								dummyProjectionForEnclosingClassInstance( f ),
 								f.documentReference()
 						)
 						.asList(),
 				Arrays.asList(
-						new MyProjection( reference( INDEX_NAME, "1" ) ),
-						new MyProjection( reference( INDEX_NAME, "2" ) )
+						new NoArgMyProjection( reference( INDEX_NAME, "1" ) ),
+						new NoArgMyProjection( reference( INDEX_NAME, "2" ) )
 				)
 		);
+	}
+
+	static class NoArgMyProjection {
+		public final DocumentReference documentReference;
+
+		@ProjectionConstructor
+		public NoArgMyProjection(@DocumentReferenceProjection DocumentReference documentReference) {
+			this.documentReference = documentReference;
+		}
 	}
 
 	@Test
@@ -83,37 +83,37 @@ class ProjectionConstructorDocumentReferenceProjectionIT extends AbstractProject
 			@FullTextField
 			public String text;
 		}
-		class MyProjection {
-			public final Object documentReference;
-
-			@ProjectionConstructor
-			public MyProjection(@DocumentReferenceProjection Object documentReference) {
-				this.documentReference = documentReference;
-			}
-		}
 
 		backendMock.expectAnySchema( INDEX_NAME );
 		SearchMapping mapping = setupHelper.start()
-				.withAnnotatedTypes( MyProjection.class )
+				.withAnnotatedTypes( SupertypeMyProjection.class )
 				.setup( IndexedEntity.class );
 
 		testSuccessfulRootProjection(
-				mapping, IndexedEntity.class, MyProjection.class,
+				mapping, IndexedEntity.class, SupertypeMyProjection.class,
 				Arrays.asList(
 						Arrays.asList( reference( INDEX_NAME, "1" ) ),
 						Arrays.asList( reference( INDEX_NAME, "2" ) )
 				),
 				f -> f.composite()
 						.from(
-								dummyProjectionForEnclosingClassInstance( f ),
 								f.documentReference()
 						)
 						.asList(),
 				Arrays.asList(
-						new MyProjection( reference( INDEX_NAME, "1" ) ),
-						new MyProjection( reference( INDEX_NAME, "2" ) )
+						new SupertypeMyProjection( reference( INDEX_NAME, "1" ) ),
+						new SupertypeMyProjection( reference( INDEX_NAME, "2" ) )
 				)
 		);
+	}
+
+	static class SupertypeMyProjection {
+		public final Object documentReference;
+
+		@ProjectionConstructor
+		public SupertypeMyProjection(@DocumentReferenceProjection Object documentReference) {
+			this.documentReference = documentReference;
+		}
 	}
 
 	@Test
@@ -125,28 +125,29 @@ class ProjectionConstructorDocumentReferenceProjectionIT extends AbstractProject
 			@FullTextField
 			public String text;
 		}
-		class MyProjection {
-			public final Integer documentReference;
-
-			@ProjectionConstructor
-			public MyProjection(@DocumentReferenceProjection Integer documentReference) {
-				this.documentReference = documentReference;
-			}
-		}
 
 		assertThatThrownBy( () -> setupHelper.start()
-				.withAnnotatedTypes( MyProjection.class )
+				.withAnnotatedTypes( InvalidTypeMyProjection.class )
 				.setup( IndexedEntity.class ) )
 				.isInstanceOf( SearchException.class )
 				.satisfies( FailureReportUtils.hasFailureReport()
-						.typeContext( MyProjection.class.getName() )
-						.constructorContext( ProjectionConstructorDocumentReferenceProjectionIT.class, Integer.class )
-						.methodParameterContext( 1, "documentReference" )
+						.typeContext( InvalidTypeMyProjection.class.getName() )
+						.constructorContext( Integer.class )
+						.methodParameterContext( 0, "documentReference" )
 						.failure(
 								"Invalid projection definition for constructor parameter type '" + Integer.class.getName()
 										+ "'",
 								"This projection results in values of type '" + DocumentReference.class.getName() + "'" )
 				);
+	}
+
+	static class InvalidTypeMyProjection {
+		public final Integer documentReference;
+
+		@ProjectionConstructor
+		public InvalidTypeMyProjection(@DocumentReferenceProjection Integer documentReference) {
+			this.documentReference = documentReference;
+		}
 	}
 
 }

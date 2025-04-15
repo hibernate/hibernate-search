@@ -38,37 +38,37 @@ class ProjectionConstructorIdProjectionIT extends AbstractProjectionConstructorI
 			@GenericField
 			public Integer identifier; // Not the ID -- we're trying to confuse Hibernate Search.
 		}
-		class MyProjection {
-			public final Integer identifier;
-
-			@ProjectionConstructor
-			public MyProjection(@IdProjection Integer identifier) {
-				this.identifier = identifier;
-			}
-		}
 
 		backendMock.expectAnySchema( INDEX_NAME );
 		SearchMapping mapping = setupHelper.start()
-				.withAnnotatedTypes( MyProjection.class )
+				.withAnnotatedTypes( NoArgMyProjection.class )
 				.setup( IndexedEntity.class );
 
 		testSuccessfulRootProjection(
-				mapping, IndexedEntity.class, MyProjection.class,
+				mapping, IndexedEntity.class, NoArgMyProjection.class,
 				Arrays.asList(
 						Arrays.asList( "11" ),
 						Arrays.asList( "21" )
 				),
 				f -> f.composite()
 						.from(
-								dummyProjectionForEnclosingClassInstance( f ),
 								f.id( Integer.class )
 						)
 						.asList(),
 				Arrays.asList(
-						new MyProjection( 11 ),
-						new MyProjection( 21 )
+						new NoArgMyProjection( 11 ),
+						new NoArgMyProjection( 21 )
 				)
 		);
+	}
+
+	static class NoArgMyProjection {
+		public final Integer identifier;
+
+		@ProjectionConstructor
+		public NoArgMyProjection(@IdProjection Integer identifier) {
+			this.identifier = identifier;
+		}
 	}
 
 	@Test
@@ -80,37 +80,37 @@ class ProjectionConstructorIdProjectionIT extends AbstractProjectionConstructorI
 			@FullTextField
 			public String text;
 		}
-		class MyProjection {
-			public final Object id;
-
-			@ProjectionConstructor
-			public MyProjection(@IdProjection Object id) {
-				this.id = id;
-			}
-		}
 
 		backendMock.expectAnySchema( INDEX_NAME );
 		SearchMapping mapping = setupHelper.start()
-				.withAnnotatedTypes( MyProjection.class )
+				.withAnnotatedTypes( SupertypeMyProjection.class )
 				.setup( IndexedEntity.class );
 
 		testSuccessfulRootProjection(
-				mapping, IndexedEntity.class, MyProjection.class,
+				mapping, IndexedEntity.class, SupertypeMyProjection.class,
 				Arrays.asList(
 						Arrays.asList( "11" ),
 						Arrays.asList( "21" )
 				),
 				f -> f.composite()
 						.from(
-								dummyProjectionForEnclosingClassInstance( f ),
 								f.id( Object.class )
 						)
 						.asList(),
 				Arrays.asList(
-						new MyProjection( 11 ),
-						new MyProjection( 21 )
+						new SupertypeMyProjection( 11 ),
+						new SupertypeMyProjection( 21 )
 				)
 		);
+	}
+
+	static class SupertypeMyProjection {
+		public final Object id;
+
+		@ProjectionConstructor
+		public SupertypeMyProjection(@IdProjection Object id) {
+			this.id = id;
+		}
 	}
 
 	@Test
@@ -122,37 +122,37 @@ class ProjectionConstructorIdProjectionIT extends AbstractProjectionConstructorI
 			@FullTextField
 			public String text;
 		}
-		class MyProjection {
-			public final int id;
-
-			@ProjectionConstructor
-			public MyProjection(@IdProjection int id) {
-				this.id = id;
-			}
-		}
 
 		backendMock.expectAnySchema( INDEX_NAME );
 		SearchMapping mapping = setupHelper.start()
-				.withAnnotatedTypes( MyProjection.class )
+				.withAnnotatedTypes( PrimitiveTypeMyProjection.class )
 				.setup( IndexedEntity.class );
 
 		testSuccessfulRootProjection(
-				mapping, IndexedEntity.class, MyProjection.class,
+				mapping, IndexedEntity.class, PrimitiveTypeMyProjection.class,
 				Arrays.asList(
 						Arrays.asList( "11" ),
 						Arrays.asList( "21" )
 				),
 				f -> f.composite()
 						.from(
-								dummyProjectionForEnclosingClassInstance( f ),
 								f.id( Integer.class )
 						)
 						.asList(),
 				Arrays.asList(
-						new MyProjection( 11 ),
-						new MyProjection( 21 )
+						new PrimitiveTypeMyProjection( 11 ),
+						new PrimitiveTypeMyProjection( 21 )
 				)
 		);
+	}
+
+	static class PrimitiveTypeMyProjection {
+		public final int id;
+
+		@ProjectionConstructor
+		public PrimitiveTypeMyProjection(@IdProjection int id) {
+			this.id = id;
+		}
 	}
 
 }

@@ -45,37 +45,37 @@ class ProjectionConstructorHighlightProjectionIT extends AbstractProjectionConst
 			@FullTextField
 			public String text;
 		}
-		class MyProjection {
-			public final List<String> text;
-
-			@ProjectionConstructor
-			public MyProjection(@HighlightProjection List<String> text) {
-				this.text = text;
-			}
-		}
 
 		backendMock.expectAnySchema( INDEX_NAME );
 		SearchMapping mapping = setupHelper.start()
-				.withAnnotatedTypes( MyProjection.class )
+				.withAnnotatedTypes( NoArgMyProjection.class )
 				.setup( IndexedEntity.class );
 
 		testSuccessfulRootProjection(
-				mapping, IndexedEntity.class, MyProjection.class,
+				mapping, IndexedEntity.class, NoArgMyProjection.class,
 				Arrays.asList(
 						Arrays.asList( Arrays.asList( "result1_term1", "result1_term2" ) ),
 						Arrays.asList( Arrays.asList( "result1_term1" ) )
 				),
 				f -> f.composite()
 						.from(
-								dummyProjectionForEnclosingClassInstance( f ),
 								f.highlight( "text" )
 						)
 						.asList(),
 				Arrays.asList(
-						new MyProjection( Arrays.asList( "result1_term1", "result1_term2" ) ),
-						new MyProjection( Arrays.asList( "result1_term1" ) )
+						new NoArgMyProjection( Arrays.asList( "result1_term1", "result1_term2" ) ),
+						new NoArgMyProjection( Arrays.asList( "result1_term1" ) )
 				)
 		);
+	}
+
+	static class NoArgMyProjection {
+		public final List<String> text;
+
+		@ProjectionConstructor
+		public NoArgMyProjection(@HighlightProjection List<String> text) {
+			this.text = text;
+		}
 	}
 
 	@Test
@@ -87,37 +87,37 @@ class ProjectionConstructorHighlightProjectionIT extends AbstractProjectionConst
 			@FullTextField(name = "myText")
 			public String text;
 		}
-		class MyProjection {
-			public final List<String> text;
-
-			@ProjectionConstructor
-			public MyProjection(@HighlightProjection(path = "myText") List<String> text) {
-				this.text = text;
-			}
-		}
 
 		backendMock.expectAnySchema( INDEX_NAME );
 		SearchMapping mapping = setupHelper.start()
-				.withAnnotatedTypes( MyProjection.class )
+				.withAnnotatedTypes( PathMyProjection.class )
 				.setup( IndexedEntity.class );
 
 		testSuccessfulRootProjection(
-				mapping, IndexedEntity.class, MyProjection.class,
+				mapping, IndexedEntity.class, PathMyProjection.class,
 				Arrays.asList(
 						Arrays.asList( Arrays.asList( "result1_term1", "result1_term2" ) ),
 						Arrays.asList( Arrays.asList( "result1_term1" ) )
 				),
 				f -> f.composite()
 						.from(
-								dummyProjectionForEnclosingClassInstance( f ),
 								f.highlight( "myText" )
 						)
 						.asList(),
 				Arrays.asList(
-						new MyProjection( Arrays.asList( "result1_term1", "result1_term2" ) ),
-						new MyProjection( Arrays.asList( "result1_term1" ) )
+						new PathMyProjection( Arrays.asList( "result1_term1", "result1_term2" ) ),
+						new PathMyProjection( Arrays.asList( "result1_term1" ) )
 				)
 		);
+	}
+
+	static class PathMyProjection {
+		public final List<String> text;
+
+		@ProjectionConstructor
+		public PathMyProjection(@HighlightProjection(path = "myText") List<String> text) {
+			this.text = text;
+		}
 	}
 
 	@Test
@@ -129,38 +129,38 @@ class ProjectionConstructorHighlightProjectionIT extends AbstractProjectionConst
 			@FullTextField
 			public String text;
 		}
-		class MyProjection {
-			public final List<String> text;
-
-			@ProjectionConstructor
-			public MyProjection(@HighlightProjection(highlighter = "foo") List<String> text) {
-				this.text = text;
-			}
-		}
 
 		backendMock.expectAnySchema( INDEX_NAME );
 		SearchMapping mapping = setupHelper.start()
-				.withAnnotatedTypes( MyProjection.class )
+				.withAnnotatedTypes( HighlighterMyProjection.class )
 				.setup( IndexedEntity.class );
 
 		testSuccessfulRootProjection(
-				mapping, IndexedEntity.class, MyProjection.class,
+				mapping, IndexedEntity.class, HighlighterMyProjection.class,
 				Arrays.asList(
 						Arrays.asList( Arrays.asList( "result1_term1", "result1_term2" ) ),
 						Arrays.asList( Arrays.asList( "result1_term1" ) )
 				),
 				f -> f.composite()
 						.from(
-								dummyProjectionForEnclosingClassInstance( f ),
 								f.highlight( "text" )
 										.highlighter( "foo" )
 						)
 						.asList(),
 				Arrays.asList(
-						new MyProjection( Arrays.asList( "result1_term1", "result1_term2" ) ),
-						new MyProjection( Arrays.asList( "result1_term1" ) )
+						new HighlighterMyProjection( Arrays.asList( "result1_term1", "result1_term2" ) ),
+						new HighlighterMyProjection( Arrays.asList( "result1_term1" ) )
 				)
 		);
+	}
+
+	static class HighlighterMyProjection {
+		public final List<String> text;
+
+		@ProjectionConstructor
+		public HighlighterMyProjection(@HighlightProjection(highlighter = "foo") List<String> text) {
+			this.text = text;
+		}
 	}
 
 	@Test
@@ -172,37 +172,37 @@ class ProjectionConstructorHighlightProjectionIT extends AbstractProjectionConst
 			@FullTextField
 			public String text;
 		}
-		class MyProjection {
-			public final List<CharSequence> text;
-
-			@ProjectionConstructor
-			public MyProjection(@HighlightProjection List<CharSequence> text) {
-				this.text = text;
-			}
-		}
 
 		backendMock.expectAnySchema( INDEX_NAME );
 		SearchMapping mapping = setupHelper.start()
-				.withAnnotatedTypes( MyProjection.class )
+				.withAnnotatedTypes( SuperTypeMyProjection.class )
 				.setup( IndexedEntity.class );
 
 		testSuccessfulRootProjection(
-				mapping, IndexedEntity.class, MyProjection.class,
+				mapping, IndexedEntity.class, SuperTypeMyProjection.class,
 				Arrays.asList(
 						Arrays.asList( Arrays.asList( "result1_term1", "result1_term2" ) ),
 						Arrays.asList( Arrays.asList( "result1_term1" ) )
 				),
 				f -> f.composite()
 						.from(
-								dummyProjectionForEnclosingClassInstance( f ),
 								f.highlight( "text" )
 						)
 						.asList(),
 				Arrays.asList(
-						new MyProjection( Arrays.asList( "result1_term1", "result1_term2" ) ),
-						new MyProjection( Arrays.asList( "result1_term1" ) )
+						new SuperTypeMyProjection( Arrays.asList( "result1_term1", "result1_term2" ) ),
+						new SuperTypeMyProjection( Arrays.asList( "result1_term1" ) )
 				)
 		);
+	}
+
+	static class SuperTypeMyProjection {
+		public final List<CharSequence> text;
+
+		@ProjectionConstructor
+		public SuperTypeMyProjection(@HighlightProjection List<CharSequence> text) {
+			this.text = text;
+		}
 	}
 
 	@Test
@@ -214,37 +214,37 @@ class ProjectionConstructorHighlightProjectionIT extends AbstractProjectionConst
 			@FullTextField
 			public String text;
 		}
-		class MyProjection {
-			public final String text;
-
-			@ProjectionConstructor
-			public MyProjection(@HighlightProjection String text) {
-				this.text = text;
-			}
-		}
 
 		backendMock.expectAnySchema( INDEX_NAME );
 		SearchMapping mapping = setupHelper.start()
-				.withAnnotatedTypes( MyProjection.class )
+				.withAnnotatedTypes( SingleValuedMyProjection.class )
 				.setup( IndexedEntity.class );
 
 		testSuccessfulRootProjection(
-				mapping, IndexedEntity.class, MyProjection.class,
+				mapping, IndexedEntity.class, SingleValuedMyProjection.class,
 				Arrays.asList(
 						Arrays.asList( "result1_term1" ),
 						Arrays.asList( "result1_term1" )
 				),
 				f -> f.composite()
 						.from(
-								dummyProjectionForEnclosingClassInstance( f ),
 								f.highlight( "text" ).collector( ProjectionCollector.nullable() )
 						)
 						.asList(),
 				Arrays.asList(
-						new MyProjection( "result1_term1" ),
-						new MyProjection( "result1_term1" )
+						new SingleValuedMyProjection( "result1_term1" ),
+						new SingleValuedMyProjection( "result1_term1" )
 				)
 		);
+	}
+
+	static class SingleValuedMyProjection {
+		public final String text;
+
+		@ProjectionConstructor
+		public SingleValuedMyProjection(@HighlightProjection String text) {
+			this.text = text;
+		}
 	}
 
 	// Technically this is not supported on the backend side,
@@ -268,32 +268,14 @@ class ProjectionConstructorHighlightProjectionIT extends AbstractProjectionConst
 			@IndexedEmbedded
 			public Contained contained;
 		}
-		class MyInnerProjection {
-			public final List<String> text;
-
-			@ProjectionConstructor
-			public MyInnerProjection(@HighlightProjection List<String> text) {
-				this.text = text;
-			}
-		}
-		class MyProjection {
-			public final List<String> text;
-			public final MyInnerProjection contained;
-
-			@ProjectionConstructor
-			public MyProjection(@HighlightProjection List<String> text, MyInnerProjection contained) {
-				this.text = text;
-				this.contained = contained;
-			}
-		}
 
 		backendMock.expectAnySchema( INDEX_NAME );
 		SearchMapping mapping = setupHelper.start()
-				.withAnnotatedTypes( MyProjection.class, MyInnerProjection.class )
+				.withAnnotatedTypes( InObjectFieldMyProjection.class, InObjectFieldMyInnerProjection.class )
 				.setup( IndexedEntity.class );
 
 		testSuccessfulRootProjection(
-				mapping, IndexedEntity.class, MyProjection.class,
+				mapping, IndexedEntity.class, InObjectFieldMyProjection.class,
 				Arrays.asList(
 						Arrays.asList( Arrays.asList( "result1_term1", "result1_term2" ),
 								Arrays.asList( Arrays.asList( "result1_term2", "result1_term3" ) ) ),
@@ -302,23 +284,42 @@ class ProjectionConstructorHighlightProjectionIT extends AbstractProjectionConst
 				),
 				f -> f.composite()
 						.from(
-								dummyProjectionForEnclosingClassInstance( f ),
 								f.highlight( "text" ),
 								f.object( "contained" )
 										.from(
-												dummyProjectionForEnclosingClassInstance( f ),
 												f.highlight( "contained.text" )
 										)
 										.asList()
 						)
 						.asList(),
 				Arrays.asList(
-						new MyProjection( Arrays.asList( "result1_term1", "result1_term2" ),
-								new MyInnerProjection( Arrays.asList( "result1_term2", "result1_term3" ) ) ),
-						new MyProjection( Arrays.asList( "result2_term1" ), new MyInnerProjection( null ) ),
-						new MyProjection( Arrays.asList( "result3_term1" ), null )
+						new InObjectFieldMyProjection( Arrays.asList( "result1_term1", "result1_term2" ),
+								new InObjectFieldMyInnerProjection( Arrays.asList( "result1_term2", "result1_term3" ) ) ),
+						new InObjectFieldMyProjection( Arrays.asList( "result2_term1" ),
+								new InObjectFieldMyInnerProjection( null ) ),
+						new InObjectFieldMyProjection( Arrays.asList( "result3_term1" ), null )
 				)
 		);
+	}
+
+	static class InObjectFieldMyInnerProjection {
+		public final List<String> text;
+
+		@ProjectionConstructor
+		public InObjectFieldMyInnerProjection(@HighlightProjection List<String> text) {
+			this.text = text;
+		}
+	}
+
+	static class InObjectFieldMyProjection {
+		public final List<String> text;
+		public final InObjectFieldMyInnerProjection contained;
+
+		@ProjectionConstructor
+		public InObjectFieldMyProjection(@HighlightProjection List<String> text, InObjectFieldMyInnerProjection contained) {
+			this.text = text;
+			this.contained = contained;
+		}
 	}
 
 	@Test
@@ -330,37 +331,37 @@ class ProjectionConstructorHighlightProjectionIT extends AbstractProjectionConst
 			@FullTextField
 			public String text;
 		}
-		class MyProjection {
-			public final Collection<String> text;
-
-			@ProjectionConstructor
-			public MyProjection(@HighlightProjection Collection<String> text) {
-				this.text = text;
-			}
-		}
 
 		backendMock.expectAnySchema( INDEX_NAME );
 		SearchMapping mapping = setupHelper.start()
-				.withAnnotatedTypes( MyProjection.class )
+				.withAnnotatedTypes( CollectionMyProjection.class )
 				.setup( IndexedEntity.class );
 
 		testSuccessfulRootProjection(
-				mapping, IndexedEntity.class, MyProjection.class,
+				mapping, IndexedEntity.class, CollectionMyProjection.class,
 				Arrays.asList(
 						Arrays.asList( Arrays.asList( "result1_term1", "result1_term2" ) ),
 						Arrays.asList( Arrays.asList( "result1_term1" ) )
 				),
 				f -> f.composite()
 						.from(
-								dummyProjectionForEnclosingClassInstance( f ),
 								f.highlight( "text" )
 						)
 						.asList(),
 				Arrays.asList(
-						new MyProjection( Arrays.asList( "result1_term1", "result1_term2" ) ),
-						new MyProjection( Arrays.asList( "result1_term1" ) )
+						new CollectionMyProjection( Arrays.asList( "result1_term1", "result1_term2" ) ),
+						new CollectionMyProjection( Arrays.asList( "result1_term1" ) )
 				)
 		);
+	}
+
+	static class CollectionMyProjection {
+		public final Collection<String> text;
+
+		@ProjectionConstructor
+		public CollectionMyProjection(@HighlightProjection Collection<String> text) {
+			this.text = text;
+		}
 	}
 
 	@Test
@@ -372,37 +373,37 @@ class ProjectionConstructorHighlightProjectionIT extends AbstractProjectionConst
 			@FullTextField
 			public String text;
 		}
-		class MyProjection {
-			public final Iterable<String> text;
-
-			@ProjectionConstructor
-			public MyProjection(@HighlightProjection Iterable<String> text) {
-				this.text = text;
-			}
-		}
 
 		backendMock.expectAnySchema( INDEX_NAME );
 		SearchMapping mapping = setupHelper.start()
-				.withAnnotatedTypes( MyProjection.class )
+				.withAnnotatedTypes( IterableMyProjection.class )
 				.setup( IndexedEntity.class );
 
 		testSuccessfulRootProjection(
-				mapping, IndexedEntity.class, MyProjection.class,
+				mapping, IndexedEntity.class, IterableMyProjection.class,
 				Arrays.asList(
 						Arrays.asList( Arrays.asList( "result1_term1", "result1_term2" ) ),
 						Arrays.asList( Arrays.asList( "result1_term1" ) )
 				),
 				f -> f.composite()
 						.from(
-								dummyProjectionForEnclosingClassInstance( f ),
 								f.highlight( "text" )
 						)
 						.asList(),
 				Arrays.asList(
-						new MyProjection( Arrays.asList( "result1_term1", "result1_term2" ) ),
-						new MyProjection( Arrays.asList( "result1_term1" ) )
+						new IterableMyProjection( Arrays.asList( "result1_term1", "result1_term2" ) ),
+						new IterableMyProjection( Arrays.asList( "result1_term1" ) )
 				)
 		);
+	}
+
+	static class IterableMyProjection {
+		public final Iterable<String> text;
+
+		@ProjectionConstructor
+		public IterableMyProjection(@HighlightProjection Iterable<String> text) {
+			this.text = text;
+		}
 	}
 
 	@Test
@@ -414,37 +415,37 @@ class ProjectionConstructorHighlightProjectionIT extends AbstractProjectionConst
 			@FullTextField
 			public String text;
 		}
-		class MyProjection {
-			public final Set<String> text;
-
-			@ProjectionConstructor
-			public MyProjection(@HighlightProjection Set<String> text) {
-				this.text = text;
-			}
-		}
 
 		backendMock.expectAnySchema( INDEX_NAME );
 		SearchMapping mapping = setupHelper.start()
-				.withAnnotatedTypes( MyProjection.class )
+				.withAnnotatedTypes( SetMyProjection.class )
 				.setup( IndexedEntity.class );
 
 		testSuccessfulRootProjection(
-				mapping, IndexedEntity.class, MyProjection.class,
+				mapping, IndexedEntity.class, SetMyProjection.class,
 				Arrays.asList(
 						Arrays.asList( Arrays.asList( "result1_term1", "result1_term2" ) ),
 						Arrays.asList( Arrays.asList( "result1_term1" ) )
 				),
 				f -> f.composite()
 						.from(
-								dummyProjectionForEnclosingClassInstance( f ),
 								f.highlight( "text" )
 						)
 						.asList(),
 				Arrays.asList(
-						new MyProjection( Set.of( "result1_term1", "result1_term2" ) ),
-						new MyProjection( Set.of( "result1_term1" ) )
+						new SetMyProjection( Set.of( "result1_term1", "result1_term2" ) ),
+						new SetMyProjection( Set.of( "result1_term1" ) )
 				)
 		);
+	}
+
+	static class SetMyProjection {
+		public final Set<String> text;
+
+		@ProjectionConstructor
+		public SetMyProjection(@HighlightProjection Set<String> text) {
+			this.text = text;
+		}
 	}
 
 	@Test
@@ -456,26 +457,27 @@ class ProjectionConstructorHighlightProjectionIT extends AbstractProjectionConst
 			@FullTextField
 			public String text;
 		}
-		class MyProjection {
-			public final List<Integer> text;
-
-			@ProjectionConstructor
-			public MyProjection(@HighlightProjection List<Integer> text) {
-				this.text = text;
-			}
-		}
 
 		assertThatThrownBy( () -> setupHelper.start()
-				.withAnnotatedTypes( MyProjection.class )
+				.withAnnotatedTypes( InvalidElementTypeMyProjection.class )
 				.setup( IndexedEntity.class ) )
 				.isInstanceOf( SearchException.class )
 				.satisfies( FailureReportUtils.hasFailureReport()
-						.typeContext( MyProjection.class.getName() )
-						.constructorContext( ProjectionConstructorHighlightProjectionIT.class, List.class )
-						.methodParameterContext( 1, "text" )
+						.typeContext( InvalidElementTypeMyProjection.class.getName() )
+						.constructorContext( List.class )
+						.methodParameterContext( 0, "text" )
 						.failure( "Invalid multi-valued projection definition for constructor parameter type",
 								"'java.util.List<java.lang.Integer>'",
 								"This projection results in values of type 'java.lang.String'" ) );
+	}
+
+	static class InvalidElementTypeMyProjection {
+		public final List<Integer> text;
+
+		@ProjectionConstructor
+		public InvalidElementTypeMyProjection(@HighlightProjection List<Integer> text) {
+			this.text = text;
+		}
 	}
 
 }
