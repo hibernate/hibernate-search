@@ -39,37 +39,37 @@ class ProjectionConstructorScoreProjectionIT extends AbstractProjectionConstruct
 			@FullTextField
 			public String text;
 		}
-		class MyProjection {
-			public final Float score;
-
-			@ProjectionConstructor
-			public MyProjection(@ScoreProjection Float score) {
-				this.score = score;
-			}
-		}
 
 		backendMock.expectAnySchema( INDEX_NAME );
 		SearchMapping mapping = setupHelper.start()
-				.withAnnotatedTypes( MyProjection.class )
+				.withAnnotatedTypes( NoArgMyProjection.class )
 				.setup( IndexedEntity.class );
 
 		testSuccessfulRootProjection(
-				mapping, IndexedEntity.class, MyProjection.class,
+				mapping, IndexedEntity.class, NoArgMyProjection.class,
 				Arrays.asList(
 						Arrays.asList( 1.0f ),
 						Arrays.asList( 2.0f )
 				),
 				f -> f.composite()
 						.from(
-								dummyProjectionForEnclosingClassInstance( f ),
 								f.score()
 						)
 						.asList(),
 				Arrays.asList(
-						new MyProjection( 1.0f ),
-						new MyProjection( 2.0f )
+						new NoArgMyProjection( 1.0f ),
+						new NoArgMyProjection( 2.0f )
 				)
 		);
+	}
+
+	static class NoArgMyProjection {
+		public final Float score;
+
+		@ProjectionConstructor
+		public NoArgMyProjection(@ScoreProjection Float score) {
+			this.score = score;
+		}
 	}
 
 	@Test
@@ -81,37 +81,37 @@ class ProjectionConstructorScoreProjectionIT extends AbstractProjectionConstruct
 			@FullTextField
 			public String text;
 		}
-		class MyProjection {
-			public final Object score;
-
-			@ProjectionConstructor
-			public MyProjection(@ScoreProjection Object score) {
-				this.score = score;
-			}
-		}
 
 		backendMock.expectAnySchema( INDEX_NAME );
 		SearchMapping mapping = setupHelper.start()
-				.withAnnotatedTypes( MyProjection.class )
+				.withAnnotatedTypes( SupertypeMyProjection.class )
 				.setup( IndexedEntity.class );
 
 		testSuccessfulRootProjection(
-				mapping, IndexedEntity.class, MyProjection.class,
+				mapping, IndexedEntity.class, SupertypeMyProjection.class,
 				Arrays.asList(
 						Arrays.asList( 1.0f ),
 						Arrays.asList( 2.0f )
 				),
 				f -> f.composite()
 						.from(
-								dummyProjectionForEnclosingClassInstance( f ),
 								f.score()
 						)
 						.asList(),
 				Arrays.asList(
-						new MyProjection( 1.0f ),
-						new MyProjection( 2.0f )
+						new SupertypeMyProjection( 1.0f ),
+						new SupertypeMyProjection( 2.0f )
 				)
 		);
+	}
+
+	static class SupertypeMyProjection {
+		public final Object score;
+
+		@ProjectionConstructor
+		public SupertypeMyProjection(@ScoreProjection Object score) {
+			this.score = score;
+		}
 	}
 
 	@Test
@@ -123,37 +123,37 @@ class ProjectionConstructorScoreProjectionIT extends AbstractProjectionConstruct
 			@FullTextField
 			public String text;
 		}
-		class MyProjection {
-			public final float score;
-
-			@ProjectionConstructor
-			public MyProjection(@ScoreProjection float score) {
-				this.score = score;
-			}
-		}
 
 		backendMock.expectAnySchema( INDEX_NAME );
 		SearchMapping mapping = setupHelper.start()
-				.withAnnotatedTypes( MyProjection.class )
+				.withAnnotatedTypes( PrimitiveTypeMyProjection.class )
 				.setup( IndexedEntity.class );
 
 		testSuccessfulRootProjection(
-				mapping, IndexedEntity.class, MyProjection.class,
+				mapping, IndexedEntity.class, PrimitiveTypeMyProjection.class,
 				Arrays.asList(
 						Arrays.asList( 1.0f ),
 						Arrays.asList( 2.0f )
 				),
 				f -> f.composite()
 						.from(
-								dummyProjectionForEnclosingClassInstance( f ),
 								f.score()
 						)
 						.asList(),
 				Arrays.asList(
-						new MyProjection( 1.0f ),
-						new MyProjection( 2.0f )
+						new PrimitiveTypeMyProjection( 1.0f ),
+						new PrimitiveTypeMyProjection( 2.0f )
 				)
 		);
+	}
+
+	static class PrimitiveTypeMyProjection {
+		public final float score;
+
+		@ProjectionConstructor
+		public PrimitiveTypeMyProjection(@ScoreProjection float score) {
+			this.score = score;
+		}
 	}
 
 	@Test
@@ -165,23 +165,15 @@ class ProjectionConstructorScoreProjectionIT extends AbstractProjectionConstruct
 			@FullTextField
 			public String text;
 		}
-		class MyProjection {
-			public final Integer score;
-
-			@ProjectionConstructor
-			public MyProjection(@ScoreProjection Integer score) {
-				this.score = score;
-			}
-		}
 
 		assertThatThrownBy( () -> setupHelper.start()
-				.withAnnotatedTypes( MyProjection.class )
+				.withAnnotatedTypes( InvalidTypeMyProjection.class )
 				.setup( IndexedEntity.class ) )
 				.isInstanceOf( SearchException.class )
 				.satisfies( FailureReportUtils.hasFailureReport()
-						.typeContext( MyProjection.class.getName() )
-						.constructorContext( ProjectionConstructorScoreProjectionIT.class, Integer.class )
-						.methodParameterContext( 1, "score" )
+						.typeContext( InvalidTypeMyProjection.class.getName() )
+						.constructorContext( Integer.class )
+						.methodParameterContext( 0, "score" )
 						.failure(
 								"Invalid projection definition for constructor parameter type '" + Integer.class.getName()
 										+ "'",
@@ -189,4 +181,12 @@ class ProjectionConstructorScoreProjectionIT extends AbstractProjectionConstruct
 				);
 	}
 
+	static class InvalidTypeMyProjection {
+		public final Integer score;
+
+		@ProjectionConstructor
+		public InvalidTypeMyProjection(@ScoreProjection Integer score) {
+			this.score = score;
+		}
+	}
 }

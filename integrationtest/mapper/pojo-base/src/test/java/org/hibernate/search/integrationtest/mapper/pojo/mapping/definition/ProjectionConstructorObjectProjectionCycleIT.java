@@ -55,7 +55,7 @@ class ProjectionConstructorObjectProjectionCycleIT extends AbstractProjectionCon
 				Level1 level1;
 			}
 
-			class ProjectionLevel1 {
+			static class ProjectionLevel1 {
 				public final String text;
 				public final ProjectionLevel2 level2;
 
@@ -66,7 +66,7 @@ class ProjectionConstructorObjectProjectionCycleIT extends AbstractProjectionCon
 				}
 			}
 
-			class ProjectionLevel2 {
+			static class ProjectionLevel2 {
 				public final String text;
 				public final ProjectionLevel1 level1;
 
@@ -84,17 +84,17 @@ class ProjectionConstructorObjectProjectionCycleIT extends AbstractProjectionCon
 				.isInstanceOf( SearchException.class )
 				.satisfies( FailureReportUtils.hasFailureReport()
 						.typeContext( Model.ProjectionLevel1.class.getName() )
-						.constructorContext( Model.class, String.class, Model.ProjectionLevel2.class )
-						.methodParameterContext( 2, "level2" )
+						.constructorContext( String.class, Model.ProjectionLevel2.class )
+						.methodParameterContext( 1, "level2" )
 						.typeContext( Model.ProjectionLevel2.class.getName() )
-						.constructorContext( Model.class, String.class, Model.ProjectionLevel1.class )
-						.methodParameterContext( 2, "level1" )
+						.constructorContext( String.class, Model.ProjectionLevel1.class )
+						.methodParameterContext( 1, "level1" )
 						.typeContext( Model.ProjectionLevel1.class.getName() )
-						.constructorContext( Model.class, String.class, Model.ProjectionLevel2.class )
-						.methodParameterContext( 2, "level2" )
+						.constructorContext( String.class, Model.ProjectionLevel2.class )
+						.methodParameterContext( 1, "level2" )
 						.multilineFailure( "Cyclic recursion starting from 'ObjectProjectionBinder(...)'",
 								"on type '" + Model.ProjectionLevel1.class.getName()
-										+ "', projection constructor, parameter at index 2 (level2)",
+										+ "', projection constructor, parameter at index 1 (level2)",
 								"Index field path starting from that location and ending with a cycle: 'level2.level1.level2.'",
 								"A projection constructor cannot declare an unrestricted @ObjectProjection to itself, even indirectly",
 								"To break the cycle, you should consider adding filters to your @ObjectProjection: includePaths, includeDepth, excludePaths, ..." ) );
@@ -122,7 +122,7 @@ class ProjectionConstructorObjectProjectionCycleIT extends AbstractProjectionCon
 				Level1 level1;
 			}
 
-			class ProjectionLevel1 {
+			static class ProjectionLevel1 {
 				public final String text;
 				public final ProjectionLevel2 level2;
 
@@ -134,7 +134,7 @@ class ProjectionConstructorObjectProjectionCycleIT extends AbstractProjectionCon
 				}
 			}
 
-			class ProjectionLevel2 {
+			static class ProjectionLevel2 {
 				public final String text;
 				public final ProjectionLevel1 level1;
 
@@ -151,8 +151,6 @@ class ProjectionConstructorObjectProjectionCycleIT extends AbstractProjectionCon
 				.withAnnotatedTypes( Model.ProjectionLevel1.class, Model.ProjectionLevel2.class )
 				.setup( Model.Level1.class );
 
-		Model model = new Model();
-
 		testSuccessfulRootProjectionExecutionOnly(
 				mapping, Model.Level1.class, Model.ProjectionLevel1.class,
 				Arrays.asList(
@@ -164,12 +162,12 @@ class ProjectionConstructorObjectProjectionCycleIT extends AbstractProjectionCon
 										Arrays.asList( "result2_level2_level1", null ) ) )
 				),
 				Arrays.asList(
-						model.new ProjectionLevel1( "result1",
-								model.new ProjectionLevel2( "result1_level2",
-										model.new ProjectionLevel1( "result1_level2_level1", null ) ) ),
-						model.new ProjectionLevel1( "result2",
-								model.new ProjectionLevel2( "result2_level2",
-										model.new ProjectionLevel1( "result2_level2_level1", null ) ) )
+						new Model.ProjectionLevel1( "result1",
+								new Model.ProjectionLevel2( "result1_level2",
+										new Model.ProjectionLevel1( "result1_level2_level1", null ) ) ),
+						new Model.ProjectionLevel1( "result2",
+								new Model.ProjectionLevel2( "result2_level2",
+										new Model.ProjectionLevel1( "result2_level2_level1", null ) ) )
 				)
 		);
 	}
@@ -196,7 +194,7 @@ class ProjectionConstructorObjectProjectionCycleIT extends AbstractProjectionCon
 				Level1 level1;
 			}
 
-			class ProjectionLevel1 {
+			static class ProjectionLevel1 {
 				public final String text;
 				public final ProjectionLevel2 level2;
 
@@ -208,7 +206,7 @@ class ProjectionConstructorObjectProjectionCycleIT extends AbstractProjectionCon
 				}
 			}
 
-			class ProjectionLevel2 {
+			static class ProjectionLevel2 {
 				public final String text;
 				public final ProjectionLevel1 level1;
 
@@ -225,8 +223,6 @@ class ProjectionConstructorObjectProjectionCycleIT extends AbstractProjectionCon
 				.withAnnotatedTypes( Model.ProjectionLevel1.class, Model.ProjectionLevel2.class )
 				.setup( Model.Level1.class );
 
-		Model model = new Model();
-
 		testSuccessfulRootProjectionExecutionOnly(
 				mapping, Model.Level1.class, Model.ProjectionLevel1.class,
 				Arrays.asList(
@@ -238,12 +234,12 @@ class ProjectionConstructorObjectProjectionCycleIT extends AbstractProjectionCon
 										Arrays.asList( "result2_level2_level1", null ) ) )
 				),
 				Arrays.asList(
-						model.new ProjectionLevel1( "result1",
-								model.new ProjectionLevel2( "result1_level2",
-										model.new ProjectionLevel1( "result1_level2_level1", null ) ) ),
-						model.new ProjectionLevel1( "result2",
-								model.new ProjectionLevel2( "result2_level2",
-										model.new ProjectionLevel1( "result2_level2_level1", null ) ) )
+						new Model.ProjectionLevel1( "result1",
+								new Model.ProjectionLevel2( "result1_level2",
+										new Model.ProjectionLevel1( "result1_level2_level1", null ) ) ),
+						new Model.ProjectionLevel1( "result2",
+								new Model.ProjectionLevel2( "result2_level2",
+										new Model.ProjectionLevel1( "result2_level2_level1", null ) ) )
 				)
 		);
 	}
@@ -270,7 +266,7 @@ class ProjectionConstructorObjectProjectionCycleIT extends AbstractProjectionCon
 				Level1 level1;
 			}
 
-			class ProjectionLevel1 {
+			static class ProjectionLevel1 {
 				public final String text;
 				public final ProjectionLevel2 level2;
 
@@ -282,7 +278,7 @@ class ProjectionConstructorObjectProjectionCycleIT extends AbstractProjectionCon
 				}
 			}
 
-			class ProjectionLevel2 {
+			static class ProjectionLevel2 {
 				public final String text;
 				public final ProjectionLevel1 level1;
 
@@ -299,8 +295,6 @@ class ProjectionConstructorObjectProjectionCycleIT extends AbstractProjectionCon
 				.withAnnotatedTypes( Model.ProjectionLevel1.class, Model.ProjectionLevel2.class )
 				.setup( Model.Level1.class );
 
-		Model model = new Model();
-
 		testSuccessfulRootProjectionExecutionOnly(
 				mapping, Model.Level1.class, Model.ProjectionLevel1.class,
 				Arrays.asList(
@@ -312,12 +306,12 @@ class ProjectionConstructorObjectProjectionCycleIT extends AbstractProjectionCon
 										Arrays.asList( "result2_level2_level1", null ) ) )
 				),
 				Arrays.asList(
-						model.new ProjectionLevel1( "result1",
-								model.new ProjectionLevel2( "result1_level2",
-										model.new ProjectionLevel1( "result1_level2_level1", null ) ) ),
-						model.new ProjectionLevel1( "result2",
-								model.new ProjectionLevel2( "result2_level2",
-										model.new ProjectionLevel1( "result2_level2_level1", null ) ) )
+						new Model.ProjectionLevel1( "result1",
+								new Model.ProjectionLevel2( "result1_level2",
+										new Model.ProjectionLevel1( "result1_level2_level1", null ) ) ),
+						new Model.ProjectionLevel1( "result2",
+								new Model.ProjectionLevel2( "result2_level2",
+										new Model.ProjectionLevel1( "result2_level2_level1", null ) ) )
 				)
 		);
 	}
@@ -353,7 +347,7 @@ class ProjectionConstructorObjectProjectionCycleIT extends AbstractProjectionCon
 				Level1 level1;
 			}
 
-			class ProjectionLevel1 {
+			static class ProjectionLevel1 {
 				public final String text;
 				public final ProjectionLevel2 level2;
 
@@ -364,7 +358,7 @@ class ProjectionConstructorObjectProjectionCycleIT extends AbstractProjectionCon
 				}
 			}
 
-			class ProjectionLevel2 {
+			static class ProjectionLevel2 {
 				public final String text;
 				public final ProjectionLevel3 level3;
 
@@ -375,7 +369,7 @@ class ProjectionConstructorObjectProjectionCycleIT extends AbstractProjectionCon
 				}
 			}
 
-			class ProjectionLevel3 {
+			static class ProjectionLevel3 {
 				public final String text;
 				public final ProjectionLevel1 level1;
 
@@ -393,20 +387,20 @@ class ProjectionConstructorObjectProjectionCycleIT extends AbstractProjectionCon
 				.isInstanceOf( SearchException.class )
 				.satisfies( FailureReportUtils.hasFailureReport()
 						.typeContext( Model.ProjectionLevel1.class.getName() )
-						.constructorContext( Model.class, String.class, Model.ProjectionLevel2.class )
-						.methodParameterContext( 2, "level2" )
+						.constructorContext( String.class, Model.ProjectionLevel2.class )
+						.methodParameterContext( 1, "level2" )
 						.typeContext( Model.ProjectionLevel2.class.getName() )
-						.constructorContext( Model.class, String.class, Model.ProjectionLevel3.class )
-						.methodParameterContext( 2, "level3" )
+						.constructorContext( String.class, Model.ProjectionLevel3.class )
+						.methodParameterContext( 1, "level3" )
 						.typeContext( Model.ProjectionLevel3.class.getName() )
-						.constructorContext( Model.class, String.class, Model.ProjectionLevel1.class )
-						.methodParameterContext( 2, "level1" )
+						.constructorContext( String.class, Model.ProjectionLevel1.class )
+						.methodParameterContext( 1, "level1" )
 						.typeContext( Model.ProjectionLevel1.class.getName() )
-						.constructorContext( Model.class, String.class, Model.ProjectionLevel2.class )
-						.methodParameterContext( 2, "level2" )
+						.constructorContext( String.class, Model.ProjectionLevel2.class )
+						.methodParameterContext( 1, "level2" )
 						.multilineFailure( "Cyclic recursion starting from 'ObjectProjectionBinder(...)'",
 								"on type '" + Model.ProjectionLevel1.class.getName()
-										+ "', projection constructor, parameter at index 2 (level2)",
+										+ "', projection constructor, parameter at index 1 (level2)",
 								"Index field path starting from that location and ending with a cycle: 'level2.level3.level1.level2.'",
 								"A projection constructor cannot declare an unrestricted @ObjectProjection to itself, even indirectly",
 								"To break the cycle, you should consider adding filters to your @ObjectProjection: includePaths, includeDepth, excludePaths, ..." ) );
@@ -443,7 +437,7 @@ class ProjectionConstructorObjectProjectionCycleIT extends AbstractProjectionCon
 				Level1 level1;
 			}
 
-			class ProjectionLevel1 {
+			static class ProjectionLevel1 {
 				public final String text;
 				public final ProjectionLevel2 level2;
 
@@ -454,7 +448,7 @@ class ProjectionConstructorObjectProjectionCycleIT extends AbstractProjectionCon
 				}
 			}
 
-			class ProjectionLevel2 {
+			static class ProjectionLevel2 {
 				public final String text;
 				public final ProjectionLevel3 level3;
 
@@ -465,7 +459,7 @@ class ProjectionConstructorObjectProjectionCycleIT extends AbstractProjectionCon
 				}
 			}
 
-			class ProjectionLevel3 {
+			static class ProjectionLevel3 {
 				public final String text;
 				public final ProjectionLevel2 level2;
 
@@ -483,20 +477,20 @@ class ProjectionConstructorObjectProjectionCycleIT extends AbstractProjectionCon
 				.isInstanceOf( SearchException.class )
 				.satisfies( FailureReportUtils.hasFailureReport()
 						.typeContext( Model.ProjectionLevel1.class.getName() )
-						.constructorContext( Model.class, String.class, Model.ProjectionLevel2.class )
-						.methodParameterContext( 2, "level2" )
+						.constructorContext( String.class, Model.ProjectionLevel2.class )
+						.methodParameterContext( 1, "level2" )
 						.typeContext( Model.ProjectionLevel2.class.getName() )
-						.constructorContext( Model.class, String.class, Model.ProjectionLevel3.class )
-						.methodParameterContext( 2, "level3" )
+						.constructorContext( String.class, Model.ProjectionLevel3.class )
+						.methodParameterContext( 1, "level3" )
 						.typeContext( Model.ProjectionLevel3.class.getName() )
-						.constructorContext( Model.class, String.class, Model.ProjectionLevel2.class )
-						.methodParameterContext( 2, "level2" )
+						.constructorContext( String.class, Model.ProjectionLevel2.class )
+						.methodParameterContext( 1, "level2" )
 						.typeContext( Model.ProjectionLevel2.class.getName() )
-						.constructorContext( Model.class, String.class, Model.ProjectionLevel3.class )
-						.methodParameterContext( 2, "level3" )
+						.constructorContext( String.class, Model.ProjectionLevel3.class )
+						.methodParameterContext( 1, "level3" )
 						.multilineFailure( "Cyclic recursion starting from 'ObjectProjectionBinder(...)'",
 								"on type '" + Model.ProjectionLevel2.class.getName()
-										+ "', projection constructor, parameter at index 2 (level3)",
+										+ "', projection constructor, parameter at index 1 (level3)",
 								"Index field path starting from that location and ending with a cycle: 'level3.level2.level3.'",
 								"A projection constructor cannot declare an unrestricted @ObjectProjection to itself, even indirectly",
 								"To break the cycle, you should consider adding filters to your @ObjectProjection: includePaths, includeDepth, excludePaths, ..." ) );

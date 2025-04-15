@@ -16,6 +16,7 @@ import org.hibernate.search.mapper.pojo.standalone.session.SearchSession;
 import org.hibernate.search.util.impl.integrationtest.common.extension.BackendMock;
 import org.hibernate.search.util.impl.integrationtest.common.extension.StubSearchWorkBehavior;
 
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
 
 public abstract class AbstractProjectionConstructorIT {
@@ -24,10 +25,6 @@ public abstract class AbstractProjectionConstructorIT {
 
 	@RegisterExtension
 	public BackendMock backendMock = BackendMock.create();
-
-	protected final ProjectionFinalStep<?> dummyProjectionForEnclosingClassInstance(SearchProjectionFactory<?, ?> f) {
-		return f.constant( null );
-	}
 
 	protected final <P> void testSuccessfulRootProjectionExecutionOnly(SearchMapping mapping, Class<?> indexedType,
 			Class<P> projectionType,
@@ -77,5 +74,10 @@ public abstract class AbstractProjectionConstructorIT {
 
 	protected SearchSession createSession(SearchMapping mapping) {
 		return mapping.createSession();
+	}
+
+	@Test
+	void name() {
+
 	}
 }

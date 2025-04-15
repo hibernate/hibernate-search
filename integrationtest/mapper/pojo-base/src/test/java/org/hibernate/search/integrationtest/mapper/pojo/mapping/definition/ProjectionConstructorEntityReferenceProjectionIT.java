@@ -42,37 +42,37 @@ class ProjectionConstructorEntityReferenceProjectionIT extends AbstractProjectio
 			@FullTextField
 			public String text;
 		}
-		class MyProjection {
-			public final EntityReference entityReference;
-
-			@ProjectionConstructor
-			public MyProjection(@EntityReferenceProjection EntityReference entityReference) {
-				this.entityReference = entityReference;
-			}
-		}
 
 		backendMock.expectAnySchema( INDEX_NAME );
 		SearchMapping mapping = setupHelper.start()
-				.withAnnotatedTypes( MyProjection.class )
+				.withAnnotatedTypes( NoArgMyProjection.class )
 				.setup( IndexedEntity.class );
 
 		testSuccessfulRootProjection(
-				mapping, IndexedEntity.class, MyProjection.class,
+				mapping, IndexedEntity.class, NoArgMyProjection.class,
 				Arrays.asList(
 						Arrays.asList( reference( INDEX_NAME, "1" ) ),
 						Arrays.asList( reference( INDEX_NAME, "2" ) )
 				),
 				f -> f.composite()
 						.from(
-								dummyProjectionForEnclosingClassInstance( f ),
 								f.entityReference()
 						)
 						.asList(),
 				Arrays.asList(
-						new MyProjection( PojoEntityReference.withDefaultName( IndexedEntity.class, 1 ) ),
-						new MyProjection( PojoEntityReference.withDefaultName( IndexedEntity.class, 2 ) )
+						new NoArgMyProjection( PojoEntityReference.withDefaultName( IndexedEntity.class, 1 ) ),
+						new NoArgMyProjection( PojoEntityReference.withDefaultName( IndexedEntity.class, 2 ) )
 				)
 		);
+	}
+
+	static class NoArgMyProjection {
+		public final EntityReference entityReference;
+
+		@ProjectionConstructor
+		public NoArgMyProjection(@EntityReferenceProjection EntityReference entityReference) {
+			this.entityReference = entityReference;
+		}
 	}
 
 	@Test
@@ -84,37 +84,37 @@ class ProjectionConstructorEntityReferenceProjectionIT extends AbstractProjectio
 			@FullTextField
 			public String text;
 		}
-		class MyProjection {
-			public final Object entityReference;
-
-			@ProjectionConstructor
-			public MyProjection(@EntityReferenceProjection Object entityReference) {
-				this.entityReference = entityReference;
-			}
-		}
 
 		backendMock.expectAnySchema( INDEX_NAME );
 		SearchMapping mapping = setupHelper.start()
-				.withAnnotatedTypes( MyProjection.class )
+				.withAnnotatedTypes( SupertypeMyProjection.class )
 				.setup( IndexedEntity.class );
 
 		testSuccessfulRootProjection(
-				mapping, IndexedEntity.class, MyProjection.class,
+				mapping, IndexedEntity.class, SupertypeMyProjection.class,
 				Arrays.asList(
 						Arrays.asList( reference( INDEX_NAME, "1" ) ),
 						Arrays.asList( reference( INDEX_NAME, "2" ) )
 				),
 				f -> f.composite()
 						.from(
-								dummyProjectionForEnclosingClassInstance( f ),
 								f.entityReference()
 						)
 						.asList(),
 				Arrays.asList(
-						new MyProjection( PojoEntityReference.withDefaultName( IndexedEntity.class, 1 ) ),
-						new MyProjection( PojoEntityReference.withDefaultName( IndexedEntity.class, 2 ) )
+						new SupertypeMyProjection( PojoEntityReference.withDefaultName( IndexedEntity.class, 1 ) ),
+						new SupertypeMyProjection( PojoEntityReference.withDefaultName( IndexedEntity.class, 2 ) )
 				)
 		);
+	}
+
+	static class SupertypeMyProjection {
+		public final Object entityReference;
+
+		@ProjectionConstructor
+		public SupertypeMyProjection(@EntityReferenceProjection Object entityReference) {
+			this.entityReference = entityReference;
+		}
 	}
 
 	@Test
@@ -126,28 +126,29 @@ class ProjectionConstructorEntityReferenceProjectionIT extends AbstractProjectio
 			@FullTextField
 			public String text;
 		}
-		class MyProjection {
-			public final Integer entityReference;
-
-			@ProjectionConstructor
-			public MyProjection(@EntityReferenceProjection Integer entityReference) {
-				this.entityReference = entityReference;
-			}
-		}
 
 		assertThatThrownBy( () -> setupHelper.start()
-				.withAnnotatedTypes( MyProjection.class )
+				.withAnnotatedTypes( InvalidTypeMyProjection.class )
 				.setup( IndexedEntity.class ) )
 				.isInstanceOf( SearchException.class )
 				.satisfies( FailureReportUtils.hasFailureReport()
-						.typeContext( MyProjection.class.getName() )
-						.constructorContext( ProjectionConstructorEntityReferenceProjectionIT.class, Integer.class )
-						.methodParameterContext( 1, "entityReference" )
+						.typeContext( InvalidTypeMyProjection.class.getName() )
+						.constructorContext( Integer.class )
+						.methodParameterContext( 0, "entityReference" )
 						.failure(
 								"Invalid projection definition for constructor parameter type '" + Integer.class.getName()
 										+ "'",
 								"This projection results in values of type '" + EntityReference.class.getName() + "'" )
 				);
+	}
+
+	static class InvalidTypeMyProjection {
+		public final Integer entityReference;
+
+		@ProjectionConstructor
+		public InvalidTypeMyProjection(@EntityReferenceProjection Integer entityReference) {
+			this.entityReference = entityReference;
+		}
 	}
 
 }

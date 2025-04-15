@@ -10,7 +10,6 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import java.lang.invoke.MethodHandles;
 import java.util.Collections;
 
-import org.hibernate.search.engine.search.projection.dsl.ProjectionFinalStep;
 import org.hibernate.search.engine.search.projection.dsl.SearchProjectionFactory;
 import org.hibernate.search.mapper.pojo.common.annotation.Param;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.DocumentId;
@@ -50,10 +49,6 @@ class ProjectionConstructorProjectionBindingIT {
 	public StandalonePojoMappingSetupHelper setupHelper =
 			StandalonePojoMappingSetupHelper.withBackendMock( MethodHandles.lookup(), backendMock );
 
-	protected final ProjectionFinalStep<?> dummyProjectionForEnclosingClassInstance(SearchProjectionFactory<?, ?> f) {
-		return f.constant( null );
-	}
-
 	@Test
 	void simple() {
 		@Indexed(index = INDEX_NAME)
@@ -63,21 +58,12 @@ class ProjectionConstructorProjectionBindingIT {
 			@GenericField(name = "myText")
 			String text;
 		}
-		class MyProjection {
-			public final String text;
-
-			@ProjectionConstructor
-			public MyProjection(
-					@ProjectionBinding(binder = @ProjectionBinderRef(type = WorkingProjectionBinder.class)) String text) {
-				this.text = text;
-			}
-		}
 
 		backendMock.expectAnySchema( INDEX_NAME );
 
 		SearchMapping mapping = setupHelper.start()
 				.expectCustomBeans()
-				.withAnnotatedTypes( MyProjection.class )
+				.withAnnotatedTypes( SimpleMyProjection.class )
 				.setup( IndexedEntity.class );
 		backendMock.verifyExpectationsMet();
 
@@ -88,7 +74,6 @@ class ProjectionConstructorProjectionBindingIT {
 						SearchProjectionFactory<?, ?> f = mapping.scope( IndexedEntity.class ).projection();
 						b.projection( f.composite()
 								.from(
-										dummyProjectionForEnclosingClassInstance( f ),
 										f.field( "myText", String.class )
 								)
 								.asList() );
@@ -101,16 +86,26 @@ class ProjectionConstructorProjectionBindingIT {
 			);
 
 			assertThat( session.search( IndexedEntity.class )
-					.select( MyProjection.class )
+					.select( SimpleMyProjection.class )
 					.where( f -> f.matchAll() )
 					.fetchAllHits() )
 					.usingRecursiveFieldByFieldElementComparator()
 					.containsExactly(
-							new MyProjection( "hit1Text" ),
-							new MyProjection( "hit2Text" )
+							new SimpleMyProjection( "hit1Text" ),
+							new SimpleMyProjection( "hit2Text" )
 					);
 		}
 		backendMock.verifyExpectationsMet();
+	}
+
+	static class SimpleMyProjection {
+		public final String text;
+
+		@ProjectionConstructor
+		public SimpleMyProjection(
+				@ProjectionBinding(binder = @ProjectionBinderRef(type = WorkingProjectionBinder.class)) String text) {
+			this.text = text;
+		}
 	}
 
 	public static class WorkingProjectionBinder implements ProjectionBinder {
@@ -130,25 +125,27 @@ class ProjectionConstructorProjectionBindingIT {
 			@GenericField(name = "myText")
 			String text;
 		}
-		class MyProjection {
-			public final String text;
 
-			@ProjectionConstructor
-			public MyProjection(@ProjectionBinding(binder = @ProjectionBinderRef) String text) {
-				this.text = text;
-			}
-		}
 		assertThatThrownBy( () -> setupHelper.start()
-				.withAnnotatedTypes( MyProjection.class )
+				.withAnnotatedTypes( MissingBinderReferenceMyProjection.class )
 				.setup( IndexedEntity.class ) )
 				.isInstanceOf( SearchException.class )
 				.satisfies( FailureReportUtils.hasFailureReport()
-						.typeContext( MyProjection.class.getName() )
-						.constructorContext( ProjectionConstructorProjectionBindingIT.class, String.class )
-						.methodParameterContext( 1, "text" )
+						.typeContext( MissingBinderReferenceMyProjection.class.getName() )
+						.constructorContext( String.class )
+						.methodParameterContext( 0, "text" )
 						.annotationContextAnyParameters( ProjectionBinding.class )
 						.failure( "Empty binder reference." )
 				);
+	}
+
+	static class MissingBinderReferenceMyProjection {
+		public final String text;
+
+		@ProjectionConstructor
+		public MissingBinderReferenceMyProjection(@ProjectionBinding(binder = @ProjectionBinderRef) String text) {
+			this.text = text;
+		}
 	}
 
 	@Test
@@ -160,21 +157,12 @@ class ProjectionConstructorProjectionBindingIT {
 			@GenericField(name = "myText")
 			String text;
 		}
-		class MyProjection {
-			public final String text;
-
-			@ProjectionConstructor
-			public MyProjection(@ProjectionBinding(binder = @ProjectionBinderRef(type = ParametricBinder.class,
-					params = @Param(name = "fieldPath", value = "myText"))) String text) {
-				this.text = text;
-			}
-		}
 
 		backendMock.expectAnySchema( INDEX_NAME );
 
 		SearchMapping mapping = setupHelper.start()
 				.expectCustomBeans()
-				.withAnnotatedTypes( MyProjection.class )
+				.withAnnotatedTypes( ParamsMyProjection.class )
 				.setup( IndexedEntity.class );
 		backendMock.verifyExpectationsMet();
 
@@ -185,7 +173,6 @@ class ProjectionConstructorProjectionBindingIT {
 						SearchProjectionFactory<?, ?> f = mapping.scope( IndexedEntity.class ).projection();
 						b.projection( f.composite()
 								.from(
-										dummyProjectionForEnclosingClassInstance( f ),
 										f.field( "myText", String.class )
 								)
 								.asList() );
@@ -198,16 +185,26 @@ class ProjectionConstructorProjectionBindingIT {
 			);
 
 			assertThat( session.search( IndexedEntity.class )
-					.select( MyProjection.class )
+					.select( ParamsMyProjection.class )
 					.where( f -> f.matchAll() )
 					.fetchAllHits() )
 					.usingRecursiveFieldByFieldElementComparator()
 					.containsExactly(
-							new MyProjection( "hit1Text" ),
-							new MyProjection( "hit2Text" )
+							new ParamsMyProjection( "hit1Text" ),
+							new ParamsMyProjection( "hit2Text" )
 					);
 		}
 		backendMock.verifyExpectationsMet();
+	}
+
+	static class ParamsMyProjection {
+		public final String text;
+
+		@ProjectionConstructor
+		public ParamsMyProjection(@ProjectionBinding(binder = @ProjectionBinderRef(type = ParametricBinder.class,
+				params = @Param(name = "fieldPath", value = "myText"))) String text) {
+			this.text = text;
+		}
 	}
 
 	@Test
@@ -219,26 +216,28 @@ class ProjectionConstructorProjectionBindingIT {
 			@GenericField
 			String text;
 		}
-		class MyProjection {
-			public final String text;
-
-			@ProjectionConstructor
-			public MyProjection(@ProjectionBinding(binder = @ProjectionBinderRef(type = ParametricBinder.class)) String text) {
-				this.text = text;
-			}
-		}
 
 		assertThatThrownBy( () -> setupHelper.start()
 				.expectCustomBeans()
-				.withAnnotatedTypes( MyProjection.class )
+				.withAnnotatedTypes( Params_paramNotDefinedMyProjection.class )
 				.setup( IndexedEntity.class ) )
 				.isInstanceOf( SearchException.class )
 				.satisfies( FailureReportUtils.hasFailureReport()
-						.typeContext( MyProjection.class.getName() )
-						.constructorContext( ProjectionConstructorProjectionBindingIT.class, String.class )
-						.methodParameterContext( 1, "text" )
+						.typeContext( Params_paramNotDefinedMyProjection.class.getName() )
+						.constructorContext( String.class )
+						.methodParameterContext( 0, "text" )
 						.failure( "Param with name 'fieldPath' has not been defined for the binder." )
 				);
+	}
+
+	static class Params_paramNotDefinedMyProjection {
+		public final String text;
+
+		@ProjectionConstructor
+		public Params_paramNotDefinedMyProjection(
+				@ProjectionBinding(binder = @ProjectionBinderRef(type = ParametricBinder.class)) String text) {
+			this.text = text;
+		}
 	}
 
 	@Test
@@ -250,31 +249,33 @@ class ProjectionConstructorProjectionBindingIT {
 			@GenericField
 			String text;
 		}
-		class MyProjection {
-			public final String text;
-
-			@ProjectionConstructor
-			public MyProjection(@ProjectionBinding(binder = @ProjectionBinderRef(type = ParametricBinder.class,
-					params = {
-							@Param(name = "fieldPath", value = "foo"),
-							@Param(name = "fieldPath", value = "foo") })) String text) {
-				this.text = text;
-			}
-		}
 
 		assertThatThrownBy( () -> setupHelper.start()
 				.expectCustomBeans()
-				.withAnnotatedTypes( MyProjection.class )
+				.withAnnotatedTypes( Params_paramDefinedTwiceMyProjection.class )
 				.setup( IndexedEntity.class ) )
 				.isInstanceOf( SearchException.class )
 				.satisfies( FailureReportUtils.hasFailureReport()
-						.typeContext( MyProjection.class.getName() )
-						.constructorContext( ProjectionConstructorProjectionBindingIT.class, String.class )
-						.methodParameterContext( 1, "text" )
+						.typeContext( Params_paramDefinedTwiceMyProjection.class.getName() )
+						.constructorContext( String.class )
+						.methodParameterContext( 0, "text" )
 						.annotationContextAnyParameters( ProjectionBinding.class )
 						.failure( "Conflicting usage of @Param annotation for parameter name: 'fieldPath'. " +
 								"Can't assign both value 'foo' and 'foo'" )
 				);
+	}
+
+	static class Params_paramDefinedTwiceMyProjection {
+		public final String text;
+
+		@ProjectionConstructor
+		public Params_paramDefinedTwiceMyProjection(
+				@ProjectionBinding(binder = @ProjectionBinderRef(type = ParametricBinder.class,
+						params = {
+								@Param(name = "fieldPath", value = "foo"),
+								@Param(name = "fieldPath", value = "foo") })) String text) {
+			this.text = text;
+		}
 	}
 
 	@Test
@@ -287,23 +288,17 @@ class ProjectionConstructorProjectionBindingIT {
 			@GenericField(name = "myText")
 			String text;
 		}
-		class MyProjection {
-			public final String text;
-
-			public MyProjection(String text) {
-				this.text = text;
-			}
-		}
 
 		backendMock.expectAnySchema( INDEX_NAME );
 
 		SearchMapping mapping = setupHelper.start()
 				.expectCustomBeans()
 				.withConfiguration( builder -> {
-					TypeMappingStep indexedEntity = builder.programmaticMapping().type( MyProjection.class );
+					TypeMappingStep indexedEntity =
+							builder.programmaticMapping().type( Params_programmaticMappingMyProjection.class );
 					indexedEntity.mainConstructor()
 							.projectionConstructor()
-							.parameter( 1 )
+							.parameter( 0 )
 							.projection( new ParametricBinder(), Collections.singletonMap( "fieldPath", "myText" ) );
 				} )
 				.setup( IndexedEntity.class );
@@ -316,7 +311,6 @@ class ProjectionConstructorProjectionBindingIT {
 						SearchProjectionFactory<?, ?> f = mapping.scope( IndexedEntity.class ).projection();
 						b.projection( f.composite()
 								.from(
-										dummyProjectionForEnclosingClassInstance( f ),
 										f.field( "myText", String.class )
 								)
 								.asList() );
@@ -329,16 +323,24 @@ class ProjectionConstructorProjectionBindingIT {
 			);
 
 			assertThat( session.search( IndexedEntity.class )
-					.select( MyProjection.class )
+					.select( Params_programmaticMappingMyProjection.class )
 					.where( f -> f.matchAll() )
 					.fetchAllHits() )
 					.usingRecursiveFieldByFieldElementComparator()
 					.containsExactly(
-							new MyProjection( "hit1Text" ),
-							new MyProjection( "hit2Text" )
+							new Params_programmaticMappingMyProjection( "hit1Text" ),
+							new Params_programmaticMappingMyProjection( "hit2Text" )
 					);
 		}
 		backendMock.verifyExpectationsMet();
+	}
+
+	static class Params_programmaticMappingMyProjection {
+		public final String text;
+
+		public Params_programmaticMappingMyProjection(String text) {
+			this.text = text;
+		}
 	}
 
 	public static class ParametricBinder implements ProjectionBinder {
