@@ -60,8 +60,8 @@
         <version.org.elasticsearch.compatible.regularly-tested.text>7.10, 7.17 or 8.17</version.org.elasticsearch.compatible.regularly-tested.text>
         <!-- These are the versions same as above, but pointing only to the major part (used in compatibility section of ES backend documentation
           as versions that Hibernate Search is compatible with. -->
-        <!-- NOTE: Adding new major versions would require to update the compatibility table in `backend-elasticsearch-compatibility` section of `backend-elasticsearch.asciidoc`. -->
-        <version.org.elasticsearch.compatible.expected.text>7.10+ or 8.x</version.org.elasticsearch.compatible.expected.text>
+        <!-- NOTE: Adding new major versions would require to update the compatibility table in `backend-elasticsearch-compatibility` section of `backend-elasticsearch.adoc`. -->
+        <version.org.elasticsearch.compatible.expected.text>7.10+, 8.x or 9.x</version.org.elasticsearch.compatible.expected.text>
         <!-- The versions of Elasticsearch that may work, but are not given priority for bugfixes and new features -->
         <version.org.elasticsearch.compatible.not-regularly-tested.text>7.11 or 8.0</version.org.elasticsearch.compatible.not-regularly-tested.text>
         <!--

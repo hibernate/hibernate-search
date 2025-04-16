@@ -182,6 +182,9 @@ public class ElasticsearchDialectFactory {
 		else if ( major == 8 ) {
 			return createProtocolDialectElasticV8( version, minor );
 		}
+		else if ( major == 9 ) {
+			return createProtocolDialectElasticV9( version, minor );
+		}
 		else {
 			VersionLog.INSTANCE.unknownElasticsearchVersion( version );
 			return new Elasticsearch81ProtocolDialect();
@@ -201,6 +204,13 @@ public class ElasticsearchDialectFactory {
 		}
 		else if ( minor == 0 ) {
 			return new Elasticsearch80ProtocolDialect();
+		}
+		return new Elasticsearch81ProtocolDialect();
+	}
+
+	private ElasticsearchProtocolDialect createProtocolDialectElasticV9(ElasticsearchVersion version, int minor) {
+		if ( minor > 0 ) {
+			VersionLog.INSTANCE.unknownElasticsearchVersion( version );
 		}
 		return new Elasticsearch81ProtocolDialect();
 	}
