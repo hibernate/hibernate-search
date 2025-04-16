@@ -53,7 +53,7 @@ Map settings() {
 					updateProperties: [],
 					onlyRunTestDependingOn: ['hibernate-search-backend-elasticsearch'],
 					// We want to use the snapshot version of an image from the ES registry since that's where they are publishing their snapshots.
-					additionalMavenArgs: '-Dtest.lucene.skip=true -Dtest.elasticsearch.run.elastic.image.name=docker.elastic.co/elasticsearch/elasticsearch -Dtest.elasticsearch.run.elastic.image.tag=8.17.5-SNAPSHOT',
+					additionalMavenArgs: '-Dtest.lucene.skip=true -Dtest.elasticsearch.run.elastic.image.name=docker.elastic.co/elasticsearch/elasticsearch -Dtest.elasticsearch.run.elastic.image.tag=9.0.1-SNAPSHOT',
 					// This job won't change the versions in the pom. We are passing the latest Elasticsearch version through an additional maven argument `-D`
 					skipSourceModifiedCheck: true
 			]
@@ -65,22 +65,22 @@ Map settings() {
 					updateProperties: [],
 					onlyRunTestDependingOn: ['hibernate-search-backend-elasticsearch'],
 					// We want to use the snapshot version of an image from the ES registry since that's where they are publishing their snapshots.
-					additionalMavenArgs: '-Dtest.lucene.skip=true -Dtest.elasticsearch.run.elastic.image.name=docker.elastic.co/elasticsearch/elasticsearch -Dtest.elasticsearch.run.elastic.image.tag=8.18.0-SNAPSHOT',
+					additionalMavenArgs: '-Dtest.lucene.skip=true -Dtest.elasticsearch.run.elastic.image.name=docker.elastic.co/elasticsearch/elasticsearch -Dtest.elasticsearch.run.elastic.image.tag=9.1.0-SNAPSHOT',
 					// This job won't change the versions in the pom. We are passing the latest Elasticsearch version through an additional maven argument `-D`
 					skipSourceModifiedCheck: true
 			]
-		// Targets the next major release of the of Elasticsearch
-		// (currently not published at all)
-		case 'elasticsearch-future':
-			return [
-					// There are no properties to update in this case.
-					updateProperties: [],
-					onlyRunTestDependingOn: ['hibernate-search-backend-elasticsearch'],
-					// We want to use the snapshot version of an image from the ES registry since that's where they are publishing their snapshots.
-					additionalMavenArgs: '-Dtest.lucene.skip=true -Dtest.elasticsearch.run.elastic.image.name=docker.elastic.co/elasticsearch/elasticsearch -Dtest.elasticsearch.run.elastic.image.tag=9.0.0-SNAPSHOT',
-					// This job won't change the versions in the pom. We are passing the latest Elasticsearch version through an additional maven argument `-D`
-					skipSourceModifiedCheck: true
-			]
+		// // Targets the next major release of the of Elasticsearch
+		// // (currently not published at all)
+		// case 'elasticsearch-future':
+		// 	return [
+		// 			// There are no properties to update in this case.
+		// 			updateProperties: [],
+		// 			onlyRunTestDependingOn: ['hibernate-search-backend-elasticsearch'],
+		// 			// We want to use the snapshot version of an image from the ES registry since that's where they are publishing their snapshots.
+		// 			additionalMavenArgs: '-Dtest.lucene.skip=true -Dtest.elasticsearch.run.elastic.image.name=docker.elastic.co/elasticsearch/elasticsearch -Dtest.elasticsearch.run.elastic.image.tag=10.0.0-SNAPSHOT',
+		// 			// This job won't change the versions in the pom. We are passing the latest Elasticsearch version through an additional maven argument `-D`
+		// 			skipSourceModifiedCheck: true
+		// 	]
 		default:
 			return [:]
 	}

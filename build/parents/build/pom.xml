@@ -57,7 +57,7 @@
         <!-- The versions of Elasticsearch advertised as compatible with Hibernate Search -->
         <!-- Make sure to only mention tested versions here -->
         <!-- Make sure that 7.10 stays explicitly mentioned here, because that's the last open-source version -->
-        <version.org.elasticsearch.compatible.regularly-tested.text>7.10, 7.17 or 8.17</version.org.elasticsearch.compatible.regularly-tested.text>
+        <version.org.elasticsearch.compatible.regularly-tested.text>7.10, 7.17, 8.17 or 9.0</version.org.elasticsearch.compatible.regularly-tested.text>
         <!-- These are the versions same as above, but pointing only to the major part (used in compatibility section of ES backend documentation
           as versions that Hibernate Search is compatible with. -->
         <!-- NOTE: Adding new major versions would require to update the compatibility table in `backend-elasticsearch-compatibility` section of `backend-elasticsearch.adoc`. -->
