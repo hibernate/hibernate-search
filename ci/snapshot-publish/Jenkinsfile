@@ -35,11 +35,21 @@ pipeline {
 				script {
 					withMaven(mavenSettingsConfig: 'ci-hibernate.deploy.settings.maven',
 							mavenLocalRepo: env.WORKSPACE_TMP + '/.m2repository') {
-						sh """mvn \
-								-Pci-build \
-								-DskipTests \
-								clean deploy \
-						"""
+						withCredentials([// TODO: HSEARCH-5354
+										 //  Once we switch to maven-central publishing (from nexus2) we need to add a new credentials
+										 //  to use the following env variable names to set the user/password:
+										 //  JRELEASER_MAVENCENTRAL_USERNAME
+										 //  JRELEASER_MAVENCENTRAL_TOKEN
+										 usernamePassword(credentialsId: 'ossrh.sonatype.org', passwordVariable: 'JRELEASER_NEXUS2_PASSWORD', usernameVariable: 'JRELEASER_NEXUS2_USERNAME'),
+										 string(credentialsId: 'Hibernate-CI.github.com', variable: 'JRELEASER_GITHUB_TOKEN')]) {
+							sh 'git clone https://github.com/hibernate/hibernate-release-scripts.git'
+							def version = sh(
+									script: ".release/scripts/determine-current-version.sh search",
+									returnStdout: true
+							).trim()
+							echo "Current version: '${version}'"
+							sh "bash -xe hibernate-release-scripts/snapshot-deploy.sh search ${version}"
+						}
 					}
 				}
 			}
