@@ -35,7 +35,7 @@ class QueryStringPredicateFieldMoreStepImpl<SR>
 
 	@Override
 	public QueryStringPredicateFieldMoreStepImpl<SR> fields(String... fieldPaths) {
-		return new QueryStringPredicateFieldMoreStepImpl<SR>( commonState, Arrays.asList( fieldPaths ) );
+		return new QueryStringPredicateFieldMoreStepImpl<>( commonState, Arrays.asList( fieldPaths ) );
 	}
 
 	@Override

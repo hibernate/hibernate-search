@@ -32,7 +32,7 @@ public class ElasticsearchSearchSortFactoryImpl<SR>
 
 	@Override
 	public ElasticsearchSearchSortFactory<SR> withRoot(String objectFieldPath) {
-		return new ElasticsearchSearchSortFactoryImpl<SR>( dslContext.rescope(
+		return new ElasticsearchSearchSortFactoryImpl<>( dslContext.rescope(
 				dslContext.scope().withRoot( objectFieldPath ),
 				dslContext.predicateFactory().withRoot( objectFieldPath ) ) );
 	}
@@ -48,6 +48,6 @@ public class ElasticsearchSearchSortFactoryImpl<SR>
 	}
 
 	private SortThenStep<SR> staticThenStep(ElasticsearchSearchSort sort) {
-		return new StaticSortThenStep<SR>( dslContext, sort );
+		return new StaticSortThenStep<>( dslContext, sort );
 	}
 }

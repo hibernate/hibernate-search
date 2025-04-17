@@ -124,7 +124,7 @@ public class StubSearchIndexScope
 
 	@Override
 	public <SR> SearchAggregationFactory<SR> aggregationFactory() {
-		return new StubSearchAggregationFactory<SR>( SearchAggregationDslContext.root( this, predicateFactory() ) );
+		return new StubSearchAggregationFactory<>( SearchAggregationDslContext.root( this, predicateFactory() ) );
 	}
 
 	@Override

@@ -33,6 +33,7 @@ public interface RangePredicateMatchingStep<N extends RangePredicateOptionsStep<
 	 * See {@link ValueModel#MAPPING} for more information.
 	 * @return The next step.
 	 */
+	@Override
 	default N between(Object lowerBound, Object upperBound) {
 		return between( lowerBound, upperBound, ValueModel.MAPPING );
 	}
@@ -99,6 +100,7 @@ public interface RangePredicateMatchingStep<N extends RangePredicateOptionsStep<
 	 * @param upperBoundInclusion Whether the upper bound is included in the range or excluded.
 	 * @return The next step.
 	 */
+	@Override
 	default N between(Object lowerBound, RangeBoundInclusion lowerBoundInclusion,
 			Object upperBound, RangeBoundInclusion upperBoundInclusion) {
 		return within( Range.between( lowerBound, lowerBoundInclusion, upperBound, upperBoundInclusion ) );
@@ -114,6 +116,7 @@ public interface RangePredicateMatchingStep<N extends RangePredicateOptionsStep<
 	 * See {@link ValueModel#MAPPING} for more information.
 	 * @return The next step.
 	 */
+	@Override
 	default N atLeast(Object lowerBoundValue) {
 		return atLeast( lowerBoundValue, ValueModel.MAPPING );
 	}
@@ -165,6 +168,7 @@ public interface RangePredicateMatchingStep<N extends RangePredicateOptionsStep<
 	 * See {@link ValueModel#MAPPING} for more information.
 	 * @return The next step.
 	 */
+	@Override
 	default N greaterThan(Object lowerBoundValue) {
 		return greaterThan( lowerBoundValue, ValueModel.MAPPING );
 	}
@@ -216,6 +220,7 @@ public interface RangePredicateMatchingStep<N extends RangePredicateOptionsStep<
 	 * See {@link ValueModel#MAPPING} for more information.
 	 * @return The next step.
 	 */
+	@Override
 	default N atMost(Object upperBoundValue) {
 		return atMost( upperBoundValue, ValueModel.MAPPING );
 	}
@@ -267,6 +272,7 @@ public interface RangePredicateMatchingStep<N extends RangePredicateOptionsStep<
 	 * See {@link ValueModel#MAPPING} for more information.
 	 * @return The next step.
 	 */
+	@Override
 	default N lessThan(Object upperBoundValue) {
 		return lessThan( upperBoundValue, ValueModel.MAPPING );
 	}
@@ -394,6 +400,7 @@ public interface RangePredicateMatchingStep<N extends RangePredicateOptionsStep<
 	 * See {@link ValueModel#MAPPING} for more information.
 	 * @return The next step.
 	 */
+	@Override
 	default N withinAny(Range<?>... ranges) {
 		return withinAny( Arrays.asList( ranges ) );
 	}
@@ -407,6 +414,7 @@ public interface RangePredicateMatchingStep<N extends RangePredicateOptionsStep<
 	 * See {@link ValueModel#MAPPING} for more information.
 	 * @return The next step.
 	 */
+	@Override
 	default N withinAny(Collection<? extends Range<?>> ranges) {
 		return withinAny( ranges, ValueModel.MAPPING );
 	}
@@ -441,5 +449,6 @@ public interface RangePredicateMatchingStep<N extends RangePredicateOptionsStep<
 	 * See {@link ValueModel} for more information.
 	 * @return The next step.
 	 */
+	@Override
 	N withinAny(Collection<? extends Range<?>> ranges, ValueModel valueModel);
 }

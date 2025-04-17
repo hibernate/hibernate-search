@@ -462,7 +462,7 @@ class SearchPredicateIT {
 		@Override
 		public Optional<MyExtendedFactory<SR>> extendOptional(SearchPredicateFactory<SR> original) {
 			assertThat( original ).isNotNull();
-			return Optional.of( new MyExtendedFactory<SR>( original ) );
+			return Optional.of( new MyExtendedFactory<>( original ) );
 		}
 	}
 

@@ -40,7 +40,7 @@ class PhrasePredicateFieldMoreStepImpl<SR>
 
 	@Override
 	public PhrasePredicateFieldMoreStepImpl<SR> fields(String... fieldPaths) {
-		return new PhrasePredicateFieldMoreStepImpl<SR>( commonState, Arrays.asList( fieldPaths ) );
+		return new PhrasePredicateFieldMoreStepImpl<>( commonState, Arrays.asList( fieldPaths ) );
 	}
 
 	@Override

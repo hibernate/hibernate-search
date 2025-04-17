@@ -560,6 +560,7 @@ class RangePredicateBaseIT {
 			return f.range().field( field0Path ).field( field1Path ).within( rangeParam, valueModel );
 		}
 
+		@SuppressWarnings("removal")
 		@Deprecated(since = "test")
 		@Override
 		protected PredicateFinalStep predicate(SearchPredicateFactory<?> f, String fieldPath, Range<?> matchingParam,
@@ -567,6 +568,7 @@ class RangePredicateBaseIT {
 			return f.range().field( fieldPath ).within( matchingParam, valueConvert );
 		}
 
+		@SuppressWarnings("removal")
 		@Deprecated(since = "test")
 		@Override
 		protected PredicateFinalStep predicate(SearchPredicateFactory<?> f, String field0Path, String field1Path,

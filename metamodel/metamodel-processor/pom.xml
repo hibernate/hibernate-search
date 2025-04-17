@@ -71,19 +71,6 @@
         <plugins>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-compiler-plugin</artifactId>
-                <executions>
-                    <execution>
-                        <id>default-compile</id>
-                        <configuration>
-                            <proc>none</proc>
-                            <annotationProcessorPaths combine.self="override"></annotationProcessorPaths>
-                        </configuration>
-                    </execution>
-                </executions>
-            </plugin>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-dependency-plugin</artifactId>
                 <executions>
                     <execution>
@@ -110,4 +97,47 @@
             </plugin>
         </plugins>
     </build>
+    <profiles>
+        <profile>
+            <!--
+                Eclipse compiler attempts to apply the annotation processor from this module to itself ?!
+                > ReportGeneratorRules.java: Internal compiler error: java.util.ServiceConfigurationError: javax.annotation.processing.Processor:
+                > Provider org.hibernate.search.build.report.loggers.LoggerCategoriesProcessor not found at java.base/java.util.ServiceLoader.fail(ServiceLoader.java:593)
+            -->
+            <id>compiler-eclipse</id>
+            <build>
+                <pluginManagement>
+                    <plugins>
+                        <plugin>
+                            <groupId>org.apache.maven.plugins</groupId>
+                            <artifactId>maven-compiler-plugin</artifactId>
+                            <executions>
+                                <execution>
+                                    <id>default-compile</id>
+                                    <configuration combine.self="override">
+                                        <proc>none</proc>
+                                        <fork>false</fork>
+                                    </configuration>
+                                </execution>
+                                <execution>
+                                    <id>default-testCompile</id>
+                                    <configuration combine.self="override">
+                                        <proc>none</proc>
+                                        <fork>false</fork>
+                                    </configuration>
+                                </execution>
+                                <execution>
+                                    <id>noparameters-testCompile</id>
+                                    <configuration combine.self="override">
+                                        <proc>none</proc>
+                                        <fork>false</fork>
+                                    </configuration>
+                                </execution>
+                            </executions>
+                        </plugin>
+                    </plugins>
+                </pluginManagement>
+            </build>
+        </profile>
+    </profiles>
 </project>

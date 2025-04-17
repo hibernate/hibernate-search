@@ -30,7 +30,7 @@ public class ElasticsearchSearchAggregationFactoryImpl<SR>
 
 	@Override
 	public ElasticsearchSearchAggregationFactory<SR> withRoot(String objectFieldPath) {
-		return new ElasticsearchSearchAggregationFactoryImpl<SR>( dslContext.rescope(
+		return new ElasticsearchSearchAggregationFactoryImpl<>( dslContext.rescope(
 				dslContext.scope().withRoot( objectFieldPath ),
 				dslContext.predicateFactory().withRoot( objectFieldPath ) ) );
 	}

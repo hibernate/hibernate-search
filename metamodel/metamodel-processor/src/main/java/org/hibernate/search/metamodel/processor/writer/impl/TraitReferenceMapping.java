@@ -38,6 +38,10 @@ import org.hibernate.search.engine.search.reference.sort.DistanceSortFieldRefere
 import org.hibernate.search.engine.search.reference.sort.FieldSortFieldReference;
 
 class TraitReferenceMapping {
+	private static final String EXTRA_PROPERTY_PREDICATE_TYPE = "predicateType";
+	private static final String EXTRA_PROPERTY_AGGREGATION_TYPE = "aggregationType";
+	private static final String EXTRA_PROPERTY_PROJECTION_TYPE = "projectionType";
+	private static final String EXTRA_PROPERTY_SORT_TYPE = "sortType";
 	private final Map<String, TraitReferenceDetails> traits;
 
 	private TraitReferenceMapping() {
@@ -46,23 +50,27 @@ class TraitReferenceMapping {
 		traits.put( IndexFieldTraits.Predicates.EXISTS,
 				new TraitReferenceDetails( ExistsPredicateFieldReference.class, "P0", TraitKind.UNTYPED ) );
 		traits.put( IndexFieldTraits.Predicates.KNN,
-				new TraitReferenceDetails( KnnPredicateFieldReference.class, "P1", TraitKind.TYPED_INPUT, "predicateType" ) );
+				new TraitReferenceDetails( KnnPredicateFieldReference.class, "P1", TraitKind.TYPED_INPUT,
+						EXTRA_PROPERTY_PREDICATE_TYPE ) );
 		traits.put( IndexFieldTraits.Predicates.MATCH,
-				new TraitReferenceDetails( MatchPredicateFieldReference.class, "P2", TraitKind.TYPED_INPUT, "predicateType" ) );
+				new TraitReferenceDetails( MatchPredicateFieldReference.class, "P2", TraitKind.TYPED_INPUT,
+						EXTRA_PROPERTY_PREDICATE_TYPE ) );
 		traits.put( IndexFieldTraits.Predicates.NESTED,
 				new TraitReferenceDetails( NestedPredicateFieldReference.class, "P3", TraitKind.UNTYPED ) );
 		traits.put( IndexFieldTraits.Predicates.PHRASE, new TraitReferenceDetails( PhrasePredicateFieldReference.class, "P4",
-				TraitKind.TYPED_INPUT, "predicateType" ) );
+				TraitKind.TYPED_INPUT, EXTRA_PROPERTY_PREDICATE_TYPE
+		) );
 		traits.put( IndexFieldTraits.Predicates.PREFIX,
 				new TraitReferenceDetails( PrefixPredicateFieldReference.class, "P5", TraitKind.UNTYPED ) );
 		traits.put( IndexFieldTraits.Predicates.RANGE,
-				new TraitReferenceDetails( RangePredicateFieldReference.class, "P6", TraitKind.TYPED_INPUT, "predicateType" ) );
+				new TraitReferenceDetails( RangePredicateFieldReference.class, "P6", TraitKind.TYPED_INPUT,
+						EXTRA_PROPERTY_PREDICATE_TYPE ) );
 		traits.put( IndexFieldTraits.Predicates.QUERY_STRING, new TraitReferenceDetails(
-				QueryStringPredicateFieldReference.class, "P7", TraitKind.TYPED_INPUT, "predicateType" ) );
+				QueryStringPredicateFieldReference.class, "P7", TraitKind.TYPED_INPUT, EXTRA_PROPERTY_PREDICATE_TYPE ) );
 		traits.put( IndexFieldTraits.Predicates.REGEXP,
 				new TraitReferenceDetails( RegexpPredicateFieldReference.class, "P8", TraitKind.UNTYPED ) );
 		traits.put( IndexFieldTraits.Predicates.SIMPLE_QUERY_STRING, new TraitReferenceDetails(
-				SimpleQueryStringPredicateFieldReference.class, "P9", TraitKind.TYPED_INPUT, "predicateType" ) );
+				SimpleQueryStringPredicateFieldReference.class, "P9", TraitKind.TYPED_INPUT, EXTRA_PROPERTY_PREDICATE_TYPE ) );
 		traits.put( IndexFieldTraits.Predicates.SPATIAL_WITHIN_BOUNDING_BOX,
 				new TraitReferenceDetails( SpatialPredicateFieldReference.class, "P10", TraitKind.UNTYPED ) );
 		traits.put( IndexFieldTraits.Predicates.SPATIAL_WITHIN_CIRCLE,
@@ -77,13 +85,15 @@ class TraitReferenceMapping {
 		traits.put( IndexFieldTraits.Sorts.DISTANCE,
 				new TraitReferenceDetails( DistanceSortFieldReference.class, "S0", TraitKind.UNTYPED ) );
 		traits.put( IndexFieldTraits.Sorts.FIELD,
-				new TraitReferenceDetails( FieldSortFieldReference.class, "S1", TraitKind.TYPED_INPUT, "sortType" ) );
+				new TraitReferenceDetails( FieldSortFieldReference.class, "S1", TraitKind.TYPED_INPUT,
+						EXTRA_PROPERTY_SORT_TYPE ) );
 
 
 		traits.put( IndexFieldTraits.Projections.DISTANCE,
 				new TraitReferenceDetails( DistanceProjectionFieldReference.class, "R0", TraitKind.UNTYPED ) );
 		traits.put( IndexFieldTraits.Projections.FIELD, new TraitReferenceDetails( FieldProjectionFieldReference.class, "R1",
-				TraitKind.TYPED_OUTPUT, "projectionType" ) );
+				TraitKind.TYPED_OUTPUT, EXTRA_PROPERTY_PROJECTION_TYPE
+		) );
 		traits.put( IndexFieldTraits.Projections.HIGHLIGHT,
 				new TraitReferenceDetails( HighlightProjectionFieldReference.class, "R2", TraitKind.UNTYPED ) );
 		traits.put( IndexFieldTraits.Projections.OBJECT,
@@ -92,21 +102,27 @@ class TraitReferenceMapping {
 		// TODO, can we really use output for the range agg ?
 		//  if not we should probably consider having different agg types, one that match inputs and other oputputs with different .aggregationType() in them.
 		traits.put( IndexFieldTraits.Aggregations.RANGE, new TraitReferenceDetails( RangeAggregationFieldReference.class, "A0",
-				TraitKind.TYPED_OUTPUT, "aggregationType" ) );
+				TraitKind.TYPED_OUTPUT, EXTRA_PROPERTY_AGGREGATION_TYPE
+		) );
 		traits.put( IndexFieldTraits.Aggregations.TERMS, new TraitReferenceDetails( TermsAggregationFieldReference.class, "A1",
-				TraitKind.TYPED_OUTPUT, "aggregationType" ) );
+				TraitKind.TYPED_OUTPUT, EXTRA_PROPERTY_AGGREGATION_TYPE
+		) );
 		traits.put( IndexFieldTraits.Aggregations.SUM, new TraitReferenceDetails( SumAggregationFieldReference.class, "A2",
-				TraitKind.TYPED_OUTPUT, "aggregationType" ) );
+				TraitKind.TYPED_OUTPUT, EXTRA_PROPERTY_AGGREGATION_TYPE
+		) );
 		traits.put( IndexFieldTraits.Aggregations.MIN, new TraitReferenceDetails( MinAggregationFieldReference.class, "A3",
-				TraitKind.TYPED_OUTPUT, "aggregationType" ) );
+				TraitKind.TYPED_OUTPUT, EXTRA_PROPERTY_AGGREGATION_TYPE
+		) );
 		traits.put( IndexFieldTraits.Aggregations.MAX, new TraitReferenceDetails( MaxAggregationFieldReference.class, "A4",
-				TraitKind.TYPED_OUTPUT, "aggregationType" ) );
+				TraitKind.TYPED_OUTPUT, EXTRA_PROPERTY_AGGREGATION_TYPE
+		) );
 		traits.put( IndexFieldTraits.Aggregations.COUNT,
 				new TraitReferenceDetails( CountAggregationFieldReference.class, "A5", TraitKind.UNTYPED ) );
 		traits.put( IndexFieldTraits.Aggregations.COUNT_DISTINCT,
 				new TraitReferenceDetails( CountDistinctAggregationFieldReference.class, "A6", TraitKind.UNTYPED ) );
 		traits.put( IndexFieldTraits.Aggregations.AVG, new TraitReferenceDetails( AvgAggregationFieldReference.class, "A7",
-				TraitKind.TYPED_OUTPUT, "aggregationType" ) );
+				TraitKind.TYPED_OUTPUT, EXTRA_PROPERTY_AGGREGATION_TYPE
+		) );
 
 		this.traits = Collections.unmodifiableMap( traits );
 	}

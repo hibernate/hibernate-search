@@ -17,6 +17,7 @@ import org.hibernate.search.engine.backend.types.VectorSimilarity;
 import org.hibernate.search.engine.backend.types.dsl.IndexFieldTypeFinalStep;
 import org.hibernate.search.engine.backend.types.dsl.VectorFieldTypeOptionsStep;
 import org.hibernate.search.mapper.pojo.bridge.binding.PropertyBindingContext;
+import org.hibernate.search.mapper.pojo.extractor.mapping.annotation.ContainerExtract;
 import org.hibernate.search.mapper.pojo.extractor.mapping.programmatic.ContainerExtractorPath;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.AnnotationDefaultValues;
 import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.PropertyMappingFieldOptionsStep;
@@ -118,24 +119,26 @@ class ProcessorVectorFieldProcessor extends AbstractProcessorFieldAnnotationProc
 		return Optional.of( optionsStep );
 	}
 
+	@Override
 	protected ContainerExtractorPath toContainerExtractorPath(AnnotationMirror extraction,
 			ProcessorAnnotationProcessorContext context) {
 		if ( extraction == null ) {
 			return ContainerExtractorPath.noExtractors();
 		}
-		return toContainerExtractorPath( extraction, "NO", context );
+		return toContainerExtractorPath( extraction, ContainerExtract.NO.name(), context );
 	}
 
 	protected VectorSimilarity getVectorSimilarity(AnnotationMirror annotation) {
-		return VectorSimilarity.valueOf( getAnnotationValueAsString( annotation, "vectorSimilarity", "DEFAULT" ) );
+		return VectorSimilarity
+				.valueOf( getAnnotationValueAsString( annotation, "vectorSimilarity", VectorSimilarity.DEFAULT.name() ) );
 	}
 
 	protected Searchable getSearchable(AnnotationMirror annotation) {
-		return Searchable.valueOf( getAnnotationValueAsString( annotation, "searchable", "DEFAULT" ) );
+		return Searchable.valueOf( getAnnotationValueAsString( annotation, "searchable", Searchable.DEFAULT.name() ) );
 	}
 
 	protected Projectable getProjectable(AnnotationMirror annotation) {
-		return Projectable.valueOf( getAnnotationValueAsString( annotation, "projectable", "DEFAULT" ) );
+		return Projectable.valueOf( getAnnotationValueAsString( annotation, "projectable", Projectable.DEFAULT.name() ) );
 	}
 
 	protected String getIndexNullAs(AnnotationMirror annotation) {

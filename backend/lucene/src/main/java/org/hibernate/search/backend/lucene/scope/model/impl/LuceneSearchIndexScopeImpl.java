@@ -168,7 +168,7 @@ public final class LuceneSearchIndexScopeImpl
 
 	@Override
 	public <SR> LuceneSearchSortFactory<SR> sortFactory() {
-		return new LuceneSearchSortFactoryImpl<SR>( SearchSortDslContext
+		return new LuceneSearchSortFactoryImpl<>( SearchSortDslContext
 				.root( this, LuceneSearchSortFactoryImpl::new, predicateFactory() ) );
 	}
 
@@ -179,7 +179,7 @@ public final class LuceneSearchIndexScopeImpl
 
 	@Override
 	public <SR> LuceneSearchAggregationFactory<SR> aggregationFactory() {
-		return new LuceneSearchAggregationFactoryImpl<SR>( SearchAggregationDslContext.root( this, predicateFactory() ) );
+		return new LuceneSearchAggregationFactoryImpl<>( SearchAggregationDslContext.root( this, predicateFactory() ) );
 	}
 
 	@Override

@@ -26,7 +26,7 @@ public class LuceneSearchPredicateFactoryImpl<SR>
 
 	@Override
 	public LuceneSearchPredicateFactory<SR> withRoot(String objectFieldPath) {
-		return new LuceneSearchPredicateFactoryImpl<SR>( dslContext.rescope(
+		return new LuceneSearchPredicateFactoryImpl<>( dslContext.rescope(
 				dslContext.scope().withRoot( objectFieldPath ) ) );
 	}
 

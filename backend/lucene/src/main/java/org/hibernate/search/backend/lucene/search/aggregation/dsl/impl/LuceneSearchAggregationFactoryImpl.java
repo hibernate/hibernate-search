@@ -27,7 +27,7 @@ public class LuceneSearchAggregationFactoryImpl<SR>
 
 	@Override
 	public LuceneSearchAggregationFactory<SR> withRoot(String objectFieldPath) {
-		return new LuceneSearchAggregationFactoryImpl<SR>( dslContext.rescope(
+		return new LuceneSearchAggregationFactoryImpl<>( dslContext.rescope(
 				dslContext.scope().withRoot( objectFieldPath ),
 				dslContext.predicateFactory().withRoot( objectFieldPath ) ) );
 	}

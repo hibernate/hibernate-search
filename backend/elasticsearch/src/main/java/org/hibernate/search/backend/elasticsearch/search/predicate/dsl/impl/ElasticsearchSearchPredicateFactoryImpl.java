@@ -27,7 +27,7 @@ public class ElasticsearchSearchPredicateFactoryImpl<SR>
 
 	@Override
 	public ElasticsearchSearchPredicateFactory<SR> withRoot(String objectFieldPath) {
-		return new ElasticsearchSearchPredicateFactoryImpl<SR>( dslContext.rescope(
+		return new ElasticsearchSearchPredicateFactoryImpl<>( dslContext.rescope(
 				dslContext.scope().withRoot( objectFieldPath ) ) );
 	}
 

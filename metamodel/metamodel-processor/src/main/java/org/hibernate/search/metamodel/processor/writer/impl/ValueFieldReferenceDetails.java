@@ -86,7 +86,7 @@ record ValueFieldReferenceDetails(TypedFieldReferenceDetails typedField) {
 
 	public String constructorCall(String name, String scopeType, String inputType, String outputType, String indexType,
 			String rawType) {
-		return "new " + name() + "<>(\"" + name + "\", " + scopeType + ".class, " + inputType + ".class, " + outputType
-				+ ".class, " + indexType + ".class, " + rawType + ".class);";
+		return String.format( Locale.ROOT, "new %s<>(\"%s\", %s.class, %s.class, %s.class, %s.class, %s.class);", name(), name,
+				scopeType, inputType, outputType, indexType, rawType );
 	}
 }
