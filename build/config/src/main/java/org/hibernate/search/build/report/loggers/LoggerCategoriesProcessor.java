@@ -47,6 +47,7 @@ public class LoggerCategoriesProcessor extends AbstractProcessor {
 	private final Map<String, String> categories = new TreeMap<>();
 	private final Map<String, Set<String>> categoryLevels = new TreeMap<>();
 	private String moduleName;
+	private boolean enabled;
 
 	@Override
 	public synchronized void init(ProcessingEnvironment processingEnv) {
@@ -54,11 +55,6 @@ public class LoggerCategoriesProcessor extends AbstractProcessor {
 		messager = processingEnv.getMessager();
 
 		moduleName = processingEnv.getOptions().get( Configuration.MODULE_NAME );
-		if ( moduleName == null || moduleName.isBlank() ) {
-			throw new IllegalArgumentException(
-					"Module name cannot be null nor blank. Specify the %s annotation processor argument to define the module name"
-							.formatted( Configuration.MODULE_NAME ) );
-		}
 	}
 
 	@Override
@@ -118,6 +114,11 @@ public class LoggerCategoriesProcessor extends AbstractProcessor {
 						writer.write( "# This Hibernate Search module does not use any logging categories.\n" );
 					}
 					else {
+						if ( moduleName == null || moduleName.isBlank() ) {
+							throw new IllegalArgumentException(
+									"Module name cannot be null nor blank. Specify the %s annotation processor argument to define the module name"
+											.formatted( Configuration.MODULE_NAME ) );
+						}
 						Map<String, Object> data = new LinkedHashMap<>();
 						data.put( ReportConstants.MODULE_NAME, moduleName );
 						data.put( ReportConstants.CATEGORIES, toYamlCategories( categories, categoryLevels ) );

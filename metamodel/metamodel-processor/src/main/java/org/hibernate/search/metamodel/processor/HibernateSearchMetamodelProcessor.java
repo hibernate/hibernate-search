@@ -14,18 +14,23 @@ import javax.annotation.processing.SupportedAnnotationTypes;
 import javax.annotation.processing.SupportedOptions;
 import javax.lang.model.SourceVersion;
 import javax.lang.model.element.TypeElement;
+import javax.tools.Diagnostic;
 
 import org.hibernate.search.metamodel.processor.impl.HibernateSearchMetamodelProcessorContext;
 import org.hibernate.search.metamodel.processor.impl.IndexedEntityMetamodelAnnotationProcessor;
 import org.hibernate.search.metamodel.processor.impl.MetamodelAnnotationProcessor;
+import org.hibernate.search.util.common.annotation.impl.SuppressForbiddenApis;
 
 // We inspect all annotations and then decide if we can process them,
 // this way we can also work with user-defined ones (at some point):
 @SupportedAnnotationTypes("*")
 // Currently this is more of a placeholder for future config options:
-@SupportedOptions({ HibernateSearchMetamodelProcessorSettings.ADD_GENERATED_ANNOTATION })
+@SupportedOptions({
+		HibernateSearchMetamodelProcessorSettings.ADD_GENERATED_ANNOTATION,
+		HibernateSearchMetamodelProcessorSettings.BACKEND_VERSION })
 @org.hibernate.search.util.common.annotation.impl.SuppressJQAssistant(
 		reason = "JQAssistant has issue with detecting that getSupportedSourceVersion is an overridden method.")
+@SuppressForbiddenApis(reason = "!")
 public class HibernateSearchMetamodelProcessor extends AbstractProcessor {
 
 	private HibernateSearchMetamodelProcessorContext context;
@@ -33,11 +38,17 @@ public class HibernateSearchMetamodelProcessor extends AbstractProcessor {
 
 	@Override
 	public synchronized void init(ProcessingEnvironment processingEnv) {
-		super.init( processingEnv );
-		context = new HibernateSearchMetamodelProcessorContext( processingEnv.getElementUtils(), processingEnv.getTypeUtils(),
-				processingEnv.getMessager(), processingEnv.getFiler(),
-				new HibernateSearchMetamodelProcessorSettings.Configuration( processingEnv.getOptions() ) );
-		processors = List.of( new IndexedEntityMetamodelAnnotationProcessor( context ) );
+		try {
+			super.init( processingEnv );
+			context =
+					new HibernateSearchMetamodelProcessorContext( processingEnv.getElementUtils(), processingEnv.getTypeUtils(),
+							processingEnv.getMessager(), processingEnv.getFiler(),
+							new HibernateSearchMetamodelProcessorSettings.Configuration( processingEnv.getOptions() ) );
+			processors = List.of( new IndexedEntityMetamodelAnnotationProcessor( context ) );
+		}
+		catch (Throwable e) {
+			e.printStackTrace( System.err );
+		}
 	}
 
 	@Override
@@ -48,7 +59,13 @@ public class HibernateSearchMetamodelProcessor extends AbstractProcessor {
 	@Override
 	public boolean process(Set<? extends TypeElement> annotations, RoundEnvironment roundEnv) {
 		for ( MetamodelAnnotationProcessor processor : processors ) {
-			processor.process( roundEnv );
+			try {
+				processor.process( roundEnv );
+			}
+			catch (Throwable e) {
+				e.printStackTrace( System.err );
+				context.messager().printMessage( Diagnostic.Kind.ERROR, e.getMessage() );
+			}
 		}
 		return false;
 	}
