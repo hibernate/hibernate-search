@@ -239,7 +239,7 @@ public abstract class AbstractSearchPredicateFactory<
 	@Override
 	public KnnPredicateFieldStep<SR> knn(int k) {
 		Contracts.assertStrictlyPositive( k, "k" );
-		return new KnnPredicateFieldStepImpl<SR>( this, dslContext, k );
+		return new KnnPredicateFieldStepImpl<>( this, dslContext, k );
 	}
 
 	@Override
@@ -254,7 +254,7 @@ public abstract class AbstractSearchPredicateFactory<
 
 	@Override
 	public SearchPredicateFactoryExtensionIfSupportedStep<SR> extension() {
-		return new SearchPredicateFactoryExtensionStep<SR>( this );
+		return new SearchPredicateFactoryExtensionStep<>( this );
 	}
 
 	@Override

@@ -29,7 +29,7 @@ public class LuceneSearchSortFactoryImpl<SR>
 
 	@Override
 	public LuceneSearchSortFactory<SR> withRoot(String objectFieldPath) {
-		return new LuceneSearchSortFactoryImpl<SR>( dslContext.rescope(
+		return new LuceneSearchSortFactoryImpl<>( dslContext.rescope(
 				dslContext.scope().withRoot( objectFieldPath ),
 				dslContext.predicateFactory().withRoot( objectFieldPath ) ) );
 	}

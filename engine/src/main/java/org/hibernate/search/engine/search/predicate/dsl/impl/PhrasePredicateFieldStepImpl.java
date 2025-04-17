@@ -16,11 +16,11 @@ public final class PhrasePredicateFieldStepImpl<SR>
 	private final PhrasePredicateFieldMoreStepImpl.CommonState<SR> commonState;
 
 	public PhrasePredicateFieldStepImpl(SearchPredicateDslContext<?> dslContext) {
-		this.commonState = new PhrasePredicateFieldMoreStepImpl.CommonState<SR>( dslContext );
+		this.commonState = new PhrasePredicateFieldMoreStepImpl.CommonState<>( dslContext );
 	}
 
 	@Override
 	public PhrasePredicateFieldMoreStep<SR, ?, ?> fields(String... fieldPaths) {
-		return new PhrasePredicateFieldMoreStepImpl<SR>( commonState, Arrays.asList( fieldPaths ) );
+		return new PhrasePredicateFieldMoreStepImpl<>( commonState, Arrays.asList( fieldPaths ) );
 	}
 }

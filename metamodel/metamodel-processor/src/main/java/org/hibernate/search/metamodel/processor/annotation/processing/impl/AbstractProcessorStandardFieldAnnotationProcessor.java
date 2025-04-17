@@ -33,11 +33,11 @@ abstract class AbstractProcessorStandardFieldAnnotationProcessor extends Abstrac
 	}
 
 	protected Searchable getSearchable(AnnotationMirror annotation) {
-		return Searchable.valueOf( getAnnotationValueAsString( annotation, "searchable", "DEFAULT" ) );
+		return Searchable.valueOf( getAnnotationValueAsString( annotation, "searchable", Searchable.DEFAULT.name() ) );
 	}
 
 	protected Projectable getProjectable(AnnotationMirror annotation) {
-		return Projectable.valueOf( getAnnotationValueAsString( annotation, "projectable", "DEFAULT" ) );
+		return Projectable.valueOf( getAnnotationValueAsString( annotation, "projectable", Projectable.DEFAULT.name() ) );
 	}
 
 	abstract PropertyMappingStandardFieldOptionsStep<?> initStandardFieldMappingContext(

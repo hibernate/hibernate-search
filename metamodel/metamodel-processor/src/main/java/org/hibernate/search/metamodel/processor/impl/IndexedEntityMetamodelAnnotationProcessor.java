@@ -155,15 +155,13 @@ public class IndexedEntityMetamodelAnnotationProcessor implements MetamodelAnnot
 		}
 
 		flattenedAnnotations( ctx.types(), typeElement )
-				.forEach( annotationMirror -> {
-					ProcessorTypeMappingAnnotationProcessor.processor( annotationMirror )
-							.ifPresent( p -> p.process(
-									typeMappingContext,
-									annotationMirror,
-									typeElement,
-									ctx
-							) );
-				} );
+				.forEach( annotationMirror -> ProcessorTypeMappingAnnotationProcessor.processor( annotationMirror )
+						.ifPresent( p -> p.process(
+								typeMappingContext,
+								annotationMirror,
+								typeElement,
+								ctx
+						) ) );
 
 		AtomicReference<PropertyMappingStep> documentId = new AtomicReference<>();
 		AtomicReference<PropertyMappingStep> ormId = new AtomicReference<>();

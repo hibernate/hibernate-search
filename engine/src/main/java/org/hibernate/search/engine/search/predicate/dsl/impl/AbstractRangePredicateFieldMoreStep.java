@@ -10,7 +10,6 @@ import java.util.Collection;
 import java.util.List;
 import java.util.function.Consumer;
 import java.util.function.Function;
-import java.util.stream.Collectors;
 
 import org.hibernate.search.engine.logging.impl.QueryLog;
 import org.hibernate.search.engine.reporting.spi.EventContexts;
@@ -43,7 +42,7 @@ abstract class AbstractRangePredicateFieldMoreStep<
 
 	private Float fieldSetBoost;
 
-	public static <SR> RangePredicateFieldMoreStepString<SR> create(
+	static <SR> RangePredicateFieldMoreStepString<SR> create(
 			SearchPredicateDslContext<?> dslContext, String[] fields) {
 		return new RangePredicateFieldMoreStepString<>(
 				dslContext,
@@ -51,7 +50,7 @@ abstract class AbstractRangePredicateFieldMoreStep<
 		);
 	}
 
-	public static <SR, T> RangePredicateFieldMoreStepReference<SR, T> create(
+	static <SR, T> RangePredicateFieldMoreStepReference<SR, T> create(
 			SearchPredicateDslContext<?> dslContext, RangePredicateFieldReference<? super SR, T>[] fields) {
 		List<RangePredicateFieldReference<? super SR, T>> fieldsList = Arrays.asList( fields );
 		return new RangePredicateFieldMoreStepReference<>(
@@ -282,7 +281,7 @@ abstract class AbstractRangePredicateFieldMoreStep<
 			return EventContexts.fromIndexFieldAbsolutePaths(
 					getFieldSetStates().stream().flatMap( f -> f.fields.stream() )
 							.map( this::fieldPath )
-							.collect( Collectors.toList() )
+							.toList()
 			);
 		}
 	}

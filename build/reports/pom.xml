@@ -150,22 +150,6 @@
         </dependency>
         <dependency>
             <groupId>org.hibernate.search</groupId>
-            <artifactId>hibernate-search-integrationtest-metamodel-standalone-lucene</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.hibernate.search</groupId>
-            <artifactId>hibernate-search-integrationtest-metamodel-standalone-elasticsearch</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.hibernate.search</groupId>
-            <artifactId>hibernate-search-integrationtest-metamodel-orm-lucene</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.hibernate.search</groupId>
-            <artifactId>hibernate-search-integrationtest-metamodel-orm-elasticsearch</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.hibernate.search</groupId>
             <artifactId>hibernate-search-documentation</artifactId>
             <scope>test</scope>
         </dependency>
@@ -262,6 +246,35 @@
                     </plugin>
                 </plugins>
             </build>
+        </profile>
+        <profile>
+            <id>metamodelITs</id>
+            <activation>
+                <!-- Hack to activate by default, except when explicitly disabled -->
+                <jdk>[17,)</jdk>
+            </activation>
+            <dependencies>
+                <dependency>
+                    <groupId>org.hibernate.search</groupId>
+                    <artifactId>hibernate-search-integrationtest-metamodel-standalone-lucene</artifactId>
+                    <scope>test</scope>
+                </dependency>
+                <dependency>
+                    <groupId>org.hibernate.search</groupId>
+                    <artifactId>hibernate-search-integrationtest-metamodel-standalone-elasticsearch</artifactId>
+                    <scope>test</scope>
+                </dependency>
+                <dependency>
+                    <groupId>org.hibernate.search</groupId>
+                    <artifactId>hibernate-search-integrationtest-metamodel-orm-lucene</artifactId>
+                    <scope>test</scope>
+                </dependency>
+                <dependency>
+                    <groupId>org.hibernate.search</groupId>
+                    <artifactId>hibernate-search-integrationtest-metamodel-orm-elasticsearch</artifactId>
+                    <scope>test</scope>
+                </dependency>
+            </dependencies>
         </profile>
         <profile>
             <!--
