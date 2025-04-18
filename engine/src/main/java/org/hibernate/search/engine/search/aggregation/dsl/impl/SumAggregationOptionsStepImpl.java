@@ -14,19 +14,19 @@ import org.hibernate.search.engine.search.predicate.SearchPredicate;
 import org.hibernate.search.engine.search.predicate.dsl.PredicateFinalStep;
 import org.hibernate.search.engine.search.predicate.dsl.SearchPredicateFactory;
 
-class SumAggregationOptionsStepImpl<PDF extends SearchPredicateFactory, F>
-		implements SumAggregationOptionsStep<SumAggregationOptionsStepImpl<PDF, F>, PDF, F> {
+class SumAggregationOptionsStepImpl<SR, PDF extends SearchPredicateFactory<SR>, F>
+		implements SumAggregationOptionsStep<SR, SumAggregationOptionsStepImpl<SR, PDF, F>, PDF, F> {
 	private final FieldMetricAggregationBuilder<F> builder;
-	private final SearchAggregationDslContext<?, ? extends PDF> dslContext;
+	private final SearchAggregationDslContext<SR, ?, ? extends PDF> dslContext;
 
 	SumAggregationOptionsStepImpl(FieldMetricAggregationBuilder<F> builder,
-			SearchAggregationDslContext<?, ? extends PDF> dslContext) {
+			SearchAggregationDslContext<SR, ?, ? extends PDF> dslContext) {
 		this.builder = builder;
 		this.dslContext = dslContext;
 	}
 
 	@Override
-	public SumAggregationOptionsStepImpl<PDF, F> filter(
+	public SumAggregationOptionsStepImpl<SR, PDF, F> filter(
 			Function<? super PDF, ? extends PredicateFinalStep> clauseContributor) {
 		SearchPredicate predicate = clauseContributor.apply( dslContext.predicateFactory() ).toPredicate();
 
@@ -34,7 +34,7 @@ class SumAggregationOptionsStepImpl<PDF extends SearchPredicateFactory, F>
 	}
 
 	@Override
-	public SumAggregationOptionsStepImpl<PDF, F> filter(SearchPredicate searchPredicate) {
+	public SumAggregationOptionsStepImpl<SR, PDF, F> filter(SearchPredicate searchPredicate) {
 		builder.filter( searchPredicate );
 		return this;
 	}

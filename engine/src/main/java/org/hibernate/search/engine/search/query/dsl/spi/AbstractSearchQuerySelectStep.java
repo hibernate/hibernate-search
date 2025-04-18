@@ -15,16 +15,17 @@ import org.hibernate.search.engine.search.query.dsl.SearchQuerySelectStep;
 import org.hibernate.search.engine.search.query.spi.SearchQueryIndexScope;
 
 public abstract class AbstractSearchQuerySelectStep<
-		N extends SearchQueryOptionsStep<?, E, LOS, ?, ?>,
+		SR,
+		N extends SearchQueryOptionsStep<SR, ?, E, LOS, ?, ?>,
 		R,
 		E,
 		LOS,
-		PJF extends SearchProjectionFactory<R, E>,
-		PDF extends SearchPredicateFactory>
-		implements SearchQuerySelectStep<N, R, E, LOS, PJF, PDF> {
+		PJF extends SearchProjectionFactory<SR, R, E>,
+		PDF extends SearchPredicateFactory<SR>>
+		implements SearchQuerySelectStep<SR, N, R, E, LOS, PJF, PDF> {
 
 	@Override
-	public <T> T extension(SearchQueryDslExtension<T, R, E, LOS> extension) {
+	public <T> T extension(SearchQueryDslExtension<SR, T, R, E, LOS> extension) {
 		return DslExtensionState.returnIfSupported(
 				extension,
 				extension.extendOptional( this, scope(), sessionContext(), loadingContextBuilder() )

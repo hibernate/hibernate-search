@@ -11,10 +11,11 @@ package org.hibernate.search.engine.search.projection.dsl;
  * <strong>Warning:</strong> Generic parameters of this type are subject to change,
  * so this type should not be referenced directly in user code.
  *
+ * @param <SR> Scope root type.
  * @param <S> The self type, i.e. the exposed type of this factory.
  */
-public interface ExtendedSearchProjectionFactory<S extends ExtendedSearchProjectionFactory<?, R, E>, R, E>
-		extends SearchProjectionFactory<R, E> {
+public interface ExtendedSearchProjectionFactory<SR, S extends ExtendedSearchProjectionFactory<SR, ?, R, E>, R, E>
+		extends SearchProjectionFactory<SR, R, E> {
 
 	@Override
 	S withRoot(String objectFieldPath);

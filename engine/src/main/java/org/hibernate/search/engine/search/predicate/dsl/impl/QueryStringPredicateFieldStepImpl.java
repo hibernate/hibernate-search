@@ -10,8 +10,8 @@ import org.hibernate.search.engine.search.predicate.dsl.QueryStringPredicateFiel
 import org.hibernate.search.engine.search.predicate.dsl.QueryStringPredicateFieldStep;
 import org.hibernate.search.engine.search.predicate.dsl.spi.SearchPredicateDslContext;
 
-public final class QueryStringPredicateFieldStepImpl
-		implements QueryStringPredicateFieldStep<QueryStringPredicateFieldMoreStep<?, ?>> {
+public final class QueryStringPredicateFieldStepImpl<SR>
+		implements QueryStringPredicateFieldStep<SR, QueryStringPredicateFieldMoreStep<SR, ?, ?>> {
 
 	private final QueryStringPredicateFieldMoreStepImpl.CommonState commonState;
 
@@ -20,7 +20,7 @@ public final class QueryStringPredicateFieldStepImpl
 	}
 
 	@Override
-	public QueryStringPredicateFieldMoreStep<?, ?> fields(String... fieldPaths) {
-		return new QueryStringPredicateFieldMoreStepImpl( commonState, Arrays.asList( fieldPaths ) );
+	public QueryStringPredicateFieldMoreStep<SR, ?, ?> fields(String... fieldPaths) {
+		return new QueryStringPredicateFieldMoreStepImpl<SR>( commonState, Arrays.asList( fieldPaths ) );
 	}
 }

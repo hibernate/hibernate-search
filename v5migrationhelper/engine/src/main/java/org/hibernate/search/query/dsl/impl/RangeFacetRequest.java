@@ -32,10 +32,10 @@ public class RangeFacetRequest<T> extends FacetingRequestImpl<Map<Range<T>, Long
 	}
 
 	@Override
-	public AggregationFinalStep<Map<Range<T>, Long>> requestAggregation(SearchAggregationFactory factory) {
-		RangeAggregationRangeStep<?, ?, T> rangeStep = factory
+	public AggregationFinalStep<Map<Range<T>, Long>> requestAggregation(SearchAggregationFactory<?> factory) {
+		RangeAggregationRangeStep<?, ?, ?, T> rangeStep = factory
 				.range().field( getFieldName(), getFacetValueType() );
-		RangeAggregationRangeMoreStep<?, ?, ?, T> rangeMoreStep = null;
+		RangeAggregationRangeMoreStep<?, ?, ?, ?, T> rangeMoreStep = null;
 		for ( FacetRange<T> facetRange : facetRangeList ) {
 			rangeMoreStep = rangeStep.range( facetRange.range() );
 			rangeStep = rangeMoreStep;

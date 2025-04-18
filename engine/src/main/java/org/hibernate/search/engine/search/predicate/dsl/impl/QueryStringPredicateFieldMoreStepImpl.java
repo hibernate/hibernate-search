@@ -18,9 +18,9 @@ import org.hibernate.search.engine.search.predicate.dsl.spi.SearchPredicateDslCo
 import org.hibernate.search.engine.search.predicate.spi.CommonQueryStringPredicateBuilder;
 import org.hibernate.search.engine.search.predicate.spi.QueryStringPredicateBuilder;
 
-class QueryStringPredicateFieldMoreStepImpl
+class QueryStringPredicateFieldMoreStepImpl<SR>
 		implements
-		QueryStringPredicateFieldMoreStep<QueryStringPredicateFieldMoreStepImpl, QueryStringPredicateOptionsStep<?>> {
+		QueryStringPredicateFieldMoreStep<SR, QueryStringPredicateFieldMoreStepImpl<SR>, QueryStringPredicateOptionsStep<?>> {
 
 	private final CommonState commonState;
 
@@ -34,12 +34,12 @@ class QueryStringPredicateFieldMoreStepImpl
 	}
 
 	@Override
-	public QueryStringPredicateFieldMoreStepImpl fields(String... fieldPaths) {
-		return new QueryStringPredicateFieldMoreStepImpl( commonState, Arrays.asList( fieldPaths ) );
+	public QueryStringPredicateFieldMoreStepImpl<SR> fields(String... fieldPaths) {
+		return new QueryStringPredicateFieldMoreStepImpl<SR>( commonState, Arrays.asList( fieldPaths ) );
 	}
 
 	@Override
-	public QueryStringPredicateFieldMoreStepImpl boost(float boost) {
+	public QueryStringPredicateFieldMoreStepImpl<SR> boost(float boost) {
 		fieldStates.forEach( c -> c.boost( boost ) );
 		return this;
 	}

@@ -107,7 +107,7 @@ public abstract class AbstractPredicateSimpleAnalysisIT {
 				} );
 	}
 
-	protected abstract PredicateFinalStep predicate(SearchPredicateFactory f, String fieldPath, String matchingParam);
+	protected abstract PredicateFinalStep predicate(SearchPredicateFactory<?> f, String fieldPath, String matchingParam);
 
 	public static final class IndexBinding {
 		final SimpleFieldModel<String> analyzedStringField;

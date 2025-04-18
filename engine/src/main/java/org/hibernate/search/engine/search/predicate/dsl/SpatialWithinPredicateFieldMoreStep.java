@@ -4,6 +4,8 @@
  */
 package org.hibernate.search.engine.search.predicate.dsl;
 
+import org.hibernate.search.engine.search.reference.predicate.SpatialPredicateFieldReference;
+
 /**
  * The step in a "within" predicate definition where the area to match can be set
  * (see the superinterface {@link SpatialWithinPredicateAreaStep}),
@@ -14,7 +16,8 @@ package org.hibernate.search.engine.search.predicate.dsl;
  * @param <N> The type of the next step.
  */
 public interface SpatialWithinPredicateFieldMoreStep<
-		S extends SpatialWithinPredicateFieldMoreStep<?, N>,
+		SR,
+		S extends SpatialWithinPredicateFieldMoreStep<SR, ?, N>,
 		N extends SpatialWithinPredicateOptionsStep<?>>
 		extends SpatialWithinPredicateAreaStep<N>,
 		MultiFieldPredicateFieldBoostStep<S> {
@@ -49,4 +52,35 @@ public interface SpatialWithinPredicateFieldMoreStep<
 	 */
 	S fields(String... fieldPaths);
 
+	/**
+	 * Target the given field in the "within" predicate,
+	 * as an alternative to the already-targeted fields.
+	 * <p>
+	 * See {@link SpatialWithinPredicateFieldStep#field(String)} for more information on targeted fields.
+	 *
+	 * @param fieldReference The field reference representing a <a href="SearchPredicateFactory.html#field-paths">path</a> to the index field
+	 * to apply the predicate on.
+	 * @return The next step.
+	 *
+	 * @see SpatialWithinPredicateFieldStep#field(String)
+	 */
+	@SuppressWarnings("unchecked")
+	default S field(SpatialPredicateFieldReference<? super SR> fieldReference) {
+		return fields( fieldReference );
+	}
+
+	/**
+	 * Target the given fields in the "within" predicate,
+	 * as an alternative to the already-targeted fields.
+	 * <p>
+	 * See {@link SpatialWithinPredicateFieldStep#fields(String...)} for more information on targeted fields.
+	 *
+	 * @param fieldReferences The field references representing <a href="SearchPredicateFactory.html#field-paths">paths</a> to the index fields
+	 * to apply the predicate on.
+	 * @return The next step.
+	 *
+	 * @see SpatialWithinPredicateFieldStep#fields(String...)
+	 */
+	@SuppressWarnings("unchecked")
+	S fields(SpatialPredicateFieldReference<? super SR>... fieldReferences);
 }

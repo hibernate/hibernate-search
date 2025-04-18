@@ -20,17 +20,17 @@ import org.hibernate.search.engine.search.predicate.spi.PredicateTypeKeys;
 import org.hibernate.search.engine.search.predicate.spi.RegexpPredicateBuilder;
 import org.hibernate.search.util.common.impl.Contracts;
 
-class RegexpPredicateFieldMoreStepImpl
-		implements RegexpPredicateFieldMoreStep<RegexpPredicateFieldMoreStepImpl, RegexpPredicateOptionsStep<?>>,
+class RegexpPredicateFieldMoreStepImpl<SR>
+		implements RegexpPredicateFieldMoreStep<SR, RegexpPredicateFieldMoreStepImpl<SR>, RegexpPredicateOptionsStep<?>>,
 		AbstractBooleanMultiFieldPredicateCommonState.FieldSetState {
 
-	private final CommonState commonState;
+	private final CommonState<SR> commonState;
 
 	private final List<RegexpPredicateBuilder> predicateBuilders = new ArrayList<>();
 
 	private Float fieldSetBoost;
 
-	RegexpPredicateFieldMoreStepImpl(CommonState commonState, List<String> fieldPaths) {
+	RegexpPredicateFieldMoreStepImpl(CommonState<SR> commonState, List<String> fieldPaths) {
 		this.commonState = commonState;
 		this.commonState.add( this );
 		SearchIndexScope<?> scope = commonState.scope();
@@ -40,12 +40,12 @@ class RegexpPredicateFieldMoreStepImpl
 	}
 
 	@Override
-	public RegexpPredicateFieldMoreStepImpl fields(String... fieldPaths) {
-		return new RegexpPredicateFieldMoreStepImpl( commonState, Arrays.asList( fieldPaths ) );
+	public RegexpPredicateFieldMoreStepImpl<SR> fields(String... fieldPaths) {
+		return new RegexpPredicateFieldMoreStepImpl<>( commonState, Arrays.asList( fieldPaths ) );
 	}
 
 	@Override
-	public RegexpPredicateFieldMoreStepImpl boost(float boost) {
+	public RegexpPredicateFieldMoreStepImpl<SR> boost(float boost) {
 		this.fieldSetBoost = boost;
 		return this;
 	}
@@ -65,9 +65,9 @@ class RegexpPredicateFieldMoreStepImpl
 		}
 	}
 
-	static class CommonState
-			extends AbstractBooleanMultiFieldPredicateCommonState<CommonState, RegexpPredicateFieldMoreStepImpl>
-			implements RegexpPredicateOptionsStep<CommonState> {
+	static class CommonState<SR>
+			extends AbstractBooleanMultiFieldPredicateCommonState<CommonState<SR>, RegexpPredicateFieldMoreStepImpl<SR>>
+			implements RegexpPredicateOptionsStep<CommonState<SR>> {
 
 		CommonState(SearchPredicateDslContext<?> dslContext) {
 			super( dslContext );
@@ -75,7 +75,7 @@ class RegexpPredicateFieldMoreStepImpl
 
 		private RegexpPredicateOptionsStep<?> matching(String regexpPattern) {
 			Contracts.assertNotNull( regexpPattern, "regexpPattern" );
-			for ( RegexpPredicateFieldMoreStepImpl fieldSetState : getFieldSetStates() ) {
+			for ( RegexpPredicateFieldMoreStepImpl<SR> fieldSetState : getFieldSetStates() ) {
 				for ( RegexpPredicateBuilder predicateBuilder : fieldSetState.predicateBuilders ) {
 					predicateBuilder.pattern( regexpPattern );
 				}
@@ -84,13 +84,13 @@ class RegexpPredicateFieldMoreStepImpl
 		}
 
 		@Override
-		protected CommonState thisAsS() {
+		protected CommonState<SR> thisAsS() {
 			return this;
 		}
 
 		@Override
-		public CommonState flags(Set<RegexpQueryFlag> flags) {
-			for ( RegexpPredicateFieldMoreStepImpl fieldSetState : getFieldSetStates() ) {
+		public CommonState<SR> flags(Set<RegexpQueryFlag> flags) {
+			for ( RegexpPredicateFieldMoreStepImpl<SR> fieldSetState : getFieldSetStates() ) {
 				for ( RegexpPredicateBuilder predicateBuilder : fieldSetState.predicateBuilders ) {
 					predicateBuilder.flags( flags );
 				}

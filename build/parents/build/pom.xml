@@ -370,6 +370,11 @@
                 <type>pom</type>
                 <version>${project.version}</version>
             </dependency>
+            <dependency>
+                <groupId>org.hibernate.search</groupId>
+                <artifactId>hibernate-search-metamodel-processor</artifactId>
+                <version>${project.version}</version>
+            </dependency>
 
             <!-- Remaining Hibernate Search dependencies -->
             <dependency>
@@ -710,6 +715,26 @@
             <dependency>
                 <groupId>org.hibernate.search</groupId>
                 <artifactId>hibernate-search-integrationtest-java-modules-pojo-standalone-lucene</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.hibernate.search</groupId>
+                <artifactId>hibernate-search-integrationtest-metamodel-standalone-lucene</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.hibernate.search</groupId>
+                <artifactId>hibernate-search-integrationtest-metamodel-standalone-elasticsearch</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.hibernate.search</groupId>
+                <artifactId>hibernate-search-integrationtest-metamodel-orm-lucene</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.hibernate.search</groupId>
+                <artifactId>hibernate-search-integrationtest-metamodel-orm-elasticsearch</artifactId>
                 <version>${project.version}</version>
             </dependency>
             <dependency>

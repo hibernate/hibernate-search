@@ -32,6 +32,19 @@
 
     <profiles>
         <profile>
+            <id>metamodelITs</id>
+            <activation>
+                <!-- Hack to activate by default, except when explicitly disabled -->
+                <jdk>[17,)</jdk>
+            </activation>
+            <modules>
+                <module>metamodel/standalone-lucene</module>
+                <module>metamodel/standalone-elasticsearch</module>
+                <module>metamodel/orm-lucene</module>
+                <module>metamodel/orm-elasticsearch</module>
+            </modules>
+        </profile>
+        <profile>
             <id>springITs</id>
             <activation>
                 <!-- Hack to activate by default, except when explicitly disabled -->

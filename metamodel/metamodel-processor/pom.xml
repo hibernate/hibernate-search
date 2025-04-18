@@ -1,0 +1,143 @@
+<?xml version="1.0"?>
+<project
+        xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd"
+        xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+    <modelVersion>4.0.0</modelVersion>
+    <parent>
+        <groupId>org.hibernate.search</groupId>
+        <artifactId>hibernate-search-parent-public</artifactId>
+        <version>8.0.0-SNAPSHOT</version>
+        <relativePath>../../build/parents/public</relativePath>
+    </parent>
+    <artifactId>hibernate-search-metamodel-processor</artifactId>
+
+    <name>Hibernate Search Metamodel annotation processor</name>
+    <description>Hibernate Search Metamodel annotation processor</description>
+
+    <properties>
+        <!-- This is a publicly distributed module that should be published: -->
+        <deploy.skip>false</deploy.skip>
+        <java.module.name>org.hibernate.search.metamodel.processor</java.module.name>
+
+        <logging.processor.skip.generated.annotation.compiler.argument></logging.processor.skip.generated.annotation.compiler.argument>
+        <logging.processor.categories.report.module-name.compiler.argument></logging.processor.categories.report.module-name.compiler.argument>
+    </properties>
+
+    <dependencies>
+        <dependency>
+            <groupId>org.hibernate.search</groupId>
+            <artifactId>hibernate-search-engine</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.hibernate.search</groupId>
+            <artifactId>hibernate-search-mapper-pojo-base</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.hibernate.search</groupId>
+            <artifactId>hibernate-search-mapper-pojo-standalone</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>org.hibernate.search</groupId>
+            <artifactId>hibernate-search-util-common</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.jboss.logging</groupId>
+            <artifactId>jboss-logging</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.jboss.logging</groupId>
+            <artifactId>jboss-logging-annotations</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>org.hibernate.search</groupId>
+            <artifactId>hibernate-search-backend-lucene</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.junit.jupiter</groupId>
+            <artifactId>junit-jupiter</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.assertj</groupId>
+            <artifactId>assertj-core</artifactId>
+            <scope>test</scope>
+        </dependency>
+    </dependencies>
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-dependency-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>copy</id>
+                        <phase>generate-test-resources</phase>
+                        <goals>
+                            <goal>copy-dependencies</goal>
+                        </goals>
+                        <configuration>
+                            <outputDirectory>${project.build.directory}/test-dependencies</outputDirectory>
+                            <stripVersion>true</stripVersion>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-surefire-plugin</artifactId>
+                <configuration>
+                    <systemPropertyVariables>
+                        <org.hibernate.search.integrationtest.backend.elasticsearch.version>${version.org.elasticsearch.client}</org.hibernate.search.integrationtest.backend.elasticsearch.version>
+                    </systemPropertyVariables>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
+    <profiles>
+        <profile>
+            <!--
+                Eclipse compiler attempts to apply the annotation processor from this module to itself ?!
+                > ReportGeneratorRules.java: Internal compiler error: java.util.ServiceConfigurationError: javax.annotation.processing.Processor:
+                > Provider org.hibernate.search.build.report.loggers.LoggerCategoriesProcessor not found at java.base/java.util.ServiceLoader.fail(ServiceLoader.java:593)
+            -->
+            <id>compiler-eclipse</id>
+            <build>
+                <pluginManagement>
+                    <plugins>
+                        <plugin>
+                            <groupId>org.apache.maven.plugins</groupId>
+                            <artifactId>maven-compiler-plugin</artifactId>
+                            <executions>
+                                <execution>
+                                    <id>default-compile</id>
+                                    <configuration combine.self="override">
+                                        <proc>none</proc>
+                                        <fork>false</fork>
+                                    </configuration>
+                                </execution>
+                                <execution>
+                                    <id>default-testCompile</id>
+                                    <configuration combine.self="override">
+                                        <proc>none</proc>
+                                        <fork>false</fork>
+                                    </configuration>
+                                </execution>
+                                <execution>
+                                    <id>noparameters-testCompile</id>
+                                    <configuration combine.self="override">
+                                        <proc>none</proc>
+                                        <fork>false</fork>
+                                    </configuration>
+                                </execution>
+                            </executions>
+                        </plugin>
+                    </plugins>
+                </pluginManagement>
+            </build>
+        </profile>
+    </profiles>
+</project>
