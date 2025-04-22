@@ -289,12 +289,20 @@ class ElasticsearchDialectFactoryTest {
 						ElasticsearchDistributionName.ELASTIC, "8.17.0", "8.17.0",
 						Elasticsearch814ModelDialect.class, Elasticsearch81ProtocolDialect.class
 				),
-				successWithWarning(
+				success(
 						ElasticsearchDistributionName.ELASTIC, "8.18", "8.18.0",
 						Elasticsearch814ModelDialect.class, Elasticsearch81ProtocolDialect.class
 				),
-				successWithWarning(
+				success(
 						ElasticsearchDistributionName.ELASTIC, "8.18.0", "8.18.0",
+						Elasticsearch814ModelDialect.class, Elasticsearch81ProtocolDialect.class
+				),
+				successWithWarning(
+						ElasticsearchDistributionName.ELASTIC, "8.19", "8.19.0",
+						Elasticsearch814ModelDialect.class, Elasticsearch81ProtocolDialect.class
+				),
+				successWithWarning(
+						ElasticsearchDistributionName.ELASTIC, "8.19.0", "8.19.0",
 						Elasticsearch814ModelDialect.class, Elasticsearch81ProtocolDialect.class
 				),
 				successWithWarning(
