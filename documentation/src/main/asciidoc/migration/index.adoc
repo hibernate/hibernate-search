@@ -79,7 +79,9 @@ no database schema update is necessary for these tables.
 
 [[vectorsize]]
 === Vector search max dimension
-For the Lucene backend, the vector search maximum dimension has been increased from 4096 to 16000. Increasing the vector size, to leverage a different, higher dimension model, implies a larger memory requirement on behalf of the JVM.
+For the Lucene backend, the maximum vector dimension has been increased from 4096 to 16000.
+Increasing the vector size, to leverage a different, higher dimensional model, implies a larger memory requirement on behalf of the JVM
+as well as an increase of the index size.
 
 [[configuration]]
 == Configuration
