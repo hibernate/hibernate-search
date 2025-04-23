@@ -5,7 +5,9 @@
 package org.hibernate.search.engine.search.reference.sort;
 
 import org.hibernate.search.engine.search.common.ValueModel;
+import org.hibernate.search.util.common.annotation.Incubating;
 
+@Incubating
 public interface TypedSortFieldReference<SR, T> extends SortFieldReference<SR> {
 
 	Class<T> sortType();
