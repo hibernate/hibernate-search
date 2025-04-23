@@ -119,6 +119,37 @@ to be in a more consistent format compared with other logging categories.
 - Hibernate Search now uses logging categories instead of class names to log messages.
 See link:https://docs.jboss.org/hibernate/search/{hibernateSearchVersionShort}/reference/en-US/html_single/#logging-categories-aggregated[Appendix B: List of all available logging categories]
 to find out what categories are available.
+- With introduction of the field references (`org.hibernate.search.engine.search.reference.pass:[*]`) most of the Search DSL
+interfaces (`org.hibernate.search.engine.search.pass:[*].dsl.pass:[*]`) got an extra type argument `SR` (scope root type).
+In simple scenarios where the query is created in one go there will be no code changes required:
++
+[source,java,subs="+attributes"]
+----
+List<Book> result = searchSession.search( Book.class )
+    .where( f -> f.match().field( "title" ).matching( "robot" ) )
+    .fetchHits( 20 );
+----
++
+In scenarios where there's work with the affected Search DSL interfaces is required user can choose between one of the following options:
++
+====
+[source,java,subs="+attributes"]
+----
+var scope = searchSession.scope( Book.class ); // <1>
+SearchScope<?, Book> scope = searchSession.scope( Book.class ); // <2>
+SearchScope<Book, Book> scope = searchSession.scope( Book.class ); // <3>
+SearchScope<ReadingMaterial, ReadingMaterial> scope = searchSession.scope( List.of( Book.class, Magazine.class ) ); // <4>
+SearchScope<Book__, Book> scope = searchSession.scope( Book.class ); // <5>
+SearchScope<SomeRandomClass, Book> scope = searchSession.scope( Book.class ); // <6>
+----
+<1> Use `var` if possible. Otherwise, if you need to pass the DSL interfaces to some other methods as parameters,
+consider one of the following options:
+<2> Use the `?` wildcard.
+<3> Use the same type as your search entity.
+<4> Use the common supertype for a scope of multiple search entities.
+<5> Use the class generated for the static metamodel of this search entity.
+<6> Use any class.
+====
 
 [[spi]]
 == SPI
