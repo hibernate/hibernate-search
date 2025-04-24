@@ -63,6 +63,8 @@ include::_backend-elasticsearch.adoc[]
 
 include::_coordination.adoc[]
 
+include::_static-metamodel.adoc[]
+
 include::_integrations.adoc[]
 
 include::_limitations.adoc[]

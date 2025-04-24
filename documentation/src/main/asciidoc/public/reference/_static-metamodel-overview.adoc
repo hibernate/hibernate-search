@@ -1,0 +1,68 @@
+// SPDX-License-Identifier: Apache-2.0
+// Copyright Red Hat Inc. and Hibernate Authors
+[[static-metamodel-overview]]
+= Overview of the static metamodel
+
+include::../components/_incubating-warning.adoc[]
+
+The static metamodel class describes the index structure. Each indexed entity (index) is represented by a single class
+that may contain inner classes describing the embeddables (i.e. nested/flattened objects). These classes contain <<static-metamodel-processor-field-reference-types,field references>>
+representing index fields and their search capabilities.
+
+The name of this root class is constructed from the indexed entity name by adding `pass:[__]` (two underscores) suffix, e.g. `MySearchEntitypass:[__]`.
+If the indexed entity is a (static) inner class, then all the owning classes will be part of the name delimited with a `pass:[_]` (single underscore),
+e.g. `MyOuterClasspass:[_]MySearchEntitypass:[__]`.
+These classes are created in the same package where the search entity they represent is located.
+
+The root metamodel class that describes the indexed entity has a static field `INDEX` that users can use to interact with the metamodel.
+It serves two primary purposes:
+
+* It simplifies creating the search scope and building search queries for such scope.
+* It provides a way to reference index fields when constructing queries.
+
+NOTE: While the default naming convention was described in this section,
+there are plans to provide more flexibility in this area to the users (see https://hibernate.atlassian.net/browse/HSEARCH-5366[HSEARCH-5366]) .
+
+====
+[source, JAVA, indent=0, subs="+callouts"]
+----
+include::{sourcedir}/org/hibernate/search/documentation/search/metamodel/MetamodelIT.java[tags=entryPoint]
+----
+<1> Obtain the search session.
+<2> Create the search scope over the book index. Using such scope in the <<search-dsl,Search DSL>> will automatically
+limit acceptable field references to the ones obtained from the `Book__.INDEX`
+<3> Use the metamodel to reference the fields when creating the queries.
+====
+
+[[static-metamodel-processor-field-reference-types]]
+== Field reference types
+
+A field reference type describes the set of search capabilities a particular index field has, in particular,
+what kind of projections/aggregations/predicates/sorts are allowed, if any. It does so by implementing a
+subset of search traits interfaces defined in `org.hibernate.search.engine.search.reference.pass:[*]`, which in turn allows
+performing compile-time checks when building <<search-dsl,search queries>>.
+
+====
+[source, JAVA, indent=0, subs="+callouts"]
+----
+include::{sourcedir}/org/hibernate/search/documentation/search/metamodel/MetamodelIT.java[tags=compileCheck-pass]
+----
+<1> If the title field is projectable then this compiles works fine,
+otherwise compilation fails with an error similar to:
++
+----
+error: no suitable method found for field(ValueFieldReferenceP0P13P14P2P4P5P6P7P8P9<Book__,String,String,String,String>)
+----
++
+as such field reference (for a filed with `Projectable.NO`) will not implement the required `FieldProjectionFieldReference` interface.
+====
+
+The field reference also provides a way to quickly switch between <<search-dsl-argument-type,different value models>> when necessary.
+
+====
+[source, JAVA, indent=0, subs="+callouts"]
+----
+include::{sourcedir}/org/hibernate/search/documentation/search/metamodel/MetamodelIT.java[tags=valueModel]
+----
+<1> Calling `string()` on a field reference is an eqivalent to `.field( "genre"  ).matching( <search value>, ValueModel.STRING )`
+====

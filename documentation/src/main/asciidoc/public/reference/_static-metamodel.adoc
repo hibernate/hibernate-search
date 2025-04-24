@@ -1,0 +1,17 @@
+// SPDX-License-Identifier: Apache-2.0
+// Copyright Red Hat Inc. and Hibernate Authors
+[[static-metamodel]]
+= Static metamodel
+
+include::../components/_incubating-warning.adoc[]
+
+Hibernate Search static metamodel represents the index structure
+that provides a type-safe way of creating search queries through the <<search-dsl,Search DSL>>.
+
+:leveloffset: +1
+
+include::_static-metamodel-overview.adoc[]
+
+include::_static-metamodel-processor.adoc[]
+
+:leveloffset: -1

@@ -1,0 +1,116 @@
+// SPDX-License-Identifier: Apache-2.0
+// Copyright Red Hat Inc. and Hibernate Authors
+[[static-metamodel-processor]]
+= Annotation processor
+
+include::../components/_incubating-warning.adoc[]
+
+[[static-metamodel-processor-enabling]]
+== Enabling the annotation processor
+
+Hibernate Search provides a dedicated annotation processor to generate the static metamodel classes.
+This annotation processor is located in the `org.hibernate.search:hibernate-search-metamodel-processor`.
+
+The annotation processor has to be added to the build, e.g. for Maven:
+
+====
+[source,XML,subs="+attributes"]
+----
+<plugin>
+    <artifactId>maven-compiler-plugin</artifactId>
+    <executions>
+        <execution>
+            <id>default-compile</id>
+            <configuration>
+                <annotationProcessors>
+                    <annotationProcessor>org.hibernate.search.metamodel.processor.HibernateSearchMetamodelProcessor</annotationProcessor> <1>
+                </annotationProcessors>
+                <annotationProcessorPaths>
+                    <path>
+                        <groupId>org.hibernate.search</groupId>
+                        <artifactId>hibernate-search-metamodel-processor</artifactId> <2>
+                    </path>
+                    <path>
+                        <groupId>org.hibernate.search</groupId>
+                        <artifactId>hibernate-search-backend-lucene</artifactId> <3>
+                    </path>
+                </annotationProcessorPaths>
+            </configuration>
+        </execution>
+    </executions>
+</plugin>
+----
+
+<1> Provide the fully qualified class name of the annotation processor that generates the metamodel.
+<2> Add the `org.hibernate.search:hibernate-search-metamodel-processor` dependency as an annotation processor path for the Maven compiler plugin to be able to actually find the processor.
+<3> Add the backend dependency, in this example, the <<backend-lucene,Lucene backend>>, as an annotation processor path.
+It is important to include the same backend that the application is using to make sure that the generated metamodel classes reflect all the backend specifics.
+For example, backends might have different defaults, resulting in a different set of field traits depending on the backend.
+
+NOTE: The version of both annotation processor and backend dependencies are skipped in the definition of the annotation paths, as in case the Hibernate Search BOM is imported via dependency management, the compiler plugin will use the managed versions.
+This way the generated metamodel classes will be based on the same backend that the application uses.
+====
+
+[[static-metamodel-processor-configuration]]
+== Configuration
+
+The annotation processor options are passed as the compiler arguments with the `-A` key:
+
+====
+[source,XML,subs="+attributes"]
+----
+<plugin>
+    <artifactId>maven-compiler-plugin</artifactId>
+    <executions>
+        <execution>
+            <id>default-compile</id>
+            <configuration>
+                <compilerArgs>
+                    <arg>-Aorg.hibernate.search.metamodel.processor.generated_annotation.timestamp=false</arg> <1>
+                    <arg><!-- ... --></arg> <2>
+                </compilerArgs>
+                <!-- ... --> <3>
+            </configuration>
+        </execution>
+    </executions>
+</plugin>
+----
+
+<1> Pass the annotation processor parameters using the `-A` key.
+<2> Pass any other compiler arguments required by the build.
+<3> Further compiler plugin configuration.
+====
+
+The following annotation processor configuration properties are available:
+
+[[static-metamodel-processor-configuration-generated_annotation-add]]`org.hibernate.search.metamodel.processor.generated_annotation.add`::
+Description:::
+Whether to add the `@Generated` annotation to the generated static metamodel classes.
+Default value:::
+`true`
+
+[[static-metamodel-processor-configuration-generated_annotation-timestamp]]`org.hibernate.search.metamodel.processor.generated_annotation.timestamp`::
+Description:::
+Defines whether the `@Generated` annotation includes the `date` attribute.
+Having the date attribute will result in non-reproducible builds, as the timestamp will be different for each compilation.
+Hence, it is disabled by default.
+Default value:::
+`false`
+
+[[static-metamodel-processor-configuration-add_generated_annotation]]`org.hibernate.search.metamodel.processor.backend.version`::
+Description:::
+Explicitly define the backend version. By default, the processor will use the latest compatible version of the backend.
+This option can be used if the static metamodel is required for an older backend version.
+Default value:::
+`<latest>`
+
+[[static-metamodel-processor-limitations]]
+== Current annotation processor limitations
+
+While the annotation processor is in its early stages of development, it has a few limitations:
+
+* Any use of <<binding-valuebridge-valuebinder,custom binders>> will be ignored and should produce a compiler warning.
+This means that if the search entities rely on custom binders, fields that those binders produce will be missing from the generated metamodel.
+* <<mapper-orm-custom-annotations,Custom mapping annotations>> are not supported.
+* <<mapping-programmatic,Programmatic mapping>> is also unsupported by the annotation processor.
+As the annotation processor cannot easily read programmatic mapping definitions, this limitation is here to stay.
