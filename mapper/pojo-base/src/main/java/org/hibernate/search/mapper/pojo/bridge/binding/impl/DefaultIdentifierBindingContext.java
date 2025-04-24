@@ -67,12 +67,16 @@ public class DefaultIdentifierBindingContext<I> extends AbstractBindingContext
 			@SuppressWarnings("unchecked") // We check that I2 equals I explicitly using reflection (see above)
 			Class<I> castedExpectedType = (Class<I>) expectedValueType;
 
-			this.partialBinding = new PartialBinding<>( castedBridgeHolder, castedExpectedType );
+			applyBridge( castedExpectedType, castedBridgeHolder );
 		}
 		catch (RuntimeException e) {
 			abortBridge( new SuppressingCloser( e ), bridgeHolder );
 			throw e;
 		}
+	}
+
+	public void applyBridge(Class<I> expectedValueType, BeanHolder<? extends IdentifierBridge<I>> bridgeHolder) {
+		this.partialBinding = new PartialBinding<>( bridgeHolder, expectedValueType );
 	}
 
 	@Override

@@ -6,6 +6,7 @@ package org.hibernate.search.metamodel.processor.impl;
 
 import static org.hibernate.search.metamodel.processor.impl.ProcessorElementUtils.flattenedAnnotations;
 import static org.hibernate.search.metamodel.processor.impl.ProcessorElementUtils.propertyElements;
+import static org.hibernate.search.metamodel.processor.impl.ProcessorElementUtils.propertyName;
 
 import java.io.IOException;
 import java.io.Writer;
@@ -20,7 +21,14 @@ import javax.tools.JavaFileObject;
 
 import org.hibernate.search.engine.backend.metamodel.IndexObjectFieldDescriptor;
 import org.hibernate.search.engine.backend.metamodel.IndexValueFieldDescriptor;
+import org.hibernate.search.engine.environment.bean.BeanHolder;
 import org.hibernate.search.engine.environment.bean.BeanReference;
+import org.hibernate.search.mapper.pojo.bridge.IdentifierBridge;
+import org.hibernate.search.mapper.pojo.bridge.binding.IdentifierBindingContext;
+import org.hibernate.search.mapper.pojo.bridge.binding.impl.DefaultIdentifierBindingContext;
+import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.IdentifierBinder;
+import org.hibernate.search.mapper.pojo.bridge.runtime.IdentifierBridgeFromDocumentIdentifierContext;
+import org.hibernate.search.mapper.pojo.bridge.runtime.IdentifierBridgeToDocumentIdentifierContext;
 import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.ProgrammaticMappingConfigurationContext;
 import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.PropertyMappingStep;
 import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.TypeMappingStep;
@@ -35,8 +43,10 @@ import org.hibernate.search.metamodel.processor.annotation.processing.impl.Proce
 import org.hibernate.search.metamodel.processor.annotation.processing.impl.ProcessorTypeMappingAnnotationProcessor;
 import org.hibernate.search.metamodel.processor.mapping.impl.ProcessorIntrospectorContext;
 import org.hibernate.search.metamodel.processor.mapping.impl.ProcessorPojoModelsBootstrapIntrospector;
+import org.hibernate.search.metamodel.processor.model.impl.HibernateSearchProcessorEnum;
 import org.hibernate.search.metamodel.processor.writer.impl.MetamodelClassWriter;
 import org.hibernate.search.metamodel.processor.writer.impl.MetamodelNamesFormatter;
+import org.hibernate.search.util.common.annotation.impl.SuppressJQAssistant;
 
 public class IndexedEntityMetamodelAnnotationProcessor implements MetamodelAnnotationProcessor {
 
@@ -71,6 +81,11 @@ public class IndexedEntityMetamodelAnnotationProcessor implements MetamodelAnnot
 									.discoverAnnotationsFromReferencedTypes( false )
 									.discoverJandexIndexesFromAddedTypes( false )
 									.buildMissingDiscoveredJandexIndexes( false );
+
+							configurationContext.bridges()
+									.subTypesOf( HibernateSearchProcessorEnum.class )
+									.valueBinder( HibernateSearchProcessorEnum.BINDER )
+									.identifierBinder( HibernateSearchProcessorEnum.BINDER );
 
 							ProgrammaticMappingConfigurationContext programmaticMapping =
 									configurationContext.programmaticMapping();
@@ -167,36 +182,83 @@ public class IndexedEntityMetamodelAnnotationProcessor implements MetamodelAnnot
 		AtomicReference<PropertyMappingStep> ormId = new AtomicReference<>();
 		propertyElements( ctx.elements(), typeElement )
 				.forEach( element -> {
-					PropertyMappingStep step = typeMappingContext.property( element.getSimpleName().toString() );
+					PropertyMappingStep step = typeMappingContext.property( propertyName( element ) );
 
-					flattenedAnnotations( ctx.types(), element )
-							.forEach( annotationMirror -> {
-								if ( ProcessorPropertyMappingAnnotationProcessor.documentId( annotationMirror ) ) {
-									documentId.set( step );
-								}
-								else if ( ProcessorPropertyMappingAnnotationProcessor.ormId( annotationMirror ) ) {
-									ormId.set( step );
-								}
-								else {
-									ProcessorPropertyMappingAnnotationProcessor.processor( annotationMirror )
-											.ifPresent( p -> p.process(
-													step,
-													annotationMirror,
-													element,
-													ctx
-											) );
-								}
-							} );
+					try {
+						flattenedAnnotations( ctx.types(), element )
+								.forEach( annotationMirror -> {
+									if ( ProcessorPropertyMappingAnnotationProcessor.documentId( annotationMirror ) ) {
+										documentId.set( step );
+									}
+									else if ( ProcessorPropertyMappingAnnotationProcessor.ormId( annotationMirror ) ) {
+										ormId.set( step );
+									}
+									else {
+										ProcessorPropertyMappingAnnotationProcessor.processor( annotationMirror )
+												.ifPresent( p -> p.process(
+														step,
+														annotationMirror,
+														element,
+														ctx
+												) );
+									}
+								} );
+					}
+					catch (Exception e) {
+						ExceptionUtils.logError( ctx.messager(), e,
+								"Unable to process Hibernate Search metamodel annotations: ", element );
+					}
 				} );
+		PropertyMappingStep docIdStep = null;
 		if ( documentId.get() != null ) {
-			documentId.get().documentId();
+			docIdStep = documentId.get();
 		}
 		if ( ormId.get() != null ) {
-			ormId.get().documentId();
+			docIdStep = ormId.get();
+		}
+		if ( docIdStep != null ) {
+			// Users can have custom identifier binders/bridges, but we don't care much about their impl
+			// and since for now we are ignoring these impls we still want users to be able to generate
+			// a partial model; without an id that wouldn't be possible... hence:
+			docIdStep.documentId().identifierBinder( ProcessorIdentifierBinder.INSTANCE );
 		}
 	}
 
 	private ProcessorPojoModelsBootstrapIntrospector wrapIntrospector(PojoBootstrapIntrospector introspector) {
 		return new ProcessorPojoModelsBootstrapIntrospector( introspectorContext, introspector );
 	}
+
+	@SuppressJQAssistant(reason = "Need to cast to an impl type to get access to not-yet exposed method")
+	private static class ProcessorIdentifierBinder implements IdentifierBinder {
+
+		static ProcessorIdentifierBinder INSTANCE = new ProcessorIdentifierBinder();
+
+		@SuppressWarnings({ "rawtypes", "unchecked" })
+		@Override
+		public void bind(IdentifierBindingContext<?> context) {
+			if ( context instanceof DefaultIdentifierBindingContext ctx ) {
+				ctx.applyBridge( Object.class, BeanHolder.of( ProcessorIdentifierBridge.INSTANCE ) );
+			}
+			else {
+				context.bridge( Object.class, ProcessorIdentifierBridge.INSTANCE );
+			}
+		}
+
+		private static class ProcessorIdentifierBridge implements IdentifierBridge<Object> {
+
+			static ProcessorIdentifierBridge INSTANCE = new ProcessorIdentifierBridge();
+
+			@Override
+			public String toDocumentIdentifier(Object propertyValue, IdentifierBridgeToDocumentIdentifierContext context) {
+				return "";
+			}
+
+			@Override
+			public Object fromDocumentIdentifier(String documentIdentifier,
+					IdentifierBridgeFromDocumentIdentifierContext context) {
+				return null;
+			}
+		}
+	}
+
 }

@@ -4,8 +4,8 @@
  */
 package org.hibernate.search.metamodel.processor.model.impl;
 
-import static org.hibernate.search.mapper.pojo.model.spi.PojoBootstrapIntrospector.noPrefix;
 import static org.hibernate.search.metamodel.processor.impl.ProcessorElementUtils.propertyElements;
+import static org.hibernate.search.metamodel.processor.impl.ProcessorElementUtils.propertyName;
 
 import java.lang.annotation.Annotation;
 import java.util.Collection;
@@ -72,13 +72,10 @@ public class ProcessorPojoRawTypeModel<T> implements PojoRawTypeModel<T> {
 	@Override
 	public PojoRawTypeIdentifier<T> typeIdentifier() {
 		if ( typeElement.getKind() == ElementKind.ENUM ) {
-			return PojoRawTypeIdentifier.of( (Class<T>) EnumStub.class, typeElement.getQualifiedName().toString() );
+			return PojoRawTypeIdentifier.of( (Class<T>) HibernateSearchProcessorEnum.class,
+					typeElement.getQualifiedName().toString() );
 		}
 		return PojoRawTypeIdentifier.of( (Class<T>) TypeElement.class, typeElement.getQualifiedName().toString() );
-	}
-
-	// TODO: see `isSubTypeOf` if we can remove this dummy enum
-	private enum EnumStub {
 	}
 
 	@Override
@@ -88,6 +85,9 @@ public class ProcessorPojoRawTypeModel<T> implements PojoRawTypeModel<T> {
 
 	@Override
 	public boolean isSubTypeOf(MappableTypeModel otherModel) {
+		if ( HibernateSearchProcessorEnum.MODEL == otherModel && typeElement.getKind() == ElementKind.ENUM ) {
+			return true;
+		}
 		TypeElement otherTypeElement;
 		if ( otherModel instanceof ProcessorPojoRawTypeModel<?> other ) {
 			otherTypeElement = other.typeElement;
@@ -95,10 +95,11 @@ public class ProcessorPojoRawTypeModel<T> implements PojoRawTypeModel<T> {
 		else {
 			otherTypeElement = context.elementUtils().getTypeElement( otherModel.name() );
 		}
-		//TODO handle enums differently here, doesn't look like it treats SomeEnum as subtype of Enum.
-		return otherTypeElement != null
-				&& ( context.typeUtils().isSameType( otherTypeElement.asType(), typeElement.asType() )
-						|| context.typeUtils().isSubtype( typeElement.asType(), otherTypeElement.asType() ) );
+		if ( otherTypeElement == null ) {
+			return false;
+		}
+		return ( context.typeUtils().isSameType( otherTypeElement.asType(), typeElement.asType() )
+				|| context.typeUtils().isSubtype( typeElement.asType(), otherTypeElement.asType() ) );
 	}
 
 	@SuppressWarnings("unchecked")
@@ -168,6 +169,10 @@ public class ProcessorPojoRawTypeModel<T> implements PojoRawTypeModel<T> {
 				.orElse( null );
 	}
 
+	public TypeElement typeElement() {
+		return typeElement;
+	}
+
 	private ProcessorPojoPropertyModel<?> propertyModel(Element element) {
 		String propertyName = propertyName( element );
 		if ( element.getKind() == ElementKind.FIELD ) {
@@ -177,16 +182,6 @@ public class ProcessorPojoRawTypeModel<T> implements PojoRawTypeModel<T> {
 		if ( element.getKind() == ElementKind.METHOD ) {
 			return propertyModels.computeIfAbsent( propertyName,
 					k -> new ProcessorPojoPropertyModel<>( (ExecutableElement) element, propertyName, context, introspector ) );
-		}
-		throw new IllegalArgumentException( "Unsupported element kind: " + element.getKind() );
-	}
-
-	private static String propertyName(Element element) {
-		if ( element.getKind() == ElementKind.FIELD ) {
-			return element.getSimpleName().toString();
-		}
-		if ( element.getKind() == ElementKind.METHOD ) {
-			return noPrefix( element.getSimpleName().toString() );
 		}
 		throw new IllegalArgumentException( "Unsupported element kind: " + element.getKind() );
 	}

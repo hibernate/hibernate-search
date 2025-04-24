@@ -4,16 +4,13 @@
  */
 package org.hibernate.search.metamodel.processor.annotation.processing.impl;
 
-import static org.hibernate.search.metamodel.processor.impl.IndexedEntityMetamodelAnnotationProcessor.processTypeAndProperties;
+import static org.hibernate.search.metamodel.processor.impl.ProcessorElementUtils.collectExtraTypes;
 
 import java.util.Optional;
 
 import javax.lang.model.element.AnnotationMirror;
 import javax.lang.model.element.AnnotationValue;
 import javax.lang.model.element.Element;
-import javax.lang.model.element.TypeElement;
-import javax.lang.model.type.DeclaredType;
-import javax.lang.model.type.TypeKind;
 import javax.lang.model.type.TypeMirror;
 import javax.tools.Diagnostic;
 
@@ -38,7 +35,7 @@ class ProcessorIndexedEmbeddedProcessor extends AbstractProcessorAnnotationProce
 		String[] includePathsArray = toStringArray( getAnnotationValue( annotation, "includePaths" ) );
 		String[] excludePathsArray = toStringArray( getAnnotationValue( annotation, "excludePaths" ) );
 
-		ContainerExtractorPath extractorPath = toContainerExtractorPath( annotation, context );
+		ContainerExtractorPath extractorPath = toContainerExtractorPath( getExtraction( annotation ), context );
 
 		if ( getAnnotationValue( annotation, "targetType" ) != null ) {
 			context.messager().printMessage( Diagnostic.Kind.WARNING,
@@ -68,28 +65,14 @@ class ProcessorIndexedEmbeddedProcessor extends AbstractProcessorAnnotationProce
 		collectExtraTypes( element.asType(), context );
 	}
 
-	private void collectExtraTypes(TypeMirror type, ProcessorAnnotationProcessorContext context) {
-		if ( type == null || type.getKind() == TypeKind.NONE ) {
-			return;
-		}
-		TypeElement element = (TypeElement) context.types().asElement( type );
-		processTypeAndProperties(
-				element,
-				context.programmaticMapping().type( element.getQualifiedName().toString() ),
-				context
-		);
-		collectExtraTypes( element.getSuperclass(), context );
-		if ( type instanceof DeclaredType declaredType ) {
-			for ( TypeMirror typeArgument : declaredType.getTypeArguments() ) {
-				collectExtraTypes( typeArgument, context );
-			}
-		}
-	}
-
 	@Override
 	protected Optional<IndexFieldTypeFinalStep<?>> configureField(PropertyBindingContext bindingContext,
 			AnnotationMirror annotation, ProcessorAnnotationProcessorContext context, Element element, TypeMirror fieldType) {
 		context.messager().printMessage( Diagnostic.Kind.ERROR, "IndexedEmbedded are not allowed within binders.", element );
 		return Optional.empty();
+	}
+
+	private AnnotationMirror getExtraction(AnnotationMirror annotation) {
+		return getAnnotationProperty( annotation, "extraction" );
 	}
 }

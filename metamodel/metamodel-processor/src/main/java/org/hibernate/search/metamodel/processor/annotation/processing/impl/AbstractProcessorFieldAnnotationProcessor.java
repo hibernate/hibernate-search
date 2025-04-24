@@ -6,13 +6,8 @@ package org.hibernate.search.metamodel.processor.annotation.processing.impl;
 
 import javax.lang.model.element.AnnotationMirror;
 import javax.lang.model.element.Element;
-import javax.lang.model.element.ElementKind;
-import javax.lang.model.type.TypeKind;
-import javax.lang.model.type.TypeMirror;
 import javax.tools.Diagnostic;
 
-import org.hibernate.search.mapper.pojo.bridge.ValueBridge;
-import org.hibernate.search.mapper.pojo.bridge.runtime.ValueBridgeToIndexedValueContext;
 import org.hibernate.search.mapper.pojo.extractor.mapping.programmatic.ContainerExtractorPath;
 import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.PropertyMappingFieldOptionsStep;
 import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.PropertyMappingStep;
@@ -22,21 +17,24 @@ public abstract class AbstractProcessorFieldAnnotationProcessor extends Abstract
 	@Override
 	public final void process(PropertyMappingStep mapping, AnnotationMirror annotation,
 			Element element, ProcessorAnnotationProcessorContext context) {
+		// we check for bridges and binders first, to make sure none are defined,
+		// if any -- we want to stop processing as soon as possible so that field is not added to the index!
+		AnnotationMirror valueBinder = getValueBinder( annotation );
+		if ( valueBinder != null ) {
+			context.messager().printMessage( Diagnostic.Kind.WARNING, "Defined value binder " + valueBinder + " is ignored ",
+					element );
+			return;
+		}
+		AnnotationMirror valueBridge = getValueBridge( annotation );
+		if ( valueBridge != null ) {
+			context.messager().printMessage( Diagnostic.Kind.WARNING, "Defined value bridge " + valueBridge + " is ignored ",
+					element );
+			return;
+		}
+
 		String cleanedUpRelativeFieldName = getName( annotation );
 		PropertyMappingFieldOptionsStep<?> fieldContext =
 				initFieldMappingContext( mapping, annotation, cleanedUpRelativeFieldName );
-
-		AnnotationMirror valueBinder = getValueBinder( annotation );
-		if ( valueBinder != null ) {
-			// TODO: do we also inject fields into a value binder ... ?
-			context.messager().printMessage( Diagnostic.Kind.WARNING, "Defined value binder " + valueBinder + " is ignored ",
-					element );
-		}
-		else if ( element.asType().getKind() == TypeKind.DECLARED
-				&& context.types().asElement( element.asType() ).getKind() == ElementKind.ENUM ) {
-			// if it's an enum, we won't get to the built-in bridge so we just use this stub one instead:
-			fieldContext.valueBridge( new ProcessorEnumValueBridge( element.asType() ) );
-		}
 
 		ContainerExtractorPath extractorPath = toContainerExtractorPath( getExtraction( annotation ), context );
 		fieldContext.extractors( extractorPath );
@@ -57,11 +55,8 @@ public abstract class AbstractProcessorFieldAnnotationProcessor extends Abstract
 		return getAnnotationProperty( annotation, "valueBinder" );
 	}
 
-	public record ProcessorEnumValueBridge(TypeMirror valueType) implements ValueBridge<Object, String> {
-
-		@Override
-		public String toIndexedValue(Object value, ValueBridgeToIndexedValueContext context) {
-			return "";
-		}
+	private AnnotationMirror getValueBridge(AnnotationMirror annotation) {
+		return getAnnotationProperty( annotation, "valueBridge" );
 	}
+
 }

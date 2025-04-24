@@ -27,10 +27,21 @@ import javax.tools.ToolProvider;
 
 import org.hibernate.search.metamodel.processor.model.FieldTypesEntity;
 import org.hibernate.search.metamodel.processor.model.ISBN;
+import org.hibernate.search.metamodel.processor.model.MyContainedEntity;
+import org.hibernate.search.metamodel.processor.model.MyContainingEntity;
+import org.hibernate.search.metamodel.processor.model.MyCustomField;
+import org.hibernate.search.metamodel.processor.model.MyCustomId;
 import org.hibernate.search.metamodel.processor.model.MyEmbeddedEntity;
 import org.hibernate.search.metamodel.processor.model.MyEntityWithBinders;
 import org.hibernate.search.metamodel.processor.model.MyEnum;
+import org.hibernate.search.metamodel.processor.model.MyEnumCollectionEntity;
+import org.hibernate.search.metamodel.processor.model.MyFieldBinderIndexedEntity;
+import org.hibernate.search.metamodel.processor.model.MyFieldBridgeIndexedEntity;
+import org.hibernate.search.metamodel.processor.model.MyGeoPointBindingFieldEntity;
+import org.hibernate.search.metamodel.processor.model.MyIdBinderIndexedEntity;
+import org.hibernate.search.metamodel.processor.model.MyIdBridgeIndexedEntity;
 import org.hibernate.search.metamodel.processor.model.MyIndexedEntity;
+import org.hibernate.search.metamodel.processor.model.MyIndexedGetterEntity;
 import org.hibernate.search.metamodel.processor.model.SomeGenerics;
 import org.hibernate.search.metamodel.processor.model.SomeRandomType;
 import org.hibernate.search.metamodel.processor.model.SomeRandomTypeBinder;
@@ -66,11 +77,27 @@ class HibernateSearchMetamodelProcessorTest {
 				getSourceFile( SomeGenerics.class ),
 				getSourceFile( MyIndexedEntity.class ),
 				getSourceFile( MyEmbeddedEntity.class ),
+				getSourceFile( MyIndexedGetterEntity.class ),
 				getSourceFile( SomeRandomType.class ),
 				getSourceFile( SomeRandomTypeBinder.class ),
 				getSourceFile( ISBN.class ),
 				getSourceFile( MyEnum.class ),
-				getSourceFile( FieldTypesEntity.class )
+				getSourceFile( FieldTypesEntity.class ),
+
+				getSourceFile( MyCustomId.class ),
+				getSourceFile( MyIdBinderIndexedEntity.class ),
+				getSourceFile( MyIdBridgeIndexedEntity.class ),
+
+				getSourceFile( MyCustomField.class ),
+				getSourceFile( MyFieldBinderIndexedEntity.class ),
+				getSourceFile( MyFieldBridgeIndexedEntity.class ),
+
+				getSourceFile( MyContainedEntity.class ),
+				getSourceFile( MyContainingEntity.class ),
+
+				getSourceFile( MyEnumCollectionEntity.class ),
+
+				getSourceFile( MyGeoPointBindingFieldEntity.class )
 		);
 		diagnostics.getDiagnostics().forEach( System.out::println );
 
