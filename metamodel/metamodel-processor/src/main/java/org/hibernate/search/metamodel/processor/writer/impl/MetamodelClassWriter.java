@@ -147,7 +147,7 @@ public class MetamodelClassWriter {
 				Locale.ROOT,
 				"""
 						%s
-						@javax.annotation.processing.Generated(value = "org.hibernate.search.metamodel.processor.HibernateSearchMetamodelProcessor")
+						%s
 						public final class %s implements
 							%s<%s, %s> {
 
@@ -174,6 +174,7 @@ public class MetamodelClassWriter {
 						}
 						""",
 				packageName.isEmpty() ? "" : "package " + packageName + ";\n",
+				configuration.formattedGeneratedAnnotation(),
 				metamodelClassName,
 				scopeInterfaceType(),
 				metamodelClassName,

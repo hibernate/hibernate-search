@@ -28,7 +28,8 @@ import org.hibernate.search.metamodel.processor.impl.MetamodelAnnotationProcesso
 @SupportedAnnotationTypes("*")
 // Currently this is more of a placeholder for future config options:
 @SupportedOptions({
-		HibernateSearchMetamodelProcessorSettings.ADD_GENERATED_ANNOTATION,
+		HibernateSearchMetamodelProcessorSettings.GENERATED_ANNOTATION_ADD,
+		HibernateSearchMetamodelProcessorSettings.GENERATED_ANNOTATION_TIMESTAMP,
 		HibernateSearchMetamodelProcessorSettings.BACKEND_VERSION })
 @org.hibernate.search.util.common.annotation.impl.SuppressJQAssistant(
 		reason = "JQAssistant has issue with detecting that getSupportedSourceVersion is an overridden method.")
