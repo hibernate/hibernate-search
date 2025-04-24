@@ -6,6 +6,11 @@ package org.hibernate.search.metamodel.processor;
 
 
 import java.io.Serializable;
+import java.time.Clock;
+import java.time.LocalDateTime;
+import java.time.ZoneOffset;
+import java.time.format.DateTimeFormatter;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
 
@@ -18,7 +23,8 @@ public final class HibernateSearchMetamodelProcessorSettings {
 
 	private static final String PREFIX = "org.hibernate.search.metamodel.processor.";
 
-	public static final String ADD_GENERATED_ANNOTATION = PREFIX + Radicals.ADD_GENERATED_ANNOTATION;
+	public static final String GENERATED_ANNOTATION_ADD = PREFIX + Radicals.GENERATED_ANNOTATION_ADD;
+	public static final String GENERATED_ANNOTATION_TIMESTAMP = PREFIX + Radicals.GENERATED_ANNOTATION_TIMESTAMP;
 	public static final String BACKEND_VERSION = PREFIX + Radicals.BACKEND_VERSION;
 
 	public static class Radicals {
@@ -26,7 +32,8 @@ public final class HibernateSearchMetamodelProcessorSettings {
 		private Radicals() {
 		}
 
-		public static final String ADD_GENERATED_ANNOTATION = "add_generated_annotation";
+		public static final String GENERATED_ANNOTATION_ADD = "generated_annotation.add";
+		public static final String GENERATED_ANNOTATION_TIMESTAMP = "generated_annotation.timestamp";
 		public static final String BACKEND_VERSION = "backend.version";
 	}
 
@@ -35,18 +42,41 @@ public final class HibernateSearchMetamodelProcessorSettings {
 	 */
 	public static final class Defaults {
 
-		public static final String ADD_GENERATED_ANNOTATION = Boolean.TRUE.toString();
+		public static final String GENERATED_ANNOTATION_ADD = Boolean.TRUE.toString();
+		public static final String GENERATED_ANNOTATION_TIMESTAMP = Boolean.FALSE.toString();
 
 		private Defaults() {
 		}
 	}
 
-	public record Configuration(boolean addGeneratedAnnotation, String version) implements Serializable {
+	public record Configuration(boolean generatedAnnotationAdd, boolean generatedAnnotationTimestamp, String version)
+			implements Serializable {
 		public Configuration(Map<String, String> options) {
 			this(
-					Boolean.parseBoolean( options.getOrDefault( ADD_GENERATED_ANNOTATION, Defaults.ADD_GENERATED_ANNOTATION ) ),
+					Boolean.parseBoolean( options.getOrDefault( GENERATED_ANNOTATION_ADD, Defaults.GENERATED_ANNOTATION_ADD ) ),
+					Boolean.parseBoolean(
+							options.getOrDefault( GENERATED_ANNOTATION_TIMESTAMP, Defaults.GENERATED_ANNOTATION_TIMESTAMP ) ),
 					Objects.toString( options.get( BACKEND_VERSION ), null )
 			);
+		}
+
+		public String formattedGeneratedAnnotation() {
+			if ( !generatedAnnotationAdd ) {
+				return "";
+			}
+			if ( generatedAnnotationTimestamp ) {
+				return String.format(
+						Locale.ROOT, "@javax.annotation.processing.Generated(value = \"%s\", date = \"%s\")",
+						HibernateSearchMetamodelProcessor.class.getName(),
+						LocalDateTime.now( Clock.systemUTC() ).atOffset( ZoneOffset.UTC )
+								.format( DateTimeFormatter.ISO_OFFSET_DATE_TIME )
+				);
+			}
+			else {
+				return String.format( Locale.ROOT, "@javax.annotation.processing.Generated(value = \"%s\")",
+						HibernateSearchMetamodelProcessor.class.getName()
+				);
+			}
 		}
 
 		public String elasticsearchVersion() {
