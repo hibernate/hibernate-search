@@ -17,6 +17,7 @@ import javax.lang.model.type.TypeMirror;
 import org.hibernate.search.mapper.pojo.model.spi.PojoBootstrapIntrospector;
 import org.hibernate.search.mapper.pojo.model.spi.PojoRawTypeModel;
 import org.hibernate.search.metamodel.processor.model.impl.BuiltInBridgeResolverTypes;
+import org.hibernate.search.metamodel.processor.model.impl.HibernateSearchProcessorEnum;
 import org.hibernate.search.metamodel.processor.model.impl.ProcessorPojoRawTypeModel;
 import org.hibernate.search.metamodel.processor.model.impl.ProcessorTypeOrdering;
 import org.hibernate.search.util.common.reflect.spi.ValueHandleFactory;
@@ -32,10 +33,17 @@ public class ProcessorPojoModelsBootstrapIntrospector implements PojoBootstrapIn
 		this.context = context;
 		this.delegate = delegate;
 		this.typeOrdering = new ProcessorTypeOrdering( context.processorContext() );
+
+		elementTypeModelCache.put( context.elementUtils().getName( HibernateSearchProcessorEnum.class.getName() ),
+				HibernateSearchProcessorEnum.MODEL );
 	}
 
 	@Override
+	@SuppressWarnings("unchecked") // we checked the type through equals
 	public <T> PojoRawTypeModel<T> typeModel(Class<T> clazz) {
+		if ( HibernateSearchProcessorEnum.class.equals( clazz ) ) {
+			return (PojoRawTypeModel<T>) HibernateSearchProcessorEnum.MODEL;
+		}
 		return delegate.typeModel( clazz );
 	}
 

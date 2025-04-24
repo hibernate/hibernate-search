@@ -4,9 +4,6 @@
  */
 package org.hibernate.search.metamodel.processor;
 
-import java.io.IOException;
-import java.io.PrintWriter;
-import java.io.StringWriter;
 import java.util.List;
 import java.util.Set;
 
@@ -17,8 +14,8 @@ import javax.annotation.processing.SupportedAnnotationTypes;
 import javax.annotation.processing.SupportedOptions;
 import javax.lang.model.SourceVersion;
 import javax.lang.model.element.TypeElement;
-import javax.tools.Diagnostic;
 
+import org.hibernate.search.metamodel.processor.impl.ExceptionUtils;
 import org.hibernate.search.metamodel.processor.impl.HibernateSearchMetamodelProcessorContext;
 import org.hibernate.search.metamodel.processor.impl.IndexedEntityMetamodelAnnotationProcessor;
 import org.hibernate.search.metamodel.processor.impl.MetamodelAnnotationProcessor;
@@ -59,14 +56,8 @@ public class HibernateSearchMetamodelProcessor extends AbstractProcessor {
 			try {
 				processor.process( roundEnv );
 			}
-			catch (Throwable e) {
-				try ( var sw = new StringWriter(); var pw = new PrintWriter( sw ) ) {
-					e.printStackTrace( pw );
-					context.messager().printMessage( Diagnostic.Kind.ERROR, sw.toString() );
-				}
-				catch (IOException ex) {
-					throw new RuntimeException( ex );
-				}
+			catch (Exception e) {
+				ExceptionUtils.logError( context.messager(), e, "Unable to process Hibernate Search metamodel annotations: " );
 			}
 		}
 		return false;

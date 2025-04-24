@@ -4,6 +4,9 @@
  */
 package org.hibernate.search.metamodel.processor.impl;
 
+import static org.hibernate.search.mapper.pojo.model.spi.PojoBootstrapIntrospector.noPrefix;
+import static org.hibernate.search.metamodel.processor.impl.IndexedEntityMetamodelAnnotationProcessor.processTypeAndProperties;
+
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -16,10 +19,14 @@ import javax.lang.model.element.ElementKind;
 import javax.lang.model.element.ExecutableElement;
 import javax.lang.model.element.TypeElement;
 import javax.lang.model.type.ArrayType;
+import javax.lang.model.type.DeclaredType;
+import javax.lang.model.type.ExecutableType;
 import javax.lang.model.type.TypeKind;
 import javax.lang.model.type.TypeMirror;
 import javax.lang.model.util.Elements;
 import javax.lang.model.util.Types;
+
+import org.hibernate.search.metamodel.processor.annotation.processing.impl.ProcessorAnnotationProcessorContext;
 
 public final class ProcessorElementUtils {
 
@@ -89,6 +96,40 @@ public final class ProcessorElementUtils {
 			return name.startsWith( "is" ) || name.startsWith( "has" );
 		}
 
-		return name.startsWith( "get" );
+		return !"getClass".equals( name ) && name.startsWith( "get" );
+	}
+
+	public static String propertyName(Element element) {
+		if ( element.getKind() == ElementKind.FIELD ) {
+			return element.getSimpleName().toString();
+		}
+		if ( element.getKind() == ElementKind.METHOD ) {
+			return noPrefix( element.getSimpleName().toString() );
+		}
+		throw new IllegalArgumentException( "Unsupported element kind: " + element.getKind() );
+	}
+
+	public static void collectExtraTypes(TypeMirror type, ProcessorAnnotationProcessorContext context) {
+		if ( type == null || type.getKind() == TypeKind.NONE ) {
+			return;
+		}
+		if ( type instanceof ExecutableType et ) {
+			type = et.getReturnType();
+		}
+		TypeElement element = (TypeElement) context.types().asElement( type );
+		processTypeAndProperties(
+				element,
+				context.programmaticMapping().type( element.getQualifiedName().toString() ),
+				context
+		);
+		if ( element.getKind() == ElementKind.ENUM ) {
+			return;
+		}
+		collectExtraTypes( element.getSuperclass(), context );
+		if ( type instanceof DeclaredType declaredType ) {
+			for ( TypeMirror typeArgument : declaredType.getTypeArguments() ) {
+				collectExtraTypes( typeArgument, context );
+			}
+		}
 	}
 }

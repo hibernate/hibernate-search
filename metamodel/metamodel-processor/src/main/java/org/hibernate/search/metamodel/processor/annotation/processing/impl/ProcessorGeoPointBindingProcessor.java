@@ -4,6 +4,8 @@
  */
 package org.hibernate.search.metamodel.processor.annotation.processing.impl;
 
+import static org.hibernate.search.metamodel.processor.impl.ProcessorElementUtils.collectExtraTypes;
+
 import java.util.Optional;
 
 import javax.lang.model.element.AnnotationMirror;
@@ -25,6 +27,8 @@ class ProcessorGeoPointBindingProcessor extends AbstractProcessorAnnotationProce
 	public void process(PropertyMappingStep mapping, AnnotationMirror annotation, Element element,
 			ProcessorAnnotationProcessorContext context) {
 		mapping.binder( createBinder( annotation ) );
+
+		collectExtraTypes( element.asType(), context );
 	}
 
 	@Override

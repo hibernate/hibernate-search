@@ -23,7 +23,7 @@ import org.hibernate.search.engine.backend.types.converter.spi.DslConverter;
 import org.hibernate.search.engine.backend.types.converter.spi.ProjectionConverter;
 import org.hibernate.search.engine.search.common.spi.SearchIndexValueFieldTypeContext;
 import org.hibernate.search.mapper.pojo.bridge.runtime.impl.PojoValueBridgeDocumentValueConverter;
-import org.hibernate.search.metamodel.processor.annotation.processing.impl.AbstractProcessorFieldAnnotationProcessor;
+import org.hibernate.search.metamodel.processor.model.impl.HibernateSearchProcessorEnum;
 import org.hibernate.search.util.common.annotation.impl.SuppressJQAssistant;
 
 @SuppressJQAssistant(reason = "Need to use an impl clss for the value converter to get to the type element")
@@ -93,8 +93,8 @@ public class MetamodelClassWriter {
 
 	private String typeFromConverter(Object delegate, Class<?> valueType) {
 		if ( delegate instanceof PojoValueBridgeDocumentValueConverter<?, ?> pvbdc
-				&& pvbdc.bridge() instanceof AbstractProcessorFieldAnnotationProcessor.ProcessorEnumValueBridge bridge ) {
-			return bridge.valueType().toString();
+				&& pvbdc.bridge() instanceof HibernateSearchProcessorEnum.Bridge bridge ) {
+			return bridge.valueType();
 		}
 		return typeToString( valueType );
 	}
@@ -153,8 +153,7 @@ public class MetamodelClassWriter {
 
 							public static final %s %s = new %s();
 
-							public final %s;
-
+							%s
 							private %s() {
 								// simple value field references:
 								%s
@@ -182,11 +181,7 @@ public class MetamodelClassWriter {
 				metamodelClassName,
 				metamodelNamesFormatter.formatIndexFieldName( metamodelClassName ),
 				metamodelClassName,
-				Stream.concat(
-						regularProperties.stream().map( p -> p.asProperty( metamodelClassName ) ),
-						objectProperties.stream().map( p -> p.asProperty( metamodelClassName ) )
-				)
-						.collect( Collectors.joining( ";\n\tpublic final " ) ),
+				getFieldReferences( metamodelClassName ),
 				metamodelClassName,
 				regularProperties.stream().map( p -> p.asSetInConstructor( metamodelClassName ) )
 						.collect( Collectors.joining( "\n\t\t" ) ),
@@ -204,6 +199,16 @@ public class MetamodelClassWriter {
 						.collect( Collectors.joining( "\n\n" ) )
 						.replaceAll( "(?m)^", indent() )
 		);
+	}
+
+	private String getFieldReferences(String metamodelClassName) {
+		if ( regularProperties.isEmpty() && objectProperties.isEmpty() ) {
+			return "";
+		}
+		return Stream.concat(
+				regularProperties.stream().map( p -> p.asProperty( metamodelClassName ) ),
+				objectProperties.stream().map( p -> p.asProperty( metamodelClassName ) )
+		).collect( Collectors.joining( ";\n\tpublic final ", "public final ", ";\n" ) );
 	}
 
 	private String scopeInterfaceType() {
@@ -293,8 +298,7 @@ public class MetamodelClassWriter {
 					Locale.ROOT, """
 							public static class %s implements %s<%s> {
 
-								public final %s;
-
+								%s
 								private %s() {
 									// simple value field references:
 									%s
@@ -318,11 +322,7 @@ public class MetamodelClassWriter {
 					metamodelClassName,
 					objectReferenceClass(),
 					scopeType,
-					Stream.concat(
-							writer.regularProperties.stream().map( p -> p.asProperty( scopeType ) ),
-							writer.objectProperties.stream().map( p -> p.asProperty( scopeType ) )
-					)
-							.collect( Collectors.joining( ";\n\tpublic final " ) ),
+					getFieldReferences( scopeType ),
 					metamodelClassName,
 					writer.regularProperties.stream().map( p -> p.asSetInConstructor( scopeType ) )
 							.collect( Collectors.joining( "\n\t\t" ) ),
@@ -336,6 +336,17 @@ public class MetamodelClassWriter {
 							.collect( Collectors.joining( "\n\n" ) )
 							.replaceAll( "(?m)^", "\t" )
 			);
+		}
+
+		private String getFieldReferences(String scopeType) {
+			if ( writer.regularProperties.isEmpty() && writer.objectProperties.isEmpty() ) {
+				return "";
+			}
+			return Stream.concat(
+					writer.regularProperties.stream().map( p -> p.asProperty( scopeType ) ),
+					writer.objectProperties.stream().map( p -> p.asProperty( scopeType ) )
+			)
+					.collect( Collectors.joining( ";\n\tpublic final ", "public final ", ";\n" ) );
 		}
 
 		private String objectReferenceClass() {

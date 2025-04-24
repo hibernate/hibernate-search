@@ -36,4 +36,8 @@ public class PojoModelValueElement<T> implements PojoModelValue<T> {
 	public Class<?> rawType() {
 		return typeModel.rawType().typeIdentifier().javaClass();
 	}
+
+	public PojoTypeModel<? extends T> typeModel() {
+		return typeModel;
+	}
 }
