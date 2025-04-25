@@ -56,7 +56,7 @@ public final class HibernateOrmMapperSettings {
 	 *
 	 * @deprecated Use {@link #INDEXING_LISTENERS_ENABLED} instead.
 	 */
-	@Deprecated
+	@Deprecated(since = "6.2")
 	public static final String AUTOMATIC_INDEXING_ENABLED = PREFIX + Radicals.AUTOMATIC_INDEXING_ENABLED;
 
 	/**
@@ -68,7 +68,7 @@ public final class HibernateOrmMapperSettings {
 	 *
 	 * @deprecated Use {@link #INDEXING_LISTENERS_ENABLED} instead (caution: it expects a boolean value).
 	 */
-	@Deprecated
+	@Deprecated(since = "6.1")
 	public static final String AUTOMATIC_INDEXING_STRATEGY = PREFIX + Radicals.AUTOMATIC_INDEXING_STRATEGY;
 
 	/**
@@ -86,7 +86,7 @@ public final class HibernateOrmMapperSettings {
 	 *
 	 * @deprecated Use {@link #INDEXING_PLAN_SYNCHRONIZATION_STRATEGY} instead.
 	 */
-	@Deprecated
+	@Deprecated(since = "6.2")
 	public static final String AUTOMATIC_INDEXING_SYNCHRONIZATION_STRATEGY =
 			PREFIX + Radicals.AUTOMATIC_INDEXING_SYNCHRONIZATION_STRATEGY;
 
@@ -105,7 +105,7 @@ public final class HibernateOrmMapperSettings {
 	 * After the removal of this property in a future version,
 	 * a dirty check will always be performed when considering whether to trigger reindexing.
 	 */
-	@Deprecated
+	@Deprecated(since = "6.2")
 	public static final String AUTOMATIC_INDEXING_ENABLE_DIRTY_CHECK = PREFIX + Radicals.AUTOMATIC_INDEXING_ENABLE_DIRTY_CHECK;
 
 	/**
@@ -293,24 +293,24 @@ public final class HibernateOrmMapperSettings {
 		}
 
 		public static final String ENABLED = "enabled";
-		@Deprecated
+		@Deprecated(since = "6.2")
 		public static final String AUTOMATIC_INDEXING = "automatic_indexing";
-		@Deprecated
+		@Deprecated(since = "6.2")
 		public static final String AUTOMATIC_INDEXING_PREFIX = AUTOMATIC_INDEXING + ".";
 		/**
 		 * @deprecated Use {@link #INDEXING_LISTENERS_ENABLED} instead.
 		 */
-		@Deprecated
+		@Deprecated(since = "6.2")
 		public static final String AUTOMATIC_INDEXING_ENABLED = AUTOMATIC_INDEXING_PREFIX + AutomaticIndexingRadicals.ENABLED;
 		/**
 		 * @deprecated Use {@link #AUTOMATIC_INDEXING_ENABLED} instead (caution: it expects a boolean value).
 		 */
-		@Deprecated
+		@Deprecated(since = "6.1")
 		public static final String AUTOMATIC_INDEXING_STRATEGY = AUTOMATIC_INDEXING_PREFIX + AutomaticIndexingRadicals.STRATEGY;
 		/**
 		 * @deprecated Use {@link  #INDEXING_PLAN_SYNCHRONIZATION_STRATEGY} instead.
 		 */
-		@Deprecated
+		@Deprecated(since = "6.2")
 		public static final String AUTOMATIC_INDEXING_SYNCHRONIZATION_STRATEGY =
 				AUTOMATIC_INDEXING_PREFIX + AutomaticIndexingRadicals.SYNCHRONIZATION_STRATEGY;
 		/**
@@ -318,7 +318,7 @@ public final class HibernateOrmMapperSettings {
 		 * After the removal of this property in a future version,
 		 * a dirty check will always be performed when considering whether to trigger reindexing.
 		 */
-		@Deprecated
+		@Deprecated(since = "6.2 ")
 		public static final String AUTOMATIC_INDEXING_ENABLE_DIRTY_CHECK =
 				AUTOMATIC_INDEXING_PREFIX + AutomaticIndexingRadicals.ENABLE_DIRTY_CHECK;
 		public static final String QUERY_LOADING_CACHE_LOOKUP_STRATEGY = "query.loading.cache_lookup.strategy";
@@ -350,7 +350,7 @@ public final class HibernateOrmMapperSettings {
 	/**
 	 * Configuration property keys without the {@link #PREFIX prefix} + {@link Radicals#AUTOMATIC_INDEXING_PREFIX}.
 	 */
-	@Deprecated
+	@Deprecated(since = "6.2")
 	public static final class AutomaticIndexingRadicals {
 
 		private AutomaticIndexingRadicals() {
@@ -359,24 +359,24 @@ public final class HibernateOrmMapperSettings {
 		/**
 		 * @deprecated Use {@link IndexingRadicals#LISTENERS_ENABLED} instead.
 		 */
-		@Deprecated
+		@Deprecated(since = "6.2")
 		public static final String ENABLED = "enabled";
 		/**
 		 * @deprecated Use {@link IndexingRadicals#LISTENERS_ENABLED} instead (caution: it expects a boolean value).
 		 */
-		@Deprecated
+		@Deprecated(since = "6.1")
 		public static final String STRATEGY = "strategy";
 		/**
 		 * @deprecated Use {@link IndexingRadicals#PLAN_SYNCHRONIZATION_STRATEGY} instead.
 		 */
-		@Deprecated
+		@Deprecated(since = "6.1")
 		public static final String SYNCHRONIZATION_STRATEGY = "synchronization.strategy";
 		/**
 		 * @deprecated This setting will be removed in a future version. There will be no alternative provided to replace it.
 		 * After the removal of this property in a future version,
 		 * a dirty check will always be performed when considering whether to trigger reindexing.
 		 */
-		@Deprecated
+		@Deprecated(since = "6.2")
 		public static final String ENABLE_DIRTY_CHECK = "enable_dirty_check";
 	}
 
@@ -434,13 +434,13 @@ public final class HibernateOrmMapperSettings {
 		 * {@link HibernateOrmMapperSettings#AUTOMATIC_INDEXING_STRATEGY},
 		 * (caution: it expects a boolean value, and its default is {@link #ENABLED}).
 		 */
-		@Deprecated
+		@Deprecated(since = "6.1")
 		public static final org.hibernate.search.mapper.orm.automaticindexing.AutomaticIndexingStrategyName AUTOMATIC_INDEXING_STRATEGY =
 				org.hibernate.search.mapper.orm.automaticindexing.AutomaticIndexingStrategyName.SESSION;
 		/**
 		 * @deprecated Use {@link #INDEXING_PLAN_SYNCHRONIZATION_STRATEGY} instead.
 		 */
-		@Deprecated
+		@Deprecated(since = "6.2")
 		public static final BeanReference<
 				org.hibernate.search.mapper.orm.automaticindexing.session.AutomaticIndexingSynchronizationStrategy> AUTOMATIC_INDEXING_SYNCHRONIZATION_STRATEGY =
 						BeanReference.of(
@@ -451,7 +451,7 @@ public final class HibernateOrmMapperSettings {
 		 * After the removal of this property in a future version,
 		 * a dirty check will always be performed when considering whether to trigger reindexing.
 		 */
-		@Deprecated
+		@Deprecated(since = "6.2")
 		public static final boolean AUTOMATIC_INDEXING_ENABLE_DIRTY_CHECK = true;
 		public static final EntityLoadingCacheLookupStrategy QUERY_LOADING_CACHE_LOOKUP_STRATEGY =
 				EntityLoadingCacheLookupStrategy.SKIP;

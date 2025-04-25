@@ -563,14 +563,14 @@ class MatchPredicateBaseIT {
 			return f.match().field( field0Path ).field( field1Path ).matching( matchingParam, valueModel );
 		}
 
-		@Deprecated
+		@Deprecated(since = "test")
 		@Override
 		protected PredicateFinalStep predicate(SearchPredicateFactory f, String fieldPath, Object matchingParam,
 				org.hibernate.search.engine.search.common.ValueConvert valueConvert) {
 			return f.match().field( fieldPath ).matching( matchingParam, valueConvert );
 		}
 
-		@Deprecated
+		@Deprecated(since = "test")
 		@Override
 		protected PredicateFinalStep predicate(SearchPredicateFactory f, String field0Path, String field1Path,
 				Object matchingParam, org.hibernate.search.engine.search.common.ValueConvert valueConvert) {

@@ -37,7 +37,7 @@ public class EntityIndexingFailureContext extends FailureContext {
 	 */
 	// The cast is safe because Object is a supertype of EntityReference and the list is unmodifiable.
 	@SuppressWarnings({ "rawtypes", "unchecked" })
-	@Deprecated
+	@Deprecated(since = "6.2")
 	public List<Object> entityReferences() {
 		return (List<Object>) (List) failingEntityReferences;
 	}
@@ -70,7 +70,7 @@ public class EntityIndexingFailureContext extends FailureContext {
 		 * @param entityReference A reference to an entity related to the failing operation.
 		 * @deprecated Use {@link #failingEntityReference(EntityReference)} instead.
 		 */
-		@Deprecated
+		@Deprecated(since = "6.2")
 		public void entityReference(Object entityReference) {
 			// This may fail for callers that don't retrieve the reference the usual way,
 			// but we consider that acceptable as this builder should only be used by integrators

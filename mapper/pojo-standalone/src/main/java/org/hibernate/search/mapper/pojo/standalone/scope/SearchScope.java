@@ -148,7 +148,7 @@ public interface SearchScope<E> {
 	 * @return A {@link SearchWorkspace}.
 	 * @deprecated Use {@link #workspace(Object)} instead.
 	 */
-	@Deprecated(forRemoval = true)
+	@Deprecated(since = "7.2", forRemoval = true)
 	SearchWorkspace workspace(String tenantId);
 
 	/**
@@ -186,7 +186,7 @@ public interface SearchScope<E> {
 	 * @return A {@link MassIndexer}.
 	 * @deprecated Use {@link #massIndexer(Object)} instead.
 	 */
-	@Deprecated(forRemoval = true)
+	@Deprecated(since = "7.2", forRemoval = true)
 	MassIndexer massIndexer(String tenantId);
 
 	/**

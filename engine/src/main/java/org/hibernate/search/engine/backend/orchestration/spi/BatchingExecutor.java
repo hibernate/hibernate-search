@@ -105,7 +105,7 @@ public final class BatchingExecutor<P extends BatchedWorkProcessor, W extends Ba
 	/**
 	 * @deprecated Use {@link #submit(BatchedWork, OperationSubmitter)} instead.
 	 */
-	@Deprecated
+	@Deprecated(since = "6.2")
 	public void submit(W work) throws InterruptedException {
 		submit( work, OperationSubmitter.blocking() );
 	}

@@ -110,6 +110,11 @@
 		<property name="message" value="Avoid throwing 'AssertionError': use org.hibernate.search.util.common.AssertionFailure" />
 	</module>
 
+	<module name="RegexpSingleline">
+		<property name="format" value="@Deprecated(?:\s*+\(\s*+(?!.*\bsince\s*+=).*\))?\s*+[^(].*+" />
+		<property name="message" value="When deprecating something include the `since` attribute" />
+	</module>
+
 	<module name="SuppressionFilter">
 		<property name="file" value="/suppressions.xml" />
 	</module>

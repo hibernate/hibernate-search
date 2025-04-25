@@ -22,42 +22,42 @@ public interface PojoScopeSchemaManager {
 
 	CompletableFuture<?> createIfMissing(FailureCollector failureCollector, OperationSubmitter operationSubmitter);
 
-	@Deprecated
+	@Deprecated(since = "6.2")
 	default CompletableFuture<?> createIfMissing(FailureCollector failureCollector) {
 		return createIfMissing( failureCollector, OperationSubmitter.blocking() );
 	}
 
 	CompletableFuture<?> createOrValidate(FailureCollector failureCollector, OperationSubmitter operationSubmitter);
 
-	@Deprecated
+	@Deprecated(since = "6.2")
 	default CompletableFuture<?> createOrValidate(FailureCollector failureCollector) {
 		return createOrValidate( failureCollector, OperationSubmitter.blocking() );
 	}
 
 	CompletableFuture<?> createOrUpdate(FailureCollector failureCollector, OperationSubmitter operationSubmitter);
 
-	@Deprecated
+	@Deprecated(since = "6.2")
 	default CompletableFuture<?> createOrUpdate(FailureCollector failureCollector) {
 		return createOrUpdate( failureCollector, OperationSubmitter.blocking() );
 	}
 
 	CompletableFuture<?> dropAndCreate(FailureCollector failureCollector, OperationSubmitter operationSubmitter);
 
-	@Deprecated
+	@Deprecated(since = "6.2")
 	default CompletableFuture<?> dropAndCreate(FailureCollector failureCollector) {
 		return dropAndCreate( failureCollector, OperationSubmitter.blocking() );
 	}
 
 	CompletableFuture<?> dropIfExisting(FailureCollector failureCollector, OperationSubmitter operationSubmitter);
 
-	@Deprecated
+	@Deprecated(since = "6.2")
 	default CompletableFuture<?> dropIfExisting(FailureCollector failureCollector) {
 		return dropIfExisting( failureCollector, OperationSubmitter.blocking() );
 	}
 
 	CompletableFuture<?> validate(FailureCollector failureCollector, OperationSubmitter operationSubmitter);
 
-	@Deprecated
+	@Deprecated(since = "6.2")
 	default CompletableFuture<?> validate(FailureCollector failureCollector) {
 		return validate( failureCollector, OperationSubmitter.blocking() );
 	}

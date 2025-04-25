@@ -39,7 +39,7 @@ public interface MatchIdPredicateMatchingStep<N extends MatchIdPredicateMatching
 	 * @return The next step.
 	 * @deprecated Use {@link #matching(Object, ValueModel)} instead.
 	 */
-	@Deprecated
+	@Deprecated(since = "7.2")
 	default N matching(Object value, org.hibernate.search.engine.search.common.ValueConvert convert) {
 		return matching( value, org.hibernate.search.engine.search.common.ValueConvert.toValueModel( convert ) );
 	}
@@ -75,7 +75,7 @@ public interface MatchIdPredicateMatchingStep<N extends MatchIdPredicateMatching
 	 * @return The next step.
 	 * @deprecated Use {@link #matchingAny(Collection, ValueModel)} instead.
 	 */
-	@Deprecated
+	@Deprecated(since = "7.2")
 	default N matchingAny(Collection<?> values, org.hibernate.search.engine.search.common.ValueConvert convert) {
 		return matching( values, org.hibernate.search.engine.search.common.ValueConvert.toValueModel( convert ) );
 	}

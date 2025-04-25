@@ -18,7 +18,7 @@ import org.hibernate.search.util.common.annotation.Incubating;
  * @deprecated Implement {@link EntityLoadingBinder} and use {@link EntityLoadingBindingContext} instead.
  */
 @Incubating
-@Deprecated
+@Deprecated(since = "7.1")
 public interface EntityConfigurationContext<E> {
 
 	/**

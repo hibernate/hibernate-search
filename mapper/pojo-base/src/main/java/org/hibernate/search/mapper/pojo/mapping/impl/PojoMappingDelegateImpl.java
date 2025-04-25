@@ -147,7 +147,7 @@ public class PojoMappingDelegateImpl implements PojoMappingDelegate {
 	}
 
 	@Override
-	@Deprecated
+	@Deprecated(since = "7.1")
 	public <R extends EntityReference, E, C> PojoScopeDelegate<R, E, C> createPojoScope(
 			PojoScopeMappingContext mappingContext,
 			Collection<? extends PojoRawTypeIdentifier<? extends E>> targetedTypes,

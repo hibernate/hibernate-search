@@ -193,7 +193,7 @@ public interface SearchSession extends SearchScopeProvider, AutoCloseable {
 	 * @return The tenant identifier for this session.
 	 * @deprecated Use {@link #tenantIdentifierValue()} instead.
 	 */
-	@Deprecated(forRemoval = true)
+	@Deprecated(since = "7.2", forRemoval = true)
 	String tenantIdentifier();
 
 	/**

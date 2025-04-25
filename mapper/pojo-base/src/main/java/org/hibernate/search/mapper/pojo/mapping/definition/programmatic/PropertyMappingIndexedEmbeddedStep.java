@@ -25,7 +25,7 @@ public interface PropertyMappingIndexedEmbeddedStep extends PropertyMappingStep 
 	 * @deprecated Pass a field name to {@link PropertyMappingStep#indexedEmbedded(String)} instead.
 	 * Note that the name passed to that method does not allow dots.
 	 */
-	@Deprecated
+	@Deprecated(since = "6.0")
 	@Search5DeprecatedAPI
 	PropertyMappingIndexedEmbeddedStep prefix(String prefix);
 

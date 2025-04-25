@@ -80,7 +80,7 @@ public interface FieldSortMissingValueBehaviorStep<N> {
 	 * @throws SearchException If the field is not numeric.
 	 * @deprecated Use {@link #use(Object, ValueModel)} instead.
 	 */
-	@Deprecated
+	@Deprecated(since = "7.2")
 	default N use(Object value, org.hibernate.search.engine.search.common.ValueConvert convert) {
 		return use( value, org.hibernate.search.engine.search.common.ValueConvert.toValueModel( convert ) );
 	}

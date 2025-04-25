@@ -12,7 +12,7 @@ import org.hibernate.search.engine.backend.types.ObjectStructure;
  * @param <N> The type of the next step.
  * @deprecated Use {@link SearchPredicateFactory#nested(String)} instead.
  */
-@Deprecated
+@Deprecated(since = "6.2")
 public interface NestedPredicateFieldStep<N extends NestedPredicateNestStep<?>> {
 
 	/**

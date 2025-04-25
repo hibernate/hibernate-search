@@ -13,7 +13,7 @@ import org.hibernate.search.mapper.orm.session.SearchSession;
  *
  * @deprecated Use {@link org.hibernate.search.mapper.orm.cfg.HibernateOrmMapperSettings#INDEXING_LISTENERS_ENABLED} instead.
  */
-@Deprecated
+@Deprecated(since = "6.1")
 public enum AutomaticIndexingStrategyName {
 
 	/**
@@ -23,8 +23,8 @@ public enum AutomaticIndexingStrategyName {
 	 *
 	 * @deprecated Use {@link org.hibernate.search.mapper.orm.cfg.HibernateOrmMapperSettings#INDEXING_LISTENERS_ENABLED} instead.
 	 */
-	@Deprecated
-	NONE( "none" ),
+	@Deprecated( since = "6.1")
+	NONE("none" ),
 
 	/**
 	 * Indexing is triggered automatically when entities are modified in the Hibernate ORM session:
@@ -32,8 +32,8 @@ public enum AutomaticIndexingStrategyName {
 	 *
 	 * @deprecated Use {@link org.hibernate.search.mapper.orm.cfg.HibernateOrmMapperSettings#INDEXING_LISTENERS_ENABLED} instead.
 	 */
-	@Deprecated
-	SESSION( "session" );
+	@Deprecated( since = "6.1")
+	SESSION("session" );
 
 	// This method conforms to the MicroProfile Config specification. Do not change its signature.
 	public static AutomaticIndexingStrategyName of(String value) {

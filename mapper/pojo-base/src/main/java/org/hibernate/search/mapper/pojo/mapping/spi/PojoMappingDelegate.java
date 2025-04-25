@@ -109,7 +109,7 @@ public interface PojoMappingDelegate extends AutoCloseable {
 	 * or {@link #createPojoAllScope(PojoScopeMappingContext, PojoScopeTypeExtendedContextProvider)}
 	 * instead.
 	 */
-	@Deprecated
+	@Deprecated(since = "7.1")
 	<R extends EntityReference, E, C> PojoScopeDelegate<R, E, C> createPojoScope(
 			PojoScopeMappingContext mappingContext,
 			Collection<? extends PojoRawTypeIdentifier<? extends E>> targetedTypes,

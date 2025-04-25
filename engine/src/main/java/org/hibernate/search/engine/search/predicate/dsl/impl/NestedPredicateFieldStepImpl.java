@@ -14,7 +14,7 @@ import org.hibernate.search.engine.search.predicate.dsl.spi.SearchPredicateDslCo
 import org.hibernate.search.engine.search.predicate.spi.NestedPredicateBuilder;
 import org.hibernate.search.engine.search.predicate.spi.PredicateTypeKeys;
 
-@Deprecated
+@Deprecated(since = "6.2")
 public final class NestedPredicateFieldStepImpl
 		extends AbstractPredicateFinalStep
 		implements org.hibernate.search.engine.search.predicate.dsl.NestedPredicateFieldStep<

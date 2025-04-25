@@ -216,7 +216,7 @@ public interface SearchSession extends SearchScopeProvider {
 	 *
 	 * @deprecated Use {@link #indexingPlanSynchronizationStrategy(IndexingPlanSynchronizationStrategy)} instead.
 	 */
-	@Deprecated
+	@Deprecated(since = "6.2")
 	void automaticIndexingSynchronizationStrategy(
 			org.hibernate.search.mapper.orm.automaticindexing.session.AutomaticIndexingSynchronizationStrategy synchronizationStrategy);
 

@@ -15,7 +15,7 @@ import org.hibernate.search.mapper.pojo.work.IndexingPlanSynchronizationStrategy
  *
  * @deprecated See {@link IndexingPlanSynchronizationStrategy}
  */
-@Deprecated
+@Deprecated(since = "6.2")
 public interface AutomaticIndexingSynchronizationStrategy {
 
 	void apply(AutomaticIndexingSynchronizationConfigurationContext context);

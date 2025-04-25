@@ -9,7 +9,7 @@ package org.hibernate.search.backend.elasticsearch.cfg.spi;
  *
  * @deprecated Use {@link org.hibernate.search.backend.elasticsearch.cfg.impl.ElasticsearchBackendImplSettings} instead.
  */
-@Deprecated
+@Deprecated(since = "6.2")
 public final class ElasticsearchBackendImplSettings {
 
 	private ElasticsearchBackendImplSettings() {

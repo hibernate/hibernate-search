@@ -593,14 +593,14 @@ class TermsPredicateBaseIT {
 					.matchingAny( Collections.singletonList( matchingParam ), valueModel );
 		}
 
-		@Deprecated
+		@Deprecated(since = "test")
 		@Override
 		protected PredicateFinalStep predicate(SearchPredicateFactory f, String fieldPath, Object matchingParam,
 				org.hibernate.search.engine.search.common.ValueConvert valueConvert) {
 			return f.terms().field( fieldPath ).matchingAny( Collections.singletonList( matchingParam ), valueConvert );
 		}
 
-		@Deprecated
+		@Deprecated(since = "test")
 		@Override
 		protected PredicateFinalStep predicate(SearchPredicateFactory f, String field0Path, String field1Path,
 				Object matchingParam, org.hibernate.search.engine.search.common.ValueConvert valueConvert) {

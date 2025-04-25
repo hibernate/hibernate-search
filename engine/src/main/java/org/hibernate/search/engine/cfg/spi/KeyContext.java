@@ -17,7 +17,7 @@ public interface KeyContext {
 	 * @return The next context.
 	 * @deprecated Use {@link #asIntegerPositiveOrZeroOrNegative()} instead.
 	 */
-	@Deprecated
+	@Deprecated(since = "6.1")
 	default OptionalPropertyContext<Integer> asInteger() {
 		return asIntegerPositiveOrZeroOrNegative();
 	}
@@ -32,7 +32,7 @@ public interface KeyContext {
 	 * @return The next context.
 	 * @deprecated Use {@link #asLongPositiveOrZeroOrNegative()} instead.
 	 */
-	@Deprecated
+	@Deprecated(since = "6.1")
 	default OptionalPropertyContext<Long> asLong() {
 		return asLongPositiveOrZeroOrNegative();
 	}

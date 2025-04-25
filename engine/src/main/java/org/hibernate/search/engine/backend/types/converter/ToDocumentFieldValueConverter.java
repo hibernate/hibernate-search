@@ -13,7 +13,7 @@ import org.hibernate.search.engine.backend.types.converter.runtime.ToDocumentVal
  * @param <F> The type of target, index field values.
  * @deprecated Implement {@link ToDocumentValueConverter} instead.
  */
-@Deprecated
+@Deprecated(since = "6.1")
 public interface ToDocumentFieldValueConverter<V, F> extends ToDocumentValueConverter<V, F> {
 
 	@Override

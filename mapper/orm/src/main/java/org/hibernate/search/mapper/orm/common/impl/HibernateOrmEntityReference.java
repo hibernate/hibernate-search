@@ -15,7 +15,7 @@ import org.hibernate.search.mapper.pojo.model.spi.PojoRawTypeIdentifier;
  * @deprecated Wherever possible, use {@link PojoEntityReference} instead.
  * This may not be possible everywhere due to backwards compatibility constraints.
  */
-@Deprecated
+@Deprecated(since = "6.2")
 public final class HibernateOrmEntityReference implements org.hibernate.search.mapper.orm.common.EntityReference {
 
 	public static org.hibernate.search.mapper.orm.common.EntityReference withDefaultName(Class<?> type, Object id) {

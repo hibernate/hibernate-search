@@ -10,7 +10,7 @@ import org.hibernate.search.util.common.SearchException;
  * @deprecated Use {@link org.hibernate.search.engine.backend.types.converter.FromDocumentValueConverter}
  * with {@link FromDocumentValueConvertContext} instead.
  */
-@Deprecated
+@Deprecated(since = "6.1")
 public interface FromDocumentFieldValueConvertContext {
 
 	/**

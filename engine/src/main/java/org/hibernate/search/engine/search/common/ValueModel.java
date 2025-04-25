@@ -113,6 +113,6 @@ public enum ValueModel {
 	 * @deprecated This constant is deprecated and will be removed at the same time as the {@link ValueConvert} enum is removed.
 	 * Do <b>not</b> use this value explicitly.
 	 */
-	@Deprecated(forRemoval = true)
+	@Deprecated(since = "7.2", forRemoval = true)
 	DEFAULT
 }

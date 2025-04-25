@@ -13,8 +13,8 @@ public enum PayloadType {
 	/**
 	 * Using {@link org.hibernate.type.SqlTypes#MATERIALIZED_BLOB} to store the payload.
 	 */
-	@Deprecated
-	MATERIALIZED_BLOB( "materialized_blob" ),
+	@Deprecated( since = "7.0")
+	MATERIALIZED_BLOB("materialized_blob" ),
 
 	/**
 	 * Using {@link org.hibernate.type.SqlTypes#LONG32VARBINARY} to store the payload.

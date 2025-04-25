@@ -113,7 +113,7 @@ public abstract class AbstractPredicateTypeCheckingAndConversionIT<V extends Abs
 				) );
 	}
 
-	@Deprecated
+	@Deprecated(since = "test")
 	@ParameterizedTest(name = "{5}")
 	@MethodSource("params")
 	void defaultDslConverter_valueConvertYes_validType(SimpleMappedIndex<IndexBinding> index,
@@ -200,7 +200,7 @@ public abstract class AbstractPredicateTypeCheckingAndConversionIT<V extends Abs
 				) );
 	}
 
-	@Deprecated
+	@Deprecated(since = "test")
 	@ParameterizedTest(name = "{5}")
 	@MethodSource("params")
 	void customDslConverter_valueConvertYes_invalidType(SimpleMappedIndex<IndexBinding> index,
@@ -236,7 +236,7 @@ public abstract class AbstractPredicateTypeCheckingAndConversionIT<V extends Abs
 				.hasDocRefHitsAnyOrder( index.typeName(), dataSet.docId( 0 ) );
 	}
 
-	@Deprecated
+	@Deprecated(since = "test")
 	@ParameterizedTest(name = "{5}")
 	@MethodSource("params")
 	void defaultDslConverter_valueConvertNo_validType(SimpleMappedIndex<IndexBinding> index,
@@ -272,7 +272,7 @@ public abstract class AbstractPredicateTypeCheckingAndConversionIT<V extends Abs
 				) );
 	}
 
-	@Deprecated
+	@Deprecated(since = "test")
 	@ParameterizedTest(name = "{5}")
 	@MethodSource("params")
 	void defaultDslConverter_valueConvertNo_invalidType(SimpleMappedIndex<IndexBinding> index,
@@ -308,7 +308,7 @@ public abstract class AbstractPredicateTypeCheckingAndConversionIT<V extends Abs
 				.hasDocRefHitsAnyOrder( index.typeName(), dataSet.docId( 0 ) );
 	}
 
-	@Deprecated
+	@Deprecated(since = "test")
 	@ParameterizedTest(name = "{5}")
 	@MethodSource("params")
 	void customDslConverter_valueConvertNo_validType(SimpleMappedIndex<IndexBinding> index,
@@ -344,7 +344,7 @@ public abstract class AbstractPredicateTypeCheckingAndConversionIT<V extends Abs
 				) );
 	}
 
-	@Deprecated
+	@Deprecated(since = "test")
 	@ParameterizedTest(name = "{5}")
 	@MethodSource("params")
 	void customDslConverter_valueConvertNo_invalidType(SimpleMappedIndex<IndexBinding> index,
@@ -387,7 +387,7 @@ public abstract class AbstractPredicateTypeCheckingAndConversionIT<V extends Abs
 				.hasDocRefHitsAnyOrder( index.typeName(), dataSet.docId( 1 ) );
 	}
 
-	@Deprecated
+	@Deprecated(since = "test")
 	@ParameterizedTest(name = "{5}")
 	@MethodSource("params")
 	void multiFields_customDslConverter_valueConvertYes(SimpleMappedIndex<IndexBinding> index,
@@ -432,7 +432,7 @@ public abstract class AbstractPredicateTypeCheckingAndConversionIT<V extends Abs
 				.hasDocRefHitsAnyOrder( index.typeName(), dataSet.docId( 1 ) );
 	}
 
-	@Deprecated
+	@Deprecated(since = "test")
 	@ParameterizedTest(name = "{5}")
 	@MethodSource("params")
 	void multiFields_customDslConverter_valueConvertNo(SimpleMappedIndex<IndexBinding> index,
@@ -771,11 +771,11 @@ public abstract class AbstractPredicateTypeCheckingAndConversionIT<V extends Abs
 	protected abstract PredicateFinalStep predicate(SearchPredicateFactory f, String field0Path, String field1Path,
 			P matchingParam, ValueModel valueModel);
 
-	@Deprecated
+	@Deprecated(since = "test")
 	protected abstract PredicateFinalStep predicate(SearchPredicateFactory f, String fieldPath, P matchingParam,
 			org.hibernate.search.engine.search.common.ValueConvert valueConvert);
 
-	@Deprecated
+	@Deprecated(since = "test")
 	protected abstract PredicateFinalStep predicate(SearchPredicateFactory f, String field0Path, String field1Path,
 			P matchingParam, org.hibernate.search.engine.search.common.ValueConvert valueConvert);
 

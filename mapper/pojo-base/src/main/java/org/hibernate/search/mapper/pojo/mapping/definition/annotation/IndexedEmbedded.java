@@ -110,7 +110,7 @@ public @interface IndexedEmbedded {
 	 * Must not be set if {@link #name()} is set.
 	 * @deprecated Use {@link #name()} instead. Note that {@link #name()} does not allow dots.
 	 */
-	@Deprecated
+	@Deprecated(since = "6.0")
 	@Search5DeprecatedAPI
 	String prefix() default "";
 

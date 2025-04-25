@@ -136,7 +136,7 @@ public final class HibernateOrmExtension
 	 * and {@link org.hibernate.search.engine.backend.types.converter.runtime.ToDocumentFieldValueConvertContext} instead.
 	 */
 	@Override
-	@Deprecated
+	@Deprecated(since = "6.1")
 	public Optional<HibernateOrmMappingContext> extendOptional(
 			org.hibernate.search.engine.backend.types.converter.runtime.ToDocumentFieldValueConvertContext original,
 			BackendMappingContext mappingContext) {
@@ -159,7 +159,7 @@ public final class HibernateOrmExtension
 	 * and {@link org.hibernate.search.engine.backend.types.converter.runtime.FromDocumentValueConvertContext} instead.
 	 */
 	@Override
-	@Deprecated
+	@Deprecated(since = "6.1")
 	public Optional<HibernateOrmSessionContext> extendOptional(
 			org.hibernate.search.engine.backend.types.converter.runtime.FromDocumentFieldValueConvertContext original,
 			BackendSessionContext sessionContext) {
