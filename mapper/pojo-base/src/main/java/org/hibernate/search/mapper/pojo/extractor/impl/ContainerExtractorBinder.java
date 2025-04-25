@@ -336,7 +336,6 @@ public class ContainerExtractorBinder {
 		}
 	}
 
-	@SuppressWarnings({ "rawtypes" }) // Checks are implemented using reflection
 	private static class ExtractorResolutionState<C> {
 
 		private final List<String> extractorNames = new ArrayList<>();

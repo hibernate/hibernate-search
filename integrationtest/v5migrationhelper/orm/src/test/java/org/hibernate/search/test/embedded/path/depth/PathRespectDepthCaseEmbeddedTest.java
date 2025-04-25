@@ -7,7 +7,6 @@ package org.hibernate.search.test.embedded.path.depth;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.junit.platform.launcher.core.LauncherFactory.openSession;
 
 import java.util.List;
 

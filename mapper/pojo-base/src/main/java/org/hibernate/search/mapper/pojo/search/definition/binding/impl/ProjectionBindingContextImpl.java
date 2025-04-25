@@ -135,7 +135,7 @@ public class ProjectionBindingContextImpl<P> implements ProjectionBindingContext
 		checkAndBind( definitionHolder, mappingHelper.introspector().typeModel( expectedValueType ) );
 	}
 
-	@SuppressWarnings("deprecation")
+	@Deprecated(since = "8.0")
 	@Override
 	public Optional<MultiContextImpl<?>> multi() {
 		PojoTypeModel<?> boundParameterElement = boundParameterElement( MULTI_EXTRACTORS );

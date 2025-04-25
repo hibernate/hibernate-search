@@ -85,7 +85,6 @@ public final class HibernateOrmMappingConfigurationContributor implements PojoMa
 		}
 	}
 
-	@SuppressWarnings("rawtypes")
 	private void contributeEmbeddableTypeMetadata(
 			MappingConfigurationCollector<PojoTypeMetadataContributor> configurationCollector,
 			Set<PojoRawTypeModel<?>> processedEmbeddableTypes,

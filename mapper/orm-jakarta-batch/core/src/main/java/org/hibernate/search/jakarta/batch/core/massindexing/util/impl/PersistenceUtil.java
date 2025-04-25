@@ -40,7 +40,6 @@ public final class PersistenceUtil {
 	 */
 	public static Session openSession(EntityManagerFactory entityManagerFactory, Object tenantId) {
 		SessionFactory sessionFactory = entityManagerFactory.unwrap( SessionFactory.class );
-		@SuppressWarnings("rawtypes")
 		SessionBuilder builder = sessionFactory.withOptions();
 		if ( tenantId != null ) {
 			builder.tenantIdentifier( tenantId );

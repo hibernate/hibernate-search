@@ -32,7 +32,7 @@ public class HighlightProjectionOptionsStepImpl
 		return this;
 	}
 
-	@SuppressWarnings("deprecation")
+	@Deprecated(since = "8.0")
 	@Override
 	public SingleHighlightProjectionFinalStep single() {
 		return new SingleHighlightProjectionFinalStepImpl();
