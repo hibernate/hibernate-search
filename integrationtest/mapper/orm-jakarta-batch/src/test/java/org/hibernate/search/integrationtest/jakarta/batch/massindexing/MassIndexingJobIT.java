@@ -7,7 +7,7 @@ package org.hibernate.search.integrationtest.jakarta.batch.massindexing;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.entry;
 import static org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmUtils.with;
-import static org.junit.Assume.assumeTrue;
+import static org.junit.jupiter.api.Assumptions.assumeTrue;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -214,10 +214,11 @@ class MassIndexingJobIT {
 	void indexedEmbeddedCollection_idFetchSize_entityFetchSize_mysql() throws InterruptedException {
 		Dialect dialect = emf.unwrap( SessionFactoryImplementor.class ).getJdbcServices()
 				.getJdbcEnvironment().getDialect();
-		assumeTrue( "This test only makes sense on MySQL,"
-				+ " which is the only JDBC driver that accepts (and, in a sense, requires)"
-				+ " passing Integer.MIN_VALUE for the JDBC fetch size",
-				dialect instanceof MySQLDialect && !( dialect instanceof MariaDBDialect ) );
+		assumeTrue( dialect instanceof MySQLDialect && !( dialect instanceof MariaDBDialect ),
+				"This test only makes sense on MySQL,"
+						+ " which is the only JDBC driver that accepts (and, in a sense, requires)"
+						+ " passing Integer.MIN_VALUE for the JDBC fetch size"
+		);
 
 		List<CompanyGroup> groupsContainingGoogle =
 				JobTestUtil.findIndexedResults( emf, CompanyGroup.class, "companies.name", "Google" );

@@ -4,8 +4,8 @@
  */
 package org.hibernate.search.test.bridge;
 
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.fail;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -52,7 +52,7 @@ class UnresolvedBridgeTest {
 				}
 				ee = ee.getCause();
 			}
-			assertTrue( hasSearchException );
+			assertThat( hasSearchException ).isTrue();
 		}
 	}
 

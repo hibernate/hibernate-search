@@ -5,8 +5,8 @@
 
 package org.hibernate.search.test.engine;
 
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.fail;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -48,7 +48,7 @@ class TransactionSynchronizationTest extends SearchTestBase {
 			raised = true;
 			transaction.rollback();
 		}
-		assertTrue( "An exception should have been raised", raised );
+		assertTrue( raised, "An exception should have been raised" );
 		fts.close();
 	}
 
