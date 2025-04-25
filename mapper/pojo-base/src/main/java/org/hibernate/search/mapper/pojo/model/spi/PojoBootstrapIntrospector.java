@@ -33,7 +33,7 @@ public interface PojoBootstrapIntrospector {
 	 * @return A {@link ValueHandleFactory} for reading annotation attributes.
 	 * @deprecated Use/implement {@link #annotationValueHandleFactory()} instead.
 	 */
-	@Deprecated
+	@Deprecated(since = "6.2")
 	default org.hibernate.search.util.common.reflect.spi.ValueReadHandleFactory annotationValueReadHandleFactory() {
 		return (org.hibernate.search.util.common.reflect.spi.ValueReadHandleFactory) annotationValueHandleFactory();
 	}

@@ -19,9 +19,9 @@ public final class UuidDataTypeUtils {
 	}
 
 	private static final String DEFAULT = "default";
-	@Deprecated
+	@Deprecated(since = "7.0")
 	private static final String UUID_BINARY = "uuid-binary";
-	@Deprecated
+	@Deprecated(since = "7.0")
 	private static final String UUID_CHAR = "uuid-char";
 
 	/**

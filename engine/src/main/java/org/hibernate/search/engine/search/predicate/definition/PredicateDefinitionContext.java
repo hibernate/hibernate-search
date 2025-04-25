@@ -36,7 +36,7 @@ public interface PredicateDefinitionContext {
 	 * @see NamedPredicateOptionsStep#param(String, Object)
 	 * @deprecated Use {@link #params()} instead.
 	 */
-	@Deprecated
+	@Deprecated(since = "7.0")
 	default Object param(String name) {
 		return params().get( name, Object.class );
 	}
@@ -50,7 +50,7 @@ public interface PredicateDefinitionContext {
 	 * @see NamedPredicateOptionsStep#param(String, Object)
 	 * @deprecated Use {@link #params()} instead.
 	 */
-	@Deprecated
+	@Deprecated(since = "7.2")
 	default <T> T param(String name, Class<T> paramType) {
 		return params().get( name, paramType );
 	}
@@ -62,7 +62,7 @@ public interface PredicateDefinitionContext {
 	 * @see NamedPredicateOptionsStep#param(String, Object)
 	 * @deprecated Use {@link #params()} instead.
 	 */
-	@Deprecated
+	@Deprecated(since = "7.0")
 	default Optional<Object> paramOptional(String name) {
 		return params().getOptional( name, Object.class );
 	}
@@ -76,7 +76,7 @@ public interface PredicateDefinitionContext {
 	 * @see NamedPredicateOptionsStep#param(String, Object)
 	 * @deprecated Use {@link #params()} instead.
 	 */
-	@Deprecated
+	@Deprecated(since = "7.2")
 	default <T> Optional<T> paramOptional(String name, Class<T> paramType) {
 		return params().getOptional( name, paramType );
 	}

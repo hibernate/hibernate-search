@@ -57,7 +57,7 @@ public class PojoIndexingPlanImpl
 	}
 
 	@Override
-	@Deprecated
+	@Deprecated(since = "6.2")
 	public void add(PojoRawTypeIdentifier<?> typeIdentifier, Object providedId,
 			DocumentRoutesDescriptor providedRoutes, Object entity) {
 		AbstractPojoTypeIndexingPlan<?, ?, ?> delegate = typeIfIncludedOrNull( typeIdentifier );
@@ -68,7 +68,7 @@ public class PojoIndexingPlanImpl
 	}
 
 	@Override
-	@Deprecated
+	@Deprecated(since = "6.2")
 	public void addOrUpdate(PojoRawTypeIdentifier<?> typeIdentifier, Object providedId,
 			DocumentRoutesDescriptor providedRoutes, Object entity,
 			boolean forceSelfDirty, boolean forceContainingDirty, BitSet dirtyPaths) {
@@ -80,7 +80,7 @@ public class PojoIndexingPlanImpl
 	}
 
 	@Override
-	@Deprecated
+	@Deprecated(since = "6.2")
 	public void delete(PojoRawTypeIdentifier<?> typeIdentifier, Object providedId,
 			DocumentRoutesDescriptor providedRoutes,
 			Object entity) {
@@ -92,7 +92,7 @@ public class PojoIndexingPlanImpl
 	}
 
 	@Override
-	@Deprecated
+	@Deprecated(since = "6.2")
 	public void addOrUpdateOrDelete(PojoRawTypeIdentifier<?> typeIdentifier, Object providedId,
 			DocumentRoutesDescriptor providedRoutes, boolean forceSelfDirty, boolean forceContainingDirty,
 			BitSet dirtyPaths) {
@@ -104,7 +104,7 @@ public class PojoIndexingPlanImpl
 	}
 
 	@Override
-	@Deprecated
+	@Deprecated(since = "6.2")
 	public void updateAssociationInverseSide(PojoRawTypeIdentifier<?> typeIdentifier,
 			BitSet dirtyAssociationPaths, Object[] oldState, Object[] newState) {
 		AbstractPojoTypeIndexingPlan<?, ?, ?> delegate = typeIfIncludedOrNull( typeIdentifier );

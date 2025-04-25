@@ -58,7 +58,7 @@ public abstract class AbstractPojoMappingImplementor<M>
 	 * @deprecated Use {@link AbstractPojoMappingImplementor}.
 	 * This constructor is only present for backwards compatibility, for mappers that expose a custom entity reference type.
 	 */
-	@Deprecated
+	@Deprecated(since = "6.2")
 	public AbstractPojoMappingImplementor(PojoMappingDelegate delegate,
 			PojoEntityReferenceFactoryDelegate entityReferenceFactoryDelegate) {
 		this.delegate = delegate;

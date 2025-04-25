@@ -13,7 +13,7 @@ import org.hibernate.search.engine.backend.types.converter.runtime.FromDocumentV
  * @param <V> The type of target values.
  * @deprecated Implement {@link FromDocumentValueConverter} instead.
  */
-@Deprecated
+@Deprecated(since = "6.1")
 public interface FromDocumentFieldValueConverter<F, V> extends FromDocumentValueConverter<F, V> {
 
 	@Override

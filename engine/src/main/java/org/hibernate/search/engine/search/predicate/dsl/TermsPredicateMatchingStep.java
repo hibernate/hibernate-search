@@ -55,7 +55,7 @@ public interface TermsPredicateMatchingStep<N extends TermsPredicateOptionsStep<
 	 * @return The next step.
 	 * @deprecated Use {@link #matchingAny(Collection, ValueModel)} instead.
 	 */
-	@Deprecated
+	@Deprecated(since = "7.2")
 	default N matchingAny(Collection<?> terms, org.hibernate.search.engine.search.common.ValueConvert convert) {
 		return matchingAny( terms, org.hibernate.search.engine.search.common.ValueConvert.toValueModel( convert ) );
 	}
@@ -112,7 +112,7 @@ public interface TermsPredicateMatchingStep<N extends TermsPredicateOptionsStep<
 	 * @return The next step.
 	 * @deprecated Use {@link #matchingAll(Collection, ValueModel)} instead.
 	 */
-	@Deprecated
+	@Deprecated(since = "7.2")
 	default N matchingAll(Collection<?> terms, org.hibernate.search.engine.search.common.ValueConvert convert) {
 		return matchingAll( terms, org.hibernate.search.engine.search.common.ValueConvert.toValueModel( convert ) );
 	}

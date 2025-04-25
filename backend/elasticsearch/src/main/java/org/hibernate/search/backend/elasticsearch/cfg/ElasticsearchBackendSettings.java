@@ -341,7 +341,7 @@ public final class ElasticsearchBackendSettings {
 		 * is now dynamic and depends on the value of the {@link ElasticsearchBackendSettings#VERSION} property.
 		 * @see ElasticsearchBackendSettings#VERSION_CHECK_ENABLED
 		 */
-		@Deprecated
+		@Deprecated(since = "7.0")
 		public static final boolean VERSION_CHECK_ENABLED = true;
 
 		/**
@@ -349,7 +349,7 @@ public final class ElasticsearchBackendSettings {
 		 * If the multi-tenancy is enabled in the mapper, the default is {@link MultiTenancyStrategyName#DISCRIMINATOR}.
 		 * Otherwise, the default is still {@link MultiTenancyStrategyName#NONE}.
 		 */
-		@Deprecated
+		@Deprecated(since = "6.1")
 		public static final MultiTenancyStrategyName MULTI_TENANCY_STRATEGY = MultiTenancyStrategyName.NONE;
 
 		public static final TypeNameMappingStrategyName MAPPING_TYPE_NAME_STRATEGY = TypeNameMappingStrategyName.DISCRIMINATOR;

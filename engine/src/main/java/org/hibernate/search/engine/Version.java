@@ -28,7 +28,7 @@ public final class Version {
 	 * @return A string representation of the version of Hibernate Search.
 	 * @deprecated Use {@link #versionString()} instead.
 	 */
-	@Deprecated
+	@Deprecated(since = "6.0")
 	@Search5DeprecatedAPI
 	public static String getVersionString() {
 		return versionString();

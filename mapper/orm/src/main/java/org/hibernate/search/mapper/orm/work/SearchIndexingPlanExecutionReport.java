@@ -10,7 +10,7 @@ import java.util.Optional;
 /**
  * @deprecated Use {@link org.hibernate.search.mapper.pojo.work.SearchIndexingPlanExecutionReport}
  */
-@Deprecated
+@Deprecated(since = "6.2")
 public interface SearchIndexingPlanExecutionReport {
 
 	/**

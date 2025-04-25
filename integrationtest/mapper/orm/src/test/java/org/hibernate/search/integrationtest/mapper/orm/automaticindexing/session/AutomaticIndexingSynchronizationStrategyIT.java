@@ -48,7 +48,7 @@ import org.assertj.core.api.InstanceOfAssertFactories;
 import org.awaitility.Awaitility;
 import org.hamcrest.CoreMatchers;
 
-@Deprecated
+@Deprecated(since = "test")
 class AutomaticIndexingSynchronizationStrategyIT {
 
 	// Let's say 3 seconds are long enough to consider that, if nothing changed after this time, nothing ever will.

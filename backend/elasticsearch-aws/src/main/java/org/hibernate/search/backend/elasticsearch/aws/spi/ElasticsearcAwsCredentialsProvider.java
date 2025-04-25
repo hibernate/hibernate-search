@@ -11,7 +11,7 @@ import software.amazon.awssdk.auth.credentials.AwsCredentialsProvider;
 /**
  * @deprecated Implement {@link ElasticsearchAwsCredentialsProvider} instead.
  */
-@Deprecated
+@Deprecated(since = "6.1")
 public interface ElasticsearcAwsCredentialsProvider extends ElasticsearchAwsCredentialsProvider {
 
 	AwsCredentialsProvider create(ConfigurationPropertySource propertySource);

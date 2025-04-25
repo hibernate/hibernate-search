@@ -135,7 +135,7 @@ public interface SearchProjectionFactory<R, E> {
 	 * @return A DSL step where the "field" projection can be defined in more details.
 	 * @deprecated Use {@link #field(String, Class, ValueModel)} instead.
 	 */
-	@Deprecated
+	@Deprecated(since = "7.2")
 	default <T> FieldProjectionValueStep<?, T> field(String fieldPath, Class<T> type,
 			org.hibernate.search.engine.search.common.ValueConvert convert) {
 		return field( fieldPath, type,
@@ -176,7 +176,7 @@ public interface SearchProjectionFactory<R, E> {
 	 * @return A DSL step where the "field" projection can be defined in more details.
 	 * @deprecated Use {@link #field(String, ValueModel)} instead.
 	 */
-	@Deprecated
+	@Deprecated(since = "7.2")
 	default FieldProjectionValueStep<?, Object> field(String fieldPath,
 			org.hibernate.search.engine.search.common.ValueConvert convert) {
 		return field( fieldPath, org.hibernate.search.engine.search.common.ValueConvert.toValueModel( convert ) );
@@ -270,7 +270,7 @@ public interface SearchProjectionFactory<R, E> {
 	 * @return A DSL step where the "composite" projection can be defined in more details.
 	 * @deprecated Use {@code .composite().from( projections ).asList( transformer )} instead.
 	 */
-	@Deprecated
+	@Deprecated(since = "6.2")
 	default <T> CompositeProjectionOptionsStep<?, T> composite(Function<List<?>, T> transformer,
 			SearchProjection<?>... projections) {
 		return composite().from( projections ).asList( transformer );
@@ -285,7 +285,7 @@ public interface SearchProjectionFactory<R, E> {
 	 * @return A DSL step where the "composite" projection can be defined in more details.
 	 * @deprecated Use {@code .composite().from( dslFinalSteps ).asList( transformer )} instead.
 	 */
-	@Deprecated
+	@Deprecated(since = "6.2")
 	default <T> CompositeProjectionOptionsStep<?, T> composite(Function<List<?>, T> transformer,
 			ProjectionFinalStep<?>... dslFinalSteps) {
 		return composite().from( dslFinalSteps ).asList( transformer );
@@ -301,7 +301,7 @@ public interface SearchProjectionFactory<R, E> {
 	 * @return A DSL step where the "composite" projection can be defined in more details.
 	 * @deprecated Use {@code .composite().from( projection ).as( transformer )} instead.
 	 */
-	@Deprecated
+	@Deprecated(since = "6.2")
 	default <P, T> CompositeProjectionOptionsStep<?, T> composite(Function<P, T> transformer, SearchProjection<P> projection) {
 		return composite().from( projection ).as( transformer );
 	}
@@ -317,7 +317,7 @@ public interface SearchProjectionFactory<R, E> {
 	 * @return A DSL step where the "composite" projection can be defined in more details.
 	 * @deprecated Use {@code .composite().from( dslFinalStep ).as( transformer )} instead.
 	 */
-	@Deprecated
+	@Deprecated(since = "6.2")
 	default <P, T> CompositeProjectionOptionsStep<?, T> composite(Function<P, T> transformer,
 			ProjectionFinalStep<P> dslFinalStep) {
 		return composite().from( dslFinalStep ).as( transformer );
@@ -336,7 +336,7 @@ public interface SearchProjectionFactory<R, E> {
 	 * @deprecated Use {@code .composite().from( projection1, projection2 ).as( transformer )}
 	 * instead.
 	 */
-	@Deprecated
+	@Deprecated(since = "6.2")
 	default <P1, P2, T> CompositeProjectionOptionsStep<?, T> composite(BiFunction<P1, P2, T> transformer,
 			SearchProjection<P1> projection1, SearchProjection<P2> projection2) {
 		return composite().from( projection1, projection2 ).as( transformer );
@@ -357,7 +357,7 @@ public interface SearchProjectionFactory<R, E> {
 	 * @deprecated Use {@code .composite().from( dslFinalStep1, dslFinalStep2 ).as( transformer )}
 	 * instead.
 	 */
-	@Deprecated
+	@Deprecated(since = "6.2")
 	default <P1, P2, T> CompositeProjectionOptionsStep<?, T> composite(BiFunction<P1, P2, T> transformer,
 			ProjectionFinalStep<P1> dslFinalStep1, ProjectionFinalStep<P2> dslFinalStep2) {
 		return composite().from( dslFinalStep1, dslFinalStep2 ).as( transformer );
@@ -378,7 +378,7 @@ public interface SearchProjectionFactory<R, E> {
 	 * @deprecated Use {@code .composite().from( projection1, projection2, projection3 ).as( transformer )}
 	 * instead.
 	 */
-	@Deprecated
+	@Deprecated(since = "6.2")
 	default <P1, P2, P3, T> CompositeProjectionOptionsStep<?, T> composite(TriFunction<P1, P2, P3, T> transformer,
 			SearchProjection<P1> projection1, SearchProjection<P2> projection2, SearchProjection<P3> projection3) {
 		return composite().from( projection1, projection2, projection3 ).as( transformer );
@@ -402,7 +402,7 @@ public interface SearchProjectionFactory<R, E> {
 	 * @deprecated Use {@code .composite().from( dslFinalStep1, dslFinalStep2, dslFinalStep3 ).as( transformer )}
 	 * instead.
 	 */
-	@Deprecated
+	@Deprecated(since = "6.2")
 	default <P1, P2, P3, T> CompositeProjectionOptionsStep<?, T> composite(TriFunction<P1, P2, P3, T> transformer,
 			ProjectionFinalStep<P1> dslFinalStep1, ProjectionFinalStep<P2> dslFinalStep2,
 			ProjectionFinalStep<P3> dslFinalStep3) {

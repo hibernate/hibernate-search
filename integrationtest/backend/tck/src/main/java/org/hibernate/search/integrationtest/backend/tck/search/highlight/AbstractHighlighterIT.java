@@ -549,7 +549,7 @@ abstract class AbstractHighlighterIT {
 				);
 	}
 
-	@Deprecated
+	@Deprecated(since = "test")
 	@Test
 	void numberOfFragmentsSingleErrorSingle() {
 		StubMappingScope scope = index.createScope();
@@ -577,7 +577,7 @@ abstract class AbstractHighlighterIT {
 						"A single-valued highlight projection requested, but the corresponding highlighter does not set number of fragments to 1" );
 	}
 
-	@Deprecated
+	@Deprecated(since = "test")
 	@Test
 	void numberOfFragmentsSingleButNoExpectedValuesReturnedSingle() {
 		StubMappingScope scope = index.createScope();

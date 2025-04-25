@@ -40,7 +40,7 @@ public interface TermsAggregationFieldStep<PDF extends SearchPredicateFactory> {
 	 * @return The next step.
 	 * @deprecated Use {@link #field(String, Class, ValueModel)} instead.
 	 */
-	@Deprecated
+	@Deprecated(since = "7.2")
 	default <F> TermsAggregationOptionsStep<?, PDF, F, Map<F, Long>> field(String fieldPath, Class<F> type,
 			org.hibernate.search.engine.search.common.ValueConvert convert) {
 		return field( fieldPath, type,

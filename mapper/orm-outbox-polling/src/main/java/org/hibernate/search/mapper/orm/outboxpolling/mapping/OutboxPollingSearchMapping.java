@@ -33,7 +33,7 @@ public interface OutboxPollingSearchMapping {
 	 * @return The number of aborted events
 	 * @deprecated Use {@link #countAbortedEvents(Object)} instead.
 	 */
-	@Deprecated(forRemoval = true)
+	@Deprecated(since = "7.2", forRemoval = true)
 	long countAbortedEvents(String tenantId);
 
 	/**
@@ -67,7 +67,7 @@ public interface OutboxPollingSearchMapping {
 	 * @return The number of reprocessed events
 	 * @deprecated Use {@link #reprocessAbortedEvents(Object)} instead.
 	 */
-	@Deprecated(forRemoval = true)
+	@Deprecated(since = "7.2", forRemoval = true)
 	int reprocessAbortedEvents(String tenantId);
 
 	/**
@@ -101,7 +101,7 @@ public interface OutboxPollingSearchMapping {
 	 * @return The number of deleted events
 	 * @deprecated Use {@link #clearAllAbortedEvents(Object)} instead.
 	 */
-	@Deprecated(forRemoval = true)
+	@Deprecated(since = "7.2", forRemoval = true)
 	int clearAllAbortedEvents(String tenantId);
 
 	/**

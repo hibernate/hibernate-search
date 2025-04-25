@@ -60,7 +60,7 @@ public interface PojoIndexingPlan {
 	 * @param entity The entity to add to the index.
 	 * @deprecated Use {@code typeIfIncludedOrNull(typeIdentifier)} instead, then (if non-null) {@code .add(...)} on the result.
 	 */
-	@Deprecated
+	@Deprecated(since = "6.2")
 	void add(PojoRawTypeIdentifier<?> typeIdentifier, Object providedId,
 			DocumentRoutesDescriptor providedRoutes, Object entity);
 
@@ -89,7 +89,7 @@ public interface PojoIndexingPlan {
 	 * for the entity type and calling one of the {@code filter} methods.
 	 * @deprecated Use {@code typeIfIncludedOrNull(typeIdentifier)} instead, then (if non-null) {@code .addOrUpdate(...)} on the result.
 	 */
-	@Deprecated
+	@Deprecated(since = "6.2")
 	void addOrUpdate(PojoRawTypeIdentifier<?> typeIdentifier, Object providedId,
 			DocumentRoutesDescriptor providedRoutes, Object entity,
 			boolean forceSelfDirty, boolean forceContainingDirty, BitSet dirtyPaths);
@@ -119,7 +119,7 @@ public interface PojoIndexingPlan {
 	 * @throws IllegalArgumentException If both {@code providedId} and {@code entity} are {@code null}.
 	 * @deprecated Use {@code typeIfIncludedOrNull(typeIdentifier)} instead, then (if non-null) {@code .delete(...)} on the result.
 	 */
-	@Deprecated
+	@Deprecated(since = "6.2")
 	void delete(PojoRawTypeIdentifier<?> typeIdentifier, Object providedId,
 			DocumentRoutesDescriptor providedRoutes, Object entity);
 
@@ -147,7 +147,7 @@ public interface PojoIndexingPlan {
 	 * for the entity type and calling one of the {@code filter} methods.
 	 * @deprecated Use {@code typeIfIncludedOrNull(typeIdentifier)} instead, then (if non-null) {@code .addOrUpdateOrDelete(...)} on the result.
 	 */
-	@Deprecated
+	@Deprecated(since = "6.2")
 	void addOrUpdateOrDelete(PojoRawTypeIdentifier<?> typeIdentifier, Object providedId,
 			DocumentRoutesDescriptor providedRoutes,
 			boolean forceSelfDirty, boolean forceContainingDirty, BitSet dirtyPaths);
@@ -174,7 +174,7 @@ public interface PojoIndexingPlan {
 	 * May be {@code null}, in which case this state will not yield any reindexing.
 	 * @deprecated Use {@code typeIfIncludedOrNull(typeIdentifier)} instead, then (if non-null) {@code .updateAssociationInverseSide(...)} on the result.
 	 */
-	@Deprecated
+	@Deprecated(since = "6.2")
 	void updateAssociationInverseSide(PojoRawTypeIdentifier<?> typeIdentifier,
 			BitSet dirtyAssociationPaths, Object[] oldState, Object[] newState);
 

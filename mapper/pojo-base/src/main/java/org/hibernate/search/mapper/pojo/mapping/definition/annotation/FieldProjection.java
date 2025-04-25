@@ -49,7 +49,7 @@ public @interface FieldProjection {
 	 * <p>
 	 * Setting {@link #valueModel()} to any non-default value will take precedence over {@link #convert()} default {@link org.hibernate.search.engine.search.common.ValueConvert#YES} value.
 	 */
-	@Deprecated
+	@Deprecated(since = "7.2")
 	org.hibernate.search.engine.search.common.ValueConvert convert() default org.hibernate.search.engine.search.common.ValueConvert.DEFAULT;
 
 	/**

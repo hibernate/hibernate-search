@@ -14,7 +14,7 @@ import org.hibernate.search.util.common.AssertionFailure;
 /**
  * @deprecated Use/implement {@link ValueHandleFactory} instead.
  */
-@Deprecated
+@Deprecated(since = "6.2")
 public interface ValueReadHandleFactory extends ValueHandleFactory {
 
 	@Override
@@ -29,7 +29,7 @@ public interface ValueReadHandleFactory extends ValueHandleFactory {
 	 * i.e {@link Method#invoke(Object, Object...)} and {@link Field#get(Object)}.
 	 * @deprecated Use {@link ValueHandleFactory#usingJavaLangReflect()} instead.
 	 */
-	@Deprecated
+	@Deprecated(since = "6.2")
 	static ValueReadHandleFactory usingJavaLangReflect() {
 		return new MemberValueHandleFactory();
 	}
@@ -40,7 +40,7 @@ public interface ValueReadHandleFactory extends ValueHandleFactory {
 	 * to get the value of a field/method.
 	 * @deprecated Use {@link ValueHandleFactory#usingMethodHandle(MethodHandles.Lookup)} instead.
 	 */
-	@Deprecated
+	@Deprecated(since = "6.2")
 	static ValueReadHandleFactory usingMethodHandle(MethodHandles.Lookup lookup) {
 		return new MethodHandleValueHandleFactory( lookup );
 	}

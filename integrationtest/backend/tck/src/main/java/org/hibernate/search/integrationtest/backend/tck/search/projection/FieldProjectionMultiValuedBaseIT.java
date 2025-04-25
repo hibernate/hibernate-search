@@ -94,7 +94,7 @@ class FieldProjectionMultiValuedBaseIT<F> {
 		indexer.join();
 	}
 
-	@Deprecated
+	@Deprecated(since = "test")
 	@ParameterizedTest(name = "{0} - {1}")
 	@MethodSource("params")
 	void simple(TestedFieldStructure fieldStructure, FieldTypeDescriptor<F, ?> fieldType, DataSet<F> dataSet) {

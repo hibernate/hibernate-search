@@ -23,7 +23,7 @@ import org.hibernate.search.engine.backend.mapping.spi.BackendMappingContext;
  * @deprecated Use {@link org.hibernate.search.engine.backend.types.converter.ToDocumentValueConverter}
  * with {@link ToDocumentValueConvertContext} and {@link ToDocumentValueConvertContextExtension} instead.
  */
-@Deprecated
+@Deprecated(since = "6.1")
 public interface ToDocumentFieldValueConvertContextExtension<T> extends ToDocumentValueConvertContextExtension<T> {
 
 	@Override

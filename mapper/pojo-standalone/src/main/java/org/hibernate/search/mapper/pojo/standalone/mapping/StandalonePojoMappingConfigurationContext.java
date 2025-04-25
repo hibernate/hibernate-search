@@ -56,7 +56,7 @@ public interface StandalonePojoMappingConfigurationContext {
 	 * and whose instances be added/updated/deleted through the {@link SearchSession#indexingPlan() indexing plan}.
 	 * @deprecated Use {@link SearchEntity} or {@code programmaticMapping().type( type ).searchEntity()} instead.
 	 */
-	@Deprecated
+	@Deprecated(since = "7.1")
 	default StandalonePojoMappingConfigurationContext addEntityType(Class<?> type) {
 		programmaticMapping().type( type ).searchEntity();
 		return this;
@@ -70,7 +70,7 @@ public interface StandalonePojoMappingConfigurationContext {
 	 * @param entityName The name of the entity.
 	 * @deprecated Use {@link SearchEntity} or {@code programmaticMapping().type( type ).searchEntity().name( entityName )} instead.
 	 */
-	@Deprecated
+	@Deprecated(since = "7.1")
 	default StandalonePojoMappingConfigurationContext addEntityType(Class<?> type, String entityName) {
 		programmaticMapping().type( type ).searchEntity().name( entityName );
 		return this;
@@ -81,7 +81,7 @@ public interface StandalonePojoMappingConfigurationContext {
 	 * and whose instances be added/updated/deleted through the {@link SearchSession#indexingPlan() indexing plan}.
 	 * @deprecated Use {@link SearchEntity} or {@code programmaticMapping().type( type ).searchEntity()} for each type instead.
 	 */
-	@Deprecated
+	@Deprecated(since = "7.1")
 	default StandalonePojoMappingConfigurationContext addEntityTypes(Class<?>... types) {
 		for ( Class<?> type : types ) {
 			programmaticMapping().type( type ).searchEntity();
@@ -94,7 +94,7 @@ public interface StandalonePojoMappingConfigurationContext {
 	 * and whose instances be added/updated/deleted through the {@link SearchSession#indexingPlan() indexing plan}.
 	 * @deprecated Use {@link SearchEntity} or {@code programmaticMapping().type( type ).searchEntity()} for each type instead.
 	 */
-	@Deprecated
+	@Deprecated(since = "7.1")
 	default StandalonePojoMappingConfigurationContext addEntityTypes(Iterable<Class<?>> types) {
 		for ( Class<?> type : types ) {
 			programmaticMapping().type( type ).searchEntity();
@@ -111,7 +111,7 @@ public interface StandalonePojoMappingConfigurationContext {
 	 * @param configurer The configurer, to provide additional information about the entity type.
 	 * @deprecated Use {@link SearchEntity} or {@code programmaticMapping().type( type ).searchEntity().loadingBinder( binder )} instead.
 	 */
-	@Deprecated
+	@Deprecated(since = "7.1")
 	default <E> StandalonePojoMappingConfigurationContext addEntityType(Class<E> type,
 			org.hibernate.search.mapper.pojo.standalone.mapping.metadata.EntityConfigurer<E> configurer) {
 		programmaticMapping().type( type ).searchEntity()
@@ -129,7 +129,7 @@ public interface StandalonePojoMappingConfigurationContext {
 	 * @param configurer The configurer, to provide additional information about the entity type.
 	 * @deprecated Use {@link SearchEntity} or {@code programmaticMapping().type( type ).searchEntity().name( entityName ).loadingBinder( binder )} instead.
 	 */
-	@Deprecated
+	@Deprecated(since = "7.1")
 	default <E> StandalonePojoMappingConfigurationContext addEntityType(Class<E> type, String entityName,
 			org.hibernate.search.mapper.pojo.standalone.mapping.metadata.EntityConfigurer<E> configurer) {
 		programmaticMapping().type( type ).searchEntity().name( entityName )

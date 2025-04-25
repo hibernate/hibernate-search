@@ -23,7 +23,7 @@ import org.hibernate.search.engine.backend.session.spi.BackendSessionContext;
  * @deprecated Use {@link org.hibernate.search.engine.backend.types.converter.FromDocumentValueConverter}
  * with {@link FromDocumentValueConvertContext} and {@link FromDocumentValueConvertContextExtension} instead.
  */
-@Deprecated
+@Deprecated(since = "6.1")
 public interface FromDocumentFieldValueConvertContextExtension<T> extends FromDocumentValueConvertContextExtension<T> {
 
 	@Override

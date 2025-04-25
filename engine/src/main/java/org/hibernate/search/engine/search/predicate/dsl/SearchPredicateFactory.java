@@ -79,7 +79,7 @@ public interface SearchPredicateFactory {
 	 * @deprecated Use {@code .bool().with(...)} instead.
 	 * @see BooleanPredicateClausesStep#with(Consumer)
 	 */
-	@Deprecated
+	@Deprecated(since = "6.2")
 	PredicateFinalStep bool(Consumer<? super BooleanPredicateClausesStep<?>> clauseContributor);
 
 	/**
@@ -223,7 +223,7 @@ public interface SearchPredicateFactory {
 	 * @see NestedPredicateFieldStep
 	 * @deprecated Use {@link #nested(String)} instead.
 	 */
-	@Deprecated
+	@Deprecated(since = "6.2")
 	NestedPredicateFieldStep<?> nested();
 
 	/**

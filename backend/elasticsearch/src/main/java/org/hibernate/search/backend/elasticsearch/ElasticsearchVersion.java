@@ -176,7 +176,7 @@ public class ElasticsearchVersion {
 	 * @return The "major" number of this version, i.e. the {@code x} in {@code x.y.z-qualifier}.
 	 * @deprecated Use {@link #majorOptional()} instead.
 	 */
-	@Deprecated
+	@Deprecated(since = "7.0")
 	public int major() {
 		if ( major == null ) {
 			return 0;

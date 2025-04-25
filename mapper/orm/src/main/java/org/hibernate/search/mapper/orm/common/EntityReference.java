@@ -9,7 +9,7 @@ package org.hibernate.search.mapper.orm.common;
  *
  * @deprecated Use {@link org.hibernate.search.engine.common.EntityReference} instead.
  */
-@Deprecated
+@Deprecated(since = "6.2")
 public interface EntityReference extends org.hibernate.search.engine.common.EntityReference {
 
 	/**

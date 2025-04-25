@@ -184,7 +184,7 @@ public abstract class AbstractSearchPredicateFactory<
 	}
 
 	@Override
-	@Deprecated
+	@Deprecated(since = "6.2")
 	public org.hibernate.search.engine.search.predicate.dsl.NestedPredicateFieldStep<?> nested() {
 		return new org.hibernate.search.engine.search.predicate.dsl.impl.NestedPredicateFieldStepImpl( dslContext, this );
 	}

@@ -10,7 +10,7 @@ import org.hibernate.search.engine.environment.bean.BeanResolver;
 /**
  * @deprecated This SPI was introduced by mistake and was never used.
  */
-@Deprecated
+@Deprecated(since = "6.2")
 public interface AutomaticIndexingStrategyStartContext {
 
 	/**

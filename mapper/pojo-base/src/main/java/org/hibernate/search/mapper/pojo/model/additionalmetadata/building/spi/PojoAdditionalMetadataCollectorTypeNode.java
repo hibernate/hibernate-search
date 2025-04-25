@@ -61,7 +61,7 @@ public interface PojoAdditionalMetadataCollectorTypeNode extends PojoAdditionalM
 	 * and (if necessary) {@link PojoAdditionalMetadataCollectorEntityTypeNode#pathDefinitionProvider(PojoPathDefinitionProvider)},
 	 * instead.
 	 */
-	@Deprecated
+	@Deprecated(since = "7.1")
 	default PojoAdditionalMetadataCollectorEntityTypeNode markAsEntity(String entityName,
 			PojoPathDefinitionProvider pathDefinitionProvider) {
 		var node = markAsEntity();
@@ -91,7 +91,7 @@ public interface PojoAdditionalMetadataCollectorTypeNode extends PojoAdditionalM
 	 * @deprecated Use {@link #markAsIndexed()} and
 	 * {@link PojoAdditionalMetadataCollectorIndexedTypeNode#enabled(boolean)} instead.
 	 */
-	@Deprecated
+	@Deprecated(since = "7.1")
 	default PojoAdditionalMetadataCollectorIndexedTypeNode markAsIndexed(boolean enabled) {
 		var node = markAsIndexed();
 		node.enabled( enabled );

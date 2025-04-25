@@ -10,7 +10,7 @@ package org.hibernate.search.engine.search.predicate.dsl;
  * @param <S> The "self" type (the actual exposed type of this step).
  * @deprecated Use {@link SearchPredicateFactory#nested(String)} instead.
  */
-@Deprecated
+@Deprecated(since = "6.2")
 public interface NestedPredicateOptionsStep<S extends NestedPredicateOptionsStep<?>>
 		extends PredicateFinalStep {
 

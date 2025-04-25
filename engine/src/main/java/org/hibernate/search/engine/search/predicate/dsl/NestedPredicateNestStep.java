@@ -14,7 +14,7 @@ import org.hibernate.search.engine.search.predicate.SearchPredicate;
  * @param <N> The type of the next step.
  * @deprecated Use {@link SearchPredicateFactory#nested(String)} instead.
  */
-@Deprecated
+@Deprecated(since = "6.2")
 public interface NestedPredicateNestStep<N extends NestedPredicateOptionsStep<?>> {
 
 	/**

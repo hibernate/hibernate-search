@@ -114,7 +114,7 @@ public abstract class AbstractPojoMappingInitiator<MPBS extends MappingPartialBu
 	 * @deprecated Use {@link AnnotationMappingConfigurationContext#discoverAnnotationsFromReferencedTypes(boolean)}
 	 * on the object returned by {@link #annotationMapping()} instead.
 	 */
-	@Deprecated
+	@Deprecated(since = "6.2")
 	public void annotatedTypeDiscoveryEnabled(boolean enabled) {
 		annotationMapping().discoverAnnotationsFromReferencedTypes( enabled );
 	}

@@ -181,7 +181,7 @@ public final class ElasticsearchIndexSettings {
 		 * is now dynamic and depends on the targeted Elasticsearch distribution.
 		 * @see ElasticsearchIndexSettings#SCHEMA_MANAGEMENT_MINIMAL_REQUIRED_STATUS
 		 */
-		@Deprecated
+		@Deprecated(since = "7.0")
 		public static final IndexStatus SCHEMA_MANAGEMENT_MINIMAL_REQUIRED_STATUS = IndexStatus.YELLOW;
 		public static final int SCHEMA_MANAGEMENT_MINIMAL_REQUIRED_STATUS_WAIT_TIMEOUT = 10_000;
 		public static final int INDEXING_QUEUE_COUNT = 10;

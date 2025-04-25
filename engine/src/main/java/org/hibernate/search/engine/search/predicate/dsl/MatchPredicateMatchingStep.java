@@ -45,7 +45,7 @@ public interface MatchPredicateMatchingStep<N extends MatchPredicateOptionsStep<
 	 *
 	 * @see org.hibernate.search.engine.search.common.ValueConvert
 	 */
-	@Deprecated
+	@Deprecated(since = "7.2")
 	default N matching(Object value, org.hibernate.search.engine.search.common.ValueConvert convert) {
 		return matching( value, org.hibernate.search.engine.search.common.ValueConvert.toValueModel( convert ) );
 	}

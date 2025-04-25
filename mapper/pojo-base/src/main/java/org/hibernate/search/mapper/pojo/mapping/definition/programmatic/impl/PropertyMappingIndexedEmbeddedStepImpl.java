@@ -67,7 +67,7 @@ class PropertyMappingIndexedEmbeddedStepImpl extends DelegatingPropertyMappingSt
 	}
 
 	@Override
-	@Deprecated
+	@Deprecated(since = "6.0")
 	@Search5DeprecatedAPI
 	public PropertyMappingIndexedEmbeddedStep prefix(String prefix) {
 		if ( relativeFieldName != null && prefix != null ) {

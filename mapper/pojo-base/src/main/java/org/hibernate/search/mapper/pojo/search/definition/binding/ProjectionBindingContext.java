@@ -102,7 +102,7 @@ public interface ProjectionBindingContext {
 	 * @see org.hibernate.search.mapper.pojo.mapping.definition.programmatic.MethodParameterMappingStep#projection(BeanReference, Map)
 	 * @deprecated Use {@link #param(String, Class)} instead.
 	 */
-	@Deprecated
+	@Deprecated(since = "7.0")
 	default Object param(String name) {
 		return param( name, Object.class );
 	}
@@ -126,7 +126,7 @@ public interface ProjectionBindingContext {
 	 * @see org.hibernate.search.mapper.pojo.mapping.definition.programmatic.MethodParameterMappingStep#projection(BeanReference, Map)
 	 * @deprecated Use {@link #paramOptional(String, Class)} instead.
 	 */
-	@Deprecated
+	@Deprecated(since = "7.0")
 	default Optional<Object> paramOptional(String name) {
 		return paramOptional( name, Object.class );
 	}

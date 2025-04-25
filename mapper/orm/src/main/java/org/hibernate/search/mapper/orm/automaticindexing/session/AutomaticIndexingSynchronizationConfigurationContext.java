@@ -17,7 +17,7 @@ import org.hibernate.search.util.common.annotation.Incubating;
 /**
  * @deprecated Use {@link IndexingPlanSynchronizationStrategyConfigurationContext}
  */
-@Deprecated
+@Deprecated(since = "6.2")
 public interface AutomaticIndexingSynchronizationConfigurationContext {
 
 	/**

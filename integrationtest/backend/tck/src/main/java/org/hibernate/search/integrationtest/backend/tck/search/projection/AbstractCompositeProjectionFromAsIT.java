@@ -298,7 +298,7 @@ public abstract class AbstractCompositeProjectionFromAsIT<B extends AbstractComp
 					.hasHitsAnyOrder( expectedTransformedForMulti() );
 		}
 
-		@Deprecated
+		@Deprecated(since = "test")
 		@Test
 		public void as_transformer_multi() {
 			assertThatQuery( index.query()

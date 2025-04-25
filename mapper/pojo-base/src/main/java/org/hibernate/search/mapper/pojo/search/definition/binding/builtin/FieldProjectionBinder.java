@@ -68,7 +68,7 @@ public final class FieldProjectionBinder implements ProjectionBinder {
 	 * @see SearchProjectionFactory#field(String, Class, org.hibernate.search.engine.search.common.ValueConvert)
 	 * @deprecated Use {@link #valueModel(ValueModel)} instead.
 	 */
-	@Deprecated
+	@Deprecated(since = "7.2")
 	public FieldProjectionBinder valueConvert(org.hibernate.search.engine.search.common.ValueConvert valueConvert) {
 		return valueModel( org.hibernate.search.engine.search.common.ValueConvert.toValueModel( valueConvert ) );
 	}

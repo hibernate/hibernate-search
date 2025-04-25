@@ -464,7 +464,7 @@ class ToHibernateOrmScrollableResultsIT {
 	}
 
 	@SuppressWarnings("removal")
-	@Deprecated(forRemoval = true)
+	@Deprecated(since = "test", forRemoval = true)
 	@Test
 	void setRowNumber() {
 		with( sessionFactory ).runInTransaction( session -> {
@@ -550,7 +550,7 @@ class ToHibernateOrmScrollableResultsIT {
 	}
 
 	@SuppressWarnings("removal")
-	@Deprecated(forRemoval = true)
+	@Deprecated(since = "test", forRemoval = true)
 	@Test
 	void setRowNumber_backwards() {
 		with( sessionFactory ).runInTransaction( session -> {
@@ -594,7 +594,7 @@ class ToHibernateOrmScrollableResultsIT {
 	}
 
 	@SuppressWarnings("removal")
-	@Deprecated(forRemoval = true)
+	@Deprecated(since = "test", forRemoval = true)
 	@Test
 	void setRowNumber_relativeToEnd() {
 		with( sessionFactory ).runInTransaction( session -> {

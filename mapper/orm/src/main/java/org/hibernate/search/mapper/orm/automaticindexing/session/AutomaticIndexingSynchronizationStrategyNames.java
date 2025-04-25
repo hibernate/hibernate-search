@@ -13,7 +13,7 @@ import org.hibernate.search.mapper.pojo.work.IndexingPlanSynchronizationStrategy
  *
  * @deprecated See {@link IndexingPlanSynchronizationStrategyNames}
  */
-@Deprecated
+@Deprecated(since = "6.2")
 public final class AutomaticIndexingSynchronizationStrategyNames {
 
 	private AutomaticIndexingSynchronizationStrategyNames() {

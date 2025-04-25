@@ -14,7 +14,7 @@ import org.hibernate.search.util.common.impl.Contracts;
  * Specifies whether values should be converted during search queries.
  * @deprecated Use {@link ValueModel} instead.
  */
-@Deprecated
+@Deprecated(since = "7.2")
 public enum ValueConvert {
 
 	/**
@@ -43,7 +43,7 @@ public enum ValueConvert {
 	 *
 	 * @deprecated Use {@link ValueModel#MAPPING} instead.
 	 */
-	@Deprecated
+	@Deprecated(since = "7.2")
 	YES,
 	/**
 	 * Disables value conversion.
@@ -64,7 +64,7 @@ public enum ValueConvert {
 	 *
 	 * @deprecated Use {@link ValueModel#INDEX} instead.
 	 */
-	@Deprecated
+	@Deprecated(since = "7.2")
 	NO,
 	/**
 	 * The result of applying this constant is the same as {@link #YES}.
@@ -73,10 +73,10 @@ public enum ValueConvert {
 	 * It is used as default value in some annotations like {@code FieldProjection} to help determine
 	 * if the attribute value was not set explicitly.
 	 */
-	@Deprecated
+	@Deprecated(since = "7.2")
 	DEFAULT;
 
-	@Deprecated
+	@Deprecated(since = "7.2")
 	public static ValueModel toValueModel(ValueConvert valueConvert) {
 		Contracts.assertNotNull( valueConvert, "valueConvert" );
 		switch ( valueConvert ) {

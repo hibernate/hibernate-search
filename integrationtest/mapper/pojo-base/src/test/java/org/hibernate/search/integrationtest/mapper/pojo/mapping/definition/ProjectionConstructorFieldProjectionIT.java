@@ -165,7 +165,7 @@ class ProjectionConstructorFieldProjectionIT extends AbstractProjectionConstruct
 		}
 	}
 
-	@Deprecated
+	@Deprecated(since = "test")
 	@Test
 	void valueConvert_nonDefault() {
 		@Indexed(index = INDEX_NAME)
@@ -199,7 +199,7 @@ class ProjectionConstructorFieldProjectionIT extends AbstractProjectionConstruct
 		);
 	}
 
-	@Deprecated
+	@Deprecated(since = "test")
 	static class ValueConvert_nonDefaultMyProjection {
 		public final String myEnum;
 
@@ -210,7 +210,7 @@ class ProjectionConstructorFieldProjectionIT extends AbstractProjectionConstruct
 		}
 	}
 
-	@Deprecated
+	@Deprecated(since = "test")
 	@Test
 	void valueConvertAndValueModel_nonDefaultFails() {
 		@Indexed(index = INDEX_NAME)
@@ -229,7 +229,7 @@ class ProjectionConstructorFieldProjectionIT extends AbstractProjectionConstruct
 						"Using non-default `valueModel=ValueModel.INDEX` and `convert=ValueConvert.NO` at the same time is not allowed. Remove the `convert` attribute and keep only the `valueModel=ValueModel.INDEX`." );
 	}
 
-	@Deprecated
+	@Deprecated(since = "test")
 	static class ValueConvertAndValueModel_nonDefaultFailsMyProjection {
 		public final String myEnum;
 

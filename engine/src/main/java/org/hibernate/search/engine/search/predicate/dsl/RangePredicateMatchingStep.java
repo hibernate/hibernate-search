@@ -54,7 +54,7 @@ public interface RangePredicateMatchingStep<N extends RangePredicateOptionsStep<
 	 * @return The next step.
 	 * @deprecated Use {@link #between(Object, Object, ValueModel)} instead.
 	 */
-	@Deprecated
+	@Deprecated(since = "7.2")
 	default N between(Object lowerBoundValue, Object upperBoundValue,
 			org.hibernate.search.engine.search.common.ValueConvert convert) {
 		return between( Range.between( lowerBoundValue, upperBoundValue ),
@@ -131,7 +131,7 @@ public interface RangePredicateMatchingStep<N extends RangePredicateOptionsStep<
 	 * @return The next step.
 	 * @deprecated Use {@link #atLeast(Object, ValueModel)} instead.
 	 */
-	@Deprecated
+	@Deprecated(since = "7.2")
 	default N atLeast(Object lowerBoundValue, org.hibernate.search.engine.search.common.ValueConvert convert) {
 		return within( Range.atLeast( lowerBoundValue ),
 				org.hibernate.search.engine.search.common.ValueConvert.toValueModel( convert ) );
@@ -182,7 +182,7 @@ public interface RangePredicateMatchingStep<N extends RangePredicateOptionsStep<
 	 * @return The next step.
 	 * @deprecated Use {@link #greaterThan(Object, ValueModel)} instead.
 	 */
-	@Deprecated
+	@Deprecated(since = "7.2")
 	default N greaterThan(Object lowerBoundValue, org.hibernate.search.engine.search.common.ValueConvert convert) {
 		return within( Range.greaterThan( lowerBoundValue ),
 				org.hibernate.search.engine.search.common.ValueConvert.toValueModel( convert ) );
@@ -233,7 +233,7 @@ public interface RangePredicateMatchingStep<N extends RangePredicateOptionsStep<
 	 * @return The next step.
 	 * @deprecated Use {@link #atMost(Object, ValueModel)} instead.
 	 */
-	@Deprecated
+	@Deprecated(since = "7.2")
 	default N atMost(Object upperBoundValue, org.hibernate.search.engine.search.common.ValueConvert convert) {
 		return within( Range.atMost( upperBoundValue ),
 				org.hibernate.search.engine.search.common.ValueConvert.toValueModel( convert ) );
@@ -283,7 +283,7 @@ public interface RangePredicateMatchingStep<N extends RangePredicateOptionsStep<
 	 * See {@link org.hibernate.search.engine.search.common.ValueConvert} for more information.
 	 * @return The next step.
 	 */
-	@Deprecated
+	@Deprecated(since = "7.2")
 	default N lessThan(Object upperBoundValue, org.hibernate.search.engine.search.common.ValueConvert convert) {
 		return within( Range.lessThan( upperBoundValue ),
 				org.hibernate.search.engine.search.common.ValueConvert.toValueModel( convert ) );
@@ -316,7 +316,7 @@ public interface RangePredicateMatchingStep<N extends RangePredicateOptionsStep<
 	 * @return The next step.
 	 * @deprecated Use {@link #within(Range)} instead.
 	 */
-	@Deprecated
+	@Deprecated(since = "7.2")
 	default N range(Range<?> range) {
 		return within( range, ValueModel.MAPPING );
 	}
@@ -334,7 +334,7 @@ public interface RangePredicateMatchingStep<N extends RangePredicateOptionsStep<
 	 * @return The next step.
 	 * @deprecated Use {@link #within(Range, org.hibernate.search.engine.search.common.ValueConvert)} instead.
 	 */
-	@Deprecated
+	@Deprecated(since = "7.2")
 	default N range(Range<?> range, org.hibernate.search.engine.search.common.ValueConvert convert) {
 		return within( range, convert );
 	}
@@ -365,7 +365,7 @@ public interface RangePredicateMatchingStep<N extends RangePredicateOptionsStep<
 	 * @return The next step.
 	 * @deprecated Use {@link #within(Range, ValueModel)} instead.
 	 */
-	@Deprecated
+	@Deprecated(since = "7.2")
 	default N within(Range<?> range, org.hibernate.search.engine.search.common.ValueConvert convert) {
 		return within( range, org.hibernate.search.engine.search.common.ValueConvert.toValueModel( convert ) );
 	}
@@ -423,7 +423,7 @@ public interface RangePredicateMatchingStep<N extends RangePredicateOptionsStep<
 	 * @return The next step.
 	 * @deprecated Use {@link #withinAny(Collection, ValueModel)} instead.
 	 */
-	@Deprecated
+	@Deprecated(since = "7.2")
 	default N withinAny(Collection<? extends Range<?>> ranges, org.hibernate.search.engine.search.common.ValueConvert convert) {
 		return withinAny( ranges, org.hibernate.search.engine.search.common.ValueConvert.toValueModel( convert ) );
 	}

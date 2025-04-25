@@ -52,7 +52,7 @@ public interface PojoIndexer {
 	 * @deprecated Use {@link #add(PojoRawTypeIdentifier, Object, DocumentRoutesDescriptor, Object, DocumentCommitStrategy, DocumentRefreshStrategy, OperationSubmitter)}
 	 * instead.
 	 */
-	@Deprecated
+	@Deprecated(since = "6.2")
 	default CompletableFuture<?> add(PojoRawTypeIdentifier<?> typeIdentifier, Object providedId,
 			DocumentRoutesDescriptor providedRoutes, Object entity,
 			DocumentCommitStrategy commitStrategy, DocumentRefreshStrategy refreshStrategy) {
@@ -90,7 +90,7 @@ public interface PojoIndexer {
 	 * @deprecated Use {@link #addOrUpdate(PojoRawTypeIdentifier, Object, DocumentRoutesDescriptor, Object, DocumentCommitStrategy, DocumentRefreshStrategy, OperationSubmitter)}
 	 * instead.
 	 */
-	@Deprecated
+	@Deprecated(since = "6.2")
 	default CompletableFuture<?> addOrUpdate(PojoRawTypeIdentifier<?> typeIdentifier, Object providedId,
 			DocumentRoutesDescriptor providedRoutes, Object entity,
 			DocumentCommitStrategy commitStrategy, DocumentRefreshStrategy refreshStrategy) {
@@ -130,7 +130,7 @@ public interface PojoIndexer {
 	 * @deprecated Use {@link #delete(PojoRawTypeIdentifier, Object, DocumentRoutesDescriptor, DocumentCommitStrategy, DocumentRefreshStrategy, OperationSubmitter)}
 	 * instead.
 	 */
-	@Deprecated
+	@Deprecated(since = "6.2")
 	default CompletableFuture<?> delete(PojoRawTypeIdentifier<?> typeIdentifier, Object providedId,
 			DocumentRoutesDescriptor providedRoutes, Object entity,
 			DocumentCommitStrategy commitStrategy, DocumentRefreshStrategy refreshStrategy) {
@@ -167,7 +167,7 @@ public interface PojoIndexer {
 	 * @deprecated Use {@link #delete(PojoRawTypeIdentifier, Object, DocumentRoutesDescriptor, DocumentCommitStrategy, DocumentRefreshStrategy, OperationSubmitter)}
 	 * instead.
 	 */
-	@Deprecated
+	@Deprecated(since = "6.2")
 	default CompletableFuture<?> delete(PojoRawTypeIdentifier<?> typeIdentifier, Object providedId,
 			DocumentRoutesDescriptor providedRoutes,
 			DocumentCommitStrategy commitStrategy, DocumentRefreshStrategy refreshStrategy
