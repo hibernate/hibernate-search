@@ -43,6 +43,7 @@ org.junit.AfterClass @ Use JUnit 5 instead
 org.junit.Rule @ Use JUnit 5 instead
 org.junit.ClassRule @ Use JUnit 5 instead
 org.junit.Ignore @ Use JUnit 5 instead
+org.junit.Assume @ Use JUnit 5 instead
 
 ################################################################################################################
 # Unsafe API/SPI from Hibernate ORM

@@ -53,6 +53,12 @@
         <dependency>
             <groupId>org.hibernate.orm</groupId>
             <artifactId>hibernate-testing</artifactId>
+            <exclusions>
+                <exclusion>
+                    <groupId>junit</groupId>
+                    <artifactId>junit</artifactId>
+                </exclusion>
+            </exclusions>
             <scope>test</scope>
         </dependency>
     </dependencies>

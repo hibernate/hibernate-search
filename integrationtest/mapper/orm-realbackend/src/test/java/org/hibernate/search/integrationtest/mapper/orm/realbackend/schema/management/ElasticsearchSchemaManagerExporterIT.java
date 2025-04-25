@@ -7,7 +7,7 @@ package org.hibernate.search.integrationtest.mapper.orm.realbackend.schema.manag
 import static org.hibernate.search.util.impl.integrationtest.backend.elasticsearch.dialect.ElasticsearchTestDialect.isActualVersion;
 import static org.hibernate.search.util.impl.test.JsonHelper.assertJsonEquals;
 import static org.hibernate.search.util.impl.test.JsonHelper.assertJsonEqualsIgnoringUnknownFields;
-import static org.junit.Assume.assumeFalse;
+import static org.junit.jupiter.api.Assumptions.assumeFalse;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -46,11 +46,11 @@ class ElasticsearchSchemaManagerExporterIT {
 	@Test
 	void elasticsearch() throws IOException {
 		assumeFalse(
-				"Older versions of Elasticsearch would not match the mappings",
 				isActualVersion(
 						esVersion -> esVersion.isLessThan( "7.0" ),
 						osVersion -> false
-				)
+				),
+				"Older versions of Elasticsearch would not match the mappings"
 		);
 		String version = ElasticsearchTestDialect.getActualVersion().toString();
 		entityManagerFactory = setupHelper.start()
