@@ -37,7 +37,6 @@ enum FileSystemAccessStrategy {
 
 	public abstract FSDirectory createDirectory(Path indexDir, LockFactory factory) throws IOException;
 
-	@SuppressWarnings("deprecation")
 	public static FileSystemAccessStrategy get(FileSystemAccessStrategyName name) {
 		switch ( name ) {
 			case AUTO:

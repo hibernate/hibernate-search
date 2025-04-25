@@ -358,11 +358,10 @@ class AutomaticIndexingBasicIT {
 	}
 
 	/**
-	 * Test that merging an entity using update() to change an indexed field
+	 * Test that merging an entity using ~update()~ merge() to change an indexed field
 	 * triggers reindexing of the indexed entity owning the property.
 	 */
 	@Test
-	@SuppressWarnings("deprecation") // This is specifically about "update", which is NOT strictly equivalent to "merge"
 	void sessionUpdate_directValueUpdate_indexedField() {
 		with( sessionFactory ).runInTransaction( session -> {
 			IndexedEntity entity1 = new IndexedEntity();

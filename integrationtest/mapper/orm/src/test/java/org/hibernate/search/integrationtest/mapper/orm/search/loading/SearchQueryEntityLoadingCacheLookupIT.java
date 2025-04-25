@@ -293,7 +293,6 @@ public class SearchQueryEntityLoadingCacheLookupIT<T> extends AbstractSearchQuer
 		);
 	}
 
-	@SuppressWarnings({ "unchecked", "deprecation" })
 	private void testLoadingCacheLookup(EntityLoadingCacheLookupStrategy overriddenLookupStrategy,
 			int entityCount,
 			List<Integer> entitiesToPutInSecondLevelCache,

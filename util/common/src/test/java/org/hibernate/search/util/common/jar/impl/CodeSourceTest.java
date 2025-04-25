@@ -193,7 +193,6 @@ class CodeSourceTest {
 		} );
 
 		try ( JarFile outerJar = new JarFile( jarPath.toFile() ) ) {
-			@SuppressWarnings("deprecation") // For JDK 20+
 			URL innerJarURL = JarUrl.create( jarPath.toFile(), null, classesDirRelativeString );
 			try ( URLClassLoader isolatedClassLoader = createIsolatedClassLoader( innerJarURL ) ) {
 				Class<?> classInIsolatedClassLoader = isolatedClassLoader.loadClass( SimpleClass.class.getName() );

@@ -120,7 +120,6 @@ public abstract class PojoModelPath {
 		}
 	}
 
-	@SuppressWarnings("rawtypes")
 	public static class Builder {
 
 		private PojoModelPathPropertyNode currentPropertyNode;

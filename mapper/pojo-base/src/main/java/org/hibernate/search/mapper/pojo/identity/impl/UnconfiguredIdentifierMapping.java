@@ -30,7 +30,6 @@ public final class UnconfiguredIdentifierMapping<E> implements IdentifierMapping
 	}
 
 	@Override
-	@SuppressWarnings("unchecked") // We can only cast to the raw type, if I is generic we need an unchecked cast
 	public Object getIdentifier(Object providedId, Supplier<? extends E> entitySupplierOrNull) {
 		if ( providedId != null ) {
 			return providedId;

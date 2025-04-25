@@ -153,7 +153,6 @@ abstract class AbstractDistanceProjectionMultiValuedBaseIT {
 	/**
 	 * Test that mentioning the same projection twice works as expected.
 	 */
-	@SuppressWarnings("unchecked")
 	@ParameterizedTest(name = "{0}")
 	@MethodSource("params")
 	void duplicated(TestedFieldStructure fieldStructure, DataSet dataSet) {

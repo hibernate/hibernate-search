@@ -18,7 +18,6 @@ import org.hibernate.search.engine.search.projection.ProjectionCollector;
  * @param <V> The type of values to accumulate obtained by transforming extracted values ({@code E}).
  * @param <R> The type of the final result containing values of type {@code V}.
  */
-@SuppressWarnings("deprecation")
 abstract class ListBasedProjectionCollector<E, V, R>
 		implements ProjectionCollector<E, V, List<Object>, R> {
 

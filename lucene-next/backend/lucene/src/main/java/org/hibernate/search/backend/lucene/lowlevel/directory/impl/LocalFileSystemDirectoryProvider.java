@@ -37,7 +37,6 @@ public class LocalFileSystemDirectoryProvider implements DirectoryProvider {
 					.build();
 
 	@Override
-	@SuppressWarnings("deprecation")
 	public DirectoryHolder createDirectoryHolder(DirectoryCreationContext context) {
 		ConfigurationPropertySource propertySource = context.configurationPropertySource();
 		Path directoryRoot = ROOT.get( propertySource ).toAbsolutePath();

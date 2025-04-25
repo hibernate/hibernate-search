@@ -80,8 +80,7 @@ public abstract class HibernateSearchPreIntegrationService implements Service, A
 		}
 
 		@Override
-		@SuppressWarnings("rawtypes") // Can't do better: Map is raw in the superclass
-		public HibernateSearchPreIntegrationService initiateService(Map configurationValues,
+		public HibernateSearchPreIntegrationService initiateService(Map<String, Object> configurationValues,
 				ServiceRegistryImplementor registry) {
 			// Hibernate ORM may call this method twice if we return a null service.
 			// Make sure we won't log statements multiple times.
@@ -95,11 +94,9 @@ public abstract class HibernateSearchPreIntegrationService implements Service, A
 			}
 
 			ConfigurationPropertyChecker propertyChecker = ConfigurationPropertyChecker.create();
-			@SuppressWarnings("unchecked")
 			ConfigurationPropertySource propertySource = propertyChecker.wrap(
 					AllAwareConfigurationPropertySource.fromMap(
-							HibernateOrmUtils.getServiceOrFail( registry, ConfigurationService.class )
-									.getSettings()
+							HibernateOrmUtils.getServiceOrFail( registry, ConfigurationService.class ).getSettings()
 					)
 			);
 

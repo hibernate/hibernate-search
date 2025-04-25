@@ -30,7 +30,6 @@ public class HibernateOrmPathDefinitionProvider implements PojoPathDefinitionPro
 	private final List<String> propertyStringRepresentationByOrdinal;
 	private final HibernateOrmPathInterpreter interpreter = new HibernateOrmPathInterpreter();
 
-	@SuppressWarnings("unchecked")
 	public HibernateOrmPathDefinitionProvider(PojoRawTypeModel<?> typeModel, PersistentClass persistentClass) {
 		this.typeModel = typeModel;
 		this.persistentClass = persistentClass;
