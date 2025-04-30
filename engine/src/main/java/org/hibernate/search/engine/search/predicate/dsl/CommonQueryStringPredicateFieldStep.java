@@ -69,14 +69,14 @@ public interface CommonQueryStringPredicateFieldStep<
 	 * When targeting multiple fields, those fields must have compatible types.
 	 * Please refer to the reference documentation for more information.
 	 *
-	 * @param field The field reference representing a <a href="SearchPredicateFactory.html#field-paths">path</a> to the index field
+	 * @param fieldReference The field reference representing a <a href="SearchPredicateFactory.html#field-references">definition</a> of the index field
 	 * to apply the predicate on.
 	 * @return The next step.
 	 */
 	@Incubating
 	@SuppressWarnings("unchecked")
-	default N field(FR field) {
-		return fields( field );
+	default N field(FR fieldReference) {
+		return fields( fieldReference );
 	}
 
 	/**
@@ -90,7 +90,7 @@ public interface CommonQueryStringPredicateFieldStep<
 	 * and other field-specific settings on the returned step will only need to be done once
 	 * and will apply to all the fields passed to this method.
 	 *
-	 * @param fields The field reference representing <a href="SearchPredicateFactory.html#field-paths">paths</a> to the index fields
+	 * @param fieldReferences The field references representing <a href="SearchPredicateFactory.html#field-references">definitions</a> of the index fields
 	 * to apply the predicate on.
 	 * @return The next step.
 	 *
@@ -98,10 +98,10 @@ public interface CommonQueryStringPredicateFieldStep<
 	 */
 	@Incubating
 	@SuppressWarnings("unchecked")
-	default N fields(FR... fields) {
-		String[] paths = new String[fields.length];
-		for ( int i = 0; i < fields.length; i++ ) {
-			paths[i] = fields[i].absolutePath();
+	default N fields(FR... fieldReferences) {
+		String[] paths = new String[fieldReferences.length];
+		for ( int i = 0; i < fieldReferences.length; i++ ) {
+			paths[i] = fieldReferences[i].absolutePath();
 		}
 		return fields( paths );
 	}

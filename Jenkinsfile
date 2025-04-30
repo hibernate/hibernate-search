@@ -499,7 +499,7 @@ stage('Non-default environments') {
 					// we'd better recompile everything with the same compiler rather than get some strange errors
 					mavenNonDefaultBuild buildEnv, """ \
 							-DskipTests -DskipITs \
-							-P${buildEnv.mavenProfile},!javaModuleITs,!metamodelITs -pl '!:hibernate-search-documentation,!:hibernate-search-reports' \
+							-P${buildEnv.mavenProfile},!javaModuleITs,!metamodelITs -pl '!:hibernate-search-documentation,!:hibernate-search-documentation-lucene-next,!:hibernate-search-reports' \
 							-Dgib.buildAll=true \
 					"""
 				}

@@ -27,6 +27,15 @@ import org.hibernate.search.util.common.annotation.Incubating;
  * Such a factory can also transform relative paths into absolute paths using {@link #toAbsolutePath(String)};
  * this can be useful for native aggregations in particular.
  *
+ * <h2 id="field-references">Field references</h2>
+ *
+ * A {@link org.hibernate.search.engine.search.reference field reference} is always represented by the absolute field path and,
+ * if applicable, i.e. when a field reference is typed, a combination of the {@link org.hibernate.search.engine.search.common.ValueModel} and the type.
+ * <p>
+ * Field references are usually accessed from the generated Hibernate Search's static metamodel classes that describe the index structure.
+ * Such reference provides the information on which search capabilities the particular index field possesses, and allows switching between different
+ * {@link org.hibernate.search.engine.search.common.ValueModel value model representations}.
+ *
  * @param <SR> Scope root type.
  *
  * @author Emmanuel Bernard emmanuel@hibernate.org

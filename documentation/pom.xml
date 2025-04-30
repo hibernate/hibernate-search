@@ -64,7 +64,7 @@
         </dependency>
         <dependency>
             <groupId>${project.groupId}</groupId>
-            <artifactId>hibernate-search-metamodel-processor</artifactId>
+            <artifactId>hibernate-search-processor</artifactId>
             <scope>test</scope>
         </dependency>
         <dependency>
@@ -121,7 +121,42 @@
                          even though we don't explicitly use it.
                          This is probably a compiler bug, so here we need to work around it. -->
                     <showDeprecation>false</showDeprecation>
+                    <testExcludes>
+                        <exclude>org/hibernate/search/documentation/search/metamodel/**</exclude>
+                    </testExcludes>
                 </configuration>
+                <executions>
+                    <execution>
+                        <id>generate-metamodel</id>
+                        <phase>test-compile</phase>
+                        <goals>
+                            <goal>testCompile</goal>
+                        </goals>
+                        <configuration>
+                            <proc>full</proc>
+                            <testIncludes>
+                                <include>org/hibernate/search/documentation/search/metamodel/**</include>
+                            </testIncludes>
+                            <testExcludes combine.self="override" combine.children="override"></testExcludes>
+                            <showWarnings>false</showWarnings>
+                            <annotationProcessors>
+                                <annotationProcessor>org.hibernate.search.processor.HibernateSearchProcessor</annotationProcessor>
+                            </annotationProcessors>
+                            <annotationProcessorPaths>
+                                <path>
+                                    <groupId>org.hibernate.search</groupId>
+                                    <artifactId>hibernate-search-processor</artifactId>
+                                    <version>${project.version}</version>
+                                </path>
+                                <path>
+                                    <groupId>org.hibernate.search</groupId>
+                                    <artifactId>hibernate-search-backend-elasticsearch</artifactId>
+                                    <version>${project.version}</version>
+                                </path>
+                            </annotationProcessorPaths>
+                        </configuration>
+                    </execution>
+                </executions>
             </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>

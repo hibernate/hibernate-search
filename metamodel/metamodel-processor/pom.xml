@@ -9,10 +9,10 @@
         <version>8.0.0-SNAPSHOT</version>
         <relativePath>../../build/parents/public</relativePath>
     </parent>
-    <artifactId>hibernate-search-metamodel-processor</artifactId>
+    <artifactId>hibernate-search-processor</artifactId>
 
-    <name>Hibernate Search Metamodel annotation processor</name>
-    <description>Hibernate Search Metamodel annotation processor</description>
+    <name>Hibernate Search annotation processor</name>
+    <description>Hibernate Search annotation processor, that generates the static metamodel.</description>
 
     <properties>
         <!-- This is a publicly distributed module that should be published: -->

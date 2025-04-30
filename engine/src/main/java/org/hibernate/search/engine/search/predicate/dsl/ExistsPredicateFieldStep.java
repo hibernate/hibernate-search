@@ -26,13 +26,13 @@ public interface ExistsPredicateFieldStep<SR, N extends ExistsPredicateOptionsSt
 	/**
 	 * Target the given field in the "exists" predicate.
 	 *
-	 * @param field The field reference representing a <a href="SearchPredicateFactory.html#field-paths">path</a> to the index field
+	 * @param fieldReference The field reference representing a <a href="SearchPredicateFactory.html#field-references">definition</a> of the index field
 	 * to apply the predicate on.
 	 * @return The next step.
 	 */
 	@Incubating
-	default N field(ExistsPredicateFieldReference<? super SR> field) {
-		return field( field.absolutePath() );
+	default N field(ExistsPredicateFieldReference<? super SR> fieldReference) {
+		return field( fieldReference.absolutePath() );
 	}
 
 }

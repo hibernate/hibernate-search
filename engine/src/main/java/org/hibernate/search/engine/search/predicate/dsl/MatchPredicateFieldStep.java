@@ -54,7 +54,7 @@ public interface MatchPredicateFieldStep<SR, N extends MatchPredicateFieldMoreSt
 	 * When targeting multiple fields, those fields must have compatible types.
 	 * Please refer to the reference documentation for more information.
 	 *
-	 * @param fieldReference The field reference representing a <a href="SearchPredicateFactory.html#field-paths">path</a> to the index field
+	 * @param fieldReference The field reference representing a <a href="SearchPredicateFactory.html#field-references">definition</a> of the index field
 	 * to apply the predicate on.
 	 * @return The next step.
 	 */

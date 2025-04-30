@@ -50,9 +50,7 @@ is it searchable, sortable, projectable,
 what is the expected java class for arguments to the <<search-dsl,Search DSL>>,
 what are the analyzers/normalizer set on this field,
 ...
-<9> Inspect the "traits" of a field type:
-each trait represents a predicate/sort/projection/aggregation
-that can be used on fields of that type.
+<9> Inspect the <<mapping-inspect-traits,"traits">> of a field type.
 <10> Object fields can also be inspected.
 <11> A collection of all configured analyzers
 available for the index represented by the descriptor can also be inspected.
@@ -62,6 +60,14 @@ to see if a particular analyzer is available within the index context.
 available for the index represented by the descriptor can also be inspected.
 <14> Alternatively, normalizer descriptors can be retrieved by name
 to see if a particular normalizer is available within the index context.
+====
+
+[[mapping-inspect-traits]]
+[TIP]
+====
+Traits define the set of search capabilities available for the field,
+in particular, each trait represents a predicate/sort/projection/aggregation
+that can be used on that field.
 ====
 
 [TIP]

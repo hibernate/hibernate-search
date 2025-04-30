@@ -47,12 +47,12 @@ public interface MaxAggregationFieldStep<SR, PDF extends SearchPredicateFactory<
 	/**
 	 * Target the given field in the avg aggregation.
 	 *
-	 * @param reference The field reference representing a <a href="SearchAggregationFactory.html#field-paths">path</a> to the index field to aggregate.
+	 * @param fieldReference The field reference representing a <a href="SearchAggregationFactory.html#field-references">definition</a> of the index field to aggregate.
 	 * @param <F> The type of field values.
 	 * @return The next step.
 	 */
 	@Incubating
-	default <F> MaxAggregationOptionsStep<SR, ?, PDF, F> field(MaxAggregationFieldReference<SR, F> reference) {
-		return field( reference.absolutePath(), reference.aggregationType(), reference.valueModel() );
+	default <F> MaxAggregationOptionsStep<SR, ?, PDF, F> field(MaxAggregationFieldReference<SR, F> fieldReference) {
+		return field( fieldReference.absolutePath(), fieldReference.aggregationType(), fieldReference.valueModel() );
 	}
 }
