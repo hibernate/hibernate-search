@@ -67,7 +67,7 @@ public interface CommonQueryStringPredicateFieldMoreStep<
 	 * <p>
 	 * See {@link CommonQueryStringPredicateFieldStep#field(String)} for more information on targeted fields.
 	 *
-	 * @param field The field reference representing a <a href="SearchPredicateFactory.html#field-paths">path</a> to the index field
+	 * @param fieldReference The field reference representing a <a href="SearchPredicateFactory.html#field-references">definition</a> of the index field
 	 * to apply the predicate on.
 	 * @return The next step.
 	 *
@@ -75,8 +75,8 @@ public interface CommonQueryStringPredicateFieldMoreStep<
 	 */
 	@Incubating
 	@SuppressWarnings("unchecked")
-	default S field(FR field) {
-		return fields( field );
+	default S field(FR fieldReference) {
+		return fields( fieldReference );
 	}
 
 	/**
@@ -87,7 +87,7 @@ public interface CommonQueryStringPredicateFieldMoreStep<
 	 * <p>
 	 * See {@link CommonQueryStringPredicateFieldStep#fields(String...)} for more information on targeted fields.
 	 *
-	 * @param fields The field reference representing <a href="SearchPredicateFactory.html#field-paths">paths</a> to the index fields
+	 * @param fieldReferences The field reference representing <a href="SearchPredicateFactory.html#field-references">definition</a> of the index fields
 	 * to apply the predicate on.
 	 * @return The next step.
 	 *
@@ -95,10 +95,10 @@ public interface CommonQueryStringPredicateFieldMoreStep<
 	 */
 	@Incubating
 	@SuppressWarnings("unchecked")
-	default S fields(FR... fields) {
-		String[] paths = new String[fields.length];
-		for ( int i = 0; i < fields.length; i++ ) {
-			paths[i] = fields[i].absolutePath();
+	default S fields(FR... fieldReferences) {
+		String[] paths = new String[fieldReferences.length];
+		for ( int i = 0; i < fieldReferences.length; i++ ) {
+			paths[i] = fieldReferences[i].absolutePath();
 		}
 		return fields( paths );
 	}

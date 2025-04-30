@@ -165,7 +165,7 @@ class ProjectionConverterIT {
 		}
 	}
 
-	private enum OrderStatus {
+	enum OrderStatus {
 		ACKNOWLEDGED,
 		IN_PROGRESS,
 		DELIVERED

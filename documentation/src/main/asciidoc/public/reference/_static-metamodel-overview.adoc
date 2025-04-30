@@ -6,7 +6,7 @@
 include::../components/_incubating-warning.adoc[]
 
 The static metamodel class describes the index structure. Each indexed entity (index) is represented by a single class
-that may contain inner classes describing the embeddables (i.e. nested/flattened objects). These classes contain <<static-metamodel-processor-field-reference-types,field references>>
+that may contain inner classes describing object fields (e.g. from <<mapping-indexedembedded,indexed-embedded properties>>). These classes contain <<static-metamodel-processor-field-reference-types,field references>>
 representing index fields and their search capabilities.
 
 The name of this root class is constructed from the indexed entity name by adding `pass:[__]` (two underscores) suffix, e.g. `MySearchEntitypass:[__]`.
@@ -14,7 +14,7 @@ If the indexed entity is a (static) inner class, then all the owning classes wil
 e.g. `MyOuterClasspass:[_]MySearchEntitypass:[__]`.
 These classes are created in the same package where the search entity they represent is located.
 
-The root metamodel class that describes the indexed entity has a static field `INDEX` that users can use to interact with the metamodel.
+The root metamodel class that describes the indexed entity has a static field `INDEX` that you can use to interact with the metamodel.
 It serves two primary purposes:
 
 * It simplifies creating the search scope and building search queries for such scope.
@@ -39,7 +39,7 @@ limit acceptable field references to the ones obtained from the `Book__.INDEX`
 
 A field reference type describes the set of search capabilities a particular index field has, in particular,
 what kind of projections/aggregations/predicates/sorts are allowed, if any. It does so by implementing a
-subset of search traits interfaces defined in `org.hibernate.search.engine.search.reference.pass:[*]`, which in turn allows
+subset of <<mapping-inspect-traits,search "trait">> interfaces defined in `org.hibernate.search.engine.search.reference.pass:[*]`, which in turn allows
 performing compile-time checks when building <<search-dsl,search queries>>.
 
 ====
@@ -47,7 +47,7 @@ performing compile-time checks when building <<search-dsl,search queries>>.
 ----
 include::{sourcedir}/org/hibernate/search/documentation/search/metamodel/MetamodelIT.java[tags=compileCheck-pass]
 ----
-<1> If the title field is projectable then this compiles works fine,
+<1> If the title field is projectable then this compiles fine,
 otherwise compilation fails with an error similar to:
 +
 ----
@@ -64,5 +64,5 @@ The field reference also provides a way to quickly switch between <<search-dsl-a
 ----
 include::{sourcedir}/org/hibernate/search/documentation/search/metamodel/MetamodelIT.java[tags=valueModel]
 ----
-<1> Calling `string()` on a field reference is an eqivalent to `.field( "genre"  ).matching( <search value>, ValueModel.STRING )`
+<1> Calling `string()` on a field reference is an equivalent to `.field( "genre"  ).matching( <search value>, ValueModel.STRING )`
 ====

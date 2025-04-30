@@ -46,9 +46,6 @@ public class Book {
 	@IndexedEmbedded(structure = ObjectStructure.NESTED)
 	private List<Author> authors = new ArrayList<>();
 
-	public Book() {
-	}
-
 	public Integer getId() {
 		return id;
 	}

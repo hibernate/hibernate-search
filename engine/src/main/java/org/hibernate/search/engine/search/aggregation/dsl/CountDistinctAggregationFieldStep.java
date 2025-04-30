@@ -30,11 +30,11 @@ public interface CountDistinctAggregationFieldStep<SR, PDF extends SearchPredica
 	/**
 	 * Target the given field in the avg aggregation.
 	 *
-	 * @param reference The field reference representing a <a href="SearchAggregationFactory.html#field-paths">path</a> to the index field to aggregate.
+	 * @param fieldReference The field reference representing a <a href="SearchAggregationFactory.html#field-references">definition</a> of the index field to aggregate.
 	 * @return The next step.
 	 */
 	@Incubating
-	default CountDistinctAggregationOptionsStep<SR, ?, PDF> field(CountAggregationFieldReference<SR> reference) {
-		return field( reference.absolutePath() );
+	default CountDistinctAggregationOptionsStep<SR, ?, PDF> field(CountAggregationFieldReference<SR> fieldReference) {
+		return field( fieldReference.absolutePath() );
 	}
 }

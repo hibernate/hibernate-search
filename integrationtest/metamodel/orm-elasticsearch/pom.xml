@@ -47,7 +47,7 @@
         </dependency>
         <dependency>
             <groupId>org.hibernate.search</groupId>
-            <artifactId>hibernate-search-metamodel-processor</artifactId>
+            <artifactId>hibernate-search-processor</artifactId>
             <scope>provided</scope>
         </dependency>
     </dependencies>
@@ -63,12 +63,12 @@
                         <configuration>
                             <proc>full</proc>
                             <annotationProcessors>
-                                <annotationProcessor>org.hibernate.search.metamodel.processor.HibernateSearchMetamodelProcessor</annotationProcessor>
+                                <annotationProcessor>org.hibernate.search.processor.HibernateSearchProcessor</annotationProcessor>
                             </annotationProcessors>
                             <annotationProcessorPaths>
                                 <path>
                                     <groupId>org.hibernate.search</groupId>
-                                    <artifactId>hibernate-search-metamodel-processor</artifactId>
+                                    <artifactId>hibernate-search-processor</artifactId>
                                     <version>${project.version}</version>
                                 </path>
                                 <path>

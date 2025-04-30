@@ -17,7 +17,6 @@ import org.hibernate.search.documentation.search.predicate.EmbeddableGeoPoint;
 import org.hibernate.search.documentation.testsupport.BackendConfigurations;
 import org.hibernate.search.documentation.testsupport.DocumentationSetupHelper;
 import org.hibernate.search.mapper.orm.Search;
-import org.hibernate.search.mapper.orm.scope.SearchScope;
 import org.hibernate.search.mapper.orm.session.SearchSession;
 
 import org.junit.jupiter.api.BeforeEach;
@@ -56,7 +55,7 @@ class MetamodelIT {
 					// end::entryPoint[]
 					Search.session( entityManager );
 			// tag::entryPoint[]
-			SearchScope<Book__, Book> scope = Book__.INDEX.scope( searchSession ); // <2>
+			var scope = Book__.INDEX.scope( searchSession ); // <2>
 
 			List<Book> hits = searchSession.search( scope )
 					.where( f -> f.match()
@@ -73,7 +72,7 @@ class MetamodelIT {
 	@Test
 	void compileCheck() {
 		withinSearchSession( searchSession -> {
-			SearchScope<Book__, Book> scope = Book__.INDEX.scope( searchSession );
+			var scope = Book__.INDEX.scope( searchSession );
 			// tag::compileCheck-pass[]
 			List<String> titles = searchSession.search( scope )
 					.select( f -> f.field( Book__.INDEX.title ) ) // <1>
@@ -88,7 +87,7 @@ class MetamodelIT {
 	@Test
 	void valueModel() {
 		withinSearchSession( searchSession -> {
-			SearchScope<Book__, Book> scope = Book__.INDEX.scope( searchSession );
+			var scope = Book__.INDEX.scope( searchSession );
 			// tag::valueModel[]
 			List<Book> hits = searchSession.search( scope )
 					.where( f -> f.match()

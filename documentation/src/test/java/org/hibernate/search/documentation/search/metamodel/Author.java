@@ -30,9 +30,6 @@ public class Author {
 	@ManyToMany(mappedBy = "authors")
 	private List<Book> books = new ArrayList<>();
 
-	public Author() {
-	}
-
 	public Integer getId() {
 		return id;
 	}

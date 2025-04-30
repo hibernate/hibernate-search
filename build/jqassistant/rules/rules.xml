@@ -281,7 +281,7 @@
                         WHEN 'hibernate-search-mapper-orm' THEN 'HibernateOrm'
                         WHEN 'hibernate-search-mapper-orm-outbox-polling' THEN 'OutboxPolling'
                         WHEN 'hibernate-search-mapper-orm-jakarta-batch-jberet' THEN 'JBeret'
-                        WHEN 'hibernate-search-metamodel-processor' THEN 'Processor'
+                        WHEN 'hibernate-search-processor' THEN 'Processor'
                         ELSE 'UNKNOWN-MODULE-SPECIFIC-KEYWORD-PLEASE-UPDATE-JQASSISTANT-RULES'
                     END
             RETURN

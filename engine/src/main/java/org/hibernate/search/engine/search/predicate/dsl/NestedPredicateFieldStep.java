@@ -32,12 +32,12 @@ public interface NestedPredicateFieldStep<SR, N extends NestedPredicateNestStep<
 	 * <p>
 	 * The selected field must have a {@link ObjectStructure#NESTED nested structure} in the targeted indexes.
 	 *
-	 * @param field The field reference representing a <a href="SearchPredicateFactory.html#field-paths">path</a> to the object field
+	 * @param fieldReference The field reference representing a <a href="SearchPredicateFactory.html#field-references">definition</a> of the object field
 	 * to apply the predicate on.
 	 * @return The next step.
 	 */
-	default N objectField(NestedPredicateFieldReference<? super SR> field) {
-		return objectField( field.absolutePath() );
+	default N objectField(NestedPredicateFieldReference<? super SR> fieldReference) {
+		return objectField( fieldReference.absolutePath() );
 	}
 
 }

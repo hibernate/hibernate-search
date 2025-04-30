@@ -5,8 +5,11 @@
 
 include::../components/_incubating-warning.adoc[]
 
-Hibernate Search static metamodel represents the index structure
-that provides a type-safe way of creating search queries through the <<search-dsl,Search DSL>>.
+Hibernate Search's static metamodel is a set of generated classes that represents the structure of each entity's index,
+thereby allowing to reference index fields in a type-safe way to create search queries through the <<search-dsl,Search DSL>>.
+
+The basic principles are very similar to the link:{hibernateDocUrl}#tooling-modelgen[JPA static metamodel available in Hibernate ORM],
+but in the case of Search the metamodel is about indexes rather than entities.
 
 :leveloffset: +1
 
