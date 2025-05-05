@@ -41,46 +41,22 @@ class ProjectionConstructorDistanceProjectionIT {
 
 	@Test
 	void noArg() {
-		@Indexed(index = INDEX_NAME)
-		class IndexedEntity {
-			@DocumentId
-			public Integer id;
-			@GenericField(projectable = Projectable.YES)
-			public GeoPoint point;
-
-			public IndexedEntity() {
-			}
-
-			public IndexedEntity(Integer id, GeoPoint point) {
-				this.id = id;
-				this.point = point;
-			}
-		}
-		class MyProjection {
-			public final Double point;
-
-			@ProjectionConstructor
-			public MyProjection(@DistanceProjection(fromParam = "param") Double point) {
-				this.point = point;
-			}
-		}
-
 		SearchMapping mapping = setupHelper.start()
-				.withAnnotatedTypes( MyProjection.class )
+				.withAnnotatedTypes( NoArgMyProjection.class )
 				.withProperty( "hibernate.search.indexing.plan.synchronization.strategy",
 						IndexingPlanSynchronizationStrategyNames.READ_SYNC )
-				.setup( IndexedEntity.class );
+				.setup( NoArgIndexedEntity.class );
 
 		try ( SearchSession session = mapping.createSession() ) {
 			SearchIndexingPlan searchIndexingPlan = session.indexingPlan();
 			for ( int i = 0; i < 5; i++ ) {
-				searchIndexingPlan.add( new IndexedEntity( i, GeoPoint.of( i, i ) ) );
+				searchIndexingPlan.add( new NoArgIndexedEntity( i, GeoPoint.of( i, i ) ) );
 			}
 		}
 
 		try ( SearchSession session = mapping.createSession() ) {
-			List<MyProjection> projections = session.search( IndexedEntity.class )
-					.select( MyProjection.class )
+			List<NoArgMyProjection> projections = session.search( NoArgIndexedEntity.class )
+					.select( NoArgMyProjection.class )
 					.where( SearchPredicateFactory::matchAll )
 					.param( "param", GeoPoint.of( 1, 1 ) )
 					.fetchAllHits();
@@ -92,48 +68,49 @@ class ProjectionConstructorDistanceProjectionIT {
 		}
 	}
 
+	@Indexed(index = INDEX_NAME)
+	static class NoArgIndexedEntity {
+		@DocumentId
+		public Integer id;
+		@GenericField(projectable = Projectable.YES)
+		public GeoPoint point;
+
+		public NoArgIndexedEntity() {
+		}
+
+		public NoArgIndexedEntity(Integer id, GeoPoint point) {
+			this.id = id;
+			this.point = point;
+		}
+	}
+
+	static class NoArgMyProjection {
+		public final Double point;
+
+		@ProjectionConstructor
+		public NoArgMyProjection(@DistanceProjection(fromParam = "param") Double point) {
+			this.point = point;
+		}
+	}
+
 	@Test
 	void path() {
-		@Indexed(index = INDEX_NAME)
-		class IndexedEntity {
-			@DocumentId
-			public Integer id;
-			@GenericField(projectable = Projectable.YES)
-			public GeoPoint point;
-
-			public IndexedEntity() {
-			}
-
-			public IndexedEntity(Integer id, GeoPoint point) {
-				this.id = id;
-				this.point = point;
-			}
-		}
-		class MyProjection {
-			public final Double distance;
-
-			@ProjectionConstructor
-			public MyProjection(@DistanceProjection(fromParam = "param", path = "point") Double distance) {
-				this.distance = distance;
-			}
-		}
-
 		SearchMapping mapping = setupHelper.start()
-				.withAnnotatedTypes( MyProjection.class )
+				.withAnnotatedTypes( PathMyProjection.class )
 				.withProperty( "hibernate.search.indexing.plan.synchronization.strategy",
 						IndexingPlanSynchronizationStrategyNames.READ_SYNC )
-				.setup( IndexedEntity.class );
+				.setup( PathIndexedEntity.class );
 
 		try ( SearchSession session = mapping.createSession() ) {
 			SearchIndexingPlan searchIndexingPlan = session.indexingPlan();
 			for ( int i = 0; i < 5; i++ ) {
-				searchIndexingPlan.add( new IndexedEntity( i, GeoPoint.of( i, i ) ) );
+				searchIndexingPlan.add( new PathIndexedEntity( i, GeoPoint.of( i, i ) ) );
 			}
 		}
 
 		try ( SearchSession session = mapping.createSession() ) {
-			List<MyProjection> projections = session.search( IndexedEntity.class )
-					.select( MyProjection.class )
+			List<PathMyProjection> projections = session.search( PathIndexedEntity.class )
+					.select( PathMyProjection.class )
 					.where( SearchPredicateFactory::matchAll )
 					.param( "param", GeoPoint.of( 1, 1 ) )
 					.fetchAllHits();
@@ -145,49 +122,49 @@ class ProjectionConstructorDistanceProjectionIT {
 		}
 	}
 
+	@Indexed(index = INDEX_NAME)
+	static class PathIndexedEntity {
+		@DocumentId
+		public Integer id;
+		@GenericField(projectable = Projectable.YES)
+		public GeoPoint point;
+
+		public PathIndexedEntity() {
+		}
+
+		public PathIndexedEntity(Integer id, GeoPoint point) {
+			this.id = id;
+			this.point = point;
+		}
+	}
+
+	static class PathMyProjection {
+		public final Double distance;
+
+		@ProjectionConstructor
+		public PathMyProjection(@DistanceProjection(fromParam = "param", path = "point") Double distance) {
+			this.distance = distance;
+		}
+	}
+
 	@Test
 	void unit() {
-		@Indexed(index = INDEX_NAME)
-		class IndexedEntity {
-			@DocumentId
-			public Integer id;
-			@GenericField(projectable = Projectable.YES)
-			public GeoPoint point;
-
-			public IndexedEntity() {
-			}
-
-			public IndexedEntity(Integer id, GeoPoint point) {
-				this.id = id;
-				this.point = point;
-			}
-		}
-		class MyProjection {
-			public final Double distance;
-
-			@ProjectionConstructor
-			public MyProjection(
-					@DistanceProjection(fromParam = "param", path = "point", unit = DistanceUnit.KILOMETERS) Double distance) {
-				this.distance = distance;
-			}
-		}
-
 		SearchMapping mapping = setupHelper.start()
-				.withAnnotatedTypes( MyProjection.class )
+				.withAnnotatedTypes( UnitMyProjection.class )
 				.withProperty( "hibernate.search.indexing.plan.synchronization.strategy",
 						IndexingPlanSynchronizationStrategyNames.READ_SYNC )
-				.setup( IndexedEntity.class );
+				.setup( UnitIndexedEntity.class );
 
 		try ( SearchSession session = mapping.createSession() ) {
 			SearchIndexingPlan searchIndexingPlan = session.indexingPlan();
 			for ( int i = 0; i < 5; i++ ) {
-				searchIndexingPlan.add( new IndexedEntity( i, GeoPoint.of( i, i ) ) );
+				searchIndexingPlan.add( new UnitIndexedEntity( i, GeoPoint.of( i, i ) ) );
 			}
 		}
 
 		try ( SearchSession session = mapping.createSession() ) {
-			List<MyProjection> projections = session.search( IndexedEntity.class )
-					.select( MyProjection.class )
+			List<UnitMyProjection> projections = session.search( UnitIndexedEntity.class )
+					.select( UnitMyProjection.class )
 					.where( SearchPredicateFactory::matchAll )
 					.param( "param", GeoPoint.of( 1, 1 ) )
 					.fetchAllHits();
@@ -200,49 +177,51 @@ class ProjectionConstructorDistanceProjectionIT {
 		}
 	}
 
+	@Indexed(index = INDEX_NAME)
+	static class UnitIndexedEntity {
+		@DocumentId
+		public Integer id;
+		@GenericField(projectable = Projectable.YES)
+		public GeoPoint point;
+
+		public UnitIndexedEntity() {
+		}
+
+		public UnitIndexedEntity(Integer id, GeoPoint point) {
+			this.id = id;
+			this.point = point;
+		}
+	}
+
+	static class UnitMyProjection {
+		public final Double distance;
+
+		@ProjectionConstructor
+		public UnitMyProjection(
+				@DistanceProjection(fromParam = "param", path = "point", unit = DistanceUnit.KILOMETERS) Double distance) {
+			this.distance = distance;
+		}
+	}
+
 	@Test
 	void multi() {
-		@Indexed(index = INDEX_NAME)
-		class IndexedEntity {
-			@DocumentId
-			public Integer id;
-			@GenericField(projectable = Projectable.YES)
-			public Collection<GeoPoint> points;
-
-			public IndexedEntity() {
-			}
-
-			public IndexedEntity(Integer id, Collection<GeoPoint> points) {
-				this.id = id;
-				this.points = points;
-			}
-		}
-		class MyProjection {
-			public final Collection<Double> distance;
-
-			@ProjectionConstructor
-			public MyProjection(@DistanceProjection(fromParam = "param", path = "points") Collection<Double> distance) {
-				this.distance = distance;
-			}
-		}
-
 		SearchMapping mapping = setupHelper.start()
-				.withAnnotatedTypes( MyProjection.class )
+				.withAnnotatedTypes( MultiMyProjection.class )
 				.withProperty( "hibernate.search.indexing.plan.synchronization.strategy",
 						IndexingPlanSynchronizationStrategyNames.READ_SYNC )
-				.setup( IndexedEntity.class );
+				.setup( MultiIndexedEntity.class );
 
 		try ( SearchSession session = mapping.createSession() ) {
 			SearchIndexingPlan searchIndexingPlan = session.indexingPlan();
 			for ( int i = 0; i < 5; i++ ) {
 				searchIndexingPlan.add(
-						new IndexedEntity( i, List.of( GeoPoint.of( i, i ), GeoPoint.of( i * 1.5, i * 1.5 ) ) ) );
+						new MultiIndexedEntity( i, List.of( GeoPoint.of( i, i ), GeoPoint.of( i * 1.5, i * 1.5 ) ) ) );
 			}
 		}
 
 		try ( SearchSession session = mapping.createSession() ) {
-			List<MyProjection> projections = session.search( IndexedEntity.class )
-					.select( MyProjection.class )
+			List<MultiMyProjection> projections = session.search( MultiIndexedEntity.class )
+					.select( MultiMyProjection.class )
 					.where( SearchPredicateFactory::matchAll )
 					.param( "param", GeoPoint.of( 1, 2 ) )
 					.fetchAllHits();
@@ -255,49 +234,50 @@ class ProjectionConstructorDistanceProjectionIT {
 		}
 	}
 
+	@Indexed(index = INDEX_NAME)
+	static class MultiIndexedEntity {
+		@DocumentId
+		public Integer id;
+		@GenericField(projectable = Projectable.YES)
+		public Collection<GeoPoint> points;
+
+		public MultiIndexedEntity() {
+		}
+
+		public MultiIndexedEntity(Integer id, Collection<GeoPoint> points) {
+			this.id = id;
+			this.points = points;
+		}
+	}
+
+	static class MultiMyProjection {
+		public final Collection<Double> distance;
+
+		@ProjectionConstructor
+		public MultiMyProjection(@DistanceProjection(fromParam = "param", path = "points") Collection<Double> distance) {
+			this.distance = distance;
+		}
+	}
+
 	@Test
 	void multi_number() {
-		@Indexed(index = INDEX_NAME)
-		class IndexedEntity {
-			@DocumentId
-			public Integer id;
-			@GenericField(projectable = Projectable.YES)
-			public Collection<GeoPoint> points;
-
-			public IndexedEntity() {
-			}
-
-			public IndexedEntity(Integer id, Collection<GeoPoint> points) {
-				this.id = id;
-				this.points = points;
-			}
-		}
-		class MyProjection {
-			public final Collection<Number> distance;
-
-			@ProjectionConstructor
-			public MyProjection(@DistanceProjection(fromParam = "param", path = "points") Collection<Number> distance) {
-				this.distance = distance;
-			}
-		}
-
 		SearchMapping mapping = setupHelper.start()
-				.withAnnotatedTypes( MyProjection.class )
+				.withAnnotatedTypes( MultiNumberMyProjection.class )
 				.withProperty( "hibernate.search.indexing.plan.synchronization.strategy",
 						IndexingPlanSynchronizationStrategyNames.READ_SYNC )
-				.setup( IndexedEntity.class );
+				.setup( MultiNumberIndexedEntity.class );
 
 		try ( SearchSession session = mapping.createSession() ) {
 			SearchIndexingPlan searchIndexingPlan = session.indexingPlan();
 			for ( int i = 0; i < 5; i++ ) {
 				searchIndexingPlan.add(
-						new IndexedEntity( i, List.of( GeoPoint.of( i, i ), GeoPoint.of( i * 1.5, i * 1.5 ) ) ) );
+						new MultiNumberIndexedEntity( i, List.of( GeoPoint.of( i, i ), GeoPoint.of( i * 1.5, i * 1.5 ) ) ) );
 			}
 		}
 
 		try ( SearchSession session = mapping.createSession() ) {
-			List<MyProjection> projections = session.search( IndexedEntity.class )
-					.select( MyProjection.class )
+			List<MultiNumberMyProjection> projections = session.search( MultiNumberIndexedEntity.class )
+					.select( MultiNumberMyProjection.class )
 					.where( SearchPredicateFactory::matchAll )
 					.param( "param", GeoPoint.of( 1, 2 ) )
 					.fetchAllHits();
@@ -306,37 +286,63 @@ class ProjectionConstructorDistanceProjectionIT {
 		}
 	}
 
+	@Indexed(index = INDEX_NAME)
+	static class MultiNumberIndexedEntity {
+		@DocumentId
+		public Integer id;
+		@GenericField(projectable = Projectable.YES)
+		public Collection<GeoPoint> points;
+
+		public MultiNumberIndexedEntity() {
+		}
+
+		public MultiNumberIndexedEntity(Integer id, Collection<GeoPoint> points) {
+			this.id = id;
+			this.points = points;
+		}
+	}
+
+	static class MultiNumberMyProjection {
+		public final Collection<Number> distance;
+
+		@ProjectionConstructor
+		public MultiNumberMyProjection(@DistanceProjection(fromParam = "param", path = "points") Collection<Number> distance) {
+			this.distance = distance;
+		}
+	}
+
 	@Test
 	void invalidType() {
-		@Indexed(index = INDEX_NAME)
-		class IndexedEntity {
-			@DocumentId
-			public Integer id;
-			@GenericField(projectable = Projectable.YES)
-			public Collection<GeoPoint> points;
-
-			public IndexedEntity() {
-			}
-
-			public IndexedEntity(Integer id, Collection<GeoPoint> points) {
-				this.id = id;
-				this.points = points;
-			}
-		}
-		class MyProjection {
-			public final List<String> distance;
-
-			@ProjectionConstructor
-			public MyProjection(@DistanceProjection(fromParam = "param", path = "points") List<String> distance) {
-				this.distance = distance;
-			}
-		}
-
 		assertThatThrownBy( () -> setupHelper.start()
-				.withAnnotatedTypes( MyProjection.class )
-				.setup( IndexedEntity.class )
+				.withAnnotatedTypes( InvalidTypeMyProjection.class )
+				.setup( InvalidTypeIndexedEntity.class )
 		).isInstanceOf( SearchException.class )
 				.hasMessageContainingAll(
 						"Invalid constructor parameter type: 'java.lang.String'. The distance projection results in values of type 'SomeContainer<Double>'" );
+	}
+
+	@Indexed(index = INDEX_NAME)
+	static class InvalidTypeIndexedEntity {
+		@DocumentId
+		public Integer id;
+		@GenericField(projectable = Projectable.YES)
+		public Collection<GeoPoint> points;
+
+		public InvalidTypeIndexedEntity() {
+		}
+
+		public InvalidTypeIndexedEntity(Integer id, Collection<GeoPoint> points) {
+			this.id = id;
+			this.points = points;
+		}
+	}
+
+	static class InvalidTypeMyProjection {
+		public final List<String> distance;
+
+		@ProjectionConstructor
+		public InvalidTypeMyProjection(@DistanceProjection(fromParam = "param", path = "points") List<String> distance) {
+			this.distance = distance;
+		}
 	}
 }
