@@ -136,6 +136,10 @@ public class ElasticsearchDialectFactory {
 					return new OpenSearch29ModelDialect();
 				}
 			}
+			if ( major == 3 ) {
+				// While at the moment this if is redundant, it is more of a placeholder
+				return new OpenSearch214ModelDialect();
+			}
 			return new OpenSearch214ModelDialect();
 		}
 	}
@@ -237,6 +241,9 @@ public class ElasticsearchDialectFactory {
 		else if ( major == 2 ) {
 			return createProtocolDialectOpenSearchV2( version, minor );
 		}
+		else if ( major == 3 ) {
+			return createProtocolDialectOpenSearchV3( version, minor );
+		}
 		else {
 			VersionLog.INSTANCE.unknownElasticsearchVersion( version );
 			return new Elasticsearch70ProtocolDialect();
@@ -252,6 +259,13 @@ public class ElasticsearchDialectFactory {
 
 	private ElasticsearchProtocolDialect createProtocolDialectOpenSearchV2(ElasticsearchVersion version, int minor) {
 		if ( minor > 19 ) {
+			VersionLog.INSTANCE.unknownElasticsearchVersion( version );
+		}
+		return new Elasticsearch70ProtocolDialect();
+	}
+
+	private ElasticsearchProtocolDialect createProtocolDialectOpenSearchV3(ElasticsearchVersion version, int minor) {
+		if ( minor > 0 ) {
 			VersionLog.INSTANCE.unknownElasticsearchVersion( version );
 		}
 		return new Elasticsearch70ProtocolDialect();

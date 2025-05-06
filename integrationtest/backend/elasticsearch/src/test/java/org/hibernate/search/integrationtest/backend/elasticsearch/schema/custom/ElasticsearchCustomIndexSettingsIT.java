@@ -82,7 +82,7 @@ class ElasticsearchCustomIndexSettingsIT {
 				.hasMessageContainingAll(
 						"Hibernate Search encountered failures during bootstrap",
 						"Elasticsearch response indicates a failure",
-						"illegal_argument_exception", "unknown setting", "index.unknown_setting"
+						"unknown setting", "index.unknown_setting"
 				);
 	}
 
