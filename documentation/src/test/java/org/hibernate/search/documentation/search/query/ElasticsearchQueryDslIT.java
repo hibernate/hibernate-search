@@ -86,7 +86,7 @@ class ElasticsearchQueryDslIT {
 						parameters.put( "search_type", "dfs_query_then_fetch" );
 
 						JsonObject body = context.body(); // <4>
-						body.addProperty( "min_score", 0.5f );
+						body.addProperty( "min_score", 0.2f );
 					} )
 					.fetchHits( 20 ); // <5>
 			// end::elasticsearch-requestTransformer[]

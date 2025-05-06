@@ -161,10 +161,12 @@ public final class SearchBackendContainer {
 		ElasticsearchVersion version =
 				ElasticsearchVersion.of( ElasticsearchDistributionName.OPENSEARCH, dockerImageName.getVersionPart() );
 
-		if ( version.majorOptional().orElse( Integer.MIN_VALUE ) == 2
-				&& version.minor().orElse( Integer.MAX_VALUE ) > 11 ) {
+		if ( ( version.majorOptional().orElse( Integer.MIN_VALUE ) == 2
+				&& version.minor().orElse( Integer.MAX_VALUE ) > 11 )
+				|| version.majorOptional().orElse( Integer.MIN_VALUE ) > 2 ) {
 			// Note: For OpenSearch 2.12 and later, a custom password for the admin user is required to be passed to set-up and utilize demo configuration.
-			container.withEnv( "OPENSEARCH_INITIAL_ADMIN_PASSWORD", "NotActua11y$trongPa$$word" );
+			container.withEnv( "OPENSEARCH_INITIAL_ADMIN_PASSWORD", "NotActua11y$trongPa$$word" )
+					.withEnv( "DISABLE_INSTALL_DEMO_CONFIG", "true" );
 		}
 		return container;
 	}
