@@ -353,6 +353,7 @@
 
         <version.asciidoctor.plugin>3.2.0</version.asciidoctor.plugin>
         <version.org.hibernate.infra.hibernate-asciidoctor-theme>5.0.7.Final</version.org.hibernate.infra.hibernate-asciidoctor-theme>
+        <version.org.hibernate.infra.hibernate-asciidoctor-extensions>3.1.0.Final</version.org.hibernate.infra.hibernate-asciidoctor-extensions>
         <version.org.asciidoctor.asciidoctorj>3.0.0</version.org.asciidoctor.asciidoctorj>
         <version.org.asciidoctor.asciidoctorj-pdf>2.3.19</version.org.asciidoctor.asciidoctorj-pdf>
 
@@ -912,6 +913,11 @@
                             <groupId>org.asciidoctor</groupId>
                             <artifactId>asciidoctorj-pdf</artifactId>
                             <version>${version.org.asciidoctor.asciidoctorj-pdf}</version>
+                        </dependency>
+                        <dependency>
+                            <groupId>org.hibernate.infra</groupId>
+                            <artifactId>hibernate-asciidoctor-extensions</artifactId>
+                            <version>${version.org.hibernate.infra.hibernate-asciidoctor-extensions}</version>
                         </dependency>
                     </dependencies>
                 </plugin>
