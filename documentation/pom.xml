@@ -31,7 +31,6 @@
         <asciidoctor.examples-resources-dir>${basedir}/src/test/resources</asciidoctor.examples-resources-dir>
 
         <html.meta.project-key>search</html.meta.project-key>
-        <html.google-analytics.id>G-282CVRCQHZ</html.google-analytics.id>
         <html.outdated-content.project-key>${html.meta.project-key}</html.outdated-content.project-key>
     </properties>
 
