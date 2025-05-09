@@ -42,6 +42,7 @@ import org.hibernate.search.mapper.pojo.mapping.definition.annotation.ScaledNumb
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.VectorField;
 import org.hibernate.search.mapper.pojo.work.IndexingPlanSynchronizationStrategyNames;
 import org.hibernate.search.util.impl.integrationtest.backend.elasticsearch.ElasticsearchBackendConfiguration;
+import org.hibernate.search.util.impl.integrationtest.backend.elasticsearch.dialect.ElasticsearchTestDialect;
 import org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmSetupHelper;
 
 import org.junit.jupiter.api.BeforeEach;
@@ -122,7 +123,27 @@ class FieldTypesIT {
 					)
 					.fetchHits( 20 ) )
 					.hasSize( 2 );
+
+			if ( isVectorSearchSupported() ) {
+				assertThat( session.search( scope )
+						.where( f -> f.bool()
+								.should( f.knn( 10 ).field( FieldTypesIT_FieldTypesEntity__.INDEX.floatVector )
+										.matching( new float[] { 1.0f, 2.0f, 3.0f } ) )
+								.should( f.knn( 10 ).field( FieldTypesIT_FieldTypesEntity__.INDEX.byteVector )
+										.matching( new byte[] { 1, 2, 3 } ) )
+						)
+						.fetchHits( 20 ) )
+						.hasSize( 2 );
+			}
 		}
+	}
+
+	private static boolean isVectorSearchSupported() {
+		return ElasticsearchTestDialect.isActualVersion(
+				es -> !es.isLessThan( "8.12.0" ),
+				os -> !os.isLessThan( "2.9.0" ),
+				aoss -> true
+		);
 	}
 
 	@Entity(name = "FieldTypesEntity")

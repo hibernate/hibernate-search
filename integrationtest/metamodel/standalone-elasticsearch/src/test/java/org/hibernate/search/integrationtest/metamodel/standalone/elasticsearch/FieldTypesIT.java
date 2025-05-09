@@ -42,6 +42,7 @@ import org.hibernate.search.mapper.pojo.standalone.session.SearchSession;
 import org.hibernate.search.mapper.pojo.work.IndexingPlanSynchronizationStrategy;
 import org.hibernate.search.mapper.pojo.work.IndexingPlanSynchronizationStrategyNames;
 import org.hibernate.search.util.impl.integrationtest.backend.elasticsearch.ElasticsearchBackendConfiguration;
+import org.hibernate.search.util.impl.integrationtest.backend.elasticsearch.dialect.ElasticsearchTestDialect;
 import org.hibernate.search.util.impl.integrationtest.mapper.pojo.standalone.StandalonePojoMappingSetupHelper;
 
 import org.junit.jupiter.api.BeforeEach;
@@ -131,15 +132,31 @@ class FieldTypesIT {
 									.matching( YearMonth.of( 2000, 1 ) ) )
 							.should( f.match().field( FieldTypesIT_FieldTypesEntity__.INDEX.aZonedDateTime )
 									.matching( ZonedDateTime.of( LocalDateTime.of( 2000, 1, 1, 1, 1 ), ZoneOffset.UTC ) ) )
-							.should( f.knn( 10 ).field( FieldTypesIT_FieldTypesEntity__.INDEX.floatVector )
-									.matching( new float[] { 1.0f, 2.0f, 3.0f } ) )
-							.should( f.knn( 10 ).field( FieldTypesIT_FieldTypesEntity__.INDEX.byteVector )
-									.matching( new byte[] { 1, 2, 3 } ) )
 							.should( f.match().field( FieldTypesIT_FieldTypesEntity__.INDEX.myEnum ).matching( MyEnum.B ) )
 					)
 					.fetchHits( 20 ) )
 					.hasSize( 2 );
+
+			if ( isVectorSearchSupported() ) {
+				assertThat( session.search( scope )
+						.where( f -> f.bool()
+								.should( f.knn( 10 ).field( FieldTypesIT_FieldTypesEntity__.INDEX.floatVector )
+										.matching( new float[] { 1.0f, 2.0f, 3.0f } ) )
+								.should( f.knn( 10 ).field( FieldTypesIT_FieldTypesEntity__.INDEX.byteVector )
+										.matching( new byte[] { 1, 2, 3 } ) )
+						)
+						.fetchHits( 20 ) )
+						.hasSize( 2 );
+			}
 		}
+	}
+
+	private static boolean isVectorSearchSupported() {
+		return ElasticsearchTestDialect.isActualVersion(
+				es -> !es.isLessThan( "8.12.0" ),
+				os -> !os.isLessThan( "2.9.0" ),
+				aoss -> true
+		);
 	}
 
 	@SearchEntity(name = "FieldTypesEntity")
