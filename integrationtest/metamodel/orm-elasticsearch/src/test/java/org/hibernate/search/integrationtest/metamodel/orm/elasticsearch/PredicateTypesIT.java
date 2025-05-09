@@ -26,6 +26,7 @@ import org.hibernate.search.mapper.pojo.mapping.definition.annotation.KeywordFie
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.VectorField;
 import org.hibernate.search.mapper.pojo.work.IndexingPlanSynchronizationStrategyNames;
 import org.hibernate.search.util.impl.integrationtest.backend.elasticsearch.ElasticsearchBackendConfiguration;
+import org.hibernate.search.util.impl.integrationtest.backend.elasticsearch.dialect.ElasticsearchTestDialect;
 import org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmSetupHelper;
 
 import org.junit.jupiter.api.BeforeEach;
@@ -77,10 +78,6 @@ class PredicateTypesIT {
 									.circle( GeoPoint.of( 10.0, 20.0 ), 20.0 ) )
 							.should( f.exists().field( PredicateTypesIT_IndexedEntity__.INDEX.geoPoint ) )
 
-							.should( f.knn( 10 ).field( PredicateTypesIT_IndexedEntity__.INDEX.floatVector )
-									.matching( new float[] { 1.0f, 2.0f, 3.0f } ) )
-							.should( f.exists().field( PredicateTypesIT_IndexedEntity__.INDEX.floatVector ) )
-
 							.should( f.match().field( PredicateTypesIT_IndexedEntity__.INDEX.myEnum ).matching( MyEnum.B ) )
 							.should( f.range().field( PredicateTypesIT_IndexedEntity__.INDEX.myEnum ).atLeast( MyEnum.B ) )
 							.should( f.phrase().field( PredicateTypesIT_IndexedEntity__.INDEX.myEnum ).matching( "B" ) )
@@ -95,7 +92,26 @@ class PredicateTypesIT {
 					)
 					.fetchHits( 20 ) )
 					.hasSize( 2 );
+
+			if ( isVectorSearchSupported() ) {
+				assertThat( session.search( scope )
+						.where( f -> f.bool()
+								.should( f.knn( 10 ).field( PredicateTypesIT_IndexedEntity__.INDEX.floatVector )
+										.matching( new float[] { 1.0f, 2.0f, 3.0f } ) )
+								.should( f.exists().field( PredicateTypesIT_IndexedEntity__.INDEX.floatVector ) )
+						)
+						.fetchHits( 20 ) )
+						.hasSize( 2 );
+			}
 		}
+	}
+
+	private static boolean isVectorSearchSupported() {
+		return ElasticsearchTestDialect.isActualVersion(
+				es -> !es.isLessThan( "8.12.0" ),
+				os -> !os.isLessThan( "2.9.0" ),
+				aoss -> true
+		);
 	}
 
 	@Entity(name = "IndexedEntity")
