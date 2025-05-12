@@ -143,6 +143,17 @@
 			</includes>
 		</dependencySet>
 		<dependencySet>
+			<outputDirectory>dist/processor</outputDirectory>
+			<scope>runtime</scope>
+			<useProjectArtifact>false</useProjectArtifact>
+			<useTransitiveDependencies>true</useTransitiveDependencies>
+			<useTransitiveFiltering>true</useTransitiveFiltering>
+			<useStrictFiltering>true</useStrictFiltering>
+			<includes>
+				<include>org.hibernate.search:hibernate-search-processor</include>
+			</includes>
+		</dependencySet>
+		<dependencySet>
 			<outputDirectory>dist/provided</outputDirectory>
 			<scope>provided</scope>
 			<useProjectArtifact>false</useProjectArtifact>
