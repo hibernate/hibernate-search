@@ -6,6 +6,7 @@ package org.hibernate.search.integrationtest.metamodel.orm.elasticsearch;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmUtils.with;
+import static org.junit.jupiter.api.Assumptions.assumeTrue;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
@@ -58,6 +59,7 @@ class FieldTypesIT {
 
 	@BeforeEach
 	void setup() {
+		assumeTrue( isVectorSearchSupported() );
 		sessionFactory = setupHelper.start()
 				.withAnnotatedTypes( FieldTypesEntity.class )
 				.withProperty( HibernateOrmMapperSettings.INDEXING_PLAN_SYNCHRONIZATION_STRATEGY,

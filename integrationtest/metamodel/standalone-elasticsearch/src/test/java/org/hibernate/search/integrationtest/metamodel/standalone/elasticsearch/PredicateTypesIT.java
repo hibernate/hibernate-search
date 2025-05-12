@@ -5,6 +5,7 @@
 package org.hibernate.search.integrationtest.metamodel.standalone.elasticsearch;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assumptions.assumeTrue;
 
 import java.lang.invoke.MethodHandles;
 import java.util.HashMap;
@@ -48,6 +49,7 @@ class PredicateTypesIT {
 
 	@BeforeEach
 	void setup() {
+		assumeTrue( isVectorSearchSupported() );
 		mapping = setupHelper.start()
 				.withAnnotatedTypes( IndexedEntity.class )
 				.withProperty( StandalonePojoMapperSettings.INDEXING_PLAN_SYNCHRONIZATION_STRATEGY,

@@ -6,6 +6,7 @@ package org.hibernate.search.integrationtest.metamodel.orm.elasticsearch;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmUtils.with;
+import static org.junit.jupiter.api.Assumptions.assumeTrue;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
@@ -42,6 +43,7 @@ class PredicateTypesIT {
 
 	@BeforeEach
 	void setup() {
+		assumeTrue( isVectorSearchSupported() );
 		sessionFactory = setupHelper.start()
 				.withAnnotatedTypes( IndexedEntity.class )
 				.withProperty( HibernateOrmMapperSettings.INDEXING_PLAN_SYNCHRONIZATION_STRATEGY,
