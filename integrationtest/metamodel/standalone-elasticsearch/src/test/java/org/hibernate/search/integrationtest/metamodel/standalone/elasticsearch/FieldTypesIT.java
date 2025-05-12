@@ -5,6 +5,7 @@
 package org.hibernate.search.integrationtest.metamodel.standalone.elasticsearch;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assumptions.assumeTrue;
 
 import java.lang.invoke.MethodHandles;
 import java.math.BigDecimal;
@@ -62,6 +63,7 @@ class FieldTypesIT {
 
 	@BeforeEach
 	void setup() {
+		assumeTrue( isVectorSearchSupported() );
 		mapping = setupHelper.start()
 				.withAnnotatedTypes( FieldTypesEntity.class )
 				.withProperty( StandalonePojoMapperSettings.INDEXING_PLAN_SYNCHRONIZATION_STRATEGY,
