@@ -1,6 +1,40 @@
 Hibernate Search Changelog
 ==========================
 
+8.0.0.Beta1 (2025-05-13)
+-------------------------
+
+** Improvement
+    * HSEARCH-5374 Upgrade Elasticsearch client to 9.0.1
+    * HSEARCH-5373 Upgrade to Lucene 10.2.1
+    * HSEARCH-5371 Upgrade to Jackson 2.19.0
+    * HSEARCH-5370 Upgrade to GSON 2.13.1
+    * HSEARCH-5368 Upgrade to Jandex 3.3
+    * HSEARCH-5367 Upgrade to Hibernate ORM 7.0.0.CR1
+    * HSEARCH-5365 Add compatibility with Elasticsearch 8.18.0 
+    * HSEARCH-5363 Add compatibility with OpenSearch 3.0.0
+    * HSEARCH-5362 Upgrade to Elasticsearch client 9.0.0
+    * HSEARCH-5361 Add Elasticsearch 9.0.0 compatibility
+    * HSEARCH-5359 Upgrade to GSON 2.13.0
+    * HSEARCH-5358 Fail faster if an enclosing instance parameter is encountered in a projection constructor on JDK 25+
+    * HSEARCH-5353 Upgrade to Apache Lucene 10.2.0
+    * HSEARCH-5347 Upgrade Elasticsearch client to 8.17.4
+    * HSEARCH-5305 Support 16,000 vector search embeddings max dimensions using Lucene backend
+
+** New Feature
+    * HSEARCH-3319 Type-safe field references
+
+** Task
+    * HSEARCH-5378 Add numbering/copytocliboard extensions from hibernate-asciidoctor-extensions
+    * HSEARCH-5376 Test against latest Elasticsearch 8.18.1 / 8.17.6
+    * HSEARCH-5375 Test against the latest Elasticsearch 9.0.1
+    * HSEARCH-5372 Test against the latest OpenSearch 2.19.2
+    * HSEARCH-5369 Enforce `since` attribute on @Deperecated
+    * HSEARCH-5360 Test against the latest Elasticsearch 8.17.5
+    * HSEARCH-5352 Clean up logger impls from misused imports
+    * HSEARCH-5348 Test against the latest Elasticsearch 8.17.4
+    * HSEARCH-5300 Experiment with the annotation processor to generate the metamodel
+
 8.0.0.Alpha3 (2025-03-24)
 -------------------------
 
