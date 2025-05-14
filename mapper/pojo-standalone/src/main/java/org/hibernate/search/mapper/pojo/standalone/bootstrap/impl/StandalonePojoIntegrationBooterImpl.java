@@ -94,6 +94,7 @@ public class StandalonePojoIntegrationBooterImpl implements StandalonePojoIntegr
 			PojoBootstrapIntrospector introspector =
 					StandalonePojoBootstrapIntrospector.create(
 							environment.classResolver(),
+							environment.resourceResolver(),
 							null,
 							valueHandleFactory != null
 									? valueHandleFactory

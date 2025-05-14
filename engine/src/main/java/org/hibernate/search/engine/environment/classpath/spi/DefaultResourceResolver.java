@@ -69,4 +69,14 @@ public final class DefaultResourceResolver implements ResourceResolver {
 		return null;
 	}
 
+	@Override
+	public URL locateResource(String resourceName) {
+		try {
+			return aggregatedClassLoader.getResource( resourceName );
+		}
+		catch (Exception e) {
+			return null;
+		}
+	}
+
 }

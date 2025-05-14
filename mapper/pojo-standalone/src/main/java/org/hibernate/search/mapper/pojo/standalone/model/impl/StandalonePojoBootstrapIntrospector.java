@@ -11,6 +11,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.hibernate.search.engine.environment.classpath.spi.ClassResolver;
+import org.hibernate.search.engine.environment.classpath.spi.ResourceResolver;
 import org.hibernate.search.mapper.pojo.model.models.spi.AbstractPojoModelsBootstrapIntrospector;
 import org.hibernate.search.mapper.pojo.model.models.spi.PojoModelsGenericContextHelper;
 import org.hibernate.search.mapper.pojo.model.models.spi.PojoSimpleModelsRawTypeModel;
@@ -32,18 +33,18 @@ import org.jboss.jandex.IndexView;
 public class StandalonePojoBootstrapIntrospector extends AbstractPojoModelsBootstrapIntrospector
 		implements PojoBootstrapIntrospector {
 
-	public static StandalonePojoBootstrapIntrospector create(ClassResolver classResolver, IndexView indexView,
-			ValueHandleFactory valueHandleFactory) {
-		return new StandalonePojoBootstrapIntrospector( classResolver, indexView, valueHandleFactory );
+	public static StandalonePojoBootstrapIntrospector create(ClassResolver classResolver, ResourceResolver resourceResolver,
+			IndexView indexView, ValueHandleFactory valueHandleFactory) {
+		return new StandalonePojoBootstrapIntrospector( classResolver, resourceResolver, indexView, valueHandleFactory );
 	}
 
 	private final PojoModelsGenericContextHelper genericContextHelper;
 
 	private final Map<Class<?>, PojoRawTypeModel<?>> typeModelCache = new HashMap<>();
 
-	private StandalonePojoBootstrapIntrospector(ClassResolver classResolver, IndexView indexView,
-			ValueHandleFactory valueHandleFactory) {
-		super( classResolver, indexView, valueHandleFactory );
+	private StandalonePojoBootstrapIntrospector(ClassResolver classResolver, ResourceResolver resourceResolver,
+			IndexView indexView, ValueHandleFactory valueHandleFactory) {
+		super( classResolver, resourceResolver, indexView, valueHandleFactory );
 		this.genericContextHelper = new PojoModelsGenericContextHelper( this );
 	}
 
