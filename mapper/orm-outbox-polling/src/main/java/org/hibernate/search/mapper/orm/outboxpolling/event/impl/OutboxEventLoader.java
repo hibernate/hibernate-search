@@ -15,7 +15,6 @@ import jakarta.persistence.OptimisticLockException;
 import jakarta.persistence.PessimisticLockException;
 
 import org.hibernate.LockMode;
-import org.hibernate.LockOptions;
 import org.hibernate.Session;
 import org.hibernate.dialect.Dialect;
 import org.hibernate.query.Query;
@@ -27,7 +26,7 @@ final class OutboxEventLoader implements ToStringTreeAppendable {
 
 	private static final String LOAD_QUERY_STRING = "select e from " + ENTITY_NAME + " e where e.id in (:ids)";
 
-	private final LockOptions lockOptions;
+	private final LockMode lockMode;
 
 	OutboxEventLoader(Dialect dialect) {
 		// HSEARCH-4289: some databases encounter deadlocks when multiple processors query or delete events
@@ -46,7 +45,7 @@ final class OutboxEventLoader implements ToStringTreeAppendable {
 		// so we can afford to just skip events that are already locked,
 		// and process them later when they are no longer locked.
 		if ( dialect.supportsSkipLocked() ) {
-			lockOptions = new LockOptions( LockMode.UPGRADE_SKIPLOCKED );
+			lockMode = LockMode.UPGRADE_SKIPLOCKED;
 		}
 		// If LockMode.UPGRADE_SKIPLOCKED is not supported, we just do basic locking and hope for the best
 		// (in particular we hope for transaction deadlocks to be detected by the database and result in a failure,
@@ -57,7 +56,7 @@ final class OutboxEventLoader implements ToStringTreeAppendable {
 		// so as long as we target a distinct set of events in each processor (we do),
 		// locking shouldn't trigger any deadlocks.
 		else {
-			lockOptions = new LockOptions( LockMode.PESSIMISTIC_WRITE );
+			lockMode = LockMode.PESSIMISTIC_WRITE;
 		}
 	}
 
@@ -69,8 +68,7 @@ final class OutboxEventLoader implements ToStringTreeAppendable {
 	@Override
 	public void appendTo(ToStringTreeAppender appender) {
 		appender.startObject( "lockOptions" )
-				.attribute( "lockMode", lockOptions.getLockMode() )
-				.attribute( "timeout", lockOptions.getTimeOut() )
+				.attribute( "lockMode", lockMode )
 				.endObject();
 	}
 
@@ -78,7 +76,7 @@ final class OutboxEventLoader implements ToStringTreeAppendable {
 		try {
 			Query<OutboxEvent> query = session.createQuery( LOAD_QUERY_STRING, OutboxEvent.class );
 			query.setParameter( "ids", ids );
-			query.setLockOptions( lockOptions );
+			query.setHibernateLockMode( lockMode );
 			return query.getResultList();
 		}
 		catch (PessimisticLockException | OptimisticLockException lockException) {

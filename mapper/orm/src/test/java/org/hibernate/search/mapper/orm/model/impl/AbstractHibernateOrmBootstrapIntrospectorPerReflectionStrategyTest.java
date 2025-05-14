@@ -22,7 +22,7 @@ import org.hibernate.boot.spi.BootstrapContext;
 import org.hibernate.boot.spi.MetadataImplementor;
 import org.hibernate.cfg.AvailableSettings;
 import org.hibernate.dialect.H2Dialect;
-import org.hibernate.models.internal.BasicModelsContextImpl;
+import org.hibernate.models.spi.ModelsConfiguration;
 import org.hibernate.models.spi.ModelsContext;
 import org.hibernate.search.util.common.impl.Closer;
 import org.hibernate.search.util.common.reflect.spi.ValueHandleFactory;
@@ -78,12 +78,9 @@ public abstract class AbstractHibernateOrmBootstrapIntrospectorPerReflectionStra
 		ClassLoaderService classLoaderService =
 				getServiceOrEmpty( bootstrapContext.getServiceRegistry(), ClassLoaderService.class )
 						.orElseThrow();
-		ClassLoaderServiceLoading classLoading = new ClassLoaderServiceLoading( classLoaderService );
-		return new BasicModelsContextImpl(
-				classLoading,
-				ModelsHelper::preFillRegistries
-		);
+		return new ModelsConfiguration()
+				.setClassLoading( new ClassLoaderServiceLoading( classLoaderService ) )
+				.setRegistryPrimer( ModelsHelper::preFillRegistries )
+				.bootstrap();
 	}
-
-
 }

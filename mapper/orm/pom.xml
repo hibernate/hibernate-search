@@ -42,10 +42,6 @@
             <artifactId>hibernate-models</artifactId>
         </dependency>
         <dependency>
-            <groupId>org.hibernate.models</groupId>
-            <artifactId>hibernate-models-jandex</artifactId>
-        </dependency>
-        <dependency>
             <groupId>jakarta.persistence</groupId>
             <artifactId>jakarta.persistence-api</artifactId>
         </dependency>
