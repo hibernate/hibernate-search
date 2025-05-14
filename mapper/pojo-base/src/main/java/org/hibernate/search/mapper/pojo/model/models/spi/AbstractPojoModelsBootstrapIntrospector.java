@@ -11,8 +11,12 @@ import java.lang.reflect.Member;
 import java.lang.reflect.Method;
 import java.net.URL;
 import java.util.Collection;
+import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.ServiceLoader;
+import java.util.Set;
 import java.util.TreeMap;
 import java.util.function.Function;
 import java.util.function.Predicate;
@@ -20,16 +24,17 @@ import java.util.stream.Collector;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import org.hibernate.models.internal.BasicModelsContextImpl;
-import org.hibernate.models.jandex.internal.JandexModelsContextImpl;
 import org.hibernate.models.spi.AnnotationTarget;
 import org.hibernate.models.spi.ClassDetails;
 import org.hibernate.models.spi.ClassDetailsRegistry;
 import org.hibernate.models.spi.ClassLoading;
 import org.hibernate.models.spi.MemberDetails;
 import org.hibernate.models.spi.MethodDetails;
+import org.hibernate.models.spi.ModelsConfiguration;
 import org.hibernate.search.engine.environment.classpath.spi.ClassLoadingException;
 import org.hibernate.search.engine.environment.classpath.spi.ClassResolver;
+import org.hibernate.search.engine.environment.classpath.spi.DefaultClassResolver;
+import org.hibernate.search.engine.environment.classpath.spi.ResourceResolver;
 import org.hibernate.search.mapper.pojo.model.spi.PojoBootstrapIntrospector;
 import org.hibernate.search.util.common.AssertionFailure;
 import org.hibernate.search.util.common.impl.StreamHelper;
@@ -41,13 +46,16 @@ import org.jboss.jandex.IndexView;
 
 public abstract class AbstractPojoModelsBootstrapIntrospector implements PojoBootstrapIntrospector {
 
+	private static final String INDEX_MODELS_CONFIG_PARAM = "hibernate.models.jandex.index";
+
 	private final PojoModelsClassOrdering typeOrdering;
 	protected final ValueHandleFactory valueHandleFactory;
 	private final ClassDetailsRegistry classDetailsRegistry;
 
-	protected AbstractPojoModelsBootstrapIntrospector(ClassResolver classResolver, IndexView indexView,
+	protected AbstractPojoModelsBootstrapIntrospector(ClassResolver classResolver, ResourceResolver resourceResolver,
+			IndexView indexView,
 			ValueHandleFactory valueHandleFactory) {
-		this( simpleClassDetailsRegistry( classResolver, indexView ), valueHandleFactory );
+		this( simpleClassDetailsRegistry( classResolver, resourceResolver, indexView ), valueHandleFactory );
 	}
 
 	protected AbstractPojoModelsBootstrapIntrospector(ClassDetailsRegistry classDetailsRegistry,
@@ -57,20 +65,15 @@ public abstract class AbstractPojoModelsBootstrapIntrospector implements PojoBoo
 		this.valueHandleFactory = valueHandleFactory;
 	}
 
-	private static ClassDetailsRegistry simpleClassDetailsRegistry(ClassResolver classResolver, IndexView indexView) {
-		if ( indexView == null ) {
-			return new BasicModelsContextImpl(
-					new HibernateSearchClassLoading( classResolver ),
-					null
-			).getClassDetailsRegistry();
-		}
-		else {
-			return new JandexModelsContextImpl(
-					indexView,
-					new HibernateSearchClassLoading( classResolver ),
-					null
-			).getClassDetailsRegistry();
-		}
+	private static ClassDetailsRegistry simpleClassDetailsRegistry(ClassResolver classResolver,
+			ResourceResolver resourceResolver,
+			IndexView indexView) {
+		ModelsConfiguration configuration = new ModelsConfiguration();
+
+		configuration.setClassLoading( new HibernateSearchClassLoading( classResolver, resourceResolver ) );
+		configuration.setConfigValue( INDEX_MODELS_CONFIG_PARAM, indexView );
+
+		return configuration.bootstrap().getClassDetailsRegistry();
 	}
 
 	@Override
@@ -148,19 +151,20 @@ public abstract class AbstractPojoModelsBootstrapIntrospector implements PojoBoo
 		return PojoBootstrapIntrospector.noPrefix( details.getName() );
 	}
 
-	private record HibernateSearchClassLoading(ClassResolver delegate) implements ClassLoading {
+	private record HibernateSearchClassLoading(ClassResolver classResolver, ResourceResolver resourceResolver)
+			implements ClassLoading {
 
 		@SuppressWarnings("unchecked")
 		@Override
 		public <T> Class<T> classForName(String name) {
-			return (Class<T>) delegate.classForName( name );
+			return (Class<T>) classResolver.classForName( name );
 		}
 
 		@SuppressWarnings("unchecked")
 		@Override
 		public <T> Class<T> findClassForName(String name) {
 			try {
-				return (Class<T>) delegate.classForName( name );
+				return (Class<T>) classResolver.classForName( name );
 			}
 			catch (ClassLoadingException e) {
 				return null;
@@ -169,12 +173,26 @@ public abstract class AbstractPojoModelsBootstrapIntrospector implements PojoBoo
 
 		@Override
 		public URL locateResource(String resourceName) {
-			return delegate.locateResource( resourceName );
+			return resourceResolver.locateResource( resourceName );
 		}
 
 		@Override
 		public <S> Collection<S> loadJavaServices(Class<S> serviceType) {
-			return delegate.loadJavaServices( serviceType );
+			ServiceLoader<S> loadedServices;
+			if ( classResolver instanceof DefaultClassResolver dcr ) {
+				loadedServices = ServiceLoader.load( serviceType, dcr.aggregatedClassLoader() );
+			}
+			else {
+				loadedServices = ServiceLoader.load( serviceType );
+			}
+			Iterator<S> iterator = loadedServices.iterator();
+			Set<S> services = new HashSet<>();
+
+			while ( iterator.hasNext() ) {
+				services.add( iterator.next() );
+			}
+
+			return services;
 		}
 	}
 }

@@ -8,6 +8,7 @@ import java.lang.reflect.Type;
 
 import org.hibernate.search.engine.environment.classpath.spi.AggregatedClassLoader;
 import org.hibernate.search.engine.environment.classpath.spi.DefaultClassResolver;
+import org.hibernate.search.engine.environment.classpath.spi.DefaultResourceResolver;
 import org.hibernate.search.mapper.pojo.model.models.spi.AbstractPojoModelsBootstrapIntrospector;
 import org.hibernate.search.mapper.pojo.model.models.spi.PojoModelsGenericContextHelper;
 import org.hibernate.search.mapper.pojo.model.models.spi.PojoSimpleModelsRawTypeModel;
@@ -23,7 +24,12 @@ public class TestIntrospector extends AbstractPojoModelsBootstrapIntrospector {
 	private final PojoModelsGenericContextHelper genericContextHelper = new PojoModelsGenericContextHelper( this );
 
 	public TestIntrospector(ValueHandleFactory valueHandleFactory) {
-		super( DefaultClassResolver.create( AggregatedClassLoader.createDefault() ), null, valueHandleFactory );
+		this( valueHandleFactory, AggregatedClassLoader.createDefault() );
+	}
+
+	private TestIntrospector(ValueHandleFactory valueHandleFactory, AggregatedClassLoader aggregatedClassLoader) {
+		super( DefaultClassResolver.create( aggregatedClassLoader ), DefaultResourceResolver.create( aggregatedClassLoader ),
+				null, valueHandleFactory );
 	}
 
 	@Override

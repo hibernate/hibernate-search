@@ -289,7 +289,9 @@ public final class HibernateOrmSearchQueryAdapter<R> extends AbstractQuery<R> {
 		throw lockOptionsNotSupported();
 	}
 
+	@Deprecated(since = "8.0")
 	@Override
+	@SuppressWarnings("removal")
 	public LockOptions getLockOptions() {
 		/*
 		 * Ideally we'd throw an UnsupportedOperationException,

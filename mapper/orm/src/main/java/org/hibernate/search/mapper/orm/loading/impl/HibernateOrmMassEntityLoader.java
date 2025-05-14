@@ -6,7 +6,7 @@ package org.hibernate.search.mapper.orm.loading.impl;
 
 import java.util.List;
 
-import org.hibernate.LockOptions;
+import org.hibernate.LockMode;
 import org.hibernate.engine.spi.SessionImplementor;
 import org.hibernate.query.QueryFlushMode;
 import org.hibernate.search.mapper.orm.common.spi.TransactionHelper;
@@ -57,7 +57,7 @@ public final class HibernateOrmMassEntityLoader<E, I> implements PojoMassEntityL
 	private List<E> multiLoad(List<I> identifiers) {
 		return typeQueryLoader.createMultiIdentifierLoadAccess( session )
 				.with( options.cacheMode() )
-				.with( LockOptions.NONE )
+				.with( LockMode.NONE )
 				.multiLoad( identifiers );
 	}
 
@@ -65,7 +65,7 @@ public final class HibernateOrmMassEntityLoader<E, I> implements PojoMassEntityL
 		return typeQueryLoader.createLoadingQuery( session, ID_PARAMETER_NAME )
 				.setParameter( ID_PARAMETER_NAME, identifiers )
 				.setCacheMode( options.cacheMode() )
-				.setLockOptions( LockOptions.NONE )
+				.setHibernateLockMode( LockMode.NONE )
 				.setCacheable( false )
 				.setQueryFlushMode( QueryFlushMode.NO_FLUSH )
 				.setFetchSize( identifiers.size() )

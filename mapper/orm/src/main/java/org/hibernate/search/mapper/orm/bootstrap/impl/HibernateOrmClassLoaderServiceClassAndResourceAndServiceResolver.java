@@ -86,7 +86,7 @@ final class HibernateOrmClassLoaderServiceClassAndResourceAndServiceResolver
 			// ignore
 		}
 		if ( url == null ) {
-			url = internalClassResolver.locateResource( resourceName );
+			url = internalResourceResolver.locateResource( resourceName );
 		}
 		return url;
 	}
