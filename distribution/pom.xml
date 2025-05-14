@@ -19,12 +19,12 @@
 
     <name>Hibernate Search Distribution</name>
     <description>Builds the distribution bundles</description>
+    <url>http://search.hibernate.org</url>
     <packaging>pom</packaging>
 
     <properties>
         <!-- Skip artifact deployment -->
         <maven.deploy.skip>true</maven.deploy.skip>
-        <gpg.skip>true</gpg.skip>
     </properties>
 
     <dependencies>
