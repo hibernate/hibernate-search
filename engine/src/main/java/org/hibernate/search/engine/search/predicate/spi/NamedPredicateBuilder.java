@@ -4,11 +4,11 @@
  */
 package org.hibernate.search.engine.search.predicate.spi;
 
-import org.hibernate.search.engine.search.predicate.dsl.SearchPredicateFactory;
+import org.hibernate.search.engine.search.predicate.dsl.TypedSearchPredicateFactory;
 
 public interface NamedPredicateBuilder extends SearchPredicateBuilder {
 
-	void factory(SearchPredicateFactory<?> factory);
+	void factory(TypedSearchPredicateFactory<?> factory);
 
 	void param(String name, Object value);
 

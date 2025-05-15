@@ -10,7 +10,7 @@ import org.hibernate.search.engine.search.common.ValueModel;
 import org.hibernate.search.engine.search.projection.ProjectionCollector;
 import org.hibernate.search.engine.search.projection.SearchProjection;
 import org.hibernate.search.engine.search.projection.definition.ProjectionDefinitionContext;
-import org.hibernate.search.engine.search.projection.dsl.SearchProjectionFactory;
+import org.hibernate.search.engine.search.projection.dsl.TypedSearchProjectionFactory;
 import org.hibernate.search.util.common.annotation.Incubating;
 import org.hibernate.search.util.common.spi.ToStringTreeAppender;
 
@@ -56,7 +56,7 @@ public abstract class FieldProjectionDefinition<P, F> extends AbstractProjection
 		}
 
 		@Override
-		public SearchProjection<F> create(SearchProjectionFactory<?, ?, ?> factory,
+		public SearchProjection<F> create(TypedSearchProjectionFactory<?, ?, ?> factory,
 				ProjectionDefinitionContext context) {
 			return factory.field( fieldPath, fieldType, valueModel ).toProjection();
 		}
@@ -76,7 +76,8 @@ public abstract class FieldProjectionDefinition<P, F> extends AbstractProjection
 		}
 
 		@Override
-		public SearchProjection<List<F>> create(SearchProjectionFactory<?, ?, ?> factory, ProjectionDefinitionContext context) {
+		public SearchProjection<List<F>> create(TypedSearchProjectionFactory<?, ?, ?> factory,
+				ProjectionDefinitionContext context) {
 			return factory.field( fieldPath, fieldType, valueModel )
 					.collector( ProjectionCollector.list() ).toProjection();
 		}
@@ -98,7 +99,7 @@ public abstract class FieldProjectionDefinition<P, F> extends AbstractProjection
 		}
 
 		@Override
-		public SearchProjection<C> create(SearchProjectionFactory<?, ?, ?> factory,
+		public SearchProjection<C> create(TypedSearchProjectionFactory<?, ?, ?> factory,
 				ProjectionDefinitionContext context) {
 			return factory.field( fieldPath, fieldType, valueModel )
 					.collector( collector ).toProjection();

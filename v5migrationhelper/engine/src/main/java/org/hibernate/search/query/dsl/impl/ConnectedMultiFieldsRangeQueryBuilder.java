@@ -6,7 +6,7 @@
 package org.hibernate.search.query.dsl.impl;
 
 import org.hibernate.search.engine.search.predicate.dsl.RangePredicateOptionsStep;
-import org.hibernate.search.engine.search.predicate.dsl.SearchPredicateFactory;
+import org.hibernate.search.engine.search.predicate.dsl.TypedSearchPredicateFactory;
 import org.hibernate.search.query.dsl.RangeTerminationExcludable;
 import org.hibernate.search.util.common.AssertionFailure;
 import org.hibernate.search.util.common.data.Range;
@@ -45,7 +45,7 @@ public class ConnectedMultiFieldsRangeQueryBuilder
 	}
 
 	@Override
-	protected RangePredicateOptionsStep<?> createPredicate(SearchPredicateFactory<?> factory, FieldContext fieldContext) {
+	protected RangePredicateOptionsStep<?> createPredicate(TypedSearchPredicateFactory<?> factory, FieldContext fieldContext) {
 		return fieldContext.applyBoost( factory.range().field( fieldContext.getField() ) )
 				.within(
 						Range.between(

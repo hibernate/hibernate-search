@@ -8,15 +8,15 @@ import java.util.function.Function;
 
 /**
  * The initial step when attempting to apply multiple extensions
- * to a {@link SearchPredicateFactory}.
+ * to a {@link TypedSearchPredicateFactory}.
  *
- * @see SearchPredicateFactory#extension()
+ * @see TypedSearchPredicateFactory#extension()
  */
 public interface SearchPredicateFactoryExtensionIfSupportedStep<SR> {
 
 	/**
 	 * If the given extension is supported, and none of the previous extensions passed to
-	 * {@link #ifSupported(SearchPredicateFactoryExtension, Function)}
+	 * {@link #ifSupported(TypedSearchPredicateFactoryExtension, Function)}
 	 * was supported, extend the current factory with this extension,
 	 * apply the given function to the extended factory, and store the resulting predicate for later retrieval.
 	 * <p>
@@ -32,7 +32,7 @@ public interface SearchPredicateFactoryExtensionIfSupportedStep<SR> {
 	 * @return The next step.
 	 */
 	<T> SearchPredicateFactoryExtensionIfSupportedMoreStep<SR> ifSupported(
-			SearchPredicateFactoryExtension<SR, T> extension,
+			SearchPredicateFactoryExtension<T> extension,
 			Function<T, ? extends PredicateFinalStep> predicateContributor
 	);
 

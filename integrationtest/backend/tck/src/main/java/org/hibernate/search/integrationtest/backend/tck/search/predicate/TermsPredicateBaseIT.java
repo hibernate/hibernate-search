@@ -17,7 +17,7 @@ import java.util.stream.IntStream;
 
 import org.hibernate.search.engine.search.common.ValueModel;
 import org.hibernate.search.engine.search.predicate.dsl.PredicateFinalStep;
-import org.hibernate.search.engine.search.predicate.dsl.SearchPredicateFactory;
+import org.hibernate.search.engine.search.predicate.dsl.TypedSearchPredicateFactory;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.FieldTypeDescriptor;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.GeoPointFieldTypeDescriptor;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.IntegerFieldTypeDescriptor;
@@ -157,13 +157,13 @@ class TermsPredicateBaseIT {
 		}
 
 		@Override
-		protected PredicateFinalStep predicate(SearchPredicateFactory<?> f, String fieldPath, int matchingDocOrdinal,
+		protected PredicateFinalStep predicate(TypedSearchPredicateFactory<?> f, String fieldPath, int matchingDocOrdinal,
 				DataSet<?, TermsPredicateTestValues<F>> dataSet) {
 			return f.terms().field( fieldPath ).matchingAny( dataSet.values.matchingArg( matchingDocOrdinal ) );
 		}
 
 		@Override
-		protected PredicateFinalStep predicate(SearchPredicateFactory<?> f, String fieldPath, String paramName,
+		protected PredicateFinalStep predicate(TypedSearchPredicateFactory<?> f, String fieldPath, String paramName,
 				DataSet<?, TermsPredicateTestValues<F>> dataSet) {
 			return f.withParameters( params -> f.terms().field( fieldPath )
 					.matchingAny( params.get( paramName, dataSet.fieldType.getJavaType() ) ) );
@@ -202,7 +202,7 @@ class TermsPredicateBaseIT {
 		}
 
 		@Override
-		protected PredicateFinalStep predicate(SearchPredicateFactory<?> f, String fieldPath, int matchingDocOrdinal,
+		protected PredicateFinalStep predicate(TypedSearchPredicateFactory<?> f, String fieldPath, int matchingDocOrdinal,
 				DataSet<?, TermsPredicateTestValues<F>> dataSet) {
 			assumeTrue(
 					TckConfiguration.get().getBackendFeatures().canPerformTermsQuery( dataSet.fieldType )
@@ -219,7 +219,7 @@ class TermsPredicateBaseIT {
 		}
 
 		@Override
-		protected PredicateFinalStep predicate(SearchPredicateFactory<?> f, String fieldPath, String paramName,
+		protected PredicateFinalStep predicate(TypedSearchPredicateFactory<?> f, String fieldPath, String paramName,
 				DataSet<?, TermsPredicateTestValues<F>> dataSet) {
 			return f.withParameters( params -> f.terms().field( fieldPath )
 					.matchingAny( params.get( paramName, Collection.class ) ) );
@@ -268,20 +268,20 @@ class TermsPredicateBaseIT {
 		}
 
 		@Override
-		protected PredicateFinalStep predicateOnFieldAndField(SearchPredicateFactory<?> f, String fieldPath,
+		protected PredicateFinalStep predicateOnFieldAndField(TypedSearchPredicateFactory<?> f, String fieldPath,
 				String otherFieldPath, int matchingDocOrdinal, DataSet<?, TermsPredicateTestValues<F>> dataSet) {
 			return f.terms().field( fieldPath ).field( otherFieldPath )
 					.matchingAny( dataSet.values.matchingArg( matchingDocOrdinal ) );
 		}
 
 		@Override
-		protected PredicateFinalStep predicateOnFields(SearchPredicateFactory<?> f, String[] fieldPaths,
+		protected PredicateFinalStep predicateOnFields(TypedSearchPredicateFactory<?> f, String[] fieldPaths,
 				int matchingDocOrdinal, DataSet<?, TermsPredicateTestValues<F>> dataSet) {
 			return f.terms().fields( fieldPaths ).matchingAny( dataSet.values.matchingArg( matchingDocOrdinal ) );
 		}
 
 		@Override
-		protected PredicateFinalStep predicateOnFieldAndFields(SearchPredicateFactory<?> f, String fieldPath,
+		protected PredicateFinalStep predicateOnFieldAndFields(TypedSearchPredicateFactory<?> f, String fieldPath,
 				String[] fieldPaths, int matchingDocOrdinal, DataSet<?, TermsPredicateTestValues<F>> dataSet) {
 			return f.terms().field( fieldPath ).fields( fieldPaths )
 					.matchingAny( dataSet.values.matchingArg( matchingDocOrdinal ) );
@@ -319,7 +319,7 @@ class TermsPredicateBaseIT {
 		}
 
 		@Override
-		protected PredicateFinalStep predicate(SearchPredicateFactory<?> f, String fieldPath, int matchingDocOrdinal,
+		protected PredicateFinalStep predicate(TypedSearchPredicateFactory<?> f, String fieldPath, int matchingDocOrdinal,
 				DataSet<?, TermsPredicateTestValues<F>> dataSet) {
 			return f.terms().field( fieldPath ).matchingAny( dataSet.values.matchingArg( matchingDocOrdinal ) );
 		}
@@ -351,27 +351,27 @@ class TermsPredicateBaseIT {
 		}
 
 		@Override
-		protected PredicateFinalStep predicate(SearchPredicateFactory<?> f, String fieldPath, int matchingDocOrdinal,
+		protected PredicateFinalStep predicate(TypedSearchPredicateFactory<?> f, String fieldPath, int matchingDocOrdinal,
 				DataSet<?, TermsPredicateTestValues<F>> dataSet) {
 			return f.terms().field( fieldPath ).matchingAny( dataSet.values.matchingArg( matchingDocOrdinal ) );
 		}
 
 		@Override
-		protected PredicateFinalStep predicateWithConstantScore(SearchPredicateFactory<?> f, String[] fieldPaths,
+		protected PredicateFinalStep predicateWithConstantScore(TypedSearchPredicateFactory<?> f, String[] fieldPaths,
 				int matchingDocOrdinal, DataSet<?, TermsPredicateTestValues<F>> dataSet) {
 			return f.terms().fields( fieldPaths ).matchingAny( dataSet.values.matchingArg( matchingDocOrdinal ) )
 					.constantScore();
 		}
 
 		@Override
-		protected PredicateFinalStep predicateWithPredicateLevelBoost(SearchPredicateFactory<?> f, String[] fieldPaths,
+		protected PredicateFinalStep predicateWithPredicateLevelBoost(TypedSearchPredicateFactory<?> f, String[] fieldPaths,
 				int matchingDocOrdinal, float predicateBoost, DataSet<?, TermsPredicateTestValues<F>> dataSet) {
 			return f.terms().fields( fieldPaths ).matchingAny( dataSet.values.matchingArg( matchingDocOrdinal ) )
 					.boost( predicateBoost );
 		}
 
 		@Override
-		protected PredicateFinalStep predicateWithConstantScoreAndPredicateLevelBoost(SearchPredicateFactory<?> f,
+		protected PredicateFinalStep predicateWithConstantScoreAndPredicateLevelBoost(TypedSearchPredicateFactory<?> f,
 				String[] fieldPaths, int matchingDocOrdinal, float predicateBoost,
 				DataSet<?, TermsPredicateTestValues<F>> dataSet) {
 			return f.terms().fields( fieldPaths ).matchingAny( dataSet.values.matchingArg( matchingDocOrdinal ) )
@@ -379,21 +379,21 @@ class TermsPredicateBaseIT {
 		}
 
 		@Override
-		protected PredicateFinalStep predicateWithFieldLevelBoost(SearchPredicateFactory<?> f, String fieldPath,
+		protected PredicateFinalStep predicateWithFieldLevelBoost(TypedSearchPredicateFactory<?> f, String fieldPath,
 				float fieldBoost, int matchingDocOrdinal, DataSet<?, TermsPredicateTestValues<F>> dataSet) {
 			return f.terms().field( fieldPath ).boost( fieldBoost )
 					.matchingAny( dataSet.values.matchingArg( matchingDocOrdinal ) );
 		}
 
 		@Override
-		protected PredicateFinalStep predicateWithFieldLevelBoostAndConstantScore(SearchPredicateFactory<?> f,
+		protected PredicateFinalStep predicateWithFieldLevelBoostAndConstantScore(TypedSearchPredicateFactory<?> f,
 				String fieldPath, float fieldBoost, int matchingDocOrdinal, DataSet<?, TermsPredicateTestValues<F>> dataSet) {
 			return f.terms().field( fieldPath ).boost( fieldBoost )
 					.matchingAny( dataSet.values.matchingArg( matchingDocOrdinal ) ).constantScore();
 		}
 
 		@Override
-		protected PredicateFinalStep predicateWithFieldLevelBoostAndPredicateLevelBoost(SearchPredicateFactory<?> f,
+		protected PredicateFinalStep predicateWithFieldLevelBoostAndPredicateLevelBoost(TypedSearchPredicateFactory<?> f,
 				String fieldPath, float fieldBoost, int matchingDocOrdinal, float predicateBoost,
 				DataSet<?, TermsPredicateTestValues<F>> dataSet) {
 			return f.terms().field( fieldPath ).boost( fieldBoost )
@@ -415,7 +415,7 @@ class TermsPredicateBaseIT {
 		}
 
 		@Override
-		protected void tryPredicate(SearchPredicateFactory<?> f, String fieldPath) {
+		protected void tryPredicate(TypedSearchPredicateFactory<?> f, String fieldPath) {
 			f.terms().field( fieldPath );
 		}
 
@@ -448,7 +448,7 @@ class TermsPredicateBaseIT {
 		}
 
 		@Override
-		protected void tryPredicate(SearchPredicateFactory<?> f, String fieldPath) {
+		protected void tryPredicate(TypedSearchPredicateFactory<?> f, String fieldPath) {
 			f.terms().field( fieldPath );
 		}
 
@@ -487,7 +487,7 @@ class TermsPredicateBaseIT {
 		}
 
 		@Override
-		protected void tryPredicate(SearchPredicateFactory<?> f, String fieldPath, FieldTypeDescriptor<?, ?> fieldType) {
+		protected void tryPredicate(TypedSearchPredicateFactory<?> f, String fieldPath, FieldTypeDescriptor<?, ?> fieldType) {
 			f.terms().field( fieldPath );
 		}
 
@@ -520,7 +520,7 @@ class TermsPredicateBaseIT {
 		}
 
 		@Override
-		protected void tryPredicateWithNullMatchingParam(SearchPredicateFactory<?> f, String fieldPath) {
+		protected void tryPredicateWithNullMatchingParam(TypedSearchPredicateFactory<?> f, String fieldPath) {
 			f.terms().field( fieldPath ).matchingAny( null );
 		}
 	}
@@ -576,18 +576,18 @@ class TermsPredicateBaseIT {
 
 
 		@Override
-		protected PredicateFinalStep predicate(SearchPredicateFactory<?> f, String fieldPath, Object matchingParam) {
+		protected PredicateFinalStep predicate(TypedSearchPredicateFactory<?> f, String fieldPath, Object matchingParam) {
 			return f.terms().field( fieldPath ).matchingAny( matchingParam );
 		}
 
 		@Override
-		protected PredicateFinalStep predicate(SearchPredicateFactory<?> f, String fieldPath, Object matchingParam,
+		protected PredicateFinalStep predicate(TypedSearchPredicateFactory<?> f, String fieldPath, Object matchingParam,
 				ValueModel valueModel) {
 			return f.terms().field( fieldPath ).matchingAny( Collections.singletonList( matchingParam ), valueModel );
 		}
 
 		@Override
-		protected PredicateFinalStep predicate(SearchPredicateFactory<?> f, String field0Path, String field1Path,
+		protected PredicateFinalStep predicate(TypedSearchPredicateFactory<?> f, String field0Path, String field1Path,
 				Object matchingParam, ValueModel valueModel) {
 			return f.terms().field( field0Path ).field( field1Path )
 					.matchingAny( Collections.singletonList( matchingParam ), valueModel );
@@ -595,14 +595,14 @@ class TermsPredicateBaseIT {
 
 		@Deprecated(since = "test")
 		@Override
-		protected PredicateFinalStep predicate(SearchPredicateFactory<?> f, String fieldPath, Object matchingParam,
+		protected PredicateFinalStep predicate(TypedSearchPredicateFactory<?> f, String fieldPath, Object matchingParam,
 				org.hibernate.search.engine.search.common.ValueConvert valueConvert) {
 			return f.terms().field( fieldPath ).matchingAny( Collections.singletonList( matchingParam ), valueConvert );
 		}
 
 		@Deprecated(since = "test")
 		@Override
-		protected PredicateFinalStep predicate(SearchPredicateFactory<?> f, String field0Path, String field1Path,
+		protected PredicateFinalStep predicate(TypedSearchPredicateFactory<?> f, String field0Path, String field1Path,
 				Object matchingParam, org.hibernate.search.engine.search.common.ValueConvert valueConvert) {
 			return f.terms().field( field0Path ).field( field1Path )
 					.matchingAny( Collections.singletonList( matchingParam ), valueConvert );
@@ -670,7 +670,7 @@ class TermsPredicateBaseIT {
 		}
 
 		@Override
-		protected PredicateFinalStep predicate(SearchPredicateFactory<?> f, String fieldPath, Object matchingParam) {
+		protected PredicateFinalStep predicate(TypedSearchPredicateFactory<?> f, String fieldPath, Object matchingParam) {
 			return f.terms().field( fieldPath ).matchingAny( matchingParam );
 		}
 

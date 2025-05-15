@@ -8,7 +8,7 @@ import java.util.Map;
 import java.util.function.Function;
 
 import org.hibernate.search.engine.search.common.ValueModel;
-import org.hibernate.search.engine.search.predicate.dsl.SearchPredicateFactory;
+import org.hibernate.search.engine.search.predicate.dsl.TypedSearchPredicateFactory;
 import org.hibernate.search.engine.search.reference.aggregation.TermsAggregationFieldReference;
 
 /**
@@ -17,7 +17,7 @@ import org.hibernate.search.engine.search.reference.aggregation.TermsAggregation
  * @param <SR> Scope root type.
  * @param <PDF> The type of factory used to create predicates in {@link AggregationFilterStep#filter(Function)}.
  */
-public interface TermsAggregationFieldStep<SR, PDF extends SearchPredicateFactory<SR>> {
+public interface TermsAggregationFieldStep<SR, PDF extends TypedSearchPredicateFactory<SR>> {
 
 	/**
 	 * Target the given field in the terms aggregation.

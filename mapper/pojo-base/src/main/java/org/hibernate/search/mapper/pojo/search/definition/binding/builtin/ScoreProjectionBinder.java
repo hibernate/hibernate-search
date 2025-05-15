@@ -7,14 +7,14 @@ package org.hibernate.search.mapper.pojo.search.definition.binding.builtin;
 import org.hibernate.search.engine.search.projection.SearchProjection;
 import org.hibernate.search.engine.search.projection.definition.ProjectionDefinitionContext;
 import org.hibernate.search.engine.search.projection.definition.spi.AbstractProjectionDefinition;
-import org.hibernate.search.engine.search.projection.dsl.SearchProjectionFactory;
+import org.hibernate.search.engine.search.projection.dsl.TypedSearchProjectionFactory;
 import org.hibernate.search.mapper.pojo.search.definition.binding.ProjectionBinder;
 import org.hibernate.search.mapper.pojo.search.definition.binding.ProjectionBindingContext;
 
 /**
  * Binds a constructor parameter to a projection to the score of a hit.
  *
- * @see SearchProjectionFactory#score()
+ * @see TypedSearchProjectionFactory#score()
  * @see org.hibernate.search.mapper.pojo.mapping.definition.annotation.ScoreProjection
  */
 public final class ScoreProjectionBinder implements ProjectionBinder {
@@ -47,7 +47,7 @@ public final class ScoreProjectionBinder implements ProjectionBinder {
 		}
 
 		@Override
-		public SearchProjection<Float> create(SearchProjectionFactory<?, ?, ?> factory,
+		public SearchProjection<Float> create(TypedSearchProjectionFactory<?, ?, ?> factory,
 				ProjectionDefinitionContext context) {
 			return factory.score().toProjection();
 		}

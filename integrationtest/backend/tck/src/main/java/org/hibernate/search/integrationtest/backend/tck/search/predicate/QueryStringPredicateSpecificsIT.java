@@ -19,7 +19,7 @@ import org.hibernate.search.engine.search.common.RewriteMethod;
 import org.hibernate.search.engine.search.predicate.SearchPredicate;
 import org.hibernate.search.engine.search.predicate.dsl.QueryStringPredicateFieldStep;
 import org.hibernate.search.engine.search.predicate.dsl.QueryStringPredicateOptionsStep;
-import org.hibernate.search.engine.search.predicate.dsl.SearchPredicateFactory;
+import org.hibernate.search.engine.search.predicate.dsl.TypedSearchPredicateFactory;
 import org.hibernate.search.engine.search.query.SearchQuery;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.StandardFieldTypeDescriptor;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.TckBackendFeatures;
@@ -473,7 +473,7 @@ class QueryStringPredicateSpecificsIT
 	}
 
 	@Override
-	QueryStringPredicateFieldStep<?, ?> predicate(SearchPredicateFactory<?> f) {
+	QueryStringPredicateFieldStep<?, ?> predicate(TypedSearchPredicateFactory<?> f) {
 		return f.queryString();
 	}
 }

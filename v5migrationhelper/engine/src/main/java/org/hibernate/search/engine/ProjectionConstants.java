@@ -8,8 +8,8 @@ import java.util.function.Function;
 
 import org.hibernate.search.backend.lucene.LuceneExtension;
 import org.hibernate.search.backend.lucene.search.projection.dsl.LuceneSearchProjectionFactory;
-import org.hibernate.search.engine.search.projection.dsl.SearchProjectionFactory;
 import org.hibernate.search.engine.search.projection.dsl.SearchProjectionFactoryExtension;
+import org.hibernate.search.engine.search.projection.dsl.TypedSearchProjectionFactory;
 import org.hibernate.search.engine.search.query.SearchQuery;
 import org.hibernate.search.engine.search.query.dsl.SearchQuerySelectStep;
 import org.hibernate.search.engine.spatial.GeoPoint;
@@ -32,7 +32,7 @@ public interface ProjectionConstants {
 	/**
 	 * Represents the Hibernate entity returned in a search.
 	 * @deprecated See the javadoc of this class for how to create projections in Hibernate Search 6.
-	 * The equivalent projection in Hibernate Search 6 is {@link SearchProjectionFactory#entity()}.
+	 * The equivalent projection in Hibernate Search 6 is {@link TypedSearchProjectionFactory#entity()}.
 	 */
 	@Deprecated
 	String THIS = "__HSearch_This";
@@ -42,7 +42,7 @@ public interface ProjectionConstants {
 	 * @deprecated See the javadoc of this class for how to create projections in Hibernate Search 6.
 	 * The equivalent projection in Hibernate Search 6 is {@link LuceneSearchProjectionFactory#document()}.
 	 * You will need to pass {@link LuceneExtension#get()} to
-	 * {@link SearchProjectionFactory#extension(SearchProjectionFactoryExtension)}
+	 * {@link TypedSearchProjectionFactory#extension(SearchProjectionFactoryExtension)}
 	 * in order to get access to this Lucene-specific feature.
 	 */
 	@Deprecated
@@ -51,7 +51,7 @@ public interface ProjectionConstants {
 	/**
 	 * The legacy document's score from a search.
 	 * @deprecated See the javadoc of this class for how to create projections in Hibernate Search 6.
-	 * The equivalent projection in Hibernate Search 6 is {@link SearchProjectionFactory#score()}.
+	 * The equivalent projection in Hibernate Search 6 is {@link TypedSearchProjectionFactory#score()}.
 	 */
 	@Deprecated
 	String SCORE = "__HSearch_Score";
@@ -59,7 +59,7 @@ public interface ProjectionConstants {
 	/**
 	 * Object id property
 	 * @deprecated See the javadoc of this class for how to create projections in Hibernate Search 6.
-	 * The equivalent projection in Hibernate Search 6 is {@link SearchProjectionFactory#entityReference()};
+	 * The equivalent projection in Hibernate Search 6 is {@link TypedSearchProjectionFactory#entityReference()};
 	 * call {@code .id()} on the reference to get the entity identifier.
 	 */
 	@Deprecated
@@ -75,7 +75,7 @@ public interface ProjectionConstants {
 	 * @deprecated See the javadoc of this class for how to create projections in Hibernate Search 6.
 	 * The equivalent projection in Hibernate Search 6 is {@link LuceneSearchProjectionFactory#explanation()}.
 	 * You will need to pass {@link LuceneExtension#get()} to
-	 * {@link SearchProjectionFactory#extension(SearchProjectionFactoryExtension)}
+	 * {@link TypedSearchProjectionFactory#extension(SearchProjectionFactoryExtension)}
 	 * in order to get access to this Lucene-specific feature.
 	 */
 	@Deprecated
@@ -85,7 +85,7 @@ public interface ProjectionConstants {
 	 * Represents the Hibernate entity class returned in a search. In contrast to the other constants this constant
 	 * represents an actual field value of the underlying Lucene document and hence can directly be used in queries.
 	 * @deprecated See the javadoc of this class for how to create projections in Hibernate Search 6.
-	 * The equivalent projection in Hibernate Search 6 is {@link SearchProjectionFactory#entityReference()};
+	 * The equivalent projection in Hibernate Search 6 is {@link TypedSearchProjectionFactory#entityReference()};
 	 * call {@code .type()} on the reference to get the entity type.
 	 */
 	@Deprecated
@@ -95,7 +95,7 @@ public interface ProjectionConstants {
 	 * Represents the distance (in kilometers) between an entity and the
 	 * center of the search area in case of a spatial query.
 	 * @deprecated See the javadoc of this class for how to create projections in Hibernate Search 6.
-	 * The equivalent projection in Hibernate Search 6 is {@link SearchProjectionFactory#distance(String, GeoPoint)}.
+	 * The equivalent projection in Hibernate Search 6 is {@link TypedSearchProjectionFactory#distance(String, GeoPoint)}.
 	 */
 	@Deprecated
 	String SPATIAL_DISTANCE = "_HSearch_SpatialDistance";

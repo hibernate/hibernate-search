@@ -321,7 +321,7 @@ class SearchPredicateIT {
 
 		// Mandatory extension, supported
 		query = scope.query()
-				.where( f -> f.extension( new SupportedExtension<>() )
+				.where( f -> f.extension( new SupportedExtension() )
 						.extendedPredicate( "string", STRING_1 )
 				)
 				.toQuery();
@@ -330,7 +330,7 @@ class SearchPredicateIT {
 
 		// Mandatory extension, unsupported
 		assertThatThrownBy(
-				() -> scope.predicate().extension( new UnSupportedExtension<>() )
+				() -> scope.predicate().extension( new UnSupportedExtension() )
 		)
 				.isInstanceOf( SearchException.class );
 
@@ -338,11 +338,11 @@ class SearchPredicateIT {
 		query = scope.query()
 				.where( f -> f.extension()
 						.ifSupported(
-								new SupportedExtension<>(),
+								new SupportedExtension(),
 								extended -> extended.extendedPredicate( "string", STRING_1 )
 						)
 						.ifSupported(
-								new SupportedExtension<>(),
+								new SupportedExtension(),
 								shouldNotBeCalled()
 						)
 						.orElseFail()
@@ -355,11 +355,11 @@ class SearchPredicateIT {
 		query = scope.query()
 				.where( f -> f.extension()
 						.ifSupported(
-								new UnSupportedExtension<>(),
+								new UnSupportedExtension(),
 								shouldNotBeCalled()
 						)
 						.ifSupported(
-								new SupportedExtension<>(),
+								new SupportedExtension(),
 								extended -> extended.extendedPredicate( "string", STRING_1 )
 						)
 						.orElse(
@@ -374,11 +374,11 @@ class SearchPredicateIT {
 		query = scope.query()
 				.where( f -> f.extension()
 						.ifSupported(
-								new UnSupportedExtension<>(),
+								new UnSupportedExtension(),
 								shouldNotBeCalled()
 						)
 						.ifSupported(
-								new UnSupportedExtension<>(),
+								new UnSupportedExtension(),
 								shouldNotBeCalled()
 						)
 						.orElse(
@@ -458,26 +458,31 @@ class SearchPredicateIT {
 		}
 	}
 
-	private static class SupportedExtension<SR> implements SearchPredicateFactoryExtension<SR, MyExtendedFactory<SR>> {
+	private static class SupportedExtension implements SearchPredicateFactoryExtension<MyExtendedFactory> {
+
+		@SuppressWarnings("unchecked") // TODO: use rescope here instead
 		@Override
-		public Optional<MyExtendedFactory<SR>> extendOptional(SearchPredicateFactory<SR> original) {
+		public Optional<MyExtendedFactory> extendOptional(SearchPredicateFactory original) {
 			assertThat( original ).isNotNull();
-			return Optional.of( new MyExtendedFactory<>( original ) );
+			if ( original instanceof MyExtendedFactory f ) {
+				return Optional.of( f );
+			}
+			return Optional.empty();
 		}
 	}
 
-	private static class UnSupportedExtension<SR> implements SearchPredicateFactoryExtension<SR, MyExtendedFactory<SR>> {
+	private static class UnSupportedExtension implements SearchPredicateFactoryExtension<MyExtendedFactory> {
 		@Override
-		public Optional<MyExtendedFactory<SR>> extendOptional(SearchPredicateFactory<SR> original) {
+		public Optional<MyExtendedFactory> extendOptional(SearchPredicateFactory original) {
 			assertThat( original ).isNotNull();
 			return Optional.empty();
 		}
 	}
 
-	private static class MyExtendedFactory<SR> {
-		private final SearchPredicateFactory<SR> delegate;
+	private static class MyExtendedFactory {
+		private final SearchPredicateFactory delegate;
 
-		MyExtendedFactory(SearchPredicateFactory<SR> delegate) {
+		MyExtendedFactory(SearchPredicateFactory delegate) {
 			this.delegate = delegate;
 		}
 

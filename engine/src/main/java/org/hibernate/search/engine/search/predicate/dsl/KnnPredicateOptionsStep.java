@@ -22,7 +22,7 @@ public interface KnnPredicateOptionsStep<SR>
 	}
 
 	KnnPredicateOptionsStep<SR> filter(
-			Function<? super SearchPredicateFactory<SR>, ? extends PredicateFinalStep> clauseContributor);
+			Function<? super TypedSearchPredicateFactory<SR>, ? extends PredicateFinalStep> clauseContributor);
 
 	/**
 	 * @param similarity A similarity limit: documents with vectors distance to which, according to the configured similarity function,

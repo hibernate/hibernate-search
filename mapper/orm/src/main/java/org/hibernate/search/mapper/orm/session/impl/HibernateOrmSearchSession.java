@@ -30,8 +30,9 @@ import org.hibernate.search.mapper.orm.model.impl.HibernateOrmRuntimeIntrospecto
 import org.hibernate.search.mapper.orm.schema.management.SearchSchemaManager;
 import org.hibernate.search.mapper.orm.scope.HibernateOrmRootReferenceScope;
 import org.hibernate.search.mapper.orm.scope.SearchScope;
+import org.hibernate.search.mapper.orm.scope.TypedSearchScope;
 import org.hibernate.search.mapper.orm.scope.impl.HibernateOrmScopeSessionContext;
-import org.hibernate.search.mapper.orm.scope.impl.SearchScopeImpl;
+import org.hibernate.search.mapper.orm.scope.impl.TypedSearchScopeImpl;
 import org.hibernate.search.mapper.orm.search.loading.dsl.SearchLoadingOptionsStep;
 import org.hibernate.search.mapper.orm.session.SearchSession;
 import org.hibernate.search.mapper.orm.session.context.HibernateOrmSessionContext;
@@ -144,8 +145,13 @@ public class HibernateOrmSearchSession extends AbstractPojoSearchSession
 
 	@Override
 	public <SR, T> SearchQuerySelectStep<SR, ?, EntityReference, T, SearchLoadingOptionsStep, ?, ?> search(
-			SearchScope<SR, T> scope) {
-		return search( (SearchScopeImpl<SR, T>) scope );
+			TypedSearchScope<SR, T> scope) {
+		return search( (TypedSearchScopeImpl<SR, T>) scope );
+	}
+
+	@Override
+	public <T> SearchQuerySelectStep<?, ?, EntityReference, T, SearchLoadingOptionsStep, ?, ?> search(SearchScope<T> scope) {
+		return search( (TypedSearchScopeImpl<?, T>) scope );
 	}
 
 	@Override
@@ -160,7 +166,7 @@ public class HibernateOrmSearchSession extends AbstractPojoSearchSession
 			T,
 			SearchLoadingOptionsStep,
 			?,
-			?> search(SearchScopeImpl<SR, T> scope) {
+			?> search(TypedSearchScopeImpl<SR, T> scope) {
 		return scope.search( this, loadingContextBuilder() );
 	}
 
@@ -180,13 +186,13 @@ public class HibernateOrmSearchSession extends AbstractPojoSearchSession
 	}
 
 	@Override
-	public <SR, T> SearchScopeImpl<SR, T> scope(Collection<? extends Class<? extends T>> classes) {
+	public <SR, T> TypedSearchScopeImpl<SR, T> scope(Collection<? extends Class<? extends T>> classes) {
 		checkOpen();
 		return mappingContext.createScope( classes );
 	}
 
 	@Override
-	public <SR, T> SearchScope<SR, T> scope(Class<T> expectedSuperType, Collection<String> entityNames) {
+	public <SR, T> TypedSearchScope<SR, T> scope(Class<T> expectedSuperType, Collection<String> entityNames) {
 		checkOpen();
 		return mappingContext.createScope( expectedSuperType, entityNames );
 	}

@@ -32,7 +32,7 @@ import org.hibernate.search.engine.search.query.SearchResult;
 import org.hibernate.search.engine.spatial.DistanceUnit;
 import org.hibernate.search.engine.spatial.GeoPoint;
 import org.hibernate.search.mapper.orm.Search;
-import org.hibernate.search.mapper.orm.scope.SearchScope;
+import org.hibernate.search.mapper.orm.scope.TypedSearchScope;
 import org.hibernate.search.mapper.orm.session.SearchSession;
 import org.hibernate.search.mapper.pojo.common.spi.PojoEntityReference;
 import org.hibernate.search.util.common.SearchException;
@@ -96,7 +96,7 @@ class ProjectionDslIT {
 					Search.session( entityManager );
 			// tag::entryPoint-objects[]
 
-			SearchScope<?, Book> scope = searchSession.scope( Book.class );
+			TypedSearchScope<?, Book> scope = searchSession.scope( Book.class );
 
 			List<String> result = searchSession.search( scope )
 					.select( scope.projection().field( "title", String.class )

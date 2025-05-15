@@ -4,16 +4,16 @@
  */
 package org.hibernate.search.engine.search.query.dsl.impl;
 
-import org.hibernate.search.engine.search.aggregation.dsl.SearchAggregationFactory;
+import org.hibernate.search.engine.search.aggregation.dsl.TypedSearchAggregationFactory;
 import org.hibernate.search.engine.search.highlighter.dsl.SearchHighlighterFactory;
 import org.hibernate.search.engine.search.loading.spi.SearchLoadingContextBuilder;
-import org.hibernate.search.engine.search.predicate.dsl.SearchPredicateFactory;
+import org.hibernate.search.engine.search.predicate.dsl.TypedSearchPredicateFactory;
 import org.hibernate.search.engine.search.query.dsl.SearchQueryOptionsStep;
 import org.hibernate.search.engine.search.query.dsl.SearchQueryWhereStep;
 import org.hibernate.search.engine.search.query.dsl.spi.AbstractSearchQueryOptionsStep;
 import org.hibernate.search.engine.search.query.spi.SearchQueryBuilder;
 import org.hibernate.search.engine.search.query.spi.SearchQueryIndexScope;
-import org.hibernate.search.engine.search.sort.dsl.SearchSortFactory;
+import org.hibernate.search.engine.search.sort.dsl.TypedSearchSortFactory;
 
 final class DefaultSearchQueryOptionsStep<SR, H, LOS>
 		extends AbstractSearchQueryOptionsStep<
@@ -21,17 +21,17 @@ final class DefaultSearchQueryOptionsStep<SR, H, LOS>
 				DefaultSearchQueryOptionsStep<SR, H, LOS>,
 				H,
 				LOS,
-				SearchPredicateFactory<SR>,
-				SearchSortFactory<SR>,
-				SearchAggregationFactory<SR>,
+				TypedSearchPredicateFactory<SR>,
+				TypedSearchSortFactory<SR>,
+				TypedSearchAggregationFactory<SR>,
 				SearchQueryIndexScope<?>>
-		implements SearchQueryWhereStep<SR, DefaultSearchQueryOptionsStep<SR, H, LOS>, H, LOS, SearchPredicateFactory<SR>>,
+		implements SearchQueryWhereStep<SR, DefaultSearchQueryOptionsStep<SR, H, LOS>, H, LOS, TypedSearchPredicateFactory<SR>>,
 		SearchQueryOptionsStep<SR,
 				DefaultSearchQueryOptionsStep<SR, H, LOS>,
 				H,
 				LOS,
-				SearchSortFactory<SR>,
-				SearchAggregationFactory<SR>> {
+				TypedSearchSortFactory<SR>,
+				TypedSearchAggregationFactory<SR>> {
 
 	DefaultSearchQueryOptionsStep(SearchQueryIndexScope<?> scope, SearchQueryBuilder<H> searchQueryBuilder,
 			SearchLoadingContextBuilder<?, LOS> loadingContextBuilder) {
@@ -39,17 +39,17 @@ final class DefaultSearchQueryOptionsStep<SR, H, LOS>
 	}
 
 	@Override
-	protected SearchPredicateFactory<SR> predicateFactory() {
+	protected TypedSearchPredicateFactory<SR> predicateFactory() {
 		return scope.predicateFactory();
 	}
 
 	@Override
-	protected SearchSortFactory<SR> sortFactory() {
+	protected TypedSearchSortFactory<SR> sortFactory() {
 		return scope.sortFactory();
 	}
 
 	@Override
-	protected SearchAggregationFactory<SR> aggregationFactory() {
+	protected TypedSearchAggregationFactory<SR> aggregationFactory() {
 		return scope.aggregationFactory();
 	}
 

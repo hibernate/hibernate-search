@@ -14,7 +14,7 @@ import org.hibernate.search.MassIndexer;
 import org.hibernate.search.SearchFactory;
 import org.hibernate.search.engine.search.query.SearchQuery;
 import org.hibernate.search.mapper.orm.mapping.SearchMapping;
-import org.hibernate.search.mapper.orm.scope.SearchScope;
+import org.hibernate.search.mapper.orm.scope.TypedSearchScope;
 import org.hibernate.search.mapper.orm.session.SearchSession;
 import org.hibernate.search.mapper.orm.work.SearchIndexingPlan;
 import org.hibernate.search.mapper.orm.work.SearchWorkspace;
@@ -110,9 +110,9 @@ public interface FullTextEntityManager extends EntityManager {
 	 *
 	 * @throws IllegalArgumentException if entityType is <code>null</code> or not a class or superclass annotated with <code>@Indexed</code>.
 	 *
-	 * @deprecated Instead of using Hibernate Search 5 APIs, get a {@link SearchScope}
+	 * @deprecated Instead of using Hibernate Search 5 APIs, get a {@link TypedSearchScope}
 	 * using {@link SearchSession#scope(Class)} or {@link SearchMapping#scope(Class)},
-	 * then a {@link SearchWorkspace} using {@link SearchScope#workspace()},
+	 * then a {@link SearchWorkspace} using {@link TypedSearchScope#workspace()},
 	 * then call {@link SearchWorkspace#purge()} to purge all indexes in scope.
 	 */
 	@Deprecated

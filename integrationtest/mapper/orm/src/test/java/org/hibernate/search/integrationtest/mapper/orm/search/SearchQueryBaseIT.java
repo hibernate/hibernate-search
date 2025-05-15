@@ -32,7 +32,7 @@ import org.hibernate.search.engine.search.query.SearchQuery;
 import org.hibernate.search.engine.search.sort.SearchSort;
 import org.hibernate.search.mapper.orm.Search;
 import org.hibernate.search.mapper.orm.mapping.SearchMapping;
-import org.hibernate.search.mapper.orm.scope.SearchScope;
+import org.hibernate.search.mapper.orm.scope.TypedSearchScope;
 import org.hibernate.search.mapper.orm.session.SearchSession;
 import org.hibernate.search.mapper.pojo.common.spi.PojoEntityReference;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.GenericField;
@@ -407,7 +407,7 @@ class SearchQueryBaseIT {
 		with( sessionFactory ).runInTransaction( session -> {
 			SearchSession searchSession = Search.session( session );
 
-			SearchScope<?, Book> scope = searchSession.scope( Book.class );
+			TypedSearchScope<?, Book> scope = searchSession.scope( Book.class );
 
 			SearchQuery<String> query = searchSession.search( scope )
 					.select(
@@ -439,7 +439,7 @@ class SearchQueryBaseIT {
 		with( sessionFactory ).runInTransaction( session -> {
 			SearchSession searchSession = Search.session( session );
 
-			SearchScope<?, Book> scope = searchSession.scope( Book.class );
+			TypedSearchScope<?, Book> scope = searchSession.scope( Book.class );
 
 			SearchQuery<List<?>> query = searchSession.search( scope )
 					.select(
@@ -599,7 +599,7 @@ class SearchQueryBaseIT {
 	@TestForIssue(jiraKey = "HSEARCH-3671")
 	void componentsFromMappingWithoutSession() {
 		SearchMapping mapping = Search.mapping( sessionFactory );
-		SearchScope<?, Book> scope = mapping.scope( Book.class );
+		TypedSearchScope<?, Book> scope = mapping.scope( Book.class );
 
 		/*
 		 * The backend is a stub, so these components are stub too:
@@ -656,7 +656,7 @@ class SearchQueryBaseIT {
 		with( sessionFactory ).runInTransaction( session -> {
 			SearchSession searchSession = Search.session( session );
 
-			SearchScope<?, Book> scope = searchSession.scope( Book.class );
+			TypedSearchScope<?, Book> scope = searchSession.scope( Book.class );
 
 			SearchQuery<? extends EntityReference> query = searchSession.search( scope )
 					.select( f -> f.entityReference() )
@@ -687,7 +687,7 @@ class SearchQueryBaseIT {
 		with( sessionFactory ).runInTransaction( session -> {
 			SearchSession searchSession = Search.session( session );
 
-			SearchScope<?, Book> scope = searchSession.scope( Book.class );
+			TypedSearchScope<?, Book> scope = searchSession.scope( Book.class );
 
 			SearchQuery<org.hibernate.search.mapper.orm.common.EntityReference> query = searchSession.search( scope )
 					.select( f -> f.entityReference() )

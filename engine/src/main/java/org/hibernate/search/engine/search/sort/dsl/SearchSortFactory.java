@@ -9,8 +9,6 @@ import java.util.function.Function;
 
 import org.hibernate.search.engine.search.common.NamedValues;
 import org.hibernate.search.engine.search.predicate.dsl.SearchPredicateFactory;
-import org.hibernate.search.engine.search.reference.sort.DistanceSortFieldReference;
-import org.hibernate.search.engine.search.reference.sort.FieldSortFieldReference;
 import org.hibernate.search.engine.spatial.GeoPoint;
 import org.hibernate.search.util.common.SearchException;
 import org.hibernate.search.util.common.annotation.Incubating;
@@ -42,10 +40,9 @@ import org.hibernate.search.util.common.annotation.Incubating;
  * Such reference provides the information on which search capabilities the particular index field possesses, and allows switching between different
  * {@link org.hibernate.search.engine.search.common.ValueModel value model representations}.
  *
- * @param <SR> Scope root type.
  * @author Emmanuel Bernard emmanuel@hibernate.org
  */
-public interface SearchSortFactory<SR> {
+public interface SearchSortFactory {
 
 	/**
 	 * Order elements by their relevance score.
@@ -54,14 +51,14 @@ public interface SearchSortFactory<SR> {
 	 *
 	 * @return A DSL step where the "score" sort can be defined in more details.
 	 */
-	ScoreSortOptionsStep<SR, ?> score();
+	ScoreSortOptionsStep<?, ?> score();
 
 	/**
 	 * Order elements by their internal index order.
 	 *
 	 * @return A DSL step where the "index order" sort can be defined in more details.
 	 */
-	SortThenStep<SR> indexOrder();
+	SortThenStep indexOrder();
 
 	/**
 	 * Order elements by the value of a specific field.
@@ -72,20 +69,7 @@ public interface SearchSortFactory<SR> {
 	 * @return A DSL step where the "field" sort can be defined in more details.
 	 * @throws SearchException If the field doesn't exist or cannot be sorted on.
 	 */
-	FieldSortOptionsStep<SR, ?, ? extends SearchPredicateFactory<SR>> field(String fieldPath);
-
-	/**
-	 * Order elements by the value of a specific field.
-	 * <p>
-	 * The default order is <strong>ascending</strong>.
-	 *
-	 * @param fieldReference The reference representing the <a href="#field-paths">path</a> to the index field to sort by.
-	 * @return A DSL step where the "field" sort can be defined in more details.
-	 * @throws SearchException If the field doesn't exist or cannot be sorted on.
-	 */
-	@Incubating
-	<T> FieldSortOptionsGenericStep<SR, T, ?, ?, ? extends SearchPredicateFactory<SR>> field(
-			FieldSortFieldReference<? super SR, T> fieldReference);
+	FieldSortOptionsStep<?, ?, ? extends SearchPredicateFactory> field(String fieldPath);
 
 	/**
 	 * Order elements by the distance from the location stored in the specified field to the location specified.
@@ -98,24 +82,7 @@ public interface SearchSortFactory<SR> {
 	 * @return A DSL step where the "distance" sort can be defined in more details.
 	 * @throws SearchException If the field type does not constitute a valid location.
 	 */
-	DistanceSortOptionsStep<SR, ?, ? extends SearchPredicateFactory<SR>> distance(String fieldPath, GeoPoint location);
-
-	/**
-	 * Order elements by the distance from the location stored in the specified field to the location specified.
-	 * <p>
-	 * The default order is <strong>ascending</strong>.
-	 *
-	 * @param fieldReference The reference representing the <a href="#field-paths">path</a> to the index field
-	 * containing the location to compute the distance from.
-	 * @param location The location to which we want to compute the distance.
-	 * @return A DSL step where the "distance" sort can be defined in more details.
-	 * @throws SearchException If the field type does not constitute a valid location.
-	 */
-	@Incubating
-	default DistanceSortOptionsStep<SR, ?, ? extends SearchPredicateFactory<SR>> distance(
-			DistanceSortFieldReference<? super SR> fieldReference, GeoPoint location) {
-		return distance( fieldReference.absolutePath(), location );
-	}
+	DistanceSortOptionsStep<?, ?, ? extends SearchPredicateFactory> distance(String fieldPath, GeoPoint location);
 
 	/**
 	 * Order elements by the distance from the location stored in the specified field to the location specified.
@@ -129,28 +96,9 @@ public interface SearchSortFactory<SR> {
 	 * @return A DSL step where the "distance" sort can be defined in more details.
 	 * @throws SearchException If the field type does not constitute a valid location.
 	 */
-	default DistanceSortOptionsStep<SR, ?, ? extends SearchPredicateFactory<SR>> distance(String fieldPath, double latitude,
+	default DistanceSortOptionsStep<?, ?, ? extends SearchPredicateFactory> distance(String fieldPath, double latitude,
 			double longitude) {
 		return distance( fieldPath, GeoPoint.of( latitude, longitude ) );
-	}
-
-	/**
-	 * Order elements by the distance from the location stored in the specified field to the location specified.
-	 * <p>
-	 * The default order is <strong>ascending</strong>.
-	 *
-	 * @param fieldReference The reference representing the <a href="#field-paths">path</a> to the index field
-	 * containing the location to compute the distance from.
-	 * @param latitude The latitude of the location to which we want to compute the distance.
-	 * @param longitude The longitude of the location to which we want to compute the distance.
-	 * @return A DSL step where the "distance" sort can be defined in more details.
-	 * @throws SearchException If the field type does not constitute a valid location.
-	 */
-	@Incubating
-	default DistanceSortOptionsStep<SR, ?, ? extends SearchPredicateFactory<SR>> distance(
-			DistanceSortFieldReference<? super SR> fieldReference, double latitude,
-			double longitude) {
-		return distance( fieldReference, GeoPoint.of( latitude, longitude ) );
 	}
 
 	/**
@@ -163,7 +111,7 @@ public interface SearchSortFactory<SR> {
 	 *
 	 * @return A DSL step where the "composite" sort can be defined in more details.
 	 */
-	CompositeSortComponentsStep<SR, ?> composite();
+	CompositeSortComponentsStep<?, ?> composite();
 
 	/**
 	 * Order by a sort composed of several elements,
@@ -186,7 +134,7 @@ public interface SearchSortFactory<SR> {
 	 * Should generally be a lambda expression.
 	 * @return A DSL step where the "composite" sort can be defined in more details.
 	 */
-	SortThenStep<SR> composite(Consumer<? super CompositeSortComponentsStep<SR, ?>> elementContributor);
+	SortThenStep<?> composite(Consumer<? super CompositeSortOptionsCollector<?>> elementContributor);
 
 	/**
 	 * Delegating sort that creates the actual sort at query create time and provides access to query parameters.
@@ -197,7 +145,7 @@ public interface SearchSortFactory<SR> {
 	 * @return A final DSL step in a parameterized sort definition.
 	 */
 	@Incubating
-	SortThenStep<SR> withParameters(Function<? super NamedValues, ? extends SortFinalStep> sortCreator);
+	SortThenStep<?> withParameters(Function<? super NamedValues, ? extends SortFinalStep> sortCreator);
 
 	/**
 	 * Extend the current factory with the given extension,
@@ -208,7 +156,7 @@ public interface SearchSortFactory<SR> {
 	 * @return The extended factory.
 	 * @throws SearchException If the extension cannot be applied (wrong underlying backend, ...).
 	 */
-	<T> T extension(SearchSortFactoryExtension<SR, T> extension);
+	<T> T extension(SearchSortFactoryExtension<T> extension);
 
 	/**
 	 * Create a DSL step allowing multiple attempts to apply extensions one after the other,
@@ -219,7 +167,7 @@ public interface SearchSortFactory<SR> {
 	 *
 	 * @return A DSL step.
 	 */
-	SearchSortFactoryExtensionIfSupportedStep<SR> extension();
+	SearchSortFactoryExtensionIfSupportedStep<?> extension();
 
 	/**
 	 * Create a new sort factory whose root for all paths passed to the DSL
@@ -232,7 +180,7 @@ public interface SearchSortFactory<SR> {
 	 * @return A new sort factory using the given object field as root.
 	 */
 	@Incubating
-	SearchSortFactory<SR> withRoot(String objectFieldPath);
+	SearchSortFactory withRoot(String objectFieldPath);
 
 	/**
 	 * @param relativeFieldPath The path to a field, relative to the {@link #withRoot(String) root} of this factory.

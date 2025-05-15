@@ -7,7 +7,7 @@ package org.hibernate.search.engine.search.aggregation.dsl.spi;
 import java.util.function.Function;
 
 import org.hibernate.search.engine.search.aggregation.spi.SearchAggregationIndexScope;
-import org.hibernate.search.engine.search.predicate.dsl.SearchPredicateFactory;
+import org.hibernate.search.engine.search.predicate.dsl.TypedSearchPredicateFactory;
 import org.hibernate.search.engine.search.sort.dsl.FieldSortOptionsStep;
 
 /**
@@ -21,11 +21,11 @@ import org.hibernate.search.engine.search.sort.dsl.FieldSortOptionsStep;
 public class SearchAggregationDslContext<
 		SR,
 		SC extends SearchAggregationIndexScope<?>,
-		PDF extends SearchPredicateFactory<SR>> {
+		PDF extends TypedSearchPredicateFactory<SR>> {
 	public static <
 			SR,
 			SC extends SearchAggregationIndexScope<?>,
-			PDF extends SearchPredicateFactory<SR>> SearchAggregationDslContext<SR, SC, PDF> root(SC scope,
+			PDF extends TypedSearchPredicateFactory<SR>> SearchAggregationDslContext<SR, SC, PDF> root(SC scope,
 					PDF predicateFactory) {
 		return new SearchAggregationDslContext<>( scope, predicateFactory );
 	}

@@ -28,11 +28,11 @@ import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaElement
 import org.hibernate.search.engine.backend.types.Sortable;
 import org.hibernate.search.engine.search.common.SortMode;
 import org.hibernate.search.engine.search.predicate.dsl.PredicateFinalStep;
-import org.hibernate.search.engine.search.predicate.dsl.SearchPredicateFactory;
+import org.hibernate.search.engine.search.predicate.dsl.TypedSearchPredicateFactory;
 import org.hibernate.search.engine.search.query.SearchQuery;
 import org.hibernate.search.engine.search.sort.SearchSort;
 import org.hibernate.search.engine.search.sort.dsl.FieldSortOptionsStep;
-import org.hibernate.search.engine.search.sort.dsl.SearchSortFactory;
+import org.hibernate.search.engine.search.sort.dsl.TypedSearchSortFactory;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.model.singlefield.AbstractObjectBinding;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.model.singlefield.SingleFieldIndexBinding;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.FieldTypeDescriptor;
@@ -494,7 +494,7 @@ class FieldSortSpecificsIT<F> {
 						dataSet.emptyDoc1Id, dataSet.emptyDoc2Id, dataSet.emptyDoc3Id, dataSet.emptyDoc4Id
 				) ) ) )
 				.routing( dataSet.routingKey )
-				.sort( ( (Function<SearchSortFactory<?>,
+				.sort( ( (Function<TypedSearchSortFactory<?>,
 						FieldSortOptionsStep<?, ?, ?>>) f -> f.withRoot( parentObjectBinding.absolutePath )
 								.field( parentObjectBinding.getRelativeFieldName( fieldStructure, fieldType ) ) )
 						.andThen( (FieldSortOptionsStep<?, ?, ?> optionsStep1) -> applySortMode( optionsStep1, sortMode ) )
@@ -609,13 +609,13 @@ class FieldSortSpecificsIT<F> {
 	}
 
 	private SearchQuery<DocumentReference> matchNonEmptyQuery(DataSet<F> dataSet,
-			Function<? super SearchSortFactory<?>, ? extends FieldSortOptionsStep<?, ?, ?>> sortContributor,
+			Function<? super TypedSearchSortFactory<?>, ? extends FieldSortOptionsStep<?, ?, ?>> sortContributor,
 			SortMode sortMode, TestedFieldStructure fieldStructure) {
 		return matchNonEmptyQuery( dataSet, sortContributor, index.createScope(), sortMode, fieldStructure );
 	}
 
 	private SearchQuery<DocumentReference> matchNonEmptyQuery(DataSet<F> dataSet,
-			Function<? super SearchSortFactory<?>, ? extends FieldSortOptionsStep<?, ?, ?>> sortContributor,
+			Function<? super TypedSearchSortFactory<?>, ? extends FieldSortOptionsStep<?, ?, ?>> sortContributor,
 			StubMappingScope scope,
 			SortMode sortMode, TestedFieldStructure fieldStructure) {
 		return query(
@@ -632,13 +632,13 @@ class FieldSortSpecificsIT<F> {
 	}
 
 	private SearchQuery<DocumentReference> matchNonEmptyAndEmpty1Query(DataSet<F> dataSet,
-			Function<? super SearchSortFactory<?>, ? extends FieldSortOptionsStep<?, ?, ?>> sortContributor,
+			Function<? super TypedSearchSortFactory<?>, ? extends FieldSortOptionsStep<?, ?, ?>> sortContributor,
 			SortMode sortMode, TestedFieldStructure fieldStructure) {
 		return matchNonEmptyAndEmpty1Query( dataSet, sortContributor, index.createScope(), sortMode, fieldStructure );
 	}
 
 	private SearchQuery<DocumentReference> matchNonEmptyAndEmpty1Query(DataSet<F> dataSet,
-			Function<? super SearchSortFactory<?>, ? extends FieldSortOptionsStep<?, ?, ?>> sortContributor,
+			Function<? super TypedSearchSortFactory<?>, ? extends FieldSortOptionsStep<?, ?, ?>> sortContributor,
 			StubMappingScope scope,
 			SortMode sortMode, TestedFieldStructure fieldStructure) {
 		return query(
@@ -653,21 +653,21 @@ class FieldSortSpecificsIT<F> {
 	}
 
 	private SearchQuery<DocumentReference> matchAllQuery(DataSet<F> dataSet,
-			Function<? super SearchSortFactory<?>, ? extends FieldSortOptionsStep<?, ?, ?>> sortContributor,
+			Function<? super TypedSearchSortFactory<?>, ? extends FieldSortOptionsStep<?, ?, ?>> sortContributor,
 			SortMode sortMode, TestedFieldStructure fieldStructure) {
 		return matchAllQuery( dataSet, sortContributor, index.createScope(), sortMode, fieldStructure );
 	}
 
 	private SearchQuery<DocumentReference> matchAllQuery(DataSet<F> dataSet,
-			Function<? super SearchSortFactory<?>, ? extends FieldSortOptionsStep<?, ?, ?>> sortContributor,
+			Function<? super TypedSearchSortFactory<?>, ? extends FieldSortOptionsStep<?, ?, ?>> sortContributor,
 			StubMappingScope scope,
 			SortMode sortMode, TestedFieldStructure fieldStructure) {
 		return query( dataSet, f -> f.matchAll(), sortContributor, scope, sortMode, fieldStructure );
 	}
 
 	private SearchQuery<DocumentReference> query(DataSet<F> dataSet,
-			Function<? super SearchPredicateFactory<?>, ? extends PredicateFinalStep> predicateContributor,
-			Function<? super SearchSortFactory<?>, ? extends FieldSortOptionsStep<?, ?, ?>> sortContributor,
+			Function<? super TypedSearchPredicateFactory<?>, ? extends PredicateFinalStep> predicateContributor,
+			Function<? super TypedSearchSortFactory<?>, ? extends FieldSortOptionsStep<?, ?, ?>> sortContributor,
 			StubMappingScope scope, SortMode sortMode, TestedFieldStructure fieldStructure) {
 		return scope.query()
 				.where( predicateContributor )

@@ -66,10 +66,10 @@ import org.hibernate.search.engine.search.sort.dsl.SearchSortFactoryExtension;
 public final class LuceneExtension<SR, H, R, E, LOS>
 		implements SearchQueryDslExtension<SR, LuceneSearchQuerySelectStep<SR, R, E, LOS>, R, E, LOS>,
 		SearchQueryExtension<LuceneSearchQuery<H>, H>,
-		SearchPredicateFactoryExtension<SR, LuceneSearchPredicateFactory<SR>>,
-		SearchSortFactoryExtension<SR, LuceneSearchSortFactory<SR>>,
-		SearchProjectionFactoryExtension<SR, LuceneSearchProjectionFactory<SR, R, E>, R, E>,
-		SearchAggregationFactoryExtension<SR, LuceneSearchAggregationFactory<SR>>,
+		SearchPredicateFactoryExtension<LuceneSearchPredicateFactory<SR>>,
+		SearchSortFactoryExtension<LuceneSearchSortFactory<SR>>,
+		SearchProjectionFactoryExtension<LuceneSearchProjectionFactory<SR, R, E>, R, E>,
+		SearchAggregationFactoryExtension<LuceneSearchAggregationFactory<SR>>,
 		IndexFieldTypeFactoryExtension<LuceneIndexFieldTypeFactory>,
 		IndexScopeExtension<LuceneIndexScope>,
 		SchemaExportExtension<LuceneIndexSchemaExport> {
@@ -139,10 +139,11 @@ public final class LuceneExtension<SR, H, R, E, LOS>
 	/**
 	 * {@inheritDoc}
 	 */
+	@SuppressWarnings("unchecked")
 	@Override
-	public Optional<LuceneSearchPredicateFactory<SR>> extendOptional(SearchPredicateFactory<SR> original) {
-		if ( original instanceof LuceneSearchPredicateFactory ) {
-			return Optional.of( (LuceneSearchPredicateFactory<SR>) original );
+	public Optional<LuceneSearchPredicateFactory<SR>> extendOptional(SearchPredicateFactory original) {
+		if ( original instanceof LuceneSearchPredicateFactory<?> f ) {
+			return Optional.of( (LuceneSearchPredicateFactory<SR>) f );
 		}
 		else {
 			return Optional.empty();
@@ -152,9 +153,9 @@ public final class LuceneExtension<SR, H, R, E, LOS>
 	/**
 	 * {@inheritDoc}
 	 */
+	@SuppressWarnings("unchecked")
 	@Override
-	public Optional<LuceneSearchSortFactory<SR>> extendOptional(
-			SearchSortFactory<SR> original) {
+	public Optional<LuceneSearchSortFactory<SR>> extendOptional(SearchSortFactory original) {
 		if ( original instanceof LuceneSearchSortFactory ) {
 			return Optional.of( (LuceneSearchSortFactory<SR>) original );
 		}
@@ -166,8 +167,9 @@ public final class LuceneExtension<SR, H, R, E, LOS>
 	/**
 	 * {@inheritDoc}
 	 */
+	@SuppressWarnings("unchecked")
 	@Override
-	public Optional<LuceneSearchProjectionFactory<SR, R, E>> extendOptional(SearchProjectionFactory<SR, R, E> original) {
+	public Optional<LuceneSearchProjectionFactory<SR, R, E>> extendOptional(SearchProjectionFactory<R, E> original) {
 		if ( original instanceof LuceneSearchProjectionFactory ) {
 			return Optional.of( (LuceneSearchProjectionFactory<SR, R, E>) original );
 		}
@@ -179,8 +181,9 @@ public final class LuceneExtension<SR, H, R, E, LOS>
 	/**
 	 * {@inheritDoc}
 	 */
+	@SuppressWarnings("unchecked")
 	@Override
-	public Optional<LuceneSearchAggregationFactory<SR>> extendOptional(SearchAggregationFactory<SR> original) {
+	public Optional<LuceneSearchAggregationFactory<SR>> extendOptional(SearchAggregationFactory original) {
 		if ( original instanceof LuceneSearchAggregationFactory ) {
 			return Optional.of( (LuceneSearchAggregationFactory<SR>) original );
 		}

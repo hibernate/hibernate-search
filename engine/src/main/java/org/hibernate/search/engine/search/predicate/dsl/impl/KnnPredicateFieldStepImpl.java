@@ -12,7 +12,7 @@ import org.hibernate.search.engine.search.predicate.dsl.KnnPredicateOptionsStep;
 import org.hibernate.search.engine.search.predicate.dsl.KnnPredicateVectorGenericStep;
 import org.hibernate.search.engine.search.predicate.dsl.KnnPredicateVectorStep;
 import org.hibernate.search.engine.search.predicate.dsl.PredicateFinalStep;
-import org.hibernate.search.engine.search.predicate.dsl.SearchPredicateFactory;
+import org.hibernate.search.engine.search.predicate.dsl.TypedSearchPredicateFactory;
 import org.hibernate.search.engine.search.predicate.dsl.spi.AbstractPredicateFinalStep;
 import org.hibernate.search.engine.search.predicate.dsl.spi.SearchPredicateDslContext;
 import org.hibernate.search.engine.search.predicate.spi.BooleanPredicateBuilder;
@@ -24,12 +24,12 @@ public class KnnPredicateFieldStepImpl<SR>
 		extends AbstractPredicateFinalStep
 		implements KnnPredicateFieldStep<SR>, KnnPredicateVectorStep<SR>, KnnPredicateOptionsStep<SR> {
 
-	private final SearchPredicateFactory<SR> factory;
+	private final TypedSearchPredicateFactory<SR> factory;
 	private final int k;
 	private BooleanPredicateBuilder booleanBuilder;
 	protected KnnPredicateBuilder builder;
 
-	public KnnPredicateFieldStepImpl(SearchPredicateFactory<SR> factory, SearchPredicateDslContext<?> dslContext, int k) {
+	public KnnPredicateFieldStepImpl(TypedSearchPredicateFactory<SR> factory, SearchPredicateDslContext<?> dslContext, int k) {
 		super( dslContext );
 		this.factory = factory;
 		this.k = k;
@@ -56,7 +56,7 @@ public class KnnPredicateFieldStepImpl<SR>
 
 	@Override
 	public KnnPredicateOptionsStep<SR> filter(
-			Function<? super SearchPredicateFactory<SR>, ? extends PredicateFinalStep> clauseContributor) {
+			Function<? super TypedSearchPredicateFactory<SR>, ? extends PredicateFinalStep> clauseContributor) {
 		this.booleanPredicateBuilder().must( clauseContributor.apply( factory ).toPredicate() );
 		return this;
 	}

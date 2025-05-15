@@ -14,10 +14,6 @@ import org.hibernate.search.engine.search.common.NamedValues;
 import org.hibernate.search.engine.search.common.ValueModel;
 import org.hibernate.search.engine.search.projection.ProjectionCollector;
 import org.hibernate.search.engine.search.projection.SearchProjection;
-import org.hibernate.search.engine.search.reference.object.ObjectFieldReference;
-import org.hibernate.search.engine.search.reference.projection.DistanceProjectionFieldReference;
-import org.hibernate.search.engine.search.reference.projection.FieldProjectionFieldReference;
-import org.hibernate.search.engine.search.reference.projection.HighlightProjectionFieldReference;
 import org.hibernate.search.engine.spatial.GeoPoint;
 import org.hibernate.search.util.common.SearchException;
 import org.hibernate.search.util.common.annotation.Incubating;
@@ -43,19 +39,18 @@ import org.hibernate.search.util.common.function.TriFunction;
  * <h2 id="field-references">Field references</h2>
  *
  * A {@link org.hibernate.search.engine.search.reference field reference} is always represented by the absolute field path and,
- * if applicable, i.e. when a field reference is typed, a combination of the {@link org.hibernate.search.engine.search.common.ValueModel} and the type.
+ * if applicable, i.e. when a field reference is typed, a combination of the {@link ValueModel} and the type.
  * <p>
  * Field references are usually accessed from the generated Hibernate Search's static metamodel classes that describe the index structure.
  * Such reference provides the information on which search capabilities the particular index field possesses, and allows switching between different
- * {@link org.hibernate.search.engine.search.common.ValueModel value model representations}.
+ * {@link ValueModel value model representations}.
  *
- * @param <SR> Scope root type.
  * @param <R> The type of entity references, i.e. the type of objects returned for
  * {@link #entityReference() entity reference projections}.
  * @param <E> The type of entities, i.e. the type of objects returned for
  * {@link #entity() entity projections}.
  */
-public interface SearchProjectionFactory<SR, R, E> {
+public interface SearchProjectionFactory<R, E> {
 
 	/**
 	 * Project the match to a {@link DocumentReference}.
@@ -207,18 +202,6 @@ public interface SearchProjectionFactory<SR, R, E> {
 	FieldProjectionValueStep<?, Object> field(String fieldPath, ValueModel valueModel);
 
 	/**
-	 * Project to the value of a field in the indexed document.
-	 *
-	 * @param fieldReference The reference representing the <a href="#field-paths">path</a> to the index field whose value will be extracted.
-	 * @param <T> The resulting type of the projection.
-	 * @return A DSL step where the "field" projection can be defined in more details.
-	 */
-	@Incubating
-	default <T> FieldProjectionValueStep<?, T> field(FieldProjectionFieldReference<? super SR, T> fieldReference) {
-		return field( fieldReference.absolutePath(), fieldReference.projectionType(), fieldReference.valueModel() );
-	}
-
-	/**
 	 * Project on the score of the hit.
 	 *
 	 * @return A DSL step where the "score" projection can be defined in more details.
@@ -236,21 +219,6 @@ public interface SearchProjectionFactory<SR, R, E> {
 	DistanceToFieldProjectionValueStep<?, Double> distance(String fieldPath, GeoPoint center);
 
 	/**
-	 * Project on the distance from the center to a {@link GeoPoint} field.
-	 *
-	 * @param fieldReference The reference representing the <a href="#field-paths">path</a> to the index field containing the location
-	 * to compute the distance from.
-	 * @param center The center to compute the distance from.
-	 * @return A DSL step where the "distance" projection can be defined in more details.
-	 */
-	@Incubating
-	default DistanceToFieldProjectionValueStep<?, Double> distance(
-			DistanceProjectionFieldReference<? super SR> fieldReference,
-			GeoPoint center) {
-		return distance( fieldReference.absolutePath(), center );
-	}
-
-	/**
 	 * Starts the definition of an object projection,
 	 * which will yield one value per object in a given object field,
 	 * the value being the result of combining multiple given projections
@@ -266,26 +234,6 @@ public interface SearchProjectionFactory<SR, R, E> {
 	 * @return A DSL step where the "composite" projection can be defined in more details.
 	 */
 	CompositeProjectionInnerStep object(String objectFieldPath);
-
-	/**
-	 * Starts the definition of an object projection,
-	 * which will yield one value per object in a given object field,
-	 * the value being the result of combining multiple given projections
-	 * (usually on fields within the object field).
-	 * <p>
-	 * Compared to the basic {@link #composite() composite projection},
-	 * an object projection is bound to a specific object field,
-	 * and thus it yields zero, one or many values, as many as there are objects in the targeted object field.
-	 * Therefore, you must take care of calling {@link CompositeProjectionValueStep#multi()}
-	 * if the object field is multi-valued.
-	 *
-	 * @param objectFieldReference The reference representing the <a href="#field-paths">path</a> to the object field whose object(s) will be extracted.
-	 * @return A DSL step where the "composite" projection can be defined in more details.
-	 */
-	@Incubating
-	default CompositeProjectionInnerStep object(ObjectFieldReference<? super SR> objectFieldReference) {
-		return object( objectFieldReference.absolutePath() );
-	}
 
 	/**
 	 * Starts the definition of a composite projection,
@@ -501,7 +449,7 @@ public interface SearchProjectionFactory<SR, R, E> {
 	 * @return The extended factory.
 	 * @throws SearchException If the extension cannot be applied (wrong underlying backend, ...).
 	 */
-	<T> T extension(SearchProjectionFactoryExtension<SR, T, R, E> extension);
+	<T> T extension(SearchProjectionFactoryExtension<T, R, E> extension);
 
 	/**
 	 * Create a DSL step allowing multiple attempts to apply extensions one after the other,
@@ -516,7 +464,7 @@ public interface SearchProjectionFactory<SR, R, E> {
 	 * @param <T> The expected projected type.
 	 * @return A DSL step.
 	 */
-	<T> SearchProjectionFactoryExtensionIfSupportedStep<SR, T, R, E> extension();
+	<T> SearchProjectionFactoryExtensionIfSupportedStep<?, T, R, E> extension();
 
 	/**
 	 * Create a new projection factory whose root for all paths passed to the DSL
@@ -529,7 +477,7 @@ public interface SearchProjectionFactory<SR, R, E> {
 	 * @return A new projection factory using the given object field as root.
 	 */
 	@Incubating
-	SearchProjectionFactory<SR, R, E> withRoot(String objectFieldPath);
+	SearchProjectionFactory<R, E> withRoot(String objectFieldPath);
 
 	/**
 	 * @param relativeFieldPath The path to a field, relative to the {@link #withRoot(String) root} of this factory.
@@ -548,14 +496,4 @@ public interface SearchProjectionFactory<SR, R, E> {
 	@Incubating
 	HighlightProjectionOptionsStep highlight(String fieldPath);
 
-	/**
-	 * Project to highlights, i.e. sequences of text that matched the query, extracted from the given field's value.
-	 *
-	 * @param fieldReference The reference representing the <a href="#field-paths">path</a> to the index field whose highlights will be extracted.
-	 * @return A DSL step where the "highlight" projection can be defined in more details.
-	 */
-	@Incubating
-	default HighlightProjectionOptionsStep highlight(HighlightProjectionFieldReference<? super SR> fieldReference) {
-		return highlight( fieldReference.absolutePath() );
-	}
 }

@@ -15,7 +15,7 @@ import org.hibernate.search.engine.backend.types.converter.ToDocumentValueConver
 import org.hibernate.search.engine.backend.types.converter.runtime.ToDocumentValueConvertContext;
 import org.hibernate.search.engine.reporting.spi.EventContexts;
 import org.hibernate.search.engine.search.common.ValueModel;
-import org.hibernate.search.engine.search.predicate.dsl.SearchPredicateFactory;
+import org.hibernate.search.engine.search.predicate.dsl.TypedSearchPredicateFactory;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.extension.SearchSetupHelper;
 import org.hibernate.search.util.common.SearchException;
 import org.hibernate.search.util.impl.integrationtest.common.reporting.FailureReportUtils;
@@ -136,7 +136,7 @@ class MatchIdPredicateSpecificsIT {
 
 	@Test
 	void multiIndex_withIncompatibleIdConverterIndex_dslConverterEnabled() {
-		SearchPredicateFactory<?> f = mainIndex.createScope( incompatibleIdConverterIndex ).predicate();
+		TypedSearchPredicateFactory<?> f = mainIndex.createScope( incompatibleIdConverterIndex ).predicate();
 
 		assertThatThrownBy( () -> f.id().matching( new Object() /* Value does not matter */ ) )
 				.isInstanceOf( SearchException.class )

@@ -12,11 +12,13 @@ import jakarta.persistence.EntityManager;
 import org.hibernate.Session;
 import org.hibernate.engine.spi.SessionImplementor;
 import org.hibernate.search.engine.search.query.dsl.SearchQuerySelectStep;
+import org.hibernate.search.mapper.orm.common.EntityReference;
 import org.hibernate.search.mapper.orm.common.impl.HibernateOrmUtils;
 import org.hibernate.search.mapper.orm.massindexing.MassIndexer;
 import org.hibernate.search.mapper.orm.schema.management.SearchSchemaManager;
 import org.hibernate.search.mapper.orm.scope.HibernateOrmRootReferenceScope;
 import org.hibernate.search.mapper.orm.scope.SearchScope;
+import org.hibernate.search.mapper.orm.scope.TypedSearchScope;
 import org.hibernate.search.mapper.orm.search.loading.dsl.SearchLoadingOptionsStep;
 import org.hibernate.search.mapper.orm.session.SearchSession;
 import org.hibernate.search.mapper.orm.work.SearchIndexingPlan;
@@ -62,7 +64,13 @@ public class DelegatingSearchSession implements SearchSession {
 			T,
 			SearchLoadingOptionsStep,
 			?,
-			?> search(SearchScope<SR, T> scope) {
+			?> search(TypedSearchScope<SR, T> scope) {
+		return getDelegate().search( scope );
+	}
+
+	@SuppressWarnings("deprecation")
+	@Override
+	public <T> SearchQuerySelectStep<?, ?, EntityReference, T, SearchLoadingOptionsStep, ?, ?> search(SearchScope<T> scope) {
 		return getDelegate().search( scope );
 	}
 
@@ -97,12 +105,12 @@ public class DelegatingSearchSession implements SearchSession {
 	}
 
 	@Override
-	public <SR, T> SearchScope<SR, T> scope(Collection<? extends Class<? extends T>> classes) {
+	public <SR, T> TypedSearchScope<SR, T> scope(Collection<? extends Class<? extends T>> classes) {
 		return getDelegate().scope( classes );
 	}
 
 	@Override
-	public <SR, T> SearchScope<SR, T> scope(Class<T> expectedSuperType, Collection<String> entityNames) {
+	public <SR, T> TypedSearchScope<SR, T> scope(Class<T> expectedSuperType, Collection<String> entityNames) {
 		return getDelegate().scope( expectedSuperType, entityNames );
 	}
 

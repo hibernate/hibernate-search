@@ -63,10 +63,10 @@ import org.hibernate.search.engine.search.sort.dsl.SearchSortFactoryExtension;
 public final class ElasticsearchExtension<SR, H, R, E, LOS>
 		implements SearchQueryDslExtension<SR, ElasticsearchSearchQuerySelectStep<SR, R, E, LOS>, R, E, LOS>,
 		SearchQueryExtension<ElasticsearchSearchQuery<H>, H>,
-		SearchPredicateFactoryExtension<SR, ElasticsearchSearchPredicateFactory<SR>>,
-		SearchSortFactoryExtension<SR, ElasticsearchSearchSortFactory<SR>>,
-		SearchProjectionFactoryExtension<SR, ElasticsearchSearchProjectionFactory<SR, R, E>, R, E>,
-		SearchAggregationFactoryExtension<SR, ElasticsearchSearchAggregationFactory<SR>>,
+		SearchPredicateFactoryExtension<ElasticsearchSearchPredicateFactory<SR>>,
+		SearchSortFactoryExtension<ElasticsearchSearchSortFactory<SR>>,
+		SearchProjectionFactoryExtension<ElasticsearchSearchProjectionFactory<SR, R, E>, R, E>,
+		SearchAggregationFactoryExtension<ElasticsearchSearchAggregationFactory<SR>>,
 		IndexFieldTypeFactoryExtension<ElasticsearchIndexFieldTypeFactory>,
 		SchemaExportExtension<ElasticsearchIndexSchemaExport> {
 
@@ -136,10 +136,11 @@ public final class ElasticsearchExtension<SR, H, R, E, LOS>
 	/**
 	 * {@inheritDoc}
 	 */
+	@SuppressWarnings("unchecked")
 	@Override
-	public Optional<ElasticsearchSearchPredicateFactory<SR>> extendOptional(SearchPredicateFactory<SR> original) {
-		if ( original instanceof ElasticsearchSearchPredicateFactory ) {
-			return Optional.of( (ElasticsearchSearchPredicateFactory<SR>) original );
+	public Optional<ElasticsearchSearchPredicateFactory<SR>> extendOptional(SearchPredicateFactory original) {
+		if ( original instanceof ElasticsearchSearchPredicateFactory<?> f ) {
+			return Optional.of( (ElasticsearchSearchPredicateFactory<SR>) f );
 		}
 		else {
 			return Optional.empty();
@@ -149,11 +150,11 @@ public final class ElasticsearchExtension<SR, H, R, E, LOS>
 	/**
 	 * {@inheritDoc}
 	 */
+	@SuppressWarnings("unchecked")
 	@Override
-	public Optional<ElasticsearchSearchSortFactory<SR>> extendOptional(
-			SearchSortFactory<SR> original) {
-		if ( original instanceof ElasticsearchSearchSortFactory ) {
-			return Optional.of( (ElasticsearchSearchSortFactory<SR>) original );
+	public Optional<ElasticsearchSearchSortFactory<SR>> extendOptional(SearchSortFactory original) {
+		if ( original instanceof ElasticsearchSearchSortFactory<?> f ) {
+			return Optional.of( (ElasticsearchSearchSortFactory<SR>) f );
 		}
 		else {
 			return Optional.empty();
@@ -163,8 +164,9 @@ public final class ElasticsearchExtension<SR, H, R, E, LOS>
 	/**
 	 * {@inheritDoc}
 	 */
+	@SuppressWarnings("unchecked")
 	@Override
-	public Optional<ElasticsearchSearchProjectionFactory<SR, R, E>> extendOptional(SearchProjectionFactory<SR, R, E> original) {
+	public Optional<ElasticsearchSearchProjectionFactory<SR, R, E>> extendOptional(SearchProjectionFactory<R, E> original) {
 		if ( original instanceof ElasticsearchSearchProjectionFactory ) {
 			return Optional.of( (ElasticsearchSearchProjectionFactory<SR, R, E>) original );
 		}
@@ -176,9 +178,9 @@ public final class ElasticsearchExtension<SR, H, R, E, LOS>
 	/**
 	 * {@inheritDoc}
 	 */
+	@SuppressWarnings("unchecked")
 	@Override
-	public Optional<ElasticsearchSearchAggregationFactory<SR>> extendOptional(
-			SearchAggregationFactory<SR> original) {
+	public Optional<ElasticsearchSearchAggregationFactory<SR>> extendOptional(SearchAggregationFactory original) {
 		if ( original instanceof ElasticsearchSearchAggregationFactory ) {
 			return Optional.of( (ElasticsearchSearchAggregationFactory<SR>) original );
 		}

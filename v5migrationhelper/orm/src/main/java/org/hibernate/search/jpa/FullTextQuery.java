@@ -15,7 +15,7 @@ import jakarta.persistence.Query;
 import org.hibernate.search.backend.lucene.LuceneExtension;
 import org.hibernate.search.engine.ProjectionConstants;
 import org.hibernate.search.engine.search.aggregation.AggregationKey;
-import org.hibernate.search.engine.search.projection.dsl.SearchProjectionFactory;
+import org.hibernate.search.engine.search.projection.dsl.TypedSearchProjectionFactory;
 import org.hibernate.search.engine.search.query.SearchQuery;
 import org.hibernate.search.engine.search.query.SearchQueryExtension;
 import org.hibernate.search.engine.search.query.SearchResult;
@@ -119,7 +119,7 @@ public interface FullTextQuery extends Query, ProjectionConstants {
 	 * using {@link org.hibernate.search.mapper.orm.Search#session(EntityManager)},
 	 * create a search query with {@link SearchSession#search(Class)},
 	 * and define your projections using {@link SearchQuerySelectStep#select(Function)}.
-	 * See in particular the distance projection: {@link SearchProjectionFactory#distance(String, GeoPoint)}.
+	 * See in particular the distance projection: {@link TypedSearchProjectionFactory#distance(String, GeoPoint)}.
 	 * Refer to the <a href="https://hibernate.org/search/documentation/migrate/6.0/">migration guide</a> for more information.
 	 */
 	@Deprecated
@@ -136,7 +136,7 @@ public interface FullTextQuery extends Query, ProjectionConstants {
 	 * using {@link org.hibernate.search.mapper.orm.Search#session(EntityManager)},
 	 * create a search query with {@link SearchSession#search(Class)},
 	 * and define your projections using {@link SearchQuerySelectStep#select(Function)}.
-	 * See in particular the distance projection: {@link SearchProjectionFactory#distance(String, GeoPoint)}.
+	 * See in particular the distance projection: {@link TypedSearchProjectionFactory#distance(String, GeoPoint)}.
 	 * Refer to the <a href="https://hibernate.org/search/documentation/migrate/6.0/">migration guide</a> for more information.
 	 */
 	@Deprecated
@@ -166,7 +166,7 @@ public interface FullTextQuery extends Query, ProjectionConstants {
 	 * create a search query with {@link SearchSession#search(Class)},
 	 * and define your projections using {@link SearchQuerySelectStep#select(Function)}.
 	 * See in particular the composite projection, which allows applying a function to another projection:
-	 * {@link SearchProjectionFactory#composite()}.
+	 * {@link TypedSearchProjectionFactory#composite()}.
 	 * Refer to the <a href="https://hibernate.org/search/documentation/migrate/6.0/">migration guide</a> for more information.
 	 */
 	@Deprecated

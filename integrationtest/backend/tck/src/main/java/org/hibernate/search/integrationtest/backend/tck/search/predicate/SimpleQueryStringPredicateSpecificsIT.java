@@ -17,9 +17,9 @@ import java.util.function.Function;
 
 import org.hibernate.search.engine.backend.common.DocumentReference;
 import org.hibernate.search.engine.search.common.BooleanOperator;
-import org.hibernate.search.engine.search.predicate.dsl.SearchPredicateFactory;
 import org.hibernate.search.engine.search.predicate.dsl.SimpleQueryFlag;
 import org.hibernate.search.engine.search.predicate.dsl.SimpleQueryStringPredicateFieldStep;
+import org.hibernate.search.engine.search.predicate.dsl.TypedSearchPredicateFactory;
 import org.hibernate.search.engine.search.query.SearchQuery;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.StandardFieldTypeDescriptor;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.TckBackendFeatures;
@@ -413,7 +413,7 @@ class SimpleQueryStringPredicateSpecificsIT
 	}
 
 	@Override
-	SimpleQueryStringPredicateFieldStep<?, ?> predicate(SearchPredicateFactory<?> f) {
+	SimpleQueryStringPredicateFieldStep<?, ?> predicate(TypedSearchPredicateFactory<?> f) {
 		return f.simpleQueryString();
 	}
 }

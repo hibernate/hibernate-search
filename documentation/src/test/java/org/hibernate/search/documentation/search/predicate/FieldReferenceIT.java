@@ -24,7 +24,7 @@ import org.hibernate.search.documentation.testsupport.DocumentationSetupHelper;
 import org.hibernate.search.engine.backend.types.Projectable;
 import org.hibernate.search.engine.search.common.ValueModel;
 import org.hibernate.search.engine.search.predicate.dsl.PredicateFinalStep;
-import org.hibernate.search.engine.search.predicate.dsl.SearchPredicateFactory;
+import org.hibernate.search.engine.search.predicate.dsl.TypedSearchPredicateFactory;
 import org.hibernate.search.engine.search.reference.object.ObjectFieldReference;
 import org.hibernate.search.engine.search.reference.predicate.ExistsPredicateFieldReference;
 import org.hibernate.search.engine.search.reference.predicate.MatchPredicateFieldReference;
@@ -32,8 +32,8 @@ import org.hibernate.search.engine.search.reference.predicate.QueryStringPredica
 import org.hibernate.search.engine.search.reference.projection.FieldProjectionFieldReference;
 import org.hibernate.search.mapper.orm.Search;
 import org.hibernate.search.mapper.orm.scope.HibernateOrmRootReferenceScope;
-import org.hibernate.search.mapper.orm.scope.SearchScope;
 import org.hibernate.search.mapper.orm.scope.SearchScopeProvider;
+import org.hibernate.search.mapper.orm.scope.TypedSearchScope;
 import org.hibernate.search.mapper.orm.session.SearchSession;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.FullTextField;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.GenericField;
@@ -64,7 +64,7 @@ class FieldReferenceIT {
 	void smoke() {
 		withinSearchSession( searchSession -> {
 
-			SearchScope<ContainingA__, ContainingA> scope = ContainingA__.INDEX.scope( searchSession );
+			TypedSearchScope<ContainingA__, ContainingA> scope = ContainingA__.INDEX.scope( searchSession );
 
 			assertThat(
 					searchSession.search( scope )
@@ -96,13 +96,13 @@ class FieldReferenceIT {
 
 
 	public static <SR extends ContainingA_e1_e2_Intersection<SR>> PredicateFinalStep utilMethodForPredicate(
-			SearchPredicateFactory<SR> factory, ContainingA_e1_e2_Intersection<SR> reference) {
+			TypedSearchPredicateFactory<SR> factory, ContainingA_e1_e2_Intersection<SR> reference) {
 		return factory.match().field( reference.a() ).matching( "a" );
 	}
 
 
 	public static <SR extends ContainingA__> PredicateFinalStep utilMethodForPredicateNoProjection(
-			SearchPredicateFactory<SR> factory, ContainingA_e1_e2_e3_Intersection<SR> reference) {
+			TypedSearchPredicateFactory<SR> factory, ContainingA_e1_e2_e3_Intersection<SR> reference) {
 		return factory.match().field( reference.a() ).matching( "a" );
 	}
 
@@ -110,7 +110,7 @@ class FieldReferenceIT {
 	void smoke2() {
 		withinSearchSession( searchSession -> {
 
-			SearchScope<Object, MappedSuperclassThing> scope = searchSession.scope( List.of( ContainingA.class ) );
+			TypedSearchScope<Object, MappedSuperclassThing> scope = searchSession.scope( List.of( ContainingA.class ) );
 
 			assertThat(
 					searchSession.search( scope )
@@ -293,7 +293,7 @@ class FieldReferenceIT {
 		}
 
 		@Override
-		public SearchScope<ContainingA__, ContainingA> scope(SearchScopeProvider scopeProvider) {
+		public TypedSearchScope<ContainingA__, ContainingA> scope(SearchScopeProvider scopeProvider) {
 			return scopeProvider.scope( ContainingA.class );
 		}
 

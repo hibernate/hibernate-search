@@ -8,14 +8,14 @@ import org.hibernate.search.engine.backend.scope.IndexScopeExtension;
 import org.hibernate.search.engine.backend.scope.spi.IndexScope;
 import org.hibernate.search.engine.backend.session.spi.BackendSessionContext;
 import org.hibernate.search.engine.mapper.scope.spi.MappedIndexScope;
-import org.hibernate.search.engine.search.aggregation.dsl.SearchAggregationFactory;
+import org.hibernate.search.engine.search.aggregation.dsl.TypedSearchAggregationFactory;
 import org.hibernate.search.engine.search.highlighter.dsl.SearchHighlighterFactory;
 import org.hibernate.search.engine.search.loading.spi.SearchLoadingContextBuilder;
-import org.hibernate.search.engine.search.predicate.dsl.SearchPredicateFactory;
-import org.hibernate.search.engine.search.projection.dsl.SearchProjectionFactory;
+import org.hibernate.search.engine.search.predicate.dsl.TypedSearchPredicateFactory;
+import org.hibernate.search.engine.search.projection.dsl.TypedSearchProjectionFactory;
 import org.hibernate.search.engine.search.query.dsl.SearchQuerySelectStep;
 import org.hibernate.search.engine.search.query.dsl.impl.DefaultSearchQuerySelectStep;
-import org.hibernate.search.engine.search.sort.dsl.SearchSortFactory;
+import org.hibernate.search.engine.search.sort.dsl.TypedSearchSortFactory;
 
 class MappedIndexScopeImpl<SR, R, E> implements MappedIndexScope<SR, R, E> {
 
@@ -31,29 +31,29 @@ class MappedIndexScopeImpl<SR, R, E> implements MappedIndexScope<SR, R, E> {
 	}
 
 	@Override
-	public <LOS> SearchQuerySelectStep<SR, ?, R, E, LOS, SearchProjectionFactory<SR, R, E>, ?> search(
+	public <LOS> SearchQuerySelectStep<SR, ?, R, E, LOS, TypedSearchProjectionFactory<SR, R, E>, ?> search(
 			BackendSessionContext sessionContext,
 			SearchLoadingContextBuilder<E, LOS> loadingContextBuilder) {
 		return new DefaultSearchQuerySelectStep<>( delegate.searchScope(), sessionContext, loadingContextBuilder );
 	}
 
 	@Override
-	public SearchPredicateFactory<SR> predicate() {
+	public TypedSearchPredicateFactory<SR> predicate() {
 		return delegate.searchScope().predicateFactory();
 	}
 
 	@Override
-	public SearchSortFactory<SR> sort() {
+	public TypedSearchSortFactory<SR> sort() {
 		return delegate.searchScope().sortFactory();
 	}
 
 	@Override
-	public SearchProjectionFactory<SR, R, E> projection() {
+	public TypedSearchProjectionFactory<SR, R, E> projection() {
 		return delegate.searchScope().projectionFactory();
 	}
 
 	@Override
-	public SearchAggregationFactory<SR> aggregation() {
+	public TypedSearchAggregationFactory<SR> aggregation() {
 		return delegate.searchScope().aggregationFactory();
 	}
 

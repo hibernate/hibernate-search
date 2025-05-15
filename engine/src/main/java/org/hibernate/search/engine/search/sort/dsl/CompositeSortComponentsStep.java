@@ -4,8 +4,6 @@
  */
 package org.hibernate.search.engine.search.sort.dsl;
 
-import org.hibernate.search.engine.search.sort.SearchSort;
-
 /**
  * The initial and final step in a composite sort definition, where sort elements can be added.
  * <p>
@@ -17,24 +15,6 @@ import org.hibernate.search.engine.search.sort.SearchSort;
  * @param <S> The "self" type (the actual exposed type of this step).
  */
 public interface CompositeSortComponentsStep<SR, S extends CompositeSortComponentsStep<SR, ?>>
-		extends SortFinalStep, SortThenStep<SR> {
-
-	/**
-	 * Add an element to the composite sort based on a previously-built {@link SearchSort}.
-	 *
-	 * @param searchSort The sort to add.
-	 * @return {@code this}, for method chaining.
-	 */
-	S add(SearchSort searchSort);
-
-	/**
-	 * Add an element to the composite sort based on an almost-built {@link SearchSort}.
-	 *
-	 * @param dslFinalStep A final step in the sort DSL allowing the retrieval of a {@link SearchSort}.
-	 * @return {@code this}, for method chaining.
-	 */
-	default S add(SortFinalStep dslFinalStep) {
-		return add( dslFinalStep.toSort() );
-	}
+		extends CompositeSortOptionsCollector<S>, SortFinalStep, SortThenStep<SR> {
 
 }

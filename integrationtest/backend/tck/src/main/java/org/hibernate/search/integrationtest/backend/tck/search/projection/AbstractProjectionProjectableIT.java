@@ -13,7 +13,7 @@ import java.util.Collection;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaElement;
 import org.hibernate.search.engine.backend.types.Projectable;
 import org.hibernate.search.engine.backend.types.dsl.SearchableProjectableIndexFieldTypeOptionsStep;
-import org.hibernate.search.engine.search.projection.dsl.SearchProjectionFactory;
+import org.hibernate.search.engine.search.projection.dsl.TypedSearchProjectionFactory;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.FieldTypeDescriptor;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.SimpleFieldModelsByType;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.TckConfiguration;
@@ -91,7 +91,7 @@ abstract class AbstractProjectionProjectableIT {
 				"Skipping this test as the backend makes fields projectable by default."
 		);
 
-		SearchProjectionFactory<?, ?, ?> f = projectableDefaultIndex.createScope().projection();
+		TypedSearchProjectionFactory<?, ?, ?> f = projectableDefaultIndex.createScope().projection();
 
 		String fieldPath = projectableDefaultIndex.binding().field.get( fieldType ).relativeFieldName;
 
@@ -110,7 +110,7 @@ abstract class AbstractProjectionProjectableIT {
 			SimpleMappedIndex<AbstractProjectionProjectableIT.ProjectableYesIndexBinding> projectableYesIndex,
 			SimpleMappedIndex<AbstractProjectionProjectableIT.ProjectableNoIndexBinding> projectableNoIndex,
 			FieldTypeDescriptor<?, ?> fieldType) {
-		SearchProjectionFactory<?, ?, ?> f = projectableNoIndex.createScope().projection();
+		TypedSearchProjectionFactory<?, ?, ?> f = projectableNoIndex.createScope().projection();
 
 		String fieldPath = projectableNoIndex.binding().field.get( fieldType ).relativeFieldName;
 
@@ -130,7 +130,7 @@ abstract class AbstractProjectionProjectableIT {
 			SimpleMappedIndex<AbstractProjectionProjectableIT.ProjectableYesIndexBinding> projectableYesIndex,
 			SimpleMappedIndex<AbstractProjectionProjectableIT.ProjectableNoIndexBinding> projectableNoIndex,
 			FieldTypeDescriptor<?, ?> fieldType) {
-		SearchProjectionFactory<?, ?, ?> f = projectableYesIndex.createScope( projectableNoIndex ).projection();
+		TypedSearchProjectionFactory<?, ?, ?> f = projectableYesIndex.createScope( projectableNoIndex ).projection();
 
 		String fieldPath = projectableYesIndex.binding().field.get( fieldType ).relativeFieldName;
 
@@ -142,7 +142,7 @@ abstract class AbstractProjectionProjectableIT {
 				);
 	}
 
-	protected abstract void tryProjection(SearchProjectionFactory<?, ?, ?> f, String fieldPath,
+	protected abstract void tryProjection(TypedSearchProjectionFactory<?, ?, ?> f, String fieldPath,
 			FieldTypeDescriptor<?, ?> fieldType);
 
 	protected abstract String projectionTrait();

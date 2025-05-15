@@ -14,7 +14,7 @@ import org.hibernate.search.backend.lucene.search.common.impl.LuceneSearchIndexS
 import org.hibernate.search.engine.search.common.spi.SearchQueryElementFactory;
 import org.hibernate.search.engine.search.predicate.SearchPredicate;
 import org.hibernate.search.engine.search.predicate.definition.PredicateDefinition;
-import org.hibernate.search.engine.search.predicate.dsl.SearchPredicateFactory;
+import org.hibernate.search.engine.search.predicate.dsl.TypedSearchPredicateFactory;
 import org.hibernate.search.engine.search.predicate.spi.NamedPredicateBuilder;
 import org.hibernate.search.engine.search.predicate.spi.NamedValuesBasedPredicateDefinitionContext;
 
@@ -70,7 +70,7 @@ public class LuceneNamedPredicate extends AbstractLuceneSingleFieldPredicate {
 		private final PredicateDefinition definition;
 		private final String predicateName;
 		private final LuceneSearchIndexCompositeNodeContext field;
-		private SearchPredicateFactory<?> factory;
+		private TypedSearchPredicateFactory<?> factory;
 		private final Map<String, Object> params = new LinkedHashMap<>();
 
 		Builder(PredicateDefinition definition, String predicateName, LuceneSearchIndexScope<?> scope,
@@ -82,7 +82,7 @@ public class LuceneNamedPredicate extends AbstractLuceneSingleFieldPredicate {
 		}
 
 		@Override
-		public void factory(SearchPredicateFactory<?> factory) {
+		public void factory(TypedSearchPredicateFactory<?> factory) {
 			this.factory = factory;
 		}
 

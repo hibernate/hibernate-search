@@ -14,7 +14,7 @@ import java.util.StringJoiner;
 import org.hibernate.search.engine.backend.common.DocumentReference;
 import org.hibernate.search.engine.search.aggregation.AggregationKey;
 import org.hibernate.search.engine.search.common.ValueModel;
-import org.hibernate.search.engine.search.predicate.dsl.SearchPredicateFactory;
+import org.hibernate.search.engine.search.predicate.dsl.TypedSearchPredicateFactory;
 import org.hibernate.search.engine.search.query.SearchQuery;
 import org.hibernate.search.engine.search.query.SearchResult;
 import org.hibernate.search.engine.search.query.dsl.SearchQueryOptionsStep;
@@ -76,7 +76,7 @@ public class MetricAggregationsTestCase<F> {
 		Class<T> javaClass = typeAssertionHelper.getJavaClass();
 
 		SearchQueryOptionsStep<?, ?, DocumentReference, StubLoadingOptionsStep, ?, ?> step = scope.query()
-				.where( SearchPredicateFactory::matchAll )
+				.where( TypedSearchPredicateFactory::matchAll )
 				.aggregation( result.minKey, f -> f.min().field( fieldPath, javaClass, valueModel ) )
 				.aggregation( result.maxKey, f -> f.max().field( fieldPath, javaClass, valueModel ) )
 				.aggregation( result.countKey, f -> f.count().field( fieldPath ) )
