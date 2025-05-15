@@ -61,6 +61,6 @@ public interface MatchAllPredicateOptionsStep<SR, S extends MatchAllPredicateOpt
 	 * Should generally be a lambda expression.
 	 * @return {@code this}, for method chaining.
 	 */
-	S except(Function<? super SearchPredicateFactory<SR>, ? extends PredicateFinalStep> clauseContributor);
+	S except(Function<? super TypedSearchPredicateFactory<SR>, ? extends PredicateFinalStep> clauseContributor);
 
 }

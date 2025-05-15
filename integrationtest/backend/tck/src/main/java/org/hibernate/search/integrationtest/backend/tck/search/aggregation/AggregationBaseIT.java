@@ -149,26 +149,26 @@ class AggregationBaseIT {
 		}
 	}
 
-	private static class SupportedExtension implements SearchAggregationFactoryExtension<Object, MyExtendedFactory> {
+	private static class SupportedExtension implements SearchAggregationFactoryExtension<MyExtendedFactory> {
 		@Override
-		public Optional<MyExtendedFactory> extendOptional(SearchAggregationFactory<Object> original) {
+		public Optional<MyExtendedFactory> extendOptional(SearchAggregationFactory original) {
 			assertThat( original ).isNotNull();
 			return Optional.of( new MyExtendedFactory( original ) );
 		}
 	}
 
-	private static class UnSupportedExtension implements SearchAggregationFactoryExtension<Object, MyExtendedFactory> {
+	private static class UnSupportedExtension implements SearchAggregationFactoryExtension<MyExtendedFactory> {
 		@Override
-		public Optional<MyExtendedFactory> extendOptional(SearchAggregationFactory<Object> original) {
+		public Optional<MyExtendedFactory> extendOptional(SearchAggregationFactory original) {
 			assertThat( original ).isNotNull();
 			return Optional.empty();
 		}
 	}
 
 	private static class MyExtendedFactory {
-		private final SearchAggregationFactory<?> delegate;
+		private final SearchAggregationFactory delegate;
 
-		MyExtendedFactory(SearchAggregationFactory<?> delegate) {
+		MyExtendedFactory(SearchAggregationFactory delegate) {
 			this.delegate = delegate;
 		}
 

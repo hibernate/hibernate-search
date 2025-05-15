@@ -133,7 +133,7 @@ public abstract class AbstractSearchProjectionFactory<
 	}
 
 	@Override
-	public <T> T extension(SearchProjectionFactoryExtension<SR, T, R, E> extension) {
+	public <T> T extension(SearchProjectionFactoryExtension<T, R, E> extension) {
 		return DslExtensionState.returnIfSupported(
 				extension, extension.extendOptional( this )
 		);

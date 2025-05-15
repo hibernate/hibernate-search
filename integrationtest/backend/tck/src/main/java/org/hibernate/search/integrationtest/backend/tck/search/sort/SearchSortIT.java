@@ -33,6 +33,7 @@ import org.hibernate.search.engine.search.sort.dsl.FieldSortOptionsStep;
 import org.hibernate.search.engine.search.sort.dsl.SearchSortFactory;
 import org.hibernate.search.engine.search.sort.dsl.SearchSortFactoryExtension;
 import org.hibernate.search.engine.search.sort.dsl.SortFinalStep;
+import org.hibernate.search.engine.search.sort.dsl.TypedSearchSortFactory;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.configuration.DefaultAnalysisDefinitions;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.extension.SearchSetupHelper;
 import org.hibernate.search.util.common.SearchException;
@@ -81,7 +82,7 @@ class SearchSortIT {
 	}
 
 	private SearchQuery<DocumentReference> simpleQuery(
-			Function<? super SearchSortFactory<?>, ? extends SortFinalStep> sortContributor) {
+			Function<? super TypedSearchSortFactory<?>, ? extends SortFinalStep> sortContributor) {
 		StubMappingScope scope = mainIndex.createScope();
 		return scope.query()
 				.where( f -> f.matchAll() )
@@ -554,30 +555,30 @@ class SearchSortIT {
 		}
 	}
 
-	private static class SupportedExtension<SR> implements SearchSortFactoryExtension<SR, MyExtendedFactory<SR>> {
+	private static class SupportedExtension<SR> implements SearchSortFactoryExtension<MyExtendedFactory<SR>> {
 		@Override
-		public Optional<MyExtendedFactory<SR>> extendOptional(SearchSortFactory<SR> original) {
+		public Optional<MyExtendedFactory<SR>> extendOptional(SearchSortFactory original) {
 			assertThat( original ).isNotNull();
 			return Optional.of( new MyExtendedFactory<>( original ) );
 		}
 	}
 
-	private static class UnSupportedExtension<SR> implements SearchSortFactoryExtension<SR, MyExtendedFactory<SR>> {
+	private static class UnSupportedExtension<SR> implements SearchSortFactoryExtension<MyExtendedFactory<SR>> {
 		@Override
-		public Optional<MyExtendedFactory<SR>> extendOptional(SearchSortFactory<SR> original) {
+		public Optional<MyExtendedFactory<SR>> extendOptional(SearchSortFactory original) {
 			assertThat( original ).isNotNull();
 			return Optional.empty();
 		}
 	}
 
 	private static class MyExtendedFactory<SR> {
-		private final SearchSortFactory<SR> delegate;
+		private final SearchSortFactory delegate;
 
-		MyExtendedFactory(SearchSortFactory<SR> delegate) {
+		MyExtendedFactory(SearchSortFactory delegate) {
 			this.delegate = delegate;
 		}
 
-		public FieldSortOptionsStep<SR, ?, ? extends SearchPredicateFactory<SR>> extendedSort(String absoluteFieldPath) {
+		public FieldSortOptionsStep<?, ?, ? extends SearchPredicateFactory> extendedSort(String absoluteFieldPath) {
 			return delegate.field( absoluteFieldPath );
 		}
 	}

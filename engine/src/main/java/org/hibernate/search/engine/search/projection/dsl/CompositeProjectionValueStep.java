@@ -32,11 +32,11 @@ public interface CompositeProjectionValueStep<N extends CompositeProjectionOptio
 	/**
 	 * Defines the projection as multi-valued, i.e. returning {@code List<T>} instead of {@code T}.
 	 * <p>
-	 * Calling {@link #multi()} is mandatory for {@link SearchProjectionFactory#object(String) object projections}
+	 * Calling {@link #multi()} is mandatory for {@link TypedSearchProjectionFactory#object(String) object projections}
 	 * on multi-valued object fields,
 	 * otherwise the projection will throw an exception upon creating the search query.
 	 * <p>
-	 * Calling {@link #multi()} on {@link SearchProjectionFactory#composite() basic composite projections}
+	 * Calling {@link #multi()} on {@link TypedSearchProjectionFactory#composite() basic composite projections}
 	 * is generally not useful: the only effect is that projected values will be wrapped in a one-element {@link List}.
 	 *
 	 * @return A new step to define optional parameters for the projection.

@@ -5,7 +5,7 @@
 package org.hibernate.search.engine.search.predicate.dsl;
 
 /**
- * A base interface for subtypes of {@link SearchPredicateFactory} allowing to
+ * A base interface for subtypes of {@link TypedSearchPredicateFactory} allowing to
  * easily override the self type for all relevant methods.
  * <p>
  * <strong>Warning:</strong> Generic parameters of this type are subject to change,
@@ -15,7 +15,7 @@ package org.hibernate.search.engine.search.predicate.dsl;
  * @param <S> The self type, i.e. the exposed type of this factory.
  */
 public interface ExtendedSearchPredicateFactory<SR, S extends ExtendedSearchPredicateFactory<SR, ?>>
-		extends SearchPredicateFactory<SR> {
+		extends TypedSearchPredicateFactory<SR> {
 
 	@Override
 	S withRoot(String objectFieldPath);

@@ -8,6 +8,7 @@ import java.util.Optional;
 
 import org.hibernate.search.engine.common.tree.TreeFilterDefinition;
 import org.hibernate.search.engine.search.projection.ProjectionCollector;
+import org.hibernate.search.engine.search.projection.dsl.TypedSearchProjectionFactory;
 import org.hibernate.search.mapper.pojo.logging.impl.ProjectionLog;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.ObjectProjection;
 import org.hibernate.search.mapper.pojo.model.PojoModelValue;
@@ -26,7 +27,7 @@ import org.hibernate.search.mapper.pojo.search.definition.binding.ProjectionBind
  * Therefore, you must take care of using a {@code List<...>} as your constructor parameter type
  * if the object field is multi-valued.
  *
- * @see org.hibernate.search.engine.search.projection.dsl.SearchProjectionFactory#object(String)
+ * @see TypedSearchProjectionFactory#object(String)
  * @see org.hibernate.search.engine.search.projection.dsl.CompositeProjectionInnerStep#as(Class)
  * @see org.hibernate.search.mapper.pojo.mapping.definition.annotation.ObjectProjection
  */

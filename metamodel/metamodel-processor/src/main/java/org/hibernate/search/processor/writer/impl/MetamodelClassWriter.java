@@ -221,7 +221,7 @@ public class MetamodelClassWriter {
 		return String.format( Locale.ROOT, ormMapperPresent
 				? """
 							@Override
-							public org.hibernate.search.mapper.orm.scope.SearchScope<%s, %s> scope(org.hibernate.search.mapper.orm.scope.SearchScopeProvider scopeProvider) {
+							public org.hibernate.search.mapper.orm.scope.TypedSearchScope<%s, %s> scope(org.hibernate.search.mapper.orm.scope.SearchScopeProvider scopeProvider) {
 								return scopeProvider.scope( %s.class );
 							}
 						"""

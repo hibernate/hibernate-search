@@ -19,7 +19,7 @@ import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaObjectF
 import org.hibernate.search.engine.backend.types.ObjectStructure;
 import org.hibernate.search.engine.search.common.BooleanOperator;
 import org.hibernate.search.engine.search.predicate.dsl.CommonQueryStringPredicateFieldStep;
-import org.hibernate.search.engine.search.predicate.dsl.SearchPredicateFactory;
+import org.hibernate.search.engine.search.predicate.dsl.TypedSearchPredicateFactory;
 import org.hibernate.search.engine.search.query.SearchQuery;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.configuration.DefaultAnalysisDefinitions;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.AnalyzedStringFieldTypeDescriptor;
@@ -505,5 +505,5 @@ abstract class AbstractBaseQueryStringPredicateSpecificsIT<P extends CommonQuery
 		return value;
 	}
 
-	abstract P predicate(SearchPredicateFactory<?> f);
+	abstract P predicate(TypedSearchPredicateFactory<?> f);
 }

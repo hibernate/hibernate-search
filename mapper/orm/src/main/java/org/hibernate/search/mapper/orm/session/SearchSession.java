@@ -18,6 +18,7 @@ import org.hibernate.search.mapper.orm.schema.management.SearchSchemaManager;
 import org.hibernate.search.mapper.orm.scope.HibernateOrmRootReferenceScope;
 import org.hibernate.search.mapper.orm.scope.SearchScope;
 import org.hibernate.search.mapper.orm.scope.SearchScopeProvider;
+import org.hibernate.search.mapper.orm.scope.TypedSearchScope;
 import org.hibernate.search.mapper.orm.search.loading.dsl.SearchLoadingOptionsStep;
 import org.hibernate.search.mapper.orm.work.SearchIndexingPlan;
 import org.hibernate.search.mapper.orm.work.SearchWorkspace;
@@ -93,7 +94,26 @@ public interface SearchSession extends SearchScopeProvider {
 			T,
 			SearchLoadingOptionsStep,
 			?,
-			?> search(SearchScope<SR, T> scope);
+			?> search(TypedSearchScope<SR, T> scope);
+
+	/**
+	 * Initiate the building of a search query.
+	 * <p>
+	 * The query will target the indexes in the given scope.
+	 *
+	 * @param scope A scope representing all indexed types that will be targeted by the search query.
+	 * @param <T> A supertype of all types in the given scope.
+	 * @return The initial step of a DSL where the search query can be defined.
+	 * @see SearchQuerySelectStep
+	 */
+	@SuppressWarnings("deprecation")
+	<T> SearchQuerySelectStep<?,
+			?,
+			org.hibernate.search.mapper.orm.common.EntityReference,
+			T,
+			SearchLoadingOptionsStep,
+			?,
+			?> search(SearchScope<T> scope);
 
 	/**
 	 * Initiate the building of a search query.

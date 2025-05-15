@@ -874,27 +874,27 @@ class SearchProjectionIT {
 	}
 
 	private static class SupportedExtension<SR, R, E>
-			implements SearchProjectionFactoryExtension<SR, MyExtendedFactory<SR, R, E>, R, E> {
+			implements SearchProjectionFactoryExtension<MyExtendedFactory<SR, R, E>, R, E> {
 		@Override
-		public Optional<MyExtendedFactory<SR, R, E>> extendOptional(SearchProjectionFactory<SR, R, E> original) {
+		public Optional<MyExtendedFactory<SR, R, E>> extendOptional(SearchProjectionFactory<R, E> original) {
 			assertThat( original ).isNotNull();
 			return Optional.of( new MyExtendedFactory<>( original ) );
 		}
 	}
 
 	private static class UnSupportedExtension<SR, R, E>
-			implements SearchProjectionFactoryExtension<SR, MyExtendedFactory<SR, R, E>, R, E> {
+			implements SearchProjectionFactoryExtension<MyExtendedFactory<SR, R, E>, R, E> {
 		@Override
-		public Optional<MyExtendedFactory<SR, R, E>> extendOptional(SearchProjectionFactory<SR, R, E> original) {
+		public Optional<MyExtendedFactory<SR, R, E>> extendOptional(SearchProjectionFactory<R, E> original) {
 			assertThat( original ).isNotNull();
 			return Optional.empty();
 		}
 	}
 
 	private static class MyExtendedFactory<SR, R, E> {
-		private final SearchProjectionFactory<SR, R, E> delegate;
+		private final SearchProjectionFactory<R, E> delegate;
 
-		MyExtendedFactory(SearchProjectionFactory<SR, R, E> delegate) {
+		MyExtendedFactory(SearchProjectionFactory<R, E> delegate) {
 			this.delegate = delegate;
 		}
 

@@ -17,7 +17,7 @@ import org.hibernate.search.engine.backend.types.Aggregable;
 import org.hibernate.search.engine.search.aggregation.AggregationKey;
 import org.hibernate.search.mapper.orm.Search;
 import org.hibernate.search.mapper.orm.cfg.HibernateOrmMapperSettings;
-import org.hibernate.search.mapper.orm.scope.SearchScope;
+import org.hibernate.search.mapper.orm.scope.TypedSearchScope;
 import org.hibernate.search.mapper.orm.session.SearchSession;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.GenericField;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
@@ -55,7 +55,7 @@ class AggregationTypesIT {
 
 		try ( var s = sessionFactory.openSession() ) {
 			SearchSession session = Search.session( s );
-			SearchScope<AggregationTypesIT_IndexedEntity__, IndexedEntity> scope =
+			TypedSearchScope<AggregationTypesIT_IndexedEntity__, IndexedEntity> scope =
 					AggregationTypesIT_IndexedEntity__.INDEX.scope( session );
 			assertThat( session.search( scope )
 					.where( f -> f.matchAll() )

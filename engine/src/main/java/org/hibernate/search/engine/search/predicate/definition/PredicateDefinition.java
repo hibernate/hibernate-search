@@ -5,7 +5,7 @@
 package org.hibernate.search.engine.search.predicate.definition;
 
 import org.hibernate.search.engine.search.predicate.SearchPredicate;
-import org.hibernate.search.engine.search.predicate.dsl.SearchPredicateFactory;
+import org.hibernate.search.engine.search.predicate.dsl.TypedSearchPredicateFactory;
 import org.hibernate.search.util.common.annotation.Incubating;
 
 /**
@@ -25,7 +25,7 @@ public interface PredicateDefinition {
 
 	/**
 	 * Creates a predicate.
-	 * @param context The context, exposing in particular a {@link SearchPredicateFactory}.
+	 * @param context The context, exposing in particular a {@link TypedSearchPredicateFactory}.
 	 * @return The created {@link SearchPredicate}.
 	 */
 	SearchPredicate create(PredicateDefinitionContext<?> context);

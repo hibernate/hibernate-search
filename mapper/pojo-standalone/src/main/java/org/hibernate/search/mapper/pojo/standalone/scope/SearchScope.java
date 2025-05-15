@@ -11,14 +11,14 @@ import org.hibernate.search.engine.backend.scope.IndexScopeExtension;
 import org.hibernate.search.engine.common.EntityReference;
 import org.hibernate.search.engine.search.aggregation.AggregationKey;
 import org.hibernate.search.engine.search.aggregation.SearchAggregation;
-import org.hibernate.search.engine.search.aggregation.dsl.SearchAggregationFactory;
+import org.hibernate.search.engine.search.aggregation.dsl.TypedSearchAggregationFactory;
 import org.hibernate.search.engine.search.highlighter.dsl.SearchHighlighterFactory;
-import org.hibernate.search.engine.search.predicate.dsl.SearchPredicateFactory;
-import org.hibernate.search.engine.search.projection.dsl.SearchProjectionFactory;
+import org.hibernate.search.engine.search.predicate.dsl.TypedSearchPredicateFactory;
+import org.hibernate.search.engine.search.projection.dsl.TypedSearchProjectionFactory;
 import org.hibernate.search.engine.search.query.dsl.SearchQueryOptionsStep;
 import org.hibernate.search.engine.search.query.dsl.SearchQuerySelectStep;
 import org.hibernate.search.engine.search.query.dsl.SearchQueryWhereStep;
-import org.hibernate.search.engine.search.sort.dsl.SearchSortFactory;
+import org.hibernate.search.engine.search.sort.dsl.TypedSearchSortFactory;
 import org.hibernate.search.mapper.pojo.standalone.entity.SearchIndexedEntity;
 import org.hibernate.search.mapper.pojo.standalone.massindexing.MassIndexer;
 import org.hibernate.search.mapper.pojo.standalone.schema.management.SearchSchemaManager;
@@ -54,9 +54,9 @@ public interface SearchScope<SR, E> {
 	 * removing the need to create separate objects to represent the predicates.
 	 *
 	 * @return A predicate factory.
-	 * @see SearchPredicateFactory
+	 * @see TypedSearchPredicateFactory
 	 */
-	SearchPredicateFactory<SR> predicate();
+	TypedSearchPredicateFactory<SR> predicate();
 
 	/**
 	 * Initiate the building of a search sort.
@@ -70,9 +70,9 @@ public interface SearchScope<SR, E> {
 	 * removing the need to create separate objects to represent the sorts.
 	 *
 	 * @return A sort factory.
-	 * @see SearchSortFactory
+	 * @see TypedSearchSortFactory
 	 */
-	SearchSortFactory<SR> sort();
+	TypedSearchSortFactory<SR> sort();
 
 	/**
 	 * Initiate the building of a search projection that will be valid for the indexes in this scope.
@@ -86,9 +86,9 @@ public interface SearchScope<SR, E> {
 	 * removing the need to create separate objects to represent the projections.
 	 *
 	 * @return A projection factory.
-	 * @see SearchProjectionFactory
+	 * @see TypedSearchProjectionFactory
 	 */
-	SearchProjectionFactory<SR, EntityReference, E> projection();
+	TypedSearchProjectionFactory<SR, EntityReference, E> projection();
 
 	/**
 	 * Initiate the building of a search aggregation that will be valid for the indexes in this scope.
@@ -102,9 +102,9 @@ public interface SearchScope<SR, E> {
 	 * removing the need to create separate objects to represent the aggregation.
 	 *
 	 * @return An aggregation factory.
-	 * @see SearchAggregationFactory
+	 * @see TypedSearchAggregationFactory
 	 */
-	SearchAggregationFactory<SR> aggregation();
+	TypedSearchAggregationFactory<SR> aggregation();
 
 	/**
 	 * Initiate the building of a highlighter that will be valid for the indexes in this scope.

@@ -8,7 +8,7 @@ import java.util.Optional;
 
 import org.hibernate.search.engine.search.common.NamedValues;
 import org.hibernate.search.engine.search.predicate.dsl.NamedPredicateOptionsStep;
-import org.hibernate.search.engine.search.predicate.dsl.SearchPredicateFactory;
+import org.hibernate.search.engine.search.predicate.dsl.TypedSearchPredicateFactory;
 import org.hibernate.search.util.common.SearchException;
 import org.hibernate.search.util.common.annotation.Incubating;
 
@@ -26,9 +26,9 @@ public interface PredicateDefinitionContext<SR> {
 	 * this factory expects field paths to be provided relative to that same object field.
 	 * This factory is only valid in the present context and must not be used after
 	 * {@link PredicateDefinition#create(PredicateDefinitionContext<SR>)} returns.
-	 * @see SearchPredicateFactory
+	 * @see TypedSearchPredicateFactory
 	 */
-	SearchPredicateFactory<SR> predicate();
+	TypedSearchPredicateFactory<SR> predicate();
 
 	/**
 	 * @param name The name of the parameter.

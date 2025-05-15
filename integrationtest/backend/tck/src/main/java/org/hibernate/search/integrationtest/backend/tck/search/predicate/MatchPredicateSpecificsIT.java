@@ -16,7 +16,7 @@ import org.hibernate.search.engine.backend.common.DocumentReference;
 import org.hibernate.search.engine.backend.document.DocumentElement;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaElement;
 import org.hibernate.search.engine.reporting.spi.EventContexts;
-import org.hibernate.search.engine.search.predicate.dsl.SearchPredicateFactory;
+import org.hibernate.search.engine.search.predicate.dsl.TypedSearchPredicateFactory;
 import org.hibernate.search.engine.search.query.dsl.SearchQueryFinalStep;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.configuration.DefaultAnalysisDefinitions;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.AnalyzedStringFieldTypeDescriptor;
@@ -219,7 +219,7 @@ class MatchPredicateSpecificsIT {
 
 	@Test
 	void unsupportedFieldType() {
-		SearchPredicateFactory<?> f = index.createScope().predicate();
+		TypedSearchPredicateFactory<?> f = index.createScope().predicate();
 
 		for ( FieldTypeDescriptor<?, ?> fieldType : unsupportedFieldTypes ) {
 			SimpleFieldModel<?> fieldModel = index.binding().unsupportedTypeFields.get( fieldType );
@@ -257,7 +257,7 @@ class MatchPredicateSpecificsIT {
 
 	@Test
 	void invalidMaxEditDistance() {
-		SearchPredicateFactory<?> f = index.createScope().predicate();
+		TypedSearchPredicateFactory<?> f = index.createScope().predicate();
 		String absoluteFieldPath = index.binding().analyzedStringField.relativeFieldName;
 
 		assertThatThrownBy( () -> f.match().field( absoluteFieldPath )
@@ -275,7 +275,7 @@ class MatchPredicateSpecificsIT {
 
 	@Test
 	void invalidPrefixLength() {
-		SearchPredicateFactory<?> f = index.createScope().predicate();
+		TypedSearchPredicateFactory<?> f = index.createScope().predicate();
 		String absoluteFieldPath = index.binding().analyzedStringField.relativeFieldName;
 
 		assertThatThrownBy( () -> f.match().field( absoluteFieldPath )

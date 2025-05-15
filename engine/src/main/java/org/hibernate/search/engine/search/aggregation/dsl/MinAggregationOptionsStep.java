@@ -6,7 +6,7 @@ package org.hibernate.search.engine.search.aggregation.dsl;
 
 import java.util.function.Function;
 
-import org.hibernate.search.engine.search.predicate.dsl.SearchPredicateFactory;
+import org.hibernate.search.engine.search.predicate.dsl.TypedSearchPredicateFactory;
 import org.hibernate.search.util.common.annotation.Incubating;
 
 /**
@@ -21,7 +21,7 @@ import org.hibernate.search.util.common.annotation.Incubating;
 public interface MinAggregationOptionsStep<
 		SR,
 		S extends MinAggregationOptionsStep<SR, ?, PDF, F>,
-		PDF extends SearchPredicateFactory<SR>,
+		PDF extends TypedSearchPredicateFactory<SR>,
 		F>
 		extends AggregationFinalStep<F>, AggregationFilterStep<SR, S, PDF> {
 

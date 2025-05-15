@@ -4,7 +4,7 @@
  */
 package org.hibernate.search.mapper.pojo.search.definition.binding.builtin;
 
-import org.hibernate.search.engine.search.projection.dsl.SearchProjectionFactory;
+import org.hibernate.search.engine.search.projection.dsl.TypedSearchProjectionFactory;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.ProjectionConstructor;
 import org.hibernate.search.mapper.pojo.search.definition.binding.ProjectionBinder;
 import org.hibernate.search.mapper.pojo.search.definition.binding.ProjectionBindingContext;
@@ -20,7 +20,7 @@ import org.hibernate.search.mapper.pojo.search.definition.binding.ProjectionBind
  * a composite projection is not bound to a specific object field,
  * and thus it will always yield one and only one value.
  *
- * @see SearchProjectionFactory#composite()
+ * @see TypedSearchProjectionFactory#composite()
  * @see org.hibernate.search.engine.search.projection.dsl.CompositeProjectionInnerStep#as(Class)
  * @see org.hibernate.search.mapper.pojo.mapping.definition.annotation.CompositeProjection
  */

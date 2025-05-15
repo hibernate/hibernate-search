@@ -14,7 +14,7 @@ import org.hibernate.search.engine.backend.types.VectorSimilarity;
 import org.hibernate.search.engine.backend.types.dsl.VectorFieldTypeOptionsStep;
 import org.hibernate.search.engine.search.predicate.dsl.KnnPredicateOptionsStep;
 import org.hibernate.search.engine.search.predicate.dsl.PredicateFinalStep;
-import org.hibernate.search.engine.search.predicate.dsl.SearchPredicateFactory;
+import org.hibernate.search.engine.search.predicate.dsl.TypedSearchPredicateFactory;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.FieldTypeDescriptor;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.StandardFieldTypeDescriptor;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.VectorFieldTypeDescriptor;
@@ -106,14 +106,14 @@ class KnnPredicateBaseIT {
 		}
 
 		@Override
-		protected PredicateFinalStep predicate(SearchPredicateFactory<?> f, String fieldPath, int matchingDocOrdinal,
+		protected PredicateFinalStep predicate(TypedSearchPredicateFactory<?> f, String fieldPath, int matchingDocOrdinal,
 				DataSet<?, KnnPredicateTestValues<F>> dataSet) {
 			return knnPredicateOptionsStep( f, fieldPath, matchingDocOrdinal,
 					dataSet.values.matchingArg( matchingDocOrdinal ) );
 		}
 
 		@Override
-		protected PredicateFinalStep predicate(SearchPredicateFactory<?> f, String fieldPath, String paramName,
+		protected PredicateFinalStep predicate(TypedSearchPredicateFactory<?> f, String fieldPath, String paramName,
 				DataSet<?, KnnPredicateTestValues<F>> dataSet) {
 			return f.withParameters( params -> {
 				Object param = params.get( paramName, dataSet.fieldType.getJavaType() );
@@ -163,7 +163,7 @@ class KnnPredicateBaseIT {
 		}
 
 		@Override
-		protected PredicateFinalStep predicate(SearchPredicateFactory<?> f, String fieldPath, int matchingDocOrdinal,
+		protected PredicateFinalStep predicate(TypedSearchPredicateFactory<?> f, String fieldPath, int matchingDocOrdinal,
 				DataSet<?, KnnPredicateTestValues<F>> dataSet) {
 			return knnPredicateOptionsStep( f, fieldPath, matchingDocOrdinal,
 					dataSet.values.matchingArg( matchingDocOrdinal ) );
@@ -184,7 +184,7 @@ class KnnPredicateBaseIT {
 		}
 
 		@Override
-		protected void tryPredicate(SearchPredicateFactory<?> f, String fieldPath) {
+		protected void tryPredicate(TypedSearchPredicateFactory<?> f, String fieldPath) {
 			f.knn( 1 ).field( fieldPath ).matching( new byte[] { 1 } );
 		}
 
@@ -216,7 +216,7 @@ class KnnPredicateBaseIT {
 		}
 
 		@Override
-		protected void tryPredicate(SearchPredicateFactory<?> f, String fieldPath) {
+		protected void tryPredicate(TypedSearchPredicateFactory<?> f, String fieldPath) {
 			f.knn( 1 ).field( fieldPath ).matching( new byte[] { 1 } );
 		}
 
@@ -255,7 +255,7 @@ class KnnPredicateBaseIT {
 		}
 
 		@Override
-		protected void tryPredicate(SearchPredicateFactory<?> f, String fieldPath, FieldTypeDescriptor<?, ?> fieldType) {
+		protected void tryPredicate(TypedSearchPredicateFactory<?> f, String fieldPath, FieldTypeDescriptor<?, ?> fieldType) {
 			if ( byte[].class.equals( fieldType.getJavaType() ) ) {
 				f.knn( 1 ).field( fieldPath ).matching(
 						new byte[( (VectorFieldTypeDescriptor<?>) fieldType ).vectorSize()] );
@@ -304,46 +304,47 @@ class KnnPredicateBaseIT {
 		}
 
 		@Override
-		protected KnnPredicateOptionsStep<?> predicate(SearchPredicateFactory<?> f, String fieldPath, int matchingDocOrdinal,
+		protected KnnPredicateOptionsStep<?> predicate(TypedSearchPredicateFactory<?> f, String fieldPath,
+				int matchingDocOrdinal,
 				DataSet<?, KnnPredicateTestValues<F>> dataSet) {
 			return knnPredicateOptionsStep( f, fieldPath, matchingDocOrdinal,
 					dataSet.values.matchingArg( matchingDocOrdinal ) );
 		}
 
 		@Override
-		protected PredicateFinalStep predicateWithConstantScore(SearchPredicateFactory<?> f, String[] fieldPaths,
+		protected PredicateFinalStep predicateWithConstantScore(TypedSearchPredicateFactory<?> f, String[] fieldPaths,
 				int matchingDocOrdinal, DataSet<?, KnnPredicateTestValues<F>> dataSet) {
 			return predicate( f, fieldPaths[0], matchingDocOrdinal, dataSet ).constantScore();
 		}
 
 		@Override
-		protected PredicateFinalStep predicateWithPredicateLevelBoost(SearchPredicateFactory<?> f, String[] fieldPaths,
+		protected PredicateFinalStep predicateWithPredicateLevelBoost(TypedSearchPredicateFactory<?> f, String[] fieldPaths,
 				int matchingDocOrdinal, float predicateBoost, DataSet<?, KnnPredicateTestValues<F>> dataSet) {
 			return predicate( f, fieldPaths[0], matchingDocOrdinal, dataSet ).boost( predicateBoost );
 		}
 
 		@Override
-		protected PredicateFinalStep predicateWithConstantScoreAndPredicateLevelBoost(SearchPredicateFactory<?> f,
+		protected PredicateFinalStep predicateWithConstantScoreAndPredicateLevelBoost(TypedSearchPredicateFactory<?> f,
 				String[] fieldPaths, int matchingDocOrdinal, float predicateBoost,
 				DataSet<?, KnnPredicateTestValues<F>> dataSet) {
 			return predicate( f, fieldPaths[0], matchingDocOrdinal, dataSet ).constantScore().boost( predicateBoost );
 		}
 
 		@Override
-		protected PredicateFinalStep predicateWithFieldLevelBoost(SearchPredicateFactory<?> f, String fieldPath,
+		protected PredicateFinalStep predicateWithFieldLevelBoost(TypedSearchPredicateFactory<?> f, String fieldPath,
 				float fieldBoost, int matchingDocOrdinal, DataSet<?, KnnPredicateTestValues<F>> dataSet) {
 			return predicate( f, fieldPath, matchingDocOrdinal, dataSet ).constantScore().boost( fieldBoost );
 		}
 
 		@Override
-		protected PredicateFinalStep predicateWithFieldLevelBoostAndConstantScore(SearchPredicateFactory<?> f,
+		protected PredicateFinalStep predicateWithFieldLevelBoostAndConstantScore(TypedSearchPredicateFactory<?> f,
 				String fieldPath, float fieldBoost, int matchingDocOrdinal,
 				DataSet<?, KnnPredicateTestValues<F>> dataSet) {
 			return predicate( f, fieldPath, matchingDocOrdinal, dataSet ).constantScore().constantScore();
 		}
 
 		@Override
-		protected PredicateFinalStep predicateWithFieldLevelBoostAndPredicateLevelBoost(SearchPredicateFactory<?> f,
+		protected PredicateFinalStep predicateWithFieldLevelBoostAndPredicateLevelBoost(TypedSearchPredicateFactory<?> f,
 				String fieldPath, float fieldBoost, int matchingDocOrdinal, float predicateBoost,
 				DataSet<?, KnnPredicateTestValues<F>> dataSet) {
 			return predicate( f, fieldPath, matchingDocOrdinal, dataSet ).constantScore().boost( fieldBoost );
@@ -354,7 +355,7 @@ class KnnPredicateBaseIT {
 		return new KnnPredicateTestValues<>( fieldType );
 	}
 
-	private static <F> KnnPredicateOptionsStep<?> knnPredicateOptionsStep(SearchPredicateFactory<?> f, String fieldPath,
+	private static <F> KnnPredicateOptionsStep<?> knnPredicateOptionsStep(TypedSearchPredicateFactory<?> f, String fieldPath,
 			int matchingDocOrdinal, F matchingArg) {
 		if ( matchingArg instanceof byte[] ) {
 			return f.knn( 1 ).field( fieldPath ).matching( ( (byte[]) matchingArg ) );

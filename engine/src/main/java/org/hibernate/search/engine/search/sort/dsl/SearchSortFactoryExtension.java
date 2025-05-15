@@ -14,14 +14,13 @@ import java.util.Optional;
  * In short, users are only expected to get instances of this type from an API ({@code SomeExtension.get()})
  * and pass it to another API.
  *
- * @param <SR> Scope root type.
  * @param <T> The type of extended sort factories. Should generally extend
  * {@link SearchSortFactory}.
  *
  * @see SearchSortFactory#extension(SearchSortFactoryExtension)
  * @see ExtendedSearchSortFactory
  */
-public interface SearchSortFactoryExtension<SR, T> {
+public interface SearchSortFactoryExtension<T> {
 
 	/**
 	 * Attempt to extend a given factory, returning an empty {@link Optional} in case of failure.
@@ -32,6 +31,6 @@ public interface SearchSortFactoryExtension<SR, T> {
 	 * @return An optional containing the extended sort factory ({@link T}) in case
 	 * of success, or an empty optional otherwise.
 	 */
-	Optional<T> extendOptional(SearchSortFactory<SR> original);
+	Optional<T> extendOptional(SearchSortFactory original);
 
 }

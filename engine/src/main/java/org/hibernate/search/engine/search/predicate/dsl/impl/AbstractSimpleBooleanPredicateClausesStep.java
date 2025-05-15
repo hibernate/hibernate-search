@@ -11,8 +11,8 @@ import java.util.function.Function;
 import org.hibernate.search.engine.search.predicate.SearchPredicate;
 import org.hibernate.search.engine.search.predicate.dsl.GenericSimpleBooleanPredicateClausesStep;
 import org.hibernate.search.engine.search.predicate.dsl.PredicateFinalStep;
-import org.hibernate.search.engine.search.predicate.dsl.SearchPredicateFactory;
 import org.hibernate.search.engine.search.predicate.dsl.SimpleBooleanPredicateClausesCollector;
+import org.hibernate.search.engine.search.predicate.dsl.TypedSearchPredicateFactory;
 import org.hibernate.search.engine.search.predicate.dsl.spi.AbstractPredicateFinalStep;
 import org.hibernate.search.engine.search.predicate.dsl.spi.SearchPredicateDslContext;
 import org.hibernate.search.engine.search.predicate.spi.BooleanPredicateBuilder;
@@ -46,11 +46,11 @@ public abstract class AbstractSimpleBooleanPredicateClausesStep<
 
 	private final BooleanPredicateBuilder builder;
 
-	private final SearchPredicateFactory<SR> factory;
+	private final TypedSearchPredicateFactory<SR> factory;
 
 	AbstractSimpleBooleanPredicateClausesStep(SimpleBooleanPredicateOperator operator,
 			SearchPredicateDslContext<?> dslContext,
-			SearchPredicateFactory<SR> factory) {
+			TypedSearchPredicateFactory<SR> factory) {
 		super( dslContext );
 		this.operator = operator;
 		this.builder = dslContext.scope().predicateBuilders().bool();
@@ -66,7 +66,7 @@ public abstract class AbstractSimpleBooleanPredicateClausesStep<
 	}
 
 	@Override
-	public S add(Function<? super SearchPredicateFactory<SR>, ? extends PredicateFinalStep> clauseContributor) {
+	public S add(Function<? super TypedSearchPredicateFactory<SR>, ? extends PredicateFinalStep> clauseContributor) {
 		return add( clauseContributor.apply( factory ) );
 	}
 

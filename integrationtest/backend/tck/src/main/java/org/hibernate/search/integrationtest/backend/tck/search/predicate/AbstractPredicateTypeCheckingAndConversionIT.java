@@ -24,7 +24,7 @@ import org.hibernate.search.engine.backend.types.dsl.StandardIndexFieldTypeOptio
 import org.hibernate.search.engine.reporting.spi.EventContexts;
 import org.hibernate.search.engine.search.common.ValueModel;
 import org.hibernate.search.engine.search.predicate.dsl.PredicateFinalStep;
-import org.hibernate.search.engine.search.predicate.dsl.SearchPredicateFactory;
+import org.hibernate.search.engine.search.predicate.dsl.TypedSearchPredicateFactory;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.FieldTypeDescriptor;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.IntegerFieldTypeDescriptor;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.InvalidType;
@@ -67,7 +67,7 @@ public abstract class AbstractPredicateTypeCheckingAndConversionIT<V extends Abs
 			SimpleMappedIndex<MissingFieldIndexBinding> missingFieldIndex,
 			SimpleMappedIndex<IncompatibleIndexBinding> incompatibleIndex,
 			DataSet<?, V> dataSet) {
-		SearchPredicateFactory<?> f = index.createScope().predicate();
+		TypedSearchPredicateFactory<?> f = index.createScope().predicate();
 		assertThatThrownBy( () -> predicate( f, defaultDslConverterField0Path( index, dataSet ), invalidTypeParam() ) )
 				.isInstanceOf( SearchException.class )
 				.hasMessageContaining( "Unable to convert DSL argument: " )
@@ -102,7 +102,7 @@ public abstract class AbstractPredicateTypeCheckingAndConversionIT<V extends Abs
 			SimpleMappedIndex<MissingFieldIndexBinding> missingFieldIndex,
 			SimpleMappedIndex<IncompatibleIndexBinding> incompatibleIndex,
 			DataSet<?, V> dataSet) {
-		SearchPredicateFactory<?> f = index.createScope().predicate();
+		TypedSearchPredicateFactory<?> f = index.createScope().predicate();
 		assertThatThrownBy( () -> predicate( f, customDslConverterField0Path( index, dataSet ), invalidTypeParam() ) )
 				.isInstanceOf( SearchException.class )
 				.hasMessageContaining( "Unable to convert DSL argument: " )
@@ -153,7 +153,7 @@ public abstract class AbstractPredicateTypeCheckingAndConversionIT<V extends Abs
 			SimpleMappedIndex<MissingFieldIndexBinding> missingFieldIndex,
 			SimpleMappedIndex<IncompatibleIndexBinding> incompatibleIndex,
 			DataSet<?, V> dataSet) {
-		SearchPredicateFactory<?> f = index.createScope().predicate();
+		TypedSearchPredicateFactory<?> f = index.createScope().predicate();
 		assertThatThrownBy( () -> predicate( f, defaultDslConverterField0Path( index, dataSet ), invalidTypeParam(),
 				ValueModel.MAPPING ) )
 				.isInstanceOf( SearchException.class )
@@ -188,7 +188,7 @@ public abstract class AbstractPredicateTypeCheckingAndConversionIT<V extends Abs
 			SimpleMappedIndex<MissingFieldIndexBinding> missingFieldIndex,
 			SimpleMappedIndex<IncompatibleIndexBinding> incompatibleIndex,
 			DataSet<?, V> dataSet) {
-		SearchPredicateFactory<?> f = index.createScope().predicate();
+		TypedSearchPredicateFactory<?> f = index.createScope().predicate();
 		assertThatThrownBy( () -> predicate( f, customDslConverterField0Path( index, dataSet ), invalidTypeParam(),
 				ValueModel.MAPPING ) )
 				.isInstanceOf( SearchException.class )
@@ -209,7 +209,7 @@ public abstract class AbstractPredicateTypeCheckingAndConversionIT<V extends Abs
 			SimpleMappedIndex<MissingFieldIndexBinding> missingFieldIndex,
 			SimpleMappedIndex<IncompatibleIndexBinding> incompatibleIndex,
 			DataSet<?, V> dataSet) {
-		SearchPredicateFactory<?> f = index.createScope().predicate();
+		TypedSearchPredicateFactory<?> f = index.createScope().predicate();
 		assertThatThrownBy( () -> predicate( f, customDslConverterField0Path( index, dataSet ), invalidTypeParam(),
 				org.hibernate.search.engine.search.common.ValueConvert.YES ) )
 				.isInstanceOf( SearchException.class )
@@ -260,7 +260,7 @@ public abstract class AbstractPredicateTypeCheckingAndConversionIT<V extends Abs
 			SimpleMappedIndex<MissingFieldIndexBinding> missingFieldIndex,
 			SimpleMappedIndex<IncompatibleIndexBinding> incompatibleIndex,
 			DataSet<?, V> dataSet) {
-		SearchPredicateFactory<?> f = index.createScope().predicate();
+		TypedSearchPredicateFactory<?> f = index.createScope().predicate();
 		assertThatThrownBy( () -> predicate( f, defaultDslConverterField0Path( index, dataSet ), invalidTypeParam(),
 				ValueModel.INDEX ) )
 				.isInstanceOf( SearchException.class )
@@ -281,7 +281,7 @@ public abstract class AbstractPredicateTypeCheckingAndConversionIT<V extends Abs
 			SimpleMappedIndex<MissingFieldIndexBinding> missingFieldIndex,
 			SimpleMappedIndex<IncompatibleIndexBinding> incompatibleIndex,
 			DataSet<?, V> dataSet) {
-		SearchPredicateFactory<?> f = index.createScope().predicate();
+		TypedSearchPredicateFactory<?> f = index.createScope().predicate();
 		assertThatThrownBy( () -> predicate( f, defaultDslConverterField0Path( index, dataSet ), invalidTypeParam(),
 				org.hibernate.search.engine.search.common.ValueConvert.NO ) )
 				.isInstanceOf( SearchException.class )
@@ -332,7 +332,7 @@ public abstract class AbstractPredicateTypeCheckingAndConversionIT<V extends Abs
 			SimpleMappedIndex<MissingFieldIndexBinding> missingFieldIndex,
 			SimpleMappedIndex<IncompatibleIndexBinding> incompatibleIndex,
 			DataSet<?, V> dataSet) {
-		SearchPredicateFactory<?> f = index.createScope().predicate();
+		TypedSearchPredicateFactory<?> f = index.createScope().predicate();
 		assertThatThrownBy( () -> predicate( f, customDslConverterField0Path( index, dataSet ), invalidTypeParam(),
 				ValueModel.INDEX ) )
 				.isInstanceOf( SearchException.class )
@@ -353,7 +353,7 @@ public abstract class AbstractPredicateTypeCheckingAndConversionIT<V extends Abs
 			SimpleMappedIndex<MissingFieldIndexBinding> missingFieldIndex,
 			SimpleMappedIndex<IncompatibleIndexBinding> incompatibleIndex,
 			DataSet<?, V> dataSet) {
-		SearchPredicateFactory<?> f = index.createScope().predicate();
+		TypedSearchPredicateFactory<?> f = index.createScope().predicate();
 		assertThatThrownBy( () -> predicate( f, customDslConverterField0Path( index, dataSet ), invalidTypeParam(),
 				org.hibernate.search.engine.search.common.ValueConvert.NO ) )
 				.isInstanceOf( SearchException.class )
@@ -670,7 +670,7 @@ public abstract class AbstractPredicateTypeCheckingAndConversionIT<V extends Abs
 			SimpleMappedIndex<MissingFieldIndexBinding> missingFieldIndex,
 			SimpleMappedIndex<IncompatibleIndexBinding> incompatibleIndex,
 			DataSet<?, V> dataSet) {
-		SearchPredicateFactory<?> f = index.createScope().predicate();
+		TypedSearchPredicateFactory<?> f = index.createScope().predicate();
 		assertThatThrownBy( () -> predicate( f, defaultDslConverterField0Path( index, dataSet ), invalidTypeParam(),
 				ValueModel.STRING ) )
 				.isInstanceOf( SearchException.class )
@@ -705,7 +705,7 @@ public abstract class AbstractPredicateTypeCheckingAndConversionIT<V extends Abs
 			SimpleMappedIndex<MissingFieldIndexBinding> missingFieldIndex,
 			SimpleMappedIndex<IncompatibleIndexBinding> incompatibleIndex,
 			DataSet<?, V> dataSet) {
-		SearchPredicateFactory<?> f = index.createScope().predicate();
+		TypedSearchPredicateFactory<?> f = index.createScope().predicate();
 		assertThatThrownBy( () -> predicate( f, customDslConverterField0Path( index, dataSet ), invalidTypeParam(),
 				ValueModel.STRING ) )
 				.isInstanceOf( SearchException.class )
@@ -751,7 +751,7 @@ public abstract class AbstractPredicateTypeCheckingAndConversionIT<V extends Abs
 			SimpleMappedIndex<MissingFieldIndexBinding> missingFieldIndex,
 			SimpleMappedIndex<IncompatibleIndexBinding> incompatibleIndex,
 			DataSet<?, V> dataSet) {
-		SearchPredicateFactory<?> f = index.createScope().predicate();
+		TypedSearchPredicateFactory<?> f = index.createScope().predicate();
 		assertThatThrownBy( () -> predicate( f, defaultDslConverterField0Path( index, dataSet ), invalidTypeParam(),
 				ValueModel.RAW ) )
 				.isInstanceOf( SearchException.class )
@@ -763,20 +763,20 @@ public abstract class AbstractPredicateTypeCheckingAndConversionIT<V extends Abs
 				) );
 	}
 
-	protected abstract PredicateFinalStep predicate(SearchPredicateFactory<?> f, String fieldPath, P matchingParam);
+	protected abstract PredicateFinalStep predicate(TypedSearchPredicateFactory<?> f, String fieldPath, P matchingParam);
 
-	protected abstract PredicateFinalStep predicate(SearchPredicateFactory<?> f, String fieldPath, P matchingParam,
+	protected abstract PredicateFinalStep predicate(TypedSearchPredicateFactory<?> f, String fieldPath, P matchingParam,
 			ValueModel valueModel);
 
-	protected abstract PredicateFinalStep predicate(SearchPredicateFactory<?> f, String field0Path, String field1Path,
+	protected abstract PredicateFinalStep predicate(TypedSearchPredicateFactory<?> f, String field0Path, String field1Path,
 			P matchingParam, ValueModel valueModel);
 
 	@Deprecated(since = "test")
-	protected abstract PredicateFinalStep predicate(SearchPredicateFactory<?> f, String fieldPath, P matchingParam,
+	protected abstract PredicateFinalStep predicate(TypedSearchPredicateFactory<?> f, String fieldPath, P matchingParam,
 			org.hibernate.search.engine.search.common.ValueConvert valueConvert);
 
 	@Deprecated(since = "test")
-	protected abstract PredicateFinalStep predicate(SearchPredicateFactory<?> f, String field0Path, String field1Path,
+	protected abstract PredicateFinalStep predicate(TypedSearchPredicateFactory<?> f, String field0Path, String field1Path,
 			P matchingParam, org.hibernate.search.engine.search.common.ValueConvert valueConvert);
 
 	protected abstract P invalidTypeParam();

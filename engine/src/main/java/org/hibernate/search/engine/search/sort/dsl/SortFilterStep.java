@@ -8,7 +8,7 @@ import java.util.function.Function;
 
 import org.hibernate.search.engine.search.predicate.SearchPredicate;
 import org.hibernate.search.engine.search.predicate.dsl.PredicateFinalStep;
-import org.hibernate.search.engine.search.predicate.dsl.SearchPredicateFactory;
+import org.hibernate.search.engine.search.predicate.dsl.TypedSearchPredicateFactory;
 
 /**
  * The step in a sort definition where a filter can be set
@@ -17,7 +17,7 @@ import org.hibernate.search.engine.search.predicate.dsl.SearchPredicateFactory;
  * @param <S> The "self" type (the actual exposed type of this step)
  * @param <PDF> The type of factory used to create predicates in {@link #filter(Function)}.
  */
-public interface SortFilterStep<SR, S, PDF extends SearchPredicateFactory<SR>> {
+public interface SortFilterStep<SR, S, PDF extends TypedSearchPredicateFactory<SR>> {
 
 	/**
 	 * Filter nested objects from which values will be extracted for this sort.

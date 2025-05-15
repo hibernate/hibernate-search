@@ -12,12 +12,12 @@ import org.hibernate.search.engine.backend.session.spi.BackendSessionContext;
 import org.hibernate.search.engine.search.loading.spi.SearchLoadingContextBuilder;
 import org.hibernate.search.engine.search.predicate.SearchPredicate;
 import org.hibernate.search.engine.search.predicate.dsl.PredicateFinalStep;
-import org.hibernate.search.engine.search.predicate.dsl.SearchPredicateFactory;
 import org.hibernate.search.engine.search.predicate.dsl.SimpleBooleanPredicateClausesCollector;
+import org.hibernate.search.engine.search.predicate.dsl.TypedSearchPredicateFactory;
 import org.hibernate.search.engine.search.projection.ProjectionCollector;
 import org.hibernate.search.engine.search.projection.SearchProjection;
 import org.hibernate.search.engine.search.projection.dsl.ProjectionFinalStep;
-import org.hibernate.search.engine.search.projection.dsl.SearchProjectionFactory;
+import org.hibernate.search.engine.search.projection.dsl.TypedSearchProjectionFactory;
 import org.hibernate.search.engine.search.projection.spi.ProjectionCompositor;
 import org.hibernate.search.engine.search.query.dsl.SearchQueryOptionsStep;
 import org.hibernate.search.engine.search.query.dsl.SearchQueryWhereStep;
@@ -32,8 +32,8 @@ public final class DefaultSearchQuerySelectStep<SR, R, E, LOS>
 				R,
 				E,
 				LOS,
-				SearchProjectionFactory<SR, R, E>,
-				SearchPredicateFactory<SR>> {
+				TypedSearchProjectionFactory<SR, R, E>,
+				TypedSearchPredicateFactory<SR>> {
 
 	private final SearchQueryIndexScope<?> scope;
 	private final BackendSessionContext sessionContext;
@@ -63,7 +63,7 @@ public final class DefaultSearchQuerySelectStep<SR, R, E, LOS>
 
 	@Override
 	public <P> DefaultSearchQueryOptionsStep<SR, P, LOS> select(
-			Function<? super SearchProjectionFactory<SR, R, E>, ? extends ProjectionFinalStep<P>> projectionContributor) {
+			Function<? super TypedSearchProjectionFactory<SR, R, E>, ? extends ProjectionFinalStep<P>> projectionContributor) {
 		SearchProjection<P> projection = projectionContributor.apply( scope.projectionFactory() ).toProjection();
 		return select( projection );
 	}
@@ -83,7 +83,7 @@ public final class DefaultSearchQuerySelectStep<SR, R, E, LOS>
 
 	@Override
 	public SearchQueryOptionsStep<SR, ?, E, LOS, ?, ?> where(
-			Function<? super SearchPredicateFactory<SR>, ? extends PredicateFinalStep> predicateContributor) {
+			Function<? super TypedSearchPredicateFactory<SR>, ? extends PredicateFinalStep> predicateContributor) {
 		return selectEntity().where( predicateContributor );
 	}
 
@@ -94,7 +94,7 @@ public final class DefaultSearchQuerySelectStep<SR, R, E, LOS>
 
 	@Override
 	public SearchQueryOptionsStep<SR, ?, E, LOS, ?, ?> where(
-			BiConsumer<? super SearchPredicateFactory<SR>,
+			BiConsumer<? super TypedSearchPredicateFactory<SR>,
 					? super SimpleBooleanPredicateClausesCollector<SR, ?>> predicateContributor) {
 		return selectEntity().where( predicateContributor );
 	}

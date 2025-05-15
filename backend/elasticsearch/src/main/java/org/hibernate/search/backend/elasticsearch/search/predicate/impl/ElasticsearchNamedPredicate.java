@@ -14,7 +14,7 @@ import org.hibernate.search.backend.elasticsearch.search.common.impl.Elasticsear
 import org.hibernate.search.engine.search.common.spi.SearchQueryElementFactory;
 import org.hibernate.search.engine.search.predicate.SearchPredicate;
 import org.hibernate.search.engine.search.predicate.definition.PredicateDefinition;
-import org.hibernate.search.engine.search.predicate.dsl.SearchPredicateFactory;
+import org.hibernate.search.engine.search.predicate.dsl.TypedSearchPredicateFactory;
 import org.hibernate.search.engine.search.predicate.spi.NamedPredicateBuilder;
 import org.hibernate.search.engine.search.predicate.spi.NamedValuesBasedPredicateDefinitionContext;
 
@@ -71,7 +71,7 @@ public class ElasticsearchNamedPredicate extends AbstractElasticsearchSingleFiel
 		private final PredicateDefinition definition;
 		private final String predicateName;
 		private final ElasticsearchSearchIndexCompositeNodeContext field;
-		private SearchPredicateFactory<?> factory;
+		private TypedSearchPredicateFactory<?> factory;
 		private final Map<String, Object> params = new LinkedHashMap<>();
 
 		Builder(PredicateDefinition definition, String predicateName,
@@ -84,7 +84,7 @@ public class ElasticsearchNamedPredicate extends AbstractElasticsearchSingleFiel
 		}
 
 		@Override
-		public void factory(SearchPredicateFactory<?> factory) {
+		public void factory(TypedSearchPredicateFactory<?> factory) {
 			this.factory = factory;
 		}
 

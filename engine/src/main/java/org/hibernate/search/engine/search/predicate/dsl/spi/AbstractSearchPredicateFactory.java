@@ -147,7 +147,7 @@ public abstract class AbstractSearchPredicateFactory<
 
 	@Override
 	@SuppressWarnings("deprecation") // javac warns about this method being deprecated, but we have to implement it
-	public PredicateFinalStep bool(Consumer<? super BooleanPredicateClausesStep<SR, ?>> clauseContributor) {
+	public PredicateFinalStep bool(Consumer<? super BooleanPredicateClausesStep<?, ?>> clauseContributor) {
 		BooleanPredicateClausesStep<SR, ?> next = bool();
 		clauseContributor.accept( next );
 		return next;
@@ -248,7 +248,7 @@ public abstract class AbstractSearchPredicateFactory<
 	}
 
 	@Override
-	public <T> T extension(SearchPredicateFactoryExtension<SR, T> extension) {
+	public <T> T extension(SearchPredicateFactoryExtension<T> extension) {
 		return DslExtensionState.returnIfSupported( extension, extension.extendOptional( this ) );
 	}
 

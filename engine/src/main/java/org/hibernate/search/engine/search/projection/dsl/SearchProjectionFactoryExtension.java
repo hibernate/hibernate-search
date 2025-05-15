@@ -22,7 +22,7 @@ import java.util.Optional;
  * @see SearchProjectionFactory#extension(SearchProjectionFactoryExtension)
  * @see ExtendedSearchProjectionFactory
  */
-public interface SearchProjectionFactoryExtension<SR, T, R, E> {
+public interface SearchProjectionFactoryExtension<T, R, E> {
 
 	/**
 	 * Attempt to extend a given factory, returning an empty {@link Optional} in case of failure.
@@ -33,6 +33,6 @@ public interface SearchProjectionFactoryExtension<SR, T, R, E> {
 	 * @return An optional containing the extended projection factory ({@link T}) in case
 	 * of success, or an empty optional otherwise.
 	 */
-	Optional<T> extendOptional(SearchProjectionFactory<SR, R, E> original);
+	Optional<T> extendOptional(SearchProjectionFactory<R, E> original);
 
 }

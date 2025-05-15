@@ -16,7 +16,7 @@ import org.hibernate.SessionFactory;
 import org.hibernate.search.engine.backend.types.Sortable;
 import org.hibernate.search.mapper.orm.Search;
 import org.hibernate.search.mapper.orm.cfg.HibernateOrmMapperSettings;
-import org.hibernate.search.mapper.orm.scope.SearchScope;
+import org.hibernate.search.mapper.orm.scope.TypedSearchScope;
 import org.hibernate.search.mapper.orm.session.SearchSession;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.GenericField;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
@@ -54,7 +54,7 @@ class SortTypesIT {
 
 		try ( var s = sessionFactory.openSession() ) {
 			SearchSession session = Search.session( s );
-			SearchScope<SortTypesIT_IndexedEntity__, IndexedEntity> scope =
+			TypedSearchScope<SortTypesIT_IndexedEntity__, IndexedEntity> scope =
 					SortTypesIT_IndexedEntity__.INDEX.scope( session );
 			assertThat( session.search( scope )
 					.where( f -> f.matchAll() )

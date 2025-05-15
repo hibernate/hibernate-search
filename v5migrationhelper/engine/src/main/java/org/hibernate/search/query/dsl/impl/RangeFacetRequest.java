@@ -11,7 +11,7 @@ import java.util.Map;
 import org.hibernate.search.engine.search.aggregation.dsl.AggregationFinalStep;
 import org.hibernate.search.engine.search.aggregation.dsl.RangeAggregationRangeMoreStep;
 import org.hibernate.search.engine.search.aggregation.dsl.RangeAggregationRangeStep;
-import org.hibernate.search.engine.search.aggregation.dsl.SearchAggregationFactory;
+import org.hibernate.search.engine.search.aggregation.dsl.TypedSearchAggregationFactory;
 import org.hibernate.search.query.engine.impl.FacetComparators;
 import org.hibernate.search.query.facet.Facet;
 import org.hibernate.search.query.facet.FacetSortOrder;
@@ -32,7 +32,7 @@ public class RangeFacetRequest<T> extends FacetingRequestImpl<Map<Range<T>, Long
 	}
 
 	@Override
-	public AggregationFinalStep<Map<Range<T>, Long>> requestAggregation(SearchAggregationFactory<?> factory) {
+	public AggregationFinalStep<Map<Range<T>, Long>> requestAggregation(TypedSearchAggregationFactory<?> factory) {
 		RangeAggregationRangeStep<?, ?, ?, T> rangeStep = factory
 				.range().field( getFieldName(), getFacetValueType() );
 		RangeAggregationRangeMoreStep<?, ?, ?, ?, T> rangeMoreStep = null;

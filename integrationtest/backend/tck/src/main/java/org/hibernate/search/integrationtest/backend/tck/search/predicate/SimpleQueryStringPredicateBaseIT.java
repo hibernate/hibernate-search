@@ -4,8 +4,8 @@
  */
 package org.hibernate.search.integrationtest.backend.tck.search.predicate;
 
-import org.hibernate.search.engine.search.predicate.dsl.SearchPredicateFactory;
 import org.hibernate.search.engine.search.predicate.dsl.SimpleQueryStringPredicateFieldStep;
+import org.hibernate.search.engine.search.predicate.dsl.TypedSearchPredicateFactory;
 
 //CHECKSTYLE:OFF HideUtilityClassConstructor ignore the rule since it is a class with nested test classes.
 // cannot make a private constructor.
@@ -13,7 +13,7 @@ class SimpleQueryStringPredicateBaseIT
 		extends AbstractBaseQueryStringPredicateBaseIT<SimpleQueryStringPredicateFieldStep<?, ?>> {
 	//CHECKSTYLE:ON
 	@Override
-	SimpleQueryStringPredicateFieldStep<?, ?> predicate(SearchPredicateFactory<?> f) {
+	SimpleQueryStringPredicateFieldStep<?, ?> predicate(TypedSearchPredicateFactory<?> f) {
 		return f.simpleQueryString();
 	}
 

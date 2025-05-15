@@ -5,8 +5,8 @@
 package org.hibernate.search.engine.search.sort.dsl.spi;
 
 import org.hibernate.search.engine.search.sort.SearchSort;
-import org.hibernate.search.engine.search.sort.dsl.SearchSortFactory;
 import org.hibernate.search.engine.search.sort.dsl.SortThenStep;
+import org.hibernate.search.engine.search.sort.dsl.TypedSearchSortFactory;
 
 public abstract class AbstractSortThenStep<SR> implements SortThenStep<SR> {
 	private final SearchSortDslContext<SR, ?, ?> parentDslContext;
@@ -18,7 +18,7 @@ public abstract class AbstractSortThenStep<SR> implements SortThenStep<SR> {
 	}
 
 	@Override
-	public final SearchSortFactory<SR> then() {
+	public final TypedSearchSortFactory<SR> then() {
 		return selfDslContext().then();
 	}
 

@@ -8,7 +8,7 @@ import org.hibernate.search.engine.common.EntityReference;
 import org.hibernate.search.engine.search.projection.SearchProjection;
 import org.hibernate.search.engine.search.projection.definition.ProjectionDefinitionContext;
 import org.hibernate.search.engine.search.projection.definition.spi.AbstractProjectionDefinition;
-import org.hibernate.search.engine.search.projection.dsl.SearchProjectionFactory;
+import org.hibernate.search.engine.search.projection.dsl.TypedSearchProjectionFactory;
 import org.hibernate.search.mapper.pojo.search.definition.binding.ProjectionBinder;
 import org.hibernate.search.mapper.pojo.search.definition.binding.ProjectionBindingContext;
 
@@ -17,7 +17,7 @@ import org.hibernate.search.mapper.pojo.search.definition.binding.ProjectionBind
  * <p>
  * Entity references are instances of type {@link EntityReference}.
  *
- * @see SearchProjectionFactory#entityReference()
+ * @see TypedSearchProjectionFactory#entityReference()
  * @see org.hibernate.search.mapper.pojo.mapping.definition.annotation.EntityReferenceProjection
  */
 public final class EntityReferenceProjectionBinder implements ProjectionBinder {
@@ -53,7 +53,7 @@ public final class EntityReferenceProjectionBinder implements ProjectionBinder {
 		// Mappers are required to have their entity reference type extend EntityReference.
 		// The generic parameter R in SearchProjectionFactory is only there for backwards compatibility.
 		@SuppressWarnings("unchecked")
-		public SearchProjection<? extends EntityReference> create(SearchProjectionFactory<?, ?, ?> factory,
+		public SearchProjection<? extends EntityReference> create(TypedSearchProjectionFactory<?, ?, ?> factory,
 				ProjectionDefinitionContext context) {
 			return (SearchProjection<? extends EntityReference>) factory.entityReference().toProjection();
 		}

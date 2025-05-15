@@ -9,10 +9,11 @@ import java.util.function.Function;
 
 import org.hibernate.search.engine.common.dsl.spi.DslExtensionState;
 import org.hibernate.search.engine.search.common.NamedValues;
-import org.hibernate.search.engine.search.predicate.dsl.SearchPredicateFactory;
+import org.hibernate.search.engine.search.predicate.dsl.TypedSearchPredicateFactory;
 import org.hibernate.search.engine.search.reference.sort.FieldSortFieldReference;
 import org.hibernate.search.engine.search.sort.SearchSort;
 import org.hibernate.search.engine.search.sort.dsl.CompositeSortComponentsStep;
+import org.hibernate.search.engine.search.sort.dsl.CompositeSortOptionsCollector;
 import org.hibernate.search.engine.search.sort.dsl.DistanceSortOptionsStep;
 import org.hibernate.search.engine.search.sort.dsl.ExtendedSearchSortFactory;
 import org.hibernate.search.engine.search.sort.dsl.FieldSortOptionsGenericStep;
@@ -35,7 +36,7 @@ public abstract class AbstractSearchSortFactory<
 		SR,
 		S extends ExtendedSearchSortFactory<SR, S, PDF>,
 		SC extends SearchSortIndexScope<?>,
-		PDF extends SearchPredicateFactory<SR>>
+		PDF extends TypedSearchPredicateFactory<SR>>
 		implements ExtendedSearchSortFactory<SR, S, PDF> {
 
 	protected final SearchSortDslContext<SR, SC, PDF> dslContext;
@@ -60,7 +61,7 @@ public abstract class AbstractSearchSortFactory<
 	}
 
 	@Override
-	public <T> FieldSortOptionsGenericStep<SR, T, ?, ?, ? extends SearchPredicateFactory<SR>> field(
+	public <T> FieldSortOptionsGenericStep<SR, T, ?, ?, ? extends TypedSearchPredicateFactory<SR>> field(
 			FieldSortFieldReference<? super SR, T> fieldReference) {
 		return AbstractFieldSortOptionsGenericStep.create( dslContext, fieldReference );
 	}
@@ -78,7 +79,7 @@ public abstract class AbstractSearchSortFactory<
 	}
 
 	@Override
-	public SortThenStep<SR> composite(Consumer<? super CompositeSortComponentsStep<SR, ?>> elementContributor) {
+	public SortThenStep<SR> composite(Consumer<? super CompositeSortOptionsCollector<?>> elementContributor) {
 		CompositeSortComponentsStep<SR, ?> next = composite();
 		elementContributor.accept( next );
 		return next;
@@ -90,7 +91,7 @@ public abstract class AbstractSearchSortFactory<
 	}
 
 	@Override
-	public <T> T extension(SearchSortFactoryExtension<SR, T> extension) {
+	public <T> T extension(SearchSortFactoryExtension<T> extension) {
 		return DslExtensionState.returnIfSupported(
 				extension, extension.extendOptional( this )
 		);
