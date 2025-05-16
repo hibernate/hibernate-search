@@ -6,7 +6,7 @@ package org.hibernate.search.engine.search.sort.dsl;
 
 import java.util.function.Function;
 
-import org.hibernate.search.engine.search.predicate.dsl.SearchPredicateFactory;
+import org.hibernate.search.engine.search.predicate.dsl.TypedSearchPredicateFactory;
 
 /**
  * The initial and final step in a "distance" sort definition, where optional parameters can be set.
@@ -18,7 +18,7 @@ import org.hibernate.search.engine.search.predicate.dsl.SearchPredicateFactory;
 public interface DistanceSortOptionsStep<
 		SR,
 		S extends DistanceSortOptionsStep<SR, ?, PDF>,
-		PDF extends SearchPredicateFactory<SR>>
+		PDF extends TypedSearchPredicateFactory<SR>>
 		extends SortFinalStep, SortThenStep<SR>, SortOrderStep<S>, SortModeStep<S>, SortFilterStep<SR, S, PDF> {
 
 	/**

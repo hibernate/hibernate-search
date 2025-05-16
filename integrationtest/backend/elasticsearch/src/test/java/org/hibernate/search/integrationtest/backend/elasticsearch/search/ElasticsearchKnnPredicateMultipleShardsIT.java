@@ -14,7 +14,7 @@ import org.hibernate.search.engine.backend.document.IndexFieldReference;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaElement;
 import org.hibernate.search.engine.backend.types.Projectable;
 import org.hibernate.search.engine.backend.types.VectorSimilarity;
-import org.hibernate.search.engine.search.projection.dsl.SearchProjectionFactory;
+import org.hibernate.search.engine.search.projection.dsl.TypedSearchProjectionFactory;
 import org.hibernate.search.engine.search.query.SearchQuery;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.TckConfiguration;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.extension.SearchSetupHelper;
@@ -52,7 +52,7 @@ class ElasticsearchKnnPredicateMultipleShardsIT {
 	void moreThanK() {
 		int k = 3;
 		SearchQuery<Object> query = index.createScope().query()
-				.select( SearchProjectionFactory::id )
+				.select( TypedSearchProjectionFactory::id )
 				.where( f -> f.knn( k ).field( "location" ).matching( 5f, 4f ) )
 				.toQuery();
 
@@ -69,7 +69,7 @@ class ElasticsearchKnnPredicateMultipleShardsIT {
 	void knnDoesNotMatchOtherPredicate() {
 		int k = 1;
 		SearchQuery<Object> query = index.createScope().query()
-				.select( SearchProjectionFactory::id )
+				.select( TypedSearchProjectionFactory::id )
 				.where( f -> f.bool()
 						.must( f.range().field( "rating" ).greaterThan( 9 ) )
 						.must( f.knn( k ).field( "location" ).matching( 5f, 4f ) ) )
@@ -84,7 +84,7 @@ class ElasticsearchKnnPredicateMultipleShardsIT {
 	void knnWithShould() {
 		int k = 1;
 		SearchQuery<Object> query = index.createScope().query()
-				.select( SearchProjectionFactory::id )
+				.select( TypedSearchProjectionFactory::id )
 				.where( f -> f.bool()
 						.should( f.range().field( "rating" ).greaterThan( 9 ).boost( 1000.0f ) )
 						.should( f.knn( k ).field( "location" ).matching( 5f, 4f ) ) )

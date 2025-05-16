@@ -6,10 +6,10 @@ package org.hibernate.search.engine.search.aggregation.dsl;
 
 import java.util.function.Function;
 
-import org.hibernate.search.engine.search.predicate.dsl.SearchPredicateFactory;
+import org.hibernate.search.engine.search.predicate.dsl.TypedSearchPredicateFactory;
 
 /**
- * A base interface for subtypes of {@link SearchAggregationFactory} allowing to
+ * A base interface for subtypes of {@link TypedSearchAggregationFactory} allowing to
  * easily override the self type and predicate factory type for all relevant methods.
  * <p>
  * <strong>Warning:</strong> Generic parameters of this type are subject to change,
@@ -22,8 +22,8 @@ import org.hibernate.search.engine.search.predicate.dsl.SearchPredicateFactory;
 public interface ExtendedSearchAggregationFactory<
 		SR,
 		S extends ExtendedSearchAggregationFactory<SR, ?, PDF>,
-		PDF extends SearchPredicateFactory<SR>>
-		extends SearchAggregationFactory<SR> {
+		PDF extends TypedSearchPredicateFactory<SR>>
+		extends TypedSearchAggregationFactory<SR> {
 
 	@Override
 	S withRoot(String objectFieldPath);

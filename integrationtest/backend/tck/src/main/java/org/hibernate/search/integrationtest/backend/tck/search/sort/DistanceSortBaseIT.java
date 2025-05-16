@@ -10,7 +10,7 @@ import static org.junit.jupiter.api.Assumptions.assumeFalse;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.hibernate.search.engine.search.sort.dsl.SearchSortFactory;
+import org.hibernate.search.engine.search.sort.dsl.TypedSearchSortFactory;
 import org.hibernate.search.engine.spatial.GeoPoint;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.FieldTypeDescriptor;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.GeoPointFieldTypeDescriptor;
@@ -70,7 +70,7 @@ class DistanceSortBaseIT {
 		}
 
 		@Override
-		protected void trySort(SearchSortFactory<?> f, String fieldPath) {
+		protected void trySort(TypedSearchSortFactory<?> f, String fieldPath) {
 			f.distance( fieldPath, GeoPoint.of( 0.0, 0.0 ) );
 		}
 
@@ -102,7 +102,7 @@ class DistanceSortBaseIT {
 		}
 
 		@Override
-		protected void trySort(SearchSortFactory<?> f, String fieldPath) {
+		protected void trySort(TypedSearchSortFactory<?> f, String fieldPath) {
 			f.distance( fieldPath, GeoPoint.of( 0.0, 0.0 ) );
 		}
 
@@ -210,7 +210,7 @@ class DistanceSortBaseIT {
 		}
 
 		@Override
-		protected void trySort(SearchSortFactory<?> f, String fieldPath, FieldTypeDescriptor<?, ?> fieldType) {
+		protected void trySort(TypedSearchSortFactory<?> f, String fieldPath, FieldTypeDescriptor<?, ?> fieldType) {
 			f.distance( fieldPath, GeoPoint.of( 0.0, 0.0 ) );
 		}
 

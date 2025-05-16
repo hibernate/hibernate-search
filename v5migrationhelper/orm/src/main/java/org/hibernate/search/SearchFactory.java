@@ -13,7 +13,7 @@ import org.hibernate.search.engine.backend.Backend;
 import org.hibernate.search.engine.backend.index.IndexManager;
 import org.hibernate.search.mapper.orm.entity.SearchIndexedEntity;
 import org.hibernate.search.mapper.orm.mapping.SearchMapping;
-import org.hibernate.search.mapper.orm.scope.SearchScope;
+import org.hibernate.search.mapper.orm.scope.TypedSearchScope;
 import org.hibernate.search.mapper.orm.session.SearchSession;
 import org.hibernate.search.mapper.orm.work.SearchWorkspace;
 import org.hibernate.search.query.dsl.FacetContext;
@@ -39,10 +39,10 @@ public interface SearchFactory {
 
 	/**
 	 * Optimize all indexes
-	 * @deprecated Instead of using Hibernate Search 5 APIs, get a {@link SearchScope}
+	 * @deprecated Instead of using Hibernate Search 5 APIs, get a {@link TypedSearchScope}
 	 * using {@link SearchSession#scope(Class)}
 	 * or {@link SearchMapping#scope(Class)},
-	 * then a {@link SearchWorkspace} using {@link SearchScope#workspace()},
+	 * then a {@link SearchWorkspace} using {@link TypedSearchScope#workspace()},
 	 * then call {@link SearchWorkspace#mergeSegments()} to "optimize" all indexes in scope.
 	 */
 	@Deprecated
@@ -52,10 +52,10 @@ public interface SearchFactory {
 	 * Optimize the index holding {@code entityType}
 	 *
 	 * @param entityType the entity type (index) to optimize
-	 * @deprecated Instead of using Hibernate Search 5 APIs, get a {@link SearchScope}
+	 * @deprecated Instead of using Hibernate Search 5 APIs, get a {@link TypedSearchScope}
 	 * using {@link SearchSession#scope(Class)}
 	 * or {@link SearchMapping#scope(Class)},
-	 * then a {@link SearchWorkspace} using {@link SearchScope#workspace()},
+	 * then a {@link SearchWorkspace} using {@link TypedSearchScope#workspace()},
 	 * then call {@link SearchWorkspace#mergeSegments()} to "optimize" all indexes in scope.
 	 */
 	@Deprecated

@@ -15,7 +15,7 @@ import jakarta.persistence.EntityManagerFactory;
 import org.hibernate.search.documentation.testsupport.BackendConfigurations;
 import org.hibernate.search.documentation.testsupport.DocumentationSetupHelper;
 import org.hibernate.search.engine.search.predicate.SearchPredicate;
-import org.hibernate.search.engine.search.predicate.dsl.SearchPredicateFactory;
+import org.hibernate.search.engine.search.predicate.dsl.TypedSearchPredicateFactory;
 import org.hibernate.search.mapper.orm.Search;
 import org.hibernate.search.mapper.orm.session.SearchSession;
 
@@ -114,7 +114,7 @@ class FieldPathsIT {
 	}
 
 	// tag::withRoot_method[]
-	private SearchPredicate matchFirstAndLastName(SearchPredicateFactory<?> f,
+	private SearchPredicate matchFirstAndLastName(TypedSearchPredicateFactory<?> f,
 			String firstName, String lastName) {
 		return f.and(
 				f.match().field( "firstName" ) // <1>

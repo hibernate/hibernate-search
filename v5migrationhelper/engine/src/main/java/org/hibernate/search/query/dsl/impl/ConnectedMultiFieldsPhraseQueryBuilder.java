@@ -6,7 +6,7 @@
 package org.hibernate.search.query.dsl.impl;
 
 import org.hibernate.search.engine.search.predicate.dsl.PhrasePredicateOptionsStep;
-import org.hibernate.search.engine.search.predicate.dsl.SearchPredicateFactory;
+import org.hibernate.search.engine.search.predicate.dsl.TypedSearchPredicateFactory;
 import org.hibernate.search.query.dsl.PhraseTermination;
 
 /**
@@ -24,7 +24,7 @@ public class ConnectedMultiFieldsPhraseQueryBuilder
 	}
 
 	@Override
-	protected PhrasePredicateOptionsStep<?> createPredicate(SearchPredicateFactory<?> factory, FieldContext fieldContext) {
+	protected PhrasePredicateOptionsStep<?> createPredicate(TypedSearchPredicateFactory<?> factory, FieldContext fieldContext) {
 		PhrasePredicateOptionsStep<?> optionsStep =
 				fieldContext.applyBoost( factory.phrase().field( fieldContext.getField() ) )
 						.matching( phraseContext.getSentence() );

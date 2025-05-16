@@ -10,7 +10,7 @@ import org.hibernate.search.engine.search.predicate.SearchPredicate;
 import org.hibernate.search.engine.search.predicate.dsl.NestedPredicateNestStep;
 import org.hibernate.search.engine.search.predicate.dsl.NestedPredicateOptionsStep;
 import org.hibernate.search.engine.search.predicate.dsl.PredicateFinalStep;
-import org.hibernate.search.engine.search.predicate.dsl.SearchPredicateFactory;
+import org.hibernate.search.engine.search.predicate.dsl.TypedSearchPredicateFactory;
 import org.hibernate.search.engine.search.predicate.dsl.spi.AbstractPredicateFinalStep;
 import org.hibernate.search.engine.search.predicate.dsl.spi.SearchPredicateDslContext;
 import org.hibernate.search.engine.search.predicate.spi.NestedPredicateBuilder;
@@ -28,10 +28,10 @@ public final class NestedPredicateFieldStepImpl<SR>
 		org.hibernate.search.engine.search.predicate.dsl.NestedPredicateOptionsStep<
 				org.hibernate.search.engine.search.predicate.dsl.NestedPredicateOptionsStep<?>> {
 
-	private final SearchPredicateFactory<SR> factory;
+	private final TypedSearchPredicateFactory<SR> factory;
 	private NestedPredicateBuilder builder;
 
-	public NestedPredicateFieldStepImpl(SearchPredicateDslContext<?> dslContext, SearchPredicateFactory<SR> factory) {
+	public NestedPredicateFieldStepImpl(SearchPredicateDslContext<?> dslContext, TypedSearchPredicateFactory<SR> factory) {
 		super( dslContext );
 		this.factory = factory;
 	}
@@ -51,7 +51,7 @@ public final class NestedPredicateFieldStepImpl<SR>
 
 	@Override
 	public org.hibernate.search.engine.search.predicate.dsl.NestedPredicateOptionsStep<?> nest(
-			Function<? super SearchPredicateFactory<SR>, ? extends PredicateFinalStep> predicateContributor) {
+			Function<? super TypedSearchPredicateFactory<SR>, ? extends PredicateFinalStep> predicateContributor) {
 		return nest( predicateContributor.apply( factory ) );
 	}
 

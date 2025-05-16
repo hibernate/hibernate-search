@@ -6,7 +6,7 @@ package org.hibernate.search.engine.search.aggregation.dsl;
 
 import java.util.function.Function;
 
-import org.hibernate.search.engine.search.predicate.dsl.SearchPredicateFactory;
+import org.hibernate.search.engine.search.predicate.dsl.TypedSearchPredicateFactory;
 import org.hibernate.search.engine.search.reference.aggregation.CountAggregationFieldReference;
 import org.hibernate.search.util.common.annotation.Incubating;
 
@@ -17,7 +17,7 @@ import org.hibernate.search.util.common.annotation.Incubating;
  * @param <PDF> The type of factory used to create predicates in {@link AggregationFilterStep#filter(Function)}.
  */
 @Incubating
-public interface CountAggregationFieldStep<SR, PDF extends SearchPredicateFactory<SR>> {
+public interface CountAggregationFieldStep<SR, PDF extends TypedSearchPredicateFactory<SR>> {
 
 	/**
 	 * Target the given field in the count aggregation.

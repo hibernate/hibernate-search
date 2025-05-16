@@ -10,10 +10,10 @@ import java.util.function.Function;
 
 import org.hibernate.search.engine.common.EntityReference;
 import org.hibernate.search.engine.search.predicate.SearchPredicate;
-import org.hibernate.search.engine.search.predicate.dsl.SearchPredicateFactory;
+import org.hibernate.search.engine.search.predicate.dsl.TypedSearchPredicateFactory;
 import org.hibernate.search.engine.search.projection.SearchProjection;
 import org.hibernate.search.engine.search.projection.dsl.ProjectionFinalStep;
-import org.hibernate.search.engine.search.projection.dsl.SearchProjectionFactory;
+import org.hibernate.search.engine.search.projection.dsl.TypedSearchProjectionFactory;
 import org.hibernate.search.util.common.SearchException;
 
 /**
@@ -30,10 +30,10 @@ import org.hibernate.search.util.common.SearchException;
  * or a similar method.
  * @param <R> The type of entity references, i.e. the type of hits returned by
  * {@link #selectEntityReference() reference queries},
- * or the type of objects returned for {@link SearchProjectionFactory#entityReference() entity reference projections}.
+ * or the type of objects returned for {@link TypedSearchProjectionFactory#entityReference() entity reference projections}.
  * @param <E> The type of entities, i.e. the type of hits returned by
  * {@link #selectEntity() entity queries},
- * or the type of objects returned for {@link SearchProjectionFactory#entity() entity projections}.
+ * or the type of objects returned for {@link TypedSearchProjectionFactory#entity() entity projections}.
  * @param <LOS> The type of the initial step of the loading options definition DSL accessible through {@link SearchQueryOptionsStep#loading(Consumer)}.
  * @param <PJF> The type of factory used to create projections in {@link #select(Function)}.
  * @param <PDF> The type of factory used to create predicates in {@link #where(Function)}.
@@ -44,8 +44,8 @@ public interface SearchQuerySelectStep<
 		R,
 		E,
 		LOS,
-		PJF extends SearchProjectionFactory<SR, R, E>,
-		PDF extends SearchPredicateFactory<SR>>
+		PJF extends TypedSearchProjectionFactory<SR, R, E>,
+		PDF extends TypedSearchPredicateFactory<SR>>
 		extends SearchQueryWhereStep<SR, N, E, LOS, PDF> {
 
 	/**
@@ -115,11 +115,11 @@ public interface SearchQuerySelectStep<
 	 * Note that using this method will force you to use casts when consuming the results,
 	 * since the returned lists are not typed ({@code List<?>} instead of {@code List<T>}).
 	 * You can replace calls to this method advantageously with calls to {@link #select(Function)}
-	 * defining a {@link SearchProjectionFactory#composite() composite projection}.
+	 * defining a {@link TypedSearchProjectionFactory#composite() composite projection}.
 	 *
 	 * @param projections A list of previously-created {@link SearchProjection} objects.
 	 * @return The next step.
-	 * @see SearchProjectionFactory#composite(SearchProjection[])
+	 * @see TypedSearchProjectionFactory#composite(SearchProjection[])
 	 * @see SearchQueryWhereStep
 	 */
 	SearchQueryWhereStep<SR, ?, List<?>, LOS, ?> select(SearchProjection<?>... projections);

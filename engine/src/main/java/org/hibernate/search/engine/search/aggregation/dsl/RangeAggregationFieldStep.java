@@ -7,7 +7,7 @@ package org.hibernate.search.engine.search.aggregation.dsl;
 import java.util.function.Function;
 
 import org.hibernate.search.engine.search.common.ValueModel;
-import org.hibernate.search.engine.search.predicate.dsl.SearchPredicateFactory;
+import org.hibernate.search.engine.search.predicate.dsl.TypedSearchPredicateFactory;
 import org.hibernate.search.engine.search.reference.aggregation.RangeAggregationFieldReference;
 
 /**
@@ -16,7 +16,7 @@ import org.hibernate.search.engine.search.reference.aggregation.RangeAggregation
  * @param <SR> Scope root type.
  * @param <PDF> The type of factory used to create predicates in {@link AggregationFilterStep#filter(Function)}.
  */
-public interface RangeAggregationFieldStep<SR, PDF extends SearchPredicateFactory<SR>> {
+public interface RangeAggregationFieldStep<SR, PDF extends TypedSearchPredicateFactory<SR>> {
 
 	/**
 	 * Target the given field in the range aggregation.

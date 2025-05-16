@@ -9,7 +9,7 @@ package org.hibernate.search.engine.search.predicate.dsl;
  * <a href="SimpleBooleanPredicateClausesCollector.html#clauses">clauses</a> can be added.
  * <p>
  * The resulting nested predicate must match <em>all</em> inner clauses,
- * similarly to an {@link SearchPredicateFactory#and() "and" predicate}.
+ * similarly to an {@link TypedSearchPredicateFactory#and() "and" predicate}.
  *
  * @param <SR> Scope root type.
  * @param <S> The "self" type (the actual exposed type of this step).

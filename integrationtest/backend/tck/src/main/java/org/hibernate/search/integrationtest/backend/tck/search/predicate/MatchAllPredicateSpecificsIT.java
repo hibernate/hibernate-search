@@ -9,7 +9,7 @@ import static org.hibernate.search.util.impl.integrationtest.common.assertion.Se
 import org.hibernate.search.engine.backend.document.IndexFieldReference;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaElement;
 import org.hibernate.search.engine.search.predicate.SearchPredicate;
-import org.hibernate.search.engine.search.predicate.dsl.SearchPredicateFactory;
+import org.hibernate.search.engine.search.predicate.dsl.TypedSearchPredicateFactory;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.extension.SearchSetupHelper;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.SimpleMappedIndex;
 
@@ -53,7 +53,7 @@ class MatchAllPredicateSpecificsIT {
 				.where( f -> f.matchAll().except( c2 -> c2.match().field( "string" ).matching( STRING_1 ) ) ) )
 				.hasDocRefHitsAnyOrder( index.typeName(), DOCUMENT_2, DOCUMENT_3 );
 
-		SearchPredicateFactory<?> f1 = index.createScope().predicate();
+		TypedSearchPredicateFactory<?> f1 = index.createScope().predicate();
 		SearchPredicate searchPredicate = f1.match().field( "string" ).matching( STRING_2 ).toPredicate();
 
 		assertThatQuery( index.query()
@@ -69,7 +69,7 @@ class MatchAllPredicateSpecificsIT {
 						.except( f.match().field( "string" ).matching( STRING_2 ) ) ) )
 				.hasDocRefHitsAnyOrder( index.typeName(), DOCUMENT_3 );
 
-		SearchPredicateFactory<?> f1 = index.createScope().predicate();
+		TypedSearchPredicateFactory<?> f1 = index.createScope().predicate();
 		SearchPredicate searchPredicate1 = f1.match().field( "string" ).matching( STRING_3 ).toPredicate();
 		SearchPredicate searchPredicate2 = f1.match().field( "string" ).matching( STRING_2 ).toPredicate();
 

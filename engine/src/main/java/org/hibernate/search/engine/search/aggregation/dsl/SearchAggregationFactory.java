@@ -4,10 +4,8 @@
  */
 package org.hibernate.search.engine.search.aggregation.dsl;
 
-import java.util.function.Function;
 
-import org.hibernate.search.engine.search.common.NamedValues;
-import org.hibernate.search.util.common.SearchException;
+import org.hibernate.search.engine.search.common.NonStaticMetamodelScope;
 import org.hibernate.search.util.common.annotation.Incubating;
 
 /**
@@ -36,112 +34,9 @@ import org.hibernate.search.util.common.annotation.Incubating;
  * Such reference provides the information on which search capabilities the particular index field possesses, and allows switching between different
  * {@link org.hibernate.search.engine.search.common.ValueModel value model representations}.
  *
- * @param <SR> Scope root type.
- *
  * @author Emmanuel Bernard emmanuel@hibernate.org
  */
-public interface SearchAggregationFactory<SR> {
-
-	/**
-	 * Perform aggregation in range buckets.
-	 * <p>
-	 * Given a field and one or more ranges of values,
-	 * this aggregation creates one bucket per range,
-	 * and puts in each bucket every document for which
-	 * the given field has a value that falls into the corresponding range.
-	 * <p>
-	 * For each bucket, the document count is computed,
-	 * or more complex metrics or sub-aggregations for backends that support it.
-	 *
-	 * @return The next step.
-	 */
-	RangeAggregationFieldStep<SR, ?> range();
-
-	/**
-	 * Perform aggregation in term buckets.
-	 * <p>
-	 * Given a field,
-	 * this aggregation creates one bucket per term of that field in the index,
-	 * and puts in each bucket every document for which
-	 * the given field matches the corresponding term.
-	 * <p>
-	 * For each bucket, the document count is computed,
-	 * or more complex metrics or sub-aggregations for backends that support it.
-	 *
-	 * @return The next step.
-	 */
-	TermsAggregationFieldStep<SR, ?> terms();
-
-	/**
-	 * Perform the sum metric aggregation.
-	 *
-	 * @return The next step.
-	 */
-	@Incubating
-	SumAggregationFieldStep<SR, ?> sum();
-
-	/**
-	 * Perform the min metric aggregation.
-	 *
-	 * @return The next step.
-	 */
-	@Incubating
-	MinAggregationFieldStep<SR, ?> min();
-
-	/**
-	 * Perform the max metric aggregation.
-	 *
-	 * @return The next step.
-	 */
-	@Incubating
-	MaxAggregationFieldStep<SR, ?> max();
-
-	/**
-	 * Perform the count metric aggregation.
-	 *
-	 * @return The next step.
-	 */
-	@Incubating
-	CountAggregationFieldStep<SR, ?> count();
-
-	/**
-	 * Perform the count distinct metric aggregation.
-	 *
-	 * @return The next step.
-	 */
-	@Incubating
-	CountDistinctAggregationFieldStep<SR, ?> countDistinct();
-
-	/**
-	 * Perform the avg metric aggregation.
-	 *
-	 * @return the next step.
-	 */
-	@Incubating
-	AvgAggregationFieldStep<SR, ?> avg();
-
-	/**
-	 * Delegating aggregation that creates the actual aggregation at query create time and provides access to query parameters.
-	 * <p>
-	 * Which aggregation exactly to create is defined by a function passed to the arguments of this aggregation.
-	 *
-	 * @param aggregationCreator The function creating an actual aggregation.
-	 * @return A final DSL step in a parameterized aggregation definition.
-	 */
-	@Incubating
-	<T> AggregationFinalStep<T> withParameters(
-			Function<? super NamedValues, ? extends AggregationFinalStep<T>> aggregationCreator);
-
-	/**
-	 * Extend the current factory with the given extension,
-	 * resulting in an extended factory offering different types of aggregations.
-	 *
-	 * @param extension The extension to the aggregation DSL.
-	 * @param <T> The type of factory provided by the extension.
-	 * @return The extended factory.
-	 * @throws SearchException If the extension cannot be applied (wrong underlying backend, ...).
-	 */
-	<T> T extension(SearchAggregationFactoryExtension<SR, T> extension);
+public interface SearchAggregationFactory extends TypedSearchAggregationFactory<NonStaticMetamodelScope> {
 
 	/**
 	 * Create a new aggregation factory whose root for all paths passed to the DSL
@@ -153,7 +48,7 @@ public interface SearchAggregationFactory<SR> {
 	 * @return A new aggregation factory using the given object field as root.
 	 */
 	@Incubating
-	SearchAggregationFactory<SR> withRoot(String objectFieldPath);
+	SearchAggregationFactory withRoot(String objectFieldPath);
 
 	/**
 	 * @param relativeFieldPath The path to a field, relative to the {@link #withRoot(String) root} of this factory.

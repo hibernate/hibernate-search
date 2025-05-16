@@ -9,20 +9,20 @@ import java.util.stream.Collectors;
 
 import org.hibernate.search.engine.backend.index.IndexManager;
 import org.hibernate.search.engine.common.EntityReference;
-import org.hibernate.search.engine.search.aggregation.dsl.SearchAggregationFactory;
-import org.hibernate.search.engine.search.predicate.dsl.SearchPredicateFactory;
+import org.hibernate.search.engine.search.aggregation.dsl.TypedSearchAggregationFactory;
+import org.hibernate.search.engine.search.predicate.dsl.TypedSearchPredicateFactory;
 import org.hibernate.search.engine.search.projection.SearchProjection;
-import org.hibernate.search.engine.search.projection.dsl.SearchProjectionFactory;
-import org.hibernate.search.engine.search.sort.dsl.SearchSortFactory;
+import org.hibernate.search.engine.search.projection.dsl.TypedSearchProjectionFactory;
+import org.hibernate.search.engine.search.sort.dsl.TypedSearchSortFactory;
 import org.hibernate.search.mapper.orm.entity.SearchIndexedEntity;
-import org.hibernate.search.mapper.orm.scope.SearchScope;
+import org.hibernate.search.mapper.orm.scope.TypedSearchScope;
 import org.hibernate.search.scope.spi.V5MigrationSearchScope;
 
 public class V5MigrationOrmSearchScopeAdapter implements V5MigrationSearchScope {
 
-	private final SearchScope<?, ?> delegate;
+	private final TypedSearchScope<?, ?> delegate;
 
-	public V5MigrationOrmSearchScopeAdapter(SearchScope<?, ?> delegate) {
+	public V5MigrationOrmSearchScopeAdapter(TypedSearchScope<?, ?> delegate) {
 		this.delegate = delegate;
 	}
 
@@ -37,23 +37,23 @@ public class V5MigrationOrmSearchScopeAdapter implements V5MigrationSearchScope 
 	}
 
 	@Override
-	public SearchPredicateFactory<?> predicate() {
+	public TypedSearchPredicateFactory<?> predicate() {
 		return delegate.predicate();
 	}
 
 	@Override
-	public SearchSortFactory<?> sort() {
+	public TypedSearchSortFactory<?> sort() {
 		return delegate.sort();
 	}
 
 	@Override
-	public SearchProjectionFactory<?, ?, ?> projection() {
+	public TypedSearchProjectionFactory<?, ?, ?> projection() {
 		return delegate.projection();
 	}
 
 	@Override
 	public SearchProjection<Object> idProjection() {
-		SearchProjectionFactory<?, ? extends EntityReference, ?> factory = delegate.projection();
+		TypedSearchProjectionFactory<?, ? extends EntityReference, ?> factory = delegate.projection();
 		// Not using factory.id() because that one throws an exception if IDs have inconsistent types.
 		return factory.composite().from( factory.entityReference() )
 				.as( EntityReference::id ).toProjection();
@@ -61,17 +61,17 @@ public class V5MigrationOrmSearchScopeAdapter implements V5MigrationSearchScope 
 
 	@Override
 	public SearchProjection<? extends Class<?>> objectClassProjection() {
-		SearchProjectionFactory<?, ? extends EntityReference, ?> factory = delegate.projection();
+		TypedSearchProjectionFactory<?, ? extends EntityReference, ?> factory = delegate.projection();
 		return factory.composite().from( factory.entityReference() )
 				.as( EntityReference::type ).toProjection();
 	}
 
 	@Override
-	public SearchAggregationFactory<?> aggregation() {
+	public TypedSearchAggregationFactory<?> aggregation() {
 		return delegate.aggregation();
 	}
 
-	public SearchScope<?, ?> toSearchScope() {
+	public TypedSearchScope<?, ?> toSearchScope() {
 		return delegate;
 	}
 }

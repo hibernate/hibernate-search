@@ -11,7 +11,7 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 import org.hibernate.search.engine.environment.bean.BeanRetrieval;
-import org.hibernate.search.engine.search.projection.dsl.SearchProjectionFactory;
+import org.hibernate.search.engine.search.projection.dsl.TypedSearchProjectionFactory;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.processing.MethodParameterMapping;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.processing.MethodParameterMappingAnnotationProcessorRef;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.processing.impl.ObjectProjectionProcessor;
@@ -29,7 +29,7 @@ import org.hibernate.search.util.common.annotation.Incubating;
  * Therefore, you must take care of using a {@code List<...>} as your constructor parameter type
  * if the object field is multi-valued.
  *
- * @see SearchProjectionFactory#object(String)
+ * @see TypedSearchProjectionFactory#object(String)
  * @see org.hibernate.search.engine.search.projection.dsl.CompositeProjectionInnerStep#as(Class)
  */
 @Documented
@@ -45,7 +45,7 @@ public @interface ObjectProjection {
 	 * Defaults to the name of the annotated constructor parameter,
 	 * if it can be retrieved (requires the class to be compiled with the {@code -parameters} flag;
 	 * otherwise an empty {@code path} will lead to a failure).
-	 * @see SearchProjectionFactory
+	 * @see TypedSearchProjectionFactory
 	 */
 	String path() default "";
 

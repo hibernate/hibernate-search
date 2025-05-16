@@ -30,7 +30,7 @@ import org.hibernate.SessionFactory;
 import org.hibernate.search.engine.spatial.GeoPoint;
 import org.hibernate.search.mapper.orm.Search;
 import org.hibernate.search.mapper.orm.cfg.HibernateOrmMapperSettings;
-import org.hibernate.search.mapper.orm.scope.SearchScope;
+import org.hibernate.search.mapper.orm.scope.TypedSearchScope;
 import org.hibernate.search.mapper.orm.session.SearchSession;
 import org.hibernate.search.mapper.pojo.automaticindexing.ReindexOnUpdate;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.FullTextField;
@@ -73,7 +73,7 @@ class FieldTypesIT {
 
 		try ( var s = sessionFactory.openSession() ) {
 			SearchSession session = Search.session( s );
-			SearchScope<FieldTypesIT_FieldTypesEntity__, FieldTypesIT.FieldTypesEntity> scope =
+			TypedSearchScope<FieldTypesIT_FieldTypesEntity__, FieldTypesEntity> scope =
 					FieldTypesIT_FieldTypesEntity__.INDEX.scope( session );
 			assertThat( session.search( scope )
 					.where( f -> f.bool()

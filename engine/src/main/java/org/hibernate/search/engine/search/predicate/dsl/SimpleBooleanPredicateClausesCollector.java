@@ -12,7 +12,7 @@ import org.hibernate.search.engine.search.predicate.SearchPredicate;
 
 /**
  * An object where the clauses and options of a simple boolean predicate
- * ({@link SearchPredicateFactory#and() and}, {@link SearchPredicateFactory#or() or})
+ * ({@link TypedSearchPredicateFactory#and() and}, {@link TypedSearchPredicateFactory#or() or})
  * can be set.
  *
  * <h2 id="clauses">Clauses</h2>
@@ -22,15 +22,15 @@ import org.hibernate.search.engine.search.predicate.SearchPredicate;
  * or <em>any</em> clause:
  * <ul>
  * <li>
- *     For the {@link SearchPredicateFactory#and() and} predicate,
+ *     For the {@link TypedSearchPredicateFactory#and() and} predicate,
  *     documents will have to match <em>all</em> clauses.
  * </li>
  * <li>
- *     For the {@link SearchPredicateFactory#or() or} predicate,
+ *     For the {@link TypedSearchPredicateFactory#or() or} predicate,
  *     documents will have to match <em>any</em> clauses (at least one).
  * </li>
  * <li>
- *     For the {@link SearchPredicateFactory#nested(String) nested} predicate,
+ *     For the {@link TypedSearchPredicateFactory#nested(String) nested} predicate,
  *     documents will have to match <em>all</em> clauses.
  * </li>
  * <li>
@@ -69,7 +69,7 @@ public interface SimpleBooleanPredicateClausesCollector<SR, S extends SimpleBool
 	 *
 	 * @return {@code this}, for method chaining.
 	 */
-	S add(Function<? super SearchPredicateFactory<SR>, ? extends PredicateFinalStep> clauseContributor);
+	S add(Function<? super TypedSearchPredicateFactory<SR>, ? extends PredicateFinalStep> clauseContributor);
 
 	/**
 	 * Delegates setting <a href="#clauses">clauses</a> and options to a given consumer.

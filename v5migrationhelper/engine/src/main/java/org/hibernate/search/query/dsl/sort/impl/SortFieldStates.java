@@ -11,9 +11,9 @@ import org.hibernate.search.engine.search.sort.dsl.CompositeSortComponentsStep;
 import org.hibernate.search.engine.search.sort.dsl.DistanceSortOptionsStep;
 import org.hibernate.search.engine.search.sort.dsl.FieldSortOptionsStep;
 import org.hibernate.search.engine.search.sort.dsl.ScoreSortOptionsStep;
-import org.hibernate.search.engine.search.sort.dsl.SearchSortFactory;
 import org.hibernate.search.engine.search.sort.dsl.SortOrder;
 import org.hibernate.search.engine.search.sort.dsl.SortOrderStep;
+import org.hibernate.search.engine.search.sort.dsl.TypedSearchSortFactory;
 import org.hibernate.search.engine.spatial.GeoPoint;
 import org.hibernate.search.query.dsl.impl.QueryBuildingContext;
 import org.hibernate.search.spatial.Coordinates;
@@ -36,7 +36,7 @@ public class SortFieldStates {
 	private static final Object MISSING_VALUE_LAST = new Object();
 	private static final Object MISSING_VALUE_FIRST = new Object();
 
-	private final SearchSortFactory<?> factory;
+	private final TypedSearchSortFactory<?> factory;
 	private final CompositeSortComponentsStep<?, ?> delegate;
 
 	private Type currentType;

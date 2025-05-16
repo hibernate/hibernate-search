@@ -16,7 +16,7 @@ import org.hibernate.graph.GraphSemantic;
 import org.hibernate.graph.RootGraph;
 import org.hibernate.query.Query;
 import org.hibernate.query.spi.QueryImplementor;
-import org.hibernate.search.engine.search.projection.dsl.SearchProjectionFactory;
+import org.hibernate.search.engine.search.projection.dsl.TypedSearchProjectionFactory;
 import org.hibernate.search.engine.search.query.SearchQuery;
 import org.hibernate.search.engine.search.query.dsl.SearchQueryOptionsStep;
 import org.hibernate.search.engine.search.query.dsl.SearchQuerySelectStep;
@@ -55,7 +55,7 @@ public interface FullTextQuery extends org.hibernate.search.jpa.FullTextQuery, Q
 	 * create a search query with {@link SearchSession#search(Class)},
 	 * and define your projections using {@link SearchQuerySelectStep#select(Function)}.
 	 * See in particular the composite projection, which allows applying a function to another projection:
-	 * {@link SearchProjectionFactory#composite()}.
+	 * {@link TypedSearchProjectionFactory#composite()}.
 	 * Refer to the <a href="https://hibernate.org/search/documentation/migrate/6.0/">migration guide</a> for more information.
 	 */
 	@Deprecated

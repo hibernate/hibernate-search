@@ -10,8 +10,8 @@ import java.util.function.Function;
 
 import org.hibernate.search.engine.search.predicate.SearchPredicate;
 import org.hibernate.search.engine.search.predicate.dsl.PredicateFinalStep;
-import org.hibernate.search.engine.search.predicate.dsl.SearchPredicateFactory;
 import org.hibernate.search.engine.search.predicate.dsl.SimpleBooleanPredicateClausesCollector;
+import org.hibernate.search.engine.search.predicate.dsl.TypedSearchPredicateFactory;
 
 /**
  * The step in a query definition where the predicate, i.e. the "WHERE" clause, can be set.
@@ -27,7 +27,7 @@ public interface SearchQueryWhereStep<
 		N extends SearchQueryOptionsStep<SR, ?, H, LOS, ?, ?>,
 		H,
 		LOS,
-		PDF extends SearchPredicateFactory<SR>> {
+		PDF extends TypedSearchPredicateFactory<SR>> {
 
 	/**
 	 * Set the predicate for this query.

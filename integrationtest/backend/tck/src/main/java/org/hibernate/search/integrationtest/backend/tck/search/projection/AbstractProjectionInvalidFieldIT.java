@@ -11,7 +11,7 @@ import org.hibernate.search.engine.backend.document.IndexObjectFieldReference;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaElement;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaObjectField;
 import org.hibernate.search.engine.backend.types.ObjectStructure;
-import org.hibernate.search.engine.search.projection.dsl.SearchProjectionFactory;
+import org.hibernate.search.engine.search.projection.dsl.TypedSearchProjectionFactory;
 import org.hibernate.search.util.common.SearchException;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.SimpleMappedIndex;
 
@@ -27,7 +27,7 @@ public abstract class AbstractProjectionInvalidFieldIT {
 
 	@Test
 	void use_unknownField() {
-		SearchProjectionFactory<?, ?, ?> f = index.createScope().projection();
+		TypedSearchProjectionFactory<?, ?, ?> f = index.createScope().projection();
 
 		assertThatThrownBy( () -> tryProjection( f, "unknown_field" ) )
 				.isInstanceOf( SearchException.class )
@@ -57,7 +57,7 @@ public abstract class AbstractProjectionInvalidFieldIT {
 
 	@Test
 	void use_objectField_nested() {
-		SearchProjectionFactory<?, ?, ?> f = index.createScope().projection();
+		TypedSearchProjectionFactory<?, ?, ?> f = index.createScope().projection();
 
 		String fieldPath = index.binding().nested.relativeFieldName;
 
@@ -68,7 +68,7 @@ public abstract class AbstractProjectionInvalidFieldIT {
 
 	@Test
 	void use_objectField_flattened() {
-		SearchProjectionFactory<?, ?, ?> f = index.createScope().projection();
+		TypedSearchProjectionFactory<?, ?, ?> f = index.createScope().projection();
 
 		String fieldPath = index.binding().flattened.relativeFieldName;
 
@@ -77,7 +77,7 @@ public abstract class AbstractProjectionInvalidFieldIT {
 				.hasMessageContaining( "Cannot use '" + projectionTrait() + "' on field '" + fieldPath + "'" );
 	}
 
-	protected abstract void tryProjection(SearchProjectionFactory<?, ?, ?> f, String fieldPath);
+	protected abstract void tryProjection(TypedSearchProjectionFactory<?, ?, ?> f, String fieldPath);
 
 	protected abstract String projectionTrait();
 

@@ -13,7 +13,7 @@ import org.hibernate.search.engine.search.projection.definition.ProjectionDefini
 import org.hibernate.search.engine.search.projection.definition.spi.CompositeProjectionDefinition;
 import org.hibernate.search.engine.search.projection.dsl.CompositeProjectionInnerStep;
 import org.hibernate.search.engine.search.projection.dsl.CompositeProjectionValueStep;
-import org.hibernate.search.engine.search.projection.dsl.SearchProjectionFactory;
+import org.hibernate.search.engine.search.projection.dsl.TypedSearchProjectionFactory;
 import org.hibernate.search.mapper.pojo.logging.impl.ProjectionLog;
 import org.hibernate.search.mapper.pojo.model.path.spi.ProjectionConstructorPath;
 import org.hibernate.search.mapper.pojo.model.spi.PojoConstructorIdentifier;
@@ -63,7 +63,7 @@ public final class PojoConstructorProjectionDefinition<T>
 	}
 
 	@Override
-	public CompositeProjectionValueStep<?, T> apply(SearchProjectionFactory<?, ?, ?> projectionFactory,
+	public CompositeProjectionValueStep<?, T> apply(TypedSearchProjectionFactory<?, ?, ?> projectionFactory,
 			CompositeProjectionInnerStep initialStep, ProjectionDefinitionContext context) {
 		int i = -1;
 		try {

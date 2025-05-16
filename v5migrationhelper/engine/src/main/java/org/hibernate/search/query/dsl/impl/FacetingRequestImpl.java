@@ -9,7 +9,7 @@ import java.util.List;
 
 import org.hibernate.search.engine.search.aggregation.AggregationKey;
 import org.hibernate.search.engine.search.aggregation.dsl.AggregationFinalStep;
-import org.hibernate.search.engine.search.aggregation.dsl.SearchAggregationFactory;
+import org.hibernate.search.engine.search.aggregation.dsl.TypedSearchAggregationFactory;
 import org.hibernate.search.query.facet.Facet;
 import org.hibernate.search.query.facet.FacetSortOrder;
 import org.hibernate.search.query.facet.FacetingRequest;
@@ -90,7 +90,7 @@ public abstract class FacetingRequestImpl<A> implements FacetingRequest {
 		this.maxNumberOfFacets = maxNumberOfFacets;
 	}
 
-	public abstract AggregationFinalStep<A> requestAggregation(SearchAggregationFactory<?> factory);
+	public abstract AggregationFinalStep<A> requestAggregation(TypedSearchAggregationFactory<?> factory);
 
 	public abstract List<Facet> toFacets(A aggregation);
 

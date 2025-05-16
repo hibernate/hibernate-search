@@ -10,7 +10,7 @@ import java.util.List;
 import java.util.function.Function;
 
 import org.hibernate.search.engine.search.projection.dsl.ProjectionFinalStep;
-import org.hibernate.search.engine.search.projection.dsl.SearchProjectionFactory;
+import org.hibernate.search.engine.search.projection.dsl.TypedSearchProjectionFactory;
 import org.hibernate.search.mapper.pojo.standalone.mapping.SearchMapping;
 import org.hibernate.search.mapper.pojo.standalone.session.SearchSession;
 import org.hibernate.search.util.impl.integrationtest.common.extension.BackendMock;
@@ -50,7 +50,7 @@ public abstract class AbstractProjectionConstructorIT {
 
 	protected final <P> void testSuccessfulRootProjection(SearchMapping mapping, Class<?> indexedType, Class<P> projectionType,
 			List<?> rawProjectionResults,
-			Function<SearchProjectionFactory<?, ?, ?>, ProjectionFinalStep<?>> expectedProjection,
+			Function<TypedSearchProjectionFactory<?, ?, ?>, ProjectionFinalStep<?>> expectedProjection,
 			List<P> expectedProjectionResults) {
 		try ( SearchSession session = createSession( mapping ) ) {
 			backendMock.expectSearchProjection(

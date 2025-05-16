@@ -10,8 +10,8 @@ import java.util.List;
 import java.util.Map;
 
 import org.hibernate.search.engine.search.aggregation.dsl.AggregationFinalStep;
-import org.hibernate.search.engine.search.aggregation.dsl.SearchAggregationFactory;
 import org.hibernate.search.engine.search.aggregation.dsl.TermsAggregationOptionsStep;
+import org.hibernate.search.engine.search.aggregation.dsl.TypedSearchAggregationFactory;
 import org.hibernate.search.query.facet.Facet;
 
 /**
@@ -25,7 +25,7 @@ public class DiscreteFacetRequest extends FacetingRequestImpl<Map<Object, Long>>
 	}
 
 	@Override
-	public AggregationFinalStep<Map<Object, Long>> requestAggregation(SearchAggregationFactory<?> factory) {
+	public AggregationFinalStep<Map<Object, Long>> requestAggregation(TypedSearchAggregationFactory<?> factory) {
 		TermsAggregationOptionsStep<?, ?, ?, Object, Map<Object, Long>> optionsStep = factory
 				.terms().field( getFieldName(), Object.class );
 		if ( maxNumberOfFacets >= 0 ) {

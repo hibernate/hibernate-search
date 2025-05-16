@@ -14,7 +14,7 @@ import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaElement
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaObjectField;
 import org.hibernate.search.engine.backend.types.ObjectStructure;
 import org.hibernate.search.engine.reporting.spi.EventContexts;
-import org.hibernate.search.engine.search.predicate.dsl.SearchPredicateFactory;
+import org.hibernate.search.engine.search.predicate.dsl.TypedSearchPredicateFactory;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.extension.SearchSetupHelper;
 import org.hibernate.search.util.common.SearchException;
 import org.hibernate.search.util.impl.integrationtest.common.reporting.FailureReportUtils;
@@ -122,7 +122,7 @@ class ExistsPredicateObjectsSpecificsIT {
 
 	@Test
 	void nested_multiIndexes_incompatibleIndexBinding() {
-		SearchPredicateFactory<?> f = mainIndex.createScope( incompatibleIndex ).predicate();
+		TypedSearchPredicateFactory<?> f = mainIndex.createScope( incompatibleIndex ).predicate();
 		String fieldPath = "nested";
 
 		assertThatThrownBy( () -> f.exists().field( fieldPath ) )
@@ -148,7 +148,7 @@ class ExistsPredicateObjectsSpecificsIT {
 
 	@Test
 	void nested_multiIndexes_wrongStructure() {
-		SearchPredicateFactory<?> f = mainIndex.createScope( invertedIndex ).predicate();
+		TypedSearchPredicateFactory<?> f = mainIndex.createScope( invertedIndex ).predicate();
 
 		String fieldPath = "nested";
 
@@ -218,7 +218,7 @@ class ExistsPredicateObjectsSpecificsIT {
 
 	@Test
 	void flattened_multiIndexes_incompatibleIndexBinding() {
-		SearchPredicateFactory<?> f = incompatibleIndex.createScope( mainIndex ).predicate();
+		TypedSearchPredicateFactory<?> f = incompatibleIndex.createScope( mainIndex ).predicate();
 		String fieldPath = "flattened";
 
 		assertThatThrownBy( () -> f.exists().field( fieldPath ) )
@@ -244,7 +244,7 @@ class ExistsPredicateObjectsSpecificsIT {
 
 	@Test
 	void flattened_multiIndexes_wrongStructure() {
-		SearchPredicateFactory<?> f = invertedIndex.createScope( mainIndex ).predicate();
+		TypedSearchPredicateFactory<?> f = invertedIndex.createScope( mainIndex ).predicate();
 
 		String fieldPath = "flattened";
 

@@ -12,9 +12,9 @@ import org.hibernate.search.engine.search.aggregation.dsl.spi.SearchAggregationD
 import org.hibernate.search.engine.search.aggregation.spi.SearchFilterableAggregationBuilder;
 import org.hibernate.search.engine.search.predicate.SearchPredicate;
 import org.hibernate.search.engine.search.predicate.dsl.PredicateFinalStep;
-import org.hibernate.search.engine.search.predicate.dsl.SearchPredicateFactory;
+import org.hibernate.search.engine.search.predicate.dsl.TypedSearchPredicateFactory;
 
-class CountDistinctAggregationOptionsStepImpl<SR, PDF extends SearchPredicateFactory<SR>>
+class CountDistinctAggregationOptionsStepImpl<SR, PDF extends TypedSearchPredicateFactory<SR>>
 		implements CountDistinctAggregationOptionsStep<SR, CountDistinctAggregationOptionsStepImpl<SR, PDF>, PDF> {
 	private final SearchFilterableAggregationBuilder<Long> builder;
 	private final SearchAggregationDslContext<SR, ?, ? extends PDF> dslContext;

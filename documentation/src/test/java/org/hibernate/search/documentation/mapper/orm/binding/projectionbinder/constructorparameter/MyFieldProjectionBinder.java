@@ -7,7 +7,7 @@ package org.hibernate.search.documentation.mapper.orm.binding.projectionbinder.c
 import org.hibernate.search.engine.search.projection.SearchProjection;
 import org.hibernate.search.engine.search.projection.definition.ProjectionDefinition;
 import org.hibernate.search.engine.search.projection.definition.ProjectionDefinitionContext;
-import org.hibernate.search.engine.search.projection.dsl.SearchProjectionFactory;
+import org.hibernate.search.engine.search.projection.dsl.TypedSearchProjectionFactory;
 import org.hibernate.search.mapper.pojo.search.definition.binding.ProjectionBinder;
 import org.hibernate.search.mapper.pojo.search.definition.binding.ProjectionBindingContext;
 
@@ -31,7 +31,7 @@ public class MyFieldProjectionBinder implements ProjectionBinder {
 		}
 
 		@Override
-		public SearchProjection<String> create(SearchProjectionFactory<?, ?, ?> factory,
+		public SearchProjection<String> create(TypedSearchProjectionFactory<?, ?, ?> factory,
 				ProjectionDefinitionContext context) {
 			return factory.field( fieldName, String.class ) // <3>
 					.toProjection();

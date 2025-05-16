@@ -23,7 +23,7 @@ import org.hibernate.search.engine.backend.types.Projectable;
 import org.hibernate.search.engine.backend.types.dsl.SearchableProjectableIndexFieldTypeOptionsStep;
 import org.hibernate.search.engine.search.projection.ProjectionCollector;
 import org.hibernate.search.engine.search.projection.dsl.ProjectionFinalStep;
-import org.hibernate.search.engine.search.projection.dsl.SearchProjectionFactory;
+import org.hibernate.search.engine.search.projection.dsl.TypedSearchProjectionFactory;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.FieldTypeDescriptor;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.SimpleFieldModelsByType;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.TckConfiguration;
@@ -1036,11 +1036,11 @@ public abstract class AbstractProjectionInObjectProjectionIT<F, P, V extends Abs
 				.multiValuedFieldAbsolutePath( dataSet.fieldType );
 	}
 
-	protected abstract ProjectionFinalStep<P> singleValuedProjection(SearchProjectionFactory<?, ?, ?> f,
+	protected abstract ProjectionFinalStep<P> singleValuedProjection(TypedSearchProjectionFactory<?, ?, ?> f,
 			String absoluteFieldPath,
 			DataSet<F, P, V> dataSet);
 
-	protected abstract ProjectionFinalStep<List<P>> multiValuedProjection(SearchProjectionFactory<?, ?, ?> f,
+	protected abstract ProjectionFinalStep<List<P>> multiValuedProjection(TypedSearchProjectionFactory<?, ?, ?> f,
 			String absoluteFieldPath,
 			DataSet<F, P, V> dataSet);
 

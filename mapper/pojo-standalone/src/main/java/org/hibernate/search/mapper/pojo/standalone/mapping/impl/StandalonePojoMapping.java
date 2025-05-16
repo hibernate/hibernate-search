@@ -31,7 +31,9 @@ import org.hibernate.search.mapper.pojo.standalone.massindexing.impl.StandaloneP
 import org.hibernate.search.mapper.pojo.standalone.reporting.impl.StandalonePojoMappingHints;
 import org.hibernate.search.mapper.pojo.standalone.schema.management.impl.SchemaManagementListener;
 import org.hibernate.search.mapper.pojo.standalone.scope.SearchScope;
-import org.hibernate.search.mapper.pojo.standalone.scope.impl.SearchScopeImpl;
+import org.hibernate.search.mapper.pojo.standalone.scope.TypedSearchScope;
+import org.hibernate.search.mapper.pojo.standalone.scope.impl.SearchScopeDelegate;
+import org.hibernate.search.mapper.pojo.standalone.scope.impl.TypedSearchScopeImpl;
 import org.hibernate.search.mapper.pojo.standalone.session.SearchSession;
 import org.hibernate.search.mapper.pojo.standalone.session.SearchSessionBuilder;
 import org.hibernate.search.mapper.pojo.standalone.session.impl.StandalonePojoSearchSession;
@@ -70,12 +72,12 @@ public class StandalonePojoMapping extends AbstractPojoMappingImplementor<Standa
 
 		configuredIndexingPlanSynchronizationStrategyHolder.start( context );
 
-		Optional<SearchScopeImpl<Object, Object>> scopeOptional = createAllScope();
+		Optional<TypedSearchScopeImpl<Object, Object>> scopeOptional = createAllScope();
 		if ( !scopeOptional.isPresent() ) {
 			// No indexed type
 			return CompletableFuture.completedFuture( null );
 		}
-		SearchScopeImpl<Object, Object> scope = scopeOptional.get();
+		TypedSearchScopeImpl<Object, Object> scope = scopeOptional.get();
 
 		// Schema management
 		PojoScopeSchemaManager schemaManager = scope.schemaManagerDelegate();
@@ -88,7 +90,7 @@ public class StandalonePojoMapping extends AbstractPojoMappingImplementor<Standa
 
 	@Override
 	public CompletableFuture<?> preStop(MappingPreStopContext context) {
-		Optional<SearchScopeImpl<Object, Object>> scope = createAllScope();
+		Optional<TypedSearchScopeImpl<Object, Object>> scope = createAllScope();
 		if ( !scope.isPresent() ) {
 			// No indexed type
 			return CompletableFuture.completedFuture( null );
@@ -130,13 +132,18 @@ public class StandalonePojoMapping extends AbstractPojoMappingImplementor<Standa
 	}
 
 	@Override
-	public <SR, T> SearchScope<SR, T> scope(Collection<? extends Class<? extends T>> targetedTypes) {
-		return createScope( targetedTypes );
+	public <T> SearchScope<T> scope(Collection<? extends Class<? extends T>> targetedTypes) {
+		return new SearchScopeDelegate<>( createScope( targetedTypes ) );
 	}
 
 	@Override
-	public <SR, T> SearchScope<SR, T> scope(Class<T> expectedSuperType, Collection<String> entityNames) {
-		return createScope( expectedSuperType, entityNames );
+	public <T> SearchScope<T> scope(Class<T> expectedSuperType, Collection<String> entityNames) {
+		return new SearchScopeDelegate<>( createScope( expectedSuperType, entityNames ) );
+	}
+
+	@Override
+	public <SR, T> TypedSearchScope<SR, T> typedScope(Class<SR> rootScope, Collection<? extends Class<? extends T>> classes) {
+		return null;
 	}
 
 	@Override
@@ -155,7 +162,7 @@ public class StandalonePojoMapping extends AbstractPojoMappingImplementor<Standa
 	}
 
 	@Override
-	public <SR, T> SearchScopeImpl<SR, T> createScope(Collection<? extends Class<? extends T>> classes) {
+	public <SR, T> TypedSearchScopeImpl<SR, T> createScope(Collection<? extends Class<? extends T>> classes) {
 		PojoScopeDelegate<SR, EntityReference, T, SearchIndexedEntity<? extends T>> scopeDelegate =
 				delegate().createPojoScopeForClasses(
 						this,
@@ -164,11 +171,11 @@ public class StandalonePojoMapping extends AbstractPojoMappingImplementor<Standa
 				);
 
 		// Explicit type parameter is necessary here for ECJ (Eclipse compiler)
-		return new SearchScopeImpl<SR, T>( this, tenancyConfiguration, scopeDelegate );
+		return new TypedSearchScopeImpl<SR, T>( this, tenancyConfiguration, scopeDelegate );
 	}
 
 	@Override
-	public <SR, T> SearchScopeImpl<SR, T> createScope(Class<T> expectedSuperType, Collection<String> entityNames) {
+	public <SR, T> TypedSearchScopeImpl<SR, T> createScope(Class<T> expectedSuperType, Collection<String> entityNames) {
 		PojoScopeDelegate<SR, EntityReference, T, SearchIndexedEntity<? extends T>> scopeDelegate =
 				delegate().createPojoScopeForEntityNames(
 						this,
@@ -177,7 +184,7 @@ public class StandalonePojoMapping extends AbstractPojoMappingImplementor<Standa
 				);
 
 		// Explicit type parameter is necessary here for ECJ (Eclipse compiler)
-		return new SearchScopeImpl<SR, T>( this, tenancyConfiguration, scopeDelegate );
+		return new TypedSearchScopeImpl<SR, T>( this, tenancyConfiguration, scopeDelegate );
 	}
 
 	@Override
@@ -235,13 +242,13 @@ public class StandalonePojoMapping extends AbstractPojoMappingImplementor<Standa
 		return integrationHandle.getOrFail();
 	}
 
-	private Optional<SearchScopeImpl<Object, Object>> createAllScope() {
+	private Optional<TypedSearchScopeImpl<Object, Object>> createAllScope() {
 		return delegate()
 				.<Object, EntityReference, SearchIndexedEntity<?>>createPojoAllScope(
 						this,
 						typeContextContainer::indexedForExactType
 				)
-				.map( scopeDelegate -> new SearchScopeImpl<>( this, tenancyConfiguration, scopeDelegate ) );
+				.map( scopeDelegate -> new TypedSearchScopeImpl<>( this, tenancyConfiguration, scopeDelegate ) );
 	}
 
 	private StandalonePojoSearchSession.Builder createSessionBuilder() {

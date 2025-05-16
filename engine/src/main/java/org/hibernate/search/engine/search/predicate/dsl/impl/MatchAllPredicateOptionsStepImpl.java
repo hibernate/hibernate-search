@@ -9,7 +9,7 @@ import java.util.function.Function;
 import org.hibernate.search.engine.search.predicate.SearchPredicate;
 import org.hibernate.search.engine.search.predicate.dsl.MatchAllPredicateOptionsStep;
 import org.hibernate.search.engine.search.predicate.dsl.PredicateFinalStep;
-import org.hibernate.search.engine.search.predicate.dsl.SearchPredicateFactory;
+import org.hibernate.search.engine.search.predicate.dsl.TypedSearchPredicateFactory;
 import org.hibernate.search.engine.search.predicate.dsl.spi.AbstractPredicateFinalStep;
 import org.hibernate.search.engine.search.predicate.dsl.spi.SearchPredicateDslContext;
 import org.hibernate.search.engine.search.predicate.spi.BooleanPredicateBuilder;
@@ -20,7 +20,7 @@ public final class MatchAllPredicateOptionsStepImpl<SR>
 		extends AbstractPredicateFinalStep
 		implements MatchAllPredicateOptionsStep<SR, MatchAllPredicateOptionsStep<SR, ?>> {
 
-	private final SearchPredicateFactory<SR> factory;
+	private final TypedSearchPredicateFactory<SR> factory;
 
 	private final MatchAllPredicateBuilder matchAllBuilder;
 	private MatchAllExceptState exceptState;
@@ -28,7 +28,7 @@ public final class MatchAllPredicateOptionsStepImpl<SR>
 	private boolean constantScore = false;
 
 	public MatchAllPredicateOptionsStepImpl(SearchPredicateDslContext<?> dslContext,
-			SearchPredicateFactory<SR> factory) {
+			TypedSearchPredicateFactory<SR> factory) {
 		super( dslContext );
 		this.factory = factory;
 		this.matchAllBuilder = dslContext.scope().predicateBuilders().matchAll();
@@ -54,7 +54,7 @@ public final class MatchAllPredicateOptionsStepImpl<SR>
 
 	@Override
 	public MatchAllPredicateOptionsStep<SR, ?> except(
-			Function<? super SearchPredicateFactory<SR>, ? extends PredicateFinalStep> clauseContributor) {
+			Function<? super TypedSearchPredicateFactory<SR>, ? extends PredicateFinalStep> clauseContributor) {
 		getExceptState().addClause( clauseContributor );
 		return this;
 	}
@@ -92,7 +92,7 @@ public final class MatchAllPredicateOptionsStepImpl<SR>
 			this.booleanBuilder = dslContext.scope().predicateBuilders().bool();
 		}
 
-		void addClause(Function<? super SearchPredicateFactory<SR>, ? extends PredicateFinalStep> clauseContributor) {
+		void addClause(Function<? super TypedSearchPredicateFactory<SR>, ? extends PredicateFinalStep> clauseContributor) {
 			addClause( clauseContributor.apply( factory ).toPredicate() );
 		}
 

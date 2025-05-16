@@ -14,7 +14,7 @@ import org.hibernate.search.engine.backend.document.DocumentElement;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaElement;
 import org.hibernate.search.engine.backend.types.dsl.SearchableProjectableIndexFieldTypeOptionsStep;
 import org.hibernate.search.engine.search.predicate.dsl.PredicateFinalStep;
-import org.hibernate.search.engine.search.predicate.dsl.SearchPredicateFactory;
+import org.hibernate.search.engine.search.predicate.dsl.TypedSearchPredicateFactory;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.FieldTypeDescriptor;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.SimpleFieldModelsByType;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.BulkIndexer;
@@ -87,10 +87,10 @@ public abstract class AbstractPredicateSingleFieldIT<V extends AbstractPredicate
 		return false;
 	}
 
-	protected abstract PredicateFinalStep predicate(SearchPredicateFactory<?> f, String fieldPath, int matchingDocOrdinal,
+	protected abstract PredicateFinalStep predicate(TypedSearchPredicateFactory<?> f, String fieldPath, int matchingDocOrdinal,
 			DataSet<?, V> dataSet);
 
-	protected abstract PredicateFinalStep predicate(SearchPredicateFactory<?> f, String fieldPath, String paramName,
+	protected abstract PredicateFinalStep predicate(TypedSearchPredicateFactory<?> f, String fieldPath, String paramName,
 			DataSet<?, V> dataSet);
 
 	protected abstract Map<String, Object> parameterValues(int matchingDocOrdinal, DataSet<?, V> dataSet, String paramName);

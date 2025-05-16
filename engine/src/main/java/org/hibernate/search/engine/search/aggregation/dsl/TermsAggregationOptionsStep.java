@@ -6,7 +6,7 @@ package org.hibernate.search.engine.search.aggregation.dsl;
 
 import java.util.function.Function;
 
-import org.hibernate.search.engine.search.predicate.dsl.SearchPredicateFactory;
+import org.hibernate.search.engine.search.predicate.dsl.TypedSearchPredicateFactory;
 
 /**
  * The final step in a "terms" aggregation definition, where optional parameters can be set.
@@ -19,7 +19,7 @@ import org.hibernate.search.engine.search.predicate.dsl.SearchPredicateFactory;
 public interface TermsAggregationOptionsStep<
 		SR,
 		S extends TermsAggregationOptionsStep<SR, ?, PDF, F, A>,
-		PDF extends SearchPredicateFactory<SR>,
+		PDF extends TypedSearchPredicateFactory<SR>,
 		F,
 		A>
 		extends AggregationFinalStep<A>, AggregationFilterStep<SR, S, PDF> {

@@ -9,12 +9,13 @@ import java.util.Collection;
 import java.util.Collections;
 
 import org.hibernate.search.engine.common.EntityReference;
+import org.hibernate.search.engine.search.common.NonStaticMetamodelScope;
 import org.hibernate.search.engine.search.query.dsl.SearchQuerySelectStep;
 import org.hibernate.search.mapper.pojo.standalone.massindexing.MassIndexer;
 import org.hibernate.search.mapper.pojo.standalone.schema.management.SearchSchemaManager;
-import org.hibernate.search.mapper.pojo.standalone.scope.SearchScope;
 import org.hibernate.search.mapper.pojo.standalone.scope.SearchScopeProvider;
 import org.hibernate.search.mapper.pojo.standalone.scope.StandalonePojoRootReferenceScope;
+import org.hibernate.search.mapper.pojo.standalone.scope.TypedSearchScope;
 import org.hibernate.search.mapper.pojo.standalone.work.SearchIndexer;
 import org.hibernate.search.mapper.pojo.standalone.work.SearchIndexingPlan;
 import org.hibernate.search.mapper.pojo.standalone.work.SearchWorkspace;
@@ -88,7 +89,7 @@ public interface SearchSession extends SearchScopeProvider, AutoCloseable {
 	 * @return The initial step of a DSL where the search query can be defined.
 	 * @see SearchQuerySelectStep
 	 */
-	default <T> SearchQuerySelectStep<T, ?, EntityReference, T, ?, ?, ?> search(Class<T> clazz) {
+	default <T> SearchQuerySelectStep<NonStaticMetamodelScope, ?, EntityReference, T, ?, ?, ?> search(Class<T> clazz) {
 		return search( Collections.singleton( clazz ) );
 	}
 
@@ -104,7 +105,8 @@ public interface SearchSession extends SearchScopeProvider, AutoCloseable {
 	 * @return The initial step of a DSL where the search query can be defined.
 	 * @see SearchQuerySelectStep
 	 */
-	<T> SearchQuerySelectStep<T, ?, EntityReference, T, ?, ?, ?> search(Collection<? extends Class<? extends T>> classes);
+	<T> SearchQuerySelectStep<NonStaticMetamodelScope, ?, EntityReference, T, ?, ?, ?> search(
+			Collection<? extends Class<? extends T>> classes);
 
 	/**
 	 * Initiate the building of a search query.
@@ -116,7 +118,7 @@ public interface SearchSession extends SearchScopeProvider, AutoCloseable {
 	 * @return The initial step of a DSL where the search query can be defined.
 	 * @see SearchQuerySelectStep
 	 */
-	<SR, T> SearchQuerySelectStep<SR, ?, EntityReference, T, ?, ?, ?> search(SearchScope<SR, T> scope);
+	<SR, T> SearchQuerySelectStep<SR, ?, EntityReference, T, ?, ?, ?> search(TypedSearchScope<SR, T> scope);
 
 	/**
 	 * Initiate the building of a search query.

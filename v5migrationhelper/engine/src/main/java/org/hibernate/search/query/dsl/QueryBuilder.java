@@ -7,7 +7,7 @@ package org.hibernate.search.query.dsl;
 
 import java.util.function.Function;
 
-import org.hibernate.search.engine.search.predicate.dsl.SearchPredicateFactory;
+import org.hibernate.search.engine.search.predicate.dsl.TypedSearchPredicateFactory;
 import org.hibernate.search.engine.search.query.SearchQuery;
 import org.hibernate.search.engine.search.query.dsl.SearchQueryWhereStep;
 import org.hibernate.search.query.dsl.sort.SortContext;
@@ -36,8 +36,8 @@ public interface QueryBuilder {
 	 *
 	 * @return a {@code TermContext} instance for building the term query
 	 * @deprecated See the javadoc of this class for how to create predicates in Hibernate Search 6.
-	 * The equivalent predicate in Hibernate Search 6 is {@link SearchPredicateFactory#match()}.
-	 * For wildcard predicates, use {@link SearchPredicateFactory#wildcard()}.
+	 * The equivalent predicate in Hibernate Search 6 is {@link TypedSearchPredicateFactory#match()}.
+	 * For wildcard predicates, use {@link TypedSearchPredicateFactory#wildcard()}.
 	 */
 	@Deprecated
 	TermContext keyword();
@@ -47,7 +47,7 @@ public interface QueryBuilder {
 	 *
 	 * @return a {@code RangeContext} instance for building the range query
 	 * @deprecated See the javadoc of this class for how to create predicates in Hibernate Search 6.
-	 * The equivalent predicate in Hibernate Search 6 is {@link SearchPredicateFactory#range()}.
+	 * The equivalent predicate in Hibernate Search 6 is {@link TypedSearchPredicateFactory#range()}.
 	 */
 	@Deprecated
 	RangeContext range();
@@ -57,7 +57,7 @@ public interface QueryBuilder {
 	 *
 	 * @return a {@code PhraseContext} instance for building the phrase query
 	 * @deprecated See the javadoc of this class for how to create predicates in Hibernate Search 6.
-	 * The equivalent predicate in Hibernate Search 6 is {@link SearchPredicateFactory#phrase()}.
+	 * The equivalent predicate in Hibernate Search 6 is {@link TypedSearchPredicateFactory#phrase()}.
 	 */
 	@Deprecated
 	PhraseContext phrase();
@@ -67,7 +67,7 @@ public interface QueryBuilder {
 	 *
 	 * @return a {@code SimpleQueryStringContext} instance for building a query from a simple query string
 	 * @deprecated See the javadoc of this class for how to create predicates in Hibernate Search 6.
-	 * The equivalent predicate in Hibernate Search 6 is {@link SearchPredicateFactory#simpleQueryString()}.
+	 * The equivalent predicate in Hibernate Search 6 is {@link TypedSearchPredicateFactory#simpleQueryString()}.
 	 */
 	@Deprecated
 	SimpleQueryStringContext simpleQueryString();
@@ -77,7 +77,7 @@ public interface QueryBuilder {
 	 *
 	 * @return a {@code BooleanJunction} instance for building the boolean query
 	 * @deprecated See the javadoc of this class for how to create predicates in Hibernate Search 6.
-	 * The equivalent predicate in Hibernate Search 6 is {@link SearchPredicateFactory#bool()}.
+	 * The equivalent predicate in Hibernate Search 6 is {@link TypedSearchPredicateFactory#bool()}.
 	 */
 	@Deprecated
 	BooleanJunction<BooleanJunction> bool();
@@ -87,7 +87,7 @@ public interface QueryBuilder {
 	 *
 	 * @return an {@code AllContext}
 	 * @deprecated See the javadoc of this class for how to create predicates in Hibernate Search 6.
-	 * The equivalent predicate in Hibernate Search 6 is {@link SearchPredicateFactory#matchAll()}.
+	 * The equivalent predicate in Hibernate Search 6 is {@link TypedSearchPredicateFactory#matchAll()}.
 	 */
 	@Deprecated
 	AllContext all();
@@ -105,7 +105,7 @@ public interface QueryBuilder {
 	 * Build a spatial query.
 	 * @return the spatial context as entry point got building the spatial request
 	 * @deprecated See the javadoc of this class for how to create predicates in Hibernate Search 6.
-	 * The equivalent predicate in Hibernate Search 6 is {@link SearchPredicateFactory#spatial()}.
+	 * The equivalent predicate in Hibernate Search 6 is {@link TypedSearchPredicateFactory#spatial()}.
 	 */
 	SpatialContext spatial();
 

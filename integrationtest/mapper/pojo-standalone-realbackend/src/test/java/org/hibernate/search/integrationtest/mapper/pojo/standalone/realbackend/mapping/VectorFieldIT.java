@@ -18,7 +18,7 @@ import java.util.Objects;
 import org.hibernate.search.backend.elasticsearch.ElasticsearchDistributionName;
 import org.hibernate.search.backend.elasticsearch.ElasticsearchVersion;
 import org.hibernate.search.engine.backend.types.VectorSimilarity;
-import org.hibernate.search.engine.search.projection.dsl.SearchProjectionFactory;
+import org.hibernate.search.engine.search.projection.dsl.TypedSearchProjectionFactory;
 import org.hibernate.search.integrationtest.mapper.pojo.standalone.realbackend.testsupport.BackendConfigurations;
 import org.hibernate.search.mapper.pojo.bridge.ValueBridge;
 import org.hibernate.search.mapper.pojo.bridge.binding.ValueBindingContext;
@@ -117,12 +117,12 @@ class VectorFieldIT {
 		}
 
 		try ( SearchSession session = setup.createSession() ) {
-			List<Object> bytes = session.search( IndexedEntity.class ).select( SearchProjectionFactory::id )
+			List<Object> bytes = session.search( IndexedEntity.class ).select( TypedSearchProjectionFactory::id )
 					.where( f -> f.knn( BATCHES ).field( "bytes" ).matching( new byte[maxDimension] ) )
 					.fetchAllHits();
 			assertThat( bytes ).hasSizeGreaterThanOrEqualTo( BATCHES );
 
-			List<Object> floats = session.search( IndexedEntity.class ).select( SearchProjectionFactory::id )
+			List<Object> floats = session.search( IndexedEntity.class ).select( TypedSearchProjectionFactory::id )
 					.where( f -> f.knn( BATCHES ).field( "floats" ).matching( new float[maxDimension] ) )
 					.fetchAllHits();
 			assertThat( floats ).hasSizeGreaterThanOrEqualTo( BATCHES );

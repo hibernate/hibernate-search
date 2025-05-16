@@ -13,10 +13,10 @@ import org.hibernate.search.engine.search.aggregation.dsl.spi.SearchAggregationD
 import org.hibernate.search.engine.search.aggregation.spi.TermsAggregationBuilder;
 import org.hibernate.search.engine.search.predicate.SearchPredicate;
 import org.hibernate.search.engine.search.predicate.dsl.PredicateFinalStep;
-import org.hibernate.search.engine.search.predicate.dsl.SearchPredicateFactory;
+import org.hibernate.search.engine.search.predicate.dsl.TypedSearchPredicateFactory;
 import org.hibernate.search.util.common.impl.Contracts;
 
-class TermsAggregationOptionsStepImpl<SR, PDF extends SearchPredicateFactory<SR>, F>
+class TermsAggregationOptionsStepImpl<SR, PDF extends TypedSearchPredicateFactory<SR>, F>
 		implements TermsAggregationOptionsStep<SR, TermsAggregationOptionsStepImpl<SR, PDF, F>, PDF, F, Map<F, Long>> {
 	private final TermsAggregationBuilder<F> builder;
 	private final SearchAggregationDslContext<SR, ?, ? extends PDF> dslContext;

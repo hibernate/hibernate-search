@@ -22,21 +22,21 @@ import org.hibernate.search.engine.backend.types.dsl.IndexFieldTypeFactory;
 import org.hibernate.search.engine.backend.types.dsl.IndexFieldTypeFactoryExtension;
 import org.hibernate.search.engine.common.schema.management.SchemaExport;
 import org.hibernate.search.engine.common.schema.management.SchemaExportExtension;
-import org.hibernate.search.engine.search.aggregation.dsl.SearchAggregationFactory;
 import org.hibernate.search.engine.search.aggregation.dsl.SearchAggregationFactoryExtension;
+import org.hibernate.search.engine.search.aggregation.dsl.TypedSearchAggregationFactory;
 import org.hibernate.search.engine.search.loading.spi.SearchLoadingContext;
 import org.hibernate.search.engine.search.loading.spi.SearchLoadingContextBuilder;
-import org.hibernate.search.engine.search.predicate.dsl.SearchPredicateFactory;
 import org.hibernate.search.engine.search.predicate.dsl.SearchPredicateFactoryExtension;
-import org.hibernate.search.engine.search.projection.dsl.SearchProjectionFactory;
+import org.hibernate.search.engine.search.predicate.dsl.TypedSearchPredicateFactory;
 import org.hibernate.search.engine.search.projection.dsl.SearchProjectionFactoryExtension;
+import org.hibernate.search.engine.search.projection.dsl.TypedSearchProjectionFactory;
 import org.hibernate.search.engine.search.query.SearchQuery;
 import org.hibernate.search.engine.search.query.SearchQueryExtension;
 import org.hibernate.search.engine.search.query.dsl.SearchQueryDslExtension;
 import org.hibernate.search.engine.search.query.dsl.SearchQuerySelectStep;
 import org.hibernate.search.engine.search.query.spi.SearchQueryIndexScope;
-import org.hibernate.search.engine.search.sort.dsl.SearchSortFactory;
 import org.hibernate.search.engine.search.sort.dsl.SearchSortFactoryExtension;
+import org.hibernate.search.engine.search.sort.dsl.TypedSearchSortFactory;
 
 /**
  * An extension for the Elasticsearch backend, giving access to Elasticsearch-specific features.
@@ -137,7 +137,7 @@ public final class ElasticsearchExtension<SR, H, R, E, LOS>
 	 * {@inheritDoc}
 	 */
 	@Override
-	public Optional<ElasticsearchSearchPredicateFactory<SR>> extendOptional(SearchPredicateFactory<SR> original) {
+	public Optional<ElasticsearchSearchPredicateFactory<SR>> extendOptional(TypedSearchPredicateFactory<SR> original) {
 		if ( original instanceof ElasticsearchSearchPredicateFactory ) {
 			return Optional.of( (ElasticsearchSearchPredicateFactory<SR>) original );
 		}
@@ -151,7 +151,7 @@ public final class ElasticsearchExtension<SR, H, R, E, LOS>
 	 */
 	@Override
 	public Optional<ElasticsearchSearchSortFactory<SR>> extendOptional(
-			SearchSortFactory<SR> original) {
+			TypedSearchSortFactory<SR> original) {
 		if ( original instanceof ElasticsearchSearchSortFactory ) {
 			return Optional.of( (ElasticsearchSearchSortFactory<SR>) original );
 		}
@@ -164,7 +164,8 @@ public final class ElasticsearchExtension<SR, H, R, E, LOS>
 	 * {@inheritDoc}
 	 */
 	@Override
-	public Optional<ElasticsearchSearchProjectionFactory<SR, R, E>> extendOptional(SearchProjectionFactory<SR, R, E> original) {
+	public Optional<ElasticsearchSearchProjectionFactory<SR, R, E>> extendOptional(
+			TypedSearchProjectionFactory<SR, R, E> original) {
 		if ( original instanceof ElasticsearchSearchProjectionFactory ) {
 			return Optional.of( (ElasticsearchSearchProjectionFactory<SR, R, E>) original );
 		}
@@ -178,7 +179,7 @@ public final class ElasticsearchExtension<SR, H, R, E, LOS>
 	 */
 	@Override
 	public Optional<ElasticsearchSearchAggregationFactory<SR>> extendOptional(
-			SearchAggregationFactory<SR> original) {
+			TypedSearchAggregationFactory<SR> original) {
 		if ( original instanceof ElasticsearchSearchAggregationFactory ) {
 			return Optional.of( (ElasticsearchSearchAggregationFactory<SR>) original );
 		}

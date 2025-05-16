@@ -10,20 +10,20 @@ import java.util.Set;
 import org.hibernate.search.engine.backend.mapping.spi.BackendMappingContext;
 import org.hibernate.search.engine.backend.scope.spi.AbstractSearchIndexScope;
 import org.hibernate.search.engine.backend.session.spi.BackendSessionContext;
-import org.hibernate.search.engine.search.aggregation.dsl.SearchAggregationFactory;
+import org.hibernate.search.engine.search.aggregation.dsl.TypedSearchAggregationFactory;
 import org.hibernate.search.engine.search.aggregation.dsl.spi.SearchAggregationDslContext;
 import org.hibernate.search.engine.search.aggregation.spi.SearchAggregationBuilderFactory;
 import org.hibernate.search.engine.search.highlighter.dsl.SearchHighlighterFactory;
 import org.hibernate.search.engine.search.loading.spi.SearchLoadingContextBuilder;
-import org.hibernate.search.engine.search.predicate.dsl.SearchPredicateFactory;
+import org.hibernate.search.engine.search.predicate.dsl.TypedSearchPredicateFactory;
 import org.hibernate.search.engine.search.predicate.dsl.spi.SearchPredicateDslContext;
 import org.hibernate.search.engine.search.predicate.spi.SearchPredicateBuilderFactory;
 import org.hibernate.search.engine.search.projection.SearchProjection;
-import org.hibernate.search.engine.search.projection.dsl.SearchProjectionFactory;
+import org.hibernate.search.engine.search.projection.dsl.TypedSearchProjectionFactory;
 import org.hibernate.search.engine.search.projection.dsl.spi.SearchProjectionDslContext;
 import org.hibernate.search.engine.search.projection.spi.SearchProjectionBuilderFactory;
 import org.hibernate.search.engine.search.query.spi.SearchQueryBuilder;
-import org.hibernate.search.engine.search.sort.dsl.SearchSortFactory;
+import org.hibernate.search.engine.search.sort.dsl.TypedSearchSortFactory;
 import org.hibernate.search.engine.search.sort.dsl.spi.SearchSortDslContext;
 import org.hibernate.search.engine.search.sort.spi.SearchSortBuilderFactory;
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.document.model.impl.StubIndexModel;
@@ -108,22 +108,22 @@ public class StubSearchIndexScope
 	}
 
 	@Override
-	public <SR> SearchPredicateFactory<SR> predicateFactory() {
+	public <SR> TypedSearchPredicateFactory<SR> predicateFactory() {
 		return new StubSearchPredicateFactory<>( SearchPredicateDslContext.root( this ) );
 	}
 
 	@Override
-	public <SR> SearchSortFactory<SR> sortFactory() {
+	public <SR> TypedSearchSortFactory<SR> sortFactory() {
 		return new StubSearchSortFactory<>( SearchSortDslContext.root( this, StubSearchSortFactory::new, predicateFactory() ) );
 	}
 
 	@Override
-	public <SR, R, E> SearchProjectionFactory<SR, R, E> projectionFactory() {
+	public <SR, R, E> TypedSearchProjectionFactory<SR, R, E> projectionFactory() {
 		return new StubSearchProjectionFactory<>( SearchProjectionDslContext.root( this ) );
 	}
 
 	@Override
-	public <SR> SearchAggregationFactory<SR> aggregationFactory() {
+	public <SR> TypedSearchAggregationFactory<SR> aggregationFactory() {
 		return new StubSearchAggregationFactory<>( SearchAggregationDslContext.root( this, predicateFactory() ) );
 	}
 

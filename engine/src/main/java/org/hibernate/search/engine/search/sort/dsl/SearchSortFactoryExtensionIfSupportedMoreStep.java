@@ -10,16 +10,16 @@ import org.hibernate.search.util.common.SearchException;
 
 /**
  * The second and later step when attempting to apply multiple extensions
- * to a {@link SearchSortFactory}.
+ * to a {@link TypedSearchSortFactory}.
  *
  * @param <SR> Scope root type.
- * @see SearchSortFactory#extension()
+ * @see TypedSearchSortFactory#extension()
  */
 public interface SearchSortFactoryExtensionIfSupportedMoreStep<SR> extends SearchSortFactoryExtensionIfSupportedStep<SR> {
 
 	/**
 	 * If no extension passed to {@link #ifSupported(SearchSortFactoryExtension, Function)}
-	 * was supported so far, apply the given consumer to the current (non-extended) {@link SearchSortFactory};
+	 * was supported so far, apply the given consumer to the current (non-extended) {@link TypedSearchSortFactory};
 	 * otherwise return the sort created in the first succeeding {@code ifSupported} call.
 	 *
 	 * @param sortContributor A function called if no extension was successfully applied;
@@ -28,7 +28,7 @@ public interface SearchSortFactoryExtensionIfSupportedMoreStep<SR> extends Searc
 	 * Should generally be a lambda expression.
 	 * @return The final step in the DSL of the resulting sort.
 	 */
-	SortThenStep<SR> orElse(Function<SearchSortFactory<SR>, ? extends SortFinalStep> sortContributor);
+	SortThenStep<SR> orElse(Function<TypedSearchSortFactory<SR>, ? extends SortFinalStep> sortContributor);
 
 	/**
 	 * If no extension passed to {@link #ifSupported(SearchSortFactoryExtension, Function)}

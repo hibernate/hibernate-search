@@ -24,12 +24,12 @@ import org.hibernate.SessionFactory;
 import org.hibernate.annotations.TenantId;
 import org.hibernate.context.spi.CurrentTenantIdentifierResolver;
 import org.hibernate.search.engine.environment.bean.BeanReference;
-import org.hibernate.search.engine.search.predicate.dsl.SearchPredicateFactory;
+import org.hibernate.search.engine.search.predicate.dsl.TypedSearchPredicateFactory;
 import org.hibernate.search.integrationtest.mapper.orm.realbackend.testsupport.BackendConfigurations;
 import org.hibernate.search.mapper.orm.Search;
 import org.hibernate.search.mapper.orm.cfg.HibernateOrmMapperSettings;
 import org.hibernate.search.mapper.orm.mapping.SearchMapping;
-import org.hibernate.search.mapper.orm.scope.SearchScope;
+import org.hibernate.search.mapper.orm.scope.TypedSearchScope;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.GenericField;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
 import org.hibernate.search.mapper.pojo.tenancy.TenantIdentifierConverter;
@@ -206,7 +206,7 @@ class RealBackendDatabaseMultitenancyIT {
 
 		// and let's check mass indexing as well:
 		SearchMapping searchMapping = Search.mapping( sessionFactory );
-		SearchScope<?, Object> scope = searchMapping.scope( Object.class );
+		TypedSearchScope<?, Object> scope = searchMapping.scope( Object.class );
 		// aws-serverless does not support purge, so we'll just drop the entire index here:
 		scope.schemaManager().dropAndCreate();
 
@@ -224,7 +224,7 @@ class RealBackendDatabaseMultitenancyIT {
 		with( sessionFactory, tenant3 ).runInTransaction( session -> setupHelper.assertions()
 				.searchAfterIndexChangesAndPotentialRefresh( () -> assertThat( Search.session( session )
 						.search( type )
-						.where( SearchPredicateFactory::matchAll )
+						.where( TypedSearchPredicateFactory::matchAll )
 						.fetchTotalHitCount() )
 						.isZero() ) );
 	}
@@ -232,7 +232,7 @@ class RealBackendDatabaseMultitenancyIT {
 	private static void assertForCurrentTenant(Session session, Class<?> type, String text) {
 		List<?> entities = Search.session( session )
 				.search( type )
-				.where( SearchPredicateFactory::matchAll )
+				.where( TypedSearchPredicateFactory::matchAll )
 				.fetchAllHits();
 		assertThat( entities ).extracting( "text" ).containsExactly( text );
 	}
