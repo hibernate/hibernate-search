@@ -15,16 +15,16 @@ import java.util.function.Function;
 import org.hibernate.search.engine.search.aggregation.AggregationKey;
 import org.hibernate.search.engine.search.aggregation.SearchAggregation;
 import org.hibernate.search.engine.search.aggregation.dsl.AggregationFinalStep;
-import org.hibernate.search.engine.search.aggregation.dsl.SearchAggregationFactory;
+import org.hibernate.search.engine.search.aggregation.dsl.TypedSearchAggregationFactory;
 import org.hibernate.search.engine.search.highlighter.SearchHighlighter;
 import org.hibernate.search.engine.search.highlighter.dsl.HighlighterFinalStep;
 import org.hibernate.search.engine.search.highlighter.dsl.SearchHighlighterFactory;
 import org.hibernate.search.engine.search.loading.spi.SearchLoadingContextBuilder;
 import org.hibernate.search.engine.search.predicate.SearchPredicate;
 import org.hibernate.search.engine.search.predicate.dsl.PredicateFinalStep;
-import org.hibernate.search.engine.search.predicate.dsl.SearchPredicateFactory;
 import org.hibernate.search.engine.search.predicate.dsl.SimpleBooleanPredicateClausesCollector;
 import org.hibernate.search.engine.search.predicate.dsl.SimpleBooleanPredicateClausesStep;
+import org.hibernate.search.engine.search.predicate.dsl.TypedSearchPredicateFactory;
 import org.hibernate.search.engine.search.query.SearchQuery;
 import org.hibernate.search.engine.search.query.SearchResult;
 import org.hibernate.search.engine.search.query.SearchScroll;
@@ -33,17 +33,17 @@ import org.hibernate.search.engine.search.query.dsl.SearchQueryWhereStep;
 import org.hibernate.search.engine.search.query.spi.SearchQueryBuilder;
 import org.hibernate.search.engine.search.query.spi.SearchQueryIndexScope;
 import org.hibernate.search.engine.search.sort.SearchSort;
-import org.hibernate.search.engine.search.sort.dsl.SearchSortFactory;
 import org.hibernate.search.engine.search.sort.dsl.SortFinalStep;
+import org.hibernate.search.engine.search.sort.dsl.TypedSearchSortFactory;
 
 public abstract class AbstractSearchQueryOptionsStep<
 		SR,
 		S extends SearchQueryOptionsStep<SR, S, H, LOS, SF, AF>,
 		H,
 		LOS,
-		PDF extends SearchPredicateFactory<SR>,
-		SF extends SearchSortFactory<SR>,
-		AF extends SearchAggregationFactory<SR>,
+		PDF extends TypedSearchPredicateFactory<SR>,
+		SF extends TypedSearchSortFactory<SR>,
+		AF extends TypedSearchAggregationFactory<SR>,
 		SC extends SearchQueryIndexScope<?>>
 		implements SearchQueryWhereStep<SR, S, H, LOS, PDF>, SearchQueryOptionsStep<SR, S, H, LOS, SF, AF> {
 

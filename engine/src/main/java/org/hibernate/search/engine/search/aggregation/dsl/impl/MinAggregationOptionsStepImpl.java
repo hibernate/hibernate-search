@@ -12,9 +12,9 @@ import org.hibernate.search.engine.search.aggregation.dsl.spi.SearchAggregationD
 import org.hibernate.search.engine.search.aggregation.spi.FieldMetricAggregationBuilder;
 import org.hibernate.search.engine.search.predicate.SearchPredicate;
 import org.hibernate.search.engine.search.predicate.dsl.PredicateFinalStep;
-import org.hibernate.search.engine.search.predicate.dsl.SearchPredicateFactory;
+import org.hibernate.search.engine.search.predicate.dsl.TypedSearchPredicateFactory;
 
-class MinAggregationOptionsStepImpl<SR, PDF extends SearchPredicateFactory<SR>, F>
+class MinAggregationOptionsStepImpl<SR, PDF extends TypedSearchPredicateFactory<SR>, F>
 		implements MinAggregationOptionsStep<SR, MinAggregationOptionsStepImpl<SR, PDF, F>, PDF, F> {
 	private final FieldMetricAggregationBuilder<F> builder;
 	private final SearchAggregationDslContext<SR, ?, ? extends PDF> dslContext;

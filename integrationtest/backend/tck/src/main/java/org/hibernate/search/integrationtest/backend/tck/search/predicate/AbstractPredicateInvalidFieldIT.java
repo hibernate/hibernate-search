@@ -11,7 +11,7 @@ import org.hibernate.search.engine.backend.document.IndexObjectFieldReference;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaElement;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaObjectField;
 import org.hibernate.search.engine.backend.types.ObjectStructure;
-import org.hibernate.search.engine.search.predicate.dsl.SearchPredicateFactory;
+import org.hibernate.search.engine.search.predicate.dsl.TypedSearchPredicateFactory;
 import org.hibernate.search.util.common.SearchException;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.SimpleMappedIndex;
 
@@ -27,7 +27,7 @@ public abstract class AbstractPredicateInvalidFieldIT {
 
 	@Test
 	void use_unknownField() {
-		SearchPredicateFactory<?> f = index.createScope().predicate();
+		TypedSearchPredicateFactory<?> f = index.createScope().predicate();
 
 		assertThatThrownBy( () -> tryPredicate( f, "unknown_field" ) )
 				.isInstanceOf( SearchException.class )
@@ -57,7 +57,7 @@ public abstract class AbstractPredicateInvalidFieldIT {
 
 	@Test
 	void use_objectField_nested() {
-		SearchPredicateFactory<?> f = index.createScope().predicate();
+		TypedSearchPredicateFactory<?> f = index.createScope().predicate();
 
 		String fieldPath = index.binding().nested.relativeFieldName;
 
@@ -68,7 +68,7 @@ public abstract class AbstractPredicateInvalidFieldIT {
 
 	@Test
 	void use_objectField_flattened() {
-		SearchPredicateFactory<?> f = index.createScope().predicate();
+		TypedSearchPredicateFactory<?> f = index.createScope().predicate();
 
 		String fieldPath = index.binding().flattened.relativeFieldName;
 
@@ -77,7 +77,7 @@ public abstract class AbstractPredicateInvalidFieldIT {
 				.hasMessageContaining( "Cannot use '" + predicateTrait() + "' on field '" + fieldPath + "'" );
 	}
 
-	protected abstract void tryPredicate(SearchPredicateFactory<?> f, String fieldPath);
+	protected abstract void tryPredicate(TypedSearchPredicateFactory<?> f, String fieldPath);
 
 	protected abstract String predicateTrait();
 

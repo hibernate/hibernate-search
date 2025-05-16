@@ -4,16 +4,16 @@
  */
 package org.hibernate.search.util.impl.integrationtest.common.stub.backend.search.sort.dsl.impl;
 
-import org.hibernate.search.engine.search.predicate.dsl.SearchPredicateFactory;
+import org.hibernate.search.engine.search.predicate.dsl.TypedSearchPredicateFactory;
 import org.hibernate.search.engine.search.sort.dsl.spi.AbstractSearchSortFactory;
 import org.hibernate.search.engine.search.sort.dsl.spi.SearchSortDslContext;
 import org.hibernate.search.engine.search.sort.spi.SearchSortIndexScope;
 
 public class StubSearchSortFactory<SR>
 		extends
-		AbstractSearchSortFactory<SR, StubSearchSortFactory<SR>, SearchSortIndexScope<?>, SearchPredicateFactory<SR>> {
+		AbstractSearchSortFactory<SR, StubSearchSortFactory<SR>, SearchSortIndexScope<?>, TypedSearchPredicateFactory<SR>> {
 	public StubSearchSortFactory(
-			SearchSortDslContext<SR, SearchSortIndexScope<?>, SearchPredicateFactory<SR>> dslContext) {
+			SearchSortDslContext<SR, SearchSortIndexScope<?>, TypedSearchPredicateFactory<SR>> dslContext) {
 		super( dslContext );
 	}
 

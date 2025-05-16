@@ -18,12 +18,12 @@ import org.hibernate.search.engine.backend.scope.IndexScopeExtension;
 import org.hibernate.search.engine.common.EntityReference;
 import org.hibernate.search.engine.mapper.scope.spi.MappedIndexScope;
 import org.hibernate.search.engine.mapper.scope.spi.MappedIndexScopeBuilder;
-import org.hibernate.search.engine.search.aggregation.dsl.SearchAggregationFactory;
+import org.hibernate.search.engine.search.aggregation.dsl.TypedSearchAggregationFactory;
 import org.hibernate.search.engine.search.highlighter.dsl.SearchHighlighterFactory;
-import org.hibernate.search.engine.search.predicate.dsl.SearchPredicateFactory;
-import org.hibernate.search.engine.search.projection.dsl.SearchProjectionFactory;
+import org.hibernate.search.engine.search.predicate.dsl.TypedSearchPredicateFactory;
+import org.hibernate.search.engine.search.projection.dsl.TypedSearchProjectionFactory;
 import org.hibernate.search.engine.search.query.dsl.SearchQuerySelectStep;
-import org.hibernate.search.engine.search.sort.dsl.SearchSortFactory;
+import org.hibernate.search.engine.search.sort.dsl.TypedSearchSortFactory;
 import org.hibernate.search.mapper.pojo.loading.spi.PojoSelectionLoadingContextBuilder;
 import org.hibernate.search.mapper.pojo.massindexing.impl.PojoDefaultMassIndexer;
 import org.hibernate.search.mapper.pojo.massindexing.spi.PojoMassIndexer;
@@ -80,7 +80,7 @@ public final class PojoScopeDelegateImpl<SR, R extends EntityReference, E, C> im
 	}
 
 	@Override
-	public <LOS> SearchQuerySelectStep<SR, ?, R, E, LOS, SearchProjectionFactory<SR, R, E>, ?> search(
+	public <LOS> SearchQuerySelectStep<SR, ?, R, E, LOS, TypedSearchProjectionFactory<SR, R, E>, ?> search(
 			PojoScopeSessionContext sessionContext,
 			PojoSelectionLoadingContextBuilder<LOS> loadingContextBuilder) {
 		Map<String, PojoSearchLoadingIndexedTypeContext<? extends E>> targetTypesByEntityName = new LinkedHashMap<>();
@@ -93,22 +93,22 @@ public final class PojoScopeDelegateImpl<SR, R extends EntityReference, E, C> im
 	}
 
 	@Override
-	public SearchPredicateFactory<SR> predicate() {
+	public TypedSearchPredicateFactory<SR> predicate() {
 		return getIndexScope().predicate();
 	}
 
 	@Override
-	public SearchSortFactory<SR> sort() {
+	public TypedSearchSortFactory<SR> sort() {
 		return getIndexScope().sort();
 	}
 
 	@Override
-	public SearchProjectionFactory<SR, R, E> projection() {
+	public TypedSearchProjectionFactory<SR, R, E> projection() {
 		return getIndexScope().projection();
 	}
 
 	@Override
-	public SearchAggregationFactory<SR> aggregation() {
+	public TypedSearchAggregationFactory<SR> aggregation() {
 		return getIndexScope().aggregation();
 	}
 

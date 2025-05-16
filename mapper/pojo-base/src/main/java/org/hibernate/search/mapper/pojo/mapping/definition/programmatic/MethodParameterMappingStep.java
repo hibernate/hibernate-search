@@ -9,7 +9,7 @@ import java.util.Map;
 
 import org.hibernate.search.engine.environment.bean.BeanReference;
 import org.hibernate.search.engine.search.projection.definition.ProjectionDefinition;
-import org.hibernate.search.engine.search.projection.dsl.SearchProjectionFactory;
+import org.hibernate.search.engine.search.projection.dsl.TypedSearchProjectionFactory;
 import org.hibernate.search.mapper.pojo.search.definition.binding.ProjectionBinder;
 
 /**
@@ -24,7 +24,7 @@ public interface MethodParameterMappingStep {
 	 * @return {@code this}, for method chaining.
 	 * @see ProjectionBinder
 	 * @see ProjectionDefinition
-	 * @see SearchProjectionFactory
+	 * @see TypedSearchProjectionFactory
 	 * @see org.hibernate.search.mapper.pojo.mapping.definition.annotation.ProjectionBinding
 	 * @see org.hibernate.search.mapper.pojo.search.definition.binding.builtin.IdProjectionBinder
 	 * @see org.hibernate.search.mapper.pojo.search.definition.binding.builtin.FieldProjectionBinder
@@ -50,7 +50,7 @@ public interface MethodParameterMappingStep {
 	 * or {@link org.hibernate.search.mapper.pojo.search.definition.binding.ProjectionBindingContext#paramOptional(String, Class)}.
 	 * @return {@code this}, for method chaining.
 	 * @see ProjectionDefinition
-	 * @see SearchProjectionFactory
+	 * @see TypedSearchProjectionFactory
 	 * @see org.hibernate.search.mapper.pojo.mapping.definition.annotation.ProjectionBinding
 	 */
 	default MethodParameterMappingStep projection(ProjectionBinder binder, Map<String, Object> params) {
@@ -64,7 +64,7 @@ public interface MethodParameterMappingStep {
 	 * @return {@code this}, for method chaining.
 	 * @see ProjectionBinder
 	 * @see ProjectionDefinition
-	 * @see SearchProjectionFactory
+	 * @see TypedSearchProjectionFactory
 	 * @see org.hibernate.search.mapper.pojo.mapping.definition.annotation.ProjectionBinding
 	 */
 	default MethodParameterMappingStep projection(BeanReference<? extends ProjectionBinder> binder) {
@@ -81,7 +81,7 @@ public interface MethodParameterMappingStep {
 	 * or {@link org.hibernate.search.mapper.pojo.search.definition.binding.ProjectionBindingContext#paramOptional(String, Class)}.
 	 * @return {@code this}, for method chaining.
 	 * @see ProjectionDefinition
-	 * @see SearchProjectionFactory
+	 * @see TypedSearchProjectionFactory
 	 * @see org.hibernate.search.mapper.pojo.mapping.definition.annotation.ProjectionBinding
 	 */
 	MethodParameterMappingStep projection(BeanReference<? extends ProjectionBinder> binder, Map<String, Object> params);

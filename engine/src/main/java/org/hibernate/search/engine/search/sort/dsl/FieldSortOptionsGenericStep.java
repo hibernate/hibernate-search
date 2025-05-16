@@ -6,7 +6,7 @@ package org.hibernate.search.engine.search.sort.dsl;
 
 import java.util.function.Function;
 
-import org.hibernate.search.engine.search.predicate.dsl.SearchPredicateFactory;
+import org.hibernate.search.engine.search.predicate.dsl.TypedSearchPredicateFactory;
 
 /**
  * The initial and final step in a "field" sort definition, where optional parameters can be set.
@@ -22,7 +22,7 @@ public interface FieldSortOptionsGenericStep<
 		T,
 		S extends FieldSortOptionsGenericStep<SR, T, ?, ?, PDF>,
 		N extends FieldSortMissingValueBehaviorGenericStep<T, S>,
-		PDF extends SearchPredicateFactory<SR>>
+		PDF extends TypedSearchPredicateFactory<SR>>
 		extends SortFinalStep, SortThenStep<SR>, SortOrderStep<S>, SortModeStep<S>, SortFilterStep<SR, S, PDF> {
 
 	/**

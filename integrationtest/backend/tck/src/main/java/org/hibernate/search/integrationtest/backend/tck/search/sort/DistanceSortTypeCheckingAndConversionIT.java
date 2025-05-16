@@ -25,8 +25,8 @@ import org.hibernate.search.engine.backend.types.Sortable;
 import org.hibernate.search.engine.backend.types.dsl.StandardIndexFieldTypeOptionsStep;
 import org.hibernate.search.engine.reporting.spi.EventContexts;
 import org.hibernate.search.engine.search.query.SearchQuery;
-import org.hibernate.search.engine.search.sort.dsl.SearchSortFactory;
 import org.hibernate.search.engine.search.sort.dsl.SortFinalStep;
+import org.hibernate.search.engine.search.sort.dsl.TypedSearchSortFactory;
 import org.hibernate.search.engine.spatial.GeoPoint;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.FieldTypeDescriptor;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.GeoPointFieldTypeDescriptor;
@@ -208,7 +208,7 @@ class DistanceSortTypeCheckingAndConversionIT {
 	}
 
 	private SearchQuery<DocumentReference> matchAllQuery(
-			Function<? super SearchSortFactory<?>, ? extends SortFinalStep> sortContributor, StubMappingScope scope) {
+			Function<? super TypedSearchSortFactory<?>, ? extends SortFinalStep> sortContributor, StubMappingScope scope) {
 		return scope.query()
 				.where( f -> f.matchAll() )
 				.sort( sortContributor )
@@ -216,7 +216,7 @@ class DistanceSortTypeCheckingAndConversionIT {
 	}
 
 	private SearchQuery<DocumentReference> matchNonEmptyQuery(
-			Function<? super SearchSortFactory<?>, ? extends SortFinalStep> sortContributor, StubMappingScope scope) {
+			Function<? super TypedSearchSortFactory<?>, ? extends SortFinalStep> sortContributor, StubMappingScope scope) {
 		return scope.query()
 				.where( f -> f.matchAll().except( f.id().matching( EMPTY ) ) )
 				.sort( sortContributor )

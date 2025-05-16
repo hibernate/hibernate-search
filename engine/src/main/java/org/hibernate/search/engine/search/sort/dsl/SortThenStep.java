@@ -17,6 +17,6 @@ public interface SortThenStep<SR> extends SortFinalStep {
 	 *
 	 * @return The next step.
 	 */
-	SearchSortFactory<SR> then();
+	TypedSearchSortFactory<SR> then();
 
 }

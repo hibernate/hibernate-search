@@ -7,7 +7,7 @@ package org.hibernate.search.mapper.pojo.search.definition.binding.builtin;
 import org.hibernate.search.engine.search.projection.SearchProjection;
 import org.hibernate.search.engine.search.projection.definition.ProjectionDefinitionContext;
 import org.hibernate.search.engine.search.projection.definition.spi.AbstractProjectionDefinition;
-import org.hibernate.search.engine.search.projection.dsl.SearchProjectionFactory;
+import org.hibernate.search.engine.search.projection.dsl.TypedSearchProjectionFactory;
 import org.hibernate.search.mapper.pojo.search.definition.binding.ProjectionBinder;
 import org.hibernate.search.mapper.pojo.search.definition.binding.ProjectionBindingContext;
 import org.hibernate.search.util.common.spi.ToStringTreeAppender;
@@ -16,7 +16,7 @@ import org.hibernate.search.util.common.spi.ToStringTreeAppender;
  * Binds a constructor parameter to a projection to the identifier of the mapped entity,
  * i.e. the value of the property marked as {@code @DocumentId}.
  *
- * @see SearchProjectionFactory#id(Class)
+ * @see TypedSearchProjectionFactory#id(Class)
  * @see org.hibernate.search.mapper.pojo.mapping.definition.annotation.IdProjection
  */
 public final class IdProjectionBinder implements ProjectionBinder {
@@ -63,7 +63,7 @@ public final class IdProjectionBinder implements ProjectionBinder {
 		}
 
 		@Override
-		public SearchProjection<I> create(SearchProjectionFactory<?, ?, ?> factory,
+		public SearchProjection<I> create(TypedSearchProjectionFactory<?, ?, ?> factory,
 				ProjectionDefinitionContext context) {
 			return factory.id( requestedIdentifierType ).toProjection();
 		}

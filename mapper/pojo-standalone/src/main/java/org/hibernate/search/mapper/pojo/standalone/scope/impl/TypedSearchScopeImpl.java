@@ -12,12 +12,12 @@ import java.util.stream.Collectors;
 
 import org.hibernate.search.engine.backend.scope.IndexScopeExtension;
 import org.hibernate.search.engine.common.EntityReference;
-import org.hibernate.search.engine.search.aggregation.dsl.SearchAggregationFactory;
+import org.hibernate.search.engine.search.aggregation.dsl.TypedSearchAggregationFactory;
 import org.hibernate.search.engine.search.highlighter.dsl.SearchHighlighterFactory;
-import org.hibernate.search.engine.search.predicate.dsl.SearchPredicateFactory;
-import org.hibernate.search.engine.search.projection.dsl.SearchProjectionFactory;
+import org.hibernate.search.engine.search.predicate.dsl.TypedSearchPredicateFactory;
+import org.hibernate.search.engine.search.projection.dsl.TypedSearchProjectionFactory;
 import org.hibernate.search.engine.search.query.dsl.SearchQuerySelectStep;
-import org.hibernate.search.engine.search.sort.dsl.SearchSortFactory;
+import org.hibernate.search.engine.search.sort.dsl.TypedSearchSortFactory;
 import org.hibernate.search.mapper.pojo.loading.spi.PojoSelectionLoadingContextBuilder;
 import org.hibernate.search.mapper.pojo.massindexing.spi.PojoMassIndexer;
 import org.hibernate.search.mapper.pojo.schema.management.spi.PojoScopeSchemaManager;
@@ -29,18 +29,20 @@ import org.hibernate.search.mapper.pojo.standalone.massindexing.MassIndexer;
 import org.hibernate.search.mapper.pojo.standalone.massindexing.impl.StandalonePojoMassIndexer;
 import org.hibernate.search.mapper.pojo.standalone.schema.management.SearchSchemaManager;
 import org.hibernate.search.mapper.pojo.standalone.schema.management.impl.SearchSchemaManagerImpl;
-import org.hibernate.search.mapper.pojo.standalone.scope.SearchScope;
+import org.hibernate.search.mapper.pojo.standalone.scope.TypedSearchScope;
 import org.hibernate.search.mapper.pojo.standalone.tenancy.impl.TenancyConfiguration;
 import org.hibernate.search.mapper.pojo.standalone.work.SearchWorkspace;
 import org.hibernate.search.mapper.pojo.standalone.work.impl.SearchWorkspaceImpl;
 
-public class SearchScopeImpl<SR, E> implements SearchScope<SR, E> {
+public class TypedSearchScopeImpl<SR, E>
+		implements TypedSearchScope<SR, E>,
+		SearchScopeSearcher<SR, E> {
 
 	private final StandalonePojoScopeMappingContext mappingContext;
 	private final PojoScopeDelegate<SR, EntityReference, E, SearchIndexedEntity<? extends E>> delegate;
 	private final TenancyConfiguration tenancyConfiguration;
 
-	public SearchScopeImpl(StandalonePojoScopeMappingContext mappingContext,
+	public TypedSearchScopeImpl(StandalonePojoScopeMappingContext mappingContext,
 			TenancyConfiguration tenancyConfiguration,
 			PojoScopeDelegate<SR, EntityReference, E, SearchIndexedEntity<? extends E>> delegate) {
 		this.mappingContext = mappingContext;
@@ -49,22 +51,22 @@ public class SearchScopeImpl<SR, E> implements SearchScope<SR, E> {
 	}
 
 	@Override
-	public SearchPredicateFactory<SR> predicate() {
+	public TypedSearchPredicateFactory<SR> predicate() {
 		return delegate.predicate();
 	}
 
 	@Override
-	public SearchSortFactory<SR> sort() {
+	public TypedSearchSortFactory<SR> sort() {
 		return delegate.sort();
 	}
 
 	@Override
-	public SearchProjectionFactory<SR, EntityReference, E> projection() {
+	public TypedSearchProjectionFactory<SR, EntityReference, E> projection() {
 		return delegate.projection();
 	}
 
 	@Override
-	public SearchAggregationFactory<SR> aggregation() {
+	public TypedSearchAggregationFactory<SR> aggregation() {
 		return delegate.aggregation();
 	}
 
@@ -104,6 +106,7 @@ public class SearchScopeImpl<SR, E> implements SearchScope<SR, E> {
 		return delegate.extension( extension );
 	}
 
+	@Override
 	public SearchQuerySelectStep<SR, ?, EntityReference, E, ?, ?, ?> search(PojoScopeSessionContext sessionContext,
 			PojoSelectionLoadingContextBuilder<?> loadingContextBuilder) {
 		return delegate.search( sessionContext, loadingContextBuilder );

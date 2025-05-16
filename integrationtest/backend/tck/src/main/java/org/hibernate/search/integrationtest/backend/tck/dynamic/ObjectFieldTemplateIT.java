@@ -17,7 +17,7 @@ import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaElement
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaObjectField;
 import org.hibernate.search.engine.backend.types.ObjectStructure;
 import org.hibernate.search.engine.search.predicate.dsl.PredicateFinalStep;
-import org.hibernate.search.engine.search.predicate.dsl.SearchPredicateFactory;
+import org.hibernate.search.engine.search.predicate.dsl.TypedSearchPredicateFactory;
 import org.hibernate.search.engine.search.query.SearchQuery;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.extension.SearchSetupHelper;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.SimpleMappedIndex;
@@ -480,7 +480,7 @@ class ObjectFieldTemplateIT {
 	}
 
 	private SearchQuery<DocumentReference> query(
-			Function<? super SearchPredicateFactory<?>, ? extends PredicateFinalStep> predicateContributor) {
+			Function<? super TypedSearchPredicateFactory<?>, ? extends PredicateFinalStep> predicateContributor) {
 		return index.createScope().query()
 				.where( predicateContributor )
 				.toQuery();

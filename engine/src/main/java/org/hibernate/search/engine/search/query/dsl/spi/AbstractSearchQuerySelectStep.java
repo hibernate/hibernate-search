@@ -7,8 +7,8 @@ package org.hibernate.search.engine.search.query.dsl.spi;
 import org.hibernate.search.engine.backend.session.spi.BackendSessionContext;
 import org.hibernate.search.engine.common.dsl.spi.DslExtensionState;
 import org.hibernate.search.engine.search.loading.spi.SearchLoadingContextBuilder;
-import org.hibernate.search.engine.search.predicate.dsl.SearchPredicateFactory;
-import org.hibernate.search.engine.search.projection.dsl.SearchProjectionFactory;
+import org.hibernate.search.engine.search.predicate.dsl.TypedSearchPredicateFactory;
+import org.hibernate.search.engine.search.projection.dsl.TypedSearchProjectionFactory;
 import org.hibernate.search.engine.search.query.dsl.SearchQueryDslExtension;
 import org.hibernate.search.engine.search.query.dsl.SearchQueryOptionsStep;
 import org.hibernate.search.engine.search.query.dsl.SearchQuerySelectStep;
@@ -20,8 +20,8 @@ public abstract class AbstractSearchQuerySelectStep<
 		R,
 		E,
 		LOS,
-		PJF extends SearchProjectionFactory<SR, R, E>,
-		PDF extends SearchPredicateFactory<SR>>
+		PJF extends TypedSearchProjectionFactory<SR, R, E>,
+		PDF extends TypedSearchPredicateFactory<SR>>
 		implements SearchQuerySelectStep<SR, N, R, E, LOS, PJF, PDF> {
 
 	@Override

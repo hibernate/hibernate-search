@@ -8,7 +8,7 @@ import java.util.Arrays;
 import java.util.List;
 
 import org.hibernate.search.engine.search.predicate.dsl.PredicateFinalStep;
-import org.hibernate.search.engine.search.predicate.dsl.SearchPredicateFactory;
+import org.hibernate.search.engine.search.predicate.dsl.TypedSearchPredicateFactory;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.extension.SearchSetupHelper;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.BulkIndexer;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappedIndex;
@@ -60,13 +60,13 @@ class AndPredicateBaseIT {
 		}
 
 		@Override
-		protected PredicateFinalStep predicate(SearchPredicateFactory<?> f, int matchingDocOrdinal,
+		protected PredicateFinalStep predicate(TypedSearchPredicateFactory<?> f, int matchingDocOrdinal,
 				AbstractPredicateDataSet dataSet, StubMappedIndex index) {
 			return f.and( f.id().matching( ScoreConfigured.dataSet.docId( matchingDocOrdinal ) ) );
 		}
 
 		@Override
-		protected PredicateFinalStep predicateWithBoost(SearchPredicateFactory<?> f, int matchingDocOrdinal,
+		protected PredicateFinalStep predicateWithBoost(TypedSearchPredicateFactory<?> f, int matchingDocOrdinal,
 				float boost, AbstractPredicateDataSet dataSet,
 				StubMappedIndex index) {
 			return f.and( f.id().matching( ScoreConfigured.dataSet.docId( matchingDocOrdinal ) ) )
@@ -74,14 +74,14 @@ class AndPredicateBaseIT {
 		}
 
 		@Override
-		protected PredicateFinalStep predicateWithConstantScore(SearchPredicateFactory<?> f, int matchingDocOrdinal,
+		protected PredicateFinalStep predicateWithConstantScore(TypedSearchPredicateFactory<?> f, int matchingDocOrdinal,
 				AbstractPredicateDataSet dataSet, StubMappedIndex index) {
 			return f.and( f.id().matching( ScoreConfigured.dataSet.docId( matchingDocOrdinal ) ) )
 					.constantScore();
 		}
 
 		@Override
-		protected PredicateFinalStep predicateWithConstantScoreAndBoost(SearchPredicateFactory<?> f,
+		protected PredicateFinalStep predicateWithConstantScoreAndBoost(TypedSearchPredicateFactory<?> f,
 				int matchingDocOrdinal, float boost, AbstractPredicateDataSet dataSet,
 				StubMappedIndex index) {
 			return f.and( f.id().matching( ScoreConfigured.dataSet.docId( matchingDocOrdinal ) ) )
@@ -117,14 +117,14 @@ class AndPredicateBaseIT {
 		}
 
 		@Override
-		protected PredicateFinalStep predicate(SearchPredicateFactory<?> f, int matchingDocOrdinal,
+		protected PredicateFinalStep predicate(TypedSearchPredicateFactory<?> f, int matchingDocOrdinal,
 				AbstractPredicateDataSet dataSet, StubMappedIndex index) {
 			return f.and()
 					.add( f.id().matching( AddScoreConfigured.dataSet.docId( matchingDocOrdinal ) ) );
 		}
 
 		@Override
-		protected PredicateFinalStep predicateWithBoost(SearchPredicateFactory<?> f, int matchingDocOrdinal,
+		protected PredicateFinalStep predicateWithBoost(TypedSearchPredicateFactory<?> f, int matchingDocOrdinal,
 				float boost, AbstractPredicateDataSet dataSet,
 				StubMappedIndex index) {
 			return f.and( f.id().matching( AddScoreConfigured.dataSet.docId( matchingDocOrdinal ) ) )
@@ -132,7 +132,7 @@ class AndPredicateBaseIT {
 		}
 
 		@Override
-		protected PredicateFinalStep predicateWithConstantScore(SearchPredicateFactory<?> f, int matchingDocOrdinal,
+		protected PredicateFinalStep predicateWithConstantScore(TypedSearchPredicateFactory<?> f, int matchingDocOrdinal,
 				AbstractPredicateDataSet dataSet, StubMappedIndex index) {
 			return f.and()
 					.add( f.id().matching( AddScoreConfigured.dataSet.docId( matchingDocOrdinal ) ) )
@@ -140,7 +140,7 @@ class AndPredicateBaseIT {
 		}
 
 		@Override
-		protected PredicateFinalStep predicateWithConstantScoreAndBoost(SearchPredicateFactory<?> f,
+		protected PredicateFinalStep predicateWithConstantScoreAndBoost(TypedSearchPredicateFactory<?> f,
 				int matchingDocOrdinal, float boost, AbstractPredicateDataSet dataSet,
 				StubMappedIndex index) {
 			return f.and()

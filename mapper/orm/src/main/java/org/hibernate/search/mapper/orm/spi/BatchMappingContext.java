@@ -17,11 +17,11 @@ public interface BatchMappingContext {
 
 	BatchSessionContext sessionContext(EntityManager entityManager);
 
-	<SR, T> BatchScopeContext<T> scope(Class<T> expectedSuperType);
+	<T> BatchScopeContext<T> scope(Class<T> expectedSuperType);
 
-	<SR, T> BatchScopeContext<T> scope(Class<T> expectedSuperType, String entityName);
+	<T> BatchScopeContext<T> scope(Class<T> expectedSuperType, String entityName);
 
-	<SR, T> BatchScopeContext<T> scope(Collection<? extends Class<? extends T>> classes);
+	<T> BatchScopeContext<T> scope(Collection<? extends Class<? extends T>> classes);
 
 	TenancyConfiguration tenancyConfiguration();
 

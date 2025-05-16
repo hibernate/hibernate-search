@@ -9,7 +9,7 @@ import java.util.function.Function;
 import org.hibernate.search.engine.search.common.SortMode;
 import org.hibernate.search.engine.search.predicate.SearchPredicate;
 import org.hibernate.search.engine.search.predicate.dsl.PredicateFinalStep;
-import org.hibernate.search.engine.search.predicate.dsl.SearchPredicateFactory;
+import org.hibernate.search.engine.search.predicate.dsl.TypedSearchPredicateFactory;
 import org.hibernate.search.engine.search.sort.SearchSort;
 import org.hibernate.search.engine.search.sort.dsl.DistanceSortMissingValueBehaviorStep;
 import org.hibernate.search.engine.search.sort.dsl.DistanceSortOptionsStep;
@@ -20,7 +20,7 @@ import org.hibernate.search.engine.search.sort.spi.DistanceSortBuilder;
 import org.hibernate.search.engine.search.sort.spi.SortTypeKeys;
 import org.hibernate.search.engine.spatial.GeoPoint;
 
-public class DistanceSortOptionsStepImpl<SR, PDF extends SearchPredicateFactory<SR>>
+public class DistanceSortOptionsStepImpl<SR, PDF extends TypedSearchPredicateFactory<SR>>
 		extends AbstractSortThenStep<SR>
 		implements DistanceSortOptionsStep<SR, DistanceSortOptionsStepImpl<SR, PDF>, PDF>,
 		DistanceSortMissingValueBehaviorStep<DistanceSortOptionsStepImpl<SR, PDF>> {

@@ -4,7 +4,7 @@
  */
 package org.hibernate.search.engine.backend.types;
 
-import org.hibernate.search.engine.search.predicate.dsl.SearchPredicateFactory;
+import org.hibernate.search.engine.search.predicate.dsl.TypedSearchPredicateFactory;
 
 /**
  * Defines how the structure of an object field is preserved upon indexing.
@@ -70,7 +70,7 @@ public enum ObjectStructure {
 	 * but has the advantage of preserving the original structure.
 	 * Note however that access to that information when querying
 	 * requires special care.
-	 * See in particular the {@link SearchPredicateFactory#nested(String) "nested" predicate}.
+	 * See in particular the {@link TypedSearchPredicateFactory#nested(String) "nested" predicate}.
 	 */
 	NESTED
 

@@ -23,7 +23,7 @@ import org.hibernate.search.mapper.pojo.standalone.cfg.StandalonePojoMapperSetti
 import org.hibernate.search.mapper.pojo.standalone.loading.SelectionLoadingStrategy;
 import org.hibernate.search.mapper.pojo.standalone.loading.binding.EntityLoadingBinder;
 import org.hibernate.search.mapper.pojo.standalone.mapping.SearchMapping;
-import org.hibernate.search.mapper.pojo.standalone.scope.SearchScope;
+import org.hibernate.search.mapper.pojo.standalone.scope.TypedSearchScope;
 import org.hibernate.search.mapper.pojo.standalone.session.SearchSession;
 import org.hibernate.search.mapper.pojo.work.IndexingPlanSynchronizationStrategy;
 import org.hibernate.search.mapper.pojo.work.IndexingPlanSynchronizationStrategyNames;
@@ -79,7 +79,7 @@ class EntityAsTreeSmokeIT {
 		indexed2.containedNonEntities.add( containedNonEntity2_1 );
 
 		try ( SearchSession session = mapping.createSession() ) {
-			SearchScope<EntityAsTreeSmokeIT_IndexedEntity__, IndexedEntity> scope =
+			TypedSearchScope<EntityAsTreeSmokeIT_IndexedEntity__, IndexedEntity> scope =
 					EntityAsTreeSmokeIT_IndexedEntity__.INDEX.scope( session );
 			assertThat( session.search( scope )
 					.where( f -> f.match().field( EntityAsTreeSmokeIT_IndexedEntity__.INDEX.containedEntities.text )
@@ -96,7 +96,7 @@ class EntityAsTreeSmokeIT {
 			simulatedIndexedEntityDatastore.put( indexed2.id, indexed2 );
 		}
 		try ( SearchSession session = mapping.createSession() ) {
-			SearchScope<EntityAsTreeSmokeIT_IndexedEntity__, IndexedEntity> scope =
+			TypedSearchScope<EntityAsTreeSmokeIT_IndexedEntity__, IndexedEntity> scope =
 					EntityAsTreeSmokeIT_IndexedEntity__.INDEX.scope( session );
 			assertThat( session.search( scope )
 					.where( f -> f.match().field( EntityAsTreeSmokeIT_IndexedEntity__.INDEX.containedEntities.text )
@@ -110,7 +110,7 @@ class EntityAsTreeSmokeIT {
 			session.indexingPlan().delete( indexed1 );
 		}
 		try ( SearchSession session = mapping.createSession() ) {
-			SearchScope<EntityAsTreeSmokeIT_IndexedEntity__, IndexedEntity> scope =
+			TypedSearchScope<EntityAsTreeSmokeIT_IndexedEntity__, IndexedEntity> scope =
 					EntityAsTreeSmokeIT_IndexedEntity__.INDEX.scope( session );
 			assertThat( session.search( scope )
 					.where( f -> f.match().field( EntityAsTreeSmokeIT_IndexedEntity__.INDEX.containedEntities.text )

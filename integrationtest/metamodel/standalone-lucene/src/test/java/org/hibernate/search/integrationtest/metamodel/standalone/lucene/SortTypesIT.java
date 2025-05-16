@@ -22,7 +22,7 @@ import org.hibernate.search.mapper.pojo.standalone.cfg.StandalonePojoMapperSetti
 import org.hibernate.search.mapper.pojo.standalone.loading.SelectionLoadingStrategy;
 import org.hibernate.search.mapper.pojo.standalone.loading.binding.EntityLoadingBinder;
 import org.hibernate.search.mapper.pojo.standalone.mapping.SearchMapping;
-import org.hibernate.search.mapper.pojo.standalone.scope.SearchScope;
+import org.hibernate.search.mapper.pojo.standalone.scope.TypedSearchScope;
 import org.hibernate.search.mapper.pojo.standalone.session.SearchSession;
 import org.hibernate.search.mapper.pojo.work.IndexingPlanSynchronizationStrategy;
 import org.hibernate.search.mapper.pojo.work.IndexingPlanSynchronizationStrategyNames;
@@ -75,7 +75,7 @@ class SortTypesIT {
 		}
 
 		try ( SearchSession session = mapping.createSession() ) {
-			SearchScope<SortTypesIT_IndexedEntity__, IndexedEntity> scope =
+			TypedSearchScope<SortTypesIT_IndexedEntity__, IndexedEntity> scope =
 					SortTypesIT_IndexedEntity__.INDEX.scope( session );
 			assertThat( session.search( scope )
 					.where( f -> f.matchAll() )

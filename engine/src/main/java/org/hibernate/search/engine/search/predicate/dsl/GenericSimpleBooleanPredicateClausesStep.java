@@ -33,7 +33,7 @@ public interface GenericSimpleBooleanPredicateClausesStep<
 	S add(SearchPredicate searchPredicate);
 
 	@Override
-	S add(Function<? super SearchPredicateFactory<SR>, ? extends PredicateFinalStep> clauseContributor);
+	S add(Function<? super TypedSearchPredicateFactory<SR>, ? extends PredicateFinalStep> clauseContributor);
 
 	@Override
 	S with(Consumer<? super C> contributor);

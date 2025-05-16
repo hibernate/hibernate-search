@@ -4,16 +4,16 @@
  */
 package org.hibernate.search.engine.search.query.dsl.spi;
 
-import org.hibernate.search.engine.search.aggregation.dsl.SearchAggregationFactory;
+import org.hibernate.search.engine.search.aggregation.dsl.TypedSearchAggregationFactory;
 import org.hibernate.search.engine.search.loading.spi.SearchLoadingContextBuilder;
-import org.hibernate.search.engine.search.predicate.dsl.SearchPredicateFactory;
+import org.hibernate.search.engine.search.predicate.dsl.TypedSearchPredicateFactory;
 import org.hibernate.search.engine.search.query.ExtendedSearchQuery;
 import org.hibernate.search.engine.search.query.SearchResult;
 import org.hibernate.search.engine.search.query.SearchScroll;
 import org.hibernate.search.engine.search.query.dsl.SearchQueryOptionsStep;
 import org.hibernate.search.engine.search.query.spi.SearchQueryBuilder;
 import org.hibernate.search.engine.search.query.spi.SearchQueryIndexScope;
-import org.hibernate.search.engine.search.sort.dsl.SearchSortFactory;
+import org.hibernate.search.engine.search.sort.dsl.TypedSearchSortFactory;
 
 public abstract class AbstractExtendedSearchQueryOptionsStep<
 		SR,
@@ -22,9 +22,9 @@ public abstract class AbstractExtendedSearchQueryOptionsStep<
 		R extends SearchResult<H>,
 		SCR extends SearchScroll<H>,
 		LOS,
-		PDF extends SearchPredicateFactory<SR>,
-		SF extends SearchSortFactory<SR>,
-		AF extends SearchAggregationFactory<SR>,
+		PDF extends TypedSearchPredicateFactory<SR>,
+		SF extends TypedSearchSortFactory<SR>,
+		AF extends TypedSearchAggregationFactory<SR>,
 		SC extends SearchQueryIndexScope<?>>
 		extends AbstractSearchQueryOptionsStep<SR, S, H, LOS, PDF, SF, AF, SC> {
 

@@ -10,7 +10,7 @@ import org.hibernate.search.engine.search.common.SortMode;
 import org.hibernate.search.engine.search.common.ValueModel;
 import org.hibernate.search.engine.search.predicate.SearchPredicate;
 import org.hibernate.search.engine.search.predicate.dsl.PredicateFinalStep;
-import org.hibernate.search.engine.search.predicate.dsl.SearchPredicateFactory;
+import org.hibernate.search.engine.search.predicate.dsl.TypedSearchPredicateFactory;
 import org.hibernate.search.engine.search.reference.sort.FieldSortFieldReference;
 import org.hibernate.search.engine.search.sort.SearchSort;
 import org.hibernate.search.engine.search.sort.dsl.FieldSortMissingValueBehaviorGenericStep;
@@ -27,7 +27,7 @@ import org.hibernate.search.engine.search.sort.spi.SortTypeKeys;
 public abstract class AbstractFieldSortOptionsGenericStep<
 		SR,
 		T,
-		PDF extends SearchPredicateFactory<SR>,
+		PDF extends TypedSearchPredicateFactory<SR>,
 		S extends AbstractFieldSortOptionsGenericStep<SR, T, PDF, S, N>,
 		N extends FieldSortMissingValueBehaviorGenericStep<T, S>>
 		extends AbstractSortThenStep<SR>
@@ -53,15 +53,15 @@ public abstract class AbstractFieldSortOptionsGenericStep<
 			T,
 			SR,
 			SC extends SearchSortIndexScope<?>,
-			PDF extends SearchPredicateFactory<
-					SR>> FieldSortOptionsGenericStep<SR, T, ?, ?, ? extends SearchPredicateFactory<SR>> create(
+			PDF extends TypedSearchPredicateFactory<
+					SR>> FieldSortOptionsGenericStep<SR, T, ?, ?, ? extends TypedSearchPredicateFactory<SR>> create(
 							SearchSortDslContext<SR, SC, PDF> dslContext,
 							FieldSortFieldReference<? super SR, T> fieldReference) {
 		return new FieldReferenceFieldSortOptionsStep<>( dslContext, fieldReference );
 	}
 
 	public static <
-			PDF extends SearchPredicateFactory<SR>,
+			PDF extends TypedSearchPredicateFactory<SR>,
 			SR,
 			SC extends SearchSortIndexScope<?>> FieldSortOptionsStep<SR, ?, PDF> create(
 					SearchSortDslContext<SR, SC, PDF> dslContext, String fieldPath) {
@@ -130,7 +130,7 @@ public abstract class AbstractFieldSortOptionsGenericStep<
 	protected abstract N thisAsN();
 
 
-	private static class FieldReferenceFieldSortOptionsStep<SR, T, PDF extends SearchPredicateFactory<SR>>
+	private static class FieldReferenceFieldSortOptionsStep<SR, T, PDF extends TypedSearchPredicateFactory<SR>>
 			extends
 			AbstractFieldSortOptionsGenericStep<SR,
 					T,
@@ -163,7 +163,7 @@ public abstract class AbstractFieldSortOptionsGenericStep<
 		}
 	}
 
-	private static class StringFieldSortOptionsStep<SR, PDF extends SearchPredicateFactory<SR>>
+	private static class StringFieldSortOptionsStep<SR, PDF extends TypedSearchPredicateFactory<SR>>
 			extends
 			AbstractFieldSortOptionsGenericStep<SR,
 					Object,

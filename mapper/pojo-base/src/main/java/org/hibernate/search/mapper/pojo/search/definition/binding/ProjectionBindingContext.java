@@ -15,7 +15,7 @@ import org.hibernate.search.engine.environment.bean.BeanResolver;
 import org.hibernate.search.engine.search.projection.ProjectionCollector;
 import org.hibernate.search.engine.search.projection.ProjectionCollectorProviderFactory;
 import org.hibernate.search.engine.search.projection.definition.ProjectionDefinition;
-import org.hibernate.search.engine.search.projection.dsl.SearchProjectionFactory;
+import org.hibernate.search.engine.search.projection.dsl.TypedSearchProjectionFactory;
 import org.hibernate.search.mapper.pojo.bridge.mapping.annotation.PropertyBinderRef;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.ObjectProjection;
 import org.hibernate.search.mapper.pojo.model.PojoModelConstructorParameter;
@@ -151,7 +151,7 @@ public interface ProjectionBindingContext {
 	 * {@link ObjectProjection#includeDepth()}, ...
 	 * @return A single-valued object projection definition for the given type.
 	 * @throws SearchException If mapping the given type to a projection definition fails.
-	 * @see org.hibernate.search.engine.search.projection.dsl.SearchProjectionFactory#object(String)
+	 * @see TypedSearchProjectionFactory#object(String)
 	 * @see org.hibernate.search.engine.search.projection.dsl.CompositeProjectionInnerStep#as(Class)
 	 */
 	@Incubating
@@ -169,7 +169,7 @@ public interface ProjectionBindingContext {
 	 * {@link ObjectProjection#includeDepth()}, ...
 	 * @return A multi-valued object projection definition for the given type.
 	 * @throws SearchException If mapping the given type to a projection definition fails.
-	 * @see org.hibernate.search.engine.search.projection.dsl.SearchProjectionFactory#object(String)
+	 * @see TypedSearchProjectionFactory#object(String)
 	 * @see org.hibernate.search.engine.search.projection.dsl.CompositeProjectionInnerStep#as(Class)
 	 * @deprecated Use {@link #createObjectDefinition(String, Class, TreeFilterDefinition, ProjectionCollector.Provider)} instead.
 	 */
@@ -189,7 +189,7 @@ public interface ProjectionBindingContext {
 	 * {@link ObjectProjection#includeDepth()}, ...
 	 * @return A container-wrapped object projection definition for the given type.
 	 * @throws SearchException If mapping the given type to a projection definition fails.
-	 * @see org.hibernate.search.engine.search.projection.dsl.SearchProjectionFactory#object(String)
+	 * @see TypedSearchProjectionFactory#object(String)
 	 * @see org.hibernate.search.engine.search.projection.dsl.CompositeProjectionInnerStep#as(Class)
 	 */
 	@Incubating
@@ -201,7 +201,7 @@ public interface ProjectionBindingContext {
 	 * (e.g. using {@link org.hibernate.search.mapper.pojo.mapping.definition.annotation.ProjectionConstructor})
 	 * @return A composite projection definition for the given type.
 	 * @throws SearchException If mapping the given type to a projection definition fails.
-	 * @see SearchProjectionFactory#composite()
+	 * @see TypedSearchProjectionFactory#composite()
 	 * @see org.hibernate.search.engine.search.projection.dsl.CompositeProjectionInnerStep#as(Class)
 	 */
 	@Incubating

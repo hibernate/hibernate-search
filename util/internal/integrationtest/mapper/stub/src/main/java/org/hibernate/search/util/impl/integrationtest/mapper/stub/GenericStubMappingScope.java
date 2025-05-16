@@ -6,14 +6,14 @@ package org.hibernate.search.util.impl.integrationtest.mapper.stub;
 
 import org.hibernate.search.engine.backend.scope.IndexScopeExtension;
 import org.hibernate.search.engine.mapper.scope.spi.MappedIndexScope;
-import org.hibernate.search.engine.search.aggregation.dsl.SearchAggregationFactory;
+import org.hibernate.search.engine.search.aggregation.dsl.TypedSearchAggregationFactory;
 import org.hibernate.search.engine.search.highlighter.dsl.SearchHighlighterFactory;
 import org.hibernate.search.engine.search.loading.spi.SearchLoadingContext;
 import org.hibernate.search.engine.search.loading.spi.SearchLoadingContextBuilder;
-import org.hibernate.search.engine.search.predicate.dsl.SearchPredicateFactory;
-import org.hibernate.search.engine.search.projection.dsl.SearchProjectionFactory;
+import org.hibernate.search.engine.search.predicate.dsl.TypedSearchPredicateFactory;
+import org.hibernate.search.engine.search.projection.dsl.TypedSearchProjectionFactory;
 import org.hibernate.search.engine.search.query.dsl.SearchQuerySelectStep;
-import org.hibernate.search.engine.search.sort.dsl.SearchSortFactory;
+import org.hibernate.search.engine.search.sort.dsl.TypedSearchSortFactory;
 
 /**
  * A wrapper around {@link MappedIndexScope} providing some syntactic sugar,
@@ -60,19 +60,19 @@ public class GenericStubMappingScope<SR, R, E> {
 		return delegate.search( sessionContext, loadingContextBuilder );
 	}
 
-	public SearchPredicateFactory<SR> predicate() {
+	public TypedSearchPredicateFactory<SR> predicate() {
 		return delegate.predicate();
 	}
 
-	public SearchSortFactory<SR> sort() {
+	public TypedSearchSortFactory<SR> sort() {
 		return delegate.sort();
 	}
 
-	public SearchProjectionFactory<SR, R, E> projection() {
+	public TypedSearchProjectionFactory<SR, R, E> projection() {
 		return delegate.projection();
 	}
 
-	public SearchAggregationFactory<SR> aggregation() {
+	public TypedSearchAggregationFactory<SR> aggregation() {
 		return delegate.aggregation();
 	}
 

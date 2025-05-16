@@ -16,9 +16,9 @@ import java.util.Optional;
  *
  * @param <SR> Scope root type.
  * @param <T> The type of extended aggregation factories. Should generally extend
- * {@link SearchAggregationFactory}.
+ * {@link TypedSearchAggregationFactory}.
  *
- * @see SearchAggregationFactory#extension(SearchAggregationFactoryExtension)
+ * @see TypedSearchAggregationFactory#extension(SearchAggregationFactoryExtension)
  * @see ExtendedSearchAggregationFactory
  */
 public interface SearchAggregationFactoryExtension<SR, T> {
@@ -28,10 +28,10 @@ public interface SearchAggregationFactoryExtension<SR, T> {
 	 * <p>
 	 * <strong>WARNING:</strong> this method is not API, see comments at the type level.
 	 *
-	 * @param original The original, non-extended {@link SearchAggregationFactory}.
+	 * @param original The original, non-extended {@link TypedSearchAggregationFactory}.
 	 * @return An optional containing the extended aggregation factory ({@link T}) in case
 	 * of success, or an empty optional otherwise.
 	 */
-	Optional<T> extendOptional(SearchAggregationFactory<SR> original);
+	Optional<T> extendOptional(TypedSearchAggregationFactory<SR> original);
 
 }

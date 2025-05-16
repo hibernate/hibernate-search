@@ -6,7 +6,7 @@ package org.hibernate.search.engine.search.aggregation.dsl;
 
 import java.util.function.Function;
 
-import org.hibernate.search.engine.search.predicate.dsl.SearchPredicateFactory;
+import org.hibernate.search.engine.search.predicate.dsl.TypedSearchPredicateFactory;
 
 /**
  * The final step in a "range" aggregation definition, where optional parameters can be set.
@@ -20,7 +20,7 @@ import org.hibernate.search.engine.search.predicate.dsl.SearchPredicateFactory;
 public interface RangeAggregationOptionsStep<
 		SR,
 		S extends RangeAggregationOptionsStep<SR, ?, PDF, F, A>,
-		PDF extends SearchPredicateFactory<SR>,
+		PDF extends TypedSearchPredicateFactory<SR>,
 		F,
 		A>
 		extends AggregationFinalStep<A>, AggregationFilterStep<SR, S, PDF> {

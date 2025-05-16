@@ -12,7 +12,7 @@ import org.hibernate.search.engine.search.projection.ProjectionCollector;
 import org.hibernate.search.engine.search.projection.definition.spi.ConstantProjectionDefinition;
 import org.hibernate.search.engine.search.projection.definition.spi.DistanceProjectionDefinition;
 import org.hibernate.search.engine.search.projection.dsl.DistanceToFieldProjectionOptionsStep;
-import org.hibernate.search.engine.search.projection.dsl.SearchProjectionFactory;
+import org.hibernate.search.engine.search.projection.dsl.TypedSearchProjectionFactory;
 import org.hibernate.search.engine.spatial.DistanceUnit;
 import org.hibernate.search.engine.spatial.GeoPoint;
 import org.hibernate.search.mapper.pojo.logging.impl.ProjectionLog;
@@ -24,7 +24,7 @@ import org.hibernate.search.util.common.impl.Contracts;
 /**
  * Binds a constructor parameter to a projection to the distance from the center to a field in the indexed document.
  *
- * @see SearchProjectionFactory#distance(String, GeoPoint)
+ * @see TypedSearchProjectionFactory#distance(String, GeoPoint)
  * @see org.hibernate.search.mapper.pojo.mapping.definition.annotation.DistanceProjection
  */
 public final class DistanceProjectionBinder implements ProjectionBinder {
@@ -42,8 +42,8 @@ public final class DistanceProjectionBinder implements ProjectionBinder {
 	 * to the field value is going to be calculated.
 	 *
 	 * @return The binder.
-	 * @see SearchProjectionFactory#distance(String, GeoPoint)
-	 * @see SearchProjectionFactory#withParameters(Function)
+	 * @see TypedSearchProjectionFactory#distance(String, GeoPoint)
+	 * @see TypedSearchProjectionFactory#withParameters(Function)
 	 */
 	public static DistanceProjectionBinder create(String parameterName) {
 		return create( null, parameterName );
@@ -62,8 +62,8 @@ public final class DistanceProjectionBinder implements ProjectionBinder {
 	 * to the field value is going to be calculated.
 	 *
 	 * @return The binder.
-	 * @see SearchProjectionFactory#distance(String, GeoPoint)
-	 * @see SearchProjectionFactory#withParameters(Function)
+	 * @see TypedSearchProjectionFactory#distance(String, GeoPoint)
+	 * @see TypedSearchProjectionFactory#withParameters(Function)
 	 */
 	public static DistanceProjectionBinder create(String fieldPath, String parameterName) {
 		return new DistanceProjectionBinder( fieldPath, parameterName );

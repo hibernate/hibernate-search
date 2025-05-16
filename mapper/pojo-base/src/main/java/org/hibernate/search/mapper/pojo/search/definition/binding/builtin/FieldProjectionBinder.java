@@ -10,7 +10,7 @@ import org.hibernate.search.engine.environment.bean.BeanHolder;
 import org.hibernate.search.engine.search.common.ValueModel;
 import org.hibernate.search.engine.search.projection.definition.spi.ConstantProjectionDefinition;
 import org.hibernate.search.engine.search.projection.definition.spi.FieldProjectionDefinition;
-import org.hibernate.search.engine.search.projection.dsl.SearchProjectionFactory;
+import org.hibernate.search.engine.search.projection.dsl.TypedSearchProjectionFactory;
 import org.hibernate.search.mapper.pojo.logging.impl.ProjectionLog;
 import org.hibernate.search.mapper.pojo.model.PojoModelValue;
 import org.hibernate.search.mapper.pojo.search.definition.binding.ProjectionBinder;
@@ -19,7 +19,7 @@ import org.hibernate.search.mapper.pojo.search.definition.binding.ProjectionBind
 /**
  * Binds a constructor parameter to a projection to the value of a field in the indexed document.
  *
- * @see SearchProjectionFactory#field(String, Class)
+ * @see TypedSearchProjectionFactory#field(String, Class)
  * @see org.hibernate.search.mapper.pojo.mapping.definition.annotation.FieldProjection
  */
 public final class FieldProjectionBinder implements ProjectionBinder {
@@ -65,7 +65,7 @@ public final class FieldProjectionBinder implements ProjectionBinder {
 	 * @param valueConvert Controls how the data fetched from the backend should be converted.
 	 * See {@link org.hibernate.search.engine.search.common.ValueConvert}.
 	 * @return {@code this}, for method chaining.
-	 * @see SearchProjectionFactory#field(String, Class, org.hibernate.search.engine.search.common.ValueConvert)
+	 * @see TypedSearchProjectionFactory#field(String, Class, org.hibernate.search.engine.search.common.ValueConvert)
 	 * @deprecated Use {@link #valueModel(ValueModel)} instead.
 	 */
 	@Deprecated(since = "7.2")
@@ -77,7 +77,7 @@ public final class FieldProjectionBinder implements ProjectionBinder {
 	 * @param valueModel Controls how the data fetched from the backend should be converted.
 	 * See {@link ValueModel}.
 	 * @return {@code this}, for method chaining.
-	 * @see SearchProjectionFactory#field(String, Class, ValueModel)
+	 * @see TypedSearchProjectionFactory#field(String, Class, ValueModel)
 	 */
 	public FieldProjectionBinder valueModel(ValueModel valueModel) {
 		this.valueModel = valueModel;

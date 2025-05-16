@@ -7,7 +7,7 @@ package org.hibernate.search.integrationtest.backend.tck.search.sort;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.hibernate.search.engine.search.sort.dsl.SearchSortFactory;
+import org.hibernate.search.engine.search.sort.dsl.TypedSearchSortFactory;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.FieldTypeDescriptor;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.StandardFieldTypeDescriptor;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.extension.SearchSetupHelper;
@@ -64,7 +64,7 @@ class FieldSortBaseIT {
 		}
 
 		@Override
-		protected void trySort(SearchSortFactory<?> f, String fieldPath) {
+		protected void trySort(TypedSearchSortFactory<?> f, String fieldPath) {
 			f.field( fieldPath );
 		}
 
@@ -96,7 +96,7 @@ class FieldSortBaseIT {
 		}
 
 		@Override
-		protected void trySort(SearchSortFactory<?> f, String fieldPath) {
+		protected void trySort(TypedSearchSortFactory<?> f, String fieldPath) {
 			f.field( fieldPath );
 		}
 
@@ -135,7 +135,7 @@ class FieldSortBaseIT {
 		}
 
 		@Override
-		protected void trySort(SearchSortFactory<?> f, String fieldPath, FieldTypeDescriptor<?, ?> fieldType) {
+		protected void trySort(TypedSearchSortFactory<?> f, String fieldPath, FieldTypeDescriptor<?, ?> fieldType) {
 			f.field( fieldPath );
 		}
 

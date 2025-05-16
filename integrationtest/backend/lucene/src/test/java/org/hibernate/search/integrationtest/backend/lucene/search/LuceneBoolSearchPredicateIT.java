@@ -11,7 +11,7 @@ import org.hibernate.search.engine.backend.document.IndexFieldReference;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaElement;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaObjectField;
 import org.hibernate.search.engine.backend.types.ObjectStructure;
-import org.hibernate.search.engine.search.predicate.dsl.SearchPredicateFactory;
+import org.hibernate.search.engine.search.predicate.dsl.TypedSearchPredicateFactory;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.extension.SearchSetupHelper;
 import org.hibernate.search.util.common.SearchException;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.SimpleMappedIndex;
@@ -55,7 +55,7 @@ class LuceneBoolSearchPredicateIT {
 
 	@Test
 	void resultingQueryOptimization() {
-		SearchPredicateFactory<?> f = index.createScope().predicate();
+		TypedSearchPredicateFactory<?> f = index.createScope().predicate();
 		assertThat(
 				index.query()
 						.where( f.bool()
@@ -93,7 +93,7 @@ class LuceneBoolSearchPredicateIT {
 
 	@Test
 	void resultingQueryOptimizationWithBoost() {
-		SearchPredicateFactory<?> f = index.createScope().predicate();
+		TypedSearchPredicateFactory<?> f = index.createScope().predicate();
 		// by default Lucene bool query would have a filter on match all
 		assertThat(
 				index.query()

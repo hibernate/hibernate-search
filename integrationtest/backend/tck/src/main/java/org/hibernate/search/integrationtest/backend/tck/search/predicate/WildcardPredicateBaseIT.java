@@ -10,7 +10,7 @@ import java.util.Map;
 
 import org.hibernate.search.engine.backend.types.dsl.SearchableProjectableIndexFieldTypeOptionsStep;
 import org.hibernate.search.engine.search.predicate.dsl.PredicateFinalStep;
-import org.hibernate.search.engine.search.predicate.dsl.SearchPredicateFactory;
+import org.hibernate.search.engine.search.predicate.dsl.TypedSearchPredicateFactory;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.FieldTypeDescriptor;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.extension.SearchSetupHelper;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.BulkIndexer;
@@ -129,13 +129,13 @@ class WildcardPredicateBaseIT {
 		}
 
 		@Override
-		protected PredicateFinalStep predicate(SearchPredicateFactory<?> f, String fieldPath, int matchingDocOrdinal,
+		protected PredicateFinalStep predicate(TypedSearchPredicateFactory<?> f, String fieldPath, int matchingDocOrdinal,
 				DataSet<?, WildcardPredicateTestValues> dataSet) {
 			return f.wildcard().field( fieldPath ).matching( dataSet.values.matchingArg( matchingDocOrdinal ) );
 		}
 
 		@Override
-		protected PredicateFinalStep predicate(SearchPredicateFactory<?> f, String fieldPath, String paramName,
+		protected PredicateFinalStep predicate(TypedSearchPredicateFactory<?> f, String fieldPath, String paramName,
 				DataSet<?, WildcardPredicateTestValues> dataSet) {
 			return f.withParameters( params -> f.wildcard().field( fieldPath )
 					.matching( params.get( paramName, String.class ) ) );
@@ -173,20 +173,21 @@ class WildcardPredicateBaseIT {
 		}
 
 		@Override
-		protected PredicateFinalStep predicateOnFieldAndField(SearchPredicateFactory<?> f, String fieldPath,
+		protected PredicateFinalStep predicateOnFieldAndField(TypedSearchPredicateFactory<?> f, String fieldPath,
 				String otherFieldPath, int matchingDocOrdinal, DataSet<?, WildcardPredicateTestValues> dataSet) {
 			return f.wildcard().field( fieldPath ).field( otherFieldPath )
 					.matching( dataSet.values.matchingArg( matchingDocOrdinal ) );
 		}
 
 		@Override
-		protected PredicateFinalStep predicateOnFields(SearchPredicateFactory<?> f, String[] fieldPaths, int matchingDocOrdinal,
+		protected PredicateFinalStep predicateOnFields(TypedSearchPredicateFactory<?> f, String[] fieldPaths,
+				int matchingDocOrdinal,
 				DataSet<?, WildcardPredicateTestValues> dataSet) {
 			return f.wildcard().fields( fieldPaths ).matching( dataSet.values.matchingArg( matchingDocOrdinal ) );
 		}
 
 		@Override
-		protected PredicateFinalStep predicateOnFieldAndFields(SearchPredicateFactory<?> f, String fieldPath,
+		protected PredicateFinalStep predicateOnFieldAndFields(TypedSearchPredicateFactory<?> f, String fieldPath,
 				String[] fieldPaths, int matchingDocOrdinal, DataSet<?, WildcardPredicateTestValues> dataSet) {
 			return f.wildcard().field( fieldPath ).fields( fieldPaths )
 					.matching( dataSet.values.matchingArg( matchingDocOrdinal ) );
@@ -222,7 +223,7 @@ class WildcardPredicateBaseIT {
 		}
 
 		@Override
-		protected PredicateFinalStep predicate(SearchPredicateFactory<?> f, String fieldPath, int matchingDocOrdinal,
+		protected PredicateFinalStep predicate(TypedSearchPredicateFactory<?> f, String fieldPath, int matchingDocOrdinal,
 				DataSet<?, WildcardPredicateTestValues> dataSet) {
 			return f.wildcard().field( fieldPath ).matching( dataSet.values.matchingArg( matchingDocOrdinal ) );
 		}
@@ -253,27 +254,27 @@ class WildcardPredicateBaseIT {
 		}
 
 		@Override
-		protected PredicateFinalStep predicate(SearchPredicateFactory<?> f, String fieldPath, int matchingDocOrdinal,
+		protected PredicateFinalStep predicate(TypedSearchPredicateFactory<?> f, String fieldPath, int matchingDocOrdinal,
 				DataSet<?, WildcardPredicateTestValues> dataSet) {
 			return f.wildcard().field( fieldPath ).matching( dataSet.values.matchingArg( matchingDocOrdinal ) );
 		}
 
 		@Override
-		protected PredicateFinalStep predicateWithConstantScore(SearchPredicateFactory<?> f, String[] fieldPaths,
+		protected PredicateFinalStep predicateWithConstantScore(TypedSearchPredicateFactory<?> f, String[] fieldPaths,
 				int matchingDocOrdinal, DataSet<?, WildcardPredicateTestValues> dataSet) {
 			return f.wildcard().fields( fieldPaths ).matching( dataSet.values.matchingArg( matchingDocOrdinal ) )
 					.constantScore();
 		}
 
 		@Override
-		protected PredicateFinalStep predicateWithPredicateLevelBoost(SearchPredicateFactory<?> f, String[] fieldPaths,
+		protected PredicateFinalStep predicateWithPredicateLevelBoost(TypedSearchPredicateFactory<?> f, String[] fieldPaths,
 				int matchingDocOrdinal, float predicateBoost, DataSet<?, WildcardPredicateTestValues> dataSet) {
 			return f.wildcard().fields( fieldPaths ).matching( dataSet.values.matchingArg( matchingDocOrdinal ) )
 					.boost( predicateBoost );
 		}
 
 		@Override
-		protected PredicateFinalStep predicateWithConstantScoreAndPredicateLevelBoost(SearchPredicateFactory<?> f,
+		protected PredicateFinalStep predicateWithConstantScoreAndPredicateLevelBoost(TypedSearchPredicateFactory<?> f,
 				String[] fieldPaths, int matchingDocOrdinal, float predicateBoost,
 				DataSet<?, WildcardPredicateTestValues> dataSet) {
 			return f.wildcard().fields( fieldPaths ).matching( dataSet.values.matchingArg( matchingDocOrdinal ) )
@@ -281,21 +282,21 @@ class WildcardPredicateBaseIT {
 		}
 
 		@Override
-		protected PredicateFinalStep predicateWithFieldLevelBoost(SearchPredicateFactory<?> f, String fieldPath,
+		protected PredicateFinalStep predicateWithFieldLevelBoost(TypedSearchPredicateFactory<?> f, String fieldPath,
 				float fieldBoost, int matchingDocOrdinal, DataSet<?, WildcardPredicateTestValues> dataSet) {
 			return f.wildcard().field( fieldPath ).boost( fieldBoost )
 					.matching( dataSet.values.matchingArg( matchingDocOrdinal ) );
 		}
 
 		@Override
-		protected PredicateFinalStep predicateWithFieldLevelBoostAndConstantScore(SearchPredicateFactory<?> f,
+		protected PredicateFinalStep predicateWithFieldLevelBoostAndConstantScore(TypedSearchPredicateFactory<?> f,
 				String fieldPath, float fieldBoost, int matchingDocOrdinal, DataSet<?, WildcardPredicateTestValues> dataSet) {
 			return f.wildcard().field( fieldPath ).boost( fieldBoost )
 					.matching( dataSet.values.matchingArg( matchingDocOrdinal ) ).constantScore();
 		}
 
 		@Override
-		protected PredicateFinalStep predicateWithFieldLevelBoostAndPredicateLevelBoost(SearchPredicateFactory<?> f,
+		protected PredicateFinalStep predicateWithFieldLevelBoostAndPredicateLevelBoost(TypedSearchPredicateFactory<?> f,
 				String fieldPath, float fieldBoost, int matchingDocOrdinal, float predicateBoost,
 				DataSet<?, WildcardPredicateTestValues> dataSet) {
 			return f.wildcard().field( fieldPath ).boost( fieldBoost )
@@ -317,7 +318,7 @@ class WildcardPredicateBaseIT {
 		}
 
 		@Override
-		protected void tryPredicate(SearchPredicateFactory<?> f, String fieldPath) {
+		protected void tryPredicate(TypedSearchPredicateFactory<?> f, String fieldPath) {
 			f.wildcard().field( fieldPath );
 		}
 
@@ -349,7 +350,7 @@ class WildcardPredicateBaseIT {
 		}
 
 		@Override
-		protected void tryPredicate(SearchPredicateFactory<?> f, String fieldPath) {
+		protected void tryPredicate(TypedSearchPredicateFactory<?> f, String fieldPath) {
 			f.wildcard().field( fieldPath );
 		}
 
@@ -388,7 +389,7 @@ class WildcardPredicateBaseIT {
 		}
 
 		@Override
-		protected void tryPredicate(SearchPredicateFactory<?> f, String fieldPath, FieldTypeDescriptor<?, ?> fieldType) {
+		protected void tryPredicate(TypedSearchPredicateFactory<?> f, String fieldPath, FieldTypeDescriptor<?, ?> fieldType) {
 			f.wildcard().field( fieldPath );
 		}
 
@@ -420,7 +421,7 @@ class WildcardPredicateBaseIT {
 		}
 
 		@Override
-		protected void tryPredicateWithNullMatchingParam(SearchPredicateFactory<?> f, String fieldPath) {
+		protected void tryPredicateWithNullMatchingParam(TypedSearchPredicateFactory<?> f, String fieldPath) {
 			f.wildcard().field( fieldPath ).matching( null );
 		}
 	}
@@ -464,13 +465,13 @@ class WildcardPredicateBaseIT {
 		}
 
 		@Override
-		protected PredicateFinalStep predicate(SearchPredicateFactory<?> f, String fieldPath, int matchingDocOrdinal,
+		protected PredicateFinalStep predicate(TypedSearchPredicateFactory<?> f, String fieldPath, int matchingDocOrdinal,
 				DataSet<?, WildcardPredicateTestValues> dataSet) {
 			return f.wildcard().field( fieldPath ).matching( dataSet.values.matchingArg( matchingDocOrdinal ) );
 		}
 
 		@Override
-		protected PredicateFinalStep predicate(SearchPredicateFactory<?> f, String field0Path, String field1Path,
+		protected PredicateFinalStep predicate(TypedSearchPredicateFactory<?> f, String field0Path, String field1Path,
 				int matchingDocOrdinal, DataSet<?, WildcardPredicateTestValues> dataSet) {
 			return f.wildcard().field( field0Path ).field( field1Path )
 					.matching( dataSet.values.matchingArg( matchingDocOrdinal ) );

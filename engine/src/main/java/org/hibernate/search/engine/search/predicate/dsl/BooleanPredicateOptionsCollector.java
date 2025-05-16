@@ -10,7 +10,7 @@ import java.util.function.Function;
 import org.hibernate.search.engine.search.predicate.SearchPredicate;
 
 /**
- * An object where the clauses and options of a {@link SearchPredicateFactory#bool() boolean predicate} can be set.
+ * An object where the clauses and options of a {@link TypedSearchPredicateFactory#bool() boolean predicate} can be set.
  * <p>
  * Different types of clauses have different effects, see below.
  *
@@ -167,7 +167,7 @@ public interface BooleanPredicateOptionsCollector<SR, S extends BooleanPredicate
 	 * Should generally be a lambda expression.
 	 * @return {@code this}, for method chaining.
 	 */
-	S must(Function<? super SearchPredicateFactory<SR>, ? extends PredicateFinalStep> clauseContributor);
+	S must(Function<? super TypedSearchPredicateFactory<SR>, ? extends PredicateFinalStep> clauseContributor);
 
 	/**
 	 * Add a <a href="#mustnot">"must not" clause</a> to be defined by the given function.
@@ -179,7 +179,7 @@ public interface BooleanPredicateOptionsCollector<SR, S extends BooleanPredicate
 	 * Should generally be a lambda expression.
 	 * @return {@code this}, for method chaining.
 	 */
-	S mustNot(Function<? super SearchPredicateFactory<SR>, ? extends PredicateFinalStep> clauseContributor);
+	S mustNot(Function<? super TypedSearchPredicateFactory<SR>, ? extends PredicateFinalStep> clauseContributor);
 
 	/**
 	 * Add a <a href="#should">"should" clause</a> to be defined by the given function.
@@ -191,7 +191,7 @@ public interface BooleanPredicateOptionsCollector<SR, S extends BooleanPredicate
 	 * Should generally be a lambda expression.
 	 * @return {@code this}, for method chaining.
 	 */
-	S should(Function<? super SearchPredicateFactory<SR>, ? extends PredicateFinalStep> clauseContributor);
+	S should(Function<? super TypedSearchPredicateFactory<SR>, ? extends PredicateFinalStep> clauseContributor);
 
 	/**
 	 * Add a <a href="#filter">"filter" clause</a> to be defined by the given function.
@@ -203,7 +203,7 @@ public interface BooleanPredicateOptionsCollector<SR, S extends BooleanPredicate
 	 * Should generally be a lambda expression.
 	 * @return {@code this}, for method chaining.
 	 */
-	S filter(Function<? super SearchPredicateFactory<SR>, ? extends PredicateFinalStep> clauseContributor);
+	S filter(Function<? super TypedSearchPredicateFactory<SR>, ? extends PredicateFinalStep> clauseContributor);
 
 	/**
 	 * Checks if this predicate contains at least one clause.

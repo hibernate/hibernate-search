@@ -11,6 +11,7 @@ import org.hibernate.search.engine.backend.scope.IndexScopeExtension;
 import org.hibernate.search.engine.search.aggregation.AggregationKey;
 import org.hibernate.search.engine.search.aggregation.SearchAggregation;
 import org.hibernate.search.engine.search.aggregation.dsl.SearchAggregationFactory;
+import org.hibernate.search.engine.search.common.NonStaticMetamodelScope;
 import org.hibernate.search.engine.search.highlighter.dsl.SearchHighlighterFactory;
 import org.hibernate.search.engine.search.predicate.dsl.SearchPredicateFactory;
 import org.hibernate.search.engine.search.projection.dsl.SearchProjectionFactory;
@@ -37,8 +38,8 @@ import org.hibernate.search.util.common.SearchException;
  *
  * @param <E> A supertype of all types in this scope.
  */
-@SuppressWarnings("deprecation")
-public interface SearchScope<SR, E> {
+@SuppressWarnings({ "deprecation", "removal" })
+public interface SearchScope<E> extends TypedSearchScope<NonStaticMetamodelScope, E> {
 
 	/**
 	 * Initiate the building of a search predicate.
@@ -54,7 +55,7 @@ public interface SearchScope<SR, E> {
 	 * @return A predicate factory.
 	 * @see SearchPredicateFactory
 	 */
-	SearchPredicateFactory<SR> predicate();
+	SearchPredicateFactory predicate();
 
 	/**
 	 * Initiate the building of a search sort.
@@ -71,7 +72,7 @@ public interface SearchScope<SR, E> {
 	 * @return A sort factory.
 	 * @see SearchSortFactory
 	 */
-	SearchSortFactory<SR> sort();
+	SearchSortFactory sort();
 
 	/**
 	 * Initiate the building of a search projection that will be valid for the indexes in this scope.
@@ -88,7 +89,7 @@ public interface SearchScope<SR, E> {
 	 * @see SearchProjectionFactory
 	 */
 	@SuppressWarnings("deprecation")
-	SearchProjectionFactory<SR, EntityReference, E> projection();
+	SearchProjectionFactory<EntityReference, E> projection();
 
 	/**
 	 * Initiate the building of a search aggregation that will be valid for the indexes in this scope.
@@ -104,7 +105,7 @@ public interface SearchScope<SR, E> {
 	 * @return An aggregation factory.
 	 * @see SearchAggregationFactory
 	 */
-	SearchAggregationFactory<SR> aggregation();
+	SearchAggregationFactory aggregation();
 
 	/**
 	 * Create a {@link SearchSchemaManager} for the indexes mapped to types in this scope, or to any of their sub-types.

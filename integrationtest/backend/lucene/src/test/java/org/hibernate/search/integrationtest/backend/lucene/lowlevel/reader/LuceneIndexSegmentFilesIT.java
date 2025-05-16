@@ -24,7 +24,7 @@ import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaElement
 import org.hibernate.search.engine.backend.work.execution.OperationSubmitter;
 import org.hibernate.search.engine.backend.work.execution.spi.IndexWorkspace;
 import org.hibernate.search.engine.backend.work.execution.spi.UnsupportedOperationBehavior;
-import org.hibernate.search.engine.search.predicate.dsl.SearchPredicateFactory;
+import org.hibernate.search.engine.search.predicate.dsl.TypedSearchPredicateFactory;
 import org.hibernate.search.engine.search.query.SearchScroll;
 import org.hibernate.search.engine.search.query.SearchScrollResult;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.extension.SearchSetupHelper;
@@ -171,7 +171,7 @@ class LuceneIndexSegmentFilesIT {
 
 	private void createMoreDocuments(int totalDocs) throws IOException {
 		createSomeDocuments( totalDocs, totalDocs );
-		assertThatQuery( index.query().where( SearchPredicateFactory::matchAll ) ).hasTotalHitCount( 2 * totalDocs );
+		assertThatQuery( index.query().where( TypedSearchPredicateFactory::matchAll ) ).hasTotalHitCount( 2 * totalDocs );
 		// we expect that there's +1 segment, but let's be more forgiving and say that there's at least +1
 		assertThat( numberOfCurrentSegments() ).isGreaterThanOrEqualTo( 1 );
 		assertThat( numberOfAllSegments() ).isGreaterThan( 1 );
@@ -182,12 +182,12 @@ class LuceneIndexSegmentFilesIT {
 				.withSchemaManagement( StubMappingSchemaManagementStrategy.DROP_AND_CREATE_ON_STARTUP_ONLY )
 				.withIndex( index )
 				.setup() ) {
-			assertThatQuery( index.query().where( SearchPredicateFactory::matchAll ) ).hasNoHits();
+			assertThatQuery( index.query().where( TypedSearchPredicateFactory::matchAll ) ).hasNoHits();
 			assertThat( numberOfCurrentSegments() ).isEqualTo( 0 );
 
 			createSomeDocuments( 0, totalDocs );
 
-			assertThatQuery( index.query().where( SearchPredicateFactory::matchAll ) ).hasTotalHitCount( totalDocs );
+			assertThatQuery( index.query().where( TypedSearchPredicateFactory::matchAll ) ).hasTotalHitCount( totalDocs );
 			assertThat( numberOfCurrentSegments() ).isGreaterThanOrEqualTo( 1 );
 			assertThat( numberOfAllSegments() ).isGreaterThanOrEqualTo( 1 );
 		}

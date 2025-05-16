@@ -6,7 +6,7 @@ package org.hibernate.search.engine.search.predicate.dsl.impl;
 
 import org.hibernate.search.engine.search.predicate.dsl.BooleanPredicateClausesStep;
 import org.hibernate.search.engine.search.predicate.dsl.BooleanPredicateOptionsCollector;
-import org.hibernate.search.engine.search.predicate.dsl.SearchPredicateFactory;
+import org.hibernate.search.engine.search.predicate.dsl.TypedSearchPredicateFactory;
 import org.hibernate.search.engine.search.predicate.dsl.spi.SearchPredicateDslContext;
 
 public final class BooleanPredicateClausesStepImpl<SR>
@@ -15,7 +15,7 @@ public final class BooleanPredicateClausesStepImpl<SR>
 		implements BooleanPredicateClausesStep<SR, BooleanPredicateClausesStepImpl<SR>> {
 
 	public BooleanPredicateClausesStepImpl(SearchPredicateDslContext<?> dslContext,
-			SearchPredicateFactory<SR> factory) {
+			TypedSearchPredicateFactory<SR> factory) {
 		super( dslContext, factory );
 	}
 

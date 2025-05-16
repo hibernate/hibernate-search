@@ -8,20 +8,20 @@ import java.util.function.Function;
 
 import org.hibernate.search.engine.common.dsl.spi.DslExtensionState;
 import org.hibernate.search.engine.search.predicate.dsl.PredicateFinalStep;
-import org.hibernate.search.engine.search.predicate.dsl.SearchPredicateFactory;
 import org.hibernate.search.engine.search.predicate.dsl.SearchPredicateFactoryExtension;
 import org.hibernate.search.engine.search.predicate.dsl.SearchPredicateFactoryExtensionIfSupportedMoreStep;
 import org.hibernate.search.engine.search.predicate.dsl.SearchPredicateFactoryExtensionIfSupportedStep;
+import org.hibernate.search.engine.search.predicate.dsl.TypedSearchPredicateFactory;
 
 public final class SearchPredicateFactoryExtensionStep<SR>
 		implements SearchPredicateFactoryExtensionIfSupportedStep<SR>,
 		SearchPredicateFactoryExtensionIfSupportedMoreStep<SR> {
 
-	private final SearchPredicateFactory<SR> parent;
+	private final TypedSearchPredicateFactory<SR> parent;
 
 	private final DslExtensionState<PredicateFinalStep> state = new DslExtensionState<>();
 
-	public SearchPredicateFactoryExtensionStep(SearchPredicateFactory<SR> parent) {
+	public SearchPredicateFactoryExtensionStep(TypedSearchPredicateFactory<SR> parent) {
 		this.parent = parent;
 	}
 
@@ -35,7 +35,7 @@ public final class SearchPredicateFactoryExtensionStep<SR>
 
 	@Override
 	public PredicateFinalStep orElse(
-			Function<SearchPredicateFactory<SR>, ? extends PredicateFinalStep> predicateContributor) {
+			Function<TypedSearchPredicateFactory<SR>, ? extends PredicateFinalStep> predicateContributor) {
 		return state.orElse( parent, predicateContributor );
 	}
 

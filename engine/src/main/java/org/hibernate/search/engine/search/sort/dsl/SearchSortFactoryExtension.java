@@ -16,9 +16,9 @@ import java.util.Optional;
  *
  * @param <SR> Scope root type.
  * @param <T> The type of extended sort factories. Should generally extend
- * {@link SearchSortFactory}.
+ * {@link TypedSearchSortFactory}.
  *
- * @see SearchSortFactory#extension(SearchSortFactoryExtension)
+ * @see TypedSearchSortFactory#extension(SearchSortFactoryExtension)
  * @see ExtendedSearchSortFactory
  */
 public interface SearchSortFactoryExtension<SR, T> {
@@ -28,10 +28,10 @@ public interface SearchSortFactoryExtension<SR, T> {
 	 * <p>
 	 * <strong>WARNING:</strong> this method is not API, see comments at the type level.
 	 *
-	 * @param original The original, non-extended {@link SearchSortFactory}.
+	 * @param original The original, non-extended {@link TypedSearchSortFactory}.
 	 * @return An optional containing the extended sort factory ({@link T}) in case
 	 * of success, or an empty optional otherwise.
 	 */
-	Optional<T> extendOptional(SearchSortFactory<SR> original);
+	Optional<T> extendOptional(TypedSearchSortFactory<SR> original);
 
 }

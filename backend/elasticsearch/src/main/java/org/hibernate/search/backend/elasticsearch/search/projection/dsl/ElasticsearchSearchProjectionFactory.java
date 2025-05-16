@@ -6,7 +6,7 @@ package org.hibernate.search.backend.elasticsearch.search.projection.dsl;
 
 import org.hibernate.search.engine.search.projection.dsl.ExtendedSearchProjectionFactory;
 import org.hibernate.search.engine.search.projection.dsl.ProjectionFinalStep;
-import org.hibernate.search.engine.search.projection.dsl.SearchProjectionFactory;
+import org.hibernate.search.engine.search.projection.dsl.TypedSearchProjectionFactory;
 
 import com.google.gson.JsonObject;
 
@@ -16,7 +16,7 @@ import com.google.gson.JsonObject;
  * @param <SR> Scope root type.
  * @param <R> The type of entity references.
  * @param <E> The type of entities.
- * @see SearchProjectionFactory
+ * @see TypedSearchProjectionFactory
  */
 public interface ElasticsearchSearchProjectionFactory<SR, R, E>
 		extends ExtendedSearchProjectionFactory<SR, ElasticsearchSearchProjectionFactory<SR, R, E>, R, E> {

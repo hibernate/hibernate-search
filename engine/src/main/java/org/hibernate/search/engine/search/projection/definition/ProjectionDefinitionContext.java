@@ -4,12 +4,12 @@
  */
 package org.hibernate.search.engine.search.projection.definition;
 
-import org.hibernate.search.engine.search.projection.dsl.SearchProjectionFactory;
+import org.hibernate.search.engine.search.projection.dsl.TypedSearchProjectionFactory;
 import org.hibernate.search.util.common.annotation.Incubating;
 
 /**
- * The context passed to {@link ProjectionDefinition#create(SearchProjectionFactory, ProjectionDefinitionContext)}.
- * @see ProjectionDefinition#create(SearchProjectionFactory, ProjectionDefinitionContext)
+ * The context passed to {@link ProjectionDefinition#create(TypedSearchProjectionFactory, ProjectionDefinitionContext)}.
+ * @see ProjectionDefinition#create(TypedSearchProjectionFactory, ProjectionDefinitionContext)
  */
 @Incubating
 public interface ProjectionDefinitionContext {

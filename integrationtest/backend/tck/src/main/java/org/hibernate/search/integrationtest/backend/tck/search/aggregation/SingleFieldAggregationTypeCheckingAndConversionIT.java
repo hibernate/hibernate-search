@@ -33,10 +33,10 @@ import org.hibernate.search.engine.backend.types.dsl.StandardIndexFieldTypeOptio
 import org.hibernate.search.engine.search.aggregation.AggregationKey;
 import org.hibernate.search.engine.search.aggregation.SearchAggregation;
 import org.hibernate.search.engine.search.aggregation.dsl.AggregationFinalStep;
-import org.hibernate.search.engine.search.aggregation.dsl.SearchAggregationFactory;
+import org.hibernate.search.engine.search.aggregation.dsl.TypedSearchAggregationFactory;
 import org.hibernate.search.engine.search.common.ValueModel;
 import org.hibernate.search.engine.search.predicate.dsl.PredicateFinalStep;
-import org.hibernate.search.engine.search.predicate.dsl.SearchPredicateFactory;
+import org.hibernate.search.engine.search.predicate.dsl.TypedSearchPredicateFactory;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.operations.AggregationDescriptor;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.operations.expectations.AggregationScenario;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.operations.expectations.SupportedSingleFieldAggregationExpectations;
@@ -766,8 +766,10 @@ class SingleFieldAggregationTypeCheckingAndConversionIT<F> {
 	}
 
 	private <A> void testValidAggregation(AggregationScenario<A> scenario, StubMappingScope scope,
-			Function<SearchPredicateFactory<?>, ? extends PredicateFinalStep> predicateContributor,
-			BiFunction<SearchAggregationFactory<?>, AggregationScenario<A>, AggregationFinalStep<A>> aggregationContributor,
+			Function<TypedSearchPredicateFactory<?>, ? extends PredicateFinalStep> predicateContributor,
+			BiFunction<TypedSearchAggregationFactory<?>,
+					AggregationScenario<A>,
+					AggregationFinalStep<A>> aggregationContributor,
 			DataSet<F> dataSet) {
 		AggregationKey<A> aggregationKey = AggregationKey.of( AGGREGATION_NAME );
 		assertThatQuery(

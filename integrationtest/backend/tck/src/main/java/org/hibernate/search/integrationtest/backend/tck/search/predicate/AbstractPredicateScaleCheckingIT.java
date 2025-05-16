@@ -15,7 +15,7 @@ import org.hibernate.search.engine.backend.document.IndexFieldReference;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaElement;
 import org.hibernate.search.engine.reporting.spi.EventContexts;
 import org.hibernate.search.engine.search.predicate.dsl.PredicateFinalStep;
-import org.hibernate.search.engine.search.predicate.dsl.SearchPredicateFactory;
+import org.hibernate.search.engine.search.predicate.dsl.TypedSearchPredicateFactory;
 import org.hibernate.search.util.common.SearchException;
 import org.hibernate.search.util.impl.integrationtest.common.reporting.FailureReportUtils;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.BulkIndexer;
@@ -89,7 +89,7 @@ public abstract class AbstractPredicateScaleCheckingIT {
 				) );
 	}
 
-	protected abstract PredicateFinalStep predicate(SearchPredicateFactory<?> f, String fieldPath, Object matchingParam);
+	protected abstract PredicateFinalStep predicate(TypedSearchPredicateFactory<?> f, String fieldPath, Object matchingParam);
 
 	protected abstract String predicateTrait();
 

@@ -8,9 +8,9 @@ import java.util.function.Function;
 
 /**
  * The initial step when attempting to apply multiple extensions
- * to a {@link SearchPredicateFactory}.
+ * to a {@link TypedSearchPredicateFactory}.
  *
- * @see SearchPredicateFactory#extension()
+ * @see TypedSearchPredicateFactory#extension()
  */
 public interface SearchPredicateFactoryExtensionIfSupportedStep<SR> {
 

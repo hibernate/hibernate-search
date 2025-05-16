@@ -10,10 +10,10 @@ import org.hibernate.search.engine.search.aggregation.dsl.spi.SearchAggregationD
 import org.hibernate.search.engine.search.aggregation.spi.AggregationTypeKeys;
 import org.hibernate.search.engine.search.aggregation.spi.FieldMetricAggregationBuilder;
 import org.hibernate.search.engine.search.common.ValueModel;
-import org.hibernate.search.engine.search.predicate.dsl.SearchPredicateFactory;
+import org.hibernate.search.engine.search.predicate.dsl.TypedSearchPredicateFactory;
 import org.hibernate.search.util.common.impl.Contracts;
 
-public class SumAggregationFieldStepImpl<SR, PDF extends SearchPredicateFactory<SR>>
+public class SumAggregationFieldStepImpl<SR, PDF extends TypedSearchPredicateFactory<SR>>
 		implements SumAggregationFieldStep<SR, PDF> {
 	private final SearchAggregationDslContext<SR, ?, ? extends PDF> dslContext;
 

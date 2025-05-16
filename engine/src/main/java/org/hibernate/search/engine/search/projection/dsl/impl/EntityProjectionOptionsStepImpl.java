@@ -12,7 +12,7 @@ import org.hibernate.search.engine.backend.reporting.spi.BackendMappingHints;
 import org.hibernate.search.engine.logging.impl.QueryLog;
 import org.hibernate.search.engine.search.projection.SearchProjection;
 import org.hibernate.search.engine.search.projection.dsl.EntityProjectionOptionsStep;
-import org.hibernate.search.engine.search.projection.dsl.SearchProjectionFactory;
+import org.hibernate.search.engine.search.projection.dsl.TypedSearchProjectionFactory;
 import org.hibernate.search.engine.search.projection.dsl.spi.SearchProjectionDslContext;
 import org.hibernate.search.engine.search.projection.spi.ProjectionMappedTypeContext;
 import org.hibernate.search.engine.search.projection.spi.SearchProjectionIndexScope;
@@ -21,11 +21,11 @@ public final class EntityProjectionOptionsStepImpl<SR, E>
 		implements EntityProjectionOptionsStep<EntityProjectionOptionsStepImpl<SR, E>, E> {
 
 	private final SearchProjectionIndexScope<?> scope;
-	private final SearchProjectionFactory<SR, ?, ?> projectionFactory;
+	private final TypedSearchProjectionFactory<SR, ?, ?> projectionFactory;
 	private final Class<E> requestedEntityType;
 
 	public EntityProjectionOptionsStepImpl(SearchProjectionDslContext<?> dslContext,
-			SearchProjectionFactory<SR, ?, ?> projectionFactory, Class<E> requestedEntityType) {
+			TypedSearchProjectionFactory<SR, ?, ?> projectionFactory, Class<E> requestedEntityType) {
 		this.scope = dslContext.scope();
 		this.projectionFactory = projectionFactory;
 		this.requestedEntityType = requestedEntityType;

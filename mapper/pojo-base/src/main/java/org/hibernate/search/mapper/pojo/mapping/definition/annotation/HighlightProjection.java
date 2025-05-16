@@ -12,7 +12,7 @@ import java.lang.annotation.Target;
 import java.util.function.Function;
 
 import org.hibernate.search.engine.environment.bean.BeanRetrieval;
-import org.hibernate.search.engine.search.projection.dsl.SearchProjectionFactory;
+import org.hibernate.search.engine.search.projection.dsl.TypedSearchProjectionFactory;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.processing.MethodParameterMapping;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.processing.MethodParameterMappingAnnotationProcessorRef;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.processing.impl.HighlightProjectionProcessor;
@@ -21,7 +21,7 @@ import org.hibernate.search.mapper.pojo.mapping.definition.annotation.processing
  * Maps a constructor parameter to a projection to highlights,
  * i.e. sequences of text that matched the query, extracted from the given field's value.
  *
- * @see SearchProjectionFactory#highlight(String)
+ * @see TypedSearchProjectionFactory#highlight(String)
  */
 @Documented
 @Target({ ElementType.PARAMETER })
@@ -36,7 +36,7 @@ public @interface HighlightProjection {
 	 * Defaults to the name of the annotated constructor parameter,
 	 * if it can be retrieved (requires the class to be compiled with the {@code -parameters} flag;
 	 * otherwise an empty {@code path} will lead to a failure).
-	 * @see SearchProjectionFactory#highlight(String)
+	 * @see TypedSearchProjectionFactory#highlight(String)
 	 */
 	String path() default "";
 

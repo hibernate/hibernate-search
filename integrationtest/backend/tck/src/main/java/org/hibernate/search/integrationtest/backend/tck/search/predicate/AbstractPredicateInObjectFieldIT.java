@@ -18,7 +18,7 @@ import org.hibernate.search.engine.search.predicate.SearchPredicate;
 import org.hibernate.search.engine.search.predicate.definition.PredicateDefinition;
 import org.hibernate.search.engine.search.predicate.definition.PredicateDefinitionContext;
 import org.hibernate.search.engine.search.predicate.dsl.PredicateFinalStep;
-import org.hibernate.search.engine.search.predicate.dsl.SearchPredicateFactory;
+import org.hibernate.search.engine.search.predicate.dsl.TypedSearchPredicateFactory;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.FieldTypeDescriptor;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.SimpleFieldModelsByType;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.SimpleMappedIndex;
@@ -180,7 +180,7 @@ public abstract class AbstractPredicateInObjectFieldIT {
 				.hasTotalHitCount( 2 );
 	}
 
-	protected abstract PredicateFinalStep predicate(SearchPredicateFactory<?> f, ObjectFieldBinding objectFieldBinding,
+	protected abstract PredicateFinalStep predicate(TypedSearchPredicateFactory<?> f, ObjectFieldBinding objectFieldBinding,
 			int matchingDocOrdinal, AbstractPredicateDataSet dataSet);
 
 	abstract static class AbstractObjectBinding {

@@ -10,10 +10,10 @@ import org.hibernate.search.engine.backend.common.DocumentReference;
 import org.hibernate.search.engine.common.EntityReference;
 import org.hibernate.search.engine.search.projection.ProjectionCollector;
 import org.hibernate.search.engine.search.projection.dsl.ProjectionFinalStep;
-import org.hibernate.search.engine.search.projection.dsl.SearchProjectionFactory;
+import org.hibernate.search.engine.search.projection.dsl.TypedSearchProjectionFactory;
 import org.hibernate.search.engine.search.query.dsl.SearchQueryOptionsStep;
-import org.hibernate.search.engine.search.sort.dsl.SearchSortFactory;
 import org.hibernate.search.engine.search.sort.dsl.SortFinalStep;
+import org.hibernate.search.engine.search.sort.dsl.TypedSearchSortFactory;
 import org.hibernate.search.engine.spatial.DistanceUnit;
 import org.hibernate.search.engine.spatial.GeoPoint;
 
@@ -26,20 +26,20 @@ class DistanceProjectionMultiValuedAccumulatorBaseIT extends AbstractDistancePro
 
 	@Override
 	protected ProjectionFinalStep<List<Double>> distance(
-			SearchProjectionFactory<?, EntityReference, DocumentReference> projection, String path, GeoPoint center,
+			TypedSearchProjectionFactory<?, EntityReference, DocumentReference> projection, String path, GeoPoint center,
 			String parameterName) {
 		return projection.distance( path, center ).collector( ProjectionCollector.list() );
 	}
 
 	@Override
 	protected ProjectionFinalStep<List<Double>> distance(
-			SearchProjectionFactory<?, EntityReference, DocumentReference> projection, String path, GeoPoint center,
+			TypedSearchProjectionFactory<?, EntityReference, DocumentReference> projection, String path, GeoPoint center,
 			DistanceUnit unit, String centerParam, String unitParam) {
 		return projection.distance( path, center ).collector( ProjectionCollector.list() ).unit( unit );
 	}
 
 	@Override
-	protected SortFinalStep sort(SearchSortFactory<?> sort, String path, GeoPoint center,
+	protected SortFinalStep sort(TypedSearchSortFactory<?> sort, String path, GeoPoint center,
 			String parameterName) {
 		return sort.distance( path, center );
 	}

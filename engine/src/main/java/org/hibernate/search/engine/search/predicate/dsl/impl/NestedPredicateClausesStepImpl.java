@@ -7,7 +7,7 @@ package org.hibernate.search.engine.search.predicate.dsl.impl;
 import org.hibernate.search.engine.search.predicate.SearchPredicate;
 import org.hibernate.search.engine.search.predicate.dsl.NestedPredicateClausesCollector;
 import org.hibernate.search.engine.search.predicate.dsl.NestedPredicateClausesStep;
-import org.hibernate.search.engine.search.predicate.dsl.SearchPredicateFactory;
+import org.hibernate.search.engine.search.predicate.dsl.TypedSearchPredicateFactory;
 import org.hibernate.search.engine.search.predicate.dsl.spi.SearchPredicateDslContext;
 import org.hibernate.search.engine.search.predicate.spi.NestedPredicateBuilder;
 import org.hibernate.search.engine.search.predicate.spi.PredicateTypeKeys;
@@ -22,7 +22,7 @@ public final class NestedPredicateClausesStepImpl<SR>
 	private final NestedPredicateBuilder builder;
 
 	public NestedPredicateClausesStepImpl(SearchPredicateDslContext<?> dslContext, String objectFieldPath,
-			SearchPredicateFactory<SR> factory) {
+			TypedSearchPredicateFactory<SR> factory) {
 		super( SimpleBooleanPredicateOperator.AND, dslContext, factory );
 		this.builder = dslContext.scope().fieldQueryElement( objectFieldPath, PredicateTypeKeys.NESTED );
 	}

@@ -23,8 +23,8 @@ import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaObjectF
 import org.hibernate.search.engine.backend.types.ObjectStructure;
 import org.hibernate.search.engine.search.predicate.SearchPredicate;
 import org.hibernate.search.engine.search.predicate.dsl.PredicateFinalStep;
-import org.hibernate.search.engine.search.predicate.dsl.SearchPredicateFactory;
 import org.hibernate.search.engine.search.predicate.dsl.SearchPredicateFactoryExtension;
+import org.hibernate.search.engine.search.predicate.dsl.TypedSearchPredicateFactory;
 import org.hibernate.search.engine.search.query.SearchQuery;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.extension.SearchSetupHelper;
 import org.hibernate.search.util.common.SearchException;
@@ -460,7 +460,7 @@ class SearchPredicateIT {
 
 	private static class SupportedExtension<SR> implements SearchPredicateFactoryExtension<SR, MyExtendedFactory<SR>> {
 		@Override
-		public Optional<MyExtendedFactory<SR>> extendOptional(SearchPredicateFactory<SR> original) {
+		public Optional<MyExtendedFactory<SR>> extendOptional(TypedSearchPredicateFactory<SR> original) {
 			assertThat( original ).isNotNull();
 			return Optional.of( new MyExtendedFactory<>( original ) );
 		}
@@ -468,16 +468,16 @@ class SearchPredicateIT {
 
 	private static class UnSupportedExtension<SR> implements SearchPredicateFactoryExtension<SR, MyExtendedFactory<SR>> {
 		@Override
-		public Optional<MyExtendedFactory<SR>> extendOptional(SearchPredicateFactory<SR> original) {
+		public Optional<MyExtendedFactory<SR>> extendOptional(TypedSearchPredicateFactory<SR> original) {
 			assertThat( original ).isNotNull();
 			return Optional.empty();
 		}
 	}
 
 	private static class MyExtendedFactory<SR> {
-		private final SearchPredicateFactory<SR> delegate;
+		private final TypedSearchPredicateFactory<SR> delegate;
 
-		MyExtendedFactory(SearchPredicateFactory<SR> delegate) {
+		MyExtendedFactory(TypedSearchPredicateFactory<SR> delegate) {
 			this.delegate = delegate;
 		}
 

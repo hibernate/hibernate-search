@@ -11,7 +11,7 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 import org.hibernate.search.engine.environment.bean.BeanRetrieval;
-import org.hibernate.search.engine.search.projection.dsl.SearchProjectionFactory;
+import org.hibernate.search.engine.search.projection.dsl.TypedSearchProjectionFactory;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.processing.MethodParameterMapping;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.processing.MethodParameterMappingAnnotationProcessorRef;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.processing.impl.CompositeProjectionProcessor;
@@ -27,7 +27,7 @@ import org.hibernate.search.mapper.pojo.mapping.definition.annotation.processing
  * a composite projection is not bound to a specific object field,
  * and thus it will always yield one and only one value.
  *
- * @see SearchProjectionFactory#composite()
+ * @see TypedSearchProjectionFactory#composite()
  */
 @Documented
 @Target({ ElementType.PARAMETER })

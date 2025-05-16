@@ -12,6 +12,7 @@ import org.hibernate.search.engine.common.EntityReference;
 import org.hibernate.search.engine.search.aggregation.AggregationKey;
 import org.hibernate.search.engine.search.aggregation.SearchAggregation;
 import org.hibernate.search.engine.search.aggregation.dsl.SearchAggregationFactory;
+import org.hibernate.search.engine.search.common.NonStaticMetamodelScope;
 import org.hibernate.search.engine.search.highlighter.dsl.SearchHighlighterFactory;
 import org.hibernate.search.engine.search.predicate.dsl.SearchPredicateFactory;
 import org.hibernate.search.engine.search.projection.dsl.SearchProjectionFactory;
@@ -39,8 +40,9 @@ import org.hibernate.search.util.common.annotation.Incubating;
  *
  * @param <E> A supertype of all types in this scope.
  */
+@SuppressWarnings({ "removal", "deprecation" })
 @Incubating
-public interface SearchScope<SR, E> {
+public interface SearchScope<E> extends TypedSearchScope<NonStaticMetamodelScope, E> {
 
 	/**
 	 * Initiate the building of a search predicate.
@@ -56,7 +58,7 @@ public interface SearchScope<SR, E> {
 	 * @return A predicate factory.
 	 * @see SearchPredicateFactory
 	 */
-	SearchPredicateFactory<SR> predicate();
+	SearchPredicateFactory predicate();
 
 	/**
 	 * Initiate the building of a search sort.
@@ -72,7 +74,7 @@ public interface SearchScope<SR, E> {
 	 * @return A sort factory.
 	 * @see SearchSortFactory
 	 */
-	SearchSortFactory<SR> sort();
+	SearchSortFactory sort();
 
 	/**
 	 * Initiate the building of a search projection that will be valid for the indexes in this scope.
@@ -88,7 +90,7 @@ public interface SearchScope<SR, E> {
 	 * @return A projection factory.
 	 * @see SearchProjectionFactory
 	 */
-	SearchProjectionFactory<SR, EntityReference, E> projection();
+	SearchProjectionFactory<EntityReference, E> projection();
 
 	/**
 	 * Initiate the building of a search aggregation that will be valid for the indexes in this scope.
@@ -104,7 +106,7 @@ public interface SearchScope<SR, E> {
 	 * @return An aggregation factory.
 	 * @see SearchAggregationFactory
 	 */
-	SearchAggregationFactory<SR> aggregation();
+	SearchAggregationFactory aggregation();
 
 	/**
 	 * Initiate the building of a highlighter that will be valid for the indexes in this scope.

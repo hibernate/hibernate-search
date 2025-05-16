@@ -6,7 +6,7 @@ package org.hibernate.search.backend.lucene.search.projection.dsl;
 
 import org.hibernate.search.engine.search.projection.dsl.ExtendedSearchProjectionFactory;
 import org.hibernate.search.engine.search.projection.dsl.ProjectionFinalStep;
-import org.hibernate.search.engine.search.projection.dsl.SearchProjectionFactory;
+import org.hibernate.search.engine.search.projection.dsl.TypedSearchProjectionFactory;
 import org.hibernate.search.util.common.annotation.Incubating;
 
 import org.apache.lucene.document.Document;
@@ -18,7 +18,7 @@ import org.apache.lucene.search.Explanation;
  * @param <SR> Scope root type.
  * @param <R> The type of entity references.
  * @param <E> The type of entities.
- * @see SearchProjectionFactory
+ * @see TypedSearchProjectionFactory
  */
 public interface LuceneSearchProjectionFactory<SR, R, E>
 		extends ExtendedSearchProjectionFactory<SR, LuceneSearchProjectionFactory<SR, R, E>, R, E> {

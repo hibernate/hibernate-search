@@ -10,11 +10,11 @@ import java.util.function.Function;
 
 import org.hibernate.search.engine.search.predicate.SearchPredicate;
 import org.hibernate.search.engine.search.predicate.dsl.PredicateFinalStep;
-import org.hibernate.search.engine.search.predicate.dsl.SearchPredicateFactory;
 import org.hibernate.search.engine.search.predicate.dsl.SimpleBooleanPredicateClausesCollector;
+import org.hibernate.search.engine.search.predicate.dsl.TypedSearchPredicateFactory;
 import org.hibernate.search.engine.search.projection.SearchProjection;
 import org.hibernate.search.engine.search.projection.dsl.ProjectionFinalStep;
-import org.hibernate.search.engine.search.projection.dsl.SearchProjectionFactory;
+import org.hibernate.search.engine.search.projection.dsl.TypedSearchProjectionFactory;
 import org.hibernate.search.engine.search.query.dsl.SearchQueryDslExtension;
 import org.hibernate.search.engine.search.query.dsl.SearchQueryOptionsStep;
 import org.hibernate.search.engine.search.query.dsl.SearchQuerySelectStep;
@@ -27,8 +27,8 @@ public abstract class AbstractDelegatingSearchQuerySelectStep<SR, R, E, LOS>
 				R,
 				E,
 				LOS,
-				SearchProjectionFactory<SR, R, E>,
-				SearchPredicateFactory<SR>> {
+				TypedSearchProjectionFactory<SR, R, E>,
+				TypedSearchPredicateFactory<SR>> {
 
 	private final SearchQuerySelectStep<SR, ?, R, E, LOS, ?, ?> delegate;
 
@@ -53,7 +53,7 @@ public abstract class AbstractDelegatingSearchQuerySelectStep<SR, R, E, LOS>
 
 	@Override
 	public <P> SearchQueryWhereStep<SR, ?, P, LOS, ?> select(
-			Function<? super SearchProjectionFactory<SR, R, E>, ? extends ProjectionFinalStep<P>> projectionContributor) {
+			Function<? super TypedSearchProjectionFactory<SR, R, E>, ? extends ProjectionFinalStep<P>> projectionContributor) {
 		return delegate.select( projectionContributor );
 	}
 
@@ -70,13 +70,13 @@ public abstract class AbstractDelegatingSearchQuerySelectStep<SR, R, E, LOS>
 
 	@Override
 	public SearchQueryOptionsStep<SR, ?, E, LOS, ?, ?> where(
-			Function<? super SearchPredicateFactory<SR>, ? extends PredicateFinalStep> predicateContributor) {
+			Function<? super TypedSearchPredicateFactory<SR>, ? extends PredicateFinalStep> predicateContributor) {
 		return delegate.where( predicateContributor );
 	}
 
 	@Override
 	public SearchQueryOptionsStep<SR, ?, E, LOS, ?, ?> where(
-			BiConsumer<? super SearchPredicateFactory<SR>,
+			BiConsumer<? super TypedSearchPredicateFactory<SR>,
 					? super SimpleBooleanPredicateClausesCollector<SR, ?>> predicateContributor) {
 		return delegate.where( predicateContributor );
 	}

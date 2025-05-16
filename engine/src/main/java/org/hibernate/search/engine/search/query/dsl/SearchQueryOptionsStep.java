@@ -12,18 +12,18 @@ import java.util.function.Function;
 import org.hibernate.search.engine.search.aggregation.AggregationKey;
 import org.hibernate.search.engine.search.aggregation.SearchAggregation;
 import org.hibernate.search.engine.search.aggregation.dsl.AggregationFinalStep;
-import org.hibernate.search.engine.search.aggregation.dsl.SearchAggregationFactory;
+import org.hibernate.search.engine.search.aggregation.dsl.TypedSearchAggregationFactory;
 import org.hibernate.search.engine.search.highlighter.SearchHighlighter;
 import org.hibernate.search.engine.search.highlighter.dsl.HighlighterFinalStep;
 import org.hibernate.search.engine.search.highlighter.dsl.SearchHighlighterFactory;
 import org.hibernate.search.engine.search.projection.dsl.HighlightProjectionOptionsStep;
-import org.hibernate.search.engine.search.projection.dsl.SearchProjectionFactory;
+import org.hibernate.search.engine.search.projection.dsl.TypedSearchProjectionFactory;
 import org.hibernate.search.engine.search.query.SearchFetchable;
 import org.hibernate.search.engine.search.query.SearchResult;
 import org.hibernate.search.engine.search.query.SearchResultTotal;
 import org.hibernate.search.engine.search.sort.SearchSort;
-import org.hibernate.search.engine.search.sort.dsl.SearchSortFactory;
 import org.hibernate.search.engine.search.sort.dsl.SortFinalStep;
+import org.hibernate.search.engine.search.sort.dsl.TypedSearchSortFactory;
 import org.hibernate.search.util.common.annotation.Incubating;
 
 /**
@@ -43,8 +43,8 @@ public interface SearchQueryOptionsStep<
 		S extends SearchQueryOptionsStep<SR, ?, H, LOS, SF, AF>,
 		H,
 		LOS,
-		SF extends SearchSortFactory<SR>,
-		AF extends SearchAggregationFactory<SR>>
+		SF extends TypedSearchSortFactory<SR>,
+		AF extends TypedSearchAggregationFactory<SR>>
 		extends SearchQueryFinalStep<H>, SearchFetchable<H> {
 
 	/**
@@ -162,7 +162,7 @@ public interface SearchQueryOptionsStep<
 	/**
 	 * Configure the default highlighter.
 	 * <p>
-	 * For specifying the fields to highlight see {@link SearchProjectionFactory#highlight(String)}.
+	 * For specifying the fields to highlight see {@link TypedSearchProjectionFactory#highlight(String)}.
 	 * For providing field-specific settings to override the ones set here see {@link #highlighter(String, Function)}.
 	 * <p>
 	 * Backend specific defaults will be used if no configuration is provided.
@@ -177,7 +177,7 @@ public interface SearchQueryOptionsStep<
 	/**
 	 * Configure the default highlighter.
 	 * <p>
-	 * For specifying the fields to highlight see {@link SearchProjectionFactory#highlight(String)}.
+	 * For specifying the fields to highlight see {@link TypedSearchProjectionFactory#highlight(String)}.
 	 * For providing field-specific settings to override the ones set here see {@link #highlighter(String, Function)}.
 	 * <p>
 	 * Backend specific defaults will be used if no configuration is provided.
@@ -202,7 +202,7 @@ public interface SearchQueryOptionsStep<
 	 * @param highlighterContributor a function that will use a highlighter factory to configure the named highlighter.
 	 * @return {@code this}, for method chaining.
 	 *
-	 * @see SearchProjectionFactory#highlight(String)
+	 * @see TypedSearchProjectionFactory#highlight(String)
 	 * @see HighlightProjectionOptionsStep#highlighter(String)
 	 */
 	@Incubating
@@ -222,7 +222,7 @@ public interface SearchQueryOptionsStep<
 	 * @param highlighter a highlighter obtained from the search scope that will serve as the named highlighter.
 	 * @return {@code this}, for method chaining.
 	 *
-	 * @see SearchProjectionFactory#highlight(String)
+	 * @see TypedSearchProjectionFactory#highlight(String)
 	 * @see HighlightProjectionOptionsStep#highlighter(String)
 	 */
 	@Incubating

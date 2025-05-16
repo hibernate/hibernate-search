@@ -102,7 +102,7 @@ class GettingStartedDefaultAnalysisIT {
 
 		// tag::searching-objects[]
 		try ( SearchSession session = searchMapping.createSession() ) { // <1>
-			SearchScope<?, Book> scope = session.scope( Book.class ); // <2>
+			SearchScope<Book> scope = session.scope( Book.class ); // <2>
 
 			SearchResult<Integer> result = session.search( scope ) // <3>
 					.select( f -> f.id( Integer.class ) ) // <4>

@@ -6,8 +6,8 @@ package org.hibernate.search.query.dsl.impl;
 
 import org.hibernate.search.backend.lucene.search.spi.LuceneMigrationUtils;
 import org.hibernate.search.engine.search.predicate.SearchPredicate;
-import org.hibernate.search.engine.search.predicate.dsl.SearchPredicateFactory;
 import org.hibernate.search.engine.search.predicate.dsl.SpatialWithinPredicateOptionsStep;
+import org.hibernate.search.engine.search.predicate.dsl.TypedSearchPredicateFactory;
 import org.hibernate.search.engine.spatial.DistanceUnit;
 import org.hibernate.search.query.dsl.SpatialTermination;
 import org.hibernate.search.spatial.Coordinates;
@@ -35,7 +35,7 @@ public class ConnectedSpatialQueryBuilder implements SpatialTermination {
 	}
 
 	private SearchPredicate createPredicate() {
-		SearchPredicateFactory<?> factory = queryContext.getScope().predicate();
+		TypedSearchPredicateFactory<?> factory = queryContext.getScope().predicate();
 
 		SpatialWithinPredicateOptionsStep<?> optionsStep = factory.spatial().within()
 				.field( spatialContext.getCoordinatesField() )
