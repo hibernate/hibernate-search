@@ -6,11 +6,6 @@ package org.hibernate.search.engine.search.sort.dsl;
 
 
 import org.hibernate.search.engine.search.common.NonStaticMetamodelScope;
-import org.hibernate.search.engine.search.predicate.dsl.SearchPredicateFactory;
-import org.hibernate.search.engine.search.reference.sort.DistanceSortFieldReference;
-import org.hibernate.search.engine.search.reference.sort.FieldSortFieldReference;
-import org.hibernate.search.engine.spatial.GeoPoint;
-import org.hibernate.search.util.common.SearchException;
 import org.hibernate.search.util.common.annotation.Incubating;
 
 /**
@@ -43,98 +38,6 @@ import org.hibernate.search.util.common.annotation.Incubating;
  * @author Emmanuel Bernard emmanuel@hibernate.org
  */
 public interface SearchSortFactory extends TypedSearchSortFactory<NonStaticMetamodelScope> {
-
-	/**
-	 * Order elements by the value of a specific field.
-	 * <p>
-	 * The default order is <strong>ascending</strong>.
-	 *
-	 * @param fieldPath The <a href="#field-paths">path</a> to the index field to sort by.
-	 * @return A DSL step where the "field" sort can be defined in more details.
-	 * @throws SearchException If the field doesn't exist or cannot be sorted on.
-	 */
-	FieldSortOptionsStep<NonStaticMetamodelScope, ?, ? extends SearchPredicateFactory> field(String fieldPath);
-
-	/**
-	 * Order elements by the value of a specific field.
-	 * <p>
-	 * The default order is <strong>ascending</strong>.
-	 *
-	 * @param fieldReference The reference representing the <a href="#field-paths">path</a> to the index field to sort by.
-	 * @return A DSL step where the "field" sort can be defined in more details.
-	 * @throws SearchException If the field doesn't exist or cannot be sorted on.
-	 */
-	@Incubating
-	<T> FieldSortOptionsGenericStep<NonStaticMetamodelScope, T, ?, ?, ? extends SearchPredicateFactory> field(
-			FieldSortFieldReference<? super NonStaticMetamodelScope, T> fieldReference);
-
-	/**
-	 * Order elements by the distance from the location stored in the specified field to the location specified.
-	 * <p>
-	 * The default order is <strong>ascending</strong>.
-	 *
-	 * @param fieldPath The <a href="#field-paths">path</a> to the index field
-	 * containing the location to compute the distance from.
-	 * @param location The location to which we want to compute the distance.
-	 * @return A DSL step where the "distance" sort can be defined in more details.
-	 * @throws SearchException If the field type does not constitute a valid location.
-	 */
-	DistanceSortOptionsStep<NonStaticMetamodelScope, ?, ? extends SearchPredicateFactory> distance(String fieldPath,
-			GeoPoint location);
-
-	/**
-	 * Order elements by the distance from the location stored in the specified field to the location specified.
-	 * <p>
-	 * The default order is <strong>ascending</strong>.
-	 *
-	 * @param fieldReference The reference representing the <a href="#field-paths">path</a> to the index field
-	 * containing the location to compute the distance from.
-	 * @param location The location to which we want to compute the distance.
-	 * @return A DSL step where the "distance" sort can be defined in more details.
-	 * @throws SearchException If the field type does not constitute a valid location.
-	 */
-	@Incubating
-	default DistanceSortOptionsStep<NonStaticMetamodelScope, ?, ? extends SearchPredicateFactory> distance(
-			DistanceSortFieldReference<? super NonStaticMetamodelScope> fieldReference, GeoPoint location) {
-		return distance( fieldReference.absolutePath(), location );
-	}
-
-	/**
-	 * Order elements by the distance from the location stored in the specified field to the location specified.
-	 * <p>
-	 * The default order is <strong>ascending</strong>.
-	 *
-	 * @param fieldPath The <a href="#field-paths">path</a> to the index field
-	 * containing the location to compute the distance from.
-	 * @param latitude The latitude of the location to which we want to compute the distance.
-	 * @param longitude The longitude of the location to which we want to compute the distance.
-	 * @return A DSL step where the "distance" sort can be defined in more details.
-	 * @throws SearchException If the field type does not constitute a valid location.
-	 */
-	default DistanceSortOptionsStep<NonStaticMetamodelScope, ?, ? extends SearchPredicateFactory> distance(String fieldPath,
-			double latitude,
-			double longitude) {
-		return distance( fieldPath, GeoPoint.of( latitude, longitude ) );
-	}
-
-	/**
-	 * Order elements by the distance from the location stored in the specified field to the location specified.
-	 * <p>
-	 * The default order is <strong>ascending</strong>.
-	 *
-	 * @param fieldReference The reference representing the <a href="#field-paths">path</a> to the index field
-	 * containing the location to compute the distance from.
-	 * @param latitude The latitude of the location to which we want to compute the distance.
-	 * @param longitude The longitude of the location to which we want to compute the distance.
-	 * @return A DSL step where the "distance" sort can be defined in more details.
-	 * @throws SearchException If the field type does not constitute a valid location.
-	 */
-	@Incubating
-	default DistanceSortOptionsStep<NonStaticMetamodelScope, ?, ? extends SearchPredicateFactory> distance(
-			DistanceSortFieldReference<? super NonStaticMetamodelScope> fieldReference, double latitude,
-			double longitude) {
-		return distance( fieldReference, GeoPoint.of( latitude, longitude ) );
-	}
 
 	/**
 	 * Create a new sort factory whose root for all paths passed to the DSL
