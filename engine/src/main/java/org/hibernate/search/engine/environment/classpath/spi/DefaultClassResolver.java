@@ -4,15 +4,9 @@
  */
 package org.hibernate.search.engine.environment.classpath.spi;
 
-import java.net.URL;
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.ServiceLoader;
-import java.util.Set;
 
 import org.hibernate.search.engine.logging.impl.EngineMiscLog;
-
+import org.hibernate.search.util.common.annotation.Incubating;
 
 /**
  * Default implementation of {@code ClassResolver} relying on an {@link AggregatedClassLoader}.
@@ -52,27 +46,8 @@ public final class DefaultClassResolver implements ClassResolver {
 		}
 	}
 
-	@Override
-	public URL locateResource(String resourceName) {
-		try {
-			return aggregatedClassLoader.getResource( resourceName );
-		}
-		catch (Exception e) {
-			return null;
-		}
+	@Incubating
+	public AggregatedClassLoader aggregatedClassLoader() {
+		return aggregatedClassLoader;
 	}
-
-	@Override
-	public <S> Collection<S> loadJavaServices(Class<S> serviceType) {
-		ServiceLoader<S> loadedServices = ServiceLoader.load( serviceType, aggregatedClassLoader );
-		Iterator<S> iterator = loadedServices.iterator();
-		Set<S> services = new HashSet<>();
-
-		while ( iterator.hasNext() ) {
-			services.add( iterator.next() );
-		}
-
-		return services;
-	}
-
 }
