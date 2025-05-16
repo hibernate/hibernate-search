@@ -9,7 +9,7 @@ import java.util.function.Function;
 
 import org.hibernate.search.engine.search.common.NamedValues;
 import org.hibernate.search.engine.search.common.NonStaticMetamodelScope;
-import org.hibernate.search.engine.search.predicate.dsl.SearchPredicateFactory;
+import org.hibernate.search.engine.search.predicate.dsl.TypedSearchPredicateFactory;
 import org.hibernate.search.engine.search.reference.sort.FieldSortFieldReference;
 import org.hibernate.search.engine.search.sort.dsl.CompositeSortComponentsStep;
 import org.hibernate.search.engine.search.sort.dsl.DistanceSortOptionsStep;
@@ -38,23 +38,27 @@ public record SearchSortFactoryDelegate(TypedSearchSortFactory<NonStaticMetamode
 	}
 
 	@Override
-	public FieldSortOptionsStep<NonStaticMetamodelScope, ?, ? extends SearchPredicateFactory> field(String fieldPath) {
-		// TODO
-		return null;
+	public FieldSortOptionsStep<NonStaticMetamodelScope,
+			?,
+			? extends TypedSearchPredicateFactory<NonStaticMetamodelScope>> field(String fieldPath) {
+		return delegate.field( fieldPath );
 	}
 
 	@Override
-	public <T> FieldSortOptionsGenericStep<NonStaticMetamodelScope, T, ?, ?, ? extends SearchPredicateFactory> field(
-			FieldSortFieldReference<? super NonStaticMetamodelScope, T> fieldReference) {
-		// TODO
-		return null;
+	public <T> FieldSortOptionsGenericStep<NonStaticMetamodelScope,
+			T,
+			?,
+			?,
+			? extends TypedSearchPredicateFactory<NonStaticMetamodelScope>> field(
+					FieldSortFieldReference<? super NonStaticMetamodelScope, T> fieldReference) {
+		return delegate.field( fieldReference );
 	}
 
 	@Override
-	public DistanceSortOptionsStep<NonStaticMetamodelScope, ?, ? extends SearchPredicateFactory> distance(String fieldPath,
-			GeoPoint location) {
-		// TODO
-		return null;
+	public DistanceSortOptionsStep<NonStaticMetamodelScope,
+			?,
+			? extends TypedSearchPredicateFactory<NonStaticMetamodelScope>> distance(String fieldPath, GeoPoint location) {
+		return delegate.distance( fieldPath, location );
 	}
 
 	@Override
