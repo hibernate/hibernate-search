@@ -9,17 +9,17 @@ import org.hibernate.search.engine.search.projection.definition.ProjectionDefini
 import org.hibernate.search.engine.search.projection.definition.ProjectionDefinitionContext;
 import org.hibernate.search.engine.search.projection.dsl.CompositeProjectionInnerStep;
 import org.hibernate.search.engine.search.projection.dsl.CompositeProjectionValueStep;
-import org.hibernate.search.engine.search.projection.dsl.SearchProjectionFactory;
+import org.hibernate.search.engine.search.projection.dsl.TypedSearchProjectionFactory;
 
 public interface CompositeProjectionDefinition<T> extends ProjectionDefinition<T>, AutoCloseable {
 
 	@Override
-	default SearchProjection<? extends T> create(SearchProjectionFactory<?, ?, ?> factory,
+	default SearchProjection<? extends T> create(TypedSearchProjectionFactory<?, ?, ?> factory,
 			ProjectionDefinitionContext context) {
 		return apply( factory, factory.composite(), context ).toProjection();
 	}
 
-	CompositeProjectionValueStep<?, T> apply(SearchProjectionFactory<?, ?, ?> projectionFactory,
+	CompositeProjectionValueStep<?, T> apply(TypedSearchProjectionFactory<?, ?, ?> projectionFactory,
 			CompositeProjectionInnerStep initialStep,
 			ProjectionDefinitionContext context);
 

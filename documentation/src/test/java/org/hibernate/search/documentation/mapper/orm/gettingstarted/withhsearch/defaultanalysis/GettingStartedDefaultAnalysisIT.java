@@ -99,7 +99,7 @@ class GettingStartedDefaultAnalysisIT {
 			// Not shown: get the entity manager and open a transaction
 			SearchSession searchSession = Search.session( entityManager ); // <1>
 
-			SearchScope<?, Book> scope = searchSession.scope( Book.class ); // <2>
+			SearchScope<Book> scope = searchSession.scope( Book.class ); // <2>
 
 			SearchResult<Book> result = searchSession.search( scope ) // <3>
 					.where( scope.predicate().match() // <4>

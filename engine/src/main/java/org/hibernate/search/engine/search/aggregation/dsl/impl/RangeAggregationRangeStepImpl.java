@@ -15,11 +15,11 @@ import org.hibernate.search.engine.search.aggregation.dsl.spi.SearchAggregationD
 import org.hibernate.search.engine.search.aggregation.spi.RangeAggregationBuilder;
 import org.hibernate.search.engine.search.predicate.SearchPredicate;
 import org.hibernate.search.engine.search.predicate.dsl.PredicateFinalStep;
-import org.hibernate.search.engine.search.predicate.dsl.SearchPredicateFactory;
+import org.hibernate.search.engine.search.predicate.dsl.TypedSearchPredicateFactory;
 import org.hibernate.search.util.common.data.Range;
 import org.hibernate.search.util.common.impl.Contracts;
 
-class RangeAggregationRangeStepImpl<SR, PDF extends SearchPredicateFactory<SR>, F>
+class RangeAggregationRangeStepImpl<SR, PDF extends TypedSearchPredicateFactory<SR>, F>
 		implements RangeAggregationRangeStep<SR, RangeAggregationRangeStepImpl<SR, PDF, F>, PDF, F>,
 		RangeAggregationRangeMoreStep<SR,
 				RangeAggregationRangeStepImpl<SR, PDF, F>,

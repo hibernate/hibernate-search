@@ -18,6 +18,7 @@ import org.hibernate.action.spi.BeforeTransactionCompletionProcess;
 import org.hibernate.engine.spi.ActionQueue;
 import org.hibernate.engine.spi.SessionImplementor;
 import org.hibernate.search.engine.backend.common.spi.EntityReferenceFactory;
+import org.hibernate.search.engine.search.common.NonStaticMetamodelScope;
 import org.hibernate.search.engine.search.query.dsl.SearchQuerySelectStep;
 import org.hibernate.search.mapper.orm.automaticindexing.session.impl.DelegatingAutomaticIndexingSynchronizationStrategy;
 import org.hibernate.search.mapper.orm.automaticindexing.spi.AutomaticIndexingEventSendingSessionContext;
@@ -30,8 +31,10 @@ import org.hibernate.search.mapper.orm.model.impl.HibernateOrmRuntimeIntrospecto
 import org.hibernate.search.mapper.orm.schema.management.SearchSchemaManager;
 import org.hibernate.search.mapper.orm.scope.HibernateOrmRootReferenceScope;
 import org.hibernate.search.mapper.orm.scope.SearchScope;
+import org.hibernate.search.mapper.orm.scope.TypedSearchScope;
 import org.hibernate.search.mapper.orm.scope.impl.HibernateOrmScopeSessionContext;
-import org.hibernate.search.mapper.orm.scope.impl.SearchScopeImpl;
+import org.hibernate.search.mapper.orm.scope.impl.SearchScopeDelegate;
+import org.hibernate.search.mapper.orm.scope.impl.SearchScopeSearcher;
 import org.hibernate.search.mapper.orm.search.loading.dsl.SearchLoadingOptionsStep;
 import org.hibernate.search.mapper.orm.session.SearchSession;
 import org.hibernate.search.mapper.orm.session.context.HibernateOrmSessionContext;
@@ -137,15 +140,22 @@ public class HibernateOrmSearchSession extends AbstractPojoSearchSession
 	}
 
 	@Override
-	public <T> SearchQuerySelectStep<T, ?, EntityReference, T, SearchLoadingOptionsStep, ?, ?> search(
+	public <T> SearchQuerySelectStep<NonStaticMetamodelScope, ?, EntityReference, T, SearchLoadingOptionsStep, ?, ?> search(
 			Collection<? extends Class<? extends T>> classes) {
-		return search( scope( classes ) );
+		return search( (SearchScopeSearcher<NonStaticMetamodelScope, T>) scope( classes ) );
+	}
+
+	@SuppressWarnings({ "unchecked" })
+	@Override
+	public <SR, T> SearchQuerySelectStep<SR, ?, EntityReference, T, SearchLoadingOptionsStep, ?, ?> search(
+			TypedSearchScope<SR, T> scope) {
+		return search( (SearchScopeSearcher<SR, T>) scope );
 	}
 
 	@Override
-	public <SR, T> SearchQuerySelectStep<SR, ?, EntityReference, T, SearchLoadingOptionsStep, ?, ?> search(
-			SearchScope<SR, T> scope) {
-		return search( (SearchScopeImpl<SR, T>) scope );
+	public <T> SearchQuerySelectStep<NonStaticMetamodelScope, ?, EntityReference, T, SearchLoadingOptionsStep, ?, ?> search(
+			SearchScope<T> scope) {
+		return search( (TypedSearchScope<NonStaticMetamodelScope, T>) scope );
 	}
 
 	@Override
@@ -160,7 +170,7 @@ public class HibernateOrmSearchSession extends AbstractPojoSearchSession
 			T,
 			SearchLoadingOptionsStep,
 			?,
-			?> search(SearchScopeImpl<SR, T> scope) {
+			?> search(SearchScopeSearcher<SR, T> scope) {
 		return scope.search( this, loadingContextBuilder() );
 	}
 
@@ -180,15 +190,20 @@ public class HibernateOrmSearchSession extends AbstractPojoSearchSession
 	}
 
 	@Override
-	public <SR, T> SearchScopeImpl<SR, T> scope(Collection<? extends Class<? extends T>> classes) {
+	public <T> SearchScopeDelegate<T> scope(Collection<? extends Class<? extends T>> classes) {
 		checkOpen();
-		return mappingContext.createScope( classes );
+		return new SearchScopeDelegate<>( mappingContext.createScope( classes ) );
 	}
 
 	@Override
-	public <SR, T> SearchScope<SR, T> scope(Class<T> expectedSuperType, Collection<String> entityNames) {
+	public <T> SearchScopeDelegate<T> scope(Class<T> expectedSuperType, Collection<String> entityNames) {
 		checkOpen();
-		return mappingContext.createScope( expectedSuperType, entityNames );
+		return new SearchScopeDelegate<>( mappingContext.createScope( expectedSuperType, entityNames ) );
+	}
+
+	@Override
+	public <SR, T> TypedSearchScope<SR, T> typedScope(Class<SR> rootScope, Collection<? extends Class<? extends T>> classes) {
+		return mappingContext.createScope( classes );
 	}
 
 	@Override

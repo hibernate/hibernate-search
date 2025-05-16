@@ -10,7 +10,7 @@ import org.hibernate.search.engine.search.predicate.SearchPredicate;
 import org.hibernate.search.engine.search.predicate.dsl.BooleanPredicateClausesStep;
 import org.hibernate.search.engine.search.predicate.dsl.BooleanPredicateOptionsCollector;
 import org.hibernate.search.engine.search.predicate.dsl.PredicateScoreStep;
-import org.hibernate.search.engine.search.predicate.dsl.SearchPredicateFactory;
+import org.hibernate.search.engine.search.predicate.dsl.TypedSearchPredicateFactory;
 import org.hibernate.search.query.dsl.QueryCustomization;
 
 import org.apache.lucene.search.Query;
@@ -55,7 +55,7 @@ class QueryCustomizer implements QueryCustomization<QueryCustomizer> {
 		}
 	}
 
-	public SearchPredicate applyFilter(SearchPredicateFactory<?> factory, SearchPredicate predicate) {
+	public SearchPredicate applyFilter(TypedSearchPredicateFactory<?> factory, SearchPredicate predicate) {
 		if ( filter == null ) {
 			return predicate;
 		}
@@ -64,7 +64,7 @@ class QueryCustomizer implements QueryCustomization<QueryCustomizer> {
 		return step.toPredicate();
 	}
 
-	public void applyFilter(SearchPredicateFactory<?> factory, BooleanPredicateOptionsCollector<?, ?> collector) {
+	public void applyFilter(TypedSearchPredicateFactory<?> factory, BooleanPredicateOptionsCollector<?, ?> collector) {
 		if ( filter == null ) {
 			return;
 		}

@@ -8,9 +8,9 @@ import java.util.function.Function;
 
 /**
  * The initial step when attempting to apply multiple extensions
- * to a {@link SearchSortFactory}.
+ * to a {@link TypedSearchSortFactory}.
  *
- * @see SearchSortFactory#extension()
+ * @see TypedSearchSortFactory#extension()
  */
 public interface SearchSortFactoryExtensionIfSupportedStep<SR> {
 

@@ -10,7 +10,7 @@ import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
 import org.hibernate.search.engine.search.predicate.dsl.PredicateFinalStep;
-import org.hibernate.search.engine.search.predicate.dsl.SearchPredicateFactory;
+import org.hibernate.search.engine.search.predicate.dsl.TypedSearchPredicateFactory;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.AnalyzedStringFieldTypeDescriptor;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.FieldTypeDescriptor;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.extension.SearchSetupHelper;
@@ -71,7 +71,7 @@ class MatchAllPredicateBaseIT {
 		}
 
 		@Override
-		protected PredicateFinalStep predicate(SearchPredicateFactory<?> f, ObjectFieldBinding objectFieldBinding,
+		protected PredicateFinalStep predicate(TypedSearchPredicateFactory<?> f, ObjectFieldBinding objectFieldBinding,
 				int matchingDocOrdinal, AbstractPredicateDataSet dataSet) {
 			return f.matchAll()
 					.except( f.id().matchingAny( InObjectFieldConfigured.dataSet.docIdsExcept( matchingDocOrdinal ) ) );
@@ -116,13 +116,13 @@ class MatchAllPredicateBaseIT {
 		}
 
 		@Override
-		protected PredicateFinalStep predicate(SearchPredicateFactory<?> f, int matchingDocOrdinal,
+		protected PredicateFinalStep predicate(TypedSearchPredicateFactory<?> f, int matchingDocOrdinal,
 				AbstractPredicateDataSet dataSet, StubMappedIndex index) {
 			return f.matchAll().except( f.id().matchingAny( ScoreConfigured.dataSet.docIdsExcept( matchingDocOrdinal ) ) );
 		}
 
 		@Override
-		protected PredicateFinalStep predicateWithBoost(SearchPredicateFactory<?> f, int matchingDocOrdinal,
+		protected PredicateFinalStep predicateWithBoost(TypedSearchPredicateFactory<?> f, int matchingDocOrdinal,
 				float boost, AbstractPredicateDataSet dataSet,
 				StubMappedIndex index) {
 			return f.matchAll().except( f.id().matchingAny( ScoreConfigured.dataSet.docIdsExcept( matchingDocOrdinal ) ) )
@@ -130,14 +130,14 @@ class MatchAllPredicateBaseIT {
 		}
 
 		@Override
-		protected PredicateFinalStep predicateWithConstantScore(SearchPredicateFactory<?> f, int matchingDocOrdinal,
+		protected PredicateFinalStep predicateWithConstantScore(TypedSearchPredicateFactory<?> f, int matchingDocOrdinal,
 				AbstractPredicateDataSet dataSet, StubMappedIndex index) {
 			return f.matchAll().except( f.id().matchingAny( ScoreConfigured.dataSet.docIdsExcept( matchingDocOrdinal ) ) )
 					.constantScore();
 		}
 
 		@Override
-		protected PredicateFinalStep predicateWithConstantScoreAndBoost(SearchPredicateFactory<?> f,
+		protected PredicateFinalStep predicateWithConstantScoreAndBoost(TypedSearchPredicateFactory<?> f,
 				int matchingDocOrdinal, float boost, AbstractPredicateDataSet dataSet,
 				StubMappedIndex index) {
 			return f.matchAll().except( f.id().matchingAny( ScoreConfigured.dataSet.docIdsExcept( matchingDocOrdinal ) ) )

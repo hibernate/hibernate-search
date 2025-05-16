@@ -25,7 +25,7 @@ import org.hibernate.search.engine.search.common.SortMode;
 import org.hibernate.search.engine.search.query.SearchQuery;
 import org.hibernate.search.engine.search.sort.SearchSort;
 import org.hibernate.search.engine.search.sort.dsl.DistanceSortOptionsStep;
-import org.hibernate.search.engine.search.sort.dsl.SearchSortFactory;
+import org.hibernate.search.engine.search.sort.dsl.TypedSearchSortFactory;
 import org.hibernate.search.engine.spatial.GeoPoint;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.model.singlefield.AbstractObjectBinding;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.model.singlefield.SingleFieldIndexBinding;
@@ -478,7 +478,7 @@ class DistanceSortSpecificsIT {
 		assertThatQuery( index.query()
 				.where( f -> f.matchAll() )
 				.routing( dataSet.routingKey )
-				.sort( ( (Function<SearchSortFactory<?>,
+				.sort( ( (Function<TypedSearchSortFactory<?>,
 						DistanceSortOptionsStep<?, ?, ?>>) f -> f.withRoot( parentObjectBinding.absolutePath )
 								.distance( parentObjectBinding.getRelativeFieldName( fieldStructure, fieldType ),
 										CENTER_POINT ) )
@@ -550,7 +550,7 @@ class DistanceSortSpecificsIT {
 	}
 
 	private SearchQuery<DocumentReference> simpleQuery(DataSet dataSet,
-			Function<? super SearchSortFactory<?>, ? extends DistanceSortOptionsStep<?, ?, ?>> sortContributor,
+			Function<? super TypedSearchSortFactory<?>, ? extends DistanceSortOptionsStep<?, ?, ?>> sortContributor,
 			SortMode sortMode, TestedFieldStructure fieldStructure) {
 		return index.query()
 				.where( f -> f.matchAll() )

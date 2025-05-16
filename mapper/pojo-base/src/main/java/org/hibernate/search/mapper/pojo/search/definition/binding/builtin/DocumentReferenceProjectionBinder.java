@@ -8,7 +8,7 @@ import org.hibernate.search.engine.backend.common.DocumentReference;
 import org.hibernate.search.engine.search.projection.SearchProjection;
 import org.hibernate.search.engine.search.projection.definition.ProjectionDefinitionContext;
 import org.hibernate.search.engine.search.projection.definition.spi.AbstractProjectionDefinition;
-import org.hibernate.search.engine.search.projection.dsl.SearchProjectionFactory;
+import org.hibernate.search.engine.search.projection.dsl.TypedSearchProjectionFactory;
 import org.hibernate.search.mapper.pojo.search.definition.binding.ProjectionBinder;
 import org.hibernate.search.mapper.pojo.search.definition.binding.ProjectionBindingContext;
 
@@ -16,7 +16,7 @@ import org.hibernate.search.mapper.pojo.search.definition.binding.ProjectionBind
  * Binds a constructor parameter to a projection to a
  * {@link org.hibernate.search.engine.backend.common.DocumentReference} representing the hit.
  *
- * @see SearchProjectionFactory#documentReference()
+ * @see TypedSearchProjectionFactory#documentReference()
  * @see org.hibernate.search.mapper.pojo.mapping.definition.annotation.DocumentReferenceProjection
  */
 public final class DocumentReferenceProjectionBinder implements ProjectionBinder {
@@ -49,7 +49,7 @@ public final class DocumentReferenceProjectionBinder implements ProjectionBinder
 		}
 
 		@Override
-		public SearchProjection<DocumentReference> create(SearchProjectionFactory<?, ?, ?> factory,
+		public SearchProjection<DocumentReference> create(TypedSearchProjectionFactory<?, ?, ?> factory,
 				ProjectionDefinitionContext context) {
 			return factory.documentReference().toProjection();
 		}

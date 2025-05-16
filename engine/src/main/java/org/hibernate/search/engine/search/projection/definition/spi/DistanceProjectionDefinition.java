@@ -9,7 +9,7 @@ import java.util.List;
 import org.hibernate.search.engine.search.projection.ProjectionCollector;
 import org.hibernate.search.engine.search.projection.SearchProjection;
 import org.hibernate.search.engine.search.projection.definition.ProjectionDefinitionContext;
-import org.hibernate.search.engine.search.projection.dsl.SearchProjectionFactory;
+import org.hibernate.search.engine.search.projection.dsl.TypedSearchProjectionFactory;
 import org.hibernate.search.engine.spatial.DistanceUnit;
 import org.hibernate.search.engine.spatial.GeoPoint;
 import org.hibernate.search.util.common.annotation.Incubating;
@@ -56,7 +56,8 @@ public abstract class DistanceProjectionDefinition<F> extends AbstractProjection
 		}
 
 		@Override
-		public SearchProjection<Double> create(SearchProjectionFactory<?, ?, ?> factory, ProjectionDefinitionContext context) {
+		public SearchProjection<Double> create(TypedSearchProjectionFactory<?, ?, ?> factory,
+				ProjectionDefinitionContext context) {
 			return factory.withParameters( params -> factory
 					.distance( fieldPath, params.get( parameterName, GeoPoint.class ) )
 					.unit( unit )
@@ -78,7 +79,7 @@ public abstract class DistanceProjectionDefinition<F> extends AbstractProjection
 		}
 
 		@Override
-		public SearchProjection<List<Double>> create(SearchProjectionFactory<?, ?, ?> factory,
+		public SearchProjection<List<Double>> create(TypedSearchProjectionFactory<?, ?, ?> factory,
 				ProjectionDefinitionContext context) {
 			return factory.withParameters( params -> factory
 					.distance( fieldPath, params.get( parameterName, GeoPoint.class ) )
@@ -104,7 +105,7 @@ public abstract class DistanceProjectionDefinition<F> extends AbstractProjection
 		}
 
 		@Override
-		public SearchProjection<C> create(SearchProjectionFactory<?, ?, ?> factory,
+		public SearchProjection<C> create(TypedSearchProjectionFactory<?, ?, ?> factory,
 				ProjectionDefinitionContext context) {
 			return factory.withParameters( params -> factory
 					.distance( fieldPath, params.get( parameterName, GeoPoint.class ) )

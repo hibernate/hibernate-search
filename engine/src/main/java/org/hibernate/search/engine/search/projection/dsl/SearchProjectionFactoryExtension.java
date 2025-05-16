@@ -15,11 +15,11 @@ import java.util.Optional;
  * and pass it to another API.
  *
  * @param <T> The type of extended projection factories. Should generally extend
- * {@link SearchProjectionFactory}.
- * @param <R> The type of entity references in the original {@link SearchProjectionFactory}.
- * @param <E> The type of entities in the original {@link SearchProjectionFactory}.
+ * {@link TypedSearchProjectionFactory}.
+ * @param <R> The type of entity references in the original {@link TypedSearchProjectionFactory}.
+ * @param <E> The type of entities in the original {@link TypedSearchProjectionFactory}.
  *
- * @see SearchProjectionFactory#extension(SearchProjectionFactoryExtension)
+ * @see TypedSearchProjectionFactory#extension(SearchProjectionFactoryExtension)
  * @see ExtendedSearchProjectionFactory
  */
 public interface SearchProjectionFactoryExtension<SR, T, R, E> {
@@ -29,10 +29,10 @@ public interface SearchProjectionFactoryExtension<SR, T, R, E> {
 	 * <p>
 	 * <strong>WARNING:</strong> this method is not API, see comments at the type level.
 	 *
-	 * @param original The original, non-extended {@link SearchProjectionFactory}.
+	 * @param original The original, non-extended {@link TypedSearchProjectionFactory}.
 	 * @return An optional containing the extended projection factory ({@link T}) in case
 	 * of success, or an empty optional otherwise.
 	 */
-	Optional<T> extendOptional(SearchProjectionFactory<SR, R, E> original);
+	Optional<T> extendOptional(TypedSearchProjectionFactory<SR, R, E> original);
 
 }

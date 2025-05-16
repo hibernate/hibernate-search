@@ -9,9 +9,9 @@ import org.hibernate.search.engine.search.aggregation.dsl.CountAggregationOption
 import org.hibernate.search.engine.search.aggregation.dsl.spi.SearchAggregationDslContext;
 import org.hibernate.search.engine.search.aggregation.spi.AggregationTypeKeys;
 import org.hibernate.search.engine.search.aggregation.spi.SearchFilterableAggregationBuilder;
-import org.hibernate.search.engine.search.predicate.dsl.SearchPredicateFactory;
+import org.hibernate.search.engine.search.predicate.dsl.TypedSearchPredicateFactory;
 
-public class CountAggregationFieldStepImpl<SR, PDF extends SearchPredicateFactory<SR>>
+public class CountAggregationFieldStepImpl<SR, PDF extends TypedSearchPredicateFactory<SR>>
 		implements CountAggregationFieldStep<SR, PDF> {
 	private final SearchAggregationDslContext<SR, ?, ? extends PDF> dslContext;
 

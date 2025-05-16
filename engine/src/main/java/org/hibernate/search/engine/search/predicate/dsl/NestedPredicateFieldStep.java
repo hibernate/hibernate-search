@@ -12,7 +12,7 @@ import org.hibernate.search.engine.search.reference.predicate.NestedPredicateFie
  *
  * @param <SR> Scope root type.
  * @param <N> The type of the next step.
- * @deprecated Use {@link SearchPredicateFactory#nested(String)} instead.
+ * @deprecated Use {@link TypedSearchPredicateFactory#nested(String)} instead.
  */
 @Deprecated(since = "6.2")
 public interface NestedPredicateFieldStep<SR, N extends NestedPredicateNestStep<SR, ?>> {

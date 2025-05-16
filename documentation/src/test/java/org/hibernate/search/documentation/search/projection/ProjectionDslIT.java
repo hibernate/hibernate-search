@@ -96,7 +96,7 @@ class ProjectionDslIT {
 					Search.session( entityManager );
 			// tag::entryPoint-objects[]
 
-			SearchScope<?, Book> scope = searchSession.scope( Book.class );
+			SearchScope<Book> scope = searchSession.scope( Book.class );
 
 			List<String> result = searchSession.search( scope )
 					.select( scope.projection().field( "title", String.class )

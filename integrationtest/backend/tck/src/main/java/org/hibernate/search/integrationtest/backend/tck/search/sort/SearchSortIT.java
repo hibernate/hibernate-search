@@ -25,14 +25,14 @@ import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaObjectF
 import org.hibernate.search.engine.backend.types.ObjectStructure;
 import org.hibernate.search.engine.backend.types.Sortable;
 import org.hibernate.search.engine.search.predicate.SearchPredicate;
-import org.hibernate.search.engine.search.predicate.dsl.SearchPredicateFactory;
+import org.hibernate.search.engine.search.predicate.dsl.TypedSearchPredicateFactory;
 import org.hibernate.search.engine.search.query.SearchQuery;
 import org.hibernate.search.engine.search.query.SearchResult;
 import org.hibernate.search.engine.search.sort.SearchSort;
 import org.hibernate.search.engine.search.sort.dsl.FieldSortOptionsStep;
-import org.hibernate.search.engine.search.sort.dsl.SearchSortFactory;
 import org.hibernate.search.engine.search.sort.dsl.SearchSortFactoryExtension;
 import org.hibernate.search.engine.search.sort.dsl.SortFinalStep;
+import org.hibernate.search.engine.search.sort.dsl.TypedSearchSortFactory;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.configuration.DefaultAnalysisDefinitions;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.extension.SearchSetupHelper;
 import org.hibernate.search.util.common.SearchException;
@@ -81,7 +81,7 @@ class SearchSortIT {
 	}
 
 	private SearchQuery<DocumentReference> simpleQuery(
-			Function<? super SearchSortFactory<?>, ? extends SortFinalStep> sortContributor) {
+			Function<? super TypedSearchSortFactory<?>, ? extends SortFinalStep> sortContributor) {
 		StubMappingScope scope = mainIndex.createScope();
 		return scope.query()
 				.where( f -> f.matchAll() )
@@ -556,7 +556,7 @@ class SearchSortIT {
 
 	private static class SupportedExtension<SR> implements SearchSortFactoryExtension<SR, MyExtendedFactory<SR>> {
 		@Override
-		public Optional<MyExtendedFactory<SR>> extendOptional(SearchSortFactory<SR> original) {
+		public Optional<MyExtendedFactory<SR>> extendOptional(TypedSearchSortFactory<SR> original) {
 			assertThat( original ).isNotNull();
 			return Optional.of( new MyExtendedFactory<>( original ) );
 		}
@@ -564,20 +564,20 @@ class SearchSortIT {
 
 	private static class UnSupportedExtension<SR> implements SearchSortFactoryExtension<SR, MyExtendedFactory<SR>> {
 		@Override
-		public Optional<MyExtendedFactory<SR>> extendOptional(SearchSortFactory<SR> original) {
+		public Optional<MyExtendedFactory<SR>> extendOptional(TypedSearchSortFactory<SR> original) {
 			assertThat( original ).isNotNull();
 			return Optional.empty();
 		}
 	}
 
 	private static class MyExtendedFactory<SR> {
-		private final SearchSortFactory<SR> delegate;
+		private final TypedSearchSortFactory<SR> delegate;
 
-		MyExtendedFactory(SearchSortFactory<SR> delegate) {
+		MyExtendedFactory(TypedSearchSortFactory<SR> delegate) {
 			this.delegate = delegate;
 		}
 
-		public FieldSortOptionsStep<SR, ?, ? extends SearchPredicateFactory<SR>> extendedSort(String absoluteFieldPath) {
+		public FieldSortOptionsStep<SR, ?, ? extends TypedSearchPredicateFactory<SR>> extendedSort(String absoluteFieldPath) {
 			return delegate.field( absoluteFieldPath );
 		}
 	}

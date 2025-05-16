@@ -20,7 +20,7 @@ import org.hibernate.SessionFactory;
 import org.hibernate.search.engine.backend.types.Projectable;
 import org.hibernate.search.mapper.orm.Search;
 import org.hibernate.search.mapper.orm.cfg.HibernateOrmMapperSettings;
-import org.hibernate.search.mapper.orm.scope.SearchScope;
+import org.hibernate.search.mapper.orm.scope.TypedSearchScope;
 import org.hibernate.search.mapper.orm.session.SearchSession;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.FullTextField;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.GenericField;
@@ -60,7 +60,7 @@ class ProjectionTypesIT {
 
 		try ( var s = sessionFactory.openSession() ) {
 			SearchSession session = Search.session( s );
-			SearchScope<ProjectionTypesIT_IndexedEntity__, IndexedEntity> scope =
+			TypedSearchScope<ProjectionTypesIT_IndexedEntity__, IndexedEntity> scope =
 					ProjectionTypesIT_IndexedEntity__.INDEX.scope( session );
 			assertThat( session.search( scope )
 					.select( f -> f.composite()

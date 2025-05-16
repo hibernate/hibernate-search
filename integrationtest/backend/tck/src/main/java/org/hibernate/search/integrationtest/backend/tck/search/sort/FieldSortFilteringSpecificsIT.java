@@ -18,8 +18,8 @@ import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaObjectF
 import org.hibernate.search.engine.backend.types.ObjectStructure;
 import org.hibernate.search.engine.backend.types.Sortable;
 import org.hibernate.search.engine.search.query.SearchQuery;
-import org.hibernate.search.engine.search.sort.dsl.SearchSortFactory;
 import org.hibernate.search.engine.search.sort.dsl.SortFinalStep;
+import org.hibernate.search.engine.search.sort.dsl.TypedSearchSortFactory;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.FieldTypeDescriptor;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.StandardFieldTypeDescriptor;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.SimpleFieldModelsByType;
@@ -120,12 +120,12 @@ class FieldSortFilteringSpecificsIT<F> {
 	}
 
 	private SearchQuery<DocumentReference> matchAllQuery(
-			Function<? super SearchSortFactory<?>, ? extends SortFinalStep> sortContributor) {
+			Function<? super TypedSearchSortFactory<?>, ? extends SortFinalStep> sortContributor) {
 		return matchAllQuery( sortContributor, index.createScope() );
 	}
 
 	private SearchQuery<DocumentReference> matchAllQuery(
-			Function<? super SearchSortFactory<?>, ? extends SortFinalStep> sortContributor, StubMappingScope scope) {
+			Function<? super TypedSearchSortFactory<?>, ? extends SortFinalStep> sortContributor, StubMappingScope scope) {
 		return scope.query()
 				.where( f -> f.matchAll() )
 				.sort( sortContributor )

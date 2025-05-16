@@ -5,9 +5,9 @@
 package org.hibernate.search.engine.search.projection.definition;
 
 import org.hibernate.search.engine.search.predicate.SearchPredicate;
-import org.hibernate.search.engine.search.predicate.dsl.SearchPredicateFactory;
+import org.hibernate.search.engine.search.predicate.dsl.TypedSearchPredicateFactory;
 import org.hibernate.search.engine.search.projection.SearchProjection;
-import org.hibernate.search.engine.search.projection.dsl.SearchProjectionFactory;
+import org.hibernate.search.engine.search.projection.dsl.TypedSearchProjectionFactory;
 import org.hibernate.search.util.common.annotation.Incubating;
 
 /**
@@ -31,13 +31,13 @@ public interface ProjectionDefinition<P> {
 	 * If the projection is used in the context of an object field,
 	 * this factory expects field paths to be provided relative to that same object field.
 	 * This factory is only valid in the present context and must not be used after
-	 * {@link ProjectionDefinition#create(SearchProjectionFactory, ProjectionDefinitionContext)} returns.
+	 * {@link ProjectionDefinition#create(TypedSearchProjectionFactory, ProjectionDefinitionContext)} returns.
 	 * @param context The context in which the definition is applied.
 	 * @return The created {@link SearchPredicate}.
 	 * @throws RuntimeException If the creation of the projection fails.
-	 * @see SearchPredicateFactory
+	 * @see TypedSearchPredicateFactory
 	 * @see ProjectionDefinitionContext
 	 */
-	SearchProjection<? extends P> create(SearchProjectionFactory<?, ?, ?> factory, ProjectionDefinitionContext context);
+	SearchProjection<? extends P> create(TypedSearchProjectionFactory<?, ?, ?> factory, ProjectionDefinitionContext context);
 
 }

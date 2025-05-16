@@ -7,7 +7,7 @@ package org.hibernate.search.engine.search.aggregation.dsl;
 import java.util.Collection;
 import java.util.function.Function;
 
-import org.hibernate.search.engine.search.predicate.dsl.SearchPredicateFactory;
+import org.hibernate.search.engine.search.predicate.dsl.TypedSearchPredicateFactory;
 import org.hibernate.search.util.common.data.Range;
 
 /**
@@ -21,7 +21,7 @@ import org.hibernate.search.util.common.data.Range;
 public interface RangeAggregationRangeStep<
 		SR,
 		N extends RangeAggregationRangeMoreStep<SR, ?, ?, PDF, F>,
-		PDF extends SearchPredicateFactory<SR>,
+		PDF extends TypedSearchPredicateFactory<SR>,
 		F> {
 
 	/**

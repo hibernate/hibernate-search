@@ -9,7 +9,7 @@ import org.hibernate.search.engine.search.predicate.SearchPredicate;
 import org.hibernate.search.engine.search.predicate.dsl.BooleanPredicateClausesStep;
 import org.hibernate.search.engine.search.predicate.dsl.PredicateFinalStep;
 import org.hibernate.search.engine.search.predicate.dsl.PredicateScoreStep;
-import org.hibernate.search.engine.search.predicate.dsl.SearchPredicateFactory;
+import org.hibernate.search.engine.search.predicate.dsl.TypedSearchPredicateFactory;
 import org.hibernate.search.query.dsl.Termination;
 
 import org.apache.lucene.search.Query;
@@ -34,7 +34,7 @@ abstract class AbstractConnectedMultiFieldsQueryBuilder<T, F extends PredicateSc
 	}
 
 	private SearchPredicate createPredicate() {
-		SearchPredicateFactory<?> factory = queryContext.getScope().predicate();
+		TypedSearchPredicateFactory<?> factory = queryContext.getScope().predicate();
 		if ( fieldsContext.size() == 1 ) {
 			F finalStep = createPredicate( factory, fieldsContext.getFirst() );
 			queryCustomizer.applyScoreOptions( finalStep );
@@ -53,5 +53,5 @@ abstract class AbstractConnectedMultiFieldsQueryBuilder<T, F extends PredicateSc
 		}
 	}
 
-	protected abstract F createPredicate(SearchPredicateFactory<?> factory, FieldContext fieldContext);
+	protected abstract F createPredicate(TypedSearchPredicateFactory<?> factory, FieldContext fieldContext);
 }

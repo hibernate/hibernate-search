@@ -10,10 +10,10 @@ import org.hibernate.search.engine.search.aggregation.dsl.spi.SearchAggregationD
 import org.hibernate.search.engine.search.aggregation.spi.AggregationTypeKeys;
 import org.hibernate.search.engine.search.aggregation.spi.RangeAggregationBuilder;
 import org.hibernate.search.engine.search.common.ValueModel;
-import org.hibernate.search.engine.search.predicate.dsl.SearchPredicateFactory;
+import org.hibernate.search.engine.search.predicate.dsl.TypedSearchPredicateFactory;
 import org.hibernate.search.util.common.impl.Contracts;
 
-public class RangeAggregationFieldStepImpl<SR, PDF extends SearchPredicateFactory<SR>>
+public class RangeAggregationFieldStepImpl<SR, PDF extends TypedSearchPredicateFactory<SR>>
 		implements RangeAggregationFieldStep<SR, PDF> {
 	private final SearchAggregationDslContext<SR, ?, ? extends PDF> dslContext;
 

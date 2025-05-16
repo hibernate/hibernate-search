@@ -11,6 +11,7 @@ import java.util.Collections;
 import jakarta.persistence.EntityManager;
 
 import org.hibernate.Session;
+import org.hibernate.search.engine.search.common.NonStaticMetamodelScope;
 import org.hibernate.search.engine.search.query.dsl.SearchQuerySelectStep;
 import org.hibernate.search.mapper.orm.mapping.SearchMapping;
 import org.hibernate.search.mapper.orm.massindexing.MassIndexer;
@@ -18,6 +19,7 @@ import org.hibernate.search.mapper.orm.schema.management.SearchSchemaManager;
 import org.hibernate.search.mapper.orm.scope.HibernateOrmRootReferenceScope;
 import org.hibernate.search.mapper.orm.scope.SearchScope;
 import org.hibernate.search.mapper.orm.scope.SearchScopeProvider;
+import org.hibernate.search.mapper.orm.scope.TypedSearchScope;
 import org.hibernate.search.mapper.orm.search.loading.dsl.SearchLoadingOptionsStep;
 import org.hibernate.search.mapper.orm.work.SearchIndexingPlan;
 import org.hibernate.search.mapper.orm.work.SearchWorkspace;
@@ -45,7 +47,7 @@ public interface SearchSession extends SearchScopeProvider {
 	 * @see SearchQuerySelectStep
 	 */
 	@SuppressWarnings("deprecation")
-	default <T> SearchQuerySelectStep<T,
+	default <T> SearchQuerySelectStep<NonStaticMetamodelScope,
 			?,
 			org.hibernate.search.mapper.orm.common.EntityReference,
 			T,
@@ -68,7 +70,7 @@ public interface SearchSession extends SearchScopeProvider {
 	 * @see SearchQuerySelectStep
 	 */
 	@SuppressWarnings("deprecation")
-	<T> SearchQuerySelectStep<T,
+	<T> SearchQuerySelectStep<NonStaticMetamodelScope,
 			?,
 			org.hibernate.search.mapper.orm.common.EntityReference,
 			T,
@@ -93,7 +95,26 @@ public interface SearchSession extends SearchScopeProvider {
 			T,
 			SearchLoadingOptionsStep,
 			?,
-			?> search(SearchScope<SR, T> scope);
+			?> search(TypedSearchScope<SR, T> scope);
+
+	/**
+	 * Initiate the building of a search query.
+	 * <p>
+	 * The query will target the indexes in the given scope.
+	 *
+	 * @param scope A scope representing all indexed types that will be targeted by the search query.
+	 * @param <T> A supertype of all types in the given scope.
+	 * @return The initial step of a DSL where the search query can be defined.
+	 * @see SearchQuerySelectStep
+	 */
+	@SuppressWarnings("deprecation")
+	<T> SearchQuerySelectStep<NonStaticMetamodelScope,
+			?,
+			org.hibernate.search.mapper.orm.common.EntityReference,
+			T,
+			SearchLoadingOptionsStep,
+			?,
+			?> search(SearchScope<T> scope);
 
 	/**
 	 * Initiate the building of a search query.

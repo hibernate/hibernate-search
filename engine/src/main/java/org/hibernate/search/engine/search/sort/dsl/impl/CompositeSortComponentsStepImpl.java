@@ -6,7 +6,7 @@ package org.hibernate.search.engine.search.sort.dsl.impl;
 
 import org.hibernate.search.engine.search.sort.SearchSort;
 import org.hibernate.search.engine.search.sort.dsl.CompositeSortComponentsStep;
-import org.hibernate.search.engine.search.sort.dsl.SearchSortFactory;
+import org.hibernate.search.engine.search.sort.dsl.TypedSearchSortFactory;
 import org.hibernate.search.engine.search.sort.dsl.spi.SearchSortDslContext;
 
 public final class CompositeSortComponentsStepImpl<SR>
@@ -25,7 +25,7 @@ public final class CompositeSortComponentsStepImpl<SR>
 	}
 
 	@Override
-	public SearchSortFactory<SR> then() {
+	public TypedSearchSortFactory<SR> then() {
 		return dslContext.then();
 	}
 

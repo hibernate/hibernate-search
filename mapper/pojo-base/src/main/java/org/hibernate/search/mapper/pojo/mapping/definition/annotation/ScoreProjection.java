@@ -11,7 +11,7 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 import org.hibernate.search.engine.environment.bean.BeanRetrieval;
-import org.hibernate.search.engine.search.projection.dsl.SearchProjectionFactory;
+import org.hibernate.search.engine.search.projection.dsl.TypedSearchProjectionFactory;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.processing.MethodParameterMapping;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.processing.MethodParameterMappingAnnotationProcessorRef;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.processing.impl.ScoreProjectionProcessor;
@@ -19,7 +19,7 @@ import org.hibernate.search.mapper.pojo.mapping.definition.annotation.processing
 /**
  * Maps a constructor parameter to a projection to the score of the hit.
  *
- * @see SearchProjectionFactory#score()
+ * @see TypedSearchProjectionFactory#score()
  */
 @Documented
 @Target({ ElementType.PARAMETER })

@@ -29,13 +29,13 @@ import org.hibernate.search.engine.search.aggregation.dsl.impl.TermsAggregationF
 import org.hibernate.search.engine.search.aggregation.dsl.impl.WithParametersAggregationFinalStep;
 import org.hibernate.search.engine.search.aggregation.spi.SearchAggregationIndexScope;
 import org.hibernate.search.engine.search.common.NamedValues;
-import org.hibernate.search.engine.search.predicate.dsl.SearchPredicateFactory;
+import org.hibernate.search.engine.search.predicate.dsl.TypedSearchPredicateFactory;
 
 public abstract class AbstractSearchAggregationFactory<
 		SR,
 		S extends ExtendedSearchAggregationFactory<SR, S, PDF>,
 		SC extends SearchAggregationIndexScope<?>,
-		PDF extends SearchPredicateFactory<SR>>
+		PDF extends TypedSearchPredicateFactory<SR>>
 		implements ExtendedSearchAggregationFactory<SR, S, PDF> {
 
 	protected final SearchAggregationDslContext<SR, SC, PDF> dslContext;

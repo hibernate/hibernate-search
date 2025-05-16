@@ -13,7 +13,7 @@ import org.hibernate.search.engine.backend.document.DocumentElement;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaElement;
 import org.hibernate.search.engine.reporting.spi.EventContexts;
 import org.hibernate.search.engine.search.predicate.dsl.PredicateFinalStep;
-import org.hibernate.search.engine.search.predicate.dsl.SearchPredicateFactory;
+import org.hibernate.search.engine.search.predicate.dsl.TypedSearchPredicateFactory;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.configuration.DefaultAnalysisDefinitions;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.AnalyzedStringFieldTypeDescriptor;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.NormalizedStringFieldTypeDescriptor;
@@ -107,7 +107,7 @@ public abstract class AbstractPredicateSimpleAnalysisIT {
 				} );
 	}
 
-	protected abstract PredicateFinalStep predicate(SearchPredicateFactory<?> f, String fieldPath, String matchingParam);
+	protected abstract PredicateFinalStep predicate(TypedSearchPredicateFactory<?> f, String fieldPath, String matchingParam);
 
 	public static final class IndexBinding {
 		final SimpleFieldModel<String> analyzedStringField;

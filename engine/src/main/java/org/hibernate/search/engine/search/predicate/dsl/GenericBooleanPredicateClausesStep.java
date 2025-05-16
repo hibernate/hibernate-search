@@ -62,16 +62,16 @@ public interface GenericBooleanPredicateClausesStep<
 	}
 
 	@Override
-	S must(Function<? super SearchPredicateFactory<SR>, ? extends PredicateFinalStep> clauseContributor);
+	S must(Function<? super TypedSearchPredicateFactory<SR>, ? extends PredicateFinalStep> clauseContributor);
 
 	@Override
-	S mustNot(Function<? super SearchPredicateFactory<SR>, ? extends PredicateFinalStep> clauseContributor);
+	S mustNot(Function<? super TypedSearchPredicateFactory<SR>, ? extends PredicateFinalStep> clauseContributor);
 
 	@Override
-	S should(Function<? super SearchPredicateFactory<SR>, ? extends PredicateFinalStep> clauseContributor);
+	S should(Function<? super TypedSearchPredicateFactory<SR>, ? extends PredicateFinalStep> clauseContributor);
 
 	@Override
-	S filter(Function<? super SearchPredicateFactory<SR>, ? extends PredicateFinalStep> clauseContributor);
+	S filter(Function<? super TypedSearchPredicateFactory<SR>, ? extends PredicateFinalStep> clauseContributor);
 
 	@Override
 	default S minimumShouldMatchNumber(int matchingClausesNumber) {

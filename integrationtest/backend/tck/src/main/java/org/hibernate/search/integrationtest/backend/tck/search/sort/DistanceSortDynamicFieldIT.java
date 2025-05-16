@@ -14,8 +14,8 @@ import org.hibernate.search.engine.backend.document.DocumentElement;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaElement;
 import org.hibernate.search.engine.backend.types.Sortable;
 import org.hibernate.search.engine.search.query.SearchQuery;
-import org.hibernate.search.engine.search.sort.dsl.SearchSortFactory;
 import org.hibernate.search.engine.search.sort.dsl.SortFinalStep;
+import org.hibernate.search.engine.search.sort.dsl.TypedSearchSortFactory;
 import org.hibernate.search.engine.spatial.GeoPoint;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.GeoPointFieldTypeDescriptor;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.values.AscendingUniqueDistanceFromCenterValues;
@@ -123,17 +123,18 @@ class DistanceSortDynamicFieldIT {
 	}
 
 	private SearchQuery<DocumentReference> matchNonEmptyQuery(
-			Function<? super SearchSortFactory<?>, ? extends SortFinalStep> sortContributor) {
+			Function<? super TypedSearchSortFactory<?>, ? extends SortFinalStep> sortContributor) {
 		return matchNonEmptyQuery( sortContributor, mainIndex.createScope(), null, null );
 	}
 
 	private SearchQuery<DocumentReference> matchNonEmptyQuery(
-			Function<? super SearchSortFactory<?>, ? extends SortFinalStep> sortContributor, String parameter, Object value) {
+			Function<? super TypedSearchSortFactory<?>, ? extends SortFinalStep> sortContributor, String parameter,
+			Object value) {
 		return matchNonEmptyQuery( sortContributor, mainIndex.createScope(), parameter, value );
 	}
 
 	private SearchQuery<DocumentReference> matchNonEmptyQuery(
-			Function<? super SearchSortFactory<?>, ? extends SortFinalStep> sortContributor, StubMappingScope scope,
+			Function<? super TypedSearchSortFactory<?>, ? extends SortFinalStep> sortContributor, StubMappingScope scope,
 			String parameter, Object value) {
 		if ( parameter == null ) {
 			return scope.query()

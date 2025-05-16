@@ -6,12 +6,12 @@ package org.hibernate.search.engine.search.sort.dsl;
 
 import java.util.function.Function;
 
-import org.hibernate.search.engine.search.predicate.dsl.SearchPredicateFactory;
+import org.hibernate.search.engine.search.predicate.dsl.TypedSearchPredicateFactory;
 import org.hibernate.search.engine.search.reference.sort.DistanceSortFieldReference;
 import org.hibernate.search.engine.spatial.GeoPoint;
 
 /**
- * A base interface for subtypes of {@link SearchSortFactory} allowing to
+ * A base interface for subtypes of {@link TypedSearchSortFactory} allowing to
  * easily override the self type and predicate factory type for all relevant methods.
  * <p>
  * <strong>Warning:</strong> Generic parameters of this type are subject to change,
@@ -24,8 +24,8 @@ import org.hibernate.search.engine.spatial.GeoPoint;
 public interface ExtendedSearchSortFactory<
 		SR,
 		S extends ExtendedSearchSortFactory<SR, ?, PDF>,
-		PDF extends SearchPredicateFactory<SR>>
-		extends SearchSortFactory<SR> {
+		PDF extends TypedSearchPredicateFactory<SR>>
+		extends TypedSearchSortFactory<SR> {
 
 	@Override
 	S withRoot(String objectFieldPath);

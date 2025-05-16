@@ -12,7 +12,7 @@ import java.lang.annotation.Target;
 
 import org.hibernate.search.engine.common.EntityReference;
 import org.hibernate.search.engine.environment.bean.BeanRetrieval;
-import org.hibernate.search.engine.search.projection.dsl.SearchProjectionFactory;
+import org.hibernate.search.engine.search.projection.dsl.TypedSearchProjectionFactory;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.processing.MethodParameterMapping;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.processing.MethodParameterMappingAnnotationProcessorRef;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.processing.impl.EntityReferenceProjectionProcessor;
@@ -22,7 +22,7 @@ import org.hibernate.search.mapper.pojo.mapping.definition.annotation.processing
  * <p>
  * Entity references are instances of type {@link EntityReference}.
  *
- * @see SearchProjectionFactory#entityReference()
+ * @see TypedSearchProjectionFactory#entityReference()
  */
 @Documented
 @Target({ ElementType.PARAMETER })

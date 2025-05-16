@@ -21,8 +21,8 @@ import org.hibernate.search.engine.backend.types.Aggregable;
 import org.hibernate.search.engine.backend.types.ObjectStructure;
 import org.hibernate.search.engine.search.aggregation.AggregationKey;
 import org.hibernate.search.engine.search.aggregation.dsl.AggregationFinalStep;
-import org.hibernate.search.engine.search.aggregation.dsl.SearchAggregationFactory;
 import org.hibernate.search.engine.search.aggregation.dsl.SearchAggregationFactoryExtension;
+import org.hibernate.search.engine.search.aggregation.dsl.TypedSearchAggregationFactory;
 import org.hibernate.search.engine.search.query.SearchQuery;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.extension.SearchSetupHelper;
 import org.hibernate.search.util.common.SearchException;
@@ -151,7 +151,7 @@ class AggregationBaseIT {
 
 	private static class SupportedExtension implements SearchAggregationFactoryExtension<Object, MyExtendedFactory> {
 		@Override
-		public Optional<MyExtendedFactory> extendOptional(SearchAggregationFactory<Object> original) {
+		public Optional<MyExtendedFactory> extendOptional(TypedSearchAggregationFactory<Object> original) {
 			assertThat( original ).isNotNull();
 			return Optional.of( new MyExtendedFactory( original ) );
 		}
@@ -159,16 +159,16 @@ class AggregationBaseIT {
 
 	private static class UnSupportedExtension implements SearchAggregationFactoryExtension<Object, MyExtendedFactory> {
 		@Override
-		public Optional<MyExtendedFactory> extendOptional(SearchAggregationFactory<Object> original) {
+		public Optional<MyExtendedFactory> extendOptional(TypedSearchAggregationFactory<Object> original) {
 			assertThat( original ).isNotNull();
 			return Optional.empty();
 		}
 	}
 
 	private static class MyExtendedFactory {
-		private final SearchAggregationFactory<?> delegate;
+		private final TypedSearchAggregationFactory<?> delegate;
 
-		MyExtendedFactory(SearchAggregationFactory<?> delegate) {
+		MyExtendedFactory(TypedSearchAggregationFactory<?> delegate) {
 			this.delegate = delegate;
 		}
 

@@ -6,9 +6,9 @@ package org.hibernate.search.engine.search.predicate.dsl.impl;
 
 import org.hibernate.search.engine.search.predicate.SearchPredicate;
 import org.hibernate.search.engine.search.predicate.dsl.PredicateFinalStep;
-import org.hibernate.search.engine.search.predicate.dsl.SearchPredicateFactory;
 import org.hibernate.search.engine.search.predicate.dsl.SimpleBooleanPredicateClausesCollector;
 import org.hibernate.search.engine.search.predicate.dsl.SimpleBooleanPredicateClausesStep;
+import org.hibernate.search.engine.search.predicate.dsl.TypedSearchPredicateFactory;
 import org.hibernate.search.engine.search.predicate.dsl.spi.SearchPredicateDslContext;
 
 public final class SimpleBooleanPredicateClausesStepImpl<SR>
@@ -20,13 +20,13 @@ public final class SimpleBooleanPredicateClausesStepImpl<SR>
 
 	public SimpleBooleanPredicateClausesStepImpl(SimpleBooleanPredicateOperator operator,
 			SearchPredicateDslContext<?> dslContext,
-			SearchPredicateFactory<SR> factory) {
+			TypedSearchPredicateFactory<SR> factory) {
 		super( operator, dslContext, factory );
 	}
 
 	public SimpleBooleanPredicateClausesStepImpl(SimpleBooleanPredicateOperator operator,
 			SearchPredicateDslContext<?> dslContext,
-			SearchPredicateFactory<SR> factory,
+			TypedSearchPredicateFactory<SR> factory,
 			SearchPredicate firstSearchPredicate,
 			SearchPredicate... otherSearchPredicates) {
 		this( operator, dslContext, factory );
@@ -38,7 +38,7 @@ public final class SimpleBooleanPredicateClausesStepImpl<SR>
 
 	public SimpleBooleanPredicateClausesStepImpl(SimpleBooleanPredicateOperator operator,
 			SearchPredicateDslContext<?> dslContext,
-			SearchPredicateFactory<SR> factory,
+			TypedSearchPredicateFactory<SR> factory,
 			PredicateFinalStep firstSearchPredicate,
 			PredicateFinalStep... otherSearchPredicates) {
 		this( operator, dslContext, factory );

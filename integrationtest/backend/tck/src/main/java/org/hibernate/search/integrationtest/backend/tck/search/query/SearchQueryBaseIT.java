@@ -29,7 +29,7 @@ import org.hibernate.search.engine.search.aggregation.AggregationKey;
 import org.hibernate.search.engine.search.common.NamedValues;
 import org.hibernate.search.engine.search.loading.spi.SearchLoadingContext;
 import org.hibernate.search.engine.search.loading.spi.SearchLoadingContextBuilder;
-import org.hibernate.search.engine.search.predicate.dsl.SearchPredicateFactory;
+import org.hibernate.search.engine.search.predicate.dsl.TypedSearchPredicateFactory;
 import org.hibernate.search.engine.search.query.SearchQuery;
 import org.hibernate.search.engine.search.query.SearchQueryExtension;
 import org.hibernate.search.engine.search.query.SearchResult;
@@ -182,20 +182,20 @@ class SearchQueryBaseIT {
 	void queryParameters_nulls() {
 		StubMappingScope scope = index.createScope();
 		assertThatCode( () -> scope.query()
-				.where( SearchPredicateFactory::matchAll )
+				.where( TypedSearchPredicateFactory::matchAll )
 				.param( "some name", null )
 				.toQuery() )
 				.doesNotThrowAnyException();
 
 		assertThatThrownBy( () -> scope.query()
-				.where( SearchPredicateFactory::matchAll )
+				.where( TypedSearchPredicateFactory::matchAll )
 				.param( "", 1 )
 				.toQuery() )
 				.isInstanceOf( IllegalArgumentException.class )
 				.hasMessageContainingAll( "'parameter' must not be null or empty" );
 
 		assertThatThrownBy( () -> scope.query()
-				.where( SearchPredicateFactory::matchAll )
+				.where( TypedSearchPredicateFactory::matchAll )
 				.param( null, 1 )
 				.toQuery() )
 				.isInstanceOf( IllegalArgumentException.class )
@@ -232,7 +232,7 @@ class SearchQueryBaseIT {
 					params.get( "p1", Double.class );
 					return f.field( "string" );
 				} ) )
-						.where( SearchPredicateFactory::matchAll )
+						.where( TypedSearchPredicateFactory::matchAll )
 						.param( "p1", "string" )
 						.toQuery() )
 				.isInstanceOf( SearchException.class )
@@ -250,7 +250,7 @@ class SearchQueryBaseIT {
 					params.get( "no-such-parameter", Double.class );
 					return f.field( "string" );
 				} ) )
-						.where( SearchPredicateFactory::matchAll )
+						.where( TypedSearchPredicateFactory::matchAll )
 						.param( "p1", "string" )
 						.toQuery() )
 				.isInstanceOf( SearchException.class )

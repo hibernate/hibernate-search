@@ -8,12 +8,12 @@ import java.util.Set;
 
 import org.hibernate.search.engine.backend.scope.IndexScopeExtension;
 import org.hibernate.search.engine.common.EntityReference;
-import org.hibernate.search.engine.search.aggregation.dsl.SearchAggregationFactory;
+import org.hibernate.search.engine.search.aggregation.dsl.TypedSearchAggregationFactory;
 import org.hibernate.search.engine.search.highlighter.dsl.SearchHighlighterFactory;
-import org.hibernate.search.engine.search.predicate.dsl.SearchPredicateFactory;
-import org.hibernate.search.engine.search.projection.dsl.SearchProjectionFactory;
+import org.hibernate.search.engine.search.predicate.dsl.TypedSearchPredicateFactory;
+import org.hibernate.search.engine.search.projection.dsl.TypedSearchProjectionFactory;
 import org.hibernate.search.engine.search.query.dsl.SearchQuerySelectStep;
-import org.hibernate.search.engine.search.sort.dsl.SearchSortFactory;
+import org.hibernate.search.engine.search.sort.dsl.TypedSearchSortFactory;
 import org.hibernate.search.mapper.pojo.loading.spi.PojoSelectionLoadingContextBuilder;
 import org.hibernate.search.mapper.pojo.massindexing.spi.PojoMassIndexer;
 import org.hibernate.search.mapper.pojo.massindexing.spi.PojoMassIndexingContext;
@@ -26,26 +26,26 @@ import org.hibernate.search.mapper.pojo.work.spi.PojoScopeWorkspace;
  * {@link SearchQuerySelectStep#selectEntityReference()} reference queries},
  * @param <E> The type of loaded entities, i.e. the type of hits returned by
  * {@link SearchQuerySelectStep#selectEntity() entity queries},
- * or the type of objects returned for {@link SearchProjectionFactory#entity() entity projections}.
+ * or the type of objects returned for {@link TypedSearchProjectionFactory#entity() entity projections}.
  * @param <C> The type of indexed type extended contexts; i.e. the type of elements in the set returned by
  * {@link #includedIndexedTypes()}.
- * or the type of objects returned for {@link SearchProjectionFactory#entity() entity projections}.
+ * or the type of objects returned for {@link TypedSearchProjectionFactory#entity() entity projections}.
  */
 public interface PojoScopeDelegate<SR, R extends EntityReference, E, C> {
 
 	Set<C> includedIndexedTypes();
 
-	<LOS> SearchQuerySelectStep<SR, ?, R, E, LOS, SearchProjectionFactory<SR, R, E>, ?> search(
+	<LOS> SearchQuerySelectStep<SR, ?, R, E, LOS, TypedSearchProjectionFactory<SR, R, E>, ?> search(
 			PojoScopeSessionContext sessionContext,
 			PojoSelectionLoadingContextBuilder<LOS> loadingContextBuilder);
 
-	SearchPredicateFactory<SR> predicate();
+	TypedSearchPredicateFactory<SR> predicate();
 
-	SearchSortFactory<SR> sort();
+	TypedSearchSortFactory<SR> sort();
 
-	SearchProjectionFactory<SR, R, E> projection();
+	TypedSearchProjectionFactory<SR, R, E> projection();
 
-	SearchAggregationFactory<SR> aggregation();
+	TypedSearchAggregationFactory<SR> aggregation();
 
 	SearchHighlighterFactory highlighter();
 

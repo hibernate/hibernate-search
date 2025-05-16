@@ -15,9 +15,9 @@ import java.util.Optional;
  * and pass it to another API.
  *
  * @param <T> The type of extended predicate factories. Should generally extend
- * {@link SearchPredicateFactory}.
+ * {@link TypedSearchPredicateFactory}.
  *
- * @see SearchPredicateFactory#extension(SearchPredicateFactoryExtension)
+ * @see TypedSearchPredicateFactory#extension(SearchPredicateFactoryExtension)
  * @see ExtendedSearchPredicateFactory
  */
 public interface SearchPredicateFactoryExtension<SR, T> {
@@ -27,10 +27,10 @@ public interface SearchPredicateFactoryExtension<SR, T> {
 	 * <p>
 	 * <strong>WARNING:</strong> this method is not API, see comments at the type level.
 	 *
-	 * @param original The original, non-extended {@link SearchPredicateFactory}.
+	 * @param original The original, non-extended {@link TypedSearchPredicateFactory}.
 	 * @return An optional containing the extended search predicate factory ({@link T}) in case
 	 * of success, or an empty optional otherwise.
 	 */
-	Optional<T> extendOptional(SearchPredicateFactory<SR> original);
+	Optional<T> extendOptional(TypedSearchPredicateFactory<SR> original);
 
 }

@@ -10,6 +10,7 @@ import java.util.Collection;
 import java.util.function.Consumer;
 
 import org.hibernate.search.engine.common.EntityReference;
+import org.hibernate.search.engine.search.common.NonStaticMetamodelScope;
 import org.hibernate.search.engine.search.query.dsl.SearchQuerySelectStep;
 import org.hibernate.search.mapper.pojo.loading.spi.PojoSelectionLoadingContext;
 import org.hibernate.search.mapper.pojo.model.spi.PojoRuntimeIntrospector;
@@ -26,7 +27,9 @@ import org.hibernate.search.mapper.pojo.standalone.reporting.impl.StandalonePojo
 import org.hibernate.search.mapper.pojo.standalone.schema.management.SearchSchemaManager;
 import org.hibernate.search.mapper.pojo.standalone.scope.SearchScope;
 import org.hibernate.search.mapper.pojo.standalone.scope.StandalonePojoRootReferenceScope;
-import org.hibernate.search.mapper.pojo.standalone.scope.impl.SearchScopeImpl;
+import org.hibernate.search.mapper.pojo.standalone.scope.TypedSearchScope;
+import org.hibernate.search.mapper.pojo.standalone.scope.impl.SearchScopeDelegate;
+import org.hibernate.search.mapper.pojo.standalone.scope.impl.SearchScopeSearcher;
 import org.hibernate.search.mapper.pojo.standalone.session.SearchSession;
 import org.hibernate.search.mapper.pojo.standalone.session.SearchSessionBuilder;
 import org.hibernate.search.mapper.pojo.standalone.work.SearchIndexer;
@@ -128,20 +131,26 @@ public class StandalonePojoSearchSession extends AbstractPojoSearchSession
 	}
 
 	@Override
-	public <T> SearchQuerySelectStep<T, ?, EntityReference, T, ?, ?, ?> search(
+	public <T> SearchQuerySelectStep<NonStaticMetamodelScope, ?, EntityReference, T, ?, ?, ?> search(
 			Collection<? extends Class<? extends T>> classes) {
-		return search( scope( classes ) );
+		return search( (SearchScopeSearcher<NonStaticMetamodelScope, T>) scope( classes ) );
+	}
+
+	@SuppressWarnings({ "unchecked" })
+	@Override
+	public <SR, T> SearchQuerySelectStep<SR, ?, EntityReference, T, ?, ?, ?> search(TypedSearchScope<SR, T> scope) {
+		return search( (SearchScopeSearcher<SR, T>) scope );
 	}
 
 	@Override
-	public <SR, T> SearchQuerySelectStep<SR, ?, EntityReference, T, ?, ?, ?> search(SearchScope<SR, T> scope) {
-		return search( (SearchScopeImpl<SR, T>) scope );
+	public <T> SearchQuerySelectStep<NonStaticMetamodelScope, ?, EntityReference, T, ?, ?, ?> search(SearchScope<T> scope) {
+		return search( (TypedSearchScope<NonStaticMetamodelScope, T>) scope );
 	}
 
 	@Override
 	public <SR, T> SearchQuerySelectStep<SR, ?, EntityReference, T, ?, ?, ?> search(
 			StandalonePojoRootReferenceScope<SR, T> referenceScope) {
-		SearchScope<SR, T> scope = referenceScope.scope( this );
+		TypedSearchScope<SR, T> scope = referenceScope.scope( this );
 		return search( scope );
 	}
 
@@ -156,13 +165,18 @@ public class StandalonePojoSearchSession extends AbstractPojoSearchSession
 	}
 
 	@Override
-	public <SR, T> SearchScopeImpl<SR, T> scope(Collection<? extends Class<? extends T>> types) {
-		return mappingContext.createScope( types );
+	public <T> SearchScopeDelegate<T> scope(Collection<? extends Class<? extends T>> types) {
+		return new SearchScopeDelegate<>( mappingContext.createScope( types ) );
 	}
 
 	@Override
-	public <SR, T> SearchScopeImpl<SR, T> scope(Class<T> expectedSuperType, Collection<String> entityNames) {
-		return mappingContext.createScope( expectedSuperType, entityNames );
+	public <T> SearchScopeDelegate<T> scope(Class<T> expectedSuperType, Collection<String> entityNames) {
+		return new SearchScopeDelegate<>( mappingContext.createScope( expectedSuperType, entityNames ) );
+	}
+
+	@Override
+	public <SR, T> TypedSearchScope<SR, T> typedScope(Class<SR> rootScope, Collection<? extends Class<? extends T>> classes) {
+		return mappingContext().createScope( classes );
 	}
 
 	@Override
@@ -209,7 +223,7 @@ public class StandalonePojoSearchSession extends AbstractPojoSearchSession
 		return mappingContext;
 	}
 
-	private <SR, T> SearchQuerySelectStep<SR, ?, EntityReference, T, ?, ?, ?> search(SearchScopeImpl<SR, T> scope) {
+	private <SR, T> SearchQuerySelectStep<SR, ?, EntityReference, T, ?, ?, ?> search(SearchScopeSearcher<SR, T> scope) {
 		return scope.search( this, loadingContextBuilder() );
 	}
 

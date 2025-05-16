@@ -10,16 +10,16 @@ import org.hibernate.search.util.common.SearchException;
 
 /**
  * The second and later step when attempting to apply multiple extensions
- * to a {@link SearchPredicateFactory}.
+ * to a {@link TypedSearchPredicateFactory}.
  *
- * @see SearchPredicateFactory#extension()
+ * @see TypedSearchPredicateFactory#extension()
  */
 public interface SearchPredicateFactoryExtensionIfSupportedMoreStep<SR>
 		extends SearchPredicateFactoryExtensionIfSupportedStep<SR> {
 
 	/**
 	 * If no extension passed to {@link #ifSupported(SearchPredicateFactoryExtension, Function)}
-	 * was supported so far, apply the given consumer to the current (non-extended) {@link SearchPredicateFactory};
+	 * was supported so far, apply the given consumer to the current (non-extended) {@link TypedSearchPredicateFactory};
 	 * otherwise return the predicate created in the first succeeding {@code ifSupported} call.
 	 *
 	 * @param predicateContributor A function called if no extension was successfully applied;
@@ -29,7 +29,7 @@ public interface SearchPredicateFactoryExtensionIfSupportedMoreStep<SR>
 	 * @return The final step in the DSL of the resulting predicate.
 	 */
 	PredicateFinalStep orElse(
-			Function<SearchPredicateFactory<SR>, ? extends PredicateFinalStep> predicateContributor);
+			Function<TypedSearchPredicateFactory<SR>, ? extends PredicateFinalStep> predicateContributor);
 
 	/**
 	 * If no extension passed to {@link #ifSupported(SearchPredicateFactoryExtension, Function)}
