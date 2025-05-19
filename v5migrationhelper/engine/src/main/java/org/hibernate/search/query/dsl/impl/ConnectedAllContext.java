@@ -13,7 +13,7 @@ import org.hibernate.search.backend.lucene.LuceneExtension;
 import org.hibernate.search.backend.lucene.search.spi.LuceneMigrationUtils;
 import org.hibernate.search.engine.search.predicate.SearchPredicate;
 import org.hibernate.search.engine.search.predicate.dsl.MatchAllPredicateOptionsStep;
-import org.hibernate.search.engine.search.predicate.dsl.TypedSearchPredicateFactory;
+import org.hibernate.search.engine.search.predicate.dsl.SearchPredicateFactory;
 import org.hibernate.search.query.dsl.AllContext;
 
 import org.apache.lucene.search.Query;
@@ -38,7 +38,7 @@ public class ConnectedAllContext implements AllContext {
 	}
 
 	private SearchPredicate createPredicate() {
-		TypedSearchPredicateFactory<?> factory = queryContext.getScope().predicate();
+		SearchPredicateFactory factory = queryContext.getScope().predicate();
 
 		MatchAllPredicateOptionsStep<?, ?> optionsStep = factory.matchAll();
 

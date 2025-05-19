@@ -25,9 +25,9 @@ import org.apache.lucene.search.Explanation;
 
 public class LuceneSearchProjectionBuilderFactory implements SearchProjectionBuilderFactory {
 
-	private final LuceneSearchIndexScopeImpl scope;
+	private final LuceneSearchIndexScopeImpl<?> scope;
 
-	public LuceneSearchProjectionBuilderFactory(LuceneSearchIndexScopeImpl scope) {
+	public LuceneSearchProjectionBuilderFactory(LuceneSearchIndexScopeImpl<?> scope) {
 		this.scope = scope;
 	}
 

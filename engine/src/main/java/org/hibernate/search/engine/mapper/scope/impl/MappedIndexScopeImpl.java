@@ -19,9 +19,9 @@ import org.hibernate.search.engine.search.sort.dsl.TypedSearchSortFactory;
 
 class MappedIndexScopeImpl<SR, R, E> implements MappedIndexScope<SR, R, E> {
 
-	private final IndexScope delegate;
+	private final IndexScope<SR> delegate;
 
-	MappedIndexScopeImpl(IndexScope delegate) {
+	MappedIndexScopeImpl(IndexScope<SR> delegate) {
 		this.delegate = delegate;
 	}
 

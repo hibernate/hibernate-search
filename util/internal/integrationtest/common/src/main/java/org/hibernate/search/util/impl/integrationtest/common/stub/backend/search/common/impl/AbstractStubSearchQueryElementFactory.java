@@ -10,7 +10,7 @@ import org.hibernate.search.engine.search.common.spi.SearchQueryElementFactory;
 import org.hibernate.search.util.common.SearchException;
 
 public abstract class AbstractStubSearchQueryElementFactory<T>
-		implements SearchQueryElementFactory<T, StubSearchIndexScope, StubSearchIndexNodeContext> {
+		implements SearchQueryElementFactory<T, StubSearchIndexScope<?>, StubSearchIndexNodeContext> {
 
 	@Override
 	public void checkCompatibleWith(SearchQueryElementFactory<?, ?, ?> other) {

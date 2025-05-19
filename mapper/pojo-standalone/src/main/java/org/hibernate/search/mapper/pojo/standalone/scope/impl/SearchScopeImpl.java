@@ -29,12 +29,12 @@ import org.hibernate.search.mapper.pojo.standalone.massindexing.MassIndexer;
 import org.hibernate.search.mapper.pojo.standalone.massindexing.impl.StandalonePojoMassIndexer;
 import org.hibernate.search.mapper.pojo.standalone.schema.management.SearchSchemaManager;
 import org.hibernate.search.mapper.pojo.standalone.schema.management.impl.SearchSchemaManagerImpl;
-import org.hibernate.search.mapper.pojo.standalone.scope.SearchScope;
+import org.hibernate.search.mapper.pojo.standalone.scope.TypedSearchScope;
 import org.hibernate.search.mapper.pojo.standalone.tenancy.impl.TenancyConfiguration;
 import org.hibernate.search.mapper.pojo.standalone.work.SearchWorkspace;
 import org.hibernate.search.mapper.pojo.standalone.work.impl.SearchWorkspaceImpl;
 
-public class SearchScopeImpl<SR, E> implements SearchScope<SR, E> {
+public class SearchScopeImpl<SR, E> implements TypedSearchScope<SR, E> {
 
 	private final StandalonePojoScopeMappingContext mappingContext;
 	private final PojoScopeDelegate<SR, EntityReference, E, SearchIndexedEntity<? extends E>> delegate;

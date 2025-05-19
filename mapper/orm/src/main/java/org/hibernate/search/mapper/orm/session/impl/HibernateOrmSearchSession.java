@@ -18,6 +18,7 @@ import org.hibernate.action.spi.BeforeTransactionCompletionProcess;
 import org.hibernate.engine.spi.ActionQueue;
 import org.hibernate.engine.spi.SessionImplementor;
 import org.hibernate.search.engine.backend.common.spi.EntityReferenceFactory;
+import org.hibernate.search.engine.search.common.NonStaticMetamodelScope;
 import org.hibernate.search.engine.search.query.dsl.SearchQuerySelectStep;
 import org.hibernate.search.mapper.orm.automaticindexing.session.impl.DelegatingAutomaticIndexingSynchronizationStrategy;
 import org.hibernate.search.mapper.orm.automaticindexing.spi.AutomaticIndexingEventSendingSessionContext;
@@ -138,7 +139,7 @@ public class HibernateOrmSearchSession extends AbstractPojoSearchSession
 	}
 
 	@Override
-	public <T> SearchQuerySelectStep<T, ?, EntityReference, T, SearchLoadingOptionsStep, ?, ?> search(
+	public <T> SearchQuerySelectStep<NonStaticMetamodelScope, ?, EntityReference, T, SearchLoadingOptionsStep, ?, ?> search(
 			Collection<? extends Class<? extends T>> classes) {
 		return search( scope( classes ) );
 	}
@@ -186,15 +187,20 @@ public class HibernateOrmSearchSession extends AbstractPojoSearchSession
 	}
 
 	@Override
-	public <SR, T> TypedSearchScopeImpl<SR, T> scope(Collection<? extends Class<? extends T>> classes) {
+	public <T> TypedSearchScopeImpl<NonStaticMetamodelScope, T> scope(Collection<? extends Class<? extends T>> classes) {
 		checkOpen();
-		return mappingContext.createScope( classes );
+		return mappingContext.createScope( NonStaticMetamodelScope.class, classes );
 	}
 
 	@Override
-	public <SR, T> TypedSearchScope<SR, T> scope(Class<T> expectedSuperType, Collection<String> entityNames) {
+	public <T> TypedSearchScope<NonStaticMetamodelScope, T> scope(Class<T> expectedSuperType, Collection<String> entityNames) {
 		checkOpen();
-		return mappingContext.createScope( expectedSuperType, entityNames );
+		return mappingContext.createScope( NonStaticMetamodelScope.class, expectedSuperType, entityNames );
+	}
+
+	@Override
+	public <SR, T> TypedSearchScope<SR, T> typedScope(Class<SR> rootScope, Collection<? extends Class<? extends T>> classes) {
+		return mappingContext.createScope( rootScope, classes );
 	}
 
 	@Override

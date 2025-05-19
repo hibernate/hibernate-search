@@ -19,7 +19,7 @@ import org.hibernate.search.documentation.testsupport.TestConfiguration;
 import org.hibernate.search.engine.search.query.SearchResult;
 import org.hibernate.search.mapper.orm.Search;
 import org.hibernate.search.mapper.orm.massindexing.MassIndexer;
-import org.hibernate.search.mapper.orm.scope.TypedSearchScope;
+import org.hibernate.search.mapper.orm.scope.SearchScope;
 import org.hibernate.search.mapper.orm.session.SearchSession;
 import org.hibernate.search.util.impl.integrationtest.common.TestConfigurationProvider;
 
@@ -99,7 +99,7 @@ class GettingStartedDefaultAnalysisIT {
 			// Not shown: get the entity manager and open a transaction
 			SearchSession searchSession = Search.session( entityManager ); // <1>
 
-			TypedSearchScope<?, Book> scope = searchSession.scope( Book.class ); // <2>
+			SearchScope<Book> scope = searchSession.scope( Book.class ); // <2>
 
 			SearchResult<Book> result = searchSession.search( scope ) // <3>
 					.where( scope.predicate().match() // <4>

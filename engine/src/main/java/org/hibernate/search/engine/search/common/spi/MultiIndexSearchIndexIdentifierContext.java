@@ -22,7 +22,7 @@ public class MultiIndexSearchIndexIdentifierContext
 	private final SearchIndexScope<?> scope;
 	private final List<SearchIndexIdentifierContext> contextByIndex;
 
-	public MultiIndexSearchIndexIdentifierContext(AbstractSearchIndexScope<?, ?, ?, ?> scope,
+	public MultiIndexSearchIndexIdentifierContext(AbstractSearchIndexScope<?, ?, ?, ?, ?> scope,
 			List<SearchIndexIdentifierContext> contextByIndex) {
 		this.scope = scope;
 		this.contextByIndex = contextByIndex;

@@ -326,7 +326,7 @@ public abstract class AbstractPredicateInObjectFieldIT {
 		public static final String IMPL_PARAM_NAME = "impl";
 
 		@Override
-		public SearchPredicate create(PredicateDefinitionContext<?> context) {
+		public SearchPredicate create(PredicateDefinitionContext context) {
 			PredicateDefinition impl = context.params().get( IMPL_PARAM_NAME, PredicateDefinition.class );
 			return impl.create( context );
 		}

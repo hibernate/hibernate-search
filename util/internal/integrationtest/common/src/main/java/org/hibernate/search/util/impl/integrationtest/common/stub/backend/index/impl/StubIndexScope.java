@@ -14,29 +14,32 @@ import org.hibernate.search.engine.backend.scope.spi.IndexScopeBuilder;
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.document.model.impl.StubIndexModel;
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.search.common.impl.StubSearchIndexScope;
 
-public class StubIndexScope implements IndexScope {
-	private final StubSearchIndexScope searchScope;
+public class StubIndexScope<SR> implements IndexScope<SR> {
+	private final StubSearchIndexScope<SR> searchScope;
 
-	private StubIndexScope(Builder builder) {
+	private StubIndexScope(Class<SR> scopeRootType, Builder<SR> builder) {
 		Set<StubIndexModel> immutableIndexModels =
 				Collections.unmodifiableSet( new LinkedHashSet<>( builder.indexModels ) );
-		searchScope = new StubSearchIndexScope( builder.mappingContext, builder.backend, immutableIndexModels );
+		searchScope =
+				new StubSearchIndexScope<>( builder.mappingContext, scopeRootType, builder.backend, immutableIndexModels );
 	}
 
 	@Override
-	public StubSearchIndexScope searchScope() {
+	public StubSearchIndexScope<SR> searchScope() {
 		return searchScope;
 	}
 
-	static class Builder implements IndexScopeBuilder {
+	static class Builder<SR> implements IndexScopeBuilder<SR> {
 
 		private final StubBackend backend;
 		private final BackendMappingContext mappingContext;
+		private final Class<SR> rootScopeType;
 		private final Set<StubIndexModel> indexModels = new LinkedHashSet<>();
 
-		Builder(StubBackend backend, BackendMappingContext mappingContext, StubIndexModel model) {
+		Builder(StubBackend backend, BackendMappingContext mappingContext, Class<SR> rootScopeType, StubIndexModel model) {
 			this.backend = backend;
 			this.mappingContext = mappingContext;
+			this.rootScopeType = rootScopeType;
 			this.indexModels.add( model );
 		}
 
@@ -49,8 +52,8 @@ public class StubIndexScope implements IndexScope {
 		}
 
 		@Override
-		public StubIndexScope build() {
-			return new StubIndexScope( this );
+		public StubIndexScope<SR> build() {
+			return new StubIndexScope<>( rootScopeType, this );
 		}
 	}
 }

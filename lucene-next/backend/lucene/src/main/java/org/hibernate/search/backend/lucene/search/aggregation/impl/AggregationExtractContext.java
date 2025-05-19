@@ -21,7 +21,7 @@ import org.apache.lucene.search.Query;
 
 public class AggregationExtractContext {
 
-	private final LuceneSearchQueryIndexScope<?> queryIndexScope;
+	private final LuceneSearchQueryIndexScope<?, ?> queryIndexScope;
 	private final BackendSessionContext sessionContext;
 	private final IndexReader indexReader;
 	private final FromDocumentValueConvertContext fromDocumentValueConvertContext;
@@ -29,7 +29,7 @@ public class AggregationExtractContext {
 	private final Set<String> routingKeys;
 	private final QueryParameters parameters;
 
-	public AggregationExtractContext(LuceneSearchQueryIndexScope<?> queryIndexScope, BackendSessionContext sessionContext,
+	public AggregationExtractContext(LuceneSearchQueryIndexScope<?, ?> queryIndexScope, BackendSessionContext sessionContext,
 			IndexReader indexReader,
 			FromDocumentValueConvertContext fromDocumentValueConvertContext,
 			HibernateSearchMultiCollectorManager.MultiCollectedResults multiCollectedResults, Set<String> routingKeys,

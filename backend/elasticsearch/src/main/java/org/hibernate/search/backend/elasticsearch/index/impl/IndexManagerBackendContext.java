@@ -146,10 +146,12 @@ public class IndexManagerBackendContext implements SearchBackendContext, WorkExe
 	}
 
 	@Override
-	public ElasticsearchSearchQueryIndexScope<?> createSearchContext(BackendMappingContext mappingContext,
+	public <SR> ElasticsearchSearchQueryIndexScope<SR, ?> createSearchContext(BackendMappingContext mappingContext,
+			Class<SR> rootScopeType,
 			Set<ElasticsearchIndexModel> indexModels) {
-		return new ElasticsearchSearchIndexScopeImpl(
+		return new ElasticsearchSearchIndexScopeImpl<>(
 				mappingContext,
+				rootScopeType,
 				this,
 				userFacingGson, link.getSearchSyntax(),
 				multiTenancyStrategy,

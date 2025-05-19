@@ -15,18 +15,20 @@ import org.hibernate.search.engine.backend.mapping.spi.BackendMappingContext;
 import org.hibernate.search.engine.backend.scope.spi.IndexScope;
 import org.hibernate.search.engine.backend.scope.spi.IndexScopeBuilder;
 
-class ElasticsearchIndexScopeBuilder implements IndexScopeBuilder {
+class ElasticsearchIndexScopeBuilder<SR> implements IndexScopeBuilder<SR> {
 
 	private final IndexManagerBackendContext backendContext;
 	private final BackendMappingContext mappingContext;
+	private final Class<SR> rootScopeType;
 
 	// Use LinkedHashSet to ensure stable order when generating requests
 	private final Set<ElasticsearchIndexManagerImpl> indexManagers = new LinkedHashSet<>();
 
 	ElasticsearchIndexScopeBuilder(IndexManagerBackendContext backendContext,
-			BackendMappingContext mappingContext, ElasticsearchIndexManagerImpl indexManager) {
+			BackendMappingContext mappingContext, Class<SR> rootScopeType, ElasticsearchIndexManagerImpl indexManager) {
 		this.backendContext = backendContext;
 		this.mappingContext = mappingContext;
+		this.rootScopeType = rootScopeType;
 		this.indexManagers.add( indexManager );
 	}
 
@@ -40,11 +42,11 @@ class ElasticsearchIndexScopeBuilder implements IndexScopeBuilder {
 	}
 
 	@Override
-	public IndexScope build() {
+	public IndexScope<SR> build() {
 		// Use LinkedHashSet to ensure stable order when generating requests
 		Set<ElasticsearchIndexModel> indexModels = indexManagers.stream().map( ElasticsearchIndexManagerImpl::model )
 				.collect( Collectors.toCollection( LinkedHashSet::new ) );
-		return new ElasticsearchIndexScope( mappingContext, backendContext, indexModels );
+		return new ElasticsearchIndexScope<>( mappingContext, backendContext, rootScopeType, indexModels );
 	}
 
 	@Override

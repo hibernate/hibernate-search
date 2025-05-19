@@ -21,13 +21,13 @@ import org.apache.lucene.search.Query;
 
 public final class AggregationRequestContext {
 
-	private final LuceneSearchQueryIndexScope<?> queryIndexScope;
+	private final LuceneSearchQueryIndexScope<?, ?> queryIndexScope;
 	private final BackendSessionContext sessionContext;
 	private final Set<String> routingKeys;
 	private final ExtractionRequirements.Builder extractionRequirementsBuilder;
 	private final QueryParameters parameters;
 
-	public AggregationRequestContext(LuceneSearchQueryIndexScope<?> queryIndexScope, BackendSessionContext sessionContext,
+	public AggregationRequestContext(LuceneSearchQueryIndexScope<?, ?> queryIndexScope, BackendSessionContext sessionContext,
 			Set<String> routingKeys, ExtractionRequirements.Builder extractionRequirementsBuilder,
 			QueryParameters parameters) {
 		this.queryIndexScope = queryIndexScope;

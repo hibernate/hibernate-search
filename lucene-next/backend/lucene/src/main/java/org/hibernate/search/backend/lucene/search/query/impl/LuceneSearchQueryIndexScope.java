@@ -26,8 +26,8 @@ import org.hibernate.search.engine.search.timeout.spi.TimeoutManager;
 
 import org.apache.lucene.search.Query;
 
-public interface LuceneSearchQueryIndexScope<S extends LuceneSearchQueryIndexScope<?>>
-		extends SearchQueryIndexScope<S>, LuceneSearchIndexScope<S>,
+public interface LuceneSearchQueryIndexScope<SR, S extends LuceneSearchQueryIndexScope<?, ?>>
+		extends SearchQueryIndexScope<SR, S>, LuceneSearchIndexScope<S>,
 		LuceneSearchPredicateIndexScope<S>, LuceneSearchSortIndexScope<S>,
 		LuceneSearchProjectionIndexScope<S>, LuceneSearchAggregationIndexScope<S> {
 
@@ -36,16 +36,16 @@ public interface LuceneSearchQueryIndexScope<S extends LuceneSearchQueryIndexSco
 			SearchLoadingContextBuilder<?, ?> loadingContextBuilder, SearchProjection<P> projection);
 
 	@Override
-	<SR> LuceneSearchPredicateFactory<SR> predicateFactory();
+	LuceneSearchPredicateFactory<SR> predicateFactory();
 
 	@Override
-	<SR> LuceneSearchSortFactory<SR> sortFactory();
+	LuceneSearchSortFactory<SR> sortFactory();
 
 	@Override
-	<SR, R, E> LuceneSearchProjectionFactory<SR, R, E> projectionFactory();
+	<R, E> LuceneSearchProjectionFactory<SR, R, E> projectionFactory();
 
 	@Override
-	<SR> LuceneSearchAggregationFactory<SR> aggregationFactory();
+	LuceneSearchAggregationFactory<SR> aggregationFactory();
 
 	Query filterOrNull(String tenantId);
 

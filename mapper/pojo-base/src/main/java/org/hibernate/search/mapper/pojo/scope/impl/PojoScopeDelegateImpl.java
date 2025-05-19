@@ -43,6 +43,7 @@ public final class PojoScopeDelegateImpl<SR, R extends EntityReference, E, C> im
 
 	public static <SR, R extends EntityReference, E, C> PojoScopeDelegate<SR, R, E, C> create(
 			PojoScopeMappingContext mappingContext,
+			Class<SR> rootScope,
 			PojoScopeTypeContextProvider typeContextProvider,
 			Set<? extends PojoScopeIndexedTypeContext<?, ? extends E>> targetedTypeContexts,
 			PojoScopeTypeExtendedContextProvider<E, C> indexedTypeExtendedContextProvider) {
@@ -53,22 +54,25 @@ public final class PojoScopeDelegateImpl<SR, R extends EntityReference, E, C> im
 						.collect( Collectors.toCollection( LinkedHashSet::new ) );
 
 		return new PojoScopeDelegateImpl<>(
-				mappingContext, typeContextProvider,
+				mappingContext, rootScope, typeContextProvider,
 				targetedTypeContexts, targetedTypeExtendedContexts
 		);
 	}
 
 	private final PojoScopeMappingContext mappingContext;
+	private final Class<SR> rootScope;
 	private final PojoScopeTypeContextProvider indexedTypeContextProvider;
 	private final Set<? extends PojoScopeIndexedTypeContext<?, ? extends E>> targetedTypeContexts;
 	private final Set<C> targetedTypeExtendedContexts;
 	private MappedIndexScope<SR, R, E> delegate;
 
 	private PojoScopeDelegateImpl(PojoScopeMappingContext mappingContext,
+			Class<SR> rootScope,
 			PojoScopeTypeContextProvider indexedTypeContextProvider,
 			Set<? extends PojoScopeIndexedTypeContext<?, ? extends E>> targetedTypeContexts,
 			Set<C> targetedTypeExtendedContexts) {
 		this.mappingContext = mappingContext;
+		this.rootScope = rootScope;
 		this.indexedTypeContextProvider = indexedTypeContextProvider;
 		this.targetedTypeContexts = targetedTypeContexts;
 		this.targetedTypeExtendedContexts = Collections.unmodifiableSet( targetedTypeExtendedContexts );
@@ -146,7 +150,7 @@ public final class PojoScopeDelegateImpl<SR, R extends EntityReference, E, C> im
 	private MappedIndexScope<SR, R, E> getIndexScope() {
 		if ( delegate == null ) {
 			Iterator<? extends PojoScopeIndexedTypeContext<?, ? extends E>> iterator = targetedTypeContexts.iterator();
-			MappedIndexScopeBuilder<SR, R, E> builder = iterator.next().createScopeBuilder( mappingContext );
+			MappedIndexScopeBuilder<SR, R, E> builder = iterator.next().createScopeBuilder( mappingContext, rootScope );
 			while ( iterator.hasNext() ) {
 				iterator.next().addTo( builder );
 			}

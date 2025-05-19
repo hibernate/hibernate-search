@@ -9,20 +9,20 @@ import java.util.stream.Collectors;
 
 import org.hibernate.search.engine.backend.index.IndexManager;
 import org.hibernate.search.engine.common.EntityReference;
-import org.hibernate.search.engine.search.aggregation.dsl.TypedSearchAggregationFactory;
-import org.hibernate.search.engine.search.predicate.dsl.TypedSearchPredicateFactory;
+import org.hibernate.search.engine.search.aggregation.dsl.SearchAggregationFactory;
+import org.hibernate.search.engine.search.predicate.dsl.SearchPredicateFactory;
 import org.hibernate.search.engine.search.projection.SearchProjection;
-import org.hibernate.search.engine.search.projection.dsl.TypedSearchProjectionFactory;
-import org.hibernate.search.engine.search.sort.dsl.TypedSearchSortFactory;
+import org.hibernate.search.engine.search.projection.dsl.SearchProjectionFactory;
+import org.hibernate.search.engine.search.sort.dsl.SearchSortFactory;
 import org.hibernate.search.mapper.pojo.standalone.entity.SearchIndexedEntity;
 import org.hibernate.search.mapper.pojo.standalone.scope.SearchScope;
 import org.hibernate.search.scope.spi.V5MigrationSearchScope;
 
 public class V5MigrationStandalonePojoSearchScopeAdapter implements V5MigrationSearchScope {
 
-	private final SearchScope<?, ?> delegate;
+	private final SearchScope<?> delegate;
 
-	public V5MigrationStandalonePojoSearchScopeAdapter(SearchScope<?, ?> delegate) {
+	public V5MigrationStandalonePojoSearchScopeAdapter(SearchScope<?> delegate) {
 		this.delegate = delegate;
 	}
 
@@ -37,23 +37,23 @@ public class V5MigrationStandalonePojoSearchScopeAdapter implements V5MigrationS
 	}
 
 	@Override
-	public TypedSearchPredicateFactory<?> predicate() {
+	public SearchPredicateFactory predicate() {
 		return delegate.predicate();
 	}
 
 	@Override
-	public TypedSearchSortFactory<?> sort() {
+	public SearchSortFactory sort() {
 		return delegate.sort();
 	}
 
 	@Override
-	public TypedSearchProjectionFactory<?, ?, ?> projection() {
+	public SearchProjectionFactory<?, ?> projection() {
 		return delegate.projection();
 	}
 
 	@Override
 	public SearchProjection<Object> idProjection() {
-		TypedSearchProjectionFactory<?, EntityReference, ?> factory = delegate.projection();
+		var factory = delegate.projection();
 		// Not using factory.id() because that one throws an exception if IDs have inconsistent types.
 		return factory.composite().from( factory.entityReference() )
 				.as( EntityReference::id ).toProjection();
@@ -61,13 +61,13 @@ public class V5MigrationStandalonePojoSearchScopeAdapter implements V5MigrationS
 
 	@Override
 	public SearchProjection<? extends Class<?>> objectClassProjection() {
-		TypedSearchProjectionFactory<?, EntityReference, ?> factory = delegate.projection();
+		var factory = delegate.projection();
 		return factory.composite().from( factory.entityReference() )
 				.as( EntityReference::type ).toProjection();
 	}
 
 	@Override
-	public TypedSearchAggregationFactory<?> aggregation() {
+	public SearchAggregationFactory aggregation() {
 		return delegate.aggregation();
 	}
 

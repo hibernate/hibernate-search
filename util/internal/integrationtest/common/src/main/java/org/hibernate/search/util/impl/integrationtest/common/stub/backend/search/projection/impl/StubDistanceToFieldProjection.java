@@ -21,7 +21,7 @@ public abstract class StubDistanceToFieldProjection<T> extends StubSearchProject
 
 	public static class Factory extends AbstractStubSearchQueryElementFactory<DistanceToFieldProjectionBuilder> {
 		@Override
-		public DistanceToFieldProjectionBuilder create(StubSearchIndexScope scope,
+		public DistanceToFieldProjectionBuilder create(StubSearchIndexScope<?> scope,
 				StubSearchIndexNodeContext node) {
 			return new Builder();
 		}

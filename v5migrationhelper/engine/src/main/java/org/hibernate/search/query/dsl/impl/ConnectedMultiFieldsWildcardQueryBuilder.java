@@ -5,7 +5,7 @@
 
 package org.hibernate.search.query.dsl.impl;
 
-import org.hibernate.search.engine.search.predicate.dsl.TypedSearchPredicateFactory;
+import org.hibernate.search.engine.search.predicate.dsl.SearchPredicateFactory;
 import org.hibernate.search.engine.search.predicate.dsl.WildcardPredicateOptionsStep;
 import org.hibernate.search.query.dsl.TermTermination;
 
@@ -25,7 +25,7 @@ public class ConnectedMultiFieldsWildcardQueryBuilder
 	}
 
 	@Override
-	protected WildcardPredicateOptionsStep<?> createPredicate(TypedSearchPredicateFactory<?> factory,
+	protected WildcardPredicateOptionsStep<?> createPredicate(SearchPredicateFactory factory,
 			FieldContext fieldContext) {
 		return fieldContext.applyBoost( factory.wildcard().field( fieldContext.getField() ) )
 				.matching( value.toString() );

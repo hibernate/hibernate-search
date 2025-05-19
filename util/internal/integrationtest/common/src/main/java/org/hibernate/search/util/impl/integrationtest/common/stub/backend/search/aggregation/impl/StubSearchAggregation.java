@@ -31,7 +31,7 @@ public class StubSearchAggregation<A> implements SearchAggregation<A> {
 
 	public static class TermsFactory extends AbstractStubSearchQueryElementFactory<TermsAggregationBuilder.TypeSelector> {
 		@Override
-		public TermsAggregationBuilder.TypeSelector create(StubSearchIndexScope scope,
+		public TermsAggregationBuilder.TypeSelector create(StubSearchIndexScope<?> scope,
 				StubSearchIndexNodeContext node) {
 			return new TermsTypeSelector();
 		}
@@ -39,7 +39,7 @@ public class StubSearchAggregation<A> implements SearchAggregation<A> {
 
 	public static class RangeFactory extends AbstractStubSearchQueryElementFactory<RangeAggregationBuilder.TypeSelector> {
 		@Override
-		public RangeAggregationBuilder.TypeSelector create(StubSearchIndexScope scope,
+		public RangeAggregationBuilder.TypeSelector create(StubSearchIndexScope<?> scope,
 				StubSearchIndexNodeContext node) {
 			return new RangeTypeSelector();
 		}

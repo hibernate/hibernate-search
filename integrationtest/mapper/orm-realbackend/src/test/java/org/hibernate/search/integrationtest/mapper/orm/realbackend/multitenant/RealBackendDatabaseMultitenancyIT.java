@@ -29,7 +29,7 @@ import org.hibernate.search.integrationtest.mapper.orm.realbackend.testsupport.B
 import org.hibernate.search.mapper.orm.Search;
 import org.hibernate.search.mapper.orm.cfg.HibernateOrmMapperSettings;
 import org.hibernate.search.mapper.orm.mapping.SearchMapping;
-import org.hibernate.search.mapper.orm.scope.TypedSearchScope;
+import org.hibernate.search.mapper.orm.scope.SearchScope;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.GenericField;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
 import org.hibernate.search.mapper.pojo.tenancy.TenantIdentifierConverter;
@@ -206,7 +206,7 @@ class RealBackendDatabaseMultitenancyIT {
 
 		// and let's check mass indexing as well:
 		SearchMapping searchMapping = Search.mapping( sessionFactory );
-		TypedSearchScope<?, Object> scope = searchMapping.scope( Object.class );
+		SearchScope<Object> scope = searchMapping.scope( Object.class );
 		// aws-serverless does not support purge, so we'll just drop the entire index here:
 		scope.schemaManager().dropAndCreate();
 

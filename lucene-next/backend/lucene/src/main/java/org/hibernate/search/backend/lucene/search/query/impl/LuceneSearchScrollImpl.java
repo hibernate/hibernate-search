@@ -26,7 +26,7 @@ public class LuceneSearchScrollImpl<H> implements LuceneSearchScroll<H> {
 	// shared with its query instance:
 	private final LuceneSyncWorkOrchestrator queryOrchestrator;
 	private final LuceneWorkFactory workFactory;
-	private final LuceneSearchQueryIndexScope<?> scope;
+	private final LuceneSearchQueryIndexScope<?, ?> scope;
 	private final Set<String> routingKeys;
 	private final TimeoutManager timeoutManager;
 	private final LuceneSearcher<LuceneLoadableSearchResult<H>, LuceneExtractableSearchResult<H>> searcher;
@@ -42,7 +42,7 @@ public class LuceneSearchScrollImpl<H> implements LuceneSearchScroll<H> {
 	private int currentPageOffset = 0;
 
 	public LuceneSearchScrollImpl(LuceneSyncWorkOrchestrator queryOrchestrator,
-			LuceneWorkFactory workFactory, LuceneSearchQueryIndexScope<?> scope,
+			LuceneWorkFactory workFactory, LuceneSearchQueryIndexScope<?, ?> scope,
 			Set<String> routingKeys,
 			TimeoutManager timeoutManager,
 			LuceneSearcher<LuceneLoadableSearchResult<H>, LuceneExtractableSearchResult<H>> searcher,

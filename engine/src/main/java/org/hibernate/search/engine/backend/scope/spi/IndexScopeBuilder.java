@@ -4,8 +4,8 @@
  */
 package org.hibernate.search.engine.backend.scope.spi;
 
-public interface IndexScopeBuilder {
+public interface IndexScopeBuilder<SR> {
 
-	IndexScope build();
+	IndexScope<SR> build();
 
 }

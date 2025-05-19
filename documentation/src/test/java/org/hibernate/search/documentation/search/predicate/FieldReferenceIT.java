@@ -32,6 +32,7 @@ import org.hibernate.search.engine.search.reference.predicate.QueryStringPredica
 import org.hibernate.search.engine.search.reference.projection.FieldProjectionFieldReference;
 import org.hibernate.search.mapper.orm.Search;
 import org.hibernate.search.mapper.orm.scope.HibernateOrmRootReferenceScope;
+import org.hibernate.search.mapper.orm.scope.SearchScope;
 import org.hibernate.search.mapper.orm.scope.SearchScopeProvider;
 import org.hibernate.search.mapper.orm.scope.TypedSearchScope;
 import org.hibernate.search.mapper.orm.session.SearchSession;
@@ -110,7 +111,7 @@ class FieldReferenceIT {
 	void smoke2() {
 		withinSearchSession( searchSession -> {
 
-			TypedSearchScope<Object, MappedSuperclassThing> scope = searchSession.scope( List.of( ContainingA.class ) );
+			SearchScope<MappedSuperclassThing> scope = searchSession.scope( List.of( ContainingA.class ) );
 
 			assertThat(
 					searchSession.search( scope )
@@ -294,7 +295,7 @@ class FieldReferenceIT {
 
 		@Override
 		public TypedSearchScope<ContainingA__, ContainingA> scope(SearchScopeProvider scopeProvider) {
-			return scopeProvider.scope( ContainingA.class );
+			return scopeProvider.typedScope( ContainingA__.class, ContainingA.class );
 		}
 
 		@Override

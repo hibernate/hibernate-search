@@ -195,22 +195,22 @@ class ElasticsearchIndexManagerImpl
 	}
 
 	@Override
-	public IndexScopeBuilder createScopeBuilder(BackendMappingContext mappingContext) {
-		return new ElasticsearchIndexScopeBuilder(
-				backendContext, mappingContext, this
+	public <SR> IndexScopeBuilder<SR> createScopeBuilder(BackendMappingContext mappingContext, Class<SR> rootScopeType) {
+		return new ElasticsearchIndexScopeBuilder<>(
+				backendContext, mappingContext, rootScopeType, this
 		);
 	}
 
 	@Override
-	public void addTo(IndexScopeBuilder builder) {
-		if ( !( builder instanceof ElasticsearchIndexScopeBuilder ) ) {
+	public void addTo(IndexScopeBuilder<?> builder) {
+		if ( builder instanceof ElasticsearchIndexScopeBuilder<?> esBuilder ) {
+			esBuilder.add( backendContext, this );
+		}
+		else {
 			throw QueryLog.INSTANCE.cannotMixElasticsearchScopeWithOtherType(
 					builder, this, backendContext.getEventContext()
 			);
 		}
-
-		ElasticsearchIndexScopeBuilder esBuilder = (ElasticsearchIndexScopeBuilder) builder;
-		esBuilder.add( backendContext, this );
 	}
 
 	@Override

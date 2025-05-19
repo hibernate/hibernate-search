@@ -11,6 +11,7 @@ import java.util.Collections;
 import jakarta.persistence.EntityManager;
 
 import org.hibernate.Session;
+import org.hibernate.search.engine.search.common.NonStaticMetamodelScope;
 import org.hibernate.search.engine.search.query.dsl.SearchQuerySelectStep;
 import org.hibernate.search.mapper.orm.mapping.SearchMapping;
 import org.hibernate.search.mapper.orm.massindexing.MassIndexer;
@@ -46,7 +47,7 @@ public interface SearchSession extends SearchScopeProvider {
 	 * @see SearchQuerySelectStep
 	 */
 	@SuppressWarnings("deprecation")
-	default <T> SearchQuerySelectStep<T,
+	default <T> SearchQuerySelectStep<NonStaticMetamodelScope,
 			?,
 			org.hibernate.search.mapper.orm.common.EntityReference,
 			T,
@@ -69,7 +70,7 @@ public interface SearchSession extends SearchScopeProvider {
 	 * @see SearchQuerySelectStep
 	 */
 	@SuppressWarnings("deprecation")
-	<T> SearchQuerySelectStep<T,
+	<T> SearchQuerySelectStep<NonStaticMetamodelScope,
 			?,
 			org.hibernate.search.mapper.orm.common.EntityReference,
 			T,

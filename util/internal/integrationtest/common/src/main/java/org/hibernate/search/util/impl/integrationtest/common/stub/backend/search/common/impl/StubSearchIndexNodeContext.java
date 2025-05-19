@@ -7,7 +7,7 @@ package org.hibernate.search.util.impl.integrationtest.common.stub.backend.searc
 import org.hibernate.search.engine.search.common.spi.SearchIndexNodeContext;
 
 public interface StubSearchIndexNodeContext
-		extends SearchIndexNodeContext<StubSearchIndexScope> {
+		extends SearchIndexNodeContext<StubSearchIndexScope<?>> {
 
 	@Override
 	StubSearchIndexCompositeNodeContext toComposite();

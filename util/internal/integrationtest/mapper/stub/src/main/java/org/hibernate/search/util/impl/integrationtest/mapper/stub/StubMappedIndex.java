@@ -204,7 +204,7 @@ public abstract class StubMappedIndex {
 	 */
 	public StubMappingScope createScope() {
 		MappedIndexScopeBuilder<Object, EntityReference, DocumentReference> builder =
-				delegate().createScopeBuilder( mapping );
+				delegate().createScopeBuilder( mapping, Object.class );
 		return new StubMappingScope( mapping, builder.build() );
 	}
 
@@ -213,7 +213,7 @@ public abstract class StubMappedIndex {
 	 */
 	public StubMappingScope createScope(StubMappedIndex... others) {
 		MappedIndexScopeBuilder<Object, EntityReference, DocumentReference> builder =
-				delegate().createScopeBuilder( mapping );
+				delegate().createScopeBuilder( mapping, Object.class );
 		for ( StubMappedIndex other : others ) {
 			other.delegate().addTo( builder );
 		}
@@ -230,7 +230,7 @@ public abstract class StubMappedIndex {
 					+ " you must also set custom type contexts with consistent types."
 					+ " Use mapping.with().typeContext(...).run(...)." );
 		}
-		MappedIndexScopeBuilder<Object, R, E> builder = delegate().createScopeBuilder( mapping );
+		MappedIndexScopeBuilder<Object, R, E> builder = delegate().createScopeBuilder( mapping, Object.class );
 		for ( StubMappedIndex other : others ) {
 			other.delegate().addTo( builder );
 		}

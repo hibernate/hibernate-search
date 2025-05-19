@@ -10,7 +10,7 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import java.lang.invoke.MethodHandles;
 import java.util.Collections;
 
-import org.hibernate.search.engine.search.projection.dsl.TypedSearchProjectionFactory;
+import org.hibernate.search.engine.search.projection.dsl.SearchProjectionFactory;
 import org.hibernate.search.mapper.pojo.common.annotation.Param;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.DocumentId;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.GenericField;
@@ -71,7 +71,7 @@ class ProjectionConstructorProjectionBindingIT {
 			backendMock.expectSearchProjection(
 					INDEX_NAME,
 					b -> {
-						TypedSearchProjectionFactory<?, ?, ?> f = mapping.scope( IndexedEntity.class ).projection();
+						SearchProjectionFactory<?, ?> f = mapping.scope( IndexedEntity.class ).projection();
 						b.projection( f.composite()
 								.from(
 										f.field( "myText", String.class )
@@ -170,7 +170,7 @@ class ProjectionConstructorProjectionBindingIT {
 			backendMock.expectSearchProjection(
 					INDEX_NAME,
 					b -> {
-						TypedSearchProjectionFactory<?, ?, ?> f = mapping.scope( IndexedEntity.class ).projection();
+						SearchProjectionFactory<?, ?> f = mapping.scope( IndexedEntity.class ).projection();
 						b.projection( f.composite()
 								.from(
 										f.field( "myText", String.class )
@@ -308,7 +308,7 @@ class ProjectionConstructorProjectionBindingIT {
 			backendMock.expectSearchProjection(
 					INDEX_NAME,
 					b -> {
-						TypedSearchProjectionFactory<?, ?, ?> f = mapping.scope( IndexedEntity.class ).projection();
+						SearchProjectionFactory<?, ?> f = mapping.scope( IndexedEntity.class ).projection();
 						b.projection( f.composite()
 								.from(
 										f.field( "myText", String.class )

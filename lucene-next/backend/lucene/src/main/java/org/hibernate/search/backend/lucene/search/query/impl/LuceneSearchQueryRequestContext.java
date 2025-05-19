@@ -19,7 +19,7 @@ import org.apache.lucene.search.Sort;
  */
 class LuceneSearchQueryRequestContext {
 
-	private final LuceneSearchQueryIndexScope<?> queryIndexScope;
+	private final LuceneSearchQueryIndexScope<?, ?> queryIndexScope;
 	private final BackendSessionContext sessionContext;
 	private final SearchLoadingContext<?> loadingContext;
 	private final Query luceneQuery;
@@ -28,7 +28,7 @@ class LuceneSearchQueryRequestContext {
 	private final QueryParameters parameters;
 
 	LuceneSearchQueryRequestContext(
-			LuceneSearchQueryIndexScope<?> queryIndexScope, BackendSessionContext sessionContext,
+			LuceneSearchQueryIndexScope<?, ?> queryIndexScope, BackendSessionContext sessionContext,
 			SearchLoadingContext<?> loadingContext,
 			Query luceneQuery,
 			Sort luceneSort,
@@ -42,7 +42,7 @@ class LuceneSearchQueryRequestContext {
 		this.parameters = parameters;
 	}
 
-	public LuceneSearchQueryIndexScope<?> getQueryIndexScope() {
+	public LuceneSearchQueryIndexScope<?, ?> getQueryIndexScope() {
 		return queryIndexScope;
 	}
 

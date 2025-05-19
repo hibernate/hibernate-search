@@ -30,7 +30,7 @@ import org.hibernate.search.engine.search.query.SearchQuery;
 import org.hibernate.search.mapper.orm.Search;
 import org.hibernate.search.mapper.orm.cfg.HibernateOrmMapperSettings;
 import org.hibernate.search.mapper.orm.mapping.HibernateOrmSearchMappingConfigurer;
-import org.hibernate.search.mapper.orm.scope.TypedSearchScope;
+import org.hibernate.search.mapper.orm.scope.SearchScope;
 import org.hibernate.search.mapper.orm.session.SearchSession;
 import org.hibernate.search.mapper.pojo.extractor.builtin.BuiltinContainerExtractors;
 import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.TypeMappingStep;
@@ -258,7 +258,7 @@ class DynamicMapBaseIT {
 		with( sessionFactory ).runNoTransaction( session -> {
 			SearchSession searchSession = Search.session( session );
 
-			TypedSearchScope<?, Map> scope = searchSession.scope( Map.class, entityTypeName );
+			SearchScope<Map> scope = searchSession.scope( Map.class, entityTypeName );
 
 			backendMock.expectIndexScaleWorks( INDEX1_NAME )
 					.purge()

@@ -25,11 +25,12 @@ import org.hibernate.search.engine.search.loading.spi.SearchLoadingContextBuilde
  */
 public interface SearchBackendContext {
 
-	LuceneSearchQueryIndexScope<?> createSearchContext(BackendMappingContext mappingContext,
+	<SR> LuceneSearchQueryIndexScope<SR, ?> createSearchContext(BackendMappingContext mappingContext,
+			Class<SR> rootScopeType,
 			Set<? extends LuceneScopeIndexManagerContext> indexManagerContexts);
 
 	<H> LuceneSearchQueryBuilder<H> createSearchQueryBuilder(
-			LuceneSearchQueryIndexScope<?> scope,
+			LuceneSearchQueryIndexScope<?, ?> scope,
 			BackendSessionContext sessionContext,
 			SearchLoadingContextBuilder<?, ?> loadingContextBuilder,
 			LuceneSearchProjection<H> rootProjection);

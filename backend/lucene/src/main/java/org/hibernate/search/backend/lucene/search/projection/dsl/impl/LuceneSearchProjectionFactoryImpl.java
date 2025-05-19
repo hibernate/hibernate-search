@@ -7,6 +7,7 @@ package org.hibernate.search.backend.lucene.search.projection.dsl.impl;
 import org.hibernate.search.backend.lucene.search.projection.dsl.DocumentTree;
 import org.hibernate.search.backend.lucene.search.projection.dsl.LuceneSearchProjectionFactory;
 import org.hibernate.search.backend.lucene.search.projection.impl.LuceneSearchProjectionIndexScope;
+import org.hibernate.search.engine.search.projection.dsl.ExtendedSearchProjectionFactory;
 import org.hibernate.search.engine.search.projection.dsl.ProjectionFinalStep;
 import org.hibernate.search.engine.search.projection.dsl.spi.AbstractSearchProjectionFactory;
 import org.hibernate.search.engine.search.projection.dsl.spi.SearchProjectionDslContext;
@@ -32,6 +33,11 @@ public class LuceneSearchProjectionFactoryImpl<SR, R, E>
 	public LuceneSearchProjectionFactory<SR, R, E> withRoot(String objectFieldPath) {
 		return new LuceneSearchProjectionFactoryImpl<>( dslContext.rescope(
 				dslContext.scope().withRoot( objectFieldPath ) ) );
+	}
+
+	@Override
+	public <SR2> ExtendedSearchProjectionFactory<SR2, ?, R, E> withScopeRoot(Class<SR2> scopeRootType) {
+		return new LuceneSearchProjectionFactoryImpl<>( dslContext );
 	}
 
 	@Override

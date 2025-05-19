@@ -28,14 +28,16 @@ import org.hibernate.search.util.common.impl.Contracts;
 import org.hibernate.search.util.common.reporting.EventContext;
 
 public abstract class AbstractSearchIndexScope<
-		S extends SearchQueryIndexScope<?>,
+		SR,
+		S extends SearchQueryIndexScope<SR, ?>,
 		M extends AbstractIndexModel<?, ? extends C, ? extends N>,
 		N extends SearchIndexNodeContext<? super S>,
 		C extends SearchIndexCompositeNodeContext<? super S>>
-		implements SearchIndexScope<S>, SearchQueryIndexScope<S> {
+		implements SearchIndexScope<S>, SearchQueryIndexScope<SR, S> {
 
 	// Mapping context
 	protected final BackendMappingContext mappingContext;
+	protected final Class<SR> rootScopeType;
 
 	// Targeted indexes
 	private final Set<String> hibernateSearchIndexNames;
@@ -46,8 +48,10 @@ public abstract class AbstractSearchIndexScope<
 	private final C overriddenRoot;
 
 
-	public AbstractSearchIndexScope(BackendMappingContext mappingContext, Set<? extends M> indexModels) {
+	public AbstractSearchIndexScope(BackendMappingContext mappingContext, Class<SR> rootScopeType,
+			Set<? extends M> indexModels) {
 		this.mappingContext = mappingContext;
+		this.rootScopeType = rootScopeType;
 
 		// Use LinkedHashMap/LinkedHashSet to ensure stable order when generating requests
 		this.hibernateSearchIndexNames = new TreeSet<>();
@@ -61,8 +65,9 @@ public abstract class AbstractSearchIndexScope<
 		this.overriddenRoot = null;
 	}
 
-	protected AbstractSearchIndexScope(AbstractSearchIndexScope<S, M, N, C> parentScope, C overriddenRoot) {
+	protected AbstractSearchIndexScope(AbstractSearchIndexScope<SR, S, M, N, C> parentScope, C overriddenRoot) {
 		this.mappingContext = parentScope.mappingContext;
+		this.rootScopeType = parentScope.rootScopeType;
 		this.hibernateSearchIndexNames = parentScope.hibernateSearchIndexNames;
 		this.indexModels = parentScope.indexModels;
 		this.mappedTypeContexts = parentScope.mappedTypeContexts;

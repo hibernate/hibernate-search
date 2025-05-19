@@ -17,8 +17,8 @@ import org.hibernate.search.engine.search.loading.spi.SearchLoadingContextBuilde
 import org.hibernate.search.engine.search.projection.SearchProjection;
 import org.hibernate.search.engine.search.query.spi.SearchQueryIndexScope;
 
-public interface ElasticsearchSearchQueryIndexScope<S extends ElasticsearchSearchQueryIndexScope<?>>
-		extends SearchQueryIndexScope<S>,
+public interface ElasticsearchSearchQueryIndexScope<SR, S extends ElasticsearchSearchQueryIndexScope<?, ?>>
+		extends SearchQueryIndexScope<SR, S>,
 		ElasticsearchSearchPredicateIndexScope<S>, ElasticsearchSearchSortIndexScope<S>,
 		ElasticsearchSearchProjectionIndexScope<S>, ElasticsearchSearchAggregationIndexScope<S> {
 
@@ -27,15 +27,15 @@ public interface ElasticsearchSearchQueryIndexScope<S extends ElasticsearchSearc
 			SearchLoadingContextBuilder<?, ?> loadingContextBuilder, SearchProjection<P> projection);
 
 	@Override
-	<SR> ElasticsearchSearchPredicateFactory<SR> predicateFactory();
+	ElasticsearchSearchPredicateFactory<SR> predicateFactory();
 
 	@Override
-	<SR> ElasticsearchSearchSortFactory<SR> sortFactory();
+	ElasticsearchSearchSortFactory<SR> sortFactory();
 
 	@Override
-	<SR, R, E> ElasticsearchSearchProjectionFactory<SR, R, E> projectionFactory();
+	<R, E> ElasticsearchSearchProjectionFactory<SR, R, E> projectionFactory();
 
 	@Override
-	<SR> ElasticsearchSearchAggregationFactory<SR> aggregationFactory();
+	ElasticsearchSearchAggregationFactory<SR> aggregationFactory();
 
 }

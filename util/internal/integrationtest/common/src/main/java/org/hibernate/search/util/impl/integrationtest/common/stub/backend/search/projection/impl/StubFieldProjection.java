@@ -84,7 +84,7 @@ public class StubFieldProjection<F, V, A, P> extends StubSearchProjection<P> {
 
 	public static class Factory extends AbstractStubSearchQueryElementFactory<FieldProjectionBuilder.TypeSelector> {
 		@Override
-		public FieldProjectionBuilder.TypeSelector create(StubSearchIndexScope scope,
+		public FieldProjectionBuilder.TypeSelector create(StubSearchIndexScope<?> scope,
 				StubSearchIndexNodeContext node) {
 			return new TypeSelector<>( node.toValueField() );
 		}

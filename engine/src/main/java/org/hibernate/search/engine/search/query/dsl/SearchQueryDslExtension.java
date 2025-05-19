@@ -44,7 +44,7 @@ public interface SearchQueryDslExtension<SR, T, R, E, LOS> {
 	 * of success, or an empty optional otherwise.
 	 */
 	Optional<T> extendOptional(SearchQuerySelectStep<SR, ?, R, E, LOS, ?, ?> original,
-			SearchQueryIndexScope<?> scope,
+			SearchQueryIndexScope<SR, ?> scope,
 			BackendSessionContext sessionContext,
 			SearchLoadingContextBuilder<E, LOS> loadingContextBuilder);
 

@@ -12,12 +12,12 @@ import org.hibernate.search.engine.search.common.spi.SearchIndexSchemaElementCon
 public class StubMultiIndexSearchIndexValueFieldContext<F>
 		extends AbstractMultiIndexSearchIndexValueFieldContext<
 				StubSearchIndexValueFieldContext<F>,
-				StubSearchIndexScope,
+				StubSearchIndexScope<?>,
 				StubSearchIndexValueFieldTypeContext<F>,
 				F>
 		implements StubSearchIndexValueFieldContext<F>, StubSearchIndexValueFieldTypeContext<F> {
 
-	public StubMultiIndexSearchIndexValueFieldContext(StubSearchIndexScope scope, String absolutePath,
+	public StubMultiIndexSearchIndexValueFieldContext(StubSearchIndexScope<?> scope, String absolutePath,
 			List<? extends StubSearchIndexValueFieldContext<F>> fieldForEachIndex) {
 		super( scope, absolutePath, fieldForEachIndex );
 	}

@@ -29,6 +29,6 @@ public interface IndexScopeExtension<T> {
 	 * @param original The original, non-extended {@link IndexScope}.
 	 * @return An extended index scope ({@link T})
 	 */
-	T extendOrFail(IndexScope original);
+	T extendOrFail(IndexScope<?> original);
 
 }

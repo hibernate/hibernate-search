@@ -29,12 +29,12 @@ class LuceneSearchQueryOptionsStepImpl<SR, H, LOS>
 				LuceneSearchPredicateFactory<SR>,
 				LuceneSearchSortFactory<SR>,
 				LuceneSearchAggregationFactory<SR>,
-				LuceneSearchQueryIndexScope<?>>
+				LuceneSearchQueryIndexScope<SR, ?>>
 		implements LuceneSearchQueryWhereStep<SR, H, LOS>, LuceneSearchQueryOptionsStep<SR, H, LOS> {
 
 	private final LuceneSearchQueryBuilder<H> searchQueryBuilder;
 
-	LuceneSearchQueryOptionsStepImpl(LuceneSearchQueryIndexScope<?> scope,
+	LuceneSearchQueryOptionsStepImpl(LuceneSearchQueryIndexScope<SR, ?> scope,
 			LuceneSearchQueryBuilder<H> searchQueryBuilder,
 			SearchLoadingContextBuilder<?, LOS> loadingContextBuilder) {
 		super( scope, searchQueryBuilder, loadingContextBuilder );

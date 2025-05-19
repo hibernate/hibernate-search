@@ -38,7 +38,7 @@ public class StubSearchSort implements SearchSort {
 
 	public static class Factory extends AbstractStubSearchQueryElementFactory<Builder> {
 		@Override
-		public Builder create(StubSearchIndexScope scope, StubSearchIndexNodeContext node) {
+		public Builder create(StubSearchIndexScope<?> scope, StubSearchIndexNodeContext node) {
 			return new Builder();
 		}
 	}

@@ -37,11 +37,11 @@ public class LuceneSearchQuerySelectStepImpl<SR, R, E, LOS>
 				LuceneSearchPredicateFactory<SR>>
 		implements LuceneSearchQuerySelectStep<SR, R, E, LOS> {
 
-	private final LuceneSearchQueryIndexScope<?> scope;
+	private final LuceneSearchQueryIndexScope<SR, ?> scope;
 	private final BackendSessionContext sessionContext;
 	private final SearchLoadingContextBuilder<E, LOS> loadingContextBuilder;
 
-	public LuceneSearchQuerySelectStepImpl(LuceneSearchQueryIndexScope<?> scope,
+	public LuceneSearchQuerySelectStepImpl(LuceneSearchQueryIndexScope<SR, ?> scope,
 			BackendSessionContext sessionContext,
 			SearchLoadingContextBuilder<E, LOS> loadingContextBuilder) {
 		this.scope = scope;
@@ -51,7 +51,7 @@ public class LuceneSearchQuerySelectStepImpl<SR, R, E, LOS>
 
 	@Override
 	public LuceneSearchQueryWhereStep<SR, E, LOS> selectEntity() {
-		return select( scope.<SR, R, E>projectionFactory().entity().toProjection() );
+		return select( scope.<R, E>projectionFactory().entity().toProjection() );
 	}
 
 	@Override
@@ -104,7 +104,7 @@ public class LuceneSearchQuerySelectStepImpl<SR, R, E, LOS>
 	}
 
 	@Override
-	protected LuceneSearchQueryIndexScope<?> scope() {
+	protected LuceneSearchQueryIndexScope<SR, ?> scope() {
 		return scope;
 	}
 

@@ -37,7 +37,7 @@ public abstract class PredicateRequestContext {
 
 	public abstract NamedValues queryParameters();
 
-	public static PredicateRequestContext withSession(LuceneSearchQueryIndexScope<?> scope,
+	public static PredicateRequestContext withSession(LuceneSearchQueryIndexScope<?, ?> scope,
 			BackendSessionContext sessionContext, Set<String> routingKeys, QueryParameters parameters) {
 		Contracts.assertNotNull( scope, "scope" );
 		Contracts.assertNotNull( scope, "sessionContext" );
@@ -89,13 +89,13 @@ public abstract class PredicateRequestContext {
 	}
 
 	private static class FullPredicateRequestContext extends PredicateRequestContext {
-		private final LuceneSearchQueryIndexScope<?> scope;
+		private final LuceneSearchQueryIndexScope<?, ?> scope;
 
 		private final BackendSessionContext sessionContext;
 		private final Set<String> routingKeys;
 		private final QueryParameters parameters;
 
-		private FullPredicateRequestContext(String nestedPath, LuceneSearchQueryIndexScope<?> scope,
+		private FullPredicateRequestContext(String nestedPath, LuceneSearchQueryIndexScope<?, ?> scope,
 				BackendSessionContext sessionContext, Set<String> routingKeys, QueryParameters parameters) {
 			super( nestedPath );
 			this.scope = scope;

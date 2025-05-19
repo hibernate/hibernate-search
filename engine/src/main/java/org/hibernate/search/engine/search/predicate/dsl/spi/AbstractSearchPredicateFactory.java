@@ -70,9 +70,11 @@ public abstract class AbstractSearchPredicateFactory<
 		SC extends SearchPredicateIndexScope<?>>
 		implements ExtendedSearchPredicateFactory<SR, S> {
 
+	protected final Class<SR> scopeRootType;
 	protected final SearchPredicateDslContext<SC> dslContext;
 
-	public AbstractSearchPredicateFactory(SearchPredicateDslContext<SC> dslContext) {
+	public AbstractSearchPredicateFactory(Class<SR> scopeRootType, SearchPredicateDslContext<SC> dslContext) {
+		this.scopeRootType = scopeRootType;
 		this.dslContext = dslContext;
 	}
 

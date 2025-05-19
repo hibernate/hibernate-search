@@ -12,10 +12,10 @@ import java.util.Set;
 import org.hibernate.search.backend.lucene.search.spi.LuceneMigrationUtils;
 import org.hibernate.search.engine.search.common.BooleanOperator;
 import org.hibernate.search.engine.search.predicate.SearchPredicate;
+import org.hibernate.search.engine.search.predicate.dsl.SearchPredicateFactory;
 import org.hibernate.search.engine.search.predicate.dsl.SimpleQueryStringPredicateFieldMoreStep;
 import org.hibernate.search.engine.search.predicate.dsl.SimpleQueryStringPredicateFieldStep;
 import org.hibernate.search.engine.search.predicate.dsl.SimpleQueryStringPredicateOptionsStep;
-import org.hibernate.search.engine.search.predicate.dsl.TypedSearchPredicateFactory;
 import org.hibernate.search.query.dsl.SimpleQueryStringTermination;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
 import org.hibernate.search.util.logging.impl.MigrationHelperLog;
@@ -53,7 +53,7 @@ public class ConnectedMultiFieldsSimpleQueryStringQueryBuilder implements Simple
 	}
 
 	private SearchPredicate createPredicate() {
-		TypedSearchPredicateFactory<?> factory = queryContext.getScope().predicate();
+		SearchPredicateFactory factory = queryContext.getScope().predicate();
 
 		SimpleQueryStringPredicateFieldStep<?, ?> fieldStep = factory.simpleQueryString();
 		SimpleQueryStringPredicateFieldMoreStep<?, ?, ?> fieldMoreStep = null;

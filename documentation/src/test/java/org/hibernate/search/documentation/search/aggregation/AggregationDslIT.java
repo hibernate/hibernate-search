@@ -25,7 +25,7 @@ import org.hibernate.search.engine.search.aggregation.AggregationKey;
 import org.hibernate.search.engine.search.common.ValueModel;
 import org.hibernate.search.engine.search.query.SearchResult;
 import org.hibernate.search.mapper.orm.Search;
-import org.hibernate.search.mapper.orm.scope.TypedSearchScope;
+import org.hibernate.search.mapper.orm.scope.SearchScope;
 import org.hibernate.search.mapper.orm.session.SearchSession;
 import org.hibernate.search.util.common.data.Range;
 import org.hibernate.search.util.common.data.RangeBoundInclusion;
@@ -85,7 +85,7 @@ class AggregationDslIT {
 					Search.session( entityManager );
 			// tag::entryPoint-objects[]
 
-			TypedSearchScope<?, Book> scope = searchSession.scope( Book.class );
+			SearchScope<Book> scope = searchSession.scope( Book.class );
 
 			AggregationKey<Map<Genre, Long>> countsByGenreKey = AggregationKey.of( "countsByGenre" );
 

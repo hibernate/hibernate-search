@@ -109,12 +109,12 @@ public final class LuceneExtension<SR, H, R, E, LOS>
 	@Override
 	public Optional<LuceneSearchQuerySelectStep<SR, R, E, LOS>> extendOptional(
 			SearchQuerySelectStep<SR, ?, R, E, LOS, ?, ?> original,
-			SearchQueryIndexScope<?> scope,
+			SearchQueryIndexScope<SR, ?> scope,
 			BackendSessionContext sessionContext,
 			SearchLoadingContextBuilder<E, LOS> loadingContextBuilder) {
 		if ( scope instanceof LuceneSearchQueryIndexScope ) {
 			return Optional.of( new LuceneSearchQuerySelectStepImpl<>(
-					(LuceneSearchQueryIndexScope<?>) scope, sessionContext, loadingContextBuilder
+					(LuceneSearchQueryIndexScope<SR, ?>) scope, sessionContext, loadingContextBuilder
 			) );
 		}
 		else {
@@ -209,7 +209,7 @@ public final class LuceneExtension<SR, H, R, E, LOS>
 	 * {@inheritDoc}
 	 */
 	@Override
-	public LuceneIndexScope extendOrFail(IndexScope original) {
+	public LuceneIndexScope extendOrFail(IndexScope<?> original) {
 		if ( original instanceof LuceneIndexScope ) {
 			return (LuceneIndexScope) original;
 		}

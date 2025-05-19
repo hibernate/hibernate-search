@@ -30,12 +30,12 @@ class ElasticsearchSearchQueryOptionsStepImpl<SR, H, LOS>
 				ElasticsearchSearchPredicateFactory<SR>,
 				ElasticsearchSearchSortFactory<SR>,
 				ElasticsearchSearchAggregationFactory<SR>,
-				ElasticsearchSearchQueryIndexScope<?>>
+				ElasticsearchSearchQueryIndexScope<SR, ?>>
 		implements ElasticsearchSearchQueryWhereStep<SR, H, LOS>, ElasticsearchSearchQueryOptionsStep<SR, H, LOS> {
 
 	private final ElasticsearchSearchQueryBuilder<H> searchQueryBuilder;
 
-	ElasticsearchSearchQueryOptionsStepImpl(ElasticsearchSearchQueryIndexScope<?> scope,
+	ElasticsearchSearchQueryOptionsStepImpl(ElasticsearchSearchQueryIndexScope<SR, ?> scope,
 			ElasticsearchSearchQueryBuilder<H> searchQueryBuilder,
 			SearchLoadingContextBuilder<?, LOS> loadingContextBuilder) {
 		super( scope, searchQueryBuilder, loadingContextBuilder );
