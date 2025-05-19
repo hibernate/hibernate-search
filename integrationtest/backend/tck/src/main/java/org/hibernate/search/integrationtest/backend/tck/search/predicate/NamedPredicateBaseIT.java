@@ -18,6 +18,8 @@ import org.hibernate.search.engine.backend.types.ObjectStructure;
 import org.hibernate.search.engine.search.predicate.SearchPredicate;
 import org.hibernate.search.engine.search.predicate.definition.PredicateDefinition;
 import org.hibernate.search.engine.search.predicate.definition.PredicateDefinitionContext;
+import org.hibernate.search.engine.search.predicate.definition.TypedPredicateDefinition;
+import org.hibernate.search.engine.search.predicate.definition.TypedPredicateDefinitionContext;
 import org.hibernate.search.engine.search.predicate.dsl.SearchPredicateFactory;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.KeywordStringFieldTypeDescriptor;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.SimpleFieldModel;
@@ -121,6 +123,20 @@ class NamedPredicateBaseIT {
 	}
 
 	@Test
+	void typedDefaultScope() {
+		assertThatQuery( index.query()
+				.where( f -> f.named( "match-both-fields-typed" )
+						.param( "value1", WORD_1 )
+						.param( "value2", WORD_2 ) ) )
+				.hasDocRefHitsAnyOrder( index.typeName(), DOCUMENT_1 );
+		assertThatQuery( index.query()
+				.where( f -> f.named( "match-both-fields-typed" )
+						.param( "value1", WORD_1 )
+						.param( "value2", WORD_5 ) ) )
+				.hasDocRefHitsAnyOrder( index.typeName(), DOCUMENT_2 );
+	}
+
+	@Test
 	void nullPath() {
 		SearchPredicateFactory f = index.createScope().predicate();
 		assertThatThrownBy( () -> f.named( null ) )
@@ -173,6 +189,8 @@ class NamedPredicateBaseIT {
 					.map( root, "field2" );
 			root.namedPredicate( "match-both-fields",
 					new TestPredicateDefinition( "field1", "field2" ) );
+			root.namedPredicate( "match-both-fields-typed",
+					new TestTypedPredicateDefinition( "field1", "field2" ) );
 
 			nested = ObjectFieldBinding.create( root, "nested", ObjectStructure.NESTED );
 			flattened = ObjectFieldBinding.create( root, "flattened", ObjectStructure.FLATTENED );
@@ -218,6 +236,8 @@ class NamedPredicateBaseIT {
 					.map( objectField, "field2" );
 			objectField.namedPredicate( "match-both-fields",
 					new TestPredicateDefinition( "field1", "field2" ) );
+			objectField.namedPredicate( "match-both-fields-typed",
+					new TestTypedPredicateDefinition( "field1", "field2" ) );
 		}
 	}
 
@@ -245,7 +265,7 @@ class NamedPredicateBaseIT {
 		}
 
 		@Override
-		public SearchPredicate create(PredicateDefinitionContext<?> context) {
+		public SearchPredicate create(PredicateDefinitionContext context) {
 			String word1 = context.params().get( "value1", String.class );
 			String word2 = context.params().get( "value2", String.class );
 			SearchPredicateFactory f = context.predicate();
@@ -253,6 +273,33 @@ class NamedPredicateBaseIT {
 					f.match().field( field1Name ).matching( word1 ),
 					f.match().field( field2Name ).matching( word2 )
 			).toPredicate();
+		}
+	}
+
+	public static class TestTypedPredicateDefinition implements TypedPredicateDefinition<NamedPredicateBaseIT> {
+
+		private final String field1Name;
+		private final String field2Name;
+
+		public TestTypedPredicateDefinition(String field1Name, String field2Name) {
+			this.field1Name = field1Name;
+			this.field2Name = field2Name;
+		}
+
+		@Override
+		public SearchPredicate create(TypedPredicateDefinitionContext<NamedPredicateBaseIT> context) {
+			String word1 = context.params().get( "value1", String.class );
+			String word2 = context.params().get( "value2", String.class );
+			SearchPredicateFactory f = context.predicate();
+			return f.and(
+					f.match().field( field1Name ).matching( word1 ),
+					f.match().field( field2Name ).matching( word2 )
+			).toPredicate();
+		}
+
+		@Override
+		public Class<NamedPredicateBaseIT> scopeRootType() {
+			return NamedPredicateBaseIT.class;
 		}
 	}
 

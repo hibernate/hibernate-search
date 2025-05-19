@@ -11,9 +11,9 @@ import org.hibernate.search.util.common.SearchException;
 /**
  * The scope of an index-related operation, aware of the targeted indexes and of the underlying technology (backend).
  */
-public interface IndexScope {
+public interface IndexScope<SR> {
 
-	SearchQueryIndexScope<? extends SearchQueryIndexScope<?>> searchScope();
+	SearchQueryIndexScope<SR, ? extends SearchQueryIndexScope<?, ?>> searchScope();
 
 	/**
 	 * Extend the current index scope with the given extension,

@@ -12,7 +12,9 @@ import org.hibernate.search.engine.backend.types.IndexFieldType;
 import org.hibernate.search.engine.search.predicate.SearchPredicate;
 import org.hibernate.search.engine.search.predicate.definition.PredicateDefinition;
 import org.hibernate.search.engine.search.predicate.definition.PredicateDefinitionContext;
-import org.hibernate.search.engine.search.predicate.dsl.TypedSearchPredicateFactory;
+import org.hibernate.search.engine.search.predicate.definition.TypedPredicateDefinition;
+import org.hibernate.search.engine.search.predicate.definition.TypedPredicateDefinitionContext;
+import org.hibernate.search.engine.search.predicate.dsl.SearchPredicateFactory;
 import org.hibernate.search.mapper.pojo.bridge.PropertyBridge;
 import org.hibernate.search.mapper.pojo.bridge.binding.PropertyBindingContext;
 import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.PropertyBinder;
@@ -44,6 +46,38 @@ public class SkuIdentifierBinder implements PropertyBinder {
 		skuIdObjectField.namedPredicate( // <1>
 				"skuIdMatch", // <2>
 				new SkuIdentifierMatchPredicateDefinition() // <3>
+		);
+
+		skuIdObjectField.namedPredicate( // <1>
+				"skuIdMatch2", // <2>
+				new TypedPredicateDefinition<SkuIdentifierBinder>() {
+
+					@Override
+					public SearchPredicate create(TypedPredicateDefinitionContext<SkuIdentifierBinder> context) {
+						return null;
+					}
+
+					@Override
+					public Class<SkuIdentifierBinder> scopeRootType() {
+						return SkuIdentifierBinder.class;
+					}
+				} // <3>
+		);
+
+		skuIdObjectField.namedPredicate( // <1>
+				"skuIdMatch3", // <2>
+				new TypedPredicateDefinition<>() {
+
+					@Override
+					public SearchPredicate create(TypedPredicateDefinitionContext<Object> context) {
+						return null;
+					}
+
+					@Override
+					public Class<Object> scopeRootType() {
+						return Object.class;
+					}
+				} // <3>
 		);
 	}
 
@@ -88,8 +122,8 @@ public class SkuIdentifierBinder implements PropertyBinder {
 
 	private static class SkuIdentifierMatchPredicateDefinition implements PredicateDefinition { // <1>
 		@Override
-		public SearchPredicate create(PredicateDefinitionContext<?> context) {
-			TypedSearchPredicateFactory<?> f = context.predicate(); // <2>
+		public SearchPredicate create(PredicateDefinitionContext context) {
+			SearchPredicateFactory f = context.predicate(); // <2>
 
 			String pattern = context.params().get( "pattern", String.class ); // <3>
 

@@ -19,7 +19,7 @@ import org.hibernate.search.engine.search.common.SortMode;
 import org.hibernate.search.engine.search.sort.dsl.SortOrder;
 import org.hibernate.search.engine.spatial.GeoPoint;
 import org.hibernate.search.mapper.orm.Search;
-import org.hibernate.search.mapper.orm.scope.TypedSearchScope;
+import org.hibernate.search.mapper.orm.scope.SearchScope;
 import org.hibernate.search.mapper.orm.session.SearchSession;
 
 import org.junit.jupiter.api.BeforeEach;
@@ -74,7 +74,7 @@ class SortDslIT {
 					Search.session( entityManager );
 			// tag::entryPoint-objects[]
 
-			TypedSearchScope<?, Book> scope = searchSession.scope( Book.class );
+			SearchScope<Book> scope = searchSession.scope( Book.class );
 
 			List<Book> result = searchSession.search( scope )
 					.where( scope.predicate().matchAll().toPredicate() )

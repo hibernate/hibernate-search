@@ -69,13 +69,13 @@ public interface QueryLog {
 	@Message(id = ID_OFFSET + 2,
 			value = "Invalid multi-index scope: a scope cannot span both a Elasticsearch index and another type of index."
 					+ " Base scope: '%1$s', incompatible (Elasticsearch) index: '%2$s'.")
-	SearchException cannotMixElasticsearchScopeWithOtherType(IndexScopeBuilder baseScope,
+	SearchException cannotMixElasticsearchScopeWithOtherType(IndexScopeBuilder<?> baseScope,
 			ElasticsearchIndexManager elasticsearchIndex, @Param EventContext context);
 
 	@Message(id = ID_OFFSET + 3,
 			value = "Invalid multi-index scope: a scope cannot span multiple Elasticsearch backends."
 					+ " Base scope: '%1$s', incompatible index (from another backend): '%2$s'.")
-	SearchException cannotMixElasticsearchScopeWithOtherBackend(IndexScopeBuilder baseScope,
+	SearchException cannotMixElasticsearchScopeWithOtherBackend(IndexScopeBuilder<?> baseScope,
 			ElasticsearchIndexManager indexFromOtherBackend, @Param EventContext context);
 
 	@Message(id = ID_OFFSET + 8,
@@ -333,4 +333,8 @@ public interface QueryLog {
 	@Message(id = ID_OFFSET + 190, value = "A single-valued highlight projection requested, "
 			+ "but the corresponding highlighter does not set number of fragments to 1.")
 	SearchException highlighterIncompatibleCardinality();
+
+	@Message(id = ID_OFFSET + 193, value = "Current factory cannot be resocped to '%1$s' as it is scoped to '%2$s'.")
+	SearchException incompatibleScopeRootType(@FormatWith(ClassFormatter.class) Class<?> requested,
+			@FormatWith(ClassFormatter.class) Class<?> actual);
 }

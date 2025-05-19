@@ -24,12 +24,11 @@ public interface SearchScopeProvider {
 	 * indexed entity types among the given class and its subtypes.
 	 *
 	 * @param clazz A class that must be an indexed entity type or a supertype of such type.
-	 * @param <SR> Scope root type.
 	 * @param <T> A supertype of all indexed entity types to include in the scope.
 	 * @return The created scope.
 	 * @see SearchScope
 	 */
-	default <SR, T> SearchScope<SR, T> scope(Class<T> clazz) {
+	default <T> SearchScope<T> scope(Class<T> clazz) {
 		return scope( Collections.singleton( clazz ) );
 	}
 
@@ -39,12 +38,11 @@ public interface SearchScopeProvider {
 	 *
 	 * @param classes A collection of classes.
 	 * Each must be an indexed entity type or a supertype of such type.
-	 * @param <SR> Scope root type.
 	 * @param <T> A supertype of all indexed entity types to include in the scope.
 	 * @return The created scope.
 	 * @see SearchScope
 	 */
-	<SR, T> SearchScope<SR, T> scope(Collection<? extends Class<? extends T>> classes);
+	<T> SearchScope<T> scope(Collection<? extends Class<? extends T>> classes);
 
 	/**
 	 * Creates a {@link SearchScope} limited to
@@ -53,12 +51,11 @@ public interface SearchScopeProvider {
 	 * @param expectedSuperType A supertype of all entity types to include in the scope.
 	 * @param entityName An entity name. See {@link SearchEntity#name()}.
 	 * The referenced entity type must be an indexed entity type or a supertype of such type.
-	 * @param <SR> Scope root type.
 	 * @param <T> A supertype of all indexed entity types to include in the scope.
 	 * @return The created scope.
 	 * @see SearchScope
 	 */
-	default <SR, T> SearchScope<SR, T> scope(Class<T> expectedSuperType, String entityName) {
+	default <T> SearchScope<T> scope(Class<T> expectedSuperType, String entityName) {
 		return scope( expectedSuperType, Collections.singleton( entityName ) );
 	}
 
@@ -69,11 +66,38 @@ public interface SearchScopeProvider {
 	 * @param expectedSuperType A supertype of all indexed entity types to include in the scope.
 	 * @param entityNames A collection of entity names. See {@link SearchEntity#name()}.
 	 * Each entity type referenced in the collection must be an indexed entity type or a supertype of such type.
-	 * @param <SR> Scope root type.
 	 * @param <T> A supertype of all indexed entity types to include in the scope.
 	 * @return The created scope.
 	 * @see SearchScope
 	 */
-	<SR, T> SearchScope<SR, T> scope(Class<T> expectedSuperType, Collection<String> entityNames);
+	<T> SearchScope<T> scope(Class<T> expectedSuperType, Collection<String> entityNames);
 
+	/**
+	 * Creates a {@link SearchScope} limited to
+	 * indexed entity types among the given class and its subtypes.
+	 *
+	 * @param clazz A class that must be an indexed entity type or a supertype of such type.
+	 * @param <SR> Scope root type.
+	 * @param <T> A supertype of all indexed entity types to include in the scope.
+	 * @return The created scope.
+	 * @see TypedSearchScope
+	 */
+	@Incubating
+	default <SR, T> TypedSearchScope<SR, T> typedScope(Class<SR> rootScope, Class<T> clazz) {
+		return typedScope( rootScope, Collections.singleton( clazz ) );
+	}
+
+	/**
+	 * Creates a {@link TypedSearchScope} limited to
+	 * indexed entity types among the given classes and their subtypes.
+	 *
+	 * @param classes A collection of classes.
+	 * Each must be an indexed entity type or a supertype of such type.
+	 * @param <SR> Scope root type.
+	 * @param <T> A supertype of all indexed entity types to include in the scope.
+	 * @return The created scope.
+	 * @see TypedSearchScope
+	 */
+	@Incubating
+	<SR, T> TypedSearchScope<SR, T> typedScope(Class<SR> rootScope, Collection<? extends Class<? extends T>> classes);
 }

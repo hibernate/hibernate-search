@@ -36,7 +36,7 @@ public class StubObjectProjection<E, V, A, P> extends StubCompositeProjection<E,
 
 	public static class Factory extends AbstractStubSearchQueryElementFactory<CompositeProjectionBuilder> {
 		@Override
-		public CompositeProjectionBuilder create(StubSearchIndexScope scope,
+		public CompositeProjectionBuilder create(StubSearchIndexScope<?> scope,
 				StubSearchIndexNodeContext node) {
 			return new Builder( node.absolutePath() );
 		}

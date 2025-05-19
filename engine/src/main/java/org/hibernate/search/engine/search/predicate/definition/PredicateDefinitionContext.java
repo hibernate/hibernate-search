@@ -8,27 +8,27 @@ import java.util.Optional;
 
 import org.hibernate.search.engine.search.common.NamedValues;
 import org.hibernate.search.engine.search.predicate.dsl.NamedPredicateOptionsStep;
+import org.hibernate.search.engine.search.predicate.dsl.SearchPredicateFactory;
 import org.hibernate.search.engine.search.predicate.dsl.TypedSearchPredicateFactory;
 import org.hibernate.search.util.common.SearchException;
 import org.hibernate.search.util.common.annotation.Incubating;
 
 /**
- * The context passed to {@link PredicateDefinition#create(PredicateDefinitionContext<SR>)}.
- * @param <SR> Scope root type.
+ * The context passed to {@link PredicateDefinition#create(PredicateDefinitionContext)}.
  * @see PredicateDefinition#create(PredicateDefinitionContext)
  */
 @Incubating
-public interface PredicateDefinitionContext<SR> {
+public interface PredicateDefinitionContext {
 
 	/**
 	 * @return A predicate factory.
 	 * If the named predicate was registered on an object field,
 	 * this factory expects field paths to be provided relative to that same object field.
 	 * This factory is only valid in the present context and must not be used after
-	 * {@link PredicateDefinition#create(PredicateDefinitionContext<SR>)} returns.
+	 * {@link PredicateDefinition#create(PredicateDefinitionContext)} returns.
 	 * @see TypedSearchPredicateFactory
 	 */
-	TypedSearchPredicateFactory<SR> predicate();
+	SearchPredicateFactory predicate();
 
 	/**
 	 * @param name The name of the parameter.

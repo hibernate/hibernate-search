@@ -11,12 +11,12 @@ import org.hibernate.search.engine.search.common.spi.AbstractMultiIndexSearchInd
 public final class StubMultiIndexSearchIndexCompositeNodeContext
 		extends AbstractMultiIndexSearchIndexCompositeNodeContext<
 				StubSearchIndexCompositeNodeContext,
-				StubSearchIndexScope,
+				StubSearchIndexScope<?>,
 				StubSearchIndexCompositeNodeTypeContext,
 				StubSearchIndexNodeContext>
 		implements StubSearchIndexCompositeNodeContext, StubSearchIndexCompositeNodeTypeContext {
 
-	public StubMultiIndexSearchIndexCompositeNodeContext(StubSearchIndexScope scope,
+	public StubMultiIndexSearchIndexCompositeNodeContext(StubSearchIndexScope<?> scope,
 			String absolutePath, List<? extends StubSearchIndexCompositeNodeContext> nodeForEachIndex) {
 		super( scope, absolutePath, nodeForEachIndex );
 	}

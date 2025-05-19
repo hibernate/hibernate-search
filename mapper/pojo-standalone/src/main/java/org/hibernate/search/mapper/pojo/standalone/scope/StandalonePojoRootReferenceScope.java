@@ -10,5 +10,5 @@ import org.hibernate.search.util.common.annotation.Incubating;
 @Incubating
 public interface StandalonePojoRootReferenceScope<SR, T> extends RootReferenceScope<SR, T> {
 
-	SearchScope<SR, T> scope(SearchScopeProvider scopeProvider);
+	TypedSearchScope<SR, T> scope(SearchScopeProvider scopeProvider);
 }

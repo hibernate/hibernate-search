@@ -106,12 +106,12 @@ public final class ElasticsearchExtension<SR, H, R, E, LOS>
 	@Override
 	public Optional<ElasticsearchSearchQuerySelectStep<SR, R, E, LOS>> extendOptional(
 			SearchQuerySelectStep<SR, ?, R, E, LOS, ?, ?> original,
-			SearchQueryIndexScope<?> scope,
+			SearchQueryIndexScope<SR, ?> scope,
 			BackendSessionContext sessionContext,
 			SearchLoadingContextBuilder<E, LOS> loadingContextBuilder) {
 		if ( scope instanceof ElasticsearchSearchQueryIndexScope ) {
 			return Optional.of( new ElasticsearchSearchQuerySelectStepImpl<>(
-					(ElasticsearchSearchQueryIndexScope<?>) scope, sessionContext, loadingContextBuilder
+					(ElasticsearchSearchQueryIndexScope<SR, ?>) scope, sessionContext, loadingContextBuilder
 			) );
 		}
 		else {

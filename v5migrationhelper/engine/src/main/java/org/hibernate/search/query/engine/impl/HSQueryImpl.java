@@ -14,7 +14,7 @@ import org.hibernate.search.backend.lucene.LuceneExtension;
 import org.hibernate.search.engine.ProjectionConstants;
 import org.hibernate.search.engine.search.predicate.SearchPredicate;
 import org.hibernate.search.engine.search.projection.SearchProjection;
-import org.hibernate.search.engine.search.projection.dsl.TypedSearchProjectionFactory;
+import org.hibernate.search.engine.search.projection.dsl.SearchProjectionFactory;
 import org.hibernate.search.engine.search.query.SearchQuery;
 import org.hibernate.search.engine.search.query.SearchResult;
 import org.hibernate.search.engine.search.query.SearchScroll;
@@ -247,7 +247,7 @@ public class HSQueryImpl<LOS> implements HSQuery {
 	}
 
 	private SearchProjection<?> createCompositeProjection() {
-		TypedSearchProjectionFactory<?, ?, ?> factory = scope.projection();
+		SearchProjectionFactory<?, ?> factory = scope.projection();
 
 		if ( projectedFields == null || projectedFields.length == 0 ) {
 			// No tuple, so we ignore the tupleTransformer (Search 5 behavior)
@@ -271,7 +271,7 @@ public class HSQueryImpl<LOS> implements HSQuery {
 	}
 
 	private SearchProjection<?> createProjection(String field) {
-		TypedSearchProjectionFactory<?, ?, ?> factory = scope.projection();
+		SearchProjectionFactory<?, ?> factory = scope.projection();
 		if ( field == null ) {
 			// Hack to return null when a null field name is requested,
 			// which is what Search 5 used to do...

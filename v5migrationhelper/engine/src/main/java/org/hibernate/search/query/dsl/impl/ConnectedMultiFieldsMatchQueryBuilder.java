@@ -6,7 +6,7 @@
 package org.hibernate.search.query.dsl.impl;
 
 import org.hibernate.search.engine.search.predicate.dsl.MatchPredicateOptionsStep;
-import org.hibernate.search.engine.search.predicate.dsl.TypedSearchPredicateFactory;
+import org.hibernate.search.engine.search.predicate.dsl.SearchPredicateFactory;
 import org.hibernate.search.query.dsl.TermTermination;
 
 /**
@@ -27,7 +27,7 @@ public class ConnectedMultiFieldsMatchQueryBuilder
 	}
 
 	@Override
-	protected MatchPredicateOptionsStep<?> createPredicate(TypedSearchPredicateFactory<?> factory, FieldContext fieldContext) {
+	protected MatchPredicateOptionsStep<?> createPredicate(SearchPredicateFactory factory, FieldContext fieldContext) {
 		MatchPredicateOptionsStep<?> optionsStep =
 				fieldContext.applyBoost( factory.match().field( fieldContext.getField() ) )
 						.matching( value, fieldContext.getValueModel() );

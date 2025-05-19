@@ -12,6 +12,8 @@ import org.hibernate.search.engine.backend.types.IndexFieldType;
 import org.hibernate.search.engine.backend.types.ObjectStructure;
 import org.hibernate.search.engine.common.tree.spi.TreeNodeInclusion;
 import org.hibernate.search.engine.search.predicate.definition.PredicateDefinition;
+import org.hibernate.search.engine.search.predicate.definition.TypedPredicateDefinition;
+import org.hibernate.search.util.common.annotation.Incubating;
 
 public interface IndexCompositeNodeBuilder extends IndexSchemaBuildContext {
 
@@ -37,6 +39,18 @@ public interface IndexCompositeNodeBuilder extends IndexSchemaBuildContext {
 	 */
 	IndexSchemaNamedPredicateOptionsStep addNamedPredicate(String relativeNamedPredicateName,
 			TreeNodeInclusion inclusion, PredicateDefinition definition);
+
+	/**
+	 * Create a new named predicate and add it to the current builder.
+	 *
+	 * @param relativeNamedPredicateName The relative name of the new named predicate.
+	 * @param inclusion Whether fields matching this template should be included, provided their parent is included.
+	 * @param definition The definition of the named predicate.
+	 * @return A DSL step where the named predicate can be defined in more details.
+	 */
+	@Incubating
+	IndexSchemaNamedPredicateOptionsStep addNamedPredicate(String relativeNamedPredicateName,
+			TreeNodeInclusion inclusion, TypedPredicateDefinition<?> definition);
 
 	/**
 	 * Create a new object field and add it to the current builder.

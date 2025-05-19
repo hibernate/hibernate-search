@@ -13,7 +13,7 @@ import org.hibernate.search.backend.lucene.LuceneExtension;
 import org.hibernate.search.backend.lucene.search.spi.LuceneMigrationUtils;
 import org.hibernate.search.engine.search.predicate.SearchPredicate;
 import org.hibernate.search.engine.search.predicate.dsl.BooleanPredicateClausesStep;
-import org.hibernate.search.engine.search.predicate.dsl.TypedSearchPredicateFactory;
+import org.hibernate.search.engine.search.predicate.dsl.SearchPredicateFactory;
 import org.hibernate.search.query.dsl.BooleanJunction;
 import org.hibernate.search.query.dsl.MustJunction;
 import org.hibernate.search.util.common.AssertionFailure;
@@ -119,7 +119,7 @@ class BooleanQueryBuilder implements MustJunction {
 			throw log.booleanQueryWithoutClauses();
 		}
 
-		TypedSearchPredicateFactory<?> factory = queryContext.getScope().predicate();
+		SearchPredicateFactory factory = queryContext.getScope().predicate();
 		BooleanPredicateClausesStep<?, ?> step = factory.bool();
 		for ( BooleanClause clause : clauses ) {
 			SearchPredicate predicate = factory.extension( LuceneExtension.get() )

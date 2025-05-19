@@ -16,7 +16,7 @@ import java.lang.annotation.Target;
 import java.lang.invoke.MethodHandles;
 import java.util.Collections;
 
-import org.hibernate.search.engine.search.projection.dsl.TypedSearchProjectionFactory;
+import org.hibernate.search.engine.search.projection.dsl.SearchProjectionFactory;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.DocumentId;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.GenericField;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
@@ -85,7 +85,7 @@ class CustomMethodParameterMappingAnnotationBaseIT {
 			backendMock.expectSearchProjection(
 					INDEX_NAME,
 					b -> {
-						TypedSearchProjectionFactory<?, ?, ?> f = mapping.scope( IndexedEntity.class ).projection();
+						SearchProjectionFactory<?, ?> f = mapping.scope( IndexedEntity.class ).projection();
 						b.projection( f.composite()
 								.from(
 										f.field( "myText", String.class )

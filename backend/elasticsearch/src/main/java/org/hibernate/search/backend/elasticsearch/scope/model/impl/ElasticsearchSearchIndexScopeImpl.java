@@ -54,14 +54,15 @@ import org.hibernate.search.engine.search.timeout.spi.TimeoutManager;
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 
-public final class ElasticsearchSearchIndexScopeImpl
+public final class ElasticsearchSearchIndexScopeImpl<SR>
 		extends AbstractSearchIndexScope<
-				ElasticsearchSearchIndexScopeImpl,
+				SR,
+				ElasticsearchSearchIndexScopeImpl<SR>,
 				ElasticsearchIndexModel,
 				ElasticsearchSearchIndexNodeContext,
 				ElasticsearchSearchIndexCompositeNodeContext>
-		implements ElasticsearchSearchIndexScope<ElasticsearchSearchIndexScopeImpl>,
-		ElasticsearchSearchQueryIndexScope<ElasticsearchSearchIndexScopeImpl> {
+		implements ElasticsearchSearchIndexScope<ElasticsearchSearchIndexScopeImpl<SR>>,
+		ElasticsearchSearchQueryIndexScope<SR, ElasticsearchSearchIndexScopeImpl<SR>> {
 
 	// Backend context
 	private final SearchBackendContext backendContext;
@@ -81,12 +82,13 @@ public final class ElasticsearchSearchIndexScopeImpl
 	private final ElasticsearchSearchAggregationBuilderFactory aggregationFactory;
 
 	public ElasticsearchSearchIndexScopeImpl(BackendMappingContext mappingContext,
+			Class<SR> rootScopeType,
 			SearchBackendContext backendContext,
 			Gson userFacingGson, ElasticsearchSearchSyntax searchSyntax,
 			MultiTenancyStrategy multiTenancyStrategy,
 			TimingSource timingSource,
 			Set<ElasticsearchIndexModel> indexModels) {
-		super( mappingContext, indexModels );
+		super( mappingContext, rootScopeType, indexModels );
 		this.backendContext = backendContext;
 		this.userFacingGson = userFacingGson;
 		this.searchSyntax = searchSyntax;
@@ -115,7 +117,7 @@ public final class ElasticsearchSearchIndexScopeImpl
 		this.aggregationFactory = new ElasticsearchSearchAggregationBuilderFactory( this );
 	}
 
-	private ElasticsearchSearchIndexScopeImpl(ElasticsearchSearchIndexScopeImpl parentScope,
+	private ElasticsearchSearchIndexScopeImpl(ElasticsearchSearchIndexScopeImpl<SR> parentScope,
 			ElasticsearchSearchIndexCompositeNodeContext overriddenRoot) {
 		super( parentScope, overriddenRoot );
 		this.backendContext = parentScope.backendContext;
@@ -134,13 +136,13 @@ public final class ElasticsearchSearchIndexScopeImpl
 	}
 
 	@Override
-	protected ElasticsearchSearchIndexScopeImpl self() {
+	protected ElasticsearchSearchIndexScopeImpl<SR> self() {
 		return this;
 	}
 
 	@Override
-	public ElasticsearchSearchIndexScopeImpl withRoot(String objectFieldPath) {
-		return new ElasticsearchSearchIndexScopeImpl( this, field( objectFieldPath ).toComposite() );
+	public ElasticsearchSearchIndexScopeImpl<SR> withRoot(String objectFieldPath) {
+		return new ElasticsearchSearchIndexScopeImpl<>( this, field( objectFieldPath ).toComposite() );
 	}
 
 	@Override
@@ -171,23 +173,23 @@ public final class ElasticsearchSearchIndexScopeImpl
 	}
 
 	@Override
-	public <SR> ElasticsearchSearchPredicateFactory<SR> predicateFactory() {
-		return new ElasticsearchSearchPredicateFactoryImpl<>( SearchPredicateDslContext.root( this ) );
+	public ElasticsearchSearchPredicateFactory<SR> predicateFactory() {
+		return new ElasticsearchSearchPredicateFactoryImpl<>( rootScopeType, SearchPredicateDslContext.root( this ) );
 	}
 
 	@Override
-	public <SR> ElasticsearchSearchSortFactory<SR> sortFactory() {
+	public ElasticsearchSearchSortFactory<SR> sortFactory() {
 		return new ElasticsearchSearchSortFactoryImpl<>( SearchSortDslContext
 				.root( this, ElasticsearchSearchSortFactoryImpl::new, predicateFactory() ) );
 	}
 
 	@Override
-	public <SR, R, E> ElasticsearchSearchProjectionFactory<SR, R, E> projectionFactory() {
+	public <R, E> ElasticsearchSearchProjectionFactory<SR, R, E> projectionFactory() {
 		return new ElasticsearchSearchProjectionFactoryImpl<>( SearchProjectionDslContext.root( this ) );
 	}
 
 	@Override
-	public <SR> ElasticsearchSearchAggregationFactory<SR> aggregationFactory() {
+	public ElasticsearchSearchAggregationFactory<SR> aggregationFactory() {
 		return new ElasticsearchSearchAggregationFactoryImpl<>(
 				SearchAggregationDslContext.root( this, predicateFactory() ) );
 	}

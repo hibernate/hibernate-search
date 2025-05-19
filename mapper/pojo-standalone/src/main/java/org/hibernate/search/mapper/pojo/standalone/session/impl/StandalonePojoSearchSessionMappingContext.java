@@ -16,9 +16,9 @@ public interface StandalonePojoSearchSessionMappingContext
 		extends PojoSearchSessionMappingContext, StandalonePojoScopeMappingContext,
 		StandalonePojoMassIndexingMappingContext {
 
-	<SR, T> SearchScopeImpl<SR, T> createScope(Collection<? extends Class<? extends T>> types);
+	<SR, T> SearchScopeImpl<SR, T> createScope(Class<SR> rootScope, Collection<? extends Class<? extends T>> types);
 
-	<SR, T> SearchScopeImpl<SR, T> createScope(Class<T> expectedSuperType, Collection<String> entityNames);
+	<SR, T> SearchScopeImpl<SR, T> createScope(Class<SR> rootScope, Class<T> expectedSuperType, Collection<String> entityNames);
 
 	TenancyConfiguration tenancyConfiguration();
 }

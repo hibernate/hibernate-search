@@ -145,7 +145,7 @@ class PredicateDefinitionContextIT {
 
 	public static class StubPredicateDefinition implements PredicateDefinition {
 		@Override
-		public SearchPredicate create(PredicateDefinitionContext<?> context) {
+		public SearchPredicate create(PredicateDefinitionContext context) {
 			PredicateDefinition impl = context.params().get( "impl", PredicateDefinition.class );
 			return impl.create( context );
 		}

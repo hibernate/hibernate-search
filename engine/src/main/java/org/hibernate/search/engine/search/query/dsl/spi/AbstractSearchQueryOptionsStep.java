@@ -44,7 +44,7 @@ public abstract class AbstractSearchQueryOptionsStep<
 		PDF extends TypedSearchPredicateFactory<SR>,
 		SF extends TypedSearchSortFactory<SR>,
 		AF extends TypedSearchAggregationFactory<SR>,
-		SC extends SearchQueryIndexScope<?>>
+		SC extends SearchQueryIndexScope<SR, ?>>
 		implements SearchQueryWhereStep<SR, S, H, LOS, PDF>, SearchQueryOptionsStep<SR, S, H, LOS, SF, AF> {
 
 	protected final SC scope;

@@ -6,6 +6,7 @@ package org.hibernate.search.backend.elasticsearch.search.projection.dsl.impl;
 
 import org.hibernate.search.backend.elasticsearch.search.projection.dsl.ElasticsearchSearchProjectionFactory;
 import org.hibernate.search.backend.elasticsearch.search.projection.impl.ElasticsearchSearchProjectionIndexScope;
+import org.hibernate.search.engine.search.projection.dsl.ExtendedSearchProjectionFactory;
 import org.hibernate.search.engine.search.projection.dsl.ProjectionFinalStep;
 import org.hibernate.search.engine.search.projection.dsl.spi.AbstractSearchProjectionFactory;
 import org.hibernate.search.engine.search.projection.dsl.spi.SearchProjectionDslContext;
@@ -31,6 +32,11 @@ public class ElasticsearchSearchProjectionFactoryImpl<SR, R, E>
 	public ElasticsearchSearchProjectionFactory<SR, R, E> withRoot(String objectFieldPath) {
 		return new ElasticsearchSearchProjectionFactoryImpl<>( dslContext.rescope(
 				dslContext.scope().withRoot( objectFieldPath ) ) );
+	}
+
+	@Override
+	public <SR2> ExtendedSearchProjectionFactory<SR2, ?, R, E> withScopeRoot(Class<SR2> scopeRootType) {
+		return new ElasticsearchSearchProjectionFactoryImpl<>( dslContext );
 	}
 
 	@Override

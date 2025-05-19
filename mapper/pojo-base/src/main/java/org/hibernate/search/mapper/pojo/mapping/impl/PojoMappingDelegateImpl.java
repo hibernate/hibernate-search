@@ -110,13 +110,14 @@ public class PojoMappingDelegateImpl implements PojoMappingDelegate {
 	@Override
 	public <SR, R extends EntityReference, E, C> PojoScopeDelegate<SR, R, E, C> createPojoScopeForClasses(
 			PojoScopeMappingContext mappingContext,
-			Collection<? extends Class<? extends E>> classes,
+			Class<SR> rootScope, Collection<? extends Class<? extends E>> classes,
 			PojoScopeTypeExtendedContextProvider<E, C> indexedTypeExtendedContextProvider) {
 		if ( classes.isEmpty() ) {
 			throw MappingLog.INSTANCE.invalidEmptyTargetForScope();
 		}
 		return PojoScopeDelegateImpl.create(
 				mappingContext,
+				rootScope,
 				typeManagers,
 				typeManagers.indexedForSuperTypeClasses( classes ),
 				indexedTypeExtendedContextProvider
@@ -126,7 +127,8 @@ public class PojoMappingDelegateImpl implements PojoMappingDelegate {
 	@Override
 	@SuppressWarnings("unchecked") // The cast is checked through reflection
 	public <SR, R extends EntityReference, E, C> PojoScopeDelegate<SR, R, E, C> createPojoScopeForEntityNames(
-			PojoScopeMappingContext mappingContext, Class<E> expectedSuperType, Collection<String> entityNames,
+			PojoScopeMappingContext mappingContext, Class<SR> rootScope, Class<E> expectedSuperType,
+			Collection<String> entityNames,
 			PojoScopeTypeExtendedContextProvider<E, C> indexedTypeExtendedContextProvider) {
 		if ( entityNames.isEmpty() ) {
 			throw MappingLog.INSTANCE.invalidEmptyTargetForScope();
@@ -140,6 +142,7 @@ public class PojoMappingDelegateImpl implements PojoMappingDelegate {
 		}
 		return PojoScopeDelegateImpl.create(
 				mappingContext,
+				rootScope,
 				typeManagers,
 				(Set<? extends PojoIndexedTypeManager<?, ? extends E>>) typeContexts,
 				indexedTypeExtendedContextProvider
@@ -150,6 +153,7 @@ public class PojoMappingDelegateImpl implements PojoMappingDelegate {
 	@Deprecated(since = "7.1")
 	public <SR, R extends EntityReference, E, C> PojoScopeDelegate<SR, R, E, C> createPojoScope(
 			PojoScopeMappingContext mappingContext,
+			Class<SR> rootScope,
 			Collection<? extends PojoRawTypeIdentifier<? extends E>> targetedTypes,
 			PojoScopeTypeExtendedContextProvider<E, C> indexedTypeExtendedContextProvider) {
 		if ( targetedTypes.isEmpty() ) {
@@ -157,6 +161,7 @@ public class PojoMappingDelegateImpl implements PojoMappingDelegate {
 		}
 		return PojoScopeDelegateImpl.create(
 				mappingContext,
+				rootScope,
 				typeManagers,
 				typeManagers.indexedForSuperTypes( targetedTypes ),
 				indexedTypeExtendedContextProvider
@@ -165,13 +170,14 @@ public class PojoMappingDelegateImpl implements PojoMappingDelegate {
 
 	@Override
 	public <SR, R extends EntityReference, C> Optional<PojoScopeDelegate<SR, R, Object, C>> createPojoAllScope(
-			PojoScopeMappingContext mappingContext,
+			PojoScopeMappingContext mappingContext, Class<SR> rootScope,
 			PojoScopeTypeExtendedContextProvider<Object, C> indexedTypeExtendedContextProvider) {
 		if ( typeManagers.allIndexed().isEmpty() ) {
 			return Optional.empty();
 		}
 		return Optional.of( PojoScopeDelegateImpl.create(
 				mappingContext,
+				rootScope,
 				typeManagers,
 				typeManagers.allIndexed(),
 				indexedTypeExtendedContextProvider

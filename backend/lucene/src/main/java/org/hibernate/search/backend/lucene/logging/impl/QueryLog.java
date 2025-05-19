@@ -79,13 +79,13 @@ public interface QueryLog {
 	@Message(id = ID_OFFSET + 24,
 			value = "Invalid multi-index scope: a scope cannot span both a Lucene index and another type of index."
 					+ " Base scope: '%1$s', incompatible (Lucene) index: '%2$s'.")
-	SearchException cannotMixLuceneScopeWithOtherType(IndexScopeBuilder baseScope,
+	SearchException cannotMixLuceneScopeWithOtherType(IndexScopeBuilder<?> baseScope,
 			LuceneIndexManager luceneIndex, @Param EventContext context);
 
 	@Message(id = ID_OFFSET + 25,
 			value = "Invalid multi-index scope: a scope cannot span multiple Lucene backends."
 					+ " Base scope: '%1$s', incompatible index (from another backend): '%2$s'.")
-	SearchException cannotMixLuceneScopeWithOtherBackend(IndexScopeBuilder baseScope,
+	SearchException cannotMixLuceneScopeWithOtherBackend(IndexScopeBuilder<?> baseScope,
 			LuceneIndexManager indexFromOtherBackend, @Param EventContext context);
 
 	@Message(id = ID_OFFSET + 27,
@@ -324,4 +324,8 @@ public interface QueryLog {
 	@Message(id = ID_OFFSET + 186, value = "A single-valued highlight projection requested, "
 			+ "but the corresponding highlighter does not set number of fragments to 1.")
 	SearchException highlighterIncompatibleCardinality();
+
+	@Message(id = ID_OFFSET + 194, value = "Current factory cannot be resocped to '%1$s' as it is scoped to '%2$s'.")
+	SearchException incompatibleScopeRootType(@FormatWith(ClassFormatter.class) Class<?> requested,
+			@FormatWith(ClassFormatter.class) Class<?> actual);
 }

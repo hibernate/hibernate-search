@@ -10,13 +10,19 @@ import org.hibernate.search.engine.search.predicate.spi.SearchPredicateIndexScop
 
 public class StubSearchPredicateFactory<SR>
 		extends AbstractSearchPredicateFactory<SR, StubSearchPredicateFactory<SR>, SearchPredicateIndexScope<?>> {
-	public StubSearchPredicateFactory(
+	public StubSearchPredicateFactory(Class<SR> rootScopeType,
 			SearchPredicateDslContext<SearchPredicateIndexScope<?>> dslContext) {
-		super( dslContext );
+		super( rootScopeType, dslContext );
 	}
 
 	@Override
 	public StubSearchPredicateFactory<SR> withRoot(String objectFieldPath) {
-		return new StubSearchPredicateFactory<>( dslContext.rescope( dslContext.scope().withRoot( objectFieldPath ) ) );
+		return new StubSearchPredicateFactory<>( scopeRootType,
+				dslContext.rescope( dslContext.scope().withRoot( objectFieldPath ) ) );
+	}
+
+	@Override
+	public <SR2> StubSearchPredicateFactory<SR2> withScopeRoot(Class<SR2> scopeRootType) {
+		return new StubSearchPredicateFactory<>( scopeRootType, dslContext );
 	}
 }

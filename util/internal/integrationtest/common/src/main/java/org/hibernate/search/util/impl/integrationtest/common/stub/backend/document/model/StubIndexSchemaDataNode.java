@@ -19,6 +19,7 @@ import org.hibernate.search.engine.backend.types.TermVector;
 import org.hibernate.search.engine.backend.types.VectorSimilarity;
 import org.hibernate.search.engine.reporting.spi.EventContexts;
 import org.hibernate.search.engine.search.predicate.definition.PredicateDefinition;
+import org.hibernate.search.engine.search.predicate.definition.TypedPredicateDefinition;
 import org.hibernate.search.util.common.reporting.EventContext;
 import org.hibernate.search.util.impl.integrationtest.common.stub.StubTreeNode;
 
@@ -167,6 +168,11 @@ public final class StubIndexSchemaDataNode extends StubTreeNode<StubIndexSchemaD
 		}
 
 		public Builder predicateDefinition(PredicateDefinition predicateDefinition) {
+			attribute( "predicateDefinition", predicateDefinition );
+			return this;
+		}
+
+		public Builder predicateDefinition(TypedPredicateDefinition<?> predicateDefinition) {
 			attribute( "predicateDefinition", predicateDefinition );
 			return this;
 		}

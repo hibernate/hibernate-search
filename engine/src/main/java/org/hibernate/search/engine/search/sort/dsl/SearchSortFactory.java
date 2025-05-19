@@ -58,7 +58,7 @@ public interface SearchSortFactory {
 	 *
 	 * @return A DSL step where the "index order" sort can be defined in more details.
 	 */
-	SortThenStep indexOrder();
+	SortThenStep<?> indexOrder();
 
 	/**
 	 * Order elements by the value of a specific field.

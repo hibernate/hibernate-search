@@ -12,14 +12,15 @@ import org.hibernate.search.backend.elasticsearch.search.query.impl.SearchBacken
 import org.hibernate.search.engine.backend.mapping.spi.BackendMappingContext;
 import org.hibernate.search.engine.backend.scope.spi.IndexScope;
 
-public class ElasticsearchIndexScope
-		implements IndexScope {
+public class ElasticsearchIndexScope<SR>
+		implements IndexScope<SR> {
 
-	private final ElasticsearchSearchQueryIndexScope<?> searchScope;
+	private final ElasticsearchSearchQueryIndexScope<SR, ?> searchScope;
 
 	public ElasticsearchIndexScope(BackendMappingContext mappingContext, SearchBackendContext backendContext,
+			Class<SR> rootScopeType,
 			Set<ElasticsearchIndexModel> indexModels) {
-		this.searchScope = backendContext.createSearchContext( mappingContext, indexModels );
+		this.searchScope = backendContext.createSearchContext( mappingContext, rootScopeType, indexModels );
 	}
 
 	@Override
@@ -28,7 +29,7 @@ public class ElasticsearchIndexScope
 	}
 
 	@Override
-	public ElasticsearchSearchQueryIndexScope<?> searchScope() {
+	public ElasticsearchSearchQueryIndexScope<SR, ?> searchScope() {
 		return searchScope;
 	}
 

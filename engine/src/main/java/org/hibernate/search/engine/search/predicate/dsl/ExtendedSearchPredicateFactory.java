@@ -4,6 +4,9 @@
  */
 package org.hibernate.search.engine.search.predicate.dsl;
 
+import org.hibernate.search.util.common.SearchException;
+import org.hibernate.search.util.common.annotation.Incubating;
+
 /**
  * A base interface for subtypes of {@link TypedSearchPredicateFactory} allowing to
  * easily override the self type for all relevant methods.
@@ -20,4 +23,9 @@ public interface ExtendedSearchPredicateFactory<SR, S extends ExtendedSearchPred
 	@Override
 	S withRoot(String objectFieldPath);
 
+	/**
+	 * @throws SearchException In case the current factory cannot be rescoped for the {@code scopeRootType}.
+	 */
+	@Incubating
+	<SR2> ExtendedSearchPredicateFactory<SR2, ?> withScopeRoot(Class<SR2> scopeRootType);
 }

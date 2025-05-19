@@ -21,9 +21,9 @@ import org.hibernate.search.util.impl.integrationtest.common.stub.backend.search
 
 public class StubSearchProjectionBuilderFactory implements SearchProjectionBuilderFactory {
 
-	private final StubSearchIndexScope scope;
+	private final StubSearchIndexScope<?> scope;
 
-	public StubSearchProjectionBuilderFactory(StubSearchIndexScope scope) {
+	public StubSearchProjectionBuilderFactory(StubSearchIndexScope<?> scope) {
 		this.scope = scope;
 	}
 

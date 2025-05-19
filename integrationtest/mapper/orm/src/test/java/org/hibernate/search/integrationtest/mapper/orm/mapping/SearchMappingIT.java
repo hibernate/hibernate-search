@@ -24,7 +24,7 @@ import org.hibernate.search.engine.reporting.spi.EventContexts;
 import org.hibernate.search.mapper.orm.Search;
 import org.hibernate.search.mapper.orm.entity.SearchIndexedEntity;
 import org.hibernate.search.mapper.orm.mapping.SearchMapping;
-import org.hibernate.search.mapper.orm.scope.TypedSearchScope;
+import org.hibernate.search.mapper.orm.scope.SearchScope;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.GenericField;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
 import org.hibernate.search.util.common.SearchException;
@@ -180,7 +180,7 @@ class SearchMappingIT {
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-3994")
 	void scope_indexedEntities() {
-		TypedSearchScope<?, Object> objectScope = mapping.scope( Object.class );
+		SearchScope<Object> objectScope = mapping.scope( Object.class );
 		Set<? extends SearchIndexedEntity<?>> objectEntities = objectScope.includedTypes();
 		assertThat( objectEntities )
 				.extracting( SearchIndexedEntity::jpaName )
@@ -189,7 +189,7 @@ class SearchMappingIT {
 						Pet.JPA_ENTITY_NAME
 				);
 
-		TypedSearchScope<?, Person> personScope = mapping.scope( Person.class );
+		SearchScope<Person> personScope = mapping.scope( Person.class );
 		Set<? extends SearchIndexedEntity<? extends Person>> personEntities = personScope.includedTypes();
 		assertThat( personEntities )
 				.extracting( SearchIndexedEntity::jpaName )
@@ -197,7 +197,7 @@ class SearchMappingIT {
 						Person.JPA_ENTITY_NAME
 				);
 
-		TypedSearchScope<?, Pet> petScope = mapping.scope( Pet.class );
+		SearchScope<Pet> petScope = mapping.scope( Pet.class );
 		Set<? extends SearchIndexedEntity<? extends Pet>> petEntities = petScope.includedTypes();
 		assertThat( petEntities )
 				.extracting( SearchIndexedEntity::jpaName )

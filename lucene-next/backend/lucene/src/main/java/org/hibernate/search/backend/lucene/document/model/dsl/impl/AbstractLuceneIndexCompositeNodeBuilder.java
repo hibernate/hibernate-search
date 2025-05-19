@@ -5,7 +5,9 @@
 package org.hibernate.search.backend.lucene.document.model.dsl.impl;
 
 import java.util.LinkedHashMap;
+import java.util.LinkedHashSet;
 import java.util.Map;
+import java.util.Set;
 
 import org.hibernate.search.backend.lucene.document.model.impl.LuceneIndexCompositeNode;
 import org.hibernate.search.backend.lucene.document.model.impl.LuceneIndexField;
@@ -25,6 +27,7 @@ import org.hibernate.search.engine.backend.types.IndexFieldType;
 import org.hibernate.search.engine.backend.types.ObjectStructure;
 import org.hibernate.search.engine.common.tree.spi.TreeNodeInclusion;
 import org.hibernate.search.engine.search.predicate.definition.PredicateDefinition;
+import org.hibernate.search.engine.search.predicate.definition.TypedPredicateDefinition;
 import org.hibernate.search.engine.search.predicate.spi.PredicateTypeKeys;
 
 abstract class AbstractLuceneIndexCompositeNodeBuilder
@@ -35,7 +38,7 @@ abstract class AbstractLuceneIndexCompositeNodeBuilder
 	// Use a LinkedHashMap for deterministic iteration
 	private final Map<String, LuceneIndexNodeContributor> fields = new LinkedHashMap<>();
 	private final Map<String, LuceneIndexNodeContributor> templates = new LinkedHashMap<>();
-	private final Map<String, LuceneIndexNamedPredicateOptions> namedPredicates = new LinkedHashMap<>();
+	private final Set<String> namedPredicates = new LinkedHashSet<>();
 
 	protected AbstractLuceneIndexCompositeNodeBuilder(LuceneIndexCompositeNodeType.Builder typeBuilder) {
 		this.typeBuilder = typeBuilder;
@@ -73,14 +76,23 @@ abstract class AbstractLuceneIndexCompositeNodeBuilder
 	@Override
 	public IndexSchemaNamedPredicateOptionsStep addNamedPredicate(String name,
 			TreeNodeInclusion inclusion, PredicateDefinition definition) {
-		LuceneIndexNamedPredicateOptions options = new LuceneIndexNamedPredicateOptions(
-				inclusion, definition );
-		putNamedPredicate( name, options );
+		putNamedPredicate( name );
 		if ( TreeNodeInclusion.INCLUDED.equals( inclusion ) ) {
 			typeBuilder.queryElementFactory( PredicateTypeKeys.named( name ),
-					new LuceneNamedPredicate.Factory( options.definition, name ) );
+					new LuceneNamedPredicate.Factory( definition, name ) );
 		}
-		return options;
+		return new LuceneIndexNamedPredicateOptions<>( inclusion, definition );
+	}
+
+	@Override
+	public IndexSchemaNamedPredicateOptionsStep addNamedPredicate(String name,
+			TreeNodeInclusion inclusion, TypedPredicateDefinition<?> definition) {
+		putNamedPredicate( name );
+		if ( TreeNodeInclusion.INCLUDED.equals( inclusion ) ) {
+			typeBuilder.queryElementFactory( PredicateTypeKeys.named( name ),
+					new LuceneNamedPredicate.TypedFactory<>( definition, name ) );
+		}
+		return new LuceneIndexNamedPredicateOptions<>( inclusion, definition );
 	}
 
 	@Override
@@ -138,9 +150,8 @@ abstract class AbstractLuceneIndexCompositeNodeBuilder
 		}
 	}
 
-	private void putNamedPredicate(String name, LuceneIndexNamedPredicateOptions options) {
-		Object previous = namedPredicates.putIfAbsent( name, options );
-		if ( previous != null ) {
+	private void putNamedPredicate(String name) {
+		if ( !namedPredicates.add( name ) ) {
 			throw MappingLog.INSTANCE.indexSchemaNamedPredicateNameConflict( name, eventContext() );
 		}
 	}

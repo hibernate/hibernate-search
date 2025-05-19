@@ -52,7 +52,7 @@ public class StubFieldHighlightProjection<T, A> extends StubSearchProjection<T> 
 
 	public static class Factory extends AbstractStubSearchQueryElementFactory<HighlightProjectionBuilder> {
 		@Override
-		public HighlightProjectionBuilder create(StubSearchIndexScope scope,
+		public HighlightProjectionBuilder create(StubSearchIndexScope<?> scope,
 				StubSearchIndexNodeContext node) {
 			return new Builder( node.toValueField().absolutePath() );
 		}

@@ -222,16 +222,16 @@ public class MetamodelClassWriter {
 				? """
 							@Override
 							public org.hibernate.search.mapper.orm.scope.TypedSearchScope<%s, %s> scope(org.hibernate.search.mapper.orm.scope.SearchScopeProvider scopeProvider) {
-								return scopeProvider.scope( %s.class );
+								return scopeProvider.typedScope( %s.class, java.util.List.of( %s.class ) );
 							}
 						"""
 				: """
 							@Override
-							public org.hibernate.search.mapper.pojo.standalone.scope.SearchScope<%s, %s> scope(org.hibernate.search.mapper.pojo.standalone.scope.SearchScopeProvider scopeProvider) {
-								return scopeProvider.scope( %s.class );
+							public org.hibernate.search.mapper.pojo.standalone.scope.TypedSearchScope<%s, %s> scope(org.hibernate.search.mapper.pojo.standalone.scope.SearchScopeProvider scopeProvider) {
+								return scopeProvider.typedScope( %s.class, java.util.List.of( %s.class ) );
 							}
 						""",
-				metamodelClassName, entityName, entityName );
+				metamodelClassName, entityName, metamodelClassName, entityName );
 	}
 
 	private String indent() {

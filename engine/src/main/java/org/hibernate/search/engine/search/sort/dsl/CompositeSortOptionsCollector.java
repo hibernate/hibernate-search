@@ -6,7 +6,7 @@ package org.hibernate.search.engine.search.sort.dsl;
 
 import org.hibernate.search.engine.search.sort.SearchSort;
 
-public interface CompositeSortOptionsCollector<S extends CompositeSortOptionsCollector> {
+public interface CompositeSortOptionsCollector<S extends CompositeSortOptionsCollector<?>> {
 
 	/**
 	 * Add an element to the composite sort based on a previously-built {@link SearchSort}.

@@ -54,7 +54,7 @@ public class LuceneSearchQueryBuilder<H> implements SearchQueryBuilder<H>, Lucen
 	private final LuceneWorkFactory workFactory;
 	private final LuceneSyncWorkOrchestrator queryOrchestrator;
 
-	private final LuceneSearchQueryIndexScope<?> scope;
+	private final LuceneSearchQueryIndexScope<?, ?> scope;
 	private final BackendSessionContext sessionContext;
 	private final Set<String> routingKeys;
 
@@ -76,7 +76,7 @@ public class LuceneSearchQueryBuilder<H> implements SearchQueryBuilder<H>, Lucen
 	public LuceneSearchQueryBuilder(
 			LuceneWorkFactory workFactory,
 			LuceneSyncWorkOrchestrator queryOrchestrator,
-			LuceneSearchQueryIndexScope<?> scope,
+			LuceneSearchQueryIndexScope<?, ?> scope,
 			BackendSessionContext sessionContext,
 			SearchLoadingContextBuilder<?, ?> loadingContextBuilder,
 			LuceneSearchProjection<H> rootProjection) {

@@ -26,13 +26,13 @@ import org.hibernate.search.util.impl.integrationtest.common.stub.backend.search
 public class StubSearchQueryBuilder<H> implements SearchQueryBuilder<H> {
 
 	private final StubBackend backend;
-	private final StubSearchIndexScope scope;
+	private final StubSearchIndexScope<?> scope;
 	private final StubSearchWork.Builder workBuilder;
 	private final StubSearchProjectionContext projectionContext;
 	private final SearchLoadingContextBuilder<?, ?> loadingContextBuilder;
 	private final StubSearchProjection<H> rootProjection;
 
-	public StubSearchQueryBuilder(StubBackend backend, StubSearchIndexScope scope,
+	public StubSearchQueryBuilder(StubBackend backend, StubSearchIndexScope<?> scope,
 			BackendSessionContext sessionContext,
 			SearchLoadingContextBuilder<?, ?> loadingContextBuilder, StubSearchProjection<H> rootProjection) {
 		this.backend = backend;

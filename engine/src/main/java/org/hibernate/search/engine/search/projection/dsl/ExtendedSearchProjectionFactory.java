@@ -4,6 +4,8 @@
  */
 package org.hibernate.search.engine.search.projection.dsl;
 
+import org.hibernate.search.util.common.annotation.Incubating;
+
 /**
  * A base interface for subtypes of {@link TypedSearchProjectionFactory} allowing to
  * easily override the self type for all relevant methods.
@@ -19,5 +21,11 @@ public interface ExtendedSearchProjectionFactory<SR, S extends ExtendedSearchPro
 
 	@Override
 	S withRoot(String objectFieldPath);
+
+	/**
+	 * @throws org.hibernate.search.util.common.SearchException In case the current factory cannot be rescoped for the {@code scopeRootType}.
+	 */
+	@Incubating
+	<SR2> ExtendedSearchProjectionFactory<SR2, ?, R, E> withScopeRoot(Class<SR2> scopeRootType);
 
 }

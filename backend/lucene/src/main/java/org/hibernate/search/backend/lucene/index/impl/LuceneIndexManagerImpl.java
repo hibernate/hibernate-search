@@ -142,22 +142,22 @@ public class LuceneIndexManagerImpl
 	}
 
 	@Override
-	public IndexScopeBuilder createScopeBuilder(BackendMappingContext mappingContext) {
-		return new LuceneIndexScopeBuilder(
-				backendContext, mappingContext, this
+	public <SR> IndexScopeBuilder<SR> createScopeBuilder(BackendMappingContext mappingContext, Class<SR> rootScopeType) {
+		return new LuceneIndexScopeBuilder<>(
+				backendContext, mappingContext, rootScopeType, this
 		);
 	}
 
 	@Override
-	public void addTo(IndexScopeBuilder builder) {
-		if ( !( builder instanceof LuceneIndexScopeBuilder ) ) {
+	public void addTo(IndexScopeBuilder<?> builder) {
+		if ( builder instanceof LuceneIndexScopeBuilder<?> luceneBuilder ) {
+			luceneBuilder.add( backendContext, this );
+		}
+		else {
 			throw QueryLog.INSTANCE.cannotMixLuceneScopeWithOtherType(
 					builder, this, backendContext.getEventContext()
 			);
 		}
-
-		LuceneIndexScopeBuilder luceneBuilder = (LuceneIndexScopeBuilder) builder;
-		luceneBuilder.add( backendContext, this );
 	}
 
 	@Override

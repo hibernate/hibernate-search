@@ -35,11 +35,11 @@ public final class DefaultSearchQuerySelectStep<SR, R, E, LOS>
 				TypedSearchProjectionFactory<SR, R, E>,
 				TypedSearchPredicateFactory<SR>> {
 
-	private final SearchQueryIndexScope<?> scope;
+	private final SearchQueryIndexScope<SR, ?> scope;
 	private final BackendSessionContext sessionContext;
 	private final SearchLoadingContextBuilder<E, LOS> loadingContextBuilder;
 
-	public DefaultSearchQuerySelectStep(SearchQueryIndexScope<?> scope, BackendSessionContext sessionContext,
+	public DefaultSearchQuerySelectStep(SearchQueryIndexScope<SR, ?> scope, BackendSessionContext sessionContext,
 			SearchLoadingContextBuilder<E, LOS> loadingContextBuilder) {
 		this.scope = scope;
 		this.sessionContext = sessionContext;
@@ -48,7 +48,7 @@ public final class DefaultSearchQuerySelectStep<SR, R, E, LOS>
 
 	@Override
 	public DefaultSearchQueryOptionsStep<SR, E, LOS> selectEntity() {
-		return select( scope.<SR, R, E>projectionFactory().entity().toProjection() );
+		return select( scope.<R, E>projectionFactory().entity().toProjection() );
 	}
 
 	@Override
@@ -100,7 +100,7 @@ public final class DefaultSearchQuerySelectStep<SR, R, E, LOS>
 	}
 
 	@Override
-	protected SearchQueryIndexScope<?> scope() {
+	protected SearchQueryIndexScope<SR, ?> scope() {
 		return scope;
 	}
 
