@@ -5,7 +5,9 @@
 package org.hibernate.search.backend.elasticsearch.document.model.dsl.impl;
 
 import java.util.LinkedHashMap;
+import java.util.LinkedHashSet;
 import java.util.Map;
+import java.util.Set;
 
 import org.hibernate.search.backend.elasticsearch.document.model.impl.ElasticsearchIndexCompositeNode;
 import org.hibernate.search.backend.elasticsearch.document.model.impl.ElasticsearchIndexField;
@@ -26,6 +28,7 @@ import org.hibernate.search.engine.backend.types.IndexFieldType;
 import org.hibernate.search.engine.backend.types.ObjectStructure;
 import org.hibernate.search.engine.common.tree.spi.TreeNodeInclusion;
 import org.hibernate.search.engine.search.predicate.definition.PredicateDefinition;
+import org.hibernate.search.engine.search.predicate.definition.TypedPredicateDefinition;
 import org.hibernate.search.engine.search.predicate.spi.PredicateTypeKeys;
 
 public abstract class AbstractElasticsearchIndexCompositeNodeBuilder implements IndexCompositeNodeBuilder {
@@ -35,7 +38,7 @@ public abstract class AbstractElasticsearchIndexCompositeNodeBuilder implements 
 	// Use a LinkedHashMap for deterministic iteration
 	private final Map<String, ElasticsearchIndexNodeContributor> fields = new LinkedHashMap<>();
 	private final Map<String, ElasticsearchIndexNodeContributor> templates = new LinkedHashMap<>();
-	private final Map<String, ElasticsearchIndexNamedPredicateOptions> namedPredicates = new LinkedHashMap<>();
+	private final Set<String> namedPredicates = new LinkedHashSet<>();
 
 	protected AbstractElasticsearchIndexCompositeNodeBuilder(
 			ElasticsearchIndexCompositeNodeType.Builder typeBuilder) {
@@ -74,14 +77,23 @@ public abstract class AbstractElasticsearchIndexCompositeNodeBuilder implements 
 	@Override
 	public IndexSchemaNamedPredicateOptionsStep addNamedPredicate(String name, TreeNodeInclusion inclusion,
 			PredicateDefinition definition) {
-		ElasticsearchIndexNamedPredicateOptions options = new ElasticsearchIndexNamedPredicateOptions(
-				inclusion, definition );
-		putNamedPredicate( name, options );
+		putNamedPredicate( name );
 		if ( TreeNodeInclusion.INCLUDED.equals( inclusion ) ) {
 			typeBuilder.queryElementFactory( PredicateTypeKeys.named( name ),
-					new ElasticsearchNamedPredicate.Factory( options.definition, name ) );
+					new ElasticsearchNamedPredicate.Factory( definition, name ) );
 		}
-		return options;
+		return new ElasticsearchIndexNamedPredicateOptions<>( inclusion, definition );
+	}
+
+	@Override
+	public IndexSchemaNamedPredicateOptionsStep addNamedPredicate(String name,
+			TreeNodeInclusion inclusion, TypedPredicateDefinition<?> definition) {
+		putNamedPredicate( name );
+		if ( TreeNodeInclusion.INCLUDED.equals( inclusion ) ) {
+			typeBuilder.queryElementFactory( PredicateTypeKeys.named( name ),
+					new ElasticsearchNamedPredicate.TypedFactory<>( definition, name ) );
+		}
+		return new ElasticsearchIndexNamedPredicateOptions<>( inclusion, definition );
 	}
 
 	@Override
@@ -147,9 +159,8 @@ public abstract class AbstractElasticsearchIndexCompositeNodeBuilder implements 
 		}
 	}
 
-	private void putNamedPredicate(String name, ElasticsearchIndexNamedPredicateOptions options) {
-		Object previous = namedPredicates.putIfAbsent( name, options );
-		if ( previous != null ) {
+	private void putNamedPredicate(String name) {
+		if ( !namedPredicates.add( name ) ) {
 			throw MappingLog.INSTANCE.indexSchemaNamedPredicateNameConflict( name, eventContext() );
 		}
 	}

@@ -7,19 +7,18 @@ package org.hibernate.search.engine.search.predicate.definition;
 import java.util.Optional;
 
 import org.hibernate.search.engine.search.common.NamedValues;
-import org.hibernate.search.engine.search.common.NonStaticMetamodelScope;
 import org.hibernate.search.engine.search.predicate.dsl.NamedPredicateOptionsStep;
-import org.hibernate.search.engine.search.predicate.dsl.SearchPredicateFactory;
 import org.hibernate.search.engine.search.predicate.dsl.TypedSearchPredicateFactory;
 import org.hibernate.search.util.common.SearchException;
 import org.hibernate.search.util.common.annotation.Incubating;
 
 /**
- * The context passed to {@link PredicateDefinition#create(PredicateDefinitionContext)}.
- * @see PredicateDefinition#create(PredicateDefinitionContext)
+ * The context passed to {@link TypedPredicateDefinition#create(TypedPredicateDefinitionContext)}.
+ * @param <SR> Scope root type.
+ * @see TypedPredicateDefinition#create(TypedPredicateDefinitionContext)
  */
 @Incubating
-public interface PredicateDefinitionContext extends TypedPredicateDefinitionContext<NonStaticMetamodelScope> {
+public interface TypedPredicateDefinitionContext<SR> {
 
 	/**
 	 * @return A predicate factory.
@@ -29,7 +28,7 @@ public interface PredicateDefinitionContext extends TypedPredicateDefinitionCont
 	 * {@link PredicateDefinition#create(PredicateDefinitionContext)} returns.
 	 * @see TypedSearchPredicateFactory
 	 */
-	SearchPredicateFactory predicate();
+	TypedSearchPredicateFactory<SR> predicate();
 
 	/**
 	 * @param name The name of the parameter.

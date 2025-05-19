@@ -18,6 +18,7 @@ import org.hibernate.search.engine.backend.types.IndexFieldType;
 import org.hibernate.search.engine.backend.types.ObjectStructure;
 import org.hibernate.search.engine.common.tree.spi.TreeNodeInclusion;
 import org.hibernate.search.engine.search.predicate.definition.PredicateDefinition;
+import org.hibernate.search.engine.search.predicate.definition.TypedPredicateDefinition;
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.document.model.StubIndexSchemaDataNode;
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.document.model.impl.StubIndexCompositeNode;
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.document.model.impl.StubIndexField;
@@ -76,6 +77,18 @@ abstract class AbstractStubIndexCompositeNodeBuilder implements IndexCompositeNo
 	@Override
 	public IndexSchemaNamedPredicateOptionsStep addNamedPredicate(String relativeNamedPredicateName,
 			TreeNodeInclusion inclusion, PredicateDefinition definition) {
+		StubIndexSchemaDataNode.Builder childBuilder =
+				StubIndexSchemaDataNode.namedPredicate( schemaDataNodeBuilder, relativeNamedPredicateName )
+						.predicateDefinition( definition );
+		if ( TreeNodeInclusion.INCLUDED.equals( inclusion ) ) {
+			schemaDataNodeBuilder.child( childBuilder );
+		}
+		return new StubIndexNamedPredicateBuilder( childBuilder );
+	}
+
+	@Override
+	public IndexSchemaNamedPredicateOptionsStep addNamedPredicate(String relativeNamedPredicateName,
+			TreeNodeInclusion inclusion, TypedPredicateDefinition<?> definition) {
 		StubIndexSchemaDataNode.Builder childBuilder =
 				StubIndexSchemaDataNode.namedPredicate( schemaDataNodeBuilder, relativeNamedPredicateName )
 						.predicateDefinition( definition );

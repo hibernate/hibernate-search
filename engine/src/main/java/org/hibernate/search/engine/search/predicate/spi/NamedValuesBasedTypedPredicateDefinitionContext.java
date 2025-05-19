@@ -9,25 +9,25 @@ import java.util.function.Function;
 
 import org.hibernate.search.engine.search.common.NamedValues;
 import org.hibernate.search.engine.search.common.spi.MapNamedValues;
-import org.hibernate.search.engine.search.predicate.definition.PredicateDefinitionContext;
-import org.hibernate.search.engine.search.predicate.dsl.SearchPredicateFactory;
+import org.hibernate.search.engine.search.predicate.definition.TypedPredicateDefinitionContext;
+import org.hibernate.search.engine.search.predicate.dsl.TypedSearchPredicateFactory;
 import org.hibernate.search.util.common.SearchException;
 import org.hibernate.search.util.common.annotation.Incubating;
 
 @Incubating
-public final class NamedValuesBasedPredicateDefinitionContext implements PredicateDefinitionContext {
+public final class NamedValuesBasedTypedPredicateDefinitionContext<SR> implements TypedPredicateDefinitionContext<SR> {
 
-	private final SearchPredicateFactory factory;
+	private final TypedSearchPredicateFactory<SR> factory;
 	private final NamedValues parameters;
 
-	public NamedValuesBasedPredicateDefinitionContext(SearchPredicateFactory factory, Map<String, Object> params,
+	public NamedValuesBasedTypedPredicateDefinitionContext(TypedSearchPredicateFactory<SR> factory, Map<String, Object> params,
 			Function<String, SearchException> namedValueMissing) {
 		this.factory = factory;
 		this.parameters = MapNamedValues.fromMap( params, namedValueMissing );
 	}
 
 	@Override
-	public SearchPredicateFactory predicate() {
+	public TypedSearchPredicateFactory<SR> predicate() {
 		return factory;
 	}
 

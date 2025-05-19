@@ -22,6 +22,7 @@ import org.hibernate.search.engine.backend.types.Sortable;
 import org.hibernate.search.engine.backend.types.VectorSimilarity;
 import org.hibernate.search.engine.search.aggregation.AggregationKey;
 import org.hibernate.search.engine.search.predicate.SearchPredicate;
+import org.hibernate.search.engine.search.predicate.definition.PredicateDefinitionContext;
 import org.hibernate.search.engine.search.predicate.dsl.PredicateFinalStep;
 import org.hibernate.search.engine.search.query.SearchQuery;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.TckConfiguration;
@@ -261,7 +262,7 @@ class ElasticsearchKnnPredicateSpecificsIT {
 			nestedLocation = nested.field( "location", f -> f.asFloatVector().dimension( 2 ).projectable( Projectable.YES )
 					.m( 16 ).efConstruction( 100 ).vectorSimilarity( VectorSimilarity.L2 ) ).toReference();
 
-			root.namedPredicate( "knn-named", context -> {
+			root.namedPredicate( "knn-named", (PredicateDefinitionContext context) -> {
 				int k = context.params().get( "k", Integer.class );
 				float[] vector = context.params().get( "vector", float[].class );
 
@@ -270,7 +271,7 @@ class ElasticsearchKnnPredicateSpecificsIT {
 						.toPredicate();
 			} );
 
-			root.namedPredicate( "bool-knn-in-should-named", context -> {
+			root.namedPredicate( "bool-knn-in-should-named", (PredicateDefinitionContext context) -> {
 				SearchPredicate knn = context.params().get( "knn", SearchPredicate.class );
 
 				return context.predicate().bool().should( knn )

@@ -21,13 +21,13 @@ import org.hibernate.search.util.common.annotation.Incubating;
  *
  */
 @Incubating
-public interface PredicateDefinition {
+public interface TypedPredicateDefinition<SR> {
 
 	/**
 	 * Creates a predicate.
 	 * @param context The context, exposing in particular a {@link TypedSearchPredicateFactory}.
 	 * @return The created {@link SearchPredicate}.
 	 */
-	SearchPredicate create(PredicateDefinitionContext context);
+	SearchPredicate create(TypedPredicateDefinitionContext<SR> context);
 
 }

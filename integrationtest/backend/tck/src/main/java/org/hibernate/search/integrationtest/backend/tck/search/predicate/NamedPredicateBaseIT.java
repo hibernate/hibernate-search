@@ -245,7 +245,7 @@ class NamedPredicateBaseIT {
 		}
 
 		@Override
-		public SearchPredicate create(PredicateDefinitionContext<?> context) {
+		public SearchPredicate create(PredicateDefinitionContext context) {
 			String word1 = context.params().get( "value1", String.class );
 			String word2 = context.params().get( "value2", String.class );
 			TypedSearchPredicateFactory<?> f = context.predicate();

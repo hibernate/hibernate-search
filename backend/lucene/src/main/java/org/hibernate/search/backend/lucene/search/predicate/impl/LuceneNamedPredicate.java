@@ -11,12 +11,17 @@ import org.hibernate.search.backend.lucene.logging.impl.QueryLog;
 import org.hibernate.search.backend.lucene.search.common.impl.AbstractLuceneCompositeNodeSearchQueryElementFactory;
 import org.hibernate.search.backend.lucene.search.common.impl.LuceneSearchIndexCompositeNodeContext;
 import org.hibernate.search.backend.lucene.search.common.impl.LuceneSearchIndexScope;
+import org.hibernate.search.engine.search.common.NonStaticMetamodelScope;
 import org.hibernate.search.engine.search.common.spi.SearchQueryElementFactory;
 import org.hibernate.search.engine.search.predicate.SearchPredicate;
 import org.hibernate.search.engine.search.predicate.definition.PredicateDefinition;
+import org.hibernate.search.engine.search.predicate.definition.TypedPredicateDefinition;
+import org.hibernate.search.engine.search.predicate.dsl.SearchPredicateFactory;
 import org.hibernate.search.engine.search.predicate.dsl.TypedSearchPredicateFactory;
+import org.hibernate.search.engine.search.predicate.dsl.spi.SearchPredicateFactoryDelegate;
 import org.hibernate.search.engine.search.predicate.spi.NamedPredicateBuilder;
 import org.hibernate.search.engine.search.predicate.spi.NamedValuesBasedPredicateDefinitionContext;
+import org.hibernate.search.engine.search.predicate.spi.NamedValuesBasedTypedPredicateDefinitionContext;
 
 import org.apache.lucene.search.Query;
 
@@ -62,44 +67,129 @@ public class LuceneNamedPredicate extends AbstractLuceneSingleFieldPredicate {
 		@Override
 		public NamedPredicateBuilder create(LuceneSearchIndexScope<?> scope,
 				LuceneSearchIndexCompositeNodeContext node) {
-			return new Builder( definition, predicateName, scope, node );
+			return new BasicBuilder( definition, predicateName, scope, node );
 		}
 	}
 
-	private static class Builder extends AbstractBuilder implements NamedPredicateBuilder {
-		private final PredicateDefinition definition;
+	public static class TypedFactory<SR>
+			extends AbstractLuceneCompositeNodeSearchQueryElementFactory<NamedPredicateBuilder> {
+		private final TypedPredicateDefinition<SR> definition;
 		private final String predicateName;
-		private final LuceneSearchIndexCompositeNodeContext field;
-		private TypedSearchPredicateFactory<?> factory;
-		private final Map<String, Object> params = new LinkedHashMap<>();
 
-		Builder(PredicateDefinition definition, String predicateName, LuceneSearchIndexScope<?> scope,
-				LuceneSearchIndexCompositeNodeContext node) {
-			super( scope, node );
+		public TypedFactory(TypedPredicateDefinition<SR> definition, String predicateName) {
 			this.definition = definition;
+			this.predicateName = predicateName;
+		}
+
+		@Override
+		public void checkCompatibleWith(SearchQueryElementFactory<?, ?, ?> other) {
+			super.checkCompatibleWith( other );
+			Factory castedOther = (Factory) other;
+			if ( !definition.equals( castedOther.definition ) ) {
+				throw QueryLog.INSTANCE.differentPredicateDefinitionForQueryElement( definition, castedOther.definition );
+			}
+		}
+
+		@Override
+		public NamedPredicateBuilder create(LuceneSearchIndexScope<?> scope,
+				LuceneSearchIndexCompositeNodeContext node) {
+			return new TypedBuilder<>( definition, predicateName, scope, node );
+		}
+	}
+
+	private abstract static class Builder extends AbstractBuilder implements NamedPredicateBuilder {
+		protected final String predicateName;
+		protected final LuceneSearchIndexCompositeNodeContext field;
+		protected final Map<String, Object> params = new LinkedHashMap<>();
+
+		Builder(String predicateName, LuceneSearchIndexScope<?> scope, LuceneSearchIndexCompositeNodeContext node) {
+			super( scope, node );
 			this.predicateName = predicateName;
 			this.field = node;
 		}
 
 		@Override
-		public void factory(TypedSearchPredicateFactory<?> factory) {
-			this.factory = factory;
-		}
-
-		@Override
-		public void param(String name, Object value) {
+		public final void param(String name, Object value) {
 			params.put( name, value );
 		}
 
+		protected abstract LuceneSearchPredicate providedPredicate();
+
 		@Override
-		public SearchPredicate build() {
-			NamedValuesBasedPredicateDefinitionContext<?> ctx =
-					new NamedValuesBasedPredicateDefinitionContext<>( factory, params,
+		public final SearchPredicate build() {
+			return new LuceneNamedPredicate( this, providedPredicate() );
+		}
+	}
+
+	private static class BasicBuilder extends Builder {
+		private final PredicateDefinition definition;
+		private SearchPredicateFactory factory;
+
+		BasicBuilder(PredicateDefinition definition, String predicateName, LuceneSearchIndexScope<?> scope,
+				LuceneSearchIndexCompositeNodeContext node) {
+			super( predicateName, scope, node );
+			this.definition = definition;
+		}
+
+		@SuppressWarnings("unchecked")
+		@Override
+		public void factory(TypedSearchPredicateFactory<?> factory) {
+			if ( isCompatible( factory ) ) {
+				this.factory =
+						new SearchPredicateFactoryDelegate( (TypedSearchPredicateFactory<NonStaticMetamodelScope>) factory );
+			}
+			else {
+				throw new IllegalArgumentException( "Current search predicate factory is incompatible with this \""
+						+ predicateName + "\" name predicate." );
+			}
+		}
+
+		private boolean isCompatible(TypedSearchPredicateFactory<?> factory) {
+			return true;
+		}
+
+		@Override
+		protected LuceneSearchPredicate providedPredicate() {
+			NamedValuesBasedPredicateDefinitionContext ctx =
+					new NamedValuesBasedPredicateDefinitionContext( factory, params,
 							name -> QueryLog.INSTANCE.paramNotDefined( name, predicateName, field.eventContext() ) );
 
-			LuceneSearchPredicate providedPredicate = LuceneSearchPredicate.from( scope, definition.create( ctx ) );
+			return LuceneSearchPredicate.from( scope, definition.create( ctx ) );
+		}
+	}
 
-			return new LuceneNamedPredicate( this, providedPredicate );
+	private static class TypedBuilder<SR> extends Builder {
+		private final TypedPredicateDefinition<SR> definition;
+		private TypedSearchPredicateFactory<SR> factory;
+
+		TypedBuilder(TypedPredicateDefinition<SR> definition, String predicateName, LuceneSearchIndexScope<?> scope,
+				LuceneSearchIndexCompositeNodeContext node) {
+			super( predicateName, scope, node );
+			this.definition = definition;
+		}
+
+		@SuppressWarnings("unchecked")
+		@Override
+		public void factory(TypedSearchPredicateFactory<?> factory) {
+			if ( isCompatible( factory ) ) {
+				this.factory = (TypedSearchPredicateFactory<SR>) factory;
+			}
+			else {
+				throw new IllegalArgumentException( "Current search predicate factory is incompatible with this \""
+						+ predicateName + "\" name predicate." );
+			}
+		}
+
+		private boolean isCompatible(TypedSearchPredicateFactory<?> factory) {
+			return true;
+		}
+
+		@Override
+		protected LuceneSearchPredicate providedPredicate() {
+			var ctx = new NamedValuesBasedTypedPredicateDefinitionContext<>( factory, params,
+					name -> QueryLog.INSTANCE.paramNotDefined( name, predicateName, field.eventContext() ) );
+
+			return LuceneSearchPredicate.from( scope, definition.create( ctx ) );
 		}
 	}
 }
