@@ -96,11 +96,6 @@
                                             <artifact>jakarta.persistence:jakarta.persistence-api</artifact>
                                             <failOnNotFound>true</failOnNotFound>
                                         </item>
-                                        <item>
-                                            <property>${version.org.hibernate.models}</property>
-                                            <artifact>org.hibernate.models:hibernate-models</artifact>
-                                            <failOnNotFound>true</failOnNotFound>
-                                        </item>
                                     </propertiesToCheck>
                                 </versionAlignRule>
                             </rules>
@@ -232,7 +227,6 @@
                                     This would mean that a corresponding pattern will only be applied to filtering of internal/public rules.
                                     If no prefix is specified then rule is considered to be both public and internal at the same time.
                                 -->
-                                <argument>^org\.hibernate\.Timeouts$</argument>
 
                                 <argument>^org\.hibernate\.query\.Query$</argument>
                                 <argument>^org\.hibernate\.query\.SelectionQuery$</argument>
@@ -245,6 +239,7 @@
                                 <argument>^org\.hibernate\.metamodel\.mapping\.SelectableMapping$</argument>
                                 <argument>^org\.hibernate\.metamodel\.mapping\.SelectablePath$</argument>
                                 <argument>^org\.hibernate\.metamodel\.model\.domain\.JpaMetamodel$</argument>
+                                <argument>^org\.hibernate\.metamodel\.model\.domain\.NavigableRole$</argument>
 
                                 <argument>^org\.hibernate\.boot\.spi\.BootstrapContext\b.*+$</argument>
                                 <argument>^org\.hibernate\.boot\.spi\.AdditionalMappingContributor$</argument>
