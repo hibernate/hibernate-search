@@ -38,11 +38,11 @@ public class ElasticsearchSearchQuerySelectStepImpl<SR, R, E, LOS>
 				ElasticsearchSearchPredicateFactory<SR>>
 		implements ElasticsearchSearchQuerySelectStep<SR, R, E, LOS> {
 
-	private final ElasticsearchSearchQueryIndexScope<?> scope;
+	private final ElasticsearchSearchQueryIndexScope<SR, ?> scope;
 	private final BackendSessionContext sessionContext;
 	private final SearchLoadingContextBuilder<E, LOS> loadingContextBuilder;
 
-	public ElasticsearchSearchQuerySelectStepImpl(ElasticsearchSearchQueryIndexScope<?> scope,
+	public ElasticsearchSearchQuerySelectStepImpl(ElasticsearchSearchQueryIndexScope<SR, ?> scope,
 			BackendSessionContext sessionContext,
 			SearchLoadingContextBuilder<E, LOS> loadingContextBuilder) {
 		this.scope = scope;
@@ -52,7 +52,7 @@ public class ElasticsearchSearchQuerySelectStepImpl<SR, R, E, LOS>
 
 	@Override
 	public ElasticsearchSearchQueryWhereStep<SR, E, LOS> selectEntity() {
-		return select( scope.<SR, R, E>projectionFactory().entity().toProjection() );
+		return select( scope.<R, E>projectionFactory().entity().toProjection() );
 	}
 
 	@Override
@@ -106,7 +106,7 @@ public class ElasticsearchSearchQuerySelectStepImpl<SR, R, E, LOS>
 	}
 
 	@Override
-	protected SearchQueryIndexScope<?> scope() {
+	protected SearchQueryIndexScope<SR, ?> scope() {
 		return scope;
 	}
 

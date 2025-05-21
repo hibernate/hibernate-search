@@ -39,9 +39,10 @@ import org.hibernate.search.util.impl.integrationtest.common.stub.backend.search
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.search.sort.dsl.impl.StubSearchSortFactory;
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.search.sort.impl.StubSearchSortBuilderFactory;
 
-public class StubSearchIndexScope
+public class StubSearchIndexScope<SR>
 		extends AbstractSearchIndexScope<
-				StubSearchIndexScope,
+				SR,
+				StubSearchIndexScope<SR>,
 				StubIndexModel,
 				StubSearchIndexNodeContext,
 				StubSearchIndexCompositeNodeContext> {
@@ -51,9 +52,9 @@ public class StubSearchIndexScope
 	private final StubSearchProjectionBuilderFactory projectionFactory;
 	private final StubSearchAggregationBuilderFactory aggregationFactory;
 
-	public StubSearchIndexScope(BackendMappingContext mappingContext, StubBackend backend,
+	public StubSearchIndexScope(BackendMappingContext mappingContext, Class<SR> rootScopeType, StubBackend backend,
 			Set<StubIndexModel> indexModels) {
-		super( mappingContext, indexModels );
+		super( mappingContext, rootScopeType, indexModels );
 		this.backend = backend;
 		this.predicateFactory = new StubSearchPredicateBuilderFactory();
 		this.sortFactory = new StubSearchSortBuilderFactory();
@@ -61,7 +62,7 @@ public class StubSearchIndexScope
 		this.aggregationFactory = new StubSearchAggregationBuilderFactory();
 	}
 
-	private StubSearchIndexScope(StubSearchIndexScope parentScope, StubSearchIndexCompositeNodeContext overriddenRoot) {
+	private StubSearchIndexScope(StubSearchIndexScope<SR> parentScope, StubSearchIndexCompositeNodeContext overriddenRoot) {
 		super( parentScope, overriddenRoot );
 		this.backend = parentScope.backend;
 		this.predicateFactory = new StubSearchPredicateBuilderFactory();
@@ -71,13 +72,13 @@ public class StubSearchIndexScope
 	}
 
 	@Override
-	protected StubSearchIndexScope self() {
+	protected StubSearchIndexScope<SR> self() {
 		return this;
 	}
 
 	@Override
-	public StubSearchIndexScope withRoot(String objectFieldPath) {
-		return new StubSearchIndexScope( this, field( objectFieldPath ).toComposite() );
+	public StubSearchIndexScope<SR> withRoot(String objectFieldPath) {
+		return new StubSearchIndexScope<>( this, field( objectFieldPath ).toComposite() );
 	}
 
 	@Override
@@ -108,22 +109,22 @@ public class StubSearchIndexScope
 	}
 
 	@Override
-	public <SR> TypedSearchPredicateFactory<SR> predicateFactory() {
-		return new StubSearchPredicateFactory<>( SearchPredicateDslContext.root( this ) );
+	public TypedSearchPredicateFactory<SR> predicateFactory() {
+		return new StubSearchPredicateFactory<>( rootScopeType, SearchPredicateDslContext.root( this ) );
 	}
 
 	@Override
-	public <SR> TypedSearchSortFactory<SR> sortFactory() {
+	public TypedSearchSortFactory<SR> sortFactory() {
 		return new StubSearchSortFactory<>( SearchSortDslContext.root( this, StubSearchSortFactory::new, predicateFactory() ) );
 	}
 
 	@Override
-	public <SR, R, E> TypedSearchProjectionFactory<SR, R, E> projectionFactory() {
+	public <R, E> TypedSearchProjectionFactory<SR, R, E> projectionFactory() {
 		return new StubSearchProjectionFactory<>( SearchProjectionDslContext.root( this ) );
 	}
 
 	@Override
-	public <SR> TypedSearchAggregationFactory<SR> aggregationFactory() {
+	public TypedSearchAggregationFactory<SR> aggregationFactory() {
 		return new StubSearchAggregationFactory<>( SearchAggregationDslContext.root( this, predicateFactory() ) );
 	}
 

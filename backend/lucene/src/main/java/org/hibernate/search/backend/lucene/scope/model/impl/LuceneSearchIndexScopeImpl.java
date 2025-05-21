@@ -54,14 +54,15 @@ import org.hibernate.search.engine.search.timeout.spi.TimeoutManager;
 
 import org.apache.lucene.search.Query;
 
-public final class LuceneSearchIndexScopeImpl
+public final class LuceneSearchIndexScopeImpl<SR>
 		extends AbstractSearchIndexScope<
-				LuceneSearchIndexScopeImpl,
+				SR,
+				LuceneSearchIndexScopeImpl<SR>,
 				LuceneIndexModel,
 				LuceneSearchIndexNodeContext,
 				LuceneSearchIndexCompositeNodeContext>
-		implements LuceneSearchIndexScope<LuceneSearchIndexScopeImpl>,
-		LuceneSearchQueryIndexScope<LuceneSearchIndexScopeImpl> {
+		implements LuceneSearchIndexScope<LuceneSearchIndexScopeImpl<SR>>,
+		LuceneSearchQueryIndexScope<SR, LuceneSearchIndexScopeImpl<SR>> {
 
 	// Backend context
 	private final SearchBackendContext backendContext;
@@ -81,12 +82,13 @@ public final class LuceneSearchIndexScopeImpl
 	private final LuceneSearchAggregationBuilderFactory aggregationBuilderFactory;
 
 	public LuceneSearchIndexScopeImpl(BackendMappingContext mappingContext,
+			Class<SR> rootScopeType,
 			SearchBackendContext backendContext,
 			LuceneAnalysisDefinitionRegistry analysisDefinitionRegistry,
 			MultiTenancyStrategy multiTenancyStrategy,
 			TimingSource timingSource,
 			Set<? extends LuceneScopeIndexManagerContext> indexManagerContexts) {
-		super( mappingContext, toModels( indexManagerContexts ) );
+		super( mappingContext, rootScopeType, toModels( indexManagerContexts ) );
 		this.backendContext = backendContext;
 		this.analysisDefinitionRegistry = analysisDefinitionRegistry;
 		this.multiTenancyStrategy = multiTenancyStrategy;
@@ -103,7 +105,7 @@ public final class LuceneSearchIndexScopeImpl
 		this.aggregationBuilderFactory = new LuceneSearchAggregationBuilderFactory( this );
 	}
 
-	private LuceneSearchIndexScopeImpl(LuceneSearchIndexScopeImpl parentScope,
+	private LuceneSearchIndexScopeImpl(LuceneSearchIndexScopeImpl<SR> parentScope,
 			LuceneSearchIndexCompositeNodeContext overriddenRoot) {
 		super( parentScope, overriddenRoot );
 		this.backendContext = parentScope.backendContext;
@@ -125,13 +127,13 @@ public final class LuceneSearchIndexScopeImpl
 	}
 
 	@Override
-	protected LuceneSearchIndexScopeImpl self() {
+	protected LuceneSearchIndexScopeImpl<SR> self() {
 		return this;
 	}
 
 	@Override
-	public LuceneSearchIndexScopeImpl withRoot(String objectFieldPath) {
-		return new LuceneSearchIndexScopeImpl( this, field( objectFieldPath ).toComposite() );
+	public LuceneSearchIndexScopeImpl<SR> withRoot(String objectFieldPath) {
+		return new LuceneSearchIndexScopeImpl<>( this, field( objectFieldPath ).toComposite() );
 	}
 
 	@Override
@@ -162,23 +164,23 @@ public final class LuceneSearchIndexScopeImpl
 	}
 
 	@Override
-	public <SR> LuceneSearchPredicateFactory<SR> predicateFactory() {
-		return new LuceneSearchPredicateFactoryImpl<>( SearchPredicateDslContext.root( this ) );
+	public LuceneSearchPredicateFactory<SR> predicateFactory() {
+		return new LuceneSearchPredicateFactoryImpl<>( rootScopeType, SearchPredicateDslContext.root( this ) );
 	}
 
 	@Override
-	public <SR> LuceneSearchSortFactory<SR> sortFactory() {
+	public LuceneSearchSortFactory<SR> sortFactory() {
 		return new LuceneSearchSortFactoryImpl<>( SearchSortDslContext
 				.root( this, LuceneSearchSortFactoryImpl::new, predicateFactory() ) );
 	}
 
 	@Override
-	public <SR, R, E> LuceneSearchProjectionFactory<SR, R, E> projectionFactory() {
+	public <R, E> LuceneSearchProjectionFactory<SR, R, E> projectionFactory() {
 		return new LuceneSearchProjectionFactoryImpl<>( SearchProjectionDslContext.root( this ) );
 	}
 
 	@Override
-	public <SR> LuceneSearchAggregationFactory<SR> aggregationFactory() {
+	public LuceneSearchAggregationFactory<SR> aggregationFactory() {
 		return new LuceneSearchAggregationFactoryImpl<>( SearchAggregationDslContext.root( this, predicateFactory() ) );
 	}
 

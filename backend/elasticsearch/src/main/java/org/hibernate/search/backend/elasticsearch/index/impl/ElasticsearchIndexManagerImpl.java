@@ -195,9 +195,9 @@ class ElasticsearchIndexManagerImpl
 	}
 
 	@Override
-	public IndexScopeBuilder createScopeBuilder(BackendMappingContext mappingContext) {
-		return new ElasticsearchIndexScopeBuilder(
-				backendContext, mappingContext, this
+	public <SR> IndexScopeBuilder<SR> createScopeBuilder(BackendMappingContext mappingContext, Class<SR> rootScopeType) {
+		return new ElasticsearchIndexScopeBuilder<>(
+				backendContext, mappingContext, rootScopeType, this
 		);
 	}
 

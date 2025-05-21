@@ -114,9 +114,9 @@ public class StubIndexManager implements IndexManagerImplementor, IndexManager {
 	}
 
 	@Override
-	public IndexScopeBuilder createScopeBuilder(BackendMappingContext mappingContext) {
+	public <SR> IndexScopeBuilder<SR> createScopeBuilder(BackendMappingContext mappingContext, Class<SR> rootScopeType) {
 		checkStarted();
-		return new StubIndexScope.Builder( backend, mappingContext, model );
+		return new StubIndexScope.Builder<>( backend, mappingContext, rootScopeType, model );
 	}
 
 	@Override

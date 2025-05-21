@@ -18,15 +18,16 @@ import org.hibernate.search.engine.backend.scope.spi.IndexScope;
 
 import org.apache.lucene.index.IndexReader;
 
-public class LuceneIndexScopeImpl
-		implements IndexScope, LuceneIndexScope {
+public class LuceneIndexScopeImpl<SR>
+		implements IndexScope<SR>, LuceneIndexScope {
 
-	private final LuceneSearchQueryIndexScope<?> searchScope;
+	private final LuceneSearchQueryIndexScope<SR, ?> searchScope;
 
 	public LuceneIndexScopeImpl(SearchBackendContext backendContext,
 			BackendMappingContext mappingContext,
+			Class<SR> rootScopeType,
 			Set<? extends LuceneScopeIndexManagerContext> indexManagerContexts) {
-		this.searchScope = backendContext.createSearchContext( mappingContext, indexManagerContexts );
+		this.searchScope = backendContext.createSearchContext( mappingContext, rootScopeType, indexManagerContexts );
 	}
 
 	@Override
@@ -35,7 +36,7 @@ public class LuceneIndexScopeImpl
 	}
 
 	@Override
-	public LuceneSearchQueryIndexScope<?> searchScope() {
+	public LuceneSearchQueryIndexScope<SR, ?> searchScope() {
 		return searchScope;
 	}
 

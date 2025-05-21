@@ -86,7 +86,7 @@ public interface IndexManagerImplementor {
 
 	IndexWorkspace createWorkspace(BackendMappingContext mappingContext, Set<String> tenantId);
 
-	IndexScopeBuilder createScopeBuilder(BackendMappingContext mappingContext);
+	<SR> IndexScopeBuilder<SR> createScopeBuilder(BackendMappingContext mappingContext, Class<SR> rootScopeType);
 
 	void addTo(IndexScopeBuilder builder);
 

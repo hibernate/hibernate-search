@@ -24,7 +24,7 @@ final class DefaultSearchQueryOptionsStep<SR, H, LOS>
 				TypedSearchPredicateFactory<SR>,
 				TypedSearchSortFactory<SR>,
 				TypedSearchAggregationFactory<SR>,
-				SearchQueryIndexScope<?>>
+				SearchQueryIndexScope<SR, ?>>
 		implements SearchQueryWhereStep<SR, DefaultSearchQueryOptionsStep<SR, H, LOS>, H, LOS, TypedSearchPredicateFactory<SR>>,
 		SearchQueryOptionsStep<SR,
 				DefaultSearchQueryOptionsStep<SR, H, LOS>,
@@ -33,7 +33,7 @@ final class DefaultSearchQueryOptionsStep<SR, H, LOS>
 				TypedSearchSortFactory<SR>,
 				TypedSearchAggregationFactory<SR>> {
 
-	DefaultSearchQueryOptionsStep(SearchQueryIndexScope<?> scope, SearchQueryBuilder<H> searchQueryBuilder,
+	DefaultSearchQueryOptionsStep(SearchQueryIndexScope<SR, ?> scope, SearchQueryBuilder<H> searchQueryBuilder,
 			SearchLoadingContextBuilder<?, LOS> loadingContextBuilder) {
 		super( scope, searchQueryBuilder, loadingContextBuilder );
 	}

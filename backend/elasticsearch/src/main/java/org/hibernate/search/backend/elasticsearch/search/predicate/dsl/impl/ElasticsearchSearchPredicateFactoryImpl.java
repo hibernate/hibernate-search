@@ -21,13 +21,14 @@ public class ElasticsearchSearchPredicateFactoryImpl<SR>
 		implements ElasticsearchSearchPredicateFactory<SR> {
 
 	public ElasticsearchSearchPredicateFactoryImpl(
+			Class<SR> scopeRootType,
 			SearchPredicateDslContext<ElasticsearchSearchPredicateIndexScope<?>> dslContext) {
-		super( dslContext );
+		super( scopeRootType, dslContext );
 	}
 
 	@Override
 	public ElasticsearchSearchPredicateFactory<SR> withRoot(String objectFieldPath) {
-		return new ElasticsearchSearchPredicateFactoryImpl<>( dslContext.rescope(
+		return new ElasticsearchSearchPredicateFactoryImpl<>( scopeRootType, dslContext.rescope(
 				dslContext.scope().withRoot( objectFieldPath ) ) );
 	}
 

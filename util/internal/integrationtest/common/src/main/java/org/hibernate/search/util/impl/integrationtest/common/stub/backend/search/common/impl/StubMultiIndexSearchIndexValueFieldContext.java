@@ -12,7 +12,7 @@ import org.hibernate.search.engine.search.common.spi.SearchIndexSchemaElementCon
 public class StubMultiIndexSearchIndexValueFieldContext<F>
 		extends AbstractMultiIndexSearchIndexValueFieldContext<
 				StubSearchIndexValueFieldContext<F>,
-				StubSearchIndexScope,
+				StubSearchIndexScope<?>,
 				StubSearchIndexValueFieldTypeContext<F>,
 				F>
 		implements StubSearchIndexValueFieldContext<F>, StubSearchIndexValueFieldTypeContext<F> {

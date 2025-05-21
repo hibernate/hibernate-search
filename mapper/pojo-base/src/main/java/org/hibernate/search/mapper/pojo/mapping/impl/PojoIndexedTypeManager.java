@@ -129,8 +129,9 @@ public class PojoIndexedTypeManager<I, E> extends AbstractPojoTypeManager<I, E>
 	}
 
 	@Override
-	public <SR, R, E2> MappedIndexScopeBuilder<SR, R, E2> createScopeBuilder(BackendMappingContext mappingContext) {
-		return indexManager.createScopeBuilder( mappingContext );
+	public <SR, R, E2> MappedIndexScopeBuilder<SR, R, E2> createScopeBuilder(BackendMappingContext mappingContext,
+			Class<SR> rootScope) {
+		return indexManager.createScopeBuilder( mappingContext, rootScope );
 	}
 
 	@Override

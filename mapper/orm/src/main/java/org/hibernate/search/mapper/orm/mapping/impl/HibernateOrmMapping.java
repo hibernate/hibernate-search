@@ -26,6 +26,7 @@ import org.hibernate.search.engine.environment.bean.BeanHolder;
 import org.hibernate.search.engine.mapper.mapping.spi.MappingImplementor;
 import org.hibernate.search.engine.mapper.mapping.spi.MappingPreStopContext;
 import org.hibernate.search.engine.mapper.mapping.spi.MappingStartContext;
+import org.hibernate.search.engine.search.common.NonStaticMetamodelScope;
 import org.hibernate.search.mapper.orm.automaticindexing.impl.AutomaticIndexingQueueEventProcessingPlanImpl;
 import org.hibernate.search.mapper.orm.automaticindexing.spi.AutomaticIndexingMappingContext;
 import org.hibernate.search.mapper.orm.automaticindexing.spi.AutomaticIndexingQueueEventProcessingPlan;
@@ -183,12 +184,12 @@ public class HibernateOrmMapping extends AbstractPojoMappingImplementor<Hibernat
 				this
 		);
 
-		Optional<TypedSearchScopeImpl<Object, Object>> scopeOptional = createAllScope();
+		Optional<TypedSearchScopeImpl<?, Object>> scopeOptional = createAllScope();
 		if ( !scopeOptional.isPresent() ) {
 			// No indexed type
 			return CompletableFuture.completedFuture( null );
 		}
-		TypedSearchScopeImpl<Object, Object> scope = scopeOptional.get();
+		TypedSearchScopeImpl<?, Object> scope = scopeOptional.get();
 
 		this.tenancyConfiguration =
 				TenancyConfiguration.create( context.beanResolver(), delegate().tenancyMode(),
@@ -204,7 +205,7 @@ public class HibernateOrmMapping extends AbstractPojoMappingImplementor<Hibernat
 
 	@Override
 	public CompletableFuture<?> preStop(MappingPreStopContext context) {
-		Optional<TypedSearchScopeImpl<Object, Object>> scope = createAllScope();
+		Optional<TypedSearchScopeImpl<?, Object>> scope = createAllScope();
 		if ( !scope.isPresent() ) {
 			// No indexed type
 			return CompletableFuture.completedFuture( null );
@@ -241,17 +242,17 @@ public class HibernateOrmMapping extends AbstractPojoMappingImplementor<Hibernat
 
 	@Override
 	public <T> SearchScopeDelegate<T> scope(Collection<? extends Class<? extends T>> classes) {
-		return new SearchScopeDelegate<>( createScope( classes ) );
+		return new SearchScopeDelegate<>( createScope( NonStaticMetamodelScope.class, classes ) );
 	}
 
 	@Override
 	public <T> SearchScopeDelegate<T> scope(Class<T> expectedSuperType, Collection<String> entityNames) {
-		return new SearchScopeDelegate<>( createScope( expectedSuperType, entityNames ) );
+		return new SearchScopeDelegate<>( createScope( NonStaticMetamodelScope.class, expectedSuperType, entityNames ) );
 	}
 
 	@Override
 	public <SR, T> TypedSearchScope<SR, T> typedScope(Class<SR> rootScope, Collection<? extends Class<? extends T>> classes) {
-		return createScope( classes );
+		return createScope( rootScope, classes );
 	}
 
 	@Override
@@ -419,13 +420,15 @@ public class HibernateOrmMapping extends AbstractPojoMappingImplementor<Hibernat
 	}
 
 	@Override
-	public <SR, T> TypedSearchScopeImpl<SR, T> createScope(Collection<? extends Class<? extends T>> classes) {
+	public <SR, T> TypedSearchScopeImpl<SR, T> createScope(Class<SR> rootScope,
+			Collection<? extends Class<? extends T>> classes) {
 		PojoScopeDelegate<SR,
 				EntityReference,
 				T,
 				SearchIndexedEntity<? extends T>> scopeDelegate =
 						delegate().createPojoScopeForClasses(
 								this,
+								rootScope,
 								classes,
 								typeContextContainer::indexedForExactType
 						);
@@ -435,13 +438,15 @@ public class HibernateOrmMapping extends AbstractPojoMappingImplementor<Hibernat
 	}
 
 	@Override
-	public <SR, T> TypedSearchScopeImpl<SR, T> createScope(Class<T> expectedSuperType, Collection<String> entityNames) {
+	public <SR, T> TypedSearchScopeImpl<SR, T> createScope(Class<SR> rootScope, Class<T> expectedSuperType,
+			Collection<String> entityNames) {
 		PojoScopeDelegate<SR,
 				EntityReference,
 				T,
 				SearchIndexedEntity<? extends T>> scopeDelegate =
 						delegate().createPojoScopeForEntityNames(
 								this,
+								rootScope,
 								expectedSuperType, entityNames,
 								typeContextContainer::indexedForExactType
 						);
@@ -472,10 +477,11 @@ public class HibernateOrmMapping extends AbstractPojoMappingImplementor<Hibernat
 		return integrationHandle.getOrFail();
 	}
 
-	private Optional<TypedSearchScopeImpl<Object, Object>> createAllScope() {
-		return delegate().<Object, org.hibernate.search.mapper.orm.common.EntityReference,
+	private Optional<TypedSearchScopeImpl<?, Object>> createAllScope() {
+		return delegate().<NonStaticMetamodelScope, EntityReference,
 				SearchIndexedEntity<?>>createPojoAllScope(
 						this,
+						NonStaticMetamodelScope.class,
 						typeContextContainer::indexedForExactType
 				)
 				.map( scopeDelegate -> new TypedSearchScopeImpl<>( this, tenancyConfiguration, scopeDelegate ) );

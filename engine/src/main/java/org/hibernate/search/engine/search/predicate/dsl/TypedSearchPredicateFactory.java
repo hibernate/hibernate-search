@@ -392,4 +392,11 @@ public interface TypedSearchPredicateFactory<SR> {
 	@Incubating
 	String toAbsolutePath(String relativeFieldPath);
 
+	/**
+	 * @param scopeRootType The scope root type to test.
+	 * @return Whether the scope root type is compatible with the current predicate factory.
+	 */
+	@Incubating
+	boolean isCompatibleWithScopeRootType(Class<?> scopeRootType);
+
 }

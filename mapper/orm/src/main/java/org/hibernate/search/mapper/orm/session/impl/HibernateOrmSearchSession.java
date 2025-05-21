@@ -192,18 +192,19 @@ public class HibernateOrmSearchSession extends AbstractPojoSearchSession
 	@Override
 	public <T> SearchScopeDelegate<T> scope(Collection<? extends Class<? extends T>> classes) {
 		checkOpen();
-		return new SearchScopeDelegate<>( mappingContext.createScope( classes ) );
+		return new SearchScopeDelegate<>( mappingContext.createScope( NonStaticMetamodelScope.class, classes ) );
 	}
 
 	@Override
 	public <T> SearchScopeDelegate<T> scope(Class<T> expectedSuperType, Collection<String> entityNames) {
 		checkOpen();
-		return new SearchScopeDelegate<>( mappingContext.createScope( expectedSuperType, entityNames ) );
+		return new SearchScopeDelegate<>(
+				mappingContext.createScope( NonStaticMetamodelScope.class, expectedSuperType, entityNames ) );
 	}
 
 	@Override
 	public <SR, T> TypedSearchScope<SR, T> typedScope(Class<SR> rootScope, Collection<? extends Class<? extends T>> classes) {
-		return mappingContext.createScope( classes );
+		return mappingContext.createScope( rootScope, classes );
 	}
 
 	@Override

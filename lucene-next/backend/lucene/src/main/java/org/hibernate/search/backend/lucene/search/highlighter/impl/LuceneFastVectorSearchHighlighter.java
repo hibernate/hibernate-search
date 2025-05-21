@@ -146,7 +146,7 @@ class LuceneFastVectorSearchHighlighter extends LuceneAbstractSearchHighlighter 
 		private BoundaryScanner boundaryScanner() {
 			switch ( LuceneFastVectorSearchHighlighter.this.boundaryScannerType ) {
 				case CHARS:
-					return new SimpleBoundaryScanner(
+					return new HibernateSearchSimpleBoundaryScanner(
 							LuceneFastVectorSearchHighlighter.this.boundaryMaxScan,
 							LuceneFastVectorSearchHighlighter.this.boundaryChars
 					);
@@ -196,7 +196,8 @@ class LuceneFastVectorSearchHighlighter extends LuceneAbstractSearchHighlighter 
 				);
 				return fragment == null || fragment.length == 0
 						? Collections.emptyList()
-						: Collections.singletonList( fragment[0] );
+						: Collections.singletonList(
+								fragment[0] );
 			}
 			return Collections.emptyList();
 		}
@@ -235,4 +236,21 @@ class LuceneFastVectorSearchHighlighter extends LuceneAbstractSearchHighlighter 
 			return src;
 		}
 	}
+
+	// TODO: HSEARCH-5160 remove this "custom" class and use the Lucene's constructor for the char[]
+	private static class HibernateSearchSimpleBoundaryScanner extends SimpleBoundaryScanner {
+
+		public HibernateSearchSimpleBoundaryScanner(int boundaryMaxScan, char[] boundaryChars) {
+			super( boundaryMaxScan, characters( boundaryChars ) );
+		}
+
+		private static Character[] characters(char[] chars) {
+			Character[] result = new Character[chars.length];
+			for ( int i = 0; i < chars.length; i++ ) {
+				result[i] = chars[i];
+			}
+			return result;
+		}
+	}
+
 }

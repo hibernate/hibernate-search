@@ -20,13 +20,14 @@ public class LuceneSearchPredicateFactoryImpl<SR>
 				LuceneSearchPredicateIndexScope<?>>
 		implements LuceneSearchPredicateFactory<SR> {
 
-	public LuceneSearchPredicateFactoryImpl(SearchPredicateDslContext<LuceneSearchPredicateIndexScope<?>> dslContext) {
-		super( dslContext );
+	public LuceneSearchPredicateFactoryImpl(Class<SR> scopeRootType,
+			SearchPredicateDslContext<LuceneSearchPredicateIndexScope<?>> dslContext) {
+		super( scopeRootType, dslContext );
 	}
 
 	@Override
 	public LuceneSearchPredicateFactory<SR> withRoot(String objectFieldPath) {
-		return new LuceneSearchPredicateFactoryImpl<>( dslContext.rescope(
+		return new LuceneSearchPredicateFactoryImpl<>( scopeRootType, dslContext.rescope(
 				dslContext.scope().withRoot( objectFieldPath ) ) );
 	}
 

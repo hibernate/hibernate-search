@@ -19,7 +19,8 @@ public interface PojoScopeIndexedTypeContext<I, E>
 		extends PojoWorkIndexedTypeContext<I, E>, PojoSchemaManagementIndexedTypeContext,
 		PojoSearchLoadingIndexedTypeContext<E>, PojoMassIndexingIndexedTypeContext<E> {
 
-	<SR, R, E2> MappedIndexScopeBuilder<SR, R, E2> createScopeBuilder(BackendMappingContext mappingContext);
+	<SR, R, E2> MappedIndexScopeBuilder<SR, R, E2> createScopeBuilder(BackendMappingContext mappingContext,
+			Class<SR> rootScope);
 
 	void addTo(MappedIndexScopeBuilder<?, ?, ?> builder);
 

@@ -142,9 +142,9 @@ public class LuceneIndexManagerImpl
 	}
 
 	@Override
-	public IndexScopeBuilder createScopeBuilder(BackendMappingContext mappingContext) {
-		return new LuceneIndexScopeBuilder(
-				backendContext, mappingContext, this
+	public <SR> IndexScopeBuilder<SR> createScopeBuilder(BackendMappingContext mappingContext, Class<SR> rootScopeType) {
+		return new LuceneIndexScopeBuilder<>(
+				backendContext, mappingContext, rootScopeType, this
 		);
 	}
 

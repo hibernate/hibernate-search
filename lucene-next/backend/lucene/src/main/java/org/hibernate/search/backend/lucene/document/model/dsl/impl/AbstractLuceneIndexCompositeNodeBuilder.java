@@ -75,22 +75,22 @@ abstract class AbstractLuceneIndexCompositeNodeBuilder
 
 	@Override
 	public IndexSchemaNamedPredicateOptionsStep addNamedPredicate(String name,
-			TreeNodeInclusion inclusion, TypedPredicateDefinition<?> definition) {
+			TreeNodeInclusion inclusion, PredicateDefinition definition) {
 		putNamedPredicate( name );
 		if ( TreeNodeInclusion.INCLUDED.equals( inclusion ) ) {
 			typeBuilder.queryElementFactory( PredicateTypeKeys.named( name ),
-					new LuceneNamedPredicate.TypedFactory<>( definition, name ) );
+					new LuceneNamedPredicate.Factory( definition, name ) );
 		}
 		return new LuceneIndexNamedPredicateOptions<>( inclusion, definition );
 	}
 
 	@Override
-	public IndexSchemaNamedPredicateOptionsStep addNamedPredicate(String name, TreeNodeInclusion inclusion,
-			PredicateDefinition definition) {
+	public IndexSchemaNamedPredicateOptionsStep addNamedPredicate(String name,
+			TreeNodeInclusion inclusion, TypedPredicateDefinition<?> definition) {
 		putNamedPredicate( name );
 		if ( TreeNodeInclusion.INCLUDED.equals( inclusion ) ) {
 			typeBuilder.queryElementFactory( PredicateTypeKeys.named( name ),
-					new LuceneNamedPredicate.Factory( definition, name ) );
+					new LuceneNamedPredicate.TypedFactory<>( definition, name ) );
 		}
 		return new LuceneIndexNamedPredicateOptions<>( inclusion, definition );
 	}

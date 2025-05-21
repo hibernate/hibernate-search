@@ -39,7 +39,7 @@ class LuceneDocumentTreeProjection extends AbstractLuceneProjection<DocumentTree
 	private final Set<String> nestedObjectsPaths;
 	private final List<LuceneIndexModel> models;
 
-	LuceneDocumentTreeProjection(LuceneSearchIndexScopeImpl scope) {
+	LuceneDocumentTreeProjection(LuceneSearchIndexScopeImpl<?> scope) {
 		super( scope );
 		nestedObjectsPaths = new LinkedHashSet<>();
 		models = new ArrayList<>();

@@ -18,20 +18,20 @@ import org.hibernate.search.engine.search.projection.spi.SearchProjectionIndexSc
 import org.hibernate.search.engine.search.sort.dsl.TypedSearchSortFactory;
 import org.hibernate.search.engine.search.sort.spi.SearchSortIndexScope;
 
-public interface SearchQueryIndexScope<S extends SearchQueryIndexScope<?>>
+public interface SearchQueryIndexScope<SR, S extends SearchQueryIndexScope<?, ?>>
 		extends SearchIndexScope<S>, SearchPredicateIndexScope<S>, SearchSortIndexScope<S>,
 		SearchProjectionIndexScope<S>, SearchAggregationIndexScope<S> {
 
 	<P> SearchQueryBuilder<P> select(BackendSessionContext sessionContext,
 			SearchLoadingContextBuilder<?, ?> loadingContextBuilder, SearchProjection<P> projection);
 
-	<SR> TypedSearchPredicateFactory<SR> predicateFactory();
+	TypedSearchPredicateFactory<SR> predicateFactory();
 
-	<SR> TypedSearchSortFactory<SR> sortFactory();
+	TypedSearchSortFactory<SR> sortFactory();
 
-	<SR, R, E> TypedSearchProjectionFactory<SR, R, E> projectionFactory();
+	<R, E> TypedSearchProjectionFactory<SR, R, E> projectionFactory();
 
-	<SR> TypedSearchAggregationFactory<SR> aggregationFactory();
+	TypedSearchAggregationFactory<SR> aggregationFactory();
 
 	SearchHighlighterFactory highlighterFactory();
 

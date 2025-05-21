@@ -211,4 +211,9 @@ public record SearchPredicateFactoryDelegate(TypedSearchPredicateFactory<NonStat
 	public String toAbsolutePath(String relativeFieldPath) {
 		return delegate.toAbsolutePath( relativeFieldPath );
 	}
+
+	@Override
+	public boolean isCompatibleWithScopeRootType(Class<?> scopeRootType) {
+		return NonStaticMetamodelScope.class.equals( scopeRootType );
+	}
 }

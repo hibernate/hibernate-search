@@ -85,7 +85,7 @@ public class ElasticsearchNamedPredicate extends AbstractElasticsearchSingleFiel
 		@Override
 		public void checkCompatibleWith(SearchQueryElementFactory<?, ?, ?> other) {
 			super.checkCompatibleWith( other );
-			Factory castedOther = (Factory) other;
+			TypedFactory castedOther = (TypedFactory) other;
 			if ( !definition.equals( castedOther.definition ) ) {
 				throw QueryLog.INSTANCE.differentPredicateDefinitionForQueryElement( definition, castedOther.definition );
 			}

@@ -29,7 +29,8 @@ public interface SearchBackendContext {
 
 	SearchProjectionBackendContext getSearchProjectionBackendContext();
 
-	ElasticsearchSearchQueryIndexScope<?> createSearchContext(BackendMappingContext mappingContext,
+	<SR> ElasticsearchSearchQueryIndexScope<SR, ?> createSearchContext(BackendMappingContext mappingContext,
+			Class<SR> rootScopeType,
 			Set<ElasticsearchIndexModel> indexModels);
 
 	<H> ElasticsearchSearchQueryBuilder<H> createSearchQueryBuilder(

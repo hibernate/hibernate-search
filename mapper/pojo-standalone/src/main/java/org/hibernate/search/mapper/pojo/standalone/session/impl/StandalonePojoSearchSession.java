@@ -166,17 +166,18 @@ public class StandalonePojoSearchSession extends AbstractPojoSearchSession
 
 	@Override
 	public <T> SearchScopeDelegate<T> scope(Collection<? extends Class<? extends T>> types) {
-		return new SearchScopeDelegate<>( mappingContext.createScope( types ) );
+		return new SearchScopeDelegate<>( mappingContext.createScope( NonStaticMetamodelScope.class, types ) );
 	}
 
 	@Override
 	public <T> SearchScopeDelegate<T> scope(Class<T> expectedSuperType, Collection<String> entityNames) {
-		return new SearchScopeDelegate<>( mappingContext.createScope( expectedSuperType, entityNames ) );
+		return new SearchScopeDelegate<>(
+				mappingContext.createScope( NonStaticMetamodelScope.class, expectedSuperType, entityNames ) );
 	}
 
 	@Override
 	public <SR, T> TypedSearchScope<SR, T> typedScope(Class<SR> rootScope, Collection<? extends Class<? extends T>> classes) {
-		return mappingContext().createScope( classes );
+		return mappingContext().createScope( rootScope, classes );
 	}
 
 	@Override
