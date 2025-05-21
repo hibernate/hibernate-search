@@ -181,7 +181,7 @@ public class LuceneNamedPredicate extends AbstractLuceneSingleFieldPredicate {
 		}
 
 		private boolean isCompatible(TypedSearchPredicateFactory<?> factory) {
-			return true;
+			return factory.isCompatibleWithScopeRootType( definition.scopeRootType() );
 		}
 
 		@Override

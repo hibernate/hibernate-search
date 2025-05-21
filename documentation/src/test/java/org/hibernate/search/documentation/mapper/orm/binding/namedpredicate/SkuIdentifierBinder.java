@@ -56,6 +56,11 @@ public class SkuIdentifierBinder implements PropertyBinder {
 					public SearchPredicate create(TypedPredicateDefinitionContext<SkuIdentifierBinder> context) {
 						return null;
 					}
+
+					@Override
+					public Class<SkuIdentifierBinder> scopeRootType() {
+						return SkuIdentifierBinder.class;
+					}
 				} // <3>
 		);
 
@@ -66,6 +71,11 @@ public class SkuIdentifierBinder implements PropertyBinder {
 					@Override
 					public SearchPredicate create(TypedPredicateDefinitionContext<Object> context) {
 						return null;
+					}
+
+					@Override
+					public Class<Object> scopeRootType() {
+						return Object.class;
 					}
 				} // <3>
 		);

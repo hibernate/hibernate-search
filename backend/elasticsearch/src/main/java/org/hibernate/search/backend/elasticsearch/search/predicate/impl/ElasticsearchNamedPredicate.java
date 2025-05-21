@@ -150,7 +150,7 @@ public class ElasticsearchNamedPredicate extends AbstractElasticsearchSingleFiel
 		}
 
 		private boolean isCompatible(TypedSearchPredicateFactory<?> factory) {
-			return true;
+			return factory.isCompatibleWithScopeRootType( NonStaticMetamodelScope.class );
 		}
 
 		@Override
@@ -186,7 +186,7 @@ public class ElasticsearchNamedPredicate extends AbstractElasticsearchSingleFiel
 		}
 
 		private boolean isCompatible(TypedSearchPredicateFactory<?> factory) {
-			return true;
+			return factory.isCompatibleWithScopeRootType( definition.scopeRootType() );
 		}
 
 		@Override

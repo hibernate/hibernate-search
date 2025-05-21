@@ -30,4 +30,10 @@ public interface TypedPredicateDefinition<SR> {
 	 */
 	SearchPredicate create(TypedPredicateDefinitionContext<SR> context);
 
+	/**
+	 * @return The scope root type. Type that limits allowed field references and other search capabilities used
+	 * within particular search factories.
+	 */
+	Class<SR> scopeRootType();
+
 }
