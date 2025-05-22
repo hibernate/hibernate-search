@@ -263,9 +263,4 @@ public abstract class AbstractSearchPredicateFactory<
 	public final String toAbsolutePath(String relativeFieldPath) {
 		return dslContext.scope().toAbsolutePath( relativeFieldPath );
 	}
-
-	@Override
-	public boolean isCompatibleWithScopeRootType(Class<?> scopeRootType) {
-		return this.scopeRootType.equals( scopeRootType );
-	}
 }

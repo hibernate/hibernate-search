@@ -16,6 +16,7 @@ import org.hibernate.search.engine.search.common.spi.SearchQueryElementFactory;
 import org.hibernate.search.engine.search.predicate.SearchPredicate;
 import org.hibernate.search.engine.search.predicate.definition.PredicateDefinition;
 import org.hibernate.search.engine.search.predicate.definition.TypedPredicateDefinition;
+import org.hibernate.search.engine.search.predicate.dsl.ExtendedSearchPredicateFactory;
 import org.hibernate.search.engine.search.predicate.dsl.SearchPredicateFactory;
 import org.hibernate.search.engine.search.predicate.dsl.TypedSearchPredicateFactory;
 import org.hibernate.search.engine.search.predicate.dsl.spi.SearchPredicateFactoryDelegate;
@@ -133,19 +134,8 @@ public class LuceneNamedPredicate extends AbstractLuceneSingleFieldPredicate {
 
 		@SuppressWarnings("unchecked")
 		@Override
-		public void factory(TypedSearchPredicateFactory<?> factory) {
-			if ( isCompatible( factory ) ) {
-				this.factory =
-						new SearchPredicateFactoryDelegate( (TypedSearchPredicateFactory<NonStaticMetamodelScope>) factory );
-			}
-			else {
-				throw new IllegalArgumentException( "Current search predicate factory is incompatible with this \""
-						+ predicateName + "\" name predicate." );
-			}
-		}
-
-		private boolean isCompatible(TypedSearchPredicateFactory<?> factory) {
-			return factory.isCompatibleWithScopeRootType( NonStaticMetamodelScope.class );
+		public void factory(ExtendedSearchPredicateFactory<?, ?> factory) {
+			this.factory = new SearchPredicateFactoryDelegate( factory.withScopeRoot( NonStaticMetamodelScope.class ) );
 		}
 
 		@Override
@@ -170,18 +160,8 @@ public class LuceneNamedPredicate extends AbstractLuceneSingleFieldPredicate {
 
 		@SuppressWarnings("unchecked")
 		@Override
-		public void factory(TypedSearchPredicateFactory<?> factory) {
-			if ( isCompatible( factory ) ) {
-				this.factory = (TypedSearchPredicateFactory<SR>) factory;
-			}
-			else {
-				throw new IllegalArgumentException( "Current search predicate factory is incompatible with this \""
-						+ predicateName + "\" name predicate." );
-			}
-		}
-
-		private boolean isCompatible(TypedSearchPredicateFactory<?> factory) {
-			return factory.isCompatibleWithScopeRootType( definition.scopeRootType() );
+		public void factory(ExtendedSearchPredicateFactory<?, ?> factory) {
+			this.factory = factory.withScopeRoot( definition.scopeRootType() );
 		}
 
 		@Override

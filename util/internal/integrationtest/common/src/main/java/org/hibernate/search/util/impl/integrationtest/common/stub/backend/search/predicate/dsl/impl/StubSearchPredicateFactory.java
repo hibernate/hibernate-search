@@ -20,4 +20,9 @@ public class StubSearchPredicateFactory<SR>
 		return new StubSearchPredicateFactory<>( scopeRootType,
 				dslContext.rescope( dslContext.scope().withRoot( objectFieldPath ) ) );
 	}
+
+	@Override
+	public <SR2> StubSearchPredicateFactory<SR2> withScopeRoot(Class<SR2> scopeRootType) {
+		return new StubSearchPredicateFactory<>( scopeRootType, dslContext );
+	}
 }

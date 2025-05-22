@@ -4,6 +4,7 @@
  */
 package org.hibernate.search.engine.search.projection.dsl.impl;
 
+import org.hibernate.search.engine.search.common.NonStaticMetamodelScope;
 import org.hibernate.search.engine.search.projection.SearchProjection;
 import org.hibernate.search.engine.search.projection.definition.impl.DefaultProjectionDefinitionContext;
 import org.hibernate.search.engine.search.projection.dsl.CompositeProjectionFrom1AsStep;
@@ -12,10 +13,10 @@ import org.hibernate.search.engine.search.projection.dsl.CompositeProjectionFrom
 import org.hibernate.search.engine.search.projection.dsl.CompositeProjectionFromAsStep;
 import org.hibernate.search.engine.search.projection.dsl.CompositeProjectionInnerStep;
 import org.hibernate.search.engine.search.projection.dsl.CompositeProjectionValueStep;
+import org.hibernate.search.engine.search.projection.dsl.ExtendedSearchProjectionFactory;
 import org.hibernate.search.engine.search.projection.dsl.ProjectionFinalStep;
-import org.hibernate.search.engine.search.projection.dsl.SearchProjectionFactory;
-import org.hibernate.search.engine.search.projection.dsl.TypedSearchProjectionFactory;
 import org.hibernate.search.engine.search.projection.dsl.spi.SearchProjectionDslContext;
+import org.hibernate.search.engine.search.projection.dsl.spi.SearchProjectionFactoryDelegate;
 import org.hibernate.search.engine.search.projection.spi.CompositeProjectionBuilder;
 import org.hibernate.search.engine.search.projection.spi.ProjectionTypeKeys;
 import org.hibernate.search.util.common.impl.Contracts;
@@ -23,12 +24,12 @@ import org.hibernate.search.util.common.impl.Contracts;
 public class CompositeProjectionInnerStepImpl<SR> implements CompositeProjectionInnerStep {
 
 	private final SearchProjectionDslContext<?> dslContext;
-	private final TypedSearchProjectionFactory<SR, ?, ?> projectionFactory;
+	private final ExtendedSearchProjectionFactory<SR, ?, ?, ?> projectionFactory;
 	private final CompositeProjectionBuilder builder;
 	private final String objectFieldPath;
 
 	public CompositeProjectionInnerStepImpl(SearchProjectionDslContext<?> dslContext,
-			TypedSearchProjectionFactory<SR, ?, ?> projectionFactory) {
+			ExtendedSearchProjectionFactory<SR, ?, ?, ?> projectionFactory) {
 		this.dslContext = dslContext;
 		this.projectionFactory = projectionFactory;
 		this.builder = dslContext.scope().projectionBuilders().composite();
@@ -36,7 +37,7 @@ public class CompositeProjectionInnerStepImpl<SR> implements CompositeProjection
 	}
 
 	public CompositeProjectionInnerStepImpl(SearchProjectionDslContext<?> dslContext,
-			TypedSearchProjectionFactory<SR, ?, ?> projectionFactory, String objectFieldPath) {
+			ExtendedSearchProjectionFactory<SR, ?, ?, ?> projectionFactory, String objectFieldPath) {
 		this.dslContext = dslContext;
 		this.projectionFactory = projectionFactory;
 		this.builder = dslContext.scope().fieldQueryElement( objectFieldPath, ProjectionTypeKeys.OBJECT );
@@ -45,13 +46,12 @@ public class CompositeProjectionInnerStepImpl<SR> implements CompositeProjection
 
 	@Override
 	public <V> CompositeProjectionValueStep<?, V> as(Class<V> objectClass) {
-		TypedSearchProjectionFactory<SR, ?, ?> projectionFactoryWithCorrectRoot = objectFieldPath == null
+		ExtendedSearchProjectionFactory<SR, ?, ?, ?> projectionFactoryWithCorrectRoot = objectFieldPath == null
 				? projectionFactory
 				: projectionFactory.withRoot( objectFieldPath );
 		return dslContext.scope().projectionRegistry().composite( objectClass )
-				// TODO: fix this cast:
-				.apply( this, new DefaultProjectionDefinitionContext(
-						(SearchProjectionFactory<?, ?>) projectionFactoryWithCorrectRoot ) );
+				.apply( this, new DefaultProjectionDefinitionContext( new SearchProjectionFactoryDelegate<>(
+						projectionFactoryWithCorrectRoot.withScopeRoot( NonStaticMetamodelScope.class ) ) ) );
 	}
 
 	@Override

@@ -324,4 +324,8 @@ public interface QueryLog {
 	@Message(id = ID_OFFSET + 186, value = "A single-valued highlight projection requested, "
 			+ "but the corresponding highlighter does not set number of fragments to 1.")
 	SearchException highlighterIncompatibleCardinality();
+
+	@Message(id = ID_OFFSET + 194, value = "Current factory cannot be resocped to '%1$s' as it is scoped to '%2$s'.")
+	SearchException incompatibleScopeRootType(@FormatWith(ClassFormatter.class) Class<?> requested,
+			@FormatWith(ClassFormatter.class) Class<?> actual);
 }

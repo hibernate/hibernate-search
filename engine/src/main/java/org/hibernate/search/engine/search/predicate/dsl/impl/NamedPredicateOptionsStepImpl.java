@@ -7,8 +7,8 @@ package org.hibernate.search.engine.search.predicate.dsl.impl;
 import org.hibernate.search.engine.search.common.spi.SearchIndexScope;
 import org.hibernate.search.engine.search.common.spi.SearchQueryElementTypeKey;
 import org.hibernate.search.engine.search.predicate.SearchPredicate;
+import org.hibernate.search.engine.search.predicate.dsl.ExtendedSearchPredicateFactory;
 import org.hibernate.search.engine.search.predicate.dsl.NamedPredicateOptionsStep;
-import org.hibernate.search.engine.search.predicate.dsl.TypedSearchPredicateFactory;
 import org.hibernate.search.engine.search.predicate.dsl.spi.AbstractPredicateFinalStep;
 import org.hibernate.search.engine.search.predicate.dsl.spi.SearchPredicateDslContext;
 import org.hibernate.search.engine.search.predicate.spi.NamedPredicateBuilder;
@@ -20,7 +20,7 @@ public class NamedPredicateOptionsStepImpl
 
 	private final NamedPredicateBuilder builder;
 
-	public NamedPredicateOptionsStepImpl(TypedSearchPredicateFactory<?> predicateFactory,
+	public NamedPredicateOptionsStepImpl(ExtendedSearchPredicateFactory<?, ?> predicateFactory,
 			SearchPredicateDslContext<?> dslContext, String fieldPath, String predicateName) {
 		super( dslContext );
 		SearchIndexScope<?> scope = dslContext.scope();

@@ -13,10 +13,10 @@ import org.hibernate.search.engine.search.common.NamedValues;
 import org.hibernate.search.engine.search.common.RewriteMethod;
 import org.hibernate.search.engine.search.common.ValueModel;
 import org.hibernate.search.engine.search.predicate.SearchPredicate;
+import org.hibernate.search.engine.search.predicate.dsl.ExtendedSearchPredicateFactory;
 import org.hibernate.search.engine.search.predicate.dsl.PredicateFinalStep;
 import org.hibernate.search.engine.search.predicate.dsl.RegexpQueryFlag;
 import org.hibernate.search.engine.search.predicate.dsl.SimpleQueryFlag;
-import org.hibernate.search.engine.search.predicate.dsl.TypedSearchPredicateFactory;
 import org.hibernate.search.engine.search.predicate.spi.BooleanPredicateBuilder;
 import org.hibernate.search.engine.search.predicate.spi.CommonQueryStringPredicateBuilder;
 import org.hibernate.search.engine.search.predicate.spi.ExistsPredicateBuilder;
@@ -296,7 +296,7 @@ public class StubSearchPredicate implements SearchPredicate {
 		}
 
 		@Override
-		public void factory(TypedSearchPredicateFactory<?> factory) {
+		public void factory(ExtendedSearchPredicateFactory<?, ?> factory) {
 			// No-op, just simulates a call on this object
 		}
 
