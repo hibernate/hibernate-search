@@ -17,7 +17,7 @@ import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaObjectF
 import org.hibernate.search.engine.backend.types.ObjectStructure;
 import org.hibernate.search.engine.backend.types.Projectable;
 import org.hibernate.search.engine.search.projection.ProjectionCollector;
-import org.hibernate.search.engine.search.projection.dsl.TypedSearchProjectionFactory;
+import org.hibernate.search.engine.search.projection.dsl.SearchProjectionFactory;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.TckConfiguration;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.extension.SearchSetupHelper;
 import org.hibernate.search.util.common.SearchException;
@@ -110,7 +110,7 @@ class ObjectProjectionSpecificsIT {
 				TckConfiguration.get().getBackendFeatures().reliesOnNestedDocumentsForMultiValuedObjectProjection(),
 				"This test is only relevant if the backend relies on nested documents to implement object projections on multi-valued fields"
 		);
-		TypedSearchProjectionFactory<?, ?, ?> f = index.createScope().projection();
+		SearchProjectionFactory<?, ?> f = index.createScope().projection();
 		assertThatThrownBy( () -> f.object( "flattenedLevel1" ) )
 				.isInstanceOf( SearchException.class )
 				.hasMessageContainingAll( "Cannot use 'projection:object' on field 'flattenedLevel1'",
@@ -122,7 +122,7 @@ class ObjectProjectionSpecificsIT {
 
 	@Test
 	void multiValuedObjectField_singleValuedObjectProjection() {
-		TypedSearchProjectionFactory<?, ?, ?> f = index.createScope().projection();
+		SearchProjectionFactory<?, ?> f = index.createScope().projection();
 		assertThatThrownBy( () -> f.object( "level1" )
 				.from( f.field( "level1.field1" ) )
 				.asList()

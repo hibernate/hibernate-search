@@ -112,7 +112,7 @@ class ProjectionConstructorProjectionBindingIT {
 		@Override
 		public void bind(ProjectionBindingContext context) {
 			context.definition( String.class,
-					(factory, context1) -> factory.field( "myText", String.class ).toProjection() );
+					(context1) -> context1.projection().field( "myText", String.class ).toProjection() );
 		}
 	}
 
@@ -348,7 +348,7 @@ class ProjectionConstructorProjectionBindingIT {
 		public void bind(ProjectionBindingContext context) {
 			String fieldPath = context.param( "fieldPath", String.class );
 			context.definition( String.class,
-					(factory, context1) -> factory.field( fieldPath, String.class ).toProjection() );
+					(context1) -> context1.projection().field( fieldPath, String.class ).toProjection() );
 		}
 	}
 }

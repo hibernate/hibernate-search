@@ -10,7 +10,6 @@ import org.hibernate.search.engine.search.common.ValueModel;
 import org.hibernate.search.engine.search.projection.ProjectionCollector;
 import org.hibernate.search.engine.search.projection.SearchProjection;
 import org.hibernate.search.engine.search.projection.definition.ProjectionDefinitionContext;
-import org.hibernate.search.engine.search.projection.dsl.TypedSearchProjectionFactory;
 import org.hibernate.search.util.common.annotation.Incubating;
 import org.hibernate.search.util.common.spi.ToStringTreeAppender;
 
@@ -56,9 +55,8 @@ public abstract class FieldProjectionDefinition<P, F> extends AbstractProjection
 		}
 
 		@Override
-		public SearchProjection<F> create(TypedSearchProjectionFactory<?, ?, ?> factory,
-				ProjectionDefinitionContext context) {
-			return factory.field( fieldPath, fieldType, valueModel ).toProjection();
+		public SearchProjection<F> create(ProjectionDefinitionContext context) {
+			return context.projection().field( fieldPath, fieldType, valueModel ).toProjection();
 		}
 	}
 
@@ -76,9 +74,8 @@ public abstract class FieldProjectionDefinition<P, F> extends AbstractProjection
 		}
 
 		@Override
-		public SearchProjection<List<F>> create(TypedSearchProjectionFactory<?, ?, ?> factory,
-				ProjectionDefinitionContext context) {
-			return factory.field( fieldPath, fieldType, valueModel )
+		public SearchProjection<List<F>> create(ProjectionDefinitionContext context) {
+			return context.projection().field( fieldPath, fieldType, valueModel )
 					.collector( ProjectionCollector.list() ).toProjection();
 		}
 	}
@@ -99,9 +96,8 @@ public abstract class FieldProjectionDefinition<P, F> extends AbstractProjection
 		}
 
 		@Override
-		public SearchProjection<C> create(TypedSearchProjectionFactory<?, ?, ?> factory,
-				ProjectionDefinitionContext context) {
-			return factory.field( fieldPath, fieldType, valueModel )
+		public SearchProjection<C> create(ProjectionDefinitionContext context) {
+			return context.projection().field( fieldPath, fieldType, valueModel )
 					.collector( collector ).toProjection();
 		}
 	}

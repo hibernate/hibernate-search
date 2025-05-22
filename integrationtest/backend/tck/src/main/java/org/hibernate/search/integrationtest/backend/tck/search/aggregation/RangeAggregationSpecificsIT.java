@@ -26,7 +26,7 @@ import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaElement
 import org.hibernate.search.engine.backend.types.Aggregable;
 import org.hibernate.search.engine.backend.types.Searchable;
 import org.hibernate.search.engine.search.aggregation.AggregationKey;
-import org.hibernate.search.engine.search.aggregation.dsl.TypedSearchAggregationFactory;
+import org.hibernate.search.engine.search.aggregation.dsl.SearchAggregationFactory;
 import org.hibernate.search.engine.search.query.dsl.SearchQueryOptionsStep;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.operations.AggregationDescriptor;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.operations.RangeAggregationDescriptor;
@@ -516,7 +516,7 @@ class RangeAggregationSpecificsIT<F> {
 
 		AggregationKey<Map<Range<F>, Long>> aggregationKey = AggregationKey.of( AGGREGATION_NAME );
 
-		TypedSearchAggregationFactory<?> af = index.createScope().aggregation();
+		SearchAggregationFactory af = index.createScope().aggregation();
 		var aggregation = af.withParameters( param -> af.range().field(
 				fieldPath, fieldType.getJavaType() )
 				.range( param.get( "range1", Range.class ) )

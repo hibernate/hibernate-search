@@ -7,7 +7,7 @@ package org.hibernate.search.integrationtest.backend.elasticsearch.testsupport.u
 import org.hibernate.search.backend.elasticsearch.ElasticsearchExtension;
 import org.hibernate.search.backend.elasticsearch.cfg.ElasticsearchIndexSettings;
 import org.hibernate.search.engine.search.predicate.dsl.PredicateFinalStep;
-import org.hibernate.search.engine.search.predicate.dsl.TypedSearchPredicateFactory;
+import org.hibernate.search.engine.search.predicate.dsl.SearchPredicateFactory;
 import org.hibernate.search.engine.search.query.dsl.SearchQueryDslExtension;
 import org.hibernate.search.engine.search.query.dsl.SearchQuerySelectStep;
 import org.hibernate.search.integrationtest.backend.elasticsearch.testsupport.configuration.AnalysisBuiltinOverrideITAnalysisConfigurer;
@@ -99,7 +99,7 @@ public class ElasticsearchTckBackendHelper implements TckBackendHelper {
 	}
 
 	@Override
-	public PredicateFinalStep createSlowPredicate(TypedSearchPredicateFactory<?> f) {
+	public PredicateFinalStep createSlowPredicate(SearchPredicateFactory f) {
 		return f.extension( ElasticsearchExtension.get() )
 				.fromJson( "{\"script\": {"
 						+ "  \"script\": \""

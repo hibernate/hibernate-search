@@ -13,7 +13,7 @@ import org.hibernate.search.engine.backend.common.DocumentReference;
 import org.hibernate.search.engine.backend.document.IndexFieldReference;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaElement;
 import org.hibernate.search.engine.search.predicate.SearchPredicate;
-import org.hibernate.search.engine.search.predicate.dsl.TypedSearchPredicateFactory;
+import org.hibernate.search.engine.search.predicate.dsl.SearchPredicateFactory;
 import org.hibernate.search.engine.search.query.SearchQuery;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.extension.SearchSetupHelper;
 import org.hibernate.search.util.common.SearchException;
@@ -87,7 +87,7 @@ class ElasticsearchShardsFailedExceptionIT {
 	private SearchQuery<DocumentReference> createQuery() {
 		StubMappingScope scope = index.createScope( index2 );
 
-		TypedSearchPredicateFactory<?> factory = scope.predicate();
+		SearchPredicateFactory factory = scope.predicate();
 		SearchPredicate predicate = factory.range().field( "field" ).greaterThan( "tex" ).toPredicate();
 
 		return scope.query().where( predicate ).toQuery();

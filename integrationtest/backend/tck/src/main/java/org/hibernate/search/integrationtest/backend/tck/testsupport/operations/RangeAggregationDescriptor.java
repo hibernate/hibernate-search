@@ -17,10 +17,10 @@ import java.util.function.Function;
 
 import org.hibernate.search.engine.search.aggregation.dsl.AggregationFinalStep;
 import org.hibernate.search.engine.search.aggregation.dsl.RangeAggregationOptionsStep;
-import org.hibernate.search.engine.search.aggregation.dsl.TypedSearchAggregationFactory;
+import org.hibernate.search.engine.search.aggregation.dsl.SearchAggregationFactory;
 import org.hibernate.search.engine.search.common.ValueModel;
 import org.hibernate.search.engine.search.predicate.dsl.PredicateFinalStep;
-import org.hibernate.search.engine.search.predicate.dsl.TypedSearchPredicateFactory;
+import org.hibernate.search.engine.search.predicate.dsl.SearchPredicateFactory;
 import org.hibernate.search.engine.spatial.GeoPoint;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.operations.expectations.AggregationScenario;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.operations.expectations.SupportedSingleFieldAggregationExpectations;
@@ -137,9 +137,9 @@ public class RangeAggregationDescriptor extends AggregationDescriptor {
 
 				return new AggregationScenario<Map<Range<T>, Long>>() {
 					@Override
-					public AggregationFinalStep<Map<Range<T>, Long>> setup(TypedSearchAggregationFactory<?> factory,
+					public AggregationFinalStep<Map<Range<T>, Long>> setup(SearchAggregationFactory factory,
 							String fieldPath,
-							Function<? super TypedSearchPredicateFactory<?>, ? extends PredicateFinalStep> filterOrNull) {
+							Function<? super SearchPredicateFactory, ? extends PredicateFinalStep> filterOrNull) {
 						RangeAggregationOptionsStep<?, ?, ?, ?, Map<Range<T>, Long>> optionsStep =
 								factory.range().field( fieldPath, helper.getJavaClass() )
 										.range( helper.create( ascendingValues.get( 0 ) ),
@@ -158,7 +158,7 @@ public class RangeAggregationDescriptor extends AggregationDescriptor {
 
 					@Override
 					public AggregationFinalStep<Map<Range<T>, Long>> setupWithConverterSetting(
-							TypedSearchAggregationFactory<?> factory,
+							SearchAggregationFactory factory,
 							String fieldPath, ValueModel valueModel) {
 						return factory.range().field( fieldPath, helper.getJavaClass(), valueModel )
 								.range( helper.create( ascendingValues.get( 0 ) ),
@@ -199,7 +199,7 @@ public class RangeAggregationDescriptor extends AggregationDescriptor {
 			}
 
 			@Override
-			public void trySetup(TypedSearchAggregationFactory<?> factory, String fieldPath) {
+			public void trySetup(SearchAggregationFactory factory, String fieldPath) {
 				factory.range().field( fieldPath, typeDescriptor.getJavaType() );
 			}
 

@@ -7,7 +7,7 @@ package org.hibernate.search.integrationtest.backend.tck.search.predicate;
 import static org.hibernate.search.util.impl.integrationtest.common.assertion.SearchResultAssert.assertThatQuery;
 
 import org.hibernate.search.engine.search.predicate.dsl.PredicateFinalStep;
-import org.hibernate.search.engine.search.predicate.dsl.TypedSearchPredicateFactory;
+import org.hibernate.search.engine.search.predicate.dsl.SearchPredicateFactory;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappedIndex;
 
 import org.junit.jupiter.params.ParameterizedTest;
@@ -77,18 +77,18 @@ public abstract class AbstractPredicateScoreIT {
 				.hasDocRefHitsExactOrder( index.typeName(), dataSet.docId( 0 ), dataSet.docId( 1 ) );
 	}
 
-	protected abstract PredicateFinalStep predicate(TypedSearchPredicateFactory<?> f, int matchingDocOrdinal,
+	protected abstract PredicateFinalStep predicate(SearchPredicateFactory f, int matchingDocOrdinal,
 			AbstractPredicateDataSet dataSet, StubMappedIndex index);
 
-	protected abstract PredicateFinalStep predicateWithBoost(TypedSearchPredicateFactory<?> f, int matchingDocOrdinal,
+	protected abstract PredicateFinalStep predicateWithBoost(SearchPredicateFactory f, int matchingDocOrdinal,
 			float boost, AbstractPredicateDataSet dataSet,
 			StubMappedIndex index);
 
-	protected abstract PredicateFinalStep predicateWithConstantScore(TypedSearchPredicateFactory<?> f,
+	protected abstract PredicateFinalStep predicateWithConstantScore(SearchPredicateFactory f,
 			int matchingDocOrdinal, AbstractPredicateDataSet dataSet,
 			StubMappedIndex index);
 
-	protected abstract PredicateFinalStep predicateWithConstantScoreAndBoost(TypedSearchPredicateFactory<?> f,
+	protected abstract PredicateFinalStep predicateWithConstantScoreAndBoost(SearchPredicateFactory f,
 			int matchingDocOrdinal, float boost, AbstractPredicateDataSet dataSet,
 			StubMappedIndex index);
 

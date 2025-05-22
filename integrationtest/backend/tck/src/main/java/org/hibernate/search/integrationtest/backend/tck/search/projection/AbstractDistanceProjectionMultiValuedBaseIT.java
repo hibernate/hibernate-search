@@ -22,10 +22,10 @@ import org.hibernate.search.engine.backend.types.Sortable;
 import org.hibernate.search.engine.common.EntityReference;
 import org.hibernate.search.engine.search.common.SortMode;
 import org.hibernate.search.engine.search.projection.dsl.ProjectionFinalStep;
-import org.hibernate.search.engine.search.projection.dsl.TypedSearchProjectionFactory;
+import org.hibernate.search.engine.search.projection.dsl.SearchProjectionFactory;
 import org.hibernate.search.engine.search.query.dsl.SearchQueryOptionsStep;
+import org.hibernate.search.engine.search.sort.dsl.SearchSortFactory;
 import org.hibernate.search.engine.search.sort.dsl.SortFinalStep;
-import org.hibernate.search.engine.search.sort.dsl.TypedSearchSortFactory;
 import org.hibernate.search.engine.spatial.DistanceUnit;
 import org.hibernate.search.engine.spatial.GeoPoint;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.model.singlefield.SingleFieldIndexBinding;
@@ -386,14 +386,14 @@ abstract class AbstractDistanceProjectionMultiValuedBaseIT {
 	protected abstract void addParameter(SearchQueryOptionsStep<?, ?, ?, ?, ?, ?> query, String parameterName, Object value);
 
 	protected abstract ProjectionFinalStep<List<Double>> distance(
-			TypedSearchProjectionFactory<?, EntityReference, DocumentReference> projection, String path, GeoPoint center,
+			SearchProjectionFactory<EntityReference, DocumentReference> projection, String path, GeoPoint center,
 			String parameterName);
 
 	protected abstract ProjectionFinalStep<List<Double>> distance(
-			TypedSearchProjectionFactory<?, EntityReference, DocumentReference> projection, String path, GeoPoint center,
+			SearchProjectionFactory<EntityReference, DocumentReference> projection, String path, GeoPoint center,
 			DistanceUnit unit, String centerParam, String unitParam);
 
-	protected abstract SortFinalStep sort(TypedSearchSortFactory<?> sort, String path, GeoPoint center,
+	protected abstract SortFinalStep sort(SearchSortFactory sort, String path, GeoPoint center,
 			String parameterName);
 
 	private static class DataSet {

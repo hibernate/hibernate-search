@@ -14,7 +14,7 @@ import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaElement
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaObjectField;
 import org.hibernate.search.engine.backend.types.ObjectStructure;
 import org.hibernate.search.engine.search.predicate.SearchPredicate;
-import org.hibernate.search.engine.search.predicate.dsl.TypedSearchPredicateFactory;
+import org.hibernate.search.engine.search.predicate.dsl.SearchPredicateFactory;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.extension.SearchSetupHelper;
 import org.hibernate.search.util.common.SearchException;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.BulkIndexer;
@@ -269,7 +269,7 @@ class NestedPredicateSpecificsIT {
 	@TestForIssue(jiraKey = "HSEARCH-4173")
 	void multiIndex_missingNestedField() {
 		StubMappingScope scope = mainIndex.createScope( missingFieldIndex );
-		TypedSearchPredicateFactory<?> f = scope.predicate();
+		SearchPredicateFactory f = scope.predicate();
 		SearchPredicate nestedPredicate = f.nested( "nestedObject" )
 				// This is referred to as "condition 1" in the data initialization method
 				.add( f.nested( "nestedObject.nestedObject" )

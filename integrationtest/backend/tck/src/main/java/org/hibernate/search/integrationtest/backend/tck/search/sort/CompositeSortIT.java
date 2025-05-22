@@ -18,8 +18,8 @@ import org.hibernate.search.engine.backend.types.ObjectStructure;
 import org.hibernate.search.engine.backend.types.Sortable;
 import org.hibernate.search.engine.search.query.SearchQuery;
 import org.hibernate.search.engine.search.sort.SearchSort;
+import org.hibernate.search.engine.search.sort.dsl.SearchSortFactory;
 import org.hibernate.search.engine.search.sort.dsl.SortFinalStep;
-import org.hibernate.search.engine.search.sort.dsl.TypedSearchSortFactory;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.KeywordStringFieldTypeDescriptor;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.SimpleFieldModel;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.extension.SearchSetupHelper;
@@ -270,12 +270,12 @@ class CompositeSortIT {
 	}
 
 	private SearchQuery<DocumentReference> simpleQuery(
-			Function<? super TypedSearchSortFactory<?>, ? extends SortFinalStep> sortContributor) {
+			Function<? super SearchSortFactory, ? extends SortFinalStep> sortContributor) {
 		return simpleQuery( index.createScope(), sortContributor );
 	}
 
 	private SearchQuery<DocumentReference> simpleQuery(StubMappingScope scope,
-			Function<? super TypedSearchSortFactory<?>, ? extends SortFinalStep> sortContributor) {
+			Function<? super SearchSortFactory, ? extends SortFinalStep> sortContributor) {
 		return scope.query()
 				.where( f -> f.matchAll() )
 				.sort( sortContributor )

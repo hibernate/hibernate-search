@@ -11,7 +11,7 @@ import java.util.Collection;
 
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaElement;
 import org.hibernate.search.engine.backend.types.Sortable;
-import org.hibernate.search.engine.search.sort.dsl.TypedSearchSortFactory;
+import org.hibernate.search.engine.search.sort.dsl.SearchSortFactory;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.FieldTypeDescriptor;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.StandardFieldTypeDescriptor;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.SimpleFieldModelsByType;
@@ -75,7 +75,7 @@ abstract class AbstractSortSortableIT {
 			SimpleMappedIndex<SortableYesIndexBinding> sortableYesIndex,
 			SimpleMappedIndex<SortableNoIndexBinding> sortableNoIndex,
 			FieldTypeDescriptor<?, ?> fieldType) {
-		TypedSearchSortFactory<?> f = sortableDefaultIndex.createScope().sort();
+		SearchSortFactory f = sortableDefaultIndex.createScope().sort();
 
 		String fieldPath = sortableDefaultIndex.binding().field.get( fieldType ).relativeFieldName;
 
@@ -94,7 +94,7 @@ abstract class AbstractSortSortableIT {
 			SimpleMappedIndex<SortableYesIndexBinding> sortableYesIndex,
 			SimpleMappedIndex<SortableNoIndexBinding> sortableNoIndex,
 			FieldTypeDescriptor<?, ?> fieldType) {
-		TypedSearchSortFactory<?> f = sortableNoIndex.createScope().sort();
+		SearchSortFactory f = sortableNoIndex.createScope().sort();
 
 		String fieldPath = sortableNoIndex.binding().field.get( fieldType ).relativeFieldName;
 
@@ -114,7 +114,7 @@ abstract class AbstractSortSortableIT {
 			SimpleMappedIndex<SortableYesIndexBinding> sortableYesIndex,
 			SimpleMappedIndex<SortableNoIndexBinding> sortableNoIndex,
 			FieldTypeDescriptor<?, ?> fieldType) {
-		TypedSearchSortFactory<?> f = sortableYesIndex.createScope( sortableNoIndex ).sort();
+		SearchSortFactory f = sortableYesIndex.createScope( sortableNoIndex ).sort();
 
 		String fieldPath = sortableYesIndex.binding().field.get( fieldType ).relativeFieldName;
 
@@ -126,7 +126,7 @@ abstract class AbstractSortSortableIT {
 				);
 	}
 
-	protected abstract void trySort(TypedSearchSortFactory<?> f, String fieldPath,
+	protected abstract void trySort(SearchSortFactory f, String fieldPath,
 			FieldTypeDescriptor<?, ?> fieldType);
 
 	protected abstract String sortTrait();

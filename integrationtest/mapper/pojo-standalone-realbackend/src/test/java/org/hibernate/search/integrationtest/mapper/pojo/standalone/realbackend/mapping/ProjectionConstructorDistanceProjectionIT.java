@@ -12,7 +12,7 @@ import java.util.Collection;
 import java.util.List;
 
 import org.hibernate.search.engine.backend.types.Projectable;
-import org.hibernate.search.engine.search.predicate.dsl.TypedSearchPredicateFactory;
+import org.hibernate.search.engine.search.predicate.dsl.SearchPredicateFactory;
 import org.hibernate.search.engine.spatial.DistanceUnit;
 import org.hibernate.search.engine.spatial.GeoPoint;
 import org.hibernate.search.integrationtest.mapper.pojo.standalone.realbackend.testsupport.BackendConfigurations;
@@ -57,7 +57,7 @@ class ProjectionConstructorDistanceProjectionIT {
 		try ( SearchSession session = mapping.createSession() ) {
 			List<NoArgMyProjection> projections = session.search( NoArgIndexedEntity.class )
 					.select( NoArgMyProjection.class )
-					.where( TypedSearchPredicateFactory::matchAll )
+					.where( SearchPredicateFactory::matchAll )
 					.param( "param", GeoPoint.of( 1, 1 ) )
 					.fetchAllHits();
 			assertThat( projections ).hasSize( 5 )
@@ -111,7 +111,7 @@ class ProjectionConstructorDistanceProjectionIT {
 		try ( SearchSession session = mapping.createSession() ) {
 			List<PathMyProjection> projections = session.search( PathIndexedEntity.class )
 					.select( PathMyProjection.class )
-					.where( TypedSearchPredicateFactory::matchAll )
+					.where( SearchPredicateFactory::matchAll )
 					.param( "param", GeoPoint.of( 1, 1 ) )
 					.fetchAllHits();
 			assertThat( projections ).hasSize( 5 )
@@ -165,7 +165,7 @@ class ProjectionConstructorDistanceProjectionIT {
 		try ( SearchSession session = mapping.createSession() ) {
 			List<UnitMyProjection> projections = session.search( UnitIndexedEntity.class )
 					.select( UnitMyProjection.class )
-					.where( TypedSearchPredicateFactory::matchAll )
+					.where( SearchPredicateFactory::matchAll )
 					.param( "param", GeoPoint.of( 1, 1 ) )
 					.fetchAllHits();
 			assertThat( projections ).hasSize( 5 )
@@ -222,7 +222,7 @@ class ProjectionConstructorDistanceProjectionIT {
 		try ( SearchSession session = mapping.createSession() ) {
 			List<MultiMyProjection> projections = session.search( MultiIndexedEntity.class )
 					.select( MultiMyProjection.class )
-					.where( TypedSearchPredicateFactory::matchAll )
+					.where( SearchPredicateFactory::matchAll )
 					.param( "param", GeoPoint.of( 1, 2 ) )
 					.fetchAllHits();
 			assertThat( projections ).hasSize( 5 )
@@ -278,7 +278,7 @@ class ProjectionConstructorDistanceProjectionIT {
 		try ( SearchSession session = mapping.createSession() ) {
 			List<MultiNumberMyProjection> projections = session.search( MultiNumberIndexedEntity.class )
 					.select( MultiNumberMyProjection.class )
-					.where( TypedSearchPredicateFactory::matchAll )
+					.where( SearchPredicateFactory::matchAll )
 					.param( "param", GeoPoint.of( 1, 2 ) )
 					.fetchAllHits();
 			assertThat( projections ).hasSize( 5 )

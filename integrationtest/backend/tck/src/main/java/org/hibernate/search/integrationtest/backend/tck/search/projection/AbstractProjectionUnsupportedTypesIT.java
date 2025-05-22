@@ -12,7 +12,7 @@ import java.util.List;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaElement;
 import org.hibernate.search.engine.backend.types.Projectable;
 import org.hibernate.search.engine.backend.types.dsl.SearchableProjectableIndexFieldTypeOptionsStep;
-import org.hibernate.search.engine.search.projection.dsl.TypedSearchProjectionFactory;
+import org.hibernate.search.engine.search.projection.dsl.SearchProjectionFactory;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.FieldTypeDescriptor;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.SimpleFieldModelsByType;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.TckConfiguration;
@@ -50,7 +50,7 @@ abstract class AbstractProjectionUnsupportedTypesIT {
 				);
 	}
 
-	protected abstract void tryProjection(TypedSearchProjectionFactory<?, ?, ?> f, String fieldPath);
+	protected abstract void tryProjection(SearchProjectionFactory<?, ?> f, String fieldPath);
 
 	protected abstract String projectionTrait();
 

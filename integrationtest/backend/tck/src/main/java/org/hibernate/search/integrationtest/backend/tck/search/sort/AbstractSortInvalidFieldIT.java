@@ -11,7 +11,7 @@ import org.hibernate.search.engine.backend.document.IndexObjectFieldReference;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaElement;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaObjectField;
 import org.hibernate.search.engine.backend.types.ObjectStructure;
-import org.hibernate.search.engine.search.sort.dsl.TypedSearchSortFactory;
+import org.hibernate.search.engine.search.sort.dsl.SearchSortFactory;
 import org.hibernate.search.util.common.SearchException;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.SimpleMappedIndex;
 
@@ -27,7 +27,7 @@ public abstract class AbstractSortInvalidFieldIT {
 
 	@Test
 	void use_unknownField() {
-		TypedSearchSortFactory<?> f = index.createScope().sort();
+		SearchSortFactory f = index.createScope().sort();
 
 		assertThatThrownBy( () -> trySort( f, "unknown_field" ) )
 				.isInstanceOf( SearchException.class )
@@ -57,7 +57,7 @@ public abstract class AbstractSortInvalidFieldIT {
 
 	@Test
 	void use_objectField_nested() {
-		TypedSearchSortFactory<?> f = index.createScope().sort();
+		SearchSortFactory f = index.createScope().sort();
 
 		String fieldPath = index.binding().nested.relativeFieldName;
 
@@ -68,7 +68,7 @@ public abstract class AbstractSortInvalidFieldIT {
 
 	@Test
 	void use_objectField_flattened() {
-		TypedSearchSortFactory<?> f = index.createScope().sort();
+		SearchSortFactory f = index.createScope().sort();
 
 		String fieldPath = index.binding().flattened.relativeFieldName;
 
@@ -77,7 +77,7 @@ public abstract class AbstractSortInvalidFieldIT {
 				.hasMessageContaining( "Cannot use '" + sortTrait() + "' on field '" + fieldPath + "'" );
 	}
 
-	protected abstract void trySort(TypedSearchSortFactory<?> f, String fieldPath);
+	protected abstract void trySort(SearchSortFactory f, String fieldPath);
 
 	protected abstract String sortTrait();
 

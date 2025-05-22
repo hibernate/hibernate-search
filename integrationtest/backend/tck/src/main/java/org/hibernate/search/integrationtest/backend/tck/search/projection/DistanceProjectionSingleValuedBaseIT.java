@@ -20,10 +20,10 @@ import org.hibernate.search.engine.search.projection.ProjectionCollector;
 import org.hibernate.search.engine.search.projection.dsl.DistanceToFieldProjectionOptionsStep;
 import org.hibernate.search.engine.search.projection.dsl.DistanceToFieldProjectionValueStep;
 import org.hibernate.search.engine.search.projection.dsl.ProjectionFinalStep;
-import org.hibernate.search.engine.search.projection.dsl.TypedSearchProjectionFactory;
+import org.hibernate.search.engine.search.projection.dsl.SearchProjectionFactory;
 import org.hibernate.search.engine.search.query.dsl.SearchQueryOptionsStep;
+import org.hibernate.search.engine.search.sort.dsl.SearchSortFactory;
 import org.hibernate.search.engine.search.sort.dsl.SortFinalStep;
-import org.hibernate.search.engine.search.sort.dsl.TypedSearchSortFactory;
 import org.hibernate.search.engine.spatial.DistanceUnit;
 import org.hibernate.search.engine.spatial.GeoPoint;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.TckConfiguration;
@@ -151,27 +151,27 @@ class DistanceProjectionSingleValuedBaseIT extends AbstractDistanceProjectionSin
 
 	@Override
 	protected DistanceToFieldProjectionValueStep<?, Double> distance(
-			TypedSearchProjectionFactory<?, EntityReference, DocumentReference> projection, String path, GeoPoint center,
+			SearchProjectionFactory<EntityReference, DocumentReference> projection, String path, GeoPoint center,
 			String parameterName) {
 		return projection.distance( path, center );
 	}
 
 	@Override
 	protected ProjectionFinalStep<List<Double>> distanceMulti(
-			TypedSearchProjectionFactory<?, EntityReference, DocumentReference> projection, String path, GeoPoint center,
+			SearchProjectionFactory<EntityReference, DocumentReference> projection, String path, GeoPoint center,
 			String parameterName) {
 		return projection.distance( path, center ).list();
 	}
 
 	@Override
 	protected DistanceToFieldProjectionOptionsStep<?, Double> distance(
-			TypedSearchProjectionFactory<?, EntityReference, DocumentReference> projection, String path, GeoPoint center,
+			SearchProjectionFactory<EntityReference, DocumentReference> projection, String path, GeoPoint center,
 			DistanceUnit unit, String centerParam, String unitParam) {
 		return projection.distance( path, center ).unit( unit );
 	}
 
 	@Override
-	protected SortFinalStep sort(TypedSearchSortFactory<?> sort, String path, GeoPoint center, String parameterName) {
+	protected SortFinalStep sort(SearchSortFactory sort, String path, GeoPoint center, String parameterName) {
 		return sort.distance( path, center );
 	}
 }

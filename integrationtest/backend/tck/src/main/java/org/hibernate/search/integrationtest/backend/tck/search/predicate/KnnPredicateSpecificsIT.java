@@ -35,9 +35,9 @@ import org.hibernate.search.engine.backend.types.Projectable;
 import org.hibernate.search.engine.backend.types.VectorSimilarity;
 import org.hibernate.search.engine.backend.types.dsl.SearchableProjectableIndexFieldTypeOptionsStep;
 import org.hibernate.search.engine.search.predicate.dsl.KnnPredicateOptionsStep;
-import org.hibernate.search.engine.search.predicate.dsl.TypedSearchPredicateFactory;
+import org.hibernate.search.engine.search.predicate.dsl.SearchPredicateFactory;
 import org.hibernate.search.engine.search.projection.ProjectionCollector;
-import org.hibernate.search.engine.search.projection.dsl.TypedSearchProjectionFactory;
+import org.hibernate.search.engine.search.projection.dsl.SearchProjectionFactory;
 import org.hibernate.search.engine.search.query.SearchQuery;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.FieldTypeDescriptor;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.VectorFieldTypeDescriptor;
@@ -209,7 +209,7 @@ class KnnPredicateSpecificsIT {
 		@ParameterizedTest(name = "{1}")
 		@MethodSource("params")
 		void wrongVectorValuesType(SimpleMappedIndex<IndexBinding> index, VectorFieldTypeDescriptor<?> fieldType) {
-			TypedSearchPredicateFactory<?> f = index.createScope( index ).predicate();
+			SearchPredicateFactory f = index.createScope( index ).predicate();
 
 			String fieldPath = index.binding().field.get( fieldType ).relativeFieldName;
 
@@ -238,7 +238,7 @@ class KnnPredicateSpecificsIT {
 					);
 		}
 
-		protected void tryPredicateWrongType(TypedSearchPredicateFactory<?> f, String fieldPath,
+		protected void tryPredicateWrongType(SearchPredicateFactory f, String fieldPath,
 				VectorFieldTypeDescriptor<?> fieldType) {
 			if ( fieldType.getJavaType() == byte[].class ) {
 				f.knn( 1 ).field( fieldPath ).matching( 1.0f, 1.0f );
@@ -248,7 +248,7 @@ class KnnPredicateSpecificsIT {
 			}
 		}
 
-		protected KnnPredicateOptionsStep<?> tryPredicateWrongLength(TypedSearchPredicateFactory<?> f, String fieldPath,
+		protected KnnPredicateOptionsStep<?> tryPredicateWrongLength(SearchPredicateFactory f, String fieldPath,
 				VectorFieldTypeDescriptor<?> fieldType) {
 			if ( fieldType.getJavaType() == byte[].class ) {
 				return f.knn( 1 ).field( fieldPath ).matching( new byte[fieldType.vectorSize() * 2] );
@@ -328,7 +328,7 @@ class KnnPredicateSpecificsIT {
 				SimpleMappedIndex<IndexBinding> indexDifferentEfConstruction,
 				SimpleMappedIndex<IndexBinding> indexDifferentM,
 				SimpleMappedIndex<IndexBinding> indexDifferentSimilarity) {
-			TypedSearchPredicateFactory<?> f = index.createScope( indexDifferentDimension ).predicate();
+			SearchPredicateFactory f = index.createScope( indexDifferentDimension ).predicate();
 
 			String fieldPath = index.binding().field.get( fieldType ).relativeFieldName;
 
@@ -351,7 +351,7 @@ class KnnPredicateSpecificsIT {
 				SimpleMappedIndex<IndexBinding> indexDifferentEfConstruction,
 				SimpleMappedIndex<IndexBinding> indexDifferentM,
 				SimpleMappedIndex<IndexBinding> indexDifferentSimilarity) {
-			TypedSearchPredicateFactory<?> f = index.createScope( indexDifferentSimilarity ).predicate();
+			SearchPredicateFactory f = index.createScope( indexDifferentSimilarity ).predicate();
 
 			String fieldPath = index.binding().field.get( fieldType ).relativeFieldName;
 
@@ -375,7 +375,7 @@ class KnnPredicateSpecificsIT {
 				SimpleMappedIndex<IndexBinding> indexDifferentM,
 				SimpleMappedIndex<IndexBinding> indexDifferentSimilarity) {
 			StubMappingScope scope = index.createScope( indexDifferentEfConstruction );
-			TypedSearchPredicateFactory<?> f = scope.predicate();
+			SearchPredicateFactory f = scope.predicate();
 
 			String fieldPath = index.binding().field.get( fieldType ).relativeFieldName;
 
@@ -399,7 +399,7 @@ class KnnPredicateSpecificsIT {
 				SimpleMappedIndex<IndexBinding> indexDifferentM,
 				SimpleMappedIndex<IndexBinding> indexDifferentSimilarity) {
 			StubMappingScope scope = index.createScope( indexDifferentM );
-			TypedSearchPredicateFactory<?> f = scope.predicate();
+			SearchPredicateFactory f = scope.predicate();
 
 			String fieldPath = index.binding().field.get( fieldType ).relativeFieldName;
 
@@ -414,7 +414,7 @@ class KnnPredicateSpecificsIT {
 					);
 		}
 
-		protected KnnPredicateOptionsStep<?> predicate(TypedSearchPredicateFactory<?> f, String fieldPath,
+		protected KnnPredicateOptionsStep<?> predicate(SearchPredicateFactory f, String fieldPath,
 				VectorFieldTypeDescriptor<?> fieldType) {
 			if ( fieldType.getJavaType() == byte[].class ) {
 				return f.knn( 1 ).field( fieldPath ).matching( (byte) 1, (byte) 1 );
@@ -527,7 +527,7 @@ class KnnPredicateSpecificsIT {
 		void similarity(VectorFieldTypeDescriptor<?> fieldType,
 				SimpleMappedIndex<IndexBinding> index) {
 			StubMappingScope scope = index.createScope();
-			TypedSearchPredicateFactory<?> f = scope.predicate();
+			SearchPredicateFactory f = scope.predicate();
 
 			String fieldPath = index.binding().field.get( fieldType ).relativeFieldName;
 
@@ -537,7 +537,7 @@ class KnnPredicateSpecificsIT {
 					.hasSize( 2 );
 		}
 
-		protected KnnPredicateOptionsStep<?> predicate(TypedSearchPredicateFactory<?> f, String fieldPath,
+		protected KnnPredicateOptionsStep<?> predicate(SearchPredicateFactory f, String fieldPath,
 				VectorFieldTypeDescriptor<?> fieldType) {
 			if ( fieldType.getJavaType() == byte[].class ) {
 				return f.knn( 2 ).field( fieldPath ).matching( (byte) 1, (byte) 0, (byte) 0, (byte) 0 );
@@ -727,7 +727,7 @@ class KnnPredicateSpecificsIT {
 		void knnAsKnnFilter() {
 			SearchQuery<Object> query = index.createScope().query()
 					.select(
-							TypedSearchProjectionFactory::id
+							SearchProjectionFactory::id
 					)
 					.where( f -> f.knn( 3 )
 							.field( "location" )
@@ -810,7 +810,7 @@ class KnnPredicateSpecificsIT {
 		void multipleKnn_shouldClauses() {
 			SearchQuery<Object> query = index.createScope().query()
 					.select(
-							TypedSearchProjectionFactory::id
+							SearchProjectionFactory::id
 					)
 					.where( f -> f.bool()
 							.should( f.knn( 3 ).field( "location" ).matching( 5.2f, 4.4f ) ) // => "ID:1", "ID:2", "ID:4"
@@ -1008,7 +1008,7 @@ class KnnPredicateSpecificsIT {
 					"This test only make sense for backends that produce the same scores as we expect in the Lucene backend for k-nn search."
 			);
 			assertThat( index.createScope().query()
-					.select( TypedSearchProjectionFactory::score )
+					.select( SearchProjectionFactory::score )
 					.where( f -> f.knn( 10 )
 							.field( "location" )
 							.matching( noramlize( 5f, 4f ) )
@@ -1076,7 +1076,7 @@ class KnnPredicateSpecificsIT {
 					"This test only make sense for backends that produce the scores different from the ones we expect in the Lucene backend for k-nn search."
 			);
 			assertThat( index.createScope().query()
-					.select( TypedSearchProjectionFactory::score )
+					.select( SearchProjectionFactory::score )
 					.where( f -> f.knn( 10 )
 							.field( "location" )
 							.matching( noramlize( 5f, 4f ) )
@@ -1125,7 +1125,7 @@ class KnnPredicateSpecificsIT {
 					"This test only make sense for backends that produce the same scores as we expect in the Lucene backend for k-nn search."
 			);
 			assertThat( index.createScope().query()
-					.select( TypedSearchProjectionFactory::score )
+					.select( SearchProjectionFactory::score )
 					.where( f -> f.knn( 10 )
 							.field( "location" )
 							.matching( noramlize( 5f, 4f ) )
@@ -1188,7 +1188,7 @@ class KnnPredicateSpecificsIT {
 					"This test only make sense for backends that produce the same scores as we expect in the Lucene backend for k-nn search."
 			);
 			assertThat( index.createScope().query()
-					.select( TypedSearchProjectionFactory::score )
+					.select( SearchProjectionFactory::score )
 					.where( f -> f.knn( 10 )
 							.field( "bytes" )
 							.matching( noramlize( index.binding().similarity, 5, 4 ) )
@@ -1246,7 +1246,7 @@ class KnnPredicateSpecificsIT {
 		@MethodSource
 		void scoreFilterFloat(SimpleMappedIndex<IndexBinding> index, float minScore, float score, int matches) {
 			assertThat( index.createScope().query()
-					.select( TypedSearchProjectionFactory::score )
+					.select( SearchProjectionFactory::score )
 					.where( f -> f.knn( 10 )
 							.field( "location" )
 							.matching( noramlize( 5f, 4f ) )
@@ -1309,7 +1309,7 @@ class KnnPredicateSpecificsIT {
 		@MethodSource
 		void scoreFilterByte(SimpleMappedIndex<IndexBinding> index, float minScore, float score, int matches) {
 			assertThat( index.createScope().query()
-					.select( TypedSearchProjectionFactory::score )
+					.select( SearchProjectionFactory::score )
 					.where( f -> f.knn( 10 )
 							.field( "bytes" )
 							.matching( noramlize( index.binding().similarity, 5, 4 ) )

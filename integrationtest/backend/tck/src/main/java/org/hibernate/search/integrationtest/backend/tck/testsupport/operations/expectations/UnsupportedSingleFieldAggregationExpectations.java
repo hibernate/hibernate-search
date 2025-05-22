@@ -4,12 +4,12 @@
  */
 package org.hibernate.search.integrationtest.backend.tck.testsupport.operations.expectations;
 
-import org.hibernate.search.engine.search.aggregation.dsl.TypedSearchAggregationFactory;
+import org.hibernate.search.engine.search.aggregation.dsl.SearchAggregationFactory;
 
 public interface UnsupportedSingleFieldAggregationExpectations {
 
 	String aggregationName();
 
-	void trySetup(TypedSearchAggregationFactory<?> factory, String fieldPath);
+	void trySetup(SearchAggregationFactory factory, String fieldPath);
 
 }

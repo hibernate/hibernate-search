@@ -9,7 +9,6 @@ import java.util.List;
 import org.hibernate.search.engine.search.projection.ProjectionCollector;
 import org.hibernate.search.engine.search.projection.SearchProjection;
 import org.hibernate.search.engine.search.projection.definition.ProjectionDefinitionContext;
-import org.hibernate.search.engine.search.projection.dsl.TypedSearchProjectionFactory;
 import org.hibernate.search.engine.spatial.DistanceUnit;
 import org.hibernate.search.engine.spatial.GeoPoint;
 import org.hibernate.search.util.common.annotation.Incubating;
@@ -56,9 +55,8 @@ public abstract class DistanceProjectionDefinition<F> extends AbstractProjection
 		}
 
 		@Override
-		public SearchProjection<Double> create(TypedSearchProjectionFactory<?, ?, ?> factory,
-				ProjectionDefinitionContext context) {
-			return factory.withParameters( params -> factory
+		public SearchProjection<Double> create(ProjectionDefinitionContext context) {
+			return context.projection().withParameters( params -> context.projection()
 					.distance( fieldPath, params.get( parameterName, GeoPoint.class ) )
 					.unit( unit )
 			).toProjection();
@@ -79,9 +77,8 @@ public abstract class DistanceProjectionDefinition<F> extends AbstractProjection
 		}
 
 		@Override
-		public SearchProjection<List<Double>> create(TypedSearchProjectionFactory<?, ?, ?> factory,
-				ProjectionDefinitionContext context) {
-			return factory.withParameters( params -> factory
+		public SearchProjection<List<Double>> create(ProjectionDefinitionContext context) {
+			return context.projection().withParameters( params -> context.projection()
 					.distance( fieldPath, params.get( parameterName, GeoPoint.class ) )
 					.collector( ProjectionCollector.list() )
 					.unit( unit )
@@ -105,9 +102,8 @@ public abstract class DistanceProjectionDefinition<F> extends AbstractProjection
 		}
 
 		@Override
-		public SearchProjection<C> create(TypedSearchProjectionFactory<?, ?, ?> factory,
-				ProjectionDefinitionContext context) {
-			return factory.withParameters( params -> factory
+		public SearchProjection<C> create(ProjectionDefinitionContext context) {
+			return context.projection().withParameters( params -> context.projection()
 					.distance( fieldPath, params.get( parameterName, GeoPoint.class ) )
 					.collector( collector )
 					.unit( unit )

@@ -25,7 +25,7 @@ import org.hibernate.search.engine.backend.work.execution.DocumentCommitStrategy
 import org.hibernate.search.engine.backend.work.execution.DocumentRefreshStrategy;
 import org.hibernate.search.engine.backend.work.execution.OperationSubmitter;
 import org.hibernate.search.engine.search.predicate.dsl.PredicateFinalStep;
-import org.hibernate.search.engine.search.predicate.dsl.TypedSearchPredicateFactory;
+import org.hibernate.search.engine.search.predicate.dsl.SearchPredicateFactory;
 import org.hibernate.search.engine.search.query.SearchQuery;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.IndexFieldLocation;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.TestedFieldStructure;
@@ -268,7 +268,7 @@ class FieldTemplateIT {
 	}
 
 	private SearchQuery<DocumentReference> query(
-			Function<? super TypedSearchPredicateFactory<?>, ? extends PredicateFinalStep> predicateContributor,
+			Function<? super SearchPredicateFactory, ? extends PredicateFinalStep> predicateContributor,
 			TestedFieldStructure fieldStructure) {
 		return index.createScope().query()
 				.where( f -> {

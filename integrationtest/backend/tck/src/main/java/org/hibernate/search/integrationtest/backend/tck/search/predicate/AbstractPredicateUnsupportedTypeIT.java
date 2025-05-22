@@ -12,7 +12,7 @@ import java.util.Collection;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaElement;
 import org.hibernate.search.engine.backend.types.dsl.SearchableProjectableIndexFieldTypeOptionsStep;
 import org.hibernate.search.engine.reporting.spi.EventContexts;
-import org.hibernate.search.engine.search.predicate.dsl.TypedSearchPredicateFactory;
+import org.hibernate.search.engine.search.predicate.dsl.SearchPredicateFactory;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.FieldTypeDescriptor;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.SimpleFieldModelsByType;
 import org.hibernate.search.util.common.SearchException;
@@ -38,7 +38,7 @@ public abstract class AbstractPredicateUnsupportedTypeIT {
 	@ParameterizedTest(name = "{1}")
 	@MethodSource("params")
 	void use(SimpleMappedIndex<IndexBinding> index, FieldTypeDescriptor<?, ?> fieldType) {
-		TypedSearchPredicateFactory<?> f = index.createScope().predicate();
+		SearchPredicateFactory f = index.createScope().predicate();
 
 		String fieldPath = index.binding().field.get( fieldType ).relativeFieldName;
 
@@ -53,7 +53,7 @@ public abstract class AbstractPredicateUnsupportedTypeIT {
 				) );
 	}
 
-	protected abstract void tryPredicate(TypedSearchPredicateFactory<?> f, String fieldPath);
+	protected abstract void tryPredicate(SearchPredicateFactory f, String fieldPath);
 
 	protected abstract String predicateTrait();
 

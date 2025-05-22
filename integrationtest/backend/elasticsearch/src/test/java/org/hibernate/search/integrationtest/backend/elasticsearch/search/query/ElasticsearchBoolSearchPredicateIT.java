@@ -10,7 +10,7 @@ import org.hibernate.search.engine.backend.document.IndexFieldReference;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaElement;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaObjectField;
 import org.hibernate.search.engine.backend.types.ObjectStructure;
-import org.hibernate.search.engine.search.predicate.dsl.TypedSearchPredicateFactory;
+import org.hibernate.search.engine.search.predicate.dsl.SearchPredicateFactory;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.extension.SearchSetupHelper;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.SimpleMappedIndex;
 
@@ -32,7 +32,7 @@ class ElasticsearchBoolSearchPredicateIT {
 
 	@Test
 	void resultingQueryOptimization() {
-		TypedSearchPredicateFactory<?> f = index.createScope().predicate();
+		SearchPredicateFactory f = index.createScope().predicate();
 
 		assertJsonEqualsIgnoringUnknownFields(
 				"{" +
@@ -128,7 +128,7 @@ class ElasticsearchBoolSearchPredicateIT {
 
 	@Test
 	void resultingQueryOptimizationWithBoost() {
-		TypedSearchPredicateFactory<?> f = index.createScope().predicate();
+		SearchPredicateFactory f = index.createScope().predicate();
 
 		assertJsonEqualsIgnoringUnknownFields(
 				"{" +
