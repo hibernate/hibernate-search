@@ -63,9 +63,8 @@ public final class EntityProjectionBinder implements ProjectionBinder {
 		}
 
 		@Override
-		public SearchProjection<I> create(TypedSearchProjectionFactory<?, ?, ?> factory,
-				ProjectionDefinitionContext context) {
-			return factory.entity( requestedEntityType ).toProjection();
+		public SearchProjection<I> create(ProjectionDefinitionContext context) {
+			return context.projection().entity( requestedEntityType ).toProjection();
 		}
 	}
 

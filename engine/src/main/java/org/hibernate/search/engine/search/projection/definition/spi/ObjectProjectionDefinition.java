@@ -9,7 +9,6 @@ import java.util.List;
 import org.hibernate.search.engine.search.projection.ProjectionCollector;
 import org.hibernate.search.engine.search.projection.SearchProjection;
 import org.hibernate.search.engine.search.projection.definition.ProjectionDefinitionContext;
-import org.hibernate.search.engine.search.projection.dsl.TypedSearchProjectionFactory;
 import org.hibernate.search.util.common.annotation.Incubating;
 import org.hibernate.search.util.common.spi.ToStringTreeAppender;
 
@@ -59,9 +58,9 @@ public abstract class ObjectProjectionDefinition<P, T>
 		}
 
 		@Override
-		public SearchProjection<T> create(TypedSearchProjectionFactory<?, ?, ?> factory,
-				ProjectionDefinitionContext context) {
-			return delegate.apply( factory.withRoot( fieldPath ), factory.object( fieldPath ), context )
+		public SearchProjection<T> create(ProjectionDefinitionContext context) {
+			var projection = context.projection();
+			return delegate.apply( projection.object( fieldPath ), context.withRoot( fieldPath ) )
 					.toProjection();
 		}
 	}
@@ -80,9 +79,8 @@ public abstract class ObjectProjectionDefinition<P, T>
 		}
 
 		@Override
-		public SearchProjection<List<T>> create(TypedSearchProjectionFactory<?, ?, ?> factory,
-				ProjectionDefinitionContext context) {
-			return delegate.apply( factory.withRoot( fieldPath ), factory.object( fieldPath ), context )
+		public SearchProjection<List<T>> create(ProjectionDefinitionContext context) {
+			return delegate.apply( context.projection().object( fieldPath ), context.withRoot( fieldPath ) )
 					.collector( ProjectionCollector.list() ).toProjection();
 		}
 	}
@@ -103,9 +101,8 @@ public abstract class ObjectProjectionDefinition<P, T>
 		}
 
 		@Override
-		public SearchProjection<C> create(TypedSearchProjectionFactory<?, ?, ?> factory,
-				ProjectionDefinitionContext context) {
-			return delegate.apply( factory.withRoot( fieldPath ), factory.object( fieldPath ), context )
+		public SearchProjection<C> create(ProjectionDefinitionContext context) {
+			return delegate.apply( context.projection().object( fieldPath ), context.withRoot( fieldPath ) )
 					.collector( collector ).toProjection();
 		}
 	}

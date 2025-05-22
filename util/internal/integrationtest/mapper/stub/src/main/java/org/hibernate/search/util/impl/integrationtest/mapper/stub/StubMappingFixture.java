@@ -18,7 +18,7 @@ import org.hibernate.search.util.common.AssertionFailure;
 public final class StubMappingFixture {
 
 	private static final CompositeProjectionDefinition<DocumentReference> DEFAULT_DOC_REF_PROJECTION =
-			(f, initialStep, ctx) -> initialStep.from( f.documentReference() ).as( Function.identity() );
+			(initialStep, ctx) -> initialStep.from( ctx.projection().documentReference() ).as( Function.identity() );
 	private static final ProjectionRegistry DEFAULT_PROJECTION_REGISTRY = new ProjectionRegistry() {
 		@Override
 		public <T> CompositeProjectionDefinition<T> composite(Class<T> objectClass) {

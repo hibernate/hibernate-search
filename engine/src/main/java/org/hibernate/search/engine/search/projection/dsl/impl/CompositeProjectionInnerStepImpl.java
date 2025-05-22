@@ -13,6 +13,7 @@ import org.hibernate.search.engine.search.projection.dsl.CompositeProjectionFrom
 import org.hibernate.search.engine.search.projection.dsl.CompositeProjectionInnerStep;
 import org.hibernate.search.engine.search.projection.dsl.CompositeProjectionValueStep;
 import org.hibernate.search.engine.search.projection.dsl.ProjectionFinalStep;
+import org.hibernate.search.engine.search.projection.dsl.SearchProjectionFactory;
 import org.hibernate.search.engine.search.projection.dsl.TypedSearchProjectionFactory;
 import org.hibernate.search.engine.search.projection.dsl.spi.SearchProjectionDslContext;
 import org.hibernate.search.engine.search.projection.spi.CompositeProjectionBuilder;
@@ -48,9 +49,9 @@ public class CompositeProjectionInnerStepImpl<SR> implements CompositeProjection
 				? projectionFactory
 				: projectionFactory.withRoot( objectFieldPath );
 		return dslContext.scope().projectionRegistry().composite( objectClass )
-				.apply( projectionFactoryWithCorrectRoot, this,
-						// TODO HSEARCH-4806/HSEARCH-4807 pass an actual context with parameters
-						DefaultProjectionDefinitionContext.INSTANCE );
+				// TODO: fix this cast:
+				.apply( this, new DefaultProjectionDefinitionContext(
+						(SearchProjectionFactory<?, ?>) projectionFactoryWithCorrectRoot ) );
 	}
 
 	@Override

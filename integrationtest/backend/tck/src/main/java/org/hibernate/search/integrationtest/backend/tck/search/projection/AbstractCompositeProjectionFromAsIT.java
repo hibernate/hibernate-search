@@ -184,13 +184,13 @@ public abstract class AbstractCompositeProjectionFromAsIT<B extends AbstractComp
 				// We simulate a projection definition on the mapper side;
 				// normally this would involve annotation mapping.
 				when( projectionRegistryMock.composite( ValueWrapper.class ) )
-						.thenReturn( (f, initialStep, ctx) ->
+						.thenReturn( (initialStep, ctx) ->
 				// Critically, in a real-world scenario the inner projections
 				// will be defined relative to the composite node
 				// (which may not be the root in the case of object projections).
 				// We need to do the same here, to check that the engine/backend compensates
 				// by passing a projection factory whose root is the composite node.
-				doFrom( f, index.binding().composite(), CompositeBinding::relativePath, initialStep )
+				doFrom( ctx.projection(), index.binding().composite(), CompositeBinding::relativePath, initialStep )
 						.asArray( ValueWrapper<Object[]>::new ) );
 				assertThatQuery( index.createScope().query()
 						.select( f -> startProjection( f ).as( ValueWrapper.class ) )
@@ -209,10 +209,10 @@ public abstract class AbstractCompositeProjectionFromAsIT<B extends AbstractComp
 				// We simulate a projection definition on the mapper side;
 				// normally this would involve annotation mapping.
 				when( projectionRegistryMock.composite( ValueWrapper.class ) )
-						.thenReturn( (f, initialStep, ctx) ->
+						.thenReturn( (initialStep, ctx) ->
 				// Inner projections need to be defined relative to the composite node;
 				// see as_class.
-				doFrom( f, index.binding().compositeForMulti(), CompositeBinding::relativePath, initialStep )
+				doFrom( ctx.projection(), index.binding().compositeForMulti(), CompositeBinding::relativePath, initialStep )
 						.asArray( ValueWrapper<Object[]>::new ) );
 				assertThatQuery( index.createScope().query()
 						.select( f -> startProjectionForMulti( f ).as( ValueWrapper.class )

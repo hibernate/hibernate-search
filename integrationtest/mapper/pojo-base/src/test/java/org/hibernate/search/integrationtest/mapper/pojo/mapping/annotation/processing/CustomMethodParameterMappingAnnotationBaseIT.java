@@ -131,7 +131,8 @@ class CustomMethodParameterMappingAnnotationBaseIT {
 					MethodParameterMappingAnnotationProcessorContext context) {
 				mapping.projection( bindingContext -> {
 					bindingContext.definition( String.class,
-							(factory, definitionContext) -> factory.field( "myText", String.class ).toProjection() );
+							(definitionContext) -> definitionContext.projection().field( "myText", String.class )
+									.toProjection() );
 				} );
 			}
 		}
