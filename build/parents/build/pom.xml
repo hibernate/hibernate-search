@@ -136,7 +136,7 @@
         <version.testcontainers>1.21.0</version.testcontainers>
 
         <version.org.hamcrest>3.0</version.org.hamcrest>
-        <version.org.mockito>5.17.0</version.org.mockito>
+        <version.org.mockito>5.18.0</version.org.mockito>
         <version.org.assertj.assertj-core>3.27.3</version.org.assertj.assertj-core>
         <!-- NOTE: Remove a Dependabot rule for 4.2.1 once the upgrade can be applied -->
         <version.org.awaitily>4.3.0</version.org.awaitily>
@@ -155,7 +155,7 @@
                 - remove and generate the files in mapper/orm-outbox-polling/src/main/avro/generated
         -->
         <version.org.apache.avro>1.12.0</version.org.apache.avro>
-        <version.org.jboss.weld>5.1.5.Final</version.org.jboss.weld>
+        <version.org.jboss.weld>5.1.6.Final</version.org.jboss.weld>
 
         <!-- >>> JDBC Drivers -->
         <version.com.h2database>2.3.232</version.com.h2database>
