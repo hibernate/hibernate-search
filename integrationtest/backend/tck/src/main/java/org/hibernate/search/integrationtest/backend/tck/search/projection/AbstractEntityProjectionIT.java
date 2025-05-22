@@ -371,8 +371,8 @@ public abstract class AbstractEntityProjectionIT {
 		CompositeProjectionDefinition<StubEntity> projectionDefinitionStub =
 				// Simulate a projection that instantiates the entity based on field values extracted from the index.
 				// Here we're just retrieving a field containing the ID.
-				(f, initialStep, ctx) -> initialStep
-						.from( f.field( mainIndex.binding().idField.relativeFieldName, String.class ) )
+				(initialStep, ctx) -> initialStep
+						.from( ctx.projection().field( mainIndex.binding().idField.relativeFieldName, String.class ) )
 						.as( id -> new StubEntity( reference( mainIndex.typeName(), id ) ) );
 		when( projectionRegistryMock.compositeOptional( StubEntity.class ) )
 				.thenReturn( Optional.of( projectionDefinitionStub ) );
@@ -442,8 +442,8 @@ public abstract class AbstractEntityProjectionIT {
 		CompositeProjectionDefinition<StubType3> type3ProjectionDefinitionStub =
 				// Simulate a projection that instantiates the entity based on field values extracted from the index.
 				// Here we're just retrieving a field containing the ID.
-				(f, initialStep, ctx) -> initialStep
-						.from( f.field( multiIndex3.binding().idField.relativeFieldName, String.class ) )
+				(initialStep, ctx) -> initialStep
+						.from( ctx.projection().field( multiIndex3.binding().idField.relativeFieldName, String.class ) )
 						.as( id -> new StubType3( reference( multiIndex3.typeName(), id ) ) );
 		when( projectionRegistryMock.compositeOptional( StubType3.class ) )
 				.thenReturn( Optional.of( type3ProjectionDefinitionStub ) );
@@ -457,8 +457,8 @@ public abstract class AbstractEntityProjectionIT {
 		CompositeProjectionDefinition<StubType4> type4ProjectionDefinitionStub =
 				// Simulate a projection that instantiates the entity based on field values extracted from the index.
 				// Here we're just retrieving a field containing the ID.
-				(f, initialStep, ctx) -> initialStep
-						.from( f.field( multiIndex4.binding().idField.relativeFieldName, String.class ) )
+				(initialStep, ctx) -> initialStep
+						.from( ctx.projection().field( multiIndex4.binding().idField.relativeFieldName, String.class ) )
 						.as( id -> new StubType4( reference( multiIndex4.typeName(), id ) ) );
 		when( projectionRegistryMock.compositeOptional( StubType4.class ) )
 				.thenReturn( Optional.of( type4ProjectionDefinitionStub ) );

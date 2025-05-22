@@ -12,7 +12,7 @@ import org.hibernate.search.engine.backend.document.DocumentElement;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaElement;
 import org.hibernate.search.engine.backend.types.dsl.SearchableProjectableIndexFieldTypeOptionsStep;
 import org.hibernate.search.engine.search.predicate.dsl.PredicateFinalStep;
-import org.hibernate.search.engine.search.predicate.dsl.TypedSearchPredicateFactory;
+import org.hibernate.search.engine.search.predicate.dsl.SearchPredicateFactory;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.FieldTypeDescriptor;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.SimpleFieldModelsByType;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.BulkIndexer;
@@ -87,14 +87,14 @@ public abstract class AbstractPredicateMultiFieldIT<V extends AbstractPredicateT
 		}
 	}
 
-	protected abstract PredicateFinalStep predicateOnFieldAndField(TypedSearchPredicateFactory<?> f, String fieldPath,
+	protected abstract PredicateFinalStep predicateOnFieldAndField(SearchPredicateFactory f, String fieldPath,
 			String otherFieldPath, int matchingDocOrdinal, DataSet<?, V> dataSet);
 
-	protected abstract PredicateFinalStep predicateOnFields(TypedSearchPredicateFactory<?> f, String[] fieldPaths,
+	protected abstract PredicateFinalStep predicateOnFields(SearchPredicateFactory f, String[] fieldPaths,
 			int matchingDocOrdinal,
 			DataSet<?, V> dataSet);
 
-	protected abstract PredicateFinalStep predicateOnFieldAndFields(TypedSearchPredicateFactory<?> f, String fieldPath,
+	protected abstract PredicateFinalStep predicateOnFieldAndFields(SearchPredicateFactory f, String fieldPath,
 			String[] fieldPaths, int matchingDocOrdinal, DataSet<?, V> dataSet);
 
 	private String field0Path(SimpleMappedIndex<IndexBinding> index, DataSet<?, V> dataSet) {

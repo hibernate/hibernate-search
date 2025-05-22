@@ -14,7 +14,7 @@ import org.hibernate.search.engine.backend.document.IndexFieldReference;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaElement;
 import org.hibernate.search.engine.search.predicate.SearchPredicate;
 import org.hibernate.search.engine.search.predicate.dsl.MinimumShouldMatchConditionStep;
-import org.hibernate.search.engine.search.predicate.dsl.TypedSearchPredicateFactory;
+import org.hibernate.search.engine.search.predicate.dsl.SearchPredicateFactory;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.extension.SearchSetupHelper;
 import org.hibernate.search.util.common.SearchException;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.BulkIndexer;
@@ -657,7 +657,7 @@ class BoolPredicateSpecificsIT {
 
 	@Test
 	void minimumShouldMatch_error_negativeCeiling() {
-		TypedSearchPredicateFactory<?> f = index.createScope().predicate();
+		SearchPredicateFactory f = index.createScope().predicate();
 
 		assertThatThrownBy( () -> f.bool().minimumShouldMatch()
 				.ifMoreThan( -1 ).thenRequireNumber( 1 ) )
@@ -674,7 +674,7 @@ class BoolPredicateSpecificsIT {
 
 	@Test
 	void minimumShouldMatch_error_multipleConflictingCeilings() {
-		TypedSearchPredicateFactory<?> f = index.createScope().predicate();
+		SearchPredicateFactory f = index.createScope().predicate();
 
 		assertThatThrownBy( () -> f.bool().minimumShouldMatch()
 				.ifMoreThan( 2 ).thenRequireNumber( -1 )

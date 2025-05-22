@@ -47,9 +47,8 @@ public final class ScoreProjectionBinder implements ProjectionBinder {
 		}
 
 		@Override
-		public SearchProjection<Float> create(TypedSearchProjectionFactory<?, ?, ?> factory,
-				ProjectionDefinitionContext context) {
-			return factory.score().toProjection();
+		public SearchProjection<Float> create(ProjectionDefinitionContext context) {
+			return context.projection().score().toProjection();
 		}
 	}
 

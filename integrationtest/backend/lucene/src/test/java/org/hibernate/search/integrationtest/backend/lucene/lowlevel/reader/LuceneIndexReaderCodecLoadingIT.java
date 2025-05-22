@@ -15,7 +15,7 @@ import org.hibernate.search.backend.lucene.lowlevel.codec.impl.HibernateSearchKn
 import org.hibernate.search.backend.lucene.lowlevel.codec.impl.HibernateSearchLuceneCodec;
 import org.hibernate.search.engine.backend.document.IndexFieldReference;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaElement;
-import org.hibernate.search.engine.search.predicate.dsl.TypedSearchPredicateFactory;
+import org.hibernate.search.engine.search.predicate.dsl.SearchPredicateFactory;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.extension.SearchSetupHelper;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.SimpleMappedIndex;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMapping;
@@ -44,9 +44,9 @@ class LuceneIndexReaderCodecLoadingIT {
 				.withSchemaManagement( StubMappingSchemaManagementStrategy.DROP_AND_CREATE_ON_STARTUP_ONLY )
 				.withIndex( index )
 				.setup() ) {
-			assertThatQuery( index.query().where( TypedSearchPredicateFactory::matchAll ) ).hasNoHits();
+			assertThatQuery( index.query().where( SearchPredicateFactory::matchAll ) ).hasNoHits();
 			index.bulkIndexer().add( "id:1", c -> c.addValue( "vector", new byte[] { 1, 2 } ) ).join();
-			assertThatQuery( index.query().where( TypedSearchPredicateFactory::matchAll ) ).hasTotalHitCount( 1 );
+			assertThatQuery( index.query().where( SearchPredicateFactory::matchAll ) ).hasTotalHitCount( 1 );
 		}
 
 		try ( StubMapping mapping = setupHelper.start()
@@ -55,7 +55,7 @@ class LuceneIndexReaderCodecLoadingIT {
 				.setup() ) {
 			// 2. Make sure that the index is still there and Hibernate Search can access it without any problems
 			//		Note: if a wrong codec was written to the index initially then we'd have a failure here.
-			assertThatQuery( index.query().where( TypedSearchPredicateFactory::matchAll ) ).hasTotalHitCount( 1 );
+			assertThatQuery( index.query().where( SearchPredicateFactory::matchAll ) ).hasTotalHitCount( 1 );
 
 			// 3. Now let's double-check that the coded in the segments is not the custom Hibernate Search one, but the one coming from the Lucene itself.
 			try ( IndexReader indexReader = index.createScope().extension( LuceneExtension.get() ).openIndexReader() ) {

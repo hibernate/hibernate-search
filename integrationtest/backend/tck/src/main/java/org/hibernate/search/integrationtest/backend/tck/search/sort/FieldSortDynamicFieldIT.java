@@ -16,8 +16,8 @@ import org.hibernate.search.engine.backend.document.DocumentElement;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaElement;
 import org.hibernate.search.engine.backend.types.Sortable;
 import org.hibernate.search.engine.search.query.SearchQuery;
+import org.hibernate.search.engine.search.sort.dsl.SearchSortFactory;
 import org.hibernate.search.engine.search.sort.dsl.SortFinalStep;
-import org.hibernate.search.engine.search.sort.dsl.TypedSearchSortFactory;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.FieldTypeDescriptor;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.StandardFieldTypeDescriptor;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.TckConfiguration;
@@ -114,12 +114,12 @@ class FieldSortDynamicFieldIT<F> {
 	}
 
 	private SearchQuery<DocumentReference> matchNonEmptyQuery(
-			Function<? super TypedSearchSortFactory<?>, ? extends SortFinalStep> sortContributor) {
+			Function<? super SearchSortFactory, ? extends SortFinalStep> sortContributor) {
 		return matchNonEmptyQuery( sortContributor, mainIndex.createScope() );
 	}
 
 	private SearchQuery<DocumentReference> matchNonEmptyQuery(
-			Function<? super TypedSearchSortFactory<?>, ? extends SortFinalStep> sortContributor, StubMappingScope scope) {
+			Function<? super SearchSortFactory, ? extends SortFinalStep> sortContributor, StubMappingScope scope) {
 		return scope.query()
 				.where( f -> f.matchAll().except( f.id().matching( EMPTY ) ) )
 				.sort( sortContributor )

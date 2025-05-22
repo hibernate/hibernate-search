@@ -12,7 +12,7 @@ import java.util.Collection;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaElement;
 import org.hibernate.search.engine.backend.types.Searchable;
 import org.hibernate.search.engine.backend.types.dsl.SearchableProjectableIndexFieldTypeOptionsStep;
-import org.hibernate.search.engine.search.predicate.dsl.TypedSearchPredicateFactory;
+import org.hibernate.search.engine.search.predicate.dsl.SearchPredicateFactory;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.FieldTypeDescriptor;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.SimpleFieldModelsByType;
 import org.hibernate.search.util.common.SearchException;
@@ -71,7 +71,7 @@ public abstract class AbstractPredicateSearchableIT {
 			SimpleMappedIndex<SearchableYesIndexBinding> searchableYesIndex,
 			SimpleMappedIndex<SearchableNoIndexBinding> searchableNoIndex,
 			FieldTypeDescriptor<?, ?> fieldType) {
-		TypedSearchPredicateFactory<?> f = searchableNoIndex.createScope().predicate();
+		SearchPredicateFactory f = searchableNoIndex.createScope().predicate();
 
 		String fieldPath = searchableNoIndex.binding().field.get( fieldType ).relativeFieldName;
 
@@ -89,7 +89,7 @@ public abstract class AbstractPredicateSearchableIT {
 			SimpleMappedIndex<SearchableYesIndexBinding> searchableYesIndex,
 			SimpleMappedIndex<SearchableNoIndexBinding> searchableNoIndex,
 			FieldTypeDescriptor<?, ?> fieldType) {
-		TypedSearchPredicateFactory<?> f = searchableYesIndex.createScope( searchableNoIndex ).predicate();
+		SearchPredicateFactory f = searchableYesIndex.createScope( searchableNoIndex ).predicate();
 
 		String fieldPath = searchableYesIndex.binding().field.get( fieldType ).relativeFieldName;
 
@@ -101,7 +101,7 @@ public abstract class AbstractPredicateSearchableIT {
 				);
 	}
 
-	protected abstract void tryPredicate(TypedSearchPredicateFactory<?> f, String fieldPath,
+	protected abstract void tryPredicate(SearchPredicateFactory f, String fieldPath,
 			FieldTypeDescriptor<?, ?> fieldType);
 
 	protected abstract String predicateTrait();

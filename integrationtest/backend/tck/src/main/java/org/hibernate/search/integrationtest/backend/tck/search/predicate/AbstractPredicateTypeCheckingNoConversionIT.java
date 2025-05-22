@@ -20,7 +20,7 @@ import org.hibernate.search.engine.backend.types.dsl.SearchableProjectableIndexF
 import org.hibernate.search.engine.backend.types.dsl.StandardIndexFieldTypeOptionsStep;
 import org.hibernate.search.engine.reporting.spi.EventContexts;
 import org.hibernate.search.engine.search.predicate.dsl.PredicateFinalStep;
-import org.hibernate.search.engine.search.predicate.dsl.TypedSearchPredicateFactory;
+import org.hibernate.search.engine.search.predicate.dsl.SearchPredicateFactory;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.FieldTypeDescriptor;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.SimpleFieldModel;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.SimpleFieldModelsByType;
@@ -179,10 +179,10 @@ public abstract class AbstractPredicateTypeCheckingNoConversionIT<V extends Abst
 				) );
 	}
 
-	protected abstract PredicateFinalStep predicate(TypedSearchPredicateFactory<?> f, String fieldPath, int matchingDocOrdinal,
+	protected abstract PredicateFinalStep predicate(SearchPredicateFactory f, String fieldPath, int matchingDocOrdinal,
 			DataSet<?, V> dataSet);
 
-	protected abstract PredicateFinalStep predicate(TypedSearchPredicateFactory<?> f, String field0Path, String field1Path,
+	protected abstract PredicateFinalStep predicate(SearchPredicateFactory f, String field0Path, String field1Path,
 			int matchingDocOrdinal, DataSet<?, V> dataSet);
 
 	protected abstract String predicateTrait();

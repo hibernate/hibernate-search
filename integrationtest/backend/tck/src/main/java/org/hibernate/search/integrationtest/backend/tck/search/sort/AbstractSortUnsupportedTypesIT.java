@@ -13,7 +13,7 @@ import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaElement
 import org.hibernate.search.engine.backend.types.Sortable;
 import org.hibernate.search.engine.backend.types.dsl.SearchableProjectableIndexFieldTypeOptionsStep;
 import org.hibernate.search.engine.backend.types.dsl.StandardIndexFieldTypeOptionsStep;
-import org.hibernate.search.engine.search.sort.dsl.TypedSearchSortFactory;
+import org.hibernate.search.engine.search.sort.dsl.SearchSortFactory;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.FieldTypeDescriptor;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.SimpleFieldModelsByType;
 import org.hibernate.search.util.common.SearchException;
@@ -50,7 +50,7 @@ abstract class AbstractSortUnsupportedTypesIT {
 				);
 	}
 
-	protected abstract void trySort(TypedSearchSortFactory<?> f, String fieldPath);
+	protected abstract void trySort(SearchSortFactory f, String fieldPath);
 
 	protected abstract String sortTrait();
 

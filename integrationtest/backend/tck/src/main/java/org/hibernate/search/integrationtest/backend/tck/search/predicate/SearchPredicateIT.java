@@ -460,14 +460,11 @@ class SearchPredicateIT {
 
 	private static class SupportedExtension implements SearchPredicateFactoryExtension<MyExtendedFactory> {
 
-		@SuppressWarnings("unchecked") // TODO: use rescope here instead
+		@SuppressWarnings("unchecked")
 		@Override
 		public Optional<MyExtendedFactory> extendOptional(SearchPredicateFactory original) {
 			assertThat( original ).isNotNull();
-			if ( original instanceof MyExtendedFactory f ) {
-				return Optional.of( f );
-			}
-			return Optional.empty();
+			return Optional.of( new MyExtendedFactory( original ) );
 		}
 	}
 

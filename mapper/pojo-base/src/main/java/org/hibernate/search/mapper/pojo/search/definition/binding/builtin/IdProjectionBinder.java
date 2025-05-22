@@ -63,9 +63,8 @@ public final class IdProjectionBinder implements ProjectionBinder {
 		}
 
 		@Override
-		public SearchProjection<I> create(TypedSearchProjectionFactory<?, ?, ?> factory,
-				ProjectionDefinitionContext context) {
-			return factory.id( requestedIdentifierType ).toProjection();
+		public SearchProjection<I> create(ProjectionDefinitionContext context) {
+			return context.projection().id( requestedIdentifierType ).toProjection();
 		}
 	}
 

@@ -14,7 +14,6 @@ import org.hibernate.search.engine.environment.bean.BeanHolder;
 import org.hibernate.search.engine.search.projection.ProjectionCollector;
 import org.hibernate.search.engine.search.projection.SearchProjection;
 import org.hibernate.search.engine.search.projection.definition.ProjectionDefinitionContext;
-import org.hibernate.search.engine.search.projection.dsl.TypedSearchProjectionFactory;
 import org.hibernate.search.util.common.annotation.Incubating;
 import org.hibernate.search.util.common.spi.ToStringTreeAppender;
 
@@ -91,8 +90,7 @@ public final class ConstantProjectionDefinition<T> extends AbstractProjectionDef
 	}
 
 	@Override
-	public SearchProjection<T> create(TypedSearchProjectionFactory<?, ?, ?> factory,
-			ProjectionDefinitionContext context) {
-		return factory.constant( value ).toProjection();
+	public SearchProjection<T> create(ProjectionDefinitionContext context) {
+		return context.projection().constant( value ).toProjection();
 	}
 }

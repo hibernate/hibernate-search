@@ -11,7 +11,7 @@ import org.hibernate.search.engine.backend.types.ObjectStructure;
 import org.hibernate.search.engine.backend.types.dsl.SearchableProjectableIndexFieldTypeOptionsStep;
 import org.hibernate.search.engine.search.projection.ProjectionCollector;
 import org.hibernate.search.engine.search.projection.dsl.ProjectionFinalStep;
-import org.hibernate.search.engine.search.projection.dsl.TypedSearchProjectionFactory;
+import org.hibernate.search.engine.search.projection.dsl.SearchProjectionFactory;
 import org.hibernate.search.engine.spatial.GeoPoint;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.FieldTypeDescriptor;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.GeoPointFieldTypeDescriptor;
@@ -146,13 +146,13 @@ class DistanceProjectionBaseIT {
 		}
 
 		@Override
-		protected ProjectionFinalStep<Double> singleValuedProjection(TypedSearchProjectionFactory<?, ?, ?> f,
+		protected ProjectionFinalStep<Double> singleValuedProjection(SearchProjectionFactory<?, ?> f,
 				String absoluteFieldPath, DataSet<GeoPoint, Double, DistanceProjectionTestValues> dataSet) {
 			return f.distance( absoluteFieldPath, dataSet.values.projectionCenterPoint() );
 		}
 
 		@Override
-		protected ProjectionFinalStep<List<Double>> multiValuedProjection(TypedSearchProjectionFactory<?, ?, ?> f,
+		protected ProjectionFinalStep<List<Double>> multiValuedProjection(SearchProjectionFactory<?, ?> f,
 				String absoluteFieldPath, DataSet<GeoPoint, Double, DistanceProjectionTestValues> dataSet) {
 			return f.distance( absoluteFieldPath, dataSet.values.projectionCenterPoint() )
 					.collector( ProjectionCollector.list() );
@@ -174,7 +174,7 @@ class DistanceProjectionBaseIT {
 		}
 
 		@Override
-		protected void tryProjection(TypedSearchProjectionFactory<?, ?, ?> f, String fieldPath) {
+		protected void tryProjection(SearchProjectionFactory<?, ?> f, String fieldPath) {
 			f.distance( fieldPath, GeoPoint.of( 0.0, 0.0 ) );
 		}
 
@@ -206,7 +206,7 @@ class DistanceProjectionBaseIT {
 		}
 
 		@Override
-		protected void tryProjection(TypedSearchProjectionFactory<?, ?, ?> f, String fieldPath) {
+		protected void tryProjection(SearchProjectionFactory<?, ?> f, String fieldPath) {
 			f.distance( fieldPath, GeoPoint.of( 0.0, 0.0 ) );
 		}
 
@@ -245,7 +245,7 @@ class DistanceProjectionBaseIT {
 		}
 
 		@Override
-		protected void tryProjection(TypedSearchProjectionFactory<?, ?, ?> f, String fieldPath,
+		protected void tryProjection(SearchProjectionFactory<?, ?> f, String fieldPath,
 				FieldTypeDescriptor<?, ?> fieldType) {
 			f.distance( fieldPath, GeoPoint.of( 0.0, 0.0 ) );
 		}

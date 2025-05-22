@@ -16,11 +16,11 @@ import java.util.Map;
 import java.util.function.Function;
 
 import org.hibernate.search.engine.search.aggregation.dsl.AggregationFinalStep;
+import org.hibernate.search.engine.search.aggregation.dsl.SearchAggregationFactory;
 import org.hibernate.search.engine.search.aggregation.dsl.TermsAggregationOptionsStep;
-import org.hibernate.search.engine.search.aggregation.dsl.TypedSearchAggregationFactory;
 import org.hibernate.search.engine.search.common.ValueModel;
 import org.hibernate.search.engine.search.predicate.dsl.PredicateFinalStep;
-import org.hibernate.search.engine.search.predicate.dsl.TypedSearchPredicateFactory;
+import org.hibernate.search.engine.search.predicate.dsl.SearchPredicateFactory;
 import org.hibernate.search.engine.spatial.GeoPoint;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.operations.expectations.AggregationScenario;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.operations.expectations.SupportedSingleFieldAggregationExpectations;
@@ -137,8 +137,8 @@ public class TermsAggregationDescriptor extends AggregationDescriptor {
 					TypeAssertionHelper<F, T> helper) {
 				return new AggregationScenario<Map<T, Long>>() {
 					@Override
-					public AggregationFinalStep<Map<T, Long>> setup(TypedSearchAggregationFactory<?> factory, String fieldPath,
-							Function<? super TypedSearchPredicateFactory<?>, ? extends PredicateFinalStep> filterOrNull) {
+					public AggregationFinalStep<Map<T, Long>> setup(SearchAggregationFactory factory, String fieldPath,
+							Function<? super SearchPredicateFactory, ? extends PredicateFinalStep> filterOrNull) {
 						TermsAggregationOptionsStep<?, ?, ?, ?, Map<T, Long>> optionsStep =
 								factory.terms().field( fieldPath, helper.getJavaClass() );
 						if ( filterOrNull == null ) {
@@ -151,7 +151,7 @@ public class TermsAggregationDescriptor extends AggregationDescriptor {
 
 					@Override
 					public AggregationFinalStep<Map<T, Long>> setupWithConverterSetting(
-							TypedSearchAggregationFactory<?> factory,
+							SearchAggregationFactory factory,
 							String fieldPath, ValueModel valueModel) {
 						return factory.terms().field( fieldPath, helper.getJavaClass(), valueModel );
 					}
@@ -200,7 +200,7 @@ public class TermsAggregationDescriptor extends AggregationDescriptor {
 			}
 
 			@Override
-			public void trySetup(TypedSearchAggregationFactory<?> factory, String fieldPath) {
+			public void trySetup(SearchAggregationFactory factory, String fieldPath) {
 				factory.terms().field( fieldPath, typeDescriptor.getJavaType() );
 			}
 

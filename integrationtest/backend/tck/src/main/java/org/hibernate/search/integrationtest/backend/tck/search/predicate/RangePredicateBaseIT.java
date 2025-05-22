@@ -15,7 +15,7 @@ import java.util.stream.IntStream;
 
 import org.hibernate.search.engine.search.common.ValueModel;
 import org.hibernate.search.engine.search.predicate.dsl.PredicateFinalStep;
-import org.hibernate.search.engine.search.predicate.dsl.TypedSearchPredicateFactory;
+import org.hibernate.search.engine.search.predicate.dsl.SearchPredicateFactory;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.FieldTypeDescriptor;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.GeoPointFieldTypeDescriptor;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.IntegerFieldTypeDescriptor;
@@ -160,13 +160,13 @@ class RangePredicateBaseIT {
 		}
 
 		@Override
-		protected PredicateFinalStep predicate(TypedSearchPredicateFactory<?> f, String fieldPath, int matchingDocOrdinal,
+		protected PredicateFinalStep predicate(SearchPredicateFactory f, String fieldPath, int matchingDocOrdinal,
 				DataSet<?, RangePredicateTestValues<F>> dataSet) {
 			return f.range().field( fieldPath ).within( dataSet.values.matchingRange( matchingDocOrdinal ) );
 		}
 
 		@Override
-		protected PredicateFinalStep predicate(TypedSearchPredicateFactory<?> f, String fieldPath, String paramName,
+		protected PredicateFinalStep predicate(SearchPredicateFactory f, String fieldPath, String paramName,
 				DataSet<?, RangePredicateTestValues<F>> dataSet) {
 			return f.withParameters( params -> f.range().field( fieldPath )
 					.within( params.get( paramName, Range.class ) ) );
@@ -204,21 +204,21 @@ class RangePredicateBaseIT {
 		}
 
 		@Override
-		protected PredicateFinalStep predicateOnFieldAndField(TypedSearchPredicateFactory<?> f, String fieldPath,
+		protected PredicateFinalStep predicateOnFieldAndField(SearchPredicateFactory f, String fieldPath,
 				String otherFieldPath, int matchingDocOrdinal, DataSet<?, RangePredicateTestValues<F>> dataSet) {
 			return f.range().field( fieldPath ).field( otherFieldPath )
 					.within( dataSet.values.matchingRange( matchingDocOrdinal ) );
 		}
 
 		@Override
-		protected PredicateFinalStep predicateOnFields(TypedSearchPredicateFactory<?> f, String[] fieldPaths,
+		protected PredicateFinalStep predicateOnFields(SearchPredicateFactory f, String[] fieldPaths,
 				int matchingDocOrdinal,
 				DataSet<?, RangePredicateTestValues<F>> dataSet) {
 			return f.range().fields( fieldPaths ).within( dataSet.values.matchingRange( matchingDocOrdinal ) );
 		}
 
 		@Override
-		protected PredicateFinalStep predicateOnFieldAndFields(TypedSearchPredicateFactory<?> f, String fieldPath,
+		protected PredicateFinalStep predicateOnFieldAndFields(SearchPredicateFactory f, String fieldPath,
 				String[] fieldPaths, int matchingDocOrdinal, DataSet<?, RangePredicateTestValues<F>> dataSet) {
 			return f.range().field( fieldPath ).fields( fieldPaths )
 					.within( dataSet.values.matchingRange( matchingDocOrdinal ) );
@@ -255,7 +255,7 @@ class RangePredicateBaseIT {
 		}
 
 		@Override
-		protected PredicateFinalStep predicate(TypedSearchPredicateFactory<?> f, String fieldPath, int matchingDocOrdinal,
+		protected PredicateFinalStep predicate(SearchPredicateFactory f, String fieldPath, int matchingDocOrdinal,
 				DataSet<?, RangePredicateTestValues<F>> dataSet) {
 			return f.range().field( fieldPath ).within( dataSet.values.matchingRange( matchingDocOrdinal ) );
 		}
@@ -281,7 +281,7 @@ class RangePredicateBaseIT {
 		}
 
 		@Override
-		protected PredicateFinalStep predicate(TypedSearchPredicateFactory<?> f, String fieldPath, String matchingParam) {
+		protected PredicateFinalStep predicate(SearchPredicateFactory f, String fieldPath, String matchingParam) {
 			return f.range().field( fieldPath ).within( Range.between( matchingParam, matchingParam ) );
 		}
 	}
@@ -311,26 +311,26 @@ class RangePredicateBaseIT {
 		}
 
 		@Override
-		protected PredicateFinalStep predicate(TypedSearchPredicateFactory<?> f, String fieldPath, int matchingDocOrdinal,
+		protected PredicateFinalStep predicate(SearchPredicateFactory f, String fieldPath, int matchingDocOrdinal,
 				DataSet<?, RangePredicateTestValues<F>> dataSet) {
 			return f.range().field( fieldPath ).within( dataSet.values.matchingRange( matchingDocOrdinal ) );
 		}
 
 		@Override
-		protected PredicateFinalStep predicateWithConstantScore(TypedSearchPredicateFactory<?> f, String[] fieldPaths,
+		protected PredicateFinalStep predicateWithConstantScore(SearchPredicateFactory f, String[] fieldPaths,
 				int matchingDocOrdinal, DataSet<?, RangePredicateTestValues<F>> dataSet) {
 			return f.range().fields( fieldPaths ).within( dataSet.values.matchingRange( matchingDocOrdinal ) ).constantScore();
 		}
 
 		@Override
-		protected PredicateFinalStep predicateWithPredicateLevelBoost(TypedSearchPredicateFactory<?> f, String[] fieldPaths,
+		protected PredicateFinalStep predicateWithPredicateLevelBoost(SearchPredicateFactory f, String[] fieldPaths,
 				int matchingDocOrdinal, float predicateBoost, DataSet<?, RangePredicateTestValues<F>> dataSet) {
 			return f.range().fields( fieldPaths ).within( dataSet.values.matchingRange( matchingDocOrdinal ) )
 					.boost( predicateBoost );
 		}
 
 		@Override
-		protected PredicateFinalStep predicateWithConstantScoreAndPredicateLevelBoost(TypedSearchPredicateFactory<?> f,
+		protected PredicateFinalStep predicateWithConstantScoreAndPredicateLevelBoost(SearchPredicateFactory f,
 				String[] fieldPaths, int matchingDocOrdinal, float predicateBoost,
 				DataSet<?, RangePredicateTestValues<F>> dataSet) {
 			return f.range().fields( fieldPaths ).within( dataSet.values.matchingRange( matchingDocOrdinal ) )
@@ -338,21 +338,21 @@ class RangePredicateBaseIT {
 		}
 
 		@Override
-		protected PredicateFinalStep predicateWithFieldLevelBoost(TypedSearchPredicateFactory<?> f, String fieldPath,
+		protected PredicateFinalStep predicateWithFieldLevelBoost(SearchPredicateFactory f, String fieldPath,
 				float fieldBoost, int matchingDocOrdinal, DataSet<?, RangePredicateTestValues<F>> dataSet) {
 			return f.range().field( fieldPath ).boost( fieldBoost )
 					.within( dataSet.values.matchingRange( matchingDocOrdinal ) );
 		}
 
 		@Override
-		protected PredicateFinalStep predicateWithFieldLevelBoostAndConstantScore(TypedSearchPredicateFactory<?> f,
+		protected PredicateFinalStep predicateWithFieldLevelBoostAndConstantScore(SearchPredicateFactory f,
 				String fieldPath, float fieldBoost, int matchingDocOrdinal, DataSet<?, RangePredicateTestValues<F>> dataSet) {
 			return f.range().field( fieldPath ).boost( fieldBoost )
 					.within( dataSet.values.matchingRange( matchingDocOrdinal ) ).constantScore();
 		}
 
 		@Override
-		protected PredicateFinalStep predicateWithFieldLevelBoostAndPredicateLevelBoost(TypedSearchPredicateFactory<?> f,
+		protected PredicateFinalStep predicateWithFieldLevelBoostAndPredicateLevelBoost(SearchPredicateFactory f,
 				String fieldPath, float fieldBoost, int matchingDocOrdinal, float predicateBoost,
 				DataSet<?, RangePredicateTestValues<F>> dataSet) {
 			return f.range().field( fieldPath ).boost( fieldBoost )
@@ -374,7 +374,7 @@ class RangePredicateBaseIT {
 		}
 
 		@Override
-		protected void tryPredicate(TypedSearchPredicateFactory<?> f, String fieldPath) {
+		protected void tryPredicate(SearchPredicateFactory f, String fieldPath) {
 			f.range().field( fieldPath );
 		}
 
@@ -406,7 +406,7 @@ class RangePredicateBaseIT {
 		}
 
 		@Override
-		protected void tryPredicate(TypedSearchPredicateFactory<?> f, String fieldPath) {
+		protected void tryPredicate(SearchPredicateFactory f, String fieldPath) {
 			f.range().field( fieldPath );
 		}
 
@@ -445,7 +445,7 @@ class RangePredicateBaseIT {
 		}
 
 		@Override
-		protected void tryPredicate(TypedSearchPredicateFactory<?> f, String fieldPath, FieldTypeDescriptor<?, ?> fieldType) {
+		protected void tryPredicate(SearchPredicateFactory f, String fieldPath, FieldTypeDescriptor<?, ?> fieldType) {
 			f.range().field( fieldPath );
 		}
 
@@ -479,7 +479,7 @@ class RangePredicateBaseIT {
 		@ParameterizedTest(name = "{1}")
 		@MethodSource("params")
 		void nullBounds(SimpleMappedIndex<IndexBinding> index, FieldTypeDescriptor<?, ?> fieldType) {
-			TypedSearchPredicateFactory<?> f = index.createScope().predicate();
+			SearchPredicateFactory f = index.createScope().predicate();
 
 			assertThatThrownBy( () -> f.range().field( fieldPath( index, fieldType ) )
 					.within( Range.between( null, null ) ) )
@@ -492,7 +492,7 @@ class RangePredicateBaseIT {
 		}
 
 		@Override
-		protected void tryPredicateWithNullMatchingParam(TypedSearchPredicateFactory<?> f, String fieldPath) {
+		protected void tryPredicateWithNullMatchingParam(SearchPredicateFactory f, String fieldPath) {
 			f.range().field( fieldPath ).within( null );
 		}
 	}
@@ -545,18 +545,18 @@ class RangePredicateBaseIT {
 		}
 
 		@Override
-		protected PredicateFinalStep predicate(TypedSearchPredicateFactory<?> f, String fieldPath, Range<?> rangeParam) {
+		protected PredicateFinalStep predicate(SearchPredicateFactory f, String fieldPath, Range<?> rangeParam) {
 			return f.range().field( fieldPath ).within( rangeParam );
 		}
 
 		@Override
-		protected PredicateFinalStep predicate(TypedSearchPredicateFactory<?> f, String fieldPath, Range<?> rangeParam,
+		protected PredicateFinalStep predicate(SearchPredicateFactory f, String fieldPath, Range<?> rangeParam,
 				ValueModel valueModel) {
 			return f.range().field( fieldPath ).within( rangeParam, valueModel );
 		}
 
 		@Override
-		protected PredicateFinalStep predicate(TypedSearchPredicateFactory<?> f, String field0Path, String field1Path,
+		protected PredicateFinalStep predicate(SearchPredicateFactory f, String field0Path, String field1Path,
 				Range<?> rangeParam, ValueModel valueModel) {
 			return f.range().field( field0Path ).field( field1Path ).within( rangeParam, valueModel );
 		}
@@ -564,7 +564,7 @@ class RangePredicateBaseIT {
 		@SuppressWarnings("removal")
 		@Deprecated(since = "test")
 		@Override
-		protected PredicateFinalStep predicate(TypedSearchPredicateFactory<?> f, String fieldPath, Range<?> matchingParam,
+		protected PredicateFinalStep predicate(SearchPredicateFactory f, String fieldPath, Range<?> matchingParam,
 				org.hibernate.search.engine.search.common.ValueConvert valueConvert) {
 			return f.range().field( fieldPath ).within( matchingParam, valueConvert );
 		}
@@ -572,7 +572,7 @@ class RangePredicateBaseIT {
 		@SuppressWarnings("removal")
 		@Deprecated(since = "test")
 		@Override
-		protected PredicateFinalStep predicate(TypedSearchPredicateFactory<?> f, String field0Path, String field1Path,
+		protected PredicateFinalStep predicate(SearchPredicateFactory f, String field0Path, String field1Path,
 				Range<?> matchingParam, org.hibernate.search.engine.search.common.ValueConvert valueConvert) {
 			return f.range().field( field0Path ).field( field1Path ).within( matchingParam, valueConvert );
 		}
@@ -657,7 +657,7 @@ class RangePredicateBaseIT {
 		}
 
 		@Override
-		protected PredicateFinalStep predicate(TypedSearchPredicateFactory<?> f, String fieldPath, Object matchingParam) {
+		protected PredicateFinalStep predicate(SearchPredicateFactory f, String fieldPath, Object matchingParam) {
 			return f.range().field( fieldPath ).within( Range.between( matchingParam, matchingParam ) );
 		}
 

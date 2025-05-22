@@ -33,7 +33,6 @@ import org.hibernate.search.engine.search.sort.dsl.FieldSortOptionsStep;
 import org.hibernate.search.engine.search.sort.dsl.SearchSortFactory;
 import org.hibernate.search.engine.search.sort.dsl.SearchSortFactoryExtension;
 import org.hibernate.search.engine.search.sort.dsl.SortFinalStep;
-import org.hibernate.search.engine.search.sort.dsl.TypedSearchSortFactory;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.configuration.DefaultAnalysisDefinitions;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.extension.SearchSetupHelper;
 import org.hibernate.search.util.common.SearchException;
@@ -82,7 +81,7 @@ class SearchSortIT {
 	}
 
 	private SearchQuery<DocumentReference> simpleQuery(
-			Function<? super TypedSearchSortFactory<?>, ? extends SortFinalStep> sortContributor) {
+			Function<? super SearchSortFactory, ? extends SortFinalStep> sortContributor) {
 		StubMappingScope scope = mainIndex.createScope();
 		return scope.query()
 				.where( f -> f.matchAll() )

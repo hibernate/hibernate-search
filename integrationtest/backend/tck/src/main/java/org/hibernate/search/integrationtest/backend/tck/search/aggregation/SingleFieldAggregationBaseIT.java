@@ -23,9 +23,9 @@ import org.hibernate.search.engine.backend.types.Aggregable;
 import org.hibernate.search.engine.search.aggregation.AggregationKey;
 import org.hibernate.search.engine.search.aggregation.SearchAggregation;
 import org.hibernate.search.engine.search.aggregation.dsl.AggregationFinalStep;
-import org.hibernate.search.engine.search.aggregation.dsl.TypedSearchAggregationFactory;
+import org.hibernate.search.engine.search.aggregation.dsl.SearchAggregationFactory;
 import org.hibernate.search.engine.search.predicate.dsl.PredicateFinalStep;
-import org.hibernate.search.engine.search.predicate.dsl.TypedSearchPredicateFactory;
+import org.hibernate.search.engine.search.predicate.dsl.SearchPredicateFactory;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.model.singlefield.AbstractObjectBinding;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.model.singlefield.SingleFieldIndexBinding;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.operations.AggregationDescriptor;
@@ -258,7 +258,7 @@ class SingleFieldAggregationBaseIT<F> {
 	}
 
 	private <A> void testValidAggregation(AggregationScenario<A> scenario, StubMappingScope scope,
-			String fieldPath, Function<? super TypedSearchPredicateFactory<?>, ? extends PredicateFinalStep> filterOrNull,
+			String fieldPath, Function<? super SearchPredicateFactory, ? extends PredicateFinalStep> filterOrNull,
 			DataSet<F> dataSet) {
 		testValidAggregation(
 				scenario, scope,
@@ -269,8 +269,8 @@ class SingleFieldAggregationBaseIT<F> {
 	}
 
 	private <A> void testValidAggregation(AggregationScenario<A> scenario, StubMappingScope scope,
-			Function<TypedSearchPredicateFactory<?>, ? extends PredicateFinalStep> predicateContributor,
-			BiFunction<TypedSearchAggregationFactory<?>,
+			Function<SearchPredicateFactory, ? extends PredicateFinalStep> predicateContributor,
+			BiFunction<SearchAggregationFactory,
 					AggregationScenario<A>,
 					AggregationFinalStep<A>> aggregationContributor,
 			DataSet<F> dataSet) {
@@ -305,12 +305,12 @@ class SingleFieldAggregationBaseIT<F> {
 		return indexBinding.getFieldPath( fieldStructure, fieldType );
 	}
 
-	private Function<? super TypedSearchPredicateFactory<?>, ? extends PredicateFinalStep> getFilterOrNull(
+	private Function<? super SearchPredicateFactory, ? extends PredicateFinalStep> getFilterOrNull(
 			SingleFieldIndexBinding binding, TestedFieldStructure fieldStructure) {
 		return getFilterOrNull( binding.getDiscriminatorFieldPath( fieldStructure ), fieldStructure );
 	}
 
-	private Function<? super TypedSearchPredicateFactory<?>, ? extends PredicateFinalStep> getFilterOrNull(
+	private Function<? super SearchPredicateFactory, ? extends PredicateFinalStep> getFilterOrNull(
 			String discriminatorPath, TestedFieldStructure fieldStructure) {
 		if ( fieldStructure.isInNested() ) {
 			return pf -> pf.match()

@@ -9,18 +9,25 @@ import org.hibernate.search.engine.search.projection.definition.ProjectionDefini
 import org.hibernate.search.engine.search.projection.definition.ProjectionDefinitionContext;
 import org.hibernate.search.engine.search.projection.dsl.CompositeProjectionInnerStep;
 import org.hibernate.search.engine.search.projection.dsl.CompositeProjectionValueStep;
-import org.hibernate.search.engine.search.projection.dsl.TypedSearchProjectionFactory;
+import org.hibernate.search.engine.search.projection.dsl.SearchProjectionFactory;
 
 public interface CompositeProjectionDefinition<T> extends ProjectionDefinition<T>, AutoCloseable {
 
+	@SuppressWarnings("removal")
+	@Deprecated(since = "8.0", forRemoval = true)
 	@Override
-	default SearchProjection<? extends T> create(TypedSearchProjectionFactory<?, ?, ?> factory,
-			ProjectionDefinitionContext context) {
-		return apply( factory, factory.composite(), context ).toProjection();
+	default SearchProjection<? extends T> create(SearchProjectionFactory<?, ?> factory, ProjectionDefinitionContext context) {
+		var projection = context.projection();
+		return apply( projection.composite(), context ).toProjection();
 	}
 
-	CompositeProjectionValueStep<?, T> apply(TypedSearchProjectionFactory<?, ?, ?> projectionFactory,
-			CompositeProjectionInnerStep initialStep,
+	@Override
+	default SearchProjection<? extends T> create(ProjectionDefinitionContext context) {
+		var projection = context.projection();
+		return apply( projection.composite(), context ).toProjection();
+	}
+
+	CompositeProjectionValueStep<?, T> apply(CompositeProjectionInnerStep initialStep,
 			ProjectionDefinitionContext context);
 
 	/**

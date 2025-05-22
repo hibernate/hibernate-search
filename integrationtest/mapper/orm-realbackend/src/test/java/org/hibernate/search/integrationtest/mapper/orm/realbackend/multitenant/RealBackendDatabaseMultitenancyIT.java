@@ -24,7 +24,7 @@ import org.hibernate.SessionFactory;
 import org.hibernate.annotations.TenantId;
 import org.hibernate.context.spi.CurrentTenantIdentifierResolver;
 import org.hibernate.search.engine.environment.bean.BeanReference;
-import org.hibernate.search.engine.search.predicate.dsl.TypedSearchPredicateFactory;
+import org.hibernate.search.engine.search.predicate.dsl.SearchPredicateFactory;
 import org.hibernate.search.integrationtest.mapper.orm.realbackend.testsupport.BackendConfigurations;
 import org.hibernate.search.mapper.orm.Search;
 import org.hibernate.search.mapper.orm.cfg.HibernateOrmMapperSettings;
@@ -224,7 +224,7 @@ class RealBackendDatabaseMultitenancyIT {
 		with( sessionFactory, tenant3 ).runInTransaction( session -> setupHelper.assertions()
 				.searchAfterIndexChangesAndPotentialRefresh( () -> assertThat( Search.session( session )
 						.search( type )
-						.where( TypedSearchPredicateFactory::matchAll )
+						.where( SearchPredicateFactory::matchAll )
 						.fetchTotalHitCount() )
 						.isZero() ) );
 	}
@@ -232,7 +232,7 @@ class RealBackendDatabaseMultitenancyIT {
 	private static void assertForCurrentTenant(Session session, Class<?> type, String text) {
 		List<?> entities = Search.session( session )
 				.search( type )
-				.where( TypedSearchPredicateFactory::matchAll )
+				.where( SearchPredicateFactory::matchAll )
 				.fetchAllHits();
 		assertThat( entities ).extracting( "text" ).containsExactly( text );
 	}

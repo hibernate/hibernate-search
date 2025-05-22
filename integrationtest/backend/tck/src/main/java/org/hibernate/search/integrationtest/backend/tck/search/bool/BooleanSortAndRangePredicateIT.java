@@ -14,10 +14,10 @@ import org.hibernate.search.engine.backend.document.IndexFieldReference;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaElement;
 import org.hibernate.search.engine.backend.types.Sortable;
 import org.hibernate.search.engine.search.predicate.dsl.PredicateFinalStep;
-import org.hibernate.search.engine.search.predicate.dsl.TypedSearchPredicateFactory;
+import org.hibernate.search.engine.search.predicate.dsl.SearchPredicateFactory;
 import org.hibernate.search.engine.search.query.SearchQuery;
+import org.hibernate.search.engine.search.sort.dsl.SearchSortFactory;
 import org.hibernate.search.engine.search.sort.dsl.SortFinalStep;
-import org.hibernate.search.engine.search.sort.dsl.TypedSearchSortFactory;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.extension.SearchSetupHelper;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.BulkIndexer;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.SimpleMappedIndex;
@@ -56,7 +56,7 @@ class BooleanSortAndRangePredicateIT {
 	}
 
 	private SearchQuery<DocumentReference> sortQuery(
-			Function<? super TypedSearchSortFactory<?>, ? extends SortFinalStep> sortContributor) {
+			Function<? super SearchSortFactory, ? extends SortFinalStep> sortContributor) {
 		StubMappingScope scope = index.createScope();
 		return scope.query()
 				.where( f -> f.matchAll() )
@@ -65,7 +65,7 @@ class BooleanSortAndRangePredicateIT {
 	}
 
 	private SearchQuery<DocumentReference> rangeQuery(
-			Function<TypedSearchPredicateFactory<?>, PredicateFinalStep> rangePredicate) {
+			Function<SearchPredicateFactory, PredicateFinalStep> rangePredicate) {
 		StubMappingScope scope = index.createScope();
 		return scope.query()
 				.where( rangePredicate )

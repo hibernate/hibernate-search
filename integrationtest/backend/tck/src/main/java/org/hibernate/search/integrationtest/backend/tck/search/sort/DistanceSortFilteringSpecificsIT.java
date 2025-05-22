@@ -16,8 +16,8 @@ import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaObjectF
 import org.hibernate.search.engine.backend.types.ObjectStructure;
 import org.hibernate.search.engine.backend.types.Sortable;
 import org.hibernate.search.engine.search.query.SearchQuery;
+import org.hibernate.search.engine.search.sort.dsl.SearchSortFactory;
 import org.hibernate.search.engine.search.sort.dsl.SortFinalStep;
-import org.hibernate.search.engine.search.sort.dsl.TypedSearchSortFactory;
 import org.hibernate.search.engine.spatial.GeoPoint;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.extension.SearchSetupHelper;
 import org.hibernate.search.util.common.SearchException;
@@ -96,12 +96,12 @@ class DistanceSortFilteringSpecificsIT {
 	}
 
 	private SearchQuery<DocumentReference> matchAllQuery(
-			Function<? super TypedSearchSortFactory<?>, ? extends SortFinalStep> sortContributor) {
+			Function<? super SearchSortFactory, ? extends SortFinalStep> sortContributor) {
 		return matchAllQuery( sortContributor, index.createScope() );
 	}
 
 	private SearchQuery<DocumentReference> matchAllQuery(
-			Function<? super TypedSearchSortFactory<?>, ? extends SortFinalStep> sortContributor, StubMappingScope scope) {
+			Function<? super SearchSortFactory, ? extends SortFinalStep> sortContributor, StubMappingScope scope) {
 		return scope.query()
 				.where( f -> f.matchAll() )
 				.sort( sortContributor )

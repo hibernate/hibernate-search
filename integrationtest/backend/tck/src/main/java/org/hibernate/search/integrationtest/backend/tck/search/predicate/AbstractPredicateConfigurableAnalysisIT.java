@@ -8,7 +8,7 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.hibernate.search.util.impl.integrationtest.common.assertion.SearchResultAssert.assertThatQuery;
 
 import org.hibernate.search.engine.search.predicate.dsl.PredicateFinalStep;
-import org.hibernate.search.engine.search.predicate.dsl.TypedSearchPredicateFactory;
+import org.hibernate.search.engine.search.predicate.dsl.SearchPredicateFactory;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.configuration.DefaultAnalysisDefinitions;
 import org.hibernate.search.util.common.SearchException;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.SimpleMappedIndex;
@@ -178,9 +178,9 @@ public abstract class AbstractPredicateConfigurableAnalysisIT extends AbstractPr
 				} );
 	}
 
-	protected abstract PredicateFinalStep predicateWithAnalyzerOverride(TypedSearchPredicateFactory<?> f, String fieldPath,
+	protected abstract PredicateFinalStep predicateWithAnalyzerOverride(SearchPredicateFactory f, String fieldPath,
 			String matchingParam, String analyzerName);
 
-	protected abstract PredicateFinalStep predicateWithSkipAnalysis(TypedSearchPredicateFactory<?> f, String fieldPath,
+	protected abstract PredicateFinalStep predicateWithSkipAnalysis(SearchPredicateFactory f, String fieldPath,
 			String matchingParam);
 }
