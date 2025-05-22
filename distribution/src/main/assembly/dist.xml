@@ -192,9 +192,8 @@
                 <exclude>copyright.txt</exclude>
                 <exclude>lgpl.txt</exclude>
 
-                <!-- only needed for documentation and helper scripts, no need to include them -->
-                <exclude>hibernate-noorm-release-scripts/**</exclude>
-                <exclude>hibernate-release-scripts/**</exclude>
+				<!-- only needed for documentation and helper scripts, no need to include them -->
+				<exclude>.release/**</exclude>
 
                 <!-- actual files which should be ignored -->
                 <exclude>.git</exclude>
