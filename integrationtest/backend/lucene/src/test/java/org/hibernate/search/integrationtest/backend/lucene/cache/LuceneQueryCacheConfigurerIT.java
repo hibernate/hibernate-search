@@ -27,6 +27,7 @@ import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappingSco
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
 
+import org.apache.lucene.search.LRUQueryCache;
 import org.apache.lucene.search.Query;
 import org.apache.lucene.search.QueryCache;
 import org.apache.lucene.search.QueryCachingPolicy;
@@ -86,6 +87,12 @@ class LuceneQueryCacheConfigurerIT {
 
 		@Override
 		public void configure(QueryCachingConfigurationContext context) {
+			final int maxCachedQueries = 1000;
+			// min of 32MB or 5% of the heap size
+			final long maxRamBytesUsed = Math.min( 1L << 25, Runtime.getRuntime().maxMemory() / 20 );
+			// starting with Lucene 11 query cache is disabled by defalt (https://github.com/apache/lucene/pull/14187),
+			// set the cache explicitly to test the policy:
+			context.queryCache( new LRUQueryCache( maxCachedQueries, maxRamBytesUsed ) );
 			context.queryCachingPolicy(
 					new TestQueryCachingPolicy( context.luceneVersion(), new SimulatedFailure( FAILURE_MESSAGE ) ) );
 		}
