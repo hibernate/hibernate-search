@@ -23,7 +23,7 @@
 
     <properties>
         <!-- Skip artifact deployment: we publish through other means. -->
-        <skipNexusStagingDeployMojo>true</skipNexusStagingDeployMojo>
+        <deploy.skip>true</deploy.skip>
     </properties>
 
     <dependencies>
