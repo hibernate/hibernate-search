@@ -123,7 +123,7 @@ to find out what categories are available.
 This change should not affect the end user as collecting of elements still works as it was originally intended to.
 - With introduction of the field references (`org.hibernate.search.engine.search.reference.pass:[*]`) most of the Search DSL
 interfaces (`org.hibernate.search.engine.search.pass:[*].dsl.pass:[*]`) got an extra type argument `SR` (scope root type).
-In simple scenarios where the query is created in one go there will be no code changes required:
+In most cases, there will be no code changes required:
 +
 [source,java,subs="+attributes"]
 ----
@@ -137,20 +137,28 @@ In scenarios where there's work with the affected Search DSL interfaces is requi
 ====
 [source,java,subs="+attributes"]
 ----
-var scope = searchSession.scope( Book.class ); // <1>
-TypedSearchScope<?, Book> scope = searchSession.scope( Book.class ); // <2>
-TypedSearchScope<Book, Book> scope = searchSession.scope( Book.class ); // <3>
-TypedSearchScope<ReadingMaterial, ReadingMaterial> scope = searchSession.scope( List.of( Book.class, Magazine.class ) ); // <4>
-TypedSearchScope<Book__, Book> scope = searchSession.scope( Book.class ); // <5>
-TypedSearchScope<SomeRandomClass, Book> scope = searchSession.scope( Book.class ); // <6>
+var scope = ...; // <1>
+AffectedSearchDslInterface<?, ...> instance = ... // <2>
 ----
 <1> Use `var` if possible. Otherwise, if you need to pass the DSL interfaces to some other methods as parameters,
 consider one of the following options:
-<2> Use the `?` wildcard.
-<3> Use the same type as your search entity.
-<4> Use the common supertype for a scope of multiple search entities.
-<5> Use the class generated for the static metamodel of this search entity.
-<6> Use any class.
+<2> Use the `?` wildcard. Or switch to the typed scopes and:
+
+Otherwise consider switching to the typed scope:
+
+[source,java,subs="+attributes"]
+----
+TypedSearchScope<Book, Book> scope = searchSession.typedScope( Book.class, Book.class ); // <1>
+TypedSearchScope<ReadingMaterial, ReadingMaterial> scope = searchSession.typedScope( ReadingMaterial.class, List.of( Book.class, Magazine.class ) ); // <2>
+TypedSearchScope<Book__, Book> scope = searchSession.typedScope( Book__.class, Book.class ); // <3>
+TypedSearchScope<SomeRandomClass, Book> scope = searchSession.typedScope( SomeRandomClass.class, Book.class ); // <4>
+----
+<1> Use the same type as your search entity.
+<2> Use the common supertype for a scope of multiple search entities.
+<3> Use the class generated for the static metamodel of this search entity.
+<4> Use any class.
+
+And use that type as the scope root type.
 ====
 
 [[spi]]
