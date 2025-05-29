@@ -5,7 +5,11 @@
  ~ License: GNU Lesser General Public License (LGPL), version 2.1 or later
  ~ See the lgpl.txt file in the root directory or <http://www.gnu.org/licenses/lgpl-2.1.html>.
   -->
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<!-- child.project.url.inherit.append.path is weird but necessary to have correct URLs in flattened POMs,
+     see XSD for more info. -->
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd"
+         child.project.url.inherit.append.path="false">
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>org.hibernate</groupId>
@@ -55,7 +59,11 @@
         <url>https://hibernate.atlassian.net/browse/HSEARCH</url>
     </issueManagement>
 
-    <scm>
+    <!-- The various child.*.append.path are weird but necessary to have correct URLs in flattened POMs,
+            see XSD for more info. -->
+    <scm child.scm.connection.inherit.append.path="false"
+         child.scm.developerConnection.inherit.append.path="false"
+         child.scm.url.inherit.append.path="false">
         <connection>scm:git:git://github.com/hibernate/hibernate-search.git</connection>
         <developerConnection>scm:git:git@github.com:hibernate/hibernate-search.git</developerConnection>
         <url>http://github.com/hibernate/hibernate-search</url>
@@ -320,7 +328,6 @@
         <version.jar.plugin>3.0.2</version.jar.plugin>
         <version.javadoc.plugin>3.0.0</version.javadoc.plugin>
         <version.jdeps.plugin>0.4.0</version.jdeps.plugin>
-        <version.nexus.plugin>2.1</version.nexus.plugin>
         <version.processor.plugin>3.2.0</version.processor.plugin>
         <version.project-info.plugin>2.9</version.project-info.plugin>
         <version.release.plugin>2.5.3</version.release.plugin>
@@ -335,7 +342,7 @@
         <version.jacoco.plugin>0.8.3</version.jacoco.plugin>
         <version.coveralls.plugin>4.3.0</version.coveralls.plugin>
         <version.org.jboss.bridger.plugin>1.5.Final</version.org.jboss.bridger.plugin>
-        <version.gpg.plugin>3.0.1</version.gpg.plugin>
+        <version.flatten-maven-plugin>1.7.0</version.flatten-maven-plugin>
 
         <!--
             Please don't change the name of this property, it may be used and
@@ -364,6 +371,8 @@
 
         <!-- Repository Deployment URLs -->
 
+        <local.staging.releases.repo.id>staging-deploy</local.staging.releases.repo.id>
+        <local.staging.releases.repo.url>file:${maven.multiModuleProjectDirectory}/target/staging-deploy/maven</local.staging.releases.repo.url>
         <ossrh.releases.repo.id>ossrh</ossrh.releases.repo.id>
         <ossrh.releases.repo.url>https://oss.sonatype.org/service/local/staging/deploy/maven2/</ossrh.releases.repo.url>
         <ossrh.snapshots.repo.id>ossrh</ossrh.snapshots.repo.id>
@@ -1281,14 +1290,6 @@
                 </executions>
             </plugin>
             <plugin>
-                <groupId>org.sonatype.plugins</groupId>
-                <artifactId>nexus-maven-plugin</artifactId>
-                <configuration>
-                    <nexusUrl>https://repository.jboss.org/nexus</nexusUrl>
-                    <automatic>true</automatic>
-                </configuration>
-            </plugin>
-            <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-jar-plugin</artifactId>
                 <configuration>
@@ -1458,11 +1459,6 @@
                             <scope>compile</scope>
                         </dependency>
                     </dependencies>
-                </plugin>
-                <plugin>
-                    <groupId>org.sonatype.plugins</groupId>
-                    <artifactId>nexus-maven-plugin</artifactId>
-                    <version>${version.nexus.plugin}</version>
                 </plugin>
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
@@ -1869,13 +1865,24 @@
                     <version>${version.org.jboss.bridger.plugin}</version>
                 </plugin>
                 <plugin>
-                    <groupId>org.apache.maven.plugins</groupId>
-                    <artifactId>maven-gpg-plugin</artifactId>
-                    <version>${version.gpg.plugin}</version>
+                    <groupId>org.codehaus.mojo</groupId>
+                    <artifactId>flatten-maven-plugin</artifactId>
+                    <version>${version.flatten-maven-plugin}</version>
                     <configuration>
-                        <homedir>${env.RELEASE_GPG_HOMEDIR}</homedir>
-                        <passphrase>${env.RELEASE_GPG_PASSPHRASE}</passphrase>
+                        <outputDirectory>${project.build.directory}</outputDirectory>
+                        <!-- Keep things like url, inceptionYear, authors...
+                             everything that's required by the OSSRH Maven repository -->
+                        <flattenMode>ossrh</flattenMode>
                     </configuration>
+                    <executions>
+                        <execution>
+                            <id>flatten-pom</id>
+                            <phase>process-resources</phase>
+                            <goals>
+                                <goal>flatten</goal>
+                            </goals>
+                        </execution>
+                    </executions>
                 </plugin>
             </plugins>
         </pluginManagement>
@@ -1957,6 +1964,27 @@
     </reporting>
 
     <profiles>
+        <profile>
+            <id>release</id>
+            <activation>
+                <property>
+                    <name>performRelease</name>
+                    <value>true</value>
+                </property>
+            </activation>
+            <build>
+                <pluginManagement>
+                    <plugins>
+                        <plugin>
+                            <artifactId>maven-deploy-plugin</artifactId>
+                            <configuration>
+                                <altReleaseDeploymentRepository>${local.staging.releases.repo.id}::${local.staging.releases.repo.url}</altReleaseDeploymentRepository>
+                            </configuration>
+                        </plugin>
+                    </plugins>
+                </pluginManagement>
+            </build>
+        </profile>
 
         <!-- The profiles `skippingAllTests` and `skippingIntegrationTests` are currently duplicates,
             as one can't trigger the profile activation on either/or property -->
@@ -2082,33 +2110,6 @@
                     </snapshots>
                 </repository>
             </repositories>
-        </profile>
-
-        <profile>
-            <id>release</id>
-            <activation>
-                <property>
-                    <name>performRelease</name>
-                    <value>true</value>
-                </property>
-            </activation>
-            <build>
-                <plugins>
-                    <plugin>
-                        <groupId>org.apache.maven.plugins</groupId>
-                        <artifactId>maven-gpg-plugin</artifactId>
-                        <executions>
-                            <execution>
-                                <id>sign-artifacts</id>
-                                <phase>verify</phase>
-                                <goals>
-                                    <goal>sign</goal>
-                                </goals>
-                            </execution>
-                        </executions>
-                    </plugin>
-                </plugins>
-            </build>
         </profile>
 
         <profile>

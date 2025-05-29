@@ -19,6 +19,7 @@
 
     <name>Hibernate Search JMS Backend</name>
     <description>Hibernate Search JGroup based backend</description>
+    <url>http://search.hibernate.org</url>
 
     <dependencies>
         <dependency>
