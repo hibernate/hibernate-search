@@ -26,7 +26,7 @@
         <failsafe.jvm.args.jacoco.elasticsearch></failsafe.jvm.args.jacoco.elasticsearch>
 
         <asciidoctor.base-output-dir>${project.build.directory}/asciidoctor/</asciidoctor.base-output-dir>
-        <asciidoctor.theme-dir>${project.build.directory}/hibernate-asciidoctor-theme</asciidoctor.theme-dir>
+        <asciidoctor.theme-dir>${project.build.directory}/hibernate-asciidoctor-theme/asciidoc</asciidoctor.theme-dir>
         <asciidoctor.aggregated-resources-dir>${project.build.directory}/aggregated-resources</asciidoctor.aggregated-resources-dir>
         <asciidoctor.examples-source-dir>${basedir}/src/test/java</asciidoctor.examples-source-dir>
         <asciidoctor.examples-resources-dir>${basedir}/src/test/resources</asciidoctor.examples-resources-dir>

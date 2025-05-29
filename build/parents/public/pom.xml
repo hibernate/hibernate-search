@@ -163,6 +163,7 @@
                                   -->
                             <additionalOption>-Xdoclint:all,-missing</additionalOption>
                         </additionalOptions>
+                        <stylesheetfile>${project.build.directory}/hibernate-asciidoctor-theme/javadoc/jdk21/stylesheet.css</stylesheetfile>
                     </configuration>
                 </plugin>
             </plugins>
@@ -286,7 +287,6 @@
                                     <goal>unpack</goal>
                                 </goals>
                                 <configuration>
-                                    <skip>${javadoc.download.phase}</skip>
                                     <artifactItems>
                                         <artifactItem>
                                             <groupId>${project.groupId}</groupId>
@@ -298,6 +298,25 @@
                                     </artifactItems>
                                     <outputDirectory>${javadoc.packagelists.directory}</outputDirectory>
                                     <overWriteSnapshots>true</overWriteSnapshots>
+                                </configuration>
+                            </execution>
+                            <execution>
+                                <id>unpack-asciidoctor-theme</id>
+                                <phase>${javadoc.download.phase}</phase>
+                                <goals>
+                                    <goal>unpack</goal>
+                                </goals>
+                                <configuration>
+                                    <artifactItems>
+                                        <artifactItem>
+                                            <groupId>org.hibernate.infra</groupId>
+                                            <artifactId>hibernate-asciidoctor-theme</artifactId>
+                                            <version>${version.org.hibernate.infra.hibernate-asciidoctor-theme}</version>
+                                            <type>zip</type>
+                                            <overWrite>true</overWrite>
+                                            <outputDirectory>${project.build.directory}/</outputDirectory>
+                                        </artifactItem>
+                                    </artifactItems>
                                 </configuration>
                             </execution>
                         </executions>
