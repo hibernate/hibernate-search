@@ -29,8 +29,7 @@
         <format.skip>true</format.skip>
         <enforcer.dependencyconvergence.skip>true</enforcer.dependencyconvergence.skip>
 
-        <tmpdir.dependencies-javadoc-packagelists>${project.build.directory}/dependencies-javadoc-packagelists
-        </tmpdir.dependencies-javadoc-packagelists>
+        <tmpdir.dependencies-javadoc-packagelists>${project.build.directory}/dependencies-javadoc-packagelists</tmpdir.dependencies-javadoc-packagelists>
         <tmpdir.dependencies-to-parse>${project.build.directory}/dependencies-to-parse</tmpdir.dependencies-to-parse>
     </properties>
 
@@ -130,8 +129,7 @@
                                     <classifier>javadoc</classifier>
                                     <type>jar</type>
                                     <version>${version.org.hibernate.orm}</version>
-                                    <outputDirectory>${tmpdir.dependencies-javadoc-packagelists}/hibernate-core
-                                    </outputDirectory>
+                                    <outputDirectory>${tmpdir.dependencies-javadoc-packagelists}/hibernate-core</outputDirectory>
                                 </artifactItem>
                                 <artifactItem>
                                     <groupId>org.apache.lucene</groupId>
@@ -139,8 +137,7 @@
                                     <classifier>javadoc</classifier>
                                     <type>jar</type>
                                     <version>${version.org.apache.lucene}</version>
-                                    <outputDirectory>${tmpdir.dependencies-javadoc-packagelists}/lucene-core
-                                    </outputDirectory>
+                                    <outputDirectory>${tmpdir.dependencies-javadoc-packagelists}/lucene-core</outputDirectory>
                                 </artifactItem>
                                 <artifactItem>
                                     <groupId>org.apache.lucene</groupId>
@@ -148,9 +145,7 @@
                                     <classifier>javadoc</classifier>
                                     <type>jar</type>
                                     <version>${version.org.apache.lucene}</version>
-                                    <outputDirectory>
-                                        ${tmpdir.dependencies-javadoc-packagelists}/lucene-analyzers-common
-                                    </outputDirectory>
+                                    <outputDirectory>${tmpdir.dependencies-javadoc-packagelists}/lucene-analyzers-common</outputDirectory>
                                 </artifactItem>
                                 <artifactItem>
                                     <groupId>org.apache.lucene</groupId>
@@ -158,8 +153,7 @@
                                     <classifier>javadoc</classifier>
                                     <type>jar</type>
                                     <version>${version.org.apache.lucene}</version>
-                                    <outputDirectory>${tmpdir.dependencies-javadoc-packagelists}/lucene-queryparser
-                                    </outputDirectory>
+                                    <outputDirectory>${tmpdir.dependencies-javadoc-packagelists}/lucene-queryparser</outputDirectory>
                                 </artifactItem>
                                 <artifactItem>
                                     <groupId>jakarta.batch</groupId>
@@ -167,8 +161,7 @@
                                     <classifier>javadoc</classifier>
                                     <type>jar</type>
                                     <version>${version.jakarta.batch}</version>
-                                    <outputDirectory>${tmpdir.dependencies-javadoc-packagelists}/batch-api
-                                    </outputDirectory>
+                                    <outputDirectory>${tmpdir.dependencies-javadoc-packagelists}/batch-api</outputDirectory>
                                 </artifactItem>
                             </artifactItems>
                             <includes>package-list,element-list</includes>
@@ -207,8 +200,7 @@
                             <goal>java</goal>
                         </goals>
                         <configuration>
-                            <mainClass>org.hibernate.search.build.report.forbiddenapis.AnnotationReportGenerator
-                            </mainClass>
+                            <mainClass>org.hibernate.search.build.report.forbiddenapis.AnnotationReportGenerator</mainClass>
                             <arguments>
                                 <!-- The location of classes to process: -->
                                 <argument>${tmpdir.dependencies-to-parse}/hibernate-core</argument>
