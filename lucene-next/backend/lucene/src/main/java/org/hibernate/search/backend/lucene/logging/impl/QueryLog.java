@@ -7,6 +7,7 @@ package org.hibernate.search.backend.lucene.logging.impl;
 import static org.hibernate.search.backend.lucene.logging.impl.LuceneLog.ID_OFFSET;
 import static org.hibernate.search.backend.lucene.logging.impl.LuceneLog.ID_OFFSET_LEGACY_ENGINE;
 import static org.jboss.logging.Logger.Level.TRACE;
+import static org.jboss.logging.Logger.Level.WARN;
 
 import java.io.IOException;
 import java.lang.invoke.MethodHandles;
@@ -328,4 +329,9 @@ public interface QueryLog {
 	@Message(id = ID_OFFSET + 194, value = "Current factory cannot be resocped to '%1$s' as it is scoped to '%2$s'.")
 	SearchException incompatibleScopeRootType(@FormatWith(ClassFormatter.class) Class<?> requested,
 			@FormatWith(ClassFormatter.class) Class<?> actual);
+
+	@LogMessage(level = WARN)
+	@Message(id = ID_OFFSET + 195, value = "Configured query cache policy is ineffective as query cache is not enabled. "
+			+ "Set the cache explicitly through the QueryCachingConfigurer.")
+	void ineffectiveQueryCachingPolicy();
 }

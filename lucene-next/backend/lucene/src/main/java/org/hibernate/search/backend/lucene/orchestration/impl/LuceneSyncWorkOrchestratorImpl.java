@@ -11,6 +11,7 @@ import java.util.concurrent.CompletableFuture;
 
 import org.hibernate.search.backend.lucene.cache.impl.LuceneQueryCachingContext;
 import org.hibernate.search.backend.lucene.logging.impl.LuceneMiscLog;
+import org.hibernate.search.backend.lucene.logging.impl.QueryLog;
 import org.hibernate.search.backend.lucene.lowlevel.reader.impl.HibernateSearchMultiReader;
 import org.hibernate.search.backend.lucene.lowlevel.reader.impl.IndexReaderMetadataResolver;
 import org.hibernate.search.backend.lucene.lowlevel.reader.impl.ReadIndexManagerContext;
@@ -131,7 +132,13 @@ public class LuceneSyncWorkOrchestratorImpl
 			searcher.setSimilarity( similarity );
 
 			cachingContext.queryCache().ifPresent( searcher::setQueryCache );
-			cachingContext.queryCachingPolicy().ifPresent( searcher::setQueryCachingPolicy );
+			if ( cachingContext.queryCachingPolicy().isPresent() ) {
+				searcher.setQueryCachingPolicy( cachingContext.queryCachingPolicy().get() );
+				// Note: Lucene 11 will not enable cache by default so policy won't get applied, let's warn users if this happens:
+				if ( searcher.getQueryCache() == null ) {
+					QueryLog.INSTANCE.ineffectiveQueryCachingPolicy();
+				}
+			}
 
 			return searcher;
 		}
