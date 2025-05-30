@@ -836,23 +836,14 @@ class ProjectionConstructorBaseIT extends AbstractProjectionConstructorIT {
 				@GenericField
 				public Integer id;
 			}
-
-			static class MyProjection {
-				public final Integer id;
-
-				@ProjectionConstructor
-				public MyProjection(@IdProjection @FieldProjection Integer id) {
-					this.id = id;
-				}
-			}
 		}
 
 		assertThatThrownBy( () -> setupHelper.start()
-				.withAnnotatedTypes( Model.MyProjection.class )
+				.withAnnotatedTypes( MultipleParameterProjectionAnnotationsMyProjection.class )
 				.setup( Model.IndexedEntity.class ) )
 				.isInstanceOf( SearchException.class )
 				.satisfies( FailureReportUtils.hasFailureReport()
-						.typeContext( Model.MyProjection.class.getName() )
+						.typeContext( MultipleParameterProjectionAnnotationsMyProjection.class.getName() )
 						.constructorContext( Integer.class )
 						.methodParameterContext( 0, "id" )
 						.failure(
@@ -860,4 +851,12 @@ class ProjectionConstructorBaseIT extends AbstractProjectionConstructorIT {
 								"At most one projection is allowed for each parameter" ) );
 	}
 
+	static class MultipleParameterProjectionAnnotationsMyProjection {
+		public final Integer id;
+
+		@ProjectionConstructor
+		public MultipleParameterProjectionAnnotationsMyProjection(@IdProjection @FieldProjection Integer id) {
+			this.id = id;
+		}
+	}
 }
