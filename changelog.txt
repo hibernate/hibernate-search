@@ -1,6 +1,18 @@
 Hibernate Search Changelog
 ==========================
 
+7.2.4.Final (2025-05-30)
+-------------------------
+
+** Improvement
+    * HSEARCH-5386 Upgrade to Hibernate ORM 6.6.16.Final
+    * HSEARCH-5379 Upgrade to Hibernate ORM 6.6.15.Final
+    * HSEARCH-5365 Add compatibility with Elasticsearch 8.18.0 
+    * HSEARCH-5350 Upgrade to Hibernate ORM 6.6.13.Final
+    * HSEARCH-5349 Upgrade to Hibernate ORM 6.6.12.Final
+    * HSEARCH-5289 Add Elasticsearch 8.17.0 compatibility
+    * HSEARCH-5269 Add Elasticsearch 8.16.0 compatibility
+
 7.2.3.Final (2025-03-18)
 -------------------------
 
