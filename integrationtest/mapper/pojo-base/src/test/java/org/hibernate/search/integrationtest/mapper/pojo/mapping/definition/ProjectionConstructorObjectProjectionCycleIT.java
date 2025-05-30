@@ -54,50 +54,50 @@ class ProjectionConstructorObjectProjectionCycleIT extends AbstractProjectionCon
 				@IndexedEmbedded
 				Level1 level1;
 			}
-
-			static class ProjectionLevel1 {
-				public final String text;
-				public final ProjectionLevel2 level2;
-
-				@ProjectionConstructor
-				public ProjectionLevel1(String text, ProjectionLevel2 level2) {
-					this.text = text;
-					this.level2 = level2;
-				}
-			}
-
-			static class ProjectionLevel2 {
-				public final String text;
-				public final ProjectionLevel1 level1;
-
-				@ProjectionConstructor
-				public ProjectionLevel2(String text, ProjectionLevel1 level1) {
-					this.text = text;
-					this.level1 = level1;
-				}
-			}
 		}
 
 		assertThatThrownBy( () -> setupHelper.start()
-				.withAnnotatedTypes( Model.ProjectionLevel1.class, Model.ProjectionLevel2.class )
+				.withAnnotatedTypes( ActualCycleDirectProjectionLevel1.class, ActualCycleDirectProjectionLevel2.class )
 				.setup( Model.Level1.class ) )
 				.isInstanceOf( SearchException.class )
 				.satisfies( FailureReportUtils.hasFailureReport()
-						.typeContext( Model.ProjectionLevel1.class.getName() )
-						.constructorContext( String.class, Model.ProjectionLevel2.class )
+						.typeContext( ActualCycleDirectProjectionLevel1.class.getName() )
+						.constructorContext( String.class, ActualCycleDirectProjectionLevel2.class )
 						.methodParameterContext( 1, "level2" )
-						.typeContext( Model.ProjectionLevel2.class.getName() )
-						.constructorContext( String.class, Model.ProjectionLevel1.class )
+						.typeContext( ActualCycleDirectProjectionLevel2.class.getName() )
+						.constructorContext( String.class, ActualCycleDirectProjectionLevel1.class )
 						.methodParameterContext( 1, "level1" )
-						.typeContext( Model.ProjectionLevel1.class.getName() )
-						.constructorContext( String.class, Model.ProjectionLevel2.class )
+						.typeContext( ActualCycleDirectProjectionLevel1.class.getName() )
+						.constructorContext( String.class, ActualCycleDirectProjectionLevel2.class )
 						.methodParameterContext( 1, "level2" )
 						.multilineFailure( "Cyclic recursion starting from 'ObjectProjectionBinder(...)'",
-								"on type '" + Model.ProjectionLevel1.class.getName()
+								"on type '" + ActualCycleDirectProjectionLevel1.class.getName()
 										+ "', projection constructor, parameter at index 1 (level2)",
 								"Index field path starting from that location and ending with a cycle: 'level2.level1.level2.'",
 								"A projection constructor cannot declare an unrestricted @ObjectProjection to itself, even indirectly",
 								"To break the cycle, you should consider adding filters to your @ObjectProjection: includePaths, includeDepth, excludePaths, ..." ) );
+	}
+
+	static class ActualCycleDirectProjectionLevel1 {
+		public final String text;
+		public final ActualCycleDirectProjectionLevel2 level2;
+
+		@ProjectionConstructor
+		public ActualCycleDirectProjectionLevel1(String text, ActualCycleDirectProjectionLevel2 level2) {
+			this.text = text;
+			this.level2 = level2;
+		}
+	}
+
+	static class ActualCycleDirectProjectionLevel2 {
+		public final String text;
+		public final ActualCycleDirectProjectionLevel1 level1;
+
+		@ProjectionConstructor
+		public ActualCycleDirectProjectionLevel2(String text, ActualCycleDirectProjectionLevel1 level1) {
+			this.text = text;
+			this.level1 = level1;
+		}
 	}
 
 	@Test
@@ -121,38 +121,16 @@ class ProjectionConstructorObjectProjectionCycleIT extends AbstractProjectionCon
 				@IndexedEmbedded
 				Level1 level1;
 			}
-
-			static class ProjectionLevel1 {
-				public final String text;
-				public final ProjectionLevel2 level2;
-
-				@ProjectionConstructor
-				public ProjectionLevel1(String text,
-						@ObjectProjection(includePaths = { "text", "level1.text" }) ProjectionLevel2 level2) {
-					this.text = text;
-					this.level2 = level2;
-				}
-			}
-
-			static class ProjectionLevel2 {
-				public final String text;
-				public final ProjectionLevel1 level1;
-
-				@ProjectionConstructor
-				public ProjectionLevel2(String text, ProjectionLevel1 level1) {
-					this.text = text;
-					this.level1 = level1;
-				}
-			}
 		}
 
 		backendMock.expectAnySchema( INDEX_NAME );
 		SearchMapping mapping = setupHelper.start()
-				.withAnnotatedTypes( Model.ProjectionLevel1.class, Model.ProjectionLevel2.class )
+				.withAnnotatedTypes( BrokenCycleIncludePathsProjectionLevel1.class,
+						BrokenCycleIncludePathsProjectionLevel2.class )
 				.setup( Model.Level1.class );
 
 		testSuccessfulRootProjectionExecutionOnly(
-				mapping, Model.Level1.class, Model.ProjectionLevel1.class,
+				mapping, Model.Level1.class, BrokenCycleIncludePathsProjectionLevel1.class,
 				Arrays.asList(
 						Arrays.asList( "result1",
 								Arrays.asList( "result1_level2",
@@ -162,14 +140,37 @@ class ProjectionConstructorObjectProjectionCycleIT extends AbstractProjectionCon
 										Arrays.asList( "result2_level2_level1", null ) ) )
 				),
 				Arrays.asList(
-						new Model.ProjectionLevel1( "result1",
-								new Model.ProjectionLevel2( "result1_level2",
-										new Model.ProjectionLevel1( "result1_level2_level1", null ) ) ),
-						new Model.ProjectionLevel1( "result2",
-								new Model.ProjectionLevel2( "result2_level2",
-										new Model.ProjectionLevel1( "result2_level2_level1", null ) ) )
+						new BrokenCycleIncludePathsProjectionLevel1( "result1",
+								new BrokenCycleIncludePathsProjectionLevel2( "result1_level2",
+										new BrokenCycleIncludePathsProjectionLevel1( "result1_level2_level1", null ) ) ),
+						new BrokenCycleIncludePathsProjectionLevel1( "result2",
+								new BrokenCycleIncludePathsProjectionLevel2( "result2_level2",
+										new BrokenCycleIncludePathsProjectionLevel1( "result2_level2_level1", null ) ) )
 				)
 		);
+	}
+
+	static class BrokenCycleIncludePathsProjectionLevel1 {
+		public final String text;
+		public final BrokenCycleIncludePathsProjectionLevel2 level2;
+
+		@ProjectionConstructor
+		public BrokenCycleIncludePathsProjectionLevel1(String text,
+				@ObjectProjection(includePaths = { "text", "level1.text" }) BrokenCycleIncludePathsProjectionLevel2 level2) {
+			this.text = text;
+			this.level2 = level2;
+		}
+	}
+
+	static class BrokenCycleIncludePathsProjectionLevel2 {
+		public final String text;
+		public final BrokenCycleIncludePathsProjectionLevel1 level1;
+
+		@ProjectionConstructor
+		public BrokenCycleIncludePathsProjectionLevel2(String text, BrokenCycleIncludePathsProjectionLevel1 level1) {
+			this.text = text;
+			this.level1 = level1;
+		}
 	}
 
 	@Test
@@ -193,38 +194,16 @@ class ProjectionConstructorObjectProjectionCycleIT extends AbstractProjectionCon
 				@IndexedEmbedded
 				Level1 level1;
 			}
-
-			static class ProjectionLevel1 {
-				public final String text;
-				public final ProjectionLevel2 level2;
-
-				@ProjectionConstructor
-				public ProjectionLevel1(String text,
-						@ObjectProjection(excludePaths = { "level1.level2" }) ProjectionLevel2 level2) {
-					this.text = text;
-					this.level2 = level2;
-				}
-			}
-
-			static class ProjectionLevel2 {
-				public final String text;
-				public final ProjectionLevel1 level1;
-
-				@ProjectionConstructor
-				public ProjectionLevel2(String text, ProjectionLevel1 level1) {
-					this.text = text;
-					this.level1 = level1;
-				}
-			}
 		}
 
 		backendMock.expectAnySchema( INDEX_NAME );
 		SearchMapping mapping = setupHelper.start()
-				.withAnnotatedTypes( Model.ProjectionLevel1.class, Model.ProjectionLevel2.class )
+				.withAnnotatedTypes( BrokenCycleExcludePathsProjectionLevel1.class,
+						BrokenCycleExcludePathsProjectionLevel2.class )
 				.setup( Model.Level1.class );
 
 		testSuccessfulRootProjectionExecutionOnly(
-				mapping, Model.Level1.class, Model.ProjectionLevel1.class,
+				mapping, Model.Level1.class, BrokenCycleExcludePathsProjectionLevel1.class,
 				Arrays.asList(
 						Arrays.asList( "result1",
 								Arrays.asList( "result1_level2",
@@ -234,14 +213,37 @@ class ProjectionConstructorObjectProjectionCycleIT extends AbstractProjectionCon
 										Arrays.asList( "result2_level2_level1", null ) ) )
 				),
 				Arrays.asList(
-						new Model.ProjectionLevel1( "result1",
-								new Model.ProjectionLevel2( "result1_level2",
-										new Model.ProjectionLevel1( "result1_level2_level1", null ) ) ),
-						new Model.ProjectionLevel1( "result2",
-								new Model.ProjectionLevel2( "result2_level2",
-										new Model.ProjectionLevel1( "result2_level2_level1", null ) ) )
+						new BrokenCycleExcludePathsProjectionLevel1( "result1",
+								new BrokenCycleExcludePathsProjectionLevel2( "result1_level2",
+										new BrokenCycleExcludePathsProjectionLevel1( "result1_level2_level1", null ) ) ),
+						new BrokenCycleExcludePathsProjectionLevel1( "result2",
+								new BrokenCycleExcludePathsProjectionLevel2( "result2_level2",
+										new BrokenCycleExcludePathsProjectionLevel1( "result2_level2_level1", null ) ) )
 				)
 		);
+	}
+
+	static class BrokenCycleExcludePathsProjectionLevel1 {
+		public final String text;
+		public final BrokenCycleExcludePathsProjectionLevel2 level2;
+
+		@ProjectionConstructor
+		public BrokenCycleExcludePathsProjectionLevel1(String text,
+				@ObjectProjection(excludePaths = { "level1.level2" }) BrokenCycleExcludePathsProjectionLevel2 level2) {
+			this.text = text;
+			this.level2 = level2;
+		}
+	}
+
+	static class BrokenCycleExcludePathsProjectionLevel2 {
+		public final String text;
+		public final BrokenCycleExcludePathsProjectionLevel1 level1;
+
+		@ProjectionConstructor
+		public BrokenCycleExcludePathsProjectionLevel2(String text, BrokenCycleExcludePathsProjectionLevel1 level1) {
+			this.text = text;
+			this.level1 = level1;
+		}
 	}
 
 	@Test
@@ -265,38 +267,16 @@ class ProjectionConstructorObjectProjectionCycleIT extends AbstractProjectionCon
 				@IndexedEmbedded
 				Level1 level1;
 			}
-
-			static class ProjectionLevel1 {
-				public final String text;
-				public final ProjectionLevel2 level2;
-
-				@ProjectionConstructor
-				public ProjectionLevel1(String text,
-						@ObjectProjection(includeDepth = 2) ProjectionLevel2 level2) {
-					this.text = text;
-					this.level2 = level2;
-				}
-			}
-
-			static class ProjectionLevel2 {
-				public final String text;
-				public final ProjectionLevel1 level1;
-
-				@ProjectionConstructor
-				public ProjectionLevel2(String text, ProjectionLevel1 level1) {
-					this.text = text;
-					this.level1 = level1;
-				}
-			}
 		}
 
 		backendMock.expectAnySchema( INDEX_NAME );
 		SearchMapping mapping = setupHelper.start()
-				.withAnnotatedTypes( Model.ProjectionLevel1.class, Model.ProjectionLevel2.class )
+				.withAnnotatedTypes( BrokenCycleIncludeDepthProjectionLevel1.class,
+						BrokenCycleIncludeDepthProjectionLevel2.class )
 				.setup( Model.Level1.class );
 
 		testSuccessfulRootProjectionExecutionOnly(
-				mapping, Model.Level1.class, Model.ProjectionLevel1.class,
+				mapping, Model.Level1.class, BrokenCycleIncludeDepthProjectionLevel1.class,
 				Arrays.asList(
 						Arrays.asList( "result1",
 								Arrays.asList( "result1_level2",
@@ -306,14 +286,37 @@ class ProjectionConstructorObjectProjectionCycleIT extends AbstractProjectionCon
 										Arrays.asList( "result2_level2_level1", null ) ) )
 				),
 				Arrays.asList(
-						new Model.ProjectionLevel1( "result1",
-								new Model.ProjectionLevel2( "result1_level2",
-										new Model.ProjectionLevel1( "result1_level2_level1", null ) ) ),
-						new Model.ProjectionLevel1( "result2",
-								new Model.ProjectionLevel2( "result2_level2",
-										new Model.ProjectionLevel1( "result2_level2_level1", null ) ) )
+						new BrokenCycleIncludeDepthProjectionLevel1( "result1",
+								new BrokenCycleIncludeDepthProjectionLevel2( "result1_level2",
+										new BrokenCycleIncludeDepthProjectionLevel1( "result1_level2_level1", null ) ) ),
+						new BrokenCycleIncludeDepthProjectionLevel1( "result2",
+								new BrokenCycleIncludeDepthProjectionLevel2( "result2_level2",
+										new BrokenCycleIncludeDepthProjectionLevel1( "result2_level2_level1", null ) ) )
 				)
 		);
+	}
+
+	static class BrokenCycleIncludeDepthProjectionLevel1 {
+		public final String text;
+		public final BrokenCycleIncludeDepthProjectionLevel2 level2;
+
+		@ProjectionConstructor
+		public BrokenCycleIncludeDepthProjectionLevel1(String text,
+				@ObjectProjection(includeDepth = 2) BrokenCycleIncludeDepthProjectionLevel2 level2) {
+			this.text = text;
+			this.level2 = level2;
+		}
+	}
+
+	static class BrokenCycleIncludeDepthProjectionLevel2 {
+		public final String text;
+		public final BrokenCycleIncludeDepthProjectionLevel1 level1;
+
+		@ProjectionConstructor
+		public BrokenCycleIncludeDepthProjectionLevel2(String text, BrokenCycleIncludeDepthProjectionLevel1 level1) {
+			this.text = text;
+			this.level1 = level1;
+		}
 	}
 
 	@Test
@@ -346,64 +349,65 @@ class ProjectionConstructorObjectProjectionCycleIT extends AbstractProjectionCon
 				@IndexedEmbedded
 				Level1 level1;
 			}
-
-			static class ProjectionLevel1 {
-				public final String text;
-				public final ProjectionLevel2 level2;
-
-				@ProjectionConstructor
-				public ProjectionLevel1(String text, ProjectionLevel2 level2) {
-					this.text = text;
-					this.level2 = level2;
-				}
-			}
-
-			static class ProjectionLevel2 {
-				public final String text;
-				public final ProjectionLevel3 level3;
-
-				@ProjectionConstructor
-				public ProjectionLevel2(String text, ProjectionLevel3 level3) {
-					this.text = text;
-					this.level3 = level3;
-				}
-			}
-
-			static class ProjectionLevel3 {
-				public final String text;
-				public final ProjectionLevel1 level1;
-
-				@ProjectionConstructor
-				public ProjectionLevel3(String text, ProjectionLevel1 level1) {
-					this.text = text;
-					this.level1 = level1;
-				}
-			}
 		}
 
 		assertThatThrownBy( () -> setupHelper.start()
-				.withAnnotatedTypes( Model.ProjectionLevel1.class, Model.ProjectionLevel2.class )
+				.withAnnotatedTypes( ActualCycleIndirectNoFilterProjectionLevel1.class,
+						ActualCycleIndirectNoFilterProjectionLevel2.class )
 				.setup( Model.Level1.class ) )
 				.isInstanceOf( SearchException.class )
 				.satisfies( FailureReportUtils.hasFailureReport()
-						.typeContext( Model.ProjectionLevel1.class.getName() )
-						.constructorContext( String.class, Model.ProjectionLevel2.class )
+						.typeContext( ActualCycleIndirectNoFilterProjectionLevel1.class.getName() )
+						.constructorContext( String.class, ActualCycleIndirectNoFilterProjectionLevel2.class )
 						.methodParameterContext( 1, "level2" )
-						.typeContext( Model.ProjectionLevel2.class.getName() )
-						.constructorContext( String.class, Model.ProjectionLevel3.class )
+						.typeContext( ActualCycleIndirectNoFilterProjectionLevel2.class.getName() )
+						.constructorContext( String.class, ActualCycleIndirectNoFilterProjectionLevel3.class )
 						.methodParameterContext( 1, "level3" )
-						.typeContext( Model.ProjectionLevel3.class.getName() )
-						.constructorContext( String.class, Model.ProjectionLevel1.class )
+						.typeContext( ActualCycleIndirectNoFilterProjectionLevel3.class.getName() )
+						.constructorContext( String.class, ActualCycleIndirectNoFilterProjectionLevel1.class )
 						.methodParameterContext( 1, "level1" )
-						.typeContext( Model.ProjectionLevel1.class.getName() )
-						.constructorContext( String.class, Model.ProjectionLevel2.class )
+						.typeContext( ActualCycleIndirectNoFilterProjectionLevel1.class.getName() )
+						.constructorContext( String.class, ActualCycleIndirectNoFilterProjectionLevel2.class )
 						.methodParameterContext( 1, "level2" )
 						.multilineFailure( "Cyclic recursion starting from 'ObjectProjectionBinder(...)'",
-								"on type '" + Model.ProjectionLevel1.class.getName()
+								"on type '" + ActualCycleIndirectNoFilterProjectionLevel1.class.getName()
 										+ "', projection constructor, parameter at index 1 (level2)",
 								"Index field path starting from that location and ending with a cycle: 'level2.level3.level1.level2.'",
 								"A projection constructor cannot declare an unrestricted @ObjectProjection to itself, even indirectly",
 								"To break the cycle, you should consider adding filters to your @ObjectProjection: includePaths, includeDepth, excludePaths, ..." ) );
+	}
+
+	static class ActualCycleIndirectNoFilterProjectionLevel1 {
+		public final String text;
+		public final ActualCycleIndirectNoFilterProjectionLevel2 level2;
+
+		@ProjectionConstructor
+		public ActualCycleIndirectNoFilterProjectionLevel1(String text, ActualCycleIndirectNoFilterProjectionLevel2 level2) {
+			this.text = text;
+			this.level2 = level2;
+		}
+	}
+
+	static class ActualCycleIndirectNoFilterProjectionLevel2 {
+		public final String text;
+		public final ActualCycleIndirectNoFilterProjectionLevel3 level3;
+
+		@ProjectionConstructor
+		public ActualCycleIndirectNoFilterProjectionLevel2(String text, ActualCycleIndirectNoFilterProjectionLevel3 level3) {
+			this.text = text;
+			this.level3 = level3;
+		}
+	}
+
+	static class ActualCycleIndirectNoFilterProjectionLevel3 {
+		public final String text;
+		public final ActualCycleIndirectNoFilterProjectionLevel1 level1;
+
+		@ProjectionConstructor
+		public ActualCycleIndirectNoFilterProjectionLevel3(String text, ActualCycleIndirectNoFilterProjectionLevel1 level1) {
+			this.text = text;
+			this.level1 = level1;
+		}
 	}
 
 	@Test
@@ -436,64 +440,64 @@ class ProjectionConstructorObjectProjectionCycleIT extends AbstractProjectionCon
 				@IndexedEmbedded
 				Level1 level1;
 			}
-
-			static class ProjectionLevel1 {
-				public final String text;
-				public final ProjectionLevel2 level2;
-
-				@ProjectionConstructor
-				public ProjectionLevel1(String text, ProjectionLevel2 level2) {
-					this.text = text;
-					this.level2 = level2;
-				}
-			}
-
-			static class ProjectionLevel2 {
-				public final String text;
-				public final ProjectionLevel3 level3;
-
-				@ProjectionConstructor
-				public ProjectionLevel2(String text, ProjectionLevel3 level3) {
-					this.text = text;
-					this.level3 = level3;
-				}
-			}
-
-			static class ProjectionLevel3 {
-				public final String text;
-				public final ProjectionLevel2 level2;
-
-				@ProjectionConstructor
-				public ProjectionLevel3(String text, ProjectionLevel2 level2) {
-					this.text = text;
-					this.level2 = level2;
-				}
-			}
 		}
 
 		assertThatThrownBy( () -> setupHelper.start()
-				.withAnnotatedTypes( Model.ProjectionLevel1.class, Model.ProjectionLevel2.class )
+				.withAnnotatedTypes( ActualCycleBuriedNoFilterProjectionLevel1.class,
+						ActualCycleBuriedNoFilterProjectionLevel2.class )
 				.setup( Model.Level1.class ) )
 				.isInstanceOf( SearchException.class )
 				.satisfies( FailureReportUtils.hasFailureReport()
-						.typeContext( Model.ProjectionLevel1.class.getName() )
-						.constructorContext( String.class, Model.ProjectionLevel2.class )
+						.typeContext( ActualCycleBuriedNoFilterProjectionLevel1.class.getName() )
+						.constructorContext( String.class, ActualCycleBuriedNoFilterProjectionLevel2.class )
 						.methodParameterContext( 1, "level2" )
-						.typeContext( Model.ProjectionLevel2.class.getName() )
-						.constructorContext( String.class, Model.ProjectionLevel3.class )
+						.typeContext( ActualCycleBuriedNoFilterProjectionLevel2.class.getName() )
+						.constructorContext( String.class, ActualCycleBuriedNoFilterProjectionLevel3.class )
 						.methodParameterContext( 1, "level3" )
-						.typeContext( Model.ProjectionLevel3.class.getName() )
-						.constructorContext( String.class, Model.ProjectionLevel2.class )
+						.typeContext( ActualCycleBuriedNoFilterProjectionLevel3.class.getName() )
+						.constructorContext( String.class, ActualCycleBuriedNoFilterProjectionLevel2.class )
 						.methodParameterContext( 1, "level2" )
-						.typeContext( Model.ProjectionLevel2.class.getName() )
-						.constructorContext( String.class, Model.ProjectionLevel3.class )
+						.typeContext( ActualCycleBuriedNoFilterProjectionLevel2.class.getName() )
+						.constructorContext( String.class, ActualCycleBuriedNoFilterProjectionLevel3.class )
 						.methodParameterContext( 1, "level3" )
 						.multilineFailure( "Cyclic recursion starting from 'ObjectProjectionBinder(...)'",
-								"on type '" + Model.ProjectionLevel2.class.getName()
+								"on type '" + ActualCycleBuriedNoFilterProjectionLevel2.class.getName()
 										+ "', projection constructor, parameter at index 1 (level3)",
 								"Index field path starting from that location and ending with a cycle: 'level3.level2.level3.'",
 								"A projection constructor cannot declare an unrestricted @ObjectProjection to itself, even indirectly",
 								"To break the cycle, you should consider adding filters to your @ObjectProjection: includePaths, includeDepth, excludePaths, ..." ) );
 	}
 
+	static class ActualCycleBuriedNoFilterProjectionLevel1 {
+		public final String text;
+		public final ActualCycleBuriedNoFilterProjectionLevel2 level2;
+
+		@ProjectionConstructor
+		public ActualCycleBuriedNoFilterProjectionLevel1(String text, ActualCycleBuriedNoFilterProjectionLevel2 level2) {
+			this.text = text;
+			this.level2 = level2;
+		}
+	}
+
+	static class ActualCycleBuriedNoFilterProjectionLevel2 {
+		public final String text;
+		public final ActualCycleBuriedNoFilterProjectionLevel3 level3;
+
+		@ProjectionConstructor
+		public ActualCycleBuriedNoFilterProjectionLevel2(String text, ActualCycleBuriedNoFilterProjectionLevel3 level3) {
+			this.text = text;
+			this.level3 = level3;
+		}
+	}
+
+	static class ActualCycleBuriedNoFilterProjectionLevel3 {
+		public final String text;
+		public final ActualCycleBuriedNoFilterProjectionLevel2 level2;
+
+		@ProjectionConstructor
+		public ActualCycleBuriedNoFilterProjectionLevel3(String text, ActualCycleBuriedNoFilterProjectionLevel2 level2) {
+			this.text = text;
+			this.level2 = level2;
+		}
+	}
 }
