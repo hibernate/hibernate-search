@@ -1,6 +1,23 @@
 Hibernate Search Changelog
 ==========================
 
+8.0.0.CR1 (2025-05-31)
+-------------------------
+
+** Improvement
+    * HSEARCH-5390 Use the Hibernate theme for rendered javadocs
+    * HSEARCH-5385 Move SearchProjectionFactory into the context for ProjectionDefinition
+    * HSEARCH-5384 Follow up on field refereces to simplify app migration 
+    * HSEARCH-5383 Upgrade to Hibernate ORM 7.0.0.Final
+    * HSEARCH-5380 Upgrade to Hibernate ORM 7.0.0.CR2
+
+** Task
+    * HSEARCH-5391 Test against latest Elasticsearch 8.18.2
+    * HSEARCH-5389 Use Maven 3.9.9 as a required minimum version for the build
+    * HSEARCH-5388 Account (in tests) for Lucene query cache being disabled by default starting in Lucene 11
+    * HSEARCH-5382 Do not include the `distributionManagement` pom section
+    * HSEARCH-5377 Remove Google Analytics
+
 8.0.0.Beta1 (2025-05-13)
 -------------------------
 
