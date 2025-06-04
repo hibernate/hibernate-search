@@ -5,6 +5,9 @@
 package org.hibernate.search.processor;
 
 
+import static org.hibernate.search.processor.util.impl.DefaultBackendVersionUtils.latestElasticsearchVersion;
+import static org.hibernate.search.processor.util.impl.DefaultBackendVersionUtils.latestLuceneVersion;
+
 import java.io.Serializable;
 import java.time.Clock;
 import java.time.LocalDateTime;
@@ -80,11 +83,11 @@ public final class HibernateSearchProcessorSettings {
 		}
 
 		public String elasticsearchVersion() {
-			return version == null ? "9.0.1" : version;
+			return version == null ? latestElasticsearchVersion() : version;
 		}
 
 		public String luceneVersion() {
-			return version == null ? "9.12.1" : version;
+			return version == null ? latestLuceneVersion() : version;
 		}
 
 		public String backendVersion() {
