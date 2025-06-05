@@ -88,7 +88,7 @@ updates:
           - "org.codehaus.plexus:*"
           - "org.eclipse.jdt:*"
           # We only use the version of WildFly for a link in the documentation
-          - "org.wildfly.bom:wildfly"
+          - "org.wildfly:wildfly-dist"
           # Used to generate reports during build time:
           - "org.yaml:snakeyaml"
     ignore:
@@ -132,7 +132,7 @@ updates:
         # Apparently patterns using wildcards are not supported here. Hopefully this will last until they drop these silly -jdk8 packages.
         versions: ["5.0-jdk8", "5.1-jdk8", "5.2-jdk8", "5.3-jdk8", "5.4-jdk8", "5.5-jdk8", "5.6-jdk8", "5.7-jdk8", "5.8-jdk8", "5.9-jdk8"]
       # We only use the major version of WildFly, and only for a link in the documentation
-      - dependency-name: "org.wildfly.bom:wildfly"
+      - dependency-name: "org.wildfly:wildfly-dist"
         update-types: [ "version-update:semver-minor", "version-update:semver-patch" ]
       # We ignore any plexus-compiler updates that are > 2.14.2 since that's the last version
       #  with which jboss-logging annotation processor can still work.
