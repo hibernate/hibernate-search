@@ -3,8 +3,8 @@
 [[credits]]
 = Credits
 
-The full list of contributors to Hibernate Search can be found in the `copyright.txt` file in the Hibernate Search sources,
-available in particular in our https://github.com/hibernate/hibernate-search/blob/main/copyright.txt[git repository].
+The list of contributors to Hibernate Search can be found in the `AUTHORS.txt` file in the Hibernate Search sources,
+available in particular in our https://github.com/hibernate/hibernate-search/blob/main/AUTHORS.txt[git repository].
 
 The following contributors have been involved in this documentation:
 

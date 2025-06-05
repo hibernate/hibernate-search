@@ -1,4 +1,13 @@
+# This file lists copyright owners of the project.
+# The list is not exhaustive: other copyright owners exist.
+# See CONTRIBUTING.md for instructions regarding how to be added to this list.
+
+# Corporate contributors
+
 Red Hat, Inc.
+
+# Individual contributors
+
 Adam Harris
 Adrian Nistor
 Ales Justin
