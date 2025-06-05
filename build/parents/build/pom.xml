@@ -964,8 +964,8 @@
             <!-- The version is used to generate a link to the WildFly documentation -->
             <!-- This simply makes sure dependabot will automatically bump the version -->
             <dependency>
-                <groupId>org.wildfly.bom</groupId>
-                <artifactId>wildfly</artifactId>
+                <groupId>org.wildfly</groupId>
+                <artifactId>wildfly-dist</artifactId>
                 <version>${version.org.wildfly}</version>
                 <type>pom</type>
             </dependency>
