@@ -44,13 +44,7 @@ and only then to later versions (which will be significantly easier).
 == Requirements
 
 The requirements of Hibernate Search {hibernateSearchVersion}
-are mostly the same as those of Hibernate Search {hibernateSearchPreviousStableVersionShort},
-with the differences being Hibernate ORM and minimum JDK version upgrade:
-
-- JDK 17 or later;
-- Lucene 9 for its Lucene backend;
-- Elasticsearch 7.10+ or OpenSearch 1.3+ for its Elasticsearch backend;
-- Hibernate ORM 6.6.x for the Hibernate ORM integration.
+are the same as those of Hibernate Search {hibernateSearchPreviousStableVersionShort}.
 
 [[artifact-changes]]
 == Artifacts
@@ -77,21 +71,11 @@ in Hibernate Search {hibernateSearchVersion}
 are backward-compatible with Hibernate Search {hibernateSearchPreviousStableVersionShort}:
 no database schema update is necessary for these tables.
 
-[[vectorsize]]
-=== Vector search max dimension
-For the Lucene backend, the maximum vector dimension has been increased from 4096 to 16000.
-Increasing the vector size, to leverage a different, higher dimensional model, implies a larger memory requirement on behalf of the JVM
-as well as an increase of the index size.
-
 [[configuration]]
 == Configuration
 
-The configuration properties in Hibernate Search {hibernateSearchVersion}
-, in general, are backward-compatible with Hibernate Search {hibernateSearchPreviousStableVersionShort}.
-But some default values have changed:
-
-- The default value of the Elasticsearch backend property `hibernate.search.backend.max_connections` is now set to `40` instead of `20`.
-- The default value of the Elasticsearch backend property `hibernate.search.backend.max_connections_per_route` is now set to `20` instead of `10`.
+The configuration properties in Hibernate Search {hibernateSearchVersion}, in general,
+are backward-compatible with Hibernate Search {hibernateSearchPreviousStableVersionShort}.
 
 [[api]]
 == API
@@ -99,67 +83,6 @@ But some default values have changed:
 The https://hibernate.org/community/compatibility-policy/#code-categorization[API]
 in Hibernate Search {hibernateSearchVersion}
 is, in general, backward-compatible with Hibernate Search {hibernateSearchPreviousStableVersionShort}.
-But there are next changes:
-
-- An incubating `org.hibernate.search.mapper.pojo.standalone.loading.MassIdentifierLoader` changed the return type of `#totalCount()` from `long` to `OptionalLong`.
-This was done to address the scenarios where the total number of identifiers to load is not known ahead of time.
-- Deprecated `org.hibernate.search.mapper.orm.massindexing.MassIndexingFailureHandler`, `org.hibernate.search.mapper.orm.massindexing.MassIndexingMonitor`
-interfaces are removed in this version. They have their alternatives in a `org.hibernate.search.mapper.pojo.massindexing` for a while now.
-- `org.hibernate.search.mapper.pojo.massindexing.MassIndexingMonitor#addToTotalCount(..)` gets deprecated for removal.
-Instead, we are introducing the `org.hibernate.search.mapper.pojo.massindexing.MassIndexingTypeGroupMonitor`
-that can be obtained through `org.hibernate.search.mapper.pojo.massindexing.MassIndexingMonitor#typeGroupMonitor(..)`.
-This new type group monitor has more flexibility and also allows implementors to skip total count computations if needed.
-- `multi()` methods exposed in various projection DSL steps are deprecated in favour of a `collector(ProjectionCollector.Provider)`,
-or one of the "shortcut-methods": `.list()`/`.set()`/`.sortedSet()`...
-Check the `ProjectionCollector` factory methods to see the list of built-in collectors that provide support for nullable/optional single-valued projections
-and for multivalued ones such as lists, sets arrays and more.
-- The `org.hibernate.search.elasticsearch.request` logging category is now renamed to `org.hibernate.search.elasticsearch.client.request`
-and `org.hibernate.search.backend.lucene.infostream` to `org.hibernate.search.lucene.infostream`
-to be in a more consistent format compared with other logging categories.
-- Hibernate Search now uses logging categories instead of class names to log messages.
-See link:https://docs.jboss.org/hibernate/search/{hibernateSearchVersionShort}/reference/en-US/html_single/#logging-categories-aggregated[Appendix B: List of all available logging categories]
-to find out what categories are available.
-- The method signature changed from `SearchSortFactory#composite(Consumer<? super CompositeSortComponentsStep<SR, ?>> elementContributor)` to `SearchSortFactory#composite(Consumer<? super CompositeSortOptionsCollector<?>> elementContributor)`.
-This change should not affect the end user as collecting of elements still works as it was originally intended to.
-- With introduction of the field references (`org.hibernate.search.engine.search.reference.pass:[*]`) most of the Search DSL
-interfaces (`org.hibernate.search.engine.search.pass:[*].dsl.pass:[*]`) got an extra type argument `SR` (scope root type).
-In most cases, there will be no code changes required:
-+
-[source,java,subs="+attributes"]
-----
-List<Book> result = searchSession.search( Book.class )
-    .where( f -> f.match().field( "title" ).matching( "robot" ) )
-    .fetchHits( 20 );
-----
-+
-In scenarios where there's work with the affected Search DSL interfaces is required user can choose between one of the following options:
-+
-====
-[source,java,subs="+attributes"]
-----
-var scope = ...; // <1>
-AffectedSearchDslInterface<?, ...> instance = ... // <2>
-----
-<1> Use `var` if possible. Otherwise, if you need to pass the DSL interfaces to some other methods as parameters,
-consider one of the following options:
-<2> Use the `?` wildcard. Or switch to the typed scopes and:
-
-Otherwise consider switching to the typed scope:
-
-[source,java,subs="+attributes"]
-----
-TypedSearchScope<Book, Book> scope = searchSession.typedScope( Book.class, Book.class ); // <1>
-TypedSearchScope<ReadingMaterial, ReadingMaterial> scope = searchSession.typedScope( ReadingMaterial.class, List.of( Book.class, Magazine.class ) ); // <2>
-TypedSearchScope<Book__, Book> scope = searchSession.typedScope( Book__.class, Book.class ); // <3>
-TypedSearchScope<SomeRandomClass, Book> scope = searchSession.typedScope( SomeRandomClass.class, Book.class ); // <4>
-----
-<1> Use the same type as your search entity.
-<2> Use the common supertype for a scope of multiple search entities.
-<3> Use the class generated for the static metamodel of this search entity.
-<4> Use any class.
-
-And use that type as the scope root type.
-====
 
 [[spi]]
 == SPI
@@ -167,18 +90,9 @@ And use that type as the scope root type.
 The https://hibernate.org/community/compatibility-policy/#code-categorization[SPI]
 in Hibernate Search {hibernateSearchVersion}
 is, in general, backward-compatible with Hibernate Search {hibernateSearchPreviousStableVersionShort}.
-But there are next changes:
-
-- `org.hibernate.search.mapper.pojo.loading.spi.PojoMassIdentifierLoader` also changed the return type of `#totalCount()` from `long` to `OptionalLong`
-to reflect the changes in the `org.hibernate.search.mapper.pojo.standalone.loading.MassIdentifierLoader`
 
 [[behavior]]
 == Behavior
 
 The behavior of Hibernate Search {hibernateSearchVersion}
 is, in general, backward-compatible with Hibernate Search {hibernateSearchPreviousStableVersionShort}.
-
-* The default mass indexer logging monitor updated the format of the logged messages to provide the information in a more condense form.
-* In a few places related to the discovery of the inverse side of an association (in the ORM mapper)
-that previously logged warnings, Hibernate Search now will throw exceptions instead.
-This is related to https://hibernate.atlassian.net/browse/HSEARCH-4708[HSEARCH-4708].
