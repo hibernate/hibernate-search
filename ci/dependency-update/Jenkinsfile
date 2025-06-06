@@ -16,7 +16,7 @@ Map settings() {
 					// just rebuild all dependants since ORM7 upgrade will affect all mappers
 					additionalMavenArgs: '-am'
 			]
-		case 'lucene9.12':
+		case 'lucene9':
 			return [
 					updateProperties: ['version.org.apache.lucene'],
 					onlyRunTestDependingOn: ['hibernate-search-backend-lucene'],
@@ -25,25 +25,14 @@ Map settings() {
 					// but just in case there are any new snapshots for 9.12 branch:
 					skipSourceModifiedCheck: true
 			]
-		case 'lucene9':
-			return [
-					updateProperties: ['version.org.apache.lucene'],
-					onlyRunTestDependingOn: ['hibernate-search-backend-lucene'],
-					additionalMavenArgs: '-Dtest.elasticsearch.skip=true -pl :hibernate-search-backend-lucene,:hibernate-search-util-internal-integrationtest-backend-lucene',
-					skipSourceModifiedCheck: true
-			]
 		case 'lucene10':
 			return [
 					updateProperties: ['version.org.apache.lucene.next.updatable'],
 					onlyRunTestDependingOn: ['hibernate-search-backend-lucene-next'],
-					additionalMavenArgs: '-Dtest.elasticsearch.skip=true -pl :hibernate-search-backend-lucene-next,:hibernate-search-util-internal-integrationtest-backend-lucene-next'
-			]
-		case 'lucene-future':
-			return [
-					testCompilerTool: 'OpenJDK 24 Latest',
-					updateProperties: ['version.org.apache.lucene.next.updatable'],
-					onlyRunTestDependingOn: ['hibernate-search-backend-lucene-next'],
-					additionalMavenArgs: '-Dtest.elasticsearch.skip=true -pl :hibernate-search-backend-lucene-next,:hibernate-search-util-internal-integrationtest-backend-lucene-next'
+					additionalMavenArgs: '-Dtest.elasticsearch.skip=true',
+					// Usually the "current-version"snapshots get stale,
+					// but just in case there are any new snapshots for 9.12 branch:
+					skipSourceModifiedCheck: true
 			]
 		// Targets the next micro release of the latest/currently integrated version of Elasticsearch
 		// (previous minor version is already published)
@@ -54,18 +43,6 @@ Map settings() {
 					onlyRunTestDependingOn: ['hibernate-search-backend-elasticsearch'],
 					// We want to use the snapshot version of an image from the ES registry since that's where they are publishing their snapshots.
 					additionalMavenArgs: '-Dtest.lucene.skip=true -Dtest.elasticsearch.run.elastic.image.name=docker.elastic.co/elasticsearch/elasticsearch -Dtest.elasticsearch.run.elastic.image.tag=9.0.3-SNAPSHOT',
-					// This job won't change the versions in the pom. We are passing the latest Elasticsearch version through an additional maven argument `-D`
-					skipSourceModifiedCheck: true
-			]
-		// Targets the next major/minor release of the of Elasticsearch
-		// (currently not published at all)
-		case 'elasticsearch-next':
-			return [
-					// There are no properties to update in this case.
-					updateProperties: [],
-					onlyRunTestDependingOn: ['hibernate-search-backend-elasticsearch'],
-					// We want to use the snapshot version of an image from the ES registry since that's where they are publishing their snapshots.
-					additionalMavenArgs: '-Dtest.lucene.skip=true -Dtest.elasticsearch.run.elastic.image.name=docker.elastic.co/elasticsearch/elasticsearch -Dtest.elasticsearch.run.elastic.image.tag=9.1.0-SNAPSHOT',
 					// This job won't change the versions in the pom. We are passing the latest Elasticsearch version through an additional maven argument `-D`
 					skipSourceModifiedCheck: true
 			]
@@ -142,7 +119,7 @@ pipeline {
 	parameters {
 		// choice parameter doesn't have a default, but the first value should be treated as a default, if it wasn't specified manually.
 		// Make sure tp update axis and settings() when adding new choice parameter.
-		choice(name: 'UPDATE_JOB', choices: ['all', 'orm7', 'lucene9.12','lucene9', 'lucene10', 'lucene-future', 'elasticsearch-current', 'elasticsearch-next'], description: 'Select which update jobs to run. `All` will include all configured update jobs.')
+		choice(name: 'UPDATE_JOB', choices: ['all', 'orm7','lucene9', 'lucene10', 'elasticsearch-current'], description: 'Select which update jobs to run. `All` will include all configured update jobs.')
 		string(name: 'ORM_REPOSITORY', defaultValue: '', description: 'Git URL to Hibernate ORM repository. If provided, Hibernate ORM will be built locally. Works only in pair with ORM_BRANCH. Provide an http repository URL rather than an ssh one.')
 		string(name: 'ORM_BRANCH', defaultValue: '', description: 'Hibernate ORM branch to build from. If provided, Hibernate ORM will be built locally. Works only in pair with ORM_REPOSITORY. Either a pull request ID or a branch name should be provided, but not both at the same time. Use branch if you want to build from a fork repository.')
 		string(name: 'ORM_PULL_REQUEST_ID', defaultValue: '', description: 'Hibernate ORM pull request id to build from. If provided, Hibernate ORM will be built locally. Works only in pair with ORM_REPOSITORY. Either a pull request ID or a branch name should be provided, but not both at the same time.')
@@ -240,7 +217,7 @@ pipeline {
 						name 'DEPENDENCY_UPDATE_NAME'
 						// NOTE: Remember to update the settings() method above when changing this.
 						// And also add a new choice parameter in the parameters {} section of the pipeline
-						values 'orm7', 'lucene9.12','lucene9', 'lucene10', 'lucene-future', 'elasticsearch-current', 'elasticsearch-next'
+						values 'orm7', 'lucene9', 'lucene10', 'elasticsearch-current'
 					}
 				}
 				stages {
