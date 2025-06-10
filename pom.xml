@@ -251,7 +251,7 @@
              WARNING: Do not forget to call 'mvn wrapper:wrapper'
              when you update this property!
          -->
-        <maven.min.version>3.9.9</maven.min.version>
+        <maven.min.version>3.9.10</maven.min.version>
 
         <!-- Set this through a property so that it can be overridden from the commandline -->
         <maven.compiler.failOnWarning>true</maven.compiler.failOnWarning>
