@@ -93,11 +93,8 @@
         <!--
             NOTE: when Hibernate ORM updates Byte Buddy, make sure to check Jenkinsfile to see if
             `net.bytebuddy.experimental` property can be removed.
-
-            NOTE 2: with the next release of Hibernate ORM remove the hibernate-models dependency override
          -->
-        <version.org.hibernate.orm>7.0.0.Final</version.org.hibernate.orm>
-        <version.org.hibernate.models>1.0.0</version.org.hibernate.models>
+        <version.org.hibernate.orm>7.0.1.Final</version.org.hibernate.orm>
 
         <javadoc.org.hibernate.orm.url>https://docs.jboss.org/hibernate/orm/${parsed-version.org.hibernate.orm.majorVersion}.${parsed-version.org.hibernate.orm.minorVersion}/javadocs/</javadoc.org.hibernate.orm.url>
         <documentation.org.hibernate.orm.url>https://docs.jboss.org/hibernate/orm/${parsed-version.org.hibernate.orm.majorVersion}.${parsed-version.org.hibernate.orm.minorVersion}/userguide/html_single/Hibernate_User_Guide.html</documentation.org.hibernate.orm.url>
@@ -408,12 +405,6 @@
                 <groupId>org.jboss.logging</groupId>
                 <artifactId>jboss-logging</artifactId>
                 <version>${version.org.jboss.logging.jboss-logging}</version>
-            </dependency>
-            <!-- Remove with the next Hibernate ORM upgrade -->
-            <dependency>
-                <groupId>org.hibernate.models</groupId>
-                <artifactId>hibernate-models</artifactId>
-                <version>${version.org.hibernate.models}</version>
             </dependency>
 
             <!-- Other public dependencies -->
