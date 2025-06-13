@@ -17,6 +17,7 @@
 
     <name>Hibernate Search JBoss Modules Aggregator</name>
     <description>Hibernate Search JBoss Modules Aggregator POM</description>
+    <url>http://search.hibernate.org</url>
 
     <modules>
         <module>engine</module>

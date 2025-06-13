@@ -44,3 +44,6 @@ atlassian-ide-plugin.xml
 # Maven wrapper files
 .mvn
 mvnw*
+
+# Cache folders for formatting plugins:
+.cache
