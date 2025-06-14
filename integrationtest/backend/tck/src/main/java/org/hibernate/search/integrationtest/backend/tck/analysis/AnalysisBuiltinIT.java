@@ -33,11 +33,13 @@ import org.hibernate.search.util.impl.integrationtest.common.assertion.SearchRes
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.SimpleMappedIndex;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.SingleFieldDocumentBuilder;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappingScope;
-import org.hibernate.search.util.impl.test.extension.parameterized.ParameterizedPerMethod;
-import org.hibernate.search.util.impl.test.extension.parameterized.ParameterizedSetup;
 
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestInstance;
 import org.junit.jupiter.api.extension.RegisterExtension;
+import org.junit.jupiter.params.BeforeParameterizedClassInvocation;
+import org.junit.jupiter.params.Parameter;
+import org.junit.jupiter.params.ParameterizedClass;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 
@@ -45,7 +47,9 @@ import org.junit.jupiter.params.provider.MethodSource;
  * Test indexing and searching with built-in analyzer definitions.
  * See {@link AnalyzerNames}.
  */
-@ParameterizedPerMethod
+@ParameterizedClass
+@MethodSource("params")
+@TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class AnalysisBuiltinIT {
 
 	public static List<? extends Arguments> params() {
@@ -61,16 +65,16 @@ class AnalysisBuiltinIT {
 
 	@RegisterExtension
 	public static SearchSetupHelper setupHelper = SearchSetupHelper.create();
-	private final SimpleMappedIndex<IndexBinding> index = SimpleMappedIndex.of( IndexBinding::new );
+	private static SimpleMappedIndex<IndexBinding> index = SimpleMappedIndex.of( IndexBinding::new );
 
-	private boolean hasCustomConfiguration;
+	@Parameter(0)
+	private static Function<TckBackendHelper, TckBackendSetupStrategy<?>> setupStrategyFunction;
+	@Parameter(1)
+	private static boolean hasCustomConfiguration;
 
-	@ParameterizedSetup
-	@MethodSource("params")
-	public void init(Function<TckBackendHelper, TckBackendSetupStrategy<?>> setupStrategyFunction,
-			boolean hasCustomConfiguration) {
+	@BeforeParameterizedClassInvocation
+	static void setup() {
 		setupHelper.start( setupStrategyFunction ).withIndex( index ).setup();
-		this.hasCustomConfiguration = hasCustomConfiguration;
 	}
 
 	@Test
