@@ -29,16 +29,18 @@ import org.hibernate.search.mapper.pojo.mapping.definition.annotation.KeywordFie
 import org.hibernate.search.util.impl.integrationtest.common.extension.BackendMock;
 import org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmSetupHelper;
 import org.hibernate.search.util.impl.test.annotation.TestForIssue;
-import org.hibernate.search.util.impl.test.extension.parameterized.ParameterizedPerMethod;
-import org.hibernate.search.util.impl.test.extension.parameterized.ParameterizedSetup;
-import org.hibernate.search.util.impl.test.extension.parameterized.ParameterizedSetupBeforeTest;
 
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
+import org.junit.jupiter.params.BeforeParameterizedClassInvocation;
+import org.junit.jupiter.params.Parameter;
+import org.junit.jupiter.params.ParameterizedClass;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 
-@ParameterizedPerMethod
+@ParameterizedClass
+@MethodSource("params")
 class MassIndexingConditionalExpressionsIT {
 
 	public static List<? extends Arguments> params() {
@@ -65,11 +67,13 @@ class MassIndexingConditionalExpressionsIT {
 
 	@RegisterExtension
 	public static OrmSetupHelper ormSetupHelper = OrmSetupHelper.withBackendMock( backendMock );
-	private SessionFactory sessionFactory;
+	private static SessionFactory sessionFactory;
 
-	@ParameterizedSetup
-	@MethodSource("params")
-	void setup(boolean jpaCompliance) {
+	@Parameter(0)
+	private static boolean jpaCompliance;
+
+	@BeforeParameterizedClassInvocation
+	static void setup() {
 		backendMock.expectAnySchema( H0_Indexed.NAME );
 		backendMock.expectAnySchema( H1_B_Indexed.NAME );
 		backendMock.expectAnySchema( H2_Root_Indexed.NAME );
@@ -91,7 +95,7 @@ class MassIndexingConditionalExpressionsIT {
 				).setup();
 	}
 
-	@ParameterizedSetupBeforeTest
+	@BeforeEach
 	void initData() {
 		with( sessionFactory ).runInTransaction( session -> {
 			session.persist( new H0_Indexed( 1, INSTANT_0, INT_0 ) );

@@ -92,6 +92,18 @@ public abstract class MappingSetupHelper<C extends MappingSetupHelper<C, B, BC, 
 		init( currentScope() );
 	}
 
+	@Override
+	protected void actualAfterClassTemplateInvocation(ExtensionContext context) throws Exception {
+		configurationProvider.afterClassTemplateInvocation( context );
+		cleanUp( ExtensionScope.PARAMETERIZED_CLASS_SETUP );
+	}
+
+	@Override
+	protected void actualBeforeClassTemplateInvocation(ExtensionContext context) throws Exception {
+		configurationProvider.beforeClassTemplateInvocation( context );
+		init( currentScope() );
+	}
+
 	private void cleanUp(ExtensionScope scope) throws Exception {
 		try ( Closer<Exception> closer = new Closer<>() ) {
 			// Make sure to close the last-created resource first,

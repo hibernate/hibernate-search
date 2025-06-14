@@ -17,11 +17,10 @@ import org.hibernate.search.mapper.orm.cfg.HibernateOrmMapperSettings;
 import org.hibernate.search.util.impl.integrationtest.common.extension.BackendMock;
 import org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmSetupHelper;
 import org.hibernate.search.util.impl.test.annotation.TestForIssue;
-import org.hibernate.search.util.impl.test.extension.parameterized.ParameterizedPerClass;
-import org.hibernate.search.util.impl.test.extension.parameterized.ParameterizedSetup;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
+import org.junit.jupiter.params.ParameterizedClass;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 
@@ -29,7 +28,8 @@ import org.junit.jupiter.params.provider.MethodSource;
  * Test fetch size of entity loading when executing a search query
  * when only a single type is involved.
  */
-@ParameterizedPerClass
+@ParameterizedClass
+@MethodSource("params")
 class SearchQueryEntityLoadingFetchSizeIT<T> extends AbstractSearchQueryEntityLoadingSingleTypeIT<T> {
 
 	public static List<? extends Arguments> params() {
@@ -70,9 +70,7 @@ class SearchQueryEntityLoadingFetchSizeIT<T> extends AbstractSearchQueryEntityLo
 		return mapping;
 	}
 
-	@ParameterizedSetup
-	@MethodSource("params")
-	void setUp(SingleTypeLoadingModel<T> model, SingleTypeLoadingMapping mapping) {
+	SearchQueryEntityLoadingFetchSizeIT(SingleTypeLoadingModel<T> model, SingleTypeLoadingMapping mapping) {
 		this.model = model;
 		this.mapping = mapping;
 	}

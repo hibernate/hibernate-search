@@ -40,16 +40,16 @@ import org.hibernate.search.util.common.impl.CollectionHelper;
 import org.hibernate.search.util.impl.integrationtest.common.extension.BackendMock;
 import org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmSetupHelper;
 import org.hibernate.search.util.impl.test.annotation.TestForIssue;
-import org.hibernate.search.util.impl.test.extension.parameterized.ParameterizedPerClass;
-import org.hibernate.search.util.impl.test.extension.parameterized.ParameterizedSetup;
 
 import org.hibernate.testing.bytecode.enhancement.extension.BytecodeEnhanced;
 
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestInstance;
 import org.junit.jupiter.api.extension.RegisterExtension;
 
 @BytecodeEnhanced
-@ParameterizedPerClass
+@TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class BytecodeEnhancementIT {
 
 	@RegisterExtension
@@ -57,10 +57,11 @@ class BytecodeEnhancementIT {
 
 	@RegisterExtension
 	public static OrmSetupHelper ormSetupHelper = OrmSetupHelper.withBackendMock( backendMock );
-	private SessionFactory sessionFactory;
+	private static SessionFactory sessionFactory;
 
-	@ParameterizedSetup
-	void setup() {
+
+	@BeforeAll
+	static void setup() {
 		backendMock.expectSchema( IndexedEntity.INDEX, b -> b
 				.field( "mappedSuperClassText", String.class )
 				.field( "entitySuperClassText", String.class )

@@ -122,6 +122,12 @@ public class SearchSetupHelper extends AbstractScopeTrackingExtension implements
 	}
 
 	@Override
+	protected void actualAfterClassTemplateInvocation(ExtensionContext context) throws Exception {
+		//		configurationProvider.afterClassTemplateInvocation( context );
+		//		cleanUp();
+	}
+
+	@Override
 	protected void actualBeforeAll(ExtensionContext context) {
 		if ( !runningInNestedContext( context ) ) {
 			configurationProvider.beforeAll( context );
@@ -133,6 +139,12 @@ public class SearchSetupHelper extends AbstractScopeTrackingExtension implements
 	protected void actualBeforeEach(ExtensionContext context) {
 		configurationProvider.beforeEach( context );
 		scopeContexts.put( ExtensionScope.TEST, new Context() );
+	}
+
+	@Override
+	protected void actualBeforeClassTemplateInvocation(ExtensionContext context) throws Exception {
+		configurationProvider.beforeClassTemplateInvocation( context );
+		scopeContexts.put( ExtensionScope.PARAMETERIZED_CLASS_SETUP, new Context() );
 	}
 
 	@Override

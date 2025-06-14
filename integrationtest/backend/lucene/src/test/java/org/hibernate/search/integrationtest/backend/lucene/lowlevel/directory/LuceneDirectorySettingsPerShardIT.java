@@ -7,11 +7,15 @@ package org.hibernate.search.integrationtest.backend.lucene.lowlevel.directory;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import java.nio.file.Path;
+import java.util.List;
+import java.util.function.Function;
 
 import org.hibernate.search.backend.lucene.index.impl.LuceneIndexManagerImpl;
 import org.hibernate.search.backend.lucene.index.impl.Shard;
 import org.hibernate.search.backend.lucene.lowlevel.index.impl.IndexAccessorImpl;
 import org.hibernate.search.integrationtest.backend.lucene.sharding.AbstractSettingsPerShardIT;
+import org.hibernate.search.integrationtest.backend.tck.testsupport.util.TckBackendHelper;
+import org.hibernate.search.integrationtest.backend.tck.testsupport.util.TckBackendSetupStrategy;
 import org.hibernate.search.util.impl.test.annotation.TestForIssue;
 
 import org.junit.jupiter.api.Test;
@@ -28,6 +32,12 @@ class LuceneDirectorySettingsPerShardIT extends AbstractSettingsPerShardIT {
 
 	@TempDir
 	public Path anotherTemporaryFolder;
+
+	public LuceneDirectorySettingsPerShardIT(String strategy,
+			Function<TckBackendHelper, TckBackendSetupStrategy<?>> setupStrategyFunction,
+			List<String> shardIds) {
+		super( strategy, setupStrategyFunction, shardIds );
+	}
 
 	@Test
 	void test() {

@@ -33,17 +33,17 @@ import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMapping;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappingScope;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubSession;
 import org.hibernate.search.util.impl.test.annotation.TestForIssue;
-import org.hibernate.search.util.impl.test.extension.parameterized.ParameterizedPerClass;
-import org.hibernate.search.util.impl.test.extension.parameterized.ParameterizedSetup;
-import org.hibernate.search.util.impl.test.extension.parameterized.ParameterizedSetupBeforeTest;
 
 import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
+import org.junit.jupiter.params.ParameterizedClass;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 
-@ParameterizedPerClass
+@ParameterizedClass
+@MethodSource("params")
 class MultiTenancyBaseIT {
 
 	private static final String DOCUMENT_ID_1 = "1";
@@ -94,14 +94,12 @@ class MultiTenancyBaseIT {
 				.setup();
 	}
 
-	@ParameterizedSetup
-	@MethodSource("params")
-	void setup(Object tenant1, Object tenant2) {
+	MultiTenancyBaseIT(Object tenant1, Object tenant2) {
 		this.tenant1 = tenant1;
 		this.tenant2 = tenant2;
 	}
 
-	@ParameterizedSetupBeforeTest
+	@BeforeEach
 	void setup() {
 		tenant1SessionContext = mapping.session( tenant1 );
 		tenant2SessionContext = mapping.session( tenant2 );
